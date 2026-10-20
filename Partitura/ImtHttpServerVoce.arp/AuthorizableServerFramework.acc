@@ -327,6 +327,7 @@
         <Component ExportedId="CachedUserCollection" ComponentId="PumaClientEngine/CachedUserCollection"/>
         <Component ExportedId="ConnectionSubscriber" ComponentId="PumaClientEngine/ConnectionSubscriber"/>
         <Component ExportedId="FeatureContainer" ComponentId="IdentifiableProductInfo"/>
+        <Component ExportedId="ExternalLoginCallbackHandler" ComponentId="PumaClientEngine/RemoteAuthorizationController"/>
         <Component ExportedId="GroupRemoteRepository" ComponentId="PumaClientEngine/GroupRemoteRepository"/>
         <Component ExportedId="HttpServerFramework" ComponentId="HttpServerFramework"/>
         <Component ExportedId="PumaGQLClientEngine" ComponentId="PumaClientEngine"/>

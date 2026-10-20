@@ -7,6 +7,7 @@ import imtauthgui 1.0
 import imtauthProfileSdl 1.0
 import imtauthTenantMembershipsSdl 1.0
 import imtauthPersonalAccessTokensSdl 1.0
+import imtauthAuthorizationSdl 1.0
 import imtbaseImtCollectionSdl 1.0
 
 /**
@@ -69,6 +70,10 @@ QtObject {
 	signal tokenCreated(string token)
 	signal tokenDeleted(string message)
 	signal tokenRevoked(string message)
+
+	signal linkedAccountsReceived(var accounts, bool hasPassword)
+	signal accountUnlinked(string providerId)
+	signal linkedAccountOperationFailed(string message)
 
 	signal profileOperationFailed(string message)
 	signal organizationOperationFailed(string message)
@@ -404,5 +409,77 @@ QtObject {
 	function revokeToken(tokenId) {
 		root.__inputId.m_id = tokenId
 		root.__revokeTokenRequest.send(root.__inputId)
+	}
+
+	// =========================================================================
+	// Linked external accounts
+	// =========================================================================
+
+	property GqlSdlRequestSender __getLinkedAccountsRequest: GqlSdlRequestSender {
+		permissionPath: root.permissionPath
+		gqlCommandId: ImtauthAuthorizationSdlCommandIds.s_getExternalIdentities
+		sdlObjectComp: Component {
+			ExternalIdentityList {
+				onFinished: {
+					let accounts = []
+					if (m_identities) {
+						for (let i = 0; i < m_identities.count; i++) {
+							let identity = m_identities.get(i).item
+							if (identity) {
+								accounts.push({
+									"providerId": identity.m_providerId,
+									"providerName": identity.m_providerName,
+									"providerType": identity.m_providerType,
+									"email": identity.m_email,
+									"linkedAt": identity.m_linkedAt,
+									"lastSignInAt": identity.m_lastSignInAt
+								})
+							}
+						}
+					}
+
+					root.linkedAccountsReceived(accounts, m_hasPassword === true)
+				}
+			}
+		}
+
+		function createQueryParams(query) {
+		}
+
+		function onError(message, type) {
+			root.linkedAccountOperationFailed(message)
+		}
+	}
+
+	property UnlinkExternalIdentityInput __unlinkAccountInput: UnlinkExternalIdentityInput {}
+	property GqlSdlRequestSender __unlinkAccountRequest: GqlSdlRequestSender {
+		permissionPath: root.permissionPath
+		gqlCommandId: ImtauthAuthorizationSdlCommandIds.s_unlinkExternalIdentity
+		requestType: 1
+		sdlObjectComp: Component {
+			UnlinkExternalIdentityPayload {
+				onFinished: {
+					if (m_ok) {
+						root.accountUnlinked(root.__unlinkAccountInput.m_providerId)
+						root.getLinkedAccounts()
+					} else {
+						root.linkedAccountOperationFailed(m_message)
+					}
+				}
+			}
+		}
+
+		function onError(message, type) {
+			root.linkedAccountOperationFailed(message)
+		}
+	}
+
+	function getLinkedAccounts() {
+		root.__getLinkedAccountsRequest.send()
+	}
+
+	function unlinkAccount(providerId) {
+		root.__unlinkAccountInput.m_providerId = providerId
+		root.__unlinkAccountRequest.send(root.__unlinkAccountInput)
 	}
 }

@@ -43,6 +43,7 @@
 #include <imtauthgql/CPermissionsProviderComp.h>
 #include <imtauthgql/CPersonalAccessTokenControllerComp.h>
 #include <imtauthgql/CClientRequestPersonalAccessTokenManagerComp.h>
+#include <imtauthgql/CExternalLoginCallbackServletComp.h>
 #include <imtauthgql/CTenantCollectionControllerComp.h>
 #include <imtauthgql/CTenantMetaInfoDelegateComp.h>
 #include <imtauthgql/CTenantCollectionDocumentServiceComp.h>
@@ -112,6 +113,7 @@ typedef imtauthgql::CTokenBasedPermissionsProviderComp ClientRequestTokenBasedPe
 typedef imtauthgql::CPermissionsProviderComp PermissionsProvider;
 typedef imtauthgql::CPersonalAccessTokenControllerComp PersonalAccessTokenController;
 typedef icomp::TModelCompWrap<imtauthgql::CClientRequestPersonalAccessTokenManagerComp> ClientRequestPersonalAccessTokenManager;
+typedef imtauthgql::CExternalLoginCallbackServletComp ExternalLoginCallbackServlet;
 typedef imtauthgql::CTenantCollectionControllerComp TenantCollectionController;
 typedef imtauthgql::CTenantMetaInfoDelegateComp TenantMetaInfoDelegate;
 typedef imtauthgql::CTenantCollectionDocumentServiceComp TenantCollectionDocumentService;

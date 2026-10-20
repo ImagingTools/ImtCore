@@ -34,6 +34,8 @@ ProfileGeneralPage 1.0 ProfileGeneralPage.qml
 ProfileOrganizationsPage 1.0 ProfileOrganizationsPage.qml
 ProfileTokensPage 1.0 ProfileTokensPage.qml
 ProfileAccessPage 1.0 ProfileAccessPage.qml
+ProfileLinkedAccountsPage 1.0 ProfileLinkedAccountsPage.qml
+ExternalLoginButton 1.0 ExternalLoginButton.qml
 ProfileNoticeBanner 1.0 ProfileNoticeBanner.qml
 RoleCollectionView 1.0 RoleCollectionView.qml
 UserCollectionView 1.0 UserCollectionView.qml

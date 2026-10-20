@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="6390" Description="ACF"/>
+            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description>Settings of the sign-in with Google, Apple, Facebook and OpenID Connect accounts</Description>
+    <Keywords>OIDC OAuth Google Apple Facebook</Keywords>
+    <ElementsList>
+        <Element Id="AppleClientIdParam" PackageId="BasePck" ComponentId="TextParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="AppleClientSecretParam" PackageId="BasePck" ComponentId="TextParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="CallbackUrlParam" PackageId="BasePck" ComponentId="TextParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="ExternalLoginParams" PackageId="BasePck" ComponentId="ComposedParamsSet">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Parameters" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>CallbackUrlParam</Value>
+                                <Value>GoogleClientIdParam</Value>
+                                <Value>GoogleClientSecretParam</Value>
+                                <Value>AppleClientIdParam</Value>
+                                <Value>AppleClientSecretParam</Value>
+                                <Value>FacebookClientIdParam</Value>
+                                <Value>FacebookClientSecretParam</Value>
+                                <Value>OidcProviderNameParam</Value>
+                                <Value>OidcAuthorizationEndpointParam</Value>
+                                <Value>OidcTokenEndpointParam</Value>
+                                <Value>OidcUserInfoEndpointParam</Value>
+                                <Value>OidcIssuerParam</Value>
+                                <Value>OidcClientIdParam</Value>
+                                <Value>OidcClientSecretParam</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParametersDescription" Type="Text[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Public URL of the sign-in callback, registered at the providers as redirect URI</Value>
+                                <Value></Value>
+                                <Value></Value>
+                                <Value>Services ID</Value>
+                                <Value>Client secret JWT signed with the Sign in with Apple key</Value>
+                                <Value></Value>
+                                <Value></Value>
+                                <Value>Name shown on the sign-in button</Value>
+                                <Value></Value>
+                                <Value></Value>
+                                <Value>Optional, the claims of the ID token are used without it</Value>
+                                <Value>Expected 'iss' claim of the ID token</Value>
+                                <Value></Value>
+                                <Value></Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParametersId" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>CallbackUrl</Value>
+                                <Value>GoogleClientId</Value>
+                                <Value>GoogleClientSecret</Value>
+                                <Value>AppleClientId</Value>
+                                <Value>AppleClientSecret</Value>
+                                <Value>FacebookClientId</Value>
+                                <Value>FacebookClientSecret</Value>
+                                <Value>OidcProviderName</Value>
+                                <Value>OidcAuthorizationEndpoint</Value>
+                                <Value>OidcTokenEndpoint</Value>
+                                <Value>OidcUserInfoEndpoint</Value>
+                                <Value>OidcIssuer</Value>
+                                <Value>OidcClientId</Value>
+                                <Value>OidcClientSecret</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParametersName" Type="Text[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Callback URL</Value>
+                                <Value>Google Client ID</Value>
+                                <Value>Google Client Secret</Value>
+                                <Value>Apple Client ID</Value>
+                                <Value>Apple Client Secret</Value>
+                                <Value>Facebook App ID</Value>
+                                <Value>Facebook App Secret</Value>
+                                <Value>OpenID Connect Provider Name</Value>
+                                <Value>OpenID Connect Authorization Endpoint</Value>
+                                <Value>OpenID Connect Token Endpoint</Value>
+                                <Value>OpenID Connect User Info Endpoint</Value>
+                                <Value>OpenID Connect Issuer</Value>
+                                <Value>OpenID Connect Client ID</Value>
+                                <Value>OpenID Connect Client Secret</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Default"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="FacebookClientIdParam" PackageId="BasePck" ComponentId="TextParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="FacebookClientSecretParam" PackageId="BasePck" ComponentId="TextParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="GoogleClientIdParam" PackageId="BasePck" ComponentId="TextParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="GoogleClientSecretParam" PackageId="BasePck" ComponentId="TextParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="OidcAuthorizationEndpointParam" PackageId="BasePck" ComponentId="TextParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="OidcClientIdParam" PackageId="BasePck" ComponentId="TextParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="OidcClientSecretParam" PackageId="BasePck" ComponentId="TextParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="OidcIssuerParam" PackageId="BasePck" ComponentId="TextParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="OidcProviderNameParam" PackageId="BasePck" ComponentId="TextParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="OidcTokenEndpointParam" PackageId="BasePck" ComponentId="TextParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="OidcUserInfoEndpointParam" PackageId="BasePck" ComponentId="TextParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imod::IModel" ComponentId="ExternalLoginParams"/>
+        <Interface InterfaceId="iprm::IParamsSet" ComponentId="ExternalLoginParams"/>
+        <Interface InterfaceId="iser::ISerializable" ComponentId="ExternalLoginParams"/>
+        <Interface InterfaceId="istd::IChangeable" ComponentId="ExternalLoginParams"/>
+    </ExportedInterfaces>
+    <ExportedComponents>
+        <Component ExportedId="AppleClientIdParam" ComponentId="AppleClientIdParam"/>
+        <Component ExportedId="AppleClientSecretParam" ComponentId="AppleClientSecretParam"/>
+        <Component ExportedId="CallbackUrlParam" ComponentId="CallbackUrlParam"/>
+        <Component ExportedId="FacebookClientIdParam" ComponentId="FacebookClientIdParam"/>
+        <Component ExportedId="FacebookClientSecretParam" ComponentId="FacebookClientSecretParam"/>
+        <Component ExportedId="GoogleClientIdParam" ComponentId="GoogleClientIdParam"/>
+        <Component ExportedId="GoogleClientSecretParam" ComponentId="GoogleClientSecretParam"/>
+        <Component ExportedId="OidcAuthorizationEndpointParam" ComponentId="OidcAuthorizationEndpointParam"/>
+        <Component ExportedId="OidcClientIdParam" ComponentId="OidcClientIdParam"/>
+        <Component ExportedId="OidcClientSecretParam" ComponentId="OidcClientSecretParam"/>
+        <Component ExportedId="OidcIssuerParam" ComponentId="OidcIssuerParam"/>
+        <Component ExportedId="OidcProviderNameParam" ComponentId="OidcProviderNameParam"/>
+        <Component ExportedId="OidcTokenEndpointParam" ComponentId="OidcTokenEndpointParam"/>
+        <Component ExportedId="OidcUserInfoEndpointParam" ComponentId="OidcUserInfoEndpointParam"/>
+    </ExportedComponents>
+</Acf>

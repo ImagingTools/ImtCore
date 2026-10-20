@@ -35,12 +35,84 @@ type PermissionList {
 	permissions: [ID]!
 }
 
+type ExternalLoginProvider {
+	id: ID!
+	name: String!
+	providerType: ID!
+}
+
+type ExternalLoginProviderList {
+	providers: [ExternalLoginProvider]!
+}
+
+input BeginExternalLoginInput {
+	providerId: ID!
+	productId: ID
+	link: Boolean
+}
+
+type BeginExternalLoginPayload {
+	loginId: ID
+	authorizationUrl: String
+	message: String
+}
+
+input ExternalLoginInput {
+	loginId: ID!
+}
+
+type ExternalLoginPayload {
+	status: ID!
+	message: String
+	authorization: AuthorizationPayload
+}
+
+input ExternalLoginCallbackInput {
+	state: ID!
+	code: String
+	error: String
+}
+
+type ExternalLoginCallbackPayload {
+	ok: Boolean!
+	message: String
+}
+
+type ExternalIdentity {
+	providerId: ID!
+	providerName: String
+	providerType: ID
+	email: String
+	linkedAt: String
+	lastSignInAt: String
+}
+
+type ExternalIdentityList {
+	identities: [ExternalIdentity]!
+	hasPassword: Boolean
+}
+
+input UnlinkExternalIdentityInput {
+	providerId: ID!
+}
+
+type UnlinkExternalIdentityPayload {
+	ok: Boolean!
+	message: String
+}
+
 type Query {
 	Authorization (input: AuthorizationInput): AuthorizationPayload!
 	UserToken (input: AuthorizationInput): AuthorizationPayload!
 	GetPermissions (input: TokenInput): PermissionList!
+	GetExternalLoginProviders: ExternalLoginProviderList!
+	GetExternalIdentities: ExternalIdentityList!
 }
 
 type Mutation {
 	Logout (input: TokenInput): LogoutPayload!
+	BeginExternalLogin (input: BeginExternalLoginInput): BeginExternalLoginPayload!
+	CompleteExternalLogin (input: ExternalLoginInput): ExternalLoginPayload!
+	HandleExternalLoginCallback (input: ExternalLoginCallbackInput): ExternalLoginCallbackPayload!
+	UnlinkExternalIdentity (input: UnlinkExternalIdentityInput): UnlinkExternalIdentityPayload!
 }

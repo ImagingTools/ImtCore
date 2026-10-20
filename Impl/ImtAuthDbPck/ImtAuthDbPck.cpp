@@ -81,6 +81,11 @@ I_EXPORT_COMPONENT(
 			"Personal Access Token Database Delegate");
 
 I_EXPORT_COMPONENT(
+			ExternalIdentityDatabaseDelegate,
+			"External identity link database delegate",
+			"External Identity Database Delegate OIDC");
+
+I_EXPORT_COMPONENT(
 			TenantDatabaseDelegate,
 			"Tenant database delegate",
 			"Tenant Database Delegate");
