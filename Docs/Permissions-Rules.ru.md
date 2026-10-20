@@ -1,5 +1,7 @@
 # Правила организации Permissions в решениях на базе ImtCore и Lisa
 
+> **Язык:** Русский · [English](Permissions-Rules.en.md) · [Deutsch](Permissions-Rules.de.md)
+
 > **Назначение.** Единый свод правил: как описывать, привязывать, проверять и тестировать права доступа (permissions) в продуктах на ImtCore и Lisa.
 > **Источник.** Код `ItDevelopment`: ImtCore `442be502b9` (2026-10-15), Lisa `a598f56` (PR #28 «Full-permissions»), ProLife `d4d9a910`, Puma `e8b53c6`; файлы Partitura (`.acc`), `*Features.h` продуктов, QML и тесты. Пути ниже даны относительно `ItDevelopment/`.
 > **Состояние реализации.** Ветки `feature/permission-requirements` (ImtCore), `feature/organization-permissions-by-path` (Puma), `feature/permission-model-tests` (ProLife), `feature/permission-paths` (Lisa), 2026-10-19: права только путями, новые деревья Lisa/ProLife и организации, ревизии в каждой сущности.
