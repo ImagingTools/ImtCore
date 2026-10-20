@@ -866,8 +866,7 @@ inline void BuildPermissionGroupsFromProvider(
 					allowedPermissionsPtr,
 					QString(),
 					translationManagerPtr,
-					groupSelected,
-					false);
+					groupSelected);
 		}
 		else{
 			for (int i = 0; i < subFeatures.count(); i++){
@@ -882,8 +881,7 @@ inline void BuildPermissionGroupsFromProvider(
 							allowedPermissionsPtr,
 							QString(),
 							translationManagerPtr,
-							groupSelected,
-							false)){
+							groupSelected)){
 						hasEntries = true;
 					}
 				}

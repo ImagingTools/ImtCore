@@ -676,6 +676,7 @@ RemoteCollectionView {
 	commandsDelegateComp: Component {
 		DocCollectionViewDelegate {
 			id: tenantCommandsDelegate
+			revisionsPermissionPath: "/OrganizationManagement/Revisions"
 			collectionView: container
 
 			function createNewTenantDocument(){

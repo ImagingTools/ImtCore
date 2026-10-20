@@ -27,10 +27,10 @@ SimpleCollectionPage {
 
 	// Members use stateManager-driven model, not a data provider
 	listModel: __combinedModel
-	managePermissionIds: ["EditOrganizationMember", "InviteOrganizationMember", "ExcludeOrganizationMember", "ChangeOrganizationMemberRole"]
-	createPermissionIds: ["EditOrganizationMember"]
-	editPermissionIds: ["ChangeOrganizationMemberRole", "EditOrganizationMember"]
-	deletePermissionIds: ["ExcludeOrganizationMember", "EditOrganizationMember"]
+	managePermissionIds: ["/OrganizationManagement/Members/Edit/Invite", "/OrganizationManagement/Members/Edit/Exclude", "/OrganizationManagement/Members/Edit/ChangeRole"]
+	createPermissionIds: ["/OrganizationManagement/Members/Edit/Invite"]
+	editPermissionIds: ["/OrganizationManagement/Members/Edit/ChangeRole"]
+	deletePermissionIds: ["/OrganizationManagement/Members/Edit/Exclude"]
 
 	readonly property bool __canCreateMember: stateManager
 		? stateManager.hasAnyPermission(createPermissionIds)

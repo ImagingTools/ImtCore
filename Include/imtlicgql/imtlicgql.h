@@ -584,7 +584,12 @@ inline void CollectCatalogNodes(
 	node.subFeatureId = isRoot ? QByteArray() : nodeId;
 	node.isOptional = featureInfo.IsOptional();
 	node.hasSubFeatures = !featureInfo.GetSubFeatures().isEmpty();
-	node.requirements = featureInfo.GetRequirements();
+	for (const QByteArray& requirement : featureInfo.GetRequirements()){
+		// Requiring the own branch would hand out the siblings, so such requirements are dropped.
+		if (!imtlic::IsSameOrNestedFeaturePath(requirement, nodePath)){
+			node.requirements.append(requirement);
+		}
+	}
 	if (!parentPath.isEmpty()){
 		const QByteArray parentPath = nodePath.left(nodePath.lastIndexOf('/'));
 		const FeatureCatalogNode* parentNodePtr = nodesByPath.contains(parentPath)
@@ -625,7 +630,11 @@ inline void CollectCatalogNodes(
 	- a requirement naming a mandatory part of a feature adds the feature it
 	  belongs to, because a mandatory part comes with it;
 	- a requirement naming an optional part adds the feature and marks that part
-	  as taken.
+	  as taken;
+	- a requirement naming a group of parts adds the feature and takes every
+	  optional part inside the group.
+
+	A requirement naming the node itself, one of its ancestors or descendants is ignored.
 
 	Only the parts a product actually has speak: the requirements of an optional
 	part are followed once the product takes it, never before.
@@ -712,9 +721,6 @@ inline ProductFeatureClosure CompleteProductFeatures(
 
 				QHash<QByteArray, Detail::FeatureCatalogNode>::const_iterator requiredIter =
 						nodesByPath.constFind(requirement);
-				if (requiredIter == nodesByPath.constEnd() && !requirement.startsWith('/')){
-					requiredIter = nodesByPath.constFind(QByteArrayLiteral("/") + requirement);
-				}
 				if (requiredIter == nodesByPath.constEnd()){
 					if (!reportedRequirements.contains(requirement)){
 						reportedRequirements.insert(requirement);
@@ -726,12 +732,17 @@ inline ProductFeatureClosure CompleteProductFeatures(
 
 				const Detail::FeatureCatalogNode& requiredNode = requiredIter.value();
 				if (requiredNode.hasSubFeatures){
-					if (!reportedRequirements.contains(requirement)){
-						reportedRequirements.insert(requirement);
-						retVal.unresolvedRequirements.append(requirement);
+					// A required group stands for everything in it, optional parts included.
+					const QByteArray groupPath = requiredIter.key() + '/';
+					for (QHash<QByteArray, Detail::FeatureCatalogNode>::const_iterator nodeIter = nodesByPath.constBegin(); nodeIter != nodesByPath.constEnd(); ++nodeIter){
+						const Detail::FeatureCatalogNode& groupNode = nodeIter.value();
+						if (nodeIter.key().startsWith(groupPath)
+									&& groupNode.isOptional
+									&& !takenSubFeatureIds.value(groupNode.featureId).contains(groupNode.subFeatureId)){
+							takenSubFeatureIds[groupNode.featureId].insert(groupNode.subFeatureId);
+							pendingFeatureIds.append(groupNode.featureId);
+						}
 					}
-
-					continue;
 				}
 
 				if (!knownFeatureIds.contains(requiredNode.featureId)){

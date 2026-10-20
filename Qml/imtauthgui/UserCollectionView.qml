@@ -22,6 +22,7 @@ RemoteCollectionView {
 	property var documentManager: null;
 	
 	commandsDelegateComp: Component {DocCollectionViewDelegate {
+			revisionsPermissionPath: "/Administration/Users/Revisions";
 			collectionView: userCollectionViewContainer;
 			documentManager: userCollectionViewContainer.documentManager;
 

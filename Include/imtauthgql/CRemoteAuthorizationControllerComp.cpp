@@ -3,6 +3,10 @@
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Authorization.h>
 
 
+// ImtCore includes
+#include <imtgql/imtgql.h>
+
+
 namespace imtauthgql
 {
 
@@ -59,7 +63,10 @@ sdl::V1_0::imtauth::CAuthorizationPayload CRemoteAuthorizationControllerComp::On
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::V1_0::imtauth::CAuthorizationPayload>(gqlRequest, errorMessage);
+	sdl::V1_0::imtauth::CAuthorizationPayload payload = SendModelRequest<sdl::V1_0::imtauth::CAuthorizationPayload>(gqlRequest, errorMessage);
+	AddImpliedPermissions(gqlRequest, payload);
+
+	return payload;
 }
 
 
@@ -68,7 +75,10 @@ sdl::V1_0::imtauth::CAuthorizationPayload CRemoteAuthorizationControllerComp::On
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::V1_0::imtauth::CAuthorizationPayload>(gqlRequest, errorMessage);
+	sdl::V1_0::imtauth::CAuthorizationPayload payload = SendModelRequest<sdl::V1_0::imtauth::CAuthorizationPayload>(gqlRequest, errorMessage);
+	AddImpliedPermissions(gqlRequest, payload);
+
+	return payload;
 }
 
 
@@ -86,7 +96,33 @@ sdl::V1_0::imtauth::CPermissionList CRemoteAuthorizationControllerComp::OnGetPer
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::V1_0::imtauth::CPermissionList>(gqlRequest, errorMessage);
+	sdl::V1_0::imtauth::CPermissionList response = SendModelRequest<sdl::V1_0::imtauth::CPermissionList>(gqlRequest, errorMessage);
+
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr != nullptr && response.permissions.HasValue()){
+		QByteArrayList permissions = response.permissions->ToList();
+		permissions += imtgql::CollectImpliedPermissions(*gqlContextPtr, permissions);
+		response.permissions->FromList(permissions);
+	}
+
+	return response;
+}
+
+
+// private methods
+
+void CRemoteAuthorizationControllerComp::AddImpliedPermissions(
+			const imtgql::CGqlRequest& gqlRequest,
+			sdl::V1_0::imtauth::CAuthorizationPayload& payload) const
+{
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr == nullptr || !payload.permissions.HasValue() || payload.permissions->isEmpty()){
+		return;
+	}
+
+	QByteArrayList permissions = payload.permissions->split(';');
+	permissions += imtgql::CollectImpliedPermissions(*gqlContextPtr, permissions);
+	payload.permissions = permissions.join(';');
 }
 
 

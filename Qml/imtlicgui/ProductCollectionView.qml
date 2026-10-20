@@ -58,11 +58,11 @@ RemoteCollectionView {
 			property ProductData productData: documentModel
 			
 			gqlGetCommandId: ImtlicProductsSdlCommandIds.s_productItem;
-			getPermissionPath: "/ProductManagement/ViewProducts";
+			getPermissionPath: "/ProductManagement/View";
 			gqlUpdateCommandId: ImtlicProductsSdlCommandIds.s_productUpdate;
-			updatePermissionPath: "/ProductManagement/EditProduct/ChangeProduct";
+			updatePermissionPath: "/ProductManagement/Edit/Change";
 			gqlAddCommandId: ImtlicProductsSdlCommandIds.s_productAdd;
-			addPermissionPath: "/ProductManagement/EditProduct/AddProduct";
+			addPermissionPath: "/ProductManagement/Edit/Add";
 			
 			typeId: "Product";
 			documentName: productData ? productData.m_productName: "";

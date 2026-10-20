@@ -7,6 +7,8 @@
 
 // ImtCore includes
 #include <imtauth/imtauth.h>
+#include <imtauth/CUserInfo.h>
+#include <imtgql/CGqlContext.h>
 #include <imtlic/CFeatureInfo.h>
 #include <imtlic/CProductInfo.h>
 #include <imtlicgql/imtlicgql.h>
@@ -16,295 +18,353 @@ namespace
 {
 
 
-imtlic::IFeatureInfo::FeatureInfoPtr CreatePermission(const QByteArray& featureId, const QByteArrayList& requirements)
+typedef QHash<QByteArray, QByteArrayList> Requirements;
+
+
+const QByteArray s_viewAdministration = "/Administration/ViewAdministration";
+const QByteArray s_viewUsers = "/Administration/ViewAdministration/ViewUsers";
+const QByteArray s_viewRoles = "/Administration/ViewAdministration/ViewRoles";
+const QByteArray s_editAdministration = "/Administration/EditAdministration";
+const QByteArray s_editUser = "/Administration/EditAdministration/EditUser";
+const QByteArray s_changeUser = "/Administration/EditAdministration/EditUser/ChangeUser";
+const QByteArray s_removeUser = "/Administration/EditAdministration/EditUser/RemoveUser";
+const QByteArray s_changeRole = "/Administration/EditAdministration/EditRole/ChangeRole";
+const QByteArray s_revisionManagement = "/RevisionManagement";
+const QByteArray s_viewRevisions = "/RevisionManagement/ViewRevisions";
+const QByteArray s_exportRevision = "/RevisionManagement/ExportRevision";
+const QByteArray s_reportsViewUsers = "/Reports/ViewUsers";
+
+
+void FillFeature(imtlic::CFeatureInfo& featureInfo, const QByteArray& path, const Requirements& requirements)
+{
+	featureInfo.SetFeatureId(path.mid(path.lastIndexOf('/') + 1));
+	featureInfo.SetIsPermission(true);
+	featureInfo.SetRequirements(requirements.value(path));
+}
+
+
+imtlic::IFeatureInfo::FeatureInfoPtr CreateFeature(const QByteArray& path, const Requirements& requirements, const QByteArrayList& subPaths = QByteArrayList())
 {
 	imtlic::CFeatureInfo* featureInfoPtr = new imtlic::CFeatureInfo();
-	featureInfoPtr->SetFeatureId(featureId);
-	featureInfoPtr->SetIsPermission(true);
-	featureInfoPtr->SetRequirements(requirements);
+	FillFeature(*featureInfoPtr, path, requirements);
+
+	for (const QByteArray& subPath : subPaths){
+		featureInfoPtr->InsertSubFeature(CreateFeature(subPath, requirements));
+	}
 
 	return imtlic::IFeatureInfo::FeatureInfoPtr(featureInfoPtr);
 }
 
 
 /**
-	Product with two permission groups:
+	Product the requirements of a test are declared in:
 
-	/Administration/EditUser  -> requires /Administration/ViewUser
-	/Administration/ViewUser  -> requires /Reports/ViewBasic
-	/Reports/ViewBasic
+	/Administration
+	  ViewAdministration: ViewUsers, ViewRoles
+	  EditAdministration
+	    EditUser: ChangeUser, RemoveUser
+	    EditRole: ChangeRole
+	/RevisionManagement: ViewRevisions, ExportRevision
+	/Reports: ViewUsers
 */
-void SetupProduct(imtlic::CProductInfo& productInfo)
+void SetupProduct(imtlic::CProductInfo& productInfo, const Requirements& requirements)
 {
-	imtlic::CFeatureInfo administration;
-	administration.SetFeatureId("Administration");
-	administration.SetIsPermission(true);
-	administration.InsertSubFeature(CreatePermission("EditUser", QByteArrayList{"/Administration/ViewUser"}));
-	administration.InsertSubFeature(CreatePermission("ViewUser", QByteArrayList{"/Reports/ViewBasic"}));
+	imtlic::IFeatureInfo::FeatureInfoPtr editUserPtr = CreateFeature(s_editUser, requirements, {s_changeUser, s_removeUser});
+	imtlic::IFeatureInfo::FeatureInfoPtr editRolePtr = CreateFeature("/Administration/EditAdministration/EditRole", requirements, {s_changeRole});
+	imtlic::IFeatureInfo::FeatureInfoPtr editAdministrationPtr = CreateFeature(s_editAdministration, requirements);
+	editAdministrationPtr->InsertSubFeature(editUserPtr);
+	editAdministrationPtr->InsertSubFeature(editRolePtr);
 
-	imtlic::CFeatureInfo reports;
-	reports.SetFeatureId("Reports");
-	reports.SetIsPermission(true);
-	reports.InsertSubFeature(CreatePermission("ViewBasic", QByteArrayList()));
+	imtlic::CIdentifiableFeatureInfo administration;
+	FillFeature(administration, "/Administration", requirements);
+	administration.InsertSubFeature(CreateFeature(s_viewAdministration, requirements, {s_viewUsers, s_viewRoles}));
+	administration.InsertSubFeature(editAdministrationPtr);
 
-	productInfo.AddFeature("Administration", administration);
-	productInfo.AddFeature("Reports", reports);
+	imtlic::CIdentifiableFeatureInfo revisions;
+	FillFeature(revisions, s_revisionManagement, requirements);
+	revisions.InsertSubFeature(CreateFeature(s_viewRevisions, requirements));
+	revisions.InsertSubFeature(CreateFeature(s_exportRevision, requirements));
+
+	imtlic::CIdentifiableFeatureInfo reports;
+	FillFeature(reports, "/Reports", requirements);
+	reports.InsertSubFeature(CreateFeature(s_reportsViewUsers, requirements));
+
+	QVERIFY(productInfo.AddFeature("Administration", administration));
+	QVERIFY(productInfo.AddFeature("RevisionManagement", revisions));
+	QVERIFY(productInfo.AddFeature("Reports", reports));
+}
+
+
+QByteArrayList Sorted(QByteArrayList permissions)
+{
+	std::sort(permissions.begin(), permissions.end());
+
+	return permissions;
+}
+
+
+QByteArrayList CollectImplied(const Requirements& requirements, const QByteArrayList& permissions)
+{
+	imtlic::CProductInfo productInfo;
+	SetupProduct(productInfo, requirements);
+
+	return Sorted(imtlic::CollectImpliedPermissions(productInfo, permissions));
 }
 
 
 } // anonymous namespace
 
 
-void CPermissionRequirementsTest::testDirectRequirements()
+void CPermissionRequirementsTest::testLeafIncludesLeaf()
 {
-	imtlic::CProductInfo productInfo;
-	SetupProduct(productInfo);
+	const Requirements requirements{{s_changeUser, {s_viewUsers}}};
 
-	const QByteArrayList impliedPermissions = imtlic::CollectImpliedPermissions(
-			productInfo,
-			QByteArrayList{"/Administration/ViewUser"});
-
-	QCOMPARE(impliedPermissions, QByteArrayList{"/Reports/ViewBasic"});
+	QCOMPARE(CollectImplied(requirements, {s_changeUser}), QByteArrayList{s_viewUsers});
 }
 
 
-void CPermissionRequirementsTest::testTransitiveRequirements()
+void CPermissionRequirementsTest::testIncludedPermissionDoesNotIncludeItsSource()
 {
-	imtlic::CProductInfo productInfo;
-	SetupProduct(productInfo);
+	const Requirements requirements{{s_changeUser, {s_viewUsers}}};
 
-	const QByteArrayList impliedPermissions = imtlic::CollectImpliedPermissions(
-			productInfo,
-			QByteArrayList{"/Administration/EditUser"});
-
-	QCOMPARE(impliedPermissions.count(), 2);
-	QVERIFY(impliedPermissions.contains("/Administration/ViewUser"));
-	QVERIFY(impliedPermissions.contains("/Reports/ViewBasic"));
+	QVERIFY(CollectImplied(requirements, {s_viewUsers}).isEmpty());
 }
 
 
-void CPermissionRequirementsTest::testRequirementsOfBareFeatureId()
+void CPermissionRequirementsTest::testInclusionIsTransitive()
 {
-	imtlic::CProductInfo productInfo;
-	SetupProduct(productInfo);
+	const Requirements requirements{
+				{s_changeUser, {s_viewUsers}},
+				{s_viewUsers, {s_viewRevisions}}};
 
-	const QByteArrayList impliedPermissions = imtlic::CollectImpliedPermissions(
-			productInfo,
-			QByteArrayList{"EditUser"});
-
-	QCOMPARE(impliedPermissions.count(), 2);
-	QVERIFY(impliedPermissions.contains("/Administration/ViewUser"));
-	QVERIFY(impliedPermissions.contains("/Reports/ViewBasic"));
-}
-
-
-void CPermissionRequirementsTest::testRequirementsOfNestedFeature()
-{
-	imtlic::CProductInfo productInfo;
-
-	imtlic::IFeatureInfo::FeatureInfoPtr usersPtr = CreatePermission("Users", QByteArrayList());
-	usersPtr->InsertSubFeature(CreatePermission("EditUser", QByteArrayList{"/Administration/Users/ViewUser"}));
-	usersPtr->InsertSubFeature(CreatePermission("ViewUser", QByteArrayList()));
-
-	imtlic::CFeatureInfo administration;
-	administration.SetFeatureId("Administration");
-	administration.SetIsPermission(true);
-	administration.InsertSubFeature(usersPtr);
-
-	productInfo.AddFeature("Administration", administration);
-
-	const QByteArrayList impliedPermissions = imtlic::CollectImpliedPermissions(
-			productInfo,
-			QByteArrayList{"/Administration/Users/EditUser"});
-
-	QCOMPARE(impliedPermissions, QByteArrayList{"/Administration/Users/ViewUser"});
-}
-
-
-void CPermissionRequirementsTest::testUnknownPathIsNotResolvedByItsLastSegment()
-{
-	imtlic::CProductInfo productInfo;
-	SetupProduct(productInfo);
-
-	// "ViewUser" exists, but not under "/Reports": another branch may name its
-	// own feature the same way, and it grants requirements of its own.
-	const QByteArrayList impliedPermissions = imtlic::CollectImpliedPermissions(
-			productInfo,
-			QByteArrayList{"/Reports/ViewUser"});
-
-	QVERIFY(impliedPermissions.isEmpty());
+	QCOMPARE(CollectImplied(requirements, {s_changeUser}), Sorted({s_viewUsers, s_viewRevisions}));
 }
 
 
 void CPermissionRequirementsTest::testRequirementCycleTerminates()
 {
-	imtlic::CProductInfo productInfo;
+	const Requirements requirements{
+				{s_changeUser, {s_viewUsers}},
+				{s_viewUsers, {s_changeUser}}};
 
-	imtlic::CFeatureInfo administration;
-	administration.SetFeatureId("Administration");
-	administration.SetIsPermission(true);
-	administration.InsertSubFeature(CreatePermission("First", QByteArrayList{"/Administration/Second"}));
-	administration.InsertSubFeature(CreatePermission("Second", QByteArrayList{"/Administration/First"}));
-
-	productInfo.AddFeature("Administration", administration);
-
-	const QByteArrayList impliedPermissions = imtlic::CollectImpliedPermissions(
-			productInfo,
-			QByteArrayList{"/Administration/First"});
-
-	QCOMPARE(impliedPermissions, QByteArrayList{"/Administration/Second"});
+	QCOMPARE(CollectImplied(requirements, {s_changeUser}), QByteArrayList{s_viewUsers});
 }
 
 
-void CPermissionRequirementsTest::testParentRequirementsApplyToDescendants()
+void CPermissionRequirementsTest::testGroupRequirementAppliesToItsLeaves()
 {
-	imtlic::CProductInfo productInfo;
+	const Requirements requirements{{s_editUser, {s_viewUsers}}};
 
-	imtlic::CFeatureInfo products;
-	products.SetFeatureId("Products");
-
-	imtlic::IFeatureInfo::FeatureInfoPtr editProducts = CreatePermission(
-			"EditProducts", QByteArrayList{"/Products/ViewProducts"});
-	editProducts->InsertSubFeature(CreatePermission("AddProduct", QByteArrayList()));
-	products.InsertSubFeature(editProducts);
-
-	products.InsertSubFeature(CreatePermission("ViewProducts", QByteArrayList()));
-	productInfo.AddFeature("Products", products);
-
-	const QByteArrayList impliedPermissions = imtlic::CollectImpliedPermissions(
-			productInfo,
-			QByteArrayList{"/Products/EditProducts/AddProduct"});
-
-	QVERIFY(impliedPermissions.contains("/Products/ViewProducts"));
+	QCOMPARE(CollectImplied(requirements, {s_removeUser}), QByteArrayList{s_viewUsers});
+	QVERIFY(CollectImplied(requirements, {s_changeRole}).isEmpty());
 }
 
 
-void CPermissionRequirementsTest::testContainerCannotBeRequirementTarget()
+void CPermissionRequirementsTest::testRequiredGroupGrantsAllItsLeaves()
 {
-	imtlic::CProductInfo productInfo;
+	const Requirements requirements{{s_changeUser, {s_viewAdministration}}};
 
-	imtlic::CFeatureInfo products;
-	products.SetFeatureId("Products");
-	products.InsertSubFeature(CreatePermission("EditProducts", QByteArrayList()));
-	products.InsertSubFeature(CreatePermission("ViewProducts", QByteArrayList()));
-	productInfo.AddFeature("Products", products);
-
-	imtlic::CFeatureInfo other;
-	other.SetFeatureId("Other");
-	other.InsertSubFeature(CreatePermission("UseProducts", QByteArrayList{"/Products/EditProducts"}));
-	productInfo.AddFeature("Other", other);
-
-	const QByteArrayList impliedPermissions = imtlic::CollectImpliedPermissions(
-			productInfo,
-			QByteArrayList{"/Other/UseProducts"});
-
-	QVERIFY(impliedPermissions.isEmpty());
+	QCOMPARE(CollectImplied(requirements, {s_changeUser}), Sorted({s_viewUsers, s_viewRoles}));
+	QVERIFY(CollectImplied(requirements, {s_viewRoles}).isEmpty());
 }
 
 
-void CPermissionRequirementsTest::testUnknownPermission()
+void CPermissionRequirementsTest::testGroupRequiringGroup()
 {
-	imtlic::CProductInfo productInfo;
-	SetupProduct(productInfo);
+	const Requirements requirements{{s_editAdministration, {s_viewAdministration}}};
 
-	const QByteArrayList impliedPermissions = imtlic::CollectImpliedPermissions(
-			productInfo,
-			QByteArrayList{"/Administration/NoSuchPermission"});
+	QCOMPARE(CollectImplied(requirements, {s_changeRole}), Sorted({s_viewUsers, s_viewRoles}));
+	QVERIFY(CollectImplied(requirements, {s_viewUsers}).isEmpty());
+}
 
-	QVERIFY(impliedPermissions.isEmpty());
+
+void CPermissionRequirementsTest::testIncludedLeafBringsRequirementsOfItsGroup()
+{
+	const Requirements requirements{
+				{s_editAdministration, {s_viewAdministration}},
+				{s_viewAdministration, {s_viewRevisions}}};
+
+	QCOMPARE(CollectImplied(requirements, {s_changeUser}), Sorted({s_viewUsers, s_viewRoles, s_viewRevisions}));
+}
+
+
+void CPermissionRequirementsTest::testRequirementOnOwnBranchIsIgnored()
+{
+	const Requirements requirements{
+				{s_changeUser, {s_changeUser, s_editUser, "/Administration"}},
+				{s_editUser, {s_changeUser}},
+				{s_editAdministration, {s_editUser}}};
+
+	QVERIFY(CollectImplied(requirements, {s_changeUser}).isEmpty());
+	QVERIFY(CollectImplied(requirements, {s_removeUser}).isEmpty());
+	QVERIFY(CollectImplied(requirements, {s_changeRole}).isEmpty());
+}
+
+
+void CPermissionRequirementsTest::testUnknownRequirementTargetIsIgnored()
+{
+	const Requirements requirements{{s_changeUser, {"/Administration/NoSuchPermission", "ViewUsers"}}};
+
+	QVERIFY(CollectImplied(requirements, {s_changeUser}).isEmpty());
+}
+
+
+void CPermissionRequirementsTest::testUnknownPathIsNotResolvedByItsLastSegment()
+{
+	const Requirements requirements{{s_changeUser, {s_viewUsers}}};
+
+	// "ChangeUser" exists, but not under "/Other": a path says which parent it belongs to.
+	QVERIFY(CollectImplied(requirements, {"/Other/ChangeUser"}).isEmpty());
 }
 
 
 void CPermissionRequirementsTest::testNoPermissions()
 {
-	imtlic::CProductInfo productInfo;
-	SetupProduct(productInfo);
+	const Requirements requirements{{s_changeUser, {s_viewUsers}}};
 
-	const QByteArrayList impliedPermissions = imtlic::CollectImpliedPermissions(productInfo, QByteArrayList());
-
-	QVERIFY(impliedPermissions.isEmpty());
+	QVERIFY(CollectImplied(requirements, QByteArrayList()).isEmpty());
 }
 
 
-void CPermissionRequirementsTest::testBareFeatureIdCollectsRequirementsOfEveryFeatureCarryingIt()
+void CPermissionRequirementsTest::testProductTakesRequiredGroup()
+{
+	imtlic::CProductInfo catalog;
+	SetupProduct(catalog, {
+				{s_changeUser, {s_revisionManagement, "/Administration"}},
+				{s_reportsViewUsers, {s_viewUsers}}});
+
+	// Export is an optional part of the revisions feature.
+	imtlic::CFeatureInfo* exportRevisionPtr = new imtlic::CFeatureInfo();
+	FillFeature(*exportRevisionPtr, s_exportRevision, Requirements());
+	exportRevisionPtr->SetOptional(true);
+
+	imtlic::CIdentifiableFeatureInfo revisions;
+	FillFeature(revisions, s_revisionManagement, Requirements());
+	revisions.InsertSubFeature(CreateFeature(s_viewRevisions, Requirements()));
+	revisions.InsertSubFeature(imtlic::IFeatureInfo::FeatureInfoPtr(exportRevisionPtr));
+
+	imtbase::IObjectCollection* catalogPtr = catalog.GetFeatures();
+	QVERIFY(catalogPtr->SetObjectData("RevisionManagement", revisions));
+
+	const imtlicgql::ProductFeatureClosure closure = imtlicgql::CompleteProductFeatures(
+				*catalogPtr,
+				{"Administration"},
+				imtlic::IProductInfo::OptionalFeatureInfos());
+
+	QCOMPARE(closure.featureIds, QByteArrayList({"Administration", "RevisionManagement"}));
+	QVERIFY(closure.unresolvedRequirements.isEmpty());
+	QCOMPARE(closure.optionalFeatures.count(), 1);
+	QCOMPARE(closure.optionalFeatures.first().featureId, QByteArrayLiteral("RevisionManagement"));
+	QCOMPARE(closure.optionalFeatures.first().subFeatureIds, QByteArrayList{"ExportRevision"});
+}
+
+
+void CPermissionRequirementsTest::testImpliedPermissionsAreLimitedByTenant()
 {
 	imtlic::CProductInfo productInfo;
+	SetupProduct(productInfo, {{s_changeUser, {s_viewAdministration}}});
 
-	imtlic::CFeatureInfo documents;
-	documents.SetFeatureId("Documents");
-	documents.SetIsPermission(true);
-	documents.InsertSubFeature(CreatePermission("Edit", QByteArrayList{"/Documents/View"}));
-	documents.InsertSubFeature(CreatePermission("View", QByteArrayList()));
+	imtauth::CUserInfo userInfo;
+	userInfo.SetLocalPermissions("Lisa", {s_changeUser});
 
-	imtlic::CFeatureInfo users;
-	users.SetFeatureId("Users");
-	users.SetIsPermission(true);
-	users.InsertSubFeature(CreatePermission("Edit", QByteArrayList{"/Users/View"}));
-	users.InsertSubFeature(CreatePermission("View", QByteArrayList()));
+	imtgql::CGqlContext gqlContext;
+	gqlContext.SetProductId("Lisa");
+	gqlContext.SetProductInfo(&productInfo);
+	gqlContext.SetUserInfo(&userInfo);
+	QCOMPARE(Sorted(gqlContext.GetImpliedPermissions()), Sorted({s_viewUsers, s_viewRoles}));
 
-	productInfo.AddFeature("Documents", documents);
-	productInfo.AddFeature("Users", users);
-
-	// A permission stored as a bare "Edit" passes the check for both features,
-	// so it grants what both of them require.
-	const QByteArrayList impliedPermissions = imtlic::CollectImpliedPermissions(
-			productInfo,
-			QByteArrayList{"Edit"});
-
-	QCOMPARE(impliedPermissions.count(), 2);
-	QVERIFY(impliedPermissions.contains("/Documents/View"));
-	QVERIFY(impliedPermissions.contains("/Users/View"));
+	gqlContext.SetTenantPermissions({s_changeUser, s_viewUsers});
+	QCOMPARE(gqlContext.GetImpliedPermissions(), QByteArrayList{s_viewUsers});
 }
 
 
-void CPermissionRequirementsTest::testStoredFeatureIdSatisfiesPathCheck()
+void CPermissionRequirementsTest::testImpliedPermissionsComeFromProductOfRequest()
 {
-	// What an older version stored for this user.
-	const QByteArrayList userPermissions{"EditUser"};
+	imtlic::CProductInfo productInfo;
+	SetupProduct(productInfo, {{s_changeUser, {s_viewUsers}}});
 
-	QVERIFY(imtauth::HasPermission(userPermissions, QByteArrayLiteral("/Administration/EditUser")));
-	QVERIFY(imtauth::HasPermission(userPermissions, QByteArrayLiteral("EditUser")));
-	QVERIFY(!imtauth::HasPermission(userPermissions, QByteArrayLiteral("/Administration/ViewUser")));
+	imtauth::CUserInfo userInfo;
+	userInfo.SetLocalPermissions("OtherProduct", {s_changeUser});
+
+	imtgql::CGqlContext gqlContext;
+	gqlContext.SetProductId("Lisa");
+	gqlContext.SetProductInfo(&productInfo);
+	gqlContext.SetUserInfo(&userInfo);
+	QVERIFY(gqlContext.GetImpliedPermissions().isEmpty());
+
+	gqlContext.SetProductId("OtherProduct");
+	QCOMPARE(gqlContext.GetImpliedPermissions(), QByteArrayList{s_viewUsers});
 }
 
 
-void CPermissionRequirementsTest::testStoredPathSatisfiesFeatureIdCheck()
+void CPermissionRequirementsTest::testBareIdIsNeverHeld()
 {
-	const QByteArrayList userPermissions{"/Administration/EditUser"};
+	const QByteArrayList userPermissions{"ChangeUser"};
 
-	QVERIFY(imtauth::HasPermission(userPermissions, QByteArrayLiteral("EditUser")));
-	QVERIFY(imtauth::HasPermission(userPermissions, QByteArrayLiteral("/Administration/EditUser")));
+	QVERIFY(!imtauth::HasPermission(userPermissions, s_changeUser));
+	QVERIFY(!imtauth::HasPermission(userPermissions, s_editUser));
+	QVERIFY(!imtauth::HasPermission(userPermissions, QByteArrayLiteral("ChangeUser")));
+}
+
+
+void CPermissionRequirementsTest::testBareIdIsNeverRequested()
+{
+	const QByteArrayList userPermissions{s_changeUser};
+
+	QVERIFY(imtauth::HasPermission(userPermissions, s_changeUser));
+	QVERIFY(!imtauth::HasPermission(userPermissions, QByteArrayLiteral("ChangeUser")));
+	QVERIFY(!imtauth::HasPermission(userPermissions, QByteArrayLiteral("EditUser")));
+}
+
+
+void CPermissionRequirementsTest::testBareIdIncludesNothing()
+{
+	const Requirements requirements{
+				{s_viewUsers, {s_viewRevisions}},
+				{s_reportsViewUsers, {s_exportRevision}}};
+
+	QVERIFY(CollectImplied(requirements, {"ViewUsers"}).isEmpty());
+	QCOMPARE(CollectImplied(requirements, {s_viewUsers}), QByteArrayList{s_viewRevisions});
 }
 
 
 void CPermissionRequirementsTest::testSameFeatureIdUnderAnotherParentIsAnotherPermission()
 {
-	const QByteArrayList userPermissions{"/Documents/Edit"};
+	const QByteArrayList userPermissions{s_viewUsers};
 
-	QVERIFY(!imtauth::HasPermission(userPermissions, QByteArrayLiteral("/Users/Edit")));
+	QVERIFY(!imtauth::HasPermission(userPermissions, s_reportsViewUsers));
 }
 
 
 void CPermissionRequirementsTest::testDescendantPathSatisfiesParentPathCheck()
 {
-	const QByteArrayList userPermissions{"/ChangeCharacterization/AddMeasurement/AddExistingMeasurement"};
+	const QByteArrayList userPermissions{s_changeUser};
 
-	QVERIFY(imtauth::HasPermission(
-			userPermissions,
-			QByteArrayLiteral("/ChangeCharacterization/AddMeasurement")));
+	QVERIFY(imtauth::HasPermission(userPermissions, s_editUser));
+	QVERIFY(imtauth::HasPermission(userPermissions, QByteArrayLiteral("/Administration")));
+	QVERIFY(!imtauth::HasPermission(QByteArrayList{s_editUser}, s_changeUser));
 }
 
 
 void CPermissionRequirementsTest::testDescendantPathDoesNotCrossBranches()
 {
-	const QByteArrayList userPermissions{"/ChangeCharacterization/AddMeasurement/AddExistingMeasurement"};
+	const QByteArrayList userPermissions{s_changeUser};
 
-	QVERIFY(!imtauth::HasPermission(
-			userPermissions,
-			QByteArrayLiteral("/ChangeCharacterization/AddExisting")));
-	QVERIFY(!imtauth::HasPermission(
-			userPermissions,
-			QByteArrayLiteral("/Other/AddMeasurement")));
+	QVERIFY(!imtauth::HasPermission(userPermissions, s_removeUser));
+	QVERIFY(!imtauth::HasPermission(userPermissions, s_viewAdministration));
+	QVERIFY(!imtauth::HasPermission(userPermissions, QByteArrayLiteral("/Administration/EditAdministration/EditUs")));
+}
+
+
+void CPermissionRequirementsTest::testPermissionPathMustNotBeWiderThanDeclared()
+{
+	const QByteArrayList declaredPermissions{"/Devices/ViewDeviceTickets", "/Support/ViewTickets"};
+
+	QVERIFY(imtauth::IsPermissionPathDeclared(declaredPermissions, "/Devices/ViewDeviceTickets"));
+	QVERIFY(imtauth::IsPermissionPathDeclared(declaredPermissions, "/Devices/ViewDeviceTickets/Assigned"));
+	QVERIFY(!imtauth::IsPermissionPathDeclared(declaredPermissions, "/Devices"));
+	QVERIFY(!imtauth::IsPermissionPathDeclared(declaredPermissions, "/Devices/ViewDevices"));
+	QVERIFY(!imtauth::IsPermissionPathDeclared(QByteArrayList{"ViewDeviceTickets"}, "/Devices/ViewDeviceTickets"));
 }
 
 
@@ -323,3 +383,5 @@ void CPermissionRequirementsTest::testIsPermissionSurvivesCopy()
 
 
 I_ADD_TEST(CPermissionRequirementsTest);
+
+

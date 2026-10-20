@@ -88,7 +88,7 @@ public:
 	/**
 		Get additional organization-specific permissions granted directly to this membership (member within the org).
 		These control the capabilities (replacing the old EnvironmentRole concept).
-		Typically populated from the OrganizationsPermissionsProvider (e.g. EditOrganizationMember, ViewOrganizationRoles, etc.).
+		Typically populated from the OrganizationsPermissionsProvider, by full path (e.g. /OrganizationManagement/Members/Edit/Invite).
 	*/
 	virtual QByteArrayList GetOrganizationPermissions() const = 0;
 
