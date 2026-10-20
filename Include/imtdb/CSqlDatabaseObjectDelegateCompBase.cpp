@@ -182,8 +182,10 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetSelectionQuery(
 
 	// SQLite does not support a top-level parenthesized SELECT statement, so skip the
 	// Qt '%<NUMBER>%' bug workaround wrapping on SQLite — it only affects Postgres drivers.
+	// DuckDB takes the same form for another reason: the wrapping cuts the page before the sort, so the rows
+	// of a page would be whichever the scan produced first, which the planner does not keep stable between runs.
 	QString retVal;
-	if (IsSqliteDriver()){
+	if (IsSqliteDriver() || IsDuckDbDriver()){
 		retVal = baseSelelectionQuery;
 		retVal += QStringLiteral(" ") + filterQuery;
 		retVal += QStringLiteral(" ") + sortQuery;
