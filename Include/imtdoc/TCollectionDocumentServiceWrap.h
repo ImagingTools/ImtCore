@@ -429,7 +429,9 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 		if (userDocsIt != this->m_userDocuments.constEnd()){
 			const WorkingDocumentList& userDocuments = userDocsIt.value();
 			for (auto it = userDocuments.constBegin(); it != userDocuments.constEnd(); ++it){
-				if (it.value().objectId != objectId || it.value().url.path() != url.path()){
+				const QStringList openedPathParts = it.value().url.path().split('/', Qt::SkipEmptyParts);
+				const int openedRevision = openedPathParts.count() == 2 ? openedPathParts.last().toInt() : -1;
+				if (it.value().objectId != objectId || openedRevision != requestedRevision){
 					continue;
 				}
 
