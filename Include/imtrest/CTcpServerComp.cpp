@@ -217,8 +217,11 @@ bool CTcpServerComp::EnsureServerStarted()
 			SendInfoMessage(0, message);
 		}
 		else{
-			QString message = QStringLiteral("Could not enable secure connection (SSL) on Tcp server");
+			// The server that is asked to be secure must not work without the encryption: the clients would send the data as plain text
+			QString message = QStringLiteral("Could not enable secure connection (SSL) on Tcp server, the server is not started");
 			SendErrorMessage(0, message);
+
+			return false;
 		}
 	}
 	else{

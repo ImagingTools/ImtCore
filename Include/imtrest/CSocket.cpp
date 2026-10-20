@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtrest/CMultiThreadServer.h>
+#include <imtrest/CServerSslTools.h>
 #include <imtrest/CSocketTimeoutWatcher.h>
 
 // Qt includes
@@ -44,9 +45,7 @@ CSocket::CSocket(CSocketThread* rootSocket, IRequest* request, bool secureConnec
 		connect(socketPtr, SIGNAL(sslErrors(QList<QSslError>)), this, SLOT(OnHandleSslErrors(QList<QSslError>)));
 
 		Q_ASSERT_X(socketPtr != nullptr, __func__, "Invalid socket!");
-		socketPtr->setLocalCertificate(sslConfiguration.localCertificate());
-		socketPtr->setPrivateKey(sslConfiguration.privateKey());
-		socketPtr->setProtocol(sslConfiguration.protocol());
+		CServerSslTools::ApplyConfiguration(*socketPtr, sslConfiguration);
 
 		socketPtr->startServerEncryption();
 	}
