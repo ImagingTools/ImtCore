@@ -335,6 +335,10 @@ Item {
 				collectionMetaInfo.elementMetaInfo = metaInfoData
 				collectionMetaInfo.stopLoading()
 			}
+
+			function onObjectMetaInfoReceiveFailed(message){
+				collectionMetaInfo.stopLoading()
+			}
 			
 			function onHeadersReceived(headers){
 				internal.headersReceived = true

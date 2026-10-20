@@ -27,6 +27,7 @@ type GroupItemData {
 	parentGroups: ID
 	added: String
 	lastModified: String
+	usersCount: Int
 }
 
 type GroupsListPayload {

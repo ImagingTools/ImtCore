@@ -31,6 +31,7 @@
                             <Values>
                                 <Value>name</Value>
                                 <Value>description</Value>
+                                <Value>usersCount</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -39,6 +40,7 @@
                             <Values>
                                 <Value>Group Name</Value>
                                 <Value>Description</Value>
+                                <Value>Members</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

@@ -41,7 +41,11 @@ RemoteCollectionView {
 	
 	property string productId;
 	property var documentManager: null;
-	
+
+	Component.onCompleted: {
+		table.setSortingInfo(RoleItemDataTypeMetaInfo.s_roleName, "ASC");
+	}
+
 	function handleSubscription(dataModel){
 		roleCollectionViewContainer.doUpdateGui();
 	}
