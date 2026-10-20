@@ -5682,6 +5682,10 @@
         <translation>Объект был успешно импортирован</translation>
     </message>
     <message>
+        <source>No more than %1 documents can be opened at once</source>
+        <translation>Одновременно можно открыть не более %1 документов</translation>
+    </message>
+    <message>
         <location line="+107"/>
         <source>Duplicate</source>
         <translation>Дублировать</translation>

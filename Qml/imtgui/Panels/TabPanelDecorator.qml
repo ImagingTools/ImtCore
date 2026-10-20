@@ -13,7 +13,9 @@ DecoratorBase {
 
 	property bool isSelected: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.selected : false;
 	property bool isHovered: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.mouseArea
-			? tabPanelDecorator.baseElement.mouseArea.containsMouse : false;
+			? tabPanelDecorator.baseElement.mouseArea.containsMouse || tabPanelDecorator.closeHovered : false;
+	// Set from a handler, not bound: the close button's enabled state follows this hover, a binding would loop.
+	property bool closeHovered: false;
 	property bool isPinned: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.pinned : false;
 	property bool canClose: tabPanelDecorator.baseElement
 			&& !tabPanelDecorator.isPinned
@@ -46,7 +48,15 @@ DecoratorBase {
 		}
 	}
 
-	// Rounded top corners only: the second rectangle squares off the bottom ones.
+	Connections {
+		target: closeButton.mouseArea;
+
+		function onContainsMouseChanged(){
+			tabPanelDecorator.closeHovered = closeButton.mouseArea.containsMouse;
+		}
+	}
+
+	// Selected tab: the second rectangle squares off the bottom corners; not on hover, where the translucent overlap shows as a strip.
 	Rectangle {
 		id: background;
 
@@ -63,7 +73,7 @@ DecoratorBase {
 		anchors.bottom: tabPanelDecorator.bottom;
 		height: tabPanelDecorator.cornerRadius;
 		color: tabPanelDecorator.backgroundColor;
-		visible: tabPanelDecorator.showBackground;
+		visible: tabPanelDecorator.isSelected;
 	}
 
 	// Concave corners that flow the selected tab into the page below.
