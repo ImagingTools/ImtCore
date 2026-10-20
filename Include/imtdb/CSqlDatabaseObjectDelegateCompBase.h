@@ -95,6 +95,7 @@ protected:
 	/**
 		The select that GetSelectionQuery filters, sorts and pages: GetBaseSelectionQuery() by default. A delegate whose
 		selection depends on the parameters overrides it, for instance to ask for distinct rows with CreateDistinctSelectionQuery().
+		An empty select fails the selection, for parameters the select cannot be made from.
 	*/
 	virtual QString CreateBaseSelectionQuery(const iprm::IParamsSet& selectionParams) const;
 	/**

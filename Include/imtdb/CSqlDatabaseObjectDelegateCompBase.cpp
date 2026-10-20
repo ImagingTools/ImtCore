@@ -183,6 +183,9 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetSelectionQuery(
 	const QString baseSelelectionQuery = selectionParamsPtr.IsValid()
 				? CreateBaseSelectionQuery(*selectionParamsPtr)
 				: GetBaseSelectionQuery();
+	if (baseSelelectionQuery.isEmpty()){
+		return QByteArray();
+	}
 
 	// SQLite does not support a top-level parenthesized SELECT statement, so skip the
 	// Qt '%<NUMBER>%' bug workaround wrapping on SQLite — it only affects Postgres drivers.
