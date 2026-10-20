@@ -732,6 +732,58 @@ void CHttpRequestTest::TcpRequestIsPersistentTest()
 
 	QVERIFY(tcpRequest.IsConnectionPersistent());
 	QVERIFY(!tcpRequest.IsResponseBodyOmitted());
+
+	// The HTTP framing of a response does not exist for the messages of the channel
+	QVERIFY(!tcpRequest.IsChunkedResponseAllowed());
+}
+
+
+void CHttpRequestTest::ChunkedResponseAllowedTest_data()
+{
+	QTest::addColumn<QByteArray>("request");
+	QTest::addColumn<bool>("isAllowed");
+
+	// RFC 9112, section 6.1: Transfer-Encoding is sent only to a client of HTTP/1.1 or later
+	QTest::newRow("HTTP/1.1") << QByteArray("GET / HTTP/1.1\r\nHost: a\r\n\r\n") << true;
+	QTest::newRow("HTTP/1.1 close") << QByteArray("GET / HTTP/1.1\r\nConnection: close\r\n\r\n") << true;
+	QTest::newRow("HTTP/1.1 POST") << QByteArray("POST / HTTP/1.1\r\nContent-Length: 2\r\n\r\nhi") << true;
+	QTest::newRow("HTTP/1.1 HEAD") << QByteArray("HEAD / HTTP/1.1\r\n\r\n") << true;
+	QTest::newRow("HTTP/1.0") << QByteArray("GET / HTTP/1.0\r\n\r\n") << false;
+	QTest::newRow("HTTP/1.0 keep-alive") << QByteArray("GET / HTTP/1.0\r\nConnection: keep-alive\r\n\r\n") << false;
+}
+
+
+void CHttpRequestTest::ChunkedResponseAllowedTest()
+{
+	QFETCH(QByteArray, request);
+	QFETCH(bool, isAllowed);
+
+	CRequestServletStub servlet;
+	CProtocolEngineStub engine;
+	imtrest::CHttpRequest httpRequest(servlet, engine);
+
+	QVERIFY(httpRequest.ExecuteHttpParser(request, nullptr));
+	QCOMPARE(httpRequest.GetState(), imtrest::IRequest::RS_MESSAGE_COMPLETE);
+
+	QCOMPARE(httpRequest.IsChunkedResponseAllowed(), isAllowed);
+}
+
+
+void CHttpRequestTest::ChunkedResponseAllowedSplitTest()
+{
+	const QByteArray request("GET / HTTP/1.1\r\nHost: a\r\n\r\n");
+
+	// The version is known when the head is received, whatever the splitting of the reads is
+	for (qsizetype position = 1; position < request.size(); ++position){
+		CRequestServletStub servlet;
+		CProtocolEngineStub engine;
+		imtrest::CHttpRequest httpRequest(servlet, engine);
+
+		QVERIFY(httpRequest.ExecuteHttpParser(request.left(position), nullptr));
+		QVERIFY(httpRequest.ExecuteHttpParser(request.mid(position), nullptr));
+
+		QVERIFY2(httpRequest.IsChunkedResponseAllowed(), qPrintable(QString::number(position)));
+	}
 }
 
 

@@ -87,6 +87,19 @@ private slots:
 	void RefusalWithMessageIsAbortedAfterLingeringTest();
 	void RefusalWithEmptyMessageAbortsConnectionTest();
 	void RefusalWithMessageIsSentOnceTest();
+
+	// Response whose body is written by parts
+	void StreamingResponseHeadIsWrittenTest();
+	void StreamingResponseIsNotCompleteBeforeEndTest();
+	void EndOfStreamingResponseCompletesResponseTest();
+	void StreamingResponseOfLargeBodyIsDeliveredTest();
+	void StreamingResponseIsRefusedWhileClosingTest();
+	void StreamingDataWithoutBeginIsIgnoredTest();
+	void EndWithoutBeginIsIgnoredTest();
+	void StreamingResponseClosesConnectionAfterEndTest();
+	void StalledStreamingResponseIsAbortedTest();
+	void ProgressKeepsStreamingResponseAliveTest();
+	void NextRequestAfterStreamingResponseTest();
 };
 
 

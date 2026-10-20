@@ -86,6 +86,12 @@ public:
 	virtual bool IsResponseBodyOmitted() const = 0;
 
 	/**
+		Returns \c true if the response can be sent with \c Transfer-Encoding: \c chunked, so its length is not needed before it is
+		sent. It is allowed only for a client of \c HTTP/1.1 and later (RFC 9112, section 6.1).
+	*/
+	virtual bool IsChunkedResponseAllowed() const = 0;
+
+	/**
 		Get the reaction to the head of the request, it should be called after each parsing of the data. The action is taken
 		once: the next call returns \c HA_NONE for an interim message.
 		\param	message	Data to send to the client for \c HA_SEND_INTERIM and \c HA_REJECT, empty otherwise.

@@ -218,6 +218,13 @@ bool CWebSocketRequest::IsResponseBodyOmitted() const
 }
 
 
+bool CWebSocketRequest::IsChunkedResponseAllowed() const
+{
+	// The messages are not HTTP requests: there is no HTTP framing of the response
+	return false;
+}
+
+
 IRequest::HeadAction CWebSocketRequest::TakeHeadAction(QByteArray& message)
 {
 	// A WebSocket message has no head that should be answered before the message is received

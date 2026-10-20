@@ -21,6 +21,7 @@ CSocketThread::CSocketThread(qintptr socketId, bool secureConnection, const QSsl
 	m_isSecureConnection(secureConnection),
 	m_isConnectionClosing(false),
 	m_isResponseBodyOmitted(false),
+	m_isChunkedResponseAllowed(false),
 	m_sslConfiguration(sslConfiguration)
 {
 	this->m_socketDescriptor = socketId;
@@ -90,16 +91,23 @@ CConnectionTimeoutConfig CSocketThread::GetConnectionTimeoutConfig() const
 }
 
 
+qint64 CSocketThread::GetWriteHighWatermark() const
+{
+	return m_server->GetWriteHighWatermark();
+}
+
+
 QByteArray CSocketThread::GetProtocolTypeId() const
 {
 	return (m_enginePtr != nullptr) ? m_enginePtr->GetProtocolTypeId() : QByteArray();
 }
 
 
-void CSocketThread::SetResponseHints(bool isConnectionClosing, bool isBodyOmitted)
+void CSocketThread::SetResponseHints(bool isConnectionClosing, bool isBodyOmitted, bool isChunkedAllowed)
 {
 	m_isConnectionClosing = isConnectionClosing;
 	m_isResponseBodyOmitted = isBodyOmitted;
+	m_isChunkedResponseAllowed = isChunkedAllowed;
 }
 
 
@@ -112,6 +120,24 @@ bool CSocketThread::IsConnectionClosing() const
 bool CSocketThread::IsResponseBodyOmitted() const
 {
 	return m_isResponseBodyOmitted;
+}
+
+
+bool CSocketThread::IsChunkedResponseAllowed() const
+{
+	return m_isChunkedResponseAllowed;
+}
+
+
+bool CSocketThread::SendStreamingResponse(const ConstResponsePtr& response, bool isConnectionClosing, bool isBodyOmitted, bool isChunkedAllowed) const
+{
+	if (!response.IsValid()){
+		return false;
+	}
+
+	Q_EMIT OnSendStreamingResponse(response, isConnectionClosing, isBodyOmitted, isChunkedAllowed);
+
+	return true;
 }
 
 
@@ -146,6 +172,9 @@ void CSocketThread::run()
 	m_socket.SetPtr(new CSocket(this, newRequestPtr.PopInterfacePtr(), m_isSecureConnection, m_sslConfiguration, m_socketDescriptor));
 
 	bool retVal = connect(this, &CSocketThread::OnSendResponse, m_socket.GetPtr(), &CSocket::OnSendResponse, Qt::QueuedConnection);
+	Q_ASSERT(retVal);
+
+	retVal = connect(this, &CSocketThread::OnSendStreamingResponse, m_socket.GetPtr(), &CSocket::OnSendStreamingResponse, Qt::QueuedConnection);
 	Q_ASSERT(retVal);
 
 	retVal = connect(this, &CSocketThread::Abort, m_socket.GetPtr(), &CSocket::Abort, Qt::QueuedConnection);

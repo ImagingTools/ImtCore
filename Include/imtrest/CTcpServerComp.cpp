@@ -81,6 +81,13 @@ CConnectionTimeoutConfig CTcpServerComp::GetConnectionTimeoutConfig() const
 }
 
 
+qint64 CTcpServerComp::GetWriteHighWatermark() const
+{
+	// A non-positive value is replaced by the default value of the streamer
+	return m_writeHighWatermarkAttrPtr.IsValid() ? qint64(*m_writeHighWatermarkAttrPtr) : qint64(0);
+}
+
+
 // protected methods
 
 void CTcpServerComp::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)

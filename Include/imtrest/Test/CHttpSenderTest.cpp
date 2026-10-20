@@ -290,6 +290,41 @@ bool ParseResponses(const QByteArray& data, SParserState& state, bool& isKeepAli
 }
 
 
+typedef imtrest::CHttpSender::BodyFraming BodyFraming;
+
+
+/**
+	Build the head of a streaming response, false if it cannot be built.
+*/
+bool BuildHead(
+			int statusCode,
+			qint64 bodySize,
+			const Headers& headers,
+			const Options& options,
+			QByteArray& head,
+			BodyFraming& framing)
+{
+	CEngineStub engine;
+
+	imtrest::CHttpResponse response(statusCode, QByteArrayLiteral("not used"), "application/octet-stream", engine);
+	response.SetHeaders(headers);
+
+	return imtrest::CHttpSender::BuildStreamingResponseHead(response, bodySize, options, head, framing);
+}
+
+
+Options CreateStreamingOptions(bool isChunkedAllowed = true, bool isBodyOmitted = false, bool isConnectionClosing = false)
+{
+	Options options = CreateOptions(isConnectionClosing, isBodyOmitted);
+	options.isChunkedAllowed = isChunkedAllowed;
+
+	return options;
+}
+
+
+const QByteArray s_headStart("HTTP/1.1 200 OK\r\nDate: " + s_date + "\r\nContent-Type: application/octet-stream\r\n");
+
+
 } // namespace
 
 
@@ -798,6 +833,375 @@ void CHttpSenderTest::ResponsesWithConnectionCloseAreParsedTest()
 
 	QCOMPARE(state.responses.size(), 1);
 	QCOMPARE(state.responses[0].body, QByteArray("hello"));
+}
+
+
+void CHttpSenderTest::StreamingHeadContentLengthTest()
+{
+	QByteArray head;
+	BodyFraming framing = BodyFraming::BF_NONE;
+
+	QVERIFY(BuildHead(imtrest::IProtocolEngine::SC_OK, 1000, Headers(), CreateStreamingOptions(), head, framing));
+
+	// The head ends with the empty line: the body is not in it
+	QCOMPARE(head, s_headStart + "Content-Length: 1000\r\n\r\n");
+	QCOMPARE(framing, imtrest::CHttpSender::BF_CONTENT_LENGTH);
+}
+
+
+void CHttpSenderTest::StreamingHeadLargeSizeTest()
+{
+	QByteArray head;
+	BodyFraming framing = BodyFraming::BF_NONE;
+
+	// More than 4 GiB: the size is not cut to int
+	QVERIFY(BuildHead(imtrest::IProtocolEngine::SC_OK, 10000000000LL, Headers(), CreateStreamingOptions(), head, framing));
+
+	QCOMPARE(head, s_headStart + "Content-Length: 10000000000\r\n\r\n");
+	QCOMPARE(framing, imtrest::CHttpSender::BF_CONTENT_LENGTH);
+}
+
+
+void CHttpSenderTest::StreamingHeadEmptyBodyTest()
+{
+	QByteArray head;
+	BodyFraming framing = BodyFraming::BF_CONTENT_LENGTH;
+
+	QVERIFY(BuildHead(imtrest::IProtocolEngine::SC_OK, 0, Headers(), CreateStreamingOptions(), head, framing));
+
+	// There is nothing to stream: the body of the size 0 is not sent
+	QCOMPARE(head, s_headStart + "Content-Length: 0\r\n\r\n");
+	QCOMPARE(framing, imtrest::CHttpSender::BF_NONE);
+}
+
+
+void CHttpSenderTest::StreamingHeadChunkedTest()
+{
+	QByteArray head;
+	BodyFraming framing = BodyFraming::BF_NONE;
+
+	QVERIFY(BuildHead(imtrest::IProtocolEngine::SC_OK, -1, Headers(), CreateStreamingOptions(), head, framing));
+
+	// The size is not known: no Content-Length (RFC 9112, section 6.2)
+	QCOMPARE(head, s_headStart + "Transfer-Encoding: chunked\r\n\r\n");
+	QCOMPARE(framing, imtrest::CHttpSender::BF_CHUNKED);
+}
+
+
+void CHttpSenderTest::StreamingHeadNegativeSizeIsUnknownTest()
+{
+	QByteArray head;
+	BodyFraming framing = BodyFraming::BF_NONE;
+
+	QVERIFY(BuildHead(imtrest::IProtocolEngine::SC_OK, -12345, Headers(), CreateStreamingOptions(), head, framing));
+
+	QCOMPARE(head, s_headStart + "Transfer-Encoding: chunked\r\n\r\n");
+	QCOMPARE(framing, imtrest::CHttpSender::BF_CHUNKED);
+}
+
+
+void CHttpSenderTest::StreamingHeadUntilCloseTest()
+{
+	QByteArray head;
+	BodyFraming framing = BodyFraming::BF_NONE;
+
+	// A client of HTTP/1.0 does not know the chunked encoding: the body ends with the connection (RFC 9112, section 6.3)
+	QVERIFY(BuildHead(imtrest::IProtocolEngine::SC_OK, -1, Headers(), CreateStreamingOptions(false), head, framing));
+
+	QCOMPARE(head, s_headStart + "Connection: close\r\n\r\n");
+	QCOMPARE(framing, imtrest::CHttpSender::BF_UNTIL_CLOSE);
+}
+
+
+void CHttpSenderTest::StreamingHeadUntilCloseWithClosingConnectionTest()
+{
+	QByteArray head;
+	BodyFraming framing = BodyFraming::BF_NONE;
+
+	QVERIFY(BuildHead(imtrest::IProtocolEngine::SC_OK, -1, Headers(), CreateStreamingOptions(false, false, true), head, framing));
+
+	// Only one Connection header:
+	SMessage message;
+	QVERIFY(Split(head, message));
+	QCOMPARE(message.Count("Connection"), 1);
+	QCOMPARE(message.Get("Connection"), QByteArray("close"));
+	QCOMPARE(framing, imtrest::CHttpSender::BF_UNTIL_CLOSE);
+}
+
+
+void CHttpSenderTest::StreamingHeadKnownSizeNeedsNoChunksTest()
+{
+	QByteArray head;
+	BodyFraming framing = BodyFraming::BF_NONE;
+
+	// The size is known: the chunked encoding is not used even for a client that supports it, and the connection stays open
+	QVERIFY(BuildHead(imtrest::IProtocolEngine::SC_OK, 5, Headers(), CreateStreamingOptions(false), head, framing));
+
+	QCOMPARE(head, s_headStart + "Content-Length: 5\r\n\r\n");
+	QCOMPARE(framing, imtrest::CHttpSender::BF_CONTENT_LENGTH);
+}
+
+
+void CHttpSenderTest::StreamingHeadIgnoresOwnFramingTest()
+{
+	Headers headers;
+	headers.insert("Content-Length", "5");
+	headers.insert("transfer-encoding", "gzip, chunked");
+
+	QByteArray head;
+	BodyFraming framing = BodyFraming::BF_NONE;
+
+	// The sender decides how the body is framed: the values of the response do not match the body that will be sent
+	QVERIFY(BuildHead(imtrest::IProtocolEngine::SC_OK, 1000, headers, CreateStreamingOptions(), head, framing));
+
+	SMessage message;
+	QVERIFY(Split(head, message));
+	QCOMPARE(message.Count("Content-Length"), 1);
+	QCOMPARE(message.Get("Content-Length"), QByteArray("1000"));
+	QCOMPARE(message.Count("Transfer-Encoding"), 0);
+
+	QVERIFY(BuildHead(imtrest::IProtocolEngine::SC_OK, -1, headers, CreateStreamingOptions(), head, framing));
+
+	QVERIFY(Split(head, message));
+	QCOMPARE(message.Count("Content-Length"), 0);
+	QCOMPARE(message.Count("Transfer-Encoding"), 1);
+	QCOMPARE(message.Get("Transfer-Encoding"), QByteArray("chunked"));
+}
+
+
+void CHttpSenderTest::StreamingHeadKeepsOtherHeadersTest()
+{
+	Headers headers;
+	headers.insert("ETag", "\"v1\"");
+	headers.insert("Content-Range", "bytes 0-9/100");
+	headers.insert("Accept-Ranges", "bytes");
+	headers.insert("Content-Type", "text/plain");
+
+	QByteArray head;
+	BodyFraming framing = BodyFraming::BF_NONE;
+
+	QVERIFY(BuildHead(imtrest::IProtocolEngine::SC_OK, 10, headers, CreateStreamingOptions(), head, framing));
+
+	SMessage message;
+	QVERIFY(Split(head, message));
+
+	QCOMPARE(message.Get("ETag"), QByteArray("\"v1\""));
+	QCOMPARE(message.Get("Content-Range"), QByteArray("bytes 0-9/100"));
+	QCOMPARE(message.Get("Accept-Ranges"), QByteArray("bytes"));
+
+	// The own type is not duplicated by the type of the data:
+	QCOMPARE(message.Count("Content-Type"), 1);
+	QCOMPARE(message.Get("Content-Type"), QByteArray("text/plain"));
+	QCOMPARE(message.Get("Content-Length"), QByteArray("10"));
+}
+
+
+void CHttpSenderTest::StreamingHeadConnectionCloseTest()
+{
+	QByteArray head;
+	BodyFraming framing = BodyFraming::BF_NONE;
+
+	QVERIFY(BuildHead(imtrest::IProtocolEngine::SC_OK, 5, Headers(), CreateStreamingOptions(true, false, true), head, framing));
+
+	QCOMPARE(head, s_headStart + "Content-Length: 5\r\nConnection: close\r\n\r\n");
+	QCOMPARE(framing, imtrest::CHttpSender::BF_CONTENT_LENGTH);
+}
+
+
+void CHttpSenderTest::StreamingHeadOfHeadRequestTest()
+{
+	QByteArray head;
+	BodyFraming framing = BodyFraming::BF_CONTENT_LENGTH;
+
+	// The answer to HEAD has the headers of the answer to GET and no body: the size of the representation is the length
+	QVERIFY(BuildHead(imtrest::IProtocolEngine::SC_OK, 1000, Headers(), CreateStreamingOptions(true, true), head, framing));
+
+	QCOMPARE(head, s_headStart + "Content-Length: 1000\r\n\r\n");
+	QCOMPARE(framing, imtrest::CHttpSender::BF_NONE);
+
+	// An unknown size is not sent as chunks: there is no body
+	QVERIFY(BuildHead(imtrest::IProtocolEngine::SC_OK, -1, Headers(), CreateStreamingOptions(true, true), head, framing));
+
+	QCOMPARE(head, s_headStart + "\r\n");
+	QCOMPARE(framing, imtrest::CHttpSender::BF_NONE);
+
+	// The length set by the response is the only source if the size is not known (RFC 9110, section 9.3.2)
+	Headers headers;
+	headers.insert("Content-Length", "777");
+
+	QVERIFY(BuildHead(imtrest::IProtocolEngine::SC_OK, -1, headers, CreateStreamingOptions(true, true), head, framing));
+
+	QCOMPARE(head, s_headStart + "Content-Length: 777\r\n\r\n");
+	QCOMPARE(framing, imtrest::CHttpSender::BF_NONE);
+
+	// HEAD for a client of HTTP/1.0 with an unknown size: no body, so the connection is not closed because of it
+	QVERIFY(BuildHead(imtrest::IProtocolEngine::SC_OK, -1, Headers(), CreateStreamingOptions(false, true), head, framing));
+
+	QCOMPARE(head, s_headStart + "\r\n");
+	QCOMPARE(framing, imtrest::CHttpSender::BF_NONE);
+}
+
+
+void CHttpSenderTest::StreamingHeadWithoutBodyStatusesTest()
+{
+	QByteArray head;
+	BodyFraming framing = BodyFraming::BF_CONTENT_LENGTH;
+	SMessage message;
+
+	// 204: no body and no length even if the size of the representation is given
+	QVERIFY(BuildHead(imtrest::IProtocolEngine::SC_NO_CONTENT, 1000, Headers(), CreateStreamingOptions(), head, framing));
+	QVERIFY(Split(head, message));
+	QCOMPARE(message.Count("Content-Length"), 0);
+	QCOMPARE(message.Count("Transfer-Encoding"), 0);
+	QCOMPARE(framing, imtrest::CHttpSender::BF_NONE);
+
+	// 304: no body, the length of the representation is the value of the response
+	Headers headers;
+	headers.insert("Content-Length", "42");
+
+	framing = BodyFraming::BF_CHUNKED;
+	QVERIFY(BuildHead(imtrest::IProtocolEngine::SC_NOT_MODIFIED, -1, headers, CreateStreamingOptions(), head, framing));
+	QVERIFY(Split(head, message));
+	QCOMPARE(message.Get("Content-Length"), QByteArray("42"));
+	QCOMPARE(message.Count("Transfer-Encoding"), 0);
+	QCOMPARE(framing, imtrest::CHttpSender::BF_NONE);
+
+	// 205: no body and the length 0
+	framing = BodyFraming::BF_CHUNKED;
+	QVERIFY(BuildHead(imtrest::IProtocolEngine::SC_RESET_CONTENT, 1000, Headers(), CreateStreamingOptions(), head, framing));
+	QVERIFY(Split(head, message));
+	QCOMPARE(message.Get("Content-Length"), QByteArray("0"));
+	QCOMPARE(message.Count("Transfer-Encoding"), 0);
+	QCOMPARE(framing, imtrest::CHttpSender::BF_NONE);
+
+	// 1xx: no body, no length and no Date
+	framing = BodyFraming::BF_CHUNKED;
+	QVERIFY(BuildHead(imtrest::IProtocolEngine::SC_CONTINUE, 1000, Headers(), CreateStreamingOptions(), head, framing));
+	QVERIFY(Split(head, message));
+	QCOMPARE(message.Count("Content-Length"), 0);
+	QCOMPARE(message.Count("Transfer-Encoding"), 0);
+	QCOMPARE(message.Count("Date"), 0);
+	QCOMPARE(framing, imtrest::CHttpSender::BF_NONE);
+}
+
+
+void CHttpSenderTest::StreamingHeadUnknownStatusTest()
+{
+	QByteArray head;
+	BodyFraming framing = BodyFraming::BF_NONE;
+
+	QVERIFY(!BuildHead(imtrest::IProtocolEngine::SC_NONE, 10, Headers(), CreateStreamingOptions(), head, framing));
+}
+
+
+void CHttpSenderTest::StreamingHeadSkipsInvalidHeadersTest()
+{
+	Headers headers;
+	headers.insert("X-Good", "value");
+	headers.insert("X-Bad", "a\r\nSet-Cookie: injected");
+
+	QByteArray head;
+	BodyFraming framing = BodyFraming::BF_NONE;
+
+	QVERIFY(BuildHead(imtrest::IProtocolEngine::SC_OK, 5, headers, CreateStreamingOptions(), head, framing));
+
+	QVERIFY(head.contains("X-Good: value\r\n"));
+	QVERIFY(!head.contains("Set-Cookie"));
+	QVERIFY(!head.contains("X-Bad"));
+}
+
+
+void CHttpSenderTest::CreateChunkTest_data()
+{
+	QTest::addColumn<QByteArray>("data");
+	QTest::addColumn<QByteArray>("expected");
+
+	QTest::newRow("text") << QByteArray("hello") << QByteArray("5\r\nhello\r\n");
+	QTest::newRow("one byte") << QByteArray("a") << QByteArray("1\r\na\r\n");
+	QTest::newRow("end of line inside") << QByteArray("\r\n") << QByteArray("2\r\n\r\n\r\n");
+	QTest::newRow("binary") << QByteArray("a\0b", 3) << QByteArray("3\r\na\0b\r\n", 8);
+	QTest::newRow("10 bytes") << QByteArray(10, 'x') << QByteArray("a\r\n") + QByteArray(10, 'x') + QByteArray("\r\n");
+	QTest::newRow("255 bytes") << QByteArray(255, 'x') << QByteArray("ff\r\n") + QByteArray(255, 'x') + QByteArray("\r\n");
+	QTest::newRow("256 bytes") << QByteArray(256, 'x') << QByteArray("100\r\n") + QByteArray(256, 'x') + QByteArray("\r\n");
+	QTest::newRow("256 KiB") << QByteArray(262144, 'x') << QByteArray("40000\r\n") + QByteArray(262144, 'x') + QByteArray("\r\n");
+}
+
+
+void CHttpSenderTest::CreateChunkTest()
+{
+	QFETCH(QByteArray, data);
+	QFETCH(QByteArray, expected);
+
+	QCOMPARE(imtrest::CHttpSender::CreateChunk(data), expected);
+}
+
+
+void CHttpSenderTest::CreateChunkOfEmptyDataTest()
+{
+	// A chunk of the size 0 finishes the body, so empty data give no chunk
+	QVERIFY(imtrest::CHttpSender::CreateChunk(QByteArray()).isEmpty());
+}
+
+
+void CHttpSenderTest::CreateLastChunkTest()
+{
+	QCOMPARE(imtrest::CHttpSender::CreateLastChunk(), QByteArray("0\r\n\r\n"));
+}
+
+
+void CHttpSenderTest::ChunkedResponseIsParsedByHttpParserTest()
+{
+	QByteArray head;
+	BodyFraming framing = BodyFraming::BF_NONE;
+	QVERIFY(BuildHead(imtrest::IProtocolEngine::SC_OK, -1, Headers(), CreateStreamingOptions(), head, framing));
+
+	// The parts are not equal and one of them contains the text of a chunk: a client takes the body by the sizes only
+	const QByteArray firstPart("hello ");
+	const QByteArray secondPart("5\r\nworld\r\n0\r\n\r\n");
+	const QByteArray thirdPart(300000, 'z');
+
+	QByteArray stream = head;
+	stream += imtrest::CHttpSender::CreateChunk(firstPart);
+	stream += imtrest::CHttpSender::CreateChunk(secondPart);
+	stream += imtrest::CHttpSender::CreateChunk(thirdPart);
+	stream += imtrest::CHttpSender::CreateLastChunk();
+
+	// The next response on the same connection:
+	stream += Build(imtrest::IProtocolEngine::SC_OK, "next", "text/plain");
+
+	SParserState state;
+	bool isKeepAlive = false;
+	QVERIFY(ParseResponses(stream, state, isKeepAlive));
+	QVERIFY(isKeepAlive);
+
+	QCOMPARE(state.responses.size(), 2);
+	QCOMPARE(state.responses[0].statusCode, 200);
+	QCOMPARE(state.responses[0].body, firstPart + secondPart + thirdPart);
+	QCOMPARE(state.responses[1].body, QByteArray("next"));
+}
+
+
+void CHttpSenderTest::SizedStreamingResponseIsParsedByHttpParserTest()
+{
+	const QByteArray body("0123456789");
+
+	QByteArray head;
+	BodyFraming framing = BodyFraming::BF_NONE;
+	QVERIFY(BuildHead(imtrest::IProtocolEngine::SC_OK, body.size(), Headers(), CreateStreamingOptions(), head, framing));
+
+	QByteArray stream = head + body;
+
+	// The next response on the same connection is not taken for a part of the body:
+	stream += Build(imtrest::IProtocolEngine::SC_OK, "next", "text/plain");
+
+	SParserState state;
+	bool isKeepAlive = false;
+	QVERIFY(ParseResponses(stream, state, isKeepAlive));
+	QVERIFY(isKeepAlive);
+
+	QCOMPARE(state.responses.size(), 2);
+	QCOMPARE(state.responses[0].body, body);
+	QCOMPARE(state.responses[1].body, QByteArray("next"));
 }
 
 

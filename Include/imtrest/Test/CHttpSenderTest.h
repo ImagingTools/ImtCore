@@ -58,6 +58,31 @@ private slots:
 	// Conformance of the produced messages
 	void ResponsesAreParsedByHttpParserTest();
 	void ResponsesWithConnectionCloseAreParsedTest();
+
+	// Streaming response: the head and the framing of the body
+	void StreamingHeadContentLengthTest();
+	void StreamingHeadLargeSizeTest();
+	void StreamingHeadEmptyBodyTest();
+	void StreamingHeadChunkedTest();
+	void StreamingHeadNegativeSizeIsUnknownTest();
+	void StreamingHeadUntilCloseTest();
+	void StreamingHeadUntilCloseWithClosingConnectionTest();
+	void StreamingHeadKnownSizeNeedsNoChunksTest();
+	void StreamingHeadIgnoresOwnFramingTest();
+	void StreamingHeadKeepsOtherHeadersTest();
+	void StreamingHeadConnectionCloseTest();
+	void StreamingHeadOfHeadRequestTest();
+	void StreamingHeadWithoutBodyStatusesTest();
+	void StreamingHeadUnknownStatusTest();
+	void StreamingHeadSkipsInvalidHeadersTest();
+
+	// Streaming response: the chunks of the body
+	void CreateChunkTest_data();
+	void CreateChunkTest();
+	void CreateChunkOfEmptyDataTest();
+	void CreateLastChunkTest();
+	void ChunkedResponseIsParsedByHttpParserTest();
+	void SizedStreamingResponseIsParsedByHttpParserTest();
 };
 
 

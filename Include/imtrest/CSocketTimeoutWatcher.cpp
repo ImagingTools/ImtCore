@@ -19,7 +19,8 @@ CSocketTimeoutWatcher::CSocketTimeoutWatcher(QAbstractSocket& socket, const CCon
 	m_behavior(behavior),
 	m_isFirstRequestCompleted(false),
 	m_isCloseRequested(false),
-	m_isStopped(false)
+	m_isStopped(false),
+	m_isStreaming(false)
 {
 	m_clock.start();
 
@@ -133,6 +134,49 @@ void CSocketTimeoutWatcher::WriteResponse(const QByteArray& data)
 }
 
 
+bool CSocketTimeoutWatcher::BeginStreamingResponse(const QByteArray& head)
+{
+	if (m_socketPtr.isNull() || IsClosing()){
+		return false;
+	}
+
+	// The flag is set before the writing: it can emit bytesWritten() at once and the response must not complete with its head.
+	m_isStreaming = true;
+
+	m_tracker.OnResponseStarted(GetNow());
+
+	m_socketPtr->write(head);
+
+	UpdateTimer();
+
+	return true;
+}
+
+
+void CSocketTimeoutWatcher::WriteStreamingData(const QByteArray& data)
+{
+	if (m_socketPtr.isNull() || IsClosing() || !m_isStreaming){
+		return;
+	}
+
+	m_socketPtr->write(data);
+}
+
+
+void CSocketTimeoutWatcher::EndStreamingResponse()
+{
+	if (!m_isStreaming){
+		return;
+	}
+
+	m_isStreaming = false;
+
+	CompleteResponseIfWritten();
+
+	UpdateTimer();
+}
+
+
 void CSocketTimeoutWatcher::WriteInterim(const QByteArray& data)
 {
 	if (m_socketPtr.isNull() || IsClosing()){
@@ -208,7 +252,7 @@ void CSocketTimeoutWatcher::UpdateTimer()
 
 void CSocketTimeoutWatcher::CompleteResponseIfWritten()
 {
-	if (!m_socketPtr.isNull() && (m_tracker.GetPhase() == CConnectionTimeoutTracker::P_SENDING) && (m_socketPtr->bytesToWrite() == 0)){
+	if (!m_socketPtr.isNull() && !m_isStreaming && (m_tracker.GetPhase() == CConnectionTimeoutTracker::P_SENDING) && (m_socketPtr->bytesToWrite() == 0)){
 		m_tracker.OnResponseCompleted(GetNow());
 
 		if (m_isCloseRequested && (m_tracker.GetPhase() != CConnectionTimeoutTracker::P_PROCESSING)){

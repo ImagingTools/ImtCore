@@ -13,6 +13,7 @@
 #include <imtrest/CConnectionTimeoutBehavior.h>
 #include <imtrest/CHttpResponse.h>
 #include <imtrest/CHttpSender.h>
+#include <imtrest/IStreamingResponse.h>
 
 
 namespace imtrest
@@ -55,6 +56,12 @@ imtrest::IProtocolEngine* CMultiThreadServer::GetProtocolEngine()
 CConnectionTimeoutConfig CMultiThreadServer::GetConnectionTimeoutConfig() const
 {
 	return m_rootServer.GetConnectionTimeoutConfig();
+}
+
+
+qint64 CMultiThreadServer::GetWriteHighWatermark() const
+{
+	return m_rootServer.GetWriteHighWatermark();
 }
 
 
@@ -102,6 +109,15 @@ bool CMultiThreadServer::SendResponse(const QByteArray& requestId, ConstResponse
 
 	for (CSocketThread* socket : m_threadSocketList){
 		if ((socket != nullptr) && (socket->GetRequestId() == requestId)){
+			// The body of a streaming response is read by parts in the thread of the connection, only its head is built here
+			if (dynamic_cast<const IStreamingResponse*>(response.GetPtr()) != nullptr){
+				return socket->SendStreamingResponse(
+							response,
+							socket->IsConnectionClosing(),
+							socket->IsResponseBodyOmitted(),
+							socket->IsChunkedResponseAllowed());
+			}
+
 			QByteArray data;
 
 			const auto* httpResponsePtr = dynamic_cast<const CHttpResponse*>(response.GetPtr());

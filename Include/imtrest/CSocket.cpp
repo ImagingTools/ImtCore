@@ -55,6 +55,10 @@ CSocket::CSocket(CSocketThread* rootSocket, IRequest* request, bool secureConnec
 
 	m_timeoutWatcherPtr = new CSocketTimeoutWatcher(*m_socket, m_rootSocket->GetConnectionTimeoutConfig(), m_behavior, this);
 
+	if (m_behavior.createStreamingResponseSender){
+		m_streamingSenderPtr = m_behavior.createStreamingResponseSender(*m_socket, *m_timeoutWatcherPtr, m_rootSocket->GetWriteHighWatermark());
+	}
+
 	connect(m_socket.data(), &QTcpSocket::disconnected, this, &CSocket::Disconnected, Qt::DirectConnection);
 	connect(m_socket.data(), &QTcpSocket::readyRead, this, &CSocket::HandleReadyRead, Qt::DirectConnection);
 }
@@ -160,7 +164,7 @@ void CSocket::HandleReadyRead()
 	}
 
 	const bool isConnectionClosing = !m_requestPtr->IsConnectionPersistent();
-	m_rootSocket->SetResponseHints(isConnectionClosing, m_requestPtr->IsResponseBodyOmitted());
+	m_rootSocket->SetResponseHints(isConnectionClosing, m_requestPtr->IsResponseBodyOmitted(), m_requestPtr->IsChunkedResponseAllowed());
 
 	m_timeoutWatcherPtr->OnRequestCompleted();
 
@@ -200,6 +204,50 @@ void CSocket::OnSendResponse(QByteArray data)
 		m_timeoutWatcherPtr->WriteResponse(data);
 	}
 
+	FinishRequest();
+}
+
+
+void CSocket::OnSendStreamingResponse(imtrest::ConstResponsePtr response, bool isConnectionClosing, bool isBodyOmitted, bool isChunkedAllowed)
+{
+	if (!m_streamingSenderPtr){
+		qWarning() << "The protocol of the connection has no streaming responses";
+
+		SendServerError();
+
+		return;
+	}
+
+	IStreamingResponseSender::Hints hints;
+	hints.isConnectionClosing = isConnectionClosing;
+	hints.isBodyOmitted = isBodyOmitted;
+	hints.isChunkedAllowed = isChunkedAllowed;
+
+	const IStreamingResponseSender::StartResult result = m_streamingSenderPtr->Start(response, hints, [this](){
+		FinishRequest();
+	});
+
+	switch (result){
+	case IStreamingResponseSender::SR_STARTED:
+		// The request is finished by the handler, when the body is sent
+		break;
+
+	case IStreamingResponseSender::SR_FAILED:
+		SendServerError();
+		break;
+
+	case IStreamingResponseSender::SR_COMPLETED:
+	case IStreamingResponseSender::SR_DROPPED:
+		FinishRequest();
+		break;
+	}
+}
+
+
+// private methods
+
+void CSocket::FinishRequest()
+{
 	if (m_isRequestInProgress){
 		m_isRequestInProgress = false;
 
@@ -211,7 +259,16 @@ void CSocket::OnSendResponse(QByteArray data)
 }
 
 
-// private methods
+void CSocket::SendServerError()
+{
+	if (m_behavior.createServerErrorMessage){
+		OnSendResponse(m_behavior.createServerErrorMessage());
+	}
+	else{
+		FinishRequest();
+	}
+}
+
 
 void CSocket::RejectRequest()
 {

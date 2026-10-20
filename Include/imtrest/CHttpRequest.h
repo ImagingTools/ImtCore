@@ -116,6 +116,11 @@ public:
 	virtual bool IsResponseBodyOmitted() const override;
 
 	/**
+		The chunked encoding of the response is allowed for \c HTTP/1.1 and later (RFC 9112, section 6.1).
+	*/
+	virtual bool IsChunkedResponseAllowed() const override;
+
+	/**
 		For \c HA_REJECT the message is the final response (the status of the policy, \c 413 for a too big body or \c 417 for
 		an unknown expectation) with \c Connection: \c close. For \c HA_SEND_INTERIM the message is \c 100 \c Continue (RFC 9110,
 		section 10.1.1): the client expects it if the request has a body, the version is \c HTTP/1.1 (RFC 9110, section 15.2) and

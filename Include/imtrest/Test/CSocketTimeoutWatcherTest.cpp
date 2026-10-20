@@ -24,6 +24,9 @@ const QByteArray s_response("HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n");
 const QByteArray s_interimMessage("HTTP/1.1 100 Continue\r\n\r\n");
 const QByteArray s_refusalMessage("HTTP/1.1 413 Payload Too Large\r\nConnection: close\r\nContent-Length: 0\r\n\r\n");
 
+// The head of a response whose body is written later by parts
+const QByteArray s_streamingHead("HTTP/1.1 200 OK\r\nContent-Length: 1000\r\n\r\n");
+
 
 /**
 	Connected pair of sockets: the socket of a server and the socket of a client.
@@ -1407,6 +1410,285 @@ void CSocketTimeoutWatcherTest::RefusalWithMessageIsSentOnceTest()
 	QTest::qWait(200);
 
 	QCOMPARE(sockets.GetClient().readAll(), s_refusalMessage);
+}
+
+
+void CSocketTimeoutWatcherTest::StreamingResponseHeadIsWrittenTest()
+{
+	CConnectedSockets sockets;
+	QVERIFY(sockets.Open());
+
+	imtrest::CSocketTimeoutWatcher watcher(sockets.GetServerSocket(), CreateConfig(5000, 5000, 5000), CreateHttpBehavior());
+
+	watcher.OnDataReceived();
+	watcher.OnRequestCompleted();
+
+	QVERIFY(watcher.BeginStreamingResponse(s_streamingHead));
+	QCOMPARE(watcher.GetPhase(), Tracker::P_SENDING);
+
+	QTRY_VERIFY_WITH_TIMEOUT(sockets.GetClient().bytesAvailable() >= s_streamingHead.size(), 3000);
+	QCOMPARE(sockets.GetClient().readAll(), s_streamingHead);
+}
+
+
+void CSocketTimeoutWatcherTest::StreamingResponseIsNotCompleteBeforeEndTest()
+{
+	CConnectedSockets sockets;
+	QVERIFY(sockets.Open());
+
+	imtrest::CSocketTimeoutWatcher watcher(sockets.GetServerSocket(), CreateConfig(5000, 150, 5000), CreateHttpBehavior());
+	QSignalSpy timedOutSpy(&watcher, &imtrest::CSocketTimeoutWatcher::TimedOut);
+
+	watcher.OnDataReceived();
+	watcher.OnRequestCompleted();
+	QVERIFY(watcher.BeginStreamingResponse(s_streamingHead));
+
+	QTRY_VERIFY_WITH_TIMEOUT(sockets.GetClient().bytesAvailable() >= s_streamingHead.size(), 3000);
+
+	// All written data are sent, but the body is not finished: the connection is not idle, the keep-alive timeout does not run
+	QTest::qWait(500);
+
+	QCOMPARE(watcher.GetPhase(), Tracker::P_SENDING);
+	QCOMPARE(timedOutSpy.count(), 0);
+	QCOMPARE(sockets.GetClient().state(), QAbstractSocket::ConnectedState);
+}
+
+
+void CSocketTimeoutWatcherTest::EndOfStreamingResponseCompletesResponseTest()
+{
+	CConnectedSockets sockets;
+	QVERIFY(sockets.Open());
+
+	imtrest::CSocketTimeoutWatcher watcher(sockets.GetServerSocket(), CreateConfig(5000, 5000, 5000), CreateHttpBehavior());
+
+	watcher.OnDataReceived();
+	watcher.OnRequestCompleted();
+	QVERIFY(watcher.BeginStreamingResponse(s_streamingHead));
+
+	watcher.WriteStreamingData("first ");
+	watcher.WriteStreamingData("second");
+
+	QCOMPARE(watcher.GetPhase(), Tracker::P_SENDING);
+
+	watcher.EndStreamingResponse();
+
+	const QByteArray expected = s_streamingHead + "first second";
+
+	QTRY_VERIFY_WITH_TIMEOUT(sockets.GetClient().bytesAvailable() >= expected.size(), 3000);
+	QCOMPARE(sockets.GetClient().readAll(), expected);
+
+	// The response is complete when it is sent to the network:
+	QTRY_COMPARE_WITH_TIMEOUT(watcher.GetPhase(), Tracker::P_IDLE, 3000);
+}
+
+
+void CSocketTimeoutWatcherTest::StreamingResponseOfLargeBodyIsDeliveredTest()
+{
+	CConnectedSockets sockets;
+	QVERIFY(sockets.Open());
+
+	imtrest::CSocketTimeoutWatcher watcher(sockets.GetServerSocket(), CreateConfig(5000, 5000, 5000), CreateHttpBehavior());
+
+	watcher.OnDataReceived();
+	watcher.OnRequestCompleted();
+	QVERIFY(watcher.BeginStreamingResponse(s_streamingHead));
+
+	const QByteArray part(1024 * 1024, 'x');
+	for (int i = 0; i < 4; ++i){
+		watcher.WriteStreamingData(part);
+	}
+
+	watcher.EndStreamingResponse();
+
+	// The end of the response is not reported until the last byte is sent
+	const qint64 expectedSize = s_streamingHead.size() + 4 * part.size();
+
+	qint64 receivedSize = 0;
+	QTRY_VERIFY_WITH_TIMEOUT((receivedSize += sockets.GetClient().readAll().size()) >= expectedSize, 10000);
+
+	QCOMPARE(receivedSize, expectedSize);
+	QTRY_COMPARE_WITH_TIMEOUT(watcher.GetPhase(), Tracker::P_IDLE, 3000);
+}
+
+
+void CSocketTimeoutWatcherTest::StreamingResponseIsRefusedWhileClosingTest()
+{
+	CConnectedSockets sockets;
+	QVERIFY(sockets.Open());
+
+	imtrest::CSocketTimeoutWatcher watcher(sockets.GetServerSocket(), CreateConfig(5000, 5000, 5000), CreateHttpBehavior());
+
+	watcher.OnDataReceived();
+	watcher.RejectRequest();
+
+	QTRY_VERIFY_WITH_TIMEOUT(sockets.GetClient().bytesAvailable() > 0, 3000);
+
+	// The connection is being closed: the response is dropped
+	QVERIFY(!watcher.BeginStreamingResponse(s_streamingHead));
+
+	watcher.WriteStreamingData("body");
+
+	QTest::qWait(200);
+
+	const QByteArray response = sockets.GetClient().readAll();
+
+	QVERIFY(response.startsWith("HTTP/1.1 400 "));
+	QVERIFY(!response.contains("body"));
+	QVERIFY(!response.contains(s_streamingHead));
+}
+
+
+void CSocketTimeoutWatcherTest::StreamingDataWithoutBeginIsIgnoredTest()
+{
+	CConnectedSockets sockets;
+	QVERIFY(sockets.Open());
+
+	imtrest::CSocketTimeoutWatcher watcher(sockets.GetServerSocket(), CreateConfig(5000, 5000, 5000), CreateHttpBehavior());
+
+	watcher.OnDataReceived();
+	watcher.OnRequestCompleted();
+
+	// The data are a part of a response that is not started
+	watcher.WriteStreamingData("body");
+
+	QTest::qWait(200);
+
+	QVERIFY(sockets.GetClient().readAll().isEmpty());
+	QCOMPARE(watcher.GetPhase(), Tracker::P_PROCESSING);
+}
+
+
+void CSocketTimeoutWatcherTest::EndWithoutBeginIsIgnoredTest()
+{
+	CConnectedSockets sockets;
+	QVERIFY(sockets.Open());
+
+	imtrest::CSocketTimeoutWatcher watcher(sockets.GetServerSocket(), CreateConfig(5000, 5000, 5000), CreateHttpBehavior());
+
+	watcher.OnDataReceived();
+	watcher.OnRequestCompleted();
+
+	watcher.EndStreamingResponse();
+
+	QCOMPARE(watcher.GetPhase(), Tracker::P_PROCESSING);
+
+	// The next response is written as usual and completes by itself
+	watcher.WriteResponse(s_response);
+
+	QTRY_COMPARE_WITH_TIMEOUT(watcher.GetPhase(), Tracker::P_IDLE, 3000);
+}
+
+
+void CSocketTimeoutWatcherTest::StreamingResponseClosesConnectionAfterEndTest()
+{
+	CConnectedSockets sockets;
+	QVERIFY(sockets.Open());
+
+	imtrest::CSocketTimeoutWatcher watcher(sockets.GetServerSocket(), CreateConfig(5000, 5000, 5000), CreateHttpBehavior());
+
+	watcher.OnDataReceived();
+	watcher.OnRequestCompleted();
+
+	// The end of the body is the closing of the connection
+	watcher.CloseAfterResponse();
+
+	QVERIFY(watcher.BeginStreamingResponse(s_streamingHead));
+	watcher.WriteStreamingData("body");
+
+	QTest::qWait(200);
+
+	// The connection is open while the body is not finished
+	QCOMPARE(sockets.GetClient().state(), QAbstractSocket::ConnectedState);
+
+	watcher.EndStreamingResponse();
+
+	QByteArray received;
+	QTRY_VERIFY_WITH_TIMEOUT((received += sockets.GetClient().readAll(), sockets.GetClient().state() == QAbstractSocket::UnconnectedState), 3000);
+
+	QCOMPARE(received, s_streamingHead + "body");
+}
+
+
+void CSocketTimeoutWatcherTest::StalledStreamingResponseIsAbortedTest()
+{
+	CConnectedSockets sockets;
+	QVERIFY(sockets.Open());
+
+	imtrest::CSocketTimeoutWatcher watcher(sockets.GetServerSocket(), CreateConfig(200, 5000, 5000), CreateHttpBehavior());
+	QSignalSpy timedOutSpy(&watcher, &imtrest::CSocketTimeoutWatcher::TimedOut);
+
+	watcher.OnDataReceived();
+	watcher.OnRequestCompleted();
+	QVERIFY(watcher.BeginStreamingResponse(s_streamingHead));
+
+	// Nothing is written after the head: the client that does not read and the source of the body that gives nothing look the same
+	QTRY_COMPARE_WITH_TIMEOUT(timedOutSpy.count(), 1, 3000);
+	QCOMPARE(GetAction(timedOutSpy, 0), int(Tracker::A_ABORT_STALLED_RESPONSE));
+
+	QTRY_COMPARE_WITH_TIMEOUT(sockets.GetClient().state(), QAbstractSocket::UnconnectedState, 3000);
+	QVERIFY(watcher.IsClosing());
+}
+
+
+void CSocketTimeoutWatcherTest::ProgressKeepsStreamingResponseAliveTest()
+{
+	CConnectedSockets sockets;
+	QVERIFY(sockets.Open());
+
+	imtrest::CSocketTimeoutWatcher watcher(sockets.GetServerSocket(), CreateConfig(300, 5000, 5000), CreateHttpBehavior());
+	QSignalSpy timedOutSpy(&watcher, &imtrest::CSocketTimeoutWatcher::TimedOut);
+
+	watcher.OnDataReceived();
+	watcher.OnRequestCompleted();
+	QVERIFY(watcher.BeginStreamingResponse(s_streamingHead));
+
+	// The body is slow, but the data do not stop for longer than the timeout
+	QByteArray expected = s_streamingHead;
+	for (int i = 0; i < 6; ++i){
+		watcher.WriteStreamingData("x");
+		expected += "x";
+
+		QTest::qWait(120);
+	}
+
+	watcher.EndStreamingResponse();
+
+	QCOMPARE(timedOutSpy.count(), 0);
+
+	QByteArray received;
+	QTRY_VERIFY_WITH_TIMEOUT((received += sockets.GetClient().readAll(), received.size() >= expected.size()), 3000);
+
+	QCOMPARE(received, expected);
+	QTRY_COMPARE_WITH_TIMEOUT(watcher.GetPhase(), Tracker::P_IDLE, 3000);
+}
+
+
+void CSocketTimeoutWatcherTest::NextRequestAfterStreamingResponseTest()
+{
+	CConnectedSockets sockets;
+	QVERIFY(sockets.Open());
+
+	imtrest::CSocketTimeoutWatcher watcher(sockets.GetServerSocket(), CreateConfig(5000, 5000, 5000), CreateHttpBehavior());
+
+	watcher.OnDataReceived();
+	watcher.OnRequestCompleted();
+	QVERIFY(watcher.BeginStreamingResponse(s_streamingHead));
+	watcher.WriteStreamingData("body");
+	watcher.EndStreamingResponse();
+
+	QTRY_COMPARE_WITH_TIMEOUT(watcher.GetPhase(), Tracker::P_IDLE, 3000);
+
+	// The connection is used again, the flag of the streaming does not stay
+	watcher.OnDataReceived();
+	watcher.OnRequestCompleted();
+	watcher.WriteResponse(s_response);
+
+	const QByteArray expected = s_streamingHead + "body" + s_response;
+
+	QTRY_VERIFY_WITH_TIMEOUT(sockets.GetClient().bytesAvailable() >= expected.size(), 3000);
+	QCOMPARE(sockets.GetClient().readAll(), expected);
+
+	QTRY_COMPARE_WITH_TIMEOUT(watcher.GetPhase(), Tracker::P_IDLE, 3000);
 }
 
 

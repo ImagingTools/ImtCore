@@ -96,6 +96,28 @@ public:
 	void WriteResponse(const QByteArray& data);
 
 	/**
+		Start a response whose body is written later by parts (see CHttpResponseBodyStreamer): write its head. The response is not complete
+		until EndStreamingResponse(), even if all written data are already sent. The time without progress of the writing is limited
+		as for any response (the client that does not read or the source of the body that gives no data for too long).
+		\param	head	The head of the response: the status line, the headers and the empty line that ends them, as built by
+						CHttpSender::BuildStreamingResponseHead(). It is written at once, so the client knows the status and how to find the end
+						of the body (\c Content-Length or \c chunked). The body is written after it by WriteStreamingData().
+		\return \c false if the connection is closing: nothing is written and the response should be dropped.
+	*/
+	bool BeginStreamingResponse(const QByteArray& head);
+
+	/**
+		Write a part of the response started by BeginStreamingResponse(). Data are ignored if the connection is closing.
+	*/
+	void WriteStreamingData(const QByteArray& data);
+
+	/**
+		The whole response started by BeginStreamingResponse() is written to the socket. The response is complete when the data
+		are sent to the network.
+	*/
+	void EndStreamingResponse();
+
+	/**
 		Write an interim message that is not a response to the request (for HTTP \c 100 \c Continue). The request is still
 		received, so the phase of the connection does not change. Data are ignored if the connection is closing.
 	*/
@@ -128,6 +150,7 @@ private:
 	bool m_isFirstRequestCompleted;
 	bool m_isCloseRequested;
 	bool m_isStopped;
+	bool m_isStreaming;
 	QElapsedTimer m_clock;
 	QTimer m_timer;
 };

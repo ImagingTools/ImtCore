@@ -4,6 +4,7 @@
 
 // ImtCore includes
 #include <imtrest/CHttpDateTools.h>
+#include <imtrest/CHttpStreamingResponseSender.h>
 #include <imtrest/ProtocolTypeIds.h>
 
 
@@ -57,6 +58,9 @@ CConnectionTimeoutBehavior CConnectionTimeoutBehavior::CreateForProtocol(const Q
 		};
 		retVal.createServerErrorMessage = [](){
 			return CreateHttpInternalServerErrorResponse(QDateTime::currentDateTimeUtc());
+		};
+		retVal.createStreamingResponseSender = [](QAbstractSocket& socket, CSocketTimeoutWatcher& watcher, qint64 writeHighWatermark){
+			return IStreamingResponseSenderPtr(new CHttpStreamingResponseSender(socket, watcher, writeHighWatermark));
 		};
 		retVal.isLimitedBeforeFirstMessageOnly = false;
 	}

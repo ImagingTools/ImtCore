@@ -9,9 +9,18 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QDateTime>
 
+// ImtCore includes
+#include <imtrest/IStreamingResponseSender.h>
+
+
+class QAbstractSocket;
+
 
 namespace imtrest
 {
+
+
+class CSocketTimeoutWatcher;
 
 
 /**
@@ -47,6 +56,16 @@ struct CConnectionTimeoutBehavior
 		open. If the function is not set, nothing is sent.
 	*/
 	std::function<QByteArray()> createServerErrorMessage;
+
+	/**
+		Creates the sender of the responses whose body is read by parts (see IStreamingResponse), it is created for a connection.
+		The sender writes the responses through the watcher of the connection. If the function is not set, the protocol does not
+		support the streaming responses.
+		\param	socket				Socket of the connection.
+		\param	watcher				Watcher of the timeouts of the connection.
+		\param	writeHighWatermark	Limit of the unsent data of the socket in bytes, a non-positive value means the default limit.
+	*/
+	std::function<IStreamingResponseSenderPtr(QAbstractSocket& socket, CSocketTimeoutWatcher& watcher, qint64 writeHighWatermark)> createStreamingResponseSender;
 
 	/**
 		If \c true, the connection is a persistent channel without a cycle of a request and a response: it is limited

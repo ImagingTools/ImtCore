@@ -16,6 +16,33 @@
 #include <imtrest/IProtocolEngine.h>
 #include <imtrest/CHttpResponse.h>
 #include <imtrest/CHttpRequest.h>
+#include <imtrest/IStreamingResponse.h>
+
+
+namespace
+{
+
+
+// The body of a streaming response is not in memory. A partial response is described by Content-Range of the uncompressed
+// representation (RFC 9110, section 14.4), so it cannot be compressed either.
+bool IsCompressionAllowed(const imtrest::IResponse& response)
+{
+	if (dynamic_cast<const imtrest::IStreamingResponse*>(&response) != nullptr){
+		return false;
+	}
+
+	const imtrest::IResponse::Headers headers = response.GetHeaders();
+	for (imtrest::IResponse::Headers::ConstIterator headerIter = headers.constBegin(); headerIter != headers.constEnd(); ++headerIter){
+		if (headerIter.key().toLower() == "content-range"){
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+} // namespace
 
 
 namespace imtrest
@@ -48,12 +75,12 @@ imtrest::ConstResponsePtr CHttpRootServletComp::ProcessRequest(const IRequest& r
 	const IRequestServlet* handlerPtr = FindRequestHandler(commandId);
 	if (handlerPtr != nullptr){
 		ConstResponsePtr responsePtr = handlerPtr->ProcessRequest(request, commandId);
-		const CHttpResponse* httpResponseConstPtr = dynamic_cast<const CHttpResponse*>(responsePtr.GetPtr());
-		CHttpResponse* httpResponsePtr = dynamic_cast<CHttpResponse*>(const_cast<CHttpResponse*>(httpResponseConstPtr));
+		const auto* httpResponseConstPtr = dynamic_cast<const CHttpResponse*>(responsePtr.GetPtr());
+		auto* httpResponsePtr = dynamic_cast<CHttpResponse*>(const_cast<CHttpResponse*>(httpResponseConstPtr));
 
-		if (m_autoCompressionAttrPtr->GetValue() == true && httpResponsePtr != nullptr){
+		if (m_autoCompressionAttrPtr->GetValue() == true && httpResponsePtr != nullptr && IsCompressionAllowed(*responsePtr)){
 			EncodingType encodingType = ET_NONE;
-			const CHttpRequest* httprequestPtr = dynamic_cast<const CHttpRequest*>(&request);
+			const auto* httprequestPtr = dynamic_cast<const CHttpRequest*>(&request);
 			if (httprequestPtr != nullptr){
 				QByteArray encodingHeader = httprequestPtr->GetHeaderValue("accept-encoding");
 				if (encodingHeader.contains("deflate")){
@@ -156,7 +183,7 @@ void CHttpRootServletComp::OnComponentCreated()
 		m_handlersMap.clear();
 
 		int handlersCount = qMin(m_commandIdsAttrPtr.GetCount(), m_requestHandlersCompPtr.GetCount());
-		
+
 		for (int i = 0; i < handlersCount; ++i){
 			QByteArray registeredCommandId = m_commandIdsAttrPtr[i];
 			IRequestServlet* handlerPtr = m_requestHandlersCompPtr[i];

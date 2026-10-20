@@ -53,6 +53,9 @@ private slots:
 	void ResponseBodyOmittedTest_data();
 	void ResponseBodyOmittedTest();
 	void TcpRequestIsPersistentTest();
+	void ChunkedResponseAllowedTest_data();
+	void ChunkedResponseAllowedTest();
+	void ChunkedResponseAllowedSplitTest();
 
 	// The request takes only its own data
 	void RequestStopsAtItsEndTest_data();

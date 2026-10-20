@@ -46,6 +46,13 @@ bool CUdpRequest::IsResponseBodyOmitted() const
 }
 
 
+bool CUdpRequest::IsChunkedResponseAllowed() const
+{
+	// The datagrams are not HTTP requests: there is no HTTP framing of the response
+	return false;
+}
+
+
 IRequest::RequestState CUdpRequest::GetState() const
 {
 	return m_state;

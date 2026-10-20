@@ -475,6 +475,12 @@ bool CHttpRequest::IsResponseBodyOmitted() const
 }
 
 
+bool CHttpRequest::IsChunkedResponseAllowed() const
+{
+	return (m_httpParser.http_major > 1) || ((m_httpParser.http_major == 1) && (m_httpParser.http_minor >= 1));
+}
+
+
 IRequest::HeadAction CHttpRequest::TakeHeadAction(QByteArray& message)
 {
 	message.clear();

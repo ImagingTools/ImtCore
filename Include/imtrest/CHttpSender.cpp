@@ -81,6 +81,70 @@ void AppendConnectionTokens(const QByteArray& value, QByteArrayList& tokens)
 }
 
 
+struct SBodyFraming
+{
+	QByteArray contentLength;
+	bool isChunked = false;
+	imtrest::CHttpSender::BodyFraming framing = imtrest::CHttpSender::BF_NONE;
+};
+
+
+/**
+	Decide how the end of the body is shown to the client.
+	\param	bodySize	Size of the body of a streamed response, a negative value if it is not known. It is not used if the response
+						is not streamed.
+	\param	contentSize	Size of the data of a response that is not streamed.
+*/
+SBodyFraming DecideBodyFraming(
+			int protocolStatusCode,
+			const imtrest::CHttpSender::ResponseOptions& options,
+			bool isStreamed,
+			qint64 bodySize,
+			qint64 contentSize,
+			bool hasTransferEncoding,
+			const QByteArray& ownContentLength)
+{
+	SBodyFraming retVal;
+
+	const bool isInformational = (protocolStatusCode < 200);
+	const bool isContentForbidden = isInformational || (protocolStatusCode == 204) || (protocolStatusCode == 304) || (protocolStatusCode == 205);
+
+	if (isStreamed && !isContentForbidden){
+		if (options.isBodyOmitted){
+			retVal.contentLength = (bodySize >= 0) ? QByteArray::number(bodySize) : ownContentLength;
+		}
+		else if (bodySize >= 0){
+			retVal.contentLength = QByteArray::number(bodySize);
+			retVal.framing = (bodySize > 0) ? imtrest::CHttpSender::BF_CONTENT_LENGTH : imtrest::CHttpSender::BF_NONE;
+		}
+		else if (options.isChunkedAllowed){
+			retVal.isChunked = true;
+			retVal.framing = imtrest::CHttpSender::BF_CHUNKED;
+		}
+		else{
+			retVal.framing = imtrest::CHttpSender::BF_UNTIL_CLOSE;
+		}
+	}
+	else if (hasTransferEncoding || isInformational || (protocolStatusCode == 204)){
+		// No length
+	}
+	else if (protocolStatusCode == 304){
+		retVal.contentLength = ownContentLength;
+	}
+	else if (protocolStatusCode == 205){
+		retVal.contentLength = QByteArrayLiteral("0");
+	}
+	else if (options.isBodyOmitted){
+		retVal.contentLength = (contentSize == 0) ? ownContentLength : QByteArray::number(contentSize);
+	}
+	else{
+		retVal.contentLength = QByteArray::number(contentSize);
+	}
+
+	return retVal;
+}
+
+
 } // namespace
 
 
@@ -120,6 +184,59 @@ bool CHttpSender::BuildResponseData(const IResponse& response, QByteArray& data)
 
 bool CHttpSender::BuildResponseData(const IResponse& response, QByteArray& data, const ResponseOptions& options)
 {
+	BodyFraming framing = BF_NONE;
+
+	return BuildData(response, response.GetData(), options, StreamedBody(), data, framing);
+}
+
+
+bool CHttpSender::BuildStreamingResponseHead(const IResponse& response, qint64 bodySize, const ResponseOptions& options, QByteArray& head, BodyFraming& framing)
+{
+	StreamedBody streamedBody;
+	streamedBody.isStreamed = true;
+	streamedBody.size = (bodySize >= 0) ? bodySize : -1;
+
+	return BuildData(response, QByteArray(), options, streamedBody, head, framing);
+}
+
+
+QByteArray CHttpSender::CreateChunk(const QByteArray& data)
+{
+	if (data.isEmpty()){
+		return {};
+	}
+
+	const QByteArray sizeText = QByteArray::number(data.size(), 16);
+
+	QByteArray retVal;
+	retVal.reserve(sizeText.size() + data.size() + 4);
+	retVal.append(sizeText);
+	retVal.append("\r\n");
+	retVal.append(data);
+	retVal.append("\r\n");
+
+	return retVal;
+}
+
+
+QByteArray CHttpSender::CreateLastChunk()
+{
+	return QByteArrayLiteral("0\r\n\r\n");
+}
+
+
+// private static methods
+
+bool CHttpSender::BuildData(
+			const IResponse& response,
+			const QByteArray& contentData,
+			const ResponseOptions& options,
+			const StreamedBody& streamedBody,
+			QByteArray& data,
+			BodyFraming& framing)
+{
+	framing = BF_NONE;
+
 	int protocolStatusCode = -1;
 	QByteArray statusLiteral;
 
@@ -163,6 +280,11 @@ bool CHttpSender::BuildResponseData(const IResponse& response, QByteArray& data,
 			continue;
 		}
 
+		// The framing of a streamed body is decided by the sender
+		if (streamedBody.isStreamed && (lowerName == "transfer-encoding")){
+			continue;
+		}
+
 		hasDate = hasDate || (lowerName == "date");
 		hasContentType = hasContentType || (lowerName == "content-type");
 		hasTransferEncoding = hasTransferEncoding || ((lowerName == "transfer-encoding") && !value.trimmed().isEmpty());
@@ -170,25 +292,19 @@ bool CHttpSender::BuildResponseData(const IResponse& response, QByteArray& data,
 		headersData += name + ": " + value + "\r\n";
 	}
 
-	const QByteArray& contentData = response.GetData();
-
 	// The response is the only source of the length of the representation for 304 and HEAD (RFC 9110, section 8.6)
-	QByteArray contentLength;
-	if (hasTransferEncoding || isInformational || (protocolStatusCode == 204)){
-		contentLength.clear();
-	}
-	else if (protocolStatusCode == 304){
-		contentLength = ownContentLength;
-	}
-	else if (protocolStatusCode == 205){
-		contentLength = QByteArrayLiteral("0");
-	}
-	else if (options.isBodyOmitted){
-		contentLength = contentData.isEmpty() ? ownContentLength : QByteArray::number(contentData.size());
-	}
-	else{
-		contentLength = QByteArray::number(contentData.size());
-	}
+	const SBodyFraming bodyFraming = DecideBodyFraming(
+				protocolStatusCode,
+				options,
+				streamedBody.isStreamed,
+				streamedBody.size,
+				contentData.size(),
+				hasTransferEncoding,
+				ownContentLength);
+
+	const QByteArray& contentLength = bodyFraming.contentLength;
+	const bool isChunked = bodyFraming.isChunked;
+	framing = bodyFraming.framing;
 
 	data.clear();
 	data.append(QByteArrayLiteral("HTTP/1.1 "));
@@ -214,7 +330,11 @@ bool CHttpSender::BuildResponseData(const IResponse& response, QByteArray& data,
 		data.append("Content-Length: " + contentLength + "\r\n");
 	}
 
-	if (options.isConnectionClosing){
+	if (isChunked){
+		data.append("Transfer-Encoding: chunked\r\n");
+	}
+
+	if (options.isConnectionClosing || (framing == BF_UNTIL_CLOSE)){
 		connectionTokens.append(QByteArrayLiteral("close"));
 	}
 
@@ -224,7 +344,7 @@ bool CHttpSender::BuildResponseData(const IResponse& response, QByteArray& data,
 
 	data.append("\r\n");
 
-	if (isContentSent){
+	if (isContentSent && !streamedBody.isStreamed){
 		data.append(contentData);
 	}
 
