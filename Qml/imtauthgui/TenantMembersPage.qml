@@ -338,6 +338,10 @@ SimpleCollectionPage {
 				permsLoading.stop()
 			}
 		}
+
+		function onRequestFailed(message) {
+			permsLoading.stop()
+		}
 	}
 
 	// --- Combined model: invitations + active members ---

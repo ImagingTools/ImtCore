@@ -22,8 +22,8 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>name</Value>
+                                <Value>userId</Value>
                                 <Value>mail</Value>
-                                <Value>systemName</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -31,10 +31,8 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>name</Value>
+                                <Value>userId</Value>
                                 <Value>mail</Value>
-                                <Value>systemName</Value>
-                                <Value>roles</Value>
-                                <Value>groups</Value>
                                 <Value>lastConnection</Value>
                             </Values>
                         </Data>
@@ -43,10 +41,8 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>Name</Value>
+                                <Value>Username</Value>
                                 <Value>Email</Value>
-                                <Value>System Name</Value>
-                                <Value>Roles</Value>
-                                <Value>Groups</Value>
                                 <Value>Last Connection</Value>
                             </Values>
                         </Data>
@@ -55,8 +51,8 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>name</Value>
+                                <Value>userId</Value>
                                 <Value>mail</Value>
-                                <Value>systemName</Value>
                                 <Value>lastConnection</Value>
                             </Values>
                         </Data>
@@ -368,7 +364,7 @@
                                 <Value>Roles</Value>
                                 <Value>Groups</Value>
                                 <Value>LastConnection</Value>
-                                <Value>UserId</Value>
+                                <Value>Id</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

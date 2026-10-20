@@ -360,6 +360,12 @@ Item {
 			}
 		}
 
+		onFinished: {
+			if (status < 0){
+				root.objectMetaInfoReceiveFailed("")
+			}
+		}
+
 		function getHeaders(){
 			return root.getHeaders();
 		}

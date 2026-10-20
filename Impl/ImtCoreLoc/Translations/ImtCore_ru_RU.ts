@@ -185,6 +185,10 @@
 <context>
     <name>Attribute</name>
     <message>
+        <source>Members</source>
+        <translation>Участники</translation>
+    </message>
+    <message>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DdlCodeCreator/CDdlCodeCreator.cpp" line="+33"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+41"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+36"/>
@@ -10315,6 +10319,14 @@ ID входных данных: </translation>
 </context>
 <context>
     <name>UserCollectionView</name>
+    <message>
+        <source>Source</source>
+        <translation>Источник</translation>
+    </message>
+    <message>
+        <source>Never</source>
+        <translation>Никогда</translation>
+    </message>
     <message>
         <location filename="../../../Qml/imtauthgui/UserCollectionView.qml" line="+60"/>
         <source>System Info</source>

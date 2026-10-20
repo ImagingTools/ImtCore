@@ -46,7 +46,7 @@ RemoteCollectionView {
 		id: systemInfoDelegateFilterComp
 		FieldFilterDelegate {
 			id: systemInfoDelegateFilter
-			name: qsTr("System Info")
+			name: qsTr("Source")
 
 			Component.onCompleted: {
 				createAndAddOption("Internal", qsTr("Internal"), "", true)
@@ -76,7 +76,6 @@ RemoteCollectionView {
 	
 	Component.onCompleted: {
 		table.setSortingInfo(UserItemDataTypeMetaInfo.s_name, "ASC");
-		table.nonSortableColumns = [UserItemDataTypeMetaInfo.s_roles, UserItemDataTypeMetaInfo.s_groups]
 		registerFieldFilterDelegate("SystemInfo", systemInfoDelegateFilterComp)
 		table.rowDelegate = tableRowDelegateBaseComp;
 	}
@@ -93,151 +92,33 @@ RemoteCollectionView {
 	}
 	
 	onHeadersChanged: {
-		table.setColumnContentById(UserItemDataTypeMetaInfo.s_roles, dataComp);
-		table.setColumnContentById(UserItemDataTypeMetaInfo.s_groups, groupsContentComp);
+		table.setColumnContentById(UserItemDataTypeMetaInfo.s_lastConnection, lastConnectionContentComp);
 	}
-	
-	Component {
-		id: dataComp;
-		
-		TableCellDelegateBase {
-			id: cellDelegate
 
-			clip: true;
+	Component {
+		id: lastConnectionContentComp;
+
+		TableCellDelegateBase {
+			id: lastConnectionCell;
 
 			onReused: {
-				if (!rowDelegate){
-					return
-				}
-				
-				let username = userCollectionViewContainer.table.elements.getData(UserItemDataTypeMetaInfo.s_name, rowIndex);
-				let roles = userCollectionViewContainer.table.elements.getData(UserItemDataTypeMetaInfo.s_roles, rowIndex);
-				arrowButton.visible = roles !== "";
-				if (roles !== ""){
-					let roleList = roles.split(';');
-					name.text = qsTr("View roles") + "(" + roleList.length +  ")";
-					
-					let result = "<b><u>" + username + "</u></b> " + qsTr("has been assigned") + " <b>" + roleList.length + "</b> " + qsTr("roles:");
-					for (let i = 0; i < roleList.length; i++){
-						result += "<p>" + roleList[i] + "</p>";
-					}
-					
-					arrowButton.tooltipText = result;
-				}
-				else{
-					name.text = qsTr("No roles");
-				}
+				let lastConnection = String(lastConnectionCell.getValue());
+				lastConnectionText.text = lastConnection !== "" ? lastConnection : qsTr("Never");
+				lastConnectionText.color = lastConnection !== "" ? Style.textColor : Style.inactiveTextColor;
 			}
-			
-			Text {
-				id: name;
 
-				anchors.verticalCenter: parent.verticalCenter;
+			Text {
+				id: lastConnectionText;
+
 				anchors.left: parent.left;
 				anchors.leftMargin: Style.marginM;
+				anchors.right: parent.right;
+				anchors.verticalCenter: parent.verticalCenter;
 
 				font.pixelSize: Style.fontSizeM;
 				font.family: Style.fontFamily;
-				color: Style.textColor;
-				
 				elide: Text.ElideRight;
 			}
-			
-			ToolButton {
-				id: arrowButton;
-				
-				anchors.verticalCenter: parent.verticalCenter;
-				anchors.left: name.right;
-				anchors.leftMargin: Style.marginXS;
-				
-				width: Style.buttonWidthXS;
-				height: width;
-				
-				iconSource: "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal);
-				
-				decorator: Component {
-					ToolButtonDecorator {
-						color: "transparent";
-						icon.width: arrowButton.width;
-					}
-				}
-			}
 		}
 	}
-	
-	Component {
-		id: groupsContentComp;
-		
-		TableCellDelegateBase {
-			id: cellDelegate
-			
-			onReused: {
-				if (!rowDelegate){
-					return
-				}
-				
-				let username = userCollectionViewContainer.table.elements.getData(UserItemDataTypeMetaInfo.s_name, rowIndex);
-				let groups = userCollectionViewContainer.table.elements.getData(UserItemDataTypeMetaInfo.s_groups, rowIndex);
-				arrowButton.visible = groups !== "";
-				if (groups !== ""){
-					let groupList = groups.split(';');
-					name2.text =  qsTr("View groups") + "(" + groupList.length +  ")";
-					
-					let result = "<b><u>" + username + "</u></b> " + qsTr("is included into") + " <b>" + groupList.length + "</b> " + qsTr("groups") + ":";
-					for (let i = 0; i < groupList.length; i++){
-						result += "<p>" + groupList[i] + "</p>";
-					}
-					arrowButton.tooltipText = result;
-				}
-				else{
-					name2.text = qsTr("No groups");
-				}
-			}
-			
-			Item {
-				anchors.fill: parent;
-				
-				clip: true;
-				
-				Text {
-					id: name2;
-					
-					anchors.verticalCenter: parent.verticalCenter;
-					anchors.left: parent.left
-					anchors.leftMargin: Style.marginM;
-					
-					font.pixelSize: Style.fontSizeM;
-					font.family: Style.fontFamily;
-					color: Style.textColor;
-					
-					elide: Text.ElideRight;
-				}
-				
-				ToolButton {
-					id: arrowButton;
-					
-					anchors.verticalCenter: parent.verticalCenter;
-					anchors.left: name2.right;
-					anchors.leftMargin: Style.marginXS;
-					
-					width: 15;
-					height: width;
-					
-					visible: name2.text !== "";
-					
-					iconSource: "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal);
-					
-					decorator: Component {
-						ToolButtonDecorator {
-							color: "transparent";
-							icon.width: 16;
-						}
-					}
-				}
-			}
-		}
-	}
-	
 }
-
-
