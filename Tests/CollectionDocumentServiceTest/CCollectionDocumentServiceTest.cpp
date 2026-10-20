@@ -527,7 +527,7 @@ void CCollectionDocumentServiceTest::OpenDocumentMultiplePathSegmentsTest()
 }
 
 
-void CCollectionDocumentServiceTest::OpenDocumentHostObjectIdWithRevisionTest()
+void CCollectionDocumentServiceTest::OpenDocumentWithHostAndRevisionTest()
 {
 	m_managerPtr->GetMockCollection().AddObject(
 		TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME,
@@ -543,10 +543,7 @@ void CCollectionDocumentServiceTest::OpenDocumentHostObjectIdWithRevisionTest()
 	params.url = QUrl("collection://" + QString(TEST_OBJECT_ID) + "/7");
 
 	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, params);
-	QVERIFY2(!taskId.isEmpty(), "BeginDocumentTask should start with host-based objectId and revision");
-
-	auto result = m_managerPtr->WaitForTaskFinished(taskId);
-	QVERIFY2(!result.documentId.isEmpty(), "OpenDocument should succeed for host-based URL with revision");
+	QVERIFY2(taskId.isEmpty(), "BeginDocumentTask should fail when URL has a host even with revision");
 }
 
 

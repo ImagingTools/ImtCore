@@ -375,32 +375,22 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 		this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("Invalid URL scheme")});
 		return;
 	}
+	if (!url.host().isEmpty()){
+		this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("Invalid URL scheme")});
+		return;
+	}
 
 	QString objectIdString;
 	QString revisionPart;
-
-	if (!url.host().isEmpty()){
-		objectIdString = url.host();
-		QStringList hostFormatParts = url.path().split('/', Qt::SkipEmptyParts);
-		if (hostFormatParts.count() > 1){
-			this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("Invalid URL path")});
-			return;
-		}
-		if (hostFormatParts.count() == 1){
-			revisionPart = hostFormatParts.first();
-		}
+	QStringList pathParts = url.path().split('/', Qt::SkipEmptyParts);
+	if (pathParts.count() < 1 || pathParts.count() > 2){
+		this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("Invalid URL path")});
+		return;
 	}
-	else{
-		QStringList pathParts = url.path().split('/', Qt::SkipEmptyParts);
-		if (pathParts.count() < 1 || pathParts.count() > 2){
-			this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("Invalid URL path")});
-			return;
-		}
 
-		objectIdString = pathParts.first();
-		if (pathParts.count() == 2){
-			revisionPart = pathParts.last();
-		}
+	objectIdString = pathParts.first();
+	if (pathParts.count() == 2){
+		revisionPart = pathParts.last();
 	}
 
 	if (objectIdString.isEmpty()){

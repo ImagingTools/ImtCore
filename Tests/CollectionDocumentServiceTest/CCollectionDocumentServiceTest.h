@@ -791,7 +791,7 @@ private slots:
 	void OpenDocumentDataLoadFailClosesDocumentTest();
 	void OpenDocumentWithHostTest();
 	void OpenDocumentMultiplePathSegmentsTest();
-	void OpenDocumentHostObjectIdWithRevisionTest();
+	void OpenDocumentWithHostAndRevisionTest();
 	void OpenDocumentWithRevisionWithoutRevisionControllerFailsTest();
 	void OpenDocumentWithUnknownRevisionFailsTest();
 	void OpenDocumentWithRevisionLoadsRevisionDataTest();
