@@ -51,6 +51,11 @@ I_EXPORT_COMPONENT(
 			"HTTP File Template");
 
 I_EXPORT_COMPONENT(
+			HttpFileServlet,
+			"Sends files by parts: ranges, conditional requests, HEAD. The file is found by the file resolver",
+			"HTTP File Download Range Streaming Resolver");
+
+I_EXPORT_COMPONENT(
 			HttpHtmlFolderBasedServlet,
 			"Generates HTML-document with list of objects for all the files and directories in the directory",
 			"HTTP File Dir Directory HTML");

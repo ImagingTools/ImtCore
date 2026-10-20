@@ -23,6 +23,7 @@ private slots:
 	void RepeatedHeadersTest();
 	void EmptyHeaderValueTest();
 	void HeaderNamesAreLowerCaseTest();
+	void HeaderLookupIgnoresCaseTest();
 	void HeaderValueWithColonsTest();
 	void MissingHeaderTest();
 

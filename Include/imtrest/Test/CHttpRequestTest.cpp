@@ -303,6 +303,32 @@ void CHttpRequestTest::HeaderNamesAreLowerCaseTest()
 }
 
 
+void CHttpRequestTest::HeaderLookupIgnoresCaseTest()
+{
+	CRequestServletStub servlet;
+	CProtocolEngineStub engine;
+	imtrest::CHttpRequest request(servlet, engine);
+
+	QVERIFY(request.ExecuteHttpParser("GET / HTTP/1.1\r\nCONTENT-type: text/plain\r\nX-Mixed-Case: Value\r\ndate: now\r\n\r\n", nullptr));
+
+	// RFC 9110, section 5.1: the name of a header is not case-sensitive, so the caller can use any case
+	QCOMPARE(request.GetHeaderValue("Content-Type"), QByteArray("text/plain"));
+	QCOMPARE(request.GetHeaderValue("content-type"), QByteArray("text/plain"));
+	QCOMPARE(request.GetHeaderValue("CONTENT-TYPE"), QByteArray("text/plain"));
+	QCOMPARE(request.GetHeaderValue("X-MIXED-CASE"), QByteArray("Value"));
+	QCOMPARE(request.GetHeaderValue("Date"), QByteArray("now"));
+
+	// A header that is not in the request
+	QVERIFY(request.GetHeaderValue("Authorization").isEmpty());
+	QVERIFY(request.GetHeaderValue(QByteArray()).isEmpty());
+
+	// The names that are set by the code are not case-sensitive too
+	request.SetHeader("X-Set-Header", "set");
+	QCOMPARE(request.GetHeaderValue("x-set-header"), QByteArray("set"));
+	QCOMPARE(request.GetHeaderValue("X-SET-HEADER"), QByteArray("set"));
+}
+
+
 void CHttpRequestTest::HeaderValueWithColonsTest()
 {
 	CRequestServletStub servlet;
