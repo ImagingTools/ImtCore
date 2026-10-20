@@ -835,6 +835,7 @@ private slots:
 	void SaveDocumentSaveAsTest();
 	void SaveDocumentNewDocumentUpdatesUrlTest();
 	void SaveDocumentSaveAsUpdatesUrlTest();
+	void SaveDocumentRevisionUrlDropsRevisionTest();
 	void SaveDocumentInvalidUserTest();
 	void SaveDocumentInvalidDocumentTest();
 	void SaveDocumentWhileLoadingTest();

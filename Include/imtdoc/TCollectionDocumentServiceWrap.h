@@ -956,6 +956,8 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 		bool res = collectionPtr->SetObjectData(workingDocumentPtr->objectId, *documentSnapshotPtr, istd::IChangeable::CM_WITHOUT_REFS, params.operationContextPtr);
 
 		if (res){
+			workingDocumentPtr->url = this->ObjectIdToUrl(workingDocumentPtr->objectId);
+
 			QString updatedName;
 			if (this->HasDocumentNameProvider(workingDocumentPtr->typeId)){
 				updatedName = this->GetDefaultDocumentName(*workingDocumentPtr);

@@ -15,6 +15,7 @@
 #include <QtCore/QSet>
 
 // ImtCore includes
+#include <imtbase/IRevisionController.h>
 #include <imtbase/imtbase.h>
 
 
@@ -474,7 +475,28 @@ bool CCollectionDocumentServiceComp::RestoreDocument(
 			bool isSingleCopyMode,
 			imtbase::IObjectCollection* collectionPtr)
 {
-	if (isSingleCopyMode && RestoreSharedDocument(documentInfo, userId)){
+	QUrl documentUrl = documentInfo.url.isEmpty() ? ObjectIdToUrl(documentInfo.objectId) : QUrl(documentInfo.url);
+	int requestedRevision = -1;
+	if (!documentInfo.objectId.isEmpty() && !documentInfo.url.isEmpty()){
+		const QStringList pathParts = documentUrl.path().split('/', Qt::SkipEmptyParts);
+		if (documentUrl.scheme() != QStringLiteral("collection")
+				|| !documentUrl.host().isEmpty()
+				|| pathParts.isEmpty()
+				|| pathParts.first().toUtf8() != documentInfo.objectId
+				|| pathParts.count() > 2){
+			return false;
+		}
+
+		if (pathParts.count() == 2){
+			bool conversionOk = false;
+			requestedRevision = pathParts.last().toInt(&conversionOk);
+			if (!conversionOk || requestedRevision < 0){
+				return false;
+			}
+		}
+	}
+
+	if (isSingleCopyMode && requestedRevision < 0 && RestoreSharedDocument(documentInfo, userId)){
 		return true;
 	}
 
@@ -488,7 +510,33 @@ bool CCollectionDocumentServiceComp::RestoreDocument(
 
 	istd::IChangeableSharedPtr objectPtr;
 	if (!documentInfo.objectId.isEmpty()){
-		if (!collectionPtr->GetObjectData(documentInfo.objectId, objectPtr) || !objectPtr.IsValid()){
+		if (requestedRevision >= 0){
+			const imtbase::IRevisionController* revisionControllerPtr = collectionPtr->GetRevisionController();
+			if (revisionControllerPtr == nullptr){
+				return false;
+			}
+
+			bool hasAvailableRevision = false;
+			const imtbase::IRevisionController::RevisionInfoList revisionInfoList =
+					revisionControllerPtr->GetRevisionInfoList(*collectionPtr, documentInfo.objectId);
+			for (const imtbase::IRevisionController::RevisionInfo& revisionInfo : revisionInfoList){
+				if (revisionInfo.revision == requestedRevision && revisionInfo.isRevisionAvailable){
+					hasAvailableRevision = true;
+					break;
+				}
+			}
+
+			if (!hasAvailableRevision){
+				return false;
+			}
+
+			idoc::MetaInfoPtr dataMetaInfoPtr;
+			if (!revisionControllerPtr->GetRevisionData(*collectionPtr, documentInfo.objectId, requestedRevision, objectPtr, dataMetaInfoPtr)
+					|| !objectPtr.IsValid()){
+				return false;
+			}
+		}
+		else if (!collectionPtr->GetObjectData(documentInfo.objectId, objectPtr) || !objectPtr.IsValid()){
 			return false;
 		}
 	}
@@ -510,7 +558,7 @@ bool CCollectionDocumentServiceComp::RestoreDocument(
 	WorkingDocument document;
 	document.objectId = documentInfo.objectId;
 	document.typeId = typeId;
-	document.url = documentInfo.url.isEmpty() ? ObjectIdToUrl(documentInfo.objectId) : QUrl(documentInfo.url);
+	document.url = documentUrl;
 	document.name = documentInfo.name;
 	document.objectPtr = objectPtr;
 	document.undoManagerPtr = undoManagerPtr;
@@ -519,7 +567,7 @@ bool CCollectionDocumentServiceComp::RestoreDocument(
 	document.singleDocumentInstance = documentInfo.singleDocumentInstance;
 	document.undoManagerModelId = -1;
 
-	if (isSingleCopyMode && !documentInfo.objectId.isEmpty()){
+	if (isSingleCopyMode && requestedRevision < 0 && !documentInfo.objectId.isEmpty()){
 		SharedDocumentData shared;
 		shared.typeId = document.typeId;
 		shared.name = document.name;
@@ -538,7 +586,7 @@ bool CCollectionDocumentServiceComp::RestoreDocument(
 		m_userDocuments[userId][documentInfo.documentId] = document;
 	}
 
-	RegisterRestoredDocument(documentInfo, userId, isSingleCopyMode, undoManagerPtr);
+	RegisterRestoredDocument(documentInfo, userId, isSingleCopyMode && requestedRevision < 0, undoManagerPtr);
 
 	return true;
 }
