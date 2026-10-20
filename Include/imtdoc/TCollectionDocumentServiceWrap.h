@@ -18,6 +18,7 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
+#include <imtbase/IRevisionController.h>
 #include <imtdoc/CDocumentServiceBase.h>
 #include <imtdoc/CDocumentClosedEvent.h>
 #include <imtdoc/CDocumentOpenedEvent.h>
