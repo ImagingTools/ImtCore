@@ -2139,7 +2139,7 @@ void CCollectionDocumentServiceTest::SingleCopyFailedCurrentLoadDoesNotCloseRevi
 	QCOMPARE(result.status, imtdoc::IDocumentService::OS_OK);
 	QVERIFY(!result.documentId.isEmpty());
 
-	QTRY_VERIFY_WITH_TIMEOUT(m_managerPtr->GetDocumentPtr(TEST_USER_ID_2, result.documentId) == nullptr, 1000);
+	QTRY_VERIFY_WITH_TIMEOUT(m_managerPtr->GetOpenedDocumentList(TEST_USER_ID_2).isEmpty(), 1000);
 	const auto* revisionDocument = dynamic_cast<const CMockDocumentObject*>(
 		m_managerPtr->GetDocumentPtr(TEST_USER_ID, revisionDocId));
 	QVERIFY(revisionDocument != nullptr);
