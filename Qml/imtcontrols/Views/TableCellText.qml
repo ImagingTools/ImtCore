@@ -1,20 +1,20 @@
 import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
-import imtcontrols 1.0
 
 Text {
     id: name
 
-    property TableRowDelegateBase rowDelegate: null
+    // A TableRowDelegateBase. Untyped, so this file needs no imtcontrols import, which makes every cell instance costlier.
+    property var rowDelegate: null
     property int columnIndex: -1;
     verticalAlignment: Text.AlignVCenter
-    horizontalAlignment: rowDelegate ? rowDelegate.tableItem.emptyDecorCell ? Text.AlignLeft : rowDelegate.tableItem.cellDecorator.isValidData("TextPosition", name.columnIndex) ? rowDelegate.tableItem.cellDecorator.getData("TextPosition", name.columnIndex) : Text.AlignLeft : Text.AlignLeft
+    horizontalAlignment: rowDelegate && rowDelegate.tableItem ? rowDelegate.tableItem.emptyDecorCell ? Text.AlignLeft : rowDelegate.tableItem.cellDecorator.isValidData("TextPosition", name.columnIndex) ? rowDelegate.tableItem.cellDecorator.getData("TextPosition", name.columnIndex) : Text.AlignLeft : Text.AlignLeft
 
-    font.pixelSize: rowDelegate ? rowDelegate.tableItem.emptyDecorCell ? Style.fontSizeM : rowDelegate.tableItem.cellDecorator.isValidData("FontSize", name.columnIndex) ? rowDelegate.tableItem.cellDecorator.getData("FontSize", name.columnIndex) : Style.fontSizeM : Style.fontSizeM
+    font.pixelSize: rowDelegate && rowDelegate.tableItem ? rowDelegate.tableItem.emptyDecorCell ? Style.fontSizeM : rowDelegate.tableItem.cellDecorator.isValidData("FontSize", name.columnIndex) ? rowDelegate.tableItem.cellDecorator.getData("FontSize", name.columnIndex) : Style.fontSizeM : Style.fontSizeM
     font.family: Style.fontFamily
 
-    color: rowDelegate
+    color: rowDelegate && rowDelegate.tableItem
            && rowDelegate.enabled ? (rowDelegate.tableItem.emptyDecorCell ? Style.textColor : rowDelegate.tableItem.cellDecorator.isValidData("FontColor", name.columnIndex) ? rowDelegate.tableItem.cellDecorator.getData("FontColor", name.columnIndex) : Style.textColor) : Style.inactiveTextColor
 
     elide: rowDelegate ? rowDelegate.elideMode : Text.ElideLeft

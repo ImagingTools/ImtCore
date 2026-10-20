@@ -89,4 +89,23 @@ TestCase {
 		table.contentY = 600
 		verifyAllRowsFilled(table, "scrolled")
 	}
+
+	// No time slice at all: only the viewport is filled at once, the queue fills the rest one row per tick
+	function test_viewportRowsFillAtOnce(){
+		let table = createTemporaryObject(tableComp, testCase.parent)
+		table.rowFillSliceMs = 0
+		table.headers = createHeaders()
+		table.elements = createElements("c")
+
+		let list = table.elementsList
+		tryVerify(function(){ return list.count === rowCount && list.itemAtIndex(0) !== null }, 3000, "rows created")
+
+		let viewportRows = Math.floor(list.height / table.itemHeight)
+		verify(viewportRows > 1, "viewport rows: " + viewportRows)
+
+		let empty = emptyRows(table).filter(function(row){ return row < viewportRows })
+		compare(empty.length, 0, "viewport rows without cells " + JSON.stringify(empty))
+
+		verifyAllRowsFilled(table, "rows below the viewport")
+	}
 }

@@ -70,6 +70,34 @@ TestCase {
 		verify(!decoratorAt(panel, 1).isSelected)
 	}
 
+	// The close button lies over the tab's own hover area: pointing at it must keep the tab hovered
+	function test_hoverOnCloseButtonOfInactiveTab(){
+		failOnWarning(/Binding loop/)
+
+		let panel = createPanel(2)
+		panel.isCloseEnable = true
+		let decorator = decoratorAt(panel, 1)
+		verify(!decorator.isSelected)
+
+		let tab = panel.tabsList.itemAtIndex(1)
+		mouseMove(tab, tab.width / 4, tab.height / 2)
+		tryVerify(function(){ return decorator.showClose }, 1000, "Close button shown on hover")
+
+		let closeButton = findChild(decorator, "CloseButton")
+		verify(closeButton !== null)
+		mouseMove(closeButton, closeButton.width / 2, closeButton.height / 2)
+		wait(100)
+
+		verify(decorator.isHovered, "Tab stays hovered over its close button")
+		verify(decorator.showClose, "Close button stays shown")
+		verify(closeButton.enabled)
+
+		// Straight from the close button off the tab
+		mouseMove(panel, panel.width - 5, tab.height / 2)
+		tryVerify(function(){ return !decorator.isHovered }, 1000, "Tab is no longer hovered")
+		verify(!decorator.showClose)
+	}
+
 	function test_tabsAreAdjacent(){
 		let panel = createPanel(3)
 		decoratorAt(panel, 2)
