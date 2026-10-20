@@ -52,6 +52,23 @@ duckdb::Value CDuckValueConverter::ToDuckDbValue(const QVariant& value)
 	case QMetaType::QDate:
 		return duckdb::Value(value.toDate().toString(Qt::ISODate).toStdString());
 
+	// The element type follows the values, so a list of QUuid is a UUID[]. The appender and the parameter binding
+	// cast it to the type of the column.
+	case QMetaType::QVariantList:
+	case QMetaType::QStringList: {
+		duckdb::vector<duckdb::Value> children;
+		for (const QVariant& item : value.toList()){
+			children.push_back(ToDuckDbValue(item));
+		}
+
+		// An empty list has no element to take the type from, and nothing to cast either.
+		if (children.empty()){
+			return duckdb::Value::LIST(duckdb::LogicalType::VARCHAR, std::move(children));
+		}
+
+		return duckdb::Value::LIST(std::move(children));
+	}
+
 	default:
 		return duckdb::Value(value.toString().toStdString());
 	}

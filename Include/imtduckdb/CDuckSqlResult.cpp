@@ -141,24 +141,24 @@ bool CDuckSqlResult::exec()
 		return false;
 	}
 
-	duckdb::case_insensitive_map_t<duckdb::BoundParameterData> namedValues;
-
-	const QStringList names = boundValueNames();
-	const QVariantList values = boundValues();
-	for (qsizetype i = 0; i < names.size() && i < values.size(); ++ i){
-		QString name = names.at(i);
-		if (name.isEmpty()){
-			continue;
-		}
-
-		if (name.startsWith(QLatin1Char(':'))){
-			name.remove(0, 1);
-		}
-
-		namedValues.emplace(name.toStdString(), duckdb::BoundParameterData(CDuckValueConverter::ToDuckDbValue(values.at(i))));
-	}
-
 	try{
+		duckdb::case_insensitive_map_t<duckdb::BoundParameterData> namedValues;
+
+		const QStringList names = boundValueNames();
+		const QVariantList values = boundValues();
+		for (qsizetype i = 0; i < names.size() && i < values.size(); ++ i){
+			QString name = names.at(i);
+			if (name.isEmpty()){
+				continue;
+			}
+
+			if (name.startsWith(QLatin1Char(':'))){
+				name.remove(0, 1);
+			}
+
+			namedValues.emplace(name.toStdString(), duckdb::BoundParameterData(CDuckValueConverter::ToDuckDbValue(values.at(i))));
+		}
+
 		auto queryResultPtr = m_preparedStatementPtr->Execute(namedValues, false);
 
 		// allow_stream_result is false above, so the concrete result is always materialized.
@@ -304,6 +304,9 @@ QMetaType CDuckSqlResult::ConvertMetaType(const duckdb::LogicalType& type)
 	case duckdb::LogicalTypeId::UINTEGER:
 		return QMetaType(QMetaType::LongLong);
 
+	case duckdb::LogicalTypeId::UBIGINT:
+		return QMetaType(QMetaType::ULongLong);
+
 	case duckdb::LogicalTypeId::FLOAT:
 		return QMetaType(QMetaType::Float);
 
@@ -311,6 +314,17 @@ QMetaType CDuckSqlResult::ConvertMetaType(const duckdb::LogicalType& type)
 	case duckdb::LogicalTypeId::DECIMAL:
 		return QMetaType(QMetaType::Double);
 
+	case duckdb::LogicalTypeId::BLOB:
+		return QMetaType(QMetaType::QByteArray);
+
+	case duckdb::LogicalTypeId::LIST:
+	case duckdb::LogicalTypeId::ARRAY:
+		return QMetaType(QMetaType::QVariantList);
+
+	case duckdb::LogicalTypeId::STRUCT:
+		return QMetaType(QMetaType::QVariantMap);
+
+	// UUID, TIMESTAMP, DATE and HUGEINT stay text, which is what the callers read them as.
 	default:
 		return QMetaType(QMetaType::QString);
 	}
@@ -345,6 +359,44 @@ QVariant CDuckSqlResult::ConvertValue(const duckdb::Value& value)
 	case duckdb::LogicalTypeId::DECIMAL:
 		return QVariant(value.GetValue<double>());
 
+	// Surrogate ids use all 64 bits, which a signed type would overflow.
+	case duckdb::LogicalTypeId::UBIGINT:
+		return QVariant(static_cast<qulonglong>(value.GetValue<uint64_t>()));
+
+	// The text form of a blob escapes every byte, so it cannot be read back.
+	case duckdb::LogicalTypeId::BLOB: {
+		const std::string& bytes = duckdb::StringValue::Get(value);
+
+		return QVariant(QByteArray(bytes.data(), static_cast<qsizetype>(bytes.size())));
+	}
+
+	case duckdb::LogicalTypeId::LIST:
+	case duckdb::LogicalTypeId::ARRAY: {
+		const duckdb::vector<duckdb::Value>& children = value.type().id() == duckdb::LogicalTypeId::LIST
+					? duckdb::ListValue::GetChildren(value)
+					: duckdb::ArrayValue::GetChildren(value);
+
+		QVariantList list;
+		list.reserve(static_cast<qsizetype>(children.size()));
+		for (const duckdb::Value& child : children){
+			list.append(ConvertValue(child));
+		}
+
+		return list;
+	}
+
+	case duckdb::LogicalTypeId::STRUCT: {
+		const duckdb::vector<duckdb::Value>& children = duckdb::StructValue::GetChildren(value);
+
+		QVariantMap map;
+		for (duckdb::idx_t i = 0; i < children.size(); ++ i){
+			map.insert(QString::fromStdString(duckdb::StructType::GetChildName(value.type(), i)), ConvertValue(children[i]));
+		}
+
+		return map;
+	}
+
+	// UUID, TIMESTAMP, DATE and HUGEINT stay text, which is what the callers read them as.
 	default:
 		return QVariant(QString::fromStdString(value.ToString()));
 	}
