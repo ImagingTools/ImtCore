@@ -43,7 +43,9 @@ public:
 	virtual BuildResult ApplyChanges(imtduckdb::IDuckConnection& connection, const QDateTime& lastSourceUpdateTime) const override;
 
 protected:
-	/// Cache table columns, in the order the create script declares them and a loaded row fills them. The first one is the surrogate id (UBIGINT) that identifies the row in the change log.
+	/**
+		Cache table columns, in the order the create script declares them and a loaded row fills them. The first one is the surrogate id (UBIGINT) that identifies the row in the change log.
+	*/
 	virtual QStringList GetColumnNames() const = 0;
 
 	/**
@@ -56,7 +58,9 @@ protected:
 				const QDateTime& since,
 				BuildResult& result) const = 0;
 
-	/// Removes cache rows whose source row is gone. The default removes nothing.
+	/**
+		Removes cache rows whose source row is gone. The default removes nothing.
+	*/
 	virtual bool RemoveDeletedRows(
 				imtduckdb::IDuckConnection& connection,
 				const QDateTime& lastSourceUpdateTime,
@@ -68,16 +72,22 @@ protected:
 	*/
 	virtual QString GetReplaceCondition() const;
 
-	/// Column identifying a row in the source.
+	/**
+		Column identifying a row in the source.
+	*/
 	QString GetObjectIdColumn() const;
 
-	/// Column identifying a row in the change log: the first of GetColumnNames().
+	/**
+		Column identifying a row in the change log: the first of GetColumnNames().
+	*/
 	QString GetKeyColumn() const;
 
 private:
 	bool CreateTable(imtduckdb::IDuckConnection& connection, const QString& tableName, QString& errorMessage) const;
 
-	/// False when the live table's columns differ from GetColumnNames(), i.e. it predates a schema change.
+	/**
+		False when the live table's columns differ from GetColumnNames(), i.e. it predates a schema change.
+	*/
 	bool HasExpectedColumns(imtduckdb::IDuckConnection& connection) const;
 
 	QString GetUpsertQuery(const QString& stagingTableName) const;
@@ -90,3 +100,4 @@ private:
 
 
 } // namespace imtcache
+

@@ -4,6 +4,7 @@
 
 // Qt includes
 #include <QtCore/QString>
+#include <QtCore/QStringList>
 #include <QtCore/QVariant>
 
 // ImtCore includes
@@ -44,6 +45,10 @@ public:
 		The first column of the first row of the result of \a query, or an invalid value when there is no row.
 	*/
 	static bool ReadValue(imtdb::IDatabaseEngine& engine, const QString& query, QVariant& value, QString& errorMessage);
+	/**
+		The columns of \a tableName in the current schema, in their order; empty when there is no such table.
+	*/
+	static bool ReadColumnNames(imtdb::IDatabaseEngine& engine, const QString& tableName, QStringList& columnNames, QString& errorMessage);
 };
 
 

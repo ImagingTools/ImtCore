@@ -12,38 +12,52 @@ namespace imtcache
 {
 
 
-/// Bookkeeping tables of the cache.
+/**
+	Bookkeeping tables of the cache.
+*/
 struct CacheTable
 {
 	static const inline QString CACHE_REVISION = QStringLiteral("CacheRevision");
 
-	/// The keys of the rows the mirrors changed, for the tables derived from them.
+	/**
+		The keys of the rows the mirrors changed, for the tables derived from them.
+	*/
 	static const inline QString CACHE_CHANGE = QStringLiteral("CacheChange");
 
-	/// How far each consumer of CACHE_CHANGE has read.
+	/**
+		How far each consumer of CACHE_CHANGE has read.
+	*/
 	static const inline QString CACHE_CHANGE_CURSOR = QStringLiteral("CacheChangeCursor");
 };
 
 
-/// Orders the rows of CacheTable::CACHE_CHANGE.
+/**
+	Orders the rows of CacheTable::CACHE_CHANGE.
+*/
 struct CacheChangeSequence
 {
 	static const inline QString NAME = QStringLiteral("CacheChangeSeq");
 };
 
 
-/// Column names of the CacheTable::CACHE_CHANGE table.
+/**
+	Column names of the CacheTable::CACHE_CHANGE table.
+*/
 struct CacheChangeColumn
 {
 	static const inline QString CHANGE_ID	= QStringLiteral("ChangeId");
 	static const inline QString TABLE_NAME	= QStringLiteral("TableName");
 
-	/// Surrogate id of the row; NULL says the whole table was rebuilt, so any row of it may have changed.
+	/**
+		Surrogate id of the row; NULL says the whole table was rebuilt, so any row of it may have changed.
+	*/
 	static const inline QString KEY_ID		= QStringLiteral("KeyId");
 };
 
 
-/// Column names of the CacheTable::CACHE_CHANGE_CURSOR table.
+/**
+	Column names of the CacheTable::CACHE_CHANGE_CURSOR table.
+*/
 struct CacheChangeCursorColumn
 {
 	static const inline QString CONSUMER			= QStringLiteral("Consumer");
@@ -51,7 +65,9 @@ struct CacheChangeCursorColumn
 };
 
 
-/// Column names of the CacheTable::CACHE_REVISION table.
+/**
+	Column names of the CacheTable::CACHE_REVISION table.
+*/
 struct CacheRevisionColumn
 {
 	static const inline QString TABLE_NAME		= QStringLiteral("TableName");
@@ -59,11 +75,15 @@ struct CacheRevisionColumn
 };
 
 
-/// Surrogate id meaning "no parent" in hierarchical cache tables.
+/**
+	Surrogate id meaning "no parent" in hierarchical cache tables.
+*/
 inline constexpr quint64 ROOT_PARENT_ID = 0;
 
 
-/// Duration for log lines: tenths of a second below a minute, whole seconds above.
+/**
+	Duration for log lines: tenths of a second below a minute, whole seconds above.
+*/
 inline QString FormatDuration(qint64 milliseconds)
 {
 	if (milliseconds < 60000){
@@ -100,10 +120,12 @@ inline quint64 DeriveSurrogateId(const QByteArray& documentId)
 }
 
 
-/// Surrogate id of the source object \a sourceId refers to, or 0 ("refers to nothing") when it is empty or not a UUID.
+/**
+	Surrogate id of the source object \a sourceId refers to, or 0 ("refers to nothing") when it is empty or not a UUID.
+*/
 inline quint64 DeriveReferenceId(const QByteArray& sourceId)
 {
-	const QUuid uuid = QUuid::fromString(QString::fromUtf8(sourceId));
+	const QUuid uuid = QUuid::fromString(sourceId);
 	if (uuid.isNull()){
 		return 0;
 	}
@@ -113,3 +135,4 @@ inline quint64 DeriveReferenceId(const QByteArray& sourceId)
 
 
 } // namespace imtcache
+

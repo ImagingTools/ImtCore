@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtcache/CViewBuilderComp.h>
 
 
@@ -14,7 +15,7 @@ namespace imtcache
 
 QString CViewBuilderComp::GetCacheTableName() const
 {
-	return QString::fromUtf8(*m_viewNameAttrPtr);
+	return QString(*m_viewNameAttrPtr);
 }
 
 
@@ -22,7 +23,7 @@ QStringList CViewBuilderComp::GetRequiredCacheTables() const
 {
 	QStringList retVal;
 	for (int i = 0; i < m_requiredTablesAttrPtr.GetCount(); ++ i){
-		retVal << QString::fromUtf8(m_requiredTablesAttrPtr[i]);
+		retVal << QString(m_requiredTablesAttrPtr[i]);
 	}
 
 	return retVal;
@@ -34,7 +35,7 @@ CViewBuilderComp::BuildResult CViewBuilderComp::Rebuild(imtduckdb::IDuckConnecti
 	BuildResult retVal;
 	retVal.wasFullRebuild = true;
 
-	QFile scriptFile(QString::fromUtf8(*m_createViewScriptPathAttrPtr));
+	QFile scriptFile(QString(*m_createViewScriptPathAttrPtr));
 	if (!scriptFile.open(QFile::ReadOnly)){
 		retVal.errorMessage = QStringLiteral("Unable to read the creation script for %1").arg(GetCacheTableName());
 
@@ -48,7 +49,9 @@ CViewBuilderComp::BuildResult CViewBuilderComp::Rebuild(imtduckdb::IDuckConnecti
 	QSqlError sqlError;
 	connection.ExecSqlQuery(createViewQuery, &sqlError);
 	if (sqlError.type() != QSqlError::NoError){
-		// The old definition stays in place, so a failed update leaves the last working view rather than none.
+		/**
+			The old definition stays in place, so a failed update leaves the last working view rather than none.
+		*/
 		retVal.errorMessage = QStringLiteral("Unable to create view %1. Error: %2").arg(GetCacheTableName(), sqlError.text());
 
 		return retVal;
@@ -64,9 +67,12 @@ CViewBuilderComp::BuildResult CViewBuilderComp::ApplyChanges(
 			imtduckdb::IDuckConnection& connection,
 			const QDateTime& /*lastSourceUpdateTime*/) const
 {
-	// A view has no rows of its own to patch; recreating it is the whole update and costs nothing.
+	/**
+		A view has no rows of its own to patch; recreating it is the whole update and costs nothing.
+	*/
 	return Rebuild(connection);
 }
 
 
 } // namespace imtcache
+

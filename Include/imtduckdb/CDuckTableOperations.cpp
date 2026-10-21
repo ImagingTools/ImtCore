@@ -117,5 +117,27 @@ bool CDuckTableOperations::ReadValue(imtdb::IDatabaseEngine& engine, const QStri
 }
 
 
+bool CDuckTableOperations::ReadColumnNames(imtdb::IDatabaseEngine& engine, const QString& tableName, QStringList& columnNames, QString& errorMessage)
+{
+	QSqlError sqlError;
+	QSqlQuery result = engine.ExecSqlQuery(
+				QStringLiteral("SELECT column_name FROM information_schema.columns WHERE table_name = '%1' AND table_schema = current_schema() ORDER BY ordinal_position")
+							.arg(imtdb::EscapeSql(tableName)).toUtf8(),
+				&sqlError);
+	if (sqlError.type() != QSqlError::NoError){
+		errorMessage = sqlError.text();
+
+		return false;
+	}
+
+	columnNames.clear();
+	while (result.next()){
+		columnNames << result.value(0).toString();
+	}
+
+	return true;
+}
+
+
 } // namespace imtduckdb
 

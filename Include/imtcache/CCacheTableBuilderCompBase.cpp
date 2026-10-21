@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtcache/CCacheTableBuilderCompBase.h>
 
 
@@ -9,32 +10,30 @@
 // ImtCore includes
 #include <imtcache/CCacheChangeLog.h>
 #include <imtdb/imtdb.h>
+#include <imtduckdb/CDuckTableOperations.h>
 
 
 namespace imtcache
 {
 
 
-namespace
-{
-
-const QString SHADOW_SUFFIX = QStringLiteral("_shadow");
-const QString STAGING_SUFFIX = QStringLiteral("_staging");
-
-} // anonymous namespace
+const QString SHADOW_SUFFIX	= QStringLiteral("_shadow");
+const QString STAGING_SUFFIX	= QStringLiteral("_staging");
 
 
 // reimplemented (imtcache::ICacheTableBuilder)
 
 QString CCacheTableBuilderCompBase::GetCacheTableName() const
 {
-	return QString::fromUtf8(*m_tableNameAttrPtr);
+	return QString(*m_tableNameAttrPtr);
 }
 
 
 QStringList CCacheTableBuilderCompBase::GetRequiredCacheTables() const
 {
-	// A table loaded from an outside source reads nothing from the cache.
+	/**
+		A table loaded from an outside source reads nothing from the cache.
+	*/
 	return QStringList();
 }
 
@@ -90,8 +89,10 @@ CCacheTableBuilderCompBase::BuildResult CCacheTableBuilderCompBase::ApplyChanges
 	const QString stagingTableName = tableName + STAGING_SUFFIX;
 	const QString stagingTableIdentifier = imtdb::QuoteIdentifier(stagingTableName);
 
-	// The merge is positional (INSERT ... SELECT *), so a live table from before a schema change cannot
-	// be patched - it would fail on every run. Rebuilding is the only way to bring it forward.
+	/**
+		The merge is positional (INSERT ... SELECT *), so a live table from before a schema change cannot
+		be patched - it would fail on every run. Rebuilding is the only way to bring it forward.
+	*/
 	if (!HasExpectedColumns(connection)){
 		return Rebuild(connection);
 	}
@@ -116,7 +117,9 @@ CCacheTableBuilderCompBase::BuildResult CCacheTableBuilderCompBase::ApplyChanges
 
 	QSqlError sqlError;
 	if (retVal.rowsWritten > 0){
-		// Before the merge, which overwrites what the staged rows are compared with.
+		/**
+			Before the merge, which overwrites what the staged rows are compared with.
+		*/
 		QString logError;
 		int changedCount = 0;
 		if (!CCacheChangeLog::RecordUpserted(connection, tableName, GetKeyColumn(), stagingTableName, GetReplaceCondition(), changedCount, logError)){
@@ -128,7 +131,9 @@ CCacheTableBuilderCompBase::BuildResult CCacheTableBuilderCompBase::ApplyChanges
 
 		connection.ExecSqlQuery(GetUpsertQuery(stagingTableName).toUtf8(), &sqlError);
 
-		// Rows read again unchanged are not writes.
+		/**
+			Rows read again unchanged are not writes.
+		*/
 		retVal.rowsWritten = changedCount;
 	}
 
@@ -178,7 +183,7 @@ QString CCacheTableBuilderCompBase::GetReplaceCondition() const
 
 QString CCacheTableBuilderCompBase::GetObjectIdColumn() const
 {
-	return QString::fromUtf8(*m_objectIdColumnAttrPtr);
+	return QString(*m_objectIdColumnAttrPtr);
 }
 
 
@@ -195,7 +200,7 @@ bool CCacheTableBuilderCompBase::CreateTable(
 			const QString& tableName,
 			QString& errorMessage) const
 {
-	QFile scriptFile(QString::fromUtf8(*m_createTableScriptPathAttrPtr));
+	QFile scriptFile(QString(*m_createTableScriptPathAttrPtr));
 	if (!scriptFile.open(QFile::ReadOnly)){
 		errorMessage = QStringLiteral("Unable to read the creation script for %1").arg(tableName);
 
@@ -224,19 +229,10 @@ bool CCacheTableBuilderCompBase::CreateTable(
 
 bool CCacheTableBuilderCompBase::HasExpectedColumns(imtduckdb::IDuckConnection& connection) const
 {
-	QSqlError sqlError;
-	QSqlQuery query = connection.ExecSqlQuery(
-				QStringLiteral("SELECT column_name FROM information_schema.columns WHERE table_name = '%1' AND table_schema = current_schema() ORDER BY ordinal_position")
-					.arg(imtdb::EscapeSql(GetCacheTableName())).toUtf8(),
-				&sqlError);
-
-	if (sqlError.type() != QSqlError::NoError){
-		return false;
-	}
-
+	QString errorMessage;
 	QStringList actualColumns;
-	while (query.next()){
-		actualColumns << query.value(0).toString();
+	if (!imtduckdb::CDuckTableOperations::ReadColumnNames(connection, GetCacheTableName(), actualColumns, errorMessage)){
+		return false;
 	}
 
 	const QStringList expectedColumns = GetColumnNames();
@@ -245,7 +241,9 @@ bool CCacheTableBuilderCompBase::HasExpectedColumns(imtduckdb::IDuckConnection& 
 	}
 
 	for (int i = 0; i < expectedColumns.count(); ++ i){
-		// DuckDB identifiers are case-insensitive, so the script's spelling need not match the constants'.
+		/**
+			DuckDB identifiers are case-insensitive, so the script's spelling need not match the constants'.
+		*/
 		if (actualColumns[i].compare(expectedColumns[i], Qt::CaseInsensitive) != 0){
 			return false;
 		}
@@ -270,10 +268,12 @@ QString CCacheTableBuilderCompBase::GetUpsertQuery(const QString& stagingTableNa
 	}
 
 	QString retVal = QStringLiteral("INSERT INTO %1 SELECT * FROM %2 ON CONFLICT (%3) DO UPDATE SET %4")
-				.arg(imtdb::QuoteIdentifier(GetCacheTableName()),
-					 imtdb::QuoteIdentifier(stagingTableName),
-					 imtdb::QuoteIdentifier(objectIdColumn),
-					 assignments.join(QStringLiteral(", ")));
+				.arg(
+						/*1*/ imtdb::QuoteIdentifier(GetCacheTableName()),
+						/*2*/ imtdb::QuoteIdentifier(stagingTableName),
+						/*3*/ imtdb::QuoteIdentifier(objectIdColumn),
+						/*4*/ assignments.join(QStringLiteral(", "))
+					);
 
 	const QString replaceCondition = GetReplaceCondition();
 	if (!replaceCondition.isEmpty()){
@@ -285,3 +285,4 @@ QString CCacheTableBuilderCompBase::GetUpsertQuery(const QString& stagingTableNa
 
 
 } // namespace imtcache
+
