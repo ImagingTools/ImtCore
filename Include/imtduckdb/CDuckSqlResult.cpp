@@ -16,55 +16,6 @@ namespace imtduckdb
 {
 
 
-namespace
-{
-
-
-// Translates Qt's Oracle-style ':name' placeholders into DuckDB's '$name' named-parameter syntax,
-// leaving quoted string/identifier literals and '::type' casts untouched.
-QString ToDuckDbNamedPlaceholders(const QString& query)
-{
-	QString result;
-	result.reserve(query.size());
-
-	QChar closingQuote;
-	const qsizetype queryLength = query.size();
-
-	for (qsizetype i = 0; i < queryLength; ++ i){
-		const QChar ch = query.at(i);
-
-		if (!closingQuote.isNull()){
-			if (ch == closingQuote){
-				closingQuote = QChar();
-			}
-
-			result += ch;
-			continue;
-		}
-
-		const bool isPlaceholderStart = ch == QLatin1Char(':')
-					&& (i == 0 || query.at(i - 1) != QLatin1Char(':'))
-					&& (i + 1 < queryLength && (query.at(i + 1).isLetterOrNumber() || query.at(i + 1) == QLatin1Char('_')));
-
-		if (isPlaceholderStart){
-			result += QLatin1Char('$');
-			continue;
-		}
-
-		if (ch == QLatin1Char('\'') || ch == QLatin1Char('"') || ch == QLatin1Char('`')){
-			closingQuote = ch;
-		}
-
-		result += ch;
-	}
-
-	return result;
-}
-
-
-} // anonymous namespace
-
-
 CDuckSqlResult::CDuckSqlResult(const CDuckSqlDriver* driverPtr, duckdb::Connection& connection)
 	:QSqlResult(driverPtr),
 	m_connection(connection)
@@ -82,7 +33,7 @@ bool CDuckSqlResult::reset(const QString& sqlQuery)
 	m_resultPtr = m_connection.Query(sqlQuery.toStdString());
 
 	if (!m_resultPtr || m_resultPtr->HasError()){
-		QString errorText = m_resultPtr ?
+		const QString errorText = m_resultPtr ?
 					QString::fromStdString(m_resultPtr->GetError()) :
 					QStringLiteral("DuckDB query could not be executed");
 
@@ -100,7 +51,9 @@ bool CDuckSqlResult::reset(const QString& sqlQuery)
 
 bool CDuckSqlResult::prepare(const QString& sqlQuery)
 {
-	// Populates the base class' placeholder-name bookkeeping (used by bindValue()/boundValueNames()).
+	/**
+		Populates the base class' placeholder-name bookkeeping (used by bindValue()/boundValueNames()).
+	*/
 	if (!QSqlResult::prepare(sqlQuery)){
 		return false;
 	}
@@ -111,13 +64,13 @@ bool CDuckSqlResult::prepare(const QString& sqlQuery)
 		m_preparedStatementPtr = m_connection.Prepare(ToDuckDbNamedPlaceholders(sqlQuery).toStdString());
 	}
 	catch (const std::exception& exception){
-		setLastError(QSqlError(QStringLiteral("Unable to prepare statement"), QString::fromUtf8(exception.what()), QSqlError::StatementError));
+		setLastError(QSqlError(QStringLiteral("Unable to prepare statement"), QString(exception.what()), QSqlError::StatementError));
 
 		return false;
 	}
 
 	if (!m_preparedStatementPtr || m_preparedStatementPtr->HasError()){
-		QString errorText = m_preparedStatementPtr ?
+		const QString errorText = m_preparedStatementPtr ?
 					QString::fromStdString(m_preparedStatementPtr->GetError()) :
 					QStringLiteral("DuckDB statement could not be prepared");
 
@@ -161,17 +114,19 @@ bool CDuckSqlResult::exec()
 
 		auto queryResultPtr = m_preparedStatementPtr->Execute(namedValues, false);
 
-		// allow_stream_result is false above, so the concrete result is always materialized.
+		/**
+			allow_stream_result is false above, so the concrete result is always materialized.
+		*/
 		m_resultPtr.reset(static_cast<duckdb::MaterializedQueryResult*>(queryResultPtr.release()));
 	}
 	catch (const std::exception& exception){
-		setLastError(QSqlError(QStringLiteral("Unable to execute statement"), QString::fromUtf8(exception.what()), QSqlError::StatementError));
+		setLastError(QSqlError(QStringLiteral("Unable to execute statement"), QString(exception.what()), QSqlError::StatementError));
 
 		return false;
 	}
 
 	if (!m_resultPtr || m_resultPtr->HasError()){
-		QString errorText = m_resultPtr ?
+		const QString errorText = m_resultPtr ?
 					QString::fromStdString(m_resultPtr->GetError()) :
 					QStringLiteral("DuckDB statement could not be executed");
 
@@ -287,6 +242,46 @@ QSqlRecord CDuckSqlResult::record() const
 
 // private methods
 
+QString CDuckSqlResult::ToDuckDbNamedPlaceholders(const QString& query)
+{
+	QString retVal;
+	retVal.reserve(query.size());
+
+	QChar closingQuote;
+	const qsizetype queryLength = query.size();
+
+	for (qsizetype i = 0; i < queryLength; ++ i){
+		const QChar ch = query.at(i);
+
+		if (!closingQuote.isNull()){
+			if (ch == closingQuote){
+				closingQuote = QChar();
+			}
+
+			retVal += ch;
+			continue;
+		}
+
+		const bool isPlaceholderStart = ch == QLatin1Char(':')
+					&& (i == 0 || query.at(i - 1) != QLatin1Char(':'))
+					&& (i + 1 < queryLength && (query.at(i + 1).isLetterOrNumber() || query.at(i + 1) == QLatin1Char('_')));
+
+		if (isPlaceholderStart){
+			retVal += QLatin1Char('$');
+			continue;
+		}
+
+		if (ch == QLatin1Char('\'') || ch == QLatin1Char('"') || ch == QLatin1Char('`')){
+			closingQuote = ch;
+		}
+
+		retVal += ch;
+	}
+
+	return retVal;
+}
+
+
 QMetaType CDuckSqlResult::ConvertMetaType(const duckdb::LogicalType& type)
 {
 	switch (type.id()){
@@ -324,7 +319,9 @@ QMetaType CDuckSqlResult::ConvertMetaType(const duckdb::LogicalType& type)
 	case duckdb::LogicalTypeId::STRUCT:
 		return QMetaType(QMetaType::QVariantMap);
 
-	// UUID, TIMESTAMP, DATE and HUGEINT stay text, which is what the callers read them as.
+	/**
+		UUID, TIMESTAMP, DATE and HUGEINT stay text, which is what the callers read them as.
+	*/
 	default:
 		return QMetaType(QMetaType::QString);
 	}
@@ -339,35 +336,39 @@ QVariant CDuckSqlResult::ConvertValue(const duckdb::Value& value)
 
 	switch (value.type().id()){
 	case duckdb::LogicalTypeId::BOOLEAN:
-		return QVariant(value.GetValue<bool>());
+		return value.GetValue<bool>();
 
 	case duckdb::LogicalTypeId::TINYINT:
 	case duckdb::LogicalTypeId::SMALLINT:
 	case duckdb::LogicalTypeId::INTEGER:
 	case duckdb::LogicalTypeId::UTINYINT:
 	case duckdb::LogicalTypeId::USMALLINT:
-		return QVariant(value.GetValue<int32_t>());
+		return value.GetValue<int32_t>();
 
 	case duckdb::LogicalTypeId::BIGINT:
 	case duckdb::LogicalTypeId::UINTEGER:
-		return QVariant(static_cast<qlonglong>(value.GetValue<int64_t>()));
+		return static_cast<qlonglong>(value.GetValue<int64_t>());
 
 	case duckdb::LogicalTypeId::FLOAT:
-		return QVariant(value.GetValue<float>());
+		return value.GetValue<float>();
 
 	case duckdb::LogicalTypeId::DOUBLE:
 	case duckdb::LogicalTypeId::DECIMAL:
-		return QVariant(value.GetValue<double>());
+		return value.GetValue<double>();
 
-	// Surrogate ids use all 64 bits, which a signed type would overflow.
+	/**
+		Surrogate ids use all 64 bits, which a signed type would overflow.
+	*/
 	case duckdb::LogicalTypeId::UBIGINT:
-		return QVariant(static_cast<qulonglong>(value.GetValue<uint64_t>()));
+		return static_cast<qulonglong>(value.GetValue<uint64_t>());
 
-	// The text form of a blob escapes every byte, so it cannot be read back.
+	/**
+		The text form of a blob escapes every byte, so it cannot be read back.
+	*/
 	case duckdb::LogicalTypeId::BLOB: {
 		const std::string& bytes = duckdb::StringValue::Get(value);
 
-		return QVariant(QByteArray(bytes.data(), static_cast<qsizetype>(bytes.size())));
+		return QByteArray(bytes.data(), static_cast<qsizetype>(bytes.size()));
 	}
 
 	case duckdb::LogicalTypeId::LIST:
@@ -396,11 +397,14 @@ QVariant CDuckSqlResult::ConvertValue(const duckdb::Value& value)
 		return map;
 	}
 
-	// UUID, TIMESTAMP, DATE and HUGEINT stay text, which is what the callers read them as.
+	/**
+		UUID, TIMESTAMP, DATE and HUGEINT stay text, which is what the callers read them as.
+	*/
 	default:
-		return QVariant(QString::fromStdString(value.ToString()));
+		return QString::fromStdString(value.ToString());
 	}
 }
 
 
 } // namespace imtduckdb
+
