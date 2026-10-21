@@ -26,4 +26,8 @@
 	<file alias="ContactInfoCollectionView.qml">ContactInfoCollectionView.qml</file>
 	<file alias="ContactInfoEditor.qml">ContactInfoEditor.qml</file>
     </qresource>
+    <qresource prefix="/qml">
+        <file alias="ReportsPage.qml">ReportsPage.qml</file>
+        <file alias="ReportTemplatesPage.qml">ReportTemplatesPage.qml</file>
+    </qresource>
 </RCC>

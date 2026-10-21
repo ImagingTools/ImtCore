@@ -17,6 +17,8 @@
         <Element ComponentName="GridViewPage" X="150" Y="100" Note=""/>
         <Element ComponentName="IndicatorsPage" X="375" Y="225" Note=""/>
         <Element ComponentName="InputsPage" X="125" Y="375" Note=""/>
+        <Element ComponentName="ReportsPage" X="600" Y="525" Note=""/>
+        <Element ComponentName="ReportTemplatesPage" X="850" Y="525" Note=""/>
         <Element ComponentName="SdlTestPage" X="375" Y="525" Note=""/>
         <Element ComponentName="TablePage" X="825" Y="100" Note=""/>
         <Element ComponentName="TableTreeViewPage" X="375" Y="100" Note=""/>

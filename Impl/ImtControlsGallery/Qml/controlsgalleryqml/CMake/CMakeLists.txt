@@ -3,6 +3,10 @@ project(controlsgalleryqml LANGUAGES CXX)
 include(${IMTCOREDIR}/Config/CMake/WebCompiler.cmake)
 include(${ACFDIR}/Config/CMake/StaticConfig.cmake)
 
+# EjEditor QML module (3rdParty/EjQml) is registered from its own .qrc, which lives next to the sources
+acf_wrap_resources(EJEDITOR_RESOURCES "${IMTCOREDIR}/3rdParty/EjQml/qml/EjEditor/EjEditor.qrc")
+target_sources(${PROJECT_NAME} PRIVATE ${EJEDITOR_RESOURCES})
+
 if(QT_VERSION_MAJOR EQUAL 6)
 	target_link_libraries(${PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::Core5Compat)
 endif()
@@ -27,6 +31,10 @@ list(APPEND webdirs ${buildwebdir}/src/controlsgalleryContactInfoCollectionDocum
 
 list(APPEND webdirs ${AUX_INCLUDE_DIR}/controlsgallerysdl/SDL/1.0/QML/controlsgalleryParamsSetTestSdl)
 list(APPEND webdirs ${buildwebdir}/src/controlsgalleryParamsSetTestSdl)
+
+# EjEditor QML module: needed by the default (jqml_compile_web2) web build, which compiles only the copied webdirs
+list(APPEND webdirs ${IMTCOREDIR}/3rdParty/EjQml/qml/EjEditor)
+list(APPEND webdirs ${buildwebdir}/src/EjEditor)
 
 option(USE_NEW_WEB "Use new web compilation (jq_compile_web)" OFF)
 
