@@ -238,19 +238,20 @@ ViewBase {
 		Column {
 			id: mainColumn
 			anchors.horizontalCenter: parent.horizontalCenter
-			width: Math.min(parent.width - Style.marginXL * 2, 600)
-			spacing: Style.marginXL
+			width: Math.min(parent.width - Style.marginXL * 2, Style.contentWidthMax)
+			spacing: Style.marginM
 
-			Text {
-				text: qsTr("Connect Organization")
-				font.pixelSize: Style.fontSizeXL
-				font.bold: true
-				color: Style.textColor
+			// Width of the label column of the form rows, as in the document editors
+			readonly property int labelWidth: Math.min(Style.sizeHintS, Math.round(mainColumn.width * 0.35))
+
+			GroupHeaderView {
+				width: parent.width
+				title: qsTr("Connect Organization")
 			}
 
 			Text {
 				text: qsTr("Enter the Connection Code of the organization you want to connect with.")
-				font.pixelSize: Style.fontSizeM
+				font.pixelSize: Style.fontSizeS
 				color: Style.inactiveTextColor
 				wrapMode: Text.WordWrap
 				width: parent.width
@@ -259,8 +260,8 @@ ViewBase {
 			Rectangle {
 				width: parent.width
 				height: sendColumn.height + Style.marginL * 2
-				color: Style.backgroundColor2
-				radius: Style.radiusL
+				color: Style.baseColor
+				radius: Style.radiusM
 				border.width: 1
 				border.color: Style.borderColor
 
@@ -272,38 +273,60 @@ ViewBase {
 					anchors.margins: Style.marginL
 					spacing: Style.marginM
 
-					Column {
+					Item {
 						width: parent.width
-						spacing: Style.marginXS
+						height: Style.controlHeightM
 
 						Text {
+							anchors.left: parent.left
+							anchors.verticalCenter: parent.verticalCenter
+							width: mainColumn.labelWidth
 							text: qsTr("Connection Code")
-							font.pixelSize: Style.fontSizeS
-							color: Style.inactiveTextColor
+							font.family: Style.fontFamilyBold
+							font.pixelSize: Style.fontSizeM
+							font.bold: true
+							color: Style.textColor
+							elide: Text.ElideRight
 						}
 
 						CustomTextField {
 							id: codeInput
-							width: parent.width
+							anchors.right: parent.right
+							anchors.verticalCenter: parent.verticalCenter
+							width: parent.width - mainColumn.labelWidth - Style.marginL
 							height: Style.controlHeightM
 							textSize: Style.fontSizeM
 							placeHolderText: qsTr("Enter code...")
 						}
 					}
 
-					Column {
+					Rectangle {
 						width: parent.width
-						spacing: Style.marginXS
+						height: 1
+						color: Style.borderColor
+					}
+
+					Item {
+						width: parent.width
+						height: Style.controlHeightM
 
 						Text {
+							anchors.left: parent.left
+							anchors.verticalCenter: parent.verticalCenter
+							width: mainColumn.labelWidth
 							text: qsTr("Message (optional)")
-							font.pixelSize: Style.fontSizeS
-							color: Style.inactiveTextColor
+							font.family: Style.fontFamilyBold
+							font.pixelSize: Style.fontSizeM
+							font.bold: true
+							color: Style.textColor
+							elide: Text.ElideRight
 						}
 
 						CustomTextField {
 							id: messageInput
-							width: parent.width
+							anchors.right: parent.right
+							anchors.verticalCenter: parent.verticalCenter
+							width: parent.width - mainColumn.labelWidth - Style.marginL
 							height: Style.controlHeightM
 							textSize: Style.fontSizeM
 							placeHolderText: qsTr("Add a message...")
@@ -320,6 +343,8 @@ ViewBase {
 					}
 
 					Button {
+						anchors.right: parent.right
+						variant: "primary"
 						text: connectPage.sending ? qsTr("Sending...") : qsTr("Send Request")
 						enabled: codeInput.text.trim().length > 0 && !connectPage.sending && connectPage.__canConnectOrganization
 						onClicked: {
@@ -336,24 +361,21 @@ ViewBase {
 				}
 			}
 
-			Rectangle {
+			Item {
 				width: parent.width
-				height: 1
-				color: Style.borderColor
+				height: Style.marginM
 			}
 
-			Text {
-				text: qsTr("Incoming Requests")
-				font.pixelSize: Style.fontSizeL
-				font.bold: true
-				color: Style.textColor
+			GroupHeaderView {
+				width: parent.width
+				title: qsTr("Incoming Requests")
 				visible: connectPage.__canViewConnections
 			}
 
 			Text {
 				visible: requestsList.count === 0
 				text: qsTr("No pending incoming requests.")
-				font.pixelSize: Style.fontSizeM
+				font.pixelSize: Style.fontSizeS
 				color: Style.inactiveTextColor
 			}
 
@@ -368,8 +390,8 @@ ViewBase {
 				delegate: Rectangle {
 					width: requestsList.width
 					height: incomingContent.height + Style.marginL * 2
-					color: Style.backgroundColor2
-					radius: Style.radiusL
+					color: Style.baseColor
+					radius: Style.radiusM
 					border.width: 1
 					border.color: Style.borderColor
 
@@ -422,62 +444,31 @@ ViewBase {
 						anchors.verticalCenter: parent.verticalCenter
 						spacing: Style.marginS
 
-						Rectangle {
-							width: approveBtnText.contentWidth + Style.marginL * 2
-							height: Style.controlHeightS
-							radius: Style.radiusM
-							color: connectPage.processingRequestId === modelData.id ? Style.inactiveTextColor : Style.successColor
-
-							Text {
-								id: approveBtnText
-								anchors.centerIn: parent
-								text: connectPage.processingRequestId === modelData.id ? qsTr("Approving...") : qsTr("Approve")
-								font.pixelSize: Style.fontSizeS
-								color: Style.highlightedTextColor
-							}
-
-							MouseArea {
-								anchors.fill: parent
-								cursorShape: Qt.PointingHandCursor
-								enabled: connectPage.processingRequestId === "" && connectPage.__canManageConnections
-								onClicked: {
-									if (connectPage.apiClient && connectPage.tenantData) {
-										connectPage.processingRequestId = modelData.id || ""
-										connectPage.processingRequestAction = "approve"
-										connectPage.__setIncomingStatus("", "", false)
-										connectPage.apiClient.approveConnectionRequest(
-											modelData.id, connectPage.tenantData.m_id)
-									}
+						Button {
+							variant: "primary"
+							text: connectPage.processingRequestId === modelData.id && connectPage.processingRequestAction === "approve" ? qsTr("Approving...") : qsTr("Approve")
+							enabled: connectPage.processingRequestId === "" && connectPage.__canManageConnections
+							onClicked: {
+								if (connectPage.apiClient && connectPage.tenantData) {
+									connectPage.processingRequestId = modelData.id || ""
+									connectPage.processingRequestAction = "approve"
+									connectPage.__setIncomingStatus("", "", false)
+									connectPage.apiClient.approveConnectionRequest(
+										modelData.id, connectPage.tenantData.m_id)
 								}
 							}
 						}
 
-						Rectangle {
-							width: rejectBtnText.contentWidth + Style.marginL * 2
-							height: Style.controlHeightS
-							radius: Style.radiusM
-							color: connectPage.processingRequestId === modelData.id ? Style.inactiveTextColor : Style.dangerColor
-
-							Text {
-								id: rejectBtnText
-								anchors.centerIn: parent
-								text: connectPage.processingRequestId === modelData.id ? qsTr("Rejecting...") : qsTr("Reject")
-								font.pixelSize: Style.fontSizeS
-								color: Style.highlightedTextColor
-							}
-
-							MouseArea {
-								anchors.fill: parent
-								cursorShape: Qt.PointingHandCursor
-								enabled: connectPage.processingRequestId === "" && connectPage.__canManageConnections
-								onClicked: {
-									if (connectPage.apiClient && connectPage.tenantData) {
-										connectPage.processingRequestId = modelData.id || ""
-										connectPage.processingRequestAction = "reject"
-										connectPage.__setIncomingStatus("", "", false)
-										connectPage.apiClient.rejectConnectionRequest(
-											modelData.id, connectPage.tenantData.m_id)
-									}
+						Button {
+							text: connectPage.processingRequestId === modelData.id && connectPage.processingRequestAction === "reject" ? qsTr("Rejecting...") : qsTr("Reject")
+							enabled: connectPage.processingRequestId === "" && connectPage.__canManageConnections
+							onClicked: {
+								if (connectPage.apiClient && connectPage.tenantData) {
+									connectPage.processingRequestId = modelData.id || ""
+									connectPage.processingRequestAction = "reject"
+									connectPage.__setIncomingStatus("", "", false)
+									connectPage.apiClient.rejectConnectionRequest(
+										modelData.id, connectPage.tenantData.m_id)
 								}
 							}
 						}
@@ -485,24 +476,21 @@ ViewBase {
 				}
 			}
 
-			Rectangle {
+			Item {
 				width: parent.width
-				height: 1
-				color: Style.borderColor
+				height: Style.marginM
 			}
 
-			Text {
-				text: qsTr("Sent Requests")
-				font.pixelSize: Style.fontSizeL
-				font.bold: true
-				color: Style.textColor
+			GroupHeaderView {
+				width: parent.width
+				title: qsTr("Sent Requests")
 				visible: connectPage.__canViewConnections
 			}
 
 			Text {
 				visible: sentRequestsList.count === 0
 				text: qsTr("No pending sent requests.")
-				font.pixelSize: Style.fontSizeM
+				font.pixelSize: Style.fontSizeS
 				color: Style.inactiveTextColor
 			}
 
@@ -517,8 +505,8 @@ ViewBase {
 				delegate: Rectangle {
 					width: sentRequestsList.width
 					height: sentContent.height + Style.marginL * 2
-					color: Style.backgroundColor2
-					radius: Style.radiusL
+					color: Style.baseColor
+					radius: Style.radiusM
 					border.width: 1
 					border.color: Style.borderColor
 
@@ -571,32 +559,16 @@ ViewBase {
 						anchors.verticalCenter: parent.verticalCenter
 						spacing: Style.marginS
 
-						Rectangle {
-							width: cancelBtnText.contentWidth + Style.marginL * 2
-							height: Style.controlHeightS
-							radius: Style.radiusM
-							color: Style.inactiveTextColor
-
-							Text {
-								id: cancelBtnText
-								anchors.centerIn: parent
-								text: qsTr("Cancel")
-								font.pixelSize: Style.fontSizeS
-								color: Style.highlightedTextColor
-							}
-
-							MouseArea {
-								anchors.fill: parent
-								cursorShape: Qt.PointingHandCursor
-								enabled: connectPage.processingRequestId === "" && connectPage.__canConnectOrganization
-								onClicked: {
-									if (connectPage.apiClient && connectPage.tenantData) {
-										connectPage.processingRequestId = modelData.id || ""
-										connectPage.processingRequestAction = "cancel"
-										connectPage.__setSentStatus("", "", false)
-										connectPage.apiClient.cancelConnectionRequest(
-											modelData.id, connectPage.tenantData.m_id)
-									}
+						Button {
+							text: qsTr("Cancel")
+							enabled: connectPage.processingRequestId === "" && connectPage.__canConnectOrganization
+							onClicked: {
+								if (connectPage.apiClient && connectPage.tenantData) {
+									connectPage.processingRequestId = modelData.id || ""
+									connectPage.processingRequestAction = "cancel"
+									connectPage.__setSentStatus("", "", false)
+									connectPage.apiClient.cancelConnectionRequest(
+										modelData.id, connectPage.tenantData.m_id)
 								}
 							}
 						}
@@ -604,23 +576,20 @@ ViewBase {
 				}
 			}
 
-			Rectangle {
+			Item {
 				width: parent.width
-				height: 1
-				color: Style.borderColor
+				height: Style.marginM
 			}
 
-			Text {
-				text: qsTr("Established Connections")
-				font.pixelSize: Style.fontSizeL
-				font.bold: true
-				color: Style.textColor
+			GroupHeaderView {
+				width: parent.width
+				title: qsTr("Established Connections")
 				visible: connectPage.__canViewConnections
 			}
 
 			Text {
 				text: qsTr("Organizations you are connected with.")
-				font.pixelSize: Style.fontSizeM
+				font.pixelSize: Style.fontSizeS
 				color: Style.inactiveTextColor
 				visible: connectPage.__canViewConnections
 			}
@@ -628,7 +597,7 @@ ViewBase {
 			Text {
 				visible: connectionsList.count === 0
 				text: qsTr("No established connections yet.")
-				font.pixelSize: Style.fontSizeM
+				font.pixelSize: Style.fontSizeS
 				color: Style.inactiveTextColor
 			}
 
@@ -643,8 +612,8 @@ ViewBase {
 				delegate: Rectangle {
 					width: connectionsList.width
 					height: connContent.height + Style.marginL * 2
-					color: Style.backgroundColor2
-					radius: Style.radiusL
+					color: Style.baseColor
+					radius: Style.radiusM
 					border.width: 1
 					border.color: Style.borderColor
 
@@ -686,30 +655,14 @@ ViewBase {
 						anchors.verticalCenter: parent.verticalCenter
 						spacing: Style.marginS
 
-						Rectangle {
-							width: removeBtnText.contentWidth + Style.marginL * 2
-							height: Style.controlHeightS
-							radius: Style.radiusM
-							color: Style.dangerColor
-
-							Text {
-								id: removeBtnText
-								anchors.centerIn: parent
-								text: qsTr("Remove")
-								font.pixelSize: Style.fontSizeS
-								color: Style.highlightedTextColor
-							}
-
-							MouseArea {
-								anchors.fill: parent
-								cursorShape: Qt.PointingHandCursor
-								enabled: connectPage.__canManageConnections
-								onClicked: {
-									if (connectPage.apiClient && connectPage.tenantData) {
-										connectPage.__connectionToRemoveId = modelData.id
-										connectPage.__connectionToRemoveName = modelData.partnerName || qsTr("Unknown Organization")
-										ModalDialogManager.openDialog(removeConnectionConfirmDialogComp)
-									}
+						Button {
+							text: qsTr("Remove")
+							enabled: connectPage.__canManageConnections
+							onClicked: {
+								if (connectPage.apiClient && connectPage.tenantData) {
+									connectPage.__connectionToRemoveId = modelData.id
+									connectPage.__connectionToRemoveName = modelData.partnerName || qsTr("Unknown Organization")
+									ModalDialogManager.openDialog(removeConnectionConfirmDialogComp)
 								}
 							}
 						}

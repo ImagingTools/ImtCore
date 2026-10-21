@@ -39,6 +39,7 @@ type ApplicationInfo {
 	superuser: SuperuserCheckResult
 	tenantsEnabled: Bool
 	externalLoginEnabled: Bool
+	documentSharingEnabled: Bool
 }
 
 input GetApplicationInfoInput {

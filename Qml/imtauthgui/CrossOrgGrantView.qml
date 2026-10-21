@@ -134,8 +134,8 @@ ViewBase {
 				width: parent.width
 				text: qsTr("This grant was created for your organization (read-only)")
 				color: Style.inactiveTextColor
-				font.pixelSize: Style.fontSizeM
-				font.italic: true
+				font.pixelSize: Style.fontSizeS
+				wrapMode: Text.WordWrap
 			}
 
 			GroupElementView {

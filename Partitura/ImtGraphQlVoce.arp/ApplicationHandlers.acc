@@ -76,6 +76,9 @@
                     <AttributeInfo Id="TenantsEnabled" Type="Boolean" ExportId="TenantsEnabled">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="DocumentSharingEnabled" Type="Boolean" ExportId="DocumentSharingEnabled">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

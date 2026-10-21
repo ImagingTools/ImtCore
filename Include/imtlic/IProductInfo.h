@@ -280,6 +280,11 @@ public:
 */
 QByteArrayList CollectImpliedPermissions(IProductInfo& productInfo, const QByteArrayList& permissionIds);
 
+/**
+	Get every permission of a product: the full paths of the leaf features marked as permissions.
+*/
+QByteArrayList CollectProductPermissions(IProductInfo& productInfo);
+
 
 typedef istd::TUniqueInterfacePtr<IProductInfo> IProductInfoUniquePtr;
 typedef istd::TSharedInterfacePtr<IProductInfo> IProductInfoSharedPtr;

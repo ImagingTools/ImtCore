@@ -94,6 +94,7 @@ CApplicationInfoControllerComp::ApplicationInfo CApplicationInfoControllerComp::
 
 	applicationInfo.tenantsEnabled = m_tenantsEnabledAttrPtr.IsValid() ? *m_tenantsEnabledAttrPtr : false;
 	applicationInfo.externalLoginEnabled = m_externalLoginEnabledAttrPtr.IsValid() ? *m_externalLoginEnabledAttrPtr : false;
+	applicationInfo.documentSharingEnabled = m_documentSharingEnabledAttrPtr.IsValid() ? *m_documentSharingEnabledAttrPtr : false;
 
 	return applicationInfo;
 }

@@ -12,6 +12,7 @@
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonDocument>
+#include <QtCore/QDateTime>
 
 // ACF includes
 #include <iprm/CTextParam.h>
@@ -43,6 +44,8 @@
 #include <imtcol/CDocumentCollectionFilterRepresentationController.h>
 #include <imtcol/CDocumentCollectionFilter.h>
 #include <imtauthgql/imtauthgql.h>
+#include <imtservergql/DocumentSharing.h>
+#include <imtauth/CDocumentShareInfo.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ComplexCollectionFilter.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/DocumentCollectionFilter.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
@@ -53,6 +56,19 @@ namespace imtservergql
 
 
 // static helpers
+
+[[nodiscard]] static QByteArrayList UniqueIds(const QByteArrayList& ids)
+{
+	QByteArrayList retVal;
+	for (const QByteArray& id : ids){
+		if (!id.isEmpty() && !retVal.contains(id)){
+			retVal.append(id);
+		}
+	}
+
+	return retVal;
+}
+
 
 /**
 	Returns the storage type ID of the value stored in the \c var.
@@ -400,7 +416,7 @@ void CObjectCollectionControllerCompBase::OnComponentCreated()
 
 sdl::V1_0::imtbase::CDuplicateElementsPayload CObjectCollectionControllerCompBase::OnDuplicateElements(
 			const sdl::V1_0::imtbase::CDuplicateElementsGqlRequest& duplicateElementsRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtbase::CDuplicateElementsPayload response;
@@ -423,6 +439,10 @@ sdl::V1_0::imtbase::CDuplicateElementsPayload CObjectCollectionControllerCompBas
 
 	if (elementIds.isEmpty()){
 		errorMessage = QStringLiteral("Unable to duplicate elements. Error: Element-IDs is empty");
+		return response;
+	}
+
+	if (!CheckObjectAccess(gqlRequest, elementIds, imtauth::IDocumentShareInfo::DAL_VIEW, errorMessage)){
 		return response;
 	}
 
@@ -460,8 +480,8 @@ sdl::V1_0::imtbase::CDuplicateElementsPayload CObjectCollectionControllerCompBas
 
 sdl::V1_0::imtbase::CVisualStatus CObjectCollectionControllerCompBase::OnGetObjectVisualStatus(
 			const sdl::V1_0::imtbase::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
-			QString& /*errorMessage*/) const
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
 {
 	sdl::V1_0::imtbase::CVisualStatus response;
 
@@ -474,6 +494,10 @@ sdl::V1_0::imtbase::CVisualStatus CObjectCollectionControllerCompBase::OnGetObje
 	QByteArray typeId;
 	if (arguments.input->typeId){
 		typeId = *arguments.input->typeId;
+	}
+
+	if (!CheckObjectAccess(gqlRequest, {objectId}, imtauth::IDocumentShareInfo::DAL_VIEW, errorMessage)){
+		return response;
 	}
 
 	QString name = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
@@ -529,6 +553,10 @@ sdl::V1_0::imtbase::CRemoveElementsPayload CObjectCollectionControllerCompBase::
 		}
 	}
 
+	if (!CheckObjectAccess(gqlRequest, elementIds, imtauth::IDocumentShareInfo::DAL_OWNER, errorMessage)){
+		return sdl::V1_0::imtbase::CRemoveElementsPayload();
+	}
+
 	if (!OnBeforeRemoveElements(elementIds, gqlRequest, errorMessage)){
 		return sdl::V1_0::imtbase::CRemoveElementsPayload();
 	}
@@ -571,6 +599,15 @@ sdl::V1_0::imtbase::CRemoveElementSetPayload CObjectCollectionControllerCompBase
 		}
 	}
 
+	// The storage removes a set without regard to the tenant, so the selected objects are removed by their IDs
+	istd::TDelPtr<imtauth::CTenantFilterParam> tenantFilterPtr(CreateTenantFilterParam(gqlRequest));
+	const bool isTenantRestricted = tenantFilterPtr.IsValid() && !IsAccessCheckBypassed(gqlRequest);
+	if (isTenantRestricted){
+		tenantFilterPtr->SetSharingScope(imtauth::SS_ACCESSIBLE);
+		tenantFilterPtr->SetMinimumAccessLevel(imtauth::IDocumentShareInfo::DAL_OWNER);
+		filterParams.SetEditableParameter("TenantFilter", tenantFilterPtr.PopPtr(), true);
+	}
+
 	imtbase::ICollectionInfo::Ids elementIds = m_objectCollectionCompPtr->GetElementIds(0, -1, &filterParams);
 	if (!OnBeforeRemoveElements(elementIds, gqlRequest, errorMessage)){
 		return sdl::V1_0::imtbase::CRemoveElementSetPayload();
@@ -586,7 +623,9 @@ sdl::V1_0::imtbase::CRemoveElementSetPayload CObjectCollectionControllerCompBase
 		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext("Remove", elementIds.toList().join(';'));
 	}
 
-	bool ok = m_objectCollectionCompPtr->RemoveElementSet(&filterParams, operationContextPtr.GetPtr());
+	bool ok = isTenantRestricted
+				? elementIds.isEmpty() || m_objectCollectionCompPtr->RemoveElements(elementIds, operationContextPtr.GetPtr())
+				: m_objectCollectionCompPtr->RemoveElementSet(&filterParams, operationContextPtr.GetPtr());
 	if (ok){
 		if (!elementIds.isEmpty()){
 			CreateUserActionLog(elementIds[0], typeId, imtauth::IUserRecentAction::s_deleteActionTypeId, gqlRequest);
@@ -675,6 +714,10 @@ sdl::V1_0::imtbase::CSetObjectNamePayload CObjectCollectionControllerCompBase::O
 		newName = *arguments.input->name;
 	}
 
+	if (!CheckObjectAccess(gqlRequest, {objectId}, imtauth::IDocumentShareInfo::DAL_EDIT, errorMessage)){
+		return sdl::V1_0::imtbase::CSetObjectNamePayload();
+	}
+
 	if (!OnBeforeSetObjectName(objectId, newName, gqlRequest, errorMessage)){
 		return sdl::V1_0::imtbase::CSetObjectNamePayload();
 	}
@@ -720,6 +763,10 @@ sdl::V1_0::imtbase::CSetObjectDescriptionPayload CObjectCollectionControllerComp
 		description = *arguments.input->description;
 	}
 
+	if (!CheckObjectAccess(gqlRequest, {objectId}, imtauth::IDocumentShareInfo::DAL_EDIT, errorMessage)){
+		return sdl::V1_0::imtbase::CSetObjectDescriptionPayload();
+	}
+
 	if (!OnBeforeSetObjectDescription(objectId, description, gqlRequest, errorMessage)){
 		return sdl::V1_0::imtbase::CSetObjectDescriptionPayload();
 	}
@@ -753,7 +800,7 @@ sdl::V1_0::imtbase::CSetObjectDescriptionPayload CObjectCollectionControllerComp
 
 sdl::V1_0::imtbase::CExportObjectPayload CObjectCollectionControllerCompBase::OnExportObject(
 			const sdl::V1_0::imtbase::CExportObjectGqlRequest& exportObjectRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtbase::CExportObjectPayload response;
@@ -772,6 +819,10 @@ sdl::V1_0::imtbase::CExportObjectPayload CObjectCollectionControllerCompBase::On
 	QString mimeType;
 	if (arguments.input->mimeType){
 		mimeType = *arguments.input->mimeType;
+	}
+
+	if (!CheckObjectAccess(gqlRequest, {objectId}, imtauth::IDocumentShareInfo::DAL_VIEW, errorMessage)){
+		return sdl::V1_0::imtbase::CExportObjectPayload();
 	}
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
@@ -1253,6 +1304,10 @@ sdl::V1_0::imtbase::CSetObjectDataPayload CObjectCollectionControllerCompBase::O
 		objectData = (*arguments.input->objectData).toUtf8();
 	}
 
+	if (!CheckObjectAccess(gqlRequest, {objectId}, imtauth::IDocumentShareInfo::DAL_EDIT, errorMessage)){
+		return sdl::V1_0::imtbase::CSetObjectDataPayload();
+	}
+
 	QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(objectId);
 
 	if (objectData.isEmpty()){
@@ -1305,6 +1360,10 @@ sdl::V1_0::imtbase::CGetObjectDataPayload CObjectCollectionControllerCompBase::O
 		objectId = *arguments.input->objectId;
 	}
 
+	if (!CheckObjectAccess(gqlRequest, {objectId}, imtauth::IDocumentShareInfo::DAL_VIEW, errorMessage)){
+		return sdl::V1_0::imtbase::CGetObjectDataPayload();
+	}
+
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
 		errorMessage = QStringLiteral("Unable to get object data '%1'. Error: Object does not exists").arg(objectId);
@@ -1328,7 +1387,7 @@ sdl::V1_0::imtbase::CGetObjectDataPayload CObjectCollectionControllerCompBase::O
 
 sdl::V1_0::imtbase::CGetDataMetaInfoPayload CObjectCollectionControllerCompBase::OnGetDataMetaInfo(
 			const sdl::V1_0::imtbase::CGetDataMetaInfoGqlRequest& getDataMetaInfoRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtbase::CGetDataMetaInfoPayload response;
@@ -1342,6 +1401,10 @@ sdl::V1_0::imtbase::CGetDataMetaInfoPayload CObjectCollectionControllerCompBase:
 	QByteArray objectId;
 	if (arguments.input->objectId){
 		objectId = *arguments.input->objectId;
+	}
+
+	if (!CheckObjectAccess(gqlRequest, {objectId}, imtauth::IDocumentShareInfo::DAL_VIEW, errorMessage)){
+		return sdl::V1_0::imtbase::CGetDataMetaInfoPayload();
 	}
 
 	QByteArray metaInfoData;
@@ -1359,8 +1422,8 @@ sdl::V1_0::imtbase::CGetDataMetaInfoPayload CObjectCollectionControllerCompBase:
 
 sdl::V1_0::imtbase::CGetElementInfoPayload CObjectCollectionControllerCompBase::OnGetElementInfo(
 			const sdl::V1_0::imtbase::CGetElementInfoGqlRequest& getElementInfoRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
-			QString& /*errorMessage*/) const
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
 {
 	sdl::V1_0::imtbase::CGetElementInfoPayload response;
 
@@ -1373,6 +1436,10 @@ sdl::V1_0::imtbase::CGetElementInfoPayload CObjectCollectionControllerCompBase::
 	QByteArray objectId;
 	if (arguments.input->elementId){
 		objectId = *arguments.input->elementId;
+	}
+
+	if (!CheckObjectAccess(gqlRequest, {objectId}, imtauth::IDocumentShareInfo::DAL_VIEW, errorMessage)){
+		return sdl::V1_0::imtbase::CGetElementInfoPayload();
 	}
 
 	sdl::V1_0::imtbase::CParameter parameterInfo;
@@ -1398,7 +1465,7 @@ sdl::V1_0::imtbase::CGetElementInfoPayload CObjectCollectionControllerCompBase::
 
 sdl::V1_0::imtbase::CGetElementMetaInfoPayload CObjectCollectionControllerCompBase::OnGetElementMetaInfo(
 			const sdl::V1_0::imtbase::CGetElementMetaInfoGqlRequest& getElementMetaInfoRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtbase::CGetElementMetaInfoPayload response;
@@ -1412,6 +1479,10 @@ sdl::V1_0::imtbase::CGetElementMetaInfoPayload CObjectCollectionControllerCompBa
 	QByteArray objectId;
 	if (arguments.input->elementId){
 		objectId = *arguments.input->elementId;
+	}
+
+	if (!CheckObjectAccess(gqlRequest, {objectId}, imtauth::IDocumentShareInfo::DAL_VIEW, errorMessage)){
+		return sdl::V1_0::imtbase::CGetElementMetaInfoPayload();
 	}
 
 	idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(objectId);
@@ -1571,6 +1642,251 @@ sdl::V1_0::imtbase::CCreateSubCollectionPayload CObjectCollectionControllerCompB
 }
 
 
+sdl::V1_0::imtbase::CGetDocumentAccessPayload CObjectCollectionControllerCompBase::OnGetDocumentAccess(
+			const sdl::V1_0::imtbase::CGetDocumentAccessGqlRequest& getDocumentAccessRequest,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& /*errorMessage*/) const
+{
+	sdl::V1_0::imtbase::CGetDocumentAccessPayload response;
+	response.items.Emplace();
+
+	sdl::V1_0::imtbase::GetDocumentAccessRequestArguments arguments = getDocumentAccessRequest.GetRequestedArguments();
+	QByteArrayList objectIds;
+	if (arguments.input->objectIds){
+		objectIds = UniqueIds(arguments.input->objectIds->ToList());
+	}
+
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	const QByteArray tenantId = gqlContextPtr != nullptr ? gqlContextPtr->GetTenantId() : QByteArray();
+	const QByteArrayList ownObjectIds = GetOwnObjectIds(gqlRequest, objectIds);
+
+	for (const QByteArray& objectId : objectIds){
+		sdl::V1_0::imtbase::CDocumentAccess accessInfo;
+		accessInfo.objectId = objectId;
+		accessInfo.accessLevel = DocumentAccessLevelToString(imtauth::IDocumentShareInfo::DAL_NONE);
+
+		imtauth::DocumentShares shares;
+		if (m_documentShareManagerCompPtr.IsValid()){
+			shares = m_documentShareManagerCompPtr->GetDocumentShares(objectId);
+		}
+
+		if (ownObjectIds.contains(objectId)){
+			accessInfo.accessLevel = DocumentAccessLevelToString(imtauth::IDocumentShareInfo::DAL_OWNER);
+			accessInfo.ownerTenantId = tenantId;
+			accessInfo.sharesCount = imtbase::narrow_cast<int>(shares.size());
+		}
+		else{
+			// The share is the one the filter would select for this user, so its level is checked by the storage
+			for (const imtauth::IDocumentShareInfoSharedPtr& sharePtr : shares){
+				if (sharePtr->GetTargetTenantId() != tenantId || tenantId.isEmpty()){
+					continue;
+				}
+
+				imtauth::IDocumentShareInfo::AccessLevel accessLevel = imtauth::IDocumentShareInfo::DAL_NONE;
+				if (CheckObjectAccessInScope(gqlRequest, {objectId}, imtauth::SS_INCOMING, imtauth::IDocumentShareInfo::DAL_EDIT)){
+					accessLevel = imtauth::IDocumentShareInfo::DAL_EDIT;
+				}
+				else if (CheckObjectAccessInScope(gqlRequest, {objectId}, imtauth::SS_INCOMING, imtauth::IDocumentShareInfo::DAL_VIEW)){
+					accessLevel = imtauth::IDocumentShareInfo::DAL_VIEW;
+				}
+
+				if (accessLevel != imtauth::IDocumentShareInfo::DAL_NONE){
+					accessInfo.accessLevel = DocumentAccessLevelToString(accessLevel);
+					accessInfo.ownerTenantId = sharePtr->GetOwnerTenantId();
+					accessInfo.ownerTenantName = sharePtr->GetOwnerTenantName();
+					accessInfo.shareId = sharePtr->GetShareId();
+				}
+
+				break;
+			}
+
+			QString accessErrorMessage;
+			if (!accessInfo.shareId.has_value() && CheckObjectAccess(gqlRequest, {objectId}, imtauth::IDocumentShareInfo::DAL_OWNER, accessErrorMessage)){
+				// The object belongs to no organization
+				accessInfo.accessLevel = DocumentAccessLevelToString(imtauth::IDocumentShareInfo::DAL_OWNER);
+			}
+		}
+
+		response.items->push_back(accessInfo);
+	}
+
+	return response;
+}
+
+
+sdl::V1_0::imtbase::CGetDocumentSharesPayload CObjectCollectionControllerCompBase::OnGetDocumentShares(
+			const sdl::V1_0::imtbase::CGetDocumentSharesGqlRequest& getDocumentSharesRequest,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	sdl::V1_0::imtbase::CGetDocumentSharesPayload response;
+
+	if (!m_documentShareManagerCompPtr.IsValid()){
+		errorMessage = QStringLiteral("Document sharing is not enabled for the collection '%1'").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
+		return response;
+	}
+
+	sdl::V1_0::imtbase::GetDocumentSharesRequestArguments arguments = getDocumentSharesRequest.GetRequestedArguments();
+	QByteArray objectId;
+	if (arguments.input->objectId){
+		objectId = *arguments.input->objectId;
+	}
+
+	if (GetOwnObjectIds(gqlRequest, {objectId}).isEmpty()){
+		errorMessage = QStringLiteral("Only the organization owning the document can see its shares");
+		return response;
+	}
+
+	response.shares.Emplace();
+	for (const imtauth::IDocumentShareInfoSharedPtr& sharePtr : m_documentShareManagerCompPtr->GetDocumentShares(objectId)){
+		response.shares->push_back(CreateDocumentShareRepresentation(*sharePtr));
+	}
+
+	return response;
+}
+
+
+sdl::V1_0::imtbase::CShareDocumentsPayload CObjectCollectionControllerCompBase::OnShareDocuments(
+			const sdl::V1_0::imtbase::CShareDocumentsGqlRequest& shareDocumentsRequest,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	sdl::V1_0::imtbase::CShareDocumentsPayload response;
+
+	if (!m_documentShareManagerCompPtr.IsValid()){
+		errorMessage = QStringLiteral("Document sharing is not enabled for the collection '%1'").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
+		return response;
+	}
+
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	const QByteArray tenantId = gqlContextPtr != nullptr ? gqlContextPtr->GetTenantId() : QByteArray();
+	if (tenantId.isEmpty()){
+		errorMessage = QStringLiteral("Documents can only be shared within an organization");
+		return response;
+	}
+
+	sdl::V1_0::imtbase::ShareDocumentsRequestArguments arguments = shareDocumentsRequest.GetRequestedArguments();
+
+	QByteArrayList objectIds;
+	QHash<QByteArray, QString> objectNames;
+	if (arguments.input->objectIds){
+		const QByteArrayList requestedIds = arguments.input->objectIds->ToList();
+		const QList<QString> requestedNames = arguments.input->objectNames ? arguments.input->objectNames->ToList() : QList<QString>();
+		for (int i = 0; i < requestedIds.size() && i < requestedNames.size(); ++i){
+			objectNames.insert(requestedIds[i], requestedNames[i]);
+		}
+
+		objectIds = UniqueIds(requestedIds);
+	}
+
+	QByteArrayList targetTenantIds;
+	if (arguments.input->targetTenantIds){
+		targetTenantIds = UniqueIds(arguments.input->targetTenantIds->ToList());
+	}
+
+	if (objectIds.isEmpty() || targetTenantIds.isEmpty()){
+		errorMessage = QStringLiteral("Documents and target organizations are required");
+		return response;
+	}
+
+	const imtauth::IDocumentShareInfo::AccessLevel accessLevel = DocumentAccessLevelFromString(arguments.input->accessLevel.value_or(QString()));
+	if (accessLevel == imtauth::IDocumentShareInfo::DAL_NONE){
+		errorMessage = QStringLiteral("Invalid access level");
+		return response;
+	}
+
+	const QString validUntilText = arguments.input->validUntil.value_or(QString());
+	const QDateTime validUntil = QDateTime::fromString(validUntilText, Qt::ISODateWithMs);
+	if (!validUntilText.isEmpty() && (!validUntil.isValid() || validUntil <= QDateTime::currentDateTimeUtc())){
+		errorMessage = QStringLiteral("Invalid expiration time '%1'").arg(validUntilText);
+		return response;
+	}
+
+	if (GetOwnObjectIds(gqlRequest, objectIds).size() != objectIds.size()){
+		errorMessage = QStringLiteral("Only documents of the own organization can be shared");
+		return response;
+	}
+
+	const imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
+	const imtauth::CIdentifiableUserInfo* identifiableUserInfoPtr = dynamic_cast<const imtauth::CIdentifiableUserInfo*>(userInfoPtr);
+
+	QByteArrayList shareIds;
+	for (const QByteArray& objectId : objectIds){
+		QString objectName = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
+		if (objectName.isEmpty()){
+			objectName = objectNames.value(objectId).trimmed();
+		}
+
+		for (const QByteArray& targetTenantId : targetTenantIds){
+			imtauth::CIdentifiableDocumentShareInfo shareInfo;
+			shareInfo.SetCollectionId(*m_collectionIdAttrPtr);
+			shareInfo.SetEntityId(objectId);
+			shareInfo.SetEntityName(objectName);
+			shareInfo.SetOwnerTenantId(tenantId);
+			shareInfo.SetTargetTenantId(targetTenantId);
+			shareInfo.SetAccessLevel(accessLevel);
+			shareInfo.SetValidUntil(validUntil);
+			shareInfo.SetMessage(arguments.input->message.value_or(QString()));
+			if (identifiableUserInfoPtr != nullptr){
+				shareInfo.SetCreatedByUserId(identifiableUserInfoPtr->GetObjectUuid());
+			}
+
+			QString shareErrorMessage;
+			const QByteArray shareId = m_documentShareManagerCompPtr->ShareDocument(shareInfo, &shareErrorMessage);
+			if (shareId.isEmpty()){
+				response.errorMessage = shareErrorMessage;
+				errorMessage = shareErrorMessage;
+
+				return response;
+			}
+
+			shareIds.append(shareId);
+		}
+	}
+
+	response.shareIds.Emplace();
+	response.shareIds->FromList(shareIds);
+
+	return response;
+}
+
+
+sdl::V1_0::imtbase::CRevokeDocumentSharesPayload CObjectCollectionControllerCompBase::OnRevokeDocumentShares(
+			const sdl::V1_0::imtbase::CRevokeDocumentSharesGqlRequest& revokeDocumentSharesRequest,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	sdl::V1_0::imtbase::CRevokeDocumentSharesPayload response;
+	response.success = false;
+
+	if (!m_documentShareManagerCompPtr.IsValid()){
+		errorMessage = QStringLiteral("Document sharing is not enabled for the collection '%1'").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
+		return response;
+	}
+
+	sdl::V1_0::imtbase::RevokeDocumentSharesRequestArguments arguments = revokeDocumentSharesRequest.GetRequestedArguments();
+	QByteArrayList shareIds;
+	if (arguments.input->shareIds){
+		shareIds = UniqueIds(arguments.input->shareIds->ToList());
+	}
+
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	const QByteArray tenantId = gqlContextPtr != nullptr ? gqlContextPtr->GetTenantId() : QByteArray();
+
+	for (const QByteArray& shareId : shareIds){
+		const imtauth::IDocumentShareInfoUniquePtr sharePtr = m_documentShareManagerCompPtr->GetShare(shareId);
+		if (!sharePtr.IsValid() || tenantId.isEmpty() || sharePtr->GetOwnerTenantId() != tenantId || sharePtr->GetCollectionId() != *m_collectionIdAttrPtr){
+			errorMessage = QStringLiteral("Only the organization owning the document can revoke its shares");
+			return response;
+		}
+	}
+
+	response.success = m_documentShareManagerCompPtr->RemoveShares(shareIds);
+
+	return response;
+}
+
+
 // reimplemented (imtservergql::CGqlRepresentationDataControllerComp)
 
 QJsonObject CObjectCollectionControllerCompBase::CreateInternalResponse(
@@ -1592,6 +1908,10 @@ QJsonObject CObjectCollectionControllerCompBase::CreateInternalResponse(
 		return UpdateObject(gqlRequest, errorMessage);
 	case OT_LIST:
 		return GetObjectListFromRequest(gqlRequest, errorMessage);
+	}
+
+	if (m_documentShareManagerCompPtr.IsValid() && gqlRequest.GetCommandId() == sdl::V1_0::imtbase::CGetElementMetaInfoGqlRequest::GetCommandId()){
+		return CreateElementMetaInfoResponse(gqlRequest, errorMessage);
 	}
 
 	return BaseClass::CreateInternalResponse(gqlRequest, errorMessage);
@@ -1771,6 +2091,10 @@ QJsonObject CObjectCollectionControllerCompBase::GetObjectFromRequest(
 	QByteArray objectId = inputParamPtr->GetParamArgumentValue("id").toByteArray();
 	QByteArray objectTypeId = GetObjectTypeIdFromRequest(gqlRequest);
 
+	if (!CheckObjectAccess(gqlRequest, {objectId}, imtauth::IDocumentShareInfo::DAL_VIEW, errorMessage)){
+		return QJsonObject();
+	}
+
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
 		errorMessage = QStringLiteral("Unable to get document. Error: Document does not exists");
@@ -1911,6 +2235,10 @@ QJsonObject CObjectCollectionControllerCompBase::UpdateObject(
 	QString name = GetObjectNameFromRequest(gqlRequest);
 	QString description = inputParamPtr->GetParamArgumentValue("description").toString();
 
+	if (!CheckObjectAccess(gqlRequest, {objectId}, imtauth::IDocumentShareInfo::DAL_EDIT, errorMessage)){
+		return QJsonObject();
+	}
+
 	imtbase::IObjectCollection::DataPtr savedObjectPtr;
 	if (!m_objectCollectionCompPtr->GetObjectData(objectId, savedObjectPtr)){
 		errorMessage = QStringLiteral("Unable to find object with id '%1'").arg(objectId);
@@ -1997,6 +2325,10 @@ QJsonObject CObjectCollectionControllerCompBase::RenameObject(
 	QByteArray objectId = inputParamPtr->GetParamArgumentValue("id").toByteArray();
 	QString newName = inputParamPtr->GetParamArgumentValue("newName").toString();
 
+	if (!CheckObjectAccess(gqlRequest, {objectId}, imtauth::IDocumentShareInfo::DAL_EDIT, errorMessage)){
+		return QJsonObject();
+	}
+
 	const QString oldName = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
 
 	if (!m_objectCollectionCompPtr->SetElementName(objectId, newName)){
@@ -2040,6 +2372,10 @@ QJsonObject CObjectCollectionControllerCompBase::SetObjectDescription(
 
 	QByteArray objectId = inputParamPtr->GetParamArgumentValue("id").toByteArray();
 	QString description = inputParamPtr->GetParamArgumentValue("description").toString();
+
+	if (!CheckObjectAccess(gqlRequest, {objectId}, imtauth::IDocumentShareInfo::DAL_EDIT, errorMessage)){
+		return QJsonObject();
+	}
 
 	const QString oldDescription = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 
@@ -2147,6 +2483,11 @@ QJsonObject CObjectCollectionControllerCompBase::GetObjectListFromRequest(
 
 			continue;
 		}
+
+		if (m_documentShareManagerCompPtr.IsValid()){
+			SetupSharingInfo(gqlRequest, objectCollectionIterator->GetObjectId(), itemObj);
+		}
+
 		itemsArray.append(itemObj);
 	}
 	dataObj.insert(QStringLiteral("items"), itemsArray);
@@ -2209,6 +2550,10 @@ QJsonObject CObjectCollectionControllerCompBase::DeleteObject(
 
 	imtbase::ICollectionInfo::Ids objectIds = ExtractObjectIdsForRemoval(gqlRequest, errorMessage);
 	if (!errorMessage.isEmpty()){
+		return QJsonObject();
+	}
+
+	if (!CheckObjectAccess(gqlRequest, objectIds, imtauth::IDocumentShareInfo::DAL_OWNER, errorMessage)){
 		return QJsonObject();
 	}
 
@@ -2444,6 +2789,10 @@ QJsonObject CObjectCollectionControllerCompBase::ExportObject(const imtgql::CGql
 
 	QByteArray objectId = inputParamPtr->GetParamArgumentValue("id").toByteArray();
 	QString mimeType = inputParamPtr->GetParamArgumentValue("mimeType").toString();
+
+	if (!CheckObjectAccess(gqlRequest, {objectId}, imtauth::IDocumentShareInfo::DAL_VIEW, errorMessage)){
+		return QJsonObject();
+	}
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
@@ -2849,6 +3198,10 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 	// Inject optional tenant filter
 	imtauth::CTenantFilterParam* tenantFilterPtr = CreateTenantFilterParam(gqlRequest);
 	if (tenantFilterPtr != nullptr){
+		if (m_documentShareManagerCompPtr.IsValid()){
+			tenantFilterPtr->SetSharingScope(SharingScopeFromString(QString::fromUtf8(gqlRequest.GetHeader(s_sharingScopeHeaderId))));
+		}
+
 		filterParams.SetEditableParameter("TenantFilter", tenantFilterPtr, true);
 	}
 
@@ -2939,7 +3292,13 @@ imtauth::CTenantFilterParam* CObjectCollectionControllerCompBase::CreateTenantFi
 		return nullptr;
 	}
 
-	return imtauthgql::CreateTenantFilterParam(gqlRequest);
+	imtauth::CTenantFilterParam* tenantFilterPtr = imtauthgql::CreateTenantFilterParam(gqlRequest);
+	if (tenantFilterPtr != nullptr && m_documentShareManagerCompPtr.IsValid() && !tenantFilterPtr->GetTenantId().isEmpty()){
+		tenantFilterPtr->SetShareOwnerTenantIds(m_documentShareManagerCompPtr->GetShareOwnerTenantIds(tenantFilterPtr->GetTenantId()), true);
+		tenantFilterPtr->SetSharesRevision(m_documentShareManagerCompPtr->GetSharesRevision());
+	}
+
+	return tenantFilterPtr;
 }
 
 
@@ -3311,6 +3670,188 @@ bool CObjectCollectionControllerCompBase::DeSerializeObject(
 
 	iser::CJsonMemReadArchive archive(objectData);
 	return serializableObject->Serialize(archive);
+}
+
+
+void CObjectCollectionControllerCompBase::SetupSharingInfo(const imtgql::CGqlRequest& gqlRequest, const QByteArray& objectId, QJsonObject& itemObj) const
+{
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	const QByteArray tenantId = gqlContextPtr != nullptr ? gqlContextPtr->GetTenantId() : QByteArray();
+
+	imtauth::IDocumentShareInfo::AccessLevel accessLevel = imtauth::IDocumentShareInfo::DAL_OWNER;
+	if (!tenantId.isEmpty()){
+		for (const imtauth::IDocumentShareInfoSharedPtr& sharePtr : m_documentShareManagerCompPtr->GetDocumentShares(objectId)){
+			if (sharePtr->GetTargetTenantId() == tenantId){
+				// The list holds the document, so the share is effective for this user
+				accessLevel = sharePtr->GetAccessLevel();
+
+				break;
+			}
+		}
+	}
+
+	itemObj.insert(QString::fromUtf8(s_sharingAccessFieldId), DocumentAccessLevelToString(accessLevel));
+}
+
+
+void CObjectCollectionControllerCompBase::AppendSharingMetaInfo(
+			const imtgql::CGqlRequest& gqlRequest,
+			const QByteArray& objectId,
+			QList<sdl::V1_0::imtbase::CParameter>& parameters) const
+{
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	const QByteArray tenantId = gqlContextPtr != nullptr ? gqlContextPtr->GetTenantId() : QByteArray();
+
+	const QByteArray languageId = gqlContextPtr != nullptr ? gqlContextPtr->GetLanguageId() : QByteArray();
+	auto translate = [this, &languageId](const char* text){
+		return m_translationManagerCompPtr.IsValid()
+					? iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QByteArray(text), languageId, QByteArrayLiteral("Attribute"))
+					: QString::fromUtf8(text);
+	};
+
+	auto addParameter = [&parameters, &translate](const QByteArray& id, const char* name, const QByteArray& typeId, const QString& data){
+		sdl::V1_0::imtbase::CParameter parameter;
+		parameter.id = id;
+		parameter.name = translate(name);
+		parameter.typeId = typeId;
+		parameter.data = data;
+
+		parameters << parameter;
+	};
+
+	auto accessText = [&translate](imtauth::IDocumentShareInfo::AccessLevel accessLevel){
+		return accessLevel == imtauth::IDocumentShareInfo::DAL_EDIT ? translate("Can edit") : translate("Can view");
+	};
+
+	QStringList targets;
+	for (const imtauth::IDocumentShareInfoSharedPtr& sharePtr : m_documentShareManagerCompPtr->GetDocumentShares(objectId)){
+		if (!tenantId.isEmpty() && sharePtr->GetTargetTenantId() == tenantId){
+			addParameter(QByteArrayLiteral("SharedBy"), "Shared by", QByteArrayLiteral("String"), sharePtr->GetOwnerTenantName());
+			addParameter(QByteArrayLiteral("SharedAccess"), "Access", QByteArrayLiteral("String"), accessText(sharePtr->GetAccessLevel()));
+
+			const QDateTime validUntil = sharePtr->GetValidUntil();
+			if (validUntil.isValid()){
+				addParameter(QByteArrayLiteral("SharedUntil"), "Shared until", QByteArrayLiteral("DateTime"), validUntil.toUTC().toString(Qt::ISODate));
+			}
+
+			return;
+		}
+
+		targets << QStringLiteral("%1 (%2)").arg(sharePtr->GetTargetTenantName(), accessText(sharePtr->GetAccessLevel()));
+	}
+
+	if (!targets.isEmpty()){
+		addParameter(QByteArrayLiteral("SharedWith"), "Shared with", QByteArrayLiteral("StringList"), targets.join(QStringLiteral(",")));
+	}
+}
+
+
+QJsonObject CObjectCollectionControllerCompBase::CreateElementMetaInfoResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+{
+	sdl::V1_0::imtbase::CGetElementMetaInfoGqlRequest metaInfoRequest(gqlRequest, false);
+	if (!metaInfoRequest.IsValid()){
+		return BaseClass::CreateInternalResponse(gqlRequest, errorMessage);
+	}
+
+	QByteArray objectId;
+	sdl::V1_0::imtbase::GetElementMetaInfoRequestArguments arguments = metaInfoRequest.GetRequestedArguments();
+	if (arguments.input && arguments.input->elementId){
+		objectId = *arguments.input->elementId;
+	}
+
+	// Checked here as well, so that collections overriding OnGetElementMetaInfo stay isolated
+	if (!CheckObjectAccess(gqlRequest, {objectId}, imtauth::IDocumentShareInfo::DAL_VIEW, errorMessage)){
+		return QJsonObject();
+	}
+
+	sdl::V1_0::imtbase::CGetElementMetaInfoPayload payload = OnGetElementMetaInfo(metaInfoRequest, gqlRequest, errorMessage);
+	if (!errorMessage.isEmpty()){
+		return QJsonObject();
+	}
+
+	sdl::V1_0::imtbase::CElementMetaInfo elementMetaInfo;
+	if (payload.elementMetaInfo){
+		elementMetaInfo = *payload.elementMetaInfo;
+	}
+
+	QList<sdl::V1_0::imtbase::CParameter> parameters;
+	if (elementMetaInfo.infoParams){
+		parameters = elementMetaInfo.infoParams->ToList();
+	}
+
+	AppendSharingMetaInfo(gqlRequest, objectId, parameters);
+
+	elementMetaInfo.infoParams.Emplace();
+	elementMetaInfo.infoParams->FromList(parameters);
+	payload.elementMetaInfo = elementMetaInfo;
+
+	QJsonObject dataObj;
+	if (!payload.WriteToJsonObject(dataObj)){
+		errorMessage = QStringLiteral("Unable to create the element meta info response");
+
+		return QJsonObject();
+	}
+
+	QJsonObject responseObj;
+	responseObj.insert(QStringLiteral("data"), dataObj);
+
+	return responseObj;
+}
+
+
+bool CObjectCollectionControllerCompBase::CheckObjectAccess(
+			const imtgql::CGqlRequest& gqlRequest,
+			const QByteArrayList& objectIds,
+			imtauth::IDocumentShareInfo::AccessLevel accessLevel,
+			QString& errorMessage) const
+{
+	if (IsAccessCheckBypassed(gqlRequest)){
+		return true;
+	}
+
+	if (CheckObjectAccessInScope(gqlRequest, objectIds, imtauth::SS_ACCESSIBLE, accessLevel)){
+		return true;
+	}
+
+	// The objects of other organizations are reported as missing, not as forbidden
+	errorMessage = accessLevel == imtauth::IDocumentShareInfo::DAL_VIEW
+				? QStringLiteral("Object does not exist")
+				: QStringLiteral("Object does not exist or the organization may not change it");
+
+	return false;
+}
+
+
+QByteArrayList CObjectCollectionControllerCompBase::GetOwnObjectIds(const imtgql::CGqlRequest& gqlRequest, const QByteArrayList& objectIds) const
+{
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr == nullptr || gqlContextPtr->GetTenantId().isEmpty()){
+		return QByteArrayList();
+	}
+
+	QByteArrayList retVal;
+	for (const QByteArray& objectId : UniqueIds(objectIds)){
+		if (CheckObjectAccessInScope(gqlRequest, {objectId}, imtauth::SS_OWN, imtauth::IDocumentShareInfo::DAL_OWNER)){
+			retVal.append(objectId);
+		}
+	}
+
+	return retVal;
+}
+
+
+bool CObjectCollectionControllerCompBase::CheckObjectAccessInScope(
+			const imtgql::CGqlRequest& gqlRequest,
+			const QByteArrayList& objectIds,
+			imtauth::SharingScope sharingScope,
+			imtauth::IDocumentShareInfo::AccessLevel accessLevel) const
+{
+	istd::TDelPtr<imtauth::CTenantFilterParam> tenantFilterPtr(CreateTenantFilterParam(gqlRequest));
+	if (!tenantFilterPtr.IsValid()){
+		return true;
+	}
+
+	return AreObjectsInSharingScope(*m_objectCollectionCompPtr, *tenantFilterPtr, objectIds, sharingScope, accessLevel);
 }
 
 

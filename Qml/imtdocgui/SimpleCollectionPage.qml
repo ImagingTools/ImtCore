@@ -223,7 +223,7 @@ ViewBase {
 		if (root.documentManager)
 			collectionStackView.addPage(editorViewComponent)
 		else if (root.customEditorComponent)
-			collectionStackView.addPage(root.customEditorComponent)
+			collectionStackView.addPage(customEditorWrapperComponent)
 		collectionStackView.next()
 	}
 
@@ -252,6 +252,9 @@ ViewBase {
 			root.refresh()
 		}
 		function onDocumentNameChanged(documentId, oldName, newName) {
+			// A new document has no name yet; keep the "Create New ..." title
+			if (!newName || newName === "")
+				return
 			stackViewHeader.setHeaderName("edit", newName)
 			stackViewHeader.setHeaderName("create", newName)
 		}
@@ -442,6 +445,23 @@ ViewBase {
 			Component.onDestruction: {
 				if (root)
 					root.selectionManager = null
+			}
+		}
+	}
+
+	// Same centered column as the document editors (SimpleDocumentEditorShell)
+	Component {
+		id: customEditorWrapperComponent
+
+		Item {
+			Loader {
+				anchors.top: parent.top
+				anchors.bottom: parent.bottom
+				anchors.left: parent.left
+				anchors.leftMargin: root.contentLeftMargin
+				width: root.contentWidth
+
+				sourceComponent: root.customEditorComponent
 			}
 		}
 	}

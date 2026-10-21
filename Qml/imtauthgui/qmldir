@@ -66,6 +66,8 @@ TenantMyConnectionsPage 1.0 TenantMyConnectionsPage.qml
 TenantRelationshipProposalsPage 1.0 TenantRelationshipProposalsPage.qml
 TenantMessagesPage 1.0 TenantMessagesPage.qml
 CrossOrgGrantView 1.0 CrossOrgGrantView.qml
+ShareDocumentDialog 1.0 ShareDocumentDialog.qml
+TenantDocumentSharesPage 1.0 TenantDocumentSharesPage.qml
 ContractView 1.0 ContractView.qml
 RelationshipView 1.0 RelationshipView.qml
 MessageView 1.0 MessageView.qml

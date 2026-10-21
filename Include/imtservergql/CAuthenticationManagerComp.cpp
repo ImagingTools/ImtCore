@@ -20,6 +20,7 @@
 #include <imtauth/imtauth.h>
 #include <imtauth/IUserSettings.h>
 #include <imtgql/CGqlRequestContextManager.h>
+#include <imtgql/imtgql.h>
 
 
 namespace imtservergql
@@ -171,7 +172,24 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 			}
 		}
 		else{
-			gqlContextPtr->SetUserInfo(userInfoPtr);
+			// The owner of the organization holds the whole product within it, so the pages, commands and headers built from the permissions show everything
+			const imtauth::IUserInfo::FeatureIds ownerPermissions = imtgql::CollectTenantOwnerPermissions(*gqlContextPtr);
+			istd::IChangeableUniquePtr ownerUserPtr = ownerPermissions.isEmpty() ? istd::IChangeableUniquePtr() : userInfoPtr->CloneMe();
+			imtauth::IUserInfo* ownerUserInfoPtr = dynamic_cast<imtauth::IUserInfo*>(ownerUserPtr.GetPtr());
+			if (ownerUserInfoPtr != nullptr){
+				imtauth::IUserInfo::FeatureIds localPermissions = ownerUserInfoPtr->GetLocalPermissions(productId);
+				for (const QByteArray& permission : ownerPermissions){
+					if (!localPermissions.contains(permission)){
+						localPermissions.append(permission);
+					}
+				}
+				ownerUserInfoPtr->SetLocalPermissions(productId, localPermissions);
+
+				gqlContextPtr->SetUserInfo(ownerUserInfoPtr);
+			}
+			else{
+				gqlContextPtr->SetUserInfo(userInfoPtr);
+			}
 		}
 	}
 

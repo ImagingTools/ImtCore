@@ -4,6 +4,7 @@
 
 // ImtCore includes
 #include <imtauth/ITenantManager.h>
+#include <imtauth/ITenantRelationshipProvider.h>
 #include <imtclientgql/TClientRequestManagerCompWrap.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Tenants_fwd.h>
 
@@ -14,6 +15,7 @@ namespace imtauthgql
 
 class CRemoteTenantControllerComp:
 			virtual public imtauth::ITenantManager,
+			virtual public imtauth::ITenantRelationshipProvider,
 			public imtclientgql::TClientRequestManagerCompWrap<
 							sdl::V1_0::imtauth::CTenantsGqlHandlerCompBase>
 {
@@ -22,6 +24,7 @@ public:
 
 	I_BEGIN_COMPONENT(CRemoteTenantControllerComp);
 		I_REGISTER_INTERFACE(imtauth::ITenantManager);
+		I_REGISTER_INTERFACE(imtauth::ITenantRelationshipProvider);
 		I_ASSIGN(m_tenantFactoryCompPtr, "TenantFactory", "Factory for tenant info objects", true, "TenantFactory");
 	I_END_COMPONENT;
 
@@ -36,6 +39,9 @@ public:
 	virtual bool SetTenantHierarchy(const QByteArray& tenantId, const QByteArray& parentTenantId) override;
 	virtual QByteArray GetSystemTenantId() const override;
 	virtual bool EnsureSystemTenant() override;
+
+	// reimplemented (imtauth::ITenantRelationshipProvider)
+	virtual imtauth::RelatedTenantInfos GetRelatedTenants(const QByteArray& tenantId, QString* tenantNamePtr = nullptr, bool* isReadPtr = nullptr) const override;
 
 protected:
 	// reimplemented (sdl::V1_0::imtauth::CTenantsGqlHandlerCompBase)

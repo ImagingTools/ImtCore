@@ -317,6 +317,38 @@ inline void TCollectionDocumentServiceWrap<Base>::OnOpenDocumentThreadFinished(
 	for (const UserDocumentPair& pair : docsToNotify){
 		this->OnDocumentDataLoaded(pair.first, pair.second);
 	}
+
+	// A document stored without a name shows the one its type derives from the content; opening does not write it
+	for (const UserDocumentPair& pair : docsToNotify){
+		QByteArray typeId;
+		QString documentName;
+		QUrl documentUrl;
+		bool isDirty = false;
+		{
+			QMutexLocker locker(&this->m_mutex);
+			WorkingDocument* docPtr = this->FindDocument(pair.first, pair.second);
+			if (docPtr == nullptr || !docPtr->name.isEmpty() || !docPtr->objectPtr.IsValid() || !this->HasDocumentNameProvider(docPtr->typeId)){
+				continue;
+			}
+
+			documentName = this->GetDefaultDocumentName(*docPtr);
+			if (documentName.isEmpty()){
+				continue;
+			}
+
+			docPtr->name = documentName;
+			typeId = docPtr->typeId;
+			documentUrl = this->ObjectIdToUrl(docPtr->objectId);
+			isDirty = docPtr->isDirty;
+		}
+
+		for (IDocumentServiceEventHandler* handlerPtr : this->GetDocumentServiceEventHandlers()){
+			if (handlerPtr != nullptr){
+				CDocumentRenamedEvent event(pair.first, pair.second, typeId, documentName, documentUrl, isDirty);
+				handlerPtr->ProcessEvent(&event);
+			}
+		}
+	}
 }
 
 

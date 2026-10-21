@@ -102,6 +102,11 @@ sdl::V1_0::imtauth::CPermissionList CRemoteAuthorizationControllerComp::OnGetPer
 	if (gqlContextPtr != nullptr && response.permissions.HasValue()){
 		QByteArrayList permissions = response.permissions->ToList();
 		permissions += imtgql::CollectImpliedPermissions(*gqlContextPtr, permissions);
+		for (const QByteArray& permission : imtgql::CollectTenantOwnerPermissions(*gqlContextPtr)){
+			if (!permissions.contains(permission)){
+				permissions.append(permission);
+			}
+		}
 		response.permissions->FromList(permissions);
 	}
 

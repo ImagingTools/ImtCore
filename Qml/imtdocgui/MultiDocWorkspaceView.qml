@@ -76,6 +76,9 @@ Item {
 				if (restPath.length >= 1){
 					let documentTypeId = matchedPath
 					let documentId = restPath[0]
+					if (params && params.readOnly !== undefined){
+						workspaceView.documentManager.setObjectReadOnly(documentId, params.readOnly === true)
+					}
 
 					workspaceView.documentManager.openDocument(documentId, documentTypeId)
 				}

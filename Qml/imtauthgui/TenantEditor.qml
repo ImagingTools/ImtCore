@@ -112,6 +112,12 @@ DocumentViewBase {
 						multiPageView.addSubPage("Relationships", "RelationshipProposals", qsTr("Proposals"), relationshipProposalsPageComp)
 					// multiPageView.addPage("Messages", qsTr("Messages"), messagesPageComp, "Icons/Message")
 				}
+				// The shares belong to the organization of the session, so only its own editor shows them
+				if (ApplicationInfoProvider.documentSharingEnabled
+							&& (stateManager_.isAdmin || stateManager_.canViewOrganizationConnections)
+							&& container.tenantData && String(container.tenantData.m_id) === AuthorizationController.getTenantId()) {
+					multiPageView.addPage("DocumentShares", qsTr("Shared Documents"), documentSharesPageComp, "Icons/Share")
+				}
 			}
 			multiPageView.currentIndex = 0
 		}
@@ -334,6 +340,13 @@ DocumentViewBase {
 			model: container.tenantData
 			stateManager: stateManager_
 			apiClient: container.apiClient
+		}
+	}
+
+	Component {
+		id: documentSharesPageComp
+
+		TenantDocumentSharesPage {
 		}
 	}
 

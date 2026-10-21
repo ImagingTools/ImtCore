@@ -71,19 +71,17 @@ ViewBase {
 		anchors.top: parent.top
 		anchors.topMargin: Style.marginXL
 		anchors.horizontalCenter: parent.horizontalCenter
-		width: Math.min(parent.width - Style.marginXL * 2, 600)
-		spacing: Style.marginXL
+		width: Math.min(parent.width - Style.marginXL * 2, Style.contentWidthMax)
+		spacing: Style.marginM
 
-		Text {
-			text: qsTr("Connection Code")
-			font.pixelSize: Style.fontSizeXL
-			font.bold: true
-			color: Style.textColor
+		GroupHeaderView {
+			width: parent.width
+			title: qsTr("Connection Code")
 		}
 
 		Text {
 			text: qsTr("Share this code with other organizations so they can send you a connection request.")
-			font.pixelSize: Style.fontSizeM
+			font.pixelSize: Style.fontSizeS
 			color: Style.inactiveTextColor
 			wrapMode: Text.WordWrap
 			width: parent.width
@@ -91,14 +89,16 @@ ViewBase {
 
 		Rectangle {
 			width: parent.width
-			height: Style.controlHeightL * 2
-			color: Style.backgroundColor2
-			radius: Style.radiusL
+			height: Style.controlHeightL + 2 * Style.marginL
+			color: Style.baseColor
+			radius: Style.radiusM
 			border.width: 1
 			border.color: Style.borderColor
 
 			Row {
-				anchors.centerIn: parent
+				anchors.left: parent.left
+				anchors.leftMargin: Style.marginL
+				anchors.verticalCenter: parent.verticalCenter
 				spacing: Style.marginL
 
 				TextInput {
@@ -106,9 +106,10 @@ ViewBase {
 					width: contentWidth
 					height: contentHeight
 					text: connectionCodePage.connectionCode ? connectionCodePage.connectionCode : qsTr("Loading...")
-					font.pixelSize: Style.fontSizeXXL
+					font.pixelSize: Style.fontSizeXL
+					font.family: Style.fontFamilyBold
 					font.bold: true
-					color: Style.titleColor
+					color: Style.textColor
 					readOnly: true
 					selectByMouse: true
 					selectionColor: Style.selectedColor
@@ -168,64 +169,99 @@ ViewBase {
 					}
 				}
 			}
+
+			Button {
+				anchors.right: parent.right
+				anchors.rightMargin: Style.marginL
+				anchors.verticalCenter: parent.verticalCenter
+				text: qsTr("Regenerate Code")
+				enabled: connectionCodePage.__canManageConnections
+				onClicked: {
+					ModalDialogManager.showConfirmationDialog(
+						qsTr("Regenerate Connection Code"),
+						qsTr("Are you sure you want to regenerate the connection code? The old code will stop working."),
+						function(result) {
+							if (result === Enums.yes && connectionCodePage.apiClient && connectionCodePage.tenantData) {
+								connectionCodePage.apiClient.regenerateConnectionCode(
+									connectionCodePage.tenantData.m_id)
+							}
+						}
+					)
+				}
+			}
 		}
 
-		Button {
-			text: qsTr("Regenerate Code")
-			enabled: connectionCodePage.__canManageConnections
-			onClicked: {
-				ModalDialogManager.showConfirmationDialog(
-					qsTr("Regenerate Connection Code"),
-					qsTr("Are you sure you want to regenerate the connection code? The old code will stop working."),
-					function(result) {
-						if (result === Enums.yes && connectionCodePage.apiClient && connectionCodePage.tenantData) {
-							connectionCodePage.apiClient.regenerateConnectionCode(
-								connectionCodePage.tenantData.m_id)
-						}
-					}
-				)
-			}
+		Item {
+			width: parent.width
+			height: Style.marginM
+		}
+
+		GroupHeaderView {
+			width: parent.width
+			title: qsTr("Access")
 		}
 
 		Rectangle {
 			width: parent.width
-			height: 1
-			color: Style.borderColor
-		}
+			height: allowColumn.height + 2 * Style.marginL
+			color: Style.baseColor
+			radius: Style.radiusM
+			border.width: 1
+			border.color: Style.borderColor
 
-		Row {
-			spacing: Style.marginM
+			Column {
+				id: allowColumn
+				anchors.left: parent.left
+				anchors.leftMargin: Style.marginL
+				anchors.right: parent.right
+				anchors.rightMargin: Style.marginL
+				anchors.verticalCenter: parent.verticalCenter
+				spacing: Style.marginXS
 
-			SwitchCustom {
-				id: allowSwitch
-				enabled: connectionCodePage.__canManageConnections
-				checked: connectionCodePage.allowConnectionsByCode
-				onCheckedChanged: {
-					if (!connectionCodePage.__ready) {
-						return
+				Item {
+					width: parent.width
+					height: Style.controlHeightM
+
+					Text {
+						anchors.left: parent.left
+						anchors.right: allowSwitch.left
+						anchors.rightMargin: Style.marginL
+						anchors.verticalCenter: parent.verticalCenter
+						text: qsTr("Allow other organizations to connect by code")
+						font.family: Style.fontFamilyBold
+						font.pixelSize: Style.fontSizeM
+						font.bold: true
+						color: Style.textColor
+						elide: Text.ElideRight
 					}
-					if (connectionCodePage.apiClient && connectionCodePage.tenantData) {
-						connectionCodePage.apiClient.setAllowConnectionsByCode(
-							connectionCodePage.tenantData.m_id, allowSwitch.checked)
+
+					SwitchCustom {
+						id: allowSwitch
+						anchors.right: parent.right
+						anchors.verticalCenter: parent.verticalCenter
+						enabled: connectionCodePage.__canManageConnections
+						checked: connectionCodePage.allowConnectionsByCode
+						onCheckedChanged: {
+							if (!connectionCodePage.__ready) {
+								return
+							}
+							if (connectionCodePage.apiClient && connectionCodePage.tenantData) {
+								connectionCodePage.apiClient.setAllowConnectionsByCode(
+									connectionCodePage.tenantData.m_id, allowSwitch.checked)
+							}
+						}
 					}
 				}
-			}
 
-			Text {
-				text: qsTr("Allow other organizations to connect by code")
-				font.pixelSize: Style.fontSizeM
-				color: Style.textColor
-				anchors.verticalCenter: parent.verticalCenter
+				Text {
+					visible: !connectionCodePage.allowConnectionsByCode
+					text: qsTr("When disabled, other organizations cannot send you connection requests using your code.")
+					font.pixelSize: Style.fontSizeS
+					color: Style.inactiveTextColor
+					wrapMode: Text.WordWrap
+					width: parent.width
+				}
 			}
-		}
-
-		Text {
-			visible: !connectionCodePage.allowConnectionsByCode
-			text: qsTr("When disabled, other organizations cannot send you connection requests using your code.")
-			font.pixelSize: Style.fontSizeS
-			color: Style.inactiveTextColor
-			wrapMode: Text.WordWrap
-			width: parent.width
 		}
 	}
 }

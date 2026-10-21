@@ -49,6 +49,43 @@ QtObject {
 	signal tryCloseDirtyDocument(string documentId, var callback)
 
 	signal documentTypeIdRegistered(string documentTypeId)
+
+	// ObjectId -> true for documents another organization shared for viewing only
+	property var readOnlyObjectIds: ({})
+
+	property Component readOnlyAlertComp: Component {
+		Rectangle {
+			color: Style.popupWarningBackgroundColor
+
+			BaseText {
+				anchors.verticalCenter: parent.verticalCenter
+				anchors.left: parent.left
+				anchors.leftMargin: Style.marginL
+				anchors.right: parent.right
+				anchors.rightMargin: Style.marginL
+
+				text: qsTr("This document was shared with your organization for viewing only. Changes cannot be saved.")
+				elide: Text.ElideRight
+			}
+		}
+	}
+
+	function setObjectReadOnly(objectId, readOnly){
+		if (!objectId){
+			return
+		}
+
+		if (readOnly){
+			documentManager.readOnlyObjectIds[objectId] = true
+		}
+		else{
+			delete documentManager.readOnlyObjectIds[objectId]
+		}
+	}
+
+	function isObjectReadOnly(objectId){
+		return objectId !== "" && documentManager.readOnlyObjectIds[objectId] === true
+	}
 	
 	function getActiveView()
 	{
@@ -588,6 +625,16 @@ QtObject {
 			}
 
 			documentData.view = view;
+
+			if (documentManager.isObjectReadOnly(documentId)){
+				view.readOnly = true;
+				if (view.commandsPanelVisible !== undefined){
+					view.commandsPanelVisible = false;
+				}
+				if (typeof view.setAlertPanel === "function"){
+					view.setAlertPanel(documentManager.readOnlyAlertComp);
+				}
+			}
 
 			if (view.viewRegistered !== undefined){
 				view.viewRegistered();
