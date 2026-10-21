@@ -72,6 +72,84 @@ function isConstantExpression(stat){
     }
 }
 
+function decodeXmlText(text) {
+    let value = String(text)
+    const cdata = []
+    value = value.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, function (_, inner) {
+        cdata.push(inner)
+        return '\u0000CDATA' + (cdata.length - 1) + '\u0000'
+    })
+    value = value
+        .replace(/&#x([0-9a-fA-F]+);/g, function (_, hex) { return String.fromCodePoint(parseInt(hex, 16)) })
+        .replace(/&#(\d+);/g, function (_, dec) { return String.fromCodePoint(Number(dec)) })
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&apos;/g, "'")
+        .replace(/&amp;/g, '&')
+    return value.replace(/\u0000CDATA(\d+)\u0000/g, function (_, index) { return cdata[Number(index)] })
+}
+
+function parseTsCatalog(xml) {
+    const dict = {}
+    const source = String(xml).replace(/<!--[\s\S]*?-->/g, '')
+    const messageRe = /<message\b[^>]*>([\s\S]*?)<\/message>/g
+    let messageMatch
+    while ((messageMatch = messageRe.exec(source))) {
+        const body = messageMatch[1]
+        const sourceMatch = body.match(/<source\b[^>]*>([\s\S]*?)<\/source>/)
+        const translationMatch = body.match(/<translation\b[^>]*>([\s\S]*?)<\/translation>/)
+        if (!sourceMatch || !translationMatch) continue
+        let translation = translationMatch[1]
+        const forms = []
+        const formRe = /<numerusform\b[^>]*>([\s\S]*?)<\/numerusform>/g
+        let formMatch
+        while ((formMatch = formRe.exec(translation))) forms.push(decodeXmlText(formMatch[1]))
+        if (forms.length) translation = forms[0]
+        else translation = decodeXmlText(translation)
+        dict[decodeXmlText(sourceMatch[1])] = translation
+    }
+    return dict
+}
+
+function translationLanguage(xml, fileName) {
+    const match = String(xml).match(/<TS\b[^>]*\blanguage\s*=\s*"([^"]+)"/)
+    if (match && match[1]) return decodeXmlText(match[1])
+    const stem = fileName.slice(0, -3)
+    const fromName = stem.match(/(?:^|_)([A-Za-z]{2,3}_[A-Za-z]{2})$/)
+    return fromName ? fromName[1] : ''
+}
+
+function loadTranslationCatalogs(dirs) {
+    const catalogs = {}
+    let fileCount = 0
+    for (const dirPath of dirs) {
+        if (!dirPath || String(dirPath).indexOf('${') >= 0) {
+            console.warn('JQML3: translation_dir was not resolved: ' + dirPath)
+            continue
+        }
+        if (!fs.existsSync(dirPath) || !fs.statSync(dirPath).isDirectory()) {
+            console.warn('JQML3: translation_dir was not found: ' + dirPath)
+            continue
+        }
+        const names = fs.readdirSync(dirPath).filter(name => name.length > 3 && name.slice(-3) === '.ts').sort()
+        for (const name of names) {
+            const filePath = path.join(dirPath, name)
+            if (!fs.statSync(filePath).isFile()) continue
+            const xml = fs.readFileSync(filePath, { encoding: 'utf8' })
+            const language = translationLanguage(xml, name)
+            if (!language) {
+                console.warn('JQML3: translation file has no language: ' + filePath)
+                continue
+            }
+            if (!catalogs[language]) catalogs[language] = {}
+            Object.assign(catalogs[language], parseTsCatalog(xml))
+            fileCount++
+        }
+    }
+    return { catalogs, fileCount }
+}
+
 function envFill(source, env) {
     let result = source
     if (result.indexOf('${') < 0) return result
@@ -115,6 +193,12 @@ function resolveConfigRef(baseDirPath, filePath, env) {
 function loadCompilerConfig(configFilePath, env = process.env) {
     const normalizedConfigPath = path.normalize(String(configFilePath || '').trim())
     const configDirPath = normalizedConfigPath.split(/[\\\/]+/g).slice(0, -1).join('/')
+    const translationDirs = []
+
+    function appendTranslationDir(baseDirPath, translationDir) {
+        if (typeof translationDir !== 'string' || !translationDir.trim()) return
+        translationDirs.push(resolveConfigRef(baseDirPath, translationDir, env))
+    }
 
     function includeFiles(sourceFile, baseDirPath = configDirPath) {
         if (sourceFile.includes)
@@ -127,12 +211,14 @@ function loadCompilerConfig(configFilePath, env = process.env) {
                     let absoluteDirPath = resolveConfigRef(includeConfigDirPath, dirPath, env)
                     sourceFile.dirs.unshift(absoluteDirPath)
                 }
+                appendTranslationDir(includeConfigDirPath, file.translation_dir)
             }
     }
 
     const config = JSON.parse(envFill(fs.readFileSync(normalizedConfigPath, { encoding: 'utf8', flag: 'r' }), env))
     includeFiles(config, configDirPath)
-    return { config, configDirPath }
+    appendTranslationDir(configDirPath, config.translation_dir)
+    return { config, configDirPath, translationDirs }
 }
 
 function qmlPathFromQmldirLine(line) {
@@ -231,7 +317,17 @@ function compile(options){
     const loadedConfig = loadCompilerConfig(options.config, env)
     const config = loadedConfig.config
     const configDirPath = loadedConfig.configDirPath
+    const translationDirs = loadedConfig.translationDirs
     console.timeEnd('JQML3: include config files')
+
+    let embeddedTranslationsJson = ''
+    if (translationDirs.length) {
+        console.time('JQML3: embed translations')
+        const embedded = loadTranslationCatalogs(translationDirs)
+        embeddedTranslationsJson = JSON.stringify(embedded.catalogs)
+        console.log('JQML3: embedded ' + embedded.fileCount + ' translation file(s)')
+        console.timeEnd('JQML3: embed translations')
+    }
 
     const BaseModules = {
         Qt,
@@ -2455,6 +2551,9 @@ function compile(options){
     }
 
     let fullCode = new SourceNode()
+    if (embeddedTranslationsJson) {
+        fullCode.add('JQApplication.embeddedTranslations=' + embeddedTranslationsJson + '\n')
+    }
     let compiledFiles = []
 
     let mainData = readRuntimeBundle()
@@ -2728,5 +2827,7 @@ if (options.listQml) {
 
 module.exports = {
   compile: compile,
+  parseTsCatalog: parseTsCatalog,
+  loadTranslationCatalogs: loadTranslationCatalogs,
   listQmldirQmlFiles: listQmldirQmlFiles,
 }

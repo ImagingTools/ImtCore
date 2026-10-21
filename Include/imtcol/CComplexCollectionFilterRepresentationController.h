@@ -29,7 +29,8 @@ private:
 		FOF_EQUAL = 2,
 		FOF_LESS = 4,
 		FOF_GREATER = 8,
-		FOF_CONTAINS = 16
+		FOF_CONTAINS = 16,
+		FOF_STARTS_WITH = 32
 	};
 
 private:

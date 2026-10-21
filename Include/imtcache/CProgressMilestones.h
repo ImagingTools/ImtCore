@@ -10,7 +10,9 @@ namespace imtcache
 {
 
 
-/// Tells a long loop when it has crossed the next N% of its work, so it can log progress that often and no more.
+/**
+	Tells a long loop when it has crossed the next N% of its work, so it can log progress that often and no more.
+*/
 class CProgressMilestones
 {
 public:
@@ -50,3 +52,4 @@ private:
 
 
 } // namespace imtcache
+

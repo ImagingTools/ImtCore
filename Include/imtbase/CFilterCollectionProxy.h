@@ -56,6 +56,7 @@ protected:
 	virtual istd::IChangeableUniquePtr CreateObjectInstance(const QByteArray& typeId) const override;
 	virtual IObjectCollection* CreateSubCollectionInstance() const override;
 	virtual bool InsertObjectIntoCollection(ObjectInfo info) override;
+	virtual istd::IChangeableUniquePtr CreateDataCopy(const ObjectInfo& objectInfo) const override;
 
 private:
 	int m_operationFlags;
