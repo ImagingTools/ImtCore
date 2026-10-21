@@ -72,15 +72,22 @@ All further phases apply only to `--mode js`.
 
 A JSON config file declares:
 
-| Field      | Description |
-|------------|-------------|
-| `dirs`     | Array of paths to `qmldir` module directories |
-| `includes` | Array of additional config files to merge |
-| `output`   | (legacy) output path |
+| Field             | Description |
+|-------------------|-------------|
+| `dirs`            | Array of paths to `qmldir` module directories |
+| `includes`        | Array of additional config files to merge |
+| `translation_dir` | Directory of Qt `.ts` catalogs to embed in the compiled bundle |
+| `output`          | (legacy) output path |
 
 Environment variables in the form `${VAR}` are substituted before parsing.
 Nested config files referenced via `includes` are merged recursively so that
 `dirs` entries are collected from all included configs.
+`translation_dir` is resolved relative to the config file that declares it.
+Included configs are visited first, then the current file. Every `.ts` file is
+grouped by its `<TS language="...">` value and merged into one dictionary per
+language. A string that exists in both keeps the later value. At runtime
+`context.language` selects that dictionary, so `context.application` is not
+required and the browser does not request `../Translations/*.ts`.
 
 Example (`imtcore.json`):
 ```json
