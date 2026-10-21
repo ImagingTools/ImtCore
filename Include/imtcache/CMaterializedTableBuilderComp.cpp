@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtcache/CMaterializedTableBuilderComp.h>
 
 
@@ -10,60 +11,26 @@
 // ImtCore includes
 #include <imtcache/CCacheChangeLog.h>
 #include <imtdb/imtdb.h>
+#include <imtduckdb/CDuckTableOperations.h>
 
 
 namespace imtcache
 {
 
 
-namespace
-{
-
-const QString SHADOW_SUFFIX = QStringLiteral("_shadow");
-const QString AFFECTED_SUFFIX = QStringLiteral("_affected");
-
-/// Column of the table of affected keys.
-const QString AFFECTED_KEY_COLUMN = QStringLiteral("KeyId");
-
-
-bool Execute(imtduckdb::IDuckConnection& connection, const QString& query, QString& errorMessage)
-{
-	QSqlError sqlError;
-	connection.ExecSqlQuery(query.toUtf8(), &sqlError);
-	if (sqlError.type() != QSqlError::NoError){
-		errorMessage = sqlError.text();
-
-		return false;
-	}
-
-	return true;
-}
-
-
-/// The first column of the first row of the result.
-bool ReadValue(imtduckdb::IDuckConnection& connection, const QString& query, QVariant& value, QString& errorMessage)
-{
-	QSqlError sqlError;
-	QSqlQuery result = connection.ExecSqlQuery(query.toUtf8(), &sqlError);
-	if (sqlError.type() != QSqlError::NoError){
-		errorMessage = sqlError.text();
-
-		return false;
-	}
-
-	value = result.next() ? result.value(0) : QVariant();
-
-	return true;
-}
-
-} // anonymous namespace
+const QString SHADOW_SUFFIX		= QStringLiteral("_shadow");
+const QString AFFECTED_SUFFIX		= QStringLiteral("_affected");
+/**
+	Column of the table of affected keys.
+*/
+const QString AFFECTED_KEY_COLUMN	= QStringLiteral("KeyId");
 
 
 // reimplemented (imtcache::ICacheTableBuilder)
 
 QString CMaterializedTableBuilderComp::GetCacheTableName() const
 {
-	return QString::fromUtf8(*m_tableNameAttrPtr);
+	return *m_tableNameAttrPtr;
 }
 
 
@@ -71,7 +38,7 @@ QStringList CMaterializedTableBuilderComp::GetRequiredCacheTables() const
 {
 	QStringList retVal;
 	for (int i = 0; i < m_requiredTablesAttrPtr.GetCount(); ++ i){
-		retVal << QString::fromUtf8(m_requiredTablesAttrPtr[i]);
+		retVal << m_requiredTablesAttrPtr[i];
 	}
 
 	return retVal;
@@ -93,7 +60,9 @@ CMaterializedTableBuilderComp::BuildResult CMaterializedTableBuilderComp::Rebuil
 		return retVal;
 	}
 
-	// The tables are read after this, so everything logged up to now is in the result.
+	/**
+		The tables are read after this, so everything logged up to now is in the result.
+	*/
 	bool hasCursor = false;
 	qint64 lastChangeId = 0;
 	qint64 latestChangeId = 0;
@@ -112,8 +81,8 @@ CMaterializedTableBuilderComp::BuildResult CMaterializedTableBuilderComp::Rebuil
 	}
 
 	const QString shadowIdentifier = imtdb::QuoteIdentifier(shadowTableName);
-	if (!Execute(connection, QStringLiteral("DROP TABLE IF EXISTS %1").arg(shadowIdentifier), error)
-				|| !Execute(connection, QStringLiteral("CREATE TABLE %1 AS\n%2").arg(shadowIdentifier, selectQuery), error)){
+	if (!imtduckdb::CDuckTableOperations::Execute(connection, QStringLiteral("DROP TABLE IF EXISTS %1").arg(shadowIdentifier), error)
+				|| !imtduckdb::CDuckTableOperations::Execute(connection, QStringLiteral("CREATE TABLE %1 AS\n%2").arg(shadowIdentifier, selectQuery), error)){
 		retVal.errorMessage = QStringLiteral("Unable to build %1. Error: %2").arg(tableName, error);
 
 		return retVal;
@@ -132,11 +101,13 @@ CMaterializedTableBuilderComp::BuildResult CMaterializedTableBuilderComp::Rebuil
 	}
 
 	QVariant rowCount;
-	if (ReadValue(connection, QStringLiteral("SELECT count(*) FROM %1").arg(imtdb::QuoteIdentifier(tableName)), rowCount, error)){
+	if (imtduckdb::CDuckTableOperations::ReadValue(connection, QStringLiteral("SELECT count(*) FROM %1").arg(imtdb::QuoteIdentifier(tableName)), rowCount, error)){
 		retVal.rowsWritten = rowCount.toInt();
 	}
 
-	// The orchestrator needs a valid time to run the next update as incremental.
+	/**
+		The orchestrator needs a valid time to run the next update as incremental.
+	*/
 	retVal.lastSourceUpdateTime = QDateTime::currentDateTimeUtc();
 	retVal.isOk = true;
 
@@ -153,7 +124,7 @@ CMaterializedTableBuilderComp::BuildResult CMaterializedTableBuilderComp::ApplyC
 
 	const QString tableName = GetCacheTableName();
 	const QString tableIdentifier = imtdb::QuoteIdentifier(tableName);
-	const QString keyIdentifier = imtdb::QuoteIdentifier(QString::fromUtf8(*m_keyColumnAttrPtr));
+	const QString keyIdentifier = imtdb::QuoteIdentifier(*m_keyColumnAttrPtr);
 	const QString affectedIdentifier = imtdb::QuoteIdentifier(GetAffectedTableName());
 	const QString affectedKeyIdentifier = imtdb::QuoteIdentifier(AFFECTED_KEY_COLUMN);
 
@@ -176,7 +147,9 @@ CMaterializedTableBuilderComp::BuildResult CMaterializedTableBuilderComp::ApplyC
 		return retVal;
 	}
 
-	// Without a cursor the table was never built from the log, and a rebuilt source or a changed script leaves no rows to patch.
+	/**
+		Without a cursor the table was never built from the log, and a rebuilt source or a changed script leaves no rows to patch.
+	*/
 	if (!hasCursor || hasRebuilt || !HasExpectedColumns(connection)){
 		return Rebuild(connection);
 	}
@@ -199,7 +172,7 @@ CMaterializedTableBuilderComp::BuildResult CMaterializedTableBuilderComp::ApplyC
 
 	QString selectQuery;
 	if (!CreateSelectQuery(
-				QStringLiteral("%1 IN (SELECT %2 FROM %3)").arg(QString::fromUtf8(*m_keyExpressionAttrPtr), affectedKeyIdentifier, affectedIdentifier),
+				QStringLiteral("%1 IN (SELECT %2 FROM %3)").arg(QString(*m_keyExpressionAttrPtr), affectedKeyIdentifier, affectedIdentifier),
 				selectQuery,
 				error)){
 		retVal.errorMessage = error;
@@ -207,7 +180,7 @@ CMaterializedTableBuilderComp::BuildResult CMaterializedTableBuilderComp::ApplyC
 		return retVal;
 	}
 
-	if (!Execute(connection,
+	if (!imtduckdb::CDuckTableOperations::Execute(connection,
 				QStringLiteral("CREATE OR REPLACE TEMP TABLE %1 AS SELECT DISTINCT CAST(k AS UBIGINT) AS %2 FROM (\n%3\n) AS keys(k)")
 					.arg(affectedIdentifier, affectedKeyIdentifier, affectedKeysQuery),
 				error)){
@@ -217,7 +190,7 @@ CMaterializedTableBuilderComp::BuildResult CMaterializedTableBuilderComp::ApplyC
 	}
 
 	QVariant affectedCount;
-	if (!ReadValue(connection, QStringLiteral("SELECT count(*) FROM %1").arg(affectedIdentifier), affectedCount, error)){
+	if (!imtduckdb::CDuckTableOperations::ReadValue(connection, QStringLiteral("SELECT count(*) FROM %1").arg(affectedIdentifier), affectedCount, error)){
 		retVal.errorMessage = error;
 
 		return retVal;
@@ -241,8 +214,14 @@ CMaterializedTableBuilderComp::BuildResult CMaterializedTableBuilderComp::ApplyC
 		return retVal;
 	}
 
-	if (!Execute(connection, QStringLiteral("DELETE FROM %1 WHERE %2 IN (SELECT %3 FROM %4)").arg(tableIdentifier, keyIdentifier, affectedKeyIdentifier, affectedIdentifier), error)
-				|| !Execute(connection, QStringLiteral("INSERT INTO %1\n%2").arg(tableIdentifier, selectQuery), error)
+	if (!imtduckdb::CDuckTableOperations::Execute(connection, QStringLiteral("DELETE FROM %1 WHERE %2 IN (SELECT %3 FROM %4)")
+				.arg(
+						/*1*/ tableIdentifier,
+						/*2*/ keyIdentifier,
+						/*3*/ affectedKeyIdentifier,
+						/*4*/ affectedIdentifier
+					), error)
+				|| !imtduckdb::CDuckTableOperations::Execute(connection, QStringLiteral("INSERT INTO %1\n%2").arg(tableIdentifier, selectQuery), error)
 				|| !CCacheChangeLog::SetCursor(connection, tableName, latestChangeId, error)){
 		connection.CancelTransaction();
 		retVal.errorMessage = QStringLiteral("Unable to recompute rows of %1. Error: %2").arg(tableName, error);
@@ -257,17 +236,31 @@ CMaterializedTableBuilderComp::BuildResult CMaterializedTableBuilderComp::ApplyC
 	}
 
 	QVariant writtenCount;
-	if (ReadValue(connection, QStringLiteral("SELECT count(*) FROM %1 WHERE %2 IN (SELECT %3 FROM %4)").arg(tableIdentifier, keyIdentifier, affectedKeyIdentifier, affectedIdentifier), writtenCount, error)){
+	if (imtduckdb::CDuckTableOperations::ReadValue(connection, QStringLiteral("SELECT count(*) FROM %1 WHERE %2 IN (SELECT %3 FROM %4)")
+				.arg(
+						/*1*/ tableIdentifier,
+						/*2*/ keyIdentifier,
+						/*3*/ affectedKeyIdentifier,
+						/*4*/ affectedIdentifier
+					), writtenCount, error)){
 		retVal.rowsWritten = writtenCount.toInt();
 	}
 
-	// An affected key with no row left is a row whose source is gone.
+	/**
+		An affected key with no row left is a row whose source is gone.
+	*/
 	QVariant removedCount;
-	if (ReadValue(connection, QStringLiteral("SELECT count(*) FROM %1 WHERE %2 NOT IN (SELECT %3 FROM %4)").arg(affectedIdentifier, affectedKeyIdentifier, keyIdentifier, tableIdentifier), removedCount, error)){
+	if (imtduckdb::CDuckTableOperations::ReadValue(connection, QStringLiteral("SELECT count(*) FROM %1 WHERE %2 NOT IN (SELECT %3 FROM %4)")
+				.arg(
+						/*1*/ affectedIdentifier,
+						/*2*/ affectedKeyIdentifier,
+						/*3*/ keyIdentifier,
+						/*4*/ tableIdentifier
+					), removedCount, error)){
 		retVal.rowsDeleted = removedCount.toInt();
 	}
 
-	Execute(connection, QStringLiteral("DROP TABLE IF EXISTS %1").arg(affectedIdentifier), error);
+	imtduckdb::CDuckTableOperations::Execute(connection, QStringLiteral("DROP TABLE IF EXISTS %1").arg(affectedIdentifier), error);
 
 	retVal.isOk = true;
 
@@ -279,17 +272,19 @@ CMaterializedTableBuilderComp::BuildResult CMaterializedTableBuilderComp::ApplyC
 
 bool CMaterializedTableBuilderComp::ReadScript(const QByteArray& path, QString& script, QString& errorMessage) const
 {
-	QFile scriptFile(QString::fromUtf8(path));
+	QFile scriptFile(path);
 	if (!scriptFile.open(QFile::ReadOnly)){
-		errorMessage = QStringLiteral("Unable to read the script %1 of %2").arg(QString::fromUtf8(path), GetCacheTableName());
+		errorMessage = QStringLiteral("Unable to read the script %1 of %2").arg(QString(path), GetCacheTableName());
 
 		return false;
 	}
 
-	script = QString::fromUtf8(scriptFile.readAll()).trimmed();
+	script = scriptFile.readAll().trimmed();
 	scriptFile.close();
 
-	// The script is put inside other statements, which a closing semicolon would break.
+	/**
+		The script is put inside other statements, which a closing semicolon would break.
+	*/
 	while (script.endsWith(QLatin1Char(';'))){
 		script.chop(1);
 	}
@@ -326,17 +321,9 @@ bool CMaterializedTableBuilderComp::HasExpectedColumns(imtduckdb::IDuckConnectio
 
 	const QSqlRecord expectedRecord = probeQuery.record();
 
-	QSqlQuery columnsQuery = connection.ExecSqlQuery(
-				QStringLiteral("SELECT column_name FROM information_schema.columns WHERE table_name = '%1' AND table_schema = current_schema() ORDER BY ordinal_position")
-					.arg(imtdb::EscapeSql(GetCacheTableName())).toUtf8(),
-				&sqlError);
-	if (sqlError.type() != QSqlError::NoError){
-		return false;
-	}
-
 	QStringList actualColumns;
-	while (columnsQuery.next()){
-		actualColumns << columnsQuery.value(0).toString();
+	if (!imtduckdb::CDuckTableOperations::ReadColumnNames(connection, GetCacheTableName(), actualColumns, error)){
+		return false;
 	}
 
 	if (actualColumns.count() != expectedRecord.count()){
@@ -344,7 +331,9 @@ bool CMaterializedTableBuilderComp::HasExpectedColumns(imtduckdb::IDuckConnectio
 	}
 
 	for (int i = 0; i < actualColumns.count(); ++ i){
-		// DuckDB identifiers are case-insensitive.
+		/**
+			DuckDB identifiers are case-insensitive.
+		*/
 		if (actualColumns[i].compare(expectedRecord.fieldName(i), Qt::CaseInsensitive) != 0){
 			return false;
 		}
@@ -361,3 +350,4 @@ QString CMaterializedTableBuilderComp::GetAffectedTableName() const
 
 
 } // namespace imtcache
+

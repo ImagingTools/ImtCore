@@ -39,7 +39,7 @@ bool CDuckConnectionEngine::SwapTable(
 			const QString& shadowTableName,
 			QString* errorMessagePtr)
 {
-	return imtduckdb::SwapTable(*this, m_isTransactionActive, liveTableName, shadowTableName, errorMessagePtr);
+	return CDuckTableOperations::SwapTable(*this, m_isTransactionActive, liveTableName, shadowTableName, errorMessagePtr);
 }
 
 
@@ -86,7 +86,7 @@ QSqlQuery CDuckConnectionEngine::ExecSqlQuery(const QByteArray& queryString, QSq
 
 	retVal.setForwardOnly(isForwardOnly);
 
-	bool success = retVal.exec(QString::fromUtf8(queryString));
+	bool success = retVal.exec(queryString);
 
 	const QSqlError queryError = retVal.lastError();
 	if (sqlErrorPtr != nullptr){
@@ -113,7 +113,7 @@ QSqlQuery CDuckConnectionEngine::ExecSqlQuery(
 	QSqlQuery retVal(new CDuckSqlResult(m_driverPtr.get(), *m_connectionPtr));
 
 	retVal.setForwardOnly(isForwardOnly);
-	retVal.prepare(QString::fromUtf8(queryString));
+	retVal.prepare(queryString);
 
 	for (auto value = bindValues.cbegin(); value != bindValues.cend(); ++ value){
 		retVal.bindValue(value.key(), *value);
@@ -150,7 +150,7 @@ QSqlQuery CDuckConnectionEngine::ExecSqlQueryFromFile(const QString& filePath, Q
 		return QSqlQuery();
 	}
 
-	QByteArray queryString = sqlQueryFile.readAll();
+	const QByteArray queryString = sqlQueryFile.readAll();
 
 	sqlQueryFile.close();
 
@@ -174,7 +174,7 @@ QSqlQuery CDuckConnectionEngine::ExecSqlQueryFromFile(
 		return QSqlQuery();
 	}
 
-	QByteArray queryString = sqlQueryFile.readAll();
+	const QByteArray queryString = sqlQueryFile.readAll();
 
 	sqlQueryFile.close();
 
@@ -183,3 +183,4 @@ QSqlQuery CDuckConnectionEngine::ExecSqlQueryFromFile(
 
 
 } // namespace imtduckdb
+

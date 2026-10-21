@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtcache/CSqlQueryCacheTableBuilderCompBase.h>
 
 
@@ -23,7 +24,9 @@ QDateTime CSqlQueryCacheTableBuilderCompBase::GetRecordTime(const QSqlQuery& /*q
 
 QString CSqlQueryCacheTableBuilderCompBase::FormatSourceTime(const QDateTime& time)
 {
-	// The source stores UTC without a zone and the cache keeps the times as it read them, so the wall time is used as is.
+	/**
+		The source stores UTC without a zone and the cache keeps the times as it read them, so the wall time is used as is.
+	*/
 	return time.toString(QStringLiteral("yyyy-MM-dd'T'HH:mm:ss.zzz"));
 }
 
@@ -61,7 +64,9 @@ bool CSqlQueryCacheTableBuilderCompBase::LoadRows(
 		return false;
 	}
 
-	// A driver that cannot tell the size up front reports -1; the progress is then simply not shown.
+	/**
+		A driver that cannot tell the size up front reports -1; the progress is then simply not shown.
+	*/
 	CLoadProgress progress(tableName, qMax(0, query.size()), readTimer.elapsed());
 
 	while (query.next()){
@@ -103,3 +108,4 @@ bool CSqlQueryCacheTableBuilderCompBase::LoadRows(
 
 
 } // namespace imtcache
+

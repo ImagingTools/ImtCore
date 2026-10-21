@@ -44,13 +44,36 @@ duckdb::Value CDuckValueConverter::ToDuckDbValue(const QVariant& value)
 		return duckdb::Value::BLOB(reinterpret_cast<duckdb::const_data_ptr_t>(bytes.constData()), static_cast<duckdb::idx_t>(bytes.size()));
 	}
 
-	// DuckDB implicitly casts VARCHAR values to the expected target type, so ISO-formatted text
-	// is used here instead of hand-rolling duckdb's internal epoch-based date/time types.
+	/**
+		DuckDB implicitly casts VARCHAR values to the expected target type, so ISO-formatted text
+		is used here instead of hand-rolling duckdb's internal epoch-based date/time types.
+	*/
 	case QMetaType::QDateTime:
 		return duckdb::Value(value.toDateTime().toString(Qt::ISODateWithMs).toStdString());
 
 	case QMetaType::QDate:
 		return duckdb::Value(value.toDate().toString(Qt::ISODate).toStdString());
+
+	/**
+		The element type follows the values, so a list of QUuid is a UUID[]. The appender and the parameter binding
+		cast it to the type of the column.
+	*/
+	case QMetaType::QVariantList:
+	case QMetaType::QStringList: {
+		duckdb::vector<duckdb::Value> children;
+		for (const QVariant& item : value.toList()){
+			children.push_back(ToDuckDbValue(item));
+		}
+
+		/**
+			An empty list has no element to take the type from, and nothing to cast either.
+		*/
+		if (children.empty()){
+			return duckdb::Value::LIST(duckdb::LogicalType::VARCHAR, std::move(children));
+		}
+
+		return duckdb::Value::LIST(std::move(children));
+	}
 
 	default:
 		return duckdb::Value(value.toString().toStdString());
@@ -59,3 +82,4 @@ duckdb::Value CDuckValueConverter::ToDuckDbValue(const QVariant& value)
 
 
 } // namespace imtduckdb
+

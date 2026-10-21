@@ -49,7 +49,9 @@ protected:
 	*/
 	virtual QDateTime GetRecordTime(const QSqlQuery& query) const;
 
-	/// \a time as a literal the source database reads as a zone-less timestamp, without the zone designator that would make it shift.
+	/**
+		\a time as a literal the source database reads as a zone-less timestamp, without the zone designator that would make it shift.
+	*/
 	static QString FormatSourceTime(const QDateTime& time);
 
 	// reimplemented (imtcache::CCacheTableBuilderCompBase)
@@ -65,3 +67,4 @@ private:
 
 
 } // namespace imtcache
+

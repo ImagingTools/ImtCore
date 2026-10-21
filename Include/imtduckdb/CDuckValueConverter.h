@@ -20,9 +20,13 @@ namespace imtduckdb
 class CDuckValueConverter
 {
 public:
-	//! Converts \a value to a duckdb::Value. A null QVariant becomes a duckdb NULL value.
+	/**
+		Converts \a value to a duckdb::Value. A null QVariant becomes a duckdb NULL value, and a QVariantList or
+		QStringList becomes a LIST of its converted items. May throw when the items of a list cannot share a type.
+	*/
 	static duckdb::Value ToDuckDbValue(const QVariant& value);
 };
 
 
 } // namespace imtduckdb
+

@@ -47,6 +47,11 @@ protected:
 private:
 	static QVariant ConvertValue(const duckdb::Value& value);
 	static QMetaType ConvertMetaType(const duckdb::LogicalType& type);
+	/**
+		Translates Qt's Oracle-style ':name' placeholders into DuckDB's '$name' named-parameter syntax,
+		leaving quoted string/identifier literals and '::type' casts untouched.
+	*/
+	static QString ToDuckDbNamedPlaceholders(const QString& query);
 
 private:
 	duckdb::Connection& m_connection;

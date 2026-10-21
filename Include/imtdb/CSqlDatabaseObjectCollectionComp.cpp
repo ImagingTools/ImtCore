@@ -10,8 +10,11 @@
 #include <istd/CChangeNotifier.h>
 #include <istd/CChangeGroup.h>
 #include <idoc/CStandardDocumentMetaInfo.h>
+#include <iprm/CParamsSet.h>
+#include <iprm/TParamsPtr.h>
 
 // ImtCore includes
+#include <imtbase/CComplexCollectionFilter.h>
 #include <imtbase/IRevisionController.h>
 #include <imtbase/CParamsSetJoiner.h>
 #include <imtdb/CSqlDatabaseObjectCollectionIterator.h>
@@ -630,13 +633,32 @@ imtbase::IObjectCollectionIterator* CSqlDatabaseObjectCollectionComp::CreateObje
 		- Not GetCountQuery(): it is built apart from GetSelectionQuery, so it can diverge from it
 		  (DISTINCT/GROUP BY, joins that filter or multiply rows, object id etc.),
 		  and the total would then disagree with the pages. Wrapping the selection guarantees they match.
+		- Not sorted: the order does not change the count, but neither PostgreSQL nor DuckDB drops the ORDER BY of a
+		  subquery, so every row of the selection would be sorted to be counted. The selection is made with a copy of
+		  the complex filter that sorts by nothing, over the parameters as they are.
 		The count runs before the page query: the driver drops pending results when a second query runs.
 		-1 makes the iterator use the number of rows it read: exact for lookups by id and unpaged reads.
 	*/
 	int totalCount = -1;
 	if (objectId.isEmpty() && (count > 0 || offset > 0)){
+		imtbase::CComplexCollectionFilter unsortedFilter;
+		iprm::CParamsSet unsortedParams;
+		unsortedParams.SetSlaveSet(selectionParamsPtr);
+
+		iprm::TParamsPtr<imtbase::IComplexCollectionFilter> complexFilterPtr(selectionParamsPtr, QByteArrayLiteral("ComplexFilter"), false);
+		if (complexFilterPtr.IsValid() && unsortedFilter.CopyFrom(*complexFilterPtr)){
+			imtbase::IComplexCollectionFilter::Fields fields = unsortedFilter.GetFields();
+			for (imtbase::IComplexCollectionFilter::FieldInfo& field : fields){
+				field.metaInfo.flags &= ~imtbase::IComplexCollectionFilter::SO_SORT;
+			}
+
+			unsortedFilter.SetFields(fields);
+			unsortedParams.SetEditableParameter(QByteArrayLiteral("ComplexFilter"), &unsortedFilter);
+		}
+
 		QSqlQuery countResult;
-		const QString countQuery = QStringLiteral("SELECT COUNT(*) FROM (%1) AS _counted").arg(selectionQuery);
+		const QString countQuery = QStringLiteral("SELECT COUNT(*) FROM (%1) AS _counted")
+					.arg(m_objectDelegateCompPtr->GetSelectionQuery(objectId, 0, -1, &unsortedParams));
 		if (!execQuery(countQuery, countResult) || !countResult.next()){
 			return nullptr;
 		}
