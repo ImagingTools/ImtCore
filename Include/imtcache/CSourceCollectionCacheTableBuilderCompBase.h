@@ -3,6 +3,7 @@
 
 
 // ImtCore includes
+#include <imtbase/CComplexCollectionFilter.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtbase/IObjectCollectionIterator.h>
 #include <imtcache/CCacheTableBuilderCompBase.h>
@@ -40,7 +41,9 @@ protected:
 	*/
 	virtual bool MapRow(const imtbase::IObjectCollectionIterator& iterator, QVariantList& rowValues) const = 0;
 
-	/// Source collection, for subclasses that need it beyond the standard iteration.
+	/**
+		Source collection, for subclasses that need it beyond the standard iteration.
+	*/
 	const imtbase::IObjectCollection* GetSourceCollection() const;
 
 	// reimplemented (imtcache::CCacheTableBuilderCompBase)
@@ -55,17 +58,28 @@ protected:
 				BuildResult& result) const override;
 
 private:
-	/// Finds removals as sources soft-deleted after \a lastSourceUpdateTime. Needs deletion to change the modification time.
+	/**
+		Finds removals as sources soft-deleted after \a lastSourceUpdateTime. Needs deletion to change the modification time.
+	*/
 	bool RemoveRowsDeletedSince(
 				imtduckdb::IDuckConnection& connection,
 				const QDateTime& lastSourceUpdateTime,
 				BuildResult& result) const;
 
-	/// Finds removals as cache rows whose id is not among the active source rows.
+	/**
+		Finds removals as cache rows whose id is not among the active source rows.
+	*/
 	bool RemoveRowsMissingFromSource(imtduckdb::IDuckConnection& connection, BuildResult& result) const;
 
-	/// Deletes the cache rows with the given normalized document ids.
+	/**
+		Deletes the cache rows with the given normalized document ids.
+	*/
 	bool DeleteRowsById(imtduckdb::IDuckConnection& connection, const QStringList& documentIds, BuildResult& result) const;
+
+	/**
+		Selects the source rows changed after \a since, or all of them when \a since is not set.
+	*/
+	static void FillChangedFilter(imtbase::CComplexCollectionFilter& filter, const QByteArray& modificationTimeField, const QDateTime& since);
 
 private:
 	I_REF(imtbase::IObjectCollection, m_sourceCollectionCompPtr);
@@ -77,3 +91,4 @@ private:
 
 
 } // namespace imtcache
+

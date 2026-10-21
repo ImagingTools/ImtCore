@@ -11,15 +11,10 @@ namespace imtcache
 {
 
 
-namespace
-{
-
-
-/// A cache that stays behind for this long has bigger problems than lost messages.
+/**
+	A cache that stays behind for this long has bigger problems than lost messages.
+*/
 constexpr int MAX_PENDING_MESSAGES = 5000;
-
-
-} // anonymous namespace
 
 
 // protected methods
@@ -106,3 +101,4 @@ void CCacheCollectionChangeNotifierComp::OnCacheUpdated(bool isOk, qint64 starte
 
 
 } // namespace imtcache
+

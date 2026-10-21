@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtcache/CSourceCollectionCacheTableBuilderCompBase.h>
 
 
@@ -22,26 +23,6 @@
 
 namespace imtcache
 {
-
-
-namespace
-{
-
-
-/// Selects the source rows changed after \a since, or all of them when \a since is not set.
-void FillChangedFilter(imtbase::CComplexCollectionFilter& filter, const QByteArray& modificationTimeField, const QDateTime& since)
-{
-	if (!since.isValid()){
-		return;
-	}
-
-	filter.AddFieldFilter(imtbase::IComplexCollectionFilter::FieldFilter(
-				modificationTimeField,
-				since,
-				imtbase::IComplexCollectionFilter::FO_GREATER));
-}
-
-} // anonymous namespace
 
 
 // protected methods
@@ -72,7 +53,9 @@ bool CSourceCollectionCacheTableBuilderCompBase::LoadRows(
 		return false;
 	}
 
-	// Without a cutoff no filter is passed, and the source delegate returns active rows only, which is what a rebuild wants.
+	/**
+		Without a cutoff no filter is passed, and the source delegate returns active rows only, which is what a rebuild wants.
+	*/
 	imtbase::CComplexCollectionFilter changedFilter;
 	iprm::CParamsSet changedParams;
 	const iprm::IParamsSet* filterParamsPtr = nullptr;
@@ -85,7 +68,9 @@ bool CSourceCollectionCacheTableBuilderCompBase::LoadRows(
 	QElapsedTimer readTimer;
 	readTimer.start();
 
-	// The SQL iterator reads the whole result set here, so this is the time spent waiting on PostgreSQL.
+	/**
+		The SQL iterator reads the whole result set here, so this is the time spent waiting on PostgreSQL.
+	*/
 	istd::TUniqueInterfacePtr<imtbase::IObjectCollectionIterator> iteratorPtr(
 				m_sourceCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), 0, -1, filterParamsPtr));
 	if (!iteratorPtr.IsValid()){
@@ -156,8 +141,10 @@ bool CSourceCollectionCacheTableBuilderCompBase::RemoveRowsDeletedSince(
 			const QDateTime& lastSourceUpdateTime,
 			BuildResult& result) const
 {
-	// This relies on the source delete changing the modification time, so the cutoff that finds edits
-	// finds removals too. That holds for address collections; document collections do not do it.
+	/**
+		This relies on the source delete changing the modification time, so the cutoff that finds edits
+		finds removals too. That holds for address collections; document collections do not do it.
+	*/
 	imtbase::CComplexCollectionFilter changedFilter;
 	FillChangedFilter(changedFilter, *m_modificationTimeFieldAttrPtr, lastSourceUpdateTime);
 
@@ -178,12 +165,12 @@ bool CSourceCollectionCacheTableBuilderCompBase::RemoveRowsDeletedSince(
 
 	QStringList deletedIds;
 	while (iteratorPtr->Next()){
-		const QUuid documentUuid = QUuid(QString::fromUtf8(iteratorPtr->GetObjectId()));
+		const QUuid documentUuid = QUuid(iteratorPtr->GetObjectId());
 		if (documentUuid.isNull()){
 			continue;
 		}
 
-		deletedIds << QString::fromUtf8(documentUuid.toByteArray(QUuid::WithoutBraces));
+		deletedIds << documentUuid.toString(QUuid::WithoutBraces);
 
 		const QDateTime lastModified = iteratorPtr->GetElementInfo(*m_modificationTimeFieldAttrPtr).toDateTime();
 		if (lastModified.isValid() && (!result.lastSourceUpdateTime.isValid() || lastModified > result.lastSourceUpdateTime)){
@@ -203,11 +190,15 @@ bool CSourceCollectionCacheTableBuilderCompBase::RemoveRowsMissingFromSource(
 			imtduckdb::IDuckConnection& connection,
 			BuildResult& result) const
 {
-	// No filter parameters: the source returns its active rows only.
+	/**
+		No filter parameters: the source returns its active rows only.
+	*/
 	istd::TUniqueInterfacePtr<imtbase::IObjectCollectionIterator> iteratorPtr(
 				m_sourceCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), 0, -1, nullptr));
 	if (!iteratorPtr.IsValid()){
-		// Deleting on the strength of a failed read would empty the table.
+		/**
+			Deleting on the strength of a failed read would empty the table.
+		*/
 		result.errorMessage = QStringLiteral("Unable to read the active rows of %1").arg(GetCacheTableName());
 
 		return false;
@@ -215,17 +206,16 @@ bool CSourceCollectionCacheTableBuilderCompBase::RemoveRowsMissingFromSource(
 
 	QSet<QString> activeIds;
 	while (iteratorPtr->Next()){
-		const QUuid documentUuid = QUuid(QString::fromUtf8(iteratorPtr->GetObjectId()));
+		const QUuid documentUuid = QUuid(iteratorPtr->GetObjectId());
 		if (!documentUuid.isNull()){
-			activeIds.insert(QString::fromUtf8(documentUuid.toByteArray(QUuid::WithoutBraces)));
+			activeIds.insert(documentUuid.toString(QUuid::WithoutBraces));
 		}
 	}
 
 	QSqlError sqlError;
 	QSqlQuery cachedQuery = connection.ExecSqlQuery(
 				QStringLiteral(R"(SELECT CAST(%1 AS VARCHAR) FROM %2)")
-							.arg(imtdb::QuoteIdentifier(GetObjectIdColumn()),
-								 imtdb::QuoteIdentifier(GetCacheTableName()))
+							.arg(imtdb::QuoteIdentifier(GetObjectIdColumn()), imtdb::QuoteIdentifier(GetCacheTableName()))
 							.toUtf8(),
 				&sqlError);
 	if (sqlError.type() != QSqlError::NoError){
@@ -255,7 +245,9 @@ bool CSourceCollectionCacheTableBuilderCompBase::DeleteRowsById(
 			const QStringList& documentIds,
 			BuildResult& result) const
 {
-	// Ids are UUID text produced by QUuid or read back from a UUID column, so quoting them is enough.
+	/**
+		Ids are UUID text produced by QUuid or read back from a UUID column, so quoting them is enough.
+	*/
 	QStringList quotedIds;
 	for (const QString& documentId : documentIds){
 		quotedIds << QStringLiteral("'%1'").arg(documentId);
@@ -288,4 +280,18 @@ bool CSourceCollectionCacheTableBuilderCompBase::DeleteRowsById(
 }
 
 
+void CSourceCollectionCacheTableBuilderCompBase::FillChangedFilter(
+			imtbase::CComplexCollectionFilter& filter,
+			const QByteArray& modificationTimeField,
+			const QDateTime& since)
+{
+	if (!since.isValid()){
+		return;
+	}
+
+	filter.AddFieldFilter(imtbase::IComplexCollectionFilter::FieldFilter(modificationTimeField, since, imtbase::IComplexCollectionFilter::FO_GREATER));
+}
+
+
 } // namespace imtcache
+

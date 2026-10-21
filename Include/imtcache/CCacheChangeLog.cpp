@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtcache/CCacheChangeLog.h>
 
 
@@ -9,67 +10,11 @@
 // ImtCore includes
 #include <imtcache/imtcache.h>
 #include <imtdb/imtdb.h>
+#include <imtduckdb/CDuckTableOperations.h>
 
 
 namespace imtcache
 {
-
-
-namespace
-{
-
-
-bool Execute(imtduckdb::IDuckConnection& connection, const QString& query, QString& errorMessage)
-{
-	QSqlError sqlError;
-	connection.ExecSqlQuery(query.toUtf8(), &sqlError);
-	if (sqlError.type() != QSqlError::NoError){
-		errorMessage = sqlError.text();
-
-		return false;
-	}
-
-	return true;
-}
-
-
-/// The first column of the first row of the result.
-bool ReadValue(imtduckdb::IDuckConnection& connection, const QString& query, QVariant& value, QString& errorMessage)
-{
-	QSqlError sqlError;
-	QSqlQuery result = connection.ExecSqlQuery(query.toUtf8(), &sqlError);
-	if (sqlError.type() != QSqlError::NoError){
-		errorMessage = sqlError.text();
-
-		return false;
-	}
-
-	value = result.next() ? result.value(0) : QVariant();
-
-	return true;
-}
-
-
-bool ExecuteScript(imtduckdb::IDuckConnection& connection, const QString& scriptPath, QString& errorMessage)
-{
-	QFile scriptFile(scriptPath);
-	if (!scriptFile.open(QFile::ReadOnly)){
-		errorMessage = QStringLiteral("Unable to read %1").arg(scriptPath);
-
-		return false;
-	}
-
-	return Execute(connection, QString::fromUtf8(scriptFile.readAll()), errorMessage);
-}
-
-
-QString NextChangeId()
-{
-	return QStringLiteral("nextval('%1')").arg(CacheChangeSequence::NAME);
-}
-
-
-} // anonymous namespace
 
 
 // public methods
@@ -92,7 +37,9 @@ bool CCacheChangeLog::RecordUpserted(
 {
 	changedCount = 0;
 
-	// The staging table is named excluded so the replace condition, written for the upsert, reads the same here.
+	/**
+		The staging table is named excluded so the replace condition, written for the upsert, reads the same here.
+	*/
 	QString changedCondition = QStringLiteral("excluded IS DISTINCT FROM %1").arg(imtdb::QuoteIdentifier(tableName));
 	if (!replaceCondition.isEmpty()){
 		changedCondition += QStringLiteral(" AND (%1)").arg(replaceCondition);
@@ -102,13 +49,15 @@ bool CCacheChangeLog::RecordUpserted(
 	const QString keyIdentifier = imtdb::QuoteIdentifier(keyColumn);
 
 	const QString query = QStringLiteral("INSERT INTO %1 SELECT %2, '%3', CAST(excluded.%4 AS UBIGINT) FROM %5 AS excluded LEFT JOIN %6 ON %6.%4 = excluded.%4 WHERE %6.%4 IS NULL OR (%7)")
-					.arg(imtdb::QuoteIdentifier(CacheTable::CACHE_CHANGE),
-						 NextChangeId(),
-						 imtdb::EscapeSql(tableName),
-						 keyIdentifier,
-						 imtdb::QuoteIdentifier(stagingTableName),
-						 tableIdentifier,
-						 changedCondition);
+					.arg(
+							/*1*/ imtdb::QuoteIdentifier(CacheTable::CACHE_CHANGE),
+							/*2*/ GetNextChangeId(),
+							/*3*/ imtdb::EscapeSql(tableName),
+							/*4*/ keyIdentifier,
+							/*5*/ imtdb::QuoteIdentifier(stagingTableName),
+							/*6*/ tableIdentifier,
+							/*7*/ changedCondition
+						);
 
 	QSqlError sqlError;
 	const QSqlQuery result = connection.ExecSqlQuery(query.toUtf8(), &sqlError);
@@ -131,25 +80,29 @@ bool CCacheChangeLog::RecordRemoved(
 			const QString& removedCondition,
 			QString& errorMessage)
 {
-	return Execute(connection,
+	return imtduckdb::CDuckTableOperations::Execute(connection,
 				QStringLiteral("INSERT INTO %1 SELECT %2, '%3', CAST(%4 AS UBIGINT) FROM %5 WHERE %6")
-					.arg(imtdb::QuoteIdentifier(CacheTable::CACHE_CHANGE),
-						 NextChangeId(),
-						 imtdb::EscapeSql(tableName),
-						 imtdb::QuoteIdentifier(keyColumn),
-						 imtdb::QuoteIdentifier(tableName),
-						 removedCondition),
+					.arg(
+							/*1*/ imtdb::QuoteIdentifier(CacheTable::CACHE_CHANGE),
+							/*2*/ GetNextChangeId(),
+							/*3*/ imtdb::EscapeSql(tableName),
+							/*4*/ imtdb::QuoteIdentifier(keyColumn),
+							/*5*/ imtdb::QuoteIdentifier(tableName),
+							/*6*/ removedCondition
+						),
 				errorMessage);
 }
 
 
 bool CCacheChangeLog::RecordRebuilt(imtduckdb::IDuckConnection& connection, const QString& tableName, QString& errorMessage)
 {
-	return Execute(connection,
+	return imtduckdb::CDuckTableOperations::Execute(connection,
 				QStringLiteral("INSERT INTO %1 VALUES (%2, '%3', NULL)")
-					.arg(imtdb::QuoteIdentifier(CacheTable::CACHE_CHANGE),
-						 NextChangeId(),
-						 imtdb::EscapeSql(tableName)),
+					.arg(
+							/*1*/ imtdb::QuoteIdentifier(CacheTable::CACHE_CHANGE),
+							/*2*/ GetNextChangeId(),
+							/*3*/ imtdb::EscapeSql(tableName)
+						),
 				errorMessage);
 }
 
@@ -157,11 +110,13 @@ bool CCacheChangeLog::RecordRebuilt(imtduckdb::IDuckConnection& connection, cons
 bool CCacheChangeLog::GetLatestChangeId(imtduckdb::IDuckConnection& connection, qint64 fallback, qint64& changeId, QString& errorMessage)
 {
 	QVariant value;
-	if (!ReadValue(connection,
+	if (!imtduckdb::CDuckTableOperations::ReadValue(connection,
 				QStringLiteral("SELECT COALESCE(max(%1), %2) FROM %3")
-					.arg(imtdb::QuoteIdentifier(CacheChangeColumn::CHANGE_ID),
-						 QString::number(fallback),
-						 imtdb::QuoteIdentifier(CacheTable::CACHE_CHANGE)),
+					.arg(
+							/*1*/ imtdb::QuoteIdentifier(CacheChangeColumn::CHANGE_ID),
+							/*2*/ QString::number(fallback),
+							/*3*/ imtdb::QuoteIdentifier(CacheTable::CACHE_CHANGE)
+						),
 				value,
 				errorMessage)){
 		return false;
@@ -181,12 +136,14 @@ bool CCacheChangeLog::GetCursor(
 			QString& errorMessage)
 {
 	QVariant value;
-	if (!ReadValue(connection,
+	if (!imtduckdb::CDuckTableOperations::ReadValue(connection,
 				QStringLiteral("SELECT %1 FROM %2 WHERE %3 = '%4'")
-					.arg(imtdb::QuoteIdentifier(CacheChangeCursorColumn::LAST_CHANGE_ID),
-						 imtdb::QuoteIdentifier(CacheTable::CACHE_CHANGE_CURSOR),
-						 imtdb::QuoteIdentifier(CacheChangeCursorColumn::CONSUMER),
-						 imtdb::EscapeSql(consumer)),
+					.arg(
+							/*1*/ imtdb::QuoteIdentifier(CacheChangeCursorColumn::LAST_CHANGE_ID),
+							/*2*/ imtdb::QuoteIdentifier(CacheTable::CACHE_CHANGE_CURSOR),
+							/*3*/ imtdb::QuoteIdentifier(CacheChangeCursorColumn::CONSUMER),
+							/*4*/ imtdb::EscapeSql(consumer)
+						),
 				value,
 				errorMessage)){
 		return false;
@@ -203,13 +160,15 @@ bool CCacheChangeLog::SetCursor(imtduckdb::IDuckConnection& connection, const QS
 {
 	const QString lastChangeId = imtdb::QuoteIdentifier(CacheChangeCursorColumn::LAST_CHANGE_ID);
 
-	return Execute(connection,
+	return imtduckdb::CDuckTableOperations::Execute(connection,
 				QStringLiteral("INSERT INTO %1 VALUES ('%2', %3) ON CONFLICT (%4) DO UPDATE SET %5 = excluded.%5")
-					.arg(imtdb::QuoteIdentifier(CacheTable::CACHE_CHANGE_CURSOR),
-						 imtdb::EscapeSql(consumer),
-						 QString::number(changeId),
-						 imtdb::QuoteIdentifier(CacheChangeCursorColumn::CONSUMER),
-						 lastChangeId),
+					.arg(
+							/*1*/ imtdb::QuoteIdentifier(CacheTable::CACHE_CHANGE_CURSOR),
+							/*2*/ imtdb::EscapeSql(consumer),
+							/*3*/ QString::number(changeId),
+							/*4*/ imtdb::QuoteIdentifier(CacheChangeCursorColumn::CONSUMER),
+							/*5*/ lastChangeId
+						),
 				errorMessage);
 }
 
@@ -234,15 +193,17 @@ bool CCacheChangeLog::HasRebuilt(
 	}
 
 	QVariant value;
-	if (!ReadValue(connection,
+	if (!imtduckdb::CDuckTableOperations::ReadValue(connection,
 				QStringLiteral("SELECT count(*) FROM %1 WHERE %2 > %3 AND %2 <= %4 AND %5 IS NULL AND %6 IN (%7)")
-					.arg(imtdb::QuoteIdentifier(CacheTable::CACHE_CHANGE),
-						 imtdb::QuoteIdentifier(CacheChangeColumn::CHANGE_ID),
-						 QString::number(afterChangeId),
-						 QString::number(upToChangeId),
-						 imtdb::QuoteIdentifier(CacheChangeColumn::KEY_ID),
-						 imtdb::QuoteIdentifier(CacheChangeColumn::TABLE_NAME),
-						 quotedNames.join(',')),
+					.arg(
+							/*1*/ imtdb::QuoteIdentifier(CacheTable::CACHE_CHANGE),
+							/*2*/ imtdb::QuoteIdentifier(CacheChangeColumn::CHANGE_ID),
+							/*3*/ QString::number(afterChangeId),
+							/*4*/ QString::number(upToChangeId),
+							/*5*/ imtdb::QuoteIdentifier(CacheChangeColumn::KEY_ID),
+							/*6*/ imtdb::QuoteIdentifier(CacheChangeColumn::TABLE_NAME),
+							/*7*/ quotedNames.join(',')
+						),
 				value,
 				errorMessage)){
 		return false;
@@ -259,14 +220,38 @@ bool CCacheChangeLog::Purge(imtduckdb::IDuckConnection& connection, QString& err
 	const QString changeTable = imtdb::QuoteIdentifier(CacheTable::CACHE_CHANGE);
 	const QString changeId = imtdb::QuoteIdentifier(CacheChangeColumn::CHANGE_ID);
 
-	return Execute(connection,
+	return imtduckdb::CDuckTableOperations::Execute(connection,
 				QStringLiteral("DELETE FROM %1 WHERE %2 <= COALESCE((SELECT min(%3) FROM %4), (SELECT max(%2) FROM %1))")
-					.arg(changeTable,
-						 changeId,
-						 imtdb::QuoteIdentifier(CacheChangeCursorColumn::LAST_CHANGE_ID),
-						 imtdb::QuoteIdentifier(CacheTable::CACHE_CHANGE_CURSOR)),
+					.arg(
+							/*1*/ changeTable,
+							/*2*/ changeId,
+							/*3*/ imtdb::QuoteIdentifier(CacheChangeCursorColumn::LAST_CHANGE_ID),
+							/*4*/ imtdb::QuoteIdentifier(CacheTable::CACHE_CHANGE_CURSOR)
+						),
 				errorMessage);
 }
 
 
+// private methods
+
+bool CCacheChangeLog::ExecuteScript(imtduckdb::IDuckConnection& connection, const QString& scriptPath, QString& errorMessage)
+{
+	QFile scriptFile(scriptPath);
+	if (!scriptFile.open(QFile::ReadOnly)){
+		errorMessage = QStringLiteral("Unable to read %1").arg(scriptPath);
+
+		return false;
+	}
+
+	return imtduckdb::CDuckTableOperations::Execute(connection, scriptFile.readAll(), errorMessage);
+}
+
+
+QString CCacheChangeLog::GetNextChangeId()
+{
+	return QStringLiteral("nextval('%1')").arg(CacheChangeSequence::NAME);
+}
+
+
 } // namespace imtcache
+
