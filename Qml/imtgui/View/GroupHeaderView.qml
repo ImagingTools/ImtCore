@@ -81,10 +81,15 @@ Rectangle {
 		anchors.topMargin: root.topPadding
 		anchors.left: parent.left;
 		anchors.leftMargin: root.leftPadding
-		
+		// Stops short of the control on the right, so a narrow header elides instead of running under it.
+		anchors.right: parent.right;
+		anchors.rightMargin: root.controlItem && root.controlItem.visible ? root.controlItem.width + root.rightPadding + Style.marginS : 0
+
 		color: Style.textColor;
 		font.family: Style.fontFamilyBold;
-		font.pixelSize: Style.fontSizeXXL;
+		font.pixelSize: Style.fontSizeXL;
+		font.bold: true;
+		elide: Text.ElideRight;
 	}
 }
 

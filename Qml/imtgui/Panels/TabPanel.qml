@@ -12,17 +12,20 @@ Rectangle {
 	// fought the left/right anchors of a host like TabView and, through maxWidth, fed
 	// its own result back into list.width - once the strip measured nothing it stayed
 	// at nothing until a resize re-applied the anchors.
-	implicitWidth: list.width + externButtons.width;
-	height: visible ? Style.controlHeightL : 0;
+	implicitWidth: Math.min(list.contentWidth, list.width) + externButtons.width;
+	height: visible ? Style.controlHeightM + Style.spacingXXS : 0;
 	
-	color: Style.baseColor;
+	color: Style.tabPanelBackgroundColor;
 
 	property int selectedIndex: 0;
 	property int count: 0;
 	property alias spacing: list.spacing;
 	property bool isCloseEnable: false;
 	property int maxWidth: width
-	
+	// From the tab extent alone: through the chevrons' width it fed back into the strip's own width.
+	readonly property bool overflow: tabPanelContainer.maxWidth > 2 * externButtons.navContentWidth
+			&& list.contentWidth > tabPanelContainer.maxWidth - externButtons.navContentWidth
+
 	property alias model: list.model;
 	property alias tabDelegate: list.delegate
 	// Expose the horizontal tab ListView so custom tabDelegate instances can set
@@ -57,23 +60,17 @@ Rectangle {
 		viewTabInListView(selectedIndex);
 	}
 	
-	// Separates the strip from the page below it.
-	Rectangle {
-		anchors.left: parent.left;
-		anchors.right: parent.right;
-		anchors.bottom: parent.bottom;
-		height: 1;
-		color: Style.borderColor;
-	}
-
 	ListView {
 		id: list;
 		
 		anchors.left: parent.left;
-		anchors.leftMargin: Style.spacingXS;
-		width: Math.max(0, Math.min(contentWidth, tabPanelContainer.maxWidth - externButtons.width - Style.spacingXS))
+		// Not bound to contentWidth, which a ListView recomputes from its own width; the panel shrinks through implicitWidth.
+		width: Math.max(0, tabPanelContainer.maxWidth - (tabPanelContainer.overflow ? externButtons.navContentWidth : 0))
 
 		height: parent.height;
+
+		// Every tab is built, so contentWidth is their real extent and does not change with this list's width.
+		cacheBuffer: 100000;
 
 		clip: true;
 
@@ -81,7 +78,7 @@ Rectangle {
 		boundsBehavior: Flickable.StopAtBounds;
 		interactive: false;
 
-		spacing: Style.spacingXS;
+		spacing: 0;
 		
 		onContentWidthChanged: {
 			tabPanelContainer.viewTabInListView(tabPanelContainer.selectedIndex);
@@ -112,11 +109,11 @@ Rectangle {
 		anchors.right: parent.right;
 		anchors.verticalCenter: parent.verticalCenter;
 
-		width: visible ? navContentWidth : 0;
+		width: tabPanelContainer.overflow ? navContentWidth : 0;
 		height: parent.height;
 
 		// Reserve space when tabs overflow the available strip width.
-		visible: list.contentWidth > (tabPanelContainer.maxWidth - navContentWidth);
+		visible: tabPanelContainer.overflow;
 
 		// Soft fade so scrolling tabs do not hard-cut under the nav cluster.
 		Rectangle {
@@ -170,7 +167,7 @@ Rectangle {
 						: ("../../../" + Style.getIconPath("Icons/Left", Icon.State.Off, Icon.Mode.Disabled));
 				decorator: Component {
 					ButtonDecorator {
-						color: parent.enabled && parent.hovered ? Style.alternateBaseColor : "transparent";
+						color: parent.enabled && parent.hovered ? Style.toolButtonHoverColor : "transparent";
 						radius: Style.radiusM;
 						border.width: 0;
 						icon.width: Style.iconSizeS;
@@ -196,7 +193,7 @@ Rectangle {
 						: ("../../../" + Style.getIconPath("Icons/Right", Icon.State.Off, Icon.Mode.Disabled));
 				decorator: Component {
 					ButtonDecorator {
-						color: parent.enabled && parent.hovered ? Style.alternateBaseColor : "transparent";
+						color: parent.enabled && parent.hovered ? Style.toolButtonHoverColor : "transparent";
 						radius: Style.radiusM;
 						border.width: 0;
 						icon.width: Style.iconSizeS;

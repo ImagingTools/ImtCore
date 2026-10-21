@@ -39,53 +39,51 @@ Rectangle{
 								   ) ? true : false;
 
 	property bool isAccented: dayDelegate.isSelectedDate || dayDelegate.isMidlleDateLR || (dayDelegate.isEndDate && dayDelegate.calendarItem.endDateExist);
+	// The picked day itself, or either end of a picked range: drawn in the accent.
+	property bool isEndpoint: dayDelegate.isSelectedDate || (dayDelegate.isEndDate && dayDelegate.calendarItem.endDateExist);
 
+	// Range strip behind the day mark, so the ends keep their own fill and today's ring.
+	Rectangle {
+		id: rectangleLeft;
 
+		anchors.verticalCenter: parent.verticalCenter;
+		anchors.left: parent.left;
 
+		height: parent.height;
+		width: parent.width/2;
+		color: (dayDelegate.isMidlleDateLR || (dayDelegate.isEndDate && dayDelegate.calendarItem.endDateExist))?
+				   dayDelegate.calendarItem.rangeColor : "transparent";
+	}
+
+	Rectangle {
+		id: rectangleRight;
+
+		anchors.right: parent.right;
+		anchors.verticalCenter: parent.verticalCenter;
+
+		height: parent.height;
+		width: parent.width/2;
+		color: (dayDelegate.isMidlleDateLR || (dayDelegate.isSelectedDate && dayDelegate.calendarItem.endDateExist))?
+				   dayDelegate.calendarItem.rangeColor : "transparent";
+	}
 
 	Rectangle {
 		id: circle;
 
 		anchors.fill: parent;
 
-		color: (dayDelegate.isSelectedDate || (dayDelegate.isEndDate && dayDelegate.calendarItem.endDateExist)) ?
-				   dayDelegate.calendarItem.selectColor : "transparent";
-		radius: Math.min(width, height) / 2;
+		color: dayDelegate.isEndpoint ? dayDelegate.calendarItem.selectColor
+			 : dayMouseArea.containsMouse && !dayDelegate.isMidlleDateLR ? dayDelegate.calendarItem.hoverColor : "transparent";
+		radius: Style.radiusM;
 		border.color: dayDelegate.calendarItem.mainColor;
-		border.width: (dayDelegate.isToday && dayDelegate.calendarItem.canShowToday) ? 2 :0;
-
-
-		Rectangle {
-			id: rectangleLeft;
-
-			anchors.verticalCenter: parent.verticalCenter;
-			anchors.left: parent.left;
-
-			height: parent.height;
-			width: parent.width/2;
-			color: (dayDelegate.isMidlleDateLR || (dayDelegate.isEndDate && dayDelegate.calendarItem.endDateExist))?
-					   dayDelegate.calendarItem.selectColor : "transparent";
-
-
-		}
-
-		Rectangle {
-			id: rectangleRight;
-
-			anchors.right: parent.right;
-			anchors.verticalCenter: parent.verticalCenter;
-
-			height: parent.height;
-			width: parent.width/2;
-			color: (dayDelegate.isMidlleDateLR || (dayDelegate.isSelectedDate && dayDelegate.calendarItem.endDateExist))?
-					   dayDelegate.calendarItem.selectColor : "transparent";
-
-		}
-
+		border.width: (dayDelegate.isToday && dayDelegate.calendarItem.canShowToday && !dayDelegate.isEndpoint) ? 1 : 0;
 	}
 
 	MouseArea {
+		id: dayMouseArea;
+
 		anchors.fill:parent;
+		hoverEnabled: true;
 
 		visible: !dayDelegate.calendarItem.readOnly
 

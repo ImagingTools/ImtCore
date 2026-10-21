@@ -14,7 +14,7 @@ ElementView {
 	controlComp: Component {
 		Rectangle {
 			height: Style.itemSizeM
-			width: container.controlWidth - Style.marginXXL
+			width: container.fittedControlWidth - Style.marginXXL
 			color: Style.baseColor
 
 			Connections {

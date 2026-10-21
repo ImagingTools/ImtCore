@@ -409,7 +409,7 @@ bool CGqlObjectCollectionDelegateComp::GetOperationResult(const imtgql::IGqlResp
 {
 	ResponseData responseData = GetResponseData(response);
 
-	out = responseData.errors.isEmpty();
+	out = responseData.errors.isEmpty() && !responseData.data.isEmpty() && responseData.data.value(QStringLiteral("success")).toBool(true);
 
 	return true;
 }
@@ -420,7 +420,7 @@ bool CGqlObjectCollectionDelegateComp::GetObjectId(const imtgql::IGqlResponse& r
 	sdl::V1_0::imtbase::CInsertNewObjectPayload insertNewObjectPayload;
 
 	ResponseData responseData = GetResponseData(response);
-	if (insertNewObjectPayload.ReadFromJsonObject(responseData.data)){
+	if (!responseData.data.isEmpty() && insertNewObjectPayload.ReadFromJsonObject(responseData.data)){
 		if (insertNewObjectPayload.objectId){
 			out = *insertNewObjectPayload.objectId;
 
@@ -436,7 +436,7 @@ bool CGqlObjectCollectionDelegateComp::GetObjectTypeId(const imtgql::IGqlRespons
 {
 	sdl::V1_0::imtbase::CGetObjectTypeIdPayload getObjectTypeIdPayload;
 	ResponseData responseData = GetResponseData(response);
-	if (getObjectTypeIdPayload.ReadFromJsonObject(responseData.data)){
+	if (!responseData.data.isEmpty() && getObjectTypeIdPayload.ReadFromJsonObject(responseData.data)){
 		if (getObjectTypeIdPayload.typeId){
 			out = *getObjectTypeIdPayload.typeId;
 			return true;
@@ -451,7 +451,7 @@ bool CGqlObjectCollectionDelegateComp::GetObjectInfo(const imtgql::IGqlResponse&
 {
 	sdl::V1_0::imtbase::CGetElementInfoPayload getElementInfoPayload;
 	ResponseData responseData = GetResponseData(response);
-	if (getElementInfoPayload.ReadFromJsonObject(responseData.data)){
+	if (!responseData.data.isEmpty() && getElementInfoPayload.ReadFromJsonObject(responseData.data)){
 		if (getElementInfoPayload.elementInfo){
 			sdl::V1_0::imtbase::CParameter parameter = *getElementInfoPayload.elementInfo;
 			if (parameter.id){
@@ -482,7 +482,7 @@ bool CGqlObjectCollectionDelegateComp::GetObjectData(const imtgql::IGqlResponse&
 {
 	sdl::V1_0::imtbase::CGetObjectDataPayload getObjectDataPayload;
 	ResponseData responseData = GetResponseData(response);
-	if (getObjectDataPayload.ReadFromJsonObject(responseData.data)){
+	if (!responseData.data.isEmpty() && getObjectDataPayload.ReadFromJsonObject(responseData.data)){
 		if (getObjectDataPayload.objectData){
 			return DeSerializeObject(&out, (*getObjectDataPayload.objectData).toUtf8());
 		}
@@ -497,7 +497,7 @@ bool CGqlObjectCollectionDelegateComp::GetMetaInfo(const imtgql::IGqlResponse& r
 	sdl::V1_0::imtbase::CGetElementMetaInfoPayload getElementMetaInfoPayload;
 	ResponseData responseData = GetResponseData(response);
 
-	if (getElementMetaInfoPayload.ReadFromJsonObject(responseData.data)){
+	if (!responseData.data.isEmpty() && getElementMetaInfoPayload.ReadFromJsonObject(responseData.data)){
 		// if (getElementMetaInfoPayload.metaInfoData){
 		// 	QByteArray metaInfoData = (*getElementMetaInfoPayload.metaInfoData).toUtf8();
 		// 	if (!metaInfoData.isEmpty()){
@@ -514,7 +514,7 @@ bool CGqlObjectCollectionDelegateComp::GetItemCount(const imtgql::IGqlResponse& 
 {
 	sdl::V1_0::imtbase::CGetElementsCountPayload getElementsCountPayload;
 	ResponseData responseData = GetResponseData(response);
-	if (getElementsCountPayload.ReadFromJsonObject(responseData.data)){
+	if (!responseData.data.isEmpty() && getElementsCountPayload.ReadFromJsonObject(responseData.data)){
 		if (getElementsCountPayload.count){
 			out = *getElementsCountPayload.count;
 			return true;
@@ -531,7 +531,7 @@ bool CGqlObjectCollectionDelegateComp::GetItemIds(const imtgql::IGqlResponse& re
 {
 	sdl::V1_0::imtbase::CGetElementIdsPayload getElementIdsPayload;
 	ResponseData responseData = GetResponseData(response);
-	if (getElementIdsPayload.ReadFromJsonObject(responseData.data)){
+	if (!responseData.data.isEmpty() && getElementIdsPayload.ReadFromJsonObject(responseData.data)){
 		if (getElementIdsPayload.elementIds.HasValue()){
 			out = getElementIdsPayload.elementIds->ToList();
 
@@ -554,8 +554,8 @@ imtbase::IObjectCollection* CGqlObjectCollectionDelegateComp::GetSubCollection(
 	ResponseData responseData = GetResponseData(response);
 	// A response without items is a failed request, not an empty collection: callers paging through a
 	// collection would take it for the end of the data.
-	if (!createSubCollectionPayload.ReadFromJsonObject(responseData.data) || !createSubCollectionPayload.items){
-		return nullptr;
+	if (responseData.data.isEmpty() || !createSubCollectionPayload.ReadFromJsonObject(responseData.data) || !createSubCollectionPayload.items){
+	  return nullptr;
 	}
 
 	const imtsdl::TElementList<sdl::V1_0::imtbase::CSubCollectionItem>& subCollectionItems = *createSubCollectionPayload.items;
@@ -681,10 +681,10 @@ CGqlObjectCollectionDelegateComp::ResponseData CGqlObjectCollectionDelegateComp:
 		}
 
 		if (rootObject.contains("errors")){
-			data.errors = rootObject["errors"].toObject();
+			data.errors = rootObject["errors"].toArray();
 			QJsonDocument errorsDoc;
-			errorsDoc.setObject(data.errors);
-			SendErrorMessage(0, errorsDoc.toJson(QJsonDocument::Compact));
+			errorsDoc.setArray(data.errors);
+			SendErrorMessage(0, QStringLiteral("Command '%1' failed: %2").arg(QString::fromUtf8(data.commandId), QString::fromUtf8(errorsDoc.toJson(QJsonDocument::Compact))));
 		}
 	}
 

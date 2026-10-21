@@ -64,13 +64,20 @@ public:
 	virtual void SetProductInfo(imtlic::IProductInfo* productInfoPtr) = 0;
 
 	/**
+		Get the permissions available to the organization of this request.
+		An empty list sets no limit.
+	*/
+	virtual QByteArrayList GetTenantPermissions() const = 0;
+	virtual void SetTenantPermissions(const QByteArrayList& permissions) = 0;
+
+	/**
 		Get the permissions the user of this request holds through the requirements
-		of the permissions given to them, transitively: holding 'A' whose
-		requirements name 'B' is holding 'B' as well.
+		of the permissions given to them in the product of the request, transitively:
+		holding 'A' whose requirements name 'B' is holding 'B' as well.
 
 		The permissions held directly are not part of the returned list, and the
 		list is empty while the context carries no user or no product info to
-		resolve the requirements in.
+		resolve the requirements in. \see imtgql::CollectImpliedPermissions
 	*/
 	virtual imtauth::IUserInfo::FeatureIds GetImpliedPermissions() const = 0;
 

@@ -18,6 +18,7 @@ RemoteCollectionView {
 	collectionId: "Features";
 	documentCollectionFilter: null
 	commandsDelegateComp: Component {DocumentCollectionViewDelegate {
+			revisionsPermissionPath: "/FeatureManagement/Revisions";
 			collectionView: featureCollectionViewContainer;
 			documentTypeIds: ["Feature"]
 			documentViewTypeIds: ["FeatureEditor"]
@@ -64,11 +65,11 @@ RemoteCollectionView {
 			property FeatureData featureData: documentModel
 			
 			gqlGetCommandId: ImtlicFeaturesSdlCommandIds.s_getFeatureItem;
-			getPermissionPath: "/FeatureManagement/ViewFeatures";
+			getPermissionPath: "/FeatureManagement/View";
 			gqlUpdateCommandId: ImtlicFeaturesSdlCommandIds.s_updateFeature;
-			updatePermissionPath: "/FeatureManagement/EditFeature/ChangeFeature";
+			updatePermissionPath: "/FeatureManagement/Edit/Change";
 			gqlAddCommandId: ImtlicFeaturesSdlCommandIds.s_addFeature;
-			addPermissionPath: "/FeatureManagement/EditFeature/AddFeature";
+			addPermissionPath: "/FeatureManagement/Edit/Add";
 			
 			typeId: "Feature";
 			documentName: featureData ? featureData.m_featureName: "";

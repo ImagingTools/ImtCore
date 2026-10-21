@@ -10,18 +10,14 @@ QtObject {
     /**
         Whether a permission list holds a permission.
 
-        A permission is identified by the full path of its feature, e.g.
-        "/Administration/EditUser/AddUser", and that is the form it is held in.
-        Either side may be a bare feature id instead, and then only the last segment
-        is compared: shared code cannot spell out a path that differs from one
-        product to the next, and accounts filled before the paths existed hold bare
-        ids to this day. Two paths, however, name two places and never stand in for
-        each other.
+        A permission is the full path of its feature, e.g. "/Administration/Users/Edit/Add".
+        A group of the tree is held when a permission inside it is held; a feature id
+        alone names no permission.
 
         Mirrors imtauth::HasPermission, which decides the same question on the server.
     */
     function hasPermission(permissions, permissionPath){
-        if (!permissionPath || permissionPath === ""){
+        if (!permissionPath || permissionPath.indexOf('/') !== 0){
             return false;
         }
 
@@ -29,16 +25,9 @@ QtObject {
             return true;
         }
 
-        let isPath = permissionPath.indexOf('/') === 0;
-        let featureId = permissionPath.substring(permissionPath.lastIndexOf('/') + 1);
-
+        let groupPrefix = permissionPath + '/';
         for (let i = 0; i < permissions.length; ++i){
-            let permission = permissions[i];
-            if (isPath && permission.indexOf('/') === 0){
-                continue;
-            }
-
-            if (permission.substring(permission.lastIndexOf('/') + 1) === featureId){
+            if (permissions[i].indexOf(groupPrefix) === 0){
                 return true;
             }
         }

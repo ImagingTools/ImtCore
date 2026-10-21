@@ -741,6 +741,63 @@ bool CSqlDatabaseDocumentDelegateCompBase::ExportRevision(
 }
 
 
+bool CSqlDatabaseDocumentDelegateCompBase::GetRevisionData(
+			const imtbase::IObjectCollection& /*collection*/,
+			const imtbase::ICollectionInfo::Id& objectId,
+			int revision,
+			istd::IChangeableSharedPtr& dataPtr,
+			idoc::MetaInfoPtr& dataMetaInfoPtr) const
+{
+	dataPtr.Reset();
+	dataMetaInfoPtr.Reset();
+	if (!m_databaseEngineCompPtr.IsValid() || objectId.isEmpty() || revision <= 0) {
+		return false;
+	}
+
+	const QString revisionExtractSql = CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int);
+	if (revisionExtractSql.isEmpty()) {
+		return false;
+	}
+
+	QString schemaPrefix;
+	if (m_tableSchemaAttrPtr.IsValid()) {
+		schemaPrefix = QStringLiteral("%1.").arg(*m_tableSchemaAttrPtr);
+	}
+
+	const QByteArray query = QStringLiteral(
+		R"(SELECT * FROM %1"%2" WHERE "%3" = '%4' AND %5 = %6;)" )
+				.arg(
+					schemaPrefix,
+					QString::fromUtf8(*m_tableNameAttrPtr),
+					QString::fromUtf8(s_documentIdColumn),
+					SqlEncode(QString::fromUtf8(objectId)),
+					revisionExtractSql,
+					QString::number(revision))
+					.toUtf8();
+
+	QSqlError sqlError;
+	QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);
+	if (sqlError.type() != QSqlError::NoError || !sqlQuery.next()) {
+		return false;
+	}
+
+	const QSqlRecord record = sqlQuery.record();
+	dataPtr.FromUnique(CreateObjectFromRecord(record));
+	if (!dataPtr.IsValid()) {
+		return false;
+	}
+
+	idoc::MetaInfoPtr collectionItemMetaInfoPtr;
+	if (!CreateObjectInfoFromRecord(record, dataMetaInfoPtr, collectionItemMetaInfoPtr)) {
+		dataPtr.Reset();
+		dataMetaInfoPtr.Reset();
+		return false;
+	}
+
+	return true;
+}
+
+
 bool CSqlDatabaseDocumentDelegateCompBase::DeleteRevision(
 			imtbase::IObjectCollection& collection,
 			const imtbase::ICollectionInfo::Id& objectId,

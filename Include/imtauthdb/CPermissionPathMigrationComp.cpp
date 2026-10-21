@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include <imtauth/CPermissionPathMigrationComp.h>
+#include <imtauthdb/CPermissionPathMigrationComp.h>
 
 
 // STL includes
@@ -7,7 +7,6 @@
 
 // Qt includes
 #include <QtCore/QSet>
-#include <QtCore/QTimer>
 
 // ImtCore includes
 #include <imtauth/IRole.h>
@@ -17,7 +16,7 @@
 #include <imtlic/IFeatureInfo.h>
 
 
-namespace imtauth
+namespace imtauthdb
 {
 
 
@@ -54,10 +53,10 @@ void CollectPermissionPaths(
 
 // protected methods
 
-void CPermissionPathMigrationComp::Migrate()
+bool CPermissionPathMigrationComp::Migrate() const
 {
 	if (!m_productInfoCompPtr.IsValid()){
-		return;
+		return false;
 	}
 
 	QByteArrayList ambiguousIds;
@@ -67,17 +66,18 @@ void CPermissionPathMigrationComp::Migrate()
 					0,
 					QStringLiteral("Permissions stored by these ids are left as they are, the ids are not unique in the feature tree: %1")
 								.arg(QString::fromUtf8(ambiguousIds.join(", "))),
-					"imtauth::CPermissionPathMigrationComp");
+					"imtauthdb::CPermissionPathMigrationComp");
 	}
 
 	if (pathMap.isEmpty()){
-		return;
+		return true;
 	}
 
 	const QByteArray productId = m_productInfoCompPtr->GetProductId();
+	bool retVal = true;
 
 	if (m_roleCollectionCompPtr.IsValid()){
-		MigrateCollection<IRole>(*m_roleCollectionCompPtr, QStringLiteral("role"), [this, &pathMap, &productId](IRole& role, imtbase::COperationContext& operationContext){
+		retVal = MigrateCollection<imtauth::IRole>(*m_roleCollectionCompPtr, QStringLiteral("role"), [this, &pathMap, &productId](imtauth::IRole& role, imtbase::COperationContext& operationContext){
 			if (role.GetProductId() != productId){
 				return false;
 			}
@@ -98,7 +98,7 @@ void CPermissionPathMigrationComp::Migrate()
 		});
 	}
 
-	auto convertUserBase = [this, &pathMap, &productId](IUserBaseInfo& userBaseInfo, imtbase::COperationContext& operationContext){
+	auto convertUserBase = [this, &pathMap, &productId](imtauth::IUserBaseInfo& userBaseInfo, imtbase::COperationContext& operationContext){
 		QByteArrayList permissions = userBaseInfo.GetLocalPermissions(productId);
 		const bool permissionsChanged = ConvertIds(permissions, pathMap, "AddPermission", "RemovePermission", "Permission", QT_TRANSLATE_NOOP("Attribute", "Permission"), operationContext);
 		if (permissionsChanged){
@@ -115,12 +115,14 @@ void CPermissionPathMigrationComp::Migrate()
 	};
 
 	if (m_userCollectionCompPtr.IsValid()){
-		MigrateCollection<IUserBaseInfo>(*m_userCollectionCompPtr, QStringLiteral("user"), convertUserBase);
+		retVal = MigrateCollection<imtauth::IUserBaseInfo>(*m_userCollectionCompPtr, QStringLiteral("user"), convertUserBase) && retVal;
 	}
 
 	if (m_userGroupCollectionCompPtr.IsValid()){
-		MigrateCollection<IUserBaseInfo>(*m_userGroupCollectionCompPtr, QStringLiteral("group"), convertUserBase);
+		retVal = MigrateCollection<imtauth::IUserBaseInfo>(*m_userGroupCollectionCompPtr, QStringLiteral("group"), convertUserBase) && retVal;
 	}
+
+	return retVal;
 }
 
 
@@ -206,8 +208,10 @@ bool CPermissionPathMigrationComp::ConvertIds(
 
 
 template<class ObjectInterface, class ConvertFunction>
-void CPermissionPathMigrationComp::MigrateCollection(imtbase::IObjectCollection& collection, const QString& objectKind, ConvertFunction convertFunction)
+bool CPermissionPathMigrationComp::MigrateCollection(imtbase::IObjectCollection& collection, const QString& objectKind, ConvertFunction convertFunction) const
 {
+	bool retVal = true;
+
 	typedef QPair<QByteArray, imtbase::IObjectCollection::DataPtr> ChangedObject;
 	QList<ChangedObject> changedObjects;
 	QList<std::shared_ptr<imtbase::COperationContext>> operationContexts;
@@ -215,9 +219,9 @@ void CPermissionPathMigrationComp::MigrateCollection(imtbase::IObjectCollection&
 	{
 		istd::TUniqueInterfacePtr<imtbase::IObjectCollectionIterator> iteratorPtr = collection.CreateObjectCollectionIterator(QByteArray(), 0, -1, nullptr);
 		if (!iteratorPtr.IsValid()){
-			SendWarningMessage(0, QStringLiteral("Permission paths are not migrated: the %1 collection cannot be iterated").arg(objectKind), "imtauth::CPermissionPathMigrationComp");
+			SendWarningMessage(0, QStringLiteral("Permission paths are not migrated: the %1 collection cannot be iterated").arg(objectKind), "imtauthdb::CPermissionPathMigrationComp");
 
-			return;
+			return false;
 		}
 
 		while (iteratorPtr->Next()){
@@ -245,27 +249,40 @@ void CPermissionPathMigrationComp::MigrateCollection(imtbase::IObjectCollection&
 			SendWarningMessage(
 						0,
 						QStringLiteral("Permission paths are not migrated in the %1 '%2': it could not be stored").arg(objectKind, QString::fromUtf8(changedObjects[i].first)),
-						"imtauth::CPermissionPathMigrationComp");
+						"imtauthdb::CPermissionPathMigrationComp");
+
+			retVal = false;
 		}
 	}
 
 	if (!changedObjects.isEmpty()){
-		SendInfoMessage(0, QStringLiteral("Permissions of %1 %2(s) are stored as feature paths now").arg(changedObjects.count()).arg(objectKind), "imtauth::CPermissionPathMigrationComp");
+		SendInfoMessage(0, QStringLiteral("Permissions of %1 %2(s) are stored as feature paths now").arg(changedObjects.count()).arg(objectKind), "imtauthdb::CPermissionPathMigrationComp");
 	}
+
+	return retVal;
 }
 
 
-// reimplemented (icomp::CComponentBase)
+// reimplemented (imtdb::IMigrationController)
 
-void CPermissionPathMigrationComp::OnComponentCreated()
+bool CPermissionPathMigrationComp::DoMigration(int& resultRevision, const istd::CIntRange& subRange) const
 {
-	BaseClass::OnComponentCreated();
+	resultRevision = -1;
 
-	// The collections are used only once the application runs.
-	QTimer::singleShot(0, this, [this](){ Migrate(); });
+	if (!subRange.IsValid() || !m_range.Contains(subRange)){
+		return false;
+	}
+
+	if (!Migrate()){
+		return false;
+	}
+
+	resultRevision = subRange.GetMaxValue();
+
+	return true;
 }
 
 
-} // namespace imtauth
+} // namespace imtauthdb
 
 

@@ -76,6 +76,9 @@ ViewBase {
 		generalPage.apiClient.setProfile(generalPage.profileData.m_id, nameInput.text, mailInput.text)
 	}
 
+	// Width of the label column of the form rows, as in the document editors.
+	readonly property int labelWidth: Math.min(Style.sizeHintS, Math.round(bodyColumn.width * 0.35))
+
 	ProfileNoticeBanner {
 		id: banner
 		anchors.top: parent.top
@@ -107,107 +110,146 @@ ViewBase {
 		boundsBehavior: Flickable.StopAtBounds
 		clip: true
 
+		// Same layout as the document editors: a section title over a card of label | field rows.
 		Column {
 			id: bodyColumn
-			width: parent.width
-			spacing: Style.marginXL
+			anchors.horizontalCenter: parent.horizontalCenter
+			width: Math.min(parent.width, Style.contentWidthMax)
+			spacing: Style.marginM
 
-			// --- Editable details ---
-			Column {
+			GroupHeaderView {
 				width: parent.width
-				spacing: Style.marginL
+				title: qsTr("Account")
+			}
 
-				Column {
-					width: parent.width
-					spacing: Style.marginXS
-
-					Text {
-						text: qsTr("Name")
-						font.pixelSize: Style.fontSizeS
-						color: Style.inactiveTextColor
-					}
-
-					CustomTextField {
-						id: nameInput
-						objectName: "NameInput"
-						width: parent.width
-						height: Style.controlHeightM
-						readOnly: generalPage.readOnly
-						placeHolderText: qsTr("Enter the name")
-					}
-				}
-
-				Column {
-					width: parent.width
-					spacing: Style.marginXS
-
-					Text {
-						text: qsTr("Email Address")
-						font.pixelSize: Style.fontSizeS
-						color: Style.inactiveTextColor
-					}
-
-					RegularExpressionValidator {
-						id: mailValid
-						regularExpression: /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/
-					}
-
-					CustomTextField {
-						id: mailInput
-						objectName: "EmailInput"
-						width: parent.width
-						height: Style.controlHeightM
-						readOnly: generalPage.readOnly
-						textInputValidator: mailValid
-						placeHolderText: qsTr("Enter the email")
-					}
-				}
-
-				Row {
-					spacing: Style.marginM
-
-					Button {
-						id: saveElementView
-						text: qsTr("Save")
-						enabled: generalPage.profileData
-							? (nameInput.text !== generalPage.profileData.m_name || mailInput.text !== generalPage.profileData.m_email)
-							: false
-						decorator: Component {
-							ButtonDecorator {
-								widthDefault: Style.buttonWidthXXL
-							}
-						}
-						onClicked: {
-							generalPage.save()
-						}
-					}
-				}
+			RegularExpressionValidator {
+				id: mailValid
+				regularExpression: /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/
 			}
 
 			Rectangle {
 				width: parent.width
-				height: 1
-				color: Style.borderColor
+				height: accountRows.height
+				radius: Style.radiusM
+				color: Style.baseColor
+				border.width: 1
+				border.color: Style.borderColor
+
+				Column {
+					id: accountRows
+					width: parent.width
+
+						Item {
+							width: parent.width
+							height: Style.controlHeightM + 2 * Style.marginM
+
+							Text {
+								anchors.left: parent.left
+								anchors.leftMargin: Style.marginL
+								anchors.verticalCenter: parent.verticalCenter
+								width: generalPage.labelWidth
+								text: qsTr("Name")
+								color: Style.textColor
+								font.family: Style.fontFamilyBold
+								font.pixelSize: Style.fontSizeM
+								font.bold: true
+								elide: Text.ElideRight
+							}
+
+							CustomTextField {
+								id: nameInput
+								objectName: "NameInput"
+								anchors.right: parent.right
+								anchors.rightMargin: Style.marginL
+								anchors.verticalCenter: parent.verticalCenter
+								width: parent.width - generalPage.labelWidth - 3 * Style.marginL
+								height: Style.controlHeightM
+								readOnly: generalPage.readOnly
+								placeHolderText: qsTr("Enter the name")
+							}
+						}
+
+						Rectangle {
+							x: Style.marginL
+							width: parent.width - 2 * Style.marginL
+							height: 1
+							color: Style.borderColor
+						}
+
+						Item {
+							width: parent.width
+							height: Style.controlHeightM + 2 * Style.marginM
+
+							Text {
+								anchors.left: parent.left
+								anchors.leftMargin: Style.marginL
+								anchors.verticalCenter: parent.verticalCenter
+								width: generalPage.labelWidth
+								text: qsTr("Email Address")
+								color: Style.textColor
+								font.family: Style.fontFamilyBold
+								font.pixelSize: Style.fontSizeM
+								font.bold: true
+								elide: Text.ElideRight
+							}
+
+							CustomTextField {
+								id: mailInput
+								objectName: "EmailInput"
+								anchors.right: parent.right
+								anchors.rightMargin: Style.marginL
+								anchors.verticalCenter: parent.verticalCenter
+								width: parent.width - generalPage.labelWidth - 3 * Style.marginL
+								height: Style.controlHeightM
+								readOnly: generalPage.readOnly
+								textInputValidator: mailValid
+								placeHolderText: qsTr("Enter the email")
+							}
+						}
+				}
+			}
+
+			Item {
+				width: parent.width
+				height: saveElementView.height
+
+				Button {
+					id: saveElementView
+					anchors.right: parent.right
+					text: qsTr("Save")
+					variant: "primary"
+					enabled: generalPage.profileData
+						? (nameInput.text !== generalPage.profileData.m_name || mailInput.text !== generalPage.profileData.m_email)
+						: false
+					decorator: Component {
+						ButtonDecorator {
+							widthDefault: Style.buttonWidthXXL
+						}
+					}
+					onClicked: {
+						generalPage.save()
+					}
+				}
 			}
 
 			// --- Security: password change, inline (no modal) ---
 			Column {
 				id: passwordSection
 				width: parent.width
-				spacing: Style.marginXS
+				spacing: Style.marginM
 				visible: generalPage.profileData ? generalPage.profileData.m_systemId === "" : false
 
 				readonly property bool needsCurrentPassword: !AuthorizationController.loggedUserIsSuperuser()
 
-				// True while waiting for AuthorizationController's async result —
+				// The new-password rows are shown while the user is changing the password.
+				property bool editing: false
+
+				// True while waiting for AuthorizationController's async result -
 				// guards against reacting to an unrelated password-change signal
 				// and against double-submitting while a request is in flight.
 				property bool submitting: false
 
-				// Functions, not properties: these read Items (newPasswordInput etc.)
-				// declared later in this file. A property binding evaluated eagerly
-				// against a not-yet-constructed sibling id can fail, so the checks
-				// are deferred to call time instead.
+				// Functions, not properties: these read Items declared later in this file.
 				function passwordsFilled() {
 					return newPasswordInput.text !== "" && confirmPasswordInput.text !== ""
 				}
@@ -277,7 +319,7 @@ ViewBase {
 						passwordSection.submitting = false
 						banner.show(qsTr("Password changed"), false)
 						passwordSection.reset()
-						passwordCard.visible = false
+						passwordSection.editing = false
 					}
 					function onChangePasswordFailed(message, violatedRules) {
 						if (!passwordSection.submitting)
@@ -291,158 +333,59 @@ ViewBase {
 					}
 				}
 
-				Text {
-					text: qsTr("Password")
-					font.pixelSize: Style.fontSizeS
-					color: Style.inactiveTextColor
+				Item {
+					width: parent.width
+					height: Style.marginS
 				}
 
-				Row {
-					visible: !passwordCard.visible
-					spacing: Style.marginM
-
-					Text {
-						anchors.verticalCenter: parent.verticalCenter
-						text: qsTr("••••••••••")
-						font.pixelSize: Style.fontSizeM
-						color: Style.textColor
-					}
-
-					Button {
-						anchors.verticalCenter: parent.verticalCenter
-						text: qsTr("Change")
-						decorator: Component {
-							ButtonDecorator {
-								height: Style.buttonHeightS
-								widthDefault: Style.buttonWidthXXL
-							}
-						}
-						onClicked: {
-							passwordSection.reset()
-							passwordCard.visible = true
-						}
-					}
+				GroupHeaderView {
+					width: parent.width
+					title: qsTr("Password")
 				}
 
 				Rectangle {
-					id: passwordCard
 					width: parent.width
-					height: passwordCardColumn.height + 2 * Style.marginL
-					visible: false
-					radius: Style.radiusL
+					height: passwordRows.height
+					radius: Style.radiusM
 					color: Style.baseColor
 					border.width: 1
 					border.color: Style.borderColor
 
 					Column {
-						id: passwordCardColumn
-						anchors.left: parent.left
-						anchors.right: parent.right
-						anchors.top: parent.top
-						anchors.margins: Style.marginL
-						spacing: Style.marginM
+						id: passwordRows
+						width: parent.width
 
-						Column {
+						Item {
 							width: parent.width
-							spacing: Style.marginXS
-							visible: passwordSection.needsCurrentPassword
+							height: Style.controlHeightM + 2 * Style.marginM
+							visible: !passwordSection.editing
 
 							Text {
-								text: qsTr("Current password")
-								font.pixelSize: Style.fontSizeS
-								color: Style.inactiveTextColor
+								anchors.left: parent.left
+								anchors.leftMargin: Style.marginL
+								anchors.verticalCenter: parent.verticalCenter
+								width: generalPage.labelWidth
+								text: qsTr("Password")
+								color: Style.textColor
+								font.family: Style.fontFamilyBold
+								font.pixelSize: Style.fontSizeM
+								font.bold: true
 							}
 
-							CustomTextField {
-								id: currentPasswordInput
-								objectName: "CurrentPasswordInput"
-								width: parent.width
-								height: Style.controlHeightM
-								echoMode: TextInput.Password
-								placeHolderText: qsTr("Enter your current password")
-							}
-						}
-
-						Row {
-							width: parent.width
-							spacing: Style.marginM
-
-							Column {
-								width: (parent.width - Style.marginM) / 2
-								spacing: Style.marginXS
-
-								Text {
-									text: qsTr("New password")
-									font.pixelSize: Style.fontSizeS
-									color: Style.inactiveTextColor
-								}
-
-								CustomTextField {
-									id: newPasswordInput
-									objectName: "NewPasswordInput"
-									width: parent.width
-									height: Style.controlHeightM
-									echoMode: TextInput.Password
-									placeHolderText: qsTr("Enter a new password")
-								}
-							}
-
-							Column {
-								width: (parent.width - Style.marginM) / 2
-								spacing: Style.marginXS
-
-								Text {
-									text: qsTr("Confirm new password")
-									font.pixelSize: Style.fontSizeS
-									color: Style.inactiveTextColor
-								}
-
-								CustomTextField {
-									id: confirmPasswordInput
-									objectName: "ConfirmPasswordInput"
-									width: parent.width
-									height: Style.controlHeightM
-									echoMode: TextInput.Password
-									placeHolderText: qsTr("Re-enter the new password")
-								}
-							}
-						}
-
-						Text {
-							text: qsTr("Passwords don't match")
-							visible: passwordSection.passwordsFilled() && !passwordSection.passwordsMatch()
-							font.pixelSize: Style.fontSizeS
-							color: Style.errorTextColor
-						}
-
-						Text {
-							width: parent.width
-							wrapMode: Text.WordWrap
-							text: passwordSection.policyHint()
-							visible: text !== ""
-							font.pixelSize: Style.fontSizeS
-							color: passwordSection.policyViolations().length > 0 ? Style.errorTextColor : Style.inactiveTextColor
-						}
-
-						Row {
-							spacing: Style.marginM
-
-							Button {
-								text: passwordSection.submitting ? qsTr("Changing password…") : qsTr("Update password")
-								enabled: passwordSection.canSubmit()
-								decorator: Component {
-									ButtonDecorator {
-										widthDefault: Style.buttonWidthXXL
-									}
-								}
-								onClicked: {
-									passwordSection.submit()
-								}
+							Text {
+								anchors.left: parent.left
+								anchors.leftMargin: generalPage.labelWidth + 2 * Style.marginL
+								anchors.verticalCenter: parent.verticalCenter
+								text: "••••••••••"
+								color: Style.subtitleColor
+								font.pixelSize: Style.fontSizeM
 							}
 
 							Button {
-								text: qsTr("Cancel")
-								enabled: !passwordSection.submitting
+								anchors.right: parent.right
+								anchors.rightMargin: Style.marginL
+								anchors.verticalCenter: parent.verticalCenter
+								text: qsTr("Change")
 								decorator: Component {
 									ButtonDecorator {
 										widthDefault: Style.buttonWidthXXL
@@ -450,8 +393,188 @@ ViewBase {
 								}
 								onClicked: {
 									passwordSection.reset()
-									passwordCard.visible = false
+									passwordSection.editing = true
 								}
+							}
+						}
+
+						Item {
+							width: parent.width
+							height: Style.controlHeightM + 2 * Style.marginM
+							visible: passwordSection.editing && passwordSection.needsCurrentPassword
+
+							Text {
+								anchors.left: parent.left
+								anchors.leftMargin: Style.marginL
+								anchors.verticalCenter: parent.verticalCenter
+								width: generalPage.labelWidth
+								text: qsTr("Current password")
+								color: Style.textColor
+								font.family: Style.fontFamilyBold
+								font.pixelSize: Style.fontSizeM
+								font.bold: true
+								elide: Text.ElideRight
+							}
+
+							CustomTextField {
+								id: currentPasswordInput
+								objectName: "CurrentPasswordInput"
+								anchors.right: parent.right
+								anchors.rightMargin: Style.marginL
+								anchors.verticalCenter: parent.verticalCenter
+								width: parent.width - generalPage.labelWidth - 3 * Style.marginL
+								height: Style.controlHeightM
+								echoMode: TextInput.Password
+								placeHolderText: qsTr("Enter your current password")
+							}
+						}
+
+						Rectangle {
+							x: Style.marginL
+							width: parent.width - 2 * Style.marginL
+							height: 1
+							color: Style.borderColor
+							visible: passwordSection.editing && passwordSection.needsCurrentPassword
+						}
+
+						Item {
+							width: parent.width
+							height: Style.controlHeightM + 2 * Style.marginM
+							visible: passwordSection.editing
+
+							Text {
+								anchors.left: parent.left
+								anchors.leftMargin: Style.marginL
+								anchors.verticalCenter: parent.verticalCenter
+								width: generalPage.labelWidth
+								text: qsTr("New password")
+								color: Style.textColor
+								font.family: Style.fontFamilyBold
+								font.pixelSize: Style.fontSizeM
+								font.bold: true
+								elide: Text.ElideRight
+							}
+
+							CustomTextField {
+								id: newPasswordInput
+								objectName: "NewPasswordInput"
+								anchors.right: parent.right
+								anchors.rightMargin: Style.marginL
+								anchors.verticalCenter: parent.verticalCenter
+								width: parent.width - generalPage.labelWidth - 3 * Style.marginL
+								height: Style.controlHeightM
+								echoMode: TextInput.Password
+								placeHolderText: qsTr("Enter a new password")
+							}
+						}
+
+						Rectangle {
+							x: Style.marginL
+							width: parent.width - 2 * Style.marginL
+							height: 1
+							color: Style.borderColor
+							visible: passwordSection.editing
+						}
+
+						Item {
+							width: parent.width
+							height: Style.controlHeightM + 2 * Style.marginM
+							visible: passwordSection.editing
+
+							Text {
+								anchors.left: parent.left
+								anchors.leftMargin: Style.marginL
+								anchors.verticalCenter: parent.verticalCenter
+								width: generalPage.labelWidth
+								text: qsTr("Confirm new password")
+								color: Style.textColor
+								font.family: Style.fontFamilyBold
+								font.pixelSize: Style.fontSizeM
+								font.bold: true
+								elide: Text.ElideRight
+							}
+
+							CustomTextField {
+								id: confirmPasswordInput
+								objectName: "ConfirmPasswordInput"
+								anchors.right: parent.right
+								anchors.rightMargin: Style.marginL
+								anchors.verticalCenter: parent.verticalCenter
+								width: parent.width - generalPage.labelWidth - 3 * Style.marginL
+								height: Style.controlHeightM
+								echoMode: TextInput.Password
+								placeHolderText: qsTr("Re-enter the new password")
+							}
+						}
+
+						Column {
+							x: Style.marginL
+							width: parent.width - 2 * Style.marginL
+							spacing: Style.marginXS
+							// Not from the children's visible: a hidden parent reports its children hidden too.
+							visible: passwordSection.editing && ((passwordSection.passwordsFilled() && !passwordSection.passwordsMatch()) || passwordSection.policyHint() !== "")
+
+							Text {
+								id: mismatchText
+								text: qsTr("Passwords don't match")
+								visible: passwordSection.passwordsFilled() && !passwordSection.passwordsMatch()
+								font.pixelSize: Style.fontSizeS
+								color: Style.errorTextColor
+							}
+
+							Text {
+								id: policyText
+								width: parent.width
+								wrapMode: Text.WordWrap
+								text: passwordSection.policyHint()
+								visible: text !== ""
+								font.pixelSize: Style.fontSizeS
+								color: passwordSection.policyViolations().length > 0 ? Style.errorTextColor : Style.inactiveTextColor
+							}
+
+							Item {
+								width: 1
+								height: Style.marginS
+							}
+						}
+					}
+				}
+
+				Item {
+					width: parent.width
+					height: passwordButtons.height
+					visible: passwordSection.editing
+
+					Row {
+						id: passwordButtons
+						anchors.right: parent.right
+						spacing: Style.marginM
+
+						Button {
+							text: passwordSection.submitting ? qsTr("Changing password…") : qsTr("Update password")
+							variant: "primary"
+							enabled: passwordSection.canSubmit()
+							decorator: Component {
+								ButtonDecorator {
+									widthDefault: Style.buttonWidthXXL
+								}
+							}
+							onClicked: {
+								passwordSection.submit()
+							}
+						}
+
+						Button {
+							text: qsTr("Cancel")
+							enabled: !passwordSection.submitting
+							decorator: Component {
+								ButtonDecorator {
+									widthDefault: Style.buttonWidthXXL
+								}
+							}
+							onClicked: {
+								passwordSection.reset()
+								passwordSection.editing = false
 							}
 						}
 					}

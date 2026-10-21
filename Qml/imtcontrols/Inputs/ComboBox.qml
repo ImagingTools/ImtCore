@@ -12,8 +12,8 @@ ControlBase {
 
 	property var model: 0;
 
-	property color borderColor: comboBoxContainer.activeFocus ? Style.iconColorOnSelected : Style.borderColor;
-	property color backgroundColor: changeable ? Style.baseColor : Style.alternateBaseColor;
+	property color borderColor: comboBoxContainer.activeFocus ? Style.iconColorOnSelected : Style.inputBorderColor;
+	property color backgroundColor: changeable ? Style.inputBackgroundColor : Style.alternateBaseColor;
 
 	// ID for display in combo box delegates
 	property string nameId: "name";
@@ -45,7 +45,7 @@ ControlBase {
 	property int radius: Style.comboBoxRadius;
 	property int contentLeftMargin: Style.marginM;
 	property int textSize: Style.fontSizeM;
-	property int itemHeight: Style.controlHeightM;
+	property int itemHeight: Style.controlHeightS + Style.spacingXS;
 
 	property real contentY;
 

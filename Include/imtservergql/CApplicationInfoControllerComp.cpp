@@ -93,6 +93,7 @@ CApplicationInfoControllerComp::ApplicationInfo CApplicationInfoControllerComp::
 	FillSuperuserStatus(applicationInfo);
 
 	applicationInfo.tenantsEnabled = m_tenantsEnabledAttrPtr.IsValid() ? *m_tenantsEnabledAttrPtr : false;
+	applicationInfo.externalLoginEnabled = m_externalLoginEnabledAttrPtr.IsValid() ? *m_externalLoginEnabledAttrPtr : false;
 
 	return applicationInfo;
 }

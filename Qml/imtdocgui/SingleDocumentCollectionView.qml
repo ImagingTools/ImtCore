@@ -315,7 +315,9 @@ Item {
 			workspaceView.startLoading(documentId)
 		}
 
+		// A representation update that follows starts the indicator again; waiting for it left it on when none came.
 		function onUndoDone(documentId){
+			workspaceView.stopLoading(documentId)
 		}
 
 		function onUndoFailed(documentId, message){
@@ -329,6 +331,7 @@ Item {
 		}
 
 		function onRedoDone(documentId){
+			workspaceView.stopLoading(documentId)
 		}
 
 		function onRedoFailed(documentId, message){

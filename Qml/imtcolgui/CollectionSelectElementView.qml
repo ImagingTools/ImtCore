@@ -168,13 +168,13 @@ ElementView {
 
 			objectName: "CollectionSelect"
 
-			width: collectionSelectView.controlWidth
+			width: collectionSelectView.fittedControlWidth
 			height: collectionSelectView.controlHeight
 
 			radius: Style.comboBoxRadius
-			color: collectionSelectView.changeable ? Style.baseColor : Style.alternateBaseColor
+			color: collectionSelectView.changeable ? Style.inputBackgroundColor : Style.alternateBaseColor
 			border.width: 1
-			border.color: control.activeFocus || collectionSelectView.isOpen ? Style.iconColorOnSelected : Style.borderColor
+			border.color: control.activeFocus || collectionSelectView.isOpen ? Style.iconColorOnSelected : Style.inputBorderColor
 
 			Keys.onSpacePressed: {
 				collectionSelectView.openPopup()
@@ -274,7 +274,7 @@ ElementView {
 				PopupMenuDelegate {
 					id: rowDelegate
 
-					width: ListView.view ? ListView.view.width : popup.itemWidth
+					width: popup.itemWidth
 					height: popup.itemHeight
 					objectName: "FilterableSelectItem_" + model.index
 					isSeparator: false

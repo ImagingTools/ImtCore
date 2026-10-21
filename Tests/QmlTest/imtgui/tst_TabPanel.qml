@@ -39,8 +39,9 @@ TestCase {
 	}
 
 	function decoratorAt(panel, index){
+		// The strip creates its tabs on its first layout, not when the model changes
+		tryVerify(function(){ return panel.tabsList.itemAtIndex(index) !== null }, 1000, "Tab " + index + " is created")
 		let tab = panel.tabsList.itemAtIndex(index)
-		verify(tab !== null, "Tab " + index + " is created")
 
 		return tab.decorator_
 	}
@@ -50,7 +51,6 @@ TestCase {
 
 		let decorator = decoratorAt(panel, 0)
 		verify(decorator.isSelected, "A single tab is selected like any other")
-		verify(decorator.isLastTab)
 	}
 
 	function test_selectionWithSeveralTabs(){
@@ -61,24 +61,50 @@ TestCase {
 		verify(decoratorAt(panel, 1).isSelected)
 	}
 
-	function test_dividerAfterEveryTabButTheLast(){
-		let panel = createPanel(4)
-
-		for (let i = 0; i < 3; ++i){
-			verify(!decoratorAt(panel, i).isLastTab, "Divider after tab " + i)
-			verify(decoratorAt(panel, i).dividerGap > 0)
-		}
-		verify(decoratorAt(panel, 3).isLastTab, "No divider after the last tab")
-		compare(decoratorAt(panel, 3).dividerGap, 0)
-	}
-
-	function test_addedTabGivesThePreviousLastOneADivider(){
+	function test_addedTabKeepsSelection(){
 		let panel = createPanel(1)
-		verify(decoratorAt(panel, 0).isLastTab)
 
 		addTab(panel, 1)
 
-		verify(!decoratorAt(panel, 0).isLastTab)
 		verify(decoratorAt(panel, 0).isSelected, "Still selected")
+		verify(!decoratorAt(panel, 1).isSelected)
+	}
+
+	// The close button lies over the tab's own hover area: pointing at it must keep the tab hovered
+	function test_hoverOnCloseButtonOfInactiveTab(){
+		failOnWarning(/Binding loop/)
+
+		let panel = createPanel(2)
+		panel.isCloseEnable = true
+		let decorator = decoratorAt(panel, 1)
+		verify(!decorator.isSelected)
+
+		let tab = panel.tabsList.itemAtIndex(1)
+		mouseMove(tab, tab.width / 4, tab.height / 2)
+		tryVerify(function(){ return decorator.showClose }, 1000, "Close button shown on hover")
+
+		let closeButton = findChild(decorator, "CloseButton")
+		verify(closeButton !== null)
+		mouseMove(closeButton, closeButton.width / 2, closeButton.height / 2)
+		wait(100)
+
+		verify(decorator.isHovered, "Tab stays hovered over its close button")
+		verify(decorator.showClose, "Close button stays shown")
+		verify(closeButton.enabled)
+
+		// Straight from the close button off the tab
+		mouseMove(panel, panel.width - 5, tab.height / 2)
+		tryVerify(function(){ return !decorator.isHovered }, 1000, "Tab is no longer hovered")
+		verify(!decorator.showClose)
+	}
+
+	function test_tabsAreAdjacent(){
+		let panel = createPanel(3)
+		decoratorAt(panel, 2)
+
+		for (let i = 1; i < 3; ++i){
+			let previous = panel.tabsList.itemAtIndex(i - 1)
+			compare(panel.tabsList.itemAtIndex(i).x, previous.x + previous.width, "Tab " + i + " starts where the previous one ends")
+		}
 	}
 }

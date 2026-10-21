@@ -158,11 +158,12 @@ sdl::V1_0::imtauth::CGetTenantRelationshipsPayload CTenantManagerControllerComp:
 	}
 
 	QString accessError;
-	if (!HasTenantIsolationAccess(
+	if (!HasTenantManageAccess(
 				*m_tenantManagerCompPtr.GetPtr(),
 				m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr,
 				gqlRequest,
 				tenantId,
+				{s_viewOrganizationConnectionsPermission},
 				accessError)){
 		response.errorMessage = accessError;
 		return response;
@@ -337,11 +338,12 @@ sdl::V1_0::imtauth::CGetTenantPermissionsPayload CTenantManagerControllerComp::O
 	}
 
 	QString accessError;
-	if (!HasTenantIsolationAccess(
+	if (!HasTenantManageAccess(
 				*m_tenantManagerCompPtr.GetPtr(),
 				m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr,
 				gqlRequest,
 				tenantId,
+				{s_viewOrganizationPermissionsPermission, s_viewOrganizationRolesPermission},
 				accessError)){
 		response.errorMessage = accessError;
 		return response;
@@ -484,7 +486,7 @@ sdl::V1_0::imtauth::CRemoveTenantPayload CTenantManagerControllerComp::OnRemoveT
 				m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr,
 				gqlRequest,
 				tenantId,
-				QByteArray(),
+				QByteArrayList(),
 				accessError)){
 		response.errorMessage = accessError;
 		response.success = false;
@@ -544,7 +546,7 @@ sdl::V1_0::imtauth::CUpdateTenantPayload CTenantManagerControllerComp::OnUpdateT
 				m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr,
 				gqlRequest,
 				tenantId,
-				QByteArrayLiteral("EditOrganization"),
+				GetEditOrganizationPermissions(),
 				accessError)){
 		response.errorMessage = accessError;
 		response.success = false;
@@ -680,7 +682,7 @@ sdl::V1_0::imtauth::CSetTenantActivePayload CTenantManagerControllerComp::OnSetT
 				m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr,
 				gqlRequest,
 				tenantId,
-				QByteArray(),
+				QByteArrayList(),
 				accessError)){
 		response.errorMessage = accessError;
 		response.success = false;
@@ -722,7 +724,7 @@ sdl::V1_0::imtauth::CRemoveTenantRelationshipPayload CTenantManagerControllerCom
 	}
 
 	QString accessError;
-	if (!HasAccessToAnyTenant(gqlRequest, {tenantId}, accessError)){
+	if (!HasAccessToAnyTenant(gqlRequest, {tenantId}, {s_removeOrganizationConnectionPermission}, accessError)){
 		response.success = false;
 		response.errorMessage = accessError;
 		return response;
@@ -815,11 +817,12 @@ sdl::V1_0::imtauth::CGetCrossOrgGrantsPayload CTenantManagerControllerComp::OnGe
 	}
 
 	QString accessError;
-	if (!HasTenantIsolationAccess(
+	if (!HasTenantManageAccess(
 				*m_tenantManagerCompPtr.GetPtr(),
 				m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr,
 				gqlRequest,
 				tenantId,
+				{s_viewOrganizationConnectionsPermission},
 				accessError)){
 		response.errorMessage = accessError;
 		return response;
@@ -902,7 +905,7 @@ sdl::V1_0::imtauth::CCreateCrossOrgGrantPayload CTenantManagerControllerComp::On
 				m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr,
 				gqlRequest,
 				sourceTenantId,
-				QByteArrayLiteral("ConnectOrganization"),
+				QByteArrayList{s_connectOrganizationPermission},
 				accessError)){
 		response.errorMessage = accessError;
 		return response;
@@ -1026,7 +1029,7 @@ sdl::V1_0::imtauth::CGetContractsPayload CTenantManagerControllerComp::OnGetCont
 	}
 
 	QString accessError;
-	if (!HasAccessToAnyTenant(gqlRequest, {tenantId}, accessError)){
+	if (!HasAccessToAnyTenant(gqlRequest, {tenantId}, {s_viewOrganizationConnectionsPermission}, accessError)){
 		response.errorMessage = accessError;
 		return response;
 	}
@@ -1108,7 +1111,7 @@ sdl::V1_0::imtauth::CCreateContractPayload CTenantManagerControllerComp::OnCreat
 	}
 
 	QString accessError;
-	if (!HasAccessToAnyTenant(gqlRequest, {sourceTenantId}, accessError)){
+	if (!HasAccessToAnyTenant(gqlRequest, {sourceTenantId}, {s_connectOrganizationPermission}, accessError)){
 		response.errorMessage = accessError;
 		return response;
 	}
@@ -1161,7 +1164,7 @@ sdl::V1_0::imtauth::CUpdateContractStatusPayload CTenantManagerControllerComp::O
 
 	const imtauth::ContractInfo contract = m_contractManagerCompPtr->GetContract(contractId);
 	QString accessError;
-	if (!HasAccessToAnyTenant(gqlRequest, {contract.sourceTenantId, contract.targetTenantId}, accessError)){
+	if (!HasAccessToAnyTenant(gqlRequest, {contract.sourceTenantId, contract.targetTenantId}, {s_connectOrganizationPermission}, accessError)){
 		response.success = false;
 		response.errorMessage = accessError;
 		return response;
@@ -1199,7 +1202,7 @@ sdl::V1_0::imtauth::CTerminateContractPayload CTenantManagerControllerComp::OnTe
 
 	const imtauth::ContractInfo contract = m_contractManagerCompPtr->GetContract(contractId);
 	QString accessError;
-	if (!HasAccessToAnyTenant(gqlRequest, {contract.sourceTenantId, contract.targetTenantId}, accessError)){
+	if (!HasAccessToAnyTenant(gqlRequest, {contract.sourceTenantId, contract.targetTenantId}, {s_connectOrganizationPermission}, accessError)){
 		response.success = false;
 		response.errorMessage = accessError;
 		return response;
@@ -1275,11 +1278,12 @@ sdl::V1_0::imtauth::CGetConnectionCodePayload CTenantManagerControllerComp::OnGe
 	}
 
 	QString accessError;
-	if (!HasTenantIsolationAccess(
+	if (!HasTenantManageAccess(
 				*m_tenantManagerCompPtr.GetPtr(),
 				m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr,
 				gqlRequest,
 				tenantId,
+				{s_viewOrganizationConnectionCodePermission},
 				accessError)){
 		response.errorMessage = accessError;
 		return response;
@@ -1324,11 +1328,12 @@ sdl::V1_0::imtauth::CRegenerateConnectionCodePayload CTenantManagerControllerCom
 	}
 
 	QString accessError;
-	if (!HasTenantIsolationAccess(
+	if (!HasTenantManageAccess(
 				*m_tenantManagerCompPtr.GetPtr(),
 				m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr,
 				gqlRequest,
 				tenantId,
+				{s_connectOrganizationPermission},
 				accessError)){
 		response.errorMessage = accessError;
 		return response;
@@ -1377,11 +1382,12 @@ sdl::V1_0::imtauth::CSetAllowConnectionsByCodePayload CTenantManagerControllerCo
 	}
 
 	QString accessError;
-	if (!HasTenantIsolationAccess(
+	if (!HasTenantManageAccess(
 				*m_tenantManagerCompPtr.GetPtr(),
 				m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr,
 				gqlRequest,
 				tenantId,
+				{s_connectOrganizationPermission},
 				accessError)){
 		response.errorMessage = accessError;
 		return response;
@@ -1425,11 +1431,12 @@ sdl::V1_0::imtauth::CGetConnectionRequestsPayload CTenantManagerControllerComp::
 	}
 
 	QString accessError;
-	if (!HasTenantIsolationAccess(
+	if (!HasTenantManageAccess(
 				*m_tenantManagerCompPtr.GetPtr(),
 				m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr,
 				gqlRequest,
 				tenantId,
+				{s_viewOrganizationConnectionsPermission},
 				accessError)){
 		response.errorMessage = accessError;
 		return response;
@@ -1519,11 +1526,12 @@ sdl::V1_0::imtauth::CCreateConnectionRequestPayload CTenantManagerControllerComp
 		}
 
 		QString accessError;
-		if (!HasTenantIsolationAccess(
+		if (!HasTenantManageAccess(
 					*m_tenantManagerCompPtr.GetPtr(),
 					m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr,
 					gqlRequest,
 					sourceTenantId,
+					{s_connectOrganizationPermission},
 					accessError)){
 			response.errorMessage = accessError;
 			return response;
@@ -1574,11 +1582,12 @@ sdl::V1_0::imtauth::CApproveConnectionRequestPayload CTenantManagerControllerCom
 	}
 
 	QString accessError;
-	if (!HasTenantIsolationAccess(
+	if (!HasTenantManageAccess(
 				*m_tenantManagerCompPtr.GetPtr(),
 				m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr,
 				gqlRequest,
 				tenantId,
+				{s_connectOrganizationPermission},
 				accessError)){
 		response.errorMessage = accessError;
 		return response;
@@ -1627,11 +1636,12 @@ sdl::V1_0::imtauth::CRejectConnectionRequestPayload CTenantManagerControllerComp
 	}
 
 	QString accessError;
-	if (!HasTenantIsolationAccess(
+	if (!HasTenantManageAccess(
 				*m_tenantManagerCompPtr.GetPtr(),
 				m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr,
 				gqlRequest,
 				tenantId,
+				{s_connectOrganizationPermission},
 				accessError)){
 		response.errorMessage = accessError;
 		return response;
@@ -1679,11 +1689,12 @@ sdl::V1_0::imtauth::CCancelConnectionRequestPayload CTenantManagerControllerComp
 	}
 
 	QString accessError;
-	if (!HasTenantIsolationAccess(
+	if (!HasTenantManageAccess(
 				*m_tenantManagerCompPtr.GetPtr(),
 				m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr,
 				gqlRequest,
 				tenantId,
+				{s_connectOrganizationPermission},
 				accessError)){
 		response.errorMessage = accessError;
 		return response;
@@ -1732,11 +1743,12 @@ sdl::V1_0::imtauth::CGetConnectionsPayload CTenantManagerControllerComp::OnGetCo
 	}
 
 	QString accessError;
-	if (!HasTenantIsolationAccess(
+	if (!HasTenantManageAccess(
 				*m_tenantManagerCompPtr.GetPtr(),
 				m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr,
 				gqlRequest,
 				tenantId,
+				{s_viewOrganizationConnectionsPermission},
 				accessError)){
 		response.errorMessage = accessError;
 		return response;
@@ -1819,11 +1831,12 @@ sdl::V1_0::imtauth::CRemoveConnectionPayload CTenantManagerControllerComp::OnRem
 
 	if (m_tenantManagerCompPtr.IsValid()){
 		QString accessError;
-		if (!HasTenantIsolationAccess(
+		if (!HasTenantManageAccess(
 					*m_tenantManagerCompPtr.GetPtr(),
 					m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr,
 					gqlRequest,
 					tenantId,
+					{s_removeOrganizationConnectionPermission},
 					accessError)){
 			response.errorMessage = accessError;
 			response.success = false;
@@ -1864,7 +1877,7 @@ sdl::V1_0::imtauth::CGetRelationshipProposalsPayload CTenantManagerControllerCom
 	}
 
 	QString accessError;
-	if (!HasAccessToAnyTenant(gqlRequest, {tenantId}, accessError)){
+	if (!HasAccessToAnyTenant(gqlRequest, {tenantId}, {s_viewOrganizationConnectionsPermission}, accessError)){
 		response.errorMessage = accessError;
 		return response;
 	}
@@ -1926,7 +1939,7 @@ sdl::V1_0::imtauth::CCreateRelationshipProposalPayload CTenantManagerControllerC
 	const QByteArray counterpartyTenantId = proposal.counterpartyTenantId ? *proposal.counterpartyTenantId : QByteArray();
 
 	QString accessError;
-	if (!HasAccessToAnyTenant(gqlRequest, {initiatorTenantId}, accessError)){
+	if (!HasAccessToAnyTenant(gqlRequest, {initiatorTenantId}, {s_connectOrganizationPermission}, accessError)){
 		response.errorMessage = accessError;
 		return response;
 	}
@@ -2044,7 +2057,7 @@ sdl::V1_0::imtauth::CApproveRelationshipProposalPayload CTenantManagerController
 	}
 
 	QString accessError;
-	if (!HasAccessToAnyTenant(gqlRequest, {tenantId}, accessError)){
+	if (!HasAccessToAnyTenant(gqlRequest, {tenantId}, {s_connectOrganizationPermission}, accessError)){
 		response.errorMessage = accessError;
 		return response;
 	}
@@ -2090,7 +2103,7 @@ sdl::V1_0::imtauth::CRejectRelationshipProposalPayload CTenantManagerControllerC
 	}
 
 	QString accessError;
-	if (!HasAccessToAnyTenant(gqlRequest, {tenantId}, accessError)){
+	if (!HasAccessToAnyTenant(gqlRequest, {tenantId}, {s_connectOrganizationPermission}, accessError)){
 		response.success = false;
 		response.errorMessage = accessError;
 		return response;
@@ -2129,7 +2142,7 @@ sdl::V1_0::imtauth::CCancelRelationshipProposalPayload CTenantManagerControllerC
 	}
 
 	QString accessError;
-	if (!HasAccessToAnyTenant(gqlRequest, {tenantId}, accessError)){
+	if (!HasAccessToAnyTenant(gqlRequest, {tenantId}, {s_connectOrganizationPermission}, accessError)){
 		response.success = false;
 		response.errorMessage = accessError;
 		return response;
@@ -2234,7 +2247,7 @@ sdl::V1_0::imtauth::CGetCrossTenantMessagePayload CTenantManagerControllerComp::
 	}
 
 	QString accessError;
-	if (!HasAccessToAnyTenant(gqlRequest, {info.sourceTenantId, info.targetTenantId}, accessError)){
+	if (!HasAccessToAnyTenant(gqlRequest, {info.sourceTenantId, info.targetTenantId}, {s_viewOrganizationConnectionsPermission}, accessError)){
 		response.errorMessage = accessError;
 		return response;
 	}
@@ -2279,7 +2292,7 @@ sdl::V1_0::imtauth::CGetCrossTenantMessagesPayload CTenantManagerControllerComp:
 	}
 
 	QString accessError;
-	if (!HasAccessToAnyTenant(gqlRequest, {tenantId}, accessError)){
+	if (!HasAccessToAnyTenant(gqlRequest, {tenantId}, {s_viewOrganizationConnectionsPermission}, accessError)){
 		response.errorMessage = accessError;
 		return response;
 	}
@@ -2363,7 +2376,7 @@ sdl::V1_0::imtauth::CSendCrossTenantMessagePayload CTenantManagerControllerComp:
 	}
 
 	QString accessError;
-	if (!HasAccessToAnyTenant(gqlRequest, {sourceTenantId}, accessError)){
+	if (!HasAccessToAnyTenant(gqlRequest, {sourceTenantId}, {s_connectOrganizationPermission}, accessError)){
 		response.errorMessage = accessError;
 		return response;
 	}
@@ -2421,7 +2434,7 @@ sdl::V1_0::imtauth::CUpdateCrossTenantMessageStatusPayload CTenantManagerControl
 
 	const imtauth::CrossTenantMessageInfo message = m_messageBrokerCompPtr->GetMessage(messageId);
 	QString accessError;
-	if (!HasAccessToAnyTenant(gqlRequest, {message.sourceTenantId, message.targetTenantId}, accessError)){
+	if (!HasAccessToAnyTenant(gqlRequest, {message.sourceTenantId, message.targetTenantId}, {s_connectOrganizationPermission}, accessError)){
 		response.success = false;
 		response.errorMessage = accessError;
 		return response;
@@ -2468,7 +2481,7 @@ sdl::V1_0::imtauth::CGetOrderRequestPayload CTenantManagerControllerComp::OnGetO
 	}
 
 	QString accessError;
-	if (!HasAccessToAnyTenant(gqlRequest, {info.sourceTenantId, info.targetTenantId}, accessError)){
+	if (!HasAccessToAnyTenant(gqlRequest, {info.sourceTenantId, info.targetTenantId}, {s_viewOrganizationConnectionsPermission}, accessError)){
 		response.errorMessage = accessError;
 		return response;
 	}
@@ -2504,7 +2517,7 @@ sdl::V1_0::imtauth::CGetOrderRequestsPayload CTenantManagerControllerComp::OnGet
 	}
 
 	QString accessError;
-	if (!HasAccessToAnyTenant(gqlRequest, {tenantId}, accessError)){
+	if (!HasAccessToAnyTenant(gqlRequest, {tenantId}, {s_viewOrganizationConnectionsPermission}, accessError)){
 		response.errorMessage = accessError;
 		return response;
 	}
@@ -2545,7 +2558,7 @@ sdl::V1_0::imtauth::CConfirmOrderRequestPayload CTenantManagerControllerComp::On
 	}
 
 	QString accessError;
-	if (!HasAccessToAnyTenant(gqlRequest, {m_orderRequestManagerCompPtr->GetOrderRequest(orderRequestId).targetTenantId}, accessError)){
+	if (!HasAccessToAnyTenant(gqlRequest, {m_orderRequestManagerCompPtr->GetOrderRequest(orderRequestId).targetTenantId}, {s_connectOrganizationPermission}, accessError)){
 		response.success = false;
 		response.errorMessage = accessError;
 		return response;
@@ -2586,7 +2599,7 @@ sdl::V1_0::imtauth::CRejectOrderRequestPayload CTenantManagerControllerComp::OnR
 	}
 
 	QString accessError;
-	if (!HasAccessToAnyTenant(gqlRequest, {m_orderRequestManagerCompPtr->GetOrderRequest(orderRequestId).targetTenantId}, accessError)){
+	if (!HasAccessToAnyTenant(gqlRequest, {m_orderRequestManagerCompPtr->GetOrderRequest(orderRequestId).targetTenantId}, {s_connectOrganizationPermission}, accessError)){
 		response.success = false;
 		response.errorMessage = accessError;
 		return response;
@@ -2631,7 +2644,7 @@ sdl::V1_0::imtauth::CUpdateOrderRequestStatusPayload CTenantManagerControllerCom
 	}
 
 	QString accessError;
-	if (!HasAccessToAnyTenant(gqlRequest, {m_orderRequestManagerCompPtr->GetOrderRequest(orderRequestId).targetTenantId}, accessError)){
+	if (!HasAccessToAnyTenant(gqlRequest, {m_orderRequestManagerCompPtr->GetOrderRequest(orderRequestId).targetTenantId}, {s_connectOrganizationPermission}, accessError)){
 		response.success = false;
 		response.errorMessage = accessError;
 		return response;
@@ -2652,6 +2665,7 @@ sdl::V1_0::imtauth::CUpdateOrderRequestStatusPayload CTenantManagerControllerCom
 bool CTenantManagerControllerComp::HasAccessToAnyTenant(
 			const ::imtgql::CGqlRequest& gqlRequest,
 			const QByteArrayList& tenantIds,
+			const QByteArrayList& requiredOrgPermissions,
 			QString& errorMessage) const
 {
 	if (!m_tenantManagerCompPtr.IsValid()){
@@ -2661,11 +2675,12 @@ bool CTenantManagerControllerComp::HasAccessToAnyTenant(
 
 	for (const QByteArray& tenantId : tenantIds){
 		if (!tenantId.isEmpty()
-					&& HasTenantIsolationAccess(
+					&& HasTenantManageAccess(
 								*m_tenantManagerCompPtr.GetPtr(),
 								m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr,
 								gqlRequest,
 								tenantId,
+								requiredOrgPermissions,
 								errorMessage)){
 			errorMessage.clear();
 			return true;
@@ -2699,7 +2714,7 @@ bool CTenantManagerControllerComp::CanManageGrant(
 	// The grantor withdraws the delegation, the grantee renounces it.
 	const imtauth::ITenantMembershipManager* membershipManagerPtr = m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr;
 	for (const QByteArray& tenantId : {grantInfo.sourceTenantId, grantInfo.targetTenantId}){
-		if (HasTenantManageAccess(*m_tenantManagerCompPtr.GetPtr(), membershipManagerPtr, gqlRequest, tenantId, QByteArrayLiteral("ConnectOrganization"), errorMessage)){
+		if (HasTenantManageAccess(*m_tenantManagerCompPtr.GetPtr(), membershipManagerPtr, gqlRequest, tenantId, QByteArrayList{s_connectOrganizationPermission}, errorMessage)){
 			errorMessage.clear();
 			return true;
 		}

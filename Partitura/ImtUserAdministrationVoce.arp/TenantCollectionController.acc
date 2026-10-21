@@ -92,18 +92,18 @@
                     <AttributeInfo Id="RedoPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>AddTenant</Value>
-                                <Value>RemoveTenant</Value>
-                                <Value>ChangeTenant</Value>
+                                <Value>/OrganizationManagement/Add</Value>
+                                <Value>/OrganizationManagement/Remove</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="SavePermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>AddTenant</Value>
-                                <Value>RemoveTenant</Value>
-                                <Value>ChangeTenant</Value>
+                                <Value>/OrganizationManagement/Add</Value>
+                                <Value>/OrganizationManagement/Remove</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -119,9 +119,9 @@
                     <AttributeInfo Id="UndoPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>AddTenant</Value>
-                                <Value>RemoveTenant</Value>
-                                <Value>ChangeTenant</Value>
+                                <Value>/OrganizationManagement/Add</Value>
+                                <Value>/OrganizationManagement/Remove</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

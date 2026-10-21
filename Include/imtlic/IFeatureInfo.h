@@ -286,6 +286,11 @@ typedef istd::TSharedInterfacePtr<IFeatureInfo> IFeatureInfoSharedPtr;
 
 QByteArray CalculateFeaturePath(const IFeatureInfo& featureInfo);
 
+/**
+	Tell whether two feature paths name the same feature, or one lies inside the other.
+*/
+bool IsSameOrNestedFeaturePath(const QByteArray& path, const QByteArray& otherPath);
+
 
 } // namespace imtlic
 

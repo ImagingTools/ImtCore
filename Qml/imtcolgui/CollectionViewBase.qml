@@ -293,24 +293,35 @@ ViewBase {
 				collectionViewBaseContainer.elementsChanged();
 			}
 
+			// Keeps only the selected ids still on this page: rows that went to another page (sorting, filtering)
+			// are not shown as selected, and commands like Edit or Remove must not act on them.
 			function restoreSelection(){
 				let count = !tableInternal.elements ? 0 : tableInternal.elements.getItemsCount()
 				let selectedIndexes = []
+				let selectedIds = []
 				for (let i = 0; i < count; i++){
 					let elementId = tableInternal.elements.getData("id", i)
 					if (collectionViewBaseContainer.selectionManager.isSelected(elementId)){
 						selectedIndexes.push(i)
+						selectedIds.push(elementId)
 					}
 				}
 
-				if (tableInternal.selectionManager.arraysEqual(tableInternal.getSelectedIndexes(), selectedIndexes)){
-					return
+				let idsChanged = selectedIds.length !== collectionViewBaseContainer.selectionManager.selectedIds.length
+				if (idsChanged){
+					collectionViewBaseContainer.selectionManager.selectMultiple(selectedIds)
 				}
 
-				tableInternal.selectionBlock = true
-				tableInternal.resetSelection()
-				tableInternal.selectionManager.selectMultiple(selectedIndexes)
-				tableInternal.selectionBlock = false
+				if (!tableInternal.selectionManager.arraysEqual(tableInternal.getSelectedIndexes(), selectedIndexes)){
+					tableInternal.selectionBlock = true
+					tableInternal.resetSelection()
+					tableInternal.selectionManager.selectMultiple(selectedIndexes)
+					tableInternal.selectionBlock = false
+				}
+
+				if (idsChanged){
+					collectionViewBaseContainer.selectionChanged(collectionViewBaseContainer.selectionManager.selectedIds, selectedIndexes)
+				}
 			}
 			
 			onHeadersChanged: {
@@ -594,7 +605,15 @@ ViewBase {
 		height: !visible ? 0 : Style.controlHeightM;
 		color: pagination_.color;
 		visible: collectionViewBaseContainer.hasPagination
-		
+
+		// Sets the paging footer apart from the rows, like a panel edge in VS Code.
+		Rectangle {
+			anchors.top: parent.top;
+			width: parent.width;
+			height: 1;
+			color: Style.borderColor;
+		}
+
 		Pagination {
 			id: pagination_;
 			anchors.horizontalCenter: parent.horizontalCenter;
@@ -613,14 +632,14 @@ ViewBase {
 		}
 	}
 
-	Loading {
+	// Covers the table only: the filters stay readable and usable while rows load.
+	SkeletonTableView {
 		id: loading_;
-		anchors.top: filterArea.top
+		anchors.top: backgroundTable.top
 		anchors.left: parent.left
 		anchors.right: parent.right
 		anchors.bottom: paginationObj.bottom
-		// baseColor is the Loading default and matches Agents/Services/Messages tables.
-		background.color: Style.baseColor
-		visible: false;
+		rowHeight: tableInternal.itemHeight
+		columnCount: tableInternal.columnCount > 0 ? Math.min(tableInternal.columnCount, 6) : 4
 	}
 }

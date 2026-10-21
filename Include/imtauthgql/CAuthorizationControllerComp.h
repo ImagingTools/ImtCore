@@ -17,6 +17,7 @@
 #include <imtauth/ITenantEntityBindingManager.h>
 #include <imtauth/IDelegatedAccess.h>
 #include <imtauth/IRoleInfoProvider.h>
+#include <imtauth/IExternalLoginController.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Authorization_fwd.h>
 
 
@@ -44,6 +45,7 @@ public:
 		I_ASSIGN(m_delegatedAccessCompPtr, "DelegatedAccess", "Delegated access resolver for cross-org grants", false, "DelegatedAccessResolver");
 		I_ASSIGN(m_roleInfoProviderCompPtr, "RoleInfoProvider", "Role info provider (used for delegated role product validation)", false, "RoleInfoProvider");
 		I_ASSIGN(m_passwordPolicyCompPtr, "PasswordPolicy", "Password policy for password lifetime checks", false, "PasswordPolicy");
+		I_ASSIGN(m_externalLoginControllerCompPtr, "ExternalLoginController", "Sign-in with external identity providers", false, "ExternalLoginController");
 	I_END_COMPONENT;
 
 protected:
@@ -57,8 +59,17 @@ protected:
 		already verified - otherwise it would turn a login attempt into an account-state probe.
 	*/
 	sdl::V1_0::imtauth::CAuthorizationPayload CreateAccountDisabledResponse(const QByteArray& login) const;
-	sdl::V1_0::imtauth::CAuthorizationPayload CreateAccountLockedResponse(const QByteArray& login, QString& errorMessage) const;
-	bool IsAccountLocked(const QByteArray& login) const;
+	/**
+		Response for a locked account; the message tells how long the lock lasts.
+		param remainingLockoutSecs negative if the account stays locked until an administrator unlocks it.
+	*/
+	sdl::V1_0::imtauth::CAuthorizationPayload CreateAccountLockedResponse(const QByteArray& login, qint64 remainingLockoutSecs, QString& errorMessage) const;
+	/**
+		Registers a failed attempt and answers it: the lock message when this attempt locked the account,
+		otherwise the invalid login or password message.
+	*/
+	sdl::V1_0::imtauth::CAuthorizationPayload CreateFailedAttemptResponse(const QByteArray& login, QString& errorMessage) const;
+	bool IsAccountLocked(const QByteArray& login, qint64* remainingLockoutSecsPtr = nullptr) const;
 	void RegisterAccessAttempt(const QByteArray& login, bool successful) const;
 	sdl::V1_0::imtauth::CAuthorizationPayload CreateAuthorizationSuccessfulResponse(
 				imtauth::CUserInfo& userInfo,
@@ -88,6 +99,35 @@ protected:
 				const sdl::V1_0::imtauth::CGetPermissionsGqlRequest& getPermissionsRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CExternalLoginProviderList OnGetExternalLoginProviders(
+				const sdl::V1_0::imtauth::CGetExternalLoginProvidersGqlRequest& getExternalLoginProvidersRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CExternalIdentityList OnGetExternalIdentities(
+				const sdl::V1_0::imtauth::CGetExternalIdentitiesGqlRequest& getExternalIdentitiesRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CBeginExternalLoginPayload OnBeginExternalLogin(
+				const sdl::V1_0::imtauth::CBeginExternalLoginGqlRequest& beginExternalLoginRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CExternalLoginPayload OnCompleteExternalLogin(
+				const sdl::V1_0::imtauth::CCompleteExternalLoginGqlRequest& completeExternalLoginRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CExternalLoginCallbackPayload OnHandleExternalLoginCallback(
+				const sdl::V1_0::imtauth::CHandleExternalLoginCallbackGqlRequest& handleExternalLoginCallbackRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CUnlinkExternalIdentityPayload OnUnlinkExternalIdentity(
+				const sdl::V1_0::imtauth::CUnlinkExternalIdentityGqlRequest& unlinkExternalIdentityRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+
+	/**
+		User of the request authenticated with a session token, empty for anonymous callers and personal access tokens.
+	*/
+	QByteArray GetSessionUserId(const imtgql::CGqlRequest& gqlRequest) const;
 
 	// reimplemented (imtservergql::CPermissibleGqlRequestHandlerComp)
 	virtual bool CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
@@ -105,6 +145,7 @@ protected:
 	I_REF(imtauth::IPasswordPolicy, m_passwordPolicyCompPtr);
 	I_MULTIREF(imtauth::ICredentialController, m_credentialControllersCompPtr);
 	I_REF(imtauth::IAccountLockoutController, m_accountLockoutControllerCompPtr);
+	I_REF(imtauth::IExternalLoginController, m_externalLoginControllerCompPtr);
 	I_MULTIATTR(QByteArray, m_systemIdsAttrPtr);
 	I_ATTR(QByteArray, m_patPrefixAttrPtr);
 };

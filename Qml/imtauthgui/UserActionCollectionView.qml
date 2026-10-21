@@ -20,7 +20,7 @@ RemoteCollectionView {
 	Component.onCompleted: {
 		registerFieldFilterDelegate("actionTypeId", actionDelegateFilterComp)
 
-		if (PermissionsController.checkPermission("ViewUsers")){
+		if (PermissionsController.checkPermission("/Administration/Users/View")){
 			registerFieldFilterDelegate("userId", userDelegateFilterComp)
 		}
 	}

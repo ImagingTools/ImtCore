@@ -3,6 +3,7 @@
 
 
 // Qt includes
+#include <QtCore/QMap>
 #include <QtCore/QString>
 
 // ImtCore includes
@@ -105,10 +106,7 @@ inline bool CheckPermissions(
 
 	const QByteArray permissionPath = GetPermissionPath(gqlRequest);
 	if (!permissionPath.isEmpty()){
-		// The path the request runs under and the permissions declared for the
-		// command may be written in different generations of the permission
-		// format, so they are matched by the same rule as the held ones.
-		if (!imtauth::HasPermission(permissions, permissionPath)){
+		if (!imtauth::IsPermissionPathDeclared(permissions, permissionPath)){
 			refusalReason = QStringLiteral("the permission path '%1' is none of '%2' this request runs under")
 					.arg(QString::fromUtf8(permissionPath), QString::fromUtf8(permissions.join(';')));
 
@@ -144,6 +142,63 @@ inline bool CheckPermissions(
 	QString refusalReason;
 
 	return CheckPermissions(gqlRequest, permissionCheckerPtr, permissions, refusalReason);
+}
+
+
+/**
+	Check a command on the revisions of a collection.
+
+	The revisions of every collection have a permission area of their own, given
+	in \c revisionPermissionPaths in the order of \c collectionIds (e.g.
+	"/SensorManagement/Revisions"); the command needs the leaf of its action in
+	that area: View for the list, Restore and Delete for a revision.
+*/
+inline bool CheckRevisionPermissions(
+			const imtgql::CGqlRequest& gqlRequest,
+			const QByteArrayList& collectionIds,
+			const QByteArrayList& revisionPermissionPaths,
+			QString& refusalReason)
+{
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	const imtauth::IUserInfo* userInfoPtr = gqlContextPtr != nullptr ? gqlContextPtr->GetUserInfo() : nullptr;
+	if (userInfoPtr == nullptr){
+		refusalReason = QStringLiteral("the caller is not authenticated");
+
+		return false;
+	}
+
+	if (userInfoPtr->IsAdmin() || gqlContextPtr->IsTenantOwner()){
+		return true;
+	}
+
+	static const QMap<QByteArray, QByteArray> actions{
+		{QByteArrayLiteral("GetRevisionInfoList"), QByteArrayLiteral("View")},
+		{QByteArrayLiteral("RestoreRevision"), QByteArrayLiteral("Restore")},
+		{QByteArrayLiteral("DeleteRevision"), QByteArrayLiteral("Delete")}};
+	const QByteArray action = actions.value(gqlRequest.GetCommandId());
+	if (action.isEmpty()){
+		refusalReason = QStringLiteral("the command is not available on revisions");
+
+		return false;
+	}
+
+	const imtgql::CGqlParamObject* inputPtr = gqlRequest.GetParamObject("input");
+	const QByteArray collectionId = inputPtr != nullptr ? inputPtr->GetParamArgumentValue("collectionId").toByteArray() : QByteArray();
+	const qsizetype index = collectionIds.indexOf(collectionId);
+	if (index < 0 || index >= revisionPermissionPaths.size() || revisionPermissionPaths[index].isEmpty()){
+		refusalReason = QStringLiteral("no revision permissions are declared for the collection '%1'").arg(QString::fromUtf8(collectionId));
+
+		return false;
+	}
+
+	const QByteArray permission = revisionPermissionPaths[index] + '/' + action;
+	if (!imtauth::HasPermission(GetUserPermissions(*gqlContextPtr), permission)){
+		refusalReason = QStringLiteral("the user does not hold '%1'").arg(QString::fromUtf8(permission));
+
+		return false;
+	}
+
+	return true;
 }
 
 

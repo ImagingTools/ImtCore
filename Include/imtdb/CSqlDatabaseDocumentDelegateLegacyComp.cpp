@@ -469,6 +469,66 @@ imtbase::IRevisionController::RevisionInfoList CSqlDatabaseDocumentDelegateLegac
 }
 
 
+bool CSqlDatabaseDocumentDelegateLegacyComp::GetRevisionData(
+			const imtbase::IObjectCollection& /*collection*/,
+			const imtbase::ICollectionInfo::Id& objectId,
+			int revision,
+			istd::IChangeableSharedPtr& dataPtr,
+			idoc::MetaInfoPtr& dataMetaInfoPtr) const
+{
+	dataPtr.Reset();
+	dataMetaInfoPtr.Reset();
+	if (!m_databaseEngineCompPtr.IsValid() || !m_revisionsTableNameAttrPtr.IsValid() ||
+		QString(*m_revisionsTableNameAttrPtr).isEmpty() || objectId.isEmpty() || revision <= 0)
+	{
+		return false;
+	}
+
+	QString metaInfoColumns;
+	QString metaInfoJoin;
+	if (m_metaInfoTableDelegateCompPtr.IsValid()) {
+		for (const QByteArray& columnId : m_metaInfoTableDelegateCompPtr->GetColumnIds()) {
+			metaInfoColumns += QStringLiteral(R"(, "meta".%1)").arg(QString::fromUtf8(columnId));
+		}
+		metaInfoJoin = QStringLiteral(R"( LEFT JOIN "%1" AS "meta" ON "revision"."Id" = "meta"."RevisionId")")
+						.arg(QString::fromUtf8(*m_metaInfoTableNameAttrPtr));
+	}
+
+	const QByteArray query = QStringLiteral(
+		R"(SELECT "document".*, "revision"."Document" AS "Document", "revision"."LastModified" AS "LastModified", "revision"."Checksum" AS "Checksum", "revision"."RevisionNumber" AS "RevisionNumber"%1 FROM "%2" AS "document" JOIN "%3" AS "revision" ON "document"."Id" = "revision"."DocumentId"%4 WHERE "document"."Id" = '%5' AND "revision"."RevisionNumber" = %6;)" )
+				.arg(
+					metaInfoColumns,
+					QString::fromUtf8(*m_tableNameAttrPtr),
+					QString::fromUtf8(*m_revisionsTableNameAttrPtr),
+					metaInfoJoin,
+					SqlEncode(QString::fromUtf8(objectId)),
+					QString::number(revision))
+					.toUtf8();
+
+	QSqlError sqlError;
+	QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);
+	if (sqlError.type() != QSqlError::NoError || !sqlQuery.next()) {
+		return false;
+	}
+
+	const QSqlRecord record = sqlQuery.record();
+	dataPtr.FromUnique(CreateObjectFromRecord(record));
+	if (!dataPtr.IsValid()) {
+		return false;
+	}
+
+	const QByteArray typeId = GetObjectTypeId(GetObjectIdFromRecord(record));
+	dataMetaInfoPtr = CreateObjectMetaInfo(typeId);
+	if (dataMetaInfoPtr.IsValid() && !SetObjectMetaInfoFromRecord(record, *dataMetaInfoPtr)) {
+		dataPtr.Reset();
+		dataMetaInfoPtr.Reset();
+		return false;
+	}
+
+	return true;
+}
+
+
 int CSqlDatabaseDocumentDelegateLegacyComp::BackupRevision(
 			const imtbase::IObjectCollection& /*collection*/,
 			const imtbase::ICollectionInfo::Id& objectId,

@@ -5,7 +5,7 @@ import com.imtcore.imtqml 1.0
 QtObject {
 	id: root;
 	
-	property var documentModel;
+	property var documentModel: null;
 	
 	property string documentId;
 	property string documentName;

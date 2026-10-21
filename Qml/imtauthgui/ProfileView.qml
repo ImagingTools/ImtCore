@@ -47,12 +47,7 @@ ViewBase {
 		: ""
 
 	function __initialsOf(text) {
-		if (!text || text === "")
-			return "?"
-		var parts = text.trim().split(/\s+/)
-		if (parts.length === 1)
-			return parts[0].substring(0, 2).toUpperCase()
-		return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase()
+		return Functions.initialsOf(text)
 	}
 
 	Component.onCompleted: {
@@ -246,7 +241,34 @@ ViewBase {
 				multiPageView.addPage("Organizations", qsTr("Organizations"), organizationsPageComp, "Icons/Organizations")
 			multiPageView.addPage("AccessTokens", qsTr("Access Tokens"), tokensPageComp, "Icons/Key")
 			multiPageView.addPage("Access", qsTr("Roles & Permissions"), accessPageComp, "Icons/Role")
+			container.__addLinkedAccountsPage()
 			multiPageView.currentIndex = 0
+
+			AuthorizationController.loadExternalLoginProviders()
+		}
+	}
+
+	// The tab exists only when the server offers sign-in providers.
+	function __addLinkedAccountsPage() {
+		if (AuthorizationController.externalLoginProviders.length === 0)
+			return
+		if (multiPageView.getIndexById("LinkedAccounts") >= 0)
+			return
+		multiPageView.addPage("LinkedAccounts", qsTr("Linked Accounts"), linkedAccountsPageComp, "Icons/Link")
+	}
+
+	Connections {
+		target: AuthorizationController
+
+		function onExternalLoginProvidersLoaded() {
+			container.__addLinkedAccountsPage()
+		}
+	}
+
+	Component {
+		id: linkedAccountsPageComp
+		ProfileLinkedAccountsPage {
+			apiClient: container.apiClient
 		}
 	}
 
@@ -282,6 +304,6 @@ ViewBase {
 		id: loading
 		anchors.fill: parent
 		visible: container.apiClient ? container.apiClient.loading : false
-		background.color: Style.backgroundColor2
+		background.color: Style.baseColor
 	}
 }

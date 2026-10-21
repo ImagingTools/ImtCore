@@ -99,6 +99,16 @@ class Color extends Property {
         return '#000000'
     }
 
+    // Qt writes alpha first (#AARRGGBB) while CSS reads it last (#RRGGBBAA), so a raw 8-digit value must not reach a style.
+    static toCss(value){
+        let hex = (value === undefined || value === null) ? '#000000' : Color.typeCasting(String(value))
+        if(hex.length === 9){
+            let a = parseInt(hex[1]+hex[2], 16)/255
+            return `rgba(${parseInt(hex[3]+hex[4], 16)}, ${parseInt(hex[5]+hex[6], 16)}, ${parseInt(hex[7]+hex[8], 16)}, ${a})`
+        }
+        return hex
+    }
+
     static getDefaultValue(){
         return '#000000'
     }

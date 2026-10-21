@@ -15,7 +15,7 @@ QtObject {
 	property string documentDescription;
 	property string typeId;
 	property Component documentModelComp;
-	property var documentModel;
+	property var documentModel: null;
 	
 	property string gqlGetCommandId: "";
 	property string gqlAddCommandId: "";

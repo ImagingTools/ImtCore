@@ -2,8 +2,17 @@
 #include <imtlicgql/CProductInfoFileGeneratorComp.h>
 
 
+// STL includes
+#include <map>
+#include <memory>
+
 // Qt includes
 #include <QtCore/QFile>
+#include <QtCore/QRegularExpression>
+#include <QtCore/QUuid>
+
+// ImtCore includes
+#include <imtlic/CFeatureInfo.h>
 
 
 namespace imtlicgql
@@ -12,6 +21,39 @@ namespace imtlicgql
 
 const QString s_featureContext = QStringLiteral("Feature");
 const QString s_productContext = QStringLiteral("Product");
+
+
+namespace
+{
+
+
+// A C string literal as the generator writes it: quotes and backslashes are escaped.
+const QString s_string = QStringLiteral(R"re("((?:[^"\\]|\\.)*)")re");
+const QString s_translated = QStringLiteral(R"re(QT_TRANSLATE_NOOP\("\w+", %1\))re").arg(s_string);
+
+
+QString Unescape(const QString& text)
+{
+	QString retVal;
+	retVal.reserve(text.size());
+	for (qsizetype i = 0; i < text.size(); ++i){
+		if (text[i] == '\\' && i + 1 < text.size()){
+			++i;
+		}
+		retVal += text[i];
+	}
+
+	return retVal;
+}
+
+
+QRegularExpressionMatch MatchStatement(const QString& pattern, const QString& statement)
+{
+	return QRegularExpression(QStringLiteral("^") + pattern + QStringLiteral("$")).match(statement);
+}
+
+
+} // anonymous namespace
 
 
 // public methods
@@ -30,11 +72,41 @@ bool CProductInfoFileGeneratorComp::IsOperationSupported(
 
 
 ifile::IFilePersistence::OperationState CProductInfoFileGeneratorComp::LoadFromFile(
-	istd::IChangeable& /*data*/,
-	const QString& /*filePath*/,
+	istd::IChangeable& data,
+	const QString& filePath,
 	ibase::IProgressManager* /*progressManagerPtr*/) const
 {
-	return ifile::IFilePersistence::OS_FAILED;
+	imtlic::IProductInfo* productInfoPtr = dynamic_cast<imtlic::IProductInfo*>(&data);
+	if (productInfoPtr == nullptr){
+		return ifile::IFilePersistence::OS_FAILED;
+	}
+
+	QFile file(filePath);
+	if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
+		SendErrorMessage(0, QStringLiteral("Unable to open the product file '%1'").arg(filePath), "CProductInfoFileGeneratorComp");
+
+		return ifile::IFilePersistence::OS_FAILED;
+	}
+
+	const QString text = QString::fromUtf8(file.readAll());
+	file.close();
+
+	data.ResetData();
+
+	QString errorMessage;
+	if (!ReadProduct(text, *productInfoPtr, errorMessage)){
+		SendErrorMessage(0, QStringLiteral("The product file '%1' cannot be read: %2").arg(filePath, errorMessage), "CProductInfoFileGeneratorComp");
+
+		return ifile::IFilePersistence::OS_FAILED;
+	}
+
+	// The header does not carry the uuid of the product, a read product is a new one.
+	imtlic::CIdentifiableProductInfo* identifiableProductPtr = dynamic_cast<imtlic::CIdentifiableProductInfo*>(&data);
+	if (identifiableProductPtr != nullptr){
+		identifiableProductPtr->SetObjectUuid(QUuid::createUuid().toByteArray(QUuid::WithoutBraces));
+	}
+
+	return ifile::IFilePersistence::OS_OK;
 }
 
 
@@ -76,23 +148,217 @@ ifile::IFilePersistence::OperationState CProductInfoFileGeneratorComp::SaveToFil
 // reimplemented (ifile::IFileTypeInfo)
 
 bool CProductInfoFileGeneratorComp::GetFileExtensions(
-	QStringList& /*result*/,
+	QStringList& result,
 	const istd::IChangeable* /*dataObjectPtr*/,
 	int /*flags*/,
-	bool /*doAppend*/) const
+	bool doAppend) const
 {
-	return false;
+	if (!doAppend){
+		result.clear();
+	}
+
+	result << QStringLiteral("h");
+
+	return true;
 }
 
 
 QString CProductInfoFileGeneratorComp::GetTypeDescription(
 	const QString* /*extensionPtr*/) const
 {
-	return QString();
+	return QStringLiteral("C++ Header Files");
 }
 
 
 // private methods
+
+bool CProductInfoFileGeneratorComp::ReadProduct(const QString& text, imtlic::IProductInfo& productInfo, QString& errorMessage) const
+{
+	static const QString variable = QStringLiteral(R"re((\w+))re");
+	static const QString featureClass = QStringLiteral(R"re(imtlic::(CIdentifiableFeatureInfo|CFeatureInfo))re");
+
+	// Features still being filled; a feature leaves when it is inserted into its parent or added to the product.
+	std::map<QString, std::unique_ptr<imtlic::CFeatureInfo>> features;
+	bool hasProductId = false;
+	bool insideFunction = false;
+
+	const QStringList lines = text.split('\n');
+	for (qsizetype lineIndex = 0; lineIndex < lines.size(); ++lineIndex){
+		const QString statement = lines[lineIndex].trimmed();
+		auto fail = [&errorMessage, lineIndex, &statement](const QString& reason){
+			errorMessage = QStringLiteral("line %1: %2 ('%3')").arg(lineIndex + 1).arg(reason, statement);
+
+			return false;
+		};
+
+		if (statement.isEmpty() || statement.startsWith(QStringLiteral("//")) || statement.startsWith('#')){
+			continue;
+		}
+
+		if (!insideFunction){
+			if (statement == QStringLiteral("static void FillProduct(imtlic::IProductInfo& productInfo){")){
+				insideFunction = true;
+			}
+			else if (!statement.startsWith(QStringLiteral("namespace ")) && statement != QStringLiteral("{") && statement != QStringLiteral("}") && statement != QStringLiteral("};")){
+				return fail(QStringLiteral("unexpected statement outside of FillProduct"));
+			}
+
+			continue;
+		}
+
+		if (statement == QStringLiteral("}")){
+			insideFunction = false;
+
+			continue;
+		}
+
+		QRegularExpressionMatch match;
+		if ((match = MatchStatement(QStringLiteral(R"re(productInfo\.SetProductId\(%1\);)re").arg(s_string), statement)).hasMatch()){
+			productInfo.SetProductId(Unescape(match.captured(1)).toUtf8());
+			hasProductId = !productInfo.GetProductId().isEmpty();
+		}
+		else if ((match = MatchStatement(QStringLiteral(R"re(productInfo\.SetName\(%1\);)re").arg(s_translated), statement)).hasMatch()){
+			productInfo.SetName(Unescape(match.captured(1)));
+		}
+		else if ((match = MatchStatement(QStringLiteral(R"re(productInfo\.SetProductDescription\(%1\);)re").arg(s_translated), statement)).hasMatch()){
+			productInfo.SetProductDescription(Unescape(match.captured(1)));
+		}
+		else if ((match = MatchStatement(QStringLiteral(R"re(productInfo\.SetCategoryId\(%1\);)re").arg(s_string), statement)).hasMatch()){
+			productInfo.SetCategoryId(Unescape(match.captured(1)).toUtf8());
+		}
+		else if ((match = MatchStatement(QStringLiteral(R"re(istd::TDelPtr<%1> %2;)re").arg(featureClass, variable), statement)).hasMatch()){
+			const QString variableName = match.captured(2);
+			if ((features.count(variableName) > 0)){
+				return fail(QStringLiteral("the feature variable is declared twice"));
+			}
+
+			if (match.captured(1) == QStringLiteral("CIdentifiableFeatureInfo")){
+				features[variableName] = std::make_unique<imtlic::CIdentifiableFeatureInfo>();
+			}
+			else{
+				features[variableName] = std::make_unique<imtlic::CFeatureInfo>();
+			}
+		}
+		else if ((match = MatchStatement(QStringLiteral(R"re(%1\.SetPtr\(new %2\);)re").arg(variable, featureClass), statement)).hasMatch()){
+			if (!(features.count(match.captured(1)) > 0)){
+				return fail(QStringLiteral("unknown feature variable"));
+			}
+		}
+		else if ((match = MatchStatement(QStringLiteral(R"re(%1->InsertSubFeature\(%2\.PopPtr\(\)\);)re").arg(variable, variable), statement)).hasMatch()){
+			const QString parentName = match.captured(1);
+			const QString childName = match.captured(2);
+			if (!(features.count(parentName) > 0) || !(features.count(childName) > 0) || parentName == childName){
+				return fail(QStringLiteral("unknown feature variable"));
+			}
+
+			imtlic::CFeatureInfo* subFeaturePtr = features.extract(childName).mapped().release();
+			if (!features[parentName]->InsertSubFeature(imtlic::IFeatureInfo::FeatureInfoPtr(subFeaturePtr))){
+				return fail(QStringLiteral("the sub-feature cannot be inserted, its id is already used under this parent"));
+			}
+		}
+		else if ((match = MatchStatement(QStringLiteral(R"re(productInfo\.AddFeature\(%1, \*%2\.GetPtr\(\)\);)re").arg(s_string, variable), statement)).hasMatch()){
+			const QString variableName = match.captured(2);
+			if (!(features.count(variableName) > 0)){
+				return fail(QStringLiteral("unknown feature variable"));
+			}
+
+			std::unique_ptr<imtlic::CFeatureInfo> featurePtr = std::move(features[variableName]);
+			features.erase(variableName);
+
+			const QByteArray elementId = Unescape(match.captured(1)).toUtf8();
+			const imtlic::CIdentifiableFeatureInfo* identifiablePtr = dynamic_cast<const imtlic::CIdentifiableFeatureInfo*>(featurePtr.get());
+			if (elementId.isEmpty() || identifiablePtr == nullptr || identifiablePtr->GetObjectUuid() != elementId){
+				return fail(QStringLiteral("a feature of the product must be added under its own uuid"));
+			}
+
+			if (featurePtr->GetFeatureId().isEmpty()){
+				return fail(QStringLiteral("the feature has no id"));
+			}
+
+			if (!productInfo.AddFeature(elementId, *featurePtr)){
+				return fail(QStringLiteral("the feature cannot be added, its uuid is already used"));
+			}
+		}
+		else{
+			match = MatchStatement(QStringLiteral(R"re(%1->(\w+)\((.*)\);)re").arg(variable), statement);
+			if (!match.hasMatch() || !(features.count(match.captured(1)) > 0)){
+				return fail(QStringLiteral("unexpected statement"));
+			}
+
+			imtlic::CFeatureInfo& featureInfo = *features[match.captured(1)];
+			const QString method = match.captured(2);
+			const QString argument = match.captured(3);
+			const QRegularExpressionMatch stringMatch = MatchStatement(s_string, argument);
+			const QRegularExpressionMatch translatedMatch = MatchStatement(s_translated, argument);
+			const bool isBoolean = (argument == QStringLiteral("true")) || (argument == QStringLiteral("false"));
+
+			if (method == QStringLiteral("SetObjectUuid") && stringMatch.hasMatch()){
+				imtlic::CIdentifiableFeatureInfo* identifiablePtr = dynamic_cast<imtlic::CIdentifiableFeatureInfo*>(&featureInfo);
+				if (identifiablePtr == nullptr){
+					return fail(QStringLiteral("only a feature of the product has a uuid"));
+				}
+
+				identifiablePtr->SetObjectUuid(Unescape(stringMatch.captured(1)).toUtf8());
+			}
+			else if (method == QStringLiteral("SetFeatureId") && stringMatch.hasMatch()){
+				featureInfo.SetFeatureId(Unescape(stringMatch.captured(1)).toUtf8());
+			}
+			else if (method == QStringLiteral("SetFeatureName") && translatedMatch.hasMatch()){
+				featureInfo.SetFeatureName(Unescape(translatedMatch.captured(1)));
+			}
+			else if (method == QStringLiteral("SetFeatureDescription") && translatedMatch.hasMatch()){
+				featureInfo.SetFeatureDescription(Unescape(translatedMatch.captured(1)));
+			}
+			else if (method == QStringLiteral("SetOptional") && isBoolean){
+				featureInfo.SetOptional(argument == QStringLiteral("true"));
+			}
+			else if (method == QStringLiteral("SetIsPermission") && isBoolean){
+				featureInfo.SetIsPermission(argument == QStringLiteral("true"));
+			}
+			else if (method == QStringLiteral("SetRequirements")){
+				const QRegularExpressionMatch requirementsMatch = MatchStatement(QStringLiteral(R"re(QByteArray\(%1\)\.split\(';'\))re").arg(s_string), argument);
+				if (!requirementsMatch.hasMatch()){
+					return fail(QStringLiteral("unexpected requirements"));
+				}
+
+				featureInfo.SetRequirements(Unescape(requirementsMatch.captured(1)).toUtf8().split(';'));
+			}
+			else{
+				return fail(QStringLiteral("unexpected feature statement"));
+			}
+		}
+	}
+
+	if (!hasProductId){
+		errorMessage = QStringLiteral("the file sets no product id");
+
+		return false;
+	}
+
+	if (!features.empty()){
+		QStringList variableNames;
+		for (const auto& feature : features){
+			variableNames << feature.first;
+		}
+
+		errorMessage = QStringLiteral("features are declared but never added to the product: %1").arg(variableNames.join(QStringLiteral(", ")));
+
+		return false;
+	}
+
+	return true;
+}
+
+
+QString CProductInfoFileGeneratorComp::EscapeString(const QString& text)
+{
+	QString retVal = text;
+	retVal.replace(QStringLiteral("\\"), QStringLiteral("\\\\"));
+	retVal.replace(QStringLiteral("\""), QStringLiteral("\\\""));
+
+	return retVal;
+}
+
 
 void CProductInfoFileGeneratorComp::WriteIncludes(QTextStream& textStream) const
 {
@@ -145,13 +411,13 @@ void CProductInfoFileGeneratorComp::WriteFunction(QTextStream& textStream, imtli
 
 	if (!productName.isEmpty()){
 		WriteTab(textStream, 1);
-		textStream << QStringLiteral("productInfo.SetName(QT_TRANSLATE_NOOP(\"%1\", \"%2\"));").arg(s_productContext, productName);
+		textStream << QStringLiteral("productInfo.SetName(QT_TRANSLATE_NOOP(\"%1\", \"%2\"));").arg(s_productContext, EscapeString(productName));
 		WriteNewLine(textStream, 1);
 	}
 
 	if (!productDescription.isEmpty()){
 		WriteTab(textStream, 1);
-		textStream << QStringLiteral("productInfo.SetProductDescription(QT_TRANSLATE_NOOP(\"%1\", \"%2\"));").arg(s_productContext, productDescription);
+		textStream << QStringLiteral("productInfo.SetProductDescription(QT_TRANSLATE_NOOP(\"%1\", \"%2\"));").arg(s_productContext, EscapeString(productDescription));
 		WriteNewLine(textStream, 1);
 	}
 
@@ -232,14 +498,14 @@ void CProductInfoFileGeneratorComp::WriteFeatureInfo(
 	if (!featureName.isEmpty()){
 		WriteTab(textStream, 1);
 		textStream << QStringLiteral("%1->SetFeatureName(QT_TRANSLATE_NOOP(\"%2\", \"%3\"));")
-						  .arg(featureVarName, s_featureContext, featureName);
+						  .arg(featureVarName, s_featureContext, EscapeString(featureName));
 		WriteNewLine(textStream, 1);
 	}
 
 	if (!featureDescription.isEmpty()){
 		WriteTab(textStream, 1);
 		textStream << QStringLiteral("%1->SetFeatureDescription(QT_TRANSLATE_NOOP(\"%2\", \"%3\"));")
-						  .arg(featureVarName, s_featureContext, featureDescription);
+						  .arg(featureVarName, s_featureContext, EscapeString(featureDescription));
 		WriteNewLine(textStream, 1);
 	}
 
@@ -296,35 +562,36 @@ QByteArrayList CProductInfoFileGeneratorComp::ResolveRequirementPaths(
 	const imtbase::ICollectionInfo::Ids featureElementIds = featureCollectionPtr->GetElementIds();
 
 	for (const QByteArray& requirement : requirements){
-		// A requirement is stored either as a bare feature identifier (older
-		// products) or as a full path; the generated file always carries the path.
-		const QByteArray requirementId = requirement.mid(requirement.lastIndexOf('/') + 1);
-		if (requirementId.isEmpty()){
-			continue;
-		}
+		// A requirement is the full path of a node; ids repeat across the tree, so it is never looked up by its last segment.
+		const QByteArrayList segments = requirement.startsWith('/') ? requirement.mid(1).split('/') : QByteArrayList();
 
 		QByteArray requirementPath;
 		for (const imtbase::ICollectionInfo::Id& featureElementId : featureElementIds){
 			imtbase::IObjectCollection::DataPtr dataPtr;
-			if (!featureCollectionPtr->GetObjectData(featureElementId, dataPtr)){
+			if (segments.isEmpty() || !featureCollectionPtr->GetObjectData(featureElementId, dataPtr)){
 				continue;
 			}
 
-			const imtlic::IFeatureInfo* rootFeatureInfoPtr = dynamic_cast<const imtlic::IFeatureInfo*>(dataPtr.GetPtr());
-			if (rootFeatureInfoPtr == nullptr){
+			const imtlic::IFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::IFeatureInfo*>(dataPtr.GetPtr());
+			if (featureInfoPtr == nullptr || featureInfoPtr->GetFeatureId() != segments.first()){
 				continue;
 			}
 
-			if (rootFeatureInfoPtr->GetFeatureId() == requirementId){
-				requirementPath = imtlic::CalculateFeaturePath(*rootFeatureInfoPtr);
-				break;
+			for (qsizetype segmentIndex = 1; segmentIndex < segments.size() && featureInfoPtr != nullptr; ++segmentIndex){
+				const imtlic::IFeatureInfo* childPtr = nullptr;
+				for (const imtlic::IFeatureInfo::FeatureInfoPtr& subFeaturePtr : featureInfoPtr->GetSubFeatures()){
+					if (subFeaturePtr.IsValid() && subFeaturePtr->GetFeatureId() == segments[segmentIndex]){
+						childPtr = subFeaturePtr.GetPtr();
+						break;
+					}
+				}
+				featureInfoPtr = childPtr;
 			}
 
-			imtlic::IFeatureInfo::FeatureInfoPtr subFeatureInfoPtr = rootFeatureInfoPtr->GetSubFeature(requirementId);
-			if (subFeatureInfoPtr.IsValid()){
-				requirementPath = imtlic::CalculateFeaturePath(*subFeatureInfoPtr);
-				break;
+			if (featureInfoPtr != nullptr){
+				requirementPath = requirement;
 			}
+			break;
 		}
 
 		if (requirementPath.isEmpty()){

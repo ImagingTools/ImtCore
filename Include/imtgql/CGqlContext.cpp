@@ -8,7 +8,7 @@
 #include <iser/CArchiveTag.h>
 
 // ImtCore includes
-#include <imtlic/IProductInfo.h>
+#include <imtgql/imtgql.h>
 
 
 namespace imtgql
@@ -41,6 +41,8 @@ void CGqlContext::SetProductId(const QByteArray& productId)
 {
 	if (m_productId != productId){
 		istd::CChangeNotifier changeNotifier(this);
+
+		ResetImpliedPermissions();
 
 		m_productId = productId;
 	}
@@ -190,6 +192,24 @@ void CGqlContext::SetProductInfo(imtlic::IProductInfo* productInfoPtr)
 }
 
 
+QByteArrayList CGqlContext::GetTenantPermissions() const
+{
+	return m_tenantPermissions;
+}
+
+
+void CGqlContext::SetTenantPermissions(const QByteArrayList& permissions)
+{
+	if (m_tenantPermissions != permissions){
+		istd::CChangeNotifier changeNotifier(this);
+
+		ResetImpliedPermissions();
+
+		m_tenantPermissions = permissions;
+	}
+}
+
+
 imtauth::IUserInfo::FeatureIds CGqlContext::GetImpliedPermissions() const
 {
 	QMutexLocker locker(&m_impliedPermissionsMutex);
@@ -197,10 +217,12 @@ imtauth::IUserInfo::FeatureIds CGqlContext::GetImpliedPermissions() const
 	if (!m_areImpliedPermissionsResolved){
 		m_areImpliedPermissionsResolved = true;
 
-		if ((m_productInfoPtr != nullptr) && m_userInfoPtr.IsValid()){
-			const imtauth::IUserInfo::FeatureIds userPermissions = m_userInfoPtr->GetPermissions();
+		if (m_userInfoPtr.IsValid()){
+			const imtauth::IUserInfo::FeatureIds userPermissions = m_productId.isEmpty()
+						? m_userInfoPtr->GetPermissions()
+						: m_userInfoPtr->GetPermissions(m_productId);
 
-			m_impliedPermissions = imtlic::CollectImpliedPermissions(*m_productInfoPtr, userPermissions);
+			m_impliedPermissions = imtgql::CollectImpliedPermissions(*this, userPermissions);
 		}
 	}
 
@@ -312,6 +334,7 @@ bool CGqlContext::CopyFrom(const IChangeable &object, CompatibilityMode /*mode*/
 		m_productId = sourcePtr->m_productId;
 		m_headers = sourcePtr->m_headers;
 		m_productInfoPtr = sourcePtr->m_productInfoPtr;
+		m_tenantPermissions = sourcePtr->m_tenantPermissions;
 		m_isTenantOwner = sourcePtr->m_isTenantOwner;
 
 		SetUserInfo(sourcePtr->m_userInfoPtr.GetPtr());
@@ -351,6 +374,7 @@ bool CGqlContext::ResetData(CompatibilityMode /*mode*/)
 	m_tenantId.clear();
 	m_headers.clear();
 	m_productInfoPtr = nullptr;
+	m_tenantPermissions.clear();
 	m_isTenantOwner = false;
 	m_userInfoPtr.Reset();
 

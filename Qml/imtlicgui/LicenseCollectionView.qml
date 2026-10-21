@@ -18,6 +18,7 @@ RemoteCollectionView {
 	documentCollectionFilter: null
 	
 	commandsDelegateComp: Component {DocumentCollectionViewDelegate {
+			revisionsPermissionPath: "/LicenseDefinitionManagement/Revisions";
 			collectionView: root;
 			documentTypeIds: ["License"]
 			documentViewTypeIds: ["LicenseEditor"]
@@ -57,11 +58,11 @@ RemoteCollectionView {
 			property LicenseDefinitionData licenseData: documentModel
 			
 			gqlGetCommandId: ImtlicLicensesSdlCommandIds.s_licenseItem;
-			getPermissionPath: "/LicenseDefinitionManagement/ViewLicensesDefinition";
+			getPermissionPath: "/LicenseDefinitionManagement/View";
 			gqlUpdateCommandId: ImtlicLicensesSdlCommandIds.s_licenseUpdate;
-			updatePermissionPath: "/LicenseDefinitionManagement/EditLicenseDefinition/ChangeLicenseDefinition";
+			updatePermissionPath: "/LicenseDefinitionManagement/Edit/Change";
 			gqlAddCommandId: ImtlicLicensesSdlCommandIds.s_licenseAdd;
-			addPermissionPath: "/LicenseDefinitionManagement/EditLicenseDefinition/AddLicenseDefinition";
+			addPermissionPath: "/LicenseDefinitionManagement/Edit/Add";
 			
 			typeId: "License";
 			documentName: licenseData ? licenseData.m_licenseName: "";

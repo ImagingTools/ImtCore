@@ -293,7 +293,7 @@ ViewBase {
 			multiPageView.addPage("General", qsTr("General"), generalPageComp, "Icons/Settings")
 			multiPageView.addPage("ParentRoles", qsTr("Parent Roles"), parentRolesPageComp, "Icons/Role")
 			multiPageView.addPage("Permission", qsTr("Permissions"), permissionPageComp, "Icons/Key")
-			if (PermissionsController.checkPermission("ViewRevisions")){
+			if (PermissionsController.checkPermission("/Administration/Roles/Revisions/View")){
 				multiPageView.addPage("History", qsTr("History"), historyPageComp, "Icons/History")
 			}
 			multiPageView.currentIndex = 0
@@ -717,6 +717,7 @@ ViewBase {
 
 			DocumentHistoryView {
 				id: historyView
+				revisionsPermissionPath: "/Administration/Roles/Revisions"
 				anchors.left: centeredContainer.left
 				anchors.top: historyHeader.bottom
 				anchors.topMargin: Style.marginM

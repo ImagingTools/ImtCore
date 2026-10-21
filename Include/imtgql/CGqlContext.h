@@ -38,6 +38,8 @@ public:
 	virtual void SetUserInfo(const imtauth::IUserInfo* userInfoPtr) override;
 	virtual imtlic::IProductInfo* GetProductInfo() const override;
 	virtual void SetProductInfo(imtlic::IProductInfo* productInfoPtr) override;
+	virtual QByteArrayList GetTenantPermissions() const override;
+	virtual void SetTenantPermissions(const QByteArrayList& permissions) override;
 	virtual imtauth::IUserInfo::FeatureIds GetImpliedPermissions() const override;
 	virtual bool IsTenantOwner() const override;
 	virtual void SetIsTenantOwner(bool isTenantOwner) override;
@@ -73,6 +75,7 @@ private:
 	// The product is a component of the running application, shared by every
 	// request and outliving all of them, so the context only points at it.
 	imtlic::IProductInfo* m_productInfoPtr;
+	QByteArrayList m_tenantPermissions;
 	bool m_isTenantOwner;
 	Headers m_headers;
 

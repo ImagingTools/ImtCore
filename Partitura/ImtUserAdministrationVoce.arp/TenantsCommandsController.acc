@@ -16,8 +16,7 @@
                     <AttributeInfo Id="EditPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/EditOrganization/ChangeOrganizationName</Value>
-                                <Value>/EditOrganization/ChangeOrganizationDescription</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -30,14 +29,14 @@
                     <AttributeInfo Id="NewPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>AddOrganization</Value>
+                                <Value>/OrganizationManagement/Add</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="RemovePermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>RemoveOrganization</Value>
+                                <Value>/OrganizationManagement/Remove</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

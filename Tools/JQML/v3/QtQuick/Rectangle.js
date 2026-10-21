@@ -30,7 +30,7 @@ class Rectangle extends Item {
             let style = []
             
             for(let stop of this.gradient.stops){
-                style.push(`${stop.color} ${stop.position*100}%`)
+                style.push(`${Color.toCss(stop.color)} ${stop.position*100}%`)
             }
             if(this.gradient.orientation == Gradient.Vertical){
                 this.__setDOMStyle({
