@@ -4,6 +4,7 @@
 
 // Qt includes
 #include <QtNetwork/QSslCertificate>
+#include <QtNetwork/QSslCipher>
 #include <QtNetwork/QSslConfiguration>
 #include <QtNetwork/QSslSocket>
 
