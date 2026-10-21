@@ -11,6 +11,12 @@ namespace imtcache
 {
 
 
+/**
+	A cache that stays behind for this long has bigger problems than lost messages.
+*/
+constexpr int MAX_PENDING_MESSAGES = 5000;
+
+
 // protected methods
 
 // reimplemented (imtservergql::CGqlPublisherCompBase)
@@ -95,3 +101,4 @@ void CCacheCollectionChangeNotifierComp::OnCacheUpdated(bool isOk, qint64 starte
 
 
 } // namespace imtcache
+

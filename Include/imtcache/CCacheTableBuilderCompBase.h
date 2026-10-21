@@ -43,9 +43,10 @@ public:
 	virtual BuildResult ApplyChanges(imtduckdb::IDuckConnection& connection, const QDateTime& lastSourceUpdateTime) const override;
 
 protected:
-	/// Cache table columns, in the order the create script declares them and a loaded row fills them. The first one is the surrogate id (UBIGINT) that identifies the row in the change log.
+	/**
+		Cache table columns, in the order the create script declares them and a loaded row fills them. The first one is the surrogate id (UBIGINT) that identifies the row in the change log.
+	*/
 	virtual QStringList GetColumnNames() const = 0;
-
 	/**
 		Loads the source rows into \a tableName through a bulk appender: the rows changed after
 		\a since, or all of them when \a since is not set. Updates \a result.
@@ -55,33 +56,32 @@ protected:
 				const QString& tableName,
 				const QDateTime& since,
 				BuildResult& result) const = 0;
-
-	/// Removes cache rows whose source row is gone. The default removes nothing.
+	/**
+		Removes cache rows whose source row is gone. The default removes nothing.
+	*/
 	virtual bool RemoveDeletedRows(
 				imtduckdb::IDuckConnection& connection,
 				const QDateTime& lastSourceUpdateTime,
 				BuildResult& result) const;
-
 	/**
 		Condition under which an incoming row may replace the one already cached, written against
 		\c excluded (the incoming row) and the table. Empty means always.
 	*/
 	virtual QString GetReplaceCondition() const;
-
-	/// Column identifying a row in the source.
+	/**
+		Column identifying a row in the source.
+	*/
 	QString GetObjectIdColumn() const;
-
-	/// Column identifying a row in the change log: the first of GetColumnNames().
+	/**
+		Column identifying a row in the change log: the first of GetColumnNames().
+	*/
 	QString GetKeyColumn() const;
 
 private:
-	static const inline QString SHADOW_SUFFIX = QStringLiteral("_shadow");
-	static const inline QString STAGING_SUFFIX = QStringLiteral("_staging");
-
-private:
 	bool CreateTable(imtduckdb::IDuckConnection& connection, const QString& tableName, QString& errorMessage) const;
-
-	/// False when the live table's columns differ from GetColumnNames(), i.e. it predates a schema change.
+	/**
+		False when the live table's columns differ from GetColumnNames(), i.e. it predates a schema change.
+	*/
 	bool HasExpectedColumns(imtduckdb::IDuckConnection& connection) const;
 
 	QString GetUpsertQuery(const QString& stagingTableName) const;
@@ -94,3 +94,4 @@ private:
 
 
 } // namespace imtcache
+

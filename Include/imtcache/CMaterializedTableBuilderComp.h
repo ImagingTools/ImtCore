@@ -58,25 +58,16 @@ public:
 private:
 	bool ReadScript(const QByteArray& path, QString& script, QString& errorMessage) const;
 
-	/// The select script with ${KeyFilter} replaced by \a keyFilter.
+	/**
+		The select script with ${KeyFilter} replaced by \a keyFilter.
+	*/
 	bool CreateSelectQuery(const QString& keyFilter, QString& query, QString& errorMessage) const;
-
-	/// False when the select script no longer yields the columns of the table, in the order of the table.
+	/**
+		False when the select script no longer yields the columns of the table, in the order of the table.
+	*/
 	bool HasExpectedColumns(imtduckdb::IDuckConnection& connection) const;
 
 	QString GetAffectedTableName() const;
-
-	static bool Execute(imtduckdb::IDuckConnection& connection, const QString& query, QString& errorMessage);
-
-	/// The first column of the first row of the result.
-	static bool ReadValue(imtduckdb::IDuckConnection& connection, const QString& query, QVariant& value, QString& errorMessage);
-
-private:
-	static const inline QString SHADOW_SUFFIX = QStringLiteral("_shadow");
-	static const inline QString AFFECTED_SUFFIX = QStringLiteral("_affected");
-
-	/// Column of the table of affected keys.
-	static const inline QString AFFECTED_KEY_COLUMN = QStringLiteral("KeyId");
 
 private:
 	I_ATTR(QByteArray, m_tableNameAttrPtr);
@@ -89,3 +80,4 @@ private:
 
 
 } // namespace imtcache
+

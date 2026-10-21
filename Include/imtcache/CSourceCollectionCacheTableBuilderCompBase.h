@@ -56,7 +56,9 @@ protected:
 	*/
 	virtual bool MapRow(const imtbase::IObjectCollectionIterator& iterator, QVariantList& rowValues) const = 0;
 
-	/// Source collection, for subclasses that need it beyond the standard iteration.
+	/**
+		Source collection, for subclasses that need it beyond the standard iteration.
+	*/
 	const imtbase::IObjectCollection* GetSourceCollection() const;
 
 	// reimplemented (imtcache::CCacheTableBuilderCompBase)
@@ -71,21 +73,27 @@ protected:
 				BuildResult& result) const override;
 
 private:
-	/// The loop over the local source, through an iterator.
+	/**
+		The loop over the local source, through an iterator.
+	*/
 	bool LoadLocalRows(
 				imtduckdb::IDuckAppender& appender,
 				const QString& tableName,
 				const QDateTime& since,
 				BuildResult& result) const;
 
-	/// The loop over the remote source, page by page.
+	/**
+		The loop over the remote source, page by page.
+	*/
 	bool LoadRemoteRows(
 				imtduckdb::IDuckAppender& appender,
 				const QString& tableName,
 				const QDateTime& since,
 				BuildResult& result) const;
 
-	/// Maps the row the iterator points at and appends it. Returns false when the row was not written.
+	/**
+		Maps the row the iterator points at and appends it. Returns false when the row was not written.
+	*/
 	bool AppendRow(
 				const imtbase::IObjectCollectionIterator& iterator,
 				imtduckdb::IDuckAppender& appender,
@@ -105,29 +113,43 @@ private:
 				const std::function<void(const imtbase::IObjectCollectionIterator&, const QDateTime&)>& onObject,
 				QString& errorMessage) const;
 
-	/// Selects the source rows changed after \a since, or all of them when \a since is not set.
-	void FillChangedFilter(imtbase::CComplexCollectionFilter& filter, const QDateTime& since) const;
-
-	/// Orders by modification time, then id, so that every row has one place in the sequence.
-	void FillPageSorting(imtbase::CComplexCollectionFilter& filter) const;
-
-	/// Selects the rows after the cursor: changed later than its time, or at its time with a greater id. Times are ISO text.
-	void FillAfterCursorFilter(imtbase::CComplexCollectionFilter& filter, const QString& cursorTime, const QByteArray& cursorId) const;
-
-	/// The time the remote source row the iterator points at was last changed, as UTC. Invalid when it has none.
-	static QDateTime GetRemoteModificationTime(const imtbase::IObjectCollectionIterator& iterator);
-
-	/// Finds removals as sources soft-deleted after \a lastSourceUpdateTime. Needs deletion to change the modification time.
+	/**
+		Finds removals as sources soft-deleted after \a lastSourceUpdateTime. Needs deletion to change the modification time.
+	*/
 	bool RemoveRowsDeletedSince(
 				imtduckdb::IDuckConnection& connection,
 				const QDateTime& lastSourceUpdateTime,
 				BuildResult& result) const;
 
-	/// Finds removals as cache rows whose id is not among the active source rows.
+	/**
+		Finds removals as cache rows whose id is not among the active source rows.
+	*/
 	bool RemoveRowsMissingFromSource(imtduckdb::IDuckConnection& connection, BuildResult& result) const;
 
-	/// Deletes the cache rows with the given normalized document ids.
+	/**
+		Deletes the cache rows with the given normalized document ids.
+	*/
 	bool DeleteRowsById(imtduckdb::IDuckConnection& connection, const QStringList& documentIds, BuildResult& result) const;
+
+	/**
+		Selects the source rows changed after \a since, or all of them when \a since is not set.
+	*/
+	static void FillChangedFilter(imtbase::CComplexCollectionFilter& filter, const QByteArray& modificationTimeField, const QDateTime& since);
+
+	/**
+		Orders by modification time, then id, so that every row has one place in the sequence.
+	*/
+	void FillPageSorting(imtbase::CComplexCollectionFilter& filter) const;
+
+	/**
+		Selects the rows after the cursor: changed later than its time, or at its time with a greater id. Times are ISO text.
+	*/
+	void FillAfterCursorFilter(imtbase::CComplexCollectionFilter& filter, const QString& cursorTime, const QByteArray& cursorId) const;
+
+	/**
+		The time the remote source row the iterator points at was last changed, as UTC. Invalid when it has none.
+	*/
+	static QDateTime GetRemoteModificationTime(const imtbase::IObjectCollectionIterator& iterator);
 
 private:
 	I_REF(imtbase::IObjectCollection, m_sourceCollectionCompPtr);
@@ -141,3 +163,4 @@ private:
 
 
 } // namespace imtcache
+

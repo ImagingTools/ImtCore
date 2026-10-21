@@ -5,7 +5,6 @@
 // Qt includes
 #include <QtCore/QString>
 #include <QtCore/QStringList>
-#include <QtCore/QVariant>
 
 // ImtCore includes
 #include <imtduckdb/IDuckConnection.h>
@@ -26,14 +25,16 @@ namespace imtcache
 class CCacheChangeLog
 {
 public:
-	/// Creates the log tables and their sequence when they are not there.
+	/**
+		Creates the log tables and their sequence when they are not there.
+	*/
 	static bool EnsureTables(imtduckdb::IDuckConnection& connection, QString& errorMessage);
 
 	/**
 		Logs the key of every row of \a stagingTableName that the merge into \a tableName will change: a row
 		that is new, or differs from the cached one and passes \a replaceCondition (written against excluded
 		and the table, as for the upsert). A row read again unchanged is not logged. Call it before the merge.
-	\a changedCount receives the number of logged rows.
+		\a changedCount receives the number of logged rows.
 	*/
 	static bool RecordUpserted(
 				imtduckdb::IDuckConnection& connection,
@@ -43,27 +44,32 @@ public:
 				const QString& replaceCondition,
 				int& changedCount,
 				QString& errorMessage);
-
-	/// Logs the key of every row of \a tableName matching the SQL condition \a removedCondition. Call it before the rows are deleted.
+	/**
+		Logs the key of every row of \a tableName matching the SQL condition \a removedCondition. Call it before the rows are deleted.
+	*/
 	static bool RecordRemoved(
 				imtduckdb::IDuckConnection& connection,
 				const QString& tableName,
 				const QString& keyColumn,
 				const QString& removedCondition,
 				QString& errorMessage);
-
-	/// Logs that \a tableName was rebuilt, which no key can describe.
+	/**
+		Logs that \a tableName was rebuilt, which no key can describe.
+	*/
 	static bool RecordRebuilt(imtduckdb::IDuckConnection& connection, const QString& tableName, QString& errorMessage);
-
-	/// The newest entry, or \a fallback when there is none because they were all purged.
+	/**
+		The newest entry, or \a fallback when there is none because they were all purged.
+	*/
 	static bool GetLatestChangeId(imtduckdb::IDuckConnection& connection, qint64 fallback, qint64& changeId, QString& errorMessage);
-
-	/// How far \a consumer has read. \a hasCursor is false before its first read.
+	/**
+		How far \a consumer has read. \a hasCursor is false before its first read.
+	*/
 	static bool GetCursor(imtduckdb::IDuckConnection& connection, const QString& consumer, bool& hasCursor, qint64& changeId, QString& errorMessage);
 
 	static bool SetCursor(imtduckdb::IDuckConnection& connection, const QString& consumer, qint64 changeId, QString& errorMessage);
-
-	/// Whether any of \a tableNames was rebuilt by an entry in (\a afterChangeId, \a upToChangeId].
+	/**
+		Whether any of \a tableNames was rebuilt by an entry in (\a afterChangeId, \a upToChangeId].
+	*/
 	static bool HasRebuilt(
 				imtduckdb::IDuckConnection& connection,
 				const QStringList& tableNames,
@@ -71,21 +77,19 @@ public:
 				qint64 upToChangeId,
 				bool& hasRebuilt,
 				QString& errorMessage);
-
-	/// Drops the entries every consumer has read, or all of them when there is no consumer.
+	/**
+		Drops the entries every consumer has read, or all of them when there is no consumer.
+	*/
 	static bool Purge(imtduckdb::IDuckConnection& connection, QString& errorMessage);
 
 private:
-	static bool Execute(imtduckdb::IDuckConnection& connection, const QString& query, QString& errorMessage);
-
-	/// The first column of the first row of the result.
-	static bool ReadValue(imtduckdb::IDuckConnection& connection, const QString& query, QVariant& value, QString& errorMessage);
-
 	static bool ExecuteScript(imtduckdb::IDuckConnection& connection, const QString& scriptPath, QString& errorMessage);
-
-	/// SQL expression taking the next change id from the sequence.
-	static QString NextChangeId();
+	/**
+		The SQL expression that takes the next id of the change log.
+	*/
+	static QString GetNextChangeId();
 };
 
 
 } // namespace imtcache
+

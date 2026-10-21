@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtcache/CSourceCollectionCacheTableBuilderCompBase.h>
 
 
@@ -63,18 +64,39 @@ bool CSourceCollectionCacheTableBuilderCompBase::LoadRows(
 }
 
 
+bool CSourceCollectionCacheTableBuilderCompBase::RemoveDeletedRows(
+			imtduckdb::IDuckConnection& connection,
+			const QDateTime& lastSourceUpdateTime,
+			BuildResult& result) const
+{
+	if (m_detectDeletionsAttrPtr.IsValid() && !*m_detectDeletionsAttrPtr){
+		return true;
+	}
+
+	if (*m_reconcileDeletionsAttrPtr){
+		return RemoveRowsMissingFromSource(connection, result);
+	}
+
+	return RemoveRowsDeletedSince(connection, lastSourceUpdateTime, result);
+}
+
+
+// private methods
+
 bool CSourceCollectionCacheTableBuilderCompBase::LoadLocalRows(
 			imtduckdb::IDuckAppender& appender,
 			const QString& tableName,
 			const QDateTime& since,
 			BuildResult& result) const
 {
-	// Without a cutoff no filter is passed, and the source delegate returns active rows only, which is what a rebuild wants.
+	/**
+		Without a cutoff no filter is passed, and the source delegate returns active rows only, which is what a rebuild wants.
+	*/
 	imtbase::CComplexCollectionFilter changedFilter;
 	iprm::CParamsSet changedParams;
 	const iprm::IParamsSet* filterParamsPtr = nullptr;
 	if (since.isValid()){
-		FillChangedFilter(changedFilter, since);
+		FillChangedFilter(changedFilter, *m_modificationTimeFieldAttrPtr, since);
 		changedParams.SetEditableParameter(QByteArrayLiteral("ComplexFilter"), &changedFilter);
 		filterParamsPtr = &changedParams;
 	}
@@ -82,7 +104,9 @@ bool CSourceCollectionCacheTableBuilderCompBase::LoadLocalRows(
 	QElapsedTimer readTimer;
 	readTimer.start();
 
-	// The SQL iterator reads the whole result set here, so this is the time spent waiting on PostgreSQL.
+	/**
+		The SQL iterator reads the whole result set here, so this is the time spent waiting on PostgreSQL.
+	*/
 	istd::TUniqueInterfacePtr<imtbase::IObjectCollectionIterator> iteratorPtr(m_sourceCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), 0, -1, filterParamsPtr));
 	if (!iteratorPtr.IsValid()){
 		result.errorMessage = QStringLiteral("Unable to read the source collection for %1").arg(tableName);
@@ -124,7 +148,9 @@ bool CSourceCollectionCacheTableBuilderCompBase::LoadRemoteRows(
 	QElapsedTimer readTimer;
 	readTimer.start();
 
-	// The pages do not say how many are to come, so the total for the progress report is asked for up front.
+	/**
+		The pages do not say how many are to come, so the total for the progress report is asked for up front.
+	*/
 	imtbase::CComplexCollectionFilter countFilter;
 	iprm::CParamsSet countParams;
 	const iprm::IParamsSet* countParamsPtr = nullptr;
@@ -197,78 +223,6 @@ bool CSourceCollectionCacheTableBuilderCompBase::AppendRow(
 	++result.rowsWritten;
 
 	return true;
-}
-
-
-void CSourceCollectionCacheTableBuilderCompBase::FillChangedFilter(imtbase::CComplexCollectionFilter& filter, const QDateTime& since) const
-{
-	if (!since.isValid()){
-		return;
-	}
-
-	filter.AddFieldFilter(imtbase::IComplexCollectionFilter::FieldFilter(
-		*m_modificationTimeFieldAttrPtr,
-		since.toString(Qt::ISODateWithMs),
-		imtbase::IComplexCollectionFilter::FO_GREATER)
-	);
-}
-
-
-void CSourceCollectionCacheTableBuilderCompBase::FillPageSorting(imtbase::CComplexCollectionFilter& filter) const
-{
-	imtbase::IComplexCollectionFilter::FieldMetaInfo sortInfo;
-	sortInfo.flags = imtbase::IComplexCollectionFilter::SO_SORT;
-	sortInfo.sortingOrder = imtbase::IComplexCollectionFilter::SO_ASC;
-
-	filter.SetFields({
-		imtbase::IComplexCollectionFilter::FieldInfo(*m_modificationTimeFieldAttrPtr, sortInfo),
-		imtbase::IComplexCollectionFilter::FieldInfo(*m_sourceIdFieldAttrPtr, sortInfo)
-	});
-}
-
-
-void CSourceCollectionCacheTableBuilderCompBase::FillAfterCursorFilter(
-			imtbase::CComplexCollectionFilter& filter,
-			const QString& cursorTime,
-			const QByteArray& cursorId) const
-{
-	if (cursorTime.isEmpty()){
-		return;
-	}
-
-	using Filter = imtbase::IComplexCollectionFilter;
-
-	const Filter::FieldFilter later(*m_modificationTimeFieldAttrPtr, cursorTime, Filter::FO_GREATER);
-	if (cursorId.isEmpty()){
-		filter.AddFieldFilter(later);
-
-		return;
-	}
-
-	Filter::FilterExpression sameTime;
-	sameTime.fieldFilters << Filter::FieldFilter(*m_modificationTimeFieldAttrPtr, cursorTime, Filter::FO_EQUAL);
-	sameTime.fieldFilters << Filter::FieldFilter(*m_sourceIdFieldAttrPtr, cursorId, Filter::FO_GREATER);
-
-	Filter::FilterExpression expression;
-	expression.logicalOperation = Filter::LO_OR;
-	expression.fieldFilters << later;
-	expression.filterExpressions << sameTime;
-
-	filter.SetFilterExpression(expression);
-}
-
-
-QDateTime CSourceCollectionCacheTableBuilderCompBase::GetRemoteModificationTime(const imtbase::IObjectCollectionIterator& iterator)
-{
-	const idoc::MetaInfoPtr metaInfoPtr = iterator.GetCollectionMetaInfo();
-	if (!metaInfoPtr.IsValid()){
-		return QDateTime();
-	}
-
-	const QDateTime time = metaInfoPtr->GetMetaInfo(imtbase::ICollectionInfo::MIT_LAST_OPERATION_TIME).toDateTime();
-
-	// The source keeps UTC without a zone, so the time is UTC whatever it came back tagged as.
-	return time.isValid() ? QDateTime(time.date(), time.time(), QTimeZone::utc()) : QDateTime();
 }
 
 
@@ -346,7 +300,9 @@ bool CSourceCollectionCacheTableBuilderCompBase::ReadRemoteRows(
 			return true;
 		}
 
-		// A source that ignores the cursor would send the same page for ever.
+		/**
+			A source that ignores the cursor would send the same page for ever.
+		*/
 		if (cursorTime == previousTime && cursorId == previousId){
 			errorMessage = QStringLiteral("the source did not move past '%1'").arg(cursorTime);
 
@@ -356,30 +312,15 @@ bool CSourceCollectionCacheTableBuilderCompBase::ReadRemoteRows(
 }
 
 
-bool CSourceCollectionCacheTableBuilderCompBase::RemoveDeletedRows(
-			imtduckdb::IDuckConnection& connection,
-			const QDateTime& lastSourceUpdateTime,
-			BuildResult& result) const
-{
-	if (m_detectDeletionsAttrPtr.IsValid() && !*m_detectDeletionsAttrPtr){
-		return true;
-	}
-
-	if (*m_reconcileDeletionsAttrPtr){
-		return RemoveRowsMissingFromSource(connection, result);
-	}
-
-	return RemoveRowsDeletedSince(connection, lastSourceUpdateTime, result);
-}
-
-
 bool CSourceCollectionCacheTableBuilderCompBase::RemoveRowsDeletedSince(
 			imtduckdb::IDuckConnection& connection,
 			const QDateTime& lastSourceUpdateTime,
 			BuildResult& result) const
 {
-	// This relies on the source delete changing the modification time, so the cutoff that finds edits
-	// finds removals too. That holds for address collections; document collections do not do it.
+	/**
+		This relies on the source delete changing the modification time, so the cutoff that finds edits
+		finds removals too. That holds for address collections; document collections do not do it.
+	*/
 	QStringList deletedIds;
 	const auto collectDeleted = [&](const imtbase::IObjectCollectionIterator& iterator, const QDateTime& lastModified){
 		const QUuid documentUuid = QUuid(iterator.GetObjectId());
@@ -387,7 +328,7 @@ bool CSourceCollectionCacheTableBuilderCompBase::RemoveRowsDeletedSince(
 			return;
 		}
 
-		deletedIds << documentUuid.toByteArray(QUuid::WithoutBraces);
+		deletedIds << documentUuid.toString(QUuid::WithoutBraces);
 
 		if (lastModified.isValid() && (!result.lastSourceUpdateTime.isValid() || lastModified > result.lastSourceUpdateTime)){
 			result.lastSourceUpdateTime = lastModified;
@@ -406,7 +347,7 @@ bool CSourceCollectionCacheTableBuilderCompBase::RemoveRowsDeletedSince(
 	}
 
 	imtbase::CComplexCollectionFilter changedFilter;
-	FillChangedFilter(changedFilter, lastSourceUpdateTime);
+	FillChangedFilter(changedFilter, *m_modificationTimeFieldAttrPtr, lastSourceUpdateTime);
 
 	imtcol::CDocumentCollectionFilter documentFilter;
 	documentFilter.AddDocumentState(imtcol::IDocumentCollectionFilter::DS_DISABLED);
@@ -445,7 +386,7 @@ bool CSourceCollectionCacheTableBuilderCompBase::RemoveRowsMissingFromSource(
 			return;
 		}
 
-		activeIds.insert(documentUuid.toByteArray(QUuid::WithoutBraces));
+		activeIds.insert(documentUuid.toString(QUuid::WithoutBraces));
 	};
 
 	if (*m_remoteSourcePageSizeAttrPtr > 0){
@@ -459,17 +400,23 @@ bool CSourceCollectionCacheTableBuilderCompBase::RemoveRowsMissingFromSource(
 					readError
 		);
 		if (!isRead){
-			// Deleting on the strength of a failed read would empty the table.
+			/**
+				Deleting on the strength of a failed read would empty the table.
+			*/
 			result.errorMessage = QStringLiteral("Unable to read the active rows of %1. Error: %2").arg(GetCacheTableName(), readError);
 
 			return false;
 		}
 	}
 	else{
-		// No filter parameters: the source returns its active rows only.
+		/**
+			No filter parameters: the source returns its active rows only.
+		*/
 		istd::TUniqueInterfacePtr<imtbase::IObjectCollectionIterator> iteratorPtr(m_sourceCollectionCompPtr->CreateObjectCollectionIterator());
 		if (!iteratorPtr.IsValid()){
-			// Deleting on the strength of a failed read would empty the table.
+			/**
+				Deleting on the strength of a failed read would empty the table.
+			*/
 			result.errorMessage = QStringLiteral("Unable to read the active rows of %1").arg(GetCacheTableName());
 
 			return false;
@@ -516,7 +463,9 @@ bool CSourceCollectionCacheTableBuilderCompBase::DeleteRowsById(
 			const QStringList& documentIds,
 			BuildResult& result) const
 {
-	// Ids are UUID text produced by QUuid or read back from a UUID column, so quoting them is enough.
+	/**
+		Ids are UUID text produced by QUuid or read back from a UUID column, so quoting them is enough.
+	*/
 	const QString quotedIds = QStringLiteral("'%1'").arg(documentIds.join(QStringLiteral("','")));
 	const QString removedCondition = QStringLiteral(R"(%1 IN (%2))")
 										 .arg(imtdb::QuoteIdentifier(GetObjectIdColumn()), quotedIds);
@@ -543,4 +492,81 @@ bool CSourceCollectionCacheTableBuilderCompBase::DeleteRowsById(
 }
 
 
+void CSourceCollectionCacheTableBuilderCompBase::FillChangedFilter(
+			imtbase::CComplexCollectionFilter& filter,
+			const QByteArray& modificationTimeField,
+			const QDateTime& since)
+{
+	if (!since.isValid()){
+		return;
+	}
+
+	/**
+		The time goes as ISO text, the only form the filter carries to a remote source besides numbers.
+	*/
+	filter.AddFieldFilter(imtbase::IComplexCollectionFilter::FieldFilter(modificationTimeField, since.toString(Qt::ISODateWithMs), imtbase::IComplexCollectionFilter::FO_GREATER));
+}
+
+
+void CSourceCollectionCacheTableBuilderCompBase::FillPageSorting(imtbase::CComplexCollectionFilter& filter) const
+{
+	imtbase::IComplexCollectionFilter::FieldMetaInfo sortInfo;
+	sortInfo.flags = imtbase::IComplexCollectionFilter::SO_SORT;
+	sortInfo.sortingOrder = imtbase::IComplexCollectionFilter::SO_ASC;
+
+	filter.SetFields({
+		imtbase::IComplexCollectionFilter::FieldInfo(*m_modificationTimeFieldAttrPtr, sortInfo),
+		imtbase::IComplexCollectionFilter::FieldInfo(*m_sourceIdFieldAttrPtr, sortInfo)
+	});
+}
+
+
+void CSourceCollectionCacheTableBuilderCompBase::FillAfterCursorFilter(
+			imtbase::CComplexCollectionFilter& filter,
+			const QString& cursorTime,
+			const QByteArray& cursorId) const
+{
+	if (cursorTime.isEmpty()){
+		return;
+	}
+
+	using Filter = imtbase::IComplexCollectionFilter;
+
+	const Filter::FieldFilter later(*m_modificationTimeFieldAttrPtr, cursorTime, Filter::FO_GREATER);
+	if (cursorId.isEmpty()){
+		filter.AddFieldFilter(later);
+
+		return;
+	}
+
+	Filter::FilterExpression sameTime;
+	sameTime.fieldFilters << Filter::FieldFilter(*m_modificationTimeFieldAttrPtr, cursorTime, Filter::FO_EQUAL);
+	sameTime.fieldFilters << Filter::FieldFilter(*m_sourceIdFieldAttrPtr, cursorId, Filter::FO_GREATER);
+
+	Filter::FilterExpression expression;
+	expression.logicalOperation = Filter::LO_OR;
+	expression.fieldFilters << later;
+	expression.filterExpressions << sameTime;
+
+	filter.SetFilterExpression(expression);
+}
+
+
+QDateTime CSourceCollectionCacheTableBuilderCompBase::GetRemoteModificationTime(const imtbase::IObjectCollectionIterator& iterator)
+{
+	const idoc::MetaInfoPtr metaInfoPtr = iterator.GetCollectionMetaInfo();
+	if (!metaInfoPtr.IsValid()){
+		return QDateTime();
+	}
+
+	const QDateTime time = metaInfoPtr->GetMetaInfo(imtbase::ICollectionInfo::MIT_LAST_OPERATION_TIME).toDateTime();
+
+	/**
+		The source keeps UTC without a zone, so the time is UTC whatever it came back tagged as.
+	*/
+	return time.isValid() ? QDateTime(time.date(), time.time(), QTimeZone::utc()) : QDateTime();
+}
+
+
 } // namespace imtcache
+

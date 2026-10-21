@@ -49,9 +49,6 @@ protected:
 	virtual void OnCacheUpdated(bool isOk, qint64 startedAtMs) override;
 
 private:
-	/// A cache that stays behind for this long has bigger problems than lost messages.
-	static constexpr int MAX_PENDING_MESSAGES = 5000;
-
 	struct PendingMessage
 	{
 		QByteArray commandId;
@@ -68,3 +65,4 @@ private:
 
 
 } // namespace imtcache
+

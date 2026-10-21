@@ -38,18 +38,26 @@ public:
 		bool wasFullRebuild = false;
 		int rowsWritten = 0;
 		int rowsDeleted = 0;
-		/// Newest source modification time covered by this run; stored as the next run's starting point.
+		/**
+			Newest source modification time covered by this run; stored as the next run's starting point.
+		*/
 		QDateTime lastSourceUpdateTime;
 		QString errorMessage;
 	};
 
-	/// Name of the cache table maintained by this builder.
+	/**
+		Name of the cache table maintained by this builder.
+	*/
 	virtual QString GetCacheTableName() const = 0;
 
-	/// Cache tables that must be up to date before this one can be built.
+	/**
+		Cache tables that must be up to date before this one can be built.
+	*/
 	virtual QStringList GetRequiredCacheTables() const = 0;
 
-	/// Rebuilds the table from scratch. Readers keep seeing the previous contents until it completes.
+	/**
+		Rebuilds the table from scratch. Readers keep seeing the previous contents until it completes.
+	*/
 	virtual BuildResult Rebuild(imtduckdb::IDuckConnection& connection) const = 0;
 
 	/**
@@ -61,3 +69,4 @@ public:
 
 
 } // namespace imtcache
+
