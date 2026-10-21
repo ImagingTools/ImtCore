@@ -460,9 +460,9 @@ Rectangle {
 		// Folded, the mark doubles as the control that unfolds the rail. The state
 		// has to be read off the panel and not off the mouse area alone: a disabled
 		// area keeps whatever containsMouse it had when it went quiet, which left
-		// the unfold arrow frozen in place after the first click.
-		readonly property bool brandHovered: menuPanel.collapsed
-			&& (brandArea.containsMouse || brandArea.activeFocus);
+		// the unfold arrow frozen in place after the first click. Not the focus: folding hands
+		// the focus here, which left the hint up beside the rail until the next click.
+		readonly property bool brandHovered: menuPanel.collapsed && brandArea.containsMouse;
 
 		// Held back until the rail is most of the way open - drawn any earlier the
 		// name is squeezed against the mark and reads as crawling out from under it.

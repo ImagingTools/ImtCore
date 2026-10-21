@@ -36,7 +36,7 @@ ViewBase {
 		? "/" + featureData.m_featureId : ""
 
 	Component.onCompleted: {
-		canEdit = PermissionsController.checkPermission("ChangeFeature")
+		canEdit = PermissionsController.checkPermission("/FeatureManagement/Edit/Change")
 		rebuildRequirementEntries()
 		CachedFeatureCollection.updateModel()
 		CachedFeatureCollection.modelUpdated.connect(featureEditor.onFeatureCollectionUpdated)
@@ -751,9 +751,11 @@ ViewBase {
 	function rootIdConflict(candidateId) {
 		if (!candidateId || candidateId === "" || !featureCollectionModel)
 			return false
+		let ownId = featureEditor.featureData ? String(featureEditor.featureData.m_id) : ""
 		for (let i = 0; i < featureCollectionModel.getItemsCount(); ++i) {
-			let id = featureCollectionModel.getData(FeatureItemTypeMetaInfo.s_featureId, i)
-			if (id === candidateId && candidateId !== featureEditor.featureId)
+			let id = String(featureCollectionModel.getData(FeatureItemTypeMetaInfo.s_featureId, i))
+			let elementId = String(featureCollectionModel.getData(FeatureItemTypeMetaInfo.s_id, i))
+			if (id === candidateId && (ownId === "" || elementId !== ownId))
 				return true
 		}
 		return false
@@ -885,7 +887,7 @@ ViewBase {
 			let p = pathsToAdd[i]
 			if (p === "" || paths.indexOf(p) >= 0)
 				continue
-			if (targetPath !== "" && p.indexOf(targetPath + "/") === 0)
+			if (targetPath !== "" && (p === targetPath || p.indexOf(targetPath + "/") === 0 || targetPath.indexOf(p + "/") === 0))
 				continue
 			paths.push(p)
 		}

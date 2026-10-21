@@ -3,6 +3,7 @@
 
 
 // ImtCore includes
+#include <imtauth/imtauth.h>
 #include <imtauth/IUserInfo.h>
 #include <imtauth/ITenantMembership.h>
 #include <imtgql/IGqlContext.h>
@@ -10,6 +11,30 @@
 
 namespace imtauthgql
 {
+
+
+QByteArrayList GetEditOrganizationPermissions()
+{
+	return {s_changeOrganizationNamePermission, s_changeOrganizationDescriptionPermission};
+}
+
+
+QByteArrayList GetEditOrganizationMemberPermissions()
+{
+	return {s_inviteOrganizationMemberPermission, s_excludeOrganizationMemberPermission, s_changeOrganizationMemberRolePermission};
+}
+
+
+bool HasAnyOrganizationPermission(const QByteArrayList& heldPermissions, const QByteArrayList& requestedPermissions)
+{
+	for (const QByteArray& requestedPermission : requestedPermissions){
+		if (imtauth::HasPermission(heldPermissions, requestedPermission)){
+			return true;
+		}
+	}
+
+	return false;
+}
 
 
 bool HasTenantIsolationAccess(
@@ -67,7 +92,7 @@ bool HasTenantManageAccess(
 			const imtauth::ITenantMembershipManager* membershipManagerPtr,
 			const imtgql::CGqlRequest& gqlRequest,
 			const QByteArray& tenantId,
-			const QByteArray& requiredOrgPermission,
+			const QByteArrayList& requiredOrgPermissions,
 			QString& errorMessage)
 {
 	const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
@@ -103,9 +128,9 @@ bool HasTenantManageAccess(
 		return true;
 	}
 
-	if (!requiredOrgPermission.isEmpty() && membershipManagerPtr != nullptr){
+	if (!requiredOrgPermissions.isEmpty() && membershipManagerPtr != nullptr){
 		imtauth::ITenantMembershipUniquePtr msPtr = membershipManagerPtr->FindMembership(userId, tenantId);
-		if (msPtr.IsValid() && msPtr->IsActive() && msPtr->GetOrganizationPermissions().contains(requiredOrgPermission)){
+		if (msPtr.IsValid() && msPtr->IsActive() && HasAnyOrganizationPermission(msPtr->GetOrganizationPermissions(), requiredOrgPermissions)){
 			return true;
 		}
 	}

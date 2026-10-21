@@ -649,13 +649,31 @@ Rectangle {
 	}
 
 
-	// Rows fill their cells within a time slice per tick; the rest wait for the next tick,
-	// so a page of rows paints progressively instead of freezing until the last one is built.
+	// Rows in the viewport fill their cells at once. The others fill within a time slice per tick and the rest
+	// wait in one queue, top row first, so a page of rows paints progressively instead of freezing.
 	property string lastWidthSignature: "";
 	property real rowFillSliceStart: 0;
 	property int rowFillSliceMs: 40;
+	property var pendingFillRows: [];
 
-	function takeRowFillSlice(){
+	function rowFillIndex(rowViewer){
+		return rowViewer.rowDelegate && rowViewer.rowDelegate.rowIndex !== undefined ? rowViewer.rowDelegate.rowIndex : -1;
+	}
+
+	// From the row index rather than the row's position: a row being built is not positioned yet.
+	function rowIsInViewport(rowViewer){
+		let rowIndex = tableContainer.rowFillIndex(rowViewer);
+		if (rowIndex < 0 || tableContainer.itemHeight <= 0){
+			return false;
+		}
+
+		let rowTop = rowIndex * tableContainer.itemHeight;
+		let viewTop = elementsListObj.contentY - elementsListObj.originY;
+
+		return rowTop + tableContainer.itemHeight > viewTop && rowTop < viewTop + elementsListObj.height;
+	}
+
+	function rowFillSliceLeft(){
 		let now = Date.now();
 		if (tableContainer.rowFillSliceStart === 0){
 			tableContainer.rowFillSliceStart = now;
@@ -667,11 +685,82 @@ Rectangle {
 		return now - tableContainer.rowFillSliceStart < tableContainer.rowFillSliceMs;
 	}
 
+	// False queues the row: the table fills it later through fillRowCells().
+	function takeRowFillSlice(rowViewer){
+		if (tableContainer.rowIsInViewport(rowViewer) || tableContainer.rowFillSliceLeft()){
+			return true;
+		}
+
+		let queue = tableContainer.pendingFillRows;
+		if (queue.indexOf(rowViewer) < 0){
+			let rowIndex = tableContainer.rowFillIndex(rowViewer);
+			let position = queue.length;
+			while (position > 0 && tableContainer.rowFillIndex(queue[position - 1]) > rowIndex){
+				position--;
+			}
+
+			queue.splice(position, 0, rowViewer);
+		}
+
+		if (!rowFillQueueTimer.running){
+			rowFillQueueTimer.start();
+		}
+
+		return false;
+	}
+
+	function cancelRowFill(rowViewer){
+		let index = tableContainer.pendingFillRows.indexOf(rowViewer);
+		if (index >= 0){
+			tableContainer.pendingFillRows.splice(index, 1);
+		}
+	}
+
+	// Always fills the first row, so a slice too short for any row still makes progress.
+	function fillPendingRows(){
+		let queue = tableContainer.pendingFillRows;
+		tableContainer.pendingFillRows = [];
+
+		let start = Date.now();
+		for (let i = 0; i < queue.length; i++){
+			if (i > 0 && Date.now() - start >= tableContainer.rowFillSliceMs && !tableContainer.rowIsInViewport(queue[i])){
+				tableContainer.pendingFillRows.push(queue[i]);
+				continue;
+			}
+
+			queue[i].fillRowCells();
+		}
+
+		if (tableContainer.pendingFillRows.length === 0){
+			rowFillQueueTimer.stop();
+		}
+	}
+
 	Timer {
 		id: rowFillSliceTimer;
 		interval: 0;
 		onTriggered: {
 			tableContainer.rowFillSliceStart = 0;
+		}
+	}
+
+	// One timer for the table instead of one per waiting row. Not 0: Qt never fires a repeating Timer with a zero interval.
+	Timer {
+		id: rowFillQueueTimer;
+		interval: 1;
+		repeat: true;
+		onTriggered: {
+			tableContainer.fillPendingRows();
+		}
+	}
+
+	Timer {
+		id: listWidthTimer;
+		interval: 0;
+		onTriggered: {
+			if (tableContainer.visible){
+				tableContainer.setWidth();
+			}
 		}
 	}
 
@@ -892,11 +981,10 @@ Rectangle {
 
 		// Columns are sized from this list's width, which also changes without the table's (the vertical
 		// scrollbar showing or hiding, anchors settling after the table resized). Rows sized to a stale width
-		// left a horizontal scrollbar that never went away.
+		// left a horizontal scrollbar that never went away. On the next tick: resizing the columns inside this
+		// change shows or hides the scrollbars, which change this width again - a binding loop.
 		onWidthChanged: {
-			if (tableContainer.visible){
-				tableContainer.setWidth();
-			}
+			listWidthTimer.restart();
 		}
 
 		onContentYChanged: {

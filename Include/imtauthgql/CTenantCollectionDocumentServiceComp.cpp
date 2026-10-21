@@ -13,6 +13,7 @@
 #include <imtgql/IGqlContext.h>
 #include <imtdoc/CDocumentSavedEvent.h>
 #include <imtauth/imtauth.h>
+#include <imtauthgql/TenantAccess.h>
 
 
 namespace
@@ -34,18 +35,6 @@ namespace
 		default:
 			return QStringLiteral("Pending");
 	}
-}
-
-
-bool HasAnyPermission(const QByteArrayList& userPermissions, const QByteArrayList& requiredPermissions)
-{
-	for (const QByteArray& permissionId : requiredPermissions){
-		if (imtauth::HasPermission(userPermissions, permissionId)){
-			return true;
-		}
-	}
-
-	return false;
 }
 
 
@@ -393,24 +382,17 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceCom
 		if (membershipPtr.IsValid() && membershipPtr->IsActive()){
 			isMember = true;
 			// isAdmin now based on having key org permission (replacing env role)
-		QByteArrayList orgP = membershipPtr->GetOrganizationPermissions();
-		isAdmin = isOwner || isCreator || orgP.contains("EditOrganizationMember") || orgP.contains("InviteOrganizationMember");
+		isAdmin = isOwner || isCreator || HasAnyOrganizationPermission(membershipPtr->GetOrganizationPermissions(), GetEditOrganizationMemberPermissions());
 		}
 	}
 	bool isNewTenant = tenantId.isEmpty();
 
-	const bool canChangeOrganizationName = isSystemAdmin || HasAnyPermission(effectiveUserPermissions,
-		QByteArrayList() << QByteArrayLiteral("ChangeOrganizationName") << QByteArrayLiteral("EditOrganization"));
-	const bool canChangeOrganizationDescription = isSystemAdmin || HasAnyPermission(effectiveUserPermissions,
-		QByteArrayList() << QByteArrayLiteral("ChangeOrganizationDescription") << QByteArrayLiteral("EditOrganization"));
-	const bool canChangeOrganizationState = isSystemAdmin || HasAnyPermission(effectiveUserPermissions,
-		QByteArrayList() << QByteArrayLiteral("EditOrganization"));
-	const bool canInviteOrganizationMember = isSystemAdmin || HasAnyPermission(effectiveUserPermissions,
-		QByteArrayList() << QByteArrayLiteral("InviteOrganizationMember") << QByteArrayLiteral("EditOrganizationMember"));
-	const bool canExcludeOrganizationMember = isSystemAdmin || HasAnyPermission(effectiveUserPermissions,
-		QByteArrayList() << QByteArrayLiteral("ExcludeOrganizationMember") << QByteArrayLiteral("EditOrganizationMember"));
-	const bool canChangeOrganizationMemberRole = isSystemAdmin || HasAnyPermission(effectiveUserPermissions,
-		QByteArrayList() << QByteArrayLiteral("ChangeOrganizationMemberRole") << QByteArrayLiteral("EditOrganizationMember"));
+	const bool canChangeOrganizationName = isSystemAdmin || HasAnyOrganizationPermission(effectiveUserPermissions, {s_changeOrganizationNamePermission});
+	const bool canChangeOrganizationDescription = isSystemAdmin || HasAnyOrganizationPermission(effectiveUserPermissions, {s_changeOrganizationDescriptionPermission});
+	const bool canChangeOrganizationState = isSystemAdmin || HasAnyOrganizationPermission(effectiveUserPermissions, GetEditOrganizationPermissions());
+	const bool canInviteOrganizationMember = isSystemAdmin || HasAnyOrganizationPermission(effectiveUserPermissions, {s_inviteOrganizationMemberPermission});
+	const bool canExcludeOrganizationMember = isSystemAdmin || HasAnyOrganizationPermission(effectiveUserPermissions, {s_excludeOrganizationMemberPermission});
+	const bool canChangeOrganizationMemberRole = isSystemAdmin || HasAnyOrganizationPermission(effectiveUserPermissions, {s_changeOrganizationMemberRolePermission});
 
 	// Block updates from non-members (e.g., invited users who haven't accepted yet)
 	if (!isNewTenant && !isOwner && !isCreator && !isMember){
@@ -422,12 +404,12 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceCom
 	const bool hasActiveChange = tenantData.isActive && (*tenantData.isActive != tenantPtr->IsActive());
 
 	if (hasNameChange && !isNewTenant && !isCreator && !isOwner && !canChangeOrganizationName){
-		errorMessage = QStringLiteral("Permission denied: ChangeOrganizationName");
+		errorMessage = QStringLiteral("Permission denied: /OrganizationManagement/Edit/ChangeName");
 		return response;
 	}
 
 	if (hasDescriptionChange && !isNewTenant && !isCreator && !isOwner && !canChangeOrganizationDescription){
-		errorMessage = QStringLiteral("Permission denied: ChangeOrganizationDescription");
+		errorMessage = QStringLiteral("Permission denied: /OrganizationManagement/Edit/ChangeDescription");
 		return response;
 	}
 
@@ -526,12 +508,12 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceCom
 		}
 
 		if (removesOthers && !isCreator && !isOwner && !isAdmin && !canExcludeOrganizationMember){
-			errorMessage = QStringLiteral("Permission denied: ExcludeOrganizationMember");
+			errorMessage = QStringLiteral("Permission denied: /OrganizationManagement/Members/Edit/Exclude");
 			return response;
 		}
 
 		if (!addedUserIds.isEmpty() && !isCreator && !isOwner && !isAdmin && !canInviteOrganizationMember){
-			errorMessage = QStringLiteral("Permission denied: InviteOrganizationMember");
+			errorMessage = QStringLiteral("Permission denied: /OrganizationManagement/Members/Edit/Invite");
 			return response;
 		}
 

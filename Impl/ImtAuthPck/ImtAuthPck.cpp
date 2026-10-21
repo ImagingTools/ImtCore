@@ -46,11 +46,6 @@ I_EXPORT_COMPONENT(
 			"Role Collection Adapter");
 
 I_EXPORT_COMPONENT(
-			PermissionPathMigration,
-			"Rewrites permissions stored by feature id as full feature paths",
-			"Permission Path Migration");
-
-I_EXPORT_COMPONENT(
 			UserCollectionAdapter,
 			"Adapting the collection to the provider",
 			"User Collection Adapter");
@@ -184,6 +179,41 @@ I_EXPORT_COMPONENT(
 			PersonalAccessTokenMetaInfoCreator,
 			"Personal access token meta info creator",
 			"Personal Access Token Meta Info Creator");
+
+I_EXPORT_COMPONENT(
+			ExternalIdentity,
+			"Link between an external provider account and a user",
+			"External Identity OIDC");
+
+I_EXPORT_COMPONENT(
+			ExternalIdentityManager,
+			"Manager of the links between external provider accounts and users",
+			"External Identity Manager OIDC");
+
+I_EXPORT_COMPONENT(
+			ExternalLoginController,
+			"Sign-in with external identity providers (OAuth 2.0 / OpenID Connect)",
+			"External Login Controller OIDC Google Apple Facebook");
+
+I_EXPORT_COMPONENT(
+			GoogleOidcProvider,
+			"Sign in with Google",
+			"Google OIDC Provider");
+
+I_EXPORT_COMPONENT(
+			AppleOidcProvider,
+			"Sign in with Apple",
+			"Apple OIDC Provider");
+
+I_EXPORT_COMPONENT(
+			FacebookOidcProvider,
+			"Continue with Facebook",
+			"Facebook OAuth Provider");
+
+I_EXPORT_COMPONENT(
+			GenericOidcProvider,
+			"Sign-in with any OpenID Connect or OAuth 2.0 provider",
+			"Generic OIDC Provider");
 
 I_EXPORT_COMPONENT(
 			TenantInfo,

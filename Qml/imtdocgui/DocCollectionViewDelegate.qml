@@ -10,6 +10,8 @@ CollectionViewCommandsDelegateBase{
 	
 	property DocumentServiceBase documentManager: null
 	property string documentManagerId: collectionId
+	// Permission area of the revisions of the collection, e.g. "/SensorManagement/Revisions".
+	property string revisionsPermissionPath: ""
 
 	property var documentConfigs: ({})
 
@@ -293,6 +295,7 @@ CollectionViewCommandsDelegateBase{
 		id: documentRevisionDialogComp;
 		DocumentRevisionDialog {
 			collectionId: commandsDelegate.collectionId
+			revisionsPermissionPath: commandsDelegate.revisionsPermissionPath
 		}
 	}
 }

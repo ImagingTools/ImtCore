@@ -3,6 +3,7 @@
 
 // ImtCore includes
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/DocumentRevision.h>
+#include <imtservergql/imtservergql.h>
 
 
 namespace imtclientgql
@@ -81,6 +82,30 @@ bool CRemoteDocumentRevisionControllerComp::IsRequestSupported(const imtgql::CGq
 	return m_collectionIdsAttrPtr.FindValue(collectionId) >= 0;
 }
 
+
+// reimplemented (imtservergql::CPermissibleGqlRequestHandlerComp)
+
+bool CRemoteDocumentRevisionControllerComp::CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& /*errorMessage*/) const
+{
+	QByteArrayList collectionIds;
+	for (int i = 0; i < m_collectionIdsAttrPtr.GetCount(); ++i){
+		collectionIds.append(m_collectionIdsAttrPtr[i]);
+	}
+
+	QByteArrayList revisionPermissionPaths;
+	for (int i = 0; i < m_revisionPermissionPathsAttrPtr.GetCount(); ++i){
+		revisionPermissionPaths.append(m_revisionPermissionPathsAttrPtr[i]);
+	}
+
+	QString refusalReason;
+	if (imtservergql::CheckRevisionPermissions(gqlRequest, collectionIds, revisionPermissionPaths, refusalReason)){
+		return true;
+	}
+
+	SendWarningMessage(0, QStringLiteral("Command '%1' refused: %2").arg(QString::fromUtf8(gqlRequest.GetCommandId()), refusalReason));
+
+	return false;
+}
 
 } // namespace imtclientgql
 

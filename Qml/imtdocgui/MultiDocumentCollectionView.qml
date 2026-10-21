@@ -220,12 +220,23 @@ Item {
 		}
 	}
 
+	// Next tick: setting paths delivers a pending path, which must not add a tab while the collection tab is being inserted.
+	Timer {
+		id: pathsUpdateTimer
+		interval: 0
+		onTriggered: {
+			if (workspaceView.documentManager){
+				navigableItem.paths = workspaceView.documentManager.getSupportedDocumentTypeIds()
+			}
+		}
+	}
+
 	Connections {
 		id: connections
 		target: workspaceView.documentManager
 
 		function onDocumentViewRegistered(documentTypeId, viewTypeId){
-			navigableItem.paths = target.getSupportedDocumentTypeIds()
+			pathsUpdateTimer.restart()
 		}
 
 		function onRequestDocumentName(documentId, documentTypeId){
@@ -470,8 +481,9 @@ Item {
 			workspaceView.startLoading(documentId)
 		}
 
+		// A representation update that follows starts the indicator again; waiting for it left it on when none came.
 		function onUndoDone(documentId){
-			// loading.stop()
+			workspaceView.stopLoading(documentId)
 		}
 
 		function onUndoFailed(documentId, message){
@@ -487,7 +499,7 @@ Item {
 		}
 
 		function onRedoDone(documentId){
-			// loading.stop()
+			workspaceView.stopLoading(documentId)
 		}
 
 		function onRedoFailed(documentId, message){

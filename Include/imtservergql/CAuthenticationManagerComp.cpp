@@ -17,6 +17,7 @@
 
 // ImtCore includes
 #include <imtbase/imtbase.h>
+#include <imtauth/imtauth.h>
 #include <imtauth/IUserSettings.h>
 #include <imtgql/CGqlRequestContextManager.h>
 
@@ -44,7 +45,12 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 	}
 
 	const QByteArray token = headers.value(imtbase::s_authenticationTokenHeaderId);
-	const QByteArray productId = headers.value(imtbase::s_productIdHeaderId);
+
+	// A server of one product checks its own permissions whatever product the client names.
+	QByteArray productId = m_productInfoCompPtr.IsValid() ? m_productInfoCompPtr->GetProductId() : QByteArray();
+	if (productId.isEmpty()){
+		productId = headers.value(imtbase::s_productIdHeaderId);
+	}
 	QByteArray resolvedUserId;
 	QByteArray tenantId;
 	QByteArrayList scopes;
@@ -91,15 +97,21 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 	// uncached GetTenant() round-trip - the exact flood seen after SelectTenant.
 	if (m_tenantManagerCompPtr.IsValid() && !tenantId.isEmpty() && !resolvedUserId.isEmpty()){
 		bool isTenantOwner = false;
-		if (!TryGetCachedTenantOwnership(token, isTenantOwner)){
+		QByteArrayList tenantPermissions;
+		if (!TryGetCachedTenantOwnership(token, isTenantOwner, tenantPermissions)){
 			imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
-			isTenantOwner = tenantPtr.IsValid() && tenantPtr->GetOwnerId() == resolvedUserId;
-			StoreCachedTenantOwnership(token, isTenantOwner);
+			if (tenantPtr.IsValid()){
+				isTenantOwner = tenantPtr->GetOwnerId() == resolvedUserId;
+				tenantPermissions = tenantPtr->GetTenantPermissions();
+			}
+			StoreCachedTenantOwnership(token, isTenantOwner, tenantPermissions);
 		}
 
 		if (isTenantOwner){
 			gqlContextPtr->SetIsTenantOwner(true);
 		}
+
+		gqlContextPtr->SetTenantPermissions(tenantPermissions);
 	}
 
 	if (m_userCollectionCompPtr.IsValid() && !resolvedUserId.isEmpty()){
@@ -130,10 +142,9 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 			// actually reads - report exactly that intersection. An empty scope list
 			// yields zero permissions (fail closed), not the full unrestricted user.
 			imtauth::IUserInfo::FeatureIds fullPermissions = userInfoPtr->GetPermissions(productId);
-			QSet<QByteArray> scopeSet(scopes.begin(), scopes.end());
 			imtauth::IUserInfo::FeatureIds effectivePermissions;
 			for (const QByteArray& perm : fullPermissions){
-				if (scopeSet.contains(perm)){
+				if (imtauth::HasPermission(scopes, perm, false)){
 					effectivePermissions.append(perm);
 				}
 			}
@@ -783,7 +794,7 @@ void CAuthenticationManagerComp::InvalidateTokenCache(const QByteArray& token) c
 }
 
 
-bool CAuthenticationManagerComp::TryGetCachedTenantOwnership(const QByteArray& token, bool& isTenantOwner) const
+bool CAuthenticationManagerComp::TryGetCachedTenantOwnership(const QByteArray& token, bool& isTenantOwner, QByteArrayList& tenantPermissions) const
 {
 	QMutexLocker cacheLocker(&m_tokenCacheMutex);
 	auto iter = m_tokenCache.find(token);
@@ -792,11 +803,12 @@ bool CAuthenticationManagerComp::TryGetCachedTenantOwnership(const QByteArray& t
 	}
 
 	isTenantOwner = iter->isTenantOwner;
+	tenantPermissions = iter->tenantPermissions;
 	return true;
 }
 
 
-void CAuthenticationManagerComp::StoreCachedTenantOwnership(const QByteArray& token, bool isTenantOwner) const
+void CAuthenticationManagerComp::StoreCachedTenantOwnership(const QByteArray& token, bool isTenantOwner, const QByteArrayList& tenantPermissions) const
 {
 	QMutexLocker cacheLocker(&m_tokenCacheMutex);
 	auto iter = m_tokenCache.find(token);
@@ -809,6 +821,7 @@ void CAuthenticationManagerComp::StoreCachedTenantOwnership(const QByteArray& to
 	}
 
 	iter->isTenantOwner = isTenantOwner;
+	iter->tenantPermissions = tenantPermissions;
 	iter->tenantOwnershipResolved = true;
 }
 

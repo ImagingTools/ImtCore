@@ -38,6 +38,8 @@ Rectangle {
 	Component.onCompleted: {
 		decoratorPause.start();
 
+		AuthorizationController.loadExternalLoginProviders();
+
 		authPageContainer.state = "unauthorized";
 		authPageContainer.isAuthenticating = false;
 
@@ -161,8 +163,8 @@ Rectangle {
 				width: loginContainer.width;
 				height: Math.max(80, welcomeText.implicitHeight + 56);
 
-				color: loginContainer.color;
-				radius: loginContainer.radius;
+				// The card paints the background; an opaque header hid the card border along its sides.
+				color: "transparent";
 
 				Text {
 					id: welcomeText;
@@ -416,8 +418,10 @@ Rectangle {
 						objectName: "LoginButton"
 						anchors.horizontalCenter: parent.horizontalCenter;
 
-						width: Style.buttonWidthXXL;
-						height: Style.controlHeightM;
+						// Full width and primary next to the full-width provider buttons.
+						width: externalLoginItem.visible ? parent.width : Style.buttonWidthXXL;
+						height: externalLoginItem.visible ? Style.controlHeightL : Style.controlHeightM;
+						variant: externalLoginItem.visible ? "primary" : "default";
 
 						enabled: !authPageContainer.isAuthenticating && loginTextInput.text != "" && passwordTextInput.text != "";
 
@@ -445,6 +449,131 @@ Rectangle {
 					}
 				}
 			}// buttonItem
+
+			// Sign-in with external accounts, shown only when the server offers providers.
+			Item {
+				id: externalLoginItem;
+
+				width: parent.width;
+				height: externalLoginColumn.height;
+				visible: AuthorizationController.externalLoginEnabled && AuthorizationController.externalLoginProviders.length > 0;
+
+				Column {
+					id: externalLoginColumn;
+
+					width: parent.width;
+					spacing: Style.marginM;
+
+					Item {
+						id: externalLoginSeparator;
+
+						width: parent.width;
+						height: externalLoginSeparatorText.height;
+
+						Rectangle {
+							anchors.left: parent.left;
+							anchors.right: externalLoginSeparatorText.left;
+							anchors.rightMargin: Style.marginM;
+							anchors.verticalCenter: parent.verticalCenter;
+
+							height: 1;
+							color: Style.borderColor;
+						}
+
+						Text {
+							id: externalLoginSeparatorText;
+
+							anchors.horizontalCenter: parent.horizontalCenter;
+
+							color: Style.inactiveTextColor;
+							font.family: Style.fontFamily;
+							font.pixelSize: Style.fontSizeS;
+
+							text: qsTr("or continue with");
+						}
+
+						Rectangle {
+							anchors.left: externalLoginSeparatorText.right;
+							anchors.leftMargin: Style.marginM;
+							anchors.right: parent.right;
+							anchors.verticalCenter: parent.verticalCenter;
+
+							height: 1;
+							color: Style.borderColor;
+						}
+					}
+
+					Column {
+						id: externalLoginButtonsColumn;
+
+						width: parent.width;
+						spacing: Style.marginM;
+
+						Repeater {
+							id: externalLoginProviderRepeater;
+
+							model: AuthorizationController.externalLoginProviders;
+
+							delegate: ExternalLoginButton {
+								objectName: "ExternalLoginButton_" + String(modelData.id);
+
+								width: externalLoginButtonsColumn.width;
+
+								providerName: String(modelData.name);
+								providerType: String(modelData.type);
+								loading: AuthorizationController.externalLoginInProgress && AuthorizationController.externalLoginProviderId === String(modelData.id);
+								enabled: !authPageContainer.isAuthenticating && !AuthorizationController.externalLoginInProgress;
+
+								onClicked: {
+									AuthorizationController.loginWithExternalProvider(String(modelData.id));
+								}
+							}
+						}
+					}
+
+					Text {
+						id: externalLoginWaitingText;
+						objectName: "ExternalLoginWaitingText"
+
+						width: parent.width;
+						visible: AuthorizationController.externalLoginInProgress;
+
+						color: Style.textColor;
+						font.family: Style.fontFamily;
+						font.pixelSize: Style.fontSizeM;
+						horizontalAlignment: Text.AlignHCenter;
+						wrapMode: Text.WordWrap;
+
+						text: qsTr("Complete the sign-in in the browser window that has opened.");
+					}
+
+					Text {
+						id: externalLoginCancelText;
+
+						anchors.horizontalCenter: parent.horizontalCenter;
+						visible: AuthorizationController.externalLoginInProgress;
+
+						color: Style.linkColor;
+						font.family: Style.fontFamilyBold;
+						font.pixelSize: Style.fontSizeM;
+						font.underline: true;
+
+						text: qsTr("Cancel");
+
+						MouseArea {
+							objectName: "ExternalLoginCancel"
+
+							anchors.fill: parent;
+							cursorShape: Qt.PointingHandCursor;
+							hoverEnabled: true;
+
+							onClicked: {
+								AuthorizationController.cancelExternalLogin();
+							}
+						}
+					}
+				}
+			}
 
 			// Register link placed below the main button - cleaner modern pattern
 			// (less clutter above the primary action).

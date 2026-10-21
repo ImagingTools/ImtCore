@@ -4682,7 +4682,7 @@
 
 **Свойства**
 
-- `rowDelegate: TableRowDelegateBase`
+- `rowDelegate: var`
 - `table: var`
 - `columnCount: int`
 - `rowCount: int`
@@ -4781,7 +4781,7 @@
 
 **Свойства**
 
-- `rowDelegate: TableRowDelegateBase`
+- `rowDelegate: var`
 - `columnIndex: int`
 
 <a id="b-imtcontrols-TableCellTextDelegate"></a>

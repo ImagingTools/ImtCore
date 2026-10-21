@@ -284,9 +284,8 @@
                                 <AttributeInfo Id="ClosePermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>RemoveTenant</Value>
-                                            <Value>ChangeTenant</Value>
-                                            <Value>ViewTenants</Value>
+                                            <Value>/OrganizationManagement/Remove</Value>
+                                            <Value>/OrganizationManagement/View</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -296,18 +295,18 @@
                                 <AttributeInfo Id="RedoPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>AddTenant</Value>
-                                            <Value>RemoveTenant</Value>
-                                            <Value>ChangeTenant</Value>
+                                            <Value>/OrganizationManagement/Add</Value>
+                                            <Value>/OrganizationManagement/Remove</Value>
+                                            <Value>/OrganizationManagement/View</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
                                 <AttributeInfo Id="SavePermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>AddTenant</Value>
-                                            <Value>RemoveTenant</Value>
-                                            <Value>ChangeTenant</Value>
+                                            <Value>/OrganizationManagement/Add</Value>
+                                            <Value>/OrganizationManagement/Remove</Value>
+                                            <Value>/OrganizationManagement/View</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -323,9 +322,9 @@
                                 <AttributeInfo Id="UndoPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>AddTenant</Value>
-                                            <Value>RemoveTenant</Value>
-                                            <Value>ChangeTenant</Value>
+                                            <Value>/OrganizationManagement/Add</Value>
+                                            <Value>/OrganizationManagement/Remove</Value>
+                                            <Value>/OrganizationManagement/View</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -351,8 +350,7 @@
                                 <AttributeInfo Id="EditPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>ViewTenants</Value>
-                                            <Value>ChangeTenant</Value>
+                                            <Value>/OrganizationManagement/View</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -365,14 +363,14 @@
                                 <AttributeInfo Id="NewPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>AddTenant</Value>
+                                            <Value>/OrganizationManagement/Add</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
                                 <AttributeInfo Id="RemovePermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>RemoveTenant</Value>
+                                            <Value>/OrganizationManagement/Remove</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -394,7 +392,7 @@
                                 <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>ViewTenants</Value>
+                                            <Value>/OrganizationManagement/View</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -431,7 +429,7 @@
                                 <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>ViewTenants</Value>
+                                            <Value>/OrganizationManagement/View</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>

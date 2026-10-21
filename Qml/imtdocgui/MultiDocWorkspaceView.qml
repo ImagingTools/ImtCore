@@ -91,16 +91,27 @@ Item {
 		}
 	}
 
+	// Next tick: setting paths delivers a pending path, which must wait for the data controller and the collection tab.
+	Timer {
+		id: pathsUpdateTimer
+		interval: 0
+		onTriggered: {
+			if (workspaceView.documentManager){
+				navigableItem.paths = workspaceView.documentManager.getSupportedDocumentTypeIds()
+			}
+		}
+	}
+
 	Connections {
 		id: connections
 		target: workspaceView.documentManager
-		
+
 		function onTypeIdChanged(){
 			navigableItem.parentSegment = target.typeId
 		}
 		
 		function onDocumentTypeIdRegistered(documentTypeId){
-			navigableItem.paths = target.getSupportedDocumentTypeIds()
+			pathsUpdateTimer.restart()
 		}
 
 		function onDocumentSaved(documentId){

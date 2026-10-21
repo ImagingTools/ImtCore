@@ -41,6 +41,7 @@ public:
 		I_ASSIGN(m_superuserProviderCompPtr, "SuperuserProvider", "Optional reference used to fold the superuser-exists status into the response (replaces a separate CheckSuperuserExists call)", false, "SuperuserProvider");
 		I_ASSIGN(m_databaseConnectionCheckerCompPtr, "DatabaseConnectionChecker", "Optional database connectivity check performed before the superuser lookup", false, "DatabaseConnectionChecker");
 		I_ASSIGN(m_tenantsEnabledAttrPtr, "TenantsEnabled", "Whether the application uses tenants (organizations); clients skip all tenant requests when disabled", true, false);
+		I_ASSIGN(m_externalLoginEnabledAttrPtr, "ExternalLoginEnabled", "Whether the client offers sign-in with external accounts (Google, Apple, Facebook, ...) configured on the authorization server", true, false);
 	I_END_COMPONENT;
 
 protected:
@@ -63,6 +64,7 @@ protected:
 	I_REF(imtauth::ISuperuserProvider, m_superuserProviderCompPtr);
 	I_REF(imtdb::IDatabaseServerConnectionChecker, m_databaseConnectionCheckerCompPtr);
 	I_ATTR(bool, m_tenantsEnabledAttrPtr);
+	I_ATTR(bool, m_externalLoginEnabledAttrPtr);
 };
 
 

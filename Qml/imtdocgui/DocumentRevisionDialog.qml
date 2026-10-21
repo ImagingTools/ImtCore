@@ -24,14 +24,16 @@ Dialog {
 
 	property string collectionId;
 	property string documentId;
+	// Permission area of the revisions of the collection, e.g. "/SensorManagement/Revisions".
+	property string revisionsPermissionPath: ""
 	property int selectedRevision: -1;
 
 	Component.onCompleted: {
-		if (PermissionsController.checkPermission("RestoreRevision")){
+		if (PermissionsController.checkPermission(documentRevisionDialog.revisionsPermissionPath + "/Restore")){
 			addButton(Enums.save, qsTr("Set this revision"), false)
 		}
 
-		if (PermissionsController.checkPermission("DeleteRevision")){
+		if (PermissionsController.checkPermission(documentRevisionDialog.revisionsPermissionPath + "/Delete")){
 			addButton(Enums.no, qsTr("Delete revision"), false)
 		}
 
@@ -182,6 +184,7 @@ Dialog {
 				anchors.margins: Style.marginL;
 				documentId: documentRevisionDialog.documentId;
 				collectionId: documentRevisionDialog.collectionId;
+				revisionsPermissionPath: documentRevisionDialog.revisionsPermissionPath;
 				selectable: true;
 				selectedRevision: documentRevisionDialog.selectedRevision;
 

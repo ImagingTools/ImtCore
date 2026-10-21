@@ -121,6 +121,7 @@ Item {
 				internal.errorDescription = qsTr("The application is paused until the connection is back. The open pages stay as they are.")
 				internal.retryVisible = true
 				internal.loadingVisible = false
+				ModalDialogManager.onServerConnectionError();
 				Events.sendEvent("ServerConnectionError");
 			}
 			else if (totalStatus == status.CONNECTION_SUCCESFUL){

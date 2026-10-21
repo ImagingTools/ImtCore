@@ -27,10 +27,10 @@ SimpleCollectionPage {
 
 	dataProvider: relationshipsPage.apiClient ? relationshipsPage.apiClient.tenantRelationshipsListDataProvider : null
 	customEditorComponent: relationshipEditorComp
-	managePermissionIds: ["EditOrganizationConnection", "ConnectOrganization", "RemoveOrganizationConnection"]
-	createPermissionIds: ["ConnectOrganization", "EditOrganizationConnection"]
-	editPermissionIds: ["EditOrganizationConnection", "ConnectOrganization"]
-	deletePermissionIds: ["RemoveOrganizationConnection", "EditOrganizationConnection"]
+	managePermissionIds: ["/OrganizationManagement/Connections/Edit/Connect", "/OrganizationManagement/Connections/Edit/Remove"]
+	createPermissionIds: ["/OrganizationManagement/Connections/Edit/Connect"]
+	editPermissionIds: ["/OrganizationManagement/Connections/Edit/Connect"]
+	deletePermissionIds: ["/OrganizationManagement/Connections/Edit/Remove"]
 
 	delegateComponent: Component {
 		SimpleCollectionItemDelegateBase {

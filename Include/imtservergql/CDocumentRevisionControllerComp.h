@@ -20,6 +20,7 @@ public:
 
 	I_BEGIN_COMPONENT(CDocumentRevisionControllerComp);
 		I_ASSIGN_MULTI_0(m_collectionIdsAttrPtr, "CollectionIds", "Collection ID-s", false);
+		I_ASSIGN_MULTI_0(m_revisionPermissionPathsAttrPtr, "RevisionPermissionPaths", "Permission area of the revisions of each collection, in the order of CollectionIds", false);
 		I_ASSIGN_MULTI_0(m_objectCollectionsCompPtr, "ObjectCollections", "Object collections", false);
 		I_ASSIGN_MULTI_0(m_documentChangeGeneratorsCompPtr, "DocumentChangeGenerators", "Document change generators", false);
 	I_END_COMPONENT;
@@ -39,8 +40,12 @@ protected:
 	// reimplemented (imtgql::IGqlRequestHandler)
 	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
 
+	// reimplemented (imtservergql::CPermissibleGqlRequestHandlerComp)
+	virtual bool CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+
 protected:
 	I_MULTIATTR(QByteArray, m_collectionIdsAttrPtr);
+	I_MULTIATTR(QByteArray, m_revisionPermissionPathsAttrPtr);
 	I_MULTIREF(imtbase::IObjectCollection, m_objectCollectionsCompPtr);
 	I_MULTIREF(imtbase::IDocumentChangeGenerator, m_documentChangeGeneratorsCompPtr);
 };

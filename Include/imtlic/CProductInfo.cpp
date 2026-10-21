@@ -323,50 +323,60 @@ namespace
 
 
 typedef QHash<QByteArray, QByteArrayList> RequirementsByPath;
-typedef QHash<QByteArray, QByteArrayList> PathsByFeatureId;
+typedef QHash<QByteArray, QByteArrayList> LeavesByPath;
 
 
-void CollectFeatureRequirements(
+/**
+	\return The leaves of the feature: the feature itself if it has no sub-features.
+*/
+QByteArrayList CollectFeatureRequirements(
 			const IFeatureInfo& featureInfo,
 			const QByteArray& parentPath,
 			RequirementsByPath& requirementsByPath,
-			PathsByFeatureId& pathsByFeatureId,
+			LeavesByPath& leavesByPath,
 			const QByteArrayList& inheritedRequirements = QByteArrayList())
 {
 	const QByteArray featureId = featureInfo.GetFeatureId();
 	if (featureId.isEmpty()){
-		return;
+		return QByteArrayList();
 	}
 
 	const QByteArray featurePath = parentPath + '/' + featureId;
 
+	// Requiring the own branch would hand out the siblings, so such requirements are dropped.
 	QByteArrayList requirements = inheritedRequirements;
 	for (const QByteArray& requirement : featureInfo.GetRequirements()){
+		if (!requirement.startsWith('/') || IsSameOrNestedFeaturePath(requirement, featurePath)){
+			continue;
+		}
+
 		if (!requirements.contains(requirement)){
 			requirements.append(requirement);
 		}
 	}
 	requirementsByPath.insert(featurePath, requirements);
 
-	// Permissions stored before paths existed name a feature by its id alone,
-	// and such an id holds for every feature carrying it - that is how the
-	// permission check itself reads them (\see imtauth::HasPermission), so the
-	// requirements of all of them are kept reachable under that id.
-	pathsByFeatureId[featureId].append(featurePath);
-
+	QByteArrayList leaves;
 	const IFeatureInfo::FeatureInfoList& subFeatures = featureInfo.GetSubFeatures();
 	for (const IFeatureInfo::FeatureInfoPtr& subFeaturePtr : subFeatures){
 		if (subFeaturePtr.IsValid()){
-			CollectFeatureRequirements(*subFeaturePtr, featurePath, requirementsByPath, pathsByFeatureId, requirements);
+			leaves += CollectFeatureRequirements(*subFeaturePtr, featurePath, requirementsByPath, leavesByPath, requirements);
 		}
 	}
+
+	if (subFeatures.isEmpty()){
+		leaves.append(featurePath);
+	}
+	leavesByPath.insert(featurePath, leaves);
+
+	return leaves;
 }
 
 
 void CollectProductRequirements(
 			IProductInfo& productInfo,
 			RequirementsByPath& requirementsByPath,
-			PathsByFeatureId& pathsByFeatureId)
+			LeavesByPath& leavesByPath)
 {
 	imtbase::IObjectCollection* featureCollectionPtr = productInfo.GetFeatures();
 	if (featureCollectionPtr == nullptr){
@@ -384,42 +394,9 @@ void CollectProductRequirements(
 
 		const IFeatureInfo* featureInfoPtr = dynamic_cast<const IFeatureInfo*>(dataPtr.GetPtr());
 		if (featureInfoPtr != nullptr){
-			CollectFeatureRequirements(*featureInfoPtr, QByteArray(), requirementsByPath, pathsByFeatureId);
+			CollectFeatureRequirements(*featureInfoPtr, QByteArray(), requirementsByPath, leavesByPath);
 		}
 	}
-}
-
-
-QByteArrayList GetPermissionRequirements(
-			const QByteArray& permissionId,
-			const RequirementsByPath& requirementsByPath,
-			const PathsByFeatureId& pathsByFeatureId)
-{
-	if (permissionId.isEmpty()){
-		return QByteArrayList();
-	}
-
-	const QByteArray featurePath = permissionId.startsWith('/') ? permissionId : ('/' + permissionId);
-
-	RequirementsByPath::const_iterator requirementsIter = requirementsByPath.constFind(featurePath);
-	if (requirementsIter != requirementsByPath.constEnd()){
-		return requirementsIter.value();
-	}
-
-	// A permission stored in the old format names a feature by its id alone,
-	// which every feature carrying that id answers for. A path that names no
-	// feature is not resolved by its last segment instead: it says which parent
-	// it belongs to, and another branch grants requirements of its own.
-	if (permissionId.contains('/')){
-		return QByteArrayList();
-	}
-
-	QByteArrayList retVal;
-	for (const QByteArray& knownPath : pathsByFeatureId.value(permissionId)){
-		retVal += requirementsByPath.value(knownPath);
-	}
-
-	return retVal;
 }
 
 
@@ -435,8 +412,8 @@ QByteArrayList CollectImpliedPermissions(IProductInfo& productInfo, const QByteA
 	}
 
 	RequirementsByPath requirementsByPath;
-	PathsByFeatureId pathsByFeatureId;
-	CollectProductRequirements(productInfo, requirementsByPath, pathsByFeatureId);
+	LeavesByPath leavesByPath;
+	CollectProductRequirements(productInfo, requirementsByPath, leavesByPath);
 	if (requirementsByPath.isEmpty()){
 		return QByteArrayList();
 	}
@@ -449,15 +426,17 @@ QByteArrayList CollectImpliedPermissions(IProductInfo& productInfo, const QByteA
 	while (!pendingPermissions.isEmpty()){
 		const QByteArray permissionId = pendingPermissions.takeFirst();
 
-		const QByteArrayList requirements = GetPermissionRequirements(permissionId, requirementsByPath, pathsByFeatureId);
-		for (const QByteArray& requirement : requirements){
-			if (requirement.isEmpty() || knownPermissions.contains(requirement)){
-				continue;
-			}
+		for (const QByteArray& requirement : requirementsByPath.value(permissionId)){
+			// A required group stands for every leaf in it: only leaves are ever held.
+			for (const QByteArray& leafPath : leavesByPath.value(requirement)){
+				if (knownPermissions.contains(leafPath)){
+					continue;
+				}
 
-			knownPermissions.insert(requirement);
-			retVal.append(requirement);
-			pendingPermissions.append(requirement);
+				knownPermissions.insert(leafPath);
+				retVal.append(leafPath);
+				pendingPermissions.append(leafPath);
+			}
 		}
 	}
 
