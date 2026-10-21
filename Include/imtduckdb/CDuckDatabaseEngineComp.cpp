@@ -3,6 +3,8 @@
 
 
 // Qt includes
+#include <QtCore/QDebug>
+#include <QtCore/QElapsedTimer>
 #include <QtCore/QFile>
 
 // ImtCore includes
@@ -88,7 +90,15 @@ QSqlQuery CDuckDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, Q
 
 	retVal.setForwardOnly(isForwardOnly);
 
+	QElapsedTimer execTimer;
+	execTimer.start();
+
 	bool success = retVal.exec(queryString);
+
+	if (IsVerboseEnabled()){
+		qDebug().noquote() << QStringLiteral("[DuckDb] exec: %1 ms, query: %2")
+					.arg(execTimer.elapsed()).arg(QString(queryString.left(80)).simplified());
+	}
 
 	const QSqlError queryError = retVal.lastError();
 	if (sqlErrorPtr != nullptr){
@@ -123,6 +133,9 @@ QSqlQuery CDuckDatabaseEngineComp::ExecSqlQuery(
 
 	retVal.setForwardOnly(isForwardOnly);
 
+	QElapsedTimer execTimer;
+	execTimer.start();
+
 	bool success = retVal.prepare(queryString);
 	if (success){
 		for (auto value = bindValues.cbegin(); value != bindValues.cend(); ++ value){
@@ -130,6 +143,11 @@ QSqlQuery CDuckDatabaseEngineComp::ExecSqlQuery(
 		}
 
 		success = retVal.exec();
+	}
+
+	if (IsVerboseEnabled()){
+		qDebug().noquote() << QStringLiteral("[DuckDb] exec: %1 ms, query: %2")
+					.arg(execTimer.elapsed()).arg(QString(queryString.left(80)).simplified());
 	}
 
 	const QSqlError queryError = retVal.lastError();
