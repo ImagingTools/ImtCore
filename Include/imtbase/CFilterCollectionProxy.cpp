@@ -8,7 +8,6 @@
 
 // ImtCore includes
 #include <imtbase/CObjectCollection.h>
-#include <imtbase/ICollectionObjectLink.h>
 
 
 namespace imtbase
@@ -117,23 +116,7 @@ bool CFilterCollectionProxy::GetObjectData(const Id& objectId, DataPtr& dataPtr,
 		return m_parent.GetObjectData(objectId, dataPtr);
 	}
 
-	if (BaseClass::GetObjectData(objectId, dataPtr)){
-		return true;
-	}
-
-	if (dataPtr.IsValid()){
-		return false;
-	}
-
-	const istd::IChangeable* objectPtr = GetObjectPtr(objectId);
-	if (objectPtr == nullptr || dynamic_cast<const ICollectionObjectLink*>(objectPtr) != nullptr){
-		return false;
-	}
-
-	istd::IChangeableUniquePtr clonePtr = objectPtr->CloneMe();
-	dataPtr.FromUnique(std::move(clonePtr));
-
-	return dataPtr.IsValid();
+	return BaseClass::GetObjectData(objectId, dataPtr);
 }
 
 
@@ -199,6 +182,20 @@ bool CFilterCollectionProxy::InsertObjectIntoCollection(ObjectInfo info)
 	m_objects.push_back(info);
 
 	return true;
+}
+
+
+istd::IChangeableUniquePtr CFilterCollectionProxy::CreateDataCopy(const ObjectInfo& objectInfo) const
+{
+	istd::IChangeableUniquePtr retVal = BaseClass::CreateDataCopy(objectInfo);
+	if (retVal.IsValid()){
+		return retVal;
+	}
+
+	// The proxy has no factories registered for the inserted types, but the stored object can clone itself
+	retVal = objectInfo.dataPtr->CloneMe(objectInfo.copyMode);
+
+	return retVal;
 }
 
 
