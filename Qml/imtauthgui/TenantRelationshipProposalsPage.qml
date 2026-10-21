@@ -186,191 +186,238 @@ ViewBase {
 		Column {
 			id: mainColumn
 			anchors.horizontalCenter: parent.horizontalCenter
-			width: Math.min(parent.width - Style.marginXL * 2, 600)
-			spacing: Style.marginXL
+			width: Math.min(parent.width - 2 * Style.marginXL, Style.contentWidthMax)
+			spacing: Style.marginM
 
-			Text {
-				text: qsTr("Relationship Proposals")
-				font.pixelSize: Style.fontSizeXL
-				font.bold: true
-				color: Style.textColor
+			GroupHeaderView {
+				width: parent.width
+				title: qsTr("Incoming Proposals")
 			}
 
 			Text {
 				width: parent.width
 				wrapMode: Text.WordWrap
 				text: qsTr("A relationship comes into force or changes only when both organizations agree.")
-				font.pixelSize: Style.fontSizeM
+				font.pixelSize: Style.fontSizeS
 				color: Style.inactiveTextColor
 			}
 
-			Text {
-				text: qsTr("Incoming Proposals")
-				font.pixelSize: Style.fontSizeL
-				font.bold: true
-				color: Style.textColor
-			}
-
-			Text {
-				visible: incomingList.count === 0
-				text: qsTr("No proposals are waiting for your answer.")
-				font.pixelSize: Style.fontSizeM
-				color: Style.inactiveTextColor
-			}
-
-			ListView {
-				id: incomingList
+			Rectangle {
 				width: parent.width
-				height: incomingList.contentHeight
-				interactive: false
-				spacing: Style.marginS
+				height: incomingList.count === 0 ? Style.controlHeightL + 2 * Style.marginM : incomingList.height + 2
+				color: Style.baseColor
+				radius: Style.radiusM
+				border.width: 1
+				border.color: Style.borderColor
+				clip: true
 
-				delegate: Rectangle {
-					width: incomingList.width
-					height: incomingContent.height + Style.marginL * 2
-					color: Style.backgroundColor2
-					radius: Style.radiusL
-					border.width: 1
-					border.color: Style.borderColor
+				Text {
+					anchors.left: parent.left
+					anchors.leftMargin: Style.marginL
+					anchors.verticalCenter: parent.verticalCenter
+					visible: incomingList.count === 0
+					text: qsTr("No proposals are waiting for your answer.")
+					font.pixelSize: Style.fontSizeM
+					color: Style.inactiveTextColor
+				}
 
-					Column {
-						id: incomingContent
-						anchors.left: parent.left
-						anchors.right: incomingActions.left
-						anchors.leftMargin: Style.marginL
-						anchors.rightMargin: Style.marginS
-						anchors.verticalCenter: parent.verticalCenter
-						spacing: Style.marginXS
+				ListView {
+					id: incomingList
+					anchors.top: parent.top
+					anchors.topMargin: 1
+					x: 1
+					width: parent.width - 2
+					height: incomingList.contentHeight
+					interactive: false
 
-						Text {
-							text: modelData.partnerName
-							font.pixelSize: Style.fontSizeM
-							font.bold: true
-							color: Style.textColor
+					delegate: Rectangle {
+						width: incomingList.width
+						height: incomingContent.height + Style.marginM * 2
+						color: incomingMouseArea.containsMouse ? Style.hover : "transparent"
+
+						MouseArea {
+							id: incomingMouseArea
+							anchors.fill: parent
+							hoverEnabled: true
 						}
 
-						Text {
-							text: modelData.typeText + ": " + modelData.roles
-							font.pixelSize: Style.fontSizeS
-							color: Style.inactiveTextColor
+						Rectangle {
+							anchors.top: parent.top
+							anchors.left: parent.left
+							anchors.leftMargin: Style.marginL
+							anchors.right: parent.right
+							anchors.rightMargin: Style.marginL
+							height: 1
+							color: Style.borderColor
+							visible: index > 0
 						}
 
-						Text {
-							visible: modelData.description !== ""
-							text: modelData.description
-							font.pixelSize: Style.fontSizeS
-							color: Style.inactiveTextColor
-						}
-					}
+						Column {
+							id: incomingContent
+							anchors.left: parent.left
+							anchors.right: incomingActions.left
+							anchors.leftMargin: Style.marginL
+							anchors.rightMargin: Style.marginS
+							anchors.verticalCenter: parent.verticalCenter
+							spacing: Style.marginXS
 
-					Row {
-						id: incomingActions
-						anchors.right: parent.right
-						anchors.rightMargin: Style.marginL
-						anchors.verticalCenter: parent.verticalCenter
-						spacing: Style.marginS
-						visible: proposalsPage.__canManage
+							Text {
+								text: modelData.partnerName
+								font.pixelSize: Style.fontSizeM
+								font.bold: true
+								color: Style.textColor
+							}
 
-						Button {
-							text: qsTr("Approve")
-							enabled: proposalsPage.processingProposalId === ""
-							onClicked: {
-								proposalsPage.processingProposalId = modelData.id
-								proposalsPage.apiClient.approveRelationshipProposal(modelData.id, proposalsPage.__tenantId)
+							Text {
+								text: modelData.typeText + ": " + modelData.roles
+								font.pixelSize: Style.fontSizeS
+								color: Style.inactiveTextColor
+							}
+
+							Text {
+								visible: modelData.description !== ""
+								text: modelData.description
+								font.pixelSize: Style.fontSizeS
+								color: Style.inactiveTextColor
 							}
 						}
 
-						Button {
-							text: qsTr("Reject")
-							enabled: proposalsPage.processingProposalId === ""
-							onClicked: {
-								proposalsPage.processingProposalId = modelData.id
-								proposalsPage.apiClient.rejectRelationshipProposal(modelData.id, proposalsPage.__tenantId)
+						Row {
+							id: incomingActions
+							anchors.right: parent.right
+							anchors.rightMargin: Style.marginL
+							anchors.verticalCenter: parent.verticalCenter
+							spacing: Style.marginS
+							visible: proposalsPage.__canManage
+
+							Button {
+								text: qsTr("Approve")
+								variant: "primary"
+								enabled: proposalsPage.processingProposalId === ""
+								onClicked: {
+									proposalsPage.processingProposalId = modelData.id
+									proposalsPage.apiClient.approveRelationshipProposal(modelData.id, proposalsPage.__tenantId)
+								}
+							}
+
+							Button {
+								text: qsTr("Reject")
+								enabled: proposalsPage.processingProposalId === ""
+								onClicked: {
+									proposalsPage.processingProposalId = modelData.id
+									proposalsPage.apiClient.rejectRelationshipProposal(modelData.id, proposalsPage.__tenantId)
+								}
 							}
 						}
 					}
 				}
 			}
 
+			Item {
+				width: parent.width
+				height: Style.marginL
+			}
+
+			GroupHeaderView {
+				width: parent.width
+				title: qsTr("Sent Proposals")
+			}
+
 			Rectangle {
 				width: parent.width
-				height: 1
-				color: Style.borderColor
-			}
+				height: outgoingList.count === 0 ? Style.controlHeightL + 2 * Style.marginM : outgoingList.height + 2
+				color: Style.baseColor
+				radius: Style.radiusM
+				border.width: 1
+				border.color: Style.borderColor
+				clip: true
 
-			Text {
-				text: qsTr("Sent Proposals")
-				font.pixelSize: Style.fontSizeL
-				font.bold: true
-				color: Style.textColor
-			}
+				Text {
+					anchors.left: parent.left
+					anchors.leftMargin: Style.marginL
+					anchors.verticalCenter: parent.verticalCenter
+					visible: outgoingList.count === 0
+					text: qsTr("No proposals are waiting for the partner's answer.")
+					font.pixelSize: Style.fontSizeM
+					color: Style.inactiveTextColor
+				}
 
-			Text {
-				visible: outgoingList.count === 0
-				text: qsTr("No proposals are waiting for the partner's answer.")
-				font.pixelSize: Style.fontSizeM
-				color: Style.inactiveTextColor
-			}
+				ListView {
+					id: outgoingList
+					anchors.top: parent.top
+					anchors.topMargin: 1
+					x: 1
+					width: parent.width - 2
+					height: outgoingList.contentHeight
+					interactive: false
 
-			ListView {
-				id: outgoingList
-				width: parent.width
-				height: outgoingList.contentHeight
-				interactive: false
-				spacing: Style.marginS
+					delegate: Rectangle {
+						width: outgoingList.width
+						height: outgoingContent.height + Style.marginM * 2
+						color: outgoingMouseArea.containsMouse ? Style.hover : "transparent"
 
-				delegate: Rectangle {
-					width: outgoingList.width
-					height: outgoingContent.height + Style.marginL * 2
-					color: Style.backgroundColor2
-					radius: Style.radiusL
-					border.width: 1
-					border.color: Style.borderColor
-
-					Column {
-						id: outgoingContent
-						anchors.left: parent.left
-						anchors.right: outgoingActions.left
-						anchors.leftMargin: Style.marginL
-						anchors.rightMargin: Style.marginS
-						anchors.verticalCenter: parent.verticalCenter
-						spacing: Style.marginXS
-
-						Text {
-							text: modelData.partnerName
-							font.pixelSize: Style.fontSizeM
-							font.bold: true
-							color: Style.textColor
+						MouseArea {
+							id: outgoingMouseArea
+							anchors.fill: parent
+							hoverEnabled: true
 						}
 
-						Text {
-							text: modelData.typeText + ": " + modelData.roles
-							font.pixelSize: Style.fontSizeS
-							color: Style.inactiveTextColor
+						Rectangle {
+							anchors.top: parent.top
+							anchors.left: parent.left
+							anchors.leftMargin: Style.marginL
+							anchors.right: parent.right
+							anchors.rightMargin: Style.marginL
+							height: 1
+							color: Style.borderColor
+							visible: index > 0
 						}
 
-						Text {
-							visible: modelData.description !== ""
-							text: modelData.description
-							font.pixelSize: Style.fontSizeS
-							color: Style.inactiveTextColor
+						Column {
+							id: outgoingContent
+							anchors.left: parent.left
+							anchors.right: outgoingActions.left
+							anchors.leftMargin: Style.marginL
+							anchors.rightMargin: Style.marginS
+							anchors.verticalCenter: parent.verticalCenter
+							spacing: Style.marginXS
+
+							Text {
+								text: modelData.partnerName
+								font.pixelSize: Style.fontSizeM
+								font.bold: true
+								color: Style.textColor
+							}
+
+							Text {
+								text: modelData.typeText + ": " + modelData.roles
+								font.pixelSize: Style.fontSizeS
+								color: Style.inactiveTextColor
+							}
+
+							Text {
+								visible: modelData.description !== ""
+								text: modelData.description
+								font.pixelSize: Style.fontSizeS
+								color: Style.inactiveTextColor
+							}
 						}
-					}
 
-					Row {
-						id: outgoingActions
-						anchors.right: parent.right
-						anchors.rightMargin: Style.marginL
-						anchors.verticalCenter: parent.verticalCenter
-						spacing: Style.marginS
-						visible: proposalsPage.__canManage
+						Row {
+							id: outgoingActions
+							anchors.right: parent.right
+							anchors.rightMargin: Style.marginL
+							anchors.verticalCenter: parent.verticalCenter
+							spacing: Style.marginS
+							visible: proposalsPage.__canManage
 
-						Button {
-							text: qsTr("Withdraw")
-							enabled: proposalsPage.processingProposalId === ""
-							onClicked: {
-								proposalsPage.processingProposalId = modelData.id
-								proposalsPage.apiClient.cancelRelationshipProposal(modelData.id, proposalsPage.__tenantId)
+							Button {
+								text: qsTr("Withdraw")
+								enabled: proposalsPage.processingProposalId === ""
+								onClicked: {
+									proposalsPage.processingProposalId = modelData.id
+									proposalsPage.apiClient.cancelRelationshipProposal(modelData.id, proposalsPage.__tenantId)
+								}
 							}
 						}
 					}

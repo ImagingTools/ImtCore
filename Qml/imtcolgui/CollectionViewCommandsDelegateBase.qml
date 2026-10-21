@@ -168,12 +168,30 @@ ViewCommandsDelegateBase {
 		}
 	}
 
+	// Number of selected rows shared with the organization by another one (collections with document sharing only)
+	function receivedSelectionCount(selection, elementsModel){
+		let count = 0
+		for (let i = 0; i < selection.length; i++){
+			if (elementsModel && elementsModel.containsKey("sharingAccess", selection[i])){
+				let accessLevel = String(elementsModel.getData("sharingAccess", selection[i]))
+				if (accessLevel === "View" || accessLevel === "Edit"){
+					count++
+				}
+			}
+		}
+
+		return count
+	}
+
 	function updateStateBaseCommands(selection, commandsController, elementsModel){
 		if(commandsController){
+			let hasReceived = receivedSelectionCount(selection, elementsModel) > 0
+
 			// State commands
 			commandsController.setCommandIsEnabled("New", !showingDisableObjects);
 			commandsController.setCommandIsEnabled("Import", !showingDisableObjects);
-			commandsController.setCommandIsEnabled("Remove", selection.length > 0 && !showingDisableObjects);
+			commandsController.setCommandIsEnabled("Remove", selection.length > 0 && !showingDisableObjects && !hasReceived);
+			commandsController.setCommandIsEnabled("Share", selection.length > 0 && !showingDisableObjects && !hasReceived);
 			commandsController.setCommandIsEnabled("RemoveAll", !showingDisableObjects);
 			commandsController.setCommandIsEnabled("Edit", selection.length > 0 && !showingDisableObjects);
 			commandsController.setCommandIsEnabled("Export", selection.length === 1 && !showingDisableObjects);

@@ -158,13 +158,17 @@ sdl::V1_0::imtauth::CGetTenantRelationshipsPayload CTenantManagerControllerComp:
 	}
 
 	QString accessError;
-	if (!HasTenantManageAccess(
+	const imtauth::ITenantMembershipManager* membershipManagerPtr = m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr;
+	const bool isManager = HasTenantManageAccess(
 				*m_tenantManagerCompPtr.GetPtr(),
-				m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr,
+				membershipManagerPtr,
 				gqlRequest,
 				tenantId,
 				{s_viewOrganizationConnectionsPermission},
-				accessError)){
+				accessError);
+
+	// Every member learns which organizations are currently related, which the documents shared with the organization depend on; the terms stay with the managers
+	if (!isManager && !HasTenantIsolationAccess(*m_tenantManagerCompPtr.GetPtr(), membershipManagerPtr, gqlRequest, tenantId, accessError)){
 		response.errorMessage = accessError;
 		return response;
 	}
@@ -178,6 +182,10 @@ sdl::V1_0::imtauth::CGetTenantRelationshipsPayload CTenantManagerControllerComp:
 			continue;
 		}
 
+		if (!isManager && relPtr->GetStatus() != imtauth::ITenantRelationshipInfo::TRS_ACTIVE){
+			continue;
+		}
+
 		sdl::V1_0::imtauth::CTenantRelationship data;
 		data.id = relPtr->GetRelationshipId();
 		data.connectionId = relPtr->GetConnectionId();
@@ -185,13 +193,15 @@ sdl::V1_0::imtauth::CGetTenantRelationshipsPayload CTenantManagerControllerComp:
 		data.targetTenantId = relPtr->GetTargetTenantId();
 		data.sourceRole = ToSdlRelationshipRole(relPtr->GetSourceRole());
 		data.targetRole = ToSdlRelationshipRole(relPtr->GetTargetRole());
-		data.scope = relPtr->GetScope();
 		data.validFrom = relPtr->GetValidFrom();
 		data.validUntil = relPtr->GetValidUntil();
 		data.status = ToSdlRelationshipStatus(relPtr->GetStatus());
-		data.description = relPtr->GetDescription();
-		data.createdAt = relPtr->GetCreatedAt();
-		data.updatedAt = relPtr->GetUpdatedAt();
+		if (isManager){
+			data.scope = relPtr->GetScope();
+			data.description = relPtr->GetDescription();
+			data.createdAt = relPtr->GetCreatedAt();
+			data.updatedAt = relPtr->GetUpdatedAt();
+		}
 
 		if (m_tenantManagerCompPtr.IsValid()){
 			imtauth::ITenantInfoUniquePtr sourceTenantPtr = m_tenantManagerCompPtr->GetTenant(relPtr->GetSourceTenantId());

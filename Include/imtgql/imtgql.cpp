@@ -34,6 +34,17 @@ imtauth::IUserInfo::FeatureIds CollectImpliedPermissions(const IGqlContext& gqlC
 }
 
 
+imtauth::IUserInfo::FeatureIds CollectTenantOwnerPermissions(const IGqlContext& gqlContext)
+{
+	imtlic::IProductInfo* productInfoPtr = gqlContext.GetProductInfo();
+	if (productInfoPtr == nullptr || !gqlContext.IsTenantOwner() || gqlContext.GetTenantId().isEmpty()){
+		return imtauth::IUserInfo::FeatureIds();
+	}
+
+	return imtlic::CollectProductPermissions(*productInfoPtr);
+}
+
+
 QByteArray GetLanguageIdFromRequest(const QList<CGqlParamObject>& inputParams)
 {
 	qsizetype count = inputParams.count();

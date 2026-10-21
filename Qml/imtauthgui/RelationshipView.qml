@@ -204,6 +204,7 @@ ViewBase {
 			}
 
 			Button {
+				variant: "primary"
 				text: container.sending
 					  ? qsTr("Sending...")
 					  : (container.__isExistingRelationship ? qsTr("Propose Changes") : qsTr("Send Proposal"))

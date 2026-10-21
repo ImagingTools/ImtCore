@@ -11,6 +11,7 @@
 #include <imtbase/IDocumentChangeGenerator.h>
 #include <imtdoc/IDocumentService.h>
 #include <imtauth/IUserActionManager.h>
+#include <imtauth/IDocumentShareManager.h>
 #include <imtbasesdl/SDL/1.0/CPP/CollectionDocumentService_fwd.h>
 #include <imtbasesdl/SDL/1.0/CPP/UndoManager_fwd.h>
 
@@ -32,6 +33,8 @@ public:
 		I_ASSIGN(m_documentChangeGeneratorCompPtr, "DocumentChangeGenerator", "Change generator producing the document history entries on save", false, "DocumentChangeGenerator");
 		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "ID of the underlaying document collection", true, "");
 		I_ASSIGN(m_userActionManagerCompPtr, "UserActionManager", "Records the save of a document as a user action", false, "UserActionManager");
+		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Document collection; if set, opening and saving a document require the organization to have access to it", false, "ObjectCollection");
+		I_ASSIGN(m_documentShareManagerCompPtr, "DocumentShareManager", "Document shares; if set, a share grants access only while the organizations are related", false, "DocumentShareManager");
 	I_END_COMPONENT
 
 protected:
@@ -90,6 +93,15 @@ protected:
 	*/
 	QByteArray GetCollectionObjectId(const QByteArray& userId, const QByteArray& documentId) const;
 
+	/**
+		Check that the organization of the request may access the collection object with at least the given level.
+	*/
+	bool CheckObjectAccess(
+				const ::imtgql::CGqlRequest& gqlRequest,
+				const QByteArray& objectId,
+				imtauth::IDocumentShareInfo::AccessLevel accessLevel,
+				QString& errorMessage) const;
+
 private:
 	int GetObjectFactoryIndex(const QByteArray& typeId) const;
 	imtbase::IOperationContext* CreateOperationContextFromGqlRequest(const ::imtgql::CGqlRequest& gqlRequest) const;
@@ -113,6 +125,8 @@ private:
 	I_REF(imtbase::IDocumentChangeGenerator, m_documentChangeGeneratorCompPtr);
 	I_ATTR(QByteArray, m_collectionIdAttrPtr);
 	I_REF(imtauth::IUserActionManager, m_userActionManagerCompPtr);
+	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
+	I_REF(imtauth::IDocumentShareManager, m_documentShareManagerCompPtr);
 };
 
 

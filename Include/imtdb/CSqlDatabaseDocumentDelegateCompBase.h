@@ -173,6 +173,18 @@ protected:
 	virtual QString CreateTenantBindingFilterQuery(const QByteArray& tenantId, imtauth::TenantFilterMode filterMode = imtauth::TFM_INCLUDE) const;
 	virtual QByteArray CreateTenantBindingInsertQuery(const QByteArray& tenantId, const QByteArray& entityId, const imtbase::IOperationContext* operationContextPtr) const;
 	virtual QByteArray CreateTenantBindingDeleteQuery(const QByteArrayList& entityIds) const;
+	virtual QString CreateDocumentShareTableName() const;
+	virtual bool EnsureDocumentShareTableExists() const;
+	virtual QString CreateTenantFilterQuery(const imtauth::ITenantFilterParam& tenantFilter) const;
+	virtual QString CreateIncomingShareFilterQuery(const imtauth::ITenantFilterParam& tenantFilter) const;
+	/**
+		Condition matching the documents other organizations shared with the organization of the tenant filter in \c filterParams,
+		empty if the request cannot see such documents. Visibility filters of a product limit the own documents only:
+		"(visibility) OR (received)".
+	*/
+	QString CreateReceivedDocumentFilterQuery(const iprm::IParamsSet& filterParams) const;
+	virtual QString CreateOutgoingShareFilterQuery(const QByteArray& tenantId) const;
+	virtual QByteArray CreateDocumentShareDeleteQuery(const QString& entityIdSelection) const;
 
 	// reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
 	virtual QString GetBaseSelectionQuery() const override;
@@ -198,6 +210,8 @@ protected:
 	virtual bool CreateDocumentIdFilterQuery(const imtcol::IDocumentIdFilter& documentIdFilter, QString& documentIdFilterQuery) const;
 	bool IsArrayOperation(const QString& query, const QString& field) const;
 	bool IsSQLite() const;
+	QString GetDocumentIdTextExpression() const;
+	QByteArray LoadTenantTableScript(const QString& fileName) const;
 
 protected:
 	I_ATTR(bool, m_useDataMetaInfoAttrPtr);
@@ -207,6 +221,7 @@ protected:
 	I_REF(imtdb::IJsonBasedMetaInfoDelegate, m_jsonBasedMetaInfoDelegateCompPtr);
 	I_REF(imtdb::ISqlJsonXPathExtractor, m_sqlJsonXPathExtractorCompPtr);
 	mutable bool m_tenantBindingTableInitialized = false;
+	mutable bool m_documentShareTableInitialized = false;
 };
 
 

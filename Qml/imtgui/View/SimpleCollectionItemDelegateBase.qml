@@ -66,7 +66,7 @@ Rectangle {
 	width: parent ? parent.width : 0
 	height: contentRow.implicitHeight + Style.marginXL
 	color: root.isSelected ? Style.selectedColor
-		: root.isHovered ? Style.buttonHoverColor
+		: root.isHovered ? Style.hover
 		: "transparent"
 
 	MouseArea {

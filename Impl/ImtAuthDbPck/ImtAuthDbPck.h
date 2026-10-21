@@ -18,6 +18,7 @@
 #include <imtauthdb/CTenantEntityBindingDbDelegateComp.h>
 #include <imtauthdb/CTenantInvitationDbDelegateComp.h>
 #include <imtauthdb/CCrossOrgGrantDbDelegateComp.h>
+#include <imtauthdb/CDocumentShareDbDelegateComp.h>
 #include <imtauthdb/CContractDbDelegateComp.h>
 #include <imtauthdb/CTenantConnectionRequestDbDelegateComp.h>
 #include <imtauthdb/CTenantConnectionCodeDbDelegateComp.h>
@@ -54,6 +55,7 @@ typedef imtauthdb::CTenantMembershipDbDelegateComp TenantMembershipDatabaseDeleg
 typedef imtauthdb::CTenantEntityBindingDbDelegateComp TenantEntityBindingDatabaseDelegate;
 typedef imtauthdb::CTenantInvitationDbDelegateComp TenantInvitationDatabaseDelegate;
 typedef imtauthdb::CCrossOrgGrantDbDelegateComp CrossOrgGrantDatabaseDelegate;
+typedef imtauthdb::CDocumentShareDbDelegateComp DocumentShareDatabaseDelegate;
 typedef imtauthdb::CContractDbDelegateComp ContractDatabaseDelegate;
 typedef imtauthdb::CTenantConnectionRequestDbDelegateComp TenantConnectionRequestDatabaseDelegate;
 typedef imtauthdb::CTenantConnectionCodeDbDelegateComp TenantConnectionCodeDatabaseDelegate;

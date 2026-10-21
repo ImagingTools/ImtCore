@@ -112,6 +112,11 @@ I_EXPORT_COMPONENT(
 			"Cross Org Grant Database Delegate");
 
 I_EXPORT_COMPONENT(
+			DocumentShareDatabaseDelegate,
+			"SQL delegate for document shares between tenants",
+			"Document Share Database Delegate");
+
+I_EXPORT_COMPONENT(
 			ContractDatabaseDelegate,
 			"SQL delegate for cooperation contracts (hydration, INSERT/UPDATE/DELETE)",
 			"Contract Database Delegate");

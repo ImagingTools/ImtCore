@@ -21,6 +21,13 @@ namespace imtgql
 */
 imtauth::IUserInfo::FeatureIds CollectImpliedPermissions(const IGqlContext& gqlContext, const imtauth::IUserInfo::FeatureIds& permissions);
 
+/**
+	Every permission of the product of the context if the caller owns the organization of the context, otherwise none.
+	The owner of an organization holds the whole product within it, whatever the roles and the permissions available to the organization.
+	\see imtlic::CollectProductPermissions
+*/
+imtauth::IUserInfo::FeatureIds CollectTenantOwnerPermissions(const IGqlContext& gqlContext);
+
 QByteArray GetLanguageIdFromRequest(const QList<CGqlParamObject>& inputParams);
 QByteArray GetDesignSchemeIdFromRequest(const QList<CGqlParamObject>& inputParams);
 QByteArray GetTranslation(const iqt::ITranslationManager* translationManagerPtr, const CGqlRequest& gqlRequest, const QByteArray& phrase, const QByteArray& context);

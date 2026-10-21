@@ -97,7 +97,7 @@ ViewBase {
 		anchors.top: parent.top
 		anchors.bottom: parent.bottom
 		anchors.horizontalCenter: parent.horizontalCenter
-		width: parent.width * 0.8
+		width: Math.min(parent.width - 2 * Style.marginXL, Style.contentWidthMax)
 	}
 
 	Column {
@@ -106,23 +106,19 @@ ViewBase {
 		anchors.topMargin: Style.marginXL
 		anchors.left: centeredContainer.left
 		anchors.right: centeredContainer.right
-		spacing: Style.marginM
+		spacing: Style.marginXS
 
-		Column {
-			spacing: Style.marginXS
+		GroupHeaderView {
+			width: parent.width
+			title: qsTr("Permissions")
+		}
 
-			BaseText {
-				text: qsTr("Permissions")
-				font.pixelSize: Style.fontSizeXL
-				font.bold: true
-				color: Style.textColor
-			}
-
-			BaseText {
-				text: qsTr("Select which product features are available for this organization.")
-				font.pixelSize: Style.fontSizeS
-				color: Style.inactiveTextColor
-			}
+		BaseText {
+			width: parent.width
+			text: qsTr("Select which product features are available for this organization.")
+			font.pixelSize: Style.fontSizeS
+			color: Style.inactiveTextColor
+			wrapMode: Text.WordWrap
 		}
 	}
 
@@ -131,6 +127,7 @@ ViewBase {
 		anchors.top: permissionsHeader.bottom
 		anchors.topMargin: Style.marginM
 		anchors.bottom: parent.bottom
+		anchors.bottomMargin: Style.marginXL
 		anchors.left: centeredContainer.left
 		anchors.right: centeredContainer.right
 		readOnly: !permissionsPage.__canEditPermissions

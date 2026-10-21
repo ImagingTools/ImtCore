@@ -1,4 +1,6 @@
 import QtQuick 2.12
+import Acf 1.0
+import imtcontrols 1.0
 
 QtObject {
 	id: root
@@ -129,6 +131,41 @@ QtObject {
 
 	function openDocument(objectTypeId, objectId){
 		console.warn("openDocument() should be implemented in a subclass")
+	}
+
+	// A document another organization shared for viewing only opens read-only
+	function setObjectReadOnly(objectId, readOnly){
+		if (!objectId){
+			return
+		}
+
+		if (readOnly){
+			__internal.readOnlyObjectIds[objectId] = true
+		}
+		else{
+			delete __internal.readOnlyObjectIds[objectId]
+		}
+	}
+
+	function isObjectReadOnly(objectId){
+		return objectId !== "" && __internal.readOnlyObjectIds[objectId] === true
+	}
+
+	property Component readOnlyAlertComp: Component {
+		Rectangle {
+			color: Style.popupWarningBackgroundColor
+
+			BaseText {
+				anchors.verticalCenter: parent.verticalCenter
+				anchors.left: parent.left
+				anchors.leftMargin: Style.marginL
+				anchors.right: parent.right
+				anchors.rightMargin: Style.marginL
+
+				text: qsTr("This document was shared with your organization for viewing only. Changes cannot be saved.")
+				elide: Text.ElideRight
+			}
+		}
 	}
 
 	function createDocument(typeId, proposedSourceDocumentId){
@@ -731,6 +768,7 @@ QtObject {
 		property var autoNamedTypeIds: ({}) // TypeId -> true for types with automatic name providers
 		property var documentManagerActiveView: null
 		property var readyEmitted: ({}) // DocumentId -> true once documentReady has been emitted
+		property var readOnlyObjectIds: ({}) // ObjectId -> true for documents shared for viewing only
 
 		property Component documentDataFactory: Component{ 
 			QtObject{
@@ -784,6 +822,16 @@ QtObject {
 					let representationController = representationControllerFactory.createObject(documentData)
 					representationController.documentId = id
 					representationController.view = view
+
+					if (root.isObjectReadOnly(objectId) || root.isObjectReadOnly(id)){
+						view.readOnly = true
+						if (view.commandsPanelVisible !== undefined){
+							view.commandsPanelVisible = false
+						}
+						if (typeof view.setAlertPanel === "function"){
+							view.setAlertPanel(root.readOnlyAlertComp)
+						}
+					}
 
 					let viewIndex = documentDecorator.registeredViews.length
 					let required = !isNew || representationController.requestRepresentationOnCreate

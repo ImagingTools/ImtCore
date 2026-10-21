@@ -42,6 +42,7 @@ public:
 		I_ASSIGN(m_databaseConnectionCheckerCompPtr, "DatabaseConnectionChecker", "Optional database connectivity check performed before the superuser lookup", false, "DatabaseConnectionChecker");
 		I_ASSIGN(m_tenantsEnabledAttrPtr, "TenantsEnabled", "Whether the application uses tenants (organizations); clients skip all tenant requests when disabled", true, false);
 		I_ASSIGN(m_externalLoginEnabledAttrPtr, "ExternalLoginEnabled", "Whether the client offers sign-in with external accounts (Google, Apple, Facebook, ...) configured on the authorization server", true, false);
+		I_ASSIGN(m_documentSharingEnabledAttrPtr, "DocumentSharingEnabled", "Whether documents can be shared between related organizations; clients show the shared documents of an organization", true, false);
 	I_END_COMPONENT;
 
 protected:
@@ -65,6 +66,7 @@ protected:
 	I_REF(imtdb::IDatabaseServerConnectionChecker, m_databaseConnectionCheckerCompPtr);
 	I_ATTR(bool, m_tenantsEnabledAttrPtr);
 	I_ATTR(bool, m_externalLoginEnabledAttrPtr);
+	I_ATTR(bool, m_documentSharingEnabledAttrPtr);
 };
 
 

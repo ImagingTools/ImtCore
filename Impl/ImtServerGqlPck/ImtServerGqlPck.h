@@ -37,6 +37,7 @@
 #include <imtservergql/CProgressManagerPublisherComp.h>
 #include <imtservergql/CGqlCollectionImportControllerComp.h>
 #include <imtservergql/CCollectionImportControllerComp.h>
+#include <imtservergql/CDocumentShareControllerComp.h>
 #include <imtservergql/CCollectionImportJobParamsFillerComp.h>
 #include <imtservergql/CCollectionDocumentServiceControllerComp.h>
 #include <imtservergql/CCollectionDocumentServicePublisherComp.h>
@@ -85,6 +86,7 @@ typedef imtservergql::CSettingsControllerComp SettingsController;
 typedef imtservergql::CProgressManagerPublisherComp ProgressManagerPublisher;
 typedef imtservergql::CGqlCollectionImportControllerComp GqlCollectionImportController;
 typedef imtservergql::CCollectionImportControllerComp CollectionImportController;
+typedef imtservergql::CDocumentShareControllerComp DocumentShareController;
 typedef imtservergql::CCollectionImportJobParamsFillerComp CollectionImportJobParamsFiller;
 typedef imtservergql::CCollectionDocumentServiceControllerComp CollectionDocumentServiceController;
 typedef imtservergql::CCollectionDocumentServicePublisherComp CollectionDocumentServicePublisher;

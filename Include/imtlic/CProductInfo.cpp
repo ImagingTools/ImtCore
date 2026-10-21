@@ -2,6 +2,9 @@
 #include <imtlic/CProductInfo.h>
 
 
+// STL includes
+#include <functional>
+
 // Qt includes
 #include <QtCore/QHash>
 #include <QtCore/QSet>
@@ -436,6 +439,52 @@ QByteArrayList CollectImpliedPermissions(IProductInfo& productInfo, const QByteA
 				knownPermissions.insert(leafPath);
 				retVal.append(leafPath);
 				pendingPermissions.append(leafPath);
+			}
+		}
+	}
+
+	return retVal;
+}
+
+
+QByteArrayList CollectProductPermissions(IProductInfo& productInfo)
+{
+	QByteArrayList retVal;
+
+	imtbase::IObjectCollection* featureCollectionPtr = productInfo.GetFeatures();
+	if (featureCollectionPtr == nullptr){
+		return retVal;
+	}
+
+	std::function<void (const IFeatureInfo&, const QByteArray&)> collect = [&retVal, &collect](const IFeatureInfo& featureInfo, const QByteArray& parentPath){
+		const QByteArray featureId = featureInfo.GetFeatureId();
+		if (featureId.isEmpty()){
+			return;
+		}
+
+		const QByteArray featurePath = parentPath + '/' + featureId;
+		const IFeatureInfo::FeatureInfoList& subFeatures = featureInfo.GetSubFeatures();
+		if (subFeatures.isEmpty()){
+			if (featureInfo.IsPermission() && !retVal.contains(featurePath)){
+				retVal.append(featurePath);
+			}
+
+			return;
+		}
+
+		for (const IFeatureInfo::FeatureInfoPtr& subFeaturePtr : subFeatures){
+			if (subFeaturePtr.IsValid()){
+				collect(*subFeaturePtr, featurePath);
+			}
+		}
+	};
+
+	for (const imtbase::ICollectionInfo::Id& elementId : featureCollectionPtr->GetElementIds()){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (featureCollectionPtr->GetObjectData(elementId, dataPtr)){
+			const IFeatureInfo* featureInfoPtr = dynamic_cast<const IFeatureInfo*>(dataPtr.GetPtr());
+			if (featureInfoPtr != nullptr){
+				collect(*featureInfoPtr, QByteArray());
 			}
 		}
 	}

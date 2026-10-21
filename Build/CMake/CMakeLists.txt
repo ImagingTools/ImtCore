@@ -589,6 +589,9 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 		add_subdirectory("${TESTS_DIR}/ExternalLoginTest/CMake" "${AUX_INCLUDE_DIR}/ExternalLoginTest")
 		add_dependencies(ExternalLoginTest imtbase imtauth imtaccount)
 
+		add_subdirectory("${TESTS_DIR}/DocumentShareTest/CMake" "${AUX_INCLUDE_DIR}/DocumentShareTest")
+		add_dependencies(DocumentShareTest imtbase imtauth imtaccount)
+
 		add_subdirectory("${TESTS_DIR}/PasswordPolicyTest/CMake" "${AUX_INCLUDE_DIR}/PasswordPolicyTest")
 		add_dependencies(PasswordPolicyTest imtbase imtauth)
 

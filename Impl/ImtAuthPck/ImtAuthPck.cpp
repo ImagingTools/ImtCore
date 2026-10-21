@@ -267,6 +267,21 @@ I_EXPORT_COMPONENT(
 			"Cross Org Grant Manager");
 
 I_EXPORT_COMPONENT(
+			DocumentShareInfo,
+			"Entity representing a document shared by one tenant with another",
+			"Document Share Info");
+
+I_EXPORT_COMPONENT(
+			DocumentShareManager,
+			"Manager for document shares between related tenants",
+			"Document Share Manager");
+
+I_EXPORT_COMPONENT(
+			TenantRelationshipProvider,
+			"Provider of the related tenants based on the local tenant relationships",
+			"Tenant Relationship Provider");
+
+I_EXPORT_COMPONENT(
 			ContractInfo,
 			"Entity representing a cooperation contract between two tenants",
 			"Contract Info");

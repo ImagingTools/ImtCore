@@ -928,6 +928,11 @@ inline imtauth::CTenantFilterParam* CreateTenantFilterParam(const imtgql::CGqlRe
 	imtauth::CTenantFilterParam* tenantFilterPtr = new imtauth::CTenantFilterParam();
 	tenantFilterPtr->SetTenantId(gqlContextPtr->GetTenantId());
 
+	// Owner and superuser see every document shared with the organization, regardless of the target groups
+	const imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
+	const bool isPrivilegedUser = gqlContextPtr->IsTenantOwner() || (userInfoPtr != nullptr && userInfoPtr->IsAdmin());
+	tenantFilterPtr->SetUserGroupIds(userInfoPtr != nullptr ? userInfoPtr->GetGroups() : QByteArrayList(), !isPrivilegedUser);
+
 	return tenantFilterPtr;
 }
 

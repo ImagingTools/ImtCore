@@ -314,6 +314,78 @@ input DuplicateElementsInput {
 	elementIds: [ID]!
 }
 
+# Document sharing between organizations
+
+type DocumentShare {
+	id: ID!
+	collectionId: ID
+	objectId: ID!
+	objectName: String
+	ownerTenantId: ID
+	ownerTenantName: String
+	targetTenantId: ID!
+	targetTenantName: String
+	targetGroupIds: [ID]
+	accessLevel: String! # View or Edit
+	status: String! # Pending, Active or Declined
+	validUntil: String
+	message: String
+	createdAt: String
+	updatedAt: String
+}
+
+type DocumentAccess {
+	objectId: ID!
+	accessLevel: String! # None, View, Edit or Owner
+	ownerTenantId: ID
+	ownerTenantName: String
+	shareId: ID
+	sharesCount: Integer
+}
+
+input GetDocumentAccessInput {
+	collectionId: ID!
+	objectIds: [ID]!
+}
+
+type GetDocumentAccessPayload {
+	items: [DocumentAccess]
+}
+
+input GetDocumentSharesInput {
+	collectionId: ID!
+	objectId: ID!
+}
+
+type GetDocumentSharesPayload {
+	shares: [DocumentShare]
+}
+
+input ShareDocumentsInput {
+	collectionId: ID!
+	objectIds: [ID]!
+	# Names shown to the target organization, in the order of objectIds; used where the collection keeps no element name
+	objectNames: [String]
+	targetTenantIds: [ID]!
+	accessLevel: String! # View or Edit
+	validUntil: String
+	message: String
+}
+
+type ShareDocumentsPayload {
+	shareIds: [ID]
+	errorMessage: String
+}
+
+input RevokeDocumentSharesInput {
+	collectionId: ID!
+	shareIds: [ID]!
+}
+
+type RevokeDocumentSharesPayload {
+	success: Boolean
+}
+
 type Query {
 	GetObjectVisualStatus (input: ObjectVisualStatusInput): VisualStatus!
 	GetObjectTypeId (input: GetObjectTypeIdInput): GetObjectTypeIdPayload!
@@ -325,6 +397,8 @@ type Query {
 	GetDataMetaInfo (input: GetDataMetaInfoInput): GetDataMetaInfoPayload!
 	GetElementInfo (input: GetElementInfoInput): GetElementInfoPayload!
 	GetElementMetaInfo (input: GetElementMetaInfoInput): GetElementMetaInfoPayload!
+	GetDocumentAccess (input: GetDocumentAccessInput): GetDocumentAccessPayload!
+	GetDocumentShares (input: GetDocumentSharesInput): GetDocumentSharesPayload!
 }
 
 type Mutation {
@@ -339,6 +413,8 @@ type Mutation {
 	InsertNewObject (input: InsertNewObjectInput): InsertNewObjectPayload!
 	SetObjectData (input: SetObjectDataInput): SetObjectDataPayload!
 	CreateSubCollection (input: CreateSubCollectionInput): CreateSubCollectionPayload!
+	ShareDocuments (input: ShareDocumentsInput): ShareDocumentsPayload!
+	RevokeDocumentShares (input: RevokeDocumentSharesInput): RevokeDocumentSharesPayload!
 }
 
 

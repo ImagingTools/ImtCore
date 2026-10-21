@@ -73,6 +73,7 @@ void CSqlDatabaseDocumentDelegateCompBase::OnComponentCreated()
 	bool useTenantBindings = m_useTenantEntityBindingsAttrPtr.IsValid() ? *m_useTenantEntityBindingsAttrPtr : true;
 	if (useTenantBindings){
 		EnsureTenantBindingTableExists();
+		EnsureDocumentShareTableExists();
 	}
 }
 
@@ -260,7 +261,12 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateCompB
 				*workingDocumentPtr,
 				operationContextPtr,
 				1);
-	
+
+	// Only the creating organization owns the document; a revision saved by an organization it is shared with adds no binding
+	if (!retVal.query.isEmpty() && operationContextPtr != nullptr){
+		retVal.query += CreateTenantBindingInsertQuery(operationContextPtr->GetTenantId(), objectId, operationContextPtr);
+	}
+
 	retVal.objectName = objectName;
 	
 	return retVal;
@@ -296,6 +302,8 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateDeleteObjectsQuery(
 		query += bindingDeleteQuery;
 	}
 
+	query += CreateDocumentShareDeleteQuery(quotedIds);
+
 	return query.toUtf8();
 }
 
@@ -309,7 +317,7 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateDeleteObjectSetQuery(
 	if (m_tableSchemaAttrPtr.IsValid()){
 		schemaPrefix = QStringLiteral("%1.").arg(*m_tableSchemaAttrPtr);
 	}
-	QByteArray retVal = QStringLiteral(R"(UPDATE %1 "%2" as root SET "%3" = 'Disabled' WHERE "%3" = 'Active')").arg(schemaPrefix, *m_tableNameAttrPtr, s_stateColumn).toUtf8();
+	QByteArray updateQuery = QStringLiteral(R"(UPDATE %1 "%2" as root SET "%3" = 'Disabled' WHERE "%3" = 'Active')").arg(schemaPrefix, *m_tableNameAttrPtr, s_stateColumn).toUtf8();
 
 	QByteArrayList conditionList;
 	if (paramsPtr != nullptr){
@@ -338,9 +346,18 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateDeleteObjectSetQuery(
 				return QByteArray();
 			}
 
-			retVal += QByteArrayLiteral(" AND (") += conditionList.join(QByteArrayLiteral(" AND ")) + ')';
+			updateQuery += QByteArrayLiteral(" AND (") += conditionList.join(QByteArrayLiteral(" AND ")) + ')';
 		}
 	}
+
+	// The share cleanup selects the documents still active, so it runs before they are disabled
+	QString documentIdSelection = QStringLiteral(R"(SELECT %1 FROM %2"%3" as root WHERE root."%4" = 'Active')")
+				.arg(GetDocumentIdTextExpression(), schemaPrefix, *m_tableNameAttrPtr, s_stateColumn);
+	if (!conditionList.isEmpty()){
+		documentIdSelection += QStringLiteral(" AND (") + QString::fromUtf8(conditionList.join(QByteArrayLiteral(" AND "))) + ')';
+	}
+
+	QByteArray retVal = CreateDocumentShareDeleteQuery(documentIdSelection) + updateQuery;
 
 	bool useTenantBindings = m_useTenantEntityBindingsAttrPtr.IsValid() ? *m_useTenantEntityBindingsAttrPtr : true;
 	if (useTenantBindings){
@@ -1022,11 +1039,6 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::PrepareInsertNewObjectQuery(
 
 	static const QString nullDataLiteral = QStringLiteral("NULL");
 
-	QByteArray tenantId;
-	if (operationContextPtr != nullptr){
-		tenantId = operationContextPtr->GetTenantId();
-	}
-
 	QString columnsClause = QStringLiteral(R"("%1", "%2", "%3", "%4", "%5", "%6", "%7", "%8", "%9", "%10")")
 				.arg(
 						/*1*/  s_idColumn,
@@ -1062,11 +1074,6 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::PrepareInsertNewObjectQuery(
 					/*3*/ columnsClause,
 					/*4*/ valuesClause
 					);
-
-	bool useTenantBindings = m_useTenantEntityBindingsAttrPtr.IsValid() ? *m_useTenantEntityBindingsAttrPtr : true;
-	if (!tenantId.isEmpty() && useTenantBindings){
-		query += CreateTenantBindingInsertQuery(tenantId, objectId, operationContextPtr);
-	}
 
 	retVal = query.toUtf8();
 
@@ -1202,30 +1209,7 @@ QString CSqlDatabaseDocumentDelegateCompBase::CreateTenantBindingTableName() con
 
 QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateTenantBindingTableInitializationQuery() const
 {
-	if (!m_databaseEngineCompPtr.IsValid()){
-		return QByteArray();
-	}
-
-	const QString scriptPath = GetSqlResourcePath(*m_databaseEngineCompPtr, QStringLiteral("CreateTenantEntityBindingsTable.sql"));
-	QFile scriptFile(scriptPath);
-	if (!scriptFile.open(QFile::ReadOnly)){
-		qWarning() << __FILE__ << __LINE__
-				   << "\n\t| CreateTenantEntityBindingsTable.sql could not be loaded from" << scriptPath;
-		return QByteArray();
-	}
-
-	QByteArray createTableQuery = scriptFile.readAll();
-	scriptFile.close();
-
-	const QByteArray tableScheme = GetTableScheme();
-	if (!tableScheme.isEmpty()){
-		createTableQuery.replace("${TableScheme}", tableScheme);
-	}
-	else{
-		createTableQuery.replace("${TableScheme}", "public");
-	}
-
-	return createTableQuery;
+	return LoadTenantTableScript(QStringLiteral("CreateTenantEntityBindingsTable.sql"));
 }
 
 
@@ -1258,6 +1242,40 @@ void CSqlDatabaseDocumentDelegateCompBase::EnsureTenantBindingTableExists() cons
 }
 
 
+bool CSqlDatabaseDocumentDelegateCompBase::EnsureDocumentShareTableExists() const
+{
+	if (m_documentShareTableInitialized){
+		return true;
+	}
+
+	const QByteArray shareTableQuery = LoadTenantTableScript(QStringLiteral("CreateDocumentSharesTable.sql"));
+	if (shareTableQuery.isEmpty()){
+		return false;
+	}
+
+	// SQLite executes one statement per query, the Postgres script is a single DO block
+	const QByteArrayList statements = IsSQLite() ? shareTableQuery.split(';') : QByteArrayList{shareTableQuery};
+	for (const QByteArray& statement : statements){
+		if (statement.trimmed().isEmpty()){
+			continue;
+		}
+
+		QSqlError sqlError;
+		m_databaseEngineCompPtr->ExecSqlQuery(statement, &sqlError);
+		if (sqlError.type() != QSqlError::NoError){
+			qWarning() << __FILE__ << __LINE__
+						<< "\n\t| DocumentShares table could not be initialized"
+						<< "\n\t| Error: " << sqlError;
+			return false;
+		}
+	}
+
+	m_documentShareTableInitialized = true;
+
+	return true;
+}
+
+
 QString CSqlDatabaseDocumentDelegateCompBase::CreateTenantBindingFilterQuery(const QByteArray& tenantId, imtauth::TenantFilterMode filterMode) const
 {
 	bool useTenantBindings = m_useTenantEntityBindingsAttrPtr.IsValid() ? *m_useTenantEntityBindingsAttrPtr : true;
@@ -1269,11 +1287,7 @@ QString CSqlDatabaseDocumentDelegateCompBase::CreateTenantBindingFilterQuery(con
 
 	const QString bindingsTableName = CreateTenantBindingTableName();
 	const QString escapedEntityType = SqlEncode(GetTableName());
-	const QByteArray databaseDriverId = m_databaseEngineCompPtr.IsValid() ? m_databaseEngineCompPtr->GetDatabaseDriverId() : QByteArray();
-	const bool isSqlite = databaseDriverId.compare(QByteArrayLiteral("QSQLITE"), Qt::CaseInsensitive) == 0;
-	const QString entityIdExpression = isSqlite
-			? QStringLiteral(R"(root."%1")").arg(s_documentIdColumn)
-			: QStringLiteral(R"(root."%1"::text)").arg(s_documentIdColumn);
+	const QString entityIdExpression = GetDocumentIdTextExpression();
 
 	QString bindingsLookup = QStringLiteral(R"(SELECT 1 FROM %1 tenantBindings WHERE tenantBindings."EntityType" = '%2' AND tenantBindings."EntityId" = %3)")
 			.arg(
@@ -1362,6 +1376,153 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateTenantBindingDeleteQuery(
 					quotedIds.join(','));
 
 	return query.toUtf8();
+}
+
+
+QString CSqlDatabaseDocumentDelegateCompBase::CreateDocumentShareTableName() const
+{
+	if (m_tableSchemaAttrPtr.IsValid() && !(*m_tableSchemaAttrPtr).isEmpty()){
+		return QStringLiteral(R"(%1."DocumentShares")").arg(*m_tableSchemaAttrPtr);
+	}
+
+	return QStringLiteral(R"("DocumentShares")");
+}
+
+
+QString CSqlDatabaseDocumentDelegateCompBase::CreateTenantFilterQuery(const imtauth::ITenantFilterParam& tenantFilter) const
+{
+	const QByteArray tenantId = tenantFilter.GetTenantId();
+	const imtauth::TenantFilterMode filterMode = tenantFilter.GetFilterMode();
+	const bool useTenantBindings = m_useTenantEntityBindingsAttrPtr.IsValid() ? *m_useTenantEntityBindingsAttrPtr : true;
+
+	if (useTenantBindings || !tenantId.isEmpty()){
+		EnsureTenantBindingTableExists();
+	}
+
+	const QString ownFilterQuery = CreateTenantBindingFilterQuery(tenantId, filterMode);
+
+	// Documents are shared between organizations only
+	if (!useTenantBindings || tenantId.isEmpty() || filterMode == imtauth::TFM_EXCLUDE){
+		return ownFilterQuery;
+	}
+
+	const imtauth::SharingScope sharingScope = tenantFilter.GetSharingScope();
+
+	QString accessibleFilterQuery;
+	if (sharingScope == imtauth::SS_ACCESSIBLE){
+		const QString foreignBindingsLookup = QStringLiteral(R"(SELECT 1 FROM )") + CreateTenantBindingTableName()
+					+ QStringLiteral(R"( tenantBindings WHERE tenantBindings."EntityType" = ')") + SqlEncode(GetTableName())
+					+ QStringLiteral(R"(' AND tenantBindings."EntityId" = )") + GetDocumentIdTextExpression()
+					+ QStringLiteral(R"( AND COALESCE(tenantBindings."TenantId", '') <> '' AND tenantBindings."TenantId" <> ')") + SqlEncode(tenantId) + '\'';
+
+		accessibleFilterQuery = QStringLiteral("(%1) OR NOT EXISTS (%2)").arg(ownFilterQuery, foreignBindingsLookup);
+	}
+
+	if (sharingScope != imtauth::SS_OWN && !EnsureDocumentShareTableExists()){
+		switch (sharingScope){
+		case imtauth::SS_ALL:
+			return ownFilterQuery;
+		case imtauth::SS_ACCESSIBLE:
+			return accessibleFilterQuery;
+		default:
+			return QStringLiteral("1 = 0");
+		}
+	}
+
+	switch (sharingScope){
+	case imtauth::SS_ACCESSIBLE:
+		return QStringLiteral("(%1) OR (%2)").arg(accessibleFilterQuery, CreateIncomingShareFilterQuery(tenantFilter));
+	case imtauth::SS_ALL:
+		return QStringLiteral("(%1) OR (%2)").arg(ownFilterQuery, CreateIncomingShareFilterQuery(tenantFilter));
+	case imtauth::SS_INCOMING:
+		return CreateIncomingShareFilterQuery(tenantFilter);
+	case imtauth::SS_OUTGOING:
+		return QStringLiteral("(%1) AND (%2)").arg(ownFilterQuery, CreateOutgoingShareFilterQuery(tenantId));
+	case imtauth::SS_OWN:
+		break;
+	}
+
+	return ownFilterQuery;
+}
+
+
+QString CSqlDatabaseDocumentDelegateCompBase::CreateIncomingShareFilterQuery(const imtauth::ITenantFilterParam& tenantFilter) const
+{
+	const QString currentTime = IsSQLite()
+				? QStringLiteral("strftime('%Y-%m-%dT%H:%M:%fZ', 'now')")
+				: QStringLiteral("(NOW() AT TIME ZONE 'UTC')");
+
+	QString retVal = QStringLiteral(R"(EXISTS (SELECT 1 FROM )") + CreateDocumentShareTableName() + QStringLiteral(R"( documentShares)")
+				+ QStringLiteral(R"( WHERE documentShares."EntityId" = )") + GetDocumentIdTextExpression()
+				+ QStringLiteral(R"( AND documentShares."TargetTenantId" = ')") + SqlEncode(tenantFilter.GetTenantId())
+				+ QStringLiteral(R"(' AND documentShares."Status" = )") + QString::number(imtauth::IDocumentShareInfo::DSS_ACTIVE)
+				+ QStringLiteral(R"( AND documentShares."AccessLevel" >= )") + QString::number(tenantFilter.GetMinimumAccessLevel())
+				+ QStringLiteral(R"( AND (documentShares."ValidUntil" IS NULL OR documentShares."ValidUntil" > )") + currentTime + ')';
+
+	if (tenantFilter.IsGroupRestrictionEnabled()){
+		QStringList groupConditions;
+		groupConditions << QStringLiteral(R"(documentShares."TargetGroupIds" = '')");
+
+		for (const QByteArray& groupId : tenantFilter.GetUserGroupIds()){
+			groupConditions << QStringLiteral(R"(documentShares."TargetGroupIds" LIKE '%,)") + SqlEncode(groupId) + QStringLiteral(",%'");
+		}
+
+		retVal += QStringLiteral(" AND (") + groupConditions.join(QStringLiteral(" OR ")) + ')';
+	}
+
+	if (tenantFilter.IsShareOwnerRestrictionEnabled()){
+		QStringList ownerIds;
+		for (const QByteArray& ownerTenantId : tenantFilter.GetShareOwnerTenantIds()){
+			ownerIds << '\'' + SqlEncode(ownerTenantId) + '\'';
+		}
+
+		retVal += ownerIds.isEmpty()
+					? QStringLiteral(" AND 1 = 0")
+					: QStringLiteral(R"( AND documentShares."OwnerTenantId" IN ()") + ownerIds.join(QStringLiteral(", ")) + ')';
+	}
+
+	return retVal + ')';
+}
+
+
+QString CSqlDatabaseDocumentDelegateCompBase::CreateReceivedDocumentFilterQuery(const iprm::IParamsSet& filterParams) const
+{
+	iprm::TParamsPtr<imtauth::ITenantFilterParam> tenantFilterPtr(&filterParams, "TenantFilter");
+	if (!tenantFilterPtr.IsValid()){
+		return QString();
+	}
+
+	const bool useTenantBindings = m_useTenantEntityBindingsAttrPtr.IsValid() ? *m_useTenantEntityBindingsAttrPtr : true;
+	if (		!useTenantBindings ||
+				tenantFilterPtr->GetTenantId().isEmpty() ||
+				tenantFilterPtr->GetFilterMode() == imtauth::TFM_EXCLUDE ||
+				tenantFilterPtr->GetSharingScope() == imtauth::SS_OWN ||
+				tenantFilterPtr->GetSharingScope() == imtauth::SS_OUTGOING ||
+				!EnsureDocumentShareTableExists()){
+		return QString();
+	}
+
+	return CreateIncomingShareFilterQuery(*tenantFilterPtr);
+}
+
+
+QString CSqlDatabaseDocumentDelegateCompBase::CreateOutgoingShareFilterQuery(const QByteArray& tenantId) const
+{
+	return QStringLiteral(R"(EXISTS (SELECT 1 FROM )") + CreateDocumentShareTableName() + QStringLiteral(R"( documentShares)")
+				+ QStringLiteral(R"( WHERE documentShares."EntityId" = )") + GetDocumentIdTextExpression()
+				+ QStringLiteral(R"( AND documentShares."OwnerTenantId" = ')") + SqlEncode(tenantId) + QStringLiteral("')");
+}
+
+
+QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateDocumentShareDeleteQuery(const QString& entityIdSelection) const
+{
+	const bool useTenantBindings = m_useTenantEntityBindingsAttrPtr.IsValid() ? *m_useTenantEntityBindingsAttrPtr : true;
+	if (!useTenantBindings || entityIdSelection.isEmpty() || !EnsureDocumentShareTableExists()){
+		return QByteArray();
+	}
+
+	return (QStringLiteral(R"(DELETE FROM )") + CreateDocumentShareTableName()
+				+ QStringLiteral(R"( WHERE "EntityId" IN ()") + entityIdSelection + QStringLiteral(");")).toUtf8();
 }
 
 
@@ -1624,13 +1785,7 @@ bool CSqlDatabaseDocumentDelegateCompBase::CreateFilterQuery(const iprm::IParams
 	if (paramIds.contains("TenantFilter")){
 		iprm::TParamsPtr<imtauth::ITenantFilterParam> tenantFilterPtr(&filterParams, "TenantFilter");
 		if (tenantFilterPtr.IsValid()){
-			QByteArray tenantId = tenantFilterPtr->GetTenantId();
-			imtauth::TenantFilterMode filterMode = tenantFilterPtr->GetFilterMode();
-			bool useTenantBindings = m_useTenantEntityBindingsAttrPtr.IsValid() ? *m_useTenantEntityBindingsAttrPtr : true;
-			if (useTenantBindings || !tenantId.isEmpty()){
-				EnsureTenantBindingTableExists();
-			}
-			tenantFilterQuery = CreateTenantBindingFilterQuery(tenantId, filterMode);
+			tenantFilterQuery = CreateTenantFilterQuery(*tenantFilterPtr);
 		}
 	}
 
@@ -2313,6 +2468,38 @@ bool CSqlDatabaseDocumentDelegateCompBase::IsSQLite() const
 
 	return m_databaseEngineCompPtr->GetDatabaseDriverId().compare(
 				QByteArrayLiteral("QSQLITE"), Qt::CaseInsensitive) == 0;
+}
+
+
+QString CSqlDatabaseDocumentDelegateCompBase::GetDocumentIdTextExpression() const
+{
+	return IsSQLite()
+				? QStringLiteral(R"(root."%1")").arg(s_documentIdColumn)
+				: QStringLiteral(R"(root."%1"::text)").arg(s_documentIdColumn);
+}
+
+
+QByteArray CSqlDatabaseDocumentDelegateCompBase::LoadTenantTableScript(const QString& fileName) const
+{
+	if (!m_databaseEngineCompPtr.IsValid()){
+		return QByteArray();
+	}
+
+	const QString scriptPath = GetSqlResourcePath(*m_databaseEngineCompPtr, fileName);
+	QFile scriptFile(scriptPath);
+	if (!scriptFile.open(QFile::ReadOnly)){
+		qWarning() << __FILE__ << __LINE__
+				   << "\n\t|" << fileName << "could not be loaded from" << scriptPath;
+		return QByteArray();
+	}
+
+	QByteArray script = scriptFile.readAll();
+	scriptFile.close();
+
+	const QByteArray tableScheme = GetTableScheme();
+	script.replace("${TableScheme}", tableScheme.isEmpty() ? QByteArrayLiteral("public") : tableScheme);
+
+	return script;
 }
 
 

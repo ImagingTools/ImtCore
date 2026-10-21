@@ -150,6 +150,8 @@ CollectionViewCommandsDelegateBase{
 
 			let itemId = elementsModel.getData("id", indexes[i]);
 			let typeId = elementsModel.getData("typeId", indexes[i]);
+			let accessLevel = elementsModel.containsKey("sharingAccess", indexes[i]) ? String(elementsModel.getData("sharingAccess", indexes[i])) : ""
+			documentManager.setObjectReadOnly(itemId, accessLevel === "View")
 
 			documentManager.openDocument(typeId, itemId)
 		}

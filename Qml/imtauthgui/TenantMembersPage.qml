@@ -151,10 +151,10 @@ SimpleCollectionPage {
 					spacing: Style.marginM
 
 					Rectangle {
-						width: 36
-						height: 36
-						radius: 18
-						color: Style.selectedColor
+						width: Style.iconSizeL
+						height: Style.iconSizeL
+						radius: width / 2
+						color: Style.neutralSubtleColor
 						anchors.verticalCenter: parent.verticalCenter
 
 						BaseText {
@@ -228,7 +228,7 @@ SimpleCollectionPage {
 				anchors.bottom: parent.bottom
 				anchors.left: parent.left
 				anchors.right: parent.right
-				height: 54
+				height: Style.controlHeightM + 2 * Style.marginM
 				color: Style.alternateBaseColor
 				radius: Style.radiusM
 
@@ -258,62 +258,28 @@ SimpleCollectionPage {
 					anchors.verticalCenter: parent.verticalCenter
 					spacing: Style.marginL
 
-					Text {
+					Button {
 						id: cancelBtn
-						text: qsTr("Cancel")
-						font.pixelSize: Style.fontSizeM
-						color: Style.linkColor
-						opacity: cancelMouse.containsMouse ? 0.65 : 1.0
 						anchors.verticalCenter: parent.verticalCenter
-
-						Behavior on opacity { NumberAnimation { duration: 100 } }
-
-						MouseArea {
-							id: cancelMouse
-							anchors.fill: parent
-							anchors.margins: -4
-							hoverEnabled: true
-							cursorShape: Qt.PointingHandCursor
-							onClicked: orgPermsPopup.close()
-						}
+						text: qsTr("Cancel")
+						onClicked: orgPermsPopup.close()
 					}
 
-					Rectangle {
+					Button {
 						id: applyBtnRect
-						width: applyBtnLabel.implicitWidth + Style.marginXL
-						height: 32
-						radius: 4
-						color: Style.linkColor
 						anchors.verticalCenter: parent.verticalCenter
-						opacity: applyBtnMouse.containsMouse ? 0.75 : 1.0
-
-						Behavior on opacity { NumberAnimation { duration: 100 } }
-
-						BaseText {
-							id: applyBtnLabel
-							anchors.centerIn: parent
-							text: qsTr("Apply")
-							font.pixelSize: Style.fontSizeM
-							font.bold: true
-							color: Style.baseColor
-						}
-
-						MouseArea {
-							id: applyBtnMouse
-							anchors.fill: parent
-							hoverEnabled: true
-							cursorShape: Qt.PointingHandCursor
-							onClicked: {
-								var selected = orgPermsTable.getCheckedIds ? orgPermsTable.getCheckedIds() : []
-								var tid = membersPage.model ? membersPage.model.m_id : ""
-								var uid = orgPermsPopup.currentMember ? orgPermsPopup.currentMember.id : ""
-								if (uid && tid && membersPage.apiClient) {
-									membersPage.apiClient.setMemberOrganizationPermissionsByUser(tid, uid, selected)
-								}
-								orgPermsPopup.close()
-								if (membersPage.stateManager) {
-									membersPage.stateManager.loadMembersFromModel()
-								}
+						text: qsTr("Apply")
+						variant: "primary"
+						onClicked: {
+							var selected = orgPermsTable.getCheckedIds ? orgPermsTable.getCheckedIds() : []
+							var tid = membersPage.model ? membersPage.model.m_id : ""
+							var uid = orgPermsPopup.currentMember ? orgPermsPopup.currentMember.id : ""
+							if (uid && tid && membersPage.apiClient) {
+								membersPage.apiClient.setMemberOrganizationPermissionsByUser(tid, uid, selected)
+							}
+							orgPermsPopup.close()
+							if (membersPage.stateManager) {
+								membersPage.stateManager.loadMembersFromModel()
 							}
 						}
 					}
