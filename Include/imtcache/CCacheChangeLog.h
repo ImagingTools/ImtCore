@@ -44,7 +44,6 @@ public:
 				const QString& replaceCondition,
 				int& changedCount,
 				QString& errorMessage);
-
 	/**
 		Logs the key of every row of \a tableName matching the SQL condition \a removedCondition. Call it before the rows are deleted.
 	*/
@@ -54,24 +53,20 @@ public:
 				const QString& keyColumn,
 				const QString& removedCondition,
 				QString& errorMessage);
-
 	/**
 		Logs that \a tableName was rebuilt, which no key can describe.
 	*/
 	static bool RecordRebuilt(imtduckdb::IDuckConnection& connection, const QString& tableName, QString& errorMessage);
-
 	/**
 		The newest entry, or \a fallback when there is none because they were all purged.
 	*/
 	static bool GetLatestChangeId(imtduckdb::IDuckConnection& connection, qint64 fallback, qint64& changeId, QString& errorMessage);
-
 	/**
 		How far \a consumer has read. \a hasCursor is false before its first read.
 	*/
 	static bool GetCursor(imtduckdb::IDuckConnection& connection, const QString& consumer, bool& hasCursor, qint64& changeId, QString& errorMessage);
 
 	static bool SetCursor(imtduckdb::IDuckConnection& connection, const QString& consumer, qint64 changeId, QString& errorMessage);
-
 	/**
 		Whether any of \a tableNames was rebuilt by an entry in (\a afterChangeId, \a upToChangeId].
 	*/
@@ -82,7 +77,6 @@ public:
 				qint64 upToChangeId,
 				bool& hasRebuilt,
 				QString& errorMessage);
-
 	/**
 		Drops the entries every consumer has read, or all of them when there is no consumer.
 	*/

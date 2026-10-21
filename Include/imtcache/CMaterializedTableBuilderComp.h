@@ -62,7 +62,6 @@ private:
 		The select script with ${KeyFilter} replaced by \a keyFilter.
 	*/
 	bool CreateSelectQuery(const QString& keyFilter, QString& query, QString& errorMessage) const;
-
 	/**
 		False when the select script no longer yields the columns of the table, in the order of the table.
 	*/
