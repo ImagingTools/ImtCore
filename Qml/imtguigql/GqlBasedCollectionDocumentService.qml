@@ -338,6 +338,11 @@ DocumentServiceBase {
 		function getHeaders(){
 			return root.getHeaders()
 		}
+
+		// The workspace covers itself while the list loads; without this a failed request left it covered.
+		function onError(message, type){
+			root.openedDocumentListReceiveFailed(message)
+		}
 	}
 
 	property GqlSdlRequestSender openDocumentRequest: GqlSdlRequestSender {

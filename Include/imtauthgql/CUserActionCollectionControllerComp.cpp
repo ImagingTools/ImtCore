@@ -157,7 +157,7 @@ void CUserActionCollectionControllerComp::SetAdditionalFilters(
 				bool viewAllUserActions = false;
 
 				if (m_checkPermissionCompPtr.IsValid()){
-					viewAllUserActions = m_checkPermissionCompPtr->CheckPermission(userPermissions, QByteArrayList {QByteArrayLiteral("ViewAllUserActions")});
+					viewAllUserActions = m_checkPermissionCompPtr->CheckPermission(userPermissions, QByteArrayList {QByteArrayLiteral("/WorkspaceManagement/ViewAllUserActions")});
 				}
 
 				if (!viewAllUserActions){

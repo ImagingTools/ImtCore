@@ -191,6 +191,11 @@ I_EXPORT_COMPONENT(
 			"Client Request Personal Access Token Manager");
 
 I_EXPORT_COMPONENT(
+			ExternalLoginCallbackServlet,
+			"Redirect URI of the external identity providers",
+			"External Login Callback Servlet OIDC");
+
+I_EXPORT_COMPONENT(
 			TenantCollectionController,
 			"Tenant collection controller",
 			"Tenant Collection Controller");

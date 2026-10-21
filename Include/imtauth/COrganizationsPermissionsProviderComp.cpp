@@ -16,6 +16,45 @@ namespace imtauth
 {
 
 
+namespace
+{
+
+
+imtlic::CFeatureInfo* CreatePermission(
+			const QByteArray& featureId,
+			const char* featureName,
+			const char* featureDescription,
+			const QByteArrayList& requirements = QByteArrayList())
+{
+	imtlic::CFeatureInfo* featureInfoPtr = new imtlic::CFeatureInfo;
+	featureInfoPtr->SetFeatureId(featureId);
+	featureInfoPtr->SetFeatureName(featureName);
+	featureInfoPtr->SetFeatureDescription(featureDescription);
+	featureInfoPtr->SetOptional(false);
+	featureInfoPtr->SetIsPermission(true);
+	featureInfoPtr->SetRequirements(requirements);
+
+	return featureInfoPtr;
+}
+
+
+imtlic::CFeatureInfo* AddPermission(
+			imtlic::CFeatureInfo& parent,
+			const QByteArray& featureId,
+			const char* featureName,
+			const char* featureDescription,
+			const QByteArrayList& requirements = QByteArrayList())
+{
+	imtlic::CFeatureInfo* featureInfoPtr = CreatePermission(featureId, featureName, featureDescription, requirements);
+	parent.InsertSubFeature(imtlic::IFeatureInfo::FeatureInfoPtr(featureInfoPtr));
+
+	return featureInfoPtr;
+}
+
+
+} // anonymous namespace
+
+
 // public methods
 
 imtlic::IFeatureInfoSharedPtr COrganizationsPermissionsProviderComp::GetFeatureInfo(const QByteArray& featureId) const
@@ -49,295 +88,116 @@ void COrganizationsPermissionsProviderComp::OnComponentCreated()
 
 void COrganizationsPermissionsProviderComp::CreateOrganizationFeatures()
 {
-	istd::TDelPtr<imtlic::CFeatureInfo> editOrganizationFeatureInfo;
-	editOrganizationFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
-	editOrganizationFeatureInfo->SetFeatureId("EditOrganization");
-	editOrganizationFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "Edit Organization"));
-	editOrganizationFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Allows editing Organization."));
-	editOrganizationFeatureInfo->SetOptional(false);
-	editOrganizationFeatureInfo->SetIsPermission(true);
+	istd::TDelPtr<imtlic::CFeatureInfo> organizationPtr(CreatePermission(
+				"OrganizationManagement",
+				QT_TRANSLATE_NOOP("Feature", "Organization Management"),
+				QT_TRANSLATE_NOOP("Feature", "Provides access to the operations inside an organization.")));
 
-	istd::TDelPtr<imtlic::CFeatureInfo> changeOrganizationNameFeatureInfo;
-	changeOrganizationNameFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
-	changeOrganizationNameFeatureInfo->SetFeatureId("ChangeOrganizationName");
-	changeOrganizationNameFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "Change Organization Name"));
-	changeOrganizationNameFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Allows changing Organization Name."));
-	changeOrganizationNameFeatureInfo->SetOptional(false);
-	changeOrganizationNameFeatureInfo->SetIsPermission(true);
-	editOrganizationFeatureInfo->InsertSubFeature(changeOrganizationNameFeatureInfo.PopPtr());
+	imtlic::CFeatureInfo* editPtr = AddPermission(*organizationPtr, "Edit",
+				QT_TRANSLATE_NOOP("Feature", "Edit Organization"),
+				QT_TRANSLATE_NOOP("Feature", "Allows editing the organization."));
+	AddPermission(*editPtr, "ChangeName",
+				QT_TRANSLATE_NOOP("Feature", "Change Name"),
+				QT_TRANSLATE_NOOP("Feature", "Allows changing the name of the organization."));
+	AddPermission(*editPtr, "ChangeDescription",
+				QT_TRANSLATE_NOOP("Feature", "Change Description"),
+				QT_TRANSLATE_NOOP("Feature", "Allows changing the description of the organization."));
 
-	istd::TDelPtr<imtlic::CFeatureInfo> changeOrganizationDescriptionFeatureInfo;
-	changeOrganizationDescriptionFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
-	changeOrganizationDescriptionFeatureInfo->SetFeatureId("ChangeOrganizationDescription");
-	changeOrganizationDescriptionFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "Change Organization Description"));
-	changeOrganizationDescriptionFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Allows changing Organization Description."));
-	changeOrganizationDescriptionFeatureInfo->SetOptional(false);
-	changeOrganizationDescriptionFeatureInfo->SetIsPermission(true);
-	editOrganizationFeatureInfo->InsertSubFeature(changeOrganizationDescriptionFeatureInfo.PopPtr());
+	imtlic::CFeatureInfo* membersPtr = AddPermission(*organizationPtr, "Members",
+				QT_TRANSLATE_NOOP("Feature", "Members"),
+				QT_TRANSLATE_NOOP("Feature", "Provides access to the members of the organization."));
+	AddPermission(*membersPtr, "View",
+				QT_TRANSLATE_NOOP("Feature", "View Members"),
+				QT_TRANSLATE_NOOP("Feature", "Allows viewing the members of the organization."));
+	imtlic::CFeatureInfo* editMembersPtr = AddPermission(*membersPtr, "Edit",
+				QT_TRANSLATE_NOOP("Feature", "Edit Members"),
+				QT_TRANSLATE_NOOP("Feature", "Allows editing the members of the organization."),
+				{QByteArrayLiteral("/OrganizationManagement/Members/View")});
+	AddPermission(*editMembersPtr, "Invite",
+				QT_TRANSLATE_NOOP("Feature", "Invite Member"),
+				QT_TRANSLATE_NOOP("Feature", "Allows inviting a user to the organization."));
+	AddPermission(*editMembersPtr, "Exclude",
+				QT_TRANSLATE_NOOP("Feature", "Exclude Member"),
+				QT_TRANSLATE_NOOP("Feature", "Allows excluding a member from the organization."));
+	AddPermission(*editMembersPtr, "ChangeRole",
+				QT_TRANSLATE_NOOP("Feature", "Change Member Role"),
+				QT_TRANSLATE_NOOP("Feature", "Allows changing the role of a member."));
 
-	m_featureCollection.InsertNewObject("FeatureInfo", "", "", editOrganizationFeatureInfo.GetPtr());
+	imtlic::CFeatureInfo* rolesPtr = AddPermission(*organizationPtr, "Roles",
+				QT_TRANSLATE_NOOP("Feature", "Roles"),
+				QT_TRANSLATE_NOOP("Feature", "Provides access to the roles of the organization."));
+	AddPermission(*rolesPtr, "View",
+				QT_TRANSLATE_NOOP("Feature", "View Roles"),
+				QT_TRANSLATE_NOOP("Feature", "Allows viewing the roles of the organization."));
+	imtlic::CFeatureInfo* editRolesPtr = AddPermission(*rolesPtr, "Edit",
+				QT_TRANSLATE_NOOP("Feature", "Edit Roles"),
+				QT_TRANSLATE_NOOP("Feature", "Allows editing the roles of the organization."),
+				{QByteArrayLiteral("/OrganizationManagement/Roles/View")});
+	AddPermission(*editRolesPtr, "Add",
+				QT_TRANSLATE_NOOP("Feature", "Add Role"),
+				QT_TRANSLATE_NOOP("Feature", "Allows adding a role."));
+	AddPermission(*editRolesPtr, "Change",
+				QT_TRANSLATE_NOOP("Feature", "Change Role"),
+				QT_TRANSLATE_NOOP("Feature", "Allows changing a role."));
+	AddPermission(*editRolesPtr, "Remove",
+				QT_TRANSLATE_NOOP("Feature", "Remove Role"),
+				QT_TRANSLATE_NOOP("Feature", "Allows removing a role."));
 
-	istd::TDelPtr<imtlic::CFeatureInfo> memberManagementFeatureInfo;
-	memberManagementFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
-	memberManagementFeatureInfo->SetFeatureId("MemberManagement");
-	memberManagementFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "Member Management"));
-	memberManagementFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Provides access to Member-related operations."));
-	memberManagementFeatureInfo->SetOptional(false);
-	memberManagementFeatureInfo->SetIsPermission(true);
+	imtlic::CFeatureInfo* groupsPtr = AddPermission(*organizationPtr, "Groups",
+				QT_TRANSLATE_NOOP("Feature", "Groups"),
+				QT_TRANSLATE_NOOP("Feature", "Provides access to the groups of the organization."));
+	AddPermission(*groupsPtr, "View",
+				QT_TRANSLATE_NOOP("Feature", "View Groups"),
+				QT_TRANSLATE_NOOP("Feature", "Allows viewing the groups of the organization."));
+	imtlic::CFeatureInfo* editGroupsPtr = AddPermission(*groupsPtr, "Edit",
+				QT_TRANSLATE_NOOP("Feature", "Edit Groups"),
+				QT_TRANSLATE_NOOP("Feature", "Allows editing the groups of the organization."),
+				{QByteArrayLiteral("/OrganizationManagement/Groups/View")});
+	AddPermission(*editGroupsPtr, "Add",
+				QT_TRANSLATE_NOOP("Feature", "Add Group"),
+				QT_TRANSLATE_NOOP("Feature", "Allows adding a group."));
+	AddPermission(*editGroupsPtr, "Change",
+				QT_TRANSLATE_NOOP("Feature", "Change Group"),
+				QT_TRANSLATE_NOOP("Feature", "Allows changing a group."));
+	AddPermission(*editGroupsPtr, "Remove",
+				QT_TRANSLATE_NOOP("Feature", "Remove Group"),
+				QT_TRANSLATE_NOOP("Feature", "Allows removing a group."));
 
-	istd::TDelPtr<imtlic::CFeatureInfo> viewOrganizationMembersFeatureInfo;
-	viewOrganizationMembersFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
-	viewOrganizationMembersFeatureInfo->SetFeatureId("ViewOrganizationMembers");
-	viewOrganizationMembersFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "View Organization Members"));
-	viewOrganizationMembersFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Allows viewing Organization Members."));
-	viewOrganizationMembersFeatureInfo->SetOptional(false);
-	viewOrganizationMembersFeatureInfo->SetIsPermission(true);
-	viewOrganizationMembersFeatureInfo->SetRequirements(QByteArrayLiteral("/MemberManagement/EditOrganizationMember;/MemberManagement/EditOrganizationMember/InviteOrganizationMember;/MemberManagement/EditOrganizationMember/ExcludeOrganizationMember;/MemberManagement/EditOrganizationMember/ChangeOrganizationMember;/MemberManagement/EditOrganizationMember/ChangeOrganizationMember/ChangeOrganizationMemberRole").split(';'));
-	memberManagementFeatureInfo->InsertSubFeature(viewOrganizationMembersFeatureInfo.PopPtr());
+	imtlic::CFeatureInfo* permissionsPtr = AddPermission(*organizationPtr, "Permissions",
+				QT_TRANSLATE_NOOP("Feature", "Permissions"),
+				QT_TRANSLATE_NOOP("Feature", "Provides access to the permissions of the members."));
+	AddPermission(*permissionsPtr, "View",
+				QT_TRANSLATE_NOOP("Feature", "View Permissions"),
+				QT_TRANSLATE_NOOP("Feature", "Allows viewing the permissions of the members."));
+	AddPermission(*permissionsPtr, "Change",
+				QT_TRANSLATE_NOOP("Feature", "Change Permissions"),
+				QT_TRANSLATE_NOOP("Feature", "Allows assigning and changing the permissions of the members."),
+				{QByteArrayLiteral("/OrganizationManagement/Permissions/View")});
 
-	istd::TDelPtr<imtlic::CFeatureInfo> editOrganizationMemberFeatureInfo;
-	editOrganizationMemberFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
-	editOrganizationMemberFeatureInfo->SetFeatureId("EditOrganizationMember");
-	editOrganizationMemberFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "Edit Organization Member"));
-	editOrganizationMemberFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Allows editing Organization Member."));
-	editOrganizationMemberFeatureInfo->SetOptional(false);
-	editOrganizationMemberFeatureInfo->SetIsPermission(true);
+	imtlic::CFeatureInfo* connectionsPtr = AddPermission(*organizationPtr, "Connections",
+				QT_TRANSLATE_NOOP("Feature", "Connections"),
+				QT_TRANSLATE_NOOP("Feature", "Provides access to the connections to other organizations."));
+	AddPermission(*connectionsPtr, "View",
+				QT_TRANSLATE_NOOP("Feature", "View Connections"),
+				QT_TRANSLATE_NOOP("Feature", "Allows viewing the connections to other organizations."));
+	AddPermission(*connectionsPtr, "ViewCode",
+				QT_TRANSLATE_NOOP("Feature", "View Connection Code"),
+				QT_TRANSLATE_NOOP("Feature", "Allows viewing the code other organizations connect with."));
+	imtlic::CFeatureInfo* editConnectionsPtr = AddPermission(*connectionsPtr, "Edit",
+				QT_TRANSLATE_NOOP("Feature", "Edit Connections"),
+				QT_TRANSLATE_NOOP("Feature", "Allows editing the connections to other organizations."),
+				{QByteArrayLiteral("/OrganizationManagement/Connections/View")});
+	AddPermission(*editConnectionsPtr, "Connect",
+				QT_TRANSLATE_NOOP("Feature", "Connect Organization"),
+				QT_TRANSLATE_NOOP("Feature", "Allows connecting to another organization."));
+	AddPermission(*editConnectionsPtr, "Remove",
+				QT_TRANSLATE_NOOP("Feature", "Remove Connection"),
+				QT_TRANSLATE_NOOP("Feature", "Allows removing a connection to another organization."));
 
-	istd::TDelPtr<imtlic::CFeatureInfo> inviteOrganizationMemberFeatureInfo;
-	inviteOrganizationMemberFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
-	inviteOrganizationMemberFeatureInfo->SetFeatureId("InviteOrganizationMember");
-	inviteOrganizationMemberFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "Invite Organization Member"));
-	inviteOrganizationMemberFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Allows inviting Organization Member."));
-	inviteOrganizationMemberFeatureInfo->SetOptional(false);
-	inviteOrganizationMemberFeatureInfo->SetIsPermission(true);
-	editOrganizationMemberFeatureInfo->InsertSubFeature(inviteOrganizationMemberFeatureInfo.PopPtr());
-
-	istd::TDelPtr<imtlic::CFeatureInfo> excludeOrganizationMemberFeatureInfo;
-	excludeOrganizationMemberFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
-	excludeOrganizationMemberFeatureInfo->SetFeatureId("ExcludeOrganizationMember");
-	excludeOrganizationMemberFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "Exclude Organization Member"));
-	excludeOrganizationMemberFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Allows excluding a member from the organization."));
-	excludeOrganizationMemberFeatureInfo->SetOptional(false);
-	excludeOrganizationMemberFeatureInfo->SetIsPermission(true);
-	editOrganizationMemberFeatureInfo->InsertSubFeature(excludeOrganizationMemberFeatureInfo.PopPtr());
-
-	istd::TDelPtr<imtlic::CFeatureInfo> changeOrganizationMemberFeatureInfo;
-	changeOrganizationMemberFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
-	changeOrganizationMemberFeatureInfo->SetFeatureId("ChangeOrganizationMember");
-	changeOrganizationMemberFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "Change Organization Member"));
-	changeOrganizationMemberFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Allows changing a member within the organization."));
-	changeOrganizationMemberFeatureInfo->SetOptional(false);
-	changeOrganizationMemberFeatureInfo->SetIsPermission(true);
-
-	istd::TDelPtr<imtlic::CFeatureInfo> changeOrganizationMemberRoleFeatureInfo;
-	changeOrganizationMemberRoleFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
-	changeOrganizationMemberRoleFeatureInfo->SetFeatureId("ChangeOrganizationMemberRole");
-	changeOrganizationMemberRoleFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "Change Organization Member Role"));
-	changeOrganizationMemberRoleFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Allows changing Organization Member Role."));
-	changeOrganizationMemberRoleFeatureInfo->SetOptional(false);
-	changeOrganizationMemberRoleFeatureInfo->SetIsPermission(true);
-	changeOrganizationMemberFeatureInfo->InsertSubFeature(changeOrganizationMemberRoleFeatureInfo.PopPtr());
-	editOrganizationMemberFeatureInfo->InsertSubFeature(changeOrganizationMemberFeatureInfo.PopPtr());
-
-	memberManagementFeatureInfo->InsertSubFeature(editOrganizationMemberFeatureInfo.PopPtr());
-	m_featureCollection.InsertNewObject("FeatureInfo", "", "", memberManagementFeatureInfo.GetPtr());
-
-	istd::TDelPtr<imtlic::CFeatureInfo> roleManagementFeatureInfo;
-	roleManagementFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
-	roleManagementFeatureInfo->SetFeatureId("RoleManagement");
-	roleManagementFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "Role Management"));
-	roleManagementFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Provides access to Role-related operations."));
-	roleManagementFeatureInfo->SetOptional(false);
-	roleManagementFeatureInfo->SetIsPermission(true);
-
-	istd::TDelPtr<imtlic::CFeatureInfo> viewOrganizationRolesFeatureInfo;
-	viewOrganizationRolesFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
-	viewOrganizationRolesFeatureInfo->SetFeatureId("ViewOrganizationRoles");
-	viewOrganizationRolesFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "View Organization Roles"));
-	viewOrganizationRolesFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Allows viewing Organization Roles."));
-	viewOrganizationRolesFeatureInfo->SetOptional(false);
-	viewOrganizationRolesFeatureInfo->SetIsPermission(true);
-	viewOrganizationRolesFeatureInfo->SetRequirements(QByteArrayLiteral("/RoleManagement/EditOrganizationRole;/RoleManagement/EditOrganizationRole/ChangeOrganizationRole;/RoleManagement/EditOrganizationRole/RemoveOrganizationRole;/RoleManagement/EditOrganizationRole/AddOrganizationRole").split(';'));
-	roleManagementFeatureInfo->InsertSubFeature(viewOrganizationRolesFeatureInfo.PopPtr());
-
-	istd::TDelPtr<imtlic::CFeatureInfo> editOrganizationRoleFeatureInfo;
-	editOrganizationRoleFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
-	editOrganizationRoleFeatureInfo->SetFeatureId("EditOrganizationRole");
-	editOrganizationRoleFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "Edit Organization Role"));
-	editOrganizationRoleFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Allows editing Organization Role."));
-	editOrganizationRoleFeatureInfo->SetOptional(false);
-	editOrganizationRoleFeatureInfo->SetIsPermission(true);
-
-	istd::TDelPtr<imtlic::CFeatureInfo> changeOrganizationRoleFeatureInfo;
-	changeOrganizationRoleFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
-	changeOrganizationRoleFeatureInfo->SetFeatureId("ChangeOrganizationRole");
-	changeOrganizationRoleFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "Change Organization Role"));
-	changeOrganizationRoleFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Allows changing Organization Role."));
-	changeOrganizationRoleFeatureInfo->SetOptional(false);
-	changeOrganizationRoleFeatureInfo->SetIsPermission(true);
-	editOrganizationRoleFeatureInfo->InsertSubFeature(changeOrganizationRoleFeatureInfo.PopPtr());
-
-	istd::TDelPtr<imtlic::CFeatureInfo> removeOrganizationRoleFeatureInfo;
-	removeOrganizationRoleFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
-	removeOrganizationRoleFeatureInfo->SetFeatureId("RemoveOrganizationRole");
-	removeOrganizationRoleFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "Remove Organization Role"));
-	removeOrganizationRoleFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Allows removing Organization Role."));
-	removeOrganizationRoleFeatureInfo->SetOptional(false);
-	removeOrganizationRoleFeatureInfo->SetIsPermission(true);
-	editOrganizationRoleFeatureInfo->InsertSubFeature(removeOrganizationRoleFeatureInfo.PopPtr());
-
-	istd::TDelPtr<imtlic::CFeatureInfo> addOrganizationRoleFeatureInfo;
-	addOrganizationRoleFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
-	addOrganizationRoleFeatureInfo->SetFeatureId("AddOrganizationRole");
-	addOrganizationRoleFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "Add Organization Role"));
-	addOrganizationRoleFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Allows adding Organization Role."));
-	addOrganizationRoleFeatureInfo->SetOptional(false);
-	addOrganizationRoleFeatureInfo->SetIsPermission(true);
-	editOrganizationRoleFeatureInfo->InsertSubFeature(addOrganizationRoleFeatureInfo.PopPtr());
-
-	roleManagementFeatureInfo->InsertSubFeature(editOrganizationRoleFeatureInfo.PopPtr());
-	m_featureCollection.InsertNewObject("FeatureInfo", "", "", roleManagementFeatureInfo.GetPtr());
-
-	istd::TDelPtr<imtlic::CFeatureInfo> groupManagementFeatureInfo;
-	groupManagementFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
-	groupManagementFeatureInfo->SetFeatureId("GroupManagement");
-	groupManagementFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "Group Management"));
-	groupManagementFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Provides access to Group-related operations."));
-	groupManagementFeatureInfo->SetOptional(false);
-	groupManagementFeatureInfo->SetIsPermission(true);
-
-	istd::TDelPtr<imtlic::CFeatureInfo> viewOrganizationGroupsFeatureInfo;
-	viewOrganizationGroupsFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
-	viewOrganizationGroupsFeatureInfo->SetFeatureId("ViewOrganizationGroups");
-	viewOrganizationGroupsFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "View Organization Groups"));
-	viewOrganizationGroupsFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Allows viewing Organization Groups."));
-	viewOrganizationGroupsFeatureInfo->SetOptional(false);
-	viewOrganizationGroupsFeatureInfo->SetIsPermission(true);
-	viewOrganizationGroupsFeatureInfo->SetRequirements(QByteArrayLiteral("/GroupManagement/EditOrganizationGroup;/GroupManagement/EditOrganizationGroup/ChangeOrganizationGroup;/GroupManagement/EditOrganizationGroup/RemoveOrganizationGroup;/GroupManagement/EditOrganizationGroup/AddOrganizationGroup").split(';'));
-	groupManagementFeatureInfo->InsertSubFeature(viewOrganizationGroupsFeatureInfo.PopPtr());
-
-	istd::TDelPtr<imtlic::CFeatureInfo> editOrganizationGroupFeatureInfo;
-	editOrganizationGroupFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
-	editOrganizationGroupFeatureInfo->SetFeatureId("EditOrganizationGroup");
-	editOrganizationGroupFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "Edit Organization Group"));
-	editOrganizationGroupFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Allows editing Organization Group."));
-	editOrganizationGroupFeatureInfo->SetOptional(false);
-	editOrganizationGroupFeatureInfo->SetIsPermission(true);
-
-	istd::TDelPtr<imtlic::CFeatureInfo> changeOrganizationGroupFeatureInfo;
-	changeOrganizationGroupFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
-	changeOrganizationGroupFeatureInfo->SetFeatureId("ChangeOrganizationGroup");
-	changeOrganizationGroupFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "Change Organization Group"));
-	changeOrganizationGroupFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Allows changing Organization Group."));
-	changeOrganizationGroupFeatureInfo->SetOptional(false);
-	changeOrganizationGroupFeatureInfo->SetIsPermission(true);
-	editOrganizationGroupFeatureInfo->InsertSubFeature(changeOrganizationGroupFeatureInfo.PopPtr());
-
-	istd::TDelPtr<imtlic::CFeatureInfo> removeOrganizationGroupFeatureInfo;
-	removeOrganizationGroupFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
-	removeOrganizationGroupFeatureInfo->SetFeatureId("RemoveOrganizationGroup");
-	removeOrganizationGroupFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "Remove Organization Group"));
-	removeOrganizationGroupFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Allows removing Organization Group."));
-	removeOrganizationGroupFeatureInfo->SetOptional(false);
-	removeOrganizationGroupFeatureInfo->SetIsPermission(true);
-	editOrganizationGroupFeatureInfo->InsertSubFeature(removeOrganizationGroupFeatureInfo.PopPtr());
-
-	istd::TDelPtr<imtlic::CFeatureInfo> addOrganizationGroupFeatureInfo;
-	addOrganizationGroupFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
-	addOrganizationGroupFeatureInfo->SetFeatureId("AddOrganizationGroup");
-	addOrganizationGroupFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "Add Organization Group"));
-	addOrganizationGroupFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Allows adding Organization Group."));
-	addOrganizationGroupFeatureInfo->SetOptional(false);
-	addOrganizationGroupFeatureInfo->SetIsPermission(true);
-	editOrganizationGroupFeatureInfo->InsertSubFeature(addOrganizationGroupFeatureInfo.PopPtr());
-
-	groupManagementFeatureInfo->InsertSubFeature(editOrganizationGroupFeatureInfo.PopPtr());
-	m_featureCollection.InsertNewObject("FeatureInfo", "", "", groupManagementFeatureInfo.GetPtr());
-
-	istd::TDelPtr<imtlic::CFeatureInfo> permissionManagementFeatureInfo;
-	permissionManagementFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
-	permissionManagementFeatureInfo->SetFeatureId("PermissionManagement");
-	permissionManagementFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "Permission Management"));
-	permissionManagementFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Provides access to Permission-related operations."));
-	permissionManagementFeatureInfo->SetOptional(false);
-	permissionManagementFeatureInfo->SetIsPermission(true);
-
-	istd::TDelPtr<imtlic::CFeatureInfo> viewOrganizationPermissionsFeatureInfo;
-	viewOrganizationPermissionsFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
-	viewOrganizationPermissionsFeatureInfo->SetFeatureId("ViewOrganizationPermissions");
-	viewOrganizationPermissionsFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "View Organization Permissions"));
-	viewOrganizationPermissionsFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Allows viewing Organization Permissions."));
-	viewOrganizationPermissionsFeatureInfo->SetOptional(false);
-	viewOrganizationPermissionsFeatureInfo->SetIsPermission(true);
-	permissionManagementFeatureInfo->InsertSubFeature(viewOrganizationPermissionsFeatureInfo.PopPtr());
-
-	istd::TDelPtr<imtlic::CFeatureInfo> editOrganizationMemberPermissionsFeatureInfo;
-	editOrganizationMemberPermissionsFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
-	editOrganizationMemberPermissionsFeatureInfo->SetFeatureId("EditOrganizationMemberPermissions");
-	editOrganizationMemberPermissionsFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "Edit Organization Member Permissions"));
-	editOrganizationMemberPermissionsFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Allows assigning and modifying permissions for organization members."));
-	editOrganizationMemberPermissionsFeatureInfo->SetOptional(false);
-	editOrganizationMemberPermissionsFeatureInfo->SetIsPermission(true);
-	permissionManagementFeatureInfo->InsertSubFeature(editOrganizationMemberPermissionsFeatureInfo.PopPtr());
-
-	m_featureCollection.InsertNewObject("FeatureInfo", "", "", permissionManagementFeatureInfo.GetPtr());
-
-	istd::TDelPtr<imtlic::CFeatureInfo> connectionManagementFeatureInfo;
-	connectionManagementFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
-	connectionManagementFeatureInfo->SetFeatureId("ConnectionManagement");
-	connectionManagementFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "Connection Management"));
-	connectionManagementFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Provides access to Connection-related operations."));
-	connectionManagementFeatureInfo->SetOptional(false);
-	connectionManagementFeatureInfo->SetIsPermission(true);
-
-	istd::TDelPtr<imtlic::CFeatureInfo> viewOrganizationConnectionsFeatureInfo;
-	viewOrganizationConnectionsFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
-	viewOrganizationConnectionsFeatureInfo->SetFeatureId("ViewOrganizationConnections");
-	viewOrganizationConnectionsFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "View Organization Connections"));
-	viewOrganizationConnectionsFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Allows viewing Organization Connections."));
-	viewOrganizationConnectionsFeatureInfo->SetOptional(false);
-	viewOrganizationConnectionsFeatureInfo->SetIsPermission(true);
-	viewOrganizationConnectionsFeatureInfo->SetRequirements(QByteArrayLiteral("/ConnectionManagement/EditOrganizationConnection;/ConnectionManagement/EditOrganizationConnection/ConnectOrganization;/ConnectionManagement/EditOrganizationConnection/RemoveOrganizationConnection").split(';'));
-	connectionManagementFeatureInfo->InsertSubFeature(viewOrganizationConnectionsFeatureInfo.PopPtr());
-
-	istd::TDelPtr<imtlic::CFeatureInfo> editOrganizationConnectionFeatureInfo;
-	editOrganizationConnectionFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
-	editOrganizationConnectionFeatureInfo->SetFeatureId("EditOrganizationConnection");
-	editOrganizationConnectionFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "Edit Organization Connection"));
-	editOrganizationConnectionFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Allows editing Organization Connection."));
-	editOrganizationConnectionFeatureInfo->SetOptional(false);
-	editOrganizationConnectionFeatureInfo->SetIsPermission(true);
-
-	istd::TDelPtr<imtlic::CFeatureInfo> connectOrganizationFeatureInfo;
-	connectOrganizationFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
-	connectOrganizationFeatureInfo->SetFeatureId("ConnectOrganization");
-	connectOrganizationFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "Connect Organization"));
-	connectOrganizationFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Allows connecting Organization."));
-	connectOrganizationFeatureInfo->SetOptional(false);
-	connectOrganizationFeatureInfo->SetIsPermission(true);
-	editOrganizationConnectionFeatureInfo->InsertSubFeature(connectOrganizationFeatureInfo.PopPtr());
-
-	istd::TDelPtr<imtlic::CFeatureInfo> removeOrganizationConnectionFeatureInfo;
-	removeOrganizationConnectionFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
-	removeOrganizationConnectionFeatureInfo->SetFeatureId("RemoveOrganizationConnection");
-	removeOrganizationConnectionFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "Remove Organization Connection"));
-	removeOrganizationConnectionFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Allows removing Organization Connection."));
-	removeOrganizationConnectionFeatureInfo->SetOptional(false);
-	removeOrganizationConnectionFeatureInfo->SetIsPermission(true);
-	editOrganizationConnectionFeatureInfo->InsertSubFeature(removeOrganizationConnectionFeatureInfo.PopPtr());
-
-	connectionManagementFeatureInfo->InsertSubFeature(editOrganizationConnectionFeatureInfo.PopPtr());
-
-	istd::TDelPtr<imtlic::CFeatureInfo> viewOrganizationConnectionCodeFeatureInfo;
-	viewOrganizationConnectionCodeFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
-	viewOrganizationConnectionCodeFeatureInfo->SetFeatureId("ViewOrganizationConnectionCode");
-	viewOrganizationConnectionCodeFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "View Organization Connection Code"));
-	viewOrganizationConnectionCodeFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Allows viewing Organization Connection Code."));
-	viewOrganizationConnectionCodeFeatureInfo->SetOptional(false);
-	viewOrganizationConnectionCodeFeatureInfo->SetIsPermission(true);
-	connectionManagementFeatureInfo->InsertSubFeature(viewOrganizationConnectionCodeFeatureInfo.PopPtr());
-	m_featureCollection.InsertNewObject("FeatureInfo", "", "", connectionManagementFeatureInfo.GetPtr());
+	m_featureCollection.InsertNewObject("FeatureInfo", "", "", organizationPtr.GetPtr());
 }
 
 
 } // namespace imtauth
+
+

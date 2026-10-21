@@ -32,6 +32,11 @@ QtObject {
 	signal registerSuccessfully();
 	signal registerFailed(string message, var violatedRules);
 
+	// --- Sign-in with external accounts (Google, Apple, Facebook) ---
+	signal externalLoginProvidersLoaded();
+	signal externalAccountLinked(string providerId);
+	signal externalLoginFailed(string message);
+
 	// --- Tenant membership lifecycle events ---
 	// Emitted by membership-aware views (e.g. TenantCollectionView) so other
 	// components anywhere in the app (e.g. an open TenantEditor) can react and
@@ -60,6 +65,20 @@ QtObject {
 
 	property bool __refreshInProgress: false
 	property var __pendingRetryQueue: []
+
+	// Sign-in with external accounts: set per application in ACC (ExternalLoginEnabled), delivered with GetApplicationInfo.
+	readonly property bool externalLoginEnabled: ApplicationInfoProvider.externalLoginEnabled
+	// Providers offered by the server: [{ "id", "name", "type" }]
+	property var externalLoginProviders: []
+	property bool externalLoginInProgress: false
+	property string externalLoginProviderId: ""
+	property string __externalLoginId: ""
+	property bool __externalLoginIsLink: false
+	property real __externalLoginDeadline: 0
+	// Prepared logins: [{ "providerId", "isLink", "loginId", "authorizationUrl", "preparedAt" }]
+	property var __preparedLogins: []
+	property var __prepareQueue: []
+	property var __preparingProvider: null
 	readonly property string authenticationTokenHeaderId: "x-authentication-token"
 
 	// Set per application in ACC and delivered with GetApplicationInfo; without tenants
@@ -155,10 +174,16 @@ QtObject {
 	onStoredRefreshTokenChanged: saveLoginSettings()
 
 	// Refresh pending invitations on relevant events (including when sender revokes)
+	onExternalLoginEnabledChanged: {
+		root.loadExternalLoginProviders()
+	}
+
 	onLoggedIn: {
+		root.__clearPreparedLogins()
 		root.__startTenantTracking()
 	}
 	onLoggedOut: {
+		root.__clearPreparedLogins()
 		root.__stopTenantTracking()
 		__refreshInProgress = false
 		__pendingRetryQueue = []
@@ -992,6 +1017,369 @@ QtObject {
 			root.__tenantRemovalSwitchInProgress = false
 			root.tenantSelectionFailed(message || "")
 			root.__completeTenantSwitch()
+		}
+	}
+
+	// --- Sign-in with external accounts ---
+	// The provider page opens in the browser; the server receives its answer, this client polls for the result.
+	// A browser opens a window only within a click, so the logins are prepared before: the click opens a ready URL.
+
+	function loadExternalLoginProviders(){
+		if (!root.externalLoginEnabled){
+			root.cancelExternalLogin()
+			root.__clearPreparedLogins()
+			root.externalLoginProviders = []
+			root.externalLoginProvidersLoaded()
+			return
+		}
+
+		root.__sendWithoutAccessToken(externalLoginProvidersGqlSender)
+	}
+
+	function loginWithExternalProvider(providerId){
+		root.__beginExternalLogin(providerId, false)
+	}
+
+	function linkExternalAccount(providerId){
+		root.__beginExternalLogin(providerId, true)
+	}
+
+	function cancelExternalLogin(){
+		externalLoginPollTimer.stop()
+		root.__externalLoginId = ""
+		root.externalLoginInProgress = false
+		root.externalLoginProviderId = ""
+	}
+
+	// Prepares a login for every offered provider: sign-in (isLink false) or linking to the signed-in user.
+	function prepareExternalLogins(isLink){
+		let queue = root.__prepareQueue.slice()
+		for (let i = 0; i < root.externalLoginProviders.length; i++){
+			queue.push({ "providerId": String(root.externalLoginProviders[i].id), "isLink": isLink })
+		}
+		root.__prepareQueue = queue
+
+		root.__prepareNextExternalLogin()
+	}
+
+	function __prepareNextExternalLogin(){
+		if (prepareExternalLoginGqlSender.state === "Loading" || root.__prepareQueue.length === 0){
+			return
+		}
+
+		let queue = root.__prepareQueue.slice()
+		let next = queue.shift()
+		root.__prepareQueue = queue
+		root.__preparingProvider = next
+
+		prepareExternalLoginInput.m_providerId = next.providerId
+		prepareExternalLoginInput.m_productId = root.productId
+		prepareExternalLoginInput.m_link = next.isLink
+
+		if (next.isLink){
+			prepareExternalLoginGqlSender.send(prepareExternalLoginInput)
+		}
+		else{
+			root.__sendWithoutAccessToken(prepareExternalLoginGqlSender, prepareExternalLoginInput)
+		}
+	}
+
+	function __storePreparedLogin(loginId, authorizationUrl){
+		let prepared = root.__preparingProvider
+		root.__preparingProvider = null
+
+		if (prepared && loginId !== "" && authorizationUrl !== ""){
+			let logins = root.__preparedLogins.slice()
+			logins.push({
+				"providerId": prepared.providerId,
+				"isLink": prepared.isLink,
+				"loginId": loginId,
+				"authorizationUrl": authorizationUrl,
+				"preparedAt": Date.now()
+			})
+			root.__preparedLogins = logins
+		}
+
+		root.__prepareNextExternalLogin()
+	}
+
+	// Takes the prepared login of the provider; one older than 8 minutes is about to expire on the server.
+	function __takePreparedLogin(providerId, isLink){
+		let found = null
+		let logins = []
+		for (let i = 0; i < root.__preparedLogins.length; i++){
+			let login = root.__preparedLogins[i]
+			let isFresh = Date.now() - login.preparedAt < 8 * 60 * 1000
+			if (found === null && isFresh && login.providerId === providerId && login.isLink === isLink){
+				found = login
+			}
+			else if (isFresh){
+				logins.push(login)
+			}
+		}
+		root.__preparedLogins = logins
+
+		return found
+	}
+
+	function __clearPreparedLogins(){
+		root.__preparedLogins = []
+		root.__prepareQueue = []
+	}
+
+	function __beginExternalLogin(providerId, isLink){
+		if (root.externalLoginInProgress){
+			root.cancelExternalLogin()
+		}
+
+		root.externalLoginInProgress = true
+		root.externalLoginProviderId = providerId
+		root.__externalLoginIsLink = isLink
+
+		let prepared = root.__takePreparedLogin(providerId, isLink)
+		if (prepared !== null){
+			root.__startExternalLogin(prepared.loginId, prepared.authorizationUrl)
+
+			// A prepared login is single-use, the next attempt gets a new one.
+			let queue = root.__prepareQueue.slice()
+			queue.push({ "providerId": providerId, "isLink": isLink })
+			root.__prepareQueue = queue
+			root.__prepareNextExternalLogin()
+
+			return
+		}
+
+		beginExternalLoginInput.m_providerId = providerId
+		beginExternalLoginInput.m_productId = root.productId
+		beginExternalLoginInput.m_link = isLink
+
+		if (isLink){
+			beginExternalLoginGqlSender.send(beginExternalLoginInput)
+		}
+		else{
+			root.__sendWithoutAccessToken(beginExternalLoginGqlSender, beginExternalLoginInput)
+		}
+	}
+
+	function __startExternalLogin(loginId, authorizationUrl){
+		root.__externalLoginId = loginId
+		root.__externalLoginDeadline = Date.now() + 10 * 60 * 1000
+		externalLoginPollTimer.start()
+
+		Qt.openUrlExternally(authorizationUrl)
+	}
+
+	function __failExternalLogin(message){
+		let isLink = root.__externalLoginIsLink
+		root.cancelExternalLogin()
+
+		let errorText = (message && message !== "") ? message : qsTr("The sign-in could not be completed")
+		root.externalLoginFailed(errorText)
+		if (!isLink){
+			root.loginFailed(errorText)
+		}
+	}
+
+	function __pollExternalLogin(){
+		if (root.__externalLoginId === ""){
+			externalLoginPollTimer.stop()
+			return
+		}
+
+		if (Date.now() > root.__externalLoginDeadline){
+			root.__failExternalLogin(qsTr("The sign-in was not completed in time. Please try again."))
+			return
+		}
+
+		if (completeExternalLoginGqlSender.state === "Loading"){
+			return
+		}
+
+		completeExternalLoginInput.m_loginId = root.__externalLoginId
+		if (root.__externalLoginIsLink){
+			completeExternalLoginGqlSender.send(completeExternalLoginInput)
+		}
+		else{
+			root.__sendWithoutAccessToken(completeExternalLoginGqlSender, completeExternalLoginInput)
+		}
+	}
+
+	function __finishExternalLogin(status, message, authorization){
+		if (status === "Pending"){
+			return
+		}
+
+		let providerId = root.externalLoginProviderId
+
+		if (status === "SignedIn" && authorization){
+			root.cancelExternalLogin()
+			root.userTokenProvider.setLoginData(
+						authorization.m_refreshToken,
+						authorization.m_token,
+						authorization.m_userId,
+						authorization.m_username,
+						authorization.m_systemId,
+						root.normalizePermissions(authorization.m_permissions))
+			return
+		}
+
+		if (status === "Linked"){
+			root.cancelExternalLogin()
+			PopupManager.addSuccessMessage(qsTr("The account has been linked"), true)
+			root.externalAccountLinked(providerId)
+			return
+		}
+
+		root.__failExternalLogin(message)
+	}
+
+	property Timer externalLoginPollTimer: Timer {
+		interval: 2000
+		repeat: true
+
+		onTriggered: {
+			root.__pollExternalLogin()
+		}
+	}
+
+	property GqlSdlRequestSender externalLoginProvidersGqlSender: GqlSdlRequestSender {
+		permissionPath: root.permissionPath
+		gqlCommandId: ImtauthAuthorizationSdlCommandIds.s_getExternalLoginProviders
+
+		sdlObjectComp: Component {
+			ExternalLoginProviderList {
+				onFinished: {
+					let providers = []
+					if (m_providers){
+						for (let i = 0; i < m_providers.count; i++){
+							let provider = m_providers.get(i).item
+							if (provider){
+								providers.push({
+									"id": provider.m_id,
+									"name": provider.m_name,
+									"type": provider.m_providerType
+								})
+							}
+						}
+					}
+
+					root.externalLoginProviders = providers
+					root.externalLoginProvidersLoaded()
+
+					if (!root.isLoggedIn()){
+						root.__clearPreparedLogins()
+						root.prepareExternalLogins(false)
+					}
+				}
+			}
+		}
+
+		function createQueryParams(query){
+		}
+
+		function getHeaders(){
+			return root.__emptyAuthTokenHeaders()
+		}
+
+		function onError(message, type){
+			// Without the providers the page only offers the password sign-in.
+			console.warn("Auth: external login providers are not available:", message)
+			root.externalLoginProviders = []
+		}
+	}
+
+	property BeginExternalLoginInput beginExternalLoginInput: BeginExternalLoginInput {}
+	property GqlSdlRequestSender beginExternalLoginGqlSender: GqlSdlRequestSender {
+		permissionPath: root.permissionPath
+		requestType: 1
+		gqlCommandId: ImtauthAuthorizationSdlCommandIds.s_beginExternalLogin
+
+		sdlObjectComp: Component {
+			BeginExternalLoginPayload {
+				onFinished: {
+					if (m_loginId === "" || m_authorizationUrl === ""){
+						root.__failExternalLogin(m_message)
+						return
+					}
+
+					root.__startExternalLogin(m_loginId, m_authorizationUrl)
+				}
+			}
+		}
+
+		function getHeaders(){
+			return root.__externalLoginIsLink ? {} : root.__emptyAuthTokenHeaders()
+		}
+
+		function onError(message, type){
+			root.__failExternalLogin(message)
+		}
+	}
+
+	property BeginExternalLoginInput prepareExternalLoginInput: BeginExternalLoginInput {}
+	property GqlSdlRequestSender prepareExternalLoginGqlSender: GqlSdlRequestSender {
+		permissionPath: root.permissionPath
+		requestType: 1
+		gqlCommandId: ImtauthAuthorizationSdlCommandIds.s_beginExternalLogin
+
+		sdlObjectComp: Component {
+			BeginExternalLoginPayload {
+				onFinished: {
+					root.__storePreparedLogin(m_loginId, m_authorizationUrl)
+				}
+			}
+		}
+
+		function getHeaders(){
+			let isLink = root.__preparingProvider ? root.__preparingProvider.isLink : false
+			return isLink ? {} : root.__emptyAuthTokenHeaders()
+		}
+
+		function onError(message, type){
+			// Without a prepared login the click starts the login itself.
+			console.warn("Auth: external login could not be prepared:", message)
+			root.__storePreparedLogin("", "")
+		}
+	}
+
+	// A prepared login expires on the server after 10 minutes.
+	property Timer preparedLoginsRefreshTimer: Timer {
+		interval: 5 * 60 * 1000
+		repeat: true
+		running: root.__preparedLogins.length > 0
+
+		onTriggered: {
+			let queue = []
+			for (let i = 0; i < root.__preparedLogins.length; i++){
+				queue.push({ "providerId": root.__preparedLogins[i].providerId, "isLink": root.__preparedLogins[i].isLink })
+			}
+			root.__preparedLogins = []
+			root.__prepareQueue = queue
+			root.__prepareNextExternalLogin()
+		}
+	}
+
+	property ExternalLoginInput completeExternalLoginInput: ExternalLoginInput {}
+	property GqlSdlRequestSender completeExternalLoginGqlSender: GqlSdlRequestSender {
+		permissionPath: root.permissionPath
+		requestType: 1
+		gqlCommandId: ImtauthAuthorizationSdlCommandIds.s_completeExternalLogin
+
+		sdlObjectComp: Component {
+			ExternalLoginPayload {
+				onFinished: {
+					root.__finishExternalLogin(m_status, m_message, m_authorization)
+				}
+			}
+		}
+
+		function getHeaders(){
+			return root.__externalLoginIsLink ? {} : root.__emptyAuthTokenHeaders()
+		}
+
+		function onError(message, type){
+			// A failed poll is retried by the timer until the login expires.
+			console.warn("Auth: external login poll failed:", message)
 		}
 	}
 }

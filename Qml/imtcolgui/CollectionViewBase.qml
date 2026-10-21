@@ -293,24 +293,35 @@ ViewBase {
 				collectionViewBaseContainer.elementsChanged();
 			}
 
+			// Keeps only the selected ids still on this page: rows that went to another page (sorting, filtering)
+			// are not shown as selected, and commands like Edit or Remove must not act on them.
 			function restoreSelection(){
 				let count = !tableInternal.elements ? 0 : tableInternal.elements.getItemsCount()
 				let selectedIndexes = []
+				let selectedIds = []
 				for (let i = 0; i < count; i++){
 					let elementId = tableInternal.elements.getData("id", i)
 					if (collectionViewBaseContainer.selectionManager.isSelected(elementId)){
 						selectedIndexes.push(i)
+						selectedIds.push(elementId)
 					}
 				}
 
-				if (tableInternal.selectionManager.arraysEqual(tableInternal.getSelectedIndexes(), selectedIndexes)){
-					return
+				let idsChanged = selectedIds.length !== collectionViewBaseContainer.selectionManager.selectedIds.length
+				if (idsChanged){
+					collectionViewBaseContainer.selectionManager.selectMultiple(selectedIds)
 				}
 
-				tableInternal.selectionBlock = true
-				tableInternal.resetSelection()
-				tableInternal.selectionManager.selectMultiple(selectedIndexes)
-				tableInternal.selectionBlock = false
+				if (!tableInternal.selectionManager.arraysEqual(tableInternal.getSelectedIndexes(), selectedIndexes)){
+					tableInternal.selectionBlock = true
+					tableInternal.resetSelection()
+					tableInternal.selectionManager.selectMultiple(selectedIndexes)
+					tableInternal.selectionBlock = false
+				}
+
+				if (idsChanged){
+					collectionViewBaseContainer.selectionChanged(collectionViewBaseContainer.selectionManager.selectedIds, selectedIndexes)
+				}
 			}
 			
 			onHeadersChanged: {

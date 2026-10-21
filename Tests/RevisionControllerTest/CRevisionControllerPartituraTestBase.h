@@ -29,6 +29,7 @@ private slots:
 	void RestoreRevisionWithCorrectParamsTest();
 	void RestoreRevisionWithIncorrectParamsTest_data();
 	void RestoreRevisionWithIncorrectParamsTest();
+	void GetRevisionDataWithCorrectParamsTest();
 	void ExportObjectWithCorrectParamsTest();
 	void ExportObjectWithIncorrectParamsTest_data();
 	void ExportObjectWithIncorrectParamsTest();

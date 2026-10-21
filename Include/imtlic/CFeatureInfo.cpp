@@ -461,6 +461,19 @@ QByteArray CalculateFeaturePath(const IFeatureInfo& featureInfo)
 }
 
 
+bool IsSameOrNestedFeaturePath(const QByteArray& path, const QByteArray& otherPath)
+{
+	if (path == otherPath){
+		return true;
+	}
+
+	const QByteArray& shorterPath = (path.size() < otherPath.size()) ? path : otherPath;
+	const QByteArray& longerPath = (path.size() < otherPath.size()) ? otherPath : path;
+
+	return longerPath.startsWith(shorterPath) && longerPath.at(shorterPath.size()) == '/';
+}
+
+
 
 } // namespace imtlic
 

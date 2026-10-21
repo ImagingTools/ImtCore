@@ -32,6 +32,9 @@ ViewCommandsDelegateBase {
 
 	property string importObjectTypeId;
 
+	// Edit opens one document per selected row; every open document costs its editor and data, so a large selection is refused.
+	property int maxOpenDocumentsCount: 5;
+
 	property bool canRename: false;
 	property bool canSetDescription: false;
 	property bool showingDisableObjects: false;
@@ -585,7 +588,12 @@ ViewCommandsDelegateBase {
 				onRemoveAll(params);
 			}
 			else if (commandId === "Edit"){
-				onEdit(params);
+				if (collectionView.table.getSelectedIndexes().length > maxOpenDocumentsCount){
+					PopupManager.addWarningMessage(qsTr("No more than %1 documents can be opened at once").arg(maxOpenDocumentsCount), true);
+				}
+				else{
+					onEdit(params);
+				}
 			}
 			else if (commandId === "Import"){
 				onImport(params);

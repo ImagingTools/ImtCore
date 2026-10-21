@@ -12,6 +12,7 @@
 #include <imtauthdb/CUsersSqlPathExtractorComp.h>
 #include <imtauthdb/CUserActionDatabaseDelegateComp.h>
 #include <imtauthdb/CPersonalAccessTokenDatabaseDelegateComp.h>
+#include <imtauthdb/CExternalIdentityDatabaseDelegateComp.h>
 #include <imtauthdb/CTenantDbDelegateComp.h>
 #include <imtauthdb/CTenantMembershipDbDelegateComp.h>
 #include <imtauthdb/CTenantEntityBindingDbDelegateComp.h>
@@ -25,6 +26,7 @@
 #include <imtauthdb/CTenantRelationshipDbDelegateComp.h>
 #include <imtauthdb/CCrossTenantMessageDbDelegateComp.h>
 #include <imtauthdb/COrderRequestDbDelegateComp.h>
+#include <imtauthdb/CPermissionPathMigrationComp.h>
 
 /**
 	ImtAuthDbPck package
@@ -46,6 +48,7 @@ typedef imtauthdb::CRoleDatabaseDelegateComp SqliteJsonRoleDatabaseDelegate;
 typedef imtauthdb::CUsersSqlPathExtractorComp UsersSqlPathExtractor;
 typedef imtauthdb::CUserActionDatabaseDelegateComp UserActionDatabaseDelegate;
 typedef imtauthdb::CPersonalAccessTokenDatabaseDelegateComp PersonalAccessTokenDatabaseDelegate;
+typedef imtauthdb::CExternalIdentityDatabaseDelegateComp ExternalIdentityDatabaseDelegate;
 typedef imtauthdb::CTenantDbDelegateComp TenantDatabaseDelegate;
 typedef imtauthdb::CTenantMembershipDbDelegateComp TenantMembershipDatabaseDelegate;
 typedef imtauthdb::CTenantEntityBindingDbDelegateComp TenantEntityBindingDatabaseDelegate;
@@ -58,6 +61,7 @@ typedef imtauthdb::CTenantConnectionDbDelegateComp TenantConnectionDatabaseDeleg
 typedef imtauthdb::CTenantRelationshipProposalDbDelegateComp TenantRelationshipProposalDatabaseDelegate;
 typedef imtauthdb::CTenantRelationshipDbDelegateComp TenantRelationshipDatabaseDelegate;
 typedef imtauthdb::CCrossTenantMessageDbDelegateComp CrossTenantMessageDatabaseDelegate;
+typedef imtauthdb::CPermissionPathMigrationComp PermissionPathMigration;
 typedef imtauthdb::COrderRequestDbDelegateComp OrderRequestDatabaseDelegate;
 
 

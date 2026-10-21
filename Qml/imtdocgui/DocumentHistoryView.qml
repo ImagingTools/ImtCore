@@ -43,7 +43,9 @@ Rectangle {
 	readonly property int activeRevision: revisionsProvider.activeRevision
 	readonly property alias contentHeight: historyTable.contentHeight
 
-	readonly property bool __canViewRevisions: PermissionsController.checkPermission("ViewRevisions")
+	// Permission area of the revisions of the collection, e.g. "/SensorManagement/Revisions".
+	property string revisionsPermissionPath: ""
+	readonly property bool __canViewRevisions: PermissionsController.checkPermission(container.revisionsPermissionPath + "/View")
 
 	property QtObject __selectionManager: QtObject {
 		function isSelected(id){

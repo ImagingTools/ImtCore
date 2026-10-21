@@ -288,6 +288,10 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 		representationObject.roles = QByteArray(userGroupInfoPtr->GetRoles(productId).join(';'));
 	}
 
+	if (requestInfo.items.isUsersCountRequested){
+		representationObject.usersCount = int(userGroupInfoPtr->GetUsers().count());
+	}
+
 	if (requestInfo.items.isParentGroupsRequested){
 		representationObject.parentGroups = QByteArray(userGroupInfoPtr->GetParentGroups().join(';'));
 	}

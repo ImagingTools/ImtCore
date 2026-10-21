@@ -51,7 +51,19 @@ node compiler/compiler.js
     -r <root>          URL root path (default: /)
     -m <mode>          output mode: "js" | "html"
     -i <file>          icon path (html mode only)
+    --list-qml         print qml files from every participating qmldir and exit
 ```
+
+`--list-qml` requires `-c`. It resolves `dirs` and `includes` the same way as a compile,
+then prints one absolute `.qml` path per line. `-e` adds the entry directory when that
+directory is not itself a module. CMake can capture that list:
+
+```cmake
+jqml3_qmldir_qml_files(QML_DEPS "${inputjs}")
+```
+
+`jq_compile_web` uses this list as `DEPENDS` when the config can be read.
+Generated includes that do not exist yet leave the previous recursive `*.qml` glob in place.
 
 When `--mode html` is used, the compiler only writes a boilerplate HTML page and exits.
 All further phases apply only to `--mode js`.

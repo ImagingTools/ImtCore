@@ -57,7 +57,7 @@ ViewBase {
 	property var freedFeatureNames: []
 
 	Component.onCompleted: {
-		canEdit = PermissionsController.checkPermission("ChangeProduct")
+		canEdit = PermissionsController.checkPermission("/ProductManagement/Edit/Change")
 		CachedFeatureCollection.updateModel()
 		CachedFeatureCollection.modelUpdated.connect(productViewContainer.onFeaturesChanged)
 		multiPageView.updatePages()
@@ -185,26 +185,44 @@ ViewBase {
 		catalogNodesByFeatureId = byFeatureId
 	}
 
-	function collectCatalogNodes(node, featureId, parentPath, isRoot, byPath, byFeatureId) {
+	// Requirements of a group apply to everything in it; requiring the own branch is ignored.
+	function collectCatalogNodes(node, featureId, parentPath, isRoot, byPath, byFeatureId, inheritedRequirements) {
 		let data = node.data || {}
 		let nodeId = data.featureId || ""
 		if (featureId === "" || nodeId === "")
 			return
 		let nodePath = parentPath + "/" + nodeId
+		let children = node.children || []
+		let requirements = inheritedRequirements ? inheritedRequirements.slice() : []
+		let ownRequirements = data.requirements ? data.requirements.split(';') : []
+		for (let r = 0; r < ownRequirements.length; ++r) {
+			let requirement = ownRequirements[r]
+			if (requirement !== "" && !isSameOrNestedPath(requirement, nodePath) && requirements.indexOf(requirement) < 0)
+				requirements.push(requirement)
+		}
 		let entry = {
 			"featureId": featureId,
 			"subFeatureId": isRoot ? "" : nodeId,
+			"path": nodePath,
+			"hasSubFeatures": children.length > 0,
 			"optional": data.optional === true,
 			"featureName": data.featureName || nodeId,
-			"requirements": data.requirements ? data.requirements.split(';') : []
+			"requirements": requirements
 		}
 		byPath[nodePath] = entry
 		if (!byFeatureId[featureId])
 			byFeatureId[featureId] = []
 		byFeatureId[featureId].push(entry)
-		let children = node.children || []
 		for (let i = 0; i < children.length; ++i)
-			collectCatalogNodes(children[i], featureId, nodePath, false, byPath, byFeatureId)
+			collectCatalogNodes(children[i], featureId, nodePath, false, byPath, byFeatureId, requirements)
+	}
+
+	function isSameOrNestedPath(path, otherPath) {
+		if (path === otherPath)
+			return true
+		let shorterPath = path.length < otherPath.length ? path : otherPath
+		let longerPath = path.length < otherPath.length ? otherPath : path
+		return longerPath.indexOf(shorterPath + "/") === 0
 	}
 
 	function takenSubFeaturesOf(taken, featureId) {
@@ -246,17 +264,23 @@ ViewBase {
 							unresolved.push(path)
 						continue
 					}
-					noteRequiredBy(requiredBy, target.featureId, node.featureName)
+					// A requirement inside the feature itself does not keep the feature in the product.
+					let sameFeature = target.featureId === featureId
+					if (!sameFeature)
+						noteRequiredBy(requiredBy, target.featureId, node.featureName)
 					if (ids.indexOf(target.featureId) < 0) {
 						ids.push(target.featureId)
 						pending.push(target.featureId)
 					}
+					if (target.hasSubFeatures)
+						takeOptionalPartsOf(target, taken, pending)
 					if (target.subFeatureId === "")
 						continue
 					// A part is required, so the feature it belongs to stays as
 					// well; an optional part on top of that has to be taken.
 					noteRequiredBy(requiredBy, target.featureId + "/" + target.subFeatureId, node.featureName)
-					noteRequiredBy(requiredParts, target.featureId, target.featureName)
+					if (!sameFeature)
+						noteRequiredBy(requiredParts, target.featureId, target.featureName)
 					if (target.optional
 							&& takenSubFeaturesOf(taken, target.featureId).indexOf(target.subFeatureId) < 0) {
 						if (!taken[target.featureId])
@@ -273,6 +297,22 @@ ViewBase {
 			"requiredBy": requiredBy,
 			"requiredParts": requiredParts,
 			"unresolved": unresolved
+		}
+	}
+
+	// A required group stands for everything in it, optional parts included.
+	function takeOptionalPartsOf(group, taken, pending) {
+		let nodes = catalogNodesByFeatureId[group.featureId] ? catalogNodesByFeatureId[group.featureId] : []
+		for (let n = 0; n < nodes.length; ++n) {
+			let node = nodes[n]
+			if (!node.optional || node.path.indexOf(group.path + "/") !== 0)
+				continue
+			if (takenSubFeaturesOf(taken, group.featureId).indexOf(node.subFeatureId) >= 0)
+				continue
+			if (!taken[group.featureId])
+				taken[group.featureId] = []
+			taken[group.featureId].push(node.subFeatureId)
+			pending.push(group.featureId)
 		}
 	}
 

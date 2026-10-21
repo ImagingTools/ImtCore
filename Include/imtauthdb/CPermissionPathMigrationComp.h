@@ -4,36 +4,33 @@
 
 // Qt includes
 #include <QtCore/QHash>
-#include <QtCore/QObject>
-
-// ACF includes
-#include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <imtbase/COperationContext.h>
+#include <imtdb/CMigrationControllerCompBase.h>
 #include <imtlic/IProductInfo.h>
 
 
-namespace imtauth
+namespace imtauthdb
 {
 
 
 /**
-	Rewrites the permissions stored by feature id alone ("AddLicense") as full feature paths
-	("/LicenseManagement/EditLicense/AddLicense"), using the feature tree of the product.
+	Database migration step that rewrites the permissions stored by feature id alone ("AddLicense")
+	as full feature paths ("/LicenseManagement/Edit/Add"), using the feature tree of the product.
 
 	Covers the local permissions and prohibitions of the product's roles and of all users and groups.
-	Runs once after the start of the application; paths and unknown or ambiguous ids are left as they are,
-	so running it again changes nothing. Every rewritten object gets a new revision.
+	Paths and unknown or ambiguous ids are left as they are, so running it again changes nothing.
+	Every rewritten object gets a new revision.
 */
-class CPermissionPathMigrationComp: public QObject, public ilog::CLoggerComponentBase
+class CPermissionPathMigrationComp: virtual public imtdb::CMigrationControllerCompBase
 {
 public:
-	typedef ilog::CLoggerComponentBase BaseClass;
+	typedef imtdb::CMigrationControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CPermissionPathMigrationComp);
-		I_ASSIGN(m_productInfoCompPtr, "ProductInfo", "Product whose feature tree gives the permission paths", false, "ProductInfo");
+		I_ASSIGN(m_productInfoCompPtr, "ProductInfo", "Product whose feature tree gives the permission paths", true, "ProductInfo");
 		I_ASSIGN(m_roleCollectionCompPtr, "RoleCollection", "Roles collection", false, "RoleCollection");
 		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "Users collection", false, "UserCollection");
 		I_ASSIGN(m_userGroupCollectionCompPtr, "UserGroupCollection", "Groups collection", false, "UserGroupCollection");
@@ -42,7 +39,7 @@ public:
 protected:
 	typedef QHash<QByteArray, QByteArray> PathMap;
 
-	void Migrate();
+	bool Migrate() const;
 
 	/**
 		Feature id to full path of every permission of the product. An id found in several places is left out.
@@ -64,12 +61,13 @@ protected:
 
 	/**
 		Apply \c convertFunction to every active object of the collection and store the converted ones.
+		\return \c false if the collection could not be read or a converted object could not be stored.
 	*/
 	template<class ObjectInterface, class ConvertFunction>
-	void MigrateCollection(imtbase::IObjectCollection& collection, const QString& objectKind, ConvertFunction convertFunction);
+	bool MigrateCollection(imtbase::IObjectCollection& collection, const QString& objectKind, ConvertFunction convertFunction) const;
 
-	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated() override;
+	// reimplemented (imtdb::IMigrationController)
+	virtual bool DoMigration(int& resultRevision, const istd::CIntRange& subRange = istd::CIntRange()) const override;
 
 private:
 	I_REF(imtlic::IProductInfo, m_productInfoCompPtr);
@@ -79,6 +77,6 @@ private:
 };
 
 
-} // namespace imtauth
+} // namespace imtauthdb
 
 

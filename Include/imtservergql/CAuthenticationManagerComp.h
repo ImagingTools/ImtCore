@@ -80,6 +80,7 @@ private:
 		// "never looked up yet" so a fresh entry doesn't get misread as a cached
 		// negative result.
 		bool isTenantOwner = false;
+		QByteArrayList tenantPermissions;
 		bool tenantOwnershipResolved = false;
 	};
 
@@ -149,20 +150,20 @@ private:
 	void InvalidateTokenCache(const QByteArray& token) const;
 
 	/**
-		Reads a previously-resolved tenant-ownership flag for 'token', if any.
-		Returns false (nothing written to isTenantOwner) if the token isn't
-		cached yet or its ownership was never resolved - the caller should then
+		Reads a previously-resolved tenant-ownership flag and tenant permissions for
+		'token', if any. Returns false (nothing written) if the token isn't
+		cached yet or its tenant was never resolved - the caller should then
 		look it up (e.g. via the tenant manager) and store the result via
 		StoreCachedTenantOwnership().
 	*/
-	bool TryGetCachedTenantOwnership(const QByteArray& token, bool& isTenantOwner) const;
+	bool TryGetCachedTenantOwnership(const QByteArray& token, bool& isTenantOwner, QByteArrayList& tenantPermissions) const;
 
 	/**
-		Records a resolved tenant-ownership flag for 'token' on its existing
-		cache entry (a no-op if the token has no cache entry - callers only
-		reach this after ResolveUserId() has already cached the token).
+		Records a resolved tenant-ownership flag and tenant permissions for 'token'
+		on its existing cache entry (a no-op if the token has no cache entry -
+		callers only reach this after ResolveUserId() has already cached the token).
 	*/
-	void StoreCachedTenantOwnership(const QByteArray& token, bool isTenantOwner) const;
+	void StoreCachedTenantOwnership(const QByteArray& token, bool isTenantOwner, const QByteArrayList& tenantPermissions) const;
 	imtgql::IGqlContextUniquePtr CreateContextInstance() const;
 	bool IsPatToken(const QByteArray& token) const;
 

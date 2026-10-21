@@ -206,7 +206,7 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CCrossOrgGrantCollectionDocumentSer
 				m_membershipManagerCompPtr.GetPtr(),
 				gqlRequest,
 				contextTenantId,
-				QByteArrayLiteral("ConnectOrganization"),
+				QByteArrayList{s_connectOrganizationPermission},
 				errorMessage)){
 		return response;
 	}
