@@ -243,7 +243,7 @@ bool CCacheChangeLog::ExecuteScript(imtduckdb::IDuckConnection& connection, cons
 		return false;
 	}
 
-	return imtduckdb::CDuckTableOperations::Execute(connection, QString(scriptFile.readAll()), errorMessage);
+	return imtduckdb::CDuckTableOperations::Execute(connection, scriptFile.readAll(), errorMessage);
 }
 
 

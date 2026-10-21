@@ -30,7 +30,7 @@ const QString AFFECTED_KEY_COLUMN	= QStringLiteral("KeyId");
 
 QString CMaterializedTableBuilderComp::GetCacheTableName() const
 {
-	return QString(*m_tableNameAttrPtr);
+	return *m_tableNameAttrPtr;
 }
 
 
@@ -38,7 +38,7 @@ QStringList CMaterializedTableBuilderComp::GetRequiredCacheTables() const
 {
 	QStringList retVal;
 	for (int i = 0; i < m_requiredTablesAttrPtr.GetCount(); ++ i){
-		retVal << QString(m_requiredTablesAttrPtr[i]);
+		retVal << m_requiredTablesAttrPtr[i];
 	}
 
 	return retVal;
@@ -272,14 +272,14 @@ CMaterializedTableBuilderComp::BuildResult CMaterializedTableBuilderComp::ApplyC
 
 bool CMaterializedTableBuilderComp::ReadScript(const QByteArray& path, QString& script, QString& errorMessage) const
 {
-	QFile scriptFile(QString(path));
+	QFile scriptFile(path);
 	if (!scriptFile.open(QFile::ReadOnly)){
 		errorMessage = QStringLiteral("Unable to read the script %1 of %2").arg(QString(path), GetCacheTableName());
 
 		return false;
 	}
 
-	script = QString(scriptFile.readAll()).trimmed();
+	script = scriptFile.readAll().trimmed();
 	scriptFile.close();
 
 	/**

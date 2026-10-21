@@ -88,7 +88,7 @@ QSqlQuery CDuckDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, Q
 
 	retVal.setForwardOnly(isForwardOnly);
 
-	bool success = retVal.exec(QString(queryString));
+	bool success = retVal.exec(queryString);
 
 	const QSqlError queryError = retVal.lastError();
 	if (sqlErrorPtr != nullptr){
@@ -123,7 +123,7 @@ QSqlQuery CDuckDatabaseEngineComp::ExecSqlQuery(
 
 	retVal.setForwardOnly(isForwardOnly);
 
-	bool success = retVal.prepare(QString(queryString));
+	bool success = retVal.prepare(queryString);
 	if (success){
 		for (auto value = bindValues.cbegin(); value != bindValues.cend(); ++ value){
 			retVal.bindValue(value.key(), *value);

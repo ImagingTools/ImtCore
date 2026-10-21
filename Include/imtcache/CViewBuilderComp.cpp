@@ -15,7 +15,7 @@ namespace imtcache
 
 QString CViewBuilderComp::GetCacheTableName() const
 {
-	return QString(*m_viewNameAttrPtr);
+	return *m_viewNameAttrPtr;
 }
 
 
@@ -23,7 +23,7 @@ QStringList CViewBuilderComp::GetRequiredCacheTables() const
 {
 	QStringList retVal;
 	for (int i = 0; i < m_requiredTablesAttrPtr.GetCount(); ++ i){
-		retVal << QString(m_requiredTablesAttrPtr[i]);
+		retVal << m_requiredTablesAttrPtr[i];
 	}
 
 	return retVal;
@@ -35,7 +35,7 @@ CViewBuilderComp::BuildResult CViewBuilderComp::Rebuild(imtduckdb::IDuckConnecti
 	BuildResult retVal;
 	retVal.wasFullRebuild = true;
 
-	QFile scriptFile(QString(*m_createViewScriptPathAttrPtr));
+	QFile scriptFile(*m_createViewScriptPathAttrPtr);
 	if (!scriptFile.open(QFile::ReadOnly)){
 		retVal.errorMessage = QStringLiteral("Unable to read the creation script for %1").arg(GetCacheTableName());
 

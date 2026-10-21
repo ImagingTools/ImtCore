@@ -25,7 +25,7 @@ const QString STAGING_SUFFIX	= QStringLiteral("_staging");
 
 QString CCacheTableBuilderCompBase::GetCacheTableName() const
 {
-	return QString(*m_tableNameAttrPtr);
+	return *m_tableNameAttrPtr;
 }
 
 
@@ -183,7 +183,7 @@ QString CCacheTableBuilderCompBase::GetReplaceCondition() const
 
 QString CCacheTableBuilderCompBase::GetObjectIdColumn() const
 {
-	return QString(*m_objectIdColumnAttrPtr);
+	return *m_objectIdColumnAttrPtr;
 }
 
 
@@ -200,7 +200,7 @@ bool CCacheTableBuilderCompBase::CreateTable(
 			const QString& tableName,
 			QString& errorMessage) const
 {
-	QFile scriptFile(QString(*m_createTableScriptPathAttrPtr));
+	QFile scriptFile(*m_createTableScriptPathAttrPtr);
 	if (!scriptFile.open(QFile::ReadOnly)){
 		errorMessage = QStringLiteral("Unable to read the creation script for %1").arg(tableName);
 

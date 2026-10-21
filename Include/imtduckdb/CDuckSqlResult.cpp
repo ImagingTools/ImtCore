@@ -64,7 +64,7 @@ bool CDuckSqlResult::prepare(const QString& sqlQuery)
 		m_preparedStatementPtr = m_connection.Prepare(ToDuckDbNamedPlaceholders(sqlQuery).toStdString());
 	}
 	catch (const std::exception& exception){
-		setLastError(QSqlError(QStringLiteral("Unable to prepare statement"), QString(exception.what()), QSqlError::StatementError));
+		setLastError(QSqlError(QStringLiteral("Unable to prepare statement"), exception.what(), QSqlError::StatementError));
 
 		return false;
 	}
@@ -120,7 +120,7 @@ bool CDuckSqlResult::exec()
 		m_resultPtr.reset(static_cast<duckdb::MaterializedQueryResult*>(queryResultPtr.release()));
 	}
 	catch (const std::exception& exception){
-		setLastError(QSqlError(QStringLiteral("Unable to execute statement"), QString(exception.what()), QSqlError::StatementError));
+		setLastError(QSqlError(QStringLiteral("Unable to execute statement"), exception.what(), QSqlError::StatementError));
 
 		return false;
 	}
