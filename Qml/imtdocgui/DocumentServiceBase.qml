@@ -381,6 +381,16 @@ QtObject {
 		}
 	}
 
+	// False while a view of the document refuses to be saved (see DocumentDecorator.viewsAcceptSave()).
+	function documentViewsAcceptSave(documentId){
+		let index = getDocumentIndexByDocumentId(documentId)
+		if (index < 0){
+			return true
+		}
+
+		return __internal.openedDocuments[index].documentDecorator.viewsAcceptSave()
+	}
+
 	// Writes the GUI state of the document views to the document.
 	function commitDocumentChanges(documentId){
 		let index = getDocumentIndexByDocumentId(documentId)

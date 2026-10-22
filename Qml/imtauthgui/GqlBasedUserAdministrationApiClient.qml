@@ -315,11 +315,7 @@ QtObject {
 			}
 
 			onDocumentIdChanged: {
-				if (documentId !== ""){
-					var objId = root.__roleDocumentService.getDocumentObjectId(documentId)
-					if (objId !== "")
-						representationModel.m_id = objId
-				}
+				root.__applyDocumentObjectId(root.__roleDocumentService, documentId, representationModel)
 			}
 
 			function updateRepresentationFromDocument(){
@@ -333,6 +329,7 @@ QtObject {
 			function updateDocumentFromRepresentation(){
 				startUpdateDocument(documentId)
 
+				root.__applyDocumentObjectId(root.__roleDocumentService, documentId, representationModel)
 				updateRoleInput.m_documentId = documentId
 				updateRoleInput.m_role = representationModel
 				updateRoleRequest.send(updateRoleInput)
@@ -348,6 +345,7 @@ QtObject {
 					RoleData {
 						onFinished: {
 							roleReprController.representationModel.copyFrom(this)
+							root.__applyDocumentObjectId(root.__roleDocumentService, roleReprController.documentId, roleReprController.representationModel)
 							roleReprController.representationUpdated(
 								roleReprController.documentId,
 								roleReprController.representationModel)
@@ -376,6 +374,8 @@ QtObject {
 
 				function onError(message, type){
 					roleReprController.updateDocumentFailed(roleReprController.documentId, message)
+					// The refused change was not applied: show what the document holds.
+					roleReprController.updateRepresentationFromDocument()
 				}
 			}
 
@@ -452,11 +452,7 @@ QtObject {
 			}
 
 			onDocumentIdChanged: {
-				if (documentId !== ""){
-					var objId = root.__groupDocumentService.getDocumentObjectId(documentId)
-					if (objId !== "")
-						representationModel.m_id = objId
-				}
+				root.__applyDocumentObjectId(root.__groupDocumentService, documentId, representationModel)
 			}
 
 			function updateRepresentationFromDocument(){
@@ -470,6 +466,7 @@ QtObject {
 			function updateDocumentFromRepresentation(){
 				startUpdateDocument(documentId)
 
+				root.__applyDocumentObjectId(root.__groupDocumentService, documentId, representationModel)
 				updateGroupInput.m_documentId = documentId
 				updateGroupInput.m_group = representationModel
 				updateGroupRequest.send(updateGroupInput)
@@ -485,6 +482,7 @@ QtObject {
 					GroupData {
 						onFinished: {
 							groupReprController.representationModel.copyFrom(this)
+							root.__applyDocumentObjectId(root.__groupDocumentService, groupReprController.documentId, groupReprController.representationModel)
 							groupReprController.representationUpdated(
 								groupReprController.documentId,
 								groupReprController.representationModel)
@@ -513,6 +511,8 @@ QtObject {
 
 				function onError(message, type){
 					groupReprController.updateDocumentFailed(groupReprController.documentId, message)
+					// The refused change was not applied: show what the document holds.
+					groupReprController.updateRepresentationFromDocument()
 				}
 			}
 
@@ -604,11 +604,7 @@ QtObject {
 			}
 
 			onDocumentIdChanged: {
-				if (documentId !== ""){
-					var objId = root.__userDocumentService.getDocumentObjectId(documentId)
-					if (objId !== "")
-						representationModel.m_id = objId
-				}
+				root.__applyDocumentObjectId(root.__userDocumentService, documentId, representationModel)
 			}
 
 			function updateRepresentationFromDocument(){
@@ -629,6 +625,7 @@ QtObject {
 			function updateDocumentFromRepresentation(){
 				startUpdateDocument(documentId)
 
+				root.__applyDocumentObjectId(root.__userDocumentService, documentId, representationModel)
 				updateUserInput.m_documentId = documentId
 				updateUserInput.m_user = representationModel
 				updateUserInput.m_tenantId = root.tenantId
@@ -645,6 +642,7 @@ QtObject {
 					UserData {
 						onFinished: {
 							userReprController.representationModel.copyFrom(this)
+							root.__applyDocumentObjectId(root.__userDocumentService, userReprController.documentId, userReprController.representationModel)
 							userReprController.representationUpdated(
 								userReprController.documentId,
 								userReprController.representationModel)
@@ -673,6 +671,8 @@ QtObject {
 
 				function onError(message, type){
 					userReprController.updateDocumentFailed(userReprController.documentId, message)
+					// The refused change was not applied: show what the document holds.
+					userReprController.updateRepresentationFromDocument()
 				}
 			}
 
@@ -718,6 +718,18 @@ QtObject {
 					PopupManager.addErrorMessage(message, true)
 				}
 			}
+		}
+	}
+
+	// The representation carries the ID of the collection element, which may become known only after the document was created.
+	function __applyDocumentObjectId(documentService, documentId, representationModel){
+		if (documentId === ""){
+			return
+		}
+
+		let objectId = documentService.getDocumentObjectId(documentId)
+		if (objectId !== ""){
+			representationModel.m_id = objectId
 		}
 	}
 

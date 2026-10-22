@@ -88,6 +88,17 @@ DocumentServiceBase {
 		}
 	}
 
+	// Stops the notifications of this service. Its owner calls it on destruction: on the web the service can outlive
+	// the owner (it is destroyed only when no reference is left), and a live subscription would keep acting on events.
+	function release(){
+		documentManagerSubscription.unRegisterSubscription()
+		undoManagerSubscription.unRegisterSubscription()
+	}
+
+	Component.onDestruction: {
+		root.release()
+	}
+
 	onDocumentServiceActivated: {
 		if (root.collectionId !== ""){
 			// getOpenedDocumentList()
@@ -231,6 +242,10 @@ DocumentServiceBase {
 						documentSaved.disconnect(savedFunc)
 						saveDocumentFailed.disconnect(savedFailedFunc)
 					}
+				}
+
+				if (!documentViewsAcceptSave(documentId)){
+					return
 				}
 
 				commitDocumentChanges(documentId)

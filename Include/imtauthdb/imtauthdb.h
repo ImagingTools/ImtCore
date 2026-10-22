@@ -778,6 +778,34 @@ typedef QList<RemovedReference> RemovedReferences;
 
 
 /**
+	Add to \c operationContext the owner and the tenant of \c sourceContextPtr and one reference change, so that
+	an object updated because another object references it records that reference, not the operation of the source.
+*/
+inline void AddReferenceOperation(
+			imtbase::COperationContext& operationContext,
+			const imtbase::IOperationContext* sourceContextPtr,
+			const QByteArray& operationTypeId,
+			const QByteArray& key,
+			const QString& keyName,
+			const QByteArray& oldValue,
+			const QByteArray& newValue)
+{
+	if (sourceContextPtr != nullptr){
+		operationContext.SetOperationOwnerId(sourceContextPtr->GetOperationOwnerId());
+		operationContext.SetTenantId(sourceContextPtr->GetTenantId());
+	}
+
+	imtbase::COperationDescription operationDescription;
+	operationDescription.SetOperationTypeId(operationTypeId);
+	operationDescription.SetKey(key);
+	operationDescription.SetKeyName(keyName);
+	operationDescription.SetOldValue(oldValue);
+	operationDescription.SetNewValue(newValue);
+	operationContext.GetChangesCollection()->InsertNewObject(QByteArrayLiteral("OperationInfo"), QString(), QString(), &operationDescription);
+}
+
+
+/**
 	Create the queries storing the active objects selected by \c filterParams after \c removeFunction dropped
 	their references to removed objects. \c removeFunction returns the dropped references; they become the
 	revision description of the stored object, which is attributed to the owner of the removal.
@@ -822,18 +850,15 @@ QByteArray CreateReferenceRemovalQuery(
 		}
 
 		imtbase::COperationContext operationContext;
-		if (operationContextPtr != nullptr){
-			operationContext.SetOperationOwnerId(operationContextPtr->GetOperationOwnerId());
-			operationContext.SetTenantId(operationContextPtr->GetTenantId());
-		}
-
 		for (const RemovedReference& removedReference : removedReferences){
-			imtbase::COperationDescription operationDescription;
-			operationDescription.SetOperationTypeId(removedReference.operationTypeId);
-			operationDescription.SetKey(removedReference.key);
-			operationDescription.SetKeyName(removedReference.keyName);
-			operationDescription.SetOldValue(removedReference.id);
-			operationContext.GetChangesCollection()->InsertNewObject(QByteArrayLiteral("OperationInfo"), QString(), QString(), &operationDescription);
+			AddReferenceOperation(
+						operationContext,
+						operationContextPtr,
+						removedReference.operationTypeId,
+						removedReference.key,
+						removedReference.keyName,
+						removedReference.id,
+						QByteArray());
 		}
 
 		retVal += objectDelegate.CreateUpdateObjectQuery(collection, objectId, *dataPtr, &operationContext, false);

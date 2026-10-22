@@ -46,11 +46,14 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserDatabaseDelegateComp::Create
 				auto userGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(dataPtr.GetPtr());
 				if (userGroupInfoPtr != nullptr){
 					userGroupInfoPtr->AddUser(proposedObjectId);
+
+					imtbase::COperationContext groupOperationContext;
+					AddReferenceOperation(groupOperationContext, operationContextPtr, "AddUser", "UserId", QT_TRANSLATE_NOOP("Attribute", "User"), QByteArray(), proposedObjectId);
 					retVal.query += m_userGroupDatabaseDelegateCompPtr->CreateUpdateObjectQuery(
 						*m_userGroupCollectionCompPtr,
 						groupId,
 						*userGroupInfoPtr,
-						operationContextPtr,
+						&groupOperationContext,
 						false);
 				}
 			}
@@ -119,11 +122,13 @@ QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 						if (!userGroupInfoPtr->GetUsers().contains(objectId)){
 							userGroupInfoPtr->AddUser(objectId);
 
+							imtbase::COperationContext groupOperationContext;
+							AddReferenceOperation(groupOperationContext, operationContextPtr, "AddUser", "UserId", QT_TRANSLATE_NOOP("Attribute", "User"), QByteArray(), objectId);
 							retVal += m_userGroupDatabaseDelegateCompPtr->CreateUpdateObjectQuery(
 										*m_userGroupCollectionCompPtr,
 										groupId,
 										*userGroupInfoPtr,
-										operationContextPtr,
+										&groupOperationContext,
 										false);
 						}
 					}
@@ -137,11 +142,13 @@ QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 					if (userGroupInfoPtr != nullptr){
 						bool result = userGroupInfoPtr->RemoveUser(objectId);
 						if (result){
+							imtbase::COperationContext groupOperationContext;
+							AddReferenceOperation(groupOperationContext, operationContextPtr, "RemoveUser", "UserId", QT_TRANSLATE_NOOP("Attribute", "User"), objectId, QByteArray());
 							retVal += m_userGroupDatabaseDelegateCompPtr->CreateUpdateObjectQuery(
 										*m_userGroupCollectionCompPtr,
 										groupId,
 										*userGroupInfoPtr,
-										operationContextPtr,
+										&groupOperationContext,
 										false);
 						}
 					}

@@ -400,10 +400,29 @@ QtObject {
 		root.__updateMembershipPermissionsSender.send(root.__updateMembershipPermissionsInput)
 	}
 
+	// Members are removed one after another: the requests share one input, and memberRemoved names the removed user.
+	property var __removeMemberQueue: []
+	property string __removingMemberUserId: ""
+
 	function removeMember(tenantId, userId) {
+		root.__removeMemberQueue.push({"tenantId": tenantId, "userId": userId})
+		if (root.__removingMemberUserId === "") {
+			root.__removeNextMember()
+		}
+	}
+
+	function __removeNextMember() {
+		if (root.__removeMemberQueue.length === 0) {
+			root.__removingMemberUserId = ""
+			return
+		}
+
+		let next = root.__removeMemberQueue.shift()
+		root.__removingMemberUserId = next.userId
+
 		// First find the membership to get its ID, then remove it
-		root.__findMembershipForRemoveInput.m_userId = userId
-		root.__findMembershipForRemoveInput.m_tenantId = tenantId
+		root.__findMembershipForRemoveInput.m_userId = next.userId
+		root.__findMembershipForRemoveInput.m_tenantId = next.tenantId
 		root.__findMembershipForRemoveSender.send(root.__findMembershipForRemoveInput)
 	}
 
@@ -428,12 +447,21 @@ QtObject {
 					if (m_errorMessage && m_errorMessage !== "") {
 						PopupManager.addErrorMessage(m_errorMessage, true)
 						root.requestFailed(m_errorMessage)
+						root.__removeNextMember()
 					} else if (m_membership && m_membership.m_id) {
 						root.__removeMembershipInput.m_membershipId = m_membership.m_id
 						root.__removeMembershipSender.send(root.__removeMembershipInput)
+					} else {
+						root.__removeNextMember()
 					}
 				}
 			}
+		}
+
+		function onError(message, type) {
+			PopupManager.addErrorMessage(message, true)
+			root.requestFailed(message)
+			root.__removeNextMember()
 		}
 	}
 
@@ -492,10 +520,17 @@ QtObject {
 						PopupManager.addErrorMessage(m_errorMessage, true)
 						root.requestFailed(m_errorMessage)
 					} else {
-						root.memberRemoved(root.__findMembershipForRemoveInput.m_userId)
+						root.memberRemoved(root.__removingMemberUserId)
 					}
+					root.__removeNextMember()
 				}
 			}
+		}
+
+		function onError(message, type) {
+			PopupManager.addErrorMessage(message, true)
+			root.requestFailed(message)
+			root.__removeNextMember()
 		}
 	}
 

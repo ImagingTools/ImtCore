@@ -60,6 +60,13 @@ Item{
 		}
 	}
 
+	// widthRecalc can arrive before this binding follows the table's column count
+	onColumnCountChanged: {
+		if(headerDelegate.complCompl){
+			headerDelegate.setCellWidth();
+		}
+	}
+
 	function createRightMA(){
 		if(headerDelegate.columnIndex == getLastHeaderIndex()){
 			if(headerDelegate.rightMA == null){
