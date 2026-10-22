@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtcache/CCacheBuilderComp.h>
 
 
@@ -75,10 +76,10 @@ CCacheBuilderComp::UpdateResult CCacheBuilderComp::Update(UpdateMode mode)
 		retVal.wasFullRebuild = retVal.wasFullRebuild || buildResult.wasFullRebuild;
 
 		if (buildResult.isOk){
+			const QString buildKind = buildResult.wasFullRebuild ? QStringLiteral("full rebuild") : QStringLiteral("incremental");
+
 			qDebug().noquote() << QStringLiteral("Table %1 updated (%2) in %3: %4 rows written, %5 removed")
-						.arg(tableName,
-							 buildResult.wasFullRebuild ? QStringLiteral("full rebuild") : QStringLiteral("incremental"),
-							 FormatDuration(tableTimer.elapsed()))
+						.arg(tableName, buildKind, FormatDuration(tableTimer.elapsed()))
 						.arg(buildResult.rowsWritten)
 						.arg(buildResult.rowsDeleted);
 
@@ -89,19 +90,25 @@ CCacheBuilderComp::UpdateResult CCacheBuilderComp::Update(UpdateMode mode)
 
 		SendErrorMessage(0, QStringLiteral("Table %1 failed after %2. Error: %3").arg(tableName, FormatDuration(tableTimer.elapsed()), buildResult.errorMessage), __func__);
 
-		// One failing table must not discard the tables that did rebuild, so the run continues.
+		/**
+			One failing table must not discard the tables that did rebuild, so the run continues.
+		*/
 		retVal.isOk = false;
 		retVal.errorMessage = retVal.errorMessage.isEmpty()
 					? buildResult.errorMessage
 					: retVal.errorMessage + QStringLiteral("; ") + buildResult.errorMessage;
 	}
 
-	// A consumer that failed keeps its cursor, so what it has not read survives.
+	/**
+		A consumer that failed keeps its cursor, so what it has not read survives.
+	*/
 	if (!CCacheChangeLog::Purge(*connectionPtr, changeLogError)){
 		SendErrorMessage(0, QStringLiteral("Unable to purge the cache change log. Error: %1").arg(changeLogError), __func__);
 	}
 
-	// DuckDB merges its WAL into the database file only at a size threshold or on a clean shutdown, which a killed process skips.
+	/**
+		DuckDB merges its WAL into the database file only at a size threshold or on a clean shutdown, which a killed process skips.
+	*/
 	QSqlError checkpointError;
 	connectionPtr->ExecSqlQuery(QByteArrayLiteral("CHECKPOINT"), &checkpointError);
 	if (checkpointError.type() != QSqlError::NoError){
@@ -117,7 +124,9 @@ bool CCacheBuilderComp::RequestUpdate(UpdateMode mode)
 	QMutexLocker locker(&m_stateMutex);
 
 	if (m_isUpdateRunning || m_suspendCount > 0){
-		// Collapse everything requested meanwhile into one run, keeping the more thorough mode.
+		/**
+			Collapse everything requested meanwhile into one run, keeping the more thorough mode.
+		*/
 		m_hasPendingRequest = true;
 		if (mode == UM_FULL){
 			m_pendingMode = UM_FULL;
@@ -203,8 +212,10 @@ void CCacheBuilderComp::OnComponentCreated()
 	connect(&m_updateWatcher, &QFutureWatcher<void>::finished, this, &CCacheBuilderComp::OnUpdateFinished);
 
 	if (*m_buildOnStartupAttrPtr){
-		// Deferred rather than called directly: the component graph is still being wired here, and
-		// blocking would stall startup for the whole rebuild.
+		/**
+			Deferred rather than called directly: the component graph is still being wired here, and
+			blocking would stall startup for the whole rebuild.
+		*/
 		QTimer::singleShot(0, this, [this](){ RequestUpdate(UM_INCREMENTAL); });
 	}
 
@@ -334,8 +345,10 @@ QList<const ICacheTableBuilder*> CCacheBuilderComp::GetOrderedBuilders() const
 		}
 
 		if (!isAnyBuilderReady){
-			// A cycle, or a dependency on a table nobody builds: run the rest in declaration order
-			// rather than silently dropping them.
+			/**
+				A cycle, or a dependency on a table nobody builds: run the rest in declaration order
+				rather than silently dropping them.
+			*/
 			QStringList unresolvedTables;
 			for (const ICacheTableBuilder* tableBuilderPtr : pendingBuilders){
 				unresolvedTables << tableBuilderPtr->GetCacheTableName();
@@ -364,7 +377,9 @@ ICacheTableBuilder::BuildResult CCacheBuilderComp::RunTableBuilder(
 				? GetLastSourceUpdateTime(connection, tableName)
 				: QDateTime();
 
-	// Without a previous update time there is nothing to apply changes on top of.
+	/**
+		Without a previous update time there is nothing to apply changes on top of.
+	*/
 	if (!lastSourceUpdateTime.isValid()){
 		return tableBuilder.Rebuild(connection);
 	}
@@ -392,7 +407,9 @@ bool CCacheBuilderComp::EnsureRevisionTable(imtduckdb::IDuckConnection& connecti
 
 QDateTime CCacheBuilderComp::GetLastSourceUpdateTime(imtduckdb::IDuckConnection& connection, const QString& tableName) const
 {
-	// A stored time alone does not prove the cached data survived, so require the table as well.
+	/**
+		A stored time alone does not prove the cached data survived, so require the table as well.
+	*/
 	QSqlError existsError;
 	QSqlQuery existsQuery = connection.ExecSqlQuery(
 				QStringLiteral("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = '%1' AND table_schema = current_schema())")
@@ -406,18 +423,23 @@ QDateTime CCacheBuilderComp::GetLastSourceUpdateTime(imtduckdb::IDuckConnection&
 	QSqlError sqlError;
 	QSqlQuery query = connection.ExecSqlQuery(
 				QStringLiteral(R"(SELECT "%1" FROM "%2" WHERE "%3" = '%4')")
-					.arg(CacheRevisionColumn::LAST_REVISION,
-						 CacheTable::CACHE_REVISION,
-						 CacheRevisionColumn::TABLE_NAME,
-						 imtdb::EscapeSql(tableName)).toUtf8(),
+					.arg(
+							/*1*/ CacheRevisionColumn::LAST_REVISION,
+							/*2*/ CacheTable::CACHE_REVISION,
+							/*3*/ CacheRevisionColumn::TABLE_NAME,
+							/*4*/ imtdb::EscapeSql(tableName)
+						)
+					.toUtf8(),
 				&sqlError);
 
 	if (sqlError.type() != QSqlError::NoError || !query.next()){
 		return QDateTime();
 	}
 
-	// The value is stored as UTC, yet comes back as zone-less text that Qt reads as local time. Left so, the
-	// toUTC() on the next store would shift it back by the local offset on every update.
+	/**
+		The value is stored as UTC, yet comes back as zone-less text that Qt reads as local time. Left so, the
+		toUTC() on the next store would shift it back by the local offset on every update.
+	*/
 	QDateTime lastUpdateTime = query.value(0).toDateTime();
 	lastUpdateTime.setTimeZone(QTimeZone::utc());
 
@@ -434,11 +456,14 @@ bool CCacheBuilderComp::SetLastSourceUpdateTime(imtduckdb::IDuckConnection& conn
 	QSqlError sqlError;
 	connection.ExecSqlQuery(
 				QStringLiteral(R"(INSERT INTO "%1" ("%2", "%3") VALUES ('%4', '%5') ON CONFLICT ("%2") DO UPDATE SET "%3" = excluded."%3")")
-					.arg(CacheTable::CACHE_REVISION,
-						 CacheRevisionColumn::TABLE_NAME,
-						 CacheRevisionColumn::LAST_REVISION,
-						 imtdb::EscapeSql(tableName),
-						 updateTime.toUTC().toString(Qt::ISODateWithMs)).toUtf8(),
+					.arg(
+							/*1*/ CacheTable::CACHE_REVISION,
+							/*2*/ CacheRevisionColumn::TABLE_NAME,
+							/*3*/ CacheRevisionColumn::LAST_REVISION,
+							/*4*/ imtdb::EscapeSql(tableName),
+							/*5*/ updateTime.toUTC().toString(Qt::ISODateWithMs)
+						)
+					.toUtf8(),
 				&sqlError);
 
 	if (sqlError.type() != QSqlError::NoError){
@@ -452,3 +477,4 @@ bool CCacheBuilderComp::SetLastSourceUpdateTime(imtduckdb::IDuckConnection& conn
 
 
 } // namespace imtcache
+

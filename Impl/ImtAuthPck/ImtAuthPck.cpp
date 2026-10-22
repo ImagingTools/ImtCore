@@ -181,6 +181,41 @@ I_EXPORT_COMPONENT(
 			"Personal Access Token Meta Info Creator");
 
 I_EXPORT_COMPONENT(
+			ExternalIdentity,
+			"Link between an external provider account and a user",
+			"External Identity OIDC");
+
+I_EXPORT_COMPONENT(
+			ExternalIdentityManager,
+			"Manager of the links between external provider accounts and users",
+			"External Identity Manager OIDC");
+
+I_EXPORT_COMPONENT(
+			ExternalLoginController,
+			"Sign-in with external identity providers (OAuth 2.0 / OpenID Connect)",
+			"External Login Controller OIDC Google Apple Facebook");
+
+I_EXPORT_COMPONENT(
+			GoogleOidcProvider,
+			"Sign in with Google",
+			"Google OIDC Provider");
+
+I_EXPORT_COMPONENT(
+			AppleOidcProvider,
+			"Sign in with Apple",
+			"Apple OIDC Provider");
+
+I_EXPORT_COMPONENT(
+			FacebookOidcProvider,
+			"Continue with Facebook",
+			"Facebook OAuth Provider");
+
+I_EXPORT_COMPONENT(
+			GenericOidcProvider,
+			"Sign-in with any OpenID Connect or OAuth 2.0 provider",
+			"Generic OIDC Provider");
+
+I_EXPORT_COMPONENT(
 			TenantInfo,
 			"Tenant entity storing organization data (name, description, status, relationships)",
 			"Tenant Info");
@@ -230,6 +265,21 @@ I_EXPORT_COMPONENT(
 			CrossOrgGrantManager,
 			"Manager for cross-org grants (create/revoke/query access delegation)",
 			"Cross Org Grant Manager");
+
+I_EXPORT_COMPONENT(
+			DocumentShareInfo,
+			"Entity representing a document shared by one tenant with another",
+			"Document Share Info");
+
+I_EXPORT_COMPONENT(
+			DocumentShareManager,
+			"Manager for document shares between related tenants",
+			"Document Share Manager");
+
+I_EXPORT_COMPONENT(
+			TenantRelationshipProvider,
+			"Provider of the related tenants based on the local tenant relationships",
+			"Tenant Relationship Provider");
 
 I_EXPORT_COMPONENT(
 			ContractInfo,

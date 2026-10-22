@@ -201,6 +201,42 @@ sdl::V1_0::imtbase::CCreateSubCollectionPayload CRemoteObjectCollectionControlle
 }
 
 
+sdl::V1_0::imtbase::CGetDocumentAccessPayload CRemoteObjectCollectionControllerComp::OnGetDocumentAccess(
+			const sdl::V1_0::imtbase::CGetDocumentAccessGqlRequest& /*getDocumentAccessRequest*/,
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtbase::CGetDocumentAccessPayload>(gqlRequest, errorMessage);
+}
+
+
+sdl::V1_0::imtbase::CGetDocumentSharesPayload CRemoteObjectCollectionControllerComp::OnGetDocumentShares(
+			const sdl::V1_0::imtbase::CGetDocumentSharesGqlRequest& /*getDocumentSharesRequest*/,
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtbase::CGetDocumentSharesPayload>(gqlRequest, errorMessage);
+}
+
+
+sdl::V1_0::imtbase::CShareDocumentsPayload CRemoteObjectCollectionControllerComp::OnShareDocuments(
+			const sdl::V1_0::imtbase::CShareDocumentsGqlRequest& /*shareDocumentsRequest*/,
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtbase::CShareDocumentsPayload>(gqlRequest, errorMessage);
+}
+
+
+sdl::V1_0::imtbase::CRevokeDocumentSharesPayload CRemoteObjectCollectionControllerComp::OnRevokeDocumentShares(
+			const sdl::V1_0::imtbase::CRevokeDocumentSharesGqlRequest& /*revokeDocumentSharesRequest*/,
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtbase::CRevokeDocumentSharesPayload>(gqlRequest, errorMessage);
+}
+
+
 // reimplemented (imtgql::IGqlRequestHandler)
 
 bool CRemoteObjectCollectionControllerComp::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const

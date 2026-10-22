@@ -29,6 +29,8 @@ class TextInput extends Item {
     static NoEcho = 2
     static PasswordEchoOnEdit = 3
 
+    static MaximumUndoDepth = 100
+
     static meta = Object.assign({}, Item.meta, {
         text: { type: String, value: ''},
         color: { type: Color, value: 'black'},
@@ -58,6 +60,8 @@ class TextInput extends Item {
         selectByMouse: { type: Bool, value: true},
         passwordCharacter: { type: String, value: ''},
         cursorPosition: { type: Int, value: 0},
+        canUndo: { type: Bool, value: false},
+        canRedo: { type: Bool, value: false},
 
         textChanged: {type:Signal, args:[]},
         colorChanged: {type:Signal, args:[]},
@@ -87,6 +91,8 @@ class TextInput extends Item {
         selectByMouseChanged: {type:Signal, args:[]},
         passwordCharacterChanged: {type:Signal, args:[]},
         cursorPositionChanged: {type:Signal, args:[]},
+        canUndoChanged: {type:Signal, args:[]},
+        canRedoChanged: {type:Signal, args:[]},
 
         accepted: {type:Signal, args:[]},
         editingFinished: {type:Signal, args:[]},
@@ -108,6 +114,7 @@ class TextInput extends Item {
         impl.innerHTML = '&#8203'
         dom.appendChild(impl)
         this.__impl = impl
+        this.__clearUndoHistory()
 
         impl.setAttribute('contenteditable', true)
 
@@ -127,32 +134,37 @@ class TextInput extends Item {
         impl.onkeydown = (e)=>{
             this.__syncSelectionFromDOM()
 
-            if(e.keyCode === QtEnums.Key_C && e.ctrlKey){
+            if(this.__isShortcutKey(e, QtEnums.Key_Z)){
                 e.preventDefault()
                 e.stopPropagation()
-                this.copy()
-            } else if(e.keyCode === QtEnums.Key_V && e.ctrlKey){
+                if(e.shiftKey){
+                    this.redo()
+                } else {
+                    this.undo()
+                }
+            } else if(this.__isShortcutKey(e, QtEnums.Key_Y) && !e.shiftKey){
                 e.preventDefault()
                 e.stopPropagation()
-                this.paste()
-            } else if(e.keyCode === QtEnums.Key_X && e.ctrlKey){
-                e.preventDefault()
+                this.redo()
+            } else if(this.__isShortcutKey(e, QtEnums.Key_C) || this.__isShortcutKey(e, QtEnums.Key_V) || this.__isShortcutKey(e, QtEnums.Key_X)){
+                // Handled by the native copy/paste/cut events (see impl.oncopy, impl.onpaste, impl.oncut)
                 e.stopPropagation()
-                this.cut()
-            } else if(e.keyCode === QtEnums.Key_A && e.ctrlKey){
+            } else if(this.__isShortcutKey(e, QtEnums.Key_A)){
                 e.preventDefault()
                 e.stopPropagation()
                 this.selectAll()
+            } else if(e.key === QtEnums.Key_Delete && e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey){
+                e.preventDefault()
+                e.stopPropagation()
+                this.cut()
             } else if(e.key === QtEnums.Key_Backspace){
                 e.preventDefault()
                 e.stopPropagation()
-                this.__deleteWithDirection(false)
-                this.textEdited()
+                if(this.__deleteWithDirection(false, this.selectionStart, this.selectionEnd)) this.textEdited()
             } else if(e.key === QtEnums.Key_Delete){
                 e.preventDefault()
                 e.stopPropagation()
-                this.__deleteWithDirection(true)
-                this.textEdited()
+                if(this.__deleteWithDirection(true, this.selectionStart, this.selectionEnd)) this.textEdited()
             } else if(e.key === QtEnums.Key_Enter){
                 e.preventDefault()
                 e.stopPropagation()
@@ -173,7 +185,46 @@ class TextInput extends Item {
             }
         }
 
-        impl.onbeforeinput = ()=>{
+        impl.oncopy = (e)=>{
+            e.preventDefault()
+            this.__syncSelectionFromDOM()
+            if(this.echoMode !== TextInput.Normal || !e.clipboardData) return
+
+            let text = this.text.slice(this.selectionStart, this.selectionEnd)
+            if(text) e.clipboardData.setData('text/plain', text)
+        }
+
+        impl.oncut = (e)=>{
+            e.preventDefault()
+            this.__syncSelectionFromDOM()
+            if(this.readOnly || this.echoMode !== TextInput.Normal || !e.clipboardData) return
+            if(this.selectionStart === this.selectionEnd) return
+
+            e.clipboardData.setData('text/plain', this.text.slice(this.selectionStart, this.selectionEnd))
+            this.__replaceText(this.selectionStart, this.selectionEnd, '', '')
+            this.textEdited()
+        }
+
+        impl.onpaste = (e)=>{
+            e.preventDefault()
+            if(this.readOnly) return
+
+            this.__syncSelectionFromDOM()
+            let text = e.clipboardData ? e.clipboardData.getData('text/plain') : ''
+            if(this.__pasteText(text, this.selectionStart, this.selectionEnd)) this.textEdited()
+        }
+
+        impl.onbeforeinput = (e)=>{
+            if(e.inputType === 'historyUndo' || e.inputType === 'historyRedo'){
+                e.preventDefault()
+                if(e.inputType === 'historyUndo'){
+                    this.undo()
+                } else {
+                    this.redo()
+                }
+                return
+            }
+
             this.__syncSelectionFromDOM()
             this.__beforeInputSelectionStart = this.selectionStart
             this.__beforeInputSelectionEnd = this.selectionEnd
@@ -188,58 +239,28 @@ class TextInput extends Item {
             let selection = document.getSelection()
             selection.removeAllRanges()
 
-            let buff = this.text.split('') 
             switch(e.inputType){
                 case 'insertText': {
-                    let previousText = this.text
                     let insertedText = e.data == null ? '' : e.data
-                    let result = this.__applyTextInsertWithLimit(inputSelectionStart, inputSelectionEnd, insertedText)
-                    this.text = result.newText
-                    if(this.text === previousText){
-                        this.__renderImplText()
-                    }
-                    this.__restoreCursorAfterEdit(result)
+                    this.__replaceText(inputSelectionStart, inputSelectionEnd, insertedText, 'insert')
                     break
                 }
                 case 'insertFromPaste': {
-                    this.paste()
+                    let pastedText = e.data
+                    if(pastedText == null && e.dataTransfer) pastedText = e.dataTransfer.getData('text/plain')
+                    this.__replaceText(inputSelectionStart, inputSelectionEnd, this.__normalizeInsertedText(pastedText), '')
                     break
                 }
                 case 'deleteByCut': {
-                    this.cut()
+                    this.__replaceText(inputSelectionStart, inputSelectionEnd, '', '')
                     break
                 }
                 case 'deleteContentBackward': {
-                    let cursor = inputSelectionStart
-                    if(inputSelectionStart === inputSelectionEnd){
-                        if(inputSelectionStart === 0){
-                            this.__renderImplText()
-                            this.select(0, 0)
-                            break
-                        }
-                        buff.splice(inputSelectionStart-1, 1)
-                        cursor = inputSelectionStart-1
-                    } else {
-                        buff.splice(inputSelectionStart, inputSelectionEnd-inputSelectionStart)
-                    }
-                    this.text = buff.join('')
-                    this.select(cursor, cursor)
+                    this.__deleteWithDirection(false, inputSelectionStart, inputSelectionEnd)
                     break
                 }
                 case 'deleteContentForward': {
-                    let cursor = inputSelectionStart
-                    if(inputSelectionStart === inputSelectionEnd){
-                        if(inputSelectionStart >= buff.length){
-                            this.__renderImplText()
-                            this.select(inputSelectionStart, inputSelectionStart)
-                            break
-                        }
-                        buff.splice(inputSelectionStart, 1)
-                    } else {
-                        buff.splice(inputSelectionStart, inputSelectionEnd-inputSelectionStart)
-                    }
-                    this.text = buff.join('')
-                    this.select(cursor, cursor)
+                    this.__deleteWithDirection(true, inputSelectionStart, inputSelectionEnd)
                     break
                 }
             }
@@ -335,28 +356,136 @@ class TextInput extends Item {
         this.selectionEnd = Math.max(this.selectionStart, Math.min(end, this.text.length))
     }
 
-    __deleteWithDirection(isForward){
-        let start = this.selectionStart
-        let end = this.selectionEnd
-
+    __deleteWithDirection(isForward, start, end){
         if(start === end){
             if(isForward){
                 if(start >= this.text.length){
+                    this.__renderImplText()
                     this.select(start, start)
-                    return
+                    return false
                 }
                 end = start + 1
             } else {
                 if(start === 0){
+                    this.__renderImplText()
                     this.select(0, 0)
-                    return
+                    return false
                 }
                 start = start - 1
             }
         }
 
-        this.text = this.text.slice(0, start) + this.text.slice(end, this.text.length)
-        this.select(start, start)
+        let previousText = this.text
+        this.__replaceText(start, end, '', isForward ? 'deleteForward' : 'deleteBackward')
+        return this.text !== previousText
+    }
+
+    __isShortcutKey(e, qtKey){
+        if(!(e.ctrlKey || e.metaKey) || e.altKey) return false
+        if(e.keyCode === qtKey) return true
+
+        // Non-latin keyboard layouts: shortcuts use the physical key
+        return typeof e.code === 'string' && /^Key[A-Z]$/.test(e.code) && e.code.charCodeAt(3) === qtKey
+    }
+
+    __normalizeInsertedText(text){
+        if(text == null) return ''
+        return text.toString().replace(/\r\n|\r|\n/g, ' ')
+    }
+
+    __replaceText(start, end, insertedText, undoMergeKind){
+        let result = this.__applyTextInsertWithLimit(start, end, insertedText)
+        if(result.newText !== this.text){
+            this.__pushUndoState(undoMergeKind)
+            this.__setTextInternal(result.newText)
+        } else {
+            this.__renderImplText()
+        }
+        this.__restoreCursorAfterEdit(result)
+        this.__undoMergeCursor = this.selectionEnd
+        return result
+    }
+
+    __pasteText(text, start, end){
+        let insertedText = this.__normalizeInsertedText(text)
+        if(!insertedText && start === end) return false
+
+        let previousText = this.text
+        this.__replaceText(start, end, insertedText, '')
+        return this.text !== previousText
+    }
+
+    __writeClipboardText(text){
+        if(typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText){
+            navigator.clipboard.writeText(text).catch(()=>{})
+            return
+        }
+
+        // Fallback for non-secure contexts where navigator.clipboard is not available
+        let handler = (e)=>{
+            e.preventDefault()
+            e.stopImmediatePropagation()
+            if(e.clipboardData) e.clipboardData.setData('text/plain', text)
+        }
+        document.addEventListener('copy', handler, true)
+        try {
+            document.execCommand('copy')
+        } catch (e) {
+        } finally {
+            document.removeEventListener('copy', handler, true)
+        }
+    }
+
+    __setTextInternal(text){
+        this.__internalTextChange = true
+        try {
+            this.text = text
+        } finally {
+            this.__internalTextChange = false
+        }
+    }
+
+    __pushUndoState(undoMergeKind){
+        if(!this.__undoStack) this.__clearUndoHistory()
+
+        let canMerge = undoMergeKind
+            && undoMergeKind === this.__undoMergeKind
+            && this.__undoStack.length > 0
+            && this.selectionStart === this.selectionEnd
+            && this.selectionStart === this.__undoMergeCursor
+
+        if(!canMerge){
+            this.__undoStack.push({ text: this.text, selectionStart: this.selectionStart, selectionEnd: this.selectionEnd })
+            if(this.__undoStack.length > TextInput.MaximumUndoDepth) this.__undoStack.shift()
+        }
+
+        this.__redoStack = []
+        this.__undoMergeKind = undoMergeKind
+        this.__updateUndoRedoState()
+    }
+
+    __applyHistoryState(state){
+        this.__setTextInternal(state.text)
+        let start = Math.max(0, Math.min(state.selectionStart, this.text.length))
+        let end = Math.max(start, Math.min(state.selectionEnd, this.text.length))
+        this.select(start, end)
+        this.__undoMergeKind = ''
+        this.__updateUndoRedoState()
+    }
+
+    __clearUndoHistory(){
+        this.__undoStack = []
+        this.__redoStack = []
+        this.__undoMergeKind = ''
+        this.__undoMergeCursor = -1
+        this.__updateUndoRedoState()
+    }
+
+    __updateUndoRedoState(){
+        let canUndo = this.__undoStack.length > 0
+        let canRedo = this.__redoStack.length > 0
+        if(this.canUndo !== canUndo) this.canUndo = canUndo
+        if(this.canRedo !== canRedo) this.canRedo = canRedo
     }
 
     SLOT_readOnlyChanged(oldValue, newValue){
@@ -526,6 +655,8 @@ class TextInput extends Item {
             return
         }
 
+        if(!this.__internalTextChange) this.__clearUndoHistory()
+
         this.__renderImplText()
         this.__syncCursorToEnd()
 
@@ -564,14 +695,21 @@ class TextInput extends Item {
         this.text = ''
     }
     copy(){
-        navigator.clipboard.writeText(this.text.slice(this.selectionStart, this.selectionEnd))
+        if(this.echoMode !== TextInput.Normal) return
+
+        let text = this.text.slice(this.selectionStart, this.selectionEnd)
+        if(text) this.__writeClipboardText(text)
     }
     cut(){
-        let text = this.text.slice(this.selectionStart, this.selectionEnd)
-        navigator.clipboard.writeText(text).then(()=>{
-            this.text = this.text.slice(0, this.selectionStart) + this.text.slice(this.selectionEnd, this.text.length)
-            this.select(this.selectionStart, this.selectionStart)
-        })
+        if(this.readOnly || this.echoMode !== TextInput.Normal) return
+
+        let start = this.selectionStart
+        let end = this.selectionEnd
+        if(start === end) return
+
+        this.__writeClipboardText(this.text.slice(start, end))
+        this.__replaceText(start, end, '', '')
+        this.textEdited()
     }
     deselect(){
         document.getSelection().removeAllRanges()
@@ -584,7 +722,10 @@ class TextInput extends Item {
     }
     insert(position, text){
         let result = this.__applyTextInsertWithLimit(position, position, text)
-        this.text = result.newText
+        if(result.newText === this.text) return
+
+        this.__pushUndoState('')
+        this.__setTextInternal(result.newText)
     }
     isRightToLeft(start, end){
 
@@ -593,11 +734,14 @@ class TextInput extends Item {
 
     }
     paste(){
+        if(this.readOnly) return
+        if(typeof navigator === 'undefined' || !navigator.clipboard || !navigator.clipboard.readText) return
+
+        let start = this.selectionStart
+        let end = this.selectionEnd
         navigator.clipboard.readText().then((text) => {
-            let result = this.__applyTextInsertWithLimit(this.selectionStart, this.selectionEnd, text)
-            this.text = result.newText
-            this.__restoreCursorAfterEdit(result)
-        })
+            if(this.__pasteText(text, start, end)) this.textEdited()
+        }).catch(()=>{})
     }
     positionAt(x, y, position){
 
@@ -606,10 +750,18 @@ class TextInput extends Item {
 
     }
     redo(){
+        if(this.readOnly || !this.__redoStack || !this.__redoStack.length) return
 
+        this.__undoStack.push({ text: this.text, selectionStart: this.selectionStart, selectionEnd: this.selectionEnd })
+        this.__applyHistoryState(this.__redoStack.pop())
+        this.textEdited()
     }
     remove(start, end){
-        this.text = this.text.slice(0, start) + this.text.slice(end, this.text.length)
+        let newText = this.text.slice(0, start) + this.text.slice(end, this.text.length)
+        if(newText === this.text) return
+
+        this.__pushUndoState('')
+        this.__setTextInternal(newText)
     }
     select(start, end){
         let selection = document.getSelection()
@@ -634,7 +786,11 @@ class TextInput extends Item {
 
     }
     undo(){
+        if(this.readOnly || !this.__undoStack || !this.__undoStack.length) return
 
+        this.__redoStack.push({ text: this.text, selectionStart: this.selectionStart, selectionEnd: this.selectionEnd })
+        this.__applyHistoryState(this.__undoStack.pop())
+        this.textEdited()
     }
 
     __onMouseDown(mouse){

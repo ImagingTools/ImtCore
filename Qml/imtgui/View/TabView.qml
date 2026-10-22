@@ -19,7 +19,7 @@ Item {
 	// Style.baseColor (defaults keep the global MultiDoc look unchanged).
 	property color contentColor: Style.baseColor
 	// Tab strip surface. Default = Style.tabPanelBackgroundColor (global theme).
-	property color tabPanelColor: Style.baseColor
+	property color tabPanelColor: Style.tabPanelBackgroundColor
 	// Optional per-instance tab chrome; default is the global Style.tabPanelDecorator.
 	property alias tabDelegateDecorator: tabPanel.tabDelegateDecorator
 
@@ -48,7 +48,27 @@ Item {
 			pinned = false;
 		}
 
-		tabModel.append({id: tabId, name: tabName, sourceComponent: tabComp, icon: icon, description: description, waitName: waitName, pinned: pinned})
+		tabModel.append({id: tabId, name: tabName, sourceComponent: tabComp, icon: icon, description: description, waitName: waitName, pinned: pinned, loading: false, dirty: false})
+	}
+
+	// Unsaved changes: the tab shows a dot in place of its close button, as in VS Code.
+	function setTabDirty(tabId, dirty){
+		let index = getIndexById(tabId);
+		if (index < 0){
+			return;
+		}
+
+		tabModel.setProperty(index, "dirty", dirty);
+	}
+
+	// Shows a skeleton in place of the tab title until the tab content is ready.
+	function setTabLoading(tabId, loading){
+		let index = getIndexById(tabId);
+		if (index < 0){
+			return;
+		}
+
+		tabModel.setProperty(index, "loading", loading);
 	}
 
 	function removeTab(tabId){
@@ -78,6 +98,16 @@ Item {
 		}
 
 		tabModel.setProperty(index, "description", description);
+	}
+
+	// Rekeys a tab, e.g. a placeholder opened before the server assigned the document id.
+	function setTabId(tabId, newTabId){
+		let index = getIndexById(tabId);
+		if (index < 0){
+			return;
+		}
+
+		tabModel.setProperty(index, "id", newTabId);
 	}
 
 	function setTabIcon(tabId, icon){
@@ -145,6 +175,8 @@ Item {
 		anchors.top: parent.top;
 		anchors.left: parent.left;
 		anchors.right: parent.right;
+		// Not the panel's own width, which briefly follows its implicit width and loops through the chevrons.
+		maxWidth: root.width;
 		model: root.tabModel;
 		isCloseEnable: false
 		clip: true;
@@ -169,17 +201,6 @@ Item {
 		onCloseItem: {
 			root.onCloseTab(index);
 		}
-	}
-
-	Rectangle {
-		id: separator;
-		z: 6;
-		anchors.top: tabPanel.bottom;
-		width: parent.width;
-		height: 1;
-		color: Style.borderColor;
-		opacity: 0.5;
-		visible: root.tabVisible;
 	}
 
 	Rectangle {

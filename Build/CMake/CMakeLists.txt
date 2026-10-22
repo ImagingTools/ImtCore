@@ -199,7 +199,7 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 	add_subdirectory("${INCLUDE_DIR}/imtzip/CMake"			"${AUX_INCLUDE_DIR}/imtzip")
 
 	add_subdirectory("${INCLUDE_DIR}/imtclientgql/CMake" "${AUX_INCLUDE_DIR}/imtclientgql")
-	add_dependencies(imtclientgql imtbasesdl)
+	add_dependencies(imtclientgql imtbasesdl imtappsdl)
 
 	add_subdirectory("${INCLUDE_DIR}/imtcol/CMake" "${AUX_INCLUDE_DIR}/imtcol")
 	add_dependencies(imtcol imtbasesdl)
@@ -417,7 +417,7 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 
 		if(USE_QTDB)
 			add_subdirectory("${IMPL_DIR}/ImtAuthDbPck/CMake" "${AUX_INCLUDE_DIR}/ImtAuthDbPck")
-			add_dependencies(ImtAuthDbPck imtbase imtdb imtauth imtaccount imtauthdb)
+			add_dependencies(ImtAuthDbPck imtbase imtdb imtauth imtaccount imtlic imtauthdb)
 
 			add_subdirectory("${IMPL_DIR}/ImtChatPck/CMake" "${AUX_INCLUDE_DIR}/ImtChatPck")
 			add_dependencies(ImtChatPck imtbase imtchat)
@@ -590,6 +590,12 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 		add_subdirectory("${TESTS_DIR}/PersonalAccessTokenTest/CMake" "${AUX_INCLUDE_DIR}/PersonalAccessTokenTest")
 		add_dependencies(PersonalAccessTokenTest imtbase imtauth imtaccount)
 
+		add_subdirectory("${TESTS_DIR}/ExternalLoginTest/CMake" "${AUX_INCLUDE_DIR}/ExternalLoginTest")
+		add_dependencies(ExternalLoginTest imtbase imtauth imtaccount)
+
+		add_subdirectory("${TESTS_DIR}/DocumentShareTest/CMake" "${AUX_INCLUDE_DIR}/DocumentShareTest")
+		add_dependencies(DocumentShareTest imtbase imtauth imtaccount)
+
 		add_subdirectory("${TESTS_DIR}/PasswordPolicyTest/CMake" "${AUX_INCLUDE_DIR}/PasswordPolicyTest")
 		add_dependencies(PasswordPolicyTest imtbase imtauth)
 
@@ -597,7 +603,13 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 		add_dependencies(UserAccountStateTest imtbase imtauth)
 
 		add_subdirectory("${TESTS_DIR}/PermissionRequirementsTest/CMake" "${AUX_INCLUDE_DIR}/PermissionRequirementsTest")
-		add_dependencies(PermissionRequirementsTest imtbase imtauth imtlic)
+		add_dependencies(PermissionRequirementsTest imtbase imtauth imtgql imtlic)
+
+		add_subdirectory("${TESTS_DIR}/PermissionCheckTest/CMake" "${AUX_INCLUDE_DIR}/PermissionCheckTest")
+		add_dependencies(PermissionCheckTest imtbase imtauth imtgql imtlic)
+
+		add_subdirectory("${TESTS_DIR}/ProductFeaturesFileTest/CMake" "${AUX_INCLUDE_DIR}/ProductFeaturesFileTest")
+		add_dependencies(ProductFeaturesFileTest imtbase imtlic imtlicgql)
 
 		add_subdirectory("${TESTS_DIR}/CollectionDocumentServiceTest/CMake" "${AUX_INCLUDE_DIR}/CollectionDocumentServiceTest")
 		add_dependencies(CollectionDocumentServiceTest imtbase imtdoc)

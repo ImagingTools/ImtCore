@@ -16,7 +16,7 @@ CDuckAppender::CDuckAppender(std::unique_ptr<duckdb::Appender> appenderPtr)
 }
 
 
-// static methods
+// public static methods
 
 std::unique_ptr<IDuckAppender> CDuckAppender::Create(
 			duckdb::Connection& connection,
@@ -33,7 +33,7 @@ std::unique_ptr<IDuckAppender> CDuckAppender::Create(
 	}
 	catch (const std::exception& exception){
 		if (errorMessagePtr != nullptr){
-			*errorMessagePtr = QString::fromUtf8(exception.what());
+			*errorMessagePtr = exception.what();
 		}
 
 		return nullptr;
@@ -61,7 +61,7 @@ bool CDuckAppender::AppendRow(const QVariantList& rowValues)
 		m_appenderPtr->EndRow();
 	}
 	catch (const std::exception& exception){
-		m_lastError = QString::fromUtf8(exception.what());
+		m_lastError = exception.what();
 
 		return false;
 	}
@@ -82,7 +82,7 @@ bool CDuckAppender::Flush()
 		m_appenderPtr->Flush();
 	}
 	catch (const std::exception& exception){
-		m_lastError = QString::fromUtf8(exception.what());
+		m_lastError = exception.what();
 
 		return false;
 	}
@@ -103,7 +103,7 @@ bool CDuckAppender::Close()
 		m_appenderPtr->Close();
 	}
 	catch (const std::exception& exception){
-		m_lastError = QString::fromUtf8(exception.what());
+		m_lastError = exception.what();
 
 		return false;
 	}

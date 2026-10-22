@@ -239,10 +239,29 @@ sdl::V1_0::imtbase::CGetElementMetaInfoPayload CUserCollectionControllerComp::On
 
 	imtsdl::TElementList<sdl::V1_0::imtbase::CParameter> infoParams;
 
+	sdl::V1_0::imtbase::CParameter statusParameter;
+	statusParameter.id = QByteArrayLiteral("Status");
+	statusParameter.typeId = QByteArrayLiteral("Text");
+	statusParameter.name = QStringLiteral("Status");
+	statusParameter.data = userInfoPtr->IsEnabled() ? QStringLiteral("Active") : QStringLiteral("Disabled");
+	infoParams << statusParameter;
+
+	QStringList sourceNames;
+	for (const imtauth::IUserInfo::SystemInfo& systemInfo: userInfoPtr->GetSystemInfos()){
+		sourceNames << (systemInfo.systemName.isEmpty() ? QStringLiteral("Internal") : systemInfo.systemName);
+	}
+
+	sdl::V1_0::imtbase::CParameter sourceParameter;
+	sourceParameter.id = QByteArrayLiteral("Source");
+	sourceParameter.typeId = QByteArrayLiteral("Text");
+	sourceParameter.name = QStringLiteral("Source");
+	sourceParameter.data = sourceNames.isEmpty() ? QStringLiteral("Internal") : sourceNames.join(QStringLiteral(", "));
+	infoParams << sourceParameter;
+
 	if (m_roleInfoProviderCompPtr.IsValid()){
 		sdl::V1_0::imtbase::CParameter roleParameter;
 		roleParameter.id = QByteArrayLiteral("Roles");
-		roleParameter.typeId = roleParameter.id;
+		roleParameter.typeId = QByteArrayLiteral("TextList");
 		roleParameter.name = QStringLiteral("Roles");
 
 		imtauth::IUserInfo::RoleIds rolesIds = userInfoPtr->GetRoles(productId);
@@ -268,7 +287,7 @@ sdl::V1_0::imtbase::CGetElementMetaInfoPayload CUserCollectionControllerComp::On
 	if (m_userGroupInfoProviderCompPtr.IsValid()){
 		sdl::V1_0::imtbase::CParameter groupParameter;
 		groupParameter.id = QByteArrayLiteral("Groups");
-		groupParameter.typeId = groupParameter.id;
+		groupParameter.typeId = QByteArrayLiteral("TextList");
 		groupParameter.name = QStringLiteral("Groups");
 
 		QByteArrayList groupIds = userInfoPtr->GetGroups();
@@ -447,7 +466,7 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 		QDateTime lastConnection = objectCollectionIterator.GetElementInfo("LastConnection").toDateTime();
 		lastConnection.setTimeSpec(Qt::UTC);
 
-		representationObject.lastConnection = QString(lastConnection.toLocalTime().toString("dd.MM.yyyy hh:mm:ss"));
+		representationObject.lastConnection = QString(lastConnection.toLocalTime().toString("dd.MM.yyyy hh:mm"));
 	}
 
 	if (requestInfo.items.isAddedRequested){

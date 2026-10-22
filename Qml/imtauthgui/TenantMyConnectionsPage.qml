@@ -27,10 +27,10 @@ SimpleCollectionPage {
 
 	dataProvider: relationshipsPage.apiClient ? relationshipsPage.apiClient.tenantRelationshipsListDataProvider : null
 	customEditorComponent: relationshipEditorComp
-	managePermissionIds: ["EditOrganizationConnection", "ConnectOrganization", "RemoveOrganizationConnection"]
-	createPermissionIds: ["ConnectOrganization", "EditOrganizationConnection"]
-	editPermissionIds: ["EditOrganizationConnection", "ConnectOrganization"]
-	deletePermissionIds: ["RemoveOrganizationConnection", "EditOrganizationConnection"]
+	managePermissionIds: ["/OrganizationManagement/Connections/Edit/Connect", "/OrganizationManagement/Connections/Edit/Remove"]
+	createPermissionIds: ["/OrganizationManagement/Connections/Edit/Connect"]
+	editPermissionIds: ["/OrganizationManagement/Connections/Edit/Connect"]
+	deletePermissionIds: ["/OrganizationManagement/Connections/Edit/Remove"]
 
 	delegateComponent: Component {
 		SimpleCollectionItemDelegateBase {
@@ -79,7 +79,7 @@ SimpleCollectionPage {
 
 				BaseText {
 					text: relDelegate.partnerTenant !== "" ? relDelegate.partnerTenant : relDelegate.itemTitle
-					font.pixelSize: Style.fontSizeL
+					font.pixelSize: Style.fontSizeM
 					font.bold: true
 					color: Style.textColor
 					width: parent.width - relInfoRow.width - Style.marginM
@@ -94,15 +94,15 @@ SimpleCollectionPage {
 						visible: relDelegate.myTenant !== "" || relDelegate.partnerTenant !== ""
 						text: relDelegate.__connectionSummary()
 						font.pixelSize: Style.fontSizeS
-						color: Style.secondColor
+						color: Style.subtitleColor
 						anchors.verticalCenter: parent.verticalCenter
 					}
 
 					StatusBadge {
 						text: relDelegate.status
-						badgeColor: relDelegate.status === "Active" ? Style.selectedColor : Style.backgroundColor2
+						badgeColor: Style.neutralSubtleColor
 						badgeBorderWidth: 0
-						textColor: relDelegate.status === "Pending" ? Style.errorTextColor : Style.textColor
+						textColor: relDelegate.status === "Active" ? Style.successColor : Style.subtitleColor
 						fontPixelSize: Style.fontSizeXS
 					}
 				}
@@ -111,7 +111,7 @@ SimpleCollectionPage {
 			BaseText {
 				visible: relDelegate.itemDescription !== ""
 				text: relDelegate.itemDescription
-				font.pixelSize: Style.fontSizeM
+				font.pixelSize: Style.fontSizeS
 				color: Style.inactiveTextColor
 				elide: Text.ElideRight
 				width: parent.width

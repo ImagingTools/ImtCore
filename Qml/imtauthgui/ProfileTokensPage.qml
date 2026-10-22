@@ -118,8 +118,10 @@ ViewBase {
 
 				Text {
 					text: qsTr("Access tokens")
-					font.pixelSize: Style.fontSizeS
-					color: Style.inactiveTextColor
+					font.family: Style.fontFamilyBold
+					font.pixelSize: Style.fontSizeXL
+					font.bold: true
+					color: Style.textColor
 				}
 
 				Row {

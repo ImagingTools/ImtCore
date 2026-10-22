@@ -7,12 +7,14 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 #include <QtCore/QPointer>
+#include <QtCore/QScopeGuard>
 
 // ImtCore includes
 #include <imtrest/IRequest.h>
 #include <imtrest/IProtocolEngine.h>
 #include <imtrest/CWebSocketRequest.h>
 #include <imtbase/imtbase.h>
+#include <imtgql/CGqlRequestContextManager.h>
 
 
 namespace imtservergql
@@ -138,6 +140,11 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 	if (webSocketRequest == nullptr){
 		return CreateErrorResponse(QByteArrayLiteral("Invalid WebSocket request"), request);
 	}
+
+	// CreateGqlContext sets the thread context; it must not outlive this registration.
+	auto cleanup = qScopeGuard([]() {
+		imtgql::CGqlRequestContextManager::Clear();
+	});
 
 	// Capture all data from the request immediately - the CWebSocketRequest is parented
 	// to QWebSocket via setParent(m_socket) in CWebSocketThread, so it can be

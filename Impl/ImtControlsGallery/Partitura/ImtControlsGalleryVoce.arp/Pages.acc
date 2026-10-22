@@ -256,6 +256,60 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="ReportsPage" PackageId="ImtCoreVoce" ComponentId="SingleDocPage">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="FixedItemQmlPath" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="../../ReportsPage.qml"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IconPath" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Icons/Product"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Reports"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PageId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Reports"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ReportTemplatesPage" PackageId="ImtCoreVoce" ComponentId="SingleDocPage">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="FixedItemQmlPath" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="../../ReportTemplatesPage.qml"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IconPath" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Icons/Product"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="ReportTemplates"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PageId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="ReportTemplates"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="SdlTestPage" PackageId="ImtCoreVoce" ComponentId="SingleDocPage">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -432,6 +486,8 @@
         <Component ExportedId="IndicatorsPage" ComponentId="IndicatorsPage"/>
         <Component ExportedId="InputsPage" ComponentId="InputsPage"/>
         <Component ExportedId="ProductRepository" ComponentId="Repositories/ProductRepository"/>
+        <Component ExportedId="ReportTemplatesPage" ComponentId="ReportTemplatesPage"/>
+        <Component ExportedId="ReportsPage" ComponentId="ReportsPage"/>
         <Component ExportedId="SdlTestPage" ComponentId="SdlTestPage"/>
         <Component ExportedId="TablePage" ComponentId="TablePage"/>
         <Component ExportedId="TableTreeViewPage" ComponentId="TableTreeViewPage"/>

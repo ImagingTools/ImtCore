@@ -47,12 +47,7 @@ ViewBase {
 		: ""
 
 	function __initialsOf(text) {
-		if (!text || text === "")
-			return "?"
-		var parts = text.trim().split(/\s+/)
-		if (parts.length === 1)
-			return parts[0].substring(0, 2).toUpperCase()
-		return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase()
+		return Functions.initialsOf(text)
 	}
 
 	Component.onCompleted: {
@@ -90,6 +85,23 @@ ViewBase {
 		container.apiClient.getProfile()
 		if (AuthorizationController.tenantsEnabled)
 			container.apiClient.getOrganizations()
+	}
+
+	// Membership notifications update the profile only while it is shown; a hidden one reloads when shown.
+	property bool __reloadPending: false
+
+	function __reloadWhenVisible() {
+		if (container.visible)
+			container.__reload()
+		else
+			container.__reloadPending = true
+	}
+
+	onVisibleChanged: {
+		if (container.visible && container.__reloadPending) {
+			container.__reloadPending = false
+			container.__reload()
+		}
 	}
 
 	Connections {
@@ -142,11 +154,12 @@ ViewBase {
 		target: AuthorizationController
 
 		function onTenantSelected(tenantId) { container.__reload() }
-		function onTenantInvitationAccepted(tenantId, membershipId) { container.__reload() }
-		function onTenantInvitationRejected(tenantId, membershipId) { container.__reload() }
-		function onTenantOwnershipTransferred(tenantId) { container.__reload() }
-		function onTenantMembershipRoleChanged(tenantId, userId, role) { container.__reload() }
-		function onTenantMembershipRemoved(tenantId, userId) { container.__reload() }
+		function onTenantInvitationAccepted(tenantId, membershipId) { container.__reloadWhenVisible() }
+		function onTenantInvitationRejected(tenantId, membershipId) { container.__reloadWhenVisible() }
+		function onTenantOwnershipTransferred(tenantId) { container.__reloadWhenVisible() }
+		function onTenantMembershipRoleChanged(tenantId, userId, role) { container.__reloadWhenVisible() }
+		function onTenantMembershipRemoved(tenantId, userId) { container.__reloadWhenVisible() }
+		function onMembershipNotificationsResumed() { container.__reloadWhenVisible() }
 	}
 
 	// --- Identity banner ---
@@ -228,7 +241,34 @@ ViewBase {
 				multiPageView.addPage("Organizations", qsTr("Organizations"), organizationsPageComp, "Icons/Organizations")
 			multiPageView.addPage("AccessTokens", qsTr("Access Tokens"), tokensPageComp, "Icons/Key")
 			multiPageView.addPage("Access", qsTr("Roles & Permissions"), accessPageComp, "Icons/Role")
+			container.__addLinkedAccountsPage()
 			multiPageView.currentIndex = 0
+
+			AuthorizationController.loadExternalLoginProviders()
+		}
+	}
+
+	// The tab exists only when the server offers sign-in providers.
+	function __addLinkedAccountsPage() {
+		if (AuthorizationController.externalLoginProviders.length === 0)
+			return
+		if (multiPageView.getIndexById("LinkedAccounts") >= 0)
+			return
+		multiPageView.addPage("LinkedAccounts", qsTr("Linked Accounts"), linkedAccountsPageComp, "Icons/Link")
+	}
+
+	Connections {
+		target: AuthorizationController
+
+		function onExternalLoginProvidersLoaded() {
+			container.__addLinkedAccountsPage()
+		}
+	}
+
+	Component {
+		id: linkedAccountsPageComp
+		ProfileLinkedAccountsPage {
+			apiClient: container.apiClient
 		}
 	}
 
@@ -264,6 +304,6 @@ ViewBase {
 		id: loading
 		anchors.fill: parent
 		visible: container.apiClient ? container.apiClient.loading : false
-		background.color: Style.backgroundColor2
+		background.color: Style.baseColor
 	}
 }

@@ -449,6 +449,16 @@ DocumentViewBase {
 		}
 	}
 	
+	// Display name of a context entity type ("Devices" -> "Hardware"); the id when it is unknown.
+	function entityTypeName(typeId) {
+		for (var i = 0; i < entityTypeModel.getItemsCount(); i++) {
+			if (String(entityTypeModel.getData("id", i)) === String(typeId)) {
+				return String(entityTypeModel.getData("name", i))
+			}
+		}
+		return String(typeId)
+	}
+
 	// --- Helper: find ComboBox index by "id" field ---
 	function findComboIndex(combo, targetId, fallback) {
 		if (combo.model) {
@@ -765,19 +775,20 @@ DocumentViewBase {
 		// Layout constants
 		readonly property real contentMaxWidth: 800
 		readonly property real cardPadding: 16
-		readonly property real cardRadius: Style.radiusL
+		readonly property real cardRadius: Style.radiusM
 		readonly property string cardColor: Style.baseColor
 		readonly property string cardBorderColor: Style.borderColor
-		// Pre-faded variant of cardBorderColor used by inputs to render a subtle
-		// (~40% opacity, alpha 0x66) border in their unfocused state.
-		readonly property string cardBorderColorFaded: Style.borderColor + "66"
+		// Unfocused input border. Appending an alpha to "#rrggbb" gave "#rrggbbaa", which Qt reads
+		// as "#aarrggbb" - a yellow border.
+		readonly property string cardBorderColorFaded: Style.inputBorderColor
 		readonly property string pageBgColor: Style.backgroundColor2
 		readonly property string accentColor: Style.imaginToolsAccentColor
 		readonly property string labelColor: Style.textColor
 		readonly property real avatarSize: 36
 		readonly property real accentDividerHeight: 2
 		readonly property real badgeHeight: 22
-		readonly property string accentBgLight: Style.selectedColor
+		// Tag/chip fill: neutral, so link text in a chip keeps its contrast on both themes.
+		readonly property string accentBgLight: Style.neutralSubtleColor
 		readonly property string accentBorderLight: Style.borderColor
 		readonly property string accentBadgeBg: Style.selectedColor
 		readonly property string chatBgColor: Style.baseColor
@@ -1066,10 +1077,10 @@ DocumentViewBase {
 									objectName: "DescriptionInput"
 									width: parent.width
 									height: Math.min(220, Math.max(50, editDescriptionInput.contentHeight)) + Style.paddingM * 2
-									radius: Style.radiusM
-									border.color: editDescriptionInput.activeFocus ? editView.accentColor : editView.cardBorderColorFaded
-									border.width: editDescriptionInput.activeFocus ? 2 : 1
-									color: ticketEditor.canEditCoreTicketFields ? Style.baseColor : Style.alternateBaseColor
+									radius: Style.textFieldRadius
+									border.color: editDescriptionInput.activeFocus ? Style.focusRingColor : editView.cardBorderColorFaded
+									border.width: 1
+									color: ticketEditor.canEditCoreTicketFields ? Style.inputBackgroundColor : Style.alternateBaseColor
 
 									Image {
 										z: 2
@@ -1343,10 +1354,11 @@ DocumentViewBase {
 										visible: ticketEditor.canEditCoreTicketFields
 										text: "+ " + qsTr("Add assignee")
 										font.pixelSize: Style.fontSizeM
-										font.bold: true
+										font.underline: addAssigneeArea.containsMouse
 										color: editView.accentColor
 
 										MouseArea {
+											id: addAssigneeArea
 											objectName: "MouseArea"
 											anchors.fill: parent
 											hoverEnabled: true
@@ -1394,10 +1406,8 @@ DocumentViewBase {
 											objectName: "AssigneeChip_" + index
 											width: Math.min(assigneeChipText.contentWidth + assigneeChipRemove.width + Style.paddingS * 3, assigneesFlow.chipMaxWidth)
 											height: assigneesFlow.chipHeight
-											radius: 14
+											radius: Style.radiusM
 											color: editView.accentBgLight
-											border.color: editView.accentBorderLight
-											border.width: 1
 											
 											Text {
 												id: assigneeChipText
@@ -1408,22 +1418,26 @@ DocumentViewBase {
 												anchors.verticalCenter: parent.verticalCenter
 												text: modelData.name || modelData.id
 												font.pixelSize: Style.fontSizeM
-												color: editView.accentColor
+												color: Style.textColor
 												elide: Text.ElideRight
 												maximumLineCount: 1
 											}
-											
+
 											ToolButton {
 												id: assigneeChipRemove
 												objectName: "RemoveButton"
 												visible: ticketEditor.canEditCoreTicketFields
 												anchors.right: parent.right
+												anchors.rightMargin: Style.spacingXS
 												anchors.verticalCenter: parent.verticalCenter
+												width: Style.iconSizeM
+												height: width
+												tooltipText: qsTr("Remove assignee")
 												iconSource: "qrc:/" +Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
 												decorator: Component {
 													ToolButtonDecorator {
-														color: "transparent"
-														icon.width: Style.iconSizeXS
+														radius: Style.buttonRadius
+														icon.width: Style.iconSizeXXS
 													}
 												}
 												onClicked: {
@@ -1570,18 +1584,21 @@ DocumentViewBase {
 										visible: ticketEditor.canEdit
 										text: "+ " + qsTr("Add context")
 										font.pixelSize: Style.fontSizeM
-										font.bold: true
+										font.underline: addContextArea.containsMouse
 										color: editView.accentColor
 
 										MouseArea {
+											id: addContextArea
 											objectName: "MouseArea"
 											anchors.fill: parent
 											hoverEnabled: true
 											cursorShape: Qt.PointingHandCursor
 											onClicked: {
-												var point = addContextBtn.mapToItem(null, 0, addContextBtn.height)
+												// Hangs under the link, right-aligned to it, so it does not cover the card.
+												var point = addContextBtn.mapToItem(null, addContextBtn.width, addContextBtn.height + Style.spacingXS)
+												var popupWidth = 320 + 2 * Style.marginL
 												ModalDialogManager.openDialog(contextPickerDialogComp, {
-													"x": point.x,
+													"x": Math.max(Style.marginS, point.x - popupWidth),
 													"y": point.y
 												})
 											}
@@ -1611,11 +1628,9 @@ DocumentViewBase {
 											objectName: "ContextChip_" + index
 											width: Math.min(refLabelText.contentWidth + refRemoveBtn.width + Style.paddingS * 3, contextFlow.chipMaxWidth)
 											height: contextFlow.chipHeight
-											radius: 14
+											radius: Style.radiusM
 											color: editView.accentBgLight
-											border.color: editView.accentBorderLight
-											border.width: 1
-											
+
 											Text {
 												id: refLabelText
 												anchors.left: parent.left
@@ -1623,14 +1638,15 @@ DocumentViewBase {
 												anchors.right: refRemoveBtn.visible ? refRemoveBtn.left : parent.right
 												anchors.rightMargin: 2
 												anchors.verticalCenter: parent.verticalCenter
-												text: (modelData.entityType ? "[" + modelData.entityType + "] " : "") + (modelData.displayName || modelData.entityId || "")
+												text: (modelData.entityType ? ticketEditor.entityTypeName(modelData.entityType) + ": " : "") + (modelData.displayName || modelData.entityId || "")
 												font.pixelSize: Style.fontSizeM
-												color: editView.accentColor
-												font.underline: modelData.entityLinkPath !== ""
+												color: modelData.entityLinkPath !== "" ? Style.linkColor : Style.textColor
+												font.underline: refLinkArea.containsMouse && modelData.entityLinkPath !== ""
 												elide: Text.ElideRight
 												maximumLineCount: 1
-												
+
 												MouseArea {
+													id: refLinkArea
 													anchors.fill: parent
 													hoverEnabled: true
 													cursorShape: Qt.PointingHandCursor
@@ -1647,12 +1663,16 @@ DocumentViewBase {
 												objectName: "RemoveButton"
 												visible: ticketEditor.canEdit
 												anchors.right: parent.right
+												anchors.rightMargin: Style.spacingXS
 												anchors.verticalCenter: parent.verticalCenter
+												width: Style.iconSizeM
+												height: width
+												tooltipText: qsTr("Unlink")
 												iconSource: "qrc:/" +Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
 												decorator: Component {
 													ToolButtonDecorator {
-														color: "transparent"
-														icon.width: Style.iconSizeXS
+														radius: Style.buttonRadius
+														icon.width: Style.iconSizeXXS
 													}
 												}
 												onClicked: {
@@ -1710,7 +1730,8 @@ DocumentViewBase {
 										readonly property int __maxHeight: 600
 
 										width: __popupWidth + 2 * Style.marginL
-										height: Math.min(Style.marginL + ctxTypeCB.height + ctxPopupItem.height + 2*Style.marginL, __maxHeight)
+										height: Math.min(ctxPopupItem.y + ctxPopupItem.height + Style.marginL, __maxHeight)
+										readonly property bool hasTypes: entityTypeModel.getItemsCount() > 0
 										// Content can be taller than __maxHeight once the combo box and
 										// margins are subtracted; clip here (the common parent of ctxBg
 										// and ctxPopupItem) so any overflow is cut at the rounded card's
@@ -1735,6 +1756,18 @@ DocumentViewBase {
 											ModalDialogManager.closeDialog()
 										}
 
+										// Lifted when the list would run past the bottom of the window.
+										function fitIntoWindow() {
+											if (!ModalDialogManager.activeView) return
+											var maxY = ModalDialogManager.activeView.height - ctxWrapper.height - Style.marginS
+											if (ctxWrapper.y > maxY) {
+												ctxWrapper.y = Math.max(Style.marginS, maxY)
+											}
+										}
+
+										onHeightChanged: ctxWrapper.fitIntoWindow()
+										onYChanged: ctxWrapper.fitIntoWindow()
+
 										onSelectedEntityTypeIdChanged: {
 											if (ctxWrapper.__ctxReady) {
 												ctxPopupLoader.sourceComponent = null
@@ -1747,9 +1780,9 @@ DocumentViewBase {
 											id: ctxBg
 											anchors.fill: parent
 											color: Style.baseColor
-											radius: Style.radiusL
+											radius: Style.radiusM
 											border.width: 1
-											border.color: Style.alternateBaseColor
+											border.color: Style.borderColor
 										}
 
 										MouseArea {
@@ -1768,20 +1801,73 @@ DocumentViewBase {
 											z: ctxBg.z - 1
 											horizontalOffset: 3
 											verticalOffset: 3
-											radius: Style.radiusL
+											radius: Style.radiusM
 											color: Style.shadowColor
 											source: ctxBg
+										}
+
+										Item {
+											id: ctxHeader
+											anchors.left: parent.left
+											anchors.leftMargin: Style.marginL
+											anchors.right: parent.right
+											anchors.rightMargin: Style.marginS
+											anchors.top: parent.top
+											anchors.topMargin: Style.marginS
+											height: Style.controlHeightM
+
+											Text {
+												anchors.left: parent.left
+												anchors.verticalCenter: parent.verticalCenter
+												text: qsTr("Link context")
+												font.family: Style.fontFamilyBold
+												font.pixelSize: Style.fontSizeL
+												color: Style.titleColor
+											}
+
+											ToolButton {
+												objectName: "CloseContextPickerButton"
+												anchors.right: parent.right
+												anchors.verticalCenter: parent.verticalCenter
+												width: Style.controlHeightS
+												height: width
+												tooltipText: qsTr("Close")
+												iconSource: "qrc:/" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
+												decorator: Component {
+													ToolButtonDecorator {
+														radius: Style.buttonRadius
+														icon.width: Style.iconSizeXS
+													}
+												}
+												onClicked: ctxWrapper.closePopup()
+											}
+										}
+
+										Text {
+											id: ctxTypeLabel
+											anchors.left: parent.left
+											anchors.leftMargin: Style.marginL
+											anchors.right: parent.right
+											anchors.rightMargin: Style.marginL
+											anchors.top: ctxHeader.bottom
+											anchors.topMargin: Style.marginS
+											text: ctxWrapper.hasTypes ? qsTr("Entity type") : qsTr("No entity types can be linked to tickets yet.")
+											font.pixelSize: Style.fontSizeS
+											color: Style.subtitleColor
+											wrapMode: Text.WordWrap
 										}
 
 										ComboBox {
 											id: ctxTypeCB
 											objectName: "ContextEntityTypeCombo"
 											anchors.left: parent.left
+											anchors.leftMargin: Style.marginL
 											anchors.right: parent.right
-											anchors.top: parent.top
-											anchors.margins: Style.marginL
-											width: parent.width
-											height: Style.buttonHeightM
+											anchors.rightMargin: Style.marginL
+											anchors.top: ctxTypeLabel.bottom
+											anchors.topMargin: Style.spacingXS
+											height: ctxWrapper.hasTypes ? Style.controlHeightM : 0
+											visible: ctxWrapper.hasTypes
 											model: entityTypeModel
 											currentIndex: 0
 											onCurrentIndexChanged: {
@@ -1854,7 +1940,7 @@ DocumentViewBase {
 											anchors.right: parent.right
 											anchors.rightMargin: Style.marginL
 											anchors.top: ctxTypeCB.bottom
-											anchors.topMargin: Style.marginL
+											anchors.topMargin: ctxWrapper.hasTypes ? Style.marginM : 0
 
 											Loader {
 												id: ctxPopupLoader
@@ -1966,17 +2052,6 @@ DocumentViewBase {
 								}
 							}
 						}
-					}
-					
-					DropShadow {
-						anchors.fill: propertiesCard
-						z: propertiesCard.z - 1
-						horizontalOffset: 3
-						verticalOffset: 3
-						radius: Style.radiusL
-						spread: 0
-						color: Style.shadowColor
-						source: propertiesCard
 					}
 				} // rightTopWrapper
 			} // topRow
@@ -2892,10 +2967,10 @@ DocumentViewBase {
 								width: parent.width - sendBtnRect.width - Style.spacingS
 								// Extra 4px accounts for the border width change on focus (1→2px on each side)
 								height: Math.min(maxInputHeight, Math.max(40, commentInputField.contentHeight + Style.paddingS * 2 + 4))
-								radius: 20
-								border.color: commentInputField.activeFocus ? editView.accentColor : editView.cardBorderColor
-								border.width: commentInputField.activeFocus ? 2 : 1
-								color: editView.cardColor
+								radius: Style.textFieldRadius
+								border.color: commentInputField.activeFocus ? Style.focusRingColor : Style.inputBorderColor
+								border.width: 1
+								color: Style.inputBackgroundColor
 
 								Flickable {
 									id: commentInputFlick
@@ -2965,12 +3040,12 @@ DocumentViewBase {
 								objectName: "SendCommentButton"
 								width: sendBtnText.contentWidth + 28
 								height: 40
-								radius: 20
+								radius: Style.buttonRadius
 								anchors.bottom: parent.bottom
 								color: commentButton.enabled
-									   ? (sendBtnMa.pressed ? Qt.darker(editView.accentColor, 1.15)
-															: sendBtnMa.containsMouse ? Qt.lighter(editView.accentColor, 1.1)
-																					  : editView.accentColor)
+									   ? (sendBtnMa.pressed ? Style.buttonPrimaryPressedColor
+															: sendBtnMa.containsMouse ? Style.buttonPrimaryHoverColor
+																					  : Style.buttonPrimaryColor)
 									   : Style.buttonInactiveColor
 								
 									Text {

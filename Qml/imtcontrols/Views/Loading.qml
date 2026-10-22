@@ -4,30 +4,34 @@ import Acf 1.0
 /**
 	Full-area loading overlay for collection/document views.
 
-	Surface: Style.baseColor (matches Agents/Services/Messages tables).
-	Indicator: three accent dots with a staggered opacity cycle (no Canvas,
-	no Behavior). Compact enough for tiny inline spinners too.
+	VS Code style: a thin spinning ring (accent arc over a faint track) with a quiet
+	"Loading..." caption under it in larger areas. The ring is painted once and only
+	rotated (Timer-driven, no Behavior), so the animation costs no repaints.
 */
 Rectangle {
 	id: root
-	// Test instrumentation: same objectName as BusyIndicator.qml (a separate, parallel spinner
-	// component) so GUI tests can wait for "whichever busy indicator is currently showing" without
-	// needing to know which of the two a given view uses. Its rotation animation (a Timer mutating
-	// `rotation` every 10ms) never touches objectName/visible/childList, so a MutationObserver-based
-	// "DOM went quiet" wait can resolve while it's still visibly spinning. Inert - no runtime/visual
-	// effect.
+	// Test instrumentation: same objectName as BusyIndicator.qml so GUI tests can wait for
+	// "whichever busy indicator is currently showing". Inert - no runtime/visual effect.
 	objectName: "BusyIndicator"
 
+	// Small sizes (inline indicators) give a ring of that size and no caption.
 	property int indicatorSize: 44
-	property color accentColor: Style.textSelectedColor
+	property color accentColor: Style.buttonPrimaryColor
+	property string text: qsTr("Loading...")
 	property alias background: backgroundRec
-	// 0..2 — which dot is currently brightest
+	// Rotation of the ring in degrees
 	property int animPhase: 0
+	readonly property int ringSize: root.indicatorSize <= 30 ? root.indicatorSize : Style.iconSizeM
+	readonly property bool captionVisible: root.indicatorSize > 30 && root.height >= Style.sizeHintBXS
 	color: "transparent"
+
+	onAccentColorChanged: {
+		ring.requestPaint()
+	}
 
 	function start(){
 		root.animPhase = 0
-		root.visible = root.width >= dotsRow.width || root.indicatorSize <= 20
+		root.visible = true
 	}
 
 	function stop(){
@@ -41,38 +45,66 @@ Rectangle {
 		color: Style.baseColor
 	}
 
-	Row {
-		id: dotsRow
-
+	Column {
 		z: root.z + 1
 		anchors.centerIn: parent
-		spacing: Math.max(3, Math.round(root.indicatorSize * 0.16))
-		visible: root.width >= width || root.indicatorSize <= 20
+		spacing: Style.marginS
 
-		Repeater {
-			model: 3
+		Canvas {
+			id: ring
 
-			delegate: Rectangle {
-				// Fixed size so the row width never jumps while animating.
-				width: Math.max(4, Math.round(root.indicatorSize * 0.22))
-				height: width
-				radius: width / 2
-				color: root.accentColor
-				// Active dot full opacity; neighbors soft.
-				opacity: ((root.animPhase - index + 3) % 3) === 0
-						? 1
-						: (((root.animPhase - index + 3) % 3) === 1 ? 0.45 : 0.2)
+			anchors.horizontalCenter: parent.horizontalCenter
+			width: root.ringSize
+			height: width
+			rotation: root.animPhase
+
+			property string trackColor: Style.borderColor
+
+			onTrackColorChanged: {
+				ring.requestPaint()
 			}
+
+			onWidthChanged: {
+				ring.requestPaint()
+			}
+
+			onPaint: {
+				let ctx = ring.getContext("2d")
+				ctx.clearRect(0, 0, ring.width, ring.height)
+				let lineWidth = Math.max(2, Math.round(ring.width / 12))
+				let r = ring.width / 2 - lineWidth
+				ctx.lineWidth = lineWidth
+				ctx.lineCap = "round"
+
+				ctx.strokeStyle = ring.trackColor
+				ctx.beginPath()
+				ctx.arc(ring.width / 2, ring.height / 2, r, 0, 2 * Math.PI, false)
+				ctx.stroke()
+
+				ctx.strokeStyle = String(root.accentColor)
+				ctx.beginPath()
+				ctx.arc(ring.width / 2, ring.height / 2, r, -Math.PI / 2, Math.PI / 4, false)
+				ctx.stroke()
+			}
+		}
+
+		Text {
+			anchors.horizontalCenter: parent.horizontalCenter
+			visible: root.captionVisible
+			text: root.text
+			color: Style.subtitleColor
+			font.family: Style.fontFamily
+			font.pixelSize: Style.fontSizeS
 		}
 	}
 
 	Timer {
-		interval: 260
+		interval: 30
 		running: root.visible
 		repeat: true
 
 		onTriggered: {
-			root.animPhase = (root.animPhase + 1) % 3
+			root.animPhase = (root.animPhase + 12) % 360
 		}
 	}
 

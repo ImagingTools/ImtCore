@@ -28,10 +28,10 @@ SimpleCollectionPage {
 	documentManager: grantsPage.apiClient ? grantsPage.apiClient.crossOrgGrantDocumentManager : null
 	objectTypeId: grantsPage.apiClient ? grantsPage.apiClient.crossOrgGrantObjectTypeId : ""
 	dataProvider: grantsPage.apiClient ? grantsPage.apiClient.crossOrgGrantsListDataProvider : null
-	managePermissionIds: ["EditOrganizationConnection", "ConnectOrganization", "RemoveOrganizationConnection"]
-	createPermissionIds: ["ConnectOrganization", "EditOrganizationConnection"]
-	editPermissionIds: ["EditOrganizationConnection", "ConnectOrganization"]
-	deletePermissionIds: ["RemoveOrganizationConnection", "EditOrganizationConnection"]
+	managePermissionIds: ["/OrganizationManagement/Connections/Edit/Connect", "/OrganizationManagement/Connections/Edit/Remove"]
+	createPermissionIds: ["/OrganizationManagement/Connections/Edit/Connect"]
+	editPermissionIds: ["/OrganizationManagement/Connections/Edit/Connect"]
+	deletePermissionIds: ["/OrganizationManagement/Connections/Edit/Remove"]
 
 	delegateComponent: Component {
 		SimpleCollectionItemDelegateBase {
@@ -68,7 +68,7 @@ SimpleCollectionPage {
 				spacing: Style.marginM
 				BaseText {
 					text: grantDelegate.targetTenant !== "" ? grantDelegate.targetTenant : grantDelegate.itemTitle
-					font.pixelSize: Style.fontSizeL
+					font.pixelSize: Style.fontSizeM
 					font.bold: true
 					color: Style.textColor
 					width: parent.width - grantInfoRow.width - Style.marginM
@@ -83,14 +83,14 @@ SimpleCollectionPage {
 						visible: grantDelegate.roles !== ""
 						text: grantDelegate.roles
 						font.pixelSize: Style.fontSizeS
-						color: Style.secondColor
+						color: Style.subtitleColor
 						anchors.verticalCenter: parent.verticalCenter
 					}
 
 					StatusBadge {
 						visible: grantDelegate.direction !== ""
 						text: grantDelegate.direction === "from" ? qsTr("Received") : qsTr("Granted")
-						badgeColor: grantDelegate.direction === "from" ? Style.selectedColor : Style.backgroundColor2
+						badgeColor: Style.neutralSubtleColor
 						badgeBorderWidth: 0
 						textColor: Style.textColor
 						fontPixelSize: Style.fontSizeXS
@@ -100,7 +100,7 @@ SimpleCollectionPage {
 						visible: grantDelegate.expiresAt !== ""
 						text: qsTr("Expires %1").arg(grantDelegate.expiresAt)
 						font.pixelSize: Style.fontSizeXS
-						color: Style.errorTextColor
+						color: Style.subtitleColor
 						anchors.verticalCenter: parent.verticalCenter
 					}
 				}
@@ -109,7 +109,7 @@ SimpleCollectionPage {
 			BaseText {
 				visible: grantDelegate.itemDescription !== ""
 				text: grantDelegate.itemDescription
-				font.pixelSize: Style.fontSizeM
+				font.pixelSize: Style.fontSizeS
 				color: Style.inactiveTextColor
 				elide: Text.ElideRight
 				width: parent.width

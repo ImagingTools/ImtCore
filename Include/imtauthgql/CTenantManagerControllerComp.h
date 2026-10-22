@@ -226,10 +226,11 @@ protected:
 				QString& errorMessage) const override;
 
 private:
-	// True when the caller may act for at least one of the given organizations.
+	// True when the caller holds any of the organization leaves in at least one of the given organizations.
 	bool HasAccessToAnyTenant(
 				const ::imtgql::CGqlRequest& gqlRequest,
 				const QByteArrayList& tenantIds,
+				const QByteArrayList& requiredOrgPermissions,
 				QString& errorMessage) const;
 	// True when the caller may manage the grantor or the grantee organization of an existing grant.
 	bool CanManageGrant(

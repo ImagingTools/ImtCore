@@ -10,6 +10,8 @@
 // ImtCore includes
 #include <imtbase/COperationContext.h>
 #include <imtauth/CUserInfo.h>
+#include <imtauthgql/imtauthgql.h>
+#include <imtservergql/DocumentSharing.h>
 
 
 namespace imtservergql
@@ -45,6 +47,7 @@ CDM::CDocumentList CCollectionDocumentServiceControllerComp::OnGetOpenedDocument
 			sdlInfo.objectTypeId = info.typeId;
 			sdlInfo.isDirty = info.isDirty;
 			sdlInfo.hasNameProvider = info.hasNameProvider;
+			sdlInfo.isLoading = info.isLoading;
 
 			retVal.documentList->append(sdlInfo);
 		}
@@ -140,6 +143,10 @@ CDM::CDocumentInfo CCollectionDocumentServiceControllerComp::OnOpenDocument(
 	QByteArray userId = GetUserId(gqlRequest);
 	if (userId.isEmpty()){
 		SendWarningMessage(0, "Unable to get user-ID from context");
+	}
+
+	if (!CheckObjectAccess(gqlRequest, *objectId->id, imtauth::IDocumentShareInfo::DAL_VIEW, errorMessage)){
+		return retVal;
 	}
 
 	QUrl url(QStringLiteral("collection:///%1").arg(*objectId->id));
@@ -312,7 +319,15 @@ CDM::CDocumentOperationStatus CCollectionDocumentServiceControllerComp::OnSaveDo
 	}
 
 	if (m_documentManagerCompPtr.IsValid()) {
-		const bool isNewObject = GetCollectionObjectId(userId, *saveDocumentInput->documentId).isEmpty();
+		const QByteArray collectionObjectId = GetCollectionObjectId(userId, *saveDocumentInput->documentId);
+		const bool isNewObject = collectionObjectId.isEmpty();
+
+		if (!isNewObject && !CheckObjectAccess(gqlRequest, collectionObjectId, imtauth::IDocumentShareInfo::DAL_EDIT, errorMessage)){
+			retVal.status = CDM::EDocumentOperationStatus::Failed;
+			retVal.message = errorMessage;
+
+			return retVal;
+		}
 
 		istd::TDelPtr<imtbase::IOperationContext> operationContextPtr;
 		operationContextPtr.SetPtr(CreateOperationContextFromGqlRequest(gqlRequest));
@@ -468,7 +483,18 @@ sdl::V1_0::imtbase::CUndoInfo CCollectionDocumentServiceControllerComp::OnGetUnd
 
 	if (m_documentManagerCompPtr.IsValid()) {
 		idoc::IUndoManager* undoManagerPtr = nullptr;
-		if (m_documentManagerCompPtr-> GetDocumentUndoManager(userId, *documentId->id, undoManagerPtr) != imtdoc::IDocumentService::OS_OK){
+		const imtdoc::IDocumentService::OperationStatus status = m_documentManagerCompPtr->GetDocumentUndoManager(userId, *documentId->id, undoManagerPtr);
+
+		// Data, not an error: a resyncing client closes the document. After a restart the user has no entry at all.
+		const bool isDocumentUnknown = !userId.isEmpty()
+					&& (status == imtdoc::IDocumentService::OS_INVALID_DOCUMENT_ID || status == imtdoc::IDocumentService::OS_INVALID_USER_ID);
+		if (isDocumentUnknown){
+			retVal.status->status = sdl::V1_0::imtbase::EUndoStatus::InvalidDocumentId;
+
+			return retVal;
+		}
+
+		if (status != imtdoc::IDocumentService::OS_OK){
 			errorMessage = "Undo manager not available";
 
 			retVal.status->status = sdl::V1_0::imtbase::EUndoStatus::Failed;
@@ -744,6 +770,28 @@ imtbase::IOperationContext* CCollectionDocumentServiceControllerComp::CreateOper
 	operationContextPtr->SetTenantId(tenantId);
 
 	return operationContextPtr.PopPtr();
+}
+
+
+bool CCollectionDocumentServiceControllerComp::CheckObjectAccess(
+			const ::imtgql::CGqlRequest& gqlRequest,
+			const QByteArray& objectId,
+			imtauth::IDocumentShareInfo::AccessLevel accessLevel,
+			QString& errorMessage) const
+{
+	if (!m_objectCollectionCompPtr.IsValid() || gqlRequest.GetRequestContext() == nullptr){
+		return true;
+	}
+
+	if (HasObjectAccess(*m_objectCollectionCompPtr, m_documentShareManagerCompPtr.GetPtr(), gqlRequest, {objectId}, accessLevel)){
+		return true;
+	}
+
+	errorMessage = accessLevel == imtauth::IDocumentShareInfo::DAL_VIEW
+				? QStringLiteral("Document does not exist")
+				: QStringLiteral("The organization may not change the document");
+
+	return false;
 }
 
 

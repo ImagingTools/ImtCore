@@ -89,6 +89,9 @@ RemoteCollectionView {
 		function onSubscriptionOwnershipTransferred(tenantId) {
 			container.doUpdateGui()
 		}
+		function onSubscriptionsResumed() {
+			container.doUpdateGui()
+		}
 	}
 
 	onHeadersChanged: {
@@ -673,6 +676,7 @@ RemoteCollectionView {
 	commandsDelegateComp: Component {
 		DocCollectionViewDelegate {
 			id: tenantCommandsDelegate
+			revisionsPermissionPath: "/OrganizationManagement/Revisions"
 			collectionView: container
 
 			function createNewTenantDocument(){

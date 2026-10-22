@@ -112,6 +112,12 @@ protected:
 				QString& errorMessage) const override;
 
 private:
+	// The user holds the organization leaf in the organization, or is its owner, creator, a system administrator or has delegated access.
+	bool CanViewOrganizationData(const ::imtgql::CGqlRequest& gqlRequest, const QByteArray& tenantId, const QByteArray& permission) const;
+	bool CanViewMembers(const ::imtgql::CGqlRequest& gqlRequest, const QByteArray& tenantId) const;
+	// Own membership, or one of an organization whose members the user may view.
+	bool CanViewMembership(const ::imtgql::CGqlRequest& gqlRequest, const imtauth::ITenantMembership& membership) const;
+
 	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);
 	I_REF(imtauth::ITenantInvitationManager, m_invitationManagerCompPtr);
 	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);

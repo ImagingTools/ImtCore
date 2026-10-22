@@ -315,6 +315,84 @@ bool CRemoteTenantControllerComp::EnsureSystemTenant()
 }
 
 
+// reimplemented (imtauth::ITenantRelationshipProvider)
+
+imtauth::RelatedTenantInfos CRemoteTenantControllerComp::GetRelatedTenants(const QByteArray& tenantId, QString* tenantNamePtr, bool* isReadPtr) const
+{
+	namespace tenantsdl = sdl::V1_0::imtauth;
+
+	imtauth::RelatedTenantInfos retVal;
+
+	if (isReadPtr != nullptr){
+		*isReadPtr = false;
+	}
+
+	if (tenantId.isEmpty()){
+		return retVal;
+	}
+
+	tenantsdl::GetTenantRelationshipsRequestArguments arguments;
+	arguments.input.emplace();
+	arguments.input->tenantId = tenantId;
+
+	imtgql::CGqlRequest gqlRequest;
+	AttachCurrentContext(gqlRequest);
+	if (!tenantsdl::CGetTenantRelationshipsGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
+		return retVal;
+	}
+
+	tenantsdl::CGetTenantRelationshipsGqlRequest getRelationshipsRequest(gqlRequest, false);
+
+	QString errorMessage;
+	tenantsdl::CGetTenantRelationshipsPayload payload = OnGetTenantRelationships(getRelationshipsRequest, gqlRequest, errorMessage);
+	if (!errorMessage.isEmpty() || !payload.relationships.has_value() || (payload.errorMessage.has_value() && !payload.errorMessage->isEmpty())){
+		return retVal;
+	}
+
+	if (isReadPtr != nullptr){
+		*isReadPtr = true;
+	}
+
+	for (const auto& relationship : *payload.relationships){
+		if (		!relationship.has_value() ||
+					!relationship->status.has_value() ||
+					*relationship->status != tenantsdl::RelationshipStatus::Active ||
+					!imtauth::IsTenantRelationshipValidNow(relationship->validFrom.value_or(QString()), relationship->validUntil.value_or(QString()))){
+			continue;
+		}
+
+		const QByteArray sourceTenantId = relationship->sourceTenantId.value_or(QByteArray());
+		const bool isSource = sourceTenantId == tenantId;
+
+		if (tenantNamePtr != nullptr){
+			const QString tenantName = isSource
+						? relationship->sourceTenantName.value_or(QString())
+						: relationship->targetTenantName.value_or(QString());
+			if (!tenantName.isEmpty()){
+				*tenantNamePtr = tenantName;
+			}
+		}
+
+		imtauth::RelatedTenantInfo relatedTenant;
+		relatedTenant.tenantId = isSource ? relationship->targetTenantId.value_or(QByteArray()) : sourceTenantId;
+		relatedTenant.tenantName = isSource
+					? relationship->targetTenantName.value_or(QString())
+					: relationship->sourceTenantName.value_or(QString());
+
+		bool isKnown = relatedTenant.tenantId.isEmpty() || relatedTenant.tenantId == tenantId;
+		for (const imtauth::RelatedTenantInfo& knownTenant : retVal){
+			isKnown = isKnown || knownTenant.tenantId == relatedTenant.tenantId;
+		}
+
+		if (!isKnown){
+			retVal.append(relatedTenant);
+		}
+	}
+
+	return retVal;
+}
+
+
 // reimplemented (sdl::V1_0::imtauth::CTenantsGqlHandlerCompBase)
 
 sdl::V1_0::imtauth::CGetTenantIdsPayload CRemoteTenantControllerComp::OnGetTenantIds(

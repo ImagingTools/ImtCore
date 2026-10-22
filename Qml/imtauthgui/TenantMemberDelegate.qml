@@ -82,9 +82,7 @@ SimpleCollectionItemDelegateBase {
 			height: Style.iconSizeL
 			radius: width / 2
 			anchors.verticalCenter: parent.verticalCenter
-			color: row.isMember
-				? ((row.isMemberOwner || row.isMemberCreator) ? Style.selectedColor : Style.borderColor)
-				: "transparent"
+			color: row.isMember ? Style.neutralSubtleColor : "transparent"
 			border.color: row.isMember ? "transparent" : Style.inactiveTextColor
 			border.width: row.isMember ? 0 : 1
 
@@ -140,7 +138,7 @@ SimpleCollectionItemDelegateBase {
 						? (row.memberData.name || row.memberData.id || "")
 						: (row.memberData.userName || row.memberData.userId || "")
 					font.bold: row.isMember && (row.isMemberOwner || row.isMemberCreator)
-					font.pixelSize: Style.fontSizeL
+					font.pixelSize: Style.fontSizeM
 					color: Style.textColor
 					elide: Text.ElideRight
 				}
@@ -149,9 +147,9 @@ SimpleCollectionItemDelegateBase {
 					visible: row.isMember && row.isCurrentUser
 					anchors.verticalCenter: parent.verticalCenter
 					width: youText.implicitWidth + Style.marginS
-					height: youText.implicitHeight + 2
+					height: youText.implicitHeight + Style.marginXXXS
 					radius: Style.radiusS
-					color: Style.selectedColor
+					color: Style.neutralSubtleColor
 
 					BaseText {
 						id: youText
@@ -191,15 +189,15 @@ SimpleCollectionItemDelegateBase {
 				StatusBadge {
 					visible: row.isMember && (row.isMemberOwner || row.isMemberCreator)
 					text: row.isMemberOwner ? qsTr("Owner") : qsTr("Creator")
-					badgeColor: Style.selectedColor
-					badgeBorderColor: Style.secondColor
-					textColor: Style.secondColor
+					badgeColor: Style.neutralSubtleColor
+					badgeBorderWidth: 0
+					textColor: Style.linkColor
 				}
 
 				StatusBadge {
 					visible: row.isMember
 					text: qsTr("Active")
-					badgeColor: Style.selectedColor
+					badgeColor: Style.neutralSubtleColor
 					badgeBorderWidth: 0
 					textColor: Style.textColor
 				}
@@ -226,7 +224,7 @@ SimpleCollectionItemDelegateBase {
 						: row.effectiveStatus === "Revoked"
 							? qsTr("Revoked")
 							: qsTr("Pending")
-					badgeColor: Style.backgroundColor2
+					badgeColor: Style.neutralSubtleColor
 					badgeBorderWidth: 0
 					textColor: row.effectiveStatus === "Expired" ? Style.errorTextColor : Style.textColor
 					horizontalPadding: Style.marginM

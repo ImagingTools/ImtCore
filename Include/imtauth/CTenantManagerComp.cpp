@@ -114,9 +114,12 @@ QByteArray CTenantManagerComp::CreateTenant(const QString& tenantName, const QSt
 	// present in this set (see CRoleDocumentValidatorComp); without a default set
 	// a fresh tenant could not grant its roles any RBAC permission at all.
 	static const QByteArrayList defaultTenantPermissions = {
-		QByteArrayLiteral("ViewUsers"), QByteArrayLiteral("AddUser"), QByteArrayLiteral("UserUpdate"), QByteArrayLiteral("RemoveUser"), QByteArrayLiteral("UserItem"),
-		QByteArrayLiteral("ViewRoles"), QByteArrayLiteral("AddRole"), QByteArrayLiteral("RoleUpdate"), QByteArrayLiteral("RemoveRole"), QByteArrayLiteral("RoleItem"),
-		QByteArrayLiteral("ViewGroups"), QByteArrayLiteral("AddGroup"), QByteArrayLiteral("GroupUpdate"), QByteArrayLiteral("RemoveGroup"), QByteArrayLiteral("GroupItem")
+		QByteArrayLiteral("/Administration/Users/ViewPage"), QByteArrayLiteral("/Administration/Users/View"), QByteArrayLiteral("/Administration/Users/Edit/Add"),
+		QByteArrayLiteral("/Administration/Users/Edit/Change"), QByteArrayLiteral("/Administration/Users/Edit/Remove"),
+		QByteArrayLiteral("/Administration/Roles/ViewPage"), QByteArrayLiteral("/Administration/Roles/View"), QByteArrayLiteral("/Administration/Roles/Edit/Add"),
+		QByteArrayLiteral("/Administration/Roles/Edit/Change"), QByteArrayLiteral("/Administration/Roles/Edit/Remove"),
+		QByteArrayLiteral("/Administration/Groups/ViewPage"), QByteArrayLiteral("/Administration/Groups/View"), QByteArrayLiteral("/Administration/Groups/Edit/Add"),
+		QByteArrayLiteral("/Administration/Groups/Edit/Change"), QByteArrayLiteral("/Administration/Groups/Edit/Remove")
 	};
 	tenantPtr->SetTenantPermissions(defaultTenantPermissions);
 

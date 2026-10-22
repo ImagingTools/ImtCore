@@ -686,7 +686,7 @@ inline bool CollectPermissionEntries(
 	imtsdl::TElementList<TEntry> childEntries;
 	int childCount = 0;
 	const bool thisNodeSelected = parentSelected
-				|| (allowedPermissionsPtr != nullptr && imtauth::HasPermission(*allowedPermissionsPtr, currentPath));
+				|| (allowedPermissionsPtr != nullptr && imtauth::HasPermission(*allowedPermissionsPtr, currentPath, false));
 
 	for (int i = 0; i < subFeatures.count(); i++){
 		const imtlic::IFeatureInfo::FeatureInfoPtr& subFeaturePtr = subFeatures.at(i);
@@ -771,7 +771,7 @@ inline void BuildPermissionGroups(
 		const imtlic::IFeatureInfo::FeatureInfoList& subFeatures = featureInfoPtr->GetSubFeatures();
 		bool hasEntries = false;
 		const bool groupSelected = (allowedPermissionsPtr != nullptr
-					&& imtauth::HasPermission(*allowedPermissionsPtr, imtlic::CalculateFeaturePath(*featureInfoPtr)));
+					&& imtauth::HasPermission(*allowedPermissionsPtr, imtlic::CalculateFeaturePath(*featureInfoPtr), false));
 
 		if (subFeatures.isEmpty()){
 			hasEntries = CollectPermissionEntries<TEntry>(
@@ -856,7 +856,7 @@ inline void BuildPermissionGroupsFromProvider(
 		const imtlic::IFeatureInfo::FeatureInfoList& subFeatures = featureInfoPtr->GetSubFeatures();
 		bool hasEntries = false;
 		const bool groupSelected = (allowedPermissionsPtr != nullptr
-					&& imtauth::HasPermission(*allowedPermissionsPtr, imtlic::CalculateFeaturePath(*featureInfoPtr)));
+					&& imtauth::HasPermission(*allowedPermissionsPtr, imtlic::CalculateFeaturePath(*featureInfoPtr), false));
 
 		if (subFeatures.isEmpty()){
 			hasEntries = CollectPermissionEntries<TEntry>(
@@ -866,8 +866,7 @@ inline void BuildPermissionGroupsFromProvider(
 					allowedPermissionsPtr,
 					QString(),
 					translationManagerPtr,
-					groupSelected,
-					false);
+					groupSelected);
 		}
 		else{
 			for (int i = 0; i < subFeatures.count(); i++){
@@ -882,8 +881,7 @@ inline void BuildPermissionGroupsFromProvider(
 							allowedPermissionsPtr,
 							QString(),
 							translationManagerPtr,
-							groupSelected,
-							false)){
+							groupSelected)){
 						hasEntries = true;
 					}
 				}
@@ -929,6 +927,11 @@ inline imtauth::CTenantFilterParam* CreateTenantFilterParam(const imtgql::CGqlRe
 
 	imtauth::CTenantFilterParam* tenantFilterPtr = new imtauth::CTenantFilterParam();
 	tenantFilterPtr->SetTenantId(gqlContextPtr->GetTenantId());
+
+	// Owner and superuser see every document shared with the organization, regardless of the target groups
+	const imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
+	const bool isPrivilegedUser = gqlContextPtr->IsTenantOwner() || (userInfoPtr != nullptr && userInfoPtr->IsAdmin());
+	tenantFilterPtr->SetUserGroupIds(userInfoPtr != nullptr ? userInfoPtr->GetGroups() : QByteArrayList(), !isPrivilegedUser);
 
 	return tenantFilterPtr;
 }
@@ -1003,8 +1006,15 @@ inline bool ShouldKeepEntityForTenant(
 /**
 	Get the roles a user holds for the product: the directly assigned ones plus
 	the roles of all groups of the user, including their parent groups.
+	With a tenant, roles and parent groups of the groups count only when they are
+	visible in the tenant; the user's own roles and groups are expected to be
+	filtered by AdaptUserForTenant already.
 */
-inline imtauth::IUserBaseInfo::RoleIds GetEffectiveUserRoles(const imtauth::IUserInfo& userInfo, const QByteArray& productId)
+inline imtauth::IUserBaseInfo::RoleIds GetTenantUserRoles(
+				const imtauth::IUserInfo& userInfo,
+				const QByteArray& tenantId,
+				const QByteArray& productId,
+				imtauth::ITenantEntityBindingManager* bindingManager)
 {
 	imtauth::IUserBaseInfo::RoleIds retVal = userInfo.GetRoles(productId);
 
@@ -1012,6 +1022,10 @@ inline imtauth::IUserBaseInfo::RoleIds GetEffectiveUserRoles(const imtauth::IUse
 	if (groupProviderPtr == nullptr){
 		return retVal;
 	}
+
+	const bool isTenantScoped = !tenantId.isEmpty() && (bindingManager != nullptr);
+	const QByteArray rolesEntity = QByteArrayLiteral("Roles");
+	const QByteArray groupsEntity = QByteArrayLiteral("UserGroups");
 
 	QByteArrayList pendingGroupIds = userInfo.GetGroups();
 	QSet<QByteArray> visitedGroupIds;
@@ -1028,12 +1042,16 @@ inline imtauth::IUserBaseInfo::RoleIds GetEffectiveUserRoles(const imtauth::IUse
 		}
 
 		for (const QByteArray& roleId : groupPtr->GetRoles(productId)){
-			if (!retVal.contains(roleId)){
+			if (!retVal.contains(roleId) && (!isTenantScoped || ShouldKeepEntityForTenant(bindingManager, tenantId, rolesEntity, roleId))){
 				retVal << roleId;
 			}
 		}
 
-		pendingGroupIds += groupPtr->GetParentGroups();
+		for (const QByteArray& parentGroupId : groupPtr->GetParentGroups()){
+			if (!isTenantScoped || ShouldKeepEntityForTenant(bindingManager, tenantId, groupsEntity, parentGroupId)){
+				pendingGroupIds << parentGroupId;
+			}
+		}
 	}
 
 	return retVal;
@@ -1062,9 +1080,8 @@ inline istd::IChangeableUniquePtr AdaptUserForTenant(
 	// CSqlDatabaseDocumentDelegateComp::CreateTenantBindingInsertQuery stores
 	// TenantEntityBindings.EntityType as GetTableName(), not the collection ID.
 	const QByteArray groupsEntity = QByteArrayLiteral("UserGroups");
-	const QByteArray permsEntity = QByteArrayLiteral("Permissions");
 
-	// Filter roles/groups/permissions according to tenant context.
+	// Filter roles/groups according to tenant context.
 	// empty tenantId: keep only entities with no tenant bindings at all (globals).
 	// non-empty tenantId: keep only entities bound to this tenant.
 	bool anyFilterChange = false;
@@ -1092,20 +1109,6 @@ inline istd::IChangeableUniquePtr AdaptUserForTenant(
 			filteredGroups.append(gid);
 		} else {
 			anyFilterChange = true;
-		}
-	}
-
-	QByteArrayList filteredPerms;
-	if (!productId.isEmpty()){
-		QByteArrayList userPerms = userInfoPtr->GetPermissions(productId);
-		for (int i = 0; i < userPerms.size(); ++i){
-			const QByteArray pid = userPerms.at(i);
-			if (pid.isEmpty()) continue;
-			if (ShouldKeepEntityForTenant(bindingManager, tenantId, permsEntity, pid)){
-				filteredPerms.append(pid);
-			} else {
-				anyFilterChange = true;
-			}
 		}
 	}
 
@@ -1170,7 +1173,6 @@ inline istd::IChangeableUniquePtr AdaptUserForTenant(
 	if (anyFilterChange){
 		if (!productId.isEmpty()){
 			adaptedUserInfoPtr->SetRoles(productId, filteredRoles);
-			adaptedUserInfoPtr->SetLocalPermissions(productId, filteredPerms);
 		}
 		// reset groups to filtered list
 		QByteArrayList currGroups = adaptedUserInfoPtr->GetGroups();
@@ -1220,40 +1222,8 @@ inline imtauth::IUserBaseInfo::FeatureIds GetTenantUserPermissions(
 	}
 
 	const QByteArray rolesEntity = QByteArrayLiteral("Roles");
-	const QByteArray groupsEntity = QByteArrayLiteral("UserGroups");
 
-	// The user's own roles and groups are already filtered by AdaptUserForTenant.
-	QByteArrayList pendingRoleIds = userInfo.GetRoles(productId);
-
-	const imtauth::IUserGroupInfoProvider* groupProviderPtr = userInfo.GetUserGroupProvider();
-	if (groupProviderPtr != nullptr){
-		QByteArrayList pendingGroupIds = userInfo.GetGroups();
-		QSet<QByteArray> visitedGroupIds;
-		while (!pendingGroupIds.isEmpty()){
-			const QByteArray groupId = pendingGroupIds.takeFirst();
-			if (visitedGroupIds.contains(groupId)){
-				continue;
-			}
-			visitedGroupIds.insert(groupId);
-
-			imtauth::IUserGroupInfoSharedPtr groupPtr = groupProviderPtr->GetUserGroup(groupId);
-			if (!groupPtr.IsValid()){
-				continue;
-			}
-
-			for (const QByteArray& roleId : groupPtr->GetRoles(productId)){
-				if (ShouldKeepEntityForTenant(bindingManager, tenantId, rolesEntity, roleId)){
-					pendingRoleIds << roleId;
-				}
-			}
-
-			for (const QByteArray& parentGroupId : groupPtr->GetParentGroups()){
-				if (ShouldKeepEntityForTenant(bindingManager, tenantId, groupsEntity, parentGroupId)){
-					pendingGroupIds << parentGroupId;
-				}
-			}
-		}
-	}
+	QByteArrayList pendingRoleIds = GetTenantUserRoles(userInfo, tenantId, productId, bindingManager);
 
 	imtauth::IUserBaseInfo::FeatureIds permissions = userInfo.GetLocalPermissions(productId);
 	QSet<QByteArray> visitedRoleIds;
@@ -1287,6 +1257,38 @@ inline imtauth::IUserBaseInfo::FeatureIds GetTenantUserPermissions(
 
 
 /**
+	Get the user as it is seen in the given tenant and product context: the result of
+	AdaptUserForTenant(), or the user itself when nothing had to be adapted.
+	\param adaptedPtr	keeps the adapted copy alive while the returned reference is used.
+*/
+inline const imtauth::IUserInfo& GetTenantAdaptedUser(
+				const QByteArray& userId,
+				const imtauth::IUserInfo& userInfo,
+				const QByteArray& tenantId,
+				const QByteArray& productId,
+				imtauth::ITenantEntityBindingManager* bindingManager,
+				imtauth::IDelegatedAccess* delegatedAccess,
+				imtauth::ITenantMembershipManager* membershipManager,
+				imtauth::IRoleInfoProvider* roleInfoProvider,
+				istd::IChangeableUniquePtr& adaptedPtr)
+{
+	adaptedPtr = AdaptUserForTenant(
+				userId,
+				userInfo,
+				tenantId,
+				productId,
+				bindingManager,
+				delegatedAccess,
+				membershipManager,
+				roleInfoProvider);
+
+	const imtauth::IUserInfo* adaptedUserPtr = dynamic_cast<const imtauth::IUserInfo*>(adaptedPtr.GetPtr());
+
+	return (adaptedUserPtr != nullptr) ? *adaptedUserPtr : userInfo;
+}
+
+
+/**
 	Get the effective permission set of a user for the given tenant and
 	product context.
 
@@ -1309,24 +1311,33 @@ inline imtauth::IUserBaseInfo::FeatureIds GetEffectiveUserPermissions(
 				imtauth::ITenantMembershipManager* membershipManager,
 				imtauth::IRoleInfoProvider* roleInfoProvider)
 {
-	istd::IChangeableUniquePtr adaptedPtr = AdaptUserForTenant(
-				userId,
-				userInfo,
-				tenantId,
-				productId,
-				bindingManager,
-				delegatedAccess,
-				membershipManager,
-				roleInfoProvider);
-	const imtauth::IUserInfo* effectiveUserPtr = &userInfo;
-	if (adaptedPtr.IsValid()){
-		const imtauth::IUserInfo* adaptedUserPtr = dynamic_cast<const imtauth::IUserInfo*>(adaptedPtr.GetPtr());
-		if (adaptedUserPtr != nullptr){
-			effectiveUserPtr = adaptedUserPtr;
-		}
-	}
+	istd::IChangeableUniquePtr adaptedPtr;
+	const imtauth::IUserInfo& effectiveUser = GetTenantAdaptedUser(
+				userId, userInfo, tenantId, productId, bindingManager, delegatedAccess, membershipManager, roleInfoProvider, adaptedPtr);
 
-	return GetTenantUserPermissions(*effectiveUserPtr, tenantId, productId, bindingManager, roleInfoProvider);
+	return GetTenantUserPermissions(effectiveUser, tenantId, productId, bindingManager, roleInfoProvider);
+}
+
+
+/**
+	Get the effective roles of a user for the given tenant and product context,
+	adapted the same way as GetEffectiveUserPermissions(), delegated roles included.
+*/
+inline imtauth::IUserBaseInfo::RoleIds GetEffectiveUserRoles(
+				const QByteArray& userId,
+				const imtauth::IUserInfo& userInfo,
+				const QByteArray& tenantId,
+				const QByteArray& productId,
+				imtauth::ITenantEntityBindingManager* bindingManager,
+				imtauth::IDelegatedAccess* delegatedAccess,
+				imtauth::ITenantMembershipManager* membershipManager,
+				imtauth::IRoleInfoProvider* roleInfoProvider)
+{
+	istd::IChangeableUniquePtr adaptedPtr;
+	const imtauth::IUserInfo& effectiveUser = GetTenantAdaptedUser(
+				userId, userInfo, tenantId, productId, bindingManager, delegatedAccess, membershipManager, roleInfoProvider, adaptedPtr);
+
+	return GetTenantUserRoles(effectiveUser, tenantId, productId, bindingManager);
 }
 
 

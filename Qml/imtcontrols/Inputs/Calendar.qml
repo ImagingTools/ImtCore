@@ -12,7 +12,7 @@ Rectangle {
 
 	width: Style.sizeHintM;
 	height: Style.sizeHintL;
-	radius: Style.radiusL;
+	radius: Style.radiusM;
 	color: Style.baseColor;
 
 	border.width: 1;
@@ -122,17 +122,22 @@ Rectangle {
 	//read only
 
 	//decoration
-	property string mainColor: Style.firstColor;
+	// VS Code look: a neutral header, the accent only on the picked days and today's ring.
+	property string mainColor: Style.imaginToolsAccentColor;
 	property string cellColor: Style.baseColor;
 	property string selectColor: mainColor;
-	property string topPanelColor: mainColor;
+	// Days strictly inside a picked range.
+	property string rangeColor: Style.selectedColor;
+	property string hoverColor: Style.hover;
+	property string topPanelColor: "transparent";
 	property string highlightColor: Style.firstColorHighlight;
-	property string fontColor_title: Style.highlightedTextColor;
+	property string fontColor_title: Style.textColor;
 	property string fontColor_cell: Style.textColor;
+	property string fontColor_weekDay: Style.subtitleColor;
 	property string selectedFontColor_cell: Style.highlightedTextColor;
 	property int fontSize_cell: Style.fontSizeM;
-	property int fontSize_title: Style.fontSizeXXL;
-	property bool fontBold_title: false;
+	property int fontSize_title: Style.fontSizeL;
+	property bool fontBold_title: true;
 	property int weekDayListHeight: Style.headerHeight;
 	property alias leftImageSource: leftButton.iconSource;
 	property alias rightImageSource: rightButton.iconSource;
@@ -606,13 +611,13 @@ Rectangle {
 
 		color: calendar.color;
 
-		property int mainMargin: calendar.gridOnly ? 0 : 10;
+		property int mainMargin: calendar.gridOnly ? 0 : Style.marginM;
 
 		Rectangle{
 			id: topPanelObj;
 
 			width: parent.width;
-			height: visible ? parent.height/7 : 1;
+			height: visible ? Style.controlHeightL : 1;
 
 			color: calendar.topPanelColor;
 			radius: calendar.radius;
@@ -675,9 +680,9 @@ Rectangle {
 						enabled: visible;
 						model: monthComboModel;
 
-						textSize: calendar.fontSize_title -4;
-						fontColor: calendar.fontColor_title;
-						compMainColor: calendar.topPanelColor;
+						textSize: calendar.fontSize_cell;
+						fontColor: calendar.fontColor_cell;
+						compMainColor: Style.baseColor;
 						compSelectedColor: calendar.highlightColor;
 
 						borderColor: "transparent";
@@ -707,7 +712,7 @@ Rectangle {
 
 					anchors.verticalCenter: parent.verticalCenter;
 					anchors.left: topPanelTextMonthItem.right;
-					anchors.leftMargin: 20;
+					anchors.leftMargin: Style.marginS;
 
 					height: topPanelTextYear.height;
 					width: topPanelTextYear.width// + 30;
@@ -737,9 +742,9 @@ Rectangle {
 						enabled: visible;
 						model: yearComboModel;
 
-						textSize: calendar.fontSize_title -4;
-						fontColor: calendar.fontColor_title;
-						compMainColor: calendar.topPanelColor;
+						textSize: calendar.fontSize_cell;
+						fontColor: calendar.fontColor_cell;
+						compMainColor: Style.baseColor;
 						compSelectedColor: calendar.highlightColor;
 
 						borderColor: "transparent";
@@ -774,19 +779,20 @@ Rectangle {
 
 				anchors.verticalCenter: parent.verticalCenter;
 				anchors.left: parent.left;
-				anchors.leftMargin: 10;
 
-				width: 25;
+				width: Style.controlHeightM;
 				height: width;
 
 				enabled: !calendar.readOnly;
+				tooltipText: qsTr("Previous month");
 
-				decorator: Component{IconButtonDecorator{
-						icon.width: !baseElement ? 0 : baseElement.width - 3;
-						icon.height: !baseElement ? 0 : baseElement.height - 3;
+				decorator: Component{ToolButtonDecorator{
+						radius: Style.buttonRadius;
+						icon.width: Style.iconSizeS;
+						icon.height: Style.iconSizeS;
 					}}
 
-				iconSource: "../../../" + Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Active);
+				iconSource: "../../../" + Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Normal);
 
 				onClicked: {
 					calendar.decrease();
@@ -799,19 +805,20 @@ Rectangle {
 
 				anchors.verticalCenter: parent.verticalCenter;
 				anchors.right: parent.right;
-				anchors.rightMargin: 10;
 
-				width: 25;
+				width: Style.controlHeightM;
 				height: width;
 
 				enabled: !calendar.readOnly;
+				tooltipText: qsTr("Next month");
 
-				decorator: Component{IconButtonDecorator{
-						icon.width: !baseElement ? 0 : baseElement.width - 3;
-						icon.height: !baseElement ? 0 : baseElement.height - 3;
+				decorator: Component{ToolButtonDecorator{
+						radius: Style.buttonRadius;
+						icon.width: Style.iconSizeS;
+						icon.height: Style.iconSizeS;
 					}}
 
-				iconSource: "../../../" + Style.getIconPath("Icons/Right", Icon.State.On, Icon.Mode.Active);
+				iconSource: "../../../" + Style.getIconPath("Icons/Right", Icon.State.On, Icon.Mode.Normal);
 
 				onClicked: {
 					calendar.increase();
@@ -912,7 +919,7 @@ Rectangle {
 			anchors.bottom: parent.bottom;
 
 			width: parent.width;
-			height: visible ? okButton.height + Style.marginXS : 1;
+			height: visible ? okButton.height + Style.marginM : 1;
 
 			visible: !calendar.gridOnly;
 			clip: true;
@@ -924,6 +931,7 @@ Rectangle {
 				anchors.bottom: parent.bottom;
 
 				text: calendar.okButtonText;
+				variant: "primary";
 
 				enabled: !calendar.readOnly
 
@@ -941,7 +949,7 @@ Rectangle {
 
 				anchors.right: okButton.left;
 				anchors.bottom: parent.bottom;
-				anchors.rightMargin: 10;
+				anchors.rightMargin: Style.marginS;
 
 				enabled: !calendar.readOnly
 
@@ -1041,9 +1049,8 @@ Rectangle {
 				anchors.centerIn: parent;
 
 				font.family: Style.fontFamily;
-				font.pixelSize: calendar.fontSize_cell;
-				font.bold: true;
-				color: calendar.fontColor_cell;
+				font.pixelSize: Style.fontSizeS;
+				color: calendar.fontColor_weekDay;
 
 				text: model.name;
 			}

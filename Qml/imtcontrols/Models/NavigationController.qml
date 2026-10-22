@@ -119,7 +119,14 @@ QtObject {
 		for (let i = 0; i < navigableItems.length; ++i) {
 			let item = navigableItems[i]
 			if (item.segmentIsSupported(first)) {
-				item.processSegment(first, params || {}, rest)
+				// The views reached by this path record their own state as they switch; one entry is enough.
+				__internal.suppressDepth++
+				try {
+					item.processSegment(first, params || {}, rest)
+				} catch (e) {
+					console.error("navigate: processing error:", e)
+				}
+				__internal.suppressDepth--
 				__internal.push(path, params || {})
 				return
 			}
@@ -175,6 +182,7 @@ QtObject {
 	*/
 	function clear() {
 		__internal.clear()
+		pending = ({})
 	}
 
 	/*!
@@ -184,6 +192,8 @@ QtObject {
 	property QtObject __internal: QtObject {
 			property var stack: []          // [{ path, params }, ...]
 			property int currentIndex: -1
+			// Above zero while a path is being applied: pushes made by the views it switches are not new history.
+			property int suppressDepth: 0
 	
 			// forward currentIndex changes
 			onCurrentIndexChanged: {
@@ -200,6 +210,14 @@ QtObject {
 				discard forward entries. Trim by maxSize.
 			*/
 			function push(path, params) {
+				if (suppressDepth > 0) {
+					return
+				}
+
+				if (currentIndex >= 0 && currentIndex < stack.length && stack[currentIndex].path === path) {
+					return
+				}
+
 				// drop forward entries
 				if (currentIndex < stack.length - 1) {
 					stack.splice(currentIndex + 1, stack.length - (currentIndex + 1))
@@ -242,12 +260,14 @@ QtObject {
 				for (let i = 0; i < root.navigableItems.length; ++i) {
 					let item = root.navigableItems[i]
 					if (item && item.segmentIsSupported && item.segmentIsSupported(first)) {
+						suppressDepth++
 						try {
 							// We call processSegment but DO NOT push again
 							item.processSegment(first, entry.params || {}, rest)
 						} catch (e) {
 							console.error("navigateInternal: processing error:", e)
 						}
+						suppressDepth--
 						return
 					}
 				}

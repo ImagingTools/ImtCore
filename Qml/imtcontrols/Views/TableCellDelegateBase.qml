@@ -1,7 +1,6 @@
 import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
-import imtcontrols 1.0
 
 
 Item {
@@ -13,7 +12,8 @@ Item {
 	// TableRowDelegateBase "TableRow_<index>" and TableHeaderDelegate "<headerId>" instrumentation.
 	objectName: delegateContainer.cellHeaderId;
 
-	property TableRowDelegateBase rowDelegate: null;
+	// A TableRowDelegateBase. Untyped, so this file needs no imtcontrols import, which makes every cell instance costlier.
+	property var rowDelegate: null;
 	property var table: rowDelegate && rowDelegate.tableItem ? rowDelegate.tableItem : null
 
 	height: rowDelegate ? rowDelegate.contentHeight : 0;
@@ -237,64 +237,6 @@ Item {
 
 			width: !delegateContainer.rowDelegate ? 0 : delegateContainer.rowDelegate.verticalBorderSize;
 			color: delegateContainer.rowDelegate ? delegateContainer.rowDelegate.borderColorVertical : "transparent";
-		}
-	}
-
-	//cornerPatches
-	Component{
-		id: leftTopCornerPatch;
-		Rectangle{
-			anchors.left: parent.left;
-			anchors.top: parent.top;
-			width: parent.width/2;
-			height: parent.height/2;
-			color: parent.color;
-			visible: delegateContainer.rowDelegate ? delegateContainer.rowDelegate.tableItem.emptyDecorCell ? true :
-																											  delegateContainer.rowDelegate.cellDecorator.isValidData("LeftTopRound", delegateContainer.columnIndex) ?
-																												  !delegateContainer.rowDelegate.cellDecorator.getData("LeftTopRound", delegateContainer.columnIndex) :true : 0;
-		}
-	}
-
-	Component{
-		id: rightTopCornerPatch;
-		Rectangle{
-			anchors.right: parent.right;
-			anchors.top: parent.top;
-			width: parent.width/2;
-			height: parent.height/2;
-			color: parent.color;
-			visible: delegateContainer.rowDelegate ? delegateContainer.rowDelegate.tableItem.emptyDecorCell ? true :
-																											  delegateContainer.rowDelegate.cellDecorator.isValidData("RightTopRound", delegateContainer.columnIndex) ?
-																												  !delegateContainer.rowDelegate.cellDecorator.getData("RightTopRound", delegateContainer.columnIndex) :true : 0;
-		}
-	}
-
-	Component{
-		id: leftBottomCornerPatch;
-		Rectangle{
-			anchors.left: parent.left;
-			anchors.bottom: parent.bottom;
-			width: parent.width/2;
-			height: parent.height/2;
-			color: parent.color;
-			visible: delegateContainer.rowDelegate ?
-						 delegateContainer.rowDelegate.tableItem.emptyDecorCell ? true :
-																				  delegateContainer.rowDelegate.cellDecorator.isValidData("LeftBottomRound", delegateContainer.columnIndex) ?
-																					  !delegateContainer.rowDelegate.cellDecorator.getData("LeftBottomRound", delegateContainer.columnIndex) :true : 0;
-		}
-	}
-
-	Component{
-		id: rightBottomCornerPatch;
-		Rectangle{
-			anchors.right:  parent.right;
-			anchors.bottom: parent.bottom;
-			width: parent.width/2;
-			height: parent.height/2;
-			color: parent.color;
-			visible: delegateContainer.rowDelegate ? delegateContainer.rowDelegate.tableItem.emptyDecorCell ? true :
-																											  delegateContainer.rowDelegate.cellDecorator.isValidData("RightBottomRound", delegateContainer.columnIndex) ?
-																												  !delegateContainer.rowDelegate.cellDecorator.getData("RightBottomRound", delegateContainer.columnIndex) :true : 0;
 		}
 	}
 

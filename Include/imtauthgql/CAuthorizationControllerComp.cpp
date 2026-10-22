@@ -3,9 +3,6 @@
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Authorization.h>
 
 
-// Qt includes
-#include <QtCore/QMutableListIterator>
-
 // ACF includes
 #include <iprm/CParamsSet.h>
 
@@ -157,22 +154,56 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateAc
 
 sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateAccountLockedResponse(
 			const QByteArray& login,
+			qint64 remainingLockoutSecs,
 			QString& errorMessage) const
 {
-	errorMessage = QT_TR_NOOP(QStringLiteral("Account is temporarily locked due to too many invalid access attempts. Login: '%1'").arg(login));
-	SendErrorMessage(0, errorMessage, "imtgql::CAuthorizationControllerComp");
+	// The user reads this message, so it says when to try again rather than only that the account is locked.
+	QString retryText;
+	if (remainingLockoutSecs < 0){
+		retryText = QStringLiteral("It stays locked until an administrator unlocks it.");
+	}
+	else if (remainingLockoutSecs < 60){
+		retryText = (remainingLockoutSecs <= 1) ? QStringLiteral("Try again in 1 second.") : QStringLiteral("Try again in %1 seconds.").arg(remainingLockoutSecs);
+	}
+	else{
+		qint64 minutes = (remainingLockoutSecs + 59) / 60;
+		if (minutes < 120){
+			retryText = (minutes == 1) ? QStringLiteral("Try again in 1 minute.") : QStringLiteral("Try again in %1 minutes.").arg(minutes);
+		}
+		else{
+			retryText = QStringLiteral("Try again in %1 hours.").arg((minutes + 59) / 60);
+		}
+	}
+
+	errorMessage = QStringLiteral("Too many invalid sign-in attempts. The account is locked. %1").arg(retryText);
+	SendErrorMessage(0, QStringLiteral("%1 Login: '%2'").arg(errorMessage, QString::fromUtf8(login)), "imtgql::CAuthorizationControllerComp");
 
 	return sdl::V1_0::imtauth::CAuthorizationPayload();
 }
 
 
-bool CAuthorizationControllerComp::IsAccountLocked(const QByteArray& login) const
+sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateFailedAttemptResponse(
+			const QByteArray& login,
+			QString& errorMessage) const
+{
+	RegisterAccessAttempt(login, false);
+
+	qint64 remainingLockoutSecs = 0;
+	if (IsAccountLocked(login, &remainingLockoutSecs)){
+		return CreateAccountLockedResponse(login, remainingLockoutSecs, errorMessage);
+	}
+
+	return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
+}
+
+
+bool CAuthorizationControllerComp::IsAccountLocked(const QByteArray& login, qint64* remainingLockoutSecsPtr) const
 {
 	if (!m_accountLockoutControllerCompPtr.IsValid()){
 		return false;
 	}
 
-	return m_accountLockoutControllerCompPtr->IsAccountLocked(login);
+	return m_accountLockoutControllerCompPtr->IsAccountLocked(login, remainingLockoutSecsPtr);
 }
 
 
@@ -344,14 +375,14 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnAuthor
 		password = inputArgument->password->toUtf8();
 	}
 
-	if (IsAccountLocked(login)){
-		return CreateAccountLockedResponse(login, errorMessage);
+	qint64 remainingLockoutSecs = 0;
+	if (IsAccountLocked(login, &remainingLockoutSecs)){
+		return CreateAccountLockedResponse(login, remainingLockoutSecs, errorMessage);
 	}
 
 	QByteArray userObjectId = GetUserObjectId(login);
 	if (userObjectId.isEmpty()){
-		RegisterAccessAttempt(login, false);
-		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
+		return CreateFailedAttemptResponse(login, errorMessage);
 	}
 
 	imtauth::CUserInfo* userInfoPtr = nullptr;
@@ -361,8 +392,7 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnAuthor
 	}
 
 	if (userInfoPtr == nullptr){
-		RegisterAccessAttempt(login, false);
-		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
+		return CreateFailedAttemptResponse(login, errorMessage);
 	}
 
 	QByteArray activeSystemId;
@@ -377,11 +407,11 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnAuthor
 		}
 	}
 
-	RegisterAccessAttempt(login, ok);
-
 	if (!ok){
-		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
+		return CreateFailedAttemptResponse(login, errorMessage);
 	}
+
+	RegisterAccessAttempt(login, true);
 
 	// Checked after the credentials, so a wrong password cannot be used to probe account states.
 	if (!userInfoPtr->IsEnabled()){
@@ -423,14 +453,14 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnUserTo
 		password = inputArgument->password->toUtf8();
 	}
 
-	if (IsAccountLocked(login)){
-		return CreateAccountLockedResponse(login, errorMessage);
+	qint64 remainingLockoutSecs = 0;
+	if (IsAccountLocked(login, &remainingLockoutSecs)){
+		return CreateAccountLockedResponse(login, remainingLockoutSecs, errorMessage);
 	}
 
 	QByteArray userObjectId = GetUserObjectId(login);
 	if (userObjectId.isEmpty()){
-		RegisterAccessAttempt(login, false);
-		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
+		return CreateFailedAttemptResponse(login, errorMessage);
 	}
 
 	imtauth::CUserInfo* userInfoPtr = nullptr;
@@ -440,8 +470,7 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnUserTo
 	}
 
 	if (userInfoPtr == nullptr){
-		RegisterAccessAttempt(login, false);
-		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
+		return CreateFailedAttemptResponse(login, errorMessage);
 	}
 
 	QByteArray activeSystemId;
@@ -456,11 +485,11 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnUserTo
 		}
 	}
 
-	RegisterAccessAttempt(login, ok);
-
 	if (!ok){
-		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
+		return CreateFailedAttemptResponse(login, errorMessage);
 	}
+
+	RegisterAccessAttempt(login, true);
 
 	// Checked after the credentials, so a wrong password cannot be used to probe account states.
 	if (!userInfoPtr->IsEnabled()){
@@ -603,13 +632,9 @@ sdl::V1_0::imtauth::CPermissionList CAuthorizationControllerComp::OnGetPermissio
 	if (tenantId.isEmpty()){
 		QByteArrayList globalPermissions = CalculateGlobalPermissions(*userInfoPtr, userId, productId);
 		if (isPat){
-			const QSet<QByteArray> scopeSet(tokenScopes.begin(), tokenScopes.end());
-			QMutableListIterator permissionsIter(globalPermissions);
-			while (permissionsIter.hasNext()){
-				if (!scopeSet.contains(permissionsIter.next())){
-					permissionsIter.remove();
-				}
-			}
+			globalPermissions.removeIf([&tokenScopes](const QByteArray& permission){
+				return !imtauth::HasPermission(tokenScopes, permission, false);
+			});
 		}
 		response.permissions.Emplace().FromList(globalPermissions);
 		return response;
@@ -638,6 +663,283 @@ sdl::V1_0::imtauth::CPermissionList CAuthorizationControllerComp::OnGetPermissio
 	response.permissions.Emplace().FromList(permissions);
 
 	return response;
+}
+
+
+sdl::V1_0::imtauth::CExternalLoginProviderList CAuthorizationControllerComp::OnGetExternalLoginProviders(
+			const sdl::V1_0::imtauth::CGetExternalLoginProvidersGqlRequest& /*getExternalLoginProvidersRequest*/,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& /*errorMessage*/) const
+{
+	QList<sdl::V1_0::imtauth::CExternalLoginProvider> providers;
+
+	if (m_externalLoginControllerCompPtr.IsValid()){
+		const imtauth::IExternalLoginController::Providers providerInfos = m_externalLoginControllerCompPtr->GetProviders();
+		for (const imtauth::IExternalLoginController::ProviderInfo& providerInfo : providerInfos){
+			sdl::V1_0::imtauth::CExternalLoginProvider provider;
+			provider.id = providerInfo.id;
+			provider.name = providerInfo.name;
+			provider.providerType = providerInfo.type;
+
+			providers.append(provider);
+		}
+	}
+
+	sdl::V1_0::imtauth::CExternalLoginProviderList response;
+	response.providers.Emplace().FromList(providers);
+
+	return response;
+}
+
+
+sdl::V1_0::imtauth::CExternalIdentityList CAuthorizationControllerComp::OnGetExternalIdentities(
+			const sdl::V1_0::imtauth::CGetExternalIdentitiesGqlRequest& /*getExternalIdentitiesRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	sdl::V1_0::imtauth::CExternalIdentityList response;
+
+	const QByteArray userId = GetSessionUserId(gqlRequest);
+	if (userId.isEmpty()){
+		errorMessage = QStringLiteral("The linked accounts are only available for a signed-in user");
+
+		return response;
+	}
+
+	QList<sdl::V1_0::imtauth::CExternalIdentity> identities;
+	if (m_externalLoginControllerCompPtr.IsValid()){
+		QMap<QByteArray, imtauth::IExternalLoginController::ProviderInfo> providerInfos;
+		for (const imtauth::IExternalLoginController::ProviderInfo& providerInfo : m_externalLoginControllerCompPtr->GetProviders()){
+			providerInfos.insert(providerInfo.id, providerInfo);
+		}
+
+		const imtauth::IExternalLoginController::LinkedAccounts accounts = m_externalLoginControllerCompPtr->GetLinkedAccounts(userId);
+		for (const imtauth::IExternalLoginController::LinkedAccount& account : accounts){
+			const imtauth::IExternalLoginController::ProviderInfo providerInfo = providerInfos.value(account.providerId);
+
+			sdl::V1_0::imtauth::CExternalIdentity identity;
+			identity.providerId = account.providerId;
+			identity.providerName = providerInfo.name.isEmpty() ? QString::fromUtf8(account.providerId) : providerInfo.name;
+			identity.providerType = providerInfo.type;
+			identity.email = account.email;
+			identity.linkedAt = account.linkedAt.toString(Qt::ISODate);
+			identity.lastSignInAt = account.lastSignInAt.toString(Qt::ISODate);
+
+			identities.append(identity);
+		}
+	}
+
+	response.identities.Emplace().FromList(identities);
+
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	if (m_userCollectionCompPtr.IsValid() && m_userCollectionCompPtr->GetObjectData(userId, dataPtr)){
+		const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
+		response.hasPassword = (userInfoPtr != nullptr) && !userInfoPtr->GetSystemInfos().isEmpty();
+	}
+
+	return response;
+}
+
+
+sdl::V1_0::imtauth::CBeginExternalLoginPayload CAuthorizationControllerComp::OnBeginExternalLogin(
+			const sdl::V1_0::imtauth::CBeginExternalLoginGqlRequest& beginExternalLoginRequest,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& /*errorMessage*/) const
+{
+	sdl::V1_0::imtauth::CBeginExternalLoginPayload response;
+
+	if (!m_externalLoginControllerCompPtr.IsValid()){
+		response.message = QStringLiteral("Sign-in with external accounts is not configured");
+
+		return response;
+	}
+
+	const istd::TNullableValue<sdl::V1_0::imtauth::CBeginExternalLoginInput> input = beginExternalLoginRequest.GetRequestedArguments().input;
+	if (!input.HasValue() || !input->providerId.HasValue()){
+		response.message = QStringLiteral("No sign-in provider is given");
+
+		return response;
+	}
+
+	const QByteArray productId = input->productId.HasValue() ? *input->productId : QByteArray();
+
+	QByteArray linkUserId;
+	if (input->link.HasValue() && *input->link){
+		linkUserId = GetSessionUserId(gqlRequest);
+		if (linkUserId.isEmpty()){
+			response.message = QStringLiteral("Sign in before linking an external account");
+
+			return response;
+		}
+	}
+
+	QByteArray loginId;
+	QString authorizationUrl;
+	QString beginErrorMessage;
+	if (!m_externalLoginControllerCompPtr->BeginLogin(*input->providerId, productId, linkUserId, loginId, authorizationUrl, beginErrorMessage)){
+		response.message = beginErrorMessage;
+
+		return response;
+	}
+
+	response.loginId = loginId;
+	response.authorizationUrl = authorizationUrl;
+
+	return response;
+}
+
+
+sdl::V1_0::imtauth::CExternalLoginPayload CAuthorizationControllerComp::OnCompleteExternalLogin(
+			const sdl::V1_0::imtauth::CCompleteExternalLoginGqlRequest& completeExternalLoginRequest,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& /*errorMessage*/) const
+{
+	sdl::V1_0::imtauth::CExternalLoginPayload response;
+
+	const istd::TNullableValue<sdl::V1_0::imtauth::CExternalLoginInput> input = completeExternalLoginRequest.GetRequestedArguments().input;
+	if (!m_externalLoginControllerCompPtr.IsValid() || !input.HasValue() || !input->loginId.HasValue()){
+		response.status = QByteArrayLiteral("Failed");
+		response.message = QStringLiteral("Sign-in with external accounts is not configured");
+
+		return response;
+	}
+
+	const imtauth::IExternalLoginController::LoginResult result = m_externalLoginControllerCompPtr->TakeLoginResult(*input->loginId);
+	switch (result.status){
+	case imtauth::IExternalLoginController::LS_PENDING:
+		response.status = QByteArrayLiteral("Pending");
+		return response;
+
+	case imtauth::IExternalLoginController::LS_LINKED:
+		response.status = QByteArrayLiteral("Linked");
+		return response;
+
+	case imtauth::IExternalLoginController::LS_FAILED:
+		response.status = QByteArrayLiteral("Failed");
+		response.message = result.message;
+		return response;
+
+	case imtauth::IExternalLoginController::LS_SIGNED_IN:
+		break;
+
+	default:
+		response.status = QByteArrayLiteral("Failed");
+		response.message = QStringLiteral("The sign-in request has expired. Please start the sign-in again.");
+		return response;
+	}
+
+	imtauth::CUserInfo* userInfoPtr = nullptr;
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	if (m_userCollectionCompPtr.IsValid() && m_userCollectionCompPtr->GetObjectData(result.userId, dataPtr)){
+		userInfoPtr = dynamic_cast<imtauth::CUserInfo*>(dataPtr.GetPtr());
+	}
+
+	response.status = QByteArrayLiteral("Failed");
+
+	if (userInfoPtr == nullptr){
+		response.message = QStringLiteral("The user does not exist.");
+
+		return response;
+	}
+
+	if (!userInfoPtr->IsEnabled()){
+		response.message = QStringLiteral("This account has been deactivated. Please contact your administrator.");
+
+		return response;
+	}
+
+	QString sessionErrorMessage;
+	sdl::V1_0::imtauth::CAuthorizationPayload authorization = CreateAuthorizationSuccessfulResponse(*userInfoPtr, QByteArray(), result.productId, sessionErrorMessage);
+	if (!sessionErrorMessage.isEmpty()){
+		response.message = sessionErrorMessage;
+
+		return response;
+	}
+
+	response.status = QByteArrayLiteral("SignedIn");
+	response.authorization = authorization;
+
+	return response;
+}
+
+
+sdl::V1_0::imtauth::CExternalLoginCallbackPayload CAuthorizationControllerComp::OnHandleExternalLoginCallback(
+			const sdl::V1_0::imtauth::CHandleExternalLoginCallbackGqlRequest& handleExternalLoginCallbackRequest,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& /*errorMessage*/) const
+{
+	sdl::V1_0::imtauth::CExternalLoginCallbackPayload response;
+	response.ok = false;
+
+	const istd::TNullableValue<sdl::V1_0::imtauth::CExternalLoginCallbackInput> input = handleExternalLoginCallbackRequest.GetRequestedArguments().input;
+	if (!m_externalLoginControllerCompPtr.IsValid() || !input.HasValue() || !input->state.HasValue()){
+		response.message = QStringLiteral("Sign-in with external accounts is not configured");
+
+		return response;
+	}
+
+	const QByteArray code = input->code.HasValue() ? input->code->toUtf8() : QByteArray();
+	const QString providerError = input->error.HasValue() ? *input->error : QString();
+
+	QString message;
+	response.ok = m_externalLoginControllerCompPtr->HandleCallback(*input->state, code, providerError, message);
+	response.message = message;
+
+	return response;
+}
+
+
+sdl::V1_0::imtauth::CUnlinkExternalIdentityPayload CAuthorizationControllerComp::OnUnlinkExternalIdentity(
+			const sdl::V1_0::imtauth::CUnlinkExternalIdentityGqlRequest& unlinkExternalIdentityRequest,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	sdl::V1_0::imtauth::CUnlinkExternalIdentityPayload response;
+	response.ok = false;
+
+	const QByteArray userId = GetSessionUserId(gqlRequest);
+	if (userId.isEmpty()){
+		errorMessage = QStringLiteral("The linked accounts are only available for a signed-in user");
+
+		return response;
+	}
+
+	const istd::TNullableValue<sdl::V1_0::imtauth::CUnlinkExternalIdentityInput> input = unlinkExternalIdentityRequest.GetRequestedArguments().input;
+	if (!m_externalLoginControllerCompPtr.IsValid() || !input.HasValue() || !input->providerId.HasValue()){
+		response.message = QStringLiteral("No linked account is given");
+
+		return response;
+	}
+
+	QString unlinkErrorMessage;
+	response.ok = m_externalLoginControllerCompPtr->UnlinkAccount(userId, *input->providerId, unlinkErrorMessage);
+	response.message = unlinkErrorMessage;
+
+	return response;
+}
+
+
+QByteArray CAuthorizationControllerComp::GetSessionUserId(const imtgql::CGqlRequest& gqlRequest) const
+{
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr == nullptr){
+		return QByteArray();
+	}
+
+	const QByteArray token = gqlContextPtr->GetToken();
+
+	// A personal access token must not manage the sign-in methods of its owner.
+	const QByteArray patPrefix = m_patPrefixAttrPtr.IsValid() ? *m_patPrefixAttrPtr : QByteArrayLiteral("imt_pat_");
+	if (token.isEmpty() || (!patPrefix.isEmpty() && token.startsWith(patPrefix))){
+		return QByteArray();
+	}
+
+	QByteArray userId = gqlContextPtr->GetUserId();
+	if (userId.isEmpty() && m_jwtSessionControllerCompPtr.IsValid()){
+		userId = m_jwtSessionControllerCompPtr->GetUserFromJwt(token);
+	}
+
+	return userId;
 }
 
 

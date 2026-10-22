@@ -76,11 +76,11 @@ FocusScope {
 
         anchors.fill: parent;
 
-        color: containerTextEdit.readOnly ? Style.alternateBaseColor : Style.baseColor;
+        color: containerTextEdit.readOnly ? Style.alternateBaseColor : Style.inputBackgroundColor;
 
         radius: containerTextEdit.radius;
 
-        border.color: containerTextEdit.borderColorConst !== "" ? containerTextEdit.borderColorConst: textEdit.activeFocus ? containerTextEdit.borderColor : Style.hover;
+        border.color: containerTextEdit.borderColorConst !== "" ? containerTextEdit.borderColorConst: textEdit.activeFocus ? containerTextEdit.borderColor : Style.inputBorderColor;
         border.width: 1;
     }
 

@@ -49,10 +49,10 @@ Item {
 
         anchors.fill: parent;
 
-        color: Style.baseColor;
-        radius: Style.radiusM;
+        color: Style.inputBackgroundColor;
+        radius: Style.textFieldRadius;
         border.width: 1;
-        border.color: Style.borderColor;
+        border.color: Style.inputBorderColor;
         
         Item {
             id: numberBlock;
@@ -216,7 +216,9 @@ Item {
             if(spinBox.editable){
                 numberTextField.forceActiveFocus();
             }
-            mouse.accepted = false;
+
+            // Keep the click inside the input area so that underlying MouseAreas (e.g. table row) do not take the focus away
+            mouse.accepted = spinBox.editable && mouse.x < buttonColumn.mapToItem(wheelMa, 0, 0).x;
         }
         
         onWheel: {

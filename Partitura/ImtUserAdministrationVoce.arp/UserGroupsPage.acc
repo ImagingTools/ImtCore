@@ -31,6 +31,7 @@
                             <Values>
                                 <Value>name</Value>
                                 <Value>description</Value>
+                                <Value>usersCount</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -39,6 +40,7 @@
                             <Values>
                                 <Value>Group Name</Value>
                                 <Value>Description</Value>
+                                <Value>Members</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -203,9 +205,6 @@
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="UserCollection" Type="Reference" ExportId="UserRepository">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="UserGroupFactory" Type="Factory" ExportId="">
                         <Data IsEnabled="true" Value="UserGroupInfo"/>
                     </AttributeInfo>
@@ -286,9 +285,9 @@
                                 <AttributeInfo Id="ClosePermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>RemoveUser</Value>
-                                            <Value>ChangeUser</Value>
-                                            <Value>ViewUsers</Value>
+                                            <Value>/Administration/Users/Edit/Remove</Value>
+                                            <Value>/Administration/Users/Edit/Change</Value>
+                                            <Value>/Administration/Users/View</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -298,18 +297,18 @@
                                 <AttributeInfo Id="RedoPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>AddGroup</Value>
-                                            <Value>RemoveGroup</Value>
-                                            <Value>ChangeGroup</Value>
+                                            <Value>/Administration/Groups/Edit/Add</Value>
+                                            <Value>/Administration/Groups/Edit/Remove</Value>
+                                            <Value>/Administration/Groups/Edit/Change</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
                                 <AttributeInfo Id="SavePermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>AddGroup</Value>
-                                            <Value>RemoveGroup</Value>
-                                            <Value>ChangeGroup</Value>
+                                            <Value>/Administration/Groups/Edit/Add</Value>
+                                            <Value>/Administration/Groups/Edit/Remove</Value>
+                                            <Value>/Administration/Groups/Edit/Change</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -325,9 +324,9 @@
                                 <AttributeInfo Id="UndoPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>AddGroup</Value>
-                                            <Value>RemoveGroup</Value>
-                                            <Value>ChangeGroup</Value>
+                                            <Value>/Administration/Groups/Edit/Add</Value>
+                                            <Value>/Administration/Groups/Edit/Remove</Value>
+                                            <Value>/Administration/Groups/Edit/Change</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -353,8 +352,8 @@
                                 <AttributeInfo Id="EditPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>ViewGroups</Value>
-                                            <Value>ChangeGroup</Value>
+                                            <Value>/Administration/Groups/View</Value>
+                                            <Value>/Administration/Groups/Edit/Change</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -367,14 +366,14 @@
                                 <AttributeInfo Id="NewPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>AddGroup</Value>
+                                            <Value>/Administration/Groups/Edit/Add</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
                                 <AttributeInfo Id="RemovePermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>RemoveGroup</Value>
+                                            <Value>/Administration/Groups/Edit/Remove</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -436,7 +435,7 @@
                                 <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>ViewRevisions</Value>
+                                            <Value>/Administration/Groups/Revisions/View</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>

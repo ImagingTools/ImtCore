@@ -14,14 +14,18 @@ Item {
 	
 	property GuiElementContainer commandsModel: GuiElementContainer {};
 	property alias centerCommandsWidth: centerCommands.width;
+	// False until the first commands model arrives; a skeleton stands in for the buttons meanwhile.
+	property bool commandsLoaded: false;
 	onCommandsModelChanged: {
 		updateGui()
 	}
-	
+
 	function updateGui(){
 		if (!commandsModel){
 			return;
 		}
+
+		commandsLoaded = true;
 
 		clearModel();
 
@@ -139,6 +143,67 @@ Item {
 		return full * 0.5;
 	}
 
+	// Shown only when the commands take longer than skeletonDelay.interval, so a quick load does not flash it.
+	property bool skeletonDelayElapsed: false;
+
+	Timer {
+		id: skeletonDelay;
+		interval: 300;
+		running: !commandsItem.commandsLoaded;
+		onTriggered: {
+			commandsItem.skeletonDelayElapsed = true;
+		}
+	}
+
+	Item {
+		id: commandsSkeleton;
+
+		anchors.fill: parent;
+		visible: !commandsItem.commandsLoaded && commandsItem.skeletonDelayElapsed;
+
+		Row {
+			anchors.left: parent.left;
+			anchors.leftMargin: Style.marginM;
+			anchors.verticalCenter: parent.verticalCenter;
+			spacing: Style.marginS;
+
+			Repeater {
+				model: 2;
+
+				delegate: SkeletonBlock {
+					width: Style.controlHeightM * (index === 0 ? 2.5 : 2);
+					height: Style.controlHeightM - Style.marginXS;
+					animated: true;
+				}
+			}
+		}
+
+		Row {
+			anchors.horizontalCenter: parent.horizontalCenter;
+			anchors.verticalCenter: parent.verticalCenter;
+			spacing: Style.marginS;
+
+			Repeater {
+				model: 2;
+
+				delegate: SkeletonBlock {
+					width: Style.controlHeightM * 2.5;
+					height: Style.controlHeightM - Style.marginXS;
+					animated: true;
+				}
+			}
+		}
+
+		SkeletonBlock {
+			anchors.right: parent.right;
+			anchors.rightMargin: Style.marginM;
+			anchors.verticalCenter: parent.verticalCenter;
+			width: Style.controlHeightM * 3;
+			height: Style.controlHeightM - Style.marginXS;
+			animated: true;
+		}
+	}
+
 	CommandsView {
 		id: leftCommands;
 		anchors.left: parent.left;
@@ -191,7 +256,7 @@ Item {
 		visible: false;
 		decorator: Component {
 			ToolButtonDecorator {
-				color: baseElement && baseElement.hovered  ? Style.hover : "transparent";
+				color: baseElement && baseElement.hovered  ? Style.toolButtonHoverColor : "transparent";
 				radius: height / 2;
 			}
 		}
@@ -266,7 +331,7 @@ Item {
 		PopupMenuDialog {
 			id: popupMenuDialog;
 			shownItemsCount: 20;
-			itemHeight: Style.controlHeightM;
+			itemHeight: Style.controlHeightS + Style.spacingXS;
 			onFinished: {
 				if (commandId !== ""){
 					commandsItem.commandActivated(commandId, null)

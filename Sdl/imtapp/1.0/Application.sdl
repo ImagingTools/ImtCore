@@ -38,6 +38,8 @@ type ApplicationInfo {
 	userMode: UserManagementMode
 	superuser: SuperuserCheckResult
 	tenantsEnabled: Bool
+	externalLoginEnabled: Bool
+	documentSharingEnabled: Bool
 }
 
 input GetApplicationInfoInput {

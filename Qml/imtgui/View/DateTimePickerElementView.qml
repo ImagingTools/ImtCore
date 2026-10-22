@@ -45,7 +45,7 @@ ElementView {
 		id: datePickerComp;
 		
 		DateInput {
-			width: 200;
+			width: expirationEditor.contentWidth > 0 ? Math.min(200, expirationEditor.contentWidth) : 200;
 			hasTitle: false
 
 			Component.onCompleted: {

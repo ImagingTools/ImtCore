@@ -79,7 +79,8 @@ sdl::V1_0::imtauth::CProfileData CProfileControllerComp::OnGetProfile(
 	imtauth::ITenantMembershipManager* memPtr = m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr;
 	imtauth::IRoleInfoProvider* roleProvPtr = m_roleInfoProviderCompPtr.IsValid() ? m_roleInfoProviderCompPtr.GetPtr() : nullptr;
 
-	istd::IChangeableUniquePtr adaptedPtr = AdaptUserForTenant(
+	istd::IChangeableUniquePtr adaptedPtr;
+	const imtauth::IUserInfo* effectiveUserPtr = &GetTenantAdaptedUser(
 				objectId,
 				*userInfoPtr,
 				currentTenantId,
@@ -87,15 +88,8 @@ sdl::V1_0::imtauth::CProfileData CProfileControllerComp::OnGetProfile(
 				bindingPtr,
 				delPtr,
 				memPtr,
-				roleProvPtr);
-
-	const imtauth::IUserInfo* effectiveUserPtr = userInfoPtr;
-	if (adaptedPtr.IsValid()){
-		imtauth::IUserInfo* au = dynamic_cast<imtauth::IUserInfo*>(adaptedPtr.GetPtr());
-		if (au != nullptr){
-			effectiveUserPtr = au;
-		}
-	}
+				roleProvPtr,
+				adaptedPtr);
 
 	imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
 	for (const imtauth::IUserInfo::SystemInfo& systemInfo : std::as_const(systemInfoList)){
@@ -142,7 +136,7 @@ sdl::V1_0::imtauth::CProfileData CProfileControllerComp::OnGetProfile(
 		// Use the (possibly tenant-adapted) roles list. The adaptation has
 		// already filtered according to tenant bindings and appended any
 		// delegated roles.
-		const QByteArrayList roles = GetEffectiveUserRoles(*effectiveUserPtr, currentProductId);
+		const QByteArrayList roles = GetTenantUserRoles(*effectiveUserPtr, currentTenantId, currentProductId, bindingPtr);
 
 		for (const QByteArray& roleId : std::as_const(roles)){
 			imtbase::IObjectCollection::DataPtr roleDataPtr;

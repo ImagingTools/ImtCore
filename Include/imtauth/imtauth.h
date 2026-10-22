@@ -43,22 +43,23 @@ inline QString GetUserName(const imtbase::IObjectCollection& userCollection, con
 /**
 	Tell whether the given permission is among the ones held.
 
-	Permissions used to be stored by feature id alone ("EditUser") and are
-	stored as the full feature path today ("/Administration/EditUser"). Both
-	forms are answered for, in either direction: a permission stored the old way
-	satisfies a check written the new way, and the other way round. Two full
-	paths, however, are only the same permission when they are equal or
-	the held permission is a descendant of the requested path. The same id under
-	a different parent is a different feature.
+	A permission is the full path of its feature ("/Administration/Users/Edit/Add").
+	The requested permission is held when it is held as such, or - for a group of
+	the tree - when a permission inside it is held. A feature id alone names no
+	permission: the same id appears under many parents.
+
+	\param includeDescendants	whether a held descendant of the requested path
+		counts. Without it only the requested node itself is matched, e.g. to tell
+		which nodes of a permission tree are selected.
 
 	This is the one place that rule is written down: every check of "does this
 	user hold that permission" is to go through here, whatever container the
 	held permissions come in (a list, a set of allowed ones, ...).
 */
 template <class PermissionsType>
-inline bool HasPermission(const PermissionsType& userPermissions, const QByteArray& permissionId)
+inline bool HasPermission(const PermissionsType& userPermissions, const QByteArray& permissionId, bool includeDescendants = true)
 {
-	if (permissionId.isEmpty()){
+	if (!permissionId.startsWith('/')){
 		return false;
 	}
 
@@ -66,21 +67,31 @@ inline bool HasPermission(const PermissionsType& userPermissions, const QByteArr
 		return true;
 	}
 
-	const bool isPath = permissionId.startsWith('/');
-	const QByteArray featureId = isPath ? permissionId.mid(permissionId.lastIndexOf('/') + 1) : permissionId;
+	if (!includeDescendants){
+		return false;
+	}
 
 	for (const QByteArray& userPermission : userPermissions){
-		if (isPath && userPermission.startsWith('/')){
-			if (userPermission.startsWith(permissionId)
-					&& userPermission.size() > permissionId.size()
+		if (userPermission.size() > permissionId.size()
+					&& userPermission.startsWith(permissionId)
 					&& userPermission.at(permissionId.size()) == '/'){
-				return true;
-			}
-
-			continue;
+			return true;
 		}
+	}
 
-		if (userPermission.mid(userPermission.lastIndexOf('/') + 1) == featureId){
+	return false;
+}
+
+
+/**
+	Tell whether a request running under the permission path may use something declared with these permissions:
+	the path is one of them or lies inside one of them, never above them.
+*/
+inline bool IsPermissionPathDeclared(const QByteArrayList& declaredPermissions, const QByteArray& permissionPath)
+{
+	const QByteArrayList pathPermissions{permissionPath};
+	for (const QByteArray& declaredPermission : declaredPermissions){
+		if (HasPermission(pathPermissions, declaredPermission)){
 			return true;
 		}
 	}

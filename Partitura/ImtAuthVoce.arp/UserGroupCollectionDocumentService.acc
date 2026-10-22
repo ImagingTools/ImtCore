@@ -25,6 +25,13 @@
         <Element Id="CachedUserGroupRepository" PackageId="ImtCorePck" ComponentId="CachedObjectCollection">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="InvalidationModels" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>CachedRoleRepository</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                     <AttributeInfo Id="ObjectCacheLimit" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="500"/>
                     </AttributeInfo>
@@ -37,6 +44,14 @@
         <Element Id="CachedUserRepository" PackageId="ImtCorePck" ComponentId="CachedObjectCollection">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="InvalidationModels" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>CachedRoleRepository</Value>
+                                <Value>CachedUserGroupRepository</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                     <AttributeInfo Id="ObjectCacheLimit" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="2000"/>
                     </AttributeInfo>
@@ -262,8 +277,7 @@
                                 <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>ViewGroups</Value>
-                                            <Value>/GroupManagement/ViewOrganizationGroups</Value>
+                                            <Value>/Administration/Groups/View</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -299,8 +313,7 @@
                                 <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>ChangeGroup</Value>
-                                            <Value>/GroupManagement/EditOrganizationGroup/ChangeOrganizationGroup</Value>
+                                            <Value>/Administration/Groups/Edit/Change</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>

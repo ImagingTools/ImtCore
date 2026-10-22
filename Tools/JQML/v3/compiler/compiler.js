@@ -29,6 +29,7 @@ program.addOption(new Option('-c, --config <path>', 'config file path'))
     .addOption(new Option('-n, --name <string>', 'application name').default(''))
     .addOption(new Option('-r, --root <string>', 'root path').default('/'))
     .addOption(new Option('-m, --mode <string>', 'compile mode').choices(['js', 'html']))
+    .addOption(new Option('--list-qml', 'print qml files declared by config qmldirs, one path per line'))
 
 program.parse(process.argv)
 
@@ -71,6 +72,209 @@ function isConstantExpression(stat){
     }
 }
 
+function decodeXmlText(text) {
+    let value = String(text)
+    const cdata = []
+    value = value.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, function (_, inner) {
+        cdata.push(inner)
+        return '\u0000CDATA' + (cdata.length - 1) + '\u0000'
+    })
+    value = value
+        .replace(/&#x([0-9a-fA-F]+);/g, function (_, hex) { return String.fromCodePoint(parseInt(hex, 16)) })
+        .replace(/&#(\d+);/g, function (_, dec) { return String.fromCodePoint(Number(dec)) })
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&apos;/g, "'")
+        .replace(/&amp;/g, '&')
+    return value.replace(/\u0000CDATA(\d+)\u0000/g, function (_, index) { return cdata[Number(index)] })
+}
+
+function parseTsCatalog(xml) {
+    const dict = {}
+    const source = String(xml).replace(/<!--[\s\S]*?-->/g, '')
+    const messageRe = /<message\b[^>]*>([\s\S]*?)<\/message>/g
+    let messageMatch
+    while ((messageMatch = messageRe.exec(source))) {
+        const body = messageMatch[1]
+        const sourceMatch = body.match(/<source\b[^>]*>([\s\S]*?)<\/source>/)
+        const translationMatch = body.match(/<translation\b[^>]*>([\s\S]*?)<\/translation>/)
+        if (!sourceMatch || !translationMatch) continue
+        let translation = translationMatch[1]
+        const forms = []
+        const formRe = /<numerusform\b[^>]*>([\s\S]*?)<\/numerusform>/g
+        let formMatch
+        while ((formMatch = formRe.exec(translation))) forms.push(decodeXmlText(formMatch[1]))
+        if (forms.length) translation = forms[0]
+        else translation = decodeXmlText(translation)
+        dict[decodeXmlText(sourceMatch[1])] = translation
+    }
+    return dict
+}
+
+function translationLanguage(xml, fileName) {
+    const match = String(xml).match(/<TS\b[^>]*\blanguage\s*=\s*"([^"]+)"/)
+    if (match && match[1]) return decodeXmlText(match[1])
+    const stem = fileName.slice(0, -3)
+    const fromName = stem.match(/(?:^|_)([A-Za-z]{2,3}_[A-Za-z]{2})$/)
+    return fromName ? fromName[1] : ''
+}
+
+function loadTranslationCatalogs(dirs) {
+    const catalogs = {}
+    let fileCount = 0
+    for (const dirPath of dirs) {
+        if (!dirPath || String(dirPath).indexOf('${') >= 0) {
+            console.warn('JQML3: translation_dir was not resolved: ' + dirPath)
+            continue
+        }
+        if (!fs.existsSync(dirPath) || !fs.statSync(dirPath).isDirectory()) {
+            console.warn('JQML3: translation_dir was not found: ' + dirPath)
+            continue
+        }
+        const names = fs.readdirSync(dirPath).filter(name => name.length > 3 && name.slice(-3) === '.ts').sort()
+        for (const name of names) {
+            const filePath = path.join(dirPath, name)
+            if (!fs.statSync(filePath).isFile()) continue
+            const xml = fs.readFileSync(filePath, { encoding: 'utf8' })
+            const language = translationLanguage(xml, name)
+            if (!language) {
+                console.warn('JQML3: translation file has no language: ' + filePath)
+                continue
+            }
+            if (!catalogs[language]) catalogs[language] = {}
+            Object.assign(catalogs[language], parseTsCatalog(xml))
+            fileCount++
+        }
+    }
+    return { catalogs, fileCount }
+}
+
+function envFill(source, env) {
+    let result = source
+    if (result.indexOf('${') < 0) return result
+    const keys = Object.keys(env).sort((a, b) => b.length - a.length)
+    for (let key of keys) {
+        let token = '${' + key + '}'
+        if (result.indexOf(token) < 0) continue
+        result = result.replaceAll(token, env[key].replaceAll('\\', '\\\\').trim())
+    }
+    return result
+}
+
+function envFillPath(filePath, env) {
+    let result = String(filePath || '')
+    if (result.indexOf('${') < 0) return result
+    const keys = Object.keys(env).sort((a, b) => b.length - a.length)
+    for (let key of keys) {
+        if (env[key] == null) continue
+        let token = '${' + key + '}'
+        if (result.indexOf(token) < 0) continue
+        result = result.replaceAll(token, String(env[key]).trim())
+    }
+    return result
+}
+
+function isAbsolutePath(filePath) {
+    if (!filePath) return false
+    if (path.isAbsolute(filePath)) return true
+    if (/^[A-Za-z]:[\\/]/.test(filePath)) return true
+    if (filePath.slice(0, 2) === '\\\\') return true
+    return false
+}
+
+function resolveConfigRef(baseDirPath, filePath, env) {
+    const filled = envFillPath(filePath, env)
+    if (isAbsolutePath(filled)) return path.normalize(filled)
+    if (filled.indexOf('${') >= 0) return path.normalize(filled)
+    return path.resolve(baseDirPath, filled)
+}
+
+function loadCompilerConfig(configFilePath, env = process.env) {
+    const normalizedConfigPath = path.normalize(String(configFilePath || '').trim())
+    const configDirPath = normalizedConfigPath.split(/[\\\/]+/g).slice(0, -1).join('/')
+    const translationDirs = []
+
+    function appendTranslationDir(baseDirPath, translationDir) {
+        if (typeof translationDir !== 'string' || !translationDir.trim()) return
+        translationDirs.push(resolveConfigRef(baseDirPath, translationDir, env))
+    }
+
+    function includeFiles(sourceFile, baseDirPath = configDirPath) {
+        if (sourceFile.includes)
+            for (let filePath of sourceFile.includes) {
+                let absoluteConfigPath = resolveConfigRef(baseDirPath, filePath, env)
+                let includeConfigDirPath = path.dirname(absoluteConfigPath)
+                let file = JSON.parse(envFill(fs.readFileSync(absoluteConfigPath, { encoding: 'utf8', flag: 'r' }), env))
+                includeFiles(file, includeConfigDirPath)
+                for (let dirPath of file.dirs) {
+                    let absoluteDirPath = resolveConfigRef(includeConfigDirPath, dirPath, env)
+                    sourceFile.dirs.unshift(absoluteDirPath)
+                }
+                appendTranslationDir(includeConfigDirPath, file.translation_dir)
+            }
+    }
+
+    const config = JSON.parse(envFill(fs.readFileSync(normalizedConfigPath, { encoding: 'utf8', flag: 'r' }), env))
+    includeFiles(config, configDirPath)
+    appendTranslationDir(configDirPath, config.translation_dir)
+    return { config, configDirPath, translationDirs }
+}
+
+function qmlPathFromQmldirLine(line) {
+    let params = line.trim().split(' ')
+    if (params.length === 3) return params[2]
+    if (params.length === 4) return params[3]
+    return ''
+}
+
+function rememberQmlFile(files, seen, filePath) {
+    let absoluteFilePath = path.resolve(filePath).replaceAll(/\\+/g, '/')
+    let key = process.platform === 'win32' ? absoluteFilePath.toLowerCase() : absoluteFilePath
+    if (seen.has(key)) return
+    seen.add(key)
+    files.push(absoluteFilePath)
+}
+
+// Qml files declared by every qmldir that compile() reads from the config and its includes.
+// When entryPath is outside those modules, also returns the qml files compile() reads
+// from the entry directory.
+function listQmldirQmlFiles(configPath, env = process.env, entryPath = '') {
+    const { config, configDirPath } = loadCompilerConfig(configPath, env)
+    const files = []
+    const seen = new Set()
+    let entryDir = ''
+    let entryIsModule = false
+
+    if (entryPath) {
+        entryDir = path.resolve(configDirPath, String(entryPath).replaceAll(/.\w+\.qml/g, ''))
+    }
+
+    for (let dirPath of config.dirs || []) {
+        let absolutePath = resolveConfigRef(configDirPath, dirPath, env)
+        if (entryDir && absolutePath === entryDir) entryIsModule = true
+        let qmldirPath = absolutePath.replace(/[\\\/]+$/g, '') + '/qmldir'
+        let lines = fs.readFileSync(qmldirPath, { encoding: 'utf8', flag: 'r' }).replaceAll('\r', '').replaceAll(/[ ]+/g, ' ').split('\n')
+        for (let line of lines) {
+            let filePath = qmlPathFromQmldirLine(line)
+            if (!filePath || filePath.split('.').pop() !== 'qml') continue
+            rememberQmlFile(files, seen, path.resolve(absolutePath, filePath))
+        }
+    }
+
+    if (entryDir && !entryIsModule) {
+        let names = fs.readdirSync(entryDir)
+        for (let name of names) {
+            let filePath = entryDir + '/' + name
+            if (fs.statSync(filePath).isDirectory()) continue
+            if (path.extname(filePath) !== '.qml') continue
+            rememberQmlFile(files, seen, filePath)
+        }
+    }
+
+    return files
+}
+
 function compile(options){
     if(options.mode === 'html'){
         console.time('JQML3: compile html')
@@ -108,68 +312,22 @@ function compile(options){
     const QtWebView = require('../QtWebView/QtWebView')
 
     const env = process.env
-    const configFilePath = path.normalize(options.config.trim())
-    const configDirPath = configFilePath.split(/[\\\/]+/g).slice(0, -1).join('/')
-
-
-    function envFill(source) {
-        let result = source
-        if (result.indexOf('${') < 0) return result
-        const keys = Object.keys(env).sort((a, b) => b.length - a.length)
-        for (let key of keys) {
-            let token = '${' + key + '}'
-            if (result.indexOf(token) < 0) continue
-            result = result.replaceAll(token, env[key].replaceAll('\\', '\\\\').trim())
-        }
-        return result
-    }
-
-    function envFillPath(filePath) {
-        let result = String(filePath || '')
-        if (result.indexOf('${') < 0) return result
-        const keys = Object.keys(env).sort((a, b) => b.length - a.length)
-        for (let key of keys) {
-            if (env[key] == null) continue
-            let token = '${' + key + '}'
-            if (result.indexOf(token) < 0) continue
-            result = result.replaceAll(token, String(env[key]).trim())
-        }
-        return result
-    }
-
-    function isAbsolutePath(filePath) {
-        if (!filePath) return false
-        if (path.isAbsolute(filePath)) return true
-        if (/^[A-Za-z]:[\\/]/.test(filePath)) return true
-        if (filePath.slice(0, 2) === '\\\\') return true
-        return false
-    }
-
-    function resolveConfigRef(baseDirPath, filePath) {
-        const filled = envFillPath(filePath)
-        if (isAbsolutePath(filled)) return path.normalize(filled)
-        if (filled.indexOf('${') >= 0) return path.normalize(filled)
-        return path.resolve(baseDirPath, filled)
-    }
-
-    function includeFiles(sourceFile, baseDirPath = configDirPath) {
-        if (sourceFile.includes)
-            for (let filePath of sourceFile.includes) {
-                let absoluteConfigPath = resolveConfigRef(baseDirPath, filePath)
-                let includeConfigDirPath = path.dirname(absoluteConfigPath)
-                let file = JSON.parse(envFill(fs.readFileSync(absoluteConfigPath, { encoding: 'utf8', flag: 'r' })))
-                includeFiles(file, includeConfigDirPath)
-                for (let dirPath of file.dirs) {
-                    let absoluteDirPath = resolveConfigRef(includeConfigDirPath, dirPath)
-                    sourceFile.dirs.unshift(absoluteDirPath)
-                }
-            }
-    }
 
     console.time('JQML3: include config files')
-    const config = JSON.parse(envFill(fs.readFileSync(configFilePath, { encoding: 'utf8', flag: 'r' })))
-    includeFiles(config, configDirPath)
+    const loadedConfig = loadCompilerConfig(options.config, env)
+    const config = loadedConfig.config
+    const configDirPath = loadedConfig.configDirPath
+    const translationDirs = loadedConfig.translationDirs
     console.timeEnd('JQML3: include config files')
+
+    let embeddedTranslationsJson = ''
+    if (translationDirs.length) {
+        console.time('JQML3: embed translations')
+        const embedded = loadTranslationCatalogs(translationDirs)
+        embeddedTranslationsJson = JSON.stringify(embedded.catalogs)
+        console.log('JQML3: embedded ' + embedded.fileCount + ' translation file(s)')
+        console.timeEnd('JQML3: embed translations')
+    }
 
     const BaseModules = {
         Qt,
@@ -840,7 +998,7 @@ function compile(options){
                         stat.isCompute = true
                         stat.wasDot = true
                         this.prepare(tree[1], stat)
-                        stat.value.add('.')
+                        stat.value.add(tree[3] ? '?.' : '.')
                         stat.value.add(new SourceNode(tree.info.line+1,tree.info.col,this.qmlFile.fileName,tree[2]))
 
                         if (stat.dotObj) {
@@ -904,7 +1062,7 @@ function compile(options){
                     }
                     case 'call': {
                         this.prepare(tree[1], stat)
-                        stat.value.add('(')
+                        stat.value.add(tree[3] ? '?.(' : '(')
                         for (let i = 0; i < tree[2].length; i++) {
                             this.prepare(tree[2][i], stat)
                             if (i < tree[2].length - 1) stat.value.add(',')
@@ -1192,7 +1350,7 @@ function compile(options){
                     }
                     case 'sub': {
                         this.prepare(tree[1], stat)
-                        stat.value.add(`[`)
+                        stat.value.add(tree[3] ? '?.[' : `[`)
                         this.prepare(tree[2], stat)
                         stat.value.add(`]\n`)
                         return stat
@@ -2365,6 +2523,16 @@ function compile(options){
     }
 
 
+    // Qt-only `.pragma library` directives are not valid JS once the file is inlined. Like in Qt they are
+    // recognized only in the file header (before the first statement), so a line starting with `.pragma`
+    // elsewhere (e.g. a method call continued on the next line) or inside a string/comment stays untouched.
+    function stripPragmaDirectives(data) {
+        const header = /^(?:\s+|\/\/[^\r\n]*|\/\*[\s\S]*?\*\/|\.pragma[ \t]+[A-Za-z_]\w*[ \t]*;?)*/
+        const prefix = header.exec(data)[0]
+        const cleaned = prefix.replace(/\/\/[^\r\n]*|\/\*[\s\S]*?\*\/|\.pragma[ \t]+[A-Za-z_]\w*[ \t]*;?/g, m => m.startsWith('.pragma') ? '' : m)
+        return cleaned + data.slice(prefix.length)
+    }
+
     class JSFile {
         fileName = ''
         moduleName = ''
@@ -2376,6 +2544,7 @@ function compile(options){
             this.version = version
             this.moduleName = moduleName
             let data = fs.readFileSync(fileName, { encoding: 'utf8', flag: 'r' })
+            data = stripPragmaDirectives(data)
 
             parser.parse.nowParsingFile = fileName
 
@@ -2393,6 +2562,9 @@ function compile(options){
     }
 
     let fullCode = new SourceNode()
+    if (embeddedTranslationsJson) {
+        fullCode.add('JQApplication.embeddedTranslations=' + embeddedTranslationsJson + '\n')
+    }
     let compiledFiles = []
 
     let mainData = readRuntimeBundle()
@@ -2410,7 +2582,7 @@ function compile(options){
     let entryDirAbsolutePath = path.resolve(configDirPath, options.entry.replaceAll(/.\w+\.qml/g, ''))
 
     for (let dirPath of config.dirs) {
-        let absolutePath = resolveConfigRef(configDirPath, dirPath)
+        let absolutePath = resolveConfigRef(configDirPath, dirPath, env)
         let moduleName = ''
         let lines = fs.readFileSync(absolutePath + '/qmldir', { encoding: 'utf8', flag: 'r' }).replaceAll('\r', '').replaceAll(/[ ]+/g, ' ').split('\n')
         let count = 0
@@ -2651,10 +2823,22 @@ function compile(options){
 }
 
 
-if(options.mode === 'js' || options.mode === 'html'){
+if (options.listQml) {
+    try {
+        if (!options.config) throw new Error('--config is required with --list-qml')
+        const files = listQmldirQmlFiles(options.config, process.env, options.entry || '')
+        process.stdout.write(files.join('\n') + (files.length ? '\n' : ''))
+    } catch (error) {
+        console.error('JQML3: ' + (error && error.message ? error.message : error))
+        process.exit(1)
+    }
+} else if (options.mode === 'js' || options.mode === 'html') {
     compile(options)
 }
 
 module.exports = {
-  compile: compile
+  compile: compile,
+  parseTsCatalog: parseTsCatalog,
+  loadTranslationCatalogs: loadTranslationCatalogs,
+  listQmldirQmlFiles: listQmldirQmlFiles,
 }

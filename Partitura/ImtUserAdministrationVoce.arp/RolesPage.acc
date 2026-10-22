@@ -22,7 +22,6 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>roleName</Value>
-                                <Value>roleId</Value>
                                 <Value>roleDescription</Value>
                             </Values>
                         </Data>
@@ -31,7 +30,6 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>roleName</Value>
-                                <Value>roleId</Value>
                                 <Value>roleDescription</Value>
                             </Values>
                         </Data>
@@ -40,7 +38,6 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>Role Name</Value>
-                                <Value>Role-ID</Value>
                                 <Value>Description</Value>
                             </Values>
                         </Data>
@@ -49,7 +46,6 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>roleName</Value>
-                                <Value>roleId</Value>
                                 <Value>roleDescription</Value>
                             </Values>
                         </Data>
@@ -171,6 +167,9 @@
         <Element Id="RolesDataController" PackageId="ImtAuthGqlPck" ComponentId="RoleCollectionController">
             <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="BindingManager" Type="Reference" ExportId="BindingManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="CollectionId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Roles"/>
                     </AttributeInfo>
@@ -267,9 +266,9 @@
                                 <AttributeInfo Id="ClosePermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>RemoveRole</Value>
-                                            <Value>ChangeRole</Value>
-                                            <Value>ViewRoles</Value>
+                                            <Value>/Administration/Roles/Edit/Remove</Value>
+                                            <Value>/Administration/Roles/Edit/Change</Value>
+                                            <Value>/Administration/Roles/View</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -279,18 +278,18 @@
                                 <AttributeInfo Id="RedoPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>AddRole</Value>
-                                            <Value>RemoveRole</Value>
-                                            <Value>ChangeRole</Value>
+                                            <Value>/Administration/Roles/Edit/Add</Value>
+                                            <Value>/Administration/Roles/Edit/Remove</Value>
+                                            <Value>/Administration/Roles/Edit/Change</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
                                 <AttributeInfo Id="SavePermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>AddRole</Value>
-                                            <Value>RemoveRole</Value>
-                                            <Value>ChangeRole</Value>
+                                            <Value>/Administration/Roles/Edit/Add</Value>
+                                            <Value>/Administration/Roles/Edit/Remove</Value>
+                                            <Value>/Administration/Roles/Edit/Change</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -306,9 +305,9 @@
                                 <AttributeInfo Id="UndoPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>AddRole</Value>
-                                            <Value>RemoveRole</Value>
-                                            <Value>ChangeRole</Value>
+                                            <Value>/Administration/Roles/Edit/Add</Value>
+                                            <Value>/Administration/Roles/Edit/Remove</Value>
+                                            <Value>/Administration/Roles/Edit/Change</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -333,8 +332,8 @@
                                 <AttributeInfo Id="EditPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>ViewRoles</Value>
-                                            <Value>ChangeRole</Value>
+                                            <Value>/Administration/Roles/View</Value>
+                                            <Value>/Administration/Roles/Edit/Change</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -347,14 +346,14 @@
                                 <AttributeInfo Id="NewPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>AddRole</Value>
+                                            <Value>/Administration/Roles/Edit/Add</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
                                 <AttributeInfo Id="RemovePermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>RemoveRole</Value>
+                                            <Value>/Administration/Roles/Edit/Remove</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -410,7 +409,7 @@
                                 <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>ViewRevisions</Value>
+                                            <Value>/Administration/Roles/Revisions/View</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>

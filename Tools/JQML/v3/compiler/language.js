@@ -72,7 +72,7 @@ function typeNameOf(node) {
     if (!node) return ''
     if (typeof node === 'string') return node
     if (Array.isArray(node)) {
-        if (node[0] === 'dot') return typeNameOf(node[1]) + '.' + typeNameOf(node[2])
+        if (node[0] === 'dot') return typeNameOf(node[1]) + (node[3] ? '?.' : '.') + typeNameOf(node[2])
         if (typeof node[1] === 'string' && node[0] !== 'qmlelem') return node[1]
     }
     return String(node)

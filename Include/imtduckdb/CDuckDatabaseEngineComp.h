@@ -76,13 +76,14 @@ public:
 	virtual QSqlQuery ExecSqlQueryFromFile(const QString& filePath, QSqlError* sqlError = nullptr, bool isForwardOnly = false) const override;
 	virtual QSqlQuery ExecSqlQueryFromFile(const QString& filePath, const QVariantMap& bindValues, QSqlError* sqlError = nullptr, bool isForwardOnly = false) const override;
 
+	// reimplemented (imtduckdb::IDuckConnectionProvider)
 	/**
 		Creates an exclusively-owned connection to this component's database, able to run queries,
 		DDL, bulk appends and table swaps concurrently with this component's shared connection.
 		Intended for one-per-request reads and for cache builders running off-thread.
 		\return nullptr if the database could not be opened.
 	*/
-	std::unique_ptr<IDuckConnection> CreateConnection() const override;
+	virtual std::unique_ptr<IDuckConnection> CreateConnection() const override;
 
 protected:
 	// reimplemented (icomp::CComponentBase)
@@ -134,3 +135,4 @@ private:
 
 
 } // namespace imtduckdb
+

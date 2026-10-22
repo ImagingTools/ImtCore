@@ -8,15 +8,22 @@ Rectangle {
 	objectName: name.replace(/\s/g, '') + "ElementView"
 	
 	width: Style.sizeHintXXL
-	height: contentHeight + 2 * Style.marginXL
-	
-	border.width: 1
+	height: contentHeight + 2 * (rootElement.flat ? Style.marginM : Style.marginXL)
+
+	border.width: rootElement.flat ? 0 : 1
 	border.color: Style.borderColor
-	
+
 	radius: Style.radiusM
-	
-	color: Style.baseColor
+
+	color: rootElement.flat ? "transparent" : Style.baseColor
 	property alias contentSpacing: content.spacing
+
+	// A row of an editor form (set by GroupElementView): no frame of its own, the group card frames it.
+	// Wide rows put name and description in a label column and let the control fill the rest;
+	// narrow rows stack name, description and a full-width control.
+	property bool flat: false
+	readonly property bool flatWide: rootElement.flat && content.width >= Style.sizeHintXL
+	readonly property int labelColumnWidth: Math.min(Style.sizeHintS, Math.round(content.width * 0.4))
 
 	property int titleFontSize:  Style.fontSizeXL;
 	
@@ -44,10 +51,19 @@ Rectangle {
 	property alias stacked: mainPart.stacked
 	
 	property int controlWidth: Style.sizeHintM
+	// The width a control should take: the requested one, but never wider than the row,
+	// so a narrow row that stacks name over control keeps the control inside it.
+	// A form row gives the control all the room its column has, so nothing is left empty on the right.
+	readonly property int fittedControlWidth: content.width <= 0 ? rootElement.controlWidth
+			: rootElement.flatWide ? content.width - rootElement.labelColumnWidth - Style.marginL
+			: rootElement.flat ? content.width
+			: Math.min(rootElement.controlWidth, content.width)
 	property int contentMargin: Style.marginXL
 	property int nameMargin: Style.marginXL
 	property int contentHeight: content.height
 	property int controlHeight: Style.controlHeightM
+	// Marks the name with an asterisk, so a required field is visible before it is focused.
+	property bool isRequired: false
 
 	onFocusChanged: {
 		if (controlItem){
@@ -106,10 +122,10 @@ Rectangle {
 		id: content
 		anchors.verticalCenter: parent.verticalCenter
 		anchors.left: parent.left
-		anchors.leftMargin: rootElement.contentMargin
+		anchors.leftMargin: rootElement.flat ? Style.marginL : rootElement.contentMargin
 		anchors.right: parent.right
-		anchors.rightMargin: rootElement.contentMargin
-		spacing: rootElement.contentMargin
+		anchors.rightMargin: rootElement.flat ? Style.marginL : rootElement.contentMargin
+		spacing: rootElement.flat ? Style.spacingS : rootElement.contentMargin
 		objectName: "ElementView"
 		
 		Loader {
@@ -122,7 +138,9 @@ Rectangle {
 			id: mainPart
 			width: parent.width
 			height: textName.text === "" && !controlLoader.item ? 0
-					: mainPart.stacked ? textName.height + Style.marginS + controlHolder.height
+					: rootElement.flatWide ? Math.max(controlHolder.height, Style.controlHeightM,
+							mainPart.inlineDescription ? inlineDescriptionText.y + inlineDescriptionText.height : textName.y + textName.height)
+					: mainPart.stacked ? mainPart.stackedControlY + controlHolder.height
 					: Math.max(Style.controlHeightM, textName.height)
 			visible: textName.text !== "" || controlLoader.item
 
@@ -130,8 +148,13 @@ Rectangle {
 			// control, the two stop sharing a line and stack instead - the only
 			// way neither ends up drawn over the other. Guarded on a real width,
 			// or a row would stack while it was still being built and had none.
-			property bool stacked: mainPart.width > 0 && controlHolder.width > 0 && textName.text !== ""
-					&& (mainPart.width - controlHolder.width - rootElement.nameMargin) < Style.sizeHintXXXS
+			// A form row stacks only when it is too narrow for its label column.
+			property bool stacked: rootElement.flat ? !rootElement.flatWide : (mainPart.width > 0 && controlHolder.width > 0 && textName.text !== ""
+					&& (mainPart.width - controlHolder.width - rootElement.nameMargin) < Style.sizeHintXXXS)
+			// A flat row reads name, description, control; the description moves up between them.
+			readonly property bool inlineDescription: rootElement.flat && textDescription.text !== ""
+			// Not controlHolder.y: in a side-by-side row that depends on this item's height, a binding loop when the row stacks.
+			readonly property int stackedControlY: textName.height + (mainPart.inlineDescription ? Style.spacingXXS + inlineDescriptionText.height : 0) + Style.marginS
 
 			// Placed by y rather than by swapping anchors between verticalCenter
 			// and top: bound through a ternary each of those is set independently,
@@ -140,15 +163,41 @@ Rectangle {
 			// down the row and kept it there.
 			Text {
 				id: textName
-				y: mainPart.stacked ? 0 : Math.round((mainPart.height - height) / 2)
+				// In a wide form row the name sits level with the control's first line.
+				y: rootElement.flatWide ? Math.round((Style.controlHeightM - height) / 2)
+					: mainPart.stacked ? 0 : Math.round((mainPart.height - height) / 2)
 				anchors.left: parent.left
 				anchors.right: mainPart.stacked ? parent.right : controlHolder.left
-				anchors.rightMargin: mainPart.stacked ? 0 : rootElement.nameMargin
+				anchors.rightMargin: (mainPart.stacked ? 0 : rootElement.flatWide ? Style.marginL : rootElement.nameMargin) + (rootElement.isRequired ? requiredMark.width : 0)
 				color: Style.textColor
 				font.family: Style.fontFamilyBold
-				font.pixelSize: rootElement.titleFontSize
+				font.pixelSize: rootElement.flat ? Style.fontSizeM : rootElement.titleFontSize
+				font.bold: rootElement.flat
 				elide: Text.ElideRight
 				wrapMode: Text.NoWrap
+			}
+
+			Text {
+				id: requiredMark
+				x: textName.x + Math.min(textName.implicitWidth, textName.width)
+				y: textName.y
+				visible: rootElement.isRequired && textName.text !== ""
+				color: Style.errorTextColor
+				font.family: Style.fontFamilyBold
+				font.pixelSize: textName.font.pixelSize
+				text: " *"
+			}
+
+			Text {
+				id: inlineDescriptionText
+				y: textName.y + textName.height + Style.spacingXXS
+				width: rootElement.flatWide ? rootElement.labelColumnWidth : parent.width
+				visible: mainPart.inlineDescription
+				text: textDescription.text
+				color: textDescription.color
+				font.family: Style.fontFamily
+				font.pixelSize: Style.fontSizeM
+				wrapMode: Text.WordWrap
 			}
 
 			// Measures the control instead of being measured by it. The Loader
@@ -159,9 +208,10 @@ Rectangle {
 			Item {
 				id: controlHolder
 
-				y: mainPart.stacked ? textName.height + Style.marginS
+				y: rootElement.flatWide ? 0
+					: mainPart.stacked ? mainPart.stackedControlY
 					: Math.round((mainPart.height - height) / 2)
-				anchors.right: parent.right
+				x: mainPart.width - width
 
 				width: controlLoader.item ? controlLoader.item.width : 0
 				height: controlLoader.item ? controlLoader.item.height : 0
@@ -175,7 +225,7 @@ Rectangle {
 		Item {
 			id: descriptionPart
 			width: parent.width
-			height: textDescription.text !== "" ? textDescription.height : 0
+			height: textDescription.text !== "" && !mainPart.inlineDescription ? textDescription.height : 0
 			visible: height > 0
 			
 			Text {

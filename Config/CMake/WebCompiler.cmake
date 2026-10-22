@@ -222,6 +222,52 @@ function(jqml_compile_web2)
 
 endfunction(jqml_compile_web2)
 
+# Qml files declared by every qmldir that JQML3 compiles for CONFIG_PATH.
+# The list is suitable for add_custom_command DEPENDS. Paths use forward slashes.
+function(jqml3_qmldir_qml_files out_var config_path)
+	if(NOT NODE_EXE)
+		if(${MSVC})
+			set(NODE_EXE ${IMTCOREDIR}/3rdParty/nodejs/node.exe)
+		else()
+			set(NODE_EXE node)
+		endif()
+	endif()
+
+	set(_jqml_env ${envvar})
+	if(DEFINED TARGETNAME)
+		list(APPEND _jqml_env "TARGETNAME=${TARGETNAME}")
+	endif()
+
+	set(_jqml_entry_arg)
+	if(startqml)
+		set(_jqml_entry_arg -e "${startqml}")
+	endif()
+
+	execute_process(
+		COMMAND ${CMAKE_COMMAND} -E env ${_jqml_env}
+			"${NODE_EXE}"
+			"${IMTCOREDIR}/Tools/JQML/v3/compiler/compiler.js"
+			--list-qml
+			-c "${config_path}"
+			${_jqml_entry_arg}
+		OUTPUT_VARIABLE _jqml_files
+		ERROR_VARIABLE _jqml_error
+		RESULT_VARIABLE _jqml_result
+		OUTPUT_STRIP_TRAILING_WHITESPACE
+	)
+
+	if(NOT _jqml_result EQUAL 0)
+		message(STATUS "JQML3 --list-qml failed for ${config_path}, using the qml folder glob: ${_jqml_error}")
+		set(${out_var} "" PARENT_SCOPE)
+		set(${out_var}_OK FALSE PARENT_SCOPE)
+		return()
+	endif()
+
+	string(REGEX REPLACE "\r?\n" ";" _jqml_files "${_jqml_files}")
+	set(${out_var} "${_jqml_files}" PARENT_SCOPE)
+	set(${out_var}_OK TRUE PARENT_SCOPE)
+endfunction()
+
 function(jq_compile_web)
 	set(QRC_WEB_FILE ${buildwebdir}/Resources/qmlJsWeb.qrc)
 	set(QRC_CPP_WEB_FILE ${buildwebdir}/Resources/qrc_${resname}Web.cpp)
@@ -255,13 +301,24 @@ function(jq_compile_web)
 	set(INDEX 0)
 	set(DEPEND_LIST)
 	set(TRANSLATION_SRC_DIRS)
+	set(_jqml_list_ok FALSE)
+
+	if(inputjs)
+		jqml3_qmldir_qml_files(DEPEND_LIST "${inputjs}")
+		set(_jqml_list_ok "${DEPEND_LIST_OK}")
+		if(startqml)
+			list(APPEND DEPEND_LIST "${startqml}")
+		endif()
+		list(APPEND DEPEND_LIST "${inputjs}")
+	endif()
 
 	message(VERBOSE "DIRS_COUNT ${DIRS_COUNT}")
 
+	# Folder walk is only the fallback. When qmldir files are the dependencies,
+	# translation dirs are not collected from folders whose qml is not in that list.
+	
 	while(INDEX LESS DIRS_COUNT)
 		list(GET webdirs ${INDEX} _FOLDER)
-		file(GLOB_RECURSE FOUND_FILES "${_FOLDER}/*.qml")
-		list(APPEND DEPEND_LIST ${FOUND_FILES})
 
 		# QML sources are compiled directly from ${_FOLDER}; a folder is a translation source if it
 		# contains .ts files, regardless of what it (or its destination) is named
@@ -273,6 +330,7 @@ function(jq_compile_web)
 		math(EXPR INDEX "${INDEX} + 2")
 		set(INDEX ${INDEX})
 	endwhile()
+	
 
 	message(VERBOSE "QRC_CPP_WEB_FILE ${QRC_CPP_WEB_FILE}")
 	list(APPEND webdirs_n ${IMTCOREDIR}/Tools/JQML/v3/dist)
@@ -405,6 +463,9 @@ macro(getImtBaseQmlWebDirs webdirs buildwebdir useImtControlsStyle)
 
 	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseImtCollectionSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtbaseImtCollectionSdl)
+
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseDocumentSharesSdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtbaseDocumentSharesSdl)
 
 	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseDocumentRevisionSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtbaseDocumentRevisionSdl)

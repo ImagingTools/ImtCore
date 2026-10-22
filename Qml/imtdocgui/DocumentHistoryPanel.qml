@@ -21,10 +21,12 @@ Rectangle {
 	// Part of the product this panel works in; scopes its permission checks.
 	property alias permissionPath: historyView.permissionPath
 	property alias collectionId: historyView.collectionId
+	// Permission area of the revisions of the collection, e.g. "/SensorManagement/Revisions".
+	property alias revisionsPermissionPath: historyView.revisionsPermissionPath
 	property alias contentHeight: historyView.contentHeight
 
 	Component.onCompleted: {
-		historyPanel.visible = PermissionsController.checkPermission("ViewRevisions")
+		historyPanel.visible = PermissionsController.checkPermission(historyPanel.revisionsPermissionPath + "/View")
 	}
 
 	Rectangle {

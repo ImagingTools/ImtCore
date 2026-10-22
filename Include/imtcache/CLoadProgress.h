@@ -24,7 +24,9 @@ namespace imtcache
 class CLoadProgress
 {
 public:
-	/// \param readMs time already spent waiting for the source to return its rows.
+	/**
+		\param readMs time already spent waiting for the source to return its rows.
+	*/
 	CLoadProgress(const QString& tableName, int totalCount, qint64 readMs)
 		:m_tableName(tableName),
 		m_totalCount(totalCount),
@@ -39,7 +41,9 @@ public:
 		m_timer.start();
 	}
 
-	/// Call once for every source row, before mapping it.
+	/**
+		Call once for every source row, before mapping it.
+	*/
 	void RowProcessed()
 	{
 		++m_processedCount;
@@ -65,13 +69,17 @@ public:
 		++m_skippedCount;
 	}
 
-	/// Call when the last row has been handed over, before flushing.
+	/**
+		Call when the last row has been handed over, before flushing.
+	*/
 	void MappingDone()
 	{
 		m_mapMs = m_timer.restart();
 	}
 
-	/// Call after flushing.
+	/**
+		Call after flushing.
+	*/
 	void Finish(int rowsWritten)
 	{
 		if (!m_isReported){
@@ -102,3 +110,4 @@ private:
 
 
 } // namespace imtcache
+

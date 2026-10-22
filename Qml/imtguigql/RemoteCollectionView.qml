@@ -5,6 +5,7 @@ import imtcontrols 1.0
 import imtguigql 1.0
 import imtauthgui 1.0
 import imtcolgui 1.0
+import imtbaseImtCollectionSdl 1.0
 
 CollectionView {
 	id: root;
@@ -25,6 +26,9 @@ CollectionView {
 	property var permissionPaths: ({})
 
 	property alias subscriptionCommandId: collectionChangeListener.gqlCommandId
+
+	// Set when the server offers the Share command: the documents can be shared with related organizations
+	property bool sharingEnabled: false
 
 	signal removed(string objectId)
 	signal collectionChanged(var changeInfo)
@@ -47,6 +51,119 @@ CollectionView {
 	onHeadersChanged: {
 		if (table.headers.getItemsCount() > 0 && tableViewParamsStoredServer){
 			tableViewParamController.getModel();
+		}
+	}
+
+	onCommandActivated: {
+		if (commandId === "Share" && root.commandsController && root.commandsController.commandIsEnabled("Share")){
+			let indexes = root.table.getSelectedIndexes()
+			let documentName = indexes.length === 1 ? root.getElementDisplayName(indexes[0]) : ""
+			ModalDialogManager.openDialog(shareDocumentDialogComp, {"collectionId": root.collectionId, "objectIds": root.getSelectedIds(), "documentName": documentName, "permissionPaths": root.permissionPaths})
+		}
+	}
+
+	Connections {
+		target: root.commandsController ? root.commandsController : null
+
+		function onCommandsChanged(){
+			root.updateSharing()
+		}
+	}
+
+	function updateSharing(){
+		if (root.sharingEnabled || !root.commandsController || !root.commandsController.commandExists("Share")){
+			return
+		}
+
+		root.sharingEnabled = true
+		root.registerFieldFilterDelegate("SharingScope", sharingScopeFilterComp)
+	}
+
+	function getSharingScope(){
+		let filterDelegate = root.sharingEnabled ? root.filterMenu.getFilterDelegate("SharingScope") : null
+
+		return filterDelegate ? filterDelegate.sharingScope : "All"
+	}
+
+	// The "name" field of the row, otherwise the value of the first column
+	function getElementDisplayName(index){
+		let elements = root.table.elements
+		if (elements.containsKey("name", index)){
+			return String(elements.getData("name", index))
+		}
+
+		let headerId = root.table.headers.getItemsCount() > 0 ? String(root.table.getHeaderId(0)) : ""
+		return headerId !== "" && elements.containsKey(headerId, index) ? String(elements.getData(headerId, index)) : ""
+	}
+
+	function shareDocuments(objectIds, targetTenantIds, accessLevel, validUntil, message){
+		let objectNames = []
+		for (let i = 0; i < objectIds.length; i++){
+			let name = ""
+			for (let index = 0; index < root.table.elements.getItemsCount(); index++){
+				if (String(root.table.elements.getData("id", index)) === String(objectIds[i])){
+					name = root.getElementDisplayName(index)
+					break
+				}
+			}
+
+			objectNames.push(name)
+		}
+
+		shareDocumentsInput.m_collectionId = root.collectionId
+		shareDocumentsInput.m_objectIds = objectIds
+		shareDocumentsInput.m_objectNames = objectNames
+		shareDocumentsInput.m_targetTenantIds = targetTenantIds
+		shareDocumentsInput.m_accessLevel = accessLevel
+		shareDocumentsInput.m_validUntil = validUntil
+		shareDocumentsInput.m_message = message
+		shareDocumentsSender.send(shareDocumentsInput)
+	}
+
+	ShareDocumentsInput {
+		id: shareDocumentsInput
+	}
+
+	GqlSdlRequestSender {
+		id: shareDocumentsSender
+
+		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_shareDocuments
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
+		requestType: 1
+
+		sdlObjectComp: Component {
+			ShareDocumentsPayload {
+				onFinished: {
+					if (m_errorMessage && m_errorMessage !== ""){
+						PopupManager.addErrorMessage(m_errorMessage, true)
+						return
+					}
+
+					PopupManager.addSuccessMessage(qsTr("The documents have been shared"), true)
+					root.doUpdateGui()
+				}
+			}
+		}
+
+		function getHeaders(){
+			return root.getHeaders()
+		}
+	}
+
+	Component {
+		id: shareDocumentDialogComp
+
+		ShareDocumentDialog {
+			onShareRequested: {
+				root.shareDocuments(objectIds, targetTenantIds, accessLevel, validUntil, message)
+			}
+		}
+	}
+
+	Component {
+		id: sharingScopeFilterComp
+
+		SharingScopeFilterDelegate {
 		}
 	}
 
@@ -79,14 +196,19 @@ CollectionView {
 			requestedFields: root.requestedFields
 			permissionPaths: root.permissionPaths
 
-			additionalFieldIds: root.additionalFieldIds;
+			additionalFieldIds: root.sharingEnabled ? root.additionalFieldIds.concat(["sharingAccess"]) : root.additionalFieldIds;
 
 			onRemoved: {
 				root.removed()
 			}
 
 			function getHeaders(){
-				return root.getHeaders();
+				let headers = root.getHeaders()
+				if (root.sharingEnabled){
+					headers["sharingScope"] = root.getSharingScope()
+				}
+
+				return headers;
 			}
 		}
 	}
@@ -210,6 +332,7 @@ CollectionView {
 		id: collectionChangeListener
 		collectionId: root.collectionId
 		currentUserId: AuthorizationController.getUserId()
+		deliveryEnabled: root.visible
 
 		function getHeaders() {
 			return root.getHeaders()
@@ -218,6 +341,10 @@ CollectionView {
 		onChanged: {
 			root.collectionChanged(changeInfo)
 			root.handleSubscription(rawData, changeInfo)
+		}
+
+		onRefreshRequired: {
+			root.doUpdateGui()
 		}
 
 		onInserted: {

@@ -310,36 +310,37 @@ bool CObjectCollectionBase::GetObjectData(const Id& objectId, DataPtr& dataPtr, 
 	QReadLocker locker(&m_lock);
 
 	for (const ObjectInfo& objectInfo : m_objects){
-		if ((objectInfo.id == objectId) && objectInfo.dataPtr.IsValid()){
-			if (objectInfo.typeId == s_externalLinkTypeId){
-				const ICollectionObjectLink* linkPtr = dynamic_cast<const ICollectionObjectLink*>(objectInfo.dataPtr.GetPtr());
-				Q_ASSERT(linkPtr != nullptr);
-
-				QByteArray realObjectTypeId = linkPtr->GetFactoryId();
-				imtbase::IObjectCollection* externalStoragePtr = GetObjectStorage(realObjectTypeId, nullptr);
-				if (externalStoragePtr == nullptr){
-					return false;
-				}
-
-				QByteArray externalObjectId = linkPtr->GetObjectUuid();
-
-				return externalStoragePtr->GetObjectData(externalObjectId, dataPtr);
-			}
-
-			if (!dataPtr.IsValid()){
-				istd::IChangeableUniquePtr newInstancePtr = CreateDataObject(objectInfo.typeId);
-				if (newInstancePtr.IsValid()){
-					if (newInstancePtr->CopyFrom(*objectInfo.dataPtr, objectInfo.copyMode)){
-						dataPtr.FromUnique(std::move(newInstancePtr));
-
-						return true;
-					}
-				}
-			}
-			else{
-				return dataPtr->CopyFrom(*objectInfo.dataPtr, objectInfo.copyMode);
-			}
+		if ((objectInfo.id != objectId) || !objectInfo.dataPtr.IsValid()){
+			continue;
 		}
+
+		if (objectInfo.typeId == s_externalLinkTypeId){
+			const ICollectionObjectLink* linkPtr = dynamic_cast<const ICollectionObjectLink*>(objectInfo.dataPtr.GetPtr());
+			Q_ASSERT(linkPtr != nullptr);
+
+			QByteArray realObjectTypeId = linkPtr->GetFactoryId();
+			imtbase::IObjectCollection* externalStoragePtr = GetObjectStorage(realObjectTypeId, nullptr);
+			if (externalStoragePtr == nullptr){
+				return false;
+			}
+
+			QByteArray externalObjectId = linkPtr->GetObjectUuid();
+
+			return externalStoragePtr->GetObjectData(externalObjectId, dataPtr);
+		}
+
+		if (dataPtr.IsValid()){
+			return dataPtr->CopyFrom(*objectInfo.dataPtr, objectInfo.copyMode);
+		}
+
+		istd::IChangeableUniquePtr dataCopyPtr = CreateDataCopy(objectInfo);
+		if (!dataCopyPtr.IsValid()){
+			return false;
+		}
+
+		dataPtr.FromUnique(std::move(dataCopyPtr));
+
+		return true;
 	}
 
 	return false;
@@ -1011,6 +1012,17 @@ void CObjectCollectionBase::RemoveAllObjects()
 	m_objects.clear();
 
 	locker.unlock();
+}
+
+
+istd::IChangeableUniquePtr CObjectCollectionBase::CreateDataCopy(const ObjectInfo& objectInfo) const
+{
+	istd::IChangeableUniquePtr retVal = CreateDataObject(objectInfo.typeId);
+	if (!retVal.IsValid() || !retVal->CopyFrom(*objectInfo.dataPtr, objectInfo.copyMode)){
+		return nullptr;
+	}
+
+	return retVal;
 }
 
 

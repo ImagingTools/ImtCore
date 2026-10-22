@@ -18,10 +18,12 @@ Rectangle {
 
 	property bool opened: true
 
+	// A light card: a thin frame shows where the group ends, hairlines separate its rows,
+	// each row draws its own hover wash.
 	border.width: 1
 	border.color: Style.borderColor
 
-	radius: Style.marginXS
+	radius: Style.radiusM
 
 	color: Style.baseColor
 
@@ -114,9 +116,11 @@ Rectangle {
 	}
 
 	Component.onDestruction: {
-		if (!internal.watched){
+		// The web runtime destroys `internal` before this handler runs.
+		if (!internal || !internal.watched){
 			return
 		}
+
 		for (let i = 0; i < internal.watched.length; i++){
 			if (internal.watched[i]){
 				internal.watched[i].visibleChanged.disconnect(container.scheduleRecalc)
@@ -130,7 +134,6 @@ Rectangle {
 		id: separatorComp
 		Rectangle {
 			height: 1
-			opacity: 0.5
 			color: Style.borderColor
 			objectName: "Separator"
 		}
@@ -183,6 +186,10 @@ Rectangle {
 				item.border.width = 0
 			}
 
+			if (item.flat !== undefined){
+				item.flat = true
+			}
+
 			// Reset anchors
 			item.anchors.top = undefined
 			item.anchors.bottom = undefined
@@ -210,8 +217,9 @@ Rectangle {
 				separator.anchors.top = visibleItems[i-1].bottom
 				separator.anchors.left = container.left
 				separator.anchors.right = container.right
-				separator.anchors.leftMargin = container.border.width
-				separator.anchors.rightMargin = container.border.width
+				// Inset to the rows' padding, so the rule reads as a row break, not as another frame.
+				separator.anchors.leftMargin = container.border.width + Style.marginL
+				separator.anchors.rightMargin = container.border.width + Style.marginL
 
 				item.anchors.top = separator.bottom
 			}

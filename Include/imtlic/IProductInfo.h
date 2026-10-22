@@ -266,18 +266,24 @@ public:
 
 	Holding a permission means holding what it requires: a permission "A" whose
 	requirements name "B" and "C" grants those too, and whatever they require in
-	turn. Requirements are stored as full feature paths (\see CalculateFeaturePath).
+	turn. Requirements are stored as full feature paths (\see CalculateFeaturePath);
+	a required group grants all of its leaves, and the requirements declared on a
+	group apply to every feature in it. A requirement naming the feature itself,
+	one of its ancestors or descendants is ignored.
 
-	A held permission is accepted in either format: as such a path, or by feature
-	id alone as older versions stored them - a bare id then stands for every
-	feature carrying it, the same way the permission check itself reads it
-	(\see imtauth::HasPermission).
+	Held permissions and requirements are full paths; anything else names no feature
+	and implies nothing (\see imtauth::HasPermission).
 
 	\param productInfo Product whose feature tree declares the requirements.
 	\param permissionIds The permissions held.
-	\return The implied permissions, without the ones passed in. Requirement cycles terminate.
+	\return The implied leaf permissions, without the ones passed in. Requirement cycles terminate.
 */
 QByteArrayList CollectImpliedPermissions(IProductInfo& productInfo, const QByteArrayList& permissionIds);
+
+/**
+	Get every permission of a product: the full paths of the leaf features marked as permissions.
+*/
+QByteArrayList CollectProductPermissions(IProductInfo& productInfo);
 
 
 typedef istd::TUniqueInterfacePtr<IProductInfo> IProductInfoUniquePtr;

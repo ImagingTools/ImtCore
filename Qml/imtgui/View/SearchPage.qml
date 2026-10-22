@@ -20,6 +20,9 @@ Item {
 	property string pendingRequestKey: ""
 	property var tabDataArrays: ({})
 
+	// Applications that still search from TopPanel keep their search box there.
+	readonly property bool ownSearchField: Style.enableTopPanel !== undefined ? !Style.enableTopPanel : false;
+
 	// Accumulating model for paged items of the currently active group/tab.
 	// We use ListModel to support append on loadMore (plain list assignment would lose previous pages).
 	ListModel {
@@ -33,7 +36,120 @@ Item {
 	Component.onDestruction: {
 		Events.unSubscribeEvent("GlobalSearchActivated", root.updateSearch)
 	}
+
+	// Empty, the field stands alone in the middle of the page; once there is
+	// something to show it moves up out of the way of the results.
+	Item {
+		id: searchHeader;
+
+		anchors.top: parent.top;
+		anchors.left: parent.left;
+		anchors.right: parent.right;
+
+		height: !root.ownSearchField ? 0
+			: root.currentText === "" ? root.height
+			: Style.controlHeightL + 2 * Style.marginL;
+
+		visible: root.ownSearchField;
+
+		Column {
+			id: searchColumn;
+
+			anchors.centerIn: parent;
+
+			width: Math.min(parent.width - 2 * Style.marginXL, Style.sizeHintXXL);
+
+			spacing: Style.marginL;
+
+			Image {
+				anchors.horizontalCenter: parent.horizontalCenter;
+				width: Style.iconSizeXL;
+				height: width;
+				visible: searchTitle.visible;
+				source: "../../../" + Style.getIconPath("Icons/Search", Icon.State.Off, Icon.Mode.Disabled);
+				sourceSize.width: width;
+				sourceSize.height: height;
+			}
+
+			Text {
+				id: searchTitle;
+
+				width: parent.width;
+
+				horizontalAlignment: Text.AlignHCenter;
+
+				text: qsTr("Search everything");
+				color: Style.titleColor;
+				font.family: Style.fontFamilyBold;
+				font.pixelSize: Style.fontSizeXXL;
+
+				opacity: root.currentText === "" ? 1 : 0;
+				visible: searchTitle.opacity > 0;
+				height: visible ? implicitHeight : 0;
+			}
+
+			SearchTextInput {
+				id: searchField;
+
+				width: parent.width;
+				height: Style.controlHeightL;
+
+				radius: Style.textFieldRadius;
+				color: Style.inputBackgroundColor;
+				textSize: Style.fontSizeM;
+				placeHolderText: qsTr("Search across the whole application");
+
+				onSearchChanged: {
+					Events.sendEvent("GlobalSearchActivated", searchField.text);
+				}
+			}
+
+			Text {
+				id: searchSubtitle;
+
+				width: parent.width;
+
+				horizontalAlignment: Text.AlignHCenter;
+
+				text: qsTr("Documents, records and settings from every section are searched at once");
+				color: Style.inactiveTextColor;
+				font.family: Style.fontFamily;
+				font.pixelSize: Style.fontSizeM;
+				wrapMode: Text.WordWrap;
+
+				opacity: searchTitle.opacity;
+				visible: searchSubtitle.opacity > 0;
+				height: visible ? implicitHeight : 0;
+			}
+		}
+	}
 	
+	function navigateToItem(item){
+		if (!item){
+			return
+		}
+
+		let objectLink = item.m_objectLink
+		if (!objectLink){
+			console.error("Unable to navigate to item. Error: Object Link is invalid")
+			return
+		}
+
+		let url = objectLink.m_url
+		if (!url){
+			console.error("Unable to navigate to item. Error: URL is invalid")
+			return
+		}
+
+		let params = {}
+		params["textFilter"] = root.currentText
+		params["resultName"] = item.m_resultName
+		params["resultDescription"] = item.m_resultDescription
+		params["contextId"] = item.m_contextId
+		params["contextTypeId"] = item.m_contextTypeId
+		NavigationController.navigate(url.m_path, params)
+	}
+
 	function makeRequestKey(text, rid, off) {
 		return text + "|" + (rid ? rid : "") + "|" + off
 	}
@@ -157,7 +273,13 @@ Item {
 
 	SearchResultsView {
 		id: searchResultsView;
-		anchors.fill: parent;
+
+		anchors.top: searchHeader.bottom;
+		anchors.left: parent.left;
+		anchors.right: parent.right;
+		anchors.bottom: parent.bottom;
+
+		visible: !root.ownSearchField || root.currentText !== "";
 
 		categories: root.categories
 		activeItems: root.activeTabItems
@@ -175,70 +297,22 @@ Item {
 		}
 		
 		onItemDoubleClicked: {
-			// Support both full searchResults shape and our active items
+			// Paged items of the active tab first, the discovery response otherwise.
 			let itemsSource = root.activeTabItems
 			let useTab = root.activeTabIndex
-			if (!itemsSource && searchResultsView.searchResults){
-				itemsSource = null
-				if (searchResultsView.searchResults.m_searchResults && useTab >= 0){
-					let r = searchResultsView.searchResults.m_searchResults.get(useTab)
-					if (r && r.item){
-						itemsSource = r.item.m_items
-					}
+			if (!itemsSource && searchResultsView.searchResults && searchResultsView.searchResults.m_searchResults && useTab >= 0){
+				let r = searchResultsView.searchResults.m_searchResults.get(useTab)
+				if (r && r.item){
+					itemsSource = r.item.m_items
 				}
 			}
-			if ((!itemsSource || useTab < 0) && searchResultsView.searchResults && useTab >= 0 && itemIndex >= 0){
-				let resultItem = searchResultsView.searchResults.m_searchResults.get(useTab).item;
-				if (!resultItem){
-					return;
-				}
-				let item = resultItem.m_items.get(itemIndex).item;
-				if (!item){
-					return;
-				}
-				let objectLink = item.m_objectLink
-				if (!objectLink){
-					console.error("Unable to navigate to item. Error: Object Link is invalid")
-					return
-				}
-				let url = objectLink.m_url
-				if (!url){
-					console.error("Unable to navigate to item. Error: URL is invalid")
-					return
-				}
-				let params = {}
-				params["textFilter"] = root.currentText
-				params["resultName"] = item.m_resultName
-				params["resultDescription"] = item.m_resultDescription
-				params["contextId"] = item.m_contextId
-				params["contextTypeId"] = item.m_contextTypeId
-				NavigationController.navigate(url.m_path, params)
+
+			if (!itemsSource || itemIndex < 0){
 				return
 			}
-			if (itemsSource && itemIndex >= 0){
-				let it = itemsSource.get ? itemsSource.get(itemIndex) : null
-				let item = it && it.item ? it.item : it
-				if (!item){
-					return
-				}
-				let objectLink = item.m_objectLink
-				if (!objectLink){
-					console.error("Unable to navigate to item. Error: Object Link is invalid")
-					return
-				}
-				let url = objectLink.m_url
-				if (!url){
-					console.error("Unable to navigate to item. Error: URL is invalid")
-					return
-				}
-				let params = {}
-				params["textFilter"] = root.currentText
-				params["resultName"] = item.m_resultName
-				params["resultDescription"] = item.m_resultDescription
-				params["contextId"] = item.m_contextId
-				params["contextTypeId"] = item.m_contextTypeId
-				NavigationController.navigate(url.m_path, params)
-			}
+
+			let it = itemsSource.get ? itemsSource.get(itemIndex) : null
+			root.navigateToItem(it && it.item ? it.item : it)
 		}
 	}
 	

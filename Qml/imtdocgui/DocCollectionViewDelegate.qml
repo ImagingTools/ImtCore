@@ -10,6 +10,8 @@ CollectionViewCommandsDelegateBase{
 	
 	property DocumentServiceBase documentManager: null
 	property string documentManagerId: collectionId
+	// Permission area of the revisions of the collection, e.g. "/SensorManagement/Revisions".
+	property string revisionsPermissionPath: ""
 
 	property var documentConfigs: ({})
 
@@ -148,6 +150,8 @@ CollectionViewCommandsDelegateBase{
 
 			let itemId = elementsModel.getData("id", indexes[i]);
 			let typeId = elementsModel.getData("typeId", indexes[i]);
+			let accessLevel = elementsModel.containsKey("sharingAccess", indexes[i]) ? String(elementsModel.getData("sharingAccess", indexes[i])) : ""
+			documentManager.setObjectReadOnly(itemId, accessLevel === "View")
 
 			documentManager.openDocument(typeId, itemId)
 		}
@@ -293,6 +297,7 @@ CollectionViewCommandsDelegateBase{
 		id: documentRevisionDialogComp;
 		DocumentRevisionDialog {
 			collectionId: commandsDelegate.collectionId
+			revisionsPermissionPath: commandsDelegate.revisionsPermissionPath
 		}
 	}
 }

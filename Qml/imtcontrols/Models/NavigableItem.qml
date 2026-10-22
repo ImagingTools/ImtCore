@@ -64,9 +64,11 @@ Item {
 		\param matchedPath The path segment that matched this Navigable
 	*/
 	signal activated(var params, var restPath, string matchedPath)
-	signal parentActivated(var params)
+	// restPath: the segments after the parent, so a child can tell a bare parent path from one passing through.
+	signal parentActivated(var params, var restPath)
 
 	Component.onCompleted: {
+		internal.completed = true
 		internal.tryRegister()
 	}
 
@@ -77,7 +79,14 @@ Item {
 	QtObject {
 		id: internal
 		property bool registered: false
+		// Not before completion: a pending path delivered while the item is still being created reaches
+		// handlers whose properties are reset to their initial values right after.
+		property bool completed: false
 		function tryRegister() {
+			if (!completed) {
+				return
+			}
+
 			if (registered) {
 				NavigationController.deliverPending(root)
 			}
@@ -117,7 +126,7 @@ Item {
 			if (child.parentSegment !== segment)
 				continue
 
-			child.parentActivated(params)
+			child.parentActivated(params, restPath)
 
 			if (!delivered && forwardRest && hasRest && child.segmentIsSupported(next)) {
 				child.processSegment(next, params, restPath.slice(1))

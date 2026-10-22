@@ -32,7 +32,7 @@ Item {
 		radius: height / 2
 		color: !control.active ? (control.primary ? Style.backgroundColor2 : "transparent")
 			: control.primary ? (commandArea.containsMouse ? Style.textSelectedColor : Style.titleColor)
-			: commandArea.containsMouse ? Style.hover : "transparent"
+			: commandArea.containsMouse ? Style.toolButtonHoverColor : "transparent"
 	}
 
 	Row {

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="6390" Description="ACF"/>
+            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="AppleClientIdParam" X="200" Y="425" Note=""/>
+        <Element ComponentName="AppleClientSecretParam" X="200" Y="500" Note=""/>
+        <Element ComponentName="CallbackUrlParam" X="200" Y="125" Note=""/>
+        <Element ComponentName="ExternalLoginParams" X="550" Y="300" Note=""/>
+        <Element ComponentName="FacebookClientIdParam" X="200" Y="575" Note=""/>
+        <Element ComponentName="FacebookClientSecretParam" X="200" Y="650" Note=""/>
+        <Element ComponentName="OidcAuthorizationEndpointParam" X="850" Y="125" Note=""/>
+        <Element ComponentName="OidcClientIdParam" X="850" Y="200" Note=""/>
+        <Element ComponentName="OidcClientSecretParam" X="850" Y="275" Note=""/>
+        <Element ComponentName="OidcIssuerParam" X="850" Y="350" Note=""/>
+        <Element ComponentName="OidcProviderNameParam" X="850" Y="425" Note=""/>
+        <Element ComponentName="OidcTokenEndpointParam" X="850" Y="500" Note=""/>
+        <Element ComponentName="OidcUserInfoEndpointParam" X="850" Y="575" Note=""/>
+        <Element ComponentName="GoogleClientIdParam" X="200" Y="275" Note=""/>
+        <Element ComponentName="GoogleClientSecretParam" X="200" Y="350" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

@@ -5,6 +5,7 @@ import imtgui 1.0
 Item {
     property string pageId;
     property string pageName;
+    property string pageIcon;
     property string startItemSource;
     property Component startItemSourceComp;
 

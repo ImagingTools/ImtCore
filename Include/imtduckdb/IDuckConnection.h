@@ -26,7 +26,7 @@ namespace imtduckdb
 	builder needs - DDL, bulk append, table swap - is available here so that an entire rebuild can
 	run off-thread without ever touching the shared connection.
 
-	Instances are created by IDuckDatabaseMaintenance::CreateConnection(). A single instance must be
+	Instances are created by IDuckConnectionProvider::CreateConnection(). A single instance must be
 	used by a single thread at a time and must not outlive the database it was created from.
 */
 class IDuckConnection: virtual public imtdb::IDatabaseEngine
@@ -44,7 +44,7 @@ public:
 
 	/**
 		Atomically replaces \a liveTableName with \a shadowTableName, so readers on other connections
-		never observe a half-built table. See imtduckdb::SwapTable().
+		never observe a half-built table. See CDuckTableOperations::SwapTable().
 	*/
 	virtual bool SwapTable(
 				const QString& liveTableName,
@@ -54,3 +54,4 @@ public:
 
 
 } // namespace imtduckdb
+

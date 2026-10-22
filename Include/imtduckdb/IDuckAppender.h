@@ -35,15 +35,20 @@ public:
 	*/
 	virtual bool AppendRow(const QVariantList& rowValues) = 0;
 
-	//! Commits all buffered rows to the table.
+	/**
+		Commits all buffered rows to the table.
+	*/
 	virtual bool Flush() = 0;
-
-	//! Flushes and closes the appender. AppendRow() must not be called afterwards.
+	/**
+		Flushes and closes the appender. AppendRow() must not be called afterwards.
+	*/
 	virtual bool Close() = 0;
-
-	//! Returns the last error message, if any of the calls above returned false.
+	/**
+		Returns the last error message, if any of the calls above returned false.
+	*/
 	virtual QString GetLastError() const = 0;
 };
 
 
 } // namespace imtduckdb
+

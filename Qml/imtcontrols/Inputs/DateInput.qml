@@ -388,7 +388,9 @@ Item {
 						if(y_ + dateInput.calendarHeight > ModalDialogManager.activeView.height){
 							y_ = point.y - (input.height + 2) - dateInput.calendarHeight - 4;
 						}
-						let parameters = {"x": point.x, "y":y_};
+						// Kept inside the window: a field near the right edge would push the popup off screen.
+						let x_ = Math.max(0, Math.min(point.x, ModalDialogManager.activeView.width - dateInput.calendarWidth - Style.marginS));
+						let parameters = {"x": x_, "y":y_};
 
 
 						ModalDialogManager.openDialog(calendarComp, parameters);

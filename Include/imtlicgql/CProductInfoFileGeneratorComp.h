@@ -14,6 +14,11 @@ namespace imtlicgql
 {
 
 
+/**
+	Writes a product with its feature tree as a C++ header (c FillProduct) and reads such a header back.
+
+	Reading accepts exactly the statements this component writes; anything else fails with the line it was found on.
+*/
 class CProductInfoFileGeneratorComp: virtual public ifile::IFilePersistence, public ilog::CLoggerComponentBase
 {
 public:
@@ -43,6 +48,9 @@ public:
 	virtual QString GetTypeDescription(const QString* extensionPtr = NULL) const override;
 
 private:
+	bool ReadProduct(const QString& text, imtlic::IProductInfo& productInfo, QString& errorMessage) const;
+	static QString EscapeString(const QString& text);
+
 	void WriteIncludes(QTextStream& textStream) const;
 	void WriteNamespaceHeader(QTextStream& textStream, const QString& productName) const;
 	void WriteNamespaceFooter(QTextStream& textStream) const;

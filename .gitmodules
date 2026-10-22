@@ -58,3 +58,7 @@
 	path = 3rdParty/zstd
 	url = https://github.com/ImagingTools/zstd.git
 	branch = main
+[submodule "3rdParty/EjQml"]
+	path = 3rdParty/EjQml
+	url = https://github.com/ImagingTools/EjQml.git
+	branch = main

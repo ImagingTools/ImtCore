@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtduckdb/CDuckTableOperations.h>
 
 
@@ -13,7 +14,9 @@ namespace imtduckdb
 {
 
 
-bool SwapTable(
+// public static methods
+
+bool CDuckTableOperations::SwapTable(
 			imtdb::IDatabaseEngine& engine,
 			bool isTransactionActive,
 			const QString& liveTableName,
@@ -29,19 +32,21 @@ bool SwapTable(
 		return false;
 	}
 
-	const QString liveTableIdentifier = imtdb::QuoteIdentifier(liveTableName);
+	const QString liveTableIdentifier	= imtdb::QuoteIdentifier(liveTableName);
 	const QString shadowTableIdentifier = imtdb::QuoteIdentifier(shadowTableName);
 
 	QSqlError sqlError;
 	QSqlQuery existsQuery = engine.ExecSqlQuery(
-		QStringLiteral("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = '%1' AND table_schema = current_schema())")
-			.arg(imtdb::EscapeSql(liveTableName)).toUtf8(),
-		&sqlError);
+				QStringLiteral("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = '%1' AND table_schema = current_schema())")
+							.arg(imtdb::EscapeSql(liveTableName)).toUtf8(),
+				&sqlError);
 
 	const bool liveTableExists = sqlError.type() == QSqlError::NoError && existsQuery.next() && existsQuery.value(0).toBool();
 
 	if (sqlError.type() == QSqlError::NoError && liveTableExists){
-		// Renaming straight over an existing table is not supported, so park the old one under a backup name first.
+		/**
+			Renaming straight over an existing table is not supported, so the old one is parked under a backup name first.
+		*/
 		const QString backupTableIdentifier = imtdb::QuoteIdentifier(liveTableName + QStringLiteral("__shadow_swap_backup"));
 
 		engine.ExecSqlQuery(QStringLiteral("DROP TABLE IF EXISTS %1").arg(backupTableIdentifier).toUtf8(), &sqlError);
@@ -74,8 +79,60 @@ bool SwapTable(
 		return false;
 	}
 
-	if (ownsTransaction){
-		return engine.FinishTransaction();
+	if (!ownsTransaction){
+		return true;
+	}
+
+	return engine.FinishTransaction();
+}
+
+
+bool CDuckTableOperations::Execute(imtdb::IDatabaseEngine& engine, const QString& query, QString& errorMessage)
+{
+	QSqlError sqlError;
+	engine.ExecSqlQuery(query.toUtf8(), &sqlError);
+	if (sqlError.type() != QSqlError::NoError){
+		errorMessage = sqlError.text();
+
+		return false;
+	}
+
+	return true;
+}
+
+
+bool CDuckTableOperations::ReadValue(imtdb::IDatabaseEngine& engine, const QString& query, QVariant& value, QString& errorMessage)
+{
+	QSqlError sqlError;
+	QSqlQuery result = engine.ExecSqlQuery(query.toUtf8(), &sqlError);
+	if (sqlError.type() != QSqlError::NoError){
+		errorMessage = sqlError.text();
+
+		return false;
+	}
+
+	value = result.next() ? result.value(0) : QVariant();
+
+	return true;
+}
+
+
+bool CDuckTableOperations::ReadColumnNames(imtdb::IDatabaseEngine& engine, const QString& tableName, QStringList& columnNames, QString& errorMessage)
+{
+	QSqlError sqlError;
+	QSqlQuery result = engine.ExecSqlQuery(
+				QStringLiteral("SELECT column_name FROM information_schema.columns WHERE table_name = '%1' AND table_schema = current_schema() ORDER BY ordinal_position")
+							.arg(imtdb::EscapeSql(tableName)).toUtf8(),
+				&sqlError);
+	if (sqlError.type() != QSqlError::NoError){
+		errorMessage = sqlError.text();
+
+		return false;
+	}
+
+	columnNames.clear();
+	while (result.next()){
+		columnNames << result.value(0).toString();
 	}
 
 	return true;
@@ -83,3 +140,4 @@ bool SwapTable(
 
 
 } // namespace imtduckdb
+

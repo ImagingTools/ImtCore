@@ -19,7 +19,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ViewTenants</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -38,84 +38,84 @@
                     <AttributeInfo Id="CreateSubCollectionPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ViewTenants</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="ExportObjectPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ExportTenant</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="GetCollectionHeadersPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ViewTenants</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="GetCommandsPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ViewTenants</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="GetDataMetaInfoPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ViewTenants</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="GetElementIdsPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ViewTenants</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="GetElementMetaInfoPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ViewTenants</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="GetObjectDataPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ViewTenants</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="GetObjectTypeIdPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ViewTenants</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="GetObjectVisualStatusPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ViewTenants</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="ImportObjectPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ImportTenant</Value>
+                                <Value>/OrganizationManagement/Add</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="InsertNewObjectPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>AddTenant</Value>
+                                <Value>/OrganizationManagement/Add</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -125,49 +125,49 @@
                     <AttributeInfo Id="RemoveElementSetPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>RemoveTenant</Value>
+                                <Value>/OrganizationManagement/Remove</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="RemoveElementsPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>RemoveTenant</Value>
+                                <Value>/OrganizationManagement/Remove</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="RestoreObjectSetPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>RestoreTenant</Value>
+                                <Value>/OrganizationManagement/Remove</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="RestoreObjectsPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>RestoreTenant</Value>
+                                <Value>/OrganizationManagement/Remove</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="SetObjectDataPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ChangeTenant</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="SetObjectDescriptionPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ChangeTenant</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="SetObjectNamePermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ChangeTenant</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -256,7 +256,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/MemberManagement/ViewOrganizationMembers</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -278,7 +278,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/MemberManagement/EditOrganizationMember/InviteOrganizationMember</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -300,7 +300,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/MemberManagement/EditOrganizationMember/ExcludeOrganizationMember</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -322,7 +322,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/MemberManagement/EditOrganizationMember/InviteOrganizationMember</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -344,7 +344,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/MemberManagement/EditOrganizationMember/ExcludeOrganizationMember</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -366,7 +366,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/MemberManagement/EditOrganizationMember/ChangeOrganizationMember/ChangeOrganizationMemberRole</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -388,7 +388,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/MemberManagement/EditOrganizationMember/ChangeOrganizationMember/ChangeOrganizationMemberRole</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -410,7 +410,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/ConnectionManagement/ViewOrganizationConnectionCode</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -432,7 +432,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/ConnectionManagement/EditOrganizationConnection</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -454,7 +454,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/ConnectionManagement/EditOrganizationConnection</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -476,7 +476,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/ConnectionManagement/EditOrganizationConnection/ConnectOrganization</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -498,7 +498,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/ConnectionManagement/EditOrganizationConnection/ConnectOrganization</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -520,7 +520,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/ConnectionManagement/EditOrganizationConnection/ConnectOrganization</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -542,7 +542,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/ConnectionManagement/EditOrganizationConnection/ConnectOrganization</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -564,7 +564,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/ConnectionManagement/EditOrganizationConnection/RemoveOrganizationConnection</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -586,7 +586,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/ConnectionManagement/ViewOrganizationConnections</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -608,7 +608,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/ConnectionManagement/EditOrganizationConnection/RemoveOrganizationConnection</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -630,7 +630,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>AddTenant</Value>
+                                <Value>/OrganizationManagement/Add</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -652,7 +652,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ChangeTenant</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -674,7 +674,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ViewTenants</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -690,7 +690,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ViewTenants</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -706,7 +706,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>AddTenant</Value>
+                                <Value>/OrganizationManagement/Add</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -722,7 +722,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ChangeTenant</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -738,7 +738,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ChangeTenant</Value>
+                                <Value>/OrganizationManagement/Remove</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -754,7 +754,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ChangeTenant</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -770,7 +770,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/PermissionManagement/ViewOrganizationPermissions</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -786,7 +786,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/PermissionManagement/ViewOrganizationPermissions</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -802,7 +802,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/PermissionManagement/EditOrganizationMemberPermissions</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -818,7 +818,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/MemberManagement/ViewOrganizationMembers</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -834,7 +834,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/MemberManagement/ViewOrganizationMembers</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -850,7 +850,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/MemberManagement/ViewOrganizationMembers</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -866,7 +866,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/MemberManagement/EditOrganizationMember/InviteOrganizationMember</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -882,7 +882,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/ConnectionManagement/ViewOrganizationConnections</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -898,7 +898,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/ConnectionManagement/ViewOrganizationConnections</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -914,7 +914,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/ConnectionManagement/ViewOrganizationConnections</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -930,7 +930,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/ConnectionManagement/ViewOrganizationConnections</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -946,7 +946,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/ConnectionManagement/ViewOrganizationConnections</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -962,7 +962,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/ConnectionManagement/ViewOrganizationConnections</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -978,7 +978,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/ConnectionManagement/ViewOrganizationConnections</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -994,7 +994,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/ConnectionManagement/ViewOrganizationConnections</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -1010,7 +1010,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/ConnectionManagement/ViewOrganizationConnections</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -1026,7 +1026,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/ConnectionManagement/EditOrganizationConnection/ConnectOrganization</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -1042,7 +1042,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/ConnectionManagement/EditOrganizationConnection/ConnectOrganization</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -1058,7 +1058,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/ConnectionManagement/EditOrganizationConnection/ConnectOrganization</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -1074,7 +1074,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/ConnectionManagement/EditOrganizationConnection/ConnectOrganization</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -1090,7 +1090,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/ConnectionManagement/EditOrganizationConnection/ConnectOrganization</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -1106,7 +1106,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/ConnectionManagement/EditOrganizationConnection/ConnectOrganization</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -1122,7 +1122,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/ConnectionManagement/EditOrganizationConnection</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -1138,7 +1138,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/ConnectionManagement/EditOrganizationConnection</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -1154,7 +1154,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/ConnectionManagement/EditOrganizationConnection</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -1170,7 +1170,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/ConnectionManagement/EditOrganizationConnection</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -1186,7 +1186,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/ConnectionManagement/EditOrganizationConnection</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -1202,7 +1202,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/ConnectionManagement/EditOrganizationConnection</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -1218,7 +1218,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/ConnectionManagement/EditOrganizationConnection</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -1234,7 +1234,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/ConnectionManagement/EditOrganizationConnection</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -1250,7 +1250,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/ConnectionManagement/EditOrganizationConnection</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

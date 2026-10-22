@@ -3,6 +3,8 @@ const String = require("./String")
 const Signal = require("./Signal")
 
 class GqlRequest extends QtObject {
+    static requestTimeout = 120000
+
     static meta = Object.assign({}, QtObject.meta, {
         json: { type: String, value: ''},
         state: { type: String, value: ''},
@@ -24,23 +26,29 @@ class GqlRequest extends QtObject {
             }
         }
 
+        // A request that never answers ends as a transport error instead of loading forever.
+        xhr.timeout = GqlRequest.requestTimeout
+
         xhr.onreadystatechange = ()=>{
             if (!this.__destroyed && xhr.readyState === XMLHttpRequest.DONE){
 				if (xhr.status === 401){
 					this.state = "Unauthorized"
 				}
-				
-				if (xhr.status === 403){
+				else if (xhr.status === 403){
 					this.state = "Forbidden"
 				}
-				
-				if (xhr.status === 200){
+				else if (xhr.status === 200){
 					this.json = xhr.responseText
 					if (this.state === "Ready"){
 						this.state = "Loading"
 					}
-					
+
 					this.state = "Ready"
+				}
+				else{
+					// 5xx, a dropped connection (status 0) or a timeout: without this the request stayed in
+					// "Loading", finished() never came and the caller kept its loading indicator.
+					this.state = "Error"
 				}
 			}
 

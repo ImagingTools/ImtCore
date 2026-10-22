@@ -57,6 +57,10 @@ Item {
 				else if (restPath.length >= 1){
 					let documentTypeId = matchedPath
 					let documentId = restPath[0]
+					if (params && params.readOnly !== undefined){
+						workspaceView.documentManager.setObjectReadOnly(documentId, params.readOnly === true)
+					}
+
 					workspaceView.documentManager.openDocument(documentTypeId, documentId)
 				}
 			}
@@ -138,6 +142,10 @@ Item {
 		function onOpenedDocumentListReceiveFailed(message){
 			globalLoading.stop()
 			PopupManager.addErrorMessage(message, true)
+		}
+
+		function onDocumentLost(documentId, documentName){
+			PopupManager.addInfoMessage(qsTr("The document \"%1\" is no longer open on the server and was closed").arg(documentName), true)
 		}
 
 		function onDocumentGuiUpdated(documentId, representation){
@@ -311,7 +319,9 @@ Item {
 			workspaceView.startLoading(documentId)
 		}
 
+		// A representation update that follows starts the indicator again; waiting for it left it on when none came.
 		function onUndoDone(documentId){
+			workspaceView.stopLoading(documentId)
 		}
 
 		function onUndoFailed(documentId, message){
@@ -325,6 +335,7 @@ Item {
 		}
 
 		function onRedoDone(documentId){
+			workspaceView.stopLoading(documentId)
 		}
 
 		function onRedoFailed(documentId, message){

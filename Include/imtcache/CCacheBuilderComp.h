@@ -13,11 +13,9 @@
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
-#include <imtduckdb/IDuckConnectionProvider.h>
-
-// IotPlatform includes
 #include <imtcache/ICacheTableBuilder.h>
 #include <imtcache/ICacheUpdateController.h>
+#include <imtduckdb/IDuckConnectionProvider.h>
 
 
 namespace imtcache
@@ -75,19 +73,27 @@ private Q_SLOTS:
 	void OnUpdateFinished();
 
 private:
-	/// Body executed on the worker thread; takes its own connection and touches no shared state.
+	/**
+		Body executed on the worker thread; takes its own connection and touches no shared state.
+	*/
 	void RunUpdate(UpdateMode mode);
 
-	/// Orders the registered builders so each one follows the tables it requires.
+	/**
+		Orders the registered builders so each one follows the tables it requires.
+	*/
 	QList<const ICacheTableBuilder*> GetOrderedBuilders() const;
 
-	/// Runs one builder, falling back to a rebuild when no previous update time is available.
+	/**
+		Runs one builder, falling back to a rebuild when no previous update time is available.
+	*/
 	ICacheTableBuilder::BuildResult RunTableBuilder(
 				const ICacheTableBuilder& tableBuilder,
 				imtduckdb::IDuckConnection& connection,
 				UpdateMode mode) const;
 
-	/// Time of the newest source change already mirrored into \a tableName, if that table still exists.
+	/**
+		Time of the newest source change already mirrored into \a tableName, if that table still exists.
+	*/
 	QDateTime GetLastSourceUpdateTime(imtduckdb::IDuckConnection& connection, const QString& tableName) const;
 	bool SetLastSourceUpdateTime(imtduckdb::IDuckConnection& connection, const QString& tableName, const QDateTime& updateTime) const;
 	bool EnsureRevisionTable(imtduckdb::IDuckConnection& connection) const;
@@ -107,10 +113,13 @@ private:
 	bool m_hasPendingRequest = false;
 	UpdateMode m_pendingMode = UM_INCREMENTAL;
 
-	// Held while the observers are called, so a detached observer is never called afterwards.
+	/**
+		Held while the observers are called, so a detached observer is never called afterwards.
+	*/
 	QMutex m_observerMutex;
 	QList<IObserver*> m_observers;
 };
 
 
 } // namespace imtcache
+
