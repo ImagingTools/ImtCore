@@ -805,6 +805,10 @@ function qmlweb_tokenizer($TEXT, document_type) {
         function grow(op) {
             if (!peek()) return op;
             var bigger = op + peek();
+            // Optional chaining is `?.` only when the next character is not a
+            // decimal digit. `cond?.5:0` is a ternary whose true branch is `.5`.
+            if (bigger == "?." && is_digit(S.text.charAt(S.pos + 1)))
+                return op;
             if (HOP(OPERATORS, bigger)) {
                 next();
                 return grow(bigger);
