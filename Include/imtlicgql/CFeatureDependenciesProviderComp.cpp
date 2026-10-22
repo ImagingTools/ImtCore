@@ -71,6 +71,34 @@ QByteArrayList CFeatureDependenciesProviderComp::GetFeatureDependencies(const QB
 
 	QByteArrayList retVal;
 
+	// Walked with a visited set: requirements may form cycles.
+	QByteArrayList pendingFeatureIds = GetDirectFeatureDependencies(featureId);
+	while (!pendingFeatureIds.isEmpty()){
+		const QByteArray requirement = pendingFeatureIds.takeFirst();
+		if (requirement == featureId || retVal.contains(requirement)){
+			continue;
+		}
+
+		retVal << requirement;
+		pendingFeatureIds += GetDirectFeatureDependencies(requirement);
+	}
+
+	return retVal;
+}
+
+
+const imtlic::IFeatureInfoProvider* CFeatureDependenciesProviderComp::GetDependencyContainer(const QByteArray& /*dependencyId*/) const
+{
+	return nullptr;
+}
+
+
+// private methods
+
+QByteArrayList CFeatureDependenciesProviderComp::GetDirectFeatureDependencies(const QByteArray& featureId) const
+{
+	QByteArrayList retVal;
+
 	// Requirements are written as full feature paths, so the identifier the
 	// collection is indexed by is the last segment of whatever came in.
 	const QByteArray featureLeafId = featureId.mid(featureId.lastIndexOf('/') + 1);
@@ -92,33 +120,20 @@ QByteArrayList CFeatureDependenciesProviderComp::GetFeatureDependencies(const QB
 		if (m_featureCollectionCompPtr->GetObjectData(featureUuid, dataPtr)){
 			const imtlic::IFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::IFeatureInfo*>(dataPtr.GetPtr());
 			if (featureInfoPtr != nullptr){
-				QByteArrayList requirements;
 				if (featureInfoPtr->GetFeatureId() != featureLeafId){
 					imtlic::IFeatureInfoSharedPtr subfeatureInfoPtr = featureInfoPtr->GetSubFeature(featureLeafId);
 					if (subfeatureInfoPtr.IsValid()){
-						requirements = subfeatureInfoPtr->GetRequirements();
+						retVal = subfeatureInfoPtr->GetRequirements();
 					}
 				}
 				else{
-					requirements = featureInfoPtr->GetRequirements();
-				}
-
-				retVal += requirements;
-
-				for (const QByteArray& requirement : std::as_const(requirements)){
-					retVal += GetFeatureDependencies(requirement);
+					retVal = featureInfoPtr->GetRequirements();
 				}
 			}
 		}
 	}
 
 	return retVal;
-}
-
-
-const imtlic::IFeatureInfoProvider* CFeatureDependenciesProviderComp::GetDependencyContainer(const QByteArray& /*dependencyId*/) const
-{
-	return nullptr;
 }
 
 

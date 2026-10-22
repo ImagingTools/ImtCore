@@ -50,8 +50,18 @@ Item {
 	property var permissionsTree: null
 	property var selectedIds: []
 	property var lockedPermissions: ({})
-	// Marks locked (inherited) permissions with a lock and tells where they come from in the tooltip.
-	property bool showSource: false
+	// Checked and locked because a checked permission requires them {permissionId: [names of the requiring ones]}.
+	property var requiredPermissions: ({})
+	// Permissions each permission requires directly {permissionId: [permissionIds]}.
+	property var __requirements: ({})
+	// Ancestors of the required permissions, their check state is computed from all children {key: true}.
+	property var __requiredParents: ({})
+	property var __groupKeys: []
+	// Row picked in the "Selected only" table.
+	property string __selectedTableKey: ""
+	property string __filterText: ""
+	// Panel under the tree with the full name, path, description, source and requirements of the selected row.
+	property bool showDetails: true
 	// Shows the checked permissions, own and inherited, as a read-only table instead of the tree and its commands.
 	property bool selectedOnly: false
 	// Shown instead of the tree when there is nothing to show.
@@ -70,9 +80,10 @@ Item {
 	property int __selectionUpdateDepth: 0
 
 	readonly property real preferredHeight: root.selectedOnly
-		? (showControlPanel ? controlPanelTopMargin : 0) + selectedTable.contentHeight + treeBottomMargin
+		? (showControlPanel ? controlPanelTopMargin + headerArea.implicitHeight + treeTopMargin : 0)
+			+ selectedTable.headerHeight + selectedTable.contentHeight + (details.visible ? details.height + Style.marginM : 0) + treeBottomMargin
 		: (showControlPanel ? controlPanelTopMargin + headerArea.implicitHeight + treeTopMargin : 0)
-			+ permissionsTreeView.contentHeight + treeBottomMargin
+			+ permissionsTreeView.contentHeight + (details.visible ? details.height + Style.marginM : 0) + treeBottomMargin
 
 	signal selectionChanged()
 
@@ -94,6 +105,8 @@ Item {
 				continue
 			if (excludeLocked && root.lockedPermissions && root.lockedPermissions[keys[i]])
 				continue
+			if (excludeLocked && root.requiredPermissions[keys[i]])
+				continue
 			result.push(keys[i])
 		}
 		result.sort()
@@ -110,8 +123,10 @@ Item {
 		__beginSelectionUpdate()
 		for (var oldId in root.lockedPermissions) {
 			var oldNode = permissionsTreeView.nodeForKey(oldId)
-			if (oldNode && oldNode.data)
+			if (oldNode && oldNode.data) {
 				oldNode.data.source = ""
+				oldNode.data.badge = ""
+			}
 			permissionsTreeView.setNodeEnabled(oldId, true)
 			permissionsTreeView.refreshNode(oldId)
 		}
@@ -124,8 +139,10 @@ Item {
 			var node = permissionsTreeView.nodeForKey(id)
 			if (!node)
 				continue
-			if (node.data)
+			if (node.data) {
 				node.data.source = qsTr("Inherited from:") + " " + lockedMap[id]
+				node.data.badge = qsTr("Inherited")
+			}
 			permissionsTreeView.checkItem(id)
 			permissionsTreeView.setNodeEnabled(id, false)
 			// Cells re-read node data only when its tick changes.
@@ -142,14 +159,122 @@ Item {
 
 		root.lockedPermissions = lockedMap
 		root.__lockedParents = lockedParents
+		root.__applyRequirements()
 		__endSelectionUpdate()
 		root.__updateLockedParentStates()
 		root.updateSelectedRows()
 	}
 
+	/**
+	 * Checks and locks what the checked permissions require, transitively, and unchecks the required
+	 * ones nothing requires any more. Requirements cycles end, as every permission is visited once.
+	 */
+	function __applyRequirements() {
+		__beginSelectionUpdate()
+		var previous = root.requiredPermissions
+		var own = ({})
+		var queue = []
+		var visited = ({})
+		var keys = permissionsTreeView.getCheckedKeys()
+		for (var i = 0; i < keys.length; i++) {
+			if (keys[i].indexOf("__group__:") === 0)
+				continue
+			// Required ones count only through what requires them, unless they are inherited now.
+			if (previous[keys[i]] && !root.lockedPermissions[keys[i]])
+				continue
+			if (!root.lockedPermissions[keys[i]])
+				own[keys[i]] = true
+			queue.push(keys[i])
+			visited[keys[i]] = true
+		}
+
+		var required = ({})
+		while (queue.length > 0) {
+			var key = queue.shift()
+			var targets = root.__requirements[key] || []
+			var sourceName = key
+			for (var t = 0; t < targets.length; t++) {
+				var targetId = targets[t]
+				// Requirements outside this tree cannot be granted here.
+				if (!permissionsTreeView.nodeForKey(targetId))
+					continue
+				if (!own[targetId] && !root.lockedPermissions[targetId]) {
+					if (!required[targetId])
+						required[targetId] = []
+					if (required[targetId].indexOf(sourceName) < 0)
+						required[targetId].push(sourceName)
+				}
+				if (!visited[targetId]) {
+					visited[targetId] = true
+					queue.push(targetId)
+				}
+			}
+		}
+
+		for (var oldId in previous) {
+			if (required[oldId] || root.lockedPermissions[oldId])
+				continue
+			var oldNode = permissionsTreeView.nodeForKey(oldId)
+			if (oldNode && oldNode.data) {
+				oldNode.data.source = ""
+				oldNode.data.badge = ""
+			}
+			permissionsTreeView.setNodeEnabled(oldId, true)
+			permissionsTreeView.uncheckItem(oldId)
+			permissionsTreeView.refreshNode(oldId)
+		}
+
+		var requiredParents = ({})
+		for (var id in required) {
+			var node = permissionsTreeView.nodeForKey(id)
+			if (node.data) {
+				node.data.source = qsTr("Required by:") + " " + required[id].join(", ")
+				node.data.badge = qsTr("Required")
+			}
+			permissionsTreeView.setNodeEnabled(id, true)
+			permissionsTreeView.checkItem(id)
+			permissionsTreeView.setNodeEnabled(id, false)
+			permissionsTreeView.refreshNode(id)
+			var parentKey = node.parentKey
+			while (parentKey && parentKey !== "") {
+				requiredParents[parentKey] = true
+				var parentNode = permissionsTreeView.nodeForKey(parentKey)
+				parentKey = parentNode ? parentNode.parentKey : ""
+			}
+		}
+
+		root.requiredPermissions = required
+		root.__requiredParents = requiredParents
+		__endSelectionUpdate()
+		root.__updateLockedParentStates()
+	}
+
+	// Forgets the required permissions, e.g. before a selection is applied anew.
+	function __clearRequirements() {
+		for (var id in root.requiredPermissions) {
+			if (root.lockedPermissions[id])
+				continue
+			var node = permissionsTreeView.nodeForKey(id)
+			if (node && node.data) {
+				node.data.source = ""
+				node.data.badge = ""
+			}
+			permissionsTreeView.setNodeEnabled(id, true)
+			permissionsTreeView.refreshNode(id)
+		}
+		root.requiredPermissions = ({})
+		root.__requiredParents = ({})
+	}
+
 	// Locked parents are skipped by the tree's own roll-up, so their state is computed here from all children.
 	function __updateLockedParentStates() {
-		for (var key in root.__lockedParents) {
+		var parents = ({})
+		for (var lockedKey in root.__lockedParents)
+			parents[lockedKey] = true
+		for (var requiredKey in root.__requiredParents)
+			parents[requiredKey] = true
+
+		for (var key in parents) {
 			var node = permissionsTreeView.nodeForKey(key)
 			if (!node)
 				continue
@@ -169,29 +294,100 @@ Item {
 	}
 
 	// Rows of the "Selected only" table: every checked permission, inherited ones with their source.
+	function __setTreeModel(nodes) {
+		var groupKeys = []
+		for (var i = 0; i < nodes.length; i++)
+			groupKeys.push(nodes[i].key)
+		root.__groupKeys = groupKeys
+		permissionsTreeView.model = nodes
+	}
+
+	// "checked/all" next to each group name.
+	function __updateGroupCounters() {
+		for (var i = 0; i < root.__groupKeys.length; i++) {
+			var group = permissionsTreeView.nodeForKey(root.__groupKeys[i])
+			if (!group || !group.data)
+				continue
+			var checked = 0
+			for (var k = 0; k < group.childrenKeys.length; k++) {
+				var child = permissionsTreeView.nodeForKey(group.childrenKeys[k])
+				if (child && child.checked === Qt.Checked)
+					checked++
+			}
+			var counter = checked + "/" + group.childrenKeys.length
+			if (group.data.badge !== counter) {
+				group.data.badge = counter
+				permissionsTreeView.refreshNode(root.__groupKeys[i])
+			}
+		}
+	}
+
+	// Fills the details panel from the selected row of the tree, or of the table in the "Selected only" mode.
+	function __updateDetails() {
+		var keys = root.selectedOnly ? [root.__selectedTableKey] : permissionsTreeView.selectedKeys()
+		var node = keys.length > 0 && keys[0] !== "" ? permissionsTreeView.nodeForKey(keys[0]) : null
+		if (!node) {
+			details.path = ""
+			return
+		}
+
+		var key = keys[0]
+		var data = node.data || ({})
+		var isGroup = node.childrenKeys.length > 0
+		// Leaf keys are full paths already; a group is keyed by its feature id.
+		details.path = isGroup ? "/" + (data.id || "") : (data.id || key)
+		details.badge = data.badge || ""
+		details.description = data.description || ""
+		if (isGroup) {
+			details.source = qsTr("%1 of the permissions are selected").arg(data.badge || "")
+			details.requires = ""
+			return
+		}
+
+		details.source = data.source ? data.source
+			: node.checked === Qt.Checked ? qsTr("Selected here")
+			: qsTr("Not selected")
+		var requiredNames = []
+		var requirements = root.__requirements[key] || []
+		for (var i = 0; i < requirements.length; i++) {
+			if (permissionsTreeView.nodeForKey(requirements[i]))
+				requiredNames.push(requirements[i])
+		}
+		details.requires = requiredNames.join(", ")
+	}
+
 	function updateSelectedRows() {
 		var ids = root.getCheckedIds(false)
 		root.__checkedCount = ids.length
+		root.__updateGroupCounters()
+		// The table is refilled below, so its selection does not survive.
+		if (root.selectedOnly)
+			root.__selectedTableKey = ""
+		root.__updateDetails()
 		if (!root.selectedOnly)
 			return
 
 		var rows = []
+		var filter = root.__filterText.toLowerCase()
 		for (var i = 0; i < ids.length; i++) {
+			if (filter !== "" && ids[i].toLowerCase().indexOf(filter) < 0)
+				continue
 			var node = permissionsTreeView.nodeForKey(ids[i])
-			var source = root.lockedPermissions ? root.lockedPermissions[ids[i]] : undefined
 			rows.push({
 				id: ids[i],
-				title: node && node.text ? node.text : ids[i],
-				direct: !source,
-				paths: source ? source.split("; ") : []
+				fullPath: ids[i],
+				badge: node && node.data && node.data.badge ? node.data.badge : ""
 			})
 		}
 		root.__selectedRows = rows
+		selectedTable.resetSelection(true)
+		selectedTable.elements = rows
 	}
 
 	function checkAll() {
 		__beginSelectionUpdate()
 		permissionsTreeView.checkAll()
+		root.__applyRequirements()
 		__endSelectionUpdate()
 		root.updateSelectedRows()
 		if (!root.readOnly)
@@ -206,7 +402,8 @@ Item {
 			for (var id in root.lockedPermissions)
 				permissionsTreeView.setCheckStateSilent(id, Qt.Checked)
 		}
-		root.__updateLockedParentStates()
+		root.__clearRequirements()
+		root.__applyRequirements()
 		__endSelectionUpdate()
 		root.updateSelectedRows()
 		if (!root.readOnly)
@@ -225,6 +422,7 @@ Item {
 		__beginSelectionUpdate()
 		var prevFilter = permissionsTreeView.filterText
 		permissionsTreeView.filterText = ""
+		root.__clearRequirements()
 		permissionsTreeView.uncheckAll()
 		// Leaf keys are the raw permission ids, so each granted id can be
 		// checked directly in O(1) instead of enumerating every node in the
@@ -235,6 +433,7 @@ Item {
 		for (var i = 0; i < ids.length; i++)
 			permissionsTreeView.checkItem(ids[i])
 		permissionsTreeView.filterText = prevFilter
+		root.__applyRequirements()
 		__endSelectionUpdate()
 		root.updateSelectedRows()
 	}
@@ -279,7 +478,7 @@ Item {
 		)
 
 		var flatGrouped = __flattenTreeNodes(treeNodes)
-		permissionsTreeView.model = flatGrouped
+		root.__setTreeModel(flatGrouped)
 		__endSelectionUpdate()
 		root.updateSelectedRows()
 	}
@@ -294,8 +493,11 @@ Item {
 	function rebuildFromFlatArray(groups) {
 		loading.start()
 		__beginSelectionUpdate()
+		root.requiredPermissions = ({})
+		root.__requiredParents = ({})
+		root.__requirements = ({})
 		if (!groups || groups.length === 0) {
-			permissionsTreeView.model = []
+			root.__setTreeModel([])
 			__endSelectionUpdate()
 			root.updateSelectedRows()
 			__buildSettleTimer.restart()
@@ -303,6 +505,7 @@ Item {
 		}
 
 		var result = []
+		var requirements = ({})
 		for (var gi = 0; gi < groups.length; gi++) {
 			var group = groups[gi]
 			var groupChildren = []
@@ -310,6 +513,8 @@ Item {
 
 			for (var ei = 0; ei < entries.length; ei++) {
 				var entry = entries[ei]
+				if (entry.permissionId && entry.requirements && entry.requirements.length > 0)
+					requirements[entry.permissionId] = entry.requirements
 				groupChildren.push(TreeModelBuilder.node({
 					key: entry.permissionId || ("perm_" + gi + "_" + ei),
 					text: entry.displayName || "",
@@ -344,7 +549,8 @@ Item {
 			}))
 		}
 
-		permissionsTreeView.model = result
+		root.__requirements = requirements
+		root.__setTreeModel(result)
 		__endSelectionUpdate()
 		root.updateSelectedRows()
 		__buildSettleTimer.restart()
@@ -402,7 +608,7 @@ Item {
 			}))
 		}
 
-		permissionsTreeView.model = flatGrouped
+		root.__setTreeModel(flatGrouped)
 	}
 
 	/**
@@ -556,7 +762,7 @@ Item {
 	// --- Header ---
 	Column {
 		id: headerArea
-		visible: root.showControlPanel && !root.selectedOnly
+		visible: root.showControlPanel
 		height: visible ? implicitHeight : 0
 		anchors.top: parent.top
 		anchors.topMargin: root.controlPanelTopMargin
@@ -564,9 +770,11 @@ Item {
 		anchors.right: parent.right
 		spacing: Style.marginM
 
+		// The commands change the tree, so the "Selected only" table keeps only the filter.
 		Row {
 			width: parent.width
 			spacing: Style.marginM
+			visible: !root.selectedOnly
 
 			Item {
 				width: parent.width
@@ -656,32 +864,104 @@ Item {
 		SearchTextInput {
 			id: filterInput
 			width: parent.width
-			visible: !root.selectedOnly
 			placeHolderText: qsTr("Filter permissions...")
-			onTextChanged: permissionsTreeView.filterText = text
+			onTextChanged: {
+				permissionsTreeView.filterText = text
+				root.__filterText = text
+				if (root.selectedOnly)
+					root.updateSelectedRows()
+			}
 		}
 	}
 
 	// --- Selected only (read-only) ---
-	AssignmentsTable {
+	// Every checked permission, own and locked, in a standard table; the details panel tells where each comes from.
+	Table {
 		id: selectedTable
-		anchors.top: parent.top
-		anchors.topMargin: root.showControlPanel ? root.controlPanelTopMargin : 0
+		objectName: "SelectedPermissionsTable"
+		anchors.top: root.showControlPanel ? headerArea.bottom : parent.top
+		anchors.topMargin: root.showControlPanel ? root.treeTopMargin : 0
 		anchors.left: parent.left
 		anchors.right: parent.right
-		anchors.bottom: parent.bottom
-		anchors.bottomMargin: root.treeBottomMargin
+		anchors.bottom: details.visible ? details.top : parent.bottom
+		anchors.bottomMargin: details.visible ? Style.marginM : root.treeBottomMargin
 		visible: root.selectedOnly
-		plainRows: root.__selectedRows
-		showSourceColumn: root.showSource
-		nameTitle: qsTr("Permission")
-		emptyText: qsTr("No permissions are selected.")
-		filterPlaceholder: qsTr("Filter permissions...")
+		canMoveColumns: false
+		isMultiSelect: false
+
+		onSelectionChanged: {
+			root.__selectedTableKey = selection.length > 0 && selection[0] < root.__selectedRows.length ? root.__selectedRows[selection[0]].id : ""
+			root.__updateDetails()
+		}
+	}
+
+	Text {
+		anchors.top: selectedTable.top
+		anchors.topMargin: selectedTable.headerHeight + Style.marginXL
+		anchors.left: parent.left
+		anchors.right: parent.right
+		anchors.margins: Style.marginL
+		visible: root.selectedOnly && root.__selectedRows.length === 0
+		text: root.__filterText !== "" ? qsTr("No permissions match the filter.") : qsTr("No permissions are selected.")
+		horizontalAlignment: Text.AlignHCenter
+		wrapMode: Text.WordWrap
+		font.pixelSize: Style.fontSizeM
+		color: Style.inactiveTextColor
+	}
+
+	TableHeaders {
+		id: selectedHeaders
+
+		Component.onCompleted: {
+			addHeader("fullPath", qsTr("Full path"), false, false)
+			selectedTable.headers = selectedHeaders
+			selectedTable.setColumnContentById("fullPath", selectedPathCellComp)
+		}
+	}
+
+	// The path with its mark ("Inherited", "Required") on the right.
+	Component {
+		id: selectedPathCellComp
+
+		TableCellDelegateBase {
+			id: selectedPathCell
+
+			readonly property var row: selectedPathCell.rowIndex >= 0 && selectedPathCell.rowIndex < root.__selectedRows.length
+				? root.__selectedRows[selectedPathCell.rowIndex] : null
+
+			Item {
+				anchors.fill: parent
+
+				BaseText {
+					objectName: "PermissionPath"
+					anchors.verticalCenter: parent.verticalCenter
+					anchors.left: parent.left
+					anchors.leftMargin: Style.marginM
+					anchors.right: selectedBadge.visible ? selectedBadge.left : parent.right
+					anchors.rightMargin: Style.marginM
+					text: selectedPathCell.row ? selectedPathCell.row.fullPath : ""
+					font.pixelSize: Style.fontSizeM
+					color: Style.textColor
+					elide: Text.ElideLeft
+				}
+
+				StatusBadge {
+					id: selectedBadge
+					objectName: "PermissionBadge"
+					anchors.verticalCenter: parent.verticalCenter
+					anchors.right: parent.right
+					anchors.rightMargin: Style.marginM
+					visible: selectedPathCell.row !== null && selectedPathCell.row.badge !== ""
+					text: selectedPathCell.row ? selectedPathCell.row.badge : ""
+					textColor: Style.inactiveTextColor
+				}
+			}
+		}
 	}
 
 	// --- Tree (flat grouped) ---
-	// One column: a permission's name and its description share a cell, one
-	// above the other, so neither is squeezed by a second column beside it.
+	// One column: the name with a short mark on the right ("Inherited", "Required", or "checked/all" on groups);
+	// the rest of a row is in the details panel under the tree.
 	Component {
 		id: permissionCellComp
 
@@ -690,40 +970,43 @@ Item {
 
 			property var cellData: parent ? parent.nodeData : null
 			property bool cellSelected: parent ? parent.selected : false
-			property bool cellEnabled: parent ? parent.nodeEnabled : true
 			property bool isGroup: parent ? parent.hasChildren : false
-			property string title: permissionCell.cellData ? permissionCell.cellData.name || "" : ""
-			property string details: permissionCell.cellData ? permissionCell.cellData.description || "" : ""
+			property string badge: permissionCell.cellData ? permissionCell.cellData.badge || "" : ""
 
-			Column {
-				id: permissionTexts
+			Text {
+				objectName: "PermissionName"
 				anchors.left: parent.left
+				anchors.right: permissionCell.isGroup ? counterText.left : badgeItem.visible ? badgeItem.left : parent.right
+				anchors.rightMargin: permissionCell.badge !== "" ? Style.marginM : 0
+				anchors.verticalCenter: parent.verticalCenter
+				text: permissionCell.cellData ? permissionCell.cellData.name || "" : ""
+				font.family: Style.fontFamily
+				font.pixelSize: Style.fontSizeM
+				font.bold: permissionCell.isGroup
+				color: permissionCell.cellSelected ? Style.textSelectedColor : Style.textColor
+				elide: Text.ElideMiddle
+			}
+
+			Text {
+				id: counterText
+				objectName: "PermissionCounter"
 				anchors.right: parent.right
 				anchors.verticalCenter: parent.verticalCenter
-				spacing: Style.spacingXXS
+				visible: permissionCell.isGroup
+				text: permissionCell.isGroup ? permissionCell.badge : ""
+				font.family: Style.fontFamily
+				font.pixelSize: Style.fontSizeS
+				color: Style.inactiveTextColor
+			}
 
-				Text {
-					objectName: "PermissionName"
-					width: permissionTexts.width
-					text: permissionCell.title
-					font.family: Style.fontFamily
-					font.pixelSize: Style.fontSizeM
-					font.bold: permissionCell.isGroup
-					color: !permissionCell.cellEnabled ? Style.inactiveTextColor
-						: permissionCell.cellSelected ? Style.textSelectedColor : Style.textColor
-					elide: Text.ElideMiddle
-				}
-
-				Text {
-					objectName: "PermissionDescription"
-					width: permissionTexts.width
-					visible: permissionCell.details !== ""
-					text: permissionCell.details
-					font.family: Style.fontFamily
-					font.pixelSize: Style.fontSizeS
-					color: Style.inactiveTextColor
-					elide: Text.ElideRight
-				}
+			StatusBadge {
+				id: badgeItem
+				objectName: "PermissionBadge"
+				anchors.right: parent.right
+				anchors.verticalCenter: parent.verticalCenter
+				visible: !permissionCell.isGroup && permissionCell.badge !== ""
+				text: permissionCell.isGroup ? "" : permissionCell.badge
+				textColor: Style.inactiveTextColor
 			}
 		}
 	}
@@ -733,8 +1016,8 @@ Item {
 		id: treeArea
 		anchors.top: root.showControlPanel ? headerArea.bottom : parent.top
 		anchors.topMargin: root.showControlPanel ? root.treeTopMargin : 0
-		anchors.bottom: parent.bottom
-		anchors.bottomMargin: root.treeBottomMargin
+		anchors.bottom: details.visible ? details.top : parent.bottom
+		anchors.bottomMargin: details.visible ? Style.marginM : root.treeBottomMargin
 		anchors.left: parent.left
 		anchors.right: parent.right
 		visible: !root.selectedOnly
@@ -745,7 +1028,7 @@ Item {
 			anchors.right: parent.right
 			anchors.top: parent.top
 			anchors.topMargin: permissionsTreeView.showHeader ? permissionsTreeView.headerHeight + 1 : 0
-			anchors.bottom: parent.bottom
+			anchors.bottom: permissionsTreeView.bottom
 			secondSize: Style.marginM
 			targetItem: permissionsTreeView.contentListView
 		}
@@ -758,18 +1041,26 @@ Item {
 			anchors.left: parent.left
 			anchors.right: scrollbar.left
 			anchors.rightMargin: root.treeToScrollbarSpacing
-			showHeader: false
+			showHeader: true
 			tristate: true
-			rowHeight: Style.controlHeightL + Style.marginS
-			hintRole: root.showSource ? "source" : ""
+			// Locked rows stay selectable to show their details; their check box stays disabled.
+			allowDisabledSelection: true
+			rowHeight: Style.tableRowHeight
+			headerHeight: Style.tableHeaderHeight
+			hintRole: "source"
 			hintIcon: "Icons/Lock"
 			columns: [
 				{ id: "name", name: qsTr("Permission"), tree: true, delegate: permissionCellComp }
 			]
 			filterRole: ["name", "description"]
 
+			onSelectionChanged: root.__updateDetails()
+
 			onCheckedItemsChanged: {
-				root.__updateLockedParentStates()
+				if (root.__selectionUpdateDepth === 0)
+					root.__applyRequirements()
+				else
+					root.__updateLockedParentStates()
 				if (!root.readOnly && root.__selectionUpdateDepth === 0)
 					root.selectionChanged()
 				root.updateSelectedRows()
@@ -789,6 +1080,17 @@ Item {
 			font.pixelSize: Style.fontSizeM
 			color: Style.inactiveTextColor
 		}
+	}
+
+	PermissionDetailsPanel {
+		id: details
+		objectName: "PermissionDetails"
+		anchors.left: parent.left
+		anchors.right: parent.right
+		anchors.bottom: parent.bottom
+		anchors.bottomMargin: root.treeBottomMargin
+		visible: root.showDetails && (root.selectedOnly ? root.__selectedRows.length > 0 : permissionsTreeView.visibleCount > 0)
+		placeholderText: qsTr("Select a permission to see its path, source and requirements")
 	}
 
 	// Rebuilding + settling the tree's layout (see GroupElementView's own

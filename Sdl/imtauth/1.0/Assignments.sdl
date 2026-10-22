@@ -4,13 +4,14 @@ schema {
 }
 
 
-# Kind of entity an assignment is inherited through.
+# Kind of entity an assignment is inherited through. Requirement: required by the permission the step names.
 enum AssignmentSourceKind {
 	Group
 	ParentGroup
 	Role
 	ParentRole
 	DelegatedRole
+	Requirement
 }
 
 # One step of an inheritance path, outward from the edited object.

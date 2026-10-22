@@ -2,6 +2,9 @@
 #pragma once
 
 
+// ACF includes
+#include <iqt/ITranslationManager.h>
+
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <imtbase/IDocumentChangeGenerator.h>
@@ -38,6 +41,7 @@ public:
 		I_ASSIGN(m_bindingManagerCompPtr, "BindingManager", "Tenant entity binding manager for tenant-scoped adaptation of user roles/groups/permissions", false, "TenantEntityBindingManager");
 		I_ASSIGN(m_roleInfoProviderCompPtr, "RoleInfoProvider", "Role info provider (used for delegated role product validation)", false, "RoleInfoProvider");
 		I_ASSIGN(m_userChangeGeneratorCompPtr, "UserChangeGenerator", "Generates the change description of a profile update", false, "UserChangeGenerator");
+		I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translates the permission names of the profile", false, "TranslationManager");
 	I_END_COMPONENT;
 
 protected:
@@ -68,6 +72,7 @@ protected:
 	I_REF(imtauth::ITenantEntityBindingManager, m_bindingManagerCompPtr);
 	I_REF(imtauth::IRoleInfoProvider, m_roleInfoProviderCompPtr);
 	I_REF(imtbase::IDocumentChangeGenerator, m_userChangeGeneratorCompPtr);
+	I_REF(iqt::ITranslationManager, m_translationManagerCompPtr);
 };
 
 

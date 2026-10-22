@@ -165,10 +165,12 @@ PermissionsProvider {
                     var entry = entries.get(ei).item
                     if (!entry)
                         continue
+                    // [ID] maps to a plain JS array.
                     groupObj.entries.push({
                         "permissionId": entry.m_permissionId || "",
                         "displayName": entry.m_displayName || "",
-                        "description": entry.m_description || ""
+                        "description": entry.m_description || "",
+                        "requirements": Array.isArray(entry.m_requirements) ? entry.m_requirements : []
                     })
                 }
             }

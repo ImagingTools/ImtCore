@@ -24,6 +24,8 @@
 #include <iqt/iqt.h>
 #include <imtgql/CGqlRequest.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Tenants.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Permissions.h>
+#include <imtauthgql/CAssignmentCollector.h>
 
 
 // Qt includes
@@ -636,6 +638,7 @@ namespace imtauthgql
 	Collect flat permission entries from a feature subtree.
 	A permission is identified by the full path of its feature, e.g. "/Administration/EditUser/AddUser".
 	When allowedPermissionsPtr is set, returns only entries reachable from selected nodes.
+	When requirementsPtr is set, each entry lists the permissions it requires.
 */
 template<typename TEntry>
 inline bool CollectPermissionEntries(
@@ -646,7 +649,8 @@ inline bool CollectPermissionEntries(
 			const QString& parentName,
 			const iqt::ITranslationManager* translationManagerPtr,
 			bool parentSelected = false,
-			bool usePath = true)
+			bool usePath = true,
+			const imtlic::PermissionRequirements* requirementsPtr = nullptr)
 {
 	if (!featureInfo.IsPermission()){
 		return false;
@@ -678,6 +682,9 @@ inline bool CollectPermissionEntries(
 		entry.permissionId = usePath ? currentPath : featureInfo.GetFeatureId();
 		entry.displayName = displayName;
 		entry.description = featureDescription;
+		if (requirementsPtr != nullptr && usePath){
+			entry.requirements.Emplace().FromList(requirementsPtr->value(currentPath));
+		}
 		entries.append(entry);
 
 		return true;
@@ -707,7 +714,8 @@ inline bool CollectPermissionEntries(
 					displayName,
 					translationManagerPtr,
 					thisNodeSelected,
-					usePath)){
+					usePath,
+					requirementsPtr)){
 			childCount++;
 		}
 	}
@@ -745,6 +753,8 @@ inline void BuildPermissionGroups(
 		return;
 	}
 
+	const imtlic::PermissionRequirements requirements = imtlic::CollectPermissionRequirements(*productInfoPtr);
+
 	imtbase::ICollectionInfo::Ids elementIds = featureCollectionPtr->GetElementIds();
 	for (imtbase::ICollectionInfo::Id& elementId : elementIds){
 		imtbase::IObjectCollection::DataPtr dataPtr;
@@ -781,7 +791,9 @@ inline void BuildPermissionGroups(
 					allowedPermissionsPtr,
 					QString(),
 					translationManagerPtr,
-					groupSelected);
+					groupSelected,
+					true,
+					&requirements);
 		}
 		else{
 			for (int i = 0; i < subFeatures.count(); i++){
@@ -799,7 +811,9 @@ inline void BuildPermissionGroups(
 							allowedPermissionsPtr,
 							QString(),
 							translationManagerPtr,
-							groupSelected)){
+							groupSelected,
+							true,
+							&requirements)){
 						hasEntries = true;
 					}
 				}
@@ -894,6 +908,53 @@ inline void BuildPermissionGroupsFromProvider(
 
 		groups.append(group);
 	}
+}
+
+
+/**
+	Add to held permissions what they imply through the feature requirements of the product,
+	with the paths each one is required through, and give them the display names of the product.
+	\param availablePermissions Permissions the organization may hold; empty sets no limit.
+*/
+inline void AddRequiredPermissions(
+			imtsdl::TElementList<sdl::V1_0::imtauth::CAssignment>& permissions,
+			imtlic::IProductInfo& productInfo,
+			const iqt::ITranslationManager* translationManagerPtr,
+			const QByteArray& languageId,
+			const QByteArrayList& availablePermissions)
+{
+	imtsdl::TElementList<sdl::V1_0::imtauth::CPermissionGroup> groups;
+	BuildPermissionGroups<sdl::V1_0::imtauth::CPermissionGroup, sdl::V1_0::imtauth::CPermissionEntry>(
+				&productInfo,
+				translationManagerPtr,
+				groups,
+				languageId,
+				nullptr);
+
+	QHash<QByteArray, QString> names;
+	imtlic::PermissionRequirements requirements;
+	for (const istd::TNullableValue<sdl::V1_0::imtauth::CPermissionGroup>& group : groups){
+		if (!group.HasValue() || !group->entries){
+			continue;
+		}
+
+		const QString groupName = group->groupName ? *group->groupName : QString();
+		for (const istd::TNullableValue<sdl::V1_0::imtauth::CPermissionEntry>& entry : *group->entries){
+			if (!entry.HasValue() || !entry->permissionId){
+				continue;
+			}
+
+			// A feature without sub-features is a group of its own and carries the group's name.
+			const QString displayName = entry->displayName ? *entry->displayName : QString();
+			names.insert(*entry->permissionId, (displayName == groupName) ? displayName : groupName + QStringLiteral(" / ") + displayName);
+
+			if (entry->requirements){
+				requirements.insert(*entry->permissionId, entry->requirements->ToList());
+			}
+		}
+	}
+
+	CAssignmentCollector::AddRequiredPermissions(permissions, requirements, names, availablePermissions);
 }
 
 

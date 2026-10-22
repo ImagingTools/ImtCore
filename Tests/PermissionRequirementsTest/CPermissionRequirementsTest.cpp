@@ -226,6 +226,37 @@ void CPermissionRequirementsTest::testNoPermissions()
 }
 
 
+void CPermissionRequirementsTest::testRequirementsListDirectLeaves()
+{
+	const Requirements requirements{
+				{s_editUser, {s_viewRevisions}},
+				{s_changeUser, {s_viewAdministration}}};
+
+	imtlic::CProductInfo productInfo;
+	SetupProduct(productInfo, requirements);
+	const imtlic::PermissionRequirements collected = imtlic::CollectPermissionRequirements(productInfo);
+
+	QCOMPARE(Sorted(collected.value(s_changeUser)), Sorted({s_viewRevisions, s_viewUsers, s_viewRoles}));
+	QCOMPARE(collected.value(s_removeUser), QByteArrayList{s_viewRevisions});
+	QVERIFY(!collected.contains(s_changeRole));
+}
+
+
+void CPermissionRequirementsTest::testRequirementsListIsNotTransitive()
+{
+	const Requirements requirements{
+				{s_changeUser, {s_viewUsers}},
+				{s_viewUsers, {s_viewRevisions}}};
+
+	imtlic::CProductInfo productInfo;
+	SetupProduct(productInfo, requirements);
+	const imtlic::PermissionRequirements collected = imtlic::CollectPermissionRequirements(productInfo);
+
+	QCOMPARE(collected.value(s_changeUser), QByteArrayList{s_viewUsers});
+	QCOMPARE(Sorted(imtlic::CollectImpliedPermissions(collected, {s_changeUser})), Sorted({s_viewUsers, s_viewRevisions}));
+}
+
+
 void CPermissionRequirementsTest::testProductTakesRequiredGroup()
 {
 	imtlic::CProductInfo catalog;

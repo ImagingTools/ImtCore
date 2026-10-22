@@ -90,6 +90,30 @@ Item {
 		}
 	}
 
+	Timer {
+		id: loadMoreTimer
+		interval: 0
+		onTriggered: {
+			if (itemListView.count === 0 || root.loadingMore)
+				return
+
+			if (itemListView.contentHeight <= itemListView.height)
+				return
+			if (itemListView.atYEnd)
+				root.loadMoreRequested()
+		}
+	}
+
+	// Applies the kept position once more after the rows of the new page are created.
+	Timer {
+		id: pagingScrollTimer
+		interval: 0
+		onTriggered: {
+			if (itemListView.contentY < root.__pagingContentY)
+				itemListView.contentY = root.__pagingContentY
+		}
+	}
+
 	readonly property alias selectionManager: selectionManager_
 	readonly property string filterText: filterInput.text
 	readonly property int itemCount: itemListView.count
@@ -244,22 +268,22 @@ Item {
 			model: root.model
 			delegate: root.delegateComponent ? root.delegateComponent : defaultDelegateComponent
 
+			// A new model resets the list to the top. The page arrives with loadingMore already off; until then
+			// the model is only re-assigned. The rows are laid out first, or the position is clamped back to 0.
 			onModelChanged: {
-				if (root.__restorePagingScroll) {
+				if (root.__restorePagingScroll && !root.loadingMore) {
 					root.__restorePagingScroll = false
+					// The web runtime has no forceLayout(); there the timer below restores the position.
+					if (itemListView.forceLayout)
+						itemListView.forceLayout()
 					itemListView.contentY = root.__pagingContentY
+					pagingScrollTimer.restart()
 				}
 			}
 
-			onContentYChanged: {
-				if (itemListView.count === 0 || root.loadingMore)
-					return
-
-				if (itemListView.contentHeight <= itemListView.height)
-					return
-				if (itemListView.atYEnd)
-					root.loadMoreRequested()
-			}
+			// Checked on the next tick: when a page arrives, loadingMore goes off before the new model is
+			// set, and the list, shrinking back over the "Loading more" row, is at its end for a moment.
+			onContentYChanged: loadMoreTimer.restart()
 		}
 
 		Item {

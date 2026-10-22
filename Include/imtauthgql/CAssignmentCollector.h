@@ -42,7 +42,8 @@ public:
 		SK_PARENT_GROUP,
 		SK_ROLE,
 		SK_PARENT_ROLE,
-		SK_DELEGATED_ROLE
+		SK_DELEGATED_ROLE,
+		SK_REQUIREMENT
 	};
 
 	struct Step
@@ -121,9 +122,24 @@ public:
 	*/
 	static Assignments CreateDirectAssignments(const QByteArrayList& ids);
 
+	/**
+		Add the permissions the listed ones require, transitively, each with every path it is required
+		through, and name the permissions after the feature tree.
+		\param requirements		Leaf permissions every permission requires directly.
+		\param names			Display names of the permissions; others keep their names.
+		\param availablePermissions	Permissions the organization may hold; empty sets no limit.
+	*/
+	static void AddRequiredPermissions(
+				Assignments& permissions,
+				const QHash<QByteArray, QByteArrayList>& requirements,
+				const QHash<QByteArray, QString>& names,
+				const QByteArrayList& availablePermissions);
+
 private:
 	static Assignments CreateAssignmentList(const QList<Item>& items);
+	static QList<Item> CreateItemList(const Assignments& assignments);
 	static sdl::V1_0::imtauth::AssignmentSourceKind GetSdlKind(StepKind kind);
+	static StepKind GetStepKind(sdl::V1_0::imtauth::AssignmentSourceKind kind);
 	imtsdl::TElementList<sdl::V1_0::imtauth::CAccessWarning> CreateAccessWarningList() const;
 
 	static void AddItem(QList<Item>& items, const QByteArray& id, const QString& name, const Path& path);

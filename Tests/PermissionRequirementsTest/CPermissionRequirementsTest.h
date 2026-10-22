@@ -37,6 +37,10 @@ private Q_SLOTS:
 	void testUnknownPathIsNotResolvedByItsLastSegment();
 	void testNoPermissions();
 
+	// Requirements listed per permission
+	void testRequirementsListDirectLeaves();
+	void testRequirementsListIsNotTransitive();
+
 	// Features a product takes through requirements
 	void testProductTakesRequiredGroup();
 

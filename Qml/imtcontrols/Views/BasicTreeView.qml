@@ -117,9 +117,14 @@ Item {
     property string normalTextColor:         Style.textColor
     property string selectedTextColor:       Style.textSelectedColor
     property string disabledTextColor:       Style.inactiveTextColor
-    property string headerBackgroundColor:   Style.alternateBaseColor
+    // Header and rows as in Table: a plain header over a divider, every other row faintly striped.
+    property string headerBackgroundColor:   Style.baseColor
+    property string headerTextColor:         Style.titleColor
+    property string headerDividerColor:      Style.borderColor
     property string gridLineColor:           Style.borderColor2
     property string editorErrorColor:        Style.dangerColor
+    property bool   enableAlternating:       Style.enableTableAlternating !== undefined ? Style.enableTableAlternating : false
+    property string alternatingColor:        Style.tableAlternateRowColor !== undefined ? Style.tableAlternateRowColor : Style.alternateBaseColor
 
     // ─── Public readonly state ─────────────────────────────────────────────
 
@@ -244,7 +249,9 @@ Item {
                         anchors.rightMargin: Style.marginM
 
                         text: root.columnTitle(parent.column)
-                        color: root.normalTextColor
+                        color: root.headerTextColor
+                        font.family: Style.fontFamilyBold
+                        font.pixelSize: Style.fontSizeS
                         font.bold: true
                         verticalAlignment: Text.AlignVCenter
                         horizontalAlignment: parent.column && parent.column.horizontalAlignment !== undefined
@@ -307,6 +314,13 @@ Item {
             }
         }
 
+        Rectangle {
+            width: parent.width
+            height: root.showHeader ? 1 : 0
+            visible: root.showHeader
+            color: root.headerDividerColor
+        }
+
         // Data area
         ListView {
             id: listView
@@ -364,6 +378,7 @@ Item {
                 anchors.fill: parent
                 color: delegateRoot.nodeSelected ? root.selectedBackgroundColor
                      : delegateRoot.rowHovered  ? root.hoveredBackgroundColor
+                     : root.enableAlternating && delegateRoot.nodeVisibleRow % 2 === 1 ? root.alternatingColor
                      : "transparent"
             }
 
@@ -460,6 +475,11 @@ Item {
                         property bool   hasDelegate: !!(column && column.delegate) && !isBoolColumn
                         property bool   isEditingHere: root.editing && root.__editingKey === delegateRoot.nodeKey && root.__editingColumn === index
                         property string editorType: isEditingHere ? root.__pickEditorType(column, cellRawValue, delegateRoot.nodeKey) : ""
+                        // Arrow, check box and hint before the content, from their own sizes: a width taken from
+                        // the content's x lagged behind a hint appearing and pushed the content past the cell.
+                        property real leadingWidth: (arrowArea.visible ? arrowArea.width + cellContent.spacing : 0)
+                            + (checkBoxLoader.visible ? checkBoxLoader.width + cellContent.spacing : 0)
+                            + (hintLoader.visible ? hintLoader.width + cellContent.spacing : 0)
 
                         width: root.__columnWidths[index] !== undefined ? root.__columnWidths[index] : 0
                         height: delegateRoot.height
@@ -483,6 +503,7 @@ Item {
 
                             // Expand / collapse arrow (only in tree column)
                             Item {
+                                id: arrowArea
                                 width: cellRoot.treeColumn ? 16 : 0
                                 height: parent.height
                                 visible: cellRoot.treeColumn
@@ -515,6 +536,7 @@ Item {
 
                             // Tri-state checkbox (tree column, checkable nodes)
                             Loader {
+                                id: checkBoxLoader
                                 anchors.verticalCenter: parent.verticalCenter
                                 active: cellRoot.treeColumn && delegateRoot.nodeCheckable
                                 visible: active
@@ -543,6 +565,7 @@ Item {
                             }
 
                             Loader {
+                                id: hintLoader
                                 anchors.verticalCenter: parent.verticalCenter
                                 active: cellRoot.treeColumn && delegateRoot.hintText !== ""
                                 visible: active
@@ -563,7 +586,7 @@ Item {
                             Text {
                                 id: cellText
                                 anchors.verticalCenter: parent.verticalCenter
-                                width: Math.max(0, parent.width - x)
+                                width: Math.max(0, parent.width - cellRoot.leadingWidth)
                                 text: cellRoot.displayText
                                 visible: !cellRoot.isEditingHere && !cellRoot.isBoolColumn && !cellRoot.hasDelegate
                                 color: !delegateRoot.nodeIsEnabled ? root.disabledTextColor
@@ -579,7 +602,7 @@ Item {
                             Loader {
                                 id: cellDelegateLoader
                                 anchors.verticalCenter: parent.verticalCenter
-                                width: Math.max(0, parent.width - x)
+                                width: Math.max(0, parent.width - cellRoot.leadingWidth)
                                 height: parent.height
                                 active: cellRoot.hasDelegate
                                 visible: active && !cellRoot.isEditingHere
@@ -628,7 +651,7 @@ Item {
                             Loader {
                                 id: editorLoader
                                 anchors.verticalCenter: parent.verticalCenter
-                                width: Math.max(0, parent.width - x)
+                                width: Math.max(0, parent.width - cellRoot.leadingWidth)
                                 height: parent.height
                                 visible: cellRoot.isEditingHere
                                 active: cellRoot.isEditingHere
