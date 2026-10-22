@@ -130,68 +130,29 @@ sdl::V1_0::imtauth::CProfileData CProfileControllerComp::OnGetProfile(
 	// plus delegated role enrichment.
 	// =========================================================================
 
-	imtsdl::TElementList<sdl::V1_0::imtauth::CRoleInfo> roleList;
+	// Roles of the adapted user; the delegated ones it was given are not its own.
+	const QByteArrayList roles = GetTenantUserRoles(*effectiveUserPtr, currentTenantId, currentProductId, bindingPtr);
+	CAssignmentCollector collector;
+	collector.CollectUser(*effectiveUserPtr, roles, userInfoPtr->GetRoles(currentProductId), currentProductId);
+	collector.FillUser(profileData);
 
-	if (m_roleCollectionCompPtr.IsValid()){
-		// Use the (possibly tenant-adapted) roles list. The adaptation has
-		// already filtered according to tenant bindings and appended any
-		// delegated roles.
-		const QByteArrayList roles = GetTenantUserRoles(*effectiveUserPtr, currentTenantId, currentProductId, bindingPtr);
-
-		for (const QByteArray& roleId : std::as_const(roles)){
-			imtbase::IObjectCollection::DataPtr roleDataPtr;
-			if (m_roleCollectionCompPtr->GetObjectData(roleId, roleDataPtr)){
-				const imtauth::IRole* roleInfoPtr = dynamic_cast<const imtauth::IRole*>(roleDataPtr.GetPtr());
-				if (roleInfoPtr != nullptr){
-					sdl::V1_0::imtauth::CRoleInfo info;
-					info.id = QByteArray(roleInfoPtr->GetRoleId());
-					info.name = QString(roleInfoPtr->GetRoleName());
-					info.description = QString(roleInfoPtr->GetRoleDescription());
-
-					roleList << info;
-				}
-			}
+	// The collector walks parent roles without the tenant bindings, so only what is held in the tenant stays.
+	const QByteArrayList permissions = GetTenantUserPermissions(*effectiveUserPtr, currentTenantId, currentProductId, bindingPtr, roleProvPtr);
+	imtsdl::TElementList<sdl::V1_0::imtauth::CAssignment> permissionList;
+	for (const istd::TNullableValue<sdl::V1_0::imtauth::CAssignment>& assignment : *profileData.permissions){
+		if (assignment.HasValue() && assignment->id && permissions.contains(*assignment->id)){
+			permissionList << *assignment;
 		}
 	}
 
-	profileData.roles = std::move(roleList);
-
-	imtsdl::TElementList<sdl::V1_0::imtauth::CGroupInfo> groupList;
-
-	if (m_groupCollectionCompPtr.IsValid()){
-		// Groups from the (tenant-adapted) user. The AdaptUserForTenant
-		// has already applied binding-based filtering for the current tenant
-		// (or globals for No Organization).
-		QByteArrayList groups = effectiveUserPtr->GetGroups();
-
-		for (const QByteArray& groupId : std::as_const(groups)){
-			imtbase::IObjectCollection::DataPtr groupDataPtr;
-			if (m_groupCollectionCompPtr->GetObjectData(groupId, groupDataPtr)){
-				const imtauth::IUserGroupInfo* groupInfoPtr = dynamic_cast<const imtauth::IUserGroupInfo*>(groupDataPtr.GetPtr());
-				if (groupInfoPtr != nullptr){
-					sdl::V1_0::imtauth::CGroupInfo info;
-
-					info.id = QByteArray(groupInfoPtr->GetId());
-					info.name = QString(groupInfoPtr->GetName());
-					info.description = QString(groupInfoPtr->GetDescription());
-
-					groupList << info;
-				}
-			}
-		}
-	}
-
-	profileData.groups = std::move(groupList);
-
-	imtsdl::TElementList<sdl::V1_0::imtauth::CPermissionInfo> permissionList;
-
-	// Permissions from the adapted user (consistent with the binding-based
-	// tenant adaptation used for user collection views).
-	QByteArrayList permissions = GetTenantUserPermissions(*effectiveUserPtr, currentTenantId, currentProductId, bindingPtr, roleProvPtr);
-	for (const QByteArray& permissionId : std::as_const(permissions)){
-		sdl::V1_0::imtauth::CPermissionInfo info;
-		info.id = permissionId;
-		permissionList << info;
+	imtlic::IProductInfo* productInfoPtr = (gqlContextPtr != nullptr) ? gqlContextPtr->GetProductInfo() : nullptr;
+	if (productInfoPtr != nullptr){
+		AddRequiredPermissions(
+					permissionList,
+					*productInfoPtr,
+					m_translationManagerCompPtr.IsValid() ? m_translationManagerCompPtr.GetPtr() : nullptr,
+					gqlContextPtr->GetLanguageId(),
+					gqlContextPtr->GetTenantPermissions());
 	}
 
 	profileData.permissions = std::move(permissionList);

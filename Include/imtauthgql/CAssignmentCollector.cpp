@@ -3,6 +3,7 @@
 
 
 // ImtCore includes
+#include <imtauth/imtauth.h>
 #include <imtauth/IUserInfoProvider.h>
 
 
@@ -102,6 +103,86 @@ CAssignmentCollector::Assignments CAssignmentCollector::CreateDirectAssignments(
 }
 
 
+void CAssignmentCollector::AddRequiredPermissions(
+			Assignments& permissions,
+			const QHash<QByteArray, QByteArrayList>& requirements,
+			const QHash<QByteArray, QString>& names,
+			const QByteArrayList& availablePermissions)
+{
+	QList<Item> items = CreateItemList(permissions);
+
+	QByteArrayList pendingIds;
+	for (Item& item : items){
+		item.name = names.value(item.id, item.name.isEmpty() ? QString::fromUtf8(item.id) : item.name);
+		pendingIds << item.id;
+	}
+
+	// A permission whose paths grew is visited again, so its requirements get the new paths too.
+	while (!pendingIds.isEmpty()){
+		const QByteArray permissionId = pendingIds.takeFirst();
+
+		QList<Path> permissionPaths;
+		for (const Item& item : std::as_const(items)){
+			if (item.id == permissionId){
+				if (item.direct){
+					permissionPaths << Path();
+				}
+				permissionPaths += item.sources;
+				break;
+			}
+		}
+
+		const Step requirementStep{SK_REQUIREMENT, permissionId, names.value(permissionId, QString::fromUtf8(permissionId))};
+
+		for (const QByteArray& requiredId : requirements.value(permissionId)){
+			if (requiredId == permissionId){
+				continue;
+			}
+
+			if (!availablePermissions.isEmpty() && !imtauth::HasPermission(availablePermissions, requiredId, false)){
+				continue;
+			}
+
+			qsizetype itemIndex = -1;
+			for (qsizetype i = 0; i < items.size(); ++i){
+				if (items[i].id == requiredId){
+					itemIndex = i;
+					break;
+				}
+			}
+
+			if (itemIndex < 0){
+				Item item;
+				item.id = requiredId;
+				item.name = names.value(requiredId, QString::fromUtf8(requiredId));
+				items << item;
+				itemIndex = items.size() - 1;
+			}
+
+			bool isGrown = false;
+			for (const Path& path : std::as_const(permissionPaths)){
+				// A chain that already passed through the required permission is a requirement cycle.
+				if (path.contains(Step{SK_REQUIREMENT, requiredId, QString()})){
+					continue;
+				}
+
+				const Path requiredPath = Path(path) << requirementStep;
+				if (!items[itemIndex].sources.contains(requiredPath)){
+					items[itemIndex].sources << requiredPath;
+					isGrown = true;
+				}
+			}
+
+			if (isGrown && !pendingIds.contains(requiredId)){
+				pendingIds << requiredId;
+			}
+		}
+	}
+
+	permissions = CreateAssignmentList(items);
+}
+
+
 // private methods
 
 CAssignmentCollector::Assignments CAssignmentCollector::CreateAssignmentList(const QList<Item>& items)
@@ -137,6 +218,45 @@ CAssignmentCollector::Assignments CAssignmentCollector::CreateAssignmentList(con
 }
 
 
+QList<CAssignmentCollector::Item> CAssignmentCollector::CreateItemList(const Assignments& assignments)
+{
+	QList<Item> retVal;
+	for (const istd::TNullableValue<sdl::V1_0::imtauth::CAssignment>& assignment : assignments){
+		if (!assignment.HasValue() || !assignment->id){
+			continue;
+		}
+
+		Item item;
+		item.id = *assignment->id;
+		item.name = assignment->name ? *assignment->name : QString();
+		item.direct = assignment->direct && *assignment->direct;
+
+		if (assignment->sources){
+			for (const istd::TNullableValue<sdl::V1_0::imtauth::CAssignmentPath>& sdlPath : *assignment->sources){
+				if (!sdlPath.HasValue() || !sdlPath->steps){
+					continue;
+				}
+
+				Path path;
+				for (const istd::TNullableValue<sdl::V1_0::imtauth::CAssignmentStep>& sdlStep : *sdlPath->steps){
+					if (sdlStep.HasValue() && sdlStep->kind && sdlStep->id){
+						path << Step{GetStepKind(*sdlStep->kind), *sdlStep->id, sdlStep->name ? *sdlStep->name : QString()};
+					}
+				}
+
+				if (!path.isEmpty()){
+					item.sources << path;
+				}
+			}
+		}
+
+		retVal << item;
+	}
+
+	return retVal;
+}
+
+
 sdl::V1_0::imtauth::AssignmentSourceKind CAssignmentCollector::GetSdlKind(StepKind kind)
 {
 	switch (kind){
@@ -148,9 +268,31 @@ sdl::V1_0::imtauth::AssignmentSourceKind CAssignmentCollector::GetSdlKind(StepKi
 		return sdl::V1_0::imtauth::AssignmentSourceKind::ParentRole;
 	case SK_DELEGATED_ROLE:
 		return sdl::V1_0::imtauth::AssignmentSourceKind::DelegatedRole;
+	case SK_REQUIREMENT:
+		return sdl::V1_0::imtauth::AssignmentSourceKind::Requirement;
 	case SK_ROLE:
 	default:
 		return sdl::V1_0::imtauth::AssignmentSourceKind::Role;
+	}
+}
+
+
+CAssignmentCollector::StepKind CAssignmentCollector::GetStepKind(sdl::V1_0::imtauth::AssignmentSourceKind kind)
+{
+	switch (kind){
+	case sdl::V1_0::imtauth::AssignmentSourceKind::Group:
+		return SK_GROUP;
+	case sdl::V1_0::imtauth::AssignmentSourceKind::ParentGroup:
+		return SK_PARENT_GROUP;
+	case sdl::V1_0::imtauth::AssignmentSourceKind::ParentRole:
+		return SK_PARENT_ROLE;
+	case sdl::V1_0::imtauth::AssignmentSourceKind::DelegatedRole:
+		return SK_DELEGATED_ROLE;
+	case sdl::V1_0::imtauth::AssignmentSourceKind::Requirement:
+		return SK_REQUIREMENT;
+	case sdl::V1_0::imtauth::AssignmentSourceKind::Role:
+	default:
+		return SK_ROLE;
 	}
 }
 

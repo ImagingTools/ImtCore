@@ -36,6 +36,8 @@
         <file alias="imtauthgui/ProfileOrganizationsPage.qml">ProfileOrganizationsPage.qml</file>
         <file alias="imtauthgui/ProfileTokensPage.qml">ProfileTokensPage.qml</file>
         <file alias="imtauthgui/ProfileAccessPage.qml">ProfileAccessPage.qml</file>
+        <file alias="imtauthgui/PermissionDetailsPanel.qml">PermissionDetailsPanel.qml</file>
+        <file alias="imtauthgui/PermissionDetailsRow.qml">PermissionDetailsRow.qml</file>
         <file alias="imtauthgui/ProfileLinkedAccountsPage.qml">ProfileLinkedAccountsPage.qml</file>
         <file alias="imtauthgui/ExternalLoginButton.qml">ExternalLoginButton.qml</file>
         <file alias="imtauthgui/PermissionSourcesPage.qml">PermissionSourcesPage.qml</file>

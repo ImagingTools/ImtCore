@@ -408,20 +408,49 @@ void CollectProductRequirements(
 
 // public functions
 
+PermissionRequirements CollectPermissionRequirements(IProductInfo& productInfo)
+{
+	RequirementsByPath requirementsByPath;
+	LeavesByPath leavesByPath;
+	CollectProductRequirements(productInfo, requirementsByPath, leavesByPath);
+
+	PermissionRequirements retVal;
+	for (RequirementsByPath::const_iterator it = requirementsByPath.constBegin(); it != requirementsByPath.constEnd(); ++it){
+		QByteArrayList requiredLeaves;
+		for (const QByteArray& requirement : it.value()){
+			// A required group stands for every leaf in it: only leaves are ever held.
+			for (const QByteArray& leafPath : leavesByPath.value(requirement)){
+				if (!requiredLeaves.contains(leafPath)){
+					requiredLeaves.append(leafPath);
+				}
+			}
+		}
+
+		if (!requiredLeaves.isEmpty()){
+			retVal.insert(it.key(), requiredLeaves);
+		}
+	}
+
+	return retVal;
+}
+
+
 QByteArrayList CollectImpliedPermissions(IProductInfo& productInfo, const QByteArrayList& permissionIds)
 {
 	if (permissionIds.isEmpty()){
 		return QByteArrayList();
 	}
 
-	RequirementsByPath requirementsByPath;
-	LeavesByPath leavesByPath;
-	CollectProductRequirements(productInfo, requirementsByPath, leavesByPath);
-	if (requirementsByPath.isEmpty()){
-		return QByteArrayList();
-	}
+	return CollectImpliedPermissions(CollectPermissionRequirements(productInfo), permissionIds);
+}
 
+
+QByteArrayList CollectImpliedPermissions(const PermissionRequirements& requirements, const QByteArrayList& permissionIds)
+{
 	QByteArrayList retVal;
+	if (requirements.isEmpty()){
+		return retVal;
+	}
 
 	QSet<QByteArray> knownPermissions(permissionIds.begin(), permissionIds.end());
 	QByteArrayList pendingPermissions = permissionIds;
@@ -429,17 +458,14 @@ QByteArrayList CollectImpliedPermissions(IProductInfo& productInfo, const QByteA
 	while (!pendingPermissions.isEmpty()){
 		const QByteArray permissionId = pendingPermissions.takeFirst();
 
-		for (const QByteArray& requirement : requirementsByPath.value(permissionId)){
-			// A required group stands for every leaf in it: only leaves are ever held.
-			for (const QByteArray& leafPath : leavesByPath.value(requirement)){
-				if (knownPermissions.contains(leafPath)){
-					continue;
-				}
-
-				knownPermissions.insert(leafPath);
-				retVal.append(leafPath);
-				pendingPermissions.append(leafPath);
+		for (const QByteArray& leafPath : requirements.value(permissionId)){
+			if (knownPermissions.contains(leafPath)){
+				continue;
 			}
+
+			knownPermissions.insert(leafPath);
+			retVal.append(leafPath);
+			pendingPermissions.append(leafPath);
 		}
 	}
 

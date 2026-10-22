@@ -95,6 +95,9 @@ Rectangle {
 		if (kindId === "DelegatedRole"){
 			return qsTr("Delegated role")
 		}
+		if (kindId === "Requirement"){
+			return qsTr("Required by")
+		}
 
 		return kindId
 	}

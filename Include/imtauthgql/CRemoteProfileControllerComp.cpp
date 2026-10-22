@@ -4,9 +4,7 @@
 
 
 // ImtCore includes
-#include <imtauth/imtauth.h>
-#include <imtlic/IFeatureInfo.h>
-#include <GeneratedFiles/imtlicsdl/SDL/1.0/CPP/Features.h>
+#include <imtauthgql/imtauthgql.h>
 
 
 namespace imtauthgql
@@ -23,51 +21,20 @@ sdl::V1_0::imtauth::CProfileData CRemoteProfileControllerComp::OnGetProfile(
 	sdl::V1_0::imtauth::CProfileData profileData =
 				SendModelRequest<sdl::V1_0::imtauth::CProfileData>(gqlRequest, errorMessage);
 
-	// Supplement permissions from local ProductInfo
-	if (m_productInfoCompPtr.IsValid()){
-		imtbase::IObjectCollection* featureCollectionPtr = m_productInfoCompPtr->GetFeatures();
-		if (featureCollectionPtr != nullptr){
-			QByteArrayList permissions;
-			if (profileData.permissions.has_value()){
-				for (const auto& permInfo : *profileData.permissions){
-					if (permInfo->id){
-						permissions.append(*permInfo->id);
-					}
-				}
-			}
+	// The auth server does not know the features of this product, so their requirements are resolved here.
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	imtlic::IProductInfo* productInfoPtr = m_productInfoCompPtr.IsValid() ? m_productInfoCompPtr.GetPtr() : nullptr;
+	if (productInfoPtr == nullptr && gqlContextPtr != nullptr){
+		productInfoPtr = gqlContextPtr->GetProductInfo();
+	}
 
-			imtsdl::TElementList<sdl::V1_0::imtauth::CPermissionInfo> permissionList;
-
-			for (imtbase::ICollectionInfo::Id& elementId : featureCollectionPtr->GetElementIds()){
-				imtbase::IObjectCollection::DataPtr permissionDataPtr;
-				if (featureCollectionPtr->GetObjectData(elementId, permissionDataPtr)){
-					const imtlic::IFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::IFeatureInfo*>(permissionDataPtr.GetPtr());
-					if (featureInfoPtr != nullptr){
-						for (imtbase::ICollectionInfo::Id& subFeatureId : featureInfoPtr->GetSubFeatureIds()){
-							imtlic::IFeatureInfoSharedPtr subFeatureInfoPtr = featureInfoPtr->GetSubFeature(subFeatureId);
-							if (!subFeatureInfoPtr.IsValid()){
-								continue;
-							}
-
-							QByteArray subFeaturePath = imtlic::CalculateFeaturePath(*subFeatureInfoPtr);
-							// The profile may name a permission by feature id
-							// alone, as older versions stored them.
-							if (imtauth::HasPermission(permissions, subFeaturePath)){
-								sdl::V1_0::imtauth::CPermissionInfo info;
-
-								info.id = subFeaturePath;
-								info.name = QString(subFeatureInfoPtr->GetFeatureName());
-								info.description = QString(subFeatureInfoPtr->GetFeatureDescription());
-
-								permissionList << info;
-							}
-						}
-					}
-				}
-			}
-
-			profileData.permissions = std::move(permissionList);
-		}
+	if (productInfoPtr != nullptr && profileData.permissions.HasValue()){
+		AddRequiredPermissions(
+					*profileData.permissions,
+					*productInfoPtr,
+					m_translationManagerCompPtr.IsValid() ? m_translationManagerCompPtr.GetPtr() : nullptr,
+					(gqlContextPtr != nullptr) ? gqlContextPtr->GetLanguageId() : QByteArray(),
+					(gqlContextPtr != nullptr) ? gqlContextPtr->GetTenantPermissions() : QByteArrayList());
 	}
 
 	return profileData;

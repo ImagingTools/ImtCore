@@ -674,7 +674,6 @@ ViewBase {
 					anchors.leftMargin: Style.marginL
 					anchors.rightMargin: Style.marginL
 					showControlPanel: true
-					showSource: true
 					emptyText: container.tenantId !== ""
 						? qsTr("No product features are enabled for this organization yet. Enable them on the Permissions page of the organization.")
 						: qsTr("No permissions available.")
