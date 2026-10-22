@@ -197,7 +197,8 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 		userData = *arguments.input->user;
 	}
 
-	if (userData.id){
+	// A stored user keeps its UUID: the editor sends the ID of its own representation.
+	if (userData.id && userPtr->GetObjectUuid().isEmpty()){
 		userPtr->SetObjectUuid(*userData.id);
 	}
 	if (userData.name){

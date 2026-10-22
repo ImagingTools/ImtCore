@@ -10,6 +10,7 @@ import imtauthgui 1.0
 import imtauthUsersSdl 1.0
 import imtauthAuthorizationSdl 1.0
 import imtauthSessionsSdl 1.0
+import imtauthTenantsSdl 1.0
 import imtauthTenantMembershipsSdl 1.0
 import Qt.labs.settings 1.0
 
@@ -62,6 +63,8 @@ QtObject {
 	property bool __tenantSwitchInProgress: false
 	property string __pendingTenantId: ""
 	property bool __hasPendingTenantSwitch: false
+	// An inactive organization cannot be selected; it is activated outside of any organization first.
+	property string __activationTenantId: ""
 
 	property bool __refreshInProgress: false
 	property var __pendingRetryQueue: []
@@ -707,6 +710,35 @@ QtObject {
 		selectTenantGqlSender.send(selectTenantInput)
 	}
 
+	// Activates the inactive organization and switches to it.
+	function activateTenant(tenantId) {
+		if (!tenantId)
+			return
+
+		root.__activationTenantId = tenantId
+		if (root.currentTenantId !== "") {
+			root.selectTenant("")
+			return
+		}
+
+		root.__continueTenantActivation()
+	}
+
+	function __continueTenantActivation() {
+		if (root.__activationTenantId === "" || root.currentTenantId !== "")
+			return
+
+		setTenantActiveInput.m_tenantId = root.__activationTenantId
+		setTenantActiveInput.m_isActive = true
+		setTenantActiveGqlSender.send(setTenantActiveInput)
+	}
+
+	function __reportTenantSelectionFailure(message) {
+		root.__activationTenantId = ""
+		root.tenantSelectionFailed(message)
+		PopupManager.addErrorMessage(message !== "" ? qsTr("Unable to switch the organization: %1").arg(message) : qsTr("Unable to switch the organization"), true)
+	}
+
 	function __completeTenantSwitch() {
 		__tenantSwitchInProgress = false
 		if (!__hasPendingTenantSwitch)
@@ -989,6 +1021,7 @@ QtObject {
 						root.refreshPermissions(function(){
 							root.tenantSelected(root.currentTenantId);
 							root.__completeTenantSwitch()
+							root.__continueTenantActivation()
 						});
 					}
 					else{
@@ -1006,7 +1039,7 @@ QtObject {
 						}
 
 						root.__tenantRemovalSwitchInProgress = false
-						root.tenantSelectionFailed(m_errorMessage || "");
+						root.__reportTenantSelectionFailure(m_errorMessage || "")
 						root.__completeTenantSwitch()
 					}
 				}
@@ -1015,8 +1048,35 @@ QtObject {
 
 		function onError(message, type) {
 			root.__tenantRemovalSwitchInProgress = false
-			root.tenantSelectionFailed(message || "")
+			root.__reportTenantSelectionFailure(message || "")
 			root.__completeTenantSwitch()
+		}
+	}
+
+	property SetTenantActiveInput setTenantActiveInput: SetTenantActiveInput {}
+	property GqlSdlRequestSender setTenantActiveGqlSender: GqlSdlRequestSender {
+		permissionPath: root.permissionPath
+		requestType: 1
+		gqlCommandId: ImtauthTenantsSdlCommandIds.s_setTenantActive
+
+		sdlObjectComp: Component {
+			SetTenantActivePayload {
+				onFinished: {
+					let tenantId = root.__activationTenantId
+					root.__activationTenantId = ""
+					if (m_success){
+						root.selectTenant(tenantId)
+					}
+					else{
+						PopupManager.addErrorMessage(m_errorMessage || qsTr("Unable to activate the organization"), true)
+					}
+				}
+			}
+		}
+
+		function onError(message, type) {
+			root.__activationTenantId = ""
+			PopupManager.addErrorMessage(message || qsTr("Unable to activate the organization"), true)
 		}
 	}
 

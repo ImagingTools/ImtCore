@@ -108,7 +108,8 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CGroupCollectionDocumentServiceComp
 		groupData = *arguments.input->group;
 	}
 
-	if (groupData.id){
+	// A stored group keeps its UUID: the editor sends the ID of its own representation.
+	if (groupData.id && groupPtr->GetObjectUuid().isEmpty()){
 		groupPtr->SetObjectUuid(*groupData.id);
 	}
 	if (groupData.name){

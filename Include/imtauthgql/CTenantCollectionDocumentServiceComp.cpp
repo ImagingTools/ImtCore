@@ -108,11 +108,13 @@ sdl::V1_0::imtauth::CTenantData CTenantCollectionDocumentServiceComp::OnGetTenan
 		return sdl::V1_0::imtauth::CTenantData();
 	}
 
-	const imtauth::ITenantInfo* tenantPtr = dynamic_cast<const imtauth::ITenantInfo*>(documentPtr.GetPtr());
+	imtauth::ITenantInfo* tenantPtr = dynamic_cast<imtauth::ITenantInfo*>(documentPtr.GetPtr());
 	if (tenantPtr == nullptr){
 		errorMessage = QStringLiteral("Invalid document type");
 		return sdl::V1_0::imtauth::CTenantData();
 	}
+
+	SyncStoredOwner(*tenantPtr);
 
 	sdl::V1_0::imtauth::CTenantData response;
 	QByteArray tenantId = tenantPtr->GetTenantId();
@@ -328,6 +330,8 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceCom
 		response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::InvalidDocumentId;
 		return response;
 	}
+
+	SyncStoredOwner(*tenantPtr);
 
 	sdl::V1_0::imtauth::CTenantData tenantData;
 	if (arguments.input->tenant){
@@ -602,6 +606,27 @@ bool CTenantCollectionDocumentServiceComp::ProcessEvent(imtdoc::CEventBase* even
 	}
 
 	return true;
+}
+
+
+// private methods
+
+void CTenantCollectionDocumentServiceComp::SyncStoredOwner(imtauth::ITenantInfo& tenant) const
+{
+	const QByteArray tenantId = tenant.GetTenantId();
+	if (tenantId.isEmpty() || !m_tenantCollectionCompPtr.IsValid()){
+		return;
+	}
+
+	imtbase::IObjectCollection::DataPtr storedDataPtr;
+	if (!m_tenantCollectionCompPtr->GetObjectData(tenantId, storedDataPtr)){
+		return;
+	}
+
+	const imtauth::ITenantInfo* storedTenantPtr = dynamic_cast<const imtauth::ITenantInfo*>(storedDataPtr.GetPtr());
+	if (storedTenantPtr != nullptr && !storedTenantPtr->GetOwnerId().isEmpty()){
+		tenant.SetOwnerId(storedTenantPtr->GetOwnerId());
+	}
 }
 
 

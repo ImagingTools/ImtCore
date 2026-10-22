@@ -230,6 +230,7 @@
                                 <Value>updatedAt</Value>
                                 <Value>isActive</Value>
                                 <Value>ownerId</Value>
+                                <Value>tenantRelationScope</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -242,6 +243,7 @@
                                 <Value>UpdatedAt</Value>
                                 <Value>IsActive</Value>
                                 <Value>OwnerId</Value>
+                                <Value>TenantRelationScope</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

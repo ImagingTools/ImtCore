@@ -122,6 +122,18 @@ DocumentViewBase {
 			generalPageInstance.handleUserDataChanged()
 	}
 	
+	// Asked by the document decorator before saving: an unconfirmed password or an invalid field is not sent.
+	function acceptsSave(){
+		var generalPageInstance = multiPageView.getPageByIndex(0)
+		if (!generalPageInstance || generalPageInstance.inputsAcceptable()){
+			return true
+		}
+
+		generalPageInstance.revealValidationErrors()
+		PopupManager.addErrorMessage(qsTr("Correct the highlighted fields before saving"), true)
+		return false
+	}
+
 	function checkChangePasswordLogic(){
 		var generalPageInstance = multiPageView.getPageByIndex(0)
 		if (generalPageInstance)
@@ -179,6 +191,14 @@ DocumentViewBase {
 			function updateModel(){
 				userGeneralEditor.updateModel();
 				systemInfoGroup.updateModel();
+			}
+
+			function inputsAcceptable(){
+				return userGeneralEditor.inputsAcceptable();
+			}
+
+			function revealValidationErrors(){
+				userGeneralEditor.revealValidationErrors();
 			}
 
 			function handleUserDataChanged(){

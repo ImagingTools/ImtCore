@@ -144,7 +144,7 @@ QtObject {
 		var date = new Date(value)
 		if (isNaN(date.getTime()))
 			return value
-		return Qt.formatDateTime(date, Qt.DefaultLocaleShortDate)
+		return date.toLocaleDateString()
 	}
 
 	function displayNameOrId(name, id) {

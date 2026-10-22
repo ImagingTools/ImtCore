@@ -109,7 +109,8 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CRoleCollectionDocumentServiceComp:
 		roleData = *arguments.input->role;
 	}
 
-	if (roleData.id){
+	// A stored role keeps its UUID: the editor sends the ID of its own representation.
+	if (roleData.id && rolePtr->GetObjectUuid().isEmpty()){
 		rolePtr->SetObjectUuid(*roleData.id);
 	}
 	if (roleData.name){

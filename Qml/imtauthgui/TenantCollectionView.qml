@@ -44,6 +44,11 @@ RemoteCollectionView {
 				let scope = table.elements.getData(TenantItemDataTypeMetaInfo.s_tenantRelationScope, indexes[0])
 				if (scope === "Invited") return
 				let tenantId = table.elements.getData("id", indexes[0])
+				if (!container.tenantIsActive(indexes[0])) {
+					let tenantName = table.elements.getData("name", indexes[0])
+					ModalDialogManager.openDialog(activateDialogComp, {"tenantId": tenantId, "tenantName": tenantName || tenantId, "openEditor": false})
+					return
+				}
 				container.switchToTenant(tenantId)
 			}
 		} else if (commandId === "Leave") {
@@ -440,11 +445,11 @@ RemoteCollectionView {
 		FieldFilterDelegate {
 			name: qsTr("Status")
 			defaultFieldFilter.m_fieldId: "IsActive"
-			defaultFieldFilter.m_filterValueType: "Integer"
+			defaultFieldFilter.m_filterValueType: "Bool"
 
 			Component.onCompleted: {
-				createAndAddOption("1", qsTr("Active"), "", true)
-				createAndAddOption("0", qsTr("Inactive"), "", true)
+				createAndAddOption("true", qsTr("Active"), "", true)
+				createAndAddOption("false", qsTr("Inactive"), "", true)
 			}
 		}
 	}
@@ -523,14 +528,49 @@ RemoteCollectionView {
 		tenantDocumentService.openDocument("Tenant", tenantId)
 	}
 
-	function requestOpenTenantDocument(tenantId, tenantName) {
+	function requestOpenTenantDocument(tenantId, tenantName, isActive) {
 		if (!tenantId) return
 		if (tenantId === AuthorizationController.currentTenantId) {
 			openTenantDocument(tenantId)
 			return
 		}
 
+		if (isActive === false) {
+			ModalDialogManager.openDialog(activateDialogComp, {"tenantId": tenantId, "tenantName": tenantName || tenantId, "openEditor": true})
+			return
+		}
+
 		ModalDialogManager.openDialog(switchToEditDialogComp, {"tenantId": tenantId, "tenantName": tenantName || tenantId})
+	}
+
+	function tenantIsActive(index) {
+		return table.elements.getData(TenantItemDataTypeMetaInfo.s_isActive, index) !== false
+	}
+
+	// An inactive organization cannot be switched to, so it is activated first.
+	function activateTenant(tenantId, openEditor) {
+		if (openEditor) {
+			NavigationController.setPending(container.collectionId, ["Tenant", tenantId], {})
+		}
+
+		AuthorizationController.activateTenant(tenantId)
+	}
+
+	Component {
+		id: activateDialogComp
+		MessageDialog {
+			property string tenantId: ""
+			property string tenantName: ""
+			property bool openEditor: false
+			width: Style.sizeHintM
+			title: qsTr("Activate organization")
+			message: qsTr("\"%1\" is inactive. Activate it and switch to it?").arg(tenantName)
+			onFinished: {
+				if (buttonId == Enums.yes) {
+					container.activateTenant(tenantId, openEditor)
+				}
+			}
+		}
 	}
 
 	// An organization is edited from inside it, and a new one is created outside of any.
@@ -731,7 +771,7 @@ RemoteCollectionView {
 						let tenantName = elementsModel.containsKey("name", index)
 								? elementsModel.getData("name", index)
 								: tenantId
-						container.requestOpenTenantDocument(tenantId, tenantName)
+						container.requestOpenTenantDocument(tenantId, tenantName, container.tenantIsActive(index))
 						return
 					}
 				}
@@ -794,10 +834,31 @@ RemoteCollectionView {
 						}
 					}
 					commandsPanelVisible: isNewTenant
+
+					// The save of a new organization is reported more than once.
+					property bool creationHandled: false
+
 					onDocumentSaved: {
-						if (isNewTenant){
-							let tenantId = tenantCommandsDelegate.documentManager.getDocumentObjectId(tenantEditor.documentId)
-							container.switchToTenantAndNavigate(tenantId, ["Tenant", tenantId], {})
+						if (!isNewTenant || tenantEditor.creationHandled){
+							return
+						}
+
+						tenantEditor.creationHandled = true
+						let tenantId = tenantCommandsDelegate.documentManager.getDocumentObjectId(tenantEditor.documentId)
+						if (tenantEditor.tenantData && tenantEditor.tenantData.m_isActive === false){
+							PopupManager.addInfoMessage(qsTr("The organization \"%1\" was created inactive. Activate it to work in it.").arg(tenantEditor.tenantData.m_name), true)
+							inactiveCloseTimer.restart()
+							return
+						}
+						container.switchToTenantAndNavigate(tenantId, ["Tenant", tenantId], {})
+					}
+
+					// Closed after the save has refreshed the editor, which still reads the document.
+					Timer {
+						id: inactiveCloseTimer
+						interval: 0
+						onTriggered: {
+							tenantCommandsDelegate.documentManager.closeDocument(tenantEditor.documentId, true)
 						}
 					}
 				}

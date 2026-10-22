@@ -225,6 +225,18 @@ QtObject {
 		documentManager.updateDocumentFailed(documentId, message)
 	}
 
+	// A visible view refuses the save while its input is not acceptable (acceptsSave() is optional).
+	function viewsAcceptSave(){
+		for (let i = 0; i < registeredViews.length; ++i){
+			let view = registeredViews[i]
+			if (view.visible && typeof view.acceptsSave === "function" && !view.acceptsSave()){
+				return false
+			}
+		}
+
+		return true
+	}
+
 	// Writes the GUI state of the visible views to the document.
 	function commitChanges(){
 		for (let i = 0; i < registeredViews.length; ++i){
@@ -348,6 +360,10 @@ QtObject {
 	function onSave(){
 		if (!documentManager){
 			console.error("Unable to handle Save command. Error: Document manager is invalid")
+			return
+		}
+
+		if (!viewsAcceptSave()){
 			return
 		}
 

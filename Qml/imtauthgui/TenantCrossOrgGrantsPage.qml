@@ -43,11 +43,13 @@ SimpleCollectionPage {
 			property TextParam __rolesParam: TextParam {}
 			property TextParam __expiresAtParam: TextParam {}
 			property TextParam __directionParam: TextParam {}
+			property TextParam __isActiveParam: TextParam {}
 
 			readonly property string targetTenant: grantDelegate.__targetTenantParam.m_text || ""
 			readonly property string roles: grantDelegate.__rolesParam.m_text || ""
 			readonly property string expiresAt: grantDelegate.__expiresAtParam.m_text || ""
 			readonly property string direction: grantDelegate.__directionParam.m_text || ""
+			readonly property bool isInactive: grantDelegate.__isActiveParam.m_text === "false"
 
 			onItemParametersChanged: grantDelegate.__fillParams()
 
@@ -60,7 +62,15 @@ SimpleCollectionPage {
 					else if (p.id === "roles") grantDelegate.__rolesParam.createFromJson(raw)
 					else if (p.id === "expiresAt") grantDelegate.__expiresAtParam.createFromJson(raw)
 					else if (p.id === "direction") grantDelegate.__directionParam.createFromJson(raw)
+					else if (p.id === "isActive") grantDelegate.__isActiveParam.createFromJson(raw)
 				}
+			}
+
+			function formatDate(value) {
+				var date = new Date(value)
+				if (isNaN(date.getTime()))
+					return value
+				return date.toLocaleDateString()
 			}
 
 			Row {
@@ -96,9 +106,18 @@ SimpleCollectionPage {
 						fontPixelSize: Style.fontSizeXS
 					}
 
+					StatusBadge {
+						visible: grantDelegate.isInactive
+						text: qsTr("Inactive")
+						badgeColor: Style.neutralSubtleColor
+						badgeBorderWidth: 0
+						textColor: Style.inactiveTextColor
+						fontPixelSize: Style.fontSizeXS
+					}
+
 					BaseText {
 						visible: grantDelegate.expiresAt !== ""
-						text: qsTr("Expires %1").arg(grantDelegate.expiresAt)
+						text: qsTr("Expires %1").arg(grantDelegate.formatDate(grantDelegate.expiresAt))
 						font.pixelSize: Style.fontSizeXS
 						color: Style.subtitleColor
 						anchors.verticalCenter: parent.verticalCenter

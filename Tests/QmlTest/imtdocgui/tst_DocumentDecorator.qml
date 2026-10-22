@@ -42,6 +42,11 @@ TestCase {
 
 			property bool hasChanges: true
 			property int savedCount: 0
+			property bool inputAcceptable: true
+
+			function acceptsSave(){
+				return inputAcceptable
+			}
 
 			function updateModel(){
 				if (hasChanges){
@@ -134,6 +139,21 @@ TestCase {
 
 		compare(document.service.calls, [["save", "doc", "Name"]])
 		compare(controllerOf(document.service).updateCount, 0)
+	}
+
+	function test_viewRefusingSaveBlocksTheSave(){
+		let document = openDocument("Name", false, 2)
+		document.views[1].inputAcceptable = false
+
+		document.views[0].commandActivated("Save")
+
+		compare(document.service.calls, [], "A view with unacceptable input refuses the save")
+		compare(controllerOf(document.service, 0).updateCount, 0, "Nothing is written to the document either")
+
+		document.views[1].inputAcceptable = true
+		document.views[0].commandActivated("Save")
+
+		compare(document.service.calls, [["save", "doc", "Name"]])
 	}
 
 	function test_saveFlushesGuiOfAllViews(){

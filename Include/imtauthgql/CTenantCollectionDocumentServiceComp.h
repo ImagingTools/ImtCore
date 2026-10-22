@@ -5,6 +5,7 @@
 // ImtCore includes
 #include <imtdoc/IDocumentService.h>
 #include <imtbase/IObjectCollection.h>
+#include <imtauth/ITenantInfo.h>
 #include <imtauth/ITenantMembershipManager.h>
 #include <imtauth/ITenantInvitationManager.h>
 #include <imtauth/IUserManager.h>
@@ -31,6 +32,7 @@ public:
 		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager for members", false, "MembershipManager");
 		I_ASSIGN(m_invitationManagerCompPtr, "InvitationManager", "Tenant invitation manager for pending invitations", false, "TenantInvitationManager");
 		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "Collection of users", true, "UserCollection");
+		I_ASSIGN(m_tenantCollectionCompPtr, "TenantCollection", "Stored organizations, the source of the owner of an open organization document", false, "TenantCollection");
 	I_END_COMPONENT
 
 protected:
@@ -48,10 +50,14 @@ protected:
 	virtual bool ProcessEvent(imtdoc::CEventBase* eventPtr) override;
 
 private:
+	// The ownership is transferred past the open documents, so they take the owner from the storage.
+	void SyncStoredOwner(imtauth::ITenantInfo& tenant) const;
+
 	I_REF(imtdoc::IDocumentService, m_documentManagerCompPtr);
 	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);
 	I_REF(imtauth::ITenantInvitationManager, m_invitationManagerCompPtr);
 	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
+	I_REF(imtbase::IObjectCollection, m_tenantCollectionCompPtr);
 };
 
 

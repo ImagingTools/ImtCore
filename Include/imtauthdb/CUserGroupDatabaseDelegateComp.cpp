@@ -46,8 +46,10 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserGroupDatabaseDelegateComp::C
 			if (userInfoPtr != nullptr){
 				if (!userInfoPtr->GetGroups().contains(proposedObjectId)){
 					userInfoPtr->AddToGroup(proposedObjectId);
-					
-					retVal.query += m_userDatabaseDelegateCompPtr->CreateUpdateObjectQuery(*m_userCollectionCompPtr, userId, *userInfoPtr, operationContextPtr, false);
+
+					imtbase::COperationContext userOperationContext;
+					AddReferenceOperation(userOperationContext, operationContextPtr, "AddGroup", "GroupId", QT_TRANSLATE_NOOP("Attribute", "Group"), QByteArray(), proposedObjectId);
+					retVal.query += m_userDatabaseDelegateCompPtr->CreateUpdateObjectQuery(*m_userCollectionCompPtr, userId, *userInfoPtr, &userOperationContext, false);
 				}
 			}
 		}
@@ -111,8 +113,10 @@ QByteArray CUserGroupDatabaseDelegateComp::CreateUpdateObjectQuery(
 				if (userInfoPtr != nullptr){
 					if (!userInfoPtr->GetGroups().contains(objectId)){
 						userInfoPtr->AddToGroup(objectId);
-						
-						retVal += m_userDatabaseDelegateCompPtr->CreateUpdateObjectQuery(*m_userCollectionCompPtr, userId, *userInfoPtr, operationContextPtr, false);
+
+						imtbase::COperationContext userOperationContext;
+						AddReferenceOperation(userOperationContext, operationContextPtr, "AddGroup", "GroupId", QT_TRANSLATE_NOOP("Attribute", "Group"), QByteArray(), objectId);
+						retVal += m_userDatabaseDelegateCompPtr->CreateUpdateObjectQuery(*m_userCollectionCompPtr, userId, *userInfoPtr, &userOperationContext, false);
 					}
 				}
 			}
@@ -125,7 +129,9 @@ QByteArray CUserGroupDatabaseDelegateComp::CreateUpdateObjectQuery(
 				if (userInfoPtr != nullptr){
 					bool result = userInfoPtr->RemoveFromGroup(objectId);
 					if (result){
-						retVal += m_userDatabaseDelegateCompPtr->CreateUpdateObjectQuery(*m_userCollectionCompPtr, userId, *userInfoPtr, operationContextPtr, false);
+						imtbase::COperationContext userOperationContext;
+						AddReferenceOperation(userOperationContext, operationContextPtr, "RemoveGroup", "GroupId", QT_TRANSLATE_NOOP("Attribute", "Group"), objectId, QByteArray());
+						retVal += m_userDatabaseDelegateCompPtr->CreateUpdateObjectQuery(*m_userCollectionCompPtr, userId, *userInfoPtr, &userOperationContext, false);
 					}
 				}
 			}
