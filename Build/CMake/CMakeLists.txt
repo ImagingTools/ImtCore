@@ -50,6 +50,8 @@ if(BUILD_TESTING)
 	find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Test REQUIRED)
 endif()
 
+add_subdirectory("${IMTCOREDIR}/Config/QmlTooling" "${CMAKE_CURRENT_BINARY_DIR}/QmlTooling")
+
 if(UNIX AND NOT APPLE)
 	if (NOT CMAKE_SHARED_LINKER_FLAGS)
 		set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--no-undefined")

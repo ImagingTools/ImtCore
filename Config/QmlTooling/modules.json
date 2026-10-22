@@ -1,0 +1,18 @@
+[
+    {
+        "uri": "com.imtcore.imtqml",
+        "version": "1.0",
+        "types": [
+            {"name": "TreeItemModel", "class": "imtbase::CTreeItemModel", "header": "Include/imtbase/CTreeItemModel.h"},
+            {"name": "WebSocket", "class": "imtqml::CQmlWebSocket", "header": "Include/imtqml/CQmlWebSocket.h"},
+            {"name": "GqlModel", "class": "imtqml::CGqlModel", "header": "Include/imtqml/CGqlModel.h"},
+            {"name": "GqlRequest", "class": "imtqml::CGqlRequest", "header": "Include/imtqml/CGqlRequest.h"},
+            {"name": "RemoteFileController", "class": "imtqml::CRemoteFileController", "header": "Include/imtqml/CRemoteFileController.h"},
+            {"name": "FileIO", "class": "imtqml::FileIO", "header": "Include/imtqml/CFileIO.h"},
+            {"name": "Process", "class": "imtqml::CQmlProcess", "header": "Include/imtqml/CQmlProcess.h"},
+            {"name": "NetworkEventInterceptor", "class": "imtqml::CNetworkEventInterceptor", "header": "Include/imtqml/CNetworkEventInterceptor.h", "singleton": true},
+            {"name": "DocumentServiceController", "class": "imtqml::CDocumentServiceController", "header": "Include/imtqml/CDocumentServiceController.h"},
+            {"name": "DataModelController", "class": "imtqml::CDataModelController", "header": "Include/imtqml/CDataModelController.h"}
+        ]
+    }
+]
