@@ -57,6 +57,25 @@ imtauth::IUserInfo::FeatureIds CollectTenantOwnerPermissions(const IGqlContext& 
 }
 
 
+imtauth::IUserInfo::FeatureIds CollectTenantScopedPermissions(const IGqlContext& gqlContext, const imtauth::IUserInfo::FeatureIds& permissions)
+{
+	if (gqlContext.GetTenantId().isEmpty()){
+		return permissions;
+	}
+
+	// Within an organization nothing outside its permission scope is held; an empty scope holds nothing
+	const QByteArrayList tenantPermissions = gqlContext.GetTenantPermissions();
+	const QByteArrayList organizationAccessPermissions = imtauth::GetOrganizationAccessPermissions();
+
+	imtauth::IUserInfo::FeatureIds retVal = permissions;
+	retVal.removeIf([&tenantPermissions, &organizationAccessPermissions](const QByteArray& permission){
+		return !organizationAccessPermissions.contains(permission) && !imtauth::HasPermission(tenantPermissions, permission, false);
+	});
+
+	return retVal;
+}
+
+
 imtauth::IUserInfo::FeatureIds CollectOrganizationAccessPermissions(const IGqlContext& gqlContext, const QByteArray& userId)
 {
 	const imtauth::IUserInfo* userInfoPtr = gqlContext.GetUserInfo();

@@ -53,6 +53,7 @@ const QByteArray s_userUpdate = "UserUpdate";
 const QByteArray s_userReplace = "UserReplace";
 const QByteArray s_roleUpdate = "RoleUpdate";
 const QByteArray s_ticketsList = "TicketsList";
+const QByteArray s_organizationsList = "OrganizationsList";
 const QByteArray s_deviceTicketsList = "DeviceTicketsList";
 const QByteArray s_supportTicketsList = "SupportTicketsList";
 const QByteArray s_serverVersion = "GetServerVersion";
@@ -79,6 +80,7 @@ public:
 		m_permissions.insert(s_userReplace, {s_changeUser, s_removeUser});
 		m_permissions.insert(s_roleUpdate, {s_changeRole});
 		m_permissions.insert(s_ticketsList, {s_viewDeviceTickets, s_viewTickets});
+		m_permissions.insert(s_organizationsList, {QByteArrayLiteral("/OrganizationManagement/View")});
 		m_permissions.insert(s_deviceTicketsList, {s_viewDeviceTickets});
 		m_permissions.insert(s_supportTicketsList, {s_viewTickets});
 		m_permissions.insert(s_serverVersion, QByteArrayList());
@@ -599,6 +601,42 @@ void CPermissionCheckTest::testTenantLimitsLeavesOfRequiredGroup()
 
 	QVERIFY(server.IsAllowed(s_rolesList, &editor, QByteArray(), {s_changeUser, s_viewRoles}));
 	QVERIFY(!server.IsAllowed(s_usersList, &editor, QByteArray(), {s_changeUser, s_viewRoles}));
+}
+
+
+void CPermissionCheckTest::testTenantLimitsHeldPermissions()
+{
+	CServer server;
+	imtauth::CUserInfo editor;
+	SetPermissions(editor, {s_changeUser, s_viewUsers});
+
+	QVERIFY(server.IsAllowed(s_userUpdate, &editor));
+	QVERIFY(server.IsAllowed(s_userUpdate, &editor, QByteArray(), {s_changeUser}));
+	QVERIFY(!server.IsAllowed(s_userUpdate, &editor, QByteArray(), {s_viewUsers}));
+	QVERIFY(!server.IsAllowed(s_userUpdate, &editor, s_changeUser, {s_viewUsers}));
+	QVERIFY(server.IsAllowed(s_usersList, &editor, QByteArray(), {s_viewUsers}));
+}
+
+
+void CPermissionCheckTest::testEmptyTenantScopeHoldsNothing()
+{
+	CServer server;
+	imtauth::CUserInfo editor;
+	SetPermissions(editor, {s_changeUser, s_restoreDeviceRevision});
+
+	QVERIFY(!server.IsAllowed(s_userUpdate, &editor, QByteArray(), QByteArrayList(), false, true));
+	QVERIFY(server.IsRevisionCommandAllowed(s_restoreRevision, s_devicesCollection, &editor));
+	QVERIFY(!server.IsRevisionCommandAllowed(s_restoreRevision, s_devicesCollection, &editor, {s_changeUser}));
+}
+
+
+void CPermissionCheckTest::testOrganizationAccessIsKeptOutsideTenantScope()
+{
+	CServer server;
+	imtauth::CUserInfo member;
+	SetPermissions(member, imtauth::GetOrganizationAccessPermissions());
+
+	QVERIFY(server.IsAllowed(s_organizationsList, &member, QByteArray(), QByteArrayList(), false, true));
 }
 
 

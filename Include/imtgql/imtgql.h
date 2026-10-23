@@ -29,6 +29,13 @@ imtauth::IUserInfo::FeatureIds CollectImpliedPermissions(const IGqlContext& gqlC
 imtauth::IUserInfo::FeatureIds CollectTenantOwnerPermissions(const IGqlContext& gqlContext);
 
 /**
+	The given permissions limited to the permission scope of the organization of the context.
+	The organization access permissions (\see imtauth::GetOrganizationAccessPermissions) are kept: they open the organizations whatever the scope.
+	Outside of any organization the permissions are returned unchanged.
+*/
+imtauth::IUserInfo::FeatureIds CollectTenantScopedPermissions(const IGqlContext& gqlContext, const imtauth::IUserInfo::FeatureIds& permissions);
+
+/**
 	The organization access permissions (\see imtauth::GetOrganizationAccessPermissions) the context grants to the given user.
 */
 imtauth::IUserInfo::FeatureIds CollectOrganizationAccessPermissions(const IGqlContext& gqlContext, const QByteArray& userId);

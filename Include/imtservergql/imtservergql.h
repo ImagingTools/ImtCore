@@ -12,6 +12,7 @@
 #include <imtbase/imtbase.h>
 #include <imtgql/CGqlRequest.h>
 #include <imtgql/IGqlContext.h>
+#include <imtgql/imtgql.h>
 #include <imtserverapp/ICommandPermissionsProvider.h>
 
 
@@ -42,6 +43,10 @@ inline QByteArray GetPermissionPath(const imtgql::CGqlRequest& gqlRequest)
 	name 'B' holds 'B' as well, and so on through the requirements of 'B'. Those
 	requirements are declared in the feature tree of the product, so a context
 	without product info answers with the permissions held directly only.
+
+	Within an organization only the permissions of its scope are held, whether
+	held directly, through a role or included by another permission.
+	\see imtgql::CollectTenantScopedPermissions
 */
 inline imtauth::IUserInfo::FeatureIds GetUserPermissions(const imtgql::IGqlContext& gqlContext)
 {
@@ -51,7 +56,9 @@ inline imtauth::IUserInfo::FeatureIds GetUserPermissions(const imtgql::IGqlConte
 	}
 
 	const QByteArray productId = gqlContext.GetProductId();
-	return (productId.isEmpty() ? userInfoPtr->GetPermissions() : userInfoPtr->GetPermissions(productId)) + gqlContext.GetImpliedPermissions();
+	const imtauth::IUserInfo::FeatureIds userPermissions = productId.isEmpty() ? userInfoPtr->GetPermissions() : userInfoPtr->GetPermissions(productId);
+
+	return imtgql::CollectTenantScopedPermissions(gqlContext, userPermissions) + gqlContext.GetImpliedPermissions();
 }
 
 

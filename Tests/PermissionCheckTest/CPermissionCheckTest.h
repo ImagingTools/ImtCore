@@ -49,6 +49,9 @@ private Q_SLOTS:
 	void testTenantLimitsIncludedPermissions();
 	void testEmptyTenantScopeIncludesNothing();
 	void testTenantLimitsLeavesOfRequiredGroup();
+	void testTenantLimitsHeldPermissions();
+	void testEmptyTenantScopeHoldsNothing();
+	void testOrganizationAccessIsKeptOutsideTenantScope();
 
 	// Permission path of the request
 	void testPermissionPathEqualToDeclaredIsAccepted();
