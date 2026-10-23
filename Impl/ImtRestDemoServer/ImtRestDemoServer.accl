@@ -2,43 +2,62 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5422" Description="ACF"/>
-            <Version Id="1" Number="2252" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+            <Version Id="0" Number="5715" Description="ACF"/>
+            <Version Id="1" Number="2459" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395267" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="AdminBodyPolicy" X="450" Y="400" Note=""/>
-        <Element ComponentName="AdminServlet" X="800" Y="1600" Note=""/>
-        <Element ComponentName="BehaviorServlet" X="800" Y="1450" Note=""/>
-        <Element ComponentName="BodyPolicyRouter" X="800" Y="300" Note=""/>
-        <Element ComponentName="ConsoleLog" X="100" Y="100" Note=""/>
-        <Element ComponentName="EchoBodyPolicy" X="450" Y="250" Note=""/>
-        <Element ComponentName="EchoServlet" X="800" Y="850" Note=""/>
-        <Element ComponentName="FileResolver" X="450" Y="700" Note=""/>
-        <Element ComponentName="FilesServlet" X="800" Y="700" Note=""/>
-        <Element ComponentName="HttpProtocolEngine" X="1150" Y="300" Note=""/>
-        <Element ComponentName="InfoServlet" X="800" Y="1000" Note=""/>
-        <Element ComponentName="RefuseBodyPolicy" X="450" Y="550" Note=""/>
-        <Element ComponentName="RootServlet" X="1150" Y="1000" Note=""/>
-        <Element ComponentName="ServerInterface" X="1500" Y="1150" Note=""/>
-        <Element ComponentName="SettingsController" X="450" Y="1450" Note=""/>
-        <Element ComponentName="SslConfigurationManager" X="2200" Y="850" Note=""/>
-        <Element ComponentName="StreamServlet" X="800" Y="1300" Note=""/>
-        <Element ComponentName="TcpServer" X="1850" Y="1000" Note=""/>
-        <Element ComponentName="TlsCertificate" X="1850" Y="250" Note=""/>
-        <Element ComponentName="TlsCertificatePath" X="1500" Y="250" Note=""/>
-        <Element ComponentName="TlsConfiguration" X="2200" Y="100" Note=""/>
-        <Element ComponentName="TlsEnable" X="1500" Y="100" Note=""/>
-        <Element ComponentName="TlsIntermediateCertificate" X="1850" Y="550" Note=""/>
-        <Element ComponentName="TlsIntermediateCertificates" X="2200" Y="550" Note=""/>
-        <Element ComponentName="TlsKeyPath" X="1500" Y="400" Note=""/>
-        <Element ComponentName="TlsPrivateKey" X="1850" Y="400" Note=""/>
-        <Element ComponentName="TlsProtocol" X="1850" Y="850" Note=""/>
-        <Element ComponentName="TlsVerifyMode" X="1850" Y="700" Note=""/>
-        <Element ComponentName="UploadBodyPolicy" X="450" Y="100" Note=""/>
-        <Element ComponentName="UploadServlet" X="800" Y="1150" Note=""/>
-        <Element ComponentName="WorkerManager" X="1500" Y="1000" Note=""/>
+        <Element ComponentName="BodyPolicy" X="575" Y="500" Note=""/>
+        <Element ComponentName="ConsoleLog" X="75" Y="425" Note=""/>
+        <Element ComponentName="HttpProtocolEngine" X="575" Y="300" Note=""/>
+        <Element ComponentName="RootServlet" X="800" Y="725" Note=""/>
+        <Element ComponentName="ServerInterface" X="1075" Y="50" Note=""/>
+        <Element ComponentName="Servlets" X="100" Y="800" Note=""/>
+        <Element ComponentName="SslConfig" X="975" Y="400" Note=""/>
+        <Element ComponentName="SslConfigurationManager" X="125" Y="75" Note=""/>
+        <Element ComponentName="TcpServer" X="775" Y="125" Note=""/>
+        <Element ComponentName="WorkerManager" X="800" Y="600" Note=""/>
     </PositionMap>
-    <EmbeddedRegistries/>
+    <EmbeddedRegistries>
+        <EmbededRegistry Id="SslConfig">
+            <PositionMap>
+                <Element ComponentName="TlsCertificate" X="725" Y="225" Note=""/>
+                <Element ComponentName="TlsCertificatePath" X="1050" Y="200" Note=""/>
+                <Element ComponentName="TlsConfiguration" X="625" Y="350" Note=""/>
+                <Element ComponentName="TlsEnable" X="550" Y="225" Note=""/>
+                <Element ComponentName="TlsIntermediateCertificate" X="1000" Y="50" Note=""/>
+                <Element ComponentName="TlsIntermediateCertificates" X="200" Y="75" Note=""/>
+                <Element ComponentName="TlsKeyPath" X="175" Y="550" Note=""/>
+                <Element ComponentName="TlsPrivateKey" X="575" Y="700" Note=""/>
+                <Element ComponentName="TlsProtocol" X="975" Y="350" Note=""/>
+                <Element ComponentName="TlsVerifyMode" X="200" Y="450" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="Servlets">
+            <PositionMap>
+                <Element ComponentName="AdminServlet" X="500" Y="100" Note=""/>
+                <Element ComponentName="BehaviorServlet" X="525" Y="225" Note=""/>
+                <Element ComponentName="EchoServlet" X="525" Y="400" Note=""/>
+                <Element ComponentName="FileResolver" X="200" Y="400" Note=""/>
+                <Element ComponentName="FilesServlet" X="200" Y="250" Note=""/>
+                <Element ComponentName="InfoServlet" X="800" Y="200" Note=""/>
+                <Element ComponentName="SettingsController" X="175" Y="100" Note=""/>
+                <Element ComponentName="StreamServlet" X="500" Y="525" Note=""/>
+                <Element ComponentName="UploadServlet" X="800" Y="400" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="BodyPolicy">
+            <PositionMap>
+                <Element ComponentName="AdminBodyPolicy" X="800" Y="200" Note=""/>
+                <Element ComponentName="BodyPolicyRouter" X="525" Y="350" Note=""/>
+                <Element ComponentName="EchoBodyPolicy" X="200" Y="200" Note=""/>
+                <Element ComponentName="RefuseBodyPolicy" X="200" Y="525" Note=""/>
+                <Element ComponentName="UploadBodyPolicy" X="800" Y="525" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+    </EmbeddedRegistries>
 </Acf>

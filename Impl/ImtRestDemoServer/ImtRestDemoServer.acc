@@ -2,81 +2,19 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5422" Description="ACF"/>
-            <Version Id="1" Number="2252" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+            <Version Id="0" Number="5715" Description="ACF"/>
+            <Version Id="1" Number="2459" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395267" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Demo server of imtrest: the policies of the bodies, the servlets of the demo, the TCP server and its TLS. The settings of the server (the port, the token, the directories, the timeouts, the limits, TLS) are the exported attributes, the program sets them before it starts the TCP server</Description>
     <Keywords>REST HTTP Server Demo Company='ImagingTools' Project='&quot;Core Framework&quot;'</Keywords>
     <ElementsList>
-        <Element Id="AdminBodyPolicy" PackageId="ImtRestDemoPck" ComponentId="DemoBodyPolicy">
-            <Data IsEnabled="true" Flags="1">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="MaxBodySize" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="262144"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Mode" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="buffer"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RequiredToken" Type="Id" ExportId="Token">
-                        <Data IsEnabled="true" Value="demo-token"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="AdminServlet" PackageId="ImtRestDemoPck" ComponentId="DemoAdminServlet">
-            <Data IsEnabled="true" Flags="1">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="CommandId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="admin/*"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ConsoleLog"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SettingsController" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="SettingsController"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="BehaviorServlet" PackageId="ImtRestDemoPck" ComponentId="DemoBehaviorServlet">
-            <Data IsEnabled="true" Flags="1">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="CommandId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="behavior/*"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ConsoleLog"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="BodyPolicyRouter" PackageId="ImtRestPck" ComponentId="HttpBodyPolicyRouter">
-            <Data IsEnabled="true" Flags="1">
+        <Element Id="BodyPolicy" PackageId="" ComponentId="BodyPolicy">
+            <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ConsoleLog"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="PathPrefixes" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>/upload</Value>
-                                <Value>/echo</Value>
-                                <Value>/refuse</Value>
-                                <Value>/admin</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Policies" Type="Reference[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>UploadBodyPolicy</Value>
-                                <Value>EchoBodyPolicy</Value>
-                                <Value>RefuseBodyPolicy</Value>
-                                <Value>AdminBodyPolicy</Value>
-                            </Values>
-                        </Data>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -93,62 +31,11 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="EchoBodyPolicy" PackageId="ImtRestDemoPck" ComponentId="DemoBodyPolicy">
-            <Data IsEnabled="true" Flags="1">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="MaxBodySize" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="4096"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Mode" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="buffer"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="EchoServlet" PackageId="ImtRestDemoPck" ComponentId="DemoEchoServlet">
-            <Data IsEnabled="true" Flags="1">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="CommandId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="echo"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ConsoleLog"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="FileResolver" PackageId="ImtRestDemoPck" ComponentId="DemoFileResolver">
-            <Data IsEnabled="true" Flags="1">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="PrivateToken" Type="Id" ExportId="Token">
-                        <Data IsEnabled="true" Value="demo-token"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RootDirectory" Type="String" ExportId="FilesDirectory">
-                        <Data IsEnabled="true" Value=""/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="FilesServlet" PackageId="ImtRestPck" ComponentId="HttpFileServlet">
-            <Data IsEnabled="true" Flags="1">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="CommandId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="files/*"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="FileResolver" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="FileResolver"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ConsoleLog"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="HttpProtocolEngine" PackageId="ImtRestPck" ComponentId="HttpProtocolEngine">
             <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap>
                     <AttributeInfo Id="BodyPolicy" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="BodyPolicyRouter"/>
+                        <Data IsEnabled="true" Value="BodyPolicy"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ConsoleLog"/>
@@ -159,46 +46,22 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="InfoServlet" PackageId="ImtRestDemoPck" ComponentId="DemoInfoServlet">
-            <Data IsEnabled="true" Flags="1">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="CommandId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="info"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="InfoJson" Type="Id" ExportId="InfoJson">
-                        <Data IsEnabled="true" Value="{}"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ConsoleLog"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="RefuseBodyPolicy" PackageId="ImtRestDemoPck" ComponentId="DemoBodyPolicy">
-            <Data IsEnabled="true" Flags="1">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="Mode" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="reject"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RejectStatusCode" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="403"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="RootServlet" PackageId="ImtRestPck" ComponentId="HttpRootServlet">
             <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="true" Value="ConsoleLog"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="RequestHandlers" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>FilesServlet</Value>
-                                <Value>EchoServlet</Value>
-                                <Value>InfoServlet</Value>
-                                <Value>UploadServlet</Value>
-                                <Value>StreamServlet</Value>
-                                <Value>BehaviorServlet</Value>
-                                <Value>AdminServlet</Value>
+                                <Value>Servlets/FilesServlet</Value>
+                                <Value>Servlets/EchoServlet</Value>
+                                <Value>Servlets/InfoServlet</Value>
+                                <Value>Servlets/UploadServlet</Value>
+                                <Value>Servlets/StreamServlet</Value>
+                                <Value>Servlets/BehaviorServlet</Value>
+                                <Value>Servlets/AdminServlet</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -214,12 +77,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="SettingsController" PackageId="ImtRestDemoPck" ComponentId="DemoSettingsController">
-            <Data IsEnabled="true" Flags="1">
-                <AttributeInfoMap/>
-            </Data>
-        </Element>
-        <Element Id="SslConfigurationManager" PackageId="ImtComPck" ComponentId="SslConfigurationManager">
+        <Element Id="Servlets" PackageId="" ComponentId="Servlets">
             <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="">
@@ -228,12 +86,14 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="StreamServlet" PackageId="ImtRestDemoPck" ComponentId="DemoStreamServlet">
+        <Element Id="SslConfig" PackageId="" ComponentId="SslConfig">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="SslConfigurationManager" PackageId="ImtComPck" ComponentId="SslConfigurationManager">
             <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="CommandId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="stream/*"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ConsoleLog"/>
                     </AttributeInfo>
@@ -265,7 +125,7 @@
                         <Data IsEnabled="true" Value="ServerInterface"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SslConfiguration" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="TlsConfiguration"/>
+                        <Data IsEnabled="true" Value="SslConfig"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SslConfigurationManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="SslConfigurationManager"/>
@@ -278,156 +138,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="WriteHighWatermark" Type="Integer" ExportId="WriteHighWatermark">
                         <Data IsEnabled="true" Value="1048576"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="TlsCertificate" PackageId="ImtComVoce" ComponentId="SslCertificateFile">
-            <Data IsEnabled="true" Flags="1">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="CertificateFilePath" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="TlsCertificatePath"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="TlsCertificatePath" PackageId="FilePck" ComponentId="FileNameParam">
-            <Data IsEnabled="true" Flags="1">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="DefaultPath" Type="String" ExportId="TlsCertificateFile">
-                        <Data IsEnabled="true" Value=""/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="PathType" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="1"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="TlsConfiguration" PackageId="BasePck" ComponentId="ComposedParamsSet">
-            <Data IsEnabled="true" Flags="1">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="Parameters" Type="Reference[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>TlsEnable</Value>
-                                <Value>TlsCertificate</Value>
-                                <Value>TlsIntermediateCertificates</Value>
-                                <Value>TlsPrivateKey</Value>
-                                <Value>TlsVerifyMode</Value>
-                                <Value>TlsProtocol</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ParametersId" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>EnableSsl</Value>
-                                <Value>LocalCert</Value>
-                                <Value>LocalCertChain</Value>
-                                <Value>PrivateKey</Value>
-                                <Value>VerifyMode</Value>
-                                <Value>Protocol</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ParametersName" Type="Text[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>Enable SSL</Value>
-                                <Value>Local Certificate</Value>
-                                <Value>Intermediate Certificates</Value>
-                                <Value>Private Key</Value>
-                                <Value>Verify Mode</Value>
-                                <Value>SSL Protocol</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="SslConfiguration"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="TlsEnable" PackageId="BasePck" ComponentId="EnableableParam">
-            <Data IsEnabled="true" Flags="1">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="DefaultEnabled" Type="Boolean" ExportId="EnableSsl">
-                        <Data IsEnabled="true" Value="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="TlsIntermediateCertificate" PackageId="ImtComVoce" ComponentId="SslCertificateFile">
-            <Data IsEnabled="true" Flags="2">
-                <AttributeInfoMap/>
-            </Data>
-        </Element>
-        <Element Id="TlsIntermediateCertificates" PackageId="BasePck" ComponentId="ParamsManager">
-            <Data IsEnabled="true" Flags="1">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ParamsSetFactory" Type="Factory" ExportId="">
-                        <Data IsEnabled="true" Value="TlsIntermediateCertificate"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="TlsKeyPath" PackageId="FilePck" ComponentId="FileNameParam">
-            <Data IsEnabled="true" Flags="1">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="DefaultPath" Type="String" ExportId="TlsKeyFile">
-                        <Data IsEnabled="true" Value=""/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="PathType" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="1"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="TlsPrivateKey" PackageId="ImtComVoce" ComponentId="SslKey">
-            <Data IsEnabled="true" Flags="1">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="PrivateKeyFilePath" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="TlsKeyPath"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="TlsProtocol" PackageId="ImtComPck" ComponentId="SslProtocolOptionList">
-            <Data IsEnabled="true" Flags="1">
-                <AttributeInfoMap/>
-            </Data>
-        </Element>
-        <Element Id="TlsVerifyMode" PackageId="ImtComPck" ComponentId="SslVerifyModeOptionList">
-            <Data IsEnabled="true" Flags="1">
-                <AttributeInfoMap/>
-            </Data>
-        </Element>
-        <Element Id="UploadBodyPolicy" PackageId="ImtRestDemoPck" ComponentId="DemoBodyPolicy">
-            <Data IsEnabled="true" Flags="1">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="Mode" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="stream"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RequiredToken" Type="Id" ExportId="Token">
-                        <Data IsEnabled="true" Value="demo-token"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="UploadDirectory" Type="String" ExportId="UploadDirectory">
-                        <Data IsEnabled="true" Value=""/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="UploadServlet" PackageId="ImtRestDemoPck" ComponentId="DemoUploadServlet">
-            <Data IsEnabled="true" Flags="1">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="CommandId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="upload/*"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ConsoleLog"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="UploadDirectory" Type="String" ExportId="UploadDirectory">
-                        <Data IsEnabled="true" Value=""/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -451,12 +161,375 @@
             </Data>
         </Element>
     </ElementsList>
-    <EmbeddedRegistriesList/>
+    <EmbeddedRegistriesList>
+        <EmbeddedRegistry Id="BodyPolicy">
+            <Data Description="" Keywords="">
+                <ElementsList>
+                    <Element Id="AdminBodyPolicy" PackageId="ImtRestDemoPck" ComponentId="DemoBodyPolicy">
+                        <Data IsEnabled="true" Flags="1">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="MaxBodySize" Type="Integer" ExportId="">
+                                    <Data IsEnabled="true" Value="262144"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Mode" Type="Id" ExportId="">
+                                    <Data IsEnabled="true" Value="buffer"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="RequiredToken" Type="Id" ExportId="Token">
+                                    <Data IsEnabled="true" Value="demo-token"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="BodyPolicyRouter" PackageId="ImtRestPck" ComponentId="HttpBodyPolicyRouter">
+                        <Data IsEnabled="true" Flags="1">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="PathPrefixes" Type="Id[]" ExportId="">
+                                    <Data IsEnabled="true">
+                                        <Values>
+                                            <Value>/upload</Value>
+                                            <Value>/echo</Value>
+                                            <Value>/refuse</Value>
+                                            <Value>/admin</Value>
+                                        </Values>
+                                    </Data>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Policies" Type="Reference[]" ExportId="">
+                                    <Data IsEnabled="true">
+                                        <Values>
+                                            <Value>UploadBodyPolicy</Value>
+                                            <Value>EchoBodyPolicy</Value>
+                                            <Value>RefuseBodyPolicy</Value>
+                                            <Value>AdminBodyPolicy</Value>
+                                        </Values>
+                                    </Data>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="EchoBodyPolicy" PackageId="ImtRestDemoPck" ComponentId="DemoBodyPolicy">
+                        <Data IsEnabled="true" Flags="1">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="MaxBodySize" Type="Integer" ExportId="">
+                                    <Data IsEnabled="true" Value="4096"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Mode" Type="Id" ExportId="">
+                                    <Data IsEnabled="true" Value="buffer"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="RefuseBodyPolicy" PackageId="ImtRestDemoPck" ComponentId="DemoBodyPolicy">
+                        <Data IsEnabled="true" Flags="1">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="Mode" Type="Id" ExportId="">
+                                    <Data IsEnabled="true" Value="reject"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="RejectStatusCode" Type="Integer" ExportId="">
+                                    <Data IsEnabled="true" Value="403"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="UploadBodyPolicy" PackageId="ImtRestDemoPck" ComponentId="DemoBodyPolicy">
+                        <Data IsEnabled="true" Flags="1">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="Mode" Type="Id" ExportId="">
+                                    <Data IsEnabled="true" Value="stream"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="RequiredToken" Type="Id" ExportId="Token">
+                                    <Data IsEnabled="true" Value="demo-token"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="UploadDirectory" Type="String" ExportId="UploadDirectory">
+                                    <Data IsEnabled="true" Value=""/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                </ElementsList>
+                <EmbeddedRegistriesList/>
+                <ExportedInterfaces>
+                    <Interface InterfaceId="imtrest::IHttpRequestBodyPolicy" ComponentId="BodyPolicyRouter"/>
+                    <Interface InterfaceId="istd::IPolymorphic" ComponentId="BodyPolicyRouter"/>
+                </ExportedInterfaces>
+                <ExportedComponents/>
+            </Data>
+        </EmbeddedRegistry>
+        <EmbeddedRegistry Id="Servlets">
+            <Data Description="" Keywords="">
+                <ElementsList>
+                    <Element Id="AdminServlet" PackageId="ImtRestDemoPck" ComponentId="DemoAdminServlet">
+                        <Data IsEnabled="true" Flags="1">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="CommandId" Type="Id" ExportId="">
+                                    <Data IsEnabled="true" Value="admin/*"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="SettingsController" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="SettingsController"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="BehaviorServlet" PackageId="ImtRestDemoPck" ComponentId="DemoBehaviorServlet">
+                        <Data IsEnabled="true" Flags="1">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="CommandId" Type="Id" ExportId="">
+                                    <Data IsEnabled="true" Value="behavior/*"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="EchoServlet" PackageId="ImtRestDemoPck" ComponentId="DemoEchoServlet">
+                        <Data IsEnabled="true" Flags="1">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="CommandId" Type="Id" ExportId="">
+                                    <Data IsEnabled="true" Value="echo"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="FileResolver" PackageId="ImtRestDemoPck" ComponentId="DemoFileResolver">
+                        <Data IsEnabled="true" Flags="1">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="PrivateToken" Type="Id" ExportId="Token">
+                                    <Data IsEnabled="true" Value="demo-token"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="RootDirectory" Type="String" ExportId="FilesDirectory">
+                                    <Data IsEnabled="true" Value=""/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="FilesServlet" PackageId="ImtRestPck" ComponentId="HttpFileServlet">
+                        <Data IsEnabled="true" Flags="1">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="CommandId" Type="Id" ExportId="">
+                                    <Data IsEnabled="true" Value="files/*"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="FileResolver" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="FileResolver"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="InfoServlet" PackageId="ImtRestDemoPck" ComponentId="DemoInfoServlet">
+                        <Data IsEnabled="true" Flags="1">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="CommandId" Type="Id" ExportId="">
+                                    <Data IsEnabled="true" Value="info"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="InfoJson" Type="Id" ExportId="InfoJson">
+                                    <Data IsEnabled="true" Value="{}"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="SettingsController" PackageId="ImtRestDemoPck" ComponentId="DemoSettingsController">
+                        <Data IsEnabled="true" Flags="1">
+                            <AttributeInfoMap/>
+                        </Data>
+                    </Element>
+                    <Element Id="StreamServlet" PackageId="ImtRestDemoPck" ComponentId="DemoStreamServlet">
+                        <Data IsEnabled="true" Flags="1">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="CommandId" Type="Id" ExportId="">
+                                    <Data IsEnabled="true" Value="stream/*"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="UploadServlet" PackageId="ImtRestDemoPck" ComponentId="DemoUploadServlet">
+                        <Data IsEnabled="true" Flags="1">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="CommandId" Type="Id" ExportId="">
+                                    <Data IsEnabled="true" Value="upload/*"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="UploadDirectory" Type="String" ExportId="UploadDirectory">
+                                    <Data IsEnabled="true" Value=""/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                </ElementsList>
+                <EmbeddedRegistriesList/>
+                <ExportedInterfaces/>
+                <ExportedComponents>
+                    <Component ExportedId="AdminServlet" ComponentId="AdminServlet"/>
+                    <Component ExportedId="BehaviorServlet" ComponentId="BehaviorServlet"/>
+                    <Component ExportedId="EchoServlet" ComponentId="EchoServlet"/>
+                    <Component ExportedId="FileResolver" ComponentId="FileResolver"/>
+                    <Component ExportedId="FilesServlet" ComponentId="FilesServlet"/>
+                    <Component ExportedId="InfoServlet" ComponentId="InfoServlet"/>
+                    <Component ExportedId="SettingsController" ComponentId="SettingsController"/>
+                    <Component ExportedId="StreamServlet" ComponentId="StreamServlet"/>
+                    <Component ExportedId="UploadServlet" ComponentId="UploadServlet"/>
+                </ExportedComponents>
+            </Data>
+        </EmbeddedRegistry>
+        <EmbeddedRegistry Id="SslConfig">
+            <Data Description="" Keywords="">
+                <ElementsList>
+                    <Element Id="TlsCertificate" PackageId="ImtComVoce" ComponentId="SslCertificateFile">
+                        <Data IsEnabled="true" Flags="1">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="CertificateFilePath" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="TlsCertificatePath"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="TlsCertificatePath" PackageId="FilePck" ComponentId="FileNameParam">
+                        <Data IsEnabled="true" Flags="1">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="DefaultPath" Type="String" ExportId="TlsCertificateFile">
+                                    <Data IsEnabled="true" Value=""/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="PathType" Type="Integer" ExportId="">
+                                    <Data IsEnabled="true" Value="1"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="TlsConfiguration" PackageId="BasePck" ComponentId="ComposedParamsSet">
+                        <Data IsEnabled="true" Flags="1">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="Parameters" Type="Reference[]" ExportId="">
+                                    <Data IsEnabled="true">
+                                        <Values>
+                                            <Value>TlsEnable</Value>
+                                            <Value>TlsCertificate</Value>
+                                            <Value>TlsIntermediateCertificates</Value>
+                                            <Value>TlsPrivateKey</Value>
+                                            <Value>TlsVerifyMode</Value>
+                                            <Value>TlsProtocol</Value>
+                                        </Values>
+                                    </Data>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ParametersId" Type="Id[]" ExportId="">
+                                    <Data IsEnabled="true">
+                                        <Values>
+                                            <Value>EnableSsl</Value>
+                                            <Value>LocalCert</Value>
+                                            <Value>LocalCertChain</Value>
+                                            <Value>PrivateKey</Value>
+                                            <Value>VerifyMode</Value>
+                                            <Value>Protocol</Value>
+                                        </Values>
+                                    </Data>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ParametersName" Type="Text[]" ExportId="">
+                                    <Data IsEnabled="true">
+                                        <Values>
+                                            <Value>Enable SSL</Value>
+                                            <Value>Local Certificate</Value>
+                                            <Value>Intermediate Certificates</Value>
+                                            <Value>Private Key</Value>
+                                            <Value>Verify Mode</Value>
+                                            <Value>SSL Protocol</Value>
+                                        </Values>
+                                    </Data>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                                    <Data IsEnabled="true" Value="SslConfiguration"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="TlsEnable" PackageId="BasePck" ComponentId="EnableableParam">
+                        <Data IsEnabled="true" Flags="1">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="DefaultEnabled" Type="Boolean" ExportId="EnableSsl">
+                                    <Data IsEnabled="true" Value="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="TlsIntermediateCertificate" PackageId="ImtComVoce" ComponentId="SslCertificateFile">
+                        <Data IsEnabled="true" Flags="2">
+                            <AttributeInfoMap/>
+                        </Data>
+                    </Element>
+                    <Element Id="TlsIntermediateCertificates" PackageId="BasePck" ComponentId="ParamsManager">
+                        <Data IsEnabled="true" Flags="1">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="ParamsSetFactory" Type="Factory" ExportId="">
+                                    <Data IsEnabled="true" Value="TlsIntermediateCertificate"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="TlsKeyPath" PackageId="FilePck" ComponentId="FileNameParam">
+                        <Data IsEnabled="true" Flags="1">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="DefaultPath" Type="String" ExportId="TlsKeyFile">
+                                    <Data IsEnabled="true" Value=""/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="PathType" Type="Integer" ExportId="">
+                                    <Data IsEnabled="true" Value="1"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="TlsPrivateKey" PackageId="ImtComVoce" ComponentId="SslKey">
+                        <Data IsEnabled="true" Flags="1">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="PrivateKeyFilePath" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="TlsKeyPath"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="TlsProtocol" PackageId="ImtComPck" ComponentId="SslProtocolOptionList">
+                        <Data IsEnabled="true" Flags="1">
+                            <AttributeInfoMap/>
+                        </Data>
+                    </Element>
+                    <Element Id="TlsVerifyMode" PackageId="ImtComPck" ComponentId="SslVerifyModeOptionList">
+                        <Data IsEnabled="true" Flags="1">
+                            <AttributeInfoMap/>
+                        </Data>
+                    </Element>
+                </ElementsList>
+                <EmbeddedRegistriesList/>
+                <ExportedInterfaces>
+                    <Interface InterfaceId="imod::IModel" ComponentId="TlsConfiguration"/>
+                    <Interface InterfaceId="iprm::IParamsInfoProvider" ComponentId="TlsConfiguration"/>
+                    <Interface InterfaceId="iprm::IParamsSet" ComponentId="TlsConfiguration"/>
+                    <Interface InterfaceId="iser::ISerializable" ComponentId="TlsConfiguration"/>
+                    <Interface InterfaceId="istd::IChangeable" ComponentId="TlsConfiguration"/>
+                    <Interface InterfaceId="istd::IPolymorphic" ComponentId="TlsConfiguration"/>
+                    <Interface InterfaceId="istd::TIHierarchical&lt;istd::IPolymorphic&gt;" ComponentId="TlsConfiguration"/>
+                </ExportedInterfaces>
+                <ExportedComponents/>
+            </Data>
+        </EmbeddedRegistry>
+    </EmbeddedRegistriesList>
     <ExportedInterfaces/>
     <ExportedComponents>
-        <Component ExportedId="SettingsController" ComponentId="SettingsController"/>
         <Component ExportedId="TcpServer" ComponentId="TcpServer"/>
-        <Component ExportedId="TlsConfiguration" ComponentId="TlsConfiguration"/>
         <Component ExportedId="WorkerManager" ComponentId="WorkerManager"/>
     </ExportedComponents>
 </Acf>
