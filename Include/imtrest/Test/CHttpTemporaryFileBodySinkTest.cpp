@@ -219,7 +219,7 @@ void CHttpTemporaryFileBodySinkTest::FileIsCreatedByOpenTest()
 	QVERIFY(!path.isEmpty());
 	QVERIFY(QFileInfo::exists(path));
 	QCOMPARE(QFileInfo(path).canonicalPath(), QFileInfo(dir.path()).canonicalFilePath());
-	QVERIFY(QFileInfo(path).fileName().startsWith(QStringLiteral("imtrest-body-")));
+	QVERIFY(QFileInfo(path).fileName().startsWith(QStringLiteral("temp-file-body-")));
 	QCOMPARE(GetFileNames(dir).size(), 1);
 
 	QVERIFY(!sink.IsFinished());
@@ -255,7 +255,7 @@ void CHttpTemporaryFileBodySinkTest::NamesOfFilesAreUniqueTest()
 	for (int i = 0; i < s_receiverCount; ++i){
 		const QString path = sinks[i]->GetFilePath();
 
-		QVERIFY(QFileInfo(path).fileName().startsWith(QStringLiteral("imtrest-body-")));
+		QVERIFY(QFileInfo(path).fileName().startsWith(QStringLiteral("temp-file-body-")));
 		QCOMPARE(ReadFile(path), CreateReceiverBody(i));
 
 		paths.insert(path);

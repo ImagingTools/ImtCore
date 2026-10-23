@@ -22,7 +22,7 @@ namespace imtrest
 	in the memory. In contrast to CHttpFileBodySink the name of the file is not known in advance: the handler of the request reads
 	it from GetFilePath() and either processes the body from the file or takes the file with TakeFile().
 
-	The name of the file is unique, a receiver never writes to a file of another one. It is made from the template "imtrest-body-XXXXXX":
+	The name of the file is unique, a receiver never writes to a file of another one. It is made from the template "temp-file-body-XXXXXX":
 	QTemporaryFile replaces "XXXXXX" with random characters and creates the file only if there is no file with such a name (it never opens an
 	existing file), so any number of the receivers that work at the same time get different files: in one directory, in different
 	threads and even in different processes.
