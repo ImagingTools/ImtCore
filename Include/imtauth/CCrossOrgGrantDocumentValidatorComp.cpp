@@ -35,7 +35,7 @@ bool CCrossOrgGrantDocumentValidatorComp::ValidateDocumentData(
 		return false;
 	}
 
-	if (m_connectionManagerCompPtr.IsValid() && !imtauth::AreTenantsConnected(*m_connectionManagerCompPtr, info.sourceTenantId, info.targetTenantId)){
+	if (info.isActive && m_connectionManagerCompPtr.IsValid() && !imtauth::AreTenantsConnected(*m_connectionManagerCompPtr, info.sourceTenantId, info.targetTenantId)){
 		errorMessage = QStringLiteral("The organizations are not connected");
 		return false;
 	}
