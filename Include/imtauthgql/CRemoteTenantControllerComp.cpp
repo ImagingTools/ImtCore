@@ -172,8 +172,14 @@ QByteArrayList CRemoteTenantControllerComp::GetTenantPermissions(const QByteArra
 }
 
 
-QByteArray CRemoteTenantControllerComp::CreateTenant(const QString& tenantName, const QString& description, const QByteArray& ownerId)
+QByteArray CRemoteTenantControllerComp::CreateTenant(
+			const QString& tenantName,
+			const QString& description,
+			const QByteArray& ownerId,
+			const QByteArray& /*creatorId*/,
+			const QByteArray& /*parentTenantId*/)
 {
+	// The tenant service takes the creator and the parent from the context of the request
 	namespace tenantsdl = sdl::V1_0::imtauth;
 
 	tenantsdl::CreateTenantRequestArguments arguments;
@@ -254,6 +260,37 @@ bool CRemoteTenantControllerComp::UpdateTenant(const QByteArray& tenantId, const
 	}
 
 	return *payload.success;
+}
+
+
+bool CRemoteTenantControllerComp::SetTenantPermissions(const QByteArray& tenantId, const QByteArrayList& permissions)
+{
+	namespace tenantsdl = sdl::V1_0::imtauth;
+
+	imtauth::ITenantInfoUniquePtr tenantPtr = GetTenant(tenantId);
+	if (!tenantPtr.IsValid()){
+		return false;
+	}
+
+	tenantsdl::UpdateTenantRequestArguments arguments;
+	arguments.input.emplace();
+	arguments.input->tenantId = tenantId;
+	arguments.input->name = tenantPtr->GetTenantName();
+	arguments.input->description = tenantPtr->GetTenantDescription();
+	arguments.input->tenantPermissions.Emplace().FromList(permissions);
+
+	imtgql::CGqlRequest gqlRequest;
+	AttachCurrentContext(gqlRequest);
+	if (!tenantsdl::CUpdateTenantGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
+		return false;
+	}
+
+	tenantsdl::CUpdateTenantGqlRequest updateTenantRequest(gqlRequest, false);
+
+	QString errorMessage;
+	tenantsdl::CUpdateTenantPayload payload = OnUpdateTenant(updateTenantRequest, gqlRequest, errorMessage);
+
+	return payload.success.has_value() && *payload.success;
 }
 
 

@@ -95,8 +95,8 @@ inline bool CheckPermissions(
 		return false;
 	}
 
-	// A superuser and the owner of the organization are not bound by the permission tree.
-	if (userInfoPtr->IsAdmin() || gqlContextPtr->IsTenantOwner()){
+	// A superuser is not bound by the permission tree; the owner of an organization holds its scope as permissions.
+	if (userInfoPtr->IsAdmin()){
 		return true;
 	}
 
@@ -167,7 +167,7 @@ inline bool CheckRevisionPermissions(
 		return false;
 	}
 
-	if (userInfoPtr->IsAdmin() || gqlContextPtr->IsTenantOwner()){
+	if (userInfoPtr->IsAdmin()){
 		return true;
 	}
 
@@ -227,7 +227,7 @@ inline bool CheckRequestPermissions(
 		return false;
 	}
 
-	if (userInfoPtr->IsAdmin() || gqlContextPtr->IsTenantOwner()){
+	if (userInfoPtr->IsAdmin()){
 		return true;
 	}
 

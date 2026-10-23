@@ -936,7 +936,7 @@ void CUserCollectionControllerComp::SetAdditionalFilters(
 		return;
 	}
 
-	// A tenant is selected: restrict the list to active members of that tenant only.
+	// A tenant is selected: restrict the list to its active members and its creator.
 	imtbase::CComplexCollectionFilter::FilterExpression filterExpr;
 	filterExpr.logicalOperation = imtbase::IComplexCollectionFilter::LO_OR;
 
@@ -946,6 +946,14 @@ void CUserCollectionControllerComp::SetAdditionalFilters(
 		if (membershipPtr.IsValid() && membershipPtr->IsActive()){
 			filterExpr.fieldFilters << imtbase::IComplexCollectionFilter::FieldFilter(
 						"DocumentId", QVariant(membershipPtr->GetUserId()), imtbase::IComplexCollectionFilter::FO_EQUAL);
+		}
+	}
+
+	if (m_tenantManagerCompPtr.IsValid()){
+		imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
+		if (tenantPtr.IsValid() && !tenantPtr->GetCreatorId().isEmpty()){
+			filterExpr.fieldFilters << imtbase::IComplexCollectionFilter::FieldFilter(
+						"DocumentId", QVariant(tenantPtr->GetCreatorId()), imtbase::IComplexCollectionFilter::FO_EQUAL);
 		}
 	}
 

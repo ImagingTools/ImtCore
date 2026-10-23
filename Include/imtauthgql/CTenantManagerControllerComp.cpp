@@ -390,8 +390,17 @@ sdl::V1_0::imtauth::CCreateTenantPayload CTenantManagerControllerComp::OnCreateT
 
 	QString name;
 	QString description;
-	QByteArray ownerId = GetUserId(gqlRequest);
-	QByteArray parentTenantId;
+	// An organization created from inside another one is its sub-organization; the parent is never chosen
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	const QByteArray parentTenantId = gqlContextPtr != nullptr ? gqlContextPtr->GetTenantId() : QByteArray();
+	const QByteArray creatorId = gqlContextPtr != nullptr ? gqlContextPtr->GetUserId() : QByteArray();
+	QByteArray ownerId = creatorId;
+
+	if (gqlContextPtr == nullptr || !CanCreateOrganization(*gqlContextPtr)){
+		response.errorMessage = QStringLiteral("Permission denied: /OrganizationManagement/Add");
+		return response;
+	}
+
 	sdl::V1_0::imtauth::CreateTenantRequestArguments arguments = createTenantRequest.GetRequestedArguments();
 	if (arguments.input->name){
 		name = *arguments.input->name;
@@ -402,8 +411,9 @@ sdl::V1_0::imtauth::CCreateTenantPayload CTenantManagerControllerComp::OnCreateT
 	if (arguments.input->ownerId){
 		ownerId = *arguments.input->ownerId;
 	}
-	if (arguments.input->parentTenantId){
-		parentTenantId = *arguments.input->parentTenantId;
+	if (arguments.input->parentTenantId && !arguments.input->parentTenantId->isEmpty() && *arguments.input->parentTenantId != parentTenantId){
+		response.errorMessage = QStringLiteral("The parent of a new organization is the organization you work in");
+		return response;
 	}
 
 	name = NormalizeTenantName(name);
@@ -427,28 +437,11 @@ sdl::V1_0::imtauth::CCreateTenantPayload CTenantManagerControllerComp::OnCreateT
 		return response;
 	}
 
-	if (!parentTenantId.isEmpty()){
-		if (!imtbase::isValidUuid(parentTenantId)){
-			response.errorMessage = QStringLiteral("Invalid parent tenant ID format");
-			return response;
-		}
-
-		if (!m_tenantManagerCompPtr->GetTenant(parentTenantId).IsValid()){
-			response.errorMessage = QStringLiteral("Parent tenant not found");
-			return response;
-		}
-	}
-
-	QByteArray tenantId = m_tenantManagerCompPtr->CreateTenant(name, description, ownerId);
+	QByteArray tenantId = m_tenantManagerCompPtr->CreateTenant(name, description, ownerId, creatorId, parentTenantId);
 
 	if (tenantId.isEmpty()){
 		response.errorMessage = QStringLiteral("Failed to create tenant");
 		return response;
-	}
-
-	// Set hierarchy fields if parentTenantId was provided
-	if (!parentTenantId.isEmpty()){
-		m_tenantManagerCompPtr->SetTenantHierarchy(tenantId, parentTenantId);
 	}
 
 	if (m_membershipManagerCompPtr.IsValid() && !ownerId.isEmpty()){
@@ -606,7 +599,30 @@ sdl::V1_0::imtauth::CUpdateTenantPayload CTenantManagerControllerComp::OnUpdateT
 		}
 	}
 
-	bool success = m_tenantManagerCompPtr->UpdateTenant(tenantId, name, description, ownerId, updateOwner);
+	const bool hasPermissions = arguments.input->tenantPermissions.HasValue();
+	const QByteArrayList newPermissions = hasPermissions ? arguments.input->tenantPermissions->ToList() : QByteArrayList();
+	if (hasPermissions){
+		const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+		QString permissionsError;
+		if (!CheckTenantPermissionsChange(
+					*m_tenantManagerCompPtr.GetPtr(),
+					currentTenantPtr->GetCreatorId(),
+					currentTenantPtr->GetParentTenantId(),
+					currentTenantPtr->GetTenantPermissions(),
+					newPermissions,
+					gqlContextPtr != nullptr ? gqlContextPtr->GetUserId() : QByteArray(),
+					permissionsError)){
+			response.errorMessage = permissionsError;
+			response.success = false;
+			return response;
+		}
+	}
+
+	// The scope goes first: a refused scope leaves the organization untouched
+	bool success = !hasPermissions || m_tenantManagerCompPtr->SetTenantPermissions(tenantId, newPermissions);
+	if (success){
+		success = m_tenantManagerCompPtr->UpdateTenant(tenantId, name, description, ownerId, updateOwner);
+	}
 
 	// Sync members with TenantMemberships
 	if (success && m_membershipManagerCompPtr.IsValid() && arguments.input->members){

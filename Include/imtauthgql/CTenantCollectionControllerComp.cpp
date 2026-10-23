@@ -121,6 +121,10 @@ bool CTenantCollectionControllerComp::CreateRepresentationFromObject(
 		representationObject.parentTenantId = tenantInfoPtr->GetParentTenantId();
 	}
 
+	if (requestInfo.items.isParentTenantNameRequested && !tenantInfoPtr->GetParentTenantId().isEmpty() && m_objectCollectionCompPtr.IsValid()){
+		representationObject.parentTenantName = m_objectCollectionCompPtr->GetElementInfo(tenantInfoPtr->GetParentTenantId(), imtbase::ICollectionInfo::EIT_NAME).toString();
+	}
+
 	if (requestInfo.items.isIsSystemTenantRequested){
 		representationObject.isSystemTenant = (tenantInfoPtr->GetTenantId() == imtauth::GetSystemTenantId());
 	}

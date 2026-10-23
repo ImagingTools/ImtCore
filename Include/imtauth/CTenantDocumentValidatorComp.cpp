@@ -9,6 +9,7 @@
 
 // ImtCore includes
 #include <imtauth/ITenantInfo.h>
+#include <imtauth/imtauth.h>
 
 
 namespace imtauth
@@ -54,6 +55,29 @@ bool CTenantDocumentValidatorComp::ValidateDocumentData(
 	if (!foundIds.isEmpty()){
 		errorMessage = QStringLiteral("An organization with the same name already exists");
 		return false;
+	}
+
+	// The parent may have been narrowed since the scope was edited
+	const QByteArray parentTenantId = tenantInfo->GetParentTenantId();
+	if (!parentTenantId.isEmpty()){
+		imtbase::IObjectCollection::DataPtr parentDataPtr;
+		const imtauth::ITenantInfo* parentTenantPtr = nullptr;
+		if (m_tenantCollectionCompPtr->GetObjectData(parentTenantId, parentDataPtr)){
+			parentTenantPtr = dynamic_cast<const imtauth::ITenantInfo*>(parentDataPtr.GetPtr());
+		}
+
+		if (parentTenantPtr == nullptr){
+			errorMessage = QStringLiteral("The parent organization does not exist");
+			return false;
+		}
+
+		const QByteArrayList parentPermissions = parentTenantPtr->GetTenantPermissions();
+		for (const QByteArray& permission : tenantInfo->GetTenantPermissions()){
+			if (!HasPermission(parentPermissions, permission, false)){
+				errorMessage = QStringLiteral("Permission '%1' is not available to the parent organization").arg(QString::fromUtf8(permission));
+				return false;
+			}
+		}
 	}
 
 	return true;

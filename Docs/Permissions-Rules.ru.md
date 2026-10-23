@@ -98,7 +98,8 @@ Lisa FeatureEditor ──generate──► <Product>Features.h ──FillProduct
 ├─ View            данные и все команды организации (чтение, изменение, участники, связи, ...)
 ├─ Add             создание организации
 ├─ Remove          удаление организации
-└─ Revisions/{View → View, Restore, Delete}
+├─ Revisions/{View → View, Restore, Delete}
+└─ Shares/Edit → View   управление расшарками документов организации
 ```
 
 Внутренние команды организации объявлены продуктовым `/OrganizationManagement/View`; какое именно действие разрешено, решает лист участника:
@@ -116,6 +117,7 @@ Lisa FeatureEditor ──generate──► <Product>Features.h ──FillProduct
 | код подключения | `Connections/ViewCode` |
 | создание, принятие, отклонение, отмена; договоры, гранты, сообщения, заявки — изменение; код подключения — изменение | `Connections/Edit/Connect` |
 | удаление связи | `Connections/Edit/Remove` |
+| расшарки: ограничение группами, статус, удаление (`SetDocumentShareGroups`, `SetDocumentSharesStatus`, `RemoveOrganizationDocumentShares`) | продуктовый `/OrganizationManagement/Shares/Edit` (ProLife, атрибут `EditCommandPermissions` композиции `DocumentShareController`); чтение (`GetOrganizationDocumentShares`) — `View` |
 
 ## 4. Формат идентификатора и правило сравнения
 
@@ -270,7 +272,7 @@ Lisa FeatureEditor ──generate──► <Product>Features.h ──FillProduct
 
 1. Провайдер не подключён → **разрешить** (13.10).
 2. Нет контекста или пользователя → **отказать**.
-3. Суперпользователь (`IsAdmin`) или владелец организации (`IsTenantOwner`) → **разрешить** (для PAT см. 13.16).
+3. Суперпользователь (`IsAdmin`) → **разрешить**. Владелец организации проверяется как все: весь scope организации уже лежит в правах его контекста (раздел 10).
 4. Команды нет в провайдере → **отказать** (`denyUndeclared = true`).
 5. Чекер не подключён или список прав команды пуст → **разрешить**.
 6. В запросе есть заголовок `permissionPath` (6.4) → путь должен **совпадать с одним из прав команды или лежать внутри него**, и он должен быть у пользователя среди действующих прав.
@@ -333,7 +335,7 @@ Lisa FeatureEditor ──generate──► <Product>Features.h ──FillProduct
 | Субъект | Как определяется | Поведение |
 |---|---|---|
 | **Суперпользователь** | `CUserInfoComp::IsAdmin()`: `UserId == AdminId` (в композициях `AdminId = su`). Клиент определяет по `login == "su"`. | Обходит все проверки прав команд; сервер отдаёт ему **пустой** список прав. |
-| **Владелец организации** | `ITenantInfo::GetOwnerId() == userId` для текущей организации (кэшируется на токен). | Обходит проверки в рамках своей организации. |
+| **Владелец организации** | `ITenantInfo::GetOwnerId() == userId` для текущей организации (кэшируется на токен). | Проверки не обходит: держит весь scope своей организации как права контекста (`imtgql::CollectTenantOwnerPermissions`) и ничего сверх него; scope только читает. |
 
 **R9.1.** Суперпользователя не определять по списку прав — он пустой и неотличим от пользователя без прав. В тестах для этого есть `permissions: ['*']` (`GuiTestKit/fixtures/defineUsers.js` отказывается принимать `su` без него).
 **R9.2.** Только суперпользователь: включение/отключение учётной записи (`IsSuperuserRequest`), изменение чужого профиля (`OnSetProfile`), создание отключённой учётной записи, выдача PAT с любыми scopes.
@@ -343,7 +345,14 @@ Lisa FeatureEditor ──generate──► <Product>Features.h ──FillProduct
 ## 10. Организации и PAT
 
 **Организации (tenant).**
-- `ITenantInfo::GetTenantPermissions()` — **верхняя граница**: перечень продуктовых прав, доступных организации.
+- `ITenantInfo::GetTenantPermissions()` — **scope**, верхняя граница: перечень продуктовых прав, доступных организации. Внутри организации ничего вне scope не действует, **пустой scope не даёт ничего** (`imtgql::CollectImpliedPermissions`).
+- **Scope задаёт только создатель** организации (`CreatorId`), в `UpdateTenant` и в редакторе организации (`imtauthgql::CheckTenantPermissionsChange`): «Only the creator of the organization can change its permissions». Редактор получает признак `canEditTenantPermissions` и, для подорганизации, scope родителя `parentTenantPermissions`.
+- **Владелец** держит весь scope как права (раздел 9) и видит его только для чтения.
+- **Создание.** Организацию создаёт суперпользователь или пользователь с `/OrganizationManagement/Add` (`imtauthgql::CanCreateOrganization`, в `CreateTenant` и в сервисе документов `Tenants`). Организация, созданная изнутри другой, — её дочерняя: родителя не выбирают, им становится организация контекста (переданный другой `parentTenantId` отклоняется), а `/OrganizationManagement/Add` должен быть ещё и в scope родителя. Scope подорганизации — подмножество scope родителя: «Permission '%1' is not available to the parent organization»; это проверяется при изменении scope и при каждом сохранении документа (`CTenantDocumentValidatorComp`). `CreateTenant` даёт подорганизации стандартный набор, урезанный до scope родителя.
+- **Каскад.** Сужение scope урезает scope всех потомков (`ITenantManager::SetTenantPermissions`).
+- **Стандартный scope** корневой организации, созданной через `CreateTenant`: листья `/Administration/{Users, Roles, Groups}/{ViewPage, View, Edit/Add, Edit/Change, Edit/Remove, Revisions/View}` (`CTenantManagerComp`).
+- **Страница «Организации»** видна при наличии хотя бы одной организации или действующего приглашения, а вне организаций — ещё и держателю `/OrganizationManagement/Add`: сервер добавляет `/OrganizationManagement/{ViewPage, View}` участнику, владельцу и создателю в контексте организации, а вне организаций — участнику любой организации, приглашённому и тому, кто может создавать организации (`CAuthenticationManagerComp::HasOrganizationAccess`). На серверах продуктов (без менеджера членств) вне организаций — только держателю `Add` (13.30).
+- **Кэш.** Scope, признак владельца и доступ к организациям кэшируются на токен на `TenantDataCacheLifetime` (по умолчанию 10 с): изменения доходят до открытых сессий не позже этого срока.
 - Роль организации может содержать только права из этого списка (`CRoleDocumentValidatorComp`: «Permission '%1' is not allowed for tenant»).
 - Список прав организации согласован с requirements: при добавлении права редактор сам добавляет листья, которые это право включает. Иначе `ChangeUser` без `ViewUsers` дал бы изменение без просмотра.
 - `GetProductPermissions(productId, tenantId)` возвращает дерево, ограниченное правами организации; `GetUserPermissions(productId)` — права текущего пользователя (суперпользователю — всё дерево).
@@ -358,7 +367,7 @@ Lisa FeatureEditor ──generate──► <Product>Features.h ──FillProduct
 ## 11. Тестирование
 
 - **Юнит:** `ImtCore/Tests/PermissionRequirementsTest` (25) — правило `HasPermission` (таблица раздела 4, голые id) и раскрытие requirements (таблицы раздела 5: четыре вида зависимостей, транзитивность, циклы, граница организации, продукт запроса, запрещённые зависимости). `ImtCore/Tests/PermissionCheckTest` (38) — проверка серверной команды целиком (`CheckRequestPermissions`): кто проверяется, декларации, все виды requirements, продукт и организация, `permissionPath`, элементы GUI, ревизии (`CheckRevisionPermissions`). Новые кейсы проверены мутациями: каждый ломается, если вернуть сравнение голых id или проверку ревизий по группе либо по чужой коллекции.
-- **API (Postman):** Puma `TenantApiPostman` — папка 20 «Organization permissions by path» (права организации по путям, голый id и группа ничего не дают); ProLife `ProLifeApiPostman` — папка 11 «Permission Model» (продукт сервера, scopes PAT путями и голым id, совпадение `GetPermissions` с решением сервера).
+- **API (Postman):** Puma `TenantApiPostman` — папка 20 «Organization permissions by path» (права организации по путям, голый id и группа ничего не дают), папки 00D «Organization creators» (право создавать организации) и 23 «Organization permission scope» (scope от создателя, владелец держит весь scope и не меняет его, подорганизация через API и через документ, scope шире родителя отклоняется, каскад, пустой scope, видимость страницы по приглашению); ProLife `ProLifeApiPostman` — папка 11 «Permission Model» (продукт сервера, scopes PAT путями и голым id, совпадение `GetPermissions` с решением сервера).
 - **Серверные API-тесты:** для каждой защищённой команды — пользователь без права получает отказ; для каждого requirement — право включает свою цель, а цель не даёт обратно источник.
 - **GUI (`GuiTestKit`).** Матриц «права → страницы» **не ведём**: клиент строится из прав пользователя, поэтому тест спрашивает его самого — `page.isAvailable()`, `page.commands.isAvailable(id)`, `admin.hasSubPage(id)`. Условие пропуска — только `requires(user, permission)` (не `!user.can(x)`: «не удалось определить» ≠ «нет права»).
 - **Фикстуры пользователей** перечисляют листья **так, как их называет сервер** (`GetProductPermissions(productId)`). `seed.js` сверяет список с живым деревом — устаревший id роняет прогон. Включённые права в фикстурах не перечисляются: их добавляет сервер. Не собирать список по `.acc`/QML: `EditFeature` в `PagePermissions` — группа, а не выдаваемое право.
@@ -396,7 +405,7 @@ Lisa FeatureEditor ──generate──► <Product>Features.h ──FillProduct
 | 13.13 | Продукт запроса берётся из заголовка клиента `productId`; без заголовка права собираются по **всем** продуктам. Requirements всегда раскрываются от прав всех продуктов (`m_userInfoPtr->GetPermissions()`). | `imtservergql/CAuthenticationManagerComp.cpp`, `imtgql/CGqlContext.cpp` | Исправлено: продукт — из конфигурации сервера (`ProductInfo`), заголовок — только запасной вариант; requirements раскрываются от прав продукта запроса. |
 | 13.14 | По коду: в Puma пользователь в контексте не адаптируется к организации (`AdaptUserForTenant` вызывается только при выдаче данных), поэтому проверка команд в Puma учитывает роли из всех организаций пользователя. В продуктовых серверах пользователь приходит из Puma уже адаптированным. | `imtservergql/CAuthenticationManagerComp.cpp`, Puma `PumaServerBase.acc` | Подтвердить тестом; адаптировать пользователя при создании контекста. |
 | 13.15 | `"*"` в списке прав элемента или команды пропускает любого пользователя через `CheckPermissionOr`. | `imtauth/CCheckPermissionOrComp.cpp` | Запретить в декларациях (R6.8). |
-| 13.16 | Шаг 3 алгоритма (суперпользователь/владелец → разрешить) выполняется до любых проверок прав. Если у PAT владельца организации выставлен `IsTenantOwner`, токен с узкими scopes получает полный доступ. Не проверялось. | `imtservergql::CheckRequestPermissions` | Проверить; обход не должен снимать scopes (R9.4). |
+| 13.16 | Шаг 3 алгоритма (суперпользователь/владелец → разрешить) выполнялся до любых проверок прав. Если у PAT владельца организации выставлен `IsTenantOwner`, токен с узкими scopes получал полный доступ. | `imtservergql::CheckRequestPermissions` | Исправлено: обход владельца убран, владелец держит scope как права; для PAT права владельца не добавляются. |
 | 13.17 | `CGuiElementRepresentationControllerComp` без `UserInfo` считает пользователя суперпользователем (показывает всё) и берёт права по всем продуктам; владелец организации видит отфильтрованный GUI, хотя сервер его пропускает. | `imtserverapp/CGuiElementRepresentationControllerComp.cpp` | Низкий приоритет: GUI не граница безопасности. |
 | 13.18 | Дерево продукта обходится заново на каждый запрос (`CollectProductRequirements` в контексте запроса, с глубокими копиями фич). | `imtlic/CProductInfo.cpp` | Requirements раскрываются на лету (R5.2), но разобранное дерево продукта держать в кэше, а не копировать на каждый запрос. |
 | 13.19 | Права участника организации проверялись мимо R4.1: точным `contains` по голым id (`CanManageMembers`, назначение прав участнику, `HasTenantManageAccess`, признак администратора организации) и голыми id групп (`EditOrganization`, `EditOrganizationMember`) в `CTenantCollectionDocumentServiceComp`. Голый id группы давал всё управление участниками, а права, записанные путями, не действовали. | `imtauthgql/CTenantMembershipManagerControllerComp.cpp`, `TenantAccess.cpp`, `CTenantCollectionDocumentServiceComp.cpp`, `CTenantManagerControllerComp.cpp`, `CCrossOrgGrantCollectionDocumentServiceComp.cpp` | Исправлено в ветке `feature/permission-requirements`: проверки через `HasPermission` по полным путям листьев дерева организации (`imtauthgql/TenantAccess.h`); группа дерева правом не является (R3.5). Дерево организации перестроено (R3.6) и отдаётся редактору прав участника полными путями (`BuildPermissionGroupsFromProvider`), а не голыми id. |
@@ -406,6 +415,11 @@ Lisa FeatureEditor ──generate──► <Product>Features.h ──FillProduct
 | 13.23 | Лист участника не различает действия: приглашение, исключение и смена роли участника, а также изменение его прав (`UpdateMembershipPermissions`) разрешаются **любым** листом `Members/Edit/*`; `Permissions/Change` в проверках не используется. | `imtauthgql/CTenantMembershipManagerControllerComp.cpp` (`CanManageMembers`) | Проверять лист своего действия. |
 | 13.24 | Роли, группы и пользователи организации в редакторе организации редактируются командами `Get/Update{Role,Group,User}{From}Representation`, объявленными только продуктовыми `/Administration/{Roles,Groups,Users}/...`. Права участника `Roles/*`, `Groups/*` эти команды не открывают (продуктовые пути организации в их декларациях указывали на несуществующие узлы ещё до этой работы и удалены). | `ImtAuthVoce.arp/{Role,User,UserGroup}CollectionDocumentService.acc`, сервисы документов `imtauthgql` | Решить: проверять в контексте организации лист участника `Roles/Edit/Change` и т. д. в самих сервисах. |
 | 13.25 | Страница поиска объявлена `*` (видна всем, 13.15), лист `/SearchManagement/ViewPage` ProLife в декларациях не используется: страница общая для продуктов, у Lisa такого листа нет. | `ImtGraphQlVoce.arp/PagesController.acc` (`SearchPage`) | Объявить страницу листом продукта в композиции каждого продукта. |
+| 13.26 | `GraphQLDemultiplexer` (`CGqlDemultiplexerComp`) не имеет атрибутов `CommandPermissions`/`PermissionChecker`: в `TenantController.acc` они заданы, но игнорируются, поэтому декларации `TenantPermissions.acc` в Puma не проверяются. Команды организаций защищены только проверками в самих контроллерах (`HasTenantManageAccess`, `CanCreateOrganization`, ...). | `imtservergql/CGqlDemultiplexerComp.*`, `ImtUserAdministrationVoce.arp/TenantController.acc` | Решить: включить проверку деклараций на демультиплексоре (меняет поведение всех команд организаций) или убрать мёртвые атрибуты. |
+| 13.27 | Корневую организацию мог создать любой пользователь вне организации и задать ей любой scope. | `CTenantManagerControllerComp::OnCreateTenant`, `CTenantCollectionDocumentServiceControllerComp` | Исправлено: только суперпользователь или держатель `/OrganizationManagement/Add`. |
+| 13.28 | Scope и признак владельца кэшировались на токен на `TokenCacheLifetime` (5 минут): сужение scope, передача владения и членство доходили до открытых сессий с задержкой. | `CAuthenticationManagerComp::TryGetCachedTenantData` | Исправлено: отдельный срок `TenantDataCacheLifetime` (10 с) для scope, признака владельца и доступа к организациям; в этот же кэш легла проверка членств и приглашений. |
+| 13.29 | Родитель нового документа организации фиксируется по контексту последнего изменения; документ, начатый в A и сохранённый после переключения в B, остаётся подорганизацией A. | `CTenantCollectionDocumentServiceComp` | Принято как есть: право `Add` проверяется и при сохранении, а scope сверяется с родителем валидатором. |
+| 13.30 | Вне организаций страница «Организации» на серверах продуктов видна только держателю `Add`: у них нет менеджеров членств и приглашений. | `CAuthenticationManagerComp::HasOrganizationAccess` | Принято: без права создавать организации страница видна только внутри организации или при приглашении (на Puma); удалённый запрос в Puma — фаза 1b. |
 
 ## 14. Текущее состояние решений
 

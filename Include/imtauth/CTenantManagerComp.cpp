@@ -8,9 +8,12 @@
 
 // ACF includes
 #include <istd/CChangeNotifier.h>
+#include <iprm/CIdParam.h>
+#include <iprm/CParamsSet.h>
 
 // ImtCore includes
 #include <imtauth/ITenantInfo.h>
+#include <imtauth/imtauth.h>
 #include <imtbase/imtbase.h>
 
 
@@ -81,7 +84,12 @@ QByteArrayList CTenantManagerComp::GetTenantPermissions(const QByteArray& tenant
 }
 
 
-QByteArray CTenantManagerComp::CreateTenant(const QString& tenantName, const QString& description, const QByteArray& ownerId)
+QByteArray CTenantManagerComp::CreateTenant(
+			const QString& tenantName,
+			const QString& description,
+			const QByteArray& ownerId,
+			const QByteArray& creatorId,
+			const QByteArray& parentTenantId)
 {
 	if (!m_tenantCollectionCompPtr.IsValid() || !m_tenantFactoryCompPtr.IsValid()){
 		SendErrorMessage(0, "Tenant collection or factory not configured", "CTenantManagerComp");
@@ -104,7 +112,8 @@ QByteArray CTenantManagerComp::CreateTenant(const QString& tenantName, const QSt
 	tenantPtr->SetTenantName(tenantName);
 	tenantPtr->SetTenantDescription(description);
 	tenantPtr->SetOwnerId(ownerId);
-	tenantPtr->SetCreatorId(ownerId);
+	tenantPtr->SetCreatorId(creatorId.isEmpty() ? ownerId : creatorId);
+	tenantPtr->SetParentTenantId(parentTenantId);
 	tenantPtr->SetActive(true);
 	tenantPtr->SetCreatedAt(now);
 	tenantPtr->SetUpdatedAt(now);
@@ -119,9 +128,12 @@ QByteArray CTenantManagerComp::CreateTenant(const QString& tenantName, const QSt
 		QByteArrayLiteral("/Administration/Roles/ViewPage"), QByteArrayLiteral("/Administration/Roles/View"), QByteArrayLiteral("/Administration/Roles/Edit/Add"),
 		QByteArrayLiteral("/Administration/Roles/Edit/Change"), QByteArrayLiteral("/Administration/Roles/Edit/Remove"),
 		QByteArrayLiteral("/Administration/Groups/ViewPage"), QByteArrayLiteral("/Administration/Groups/View"), QByteArrayLiteral("/Administration/Groups/Edit/Add"),
-		QByteArrayLiteral("/Administration/Groups/Edit/Change"), QByteArrayLiteral("/Administration/Groups/Edit/Remove")
+		QByteArrayLiteral("/Administration/Groups/Edit/Change"), QByteArrayLiteral("/Administration/Groups/Edit/Remove"),
+		QByteArrayLiteral("/Administration/Users/Revisions/View"), QByteArrayLiteral("/Administration/Roles/Revisions/View"), QByteArrayLiteral("/Administration/Groups/Revisions/View")
 	};
-	tenantPtr->SetTenantPermissions(defaultTenantPermissions);
+	tenantPtr->SetTenantPermissions(parentTenantId.isEmpty()
+				? defaultTenantPermissions
+				: RestrictPermissions(defaultTenantPermissions, GetTenantPermissions(parentTenantId)));
 
 	QByteArray retVal = m_tenantCollectionCompPtr->InsertNewObject("Tenant", tenantName, description, tenantPtr.GetPtr(), tenantId);
 	if (retVal.isEmpty()){
@@ -229,6 +241,51 @@ bool CTenantManagerComp::SetTenantActive(const QByteArray& tenantId, bool isActi
 }
 
 
+bool CTenantManagerComp::SetTenantPermissions(const QByteArray& tenantId, const QByteArrayList& permissions)
+{
+	if (!m_tenantCollectionCompPtr.IsValid()){
+		SendErrorMessage(0, "Tenant collection not configured", "CTenantManagerComp");
+		return false;
+	}
+
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	if (!m_tenantCollectionCompPtr->GetObjectData(tenantId, dataPtr)){
+		SendErrorMessage(0, QStringLiteral("Tenant '%1' not found").arg(QString::fromUtf8(tenantId)), "CTenantManagerComp");
+		return false;
+	}
+
+	ITenantInfo* tenantPtr = dynamic_cast<ITenantInfo*>(dataPtr.GetPtr());
+	if (tenantPtr == nullptr){
+		SendErrorMessage(0, "Invalid tenant object", "CTenantManagerComp");
+		return false;
+	}
+
+	istd::CChangeNotifier changeNotifier(this);
+
+	if (tenantPtr->GetTenantPermissions() != permissions){
+		tenantPtr->SetTenantPermissions(permissions);
+		tenantPtr->SetUpdatedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
+
+		if (!m_tenantCollectionCompPtr->SetObjectData(tenantId, *tenantPtr)){
+			SendErrorMessage(0, QStringLiteral("Failed to set the permissions of tenant '%1'").arg(QString::fromUtf8(tenantId)), "CTenantManagerComp");
+			return false;
+		}
+	}
+
+	// A sub-organization never holds more than its parent
+	bool retVal = true;
+	for (const QByteArray& childTenantId : GetChildTenantIds(tenantId)){
+		const QByteArrayList childPermissions = GetTenantPermissions(childTenantId);
+		const QByteArrayList restrictedPermissions = RestrictPermissions(childPermissions, permissions);
+		if (restrictedPermissions != childPermissions){
+			retVal = SetTenantPermissions(childTenantId, restrictedPermissions) && retVal;
+		}
+	}
+
+	return retVal;
+}
+
+
 bool CTenantManagerComp::SetTenantHierarchy(const QByteArray& tenantId, const QByteArray& parentTenantId)
 {
 	if (!m_tenantCollectionCompPtr.IsValid()){
@@ -315,6 +372,29 @@ bool CTenantManagerComp::EnsureSystemTenant()
 QByteArray CTenantManagerComp::GetSystemTenantId() const
 {
 	return imtauth::GetSystemTenantId();
+}
+
+
+// private methods
+
+QByteArrayList CTenantManagerComp::GetChildTenantIds(const QByteArray& tenantId) const
+{
+	iprm::CIdParam parentTenantParam;
+	parentTenantParam.SetId(tenantId);
+
+	iprm::CParamsSet filterParams;
+	filterParams.SetEditableParameter("ParentTenantId", &parentTenantParam);
+
+	// A collection that does not know the filter returns every organization
+	QByteArrayList retVal;
+	for (const QByteArray& candidateId : m_tenantCollectionCompPtr->GetElementIds(0, -1, &filterParams)){
+		ITenantInfoUniquePtr candidatePtr = GetTenant(candidateId);
+		if (candidatePtr.IsValid() && candidatePtr->GetParentTenantId() == tenantId){
+			retVal.append(candidateId);
+		}
+	}
+
+	return retVal;
 }
 
 

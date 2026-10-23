@@ -15,8 +15,8 @@ namespace imtauthgql
  *
  * Extends imtservergql::CCollectionDocumentServiceControllerComp with
  * permission checks that enforce:
- * - Creating a new tenant is only allowed when the session has NO active
- *   tenant (tenantId is empty).
+ * - A new tenant needs /OrganizationManagement/Add (a superuser excepted); created inside
+ *   an active tenant it is its sub-organization and the tenant scope must contain the permission too.
  * - Opening/editing/saving a tenant is only allowed when the session's active
  *   tenantId matches the tenant being accessed (i.e. while authorized in
  *   Tenant A the user cannot open Tenant B).

@@ -12,6 +12,7 @@
 #include <imtauth/CUserConnectionInfo.h>
 #include <imtauth/ITenantInfo.h>
 #include <imtauthgql/imtauthgql.h>
+#include <imtgql/imtgql.h>
 
 
 namespace imtauthgql
@@ -628,6 +629,10 @@ sdl::V1_0::imtauth::CPermissionList CAuthorizationControllerComp::OnGetPermissio
 					m_tenantMembershipManagerCompPtr.IsValid() ? m_tenantMembershipManagerCompPtr.GetPtr() : nullptr,
 					m_roleInfoProviderCompPtr.IsValid() ? m_roleInfoProviderCompPtr.GetPtr() : nullptr);
 
+	const imtauth::IUserInfo::FeatureIds organizationAccessPermissions = (!isPat && gqlContextPtr != nullptr)
+				? imtgql::CollectOrganizationAccessPermissions(*gqlContextPtr, userId)
+				: imtauth::IUserInfo::FeatureIds();
+
 	// Empty tenantId means global (non-tenant) scope.
 	if (tenantId.isEmpty()){
 		QByteArrayList globalPermissions = CalculateGlobalPermissions(*userInfoPtr, userId, productId);
@@ -636,18 +641,27 @@ sdl::V1_0::imtauth::CPermissionList CAuthorizationControllerComp::OnGetPermissio
 				return !imtauth::HasPermission(tokenScopes, permission, false);
 			});
 		}
+		for (const QByteArray& permission : organizationAccessPermissions){
+			if (!globalPermissions.contains(permission)){
+				globalPermissions.append(permission);
+			}
+		}
 		response.permissions.Emplace().FromList(globalPermissions);
 		return response;
 	}
 
 	QByteArrayList tenantPermissions;
+	bool isTenantOwner = false;
 	if (m_tenantManagerCompPtr.IsValid()){
 		tenantPermissions = m_tenantManagerCompPtr->GetTenantPermissions(tenantId);
+		imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
+		isTenantOwner = tenantPtr.IsValid() && tenantPtr->GetOwnerId() == userId;
 	}
 
+	// Within an organization only its scope applies: the owner holds all of it, an empty scope grants nothing
 	QByteArrayList permissions;
-	if (tenantPermissions.isEmpty()){
-		permissions = userPermissions;
+	if (isTenantOwner && !isPat){
+		permissions = tenantPermissions;
 	}
 	else{
 		QSet<QByteArray> tenantSet(tenantPermissions.begin(), tenantPermissions.end());
@@ -658,6 +672,7 @@ sdl::V1_0::imtauth::CPermissionList CAuthorizationControllerComp::OnGetPermissio
 		}
 	}
 
+	permissions += organizationAccessPermissions;
 	permissions = QSet<QByteArray>(permissions.begin(), permissions.end()).values();
 	std::sort(permissions.begin(), permissions.end());
 	response.permissions.Emplace().FromList(permissions);

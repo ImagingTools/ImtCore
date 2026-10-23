@@ -26,6 +26,7 @@ typedef QHash<QByteArray, QByteArrayList> Requirements;
 
 
 const QByteArray s_productId = "ProLife";
+const QByteArray s_tenantId = "TenantA";
 
 const QByteArray s_viewAdministration = "/Administration/ViewAdministration";
 const QByteArray s_viewUsers = "/Administration/ViewAdministration/ViewUsers";
@@ -219,12 +220,17 @@ public:
 				const imtauth::IUserInfo* userInfoPtr,
 				const QByteArray& permissionPath = QByteArray(),
 				const QByteArrayList& tenantPermissions = QByteArrayList(),
-				bool isTenantOwner = false)
+				bool isTenantOwner = false,
+				bool inTenant = false)
 	{
 		imtgql::IGqlContextUniquePtr contextPtr(new imtgql::CGqlContext);
 		contextPtr->SetProductId(s_productId);
 		contextPtr->SetProductInfo(&m_productInfo);
 		contextPtr->SetUserInfo(userInfoPtr);
+		// A permission scope exists only inside an organization
+		if (inTenant || isTenantOwner || !tenantPermissions.isEmpty()){
+			contextPtr->SetTenantId(s_tenantId);
+		}
 		contextPtr->SetTenantPermissions(tenantPermissions);
 		contextPtr->SetIsTenantOwner(isTenantOwner);
 		if (!permissionPath.isEmpty()){
@@ -242,10 +248,11 @@ public:
 				const imtauth::IUserInfo* userInfoPtr,
 				const QByteArray& permissionPath = QByteArray(),
 				const QByteArrayList& tenantPermissions = QByteArrayList(),
-				bool isTenantOwner = false)
+				bool isTenantOwner = false,
+				bool inTenant = false)
 	{
 		imtgql::CGqlRequest request;
-		SetupRequest(request, commandId, userInfoPtr, permissionPath, tenantPermissions, isTenantOwner);
+		SetupRequest(request, commandId, userInfoPtr, permissionPath, tenantPermissions, isTenantOwner, inTenant);
 
 		m_refusalReason.clear();
 
@@ -313,14 +320,17 @@ void CPermissionCheckTest::testSuperuserIsNotChecked()
 }
 
 
-void CPermissionCheckTest::testTenantOwnerIsNotChecked()
+void CPermissionCheckTest::testTenantOwnerIsChecked()
 {
 	CServer server;
 	imtauth::CUserInfo owner;
 	SetPermissions(owner, QByteArrayList());
 
-	QVERIFY(server.IsAllowed(s_userUpdate, &owner, QByteArray(), QByteArrayList(), true));
-	QVERIFY(!server.IsAllowed(s_userUpdate, &owner));
+	// The owner holds the scope as permissions of its context, nothing lets it through
+	QVERIFY(!server.IsAllowed(s_userUpdate, &owner, QByteArray(), {s_changeUser}, true));
+
+	SetPermissions(owner, {s_changeUser});
+	QVERIFY(server.IsAllowed(s_userUpdate, &owner, QByteArray(), {s_changeUser}, true));
 }
 
 
@@ -567,6 +577,17 @@ void CPermissionCheckTest::testTenantLimitsIncludedPermissions()
 	QVERIFY(server.IsAllowed(s_usersList, &user, QByteArray(), {s_changeUser, s_viewUsers}));
 	QVERIFY(!server.IsAllowed(s_usersList, &user, QByteArray(), {s_changeUser}));
 	QVERIFY(server.IsAllowed(s_userUpdate, &user, QByteArray(), {s_changeUser}));
+}
+
+
+void CPermissionCheckTest::testEmptyTenantScopeIncludesNothing()
+{
+	CServer server({{s_editUser, {s_viewUsers}}});
+	imtauth::CUserInfo user;
+	SetPermissions(user, {s_changeUser});
+
+	QVERIFY(server.IsAllowed(s_usersList, &user));
+	QVERIFY(!server.IsAllowed(s_usersList, &user, QByteArray(), QByteArrayList(), false, true));
 }
 
 

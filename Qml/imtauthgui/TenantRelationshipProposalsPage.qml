@@ -123,8 +123,8 @@ ViewBase {
 				}
 			}
 		}
-		incomingList.model = incoming
-		outgoingList.model = outgoing
+		incomingTable.elements = incoming
+		outgoingTable.elements = outgoing
 	}
 
 	Connections {
@@ -202,115 +202,20 @@ ViewBase {
 				color: Style.inactiveTextColor
 			}
 
-			Rectangle {
+			Text {
+				visible: incomingTable.elementsCount === 0
+				text: qsTr("No proposals are waiting for your answer.")
+				font.pixelSize: Style.fontSizeM
+				color: Style.inactiveTextColor
+			}
+
+			Table {
+				id: incomingTable
+				visible: incomingTable.elementsCount > 0
 				width: parent.width
-				height: incomingList.count === 0 ? Style.controlHeightL + 2 * Style.marginM : incomingList.height + 2
-				color: Style.baseColor
-				radius: Style.radiusM
-				border.width: 1
-				border.color: Style.borderColor
-				clip: true
-
-				Text {
-					anchors.left: parent.left
-					anchors.leftMargin: Style.marginL
-					anchors.verticalCenter: parent.verticalCenter
-					visible: incomingList.count === 0
-					text: qsTr("No proposals are waiting for your answer.")
-					font.pixelSize: Style.fontSizeM
-					color: Style.inactiveTextColor
-				}
-
-				ListView {
-					id: incomingList
-					anchors.top: parent.top
-					anchors.topMargin: 1
-					x: 1
-					width: parent.width - 2
-					height: incomingList.contentHeight
-					interactive: false
-
-					delegate: Rectangle {
-						width: incomingList.width
-						height: incomingContent.height + Style.marginM * 2
-						color: incomingMouseArea.containsMouse ? Style.hover : "transparent"
-
-						MouseArea {
-							id: incomingMouseArea
-							anchors.fill: parent
-							hoverEnabled: true
-						}
-
-						Rectangle {
-							anchors.top: parent.top
-							anchors.left: parent.left
-							anchors.leftMargin: Style.marginL
-							anchors.right: parent.right
-							anchors.rightMargin: Style.marginL
-							height: 1
-							color: Style.borderColor
-							visible: index > 0
-						}
-
-						Column {
-							id: incomingContent
-							anchors.left: parent.left
-							anchors.right: incomingActions.left
-							anchors.leftMargin: Style.marginL
-							anchors.rightMargin: Style.marginS
-							anchors.verticalCenter: parent.verticalCenter
-							spacing: Style.marginXS
-
-							Text {
-								text: modelData.partnerName
-								font.pixelSize: Style.fontSizeM
-								font.bold: true
-								color: Style.textColor
-							}
-
-							Text {
-								text: modelData.typeText + ": " + modelData.roles
-								font.pixelSize: Style.fontSizeS
-								color: Style.inactiveTextColor
-							}
-
-							Text {
-								visible: modelData.description !== ""
-								text: modelData.description
-								font.pixelSize: Style.fontSizeS
-								color: Style.inactiveTextColor
-							}
-						}
-
-						Row {
-							id: incomingActions
-							anchors.right: parent.right
-							anchors.rightMargin: Style.marginL
-							anchors.verticalCenter: parent.verticalCenter
-							spacing: Style.marginS
-							visible: proposalsPage.__canManage
-
-							Button {
-								text: qsTr("Approve")
-								variant: "primary"
-								enabled: proposalsPage.processingProposalId === ""
-								onClicked: {
-									proposalsPage.processingProposalId = modelData.id
-									proposalsPage.apiClient.approveRelationshipProposal(modelData.id, proposalsPage.__tenantId)
-								}
-							}
-
-							Button {
-								text: qsTr("Reject")
-								enabled: proposalsPage.processingProposalId === ""
-								onClicked: {
-									proposalsPage.processingProposalId = modelData.id
-									proposalsPage.apiClient.rejectRelationshipProposal(modelData.id, proposalsPage.__tenantId)
-								}
-							}
-						}
-					}
-				}
+				height: incomingTable.contentHeight + incomingTable.headerHeight
+				canMoveColumns: false
+				selectable: false
 			}
 
 			Item {
@@ -323,104 +228,105 @@ ViewBase {
 				title: qsTr("Sent Proposals")
 			}
 
-			Rectangle {
-				width: parent.width
-				height: outgoingList.count === 0 ? Style.controlHeightL + 2 * Style.marginM : outgoingList.height + 2
-				color: Style.baseColor
-				radius: Style.radiusM
-				border.width: 1
-				border.color: Style.borderColor
-				clip: true
+			Text {
+				visible: outgoingTable.elementsCount === 0
+				text: qsTr("No proposals are waiting for the partner's answer.")
+				font.pixelSize: Style.fontSizeM
+				color: Style.inactiveTextColor
+			}
 
-				Text {
-					anchors.left: parent.left
-					anchors.leftMargin: Style.marginL
-					anchors.verticalCenter: parent.verticalCenter
-					visible: outgoingList.count === 0
-					text: qsTr("No proposals are waiting for the partner's answer.")
-					font.pixelSize: Style.fontSizeM
-					color: Style.inactiveTextColor
+			Table {
+				id: outgoingTable
+				visible: outgoingTable.elementsCount > 0
+				width: parent.width
+				height: outgoingTable.contentHeight + outgoingTable.headerHeight
+				canMoveColumns: false
+				selectable: false
+			}
+		}
+	}
+
+	TableHeaders {
+		id: incomingHeaders
+
+		Component.onCompleted: {
+			addHeader("partnerName", qsTr("Partner"), false, false)
+			addHeader("typeText", qsTr("Proposal"), false, false)
+			addHeader("roles", qsTr("Roles"), false, false)
+			addHeader("description", qsTr("Description"), false, false)
+			addHeader("actions", "", false, false)
+			incomingTable.headers = incomingHeaders
+			incomingTable.setColumnContentById("actions", incomingActionsCellComp)
+		}
+	}
+
+	TableHeaders {
+		id: outgoingHeaders
+
+		Component.onCompleted: {
+			addHeader("partnerName", qsTr("Partner"), false, false)
+			addHeader("typeText", qsTr("Proposal"), false, false)
+			addHeader("roles", qsTr("Roles"), false, false)
+			addHeader("description", qsTr("Description"), false, false)
+			addHeader("actions", "", false, false)
+			outgoingTable.headers = outgoingHeaders
+			outgoingTable.setColumnContentById("actions", outgoingActionsCellComp)
+		}
+	}
+
+	Component {
+		id: incomingActionsCellComp
+
+		TableCellDelegateBase {
+			id: incomingActionsCell
+			readonly property string proposalId: incomingActionsCell.getRowData() ? (incomingActionsCell.getRowData().id || "") : ""
+
+			Row {
+				anchors.verticalCenter: parent.verticalCenter
+				anchors.right: parent.right
+				anchors.rightMargin: Style.marginM
+				spacing: Style.marginS
+				visible: proposalsPage.__canManage
+
+				Button {
+					text: qsTr("Approve")
+					variant: "primary"
+					enabled: proposalsPage.processingProposalId === ""
+					onClicked: {
+						proposalsPage.processingProposalId = incomingActionsCell.proposalId
+						proposalsPage.apiClient.approveRelationshipProposal(incomingActionsCell.proposalId, proposalsPage.__tenantId)
+					}
 				}
 
-				ListView {
-					id: outgoingList
-					anchors.top: parent.top
-					anchors.topMargin: 1
-					x: 1
-					width: parent.width - 2
-					height: outgoingList.contentHeight
-					interactive: false
-
-					delegate: Rectangle {
-						width: outgoingList.width
-						height: outgoingContent.height + Style.marginM * 2
-						color: outgoingMouseArea.containsMouse ? Style.hover : "transparent"
-
-						MouseArea {
-							id: outgoingMouseArea
-							anchors.fill: parent
-							hoverEnabled: true
-						}
-
-						Rectangle {
-							anchors.top: parent.top
-							anchors.left: parent.left
-							anchors.leftMargin: Style.marginL
-							anchors.right: parent.right
-							anchors.rightMargin: Style.marginL
-							height: 1
-							color: Style.borderColor
-							visible: index > 0
-						}
-
-						Column {
-							id: outgoingContent
-							anchors.left: parent.left
-							anchors.right: outgoingActions.left
-							anchors.leftMargin: Style.marginL
-							anchors.rightMargin: Style.marginS
-							anchors.verticalCenter: parent.verticalCenter
-							spacing: Style.marginXS
-
-							Text {
-								text: modelData.partnerName
-								font.pixelSize: Style.fontSizeM
-								font.bold: true
-								color: Style.textColor
-							}
-
-							Text {
-								text: modelData.typeText + ": " + modelData.roles
-								font.pixelSize: Style.fontSizeS
-								color: Style.inactiveTextColor
-							}
-
-							Text {
-								visible: modelData.description !== ""
-								text: modelData.description
-								font.pixelSize: Style.fontSizeS
-								color: Style.inactiveTextColor
-							}
-						}
-
-						Row {
-							id: outgoingActions
-							anchors.right: parent.right
-							anchors.rightMargin: Style.marginL
-							anchors.verticalCenter: parent.verticalCenter
-							spacing: Style.marginS
-							visible: proposalsPage.__canManage
-
-							Button {
-								text: qsTr("Withdraw")
-								enabled: proposalsPage.processingProposalId === ""
-								onClicked: {
-									proposalsPage.processingProposalId = modelData.id
-									proposalsPage.apiClient.cancelRelationshipProposal(modelData.id, proposalsPage.__tenantId)
-								}
-							}
-						}
+				Button {
+					text: qsTr("Reject")
+					enabled: proposalsPage.processingProposalId === ""
+					onClicked: {
+						proposalsPage.processingProposalId = incomingActionsCell.proposalId
+						proposalsPage.apiClient.rejectRelationshipProposal(incomingActionsCell.proposalId, proposalsPage.__tenantId)
 					}
+				}
+			}
+		}
+	}
+
+	Component {
+		id: outgoingActionsCellComp
+
+		TableCellDelegateBase {
+			id: outgoingActionsCell
+			readonly property string proposalId: outgoingActionsCell.getRowData() ? (outgoingActionsCell.getRowData().id || "") : ""
+
+			Button {
+				anchors.verticalCenter: parent.verticalCenter
+				anchors.right: parent.right
+				anchors.rightMargin: Style.marginM
+				visible: proposalsPage.__canManage
+				text: qsTr("Withdraw")
+				enabled: proposalsPage.processingProposalId === ""
+				onClicked: {
+					proposalsPage.processingProposalId = outgoingActionsCell.proposalId
+					proposalsPage.apiClient.cancelRelationshipProposal(outgoingActionsCell.proposalId, proposalsPage.__tenantId)
 				}
 			}
 		}

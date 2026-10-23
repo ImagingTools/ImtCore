@@ -59,6 +59,14 @@ QtObject {
 		? stateManager.tenantData.m_currentUserId === stateManager.tenantData.m_ownerId
 		: false
 
+	// The server decides who edits the permission scope: only the creator, the owner reads it
+	readonly property bool canEditTenantPermissions: stateManager.isNewTenant
+		|| (stateManager.tenantData ? stateManager.tenantData.m_canEditTenantPermissions === true : false)
+
+	readonly property bool isSubOrganization: stateManager.tenantData
+		? (stateManager.tenantData.m_parentTenantId !== undefined && stateManager.tenantData.m_parentTenantId !== "")
+		: false
+
 	// Full-access users are owner or creator; members with specific org permissions
 	// are controlled granularly via __currentUserOrgPerms, not through isAdmin.
 	readonly property bool isAdmin: stateManager.isOwner || stateManager.isCreator
