@@ -79,6 +79,7 @@ object_script.*.Debug
 *.qmlc
 *.jsc
 *.qm
+!Impl/ImtRestDemoClient/Translations/*.qm
 
 # Compiled Object files
 *.o

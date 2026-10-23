@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Qml/Main.qml</file>
+        <file>Qml/ScenariosPage.qml</file>
+        <file>Qml/RequestPage.qml</file>
+        <file>Qml/RawPage.qml</file>
+        <file>Qml/ServerSettingsPage.qml</file>
+        <file>Qml/DebugPreview.qml</file>
+        <file>Translations/imtrestdemoclient_ru.qm</file>
+    </qresource>
+</RCC>
