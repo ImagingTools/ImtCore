@@ -69,8 +69,8 @@ bool IsOwner(const imtauth::ITenantManager& tenantManager, const QByteArray& use
 
 /**
 	Check if the user has access to perform tenant operations.
-	Owner always has access.
-	Non-owners must be active members of the tenant.
+	Owner and creator always have access.
+	Non-owners and non-creators must be active members of the tenant.
 */
 bool HasTenantAccess(
 		const imtauth::ITenantManager& tenantManager,
@@ -84,12 +84,13 @@ bool HasTenantAccess(
 		return false;
 	}
 
-	// Owner bypasses all permission checks
-	if (IsOwner(tenantManager, userId, tenantId)){
+	// Owner and creator bypass membership checks
+	imtauth::ITenantInfoUniquePtr tenantPtr = tenantManager.GetTenant(tenantId);
+	if (tenantPtr.IsValid() && (tenantPtr->GetOwnerId() == userId || tenantPtr->GetCreatorId() == userId)){
 		return true;
 	}
 
-	// Non-owners must be active members of the tenant.
+	// Non-owners and non-creators must be active members of the tenant.
 	return membershipManager.IsMember(userId, tenantId);
 }
 

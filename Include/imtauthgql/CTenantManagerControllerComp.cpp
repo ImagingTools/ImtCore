@@ -103,13 +103,13 @@ sdl::V1_0::imtauth::CGetTenantIdsPayload CTenantManagerControllerComp::OnGetTena
 	const imtauth::IUserInfo* userInfoPtr = contextPtr->GetUserInfo();
 	const bool isAdmin = userInfoPtr != nullptr && userInfoPtr->IsAdmin();
 
-	// Users other than administrators learn only the organizations they own or belong to.
+	// Users other than administrators learn only the organizations they own, created, or belong to.
 	QByteArrayList ids;
 	for (const QByteArray& tenantId : m_tenantManagerCompPtr->GetTenantIds()){
 		bool isVisible = isAdmin;
 		if (!isVisible){
 			imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
-			isVisible = tenantPtr.IsValid() && tenantPtr->GetOwnerId() == userId;
+			isVisible = tenantPtr.IsValid() && (tenantPtr->GetOwnerId() == userId || tenantPtr->GetCreatorId() == userId);
 		}
 		if (!isVisible && m_membershipManagerCompPtr.IsValid()){
 			isVisible = m_membershipManagerCompPtr->IsMember(userId, tenantId);

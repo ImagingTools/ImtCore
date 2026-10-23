@@ -2,6 +2,9 @@
 #include <imtauth/CTenantDocumentValidatorComp.h>
 
 
+// Qt includes
+#include <QtCore/QSet>
+
 // ACF includes
 #include <iprm/CIdParam.h>
 #include <iprm/CParamsSet.h>
@@ -10,17 +13,31 @@
 // ImtCore includes
 #include <imtauth/ITenantInfo.h>
 #include <imtauth/imtauth.h>
+#include <imtbase/IOperationContext.h>
 
 
 namespace imtauth
 {
+
+bool IsTenantPermissionScopeChangeAllowed(
+			const QByteArray& creatorId,
+			const QByteArrayList& currentPermissions,
+			const QByteArrayList& newPermissions,
+			const QByteArray& userId)
+{
+	if (QSet<QByteArray>(currentPermissions.begin(), currentPermissions.end()) == QSet<QByteArray>(newPermissions.begin(), newPermissions.end())){
+		return true;
+	}
+
+	return !creatorId.isEmpty() && creatorId == userId;
+}
 
 
 bool CTenantDocumentValidatorComp::ValidateDocumentData(
 			const QByteArray& objectId,
 			const istd::IChangeable& document,
 			QString& errorMessage,
-			const imtbase::IOperationContext* /*operationContextPtr*/) const
+			const imtbase::IOperationContext* operationContextPtr) const
 {
 	const imtauth::ITenantInfo* tenantInfo = dynamic_cast<const imtauth::ITenantInfo*>(&document);
 	if (tenantInfo == nullptr){
@@ -37,6 +54,29 @@ bool CTenantDocumentValidatorComp::ValidateDocumentData(
 	if (!m_tenantCollectionCompPtr.IsValid()){
 		errorMessage = QStringLiteral("Tenant collection is not configured");
 		return false;
+	}
+
+	const imtauth::ITenantInfo* storedTenantInfoPtr = nullptr;
+	imtbase::IObjectCollection::DataPtr storedDataPtr;
+	if (!objectId.isEmpty()){
+		if (!m_tenantCollectionCompPtr->GetObjectData(objectId, storedDataPtr)){
+			errorMessage = QStringLiteral("The stored organization could not be loaded");
+			return false;
+		}
+
+		storedTenantInfoPtr = dynamic_cast<const imtauth::ITenantInfo*>(storedDataPtr.GetPtr());
+		if (storedTenantInfoPtr == nullptr){
+			errorMessage = QStringLiteral("Invalid stored organization for tenant validation");
+			return false;
+		}
+
+		const QByteArrayList storedPermissionList = storedTenantInfoPtr->GetTenantPermissions();
+		const QByteArrayList documentPermissions = tenantInfo->GetTenantPermissions();
+		const QByteArray userId = operationContextPtr != nullptr ? operationContextPtr->GetOperationOwnerId().id : QByteArray();
+		if (!IsTenantPermissionScopeChangeAllowed(storedTenantInfoPtr->GetCreatorId(), storedPermissionList, documentPermissions, userId)){
+			errorMessage = QStringLiteral("Only the creator of the organization can change its permissions");
+			return false;
+		}
 	}
 
 	iprm::CParamsSet filterParams;
@@ -58,7 +98,7 @@ bool CTenantDocumentValidatorComp::ValidateDocumentData(
 	}
 
 	// The parent may have been narrowed since the scope was edited
-	const QByteArray parentTenantId = tenantInfo->GetParentTenantId();
+	const QByteArray parentTenantId = storedTenantInfoPtr != nullptr ? storedTenantInfoPtr->GetParentTenantId() : tenantInfo->GetParentTenantId();
 	if (!parentTenantId.isEmpty()){
 		imtbase::IObjectCollection::DataPtr parentDataPtr;
 		const imtauth::ITenantInfo* parentTenantPtr = nullptr;

@@ -46,7 +46,7 @@ bool HasAnyOrganizationPermission(const QByteArrayList& heldPermissions, const Q
 
 /**
 	Access to the data of the organization: system administrators, and otherwise
-	the organization of the request context, or (without a context) its owner and members.
+	the organization of the request context, or (without a context) its owner, creator and members.
 */
 bool HasTenantIsolationAccess(
 			const imtauth::ITenantManager& tenantManager,
@@ -89,5 +89,4 @@ bool CheckTenantPermissionsChange(
 
 
 } // namespace imtauthgql
-
 

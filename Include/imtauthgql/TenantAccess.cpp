@@ -76,7 +76,7 @@ bool HasTenantIsolationAccess(
 	}
 
 	imtauth::ITenantInfoUniquePtr tenantPtr = tenantManager.GetTenant(tenantId);
-	if (tenantPtr.IsValid() && tenantPtr->GetOwnerId() == userId){
+	if (tenantPtr.IsValid() && (tenantPtr->GetOwnerId() == userId || tenantPtr->GetCreatorId() == userId)){
 		return true;
 	}
 
@@ -197,5 +197,4 @@ bool CheckTenantPermissionsChange(
 
 
 } // namespace imtauthgql
-
 
