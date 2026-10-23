@@ -574,7 +574,7 @@ sdl::V1_0::imtauth::CPermissionList CAuthorizationControllerComp::OnGetPermissio
 
 		m_personalAccessTokenManagerCompPtr->UpdateLastUsedAt(tokenId);
 	}
-	else if (m_jwtSessionControllerCompPtr.IsValid()){
+	else if (m_jwtSessionControllerCompPtr.IsValid() && m_jwtSessionControllerCompPtr->ValidateJwt(token) == imtauth::IJwtSessionController::JS_OK){
 		userId = m_jwtSessionControllerCompPtr->GetUserFromJwt(token);
 		tenantId = m_jwtSessionControllerCompPtr->GetTenantFromJwt(token);
 	}
@@ -935,7 +935,7 @@ QByteArray CAuthorizationControllerComp::GetSessionUserId(const imtgql::CGqlRequ
 	}
 
 	QByteArray userId = gqlContextPtr->GetUserId();
-	if (userId.isEmpty() && m_jwtSessionControllerCompPtr.IsValid()){
+	if (userId.isEmpty() && m_jwtSessionControllerCompPtr.IsValid() && m_jwtSessionControllerCompPtr->ValidateJwt(token) == imtauth::IJwtSessionController::JS_OK){
 		userId = m_jwtSessionControllerCompPtr->GetUserFromJwt(token);
 	}
 

@@ -335,6 +335,9 @@
                     <AttributeInfo Id="TenantCollection" Type="Reference" ExportId="TenantRepository">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="TenantConnectionRequestManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TenantConnectionManager/TenantConnectionRequestManager"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="TenantManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="TenantManager/TenantManager"/>
                     </AttributeInfo>

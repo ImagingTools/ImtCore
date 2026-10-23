@@ -921,6 +921,11 @@ sdl::V1_0::imtauth::CCreateCrossOrgGrantPayload CTenantManagerControllerComp::On
 		return response;
 	}
 
+	if (!m_connectionRequestManagerCompPtr.IsValid() || !imtauth::AreTenantsConnected(*m_connectionRequestManagerCompPtr, sourceTenantId, targetTenantId)){
+		response.errorMessage = QStringLiteral("The organizations are not connected");
+		return response;
+	}
+
 	QByteArray grantId = m_grantManagerCompPtr->CreateGrant(
 							 sourceTenantId,
 							 targetTenantId,

@@ -214,10 +214,6 @@ bool CCrossOrgGrantManagerComp::HasAccess(
 		const QByteArray& targetTenantId,
 		const QByteArray& roleId) const
 {
-	if (roleId.isEmpty()){
-		return true;
-	}
-
 	const CrossOrgGrants grants = GetGrantsByTargetTenant(targetTenantId);
 	for (const CrossOrgGrantInfo& info : grants){
 		if (info.sourceTenantId != sourceTenantId){
@@ -226,7 +222,7 @@ bool CCrossOrgGrantManagerComp::HasAccess(
 		if (!IsGrantEffective(info)){
 			continue;
 		}
-		if (info.roleIds.contains(roleId)){
+		if (roleId.isEmpty() || info.roleIds.contains(roleId)){
 			return true;
 		}
 	}

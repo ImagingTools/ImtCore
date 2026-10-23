@@ -387,7 +387,13 @@ bool CAuthenticationManagerComp::RemoveSession(const QByteArray& sessionId) cons
 		return false;
 	}
 
-	return m_slaveJwtSessionControllerCompPtr->RemoveSession(sessionId);
+	if (!m_slaveJwtSessionControllerCompPtr->RemoveSession(sessionId)){
+		return false;
+	}
+
+	InvalidateSessionTokenCache(sessionId);
+
+	return true;
 }
 
 
@@ -809,6 +815,28 @@ void CAuthenticationManagerComp::InvalidateTokenCache(const QByteArray& token) c
 	QMutexLocker cacheLocker(&m_tokenCacheMutex);
 	m_tokenCache.remove(token);
 	m_expiredTokenCache.remove(token);
+}
+
+
+void CAuthenticationManagerComp::InvalidateSessionTokenCache(const QByteArray& sessionId) const
+{
+	if (sessionId.isEmpty()){
+		return;
+	}
+
+	QMutexLocker cacheLocker(&m_tokenCacheMutex);
+	for (auto iter = m_tokenCache.begin(); iter != m_tokenCache.end();){
+		QByteArray userId;
+		QByteArray tenantId;
+		QByteArray tokenSessionId;
+		qint64 expSecs = 0;
+		if (ParseJwtClaims(iter.key(), userId, tenantId, tokenSessionId, expSecs) && tokenSessionId == sessionId){
+			iter = m_tokenCache.erase(iter);
+		}
+		else{
+			++iter;
+		}
+	}
 }
 
 

@@ -5,9 +5,13 @@
 // Qt includes
 #include <QtCore/QSet>
 
+// ACF includes
+#include <iprm/CParamsSet.h>
 
 // ImtCore includes
+#include <imtauth/CTenantFilterParam.h>
 #include <imtauth/IRole.h>
+#include <imtbase/CComplexCollectionFilter.h>
 #include <imtbase/IOperationContext.h>
 
 
@@ -40,27 +44,17 @@ bool CRoleDocumentValidatorComp::ValidateDocumentData(
 		return false;
 	}
 
-	imtbase::ICollectionInfo::Ids collectionIds = m_roleCollectionCompPtr->GetElementIds();
-	for (const imtbase::ICollectionInfo::Id& collectionId : collectionIds){
-		if (collectionId == objectId){
-			continue;
-		}
-
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (m_roleCollectionCompPtr->GetObjectData(collectionId, dataPtr)){
-			const imtauth::IRole* currentRoleInfoPtr = dynamic_cast<const imtauth::IRole*>(dataPtr.GetPtr());
-			if (currentRoleInfoPtr != nullptr){
-				if (currentRoleInfoPtr->GetRoleId() == roleId && currentRoleInfoPtr->GetProductId() == productId){
-					errorMessage = QStringLiteral("Role with ID: '%1' already exists").arg(roleId);
-					return false;
-				}
-			}
-		}
-	}
-
 	QByteArray tenantId;
 	if (operationContextPtr != nullptr){
 		tenantId = operationContextPtr->GetTenantId().trimmed();
+	}
+
+	if (!CheckRoleIdUnique(*m_roleCollectionCompPtr, objectId, roleId, productId, tenantId, errorMessage)){
+		return false;
+	}
+
+	if (!CheckParentRolesInTenant(*m_roleCollectionCompPtr, roleInfoPtr->GetIncludedRoles(), tenantId, errorMessage)){
+		return false;
 	}
 
 	if (!tenantId.isEmpty()){
@@ -90,6 +84,80 @@ bool CRoleDocumentValidatorComp::ValidateDocumentData(
 						.arg(QString::fromUtf8(normalizedPermissionId), QString::fromUtf8(tenantId));
 				return false;
 			}
+		}
+	}
+
+	return true;
+}
+
+
+bool CRoleDocumentValidatorComp::CheckRoleIdUnique(
+			const imtbase::IObjectCollection& roleCollection,
+			const QByteArray& objectId,
+			const QByteArray& roleId,
+			const QByteArray& productId,
+			const QByteArray& tenantId,
+			QString& errorMessage)
+{
+	imtauth::CTenantFilterParam tenantFilter;
+	tenantFilter.SetTenantId(tenantId);
+
+	imtbase::CComplexCollectionFilter::FilterExpression filterExpr;
+	filterExpr.logicalOperation = imtbase::IComplexCollectionFilter::LO_AND;
+	filterExpr.fieldFilters << imtbase::IComplexCollectionFilter::FieldFilter("RoleId", QString::fromUtf8(roleId));
+	filterExpr.fieldFilters << imtbase::IComplexCollectionFilter::FieldFilter("ProductId", QString::fromUtf8(productId));
+	if (!objectId.isEmpty()){
+		filterExpr.fieldFilters << imtbase::IComplexCollectionFilter::FieldFilter(
+					"DocumentId", QString::fromUtf8(objectId), imtbase::IComplexCollectionFilter::FO_NOT_EQUAL);
+	}
+
+	imtbase::CComplexCollectionFilter complexFilter;
+	complexFilter.SetFilterExpression(filterExpr);
+
+	iprm::CParamsSet filterParams;
+	filterParams.SetEditableParameter("TenantFilter", &tenantFilter);
+	filterParams.SetEditableParameter("ComplexFilter", &complexFilter);
+
+	if (!roleCollection.GetElementIds(0, 1, &filterParams).isEmpty()){
+		errorMessage = QStringLiteral("Role with ID: '%1' already exists").arg(roleId);
+		return false;
+	}
+
+	return true;
+}
+
+
+bool CRoleDocumentValidatorComp::CheckParentRolesInTenant(
+			const imtbase::IObjectCollection& roleCollection,
+			const QByteArrayList& parentRoleIds,
+			const QByteArray& tenantId,
+			QString& errorMessage)
+{
+	if (parentRoleIds.isEmpty()){
+		return true;
+	}
+
+	imtauth::CTenantFilterParam tenantFilter;
+	tenantFilter.SetTenantId(tenantId);
+
+	imtbase::CComplexCollectionFilter::FilterExpression filterExpr;
+	filterExpr.logicalOperation = imtbase::IComplexCollectionFilter::LO_OR;
+	for (const QByteArray& parentRoleId : parentRoleIds){
+		filterExpr.fieldFilters << imtbase::IComplexCollectionFilter::FieldFilter("DocumentId", QString::fromUtf8(parentRoleId));
+	}
+
+	imtbase::CComplexCollectionFilter complexFilter;
+	complexFilter.SetFilterExpression(filterExpr);
+
+	iprm::CParamsSet filterParams;
+	filterParams.SetEditableParameter("TenantFilter", &tenantFilter);
+	filterParams.SetEditableParameter("ComplexFilter", &complexFilter);
+
+	const imtbase::ICollectionInfo::Ids tenantRoleIds = roleCollection.GetElementIds(0, -1, &filterParams);
+	for (const QByteArray& parentRoleId : parentRoleIds){
+		if (!tenantRoleIds.contains(parentRoleId)){
+			errorMessage = QStringLiteral("The parent role '%1' belongs to another organization").arg(QString::fromUtf8(parentRoleId));
+			return false;
 		}
 	}
 

@@ -67,6 +67,7 @@ protected:
 				const sdl::V1_0::imtauth::CGroupUpdateGqlRequest& groupUpdateRequest,
 				istd::IChangeable& object,
 				QString& errorMessage) const override;
+	virtual istd::IChangeableUniquePtr CreateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& errorMessage) const override;
 
 	// reimplemented (imtservergql::CPermissibleGqlRequestHandlerComp)
 	virtual bool CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
@@ -78,6 +79,9 @@ protected:
 	I_FACT(imtauth::IUserGroupInfo, m_userGroupInfoFactCompPtr);
 	I_REF(imtauth::IDelegatedAccess, m_delegatedAccessCompPtr);
 	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);
+
+private:
+	bool ValidateGroupForTenant(const imtgql::CGqlRequest& gqlRequest, const imtauth::IUserGroupInfo& userGroup, const QByteArray& objectId, QString& errorMessage) const;
 };
 
 

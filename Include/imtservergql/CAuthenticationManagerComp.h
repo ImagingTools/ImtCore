@@ -148,6 +148,7 @@ private:
 				qint64 jwtExpSecs = 0) const;
 	void StoreExpiredToken(const QByteArray& token) const;
 	void InvalidateTokenCache(const QByteArray& token) const;
+	void InvalidateSessionTokenCache(const QByteArray& sessionId) const;
 
 	/**
 		Reads a previously-resolved tenant-ownership flag and tenant permissions for

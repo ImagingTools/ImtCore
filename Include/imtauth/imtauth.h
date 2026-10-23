@@ -10,6 +10,7 @@
 #include <imtauth/IUserInfo.h>
 #include <imtauth/IRoleInfoProvider.h>
 #include <imtauth/IUserGroupInfoProvider.h>
+#include <imtauth/ITenantConnectionRequestManager.h>
 
 
 /**
@@ -163,6 +164,29 @@ inline bool CreatesGroupCycle(const IUserGroupInfoProvider* groupProviderPtr, co
 		IUserGroupInfoSharedPtr groupPtr = groupProviderPtr->GetUserGroup(currentGroupId);
 		if (groupPtr.IsValid()){
 			pendingGroupIds += groupPtr->GetParentGroups();
+		}
+	}
+
+	return false;
+}
+
+
+/**
+	Tell whether the two organizations are linked by an active connection.
+*/
+inline bool AreTenantsConnected(const ITenantConnectionRequestManager& connectionManager, const QByteArray& tenantId, const QByteArray& otherTenantId)
+{
+	if (tenantId.isEmpty() || otherTenantId.isEmpty()){
+		return false;
+	}
+
+	for (const QByteArray& connectionId : connectionManager.GetConnectionIds(tenantId)){
+		ITenantConnectionInfoUniquePtr connectionPtr = connectionManager.GetConnection(connectionId);
+		if (		connectionPtr.IsValid() &&
+					connectionPtr->GetStatus() == ITenantConnectionInfo::CS_ACTIVE &&
+					((connectionPtr->GetTenantAId() == tenantId && connectionPtr->GetTenantBId() == otherTenantId) ||
+					(connectionPtr->GetTenantAId() == otherTenantId && connectionPtr->GetTenantBId() == tenantId))){
+			return true;
 		}
 	}
 

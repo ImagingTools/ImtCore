@@ -280,6 +280,31 @@ QByteArray CUserDatabaseDelegateComp::GetCustomColumnsQuery() const
 }
 
 
+// reimplemented (imtdb::CSqlDatabaseDocumentDelegateCompBase)
+
+QString CUserDatabaseDelegateComp::CreateTenantBindingFilterQuery(const QByteArray& tenantId, imtauth::TenantFilterMode filterMode) const
+{
+	// Users belong to no organization; in an organization only its active members are visible
+	if (tenantId.isEmpty()){
+		return QString();
+	}
+
+	const QString membershipsTableName = (m_tableSchemaAttrPtr.IsValid() && !(*m_tableSchemaAttrPtr).isEmpty())
+				? QStringLiteral(R"(%1."TenantMemberships")").arg(QString::fromUtf8(*m_tableSchemaAttrPtr))
+				: QStringLiteral(R"("TenantMemberships")");
+
+	const QString membershipLookup = IsSQLite()
+				? QStringLiteral(R"(SELECT 1 FROM %1 memberships WHERE memberships."UserId" = %2 AND memberships."TenantId" = '%3' AND memberships."IsActive" = 1)")
+				: QStringLiteral(R"(SELECT 1 FROM %1 memberships WHERE memberships."UserId"::text = %2 AND memberships."TenantId"::text = '%3' AND memberships."IsActive")");
+
+	const QString query = membershipLookup.arg(membershipsTableName, GetDocumentIdTextExpression(), SqlEncode(QString::fromUtf8(tenantId)));
+
+	return filterMode == imtauth::TFM_EXCLUDE
+				? QStringLiteral("NOT EXISTS (%1)").arg(query)
+				: QStringLiteral("EXISTS (%1)").arg(query);
+}
+
+
 } // namespace imtauthdb
 
 

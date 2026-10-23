@@ -4,6 +4,7 @@
 
 // ImtCore includes
 #include <imtauth/ICrossOrgGrantData.h>
+#include <imtauth/imtauth.h>
 
 
 namespace imtauth
@@ -31,6 +32,11 @@ bool CCrossOrgGrantDocumentValidatorComp::ValidateDocumentData(
 
 	if (info.roleIds.isEmpty()){
 		errorMessage = QStringLiteral("At least one role must be selected");
+		return false;
+	}
+
+	if (m_connectionManagerCompPtr.IsValid() && !imtauth::AreTenantsConnected(*m_connectionManagerCompPtr, info.sourceTenantId, info.targetTenantId)){
+		errorMessage = QStringLiteral("The organizations are not connected");
 		return false;
 	}
 

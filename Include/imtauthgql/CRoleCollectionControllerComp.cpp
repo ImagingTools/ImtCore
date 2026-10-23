@@ -10,6 +10,7 @@
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Roles.h>
 #include <imtbase/CComplexCollectionFilterHelper.h>
 #include <imtauth/CRole.h>
+#include <imtauth/CRoleDocumentValidatorComp.h>
 #include <imtauth/imtauth.h>
 #include <imtauthgql/imtauthgql.h>
 #include <imtauthgql/CAssignmentCollector.h>
@@ -50,25 +51,6 @@ bool CRoleCollectionControllerComp::FillObjectFromRepresentation(
 	QByteArray productId;
 	if (roleDataRepresentation.productId){
 		productId = *roleDataRepresentation.productId;
-	}
-
-	imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds();
-	for (const imtbase::ICollectionInfo::Id& collectionId : collectionIds){
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (m_objectCollectionCompPtr->GetObjectData(collectionId, dataPtr)){
-			imtauth::IRole* currentRoleInfoPtr = dynamic_cast<imtauth::IRole*>(dataPtr.GetPtr());
-			if (currentRoleInfoPtr != nullptr){
-				if (collectionId != objectId){
-					QByteArray currentRoleId = currentRoleInfoPtr->GetRoleId();
-					QByteArray currentProductId = currentRoleInfoPtr->GetProductId();
-
-					if (currentRoleId == roleId && currentProductId == productId){
-						errorMessage = QStringLiteral("Role with ID: '%1' already exists").arg(currentRoleId);
-						return false;
-					}
-				}
-			}
-		}
 	}
 
 	roleInfoPtr->SetProductId(productId);
@@ -471,7 +453,7 @@ bool CRoleCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequest& 
 
 
 bool CRoleCollectionControllerComp::UpdateObjectFromRepresentationRequest(
-			const imtgql::CGqlRequest& /*rawGqlRequest*/,
+			const imtgql::CGqlRequest& rawGqlRequest,
 			const sdl::V1_0::imtauth::CRoleUpdateGqlRequest& roleUpdateRequest,
 			istd::IChangeable& object,
 			QString& errorMessage) const
@@ -497,7 +479,30 @@ bool CRoleCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 	}
 
 	QByteArray objectId = roleInfoPtr->GetObjectUuid();
-	return FillObjectFromRepresentation(roleDataRepresentation, object, objectId, errorMessage);
+	if (!FillObjectFromRepresentation(roleDataRepresentation, object, objectId, errorMessage)){
+		return false;
+	}
+
+	return ValidateRoleForTenant(rawGqlRequest, *roleInfoPtr, objectId, errorMessage);
+}
+
+
+istd::IChangeableUniquePtr CRoleCollectionControllerComp::CreateObjectFromRequest(
+			const imtgql::CGqlRequest& gqlRequest,
+			QByteArray& newObjectId,
+			QString& errorMessage) const
+{
+	istd::IChangeableUniquePtr objectPtr = BaseClass::CreateObjectFromRequest(gqlRequest, newObjectId, errorMessage);
+	if (!objectPtr.IsValid()){
+		return nullptr;
+	}
+
+	const imtauth::IRole* roleInfoPtr = dynamic_cast<const imtauth::IRole*>(objectPtr.GetPtr());
+	if (roleInfoPtr == nullptr || !ValidateRoleForTenant(gqlRequest, *roleInfoPtr, newObjectId, errorMessage)){
+		return nullptr;
+	}
+
+	return objectPtr;
 }
 
 
@@ -509,6 +514,31 @@ void CRoleCollectionControllerComp::OnComponentCreated()
 
 	m_idParamRepresentationControllerPtr.SetPtr(new imtserverapp::CIdParamRepresentationController("ParentListFilter"));
 	RegisterFilterToSelectionParams(m_idParam, *m_idParamRepresentationControllerPtr);
+}
+
+
+// private methods
+
+bool CRoleCollectionControllerComp::ValidateRoleForTenant(
+			const imtgql::CGqlRequest& gqlRequest,
+			const imtauth::IRole& role,
+			const QByteArray& objectId,
+			QString& errorMessage) const
+{
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	const QByteArray tenantId = gqlContextPtr != nullptr ? gqlContextPtr->GetTenantId() : QByteArray();
+
+	if (!imtauth::CRoleDocumentValidatorComp::CheckRoleIdUnique(
+				*m_objectCollectionCompPtr,
+				objectId,
+				role.GetRoleId(),
+				role.GetProductId(),
+				tenantId,
+				errorMessage)){
+		return false;
+	}
+
+	return imtauth::CRoleDocumentValidatorComp::CheckParentRolesInTenant(*m_objectCollectionCompPtr, role.GetIncludedRoles(), tenantId, errorMessage);
 }
 
 

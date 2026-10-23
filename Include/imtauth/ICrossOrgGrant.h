@@ -113,7 +113,7 @@ public:
 
 	/**
 		Check if a target tenant has at least one of the specified roles
-		granted by the source tenant.
+		granted by the source tenant. An empty role ID checks for any effective grant.
 	*/
 	virtual bool HasAccess(
 		const QByteArray& sourceTenantId,

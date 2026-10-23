@@ -7,6 +7,7 @@
 
 // ImtCore includes
 #include <imtdoc/IDocumentValidator.h>
+#include <imtauth/ITenantConnectionRequestManager.h>
 
 
 namespace imtauth
@@ -15,7 +16,7 @@ namespace imtauth
 
 /**
 	Validates CrossOrgGrant documents before save.
-	Ensures required fields (targetTenantId, roleIds) are present.
+	Ensures required fields (targetTenantId, roleIds) are present and the organizations are connected.
 */
 class CCrossOrgGrantDocumentValidatorComp:
 			public icomp::CComponentBase,
@@ -26,10 +27,14 @@ public:
 
 	I_BEGIN_COMPONENT(CCrossOrgGrantDocumentValidatorComp)
 		I_REGISTER_INTERFACE(imtdoc::IDocumentValidator)
+		I_ASSIGN(m_connectionManagerCompPtr, "TenantConnectionRequestManager", "Connection manager used to require a connection between the organizations", false, "TenantConnectionRequestManager");
 	I_END_COMPONENT
 
 	// imtdoc::IDocumentValidator
 	virtual bool ValidateDocumentData(const QByteArray& objectId, const istd::IChangeable& document, QString& errorMessage, const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
+
+private:
+	I_REF(imtauth::ITenantConnectionRequestManager, m_connectionManagerCompPtr);
 };
 
 
