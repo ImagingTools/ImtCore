@@ -423,6 +423,12 @@ module.exports = {
 
             let hoverBlocker = event.target ? null : this.__findHoverBlocker(event)
 
+            const pointerInside = (obj) => {
+                event.relative(obj)
+                return event.x >= 0 && event.y >= 0 && event.x < obj.width && event.y < obj.height
+            }
+
+            // Physical exits must precede entries into unrelated areas.
             let i = 0
             while(i < this.entered.length){
                 let obj = this.entered[i]
@@ -432,8 +438,44 @@ module.exports = {
                     continue
                 }
 
-                event.relative(obj)
-                if(event.x < 0 || event.y < 0 || event.x >= obj.width || event.y >= obj.height || this.__isHoverBlocked(obj, hoverBlocker)) {
+                if(!pointerInside(obj)) {
+                    if(typeof obj.__onMouseLeave === 'function') obj.__onMouseLeave(event)
+                    this.entered.splice(i, 1)
+                    this.enteredSet.delete(obj)
+                } else {
+                    i++
+                }
+            }
+
+            // Enter the new topmost area before dispatching blocked exits.
+            // This keeps hover-dependent close buttons enabled during handoff.
+            i = 0
+            while(i < event.path.length){
+                let obj = event.path[i]
+                if(obj.__destroyed) {
+                    event.path.splice(i, 1)
+                    continue
+                }
+
+                if(!this.__isHoverBlocked(obj, hoverBlocker) && pointerInside(obj) && !this.enteredSet.has(obj)) {
+                    this.entered.push(obj)
+                    this.enteredSet.add(obj)
+                    if(typeof obj.__onMouseEnter === 'function') obj.__onMouseEnter(event)
+                }
+
+                i++
+            }
+
+            i = 0
+            while(i < this.entered.length){
+                let obj = this.entered[i]
+                if(obj.__destroyed) {
+                    this.entered.splice(i, 1)
+                    this.enteredSet.delete(obj)
+                    continue
+                }
+
+                if(!pointerInside(obj) || this.__isHoverBlocked(obj, hoverBlocker)) {
                     if(typeof obj.__onMouseLeave === 'function') obj.__onMouseLeave(event)
                     this.entered.splice(i, 1)
                     this.enteredSet.delete(obj)
@@ -450,20 +492,10 @@ module.exports = {
                     continue
                 }
 
-                if(this.__isHoverBlocked(obj, hoverBlocker)) {
-                    i++
-                    continue
+                if(!this.__isHoverBlocked(obj, hoverBlocker) && typeof obj.__onMouseMove === 'function') {
+                    event.relative(obj)
+                    obj.__onMouseMove(event)
                 }
-
-                event.relative(obj)
-                if(event.x >= 0 && event.y >= 0 && event.x < obj.width && event.y < obj.height){
-                    if(!this.enteredSet.has(obj)) {
-                        this.entered.push(obj)
-                        this.enteredSet.add(obj)
-                        if(typeof obj.__onMouseEnter === 'function') obj.__onMouseEnter(event)
-                    }
-                }
-                if(typeof obj.__onMouseMove === 'function') obj.__onMouseMove(event)
 
                 i++
             }
