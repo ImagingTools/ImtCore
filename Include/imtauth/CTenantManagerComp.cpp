@@ -243,46 +243,9 @@ bool CTenantManagerComp::SetTenantActive(const QByteArray& tenantId, bool isActi
 
 bool CTenantManagerComp::SetTenantPermissions(const QByteArray& tenantId, const QByteArrayList& permissions)
 {
-	if (!m_tenantCollectionCompPtr.IsValid()){
-		SendErrorMessage(0, "Tenant collection not configured", "CTenantManagerComp");
-		return false;
-	}
+	QSet<QByteArray> visitedTenantIds;
 
-	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (!m_tenantCollectionCompPtr->GetObjectData(tenantId, dataPtr)){
-		SendErrorMessage(0, QStringLiteral("Tenant '%1' not found").arg(QString::fromUtf8(tenantId)), "CTenantManagerComp");
-		return false;
-	}
-
-	ITenantInfo* tenantPtr = dynamic_cast<ITenantInfo*>(dataPtr.GetPtr());
-	if (tenantPtr == nullptr){
-		SendErrorMessage(0, "Invalid tenant object", "CTenantManagerComp");
-		return false;
-	}
-
-	istd::CChangeNotifier changeNotifier(this);
-
-	if (tenantPtr->GetTenantPermissions() != permissions){
-		tenantPtr->SetTenantPermissions(permissions);
-		tenantPtr->SetUpdatedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
-
-		if (!m_tenantCollectionCompPtr->SetObjectData(tenantId, *tenantPtr)){
-			SendErrorMessage(0, QStringLiteral("Failed to set the permissions of tenant '%1'").arg(QString::fromUtf8(tenantId)), "CTenantManagerComp");
-			return false;
-		}
-	}
-
-	// A sub-organization never holds more than its parent
-	bool retVal = true;
-	for (const QByteArray& childTenantId : GetChildTenantIds(tenantId)){
-		const QByteArrayList childPermissions = GetTenantPermissions(childTenantId);
-		const QByteArrayList restrictedPermissions = RestrictPermissions(childPermissions, permissions);
-		if (restrictedPermissions != childPermissions){
-			retVal = SetTenantPermissions(childTenantId, restrictedPermissions) && retVal;
-		}
-	}
-
-	return retVal;
+	return SetTenantPermissionsTree(tenantId, permissions, visitedTenantIds);
 }
 
 
@@ -392,6 +355,54 @@ QByteArrayList CTenantManagerComp::GetChildTenantIds(const QByteArray& tenantId)
 		if (candidatePtr.IsValid() && candidatePtr->GetParentTenantId() == tenantId){
 			retVal.append(candidateId);
 		}
+	}
+
+	return retVal;
+}
+
+
+bool CTenantManagerComp::SetTenantPermissionsTree(const QByteArray& tenantId, const QByteArrayList& permissions, QSet<QByteArray>& visitedTenantIds)
+{
+	visitedTenantIds.insert(tenantId);
+
+	if (!m_tenantCollectionCompPtr.IsValid()){
+		SendErrorMessage(0, "Tenant collection not configured", "CTenantManagerComp");
+		return false;
+	}
+
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	if (!m_tenantCollectionCompPtr->GetObjectData(tenantId, dataPtr)){
+		SendErrorMessage(0, QStringLiteral("Tenant '%1' not found").arg(QString::fromUtf8(tenantId)), "CTenantManagerComp");
+		return false;
+	}
+
+	ITenantInfo* tenantPtr = dynamic_cast<ITenantInfo*>(dataPtr.GetPtr());
+	if (tenantPtr == nullptr){
+		SendErrorMessage(0, "Invalid tenant object", "CTenantManagerComp");
+		return false;
+	}
+
+	istd::CChangeNotifier changeNotifier(this);
+
+	if (tenantPtr->GetTenantPermissions() != permissions){
+		tenantPtr->SetTenantPermissions(permissions);
+		tenantPtr->SetUpdatedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
+
+		if (!m_tenantCollectionCompPtr->SetObjectData(tenantId, *tenantPtr)){
+			SendErrorMessage(0, QStringLiteral("Failed to set the permissions of tenant '%1'").arg(QString::fromUtf8(tenantId)), "CTenantManagerComp");
+			return false;
+		}
+	}
+
+	// A sub-organization never holds more than its parent. Every subtree is visited, so a retry repairs descendants left over from a partially failed update
+	bool retVal = true;
+	for (const QByteArray& childTenantId : GetChildTenantIds(tenantId)){
+		if (visitedTenantIds.contains(childTenantId)){
+			continue;
+		}
+
+		const QByteArrayList restrictedPermissions = RestrictPermissions(GetTenantPermissions(childTenantId), permissions);
+		retVal = SetTenantPermissionsTree(childTenantId, restrictedPermissions, visitedTenantIds) && retVal;
 	}
 
 	return retVal;

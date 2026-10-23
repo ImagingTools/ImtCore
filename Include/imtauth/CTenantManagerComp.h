@@ -2,6 +2,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QSet>
+
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
 
@@ -47,6 +50,7 @@ public:
 
 private:
 	QByteArrayList GetChildTenantIds(const QByteArray& tenantId) const;
+	bool SetTenantPermissionsTree(const QByteArray& tenantId, const QByteArrayList& permissions, QSet<QByteArray>& visitedTenantIds);
 
 	I_REF(imtbase::IObjectCollection, m_tenantCollectionCompPtr);
 	I_FACT(imtauth::ITenantInfo, m_tenantFactoryCompPtr);
