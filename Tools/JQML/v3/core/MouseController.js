@@ -423,7 +423,33 @@ module.exports = {
 
             let hoverBlocker = event.target ? null : this.__findHoverBlocker(event)
 
+            const pointerInside = (obj) => {
+                event.relative(obj)
+                return event.x >= 0 && event.y >= 0 && event.x < obj.width && event.y < obj.height
+            }
+
+            // Enter the new topmost area before leaving the one underneath. A
+            // leave-first gap makes a tab drop its hover and disable the close
+            // button before that button can record containsMouse, so the two
+            // swap on every move.
             let i = 0
+            while(i < event.path.length){
+                let obj = event.path[i]
+                if(obj.__destroyed) {
+                    event.path.splice(i, 1)
+                    continue
+                }
+
+                if(!this.__isHoverBlocked(obj, hoverBlocker) && pointerInside(obj) && !this.enteredSet.has(obj)) {
+                    this.entered.push(obj)
+                    this.enteredSet.add(obj)
+                    if(typeof obj.__onMouseEnter === 'function') obj.__onMouseEnter(event)
+                }
+
+                i++
+            }
+
+            i = 0
             while(i < this.entered.length){
                 let obj = this.entered[i]
                 if(obj.__destroyed) {
@@ -432,8 +458,7 @@ module.exports = {
                     continue
                 }
 
-                event.relative(obj)
-                if(event.x < 0 || event.y < 0 || event.x >= obj.width || event.y >= obj.height || this.__isHoverBlocked(obj, hoverBlocker)) {
+                if(!pointerInside(obj) || this.__isHoverBlocked(obj, hoverBlocker)) {
                     if(typeof obj.__onMouseLeave === 'function') obj.__onMouseLeave(event)
                     this.entered.splice(i, 1)
                     this.enteredSet.delete(obj)
@@ -450,20 +475,9 @@ module.exports = {
                     continue
                 }
 
-                if(this.__isHoverBlocked(obj, hoverBlocker)) {
-                    i++
-                    continue
+                if(!this.__isHoverBlocked(obj, hoverBlocker) && pointerInside(obj) && typeof obj.__onMouseMove === 'function') {
+                    obj.__onMouseMove(event)
                 }
-
-                event.relative(obj)
-                if(event.x >= 0 && event.y >= 0 && event.x < obj.width && event.y < obj.height){
-                    if(!this.enteredSet.has(obj)) {
-                        this.entered.push(obj)
-                        this.enteredSet.add(obj)
-                        if(typeof obj.__onMouseEnter === 'function') obj.__onMouseEnter(event)
-                    }
-                }
-                if(typeof obj.__onMouseMove === 'function') obj.__onMouseMove(event)
 
                 i++
             }
