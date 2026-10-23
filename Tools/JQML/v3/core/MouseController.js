@@ -475,7 +475,8 @@ module.exports = {
                     continue
                 }
 
-                if(!this.__isHoverBlocked(obj, hoverBlocker) && pointerInside(obj) && typeof obj.__onMouseMove === 'function') {
+                if(!this.__isHoverBlocked(obj, hoverBlocker) && typeof obj.__onMouseMove === 'function') {
+                    event.relative(obj)
                     obj.__onMouseMove(event)
                 }
 
