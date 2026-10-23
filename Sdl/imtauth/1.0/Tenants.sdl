@@ -27,6 +27,7 @@ type TenantItemData {
 	invitationId: ID
 	invitedByName: String
 	parentTenantId: ID
+	parentTenantName: String
 	isSystemTenant: Boolean
 }
 
@@ -67,6 +68,10 @@ type TenantData {
 	tenantPermissions: [ID]
 	parentTenantId: ID
 	isSystemTenant: Boolean
+	canEditTenantPermissions: Boolean
+	parentTenantPermissions: [ID]
+	ownerName: String
+	creatorName: String
 }
 
 input GetTenantListInput {

@@ -23,10 +23,15 @@ imtauth::IUserInfo::FeatureIds CollectImpliedPermissions(const IGqlContext& gqlC
 
 /**
 	Every permission of the product of the context if the caller owns the organization of the context, otherwise none.
-	The owner of an organization holds the whole product within it, whatever the roles and the permissions available to the organization.
+	The owner of an organization holds its whole permission scope, whatever the roles.
 	\see imtlic::CollectProductPermissions
 */
 imtauth::IUserInfo::FeatureIds CollectTenantOwnerPermissions(const IGqlContext& gqlContext);
+
+/**
+	The organization access permissions (\see imtauth::GetOrganizationAccessPermissions) the context grants to the given user.
+*/
+imtauth::IUserInfo::FeatureIds CollectOrganizationAccessPermissions(const IGqlContext& gqlContext, const QByteArray& userId);
 
 QByteArray GetLanguageIdFromRequest(const QList<CGqlParamObject>& inputParams);
 QByteArray GetDesignSchemeIdFromRequest(const QList<CGqlParamObject>& inputParams);

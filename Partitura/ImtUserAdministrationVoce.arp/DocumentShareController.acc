@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6390" Description="ACF"/>
-            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6601" Description="ACF"/>
+            <Version Id="1" Number="2459" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -64,14 +64,34 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="PermissionsJoiner" PackageId="ImtServerAppPck" ComponentId="CommandPermissionsProviderJoiner">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CommandPermissionsProvider" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>GetOrganizationDocumentShares</Value>
+                                <Value>RemoveOrganizationDocumentShares</Value>
+                                <Value>SetDocumentShareGroups</Value>
+                                <Value>SetDocumentSharesStatus</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="RemoveOrganizationDocumentShares" PackageId="ImtServerAppPck" ComponentId="SingleCommandPermissionsProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CommandId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="RemoveOrganizationDocumentShares"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="CommandPermissions">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="EditCommandPermissions">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>/OrganizationManagement/Shares/Edit</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
@@ -85,8 +105,12 @@
                     <AttributeInfo Id="CommandId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="SetDocumentShareGroups"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="CommandPermissions">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="EditCommandPermissions">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>/OrganizationManagement/Shares/Edit</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
@@ -100,27 +124,15 @@
                     <AttributeInfo Id="CommandId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="SetDocumentSharesStatus"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="CommandPermissions">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="EditCommandPermissions">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>/OrganizationManagement/Shares/Edit</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="PermissionsJoiner" PackageId="ImtServerAppPck" ComponentId="CommandPermissionsProviderJoiner">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="CommandPermissionsProvider" Type="Reference[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>GetOrganizationDocumentShares</Value>
-                                <Value>RemoveOrganizationDocumentShares</Value>
-                                <Value>SetDocumentShareGroups</Value>
-                                <Value>SetDocumentSharesStatus</Value>
-                            </Values>
-                        </Data>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

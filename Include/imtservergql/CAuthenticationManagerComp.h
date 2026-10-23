@@ -16,7 +16,9 @@
 #include <imtgql/IGqlContextCreator.h>
 #include <imtauth/IJwtSessionController.h>
 #include <imtauth/IPersonalAccessTokenManager.h>
+#include <imtauth/ITenantInvitationManager.h>
 #include <imtauth/ITenantManager.h>
+#include <imtauth/ITenantMembershipManager.h>
 #include <imtlic/IProductInfo.h>
 
 
@@ -41,10 +43,13 @@ public:
 		I_ASSIGN(m_slaveJwtSessionControllerCompPtr, "SlaveJwtSessionController", "Slave JWT session controller for delegation", false, "JwtSessionController");
 		I_ASSIGN(m_patManagerCompPtr, "PersonalAccessTokenManager", "Personal Access Token manager", false, "PersonalAccessTokenManager");
 		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager for owner resolution", false, "TenantManager");
+		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Memberships that give a user outside of any organization access to the organizations", false, "MembershipManager");
+		I_ASSIGN(m_invitationManagerCompPtr, "InvitationManager", "Pending invitations that give a user outside of any organization access to the organizations", false, "InvitationManager");
 		I_ASSIGN(m_productInfoCompPtr, "FeatureContainer", "Product the permissions of a request are checked against", false, "FeatureContainer");
 		I_ASSIGN(m_patPrefixAttrPtr, "PatPrefix", "Personal Access Token prefix", false, "imt_pat_");
 		I_ASSIGN(m_maxTokenCacheSizeAttrPtr, "MaxTokenCacheSize", "Maximum number of cached tokens", false, 10000);
 		I_ASSIGN(m_tokenCacheTtlAttrPtr, "TokenCacheLifetime", "Token cache lifetime (in secs)", false, 5 * 60);
+		I_ASSIGN(m_tenantDataCacheTtlAttrPtr, "TenantDataCacheLifetime", "How long the scope, the ownership and the organization access of a token are cached (in secs)", false, 10);
 	I_END_COMPONENT;
 
 	// reimplemented (imtgql::IGqlContextCreator)
@@ -74,14 +79,14 @@ private:
 		bool isPat = false;
 		qint64 expiresAt = 0;
 
-		// Tenant-ownership flag, resolved lazily (see TryGetCachedTenantOwnership /
-		// StoreCachedTenantOwnership) and cached alongside the rest of this token's
-		// claims for the same TTL. 'resolved' distinguishes "not an owner" from
-		// "never looked up yet" so a fresh entry doesn't get misread as a cached
-		// negative result.
+		// Organization data of the token, resolved lazily (see TryGetCachedTenantData /
+		// StoreCachedTenantData) and kept only for TenantDataCacheLifetime, so a changed
+		// scope, owner or membership reaches open sessions soon. 'resolvedAt' 0 means
+		// "never looked up yet", not a cached negative result.
 		bool isTenantOwner = false;
 		QByteArrayList tenantPermissions;
-		bool tenantOwnershipResolved = false;
+		bool hasOrganizationAccess = false;
+		qint64 tenantDataResolvedAt = 0;
 	};
 
 	bool ResolveUserId(
@@ -151,22 +156,27 @@ private:
 	void InvalidateSessionTokenCache(const QByteArray& sessionId) const;
 
 	/**
-		Reads a previously-resolved tenant-ownership flag and tenant permissions for
-		'token', if any. Returns false (nothing written) if the token isn't
-		cached yet or its tenant was never resolved - the caller should then
-		look it up (e.g. via the tenant manager) and store the result via
-		StoreCachedTenantOwnership().
+		Reads the organization data cached for 'token' while it is fresh. Returns false
+		(nothing written) if the token isn't cached, its data was never resolved or it is
+		older than TenantDataCacheLifetime - the caller then resolves it and stores it via
+		StoreCachedTenantData().
 	*/
-	bool TryGetCachedTenantOwnership(const QByteArray& token, bool& isTenantOwner, QByteArrayList& tenantPermissions) const;
+	bool TryGetCachedTenantData(const QByteArray& token, bool& isTenantOwner, QByteArrayList& tenantPermissions, bool& hasOrganizationAccess) const;
 
 	/**
-		Records a resolved tenant-ownership flag and tenant permissions for 'token'
-		on its existing cache entry (a no-op if the token has no cache entry -
-		callers only reach this after ResolveUserId() has already cached the token).
+		Records the resolved organization data for 'token' on its existing cache entry (a no-op
+		if the token has no cache entry - callers only reach this after ResolveUserId() has
+		already cached the token).
 	*/
-	void StoreCachedTenantOwnership(const QByteArray& token, bool isTenantOwner, const QByteArrayList& tenantPermissions) const;
+	void StoreCachedTenantData(const QByteArray& token, bool isTenantOwner, const QByteArrayList& tenantPermissions, bool hasOrganizationAccess) const;
 	imtgql::IGqlContextUniquePtr CreateContextInstance() const;
 	bool IsPatToken(const QByteArray& token) const;
+
+	/**
+		Tell whether the memberships let the user see the organizations: inside an organization its owner,
+		creator and members, outside of any a member of one or a user with a pending invitation.
+	*/
+	bool HasOrganizationAccess(const QByteArray& userId, const QByteArray& tenantId, bool isOwnerOrCreator) const;
 
 	/**
 		Extract the 'exp' claim (seconds since epoch) from a JWT without going
@@ -202,10 +212,13 @@ private:
 	I_REF(imtauth::IJwtSessionController, m_slaveJwtSessionControllerCompPtr);
 	I_REF(imtauth::IPersonalAccessTokenManager, m_patManagerCompPtr);
 	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
+	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);
+	I_REF(imtauth::ITenantInvitationManager, m_invitationManagerCompPtr);
 	I_REF(imtlic::IProductInfo, m_productInfoCompPtr);
 	I_ATTR(QByteArray, m_patPrefixAttrPtr);
 	I_ATTR(int, m_maxTokenCacheSizeAttrPtr);
 	I_ATTR(int, m_tokenCacheTtlAttrPtr);
+	I_ATTR(int, m_tenantDataCacheTtlAttrPtr);
 
 	mutable QMutex m_tokenCacheMutex;
 	mutable QHash<QByteArray, TokenCacheEntry> m_tokenCache;

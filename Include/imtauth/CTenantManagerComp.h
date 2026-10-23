@@ -31,15 +31,23 @@ public:
 	virtual QByteArrayList GetTenantIds() const override;
 	virtual ITenantInfoUniquePtr GetTenant(const QByteArray& tenantId) const override;
 	virtual QByteArrayList GetTenantPermissions(const QByteArray& tenantId) const override;
-	virtual QByteArray CreateTenant(const QString& tenantName, const QString& description = QString(), const QByteArray& ownerId = QByteArray()) override;
+	virtual QByteArray CreateTenant(
+				const QString& tenantName,
+				const QString& description = QString(),
+				const QByteArray& ownerId = QByteArray(),
+				const QByteArray& creatorId = QByteArray(),
+				const QByteArray& parentTenantId = QByteArray()) override;
 	virtual bool RemoveTenant(const QByteArray& tenantId) override;
 	virtual bool UpdateTenant(const QByteArray& tenantId, const QString& tenantName, const QString& description, const QByteArray& ownerId = QByteArray(), bool updateOwner = false) override;
 	virtual bool SetTenantActive(const QByteArray& tenantId, bool isActive) override;
+	virtual bool SetTenantPermissions(const QByteArray& tenantId, const QByteArrayList& permissions) override;
 	virtual bool SetTenantHierarchy(const QByteArray& tenantId, const QByteArray& parentTenantId) override;
 	virtual QByteArray GetSystemTenantId() const override;
 	virtual bool EnsureSystemTenant() override;
 
 private:
+	QByteArrayList GetChildTenantIds(const QByteArray& tenantId) const;
+
 	I_REF(imtbase::IObjectCollection, m_tenantCollectionCompPtr);
 	I_FACT(imtauth::ITenantInfo, m_tenantFactoryCompPtr);
 };

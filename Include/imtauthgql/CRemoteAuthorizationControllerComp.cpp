@@ -102,7 +102,9 @@ sdl::V1_0::imtauth::CPermissionList CRemoteAuthorizationControllerComp::OnGetPer
 	if (gqlContextPtr != nullptr && response.permissions.HasValue()){
 		QByteArrayList permissions = response.permissions->ToList();
 		permissions += imtgql::CollectImpliedPermissions(*gqlContextPtr, permissions);
-		for (const QByteArray& permission : imtgql::CollectTenantOwnerPermissions(*gqlContextPtr)){
+		const imtauth::IUserInfo::FeatureIds grantedPermissions = imtgql::CollectTenantOwnerPermissions(*gqlContextPtr)
+					+ imtgql::CollectOrganizationAccessPermissions(*gqlContextPtr, gqlContextPtr->GetUserId());
+		for (const QByteArray& permission : grantedPermissions){
 			if (!permissions.contains(permission)){
 				permissions.append(permission);
 			}

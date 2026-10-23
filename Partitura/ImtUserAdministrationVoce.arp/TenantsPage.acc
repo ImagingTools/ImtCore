@@ -31,6 +31,7 @@
                             <Values>
                                 <Value>name</Value>
                                 <Value>description</Value>
+                                <Value>parentTenantName</Value>
                                 <Value>ownerId</Value>
                                 <Value>membersCount</Value>
                                 <Value>isActive</Value>
@@ -42,8 +43,9 @@
                     <AttributeInfo Id="HeaderNames" Type="Text[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>Tenant Name</Value>
+                                <Value>Name</Value>
                                 <Value>Description</Value>
+                                <Value>Parent organization</Value>
                                 <Value>Owner</Value>
                                 <Value>Members Count</Value>
                                 <Value>Active</Value>
@@ -117,6 +119,9 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TenantCollection" Type="Reference" ExportId="TenantRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantManager" Type="Reference" ExportId="TenantManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">

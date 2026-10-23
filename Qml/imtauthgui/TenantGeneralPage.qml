@@ -4,6 +4,9 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtcontrols 1.0
+import imtcolgui 1.0
+import imtauthgui 1.0
+import imtauthUsersSdl 1.0
 
 /**
  * TenantGeneralPage
@@ -35,6 +38,7 @@ ViewBase {
 	readonly property bool __canEditIsActive: generalPage.stateManager
 		? (generalPage.stateManager.isNewTenant || generalPage.stateManager.canEditOrganization)
 		: false
+	readonly property bool __isNewTenant: generalPage.stateManager ? generalPage.stateManager.isNewTenant : false
 
 	function updateGui() {
 		if (!generalPage.tenantData) return
@@ -43,6 +47,18 @@ ViewBase {
 		isActiveSwitch.checked = generalPage.tenantData.m_isActive !== undefined
 			? generalPage.tenantData.m_isActive
 			: true
+		ownerText.text = generalPage.tenantData.m_ownerName
+		ownerSelect.selectedId = generalPage.tenantData.m_ownerId
+		ownerSelect.selectedText = generalPage.tenantData.m_ownerName
+	}
+
+	// The creator picks the owner of a new organization; the owner holds every available permission
+	function __selectOwner(userId, userName) {
+		if (!generalPage.tenantData || userId === "")
+			return
+		generalPage.tenantData.m_ownerId = userId
+		generalPage.tenantData.m_ownerName = userName
+		generalPage.doUpdateModel()
 	}
 
 	function updateModel() {
@@ -109,6 +125,39 @@ ViewBase {
 						if (generalPage.tenantData && generalPage.tenantData.m_description !== descriptionInput.text)
 							generalPage.doUpdateModel()
 					}
+				}
+
+				TextInputElementView {
+					id: parentInput
+					name: qsTr("Parent organization")
+					readOnly: true
+					visible: generalPage.stateManager ? (generalPage.stateManager.isNewTenant && generalPage.stateManager.isSubOrganization) : false
+					text: AuthorizationController.currentTenantName
+				}
+
+				// Until the organization is saved the creator picks its owner; afterwards it is transferred on the Members page
+				CollectionSelectElementView {
+					id: ownerSelect
+					visible: generalPage.__isNewTenant
+					name: qsTr("Owner")
+					description: qsTr("The owner holds every available permission of the organization")
+					commandId: ImtauthUsersSdlCommandIds.s_usersList
+					fields: [UserItemDataTypeMetaInfo.s_id, UserItemDataTypeMetaInfo.s_name]
+					titleField: UserItemDataTypeMetaInfo.s_name
+					textFilterFieldIds: [UserItemDataTypeMetaInfo.s_name]
+					sortByField: UserItemDataTypeMetaInfo.s_name
+					placeHolderText: qsTr("You (the creator)")
+					filterPlaceholder: qsTr("Search for a user")
+
+					onItemSelected: {
+						generalPage.__selectOwner(itemId, item ? item.title : "")
+					}
+				}
+
+				TextElementView {
+					id: ownerText
+					visible: !generalPage.__isNewTenant
+					name: qsTr("Owner")
 				}
 
 				SwitchElementView {

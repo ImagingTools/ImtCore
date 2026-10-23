@@ -284,20 +284,30 @@ QByteArray CUserDatabaseDelegateComp::GetCustomColumnsQuery() const
 
 QString CUserDatabaseDelegateComp::CreateTenantBindingFilterQuery(const QByteArray& tenantId, imtauth::TenantFilterMode filterMode) const
 {
-	// Users belong to no organization; in an organization only its active members are visible
+	// Users belong to no organization; in an organization its active members and its creator are visible
 	if (tenantId.isEmpty()){
 		return QString();
 	}
 
-	const QString membershipsTableName = (m_tableSchemaAttrPtr.IsValid() && !(*m_tableSchemaAttrPtr).isEmpty())
+	const bool hasSchema = m_tableSchemaAttrPtr.IsValid() && !(*m_tableSchemaAttrPtr).isEmpty();
+	const QString membershipsTableName = hasSchema
 				? QStringLiteral(R"(%1."TenantMemberships")").arg(QString::fromUtf8(*m_tableSchemaAttrPtr))
 				: QStringLiteral(R"("TenantMemberships")");
+	const QString tenantsTableName = hasSchema
+				? QStringLiteral(R"(%1."Tenants")").arg(QString::fromUtf8(*m_tableSchemaAttrPtr))
+				: QStringLiteral(R"("Tenants")");
 
 	const QString membershipLookup = IsSQLite()
 				? QStringLiteral(R"(SELECT 1 FROM %1 memberships WHERE memberships."UserId" = %2 AND memberships."TenantId" = '%3' AND memberships."IsActive" = 1)")
 				: QStringLiteral(R"(SELECT 1 FROM %1 memberships WHERE memberships."UserId"::text = %2 AND memberships."TenantId"::text = '%3' AND memberships."IsActive")");
+	const QString creatorLookup = IsSQLite()
+				? QStringLiteral(R"(SELECT 1 FROM %1 tenants WHERE tenants."CreatorId" = %2 AND tenants."Id" = '%3')")
+				: QStringLiteral(R"(SELECT 1 FROM %1 tenants WHERE tenants."CreatorId"::text = %2 AND tenants."Id"::text = '%3')");
 
-	const QString query = membershipLookup.arg(membershipsTableName, GetDocumentIdTextExpression(), SqlEncode(QString::fromUtf8(tenantId)));
+	const QString encodedTenantId = SqlEncode(QString::fromUtf8(tenantId));
+	const QString query = membershipLookup.arg(membershipsTableName, GetDocumentIdTextExpression(), encodedTenantId)
+				+ QStringLiteral(" UNION ALL ")
+				+ creatorLookup.arg(tenantsTableName, GetDocumentIdTextExpression(), encodedTenantId);
 
 	return filterMode == imtauth::TFM_EXCLUDE
 				? QStringLiteral("NOT EXISTS (%1)").arg(query)

@@ -32,7 +32,6 @@ static const inline QByteArray s_viewOrganizationConnectionsPermission = QByteAr
 static const inline QByteArray s_viewOrganizationConnectionCodePermission = QByteArrayLiteral("/OrganizationManagement/Connections/ViewCode");
 static const inline QByteArray s_connectOrganizationPermission = QByteArrayLiteral("/OrganizationManagement/Connections/Edit/Connect");
 static const inline QByteArray s_removeOrganizationConnectionPermission = QByteArrayLiteral("/OrganizationManagement/Connections/Edit/Remove");
-
 /**
 	Every leaf that edits the organization itself, or its members.
 */
@@ -66,6 +65,26 @@ bool HasTenantManageAccess(
 			const imtgql::CGqlRequest& gqlRequest,
 			const QByteArray& tenantId,
 			const QByteArrayList& requiredOrgPermissions,
+			QString& errorMessage);
+
+/**
+	Creation of an organization: system administrators, and users holding /OrganizationManagement/Add.
+	Inside an organization the new one is its sub-organization, so the scope of the organization must contain the permission too.
+*/
+bool CanCreateOrganization(const imtgql::IGqlContext& context);
+
+/**
+	Check a change of the permission scope of an organization: only its creator changes it,
+	and a sub-organization gets nothing its parent lacks. An unchanged scope always passes.
+	\param creatorId	The creator of the organization; empty for one not stored yet.
+*/
+bool CheckTenantPermissionsChange(
+			const imtauth::ITenantManager& tenantManager,
+			const QByteArray& creatorId,
+			const QByteArray& parentTenantId,
+			const QByteArrayList& currentPermissions,
+			const QByteArrayList& newPermissions,
+			const QByteArray& contextUserId,
 			QString& errorMessage);
 
 

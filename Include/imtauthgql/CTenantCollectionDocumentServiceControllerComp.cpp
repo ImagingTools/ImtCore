@@ -5,6 +5,7 @@
 #include <imtbasesdl/SDL/1.0/CPP/CollectionDocumentService.h>
 #include <imtgql/IGqlContext.h>
 #include <imtbasesdl/SDL/1.0/CPP/UndoManager.h>
+#include <imtauthgql/TenantAccess.h>
 
 
 namespace imtauthgql
@@ -52,15 +53,10 @@ CDM::CDocumentInfo CTenantCollectionDocumentServiceControllerComp::OnCreateNewDo
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const
 {
-	// Creating a new tenant is only allowed when the user has NOT selected
-	// any tenant (currentTenantId must be empty).
 	const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
-	if (contextPtr != nullptr){
-		QByteArray sessionTenantId = contextPtr->GetTenantId();
-		if (!sessionTenantId.isEmpty()){
-			errorMessage = QStringLiteral("A new organization can be created only outside of any organization. Switch to \"No organization\" first.");
-			return CDM::CDocumentInfo();
-		}
+	if (contextPtr == nullptr || !CanCreateOrganization(*contextPtr)){
+		errorMessage = QStringLiteral("Permission denied: /OrganizationManagement/Add");
+		return CDM::CDocumentInfo();
 	}
 
 	return BaseClass::OnCreateNewDocument(createNewDocumentRequest, gqlRequest, errorMessage);
@@ -112,8 +108,8 @@ CDM::CDocumentOperationStatus CTenantCollectionDocumentServiceControllerComp::On
 		const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
 		const QByteArray sessionTenantId = (contextPtr != nullptr) ? contextPtr->GetTenantId() : QByteArray();
 		const QByteArray tenantId = GetCollectionObjectId(GetUserId(gqlRequest), *arguments.input->documentId);
-		if (tenantId.isEmpty() && !sessionTenantId.isEmpty()){
-			errorMessage = QStringLiteral("A new organization can be created only outside of any organization. Switch to \"No organization\" first.");
+		if (tenantId.isEmpty() && (contextPtr == nullptr || !CanCreateOrganization(*contextPtr))){
+			errorMessage = QStringLiteral("Permission denied: /OrganizationManagement/Add");
 			CDM::CDocumentOperationStatus retVal;
 			retVal.status = CDM::EDocumentOperationStatus::Failed;
 			retVal.message = errorMessage;

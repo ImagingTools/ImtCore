@@ -11,9 +11,8 @@ import imtauthgui 1.0
  * TenantMembersPage
  *
  * Members tab — list / create / edit / exclude tenant members.
- * Extends SimpleCollectionPage with custom header buttons,
- * a custom delegate (TenantMemberDelegate), and member-specific
- * commands (invite, exclude, role management).
+ * Extends SimpleCollectionPage with custom header buttons, the standard table
+ * of members and invitations, and member-specific commands (invite, exclude, role management).
  */
 SimpleCollectionPage {
 	id: membersPage
@@ -45,7 +44,10 @@ SimpleCollectionPage {
 		? stateManager.canExcludeOrganizationMember
 		: false
 
-	delegateComponent: memberDelegateComp
+	columnIds: ["name", "role", "status", "details", "actions"]
+	columnNames: [qsTr("Name"), qsTr("Role"), qsTr("Status"), qsTr("Details"), ""]
+	columnDelegateIds: ["actions"]
+	columnDelegateComponents: [memberActionsCellComp]
 
 	headerButtonsComponent: memberHeaderButtonsComp
 
@@ -68,6 +70,17 @@ SimpleCollectionPage {
 					var tid = membersPage.model ? membersPage.model.m_id : ""
 					membersPage.apiClient.transferOwnership(tid, memberActionMenu.targetUserId)
 				}
+			}
+		)
+	}
+
+	function confirmRevokeInvitation(invitationId, userName) {
+		ModalDialogManager.showConfirmationDialog(
+			qsTr("Revoke Invitation"),
+			qsTr("Are you sure you want to revoke the invitation of \"%1\"?").arg(userName),
+			function(result) {
+				if (result === Enums.yes && membersPage.apiClient)
+					membersPage.apiClient.revokeInvitation(invitationId)
 			}
 		)
 	}
@@ -550,57 +563,177 @@ SimpleCollectionPage {
 		}
 	}
 
-	// --- Custom delegate ---
+	// --- Rows of the members table ---
+	function __isOwnerOrCreator(userId) {
+		var tenant = membersPage.model
+		return tenant ? (userId === tenant.m_ownerId || (tenant.m_creatorId !== "" && userId === tenant.m_creatorId)) : false
+	}
+
+	function __isCurrentUser(userId) {
+		var tenant = membersPage.model
+		return tenant ? (tenant.m_currentUserId !== "" && userId === tenant.m_currentUserId) : false
+	}
+
+	function __invitationStatus(invitation) {
+		if (membersPage.stateManager && membersPage.stateManager.isInvitationExpired(invitation.expiresAt))
+			return "Expired"
+		if (invitation.status === "revoked" || invitation.status === "Revoked")
+			return "Revoked"
+		return "Pending"
+	}
+
+	function createRow(item) {
+		var data = item.sourceData || item
+		var tenant = membersPage.model
+		var row = {}
+		row.kind = item.kind || "member"
+		row.name = item.title || ""
+		if (row.kind === "invitation") {
+			var status = membersPage.__invitationStatus(data)
+			row.role = qsTr("Invited")
+			row.status = qsTr("Pending")
+			if (status === "Expired")
+				row.status = qsTr("Expired")
+			else if (status === "Revoked")
+				row.status = qsTr("Revoked")
+			row.details = membersPage.stateManager
+				? membersPage.stateManager.formatInvitationInfo(data.invitedByName || data.invitedByUserId || "", data.expiresAt || "")
+				: ""
+			return row
+		}
+
+		var userId = data.id || ""
+		row.role = qsTr("Member")
+		if (tenant && userId === tenant.m_ownerId)
+			row.role = qsTr("Owner")
+		else if (tenant && tenant.m_creatorId !== "" && userId === tenant.m_creatorId)
+			row.role = qsTr("Creator")
+		row.status = qsTr("Active")
+		var permissionCount = Array.isArray(data.organizationPermissions) ? data.organizationPermissions.length : 0
+		var details = []
+		if (membersPage.__isCurrentUser(userId))
+			details.push(qsTr("You"))
+		if (permissionCount > 0)
+			details.push(qsTr("%1 organization permission(s)").arg(permissionCount))
+		row.details = details.join(" · ")
+		return row
+	}
+
+	// A double-clicked member opens the user; an invitation is not a document
+	function openItem(itemId) {
+		if (itemId.indexOf("inv_") === 0)
+			return
+		if (!membersPage.stateManager || !membersPage.stateManager.canChangeOrganizationMember)
+			return
+		var item = membersPage.__findItemById(itemId)
+		if (item)
+			membersPage.openEdit(itemId, item.title || itemId, "")
+	}
+
+	function __memberMenuItems(userId) {
+		var items = []
+		var isOwnerOrCreator = membersPage.__isOwnerOrCreator(userId)
+		if (isOwnerOrCreator)
+			return items
+		var stateManager = membersPage.stateManager
+		if (membersPage.__isCurrentUser(userId)) {
+			items.push("leave")
+			return items
+		}
+		if (stateManager && (stateManager.canChangeOrganizationMemberRole || stateManager.canManageOrganizationMembers))
+			items.push("managePermissions")
+		if (stateManager && stateManager.canExcludeOrganizationMember)
+			items.push("remove")
+		if (stateManager && stateManager.isOwner)
+			items.push("transfer")
+		return items
+	}
+
+	function __invitationMenuItems(invitation) {
+		var items = []
+		if (membersPage.__invitationStatus(invitation) !== "Pending")
+			return items
+		var stateManager = membersPage.stateManager
+		if (stateManager && stateManager.canInviteOrganizationMember)
+			items.push({ text: qsTr("Resend Invitation"), action: "resend" })
+		if (stateManager && stateManager.canExcludeOrganizationMember)
+			items.push({ text: qsTr("Revoke Invitation"), action: "revoke" })
+		return items
+	}
+
+	function hasRowActions(itemId) {
+		var item = membersPage.__findItemById(itemId)
+		if (!item)
+			return false
+		var data = item.sourceData || item
+		if (item.kind === "invitation")
+			return membersPage.__invitationMenuItems(data).length > 0
+		return membersPage.__memberMenuItems(data.id || "").length > 0
+	}
+
+	function showRowActions(itemId, menuX, menuY) {
+		var item = membersPage.__findItemById(itemId)
+		if (!item)
+			return
+		var data = item.sourceData || item
+		if (item.kind === "invitation") {
+			var inviteItems = membersPage.__invitationMenuItems(data)
+			if (inviteItems.length === 0)
+				return
+			inviteActionMenu.menuItems = inviteItems
+			inviteActionMenu.targetInvitationId = data.id || ""
+			inviteActionMenu.targetUserName = data.userName || data.userId || ""
+			inviteActionContextModel.fillModel()
+			ModalDialogManager.openDialog(inviteActionPopupComp, {
+				"x": menuX,
+				"y": menuY,
+				"model": inviteActionContextModel
+			})
+			return
+		}
+
+		var actions = membersPage.__memberMenuItems(data.id || "")
+		if (actions.length === 0)
+			return
+		memberActionMenu.targetUserId = data.id || ""
+		memberActionMenu.targetUserName = data.name || data.id || ""
+		memberActionMenu.showManagePermissions = actions.indexOf("managePermissions") >= 0
+		memberActionMenu.showExclude = actions.indexOf("remove") >= 0
+		memberActionMenu.showTransfer = actions.indexOf("transfer") >= 0
+		memberActionMenu.showLeave = actions.indexOf("leave") >= 0
+		memberActionContextModel.fillModel()
+		ModalDialogManager.openDialog(memberActionPopupComp, {
+			"x": menuX,
+			"y": menuY,
+			"model": memberActionContextModel
+		})
+	}
+
 	Component {
-		id: memberDelegateComp
+		id: memberActionsCellComp
 
-		TenantMemberDelegate {
-			width: parent.width
-			kind: modelData.kind || "member"
-			memberData: modelData.sourceData || modelData
-			tenantData: membersPage.model
-			stateManager: membersPage.stateManager
-			actionHandler: membersPage
-			isOwner: membersPage.stateManager ? membersPage.stateManager.isOwner : false
-			selectionManager: membersPage.selectionManager
-			showCheckBox: true
+		TableCellDelegateBase {
+			id: actionsCell
 
-			onMemberActionsRequested: {
-				memberActionMenu.targetUserId = userId
-				memberActionMenu.targetUserName = userName
-				memberActionMenu.showManagePermissions = false
-				memberActionMenu.showExclude = false
-				memberActionMenu.showTransfer = false
-				memberActionMenu.showLeave = false
-				for (var i = 0; i < menuItems.length; i++) {
-					if (menuItems[i].action === "managePermissions") memberActionMenu.showManagePermissions = true
-					else if (menuItems[i].action === "remove") memberActionMenu.showExclude = true
-					else if (menuItems[i].action === "transfer") memberActionMenu.showTransfer = true
-					else if (menuItems[i].action === "leave") memberActionMenu.showLeave = true
+			readonly property string itemId: actionsCell.getRowData() ? (actionsCell.getRowData().id || "") : ""
+
+			ToolButton {
+				id: actionsButton
+				visible: actionsCell.itemId !== "" && membersPage.hasRowActions(actionsCell.itemId)
+				anchors.centerIn: parent
+				tooltipText: qsTr("Actions")
+				iconSource: "qrc:/" + Style.getIconPath("Icons/More", Icon.State.On, Icon.Mode.Normal)
+				decorator: Component {
+					ToolButtonDecorator {
+						color: "transparent"
+						icon.width: Style.iconSizeXS
+					}
 				}
-				memberActionContextModel.fillModel()
-				ModalDialogManager.openDialog(memberActionPopupComp, {
-					"x": menuX,
-					"y": menuY,
-					"model": memberActionContextModel
-				})
-			}
 
-			onMemberEditRequested: {
-				if (membersPage.stateManager && membersPage.stateManager.canChangeOrganizationMember)
-					membersPage.openEdit(userId, userName, "")
-			}
-
-			onInviteActionsRequested: {
-				inviteActionMenu.menuItems = menuItems
-				inviteActionMenu.targetInvitationId = invitationId
-				inviteActionMenu.targetUserName = userName
-				inviteActionContextModel.fillModel()
-				ModalDialogManager.openDialog(inviteActionPopupComp, {
-					"x": menuX,
-					"y": menuY,
-					"model": inviteActionContextModel
-				})
+				onClicked: {
+					var point = actionsButton.mapToItem(null, 0, actionsButton.height)
+					membersPage.showRowActions(actionsCell.itemId, point.x, point.y)
+				}
 			}
 		}
 	}
@@ -694,7 +827,7 @@ SimpleCollectionPage {
 				if (commandId === "resend" && membersPage.apiClient && membersPage.stateManager && membersPage.stateManager.canInviteOrganizationMember)
 					membersPage.apiClient.resendInvitation(inviteActionMenu.targetInvitationId)
 				else if (commandId === "revoke" && membersPage.apiClient && membersPage.stateManager && membersPage.stateManager.canExcludeOrganizationMember)
-					membersPage.apiClient.revokeInvitation(inviteActionMenu.targetInvitationId)
+					membersPage.confirmRevokeInvitation(inviteActionMenu.targetInvitationId, inviteActionMenu.targetUserName)
 			}
 		}
 	}
@@ -763,7 +896,7 @@ SimpleCollectionPage {
 					if (action === "resend" && membersPage.apiClient)
 						membersPage.apiClient.resendInvitation(inviteActionMenu.targetInvitationId)
 					else if (action === "revoke" && membersPage.apiClient)
-						membersPage.apiClient.revokeInvitation(inviteActionMenu.targetInvitationId)
+						membersPage.confirmRevokeInvitation(inviteActionMenu.targetInvitationId, inviteActionMenu.targetUserName)
 				}
 			}
 			onObjectAdded: inviteActionMenu.insertItem(index, object)

@@ -438,7 +438,8 @@ bool CGqlJwtSessionControllerComp::CanUseTenant(
 		return false;
 	}
 
-	if (tenantPtr->GetOwnerId() == userId){
+	// The creator manages the permission scope of the organization, which is edited only from inside it
+	if (tenantPtr->GetOwnerId() == userId || tenantPtr->GetCreatorId() == userId){
 		return true;
 	}
 

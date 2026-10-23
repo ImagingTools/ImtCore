@@ -67,6 +67,9 @@ Canvas {
 			if ("item" in rowDelegate.dataModel){
 				val = rowDelegate.dataModel.item[key]
 			}
+			else if (rowDelegate.dataModel.modelData && typeof rowDelegate.dataModel.modelData == 'object'){
+				val = rowDelegate.dataModel.modelData[key];
+			}
 			else {
 				val = rowDelegate.dataModel[key];
 			}

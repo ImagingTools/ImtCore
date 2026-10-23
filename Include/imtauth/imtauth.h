@@ -172,6 +172,37 @@ inline bool CreatesGroupCycle(const IUserGroupInfoProvider* groupProviderPtr, co
 
 
 /**
+	Keep of \c permissions only those inside \c scope, the permission scope of an organization.
+*/
+inline QByteArrayList RestrictPermissions(const QByteArrayList& permissions, const QByteArrayList& scope)
+{
+	QByteArrayList retVal;
+	for (const QByteArray& permission : permissions){
+		if (HasPermission(scope, permission, false) && !retVal.contains(permission)){
+			retVal.append(permission);
+		}
+	}
+
+	return retVal;
+}
+
+
+/**
+	Permission to create an organization.
+*/
+static const inline QByteArray s_addOrganizationPermission = QByteArrayLiteral("/OrganizationManagement/Add");
+
+
+/**
+	Permissions to open the organizations page and list. Everyone who belongs to an organization or is invited to one holds them.
+*/
+inline QByteArrayList GetOrganizationAccessPermissions()
+{
+	return {QByteArrayLiteral("/OrganizationManagement/ViewPage"), QByteArrayLiteral("/OrganizationManagement/View")};
+}
+
+
+/**
 	Tell whether the two organizations are linked by an active connection.
 */
 inline bool AreTenantsConnected(const ITenantConnectionRequestManager& connectionManager, const QByteArray& tenantId, const QByteArray& otherTenantId)

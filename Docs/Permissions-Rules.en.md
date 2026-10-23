@@ -98,7 +98,8 @@ Permissions in this tree, like product permissions, are stored and checked only 
 ├─ View            organization data and all commands (read, edit, members, connections, ...)
 ├─ Add             create an organization
 ├─ Remove          delete an organization
-└─ Revisions/{View → View, Restore, Delete}
+├─ Revisions/{View → View, Restore, Delete}
+└─ Shares/Edit → View   manage the document shares of the organization
 ```
 
 Internal organization commands are declared with product permission `/OrganizationManagement/View`; the member leaf determines which action is allowed:
@@ -116,6 +117,7 @@ Internal organization commands are declared with product permission `/Organizati
 | Connection code | `Connections/ViewCode` |
 | Create, accept, reject, or cancel; edit contracts, grants, messages, or applications; change the connection code | `Connections/Edit/Connect` |
 | Remove a connection | `Connections/Edit/Remove` |
+| Shares: restrict to groups, status, removal (`SetDocumentShareGroups`, `SetDocumentSharesStatus`, `RemoveOrganizationDocumentShares`) | product `/OrganizationManagement/Shares/Edit` (ProLife, attribute `EditCommandPermissions` of the `DocumentShareController` composite); reading (`GetOrganizationDocumentShares`) is `View` |
 
 ## 4. Identifier format and comparison rule
 
@@ -270,7 +272,7 @@ The tree is from section 4. Names in the tables abbreviate full paths: `ChangeUs
 
 1. No provider connected → **allow** (13.10).
 2. No context or user → **deny**.
-3. Superuser (`IsAdmin`) or organization owner (`IsTenantOwner`) → **allow** (for PAT, see 13.16).
+3. Superuser (`IsAdmin`) → **allow**. The organization owner is checked like anyone else: the whole scope of the organization is already among the permissions of its context (section 10).
 4. Command is not in the provider → **deny** (`denyUndeclared = true`).
 5. No checker connected or command permission list is empty → **allow**.
 6. The request has a `permissionPath` header (6.4) → the path must **match one of the command permissions or be inside one**, and the user must hold it among their effective permissions.
@@ -333,7 +335,7 @@ permissions(product, tenant) = user's roles in the product
 | Principal | How it is identified | Behavior |
 |---|---|---|
 | **Superuser** | `CUserInfoComp::IsAdmin()`: `UserId == AdminId` (`AdminId = su` in compositions). The client checks `login == "su"`. | Bypasses all command permission checks; the server returns an **empty** permission list. |
-| **Organization owner** | `ITenantInfo::GetOwnerId() == userId` for the current organization (cached on the token). | Bypasses checks within their organization. |
+| **Organization owner** | `ITenantInfo::GetOwnerId() == userId` for the current organization (cached on the token). | Bypasses no check: holds the whole scope of their organization as context permissions (`imtgql::CollectTenantOwnerPermissions`) and nothing beyond it; reads the scope only. |
 
 **R9.1.** Do not identify a superuser from the permission list: it is empty and indistinguishable from a user with no permissions. Tests use `permissions: ['*']` for this (`GuiTestKit/fixtures/defineUsers.js` refuses `su` without it).
 **R9.2.** Superuser-only actions: enable/disable an account (`IsSuperuserRequest`), change another user's profile (`OnSetProfile`), create a disabled account, and issue PATs with any scopes.
@@ -343,7 +345,14 @@ permissions(product, tenant) = user's roles in the product
 ## 10. Organizations and PATs
 
 **Organizations (tenants).**
-- `ITenantInfo::GetTenantPermissions()` is the **upper bound**: the product permissions available to the organization.
+- `ITenantInfo::GetTenantPermissions()` is the **scope**, the upper bound: the product permissions available to the organization. Inside the organization nothing outside the scope takes effect, and **an empty scope grants nothing** (`imtgql::CollectImpliedPermissions`).
+- **Only the creator** of the organization (`CreatorId`) sets the scope, in `UpdateTenant` and in the organization editor (`imtauthgql::CheckTenantPermissionsChange`): "Only the creator of the organization can change its permissions". The editor receives `canEditTenantPermissions` and, for a sub-organization, the parent scope `parentTenantPermissions`.
+- **The owner** holds the whole scope as permissions (section 9) and sees it read-only.
+- **Creation.** An organization is created by the superuser or by a user holding `/OrganizationManagement/Add` (`imtauthgql::CanCreateOrganization`, in `CreateTenant` and in the `Tenants` document service). An organization created from inside another one is its child: the parent is never chosen, it is the organization of the context (a different `parentTenantId` is refused), and `/OrganizationManagement/Add` must also be in the parent scope. The scope of a sub-organization is a subset of the parent scope: "Permission '%1' is not available to the parent organization"; this is checked on every scope change and on every save of the document (`CTenantDocumentValidatorComp`). `CreateTenant` gives a sub-organization the default set cut to the parent scope.
+- **Cascade.** Narrowing a scope trims the scope of every descendant (`ITenantManager::SetTenantPermissions`).
+- **Default scope** of a root organization created by `CreateTenant`: the leaves `/Administration/{Users, Roles, Groups}/{ViewPage, View, Edit/Add, Edit/Change, Edit/Remove, Revisions/View}` (`CTenantManagerComp`).
+- **The Organizations page** is visible with at least one organization or a pending invitation, and outside of any organization also to a holder of `/OrganizationManagement/Add`: the server adds `/OrganizationManagement/{ViewPage, View}` to members, the owner and the creator inside an organization, and outside of any to a member of some organization, an invited user and a user who may create organizations (`CAuthenticationManagerComp::HasOrganizationAccess`). On product servers (no membership manager) outside of any organization only to a holder of `Add` (13.30).
+- **Cache.** The scope, the owner flag and the organization access are cached on the token for `TenantDataCacheLifetime` (10 s by default): changes reach open sessions within that time.
 - An organization role may contain only permissions from this list (`CRoleDocumentValidatorComp`: “Permission '%1' is not allowed for tenant”).
 - Organization permissions are consistent with requirements: when a permission is added, the editor also adds the leaves it includes. Otherwise, `ChangeUser` without `ViewUsers` would allow modification without viewing.
 - `GetProductPermissions(productId, tenantId)` returns the tree limited by organization permissions; `GetUserPermissions(productId)` returns the current user's permissions (the superuser receives the whole tree).
@@ -358,7 +367,7 @@ permissions(product, tenant) = user's roles in the product
 ## 11. Testing
 
 - **Unit tests:** `ImtCore/Tests/PermissionRequirementsTest` (25) covers `HasPermission` (section 4 table, bare identifiers) and requirement expansion (section 5 tables: all four dependency types, transitivity, cycles, organization boundary, request product, and forbidden dependencies). `ImtCore/Tests/PermissionCheckTest` (38) tests complete server-command checks (`CheckRequestPermissions`): principals, declarations, all requirement types, product and organization, `permissionPath`, GUI elements, and revisions (`CheckRevisionPermissions`). New cases were mutation-tested: each fails if bare-identifier comparisons or revision checks by group/another collection are restored.
-- **API (Postman):** Puma `TenantApiPostman`, folder 20 “Organization permissions by path” (path-based organization permissions; bare identifiers and groups grant nothing); ProLife `ProLifeApiPostman`, folder 11 “Permission Model” (server product, PAT path and bare-id scopes, and `GetPermissions` matching server decisions).
+- **API (Postman):** Puma `TenantApiPostman`, folder 20 “Organization permissions by path” (path-based organization permissions; bare identifiers and groups grant nothing), folders 00D “Organization creators” (the right to create organizations) and 23 “Organization permission scope” (scope set by the creator, the owner holds the whole scope and cannot change it, sub-organization through the API and through the document, a scope wider than the parent is refused, cascade, empty scope, page visibility by invitation); ProLife `ProLifeApiPostman`, folder 11 “Permission Model” (server product, PAT path and bare-id scopes, and `GetPermissions` matching server decisions).
 - **Server API tests:** for each protected command, a user without permission is denied; for each requirement, a permission includes its target but the target does not grant the source.
 - **GUI (`GuiTestKit`).** Do **not** maintain permission-to-page matrices: the client is built from the user's permissions, so tests ask the client itself—`page.isAvailable()`, `page.commands.isAvailable(id)`, `admin.hasSubPage(id)`. Skip only with `requires(user, permission)` (not `!user.can(x)`: “could not determine” is not “does not have permission”).
 - **User fixtures** list leaves **as named by the server** (`GetProductPermissions(productId)`). `seed.js` checks them against the live tree, and an obsolete identifier fails the run. Fixtures do not list implied permissions; the server adds them. Do not derive the list from `.acc`/QML: `EditFeature` in `PagePermissions` is a group, not a grantable permission.
@@ -396,7 +405,7 @@ Baseline: ImtCore `442be502b9`; “Fixed” means fixed in the branches listed i
 | 13.13 | Request product came from the client `productId` header; without it, permissions were collected from **all** products. Requirements always expanded from permissions across all products (`m_userInfoPtr->GetPermissions()`). | `imtservergql/CAuthenticationManagerComp.cpp`, `imtgql/CGqlContext.cpp` | Fixed: product comes from server configuration (`ProductInfo`), header is fallback only; requirements expand from request-product permissions. |
 | 13.14 | According to code, Puma does not adapt the user in context to the organization (`AdaptUserForTenant` is called only when returning data), so Puma command checks include roles from all of the user's organizations. Product servers receive a user already adapted by Puma. | `imtservergql/CAuthenticationManagerComp.cpp`, Puma `PumaServerBase.acc` | Confirm with a test; adapt the user when creating the context. |
 | 13.15 | `"*"` in an element or command permission list lets any user through `CheckPermissionOr`. | `imtauth/CCheckPermissionOrComp.cpp` | Prohibit it in declarations (R6.8). |
-| 13.16 | Step 3 of the algorithm (superuser/owner → allow) runs before all permission checks. If a PAT belonging to an organization owner has `IsTenantOwner`, a token with narrow scopes gets full access. Not tested. | `imtservergql::CheckRequestPermissions` | Verify; a bypass must not remove scope restrictions (R9.4). |
+| 13.16 | Step 3 of the algorithm (superuser/owner → allow) ran before all permission checks. If a PAT belonging to an organization owner had `IsTenantOwner`, a token with narrow scopes got full access. | `imtservergql::CheckRequestPermissions` | Fixed: the owner bypass is gone, the owner holds the scope as permissions; a PAT gets no owner permissions. |
 | 13.17 | `CGuiElementRepresentationControllerComp` treats a missing `UserInfo` as a superuser (shows everything) and collects permissions across all products; an organization owner sees filtered GUI even though the server allows them. | `imtserverapp/CGuiElementRepresentationControllerComp.cpp` | Low priority: GUI is not a security boundary. |
 | 13.18 | The product tree is traversed again for every request (`CollectProductRequirements` in request context, with deep feature copies). | `imtlic/CProductInfo.cpp` | Requirements are expanded on demand (R5.2), but cache the parsed product tree instead of copying it on every request. |
 | 13.19 | Organization member permissions bypassed R4.1: exact `contains` checks on bare identifiers (`CanManageMembers`, member permission assignment, `HasTenantManageAccess`, organization-admin flag) and bare group IDs (`EditOrganization`, `EditOrganizationMember`) in `CTenantCollectionDocumentServiceComp`. A bare group ID granted all member management, while path-based permissions did not work. | `imtauthgql/CTenantMembershipManagerControllerComp.cpp`, `TenantAccess.cpp`, `CTenantCollectionDocumentServiceComp.cpp`, `CTenantManagerControllerComp.cpp`, `CCrossOrgGrantCollectionDocumentServiceComp.cpp` | Fixed in `feature/permission-requirements`: checks use `HasPermission` with full organization-tree leaf paths (`imtauthgql/TenantAccess.h`); a group is not a permission (R3.5). The organization tree was rebuilt (R3.6) and the member-permission editor now receives full paths (`BuildPermissionGroupsFromProvider`) instead of bare identifiers. |
@@ -406,6 +415,11 @@ Baseline: ImtCore `442be502b9`; “Fixed” means fixed in the branches listed i
 | 13.23 | Member leaves do not distinguish actions: inviting, excluding, and changing a member's role, as well as changing their permissions (`UpdateMembershipPermissions`), are allowed by **any** `Members/Edit/*` leaf; checks do not use `Permissions/Change`. | `imtauthgql/CTenantMembershipManagerControllerComp.cpp` (`CanManageMembers`) | Check the leaf for the specific action. |
 | 13.24 | Organization roles, groups, and users are edited through `Get/Update{Role,Group,User}{From}Representation`, declared only with product `/Administration/{Roles,Groups,Users}/...`. Member `Roles/*` and `Groups/*` permissions do not open these commands (the product organization paths in their declarations pointed to nonexistent nodes before this work and were removed). | `ImtAuthVoce.arp/{Role,User,UserGroup}CollectionDocumentService.acc`, `imtauthgql` document services | Decide whether the document services should check member leaves such as `Roles/Edit/Change` in organization context. |
 | 13.25 | Search page is declared as `*` (visible to everyone, 13.15); ProLife `/SearchManagement/ViewPage` is not used in declarations. The page is shared across products, and Lisa has no such leaf. | `ImtGraphQlVoce.arp/PagesController.acc` (`SearchPage`) | Declare the page with a product leaf in each product composition. |
+| 13.26 | `GraphQLDemultiplexer` (`CGqlDemultiplexerComp`) has no `CommandPermissions`/`PermissionChecker` attributes: `TenantController.acc` sets them but they are ignored, so Puma never checks the declarations of `TenantPermissions.acc`. Organization commands are protected only by the checks inside the controllers (`HasTenantManageAccess`, `CanCreateOrganization`, ...). | `imtservergql/CGqlDemultiplexerComp.*`, `ImtUserAdministrationVoce.arp/TenantController.acc` | Decide: check the declarations on the demultiplexer (changes every organization command) or remove the dead attributes. |
+| 13.27 | Any user outside of an organization could create a root organization and give it any scope. | `CTenantManagerControllerComp::OnCreateTenant`, `CTenantCollectionDocumentServiceControllerComp` | Fixed: only the superuser or a holder of `/OrganizationManagement/Add`. |
+| 13.28 | The scope and the owner flag were cached on the token for `TokenCacheLifetime` (5 minutes): a narrowed scope, a transferred ownership or a membership reached open sessions late. | `CAuthenticationManagerComp::TryGetCachedTenantData` | Fixed: a separate `TenantDataCacheLifetime` (10 s) for the scope, the owner flag and the organization access; the membership and invitation lookup is cached there too. |
+| 13.29 | The parent of a new organization document follows the context of its last edit; a document started in A and saved after switching to B stays a sub-organization of A. | `CTenantCollectionDocumentServiceComp` | Accepted: `Add` is checked on save as well, and the validator checks the scope against the parent. |
+| 13.30 | Outside of any organization product servers show the Organizations page only to a holder of `Add`: they have no membership or invitation managers. | `CAuthenticationManagerComp::HasOrganizationAccess` | Accepted: without the right to create organizations the page is visible only inside an organization or with an invitation (on Puma); a remote query to Puma is phase 1b. |
 
 ## 14. Current product status
 
