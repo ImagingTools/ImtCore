@@ -428,11 +428,28 @@ module.exports = {
                 return event.x >= 0 && event.y >= 0 && event.x < obj.width && event.y < obj.height
             }
 
-            // Enter the new topmost area before leaving the one underneath. A
-            // leave-first gap makes a tab drop its hover and disable the close
-            // button before that button can record containsMouse, so the two
-            // swap on every move.
+            // Physical exits must precede entries into unrelated areas.
             let i = 0
+            while(i < this.entered.length){
+                let obj = this.entered[i]
+                if(obj.__destroyed) {
+                    this.entered.splice(i, 1)
+                    this.enteredSet.delete(obj)
+                    continue
+                }
+
+                if(!pointerInside(obj)) {
+                    if(typeof obj.__onMouseLeave === 'function') obj.__onMouseLeave(event)
+                    this.entered.splice(i, 1)
+                    this.enteredSet.delete(obj)
+                } else {
+                    i++
+                }
+            }
+
+            // Enter the new topmost area before dispatching blocked exits.
+            // This keeps hover-dependent close buttons enabled during handoff.
+            i = 0
             while(i < event.path.length){
                 let obj = event.path[i]
                 if(obj.__destroyed) {
