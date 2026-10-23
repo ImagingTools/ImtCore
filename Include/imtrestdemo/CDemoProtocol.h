@@ -35,6 +35,21 @@ const char* const s_uploadsDirectoryName = "uploaded";
 const int s_echoMaxBodySize = 4096;
 
 /**
+	Name of the directory (inside of the directory of the files) where the dynamic policy of \c /dynamic writes the bodies that are too big
+	for the memory. The file of a body exists only while its request is handled. The directory is in \c private, so the files are not given to everybody.
+*/
+const char* const s_receivedDirectoryName = "private/received";
+
+/**
+	Limits of the dynamic policy of \c /dynamic: a body up to \c s_dynamicMemoryBodyLimit bytes goes to the memory, a bigger one to a file,
+	a body over \c s_dynamicMaxBodySize bytes is refused with 413 before it is received. The same values are in the partitura
+	(Impl/ImtRestDemoServer/ImtRestDemoServer.acc, the element \c DynamicBodyPolicy of the registry \c BodyPolicy). They are much less than the
+	defaults of the policy (100 MiB for the memory, the limit by the free space of the disk), so the demo and the tests do not need big bodies.
+*/
+const int s_dynamicMemoryBodyLimit = 256 * 1024;
+const int s_dynamicMaxBodySize = 8 * 1024 * 1024;
+
+/**
 	Sample files of the server (see CDemoServer::CreateSampleFiles()).
 */
 const char* const s_helloFileName = "hello.txt";

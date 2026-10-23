@@ -103,6 +103,9 @@ struct CDemoServerSettings
 	- \c /stream/<size>: the generated body of any size, also slow and without the announced size;
 	- \c /behavior/<case>: the special situations: statuses, an exception of the servlet, a long processing, the headers
 	  that the server must control, a big body in memory;
+	- \c /dynamic/<name>: the dynamic policy of the body (imtrest::CHttpDynamicBodyPolicyComp) with small limits: a body up to
+	  DemoProtocol::s_dynamicMemoryBodyLimit is received to the memory, a bigger one to a file, a body over DemoProtocol::s_dynamicMaxBodySize is
+	  refused with 413; the answer tells where the body was received (CDemoDynamicBodyServletComp);
 	- \c /refuse: every request is refused with 403 before the body is received;
 	- \c /admin/settings: reading and changing of the settings of the running server (needs the token, CDemoAdminServletComp).
 

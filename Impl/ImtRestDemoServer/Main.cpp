@@ -23,6 +23,7 @@
 #include <QtCore/QTimer>
 
 // ImtCore includes
+#include <imtrestdemo/CDemoProtocol.h>
 #include <imtrestdemo/CDemoServer.h>
 #include <imtrestdemo/DemoTlsTools.h>
 #include <GeneratedFiles/ImtRestDemoServer/CImtRestDemoServer.h>
@@ -151,7 +152,10 @@ int main(int argc, char* argv[])
 
 	std::printf("ImtRestDemoServer listens on %s://localhost:%d\n", settings.isTlsEnabled ? "https" : "http", server.GetPort());
 	std::printf("Files: %s\n", qPrintable(server.GetFilesDirectory()));
-	std::printf("Paths: /echo /info /files/<path> /upload/<name> /stream/<size> /behavior/<case> /refuse /admin/settings\n");
+	std::printf("Paths: /echo /info /files/<path> /upload/<name> /stream/<size> /behavior/<case> /dynamic/<name> /refuse /admin/settings\n");
+	std::printf("/dynamic: a body up to %d bytes goes to the memory, a bigger one to a file, a body over %d bytes is refused with 413\n",
+				imtrestdemo::DemoProtocol::s_dynamicMemoryBodyLimit,
+				imtrestdemo::DemoProtocol::s_dynamicMaxBodySize);
 	std::printf("Token of /upload and /files/private: %s\n", qPrintable(settings.token));
 	if (!settings.tlsSamplesDirectory.isEmpty()){
 		std::printf("Test certificates: %s (ca, single, chain, several, bundle, ec, wrong-host); a client trusts the files from the settings of the server\n", qPrintable(settings.tlsSamplesDirectory));

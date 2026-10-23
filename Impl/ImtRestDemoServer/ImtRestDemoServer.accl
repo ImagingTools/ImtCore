@@ -39,6 +39,7 @@
             <PositionMap>
                 <Element ComponentName="AdminServlet" X="500" Y="100" Note=""/>
                 <Element ComponentName="BehaviorServlet" X="525" Y="225" Note=""/>
+                <Element ComponentName="DynamicServlet" X="800" Y="550" Note=""/>
                 <Element ComponentName="EchoServlet" X="525" Y="400" Note=""/>
                 <Element ComponentName="FileResolver" X="200" Y="400" Note=""/>
                 <Element ComponentName="FilesServlet" X="200" Y="250" Note=""/>
@@ -53,6 +54,7 @@
             <PositionMap>
                 <Element ComponentName="AdminBodyPolicy" X="800" Y="200" Note=""/>
                 <Element ComponentName="BodyPolicyRouter" X="525" Y="350" Note=""/>
+                <Element ComponentName="DynamicBodyPolicy" X="525" Y="600" Note=""/>
                 <Element ComponentName="EchoBodyPolicy" X="200" Y="200" Note=""/>
                 <Element ComponentName="RefuseBodyPolicy" X="200" Y="525" Note=""/>
                 <Element ComponentName="UploadBodyPolicy" X="800" Y="525" Note=""/>

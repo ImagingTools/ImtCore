@@ -9,6 +9,7 @@
 #include <imtrestdemo/CDemoAdminServletComp.h>
 #include <imtrestdemo/CDemoBehaviorServletComp.h>
 #include <imtrestdemo/CDemoBodyPolicyComp.h>
+#include <imtrestdemo/CDemoDynamicBodyServletComp.h>
 #include <imtrestdemo/CDemoEchoServletComp.h>
 #include <imtrestdemo/CDemoFileResolverComp.h>
 #include <imtrestdemo/CDemoInfoServletComp.h>
@@ -29,6 +30,7 @@ typedef imtrestdemo::CDemoFileResolverComp DemoFileResolver;
 typedef imtrestdemo::CDemoEchoServletComp DemoEchoServlet;
 typedef imtrestdemo::CDemoInfoServletComp DemoInfoServlet;
 typedef imtrestdemo::CDemoUploadServletComp DemoUploadServlet;
+typedef imtrestdemo::CDemoDynamicBodyServletComp DemoDynamicBodyServlet;
 typedef imtrestdemo::CDemoStreamServletComp DemoStreamServlet;
 typedef imtrestdemo::CDemoBehaviorServletComp DemoBehaviorServlet;
 typedef imtrestdemo::CDemoAdminServletComp DemoAdminServlet;

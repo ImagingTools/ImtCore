@@ -13,8 +13,17 @@
         <Element Id="BodyPolicy" PackageId="" ComponentId="BodyPolicy">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="DynamicBodyDirectory" Type="String" ExportId="DynamicBodyDirectory">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ConsoleLog"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Token" Type="Id" ExportId="Token">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UploadDirectory" Type="String" ExportId="UploadDirectory">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -61,6 +70,7 @@
                                 <Value>Servlets/UploadServlet</Value>
                                 <Value>Servlets/StreamServlet</Value>
                                 <Value>Servlets/BehaviorServlet</Value>
+                                <Value>Servlets/DynamicServlet</Value>
                                 <Value>Servlets/AdminServlet</Value>
                             </Values>
                         </Data>
@@ -80,15 +90,37 @@
         <Element Id="Servlets" PackageId="" ComponentId="Servlets">
             <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="FilesDirectory" Type="String" ExportId="FilesDirectory">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="InfoJson" Type="Id" ExportId="InfoJson">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ConsoleLog"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Token" Type="Id" ExportId="Token">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UploadDirectory" Type="String" ExportId="UploadDirectory">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
         <Element Id="SslConfig" PackageId="" ComponentId="SslConfig">
             <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap/>
+                <AttributeInfoMap>
+                    <AttributeInfo Id="EnableSsl" Type="Boolean" ExportId="EnableSsl">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TlsCertificateFile" Type="String" ExportId="TlsCertificateFile">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TlsKeyFile" Type="String" ExportId="TlsKeyFile">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
             </Data>
         </Element>
         <Element Id="SslConfigurationManager" PackageId="ImtComPck" ComponentId="SslConfigurationManager">
@@ -193,6 +225,7 @@
                                             <Value>/echo</Value>
                                             <Value>/refuse</Value>
                                             <Value>/admin</Value>
+                                            <Value>/dynamic</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -203,8 +236,30 @@
                                             <Value>EchoBodyPolicy</Value>
                                             <Value>RefuseBodyPolicy</Value>
                                             <Value>AdminBodyPolicy</Value>
+                                            <Value>DynamicBodyPolicy</Value>
                                         </Values>
                                     </Data>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="DynamicBodyPolicy" PackageId="ImtRestPck" ComponentId="HttpDynamicBodyPolicy">
+                        <Data IsEnabled="true" Flags="1">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="BodyDirectory" Type="String" ExportId="DynamicBodyDirectory">
+                                    <Data IsEnabled="true" Value=""/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="FreeSpaceReservePercent" Type="Integer" ExportId="">
+                                    <Data IsEnabled="true" Value="1"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="MaxBodySize" Type="Integer" ExportId="">
+                                    <Data IsEnabled="true" Value="8388608"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="MemoryBodyLimit" Type="Integer" ExportId="">
+                                    <Data IsEnabled="true" Value="262144"/>
                                 </AttributeInfo>
                             </AttributeInfoMap>
                         </Data>
@@ -280,6 +335,18 @@
                             <AttributeInfoMap>
                                 <AttributeInfo Id="CommandId" Type="Id" ExportId="">
                                     <Data IsEnabled="true" Value="behavior/*"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="DynamicServlet" PackageId="ImtRestDemoPck" ComponentId="DemoDynamicBodyServlet">
+                        <Data IsEnabled="true" Flags="1">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="CommandId" Type="Id" ExportId="">
+                                    <Data IsEnabled="true" Value="dynamic/*"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                                     <Data IsEnabled="false"/>
@@ -379,6 +446,7 @@
                 <ExportedComponents>
                     <Component ExportedId="AdminServlet" ComponentId="AdminServlet"/>
                     <Component ExportedId="BehaviorServlet" ComponentId="BehaviorServlet"/>
+                    <Component ExportedId="DynamicServlet" ComponentId="DynamicServlet"/>
                     <Component ExportedId="EchoServlet" ComponentId="EchoServlet"/>
                     <Component ExportedId="FileResolver" ComponentId="FileResolver"/>
                     <Component ExportedId="FilesServlet" ComponentId="FilesServlet"/>
@@ -529,7 +597,9 @@
     </EmbeddedRegistriesList>
     <ExportedInterfaces/>
     <ExportedComponents>
+        <Component ExportedId="SettingsController" ComponentId="Servlets/SettingsController"/>
         <Component ExportedId="TcpServer" ComponentId="TcpServer"/>
+        <Component ExportedId="TlsConfiguration" ComponentId="SslConfig"/>
         <Component ExportedId="WorkerManager" ComponentId="WorkerManager"/>
     </ExportedComponents>
 </Acf>
