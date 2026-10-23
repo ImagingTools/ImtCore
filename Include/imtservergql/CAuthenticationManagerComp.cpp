@@ -794,7 +794,24 @@ void CAuthenticationManagerComp::StoreCachedToken(
 
 	const qint64 cacheTtlSecs = (entry.expiresAt - now) / 1000;
 
+	QByteArray sessionId;
+	if (!isPat){
+		QByteArray claimUserId;
+		QByteArray claimTenantId;
+		qint64 claimExpSecs = 0;
+		ParseJwtClaims(token, claimUserId, claimTenantId, sessionId, claimExpSecs);
+	}
+
 	QMutexLocker cacheLocker(&m_tokenCacheMutex);
+	if (!sessionId.isEmpty()){
+		// A resolution that started before RemoveSession() must not re-insert
+		// a token of the removed session after its cache entries were swept.
+		auto revokedIter = m_revokedSessionIds.constFind(sessionId);
+		if (revokedIter != m_revokedSessionIds.constEnd() && *revokedIter > now){
+			return;
+		}
+	}
+
 	m_expiredTokenCache.remove(token);
 	m_tokenCache.insert(token, entry);
 	const int maxTokenCacheSize = m_maxTokenCacheSizeAttrPtr.IsValid() ? *m_maxTokenCacheSizeAttrPtr : 10000;
@@ -865,7 +882,25 @@ void CAuthenticationManagerComp::InvalidateSessionTokenCache(const QByteArray& s
 		return;
 	}
 
+	const qint64 now = QDateTime::currentMSecsSinceEpoch();
+	const qint64 tokenCacheTtlMs = m_tokenCacheTtlAttrPtr.IsValid() ? (static_cast<qint64>(*m_tokenCacheTtlAttrPtr) * 1000) : (30 * 1000);
+
 	QMutexLocker cacheLocker(&m_tokenCacheMutex);
+	for (auto iter = m_revokedSessionIds.begin(); iter != m_revokedSessionIds.end(); ){
+		if (*iter <= now){
+			iter = m_revokedSessionIds.erase(iter);
+		}
+		else{
+			++iter;
+		}
+	}
+
+	const int maxTokenCacheSize = m_maxTokenCacheSizeAttrPtr.IsValid() ? *m_maxTokenCacheSizeAttrPtr : 10000;
+	while (!m_revokedSessionIds.isEmpty() && m_revokedSessionIds.size() >= maxTokenCacheSize){
+		m_revokedSessionIds.erase(m_revokedSessionIds.begin());
+	}
+	m_revokedSessionIds.insert(sessionId, now + tokenCacheTtlMs);
+
 	for (auto iter = m_tokenCache.begin(); iter != m_tokenCache.end();){
 		QByteArray userId;
 		QByteArray tenantId;

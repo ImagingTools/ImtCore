@@ -224,6 +224,12 @@ private:
 	mutable QHash<QByteArray, TokenCacheEntry> m_tokenCache;
 	mutable QHash<QByteArray, qint64> m_expiredTokenCache;
 
+	// Session-IDs removed via RemoveSession(), mapped to the time until which
+	// StoreCachedToken() refuses to cache JWTs of that session. Guarded by
+	// m_tokenCacheMutex so an in-flight validation/refresh cannot restore a
+	// revoked session's token after InvalidateSessionTokenCache() swept it.
+	mutable QHash<QByteArray, qint64> m_revokedSessionIds;
+
 	// Tokens currently being resolved by some thread via ResolveUserId(), so
 	// concurrent callers for the same token can wait for that result instead
 	// of each independently hitting the slave JWT/PAT controller. Guarded by
