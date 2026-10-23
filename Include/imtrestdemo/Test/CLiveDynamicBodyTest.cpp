@@ -60,7 +60,7 @@ QString CheckAnswer(const CRawHttpClient::Response& response, const QByteArray& 
 
 	// A file of a body has the name that the temporary files of imtrest have
 	const QString fileName = result.value("fileName").toString();
-	if (storage == QLatin1String("file") && !fileName.startsWith(QLatin1String("imtrest-body-"))){
+	if (storage == QLatin1String("file") && !fileName.startsWith(QLatin1String("temp-file-body-"))){
 		return QStringLiteral("The name of the file is '%1'").arg(fileName);
 	}
 
@@ -232,7 +232,7 @@ void CLiveDynamicBodyTest::BigBodyGoesToFileTest()
 	QVERIFY2(WaitForFileSize(paths.first(), s_mebibyte / 2), "The received part is not written to the file");
 
 	// The file has the name of the temporary files of imtrest
-	QVERIFY(QFileInfo(paths.first()).fileName().startsWith(QLatin1String("imtrest-body-")));
+	QVERIFY(QFileInfo(paths.first()).fileName().startsWith(QLatin1String("temp-file-body-")));
 
 	QVERIFY(SendBodyInParts(client, body.mid(s_mebibyte), 64 * 1024));
 
