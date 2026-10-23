@@ -13,6 +13,7 @@
 #include <imtrest/CTcpServerComp.h>
 #include <imtrest/CHttpProtocolEngineComp.h>
 #include <imtrest/CHttpBodyPolicyRouterComp.h>
+#include <imtrest/CHttpDynamicBodyPolicyComp.h>
 #include <imtrest/CHttpRootServletComp.h>
 #include <imtrest/CHttpFileBasedServletComp.h>
 #include <imtrest/CHttpFileServletComp.h>
@@ -43,6 +44,7 @@ typedef icomp::TModelCompWrap<imtrest::CWebSocketServerComp> WebSocketServer;
 typedef imtrest::CWebSocketProtocolEngineComp WebSocketProtocolEngine;
 typedef imtrest::CHttpProtocolEngineComp HttpProtocolEngine;
 typedef imtrest::CHttpBodyPolicyRouterComp HttpBodyPolicyRouter;
+typedef imtrest::CHttpDynamicBodyPolicyComp HttpDynamicBodyPolicy;
 typedef imtrest::CHttpRootServletComp HttpRootServlet;
 typedef imtrest::CHttpFileBasedServletComp HttpFileBasedServlet;
 typedef imtrest::CHttpFileServletComp HttpFileServlet;
