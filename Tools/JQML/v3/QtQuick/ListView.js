@@ -597,22 +597,58 @@ class ListView extends Flickable {
         this.__items = shifted
     }
 
+    // The row is the __items key. JQAbstractModel.index can still name the
+    // pre-shift row, and following that index writes this same delegate.
+    __itemIndex(item) {
+        if (!item) return -1
+
+        for (let key of Object.keys(this.__items)) {
+            if (this.__items[key] === item) return Number(key)
+        }
+
+        return -1
+    }
+
     // Neighbour follow during insert/realign shoves the displaced row before the
     // new one has its final size, which leaves a gap (PopupContainer insert(0)).
+    // x/width shift the horizontal tail, y/height the vertical one. One pass
+    // under __aligning: each write emits xChanged/yChanged, and a nested follow
+    // either overflows a long list or loops on a stale model index.
     __followItemGeometry(item, horizontal) {
         if (this.__aligning) return
         if ((this.orientation === ListView.Horizontal) !== !!horizontal) return
 
-        let index = item && item.JQAbstractModel ? item.JQAbstractModel.index : -1
+        let index = this.__itemIndex(item)
         if (index < 0 || !this.__items[index + 1]) return
 
-        let next = this.__items[index + 1]
-        if (horizontal) {
-            let x = item.x + item.width + this.spacing
-            if (next.x !== x) next.x = x
-        } else {
-            let y = item.y + item.height + this.spacing
-            if (next.y !== y) next.y = y
+        let wasUpdating = this.__updating
+        this.__aligning = true
+        this.__updating = true
+        try {
+            let guard = 0
+            let limit = Math.max(this.count || 0, Object.keys(this.__items).length)
+
+            while (this.__items[index + 1] && guard < limit) {
+                let current = this.__items[index]
+                let next = this.__items[index + 1]
+                if (!current || next === current) break
+
+                if (horizontal) {
+                    let x = current.x + current.width + this.spacing
+                    if (next.x === x) break
+                    next.x = x
+                } else {
+                    let y = current.y + current.height + this.spacing
+                    if (next.y === y) break
+                    next.y = y
+                }
+
+                index++
+                guard++
+            }
+        } finally {
+            this.__aligning = false
+            if (!wasUpdating) delete this.__updating
         }
     }
 
