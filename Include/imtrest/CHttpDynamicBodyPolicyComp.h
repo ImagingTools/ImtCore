@@ -11,6 +11,7 @@
 #include <QtCore/QString>
 
 // ACF includes
+#include <ifile/IFileNameParam.h>
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
@@ -40,6 +41,11 @@ namespace imtrest
 	the space that the first one is going to use. The size of a chunked body is not known, such a body does not hold the space.
 	The limit is the best effort: the other programs can use the disk while the body is received.
 
+	The directory of the files is the obligatory reference \c BodyDirectory to ifile::IFileNameParam, so it is set explicitly and is not implied:
+	for example ifile::CSystemLocationComp gives the temporary directory of the system. The path is read once, when the component is created,
+	and the directory is created if it does not exist. If the path is empty (a mistake of the settings of the server), the bodies cannot be
+	written to files and the requests with such bodies are refused with \c 500.
+
 	The policy is thread-safe, as the requests are received in many threads at the same time.
 */
 class CHttpDynamicBodyPolicyComp:
@@ -54,7 +60,7 @@ public:
 		I_ASSIGN(m_memoryBodyLimitAttrPtr, "MemoryBodyLimit", "Maximal size of the body in bytes that is received to the memory (100 MiB by default). A bigger body is written to a file. 0 - every body that is not empty goes to a file", true, 100 * 1024 * 1024);
 		I_ASSIGN(m_maxBodySizeAttrPtr, "MaxBodySize", "Maximal size of the body in bytes in any mode, a bigger body is refused with 413 before it is received. The free space of the disk limits the bodies that go to a file in any case. 0 - there is no other limit", true, 0);
 		I_ASSIGN(m_freeSpaceReservePercentAttrPtr, "FreeSpaceReservePercent", "Share of the disk in percent that stays free after the body is written to a file (10 by default): a body is accepted only if it fits into the free space without this share. 0 - the disk can be filled up completely", true, 10);
-		I_ASSIGN(m_bodyDirectoryAttrPtr, "BodyDirectory", "Directory of the files of the bodies that are bigger than MemoryBodyLimit, the free space of its disk limits the size of the bodies. The directory is created if it does not exist. Empty - the directory of the temporary files of the system", true, "");
+		I_ASSIGN(m_bodyDirectoryCompPtr, "BodyDirectory", "Directory of the files of the bodies that are bigger than MemoryBodyLimit, the free space of its disk limits the size of the bodies. The path is read when the component is created, the directory is created if it does not exist. For example the temporary directory of the system (SystemLocation)", true, "BodyDirectory");
 	I_END_COMPONENT;
 
 	CHttpDynamicBodyPolicyComp();
@@ -104,7 +110,7 @@ private:
 	I_ATTR(int, m_memoryBodyLimitAttrPtr);
 	I_ATTR(int, m_maxBodySizeAttrPtr);
 	I_ATTR(int, m_freeSpaceReservePercentAttrPtr);
-	I_ATTR(QString, m_bodyDirectoryAttrPtr);
+	I_REF(ifile::IFileNameParam, m_bodyDirectoryCompPtr);
 
 	// Set when the component is created, the policy is used from many threads and does not change it after that.
 	QString m_directoryPath;

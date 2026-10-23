@@ -4,6 +4,7 @@
 
 // ImtCore includes
 #include <imtrest/CHttpRequest.h>
+#include <imtrest/IProtocolEngine.h>
 
 
 namespace imtrest
@@ -67,7 +68,16 @@ IHttpRequestBodyPolicy::BodyDecision CHttpBodyPolicyRouterComp::DecideBody(const
 		}
 	}
 
-	return {};
+	if (m_defaultPolicyCompPtr.IsValid()){
+		return m_defaultPolicyCompPtr->DecideBody(requestHead);
+	}
+
+	// The default policy is obligatory, so there is no way to receive the body that nobody has chosen the policy for: it is a mistake of the settings of the server
+	BodyDecision decision;
+	decision.mode = BM_REJECT;
+	decision.rejectStatusCode = IProtocolEngine::SC_INTERNAL_SERVER_ERROR;
+
+	return decision;
 }
 
 
@@ -78,6 +88,10 @@ IHttpRequestBodyPolicy::BodyDecision CHttpBodyPolicyRouterComp::DecideBody(const
 void CHttpBodyPolicyRouterComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
+
+	if (!m_defaultPolicyCompPtr.IsValid()){
+		SendErrorMessage(0, QStringLiteral("The default policy is not set, the requests with a body whose path does not match any of the prefixes will be refused"));
+	}
 
 	if (m_pathPrefixesAttrPtr.GetCount() != m_policiesCompPtr.GetCount()){
 		SendWarningMessage(0, QStringLiteral("The number of the path prefixes and of the policies is different, the extra ones are ignored"));

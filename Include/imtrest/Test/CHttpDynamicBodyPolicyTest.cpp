@@ -15,6 +15,8 @@
 
 // ACF includes
 #include <icomp/TSimComponentWrap.h>
+#include <ifile/CFileNameParamComp.h>
+#include <ifile/CSystemLocationComp.h>
 
 // ImtCore includes
 #include <imtrest/CHttpDynamicBodyPolicyComp.h>
@@ -133,11 +135,32 @@ struct SPolicySettings
 	int maxBodySize = 0;
 	int reservePercent = 0;
 	QString directory;
+
+	// The reference to the directory is obligatory, a policy without it is a mistake of the settings
+	bool isDirectoryMissing = false;
 };
 
 
+typedef icomp::TSimSharedComponentPtr<ifile::CFileNameParamComp> DirectoryParam;
+
+
 /**
-	Create the policy as the container of the components does: the attributes are set, then the component is created.
+	The parameter of the directory as a component, it is what the container gives to the policy.
+*/
+DirectoryParam CreateDirectoryParam(const QString& path)
+{
+	DirectoryParam param;
+
+	param->SetStringAttr("DefaultPath", path);
+	param->SetIntAttr("PathType", ifile::IFileNameParam::PT_DIRECTORY);
+	param->InitComponent();
+
+	return param;
+}
+
+
+/**
+	Create the policy as the container of the components does: the attributes and the references are set, then the component is created.
 */
 std::unique_ptr<Policy> CreatePolicy(const SPolicySettings& settings)
 {
@@ -146,7 +169,12 @@ std::unique_ptr<Policy> CreatePolicy(const SPolicySettings& settings)
 	policyPtr->SetIntAttr("MemoryBodyLimit", settings.memoryBodyLimit);
 	policyPtr->SetIntAttr("MaxBodySize", settings.maxBodySize);
 	policyPtr->SetIntAttr("FreeSpaceReservePercent", settings.reservePercent);
-	policyPtr->SetStringAttr("BodyDirectory", settings.directory);
+
+	// The reference that is not set: ACF logs it (the critical message "Component BodyDirectory is defined, but definition component has no parent" of the test of the missing directory is expected)
+	if (!settings.isDirectoryMissing){
+		policyPtr->SetRef("BodyDirectory", CreateDirectoryParam(settings.directory));
+	}
+
 	policyPtr->InitComponent();
 
 	return policyPtr;
@@ -354,8 +382,13 @@ void CHttpDynamicBodyPolicyTest::FileBodyLimitOfHugeDiskTest()
 
 void CHttpDynamicBodyPolicyTest::DefaultAttributesTest()
 {
-	// The attributes are not set: 100 MiB to the memory, the bigger body goes to a file, 10% of the disk stays free
+	QTemporaryDir dir;
+	QVERIFY(dir.isValid());
+
+	// The attributes are not set: 100 MiB to the memory, the bigger body goes to a file, 10% of the disk stays free.
+	// Only the directory is set: the reference to it is obligatory and has no default.
 	Policy policy;
+	policy.SetRef("BodyDirectory", CreateDirectoryParam(dir.path()));
 	policy.InitComponent();
 
 	{
@@ -1026,14 +1059,66 @@ void CHttpDynamicBodyPolicyTest::UnusableDirectoryRefusesFileBodiesTest()
 }
 
 
-void CHttpDynamicBodyPolicyTest::EmptyDirectoryMeansSystemTemporaryDirectoryTest()
+void CHttpDynamicBodyPolicyTest::EmptyDirectoryRefusesFileBodiesTest()
 {
 	SPolicySettings settings;
 	settings.memoryBodyLimit = 100;
 
 	const std::unique_ptr<Policy> policyPtr = CreatePolicy(settings);
 
+	// The directory is set explicitly: an empty path is not the system temporary directory and is not the current directory
+	const IHttpRequestBodyPolicy::BodyDecision knownSize = Decide(*policyPtr, CreateHeadOfSize(101));
+
+	QCOMPARE(int(knownSize.mode), s_reject);
+	QCOMPARE(knownSize.rejectStatusCode, s_internalServerError);
+	QVERIFY(!knownSize.sinkPtr);
+
+	const IHttpRequestBodyPolicy::BodyDecision unknownSize = Decide(*policyPtr, CreateHead(QByteArray(), s_chunkedHeader));
+
+	QCOMPARE(int(unknownSize.mode), s_reject);
+	QCOMPARE(unknownSize.rejectStatusCode, s_internalServerError);
+
+	// The bodies of the memory do not need the directory
+	QCOMPARE(int(Decide(*policyPtr, CreateHeadOfSize(100)).mode), s_buffer);
+	QCOMPARE(policyPtr->GetReservedSize(), qint64(0));
+}
+
+
+void CHttpDynamicBodyPolicyTest::MissingDirectoryParameterRefusesFileBodiesTest()
+{
+	SPolicySettings settings;
+	settings.memoryBodyLimit = 100;
+	settings.isDirectoryMissing = true;
+
+	// The reference is obligatory, but the component is created anyway: the container does not stop the server
+	const std::unique_ptr<Policy> policyPtr = CreatePolicy(settings);
+
 	const IHttpRequestBodyPolicy::BodyDecision decision = Decide(*policyPtr, CreateHeadOfSize(101));
+
+	QCOMPARE(int(decision.mode), s_reject);
+	QCOMPARE(decision.rejectStatusCode, s_internalServerError);
+	QVERIFY(!decision.sinkPtr);
+
+	QCOMPARE(int(Decide(*policyPtr, CreateHeadOfSize(100)).mode), s_buffer);
+}
+
+
+void CHttpDynamicBodyPolicyTest::SystemLocationIsUsedAsDirectoryTest()
+{
+	// The system location of the temporary directory is a ready parameter of a directory, the partitura of the demo server uses it
+	icomp::TSimSharedComponentPtr<ifile::CSystemLocationComp> location;
+	location->SetIntAttr("LocationType", 7);
+	location->InitComponent();
+
+	QVERIFY(!location->GetPath().isEmpty());
+
+	Policy policy;
+	policy.SetIntAttr("MemoryBodyLimit", 100);
+	policy.SetIntAttr("FreeSpaceReservePercent", 0);
+	policy.SetRef("BodyDirectory", location);
+	policy.InitComponent();
+
+	const IHttpRequestBodyPolicy::BodyDecision decision = Decide(policy, CreateHeadOfSize(101));
 
 	QCOMPARE(int(decision.mode), s_stream);
 
@@ -1041,6 +1126,36 @@ void CHttpDynamicBodyPolicyTest::EmptyDirectoryMeansSystemTemporaryDirectoryTest
 	const std::shared_ptr<FileSink> sinkPtr = GetFileSink(decision);
 	QVERIFY(sinkPtr);
 	QCOMPARE(QFileInfo(sinkPtr->GetFilePath()).canonicalPath(), QFileInfo(QDir::tempPath()).canonicalFilePath());
+}
+
+
+void CHttpDynamicBodyPolicyTest::DirectoryIsReadWhenComponentIsCreatedTest()
+{
+	QTemporaryDir dir;
+	QVERIFY(dir.isValid());
+
+	const QString directory = dir.filePath("first");
+	const QString otherDirectory = dir.filePath("second");
+
+	DirectoryParam param = CreateDirectoryParam(directory);
+
+	Policy policy;
+	policy.SetIntAttr("MemoryBodyLimit", 100);
+	policy.SetIntAttr("FreeSpaceReservePercent", 0);
+	policy.SetRef("BodyDirectory", param);
+	policy.InitComponent();
+
+	// The policy is used from many threads, so it does not follow the changes of the parameter: the directory cannot change under a body
+	param->SetPath(otherDirectory);
+
+	const IHttpRequestBodyPolicy::BodyDecision decision = Decide(policy, CreateHeadOfSize(101));
+
+	QCOMPARE(int(decision.mode), s_stream);
+
+	const std::shared_ptr<FileSink> sinkPtr = GetFileSink(decision);
+	QVERIFY(sinkPtr);
+	QCOMPARE(QFileInfo(sinkPtr->GetFilePath()).canonicalPath(), QFileInfo(directory).canonicalFilePath());
+	QVERIFY(!QFileInfo::exists(otherDirectory));
 }
 
 

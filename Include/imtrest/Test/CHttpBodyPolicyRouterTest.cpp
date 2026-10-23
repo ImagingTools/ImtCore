@@ -2,17 +2,190 @@
 #include "CHttpBodyPolicyRouterTest.h"
 
 
+// STL includes
+#include <memory>
+
+// ACF includes
+#include <icomp/CComponentBase.h>
+#include <icomp/TSimComponentWrap.h>
+
 // ImtCore includes
 #include <imtrest/CHttpBodyPolicyRouterComp.h>
+#include <imtrest/CHttpRequest.h>
+#include <imtrest/IHttpRequestBodyPolicy.h>
+#include <imtrest/IProtocolEngine.h>
+#include <imtrest/IRequestServlet.h>
 
 
 namespace
 {
 
 
+typedef imtrest::IHttpRequestBodyPolicy IHttpRequestBodyPolicy;
+typedef imtrest::CHttpBodyPolicyRouterComp RouterComp;
+typedef icomp::TSimComponentWrap<RouterComp> Router;
+
+const int s_reject = int(IHttpRequestBodyPolicy::BM_REJECT);
+const int s_internalServerError = int(imtrest::IProtocolEngine::SC_INTERNAL_SERVER_ERROR);
+
+
 int Find(const QByteArrayList& prefixes, const QByteArray& path)
 {
 	return imtrest::CHttpBodyPolicyRouterComp::FindPrefixIndex(prefixes, path);
+}
+
+
+class CRequestServletStub: virtual public imtrest::IRequestServlet
+{
+public:
+	// reimplemented (imtrest::IRequestServlet)
+	bool IsCommandSupported(const QByteArray& /*commandId*/) const override
+	{
+		return true;
+	}
+
+	imtrest::ConstResponsePtr ProcessRequest(const imtrest::IRequest& /*request*/, const QByteArray& /*subCommandId*/) const override
+	{
+		return {};
+	}
+};
+
+
+class CProtocolEngineStub: virtual public imtrest::IProtocolEngine
+{
+public:
+	// reimplemented (imtrest::IProtocolEngine)
+	QByteArray GetProtocolTypeId() const override
+	{
+		return QByteArrayLiteral("http");
+	}
+
+	const iser::IVersionInfo* GetProtocolVersion() const override
+	{
+		return nullptr;
+	}
+
+	bool GetProtocolStatusCode(int /*statusCode*/, int& /*protocolStatusCode*/, QByteArray& /*statusCodeLiteral*/) const override
+	{
+		return false;
+	}
+
+	imtrest::IRequestUniquePtr CreateRequest(const imtrest::IRequestServlet& /*requestHandler*/) const override
+	{
+		return nullptr;
+	}
+
+	imtrest::IRequestUniquePtr CreateRequestForSend(
+				const imtrest::IRequestServlet& /*requestHandler*/,
+				int /*statusCode*/,
+				const QByteArray& /*data*/,
+				const QByteArray& /*dataTypeId*/) const override
+	{
+		return nullptr;
+	}
+
+	imtrest::IResponseUniquePtr CreateResponse(
+				const imtrest::IRequest& /*request*/,
+				int /*statusCode*/,
+				const QByteArray& /*data*/,
+				const QByteArray& /*dataTypeId*/) const override
+	{
+		return nullptr;
+	}
+};
+
+
+/**
+	Policy that says who it is: its decision has the mark of the policy as the limit of the body and the path of the request in the headers
+	of the refusal, so the test sees which policy has decided and that it got the request of the router.
+*/
+class CMarkedPolicyComp:
+			public icomp::CComponentBase,
+			virtual public imtrest::IHttpRequestBodyPolicy
+{
+public:
+	typedef icomp::CComponentBase BaseClass;
+
+	I_BEGIN_COMPONENT(CMarkedPolicyComp);
+		I_REGISTER_INTERFACE(imtrest::IHttpRequestBodyPolicy);
+		I_ASSIGN(m_markAttrPtr, "Mark", "Number that identifies the policy", true, 0);
+	I_END_COMPONENT;
+
+	// reimplemented (imtrest::IHttpRequestBodyPolicy)
+	BodyDecision DecideBody(const imtrest::CHttpRequest& requestHead) const override
+	{
+		BodyDecision decision;
+		decision.maxBodySize = *m_markAttrPtr;
+		decision.rejectHeaders.insert("path", requestHead.GetCommandId());
+
+		return decision;
+	}
+
+private:
+	I_ATTR(int, m_markAttrPtr);
+};
+
+
+typedef icomp::TSimSharedComponentPtr<CMarkedPolicyComp> MarkedPolicy;
+
+
+MarkedPolicy CreateMarkedPolicy(int mark)
+{
+	MarkedPolicy policy;
+
+	policy->SetIntAttr("Mark", mark);
+	policy->InitComponent();
+
+	return policy;
+}
+
+
+/**
+	Create the router as the container of the components does: the attributes and the references are set, then the component is created.
+	\param	marks			Marks of the policies of the prefixes.
+	\param	defaultMark		Mark of the default policy, less than 0 - the default policy is not set.
+*/
+std::unique_ptr<Router> CreateRouter(const QByteArrayList& prefixes, const QList<int>& marks, int defaultMark)
+{
+	std::unique_ptr<Router> routerPtr(new Router);
+
+	for (qsizetype i = 0; i < prefixes.size(); ++i){
+		routerPtr->InsertMultiAttr("PathPrefixes", prefixes[i]);
+		routerPtr->InsertMultiRef("Policies", CreateMarkedPolicy(marks[i]));
+	}
+
+	// The reference that is not set: ACF logs it (the critical message "Component DefaultPolicy is defined, but definition component has no parent" of this test is expected)
+	if (defaultMark >= 0){
+		routerPtr->SetRef("DefaultPolicy", CreateMarkedPolicy(defaultMark));
+	}
+
+	routerPtr->InitComponent();
+
+	return routerPtr;
+}
+
+
+/**
+	The decision of the router about the request of the path. The head of the request is parsed by a request without the policy.
+*/
+IHttpRequestBodyPolicy::BodyDecision Decide(const IHttpRequestBodyPolicy& policy, const QByteArray& path)
+{
+	CRequestServletStub servlet;
+	CProtocolEngineStub engine;
+	imtrest::CHttpRequest request(servlet, engine);
+
+	request.ExecuteHttpParser("GET " + path + " HTTP/1.1\r\nHost: localhost:7380\r\n\r\n", nullptr);
+
+	return policy.DecideBody(request);
+}
+
+
+/**
+	Mark of the policy that has decided.
+*/
+qint64 GetMark(const IHttpRequestBodyPolicy& policy, const QByteArray& path)
+{
+	return Decide(policy, path).maxBodySize;
 }
 
 
@@ -105,6 +278,71 @@ void CHttpBodyPolicyRouterTest::DefaultPrefixTest()
 void CHttpBodyPolicyRouterTest::NoPrefixesTest()
 {
 	QCOMPARE(Find(QByteArrayList(), "/files"), -1);
+}
+
+
+void CHttpBodyPolicyRouterTest::PolicyOfPrefixDecidesTest()
+{
+	const std::unique_ptr<Router> routerPtr = CreateRouter(QByteArrayList() << "/files" << "/api" << "/api/files", QList<int>() << 1 << 2 << 3, 100);
+
+	QCOMPARE(GetMark(*routerPtr, "/files"), qint64(1));
+	QCOMPARE(GetMark(*routerPtr, "/files/a/b"), qint64(1));
+	QCOMPARE(GetMark(*routerPtr, "/api/users"), qint64(2));
+
+	// The longest prefix decides
+	QCOMPARE(GetMark(*routerPtr, "/api/files/a"), qint64(3));
+}
+
+
+void CHttpBodyPolicyRouterTest::DefaultPolicyDecidesIfNoPrefixMatchesTest()
+{
+	const std::unique_ptr<Router> routerPtr = CreateRouter(QByteArrayList() << "/files" << "/api", QList<int>() << 1 << 2, 100);
+
+	QCOMPARE(GetMark(*routerPtr, "/other"), qint64(100));
+	QCOMPARE(GetMark(*routerPtr, "/"), qint64(100));
+
+	// Only whole segments match
+	QCOMPARE(GetMark(*routerPtr, "/files2"), qint64(100));
+	QCOMPARE(GetMark(*routerPtr, "/api2/a"), qint64(100));
+
+	// The default policy decides about the same request that the router has got
+	QCOMPARE(Decide(*routerPtr, "/other/a").rejectHeaders.value("path"), QByteArray("/other/a"));
+}
+
+
+void CHttpBodyPolicyRouterTest::DefaultPolicyDecidesWithoutPrefixesTest()
+{
+	const std::unique_ptr<Router> routerPtr = CreateRouter(QByteArrayList(), QList<int>(), 100);
+
+	QCOMPARE(GetMark(*routerPtr, "/files"), qint64(100));
+	QCOMPARE(GetMark(*routerPtr, "/"), qint64(100));
+}
+
+
+void CHttpBodyPolicyRouterTest::PrefixWinsOverDefaultPolicyTest()
+{
+	// The empty prefix is a prefix like the others: it matches all paths, so the default policy is not needed for them
+	const std::unique_ptr<Router> routerPtr = CreateRouter(QByteArrayList() << "/files" << "", QList<int>() << 1 << 7, 100);
+
+	QCOMPARE(GetMark(*routerPtr, "/files/a"), qint64(1));
+	QCOMPARE(GetMark(*routerPtr, "/other"), qint64(7));
+}
+
+
+void CHttpBodyPolicyRouterTest::MissingDefaultPolicyRefusesTest()
+{
+	// The default policy is obligatory, but the component is created anyway: the container does not stop the server
+	const std::unique_ptr<Router> routerPtr = CreateRouter(QByteArrayList() << "/files", QList<int>() << 1, -1);
+
+	// The request that nobody has chosen the policy for is not received with a policy that is not set
+	const IHttpRequestBodyPolicy::BodyDecision decision = Decide(*routerPtr, "/other");
+
+	QCOMPARE(int(decision.mode), s_reject);
+	QCOMPARE(decision.rejectStatusCode, s_internalServerError);
+	QVERIFY(!decision.sinkPtr);
+
+	// The requests of the prefixes do not need it
+	QCOMPARE(GetMark(*routerPtr, "/files/a"), qint64(1));
 }
 
 

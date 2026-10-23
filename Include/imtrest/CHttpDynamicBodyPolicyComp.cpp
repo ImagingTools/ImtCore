@@ -196,7 +196,15 @@ void CHttpDynamicBodyPolicyComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	m_directoryPath = (*m_bodyDirectoryAttrPtr).isEmpty() ? QDir::tempPath() : QDir(*m_bodyDirectoryAttrPtr).absolutePath();
+	// The path is read once: the policy is used from many threads, so the directory must not change while it works
+	const QString path = m_bodyDirectoryCompPtr.IsValid() ? m_bodyDirectoryCompPtr->GetPath() : QString();
+	if (path.isEmpty()){
+		SendErrorMessage(0, QStringLiteral("The directory of the bodies is not set, the requests with a body that does not go to the memory will be refused"));
+
+		return;
+	}
+
+	m_directoryPath = QDir(path).absolutePath();
 
 	// The directory is used only when a big body comes, but a mistake of the settings should be seen when the server starts
 	if (!QDir().mkpath(m_directoryPath)){
@@ -270,6 +278,10 @@ IHttpRequestBodyPolicy::BodyDecision CHttpDynamicBodyPolicyComp::DecideFileBody(
 
 bool CHttpDynamicBodyPolicyComp::GetDiskSpace(qint64& totalBytes, qint64& availableBytes) const
 {
+	if (m_directoryPath.isEmpty()){
+		return false;
+	}
+
 	// The object is created for every call: it reads the actual state of the disk and it is not shared between the threads
 	const QStorageInfo storage(m_directoryPath);
 	if (!storage.isValid() || !storage.isReady()){

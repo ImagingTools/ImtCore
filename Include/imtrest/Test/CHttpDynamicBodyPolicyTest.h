@@ -55,7 +55,10 @@ private slots:
 	// The directory of the files
 	void MissingDirectoryIsCreatedTest();
 	void UnusableDirectoryRefusesFileBodiesTest();
-	void EmptyDirectoryMeansSystemTemporaryDirectoryTest();
+	void EmptyDirectoryRefusesFileBodiesTest();
+	void MissingDirectoryParameterRefusesFileBodiesTest();
+	void SystemLocationIsUsedAsDirectoryTest();
+	void DirectoryIsReadWhenComponentIsCreatedTest();
 
 	// With the request
 	void RequestReceivesSmallBodyToMemoryTest();

@@ -20,6 +20,13 @@ private slots:
 	void FirstOfEqualPrefixesWinsTest();
 	void DefaultPrefixTest();
 	void NoPrefixesTest();
+
+	// The policy of the request: the policy of the prefix or the default policy
+	void PolicyOfPrefixDecidesTest();
+	void DefaultPolicyDecidesIfNoPrefixMatchesTest();
+	void DefaultPolicyDecidesWithoutPrefixesTest();
+	void PrefixWinsOverDefaultPolicyTest();
+	void MissingDefaultPolicyRefusesTest();
 };
 
 

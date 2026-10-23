@@ -20,7 +20,8 @@ namespace imtrest
 	Policy of the body that chooses another policy by the path of the request. The policy with the longest matching
 	prefix decides. A prefix matches whole segments of the path: \c /files matches \c /files and \c /files/a, but not
 	\c /files2. The empty prefix (or \c /) matches all paths and is used if no other prefix matches.
-	If no prefix matches, the body is received with the limit of the server.
+	If no prefix matches, the policy \c DefaultPolicy decides. It is obligatory: the policy of the requests that nobody
+	has chosen is set explicitly and is not implied. Without it (a mistake of the settings of the server) such a request is refused with \c 500.
 */
 class CHttpBodyPolicyRouterComp:
 			public ilog::CLoggerComponentBase,
@@ -33,7 +34,8 @@ public:
 		I_REGISTER_INTERFACE(IHttpRequestBodyPolicy);
 		I_ASSIGN_MULTI_0(m_pathPrefixesAttrPtr, "PathPrefixes", "Path prefixes of the requests, the policy with the same index is used for the requests of the prefix", false);
 		I_ASSIGN_MULTI_0(m_policiesCompPtr, "Policies", "Policies of the prefixes, in the order of the prefixes", false);
-	I_END_COMPONENT
+		I_ASSIGN(m_defaultPolicyCompPtr, "DefaultPolicy", "Policy of the requests whose path does not match any of the prefixes (and of the requests whose prefix has no policy)", true, "DefaultPolicy");
+	I_END_COMPONENT;
 
 	/**
 		Find the prefix for the path.
@@ -52,6 +54,7 @@ protected:
 private:
 	I_MULTIATTR(QByteArray, m_pathPrefixesAttrPtr);
 	I_MULTIREF(IHttpRequestBodyPolicy, m_policiesCompPtr);
+	I_REF(IHttpRequestBodyPolicy, m_defaultPolicyCompPtr);
 
 	// Set when the component is created, the policy is used from many threads and does not change after that.
 	QByteArrayList m_pathPrefixes;
