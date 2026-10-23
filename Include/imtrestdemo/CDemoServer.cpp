@@ -328,9 +328,6 @@ bool CDemoServer::StartServer(const CDemoServerSettings& settings)
 	SetSettingAttribute(element, "Token", settings.token.toUtf8());
 	SetSettingAttribute(element, "FilesDirectory", impl.filesDirectory);
 	SetSettingAttribute(element, "UploadDirectory", impl.uploadDirectory);
-
-	// The directory is created by the policy of /dynamic when the composition is created
-	SetSettingAttribute(element, "DynamicBodyDirectory", QDir(impl.filesDirectory).absoluteFilePath(DemoProtocol::s_receivedDirectoryName));
 	SetSettingAttribute(element, "ThreadsLimit", settings.threadsLimit);
 	SetSettingAttribute(element, "RequestInactivityTimeoutMs", settings.requestInactivityTimeoutMs);
 	SetSettingAttribute(element, "KeepAliveTimeoutMs", settings.keepAliveTimeoutMs);

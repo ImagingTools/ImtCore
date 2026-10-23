@@ -10,10 +10,16 @@
 	Live server: the dynamic policy of the body (imtrest::CHttpDynamicBodyPolicyComp) on the path \c /dynamic. The limits of the partitura are
 	small (see imtrestdemo::DemoProtocol::s_dynamicMemoryBodyLimit and \c s_dynamicMaxBodySize), so the tests do not need big bodies: a body
 	up to the first limit is received to the memory, a bigger one is written to a file, a body over the second limit is refused with 413 before it is sent.
+	The policy writes the files to the temporary directory of the system (the component \c TempLocation of the partitura). The server of the test
+	gets a temporary directory of its own, so the tests count the files of the bodies and are not disturbed by the files of other programs.
 */
 class CLiveDynamicBodyTest: public CLiveTestBase
 {
 	Q_OBJECT
+protected:
+	// reimplemented (CLiveTestBase)
+	virtual QString GetServerTemporaryDirectory(const imtrestdemo::CDemoServerSettings& settings) const override;
+
 private Q_SLOTS:
 	// A small body is received to the memory
 	void EmptyBodyGoesToMemoryTest();

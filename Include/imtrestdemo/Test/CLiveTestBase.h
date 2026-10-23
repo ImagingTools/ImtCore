@@ -2,6 +2,9 @@
 #pragma once
 
 
+// STL includes
+#include <memory>
+
 // Qt includes
 #include <QtCore/QJsonObject>
 #include <QtCore/QObject>
@@ -13,6 +16,9 @@
 #include "DemoTestServer.h"
 
 #include "CRawHttpClient.h"
+
+
+class CTemporaryDirectoryOverride;
 
 
 /**
@@ -28,6 +34,10 @@ public:
 	static constexpr int s_keepAliveTimeoutMs = 1500;
 	static constexpr int s_requestProcessingTimeoutMs = 1000;
 
+	// The constructor and the destructor are not inline, because the member that gives the temporary directory is of a type that the header does not define
+	CLiveTestBase();
+	~CLiveTestBase() override;
+
 private Q_SLOTS:
 	void initTestCase();
 	void cleanupTestCase();
@@ -37,6 +47,15 @@ protected:
 		A class can change the settings of the server that is started for it.
 	*/
 	virtual void CustomizeSettings(imtrestdemo::CDemoServerSettings& settings);
+
+	/**
+		Directory that is the temporary directory of the system of the process while the tests of the class work (from the start of the
+		server to its stop), empty - the real one. The components of the partitura take the temporary directory when they are created
+		(the component TempLocation), and they are created when they are needed, for example at the first request, so the directory is
+		given for the whole time of the class. A class can give the server a directory of its own: the files that the server writes there are
+		not mixed with the files of other programs. The directory is created if it does not exist.
+	*/
+	virtual QString GetServerTemporaryDirectory(const imtrestdemo::CDemoServerSettings& settings) const;
 
 	typedef CRawHttpClient::Response Response;
 	typedef CRawHttpClient::Headers Headers;
@@ -83,6 +102,7 @@ protected:
 private:
 	imtrestdemo::CDemoServerThread m_server{CreateTestCompositionFactory()};
 	QTemporaryDir m_directory;
+	std::unique_ptr<CTemporaryDirectoryOverride> m_temporaryDirectoryOverridePtr;
 };
 
 

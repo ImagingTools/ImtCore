@@ -27,6 +27,12 @@ const qint64 s_memoryBodyLimit = imtrestdemo::DemoProtocol::s_dynamicMemoryBodyL
 const qint64 s_maxBodySize = imtrestdemo::DemoProtocol::s_dynamicMaxBodySize;
 const qint64 s_mebibyte = qint64(1024) * 1024;
 
+// Beginning of the names of the files of the bodies (see imtrest::CHttpTemporaryFileBodySink), the other files of a temporary directory are not counted
+const QLatin1String s_bodyFilePrefix("temp-file-body-");
+
+// Name of the directory (inside of the directory of the files) that the server of the test gets as its temporary directory
+const char* const s_temporaryDirectoryName = "private/received";
+
 
 QByteArray CalculateSha256(const QByteArray& data)
 {
@@ -60,7 +66,7 @@ QString CheckAnswer(const CRawHttpClient::Response& response, const QByteArray& 
 
 	// A file of a body has the name that the temporary files of imtrest have
 	const QString fileName = result.value("fileName").toString();
-	if (storage == QLatin1String("file") && !fileName.startsWith(QLatin1String("temp-file-body-"))){
+	if (storage == QLatin1String("file") && !fileName.startsWith(s_bodyFilePrefix)){
 		return QStringLiteral("The name of the file is '%1'").arg(fileName);
 	}
 
@@ -74,15 +80,20 @@ QString CheckAnswer(const CRawHttpClient::Response& response, const QByteArray& 
 
 QString GetReceivedDirectory(const QString& filesDirectory)
 {
-	return QDir(filesDirectory).absoluteFilePath(imtrestdemo::DemoProtocol::s_receivedDirectoryName);
+	return QDir(filesDirectory).absoluteFilePath(s_temporaryDirectoryName);
 }
 
 
+/**
+	Files of the bodies of the directory. The directory is the temporary directory of the server of the test, but the files of
+	other programs and of Qt itself can be there too.
+*/
 QStringList GetFilePaths(const QString& directory)
 {
 	QStringList paths;
 
-	const QFileInfoList entries = QDir(directory).entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
+	const QStringList nameFilters = QStringList() << (QString(s_bodyFilePrefix) + QLatin1Char('*'));
+	const QFileInfoList entries = QDir(directory).entryInfoList(nameFilters, QDir::Files | QDir::NoDotAndDotDot);
 	for (const QFileInfo& entry : entries){
 		paths.append(entry.absoluteFilePath());
 	}
@@ -150,6 +161,16 @@ QByteArray CreateRequestHead(const QByteArray& target, qint64 contentLength, con
 
 
 } // namespace
+
+
+// protected methods
+
+// reimplemented (CLiveTestBase)
+
+QString CLiveDynamicBodyTest::GetServerTemporaryDirectory(const imtrestdemo::CDemoServerSettings& settings) const
+{
+	return GetReceivedDirectory(settings.filesDirectory);
+}
 
 
 // private slots
@@ -232,7 +253,7 @@ void CLiveDynamicBodyTest::BigBodyGoesToFileTest()
 	QVERIFY2(WaitForFileSize(paths.first(), s_mebibyte / 2), "The received part is not written to the file");
 
 	// The file has the name of the temporary files of imtrest
-	QVERIFY(QFileInfo(paths.first()).fileName().startsWith(QLatin1String("temp-file-body-")));
+	QVERIFY(QFileInfo(paths.first()).fileName().startsWith(s_bodyFilePrefix));
 
 	QVERIFY(SendBodyInParts(client, body.mid(s_mebibyte), 64 * 1024));
 

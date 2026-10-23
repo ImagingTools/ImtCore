@@ -10,16 +10,29 @@
     <PositionMap>
         <Element ComponentName="BodyPolicy" X="575" Y="500" Note=""/>
         <Element ComponentName="ConsoleLog" X="75" Y="425" Note=""/>
-        <Element ComponentName="HttpProtocolEngine" X="575" Y="300" Note=""/>
+        <Element ComponentName="HttpProtocolEngine" X="650" Y="325" Note=""/>
         <Element ComponentName="RootServlet" X="800" Y="725" Note=""/>
         <Element ComponentName="ServerInterface" X="1075" Y="50" Note=""/>
         <Element ComponentName="Servlets" X="100" Y="800" Note=""/>
         <Element ComponentName="SslConfig" X="975" Y="400" Note=""/>
         <Element ComponentName="SslConfigurationManager" X="125" Y="75" Note=""/>
-        <Element ComponentName="TcpServer" X="775" Y="125" Note=""/>
+        <Element ComponentName="TcpServer" X="750" Y="125" Note=""/>
         <Element ComponentName="WorkerManager" X="800" Y="600" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
+        <EmbededRegistry Id="BodyPolicy">
+            <PositionMap>
+                <Element ComponentName="AdminBodyPolicy" X="800" Y="200" Note=""/>
+                <Element ComponentName="BodyPolicyRouter" X="525" Y="350" Note=""/>
+                <Element ComponentName="DefaultBodyPolicy" X="500" Y="100" Note=""/>
+                <Element ComponentName="DynamicBodyPolicy" X="525" Y="600" Note=""/>
+                <Element ComponentName="EchoBodyPolicy" X="200" Y="200" Note=""/>
+                <Element ComponentName="RefuseBodyPolicy" X="200" Y="525" Note=""/>
+                <Element ComponentName="TempLocation" X="525" Y="725" Note=""/>
+                <Element ComponentName="UploadBodyPolicy" X="800" Y="525" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
         <EmbededRegistry Id="SslConfig">
             <PositionMap>
                 <Element ComponentName="TlsCertificate" X="725" Y="225" Note=""/>
@@ -47,17 +60,6 @@
                 <Element ComponentName="SettingsController" X="175" Y="100" Note=""/>
                 <Element ComponentName="StreamServlet" X="500" Y="525" Note=""/>
                 <Element ComponentName="UploadServlet" X="800" Y="400" Note=""/>
-            </PositionMap>
-            <EmbeddedRegistries/>
-        </EmbededRegistry>
-        <EmbededRegistry Id="BodyPolicy">
-            <PositionMap>
-                <Element ComponentName="AdminBodyPolicy" X="800" Y="200" Note=""/>
-                <Element ComponentName="BodyPolicyRouter" X="525" Y="350" Note=""/>
-                <Element ComponentName="DynamicBodyPolicy" X="525" Y="600" Note=""/>
-                <Element ComponentName="EchoBodyPolicy" X="200" Y="200" Note=""/>
-                <Element ComponentName="RefuseBodyPolicy" X="200" Y="525" Note=""/>
-                <Element ComponentName="UploadBodyPolicy" X="800" Y="525" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>

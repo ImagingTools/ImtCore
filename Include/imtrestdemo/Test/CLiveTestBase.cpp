@@ -2,11 +2,70 @@
 #include "CLiveTestBase.h"
 
 
+// STL includes
+#include <vector>
+
 // Qt includes
+#include <QtCore/QDir>
 #include <QtCore/QJsonDocument>
 
 // ImtCore includes
 #include <imtrestdemo/CDemoProtocol.h>
+
+
+/**
+	While the object lives, the temporary directory of the system of the process is the given directory: Qt reads it from the environment
+	(QDir::tempPath() and QStandardPaths::TempLocation do not cache it), so the components that take it when they are created get it too.
+	The previous values are restored when the object is destroyed. The object is not thread-safe, as the environment of the process is not.
+*/
+class CTemporaryDirectoryOverride
+{
+public:
+	explicit CTemporaryDirectoryOverride(const QString& directory)
+	{
+		// Qt does not use a directory that does not exist
+		QDir().mkpath(directory);
+
+		// TMPDIR is read on Unix, TMP and TEMP on Windows
+		for (const char* name : {"TMPDIR", "TMP", "TEMP"}){
+			m_savedVariables.push_back({name, qEnvironmentVariableIsSet(name), qgetenv(name)});
+
+			qputenv(name, QDir::toNativeSeparators(directory).toLocal8Bit());
+		}
+	}
+
+	~CTemporaryDirectoryOverride()
+	{
+		for (const SVariable& variable : m_savedVariables){
+			if (variable.isSet){
+				qputenv(variable.name, variable.value);
+			}
+			else{
+				qunsetenv(variable.name);
+			}
+		}
+	}
+
+private:
+	struct SVariable
+	{
+		const char* name;
+		bool isSet;
+		QByteArray value;
+	};
+
+	std::vector<SVariable> m_savedVariables;
+};
+
+
+CLiveTestBase::CLiveTestBase()
+{
+}
+
+
+CLiveTestBase::~CLiveTestBase()
+{
+}
 
 
 void CLiveTestBase::initTestCase()
@@ -20,6 +79,12 @@ void CLiveTestBase::initTestCase()
 	settings.requestProcessingTimeoutMs = s_requestProcessingTimeoutMs;
 	CustomizeSettings(settings);
 
+	// The components of the server are created when they are needed, so the directory is given until the server is stopped
+	const QString temporaryDirectory = GetServerTemporaryDirectory(settings);
+	if (!temporaryDirectory.isEmpty()){
+		m_temporaryDirectoryOverridePtr.reset(new CTemporaryDirectoryOverride(temporaryDirectory));
+	}
+
 	QVERIFY2(m_server.Start(settings), qPrintable(m_server.GetErrorString()));
 	QVERIFY(m_server.GetPort() > 0);
 }
@@ -30,9 +95,17 @@ void CLiveTestBase::CustomizeSettings(imtrestdemo::CDemoServerSettings& /*settin
 }
 
 
+QString CLiveTestBase::GetServerTemporaryDirectory(const imtrestdemo::CDemoServerSettings& /*settings*/) const
+{
+	return QString();
+}
+
+
 void CLiveTestBase::cleanupTestCase()
 {
 	m_server.Stop();
+
+	m_temporaryDirectoryOverridePtr.reset();
 }
 
 
