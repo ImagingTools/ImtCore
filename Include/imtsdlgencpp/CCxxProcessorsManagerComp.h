@@ -91,9 +91,12 @@ public:
 				istd::IChangeable* processingReportPtr = nullptr) override;
 
 private:
-	[[nodiscard]] bool BeginHeaderFile(const iprm::IParamsSet& entryParams, QFile& headerFile, const iprm::IParamsSet* paramsPtr) const;
+	/**
+		\param isObjectsFile - the file holds the QObject based classes (<Type>Object, <Type>ObjectList, union objects) and the QML types registration
+	*/
+	[[nodiscard]] bool BeginHeaderFile(const iprm::IParamsSet& entryParams, QFile& headerFile, const iprm::IParamsSet* paramsPtr, bool isObjectsFile = false) const;
 	[[nodiscard]] bool BeginSourceFile(const iprm::IParamsSet& entryParams, QFile& headerFile, const iprm::IParamsSet* paramsPtr) const;
-	[[nodiscard]] bool EndHeaderFile(const iprm::IParamsSet& entryParams, QFile& headerFile, const iprm::IParamsSet* paramsPtr) const;
+	[[nodiscard]] bool EndHeaderFile(const iprm::IParamsSet& entryParams, QFile& headerFile, const iprm::IParamsSet* paramsPtr, bool isObjectsFile = false) const;
 	[[nodiscard]] bool EndSourceFile(const iprm::IParamsSet& entryParams, QFile& sourceFile, const iprm::IParamsSet* paramsPtr) const;
 	bool ProcessEnums (
 				const EntryFileMap& headerFiles,
@@ -102,10 +105,14 @@ private:
 	bool ProcessTypes (
 				const EntryFileMap& headerFiles,
 				const EntryFileMap& sourceFiles,
+				const EntryFileMap& objectHeaderFiles,
+				const EntryFileMap& objectSourceFiles,
 				const iprm::IParamsSet* paramsPtr) const;
 	bool ProcessUnions(
 				const EntryFileMap& headerFiles,
 				const EntryFileMap& sourceFiles,
+				const EntryFileMap& objectHeaderFiles,
+				const EntryFileMap& objectSourceFiles,
 				const iprm::IParamsSet* paramsPtr) const;
 	bool ProcessDocumentTypes(
 				const EntryFileMap& headerFiles,
@@ -130,6 +137,16 @@ private:
 	*/
 	[[nodiscard]] EntryFileMap CreateHeaderFiles(const iprm::IParamsSet* paramsPtr) const;
 	[[nodiscard]] EntryFileMap CreateSourceFiles(const iprm::IParamsSet* paramsPtr) const;
+	/**
+		Creates the files of the QObject based classes (<Schema>Objects.h/.cpp), see \c CreateHeaderFiles
+		\note call only if \c HasObjectEntries() returns true
+	*/
+	[[nodiscard]] EntryFileMap CreateObjectHeaderFiles(const iprm::IParamsSet* paramsPtr) const;
+	[[nodiscard]] EntryFileMap CreateObjectSourceFiles(const iprm::IParamsSet* paramsPtr) const;
+	/**
+		\returns true if the '<Schema>Objects' files are generated, i.e. the generation is not disabled with --no-objects
+	*/
+	[[nodiscard]] bool HasObjectEntries() const;
 	/**
 		Createsn and opens a file by name
 		\note all parent directories will be created
