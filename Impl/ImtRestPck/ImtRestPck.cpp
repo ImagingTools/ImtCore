@@ -36,6 +36,16 @@ I_EXPORT_COMPONENT(
 			"TCP Connection Server HTTP REST");
 
 I_EXPORT_COMPONENT(
+			HttpBodyPolicyRouter,
+			"Chooses the policy of the request body by the path of the request",
+			"HTTP REST Request Body Policy Limit Route");
+
+I_EXPORT_COMPONENT(
+			HttpDynamicBodyPolicy,
+			"Chooses by the size of the request body where to receive it: a small body goes to the memory, a big one to a file, a body that does not fit into the free space of the disk is refused",
+			"HTTP REST Request Body Policy Memory File Size Disk Space Limit");
+
+I_EXPORT_COMPONENT(
 			HttpRootServlet,
 			"HTTP root servlet",
 			"HTTP REST Root Protocol");
@@ -44,6 +54,11 @@ I_EXPORT_COMPONENT(
 			HttpFileBasedServlet,
 			"HTTP file servlet",
 			"HTTP File Template");
+
+I_EXPORT_COMPONENT(
+			HttpFileServlet,
+			"Sends files by parts: ranges, conditional requests, HEAD. The file is found by the file resolver",
+			"HTTP File Download Range Streaming Resolver");
 
 I_EXPORT_COMPONENT(
 			HttpHtmlFolderBasedServlet,
