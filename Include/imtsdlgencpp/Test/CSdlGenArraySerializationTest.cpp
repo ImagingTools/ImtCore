@@ -12,6 +12,7 @@
 
 // ImtCore includes
 #include <GeneratedFiles/sdlgentestsdl/SDL/1.0/CPP/ArraySerialization.h>
+#include <GeneratedFiles/sdlgentestsdl/SDL/1.0/CPP/ArraySerializationObjects.h>
 #include <imtbase/CTreeItemModel.h>
 #include <imtgql/CGqlRequest.h>
 

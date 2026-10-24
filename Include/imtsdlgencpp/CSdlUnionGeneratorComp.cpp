@@ -257,9 +257,8 @@ bool CSdlUnionGeneratorComp::ProcessEntry(
 
 QList<imtsdl::IncludeDirective> CSdlUnionGeneratorComp::GetIncludeDirectives() const
 {
-	static QList<imtsdl::IncludeDirective> retVal = {CreateImtDirective("<imtbase/CItemModelBase.h>")};
-
-	return retVal;
+	// <imtbase/CItemModelBase.h> is only needed by the union objects, it is included by the '<Schema>Objects' header
+	return {};
 }
 
 
