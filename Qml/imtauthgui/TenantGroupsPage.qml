@@ -22,6 +22,8 @@ SimpleCollectionPage {
 	documentManager: apiClient ? apiClient.groupDocumentManager : null
 	objectTypeId: apiClient ? apiClient.groupObjectTypeId : ""
 	dataProvider: apiClient ? apiClient.groupListDataProvider : null
+	columnIds: ["title", "description"]
+	columnNames: [qsTr("Name"), qsTr("Description")]
 	managePermissionIds: ["/OrganizationManagement/Groups/Edit/Change", "/OrganizationManagement/Groups/Edit/Remove", "/OrganizationManagement/Groups/Edit/Add"]
 	createPermissionIds: ["/OrganizationManagement/Groups/Edit/Add"]
 	editPermissionIds: ["/OrganizationManagement/Groups/Edit/Change"]

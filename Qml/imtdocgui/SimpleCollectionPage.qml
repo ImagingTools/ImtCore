@@ -52,6 +52,11 @@ ViewBase {
 	property string objectTypeId: ""
 	property var listModel: null
 	property Component delegateComponent: null
+	// Standard table instead of `delegateComponent` (see SimpleCollectionTable)
+	property var columnIds: []
+	property var columnNames: []
+	property var columnDelegateIds: []
+	property var columnDelegateComponents: []
 	property Component headerButtonsComponent: null
 	property Component customEditorComponent: null
 	property bool showCreateButton: true
@@ -81,6 +86,28 @@ ViewBase {
 					root.selectionManager.clear()
 			}
 		})
+	}
+
+	// Row of the standard table for a list item; null takes the item's own fields of the columns
+	function createRow(item) {
+		return null
+	}
+
+	// Text of a TextParam carried in the parameters of a list item
+	function parameterText(item, parameterId) {
+		var parameters = item && item.parameters ? item.parameters : []
+		var count = parameters.count !== undefined ? parameters.count : parameters.length
+		for (var i = 0; i < count; i++) {
+			var parameter = parameters.get ? parameters.get(i) : parameters[i]
+			if (parameter && parameter.id === parameterId) {
+				var raw = parameter.data || ""
+				if (raw === "")
+					return ""
+				var parsed = JSON.parse(raw)
+				return parsed && parsed.text !== undefined ? String(parsed.text) : ""
+			}
+		}
+		return ""
 	}
 
 	function updateGui() {}
@@ -232,6 +259,13 @@ ViewBase {
 		root.__isCreating = true
 		stackViewHeader.addHeader("create", qsTr("Create New %1").arg(root.entityName))
 		__pushEditorPage()
+	}
+
+	// A double-clicked row of the table; pages with rows that are not documents override it
+	function openItem(itemId) {
+		var item = root.__findItemById(itemId)
+		if (item && root.canEdit && (root.documentManager || root.customEditorComponent))
+			root.__openEdit(itemId, item.title || item.id || "", item.description || "")
 	}
 
 	function openEdit(itemId, itemName, itemDescription) {
@@ -416,6 +450,10 @@ ViewBase {
 			id: collectionTable
 			model: root.effectiveModel
 			delegateComponent: root.delegateComponent
+			columnIds: root.columnIds
+			columnNames: root.columnNames
+			columnDelegateIds: root.columnDelegateIds
+			columnDelegateComponents: root.columnDelegateComponents
 			actionHandler: root
 			emptyText: root.__emptyText
 			filterPlaceholder: root.__filterPlaceholder
@@ -426,6 +464,7 @@ ViewBase {
 				: ""
 
 			onFilterChanged: root.__lastFilterText = text
+			onItemDoubleClicked: root.openItem(id)
 			onFilterRequested: {
 				if (root.dataProvider)
 					root.dataProvider.fetch(text)

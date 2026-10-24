@@ -72,6 +72,7 @@ protected:
 				istd::IChangeable& object,
 				QString& errorMessage) const override;
 	virtual void SetAdditionalFilters(const imtgql::CGqlRequest& gqlRequest, imtbase::CComplexCollectionFilter& complexFilter) const override;
+	virtual istd::IChangeableUniquePtr CreateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& errorMessage) const override;
 
 	// reimplemented (imtservergql::CPermissibleGqlRequestHandlerComp)
 	virtual bool CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
@@ -88,6 +89,8 @@ protected:
 	I_REF(imtauth::ITenantEntityBindingManager, m_bindingManagerCompPtr);
 
 private:
+	bool ValidateRoleForTenant(const imtgql::CGqlRequest& gqlRequest, const imtauth::IRole& role, const QByteArray& objectId, QString& errorMessage) const;
+
 	iprm::CIdParam m_idParam;
 	istd::TDelPtr<imtserverapp::CIdParamRepresentationController> m_idParamRepresentationControllerPtr;
 };

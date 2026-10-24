@@ -28,7 +28,7 @@ namespace imtauth
 	\param userId The user requesting access.
 	\param homeTenantId The user's home tenant (from GQL context).
 	\param targetTenantId The tenant the user wants to access.
-	\return true if the user has access via ownership, direct membership, or delegation.
+	\return true if the user has access via ownership, creation, direct membership, or delegation.
 */
 inline bool HasDelegatedTenantAccess(
 		const ITenantManager& tenantManager,
@@ -38,9 +38,9 @@ inline bool HasDelegatedTenantAccess(
 		const QByteArray& homeTenantId,
 		const QByteArray& targetTenantId)
 {
-	// 1. Owner bypasses all permission checks
+	// 1. Owner and creator bypass membership checks
 	ITenantInfoUniquePtr tenantPtr = tenantManager.GetTenant(targetTenantId);
-	if (tenantPtr.IsValid() && tenantPtr->GetOwnerId() == userId){
+	if (tenantPtr.IsValid() && (tenantPtr->GetOwnerId() == userId || tenantPtr->GetCreatorId() == userId)){
 		return true;
 	}
 

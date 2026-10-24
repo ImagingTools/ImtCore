@@ -49,6 +49,9 @@
         <Element Id="CollectionDocumentService" PackageId="ImtCollectionVoce" ComponentId="CollectionDocumentService">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="AccessCheckCollection" Type="Reference" ExportId="UserRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Collection" Type="Reference" ExportId="UserRepository">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

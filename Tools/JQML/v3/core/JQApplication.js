@@ -112,12 +112,26 @@ module.exports = {
         
         global.JSContext = Context.create()
 
-        // Qt QString.arg() — replaces %1, %2, ... with arguments
+        // Qt QString.arg(): each value replaces every occurrence of the lowest numbered place marker (%1..%99),
+        // so chained calls ("%1 of %2".arg(a).arg(b)) fill the markers in order
         if (!String.prototype.arg) {
             String.prototype.arg = function(...args) {
                 let result = String(this)
                 for (let i = 0; i < args.length; i++) {
-                    result = result.replace('%' + (i + 1), args[i] !== undefined && args[i] !== null ? String(args[i]) : '')
+                    let lowest = 0
+                    const markerRe = /%(\d{1,2})/g
+                    let match
+                    while ((match = markerRe.exec(result)) !== null) {
+                        const number = parseInt(match[1], 10)
+                        if (number > 0 && (lowest === 0 || number < lowest)) {
+                            lowest = number
+                        }
+                    }
+                    if (lowest === 0) {
+                        break
+                    }
+                    const value = args[i] !== undefined && args[i] !== null ? String(args[i]) : ''
+                    result = result.replace(new RegExp('%' + lowest + '(?!\\d)', 'g'), () => value)
                 }
                 return result
             }

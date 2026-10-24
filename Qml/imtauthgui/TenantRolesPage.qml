@@ -22,6 +22,8 @@ SimpleCollectionPage {
 	documentManager: apiClient ? apiClient.roleDocumentManager : null
 	objectTypeId: apiClient ? apiClient.roleObjectTypeId : ""
 	dataProvider: apiClient ? apiClient.roleListDataProvider : null
+	columnIds: ["title", "description"]
+	columnNames: [qsTr("Name"), qsTr("Description")]
 	managePermissionIds: ["/OrganizationManagement/Roles/Edit/Change", "/OrganizationManagement/Roles/Edit/Remove", "/OrganizationManagement/Roles/Edit/Add"]
 	createPermissionIds: ["/OrganizationManagement/Roles/Edit/Add"]
 	editPermissionIds: ["/OrganizationManagement/Roles/Edit/Change"]

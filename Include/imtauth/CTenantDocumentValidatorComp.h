@@ -5,13 +5,23 @@
 // ACF includes
 #include <icomp/CComponentBase.h>
 
+// Qt includes
+#include <QtCore/QByteArrayList>
+
 // ImtCore includes
 #include <imtdoc/IDocumentValidator.h>
+#include <imtbase/IOperationContext.h>
 #include <imtbase/IObjectCollection.h>
 
 
 namespace imtauth
 {
+
+bool IsTenantPermissionScopeChangeAllowed(
+			const QByteArray& creatorId,
+			const QByteArrayList& currentPermissions,
+			const QByteArrayList& newPermissions,
+			const QByteArray& userId);
 
 
 /**

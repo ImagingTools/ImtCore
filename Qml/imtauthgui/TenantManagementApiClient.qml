@@ -160,6 +160,7 @@ QtObject {
 	function fetchAllPermissions() {}
 
 	// Tenant-scoped permissions (filtered by tenant's tenantPermissions) — for RoleView
+	property string rolePermissionsTenantId: ""
 	property var tenantPermissions: []
 	signal tenantPermissionsReceived()
 	function fetchTenantPermissions(tenantId) {}

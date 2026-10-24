@@ -221,7 +221,7 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentChanged(imtdoc::CEventBa
 	FillSdlNotification(notification, sdl::V1_0::imtbase::EDocumentOperation::DocumentChanged, sdlNotification);
 
 	PublishRepresentation(sdl::V1_0::imtbase::COnDocumentManagerChangedGqlRequest::GetCommandId(), notification.userId, sdlNotification);
-	PublishRepresentation(sdl::V1_0::imtbase::COnDocumentChangedGqlRequest::GetCommandId(), notification.userId, sdlNotification);
+	PublishRepresentation(sdl::V1_0::imtbase::COnDocumentChangedGqlRequest::GetCommandId(), notification.userId, sdlNotification, notification.documentId);
 
 	return true;
 }

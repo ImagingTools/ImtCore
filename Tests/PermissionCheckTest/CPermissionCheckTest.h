@@ -20,7 +20,7 @@ private Q_SLOTS:
 	// Who is checked
 	void testRequestWithoutUserIsRefused();
 	void testSuperuserIsNotChecked();
-	void testTenantOwnerIsNotChecked();
+	void testTenantOwnerIsChecked();
 
 	// What a command declares
 	void testUndeclaredCommandIsRefused();
@@ -47,7 +47,11 @@ private Q_SLOTS:
 	// Product and organization of the request
 	void testPermissionsOfAnotherProductDoNotOpenCommands();
 	void testTenantLimitsIncludedPermissions();
+	void testEmptyTenantScopeIncludesNothing();
 	void testTenantLimitsLeavesOfRequiredGroup();
+	void testTenantLimitsHeldPermissions();
+	void testEmptyTenantScopeHoldsNothing();
+	void testOrganizationAccessIsKeptOutsideTenantScope();
 
 	// Permission path of the request
 	void testPermissionPathEqualToDeclaredIsAccepted();

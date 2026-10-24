@@ -56,7 +56,6 @@ GqlBasedTenantManagementApiClient 1.0 GqlBasedTenantManagementApiClient.qml
 GqlBasedUserAdministrationApiClient 1.0 GqlBasedUserAdministrationApiClient.qml
 TenantGeneralPage 1.0 TenantGeneralPage.qml
 TenantMembersPage 1.0 TenantMembersPage.qml
-TenantMemberDelegate 1.0 TenantMemberDelegate.qml
 TenantRolesPage 1.0 TenantRolesPage.qml
 TenantGroupsPage 1.0 TenantGroupsPage.qml
 TenantPermissionsPage 1.0 TenantPermissionsPage.qml

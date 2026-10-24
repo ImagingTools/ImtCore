@@ -92,23 +92,37 @@ sdl::V1_0::imtauth::CLogoutPayload CRemoteAuthorizationControllerComp::OnLogout(
 
 
 sdl::V1_0::imtauth::CPermissionList CRemoteAuthorizationControllerComp::OnGetPermissions(
-			const sdl::V1_0::imtauth::CGetPermissionsGqlRequest& /*getPermissionsRequest*/,
+			const sdl::V1_0::imtauth::CGetPermissionsGqlRequest& getPermissionsRequest,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtauth::CPermissionList response = SendModelRequest<sdl::V1_0::imtauth::CPermissionList>(gqlRequest, errorMessage);
 
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
-	if (gqlContextPtr != nullptr && response.permissions.HasValue()){
-		QByteArrayList permissions = response.permissions->ToList();
-		permissions += imtgql::CollectImpliedPermissions(*gqlContextPtr, permissions);
-		for (const QByteArray& permission : imtgql::CollectTenantOwnerPermissions(*gqlContextPtr)){
-			if (!permissions.contains(permission)){
-				permissions.append(permission);
-			}
-		}
-		response.permissions->FromList(permissions);
+	if (gqlContextPtr == nullptr || !response.permissions.HasValue()){
+		return response;
 	}
+
+	QByteArray queriedToken;
+	const istd::TNullableValue<sdl::V1_0::imtauth::CTokenInput> input = getPermissionsRequest.GetRequestedArguments().input;
+	if (input.HasValue() && input->accessToken.HasValue()){
+		queriedToken = *input->accessToken;
+	}
+
+	if (!queriedToken.isEmpty() && queriedToken != gqlContextPtr->GetToken()){
+		return response;
+	}
+
+	QByteArrayList permissions = response.permissions->ToList();
+	permissions += imtgql::CollectImpliedPermissions(*gqlContextPtr, permissions);
+	const imtauth::IUserInfo::FeatureIds grantedPermissions = imtgql::CollectTenantOwnerPermissions(*gqlContextPtr)
+				+ imtgql::CollectOrganizationAccessPermissions(*gqlContextPtr, gqlContextPtr->GetUserId());
+	for (const QByteArray& permission : grantedPermissions){
+		if (!permissions.contains(permission)){
+			permissions.append(permission);
+		}
+	}
+	response.permissions->FromList(permissions);
 
 	return response;
 }

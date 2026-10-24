@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgql/TenantAccess.h>
 
+// Qt includes
+#include <QtCore/QSet>
 
 // ImtCore includes
 #include <imtauth/imtauth.h>
@@ -74,7 +76,7 @@ bool HasTenantIsolationAccess(
 	}
 
 	imtauth::ITenantInfoUniquePtr tenantPtr = tenantManager.GetTenant(tenantId);
-	if (tenantPtr.IsValid() && tenantPtr->GetOwnerId() == userId){
+	if (tenantPtr.IsValid() && (tenantPtr->GetOwnerId() == userId || tenantPtr->GetCreatorId() == userId)){
 		return true;
 	}
 
@@ -140,6 +142,71 @@ bool HasTenantManageAccess(
 }
 
 
-} // namespace imtauthgql
+bool CanCreateOrganization(const imtgql::IGqlContext& context)
+{
+	const imtauth::IUserInfo* userInfoPtr = context.GetUserInfo();
+	if (userInfoPtr == nullptr){
+		return false;
+	}
 
+	if (userInfoPtr->IsAdmin()){
+		return true;
+	}
+
+	const QByteArray productId = context.GetProductId();
+	const imtauth::IUserInfo::FeatureIds userPermissions = productId.isEmpty() ? userInfoPtr->GetPermissions() : userInfoPtr->GetPermissions(productId);
+
+	if (!imtauth::HasPermission(userPermissions, imtauth::s_addOrganizationPermission, false)){
+		return false;
+	}
+
+	return context.GetTenantId().isEmpty() || imtauth::HasPermission(context.GetTenantPermissions(), imtauth::s_addOrganizationPermission, false);
+}
+
+
+bool CheckTenantPermissionsChange(
+			const imtauth::ITenantManager& tenantManager,
+			const QByteArray& creatorId,
+			const QByteArray& parentTenantId,
+			const QByteArrayList& currentPermissions,
+			const QByteArrayList& newPermissions,
+			const QByteArray& contextUserId,
+			QString& errorMessage)
+{
+	if (QSet<QByteArray>(newPermissions.begin(), newPermissions.end()) == QSet<QByteArray>(currentPermissions.begin(), currentPermissions.end())){
+		return true;
+	}
+
+	if (!creatorId.isEmpty() && creatorId != contextUserId){
+		errorMessage = QStringLiteral("Only the creator of the organization can change its permissions");
+		return false;
+	}
+
+	if (!parentTenantId.isEmpty()){
+		const QByteArrayList parentPermissions = tenantManager.GetTenantPermissions(parentTenantId);
+		for (const QByteArray& permission : newPermissions){
+			if (!imtauth::HasPermission(parentPermissions, permission, false)){
+				errorMessage = QStringLiteral("Permission '%1' is not available to the parent organization").arg(QString::fromUtf8(permission));
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
+
+bool NarrowSubOrganizationPermissions(imtauth::ITenantManager& tenantManager, const QByteArray& tenantId, QString& errorMessage)
+{
+	imtauth::ITenantInfoUniquePtr tenantPtr = tenantManager.GetTenant(tenantId);
+	if (!tenantPtr.IsValid() || !tenantManager.SetTenantPermissions(tenantId, tenantPtr->GetTenantPermissions())){
+		errorMessage = QStringLiteral("The organization was saved, but the permissions of its sub-organizations could not be narrowed. Save the organization again to retry.");
+		return false;
+	}
+
+	return true;
+}
+
+
+} // namespace imtauthgql
 

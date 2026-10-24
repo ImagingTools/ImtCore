@@ -200,13 +200,14 @@ imtsdl::TElementList<sdl::V1_0::imtauth::CProfileTenantInfo> CProfileControllerC
 		}
 
 		const bool isOwner = tenantPtr->GetOwnerId() == userId;
+		const bool isCreator = tenantPtr->GetCreatorId() == userId;
 		imtauth::ITenantMembershipUniquePtr membershipPtr;
 		if (m_membershipManagerCompPtr.IsValid()){
 			membershipPtr = m_membershipManagerCompPtr->FindMembership(userId, tenantId);
 		}
 
 		const bool isActiveMember = membershipPtr.IsValid() && membershipPtr->IsActive();
-		if (!isOwner && !isActiveMember){
+		if (!isOwner && !isCreator && !isActiveMember){
 			continue;
 		}
 
@@ -222,6 +223,9 @@ imtsdl::TElementList<sdl::V1_0::imtauth::CProfileTenantInfo> CProfileControllerC
 		organizationInfo.isDelegated = false;
 		if (isOwner){
 			organizationInfo.role = QStringLiteral("Owner");
+		}
+		else if (isCreator){
+			organizationInfo.role = QStringLiteral("Creator");
 		}
 		else{
 			organizationInfo.role = QStringLiteral("Member");

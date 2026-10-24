@@ -428,10 +428,14 @@ QtObject {
 	property Component __groupEditorComp: Component {
 		UserGroupView {
 			productId: root.productId
-			permissionGroups: root.allPermissions
+			// Inside an organization only its permission scope can be given
+			permissionGroups: root.rolePermissionsTenantId !== "" ? root.tenantPermissions : root.allPermissions
 
 			Component.onCompleted: {
-				if (!root.allPermissions || root.allPermissions.length === 0){
+				if (root.rolePermissionsTenantId !== ""){
+					root.fetchTenantPermissions(root.rolePermissionsTenantId)
+				}
+				else if (!root.allPermissions || root.allPermissions.length === 0){
 					root.fetchAllPermissions()
 				}
 			}
@@ -568,10 +572,14 @@ QtObject {
 			id: userEditor
 			productId: root.productId
 			passwordPolicy: root.passwordPolicy
-			permissionGroups: root.allPermissions
+			// Inside an organization only its permission scope can be given
+			permissionGroups: root.rolePermissionsTenantId !== "" ? root.tenantPermissions : root.allPermissions
 
 			Component.onCompleted: {
-				if (!root.allPermissions || root.allPermissions.length === 0){
+				if (root.rolePermissionsTenantId !== ""){
+					root.fetchTenantPermissions(root.rolePermissionsTenantId)
+				}
+				else if (!root.allPermissions || root.allPermissions.length === 0){
 					root.fetchAllPermissions()
 				}
 			}

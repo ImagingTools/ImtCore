@@ -897,7 +897,7 @@ Item {
 
 	Text {
 		anchors.top: selectedTable.top
-		anchors.topMargin: selectedTable.headerHeight + Style.marginXL
+		anchors.topMargin: Math.max(selectedTable.headerHeight, Style.tableHeaderHeight) + Style.marginXL
 		anchors.left: parent.left
 		anchors.right: parent.right
 		anchors.margins: Style.marginL

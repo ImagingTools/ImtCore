@@ -240,13 +240,35 @@ Item {
 		}
 	}
 
+	// The element of a JS array model: the web runtime gives it as modelData, Qt as model.modelData
+	function getRowData(){
+		if (!delegateContainer.rowDelegate){
+			return null
+		}
+
+		if (delegateContainer.rowDelegate.modelData){
+			return delegateContainer.rowDelegate.modelData
+		}
+
+		let dataModel = delegateContainer.rowDelegate.dataModel
+		if (dataModel && dataModel.modelData){
+			return dataModel.modelData
+		}
+
+		return null
+	}
+
 	function getValue(){
 		if (delegateContainer && delegateContainer.columnIndex >= 0){
 			if(delegateContainer.rowDelegate !== null && delegateContainer.rowDelegate.tableItem !==null && delegateContainer.rowDelegate.dataModel != null){
 				let val
 				let key = delegateContainer.rowDelegate.tableItem.getHeaderId(delegateContainer.columnIndex)
+				let rowData = delegateContainer.getRowData()
 				if ("item" in delegateContainer.rowDelegate.dataModel){
 					val = delegateContainer.rowDelegate.dataModel.item[delegateContainer.sdlVarPrefix + key]
+				}
+				else if (rowData && typeof rowData == 'object' && !delegateContainer.rowDelegate.modelData){
+					val = rowData[key];
 				}
 				else if(delegateContainer.rowDelegate.modelData){
 					if(typeof delegateContainer.rowDelegate.modelData == 'object'){

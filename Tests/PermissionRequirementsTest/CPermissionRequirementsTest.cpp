@@ -304,8 +304,13 @@ void CPermissionRequirementsTest::testImpliedPermissionsAreLimitedByTenant()
 	gqlContext.SetUserInfo(&userInfo);
 	QCOMPARE(Sorted(gqlContext.GetImpliedPermissions()), Sorted({s_viewUsers, s_viewRoles}));
 
+	gqlContext.SetTenantId("TenantA");
 	gqlContext.SetTenantPermissions({s_changeUser, s_viewUsers});
 	QCOMPARE(gqlContext.GetImpliedPermissions(), QByteArrayList{s_viewUsers});
+
+	// An empty scope of an organization grants nothing
+	gqlContext.SetTenantPermissions(QByteArrayList());
+	QCOMPARE(gqlContext.GetImpliedPermissions(), QByteArrayList());
 }
 
 

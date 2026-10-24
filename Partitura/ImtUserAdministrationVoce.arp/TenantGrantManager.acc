@@ -45,7 +45,11 @@
         </Element>
         <Element Id="CrossOrgGrantDocumentValidator" PackageId="ImtAuthPck" ComponentId="CrossOrgGrantDocumentValidator">
             <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap/>
+                <AttributeInfoMap>
+                    <AttributeInfo Id="TenantConnectionRequestManager" Type="Reference" ExportId="TenantConnectionRequestManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
             </Data>
         </Element>
         <Element Id="CrossOrgGrantInfo" PackageId="ImtAuthPck" ComponentId="CrossOrgGrantInfo">

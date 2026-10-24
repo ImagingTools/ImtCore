@@ -8,6 +8,7 @@
 #include <istd/TInterfacePtr.h>
 
 // ImtCore includes
+#include <imtauth/CUserGroupDocumentValidatorComp.h>
 #include <imtauth/CUserGroupInfo.h>
 #include <imtauth/IUserInfoProvider.h>
 #include <imtauth/imtauth.h>
@@ -48,23 +49,6 @@ bool CUserGroupCollectionControllerComp::FillObjectFromRepresentation(
 	if (name.isEmpty()){
 		errorMessage = QStringLiteral("Group name cannot be empty");
 		return false;
-	}
-
-	imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds();
-	for (imtbase::ICollectionInfo::Id& collectionId : collectionIds){
-		imtbase::IObjectCollection::DataPtr groupDataPtr;
-		if (m_objectCollectionCompPtr->GetObjectData(collectionId, groupDataPtr)){
-			auto currentUserGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(groupDataPtr.GetPtr());
-			if (currentUserGroupInfoPtr != nullptr){
-				if (collectionId != newObjectId){
-					QString currentUserGroupName = currentUserGroupInfoPtr->GetName();
-					if (currentUserGroupName == name){
-						errorMessage = QT_TR_NOOP(QStringLiteral("Group Name '%1' already exists").arg(currentUserGroupName));
-						return false;
-					}
-				}
-			}
-		}
 	}
 
 	userGroupInfoPtr->SetName(name);
@@ -399,7 +383,7 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 
 
 bool CUserGroupCollectionControllerComp::UpdateObjectFromRepresentationRequest(
-			const imtgql::CGqlRequest& /*rawGqlRequest*/,
+			const imtgql::CGqlRequest& rawGqlRequest,
 			const sdl::V1_0::imtauth::CGroupUpdateGqlRequest& groupUpdateRequest,
 			istd::IChangeable& object,
 			QString& errorMessage) const
@@ -431,7 +415,30 @@ bool CUserGroupCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 		userGroupInfoPtr->RemoveUser(userId);
 	}
 
-	return FillObjectFromRepresentation(representation, object, objectId, errorMessage);
+	if (!FillObjectFromRepresentation(representation, object, objectId, errorMessage)){
+		return false;
+	}
+
+	return ValidateGroupForTenant(rawGqlRequest, *userGroupInfoPtr, objectId, errorMessage);
+}
+
+
+istd::IChangeableUniquePtr CUserGroupCollectionControllerComp::CreateObjectFromRequest(
+			const imtgql::CGqlRequest& gqlRequest,
+			QByteArray& newObjectId,
+			QString& errorMessage) const
+{
+	istd::IChangeableUniquePtr objectPtr = BaseClass::CreateObjectFromRequest(gqlRequest, newObjectId, errorMessage);
+	if (!objectPtr.IsValid()){
+		return nullptr;
+	}
+
+	const imtauth::IUserGroupInfo* userGroupInfoPtr = dynamic_cast<const imtauth::IUserGroupInfo*>(objectPtr.GetPtr());
+	if (userGroupInfoPtr == nullptr || !ValidateGroupForTenant(gqlRequest, *userGroupInfoPtr, newObjectId, errorMessage)){
+		return nullptr;
+	}
+
+	return objectPtr;
 }
 
 
@@ -479,6 +486,30 @@ bool CUserGroupCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequ
 	}
 
 	return BaseClass::CheckPermissions(gqlRequest, errorMessage);
+}
+
+
+// private methods
+
+bool CUserGroupCollectionControllerComp::ValidateGroupForTenant(
+			const imtgql::CGqlRequest& gqlRequest,
+			const imtauth::IUserGroupInfo& userGroup,
+			const QByteArray& objectId,
+			QString& errorMessage) const
+{
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	const QByteArray tenantId = gqlContextPtr != nullptr ? gqlContextPtr->GetTenantId() : QByteArray();
+
+	if (!imtauth::CUserGroupDocumentValidatorComp::CheckGroupNameUnique(
+				*m_objectCollectionCompPtr,
+				objectId,
+				userGroup.GetName(),
+				tenantId,
+				errorMessage)){
+		return false;
+	}
+
+	return imtauth::CUserGroupDocumentValidatorComp::CheckParentGroupsInTenant(*m_objectCollectionCompPtr, userGroup.GetParentGroups(), tenantId, errorMessage);
 }
 
 

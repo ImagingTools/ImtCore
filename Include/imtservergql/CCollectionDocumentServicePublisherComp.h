@@ -133,7 +133,8 @@ protected:
 	void PublishRepresentation(
 		const QByteArray& commandId,
 		const QByteArray& userId,
-		const Representation& representation) const;
+		const Representation& representation,
+		const QByteArray& documentId = QByteArray()) const;
 
 protected Q_SLOTS:
 	/**
@@ -181,7 +182,8 @@ template<class Representation>
 void CCollectionDocumentServicePublisherComp::PublishRepresentation(
 			const QByteArray& commandId,
 			const QByteArray& userId,
-			const Representation& representation) const
+			const Representation& representation,
+			const QByteArray& documentId) const
 {
 	QJsonObject jsonObject;
 	if (!representation.WriteToJsonObject(jsonObject)){
@@ -204,6 +206,13 @@ void CCollectionDocumentServicePublisherComp::PublishRepresentation(
 						continue;
 					}
 				}
+			}
+		}
+
+		if (!documentId.isEmpty()){
+			const QByteArray subscribedDocumentId = GetSubscribedDocumentId(networkRequest.gqlRequest);
+			if (!subscribedDocumentId.isEmpty() && subscribedDocumentId != documentId){
+				continue;
 			}
 		}
 

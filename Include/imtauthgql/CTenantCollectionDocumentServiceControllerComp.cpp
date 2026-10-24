@@ -5,6 +5,7 @@
 #include <imtbasesdl/SDL/1.0/CPP/CollectionDocumentService.h>
 #include <imtgql/IGqlContext.h>
 #include <imtbasesdl/SDL/1.0/CPP/UndoManager.h>
+#include <imtauthgql/TenantAccess.h>
 
 
 namespace imtauthgql
@@ -52,15 +53,10 @@ CDM::CDocumentInfo CTenantCollectionDocumentServiceControllerComp::OnCreateNewDo
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const
 {
-	// Creating a new tenant is only allowed when the user has NOT selected
-	// any tenant (currentTenantId must be empty).
 	const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
-	if (contextPtr != nullptr){
-		QByteArray sessionTenantId = contextPtr->GetTenantId();
-		if (!sessionTenantId.isEmpty()){
-			errorMessage = QStringLiteral("A new organization can be created only outside of any organization. Switch to \"No organization\" first.");
-			return CDM::CDocumentInfo();
-		}
+	if (contextPtr == nullptr || !CanCreateOrganization(*contextPtr)){
+		errorMessage = QStringLiteral("Permission denied: /OrganizationManagement/Add");
+		return CDM::CDocumentInfo();
 	}
 
 	return BaseClass::OnCreateNewDocument(createNewDocumentRequest, gqlRequest, errorMessage);
@@ -107,13 +103,14 @@ CDM::CDocumentOperationStatus CTenantCollectionDocumentServiceControllerComp::On
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const
 {
+	QByteArray tenantId;
 	const auto& arguments = saveDocumentRequest.GetRequestedArguments();
 	if (arguments.input.has_value() && arguments.input->documentId){
 		const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
 		const QByteArray sessionTenantId = (contextPtr != nullptr) ? contextPtr->GetTenantId() : QByteArray();
-		const QByteArray tenantId = GetCollectionObjectId(GetUserId(gqlRequest), *arguments.input->documentId);
-		if (tenantId.isEmpty() && !sessionTenantId.isEmpty()){
-			errorMessage = QStringLiteral("A new organization can be created only outside of any organization. Switch to \"No organization\" first.");
+		tenantId = GetCollectionObjectId(GetUserId(gqlRequest), *arguments.input->documentId);
+		if (tenantId.isEmpty() && (contextPtr == nullptr || !CanCreateOrganization(*contextPtr))){
+			errorMessage = QStringLiteral("Permission denied: /OrganizationManagement/Add");
 			CDM::CDocumentOperationStatus retVal;
 			retVal.status = CDM::EDocumentOperationStatus::Failed;
 			retVal.message = errorMessage;
@@ -129,7 +126,19 @@ CDM::CDocumentOperationStatus CTenantCollectionDocumentServiceControllerComp::On
 		}
 	}
 
-	return BaseClass::OnSaveDocument(saveDocumentRequest, gqlRequest, errorMessage);
+	CDM::CDocumentOperationStatus retVal = BaseClass::OnSaveDocument(saveDocumentRequest, gqlRequest, errorMessage);
+	if (tenantId.isEmpty() || !m_tenantManagerCompPtr.IsValid() || !retVal.status || *retVal.status != CDM::EDocumentOperationStatus::Success){
+		return retVal;
+	}
+
+	// A save of a restored scope (e.g. after undo/redo) bypasses the representation update, so the sub-organizations are narrowed here.
+	// This also runs when the scope is unchanged, so retrying the save completes a cascade that failed earlier.
+	if (!NarrowSubOrganizationPermissions(*m_tenantManagerCompPtr, tenantId, errorMessage)){
+		retVal.status = CDM::EDocumentOperationStatus::Failed;
+		retVal.message = errorMessage;
+	}
+
+	return retVal;
 }
 
 

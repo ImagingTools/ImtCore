@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgql/CTenantMembershipManagerControllerComp.h>
 
+// Qt includes
+#include <QtCore/QSet>
+
 // ImtCore includes
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/TenantMemberships.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Permissions.h>
@@ -66,8 +69,8 @@ bool IsOwner(const imtauth::ITenantManager& tenantManager, const QByteArray& use
 
 /**
 	Check if the user has access to perform tenant operations.
-	Owner always has access.
-	Non-owners must be active members of the tenant.
+	Owner and creator always have access.
+	Non-owners and non-creators must be active members of the tenant.
 */
 bool HasTenantAccess(
 		const imtauth::ITenantManager& tenantManager,
@@ -81,12 +84,13 @@ bool HasTenantAccess(
 		return false;
 	}
 
-	// Owner bypasses all permission checks
-	if (IsOwner(tenantManager, userId, tenantId)){
+	// Owner and creator bypass membership checks
+	imtauth::ITenantInfoUniquePtr tenantPtr = tenantManager.GetTenant(tenantId);
+	if (tenantPtr.IsValid() && (tenantPtr->GetOwnerId() == userId || tenantPtr->GetCreatorId() == userId)){
 		return true;
 	}
 
-	// Non-owners must be active members of the tenant.
+	// Non-owners and non-creators must be active members of the tenant.
 	return membershipManager.IsMember(userId, tenantId);
 }
 
@@ -166,6 +170,32 @@ bool CanViewUserMemberships(
 	}
 
 	return false;
+}
+
+
+void CollectFeaturePaths(const imtlic::IFeatureInfo& featureInfo, QSet<QByteArray>& paths)
+{
+	paths.insert(imtlic::CalculateFeaturePath(featureInfo));
+
+	for (const imtlic::IFeatureInfo::FeatureInfoPtr& subFeaturePtr : featureInfo.GetSubFeatures()){
+		if (subFeaturePtr.IsValid()){
+			CollectFeaturePaths(*subFeaturePtr, paths);
+		}
+	}
+}
+
+
+QSet<QByteArray> GetOrganizationPermissionPaths(const imtlic::IFeatureInfoProvider& provider)
+{
+	QSet<QByteArray> paths;
+	for (const QByteArray& featureId : provider.GetFeatureList().GetElementIds()){
+		imtlic::IFeatureInfoSharedPtr featurePtr = provider.GetFeatureInfo(featureId);
+		if (featurePtr.IsValid()){
+			CollectFeaturePaths(*featurePtr, paths);
+		}
+	}
+
+	return paths;
 }
 
 
@@ -359,7 +389,7 @@ sdl::V1_0::imtauth::CFindMembershipPayload CTenantMembershipManagerControllerCom
 
 sdl::V1_0::imtauth::CIsMemberPayload CTenantMembershipManagerControllerComp::OnIsMember(
 	const sdl::V1_0::imtauth::CIsMemberGqlRequest& request,
-	const ::imtgql::CGqlRequest& /*gqlRequest*/,
+	const ::imtgql::CGqlRequest& gqlRequest,
 	QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtauth::CIsMemberPayload response;
@@ -379,6 +409,11 @@ sdl::V1_0::imtauth::CIsMemberPayload CTenantMembershipManagerControllerComp::OnI
 		tenantId = *arguments.input->tenantId;
 	}
 
+	if (userId != ContextUserId(gqlRequest) && !CanViewMembers(gqlRequest, tenantId)){
+		response.errorMessage = QStringLiteral("Access denied");
+		return response;
+	}
+
 	response.isMember = m_membershipManagerCompPtr->IsMember(userId, tenantId);
 
 	return response;
@@ -387,7 +422,7 @@ sdl::V1_0::imtauth::CIsMemberPayload CTenantMembershipManagerControllerComp::OnI
 
 sdl::V1_0::imtauth::CHasMinimumRolePayload CTenantMembershipManagerControllerComp::OnHasMinimumRole(
 	const sdl::V1_0::imtauth::CHasMinimumRoleGqlRequest& request,
-	const ::imtgql::CGqlRequest& /*gqlRequest*/,
+	const ::imtgql::CGqlRequest& gqlRequest,
 	QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtauth::CHasMinimumRolePayload response;
@@ -405,6 +440,11 @@ sdl::V1_0::imtauth::CHasMinimumRolePayload CTenantMembershipManagerControllerCom
 	}
 	if (arguments.input && arguments.input->tenantId){
 		tenantId = *arguments.input->tenantId;
+	}
+
+	if (userId != ContextUserId(gqlRequest) && !CanViewMembers(gqlRequest, tenantId)){
+		response.errorMessage = QStringLiteral("Access denied");
+		return response;
 	}
 
 	response.hasRole = m_membershipManagerCompPtr->IsMember(userId, tenantId);
@@ -868,6 +908,17 @@ sdl::V1_0::imtauth::CUpdateMembershipPermissionsPayload CTenantMembershipManager
 	QByteArrayList permissions;
 	if (arguments.input && arguments.input->permissions){
 		permissions = arguments.input->permissions->ToList();
+	}
+
+	if (m_organizationsProviderCompPtr.IsValid()){
+		const QSet<QByteArray> knownPaths = GetOrganizationPermissionPaths(*m_organizationsProviderCompPtr);
+		for (const QByteArray& permission : permissions){
+			if (!knownPaths.contains(permission)){
+				response.success = false;
+				response.errorMessage = QStringLiteral("Unknown organization permission '%1'").arg(QString::fromUtf8(permission));
+				return response;
+			}
+		}
 	}
 
 	// Resolve tenant for access check

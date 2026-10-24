@@ -49,43 +49,33 @@ Item {
 					}
 				}
 
-				rows.push({
-					"id": String(share.m_id),
-					"objectId": String(share.m_objectId),
-					"objectName": share.m_objectName ? String(share.m_objectName) : String(share.m_objectId),
-					"collectionId": share.m_collectionId ? String(share.m_collectionId) : "",
-					"ownerTenantName": share.m_ownerTenantName ? String(share.m_ownerTenantName) : "",
-					"targetTenantName": share.m_targetTenantName ? String(share.m_targetTenantName) : "",
-					"accessLevel": String(share.m_accessLevel),
-					"status": String(share.m_status),
-					"validUntil": share.m_validUntil ? String(share.m_validUntil) : "",
-					"groupIds": groupIds
-				})
+				let row = {}
+				row.id = String(share.m_id)
+				row.objectId = String(share.m_objectId)
+				row.objectName = share.m_objectName ? String(share.m_objectName) : String(share.m_objectId)
+				row.collectionId = share.m_collectionId ? String(share.m_collectionId) : ""
+				row.ownerTenantName = share.m_ownerTenantName ? String(share.m_ownerTenantName) : ""
+				row.targetTenantName = share.m_targetTenantName ? String(share.m_targetTenantName) : ""
+				row.accessLevel = String(share.m_accessLevel)
+				row.status = String(share.m_status)
+				row.validUntil = share.m_validUntil ? String(share.m_validUntil).substring(0, 10) : ""
+				row.groupIds = groupIds
+				row.access = row.accessLevel === "Edit" ? qsTr("Edit") : qsTr("View")
+				row.state = sharesPage.stateText(row.status)
+				row.groups = groupIds.length > 0 ? String(groupIds.length) : ""
+				rows.push(row)
 			}
 		}
 
 		return rows
 	}
 
-	function accessText(row){
-		let accessLevel = row.accessLevel === "Edit" ? qsTr("Edit") : qsTr("View")
-		let status = row.status === "Declined" ? qsTr("declined") : row.status === "Pending" ? qsTr("pending") : ""
-		let validUntil = row.validUntil !== "" ? qsTr("until %1").arg(row.validUntil.substring(0, 10)) : ""
-
-		let parts = [row.collectionId, accessLevel]
-		if (status !== ""){
-			parts.push(status)
-		}
-
-		if (validUntil !== ""){
-			parts.push(validUntil)
-		}
-
-		if (row.groupIds.length > 0){
-			parts.push(qsTr("%1 groups").arg(row.groupIds.length))
-		}
-
-		return parts.join(" · ")
+	function stateText(status){
+		if (status === "Declined")
+			return qsTr("Declined")
+		if (status === "Pending")
+			return qsTr("Pending")
+		return qsTr("Active")
 	}
 
 	function setStatus(shareId, status){
@@ -165,119 +155,20 @@ Item {
 				wrapMode: Text.WordWrap
 			}
 
-			Rectangle {
+			BaseText {
+				visible: sharesPage.incomingShares.length === 0
+				text: qsTr("No documents are shared with this organization")
+				color: Style.inactiveTextColor
+			}
+
+			Table {
+				id: incomingTable
+				visible: sharesPage.incomingShares.length > 0
 				width: parent.width
-				height: sharesPage.incomingShares.length === 0 ? Style.controlHeightL + 2 * Style.marginM : incomingColumn.height + 2
-
-				radius: Style.radiusM
-				color: Style.baseColor
-				border.width: 1
-				border.color: Style.borderColor
-
-				BaseText {
-					anchors.left: parent.left
-					anchors.leftMargin: Style.marginL
-					anchors.verticalCenter: parent.verticalCenter
-
-					visible: sharesPage.incomingShares.length === 0
-					text: qsTr("No documents are shared with this organization")
-					color: Style.inactiveTextColor
-				}
-
-				Column {
-					id: incomingColumn
-
-					anchors.top: parent.top
-					anchors.topMargin: 1
-					anchors.left: parent.left
-					anchors.right: parent.right
-
-					Repeater {
-						model: sharesPage.incomingShares
-
-						delegate: Item {
-							width: incomingColumn.width
-							height: Math.max(incomingTextColumn.height, incomingButtons.height) + 2 * Style.marginM
-
-							Column {
-								id: incomingTextColumn
-
-								anchors.left: parent.left
-								anchors.leftMargin: Style.marginL
-								anchors.right: incomingButtons.left
-								anchors.rightMargin: Style.marginM
-								anchors.verticalCenter: parent.verticalCenter
-								spacing: Style.marginXXS
-
-								BaseText {
-									width: Math.min(implicitWidth, parent.width)
-									text: modelData.objectName
-									font.bold: true
-									font.underline: incomingLinkArea.containsMouse && incomingLinkArea.enabled
-									color: incomingLinkArea.enabled ? Style.linkColor : Style.textColor
-									elide: Text.ElideRight
-
-									MouseArea {
-										id: incomingLinkArea
-
-										anchors.fill: parent
-										hoverEnabled: true
-										enabled: modelData.status === "Active"
-										cursorShape: Qt.PointingHandCursor
-
-										onClicked: {
-											sharesPage.openDocument(modelData, modelData.accessLevel !== "Edit")
-										}
-									}
-								}
-
-								BaseText {
-									width: parent.width
-									text: qsTr("From %1").arg(modelData.ownerTenantName) + " · " + sharesPage.accessText(modelData)
-									color: Style.subtitleColor
-									font.pixelSize: Style.fontSizeS
-									elide: Text.ElideRight
-								}
-							}
-
-							Row {
-								id: incomingButtons
-
-								anchors.right: parent.right
-								anchors.rightMargin: Style.marginL
-								anchors.verticalCenter: parent.verticalCenter
-								spacing: Style.marginS
-
-								Button {
-									text: qsTr("Groups")
-									visible: modelData.status === "Active"
-									onClicked: {
-										ModalDialogManager.openDialog(groupsDialogComp, {"shareId": modelData.id, "groupIds": modelData.groupIds})
-									}
-								}
-
-								Button {
-									text: modelData.status === "Active" ? qsTr("Decline") : qsTr("Accept")
-									onClicked: {
-										sharesPage.setStatus(modelData.id, modelData.status === "Active" ? "Declined" : "Active")
-									}
-								}
-							}
-
-							Rectangle {
-								anchors.left: parent.left
-								anchors.leftMargin: Style.marginL
-								anchors.right: parent.right
-								anchors.rightMargin: Style.marginL
-								anchors.bottom: parent.bottom
-
-								height: 1
-								color: Style.borderColor
-								visible: index < sharesPage.incomingShares.length - 1
-							}
-						}
-					}
-				}
+				height: incomingTable.contentHeight + incomingTable.headerHeight
+				canMoveColumns: false
+				selectable: false
+				elements: sharesPage.incomingShares
 			}
 
 			Item {
@@ -290,106 +181,168 @@ Item {
 				title: qsTr("Shared by us")
 			}
 
-			Rectangle {
+			BaseText {
+				visible: sharesPage.outgoingShares.length === 0
+				text: qsTr("This organization shares no documents")
+				color: Style.inactiveTextColor
+			}
+
+			Table {
+				id: outgoingTable
+				visible: sharesPage.outgoingShares.length > 0
 				width: parent.width
-				height: sharesPage.outgoingShares.length === 0 ? Style.controlHeightL + 2 * Style.marginM : outgoingColumn.height + 2
+				height: outgoingTable.contentHeight + outgoingTable.headerHeight
+				canMoveColumns: false
+				selectable: false
+				elements: sharesPage.outgoingShares
+			}
+		}
+	}
 
-				radius: Style.radiusM
-				color: Style.baseColor
-				border.width: 1
-				border.color: Style.borderColor
+	TableHeaders {
+		id: incomingHeaders
 
-				BaseText {
-					anchors.left: parent.left
-					anchors.leftMargin: Style.marginL
-					anchors.verticalCenter: parent.verticalCenter
+		Component.onCompleted: {
+			addHeader("objectName", qsTr("Document"), false, false)
+			addHeader("ownerTenantName", qsTr("From"), false, false)
+			addHeader("collectionId", qsTr("Collection"), false, false)
+			addHeader("access", qsTr("Access"), false, false)
+			addHeader("state", qsTr("State"), false, false)
+			addHeader("validUntil", qsTr("Valid until"), false, false)
+			addHeader("groups", qsTr("Groups"), false, false)
+			addHeader("actions", "", false, false)
+			incomingTable.headers = incomingHeaders
+			incomingTable.setColumnContentById("objectName", incomingDocumentCellComp)
+			incomingTable.setColumnContentById("actions", incomingActionsCellComp)
+		}
+	}
 
-					visible: sharesPage.outgoingShares.length === 0
-					text: qsTr("This organization shares no documents")
-					color: Style.inactiveTextColor
+	TableHeaders {
+		id: outgoingHeaders
+
+		Component.onCompleted: {
+			addHeader("objectName", qsTr("Document"), false, false)
+			addHeader("targetTenantName", qsTr("To"), false, false)
+			addHeader("collectionId", qsTr("Collection"), false, false)
+			addHeader("access", qsTr("Access"), false, false)
+			addHeader("state", qsTr("State"), false, false)
+			addHeader("validUntil", qsTr("Valid until"), false, false)
+			addHeader("groups", qsTr("Groups"), false, false)
+			addHeader("actions", "", false, false)
+			outgoingTable.headers = outgoingHeaders
+			outgoingTable.setColumnContentById("objectName", outgoingDocumentCellComp)
+			outgoingTable.setColumnContentById("actions", outgoingActionsCellComp)
+		}
+	}
+
+	Component {
+		id: incomingDocumentCellComp
+
+		TableCellDelegateBase {
+			id: incomingDocumentCell
+			readonly property var rowData: incomingDocumentCell.getRowData()
+			readonly property bool canOpen: incomingDocumentCell.rowData ? incomingDocumentCell.rowData.status === "Active" : false
+
+			BaseText {
+				anchors.verticalCenter: parent.verticalCenter
+				anchors.left: parent.left
+				anchors.leftMargin: Style.marginM
+				width: Math.min(implicitWidth, parent.width - 2 * Style.marginM)
+				text: incomingDocumentCell.rowData ? incomingDocumentCell.rowData.objectName : ""
+				font.underline: incomingLinkArea.containsMouse && incomingDocumentCell.canOpen
+				color: incomingDocumentCell.canOpen ? Style.linkColor : Style.textColor
+				elide: Text.ElideRight
+
+				MouseArea {
+					id: incomingLinkArea
+					anchors.fill: parent
+					hoverEnabled: true
+					enabled: incomingDocumentCell.canOpen
+					cursorShape: Qt.PointingHandCursor
+					onClicked: {
+						sharesPage.openDocument(incomingDocumentCell.rowData, incomingDocumentCell.rowData.accessLevel !== "Edit")
+					}
+				}
+			}
+		}
+	}
+
+	Component {
+		id: incomingActionsCellComp
+
+		TableCellDelegateBase {
+			id: incomingActionsCell
+			readonly property var rowData: incomingActionsCell.getRowData()
+			readonly property bool isActive: incomingActionsCell.rowData ? incomingActionsCell.rowData.status === "Active" : false
+
+			Row {
+				anchors.verticalCenter: parent.verticalCenter
+				anchors.right: parent.right
+				anchors.rightMargin: Style.marginM
+				spacing: Style.marginS
+
+				Button {
+					text: qsTr("Groups")
+					visible: incomingActionsCell.isActive
+					onClicked: {
+						ModalDialogManager.openDialog(groupsDialogComp, {"shareId": incomingActionsCell.rowData.id, "groupIds": incomingActionsCell.rowData.groupIds})
+					}
 				}
 
-				Column {
-					id: outgoingColumn
-
-					anchors.top: parent.top
-					anchors.topMargin: 1
-					anchors.left: parent.left
-					anchors.right: parent.right
-
-					Repeater {
-						model: sharesPage.outgoingShares
-
-						delegate: Item {
-							width: outgoingColumn.width
-							height: Math.max(outgoingTextColumn.height, revokeButton.height) + 2 * Style.marginM
-
-							Column {
-								id: outgoingTextColumn
-
-								anchors.left: parent.left
-								anchors.leftMargin: Style.marginL
-								anchors.right: revokeButton.left
-								anchors.rightMargin: Style.marginM
-								anchors.verticalCenter: parent.verticalCenter
-								spacing: Style.marginXXS
-
-								BaseText {
-									width: Math.min(implicitWidth, parent.width)
-									text: modelData.objectName
-									font.bold: true
-									font.underline: outgoingLinkArea.containsMouse
-									color: Style.linkColor
-									elide: Text.ElideRight
-
-									MouseArea {
-										id: outgoingLinkArea
-
-										anchors.fill: parent
-										hoverEnabled: true
-										cursorShape: Qt.PointingHandCursor
-
-										onClicked: {
-											sharesPage.openDocument(modelData, false)
-										}
-									}
-								}
-
-								BaseText {
-									width: parent.width
-									text: qsTr("To %1").arg(modelData.targetTenantName) + " · " + sharesPage.accessText(modelData)
-									color: Style.subtitleColor
-									font.pixelSize: Style.fontSizeS
-									elide: Text.ElideRight
-								}
-							}
-
-							Button {
-								id: revokeButton
-
-								anchors.right: parent.right
-								anchors.rightMargin: Style.marginL
-								anchors.verticalCenter: parent.verticalCenter
-
-								text: qsTr("Revoke")
-								onClicked: {
-									sharesPage.removeShare(modelData.id)
-								}
-							}
-
-							Rectangle {
-								anchors.left: parent.left
-								anchors.leftMargin: Style.marginL
-								anchors.right: parent.right
-								anchors.rightMargin: Style.marginL
-								anchors.bottom: parent.bottom
-
-								height: 1
-								color: Style.borderColor
-								visible: index < sharesPage.outgoingShares.length - 1
-							}
-						}
+				Button {
+					text: incomingActionsCell.isActive ? qsTr("Decline") : qsTr("Accept")
+					onClicked: {
+						sharesPage.setStatus(incomingActionsCell.rowData.id, incomingActionsCell.isActive ? "Declined" : "Active")
 					}
+				}
+			}
+		}
+	}
+
+	Component {
+		id: outgoingDocumentCellComp
+
+		TableCellDelegateBase {
+			id: outgoingDocumentCell
+			readonly property var rowData: outgoingDocumentCell.getRowData()
+
+			BaseText {
+				anchors.verticalCenter: parent.verticalCenter
+				anchors.left: parent.left
+				anchors.leftMargin: Style.marginM
+				width: Math.min(implicitWidth, parent.width - 2 * Style.marginM)
+				text: outgoingDocumentCell.rowData ? outgoingDocumentCell.rowData.objectName : ""
+				font.underline: outgoingLinkArea.containsMouse
+				color: Style.linkColor
+				elide: Text.ElideRight
+
+				MouseArea {
+					id: outgoingLinkArea
+					anchors.fill: parent
+					hoverEnabled: true
+					cursorShape: Qt.PointingHandCursor
+					onClicked: {
+						sharesPage.openDocument(outgoingDocumentCell.rowData, false)
+					}
+				}
+			}
+		}
+	}
+
+	Component {
+		id: outgoingActionsCellComp
+
+		TableCellDelegateBase {
+			id: outgoingActionsCell
+			readonly property var rowData: outgoingActionsCell.getRowData()
+
+			Button {
+				anchors.verticalCenter: parent.verticalCenter
+				anchors.right: parent.right
+				anchors.rightMargin: Style.marginM
+				text: qsTr("Revoke")
+				onClicked: {
+					sharesPage.removeShare(outgoingActionsCell.rowData.id)
 				}
 			}
 		}

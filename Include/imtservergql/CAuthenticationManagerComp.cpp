@@ -87,7 +87,7 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 	// Set before the tenant and the user are read: remote collections authenticate their requests with this context.
 	imtgql::CGqlRequestContextManager::SetContext(dynamic_cast<imtgql::IGqlContext*>(gqlContextPtr.GetPtr()));
 
-	// Resolve tenant ownership flag. Cached alongside the rest of this token's
+	// Resolve the scope, the ownership and the organization access of the token, cached for TenantDataCacheLifetime alongside the rest of this token's
 	// resolved claims (see TokenCacheEntry) instead of being looked up live on
 	// every call - CreateGqlContext() runs on every single incoming request AND
 	// every WebSocket subscription (re-)registration, and m_tenantManagerCompPtr
@@ -96,16 +96,22 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 	// the dozens fired right after a tenant switch: subscriptions re-registering,
 	// per-open-document queries, page reload) each re-triggered their own
 	// uncached GetTenant() round-trip - the exact flood seen after SelectTenant.
-	if (m_tenantManagerCompPtr.IsValid() && !tenantId.isEmpty() && !resolvedUserId.isEmpty()){
+	bool hasOrganizationAccess = false;
+	if (!resolvedUserId.isEmpty()){
 		bool isTenantOwner = false;
 		QByteArrayList tenantPermissions;
-		if (!TryGetCachedTenantOwnership(token, isTenantOwner, tenantPermissions)){
-			imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
-			if (tenantPtr.IsValid()){
-				isTenantOwner = tenantPtr->GetOwnerId() == resolvedUserId;
-				tenantPermissions = tenantPtr->GetTenantPermissions();
+		if (!TryGetCachedTenantData(token, isTenantOwner, tenantPermissions, hasOrganizationAccess)){
+			bool isCreator = false;
+			if (m_tenantManagerCompPtr.IsValid() && !tenantId.isEmpty()){
+				imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
+				if (tenantPtr.IsValid()){
+					isTenantOwner = tenantPtr->GetOwnerId() == resolvedUserId;
+					isCreator = tenantPtr->GetCreatorId() == resolvedUserId;
+					tenantPermissions = tenantPtr->GetTenantPermissions();
+				}
 			}
-			StoreCachedTenantOwnership(token, isTenantOwner, tenantPermissions);
+			hasOrganizationAccess = HasOrganizationAccess(resolvedUserId, tenantId, isTenantOwner || isCreator);
+			StoreCachedTenantData(token, isTenantOwner, tenantPermissions, hasOrganizationAccess);
 		}
 
 		if (isTenantOwner){
@@ -172,20 +178,25 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 			}
 		}
 		else{
-			// The owner of the organization holds the whole product within it, so the pages, commands and headers built from the permissions show everything
-			const imtauth::IUserInfo::FeatureIds ownerPermissions = imtgql::CollectTenantOwnerPermissions(*gqlContextPtr);
-			istd::IChangeableUniquePtr ownerUserPtr = ownerPermissions.isEmpty() ? istd::IChangeableUniquePtr() : userInfoPtr->CloneMe();
-			imtauth::IUserInfo* ownerUserInfoPtr = dynamic_cast<imtauth::IUserInfo*>(ownerUserPtr.GetPtr());
-			if (ownerUserInfoPtr != nullptr){
-				imtauth::IUserInfo::FeatureIds localPermissions = ownerUserInfoPtr->GetLocalPermissions(productId);
-				for (const QByteArray& permission : ownerPermissions){
+			// The owner of the organization holds its whole permission scope, so the pages, commands and headers built from the permissions show all of it
+			imtauth::IUserInfo::FeatureIds grantedPermissions = imtgql::CollectTenantOwnerPermissions(*gqlContextPtr);
+			// Outside of any organization a user allowed to create one sees them too
+			if (hasOrganizationAccess || (tenantId.isEmpty() && imtauth::HasPermission(userInfoPtr->GetPermissions(productId), imtauth::s_addOrganizationPermission, false))){
+				grantedPermissions += imtauth::GetOrganizationAccessPermissions();
+			}
+
+			istd::IChangeableUniquePtr grantedUserPtr = grantedPermissions.isEmpty() ? istd::IChangeableUniquePtr() : userInfoPtr->CloneMe();
+			imtauth::IUserInfo* grantedUserInfoPtr = dynamic_cast<imtauth::IUserInfo*>(grantedUserPtr.GetPtr());
+			if (grantedUserInfoPtr != nullptr){
+				imtauth::IUserInfo::FeatureIds localPermissions = grantedUserInfoPtr->GetLocalPermissions(productId);
+				for (const QByteArray& permission : grantedPermissions){
 					if (!localPermissions.contains(permission)){
 						localPermissions.append(permission);
 					}
 				}
-				ownerUserInfoPtr->SetLocalPermissions(productId, localPermissions);
+				grantedUserInfoPtr->SetLocalPermissions(productId, localPermissions);
 
-				gqlContextPtr->SetUserInfo(ownerUserInfoPtr);
+				gqlContextPtr->SetUserInfo(grantedUserInfoPtr);
 			}
 			else{
 				gqlContextPtr->SetUserInfo(userInfoPtr);
@@ -387,7 +398,13 @@ bool CAuthenticationManagerComp::RemoveSession(const QByteArray& sessionId) cons
 		return false;
 	}
 
-	return m_slaveJwtSessionControllerCompPtr->RemoveSession(sessionId);
+	if (!m_slaveJwtSessionControllerCompPtr->RemoveSession(sessionId)){
+		return false;
+	}
+
+	InvalidateSessionTokenCache(sessionId);
+
+	return true;
 }
 
 
@@ -478,6 +495,36 @@ void CAuthenticationManagerComp::InvalidateToken(const QByteArray& token) const
 
 
 // private methods
+
+bool CAuthenticationManagerComp::HasOrganizationAccess(const QByteArray& userId, const QByteArray& tenantId, bool isOwnerOrCreator) const
+{
+	if (!tenantId.isEmpty()){
+		// Without the memberships (a product server) the organization of the token is trusted
+		return isOwnerOrCreator || !m_membershipManagerCompPtr.IsValid() || m_membershipManagerCompPtr->IsMember(userId, tenantId);
+	}
+
+	if (m_membershipManagerCompPtr.IsValid()){
+		for (const QByteArray& membershipId : m_membershipManagerCompPtr->GetMembershipsByUser(userId)){
+			imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
+			if (membershipPtr.IsValid() && membershipPtr->IsActive()){
+				return true;
+			}
+		}
+	}
+
+	if (m_invitationManagerCompPtr.IsValid()){
+		const imtauth::ITenantInvitationManager::Statuses statuses{imtauth::ITenantInvitation::TIS_PENDING};
+		for (const QByteArray& invitationId : m_invitationManagerCompPtr->GetInvitationsByUser(userId, statuses)){
+			imtauth::ITenantInvitationUniquePtr invitationPtr = m_invitationManagerCompPtr->GetInvitation(invitationId);
+			if (invitationPtr.IsValid() && m_invitationManagerCompPtr->GetEffectiveStatus(*invitationPtr) == imtauth::ITenantInvitation::TIS_PENDING){
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
 
 bool CAuthenticationManagerComp::ResolveUserId(
 			const QByteArray& token,
@@ -747,7 +794,24 @@ void CAuthenticationManagerComp::StoreCachedToken(
 
 	const qint64 cacheTtlSecs = (entry.expiresAt - now) / 1000;
 
+	QByteArray sessionId;
+	if (!isPat){
+		QByteArray claimUserId;
+		QByteArray claimTenantId;
+		qint64 claimExpSecs = 0;
+		ParseJwtClaims(token, claimUserId, claimTenantId, sessionId, claimExpSecs);
+	}
+
 	QMutexLocker cacheLocker(&m_tokenCacheMutex);
+	if (!sessionId.isEmpty()){
+		// A resolution that started before RemoveSession() must not re-insert
+		// a token of the removed session after its cache entries were swept.
+		auto revokedIter = m_revokedSessionIds.constFind(sessionId);
+		if (revokedIter != m_revokedSessionIds.constEnd() && *revokedIter > now){
+			return;
+		}
+	}
+
 	m_expiredTokenCache.remove(token);
 	m_tokenCache.insert(token, entry);
 	const int maxTokenCacheSize = m_maxTokenCacheSizeAttrPtr.IsValid() ? *m_maxTokenCacheSizeAttrPtr : 10000;
@@ -812,21 +876,64 @@ void CAuthenticationManagerComp::InvalidateTokenCache(const QByteArray& token) c
 }
 
 
-bool CAuthenticationManagerComp::TryGetCachedTenantOwnership(const QByteArray& token, bool& isTenantOwner, QByteArrayList& tenantPermissions) const
+void CAuthenticationManagerComp::InvalidateSessionTokenCache(const QByteArray& sessionId) const
 {
+	if (sessionId.isEmpty()){
+		return;
+	}
+
+	const qint64 now = QDateTime::currentMSecsSinceEpoch();
+	const qint64 tokenCacheTtlMs = m_tokenCacheTtlAttrPtr.IsValid() ? (static_cast<qint64>(*m_tokenCacheTtlAttrPtr) * 1000) : (30 * 1000);
+
+	QMutexLocker cacheLocker(&m_tokenCacheMutex);
+	for (auto iter = m_revokedSessionIds.begin(); iter != m_revokedSessionIds.end(); ){
+		if (*iter <= now){
+			iter = m_revokedSessionIds.erase(iter);
+		}
+		else{
+			++iter;
+		}
+	}
+
+	const int maxTokenCacheSize = m_maxTokenCacheSizeAttrPtr.IsValid() ? *m_maxTokenCacheSizeAttrPtr : 10000;
+	while (!m_revokedSessionIds.isEmpty() && m_revokedSessionIds.size() >= maxTokenCacheSize){
+		m_revokedSessionIds.erase(m_revokedSessionIds.begin());
+	}
+	m_revokedSessionIds.insert(sessionId, now + tokenCacheTtlMs);
+
+	for (auto iter = m_tokenCache.begin(); iter != m_tokenCache.end();){
+		QByteArray userId;
+		QByteArray tenantId;
+		QByteArray tokenSessionId;
+		qint64 expSecs = 0;
+		if (ParseJwtClaims(iter.key(), userId, tenantId, tokenSessionId, expSecs) && tokenSessionId == sessionId){
+			iter = m_tokenCache.erase(iter);
+		}
+		else{
+			++iter;
+		}
+	}
+}
+
+
+bool CAuthenticationManagerComp::TryGetCachedTenantData(const QByteArray& token, bool& isTenantOwner, QByteArrayList& tenantPermissions, bool& hasOrganizationAccess) const
+{
+	const qint64 ttlMs = m_tenantDataCacheTtlAttrPtr.IsValid() ? (static_cast<qint64>(*m_tenantDataCacheTtlAttrPtr) * 1000) : (10 * 1000);
+
 	QMutexLocker cacheLocker(&m_tokenCacheMutex);
 	auto iter = m_tokenCache.find(token);
-	if (iter == m_tokenCache.end() || !iter->tenantOwnershipResolved){
+	if (iter == m_tokenCache.end() || iter->tenantDataResolvedAt == 0 || QDateTime::currentMSecsSinceEpoch() - iter->tenantDataResolvedAt > ttlMs){
 		return false;
 	}
 
 	isTenantOwner = iter->isTenantOwner;
 	tenantPermissions = iter->tenantPermissions;
+	hasOrganizationAccess = iter->hasOrganizationAccess;
 	return true;
 }
 
 
-void CAuthenticationManagerComp::StoreCachedTenantOwnership(const QByteArray& token, bool isTenantOwner, const QByteArrayList& tenantPermissions) const
+void CAuthenticationManagerComp::StoreCachedTenantData(const QByteArray& token, bool isTenantOwner, const QByteArrayList& tenantPermissions, bool hasOrganizationAccess) const
 {
 	QMutexLocker cacheLocker(&m_tokenCacheMutex);
 	auto iter = m_tokenCache.find(token);
@@ -840,7 +947,8 @@ void CAuthenticationManagerComp::StoreCachedTenantOwnership(const QByteArray& to
 
 	iter->isTenantOwner = isTenantOwner;
 	iter->tenantPermissions = tenantPermissions;
-	iter->tenantOwnershipResolved = true;
+	iter->hasOrganizationAccess = hasOrganizationAccess;
+	iter->tenantDataResolvedAt = QDateTime::currentMSecsSinceEpoch();
 }
 
 

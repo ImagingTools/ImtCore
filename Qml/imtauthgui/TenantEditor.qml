@@ -52,6 +52,9 @@ DocumentViewBase {
 	}
 
 	function updateGui() {
+		// The role, group and user editors of the organization offer only its permission scope
+		if (container.apiClient && container.tenantData && container.tenantData.m_id !== "")
+			container.apiClient.rolePermissionsTenantId = container.tenantData.m_id
 		stateManager_.loadMembersFromModel()
 		stateManager_.loadInvitationsFromModel()
 		var generalPage = multiPageView.getPageByIndex(0)
@@ -84,6 +87,9 @@ DocumentViewBase {
 		function updatePages() {
 			multiPageView.clear()
 			multiPageView.addPage("General", qsTr("General"), generalPageComp, "Icons/Settings")
+			// The creator picks the permission scope while creating the organization
+			if (stateManager_.isNewTenant)
+				multiPageView.addPage("Permissions", qsTr("Available permissions"), permissionsPageComp, "Icons/Key")
 			if (!stateManager_.isNewTenant) {
 				if (stateManager_.canViewOrganizationMembers)
 					multiPageView.addPage("Members", qsTr("Members"), membersPageComp, "Icons/MultipleUser")
@@ -94,7 +100,7 @@ DocumentViewBase {
 					multiPageView.addPage("Groups", qsTr("Groups"), groupsPageComp, "Icons/Organization")
 				}
 				if (stateManager_.canViewOrganizationPermissions) {
-					multiPageView.addPage("Permissions", qsTr("Permissions"), permissionsPageComp, "Icons/Key")
+					multiPageView.addPage("Permissions", qsTr("Available permissions"), permissionsPageComp, "Icons/Key")
 				}
 				if (stateManager_.isCreator) {
 					multiPageView.addPage("CrossOrgGrants", qsTr("Grants"), crossOrgGrantsPageComp, "Icons/Crown")

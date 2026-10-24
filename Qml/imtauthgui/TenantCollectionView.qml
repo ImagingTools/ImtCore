@@ -32,7 +32,7 @@ RemoteCollectionView {
 
 	Component.onCompleted: {
 		table.setSortingInfo(TenantItemDataTypeMetaInfo.s_createdAt, "DESC")
-		table.nonSortableColumns = [TenantItemDataTypeMetaInfo.s_ownerId, TenantItemDataTypeMetaInfo.s_isActive, TenantItemDataTypeMetaInfo.s_membersCount, TenantItemDataTypeMetaInfo.s_tenantRelationScope, TenantItemDataTypeMetaInfo.s_invitationId, TenantItemDataTypeMetaInfo.s_invitedByName]
+		table.nonSortableColumns = [TenantItemDataTypeMetaInfo.s_parentTenantName, TenantItemDataTypeMetaInfo.s_ownerId,TenantItemDataTypeMetaInfo.s_isActive, TenantItemDataTypeMetaInfo.s_membersCount, TenantItemDataTypeMetaInfo.s_tenantRelationScope, TenantItemDataTypeMetaInfo.s_invitationId, TenantItemDataTypeMetaInfo.s_invitedByName]
 		registerFieldFilterDelegate("isActiveFilter", isActiveDelegateFilterComp)
 		registerFieldFilterDelegate("tenantRelationFilter", tenantRelationDelegateFilterComp)
 	}
@@ -573,7 +573,7 @@ RemoteCollectionView {
 		}
 	}
 
-	// An organization is edited from inside it, and a new one is created outside of any.
+	// An organization is edited from inside it.
 	// Switching rebuilds this view; the document navigation of the rebuilt one picks up the pending path when it registers.
 	function switchToTenantAndNavigate(tenantId, rest, params) {
 		NavigationController.setPending(container.collectionId, rest, params)
@@ -591,20 +591,6 @@ RemoteCollectionView {
 			onFinished: {
 				if (buttonId == Enums.yes) {
 					container.switchToTenantAndNavigate(tenantId, ["Tenant", tenantId], {})
-				}
-			}
-		}
-	}
-
-	Component {
-		id: switchToCreateDialogComp
-		MessageDialog {
-			width: Style.sizeHintM
-			title: qsTr("Switch organization")
-			message: qsTr("A new organization can be created only outside of any organization. Switch to \"No organization\" and continue?")
-			onFinished: {
-				if (buttonId == Enums.yes) {
-					container.switchToTenantAndNavigate("", ["Tenant"], {"createNew": true})
 				}
 			}
 		}
@@ -728,12 +714,8 @@ RemoteCollectionView {
 				documentManager.createDocument("Tenant")
 			}
 
+			// Created inside an organization the new one becomes its sub-organization
 			function onNew(){
-				if (AuthorizationController.currentTenantId && AuthorizationController.currentTenantId !== "") {
-					ModalDialogManager.openDialog(switchToCreateDialogComp, {})
-					return
-				}
-
 				createNewTenantDocument()
 			}
 

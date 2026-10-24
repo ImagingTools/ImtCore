@@ -545,6 +545,13 @@ QString CTenantDbDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsS
 		}
 	}
 
+	if (filterParamIds.contains("ParentTenantId")){
+		iprm::TParamsPtr<iprm::IIdParam> parentTenantIdParamPtr(&filterParams, "ParentTenantId");
+		if (parentTenantIdParamPtr.IsValid() && !parentTenantIdParamPtr->GetId().isEmpty()){
+			additionalFilters << QStringLiteral(R"("ParentTenantId"='%1')").arg(imtdb::EscapeSql(QString::fromUtf8(parentTenantIdParamPtr->GetId())));
+		}
+	}
+
 	return additionalFilters.join(QStringLiteral(" AND "));
 }
 
