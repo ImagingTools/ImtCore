@@ -10,6 +10,7 @@
 #include <imtaccount/CAddress.h>
 #include <imtaccount/CAccountInfo.h>
 #include <imtaccount/CContactInfo.h>
+#include <imtaccount/CPersonInfo.h>
 #include <imtaccount/CCompanyInfo.h>
 #include <imtaccount/CAccountInfoMetaInfoCreatorComp.h>
 #include <imtaccount/CContactInfoMetaInfoCreatorComp.h>
@@ -36,9 +37,16 @@ typedef icomp::TModelCompWrap<
 						istd::IChangeable>> ContactInfo;
 typedef icomp::TModelCompWrap<
 			icomp::TMakeComponentWrap<
+						imtaccount::CIdentifiablePersonInfo,
+						imtaccount::IPersonInfo,
+						iser::IObject,
+						iser::ISerializable,
+						istd::IChangeable>> PersonInfo;
+typedef icomp::TModelCompWrap<
+			icomp::TMakeComponentWrap<
 						imtaccount::CIdentifiableCompanyInfo,
-						imtaccount::IContactBaseInfo,
 						imtaccount::ICompanyInfo,
+						imtaccount::IContactInfoProvider,
 						iser::IObject,
 						iser::ISerializable,
 						istd::IChangeable>> CompanyInfo;

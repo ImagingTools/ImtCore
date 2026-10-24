@@ -15,11 +15,6 @@ I_EXPORT_PACKAGE(
 			IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools"));
 
 I_EXPORT_COMPONENT(
-			ContactInfoEditor,
-			"Contact info editor",
-			"Contact Info Editor");
-
-I_EXPORT_COMPONENT(
 			AddressEditor,
 			"Address editor",
 			"Address Editor");
@@ -28,11 +23,6 @@ I_EXPORT_COMPONENT(
 			AccountInfoEditor,
 			"Account info editor",
 			"Account Info Editor");
-
-I_EXPORT_COMPONENT(
-			ContactInfoViewDelegate,
-			"Contact info view delegate",
-			"Contact Address Info View Delegate");
 
 I_EXPORT_COMPONENT(
 			AccountInfoViewDelegate,
