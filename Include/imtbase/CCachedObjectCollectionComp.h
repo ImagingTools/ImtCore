@@ -18,6 +18,7 @@
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <imtbase/IObjectCollectionCacheController.h>
+#include <imtbase/IAccessContext.h>
 
 
 namespace imtbase
@@ -48,6 +49,7 @@ public:
 		I_ASSIGN_MULTI_0(m_invalidationModels, "InvalidationModels", "Additional models to observe; a change in any of them will trigger cache invalidation (the ObjectCollection's model is always observed too)", false);
 		I_ASSIGN(m_metaInfoCacheLimitAttrPtr, "MetaInfoCacheLimit", "Maximal count of filter combinations stored in the ring buffer (meta info cache)", true, 1000);
 		I_ASSIGN(m_objectCacheLimitAttrPtr, "ObjectCacheLimit", "Maximal count of the data objects in the ring buffer (cache)", true, 100);
+		I_ASSIGN(m_accessContextCompPtr, "AccessContext", "If set, cached data is kept separately for each access context (tenant and user), because the visible data may differ (e.g. under tenant Row Level Security)", false, "AccessContext");
 	I_END_COMPONENT;
 
 	CCachedObjectCollectionComp();
@@ -124,13 +126,15 @@ protected:
 
 	struct FilteredCollection
 	{
-		FilteredCollection(int aOffset, int aCount, const QByteArray& aSelectionParamsData, IObjectCollectionUniquePtr&& aCachePtr)
-			:offset(aOffset),
+		FilteredCollection(const QByteArray& aScope, int aOffset, int aCount, const QByteArray& aSelectionParamsData, IObjectCollectionUniquePtr&& aCachePtr)
+			:scope(aScope),
+			offset(aOffset),
 			count(aCount),
 			selectionParamsData(aSelectionParamsData),
 			cachePtr(std::move(aCachePtr))
 		{
 		}
+		QByteArray scope;
 		int offset;
 		int count;
 		QByteArray selectionParamsData;
@@ -146,6 +150,10 @@ protected:
 
 	void ClearCache();
 	void RemoveOldestObjectFromCache() const;
+	QByteArray GetCacheScope() const;
+	FilteredCollectionPtr FindCachedCollectionWithElement(const Id& elementId) const;
+	int GetCachedObjectsCount() const;
+	void RemoveCachedObject(const Id& objectId) const;
 
 private:
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
@@ -153,6 +161,7 @@ private:
 	I_MULTIREF(imod::IModel, m_invalidationModels);
 	I_ATTR(int, m_metaInfoCacheLimitAttrPtr);
 	I_ATTR(int, m_objectCacheLimitAttrPtr);
+	I_REF(imtbase::IAccessContext, m_accessContextCompPtr);
 
 	mutable QVector<FilteredCollectionPtr> m_cachedCollections;
 
@@ -163,7 +172,8 @@ private:
 	};
 
 	typedef QMap<QByteArray, CacheItem> CacheItemMap;
-	mutable CacheItemMap m_cacheItems;
+	typedef QMap<QByteArray, CacheItemMap> ScopedCacheItemMap;
+	mutable ScopedCacheItemMap m_cacheItems;
 
 	int m_operationFlags;
 	mutable QReadWriteLock m_lock;

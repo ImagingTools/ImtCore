@@ -5,6 +5,7 @@
         <file alias="GetRevision.sql">Resources/SQL/Postgres/GetRevision.sql</file>
         <file alias="SetRevision.sql">Resources/SQL/Postgres/SetRevision.sql</file>
         <file alias="CreateCollectionTable.sql">Resources/SQL/Postgres/CreateCollectionTable.sql</file>
+        <file alias="AdoptDatabaseObjects.sql">Resources/SQL/Postgres/AdoptDatabaseObjects.sql</file>
     </qresource>
     <qresource prefix="/SQL/SQLite">
         <file alias="CreateDatabase.sql">Resources/SQL/SQLite/CreateDatabase.sql</file>

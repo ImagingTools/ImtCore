@@ -265,20 +265,18 @@ void CDocumentServiceBase::DoCreateNewDocument(const QByteArray& taskId, const T
 	}
 
 	std::weak_ptr<std::atomic<bool>> aliveGuard(m_isAlive);
+	const AccessContextSnapshot accessContext = CaptureAccessContext();
 	QObject::connect(
 		thread,
 		&QThread::started,
 		worker,
-		std::bind(
-					&CDocumentServiceBase::OnCreateDocumentThreadStarted,
-					this,
-					aliveGuard,
-					documentTypeId,
-					userId,
-					documentId,
-					taskId,
-					worker,
-					defaultDataPtr));
+		[this, aliveGuard, accessContext, documentTypeId, userId, documentId, taskId, worker, defaultDataPtr](){
+			ApplyAccessContext(accessContext);
+
+			OnCreateDocumentThreadStarted(aliveGuard, documentTypeId, userId, documentId, taskId, worker, defaultDataPtr);
+
+			ResetAccessContext(accessContext);
+		});
 
 	// Initialize observers and fire events in the main thread after background work completes
 	QObject::connect(
@@ -298,6 +296,50 @@ void CDocumentServiceBase::DoCreateNewDocument(const QByteArray& taskId, const T
 	QObject::connect(thread, &QThread::finished, thread, &QObject::deleteLater);
 
 	thread->start();
+}
+
+
+imtbase::IAccessContextController* CDocumentServiceBase::GetAccessContextController() const
+{
+	return nullptr;
+}
+
+
+CDocumentServiceBase::AccessContextSnapshot CDocumentServiceBase::CaptureAccessContext() const
+{
+	AccessContextSnapshot retVal;
+
+	retVal.controllerPtr = GetAccessContextController();
+	if (retVal.controllerPtr != nullptr && retVal.controllerPtr->GetAccessMode() == imtbase::IAccessContext::AM_TENANT){
+		retVal.isTenantContext = true;
+		retVal.tenantId = retVal.controllerPtr->GetTenantId();
+		retVal.userId = retVal.controllerPtr->GetUserId();
+	}
+
+	return retVal;
+}
+
+
+void CDocumentServiceBase::ApplyAccessContext(const AccessContextSnapshot& snapshot)
+{
+	if (snapshot.controllerPtr == nullptr){
+		return;
+	}
+
+	if (snapshot.isTenantContext){
+		snapshot.controllerPtr->SetTenantAccessContext(snapshot.tenantId, snapshot.userId);
+	}
+	else{
+		snapshot.controllerPtr->ResetAccessContext();
+	}
+}
+
+
+void CDocumentServiceBase::ResetAccessContext(const AccessContextSnapshot& snapshot)
+{
+	if (snapshot.controllerPtr != nullptr){
+		snapshot.controllerPtr->ResetAccessContext();
+	}
 }
 
 

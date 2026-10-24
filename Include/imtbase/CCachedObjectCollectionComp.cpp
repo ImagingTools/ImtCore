@@ -146,7 +146,7 @@ bool CCachedObjectCollectionComp::RemoveElements(const Ids& elementIds, const IO
 		QWriteLocker locker(&m_lock);
 		m_cachedCollections.clear();
 		for (int i = 0; i < elementIds.size(); ++i){
-			m_cacheItems.remove(elementIds[i]);
+			RemoveCachedObject(elementIds[i]);
 		}
 	}
 	else{
@@ -197,11 +197,14 @@ bool CCachedObjectCollectionComp::GetObjectData(const Id& objectId, DataPtr& dat
 		return false;
 	}
 
+	const QByteArray scope = GetCacheScope();
+
 	{
 		QReadLocker locker(&m_lock);
 
-		CacheItemMap::const_iterator it = m_cacheItems.constFind(objectId);
-		if (it != m_cacheItems.constEnd() && it.value().dataPtr.IsValid()){
+		const CacheItemMap scopeItems = m_cacheItems.value(scope);
+		CacheItemMap::const_iterator it = scopeItems.constFind(objectId);
+		if (it != scopeItems.constEnd() && it.value().dataPtr.IsValid()){
 			// Callers modify the returned object in place, so the cached instance is never handed out.
 			istd::IChangeableUniquePtr clonePtr = it.value().dataPtr->CloneMe();
 			if (clonePtr.IsValid()){
@@ -220,10 +223,10 @@ bool CCachedObjectCollectionComp::GetObjectData(const Id& objectId, DataPtr& dat
 			cachedDataPtr.FromUnique(std::move(cachedCopyPtr));
 
 			QWriteLocker locker(&m_lock);
-			if (m_cacheItems.size() >= *m_objectCacheLimitAttrPtr){
+			if (GetCachedObjectsCount() >= *m_objectCacheLimitAttrPtr){
 				RemoveOldestObjectFromCache();
 			}
-			m_cacheItems.insert(objectId, {cachedDataPtr, QDateTime::currentMSecsSinceEpoch()});
+			m_cacheItems[scope].insert(objectId, {cachedDataPtr, QDateTime::currentMSecsSinceEpoch()});
 		}
 	}
 
@@ -247,7 +250,7 @@ bool CCachedObjectCollectionComp::SetObjectData(
 
 	QWriteLocker locker(&m_lock);
 	m_cachedCollections.clear();
-	m_cacheItems.remove(objectId);
+	RemoveCachedObject(objectId);
 	locker.unlock();
 
 	bool retVal = m_objectCollectionCompPtr->SetObjectData(objectId, object, mode, operationContextPtr);
@@ -313,13 +316,9 @@ QByteArray CCachedObjectCollectionComp::GetObjectTypeId(const Id& objectId) cons
 
 idoc::MetaInfoPtr CCachedObjectCollectionComp::GetDataMetaInfo(const Id& objectId) const
 {
-	QReadLocker locker(&m_lock);
-
-	for (int index = 0; index < m_cachedCollections.size(); index++){
-		const FilteredCollectionPtr& collectionCacheItemPtr = m_cachedCollections.at(index);
-		if (collectionCacheItemPtr->cachePtr->GetElementIds().contains(objectId)){
-			return collectionCacheItemPtr->cachePtr->GetDataMetaInfo(objectId);
-		}
+	FilteredCollectionPtr collectionCacheItemPtr = FindCachedCollectionWithElement(objectId);
+	if (collectionCacheItemPtr != nullptr){
+		return collectionCacheItemPtr->cachePtr->GetDataMetaInfo(objectId);
 	}
 
 	return idoc::MetaInfoPtr();
@@ -364,13 +363,9 @@ bool CCachedObjectCollectionComp::GetSubsetInfo(
 
 QVariant CCachedObjectCollectionComp::GetElementInfo(const Id& elementId, int infoType, ilog::IMessageConsumer* logPtr) const
 {
-	QReadLocker locker(&m_lock);
-
-	for (int index = 0; index < m_cachedCollections.size(); index++){
-		const FilteredCollectionPtr& collectionCacheItemPtr = m_cachedCollections.at(index);
-		if (collectionCacheItemPtr->cachePtr->GetElementIds().contains(elementId)){
-			return collectionCacheItemPtr->cachePtr->GetElementInfo(elementId, infoType, logPtr);
-		}
+	FilteredCollectionPtr collectionCacheItemPtr = FindCachedCollectionWithElement(elementId);
+	if (collectionCacheItemPtr != nullptr){
+		return collectionCacheItemPtr->cachePtr->GetElementInfo(elementId, infoType, logPtr);
 	}
 
 	return QVariant();
@@ -379,13 +374,9 @@ QVariant CCachedObjectCollectionComp::GetElementInfo(const Id& elementId, int in
 
 idoc::MetaInfoPtr CCachedObjectCollectionComp::GetElementMetaInfo(const Id& elementId, ilog::IMessageConsumer* logPtr) const
 {
-	QReadLocker locker(&m_lock);
-
-	for (int index = 0; index < m_cachedCollections.size(); index++){
-		const FilteredCollectionPtr& collectionCacheItemPtr = m_cachedCollections.at(index);
-		if (collectionCacheItemPtr->cachePtr->GetElementIds().contains(elementId)){
-			return collectionCacheItemPtr->cachePtr->GetElementMetaInfo(elementId, logPtr);
-		}
+	FilteredCollectionPtr collectionCacheItemPtr = FindCachedCollectionWithElement(elementId);
+	if (collectionCacheItemPtr != nullptr){
+		return collectionCacheItemPtr->cachePtr->GetElementMetaInfo(elementId, logPtr);
 	}
 
 	return idoc::MetaInfoPtr();
@@ -480,12 +471,15 @@ CCachedObjectCollectionComp::FilteredCollectionPtr CCachedObjectCollectionComp::
 
 	QByteArray data((char*)archive.GetBuffer(), archive.GetBufferSize());
 
+	const QByteArray scope = GetCacheScope();
+
 	{
 		QReadLocker locker(&m_lock);
 
 		for (int index = 0; index < m_cachedCollections.size(); index++){
 			const FilteredCollectionPtr& collectionCacheItemPtr = m_cachedCollections.at(index);
 			if (		collectionCacheItemPtr != nullptr &&
+						collectionCacheItemPtr->scope == scope &&
 						collectionCacheItemPtr->offset == offset &&
 						collectionCacheItemPtr->count == count &&
 						collectionCacheItemPtr->selectionParamsData == data){
@@ -505,6 +499,7 @@ CCachedObjectCollectionComp::FilteredCollectionPtr CCachedObjectCollectionComp::
 	for (int index = 0; index < m_cachedCollections.size(); index++){
 		const FilteredCollectionPtr& collectionCacheItemPtr = m_cachedCollections.at(index);
 		if (		collectionCacheItemPtr != nullptr &&
+					collectionCacheItemPtr->scope == scope &&
 					collectionCacheItemPtr->offset == offset &&
 					collectionCacheItemPtr->count == count &&
 					collectionCacheItemPtr->selectionParamsData == data){
@@ -516,7 +511,7 @@ CCachedObjectCollectionComp::FilteredCollectionPtr CCachedObjectCollectionComp::
 		m_cachedCollections.removeFirst();
 	}
 
-	m_cachedCollections.append(std::make_shared<FilteredCollection>(offset, count, data, std::move(subCollectionPtr)));
+	m_cachedCollections.append(std::make_shared<FilteredCollection>(scope, offset, count, data, std::move(subCollectionPtr)));
 
 	return m_cachedCollections.last();
 }
@@ -544,19 +539,90 @@ void CCachedObjectCollectionComp::InvalidateCache()
 
 void CCachedObjectCollectionComp::RemoveOldestObjectFromCache() const
 {
-	if (m_cacheItems.isEmpty()){
-		return;
-	}
+	ScopedCacheItemMap::iterator oldestScopeIter = m_cacheItems.end();
+	CacheItemMap::iterator oldestIter;
 
-	CacheItemMap::iterator oldestIter = m_cacheItems.begin();
-
-	for (CacheItemMap::iterator iter = m_cacheItems.begin(); iter != m_cacheItems.end(); ++iter){
-		if (iter.value().timestamp < oldestIter.value().timestamp){
-			oldestIter = iter;
+	for (ScopedCacheItemMap::iterator scopeIter = m_cacheItems.begin(); scopeIter != m_cacheItems.end(); ++scopeIter){
+		CacheItemMap& scopeItems = scopeIter.value();
+		for (CacheItemMap::iterator iter = scopeItems.begin(); iter != scopeItems.end(); ++iter){
+			if ((oldestScopeIter == m_cacheItems.end()) || (iter.value().timestamp < oldestIter.value().timestamp)){
+				oldestScopeIter = scopeIter;
+				oldestIter = iter;
+			}
 		}
 	}
 
-	m_cacheItems.erase(oldestIter);
+	if (oldestScopeIter == m_cacheItems.end()){
+		return;
+	}
+
+	oldestScopeIter.value().erase(oldestIter);
+	if (oldestScopeIter.value().isEmpty()){
+		m_cacheItems.erase(oldestScopeIter);
+	}
+}
+
+
+QByteArray CCachedObjectCollectionComp::GetCacheScope() const
+{
+	if (!m_accessContextCompPtr.IsValid()){
+		return QByteArray();
+	}
+
+	switch (m_accessContextCompPtr->GetAccessMode()){
+	case IAccessContext::AM_TENANT:
+		// User-owned rows are visible independently of the tenant, so the user is part of the scope.
+		return QByteArrayLiteral("tenant/") + m_accessContextCompPtr->GetTenantId() + '/' + m_accessContextCompPtr->GetUserId();
+
+	case IAccessContext::AM_SYSTEM:
+		return QByteArrayLiteral("system");
+
+	default:
+		return QByteArrayLiteral("none");
+	}
+}
+
+
+CCachedObjectCollectionComp::FilteredCollectionPtr CCachedObjectCollectionComp::FindCachedCollectionWithElement(const Id& elementId) const
+{
+	const QByteArray scope = GetCacheScope();
+
+	QReadLocker locker(&m_lock);
+
+	for (int index = 0; index < m_cachedCollections.size(); index++){
+		const FilteredCollectionPtr& collectionCacheItemPtr = m_cachedCollections.at(index);
+		if ((collectionCacheItemPtr->scope == scope) && collectionCacheItemPtr->cachePtr->GetElementIds().contains(elementId)){
+			return collectionCacheItemPtr;
+		}
+	}
+
+	return nullptr;
+}
+
+
+int CCachedObjectCollectionComp::GetCachedObjectsCount() const
+{
+	int retVal = 0;
+
+	for (const CacheItemMap& scopeItems : m_cacheItems){
+		retVal += scopeItems.size();
+	}
+
+	return retVal;
+}
+
+
+void CCachedObjectCollectionComp::RemoveCachedObject(const Id& objectId) const
+{
+	for (ScopedCacheItemMap::iterator scopeIter = m_cacheItems.begin(); scopeIter != m_cacheItems.end();){
+		scopeIter.value().remove(objectId);
+		if (scopeIter.value().isEmpty()){
+			scopeIter = m_cacheItems.erase(scopeIter);
+		}
+		else{
+			++scopeIter;
+		}
+	}
 }
 
 
