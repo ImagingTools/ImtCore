@@ -63,9 +63,20 @@ QByteArray CCollectionDocumentServiceTest::OpenDocumentAndWaitForLoad(
 	const QByteArray& userId,
 	const QByteArray& objectId)
 {
+	return OpenDocumentUrlAndWaitForLoad(manager, userId, QUrl("collection:///" + objectId));
+}
+
+
+QByteArray CCollectionDocumentServiceTest::OpenDocumentUrlAndWaitForLoad(
+	CTestableDocumentService& manager,
+	const QByteArray& userId,
+	const QUrl& url,
+	bool singleDocumentInstance)
+{
 	imtdoc::IDocumentService::TaskParams params;
 	params.userId = userId;
-	params.url = QUrl("collection:///" + objectId);
+	params.url = url;
+	params.singleDocumentInstance = singleDocumentInstance;
 
 	QByteArray taskId = manager.BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, params);
 	if (taskId.isEmpty()) {
@@ -527,6 +538,108 @@ void CCollectionDocumentServiceTest::OpenDocumentMultiplePathSegmentsTest()
 }
 
 
+void CCollectionDocumentServiceTest::OpenDocumentWithHostAndRevisionTest()
+{
+	m_managerPtr->GetMockCollection().AddObject(
+		TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME,
+		istd::IChangeableSharedPtr(new CMockDocumentObject("currentData")));
+	m_managerPtr->GetMockCollection().SetRevisionControllerEnabled(true);
+	m_managerPtr->GetMockCollection().AddRevisionData(
+		TEST_OBJECT_ID,
+		7,
+		istd::IChangeableSharedPtr(new CMockDocumentObject("revisionData")));
+
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.url = QUrl("collection://" + QString(TEST_OBJECT_ID) + "/7");
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, params);
+	QVERIFY2(!taskId.isEmpty(), "BeginDocumentTask should return a task ID when URL validation fails asynchronously");
+
+	imtdoc::IDocumentService::TaskResult result = m_managerPtr->WaitForTaskFinished(taskId);
+	QCOMPARE(result.status, imtdoc::IDocumentService::OS_FAILED);
+	QVERIFY2(result.documentId.isEmpty(), "OpenDocument should reject a host even with revision");
+}
+
+
+void CCollectionDocumentServiceTest::OpenDocumentWithRevisionWithoutRevisionControllerFailsTest()
+{
+	m_managerPtr->GetMockCollection().AddObject(
+		TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME,
+		istd::IChangeableSharedPtr(new CMockDocumentObject("currentData")));
+
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.url = QUrl("collection:///" + QString(TEST_OBJECT_ID) + "/3");
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, params);
+	QVERIFY2(!taskId.isEmpty(), "BeginDocumentTask should start and fail when revision controller is missing");
+
+	imtdoc::IDocumentService::TaskResult result = m_managerPtr->WaitForTaskFinished(taskId);
+	QCOMPARE(result.status, imtdoc::IDocumentService::OS_FAILED);
+	QVERIFY2(result.documentId.isEmpty(), "OpenDocument should fail without revision controller");
+}
+
+
+void CCollectionDocumentServiceTest::OpenDocumentWithUnknownRevisionFailsTest()
+{
+	m_managerPtr->GetMockCollection().AddObject(
+		TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME,
+		istd::IChangeableSharedPtr(new CMockDocumentObject("currentData")));
+	m_managerPtr->GetMockCollection().SetRevisionControllerEnabled(true);
+	m_managerPtr->GetMockCollection().AddRevisionData(
+		TEST_OBJECT_ID,
+		2,
+		istd::IChangeableSharedPtr(new CMockDocumentObject("revision2Data")));
+
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.url = QUrl("collection:///" + QString(TEST_OBJECT_ID) + "/5");
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, params);
+	QVERIFY2(!taskId.isEmpty(), "BeginDocumentTask should start and fail for unknown revision");
+
+	imtdoc::IDocumentService::TaskResult result = m_managerPtr->WaitForTaskFinished(taskId);
+	QCOMPARE(result.status, imtdoc::IDocumentService::OS_FAILED);
+	QVERIFY2(result.documentId.isEmpty(), "OpenDocument should fail for unknown revision");
+}
+
+
+void CCollectionDocumentServiceTest::OpenDocumentWithRevisionLoadsRevisionDataTest()
+{
+	m_managerPtr->GetMockCollection().AddObject(
+		TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME,
+		istd::IChangeableSharedPtr(new CMockDocumentObject("currentData")));
+	m_managerPtr->GetMockCollection().SetRevisionControllerEnabled(true);
+	m_managerPtr->GetMockCollection().AddRevisionData(
+		TEST_OBJECT_ID,
+		4,
+		istd::IChangeableSharedPtr(new CMockDocumentObject("revision4Data")));
+
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.url = QUrl("collection:///" + QString(TEST_OBJECT_ID) + "/4");
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, params);
+	QVERIFY2(!taskId.isEmpty(), "BeginDocumentTask should start with revision URL");
+
+	imtdoc::IDocumentService::TaskResult result = m_managerPtr->WaitForTaskFinished(taskId);
+	QVERIFY2(!result.documentId.isEmpty(), "OpenDocument should succeed with available revision");
+
+	QTRY_VERIFY_WITH_TIMEOUT(([this, &result]() {
+		const istd::IChangeable* ptr = m_managerPtr->GetDocumentPtr(TEST_USER_ID, result.documentId);
+		return ptr != nullptr;
+	}()), 1000);
+
+	const istd::IChangeable* ptr = m_managerPtr->GetDocumentPtr(TEST_USER_ID, result.documentId);
+	QVERIFY2(ptr != nullptr, "Document pointer should be available after revision load");
+
+	const CMockDocumentObject* mockPtr = dynamic_cast<const CMockDocumentObject*>(ptr);
+	QVERIFY2(mockPtr != nullptr, "Loaded document should be CMockDocumentObject");
+	QCOMPARE(mockPtr->GetData(), QByteArray("revision4Data"));
+}
+
+
 void CCollectionDocumentServiceTest::OpenDocumentWithoutSingleInstanceModeFailsWhenSingleInstanceAlreadyOpenedTest()
 {
 	m_managerPtr->GetMockCollection().AddObject(
@@ -977,6 +1090,7 @@ void CCollectionDocumentServiceTest::SaveDocumentSaveAsUpdatesUrlTest()
 		m_managerPtr->m_userDocuments[TEST_USER_ID][docId].url = QUrl("collection:///" + TEST_OBJECT_ID);
 	}
 
+
 	// Saving under another name stores a copy as a new object
 	imtdoc::IDocumentService::TaskParams params;
 	params.userId = TEST_USER_ID;
@@ -1000,6 +1114,33 @@ void CCollectionDocumentServiceTest::SaveDocumentSaveAsUpdatesUrlTest()
 		}
 	}
 	QVERIFY(found);
+}
+
+
+void CCollectionDocumentServiceTest::SaveDocumentRevisionUrlDropsRevisionTest()
+{
+	m_managerPtr->GetMockCollection().AddObject(
+		TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME,
+		istd::IChangeableSharedPtr(new CMockDocumentObject()));
+
+	QByteArray docId = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID, TEST_TYPE_ID, TEST_OBJECT_ID, TEST_DOC_NAME);
+	{
+		QMutexLocker locker(&m_managerPtr->m_mutex);
+		m_managerPtr->m_userDocuments[TEST_USER_ID][docId].url = QUrl("collection:///" + TEST_OBJECT_ID + "/4");
+	}
+
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.documentId = docId;
+	params.documentName = TEST_DOC_NAME;
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_SAVE, params);
+	const imtdoc::IDocumentService::TaskResult result = m_managerPtr->WaitForTaskFinished(taskId);
+	QCOMPARE(result.status, imtdoc::IDocumentService::OS_OK);
+
+	const auto documents = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID);
+	QCOMPARE(documents.count(), 1);
+	QCOMPARE(documents.first().url, QUrl("collection:///" + TEST_OBJECT_ID));
 }
 
 
@@ -1863,6 +2004,146 @@ void CCollectionDocumentServiceTest::SingleCopySetDocumentNameUpdatesAllTest()
 	m_managerPtr->GetDocumentName(TEST_USER_ID_2, docId2, name2);
 	QCOMPARE(name1, newName);
 	QCOMPARE(name2, newName);
+}
+
+
+void CCollectionDocumentServiceTest::SingleCopyRevisionOpenedBeforeCurrentIsIsolatedTest()
+{
+	m_managerPtr->SetSingleCopyMode(true);
+	m_managerPtr->GetMockCollection().AddObject(
+		TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME,
+		istd::IChangeableSharedPtr(new CMockDocumentObject("currentData")));
+	m_managerPtr->GetMockCollection().SetRevisionControllerEnabled(true);
+	m_managerPtr->GetMockCollection().AddRevisionData(
+		TEST_OBJECT_ID,
+		4,
+		istd::IChangeableSharedPtr(new CMockDocumentObject("revisionData")));
+
+	QByteArray revisionDocId = OpenDocumentUrlAndWaitForLoad(
+		*m_managerPtr,
+		TEST_USER_ID,
+		QUrl("collection:///" + TEST_OBJECT_ID + "/4"),
+		true);
+	QVERIFY(!revisionDocId.isEmpty());
+
+	QByteArray currentDocId = OpenDocumentUrlAndWaitForLoad(
+		*m_managerPtr,
+		TEST_USER_ID,
+		QUrl("collection:///" + TEST_OBJECT_ID),
+		true);
+	QVERIFY(!currentDocId.isEmpty());
+
+	const auto* revisionDocument = dynamic_cast<const CMockDocumentObject*>(
+		m_managerPtr->GetDocumentPtr(TEST_USER_ID, revisionDocId));
+	const auto* currentDocument = dynamic_cast<const CMockDocumentObject*>(
+		m_managerPtr->GetDocumentPtr(TEST_USER_ID, currentDocId));
+	QVERIFY(revisionDocument != nullptr);
+	QVERIFY(currentDocument != nullptr);
+	QVERIFY(revisionDocument != currentDocument);
+	QCOMPARE(revisionDocument->GetData(), QByteArray("revisionData"));
+	QCOMPARE(currentDocument->GetData(), QByteArray("currentData"));
+
+	CMockDocumentObject changedRevision("changedRevision");
+	QCOMPARE(m_managerPtr->SetDocumentData(TEST_USER_ID, revisionDocId, changedRevision), imtdoc::IDocumentService::OS_OK);
+
+	m_managerPtr->GetMockEventHandler().ClearEvents();
+	imtdoc::IDocumentService::TaskParams saveParams;
+	saveParams.userId = TEST_USER_ID;
+	saveParams.documentId = revisionDocId;
+	QByteArray saveTaskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_SAVE, saveParams);
+	QCOMPARE(m_managerPtr->WaitForTaskFinished(saveTaskId).status, imtdoc::IDocumentService::OS_OK);
+	QCOMPARE(m_managerPtr->GetMockEventHandler().CountEventsOfType("DocumentSavedEvent"), 1);
+
+	QCOMPARE(currentDocument->GetData(), QByteArray("currentData"));
+}
+
+
+void CCollectionDocumentServiceTest::SingleCopyClosingRevisionKeepsCurrentSharedTest()
+{
+	m_managerPtr->SetSingleCopyMode(true);
+	m_managerPtr->GetMockCollection().AddObject(
+		TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME,
+		istd::IChangeableSharedPtr(new CMockDocumentObject("currentData")));
+	m_managerPtr->GetMockCollection().SetRevisionControllerEnabled(true);
+	m_managerPtr->GetMockCollection().AddRevisionData(
+		TEST_OBJECT_ID,
+		4,
+		istd::IChangeableSharedPtr(new CMockDocumentObject("revisionData")));
+
+	QByteArray currentDocId = OpenDocumentUrlAndWaitForLoad(
+		*m_managerPtr,
+		TEST_USER_ID,
+		QUrl("collection:///" + TEST_OBJECT_ID),
+		true);
+	QVERIFY(!currentDocId.isEmpty());
+	QByteArray revisionDocId = OpenDocumentUrlAndWaitForLoad(
+		*m_managerPtr,
+		TEST_USER_ID,
+		QUrl("collection:///" + TEST_OBJECT_ID + "/4"),
+		true);
+	QVERIFY(!revisionDocId.isEmpty());
+
+	const istd::IChangeable* currentDocument = m_managerPtr->GetDocumentPtr(TEST_USER_ID, currentDocId);
+	const istd::IChangeable* revisionDocument = m_managerPtr->GetDocumentPtr(TEST_USER_ID, revisionDocId);
+	QVERIFY(currentDocument != nullptr);
+	QVERIFY(revisionDocument != nullptr);
+	QVERIFY(currentDocument != revisionDocument);
+
+	imtdoc::IDocumentService::TaskParams saveParams;
+	saveParams.userId = TEST_USER_ID;
+	saveParams.documentId = revisionDocId;
+	saveParams.documentName = QStringLiteral("Revision copy");
+	QByteArray saveTaskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_SAVE, saveParams);
+	QCOMPARE(m_managerPtr->WaitForTaskFinished(saveTaskId).status, imtdoc::IDocumentService::OS_OK);
+
+	QVERIFY(m_managerPtr->m_sharedDocuments.contains(TEST_OBJECT_ID));
+	QCOMPARE(m_managerPtr->m_sharedDocuments[TEST_OBJECT_ID].refCount, 1);
+	QVERIFY(m_managerPtr->GetDocumentPtr(TEST_USER_ID, currentDocId) != nullptr);
+
+	imtdoc::IDocumentService::TaskParams closeParams;
+	closeParams.userId = TEST_USER_ID;
+	closeParams.documentId = revisionDocId;
+	QByteArray closeTaskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_CLOSE, closeParams);
+	QCOMPARE(m_managerPtr->WaitForTaskFinished(closeTaskId).status, imtdoc::IDocumentService::OS_OK);
+
+	QVERIFY(m_managerPtr->m_sharedDocuments.contains(TEST_OBJECT_ID));
+	QCOMPARE(m_managerPtr->m_sharedDocuments[TEST_OBJECT_ID].refCount, 1);
+	QVERIFY(m_managerPtr->GetDocumentPtr(TEST_USER_ID, currentDocId) != nullptr);
+}
+
+
+void CCollectionDocumentServiceTest::SingleCopyFailedCurrentLoadDoesNotCloseRevisionTest()
+{
+	m_managerPtr->SetSingleCopyMode(true);
+	m_managerPtr->GetMockCollection().AddObject(
+		TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME,
+		istd::IChangeableSharedPtr(new CMockDocumentObject("currentData")));
+	m_managerPtr->GetMockCollection().SetRevisionControllerEnabled(true);
+	m_managerPtr->GetMockCollection().AddRevisionData(
+		TEST_OBJECT_ID,
+		4,
+		istd::IChangeableSharedPtr(new CMockDocumentObject("revisionData")));
+
+	QByteArray revisionDocId = OpenDocumentUrlAndWaitForLoad(
+		*m_managerPtr,
+		TEST_USER_ID,
+		QUrl("collection:///" + TEST_OBJECT_ID + "/4"));
+	QVERIFY(!revisionDocId.isEmpty());
+
+	m_managerPtr->GetMockCollection().SetGetObjectDataShouldFail(true);
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID_2;
+	params.url = QUrl("collection:///" + TEST_OBJECT_ID);
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, params);
+	const auto result = m_managerPtr->WaitForTaskFinished(taskId);
+	QCOMPARE(result.status, imtdoc::IDocumentService::OS_OK);
+	QVERIFY(!result.documentId.isEmpty());
+
+	QTRY_VERIFY_WITH_TIMEOUT(m_managerPtr->GetOpenedDocumentList(TEST_USER_ID_2).isEmpty(), 1000);
+	const auto* revisionDocument = dynamic_cast<const CMockDocumentObject*>(
+		m_managerPtr->GetDocumentPtr(TEST_USER_ID, revisionDocId));
+	QVERIFY(revisionDocument != nullptr);
+	QCOMPARE(revisionDocument->GetData(), QByteArray("revisionData"));
 }
 
 

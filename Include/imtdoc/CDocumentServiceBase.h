@@ -247,6 +247,7 @@ protected:
 		bool isDirty;                              ///< \c true when there are unsaved changes.
 		bool isLoading = false;                    ///< \c true while the background load is in progress.
 		bool singleDocumentInstance = false;       ///< \c true when the document was opened with \c TaskParams::singleDocumentInstance.
+		bool isShared = false;                     ///< \c true when this document belongs to a single-copy shared entry.
 		int undoManagerModelId = -1;               ///< Model registration ID in \c UndoManagerObserver.
 	};
 
@@ -305,7 +306,7 @@ protected:
 
 	typedef QPair<QByteArray, QByteArray> UserDocumentPair;
 	typedef QList<UserDocumentPair> UserDocumentPairList;
-	UserDocumentPairList FindDocumentsByObjectId(const QByteArray& objectId) const;
+	UserDocumentPairList FindSharedDocumentsByObjectId(const QByteArray& objectId) const;
 
 	typedef QMap<QByteArray, WorkingDocument> WorkingDocumentList;
 	mutable QMap<QByteArray, WorkingDocumentList> m_userDocuments; ///< Two-level map: userId → documentId → WorkingDocument.

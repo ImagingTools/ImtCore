@@ -457,7 +457,7 @@ IDocumentService::OperationStatus CDocumentServiceBase::CloseDocumentInternal(
 
 		bool isLastSharedUser = true;
 		bool isUndoObserverUnregistered = false;
-		if (IsSingleCopyMode() && !workingDocumentPtr->objectId.isEmpty()
+		if (workingDocumentPtr->isShared && IsSingleCopyMode() && !workingDocumentPtr->objectId.isEmpty()
 			&& m_sharedDocuments.contains(workingDocumentPtr->objectId)){
 			SharedDocumentData& shared = m_sharedDocuments[workingDocumentPtr->objectId];
 			shared.refCount--;
@@ -949,7 +949,7 @@ void CDocumentServiceBase::OnUndoManagerChanged(int modelId)
 			}
 
 			if (!sharedObjectId.isEmpty()){
-				docs = FindDocumentsByObjectId(sharedObjectId);
+				docs = FindSharedDocumentsByObjectId(sharedObjectId);
 			}
 		}
 
@@ -1120,14 +1120,14 @@ bool CDocumentServiceBase::IsSingleCopyMode() const
 }
 
 
-CDocumentServiceBase::UserDocumentPairList CDocumentServiceBase::FindDocumentsByObjectId(
+CDocumentServiceBase::UserDocumentPairList CDocumentServiceBase::FindSharedDocumentsByObjectId(
 	const QByteArray& objectId) const
 {
 	UserDocumentPairList result;
 
 	for (auto userIt = m_userDocuments.constBegin(); userIt != m_userDocuments.constEnd(); ++userIt){
 		for (auto docIt = userIt.value().constBegin(); docIt != userIt.value().constEnd(); ++docIt){
-			if (docIt.value().objectId == objectId){
+			if (docIt.value().objectId == objectId && docIt.value().isShared){
 				result.append(qMakePair(userIt.key(), docIt.key()));
 			}
 		}

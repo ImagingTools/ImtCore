@@ -18,6 +18,7 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
+#include <imtbase/IRevisionController.h>
 #include <imtdoc/CDocumentServiceBase.h>
 #include <imtdoc/CDocumentClosedEvent.h>
 #include <imtdoc/CDocumentOpenedEvent.h>
@@ -114,6 +115,7 @@ private:
 	void OnOpenDocumentThreadStarted(
 				const std::weak_ptr<std::atomic<bool>>& aliveGuard,
 				bool singleCopyMode,
+				int requestedRevision,
 				const QByteArray& objectId,
 				const QByteArray& userId,
 				const QByteArray& documentId,
@@ -169,6 +171,7 @@ template<class Base>
 inline void TCollectionDocumentServiceWrap<Base>::OnOpenDocumentThreadStarted(
 			const std::weak_ptr<std::atomic<bool>>& aliveGuard,
 			bool singleCopyMode,
+			int requestedRevision,
 			const QByteArray& objectId,
 			const QByteArray& userId,
 			const QByteArray& documentId,
@@ -188,7 +191,7 @@ inline void TCollectionDocumentServiceWrap<Base>::OnOpenDocumentThreadStarted(
 			QMutexLocker locker(&this->m_mutex);
 			if (singleCopyMode && this->m_sharedDocuments.contains(objectId)){
 				this->m_sharedDocuments[objectId].isLoading = false;
-				docsToClose = this->FindDocumentsByObjectId(objectId);
+				docsToClose = this->FindSharedDocumentsByObjectId(objectId);
 			}
 			else{
 				docsToClose.append(qMakePair(userId, documentId));
@@ -203,7 +206,16 @@ inline void TCollectionDocumentServiceWrap<Base>::OnOpenDocumentThreadStarted(
 	}
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
-	bool success = collPtr->GetObjectData(objectId, dataPtr);
+	bool success = false;
+	if (requestedRevision >= 0){
+		const imtbase::IRevisionController* revisionControllerPtr = collPtr->GetRevisionController();
+		idoc::MetaInfoPtr dataMetaInfoPtr;
+		success = revisionControllerPtr != nullptr
+				&& revisionControllerPtr->GetRevisionData(*collPtr, objectId, requestedRevision, dataPtr, dataMetaInfoPtr);
+	}
+	else{
+		success = collPtr->GetObjectData(objectId, dataPtr);
+	}
 	isAlive = aliveGuard.lock();
 	if (!isAlive || !isAlive->load()){
 		worker->deleteLater();
@@ -220,7 +232,7 @@ inline void TCollectionDocumentServiceWrap<Base>::OnOpenDocumentThreadStarted(
 					this->m_sharedDocuments[objectId].objectPtr = dataPtr;
 				}
 
-				UserDocumentPairList docs = this->FindDocumentsByObjectId(objectId);
+				UserDocumentPairList docs = this->FindSharedDocumentsByObjectId(objectId);
 				for (const UserDocumentPair& pair : docs){
 					WorkingDocument* dp = this->FindDocument(pair.first, pair.second);
 					if (dp != nullptr){
@@ -233,7 +245,7 @@ inline void TCollectionDocumentServiceWrap<Base>::OnOpenDocumentThreadStarted(
 					this->m_sharedDocuments[objectId].isLoading = false;
 				}
 
-				UserDocumentPairList docs = this->FindDocumentsByObjectId(objectId);
+				UserDocumentPairList docs = this->FindSharedDocumentsByObjectId(objectId);
 				for (const UserDocumentPair& pair : docs){
 					WorkingDocument* dp = this->FindDocument(pair.first, pair.second);
 					if (dp != nullptr){
@@ -286,7 +298,7 @@ inline void TCollectionDocumentServiceWrap<Base>::OnOpenDocumentThreadFinished(
 					shared.isLoading = false;
 
 					bool observersInitialized = false;
-					UserDocumentPairList docs = this->FindDocumentsByObjectId(objectId);
+					UserDocumentPairList docs = this->FindSharedDocumentsByObjectId(objectId);
 					for (const UserDocumentPair& pair : docs){
 						WorkingDocument* dp = this->FindDocument(pair.first, pair.second);
 						if (dp != nullptr && dp->isLoading){
@@ -392,20 +404,51 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 	const QUrl& url = params.url;
 	const QByteArray& userId = params.userId;
 
-	if (url.scheme() != "collection" || !url.host().isEmpty()){
+	if (url.scheme() != "collection"){
+		this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("Invalid URL scheme")});
+		return;
+	}
+	if (!url.host().isEmpty()){
 		this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("Invalid URL scheme")});
 		return;
 	}
 
-	QString path = url.path();
-
-	QStringList parts = path.split('/', Qt::SkipEmptyParts);
-	if (parts.count() != 1){
+	QString objectIdString;
+	QString revisionPart;
+	QStringList pathParts = url.path().split('/', Qt::SkipEmptyParts);
+	if (pathParts.count() < 1 || pathParts.count() > 2){
 		this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("Invalid URL path")});
 		return;
 	}
 
-	QByteArray objectId = parts.first().toUtf8();
+	objectIdString = pathParts.first();
+	if (pathParts.count() == 2){
+		revisionPart = pathParts.last();
+	}
+
+	if (objectIdString.isEmpty()){
+		this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("Invalid URL path")});
+		return;
+	}
+
+	int requestedRevision = -1;
+	if (!revisionPart.isEmpty()){
+		for (QChar symbol : revisionPart){
+			if (!symbol.isDigit()){
+				this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("Invalid revision number")});
+				return;
+			}
+		}
+
+		bool conversionOk = false;
+		requestedRevision = revisionPart.toInt(&conversionOk);
+		if (!conversionOk){
+			this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("Invalid revision number")});
+			return;
+		}
+	}
+
+	QByteArray objectId = objectIdString.toUtf8();
 	QByteArray documentId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
 	// Single-instance constraints (per user/object):
@@ -418,7 +461,9 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 		if (userDocsIt != this->m_userDocuments.constEnd()){
 			const WorkingDocumentList& userDocuments = userDocsIt.value();
 			for (auto it = userDocuments.constBegin(); it != userDocuments.constEnd(); ++it){
-				if (it.value().objectId != objectId){
+				const QStringList openedPathParts = it.value().url.path().split('/', Qt::SkipEmptyParts);
+				const int openedRevision = openedPathParts.count() == 2 ? openedPathParts.last().toInt() : -1;
+				if (it.value().objectId != objectId || openedRevision != requestedRevision){
 					continue;
 				}
 
@@ -458,8 +503,32 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 		return;
 	}
 
+	if (requestedRevision >= 0){
+		const imtbase::IRevisionController* revisionControllerPtr = collectionPtr->GetRevisionController();
+		if (revisionControllerPtr == nullptr){
+			this->ClearReservedOpen(userId, documentId);
+			this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("Revision controller is not available")});
+			return;
+		}
+
+		const imtbase::IRevisionController::RevisionInfoList revisionInfoList = revisionControllerPtr->GetRevisionInfoList(*collectionPtr, objectId);
+		bool hasRequestedRevisionInList = false;
+		for (const imtbase::IRevisionController::RevisionInfo& revisionInfo : revisionInfoList){
+			if (revisionInfo.revision == requestedRevision){
+				hasRequestedRevisionInList = true;
+				break;
+			}
+		}
+
+		if (!hasRequestedRevisionInList){
+			this->ClearReservedOpen(userId, documentId);
+			this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("Unknown object revision")});
+			return;
+		}
+	}
+
 	// Single-copy mode: check if this object is already opened by any user
-	if (this->IsSingleCopyMode()){
+	if (this->IsSingleCopyMode() && requestedRevision < 0){
 		bool isSharedDocument = false;
 		QByteArray sharedTypeId;
 		QString sharedName;
@@ -499,6 +568,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 					doc.isDirty = docIsDirty;
 					doc.isLoading = shared.isLoading;
 					doc.singleDocumentInstance = params.singleDocumentInstance;
+					doc.isShared = true;
 					doc.undoManagerModelId = -1;
 				}
 			}
@@ -564,13 +634,14 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 		doc.isLoading = true;
 		doc.singleDocumentInstance = params.singleDocumentInstance;
 
-		if (this->IsSingleCopyMode()){
+		if (this->IsSingleCopyMode() && requestedRevision < 0){
 			SharedDocumentData& shared = this->m_sharedDocuments[objectId];
 			shared.typeId = objectTypeId;
 			shared.name = documentName;
 			shared.undoManagerPtr = undoManagerPtr;
 			shared.refCount = 1;
 			shared.isLoading = true;
+			doc.isShared = true;
 		}
 	}
 
@@ -600,13 +671,13 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 		this->m_workerThreads.append(QPointer<QThread>(thread));
 	}
 
-	bool singleCopyMode = this->IsSingleCopyMode();
+	bool singleCopyMode = this->IsSingleCopyMode() && requestedRevision < 0;
 	std::weak_ptr<std::atomic<bool>> aliveGuard(this->m_isAlive);
 	QObject::connect(
 		thread,
 		&QThread::started,
 		worker,
-		[this, aliveGuard, singleCopyMode, objectId, userId, documentId, worker](){
+		[this, aliveGuard, singleCopyMode, requestedRevision, objectId, userId, documentId, worker](){
 			auto isAlive = aliveGuard.lock();
 			if (!isAlive || !isAlive->load()){
 				worker->deleteLater();
@@ -616,6 +687,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 			this->OnOpenDocumentThreadStarted(
 						aliveGuard,
 						singleCopyMode,
+						requestedRevision,
 						objectId,
 						userId,
 						documentId,
@@ -658,6 +730,7 @@ TCollectionDocumentServiceWrap<Base>::SetDocumentName(
 	QByteArray objectId;
 	QByteArray typeId;
 	bool isDirty = false;
+	bool isShared = false;
 
 	{
 		QMutexLocker locker(&this->m_mutex);
@@ -676,6 +749,7 @@ TCollectionDocumentServiceWrap<Base>::SetDocumentName(
 		objectId = workingDocumentPtr->objectId;
 		typeId = workingDocumentPtr->typeId;
 		isDirty = workingDocumentPtr->isDirty;
+		isShared = workingDocumentPtr->isShared;
 	}
 
 	if (!objectId.isEmpty()){
@@ -692,14 +766,14 @@ TCollectionDocumentServiceWrap<Base>::SetDocumentName(
 	istd::CChangeNotifier notifier(this);
 
 	// Shared docs: rename and notify each user sharing this object
-	if (this->IsSingleCopyMode() && !objectId.isEmpty()){
+	if (this->IsSingleCopyMode() && isShared && !objectId.isEmpty()){
 		UserDocumentPairList sharedDocs;
 		{
 			QMutexLocker locker(&this->m_mutex);
 			if (this->m_sharedDocuments.contains(objectId)){
 				this->m_sharedDocuments[objectId].name = documentName;
 			}
-			sharedDocs = this->FindDocumentsByObjectId(objectId);
+			sharedDocs = this->FindSharedDocumentsByObjectId(objectId);
 		}
 
 		for (const UserDocumentPair& pair : sharedDocs){
@@ -856,7 +930,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 			}
 
 			// In single-copy mode, detach from shared document before changing objectId
-			if (this->IsSingleCopyMode() && this->m_sharedDocuments.contains(oldObjectId)){
+			if (this->IsSingleCopyMode() && workingDocumentPtr->isShared && this->m_sharedDocuments.contains(oldObjectId)){
 				SharedDocumentData& shared = this->m_sharedDocuments[oldObjectId];
 				shared.refCount--;
 				bool isLastUser = (shared.refCount <= 0);
@@ -878,6 +952,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 
 				workingDocumentPtr->objectPtr = newObjectPtr;
 				workingDocumentPtr->undoManagerPtr = newUndoManagerPtr;
+				workingDocumentPtr->isShared = false;
 
 				this->InitializeDocumentObservers(*workingDocumentPtr, userId, documentId);
 			}
@@ -920,6 +995,8 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 		bool res = collectionPtr->SetObjectData(workingDocumentPtr->objectId, *documentSnapshotPtr, istd::IChangeable::CM_WITHOUT_REFS, params.operationContextPtr);
 
 		if (res){
+			workingDocumentPtr->url = this->ObjectIdToUrl(workingDocumentPtr->objectId);
+
 			QString updatedName;
 			if (this->HasDocumentNameProvider(workingDocumentPtr->typeId)){
 				updatedName = this->GetDefaultDocumentName(*workingDocumentPtr);
@@ -930,7 +1007,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 
 			istd::CChangeNotifier notifier(this);
 
-			if (this->IsSingleCopyMode() && !workingDocumentPtr->objectId.isEmpty()){
+			if (this->IsSingleCopyMode() && workingDocumentPtr->isShared && !workingDocumentPtr->objectId.isEmpty()){
 				// Update all users sharing this document
 				QByteArray sharedObjectId = workingDocumentPtr->objectId;
 
@@ -938,7 +1015,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 					this->m_sharedDocuments[sharedObjectId].name = updatedName;
 				}
 
-				UserDocumentPairList docs = this->FindDocumentsByObjectId(sharedObjectId);
+				UserDocumentPairList docs = this->FindSharedDocumentsByObjectId(sharedObjectId);
 				for (const UserDocumentPair& pair : docs){
 					WorkingDocument* dp = this->FindDocument(pair.first, pair.second);
 					if (dp == nullptr){
@@ -1069,6 +1146,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 				shared.undoManagerModelId = workingDocumentPtr->undoManagerModelId;
 
 				this->m_sharedDocuments[savedObjectId] = shared;
+				workingDocumentPtr->isShared = true;
 			}
 		}
 
