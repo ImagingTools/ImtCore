@@ -80,7 +80,7 @@ endmacro()
 
 
 macro(ImtCoreGetStaticCppDeps)
-	set(booleanArgs)
+	set(booleanArgs NO_OBJECTS)
 	set(oneValueArgs INPUT OUT_DIR RESULT_VARIABLE)
 	set(multiValueArgs)
 	cmake_parse_arguments(ARG "${booleanArgs}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
@@ -90,6 +90,10 @@ macro(ImtCoreGetStaticCppDeps)
 	list(APPEND SDL_DEPS_VAR "${ARG_OUT_DIR}/${PROJECT_NAME}/SDL/${ARG_VERSION}/CPP/${SDL_SCHEMA_NAME}.h")
 	list(APPEND SDL_DEPS_VAR "${ARG_OUT_DIR}/${PROJECT_NAME}/SDL/${ARG_VERSION}/CPP/${SDL_SCHEMA_NAME}_fwd.h")
 	list(APPEND SDL_DEPS_VAR "${ARG_OUT_DIR}/${PROJECT_NAME}/SDL/${ARG_VERSION}/CPP/${SDL_SCHEMA_NAME}.cpp")
+	if (NOT ARG_NO_OBJECTS)
+		list(APPEND SDL_DEPS_VAR "${ARG_OUT_DIR}/${PROJECT_NAME}/SDL/${ARG_VERSION}/CPP/${SDL_SCHEMA_NAME}Objects.h")
+		list(APPEND SDL_DEPS_VAR "${ARG_OUT_DIR}/${PROJECT_NAME}/SDL/${ARG_VERSION}/CPP/${SDL_SCHEMA_NAME}Objects.cpp")
+	endif()
 
 	set(${ARG_RESULT_VARIABLE} ${SDL_DEPS_VAR})
 	message(VERBOSE "static CXX deps for schema: ${ARG_INPUT}: ${SDL_DEPS_VAR}")
@@ -160,6 +164,8 @@ endfunction()
 
 
 macro (ImtCoreCustomConfigureSdlCpp)
+	set(booleanArgs
+				NO_OBJECTS)
 	set(oneValueArgs
 				SCHEMA_PATH
 				VERSION
@@ -167,7 +173,7 @@ macro (ImtCoreCustomConfigureSdlCpp)
 				EXTRA_DEPS
 				FOUND_DEPS
 				CUSTOM_OUTPUT_ROOT_DIR_PATH)
-	cmake_parse_arguments(ARG "" "${oneValueArgs}" "" ${ARGN})
+	cmake_parse_arguments(ARG "${booleanArgs}" "${oneValueArgs}" "" ${ARGN})
 
 	get_filename_component(SCHEMA_NAME "${ARG_SCHEMA_PATH}" NAME_WE)
 
@@ -184,6 +190,11 @@ macro (ImtCoreCustomConfigureSdlCpp)
 	list(APPEND CUSTOM_MODIFICATORS "--config=${IMT_CONFIG_CMAKE_PATH}/SDL/CommonCXX.cfg") ##< Use config file
 	list(APPEND CUSTOM_MODIFICATORS "--generator=DEPFILE:${DEP_FILE_PATH}") ##< use depfile
 	list(APPEND CUSTOM_MODIFICATORS "--CPP")
+	set(SDL_STATIC_DEPS_ARGS)
+	if (ARG_NO_OBJECTS)
+		list(APPEND CUSTOM_MODIFICATORS "--no-objects") ##< do not generate the '<Schema>Objects' files (QObject based classes and QML types registration)
+		list(APPEND SDL_STATIC_DEPS_ARGS NO_OBJECTS)
+	endif()
 
 	list(LENGTH GLOBAL_SDL_SEARCH_PATHS SDL_PATHS_COUNT)
 	if (SDL_PATHS_COUNT GREATER 0)
@@ -206,6 +217,7 @@ macro (ImtCoreCustomConfigureSdlCpp)
 			"${SDL_OUTPUT_ROOT_DIRECTORY}"
 		RESULT_VARIABLE
 			FOUND_DEPS
+		${SDL_STATIC_DEPS_ARGS}
 	)
 
 	set(${ARG_FOUND_DEPS} "${FOUND_DEPS}")
