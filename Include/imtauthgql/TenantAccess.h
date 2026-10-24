@@ -87,6 +87,12 @@ bool CheckTenantPermissionsChange(
 			const QByteArray& contextUserId,
 			QString& errorMessage);
 
+/**
+	Narrow the scopes of all sub-organizations to the stored scope of the organization.
+	Call it after every save of a stored organization: it writes only the scopes that change, so a retry completes a cascade that failed earlier.
+*/
+bool NarrowSubOrganizationPermissions(imtauth::ITenantManager& tenantManager, const QByteArray& tenantId, QString& errorMessage);
+
 
 } // namespace imtauthgql
 

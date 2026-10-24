@@ -196,5 +196,17 @@ bool CheckTenantPermissionsChange(
 }
 
 
+bool NarrowSubOrganizationPermissions(imtauth::ITenantManager& tenantManager, const QByteArray& tenantId, QString& errorMessage)
+{
+	imtauth::ITenantInfoUniquePtr tenantPtr = tenantManager.GetTenant(tenantId);
+	if (!tenantPtr.IsValid() || !tenantManager.SetTenantPermissions(tenantId, tenantPtr->GetTenantPermissions())){
+		errorMessage = QStringLiteral("The organization was saved, but the permissions of its sub-organizations could not be narrowed. Save the organization again to retry.");
+		return false;
+	}
+
+	return true;
+}
+
+
 } // namespace imtauthgql
 

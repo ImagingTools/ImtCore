@@ -630,11 +630,8 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceCom
 
 		// The stored scope is already the new one, so only the sub-organizations are narrowed here.
 		// This also runs when the scope is unchanged, so retrying the save completes a cascade that failed earlier.
-		if (tenantData.tenantPermissions && m_tenantManagerCompPtr.IsValid()){
-			if (!m_tenantManagerCompPtr->SetTenantPermissions(tenantId, tenantPtr->GetTenantPermissions())){
-				errorMessage = QStringLiteral("The organization was saved, but the permissions of its sub-organizations could not be narrowed. Save the organization again to retry.");
-				return response;
-			}
+		if (m_tenantManagerCompPtr.IsValid() && !NarrowSubOrganizationPermissions(*m_tenantManagerCompPtr, tenantId, errorMessage)){
+			return response;
 		}
 	}
 

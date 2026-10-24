@@ -3,6 +3,7 @@
 
 
 // ImtCore includes
+#include <imtauth/ITenantManager.h>
 #include <imtservergql/CCollectionDocumentServiceControllerComp.h>
 
 
@@ -28,6 +29,7 @@ public:
 	typedef imtservergql::CCollectionDocumentServiceControllerComp BaseClass;
 
 	I_BEGIN_COMPONENT(CTenantCollectionDocumentServiceControllerComp);
+		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager, narrows the sub-organizations to the scope of a saved organization", false, "TenantManager");
 	I_END_COMPONENT;
 
 protected:
@@ -48,6 +50,9 @@ protected:
 		const sdl::V1_0::imtbase::CSaveDocumentGqlRequest& saveDocumentRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
+
+private:
+	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
 };
 
 
