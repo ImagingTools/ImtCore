@@ -42,6 +42,9 @@ QFuture<IAsyncGqlClient::GqlResult> CAsyncApiClientComp::SendRequest(
 			GqlRequestPtr requestPtr,
 			imtbase::IUrlParam* urlParamPtr) const
 {
+	// After OnComponentDestroyed() the network manager is gone; a caller still sending is a bug in the caller.
+	Q_ASSERT(IsComponentActive());
+
 	auto FailFast = [this](ErrorCategory category, const QString& message) {
 		SendErrorMessage(0, message);
 		return QtFuture::makeReadyValueFuture(GqlResult{GqlResponsePtr(), category, message});
