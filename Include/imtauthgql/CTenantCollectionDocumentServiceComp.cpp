@@ -8,6 +8,8 @@
 #include <QSet>
 
 // ImtCore includes
+#include <imtbase/COperationContext.h>
+#include <imtauth/CUserInfo.h>
 #include <imtauth/ITenantInfo.h>
 #include <imtauth/IUserManager.h>
 #include <imtgql/IGqlContext.h>
@@ -601,9 +603,24 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceCom
 	// For new tenants do NOT auto-save — user will save manually.
 	// For existing tenants, save immediately after each change (like tickets).
 	if (!tenantId.isEmpty()){
+		// The validator takes the initiating user from the operation context, it lives until the save task is finished.
+		imtbase::COperationContext operationContext;
+		if (gqlContextPtr != nullptr){
+			const imtauth::CIdentifiableUserInfo* contextIdentifiableUserInfoPtr = dynamic_cast<const imtauth::CIdentifiableUserInfo*>(gqlContextPtr->GetUserInfo());
+			if (contextIdentifiableUserInfoPtr != nullptr){
+				imtbase::IOperationContext::IdentifableObjectInfo ownerInfo;
+				ownerInfo.id = contextIdentifiableUserInfoPtr->GetObjectUuid();
+				ownerInfo.name = contextIdentifiableUserInfoPtr->GetName();
+				operationContext.SetOperationOwnerId(ownerInfo);
+			}
+
+			operationContext.SetTenantId(contextTenantId);
+		}
+
 		imtdoc::IDocumentService::TaskParams saveParams;
 		saveParams.userId = userLogin;
 		saveParams.documentId = documentId;
+		saveParams.operationContextPtr = gqlContextPtr != nullptr ? &operationContext : nullptr;
 		QByteArray saveTaskId = m_documentManagerCompPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_SAVE, saveParams);
 		const imtdoc::IDocumentService::TaskResult saveResult = m_documentManagerCompPtr->WaitForTaskFinished(saveTaskId);
 		if (saveResult.status != imtdoc::IDocumentService::OS_OK){
