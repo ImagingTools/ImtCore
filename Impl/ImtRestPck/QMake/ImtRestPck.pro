@@ -6,6 +6,7 @@ include($$PWD/../../../Config/QMake/ImtCore.pri)
 
 CONFIG += network websockets
 QT += websockets
+qtHaveModule(httpserver): QT += httpserver
 
 LIBS += -L../../../Lib/$$COMPILER_DIR -limtbase -limtrest -limtrepo -limtcom -limtbasesdl -limtgql
 LIBS += -L$$(ACFSLNDIR)/Lib/$$COMPILER_DIR -liproc -lidoc -listd

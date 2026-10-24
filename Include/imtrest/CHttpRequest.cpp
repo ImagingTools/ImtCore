@@ -121,6 +121,18 @@ void CHttpRequest::SetMethodType(const MethodType& methodType)
 	case MT_PUT:
 		method = HTTP_PUT;
 		break;
+	case MT_PATCH:
+		method = HTTP_PATCH;
+		break;
+	case MT_DELETE:
+		method = HTTP_DELETE;
+		break;
+	case MT_HEAD:
+		method = HTTP_HEAD;
+		break;
+	case MT_OPTIONS:
+		method = HTTP_OPTIONS;
+		break;
 	default:
 		break;
 	}
@@ -138,6 +150,31 @@ void CHttpRequest::SetCommandId(const QByteArray& commandId)
 {
 	m_url.setPath(commandId);
 }
+
+
+void CHttpRequest::SetUrl(const QUrl& url)
+{
+	m_url = url;
+}
+
+
+void CHttpRequest::SetRemoteAddress(const QHostAddress& remoteAddress)
+{
+	m_remoteAddress = remoteAddress;
+}
+
+
+void CHttpRequest::SetRequestId(const QByteArray& requestId)
+{
+	m_requestId = requestId;
+}
+
+
+void CHttpRequest::SetState(RequestState state)
+{
+	m_state = state;
+}
+
 
 // public static methods
 

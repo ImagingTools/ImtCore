@@ -10,7 +10,7 @@
     <PositionMap>
         <Element ComponentName="HttpProtocolEngine" X="600" Y="400" Note=""/>
         <Element ComponentName="SslConfigurationManager" X="300" Y="220" Note=""/>
-        <Element ComponentName="TcpServer" X="600" Y="225" Note=""/>
+        <Element ComponentName="HttpServer" X="600" Y="225" Note=""/>
         <Element ComponentName="WorkerManager" X="940" Y="40" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
