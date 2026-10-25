@@ -136,6 +136,16 @@ Item {
 		}
 
 		function onOpenedDocumentListReceived(documentInfoList){
+			for (let i = 0; i < documentInfoList.count; ++i){
+				let documentInfo = documentInfoList.get(i).item
+				let documentId = String(documentInfo.m_documentId)
+
+				// Resync: a missed DocumentDataLoaded must not keep the open document loading
+				if (workspaceView.documentManager.documentIsOpened(documentId) && documentInfo.m_isLoading === false){
+					workspaceView.documentManager.setDocumentIsLoading(documentId, false)
+				}
+			}
+
 			globalLoading.stop()
 		}
 
