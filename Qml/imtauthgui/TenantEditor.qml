@@ -148,12 +148,35 @@ DocumentViewBase {
 		}
 	}
 
+	// The reasons to read the organization again come in bursts: an own change and its notification,
+	// a notification relayed by the API client and by AuthorizationController. One reading serves them all.
+	function __refreshRepresentation() {
+		if (!stateManager_.isNewTenant && container.representationController)
+			representationRefreshTimer.restart()
+	}
+
+	Timer {
+		id: representationRefreshTimer
+		interval: 100
+		onTriggered: {
+			if (!stateManager_.isNewTenant && container.representationController)
+				container.representationController.updateRepresentationFromDocument()
+		}
+	}
+
+	// Members invited by another manager are not notified: the members are read again when their page is shown again
+	Connections {
+		target: stateManager_
+		function onMembersRefreshRequested() {
+			container.__refreshRepresentation()
+		}
+	}
+
 	// --- Refresh the document when the server confirms membership changes ---
 	Connections {
 		target: container.apiClient ? container.apiClient.userDocumentManager : null
 		function onDocumentSaved(documentId) {
-			if (!stateManager_.isNewTenant && container.representationController)
-				container.representationController.updateRepresentationFromDocument()
+			container.__refreshRepresentation()
 		}
 	}
 
@@ -161,13 +184,11 @@ DocumentViewBase {
 		target: container.apiClient
 		function onInvitationCreated() {
 			PopupManager.addSuccessMessage(qsTr("Invitation created successfully"), true)
-			if (container.representationController)
-				container.representationController.updateRepresentationFromDocument()
+			container.__refreshRepresentation()
 		}
 		function onOwnershipTransferred() {
 			PopupManager.addSuccessMessage(qsTr("Ownership transferred successfully"), true)
-			if (container.representationController)
-				container.representationController.updateRepresentationFromDocument()
+			container.__refreshRepresentation()
 		}
 		function onRoleCreated() {
 			PopupManager.addSuccessMessage(qsTr("Role created successfully"), true)
@@ -180,8 +201,7 @@ DocumentViewBase {
 			// Refresh the tenant document so the newly added user (auto-joined
 			// as Member via AddMembership in the api client) appears in the
 			// TenantMembersPage list.
-			if (!stateManager_.isNewTenant && container.representationController)
-				container.representationController.updateRepresentationFromDocument()
+			container.__refreshRepresentation()
 		}
 		function onMemberRemoved(userId) {
 			if (!container.tenantData || stateManager_.isNewTenant)
@@ -200,36 +220,29 @@ DocumentViewBase {
 			if (!container.tenantData || stateManager_.isNewTenant)
 				return
 			if (tenantId === container.tenantData.m_id) {
-				PopupManager.addSuccessMessage(qsTr("Invitation accepted"), true)
-				if (container.representationController)
-					container.representationController.updateRepresentationFromDocument()
+				container.__refreshRepresentation()
 			}
 		}
 		function onSubscriptionInvitationRejected(tenantId, membershipId) {
 			if (!container.tenantData || stateManager_.isNewTenant)
 				return
 			if (tenantId === container.tenantData.m_id) {
-				PopupManager.addInfoMessage(qsTr("Invitation rejected"), true)
 				stateManager_.removePendingInvitation(membershipId)
-				if (container.representationController)
-					container.representationController.updateRepresentationFromDocument()
+				container.__refreshRepresentation()
 			}
 		}
 		function onSubscriptionOwnershipTransferred(tenantId) {
 			if (!container.tenantData || stateManager_.isNewTenant)
 				return
 			if (tenantId === container.tenantData.m_id) {
-				PopupManager.addInfoMessage(qsTr("Ownership transferred"), true)
-				if (container.representationController)
-					container.representationController.updateRepresentationFromDocument()
+				container.__refreshRepresentation()
 			}
 		}
 		function onSubscriptionMembershipRoleChanged(tenantId, userId, role) {
 			if (!container.tenantData || stateManager_.isNewTenant)
 				return
 			if (tenantId === container.tenantData.m_id) {
-				if (container.representationController)
-					container.representationController.updateRepresentationFromDocument()
+				container.__refreshRepresentation()
 			}
 		}
 		function onSubscriptionMembershipRemoved(tenantId, userId) {
@@ -246,8 +259,7 @@ DocumentViewBase {
 						container.documentManager.closeDocument(container.documentId)
 					return
 				}
-				if (container.representationController)
-					container.representationController.updateRepresentationFromDocument()
+				container.__refreshRepresentation()
 			}
 		}
 	}
@@ -263,8 +275,7 @@ DocumentViewBase {
 			if (!container.tenantData || stateManager_.isNewTenant)
 				return
 			if (tenantId === container.tenantData.m_id) {
-				if (container.representationController)
-					container.representationController.updateRepresentationFromDocument()
+				container.__refreshRepresentation()
 			}
 		}
 		function onTenantInvitationRejected(tenantId, membershipId) {
@@ -273,16 +284,14 @@ DocumentViewBase {
 			if (tenantId === container.tenantData.m_id) {
 				if (membershipId)
 					stateManager_.removePendingInvitation(membershipId)
-				if (container.representationController)
-					container.representationController.updateRepresentationFromDocument()
+				container.__refreshRepresentation()
 			}
 		}
 		function onTenantOwnershipTransferred(tenantId) {
 			if (!container.tenantData || stateManager_.isNewTenant)
 				return
 			if (tenantId === container.tenantData.m_id) {
-				if (container.representationController)
-					container.representationController.updateRepresentationFromDocument()
+				container.__refreshRepresentation()
 			}
 		}
 	}

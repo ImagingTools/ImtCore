@@ -397,7 +397,19 @@ SimpleCollectionPage {
 		function onPendingInvitationsChanged() { membersPage.__rebuildCombinedModel() }
 	}
 
+	// Shown again, the page reads the members anew: an invitation by another manager reaches nobody else
+	property bool __shownOnce: false
+
+	onVisibleChanged: {
+		if (!membersPage.visible)
+			return
+		if (membersPage.__shownOnce && membersPage.stateManager)
+			membersPage.stateManager.requestMembersRefresh()
+		membersPage.__shownOnce = true
+	}
+
 	Component.onCompleted: {
+		membersPage.__shownOnce = membersPage.visible
 		__rebuildCombinedModel()
 		if (membersPage.apiClient && membersPage.model) {
 			var tid = membersPage.model.m_id
