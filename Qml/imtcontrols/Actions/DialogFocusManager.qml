@@ -25,7 +25,7 @@ QtObject{
 	function setConnections(){
 		for(let i = 0; i < targetList.length; i++){
 			let item = targetList[i]
-			item.activeFocusChanged.connect(()=>{if(item.activeFocus) {
+			item.activeFocusChanged.connect(function(){if(item.activeFocus) {
 													//console.log("SET_ACTIVE_ITEM", item)
 													for(let i = 0; i < focusManager.targetList.length; i++){
 														if(focusManager.targetList[i] !== item){
@@ -154,6 +154,4 @@ QtObject{
 		return -1;
 	}
 }
-
-
 
