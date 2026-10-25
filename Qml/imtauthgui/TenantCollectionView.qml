@@ -639,6 +639,15 @@ RemoteCollectionView {
 		}
 	}
 
+	// A removed organization leaves the organization switcher
+	Connections {
+		target: container.dataController
+
+		function onElementsRemoved(elementIds){
+			AuthorizationController.notifyOrganizationsChanged()
+		}
+	}
+
 	Connections {
 		target: AuthorizationController
 
@@ -864,6 +873,9 @@ RemoteCollectionView {
 					property bool creationHandled: false
 
 					onDocumentSaved: {
+						// A new or renamed organization shows in the organization switcher
+						AuthorizationController.notifyOrganizationsChanged()
+
 						if (!isNewTenant || tenantEditor.creationHandled){
 							return
 						}

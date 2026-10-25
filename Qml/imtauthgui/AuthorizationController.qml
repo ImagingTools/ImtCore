@@ -51,6 +51,8 @@ QtObject {
 	signal tenantInvitationRevoked(string tenantId, string invitationId);
 	// Membership notifications were lost while the connection was down; membership views re-read their data.
 	signal membershipNotificationsResumed();
+	// The organizations the user may switch to changed: what shows them reads them again
+	signal organizationsChanged();
 
 	// Properties to store remember me state and credentials
 	property bool rememberMe: false
@@ -526,6 +528,20 @@ QtObject {
 		root.currentTenantName = storage.value("tenantName", "");
 	}
 	
+	function notifyOrganizationsChanged(){
+		root.organizationsChanged();
+	}
+
+	// The name of the current organization as the server reports it now, e.g. after a rename
+	function updateCurrentTenantName(tenantName){
+		if (root.currentTenantId === "" || root.currentTenantName === tenantName){
+			return;
+		}
+
+		root.currentTenantName = tenantName;
+		storage.setValue("tenantName", tenantName);
+	}
+
 	function saveDataToStorage(){
 		storage.setValue("accessToken", userTokenProvider.accessToken);
 		storage.setValue("refreshToken", userTokenProvider.refreshToken);
