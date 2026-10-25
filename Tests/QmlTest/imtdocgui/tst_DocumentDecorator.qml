@@ -84,6 +84,14 @@ TestCase {
 			function respond(){
 				representationUpdated(documentId, representationModel)
 			}
+
+			function answerUpdate(){
+				documentUpdated(documentId)
+			}
+
+			function refuseUpdate(){
+				updateDocumentFailed(documentId, "Refused")
+			}
 		}
 	}
 
@@ -152,6 +160,8 @@ TestCase {
 
 		document.views[1].inputAcceptable = true
 		document.views[0].commandActivated("Save")
+		controllerOf(document.service, 0).answerUpdate()
+		controllerOf(document.service, 1).answerUpdate()
 
 		compare(document.service.calls, [["save", "doc", "Name"]])
 	}
@@ -163,7 +173,45 @@ TestCase {
 
 		compare(controllerOf(document.service, 0).updateCount, 1, "Save first writes the GUI state to the document")
 		compare(controllerOf(document.service, 1).updateCount, 1)
+		compare(document.service.calls, [], "The server handles requests in parallel: the save waits for the written changes")
+
+		controllerOf(document.service, 0).answerUpdate()
+		compare(document.service.calls, [])
+
+		controllerOf(document.service, 1).answerUpdate()
 		compare(document.service.calls, [["save", "doc", "Name"]])
+	}
+
+	function test_repeatedSaveWhileWaitingSavesOnce(){
+		let document = openDocument("Name", false)
+		let controller = controllerOf(document.service)
+
+		document.views[0].commandActivated("Save")
+		document.views[0].hasChanges = false
+		document.views[0].commandActivated("Save")
+		controller.answerUpdate()
+
+		compare(controller.updateCount, 1)
+		compare(document.service.calls, [["save", "doc", "Name"]])
+	}
+
+	function test_refusedChangeCancelsTheSave(){
+		let document = openDocument("Name", false)
+
+		document.views[0].commandActivated("Save")
+		controllerOf(document.service).refuseUpdate()
+
+		compare(document.service.calls, [], "The document misses the refused change")
+
+		document.views[0].model.modelChanged(null)
+		controllerOf(document.service).answerUpdate()
+
+		compare(document.service.calls, [], "A later edit does not save by itself")
+
+		document.views[0].hasChanges = false
+		document.views[0].commandActivated("Save")
+
+		compare(document.service.calls, [["save", "doc", "Name"]], "A refusal does not block later saves")
 	}
 
 	function test_saveWithoutNameRequestsName(){
