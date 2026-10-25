@@ -31,6 +31,7 @@ import imtgui 1.0
 	- Customizable filter placeholder text (\c filterPlaceholder)
 	- Optional selected items group at top with "Clear all" button (\c showSelectedGroup)
 	- Optional header component above filter (\c headerComponent) for custom controls like type selectors
+	- Optional footer component below the list (\c footerComponent), e.g. an apply button
 
 	\sa FilterableSelectDataProvider, FilterableSelectGqlDataProvider
 */
@@ -111,6 +112,9 @@ PopupView {
 
 	// --- Optional header component (rendered above filter field) ---
 	property Component headerComponent: null
+
+	// --- Optional footer component (rendered below the list, e.g. an apply button) ---
+	property Component footerComponent: null
 
 	// --- Selected items group at top ---
 	property bool showSelectedGroup: false
@@ -997,6 +1001,13 @@ PopupView {
 				height: 0
 				visible: false
 			}
+
+			Loader {
+				id: footerLoader
+				width: parent.width
+				sourceComponent: root.footerComponent
+				visible: root.footerComponent !== null
+			}
 		}
 	}
 
@@ -1005,7 +1016,7 @@ PopupView {
 		id: loadingMoreOverlay
 
 		anchors.bottom: body.bottom
-		anchors.bottomMargin: Style.marginS
+		anchors.bottomMargin: footerLoader.visible ? footerLoader.height + Style.marginM + Style.marginS : Style.marginS
 		anchors.horizontalCenter: body.horizontalCenter
 
 		visible: root.dataProvider

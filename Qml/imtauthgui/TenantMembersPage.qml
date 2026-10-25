@@ -927,17 +927,40 @@ SimpleCollectionPage {
 			showSelectedGroup: true
 			filterPlaceholder: qsTr("Type or choose a user to invite")
 
+			// Users ticked in the popup; the invitations go only on the Invite button
+			property var newSelection: []
+
+			footerComponent: Component {
+				Item {
+					height: inviteButton.height
+
+					Button {
+						id: inviteButton
+						anchors.right: parent.right
+						text: qsTr("Invite (%1)").arg(invitePopup.newSelection.length)
+						variant: "primary"
+						enabled: invitePopup.newSelection.length > 0
+						onClicked: {
+							if (membersPage.stateManager)
+								membersPage.stateManager.inviteSelectedUsers(invitePopup.newSelection)
+							invitePopup.closePopup()
+						}
+					}
+				}
+			}
+
 			onSelectionChanged: {
 				var arr = []
 				for (var i = 0; i < selectedIds.length; i++) {
 					var selId = selectedIds[i]
+					if (preselectedIds.indexOf(selId) >= 0)
+						continue
 					var selName = dataProvider ? dataProvider.getSelectedItemText(selId) : ""
 					if (!selName)
 						selName = selId
 					arr.push({id: selId, name: selName})
 				}
-				if (membersPage.stateManager)
-					membersPage.stateManager.inviteSelectedUsers(arr)
+				invitePopup.newSelection = arr
 			}
 
 			Component.onDestruction: {
