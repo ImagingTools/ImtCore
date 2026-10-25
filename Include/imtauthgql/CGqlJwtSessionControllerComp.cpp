@@ -15,6 +15,27 @@ namespace imtauthgql
 {
 
 
+namespace
+{
+
+
+// A session is read and ended by its own user, or by the superuser
+bool IsSessionOfRequest(const imtauth::ISession& session, const imtgql::CGqlRequest& gqlRequest)
+{
+	if (IsSuperuserRequest(gqlRequest)){
+		return true;
+	}
+
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	const QByteArray requestUserId = gqlContextPtr != nullptr ? gqlContextPtr->GetUserId() : QByteArray();
+
+	return !requestUserId.isEmpty() && requestUserId == session.GetUserId();
+}
+
+
+} // anonymous namespace
+
+
 // protected methods
 
 // reimplemented (sdl::V1_0::imtauth::CSessionsGqlHandlerCompBase)
@@ -91,8 +112,8 @@ sdl::V1_0::imtauth::CValidateJwtPayload CGqlJwtSessionControllerComp::OnValidate
 
 sdl::V1_0::imtauth::CGetSessionPayload CGqlJwtSessionControllerComp::OnGetSession(
 	const sdl::V1_0::imtauth::CGetSessionGqlRequest& getSessionRequest,
-	const ::imtgql::CGqlRequest& /*gqlRequest*/,
-	QString& /*errorMessage*/) const
+	const ::imtgql::CGqlRequest& gqlRequest,
+	QString& errorMessage) const
 {
 	sdl::V1_0::imtauth::CGetSessionPayload response;
 
@@ -114,9 +135,18 @@ sdl::V1_0::imtauth::CGetSessionPayload CGqlJwtSessionControllerComp::OnGetSessio
 		sessionId = *arguments.input->sessionId;
 	}
 
+	// A session of another user is answered like a missing one
 	imtauth::ISessionSharedPtr sessionInfoPtr = m_jwtSessionControllerCompPtr->GetSession(sessionId);
 	if (!sessionInfoPtr.IsValid()){
 		SendErrorMessage(0, QStringLiteral("Unable to get session '%1'. Error: Session not found").arg(sessionId));
+		errorMessage = QStringLiteral("Unable to get session. Error: Session not found");
+
+		return response;
+	}
+
+	if (!IsSessionOfRequest(*sessionInfoPtr, gqlRequest)){
+		SendWarningMessage(0, QStringLiteral("Session '%1' was requested by another user").arg(sessionId));
+		errorMessage = QStringLiteral("Unable to get session. Error: Session not found");
 
 		return response;
 	}
@@ -317,7 +347,7 @@ sdl::V1_0::imtauth::CSelectTenantPayload CGqlJwtSessionControllerComp::OnSelectT
 
 sdl::V1_0::imtauth::CRemoveSessionPayload CGqlJwtSessionControllerComp::OnRemoveSession(
 	const sdl::V1_0::imtauth::CRemoveSessionGqlRequest& removeSessionRequest,
-	const ::imtgql::CGqlRequest& /*gqlRequest*/,
+	const ::imtgql::CGqlRequest& gqlRequest,
 	QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtauth::CRemoveSessionPayload response;
@@ -335,6 +365,13 @@ sdl::V1_0::imtauth::CRemoveSessionPayload CGqlJwtSessionControllerComp::OnRemove
 	}
 	if (arguments.input->sessionId){
 		sessionId = *arguments.input->sessionId;
+	}
+
+	imtauth::ISessionSharedPtr sessionInfoPtr = m_jwtSessionControllerCompPtr->GetSession(sessionId);
+	if (!sessionInfoPtr.IsValid() || !IsSessionOfRequest(*sessionInfoPtr, gqlRequest)){
+		response.ok = false;
+
+		return response;
 	}
 
 	response.ok = m_jwtSessionControllerCompPtr->RemoveSession(sessionId);
@@ -429,12 +466,12 @@ bool CGqlJwtSessionControllerComp::CanUseTenant(
 
 	imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
 	if (!tenantPtr.IsValid()){
-		errorMessage = QStringLiteral("Tenant not found");
+		errorMessage = QStringLiteral("Organization not found");
 		return false;
 	}
 
 	if (!tenantPtr->IsActive()){
-		errorMessage = QStringLiteral("Tenant is not active");
+		errorMessage = QStringLiteral("The organization is not active");
 		return false;
 	}
 
@@ -472,7 +509,7 @@ bool CGqlJwtSessionControllerComp::CanUseTenant(
 		}
 	}
 
-	errorMessage = QStringLiteral("User is not an active member of tenant");
+	errorMessage = QStringLiteral("You are not an active member of this organization");
 	return false;
 }
 

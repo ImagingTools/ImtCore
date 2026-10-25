@@ -14,6 +14,7 @@
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Users.h>
 #include <imtbase/CComplexCollectionFilter.h>
+#include <imtauth/CollectionSelection.h>
 #include <imtauth/CUserInfo.h>
 #include <imtgql/IGqlContext.h>
 #include <imtauth/ITenantManager.h>
@@ -829,7 +830,7 @@ bool CUserCollectionControllerComp::OnBeforeRemoveElements(const QByteArrayList&
 {
 	if (m_tenantManagerCompPtr.IsValid()){
 		for (const QByteArray& userId : elementIds){
-			QByteArrayList tenantIds = m_tenantManagerCompPtr->GetTenantIds();
+			const QByteArrayList tenantIds = m_tenantManagerCompPtr->GetOwnedOrCreatedTenantIds(userId);
 			for (const QByteArray& tenantId : tenantIds){
 				imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
 				if (tenantPtr.IsValid() && tenantPtr->GetOwnerId() == userId){
@@ -862,9 +863,12 @@ void CUserCollectionControllerComp::OnAfterRemoveElements(const QByteArrayList& 
 
 		// 3. Clean TenantInvitations where user is involved (as target, inviter or revoker)
 		if (m_invitationCollectionCompPtr.IsValid()){
-			QByteArrayList all = m_invitationCollectionCompPtr->GetElementIds();
+			imtauth::CollectionSelection::FilterExpression involvedExpression =
+						imtauth::CollectionSelection::AnyColumnEquals("UserId", "InvitedByUserId", userId);
+			involvedExpression.fieldFilters << imtauth::CollectionSelection::FieldFilter("RevokedByUserId", QString::fromUtf8(userId));
+
 			QByteArrayList toRemove;
-			for (const QByteArray& iid : all){
+			for (const QByteArray& iid : imtauth::CollectionSelection::SelectIds(*m_invitationCollectionCompPtr, involvedExpression)){
 				imtbase::IObjectCollection::DataPtr dptr;
 				if (m_invitationCollectionCompPtr->GetObjectData(iid, dptr)){
 					const imtauth::ITenantInvitation* inv = dynamic_cast<const imtauth::ITenantInvitation*>(dptr.GetPtr());
@@ -891,9 +895,9 @@ void CUserCollectionControllerComp::OnAfterRemoveElements(const QByteArrayList& 
 
 		// 5. Clean UserSessions for the user
 		if (m_sessionCollectionCompPtr.IsValid()){
-			QByteArrayList all = m_sessionCollectionCompPtr->GetElementIds();
 			QByteArrayList toRemove;
-			for (const QByteArray& sid : all){
+			const imtauth::CollectionSelection::FilterExpression userExpression = imtauth::CollectionSelection::ColumnEquals("UserId", userId);
+			for (const QByteArray& sid : imtauth::CollectionSelection::SelectIds(*m_sessionCollectionCompPtr, userExpression, {"UserId"})){
 				imtbase::IObjectCollection::DataPtr dptr;
 				if (m_sessionCollectionCompPtr->GetObjectData(sid, dptr)){
 					const imtauth::ISession* sess = dynamic_cast<const imtauth::ISession*>(dptr.GetPtr());

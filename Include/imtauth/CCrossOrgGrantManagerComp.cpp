@@ -10,6 +10,9 @@
 // ACF includes
 #include <istd/CChangeNotifier.h>
 
+// ImtCore includes
+#include <imtauth/CollectionSelection.h>
+
 
 namespace imtauth
 {
@@ -152,14 +155,15 @@ CrossOrgGrantInfo CCrossOrgGrantManagerComp::GetGrant(const QByteArray& grantId)
 }
 
 
-CrossOrgGrants CCrossOrgGrantManagerComp::CollectGrants(const std::function<bool(const CrossOrgGrantInfo&)>& predicate) const
+CrossOrgGrants CCrossOrgGrantManagerComp::CollectGrants(const QByteArray& columnId, const QByteArray& value, const std::function<bool(const CrossOrgGrantInfo&)>& predicate) const
 {
 	CrossOrgGrants result;
 	if (!m_grantCollectionCompPtr.IsValid()){
 		return result;
 	}
 
-	for (const QByteArray& id : m_grantCollectionCompPtr->GetElementIds()){
+	// A collection that does not know the filter returns every id, the predicate still decides
+	for (const QByteArray& id : CollectionSelection::SelectIds(*m_grantCollectionCompPtr, CollectionSelection::ColumnEquals(columnId, value))){
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (m_grantCollectionCompPtr->GetObjectData(id, dataPtr)){
 			const ICrossOrgGrantData* grantPtr = dynamic_cast<const ICrossOrgGrantData*>(dataPtr.GetPtr());
@@ -178,7 +182,7 @@ CrossOrgGrants CCrossOrgGrantManagerComp::CollectGrants(const std::function<bool
 
 CrossOrgGrants CCrossOrgGrantManagerComp::GetGrantsBySourceTenant(const QByteArray& sourceTenantId) const
 {
-	return CollectGrants([&sourceTenantId](const CrossOrgGrantInfo& info){
+	return CollectGrants("SourceTenantId", sourceTenantId, [&sourceTenantId](const CrossOrgGrantInfo& info){
 		return info.sourceTenantId == sourceTenantId;
 	});
 }
@@ -186,7 +190,7 @@ CrossOrgGrants CCrossOrgGrantManagerComp::GetGrantsBySourceTenant(const QByteArr
 
 CrossOrgGrants CCrossOrgGrantManagerComp::GetGrantsByTargetTenant(const QByteArray& targetTenantId) const
 {
-	return CollectGrants([&targetTenantId](const CrossOrgGrantInfo& info){
+	return CollectGrants("TargetTenantId", targetTenantId, [&targetTenantId](const CrossOrgGrantInfo& info){
 		return info.targetTenantId == targetTenantId;
 	});
 }

@@ -336,6 +336,7 @@ type TenantRelationship {
 	description: String
 	createdAt: String
 	updatedAt: String
+	relatedSince: String
 }
 
 input GetTenantRelationshipsInput {
@@ -785,6 +786,7 @@ enum EConnectionNotificationType {
 	RelationshipProposalReceived
 	RelationshipProposalApproved
 	RelationshipProposalRejected
+	RelationshipRemoved
 }
 
 type ConnectionNotification {
@@ -793,6 +795,7 @@ type ConnectionNotification {
 	connectionId: ID
 	requestId: ID
 	proposalId: ID
+	relationshipId: ID
 }
 
 input ConnectionNotificationSubscriptionInput {

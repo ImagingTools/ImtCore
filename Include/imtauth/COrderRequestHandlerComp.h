@@ -74,7 +74,7 @@ public:
 				const QString& note = QString()) override;
 
 private:
-	OrderRequests CollectOrderRequests(const std::function<bool(const OrderRequestInfo&)>& predicate) const;
+	OrderRequests CollectOrderRequests(const QByteArray& columnId, const QByteArray& value, const std::function<bool(const OrderRequestInfo&)>& predicate) const;
 	bool ApplyStatusFeedback(
 				const QByteArray& orderRequestId,
 				OrderRequestStatus status,

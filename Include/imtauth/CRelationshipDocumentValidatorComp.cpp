@@ -3,6 +3,7 @@
 
 
 // ImtCore includes
+#include <imtauth/CollectionSelection.h>
 #include <imtauth/ITenantRelationshipInfo.h>
 
 
@@ -45,7 +46,10 @@ bool CRelationshipDocumentValidatorComp::ValidateDocumentData(
 		const int srcRole = static_cast<int>(relInfo->GetSourceRole());
 		const int tgtRole = static_cast<int>(relInfo->GetTargetRole());
 
-		for (const QByteArray& existingId : m_relationshipCollectionCompPtr->GetElementIds()){
+		// Only the relationships of the same pair can be duplicates
+		const CollectionSelection::FilterExpression pairExpression =
+					CollectionSelection::PairInEitherOrder("SourceTenantId", "TargetTenantId", sourceTenantId, targetTenantId);
+		for (const QByteArray& existingId : CollectionSelection::SelectIds(*m_relationshipCollectionCompPtr, pairExpression)){
 			// Skip the document being edited (update case)
 			if (existingId == objectId){
 				continue;

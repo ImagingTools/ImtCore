@@ -3,6 +3,8 @@
 
 
 // Qt includes
+#include <QtCore/QHash>
+#include <QtCore/QMutex>
 #include <QtCore/QThread>
 
 // ACF includes
@@ -34,6 +36,7 @@ public:
 	virtual const imtauth::IUserVerification* GetVerificationData(const QByteArray& verificationId) const override;
 	virtual bool GenerateVerificationData(const QByteArray& userId, imtauth::IUserVerification* userVerificationPtr = nullptr) override;
 	virtual bool VerifyUser(const QByteArray& userId, const QByteArray& verificationCode) const override;
+	virtual bool RemoveVerificationData(const QByteArray& userId) override;
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
@@ -41,6 +44,7 @@ public:
 
 private:
 	int GenerateCode(int min, int max) const;
+	void RemoveVerification(const QByteArray& userId) const;
 
 	class CheckExpiredVerificationDataThread: public QThread
 	{
@@ -61,6 +65,9 @@ private:
 
 private:
 	CheckExpiredVerificationDataThread m_checkExpiredVerificationDataThread;
+
+	mutable QMutex m_failedAttemptsMutex;
+	mutable QHash<QByteArray, int> m_failedAttempts;
 };
 
 

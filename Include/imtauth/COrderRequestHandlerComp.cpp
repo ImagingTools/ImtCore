@@ -11,6 +11,9 @@
 // ACF includes
 #include <istd/CChangeNotifier.h>
 
+// ImtCore includes
+#include <imtauth/CollectionSelection.h>
+
 
 namespace imtauth
 {
@@ -94,14 +97,15 @@ OrderRequestInfo COrderRequestHandlerComp::GetOrderRequest(const QByteArray& ord
 }
 
 
-OrderRequests COrderRequestHandlerComp::CollectOrderRequests(const std::function<bool(const OrderRequestInfo&)>& predicate) const
+OrderRequests COrderRequestHandlerComp::CollectOrderRequests(const QByteArray& columnId, const QByteArray& value, const std::function<bool(const OrderRequestInfo&)>& predicate) const
 {
 	OrderRequests result;
 	if (!m_orderRequestCollectionCompPtr.IsValid()){
 		return result;
 	}
 
-	for (const QByteArray& id : m_orderRequestCollectionCompPtr->GetElementIds()){
+	// The database selects the candidates, the predicate decides
+	for (const QByteArray& id : CollectionSelection::SelectIds(*m_orderRequestCollectionCompPtr, CollectionSelection::ColumnEquals(columnId, value))){
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (!m_orderRequestCollectionCompPtr->GetObjectData(id, dataPtr)){
 			continue;
@@ -124,7 +128,7 @@ OrderRequests COrderRequestHandlerComp::CollectOrderRequests(const std::function
 
 OrderRequests COrderRequestHandlerComp::GetOrderRequests(const QByteArray& targetTenantId) const
 {
-	return CollectOrderRequests([&targetTenantId](const OrderRequestInfo& info){
+	return CollectOrderRequests("TargetTenantId", targetTenantId, [&targetTenantId](const OrderRequestInfo& info){
 		return info.targetTenantId == targetTenantId;
 	});
 }
@@ -132,7 +136,7 @@ OrderRequests COrderRequestHandlerComp::GetOrderRequests(const QByteArray& targe
 
 OrderRequests COrderRequestHandlerComp::GetOrderRequestsByRelationship(const QByteArray& relationshipId) const
 {
-	return CollectOrderRequests([&relationshipId](const OrderRequestInfo& info){
+	return CollectOrderRequests("RelationshipId", relationshipId, [&relationshipId](const OrderRequestInfo& info){
 		return info.relationshipId == relationshipId;
 	});
 }

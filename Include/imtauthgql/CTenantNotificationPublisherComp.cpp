@@ -5,11 +5,11 @@
 // Qt includes
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QMutexLocker>
 
 // ImtCore includes
 #include <imtgql/CGqlRequest.h>
 #include <imtgql/IGqlContext.h>
+#include <imtauth/TenantEvents.h>
 
 
 namespace imtauthgql
@@ -41,11 +41,6 @@ void CTenantNotificationPublisherComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	{
-		QMutexLocker locker(&m_snapshotMutex);
-		m_snapshot = TakeSnapshot();
-	}
-
 	if (m_invitationManagerModelCompPtr.IsValid()){
 		RegisterModel(m_invitationManagerModelCompPtr.GetPtr(), 0);
 	}
@@ -70,149 +65,66 @@ void CTenantNotificationPublisherComp::OnComponentDestroyed()
 
 // reimplemented (imod::CMultiModelDispatcherBase)
 
-void CTenantNotificationPublisherComp::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
+void CTenantNotificationPublisherComp::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& changeSet)
 {
-	QList<Notification> notifications;
-	{
-		QMutexLocker locker(&m_snapshotMutex);
-		Snapshot current = TakeSnapshot();
-		notifications = CompareSnapshots(m_snapshot, current);
-		m_snapshot = current;
-	}
-
-	// Published outside the lock: PublishDataFiltered takes the publisher's own mutex.
-	for (const Notification& notification : std::as_const(notifications)){
-		PublishNotification(notification);
+	// The managers name each change, so only the organizations it touched are read
+	for (const QVariantMap& event : imtauth::TenantEvent::GetEvents(changeSet)){
+		for (const Notification& notification : CreateNotifications(event)){
+			PublishNotification(notification);
+		}
 	}
 }
 
 
 // private methods
 
-CTenantNotificationPublisherComp::Snapshot CTenantNotificationPublisherComp::TakeSnapshot() const
-{
-	Snapshot snapshot;
-	if (!m_tenantManagerCompPtr.IsValid()){
-		return snapshot;
-	}
-
-	const QByteArrayList tenantIds = m_tenantManagerCompPtr->GetTenantIds();
-	for (const QByteArray& tenantId : tenantIds){
-		imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
-		if (tenantPtr.IsValid()){
-			snapshot.owners.insert(tenantId, tenantPtr->GetOwnerId());
-		}
-
-		if (m_membershipManagerCompPtr.IsValid()){
-			for (const QByteArray& membershipId : m_membershipManagerCompPtr->GetMembershipsByTenant(tenantId)){
-				imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
-				if (membershipPtr.IsValid()){
-					MembershipState state;
-					state.userId = membershipPtr->GetUserId();
-					state.tenantId = membershipPtr->GetTenantId();
-					state.organizationPermissions = membershipPtr->GetOrganizationPermissions();
-					std::sort(state.organizationPermissions.begin(), state.organizationPermissions.end());
-					snapshot.memberships.insert(membershipId, state);
-				}
-			}
-		}
-
-		if (m_invitationManagerCompPtr.IsValid()){
-			for (const QByteArray& invitationId : m_invitationManagerCompPtr->GetInvitationsByTenant(tenantId)){
-				imtauth::ITenantInvitationUniquePtr invitationPtr = m_invitationManagerCompPtr->GetInvitation(invitationId);
-				if (invitationPtr.IsValid()){
-					InvitationState state;
-					state.userId = invitationPtr->GetUserId();
-					state.tenantId = invitationPtr->GetTenantId();
-					state.invitedByUserId = invitationPtr->GetInvitedByUserId();
-					state.status = invitationPtr->GetStatus();
-					state.lastSentAt = invitationPtr->GetLastSentAt();
-					snapshot.invitations.insert(invitationId, state);
-				}
-			}
-		}
-	}
-
-	return snapshot;
-}
-
-
-QList<CTenantNotificationPublisherComp::Notification> CTenantNotificationPublisherComp::CompareSnapshots(
-			const Snapshot& before,
-			const Snapshot& after) const
+QList<CTenantNotificationPublisherComp::Notification> CTenantNotificationPublisherComp::CreateNotifications(const QVariantMap& event) const
 {
 	QList<Notification> notifications;
 
-	// --- memberships
-	for (auto it = before.memberships.constBegin(); it != before.memberships.constEnd(); ++it){
-		const QByteArray& membershipId = it.key();
-		const MembershipState& previous = it.value();
+	const QString type = event.value(imtauth::TenantEvent::s_type).toString();
+	const QByteArray tenantId = event.value(imtauth::TenantEvent::s_tenantId).toByteArray();
+	const QByteArray userId = event.value(imtauth::TenantEvent::s_userId).toByteArray();
 
-		if (!after.memberships.contains(membershipId)){
-			notifications.append({previous.userId, NotificationType::MembershipRemoved, membershipId, previous.userId, previous.tenantId});
+	if (type == imtauth::TenantEvent::s_membershipRemoved){
+		const QByteArray membershipId = event.value(imtauth::TenantEvent::s_membershipId).toByteArray();
+		notifications.append({userId, NotificationType::MembershipRemoved, membershipId, userId, tenantId});
 
-			const QByteArray ownerId = after.owners.value(previous.tenantId);
-			if (!ownerId.isEmpty() && ownerId != previous.userId){
-				notifications.append({ownerId, NotificationType::MembershipRemoved, membershipId, previous.userId, previous.tenantId});
-			}
-			continue;
-		}
-
-		if (after.memberships.value(membershipId).organizationPermissions != previous.organizationPermissions){
-			notifications.append({previous.userId, NotificationType::MembershipRoleChanged, membershipId, previous.userId, previous.tenantId});
+		const QByteArray ownerId = FindTenantOwnerId(tenantId);
+		if (!ownerId.isEmpty() && ownerId != userId){
+			notifications.append({ownerId, NotificationType::MembershipRemoved, membershipId, userId, tenantId});
 		}
 	}
-
-	// --- invitations
-	for (auto it = after.invitations.constBegin(); it != after.invitations.constEnd(); ++it){
-		const QByteArray& invitationId = it.key();
-		const InvitationState& current = it.value();
-
-		if (!before.invitations.contains(invitationId)){
-			if (current.status == imtauth::ITenantInvitation::TIS_PENDING){
-				notifications.append({current.userId, NotificationType::InvitationReceived, invitationId, current.userId, current.tenantId});
+	else if (type == imtauth::TenantEvent::s_membershipPermissionsChanged){
+		notifications.append({userId, NotificationType::MembershipRoleChanged, event.value(imtauth::TenantEvent::s_membershipId).toByteArray(), userId, tenantId});
+	}
+	else if (type == imtauth::TenantEvent::s_invitationSent || type == imtauth::TenantEvent::s_invitationStatusChanged){
+		const QByteArray invitationId = event.value(imtauth::TenantEvent::s_invitationId).toByteArray();
+		const int status = event.value(imtauth::TenantEvent::s_status).toInt();
+		if (type == imtauth::TenantEvent::s_invitationSent){
+			if (status == imtauth::ITenantInvitation::TIS_PENDING){
+				notifications.append({userId, NotificationType::InvitationReceived, invitationId, userId, tenantId});
 			}
-			continue;
 		}
-
-		const InvitationState& previous = before.invitations.value(invitationId);
-		if (previous.status == current.status){
-			if (current.status == imtauth::ITenantInvitation::TIS_PENDING && previous.lastSentAt != current.lastSentAt){
-				notifications.append({current.userId, NotificationType::InvitationReceived, invitationId, current.userId, current.tenantId});
+		else if (status == imtauth::ITenantInvitation::TIS_REVOKED){
+			notifications.append({userId, NotificationType::InvitationRevoked, invitationId, userId, tenantId});
+		}
+		else if (status == imtauth::ITenantInvitation::TIS_ACCEPTED || status == imtauth::ITenantInvitation::TIS_REJECTED){
+			// The answer goes back to whoever sent the invitation
+			QByteArray senderId = event.value(imtauth::TenantEvent::s_invitedByUserId).toByteArray();
+			if (senderId.isEmpty()){
+				senderId = FindTenantOwnerId(tenantId);
 			}
-			continue;
-		}
 
-		// The answer goes back to whoever sent the invitation.
-		const QByteArray senderId = current.invitedByUserId.isEmpty() ? after.owners.value(current.tenantId) : current.invitedByUserId;
-		switch (current.status){
-		case imtauth::ITenantInvitation::TIS_ACCEPTED:
-			notifications.append({senderId, NotificationType::InvitationAccepted, invitationId, current.userId, current.tenantId});
-			break;
-		case imtauth::ITenantInvitation::TIS_REJECTED:
-			notifications.append({senderId, NotificationType::InvitationRejected, invitationId, current.userId, current.tenantId});
-			break;
-		case imtauth::ITenantInvitation::TIS_REVOKED:
-			notifications.append({current.userId, NotificationType::InvitationRevoked, invitationId, current.userId, current.tenantId});
-			break;
-		default:
-			break;
+			const NotificationType notificationType = status == imtauth::ITenantInvitation::TIS_ACCEPTED
+						? NotificationType::InvitationAccepted
+						: NotificationType::InvitationRejected;
+			notifications.append({senderId, notificationType, invitationId, userId, tenantId});
 		}
 	}
-
-	// --- ownership
-	for (auto it = after.owners.constBegin(); it != after.owners.constEnd(); ++it){
-		const QByteArray& tenantId = it.key();
-		const QByteArray& ownerId = it.value();
-		if (!before.owners.contains(tenantId)){
-			continue;
-		}
-
-		const QByteArray previousOwnerId = before.owners.value(tenantId);
-		if (previousOwnerId == ownerId){
-			continue;
-		}
-
+	else if (type == imtauth::TenantEvent::s_ownershipTransferred){
+		const QByteArray previousOwnerId = event.value(imtauth::TenantEvent::s_previousOwnerId).toByteArray();
+		const QByteArray ownerId = event.value(imtauth::TenantEvent::s_ownerId).toByteArray();
 		if (!previousOwnerId.isEmpty()){
 			notifications.append({previousOwnerId, NotificationType::OwnershipTransferred, QByteArray(), ownerId, tenantId});
 		}
@@ -222,6 +134,18 @@ QList<CTenantNotificationPublisherComp::Notification> CTenantNotificationPublish
 	}
 
 	return notifications;
+}
+
+
+QByteArray CTenantNotificationPublisherComp::FindTenantOwnerId(const QByteArray& tenantId) const
+{
+	if (!m_tenantManagerCompPtr.IsValid() || tenantId.isEmpty()){
+		return QByteArray();
+	}
+
+	imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
+
+	return tenantPtr.IsValid() ? tenantPtr->GetOwnerId() : QByteArray();
 }
 
 

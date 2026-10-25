@@ -3,8 +3,6 @@
 
 
 // Qt includes
-#include <QRecursiveMutex>
-#include <QMap>
 #include <QList>
 
 // ACF includes
@@ -16,8 +14,8 @@
 #include <imtauth/ITenantConnectionRequestInfo.h>
 #include <imtauth/ITenantConnectionInfo.h>
 #include <imtauth/ITenantRelationshipProposalInfo.h>
+#include <imtauth/ITenantRelationshipInfo.h>
 #include <imtauth/ITenantManager.h>
-#include <imtbase/IObjectCollection.h>
 #include <imtservergql/CGqlPublisherCompBase.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Tenants_fwd.h>
 
@@ -58,8 +56,6 @@ public:
 		I_ASSIGN(m_connectionRequestManagerCompPtr, "ConnectionRequestManager", "Connection request manager to observe", true, "TenantConnectionRequestManager");
 		I_ASSIGN_TO(m_connectionRequestManagerModelCompPtr, m_connectionRequestManagerCompPtr, true);
 		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager for resolving tenant owners", true, "TenantManager");
-		I_ASSIGN(m_requestCollectionCompPtr, "RequestCollection", "Connection request collection for reading request data", true, "RequestCollection");
-		I_ASSIGN(m_connectionCollectionCompPtr, "ConnectionCollection", "Connections collection for reading connection data", true, "ConnectionCollection");
 	I_END_COMPONENT;
 
 protected:
@@ -77,49 +73,15 @@ protected:
 	I_REF(imtauth::ITenantConnectionRequestManager, m_connectionRequestManagerCompPtr);
 	I_REF(imod::IModel, m_connectionRequestManagerModelCompPtr);
 	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
-	I_REF(imtbase::IObjectCollection, m_requestCollectionCompPtr);
-	I_REF(imtbase::IObjectCollection, m_connectionCollectionCompPtr);
 
 private:
-	struct CachedConnectionRequest
-	{
-		QByteArray sourceTenantId;
-		QByteArray targetTenantId;
-		imtauth::ITenantConnectionRequestInfo::ConnectionRequestStatus status;
-	};
-
-	struct CachedConnection
-	{
-		QByteArray tenantAId;
-		QByteArray tenantBId;
-		imtauth::ITenantConnectionInfo::ConnectionStatus status;
-	};
-
-	struct CachedRelationshipProposal
-	{
-		QByteArray initiatorTenantId;
-		QByteArray counterpartyTenantId;
-		QByteArray connectionId;
-		imtauth::ITenantRelationshipProposalInfo::RelationshipProposalStatus status;
-	};
-
 	void PublishNotification(
 				const QByteArray& targetUserId,
 				sdl::V1_0::imtauth::EConnectionNotificationType notificationType,
 				const QByteArray& tenantId,
 				const QByteArray& relatedId) const;
 
-	QMap<QByteArray, CachedRelationshipProposal> ReadProposals() const;
 	QByteArray FindTenantOwnerUserId(const QByteArray& tenantId) const;
-
-	// Cache of requestId → state for change detection.
-	mutable QMap<QByteArray, CachedConnectionRequest> m_cachedRequests;
-	// Cache of connectionId → state for connection removal detection.
-	mutable QMap<QByteArray, CachedConnection> m_cachedConnections;
-	// Cache of proposalId → state for proposal lifecycle detection.
-	mutable QMap<QByteArray, CachedRelationshipProposal> m_cachedProposals;
-	// Protects all caches from concurrent access.
-	mutable QRecursiveMutex m_cacheMutex;
 };
 
 

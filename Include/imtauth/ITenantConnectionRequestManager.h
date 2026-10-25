@@ -5,6 +5,7 @@
 // Qt includes
 #include <QtCore/QByteArray>
 #include <QtCore/QByteArrayList>
+#include <QtCore/QDateTime>
 #include <QtCore/QString>
 
 // ACF includes
@@ -58,6 +59,11 @@ public:
 	virtual QByteArrayList GetTenantRelationshipIds(const QByteArray& tenantId) const = 0;
 	virtual ITenantRelationshipInfoUniquePtr GetTenantRelationship(const QByteArray& relationshipId) const = 0;
 	virtual bool RemoveTenantRelationship(const QByteArray& tenantId, const QByteArray& relationshipId) = 0;
+	/**
+		Start of the uninterrupted period in which the two tenants had an active relationship, archived relationships included.
+		Invalid when they have no active relationship now, or a start time is unknown.
+	*/
+	virtual QDateTime GetRelatedSince(const QByteArray& tenantId, const QByteArray& otherTenantId) const = 0;
 };
 
 

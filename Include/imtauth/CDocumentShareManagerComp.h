@@ -52,9 +52,22 @@ public:
 	virtual DocumentShares GetIncomingShares(const QByteArray& targetTenantId) const override;
 	virtual DocumentShares GetOutgoingShares(const QByteArray& ownerTenantId) const override;
 	virtual QByteArrayList GetShareOwnerTenantIds(const QByteArray& targetTenantId) const override;
+	virtual int RemoveUnrelatedShares(const QByteArray& tenantId) override;
 	virtual int GetSharesRevision() const override;
 
 private:
+	// Seconds a share may seem older than its relationship, for the clocks of the servers that differ
+	static constexpr int s_clockToleranceSecs = 120;
+
+	/**
+		The tenants the given one has a currently valid relationship with, reused for RelationshipCacheTimeout.
+		Reading them anew removes the shares of the tenant's ended relationships.
+		\return The number of the removed shares.
+	*/
+	int ReadRelatedTenants(const QByteArray& tenantId, QByteArrayList& effectiveTenantIds) const;
+	bool IsOfEarlierRelationship(const IDocumentShareInfo& share, const QDateTime& relatedSince) const;
+	// Shares of the tenant with organizations it has no relationship with, or that are left from an earlier relationship
+	QByteArrayList FindSharesOfEndedRelationships(const QByteArray& tenantId, const RelatedTenantInfos& relatedTenants, const DocumentShares& shares) const;
 	DocumentShares FindShares(const QByteArray& fieldId, const QByteArray& value) const;
 	bool StoreShare(const IDocumentShareInfo& shareInfo, bool isNew);
 

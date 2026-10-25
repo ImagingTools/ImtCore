@@ -31,24 +31,33 @@ RelatedTenantInfos CTenantRelationshipProviderComp::GetRelatedTenants(const QByt
 	QByteArrayList relatedTenantIds;
 	for (const QByteArray& relationshipId : m_connectionRequestManagerCompPtr->GetTenantRelationshipIds(tenantId)){
 		ITenantRelationshipInfoUniquePtr relationshipPtr = m_connectionRequestManagerCompPtr->GetTenantRelationship(relationshipId);
-		if (		!relationshipPtr.IsValid() ||
-					relationshipPtr->GetStatus() != ITenantRelationshipInfo::TRS_ACTIVE ||
-					!IsTenantRelationshipValidNow(relationshipPtr->GetValidFrom(), relationshipPtr->GetValidUntil())){
+		if (!relationshipPtr.IsValid() || relationshipPtr->GetStatus() != ITenantRelationshipInfo::TRS_ACTIVE){
 			continue;
 		}
 
 		const QByteArray relatedTenantId = relationshipPtr->GetSourceTenantId() == tenantId
 					? relationshipPtr->GetTargetTenantId()
 					: relationshipPtr->GetSourceTenantId();
-		if (!relatedTenantId.isEmpty() && relatedTenantId != tenantId && !relatedTenantIds.contains(relatedTenantId)){
-			relatedTenantIds.append(relatedTenantId);
-
-			RelatedTenantInfo relatedTenantInfo;
-			relatedTenantInfo.tenantId = relatedTenantId;
-			relatedTenantInfo.tenantName = GetTenantName(relatedTenantId);
-
-			retVal.append(relatedTenantInfo);
+		if (relatedTenantId.isEmpty() || relatedTenantId == tenantId){
+			continue;
 		}
+
+		const bool isEffective = IsTenantRelationshipValidNow(relationshipPtr->GetValidFrom(), relationshipPtr->GetValidUntil());
+		const int index = relatedTenantIds.indexOf(relatedTenantId);
+		if (index >= 0){
+			retVal[index].isEffective = retVal[index].isEffective || isEffective;
+			continue;
+		}
+
+		relatedTenantIds.append(relatedTenantId);
+
+		RelatedTenantInfo relatedTenantInfo;
+		relatedTenantInfo.tenantId = relatedTenantId;
+		relatedTenantInfo.tenantName = GetTenantName(relatedTenantId);
+		relatedTenantInfo.isEffective = isEffective;
+		relatedTenantInfo.relatedSince = m_connectionRequestManagerCompPtr->GetRelatedSince(tenantId, relatedTenantId);
+
+		retVal.append(relatedTenantInfo);
 	}
 
 	return retVal;

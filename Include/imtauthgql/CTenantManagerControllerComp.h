@@ -237,6 +237,8 @@ private:
 				const ::imtgql::CGqlRequest& gqlRequest,
 				const QByteArray& grantId,
 				QString& errorMessage) const;
+	// Revoke the active grants between two organizations, in both directions.
+	void RevokeGrantsBetween(const QByteArray& tenantAId, const QByteArray& tenantBId) const;
 
 	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
 	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);

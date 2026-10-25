@@ -81,15 +81,21 @@ public:
 	virtual QByteArrayList GetTenantRelationshipIds(const QByteArray& tenantId) const override;
 	virtual ITenantRelationshipInfoUniquePtr GetTenantRelationship(const QByteArray& relationshipId) const override;
 	virtual bool RemoveTenantRelationship(const QByteArray& tenantId, const QByteArray& relationshipId) override;
+	virtual QDateTime GetRelatedSince(const QByteArray& tenantId, const QByteArray& otherTenantId) const override;
 
 private:
 	QString GenerateConnectionCode() const;
 	QByteArray FindTenantByConnectionCode(const QString& connectionCode) const;
+	void PublishProposalEvent(
+				const QString& eventType,
+				const ITenantRelationshipProposalInfo& proposal,
+				ITenantRelationshipProposalInfo::RelationshipProposalStatus previousStatus);
 	bool ConnectionExists(const QByteArray& tenantAId, const QByteArray& tenantBId) const;
 	bool PendingRequestExists(const QByteArray& tenantAId, const QByteArray& tenantBId) const;
 	QByteArray CreateConnection(const QByteArray& tenantAId, const QByteArray& tenantBId);
 	QByteArray ApplyRelationshipProposal(const ITenantRelationshipProposalInfo* proposalPtr);
 	void ArchiveRelationshipsForConnection(const QByteArray& connectionId);
+	bool ArchiveRelationship(const QByteArray& relationshipId, const ITenantRelationshipInfo& relationship, bool isRemovalPublished);
 
 	// DB helper methods
 	bool StoreConnectionCode(const QByteArray& tenantId, const ITenantConnectionCodeInfo& codeInfo);

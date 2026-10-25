@@ -48,7 +48,7 @@ public:
 				const QByteArray& roleId) const override;
 
 private:
-	CrossOrgGrants CollectGrants(const std::function<bool(const CrossOrgGrantInfo&)>& predicate) const;
+	CrossOrgGrants CollectGrants(const QByteArray& columnId, const QByteArray& value, const std::function<bool(const CrossOrgGrantInfo&)>& predicate) const;
 	bool IsGrantEffective(const CrossOrgGrantInfo& grantInfo) const;
 
 private:

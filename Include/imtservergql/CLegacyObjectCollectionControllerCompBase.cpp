@@ -1075,7 +1075,8 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::ImportObject(const imtgql
 		objectUuid = identifiableObjectPtr->GetObjectUuid();
 	}
 
-	if (m_objectCollectionCompPtr->GetElementIds().contains(objectUuid)){
+	imtbase::IObjectCollection::DataPtr existingDataPtr;
+	if (m_objectCollectionCompPtr->GetObjectData(objectUuid, existingDataPtr)){
 		errorMessage = QStringLiteral("Unable to import object with ID: '%1' to the collection. Error: The object already exists inside the collection").arg(objectUuid);
 		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
 		QFile::remove(filePathTmp);

@@ -21,6 +21,7 @@
 
 // ImtCore includes
 #include <imtbase/IIdentifiable.h>
+#include <imtauth/CollectionSelection.h>
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtauth/IRole.h>
 
@@ -683,7 +684,9 @@ IExternalLoginController::LoginResult CExternalLoginControllerComp::RegisterUser
 	userPtr->SetEnabled(true);
 
 	if (m_roleCollectionCompPtr.IsValid() && !login.productId.isEmpty()){
-		const imtbase::ICollectionInfo::Ids roleIds = m_roleCollectionCompPtr->GetElementIds();
+		// The roles of the product are the candidates for its default role
+		const imtbase::ICollectionInfo::Ids roleIds = CollectionSelection::SelectIds(
+					*m_roleCollectionCompPtr, CollectionSelection::ColumnEquals("ProductId", login.productId), {"ProductId"});
 		for (const QByteArray& roleId : roleIds){
 			imtbase::IObjectCollection::DataPtr roleDataPtr;
 			if (m_roleCollectionCompPtr->GetObjectData(roleId, roleDataPtr)){

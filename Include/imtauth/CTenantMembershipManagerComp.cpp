@@ -10,10 +10,13 @@
 #include <istd/CChangeNotifier.h>
 
 // ImtCore includes
+#include <imtbase/imtbase.h>
 #include <imtauth/ITenantMembership.h>
 #include <imtauth/ITenantEntityBindingManager.h>
 #include <imtauth/ITenantManager.h>
+#include <imtauth/TenantEvents.h>
 #include <imtauth/IUserInfo.h>
+#include <imtauth/CollectionSelection.h>
 
 
 namespace imtauth
@@ -33,8 +36,7 @@ ITenantMembershipManager::MembershipIds CTenantMembershipManagerComp::GetMembers
 		return result;
 	}
 
-	QByteArrayList allIds = m_membershipCollectionCompPtr->GetElementIds();
-	for (const QByteArray& id : allIds){
+	for (const QByteArray& id : GetCandidateMembershipIds(QByteArray(), tenantId)){
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (m_membershipCollectionCompPtr->GetObjectData(id, dataPtr)){
 			const ITenantMembership* membershipPtr = dynamic_cast<const ITenantMembership*>(dataPtr.GetPtr());
@@ -57,8 +59,7 @@ ITenantMembershipManager::MembershipIds CTenantMembershipManagerComp::GetMembers
 		return result;
 	}
 
-	QByteArrayList allIds = m_membershipCollectionCompPtr->GetElementIds();
-	for (const QByteArray& id : allIds){
+	for (const QByteArray& id : GetCandidateMembershipIds(userId, QByteArray())){
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (m_membershipCollectionCompPtr->GetObjectData(id, dataPtr)){
 			const ITenantMembership* membershipPtr = dynamic_cast<const ITenantMembership*>(dataPtr.GetPtr());
@@ -109,8 +110,7 @@ ITenantMembershipUniquePtr CTenantMembershipManagerComp::FindMembership(const QB
 		return nullptr;
 	}
 
-	QByteArrayList allIds = m_membershipCollectionCompPtr->GetElementIds();
-	for (const QByteArray& id : allIds){
+	for (const QByteArray& id : GetCandidateMembershipIds(userId, tenantId)){
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (m_membershipCollectionCompPtr->GetObjectData(id, dataPtr)){
 			const ITenantMembership* membershipPtr = dynamic_cast<const ITenantMembership*>(dataPtr.GetPtr());
@@ -135,8 +135,8 @@ QByteArray CTenantMembershipManagerComp::AddMembership(const QByteArray& userId,
 		return QByteArray();
 	}
 
-	if (userId.isEmpty() || tenantId.isEmpty()){
-		SendErrorMessage(0, QStringLiteral("Cannot add membership: userId or tenantId is empty (userId='%1', tenantId='%2')")
+	if (!imtbase::isValidUuid(userId) || !imtbase::isValidUuid(tenantId)){
+		SendErrorMessage(0, QStringLiteral("Cannot add membership: userId or tenantId is not a UUID (userId='%1', tenantId='%2')")
 			.arg(userId, tenantId), QStringLiteral("CTenantMembershipManagerComp"));
 		return QByteArray();
 	}
@@ -232,6 +232,12 @@ bool CTenantMembershipManagerComp::RemoveMembership(const QByteArray& membership
 			.arg(QString::fromUtf8(userId), QString::fromUtf8(tenantId)), "CTenantMembershipManagerComp");
 	}
 
+	TenantEvent::Publish(this, {
+				{TenantEvent::s_type, TenantEvent::s_membershipRemoved},
+				{TenantEvent::s_membershipId, membershipId},
+				{TenantEvent::s_userId, userId},
+				{TenantEvent::s_tenantId, tenantId}});
+
 	SendInfoMessage(0, QStringLiteral("Removed membership '%1'").arg(membershipId), "CTenantMembershipManagerComp");
 
 	return true;
@@ -259,11 +265,24 @@ bool CTenantMembershipManagerComp::UpdateMembershipOrganizationPermissions(const
 
 	istd::CChangeNotifier changeNotifier(this);
 
+	QByteArrayList previousPermissions = membershipPtr->GetOrganizationPermissions();
+	QByteArrayList newPermissions = permissions;
+	std::sort(previousPermissions.begin(), previousPermissions.end());
+	std::sort(newPermissions.begin(), newPermissions.end());
+
 	membershipPtr->SetOrganizationPermissions(permissions);
 
 	if (!m_membershipCollectionCompPtr->SetObjectData(membershipId, *membershipPtr)){
 		SendErrorMessage(0, QStringLiteral("Failed to update membership '%1' permissions").arg(membershipId), "CTenantMembershipManagerComp");
 		return false;
+	}
+
+	if (previousPermissions != newPermissions){
+		TenantEvent::Publish(this, {
+					{TenantEvent::s_type, TenantEvent::s_membershipPermissionsChanged},
+					{TenantEvent::s_membershipId, membershipId},
+					{TenantEvent::s_userId, membershipPtr->GetUserId()},
+					{TenantEvent::s_tenantId, membershipPtr->GetTenantId()}});
 	}
 
 	SendInfoMessage(0, QStringLiteral("Updated organization permissions for membership '%1'").arg(membershipId), "CTenantMembershipManagerComp");
@@ -280,6 +299,24 @@ bool CTenantMembershipManagerComp::IsMember(const QByteArray& userId, const QByt
 
 
 // private methods
+
+QByteArrayList CTenantMembershipManagerComp::GetCandidateMembershipIds(const QByteArray& userId, const QByteArray& tenantId) const
+{
+	if (userId.isEmpty() && tenantId.isEmpty()){
+		return QByteArrayList();
+	}
+
+	CollectionSelection::FilterExpression filterExpr;
+	if (!userId.isEmpty()){
+		filterExpr.fieldFilters << CollectionSelection::FieldFilter("UserId", QString::fromUtf8(userId));
+	}
+	if (!tenantId.isEmpty()){
+		filterExpr.fieldFilters << CollectionSelection::FieldFilter("TenantId", QString::fromUtf8(tenantId));
+	}
+
+	return CollectionSelection::SelectIds(*m_membershipCollectionCompPtr, filterExpr);
+}
+
 
 bool CTenantMembershipManagerComp::CleanupTenantAssignedUserData(const QByteArray& userId, const QByteArray& tenantId)
 {

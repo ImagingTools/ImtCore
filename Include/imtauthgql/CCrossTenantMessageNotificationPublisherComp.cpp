@@ -4,11 +4,12 @@
 // Qt includes
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QMutexLocker>
+#include <QSet>
 
 // ImtCore includes
 #include <imtgql/CGqlRequest.h>
 #include <imtgql/IGqlContext.h>
+#include <imtauth/TenantEvents.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Tenants.h>
 
 
@@ -87,19 +88,6 @@ void CCrossTenantMessageNotificationPublisherComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	// Initialize the message cache so subsequent OnModelChanged() calls can
-	// detect NEW messages (those not present in the cache) and status changes.
-	if (m_messageBrokerCompPtr.IsValid() && m_tenantManagerCompPtr.IsValid()){
-		QMutexLocker locker(&m_cacheMutex);
-		QByteArrayList tenantIds = m_tenantManagerCompPtr->GetTenantIds();
-		for (const QByteArray& tenantId : std::as_const(tenantIds)){
-			imtauth::CrossTenantMessages messages = m_messageBrokerCompPtr->GetIncomingMessages(tenantId);
-			for (const imtauth::CrossTenantMessageInfo& message : std::as_const(messages)){
-				m_cachedMessageStatus.insert(message.messageId, message.status);
-			}
-		}
-	}
-
 	if (m_messageBrokerModelCompPtr.IsValid()){
 		RegisterModel(m_messageBrokerModelCompPtr.GetPtr(), 0);
 	}
@@ -116,73 +104,51 @@ void CCrossTenantMessageNotificationPublisherComp::OnComponentDestroyed()
 
 // reimplemented (imod::CMultiModelDispatcherBase)
 
-void CCrossTenantMessageNotificationPublisherComp::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
+void CCrossTenantMessageNotificationPublisherComp::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& changeSet)
 {
 	if (!m_messageBrokerCompPtr.IsValid() || !m_tenantManagerCompPtr.IsValid()){
 		return;
 	}
 
-	struct PendingNotification
-	{
-		QByteArray targetUserId;
-		sdl::V1_0::imtauth::ECrossTenantMessageNotificationType notificationType;
-		imtauth::CrossTenantMessageInfo message;
-		QString tenantName;
-	};
+	const QList<QVariantMap> events = imtauth::TenantEvent::GetEvents(changeSet);
 
-	QList<PendingNotification> pendingNotifications;
-
-	{
-		QMutexLocker locker(&m_cacheMutex);
-
-		QMap<QByteArray, imtauth::CrossTenantMessageStatus> currentState;
-
-		QByteArrayList tenantIds = m_tenantManagerCompPtr->GetTenantIds();
-		for (const QByteArray& tenantId : std::as_const(tenantIds)){
-			// Every message has exactly one target tenant, so iterating the
-			// inbox of all tenants visits each message exactly once.
-			imtauth::CrossTenantMessages messages = m_messageBrokerCompPtr->GetIncomingMessages(tenantId);
-			for (const imtauth::CrossTenantMessageInfo& message : std::as_const(messages)){
-				currentState.insert(message.messageId, message.status);
-
-				if (!m_cachedMessageStatus.contains(message.messageId)){
-					// New incoming message — notify the target tenant owner.
-					QByteArray ownerUserId = FindTenantOwnerUserId(message.targetTenantId);
-					if (!ownerUserId.isEmpty()){
-						pendingNotifications.append({
-							ownerUserId,
-							sdl::V1_0::imtauth::ECrossTenantMessageNotificationType::MessageReceived,
-							message,
-							FindTenantName(message.sourceTenantId)});
-					}
-				}
-				else if (m_cachedMessageStatus.value(message.messageId) != message.status){
-					// Status changed — notify the source tenant owner so the
-					// sender learns about confirmations/rejections/updates that
-					// flow back through the reverse channel.
-					QByteArray ownerUserId = FindTenantOwnerUserId(message.sourceTenantId);
-					if (!ownerUserId.isEmpty()){
-						pendingNotifications.append({
-							ownerUserId,
-							sdl::V1_0::imtauth::ECrossTenantMessageNotificationType::MessageStatusChanged,
-							message,
-							FindTenantName(message.targetTenantId)});
-					}
-				}
-			}
+	// A message announced as new carries its latest status, so its status changes in the same change are not told again
+	QSet<QByteArray> createdMessageIds;
+	for (const QVariantMap& event : events){
+		if (event.value(imtauth::TenantEvent::s_type).toString() == imtauth::TenantEvent::s_messageCreated){
+			createdMessageIds.insert(event.value(imtauth::TenantEvent::s_messageId).toByteArray());
 		}
-
-		m_cachedMessageStatus = currentState;
 	}
 
-	// Publish notifications outside the cache lock to avoid potential deadlocks
-	// with the base class mutex used by PublishDataFiltered.
-	for (const PendingNotification& notification : std::as_const(pendingNotifications)){
-		PublishNotification(
-			notification.targetUserId,
-			notification.notificationType,
-			notification.message,
-			notification.tenantName);
+	for (const QVariantMap& event : events){
+		const QString type = event.value(imtauth::TenantEvent::s_type).toString();
+		const QByteArray messageId = event.value(imtauth::TenantEvent::s_messageId).toByteArray();
+		const bool isCreated = type == imtauth::TenantEvent::s_messageCreated;
+		if (!isCreated && (type != imtauth::TenantEvent::s_messageStatusChanged || createdMessageIds.contains(messageId))){
+			continue;
+		}
+
+		const imtauth::CrossTenantMessageInfo message = m_messageBrokerCompPtr->GetMessage(messageId);
+		if (message.messageId.isEmpty()){
+			continue;
+		}
+
+		if (isCreated){
+			// A new message goes to the owner of the target organization
+			PublishNotification(
+						FindTenantOwnerUserId(message.targetTenantId),
+						sdl::V1_0::imtauth::ECrossTenantMessageNotificationType::MessageReceived,
+						message,
+						FindTenantName(message.sourceTenantId));
+		}
+		else{
+			// The answer flows back to the owner of the source organization
+			PublishNotification(
+						FindTenantOwnerUserId(message.sourceTenantId),
+						sdl::V1_0::imtauth::ECrossTenantMessageNotificationType::MessageStatusChanged,
+						message,
+						FindTenantName(message.targetTenantId));
+		}
 	}
 }
 
@@ -195,6 +161,10 @@ void CCrossTenantMessageNotificationPublisherComp::PublishNotification(
 			const imtauth::CrossTenantMessageInfo& message,
 			const QString& tenantName) const
 {
+	if (targetUserId.isEmpty()){
+		return;
+	}
+
 	sdl::V1_0::imtauth::CCrossTenantMessageNotification notification;
 	notification.notificationType = notificationType;
 	notification.messageId = message.messageId;

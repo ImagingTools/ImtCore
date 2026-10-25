@@ -20,7 +20,6 @@ Dialog {
 	property int currentIndex: -1;
 
 	property string login: "";
-	property string username: "";
 	property string email: "";
 	property string code: "";
 	property string newPassword: "";
@@ -43,11 +42,6 @@ Dialog {
 			passwordRecoveryDialog.setButtonName(Enums.yes, qsTr("Check the email"));
 
 			stackView.addPage(pageComp0);
-		}
-		else if (currentIndex === 1){
-			passwordRecoveryDialog.setButtonName(Enums.yes, qsTr("Yes"));
-
-			stackView.addPage(pageComp1);
 		}
 		else if (currentIndex === 2){
 			passwordRecoveryDialog.setButtonEnabled(Enums.yes, false);
@@ -88,12 +82,6 @@ Dialog {
 		if (buttonId === Enums.yes){
 			if (currentIndex == 0){
 				checkEmailRequestSender.send();
-			}
-			else if (currentIndex == 1){
-				sendEmailCodeRequestSender.send();
-				currentIndex = 2;
-
-				return;
 			}
 			else if (currentIndex == 2){
 				checkEmailCodeRequestSender.send();
@@ -241,30 +229,6 @@ Dialog {
 	}
 
 	Component {
-		id: pageComp1;
-
-		Item {
-			GroupElementView {
-				id: group;
-				anchors.top: parent.top;
-				anchors.topMargin: Style.marginXL;
-				anchors.left: parent.left;
-				anchors.leftMargin: Style.marginXL;
-				anchors.right: parent.right;
-				anchors.rightMargin: Style.marginXL;
-
-				TextInputElementView {
-					id: usernameElementView;
-					name: qsTr("Username");
-					description: qsTr("For this email this account has been found, is that you?");
-					text: passwordRecoveryDialog.username;
-					readOnly: true;
-				}
-			}
-		}
-	}
-
-	Component {
 		id: pageComp3;
 
 		Item {
@@ -302,9 +266,10 @@ Dialog {
 		sdlObjectComp: Component {
 			CheckEmailPayload {
 				onFinished: {
+					// The recovery goes on by the e-mail: the server does not tell whether it has an account
 					if (m_success){
-						passwordRecoveryDialog.username = m_userName;
-						passwordRecoveryDialog.login = m_login;
+						passwordRecoveryDialog.login = passwordRecoveryDialog.email;
+						sendEmailCodeRequestSender.send();
 					}
 					else{
 						if (m_message !== ""){
@@ -312,7 +277,7 @@ Dialog {
 						}
 					}
 
-					passwordRecoveryDialog.currentIndex = m_success ? 1 : 0;
+					passwordRecoveryDialog.currentIndex = m_success ? 2 : 0;
 				}
 			}
 		}
@@ -392,6 +357,7 @@ Dialog {
 			ChangePasswordInput {
 				m_login: passwordRecoveryDialog.login;
 				m_newPassword: passwordRecoveryDialog.newPassword;
+				m_verificationCode: passwordRecoveryDialog.code;
 			}
 		}
 

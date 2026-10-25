@@ -4,6 +4,7 @@
 
 // Qt includes
 #include <QtCore/QDateTime>
+#include <QtCore/QHash>
 #include <QtCore/QUuid>
 
 // ACF includes
@@ -14,6 +15,7 @@
 // ImtCore includes
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtbase/IObjectCollectionIterator.h>
+#include <imtbase/imtbase.h>
 
 
 namespace imtauth
@@ -27,6 +29,7 @@ QByteArray CDocumentShareManagerComp::ShareDocument(const IDocumentShareInfo& sh
 	QString errorMessage;
 	QString ownerTenantName;
 	QString targetTenantName;
+	QDateTime relatedSince;
 
 	const QByteArray ownerTenantId = shareInfo.GetOwnerTenantId();
 	const QByteArray targetTenantId = shareInfo.GetTargetTenantId();
@@ -43,16 +46,22 @@ QByteArray CDocumentShareManagerComp::ShareDocument(const IDocumentShareInfo& sh
 	}
 	else{
 		bool isRelated = false;
+		bool isEffective = false;
 		for (const RelatedTenantInfo& relatedTenant : m_relationshipProviderCompPtr->GetRelatedTenants(ownerTenantId, &ownerTenantName)){
 			if (relatedTenant.tenantId == targetTenantId){
 				targetTenantName = relatedTenant.tenantName;
+				relatedSince = relatedTenant.relatedSince;
 				isRelated = true;
+				isEffective = relatedTenant.isEffective;
 				break;
 			}
 		}
 
 		if (!isRelated){
 			errorMessage = QStringLiteral("The organizations have no active relationship");
+		}
+		else if (!isEffective){
+			errorMessage = QStringLiteral("The relationship of the organizations is not valid at this time");
 		}
 	}
 
@@ -73,6 +82,12 @@ QByteArray CDocumentShareManagerComp::ShareDocument(const IDocumentShareInfo& sh
 			storedPtr = existingPtr;
 			break;
 		}
+	}
+
+	// A share left from an earlier relationship ends; sharing again starts a new one
+	if (storedPtr.IsValid() && storedPtr->GetOwnerTenantId() == ownerTenantId && IsOfEarlierRelationship(*storedPtr, relatedSince)){
+		RemoveShares({storedPtr->GetShareId()});
+		storedPtr.Reset();
 	}
 
 	const bool isNew = !storedPtr.IsValid();
@@ -226,35 +241,18 @@ DocumentShares CDocumentShareManagerComp::GetOutgoingShares(const QByteArray& ow
 
 QByteArrayList CDocumentShareManagerComp::GetShareOwnerTenantIds(const QByteArray& targetTenantId) const
 {
-	if (targetTenantId.isEmpty()){
-		return QByteArrayList();
-	}
+	QByteArrayList retVal;
+	ReadRelatedTenants(targetTenantId, retVal);
 
-	const qint64 now = QDateTime::currentMSecsSinceEpoch();
-	{
-		QMutexLocker locker(&m_relatedTenantsCacheMutex);
-		auto cacheIter = m_relatedTenantsCache.constFind(targetTenantId);
-		if (cacheIter != m_relatedTenantsCache.constEnd() && cacheIter->expiresAt > now){
-			return cacheIter->tenantIds;
-		}
-	}
+	return retVal;
+}
 
-	RelatedTenantsCacheItem cacheItem;
-	cacheItem.expiresAt = now + qint64(qMax(0, *m_relationshipCacheTimeoutAttrPtr)) * 1000;
-	bool isRead = false;
-	for (const RelatedTenantInfo& relatedTenant : m_relationshipProviderCompPtr->GetRelatedTenants(targetTenantId, nullptr, &isRead)){
-		cacheItem.tenantIds << relatedTenant.tenantId;
-	}
 
-	// A requester who may not read the relationships gets no shares, without affecting the others
-	if (!isRead){
-		return QByteArrayList();
-	}
+int CDocumentShareManagerComp::RemoveUnrelatedShares(const QByteArray& tenantId)
+{
+	QByteArrayList effectiveTenantIds;
 
-	QMutexLocker locker(&m_relatedTenantsCacheMutex);
-	m_relatedTenantsCache.insert(targetTenantId, cacheItem);
-
-	return cacheItem.tenantIds;
+	return ReadRelatedTenants(tenantId, effectiveTenantIds);
 }
 
 
@@ -265,6 +263,96 @@ int CDocumentShareManagerComp::GetSharesRevision() const
 
 
 // private methods
+
+int CDocumentShareManagerComp::ReadRelatedTenants(const QByteArray& tenantId, QByteArrayList& effectiveTenantIds) const
+{
+	effectiveTenantIds.clear();
+	if (tenantId.isEmpty()){
+		return 0;
+	}
+
+	const qint64 now = QDateTime::currentMSecsSinceEpoch();
+	{
+		QMutexLocker locker(&m_relatedTenantsCacheMutex);
+		auto cacheIter = m_relatedTenantsCache.constFind(tenantId);
+		if (cacheIter != m_relatedTenantsCache.constEnd() && cacheIter->expiresAt > now){
+			effectiveTenantIds = cacheIter->tenantIds;
+
+			return 0;
+		}
+	}
+
+	bool isRead = false;
+	const RelatedTenantInfos relatedTenants = m_relationshipProviderCompPtr->GetRelatedTenants(tenantId, nullptr, &isRead);
+
+	// An unreadable answer is not an ended relationship; the requester gets no shares, without affecting the others
+	if (!isRead){
+		return 0;
+	}
+
+	// The shares of ended relationships go before the partners are trusted, so a re-created relationship revives none
+	const QByteArrayList endedShareIds = FindSharesOfEndedRelationships(tenantId, relatedTenants, GetOutgoingShares(tenantId) + GetIncomingShares(tenantId));
+	int removedCount = 0;
+	if (!endedShareIds.isEmpty() && const_cast<CDocumentShareManagerComp*>(this)->RemoveShares(endedShareIds)){
+		removedCount = imtbase::narrow_cast<int>(endedShareIds.size());
+
+		SendInfoMessage(0, QStringLiteral("Removed %1 document shares of tenant '%2' of ended relationships").arg(QString::number(removedCount), QString::fromUtf8(tenantId)), "CDocumentShareManagerComp");
+	}
+
+	RelatedTenantsCacheItem cacheItem;
+	cacheItem.expiresAt = now + qint64(qMax(0, *m_relationshipCacheTimeoutAttrPtr)) * 1000;
+	for (const RelatedTenantInfo& relatedTenant : relatedTenants){
+		if (relatedTenant.isEffective){
+			cacheItem.tenantIds << relatedTenant.tenantId;
+		}
+	}
+
+	QMutexLocker locker(&m_relatedTenantsCacheMutex);
+	m_relatedTenantsCache.insert(tenantId, cacheItem);
+	effectiveTenantIds = cacheItem.tenantIds;
+
+	return removedCount;
+}
+
+
+bool CDocumentShareManagerComp::IsOfEarlierRelationship(const IDocumentShareInfo& share, const QDateTime& relatedSince) const
+{
+	// The clocks of the servers may differ a little, an unknown time decides nothing
+	const QDateTime createdAt = share.GetCreatedAt();
+
+	return relatedSince.isValid() && createdAt.isValid() && createdAt.addSecs(s_clockToleranceSecs) < relatedSince;
+}
+
+
+QByteArrayList CDocumentShareManagerComp::FindSharesOfEndedRelationships(
+			const QByteArray& tenantId,
+			const RelatedTenantInfos& relatedTenants,
+			const DocumentShares& shares) const
+{
+	// A relationship outside its validity period still exists: its shares grant nothing until it is valid again
+	QHash<QByteArray, QDateTime> relatedSinceByTenant;
+	for (const RelatedTenantInfo& relatedTenant : relatedTenants){
+		relatedSinceByTenant.insert(relatedTenant.tenantId, relatedTenant.relatedSince);
+	}
+
+	QByteArrayList retVal;
+	for (const IDocumentShareInfoSharedPtr& sharePtr : shares){
+		const bool isOwner = sharePtr->GetOwnerTenantId() == tenantId;
+		if (!isOwner && sharePtr->GetTargetTenantId() != tenantId){
+			continue;
+		}
+
+		const QByteArray partnerTenantId = isOwner ? sharePtr->GetTargetTenantId() : sharePtr->GetOwnerTenantId();
+		const auto relatedIter = relatedSinceByTenant.constFind(partnerTenantId);
+		const bool isEnded = relatedIter == relatedSinceByTenant.constEnd() || IsOfEarlierRelationship(*sharePtr, relatedIter.value());
+		if (isEnded && !retVal.contains(sharePtr->GetShareId())){
+			retVal.append(sharePtr->GetShareId());
+		}
+	}
+
+	return retVal;
+}
+
 
 DocumentShares CDocumentShareManagerComp::FindShares(const QByteArray& fieldId, const QByteArray& value) const
 {

@@ -581,7 +581,9 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceCom
 			QByteArray creatorId = tenantPtr->GetCreatorId();
 			for (const QByteArray& existingUserId : currentUserIds){
 				if (!newUserIds.contains(existingUserId) && existingUserId != ownerId && existingUserId != creatorId){
-					m_membershipManagerCompPtr->RemoveMembership(userIdToMembershipId.value(existingUserId));
+					if (m_membershipManagerCompPtr->RemoveMembership(userIdToMembershipId.value(existingUserId)) && m_invitationManagerCompPtr.IsValid()){
+						m_invitationManagerCompPtr->RevokeInvitationsSentBy(tenantId, existingUserId, contextUserId);
+					}
 				}
 			}
 
@@ -594,7 +596,9 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceCom
 			}
 		} else if (isSelfLeaving){
 			// Non-admin member can only remove themselves
-			m_membershipManagerCompPtr->RemoveMembership(userIdToMembershipId.value(contextUserId));
+			if (m_membershipManagerCompPtr->RemoveMembership(userIdToMembershipId.value(contextUserId)) && m_invitationManagerCompPtr.IsValid()){
+				m_invitationManagerCompPtr->RevokeInvitationsSentBy(tenantId, contextUserId, contextUserId);
+			}
 		}
 	}
 

@@ -549,6 +549,18 @@ sdl::V1_0::imtauth::CGetOrganizationPermissionsPayload CTenantMembershipManagerC
 		return response;
 	}
 
+	sdl::V1_0::imtauth::GetOrganizationPermissionsRequestArguments arguments = request.GetRequestedArguments();
+	const QByteArray userId = arguments.input && arguments.input->userId ? *arguments.input->userId : QByteArray();
+	const QByteArray tenantId = arguments.input && arguments.input->tenantId ? *arguments.input->tenantId : QByteArray();
+	const bool isMemberRequested = !userId.isEmpty() && !tenantId.isEmpty() && m_membershipManagerCompPtr.IsValid();
+
+	// A refused request gets nothing, not even the permission tree
+	if (isMemberRequested && userId != ContextUserId(gqlRequest) && !CanViewOrganizationData(gqlRequest, tenantId, s_viewOrganizationPermissionsPermission)){
+		response.errorMessage = QStringLiteral("Access denied");
+
+		return response;
+	}
+
 	QByteArray languageId;
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 	if (gqlContextPtr != nullptr){
@@ -563,24 +575,10 @@ sdl::V1_0::imtauth::CGetOrganizationPermissionsPayload CTenantMembershipManagerC
 			languageId,
 			nullptr);
 
-	sdl::V1_0::imtauth::GetOrganizationPermissionsRequestArguments arguments = request.GetRequestedArguments();
-	if (arguments.input && arguments.input->userId && arguments.input->tenantId
-			&& m_membershipManagerCompPtr.IsValid())
-	{
-		const QByteArray userId = *arguments.input->userId;
-		const QByteArray tenantId = *arguments.input->tenantId;
-		if (!userId.isEmpty() && !tenantId.isEmpty()){
-			if (userId != ContextUserId(gqlRequest) && !CanViewOrganizationData(gqlRequest, tenantId, s_viewOrganizationPermissionsPermission)){
-				response.errorMessage = QStringLiteral("Access denied");
-
-				return response;
-			}
-
-			imtauth::ITenantMembershipUniquePtr membershipPtr =
-					m_membershipManagerCompPtr->FindMembership(userId, tenantId);
-			if (membershipPtr.IsValid()){
-				response.memberPermissions.Emplace().FromList(membershipPtr->GetOrganizationPermissions());
-			}
+	if (isMemberRequested){
+		imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->FindMembership(userId, tenantId);
+		if (membershipPtr.IsValid()){
+			response.memberPermissions.Emplace().FromList(membershipPtr->GetOrganizationPermissions());
 		}
 	}
 
@@ -682,6 +680,9 @@ sdl::V1_0::imtauth::CRemoveMembershipPayload CTenantMembershipManagerControllerC
 	}
 
 	bool success = m_membershipManagerCompPtr->RemoveMembership(membershipId);
+	if (success && m_invitationManagerCompPtr.IsValid()){
+		m_invitationManagerCompPtr->RevokeInvitationsSentBy(membershipPtr->GetTenantId(), membershipPtr->GetUserId(), ContextUserId(gqlRequest));
+	}
 
 	response.success = success;
 	if (!success){
@@ -997,7 +998,7 @@ sdl::V1_0::imtauth::CTransferTenantOwnershipPayload CTenantMembershipManagerCont
 	imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
 	if (!tenantPtr.IsValid()){
 		response.success = false;
-		response.errorMessage = QStringLiteral("Tenant not found");
+		response.errorMessage = QStringLiteral("Organization not found");
 		return response;
 	}
 

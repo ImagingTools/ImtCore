@@ -9,10 +9,23 @@
 
 // ImtCore includes
 #include <imtauth/CUserVerification.h>
+#include <imtauth/CollectionSelection.h>
+#include <imtservergql/imtservergql.h>
 
 
 namespace imtauthgql
 {
+
+
+namespace
+{
+
+
+// The permission UserItem requires to read another user
+static const QByteArray s_viewUsersPermissionId = QByteArrayLiteral("/Administration/Users/View");
+
+
+} // anonymous namespace
 
 
 // reimplemented (sdl::V1_0::imtauth::CUsersGqlHandlerCompBase)
@@ -63,7 +76,12 @@ sdl::V1_0::imtauth::CChangePasswordPayload CUserControllerComp::OnChangePassword
 		newPassword = *inputArgument.newPassword;
 	}
 
-	QByteArray userId = GetUserIdByLogin(login);
+	QByteArray verificationCode;
+	if (inputArgument.verificationCode){
+		verificationCode = inputArgument.verificationCode->toUtf8();
+	}
+
+	QByteArray userId = GetUserIdByLoginOrEmail(login);
 
 	imtauth::IUserInfo* userInfoPtr = nullptr;
 	imtbase::IObjectCollection::DataPtr dataPtr;
@@ -71,11 +89,15 @@ sdl::V1_0::imtauth::CChangePasswordPayload CUserControllerComp::OnChangePassword
 		userInfoPtr = dynamic_cast<imtauth::IUserInfo*>(dataPtr.GetPtr());
 	}
 
+	// An unknown account is refused like a wrong password, so the answer does not tell which accounts exist
 	if (userInfoPtr == nullptr){
 		return CreateChangePasswordFailure(
-					QStringLiteral("Unable to change password for user '%1'. Error: The user does not exist").arg(login),
-					QStringList() << QStringLiteral("UnknownUser"));
+					QStringLiteral("Unable to change password for user '%1'. Error: Invalid login or password.").arg(login),
+					QStringList() << QStringLiteral("InvalidCredentials"));
 	}
+
+	// The recovery may name the account by its e-mail; the password hash is built from the login
+	login = userInfoPtr->GetId();
 
 	imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
 	for (const imtauth::IUserInfo::SystemInfo& systemInfo : systemInfoList){
@@ -102,11 +124,10 @@ sdl::V1_0::imtauth::CChangePasswordPayload CUserControllerComp::OnChangePassword
 		ok = m_credentialControllerCompPtr->CheckCredential(login, oldPassword.toUtf8());
 	}
 
-	if (m_userVerificationControllerCompPtr.IsValid()){
-		istd::TDelPtr<const imtauth::IUserVerification> verificationInfoPtr = m_userVerificationControllerCompPtr->GetVerificationData(userId);
-		if (verificationInfoPtr.IsValid() && !verificationInfoPtr->IsExpired()){
-			ok = true;
-		}
+	// The recovery proves the account by the code sent to its e-mail, not by a pending verification alone
+	bool isRecovery = false;
+	if (!ok && !verificationCode.isEmpty() && m_userVerificationControllerCompPtr.IsValid()){
+		ok = isRecovery = m_userVerificationControllerCompPtr->VerifyUser(userId, verificationCode);
 	}
 
 	if (!ok){
@@ -159,6 +180,10 @@ sdl::V1_0::imtauth::CChangePasswordPayload CUserControllerComp::OnChangePassword
 		return CreateChangePasswordFailure(
 					QStringLiteral("Unable to change password for user '%1'. Error: The user could not be stored").arg(login),
 					QStringList() << QStringLiteral("StorageError"));
+	}
+
+	if (isRecovery){
+		m_userVerificationControllerCompPtr->RemoveVerificationData(userId);
 	}
 
 	payload.success = true;
@@ -293,7 +318,9 @@ sdl::V1_0::imtauth::CRegisterUserPayload CUserControllerComp::OnRegisterUser(
 	response.id = userId;
 
 	if (m_roleCollectionCompPtr.IsValid()){
-		imtbase::IObjectCollection::Ids roleIds = m_roleCollectionCompPtr->GetElementIds();
+		// The roles of the product are the candidates for its default role
+		const imtbase::IObjectCollection::Ids roleIds = imtauth::CollectionSelection::SelectIds(
+					*m_roleCollectionCompPtr, imtauth::CollectionSelection::ColumnEquals("ProductId", productId), {"ProductId"});
 		for (const QByteArray& roleId : roleIds){
 			imtbase::IObjectCollection::DataPtr roleDataPtr;
 			if (m_roleCollectionCompPtr->GetObjectData(roleId, roleDataPtr)){
@@ -355,22 +382,8 @@ sdl::V1_0::imtauth::CCheckEmailPayload CUserControllerComp::OnCheckEmail(
 		return retVal;
 	}
 
-	QByteArray userId = GetUserIdByEmail(email);
-
-	const imtauth::IUserInfo* userInfoPtr = nullptr;
-	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (m_userCollectionCompPtr->GetObjectData(userId, dataPtr)){
-		userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
-	}
-
-	if (userInfoPtr == nullptr){
-		response.message = QStringLiteral("There are no users with email '%1' in the system").arg(email);
-		return retVal;
-	}
-
+	// Anyone may ask, so the answer neither names the account nor tells whether one exists
 	response.success = true;
-	response.userName = userInfoPtr->GetName();
-	response.login = userInfoPtr->GetId();
 
 	return retVal;
 }
@@ -398,20 +411,19 @@ sdl::V1_0::imtauth::CSendEmailCodePayload CUserControllerComp::OnSendEmailCode(
 	response.login = login;
 	response.success = false;
 
-	QByteArray objectId = GetUserIdByLogin(login);
-	imtauth::IUserInfoSharedPtr userInfoPtr = GetUserInfoByLogin(login);
-	if (!userInfoPtr.IsValid()){
-		response.message = QStringLiteral("Unable to send email code. Error: User is invalid");
+	const QByteArray objectId = GetUserIdByLoginOrEmail(login);
+	imtauth::IUserInfoSharedPtr userInfoPtr;
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	if (!objectId.isEmpty() && m_userCollectionCompPtr.IsValid() && m_userCollectionCompPtr->GetObjectData(objectId, dataPtr) && dataPtr.IsValid()){
+		userInfoPtr.SetCastedPtr<istd::IChangeable>(dataPtr);
 	}
-	else{
-		bool ok = SendUserCode(objectId, *userInfoPtr.GetPtr());
-		if (ok){
-			response.success = ok;
-		}
-		else{
-			response.message = QStringLiteral("Unable to send email code. Error: Unknown error");
-		}
+
+	// Unknown accounts and failed sendings get the same answer, so it tells no account exists; the failure is logged
+	if (userInfoPtr.IsValid()){
+		SendUserCode(objectId, *userInfoPtr.GetPtr());
 	}
+
+	response.success = true;
 
 	return retVal;
 }
@@ -437,7 +449,7 @@ sdl::V1_0::imtauth::CCheckEmailCodePayload CUserControllerComp::OnCheckEmailCode
 		login = *arguments.input->login;
 	}
 
-	QByteArray userId = GetUserIdByLogin(login);
+	QByteArray userId = GetUserIdByLoginOrEmail(login);
 
 	QString code;
 	if (arguments.input->code){
@@ -611,7 +623,7 @@ sdl::V1_0::imtauth::CCreateSuperuserPayload CUserControllerComp::OnCreateSuperus
 
 sdl::V1_0::imtauth::CUserObjectId CUserControllerComp::OnGetUserObjectId(
 			const sdl::V1_0::imtauth::CGetUserObjectIdGqlRequest& getUserObjectIdRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtauth::CUserObjectId response;
@@ -629,6 +641,17 @@ sdl::V1_0::imtauth::CUserObjectId CUserControllerComp::OnGetUserObjectId(
 
 	QByteArray login = *arguments.input->login;
 	QByteArray objectId = GetUserIdByLogin(login);
+
+	// The id of another account is told to whoever may view users, like UserItem
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	const QByteArray requestUserId = gqlContextPtr != nullptr ? gqlContextPtr->GetUserId() : QByteArray();
+	const bool isOwnAccount = !requestUserId.isEmpty() && requestUserId == objectId;
+	const bool mayViewUsers = gqlContextPtr != nullptr && imtauth::HasPermission(imtservergql::GetUserPermissions(*gqlContextPtr), s_viewUsersPermissionId);
+	if (!isOwnAccount && !mayViewUsers && !IsSuperuserRequest(gqlRequest)){
+		errorMessage = QStringLiteral("Unable to get user object-ID. Error: No permission to view other users");
+		SendWarningMessage(0, errorMessage, "CUserControllerComp");
+		return response;
+	}
 
 	response.objectId = objectId;
 
@@ -813,6 +836,21 @@ QByteArray CUserControllerComp::GetUserIdByLogin(const QByteArray& login) const
 	}
 
 	return QByteArray();
+}
+
+
+QByteArray CUserControllerComp::GetUserIdByLoginOrEmail(const QByteArray& loginOrEmail) const
+{
+	if (loginOrEmail.isEmpty() || !m_userCollectionCompPtr.IsValid()){
+		return QByteArray();
+	}
+
+	const QByteArray userId = GetUserIdByLogin(loginOrEmail);
+	if (!userId.isEmpty() || !loginOrEmail.contains('@')){
+		return userId;
+	}
+
+	return GetUserIdByEmail(QString::fromUtf8(loginOrEmail));
 }
 
 
