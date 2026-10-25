@@ -6,6 +6,7 @@
 
 // Qt includes
 #include <QtCore/QTemporaryDir>
+#include <QtCore/QTemporaryFile>
 #include <QtCore/QLockFile>
 #include <QtCore/QFileInfo>
 
@@ -157,7 +158,6 @@ iproc::IProcessor::TaskState CCxxProcessorsManagerComp::DoProcessing(
 		cumulatedFiles << headerFilePath;
 		cumulatedFiles << fwdFilePath;
 		if (HasObjectEntries()){
-			cumulatedFiles << ToObjectsFilePath(sourceFilePath);
 			cumulatedFiles << ToObjectsFilePath(headerFilePath);
 		}
 
@@ -196,7 +196,8 @@ iproc::IProcessor::TaskState CCxxProcessorsManagerComp::DoProcessing(
 	}
 	if (objectSourceFiles.size() == 1){
 		const FilePtr& filePtr = objectSourceFiles.first();
-		if (!filePtr || !BeginSourceFile(*m_schemaParamsCompPtr, *filePtr, paramsPtr)){
+		const QString headerFilePath = CalculateTargetCppFilesFromSchemaParams(*m_schemaParamsCompPtr, *m_argumentParserCompPtr)[imtsdl::ISdlProcessArgumentsParser::s_headerFileType];
+		if (!filePtr || !BeginSourceFile(*m_schemaParamsCompPtr, *filePtr, paramsPtr, QFileInfo(ToObjectsFilePath(headerFilePath)).fileName())){
 			SendErrorMessage(0, QStringLiteral("Unable to begin process objects source file"));
 
 			return TS_INVALID;
@@ -348,6 +349,17 @@ iproc::IProcessor::TaskState CCxxProcessorsManagerComp::DoProcessing(
 	if (objectSourceFiles.size() == 1){
 		const FilePtr& filePtr = objectSourceFiles.first();
 		if (!EndSourceFile(*m_schemaParamsCompPtr, *filePtr, paramsPtr)){
+			SendErrorMessage(0, QStringLiteral("Unable to end process file '%1'").arg(filePtr->fileName()));
+
+			return TS_INVALID;
+		}
+	}
+
+	// one source file per schema: the objects implementation and the moc output are compiled with the main one
+	if (sourceFiles.size() == 1){
+		const FilePtr& filePtr = sourceFiles.first();
+		const FilePtr objectSourceFilePtr = objectSourceFiles.isEmpty() ? FilePtr() : objectSourceFiles.first();
+		if (!AppendSourceFileTail(*filePtr, objectSourceFilePtr.get())){
 			SendErrorMessage(0, QStringLiteral("Unable to end process file '%1'").arg(filePtr->fileName()));
 
 			return TS_INVALID;
@@ -527,14 +539,21 @@ bool CCxxProcessorsManagerComp::BeginHeaderFile(
 bool CCxxProcessorsManagerComp::BeginSourceFile(
 			const iprm::IParamsSet& entryParams,
 			QFile& sourceFile,
-			const iprm::IParamsSet* /*paramsPtr*/) const
+			const iprm::IParamsSet* /*paramsPtr*/,
+			const QString& objectsHeaderFileName) const
 {
 	QTextStream stream(&sourceFile);
 
 	// include header file
 	stream << QStringLiteral("#include \"");
-	stream << QFileInfo(sourceFile).baseName();
-	stream << QStringLiteral(".h\"");
+	if (objectsHeaderFileName.isEmpty()){
+		stream << QFileInfo(sourceFile).baseName();
+		stream << QStringLiteral(".h");
+	}
+	else{
+		stream << objectsHeaderFileName;
+	}
+	stream << '"';
 	FeedStream(stream, 3, false);
 
 	// begin namespace
@@ -593,6 +612,34 @@ bool CCxxProcessorsManagerComp::EndSourceFile(
 	stream << QStringLiteral(" // namespace ");
 	stream << sdlNamespace;
 	FeedStream(stream, 1, false);
+
+	return true;
+}
+
+
+bool CCxxProcessorsManagerComp::AppendSourceFileTail(QFile& sourceFile, QFile* objectsSourceFilePtr) const
+{
+	QTextStream stream(&sourceFile);
+
+	if (objectsSourceFilePtr != nullptr){
+		if (!objectsSourceFilePtr->seek(0)){
+			return false;
+		}
+
+		FeedStream(stream, 1, false);
+		stream << QString::fromUtf8(objectsSourceFilePtr->readAll());
+	}
+
+	if (m_argumentParserCompPtr->IsMocIncludeEnabled()){
+		const QString baseName = QFileInfo(sourceFile).baseName();
+		FeedStream(stream, 2, false);
+		stream << QStringLiteral("#include \"moc_") << baseName << QStringLiteral(".cpp\"");
+		FeedStream(stream, 1, false);
+		if (HasObjectEntries()){
+			stream << QStringLiteral("#include \"moc_") << baseName << QStringLiteral("Objects.cpp\"");
+			FeedStream(stream, 1, false);
+		}
+	}
 
 	return true;
 }
@@ -1184,9 +1231,11 @@ CCxxProcessorsManagerComp::EntryFileMap CCxxProcessorsManagerComp::CreateObjectS
 		return retVal;
 	}
 
-	const QString outputFilePath = CalculateTargetCppFilesFromSchemaParams(*m_schemaParamsCompPtr, *m_argumentParserCompPtr)[imtsdl::ISdlProcessArgumentsParser::s_sourceFileType];
-	FilePtr singleFilePtr = CreateFile(ToObjectsFilePath(outputFilePath));
-	if (!singleFilePtr){
+	// the content is appended to the main source file by AppendSourceFileTail
+	std::shared_ptr<QTemporaryFile> singleFilePtr(new QTemporaryFile);
+	if (!singleFilePtr->open()){
+		SendErrorMessage(0, QStringLiteral("Unable to open a temporary file. Error: %1").arg(singleFilePtr->errorString()));
+
 		return retVal;
 	}
 	retVal[QString()] = singleFilePtr;

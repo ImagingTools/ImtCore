@@ -312,7 +312,7 @@ void CSdlGenTest::TestImportedEnumArrayQObjectSetter()
 	ExecuteTest(testSuite, "ImportedEnumArray.sdl");
 
 	QFile generatedSource(m_tempOutputDir.absoluteFilePath(
-		"enumconsumersdl/SDL/1.0/CPP/ImportedEnumArrayObjects.cpp"));
+		"enumconsumersdl/SDL/1.0/CPP/ImportedEnumArray.cpp"));
 	QVERIFY(generatedSource.open(QIODevice::ReadOnly | QIODevice::Text));
 
 	const QByteArray source = generatedSource.readAll();
