@@ -96,6 +96,11 @@ TestCase {
 		tryCompare(failedSpy, "count", 1, 5000)
 		compare(failedSpy.signalArguments[0][1], "Refused by the server")
 		tryVerify(function(){ return controller.representationModel.m_name === "Stored" }, 5000, "The stored document is shown again")
+
+		wait(300)
+		let commands = GqlTestTransport.requestedCommands()
+		compare(commands.filter(function(command){ return command === data.update }).length, 1, "The refused change is sent once")
+		compare(commands.filter(function(command){ return command === data.get }).length, 1, "The document is read again once")
 	}
 
 	function test_storedDocumentKeepsTheElementId_data(){

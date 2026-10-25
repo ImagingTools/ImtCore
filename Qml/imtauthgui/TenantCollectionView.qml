@@ -733,6 +733,22 @@ RemoteCollectionView {
 				createNewTenantDocument()
 			}
 
+			// The dialog names what is removed; the server refuses an organization with sub-organizations and says why
+			function onRemove(params){
+				let indexes = collectionView.table.getSelectedIndexes()
+				let elementsModel = collectionView.table.elements
+				if (indexes.length === 1 && elementsModel && elementsModel.containsKey("name", indexes[0])){
+					tenantCommandsDelegate.removeDialogTitle = qsTr("Remove organization")
+					tenantCommandsDelegate.removeMessage = qsTr("Remove the organization \"%1\"?").arg(elementsModel.getData("name", indexes[0]))
+				}
+				else{
+					tenantCommandsDelegate.removeDialogTitle = qsTr("Remove organizations")
+					tenantCommandsDelegate.removeMessage = qsTr("Remove %1 organizations?").arg(indexes.length)
+				}
+
+				ModalDialogManager.openDialog(tenantCommandsDelegate.removeDialogComp, {})
+			}
+
 			function onEdit(){
 				if (!collectionView){
 					console.error("Unable to edit element. Error: Collection view is invalid")

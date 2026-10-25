@@ -36,6 +36,18 @@ TestCase {
 		return controller
 	}
 
+	function requestCount(commandId){
+		let commands = GqlTestTransport.requestedCommands()
+		let count = 0
+		for (let i = 0; i < commands.length; i++){
+			if (commands[i] === commandId){
+				count++
+			}
+		}
+
+		return count
+	}
+
 	function storedRepresentation(){
 		return JSON.stringify({"data": {"GetTenantRepresentation": {"id": "tenant-id", "name": "Stored"}}})
 	}
@@ -77,6 +89,12 @@ TestCase {
 		compare(updatedSpy.count, 0, "A refused save is no saved document")
 
 		tryVerify(function(){ return controller.representationModel.m_name === "Stored" }, 5000, "The editor shows the stored organization again")
+
+		// Reading the stored organization again sends nothing more
+		wait(300)
+		compare(requestCount("UpdateTenantFromRepresentation"), 1, "The refused change is sent once")
+		compare(requestCount("GetTenantRepresentation"), 1, "The organization is read again once")
+		compare(failedSpy.count, 1)
 	}
 
 	// The editor of a new organization shows its parent and limits the scope to the parent's before the first save
@@ -93,6 +111,10 @@ TestCase {
 		tryVerify(function(){ return controller.representationModel.m_parentTenantId === "parent-id" }, 5000)
 		compare(controller.representationModel.m_parentTenantPermissions.length, 2)
 		compare(String(controller.representationModel.m_parentTenantPermissions[0]), "/Sensors/View")
+
+		wait(300)
+		compare(requestCount("GetTenantRepresentation"), 1, "The new organization is read once")
+		compare(requestCount("UpdateTenantFromRepresentation"), 0, "Reading it sends no change")
 	}
 
 	function test_savedUpdateIsNotReloaded(){
@@ -107,6 +129,7 @@ TestCase {
 		tryCompare(updatedSpy, "count", 1, 5000)
 		compare(failedSpy.count, 0)
 		compare(GqlTestTransport.requestedCommands().indexOf("GetTenantRepresentation"), -1, "A saved organization is not read again")
+		compare(requestCount("UpdateTenantFromRepresentation"), 1, "The change is sent once")
 		compare(controller.representationModel.m_name, "Typed")
 	}
 }
