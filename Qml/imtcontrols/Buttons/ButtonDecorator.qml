@@ -228,7 +228,9 @@ DecoratorBase {
 				font.pixelSize: commonButtonDecorator.fontSize;
 				font.family: commonButtonDecorator.fontFamily;
 
+				// Menu items show user data, like organization names: never markup
 				text: !commonButtonDecorator.baseElement ? "" : commonButtonDecorator.baseElement.text
+				textFormat: Text.PlainText;
 				elide: Text.ElideRight;
 			}
 
@@ -239,6 +241,7 @@ DecoratorBase {
 				font.family: commonButtonDecorator.fontFamily;
 
 				text: textObj.text;
+				textFormat: Text.PlainText;
 
 				visible: false;
 			}

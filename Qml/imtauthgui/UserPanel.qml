@@ -476,6 +476,7 @@ Item {
 								width: parent.width;
 
 								text: AuthorizationController.userTokenProvider.login;
+								textFormat: Text.PlainText;
 								color: Style.titleColor;
 								font.family: Style.fontFamilyBold;
 								font.pixelSize: Style.fontSizeM;
@@ -486,6 +487,7 @@ Item {
 								width: parent.width;
 
 								text: AuthorizationController.currentTenantName ? AuthorizationController.currentTenantName : qsTr("No organization");
+								textFormat: Text.PlainText;
 								color: Style.inactiveTextColor;
 								font.family: Style.fontFamily;
 								font.pixelSize: Style.fontSizeS;

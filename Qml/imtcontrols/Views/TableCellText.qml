@@ -8,6 +8,8 @@ Text {
     // A TableRowDelegateBase. Untyped, so this file needs no imtcontrols import, which makes every cell instance costlier.
     property var rowDelegate: null
     property int columnIndex: -1;
+    // Cells show user data: never markup
+    textFormat: Text.PlainText
     verticalAlignment: Text.AlignVCenter
     horizontalAlignment: rowDelegate && rowDelegate.tableItem ? rowDelegate.tableItem.emptyDecorCell ? Text.AlignLeft : rowDelegate.tableItem.cellDecorator.isValidData("TextPosition", name.columnIndex) ? rowDelegate.tableItem.cellDecorator.getData("TextPosition", name.columnIndex) : Text.AlignLeft : Text.AlignLeft
 
