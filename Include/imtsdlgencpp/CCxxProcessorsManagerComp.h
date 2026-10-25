@@ -95,9 +95,17 @@ private:
 		\param isObjectsFile - the file holds the QObject based classes (<Type>Object, <Type>ObjectList, union objects) and the QML types registration
 	*/
 	[[nodiscard]] bool BeginHeaderFile(const iprm::IParamsSet& entryParams, QFile& headerFile, const iprm::IParamsSet* paramsPtr, bool isObjectsFile = false) const;
-	[[nodiscard]] bool BeginSourceFile(const iprm::IParamsSet& entryParams, QFile& headerFile, const iprm::IParamsSet* paramsPtr) const;
+	/**
+		\param objectsHeaderFileName - if not empty, the objects section of the source file is begun, which includes this header instead of the main one
+	*/
+	[[nodiscard]] bool BeginSourceFile(const iprm::IParamsSet& entryParams, QFile& headerFile, const iprm::IParamsSet* paramsPtr, const QString& objectsHeaderFileName = QString()) const;
 	[[nodiscard]] bool EndHeaderFile(const iprm::IParamsSet& entryParams, QFile& headerFile, const iprm::IParamsSet* paramsPtr, bool isObjectsFile = false) const;
 	[[nodiscard]] bool EndSourceFile(const iprm::IParamsSet& entryParams, QFile& sourceFile, const iprm::IParamsSet* paramsPtr) const;
+	/**
+		Appends the objects section and, if enabled, the includes of the moc output to the ended source file
+		\param objectsSourceFilePtr - the objects section, written by \c BeginSourceFile, the QObject processors and \c EndSourceFile. Can be NULL
+	*/
+	[[nodiscard]] bool AppendSourceFileTail(QFile& sourceFile, QFile* objectsSourceFilePtr) const;
 	bool ProcessEnums (
 				const EntryFileMap& headerFiles,
 				const EntryFileMap& sourceFiles,
@@ -138,13 +146,14 @@ private:
 	[[nodiscard]] EntryFileMap CreateHeaderFiles(const iprm::IParamsSet* paramsPtr) const;
 	[[nodiscard]] EntryFileMap CreateSourceFiles(const iprm::IParamsSet* paramsPtr) const;
 	/**
-		Creates the files of the QObject based classes (<Schema>Objects.h/.cpp), see \c CreateHeaderFiles
+		Creates the header file of the QObject based classes (<Schema>Objects.h), see \c CreateHeaderFiles,
+		and a temporary file for their implementation, which is appended to the main source file at the end
 		\note call only if \c HasObjectEntries() returns true
 	*/
 	[[nodiscard]] EntryFileMap CreateObjectHeaderFiles(const iprm::IParamsSet* paramsPtr) const;
 	[[nodiscard]] EntryFileMap CreateObjectSourceFiles(const iprm::IParamsSet* paramsPtr) const;
 	/**
-		\returns true if the '<Schema>Objects' files are generated, i.e. the generation is not disabled with --no-objects
+		\returns true if the QObject based classes are generated, i.e. the generation is not disabled with --no-objects
 	*/
 	[[nodiscard]] bool HasObjectEntries() const;
 	/**

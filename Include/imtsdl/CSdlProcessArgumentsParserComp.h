@@ -59,6 +59,7 @@ public:
 	virtual CppGenerationMode GetCppGenerationMode() const override;
 	virtual TypenameWriteMode GetTypenameWriteMode() const override;
 	virtual bool IsObjectsGenerationEnabled() const override;
+	virtual bool IsMocIncludeEnabled() const override;
 
 	// reimplemented (imtsdl::ISdlEditableProcessArgumentsParser)
 	virtual bool ReadFromSettings(const QString& settingsFilePath) override;
@@ -129,6 +130,7 @@ private:
 	std::optional<CppGenerationMode> m_cppGenerationMode;
 	std::optional<TypenameWriteMode> m_typenameWriteMode;
 	bool m_isObjectsGenerationEnabled = true;
+	bool m_isMocIncludeEnabled = false;
 };
 
 

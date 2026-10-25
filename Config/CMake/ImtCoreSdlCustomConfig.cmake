@@ -92,7 +92,6 @@ macro(ImtCoreGetStaticCppDeps)
 	list(APPEND SDL_DEPS_VAR "${ARG_OUT_DIR}/${PROJECT_NAME}/SDL/${ARG_VERSION}/CPP/${SDL_SCHEMA_NAME}.cpp")
 	if (NOT ARG_NO_OBJECTS)
 		list(APPEND SDL_DEPS_VAR "${ARG_OUT_DIR}/${PROJECT_NAME}/SDL/${ARG_VERSION}/CPP/${SDL_SCHEMA_NAME}Objects.h")
-		list(APPEND SDL_DEPS_VAR "${ARG_OUT_DIR}/${PROJECT_NAME}/SDL/${ARG_VERSION}/CPP/${SDL_SCHEMA_NAME}Objects.cpp")
 	endif()
 
 	set(${ARG_RESULT_VARIABLE} ${SDL_DEPS_VAR})
@@ -190,6 +189,7 @@ macro (ImtCoreCustomConfigureSdlCpp)
 	list(APPEND CUSTOM_MODIFICATORS "--config=${IMT_CONFIG_CMAKE_PATH}/SDL/CommonCXX.cfg") ##< Use config file
 	list(APPEND CUSTOM_MODIFICATORS "--generator=DEPFILE:${DEP_FILE_PATH}") ##< use depfile
 	list(APPEND CUSTOM_MODIFICATORS "--CPP")
+	list(APPEND CUSTOM_MODIFICATORS "--include-moc") ##< the source file includes the moc output, see below
 	set(SDL_STATIC_DEPS_ARGS)
 	if (ARG_NO_OBJECTS)
 		list(APPEND CUSTOM_MODIFICATORS "--no-objects") ##< do not generate the '<Schema>Objects' files (QObject based classes and QML types registration)
@@ -243,19 +243,24 @@ macro (ImtCoreCustomConfigureSdlCpp)
 
 	target_sources(${PROJECT_NAME} PRIVATE ${FOUND_DEPS})
 
-	set(HEADER_FILES)
-
+	# the generated source file includes the moc output of its headers (one translation unit per schema),
+	# so it is created next to it and is not compiled separately
+	set(SDL_MOC_SOURCES)
 	foreach(SDL_HEADER ${FOUND_DEPS})
 		string(FIND "${SDL_HEADER}" ".h" matchres)
 		string(FIND "${SDL_HEADER}" "_fwd.h" matchres_fwd)
 
 		if (${matchres} GREATER -1 AND ${matchres_fwd} EQUAL -1)
-			LIST(APPEND HEADER_FILES ${SDL_HEADER})
+			get_filename_component(SDL_HEADER_NAME "${SDL_HEADER}" NAME_WE)
+			set(SDL_MOC_SOURCE "${SDL_CPP_OUTPUT_DIRECTORY}/moc_${SDL_HEADER_NAME}.cpp")
+			qt6_generate_moc("${SDL_HEADER}" "${SDL_MOC_SOURCE}")
+			list(APPEND SDL_MOC_SOURCES "${SDL_MOC_SOURCE}")
 		endif ()
 	endforeach()
 
-	qt6_wrap_cpp(MOC_SOURCES "${HEADER_FILES}")
-	target_sources(${PROJECT_NAME} PRIVATE ${MOC_SOURCES})
+	set_source_files_properties(${SDL_MOC_SOURCES} PROPERTIES HEADER_FILE_ONLY ON)
+	target_sources(${PROJECT_NAME} PRIVATE ${SDL_MOC_SOURCES})
+	set_source_files_properties("${SDL_CPP_OUTPUT_DIRECTORY}/${SCHEMA_NAME}.cpp" PROPERTIES OBJECT_DEPENDS "${SDL_MOC_SOURCES}")
 
 	message(VERBOSE "EXEC: ${SDL_GENERATOR_EXE_PATH} -GS ${ARG_SCHEMA_PATH} -O ${SDL_OUTPUT_ROOT_DIRECTORY} ${CUSTOM_MODIFICATORS}")
 

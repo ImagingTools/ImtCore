@@ -68,6 +68,8 @@ public:
 	virtual TypenameWriteMode GetTypenameWriteMode() const = 0;
 	/// \returns false if the '<Schema>Objects' files with the QObject based classes (<Type>Object, <Type>ObjectList, union objects) and the QML types registration should not be generated
 	virtual bool IsObjectsGenerationEnabled() const = 0;
+	/// \returns true if the generated source file includes the moc output of the generated headers at its end
+	virtual bool IsMocIncludeEnabled() const = 0;
 
 	// template
 	virtual bool IsTemplateEnabled() const = 0;
