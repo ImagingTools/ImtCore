@@ -74,6 +74,23 @@ SimpleCollectionPage {
 		)
 	}
 
+	// Declared on the page: a callback declared inside the popup component loses the page on the web
+	function confirmExcludeMember(userId, userName) {
+		if (!membersPage.stateManager || !membersPage.stateManager.canExcludeOrganizationMember)
+			return
+
+		ModalDialogManager.showConfirmationDialog(
+			qsTr("Exclude Member"),
+			qsTr("Are you sure you want to exclude \"%1\" from this organization?").arg(userName),
+			function(result) {
+				if (result === Enums.yes && membersPage.apiClient) {
+					var tid = membersPage.model ? membersPage.model.m_id : ""
+					membersPage.apiClient.removeMember(tid, userId)
+				}
+			}
+		)
+	}
+
 	function confirmRevokeInvitation(invitationId, userName) {
 		ModalDialogManager.showConfirmationDialog(
 			qsTr("Revoke Invitation"),
@@ -779,19 +796,7 @@ SimpleCollectionPage {
 					}
 				}
 				else if (commandId === "Exclude") {
-					if (!membersPage.stateManager || !membersPage.stateManager.canExcludeOrganizationMember)
-						return
-
-					ModalDialogManager.showConfirmationDialog(
-						qsTr("Exclude Member"),
-						qsTr("Are you sure you want to exclude \"%1\" from this organization?").arg(memberActionMenu.targetUserName),
-						function(result) {
-							if (result === Enums.yes && membersPage.apiClient) {
-								var tenantIdExclude = membersPage.model ? membersPage.model.m_id : ""
-								membersPage.apiClient.removeMember(tenantIdExclude, memberActionMenu.targetUserId)
-							}
-						}
-					)
+					membersPage.confirmExcludeMember(memberActionMenu.targetUserId, memberActionMenu.targetUserName)
 				}
 				else if (commandId === "Transfer") {
 					if (membersPage.stateManager && membersPage.stateManager.isOwner)
@@ -849,16 +854,7 @@ SimpleCollectionPage {
 			visible: memberActionMenu.showExclude
 			height: visible ? implicitHeight : 0
 			onTriggered: {
-				ModalDialogManager.showConfirmationDialog(
-					qsTr("Exclude Member"),
-					qsTr("Are you sure you want to exclude \"%1\" from this organization?").arg(memberActionMenu.targetUserName),
-					function(result) {
-						if (result === Enums.yes && membersPage.apiClient) {
-							var tenantId = membersPage.model ? membersPage.model.m_id : ""
-							membersPage.apiClient.removeMember(tenantId, memberActionMenu.targetUserId)
-						}
-					}
-				)
+				membersPage.confirmExcludeMember(memberActionMenu.targetUserId, memberActionMenu.targetUserName)
 			}
 		}
 
