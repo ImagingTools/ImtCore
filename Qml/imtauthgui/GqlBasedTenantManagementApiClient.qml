@@ -1791,6 +1791,9 @@ QtObject {
 							if (m_status === "Success"){
 								crossOrgGrantReprController.documentUpdated(crossOrgGrantReprController.documentId)
 							}
+							else{
+								crossOrgGrantReprController.updateDocumentFailed(crossOrgGrantReprController.documentId, m_message !== "" ? m_message : qsTr("The changes could not be saved"))
+							}
 						}
 					}
 				}

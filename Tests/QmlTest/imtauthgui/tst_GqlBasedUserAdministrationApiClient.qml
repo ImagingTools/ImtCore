@@ -63,6 +63,41 @@ TestCase {
 		compare(request.params.input[data.input].id, "proposed-id", "The representation is sent under the proposed element ID")
 	}
 
+	Component {
+		id: spyComp
+
+		SignalSpy {
+		}
+	}
+
+	// A save the server refuses by its status is reported and the editor shows the stored document again
+	function test_refusedStatusIsReportedAndReloaded_data(){
+		return editors_data()
+	}
+
+	function test_refusedStatusIsReportedAndReloaded(data){
+		let client = createTemporaryObject(clientComp, testCase)
+		let parts = editorParts(client, data.typeId)
+
+		parts.service.handleDocumentOpened("doc", "element-id", data.typeId, "Name", true, false)
+		let controller = createTemporaryObject(parts.controllerComp, testCase)
+		controller.documentId = "doc"
+		let failedSpy = createTemporaryObject(spyComp, testCase, {target: controller, signalName: "updateDocumentFailed"})
+
+		let status = {}
+		status[data.update] = {"status": "Failed", "message": "Refused by the server"}
+		GqlTestTransport.queueResponse(data.update, JSON.stringify({"data": status}))
+		let representation = {}
+		representation[data.get] = {"id": "element-id", "name": "Stored"}
+		GqlTestTransport.queueResponse(data.get, JSON.stringify({"data": representation}))
+
+		controller.updateDocumentFromRepresentation()
+
+		tryCompare(failedSpy, "count", 1, 5000)
+		compare(failedSpy.signalArguments[0][1], "Refused by the server")
+		tryVerify(function(){ return controller.representationModel.m_name === "Stored" }, 5000, "The stored document is shown again")
+	}
+
 	function test_storedDocumentKeepsTheElementId_data(){
 		return editors_data()
 	}

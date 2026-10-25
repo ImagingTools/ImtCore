@@ -50,6 +50,7 @@
 	<file alias="imtauthgui/UserActionCollectionView.qml">UserActionCollectionView.qml</file>
 	<file alias="imtauthgui/TenantCollectionView.qml">TenantCollectionView.qml</file>
 	<file alias="imtauthgui/TenantEditor.qml">TenantEditor.qml</file>
+	<file alias="imtauthgui/TenantRepresentationController.qml">TenantRepresentationController.qml</file>
 	<file alias="imtauthgui/TenantEditorStateManager.qml">TenantEditorStateManager.qml</file>
 	<file alias="imtauthgui/TenantManagementApiClient.qml">TenantManagementApiClient.qml</file>
 	<file alias="imtauthgui/GqlBasedTenantManagementApiClient.qml">GqlBasedTenantManagementApiClient.qml</file>

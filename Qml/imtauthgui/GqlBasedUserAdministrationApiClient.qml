@@ -368,6 +368,10 @@ QtObject {
 							if (m_status === "Success"){
 								roleReprController.documentUpdated(roleReprController.documentId)
 							}
+							else{
+								roleReprController.updateDocumentFailed(roleReprController.documentId, m_message !== "" ? m_message : qsTr("The changes could not be saved"))
+								roleReprController.updateRepresentationFromDocument()
+							}
 						}
 					}
 				}
@@ -508,6 +512,10 @@ QtObject {
 						onFinished: {
 							if (m_status === "Success"){
 								groupReprController.documentUpdated(groupReprController.documentId)
+							}
+							else{
+								groupReprController.updateDocumentFailed(groupReprController.documentId, m_message !== "" ? m_message : qsTr("The changes could not be saved"))
+								groupReprController.updateRepresentationFromDocument()
 							}
 						}
 					}
@@ -672,6 +680,10 @@ QtObject {
 						onFinished: {
 							if (m_status === "Success"){
 								userReprController.documentUpdated(userReprController.documentId)
+							}
+							else{
+								userReprController.updateDocumentFailed(userReprController.documentId, m_message !== "" ? m_message : qsTr("The changes could not be saved"))
+								userReprController.updateRepresentationFromDocument()
 							}
 						}
 					}
