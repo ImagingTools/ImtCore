@@ -13,6 +13,9 @@ DocumentRepresentationController {
 	property string collectionId
 	property string permissionPath
 
+	// Created inside an organization a new one is its sub-organization: the server tells the parent and its permission scope
+	requestRepresentationOnCreate: true
+
 	representationModel: TenantData {
 		m_isActive: true
 	}

@@ -79,6 +79,22 @@ TestCase {
 		tryVerify(function(){ return controller.representationModel.m_name === "Stored" }, 5000, "The editor shows the stored organization again")
 	}
 
+	// The editor of a new organization shows its parent and limits the scope to the parent's before the first save
+	function test_newOrganizationReadsItsParent(){
+		let controller = createController()
+		verify(controller.requestRepresentationOnCreate, "A new organization reads its representation")
+
+		GqlTestTransport.queueResponse("GetTenantRepresentation", JSON.stringify({"data": {"GetTenantRepresentation": {
+			"id": "", "name": "", "isActive": true, "parentTenantId": "parent-id",
+			"canEditTenantPermissions": true, "parentTenantPermissions": ["/Sensors/View", "/Sensors/Edit"]}}}))
+
+		controller.updateRepresentationFromDocument()
+
+		tryVerify(function(){ return controller.representationModel.m_parentTenantId === "parent-id" }, 5000)
+		compare(controller.representationModel.m_parentTenantPermissions.length, 2)
+		compare(String(controller.representationModel.m_parentTenantPermissions[0]), "/Sensors/View")
+	}
+
 	function test_savedUpdateIsNotReloaded(){
 		let controller = createController()
 		let failedSpy = createTemporaryObject(spyComp, testCase, {target: controller, signalName: "updateDocumentFailed"})
