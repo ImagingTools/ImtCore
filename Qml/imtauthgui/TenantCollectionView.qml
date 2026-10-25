@@ -547,6 +547,20 @@ RemoteCollectionView {
 		return table.elements.getData(TenantItemDataTypeMetaInfo.s_isActive, index) !== false
 	}
 
+	// The relation of the current user to the organization of a row; empty when there is none, e.g. for the superuser
+	function tenantRelationScope(elementsModel, index) {
+		let scope = elementsModel.getData(TenantItemDataTypeMetaInfo.s_tenantRelationScope, index)
+		return scope ? String(scope) : ""
+	}
+
+	function tenantIsEditable(elementsModel, index) {
+		return relationRules.isEditable(container.tenantRelationScope(elementsModel, index))
+	}
+
+	TenantRelationRules {
+		id: relationRules
+	}
+
 	// An inactive organization cannot be switched to, so it is activated first.
 	function activateTenant(tenantId, openEditor) {
 		if (openEditor) {
@@ -743,16 +757,21 @@ RemoteCollectionView {
 						continue
 					}
 
-					let scope = elementsModel.getData(TenantItemDataTypeMetaInfo.s_tenantRelationScope, index)
+					let scope = container.tenantRelationScope(elementsModel, index)
 					if (scope === "Invited") {
 						continue
 					}
 
 					let tenantId = elementsModel.getData("id", index)
+					let tenantName = elementsModel.containsKey("name", index)
+							? elementsModel.getData("name", index)
+							: tenantId
+					if (!container.tenantIsEditable(elementsModel, index)) {
+						PopupManager.addInfoMessage(qsTr("Only the members of \"%1\" can edit it.").arg(tenantName), true)
+						return
+					}
+
 					if (tenantId && tenantId !== AuthorizationController.currentTenantId){
-						let tenantName = elementsModel.containsKey("name", index)
-								? elementsModel.getData("name", index)
-								: tenantId
 						container.requestOpenTenantDocument(tenantId, tenantName, container.tenantIsActive(index))
 						return
 					}
@@ -790,13 +809,21 @@ RemoteCollectionView {
 					let row = selection[0]
 
 					let tenantId = elementsModel.getData("id", row)
-					let scope = elementsModel.getData(TenantItemDataTypeMetaInfo.s_tenantRelationScope, row)
+					let scope = container.tenantRelationScope(elementsModel, row)
 
-					switchEnabled = tenantId !== AuthorizationController.currentTenantId && scope !== "Invited"
-					leaveEnabled = scope === "Member"
+					switchEnabled = relationRules.canSwitch(scope, tenantId === AuthorizationController.currentTenantId)
+					leaveEnabled = relationRules.canLeave(scope)
 				}
 				commandsController.setCommandIsEnabled("Switch", switchEnabled)
 				commandsController.setCommandIsEnabled("Leave", leaveEnabled)
+
+				let editEnabled = selection && selection.length > 0
+				for (let i = 0; editEnabled && i < selection.length; i++) {
+					editEnabled = container.tenantIsEditable(elementsModel, selection[i])
+				}
+				if (!editEnabled) {
+					commandsController.setCommandIsEnabled("Edit", false)
+				}
 			}
 
 			Component.onCompleted: {
