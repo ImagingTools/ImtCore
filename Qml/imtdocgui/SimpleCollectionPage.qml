@@ -60,6 +60,9 @@ ViewBase {
 	property Component headerButtonsComponent: null
 	property Component customEditorComponent: null
 	property bool showCreateButton: true
+	// False when the user may create items but the server would refuse them; the create button then gives way to createUnavailableText
+	property bool createAllowed: true
+	property string createUnavailableText: ""
 	property var managePermissionIds: []
 	property var createPermissionIds: []
 	property var editPermissionIds: []
@@ -228,6 +231,8 @@ ViewBase {
 	// --- derived display strings ---
 	readonly property string __listTitle: listHeaderTitle.length > 0 ? listHeaderTitle : entityNamePlural
 	readonly property string __createBtnText: createButtonText.length > 0 ? createButtonText : ("+ " + qsTr("Create %1").arg(entityName))
+	readonly property bool __createUnavailable: root.showCreateButton && root.canCreate && !root.createAllowed && root.createUnavailableText.length > 0
+	readonly property string __descriptionText: !root.__createUnavailable ? root.descriptionText : root.descriptionText.length > 0 ? root.descriptionText + " " + root.createUnavailableText : root.createUnavailableText
 	readonly property string __emptyText: emptyText.length > 0 ? emptyText : qsTr("No %1 found.").arg(entityNamePlural.toLowerCase())
 	readonly property string __filterPlaceholder: filterPlaceholder.length > 0 ? filterPlaceholder : qsTr("Filter %1...").arg(entityNamePlural.toLowerCase())
 	readonly property string __deleteSingleTitle: deleteSingleTitle.length > 0 ? deleteSingleTitle : qsTr("Delete %1").arg(entityName)
@@ -335,7 +340,7 @@ ViewBase {
 
 	Text {
 		id: createBtn
-		visible: root.showCreateButton && root.canCreate && root.__onListPage && root.__useDefaultButtons
+		visible: root.showCreateButton && root.canCreate && root.createAllowed && root.__onListPage && root.__useDefaultButtons
 		anchors.right: stackViewHeader.right
 		anchors.verticalCenter: stackViewHeader.verticalCenter
 		text: root.__createBtnText
@@ -348,7 +353,7 @@ ViewBase {
 			hoverEnabled: true
 			cursorShape: Qt.PointingHandCursor
 			onClicked: {
-				if (root.canCreate)
+				if (root.canCreate && root.createAllowed)
 					root.openCreate()
 			}
 		}
@@ -424,8 +429,8 @@ ViewBase {
 		anchors.topMargin: Style.marginS
 		anchors.horizontalCenter: parent.horizontalCenter
 		width: root.contentWidth
-		visible: root.__onListPage && root.descriptionText.length > 0
-		text: root.descriptionText
+		visible: root.__onListPage && root.__descriptionText.length > 0
+		text: root.__descriptionText
 		font.pixelSize: Style.fontSizeM
 		color: Style.inactiveTextColor
 	}

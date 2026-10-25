@@ -34,6 +34,8 @@ SimpleCollectionPage {
 	readonly property bool __canCreateMember: stateManager
 		? stateManager.hasAnyPermission(createPermissionIds)
 		: false
+	createAllowed: stateManager ? stateManager.scopeHolds("/Administration/Users/Edit/Add") : false
+	createUnavailableText: qsTr("New users can be created once the permissions of the organization include Administration > Users > Add. Existing users can be invited.")
 	readonly property bool __canInviteMember: stateManager
 		? stateManager.canInviteOrganizationMember
 		: false
@@ -525,7 +527,7 @@ SimpleCollectionPage {
 				text: "+ " + qsTr("Create User")
 				font.pixelSize: Style.fontSizeM
 				font.bold: true
-				visible: membersPage.__canCreateMember
+				visible: membersPage.__canCreateMember && membersPage.createAllowed
 				color: membersPage.__canCreateMember ? Style.linkColor : Style.inactiveTextColor
 
 				MouseArea {
@@ -534,7 +536,7 @@ SimpleCollectionPage {
 					cursorShape: membersPage.__canCreateMember ? Qt.PointingHandCursor : Qt.ArrowCursor
 					enabled: membersPage.__canCreateMember
 					onClicked: {
-						if (membersPage.__canCreateMember)
+						if (membersPage.__canCreateMember && membersPage.createAllowed)
 							membersPage.openCreate()
 					}
 				}
