@@ -44,7 +44,8 @@ public:
 
 private:
 	int GenerateCode(int min, int max) const;
-	void RemoveVerification(const QByteArray& userId) const;
+	/// A code that could not be removed stays blocked, so it cannot be used or guessed again.
+	bool RemoveVerification(const QByteArray& userId) const;
 
 	class CheckExpiredVerificationDataThread: public QThread
 	{

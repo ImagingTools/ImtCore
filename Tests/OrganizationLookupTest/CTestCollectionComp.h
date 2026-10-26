@@ -66,8 +66,21 @@ public:
 	*/
 	QSet<QByteArray> GetUnknownFieldIds() const;
 
+	/**
+		Text values the field filters asked for, in the order of the selections.
+	*/
+	QStringList GetRequestedFilterValues() const;
+
+	/**
+		Failures of the storage: a failing selection reports an error to the log of the caller and returns nothing.
+	*/
+	void SetSelectionFailing(bool isFailing);
+	void SetLoadFailingIds(const QSet<QByteArray>& objectIds);
+	void SetRemovalFailing(bool isFailing);
+
 	// reimplemented (imtbase::IObjectCollection)
 	virtual bool GetObjectData(const Id& objectId, DataPtr& dataPtr, const iprm::IParamsSet* dataConfigurationPtr = nullptr) const override;
+	virtual bool RemoveElements(const Ids& elementIds, const imtbase::IOperationContext* operationContextPtr = nullptr) override;
 
 	// reimplemented (imtbase::ICollectionInfo)
 	virtual int GetElementsCount(const iprm::IParamsSet* selectionParamPtr = nullptr, ilog::IMessageConsumer* logPtr = nullptr) const override;
@@ -93,6 +106,10 @@ private:
 	mutable std::atomic<int> m_loadCount{0};
 	mutable std::atomic<int> m_unfilteredSelectionCount{0};
 	mutable QSet<QByteArray> m_unknownFieldIds;
+	mutable QStringList m_requestedFilterValues;
+	bool m_isSelectionFailing = false;
+	QSet<QByteArray> m_loadFailingIds;
+	bool m_isRemovalFailing = false;
 };
 
 

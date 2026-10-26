@@ -36,6 +36,8 @@ private slots:
 
 	// Answers to anonymous requests
 	void testUnknownAccount_AnswersLikeAWrongPassword();
+	void testEmailOfAnAccount_AnswersLikeAnUnknownEmail();
+	void testExternalAccount_AnswersLikeAWrongPasswordUntilProven();
 	void testSendEmailCode_UnknownAccountAnswersLikeAKnownOne();
 	void testSendEmailCode_FailedSendingAnswersLikeAnUnknownAccount();
 	void testCheckEmail_NamesNoAccount();

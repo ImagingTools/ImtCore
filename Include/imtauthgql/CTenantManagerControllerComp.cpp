@@ -163,14 +163,25 @@ sdl::V1_0::imtauth::CGetTenantRelationshipsPayload CTenantManagerControllerComp:
 		return response;
 	}
 
+	// A partial list would look like ended relationships to the product servers, which remove the shares of those
+	const QString readError = QStringLiteral("Unable to read the relationships of the organization");
+	bool isRead = false;
+	QByteArrayList relIds = m_connectionRequestManagerCompPtr->GetTenantRelationshipIds(tenantId, &isRead);
+	if (!isRead){
+		response.errorMessage = readError;
+		return response;
+	}
+
 	response.relationships.Emplace();
 
 	QHash<QByteArray, QDateTime> relatedSinceByPartner;
-	QByteArrayList relIds = m_connectionRequestManagerCompPtr->GetTenantRelationshipIds(tenantId);
 	for (const QByteArray& relId : relIds){
 		imtauth::ITenantRelationshipInfoUniquePtr relPtr = m_connectionRequestManagerCompPtr->GetTenantRelationship(relId);
 		if (!relPtr.IsValid()){
-			continue;
+			sdl::V1_0::imtauth::CGetTenantRelationshipsPayload failedResponse;
+			failedResponse.errorMessage = readError;
+
+			return failedResponse;
 		}
 
 		if (!isManager && relPtr->GetStatus() != imtauth::ITenantRelationshipInfo::TRS_ACTIVE){
@@ -654,9 +665,12 @@ sdl::V1_0::imtauth::CUpdateTenantPayload CTenantManagerControllerComp::OnUpdateT
 		}
 
 		// Remove memberships for users no longer in the list
+		// A removed member's pending invitations go with the membership, as on the other removal paths
+		const imtgql::IGqlContext* removalContextPtr = gqlRequest.GetRequestContext();
+		const QByteArray revokedByUserId = removalContextPtr != nullptr ? removalContextPtr->GetUserId() : QByteArray();
 		for (const QByteArray& uid : currentUserIds){
-			if (!newUserIds.contains(uid)){
-				m_membershipManagerCompPtr->RemoveMembership(userIdToMembershipId[uid]);
+			if (!newUserIds.contains(uid) && m_membershipManagerCompPtr->RemoveMembership(userIdToMembershipId[uid]) && m_invitationManagerCompPtr.IsValid()){
+				m_invitationManagerCompPtr->RevokeInvitationsSentBy(tenantId, uid, revokedByUserId);
 			}
 		}
 

@@ -386,7 +386,8 @@ QByteArray CTenantConnectionRequestManagerComp::ApplyRelationshipProposal(const 
 			return QByteArray();
 		}
 		const ITenantRelationshipInfo* existingPtr = dynamic_cast<const ITenantRelationshipInfo*>(dataPtr.GetPtr());
-		if (existingPtr == nullptr){
+		// The terms of an ended relationship stay as they were
+		if (existingPtr == nullptr || existingPtr->GetStatus() != ITenantRelationshipInfo::TRS_ACTIVE){
 			return QByteArray();
 		}
 		istd::TUniqueInterfacePtr<ITenantRelationshipInfo> updatedPtr = m_relationshipFactoryCompPtr.CreateInstance();
@@ -1280,16 +1281,25 @@ ITenantRelationshipProposalInfoUniquePtr CTenantConnectionRequestManagerComp::Ge
 
 // --- Relationships ---
 
-QByteArrayList CTenantConnectionRequestManagerComp::GetTenantRelationshipIds(const QByteArray& tenantId) const
+QByteArrayList CTenantConnectionRequestManagerComp::GetTenantRelationshipIds(const QByteArray& tenantId, bool* isReadPtr) const
 {
 	QByteArrayList result;
+	if (isReadPtr != nullptr){
+		*isReadPtr = false;
+	}
+
 	if (!m_relationshipCollectionCompPtr.IsValid()){
 		return result;
 	}
 
-	for (const QByteArray& id : SelectIds(*m_relationshipCollectionCompPtr, AnyColumnEquals("SourceTenantId", "TargetTenantId", tenantId))){
+	bool isRead = true;
+	for (const QByteArray& id : SelectIds(*m_relationshipCollectionCompPtr, AnyColumnEquals("SourceTenantId", "TargetTenantId", tenantId), QByteArrayList(), &isRead)){
 		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (m_relationshipCollectionCompPtr->GetObjectData(id, dataPtr)){
+		// A selected relationship that cannot be loaded may be an active one
+		if (!m_relationshipCollectionCompPtr->GetObjectData(id, dataPtr)){
+			isRead = false;
+		}
+		else{
 			const ITenantRelationshipInfo* relPtr = dynamic_cast<const ITenantRelationshipInfo*>(dataPtr.GetPtr());
 			if (relPtr != nullptr && relPtr->GetStatus() == ITenantRelationshipInfo::TRS_ACTIVE
 			&& (relPtr->GetSourceTenantId() == tenantId || relPtr->GetTargetTenantId() == tenantId)){
@@ -1297,6 +1307,11 @@ QByteArrayList CTenantConnectionRequestManagerComp::GetTenantRelationshipIds(con
 			}
 		}
 	}
+
+	if (isReadPtr != nullptr){
+		*isReadPtr = isRead;
+	}
+
 	return result;
 }
 
@@ -1397,6 +1412,11 @@ bool CTenantConnectionRequestManagerComp::RemoveTenantRelationship(const QByteAr
 
 bool CTenantConnectionRequestManagerComp::ArchiveRelationship(const QByteArray& relationshipId, const ITenantRelationshipInfo& relationship, bool isRemovalPublished)
 {
+	// The end of an archived relationship is final: writing it again would move the end and join its period with a later one
+	if (relationship.GetStatus() != ITenantRelationshipInfo::TRS_ACTIVE){
+		return true;
+	}
+
 	istd::TUniqueInterfacePtr<ITenantRelationshipInfo> updatedPtr = m_relationshipFactoryCompPtr.CreateInstance();
 	if (!updatedPtr.IsValid()){
 		return false;

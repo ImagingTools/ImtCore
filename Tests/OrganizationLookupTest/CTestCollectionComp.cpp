@@ -5,6 +5,7 @@
 // ACF includes
 #include <iprm/IIdParam.h>
 #include <iprm/TParamsPtr.h>
+#include <ilog/CMessage.h>
 
 // ImtCore includes
 #include <imtbase/imtbase.h>
@@ -65,13 +66,50 @@ QSet<QByteArray> CTestCollectionComp::GetUnknownFieldIds() const
 }
 
 
+QStringList CTestCollectionComp::GetRequestedFilterValues() const
+{
+	return m_requestedFilterValues;
+}
+
+
+void CTestCollectionComp::SetSelectionFailing(bool isFailing)
+{
+	m_isSelectionFailing = isFailing;
+}
+
+
+void CTestCollectionComp::SetLoadFailingIds(const QSet<QByteArray>& objectIds)
+{
+	m_loadFailingIds = objectIds;
+}
+
+
+void CTestCollectionComp::SetRemovalFailing(bool isFailing)
+{
+	m_isRemovalFailing = isFailing;
+}
+
+
 // reimplemented (imtbase::IObjectCollection)
 
 bool CTestCollectionComp::GetObjectData(const Id& objectId, DataPtr& dataPtr, const iprm::IParamsSet* dataConfigurationPtr) const
 {
 	++m_loadCount;
+	if (m_loadFailingIds.contains(objectId)){
+		return false;
+	}
 
 	return BaseClass2::GetObjectData(objectId, dataPtr, dataConfigurationPtr);
+}
+
+
+bool CTestCollectionComp::RemoveElements(const Ids& elementIds, const imtbase::IOperationContext* operationContextPtr)
+{
+	if (m_isRemovalFailing){
+		return false;
+	}
+
+	return BaseClass2::RemoveElements(elementIds, operationContextPtr);
 }
 
 
@@ -95,6 +133,25 @@ imtbase::ICollectionInfo::Ids CTestCollectionComp::GetElementIds(
 	iprm::TParamsPtr<iprm::IIdParam> parentTenantIdParamPtr(selectionParamsPtr, "ParentTenantId", false);
 	if (!complexFilterPtr.IsValid() && !parentTenantIdParamPtr.IsValid()){
 		++m_unfilteredSelectionCount;
+	}
+
+	if (complexFilterPtr.IsValid()){
+		QList<imtbase::IComplexCollectionFilter::FilterExpression> expressions{complexFilterPtr->GetFilterExpression()};
+		while (!expressions.isEmpty()){
+			const imtbase::IComplexCollectionFilter::FilterExpression expression = expressions.takeFirst();
+			for (const imtbase::IComplexCollectionFilter::FieldFilter& fieldFilter : expression.fieldFilters){
+				m_requestedFilterValues << fieldFilter.filterValue.toString();
+			}
+			expressions << expression.filterExpressions;
+		}
+	}
+
+	if (m_isSelectionFailing){
+		if (logPtr != nullptr){
+			logPtr->AddMessage(ilog::IMessageConsumer::MessagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0, "Selection failed", "CTestCollectionComp")));
+		}
+
+		return Ids();
 	}
 
 	if (selectionParamsPtr == nullptr || !m_isFilterSupported){

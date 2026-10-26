@@ -226,7 +226,7 @@ public:
 		controller->InitComponent();
 	}
 
-	QByteArray AddUser(const QByteArray& login, const QString& password)
+	QByteArray AddUser(const QByteArray& login, const QString& password, const QByteArray& externalSystemId = QByteArray())
 	{
 		const QByteArray objectId = NewId();
 
@@ -236,6 +236,12 @@ public:
 		user.SetName(QString::fromUtf8(login));
 		user.SetMail(Mail(login));
 		user.SetPasswordHash(Hash(login, password));
+		if (!externalSystemId.isEmpty()){
+			imtauth::IUserInfo::SystemInfo systemInfo;
+			systemInfo.systemId = externalSystemId;
+			systemInfo.systemName = QString::fromUtf8(externalSystemId);
+			user.AddToSystem(systemInfo);
+		}
 
 		users->InsertNewObject("User", QString(), QString(), &user, objectId);
 
@@ -599,6 +605,42 @@ void CUserControllerTest::testUnknownAccount_AnswersLikeAWrongPassword()
 	QVERIFY(!unknown.success);
 	QCOMPARE(unknown.violatedRules, wrong.violatedRules);
 	QCOMPARE(unknown.message, wrong.message.replace("alice", "nobody"));
+}
+
+
+// The answers tell nothing about the account that is not proven: neither that it exists nor its login or kind
+void CUserControllerTest::testEmailOfAnAccount_AnswersLikeAnUnknownEmail()
+{
+	CFixture fixture;
+	fixture.AddUser("alice", "Old_Pass_1");
+	const QByteArray knownMail = CFixture::Mail("alice").toUtf8();
+	const QByteArray unknownMail = CFixture::Mail("nobody").toUtf8();
+
+	ChangeResult known = fixture.ChangePassword(knownMail, "Any_Pass_1", "New_Pass_2");
+	const ChangeResult unknown = fixture.ChangePassword(unknownMail, "Any_Pass_1", "New_Pass_2");
+	QVERIFY(!known.success);
+	QVERIFY2(!known.message.contains("'alice'"), qPrintable(known.message));
+	QCOMPARE(known.violatedRules, unknown.violatedRules);
+	QCOMPARE(known.message.replace(QString::fromUtf8(knownMail), QString::fromUtf8(unknownMail)), unknown.message);
+}
+
+
+void CUserControllerTest::testExternalAccount_AnswersLikeAWrongPasswordUntilProven()
+{
+	CFixture fixture;
+	fixture.AddUser("alice", "Old_Pass_1");
+	fixture.AddUser("ext", "Ext_Pass_1", "Google");
+
+	ChangeResult wrong = fixture.ChangePassword("alice", "Any_Pass_1", "New_Pass_2");
+	const ChangeResult external = fixture.ChangePassword("ext", "Any_Pass_1", "New_Pass_2");
+	QVERIFY(!external.success);
+	QCOMPARE(external.violatedRules, wrong.violatedRules);
+	QCOMPARE(wrong.message.replace("alice", "ext"), external.message);
+
+	// Who proves the account learns why the password cannot be changed
+	const ChangeResult proven = fixture.ChangePassword("ext", "Ext_Pass_1", "New_Pass_2");
+	QVERIFY(!proven.success);
+	QCOMPARE(proven.violatedRules, QStringList({QStringLiteral("ExternalUser")}));
 }
 
 

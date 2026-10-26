@@ -78,7 +78,7 @@ public:
 	virtual ITenantRelationshipProposalInfoUniquePtr GetRelationshipProposal(const QByteArray& proposalId) const override;
 
 	// ITenantConnectionRequestManager - Relationships
-	virtual QByteArrayList GetTenantRelationshipIds(const QByteArray& tenantId) const override;
+	virtual QByteArrayList GetTenantRelationshipIds(const QByteArray& tenantId, bool* isReadPtr = nullptr) const override;
 	virtual ITenantRelationshipInfoUniquePtr GetTenantRelationship(const QByteArray& relationshipId) const override;
 	virtual bool RemoveTenantRelationship(const QByteArray& tenantId, const QByteArray& relationshipId) override;
 	virtual QDateTime GetRelatedSince(const QByteArray& tenantId, const QByteArray& otherTenantId) const override;

@@ -128,15 +128,32 @@ QByteArrayList CTenantManagerComp::FindTenantIdsByName(const QString& tenantName
 		return retVal;
 	}
 
-	// The case-insensitive match of the database selects the candidates, the comparison below decides; SQLite ignores the case of ASCII letters only
+	// The case-insensitive match of the database selects the candidates, the comparison below decides; SQLite ignores the case of ASCII letters only.
+	// A semicolon does not reach a selection query unchanged and a backslash escapes in LIKE, so the candidates match the longest part without them.
+	QString candidatePart;
+	QString part;
+	for (const QChar character : name + QChar(';')){
+		if (character == QChar(';') || character == QChar('\\')){
+			if (part.size() > candidatePart.size()){
+				candidatePart = part;
+			}
+			part.clear();
+		}
+		else{
+			part.append(character);
+		}
+	}
+
 	imtbase::IComplexCollectionFilter::FilterExpression filterExpr;
-	filterExpr.fieldFilters << imtbase::IComplexCollectionFilter::FieldFilter("Name", name, imtbase::IComplexCollectionFilter::FO_CONTAINS);
+	filterExpr.fieldFilters << imtbase::IComplexCollectionFilter::FieldFilter("Name", candidatePart, imtbase::IComplexCollectionFilter::FO_CONTAINS);
 
 	imtbase::CComplexCollectionFilter complexFilter;
 	complexFilter.SetFilterExpression(filterExpr);
 
 	iprm::CParamsSet filterParams;
-	filterParams.SetEditableParameter("ComplexFilter", &complexFilter);
+	if (!candidatePart.isEmpty()){
+		filterParams.SetEditableParameter("ComplexFilter", &complexFilter);
+	}
 
 	for (const QByteArray& candidateId : m_tenantCollectionCompPtr->GetElementIds(0, -1, &filterParams)){
 		ITenantInfoUniquePtr candidatePtr = GetTenant(candidateId);
