@@ -643,19 +643,13 @@ sdl::V1_0::imtauth::CUpdateTenantPayload CTenantManagerControllerComp::OnUpdateT
 		}
 	}
 
-	// The scope goes first: a refused scope leaves the organization untouched
-	bool success = !hasPermissions || m_tenantManagerCompPtr->SetTenantPermissions(tenantId, newPermissions);
-	if (success){
-		success = m_tenantManagerCompPtr->UpdateTenant(tenantId, name, description, ownerId, updateOwner);
-	}
-
-	// Sync members with TenantMemberships
-	if (success && m_membershipManagerCompPtr.IsValid() && arguments.input->members){
-		// Get current member user IDs
-		QByteArrayList currentMembershipIds = m_membershipManagerCompPtr->GetMembershipsByTenant(tenantId);
-		QSet<QByteArray> currentUserIds;
-		QMap<QByteArray, QByteArray> userIdToMembershipId; // userId -> membershipId
-		for (const QByteArray& msId : currentMembershipIds){
+	// The members to sync are read before anything changes
+	const bool syncsMembers = m_membershipManagerCompPtr.IsValid() && arguments.input->members;
+	QSet<QByteArray> currentUserIds;
+	QMap<QByteArray, QByteArray> userIdToMembershipId; // userId -> membershipId
+	QSet<QByteArray> newUserIds;
+	if (syncsMembers){
+		for (const QByteArray& msId : m_membershipManagerCompPtr->GetMembershipsByTenant(tenantId)){
 			imtauth::ITenantMembershipUniquePtr msPtr = m_membershipManagerCompPtr->GetMembership(msId);
 			if (msPtr.IsValid()){
 				currentUserIds.insert(msPtr->GetUserId());
@@ -663,21 +657,35 @@ sdl::V1_0::imtauth::CUpdateTenantPayload CTenantManagerControllerComp::OnUpdateT
 			}
 		}
 
-		// Build new set
-		QSet<QByteArray> newUserIds;
 		for (const auto& member : *arguments.input->members){
 			if (member->id){
 				newUserIds << *member->id;
 			}
 		}
 
-		// Remove memberships for users no longer in the list
-		// A removed member's pending invitations go with the membership, as on the other removal paths
+		// A removed member's pending invitations go first, as on the other removal paths; a failure leaves the organization untouched
 		const imtgql::IGqlContext* removalContextPtr = gqlRequest.GetRequestContext();
 		const QByteArray revokedByUserId = removalContextPtr != nullptr ? removalContextPtr->GetUserId() : QByteArray();
 		for (const QByteArray& uid : currentUserIds){
-			if (!newUserIds.contains(uid) && m_membershipManagerCompPtr->RemoveMembership(userIdToMembershipId[uid]) && m_invitationManagerCompPtr.IsValid()){
-				m_invitationManagerCompPtr->RevokeInvitationsSentBy(tenantId, uid, revokedByUserId);
+			if (!newUserIds.contains(uid) && m_invitationManagerCompPtr.IsValid() && !m_invitationManagerCompPtr->RevokeInvitationsSentBy(tenantId, uid, revokedByUserId)){
+				response.errorMessage = QStringLiteral("The invitations a removed member sent could not be revoked. Try again.");
+				response.success = false;
+				return response;
+			}
+		}
+	}
+
+	// The scope goes first: a refused scope leaves the organization untouched
+	bool success = !hasPermissions || m_tenantManagerCompPtr->SetTenantPermissions(tenantId, newPermissions);
+	if (success){
+		success = m_tenantManagerCompPtr->UpdateTenant(tenantId, name, description, ownerId, updateOwner);
+	}
+
+	// Sync members with TenantMemberships
+	if (success && syncsMembers){
+		for (const QByteArray& uid : currentUserIds){
+			if (!newUserIds.contains(uid)){
+				m_membershipManagerCompPtr->RemoveMembership(userIdToMembershipId[uid]);
 			}
 		}
 
@@ -1903,10 +1911,18 @@ sdl::V1_0::imtauth::CRemoveConnectionPayload CTenantManagerControllerComp::OnRem
 		}
 	}
 	
+	// The access check above is for the given organization: the connection must be its own and active before anything ends
 	imtauth::ITenantConnectionInfoUniquePtr connectionPtr = m_connectionRequestManagerCompPtr->GetConnection(connectionId);
+	if (!connectionPtr.IsValid()
+				|| (connectionPtr->GetTenantAId() != tenantId && connectionPtr->GetTenantBId() != tenantId)
+				|| connectionPtr->GetStatus() != imtauth::ITenantConnectionInfo::CS_ACTIVE){
+		response.success = false;
+		response.errorMessage = QStringLiteral("Failed to remove connection");
+		return response;
+	}
 
 	// A grant needs an active connection: the grants end first, so a failure leaves the connection to remove again
-	if (connectionPtr.IsValid() && !RevokeGrantsBetween(connectionPtr->GetTenantAId(), connectionPtr->GetTenantBId())){
+	if (!RevokeGrantsBetween(connectionPtr->GetTenantAId(), connectionPtr->GetTenantBId())){
 		response.success = false;
 		response.errorMessage = QStringLiteral("The grants between the organizations could not be revoked. Try again.");
 		return response;

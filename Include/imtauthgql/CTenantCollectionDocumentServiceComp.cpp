@@ -579,12 +579,23 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceCom
 			// Creator/Owner/Admin can remove any member (except creator/owner) and add new ones
 			QByteArray ownerId = tenantPtr->GetOwnerId();
 			QByteArray creatorId = tenantPtr->GetCreatorId();
+			QByteArrayList excludedUserIds;
 			for (const QByteArray& existingUserId : currentUserIds){
 				if (!newUserIds.contains(existingUserId) && existingUserId != ownerId && existingUserId != creatorId){
-					if (m_membershipManagerCompPtr->RemoveMembership(userIdToMembershipId.value(existingUserId)) && m_invitationManagerCompPtr.IsValid()){
-						m_invitationManagerCompPtr->RevokeInvitationsSentBy(tenantId, existingUserId, contextUserId);
-					}
+					excludedUserIds << existingUserId;
 				}
+			}
+
+			// The invitations of the excluded members go first: after a membership is gone a failed revocation could not be repeated
+			for (const QByteArray& excludedUserId : excludedUserIds){
+				if (m_invitationManagerCompPtr.IsValid() && !m_invitationManagerCompPtr->RevokeInvitationsSentBy(tenantId, excludedUserId, contextUserId)){
+					errorMessage = QStringLiteral("The invitations an excluded member sent could not be revoked. Try again.");
+					return response;
+				}
+			}
+
+			for (const QByteArray& excludedUserId : excludedUserIds){
+				m_membershipManagerCompPtr->RemoveMembership(userIdToMembershipId.value(excludedUserId));
 			}
 
 			for (const QByteArray& addUserId : newUserIds){
@@ -595,10 +606,13 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceCom
 				}
 			}
 		} else if (isSelfLeaving){
-			// Non-admin member can only remove themselves
-			if (m_membershipManagerCompPtr->RemoveMembership(userIdToMembershipId.value(contextUserId)) && m_invitationManagerCompPtr.IsValid()){
-				m_invitationManagerCompPtr->RevokeInvitationsSentBy(tenantId, contextUserId, contextUserId);
+			// Non-admin member can only remove themselves; the own invitations go first
+			if (m_invitationManagerCompPtr.IsValid() && !m_invitationManagerCompPtr->RevokeInvitationsSentBy(tenantId, contextUserId, contextUserId)){
+				errorMessage = QStringLiteral("The invitations you sent could not be revoked. Try again.");
+				return response;
 			}
+
+			m_membershipManagerCompPtr->RemoveMembership(userIdToMembershipId.value(contextUserId));
 		}
 	}
 

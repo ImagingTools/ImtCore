@@ -846,14 +846,19 @@ bool CUserCollectionControllerComp::OnBeforeRemoveElements(const QByteArrayList&
 
 void CUserCollectionControllerComp::OnAfterRemoveElements(const QByteArrayList& elementIds, const ::imtgql::CGqlRequest& gqlRequest) const
 {
+	// What is left of a removed user grants nothing (a token is accepted only for an existing user), but it must not go unnoticed
+	const auto reportLeftover = [this](const QByteArray& userId, const QString& leftover){
+		SendErrorMessage(0, QStringLiteral("The %1 of the removed user '%2' could not be removed").arg(leftover, QString::fromUtf8(userId)), "CUserCollectionControllerComp");
+	};
+
 	for (const QByteArray& userId : elementIds){
 		// 1. Clean TenantMemberships directly (bypasses owner protection; owner deletes are blocked in OnBefore)
 		QByteArrayList memIds;
 		if (m_membershipManagerCompPtr.IsValid()){
 			memIds = m_membershipManagerCompPtr->GetMembershipsByUser(userId);
 		}
-		if (m_membershipCollectionCompPtr.IsValid() && !memIds.isEmpty()){
-			m_membershipCollectionCompPtr->RemoveElements(memIds);
+		if (m_membershipCollectionCompPtr.IsValid() && !memIds.isEmpty() && !m_membershipCollectionCompPtr->RemoveElements(memIds)){
+			reportLeftover(userId, QStringLiteral("memberships"));
 		}
 
 		// 2. Force-clean any remaining TenantEntityBindings for this user (e.g. non-mem cases)
@@ -880,8 +885,8 @@ void CUserCollectionControllerComp::OnAfterRemoveElements(const QByteArrayList& 
 					}
 				}
 			}
-			if (!toRemove.isEmpty()){
-				m_invitationCollectionCompPtr->RemoveElements(toRemove);
+			if (!toRemove.isEmpty() && !m_invitationCollectionCompPtr->RemoveElements(toRemove)){
+				reportLeftover(userId, QStringLiteral("invitations"));
 			}
 		}
 
@@ -889,7 +894,9 @@ void CUserCollectionControllerComp::OnAfterRemoveElements(const QByteArrayList& 
 		if (m_personalAccessTokenManagerCompPtr.IsValid()){
 			QByteArrayList tids = m_personalAccessTokenManagerCompPtr->GetTokenIds(userId);
 			for (const QByteArray& tid : tids){
-				m_personalAccessTokenManagerCompPtr->DeleteToken(tid);
+				if (!m_personalAccessTokenManagerCompPtr->DeleteToken(tid)){
+					reportLeftover(userId, QStringLiteral("access token '%1'").arg(QString::fromUtf8(tid)));
+				}
 			}
 		}
 
@@ -906,8 +913,8 @@ void CUserCollectionControllerComp::OnAfterRemoveElements(const QByteArrayList& 
 					}
 				}
 			}
-			if (!toRemove.isEmpty()){
-				m_sessionCollectionCompPtr->RemoveElements(toRemove);
+			if (!toRemove.isEmpty() && !m_sessionCollectionCompPtr->RemoveElements(toRemove)){
+				reportLeftover(userId, QStringLiteral("sessions"));
 			}
 		}
 	}

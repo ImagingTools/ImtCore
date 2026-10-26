@@ -68,7 +68,8 @@ private:
 	bool IsOfEarlierRelationship(const IDocumentShareInfo& share, const QDateTime& relatedSince) const;
 	// Shares of the tenant with organizations it has no relationship with, or that are left from an earlier relationship
 	QByteArrayList FindSharesOfEndedRelationships(const QByteArray& tenantId, const RelatedTenantInfos& relatedTenants, const DocumentShares& shares) const;
-	DocumentShares FindShares(const QByteArray& fieldId, const QByteArray& value) const;
+	/// \param isReadPtr [optional] False when a share could not be read, so the list may miss shares.
+	DocumentShares FindShares(const QByteArray& fieldId, const QByteArray& value, bool* isReadPtr = nullptr) const;
 	bool StoreShare(const IDocumentShareInfo& shareInfo, bool isNew);
 
 private:

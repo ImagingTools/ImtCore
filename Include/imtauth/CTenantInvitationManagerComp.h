@@ -38,7 +38,7 @@ public:
 	virtual bool RejectInvitation(const QByteArray& invitationId, const QByteArray& userId) override;
 	virtual bool RevokeInvitation(const QByteArray& invitationId, const QByteArray& revokedByUserId) override;
 	virtual bool ResendInvitation(const QByteArray& invitationId) override;
-	virtual int RevokeInvitationsSentBy(const QByteArray& tenantId, const QByteArray& invitedByUserId, const QByteArray& revokedByUserId) override;
+	virtual bool RevokeInvitationsSentBy(const QByteArray& tenantId, const QByteArray& invitedByUserId, const QByteArray& revokedByUserId) override;
 	virtual ITenantInvitation::TenantInvitationStatus GetEffectiveStatus(const ITenantInvitation& invitation) const override;
 
 private:
@@ -46,7 +46,7 @@ private:
 		Ids of the invitations whose column holds the value; the caller verifies the loaded invitation,
 		because a collection that does not know the filter returns every id.
 	*/
-	QByteArrayList GetCandidateInvitationIds(const QByteArray& columnId, const QByteArray& value) const;
+	QByteArrayList GetCandidateInvitationIds(const QByteArray& columnId, const QByteArray& value, bool* isReadPtr = nullptr) const;
 	bool StatusMatches(const ITenantInvitation& invitation, const Statuses& statuses) const;
 	bool StoreInvitation(const QByteArray& invitationId, ITenantInvitation& invitation);
 	void PublishInvitationEvent(const QString& eventType, const ITenantInvitation& invitation);
