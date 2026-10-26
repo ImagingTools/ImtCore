@@ -355,6 +355,52 @@ bool CTenantConnectionRequestManagerComp::ArchiveRelationshipsForConnection(cons
 }
 
 
+bool CTenantConnectionRequestManagerComp::CancelProposalsForConnection(const QByteArray& connectionId)
+{
+	if (!m_proposalCollectionCompPtr.IsValid() || !m_proposalFactoryCompPtr.IsValid()){
+		return false;
+	}
+
+	bool isCanceled = true;
+	for (const QByteArray& id : SelectIds(*m_proposalCollectionCompPtr, ColumnEquals("ConnectionId", connectionId), QByteArrayList(), &isCanceled)){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (!m_proposalCollectionCompPtr->GetObjectData(id, dataPtr)){
+			isCanceled = false;
+			continue;
+		}
+
+		const ITenantRelationshipProposalInfo* proposalPtr = dynamic_cast<const ITenantRelationshipProposalInfo*>(dataPtr.GetPtr());
+		if (proposalPtr == nullptr || proposalPtr->GetConnectionId() != connectionId){
+			continue;
+		}
+
+		const ITenantRelationshipProposalInfo::RelationshipProposalStatus status = proposalPtr->GetStatus();
+		if (status != ITenantRelationshipProposalInfo::RPS_PENDING
+		&& status != ITenantRelationshipProposalInfo::RPS_APPROVED_BY_INITIATOR
+		&& status != ITenantRelationshipProposalInfo::RPS_APPROVED_BY_COUNTERPARTY){
+			continue;
+		}
+
+		ITenantRelationshipProposalInfoUniquePtr updatedProposal = m_proposalFactoryCompPtr.CreateInstance();
+		if (!updatedProposal.IsValid()){
+			isCanceled = false;
+			continue;
+		}
+		updatedProposal->CopyFrom(*proposalPtr);
+		updatedProposal->SetStatus(ITenantRelationshipProposalInfo::RPS_CANCELED);
+		updatedProposal->SetUpdatedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs));
+		if (!StoreProposal(id, *updatedProposal)){
+			isCanceled = false;
+			continue;
+		}
+
+		PublishProposalEvent(TenantEvent::s_proposalStatusChanged, *updatedProposal, status);
+	}
+
+	return isCanceled;
+}
+
+
 QByteArray CTenantConnectionRequestManagerComp::ApplyRelationshipProposal(const ITenantRelationshipProposalInfo* proposalPtr)
 {
 	if (!m_relationshipCollectionCompPtr.IsValid() || !m_relationshipFactoryCompPtr.IsValid() || proposalPtr == nullptr){
@@ -1014,8 +1060,9 @@ bool CTenantConnectionRequestManagerComp::RemoveConnection(const QByteArray& con
 	updatedConnPtr->SetStatus(ITenantConnectionInfo::CS_REMOVED);
 	updatedConnPtr->SetUpdatedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs));
 
-	// The relationships end first: a removed connection with an active relationship would keep its shares giving access
-	if (!ArchiveRelationshipsForConnection(connectionId) || !StoreConnection(*updatedConnPtr)){
+	// The open proposals and the relationships end first: a reconnection reactivates this connection, and an old proposal
+	// approved then, or an active relationship, would keep the partner's shares giving access
+	if (!CancelProposalsForConnection(connectionId) || !ArchiveRelationshipsForConnection(connectionId) || !StoreConnection(*updatedConnPtr)){
 		return false;
 	}
 
@@ -1034,6 +1081,8 @@ bool CTenantConnectionRequestManagerComp::RemoveConnection(const QByteArray& con
 QByteArray CTenantConnectionRequestManagerComp::CreateRelationshipProposal(
 		const ITenantRelationshipProposalInfo& proposalInfo)
 {
+	QMutexLocker locker(&m_relationshipChangeMutex);
+
 	QByteArray connectionId = proposalInfo.GetConnectionId();
 	QByteArray initiatorTenantId = proposalInfo.GetInitiatorTenantId();
 	QByteArray counterpartyTenantId = proposalInfo.GetCounterpartyTenantId();

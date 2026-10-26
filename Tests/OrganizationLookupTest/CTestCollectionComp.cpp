@@ -361,6 +361,12 @@ bool CTestCollectionComp::GetFieldValue(const istd::IChangeable& object, const Q
 					: fieldId == "ConnectionId" ? relationshipPtr->GetConnectionId()
 					: relationshipPtr->GetRelationshipId();
 	}
+	else if (const imtauth::ITenantRelationshipProposalInfo* proposalPtr = dynamic_cast<const imtauth::ITenantRelationshipProposalInfo*>(&object)){
+		isKnown = fieldId == "InitiatorTenantId" || fieldId == "CounterpartyTenantId" || fieldId == "ConnectionId";
+		rawValue = fieldId == "InitiatorTenantId" ? proposalPtr->GetInitiatorTenantId()
+					: fieldId == "CounterpartyTenantId" ? proposalPtr->GetCounterpartyTenantId()
+					: proposalPtr->GetConnectionId();
+	}
 	else if (const imtauth::ICrossOrgGrantData* grantPtr = dynamic_cast<const imtauth::ICrossOrgGrantData*>(&object)){
 		const imtauth::CrossOrgGrantInfo grantInfo = grantPtr->GetGrantInfo();
 		isKnown = fieldId == "SourceTenantId" || fieldId == "TargetTenantId";

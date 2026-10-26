@@ -99,8 +99,10 @@ private:
 	QByteArray ApplyRelationshipProposal(const ITenantRelationshipProposalInfo* proposalPtr);
 	/// False when a relationship of the connection could not be read or archived.
 	bool ArchiveRelationshipsForConnection(const QByteArray& connectionId);
+	/// False when an open proposal of the connection could not be read or canceled.
+	bool CancelProposalsForConnection(const QByteArray& connectionId);
 
-	// Approvals and connection removals one at a time: two approvals of a proposal, or an approval during the removal of its connection, would each create a relationship
+	// Proposals, approvals and connection removals one at a time: two approvals of a proposal, or a proposal during the removal of its connection, would each leave a relationship
 	QMutex m_relationshipChangeMutex;
 	bool ArchiveRelationship(const QByteArray& relationshipId, const ITenantRelationshipInfo& relationship, bool isRemovalPublished);
 
