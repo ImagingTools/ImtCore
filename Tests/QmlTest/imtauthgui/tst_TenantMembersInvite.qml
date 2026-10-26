@@ -202,4 +202,24 @@ TestCase {
 		compare(context.stateManager.invitations.length, 1)
 		compare(context.stateManager.invitations[0].length, 4)
 	}
+
+	// Keyboard only: the Tab cycle reaches the Invite button after the list, and Return presses it
+	function test_keyboardReachesTheInviteButton(){
+		let context = openInvitePopup()
+		context.popup.handleItemClick(context.popup.getItemId(0), 0)
+		wait(100)
+		let button = inviteButton(context.popup)
+		verify(button.enabled)
+
+		// filter → "Clear all" → selected users → list → Invite
+		for (let i = 0; i < 4; ++i){
+			keyClick(Qt.Key_Tab)
+			wait(50)
+		}
+		verify(button.activeFocus, "Tab reaches the Invite button")
+
+		keyClick(Qt.Key_Return)
+		compare(context.stateManager.invitations.length, 1)
+		compare(context.stateManager.invitations[0].length, 1)
+	}
 }

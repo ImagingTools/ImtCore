@@ -934,6 +934,9 @@ SimpleCollectionPage {
 				Item {
 					height: inviteButton.height
 
+					// The popup's keyboard reaches the Invite button after the list
+					property Item keyboardItem: inviteButton
+
 					Button {
 						id: inviteButton
 						anchors.right: parent.right

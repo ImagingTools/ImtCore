@@ -114,6 +114,7 @@ PopupView {
 	property Component headerComponent: null
 
 	// --- Optional footer component (rendered below the list, e.g. an apply button) ---
+	// A footer with a 'keyboardItem' (a Button) joins the Tab cycle after the list; Return and Space press it.
 	property Component footerComponent: null
 
 	// --- Selected items group at top ---
@@ -345,6 +346,7 @@ PopupView {
 	property QtObject __internal: QtObject {
 		property int selectedFocusedIndex: -1
 		property bool clearAllFocused: false
+		property bool footerFocused: false
 		property bool hoverBlocked: true
 		property var selectedItemsList: []
 		property int selectedItemsCount: 0
@@ -1056,6 +1058,29 @@ PopupView {
 		root.focusedIndex = -1
 		root.__internal.selectedFocusedIndex = -1
 		root.__internal.clearAllFocused = false
+		root.__internal.footerFocused = false
+	}
+
+	// --- Helper: the footer control the keyboard reaches, if the footer offers an enabled one ---
+	function __footerKeyboardItem(){
+		let footerItem = footerLoader.item
+		if (!footerItem || footerItem.keyboardItem === undefined || !footerItem.keyboardItem){
+			return null
+		}
+
+		return footerItem.keyboardItem.enabled ? footerItem.keyboardItem : null
+	}
+
+	function __focusFooter(){
+		let keyboardItem = root.__footerKeyboardItem()
+		root.__clearAllFocusIndicators()
+		if (!keyboardItem){
+			root.__focusFilter()
+			return
+		}
+
+		root.__internal.footerFocused = true
+		keyboardItem.forceActiveFocus()
 	}
 
 	// --- Helper: handle "Clear all" action from keyboard ---
@@ -1087,6 +1112,14 @@ PopupView {
 
 	// --- Helper: handle keyboard activation (Return/Enter/Space) ---
 	function __handleKeyboardActivation(){
+		// Footer control (e.g. an apply button) — press it
+		if (root.__internal.footerFocused){
+			let keyboardItem = root.__footerKeyboardItem()
+			if (keyboardItem){
+				keyboardItem.clicked()
+			}
+			return
+		}
 		// "Clear all" button action
 		if (root.__internal.clearAllFocused){
 			root.__handleClearAllAction()
@@ -1135,7 +1168,11 @@ PopupView {
 	Shortcut {
 		sequence: "Tab"
 		onActivated: {
-			if (filterField.textInputFocus){
+			if (root.__internal.footerFocused){
+				// Tab from the footer → back to filter
+				root.__focusFilter()
+				root.__clearAllFocusIndicators()
+			} else if (filterField.textInputFocus){
 				filterField.setFocus(false)
 				root.__internal.hoverBlocked = true
 				// If selected group visible, tab to "Clear all" first
@@ -1164,9 +1201,8 @@ PopupView {
 				var mainCount = root.dataProvider ? root.dataProvider.items.length : 0
 				root.focusedIndex = mainCount > 0 ? 0 : -1
 			} else {
-				// Tab from main list → back to filter
-				root.__focusFilter()
-				root.__clearAllFocusIndicators()
+				// Tab from main list → the footer, if it offers a control, or back to filter
+				root.__focusFooter()
 			}
 		}
 	}
@@ -1174,7 +1210,13 @@ PopupView {
 	Shortcut {
 		sequence: "Shift+Tab"
 		onActivated: {
-			if (root.focusedIndex >= 0){
+			if (root.__internal.footerFocused){
+				// Shift+Tab from the footer → main list
+				root.__internal.footerFocused = false
+				root.forceActiveFocus()
+				let itemCount = root.dataProvider ? root.dataProvider.items.length : 0
+				root.focusedIndex = itemCount > 0 ? 0 : -1
+			} else if (root.focusedIndex >= 0){
 				// Shift+Tab from main list → selected group (last item) or "Clear all" or filter
 				root.focusedIndex = -1
 				if (root.showSelectedGroup && root.__internal.selectedItemsCount > 0){
@@ -1200,6 +1242,7 @@ PopupView {
 	Shortcut {
 		sequence: "Up"
 		onActivated: {
+			root.__internal.footerFocused = false
 			if (filterField.textInputFocus){
 				filterField.setFocus(false)
 			}
@@ -1244,6 +1287,7 @@ PopupView {
 	Shortcut {
 		sequence: "Down"
 		onActivated: {
+			root.__internal.footerFocused = false
 			if (filterField.textInputFocus){
 				filterField.setFocus(false)
 			}
