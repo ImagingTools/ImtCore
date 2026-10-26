@@ -42,8 +42,6 @@ QtObject {
 			representationController.representationUpdated.connect(onRepresentationUpdated)
 			representationController.startUpdateRepresentation.connect(onStartUpdateRepresentation)
 			representationController.updateDocumentFailed.connect(onUpdateDocumentFailed)
-			representationController.startUpdateDocument.connect(onStartUpdateDocument)
-			representationController.documentUpdated.connect(onDocumentUpdated)
 
 			// The failure signal does not say which representation failed, so it is bound to its view.
 			let registeredView = view
@@ -224,33 +222,7 @@ QtObject {
 			return
 		}
 
-		// The document misses the refused change, it is not saved
-		_internal.finishDocumentUpdate()
-		_internal.saveAfterUpdates = false
-		_internal.saveAfterUpdatesTimer.stop()
-
 		documentManager.updateDocumentFailed(documentId, message)
-	}
-
-	function onStartUpdateDocument(documentId){
-		if (root.documentId !== documentId){
-			return
-		}
-
-		_internal.pendingDocumentUpdates = _internal.pendingDocumentUpdates + 1
-	}
-
-	function onDocumentUpdated(documentId){
-		if (root.documentId !== documentId){
-			return
-		}
-
-		_internal.finishDocumentUpdate()
-		if (_internal.pendingDocumentUpdates === 0 && _internal.saveAfterUpdates){
-			_internal.saveAfterUpdates = false
-			_internal.saveAfterUpdatesTimer.stop()
-			doSave()
-		}
 	}
 
 	// A visible view refuses the save while its input is not acceptable (acceptsSave() is optional).
@@ -348,8 +320,6 @@ QtObject {
 		representationController.startUpdateRepresentation.disconnect(onStartUpdateRepresentation)
 		representationController.updateRepresentationFailed.disconnect(connection.representationFailed)
 		representationController.updateDocumentFailed.disconnect(onUpdateDocumentFailed)
-		representationController.startUpdateDocument.disconnect(onStartUpdateDocument)
-		representationController.documentUpdated.disconnect(onDocumentUpdated)
 
 		registeredViews.splice(index, 1)
 		registeredRepresentation.splice(index, 1)
@@ -398,14 +368,6 @@ QtObject {
 		}
 
 		commitChanges()
-
-		// The server handles requests in parallel: a save sent beside an update can be stored without it
-		if (_internal.pendingDocumentUpdates > 0){
-			_internal.saveAfterUpdates = true
-			_internal.saveAfterUpdatesTimer.restart()
-			return
-		}
-
 		doSave()
 	}
 
@@ -509,23 +471,5 @@ QtObject {
 		property var failedViews: []
 		property var viewConnections: []
 		property var initiatingView: null
-		property int pendingDocumentUpdates: 0
-		property bool saveAfterUpdates: false
-
-		function finishDocumentUpdate(){
-			if (pendingDocumentUpdates > 0){
-				pendingDocumentUpdates = pendingDocumentUpdates - 1
-			}
-		}
-
-		// A controller that never answers must not block the save
-		property Timer saveAfterUpdatesTimer: Timer {
-			interval: 10000
-			onTriggered: {
-				root._internal.saveAfterUpdates = false
-				root._internal.pendingDocumentUpdates = 0
-				root.doSave()
-			}
-		}
 	}
 }
