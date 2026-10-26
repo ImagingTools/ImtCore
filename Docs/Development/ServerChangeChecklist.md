@@ -57,14 +57,31 @@ If you add a helper, such as a selection by columns, an access check or an event
 - Do not add "fallback" lookups that query the same key as the direct lookup. Such a fallback is dead code that hides real errors.
 - A full scan of a collection (`GetElementIds()` without a filter) is not acceptable in a request path. Select by indexed columns.
 
-## 7. Write tests that can fail
+## 7. A read that can fail must say so before anything destructive or trusting
+
+An empty result is not "nothing there". A failed selection or a row that cannot be loaded must be reported, and a decision that **removes, revokes or trusts** must not be taken on an incomplete read:
+
+- report completeness (`bool* isReadPtr`, an error in the `logPtr` of `GetElementIds`) and pass it up to every caller, including the GraphQL answer to another server;
+- treat `if (!GetObjectData(...)) continue;` in a cleanup, cascade or guard as a defect;
+- a guard fails closed: "the organization cannot be read" refuses, it does not mean "not the owner";
+- check the result of every cascade step (revoke, archive, remove) and do the cascade **before** the change it depends on, so a failure leaves the change to repeat.
+
+Find the whole class with a search before fixing one place: every caller of the read, every `continue` after a failed load, every ignored `bool` of a cascade.
+*Example:* the share cleanup trusted an incomplete relationship read; three review rounds later the same gap was still in the share creation, the share listing and the invitation revocation.
+
+## 8. Moving code moves its checks
+
+When you reorder an operation (for example a cascade before the change), list the checks that guarded the code you move: authorization, "the object belongs to the caller", status. Move them in front of it.
+*Example:* revoking the grants before `RemoveConnection` left the check "the organization is a side of the connection" inside `RemoveConnection`, so any organization manager could revoke the grants of an unrelated connection.
+
+## 9. Write tests that can fail
 
 - A fake collection or provider must be **at least as strict as the strictest real backend**. A fake that is more forgiving than SQLite hides SQLite bugs.
 - Assert only on fields that exist in the SDL schema. An assertion on a field that is never returned, for example `id` instead of `objectId`, always passes.
 - Mutation-check every new test: break the code it protects, see the test fail, and restore the code.
-- Cover the paths from item 2 and the states from item 1, not only the happy path.
+- Cover the paths from item 2, the states from item 1 and the failed reads from item 7, not only the happy path.
 
-## 8. Before you say "done"
+## 10. Before you say "done"
 
 - Run a strict code review of your own diff and verify each finding against the code.
 - Build and run the QtTests of every affected repository, including product tests that are not built by default (for example, Puma `pumatest` requires `BUILD_TESTING`).

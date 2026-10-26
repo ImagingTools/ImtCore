@@ -57,17 +57,6 @@ sdl::V1_0::imtauth::CTenantInvitationData ToTenantInvitationData(
 
 
 /**
-	Check if the user is the owner of the tenant.
-	Owner bypasses all tenant permission checks.
-*/
-bool IsOwner(const imtauth::ITenantManager& tenantManager, const QByteArray& userId, const QByteArray& tenantId)
-{
-	imtauth::ITenantInfoUniquePtr tenantPtr = tenantManager.GetTenant(tenantId);
-	return tenantPtr.IsValid() && tenantPtr->GetOwnerId() == userId;
-}
-
-
-/**
 	Check if the user has access to perform tenant operations.
 	Owner and creator always have access.
 	Non-owners and non-creators must be active members of the tenant.
@@ -672,17 +661,28 @@ sdl::V1_0::imtauth::CRemoveMembershipPayload CTenantMembershipManagerControllerC
 			response.errorMessage = QStringLiteral("Insufficient organization permissions to remove other members");
 			return response;
 		}
-		if (IsOwner(*m_tenantManagerCompPtr.GetPtr(), membershipPtr->GetUserId(), tenantId)){
+		// A guard does not pass on a failed read: the organization might be the member's own
+		imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
+		if (!tenantPtr.IsValid()){
+			response.success = false;
+			response.errorMessage = QStringLiteral("The organization could not be read. Try again.");
+			return response;
+		}
+		if (tenantPtr->GetOwnerId() == membershipPtr->GetUserId()){
 			response.success = false;
 			response.errorMessage = QStringLiteral("The owner cannot leave or be excluded from the organization. Transfer the ownership first.");
 			return response;
 		}
 	}
 
-	bool success = m_membershipManagerCompPtr->RemoveMembership(membershipId);
-	if (success && m_invitationManagerCompPtr.IsValid()){
-		m_invitationManagerCompPtr->RevokeInvitationsSentBy(membershipPtr->GetTenantId(), membershipPtr->GetUserId(), ContextUserId(gqlRequest));
+	// The invitations go first: after the membership is gone a failed revocation could not be repeated
+	if (m_invitationManagerCompPtr.IsValid() && !m_invitationManagerCompPtr->RevokeInvitationsSentBy(membershipPtr->GetTenantId(), membershipPtr->GetUserId(), ContextUserId(gqlRequest))){
+		response.success = false;
+		response.errorMessage = QStringLiteral("The invitations the member sent could not be revoked. Try again.");
+		return response;
 	}
+
+	bool success = m_membershipManagerCompPtr->RemoveMembership(membershipId);
 
 	response.success = success;
 	if (!success){

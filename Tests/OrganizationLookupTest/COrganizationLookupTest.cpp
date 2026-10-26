@@ -397,6 +397,11 @@ public:
 		return relationships.GetImpl();
 	}
 
+	CTestCollectionComp& Proposals()
+	{
+		return proposals.GetImpl();
+	}
+
 	imtauth::ITenantConnectionRequestManager& Manager()
 	{
 		return manager.GetImpl();
@@ -764,7 +769,7 @@ void COrganizationLookupTest::testRevokeInvitationsSentBy_RevokesOnlyPendingInvi
 	const QByteArray acceptedId = fixture.Add(tenantId, inviterId, imtauth::ITenantInvitation::TIS_ACCEPTED);
 	const QByteArray expiredId = fixture.Add(tenantId, inviterId, imtauth::ITenantInvitation::TIS_PENDING, -1);
 
-	QCOMPARE(fixture.Manager().RevokeInvitationsSentBy(tenantId, inviterId, adminId), 2);
+	QVERIFY(fixture.Manager().RevokeInvitationsSentBy(tenantId, inviterId, adminId));
 
 	for (const QByteArray& invitationId : {firstPendingId, secondPendingId}){
 		imtauth::ITenantInvitationUniquePtr invitationPtr = fixture.Get(invitationId);
@@ -778,8 +783,8 @@ void COrganizationLookupTest::testRevokeInvitationsSentBy_RevokesOnlyPendingInvi
 	QCOMPARE(fixture.Get(acceptedId)->GetStatus(), imtauth::ITenantInvitation::TIS_ACCEPTED);
 	QCOMPARE(fixture.Manager().GetEffectiveStatus(*fixture.Get(expiredId)), imtauth::ITenantInvitation::TIS_EXPIRED);
 
-	QCOMPARE(fixture.Manager().RevokeInvitationsSentBy(tenantId, inviterId, adminId), 0);
-	QCOMPARE(fixture.Manager().RevokeInvitationsSentBy(tenantId, QByteArray(), adminId), 0);
+	QVERIFY(fixture.Manager().RevokeInvitationsSentBy(tenantId, inviterId, adminId));
+	QVERIFY(fixture.Manager().RevokeInvitationsSentBy(tenantId, QByteArray(), adminId));
 	QCOMPARE(fixture.Get(otherInviterPendingId)->GetStatus(), imtauth::ITenantInvitation::TIS_PENDING);
 }
 
@@ -1704,6 +1709,190 @@ void COrganizationLookupTest::testConsumeVerification_OnlyOneConcurrentCallerSuc
 		QCOMPARE(successCount.load(), 1);
 		QVERIFY(!fixture.Controller().VerifyUser(userId, code));
 	}
+}
+
+
+// Third review round
+
+void COrganizationLookupTest::testRevokeInvitationsSentBy_ReportsAnUnreadInvitation()
+{
+	CInvitationFixture fixture;
+
+	const QByteArray tenantId = NewId();
+	const QByteArray inviterId = NewId();
+	const QByteArray unreadId = fixture.Add(tenantId, inviterId);
+	const QByteArray revokedId = fixture.Add(tenantId, inviterId);
+
+	// The invitation that cannot be read may be a pending one of the member: the membership must stay
+	fixture.Collection().SetLoadFailingIds({unreadId});
+	QVERIFY(!fixture.Manager().RevokeInvitationsSentBy(tenantId, inviterId, NewId()));
+
+	fixture.Collection().SetLoadFailingIds({});
+	QCOMPARE(fixture.Get(revokedId)->GetStatus(), imtauth::ITenantInvitation::TIS_REVOKED);
+	QCOMPARE(fixture.Get(unreadId)->GetStatus(), imtauth::ITenantInvitation::TIS_PENDING);
+
+	fixture.Collection().SetSelectionFailing(true);
+	QVERIFY(!fixture.Manager().RevokeInvitationsSentBy(tenantId, inviterId, NewId()));
+
+	fixture.Collection().SetSelectionFailing(false);
+	QVERIFY(fixture.Manager().RevokeInvitationsSentBy(tenantId, inviterId, NewId()));
+	QCOMPARE(fixture.Get(unreadId)->GetStatus(), imtauth::ITenantInvitation::TIS_REVOKED);
+}
+
+
+namespace
+{
+
+
+imtauth::CIdentifiableDocumentShareInfo ShareOf(const QByteArray& entityId, const QByteArray& ownerTenantId, const QByteArray& targetTenantId)
+{
+	imtauth::CIdentifiableDocumentShareInfo share;
+	share.SetCollectionId("Customers");
+	share.SetEntityId(entityId);
+	share.SetOwnerTenantId(ownerTenantId);
+	share.SetTargetTenantId(targetTenantId);
+	share.SetAccessLevel(imtauth::IDocumentShareInfo::DAL_VIEW);
+
+	return share;
+}
+
+
+} // anonymous namespace
+
+
+void COrganizationLookupTest::testShareDocument_RefusesUnreadRelationships()
+{
+	CShareFixture fixture;
+
+	// The relationship started long before the share, but the part of its history that says so cannot be read:
+	// the answered start is too late and would take the live share for one of an earlier relationship
+	const QDateTime now = QDateTime::currentDateTimeUtc();
+	const QByteArray tenantId = NewId();
+	const QByteArray partnerId = NewId();
+	fixture.Relationships().AddRelationship(tenantId, partnerId, now);
+	const QByteArray entityId = NewId();
+	const QByteArray shareId = fixture.Add(tenantId, partnerId, now.addSecs(-3600), entityId);
+
+	fixture.Relationships().SetPartialRead(true);
+	QString errorMessage;
+	QVERIFY(fixture.Manager().ShareDocument(ShareOf(entityId, tenantId, partnerId), &errorMessage).isEmpty());
+	QVERIFY(!errorMessage.isEmpty());
+	QCOMPARE(fixture.StoredShareIds(), QByteArrayList({shareId}));
+}
+
+
+void COrganizationLookupTest::testShareDocument_RefusesAnUnreadShareOfTheDocument()
+{
+	CShareFixture fixture;
+
+	const QByteArray tenantId = NewId();
+	const QByteArray partnerId = NewId();
+	fixture.Relationships().AddRelationship(tenantId, partnerId, QDateTime::currentDateTimeUtc());
+	const QByteArray entityId = NewId();
+	const QByteArray shareId = fixture.Add(tenantId, partnerId, QDateTime::currentDateTimeUtc(), entityId);
+
+	// The share that cannot be read may be the existing one: no second share is created beside it
+	fixture.Collection().SetLoadFailingIds({shareId});
+	QString errorMessage;
+	QVERIFY(fixture.Manager().ShareDocument(ShareOf(entityId, tenantId, partnerId), &errorMessage).isEmpty());
+	QVERIFY(!errorMessage.isEmpty());
+
+	fixture.Collection().SetLoadFailingIds({});
+	QCOMPARE(fixture.StoredShareIds(), QByteArrayList({shareId}));
+}
+
+
+void COrganizationLookupTest::testShareDocument_RefusesWhenTheEarlierShareStays()
+{
+	CShareFixture fixture;
+
+	const QDateTime now = QDateTime::currentDateTimeUtc();
+	const QByteArray tenantId = NewId();
+	const QByteArray partnerId = NewId();
+	fixture.Relationships().AddRelationship(tenantId, partnerId, now);
+	const QByteArray entityId = NewId();
+	const QByteArray staleShareId = fixture.Add(tenantId, partnerId, now.addSecs(-3600), entityId);
+
+	fixture.Collection().SetRemovalFailing(true);
+	QString errorMessage;
+	QVERIFY(fixture.Manager().ShareDocument(ShareOf(entityId, tenantId, partnerId), &errorMessage).isEmpty());
+	QVERIFY(!errorMessage.isEmpty());
+	QCOMPARE(fixture.StoredShareIds(), QByteArrayList({staleShareId}));
+}
+
+
+void COrganizationLookupTest::testGetShareOwnerTenantIds_UnreadShareTrustsNoPartner()
+{
+	CShareFixture fixture;
+
+	const QDateTime now = QDateTime::currentDateTimeUtc();
+	const QByteArray tenantId = NewId();
+	const QByteArray partnerId = NewId();
+	fixture.Relationships().AddRelationship(tenantId, partnerId, now);
+	fixture.Add(partnerId, tenantId, now.addSecs(5));
+	const QByteArray staleShareId = fixture.Add(partnerId, tenantId, now.addSecs(-3600));
+
+	// The share of the earlier relationship cannot be read, so the cleanup cannot know it is gone
+	fixture.Collection().SetLoadFailingIds({staleShareId});
+	QVERIFY(fixture.Manager().GetShareOwnerTenantIds(tenantId).isEmpty());
+
+	fixture.Collection().SetLoadFailingIds({});
+	QCOMPARE(fixture.Manager().GetShareOwnerTenantIds(tenantId), QByteArrayList({partnerId}));
+	QVERIFY(!fixture.StoredShareIds().contains(staleShareId));
+}
+
+
+void COrganizationLookupTest::testRemoveConnection_KeepsTheConnectionWhenARelationshipStays()
+{
+	CConnectionFixture fixture;
+
+	const QByteArray tenantId = NewId();
+	const QByteArray partnerId = NewId();
+	const QByteArray connectionId = fixture.AddConnection(tenantId, partnerId);
+	const QByteArray relationshipId = fixture.AddRelationship(connectionId, tenantId, partnerId);
+
+	// A removed connection with an active relationship would keep the shares of the relationship giving access
+	fixture.Relationships().SetLoadFailingIds({relationshipId});
+	QVERIFY(!fixture.Manager().RemoveConnection(connectionId, tenantId));
+	fixture.Relationships().SetLoadFailingIds({});
+	QCOMPARE(fixture.Manager().GetConnection(connectionId)->GetStatus(), imtauth::ITenantConnectionInfo::CS_ACTIVE);
+	QCOMPARE(fixture.Manager().GetTenantRelationship(relationshipId)->GetStatus(), imtauth::ITenantRelationshipInfo::TRS_ACTIVE);
+
+	fixture.Relationships().SetStoreFailing(true);
+	QVERIFY(!fixture.Manager().RemoveConnection(connectionId, tenantId));
+	fixture.Relationships().SetStoreFailing(false);
+	QCOMPARE(fixture.Manager().GetConnection(connectionId)->GetStatus(), imtauth::ITenantConnectionInfo::CS_ACTIVE);
+
+	QVERIFY(fixture.Manager().RemoveConnection(connectionId, tenantId));
+	QCOMPARE(fixture.Manager().GetTenantRelationship(relationshipId)->GetStatus(), imtauth::ITenantRelationshipInfo::TRS_ARCHIVED);
+}
+
+
+void COrganizationLookupTest::testApproveProposal_IsNotAppliedTwice()
+{
+	CConnectionFixture fixture;
+
+	const QByteArray tenantId = NewId();
+	const QByteArray partnerId = NewId();
+	const QByteArray connectionId = fixture.AddConnection(tenantId, partnerId);
+
+	imtauth::CTenantRelationshipProposal proposal;
+	proposal.SetConnectionId(connectionId);
+	proposal.SetInitiatorTenantId(tenantId);
+	proposal.SetCounterpartyTenantId(partnerId);
+	proposal.SetProposalType(imtauth::ITenantRelationshipProposalInfo::RPT_CREATE);
+	const QByteArray proposalId = fixture.Manager().CreateRelationshipProposal(proposal);
+	QVERIFY(!proposalId.isEmpty());
+
+	// A status that cannot be stored must not leave an applied proposal approvable again
+	fixture.Proposals().SetStoreFailing(true);
+	QVERIFY(fixture.Manager().ApproveRelationshipProposal(proposalId, partnerId).isEmpty());
+	QVERIFY(fixture.Manager().GetTenantRelationshipIds(tenantId).isEmpty());
+
+	fixture.Proposals().SetStoreFailing(false);
+	QVERIFY(!fixture.Manager().ApproveRelationshipProposal(proposalId, partnerId).isEmpty());
+	QVERIFY(fixture.Manager().ApproveRelationshipProposal(proposalId, partnerId).isEmpty());
+	QCOMPARE(fixture.Manager().GetTenantRelationshipIds(tenantId).size(), 1);
 }
 
 

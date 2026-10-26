@@ -312,21 +312,32 @@ bool CTenantInvitationManagerComp::RevokeInvitation(const QByteArray& invitation
 }
 
 
-int CTenantInvitationManagerComp::RevokeInvitationsSentBy(const QByteArray& tenantId, const QByteArray& invitedByUserId, const QByteArray& revokedByUserId)
+bool CTenantInvitationManagerComp::RevokeInvitationsSentBy(const QByteArray& tenantId, const QByteArray& invitedByUserId, const QByteArray& revokedByUserId)
 {
-	if (tenantId.isEmpty() || invitedByUserId.isEmpty()){
-		return 0;
+	if (!m_invitationCollectionCompPtr.IsValid()){
+		return false;
 	}
 
-	int revokedCount = 0;
-	for (const QByteArray& invitationId : GetInvitationsByTenant(tenantId, {ITenantInvitation::TIS_PENDING})){
+	if (tenantId.isEmpty() || invitedByUserId.isEmpty()){
+		return true;
+	}
+
+	// An invitation that cannot be read may be a pending one of the member
+	bool isRevoked = true;
+	for (const QByteArray& invitationId : GetCandidateInvitationIds("TenantId", tenantId, &isRevoked)){
 		ITenantInvitationUniquePtr invitationPtr = GetInvitation(invitationId);
-		if (invitationPtr.IsValid() && invitationPtr->GetInvitedByUserId() == invitedByUserId && RevokeInvitation(invitationId, revokedByUserId)){
-			++revokedCount;
+		if (!invitationPtr.IsValid()){
+			isRevoked = false;
+			continue;
+		}
+
+		if (invitationPtr->GetTenantId() == tenantId && invitationPtr->GetInvitedByUserId() == invitedByUserId
+					&& GetEffectiveStatus(*invitationPtr) == ITenantInvitation::TIS_PENDING && !RevokeInvitation(invitationId, revokedByUserId)){
+			isRevoked = false;
 		}
 	}
 
-	return revokedCount;
+	return isRevoked;
 }
 
 
@@ -379,9 +390,9 @@ ITenantInvitation::TenantInvitationStatus CTenantInvitationManagerComp::GetEffec
 }
 
 
-QByteArrayList CTenantInvitationManagerComp::GetCandidateInvitationIds(const QByteArray& columnId, const QByteArray& value) const
+QByteArrayList CTenantInvitationManagerComp::GetCandidateInvitationIds(const QByteArray& columnId, const QByteArray& value, bool* isReadPtr) const
 {
-	return CollectionSelection::SelectIds(*m_invitationCollectionCompPtr, CollectionSelection::ColumnEquals(columnId, value));
+	return CollectionSelection::SelectIds(*m_invitationCollectionCompPtr, CollectionSelection::ColumnEquals(columnId, value), QByteArrayList(), isReadPtr);
 }
 
 

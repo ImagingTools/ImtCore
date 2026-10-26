@@ -77,10 +77,16 @@ public:
 	void SetSelectionFailing(bool isFailing);
 	void SetLoadFailingIds(const QSet<QByteArray>& objectIds);
 	void SetRemovalFailing(bool isFailing);
+	void SetStoreFailing(bool isFailing);
 
 	// reimplemented (imtbase::IObjectCollection)
 	virtual bool GetObjectData(const Id& objectId, DataPtr& dataPtr, const iprm::IParamsSet* dataConfigurationPtr = nullptr) const override;
 	virtual bool RemoveElements(const Ids& elementIds, const imtbase::IOperationContext* operationContextPtr = nullptr) override;
+	virtual bool SetObjectData(
+				const Id& objectId,
+				const istd::IChangeable& object,
+				CompatibilityMode mode = CM_WITHOUT_REFS,
+				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
 
 	// reimplemented (imtbase::ICollectionInfo)
 	virtual int GetElementsCount(const iprm::IParamsSet* selectionParamPtr = nullptr, ilog::IMessageConsumer* logPtr = nullptr) const override;
@@ -110,6 +116,7 @@ private:
 	bool m_isSelectionFailing = false;
 	QSet<QByteArray> m_loadFailingIds;
 	bool m_isRemovalFailing = false;
+	bool m_isStoreFailing = false;
 };
 
 
@@ -129,6 +136,8 @@ public:
 
 	void AddRelationship(const QByteArray& tenantId, const QByteArray& otherTenantId, const QDateTime& relatedSince = QDateTime(), bool isEffective = true);
 	void SetReadable(bool isReadable);
+	/// The relationships are answered, but the read is reported incomplete, e.g. part of their history is missing.
+	void SetPartialRead(bool isPartial);
 	int GetReadCount() const;
 
 	// reimplemented (imtauth::ITenantRelationshipProvider)
@@ -145,6 +154,7 @@ private:
 
 	QList<Relationship> m_relationships;
 	bool m_isReadable = true;
+	bool m_isPartialRead = false;
 	mutable int m_readCount = 0;
 };
 

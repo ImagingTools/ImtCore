@@ -90,6 +90,12 @@ void CTestCollectionComp::SetRemovalFailing(bool isFailing)
 }
 
 
+void CTestCollectionComp::SetStoreFailing(bool isFailing)
+{
+	m_isStoreFailing = isFailing;
+}
+
+
 // reimplemented (imtbase::IObjectCollection)
 
 bool CTestCollectionComp::GetObjectData(const Id& objectId, DataPtr& dataPtr, const iprm::IParamsSet* dataConfigurationPtr) const
@@ -110,6 +116,16 @@ bool CTestCollectionComp::RemoveElements(const Ids& elementIds, const imtbase::I
 	}
 
 	return BaseClass2::RemoveElements(elementIds, operationContextPtr);
+}
+
+
+bool CTestCollectionComp::SetObjectData(const Id& objectId, const istd::IChangeable& object, CompatibilityMode mode, const imtbase::IOperationContext* operationContextPtr)
+{
+	if (m_isStoreFailing){
+		return false;
+	}
+
+	return BaseClass2::SetObjectData(objectId, object, mode, operationContextPtr);
 }
 
 
@@ -371,6 +387,12 @@ void CTestRelationshipProviderComp::SetReadable(bool isReadable)
 }
 
 
+void CTestRelationshipProviderComp::SetPartialRead(bool isPartial)
+{
+	m_isPartialRead = isPartial;
+}
+
+
 int CTestRelationshipProviderComp::GetReadCount() const
 {
 	return m_readCount;
@@ -383,7 +405,7 @@ imtauth::RelatedTenantInfos CTestRelationshipProviderComp::GetRelatedTenants(con
 {
 	++m_readCount;
 	if (isReadPtr != nullptr){
-		*isReadPtr = m_isReadable;
+		*isReadPtr = m_isReadable && !m_isPartialRead;
 	}
 
 	imtauth::RelatedTenantInfos retVal;

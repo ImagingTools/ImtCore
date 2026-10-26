@@ -94,7 +94,8 @@ private:
 	bool PendingRequestExists(const QByteArray& tenantAId, const QByteArray& tenantBId) const;
 	QByteArray CreateConnection(const QByteArray& tenantAId, const QByteArray& tenantBId);
 	QByteArray ApplyRelationshipProposal(const ITenantRelationshipProposalInfo* proposalPtr);
-	void ArchiveRelationshipsForConnection(const QByteArray& connectionId);
+	/// False when a relationship of the connection could not be read or archived.
+	bool ArchiveRelationshipsForConnection(const QByteArray& connectionId);
 	bool ArchiveRelationship(const QByteArray& relationshipId, const ITenantRelationshipInfo& relationship, bool isRemovalPublished);
 
 	// DB helper methods

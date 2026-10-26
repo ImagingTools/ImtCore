@@ -329,23 +329,29 @@ QByteArray CTenantConnectionRequestManagerComp::CreateConnection(const QByteArra
 }
 
 
-void CTenantConnectionRequestManagerComp::ArchiveRelationshipsForConnection(const QByteArray& connectionId)
+bool CTenantConnectionRequestManagerComp::ArchiveRelationshipsForConnection(const QByteArray& connectionId)
 {
 	if (!m_relationshipCollectionCompPtr.IsValid() || !m_relationshipFactoryCompPtr.IsValid()){
-		return;
+		return false;
 	}
 
-	for (const QByteArray& id : SelectIds(*m_relationshipCollectionCompPtr, ColumnEquals("ConnectionId", connectionId))){
+	bool isArchived = true;
+	for (const QByteArray& id : SelectIds(*m_relationshipCollectionCompPtr, ColumnEquals("ConnectionId", connectionId), QByteArrayList(), &isArchived)){
 		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (m_relationshipCollectionCompPtr->GetObjectData(id, dataPtr)){
-			const ITenantRelationshipInfo* relPtr = dynamic_cast<const ITenantRelationshipInfo*>(dataPtr.GetPtr());
-			// The removal of the connection is published instead of each relationship
-			if (relPtr != nullptr && relPtr->GetConnectionId() == connectionId
-			&& relPtr->GetStatus() == ITenantRelationshipInfo::TRS_ACTIVE){
-				ArchiveRelationship(id, *relPtr, false);
-			}
+		if (!m_relationshipCollectionCompPtr->GetObjectData(id, dataPtr)){
+			isArchived = false;
+			continue;
+		}
+
+		const ITenantRelationshipInfo* relPtr = dynamic_cast<const ITenantRelationshipInfo*>(dataPtr.GetPtr());
+		// The removal of the connection is published instead of each relationship
+		if (relPtr != nullptr && relPtr->GetConnectionId() == connectionId
+		&& relPtr->GetStatus() == ITenantRelationshipInfo::TRS_ACTIVE && !ArchiveRelationship(id, *relPtr, false)){
+			isArchived = false;
 		}
 	}
+
+	return isArchived;
 }
 
 
@@ -997,16 +1003,18 @@ bool CTenantConnectionRequestManagerComp::RemoveConnection(const QByteArray& con
 	updatedConnPtr->CopyFrom(*connPtr);
 	updatedConnPtr->SetStatus(ITenantConnectionInfo::CS_REMOVED);
 	updatedConnPtr->SetUpdatedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs));
-	if (StoreConnection(*updatedConnPtr)){
-		TenantEvent::Publish(this, {
-					{TenantEvent::s_type, TenantEvent::s_connectionRemoved},
-					{TenantEvent::s_connectionId, updatedConnPtr->GetConnectionId()},
-					{TenantEvent::s_sourceTenantId, updatedConnPtr->GetTenantAId()},
-					{TenantEvent::s_targetTenantId, updatedConnPtr->GetTenantBId()}});
+
+	// The relationships end first: a removed connection with an active relationship would keep its shares giving access
+	if (!ArchiveRelationshipsForConnection(connectionId) || !StoreConnection(*updatedConnPtr)){
+		return false;
 	}
 
-	// Cascade: archive all relationships for this connection
-	ArchiveRelationshipsForConnection(connectionId);
+	TenantEvent::Publish(this, {
+				{TenantEvent::s_type, TenantEvent::s_connectionRemoved},
+				{TenantEvent::s_connectionId, updatedConnPtr->GetConnectionId()},
+				{TenantEvent::s_sourceTenantId, updatedConnPtr->GetTenantAId()},
+				{TenantEvent::s_targetTenantId, updatedConnPtr->GetTenantBId()}});
+
 	return true;
 }
 
@@ -1106,15 +1114,21 @@ QByteArray CTenantConnectionRequestManagerComp::ApproveRelationshipProposal(cons
 		updatedProposal->SetStatus(ITenantRelationshipProposalInfo::RPS_APPLIED);
 		updatedProposal->SetUpdatedAt(now);
 
-		// A proposal that cannot be applied (e.g. new terms of an ended relationship) is not marked applied
-		const QByteArray relationshipId = ApplyRelationshipProposal(updatedProposal.GetPtr());
-		if (relationshipId.isEmpty()){
+		// Marked applied first, so a proposal is never applied twice; one that cannot be applied
+		// (e.g. new terms of an ended relationship) gets its status back
+		if (!StoreProposal(proposalId, *updatedProposal)){
 			return QByteArray();
 		}
 
-		if (StoreProposal(proposalId, *updatedProposal)){
-			PublishProposalEvent(TenantEvent::s_proposalStatusChanged, *updatedProposal, proposalPtr->GetStatus());
+		const QByteArray relationshipId = ApplyRelationshipProposal(updatedProposal.GetPtr());
+		if (relationshipId.isEmpty()){
+			StoreProposal(proposalId, *proposalPtr);
+
+			return QByteArray();
 		}
+
+		PublishProposalEvent(TenantEvent::s_proposalStatusChanged, *updatedProposal, proposalPtr->GetStatus());
+
 		return relationshipId;
 	}
 
@@ -1129,15 +1143,21 @@ QByteArray CTenantConnectionRequestManagerComp::ApproveRelationshipProposal(cons
 		updatedProposal->SetStatus(ITenantRelationshipProposalInfo::RPS_APPLIED);
 		updatedProposal->SetUpdatedAt(now);
 
-		// A proposal that cannot be applied (e.g. new terms of an ended relationship) is not marked applied
-		const QByteArray relationshipId = ApplyRelationshipProposal(updatedProposal.GetPtr());
-		if (relationshipId.isEmpty()){
+		// Marked applied first, so a proposal is never applied twice; one that cannot be applied
+		// (e.g. new terms of an ended relationship) gets its status back
+		if (!StoreProposal(proposalId, *updatedProposal)){
 			return QByteArray();
 		}
 
-		if (StoreProposal(proposalId, *updatedProposal)){
-			PublishProposalEvent(TenantEvent::s_proposalStatusChanged, *updatedProposal, proposalPtr->GetStatus());
+		const QByteArray relationshipId = ApplyRelationshipProposal(updatedProposal.GetPtr());
+		if (relationshipId.isEmpty()){
+			StoreProposal(proposalId, *proposalPtr);
+
+			return QByteArray();
 		}
+
+		PublishProposalEvent(TenantEvent::s_proposalStatusChanged, *updatedProposal, proposalPtr->GetStatus());
+
 		return relationshipId;
 	}
 

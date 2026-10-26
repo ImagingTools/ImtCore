@@ -37,6 +37,13 @@ private slots:
 	void testGetRelatedSince_ReportsAFailedHistoryRead();
 	void testRemoveVerificationData_UnreadableCodeIsRemovedAnyway();
 	void testConsumeVerification_OnlyOneConcurrentCallerSucceeds();
+	void testRevokeInvitationsSentBy_ReportsAnUnreadInvitation();
+	void testShareDocument_RefusesUnreadRelationships();
+	void testShareDocument_RefusesAnUnreadShareOfTheDocument();
+	void testShareDocument_RefusesWhenTheEarlierShareStays();
+	void testGetShareOwnerTenantIds_UnreadShareTrustsNoPartner();
+	void testRemoveConnection_KeepsTheConnectionWhenARelationshipStays();
+	void testApproveProposal_IsNotAppliedTwice();
 
 	// Invitations
 	void testRevokeInvitationsSentBy_RevokesOnlyPendingInvitationsOfTheInviter();
