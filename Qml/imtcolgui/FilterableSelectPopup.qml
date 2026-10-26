@@ -1019,7 +1019,7 @@ PopupView {
 
 					onPositionChanged: {
 						let position = hoverBlockMouseArea.mapToItem(null, hoverBlockMouseArea.mouseX, hoverBlockMouseArea.mouseY)
-						if (position.x !== hoverBlockMouseArea.enteredPosition.x || position.y !== hoverBlockMouseArea.enteredPosition.y){
+						if (Math.abs(position.x - hoverBlockMouseArea.enteredPosition.x) >= 1 || Math.abs(position.y - hoverBlockMouseArea.enteredPosition.y) >= 1){
 							root.__internal.hoverBlocked = false
 						}
 					}
