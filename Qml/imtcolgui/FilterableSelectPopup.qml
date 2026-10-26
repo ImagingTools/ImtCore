@@ -340,6 +340,8 @@ PopupView {
 	*/
 	function focusItem(index){
 		root.__leaveFooter()
+		root.__internal.selectedFocusedIndex = -1
+		root.__internal.clearAllFocused = false
 		root.focusedIndex = index
 	}
 
@@ -1092,6 +1094,23 @@ PopupView {
 		return true
 	}
 
+	// --- Helper: the target before the footer: the last row, the last selected item or the filter ---
+	function __focusBeforeFooter(){
+		root.__internal.footerFocused = false
+		root.forceActiveFocus()
+		root.__internal.hoverBlocked = true
+		let itemCount = root.dataProvider ? root.dataProvider.items.length : 0
+		if (itemCount > 0){
+			root.focusedIndex = itemCount - 1
+			root.__scrollToRow(itemCount - 1)
+		} else if (root.showSelectedGroup && root.__internal.selectedItemsCount > 0){
+			root.__internal.selectedFocusedIndex = root.__internal.selectedItemsCount - 1
+			root.__selectedContentYCorrection(false)
+		} else {
+			root.__focusFilter()
+		}
+	}
+
 	function __focusFooter(){
 		let keyboardItem = root.__footerKeyboardItem()
 		root.__clearAllFocusIndicators()
@@ -1232,11 +1251,7 @@ PopupView {
 		sequence: "Shift+Tab"
 		onActivated: {
 			if (root.__internal.footerFocused){
-				// Shift+Tab from the footer → main list
-				root.__internal.footerFocused = false
-				root.forceActiveFocus()
-				let itemCount = root.dataProvider ? root.dataProvider.items.length : 0
-				root.focusedIndex = itemCount > 0 ? 0 : -1
+				root.__focusBeforeFooter()
 			} else if (root.focusedIndex >= 0){
 				// Shift+Tab from main list → selected group (last item) or "Clear all" or filter
 				root.focusedIndex = -1
@@ -1263,15 +1278,8 @@ PopupView {
 	Shortcut {
 		sequence: "Up"
 		onActivated: {
-			if (root.__leaveFooter()){
-				root.__internal.hoverBlocked = true
-				let footerItemCount = root.dataProvider ? root.dataProvider.items.length : 0
-				if (footerItemCount > 0){
-					root.focusedIndex = footerItemCount - 1
-					root.__scrollToRow(footerItemCount - 1)
-				} else {
-					root.__focusFilter()
-				}
+			if (root.__internal.footerFocused){
+				root.__focusBeforeFooter()
 				return
 			}
 			if (filterField.textInputFocus){

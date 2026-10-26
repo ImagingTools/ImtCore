@@ -71,7 +71,14 @@ TestCase {
 				multiSelect: true
 
 				function executeRequest(requestId, count, offset, filter){
-					onRequestSuccess(requestId, [{"id": "u1", "title": "User 1"}, {"id": "u2", "title": "User 2"}, {"id": "u3", "title": "User 3"}, {"id": "u4", "title": "User 4"}, {"id": "u5", "title": "User 5"}])
+					let users = [{"id": "u1", "title": "User 1"}, {"id": "u2", "title": "User 2"}, {"id": "u3", "title": "User 3"}, {"id": "u4", "title": "User 4"}, {"id": "u5", "title": "User 5"}]
+					let found = []
+					for (let i = 0; i < users.length; ++i){
+						if (users[i].title.indexOf(filter) >= 0){
+							found.push(users[i])
+						}
+					}
+					onRequestSuccess(requestId, found)
 				}
 
 				function executeFetchByIds(requestId, ids){
@@ -234,20 +241,24 @@ TestCase {
 		verify(inviteButton(context.popup).activeFocus, "Tab reaches the Invite button")
 	}
 
-	// Mouse after keyboard: the hovered row takes over, Return toggles it instead of sending
-	function test_hoverAfterTheButtonTogglesTheRow(){
-		let context = openInvitePopup()
-		tabToTheInviteButton(context)
-
+	// The pointer comes from outside the list onto the second row
+	function hoverTheSecondRow(context){
 		let list = findItem(context.popup, function(item){ return item.itemCount !== undefined && item.contentY !== undefined })
 		verify(list)
-		// The pointer comes from outside the list onto the second row
 		mouseMove(list, 20, -10)
 		wait(50)
 		mouseMove(list, 20, context.popup.itemHeight * 1.5)
 		wait(50)
 		mouseMove(list, 22, context.popup.itemHeight * 1.5)
 		wait(100)
+	}
+
+	// Mouse after keyboard: the hovered row takes over, Return toggles it instead of sending
+	function test_hoverAfterTheButtonTogglesTheRow(){
+		let context = openInvitePopup()
+		tabToTheInviteButton(context)
+
+		hoverTheSecondRow(context)
 		keyClick(Qt.Key_Return)
 		wait(100)
 
@@ -271,12 +282,43 @@ TestCase {
 		verify(context.popup.__internal.clearAllFocused, "Tab from the filter goes to \"Clear all\"")
 	}
 
-	// Up from the button goes to the last row, which Return toggles
-	function test_upFromTheButtonGoesToTheLastRow(){
+	function test_hoverAfterTheSelectedGroupTogglesTheRow_data(){
+		return [
+			{"tag": "\"Clear all\"", "tabs": 1},
+			{"tag": "selected user", "tabs": 2}
+		]
+	}
+
+	// A hovered row takes over from "Clear all" and the selected users too: Return toggles it, the selection stays
+	function test_hoverAfterTheSelectedGroupTogglesTheRow(data){
+		let context = openInvitePopup()
+		context.popup.handleItemClick(context.popup.getItemId(0), 0)
+		wait(100)
+		for (let i = 0; i < data.tabs; ++i){
+			keyClick(Qt.Key_Tab)
+			wait(50)
+		}
+
+		hoverTheSecondRow(context)
+		keyClick(Qt.Key_Return)
+		wait(100)
+
+		compare(context.popup.newSelection.length, 2, "Return toggles the hovered row")
+	}
+
+	function test_backFromTheButtonGoesToTheLastRow_data(){
+		return [
+			{"tag": "Shift+Tab", "key": Qt.Key_Tab, "modifiers": Qt.ShiftModifier},
+			{"tag": "Up", "key": Qt.Key_Up, "modifiers": Qt.NoModifier}
+		]
+	}
+
+	// Back from the button goes to the last row, which Return toggles
+	function test_backFromTheButtonGoesToTheLastRow(data){
 		let context = openInvitePopup()
 		tabToTheInviteButton(context)
 
-		keyClick(Qt.Key_Up)
+		keyClick(data.key, data.modifiers)
 		wait(50)
 
 		verify(!inviteButton(context.popup).activeFocus)
@@ -285,5 +327,33 @@ TestCase {
 		wait(100)
 		compare(context.stateManager.invitations.length, 0)
 		compare(context.popup.newSelection.length, 2)
+	}
+
+	// The filter matches nobody: back from the button goes to the last selected user, which Return removes
+	function test_backFromTheButtonOverAnEmptyListGoesToTheSelectedUser_data(){
+		return test_backFromTheButtonGoesToTheLastRow_data()
+	}
+
+	function test_backFromTheButtonOverAnEmptyListGoesToTheSelectedUser(data){
+		let context = openInvitePopup()
+		context.popup.handleItemClick(context.popup.getItemId(0), 0)
+		wait(100)
+		keyClick("z")
+		tryVerify(function(){ return context.popup.dataProvider.items.length === 0 }, 3000, "The filter matches nobody")
+		wait(100)
+		for (let i = 0; i < 4; ++i){
+			keyClick(Qt.Key_Tab)
+			wait(50)
+		}
+		verify(inviteButton(context.popup).activeFocus, "Tab reaches the Invite button")
+
+		keyClick(data.key, data.modifiers)
+		wait(50)
+
+		compare(context.popup.__internal.selectedFocusedIndex, 0)
+		keyClick(Qt.Key_Return)
+		wait(100)
+		compare(context.popup.newSelection.length, 0, "Return removes the selected user")
+		compare(context.stateManager.invitations.length, 0)
 	}
 }
