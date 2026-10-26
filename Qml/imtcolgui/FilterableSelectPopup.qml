@@ -157,8 +157,15 @@ PopupView {
 	// maxVisibleItems the list simply leaves blank space below, the same tradeoff
 	// any fixed-height dropdown/autocomplete makes.
 	readonly property int __listStageHeight: root.maxVisibleItems > 0
-		? root.maxVisibleItems * root.itemHeight
+		? (root.embedded ? root.maxVisibleItems * root.itemHeight : Math.max(2 * root.itemHeight, Math.min(root.maxVisibleItems * root.itemHeight, root.__maxPopupHeight - root.__reservedHeight)))
 		: 200
+
+	// --- Private: everything but the list; on a short window the list gives way, so the footer (e.g. an apply button) stays reachable ---
+	readonly property int __reservedHeight: 2 * Style.marginL
+		+ (headerLoader.visible ? headerLoader.height + contentColumn.spacing : 0)
+		+ filterField.height + contentColumn.spacing
+		+ (selectedGroup.visible ? selectedGroup.height + contentColumn.spacing : 0)
+		+ (footerLoader.visible ? footerLoader.height + contentColumn.spacing : 0)
 
 	// --- Private: floor so loading/empty/error still show something in embedded
 	// "-1" mode when there are (as yet) zero rows to size against ---

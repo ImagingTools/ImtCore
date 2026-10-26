@@ -71,7 +71,7 @@ TestCase {
 				multiSelect: true
 
 				function executeRequest(requestId, count, offset, filter){
-					onRequestSuccess(requestId, [{"id": "u1", "title": "User 1"}, {"id": "u2", "title": "User 2"}])
+					onRequestSuccess(requestId, [{"id": "u1", "title": "User 1"}, {"id": "u2", "title": "User 2"}, {"id": "u3", "title": "User 3"}, {"id": "u4", "title": "User 4"}, {"id": "u5", "title": "User 5"}])
 				}
 
 				function executeFetchByIds(requestId, ids){
@@ -114,9 +114,9 @@ TestCase {
 		return null
 	}
 
-	function openInvitePopup(){
-		let dialogView = createTemporaryObject(dialogViewComp, testCase.parent)
-		let stateManager = createTemporaryObject(stateManagerComp, testCase)
+	function openInvitePopup(windowHeight, members){
+		let dialogView = createTemporaryObject(dialogViewComp, testCase.parent, windowHeight ? {"height": windowHeight} : {})
+		let stateManager = createTemporaryObject(stateManagerComp, testCase, members ? {"pendingMembers": members} : {})
 		let page = createTemporaryObject(pageComp, testCase.parent, {"stateManager": stateManager, "apiClient": createTemporaryObject(apiClientComp, testCase)})
 		wait(100)
 
@@ -179,5 +179,27 @@ TestCase {
 
 		context.popup.closePopup()
 		tryCompare(ModalDialogManager, "count", 0, 3000)
+	}
+
+	// On a short window the list gives way: the Invite button, the only way to send, stays inside the popup
+	function test_inviteButtonStaysReachableOnAShortWindow(){
+		let context = openInvitePopup(360)
+		// Ticked rows fill the group of the selected users above the list
+		for (let i = 0; i < 4; ++i){
+			context.popup.handleItemClick(context.popup.getItemId(i), i)
+		}
+		wait(100)
+		compare(context.popup.newSelection.length, 4)
+
+		let button = inviteButton(context.popup)
+		verify(button)
+		let bottomInPopup = button.mapToItem(context.popup, 0, button.height).y
+		let bottomInWindow = button.mapToItem(context.dialogView, 0, button.height).y
+		verify(bottomInPopup <= context.popup.height, "In the popup: " + bottomInPopup + " of " + context.popup.height)
+		verify(bottomInWindow <= context.dialogView.height, "In the window: " + bottomInWindow + " of " + context.dialogView.height)
+
+		mouseClick(button)
+		compare(context.stateManager.invitations.length, 1)
+		compare(context.stateManager.invitations[0].length, 4)
 	}
 }
