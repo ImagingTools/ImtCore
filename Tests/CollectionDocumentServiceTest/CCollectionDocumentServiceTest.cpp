@@ -99,9 +99,9 @@ QByteArray CCollectionDocumentServiceTest::SetupDocumentDirectly(
 	QByteArray documentId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
 	QMutexLocker locker(&manager.m_mutex);
-	auto& doc = manager.m_userDocuments[userId][documentId];
+	auto& doc = manager.InsertDocument(userId, documentId);
 	doc.typeId = typeId;
-	doc.objectId = objectId;
+	doc.url = objectId.isEmpty() ? QUrl() : QUrl("collection:///" + objectId);
 	doc.name = name;
 	doc.objectPtr = istd::IChangeableSharedPtr(new CMockDocumentObject());
 	doc.undoManagerPtr = idoc::IUndoManagerSharedPtr(new CMockUndoManager());
@@ -974,7 +974,7 @@ void CCollectionDocumentServiceTest::SaveDocumentSaveAsUpdatesUrlTest()
 	QByteArray docId = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID, TEST_TYPE_ID, TEST_OBJECT_ID, TEST_DOC_NAME);
 	{
 		QMutexLocker locker(&m_managerPtr->m_mutex);
-		m_managerPtr->m_userDocuments[TEST_USER_ID][docId].url = QUrl("collection:///" + TEST_OBJECT_ID);
+		m_managerPtr->m_documents[docId].url = QUrl("collection:///" + TEST_OBJECT_ID);
 	}
 
 	// Saving under another name stores a copy as a new object
@@ -1533,6 +1533,47 @@ void CCollectionDocumentServiceTest::ValidateInputParamsInvalidDocumentTest()
 }
 
 
+void CCollectionDocumentServiceTest::ValidateInputParamsForeignDocumentTest()
+{
+	SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID_2);
+	QByteArray docId = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID);
+
+	imtdoc::IDocumentService::OperationStatus status;
+	bool result = m_managerPtr->ValidateInputParams(TEST_USER_ID_2, docId, status);
+
+	QVERIFY2(!result, "ValidateInputParams should return false for a document of another user");
+	QCOMPARE(status, imtdoc::IDocumentService::OS_INVALID_DOCUMENT_ID);
+	QVERIFY(m_managerPtr->FindDocument(TEST_USER_ID_2, docId) == nullptr);
+	QVERIFY(m_managerPtr->FindDocument(TEST_USER_ID, docId) != nullptr);
+}
+
+
+// ======================================================================
+// Document storage tests
+// ======================================================================
+
+void CCollectionDocumentServiceTest::DocumentStorageInsertRemoveTest()
+{
+	QByteArray docId1 = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID);
+	QByteArray docId2 = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID);
+	QByteArray docId3 = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID_2);
+
+	QCOMPARE(m_managerPtr->m_documents.count(), 3);
+	QVERIFY(m_managerPtr->FindDocument(TEST_USER_ID, docId1) != nullptr);
+	QVERIFY(m_managerPtr->FindDocument(TEST_USER_ID_2, docId3) != nullptr);
+	QCOMPARE(m_managerPtr->m_userDocumentIds[TEST_USER_ID], QByteArrayList({docId1, docId2}));
+	QCOMPARE(m_managerPtr->m_userDocumentIds[TEST_USER_ID_2], QByteArrayList({docId3}));
+
+	QCOMPARE(m_managerPtr->CloseDocumentInternal(TEST_USER_ID, docId1), imtdoc::IDocumentService::OS_OK);
+	QVERIFY(!m_managerPtr->m_documents.contains(docId1));
+	QCOMPARE(m_managerPtr->m_userDocumentIds[TEST_USER_ID], QByteArrayList({docId2}));
+
+	QCOMPARE(m_managerPtr->CloseDocumentInternal(TEST_USER_ID_2, docId3), imtdoc::IDocumentService::OS_OK);
+	QVERIFY(!m_managerPtr->m_documents.contains(docId3));
+	QVERIFY2(!m_managerPtr->m_userDocumentIds.contains(TEST_USER_ID_2), "User without documents must be removed from the user map");
+}
+
+
 // ======================================================================
 // ObjectIdToUrl test
 // ======================================================================
@@ -1543,6 +1584,16 @@ void CCollectionDocumentServiceTest::ObjectIdToUrlTest()
 	QCOMPARE(url.toString(), QString("collection:///myObjectId"));
 	QCOMPARE(url.scheme(), QString("collection"));
 	QVERIFY2(url.host().isEmpty(), "URL host should be empty");
+}
+
+
+void CCollectionDocumentServiceTest::UrlToObjectIdTest()
+{
+	QCOMPARE(CTestableDocumentService::UrlToObjectId(m_managerPtr->ObjectIdToUrl("myObjectId")), QByteArray("myObjectId"));
+	QVERIFY(CTestableDocumentService::UrlToObjectId(QUrl()).isEmpty());
+	QVERIFY(CTestableDocumentService::UrlToObjectId(QUrl("collection:///")).isEmpty());
+	QVERIFY(CTestableDocumentService::UrlToObjectId(QUrl("file:///myObjectId")).isEmpty());
+	QVERIFY(CTestableDocumentService::UrlToObjectId(QUrl("collection:///segment1/segment2")).isEmpty());
 }
 
 
@@ -1657,7 +1708,7 @@ void CCollectionDocumentServiceTest::SingleCopyOpenSameObjectByTwoUsersTest()
 
 	QByteArray docId2 = OpenDocumentAndWaitForLoad(*m_managerPtr, TEST_USER_ID_2, TEST_OBJECT_ID);
 	QVERIFY2(!docId2.isEmpty(), "Second user should open document successfully");
-	QVERIFY2(docId1 != docId2, "Different users should get different document IDs");
+	QCOMPARE(docId2, docId1);
 
 	// Both users should see the same data
 	const istd::IChangeable* ptr1 = m_managerPtr->GetDocumentPtr(TEST_USER_ID, docId1);
@@ -1766,9 +1817,9 @@ void CCollectionDocumentServiceTest::SingleCopyCloseOneUserTest()
 	const istd::IChangeable* ptr2 = m_managerPtr->GetDocumentPtr(TEST_USER_ID_2, docId2);
 	QVERIFY2(ptr2 != nullptr, "Second user's document pointer should still be valid after first user closes");
 
-	// Shared document data should still exist
-	QVERIFY2(m_managerPtr->m_sharedDocuments.contains(TEST_OBJECT_ID),
-		"Shared document data should still exist while one user has it open");
+	// The document is still open while one user holds it
+	QVERIFY2(m_managerPtr->m_documents.contains(docId2),
+		"Document should still exist while one user has it open");
 }
 
 
@@ -1802,9 +1853,9 @@ void CCollectionDocumentServiceTest::SingleCopyCloseBothUsersTest()
 	QVERIFY2(m_managerPtr->GetOpenedDocumentList(TEST_USER_ID_2).isEmpty(),
 		"Second user should have no documents");
 
-	// Shared document data should be cleaned up
-	QVERIFY2(!m_managerPtr->m_sharedDocuments.contains(TEST_OBJECT_ID),
-		"Shared document data should be cleaned up after all users close");
+	// The document is closed after the last user closes it
+	QVERIFY2(!m_managerPtr->m_documents.contains(docId1),
+		"Document should be removed after all users close it");
 }
 
 
@@ -1863,6 +1914,70 @@ void CCollectionDocumentServiceTest::SingleCopySetDocumentNameUpdatesAllTest()
 	m_managerPtr->GetDocumentName(TEST_USER_ID_2, docId2, name2);
 	QCOMPARE(name1, newName);
 	QCOMPARE(name2, newName);
+}
+
+
+void CCollectionDocumentServiceTest::SingleCopySaveAsUpdatesAllTest()
+{
+	m_managerPtr->SetSingleCopyMode(true);
+	m_managerPtr->GetMockCollection().AddObject(
+		TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME,
+		istd::IChangeableSharedPtr(new CMockDocumentObject("sharedData")));
+
+	QByteArray docId = OpenDocumentAndWaitForLoad(*m_managerPtr, TEST_USER_ID, TEST_OBJECT_ID);
+	QCOMPARE(OpenDocumentAndWaitForLoad(*m_managerPtr, TEST_USER_ID_2, TEST_OBJECT_ID), docId);
+
+	m_managerPtr->GetMockEventHandler().ClearEvents();
+
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.documentId = docId;
+	params.documentName = "Saved As Copy";
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_SAVE, params);
+	auto result = m_managerPtr->WaitForTaskFinished(taskId);
+	QCOMPARE(result.status, imtdoc::IDocumentService::OS_OK);
+
+	const QUrl copyUrl("collection:///" + m_managerPtr->GetMockCollection().GetLastInsertedId());
+
+	// Both users hold the same document, which is now backed by the copy
+	auto list1 = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID);
+	auto list2 = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID_2);
+	QCOMPARE(list1.size(), 1);
+	QCOMPARE(list2.size(), 1);
+	QCOMPARE(list1[0].url, copyUrl);
+	QCOMPARE(list2[0].url, copyUrl);
+
+	QCOMPARE(m_managerPtr->GetMockEventHandler().CountEventsOfType("DocumentSavedAsEvent"), 2);
+}
+
+
+void CCollectionDocumentServiceTest::SingleCopyReopenBySameUserTest()
+{
+	m_managerPtr->SetSingleCopyMode(true);
+	m_managerPtr->GetMockCollection().AddObject(
+		TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME,
+		istd::IChangeableSharedPtr(new CMockDocumentObject("sharedData")));
+
+	QByteArray docId = OpenDocumentAndWaitForLoad(*m_managerPtr, TEST_USER_ID, TEST_OBJECT_ID);
+	QCOMPARE(OpenDocumentAndWaitForLoad(*m_managerPtr, TEST_USER_ID, TEST_OBJECT_ID), docId);
+	QCOMPARE(m_managerPtr->GetOpenedDocumentList(TEST_USER_ID).size(), 1);
+}
+
+
+void CCollectionDocumentServiceTest::SingleCopyOneDocumentForAllUsersTest()
+{
+	m_managerPtr->SetSingleCopyMode(true);
+	m_managerPtr->GetMockCollection().AddObject(
+		TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME,
+		istd::IChangeableSharedPtr(new CMockDocumentObject("sharedData")));
+
+	QByteArray docId = OpenDocumentAndWaitForLoad(*m_managerPtr, TEST_USER_ID, TEST_OBJECT_ID);
+	QCOMPARE(OpenDocumentAndWaitForLoad(*m_managerPtr, TEST_USER_ID_2, TEST_OBJECT_ID), docId);
+
+	QMutexLocker locker(&m_managerPtr->m_mutex);
+	QCOMPARE(m_managerPtr->m_documents.size(), 1);
+	QCOMPARE(m_managerPtr->GetDocumentUserIds(docId).size(), 2);
 }
 
 

@@ -73,8 +73,7 @@ class TCollectionDocumentServiceWrap : public Base
 {
 public:
 	typedef typename Base::WorkingDocument WorkingDocument;
-	typedef typename Base::WorkingDocumentList WorkingDocumentList;
-	typedef typename Base::SharedDocumentData SharedDocumentData;
+	typedef typename Base::WorkingDocumentMap WorkingDocumentMap;
 	typedef typename Base::UserDocumentPair UserDocumentPair;
 	typedef typename Base::UserDocumentPairList UserDocumentPairList;
 
@@ -113,14 +112,12 @@ private:
 	void ClearReservedOpen(const QByteArray& userId, const QByteArray& documentId);
 	void OnOpenDocumentThreadStarted(
 				const std::weak_ptr<std::atomic<bool>>& aliveGuard,
-				bool singleCopyMode,
 				const QByteArray& objectId,
 				const QByteArray& userId,
 				const QByteArray& documentId,
 				QObject* worker);
 	void OnOpenDocumentThreadFinished(
 				const std::weak_ptr<std::atomic<bool>>& aliveGuard,
-				bool singleCopyMode,
 				const QByteArray& objectId,
 				const QByteArray& userId,
 				const QByteArray& documentId);
@@ -153,22 +150,13 @@ inline void TCollectionDocumentServiceWrap<Base>::ClearReservedOpen(
 			const QByteArray& documentId)
 {
 	QMutexLocker locker(&this->m_mutex);
-	auto userDocsIt = this->m_userDocuments.find(userId);
-	if (userDocsIt == this->m_userDocuments.end()){
-		return;
-	}
-
-	userDocsIt.value().remove(documentId);
-	if (userDocsIt.value().isEmpty()){
-		this->m_userDocuments.erase(userDocsIt);
-	}
+	this->RemoveDocument(userId, documentId);
 }
 
 
 template<class Base>
 inline void TCollectionDocumentServiceWrap<Base>::OnOpenDocumentThreadStarted(
 			const std::weak_ptr<std::atomic<bool>>& aliveGuard,
-			bool singleCopyMode,
 			const QByteArray& objectId,
 			const QByteArray& userId,
 			const QByteArray& documentId,
@@ -181,29 +169,8 @@ inline void TCollectionDocumentServiceWrap<Base>::OnOpenDocumentThreadStarted(
 	}
 
 	imtbase::IObjectCollection* collPtr = GetCollection();
-	if (collPtr == nullptr){
-		UserDocumentPairList docsToClose;
-		{
-			istd::CChangeNotifier notifier(this);
-			QMutexLocker locker(&this->m_mutex);
-			if (singleCopyMode && this->m_sharedDocuments.contains(objectId)){
-				this->m_sharedDocuments[objectId].isLoading = false;
-				docsToClose = this->FindDocumentsByObjectId(objectId);
-			}
-			else{
-				docsToClose.append(qMakePair(userId, documentId));
-			}
-		}
-
-		for (const UserDocumentPair& pair : docsToClose){
-			this->CloseDocumentInternal(pair.first, pair.second);
-		}
-		worker->deleteLater();
-		return;
-	}
-
 	imtbase::IObjectCollection::DataPtr dataPtr;
-	bool success = collPtr->GetObjectData(objectId, dataPtr);
+	bool success = (collPtr != nullptr) && collPtr->GetObjectData(objectId, dataPtr);
 	isAlive = aliveGuard.lock();
 	if (!isAlive || !isAlive->load()){
 		worker->deleteLater();
@@ -214,44 +181,18 @@ inline void TCollectionDocumentServiceWrap<Base>::OnOpenDocumentThreadStarted(
 		istd::CChangeNotifier notifier(this);
 		QMutexLocker locker(&this->m_mutex);
 
-		if (singleCopyMode){
+		auto documentIt = this->m_documents.find(documentId);
+		if (documentIt != this->m_documents.end()){
 			if (success && dataPtr.IsValid()){
-				if (this->m_sharedDocuments.contains(objectId)){
-					this->m_sharedDocuments[objectId].objectPtr = dataPtr;
-				}
-
-				UserDocumentPairList docs = this->FindDocumentsByObjectId(objectId);
-				for (const UserDocumentPair& pair : docs){
-					WorkingDocument* dp = this->FindDocument(pair.first, pair.second);
-					if (dp != nullptr){
-						dp->objectPtr = dataPtr;
-					}
-				}
+				documentIt.value().objectPtr = dataPtr;
 			}
-			else {
-				if (this->m_sharedDocuments.contains(objectId)){
-					this->m_sharedDocuments[objectId].isLoading = false;
-				}
+			else{
+				documentIt.value().isLoading = false;
 
-				UserDocumentPairList docs = this->FindDocumentsByObjectId(objectId);
-				for (const UserDocumentPair& pair : docs){
-					WorkingDocument* dp = this->FindDocument(pair.first, pair.second);
-					if (dp != nullptr){
-						dp->isLoading = false;
-						this->CloseDocumentInternal(pair.first, pair.second);
-					}
+				// Loading failed: close the document for every user holding it
+				for (const QByteArray& documentUserId : this->GetDocumentUserIds(documentId)){
+					this->CloseDocumentInternal(documentUserId, documentId);
 				}
-			}
-		}
-		else {
-			WorkingDocument* docPtr = this->FindDocument(userId, documentId);
-
-			if (docPtr != nullptr && success && dataPtr.IsValid()){
-				docPtr->objectPtr = dataPtr;
-			}
-			else if (docPtr != nullptr){
-				docPtr->isLoading = false;
-				this->CloseDocumentInternal(userId, documentId);
 			}
 		}
 	}
@@ -263,8 +204,7 @@ inline void TCollectionDocumentServiceWrap<Base>::OnOpenDocumentThreadStarted(
 template<class Base>
 inline void TCollectionDocumentServiceWrap<Base>::OnOpenDocumentThreadFinished(
 			const std::weak_ptr<std::atomic<bool>>& aliveGuard,
-			bool singleCopyMode,
-			const QByteArray& objectId,
+			const QByteArray& /*objectId*/,
 			const QByteArray& userId,
 			const QByteArray& documentId)
 {
@@ -273,78 +213,61 @@ inline void TCollectionDocumentServiceWrap<Base>::OnOpenDocumentThreadFinished(
 		return;
 	}
 
-	UserDocumentPairList docsToNotify;
+	QByteArrayList userIdsToNotify;
 
 	{
 		istd::CChangeNotifier notifier(this);
 		QMutexLocker locker(&this->m_mutex);
 
-		if (singleCopyMode){
-			if (this->m_sharedDocuments.contains(objectId)){
-				SharedDocumentData& shared = this->m_sharedDocuments[objectId];
-				if (shared.objectPtr.IsValid() && shared.isLoading){
-					shared.isLoading = false;
-
-					bool observersInitialized = false;
-					UserDocumentPairList docs = this->FindDocumentsByObjectId(objectId);
-					for (const UserDocumentPair& pair : docs){
-						WorkingDocument* dp = this->FindDocument(pair.first, pair.second);
-						if (dp != nullptr && dp->isLoading){
-							if (!observersInitialized){
-								this->InitializeDocumentObservers(*dp, pair.first, pair.second);
-								shared.undoManagerModelId = dp->undoManagerModelId;
-								observersInitialized = true;
-							}
-
-							docsToNotify.append(pair);
-						}
-					}
-
-				}
-			}
-		}
-		else {
-			WorkingDocument* docPtr = this->FindDocument(userId, documentId);
-
-			if (docPtr != nullptr && docPtr->objectPtr.IsValid() && docPtr->isLoading){
-				this->InitializeDocumentObservers(*docPtr, userId, documentId);
-				docsToNotify.append(qMakePair(userId, documentId));
-			}
+		auto documentIt = this->m_documents.find(documentId);
+		if (documentIt != this->m_documents.end() && documentIt.value().objectPtr.IsValid() && documentIt.value().isLoading){
+			this->InitializeDocumentObservers(documentIt.value(), userId, documentId);
+			userIdsToNotify = this->GetDocumentUserIds(documentId);
 		}
 	}
 
 	// OnDocumentDataLoaded sets isLoading=false
-	for (const UserDocumentPair& pair : docsToNotify){
-		this->OnDocumentDataLoaded(pair.first, pair.second);
+	for (const QByteArray& notifyUserId : userIdsToNotify){
+		this->OnDocumentDataLoaded(notifyUserId, documentId);
+	}
+
+	if (userIdsToNotify.isEmpty()){
+		return;
 	}
 
 	// A document stored without a name shows the one its type derives from the content; opening does not write it
-	for (const UserDocumentPair& pair : docsToNotify){
-		QByteArray typeId;
-		QString documentName;
-		QUrl documentUrl;
-		bool isDirty = false;
-		{
-			QMutexLocker locker(&this->m_mutex);
-			WorkingDocument* docPtr = this->FindDocument(pair.first, pair.second);
-			if (docPtr == nullptr || !docPtr->name.isEmpty() || !docPtr->objectPtr.IsValid() || !this->HasDocumentNameProvider(docPtr->typeId)){
-				continue;
-			}
-
-			documentName = this->GetDefaultDocumentName(*docPtr);
-			if (documentName.isEmpty()){
-				continue;
-			}
-
-			docPtr->name = documentName;
-			typeId = docPtr->typeId;
-			documentUrl = this->ObjectIdToUrl(docPtr->objectId);
-			isDirty = docPtr->isDirty;
+	QByteArray typeId;
+	QString documentName;
+	QUrl documentUrl;
+	bool isDirty = false;
+	{
+		QMutexLocker locker(&this->m_mutex);
+		auto documentIt = this->m_documents.find(documentId);
+		if (documentIt == this->m_documents.end()){
+			return;
 		}
 
+		WorkingDocument& document = documentIt.value();
+		if (!document.name.isEmpty() || !document.objectPtr.IsValid() || !this->HasDocumentNameProvider(document.typeId)){
+			return;
+		}
+
+		documentName = this->GetDefaultDocumentName(document);
+		if (documentName.isEmpty()){
+			return;
+		}
+
+		document.name = documentName;
+		typeId = document.typeId;
+		documentUrl = document.url;
+		isDirty = document.isDirty;
+		userIdsToNotify = this->GetDocumentUserIds(documentId);
+	}
+
+	for (const QByteArray& notifyUserId : userIdsToNotify){
 		for (IDocumentServiceEventHandler* handlerPtr : this->GetDocumentServiceEventHandlers()){
 			if (handlerPtr != nullptr){
-				CDocumentRenamedEvent event(pair.first, pair.second, typeId, documentName, documentUrl, isDirty);
+				CDocumentRenamedEvent event(notifyUserId, documentId, typeId, documentName, documentUrl, isDirty);
 				handlerPtr->ProcessEvent(&event);
 			}
 		}
@@ -370,14 +293,11 @@ inline void TCollectionDocumentServiceWrap<Base>::DoCreateNewDocument(
 	if (!params.proposedSourceDocumentId.isEmpty()){
 		// Find the document that was just created — it will be the most
 		// recently added entry for this user.
-		auto userDocsIt = this->m_userDocuments.constFind(params.userId);
-		if (userDocsIt != this->m_userDocuments.constEnd()){
-			const WorkingDocumentList& docs = userDocsIt.value();
-			for (auto it = docs.constBegin(); it != docs.constEnd(); ++it){
-				if (it.value().typeId == params.documentTypeId && it.value().isLoading){
-					m_proposedSourceDocumentIds[it.key()] = params.proposedSourceDocumentId;
-					break;
-				}
+		for (const QByteArray& userDocumentId : this->GetUserDocumentIds(params.userId)){
+			const WorkingDocument* docPtr = this->FindDocument(params.userId, userDocumentId);
+			if (docPtr != nullptr && docPtr->typeId == params.documentTypeId && docPtr->isLoading){
+				m_proposedSourceDocumentIds[userDocumentId] = params.proposedSourceDocumentId;
+				break;
 			}
 		}
 	}
@@ -406,7 +326,14 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 	}
 
 	QByteArray objectId = parts.first().toUtf8();
+	QUrl documentUrl = this->ObjectIdToUrl(objectId);
 	QByteArray documentId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+
+	QByteArray sharedDocumentId;
+	QByteArray sharedTypeId;
+	QString sharedName;
+	bool sharedIsDirty = false;
+	bool sharedIsLoading = false;
 
 	// Single-instance constraints (per user/object):
 	// - opening in single-instance mode is forbidden when the object is already open;
@@ -414,33 +341,83 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 	//   open in single-instance mode.
 	{
 		QMutexLocker locker(&this->m_mutex);
-		auto userDocsIt = this->m_userDocuments.constFind(userId);
-		if (userDocsIt != this->m_userDocuments.constEnd()){
-			const WorkingDocumentList& userDocuments = userDocsIt.value();
-			for (auto it = userDocuments.constBegin(); it != userDocuments.constEnd(); ++it){
-				if (it.value().objectId != objectId){
-					continue;
-				}
+		for (const QByteArray& userDocumentId : this->GetUserDocumentIds(userId)){
+			const WorkingDocument* userDocPtr = this->FindDocument(userId, userDocumentId);
+			if (userDocPtr == nullptr || this->UrlToObjectId(userDocPtr->url) != objectId){
+				continue;
+			}
 
-				if (params.singleDocumentInstance){
-					locker.unlock();
-					this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("Document is already open")});
-					return;
-				}
+			if (params.singleDocumentInstance){
+				locker.unlock();
+				this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("Document is already open")});
+				return;
+			}
 
-				if (it.value().singleDocumentInstance){
-					locker.unlock();
-					this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("Document is already open in single-instance mode")});
-					return;
-				}
+			if (userDocPtr->singleDocumentInstance){
+				locker.unlock();
+				this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("Document is already open in single-instance mode")});
+				return;
 			}
 		}
 
-		WorkingDocument& reservedDoc = this->m_userDocuments[userId][documentId];
-		reservedDoc.objectId = objectId;
-		reservedDoc.url = url;
-		reservedDoc.isLoading = true;
-		reservedDoc.singleDocumentInstance = params.singleDocumentInstance;
+		// Single-copy mode: an object already opened by any user is represented by one document
+		if (this->IsSingleCopyMode()){
+			const UserDocumentPairList openedDocuments = this->FindDocumentsByObjectId(objectId);
+			if (!openedDocuments.isEmpty()){
+				sharedDocumentId = openedDocuments.first().second;
+
+				const WorkingDocument& sharedDoc = this->InsertDocument(userId, sharedDocumentId);
+				sharedTypeId = sharedDoc.typeId;
+				sharedName = sharedDoc.name;
+				sharedIsDirty = sharedDoc.isDirty;
+				sharedIsLoading = sharedDoc.isLoading;
+			}
+		}
+
+		if (sharedDocumentId.isEmpty()){
+			WorkingDocument& reservedDoc = this->InsertDocument(userId, documentId);
+			reservedDoc.url = documentUrl;
+			reservedDoc.isLoading = true;
+			reservedDoc.singleDocumentInstance = params.singleDocumentInstance;
+		}
+	}
+
+	if (!sharedDocumentId.isEmpty()){
+		istd::CChangeNotifier notifier(this);
+
+		for (IDocumentServiceEventHandler* handlerPtr : this->GetDocumentServiceEventHandlers()){
+			if (handlerPtr != nullptr){
+				CDocumentOpenedEvent event(
+							userId,
+							sharedDocumentId,
+							sharedTypeId,
+							sharedName,
+							documentUrl,
+							sharedIsDirty);
+				handlerPtr->ProcessEvent(&event);
+			}
+		}
+
+		if (!sharedIsLoading){
+			// Defer the notification to ensure the mutation response is sent
+			// to the client before the subscription notification arrives.
+			// Use invokeMethod (not QTimer::singleShot(..., qApp, ...)): singleShot
+			// creates a QObject parented to qApp; from a worker thread that logs
+			// "Cannot create children for a parent that is in a different thread".
+			std::weak_ptr<std::atomic<bool>> deferredAliveGuard(this->m_isAlive);
+			QMetaObject::invokeMethod(
+						QCoreApplication::instance(),
+						std::bind(
+									&TCollectionDocumentServiceWrap<Base>::OnDeferredDocumentDataLoaded,
+									this,
+									deferredAliveGuard,
+									userId,
+									sharedDocumentId),
+						Qt::QueuedConnection);
+		}
+
+		this->CompleteTask(taskId, TaskResult{IDocumentService::OS_OK, sharedDocumentId, QString()});
+		return;
 	}
 
 	imtbase::IObjectCollection* collectionPtr = GetCollection();
@@ -458,89 +435,6 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 		return;
 	}
 
-	// Single-copy mode: check if this object is already opened by any user
-	if (this->IsSingleCopyMode()){
-		bool isSharedDocument = false;
-		QByteArray sharedTypeId;
-		QString sharedName;
-		bool sharedIsLoading = false;
-		bool docIsDirty = false;
-
-		{
-			QMutexLocker locker(&this->m_mutex);
-			if (this->m_sharedDocuments.contains(objectId)){
-				isSharedDocument = true;
-				SharedDocumentData& shared = this->m_sharedDocuments[objectId];
-				sharedTypeId = shared.typeId;
-				sharedName = shared.name;
-				sharedIsLoading = shared.isLoading;
-				docIsDirty = shared.undoManagerPtr.IsValid()
-							? (shared.undoManagerPtr->GetDocumentChangeFlag() != idoc::IDocumentStateComparator::DCF_EQUAL)
-							: false;
-			}
-		}
-
-		if (isSharedDocument){
-			istd::CChangeNotifier notifier(this);
-
-			{
-				QMutexLocker locker(&this->m_mutex);
-				if (this->m_sharedDocuments.contains(objectId)){
-					SharedDocumentData& shared = this->m_sharedDocuments[objectId];
-					shared.refCount++;
-
-					WorkingDocument& doc = this->m_userDocuments[userId][documentId];
-					doc.objectId = objectId;
-					doc.typeId = shared.typeId;
-					doc.url = url;
-					doc.name = shared.name;
-					doc.objectPtr = shared.objectPtr;
-					doc.undoManagerPtr = shared.undoManagerPtr;
-					doc.isDirty = docIsDirty;
-					doc.isLoading = shared.isLoading;
-					doc.singleDocumentInstance = params.singleDocumentInstance;
-					doc.undoManagerModelId = -1;
-				}
-			}
-
-			for (IDocumentServiceEventHandler* handlerPtr : this->GetDocumentServiceEventHandlers()){
-				if (handlerPtr != nullptr){
-					CDocumentOpenedEvent event(
-								userId,
-								documentId,
-								sharedTypeId,
-								sharedName,
-								this->ObjectIdToUrl(objectId),
-								docIsDirty);
-					handlerPtr->ProcessEvent(&event);
-				}
-			}
-
-			if (!sharedIsLoading){
-				// Defer the notification to ensure the mutation response is sent
-				// to the client before the subscription notification arrives.
-				// Use invokeMethod (not QTimer::singleShot(..., qApp, ...)): singleShot
-				// creates a QObject parented to qApp; from a worker thread that logs
-				// "Cannot create children for a parent that is in a different thread".
-				QByteArray deferredUserId = userId;
-				QByteArray deferredDocumentId = documentId;
-				std::weak_ptr<std::atomic<bool>> deferredAliveGuard(this->m_isAlive);
-				QMetaObject::invokeMethod(
-							QCoreApplication::instance(),
-							std::bind(
-										&TCollectionDocumentServiceWrap<Base>::OnDeferredDocumentDataLoaded,
-										this,
-										deferredAliveGuard,
-										deferredUserId,
-										deferredDocumentId),
-										Qt::QueuedConnection);
-			}
-
-			this->CompleteTask(taskId, TaskResult{IDocumentService::OS_OK, documentId, QString()});
-			return;
-		}
-	}
-
 	idoc::IUndoManagerSharedPtr undoManagerPtr;
 	undoManagerPtr.FromUnique(std::move(this->CreateUndoManager()));
 	if (!undoManagerPtr.IsValid()){
@@ -554,24 +448,14 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 
 	{
 		QMutexLocker locker(&this->m_mutex);
-		WorkingDocument& doc = this->m_userDocuments[userId][documentId];
-		doc.objectId = objectId;
+		WorkingDocument& doc = this->InsertDocument(userId, documentId);
 		doc.typeId = objectTypeId;
-		doc.url = url;
+		doc.url = documentUrl;
 		doc.name = documentName;
 		doc.undoManagerPtr = undoManagerPtr;
 		doc.isDirty = false;
 		doc.isLoading = true;
 		doc.singleDocumentInstance = params.singleDocumentInstance;
-
-		if (this->IsSingleCopyMode()){
-			SharedDocumentData& shared = this->m_sharedDocuments[objectId];
-			shared.typeId = objectTypeId;
-			shared.name = documentName;
-			shared.undoManagerPtr = undoManagerPtr;
-			shared.refCount = 1;
-			shared.isLoading = true;
-		}
 	}
 
 	for (IDocumentServiceEventHandler* handlerPtr : this->GetDocumentServiceEventHandlers()){
@@ -581,7 +465,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 						documentId,
 						objectTypeId,
 						documentName,
-						this->ObjectIdToUrl(objectId),
+						documentUrl,
 						false);
 			handlerPtr->ProcessEvent(&event);
 		}
@@ -600,13 +484,12 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 		this->m_workerThreads.append(QPointer<QThread>(thread));
 	}
 
-	bool singleCopyMode = this->IsSingleCopyMode();
 	std::weak_ptr<std::atomic<bool>> aliveGuard(this->m_isAlive);
 	QObject::connect(
 		thread,
 		&QThread::started,
 		worker,
-		[this, aliveGuard, singleCopyMode, objectId, userId, documentId, worker](){
+		[this, aliveGuard, objectId, userId, documentId, worker](){
 			auto isAlive = aliveGuard.lock();
 			if (!isAlive || !isAlive->load()){
 				worker->deleteLater();
@@ -615,7 +498,6 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 
 			this->OnOpenDocumentThreadStarted(
 						aliveGuard,
-						singleCopyMode,
 						objectId,
 						userId,
 						documentId,
@@ -627,7 +509,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 		thread,
 		&QThread::finished,
 		QCoreApplication::instance(),
-		[this, aliveGuard, singleCopyMode, objectId, userId, documentId](){
+		[this, aliveGuard, objectId, userId, documentId](){
 			auto isAlive = aliveGuard.lock();
 			if (!isAlive || !isAlive->load()){
 				return;
@@ -635,7 +517,6 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 
 			this->OnOpenDocumentThreadFinished(
 						aliveGuard,
-						singleCopyMode,
 						objectId,
 						userId,
 						documentId);
@@ -667,13 +548,13 @@ TCollectionDocumentServiceWrap<Base>::SetDocumentName(
 			return validationStatus;
 		}
 
-		WorkingDocument* workingDocumentPtr = &this->m_userDocuments[userId][documentId];
+		WorkingDocument* workingDocumentPtr = &this->m_documents[documentId];
 
 		if (workingDocumentPtr->name == documentName){
 			return IDocumentService::OS_OK;
 		}
 
-		objectId = workingDocumentPtr->objectId;
+		objectId = this->UrlToObjectId(workingDocumentPtr->url);
 		typeId = workingDocumentPtr->typeId;
 		isDirty = workingDocumentPtr->isDirty;
 	}
@@ -691,84 +572,33 @@ TCollectionDocumentServiceWrap<Base>::SetDocumentName(
 
 	istd::CChangeNotifier notifier(this);
 
-	// Shared docs: rename and notify each user sharing this object
-	if (this->IsSingleCopyMode() && !objectId.isEmpty()){
-		UserDocumentPairList sharedDocs;
-		{
-			QMutexLocker locker(&this->m_mutex);
-			if (this->m_sharedDocuments.contains(objectId)){
-				this->m_sharedDocuments[objectId].name = documentName;
-			}
-			sharedDocs = this->FindDocumentsByObjectId(objectId);
-		}
-
-		for (const UserDocumentPair& pair : sharedDocs){
-			if (pair.first == userId && pair.second == documentId){
-				continue;
-			}
-
-			QByteArray dpTypeId;
-			QByteArray dpObjectId;
-			bool dpIsDirty = false;
-			bool dpExists = false;
-
-			{
-				QMutexLocker locker(&this->m_mutex);
-				WorkingDocument* dp = this->FindDocument(pair.first, pair.second);
-				if (dp != nullptr){
-					dpExists = true;
-					dpTypeId = dp->typeId;
-					dpObjectId = dp->objectId;
-					dpIsDirty = dp->isDirty;
-				}
-			}
-
-			if (!dpExists){
-				continue;
-			}
-
-			{
-				QMutexLocker locker(&this->m_mutex);
-				WorkingDocument* dp = this->FindDocument(pair.first, pair.second);
-				if (dp != nullptr){
-					dp->name = documentName;
-				}
-			}
-
-			for (IDocumentServiceEventHandler* handlerPtr : this->GetDocumentServiceEventHandlers()){
-				if (handlerPtr != nullptr){
-					CDocumentRenamedEvent event(
-								pair.first,
-								pair.second,
-								dpTypeId,
-								documentName,
-								this->ObjectIdToUrl(dpObjectId),
-								dpIsDirty);
-					handlerPtr->ProcessEvent(&event);
-				}
-			}
-		}
-	}
-
-	// Primary doc: rename and notify
+	QUrl documentUrl;
+	QByteArrayList userIds;
 	{
 		QMutexLocker locker(&this->m_mutex);
 		WorkingDocument* workingDocumentPtr = this->FindDocument(userId, documentId);
-		if (workingDocumentPtr != nullptr){
-			workingDocumentPtr->name = documentName;
+		if (workingDocumentPtr == nullptr){
+			return IDocumentService::OS_INVALID_DOCUMENT_ID;
 		}
+
+		workingDocumentPtr->name = documentName;
+		documentUrl = workingDocumentPtr->url;
+		userIds = this->GetDocumentUserIds(documentId);
 	}
 
-	for (IDocumentServiceEventHandler* handlerPtr : this->GetDocumentServiceEventHandlers()){
-		if (handlerPtr != nullptr){
-			CDocumentRenamedEvent event(
-						userId,
-						documentId,
-						typeId,
-						documentName,
-						this->ObjectIdToUrl(objectId),
-						isDirty);
-			handlerPtr->ProcessEvent(&event);
+	// Notify every user holding the document
+	for (const QByteArray& documentUserId : userIds){
+		for (IDocumentServiceEventHandler* handlerPtr : this->GetDocumentServiceEventHandlers()){
+			if (handlerPtr != nullptr){
+				CDocumentRenamedEvent event(
+							documentUserId,
+							documentId,
+							typeId,
+							documentName,
+							documentUrl,
+							isDirty);
+				handlerPtr->ProcessEvent(&event);
+			}
 		}
 	}
 
@@ -799,7 +629,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 		return;
 	}
 
-	WorkingDocument* workingDocumentPtr = &this->m_userDocuments[userId][documentId];
+	WorkingDocument* workingDocumentPtr = &this->m_documents[documentId];
 
 	if (workingDocumentPtr->isLoading){
 		this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, documentId, QStringLiteral("Document is still loading")});
@@ -830,11 +660,10 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 	istd::CChangeGroup changeGroup(collectionPtr);
 
 	QString resultDocumentName = documentName;
-	if (!workingDocumentPtr->objectId.isEmpty()){
+	const QByteArray currentObjectId = this->UrlToObjectId(workingDocumentPtr->url);
+	if (!currentObjectId.isEmpty()){
 		// Create copy of the object
 		if (!resultDocumentName.isEmpty() && workingDocumentPtr->name != resultDocumentName){
-			QByteArray oldObjectId = workingDocumentPtr->objectId;
-
 			QByteArray newObjectId = collectionPtr->InsertNewObject(
 						workingDocumentPtr->typeId,
 						resultDocumentName,
@@ -855,60 +684,38 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 				collectionPtr->SetElementName(newObjectId, resultDocumentName);
 			}
 
-			// In single-copy mode, detach from shared document before changing objectId
-			if (this->IsSingleCopyMode() && this->m_sharedDocuments.contains(oldObjectId)){
-				SharedDocumentData& shared = this->m_sharedDocuments[oldObjectId];
-				shared.refCount--;
-				bool isLastUser = (shared.refCount <= 0);
-				if (isLastUser){
-					imod::IModel* undoModelPtr = dynamic_cast<imod::IModel*>(shared.undoManagerPtr.GetPtr());
-					if (undoModelPtr != nullptr && shared.undoManagerModelId >= 0){
-						this->m_undoManagerObserver.UnregisterModel(shared.undoManagerModelId);
-					}
-					this->m_sharedDocuments.remove(oldObjectId);
-				}
-
-				// Create new private objectPtr and undoManagerPtr for this user
-				istd::IChangeableSharedPtr newObjectPtr = this->CreateObject(workingDocumentPtr->typeId);
-				if (newObjectPtr.IsValid()){
-					newObjectPtr->CopyFrom(*documentSnapshotPtr);
-				}
-				idoc::IUndoManagerSharedPtr newUndoManagerPtr;
-				newUndoManagerPtr.FromUnique(std::move(this->CreateUndoManager()));
-
-				workingDocumentPtr->objectPtr = newObjectPtr;
-				workingDocumentPtr->undoManagerPtr = newUndoManagerPtr;
-
-				this->InitializeDocumentObservers(*workingDocumentPtr, userId, documentId);
-			}
-
 			// Prepare notification with expected new state
 			QByteArray savedTypeId = workingDocumentPtr->typeId;
-	
+			QByteArrayList userIds;
+
 			workingDocumentPtr = this->FindDocument(userId, documentId);
 			if (workingDocumentPtr != nullptr){
 				istd::CChangeNotifier notifier(this);
 
-				workingDocumentPtr->objectId = newObjectId;
-				// The document is now backed by the new object, so GetOpenedDocumentList() must report its URL
+				// The document is now backed by the new object for every user holding it,
+				// so GetOpenedDocumentList() must report its URL
 				workingDocumentPtr->url = this->ObjectIdToUrl(newObjectId);
 				workingDocumentPtr->name = resultDocumentName;
 				workingDocumentPtr->isDirty = false;
 				workingDocumentPtr->undoManagerPtr->StoreDocumentState();
+
+				userIds = this->GetDocumentUserIds(documentId);
 			}
 
 			locker.unlock();
 
-			for (IDocumentServiceEventHandler* handlerPtr : this->GetDocumentServiceEventHandlers()){
-				if (handlerPtr != nullptr){
-					CDocumentSavedAsEvent event(
-								userId,
-								documentId,
-								savedTypeId,
-								resultDocumentName,
-								this->ObjectIdToUrl(newObjectId),
-								false);
-					handlerPtr->ProcessEvent(&event);
+			for (const QByteArray& documentUserId : userIds){
+				for (IDocumentServiceEventHandler* handlerPtr : this->GetDocumentServiceEventHandlers()){
+					if (handlerPtr != nullptr){
+						CDocumentSavedAsEvent event(
+									documentUserId,
+									documentId,
+									savedTypeId,
+									resultDocumentName,
+									this->ObjectIdToUrl(newObjectId),
+									false);
+						handlerPtr->ProcessEvent(&event);
+					}
 				}
 			}
 
@@ -917,100 +724,48 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 		}
 
 		// Update object
-		bool res = collectionPtr->SetObjectData(workingDocumentPtr->objectId, *documentSnapshotPtr, istd::IChangeable::CM_WITHOUT_REFS, params.operationContextPtr);
+		bool res = collectionPtr->SetObjectData(currentObjectId, *documentSnapshotPtr, istd::IChangeable::CM_WITHOUT_REFS, params.operationContextPtr);
 
 		if (res){
 			QString updatedName;
 			if (this->HasDocumentNameProvider(workingDocumentPtr->typeId)){
 				updatedName = this->GetDefaultDocumentName(*workingDocumentPtr);
-				collectionPtr->SetElementName(workingDocumentPtr->objectId, updatedName);
+				collectionPtr->SetElementName(currentObjectId, updatedName);
 			}
 
 			workingDocumentPtr->undoManagerPtr->StoreDocumentState();
 
 			istd::CChangeNotifier notifier(this);
 
-			if (this->IsSingleCopyMode() && !workingDocumentPtr->objectId.isEmpty()){
-				// Update all users sharing this document
-				QByteArray sharedObjectId = workingDocumentPtr->objectId;
-
-				if (this->m_sharedDocuments.contains(sharedObjectId) && !updatedName.isEmpty()){
-					this->m_sharedDocuments[sharedObjectId].name = updatedName;
-				}
-
-				UserDocumentPairList docs = this->FindDocumentsByObjectId(sharedObjectId);
-				for (const UserDocumentPair& pair : docs){
-					WorkingDocument* dp = this->FindDocument(pair.first, pair.second);
-					if (dp == nullptr){
-						continue;
-					}
-
-					QByteArray dpTypeId = dp->typeId;
-					QByteArray dpObjectId = dp->objectId;
-					QString dpNewName = !updatedName.isEmpty() ? updatedName : dp->name;
-
-					locker.unlock();
-
-					{
-						QMutexLocker locker(&this->m_mutex);
-						dp = this->FindDocument(pair.first, pair.second);
-						if (dp != nullptr){
-							dp->isDirty = false;
-							if (!updatedName.isEmpty()){
-								dp->name = updatedName;
-							}
-						}
-					}
-
-					for (IDocumentServiceEventHandler* handlerPtr : this->GetDocumentServiceEventHandlers()){
-						if (handlerPtr != nullptr){
-							CDocumentSavedEvent event(
-										pair.first,
-										pair.second,
-										dpTypeId,
-										dpNewName,
-										this->ObjectIdToUrl(dpObjectId),
-										false);
-							handlerPtr->ProcessEvent(&event);
-						}
-					}
-
-					locker.relock();
-				}
+			if (!updatedName.isEmpty()){
+				workingDocumentPtr->name = updatedName;
 			}
-			else {
-				QByteArray savedTypeId = workingDocumentPtr->typeId;
-				QByteArray savedObjectId = workingDocumentPtr->objectId;
-				QString newName = !updatedName.isEmpty() ? updatedName : workingDocumentPtr->name;
+			workingDocumentPtr->isDirty = false;
 
-				locker.unlock();
+			QByteArray savedTypeId = workingDocumentPtr->typeId;
+			QUrl savedUrl = workingDocumentPtr->url;
+			QString newName = workingDocumentPtr->name;
+			QByteArrayList userIds = this->GetDocumentUserIds(documentId);
 
-				{
-					QMutexLocker locker(&this->m_mutex);
-					workingDocumentPtr = this->FindDocument(userId, documentId);
-					if (workingDocumentPtr != nullptr){
-						if (!updatedName.isEmpty()){
-							workingDocumentPtr->name = updatedName;
-						}
-						workingDocumentPtr->isDirty = false;
-					}
-				}
+			locker.unlock();
 
+			// Notify every user holding the document
+			for (const QByteArray& documentUserId : userIds){
 				for (IDocumentServiceEventHandler* handlerPtr : this->GetDocumentServiceEventHandlers()){
 					if (handlerPtr != nullptr){
 						CDocumentSavedEvent event(
-									userId,
+									documentUserId,
 									documentId,
 									savedTypeId,
 									newName,
-									this->ObjectIdToUrl(savedObjectId),
+									savedUrl,
 									false);
 						handlerPtr->ProcessEvent(&event);
 					}
 				}
-
-				locker.relock();
 			}
+
+			locker.relock();
 		}
 
 		this->CompleteTask(taskId, TaskResult{res ? IDocumentService::OS_OK : IDocumentService::OS_FAILED, documentId, res ? QString() : QStringLiteral("Failed to update object data")});
@@ -1027,7 +782,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 		}
 	}
 
-	workingDocumentPtr->objectId = collectionPtr->InsertNewObject(
+	const QByteArray savedObjectId = collectionPtr->InsertNewObject(
 				workingDocumentPtr->typeId,
 				resultDocumentName,
 				"",
@@ -1037,39 +792,26 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 				nullptr,
 				params.operationContextPtr);
 
-	if (this->HasDocumentNameProvider(workingDocumentPtr->typeId)){
-		resultDocumentName = this->GetDefaultDocumentName(*workingDocumentPtr);
-		collectionPtr->SetElementName(workingDocumentPtr->objectId, resultDocumentName);
+	if (!savedObjectId.isEmpty()){
+		// A new document had no URL; it is now backed by the inserted object
+		workingDocumentPtr->url = this->ObjectIdToUrl(savedObjectId);
 	}
 
-	if (!workingDocumentPtr->objectId.isEmpty()){
+	if (this->HasDocumentNameProvider(workingDocumentPtr->typeId)){
+		resultDocumentName = this->GetDefaultDocumentName(*workingDocumentPtr);
+		collectionPtr->SetElementName(savedObjectId, resultDocumentName);
+	}
+
+	if (!savedObjectId.isEmpty()){
 		QByteArray savedTypeId = workingDocumentPtr->typeId;
-		QByteArray savedObjectId = workingDocumentPtr->objectId;
 
 		workingDocumentPtr = this->FindDocument(userId, documentId);
 		if (workingDocumentPtr != nullptr){
 			istd::CChangeNotifier notifier(this);
 
-			// A new document had no URL; it is now backed by the inserted object
-			workingDocumentPtr->url = this->ObjectIdToUrl(savedObjectId);
 			workingDocumentPtr->name = resultDocumentName;
 			workingDocumentPtr->isDirty = false;
 			workingDocumentPtr->undoManagerPtr->StoreDocumentState();
-
-			// The document received an objectId for the first time. In single-copy mode
-			// create a shared entry so that other users opening the same object reuse it.
-			if (this->IsSingleCopyMode() && !this->m_sharedDocuments.contains(savedObjectId)){
-				SharedDocumentData shared;
-				shared.typeId = workingDocumentPtr->typeId;
-				shared.name = workingDocumentPtr->name;
-				shared.objectPtr = workingDocumentPtr->objectPtr;
-				shared.undoManagerPtr = workingDocumentPtr->undoManagerPtr;
-				shared.refCount = 1;
-				shared.isLoading = false;
-				shared.undoManagerModelId = workingDocumentPtr->undoManagerModelId;
-
-				this->m_sharedDocuments[savedObjectId] = shared;
-			}
 		}
 
 		locker.unlock();
@@ -1090,7 +832,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 		locker.relock();
 	}
 
-	OperationStatus saveStatus = workingDocumentPtr->objectId.isEmpty() ? IDocumentService::OS_FAILED : IDocumentService::OS_OK;
+	OperationStatus saveStatus = savedObjectId.isEmpty() ? IDocumentService::OS_FAILED : IDocumentService::OS_OK;
 	this->CompleteTask(taskId, TaskResult{saveStatus, documentId, saveStatus == IDocumentService::OS_OK ? QString() : QStringLiteral("Failed to insert new object")});
 }
 

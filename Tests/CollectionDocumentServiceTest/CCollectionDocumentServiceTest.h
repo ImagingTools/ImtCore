@@ -553,9 +553,13 @@ public:
 	using imtdoc::CDocumentServiceBase::FindDocument;
 	using imtdoc::CDocumentServiceBase::ValidateInputParams;
 	using imtdoc::CDocumentServiceBase::ObjectIdToUrl;
-	using imtdoc::CDocumentServiceBase::m_userDocuments;
+	using imtdoc::CDocumentServiceBase::UrlToObjectId;
+	using imtdoc::CDocumentServiceBase::InsertDocument;
+	using imtdoc::CDocumentServiceBase::CloseDocumentInternal;
+	using imtdoc::CDocumentServiceBase::m_documents;
+	using imtdoc::CDocumentServiceBase::m_userDocumentIds;
 	using imtdoc::CDocumentServiceBase::m_mutex;
-	using imtdoc::CDocumentServiceBase::m_sharedDocuments;
+	using imtdoc::CDocumentServiceBase::GetDocumentUserIds;
 
 protected:
 	// reimplemented (CCollectionDocumentServiceBase)
@@ -777,9 +781,14 @@ private slots:
 	void ValidateInputParamsSuccessTest();
 	void ValidateInputParamsInvalidUserTest();
 	void ValidateInputParamsInvalidDocumentTest();
+	void ValidateInputParamsForeignDocumentTest();
+
+	// Document storage tests
+	void DocumentStorageInsertRemoveTest();
 
 	// ObjectIdToUrl tests
 	void ObjectIdToUrlTest();
+	void UrlToObjectIdTest();
 
 	// Async document loading completion tests
 	void CreateNewDocumentAsyncCompletionTest();
@@ -797,6 +806,9 @@ private slots:
 	void SingleCopyCloseBothUsersTest();
 	void SingleCopySaveUpdatesAllTest();
 	void SingleCopySetDocumentNameUpdatesAllTest();
+	void SingleCopySaveAsUpdatesAllTest();
+	void SingleCopyReopenBySameUserTest();
+	void SingleCopyOneDocumentForAllUsersTest();
 
 private:
 	/**
