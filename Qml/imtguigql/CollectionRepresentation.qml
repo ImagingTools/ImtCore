@@ -179,6 +179,7 @@ Item {
 	}
 
 	function publishElements(items){
+		// TODO: remove bullshit
 		//if (!root.canUpdateElementsInPlace(items)){
 			root.elementsModel = items;
 			root.elementsSource = null;
