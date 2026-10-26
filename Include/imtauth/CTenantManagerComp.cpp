@@ -10,6 +10,7 @@
 #include <istd/CChangeNotifier.h>
 #include <iprm/CIdParam.h>
 #include <iprm/CParamsSet.h>
+#include <ilog/CMessageContainer.h>
 
 // ImtCore includes
 #include <imtauth/ITenantInfo.h>
@@ -95,9 +96,13 @@ QByteArrayList CTenantManagerComp::GetOwnedOrCreatedTenantIds(const QByteArray& 
 }
 
 
-QByteArrayList CTenantManagerComp::GetChildTenantIds(const QByteArray& tenantId) const
+QByteArrayList CTenantManagerComp::GetChildTenantIds(const QByteArray& tenantId, bool* isReadPtr) const
 {
 	QByteArrayList retVal;
+	if (isReadPtr != nullptr){
+		*isReadPtr = m_tenantCollectionCompPtr.IsValid();
+	}
+
 	if (!m_tenantCollectionCompPtr.IsValid() || tenantId.isEmpty()){
 		return retVal;
 	}
@@ -109,11 +114,20 @@ QByteArrayList CTenantManagerComp::GetChildTenantIds(const QByteArray& tenantId)
 	filterParams.SetEditableParameter("ParentTenantId", &parentTenantParam);
 
 	// A collection that does not know the filter returns every organization
-	for (const QByteArray& candidateId : m_tenantCollectionCompPtr->GetElementIds(0, -1, &filterParams)){
+	ilog::CMessageContainer readErrors;
+	bool isRead = true;
+	for (const QByteArray& candidateId : m_tenantCollectionCompPtr->GetElementIds(0, -1, &filterParams, &readErrors)){
 		ITenantInfoUniquePtr candidatePtr = GetTenant(candidateId);
-		if (candidatePtr.IsValid() && candidatePtr->GetParentTenantId() == tenantId){
+		if (!candidatePtr.IsValid()){
+			isRead = false;
+		}
+		else if (candidatePtr->GetParentTenantId() == tenantId){
 			retVal.append(candidateId);
 		}
+	}
+
+	if (isReadPtr != nullptr){
+		*isReadPtr = isRead && readErrors.GetWorstCategory() < istd::IInformationProvider::IC_ERROR;
 	}
 
 	return retVal;

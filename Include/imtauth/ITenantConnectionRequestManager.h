@@ -63,8 +63,9 @@ public:
 	/**
 		Start of the uninterrupted period in which the two tenants had an active relationship, archived relationships included.
 		Invalid when they have no active relationship now, or a start time is unknown.
+		\param isReadPtr [optional] False when the history could not be read completely, so the start may be too late.
 	*/
-	virtual QDateTime GetRelatedSince(const QByteArray& tenantId, const QByteArray& otherTenantId) const = 0;
+	virtual QDateTime GetRelatedSince(const QByteArray& tenantId, const QByteArray& otherTenantId, bool* isReadPtr = nullptr) const = 0;
 };
 
 

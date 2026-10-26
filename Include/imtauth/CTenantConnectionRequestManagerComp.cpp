@@ -1361,16 +1361,23 @@ ITenantRelationshipInfoUniquePtr CTenantConnectionRequestManagerComp::GetTenantR
 }
 
 
-QDateTime CTenantConnectionRequestManagerComp::GetRelatedSince(const QByteArray& tenantId, const QByteArray& otherTenantId) const
+QDateTime CTenantConnectionRequestManagerComp::GetRelatedSince(const QByteArray& tenantId, const QByteArray& otherTenantId, bool* isReadPtr) const
 {
+	if (isReadPtr != nullptr){
+		*isReadPtr = false;
+	}
+
 	if (!m_relationshipCollectionCompPtr.IsValid()){
 		return QDateTime();
 	}
 
+	// A missing archived relationship would move the start forward and the shares of that time would look earlier
+	bool isRead = true;
 	QList<RelationshipPeriod> periods;
-	for (const QByteArray& id : SelectIds(*m_relationshipCollectionCompPtr, PairInEitherOrder("SourceTenantId", "TargetTenantId", tenantId, otherTenantId))){
+	for (const QByteArray& id : SelectIds(*m_relationshipCollectionCompPtr, PairInEitherOrder("SourceTenantId", "TargetTenantId", tenantId, otherTenantId), QByteArrayList(), &isRead)){
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (!m_relationshipCollectionCompPtr->GetObjectData(id, dataPtr)){
+			isRead = false;
 			continue;
 		}
 
@@ -1392,6 +1399,10 @@ QDateTime CTenantConnectionRequestManagerComp::GetRelatedSince(const QByteArray&
 		else if (relPtr->GetStatus() == ITenantRelationshipInfo::TRS_ARCHIVED){
 			periods.append({ParseRelationshipTime(relPtr->GetCreatedAt()), ParseRelationshipTime(relPtr->GetUpdatedAt())});
 		}
+	}
+
+	if (isReadPtr != nullptr){
+		*isReadPtr = isRead;
 	}
 
 	return GetUninterruptedStart(periods);

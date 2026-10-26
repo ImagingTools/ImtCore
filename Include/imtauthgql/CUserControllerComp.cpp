@@ -162,6 +162,13 @@ sdl::V1_0::imtauth::CChangePasswordPayload CUserControllerComp::OnChangePassword
 		}
 	}
 
+	// The code is used up before the password changes, so two requests with the same code cannot both change it
+	if (isRecovery && !m_userVerificationControllerCompPtr->ConsumeVerification(userId, verificationCode)){
+		return CreateChangePasswordFailure(
+					QStringLiteral("Unable to change password for user '%1'. Error: Invalid login or password.").arg(QString::fromUtf8(requestedLogin)),
+					QStringList() << QStringLiteral("InvalidCredentials"));
+	}
+
 	QByteArray previousPasswordHash = userInfoPtr->GetPasswordHash();
 	userInfoPtr->SetPasswordHash(passwordHash);
 
@@ -182,11 +189,6 @@ sdl::V1_0::imtauth::CChangePasswordPayload CUserControllerComp::OnChangePassword
 		return CreateChangePasswordFailure(
 					QStringLiteral("Unable to change password for user '%1'. Error: The user could not be stored").arg(login),
 					QStringList() << QStringLiteral("StorageError"));
-	}
-
-	// The code stays blocked when it cannot be removed, the password is changed anyway
-	if (isRecovery && !m_userVerificationControllerCompPtr->RemoveVerificationData(userId)){
-		SendErrorMessage(0, QStringLiteral("The used recovery code of user '%1' could not be removed").arg(QString::fromUtf8(userId)), "CUserControllerComp");
 	}
 
 	payload.success = true;

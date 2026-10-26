@@ -10,6 +10,7 @@
 // ACF includes
 #include <iprm/CIdParam.h>
 #include <iprm/CParamsSet.h>
+#include <ilog/CMessageContainer.h>
 
 // ImtCore includes
 #include <imtauth/imtauth.h>
@@ -28,14 +29,22 @@ namespace
 
 bool CheckTenantRemovalWith(
 			const QByteArrayList& tenantIds,
-			const std::function<QByteArrayList(const QByteArray&)>& getChildTenantIds,
+			const std::function<QByteArrayList(const QByteArray&, bool&)>& getChildTenantIds,
 			const std::function<QString(const QByteArray&)>& getTenantName,
 			QString& errorMessage)
 {
 	const QSet<QByteArray> removedTenantIds(tenantIds.cbegin(), tenantIds.cend());
 	for (const QByteArray& tenantId : tenantIds){
+		// Removing an organization whose sub-organizations could not be read would leave them orphaned
+		bool isRead = false;
+		const QByteArrayList childTenantIds = getChildTenantIds(tenantId, isRead);
+		if (!isRead){
+			errorMessage = QStringLiteral("The sub-organizations of \"%1\" could not be read. Try again.").arg(getTenantName(tenantId));
+			return false;
+		}
+
 		int remainingChildCount = 0;
-		for (const QByteArray& childTenantId : getChildTenantIds(tenantId)){
+		for (const QByteArray& childTenantId : childTenantIds){
 			if (!removedTenantIds.contains(childTenantId)){
 				++remainingChildCount;
 			}
@@ -254,8 +263,8 @@ bool CheckTenantRemoval(const imtauth::ITenantManager& tenantManager, const QByt
 {
 	return CheckTenantRemovalWith(
 				tenantIds,
-				[&tenantManager](const QByteArray& tenantId){
-					return tenantManager.GetChildTenantIds(tenantId);
+				[&tenantManager](const QByteArray& tenantId, bool& isRead){
+					return tenantManager.GetChildTenantIds(tenantId, &isRead);
 				},
 				[&tenantManager](const QByteArray& tenantId){
 					imtauth::ITenantInfoUniquePtr tenantPtr = tenantManager.GetTenant(tenantId);
@@ -273,7 +282,7 @@ bool CheckTenantRemoval(const imtbase::IObjectCollection& tenantCollection, cons
 
 	return CheckTenantRemovalWith(
 				tenantIds,
-				[&tenantCollection, &getTenantInfo](const QByteArray& tenantId){
+				[&tenantCollection, &getTenantInfo](const QByteArray& tenantId, bool& isRead){
 					iprm::CIdParam parentTenantParam;
 					parentTenantParam.SetId(tenantId);
 
@@ -281,14 +290,21 @@ bool CheckTenantRemoval(const imtbase::IObjectCollection& tenantCollection, cons
 					filterParams.SetEditableParameter("ParentTenantId", &parentTenantParam);
 
 					// A collection that does not know the filter returns every organization
+					ilog::CMessageContainer readErrors;
+					isRead = true;
 					QByteArrayList childTenantIds;
-					for (const QByteArray& candidateId : tenantCollection.GetElementIds(0, -1, &filterParams)){
+					for (const QByteArray& candidateId : tenantCollection.GetElementIds(0, -1, &filterParams, &readErrors)){
 						imtbase::IObjectCollection::DataPtr dataPtr;
 						const imtauth::ITenantInfo* candidatePtr = getTenantInfo(candidateId, dataPtr);
-						if (candidatePtr != nullptr && candidatePtr->GetParentTenantId() == tenantId){
+						if (candidatePtr == nullptr){
+							isRead = false;
+						}
+						else if (candidatePtr->GetParentTenantId() == tenantId){
 							childTenantIds.append(candidateId);
 						}
 					}
+
+					isRead = isRead && readErrors.GetWorstCategory() < istd::IInformationProvider::IC_ERROR;
 
 					return childTenantIds;
 				},

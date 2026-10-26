@@ -26,6 +26,10 @@ public:
 		End the verification of the user, e.g. after its code was used.
 	*/
 	virtual bool RemoveVerificationData(const QByteArray& userId) = 0;
+	/**
+		Check the code and end the verification in one step: of concurrent callers with the same code only one succeeds.
+	*/
+	virtual bool ConsumeVerification(const QByteArray& userId, const QByteArray& verificationCode) = 0;
 };
 
 

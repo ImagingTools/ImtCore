@@ -208,7 +208,14 @@ sdl::V1_0::imtauth::CGetTenantRelationshipsPayload CTenantManagerControllerComp:
 		// The documents shared with a partner belong to the period the organizations have been related, so every member gets its start
 		const QByteArray partnerId = relPtr->GetSourceTenantId() == tenantId ? relPtr->GetTargetTenantId() : relPtr->GetSourceTenantId();
 		if (!relatedSinceByPartner.contains(partnerId)){
-			relatedSinceByPartner.insert(partnerId, m_connectionRequestManagerCompPtr->GetRelatedSince(tenantId, partnerId));
+			bool isHistoryRead = false;
+			relatedSinceByPartner.insert(partnerId, m_connectionRequestManagerCompPtr->GetRelatedSince(tenantId, partnerId, &isHistoryRead));
+			if (!isHistoryRead){
+				sdl::V1_0::imtauth::CGetTenantRelationshipsPayload failedResponse;
+				failedResponse.errorMessage = readError;
+
+				return failedResponse;
+			}
 		}
 		const QDateTime relatedSince = relatedSinceByPartner.value(partnerId);
 		if (relatedSince.isValid()){
@@ -1898,14 +1905,17 @@ sdl::V1_0::imtauth::CRemoveConnectionPayload CTenantManagerControllerComp::OnRem
 	
 	imtauth::ITenantConnectionInfoUniquePtr connectionPtr = m_connectionRequestManagerCompPtr->GetConnection(connectionId);
 
+	// A grant needs an active connection: the grants end first, so a failure leaves the connection to remove again
+	if (connectionPtr.IsValid() && !RevokeGrantsBetween(connectionPtr->GetTenantAId(), connectionPtr->GetTenantBId())){
+		response.success = false;
+		response.errorMessage = QStringLiteral("The grants between the organizations could not be revoked. Try again.");
+		return response;
+	}
+
 	bool success = m_connectionRequestManagerCompPtr->RemoveConnection(connectionId, tenantId);
 	response.success = success;
 	if (!success){
 		response.errorMessage = QStringLiteral("Failed to remove connection");
-	}
-	else if (connectionPtr.IsValid()){
-		// A grant needs an active connection, so the grants between the organizations end with it
-		RevokeGrantsBetween(connectionPtr->GetTenantAId(), connectionPtr->GetTenantBId());
 	}
 	
 	return response;
@@ -2753,19 +2763,25 @@ bool CTenantManagerControllerComp::HasAccessToAnyTenant(
 }
 
 
-void CTenantManagerControllerComp::RevokeGrantsBetween(const QByteArray& tenantAId, const QByteArray& tenantBId) const
+bool CTenantManagerControllerComp::RevokeGrantsBetween(const QByteArray& tenantAId, const QByteArray& tenantBId) const
 {
 	if (!m_grantManagerCompPtr.IsValid() || tenantAId.isEmpty() || tenantBId.isEmpty()){
-		return;
+		return true;
 	}
 
-	for (const imtauth::CrossOrgGrantInfo& grantInfo : m_grantManagerCompPtr->GetGrantsBySourceTenant(tenantAId) + m_grantManagerCompPtr->GetGrantsBySourceTenant(tenantBId)){
+	bool isReadA = false;
+	bool isReadB = false;
+	const imtauth::CrossOrgGrants grants = m_grantManagerCompPtr->GetGrantsBySourceTenant(tenantAId, &isReadA) + m_grantManagerCompPtr->GetGrantsBySourceTenant(tenantBId, &isReadB);
+	bool isRevoked = isReadA && isReadB;
+	for (const imtauth::CrossOrgGrantInfo& grantInfo : grants){
 		const bool isBetween = (grantInfo.sourceTenantId == tenantAId && grantInfo.targetTenantId == tenantBId)
 					|| (grantInfo.sourceTenantId == tenantBId && grantInfo.targetTenantId == tenantAId);
-		if (isBetween && grantInfo.isActive){
-			m_grantManagerCompPtr->RevokeGrant(grantInfo.grantId);
+		if (isBetween && grantInfo.isActive && !m_grantManagerCompPtr->RevokeGrant(grantInfo.grantId)){
+			isRevoked = false;
 		}
 	}
+
+	return isRevoked;
 }
 
 

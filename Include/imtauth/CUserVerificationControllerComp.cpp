@@ -140,6 +140,14 @@ bool CUserVerificationControllerComp::RemoveVerificationData(const QByteArray& u
 }
 
 
+bool CUserVerificationControllerComp::ConsumeVerification(const QByteArray& userId, const QByteArray& verificationCode)
+{
+	QMutexLocker locker(&m_consumeMutex);
+
+	return VerifyUser(userId, verificationCode) && RemoveVerification(userId);
+}
+
+
 // reimplemented (icomp::CComponentBase)
 
 void CUserVerificationControllerComp::OnComponentCreated()
@@ -164,8 +172,8 @@ bool CUserVerificationControllerComp::RemoveVerification(const QByteArray& userI
 		return false;
 	}
 
-	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (m_userVerificationCollectionCompPtr->GetObjectData(userId, dataPtr) && !m_userVerificationCollectionCompPtr->RemoveElements({userId})){
+	// Removed by its id: a failed read is no proof that the code is gone
+	if (!m_userVerificationCollectionCompPtr->RemoveElements({userId})){
 		QMutexLocker locker(&m_failedAttemptsMutex);
 		m_failedAttempts[userId] = s_maxFailedAttempts;
 

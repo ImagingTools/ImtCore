@@ -155,17 +155,25 @@ CrossOrgGrantInfo CCrossOrgGrantManagerComp::GetGrant(const QByteArray& grantId)
 }
 
 
-CrossOrgGrants CCrossOrgGrantManagerComp::CollectGrants(const QByteArray& columnId, const QByteArray& value, const std::function<bool(const CrossOrgGrantInfo&)>& predicate) const
+CrossOrgGrants CCrossOrgGrantManagerComp::CollectGrants(const QByteArray& columnId, const QByteArray& value, const std::function<bool(const CrossOrgGrantInfo&)>& predicate, bool* isReadPtr) const
 {
 	CrossOrgGrants result;
+	if (isReadPtr != nullptr){
+		*isReadPtr = false;
+	}
+
 	if (!m_grantCollectionCompPtr.IsValid()){
 		return result;
 	}
 
 	// A collection that does not know the filter returns every id, the predicate still decides
-	for (const QByteArray& id : CollectionSelection::SelectIds(*m_grantCollectionCompPtr, CollectionSelection::ColumnEquals(columnId, value))){
+	bool isRead = true;
+	for (const QByteArray& id : CollectionSelection::SelectIds(*m_grantCollectionCompPtr, CollectionSelection::ColumnEquals(columnId, value), QByteArrayList(), &isRead)){
 		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (m_grantCollectionCompPtr->GetObjectData(id, dataPtr)){
+		if (!m_grantCollectionCompPtr->GetObjectData(id, dataPtr)){
+			isRead = false;
+		}
+		else{
 			const ICrossOrgGrantData* grantPtr = dynamic_cast<const ICrossOrgGrantData*>(dataPtr.GetPtr());
 			if (grantPtr != nullptr){
 				CrossOrgGrantInfo info = grantPtr->GetGrantInfo();
@@ -176,15 +184,19 @@ CrossOrgGrants CCrossOrgGrantManagerComp::CollectGrants(const QByteArray& column
 		}
 	}
 
+	if (isReadPtr != nullptr){
+		*isReadPtr = isRead;
+	}
+
 	return result;
 }
 
 
-CrossOrgGrants CCrossOrgGrantManagerComp::GetGrantsBySourceTenant(const QByteArray& sourceTenantId) const
+CrossOrgGrants CCrossOrgGrantManagerComp::GetGrantsBySourceTenant(const QByteArray& sourceTenantId, bool* isReadPtr) const
 {
 	return CollectGrants("SourceTenantId", sourceTenantId, [&sourceTenantId](const CrossOrgGrantInfo& info){
 		return info.sourceTenantId == sourceTenantId;
-	});
+	}, isReadPtr);
 }
 
 
