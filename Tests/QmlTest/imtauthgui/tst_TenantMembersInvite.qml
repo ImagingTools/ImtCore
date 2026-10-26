@@ -222,4 +222,68 @@ TestCase {
 		compare(context.stateManager.invitations.length, 1)
 		compare(context.stateManager.invitations[0].length, 1)
 	}
+
+	// Tab to the Invite button with one user ticked
+	function tabToTheInviteButton(context){
+		context.popup.handleItemClick(context.popup.getItemId(0), 0)
+		wait(100)
+		for (let i = 0; i < 4; ++i){
+			keyClick(Qt.Key_Tab)
+			wait(50)
+		}
+		verify(inviteButton(context.popup).activeFocus, "Tab reaches the Invite button")
+	}
+
+	// Mouse after keyboard: the hovered row takes over, Return toggles it instead of sending
+	function test_hoverAfterTheButtonTogglesTheRow(){
+		let context = openInvitePopup()
+		tabToTheInviteButton(context)
+
+		let list = findItem(context.popup, function(item){ return item.itemCount !== undefined && item.contentY !== undefined })
+		verify(list)
+		// The pointer comes from outside the list onto the second row
+		mouseMove(list, 20, -10)
+		wait(50)
+		mouseMove(list, 20, context.popup.itemHeight * 1.5)
+		wait(50)
+		mouseMove(list, 22, context.popup.itemHeight * 1.5)
+		wait(100)
+		keyClick(Qt.Key_Return)
+		wait(100)
+
+		compare(context.stateManager.invitations.length, 0, "Return toggles the hovered row")
+		compare(context.popup.newSelection.length, 2)
+	}
+
+	// A click into the filter takes the focus: the next Tab starts the cycle again
+	function test_filterClickAfterTheButtonRestartsTheCycle(){
+		let context = openInvitePopup()
+		tabToTheInviteButton(context)
+
+		let filter = findItem(context.popup, function(item){ return item.placeHolderText !== undefined && item.textInputFocus !== undefined })
+		verify(filter)
+		mouseClick(filter)
+		wait(100)
+		keyClick(Qt.Key_Tab)
+		wait(50)
+
+		verify(!inviteButton(context.popup).activeFocus)
+		verify(context.popup.__internal.clearAllFocused, "Tab from the filter goes to \"Clear all\"")
+	}
+
+	// Up from the button goes to the last row, which Return toggles
+	function test_upFromTheButtonGoesToTheLastRow(){
+		let context = openInvitePopup()
+		tabToTheInviteButton(context)
+
+		keyClick(Qt.Key_Up)
+		wait(50)
+
+		verify(!inviteButton(context.popup).activeFocus)
+		compare(context.popup.focusedIndex, 4)
+		keyClick(Qt.Key_Return)
+		wait(100)
+		compare(context.stateManager.invitations.length, 0)
+		compare(context.popup.newSelection.length, 2)
+	}
 }

@@ -339,6 +339,7 @@ PopupView {
 		\param index The index in the dataProvider.items array.
 	*/
 	function focusItem(index){
+		root.__leaveFooter()
 		root.focusedIndex = index
 	}
 
@@ -498,6 +499,7 @@ PopupView {
 	function __focusFilter(){
 		root.__internal.selectedFocusedIndex = -1
 		root.__internal.clearAllFocused = false
+		root.__internal.footerFocused = false
 		filterField.setFocus(true)
 		filterField.forceActiveFocus()
 	}
@@ -648,6 +650,13 @@ PopupView {
 				fontColor: root.fontColor
 				placeHolderText: root.filterPlaceholder
 				radius: Style.textFieldRadius
+
+				// A click into the filter moves the focus off the footer as well
+				onTextInputFocusChanged: {
+					if (filterField.textInputFocus){
+						root.__internal.footerFocused = false
+					}
+				}
 
 				onTextChanged: {
 					root.focusedIndex = -1
@@ -1071,6 +1080,18 @@ PopupView {
 		return footerItem.keyboardItem.enabled ? footerItem.keyboardItem : null
 	}
 
+	// --- Helper: the footer control gives up the focus; true when it had it ---
+	function __leaveFooter(){
+		if (!root.__internal.footerFocused){
+			return false
+		}
+
+		root.__internal.footerFocused = false
+		root.forceActiveFocus()
+
+		return true
+	}
+
 	function __focusFooter(){
 		let keyboardItem = root.__footerKeyboardItem()
 		root.__clearAllFocusIndicators()
@@ -1242,7 +1263,17 @@ PopupView {
 	Shortcut {
 		sequence: "Up"
 		onActivated: {
-			root.__internal.footerFocused = false
+			if (root.__leaveFooter()){
+				root.__internal.hoverBlocked = true
+				let footerItemCount = root.dataProvider ? root.dataProvider.items.length : 0
+				if (footerItemCount > 0){
+					root.focusedIndex = footerItemCount - 1
+					root.__scrollToRow(footerItemCount - 1)
+				} else {
+					root.__focusFilter()
+				}
+				return
+			}
 			if (filterField.textInputFocus){
 				filterField.setFocus(false)
 			}
@@ -1287,7 +1318,10 @@ PopupView {
 	Shortcut {
 		sequence: "Down"
 		onActivated: {
-			root.__internal.footerFocused = false
+			if (root.__leaveFooter()){
+				root.__focusFilter()
+				return
+			}
 			if (filterField.textInputFocus){
 				filterField.setFocus(false)
 			}
