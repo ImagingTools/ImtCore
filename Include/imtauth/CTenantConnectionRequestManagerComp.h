@@ -102,7 +102,8 @@ private:
 	/// False when an open proposal of the connection could not be read or canceled.
 	bool CancelProposalsForConnection(const QByteArray& connectionId);
 
-	// Proposals, approvals and connection removals one at a time: two approvals of a proposal, or a proposal during the removal of its connection, would each leave a relationship
+	// Proposal changes and connection removals one at a time: two approvals of a proposal, or a proposal during the removal of its connection,
+	// would each leave a relationship, and a cancellation during an approval would mark an applied proposal canceled
 	QMutex m_relationshipChangeMutex;
 	bool ArchiveRelationship(const QByteArray& relationshipId, const ITenantRelationshipInfo& relationship, bool isRemovalPublished);
 

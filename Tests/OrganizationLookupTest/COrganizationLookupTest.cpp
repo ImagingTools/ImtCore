@@ -2013,6 +2013,50 @@ void COrganizationLookupTest::testApproveProposal_ConcurrentApprovalsCreateOneRe
 }
 
 
+void COrganizationLookupTest::testCancelProposal_DuringAnApprovalLeavesOneOutcome()
+{
+	CConnectionFixture fixture;
+
+	const QByteArray tenantId = NewId();
+	const QByteArray partnerId = NewId();
+	const QByteArray connectionId = fixture.AddConnection(tenantId, partnerId);
+
+	int relationshipCount = 0;
+	for (int round = 0; round < 20; ++round){
+		const QByteArray proposalId = ProposeRelationship(fixture, connectionId, tenantId, partnerId);
+		QVERIFY(!proposalId.isEmpty());
+
+		std::atomic<int> waitingCount{0};
+		std::atomic<bool> isApplied{false};
+		std::atomic<bool> isCanceled{false};
+		auto waitForBoth = [&waitingCount](){
+			++waitingCount;
+			while (waitingCount.load() < 2){
+				std::this_thread::yield();
+			}
+		};
+		std::thread approval([&](){
+			waitForBoth();
+			isApplied = !fixture.Manager().ApproveRelationshipProposal(proposalId, partnerId).isEmpty();
+		});
+		std::thread cancellation([&](){
+			waitForBoth();
+			isCanceled = fixture.Manager().CancelRelationshipProposal(proposalId, tenantId);
+		});
+		approval.join();
+		cancellation.join();
+
+		// An applied proposal marked canceled would hide an active relationship
+		QVERIFY(isApplied.load() != isCanceled.load());
+		relationshipCount += isApplied.load() ? 1 : 0;
+		QCOMPARE(fixture.Manager().GetRelationshipProposal(proposalId)->GetStatus(), isApplied.load()
+					? imtauth::ITenantRelationshipProposalInfo::RPS_APPLIED
+					: imtauth::ITenantRelationshipProposalInfo::RPS_CANCELED);
+		QCOMPARE(fixture.Manager().GetTenantRelationshipIds(tenantId).size(), relationshipCount);
+	}
+}
+
+
 I_ADD_TEST(COrganizationLookupTest);
 
 

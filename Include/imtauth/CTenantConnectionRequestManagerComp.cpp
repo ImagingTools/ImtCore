@@ -1248,6 +1248,8 @@ QByteArray CTenantConnectionRequestManagerComp::ApproveRelationshipProposal(cons
 
 bool CTenantConnectionRequestManagerComp::RejectRelationshipProposal(const QByteArray& proposalId, const QByteArray& tenantId)
 {
+	QMutexLocker locker(&m_relationshipChangeMutex);
+
 	if (!m_proposalCollectionCompPtr.IsValid() || !m_proposalFactoryCompPtr.IsValid()){
 		return false;
 	}
@@ -1291,6 +1293,8 @@ bool CTenantConnectionRequestManagerComp::RejectRelationshipProposal(const QByte
 
 bool CTenantConnectionRequestManagerComp::CancelRelationshipProposal(const QByteArray& proposalId, const QByteArray& tenantId)
 {
+	QMutexLocker locker(&m_relationshipChangeMutex);
+
 	if (!m_proposalCollectionCompPtr.IsValid() || !m_proposalFactoryCompPtr.IsValid()){
 		return false;
 	}
