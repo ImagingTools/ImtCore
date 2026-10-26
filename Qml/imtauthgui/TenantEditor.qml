@@ -129,22 +129,51 @@ DocumentViewBase {
 		}
 
 		Component.onCompleted: {
+			container.__builtPagesKey = container.__pagesKey()
 			multiPageView.updatePages()
 		}
 	}
 
-	// Re-build pages whenever anything controlling page visibility changes.
+	// The page list follows what the pages depend on, including the organization of the session for the shares
+	function __pagesKey() {
+		var sessionTenant = container.tenantData && String(container.tenantData.m_id) === AuthorizationController.getTenantId()
+		return stateManager_.pagesConfigKey + (sessionTenant ? "S" : "")
+	}
+
+	property string __builtPagesKey: ""
+
+	// A representation fills the model field by field and every field flips some of the flags: the pages are rebuilt
+	// once, after the model is filled, and only when the list really changes (a rebuild recreates the shown page).
+	Timer {
+		id: pagesUpdateTimer
+		interval: 0
+		onTriggered: {
+			var key = container.__pagesKey()
+			if (key === container.__builtPagesKey)
+				return
+			container.__builtPagesKey = key
+			multiPageView.updatePages()
+		}
+	}
+
 	Connections {
 		target: stateManager_
 		function onIsNewTenantChanged() {
-			multiPageView.updatePages()
+			pagesUpdateTimer.restart()
 			if (!stateManager_.isNewTenant) {
 				stateManager_.loadMembersFromModel()
 				stateManager_.loadInvitationsFromModel()
 			}
 		}
 		function onPagesConfigKeyChanged() {
-			if (!stateManager_.isNewTenant) multiPageView.updatePages()
+			pagesUpdateTimer.restart()
+		}
+	}
+
+	Connections {
+		target: container.tenantData
+		function onM_idChanged() {
+			pagesUpdateTimer.restart()
 		}
 	}
 
