@@ -10,6 +10,7 @@
 #include <istd/CChangeNotifier.h>
 #include <istd/CChangeGroup.h>
 #include <idoc/CStandardDocumentMetaInfo.h>
+#include <ilog/CMessage.h>
 #include <iprm/CParamsSet.h>
 #include <iprm/TParamsPtr.h>
 
@@ -559,7 +560,7 @@ imtbase::ICollectionInfo::Ids CSqlDatabaseObjectCollectionComp::GetElementIds(
 			int offset,
 			int count,
 			const iprm::IParamsSet* selectionParamsPtr,
-			ilog::IMessageConsumer* /*logPtr*/) const
+			ilog::IMessageConsumer* logPtr) const
 {
 	Ids retVal;
 
@@ -571,6 +572,15 @@ imtbase::ICollectionInfo::Ids CSqlDatabaseObjectCollectionComp::GetElementIds(
 
 		QSqlError sqlError;
 		QSqlQuery sqlQuery = m_dbEngineCompPtr->ExecSqlQuery(objectSelectionQuery, &sqlError, true);
+
+		// A failed query is not an empty selection; the caller that asks can tell them apart
+		if (sqlError.type() != QSqlError::NoError){
+			if (logPtr != nullptr){
+				logPtr->AddMessage(ilog::IMessageConsumer::MessagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0, sqlError.text(), "CSqlDatabaseObjectCollectionComp")));
+			}
+
+			return Ids();
+		}
 
 		while (sqlQuery.next()){
 			QByteArray objectId = m_objectDelegateCompPtr->GetObjectIdFromRecord(sqlQuery.record());

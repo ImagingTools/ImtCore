@@ -56,7 +56,8 @@ public:
 	virtual bool CancelRelationshipProposal(const QByteArray& proposalId, const QByteArray& tenantId) = 0;
 	virtual QByteArrayList GetRelationshipProposalIds(const QByteArray& tenantId) const = 0;
 	virtual ITenantRelationshipProposalInfoUniquePtr GetRelationshipProposal(const QByteArray& proposalId) const = 0;
-	virtual QByteArrayList GetTenantRelationshipIds(const QByteArray& tenantId) const = 0;
+	/// \param isReadPtr [optional] False when the storage could not be read completely, so the list may miss relationships.
+	virtual QByteArrayList GetTenantRelationshipIds(const QByteArray& tenantId, bool* isReadPtr = nullptr) const = 0;
 	virtual ITenantRelationshipInfoUniquePtr GetTenantRelationship(const QByteArray& relationshipId) const = 0;
 	virtual bool RemoveTenantRelationship(const QByteArray& tenantId, const QByteArray& relationshipId) = 0;
 	/**

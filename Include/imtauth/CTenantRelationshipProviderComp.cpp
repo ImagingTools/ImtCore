@@ -17,7 +17,7 @@ RelatedTenantInfos CTenantRelationshipProviderComp::GetRelatedTenants(const QByt
 	RelatedTenantInfos retVal;
 
 	if (isReadPtr != nullptr){
-		*isReadPtr = true;
+		*isReadPtr = tenantId.isEmpty();
 	}
 
 	if (tenantId.isEmpty()){
@@ -28,10 +28,17 @@ RelatedTenantInfos CTenantRelationshipProviderComp::GetRelatedTenants(const QByt
 		*tenantNamePtr = GetTenantName(tenantId);
 	}
 
+	// A partial read would look like ended relationships, and the shares of those are removed
+	bool isRead = false;
 	QByteArrayList relatedTenantIds;
-	for (const QByteArray& relationshipId : m_connectionRequestManagerCompPtr->GetTenantRelationshipIds(tenantId)){
+	for (const QByteArray& relationshipId : m_connectionRequestManagerCompPtr->GetTenantRelationshipIds(tenantId, &isRead)){
 		ITenantRelationshipInfoUniquePtr relationshipPtr = m_connectionRequestManagerCompPtr->GetTenantRelationship(relationshipId);
-		if (!relationshipPtr.IsValid() || relationshipPtr->GetStatus() != ITenantRelationshipInfo::TRS_ACTIVE){
+		if (!relationshipPtr.IsValid()){
+			isRead = false;
+			continue;
+		}
+
+		if (relationshipPtr->GetStatus() != ITenantRelationshipInfo::TRS_ACTIVE){
 			continue;
 		}
 
@@ -58,6 +65,10 @@ RelatedTenantInfos CTenantRelationshipProviderComp::GetRelatedTenants(const QByt
 		relatedTenantInfo.relatedSince = m_connectionRequestManagerCompPtr->GetRelatedSince(tenantId, relatedTenantId);
 
 		retVal.append(relatedTenantInfo);
+	}
+
+	if (isReadPtr != nullptr){
+		*isReadPtr = isRead;
 	}
 
 	return retVal;

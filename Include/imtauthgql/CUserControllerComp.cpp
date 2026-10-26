@@ -61,9 +61,10 @@ sdl::V1_0::imtauth::CChangePasswordPayload CUserControllerComp::OnChangePassword
 	}
 
 	auto& inputArgument = *arguments.input;
-	QByteArray login;
+	// The answers name the account only as it was asked for: the login behind an e-mail stays unknown to who does not prove the account
+	QByteArray requestedLogin;
 	if (inputArgument.login){
-		login = *inputArgument.login;
+		requestedLogin = *inputArgument.login;
 	}
 
 	QString oldPassword;
@@ -81,7 +82,7 @@ sdl::V1_0::imtauth::CChangePasswordPayload CUserControllerComp::OnChangePassword
 		verificationCode = inputArgument.verificationCode->toUtf8();
 	}
 
-	QByteArray userId = GetUserIdByLoginOrEmail(login);
+	QByteArray userId = GetUserIdByLoginOrEmail(requestedLogin);
 
 	imtauth::IUserInfo* userInfoPtr = nullptr;
 	imtbase::IObjectCollection::DataPtr dataPtr;
@@ -92,21 +93,12 @@ sdl::V1_0::imtauth::CChangePasswordPayload CUserControllerComp::OnChangePassword
 	// An unknown account is refused like a wrong password, so the answer does not tell which accounts exist
 	if (userInfoPtr == nullptr){
 		return CreateChangePasswordFailure(
-					QStringLiteral("Unable to change password for user '%1'. Error: Invalid login or password.").arg(login),
+					QStringLiteral("Unable to change password for user '%1'. Error: Invalid login or password.").arg(QString::fromUtf8(requestedLogin)),
 					QStringList() << QStringLiteral("InvalidCredentials"));
 	}
 
-	// The recovery may name the account by its e-mail; the password hash is built from the login
-	login = userInfoPtr->GetId();
-
-	imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
-	for (const imtauth::IUserInfo::SystemInfo& systemInfo : systemInfoList){
-		if (systemInfo.enabled && !systemInfo.systemId.isEmpty()){
-			return CreateChangePasswordFailure(
-						QStringLiteral("Unable to change password for user '%1'. Error: A user from an external system").arg(login),
-						QStringList() << QStringLiteral("ExternalUser"));
-		}
-	}
+	// The recovery may name the account by its e-mail; the credentials and the password hash use the login
+	const QByteArray login = userInfoPtr->GetId();
 
 	bool ok = false;
 	bool isAdminRequest = false;
@@ -132,8 +124,18 @@ sdl::V1_0::imtauth::CChangePasswordPayload CUserControllerComp::OnChangePassword
 
 	if (!ok){
 		return CreateChangePasswordFailure(
-					QStringLiteral("Unable to change password for user '%1'. Error: Invalid login or password.").arg(login),
+					QStringLiteral("Unable to change password for user '%1'. Error: Invalid login or password.").arg(QString::fromUtf8(requestedLogin)),
 					QStringList() << QStringLiteral("InvalidCredentials"));
+	}
+
+	// Told only after the account is proven, so the kind of an account does not show its existence
+	imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
+	for (const imtauth::IUserInfo::SystemInfo& systemInfo : systemInfoList){
+		if (systemInfo.enabled && !systemInfo.systemId.isEmpty()){
+			return CreateChangePasswordFailure(
+						QStringLiteral("Unable to change password for user '%1'. Error: A user from an external system").arg(QString::fromUtf8(requestedLogin)),
+						QStringList() << QStringLiteral("ExternalUser"));
+		}
 	}
 
 	QByteArray passwordHash = m_hashCalculatorCompPtr->GenerateHash(login + newPassword.toUtf8());
@@ -182,8 +184,9 @@ sdl::V1_0::imtauth::CChangePasswordPayload CUserControllerComp::OnChangePassword
 					QStringList() << QStringLiteral("StorageError"));
 	}
 
-	if (isRecovery){
-		m_userVerificationControllerCompPtr->RemoveVerificationData(userId);
+	// The code stays blocked when it cannot be removed, the password is changed anyway
+	if (isRecovery && !m_userVerificationControllerCompPtr->RemoveVerificationData(userId)){
+		SendErrorMessage(0, QStringLiteral("The used recovery code of user '%1' could not be removed").arg(QString::fromUtf8(userId)), "CUserControllerComp");
 	}
 
 	payload.success = true;

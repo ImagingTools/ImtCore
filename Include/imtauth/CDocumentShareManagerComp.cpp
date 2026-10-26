@@ -293,7 +293,14 @@ int CDocumentShareManagerComp::ReadRelatedTenants(const QByteArray& tenantId, QB
 	// The shares of ended relationships go before the partners are trusted, so a re-created relationship revives none
 	const QByteArrayList endedShareIds = FindSharesOfEndedRelationships(tenantId, relatedTenants, GetOutgoingShares(tenantId) + GetIncomingShares(tenantId));
 	int removedCount = 0;
-	if (!endedShareIds.isEmpty() && const_cast<CDocumentShareManagerComp*>(this)->RemoveShares(endedShareIds)){
+	if (!endedShareIds.isEmpty()){
+		// The old shares are still stored: no partner is trusted until they go, the next request tries again
+		if (!const_cast<CDocumentShareManagerComp*>(this)->RemoveShares(endedShareIds)){
+			SendErrorMessage(0, QStringLiteral("Unable to remove %1 document shares of tenant '%2' of ended relationships").arg(QString::number(endedShareIds.size()), QString::fromUtf8(tenantId)), "CDocumentShareManagerComp");
+
+			return 0;
+		}
+
 		removedCount = imtbase::narrow_cast<int>(endedShareIds.size());
 
 		SendInfoMessage(0, QStringLiteral("Removed %1 document shares of tenant '%2' of ended relationships").arg(QString::number(removedCount), QString::fromUtf8(tenantId)), "CDocumentShareManagerComp");

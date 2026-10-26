@@ -38,6 +38,18 @@ bool CRelationshipDocumentValidatorComp::ValidateDocumentData(
 		return false;
 	}
 
+	// The end of an archived relationship is final: a later write would move it and join its period with a later one
+	if (m_relationshipCollectionCompPtr.IsValid() && !objectId.isEmpty()){
+		imtbase::IObjectCollection::DataPtr storedDataPtr;
+		if (m_relationshipCollectionCompPtr->GetObjectData(objectId, storedDataPtr)){
+			const imtauth::ITenantRelationshipInfo* storedPtr = dynamic_cast<const imtauth::ITenantRelationshipInfo*>(storedDataPtr.GetPtr());
+			if (storedPtr != nullptr && storedPtr->GetStatus() == imtauth::ITenantRelationshipInfo::TRS_ARCHIVED){
+				errorMessage = QStringLiteral("An ended relationship cannot be changed");
+				return false;
+			}
+		}
+	}
+
 	// Check for duplicate relationship: same tenant pair with same role combination
 	// (including symmetric/mirror matches) is not allowed.
 	if (m_relationshipCollectionCompPtr.IsValid()){

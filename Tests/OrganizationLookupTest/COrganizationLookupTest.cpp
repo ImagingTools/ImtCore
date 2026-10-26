@@ -39,6 +39,8 @@
 #include <imtauth/TenantEvents.h>
 #include <imtauth/CUserVerification.h>
 #include <imtauth/CUserVerificationControllerComp.h>
+#include <imtauth/CTenantRelationshipProviderComp.h>
+#include <imtauth/CRelationshipDocumentValidatorComp.h>
 
 // Test includes
 #include "CTestCollectionComp.h"
@@ -504,6 +506,11 @@ public:
 	imtauth::IUserVerificationController& Controller()
 	{
 		return controller.GetImpl();
+	}
+
+	CTestCollectionComp& Collection()
+	{
+		return collection.GetImpl();
 	}
 
 	icomp::TSimSharedComponentPtr<CTestCollectionComp> collection;
@@ -1369,6 +1376,215 @@ void COrganizationLookupTest::testRemoveConnection_PublishesOnlyTheConnectionRem
 	QVERIFY(fixture.Manager().RemoveConnection(connectionId, tenantId));
 	QCOMPARE(fixture.EventManager().GetEventTypes(), QStringList({imtauth::TenantEvent::s_connectionRemoved}));
 	QVERIFY(fixture.Manager().GetTenantRelationshipIds(tenantId).isEmpty());
+}
+
+
+// Review findings
+
+void COrganizationLookupTest::testFindTenantIdsByName_SemicolonAndBackslashStayOutOfTheSelection()
+{
+	CTenantFixture fixture;
+
+	const QByteArray userId = NewId();
+	const QByteArray semicolonId = fixture.Add(userId, userId);
+	fixture.Rename(semicolonId, "Acme;North");
+	const QByteArray backslashId = fixture.Add(userId, userId);
+	fixture.Rename(backslashId, "A\\B Corp");
+	const QByteArray separatorsOnlyId = fixture.Add(userId, userId);
+	fixture.Rename(separatorsOnlyId, ";\\;");
+
+	// A selection query gets a semicolon changed and a backslash escapes in LIKE: neither may reach it
+	QCOMPARE(fixture.Manager().FindTenantIdsByName("acme;north"), QByteArrayList({semicolonId}));
+	QCOMPARE(fixture.Manager().FindTenantIdsByName("a\\b corp"), QByteArrayList({backslashId}));
+	QCOMPARE(fixture.Manager().FindTenantIdsByName(";\\;"), QByteArrayList({separatorsOnlyId}));
+	for (const QString& filterValue : fixture.Collection().GetRequestedFilterValues()){
+		QVERIFY2(!filterValue.contains(';') && !filterValue.contains('\\'), qPrintable(filterValue));
+	}
+}
+
+
+void COrganizationLookupTest::testGetShareOwnerTenantIds_FailedRemovalTrustsNoPartner()
+{
+	CShareFixture fixture;
+
+	const QByteArray tenantId = NewId();
+	const QByteArray partnerId = NewId();
+	fixture.Relationships().AddRelationship(tenantId, partnerId);
+	fixture.Add(tenantId, partnerId);
+	fixture.Add(NewId(), tenantId);
+
+	// The share of an ended relationship is still stored, so its owner must not be trusted again
+	fixture.Collection().SetRemovalFailing(true);
+	QVERIFY(fixture.Manager().GetShareOwnerTenantIds(tenantId).isEmpty());
+	QVERIFY(fixture.Manager().GetShareOwnerTenantIds(tenantId).isEmpty());
+	QCOMPARE(fixture.Relationships().GetReadCount(), 2);
+
+	fixture.Collection().SetRemovalFailing(false);
+	QCOMPARE(fixture.Manager().GetShareOwnerTenantIds(tenantId), QByteArrayList({partnerId}));
+	QCOMPARE(fixture.Relationships().GetReadCount(), 3);
+}
+
+
+void COrganizationLookupTest::testGetTenantRelationshipIds_ReportsAFailedRead()
+{
+	CConnectionFixture fixture;
+
+	const QByteArray tenantId = NewId();
+	const QByteArray partnerId = NewId();
+	const QByteArray relationshipId = fixture.AddRelationship(fixture.AddConnection(tenantId, partnerId), tenantId, partnerId);
+
+	bool isRead = false;
+	QCOMPARE(fixture.Manager().GetTenantRelationshipIds(tenantId, &isRead), QByteArrayList({relationshipId}));
+	QVERIFY(isRead);
+
+	fixture.Relationships().SetSelectionFailing(true);
+	QVERIFY(fixture.Manager().GetTenantRelationshipIds(tenantId, &isRead).isEmpty());
+	QVERIFY(!isRead);
+
+	fixture.Relationships().SetSelectionFailing(false);
+	fixture.Relationships().SetLoadFailingIds({relationshipId});
+	QVERIFY(fixture.Manager().GetTenantRelationshipIds(tenantId, &isRead).isEmpty());
+	QVERIFY(!isRead);
+}
+
+
+void COrganizationLookupTest::testGetRelatedTenants_PartialReadIsNotRead()
+{
+	CConnectionFixture fixture;
+
+	icomp::TSimSharedComponentPtr<imtauth::CTenantRelationshipProviderComp> provider;
+	provider->SetRef("ConnectionRequestManager", fixture.manager);
+	provider->InitComponent();
+
+	const QByteArray tenantId = NewId();
+	const QByteArray partnerId = NewId();
+	fixture.AddRelationship(fixture.AddConnection(tenantId, partnerId), tenantId, partnerId);
+
+	bool isRead = false;
+	QCOMPARE(provider->GetRelatedTenants(tenantId, nullptr, &isRead).size(), 1);
+	QVERIFY(isRead);
+
+	// An empty answer of a failed read would make the shares of the partner look ended
+	fixture.Relationships().SetSelectionFailing(true);
+	QVERIFY(provider->GetRelatedTenants(tenantId, nullptr, &isRead).isEmpty());
+	QVERIFY(!isRead);
+}
+
+
+void COrganizationLookupTest::testRemoveTenantRelationship_RepeatedRemovalKeepsTheEnd()
+{
+	CConnectionFixture fixture;
+
+	const QByteArray tenantId = NewId();
+	const QByteArray partnerId = NewId();
+	const QByteArray relationshipId = fixture.AddRelationship(fixture.AddConnection(tenantId, partnerId), tenantId, partnerId);
+
+	QVERIFY(fixture.Manager().RemoveTenantRelationship(tenantId, relationshipId));
+	const QString endedAt = fixture.Manager().GetTenantRelationship(relationshipId)->GetUpdatedAt();
+	QTest::qWait(5);
+
+	// The end is final: a later write would join the period of this relationship with one that starts later
+	QVERIFY(fixture.Manager().RemoveTenantRelationship(partnerId, relationshipId));
+	QCOMPARE(fixture.Manager().GetTenantRelationship(relationshipId)->GetUpdatedAt(), endedAt);
+	QCOMPARE(fixture.EventManager().GetEventTypes(), QStringList({imtauth::TenantEvent::s_relationshipRemoved}));
+}
+
+
+void COrganizationLookupTest::testUpdateProposal_RefusesAnEndedRelationship()
+{
+	CConnectionFixture fixture;
+
+	const QByteArray tenantId = NewId();
+	const QByteArray partnerId = NewId();
+	const QByteArray connectionId = fixture.AddConnection(tenantId, partnerId);
+	const QByteArray relationshipId = fixture.AddRelationship(connectionId, tenantId, partnerId);
+
+	imtauth::CTenantRelationshipProposal proposal;
+	proposal.SetConnectionId(connectionId);
+	proposal.SetInitiatorTenantId(tenantId);
+	proposal.SetCounterpartyTenantId(partnerId);
+	proposal.SetProposalType(imtauth::ITenantRelationshipProposalInfo::RPT_UPDATE);
+	proposal.SetExistingRelationshipId(relationshipId);
+	proposal.SetProposedDescription("New terms");
+
+	const QByteArray proposalId = fixture.Manager().CreateRelationshipProposal(proposal);
+	QVERIFY(!proposalId.isEmpty());
+
+	// The relationship ends while the proposal waits
+	QVERIFY(fixture.Manager().RemoveTenantRelationship(tenantId, relationshipId));
+	const QString endedAt = fixture.Manager().GetTenantRelationship(relationshipId)->GetUpdatedAt();
+
+	QVERIFY(fixture.Manager().ApproveRelationshipProposal(proposalId, partnerId).isEmpty());
+	imtauth::ITenantRelationshipInfoUniquePtr relationshipPtr = fixture.Manager().GetTenantRelationship(relationshipId);
+	QCOMPARE(relationshipPtr->GetUpdatedAt(), endedAt);
+	QVERIFY(relationshipPtr->GetDescription() != "New terms");
+}
+
+
+void COrganizationLookupTest::testValidateRelationship_RefusesAnEndedRelationship()
+{
+	CConnectionFixture fixture;
+
+	icomp::TSimSharedComponentPtr<imtauth::CRelationshipDocumentValidatorComp> validator;
+	validator->SetRef("RelationshipCollection", fixture.relationships);
+	validator->InitComponent();
+
+	const QByteArray tenantId = NewId();
+	const QByteArray partnerId = NewId();
+	const QByteArray connectionId = fixture.AddConnection(tenantId, partnerId);
+	const QByteArray activeId = fixture.AddRelationship(connectionId, tenantId, partnerId);
+	const QByteArray endedId = fixture.AddRelationship(connectionId, NewId(), partnerId, imtauth::ITenantRelationshipInfo::TRS_ARCHIVED);
+
+	QString errorMessage;
+	QVERIFY2(validator->ValidateDocumentData(activeId, *fixture.Manager().GetTenantRelationship(activeId), errorMessage), qPrintable(errorMessage));
+
+	// The document service over the relationships could otherwise write an archived row
+	QVERIFY(!validator->ValidateDocumentData(endedId, *fixture.Manager().GetTenantRelationship(endedId), errorMessage));
+	QVERIFY(!errorMessage.isEmpty());
+}
+
+
+void COrganizationLookupTest::testVerifyUser_CodeThatCannotBeRemovedStaysBlocked()
+{
+	CVerificationFixture fixture;
+
+	const QByteArray userId = NewId();
+	const QByteArray code = fixture.Generate(userId);
+	fixture.Collection().SetRemovalFailing(true);
+	for (int i = 0; i < 5; ++i){
+		QVERIFY(!fixture.Controller().VerifyUser(userId, WrongCode(code)));
+	}
+
+	// The exhausted code is still stored: it must not come back with a fresh budget of attempts
+	QVERIFY(fixture.Controller().GetVerificationData(userId) != nullptr);
+	QVERIFY(!fixture.Controller().VerifyUser(userId, code));
+
+	// A used code that cannot be removed cannot be used again either
+	const QByteArray otherUserId = NewId();
+	fixture.Collection().SetRemovalFailing(false);
+	const QByteArray otherCode = fixture.Generate(otherUserId);
+	fixture.Collection().SetRemovalFailing(true);
+	QVERIFY(fixture.Controller().VerifyUser(otherUserId, otherCode));
+	QVERIFY(!fixture.Controller().RemoveVerificationData(otherUserId));
+	QVERIFY(!fixture.Controller().VerifyUser(otherUserId, otherCode));
+}
+
+
+void COrganizationLookupTest::testGenerateVerificationData_FailsWhileTheOldCodeStays()
+{
+	CVerificationFixture fixture;
+
+	const QByteArray userId = NewId();
+	const QByteArray code = fixture.Generate(userId);
+	fixture.Collection().SetRemovalFailing(true);
+
+	imtauth::CUserVerification verification;
+	QVERIFY(!fixture.Controller().GenerateVerificationData(userId, &verification));
+	QVERIFY(!fixture.Controller().VerifyUser(userId, code));
+
+	fixture.Collection().SetRemovalFailing(false);
+	const QByteArray newCode = fixture.Generate(userId);
+	QVERIFY(fixture.Controller().VerifyUser(userId, newCode));
 }
 
 

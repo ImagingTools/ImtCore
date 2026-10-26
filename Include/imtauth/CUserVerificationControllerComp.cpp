@@ -60,7 +60,9 @@ bool CUserVerificationControllerComp::GenerateVerificationData(const QByteArray&
 {
 	if (m_userVerificationCollectionCompPtr.IsValid()){
 		// A new code replaces the previous one and its wrong attempts
-		RemoveVerification(userId);
+		if (!RemoveVerification(userId)){
+			return false;
+		}
 
 		istd::TDelPtr<imtauth::CIdentifiableUserVerificationInfo> userVerificationInfoPtr;
 		userVerificationInfoPtr.SetPtr(new imtauth::CIdentifiableUserVerificationInfo);
@@ -78,7 +80,9 @@ bool CUserVerificationControllerComp::GenerateVerificationData(const QByteArray&
 		qDebug() << "expirationDate" << expirationDate.toString();
 		userVerificationInfoPtr->SetExpirationDate(expirationDate);
 
-		m_userVerificationCollectionCompPtr->InsertNewObject("UserVerification", "", "", userVerificationInfoPtr.GetPtr(), userId);
+		if (m_userVerificationCollectionCompPtr->InsertNewObject("UserVerification", "", "", userVerificationInfoPtr.GetPtr(), userId).isEmpty()){
+			return false;
+		}
 
 		if (outputUserVerificationPtr != nullptr){
 			outputUserVerificationPtr->CopyFrom(*userVerificationInfoPtr.GetPtr());
@@ -100,6 +104,13 @@ bool CUserVerificationControllerComp::VerifyUser(const QByteArray& userId, const
 	istd::TDelPtr<const imtauth::IUserVerification> userVerificationInfoPtr = GetVerificationData(userId);
 	if (!userVerificationInfoPtr.IsValid() || userVerificationInfoPtr->GetUserId() != userId || userVerificationInfoPtr->IsExpired()){
 		return false;
+	}
+
+	{
+		QMutexLocker locker(&m_failedAttemptsMutex);
+		if (m_failedAttempts.value(userId) >= s_maxFailedAttempts){
+			return false;
+		}
 	}
 
 	if (!verificationCode.isEmpty() && userVerificationInfoPtr->GetVerificationCode() == verificationCode){
@@ -125,9 +136,7 @@ bool CUserVerificationControllerComp::VerifyUser(const QByteArray& userId, const
 
 bool CUserVerificationControllerComp::RemoveVerificationData(const QByteArray& userId)
 {
-	RemoveVerification(userId);
-
-	return true;
+	return RemoveVerification(userId);
 }
 
 
@@ -149,21 +158,24 @@ void CUserVerificationControllerComp::OnComponentDestroyed()
 
 // private methods
 
-void CUserVerificationControllerComp::RemoveVerification(const QByteArray& userId) const
+bool CUserVerificationControllerComp::RemoveVerification(const QByteArray& userId) const
 {
-	{
-		QMutexLocker locker(&m_failedAttemptsMutex);
-		m_failedAttempts.remove(userId);
-	}
-
 	if (!m_userVerificationCollectionCompPtr.IsValid() || userId.isEmpty()){
-		return;
+		return false;
 	}
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (m_userVerificationCollectionCompPtr->GetObjectData(userId, dataPtr)){
-		m_userVerificationCollectionCompPtr->RemoveElements({userId});
+	if (m_userVerificationCollectionCompPtr->GetObjectData(userId, dataPtr) && !m_userVerificationCollectionCompPtr->RemoveElements({userId})){
+		QMutexLocker locker(&m_failedAttemptsMutex);
+		m_failedAttempts[userId] = s_maxFailedAttempts;
+
+		return false;
 	}
+
+	QMutexLocker locker(&m_failedAttemptsMutex);
+	m_failedAttempts.remove(userId);
+
+	return true;
 }
 
 

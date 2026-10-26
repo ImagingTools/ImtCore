@@ -967,6 +967,23 @@ void CUserCollectionControllerComp::SetAdditionalFilters(
 					"DocumentId", QVariant(QString()), imtbase::IComplexCollectionFilter::FO_EQUAL);
 	}
 
+	// The restriction joins the filter of the request, which keeps its other settings (e.g. the sorting)
+	imtbase::IComplexCollectionFilter* requestFilterPtr = dynamic_cast<imtbase::IComplexCollectionFilter*>(filterParamsPtr->GetEditableParameter("ComplexFilter"));
+	if (requestFilterPtr != nullptr){
+		const imtbase::IComplexCollectionFilter::FilterExpression requestExpr = requestFilterPtr->GetFilterExpression();
+		if (requestExpr.fieldFilters.isEmpty() && requestExpr.filterExpressions.isEmpty()){
+			requestFilterPtr->SetFilterExpression(filterExpr);
+		}
+		else{
+			imtbase::IComplexCollectionFilter::FilterExpression combinedExpr;
+			combinedExpr.logicalOperation = imtbase::IComplexCollectionFilter::LO_AND;
+			combinedExpr.filterExpressions << requestExpr << filterExpr;
+			requestFilterPtr->SetFilterExpression(combinedExpr);
+		}
+
+		return;
+	}
+
 	imtbase::CComplexCollectionFilter* complexFilterPtr = new imtbase::CComplexCollectionFilter();
 	complexFilterPtr->SetFilterExpression(filterExpr);
 	filterParamsPtr->SetEditableParameter("ComplexFilter", complexFilterPtr, true);

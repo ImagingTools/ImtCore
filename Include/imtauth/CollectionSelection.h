@@ -7,6 +7,7 @@
 
 // ACF includes
 #include <iprm/CParamsSet.h>
+#include <ilog/CMessageContainer.h>
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
@@ -69,12 +70,18 @@ inline FilterExpression PairInEitherOrder(const QByteArray& firstColumnId, const
 	Ids of the elements whose columns match the expression.
 	\param textColumnIds	The columns of the expression that hold text; all others hold UUIDs, and another value there matches no row
 							(in a filter it would be an SQL error).
+	\param isReadPtr		[optional] False when the collection reported an error, so an empty result is not a selection of nothing.
 */
 inline QByteArrayList SelectIds(
 			const imtbase::IObjectCollection& collection,
 			const FilterExpression& filterExpression,
-			const QByteArrayList& textColumnIds = QByteArrayList())
+			const QByteArrayList& textColumnIds = QByteArrayList(),
+			bool* isReadPtr = nullptr)
 {
+	if (isReadPtr != nullptr){
+		*isReadPtr = true;
+	}
+
 	QList<FilterExpression> expressions{filterExpression};
 	while (!expressions.isEmpty()){
 		const FilterExpression expression = expressions.takeLast();
@@ -94,7 +101,13 @@ inline QByteArrayList SelectIds(
 	iprm::CParamsSet filterParams;
 	filterParams.SetEditableParameter("ComplexFilter", &complexFilter);
 
-	return collection.GetElementIds(0, -1, &filterParams);
+	ilog::CMessageContainer readErrors;
+	const QByteArrayList retVal = collection.GetElementIds(0, -1, &filterParams, &readErrors);
+	if (isReadPtr != nullptr && readErrors.GetWorstCategory() >= istd::IInformationProvider::IC_ERROR){
+		*isReadPtr = false;
+	}
+
+	return retVal;
 }
 
 

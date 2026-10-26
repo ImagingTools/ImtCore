@@ -31,6 +31,7 @@ private slots:
 	void testOwnedOrCreated_InvalidUserId_ReturnsNothing();
 	void testChildTenantIds_ReturnsDirectChildrenOnly();
 	void testFindTenantIdsByName_IgnoresCaseAndSpacesNotParts();
+	void testFindTenantIdsByName_SemicolonAndBackslashStayOutOfTheSelection();
 
 	// Invitations
 	void testRevokeInvitationsSentBy_RevokesOnlyPendingInvitationsOfTheInviter();
@@ -39,6 +40,7 @@ private slots:
 	// Document shares
 	void testRemoveUnrelatedShares_RemovesTheSharesWithoutRelationship();
 	void testRemoveUnrelatedShares_UnreadableRelationshipsRemoveNothing();
+	void testGetShareOwnerTenantIds_FailedRemovalTrustsNoPartner();
 	void testRemoveUnrelatedShares_CollectionWithoutFilters_KeepsSharesOfOtherTenants();
 	void testRemoveUnrelatedShares_RemovesTheSharesOfAnEarlierRelationship();
 	void testGetShareOwnerTenantIds_DropsTheSharesOfAnEarlierRelationship();
@@ -53,6 +55,11 @@ private slots:
 	void testRemoveConnection_ArchivesOnlyItsRelationships();
 	void testConnectionLookups_NonUuidIds_MatchNothing();
 	void testGetTenantRelationship_UnknownIdIsNoRelationship();
+	void testGetTenantRelationshipIds_ReportsAFailedRead();
+	void testGetRelatedTenants_PartialReadIsNotRead();
+	void testRemoveTenantRelationship_RepeatedRemovalKeepsTheEnd();
+	void testUpdateProposal_RefusesAnEndedRelationship();
+	void testValidateRelationship_RefusesAnEndedRelationship();
 
 	// The period of relationships of two organizations
 	void testGetUninterruptedStart_FollowsTheRelationshipsThatOverlap();
@@ -78,6 +85,8 @@ private slots:
 	void testVerifyUser_TooManyWrongCodesEndTheVerification();
 	void testVerifyUser_NewCodeResetsTheAttempts();
 	void testRemoveVerificationData_EndsTheVerification();
+	void testVerifyUser_CodeThatCannotBeRemovedStaysBlocked();
+	void testGenerateVerificationData_FailsWhileTheOldCodeStays();
 };
 
 

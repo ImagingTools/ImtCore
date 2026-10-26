@@ -212,6 +212,11 @@ bool CTenantCollectionControllerComp::CheckObjectAccess(
 
 bool CTenantCollectionControllerComp::OnBeforeRemoveElements(const QByteArrayList& elementIds, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
+	// RemoveElementSet selects by the filter of the request without the access check of RemoveElements
+	if (!CheckObjectAccess(gqlRequest, elementIds, imtauth::IDocumentShareInfo::DAL_OWNER, errorMessage)){
+		return false;
+	}
+
 	if (m_objectCollectionCompPtr.IsValid() && !CheckTenantRemoval(*m_objectCollectionCompPtr, elementIds, errorMessage)){
 		return false;
 	}
