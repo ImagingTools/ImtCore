@@ -86,6 +86,9 @@ Item {
 		id: organizationsReloadTimer
 		interval: 100
 		onTriggered: {
+			// The session can end while the read waits
+			if (!AuthorizationController.tenantsEnabled || !AuthorizationController.userTokenProvider.userId)
+				return
 			organizationsRequest.send(organizationsInput)
 		}
 	}
