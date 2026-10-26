@@ -1515,6 +1515,7 @@ void COrganizationLookupTest::testUpdateProposal_RefusesAnEndedRelationship()
 	const QString endedAt = fixture.Manager().GetTenantRelationship(relationshipId)->GetUpdatedAt();
 
 	QVERIFY(fixture.Manager().ApproveRelationshipProposal(proposalId, partnerId).isEmpty());
+	QVERIFY(fixture.Manager().GetRelationshipProposal(proposalId)->GetStatus() != imtauth::ITenantRelationshipProposalInfo::RPS_APPLIED);
 	imtauth::ITenantRelationshipInfoUniquePtr relationshipPtr = fixture.Manager().GetTenantRelationship(relationshipId);
 	QCOMPARE(relationshipPtr->GetUpdatedAt(), endedAt);
 	QVERIFY(relationshipPtr->GetDescription() != "New terms");

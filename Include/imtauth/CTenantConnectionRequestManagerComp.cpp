@@ -1105,10 +1105,17 @@ QByteArray CTenantConnectionRequestManagerComp::ApproveRelationshipProposal(cons
 		updatedProposal->CopyFrom(*proposalPtr);
 		updatedProposal->SetStatus(ITenantRelationshipProposalInfo::RPS_APPLIED);
 		updatedProposal->SetUpdatedAt(now);
+
+		// A proposal that cannot be applied (e.g. new terms of an ended relationship) is not marked applied
+		const QByteArray relationshipId = ApplyRelationshipProposal(updatedProposal.GetPtr());
+		if (relationshipId.isEmpty()){
+			return QByteArray();
+		}
+
 		if (StoreProposal(proposalId, *updatedProposal)){
 			PublishProposalEvent(TenantEvent::s_proposalStatusChanged, *updatedProposal, proposalPtr->GetStatus());
 		}
-		return ApplyRelationshipProposal(updatedProposal.GetPtr());
+		return relationshipId;
 	}
 
 	// The initiator approves (when counterparty already approved)
@@ -1121,10 +1128,17 @@ QByteArray CTenantConnectionRequestManagerComp::ApproveRelationshipProposal(cons
 		updatedProposal->CopyFrom(*proposalPtr);
 		updatedProposal->SetStatus(ITenantRelationshipProposalInfo::RPS_APPLIED);
 		updatedProposal->SetUpdatedAt(now);
+
+		// A proposal that cannot be applied (e.g. new terms of an ended relationship) is not marked applied
+		const QByteArray relationshipId = ApplyRelationshipProposal(updatedProposal.GetPtr());
+		if (relationshipId.isEmpty()){
+			return QByteArray();
+		}
+
 		if (StoreProposal(proposalId, *updatedProposal)){
 			PublishProposalEvent(TenantEvent::s_proposalStatusChanged, *updatedProposal, proposalPtr->GetStatus());
 		}
-		return ApplyRelationshipProposal(updatedProposal.GetPtr());
+		return relationshipId;
 	}
 
 	// If initiator hasn't approved yet but counterparty is approving
