@@ -360,6 +360,21 @@ DocumentServiceBase {
 		}
 	}
 
+	// A DocumentDataLoaded lost on the way (e.g. a relay subscription refused with an expired token) must not keep
+	// the document loading forever: the opened document list tells the state once.
+	property Timer loadingResyncTimer: Timer {
+		interval: 5000
+		onTriggered: {
+			let documentIds = root.getOpenedDocumentIds()
+			for (let i = 0; i < documentIds.length; ++i){
+				if (root.documentIsLoading(documentIds[i])){
+					root.getOpenedDocumentList()
+					return
+				}
+			}
+		}
+	}
+
 	property GqlSdlRequestSender openDocumentRequest: GqlSdlRequestSender {
 		permissionPath: root.permissionPaths[gqlCommandId] || ""
 		gqlCommandId: ImtbaseCollectionDocumentServiceSdlCommandIds.s_openDocument
@@ -368,7 +383,9 @@ DocumentServiceBase {
 			DocumentInfo {
 				onFinished: {
 					delete root.__openingObjectIds[m_objectId]
-					root.handleDocumentOpened(m_documentId, m_objectId, m_objectTypeId, m_documentName, m_hasNameProvider, m_isDirty)
+					root.handleDocumentOpened(m_documentId, m_objectId, m_objectTypeId, m_documentName, m_hasNameProvider, m_isDirty, m_isLoading === false)
+					if (root.documentIsLoading(m_documentId))
+						root.loadingResyncTimer.restart()
 				}
 			}
 		}

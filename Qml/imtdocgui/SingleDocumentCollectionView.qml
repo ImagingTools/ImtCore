@@ -220,7 +220,10 @@ Item {
 			workspaceView.reopenAfterCloseTypeId = ""
 			workspaceView.reopenAfterCloseObjectId = ""
 			workspaceView.__showSingleDocument(documentId, name)
-			workspaceView.startLoading(documentId)
+			// The data can be loaded already: DocumentDataLoaded came before the document was shown
+			if (workspaceView.documentManager.documentIsLoading(documentId)){
+				workspaceView.startLoading(documentId)
+			}
 		}
 
 		function onDocumentAlreadyOpened(documentId, typeId){

@@ -136,4 +136,60 @@ TestCase {
 		verify(context.service.documentIsLoading("doc"))
 		verify(visibleLoadingCount(context.workspace) > 0)
 	}
+
+	function openAnswer(isLoading){
+		return JSON.stringify({"data": {"OpenDocument": {"documentId": "doc", "documentName": "doc", "hasNameProvider": false,
+			"isDirty": false, "isLoading": isLoading, "objectId": "obj-doc", "objectTypeId": typeId}}})
+	}
+
+	function listRequestCount(){
+		return GqlTestTransport.requestedCommands().filter(function(command){ return command === "GetOpenedDocumentList" }).length
+	}
+
+	function openFromServer(context, isLoading){
+		GqlTestTransport.queueResponse("OpenDocument", openAnswer(isLoading))
+		context.service.openDocument(typeId, "obj-doc")
+		tryVerify(function(){ return context.service.documentIsOpened("doc") }, 5000, "The document is opened")
+		wait(100)
+	}
+
+	// The server already has the data: nothing waits for a DocumentDataLoaded that may never come
+	function test_openAnswerWithLoadedDataEndsLoading(){
+		let context = createWorkspace()
+
+		openFromServer(context, false)
+
+		verify(!context.service.documentIsLoading("doc"))
+		compare(visibleLoadingCount(context.workspace), 0)
+		verify(!context.service.loadingResyncTimer.running, "No resync is planned")
+	}
+
+	// A DocumentDataLoaded lost on the way, e.g. a relay subscription refused with an expired token
+	function test_lostDataLoadedIsResyncedOnce(){
+		let context = createWorkspace()
+		context.service.loadingResyncTimer.interval = 200
+		let listsBefore = listRequestCount()
+
+		openFromServer(context, true)
+		verify(context.service.documentIsLoading("doc"), "The server is still loading")
+
+		GqlTestTransport.queueResponse("GetOpenedDocumentList", JSON.stringify({"data": {"GetOpenedDocumentList": {"documentList": [documentInfo("doc", false)]}}}))
+		tryVerify(function(){ return !context.service.documentIsLoading("doc") }, 3000, "The opened document list ends the loading")
+		compare(visibleLoadingCount(context.workspace), 0)
+
+		wait(500)
+		compare(listRequestCount() - listsBefore, 1, "One request")
+	}
+
+	function test_dataLoadedInTimeSendsNoResync(){
+		let context = createWorkspace()
+		context.service.loadingResyncTimer.interval = 200
+		let listsBefore = listRequestCount()
+
+		openFromServer(context, true)
+		context.service.setDocumentIsLoading("doc", false)
+		wait(500)
+
+		compare(listRequestCount(), listsBefore)
+	}
 }
