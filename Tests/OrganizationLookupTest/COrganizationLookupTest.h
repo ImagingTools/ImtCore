@@ -46,6 +46,7 @@ private slots:
 	void testApproveProposal_IsNotAppliedTwice();
 	void testApproveProposal_AfterTheConnectionWasRemovedCreatesNoRelationship();
 	void testApproveProposal_ConcurrentApprovalsCreateOneRelationship();
+	void testRemoveConnection_RefusedWhenAProposalCannotBeCanceled();
 
 	// Invitations
 	void testRevokeInvitationsSentBy_RevokesOnlyPendingInvitationsOfTheInviter();

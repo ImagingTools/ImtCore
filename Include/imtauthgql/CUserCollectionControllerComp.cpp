@@ -846,11 +846,12 @@ bool CUserCollectionControllerComp::OnBeforeRemoveElements(const QByteArrayList&
 		return false;
 	}
 
-	// The invitations the user sent go before the user, after every check: an invitation is accepted without a look at its inviter
+	// The invitations the user sent go before the user, after every check: an invitation is accepted without a look at its inviter.
+	// All users are read before anything is removed, so a failed read leaves every user as it was.
 	if (m_invitationCollectionCompPtr.IsValid()){
+		QByteArrayList sentIds;
 		for (const QByteArray& userId : elementIds){
 			bool isRead = false;
-			QByteArrayList sentIds;
 			for (const QByteArray& invitationId : imtauth::CollectionSelection::SelectIds(
 						*m_invitationCollectionCompPtr, imtauth::CollectionSelection::ColumnEquals("InvitedByUserId", userId), QByteArrayList(), &isRead)){
 				imtbase::IObjectCollection::DataPtr dataPtr;
@@ -865,10 +866,15 @@ bool CUserCollectionControllerComp::OnBeforeRemoveElements(const QByteArrayList&
 				}
 			}
 
-			if (!isRead || (!sentIds.isEmpty() && !m_invitationCollectionCompPtr->RemoveElements(sentIds))){
-				errorMessage = QStringLiteral("The invitations user '%1' sent could not be removed. Try again.").arg(QString::fromUtf8(userId));
+			if (!isRead){
+				errorMessage = QStringLiteral("The invitations user '%1' sent could not be read. Try again.").arg(QString::fromUtf8(userId));
 				return false;
 			}
+		}
+
+		if (!sentIds.isEmpty() && !m_invitationCollectionCompPtr->RemoveElements(sentIds)){
+			errorMessage = QStringLiteral("The invitations the users sent could not be removed. Try again.");
+			return false;
 		}
 	}
 

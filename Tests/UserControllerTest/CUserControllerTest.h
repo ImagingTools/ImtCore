@@ -47,6 +47,11 @@ private slots:
 	void testGetUserObjectId_UserViewerGetsAnotherAccount();
 	void testGetUserObjectId_OtherUserGetsNothing();
 	void testGetUserObjectId_AnonymousGetsNothing();
+
+	// Removal of users
+	void testRemoveUsers_RemovesTheInvitationsTheySent();
+	void testRemoveUsers_FailedReadRemovesNoInvitation();
+	void testRemoveUsers_FailedInvitationRemovalIsRefused();
 };
 
 

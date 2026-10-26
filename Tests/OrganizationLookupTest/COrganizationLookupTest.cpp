@@ -1938,7 +1938,43 @@ void COrganizationLookupTest::testApproveProposal_AfterTheConnectionWasRemovedCr
 	QVERIFY(fixture.Manager().RemoveConnection(connectionId, tenantId));
 	QVERIFY(fixture.Manager().ApproveRelationshipProposal(proposalId, partnerId).isEmpty());
 	QVERIFY(fixture.Manager().GetTenantRelationshipIds(tenantId).isEmpty());
-	QVERIFY(fixture.Manager().GetRelationshipProposal(proposalId)->GetStatus() != imtauth::ITenantRelationshipProposalInfo::RPS_APPLIED);
+	QCOMPARE(fixture.Manager().GetRelationshipProposal(proposalId)->GetStatus(), imtauth::ITenantRelationshipProposalInfo::RPS_CANCELED);
+
+	// A reconnection reactivates the same connection, as CreateConnection does: the old proposal stays canceled
+	imtauth::CIdentifiableTenantConnection reconnected;
+	reconnected.SetConnectionId(connectionId);
+	reconnected.SetTenantAId(tenantId);
+	reconnected.SetTenantBId(partnerId);
+	reconnected.SetStatus(imtauth::ITenantConnectionInfo::CS_ACTIVE);
+	QVERIFY(fixture.Connections().SetObjectData(connectionId, reconnected));
+	QVERIFY(fixture.Manager().ApproveRelationshipProposal(proposalId, partnerId).isEmpty());
+	QVERIFY(fixture.Manager().GetTenantRelationshipIds(tenantId).isEmpty());
+}
+
+
+void COrganizationLookupTest::testRemoveConnection_RefusedWhenAProposalCannotBeCanceled()
+{
+	CConnectionFixture fixture;
+
+	const QByteArray tenantId = NewId();
+	const QByteArray partnerId = NewId();
+	const QByteArray connectionId = fixture.AddConnection(tenantId, partnerId);
+	const QByteArray proposalId = ProposeRelationship(fixture, connectionId, tenantId, partnerId);
+	QVERIFY(!proposalId.isEmpty());
+
+	// A proposal left open on a removed connection could be approved after a reconnection
+	fixture.Proposals().SetStoreFailing(true);
+	QVERIFY(!fixture.Manager().RemoveConnection(connectionId, tenantId));
+	fixture.Proposals().SetStoreFailing(false);
+	QCOMPARE(fixture.Manager().GetConnection(connectionId)->GetStatus(), imtauth::ITenantConnectionInfo::CS_ACTIVE);
+
+	fixture.Proposals().SetSelectionFailing(true);
+	QVERIFY(!fixture.Manager().RemoveConnection(connectionId, tenantId));
+	fixture.Proposals().SetSelectionFailing(false);
+	QCOMPARE(fixture.Manager().GetConnection(connectionId)->GetStatus(), imtauth::ITenantConnectionInfo::CS_ACTIVE);
+
+	QVERIFY(fixture.Manager().RemoveConnection(connectionId, tenantId));
+	QCOMPARE(fixture.Manager().GetRelationshipProposal(proposalId)->GetStatus(), imtauth::ITenantRelationshipProposalInfo::RPS_CANCELED);
 }
 
 
@@ -1955,7 +1991,13 @@ void COrganizationLookupTest::testApproveProposal_ConcurrentApprovalsCreateOneRe
 		QVERIFY(!proposalId.isEmpty());
 
 		std::atomic<int> appliedCount{0};
-		auto approve = [&fixture, &proposalId, &partnerId, &appliedCount](){
+		std::atomic<int> waitingCount{0};
+		auto approve = [&fixture, &proposalId, &partnerId, &appliedCount, &waitingCount](){
+			// Both threads approve at once
+			++waitingCount;
+			while (waitingCount.load() < 2){
+				std::this_thread::yield();
+			}
 			if (!fixture.Manager().ApproveRelationshipProposal(proposalId, partnerId).isEmpty()){
 				++appliedCount;
 			}

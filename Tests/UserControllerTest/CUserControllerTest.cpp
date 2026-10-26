@@ -18,9 +18,11 @@
 #include <imtauth/CCredentialControllerComp.h>
 #include <imtauth/CUserInfo.h>
 #include <imtauth/CUserInfoComp.h>
+#include <imtauth/CTenantInvitation.h>
 #include <imtauth/CUserVerification.h>
 #include <imtauth/CUserVerificationControllerComp.h>
 #include <imtauth/IUserVerificationCodeSender.h>
+#include <imtauthgql/CUserCollectionControllerComp.h>
 #include <imtauthgql/CUserControllerComp.h>
 #include <imtcrypt/CMD5HashCalculator.h>
 #include <imtgql/CGqlContext.h>
@@ -196,6 +198,138 @@ struct ChangeResult
 	bool success = false;
 	QString message;
 	QStringList violatedRules;
+};
+
+
+/**
+	Invitations selected like the SQL invitation table does, by the inviter; loads and removals can be made to fail.
+*/
+class CTestInvitationCollectionComp:
+			public icomp::CComponentBase,
+			public imtbase::CObjectCollectionBase
+{
+public:
+	typedef icomp::CComponentBase BaseClass;
+
+	I_BEGIN_COMPONENT(CTestInvitationCollectionComp);
+		I_REGISTER_INTERFACE(imtbase::IObjectCollection);
+		I_REGISTER_INTERFACE(imtbase::IObjectCollectionInfo);
+		I_REGISTER_INTERFACE(imtbase::ICollectionInfo);
+	I_END_COMPONENT;
+
+	QSet<QByteArray> m_loadFailingIds;
+	bool m_isRemovalFailing = false;
+
+	// reimplemented (imtbase::ICollectionInfo)
+	virtual Ids GetElementIds(
+				int offset = 0,
+				int count = -1,
+				const iprm::IParamsSet* selectionParamsPtr = nullptr,
+				ilog::IMessageConsumer* logPtr = nullptr) const override
+	{
+		const Ids allIds = imtbase::CObjectCollectionBase::GetElementIds(0, -1, nullptr, logPtr);
+
+		iprm::TParamsPtr<imtbase::IComplexCollectionFilter> complexFilterPtr(selectionParamsPtr, "ComplexFilter", false);
+		if (!complexFilterPtr.IsValid()){
+			return allIds.mid(offset, count);
+		}
+
+		Ids retVal;
+		for (const QByteArray& objectId : allIds){
+			DataPtr dataPtr;
+			if (!imtbase::CObjectCollectionBase::GetObjectData(objectId, dataPtr)){
+				continue;
+			}
+
+			const imtauth::ITenantInvitation* invitationPtr = dynamic_cast<const imtauth::ITenantInvitation*>(dataPtr.GetPtr());
+			bool isMatch = invitationPtr != nullptr;
+			for (const imtbase::IComplexCollectionFilter::FieldFilter& fieldFilter : complexFilterPtr->GetFilterExpression().fieldFilters){
+				isMatch = isMatch && fieldFilter.fieldId == "InvitedByUserId"
+							&& QString::fromUtf8(invitationPtr->GetInvitedByUserId()) == fieldFilter.filterValue.toString();
+			}
+
+			if (isMatch){
+				retVal.append(objectId);
+			}
+		}
+
+		return retVal.mid(offset, count);
+	}
+
+	// reimplemented (imtbase::IObjectCollection)
+	virtual bool GetObjectData(const Id& objectId, DataPtr& dataPtr, const iprm::IParamsSet* dataConfigurationPtr = nullptr) const override
+	{
+		if (m_loadFailingIds.contains(objectId)){
+			return false;
+		}
+
+		return imtbase::CObjectCollectionBase::GetObjectData(objectId, dataPtr, dataConfigurationPtr);
+	}
+
+	virtual bool RemoveElements(const Ids& elementIds, const imtbase::IOperationContext* operationContextPtr = nullptr) override
+	{
+		if (m_isRemovalFailing){
+			return false;
+		}
+
+		return imtbase::CObjectCollectionBase::RemoveElements(elementIds, operationContextPtr);
+	}
+
+protected:
+	// reimplemented (imtbase::CObjectCollectionBase)
+	virtual istd::IChangeableUniquePtr CreateObjectInstance(const QByteArray& /*typeId*/) const override
+	{
+		return new imtauth::CIdentifiableTenantInvitation;
+	}
+};
+
+
+/**
+	The user collection controller with its removal check callable from the test.
+*/
+class CTestUserCollectionControllerComp: public imtauthgql::CUserCollectionControllerComp
+{
+public:
+	typedef imtauthgql::CUserCollectionControllerComp BaseClass;
+
+	I_BEGIN_COMPONENT(CTestUserCollectionControllerComp);
+	I_END_COMPONENT;
+
+	using BaseClass::OnBeforeRemoveElements;
+};
+
+
+class CRemovalFixture
+{
+public:
+	CRemovalFixture()
+	{
+		invitations->InitComponent();
+		controller->SetRef("InvitationCollection", invitations);
+		controller->InitComponent();
+	}
+
+	QByteArray AddInvitation(const QByteArray& invitedByUserId)
+	{
+		const QByteArray invitationId = NewId();
+
+		imtauth::CIdentifiableTenantInvitation invitation;
+		invitation.SetObjectUuid(invitationId);
+		invitation.SetUserId(NewId());
+		invitation.SetTenantId(NewId());
+		invitation.SetInvitedByUserId(invitedByUserId);
+		invitations->InsertNewObject("TenantInvitation", QString(), QString(), &invitation, invitationId);
+
+		return invitationId;
+	}
+
+	bool RemoveUsers(const QByteArrayList& userIds, QString& errorMessage)
+	{
+		return controller->OnBeforeRemoveElements(userIds, imtgql::CGqlRequest(), errorMessage);
+	}
+
+	icomp::TSimSharedComponentPtr<CTestInvitationCollectionComp> invitations;
+	icomp::TSimSharedComponentPtr<CTestUserCollectionControllerComp> controller;
 };
 
 
@@ -744,6 +878,62 @@ void CUserControllerTest::testGetUserObjectId_AnonymousGetsNothing()
 
 	QVERIFY(fixture.GetUserObjectId("alice").isEmpty());
 	QVERIFY(fixture.GetUserObjectId("nobody").isEmpty());
+}
+
+
+void CUserControllerTest::testRemoveUsers_RemovesTheInvitationsTheySent()
+{
+	CRemovalFixture fixture;
+	const QByteArray firstUserId = NewId();
+	const QByteArray secondUserId = NewId();
+	fixture.AddInvitation(firstUserId);
+	fixture.AddInvitation(secondUserId);
+	const QByteArray othersInvitationId = fixture.AddInvitation(NewId());
+
+	// An invitation is accepted without a look at its inviter, so a removed user's invitations go with the user
+	QString errorMessage;
+	QVERIFY(fixture.RemoveUsers({firstUserId, secondUserId}, errorMessage));
+	QCOMPARE(fixture.invitations->GetElementIds(), QByteArrayList({othersInvitationId}));
+}
+
+
+void CUserControllerTest::testRemoveUsers_FailedReadRemovesNoInvitation()
+{
+	CRemovalFixture fixture;
+	const QByteArray firstUserId = NewId();
+	const QByteArray secondUserId = NewId();
+	const QByteArray firstInvitationId = fixture.AddInvitation(firstUserId);
+	const QByteArray secondInvitationId = fixture.AddInvitation(secondUserId);
+
+	// The second user's invitations cannot be read: the removal is refused, and the first user keeps the invitations too
+	fixture.invitations->m_loadFailingIds.insert(secondInvitationId);
+	QString errorMessage;
+	QVERIFY(!fixture.RemoveUsers({firstUserId, secondUserId}, errorMessage));
+	QVERIFY(!errorMessage.isEmpty());
+	fixture.invitations->m_loadFailingIds.clear();
+
+	QByteArrayList invitationIds = fixture.invitations->GetElementIds();
+	std::sort(invitationIds.begin(), invitationIds.end());
+	QByteArrayList expectedIds = {firstInvitationId, secondInvitationId};
+	std::sort(expectedIds.begin(), expectedIds.end());
+	QCOMPARE(invitationIds, expectedIds);
+}
+
+
+void CUserControllerTest::testRemoveUsers_FailedInvitationRemovalIsRefused()
+{
+	CRemovalFixture fixture;
+	const QByteArray userId = NewId();
+	fixture.AddInvitation(userId);
+
+	fixture.invitations->m_isRemovalFailing = true;
+	QString errorMessage;
+	QVERIFY(!fixture.RemoveUsers({userId}, errorMessage));
+	QVERIFY(!errorMessage.isEmpty());
+
+	fixture.invitations->m_isRemovalFailing = false;
+	QVERIFY(fixture.RemoveUsers({userId}, errorMessage));
+	QVERIFY(fixture.invitations->GetElementIds().isEmpty());
 }
 
 
