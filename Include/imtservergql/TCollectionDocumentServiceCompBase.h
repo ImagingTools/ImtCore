@@ -541,8 +541,9 @@ inline UM::CUndoInfo TCollectionDocumentServiceCompBase<Base, ColorCollectionDoc
 	}
 
 	QMutexLocker locker(&m_mutex);
-	if (!m_userDocuments.contains(userId) || !m_userDocuments[userId].contains(*documentId->id)) {
-		idoc::IUndoManager* undoManagerPtr = m_userDocuments[userId][*documentId->id].undoManagerPtr.GetPtr();
+	auto* workingDocumentPtr = this->FindDocument(userId, *documentId->id);
+	if (workingDocumentPtr != nullptr) {
+		idoc::IUndoManager* undoManagerPtr = workingDocumentPtr->undoManagerPtr.GetPtr();
 
 		int count = undoManagerPtr->GetAvailableUndoSteps();
 		retVal.availableUndoSteps = count;
@@ -602,7 +603,8 @@ inline UM::CUndoStatus TCollectionDocumentServiceCompBase<Base, ColorCollectionD
 	QMutexLocker locker(&m_mutex);
 
 	idoc::IUndoManager* undoManagerPtr = nullptr;
-	if (!m_userDocuments.contains(userId) || !m_userDocuments[userId].contains(documentId)) {
+	auto* workingDocumentPtr = this->FindDocument(userId, documentId);
+	if (workingDocumentPtr == nullptr) {
 		errorMessage = "Undo operation failed";
 
 		retVal.status = UM::EUndoStatus::Failed;
@@ -610,7 +612,7 @@ inline UM::CUndoStatus TCollectionDocumentServiceCompBase<Base, ColorCollectionD
 		return retVal;
 	}
 
-	undoManagerPtr = m_userDocuments[userId][documentId].undoManagerPtr.GetPtr();
+	undoManagerPtr = workingDocumentPtr->undoManagerPtr.GetPtr();
 
 	if (undoManagerPtr->GetAvailableUndoSteps() < *undoRedoInput->steps) {
 		errorMessage = "The number of available undo steps is less than requested";
@@ -669,7 +671,8 @@ inline UM::CUndoStatus TCollectionDocumentServiceCompBase<Base, ColorCollectionD
 	QMutexLocker locker(&m_mutex);
 
 	idoc::IUndoManager* undoManagerPtr = nullptr;
-	if (!m_userDocuments.contains(userId) || !m_userDocuments[userId].contains(documentId)) {
+	auto* workingDocumentPtr = this->FindDocument(userId, documentId);
+	if (workingDocumentPtr == nullptr) {
 		errorMessage = "Redo operation failed";
 
 		retVal.status = UM::EUndoStatus::Failed;
@@ -677,7 +680,7 @@ inline UM::CUndoStatus TCollectionDocumentServiceCompBase<Base, ColorCollectionD
 		return retVal;
 	}
 
-	undoManagerPtr = m_userDocuments[userId][documentId].undoManagerPtr.GetPtr();
+	undoManagerPtr = workingDocumentPtr->undoManagerPtr.GetPtr();
 
 	if (undoManagerPtr->GetAvailableRedoSteps() < *undoRedoInput->steps) {
 		errorMessage = "The number of available redo steps is less than requested";
@@ -735,7 +738,8 @@ inline UM::CUndoStatus TCollectionDocumentServiceCompBase<Base, ColorCollectionD
 	QMutexLocker locker(&m_mutex);
 
 	idoc::IUndoManager* undoManagerPtr = nullptr;
-	if (!m_userDocuments.contains(userId) || !m_userDocuments[userId].contains(*documentId->id)) {
+	auto* workingDocumentPtr = this->FindDocument(userId, *documentId->id);
+	if (workingDocumentPtr == nullptr) {
 		errorMessage = "Reset undo operation failed";
 
 		retVal.status = UM::EUndoStatus::Failed;
@@ -743,7 +747,7 @@ inline UM::CUndoStatus TCollectionDocumentServiceCompBase<Base, ColorCollectionD
 		return retVal;
 	}
 
-	undoManagerPtr = m_userDocuments[userId][*documentId->id].undoManagerPtr.GetPtr();
+	undoManagerPtr = workingDocumentPtr->undoManagerPtr.GetPtr();
 	undoManagerPtr->ResetUndo();
 
 	retVal.status = UM::EUndoStatus::Success;

@@ -19,19 +19,6 @@ IDocumentService::OperationStatus CDocumentServiceComp::CloseDocumentInternal(
 			const QByteArray& userId,
 			const QByteArray& documentId)
 {
-	QByteArray objectId;
-
-	{
-		QMutexLocker locker(&m_mutex);
-		OperationStatus validationStatus;
-		if (!ValidateInputParams(userId, documentId, validationStatus)){
-			return validationStatus;
-		}
-
-		const WorkingDocument& workingDocument = m_userDocuments[userId][documentId];
-		objectId = workingDocument.objectId;
-	}
-
 	OperationStatus status = BaseClass::CloseDocumentInternal(userId, documentId);
 
 	if (status != OS_OK){
@@ -40,7 +27,9 @@ IDocumentService::OperationStatus CDocumentServiceComp::CloseDocumentInternal(
 
 	{
 		QMutexLocker locker(&m_mutex);
-		if (IsSingleCopyMode() && !objectId.isEmpty() && m_sharedDocuments.contains(objectId)){
+
+		// The document is still held by other users
+		if (m_documents.contains(documentId)){
 			return status;
 		}
 

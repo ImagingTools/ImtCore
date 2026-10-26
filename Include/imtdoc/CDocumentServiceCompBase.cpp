@@ -21,7 +21,7 @@ QString CDocumentServiceCompBase::GetDefaultDocumentName(const WorkingDocument& 
 		return QString();
 	}
 
-	return nameProviderPtr->GetDefaultDocumentName(document.objectId, *document.objectPtr);
+	return nameProviderPtr->GetDefaultDocumentName(UrlToObjectId(document.url), *document.objectPtr);
 }
 
 
@@ -56,7 +56,7 @@ bool CDocumentServiceCompBase::ValidateDocumentData(
 	}
 
 	QString validationMessage;
-	if (!documentValidator->ValidateDocumentData(document.objectId, *document.objectPtr, validationMessage, operationContextPtr)){
+	if (!documentValidator->ValidateDocumentData(UrlToObjectId(document.url), *document.objectPtr, validationMessage, operationContextPtr)){
 		status = OS_INVALID_DOCUMENT_DATA;
 		if (errorMessage != nullptr){
 			*errorMessage = validationMessage.isEmpty() ? GetInvalidDocumentMessage() : validationMessage;
