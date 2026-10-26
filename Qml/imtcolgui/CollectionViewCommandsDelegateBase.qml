@@ -71,6 +71,17 @@ ViewCommandsDelegateBase {
 	ListModel {
 		id: extensionModel;
 	}
+
+	// After the table has restored its selection for the received rows
+	Timer {
+		id: commandsStateTimer
+		interval: 0
+		onTriggered: {
+			if (collectionViewCommandsDelegate.collectionView && collectionViewCommandsDelegate.collectionView.table){
+				collectionViewCommandsDelegate.updateItemSelection(collectionViewCommandsDelegate.collectionView.table.getSelectedIndexes())
+			}
+		}
+	}
 	
 	Connections {
 		target: collectionViewCommandsDelegate.collectionView ? collectionViewCommandsDelegate.collectionView.documentCollectionFilter : null
@@ -118,6 +129,11 @@ ViewCommandsDelegateBase {
 	Connections {
 		id: controllerConnections;
 		target: null
+
+		// A refresh of the same rows refills the model in place: the table sees no new elements, the row values changed
+		function onElementsReceived(elements){
+			commandsStateTimer.restart()
+		}
 
 		function onImported(objectId){
 			PopupManager.addSuccessMessage(qsTr("The object has been successfully imported"), true);

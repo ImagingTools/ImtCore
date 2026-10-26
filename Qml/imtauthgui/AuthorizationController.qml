@@ -51,6 +51,8 @@ QtObject {
 	signal tenantInvitationRevoked(string tenantId, string invitationId);
 	// Membership notifications were lost while the connection was down; membership views re-read their data.
 	signal membershipNotificationsResumed();
+	// The organizations the user may switch to changed: what shows them reads them again
+	signal organizationsChanged();
 
 	// Properties to store remember me state and credentials
 	property bool rememberMe: false
@@ -221,27 +223,31 @@ QtObject {
 			var tenantName = data.containsKey("tenantName") ? data.getData("tenantName") : ""
 			var role = data.containsKey("role") ? data.getData("role") : ""
 			var tName = tenantName ? tenantName : qsTr("an organization")
+			// The notification names the member it is about; the text is written for whoever receives it
+			var isAboutMe = userId !== "" && userId === root.getUserId()
+			// One message per kind and organization: a repeated notification replaces the shown one
+			var messageId = "membership-" + notificationType + "-" + tenantId
 
 			if (notificationType === "InvitationReceived" || notificationType === 0) {
-				PopupManager.addInfoMessage(qsTr("You have been invited to join \"%1\"").arg(tName), false)
+				PopupManager.addInfoMessage(qsTr("You have been invited to join \"%1\"").arg(tName), true, messageId)
 				root.tenantInvitationReceived(tenantId, tenantName, role)
 			} else if (notificationType === "InvitationAccepted" || notificationType === 1) {
-				PopupManager.addInfoMessage(qsTr("Invitation accepted for \"%1\"").arg(tName), false)
+				PopupManager.addInfoMessage(qsTr("Your invitation to \"%1\" was accepted").arg(tName), true, messageId)
 				root.tenantInvitationAccepted(tenantId, membershipId)
 			} else if (notificationType === "InvitationRejected" || notificationType === 2) {
-				PopupManager.addInfoMessage(qsTr("Invitation rejected for \"%1\"").arg(tName), false)
+				PopupManager.addInfoMessage(qsTr("Your invitation to \"%1\" was declined").arg(tName), true, messageId)
 				root.tenantInvitationRejected(tenantId, membershipId)
 			} else if (notificationType === "OwnershipTransferred" || notificationType === 3) {
-				PopupManager.addInfoMessage(qsTr("Ownership transferred for \"%1\"").arg(tName), false)
+				PopupManager.addInfoMessage(isAboutMe ? qsTr("You are now the owner of \"%1\"").arg(tName) : qsTr("The ownership of \"%1\" was transferred").arg(tName), true, messageId)
 				root.tenantOwnershipTransferred(tenantId)
 			} else if (notificationType === "MembershipRoleChanged" || notificationType === 4) {
-				PopupManager.addInfoMessage(qsTr("Role changed in \"%1\"").arg(tName), false)
+				PopupManager.addInfoMessage(qsTr("Your permissions in \"%1\" were changed").arg(tName), true, messageId)
 				root.tenantMembershipRoleChanged(tenantId, userId, role)
 			} else if (notificationType === "MembershipRemoved" || notificationType === 5) {
-				PopupManager.addInfoMessage(qsTr("Removed from \"%1\"").arg(tName), false)
+				PopupManager.addInfoMessage(isAboutMe ? qsTr("You are no longer a member of \"%1\"").arg(tName) : qsTr("A member is no longer in \"%1\"").arg(tName), true, messageId)
 				root.tenantMembershipRemoved(tenantId, userId)
 			} else if (notificationType === "InvitationRevoked" || notificationType === 6) {
-				PopupManager.addInfoMessage(qsTr("Invitation to join \"%1\" was revoked").arg(tName), false)
+				PopupManager.addInfoMessage(qsTr("Your invitation to join \"%1\" was withdrawn").arg(tName), true, messageId)
 				root.tenantInvitationRevoked(tenantId, membershipId)
 			}
 		}
@@ -522,6 +528,20 @@ QtObject {
 		root.currentTenantName = storage.value("tenantName", "");
 	}
 	
+	function notifyOrganizationsChanged(){
+		root.organizationsChanged();
+	}
+
+	// The name of the current organization as the server reports it now, e.g. after a rename
+	function updateCurrentTenantName(tenantName){
+		if (root.currentTenantId === "" || root.currentTenantName === tenantName){
+			return;
+		}
+
+		root.currentTenantName = tenantName;
+		storage.setValue("tenantName", tenantName);
+	}
+
 	function saveDataToStorage(){
 		storage.setValue("accessToken", userTokenProvider.accessToken);
 		storage.setValue("refreshToken", userTokenProvider.refreshToken);

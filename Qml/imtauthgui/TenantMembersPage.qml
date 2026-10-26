@@ -34,6 +34,8 @@ SimpleCollectionPage {
 	readonly property bool __canCreateMember: stateManager
 		? stateManager.hasAnyPermission(createPermissionIds)
 		: false
+	createAllowed: stateManager ? stateManager.scopeHolds("/Administration/Users/Edit/Add") : false
+	createUnavailableText: qsTr("New users can be created once the permissions of the organization include Administration > Users > Add. Existing users can be invited.")
 	readonly property bool __canInviteMember: stateManager
 		? stateManager.canInviteOrganizationMember
 		: false
@@ -69,6 +71,23 @@ SimpleCollectionPage {
 				if (result === Enums.yes && membersPage.apiClient) {
 					var tid = membersPage.model ? membersPage.model.m_id : ""
 					membersPage.apiClient.transferOwnership(tid, memberActionMenu.targetUserId)
+				}
+			}
+		)
+	}
+
+	// Declared on the page: a callback declared inside the popup component loses the page on the web
+	function confirmExcludeMember(userId, userName) {
+		if (!membersPage.stateManager || !membersPage.stateManager.canExcludeOrganizationMember)
+			return
+
+		ModalDialogManager.showConfirmationDialog(
+			qsTr("Exclude Member"),
+			qsTr("Are you sure you want to exclude \"%1\" from this organization?").arg(userName),
+			function(result) {
+				if (result === Enums.yes && membersPage.apiClient) {
+					var tid = membersPage.model ? membersPage.model.m_id : ""
+					membersPage.apiClient.removeMember(tid, userId)
 				}
 			}
 		)
@@ -378,7 +397,19 @@ SimpleCollectionPage {
 		function onPendingInvitationsChanged() { membersPage.__rebuildCombinedModel() }
 	}
 
+	// Shown again, the page reads the members anew: an invitation by another manager reaches nobody else
+	property bool __shownOnce: false
+
+	onVisibleChanged: {
+		if (!membersPage.visible)
+			return
+		if (membersPage.__shownOnce && membersPage.stateManager)
+			membersPage.stateManager.requestMembersRefresh()
+		membersPage.__shownOnce = true
+	}
+
 	Component.onCompleted: {
+		membersPage.__shownOnce = membersPage.visible
 		__rebuildCombinedModel()
 		if (membersPage.apiClient && membersPage.model) {
 			var tid = membersPage.model.m_id
@@ -508,7 +539,7 @@ SimpleCollectionPage {
 				text: "+ " + qsTr("Create User")
 				font.pixelSize: Style.fontSizeM
 				font.bold: true
-				visible: membersPage.__canCreateMember
+				visible: membersPage.__canCreateMember && membersPage.createAllowed
 				color: membersPage.__canCreateMember ? Style.linkColor : Style.inactiveTextColor
 
 				MouseArea {
@@ -517,7 +548,7 @@ SimpleCollectionPage {
 					cursorShape: membersPage.__canCreateMember ? Qt.PointingHandCursor : Qt.ArrowCursor
 					enabled: membersPage.__canCreateMember
 					onClicked: {
-						if (membersPage.__canCreateMember)
+						if (membersPage.__canCreateMember && membersPage.createAllowed)
 							membersPage.openCreate()
 					}
 				}
@@ -779,19 +810,7 @@ SimpleCollectionPage {
 					}
 				}
 				else if (commandId === "Exclude") {
-					if (!membersPage.stateManager || !membersPage.stateManager.canExcludeOrganizationMember)
-						return
-
-					ModalDialogManager.showConfirmationDialog(
-						qsTr("Exclude Member"),
-						qsTr("Are you sure you want to exclude \"%1\" from this organization?").arg(memberActionMenu.targetUserName),
-						function(result) {
-							if (result === Enums.yes && membersPage.apiClient) {
-								var tenantIdExclude = membersPage.model ? membersPage.model.m_id : ""
-								membersPage.apiClient.removeMember(tenantIdExclude, memberActionMenu.targetUserId)
-							}
-						}
-					)
+					membersPage.confirmExcludeMember(memberActionMenu.targetUserId, memberActionMenu.targetUserName)
 				}
 				else if (commandId === "Transfer") {
 					if (membersPage.stateManager && membersPage.stateManager.isOwner)
@@ -849,16 +868,7 @@ SimpleCollectionPage {
 			visible: memberActionMenu.showExclude
 			height: visible ? implicitHeight : 0
 			onTriggered: {
-				ModalDialogManager.showConfirmationDialog(
-					qsTr("Exclude Member"),
-					qsTr("Are you sure you want to exclude \"%1\" from this organization?").arg(memberActionMenu.targetUserName),
-					function(result) {
-						if (result === Enums.yes && membersPage.apiClient) {
-							var tenantId = membersPage.model ? membersPage.model.m_id : ""
-							membersPage.apiClient.removeMember(tenantId, memberActionMenu.targetUserId)
-						}
-					}
-				)
+				membersPage.confirmExcludeMember(memberActionMenu.targetUserId, memberActionMenu.targetUserName)
 			}
 		}
 
@@ -917,17 +927,43 @@ SimpleCollectionPage {
 			showSelectedGroup: true
 			filterPlaceholder: qsTr("Type or choose a user to invite")
 
+			// Users ticked in the popup; the invitations go only on the Invite button
+			property var newSelection: []
+
+			footerComponent: Component {
+				Item {
+					height: inviteButton.height
+
+					// The popup's keyboard reaches the Invite button after the list
+					property Item keyboardItem: inviteButton
+
+					Button {
+						id: inviteButton
+						anchors.right: parent.right
+						text: qsTr("Invite (%1)").arg(invitePopup.newSelection.length)
+						variant: "primary"
+						enabled: invitePopup.newSelection.length > 0
+						onClicked: {
+							if (membersPage.stateManager)
+								membersPage.stateManager.inviteSelectedUsers(invitePopup.newSelection)
+							invitePopup.closePopup()
+						}
+					}
+				}
+			}
+
 			onSelectionChanged: {
 				var arr = []
 				for (var i = 0; i < selectedIds.length; i++) {
 					var selId = selectedIds[i]
+					if (preselectedIds.indexOf(selId) >= 0)
+						continue
 					var selName = dataProvider ? dataProvider.getSelectedItemText(selId) : ""
 					if (!selName)
 						selName = selId
 					arr.push({id: selId, name: selName})
 				}
-				if (membersPage.stateManager)
-					membersPage.stateManager.inviteSelectedUsers(arr)
+				invitePopup.newSelection = arr
 			}
 
 			Component.onDestruction: {

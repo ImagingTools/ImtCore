@@ -129,22 +129,75 @@ DocumentViewBase {
 		}
 
 		Component.onCompleted: {
+			container.__builtPagesKey = container.__pagesKey()
 			multiPageView.updatePages()
 		}
 	}
 
-	// Re-build pages whenever anything controlling page visibility changes.
+	// The page list follows what the pages depend on, including the organization of the session for the shares
+	function __pagesKey() {
+		var sessionTenant = container.tenantData && String(container.tenantData.m_id) === AuthorizationController.getTenantId()
+		return stateManager_.pagesConfigKey + (sessionTenant ? "S" : "")
+	}
+
+	property string __builtPagesKey: ""
+
+	// A representation fills the model field by field and every field flips some of the flags: the pages are rebuilt
+	// once, after the model is filled, and only when the list really changes (a rebuild recreates the shown page).
+	Timer {
+		id: pagesUpdateTimer
+		interval: 0
+		onTriggered: {
+			var key = container.__pagesKey()
+			if (key === container.__builtPagesKey)
+				return
+			container.__builtPagesKey = key
+			multiPageView.updatePages()
+		}
+	}
+
 	Connections {
 		target: stateManager_
 		function onIsNewTenantChanged() {
-			multiPageView.updatePages()
+			pagesUpdateTimer.restart()
 			if (!stateManager_.isNewTenant) {
 				stateManager_.loadMembersFromModel()
 				stateManager_.loadInvitationsFromModel()
 			}
 		}
 		function onPagesConfigKeyChanged() {
-			if (!stateManager_.isNewTenant) multiPageView.updatePages()
+			pagesUpdateTimer.restart()
+		}
+	}
+
+	Connections {
+		target: container.tenantData
+		function onM_idChanged() {
+			pagesUpdateTimer.restart()
+		}
+	}
+
+	// The reasons to read the organization again come in bursts: an own change and its notification,
+	// a notification relayed by the API client and by AuthorizationController. One reading serves them all.
+	function __refreshRepresentation() {
+		if (!stateManager_.isNewTenant && container.representationController)
+			representationRefreshTimer.restart()
+	}
+
+	Timer {
+		id: representationRefreshTimer
+		interval: 100
+		onTriggered: {
+			if (!stateManager_.isNewTenant && container.representationController)
+				container.representationController.updateRepresentationFromDocument()
+		}
+	}
+
+	// Members invited by another manager are not notified: the members are read again when their page is shown again
+	Connections {
+		target: stateManager_
+		function onMembersRefreshRequested() {
+			container.__refreshRepresentation()
 		}
 	}
 
@@ -152,8 +205,7 @@ DocumentViewBase {
 	Connections {
 		target: container.apiClient ? container.apiClient.userDocumentManager : null
 		function onDocumentSaved(documentId) {
-			if (!stateManager_.isNewTenant && container.representationController)
-				container.representationController.updateRepresentationFromDocument()
+			container.__refreshRepresentation()
 		}
 	}
 
@@ -161,13 +213,11 @@ DocumentViewBase {
 		target: container.apiClient
 		function onInvitationCreated() {
 			PopupManager.addSuccessMessage(qsTr("Invitation created successfully"), true)
-			if (container.representationController)
-				container.representationController.updateRepresentationFromDocument()
+			container.__refreshRepresentation()
 		}
 		function onOwnershipTransferred() {
 			PopupManager.addSuccessMessage(qsTr("Ownership transferred successfully"), true)
-			if (container.representationController)
-				container.representationController.updateRepresentationFromDocument()
+			container.__refreshRepresentation()
 		}
 		function onRoleCreated() {
 			PopupManager.addSuccessMessage(qsTr("Role created successfully"), true)
@@ -180,8 +230,7 @@ DocumentViewBase {
 			// Refresh the tenant document so the newly added user (auto-joined
 			// as Member via AddMembership in the api client) appears in the
 			// TenantMembersPage list.
-			if (!stateManager_.isNewTenant && container.representationController)
-				container.representationController.updateRepresentationFromDocument()
+			container.__refreshRepresentation()
 		}
 		function onMemberRemoved(userId) {
 			if (!container.tenantData || stateManager_.isNewTenant)
@@ -200,36 +249,29 @@ DocumentViewBase {
 			if (!container.tenantData || stateManager_.isNewTenant)
 				return
 			if (tenantId === container.tenantData.m_id) {
-				PopupManager.addSuccessMessage(qsTr("Invitation accepted"), true)
-				if (container.representationController)
-					container.representationController.updateRepresentationFromDocument()
+				container.__refreshRepresentation()
 			}
 		}
 		function onSubscriptionInvitationRejected(tenantId, membershipId) {
 			if (!container.tenantData || stateManager_.isNewTenant)
 				return
 			if (tenantId === container.tenantData.m_id) {
-				PopupManager.addInfoMessage(qsTr("Invitation rejected"), true)
 				stateManager_.removePendingInvitation(membershipId)
-				if (container.representationController)
-					container.representationController.updateRepresentationFromDocument()
+				container.__refreshRepresentation()
 			}
 		}
 		function onSubscriptionOwnershipTransferred(tenantId) {
 			if (!container.tenantData || stateManager_.isNewTenant)
 				return
 			if (tenantId === container.tenantData.m_id) {
-				PopupManager.addInfoMessage(qsTr("Ownership transferred"), true)
-				if (container.representationController)
-					container.representationController.updateRepresentationFromDocument()
+				container.__refreshRepresentation()
 			}
 		}
 		function onSubscriptionMembershipRoleChanged(tenantId, userId, role) {
 			if (!container.tenantData || stateManager_.isNewTenant)
 				return
 			if (tenantId === container.tenantData.m_id) {
-				if (container.representationController)
-					container.representationController.updateRepresentationFromDocument()
+				container.__refreshRepresentation()
 			}
 		}
 		function onSubscriptionMembershipRemoved(tenantId, userId) {
@@ -246,8 +288,7 @@ DocumentViewBase {
 						container.documentManager.closeDocument(container.documentId)
 					return
 				}
-				if (container.representationController)
-					container.representationController.updateRepresentationFromDocument()
+				container.__refreshRepresentation()
 			}
 		}
 	}
@@ -263,8 +304,7 @@ DocumentViewBase {
 			if (!container.tenantData || stateManager_.isNewTenant)
 				return
 			if (tenantId === container.tenantData.m_id) {
-				if (container.representationController)
-					container.representationController.updateRepresentationFromDocument()
+				container.__refreshRepresentation()
 			}
 		}
 		function onTenantInvitationRejected(tenantId, membershipId) {
@@ -273,16 +313,14 @@ DocumentViewBase {
 			if (tenantId === container.tenantData.m_id) {
 				if (membershipId)
 					stateManager_.removePendingInvitation(membershipId)
-				if (container.representationController)
-					container.representationController.updateRepresentationFromDocument()
+				container.__refreshRepresentation()
 			}
 		}
 		function onTenantOwnershipTransferred(tenantId) {
 			if (!container.tenantData || stateManager_.isNewTenant)
 				return
 			if (tenantId === container.tenantData.m_id) {
-				if (container.representationController)
-					container.representationController.updateRepresentationFromDocument()
+				container.__refreshRepresentation()
 			}
 		}
 	}

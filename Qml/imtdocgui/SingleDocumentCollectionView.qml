@@ -172,6 +172,13 @@ Item {
 			}
 		}
 
+		// A refused change is undone by reading the document again: the reason is told here
+		function onUpdateDocumentFailed(documentId, message){
+			if (message !== ""){
+				PopupManager.addErrorMessage(message, true)
+			}
+		}
+
 		function onDocumentManagerChanged(typeOperation, objectId, documentId, documentName){
 			if (typeOperation === EDocumentOperationEnum.s_newDocumentCreated ||
 					typeOperation === EDocumentOperationEnum.s_documentOpened){
@@ -210,7 +217,10 @@ Item {
 			workspaceView.reopenAfterCloseTypeId = ""
 			workspaceView.reopenAfterCloseObjectId = ""
 			workspaceView.__showSingleDocument(documentId, name)
-			workspaceView.startLoading(documentId)
+			// The data can be loaded already: DocumentDataLoaded came before the document was shown
+			if (workspaceView.documentManager.documentIsLoading(documentId)){
+				workspaceView.startLoading(documentId)
+			}
 		}
 
 		function onDocumentAlreadyOpened(documentId, typeId){

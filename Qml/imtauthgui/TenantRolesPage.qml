@@ -26,6 +26,8 @@ SimpleCollectionPage {
 	columnNames: [qsTr("Name"), qsTr("Description")]
 	managePermissionIds: ["/OrganizationManagement/Roles/Edit/Change", "/OrganizationManagement/Roles/Edit/Remove", "/OrganizationManagement/Roles/Edit/Add"]
 	createPermissionIds: ["/OrganizationManagement/Roles/Edit/Add"]
+	createAllowed: stateManager ? stateManager.scopeHolds("/Administration/Roles/Edit/Add") : false
+	createUnavailableText: qsTr("New roles can be created once the permissions of the organization include Administration > Roles > Add.")
 	editPermissionIds: ["/OrganizationManagement/Roles/Edit/Change"]
 	deletePermissionIds: ["/OrganizationManagement/Roles/Edit/Remove"]
 	property string __lastPermissionsTenantId: ""

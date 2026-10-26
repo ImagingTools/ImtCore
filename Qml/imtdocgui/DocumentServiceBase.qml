@@ -619,7 +619,8 @@ QtObject {
 	// Call these from custom override implementations or onFinished handlers
 	// to apply the standard DocumentService state transitions.
 
-	function handleDocumentOpened(documentId, objectId, objectTypeId, documentName, hasNameProvider, isDirty){
+	// isDataLoaded === true: the server already has the data, no DocumentDataLoaded notification is awaited.
+	function handleDocumentOpened(documentId, objectId, objectTypeId, documentName, hasNameProvider, isDirty, isDataLoaded){
 		setAutoNamedTypeId(objectTypeId, hasNameProvider)
 		setDocumentName(documentId, documentName)
 
@@ -631,8 +632,13 @@ QtObject {
 			setDocumentObjectId(documentId, objectId)
 			if (isDirty)
 				setDocumentIsDirty(documentId, true)
+			if (isDataLoaded === true)
+				setDocumentIsLoading(documentId, false)
 			return
 		}
+
+		if (isDataLoaded === true)
+			__internal.pendingDataLoaded[documentId] = true
 
 		__internal.createDocumentData(documentId, objectTypeId, false)
 		setDocumentObjectId(documentId, objectId)

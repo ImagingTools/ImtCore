@@ -67,6 +67,30 @@ Item {
 		function onTenantsEnabledChanged(){
 			userPanel.__loadOrganizations();
 		}
+
+		function onOrganizationsChanged(){
+			userPanel.__loadOrganizations();
+		}
+
+		function onTenantMembershipRemoved(tenantId, userId){
+			userPanel.__loadOrganizations();
+		}
+
+		function onTenantOwnershipTransferred(tenantId){
+			userPanel.__loadOrganizations();
+		}
+	}
+
+	// The reasons to read the organizations come in bursts (a login selects an organization too): one request serves them all
+	Timer {
+		id: organizationsReloadTimer
+		interval: 100
+		onTriggered: {
+			// The session can end while the read waits
+			if (!AuthorizationController.tenantsEnabled || !AuthorizationController.userTokenProvider.userId)
+				return
+			organizationsRequest.send(organizationsInput)
+		}
 	}
 	
 	function setUserPanelEnabled(enabled){
@@ -108,7 +132,7 @@ Item {
 	function __loadOrganizations() {
 		if (!AuthorizationController.tenantsEnabled || !AuthorizationController.userTokenProvider.userId)
 			return
-		organizationsRequest.send(organizationsInput)
+		organizationsReloadTimer.restart()
 	}
 
 	GqlSdlRequestSender {
@@ -127,6 +151,9 @@ Item {
 							var org = orgs.get(i).item
 							if (org && org.m_isActive) {
 								var displayName = org.m_name || org.m_id || ""
+								if (String(org.m_id) === AuthorizationController.currentTenantId && org.m_name) {
+									AuthorizationController.updateCurrentTenantName(String(org.m_name))
+								}
 								var isDelegated = org.m_isDelegated || false
 								if (isDelegated) {
 									displayName = displayName + " " + qsTr("(delegated)")
@@ -476,6 +503,7 @@ Item {
 								width: parent.width;
 
 								text: AuthorizationController.userTokenProvider.login;
+								textFormat: Text.PlainText;
 								color: Style.titleColor;
 								font.family: Style.fontFamilyBold;
 								font.pixelSize: Style.fontSizeM;
@@ -486,6 +514,7 @@ Item {
 								width: parent.width;
 
 								text: AuthorizationController.currentTenantName ? AuthorizationController.currentTenantName : qsTr("No organization");
+								textFormat: Text.PlainText;
 								color: Style.inactiveTextColor;
 								font.family: Style.fontFamily;
 								font.pixelSize: Style.fontSizeS;

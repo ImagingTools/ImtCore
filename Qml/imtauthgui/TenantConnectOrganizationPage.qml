@@ -62,6 +62,31 @@ ViewBase {
 		connectPage.updateGui()
 	}
 
+	// Notifications come in bursts and while the page is hidden: one reading when it is shown serves them all
+	property bool __updatePending: false
+
+	function __updateWhenVisible() {
+		if (connectPage.visible)
+			notificationUpdateTimer.restart()
+		else
+			connectPage.__updatePending = true
+	}
+
+	onVisibleChanged: {
+		if (connectPage.visible && connectPage.__updatePending) {
+			connectPage.__updatePending = false
+			notificationUpdateTimer.restart()
+		}
+	}
+
+	Timer {
+		id: notificationUpdateTimer
+		interval: 100
+		onTriggered: {
+			connectPage.updateGui()
+		}
+	}
+
 	Connections {
 		target: connectPage.apiClient
 
@@ -117,7 +142,7 @@ ViewBase {
 			connectPage.processingRequestId = ""
 			connectPage.processingRequestAction = ""
 			PopupManager.addSuccessMessage(qsTr("Connection request approved"), true)
-			connectPage.updateGui()
+			notificationUpdateTimer.restart()
 		}
 
 		function onConnectionRequestRejected() {
@@ -125,7 +150,7 @@ ViewBase {
 			connectPage.processingRequestId = ""
 			connectPage.processingRequestAction = ""
 			PopupManager.addSuccessMessage(qsTr("Connection request rejected"), true)
-			connectPage.updateGui()
+			notificationUpdateTimer.restart()
 		}
 
 		function onConnectionRequestCanceled() {
@@ -133,16 +158,24 @@ ViewBase {
 			connectPage.processingRequestId = ""
 			connectPage.processingRequestAction = ""
 			PopupManager.addSuccessMessage(qsTr("Connection request canceled"), true)
-			connectPage.updateGui()
+			notificationUpdateTimer.restart()
 		}
 
 		function onConnectionsReceived() {
 			connectPage.refreshConnectionsList()
 		}
 
+		function onSubscriptionConnectionCodesChanged(notification) {
+			connectPage.__updateWhenVisible()
+		}
+
+		function onSubscriptionsResumed() {
+			connectPage.__updateWhenVisible()
+		}
+
 		function onConnectionRemoved(connectionId) {
-			PopupManager.addSuccessMessage(qsTr("Connection removed"), true)
-			connectPage.updateGui()
+			PopupManager.addSuccessMessage(qsTr("Connection removed"), true, "connection-removed-" + (connectPage.tenantData ? connectPage.tenantData.m_id : ""))
+			notificationUpdateTimer.restart()
 		}
 	}
 
