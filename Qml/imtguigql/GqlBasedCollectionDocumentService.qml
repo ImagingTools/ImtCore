@@ -346,6 +346,7 @@ DocumentServiceBase {
 			DocumentList {
 				onFinished: {
 					root.openedDocumentListReceived(m_documentList)
+					root.__continueLoadingResync()
 				}
 			}
 		}
@@ -357,20 +358,40 @@ DocumentServiceBase {
 		// The workspace covers itself while the list loads; without this a failed request left it covered.
 		function onError(message, type){
 			root.openedDocumentListReceiveFailed(message)
+			root.__continueLoadingResync()
 		}
 	}
 
 	// A DocumentDataLoaded lost on the way (e.g. a relay subscription refused with an expired token) must not keep
-	// the document loading forever: the opened document list tells the state once.
+	// the document loading forever: the opened document list tells the state, asked again while the server still loads.
+	property int __loadingResyncAttemptsLeft: 0
+
+	function __startLoadingResync(){
+		root.__loadingResyncAttemptsLeft = 6
+		root.loadingResyncTimer.restart()
+	}
+
+	function __continueLoadingResync(){
+		if (root.__loadingResyncAttemptsLeft > 0 && root.__hasLoadingDocument())
+			root.loadingResyncTimer.restart()
+	}
+
+	function __hasLoadingDocument(){
+		let documentIds = root.getOpenedDocumentIds()
+		for (let i = 0; i < documentIds.length; ++i){
+			if (root.documentIsLoading(documentIds[i]))
+				return true
+		}
+
+		return false
+	}
+
 	property Timer loadingResyncTimer: Timer {
 		interval: 5000
 		onTriggered: {
-			let documentIds = root.getOpenedDocumentIds()
-			for (let i = 0; i < documentIds.length; ++i){
-				if (root.documentIsLoading(documentIds[i])){
-					root.getOpenedDocumentList()
-					return
-				}
+			if (root.__loadingResyncAttemptsLeft > 0 && root.__hasLoadingDocument()){
+				root.__loadingResyncAttemptsLeft = root.__loadingResyncAttemptsLeft - 1
+				root.getOpenedDocumentList()
 			}
 		}
 	}
@@ -385,7 +406,7 @@ DocumentServiceBase {
 					delete root.__openingObjectIds[m_objectId]
 					root.handleDocumentOpened(m_documentId, m_objectId, m_objectTypeId, m_documentName, m_hasNameProvider, m_isDirty, m_isLoading === false)
 					if (root.documentIsLoading(m_documentId))
-						root.loadingResyncTimer.restart()
+						root.__startLoadingResync()
 				}
 			}
 		}

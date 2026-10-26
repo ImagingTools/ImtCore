@@ -192,4 +192,40 @@ TestCase {
 
 		compare(listRequestCount(), listsBefore)
 	}
+
+	function listAnswer(isLoading){
+		return JSON.stringify({"data": {"GetOpenedDocumentList": {"documentList": [documentInfo("doc", isLoading)]}}})
+	}
+
+	// The list may still say "loading": it is asked again until the server has the data
+	function test_serverStillLoadingIsAskedAgain(){
+		let context = createWorkspace()
+		context.service.loadingResyncTimer.interval = 100
+		let listsBefore = listRequestCount()
+
+		openFromServer(context, true)
+		GqlTestTransport.queueResponse("GetOpenedDocumentList", listAnswer(true))
+		GqlTestTransport.queueResponse("GetOpenedDocumentList", listAnswer(true))
+		GqlTestTransport.queueResponse("GetOpenedDocumentList", listAnswer(false))
+
+		tryVerify(function(){ return !context.service.documentIsLoading("doc") }, 5000, "Loaded at the third answer")
+		wait(500)
+		compare(listRequestCount() - listsBefore, 3)
+	}
+
+	// A server that keeps loading is not asked forever
+	function test_resyncAsksAFewTimesOnly(){
+		let context = createWorkspace()
+		context.service.loadingResyncTimer.interval = 50
+		let listsBefore = listRequestCount()
+
+		openFromServer(context, true)
+		for (let i = 0; i < 10; ++i){
+			GqlTestTransport.queueResponse("GetOpenedDocumentList", listAnswer(true))
+		}
+
+		wait(1500)
+		compare(listRequestCount() - listsBefore, 6)
+		verify(context.service.documentIsLoading("doc"))
+	}
 }
