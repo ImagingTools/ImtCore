@@ -6,6 +6,7 @@
 #include <atomic>
 
 // Qt includes
+#include <QtCore/QMutex>
 #include <QtCore/QSet>
 
 // ACF includes
@@ -111,6 +112,8 @@ private:
 	// The verification controller reads from its own thread
 	mutable std::atomic<int> m_loadCount{0};
 	mutable std::atomic<int> m_unfilteredSelectionCount{0};
+	// The concurrency tests select from several threads
+	mutable QMutex m_recordMutex;
 	mutable QSet<QByteArray> m_unknownFieldIds;
 	mutable QStringList m_requestedFilterValues;
 	bool m_isSelectionFailing = false;

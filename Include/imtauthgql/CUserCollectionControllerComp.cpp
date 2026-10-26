@@ -841,12 +841,44 @@ bool CUserCollectionControllerComp::OnBeforeRemoveElements(const QByteArrayList&
 			}
 		}
 	}
-	return BaseClass::OnBeforeRemoveElements(elementIds, gqlRequest, errorMessage);
+
+	if (!BaseClass::OnBeforeRemoveElements(elementIds, gqlRequest, errorMessage)){
+		return false;
+	}
+
+	// The invitations the user sent go before the user, after every check: an invitation is accepted without a look at its inviter
+	if (m_invitationCollectionCompPtr.IsValid()){
+		for (const QByteArray& userId : elementIds){
+			bool isRead = false;
+			QByteArrayList sentIds;
+			for (const QByteArray& invitationId : imtauth::CollectionSelection::SelectIds(
+						*m_invitationCollectionCompPtr, imtauth::CollectionSelection::ColumnEquals("InvitedByUserId", userId), QByteArrayList(), &isRead)){
+				imtbase::IObjectCollection::DataPtr dataPtr;
+				const imtauth::ITenantInvitation* invitationPtr = m_invitationCollectionCompPtr->GetObjectData(invitationId, dataPtr)
+							? dynamic_cast<const imtauth::ITenantInvitation*>(dataPtr.GetPtr())
+							: nullptr;
+				if (invitationPtr == nullptr){
+					isRead = false;
+				}
+				else if (invitationPtr->GetInvitedByUserId() == userId){
+					sentIds.append(invitationId);
+				}
+			}
+
+			if (!isRead || (!sentIds.isEmpty() && !m_invitationCollectionCompPtr->RemoveElements(sentIds))){
+				errorMessage = QStringLiteral("The invitations user '%1' sent could not be removed. Try again.").arg(QString::fromUtf8(userId));
+				return false;
+			}
+		}
+	}
+
+	return true;
 }
 
 void CUserCollectionControllerComp::OnAfterRemoveElements(const QByteArrayList& elementIds, const ::imtgql::CGqlRequest& gqlRequest) const
 {
-	// What is left of a removed user grants nothing (a token is accepted only for an existing user), but it must not go unnoticed
+	// What is left of a removed user grants nothing: a session or token is accepted only for an existing user, and the invitations
+	// the user sent were removed before; still a leftover must not go unnoticed
 	const auto reportLeftover = [this](const QByteArray& userId, const QString& leftover){
 		SendErrorMessage(0, QStringLiteral("The %1 of the removed user '%2' could not be removed").arg(leftover, QString::fromUtf8(userId)), "CUserCollectionControllerComp");
 	};

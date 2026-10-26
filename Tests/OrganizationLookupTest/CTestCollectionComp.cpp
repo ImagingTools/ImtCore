@@ -62,12 +62,16 @@ int CTestCollectionComp::GetUnfilteredSelectionCount() const
 
 QSet<QByteArray> CTestCollectionComp::GetUnknownFieldIds() const
 {
+	QMutexLocker locker(&m_recordMutex);
+
 	return m_unknownFieldIds;
 }
 
 
 QStringList CTestCollectionComp::GetRequestedFilterValues() const
 {
+	QMutexLocker locker(&m_recordMutex);
+
 	return m_requestedFilterValues;
 }
 
@@ -156,6 +160,7 @@ imtbase::ICollectionInfo::Ids CTestCollectionComp::GetElementIds(
 		while (!expressions.isEmpty()){
 			const imtbase::IComplexCollectionFilter::FilterExpression expression = expressions.takeFirst();
 			for (const imtbase::IComplexCollectionFilter::FieldFilter& fieldFilter : expression.fieldFilters){
+				QMutexLocker locker(&m_recordMutex);
 				m_requestedFilterValues << fieldFilter.filterValue.toString();
 			}
 			expressions << expression.filterExpressions;
@@ -264,6 +269,7 @@ bool CTestCollectionComp::Matches(const istd::IChangeable& object, const imtbase
 		QString value;
 		const bool isKnown = GetFieldValue(object, fieldFilter.fieldId, value);
 		if (!isKnown){
+			QMutexLocker locker(&m_recordMutex);
 			m_unknownFieldIds.insert(fieldFilter.fieldId);
 		}
 

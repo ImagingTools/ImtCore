@@ -44,6 +44,8 @@ private slots:
 	void testGetShareOwnerTenantIds_UnreadShareTrustsNoPartner();
 	void testRemoveConnection_KeepsTheConnectionWhenARelationshipStays();
 	void testApproveProposal_IsNotAppliedTwice();
+	void testApproveProposal_AfterTheConnectionWasRemovedCreatesNoRelationship();
+	void testApproveProposal_ConcurrentApprovalsCreateOneRelationship();
 
 	// Invitations
 	void testRevokeInvitationsSentBy_RevokesOnlyPendingInvitationsOfTheInviter();

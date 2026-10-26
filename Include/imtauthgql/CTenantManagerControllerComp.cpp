@@ -648,6 +648,7 @@ sdl::V1_0::imtauth::CUpdateTenantPayload CTenantManagerControllerComp::OnUpdateT
 	QSet<QByteArray> currentUserIds;
 	QMap<QByteArray, QByteArray> userIdToMembershipId; // userId -> membershipId
 	QSet<QByteArray> newUserIds;
+	QSet<QByteArray> keptUserIds;
 	if (syncsMembers){
 		for (const QByteArray& msId : m_membershipManagerCompPtr->GetMembershipsByTenant(tenantId)){
 			imtauth::ITenantMembershipUniquePtr msPtr = m_membershipManagerCompPtr->GetMembership(msId);
@@ -663,11 +664,16 @@ sdl::V1_0::imtauth::CUpdateTenantPayload CTenantManagerControllerComp::OnUpdateT
 			}
 		}
 
-		// A removed member's pending invitations go first, as on the other removal paths; a failure leaves the organization untouched
+		// The owner and the creator are never removed, as in the organization editor
+		keptUserIds = newUserIds;
+		keptUserIds << ownerId << currentTenantPtr->GetCreatorId();
+
+		// A removed member's pending invitations go first, as on the other removal paths. A failure stops before the organization
+		// and its members change; the invitations already revoked stay revoked, which takes away no member's access.
 		const imtgql::IGqlContext* removalContextPtr = gqlRequest.GetRequestContext();
 		const QByteArray revokedByUserId = removalContextPtr != nullptr ? removalContextPtr->GetUserId() : QByteArray();
 		for (const QByteArray& uid : currentUserIds){
-			if (!newUserIds.contains(uid) && m_invitationManagerCompPtr.IsValid() && !m_invitationManagerCompPtr->RevokeInvitationsSentBy(tenantId, uid, revokedByUserId)){
+			if (!keptUserIds.contains(uid) && m_invitationManagerCompPtr.IsValid() && !m_invitationManagerCompPtr->RevokeInvitationsSentBy(tenantId, uid, revokedByUserId)){
 				response.errorMessage = QStringLiteral("The invitations a removed member sent could not be revoked. Try again.");
 				response.success = false;
 				return response;
@@ -684,8 +690,10 @@ sdl::V1_0::imtauth::CUpdateTenantPayload CTenantManagerControllerComp::OnUpdateT
 	// Sync members with TenantMemberships
 	if (success && syncsMembers){
 		for (const QByteArray& uid : currentUserIds){
-			if (!newUserIds.contains(uid)){
-				m_membershipManagerCompPtr->RemoveMembership(userIdToMembershipId[uid]);
+			if (!keptUserIds.contains(uid) && !m_membershipManagerCompPtr->RemoveMembership(userIdToMembershipId[uid])){
+				response.errorMessage = QStringLiteral("A member could not be removed. Try again.");
+				response.success = false;
+				return response;
 			}
 		}
 
@@ -2154,6 +2162,13 @@ sdl::V1_0::imtauth::CApproveRelationshipProposalPayload CTenantManagerController
 	response.success = beforePtr.IsValid() && afterPtr.IsValid() && beforePtr->GetStatus() != afterPtr->GetStatus();
 	if (!*response.success){
 		response.errorMessage = QStringLiteral("The proposal is not waiting for approval by this organization");
+		return response;
+	}
+
+	// An applied proposal has a relationship behind it; without one the approval did not take effect
+	if (afterPtr->GetStatus() == imtauth::ITenantRelationshipProposalInfo::RPS_APPLIED && relationshipId.isEmpty()){
+		response.success = false;
+		response.errorMessage = QStringLiteral("The proposal could not be applied");
 		return response;
 	}
 	if (!relationshipId.isEmpty()){
