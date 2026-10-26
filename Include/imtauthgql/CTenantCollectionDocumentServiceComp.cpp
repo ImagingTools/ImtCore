@@ -586,7 +586,8 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceCom
 				}
 			}
 
-			// The invitations of the excluded members go first: after a membership is gone a failed revocation could not be repeated
+			// The invitations of the excluded members go first: after a membership is gone a failed revocation could not be repeated.
+			// A failure stops before the document and the members change; the invitations already revoked stay revoked.
 			for (const QByteArray& excludedUserId : excludedUserIds){
 				if (m_invitationManagerCompPtr.IsValid() && !m_invitationManagerCompPtr->RevokeInvitationsSentBy(tenantId, excludedUserId, contextUserId)){
 					errorMessage = QStringLiteral("The invitations an excluded member sent could not be revoked. Try again.");
@@ -595,7 +596,10 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceCom
 			}
 
 			for (const QByteArray& excludedUserId : excludedUserIds){
-				m_membershipManagerCompPtr->RemoveMembership(userIdToMembershipId.value(excludedUserId));
+				if (!m_membershipManagerCompPtr->RemoveMembership(userIdToMembershipId.value(excludedUserId))){
+					errorMessage = QStringLiteral("A member could not be excluded. Try again.");
+					return response;
+				}
 			}
 
 			for (const QByteArray& addUserId : newUserIds){
@@ -612,7 +616,10 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceCom
 				return response;
 			}
 
-			m_membershipManagerCompPtr->RemoveMembership(userIdToMembershipId.value(contextUserId));
+			if (!m_membershipManagerCompPtr->RemoveMembership(userIdToMembershipId.value(contextUserId))){
+				errorMessage = QStringLiteral("You could not leave the organization. Try again.");
+				return response;
+			}
 		}
 	}
 

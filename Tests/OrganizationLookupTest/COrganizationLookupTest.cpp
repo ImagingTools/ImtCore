@@ -1863,7 +1863,14 @@ void COrganizationLookupTest::testRemoveConnection_KeepsTheConnectionWhenARelati
 	fixture.Relationships().SetStoreFailing(false);
 	QCOMPARE(fixture.Manager().GetConnection(connectionId)->GetStatus(), imtauth::ITenantConnectionInfo::CS_ACTIVE);
 
+	// The connection cannot be stored after its relationships were archived: it stays active, and a retry completes the removal
+	fixture.Connections().SetStoreFailing(true);
+	QVERIFY(!fixture.Manager().RemoveConnection(connectionId, tenantId));
+	fixture.Connections().SetStoreFailing(false);
+	QCOMPARE(fixture.Manager().GetConnection(connectionId)->GetStatus(), imtauth::ITenantConnectionInfo::CS_ACTIVE);
+
 	QVERIFY(fixture.Manager().RemoveConnection(connectionId, tenantId));
+	QCOMPARE(fixture.Manager().GetConnection(connectionId)->GetStatus(), imtauth::ITenantConnectionInfo::CS_REMOVED);
 	QCOMPARE(fixture.Manager().GetTenantRelationship(relationshipId)->GetStatus(), imtauth::ITenantRelationshipInfo::TRS_ARCHIVED);
 }
 
@@ -1893,6 +1900,74 @@ void COrganizationLookupTest::testApproveProposal_IsNotAppliedTwice()
 	QVERIFY(!fixture.Manager().ApproveRelationshipProposal(proposalId, partnerId).isEmpty());
 	QVERIFY(fixture.Manager().ApproveRelationshipProposal(proposalId, partnerId).isEmpty());
 	QCOMPARE(fixture.Manager().GetTenantRelationshipIds(tenantId).size(), 1);
+}
+
+
+// Fourth review round
+
+namespace
+{
+
+
+QByteArray ProposeRelationship(CConnectionFixture& fixture, const QByteArray& connectionId, const QByteArray& initiatorId, const QByteArray& counterpartyId)
+{
+	imtauth::CTenantRelationshipProposal proposal;
+	proposal.SetConnectionId(connectionId);
+	proposal.SetInitiatorTenantId(initiatorId);
+	proposal.SetCounterpartyTenantId(counterpartyId);
+	proposal.SetProposalType(imtauth::ITenantRelationshipProposalInfo::RPT_CREATE);
+
+	return fixture.Manager().CreateRelationshipProposal(proposal);
+}
+
+
+} // anonymous namespace
+
+
+void COrganizationLookupTest::testApproveProposal_AfterTheConnectionWasRemovedCreatesNoRelationship()
+{
+	CConnectionFixture fixture;
+
+	const QByteArray tenantId = NewId();
+	const QByteArray partnerId = NewId();
+	const QByteArray connectionId = fixture.AddConnection(tenantId, partnerId);
+	const QByteArray proposalId = ProposeRelationship(fixture, connectionId, tenantId, partnerId);
+	QVERIFY(!proposalId.isEmpty());
+
+	// A relationship on a removed connection would make its partner trusted for shares again
+	QVERIFY(fixture.Manager().RemoveConnection(connectionId, tenantId));
+	QVERIFY(fixture.Manager().ApproveRelationshipProposal(proposalId, partnerId).isEmpty());
+	QVERIFY(fixture.Manager().GetTenantRelationshipIds(tenantId).isEmpty());
+	QVERIFY(fixture.Manager().GetRelationshipProposal(proposalId)->GetStatus() != imtauth::ITenantRelationshipProposalInfo::RPS_APPLIED);
+}
+
+
+void COrganizationLookupTest::testApproveProposal_ConcurrentApprovalsCreateOneRelationship()
+{
+	CConnectionFixture fixture;
+
+	const QByteArray tenantId = NewId();
+	const QByteArray partnerId = NewId();
+	const QByteArray connectionId = fixture.AddConnection(tenantId, partnerId);
+
+	for (int round = 0; round < 20; ++round){
+		const QByteArray proposalId = ProposeRelationship(fixture, connectionId, tenantId, partnerId);
+		QVERIFY(!proposalId.isEmpty());
+
+		std::atomic<int> appliedCount{0};
+		auto approve = [&fixture, &proposalId, &partnerId, &appliedCount](){
+			if (!fixture.Manager().ApproveRelationshipProposal(proposalId, partnerId).isEmpty()){
+				++appliedCount;
+			}
+		};
+		std::thread first(approve);
+		std::thread second(approve);
+		first.join();
+		second.join();
+
+		QCOMPARE(appliedCount.load(), 1);
+		QCOMPARE(fixture.Manager().GetTenantRelationshipIds(tenantId).size(), round + 1);
+	}
 }
 
 

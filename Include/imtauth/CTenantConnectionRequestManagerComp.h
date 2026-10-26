@@ -2,6 +2,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QMutex>
+
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
 
@@ -96,6 +99,9 @@ private:
 	QByteArray ApplyRelationshipProposal(const ITenantRelationshipProposalInfo* proposalPtr);
 	/// False when a relationship of the connection could not be read or archived.
 	bool ArchiveRelationshipsForConnection(const QByteArray& connectionId);
+
+	// Approvals and connection removals one at a time: two approvals of a proposal, or an approval during the removal of its connection, would each create a relationship
+	QMutex m_relationshipChangeMutex;
 	bool ArchiveRelationship(const QByteArray& relationshipId, const ITenantRelationshipInfo& relationship, bool isRemovalPublished);
 
 	// DB helper methods

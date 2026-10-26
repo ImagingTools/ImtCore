@@ -361,6 +361,14 @@ QByteArray CTenantConnectionRequestManagerComp::ApplyRelationshipProposal(const 
 		return QByteArray();
 	}
 
+	// A relationship lives only on an active connection: a proposal made before its connection was removed applies no more
+	if (proposalPtr->GetProposalType() != ITenantRelationshipProposalInfo::RPT_DELETE){
+		ITenantConnectionInfoUniquePtr connectionPtr = GetConnection(proposalPtr->GetConnectionId());
+		if (!connectionPtr.IsValid() || connectionPtr->GetStatus() != ITenantConnectionInfo::CS_ACTIVE){
+			return QByteArray();
+		}
+	}
+
 	if (proposalPtr->GetProposalType() == ITenantRelationshipProposalInfo::RPT_CREATE){
 		istd::TUniqueInterfacePtr<ITenantRelationshipInfo> relPtr = m_relationshipFactoryCompPtr.CreateInstance();
 		if (!relPtr.IsValid()){
@@ -973,6 +981,8 @@ ITenantConnectionInfoUniquePtr CTenantConnectionRequestManagerComp::GetConnectio
 
 bool CTenantConnectionRequestManagerComp::RemoveConnection(const QByteArray& connectionId, const QByteArray& tenantId)
 {
+	QMutexLocker locker(&m_relationshipChangeMutex);
+
 	if (!m_connectionCollectionCompPtr.IsValid()){
 		return false;
 	}
@@ -1087,6 +1097,8 @@ QByteArray CTenantConnectionRequestManagerComp::CreateRelationshipProposal(
 
 QByteArray CTenantConnectionRequestManagerComp::ApproveRelationshipProposal(const QByteArray& proposalId, const QByteArray& tenantId)
 {
+	QMutexLocker locker(&m_relationshipChangeMutex);
+
 	if (!m_proposalCollectionCompPtr.IsValid() || !m_proposalFactoryCompPtr.IsValid()){
 		return QByteArray();
 	}
@@ -1122,7 +1134,9 @@ QByteArray CTenantConnectionRequestManagerComp::ApproveRelationshipProposal(cons
 
 		const QByteArray relationshipId = ApplyRelationshipProposal(updatedProposal.GetPtr());
 		if (relationshipId.isEmpty()){
-			StoreProposal(proposalId, *proposalPtr);
+			if (!StoreProposal(proposalId, *proposalPtr)){
+				SendErrorMessage(0, QStringLiteral("Relationship proposal '%1' was not applied, and its status could not be restored").arg(QString::fromUtf8(proposalId)), "CTenantConnectionRequestManagerComp");
+			}
 
 			return QByteArray();
 		}
@@ -1151,7 +1165,9 @@ QByteArray CTenantConnectionRequestManagerComp::ApproveRelationshipProposal(cons
 
 		const QByteArray relationshipId = ApplyRelationshipProposal(updatedProposal.GetPtr());
 		if (relationshipId.isEmpty()){
-			StoreProposal(proposalId, *proposalPtr);
+			if (!StoreProposal(proposalId, *proposalPtr)){
+				SendErrorMessage(0, QStringLiteral("Relationship proposal '%1' was not applied, and its status could not be restored").arg(QString::fromUtf8(proposalId)), "CTenantConnectionRequestManagerComp");
+			}
 
 			return QByteArray();
 		}
@@ -1431,6 +1447,8 @@ QDateTime CTenantConnectionRequestManagerComp::GetRelatedSince(const QByteArray&
 
 bool CTenantConnectionRequestManagerComp::RemoveTenantRelationship(const QByteArray& tenantId, const QByteArray& relationshipId)
 {
+	QMutexLocker locker(&m_relationshipChangeMutex);
+
 	if (!m_relationshipCollectionCompPtr.IsValid() || !m_relationshipFactoryCompPtr.IsValid()){
 		return false;
 	}
