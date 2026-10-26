@@ -228,4 +228,50 @@ TestCase {
 		compare(listRequestCount() - listsBefore, 6)
 		verify(context.service.documentIsLoading("doc"))
 	}
+
+	// The messages the user is told
+	Component {
+		id: popupContainerComp
+
+		PopupContainer {
+			property var messages: []
+
+			function addMessage(type, text, autoClose, id){
+				messages.push([type, text])
+			}
+		}
+	}
+
+	function capturePopups(){
+		let container = createTemporaryObject(popupContainerComp, testCase)
+		let previous = PopupManager.popupContainer
+		PopupManager.registerPopupContainer(container)
+
+		return {"container": container, "previous": previous}
+	}
+
+	// A refused change is undone by reading the document again; without a message the edit just vanishes
+	function test_refusedChangeIsTold(){
+		let context = createWorkspace()
+		let popups = capturePopups()
+		context.service.handleDocumentOpened("doc", "obj-doc", typeId, "doc", false, false)
+
+		context.service.updateDocumentFailed("doc", "Refused by the server")
+
+		let errors = popups.container.messages.filter(function(message){ return message[0] === "error" })
+		PopupManager.registerPopupContainer(popups.previous)
+		compare(errors.length, 1)
+		compare(errors[0][1], "Refused by the server")
+	}
+	// Editors without a collection host (e.g. role, user editors) use the service directly
+	function test_serviceAppliesTheListWithoutAView(){
+		let service = createTemporaryObject(serviceComp, testCase)
+		service.registerDocumentViewData(typeId, viewTypeId, viewComp, controllerComp)
+		service.handleDocumentOpened("doc", "obj-doc", typeId, "doc", false, false)
+		verify(service.documentIsLoading("doc"))
+
+		receiveDocumentList({"service": service}, [documentInfo("doc", false)])
+
+		verify(!service.documentIsLoading("doc"))
+	}
 }

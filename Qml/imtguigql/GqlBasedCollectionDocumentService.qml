@@ -345,6 +345,7 @@ DocumentServiceBase {
 		sdlObjectComp: Component {
 			DocumentList {
 				onFinished: {
+					root.__applyLoadingStates(m_documentList)
 					root.openedDocumentListReceived(m_documentList)
 					root.__continueLoadingResync()
 				}
@@ -365,6 +366,17 @@ DocumentServiceBase {
 	// A DocumentDataLoaded lost on the way (e.g. a relay subscription refused with an expired token) must not keep
 	// the document loading forever: the opened document list tells the state, asked again while the server still loads.
 	property int __loadingResyncAttemptsLeft: 0
+
+	// Every editor of the service learns that a missed DocumentDataLoaded happened, not only the collection hosts
+	function __applyLoadingStates(documentInfoList){
+		for (let i = 0; i < documentInfoList.count; ++i){
+			let documentInfo = documentInfoList.get(i).item
+			let documentId = String(documentInfo.m_documentId)
+			if (root.documentIsOpened(documentId) && documentInfo.m_isLoading === false){
+				root.setDocumentIsLoading(documentId, false)
+			}
+		}
+	}
 
 	function __startLoadingResync(){
 		root.__loadingResyncAttemptsLeft = 6

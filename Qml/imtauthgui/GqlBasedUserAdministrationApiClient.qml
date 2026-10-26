@@ -633,8 +633,8 @@ QtObject {
 
 			property MailRegExpValidator mailRegExp: MailRegExpValidator {}
 
+			// The collection hosts tell the reason of updateDocumentFailed
 			function __failValidation(message){
-				PopupManager.addErrorMessage(message, true)
 				updateDocumentFailed(documentId, message)
 			}
 

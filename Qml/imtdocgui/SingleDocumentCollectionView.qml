@@ -136,16 +136,6 @@ Item {
 		}
 
 		function onOpenedDocumentListReceived(documentInfoList){
-			for (let i = 0; i < documentInfoList.count; ++i){
-				let documentInfo = documentInfoList.get(i).item
-				let documentId = String(documentInfo.m_documentId)
-
-				// Resync: a missed DocumentDataLoaded must not keep the open document loading
-				if (workspaceView.documentManager.documentIsOpened(documentId) && documentInfo.m_isLoading === false){
-					workspaceView.documentManager.setDocumentIsLoading(documentId, false)
-				}
-			}
-
 			globalLoading.stop()
 		}
 
@@ -179,6 +169,13 @@ Item {
 			PopupManager.addErrorMessage(message, true)
 			if (!workspaceView.documentManager.documentIsLoading(documentId)){
 				workspaceView.stopLoading(documentId)
+			}
+		}
+
+		// A refused change is undone by reading the document again: the reason is told here
+		function onUpdateDocumentFailed(documentId, message){
+			if (message !== ""){
+				PopupManager.addErrorMessage(message, true)
 			}
 		}
 
