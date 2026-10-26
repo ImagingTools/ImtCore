@@ -62,7 +62,9 @@ RelatedTenantInfos CTenantRelationshipProviderComp::GetRelatedTenants(const QByt
 		relatedTenantInfo.tenantId = relatedTenantId;
 		relatedTenantInfo.tenantName = GetTenantName(relatedTenantId);
 		relatedTenantInfo.isEffective = isEffective;
-		relatedTenantInfo.relatedSince = m_connectionRequestManagerCompPtr->GetRelatedSince(tenantId, relatedTenantId);
+		bool isHistoryRead = false;
+		relatedTenantInfo.relatedSince = m_connectionRequestManagerCompPtr->GetRelatedSince(tenantId, relatedTenantId, &isHistoryRead);
+		isRead = isRead && isHistoryRead;
 
 		retVal.append(relatedTenantInfo);
 	}

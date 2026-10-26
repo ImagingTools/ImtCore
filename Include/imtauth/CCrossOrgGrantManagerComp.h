@@ -40,7 +40,7 @@ public:
 	virtual bool RevokeGrant(const QByteArray& grantId) override;
 	virtual bool RemoveGrants(const QByteArrayList& grantIds) override;
 	virtual CrossOrgGrantInfo GetGrant(const QByteArray& grantId) const override;
-	virtual CrossOrgGrants GetGrantsBySourceTenant(const QByteArray& sourceTenantId) const override;
+	virtual CrossOrgGrants GetGrantsBySourceTenant(const QByteArray& sourceTenantId, bool* isReadPtr = nullptr) const override;
 	virtual CrossOrgGrants GetGrantsByTargetTenant(const QByteArray& targetTenantId) const override;
 	virtual bool HasAccess(
 				const QByteArray& sourceTenantId,
@@ -48,7 +48,7 @@ public:
 				const QByteArray& roleId) const override;
 
 private:
-	CrossOrgGrants CollectGrants(const QByteArray& columnId, const QByteArray& value, const std::function<bool(const CrossOrgGrantInfo&)>& predicate) const;
+	CrossOrgGrants CollectGrants(const QByteArray& columnId, const QByteArray& value, const std::function<bool(const CrossOrgGrantInfo&)>& predicate, bool* isReadPtr = nullptr) const;
 	bool IsGrantEffective(const CrossOrgGrantInfo& grantInfo) const;
 
 private:

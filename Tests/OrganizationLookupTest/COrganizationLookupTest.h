@@ -32,6 +32,11 @@ private slots:
 	void testChildTenantIds_ReturnsDirectChildrenOnly();
 	void testFindTenantIdsByName_IgnoresCaseAndSpacesNotParts();
 	void testFindTenantIdsByName_SemicolonAndBackslashStayOutOfTheSelection();
+	void testChildTenantIds_ReportsAFailedRead();
+	void testGetGrantsBySourceTenant_ReportsAFailedRead();
+	void testGetRelatedSince_ReportsAFailedHistoryRead();
+	void testRemoveVerificationData_UnreadableCodeIsRemovedAnyway();
+	void testConsumeVerification_OnlyOneConcurrentCallerSucceeds();
 
 	// Invitations
 	void testRevokeInvitationsSentBy_RevokesOnlyPendingInvitationsOfTheInviter();

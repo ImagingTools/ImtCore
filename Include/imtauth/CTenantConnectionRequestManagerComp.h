@@ -81,7 +81,7 @@ public:
 	virtual QByteArrayList GetTenantRelationshipIds(const QByteArray& tenantId, bool* isReadPtr = nullptr) const override;
 	virtual ITenantRelationshipInfoUniquePtr GetTenantRelationship(const QByteArray& relationshipId) const override;
 	virtual bool RemoveTenantRelationship(const QByteArray& tenantId, const QByteArray& relationshipId) override;
-	virtual QDateTime GetRelatedSince(const QByteArray& tenantId, const QByteArray& otherTenantId) const override;
+	virtual QDateTime GetRelatedSince(const QByteArray& tenantId, const QByteArray& otherTenantId, bool* isReadPtr = nullptr) const override;
 
 private:
 	QString GenerateConnectionCode() const;

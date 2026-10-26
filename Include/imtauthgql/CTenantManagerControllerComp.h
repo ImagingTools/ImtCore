@@ -240,7 +240,8 @@ private:
 				const QByteArray& grantId,
 				QString& errorMessage) const;
 	// Revoke the active grants between two organizations, in both directions.
-	void RevokeGrantsBetween(const QByteArray& tenantAId, const QByteArray& tenantBId) const;
+	/// False when a grant could not be read or revoked, so some may still give access.
+	bool RevokeGrantsBetween(const QByteArray& tenantAId, const QByteArray& tenantBId) const;
 
 	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
 	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);

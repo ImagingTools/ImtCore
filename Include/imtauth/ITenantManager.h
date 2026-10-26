@@ -24,8 +24,9 @@ public:
 	virtual QByteArrayList GetOwnedOrCreatedTenantIds(const QByteArray& userId) const = 0;
 	/**
 		Ids of the direct sub-organizations of an organization.
+		\param isReadPtr [optional] False when the storage could not be read completely, so the list may miss some.
 	*/
-	virtual QByteArrayList GetChildTenantIds(const QByteArray& tenantId) const = 0;
+	virtual QByteArrayList GetChildTenantIds(const QByteArray& tenantId, bool* isReadPtr = nullptr) const = 0;
 	/**
 		Ids of the organizations with the name, ignoring the case and the surrounding spaces.
 	*/

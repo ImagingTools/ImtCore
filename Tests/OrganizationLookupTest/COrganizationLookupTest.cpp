@@ -2,6 +2,10 @@
 #include "COrganizationLookupTest.h"
 
 
+// STL includes
+#include <atomic>
+#include <thread>
+
 // Qt includes
 #include <QtCore/QDateTime>
 #include <QtCore/QUuid>
@@ -1586,6 +1590,120 @@ void COrganizationLookupTest::testGenerateVerificationData_FailsWhileTheOldCodeS
 	fixture.Collection().SetRemovalFailing(false);
 	const QByteArray newCode = fixture.Generate(userId);
 	QVERIFY(fixture.Controller().VerifyUser(userId, newCode));
+}
+
+
+// Second review round
+
+void COrganizationLookupTest::testChildTenantIds_ReportsAFailedRead()
+{
+	CTenantFixture fixture;
+
+	const QByteArray userId = NewId();
+	const QByteArray parentId = fixture.Add(userId, userId);
+	const QByteArray childId = fixture.Add(userId, userId, parentId);
+
+	bool isRead = false;
+	QCOMPARE(fixture.Manager().GetChildTenantIds(parentId, &isRead), QByteArrayList({childId}));
+	QVERIFY(isRead);
+
+	// A sub-organization that cannot be read must not let the parent go
+	fixture.Collection().SetLoadFailingIds({childId});
+	QVERIFY(fixture.Manager().GetChildTenantIds(parentId, &isRead).isEmpty());
+	QVERIFY(!isRead);
+
+	fixture.Collection().SetLoadFailingIds({});
+	fixture.Collection().SetSelectionFailing(true);
+	QVERIFY(fixture.Manager().GetChildTenantIds(parentId, &isRead).isEmpty());
+	QVERIFY(!isRead);
+}
+
+
+void COrganizationLookupTest::testGetGrantsBySourceTenant_ReportsAFailedRead()
+{
+	CGrantFixture fixture;
+
+	const QByteArray tenantId = NewId();
+	const QByteArray grantId = fixture.Manager().CreateGrant(tenantId, NewId(), {"Viewer"});
+
+	bool isRead = false;
+	QCOMPARE(fixture.Manager().GetGrantsBySourceTenant(tenantId, &isRead).size(), 1);
+	QVERIFY(isRead);
+
+	// A grant that cannot be read would stay active when its connection is removed
+	fixture.Collection().SetLoadFailingIds({grantId});
+	QVERIFY(fixture.Manager().GetGrantsBySourceTenant(tenantId, &isRead).isEmpty());
+	QVERIFY(!isRead);
+
+	fixture.Collection().SetLoadFailingIds({});
+	fixture.Collection().SetSelectionFailing(true);
+	QVERIFY(fixture.Manager().GetGrantsBySourceTenant(tenantId, &isRead).isEmpty());
+	QVERIFY(!isRead);
+}
+
+
+void COrganizationLookupTest::testGetRelatedSince_ReportsAFailedHistoryRead()
+{
+	CConnectionFixture fixture;
+
+	const QDateTime t0 = QDateTime::currentDateTimeUtc().addDays(-100).toUTC();
+	const QByteArray tenantId = NewId();
+	const QByteArray partnerId = NewId();
+	const QByteArray connectionId = fixture.AddConnection(tenantId, partnerId);
+	const QByteArray archivedId = fixture.AddRelationship(connectionId, tenantId, partnerId, imtauth::ITenantRelationshipInfo::TRS_ARCHIVED, t0, t0.addDays(20));
+	fixture.AddRelationship(connectionId, partnerId, tenantId, imtauth::ITenantRelationshipInfo::TRS_ACTIVE, t0.addDays(10));
+
+	bool isRead = false;
+	QCOMPARE(fixture.Manager().GetRelatedSince(tenantId, partnerId, &isRead), t0);
+	QVERIFY(isRead);
+
+	// Without the archived relationship the start moves forward and the shares of the overlap look earlier
+	fixture.Relationships().SetLoadFailingIds({archivedId});
+	fixture.Manager().GetRelatedSince(tenantId, partnerId, &isRead);
+	QVERIFY(!isRead);
+}
+
+
+void COrganizationLookupTest::testRemoveVerificationData_UnreadableCodeIsRemovedAnyway()
+{
+	CVerificationFixture fixture;
+
+	const QByteArray userId = NewId();
+	const QByteArray code = fixture.Generate(userId);
+	QVERIFY(fixture.Controller().VerifyUser(userId, code));
+
+	// A failed read is no proof that the used code is gone
+	fixture.Collection().SetLoadFailingIds({userId});
+	QVERIFY(fixture.Controller().RemoveVerificationData(userId));
+
+	fixture.Collection().SetLoadFailingIds({});
+	QVERIFY(fixture.Controller().GetVerificationData(userId) == nullptr);
+	QVERIFY(!fixture.Controller().VerifyUser(userId, code));
+}
+
+
+void COrganizationLookupTest::testConsumeVerification_OnlyOneConcurrentCallerSucceeds()
+{
+	CVerificationFixture fixture;
+
+	for (int round = 0; round < 20; ++round){
+		const QByteArray userId = NewId();
+		const QByteArray code = fixture.Generate(userId);
+
+		std::atomic<int> successCount{0};
+		auto consume = [&fixture, &userId, &code, &successCount](){
+			if (fixture.Controller().ConsumeVerification(userId, code)){
+				++successCount;
+			}
+		};
+		std::thread first(consume);
+		std::thread second(consume);
+		first.join();
+		second.join();
+
+		QCOMPARE(successCount.load(), 1);
+		QVERIFY(!fixture.Controller().VerifyUser(userId, code));
+	}
 }
 
 

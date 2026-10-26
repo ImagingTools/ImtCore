@@ -37,6 +37,7 @@ public:
 	virtual bool GenerateVerificationData(const QByteArray& userId, imtauth::IUserVerification* userVerificationPtr = nullptr) override;
 	virtual bool VerifyUser(const QByteArray& userId, const QByteArray& verificationCode) const override;
 	virtual bool RemoveVerificationData(const QByteArray& userId) override;
+	virtual bool ConsumeVerification(const QByteArray& userId, const QByteArray& verificationCode) override;
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
@@ -68,6 +69,7 @@ private:
 	CheckExpiredVerificationDataThread m_checkExpiredVerificationDataThread;
 
 	mutable QMutex m_failedAttemptsMutex;
+	QMutex m_consumeMutex;
 	mutable QHash<QByteArray, int> m_failedAttempts;
 };
 

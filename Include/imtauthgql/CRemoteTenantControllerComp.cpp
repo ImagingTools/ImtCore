@@ -145,8 +145,12 @@ QByteArrayList CRemoteTenantControllerComp::GetOwnedOrCreatedTenantIds(const QBy
 }
 
 
-QByteArrayList CRemoteTenantControllerComp::GetChildTenantIds(const QByteArray& /*tenantId*/) const
+QByteArrayList CRemoteTenantControllerComp::GetChildTenantIds(const QByteArray& /*tenantId*/, bool* isReadPtr) const
 {
+	if (isReadPtr != nullptr){
+		*isReadPtr = false;
+	}
+
 	SendErrorMessage(0, QStringLiteral("The sub-organizations are not available from a product server"), "CRemoteTenantControllerComp");
 
 	return QByteArrayList();
