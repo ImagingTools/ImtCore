@@ -190,6 +190,23 @@ Item {
 			container.commandsDelegate.commandHandle("Edit");
 		}
 	}
+
+	// Replacing the model resets ListView offsets; restore them after the new model lays out.
+	Timer {
+		id: restoreTableViewportTimer
+		interval: 0
+		repeat: false
+
+		property real contentXToRestore: 0
+		property real contentYToRestore: 0
+
+		onTriggered: {
+			let maxContentX = Math.max(container.table.originX, container.table.contentWidth - container.table.elementsListWidth + container.table.originX)
+			let maxContentY = Math.max(container.table.originY, container.table.contentHeight - container.table.elementsList.height + container.table.originY)
+			container.table.contentX = Math.min(contentXToRestore, maxContentX)
+			container.table.contentY = Math.min(contentYToRestore, maxContentY)
+		}
+	}
 	
 	function getSelectedIds(){
 		return container.getSelectedIds()
@@ -365,11 +382,20 @@ Item {
 			}
 
 			function onElementsReceived(elements){
-				let sameModel = container.table.elements === elements;
+				let previousElements = container.table.elements;
+				let sameModel = previousElements === elements;
+				let preserveViewport = !sameModel && previousElements && elements;
+				if (preserveViewport && !restoreTableViewportTimer.running){
+					restoreTableViewportTimer.contentXToRestore = container.table.contentX
+					restoreTableViewportTimer.contentYToRestore = container.table.contentY
+				}
 				container.table.elements = elements;
 				if (sameModel){
 					container.table.restoreSelection();
 					container.table.refreshVisibleRows();
+				}
+				else if (preserveViewport){
+					restoreTableViewportTimer.restart()
 				}
 			}
 
