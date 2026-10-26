@@ -179,21 +179,21 @@ Item {
 	}
 
 	function publishElements(items){
-		if (!root.canUpdateElementsInPlace(items)){
+		//if (!root.canUpdateElementsInPlace(items)){
 			root.elementsModel = items;
 			root.elementsSource = null;
 			root.elementsReceived(root.elementsModel);
 			return;
-		}
+		//}
 
-		root.elementsModel.setUpdateEnabled(false);
+		/*root.elementsModel.setUpdateEnabled(false);
 		let count = items.getItemsCount();
 		for (let i = 0; i < count; i++){
 			root.copyElementRow(i, items);
 		}
 		root.elementsModel.setUpdateEnabled(true);
 		root.elementsSource = items;
-		root.elementsReceived(root.elementsModel);
+		root.elementsReceived(root.elementsModel);*/
 	}
 
 	function canUpdateElementsInPlace(items){
