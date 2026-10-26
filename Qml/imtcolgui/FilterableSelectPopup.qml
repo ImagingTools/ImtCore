@@ -1002,13 +1002,26 @@ PopupView {
 					}
 				}
 
+				// Only a real pointer move ends the block: the block appears under a still pointer, and the list moves under it
+				// when the selected group changes, so the position is compared in the window
 				MouseArea {
+					id: hoverBlockMouseArea
+
+					property point enteredPosition: Qt.point(-1, -1)
+
 					anchors.fill: parent
 					hoverEnabled: true
 					visible: root.__internal.hoverBlocked
 
+					onEntered: {
+						hoverBlockMouseArea.enteredPosition = hoverBlockMouseArea.mapToItem(null, hoverBlockMouseArea.mouseX, hoverBlockMouseArea.mouseY)
+					}
+
 					onPositionChanged: {
-						root.__internal.hoverBlocked = false
+						let position = hoverBlockMouseArea.mapToItem(null, hoverBlockMouseArea.mouseX, hoverBlockMouseArea.mouseY)
+						if (position.x !== hoverBlockMouseArea.enteredPosition.x || position.y !== hoverBlockMouseArea.enteredPosition.y){
+							root.__internal.hoverBlocked = false
+						}
 					}
 				}
 			}
@@ -1236,10 +1249,14 @@ PopupView {
 					root.focusedIndex = cnt > 0 ? 0 : -1
 				}
 			} else if (root.__internal.selectedFocusedIndex >= 0){
-				// Tab from selected group → main list
+				// Tab from selected group → main list, or the footer when the list is empty
 				root.__internal.selectedFocusedIndex = -1
 				var mainCount = root.dataProvider ? root.dataProvider.items.length : 0
-				root.focusedIndex = mainCount > 0 ? 0 : -1
+				if (mainCount > 0){
+					root.focusedIndex = 0
+				} else {
+					root.__focusFooter()
+				}
 			} else {
 				// Tab from main list → the footer, if it offers a control, or back to filter
 				root.__focusFooter()
@@ -1250,10 +1267,14 @@ PopupView {
 	Shortcut {
 		sequence: "Shift+Tab"
 		onActivated: {
+			// Rows that move under a still pointer do not take the keyboard target
+			root.__internal.hoverBlocked = true
 			if (root.__internal.footerFocused){
 				root.__focusBeforeFooter()
 			} else if (root.focusedIndex >= 0){
-				// Shift+Tab from main list → selected group (last item) or "Clear all" or filter
+				// Shift+Tab from main list → selected group (last item) or "Clear all" or filter.
+				// A hovered row is reached with the text focus still in the filter, which would take Return.
+				filterField.setFocus(false)
 				root.focusedIndex = -1
 				if (root.showSelectedGroup && root.__internal.selectedItemsCount > 0){
 					root.__internal.selectedFocusedIndex = root.__internal.selectedItemsCount - 1

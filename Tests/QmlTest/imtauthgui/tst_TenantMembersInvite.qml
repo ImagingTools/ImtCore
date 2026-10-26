@@ -306,6 +306,31 @@ TestCase {
 		compare(context.popup.newSelection.length, 2, "Return toggles the hovered row")
 	}
 
+	// The pointer rests on the list: rows that move under it after a keyboard removal do not take the keyboard target
+	function test_keyboardRemovalUnderAStillPointerKeepsTheTarget(){
+		let context = openInvitePopup()
+		context.popup.handleItemClick(context.popup.getItemId(0), 0)
+		context.popup.handleItemClick(context.popup.getItemId(1), 1)
+		context.popup.handleItemClick(context.popup.getItemId(2), 2)
+		wait(100)
+		hoverTheSecondRow(context)
+		compare(context.popup.focusedIndex, 1)
+
+		// list → the last selected user
+		keyClick(Qt.Key_Tab, Qt.ShiftModifier)
+		wait(50)
+		compare(context.popup.__internal.selectedFocusedIndex, 2)
+		keyClick(Qt.Key_Return)
+		wait(100)
+		compare(context.popup.newSelection.length, 2)
+		compare(context.popup.__internal.selectedFocusedIndex, 1, "The target stays in the selected group")
+		compare(context.popup.focusedIndex, -1)
+
+		keyClick(Qt.Key_Return)
+		wait(100)
+		compare(context.popup.newSelection.length, 1, "Return removes the next selected user")
+	}
+
 	function test_backFromTheButtonGoesToTheLastRow_data(){
 		return [
 			{"tag": "Shift+Tab", "key": Qt.Key_Tab, "modifiers": Qt.ShiftModifier},
@@ -341,7 +366,8 @@ TestCase {
 		keyClick("z")
 		tryVerify(function(){ return context.popup.dataProvider.items.length === 0 }, 3000, "The filter matches nobody")
 		wait(100)
-		for (let i = 0; i < 4; ++i){
+		// filter → "Clear all" → selected user → Invite: the empty list is no stop
+		for (let i = 0; i < 3; ++i){
 			keyClick(Qt.Key_Tab)
 			wait(50)
 		}
