@@ -162,8 +162,9 @@ CTenantDbDelegateComp::NewObjectQuery CTenantDbDelegateComp::CreateNewObjectQuer
 		id = QUuid::createUuid().toString(QUuid::WithoutBraces);
 	}
 
-	QString name = imtdb::EscapeSql(tenantPtr != nullptr ? tenantPtr->GetTenantName() : objectName);
-	QString description = imtdb::EscapeSql(tenantPtr != nullptr ? tenantPtr->GetTenantDescription() : objectDescription);
+	// The text goes through the statement split at ';', so it is encoded for it
+	QString name = imtdb::SqlEncode(tenantPtr != nullptr ? tenantPtr->GetTenantName() : objectName);
+	QString description = imtdb::SqlEncode(tenantPtr != nullptr ? tenantPtr->GetTenantDescription() : objectDescription);
 	QString ownerId = imtdb::EscapeSql(tenantPtr != nullptr ? QString::fromUtf8(tenantPtr->GetOwnerId()) : QString());
 	QString creatorId = imtdb::EscapeSql(tenantPtr != nullptr ? QString::fromUtf8(tenantPtr->GetCreatorId()) : QString());
 	bool isActive = tenantPtr != nullptr ? tenantPtr->IsActive() : true;
@@ -227,8 +228,8 @@ QByteArray CTenantDbDelegateComp::CreateUpdateObjectQuery(
 		"\"ParentTenantId\"='%8' "
 		"WHERE \"Id\"='%9';")
 		.arg(*m_tableNameAttrPtr)
-		.arg(imtdb::EscapeSql(tenantPtr->GetTenantName()))
-		.arg(imtdb::EscapeSql(tenantPtr->GetTenantDescription()))
+		.arg(imtdb::SqlEncode(tenantPtr->GetTenantName()))
+		.arg(imtdb::SqlEncode(tenantPtr->GetTenantDescription()))
 		.arg(imtdb::EscapeSql(QString::fromUtf8(tenantPtr->GetOwnerId())))
 		.arg(imtdb::EscapeSql(QString::fromUtf8(tenantPtr->GetCreatorId())))
 		.arg(tenantPtr->IsActive() ? "true" : "false")
@@ -289,7 +290,7 @@ QByteArray CTenantDbDelegateComp::CreateRenameObjectQuery(
 {
 	return QStringLiteral(R"(UPDATE "%1" SET "Name"='%2', "UpdatedAt"='%3' WHERE "Id"='%4';)")
 			.arg(*m_tableNameAttrPtr,
-				 imtdb::EscapeSql(newObjectName),
+				 imtdb::SqlEncode(newObjectName),
 				 imtdb::UtcNow(),
 				 imtdb::EscapeSql(QString::fromUtf8(objectId))).toUtf8();
 }
@@ -303,7 +304,7 @@ QByteArray CTenantDbDelegateComp::CreateDescriptionObjectQuery(
 {
 	return QStringLiteral(R"(UPDATE "%1" SET "Description"='%2', "UpdatedAt"='%3' WHERE "Id"='%4';)")
 			.arg(*m_tableNameAttrPtr,
-				 imtdb::EscapeSql(description),
+				 imtdb::SqlEncode(description),
 				 imtdb::UtcNow(),
 				 imtdb::EscapeSql(QString::fromUtf8(objectId))).toUtf8();
 }
