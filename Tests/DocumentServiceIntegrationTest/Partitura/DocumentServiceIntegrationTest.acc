@@ -153,7 +153,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="TextDocumentNameProvider" PackageId="CollectionDocumentServiceIntegrationTestPck" ComponentId="TextDocumentNameProvider">
+        <Element Id="TextDocumentNameProvider" PackageId="DocumentServiceIntegrationTestPck" ComponentId="TextDocumentNameProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="NamePrefix" Type="String" ExportId="">
@@ -162,7 +162,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="TextDocumentValidator" PackageId="CollectionDocumentServiceIntegrationTestPck" ComponentId="TextDocumentValidator">
+        <Element Id="TextDocumentValidator" PackageId="DocumentServiceIntegrationTestPck" ComponentId="TextDocumentValidator">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="InvalidText" Type="String" ExportId="">
@@ -171,7 +171,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="TextDocumentValidatorWithMessage" PackageId="CollectionDocumentServiceIntegrationTestPck" ComponentId="TextDocumentValidator">
+        <Element Id="TextDocumentValidatorWithMessage" PackageId="DocumentServiceIntegrationTestPck" ComponentId="TextDocumentValidator">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ErrorMessage" Type="String" ExportId="">

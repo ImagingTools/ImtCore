@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include "CollectionDocumentServiceIntegrationTestPck.h"
+#include "DocumentServiceIntegrationTestPck.h"
 
 
 // ACF includes
 #include <icomp/export.h>
 
 
-namespace CollectionDocumentServiceIntegrationTestPck
+namespace DocumentServiceIntegrationTestPck
 {
 
 
 I_EXPORT_PACKAGE(
-			"CollectionDocumentServiceIntegrationTestPck",
+			"DocumentServiceIntegrationTestPck",
 			"Test components for the collection document service integration test",
 			IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools"));
 
@@ -26,4 +26,4 @@ I_EXPORT_COMPONENT(
 			"Document Name Provider Text Test");
 
 
-} // namespace CollectionDocumentServiceIntegrationTestPck
+} // namespace DocumentServiceIntegrationTestPck

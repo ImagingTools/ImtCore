@@ -76,11 +76,11 @@ private:
 	collection document services (regular and single-copy mode) sharing one object
 	collection, the documents are \c iprm::ITextParam objects.
 	Document validators and name providers of the validated types are provided by
-	CollectionDocumentServiceIntegrationTestPck.
+	DocumentServiceIntegrationTestPck.
 	Contains the test cases of CollectionDocumentServiceTest; cases that need fault
 	injection or access to internals are rewritten with the public API or skipped.
 */
-class CCollectionDocumentServiceIntegrationTest: public QObject
+class CDocumentServiceIntegrationTest: public QObject
 {
 	Q_OBJECT
 

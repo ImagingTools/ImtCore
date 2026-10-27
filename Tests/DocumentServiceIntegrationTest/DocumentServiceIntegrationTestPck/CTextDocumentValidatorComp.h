@@ -9,7 +9,7 @@
 #include <imtdoc/IDocumentValidator.h>
 
 
-namespace CollectionDocumentServiceIntegrationTestPck
+namespace DocumentServiceIntegrationTestPck
 {
 
 
@@ -43,4 +43,4 @@ private:
 };
 
 
-} // namespace CollectionDocumentServiceIntegrationTestPck
+} // namespace DocumentServiceIntegrationTestPck

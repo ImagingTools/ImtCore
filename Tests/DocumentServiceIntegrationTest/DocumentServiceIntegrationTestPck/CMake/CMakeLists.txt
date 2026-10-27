@@ -1,4 +1,4 @@
-project(CollectionDocumentServiceIntegrationTestPck LANGUAGES CXX)
+project(DocumentServiceIntegrationTestPck LANGUAGES CXX)
 
 
 include(${ACFDIR}/Config/CMake/ComponentConfig.cmake)

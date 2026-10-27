@@ -1,4 +1,4 @@
-project(CollectionDocumentServiceIntegrationTest)
+project(DocumentServiceIntegrationTest)
 
 
 include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include "CCollectionDocumentServiceIntegrationTest.h"
+#include "CDocumentServiceIntegrationTest.h"
 
 
 // Qt includes
@@ -174,14 +174,14 @@ void CTestObserver::AfterUpdate(imod::IModel* /*modelPtr*/, const istd::IChangea
 }
 
 
-// private slots of the class CCollectionDocumentServiceIntegrationTest
+// private slots of the class CDocumentServiceIntegrationTest
 
 // Setup and teardown
 
-void CCollectionDocumentServiceIntegrationTest::init()
+void CDocumentServiceIntegrationTest::init()
 {
 	const QString imtCorePath = qEnvironmentVariable("IMTCOREDIR");
-	const QString registryFile = imtCorePath + QStringLiteral("/Tests/CollectionDocumentServiceIntegrationTest/Partitura/CollectionDocumentServiceIntegrationTest.acc");
+	const QString registryFile = imtCorePath + QStringLiteral("/Tests/DocumentServiceIntegrationTest/Partitura/DocumentServiceIntegrationTest.acc");
 	const QString configFile = imtCorePath + QStringLiteral("/Config/ImtCoreTest.awc");
 
 	m_accessorPtr.SetPtr(new ipackage::CComponentAccessor(registryFile, configFile));
@@ -201,7 +201,7 @@ void CCollectionDocumentServiceIntegrationTest::init()
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::cleanup()
+void CDocumentServiceIntegrationTest::cleanup()
 {
 	const QList<imtdoc::IDocumentService*> services = {m_servicePtr, m_singleCopyServicePtr};
 	for (imtdoc::IDocumentService* servicePtr : services){
@@ -230,7 +230,7 @@ void CCollectionDocumentServiceIntegrationTest::cleanup()
 
 // private methods
 
-void CCollectionDocumentServiceIntegrationTest::AddCollectionObject(
+void CDocumentServiceIntegrationTest::AddCollectionObject(
 			const QByteArray& objectId,
 			const QByteArray& typeId,
 			const QString& name,
@@ -247,7 +247,7 @@ void CCollectionDocumentServiceIntegrationTest::AddCollectionObject(
 }
 
 
-QByteArray CCollectionDocumentServiceIntegrationTest::CreateDocumentAndWaitForLoad(
+QByteArray CDocumentServiceIntegrationTest::CreateDocumentAndWaitForLoad(
 			imtdoc::IDocumentService& service,
 			const QByteArray& userId,
 			const QByteArray& typeId,
@@ -271,7 +271,7 @@ QByteArray CCollectionDocumentServiceIntegrationTest::CreateDocumentAndWaitForLo
 }
 
 
-QByteArray CCollectionDocumentServiceIntegrationTest::OpenDocumentAndWaitForLoad(
+QByteArray CDocumentServiceIntegrationTest::OpenDocumentAndWaitForLoad(
 			imtdoc::IDocumentService& service,
 			const QByteArray& userId,
 			const QByteArray& objectId)
@@ -293,7 +293,7 @@ QByteArray CCollectionDocumentServiceIntegrationTest::OpenDocumentAndWaitForLoad
 }
 
 
-bool CCollectionDocumentServiceIntegrationTest::WaitForDocumentLoaded(
+bool CDocumentServiceIntegrationTest::WaitForDocumentLoaded(
 			imtdoc::IDocumentService& service,
 			const QByteArray& userId,
 			const QByteArray& documentId)
@@ -328,7 +328,7 @@ bool CCollectionDocumentServiceIntegrationTest::WaitForDocumentLoaded(
 }
 
 
-imtdoc::IDocumentService::OperationStatus CCollectionDocumentServiceIntegrationTest::ExecuteTask(
+imtdoc::IDocumentService::OperationStatus CDocumentServiceIntegrationTest::ExecuteTask(
 			imtdoc::IDocumentService& service,
 			imtdoc::IDocumentService::TaskType taskType,
 			const imtdoc::IDocumentService::TaskParams& params,
@@ -349,7 +349,7 @@ imtdoc::IDocumentService::OperationStatus CCollectionDocumentServiceIntegrationT
 }
 
 
-imtdoc::IDocumentService::OperationStatus CCollectionDocumentServiceIntegrationTest::CloseDocument(
+imtdoc::IDocumentService::OperationStatus CDocumentServiceIntegrationTest::CloseDocument(
 			imtdoc::IDocumentService& service,
 			const QByteArray& userId,
 			const QByteArray& documentId)
@@ -362,7 +362,7 @@ imtdoc::IDocumentService::OperationStatus CCollectionDocumentServiceIntegrationT
 }
 
 
-imtdoc::IDocumentService::OperationStatus CCollectionDocumentServiceIntegrationTest::SaveDocument(
+imtdoc::IDocumentService::OperationStatus CDocumentServiceIntegrationTest::SaveDocument(
 			imtdoc::IDocumentService& service,
 			const QByteArray& userId,
 			const QByteArray& documentId,
@@ -377,7 +377,7 @@ imtdoc::IDocumentService::OperationStatus CCollectionDocumentServiceIntegrationT
 }
 
 
-imtdoc::IDocumentService::DocumentListItem CCollectionDocumentServiceIntegrationTest::FindDocumentInfo(
+imtdoc::IDocumentService::DocumentListItem CDocumentServiceIntegrationTest::FindDocumentInfo(
 			imtdoc::IDocumentService& service,
 			const QByteArray& userId,
 			const QByteArray& documentId) const
@@ -392,7 +392,7 @@ imtdoc::IDocumentService::DocumentListItem CCollectionDocumentServiceIntegration
 }
 
 
-QString CCollectionDocumentServiceIntegrationTest::GetDocumentText(
+QString CDocumentServiceIntegrationTest::GetDocumentText(
 			imtdoc::IDocumentService& service,
 			const QByteArray& userId,
 			const QByteArray& documentId) const
@@ -409,19 +409,19 @@ QString CCollectionDocumentServiceIntegrationTest::GetDocumentText(
 
 // GetOpenedDocumentList tests
 
-void CCollectionDocumentServiceIntegrationTest::GetOpenedDocumentListEmptyTest()
+void CDocumentServiceIntegrationTest::GetOpenedDocumentListEmptyTest()
 {
 	QVERIFY2(m_servicePtr->GetOpenedDocumentList(TEST_USER_ID).isEmpty(), "Document list should be empty initially");
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::GetOpenedDocumentListNonExistentUserTest()
+void CDocumentServiceIntegrationTest::GetOpenedDocumentListNonExistentUserTest()
 {
 	QVERIFY2(m_servicePtr->GetOpenedDocumentList(QByteArrayLiteral("nonexistentUser")).isEmpty(), "Document list for non-existent user should be empty");
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::GetOpenedDocumentListAfterCreateTest()
+void CDocumentServiceIntegrationTest::GetOpenedDocumentListAfterCreateTest()
 {
 	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
 	QVERIFY2(!docId.isEmpty(), "Document should be created");
@@ -436,7 +436,7 @@ void CCollectionDocumentServiceIntegrationTest::GetOpenedDocumentListAfterCreate
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::GetOpenedDocumentListMultipleDocumentsTest()
+void CDocumentServiceIntegrationTest::GetOpenedDocumentListMultipleDocumentsTest()
 {
 	QByteArray docId1 = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
 	QByteArray docId2 = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID_2);
@@ -451,7 +451,7 @@ void CCollectionDocumentServiceIntegrationTest::GetOpenedDocumentListMultipleDoc
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::GetOpenedDocumentListMultipleUsersTest()
+void CDocumentServiceIntegrationTest::GetOpenedDocumentListMultipleUsersTest()
 {
 	QByteArray docId1 = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
 	QByteArray docId2 = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID_2, TEST_TYPE_ID);
@@ -469,7 +469,7 @@ void CCollectionDocumentServiceIntegrationTest::GetOpenedDocumentListMultipleUse
 
 // CreateNewDocument tests
 
-void CCollectionDocumentServiceIntegrationTest::CreateNewDocumentSuccessTest()
+void CDocumentServiceIntegrationTest::CreateNewDocumentSuccessTest()
 {
 	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID, TEST_DOC_NAME);
 	QVERIFY2(!docId.isEmpty(), "Document should be created");
@@ -481,13 +481,13 @@ void CCollectionDocumentServiceIntegrationTest::CreateNewDocumentSuccessTest()
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::CreateNewDocumentUndoManagerFailTest()
+void CDocumentServiceIntegrationTest::CreateNewDocumentUndoManagerFailTest()
 {
 	QSKIP("The undo manager factory is always configured in the integration registry");
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::CreateNewDocumentObjectCreationFailAsyncTest()
+void CDocumentServiceIntegrationTest::CreateNewDocumentObjectCreationFailAsyncTest()
 {
 #ifndef QT_NO_DEBUG
 	QSKIP("Missing object factory triggers Q_ASSERT in debug builds");
@@ -505,7 +505,7 @@ void CCollectionDocumentServiceIntegrationTest::CreateNewDocumentObjectCreationF
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::CreateNewDocumentEventFiredTest()
+void CDocumentServiceIntegrationTest::CreateNewDocumentEventFiredTest()
 {
 	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
 	QVERIFY(!docId.isEmpty());
@@ -515,7 +515,7 @@ void CCollectionDocumentServiceIntegrationTest::CreateNewDocumentEventFiredTest(
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::CreateNewDocumentIsLoadingTest()
+void CDocumentServiceIntegrationTest::CreateNewDocumentIsLoadingTest()
 {
 	imtdoc::IDocumentService::TaskParams params;
 	params.userId = TEST_USER_ID;
@@ -535,7 +535,7 @@ void CCollectionDocumentServiceIntegrationTest::CreateNewDocumentIsLoadingTest()
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::CreateNewDocumentMultipleDocumentsTest()
+void CDocumentServiceIntegrationTest::CreateNewDocumentMultipleDocumentsTest()
 {
 	QSet<QByteArray> ids;
 	for (int i = 0; i < 3; ++i){
@@ -550,7 +550,7 @@ void CCollectionDocumentServiceIntegrationTest::CreateNewDocumentMultipleDocumen
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::CreateNewDocumentProposedSourceDocumentIdUsedOnSaveTest()
+void CDocumentServiceIntegrationTest::CreateNewDocumentProposedSourceDocumentIdUsedOnSaveTest()
 {
 	imtdoc::IDocumentService::TaskParams params;
 	params.userId = TEST_USER_ID;
@@ -571,7 +571,7 @@ void CCollectionDocumentServiceIntegrationTest::CreateNewDocumentProposedSourceD
 
 // OpenDocument tests
 
-void CCollectionDocumentServiceIntegrationTest::OpenDocumentSuccessTest()
+void CDocumentServiceIntegrationTest::OpenDocumentSuccessTest()
 {
 	AddCollectionObject(TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME, QStringLiteral("testData"));
 
@@ -587,7 +587,7 @@ void CCollectionDocumentServiceIntegrationTest::OpenDocumentSuccessTest()
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::OpenDocumentInvalidSchemeTest()
+void CDocumentServiceIntegrationTest::OpenDocumentInvalidSchemeTest()
 {
 	AddCollectionObject(TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME);
 
@@ -600,7 +600,7 @@ void CCollectionDocumentServiceIntegrationTest::OpenDocumentInvalidSchemeTest()
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::OpenDocumentInvalidUrlTest()
+void CDocumentServiceIntegrationTest::OpenDocumentInvalidUrlTest()
 {
 	imtdoc::IDocumentService::TaskParams params;
 	params.userId = TEST_USER_ID;
@@ -611,7 +611,7 @@ void CCollectionDocumentServiceIntegrationTest::OpenDocumentInvalidUrlTest()
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::OpenDocumentNonExistentObjectTest()
+void CDocumentServiceIntegrationTest::OpenDocumentNonExistentObjectTest()
 {
 	imtdoc::IDocumentService::TaskParams params;
 	params.userId = TEST_USER_ID;
@@ -622,13 +622,13 @@ void CCollectionDocumentServiceIntegrationTest::OpenDocumentNonExistentObjectTes
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::OpenDocumentUndoManagerFailTest()
+void CDocumentServiceIntegrationTest::OpenDocumentUndoManagerFailTest()
 {
 	QSKIP("The undo manager factory is always configured in the integration registry");
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::OpenDocumentEventFiredTest()
+void CDocumentServiceIntegrationTest::OpenDocumentEventFiredTest()
 {
 	AddCollectionObject(TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME);
 
@@ -640,7 +640,7 @@ void CCollectionDocumentServiceIntegrationTest::OpenDocumentEventFiredTest()
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::OpenDocumentIsLoadingTest()
+void CDocumentServiceIntegrationTest::OpenDocumentIsLoadingTest()
 {
 	AddCollectionObject(TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME);
 
@@ -661,7 +661,7 @@ void CCollectionDocumentServiceIntegrationTest::OpenDocumentIsLoadingTest()
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::OpenDocumentCompletesBeforeDataLoadedTest()
+void CDocumentServiceIntegrationTest::OpenDocumentCompletesBeforeDataLoadedTest()
 {
 	AddCollectionObject(TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME, QStringLiteral("testData"));
 
@@ -684,13 +684,13 @@ void CCollectionDocumentServiceIntegrationTest::OpenDocumentCompletesBeforeDataL
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::OpenDocumentDataLoadFailClosesDocumentTest()
+void CDocumentServiceIntegrationTest::OpenDocumentDataLoadFailClosesDocumentTest()
 {
 	QSKIP("Collection data loading failure cannot be injected with real components");
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::OpenDocumentWithHostTest()
+void CDocumentServiceIntegrationTest::OpenDocumentWithHostTest()
 {
 	AddCollectionObject(TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME);
 
@@ -703,7 +703,7 @@ void CCollectionDocumentServiceIntegrationTest::OpenDocumentWithHostTest()
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::OpenDocumentMultiplePathSegmentsTest()
+void CDocumentServiceIntegrationTest::OpenDocumentMultiplePathSegmentsTest()
 {
 	imtdoc::IDocumentService::TaskParams params;
 	params.userId = TEST_USER_ID;
@@ -714,7 +714,7 @@ void CCollectionDocumentServiceIntegrationTest::OpenDocumentMultiplePathSegments
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::OpenDocumentWithoutSingleInstanceModeFailsWhenSingleInstanceAlreadyOpenedTest()
+void CDocumentServiceIntegrationTest::OpenDocumentWithoutSingleInstanceModeFailsWhenSingleInstanceAlreadyOpenedTest()
 {
 	AddCollectionObject(TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME);
 
@@ -738,7 +738,7 @@ void CCollectionDocumentServiceIntegrationTest::OpenDocumentWithoutSingleInstanc
 
 // GetDocumentName tests
 
-void CCollectionDocumentServiceIntegrationTest::GetDocumentNameSuccessTest()
+void CDocumentServiceIntegrationTest::GetDocumentNameSuccessTest()
 {
 	AddCollectionObject(TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME);
 
@@ -751,7 +751,7 @@ void CCollectionDocumentServiceIntegrationTest::GetDocumentNameSuccessTest()
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::GetDocumentNameInvalidUserTest()
+void CDocumentServiceIntegrationTest::GetDocumentNameInvalidUserTest()
 {
 	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
 	QVERIFY(!docId.isEmpty());
@@ -761,7 +761,7 @@ void CCollectionDocumentServiceIntegrationTest::GetDocumentNameInvalidUserTest()
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::GetDocumentNameInvalidDocumentTest()
+void CDocumentServiceIntegrationTest::GetDocumentNameInvalidDocumentTest()
 {
 	QVERIFY(!CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID).isEmpty());
 
@@ -772,7 +772,7 @@ void CCollectionDocumentServiceIntegrationTest::GetDocumentNameInvalidDocumentTe
 
 // SetDocumentName tests
 
-void CCollectionDocumentServiceIntegrationTest::SetDocumentNameSuccessTest()
+void CDocumentServiceIntegrationTest::SetDocumentNameSuccessTest()
 {
 	AddCollectionObject(TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME);
 
@@ -789,7 +789,7 @@ void CCollectionDocumentServiceIntegrationTest::SetDocumentNameSuccessTest()
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::SetDocumentNameSameNameTest()
+void CDocumentServiceIntegrationTest::SetDocumentNameSameNameTest()
 {
 	AddCollectionObject(TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME);
 
@@ -803,7 +803,7 @@ void CCollectionDocumentServiceIntegrationTest::SetDocumentNameSameNameTest()
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::SetDocumentNameInvalidUserTest()
+void CDocumentServiceIntegrationTest::SetDocumentNameInvalidUserTest()
 {
 	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
 	QVERIFY(!docId.isEmpty());
@@ -812,7 +812,7 @@ void CCollectionDocumentServiceIntegrationTest::SetDocumentNameInvalidUserTest()
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::SetDocumentNameInvalidDocumentTest()
+void CDocumentServiceIntegrationTest::SetDocumentNameInvalidDocumentTest()
 {
 	QVERIFY(!CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID).isEmpty());
 
@@ -820,7 +820,7 @@ void CCollectionDocumentServiceIntegrationTest::SetDocumentNameInvalidDocumentTe
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::SetDocumentNameCollectionUpdateFailTest()
+void CDocumentServiceIntegrationTest::SetDocumentNameCollectionUpdateFailTest()
 {
 	AddCollectionObject(TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME);
 
@@ -838,7 +838,7 @@ void CCollectionDocumentServiceIntegrationTest::SetDocumentNameCollectionUpdateF
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::SetDocumentNameEventFiredTest()
+void CDocumentServiceIntegrationTest::SetDocumentNameEventFiredTest()
 {
 	AddCollectionObject(TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME);
 
@@ -860,7 +860,7 @@ void CCollectionDocumentServiceIntegrationTest::SetDocumentNameEventFiredTest()
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::SetDocumentNameNewDocumentNoCollectionUpdateTest()
+void CDocumentServiceIntegrationTest::SetDocumentNameNewDocumentNoCollectionUpdateTest()
 {
 	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
 	QVERIFY(!docId.isEmpty());
@@ -878,7 +878,7 @@ void CCollectionDocumentServiceIntegrationTest::SetDocumentNameNewDocumentNoColl
 
 // GetDocumentPtr tests
 
-void CCollectionDocumentServiceIntegrationTest::GetDocumentPtrSuccessTest()
+void CDocumentServiceIntegrationTest::GetDocumentPtrSuccessTest()
 {
 	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
 	QVERIFY(!docId.isEmpty());
@@ -889,7 +889,7 @@ void CCollectionDocumentServiceIntegrationTest::GetDocumentPtrSuccessTest()
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::GetDocumentPtrInvalidUserTest()
+void CDocumentServiceIntegrationTest::GetDocumentPtrInvalidUserTest()
 {
 	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
 	QVERIFY(!docId.isEmpty());
@@ -898,7 +898,7 @@ void CCollectionDocumentServiceIntegrationTest::GetDocumentPtrInvalidUserTest()
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::GetDocumentPtrInvalidDocumentTest()
+void CDocumentServiceIntegrationTest::GetDocumentPtrInvalidDocumentTest()
 {
 	QVERIFY(!CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID).isEmpty());
 
@@ -906,7 +906,7 @@ void CCollectionDocumentServiceIntegrationTest::GetDocumentPtrInvalidDocumentTes
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::GetDocumentPtrWhileLoadingTest()
+void CDocumentServiceIntegrationTest::GetDocumentPtrWhileLoadingTest()
 {
 	imtdoc::IDocumentService::TaskParams params;
 	params.userId = TEST_USER_ID;
@@ -923,7 +923,7 @@ void CCollectionDocumentServiceIntegrationTest::GetDocumentPtrWhileLoadingTest()
 
 // GetDocumentData tests
 
-void CCollectionDocumentServiceIntegrationTest::GetDocumentDataSuccessTest()
+void CDocumentServiceIntegrationTest::GetDocumentDataSuccessTest()
 {
 	AddCollectionObject(TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME, QStringLiteral("testData"));
 
@@ -943,7 +943,7 @@ void CCollectionDocumentServiceIntegrationTest::GetDocumentDataSuccessTest()
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::GetDocumentDataInvalidUserTest()
+void CDocumentServiceIntegrationTest::GetDocumentDataInvalidUserTest()
 {
 	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
 	QVERIFY(!docId.isEmpty());
@@ -953,7 +953,7 @@ void CCollectionDocumentServiceIntegrationTest::GetDocumentDataInvalidUserTest()
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::GetDocumentDataInvalidDocumentTest()
+void CDocumentServiceIntegrationTest::GetDocumentDataInvalidDocumentTest()
 {
 	QVERIFY(!CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID).isEmpty());
 
@@ -962,7 +962,7 @@ void CCollectionDocumentServiceIntegrationTest::GetDocumentDataInvalidDocumentTe
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::GetDocumentDataWhileLoadingTest()
+void CDocumentServiceIntegrationTest::GetDocumentDataWhileLoadingTest()
 {
 	imtdoc::IDocumentService::TaskParams params;
 	params.userId = TEST_USER_ID;
@@ -980,7 +980,7 @@ void CCollectionDocumentServiceIntegrationTest::GetDocumentDataWhileLoadingTest(
 
 // SetDocumentData tests
 
-void CCollectionDocumentServiceIntegrationTest::SetDocumentDataSuccessTest()
+void CDocumentServiceIntegrationTest::SetDocumentDataSuccessTest()
 {
 	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
 	QVERIFY(!docId.isEmpty());
@@ -993,7 +993,7 @@ void CCollectionDocumentServiceIntegrationTest::SetDocumentDataSuccessTest()
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::SetDocumentDataInvalidUserTest()
+void CDocumentServiceIntegrationTest::SetDocumentDataInvalidUserTest()
 {
 	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
 	QVERIFY(!docId.isEmpty());
@@ -1003,7 +1003,7 @@ void CCollectionDocumentServiceIntegrationTest::SetDocumentDataInvalidUserTest()
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::SetDocumentDataInvalidDocumentTest()
+void CDocumentServiceIntegrationTest::SetDocumentDataInvalidDocumentTest()
 {
 	QVERIFY(!CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID).isEmpty());
 
@@ -1012,7 +1012,7 @@ void CCollectionDocumentServiceIntegrationTest::SetDocumentDataInvalidDocumentTe
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::SetDocumentDataWhileLoadingTest()
+void CDocumentServiceIntegrationTest::SetDocumentDataWhileLoadingTest()
 {
 	imtdoc::IDocumentService::TaskParams params;
 	params.userId = TEST_USER_ID;
@@ -1030,7 +1030,7 @@ void CCollectionDocumentServiceIntegrationTest::SetDocumentDataWhileLoadingTest(
 
 // SaveDocument tests
 
-void CCollectionDocumentServiceIntegrationTest::SaveDocumentNewDocumentTest()
+void CDocumentServiceIntegrationTest::SaveDocumentNewDocumentTest()
 {
 	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID, TEST_DOC_NAME);
 	QVERIFY(!docId.isEmpty());
@@ -1059,7 +1059,7 @@ void CCollectionDocumentServiceIntegrationTest::SaveDocumentNewDocumentTest()
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::SaveDocumentExistingDocumentTest()
+void CDocumentServiceIntegrationTest::SaveDocumentExistingDocumentTest()
 {
 	AddCollectionObject(TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME, QStringLiteral("original"));
 
@@ -1087,7 +1087,7 @@ void CCollectionDocumentServiceIntegrationTest::SaveDocumentExistingDocumentTest
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::SaveDocumentSaveAsTest()
+void CDocumentServiceIntegrationTest::SaveDocumentSaveAsTest()
 {
 	AddCollectionObject(TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME, QStringLiteral("original"));
 
@@ -1108,7 +1108,7 @@ void CCollectionDocumentServiceIntegrationTest::SaveDocumentSaveAsTest()
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::SaveDocumentNewDocumentUpdatesUrlTest()
+void CDocumentServiceIntegrationTest::SaveDocumentNewDocumentUpdatesUrlTest()
 {
 	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID, TEST_DOC_NAME);
 	QVERIFY(!docId.isEmpty());
@@ -1125,7 +1125,7 @@ void CCollectionDocumentServiceIntegrationTest::SaveDocumentNewDocumentUpdatesUr
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::SaveDocumentSaveAsUpdatesUrlTest()
+void CDocumentServiceIntegrationTest::SaveDocumentSaveAsUpdatesUrlTest()
 {
 	AddCollectionObject(TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME);
 
@@ -1141,7 +1141,7 @@ void CCollectionDocumentServiceIntegrationTest::SaveDocumentSaveAsUpdatesUrlTest
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::SaveDocumentInvalidUserTest()
+void CDocumentServiceIntegrationTest::SaveDocumentInvalidUserTest()
 {
 	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
 	QVERIFY(!docId.isEmpty());
@@ -1150,7 +1150,7 @@ void CCollectionDocumentServiceIntegrationTest::SaveDocumentInvalidUserTest()
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::SaveDocumentInvalidDocumentTest()
+void CDocumentServiceIntegrationTest::SaveDocumentInvalidDocumentTest()
 {
 	QVERIFY(!CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID).isEmpty());
 
@@ -1158,7 +1158,7 @@ void CCollectionDocumentServiceIntegrationTest::SaveDocumentInvalidDocumentTest(
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::SaveDocumentWhileLoadingTest()
+void CDocumentServiceIntegrationTest::SaveDocumentWhileLoadingTest()
 {
 	imtdoc::IDocumentService::TaskParams params;
 	params.userId = TEST_USER_ID;
@@ -1174,7 +1174,7 @@ void CCollectionDocumentServiceIntegrationTest::SaveDocumentWhileLoadingTest()
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::SaveDocumentCollectionInsertFailTest()
+void CDocumentServiceIntegrationTest::SaveDocumentCollectionInsertFailTest()
 {
 	AddCollectionObject(TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME);
 
@@ -1199,7 +1199,7 @@ void CCollectionDocumentServiceIntegrationTest::SaveDocumentCollectionInsertFail
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::SaveDocumentCollectionSetDataFailTest()
+void CDocumentServiceIntegrationTest::SaveDocumentCollectionSetDataFailTest()
 {
 	AddCollectionObject(TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME);
 
@@ -1217,7 +1217,7 @@ void CCollectionDocumentServiceIntegrationTest::SaveDocumentCollectionSetDataFai
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::SaveDocumentValidationFailTest()
+void CDocumentServiceIntegrationTest::SaveDocumentValidationFailTest()
 {
 	// Validator of this type has no error message configured
 	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, VALIDATED_TYPE_ID_2);
@@ -1253,7 +1253,7 @@ void CCollectionDocumentServiceIntegrationTest::SaveDocumentValidationFailTest()
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::SaveDocumentValidationFailWithMessageTest()
+void CDocumentServiceIntegrationTest::SaveDocumentValidationFailWithMessageTest()
 {
 	AddCollectionObject(TEST_OBJECT_ID, VALIDATED_TYPE_ID, TEST_DOC_NAME, QStringLiteral("original"));
 
@@ -1285,7 +1285,7 @@ void CCollectionDocumentServiceIntegrationTest::SaveDocumentValidationFailWithMe
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::SaveDocumentWithNameProviderTest()
+void CDocumentServiceIntegrationTest::SaveDocumentWithNameProviderTest()
 {
 	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, VALIDATED_TYPE_ID);
 	QVERIFY(!docId.isEmpty());
@@ -1320,7 +1320,7 @@ void CCollectionDocumentServiceIntegrationTest::SaveDocumentWithNameProviderTest
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::SaveDocumentEventFiredTest()
+void CDocumentServiceIntegrationTest::SaveDocumentEventFiredTest()
 {
 	AddCollectionObject(TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME);
 
@@ -1335,7 +1335,7 @@ void CCollectionDocumentServiceIntegrationTest::SaveDocumentEventFiredTest()
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::SaveDocumentSaveAsEventFiredTest()
+void CDocumentServiceIntegrationTest::SaveDocumentSaveAsEventFiredTest()
 {
 	AddCollectionObject(TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME);
 
@@ -1352,7 +1352,7 @@ void CCollectionDocumentServiceIntegrationTest::SaveDocumentSaveAsEventFiredTest
 
 // CloseDocument tests
 
-void CCollectionDocumentServiceIntegrationTest::CloseDocumentSuccessTest()
+void CDocumentServiceIntegrationTest::CloseDocumentSuccessTest()
 {
 	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
 	QVERIFY(!docId.isEmpty());
@@ -1361,7 +1361,7 @@ void CCollectionDocumentServiceIntegrationTest::CloseDocumentSuccessTest()
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::CloseDocumentInvalidUserTest()
+void CDocumentServiceIntegrationTest::CloseDocumentInvalidUserTest()
 {
 	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
 	QVERIFY(!docId.isEmpty());
@@ -1371,7 +1371,7 @@ void CCollectionDocumentServiceIntegrationTest::CloseDocumentInvalidUserTest()
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::CloseDocumentInvalidDocumentTest()
+void CDocumentServiceIntegrationTest::CloseDocumentInvalidDocumentTest()
 {
 	QVERIFY(!CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID).isEmpty());
 
@@ -1380,7 +1380,7 @@ void CCollectionDocumentServiceIntegrationTest::CloseDocumentInvalidDocumentTest
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::CloseDocumentEventFiredTest()
+void CDocumentServiceIntegrationTest::CloseDocumentEventFiredTest()
 {
 	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
 	QVERIFY(!docId.isEmpty());
@@ -1392,7 +1392,7 @@ void CCollectionDocumentServiceIntegrationTest::CloseDocumentEventFiredTest()
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::CloseDocumentRemovesFromListTest()
+void CDocumentServiceIntegrationTest::CloseDocumentRemovesFromListTest()
 {
 	QByteArray docId1 = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
 	QByteArray docId2 = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
@@ -1407,7 +1407,7 @@ void CCollectionDocumentServiceIntegrationTest::CloseDocumentRemovesFromListTest
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::CloseDocumentLastDocForUserTest()
+void CDocumentServiceIntegrationTest::CloseDocumentLastDocForUserTest()
 {
 	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
 	QVERIFY(!docId.isEmpty());
@@ -1423,7 +1423,7 @@ void CCollectionDocumentServiceIntegrationTest::CloseDocumentLastDocForUserTest(
 
 // GetDocumentUndoManager tests
 
-void CCollectionDocumentServiceIntegrationTest::GetDocumentUndoManagerSuccessTest()
+void CDocumentServiceIntegrationTest::GetDocumentUndoManagerSuccessTest()
 {
 	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
 	QVERIFY(!docId.isEmpty());
@@ -1434,7 +1434,7 @@ void CCollectionDocumentServiceIntegrationTest::GetDocumentUndoManagerSuccessTes
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::GetDocumentUndoManagerInvalidUserTest()
+void CDocumentServiceIntegrationTest::GetDocumentUndoManagerInvalidUserTest()
 {
 	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
 	QVERIFY(!docId.isEmpty());
@@ -1444,7 +1444,7 @@ void CCollectionDocumentServiceIntegrationTest::GetDocumentUndoManagerInvalidUse
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::GetDocumentUndoManagerInvalidDocumentTest()
+void CDocumentServiceIntegrationTest::GetDocumentUndoManagerInvalidDocumentTest()
 {
 	QVERIFY(!CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID).isEmpty());
 
@@ -1455,7 +1455,7 @@ void CCollectionDocumentServiceIntegrationTest::GetDocumentUndoManagerInvalidDoc
 
 // RegisterDocumentObserver tests
 
-void CCollectionDocumentServiceIntegrationTest::RegisterDocumentObserverSuccessTest()
+void CDocumentServiceIntegrationTest::RegisterDocumentObserverSuccessTest()
 {
 	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
 	QVERIFY(!docId.isEmpty());
@@ -1466,7 +1466,7 @@ void CCollectionDocumentServiceIntegrationTest::RegisterDocumentObserverSuccessT
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::RegisterDocumentObserverInvalidUserTest()
+void CDocumentServiceIntegrationTest::RegisterDocumentObserverInvalidUserTest()
 {
 	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
 	QVERIFY(!docId.isEmpty());
@@ -1477,7 +1477,7 @@ void CCollectionDocumentServiceIntegrationTest::RegisterDocumentObserverInvalidU
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::RegisterDocumentObserverInvalidDocumentTest()
+void CDocumentServiceIntegrationTest::RegisterDocumentObserverInvalidDocumentTest()
 {
 	QVERIFY(!CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID).isEmpty());
 
@@ -1487,7 +1487,7 @@ void CCollectionDocumentServiceIntegrationTest::RegisterDocumentObserverInvalidD
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::RegisterDocumentObserverAlreadyRegisteredTest()
+void CDocumentServiceIntegrationTest::RegisterDocumentObserverAlreadyRegisteredTest()
 {
 	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
 	QVERIFY(!docId.isEmpty());
@@ -1500,7 +1500,7 @@ void CCollectionDocumentServiceIntegrationTest::RegisterDocumentObserverAlreadyR
 
 // UnregisterDocumentObserver tests
 
-void CCollectionDocumentServiceIntegrationTest::UnregisterDocumentObserverSuccessTest()
+void CDocumentServiceIntegrationTest::UnregisterDocumentObserverSuccessTest()
 {
 	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
 	QVERIFY(!docId.isEmpty());
@@ -1512,7 +1512,7 @@ void CCollectionDocumentServiceIntegrationTest::UnregisterDocumentObserverSucces
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::UnregisterDocumentObserverInvalidUserTest()
+void CDocumentServiceIntegrationTest::UnregisterDocumentObserverInvalidUserTest()
 {
 	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
 	QVERIFY(!docId.isEmpty());
@@ -1522,7 +1522,7 @@ void CCollectionDocumentServiceIntegrationTest::UnregisterDocumentObserverInvali
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::UnregisterDocumentObserverInvalidDocumentTest()
+void CDocumentServiceIntegrationTest::UnregisterDocumentObserverInvalidDocumentTest()
 {
 	QVERIFY(!CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID).isEmpty());
 
@@ -1531,7 +1531,7 @@ void CCollectionDocumentServiceIntegrationTest::UnregisterDocumentObserverInvali
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::UnregisterDocumentObserverNotRegisteredTest()
+void CDocumentServiceIntegrationTest::UnregisterDocumentObserverNotRegisteredTest()
 {
 	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
 	QVERIFY(!docId.isEmpty());
@@ -1543,7 +1543,7 @@ void CCollectionDocumentServiceIntegrationTest::UnregisterDocumentObserverNotReg
 
 // Serialize tests
 
-void CCollectionDocumentServiceIntegrationTest::SerializeReturnsFalseTest()
+void CDocumentServiceIntegrationTest::SerializeReturnsFalseTest()
 {
 	iser::CMemoryWriteArchive archive;
 	QVERIFY2(!m_servicePtr->Serialize(archive), "Serialize should return false");
@@ -1552,7 +1552,7 @@ void CCollectionDocumentServiceIntegrationTest::SerializeReturnsFalseTest()
 
 // ValidateInputParams tests (checked through GetDocumentName)
 
-void CCollectionDocumentServiceIntegrationTest::ValidateInputParamsSuccessTest()
+void CDocumentServiceIntegrationTest::ValidateInputParamsSuccessTest()
 {
 	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
 	QVERIFY(!docId.isEmpty());
@@ -1562,14 +1562,14 @@ void CCollectionDocumentServiceIntegrationTest::ValidateInputParamsSuccessTest()
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::ValidateInputParamsInvalidUserTest()
+void CDocumentServiceIntegrationTest::ValidateInputParamsInvalidUserTest()
 {
 	QString name;
 	QCOMPARE(m_servicePtr->GetDocumentName(QByteArrayLiteral("invalidUser"), QByteArrayLiteral("anyDocId"), name), imtdoc::IDocumentService::OS_INVALID_USER_ID);
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::ValidateInputParamsInvalidDocumentTest()
+void CDocumentServiceIntegrationTest::ValidateInputParamsInvalidDocumentTest()
 {
 	QVERIFY(!CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID).isEmpty());
 
@@ -1578,7 +1578,7 @@ void CCollectionDocumentServiceIntegrationTest::ValidateInputParamsInvalidDocume
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::ValidateInputParamsForeignDocumentTest()
+void CDocumentServiceIntegrationTest::ValidateInputParamsForeignDocumentTest()
 {
 	QByteArray docId1 = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
 	QVERIFY(!docId1.isEmpty());
@@ -1591,7 +1591,7 @@ void CCollectionDocumentServiceIntegrationTest::ValidateInputParamsForeignDocume
 
 // Document storage tests
 
-void CCollectionDocumentServiceIntegrationTest::DocumentStorageInsertRemoveTest()
+void CDocumentServiceIntegrationTest::DocumentStorageInsertRemoveTest()
 {
 	QByteArray docId1 = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
 	QByteArray docId2 = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
@@ -1611,7 +1611,7 @@ void CCollectionDocumentServiceIntegrationTest::DocumentStorageInsertRemoveTest(
 
 // ObjectIdToUrl tests
 
-void CCollectionDocumentServiceIntegrationTest::ObjectIdToUrlTest()
+void CDocumentServiceIntegrationTest::ObjectIdToUrlTest()
 {
 	AddCollectionObject(TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME);
 
@@ -1625,7 +1625,7 @@ void CCollectionDocumentServiceIntegrationTest::ObjectIdToUrlTest()
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::UrlToObjectIdTest()
+void CDocumentServiceIntegrationTest::UrlToObjectIdTest()
 {
 	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID, TEST_DOC_NAME);
 	QVERIFY(!docId.isEmpty());
@@ -1645,7 +1645,7 @@ void CCollectionDocumentServiceIntegrationTest::UrlToObjectIdTest()
 
 // Async document loading completion tests
 
-void CCollectionDocumentServiceIntegrationTest::CreateNewDocumentAsyncCompletionTest()
+void CDocumentServiceIntegrationTest::CreateNewDocumentAsyncCompletionTest()
 {
 	imtdoc::IDocumentService::TaskParams params;
 	params.userId = TEST_USER_ID;
@@ -1664,7 +1664,7 @@ void CCollectionDocumentServiceIntegrationTest::CreateNewDocumentAsyncCompletion
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::OpenDocumentAsyncCompletionTest()
+void CDocumentServiceIntegrationTest::OpenDocumentAsyncCompletionTest()
 {
 	AddCollectionObject(TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME, QStringLiteral("testData"));
 
@@ -1687,7 +1687,7 @@ void CCollectionDocumentServiceIntegrationTest::OpenDocumentAsyncCompletionTest(
 
 // Multi-user scenario tests
 
-void CCollectionDocumentServiceIntegrationTest::MultiUserCreateAndCloseTest()
+void CDocumentServiceIntegrationTest::MultiUserCreateAndCloseTest()
 {
 	QByteArray docId1 = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
 	QByteArray docId2 = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID_2, TEST_TYPE_ID);
@@ -1704,7 +1704,7 @@ void CCollectionDocumentServiceIntegrationTest::MultiUserCreateAndCloseTest()
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::MultiUserIsolationTest()
+void CDocumentServiceIntegrationTest::MultiUserIsolationTest()
 {
 	QByteArray docId1 = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID, QStringLiteral("User1 Doc"));
 	QByteArray docId2 = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID_2, TEST_TYPE_ID, QStringLiteral("User2 Doc"));
@@ -1725,7 +1725,7 @@ void CCollectionDocumentServiceIntegrationTest::MultiUserIsolationTest()
 
 // Single-copy mode tests
 
-void CCollectionDocumentServiceIntegrationTest::SingleCopyOpenSameObjectByTwoUsersTest()
+void CDocumentServiceIntegrationTest::SingleCopyOpenSameObjectByTwoUsersTest()
 {
 	AddCollectionObject(TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME, QStringLiteral("sharedData"));
 
@@ -1744,7 +1744,7 @@ void CCollectionDocumentServiceIntegrationTest::SingleCopyOpenSameObjectByTwoUse
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::SingleCopySecondUserGetsDataLoadedEventTest()
+void CDocumentServiceIntegrationTest::SingleCopySecondUserGetsDataLoadedEventTest()
 {
 	AddCollectionObject(TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME);
 
@@ -1774,7 +1774,7 @@ void CCollectionDocumentServiceIntegrationTest::SingleCopySecondUserGetsDataLoad
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::SingleCopySetDocumentDataSharedTest()
+void CDocumentServiceIntegrationTest::SingleCopySetDocumentDataSharedTest()
 {
 	AddCollectionObject(TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME, QStringLiteral("original"));
 
@@ -1791,7 +1791,7 @@ void CCollectionDocumentServiceIntegrationTest::SingleCopySetDocumentDataSharedT
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::SingleCopyCloseOneUserTest()
+void CDocumentServiceIntegrationTest::SingleCopyCloseOneUserTest()
 {
 	AddCollectionObject(TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME);
 
@@ -1808,7 +1808,7 @@ void CCollectionDocumentServiceIntegrationTest::SingleCopyCloseOneUserTest()
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::SingleCopyCloseBothUsersTest()
+void CDocumentServiceIntegrationTest::SingleCopyCloseBothUsersTest()
 {
 	AddCollectionObject(TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME);
 
@@ -1830,7 +1830,7 @@ void CCollectionDocumentServiceIntegrationTest::SingleCopyCloseBothUsersTest()
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::SingleCopySaveUpdatesAllTest()
+void CDocumentServiceIntegrationTest::SingleCopySaveUpdatesAllTest()
 {
 	AddCollectionObject(TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME);
 
@@ -1855,7 +1855,7 @@ void CCollectionDocumentServiceIntegrationTest::SingleCopySaveUpdatesAllTest()
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::SingleCopySetDocumentNameUpdatesAllTest()
+void CDocumentServiceIntegrationTest::SingleCopySetDocumentNameUpdatesAllTest()
 {
 	AddCollectionObject(TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME);
 
@@ -1879,7 +1879,7 @@ void CCollectionDocumentServiceIntegrationTest::SingleCopySetDocumentNameUpdates
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::SingleCopySaveAsUpdatesAllTest()
+void CDocumentServiceIntegrationTest::SingleCopySaveAsUpdatesAllTest()
 {
 	AddCollectionObject(TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME);
 
@@ -1901,7 +1901,7 @@ void CCollectionDocumentServiceIntegrationTest::SingleCopySaveAsUpdatesAllTest()
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::SingleCopyReopenBySameUserTest()
+void CDocumentServiceIntegrationTest::SingleCopyReopenBySameUserTest()
 {
 	AddCollectionObject(TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME);
 
@@ -1912,7 +1912,7 @@ void CCollectionDocumentServiceIntegrationTest::SingleCopyReopenBySameUserTest()
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::SingleCopyOneDocumentForAllUsersTest()
+void CDocumentServiceIntegrationTest::SingleCopyOneDocumentForAllUsersTest()
 {
 	AddCollectionObject(TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME);
 	AddCollectionObject(TEST_OBJECT_ID_2, TEST_TYPE_ID, TEST_DOC_NAME);
@@ -1938,4 +1938,4 @@ void CCollectionDocumentServiceIntegrationTest::SingleCopyOneDocumentForAllUsers
 }
 
 
-I_ADD_TEST(CCollectionDocumentServiceIntegrationTest);
+I_ADD_TEST(CDocumentServiceIntegrationTest);

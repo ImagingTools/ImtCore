@@ -6,7 +6,7 @@
 #include <iprm/ITextParam.h>
 
 
-namespace CollectionDocumentServiceIntegrationTestPck
+namespace DocumentServiceIntegrationTestPck
 {
 
 
@@ -27,4 +27,4 @@ QString CTextDocumentNameProviderComp::GetDefaultDocumentName(const QUrl& /*url*
 }
 
 
-} // namespace CollectionDocumentServiceIntegrationTestPck
+} // namespace DocumentServiceIntegrationTestPck

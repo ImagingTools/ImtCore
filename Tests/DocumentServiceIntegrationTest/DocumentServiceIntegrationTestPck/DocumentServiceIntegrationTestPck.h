@@ -8,9 +8,9 @@
 
 
 /**
-	Test components for CollectionDocumentServiceIntegrationTest.
+	Test components for DocumentServiceIntegrationTest.
 */
-namespace CollectionDocumentServiceIntegrationTestPck
+namespace DocumentServiceIntegrationTestPck
 {
 
 
@@ -18,4 +18,4 @@ typedef CTextDocumentValidatorComp TextDocumentValidator;
 typedef CTextDocumentNameProviderComp TextDocumentNameProvider;
 
 
-} // namespace CollectionDocumentServiceIntegrationTestPck
+} // namespace DocumentServiceIntegrationTestPck

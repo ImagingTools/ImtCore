@@ -1,4 +1,4 @@
-TARGET = CollectionDocumentServiceIntegrationTest
+TARGET = DocumentServiceIntegrationTest
 
 include($(ACFCONFIGDIR)/QMake/ApplicationConfig.pri)
 include($$PWD/../../../Config/QMake/ImtCore.pri)

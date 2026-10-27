@@ -6,7 +6,7 @@
 #include <iprm/ITextParam.h>
 
 
-namespace CollectionDocumentServiceIntegrationTestPck
+namespace DocumentServiceIntegrationTestPck
 {
 
 
@@ -33,4 +33,4 @@ bool CTextDocumentValidatorComp::ValidateDocumentData(
 }
 
 
-} // namespace CollectionDocumentServiceIntegrationTestPck
+} // namespace DocumentServiceIntegrationTestPck
