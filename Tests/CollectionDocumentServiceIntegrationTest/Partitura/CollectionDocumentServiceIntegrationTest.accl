@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="6560" Description="ACF"/>
+            <Version Id="1" Number="2449" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="CollectionDocumentService" X="375" Y="200" Note=""/>
+        <Element ComponentName="DocumentObject" X="125" Y="450" Note=""/>
+        <Element ComponentName="ObjectCollection" X="625" Y="450" Note=""/>
+        <Element ComponentName="SingleCopyCollectionDocumentService" X="875" Y="200" Note=""/>
+        <Element ComponentName="UndoManager" X="375" Y="450" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>
