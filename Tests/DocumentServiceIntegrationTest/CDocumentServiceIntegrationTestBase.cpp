@@ -8,7 +8,7 @@
 
 // ACF includes
 #include <imod/IModel.h>
-#include <iprm/ITextParam.h>
+#include <iprm/CTextParam.h>
 
 // ImtCore includes
 #include <imtdoc/CEventBase.h>
@@ -84,6 +84,7 @@ bool CRecordingEventHandler::ProcessEvent(imtdoc::CEventBase* eventPtr)
 	event.documentTypeId = eventPtr->GetDocumentTypeId();
 	event.documentName = eventPtr->GetDocumentName();
 	event.documentUrl = eventPtr->GetDocumentUrl();
+	event.isDirty = eventPtr->IsDocumentDirty();
 
 	QMutexLocker locker(&m_mutex);
 
@@ -284,6 +285,19 @@ QString CDocumentServiceIntegrationTestBase::GetDocumentText(
 	}
 
 	return textPtr->GetText();
+}
+
+
+imtdoc::IDocumentService::OperationStatus CDocumentServiceIntegrationTestBase::SetDocumentText(
+			imtdoc::IDocumentService& service,
+			const QByteArray& userId,
+			const QByteArray& documentId,
+			const QString& text)
+{
+	iprm::CTextParam data;
+	data.SetText(text);
+
+	return service.SetDocumentData(userId, documentId, data);
 }
 
 

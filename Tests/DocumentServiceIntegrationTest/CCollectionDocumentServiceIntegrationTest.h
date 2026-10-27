@@ -80,6 +80,10 @@ private slots:
 	void SaveDocumentEventFiredTest();
 	void SaveDocumentSaveAsEventFiredTest();
 
+	// Undo/redo tests
+	void UndoRedoOpenedDocumentDirtyFlagTest();
+	void UndoAfterSaveMakesDocumentDirtyTest();
+
 	// ObjectIdToUrl tests
 	void ObjectIdToUrlTest();
 	void UrlToObjectIdTest();
@@ -98,6 +102,7 @@ private slots:
 	void SingleCopySaveAsUpdatesAllTest();
 	void SingleCopyReopenBySameUserTest();
 	void SingleCopyOneDocumentForAllUsersTest();
+	void SingleCopyUndoRedoSharedTest();
 
 private:
 	/**

@@ -90,6 +90,17 @@ private slots:
 	void GetDocumentUndoManagerInvalidUserTest();
 	void GetDocumentUndoManagerInvalidDocumentTest();
 
+	// Undo/redo tests
+	void UndoRedoInitialStateTest();
+	void UndoRedoSetDocumentDataAddsUndoStepTest();
+	void UndoRestoresDocumentDataTest();
+	void RedoRestoresDocumentDataTest();
+	void UndoRedoNewChangeClearsRedoTest();
+	void UndoRedoExecuteDocumentMethodTest();
+	void UndoRedoChangedEventFiredTest();
+	void UndoRedoNewDocumentStaysDirtyTest();
+	void UndoRedoDocumentsIsolationTest();
+
 	// RegisterDocumentObserver tests
 	void RegisterDocumentObserverSuccessTest();
 	void RegisterDocumentObserverInvalidUserTest();

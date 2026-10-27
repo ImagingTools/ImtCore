@@ -7,6 +7,9 @@
 #include <iprm/CTextParam.h>
 #include <iser/CMemoryWriteArchive.h>
 
+// ImtCore includes
+#include <imtdoc/CDocumentMethod.h>
+
 
 namespace
 {
@@ -22,6 +25,7 @@ const QByteArray CREATED_EVENT = QByteArrayLiteral("DocumentCreatedEvent");
 const QByteArray DATA_LOADED_EVENT = QByteArrayLiteral("DocumentDataLoadedEvent");
 const QByteArray CLOSED_EVENT = QByteArrayLiteral("DocumentClosedEvent");
 const QByteArray RENAMED_EVENT = QByteArrayLiteral("DocumentRenamedEvent");
+const QByteArray UNDO_REDO_CHANGED_EVENT = QByteArrayLiteral("DocumentUndoRedoChangedEvent");
 
 const int WAIT_TIMEOUT = 5000;
 
@@ -570,6 +574,219 @@ void CDocumentServiceIntegrationTest::GetDocumentUndoManagerInvalidDocumentTest(
 
 	idoc::IUndoManager* undoManagerPtr = nullptr;
 	QCOMPARE(m_servicePtr->GetDocumentUndoManager(TEST_USER_ID, QByteArrayLiteral("invalidDocId"), undoManagerPtr), imtdoc::IDocumentService::OS_INVALID_DOCUMENT_ID);
+}
+
+
+// Undo/redo tests
+
+void CDocumentServiceIntegrationTest::UndoRedoInitialStateTest()
+{
+	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
+	QVERIFY(!docId.isEmpty());
+
+	idoc::IUndoManager* undoManagerPtr = nullptr;
+	QCOMPARE(m_servicePtr->GetDocumentUndoManager(TEST_USER_ID, docId, undoManagerPtr), imtdoc::IDocumentService::OS_OK);
+	QVERIFY(undoManagerPtr != nullptr);
+	QCOMPARE(undoManagerPtr->GetAvailableUndoSteps(), 0);
+	QCOMPARE(undoManagerPtr->GetAvailableRedoSteps(), 0);
+	QVERIFY(!undoManagerPtr->DoUndo());
+	QVERIFY(!undoManagerPtr->DoRedo());
+}
+
+
+void CDocumentServiceIntegrationTest::UndoRedoSetDocumentDataAddsUndoStepTest()
+{
+	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
+	QVERIFY(!docId.isEmpty());
+
+	idoc::IUndoManager* undoManagerPtr = nullptr;
+	QCOMPARE(m_servicePtr->GetDocumentUndoManager(TEST_USER_ID, docId, undoManagerPtr), imtdoc::IDocumentService::OS_OK);
+	QVERIFY(undoManagerPtr != nullptr);
+
+	QCOMPARE(SetDocumentText(*m_servicePtr, TEST_USER_ID, docId, QStringLiteral("first")), imtdoc::IDocumentService::OS_OK);
+	QCOMPARE(undoManagerPtr->GetAvailableUndoSteps(), 1);
+	QCOMPARE(undoManagerPtr->GetAvailableRedoSteps(), 0);
+
+	QCOMPARE(SetDocumentText(*m_servicePtr, TEST_USER_ID, docId, QStringLiteral("second")), imtdoc::IDocumentService::OS_OK);
+	QCOMPARE(undoManagerPtr->GetAvailableUndoSteps(), 2);
+	QCOMPARE(undoManagerPtr->GetAvailableRedoSteps(), 0);
+}
+
+
+void CDocumentServiceIntegrationTest::UndoRestoresDocumentDataTest()
+{
+	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
+	QVERIFY(!docId.isEmpty());
+
+	idoc::IUndoManager* undoManagerPtr = nullptr;
+	QCOMPARE(m_servicePtr->GetDocumentUndoManager(TEST_USER_ID, docId, undoManagerPtr), imtdoc::IDocumentService::OS_OK);
+	QVERIFY(undoManagerPtr != nullptr);
+
+	QCOMPARE(SetDocumentText(*m_servicePtr, TEST_USER_ID, docId, QStringLiteral("first")), imtdoc::IDocumentService::OS_OK);
+	QCOMPARE(SetDocumentText(*m_servicePtr, TEST_USER_ID, docId, QStringLiteral("second")), imtdoc::IDocumentService::OS_OK);
+
+	QVERIFY(undoManagerPtr->DoUndo());
+	QCOMPARE(GetDocumentText(*m_servicePtr, TEST_USER_ID, docId), QStringLiteral("first"));
+	QCOMPARE(undoManagerPtr->GetAvailableUndoSteps(), 1);
+	QCOMPARE(undoManagerPtr->GetAvailableRedoSteps(), 1);
+
+	QVERIFY(undoManagerPtr->DoUndo());
+	QCOMPARE(GetDocumentText(*m_servicePtr, TEST_USER_ID, docId), QString());
+	QCOMPARE(undoManagerPtr->GetAvailableUndoSteps(), 0);
+	QCOMPARE(undoManagerPtr->GetAvailableRedoSteps(), 2);
+}
+
+
+void CDocumentServiceIntegrationTest::RedoRestoresDocumentDataTest()
+{
+	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
+	QVERIFY(!docId.isEmpty());
+
+	idoc::IUndoManager* undoManagerPtr = nullptr;
+	QCOMPARE(m_servicePtr->GetDocumentUndoManager(TEST_USER_ID, docId, undoManagerPtr), imtdoc::IDocumentService::OS_OK);
+	QVERIFY(undoManagerPtr != nullptr);
+
+	QCOMPARE(SetDocumentText(*m_servicePtr, TEST_USER_ID, docId, QStringLiteral("first")), imtdoc::IDocumentService::OS_OK);
+	QCOMPARE(SetDocumentText(*m_servicePtr, TEST_USER_ID, docId, QStringLiteral("second")), imtdoc::IDocumentService::OS_OK);
+	QVERIFY(undoManagerPtr->DoUndo(2));
+	QCOMPARE(GetDocumentText(*m_servicePtr, TEST_USER_ID, docId), QString());
+
+	QVERIFY(undoManagerPtr->DoRedo());
+	QCOMPARE(GetDocumentText(*m_servicePtr, TEST_USER_ID, docId), QStringLiteral("first"));
+
+	QVERIFY(undoManagerPtr->DoRedo());
+	QCOMPARE(GetDocumentText(*m_servicePtr, TEST_USER_ID, docId), QStringLiteral("second"));
+	QCOMPARE(undoManagerPtr->GetAvailableUndoSteps(), 2);
+	QCOMPARE(undoManagerPtr->GetAvailableRedoSteps(), 0);
+}
+
+
+void CDocumentServiceIntegrationTest::UndoRedoNewChangeClearsRedoTest()
+{
+	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
+	QVERIFY(!docId.isEmpty());
+
+	idoc::IUndoManager* undoManagerPtr = nullptr;
+	QCOMPARE(m_servicePtr->GetDocumentUndoManager(TEST_USER_ID, docId, undoManagerPtr), imtdoc::IDocumentService::OS_OK);
+	QVERIFY(undoManagerPtr != nullptr);
+
+	QCOMPARE(SetDocumentText(*m_servicePtr, TEST_USER_ID, docId, QStringLiteral("first")), imtdoc::IDocumentService::OS_OK);
+	QCOMPARE(SetDocumentText(*m_servicePtr, TEST_USER_ID, docId, QStringLiteral("second")), imtdoc::IDocumentService::OS_OK);
+	QVERIFY(undoManagerPtr->DoUndo());
+	QCOMPARE(undoManagerPtr->GetAvailableRedoSteps(), 1);
+
+	QCOMPARE(SetDocumentText(*m_servicePtr, TEST_USER_ID, docId, QStringLiteral("third")), imtdoc::IDocumentService::OS_OK);
+	QCOMPARE(undoManagerPtr->GetAvailableRedoSteps(), 0);
+	QCOMPARE(undoManagerPtr->GetAvailableUndoSteps(), 2);
+	QVERIFY(!undoManagerPtr->DoRedo());
+	QCOMPARE(GetDocumentText(*m_servicePtr, TEST_USER_ID, docId), QStringLiteral("third"));
+}
+
+
+void CDocumentServiceIntegrationTest::UndoRedoExecuteDocumentMethodTest()
+{
+	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
+	QVERIFY(!docId.isEmpty());
+
+	idoc::IUndoManager* undoManagerPtr = nullptr;
+	QCOMPARE(m_servicePtr->GetDocumentUndoManager(TEST_USER_ID, docId, undoManagerPtr), imtdoc::IDocumentService::OS_OK);
+	QVERIFY(undoManagerPtr != nullptr);
+
+	const imtdoc::CDocumentMethod method(&iprm::ITextParam::SetText, QStringLiteral("method"));
+	QCOMPARE(m_servicePtr->ExecuteDocumentMethod(TEST_USER_ID, docId, method), imtdoc::IDocumentService::OS_OK);
+	QCOMPARE(GetDocumentText(*m_servicePtr, TEST_USER_ID, docId), QStringLiteral("method"));
+	QCOMPARE(undoManagerPtr->GetAvailableUndoSteps(), 1);
+
+	QVERIFY(undoManagerPtr->DoUndo());
+	QCOMPARE(GetDocumentText(*m_servicePtr, TEST_USER_ID, docId), QString());
+
+	QVERIFY(undoManagerPtr->DoRedo());
+	QCOMPARE(GetDocumentText(*m_servicePtr, TEST_USER_ID, docId), QStringLiteral("method"));
+}
+
+
+void CDocumentServiceIntegrationTest::UndoRedoChangedEventFiredTest()
+{
+	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID, TEST_DOC_NAME);
+	QVERIFY(!docId.isEmpty());
+
+	idoc::IUndoManager* undoManagerPtr = nullptr;
+	QCOMPARE(m_servicePtr->GetDocumentUndoManager(TEST_USER_ID, docId, undoManagerPtr), imtdoc::IDocumentService::OS_OK);
+	QVERIFY(undoManagerPtr != nullptr);
+
+	m_eventHandler.ClearEvents();
+	QCOMPARE(SetDocumentText(*m_servicePtr, TEST_USER_ID, docId, QStringLiteral("first")), imtdoc::IDocumentService::OS_OK);
+	QVERIFY2(m_eventHandler.HasEvent(UNDO_REDO_CHANGED_EVENT, TEST_USER_ID), "DocumentUndoRedoChanged event should be fired on change");
+
+	m_eventHandler.ClearEvents();
+	QVERIFY(undoManagerPtr->DoUndo());
+	QVERIFY2(m_eventHandler.HasEvent(UNDO_REDO_CHANGED_EVENT, TEST_USER_ID), "DocumentUndoRedoChanged event should be fired on undo");
+
+	m_eventHandler.ClearEvents();
+	QVERIFY(undoManagerPtr->DoRedo());
+	QVERIFY2(m_eventHandler.HasEvent(UNDO_REDO_CHANGED_EVENT, TEST_USER_ID), "DocumentUndoRedoChanged event should be fired on redo");
+
+	const QList<CRecordingEventHandler::RecordedEvent> events = m_eventHandler.GetEvents();
+	for (const CRecordingEventHandler::RecordedEvent& event : events){
+		if (event.type == UNDO_REDO_CHANGED_EVENT){
+			QCOMPARE(event.userId, TEST_USER_ID);
+			QCOMPARE(event.documentId, docId);
+			QCOMPARE(event.documentTypeId, TEST_TYPE_ID);
+			QCOMPARE(event.documentName, TEST_DOC_NAME);
+		}
+	}
+}
+
+
+void CDocumentServiceIntegrationTest::UndoRedoNewDocumentStaysDirtyTest()
+{
+	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
+	QVERIFY(!docId.isEmpty());
+
+	idoc::IUndoManager* undoManagerPtr = nullptr;
+	QCOMPARE(m_servicePtr->GetDocumentUndoManager(TEST_USER_ID, docId, undoManagerPtr), imtdoc::IDocumentService::OS_OK);
+	QVERIFY(undoManagerPtr != nullptr);
+
+	QCOMPARE(SetDocumentText(*m_servicePtr, TEST_USER_ID, docId, QStringLiteral("first")), imtdoc::IDocumentService::OS_OK);
+
+	m_eventHandler.ClearEvents();
+	QVERIFY(undoManagerPtr->DoUndo());
+
+	// A document without URL has never been saved, so it is dirty even in the initial state
+	QVERIFY2(FindDocumentInfo(*m_servicePtr, TEST_USER_ID, docId).isDirty, "New document should stay dirty after undo");
+
+	const QList<CRecordingEventHandler::RecordedEvent> events = m_eventHandler.GetEvents();
+	for (const CRecordingEventHandler::RecordedEvent& event : events){
+		if (event.type == UNDO_REDO_CHANGED_EVENT){
+			QVERIFY(event.isDirty);
+		}
+	}
+}
+
+
+void CDocumentServiceIntegrationTest::UndoRedoDocumentsIsolationTest()
+{
+	QByteArray docId1 = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
+	QByteArray docId2 = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
+	QVERIFY(!docId1.isEmpty());
+	QVERIFY(!docId2.isEmpty());
+
+	idoc::IUndoManager* undoManager1Ptr = nullptr;
+	idoc::IUndoManager* undoManager2Ptr = nullptr;
+	QCOMPARE(m_servicePtr->GetDocumentUndoManager(TEST_USER_ID, docId1, undoManager1Ptr), imtdoc::IDocumentService::OS_OK);
+	QCOMPARE(m_servicePtr->GetDocumentUndoManager(TEST_USER_ID, docId2, undoManager2Ptr), imtdoc::IDocumentService::OS_OK);
+	QVERIFY(undoManager1Ptr != nullptr);
+	QVERIFY(undoManager2Ptr != nullptr);
+	QVERIFY(undoManager1Ptr != undoManager2Ptr);
+
+	QCOMPARE(SetDocumentText(*m_servicePtr, TEST_USER_ID, docId1, QStringLiteral("doc1")), imtdoc::IDocumentService::OS_OK);
+	QCOMPARE(SetDocumentText(*m_servicePtr, TEST_USER_ID, docId2, QStringLiteral("doc2")), imtdoc::IDocumentService::OS_OK);
+
+	QVERIFY(undoManager1Ptr->DoUndo());
+	QCOMPARE(GetDocumentText(*m_servicePtr, TEST_USER_ID, docId1), QString());
+	QCOMPARE(GetDocumentText(*m_servicePtr, TEST_USER_ID, docId2), QStringLiteral("doc2"));
+	QCOMPARE(undoManager2Ptr->GetAvailableUndoSteps(), 1);
+	QCOMPARE(undoManager2Ptr->GetAvailableRedoSteps(), 0);
 }
 
 

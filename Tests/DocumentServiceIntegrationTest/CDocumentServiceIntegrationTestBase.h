@@ -119,6 +119,15 @@ protected:
 				const QByteArray& userId,
 				const QByteArray& documentId) const;
 
+	/**
+		Sets the text of the document using \c SetDocumentData.
+	*/
+	imtdoc::IDocumentService::OperationStatus SetDocumentText(
+				imtdoc::IDocumentService& service,
+				const QByteArray& userId,
+				const QByteArray& documentId,
+				const QString& text);
+
 protected:
 	CRecordingEventHandler m_eventHandler;
 };

@@ -3,6 +3,7 @@
 
 
 // ACF includes
+#include <idoc/IUndoManager.h>
 #include <iprm/CTextParam.h>
 
 // ImtCore includes
@@ -32,6 +33,7 @@ const QByteArray DATA_LOADED_EVENT = QByteArrayLiteral("DocumentDataLoadedEvent"
 const QByteArray RENAMED_EVENT = QByteArrayLiteral("DocumentRenamedEvent");
 const QByteArray SAVED_EVENT = QByteArrayLiteral("DocumentSavedEvent");
 const QByteArray SAVED_AS_EVENT = QByteArrayLiteral("DocumentSavedAsEvent");
+const QByteArray UNDO_REDO_CHANGED_EVENT = QByteArrayLiteral("DocumentUndoRedoChangedEvent");
 
 const int WAIT_TIMEOUT = 5000;
 
@@ -750,6 +752,68 @@ void CCollectionDocumentServiceIntegrationTest::SaveDocumentSaveAsEventFiredTest
 }
 
 
+// Undo/redo tests
+
+void CCollectionDocumentServiceIntegrationTest::UndoRedoOpenedDocumentDirtyFlagTest()
+{
+	AddCollectionObject(TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME, QStringLiteral("original"));
+
+	QByteArray docId = OpenDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_OBJECT_ID);
+	QVERIFY(!docId.isEmpty());
+	QVERIFY(!FindDocumentInfo(*m_servicePtr, TEST_USER_ID, docId).isDirty);
+
+	idoc::IUndoManager* undoManagerPtr = nullptr;
+	QCOMPARE(m_servicePtr->GetDocumentUndoManager(TEST_USER_ID, docId, undoManagerPtr), imtdoc::IDocumentService::OS_OK);
+	QVERIFY(undoManagerPtr != nullptr);
+	QCOMPARE(undoManagerPtr->GetAvailableUndoSteps(), 0);
+
+	QCOMPARE(SetDocumentText(*m_servicePtr, TEST_USER_ID, docId, QStringLiteral("modified")), imtdoc::IDocumentService::OS_OK);
+	QVERIFY2(FindDocumentInfo(*m_servicePtr, TEST_USER_ID, docId).isDirty, "Document should be dirty after change");
+
+	QVERIFY(undoManagerPtr->DoUndo());
+	QCOMPARE(GetDocumentText(*m_servicePtr, TEST_USER_ID, docId), QStringLiteral("original"));
+	QVERIFY2(!FindDocumentInfo(*m_servicePtr, TEST_USER_ID, docId).isDirty, "Document should not be dirty after undo to the opened state");
+
+	QVERIFY(undoManagerPtr->DoRedo());
+	QCOMPARE(GetDocumentText(*m_servicePtr, TEST_USER_ID, docId), QStringLiteral("modified"));
+	QVERIFY2(FindDocumentInfo(*m_servicePtr, TEST_USER_ID, docId).isDirty, "Document should be dirty after redo");
+}
+
+
+void CCollectionDocumentServiceIntegrationTest::UndoAfterSaveMakesDocumentDirtyTest()
+{
+	AddCollectionObject(TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME, QStringLiteral("original"));
+
+	QByteArray docId = OpenDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_OBJECT_ID);
+	QVERIFY(!docId.isEmpty());
+
+	idoc::IUndoManager* undoManagerPtr = nullptr;
+	QCOMPARE(m_servicePtr->GetDocumentUndoManager(TEST_USER_ID, docId, undoManagerPtr), imtdoc::IDocumentService::OS_OK);
+	QVERIFY(undoManagerPtr != nullptr);
+
+	QCOMPARE(SetDocumentText(*m_servicePtr, TEST_USER_ID, docId, QStringLiteral("modified")), imtdoc::IDocumentService::OS_OK);
+	QCOMPARE(SaveDocument(*m_servicePtr, TEST_USER_ID, docId), imtdoc::IDocumentService::OS_OK);
+	QVERIFY(!FindDocumentInfo(*m_servicePtr, TEST_USER_ID, docId).isDirty);
+
+	m_eventHandler.ClearEvents();
+	QVERIFY(undoManagerPtr->DoUndo());
+	QCOMPARE(GetDocumentText(*m_servicePtr, TEST_USER_ID, docId), QStringLiteral("original"));
+	QVERIFY2(FindDocumentInfo(*m_servicePtr, TEST_USER_ID, docId).isDirty, "Document should be dirty after undo behind the saved state");
+	QVERIFY2(m_eventHandler.HasEvent(UNDO_REDO_CHANGED_EVENT, TEST_USER_ID), "DocumentUndoRedoChanged event should be fired on undo");
+
+	const QList<CRecordingEventHandler::RecordedEvent> events = m_eventHandler.GetEvents();
+	for (const CRecordingEventHandler::RecordedEvent& event : events){
+		if (event.type == UNDO_REDO_CHANGED_EVENT){
+			QVERIFY(event.isDirty);
+		}
+	}
+
+	m_eventHandler.ClearEvents();
+	QVERIFY(undoManagerPtr->DoRedo());
+	QVERIFY2(!FindDocumentInfo(*m_servicePtr, TEST_USER_ID, docId).isDirty, "Document should not be dirty after redo to the saved state");
+}
+
+
 // ObjectIdToUrl tests
 
 void CCollectionDocumentServiceIntegrationTest::ObjectIdToUrlTest()
@@ -1021,6 +1085,38 @@ void CCollectionDocumentServiceIntegrationTest::SingleCopyOneDocumentForAllUsers
 	QVERIFY(regularDocId1 != regularDocId2);
 }
 
+
+
+void CCollectionDocumentServiceIntegrationTest::SingleCopyUndoRedoSharedTest()
+{
+	AddCollectionObject(TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME, QStringLiteral("original"));
+
+	QByteArray docId1 = OpenDocumentAndWaitForLoad(*m_singleCopyServicePtr, TEST_USER_ID, TEST_OBJECT_ID);
+	QByteArray docId2 = OpenDocumentAndWaitForLoad(*m_singleCopyServicePtr, TEST_USER_ID_2, TEST_OBJECT_ID);
+	QVERIFY(!docId1.isEmpty());
+	QVERIFY(!docId2.isEmpty());
+
+	idoc::IUndoManager* undoManager1Ptr = nullptr;
+	idoc::IUndoManager* undoManager2Ptr = nullptr;
+	QCOMPARE(m_singleCopyServicePtr->GetDocumentUndoManager(TEST_USER_ID, docId1, undoManager1Ptr), imtdoc::IDocumentService::OS_OK);
+	QCOMPARE(m_singleCopyServicePtr->GetDocumentUndoManager(TEST_USER_ID_2, docId2, undoManager2Ptr), imtdoc::IDocumentService::OS_OK);
+	QVERIFY(undoManager1Ptr != nullptr);
+	QCOMPARE(undoManager1Ptr, undoManager2Ptr);
+
+	m_eventHandler.ClearEvents();
+	QCOMPARE(SetDocumentText(*m_singleCopyServicePtr, TEST_USER_ID, docId1, QStringLiteral("modified")), imtdoc::IDocumentService::OS_OK);
+	QVERIFY2(m_eventHandler.HasEvent(UNDO_REDO_CHANGED_EVENT, TEST_USER_ID), "DocumentUndoRedoChanged event should be fired for the first user");
+	QVERIFY2(m_eventHandler.HasEvent(UNDO_REDO_CHANGED_EVENT, TEST_USER_ID_2), "DocumentUndoRedoChanged event should be fired for the second user");
+
+	// Undo by the second user reverts the change of the first user
+	m_eventHandler.ClearEvents();
+	QVERIFY(undoManager2Ptr->DoUndo());
+	QCOMPARE(GetDocumentText(*m_singleCopyServicePtr, TEST_USER_ID, docId1), QStringLiteral("original"));
+	QVERIFY(!FindDocumentInfo(*m_singleCopyServicePtr, TEST_USER_ID, docId1).isDirty);
+	QVERIFY(!FindDocumentInfo(*m_singleCopyServicePtr, TEST_USER_ID_2, docId2).isDirty);
+	QVERIFY2(m_eventHandler.HasEvent(UNDO_REDO_CHANGED_EVENT, TEST_USER_ID), "DocumentUndoRedoChanged event should be fired for the first user on undo");
+	QVERIFY2(m_eventHandler.HasEvent(UNDO_REDO_CHANGED_EVENT, TEST_USER_ID_2), "DocumentUndoRedoChanged event should be fired for the second user on undo");
+}
 
 
 I_ADD_TEST(CCollectionDocumentServiceIntegrationTest);
