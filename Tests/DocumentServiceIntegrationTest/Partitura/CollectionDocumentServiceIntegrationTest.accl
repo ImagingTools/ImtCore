@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="6603" Description="ACF"/>
+            <Version Id="1" Number="2459" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="396033" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="CollectionDocumentService" X="1025" Y="325" Note=""/>
+        <Element ComponentName="DocumentObject" X="125" Y="525" Note=""/>
+        <Element ComponentName="ObjectCollection" X="350" Y="525" Note=""/>
+        <Element ComponentName="SingleCopyCollectionDocumentService" X="975" Y="425" Note=""/>
+        <Element ComponentName="TextDocumentNameProvider" X="250" Y="275" Note=""/>
+        <Element ComponentName="TextDocumentValidator" X="500" Y="125" Note=""/>
+        <Element ComponentName="TextDocumentValidatorWithMessage" X="450" Y="650" Note=""/>
+        <Element ComponentName="UndoManager" X="800" Y="225" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

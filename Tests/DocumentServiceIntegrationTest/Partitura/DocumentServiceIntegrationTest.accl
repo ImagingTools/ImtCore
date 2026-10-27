@@ -8,14 +8,9 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="CollectionDocumentService" X="1025" Y="325" Note=""/>
-        <Element ComponentName="DocumentObject" X="125" Y="525" Note=""/>
-        <Element ComponentName="ObjectCollection" X="350" Y="525" Note=""/>
-        <Element ComponentName="SingleCopyCollectionDocumentService" X="975" Y="425" Note=""/>
-        <Element ComponentName="TextDocumentNameProvider" X="250" Y="275" Note=""/>
-        <Element ComponentName="TextDocumentValidator" X="500" Y="125" Note=""/>
-        <Element ComponentName="TextDocumentValidatorWithMessage" X="450" Y="650" Note=""/>
-        <Element ComponentName="UndoManager" X="800" Y="225" Note=""/>
+        <Element ComponentName="DocumentObject" X="125" Y="325" Note=""/>
+        <Element ComponentName="DocumentService" X="450" Y="225" Note=""/>
+        <Element ComponentName="UndoManager" X="125" Y="125" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>
