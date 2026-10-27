@@ -87,6 +87,7 @@ protected:
 	BaseClass* GetNonConstThis() const;
 	int GetObjectFactoryIndex(const QByteArray& typeId) const;
 	QByteArray GetUserId(const ::imtgql::CGqlRequest& gqlRequest) const;
+	static QString CreateDocumentNotFoundMessage(const QByteArray& userId, const QByteArray& documentId);
 
 	// reimplemented (imtdoc::TCollectionDocumentServiceWrap)
 	virtual imtbase::IObjectCollection* GetCollection() const override;
@@ -160,6 +161,14 @@ inline QByteArray TCollectionDocumentServiceCompBase<Base, ColorCollectionDocume
 	}
 
 	return QByteArray();
+}
+
+
+template<class Base, class ColorCollectionDocumentServiceDefs>
+inline QString TCollectionDocumentServiceCompBase<Base, ColorCollectionDocumentServiceDefs>::
+			CreateDocumentNotFoundMessage(const QByteArray& userId, const QByteArray& documentId)
+{
+	return QStringLiteral("No open document with ID '%1' found for user '%2'").arg(QString(documentId), QString(userId));
 }
 
 
@@ -542,24 +551,30 @@ inline UM::CUndoInfo TCollectionDocumentServiceCompBase<Base, ColorCollectionDoc
 
 	QMutexLocker locker(&m_mutex);
 	auto* workingDocumentPtr = this->FindDocument(userId, *documentId->id);
-	if (workingDocumentPtr != nullptr) {
-		idoc::IUndoManager* undoManagerPtr = workingDocumentPtr->undoManagerPtr.GetPtr();
+	if (workingDocumentPtr == nullptr) {
+		errorMessage = CreateDocumentNotFoundMessage(userId, *documentId->id);
 
-		int count = undoManagerPtr->GetAvailableUndoSteps();
-		retVal.availableUndoSteps = count;
-		retVal.undoLevelDescriptions.emplace();
-		for (int i = 0; i < count; i++) {
-			QString description = undoManagerPtr->GetUndoLevelDescription(i);
-			retVal.undoLevelDescriptions->append(description);
-		}
+		retVal.status->status = UM::EUndoStatus::Failed;
 
-		count = undoManagerPtr->GetAvailableRedoSteps();
-		retVal.availableRedoSteps = count;
-		retVal.redoLevelDescriptions.emplace();
-		for (int i = 0; i < count; i++) {
-			QString description = undoManagerPtr->GetRedoLevelDescription(i);
-			retVal.redoLevelDescriptions->append(description);
-		}
+		return retVal;
+	}
+
+	idoc::IUndoManager* undoManagerPtr = workingDocumentPtr->undoManagerPtr.GetPtr();
+
+	int count = undoManagerPtr->GetAvailableUndoSteps();
+	retVal.availableUndoSteps = count;
+	retVal.undoLevelDescriptions.emplace();
+	for (int i = 0; i < count; i++) {
+		QString description = undoManagerPtr->GetUndoLevelDescription(i);
+		retVal.undoLevelDescriptions->append(description);
+	}
+
+	count = undoManagerPtr->GetAvailableRedoSteps();
+	retVal.availableRedoSteps = count;
+	retVal.redoLevelDescriptions.emplace();
+	for (int i = 0; i < count; i++) {
+		QString description = undoManagerPtr->GetRedoLevelDescription(i);
+		retVal.redoLevelDescriptions->append(description);
 	}
 
 	retVal.status->status = UM::EUndoStatus::Success;
@@ -605,7 +620,7 @@ inline UM::CUndoStatus TCollectionDocumentServiceCompBase<Base, ColorCollectionD
 	idoc::IUndoManager* undoManagerPtr = nullptr;
 	auto* workingDocumentPtr = this->FindDocument(userId, documentId);
 	if (workingDocumentPtr == nullptr) {
-		errorMessage = "Undo operation failed";
+		errorMessage = CreateDocumentNotFoundMessage(userId, documentId);
 
 		retVal.status = UM::EUndoStatus::Failed;
 
@@ -673,7 +688,7 @@ inline UM::CUndoStatus TCollectionDocumentServiceCompBase<Base, ColorCollectionD
 	idoc::IUndoManager* undoManagerPtr = nullptr;
 	auto* workingDocumentPtr = this->FindDocument(userId, documentId);
 	if (workingDocumentPtr == nullptr) {
-		errorMessage = "Redo operation failed";
+		errorMessage = CreateDocumentNotFoundMessage(userId, documentId);
 
 		retVal.status = UM::EUndoStatus::Failed;
 
@@ -740,7 +755,7 @@ inline UM::CUndoStatus TCollectionDocumentServiceCompBase<Base, ColorCollectionD
 	idoc::IUndoManager* undoManagerPtr = nullptr;
 	auto* workingDocumentPtr = this->FindDocument(userId, *documentId->id);
 	if (workingDocumentPtr == nullptr) {
-		errorMessage = "Reset undo operation failed";
+		errorMessage = CreateDocumentNotFoundMessage(userId, *documentId->id);
 
 		retVal.status = UM::EUndoStatus::Failed;
 
