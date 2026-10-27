@@ -192,12 +192,6 @@ protected:
 		Returns the IDs of all users holding the document \a documentId.
 	*/
 	QByteArrayList GetDocumentUserIds(const QByteArray& documentId) const;
-	QUrl ObjectIdToUrl(const QByteArray& objectId);
-	/**
-		Extracts the collection object ID from a \c collection:///<objectId> URL.
-		Returns an empty ID for unsaved documents (empty URL) or non-collection URLs.
-	*/
-	static QByteArray UrlToObjectId(const QUrl& url);
 	/**
 		A document that was never saved (no backing URL) is dirty regardless of its undo state;
 		otherwise it is dirty when the undo manager reports changes since the last save.
@@ -220,9 +214,16 @@ protected:
 				const QByteArray& taskId,
 				const iprm::IParamsSet* initParamsPtr);
 
-	virtual QString GetDefaultDocumentName(const WorkingDocument& document) const;
+	/**
+		\param objectId	ID of the object backing the document in the storage, empty for unsaved documents.
+	*/
+	virtual QString GetDefaultDocumentName(const QByteArray& objectId, const WorkingDocument& document) const;
 	virtual bool HasDocumentNameProvider(const QByteArray& typeId) const;
+	/**
+		\param objectId	ID of the object backing the document in the storage, empty for unsaved documents.
+	*/
 	virtual bool ValidateDocumentData(
+				const QByteArray& objectId,
 				const WorkingDocument& document,
 				OperationStatus& status,
 				QString* errorMessage = nullptr,
@@ -265,7 +266,7 @@ protected:
 	struct WorkingDocument
 	{
 		QByteArray typeId;                         ///< Registered object type-ID.
-		QUrl url;                                  ///< Backing collection element URL (\c collection:///<objectId>; empty for unsaved documents).
+		QUrl url;                                  ///< URL of the document source, set by the storage-specific subclass (empty for unsaved documents).
 		QString name;                              ///< Current display name.
 		istd::IChangeableSharedPtr objectPtr;      ///< The document's data object.
 		idoc::IUndoManagerSharedPtr undoManagerPtr;///< Associated undo/redo manager.
@@ -310,10 +311,6 @@ protected:
 	};
 
 	virtual bool IsSingleCopyMode() const;
-
-	typedef QPair<QByteArray, QByteArray> UserDocumentPair;
-	typedef QList<UserDocumentPair> UserDocumentPairList;
-	UserDocumentPairList FindDocumentsByObjectId(const QByteArray& objectId) const;
 
 	typedef QMap<QByteArray, WorkingDocument> WorkingDocumentMap;
 	typedef QMap<QByteArray, QByteArrayList> UserDocumentIdsMap;

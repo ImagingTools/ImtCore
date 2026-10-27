@@ -552,8 +552,8 @@ public:
 	// Expose protected methods for testing
 	using imtdoc::CDocumentServiceBase::FindDocument;
 	using imtdoc::CDocumentServiceBase::ValidateInputParams;
-	using imtdoc::CDocumentServiceBase::ObjectIdToUrl;
-	using imtdoc::CDocumentServiceBase::UrlToObjectId;
+	using imtdoc::CCollectionDocumentServiceBase::ObjectIdToUrl;
+	using imtdoc::CCollectionDocumentServiceBase::UrlToObjectId;
 	using imtdoc::CDocumentServiceBase::InsertDocument;
 	using imtdoc::CDocumentServiceBase::CloseDocumentInternal;
 	using imtdoc::CDocumentServiceBase::m_documents;
@@ -591,7 +591,7 @@ protected:
 		return idoc::IUndoManagerUniquePtr(new CMockUndoManager());
 	}
 
-	virtual QString GetDefaultDocumentName(const WorkingDocument& /*document*/) const override
+	virtual QString GetDefaultDocumentName(const QByteArray& /*objectId*/, const WorkingDocument& /*document*/) const override
 	{
 		return m_defaultDocumentName;
 	}
@@ -602,6 +602,7 @@ protected:
 	}
 
 	virtual bool ValidateDocumentData(
+		const QByteArray& /*objectId*/,
 		const WorkingDocument& /*document*/,
 		OperationStatus& status,
 		QString* errorMessage = nullptr,

@@ -894,33 +894,9 @@ QByteArrayList CDocumentServiceBase::GetDocumentUserIds(const QByteArray& docume
 }
 
 
-QUrl CDocumentServiceBase::ObjectIdToUrl(const QByteArray& objectId)
-{
-	QUrl url;
-	url = "collection:///" + objectId;
-
-	return url;
-}
-
-
-QByteArray CDocumentServiceBase::UrlToObjectId(const QUrl& url)
-{
-	if (url.scheme() != QStringLiteral("collection")){
-		return QByteArray();
-	}
-
-	const QStringList parts = url.path().split('/', Qt::SkipEmptyParts);
-	if (parts.count() != 1){
-		return QByteArray();
-	}
-
-	return parts.first().toUtf8();
-}
-
-
 bool CDocumentServiceBase::IsDocumentDirty(const WorkingDocument& document)
 {
-	if (UrlToObjectId(document.url).isEmpty()){
+	if (document.url.isEmpty()){
 		return true;
 	}
 
@@ -1023,7 +999,7 @@ void CDocumentServiceBase::OnUndoManagerChanged(int modelId)
 }
 
 
-QString CDocumentServiceBase::GetDefaultDocumentName(const WorkingDocument& /*document*/) const
+QString CDocumentServiceBase::GetDefaultDocumentName(const QByteArray& /*objectId*/, const WorkingDocument& /*document*/) const
 {
 	return QString();
 }
@@ -1036,6 +1012,7 @@ bool CDocumentServiceBase::HasDocumentNameProvider(const QByteArray& /*typeId*/)
 
 
 bool CDocumentServiceBase::ValidateDocumentData(
+			const QByteArray& /*objectId*/,
 			const WorkingDocument& /*document*/,
 			OperationStatus& status,
 			QString* errorMessage,
@@ -1084,24 +1061,6 @@ QString CDocumentServiceBase::GetInvalidDocumentMessage()
 bool CDocumentServiceBase::IsSingleCopyMode() const
 {
 	return false;
-}
-
-
-CDocumentServiceBase::UserDocumentPairList CDocumentServiceBase::FindDocumentsByObjectId(
-	const QByteArray& objectId) const
-{
-	UserDocumentPairList result;
-
-	for (auto userIt = m_userDocumentIds.constBegin(); userIt != m_userDocumentIds.constEnd(); ++userIt){
-		for (const QByteArray& documentId : userIt.value()){
-			auto documentIt = m_documents.constFind(documentId);
-			if (documentIt != m_documents.constEnd() && UrlToObjectId(documentIt.value().url) == objectId){
-				result.append(qMakePair(userIt.key(), documentId));
-			}
-		}
-	}
-
-	return result;
 }
 
 

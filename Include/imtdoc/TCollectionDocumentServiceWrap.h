@@ -74,8 +74,8 @@ class TCollectionDocumentServiceWrap : public Base
 public:
 	typedef typename Base::WorkingDocument WorkingDocument;
 	typedef typename Base::WorkingDocumentMap WorkingDocumentMap;
-	typedef typename Base::UserDocumentPair UserDocumentPair;
-	typedef typename Base::UserDocumentPairList UserDocumentPairList;
+	typedef QPair<QByteArray, QByteArray> UserDocumentPair;
+	typedef QList<UserDocumentPair> UserDocumentPairList;
 
 	using TaskResult = typename Base::TaskResult;
 	using TaskParams = typename Base::TaskParams;
@@ -104,6 +104,21 @@ protected:
 	*/
 	virtual imtbase::IObjectCollection* GetCollection() const = 0;
 
+	/**
+		Returns the \c collection:///<objectId> URL of the collection object.
+	*/
+	static QUrl ObjectIdToUrl(const QByteArray& objectId);
+	/**
+		Extracts the collection object ID from a \c collection:///<objectId> URL.
+		Returns an empty ID for unsaved documents (empty URL) or non-collection URLs.
+	*/
+	static QByteArray UrlToObjectId(const QUrl& url);
+	/**
+		Returns the (userId, documentId) pairs of all opened documents backed by the collection object \a objectId.
+		\note \c m_mutex must be locked by the caller.
+	*/
+	UserDocumentPairList FindDocumentsByObjectId(const QByteArray& objectId) const;
+
 private:
 	void OnDeferredDocumentDataLoaded(
 				const std::weak_ptr<std::atomic<bool>>& aliveGuard,
@@ -127,6 +142,48 @@ private:
 
 
 // ─── Inline implementations ────────────────────────────────────────────────
+
+
+template<class Base>
+inline QUrl TCollectionDocumentServiceWrap<Base>::ObjectIdToUrl(const QByteArray& objectId)
+{
+	return QUrl(QStringLiteral("collection:///") + objectId);
+}
+
+
+template<class Base>
+inline QByteArray TCollectionDocumentServiceWrap<Base>::UrlToObjectId(const QUrl& url)
+{
+	if (url.scheme() != QStringLiteral("collection")){
+		return QByteArray();
+	}
+
+	const QStringList parts = url.path().split('/', Qt::SkipEmptyParts);
+	if (parts.count() != 1){
+		return QByteArray();
+	}
+
+	return parts.first().toUtf8();
+}
+
+
+template<class Base>
+inline typename TCollectionDocumentServiceWrap<Base>::UserDocumentPairList TCollectionDocumentServiceWrap<Base>::FindDocumentsByObjectId(
+			const QByteArray& objectId) const
+{
+	UserDocumentPairList result;
+
+	for (auto userIt = this->m_userDocumentIds.constBegin(); userIt != this->m_userDocumentIds.constEnd(); ++userIt){
+		for (const QByteArray& documentId : userIt.value()){
+			auto documentIt = this->m_documents.constFind(documentId);
+			if (documentIt != this->m_documents.constEnd() && UrlToObjectId(documentIt.value().url) == objectId){
+				result.append(qMakePair(userIt.key(), documentId));
+			}
+		}
+	}
+
+	return result;
+}
 
 
 template<class Base>
@@ -252,7 +309,7 @@ inline void TCollectionDocumentServiceWrap<Base>::OnOpenDocumentThreadFinished(
 			return;
 		}
 
-		documentName = this->GetDefaultDocumentName(document);
+		documentName = this->GetDefaultDocumentName(UrlToObjectId(document.url), document);
 		if (documentName.isEmpty()){
 			return;
 		}
@@ -650,8 +707,10 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 	WorkingDocument workingDocumentSnapshot = *workingDocumentPtr;
 	workingDocumentSnapshot.objectPtr = documentSnapshotPtr;
 
+	const QByteArray currentObjectId = this->UrlToObjectId(workingDocumentPtr->url);
+
 	QString validationMessage;
-	if (!this->ValidateDocumentData(workingDocumentSnapshot, validationStatus, &validationMessage, params.operationContextPtr)){
+	if (!this->ValidateDocumentData(currentObjectId, workingDocumentSnapshot, validationStatus, &validationMessage, params.operationContextPtr)){
 		QString msg = validationMessage.isEmpty() ? this->GetInvalidDocumentMessage() : validationMessage;
 		this->CompleteTask(taskId, TaskResult{validationStatus, documentId, msg});
 		return;
@@ -660,7 +719,6 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 	istd::CChangeGroup changeGroup(collectionPtr);
 
 	QString resultDocumentName = documentName;
-	const QByteArray currentObjectId = this->UrlToObjectId(workingDocumentPtr->url);
 	if (!currentObjectId.isEmpty()){
 		// Create copy of the object
 		if (!resultDocumentName.isEmpty() && workingDocumentPtr->name != resultDocumentName){
@@ -680,7 +738,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 			}
 
 			if (this->HasDocumentNameProvider(workingDocumentPtr->typeId)){
-				resultDocumentName = this->GetDefaultDocumentName(*workingDocumentPtr);
+				resultDocumentName = this->GetDefaultDocumentName(UrlToObjectId(workingDocumentPtr->url), *workingDocumentPtr);
 				collectionPtr->SetElementName(newObjectId, resultDocumentName);
 			}
 
@@ -729,7 +787,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 		if (res){
 			QString updatedName;
 			if (this->HasDocumentNameProvider(workingDocumentPtr->typeId)){
-				updatedName = this->GetDefaultDocumentName(*workingDocumentPtr);
+				updatedName = this->GetDefaultDocumentName(UrlToObjectId(workingDocumentPtr->url), *workingDocumentPtr);
 				collectionPtr->SetElementName(currentObjectId, updatedName);
 			}
 
@@ -798,7 +856,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 	}
 
 	if (this->HasDocumentNameProvider(workingDocumentPtr->typeId)){
-		resultDocumentName = this->GetDefaultDocumentName(*workingDocumentPtr);
+		resultDocumentName = this->GetDefaultDocumentName(UrlToObjectId(workingDocumentPtr->url), *workingDocumentPtr);
 		collectionPtr->SetElementName(savedObjectId, resultDocumentName);
 	}
 
