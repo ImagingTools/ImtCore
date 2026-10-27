@@ -22,9 +22,17 @@ const QByteArray TEST_USER_ID = QByteArrayLiteral("testUser");
 const QByteArray TEST_USER_ID_2 = QByteArrayLiteral("testUser2");
 const QByteArray TEST_TYPE_ID = QByteArrayLiteral("TestType");
 const QByteArray TEST_TYPE_ID_2 = QByteArrayLiteral("TestType2");
+const QByteArray VALIDATED_TYPE_ID = QByteArrayLiteral("ValidatedType");
+const QByteArray VALIDATED_TYPE_ID_2 = QByteArrayLiteral("ValidatedType2");
 const QByteArray TEST_OBJECT_ID = QByteArrayLiteral("testObject123");
 const QByteArray TEST_OBJECT_ID_2 = QByteArrayLiteral("testObject456");
 const QString TEST_DOC_NAME = QStringLiteral("Test Document");
+
+// Configured in the TextDocumentValidator* and TextDocumentNameProvider registry elements
+const QString INVALID_TEXT = QStringLiteral("invalid");
+const QString VALIDATION_ERROR_MESSAGE = QStringLiteral("Custom validation error");
+const QString DEFAULT_VALIDATION_ERROR_MESSAGE = QStringLiteral("Document data is invalid");
+const QString NAME_PREFIX = QStringLiteral("Auto: ");
 
 const QByteArray CREATED_EVENT = QByteArrayLiteral("DocumentCreatedEvent");
 const QByteArray OPENED_EVENT = QByteArrayLiteral("DocumentOpenedEvent");
@@ -1231,19 +1239,104 @@ void CCollectionDocumentServiceIntegrationTest::SaveDocumentCollectionSetDataFai
 
 void CCollectionDocumentServiceIntegrationTest::SaveDocumentValidationFailTest()
 {
-	QSKIP("No document validator is available in the integration registry");
+	// Validator of this type has no error message configured
+	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, VALIDATED_TYPE_ID_2);
+	QVERIFY(!docId.isEmpty());
+
+	iprm::CTextParam invalidData;
+	invalidData.SetText(INVALID_TEXT);
+	QCOMPARE(m_servicePtr->SetDocumentData(TEST_USER_ID, docId, invalidData), imtdoc::IDocumentService::OS_OK);
+
+	const int elementCount = m_collectionPtr->GetElementIds().count();
+
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.documentId = docId;
+	params.documentName = TEST_DOC_NAME;
+
+	QByteArray taskId = m_servicePtr->BeginDocumentTask(imtdoc::IDocumentService::TT_SAVE, params);
+	imtdoc::IDocumentService::TaskResult result = m_servicePtr->WaitForTaskFinished(taskId);
+	QCOMPARE(result.status, imtdoc::IDocumentService::OS_INVALID_DOCUMENT_DATA);
+	QCOMPARE(result.errorMessage, DEFAULT_VALIDATION_ERROR_MESSAGE);
+	QCOMPARE(m_collectionPtr->GetElementIds().count(), elementCount);
+
+	imtdoc::IDocumentService::DocumentListItem info = FindDocumentInfo(*m_servicePtr, TEST_USER_ID, docId);
+	QVERIFY2(info.isDirty, "Document should stay dirty after failed validation");
+	QVERIFY(info.url.isEmpty());
+
+	// Document is saved after correction of the data
+	iprm::CTextParam validData;
+	validData.SetText(QStringLiteral("valid"));
+	QCOMPARE(m_servicePtr->SetDocumentData(TEST_USER_ID, docId, validData), imtdoc::IDocumentService::OS_OK);
+	QCOMPARE(SaveDocument(*m_servicePtr, TEST_USER_ID, docId, TEST_DOC_NAME), imtdoc::IDocumentService::OS_OK);
+	QCOMPARE(m_collectionPtr->GetElementIds().count(), elementCount + 1);
 }
 
 
 void CCollectionDocumentServiceIntegrationTest::SaveDocumentValidationFailWithMessageTest()
 {
-	QSKIP("No document validator is available in the integration registry");
+	AddCollectionObject(TEST_OBJECT_ID, VALIDATED_TYPE_ID, TEST_DOC_NAME, QStringLiteral("original"));
+
+	QByteArray docId = OpenDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_OBJECT_ID);
+	QVERIFY(!docId.isEmpty());
+
+	iprm::CTextParam invalidData;
+	invalidData.SetText(INVALID_TEXT);
+	QCOMPARE(m_servicePtr->SetDocumentData(TEST_USER_ID, docId, invalidData), imtdoc::IDocumentService::OS_OK);
+
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.documentId = docId;
+
+	QByteArray taskId = m_servicePtr->BeginDocumentTask(imtdoc::IDocumentService::TT_SAVE, params);
+	imtdoc::IDocumentService::TaskResult result = m_servicePtr->WaitForTaskFinished(taskId);
+	QCOMPARE(result.status, imtdoc::IDocumentService::OS_INVALID_DOCUMENT_DATA);
+	QCOMPARE(result.errorMessage, VALIDATION_ERROR_MESSAGE);
+
+	// Collection object is not changed
+	imtbase::IObjectCollection::DataPtr storedDataPtr;
+	QVERIFY(m_collectionPtr->GetObjectData(TEST_OBJECT_ID, storedDataPtr));
+	const iprm::ITextParam* storedTextPtr = dynamic_cast<const iprm::ITextParam*>(storedDataPtr.GetPtr());
+	QVERIFY(storedTextPtr != nullptr);
+	QCOMPARE(storedTextPtr->GetText(), QStringLiteral("original"));
+	QCOMPARE(m_collectionPtr->GetElementInfo(TEST_OBJECT_ID, imtbase::ICollectionInfo::EIT_NAME).toString(), TEST_DOC_NAME);
+
+	QVERIFY2(FindDocumentInfo(*m_servicePtr, TEST_USER_ID, docId).isDirty, "Document should stay dirty after failed validation");
 }
 
 
 void CCollectionDocumentServiceIntegrationTest::SaveDocumentWithNameProviderTest()
 {
-	QSKIP("No document name provider is available in the integration registry");
+	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, VALIDATED_TYPE_ID);
+	QVERIFY(!docId.isEmpty());
+
+	iprm::CTextParam data;
+	data.SetText(QStringLiteral("Generated"));
+	QCOMPARE(m_servicePtr->SetDocumentData(TEST_USER_ID, docId, data), imtdoc::IDocumentService::OS_OK);
+
+	// Name provided by the name provider overrides the requested name of a new document
+	QCOMPARE(SaveDocument(*m_servicePtr, TEST_USER_ID, docId, TEST_DOC_NAME), imtdoc::IDocumentService::OS_OK);
+
+	const QString expectedName = NAME_PREFIX + QStringLiteral("Generated");
+
+	QString name;
+	QCOMPARE(m_servicePtr->GetDocumentName(TEST_USER_ID, docId, name), imtdoc::IDocumentService::OS_OK);
+	QCOMPARE(name, expectedName);
+
+	const QByteArray objectId = UrlObjectId(FindDocumentInfo(*m_servicePtr, TEST_USER_ID, docId).url);
+	QVERIFY(!objectId.isEmpty());
+	QCOMPARE(m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString(), expectedName);
+
+	// Name of an existing document is updated on save
+	data.SetText(QStringLiteral("Updated"));
+	QCOMPARE(m_servicePtr->SetDocumentData(TEST_USER_ID, docId, data), imtdoc::IDocumentService::OS_OK);
+	QCOMPARE(SaveDocument(*m_servicePtr, TEST_USER_ID, docId), imtdoc::IDocumentService::OS_OK);
+
+	const QString updatedName = NAME_PREFIX + QStringLiteral("Updated");
+
+	QCOMPARE(m_servicePtr->GetDocumentName(TEST_USER_ID, docId, name), imtdoc::IDocumentService::OS_OK);
+	QCOMPARE(name, updatedName);
+	QCOMPARE(m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString(), updatedName);
 }
 
 
