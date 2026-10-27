@@ -536,7 +536,53 @@ IDocumentService::OperationStatus CDocumentServiceBase::SetDocumentName(
 			const QByteArray& documentId,
 			const QString& documentName)
 {
-	return OS_FAILED;
+	QByteArray typeId;
+	QUrl documentUrl;
+	bool isDirty = false;
+	QByteArrayList userIds;
+
+	istd::CChangeNotifier notifier(this);
+
+	{
+		QMutexLocker locker(&m_mutex);
+
+		OperationStatus validationStatus;
+		if (!ValidateInputParams(userId, documentId, validationStatus)){
+			return validationStatus;
+		}
+
+		WorkingDocument& document = m_documents[documentId];
+		if (document.name == documentName){
+			notifier.Abort();
+
+			return OS_OK;
+		}
+
+		document.name = documentName;
+
+		typeId = document.typeId;
+		documentUrl = document.url;
+		isDirty = document.isDirty;
+		userIds = GetDocumentUserIds(documentId);
+	}
+
+	// Notify every user holding the document
+	for (const QByteArray& documentUserId : userIds){
+		for (IDocumentServiceEventHandler* handlerPtr : GetDocumentServiceEventHandlers()){
+			if (handlerPtr != nullptr){
+				CDocumentRenamedEvent event(
+							documentUserId,
+							documentId,
+							typeId,
+							documentName,
+							documentUrl,
+							isDirty);
+				handlerPtr->ProcessEvent(&event);
+			}
+		}
+	}
+
+	return OS_OK;
 }
 
 

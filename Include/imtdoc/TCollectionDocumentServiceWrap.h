@@ -51,8 +51,8 @@ namespace imtdoc
 	  changes); fires \c CDocumentSavedEvent or \c CDocumentSavedAsEvent.
 	- **DoCloseDocument** — removes the document entry and fires
 	  \c CDocumentClosedEvent.
-	- **SetDocumentName** — renames the document in the collection and fires
-	  \c CDocumentRenamedEvent for every affected user session.
+	- **SetDocumentName** — renames the object in the collection (for saved
+	  documents) and delegates to the base implementation.
 
 	Subclasses must implement \c GetCollection() to provide the backing
 	collection.
@@ -563,8 +563,6 @@ TCollectionDocumentServiceWrap<Base>::SetDocumentName(
 			const QString& documentName)
 {
 	QByteArray objectId;
-	QByteArray typeId;
-	bool isDirty = false;
 
 	{
 		QMutexLocker locker(&this->m_mutex);
@@ -574,15 +572,12 @@ TCollectionDocumentServiceWrap<Base>::SetDocumentName(
 			return validationStatus;
 		}
 
-		WorkingDocument* workingDocumentPtr = &this->m_documents[documentId];
-
-		if (workingDocumentPtr->name == documentName){
+		const WorkingDocument& workingDocument = this->m_documents[documentId];
+		if (workingDocument.name == documentName){
 			return IDocumentService::OS_OK;
 		}
 
-		objectId = imtdoc::UrlToObjectId(workingDocumentPtr->url);
-		typeId = workingDocumentPtr->typeId;
-		isDirty = workingDocumentPtr->isDirty;
+		objectId = imtdoc::UrlToObjectId(workingDocument.url);
 	}
 
 	if (!objectId.isEmpty()){
@@ -596,39 +591,7 @@ TCollectionDocumentServiceWrap<Base>::SetDocumentName(
 		}
 	}
 
-	istd::CChangeNotifier notifier(this);
-
-	QUrl documentUrl;
-	QByteArrayList userIds;
-	{
-		QMutexLocker locker(&this->m_mutex);
-		WorkingDocument* workingDocumentPtr = this->FindDocument(userId, documentId);
-		if (workingDocumentPtr == nullptr){
-			return IDocumentService::OS_INVALID_DOCUMENT_ID;
-		}
-
-		workingDocumentPtr->name = documentName;
-		documentUrl = workingDocumentPtr->url;
-		userIds = this->GetDocumentUserIds(documentId);
-	}
-
-	// Notify every user holding the document
-	for (const QByteArray& documentUserId : userIds){
-		for (IDocumentServiceEventHandler* handlerPtr : this->GetDocumentServiceEventHandlers()){
-			if (handlerPtr != nullptr){
-				CDocumentRenamedEvent event(
-							documentUserId,
-							documentId,
-							typeId,
-							documentName,
-							documentUrl,
-							isDirty);
-				handlerPtr->ProcessEvent(&event);
-			}
-		}
-	}
-
-	return IDocumentService::OS_OK;
+	return Base::SetDocumentName(userId, documentId, documentName);
 }
 
 

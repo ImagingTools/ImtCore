@@ -21,6 +21,7 @@ const QString TEST_DOC_NAME = QStringLiteral("Test Document");
 const QByteArray CREATED_EVENT = QByteArrayLiteral("DocumentCreatedEvent");
 const QByteArray DATA_LOADED_EVENT = QByteArrayLiteral("DocumentDataLoadedEvent");
 const QByteArray CLOSED_EVENT = QByteArrayLiteral("DocumentClosedEvent");
+const QByteArray RENAMED_EVENT = QByteArrayLiteral("DocumentRenamedEvent");
 
 const int WAIT_TIMEOUT = 5000;
 
@@ -240,6 +241,78 @@ void CDocumentServiceIntegrationTest::GetDocumentNameInvalidDocumentTest()
 
 	QString name;
 	QCOMPARE(m_servicePtr->GetDocumentName(TEST_USER_ID, QByteArrayLiteral("invalidDocId"), name), imtdoc::IDocumentService::OS_INVALID_DOCUMENT_ID);
+}
+
+
+// SetDocumentName tests
+
+void CDocumentServiceIntegrationTest::SetDocumentNameSuccessTest()
+{
+	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID, TEST_DOC_NAME);
+	QVERIFY(!docId.isEmpty());
+
+	const QString newName = QStringLiteral("New Name");
+	QCOMPARE(m_servicePtr->SetDocumentName(TEST_USER_ID, docId, newName), imtdoc::IDocumentService::OS_OK);
+
+	QString name;
+	QCOMPARE(m_servicePtr->GetDocumentName(TEST_USER_ID, docId, name), imtdoc::IDocumentService::OS_OK);
+	QCOMPARE(name, newName);
+	QCOMPARE(FindDocumentInfo(*m_servicePtr, TEST_USER_ID, docId).name, newName);
+}
+
+
+void CDocumentServiceIntegrationTest::SetDocumentNameSameNameTest()
+{
+	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID, TEST_DOC_NAME);
+	QVERIFY(!docId.isEmpty());
+
+	m_eventHandler.ClearEvents();
+
+	QCOMPARE(m_servicePtr->SetDocumentName(TEST_USER_ID, docId, TEST_DOC_NAME), imtdoc::IDocumentService::OS_OK);
+	QCOMPARE(m_eventHandler.CountEventsOfType(RENAMED_EVENT), 0);
+}
+
+
+void CDocumentServiceIntegrationTest::SetDocumentNameInvalidUserTest()
+{
+	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID, TEST_DOC_NAME);
+	QVERIFY(!docId.isEmpty());
+
+	QCOMPARE(m_servicePtr->SetDocumentName(QByteArrayLiteral("invalidUser"), docId, QStringLiteral("NewName")), imtdoc::IDocumentService::OS_INVALID_USER_ID);
+
+	QString name;
+	QCOMPARE(m_servicePtr->GetDocumentName(TEST_USER_ID, docId, name), imtdoc::IDocumentService::OS_OK);
+	QCOMPARE(name, TEST_DOC_NAME);
+}
+
+
+void CDocumentServiceIntegrationTest::SetDocumentNameInvalidDocumentTest()
+{
+	QVERIFY(!CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID).isEmpty());
+
+	QCOMPARE(m_servicePtr->SetDocumentName(TEST_USER_ID, QByteArrayLiteral("invalidDocId"), QStringLiteral("NewName")), imtdoc::IDocumentService::OS_INVALID_DOCUMENT_ID);
+}
+
+
+void CDocumentServiceIntegrationTest::SetDocumentNameEventFiredTest()
+{
+	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID, TEST_DOC_NAME);
+	QVERIFY(!docId.isEmpty());
+
+	m_eventHandler.ClearEvents();
+
+	QCOMPARE(m_servicePtr->SetDocumentName(TEST_USER_ID, docId, QStringLiteral("NewName")), imtdoc::IDocumentService::OS_OK);
+	QCOMPARE(m_eventHandler.CountEventsOfType(RENAMED_EVENT), 1);
+
+	const QList<CRecordingEventHandler::RecordedEvent> events = m_eventHandler.GetEvents();
+	for (const CRecordingEventHandler::RecordedEvent& event : events){
+		if (event.type == RENAMED_EVENT){
+			QCOMPARE(event.userId, TEST_USER_ID);
+			QCOMPARE(event.documentId, docId);
+			QCOMPARE(event.documentTypeId, TEST_TYPE_ID);
+			QCOMPARE(event.documentName, QStringLiteral("NewName"));
+		}
+	}
 }
 
 
@@ -741,19 +814,6 @@ void CDocumentServiceIntegrationTest::SaveDocumentNotSupportedTest()
 	imtdoc::IDocumentService::DocumentListItem info = FindDocumentInfo(*m_servicePtr, TEST_USER_ID, docId);
 	QVERIFY2(info.isDirty, "Document should stay dirty");
 	QVERIFY(info.url.isEmpty());
-}
-
-
-void CDocumentServiceIntegrationTest::SetDocumentNameNotSupportedTest()
-{
-	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID, TEST_DOC_NAME);
-	QVERIFY(!docId.isEmpty());
-
-	QCOMPARE(m_servicePtr->SetDocumentName(TEST_USER_ID, docId, QStringLiteral("NewName")), imtdoc::IDocumentService::OS_FAILED);
-
-	QString name;
-	QCOMPARE(m_servicePtr->GetDocumentName(TEST_USER_ID, docId, name), imtdoc::IDocumentService::OS_OK);
-	QCOMPARE(name, TEST_DOC_NAME);
 }
 
 

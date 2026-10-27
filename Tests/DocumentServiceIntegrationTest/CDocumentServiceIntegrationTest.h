@@ -21,7 +21,7 @@
 	Integration test for CDocumentServiceComp.
 	The service is created from a Partitura registry with real components, the documents
 	are \c iprm::ITextParam objects. The service is not connected to a collection, so the
-	open, save and rename operations are not supported.
+	open and save operations are not supported.
 */
 class CDocumentServiceIntegrationTest: public CDocumentServiceIntegrationTestBase
 {
@@ -51,6 +51,13 @@ private slots:
 	void GetDocumentNameSuccessTest();
 	void GetDocumentNameInvalidUserTest();
 	void GetDocumentNameInvalidDocumentTest();
+
+	// SetDocumentName tests
+	void SetDocumentNameSuccessTest();
+	void SetDocumentNameSameNameTest();
+	void SetDocumentNameInvalidUserTest();
+	void SetDocumentNameInvalidDocumentTest();
+	void SetDocumentNameEventFiredTest();
 
 	// GetDocumentPtr tests
 	void GetDocumentPtrSuccessTest();
@@ -117,7 +124,6 @@ private slots:
 	// Collection related operations
 	void OpenDocumentNotSupportedTest();
 	void SaveDocumentNotSupportedTest();
-	void SetDocumentNameNotSupportedTest();
 
 private:
 	istd::TDelPtr<ipackage::CComponentAccessor> m_accessorPtr;
