@@ -33,7 +33,7 @@ public:
 	I_END_COMPONENT
 
 	// imtdoc::IDocumentValidator
-	virtual bool ValidateDocumentData(const QByteArray& objectId, const istd::IChangeable& document, QString& errorMessage, const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
+	virtual bool ValidateDocumentData(const QUrl& url, const istd::IChangeable& document, QString& errorMessage, const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
 
 	/**
 		Check that no other role of the tenant has the same role-ID within the product.

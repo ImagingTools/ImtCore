@@ -32,7 +32,7 @@ public:
 
 	// reimplemented (imtdoc::IDocumentValidator)
 	virtual bool ValidateDocumentData(
-				const QByteArray& objectId,
+				const QUrl& url,
 				const istd::IChangeable& document,
 				QString& errorMessage,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;

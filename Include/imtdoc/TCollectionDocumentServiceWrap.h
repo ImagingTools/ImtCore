@@ -18,6 +18,7 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
+#include <imtdoc/imtdoc.h>
 #include <imtdoc/CDocumentServiceBase.h>
 #include <imtdoc/CDocumentClosedEvent.h>
 #include <imtdoc/CDocumentOpenedEvent.h>
@@ -105,15 +106,6 @@ protected:
 	virtual imtbase::IObjectCollection* GetCollection() const = 0;
 
 	/**
-		Returns the \c collection:///<objectId> URL of the collection object.
-	*/
-	static QUrl ObjectIdToUrl(const QByteArray& objectId);
-	/**
-		Extracts the collection object ID from a \c collection:///<objectId> URL.
-		Returns an empty ID for unsaved documents (empty URL) or non-collection URLs.
-	*/
-	static QByteArray UrlToObjectId(const QUrl& url);
-	/**
 		Returns the (userId, documentId) pairs of all opened documents backed by the collection object \a objectId.
 		\note \c m_mutex must be locked by the caller.
 	*/
@@ -145,29 +137,6 @@ private:
 
 
 template<class Base>
-inline QUrl TCollectionDocumentServiceWrap<Base>::ObjectIdToUrl(const QByteArray& objectId)
-{
-	return QUrl(QStringLiteral("collection:///") + objectId);
-}
-
-
-template<class Base>
-inline QByteArray TCollectionDocumentServiceWrap<Base>::UrlToObjectId(const QUrl& url)
-{
-	if (url.scheme() != QStringLiteral("collection")){
-		return QByteArray();
-	}
-
-	const QStringList parts = url.path().split('/', Qt::SkipEmptyParts);
-	if (parts.count() != 1){
-		return QByteArray();
-	}
-
-	return parts.first().toUtf8();
-}
-
-
-template<class Base>
 inline typename TCollectionDocumentServiceWrap<Base>::UserDocumentPairList TCollectionDocumentServiceWrap<Base>::FindDocumentsByObjectId(
 			const QByteArray& objectId) const
 {
@@ -176,7 +145,7 @@ inline typename TCollectionDocumentServiceWrap<Base>::UserDocumentPairList TColl
 	for (auto userIt = this->m_userDocumentIds.constBegin(); userIt != this->m_userDocumentIds.constEnd(); ++userIt){
 		for (const QByteArray& documentId : userIt.value()){
 			auto documentIt = this->m_documents.constFind(documentId);
-			if (documentIt != this->m_documents.constEnd() && UrlToObjectId(documentIt.value().url) == objectId){
+			if (documentIt != this->m_documents.constEnd() && imtdoc::UrlToObjectId(documentIt.value().url) == objectId){
 				result.append(qMakePair(userIt.key(), documentId));
 			}
 		}
@@ -309,7 +278,7 @@ inline void TCollectionDocumentServiceWrap<Base>::OnOpenDocumentThreadFinished(
 			return;
 		}
 
-		documentName = this->GetDefaultDocumentName(UrlToObjectId(document.url), document);
+		documentName = this->GetDefaultDocumentName(document);
 		if (documentName.isEmpty()){
 			return;
 		}
@@ -383,7 +352,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 	}
 
 	QByteArray objectId = parts.first().toUtf8();
-	QUrl documentUrl = this->ObjectIdToUrl(objectId);
+	QUrl documentUrl = imtdoc::ObjectIdToUrl(objectId);
 	QByteArray documentId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
 	QByteArray sharedDocumentId;
@@ -400,7 +369,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 		QMutexLocker locker(&this->m_mutex);
 		for (const QByteArray& userDocumentId : this->GetUserDocumentIds(userId)){
 			const WorkingDocument* userDocPtr = this->FindDocument(userId, userDocumentId);
-			if (userDocPtr == nullptr || this->UrlToObjectId(userDocPtr->url) != objectId){
+			if (userDocPtr == nullptr || imtdoc::UrlToObjectId(userDocPtr->url) != objectId){
 				continue;
 			}
 
@@ -611,7 +580,7 @@ TCollectionDocumentServiceWrap<Base>::SetDocumentName(
 			return IDocumentService::OS_OK;
 		}
 
-		objectId = this->UrlToObjectId(workingDocumentPtr->url);
+		objectId = imtdoc::UrlToObjectId(workingDocumentPtr->url);
 		typeId = workingDocumentPtr->typeId;
 		isDirty = workingDocumentPtr->isDirty;
 	}
@@ -707,10 +676,8 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 	WorkingDocument workingDocumentSnapshot = *workingDocumentPtr;
 	workingDocumentSnapshot.objectPtr = documentSnapshotPtr;
 
-	const QByteArray currentObjectId = this->UrlToObjectId(workingDocumentPtr->url);
-
 	QString validationMessage;
-	if (!this->ValidateDocumentData(currentObjectId, workingDocumentSnapshot, validationStatus, &validationMessage, params.operationContextPtr)){
+	if (!this->ValidateDocumentData(workingDocumentSnapshot, validationStatus, &validationMessage, params.operationContextPtr)){
 		QString msg = validationMessage.isEmpty() ? this->GetInvalidDocumentMessage() : validationMessage;
 		this->CompleteTask(taskId, TaskResult{validationStatus, documentId, msg});
 		return;
@@ -719,6 +686,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 	istd::CChangeGroup changeGroup(collectionPtr);
 
 	QString resultDocumentName = documentName;
+	const QByteArray currentObjectId = imtdoc::UrlToObjectId(workingDocumentPtr->url);
 	if (!currentObjectId.isEmpty()){
 		// Create copy of the object
 		if (!resultDocumentName.isEmpty() && workingDocumentPtr->name != resultDocumentName){
@@ -738,7 +706,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 			}
 
 			if (this->HasDocumentNameProvider(workingDocumentPtr->typeId)){
-				resultDocumentName = this->GetDefaultDocumentName(UrlToObjectId(workingDocumentPtr->url), *workingDocumentPtr);
+				resultDocumentName = this->GetDefaultDocumentName(*workingDocumentPtr);
 				collectionPtr->SetElementName(newObjectId, resultDocumentName);
 			}
 
@@ -752,7 +720,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 
 				// The document is now backed by the new object for every user holding it,
 				// so GetOpenedDocumentList() must report its URL
-				workingDocumentPtr->url = this->ObjectIdToUrl(newObjectId);
+				workingDocumentPtr->url = imtdoc::ObjectIdToUrl(newObjectId);
 				workingDocumentPtr->name = resultDocumentName;
 				workingDocumentPtr->isDirty = false;
 				workingDocumentPtr->undoManagerPtr->StoreDocumentState();
@@ -770,7 +738,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 									documentId,
 									savedTypeId,
 									resultDocumentName,
-									this->ObjectIdToUrl(newObjectId),
+									imtdoc::ObjectIdToUrl(newObjectId),
 									false);
 						handlerPtr->ProcessEvent(&event);
 					}
@@ -787,7 +755,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 		if (res){
 			QString updatedName;
 			if (this->HasDocumentNameProvider(workingDocumentPtr->typeId)){
-				updatedName = this->GetDefaultDocumentName(UrlToObjectId(workingDocumentPtr->url), *workingDocumentPtr);
+				updatedName = this->GetDefaultDocumentName(*workingDocumentPtr);
 				collectionPtr->SetElementName(currentObjectId, updatedName);
 			}
 
@@ -852,11 +820,11 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 
 	if (!savedObjectId.isEmpty()){
 		// A new document had no URL; it is now backed by the inserted object
-		workingDocumentPtr->url = this->ObjectIdToUrl(savedObjectId);
+		workingDocumentPtr->url = imtdoc::ObjectIdToUrl(savedObjectId);
 	}
 
 	if (this->HasDocumentNameProvider(workingDocumentPtr->typeId)){
-		resultDocumentName = this->GetDefaultDocumentName(UrlToObjectId(workingDocumentPtr->url), *workingDocumentPtr);
+		resultDocumentName = this->GetDefaultDocumentName(*workingDocumentPtr);
 		collectionPtr->SetElementName(savedObjectId, resultDocumentName);
 	}
 
@@ -881,7 +849,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 							documentId,
 							savedTypeId,
 							resultDocumentName,
-							this->ObjectIdToUrl(savedObjectId),
+							imtdoc::ObjectIdToUrl(savedObjectId),
 							false);
 				handlerPtr->ProcessEvent(&event);
 			}

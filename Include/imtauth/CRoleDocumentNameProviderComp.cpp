@@ -12,7 +12,7 @@ namespace imtauth
 
 // reimplemented (imtdoc::IDocumentNameProvider)
 
-QString CRoleDocumentNameProviderComp::GetDefaultDocumentName(const QByteArray& /*objectId*/, const istd::IChangeable& document) const
+QString CRoleDocumentNameProviderComp::GetDefaultDocumentName(const QUrl& /*url*/, const istd::IChangeable& document) const
 {
 	const IRole* rolePtr = dynamic_cast<const IRole*>(&document);
 	if (rolePtr != nullptr){

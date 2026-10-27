@@ -14,14 +14,14 @@ namespace imtdoc
 
 // reimplemented (imtdoc::CDocumentServiceBase)
 
-QString CDocumentServiceCompBase::GetDefaultDocumentName(const QByteArray& objectId, const WorkingDocument& document) const
+QString CDocumentServiceCompBase::GetDefaultDocumentName(const WorkingDocument& document) const
 {
 	const imtdoc::IDocumentNameProvider* nameProviderPtr = GetDocumentNameProvider(document.typeId);
 	if (nameProviderPtr == nullptr){
 		return QString();
 	}
 
-	return nameProviderPtr->GetDefaultDocumentName(objectId, *document.objectPtr);
+	return nameProviderPtr->GetDefaultDocumentName(document.url, *document.objectPtr);
 }
 
 
@@ -32,7 +32,6 @@ bool CDocumentServiceCompBase::HasDocumentNameProvider(const QByteArray& typeId)
 
 
 bool CDocumentServiceCompBase::ValidateDocumentData(
-			const QByteArray& objectId,
 			const WorkingDocument& document,
 			OperationStatus& status,
 			QString* errorMessage,
@@ -57,7 +56,7 @@ bool CDocumentServiceCompBase::ValidateDocumentData(
 	}
 
 	QString validationMessage;
-	if (!documentValidator->ValidateDocumentData(objectId, *document.objectPtr, validationMessage, operationContextPtr)){
+	if (!documentValidator->ValidateDocumentData(document.url, *document.objectPtr, validationMessage, operationContextPtr)){
 		status = OS_INVALID_DOCUMENT_DATA;
 		if (errorMessage != nullptr){
 			*errorMessage = validationMessage.isEmpty() ? GetInvalidDocumentMessage() : validationMessage;

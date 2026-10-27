@@ -14,6 +14,7 @@
 #include <imtauth/ITenantInfo.h>
 #include <imtauth/imtauth.h>
 #include <imtbase/IOperationContext.h>
+#include <imtdoc/imtdoc.h>
 
 
 namespace imtauth
@@ -34,11 +35,13 @@ bool IsTenantPermissionScopeChangeAllowed(
 
 
 bool CTenantDocumentValidatorComp::ValidateDocumentData(
-			const QByteArray& objectId,
+			const QUrl& url,
 			const istd::IChangeable& document,
 			QString& errorMessage,
 			const imtbase::IOperationContext* operationContextPtr) const
 {
+	const QByteArray objectId = imtdoc::UrlToObjectId(url);
+
 	const imtauth::ITenantInfo* tenantInfo = dynamic_cast<const imtauth::ITenantInfo*>(&document);
 	if (tenantInfo == nullptr){
 		errorMessage = QStringLiteral("Invalid document type for tenant validation");

@@ -214,16 +214,9 @@ protected:
 				const QByteArray& taskId,
 				const iprm::IParamsSet* initParamsPtr);
 
-	/**
-		\param objectId	ID of the object backing the document in the storage, empty for unsaved documents.
-	*/
-	virtual QString GetDefaultDocumentName(const QByteArray& objectId, const WorkingDocument& document) const;
+	virtual QString GetDefaultDocumentName(const WorkingDocument& document) const;
 	virtual bool HasDocumentNameProvider(const QByteArray& typeId) const;
-	/**
-		\param objectId	ID of the object backing the document in the storage, empty for unsaved documents.
-	*/
 	virtual bool ValidateDocumentData(
-				const QByteArray& objectId,
 				const WorkingDocument& document,
 				OperationStatus& status,
 				QString* errorMessage = nullptr,

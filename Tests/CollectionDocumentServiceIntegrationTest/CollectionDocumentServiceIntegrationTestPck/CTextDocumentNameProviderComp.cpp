@@ -12,7 +12,7 @@ namespace CollectionDocumentServiceIntegrationTestPck
 
 // reimplemented (imtdoc::IDocumentNameProvider)
 
-QString CTextDocumentNameProviderComp::GetDefaultDocumentName(const QByteArray& /*objectId*/, const istd::IChangeable& document) const
+QString CTextDocumentNameProviderComp::GetDefaultDocumentName(const QUrl& /*url*/, const istd::IChangeable& document) const
 {
 	const iprm::ITextParam* textPtr = dynamic_cast<const iprm::ITextParam*>(&document);
 	if ((textPtr == nullptr) || textPtr->GetText().isEmpty()){

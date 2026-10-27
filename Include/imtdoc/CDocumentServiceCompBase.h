@@ -66,10 +66,9 @@ public:
 
 protected:
 	// reimplemented (imtdoc::CDocumentServiceBase)
-	virtual QString GetDefaultDocumentName(const QByteArray& objectId, const WorkingDocument& document) const override;
+	virtual QString GetDefaultDocumentName(const WorkingDocument& document) const override;
 	virtual bool HasDocumentNameProvider(const QByteArray& typeId) const override;
 	virtual bool ValidateDocumentData(
-				const QByteArray& objectId,
 				const WorkingDocument& document,
 				OperationStatus& status,
 				QString* errorMessage = nullptr,

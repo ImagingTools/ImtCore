@@ -12,7 +12,7 @@ namespace imtauth
 
 
 bool CCrossOrgGrantDocumentValidatorComp::ValidateDocumentData(
-			const QByteArray& /*objectId*/,
+			const QUrl& /*url*/,
 			const istd::IChangeable& document,
 			QString& errorMessage,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const

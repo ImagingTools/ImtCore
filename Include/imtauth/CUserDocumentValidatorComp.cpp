@@ -9,6 +9,7 @@
 // ImtCore includes
 #include <imtauth/IUserInfo.h>
 #include <imtbase/CComplexCollectionFilter.h>
+#include <imtdoc/imtdoc.h>
 
 
 namespace imtauth
@@ -16,11 +17,13 @@ namespace imtauth
 
 
 bool CUserDocumentValidatorComp::ValidateDocumentData(
-			const QByteArray& objectId,
+			const QUrl& url,
 			const istd::IChangeable& document,
 			QString& errorMessage,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
+	const QByteArray objectId = imtdoc::UrlToObjectId(url);
+
 	const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(&document);
 	if (userInfoPtr == nullptr){
 		errorMessage = QStringLiteral("Invalid document type for user validation");

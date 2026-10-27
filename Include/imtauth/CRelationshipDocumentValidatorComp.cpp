@@ -5,6 +5,7 @@
 // ImtCore includes
 #include <imtauth/CollectionSelection.h>
 #include <imtauth/ITenantRelationshipInfo.h>
+#include <imtdoc/imtdoc.h>
 
 
 namespace imtauth
@@ -12,11 +13,13 @@ namespace imtauth
 
 
 bool CRelationshipDocumentValidatorComp::ValidateDocumentData(
-			const QByteArray& objectId,
+			const QUrl& url,
 			const istd::IChangeable& document,
 			QString& errorMessage,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
+	const QByteArray objectId = imtdoc::UrlToObjectId(url);
+
 	const imtauth::ITenantRelationshipInfo* relInfo = dynamic_cast<const imtauth::ITenantRelationshipInfo*>(&document);
 	if (relInfo == nullptr){
 		errorMessage = QStringLiteral("Invalid document type for relationship validation");

@@ -10,6 +10,7 @@
 #include <imtauth/IUserGroupInfo.h>
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtbase/IOperationContext.h>
+#include <imtdoc/imtdoc.h>
 
 
 namespace imtauth
@@ -17,11 +18,13 @@ namespace imtauth
 
 
 bool CUserGroupDocumentValidatorComp::ValidateDocumentData(
-			const QByteArray& objectId,
+			const QUrl& url,
 			const istd::IChangeable& document,
 			QString& errorMessage,
 			const imtbase::IOperationContext* operationContextPtr) const
 {
+	const QByteArray objectId = imtdoc::UrlToObjectId(url);
+
 	const imtauth::IUserGroupInfo* userGroupInfoPtr = dynamic_cast<const imtauth::IUserGroupInfo*>(&document);
 	if (userGroupInfoPtr == nullptr){
 		errorMessage = QStringLiteral("Invalid document type for user group validation");

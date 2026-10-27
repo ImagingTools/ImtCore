@@ -296,9 +296,6 @@ private:
 				const QByteArray& userId,
 				const QByteArray& documentId) const;
 
-	static QUrl ObjectUrl(const QByteArray& objectId);
-	static QByteArray UrlObjectId(const QUrl& url);
-
 private:
 	istd::TDelPtr<ipackage::CComponentAccessor> m_accessorPtr;
 	imtdoc::IDocumentService* m_servicePtr = nullptr;

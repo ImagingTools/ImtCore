@@ -999,7 +999,7 @@ void CDocumentServiceBase::OnUndoManagerChanged(int modelId)
 }
 
 
-QString CDocumentServiceBase::GetDefaultDocumentName(const QByteArray& /*objectId*/, const WorkingDocument& /*document*/) const
+QString CDocumentServiceBase::GetDefaultDocumentName(const WorkingDocument& /*document*/) const
 {
 	return QString();
 }
@@ -1012,7 +1012,6 @@ bool CDocumentServiceBase::HasDocumentNameProvider(const QByteArray& /*typeId*/)
 
 
 bool CDocumentServiceBase::ValidateDocumentData(
-			const QByteArray& /*objectId*/,
 			const WorkingDocument& /*document*/,
 			OperationStatus& status,
 			QString* errorMessage,

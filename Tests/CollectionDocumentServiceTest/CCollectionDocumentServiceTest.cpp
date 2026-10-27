@@ -1580,7 +1580,7 @@ void CCollectionDocumentServiceTest::DocumentStorageInsertRemoveTest()
 
 void CCollectionDocumentServiceTest::ObjectIdToUrlTest()
 {
-	QUrl url = m_managerPtr->ObjectIdToUrl("myObjectId");
+	QUrl url = imtdoc::ObjectIdToUrl("myObjectId");
 	QCOMPARE(url.toString(), QString("collection:///myObjectId"));
 	QCOMPARE(url.scheme(), QString("collection"));
 	QVERIFY2(url.host().isEmpty(), "URL host should be empty");
@@ -1589,11 +1589,11 @@ void CCollectionDocumentServiceTest::ObjectIdToUrlTest()
 
 void CCollectionDocumentServiceTest::UrlToObjectIdTest()
 {
-	QCOMPARE(CTestableDocumentService::UrlToObjectId(m_managerPtr->ObjectIdToUrl("myObjectId")), QByteArray("myObjectId"));
-	QVERIFY(CTestableDocumentService::UrlToObjectId(QUrl()).isEmpty());
-	QVERIFY(CTestableDocumentService::UrlToObjectId(QUrl("collection:///")).isEmpty());
-	QVERIFY(CTestableDocumentService::UrlToObjectId(QUrl("file:///myObjectId")).isEmpty());
-	QVERIFY(CTestableDocumentService::UrlToObjectId(QUrl("collection:///segment1/segment2")).isEmpty());
+	QCOMPARE(imtdoc::UrlToObjectId(imtdoc::ObjectIdToUrl("myObjectId")), QByteArray("myObjectId"));
+	QVERIFY(imtdoc::UrlToObjectId(QUrl()).isEmpty());
+	QVERIFY(imtdoc::UrlToObjectId(QUrl("collection:///")).isEmpty());
+	QVERIFY(imtdoc::UrlToObjectId(QUrl("file:///myObjectId")).isEmpty());
+	QVERIFY(imtdoc::UrlToObjectId(QUrl("collection:///segment1/segment2")).isEmpty());
 }
 
 

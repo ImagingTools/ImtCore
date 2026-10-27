@@ -207,7 +207,7 @@ void CCollectionDocumentServiceComp::PrepareDocumentMap(DocumentMap& documentMap
 
 			DocumentInfo doc;
 			doc.documentId = documentId;
-			doc.objectId = UrlToObjectId(workingDocumentPtr->url);
+			doc.objectId = imtdoc::UrlToObjectId(workingDocumentPtr->url);
 			doc.typeId = workingDocumentPtr->typeId;
 			doc.url = workingDocumentPtr->url.toString();
 			doc.name = workingDocumentPtr->name;
@@ -497,7 +497,7 @@ bool CCollectionDocumentServiceComp::RestoreDocument(
 
 	WorkingDocument document;
 	document.typeId = typeId;
-	document.url = documentInfo.objectId.isEmpty() ? QUrl() : ObjectIdToUrl(documentInfo.objectId);
+	document.url = documentInfo.objectId.isEmpty() ? QUrl() : imtdoc::ObjectIdToUrl(documentInfo.objectId);
 	document.name = documentInfo.name;
 	document.objectPtr = objectPtr;
 	document.undoManagerPtr = undoManagerPtr;

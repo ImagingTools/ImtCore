@@ -6,7 +6,7 @@
 #include <istd/IPolymorphic.h>
 
 // Qt includes
-#include <QtCore/QByteArray>
+#include <QtCore/QUrl>
 
 
 class QString;
@@ -55,7 +55,8 @@ public:
 	/**
 		Validate document data.
 		\return		true if document is valid, false otherwise.
-		\param		objectId		ID of the object being validated (empty for new documents not yet saved).
+		\param		url				URL of the document source (empty for new documents not yet saved).
+								For collection-based documents use \c imtdoc::UrlToObjectId to get the collection object ID.
 		\param		document		document data to validate.
 		\param		errorMessage	output parameter with validation error description when return value is false.
 								When validation succeeds, errorMessage is left unchanged.
@@ -63,7 +64,7 @@ public:
 		\note		Implementations must be thread-safe.
 	*/
 	virtual bool ValidateDocumentData(
-		const QByteArray& objectId,
+		const QUrl& url,
 		const istd::IChangeable& document,
 		QString& errorMessage,
 		const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
