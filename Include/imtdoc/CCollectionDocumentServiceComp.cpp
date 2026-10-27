@@ -445,7 +445,8 @@ bool CCollectionDocumentServiceComp::RestoreSharedDocument(const DocumentInfo& d
 		return false;
 	}
 
-	const UserDocumentPairList documents = FindDocumentsByObjectId(documentInfo.objectId);
+	const int revision = imtdoc::UrlToRevision(QUrl(documentInfo.url));
+	const UserDocumentPairList documents = FindDocumentsByUrl(imtdoc::ObjectIdToUrl(documentInfo.objectId, revision));
 	if (documents.isEmpty()){
 		return false;
 	}
@@ -474,10 +475,23 @@ bool CCollectionDocumentServiceComp::RestoreDocument(
 		return false;
 	}
 
+	const int revision = imtdoc::UrlToRevision(QUrl(documentInfo.url));
+
 	istd::IChangeableSharedPtr objectPtr;
 	if (!documentInfo.objectId.isEmpty()){
-		if (!collectionPtr->GetObjectData(documentInfo.objectId, objectPtr) || !objectPtr.IsValid()){
-			return false;
+		if (revision < 0){
+			if (!collectionPtr->GetObjectData(documentInfo.objectId, objectPtr) || !objectPtr.IsValid()){
+				return false;
+			}
+		}
+		else{
+			const imtbase::IRevisionController* revisionControllerPtr = collectionPtr->GetRevisionController();
+			idoc::MetaInfoPtr metaInfoPtr;
+			if (revisionControllerPtr == nullptr
+						|| !revisionControllerPtr->GetRevisionData(*collectionPtr, documentInfo.objectId, revision, objectPtr, metaInfoPtr)
+						|| !objectPtr.IsValid()){
+				return false;
+			}
 		}
 	}
 
@@ -497,7 +511,7 @@ bool CCollectionDocumentServiceComp::RestoreDocument(
 
 	WorkingDocument document;
 	document.typeId = typeId;
-	document.url = documentInfo.objectId.isEmpty() ? QUrl() : imtdoc::ObjectIdToUrl(documentInfo.objectId);
+	document.url = documentInfo.objectId.isEmpty() ? QUrl() : imtdoc::ObjectIdToUrl(documentInfo.objectId, revision);
 	document.name = documentInfo.name;
 	document.objectPtr = objectPtr;
 	document.undoManagerPtr = undoManagerPtr;

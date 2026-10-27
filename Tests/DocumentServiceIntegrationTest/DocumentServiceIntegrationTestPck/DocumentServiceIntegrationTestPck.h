@@ -2,7 +2,11 @@
 #pragma once
 
 
+// ACF includes
+#include <icomp/TModelCompWrap.h>
+
 // Local includes
+#include "CRevisionObjectCollectionComp.h"
 #include "CTextDocumentValidatorComp.h"
 #include "CTextDocumentNameProviderComp.h"
 
@@ -16,6 +20,7 @@ namespace DocumentServiceIntegrationTestPck
 
 typedef CTextDocumentValidatorComp TextDocumentValidator;
 typedef CTextDocumentNameProviderComp TextDocumentNameProvider;
+typedef icomp::TModelCompWrap<CRevisionObjectCollectionComp> RevisionObjectCollection;
 
 
 } // namespace DocumentServiceIntegrationTestPck

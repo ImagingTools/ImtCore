@@ -12,6 +12,7 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
+#include <imtbase/IRevisionController.h>
 #include <imtdoc/IDocumentService.h>
 
 // Local includes
@@ -104,6 +105,16 @@ private slots:
 	void SingleCopyOneDocumentForAllUsersTest();
 	void SingleCopyUndoRedoSharedTest();
 
+	// Object revision tests
+	void RevisionUrlHelpersTest();
+	void OpenDocumentRevisionTest();
+	void OpenDocumentRevisionListNameSuffixTest();
+	void OpenDocumentNonExistentRevisionTest();
+	void OpenDocumentRevisionAndHeadSeparateTest();
+	void SaveDocumentRevisionRemovesRevisionFromUrlTest();
+	void SaveDocumentSaveAsRevisionTest();
+	void SingleCopyRevisionSharedTest();
+
 private:
 	/**
 		Inserts a text object into the shared collection if it does not exist yet.
@@ -121,7 +132,14 @@ private:
 	QByteArray OpenDocumentAndWaitForLoad(
 				imtdoc::IDocumentService& service,
 				const QByteArray& userId,
-				const QByteArray& objectId);
+				const QByteArray& objectId,
+				int revision = -1);
+
+	/**
+		Creates a revision of the collection object with the given text and sets
+		the current object text to \c currentText. Returns the revision number.
+	*/
+	int CreateObjectRevision(const QByteArray& objectId, const QString& revisionText, const QString& currentText);
 
 private:
 	istd::TDelPtr<ipackage::CComponentAccessor> m_accessorPtr;

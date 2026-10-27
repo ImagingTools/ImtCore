@@ -66,7 +66,7 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
-        <Element Id="ObjectCollection" PackageId="ImtCorePck" ComponentId="ObjectCollection">
+        <Element Id="ObjectCollection" PackageId="DocumentServiceIntegrationTestPck" ComponentId="RevisionObjectCollection">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ObjectFactories" Type="Factory[]" ExportId="">

@@ -25,5 +25,10 @@ I_EXPORT_COMPONENT(
 			"Name provider of text parameter documents",
 			"Document Name Provider Text Test");
 
+I_EXPORT_COMPONENT(
+			RevisionObjectCollection,
+			"Object collection with in-memory object revisions",
+			"Object Collection Revision Test");
+
 
 } // namespace DocumentServiceIntegrationTestPck

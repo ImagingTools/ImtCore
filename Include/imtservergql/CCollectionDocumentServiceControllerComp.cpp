@@ -11,6 +11,7 @@
 #include <imtbase/COperationContext.h>
 #include <imtauth/CUserInfo.h>
 #include <imtauthgql/imtauthgql.h>
+#include <imtdoc/imtdoc.h>
 #include <imtservergql/DocumentSharing.h>
 
 
@@ -804,8 +805,7 @@ QByteArray CCollectionDocumentServiceControllerComp::GetCollectionObjectId(const
 	const imtdoc::IDocumentService::DocumentList documentList = m_documentManagerCompPtr->GetOpenedDocumentList(userId);
 	for (const imtdoc::IDocumentService::DocumentListItem& documentItem : documentList){
 		if (documentItem.documentId == documentId){
-			// Documents bound to a collection element carry a 'collection:///<objectId>' source URL.
-			return documentItem.url.path().mid(1).toUtf8();
+			return imtdoc::UrlToObjectId(documentItem.url);
 		}
 	}
 

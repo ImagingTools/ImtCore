@@ -18,6 +18,7 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
+#include <imtbase/IRevisionController.h>
 #include <imtdoc/imtdoc.h>
 #include <imtdoc/CDocumentServiceBase.h>
 #include <imtdoc/CDocumentClosedEvent.h>
@@ -45,10 +46,14 @@ namespace imtdoc
 	  source element ID for later use during save.
 	- **DoOpenDocument** — resolves the URL to a collection object ID, fetches
 	  the object data in a background thread, and supports single-copy sharing of
-	  data across user sessions.
+	  data across user sessions.  A \c collection:///<objectId>/<revision> URL
+	  opens the object revision through the collection's \c IRevisionController.
+	- **GetOpenedDocumentList** — appends " (Rev #<revision>)" to the names of
+	  documents opened from an object revision.
 	- **DoSaveDocument** — validates the data, then either updates an existing
 	  collection element or inserts a new one (creating a copy when the name
 	  changes); fires \c CDocumentSavedEvent or \c CDocumentSavedAsEvent.
+	  After saving, the document URL does not address a revision anymore.
 	- **DoCloseDocument** — removes the document entry and fires
 	  \c CDocumentClosedEvent.
 	- **SetDocumentName** — renames the object in the collection (for saved
@@ -91,6 +96,7 @@ public:
 	virtual void DoCloseDocument(const QByteArray& taskId, const TaskParams& params) override;
 
 	// reimplemented (imtdoc::IDocumentService)
+	virtual DocumentList GetOpenedDocumentList(const QByteArray& userId) const override;
 	virtual OperationStatus SetDocumentName(const QByteArray& userId, const QByteArray& documentId, const QString& documentName) override;
 
 protected:
@@ -111,6 +117,13 @@ protected:
 	*/
 	UserDocumentPairList FindDocumentsByObjectId(const QByteArray& objectId) const;
 
+	/**
+		Returns the (userId, documentId) pairs of all opened documents with the URL \a url
+		(the same collection object and the same revision).
+		\note \c m_mutex must be locked by the caller.
+	*/
+	UserDocumentPairList FindDocumentsByUrl(const QUrl& url) const;
+
 private:
 	void OnDeferredDocumentDataLoaded(
 				const std::weak_ptr<std::atomic<bool>>& aliveGuard,
@@ -120,6 +133,7 @@ private:
 	void OnOpenDocumentThreadStarted(
 				const std::weak_ptr<std::atomic<bool>>& aliveGuard,
 				const QByteArray& objectId,
+				int revision,
 				const QByteArray& userId,
 				const QByteArray& documentId,
 				QObject* worker);
@@ -146,6 +160,25 @@ inline typename TCollectionDocumentServiceWrap<Base>::UserDocumentPairList TColl
 		for (const QByteArray& documentId : userIt.value()){
 			auto documentIt = this->m_documents.constFind(documentId);
 			if (documentIt != this->m_documents.constEnd() && imtdoc::UrlToObjectId(documentIt.value().url) == objectId){
+				result.append(qMakePair(userIt.key(), documentId));
+			}
+		}
+	}
+
+	return result;
+}
+
+
+template<class Base>
+inline typename TCollectionDocumentServiceWrap<Base>::UserDocumentPairList TCollectionDocumentServiceWrap<Base>::FindDocumentsByUrl(
+			const QUrl& url) const
+{
+	UserDocumentPairList result;
+
+	for (auto userIt = this->m_userDocumentIds.constBegin(); userIt != this->m_userDocumentIds.constEnd(); ++userIt){
+		for (const QByteArray& documentId : userIt.value()){
+			auto documentIt = this->m_documents.constFind(documentId);
+			if (documentIt != this->m_documents.constEnd() && documentIt.value().url == url){
 				result.append(qMakePair(userIt.key(), documentId));
 			}
 		}
@@ -184,6 +217,7 @@ template<class Base>
 inline void TCollectionDocumentServiceWrap<Base>::OnOpenDocumentThreadStarted(
 			const std::weak_ptr<std::atomic<bool>>& aliveGuard,
 			const QByteArray& objectId,
+			int revision,
 			const QByteArray& userId,
 			const QByteArray& documentId,
 			QObject* worker)
@@ -196,7 +230,18 @@ inline void TCollectionDocumentServiceWrap<Base>::OnOpenDocumentThreadStarted(
 
 	imtbase::IObjectCollection* collPtr = GetCollection();
 	imtbase::IObjectCollection::DataPtr dataPtr;
-	bool success = (collPtr != nullptr) && collPtr->GetObjectData(objectId, dataPtr);
+	bool success = false;
+	if (collPtr != nullptr){
+		if (revision < 0){
+			success = collPtr->GetObjectData(objectId, dataPtr);
+		}
+		else{
+			const imtbase::IRevisionController* revisionControllerPtr = collPtr->GetRevisionController();
+			idoc::MetaInfoPtr metaInfoPtr;
+			success = (revisionControllerPtr != nullptr)
+						&& revisionControllerPtr->GetRevisionData(*collPtr, objectId, revision, dataPtr, metaInfoPtr);
+		}
+	}
 	isAlive = aliveGuard.lock();
 	if (!isAlive || !isAlive->load()){
 		worker->deleteLater();
@@ -343,16 +388,14 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 		return;
 	}
 
-	QString path = url.path();
-
-	QStringList parts = path.split('/', Qt::SkipEmptyParts);
-	if (parts.count() != 1){
+	const QByteArray objectId = imtdoc::UrlToObjectId(url);
+	if (objectId.isEmpty()){
 		this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("Invalid URL path")});
 		return;
 	}
 
-	QByteArray objectId = parts.first().toUtf8();
-	QUrl documentUrl = imtdoc::ObjectIdToUrl(objectId);
+	const int revision = imtdoc::UrlToRevision(url);
+	const QUrl documentUrl = imtdoc::ObjectIdToUrl(objectId, revision);
 	QByteArray documentId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
 	QByteArray sharedDocumentId;
@@ -361,7 +404,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 	bool sharedIsDirty = false;
 	bool sharedIsLoading = false;
 
-	// Single-instance constraints (per user/object):
+	// Single-instance constraints (per user/object revision):
 	// - opening in single-instance mode is forbidden when the object is already open;
 	// - opening without single-instance mode is forbidden when the object is already
 	//   open in single-instance mode.
@@ -369,7 +412,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 		QMutexLocker locker(&this->m_mutex);
 		for (const QByteArray& userDocumentId : this->GetUserDocumentIds(userId)){
 			const WorkingDocument* userDocPtr = this->FindDocument(userId, userDocumentId);
-			if (userDocPtr == nullptr || imtdoc::UrlToObjectId(userDocPtr->url) != objectId){
+			if (userDocPtr == nullptr || userDocPtr->url != documentUrl){
 				continue;
 			}
 
@@ -386,9 +429,9 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 			}
 		}
 
-		// Single-copy mode: an object already opened by any user is represented by one document
+		// Single-copy mode: an object revision already opened by any user is represented by one document
 		if (this->IsSingleCopyMode()){
-			const UserDocumentPairList openedDocuments = this->FindDocumentsByObjectId(objectId);
+			const UserDocumentPairList openedDocuments = this->FindDocumentsByUrl(documentUrl);
 			if (!openedDocuments.isEmpty()){
 				sharedDocumentId = openedDocuments.first().second;
 
@@ -450,6 +493,12 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 	if (collectionPtr == nullptr){
 		this->ClearReservedOpen(userId, documentId);
 		this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("No collection available")});
+		return;
+	}
+
+	if (revision >= 0 && collectionPtr->GetRevisionController() == nullptr){
+		this->ClearReservedOpen(userId, documentId);
+		this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("Object revisions are not supported by the collection")});
 		return;
 	}
 
@@ -515,7 +564,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 		thread,
 		&QThread::started,
 		worker,
-		[this, aliveGuard, objectId, userId, documentId, worker](){
+		[this, aliveGuard, objectId, revision, userId, documentId, worker](){
 			auto isAlive = aliveGuard.lock();
 			if (!isAlive || !isAlive->load()){
 				worker->deleteLater();
@@ -525,6 +574,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 			this->OnOpenDocumentThreadStarted(
 						aliveGuard,
 						objectId,
+						revision,
 						userId,
 						documentId,
 						worker);
@@ -552,6 +602,23 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 	QObject::connect(thread, &QThread::finished, thread, &QObject::deleteLater);
 
 	thread->start();
+}
+
+
+template<class Base>
+inline typename TCollectionDocumentServiceWrap<Base>::DocumentList
+TCollectionDocumentServiceWrap<Base>::GetOpenedDocumentList(const QByteArray& userId) const
+{
+	DocumentList documentList = Base::GetOpenedDocumentList(userId);
+
+	for (DocumentListItem& item : documentList){
+		const int revision = imtdoc::UrlToRevision(item.url);
+		if (revision >= 0){
+			item.name += QStringLiteral(" (Rev #%1)").arg(revision);
+		}
+	}
+
+	return documentList;
 }
 
 
@@ -730,6 +797,9 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 				workingDocumentPtr->name = updatedName;
 			}
 			workingDocumentPtr->isDirty = false;
+
+			// A document opened from an object revision is now backed by the current object data
+			workingDocumentPtr->url = imtdoc::ObjectIdToUrl(currentObjectId);
 
 			QByteArray savedTypeId = workingDocumentPtr->typeId;
 			QUrl savedUrl = workingDocumentPtr->url;

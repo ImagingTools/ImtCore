@@ -25,6 +25,7 @@
 #include <imtdoc/CDocumentSavedAsEvent.h>
 #include <imtdoc/CDocumentSavedEvent.h>
 #include <imtdoc/CDocumentUndoRedoChangedEvent.h>
+#include <imtdoc/imtdoc.h>
 
 
 namespace imtservergql
@@ -402,14 +403,7 @@ void CCollectionDocumentServicePublisherComp::FillNameProviderFlag(
 
 QByteArray CCollectionDocumentServicePublisherComp::ConvertUrlToObjectId(const QUrl& url) const
 {
-	QString path = url.path();
-
-	QStringList parts = path.split('/', Qt::SkipEmptyParts);
-	if (parts.count() == 1){
-		return parts.first().toUtf8();
-	}
-
-	return QByteArray();
+	return imtdoc::UrlToObjectId(url);
 }
 
 
