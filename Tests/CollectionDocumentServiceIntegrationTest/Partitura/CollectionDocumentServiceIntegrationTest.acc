@@ -16,6 +16,22 @@
                     <AttributeInfo Id="Collection" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ObjectCollection"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="DocumentNameProviders" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>TextDocumentNameProvider</Value>
+                                <Value>TextDocumentNameProvider</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DocumentValidators" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>TextDocumentValidatorWithMessage</Value>
+                                <Value>TextDocumentValidator</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                     <AttributeInfo Id="IsSingleCopyMode" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="false"/>
                     </AttributeInfo>
@@ -23,13 +39,17 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>DocumentObject</Value>
-                                <Value>DocumentObject</Value>
+<Value>DocumentObject</Value>
+<Value>DocumentObject</Value>
+<Value>DocumentObject</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="ObjectTypeIdList" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
+                                <Value>ValidatedType</Value>
+                                <Value>ValidatedType2</Value>
                                 <Value>TestType</Value>
                                 <Value>TestType2</Value>
                             </Values>
@@ -53,13 +73,17 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>DocumentObject</Value>
-                                <Value>DocumentObject</Value>
+<Value>DocumentObject</Value>
+<Value>DocumentObject</Value>
+<Value>DocumentObject</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="TypeIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
+                                <Value>ValidatedType</Value>
+                                <Value>ValidatedType2</Value>
                                 <Value>TestType</Value>
                                 <Value>TestType2</Value>
                             </Values>
@@ -68,6 +92,8 @@
                     <AttributeInfo Id="TypeNames" Type="Text[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
+                                <Value>ValidatedType</Value>
+                                <Value>ValidatedType2</Value>
                                 <Value>TestType</Value>
                                 <Value>TestType2</Value>
                             </Values>
@@ -82,6 +108,22 @@
                     <AttributeInfo Id="Collection" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ObjectCollection"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="DocumentNameProviders" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>TextDocumentNameProvider</Value>
+                                <Value>TextDocumentNameProvider</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DocumentValidators" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>TextDocumentValidatorWithMessage</Value>
+                                <Value>TextDocumentValidator</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                     <AttributeInfo Id="IsSingleCopyMode" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
                     </AttributeInfo>
@@ -89,13 +131,17 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>DocumentObject</Value>
-                                <Value>DocumentObject</Value>
+<Value>DocumentObject</Value>
+<Value>DocumentObject</Value>
+<Value>DocumentObject</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="ObjectTypeIdList" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
+                                <Value>ValidatedType</Value>
+                                <Value>ValidatedType2</Value>
                                 <Value>TestType</Value>
                                 <Value>TestType2</Value>
                             </Values>
@@ -103,6 +149,36 @@
                     </AttributeInfo>
                     <AttributeInfo Id="UndoManager" Type="Factory" ExportId="">
                         <Data IsEnabled="true" Value="UndoManager"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="TextDocumentNameProvider" PackageId="CollectionDocumentServiceIntegrationTestPck" ComponentId="TextDocumentNameProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="NamePrefix" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="Auto: "/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="TextDocumentValidator" PackageId="CollectionDocumentServiceIntegrationTestPck" ComponentId="TextDocumentValidator">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="InvalidText" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="invalid"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="TextDocumentValidatorWithMessage" PackageId="CollectionDocumentServiceIntegrationTestPck" ComponentId="TextDocumentValidator">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ErrorMessage" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="Custom validation error"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="InvalidText" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="invalid"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
