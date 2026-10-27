@@ -610,6 +610,9 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 		add_subdirectory("${TESTS_DIR}/CollectionDocumentServiceTest/CMake" "${AUX_INCLUDE_DIR}/CollectionDocumentServiceTest")
 		add_dependencies(CollectionDocumentServiceTest imtbase imtdoc)
 
+		add_subdirectory("${TESTS_DIR}/CollectionDocumentServiceIntegrationTest/CMake" "${AUX_INCLUDE_DIR}/CollectionDocumentServiceIntegrationTest")
+		add_dependencies(CollectionDocumentServiceIntegrationTest imtbase imtdoc ImtCorePck ImtDocPck)
+
 		if(USE_QTQML)
 			add_subdirectory("${TESTS_DIR}/QmlTest/CMake" "${AUX_INCLUDE_DIR}/QmlTest")
 			add_dependencies(ImtCoreQmlTest

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="6560" Description="ACF"/>
+            <Version Id="1" Number="2449" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="CollectionDocumentService" PackageId="ImtDocPck" ComponentId="CollectionDocumentService">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Collection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ObjectCollection"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IsSingleCopyMode" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectFactories" Type="Factory[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>DocumentObject</Value>
+                                <Value>DocumentObject</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectTypeIdList" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>TestType</Value>
+                                <Value>TestType2</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UndoManager" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="UndoManager"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="DocumentObject" PackageId="BasePck" ComponentId="TextParam">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="ObjectCollection" PackageId="ImtCorePck" ComponentId="ObjectCollection">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ObjectFactories" Type="Factory[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>DocumentObject</Value>
+                                <Value>DocumentObject</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>TestType</Value>
+                                <Value>TestType2</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeNames" Type="Text[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>TestType</Value>
+                                <Value>TestType2</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SingleCopyCollectionDocumentService" PackageId="ImtDocPck" ComponentId="CollectionDocumentService">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Collection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ObjectCollection"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IsSingleCopyMode" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectFactories" Type="Factory[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>DocumentObject</Value>
+                                <Value>DocumentObject</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectTypeIdList" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>TestType</Value>
+                                <Value>TestType2</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UndoManager" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="UndoManager"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="UndoManager" PackageId="BasePck" ComponentId="SerializedUndoManager">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces/>
+    <ExportedComponents>
+        <Component ExportedId="CollectionDocumentService" ComponentId="CollectionDocumentService"/>
+        <Component ExportedId="ObjectCollection" ComponentId="ObjectCollection"/>
+        <Component ExportedId="SingleCopyCollectionDocumentService" ComponentId="SingleCopyCollectionDocumentService"/>
+    </ExportedComponents>
+</Acf>
