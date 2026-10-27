@@ -48,6 +48,7 @@
                             <Values>
                                 <Value>OnTenantsCollectionChanged</Value>
                                 <Value>OnMembershipNotification</Value>
+                                <Value>OnOrganizationMembersChanged</Value>
                                 <Value>OnConnectionCodesNotification</Value>
                                 <Value>OnTenantRelationshipsCollectionChanged</Value>
                                 <Value>OnCrossTenantMessageNotification</Value>

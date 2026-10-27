@@ -115,7 +115,13 @@ QtObject {
 		if (!root.__permissionsProvider)
 			return
 		root.__permissionsProvider.productId = root.productId || ""
-		root.__permissionsProvider.requestPermissions(tenantId || root.tenantId || "")
+		root.__permissionsProvider.ensurePermissions(tenantId || root.tenantId || "")
+	}
+
+	// The permission scope of the organization changed: its permissions are read again when an editor needs them
+	function invalidateTenantPermissions() {
+		if (root.__permissionsProvider)
+			root.__permissionsProvider.invalidateTenantPermissions()
 	}
 
 	function fetchOrganizationPermissions(tenantId, userId) {

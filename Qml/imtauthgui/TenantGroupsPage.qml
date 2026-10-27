@@ -26,8 +26,6 @@ SimpleCollectionPage {
 	columnNames: [qsTr("Name"), qsTr("Description")]
 	managePermissionIds: ["/OrganizationManagement/Groups/Edit/Change", "/OrganizationManagement/Groups/Edit/Remove", "/OrganizationManagement/Groups/Edit/Add"]
 	createPermissionIds: ["/OrganizationManagement/Groups/Edit/Add"]
-	createAllowed: stateManager ? stateManager.scopeHolds("/Administration/Groups/Edit/Add") : false
-	createUnavailableText: qsTr("New groups can be created once the permissions of the organization include Administration > Groups > Add.")
 	editPermissionIds: ["/OrganizationManagement/Groups/Edit/Change"]
 	deletePermissionIds: ["/OrganizationManagement/Groups/Edit/Remove"]
 	function removeItems(ids) {

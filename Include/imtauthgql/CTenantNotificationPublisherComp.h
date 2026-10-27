@@ -37,6 +37,9 @@ namespace imtauthgql
 	Notifications are delivered only to subscribers whose authenticated user
 	matches the target userId.
 
+	Any of the changes above and a new membership are also announced by OnOrganizationMembersChanged
+	to every subscriber whose session is in the organization.
+
 	The subscription endpoint name is configurable via the \c CommandId
 	attribute and defaults to "OnMembershipNotification".
 */
@@ -88,6 +91,7 @@ private:
 
 	QList<Notification> CreateNotifications(const QVariantMap& event) const;
 	void PublishNotification(const Notification& notification) const;
+	void PublishMembersChanged(const QByteArray& tenantId) const;
 
 	QString FindTenantName(const QByteArray& tenantId) const;
 	QByteArray FindTenantOwnerId(const QByteArray& tenantId) const;

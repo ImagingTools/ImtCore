@@ -37,13 +37,19 @@ inline QByteArray GetPermissionPath(const iprm::IParamsSet* paramsPtr)
 }
 
 
+/**
+	Tell whether the element is accessible. Inside an organization (\c isInOrganization) the organization permissions of the user
+	apply as in a command check (\see imtauth::SelectApplicablePermissions, imtauth::CollectHeldPermissions).
+*/
 inline bool IsElementAccessible(
 			const ICommandPermissionsProvider* permissionsProviderPtr,
 			imtauth::IPermissionChecker* permissionCheckerPtr,
 			const QByteArray& elementId,
 			const imtauth::IUserInfo::FeatureIds& userPermissions,
 			bool isAdmin,
-			const QByteArray& permissionPath)
+			const QByteArray& permissionPath,
+			bool isInOrganization = false,
+			const QByteArrayList& organizationPermissions = QByteArrayList())
 {
 	if (permissionsProviderPtr == nullptr || permissionCheckerPtr == nullptr){
 		return true;
@@ -53,17 +59,23 @@ inline bool IsElementAccessible(
 		return true;
 	}
 
-	const QByteArrayList elementPermissions = permissionsProviderPtr->GetCommandPermissions(elementId);
-	if (elementPermissions.isEmpty()){
+	const QByteArrayList declaredPermissions = permissionsProviderPtr->GetCommandPermissions(elementId);
+	if (declaredPermissions.isEmpty()){
 		return true;
 	}
 
-	if (!permissionPath.isEmpty()){
-		return imtauth::IsPermissionPathDeclared(elementPermissions, permissionPath)
-				&& permissionCheckerPtr->CheckPermission(userPermissions, {permissionPath});
+	const QByteArrayList elementPermissions = imtauth::SelectApplicablePermissions(declaredPermissions, isInOrganization);
+	if (elementPermissions.isEmpty()){
+		return false;
 	}
 
-	return permissionCheckerPtr->CheckPermission(userPermissions, elementPermissions);
+	const QByteArrayList heldPermissions = imtauth::CollectHeldPermissions(userPermissions, organizationPermissions, elementPermissions);
+	if (!permissionPath.isEmpty()){
+		return imtauth::IsPermissionPathDeclared(elementPermissions, permissionPath)
+				&& permissionCheckerPtr->CheckPermission(heldPermissions, {permissionPath});
+	}
+
+	return permissionCheckerPtr->CheckPermission(heldPermissions, elementPermissions);
 }
 
 

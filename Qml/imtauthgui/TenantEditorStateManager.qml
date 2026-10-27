@@ -136,23 +136,6 @@ QtObject {
 		return PermissionsController.hasPermission(stateManager.__currentUserOrgPerms, permissionId)
 	}
 
-	// The members page asks the editor to read the organization again
-	signal membersRefreshRequested()
-
-	function requestMembersRefresh() {
-		stateManager.membersRefreshRequested()
-	}
-
-	// Within the organization a product permission is held only if the permission scope of the organization holds it exactly
-	function scopeHolds(permissionId) {
-		var scope = stateManager.tenantData && stateManager.tenantData.m_tenantPermissions ? stateManager.tenantData.m_tenantPermissions : []
-		for (var i = 0; i < scope.length; i++) {
-			if (String(scope[i]) === permissionId)
-				return true
-		}
-		return false
-	}
-
 	function hasAnyPermission(permissionIds) {
 		if (!permissionIds || permissionIds.length === 0)
 			return false

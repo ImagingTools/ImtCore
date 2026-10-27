@@ -26,16 +26,14 @@ SimpleCollectionPage {
 
 	// Members use stateManager-driven model, not a data provider
 	listModel: __combinedModel
-	managePermissionIds: ["/OrganizationManagement/Members/Edit/Invite", "/OrganizationManagement/Members/Edit/Exclude", "/OrganizationManagement/Members/Edit/ChangeRole"]
-	createPermissionIds: ["/OrganizationManagement/Members/Edit/Invite"]
-	editPermissionIds: ["/OrganizationManagement/Members/Edit/ChangeRole"]
+	managePermissionIds: ["/OrganizationManagement/Members/Edit/Add", "/OrganizationManagement/Members/Edit/Change", "/OrganizationManagement/Members/Edit/Invite", "/OrganizationManagement/Members/Edit/Exclude", "/OrganizationManagement/Members/Edit/ChangeRole"]
+	createPermissionIds: ["/OrganizationManagement/Members/Edit/Add"]
+	editPermissionIds: ["/OrganizationManagement/Members/Edit/Change", "/OrganizationManagement/Members/Edit/ChangeRole"]
 	deletePermissionIds: ["/OrganizationManagement/Members/Edit/Exclude"]
 
 	readonly property bool __canCreateMember: stateManager
 		? stateManager.hasAnyPermission(createPermissionIds)
 		: false
-	createAllowed: stateManager ? stateManager.scopeHolds("/Administration/Users/Edit/Add") : false
-	createUnavailableText: qsTr("New users can be created once the permissions of the organization include Administration > Users > Add. Existing users can be invited.")
 	readonly property bool __canInviteMember: stateManager
 		? stateManager.canInviteOrganizationMember
 		: false
@@ -397,19 +395,7 @@ SimpleCollectionPage {
 		function onPendingInvitationsChanged() { membersPage.__rebuildCombinedModel() }
 	}
 
-	// Shown again, the page reads the members anew: an invitation by another manager reaches nobody else
-	property bool __shownOnce: false
-
-	onVisibleChanged: {
-		if (!membersPage.visible)
-			return
-		if (membersPage.__shownOnce && membersPage.stateManager)
-			membersPage.stateManager.requestMembersRefresh()
-		membersPage.__shownOnce = true
-	}
-
 	Component.onCompleted: {
-		membersPage.__shownOnce = membersPage.visible
 		__rebuildCombinedModel()
 		if (membersPage.apiClient && membersPage.model) {
 			var tid = membersPage.model.m_id
@@ -539,7 +525,7 @@ SimpleCollectionPage {
 				text: "+ " + qsTr("Create User")
 				font.pixelSize: Style.fontSizeM
 				font.bold: true
-				visible: membersPage.__canCreateMember && membersPage.createAllowed
+				visible: membersPage.__canCreateMember
 				color: membersPage.__canCreateMember ? Style.linkColor : Style.inactiveTextColor
 
 				MouseArea {
@@ -548,7 +534,7 @@ SimpleCollectionPage {
 					cursorShape: membersPage.__canCreateMember ? Qt.PointingHandCursor : Qt.ArrowCursor
 					enabled: membersPage.__canCreateMember
 					onClicked: {
-						if (membersPage.__canCreateMember && membersPage.createAllowed)
+						if (membersPage.__canCreateMember)
 							membersPage.openCreate()
 					}
 				}
@@ -685,10 +671,11 @@ SimpleCollectionPage {
 		if (membersPage.__invitationStatus(invitation) !== "Pending")
 			return items
 		var stateManager = membersPage.stateManager
-		if (stateManager && stateManager.canInviteOrganizationMember)
+		// Who may invite may also take an invitation back
+		if (stateManager && stateManager.canInviteOrganizationMember) {
 			items.push({ text: qsTr("Resend Invitation"), action: "resend" })
-		if (stateManager && stateManager.canExcludeOrganizationMember)
 			items.push({ text: qsTr("Revoke Invitation"), action: "revoke" })
+		}
 		return items
 	}
 
@@ -845,7 +832,7 @@ SimpleCollectionPage {
 			onFinished: {
 				if (commandId === "resend" && membersPage.apiClient && membersPage.stateManager && membersPage.stateManager.canInviteOrganizationMember)
 					membersPage.apiClient.resendInvitation(inviteActionMenu.targetInvitationId)
-				else if (commandId === "revoke" && membersPage.apiClient && membersPage.stateManager && membersPage.stateManager.canExcludeOrganizationMember)
+				else if (commandId === "revoke" && membersPage.apiClient && membersPage.stateManager && membersPage.stateManager.canInviteOrganizationMember)
 					membersPage.confirmRevokeInvitation(inviteActionMenu.targetInvitationId, inviteActionMenu.targetUserName)
 			}
 		}

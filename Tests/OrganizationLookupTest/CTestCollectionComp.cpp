@@ -100,6 +100,12 @@ void CTestCollectionComp::SetStoreFailing(bool isFailing)
 }
 
 
+void CTestCollectionComp::SetAfterLoadHook(const std::function<void()>& hook)
+{
+	m_afterLoadHook = hook;
+}
+
+
 // reimplemented (imtbase::IObjectCollection)
 
 bool CTestCollectionComp::GetObjectData(const Id& objectId, DataPtr& dataPtr, const iprm::IParamsSet* dataConfigurationPtr) const
@@ -109,7 +115,14 @@ bool CTestCollectionComp::GetObjectData(const Id& objectId, DataPtr& dataPtr, co
 		return false;
 	}
 
-	return BaseClass2::GetObjectData(objectId, dataPtr, dataConfigurationPtr);
+	const bool retVal = BaseClass2::GetObjectData(objectId, dataPtr, dataConfigurationPtr);
+	if (m_afterLoadHook){
+		const std::function<void()> hook = m_afterLoadHook;
+		m_afterLoadHook = nullptr;
+		hook();
+	}
+
+	return retVal;
 }
 
 

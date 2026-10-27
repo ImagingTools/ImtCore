@@ -33,6 +33,9 @@ private slots:
 	void testFindTenantIdsByName_IgnoresCaseAndSpacesNotParts();
 	void testFindTenantIdsByName_SemicolonAndBackslashStayOutOfTheSelection();
 	void testChildTenantIds_ReportsAFailedRead();
+	void testOwnedOrCreated_ReportsAFailedRead();
+	void testGetRelatedTenants_RelationshipReplacedDuringTheRead();
+	void testRemoveMembership_RefusedWhenItCannotBeRead();
 	void testGetGrantsBySourceTenant_ReportsAFailedRead();
 	void testGetRelatedSince_ReportsAFailedHistoryRead();
 	void testRemoveVerificationData_UnreadableCodeIsRemovedAnyway();

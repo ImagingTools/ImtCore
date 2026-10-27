@@ -20,8 +20,9 @@ public:
 	virtual ITenantInfoUniquePtr GetTenant(const QByteArray& tenantId) const = 0;
 	/**
 		Ids of the organizations the user owns or created.
+		\param isReadPtr [optional] False when the storage could not be read completely, so the list may miss some.
 	*/
-	virtual QByteArrayList GetOwnedOrCreatedTenantIds(const QByteArray& userId) const = 0;
+	virtual QByteArrayList GetOwnedOrCreatedTenantIds(const QByteArray& userId, bool* isReadPtr = nullptr) const = 0;
 	/**
 		Ids of the direct sub-organizations of an organization.
 		\param isReadPtr [optional] False when the storage could not be read completely, so the list may miss some.

@@ -166,7 +166,7 @@ Item {
 				visible: sharesPage.incomingShares.length > 0
 				width: parent.width
 				height: incomingTable.contentHeight + incomingTable.headerHeight
-				canMoveColumns: false
+				canMoveColumns: true
 				selectable: false
 				elements: sharesPage.incomingShares
 			}
@@ -192,7 +192,7 @@ Item {
 				visible: sharesPage.outgoingShares.length > 0
 				width: parent.width
 				height: outgoingTable.contentHeight + outgoingTable.headerHeight
-				canMoveColumns: false
+				canMoveColumns: true
 				selectable: false
 				elements: sharesPage.outgoingShares
 			}

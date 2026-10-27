@@ -53,6 +53,13 @@ private Q_SLOTS:
 	void testEmptyTenantScopeHoldsNothing();
 	void testOrganizationAccessIsKeptOutsideTenantScope();
 
+	// Users, roles and groups inside and outside of an organization
+	void testOrganizationPermissionOpensItsCommandInOrganization();
+	void testOwnerHoldsEveryOrganizationPermission();
+	void testProductAdministrationDoesNotApplyInOrganization();
+	void testOrganizationPermissionOfRoleOpensNothing();
+	void testOrganizationPermissionPathOutsideOrganizationIsRefused();
+
 	// Permission path of the request
 	void testPermissionPathEqualToDeclaredIsAccepted();
 	void testPermissionPathInsideDeclaredIsAccepted();
@@ -72,6 +79,7 @@ private Q_SLOTS:
 	// Elements of the user interface
 	void testGuiElementOpensForAnyDeclaredPermission();
 	void testGuiElementPermissionPathWiderThanDeclaredIsHidden();
+	void testGuiElementInOrganizationFollowsOrganizationPermissions();
 };
 
 

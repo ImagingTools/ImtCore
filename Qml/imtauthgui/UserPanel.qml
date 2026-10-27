@@ -89,7 +89,7 @@ Item {
 			// The session can end while the read waits
 			if (!AuthorizationController.tenantsEnabled || !AuthorizationController.userTokenProvider.userId)
 				return
-			organizationsRequest.send(organizationsInput)
+			organizationsRequest.send(userPanel.organizationsInput)
 		}
 	}
 	

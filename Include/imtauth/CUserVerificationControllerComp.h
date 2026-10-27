@@ -45,7 +45,9 @@ public:
 
 private:
 	int GenerateCode(int min, int max) const;
-	/// A code that could not be removed stays blocked, so it cannot be used or guessed again.
+	/// VerifyUser for a caller that holds m_lifecycleMutex.
+	bool VerifyLocked(const QByteArray& userId, const QByteArray& verificationCode) const;
+	/// A code that could not be removed stays blocked, so it cannot be used or guessed again. The caller holds m_lifecycleMutex.
 	bool RemoveVerification(const QByteArray& userId) const;
 
 	class CheckExpiredVerificationDataThread: public QThread
@@ -68,8 +70,9 @@ private:
 private:
 	CheckExpiredVerificationDataThread m_checkExpiredVerificationDataThread;
 
-	mutable QMutex m_failedAttemptsMutex;
-	QMutex m_consumeMutex;
+	// A code is generated, checked, counted, consumed and removed one step at a time: a check between the read of a code and its
+	// removal could otherwise lift a block set meanwhile, or remove a code generated meanwhile
+	mutable QMutex m_lifecycleMutex;
 	mutable QHash<QByteArray, int> m_failedAttempts;
 };
 

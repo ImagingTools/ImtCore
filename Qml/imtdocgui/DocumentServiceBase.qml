@@ -476,6 +476,15 @@ QtObject {
 		return __internal.openedDocuments[index].isDirty
 	}
 
+	function documentIsClosing(documentId){
+		let index = getDocumentIndexByDocumentId(documentId)
+		if (index < 0){
+			return false
+		}
+
+		return __internal.openedDocuments[index].isClosing
+	}
+
 	function documentIsLoading(documentId){
 		let index = getDocumentIndexByDocumentId(documentId)
 		if (index < 0){

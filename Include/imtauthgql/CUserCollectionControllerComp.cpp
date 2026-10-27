@@ -830,10 +830,21 @@ bool CUserCollectionControllerComp::OnBeforeRemoveElements(const QByteArrayList&
 {
 	if (m_tenantManagerCompPtr.IsValid()){
 		for (const QByteArray& userId : elementIds){
-			const QByteArrayList tenantIds = m_tenantManagerCompPtr->GetOwnedOrCreatedTenantIds(userId);
+			// An organization that cannot be read may be owned by the user: it would be left with a removed owner
+			bool isRead = false;
+			const QByteArrayList tenantIds = m_tenantManagerCompPtr->GetOwnedOrCreatedTenantIds(userId, &isRead);
+			if (!isRead){
+				errorMessage = QStringLiteral("The organizations of user '%1' could not be read. Try again.").arg(QString::fromUtf8(userId));
+				return false;
+			}
+
 			for (const QByteArray& tenantId : tenantIds){
 				imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
-				if (tenantPtr.IsValid() && tenantPtr->GetOwnerId() == userId){
+				if (!tenantPtr.IsValid()){
+					errorMessage = QStringLiteral("The organizations of user '%1' could not be read. Try again.").arg(QString::fromUtf8(userId));
+					return false;
+				}
+				if (tenantPtr->GetOwnerId() == userId){
 					errorMessage = QStringLiteral("Cannot delete user '%1' who owns tenant '%2'. Transfer ownership first.")
 						.arg(QString::fromUtf8(userId), QString::fromUtf8(tenantId));
 					return false;

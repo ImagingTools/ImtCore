@@ -70,6 +70,16 @@ public:
 	virtual void InvalidateToken(const QByteArray& token) const override;
 
 private:
+	// Organization data of a token
+	struct TokenTenantData
+	{
+		bool isTenantOwner = false;
+		QByteArrayList tenantPermissions;
+		// What the user holds inside the organization: its owner and its creator manage all of it, a member what the membership gives
+		QByteArrayList organizationPermissions;
+		bool hasOrganizationAccess = false;
+	};
+
 	struct TokenCacheEntry
 	{
 		QByteArray userId;
@@ -83,9 +93,7 @@ private:
 		// StoreCachedTenantData) and kept only for TenantDataCacheLifetime, so a changed
 		// scope, owner or membership reaches open sessions soon. 'resolvedAt' 0 means
 		// "never looked up yet", not a cached negative result.
-		bool isTenantOwner = false;
-		QByteArrayList tenantPermissions;
-		bool hasOrganizationAccess = false;
+		TokenTenantData tenantData;
 		qint64 tenantDataResolvedAt = 0;
 	};
 
@@ -161,14 +169,14 @@ private:
 		older than TenantDataCacheLifetime - the caller then resolves it and stores it via
 		StoreCachedTenantData().
 	*/
-	bool TryGetCachedTenantData(const QByteArray& token, bool& isTenantOwner, QByteArrayList& tenantPermissions, bool& hasOrganizationAccess) const;
+	bool TryGetCachedTenantData(const QByteArray& token, TokenTenantData& tenantData) const;
 
 	/**
 		Records the resolved organization data for 'token' on its existing cache entry (a no-op
 		if the token has no cache entry - callers only reach this after ResolveUserId() has
 		already cached the token).
 	*/
-	void StoreCachedTenantData(const QByteArray& token, bool isTenantOwner, const QByteArrayList& tenantPermissions, bool hasOrganizationAccess) const;
+	void StoreCachedTenantData(const QByteArray& token, const TokenTenantData& tenantData) const;
 	imtgql::IGqlContextUniquePtr CreateContextInstance() const;
 	bool IsPatToken(const QByteArray& token) const;
 
@@ -177,6 +185,8 @@ private:
 		creator and members, outside of any a member of one or a user with a pending invitation.
 	*/
 	bool HasOrganizationAccess(const QByteArray& userId, const QByteArray& tenantId, bool isOwnerOrCreator) const;
+	/// The organization permissions of the user inside the organization; without the memberships (a product server) a member holds none.
+	QByteArrayList GetOrganizationPermissions(const QByteArray& userId, const QByteArray& tenantId, bool isOwnerOrCreator) const;
 
 	/**
 		Extract the 'exp' claim (seconds since epoch) from a JWT without going

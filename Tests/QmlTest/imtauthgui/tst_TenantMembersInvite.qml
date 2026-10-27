@@ -53,12 +53,10 @@ TestCase {
 
 			function hasAnyPermission(ids){ return true }
 			function hasPermission(id){ return true }
-			function scopeHolds(id){ return true }
 			function isOwner(userId){ return false }
 			function isInvitationExpired(invitation){ return false }
 			function formatInvitationInfo(invitedByName, expiresAt){ return "" }
 			function loadMembersFromModel(){}
-			function requestMembersRefresh(){}
 			function inviteSelectedUsers(selectedItems){ invitations.push(selectedItems) }
 		}
 	}

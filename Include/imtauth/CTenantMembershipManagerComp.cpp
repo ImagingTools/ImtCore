@@ -178,6 +178,12 @@ QByteArray CTenantMembershipManagerComp::AddMembership(const QByteArray& userId,
 		m_bindingManagerCompPtr->AddBinding(tenantId, entityType, userId);
 	}
 
+	TenantEvent::Publish(this, {
+				{TenantEvent::s_type, TenantEvent::s_membershipAdded},
+				{TenantEvent::s_membershipId, membershipId},
+				{TenantEvent::s_userId, userId},
+				{TenantEvent::s_tenantId, tenantId}});
+
 	SendInfoMessage(0, QStringLiteral("Added membership for user '%1' in tenant '%2'")
 		.arg(userId, tenantId), QStringLiteral("CTenantMembershipManagerComp"));
 
@@ -192,22 +198,34 @@ bool CTenantMembershipManagerComp::RemoveMembership(const QByteArray& membership
 		return false;
 	}
 
-	if (IsOwnerMembership(membershipId)){
-		SendErrorMessage(0, QStringLiteral("Cannot remove the tenant owner's membership (membership '%1')").arg(membershipId), QStringLiteral("CTenantMembershipManagerComp"));
-		return false;
-	}
-
-	// Retrieve userId and tenantId before removing membership record
+	// The user and the organization are read before the removal: without them the bindings and the notifications
+	// would be lost, and a removal already done could not be repeated
 	QByteArray userId;
 	QByteArray tenantId;
 	{
 		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (m_membershipCollectionCompPtr->GetObjectData(membershipId, dataPtr)){
-			const ITenantMembership* membershipPtr = dynamic_cast<const ITenantMembership*>(dataPtr.GetPtr());
-			if (membershipPtr != nullptr){
-				userId = membershipPtr->GetUserId();
-				tenantId = membershipPtr->GetTenantId();
-			}
+		const ITenantMembership* membershipPtr = m_membershipCollectionCompPtr->GetObjectData(membershipId, dataPtr)
+					? dynamic_cast<const ITenantMembership*>(dataPtr.GetPtr())
+					: nullptr;
+		if (membershipPtr == nullptr){
+			SendErrorMessage(0, QStringLiteral("Membership '%1' could not be read").arg(QString::fromUtf8(membershipId)), "CTenantMembershipManagerComp");
+			return false;
+		}
+
+		userId = membershipPtr->GetUserId();
+		tenantId = membershipPtr->GetTenantId();
+	}
+
+	// An organization that cannot be read may be owned by the member
+	if (m_tenantManagerCompPtr.IsValid()){
+		ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
+		if (!tenantPtr.IsValid()){
+			SendErrorMessage(0, QStringLiteral("The organization of membership '%1' could not be read").arg(QString::fromUtf8(membershipId)), "CTenantMembershipManagerComp");
+			return false;
+		}
+		if (tenantPtr->GetOwnerId() == userId){
+			SendErrorMessage(0, QStringLiteral("Cannot remove the tenant owner's membership (membership '%1')").arg(membershipId), QStringLiteral("CTenantMembershipManagerComp"));
+			return false;
 		}
 	}
 
@@ -367,31 +385,6 @@ bool CTenantMembershipManagerComp::CleanupTenantAssignedUserData(const QByteArra
 	}
 
 	return m_userCollectionCompPtr->SetObjectData(userId, *userInfoPtr);
-}
-
-
-bool CTenantMembershipManagerComp::IsOwnerMembership(const QByteArray& membershipId) const
-{
-	if (!m_tenantManagerCompPtr.IsValid()){
-		return false;
-	}
-
-	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (!m_membershipCollectionCompPtr->GetObjectData(membershipId, dataPtr)){
-		return false;
-	}
-
-	const ITenantMembership* membershipPtr = dynamic_cast<const ITenantMembership*>(dataPtr.GetPtr());
-	if (membershipPtr == nullptr){
-		return false;
-	}
-
-	ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(membershipPtr->GetTenantId());
-	if (!tenantPtr.IsValid()){
-		return false;
-	}
-
-	return tenantPtr->GetOwnerId() == membershipPtr->GetUserId();
 }
 
 

@@ -33,6 +33,7 @@ private slots:
 	void testRecoveryAfterTooManyWrongCodes_IsRefused();
 	void testRecoveryCodeOfAnotherUser_IsRefused();
 	void testCheckEmailCode_DoesNotUseTheCode();
+	void testRecoveryCode_GeneratedDuringAConsumptionStays();
 
 	// Answers to anonymous requests
 	void testUnknownAccount_AnswersLikeAWrongPassword();
@@ -52,6 +53,7 @@ private slots:
 	void testRemoveUsers_RemovesTheInvitationsTheySent();
 	void testRemoveUsers_FailedReadRemovesNoInvitation();
 	void testRemoveUsers_FailedInvitationRemovalIsRefused();
+	void testRemoveUsers_RefusedWhenTheirOrganizationsCannotBeRead();
 };
 
 

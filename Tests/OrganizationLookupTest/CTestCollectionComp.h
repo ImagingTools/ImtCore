@@ -4,6 +4,7 @@
 
 // STL includes
 #include <atomic>
+#include <functional>
 
 // Qt includes
 #include <QtCore/QMutex>
@@ -80,6 +81,11 @@ public:
 	void SetRemovalFailing(bool isFailing);
 	void SetStoreFailing(bool isFailing);
 
+	/**
+		Runs once, right after the next object is loaded: a change of another request between two reads of the caller.
+	*/
+	void SetAfterLoadHook(const std::function<void()>& hook);
+
 	// reimplemented (imtbase::IObjectCollection)
 	virtual bool GetObjectData(const Id& objectId, DataPtr& dataPtr, const iprm::IParamsSet* dataConfigurationPtr = nullptr) const override;
 	virtual bool RemoveElements(const Ids& elementIds, const imtbase::IOperationContext* operationContextPtr = nullptr) override;
@@ -120,6 +126,7 @@ private:
 	QSet<QByteArray> m_loadFailingIds;
 	bool m_isRemovalFailing = false;
 	bool m_isStoreFailing = false;
+	mutable std::function<void()> m_afterLoadHook;
 };
 
 

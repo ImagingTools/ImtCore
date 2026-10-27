@@ -96,7 +96,7 @@ ViewBase {
 			codeInput.text = ""
 			messageInput.text = ""
 			PopupManager.addSuccessMessage(qsTr("Connection request sent successfully"), true)
-			connectPage.updateGui()
+			notificationUpdateTimer.restart()
 		}
 
 		function onConnectionRequestError(errorMessage) {
@@ -174,7 +174,8 @@ ViewBase {
 		}
 
 		function onConnectionRemoved(connectionId) {
-			PopupManager.addSuccessMessage(qsTr("Connection removed"), true, "connection-removed-" + (connectPage.tenantData ? connectPage.tenantData.m_id : ""))
+			// Keyed by the connection, as the notification of the same removal: one message for both
+			PopupManager.addSuccessMessage(qsTr("Connection removed"), true, "connection-removed-" + connectionId)
 			notificationUpdateTimer.restart()
 		}
 	}
@@ -435,7 +436,7 @@ ViewBase {
 				visible: connectPage.__canViewConnections && requestsTable.elementsCount > 0
 				width: parent.width
 				height: requestsTable.contentHeight + requestsTable.headerHeight
-				canMoveColumns: false
+				canMoveColumns: true
 				selectable: false
 			}
 
@@ -462,7 +463,7 @@ ViewBase {
 				visible: connectPage.__canViewConnections && sentRequestsTable.elementsCount > 0
 				width: parent.width
 				height: sentRequestsTable.contentHeight + sentRequestsTable.headerHeight
-				canMoveColumns: false
+				canMoveColumns: true
 				selectable: false
 			}
 
@@ -496,7 +497,7 @@ ViewBase {
 				visible: connectPage.__canViewConnections && connectionsTable.elementsCount > 0
 				width: parent.width
 				height: connectionsTable.contentHeight + connectionsTable.headerHeight
-				canMoveColumns: false
+				canMoveColumns: true
 				selectable: false
 			}
 		}

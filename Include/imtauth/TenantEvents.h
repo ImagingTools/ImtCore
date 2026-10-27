@@ -44,6 +44,7 @@ static const inline QString s_targetTenantId = QStringLiteral("targetTenantId");
 static const inline QString s_status = QStringLiteral("status");
 static const inline QString s_previousStatus = QStringLiteral("previousStatus");
 
+static const inline QString s_membershipAdded = QStringLiteral("MembershipAdded");
 static const inline QString s_membershipRemoved = QStringLiteral("MembershipRemoved");
 static const inline QString s_membershipPermissionsChanged = QStringLiteral("MembershipPermissionsChanged");
 static const inline QString s_invitationSent = QStringLiteral("InvitationSent");

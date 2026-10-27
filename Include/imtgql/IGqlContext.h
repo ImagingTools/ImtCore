@@ -84,6 +84,13 @@ public:
 	virtual bool IsTenantOwner() const = 0;
 	virtual void SetIsTenantOwner(bool isTenantOwner) = 0;
 
+	/**
+		Get the permissions the user of this request holds inside its organization (\see imtauth::IsOrganizationInternalPermission).
+		They come from the ownership or the membership, not from the roles of the user; empty outside of an organization.
+	*/
+	virtual QByteArrayList GetOrganizationPermissions() const = 0;
+	virtual void SetOrganizationPermissions(const QByteArrayList& permissions) = 0;
+
 	virtual Headers GetHeaders() const = 0;
 	virtual void SetHeaders(const Headers& headers) = 0;
 };

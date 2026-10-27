@@ -49,6 +49,8 @@ QtObject {
 	signal tenantMembershipRoleChanged(string tenantId, string userId, string role);
 	signal tenantMembershipRemoved(string tenantId, string userId);
 	signal tenantInvitationRevoked(string tenantId, string invitationId);
+	// The members or invitations of the organization of the session changed, whoever changed them
+	signal tenantMembersChanged(string tenantId);
 	// Membership notifications were lost while the connection was down; membership views re-read their data.
 	signal membershipNotificationsResumed();
 	// The organizations the user may switch to changed: what shows them reads them again
@@ -70,6 +72,7 @@ QtObject {
 
 	property bool __refreshInProgress: false
 	property var __pendingRetryQueue: []
+	property bool __authFailedDuringSwitch: false
 
 	// Sign-in with external accounts: set per application in ACC (ExternalLoginEnabled), delivered with GetApplicationInfo.
 	readonly property bool externalLoginEnabled: ApplicationInfoProvider.externalLoginEnabled
@@ -107,11 +110,13 @@ QtObject {
 			return
 		root.refreshPendingInvitations()
 		__membershipSubscription.registerSubscription()
+		__organizationMembersSubscription.registerSubscription()
 		tenantCollectionListener.registerSubscription()
 	}
 
 	function __stopTenantTracking() {
 		__membershipSubscription.unRegisterSubscription()
+		__organizationMembersSubscription.unRegisterSubscription()
 		tenantCollectionListener.unRegisterSubscription()
 	}
 
@@ -192,6 +197,7 @@ QtObject {
 		root.__stopTenantTracking()
 		__refreshInProgress = false
 		__pendingRetryQueue = []
+		__authFailedDuringSwitch = false
 	}
 	// The application info can arrive after a restored session has already logged in.
 	onTenantsEnabledChanged: {
@@ -255,6 +261,23 @@ QtObject {
 		onRefreshRequired: {
 			root.refreshPendingInvitations()
 			root.membershipNotificationsResumed()
+		}
+	}
+
+	// The members of the organization of the session; the server sends it to everybody working inside it
+	property SubscriptionClient __organizationMembersSubscription: SubscriptionClient {
+		gqlCommandId: "OnOrganizationMembersChanged"
+		autoSubscribe: false
+
+		function getHeaders() { return {} }
+
+		onMessageReceived: {
+			if (data && data.containsKey("tenantId"))
+				root.tenantMembersChanged(data.getData("tenantId"))
+		}
+
+		onRefreshRequired: {
+			root.tenantMembersChanged(root.currentTenantId)
 		}
 	}
 
@@ -402,6 +425,12 @@ QtObject {
 		if (root.__refreshInProgress)
 			return
 
+		// A request sent during a tenant switch carries the token the switch closes: it is repeated with the new one
+		if (root.__tenantSwitchInProgress) {
+			root.__authFailedDuringSwitch = true
+			return
+		}
+
 		if (!root.userTokenProvider.refreshToken || root.userTokenProvider.refreshToken === "") {
 			if (!root.isLoggedIn()) {
 				root.__pendingRetryQueue = []
@@ -437,6 +466,10 @@ QtObject {
 		// Re-register WS subscriptions that failed with the old access token.
 		Events.sendEvent("AccessTokenRefreshed", {})
 
+		root.__retryPendingRequests()
+	}
+
+	function __retryPendingRequests() {
 		var queue = root.__pendingRetryQueue
 		root.__pendingRetryQueue = []
 		for (var i = 0; i < queue.length; i++) {
@@ -761,6 +794,12 @@ QtObject {
 
 	function __completeTenantSwitch() {
 		__tenantSwitchInProgress = false
+		// Refused after the new token was taken over, or the switch failed: the token is refreshed
+		if (root.__authFailedDuringSwitch) {
+			root.__authFailedDuringSwitch = false
+			root.handleAuthFailure("", null)
+		}
+
 		if (!__hasPendingTenantSwitch)
 			return
 
@@ -1037,6 +1076,11 @@ QtObject {
 							XMLHttpRequest.QMLAuthRefreshToken = m_userSession.m_refreshToken
 							root.saveDataToStorage()
 						}
+						// The refusals so far were for the closed token
+						root.__authFailedDuringSwitch = false
+						root.__retryPendingRequests()
+						// The subscriptions still hold the closed session and the previous organization
+						Events.sendEvent("AccessTokenRefreshed", {})
 
 						root.refreshPermissions(function(){
 							root.tenantSelected(root.currentTenantId);

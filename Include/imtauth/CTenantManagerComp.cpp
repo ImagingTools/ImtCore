@@ -77,19 +77,31 @@ ITenantInfoUniquePtr CTenantManagerComp::GetTenant(const QByteArray& tenantId) c
 }
 
 
-QByteArrayList CTenantManagerComp::GetOwnedOrCreatedTenantIds(const QByteArray& userId) const
+QByteArrayList CTenantManagerComp::GetOwnedOrCreatedTenantIds(const QByteArray& userId, bool* isReadPtr) const
 {
 	QByteArrayList retVal;
+	if (isReadPtr != nullptr){
+		*isReadPtr = m_tenantCollectionCompPtr.IsValid();
+	}
+
 	if (!m_tenantCollectionCompPtr.IsValid()){
 		return retVal;
 	}
 
 	// A collection that does not know the filter returns every organization
-	for (const QByteArray& candidateId : CollectionSelection::SelectIds(*m_tenantCollectionCompPtr, CollectionSelection::AnyColumnEquals("OwnerId", "CreatorId", userId))){
+	bool isRead = true;
+	for (const QByteArray& candidateId : CollectionSelection::SelectIds(*m_tenantCollectionCompPtr, CollectionSelection::AnyColumnEquals("OwnerId", "CreatorId", userId), QByteArrayList(), &isRead)){
 		ITenantInfoUniquePtr candidatePtr = GetTenant(candidateId);
-		if (candidatePtr.IsValid() && (candidatePtr->GetOwnerId() == userId || candidatePtr->GetCreatorId() == userId)){
+		if (!candidatePtr.IsValid()){
+			isRead = false;
+		}
+		else if (candidatePtr->GetOwnerId() == userId || candidatePtr->GetCreatorId() == userId){
 			retVal.append(candidateId);
 		}
+	}
+
+	if (isReadPtr != nullptr){
+		*isReadPtr = isRead;
 	}
 
 	return retVal;

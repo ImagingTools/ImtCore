@@ -137,8 +137,12 @@ imtauth::ITenantInfoUniquePtr CRemoteTenantControllerComp::GetTenant(const QByte
 
 // The lookups below serve the authorization server, which owns the organizations; a product server has no query for them
 
-QByteArrayList CRemoteTenantControllerComp::GetOwnedOrCreatedTenantIds(const QByteArray& /*userId*/) const
+QByteArrayList CRemoteTenantControllerComp::GetOwnedOrCreatedTenantIds(const QByteArray& /*userId*/, bool* isReadPtr) const
 {
+	if (isReadPtr != nullptr){
+		*isReadPtr = false;
+	}
+
 	SendErrorMessage(0, QStringLiteral("The organizations of a user are not available from a product server"), "CRemoteTenantControllerComp");
 
 	return QByteArrayList();

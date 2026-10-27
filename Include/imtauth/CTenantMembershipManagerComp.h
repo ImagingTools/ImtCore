@@ -51,7 +51,6 @@ private:
 		The caller verifies the loaded membership: a collection that does not know the filter returns every id.
 	*/
 	QByteArrayList GetCandidateMembershipIds(const QByteArray& userId, const QByteArray& tenantId) const;
-	bool IsOwnerMembership(const QByteArray& membershipId) const;
 	bool CleanupTenantAssignedUserData(const QByteArray& userId, const QByteArray& tenantId);
 
 	I_REF(imtbase::IObjectCollection, m_membershipCollectionCompPtr);

@@ -246,6 +246,22 @@ void CGqlContext::SetIsTenantOwner(bool isTenantOwner)
 }
 
 
+QByteArrayList CGqlContext::GetOrganizationPermissions() const
+{
+	return m_organizationPermissions;
+}
+
+
+void CGqlContext::SetOrganizationPermissions(const QByteArrayList& permissions)
+{
+	if (m_organizationPermissions != permissions){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_organizationPermissions = permissions;
+	}
+}
+
+
 IGqlContext::Headers CGqlContext::GetHeaders() const
 {
 	return m_headers;
@@ -336,6 +352,7 @@ bool CGqlContext::CopyFrom(const IChangeable &object, CompatibilityMode /*mode*/
 		m_productInfoPtr = sourcePtr->m_productInfoPtr;
 		m_tenantPermissions = sourcePtr->m_tenantPermissions;
 		m_isTenantOwner = sourcePtr->m_isTenantOwner;
+		m_organizationPermissions = sourcePtr->m_organizationPermissions;
 
 		SetUserInfo(sourcePtr->m_userInfoPtr.GetPtr());
 
@@ -376,6 +393,7 @@ bool CGqlContext::ResetData(CompatibilityMode /*mode*/)
 	m_productInfoPtr = nullptr;
 	m_tenantPermissions.clear();
 	m_isTenantOwner = false;
+	m_organizationPermissions.clear();
 	m_userInfoPtr.Reset();
 
 	ResetImpliedPermissions();

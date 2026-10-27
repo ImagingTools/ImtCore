@@ -225,15 +225,18 @@ QtObject {
 			var notification = {
 				"notificationType": data.containsKey("notificationType") ? data.getData("notificationType") : "",
 				"tenantId": data.containsKey("tenantId") ? data.getData("tenantId") : "",
-				"requestId": data.containsKey("requestId") ? data.getData("requestId") : ""
+				"requestId": data.containsKey("requestId") ? data.getData("requestId") : "",
+				"connectionId": data.containsKey("connectionId") ? data.getData("connectionId") : "",
+				"relationshipId": data.containsKey("relationshipId") ? data.getData("relationshipId") : ""
 			}
 
-			// The partner may end a connection or a relationship: the owners of both organizations are told
+			// The partner may end a connection or a relationship: the owners of both organizations are told.
+			// The message is keyed by the connection or relationship, so the page's own message of the same removal is replaced.
 			var type = notification.notificationType
 			if (type === "ConnectionRemoved" || type === 3) {
-				PopupManager.addInfoMessage(qsTr("A connection of your organization with another one was removed"), true, "connection-removed-" + notification.tenantId)
+				PopupManager.addInfoMessage(qsTr("A connection of your organization with another one was removed"), true, "connection-removed-" + notification.connectionId)
 			} else if (type === "RelationshipRemoved" || type === 7) {
-				PopupManager.addInfoMessage(qsTr("A relationship of your organization with another one was ended"), true, "relationship-removed-" + notification.tenantId)
+				PopupManager.addInfoMessage(qsTr("A relationship of your organization with another one was ended"), true, "relationship-removed-" + notification.relationshipId)
 			}
 
 			root.subscriptionConnectionCodesChanged(notification)
@@ -567,6 +570,10 @@ QtObject {
 
 	function fetchTenantPermissions(tenantId) {
 		__userAdmin.fetchTenantPermissions(tenantId)
+	}
+
+	function invalidateTenantPermissions() {
+		__userAdmin.invalidateTenantPermissions()
 	}
 
 	function fetchOrganizationPermissions(tenantId, userId) {
@@ -1616,6 +1623,7 @@ QtObject {
 
 	property FilterableSelectGqlDataProvider roleListDataProvider: FilterableSelectGqlDataProvider {
 		collectionId: "Roles"
+		followsCollectionChanges: true
 		pageSize: 50
 	}
 
@@ -1637,6 +1645,7 @@ QtObject {
 
 	property FilterableSelectGqlDataProvider groupListDataProvider: FilterableSelectGqlDataProvider {
 		collectionId: "Groups"
+		followsCollectionChanges: true
 		pageSize: 50
 	}
 
@@ -1684,6 +1693,7 @@ QtObject {
 
 	property FilterableSelectGqlDataProvider tenantRelationshipsListDataProvider: FilterableSelectGqlDataProvider {
 		collectionId: "TenantRelationships"
+		followsCollectionChanges: true
 		pageSize: 50
 	}
 
@@ -1709,6 +1719,7 @@ QtObject {
 
 	property FilterableSelectGqlDataProvider crossOrgGrantsListDataProvider: FilterableSelectGqlDataProvider {
 		collectionId: "CrossOrgGrants"
+		followsCollectionChanges: true
 	}
 
 	property RemoteCollectionChangeListener __crossOrgGrantsCollectionChangeListener: RemoteCollectionChangeListener {

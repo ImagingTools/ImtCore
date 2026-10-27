@@ -113,6 +113,12 @@ void COrganizationsPermissionsProviderComp::CreateOrganizationFeatures()
 				QT_TRANSLATE_NOOP("Feature", "Edit Members"),
 				QT_TRANSLATE_NOOP("Feature", "Allows editing the members of the organization."),
 				{QByteArrayLiteral("/OrganizationManagement/Members/View")});
+	AddPermission(*editMembersPtr, "Add",
+				QT_TRANSLATE_NOOP("Feature", "Create Member"),
+				QT_TRANSLATE_NOOP("Feature", "Allows creating a user who becomes a member of the organization."));
+	AddPermission(*editMembersPtr, "Change",
+				QT_TRANSLATE_NOOP("Feature", "Change Member"),
+				QT_TRANSLATE_NOOP("Feature", "Allows changing the account data of a member."));
 	AddPermission(*editMembersPtr, "Invite",
 				QT_TRANSLATE_NOOP("Feature", "Invite Member"),
 				QT_TRANSLATE_NOOP("Feature", "Allows inviting a user to the organization."));

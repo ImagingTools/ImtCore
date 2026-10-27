@@ -613,6 +613,7 @@ Rectangle {
 
 	SimpleCollectionTable {
 		id: itemsTable
+		canMoveColumns: true
 		anchors.top: warningsText.bottom
 		anchors.left: parent.left
 		anchors.right: parent.right

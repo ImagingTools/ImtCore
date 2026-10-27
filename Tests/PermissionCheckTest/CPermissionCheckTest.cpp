@@ -45,6 +45,8 @@ const QByteArray s_viewDeviceRevisions = "/Devices/Revisions/View";
 const QByteArray s_restoreDeviceRevision = "/Devices/Revisions/Restore";
 const QByteArray s_deleteDeviceRevision = "/Devices/Revisions/Delete";
 const QByteArray s_ticketRevisions = "/Support/Revisions";
+const QByteArray s_addRole = "/Administration/Roles/Edit/Add";
+const QByteArray s_addOrganizationRole = "/OrganizationManagement/Roles/Edit/Add";
 const QByteArray s_viewTicketRevisions = "/Support/Revisions/View";
 
 const QByteArray s_usersList = "UsersList";
@@ -52,6 +54,7 @@ const QByteArray s_rolesList = "RolesList";
 const QByteArray s_userUpdate = "UserUpdate";
 const QByteArray s_userReplace = "UserReplace";
 const QByteArray s_roleUpdate = "RoleUpdate";
+const QByteArray s_roleAdd = "RoleAdd";
 const QByteArray s_ticketsList = "TicketsList";
 const QByteArray s_organizationsList = "OrganizationsList";
 const QByteArray s_deviceTicketsList = "DeviceTicketsList";
@@ -79,6 +82,7 @@ public:
 		m_permissions.insert(s_userUpdate, {s_changeUser});
 		m_permissions.insert(s_userReplace, {s_changeUser, s_removeUser});
 		m_permissions.insert(s_roleUpdate, {s_changeRole});
+		m_permissions.insert(s_roleAdd, {s_addRole, s_addOrganizationRole});
 		m_permissions.insert(s_ticketsList, {s_viewDeviceTickets, s_viewTickets});
 		m_permissions.insert(s_organizationsList, {QByteArrayLiteral("/OrganizationManagement/View")});
 		m_permissions.insert(s_deviceTicketsList, {s_viewDeviceTickets});
@@ -235,6 +239,7 @@ public:
 		}
 		contextPtr->SetTenantPermissions(tenantPermissions);
 		contextPtr->SetIsTenantOwner(isTenantOwner);
+		contextPtr->SetOrganizationPermissions(m_organizationPermissions);
 		if (!permissionPath.isEmpty()){
 			imtgql::IGqlContext::Headers headers;
 			headers.insert(imtbase::s_permissionPathHeaderId.toLower(), permissionPath);
@@ -287,9 +292,27 @@ public:
 		return m_refusalReason;
 	}
 
-	bool IsElementShown(const QByteArray& elementId, const QByteArrayList& userPermissions, const QByteArray& permissionPath = QByteArray())
+	// What the user holds inside the organization of the next requests
+	void SetOrganizationPermissions(const QByteArrayList& permissions)
 	{
-		return imtserverapp::IsElementAccessible(&m_declaredPermissions, &m_anyChecker, elementId, userPermissions, false, permissionPath);
+		m_organizationPermissions = permissions;
+	}
+
+	bool IsElementShown(
+				const QByteArray& elementId,
+				const QByteArrayList& userPermissions,
+				const QByteArray& permissionPath = QByteArray(),
+				bool isInOrganization = false)
+	{
+		return imtserverapp::IsElementAccessible(
+					&m_declaredPermissions,
+					&m_anyChecker,
+					elementId,
+					userPermissions,
+					false,
+					permissionPath,
+					isInOrganization,
+					m_organizationPermissions);
 	}
 
 private:
@@ -298,6 +321,7 @@ private:
 	imtauth::CCheckPermissionCompBase m_allChecker;
 	imtauth::CCheckPermissionOrComp m_anyChecker;
 	QString m_refusalReason;
+	QByteArrayList m_organizationPermissions;
 };
 
 
@@ -640,6 +664,67 @@ void CPermissionCheckTest::testOrganizationAccessIsKeptOutsideTenantScope()
 }
 
 
+void CPermissionCheckTest::testOrganizationPermissionOpensItsCommandInOrganization()
+{
+	CServer server;
+	imtauth::CUserInfo member;
+
+	// A member whose membership allows adding roles, with an empty permission scope of the organization
+	QVERIFY(!server.IsAllowed(s_roleAdd, &member, QByteArray(), QByteArrayList(), false, true));
+	server.SetOrganizationPermissions({s_addOrganizationRole});
+	QVERIFY2(server.IsAllowed(s_roleAdd, &member, QByteArray(), QByteArrayList(), false, true), qPrintable(server.GetRefusalReason()));
+	QVERIFY(server.IsAllowed(s_roleAdd, &member, s_addOrganizationRole, QByteArrayList(), false, true));
+}
+
+
+void CPermissionCheckTest::testOwnerHoldsEveryOrganizationPermission()
+{
+	CServer server;
+	imtauth::CUserInfo owner;
+	server.SetOrganizationPermissions({imtauth::s_organizationManagementPermission});
+
+	QVERIFY2(server.IsAllowed(s_roleAdd, &owner, QByteArray(), QByteArrayList(), true), qPrintable(server.GetRefusalReason()));
+}
+
+
+void CPermissionCheckTest::testProductAdministrationDoesNotApplyInOrganization()
+{
+	CServer server;
+	imtauth::CUserInfo administrator;
+	SetPermissions(administrator, {s_addRole});
+
+	QVERIFY2(server.IsAllowed(s_roleAdd, &administrator), qPrintable(server.GetRefusalReason()));
+
+	// Inside an organization, even with the product permission in its scope, the roles are managed with the organization permission
+	QVERIFY(!server.IsAllowed(s_roleAdd, &administrator, QByteArray(), {s_addRole}));
+	QVERIFY(!server.IsAllowed(s_roleAdd, &administrator, s_addRole, {s_addRole}));
+}
+
+
+void CPermissionCheckTest::testOrganizationPermissionOfRoleOpensNothing()
+{
+	CServer server;
+	imtauth::CUserInfo user;
+	SetPermissions(user, {s_addOrganizationRole});
+
+	// Given by a product role it is no ownership or membership: neither outside nor inside of an organization
+	QVERIFY(!server.IsAllowed(s_roleAdd, &user));
+	QVERIFY(!server.IsAllowed(s_roleAdd, &user, QByteArray(), {s_addOrganizationRole}));
+}
+
+
+void CPermissionCheckTest::testOrganizationPermissionPathOutsideOrganizationIsRefused()
+{
+	CServer server;
+	imtauth::CUserInfo administrator;
+	SetPermissions(administrator, {s_addRole});
+	server.SetOrganizationPermissions({s_addOrganizationRole});
+
+	QVERIFY(!server.IsAllowed(s_roleAdd, &administrator, s_addOrganizationRole));
+	QVERIFY(server.IsAllowed(s_roleAdd, &administrator, s_addRole));
+}
+
+
 void CPermissionCheckTest::testPermissionPathEqualToDeclaredIsAccepted()
 {
 	CServer server;
@@ -804,6 +889,24 @@ void CPermissionCheckTest::testGuiElementPermissionPathWiderThanDeclaredIsHidden
 
 	QVERIFY(server.IsElementShown("DeviceTicketsPanel", {s_viewDeviceTickets}, s_viewDeviceTickets));
 	QVERIFY(!server.IsElementShown("DeviceTicketsPanel", {s_changeDevice}, QByteArrayLiteral("/Devices")));
+}
+
+
+void CPermissionCheckTest::testGuiElementInOrganizationFollowsOrganizationPermissions()
+{
+	CServer server;
+
+	// The command buttons of a role editor: the product permission outside of an organization, the organization one inside
+	QVERIFY(server.IsElementShown(s_roleAdd, {s_addRole}));
+	QVERIFY(!server.IsElementShown(s_roleAdd, {s_addRole}, QByteArray(), true));
+	QVERIFY(!server.IsElementShown(s_roleAdd, {s_addOrganizationRole}, QByteArray(), true));
+
+	server.SetOrganizationPermissions({s_addOrganizationRole});
+	QVERIFY(server.IsElementShown(s_roleAdd, QByteArrayList(), QByteArray(), true));
+	QVERIFY(!server.IsElementShown(s_roleAdd, QByteArrayList()));
+
+	server.SetOrganizationPermissions({imtauth::s_organizationManagementPermission});
+	QVERIFY(server.IsElementShown(s_roleAdd, QByteArrayList(), QByteArray(), true));
 }
 
 

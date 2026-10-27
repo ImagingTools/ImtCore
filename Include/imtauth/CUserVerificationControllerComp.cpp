@@ -58,6 +58,8 @@ const imtauth::IUserVerification* CUserVerificationControllerComp::GetVerificati
 
 bool CUserVerificationControllerComp::GenerateVerificationData(const QByteArray& userId, imtauth::IUserVerification* outputUserVerificationPtr)
 {
+	QMutexLocker locker(&m_lifecycleMutex);
+
 	if (m_userVerificationCollectionCompPtr.IsValid()){
 		// A new code replaces the previous one and its wrong attempts
 		if (!RemoveVerification(userId)){
@@ -101,50 +103,25 @@ bool CUserVerificationControllerComp::GenerateVerificationData(const QByteArray&
 
 bool CUserVerificationControllerComp::VerifyUser(const QByteArray& userId, const QByteArray& verificationCode) const
 {
-	istd::TDelPtr<const imtauth::IUserVerification> userVerificationInfoPtr = GetVerificationData(userId);
-	if (!userVerificationInfoPtr.IsValid() || userVerificationInfoPtr->GetUserId() != userId || userVerificationInfoPtr->IsExpired()){
-		return false;
-	}
+	QMutexLocker locker(&m_lifecycleMutex);
 
-	{
-		QMutexLocker locker(&m_failedAttemptsMutex);
-		if (m_failedAttempts.value(userId) >= s_maxFailedAttempts){
-			return false;
-		}
-	}
-
-	if (!verificationCode.isEmpty() && userVerificationInfoPtr->GetVerificationCode() == verificationCode){
-		QMutexLocker locker(&m_failedAttemptsMutex);
-		m_failedAttempts.remove(userId);
-
-		return true;
-	}
-
-	bool isExhausted = false;
-	{
-		QMutexLocker locker(&m_failedAttemptsMutex);
-		isExhausted = ++m_failedAttempts[userId] >= s_maxFailedAttempts;
-	}
-
-	if (isExhausted){
-		RemoveVerification(userId);
-	}
-
-	return false;
+	return VerifyLocked(userId, verificationCode);
 }
 
 
 bool CUserVerificationControllerComp::RemoveVerificationData(const QByteArray& userId)
 {
+	QMutexLocker locker(&m_lifecycleMutex);
+
 	return RemoveVerification(userId);
 }
 
 
 bool CUserVerificationControllerComp::ConsumeVerification(const QByteArray& userId, const QByteArray& verificationCode)
 {
-	QMutexLocker locker(&m_consumeMutex);
+	QMutexLocker locker(&m_lifecycleMutex);
 
-	return VerifyUser(userId, verificationCode) && RemoveVerification(userId);
+	return VerifyLocked(userId, verificationCode) && RemoveVerification(userId);
 }
 
 
@@ -166,6 +143,31 @@ void CUserVerificationControllerComp::OnComponentDestroyed()
 
 // private methods
 
+bool CUserVerificationControllerComp::VerifyLocked(const QByteArray& userId, const QByteArray& verificationCode) const
+{
+	istd::TDelPtr<const imtauth::IUserVerification> userVerificationInfoPtr = GetVerificationData(userId);
+	if (!userVerificationInfoPtr.IsValid() || userVerificationInfoPtr->GetUserId() != userId || userVerificationInfoPtr->IsExpired()){
+		return false;
+	}
+
+	if (m_failedAttempts.value(userId) >= s_maxFailedAttempts){
+		return false;
+	}
+
+	if (!verificationCode.isEmpty() && userVerificationInfoPtr->GetVerificationCode() == verificationCode){
+		m_failedAttempts.remove(userId);
+
+		return true;
+	}
+
+	if (++m_failedAttempts[userId] >= s_maxFailedAttempts){
+		RemoveVerification(userId);
+	}
+
+	return false;
+}
+
+
 bool CUserVerificationControllerComp::RemoveVerification(const QByteArray& userId) const
 {
 	if (!m_userVerificationCollectionCompPtr.IsValid() || userId.isEmpty()){
@@ -174,13 +176,11 @@ bool CUserVerificationControllerComp::RemoveVerification(const QByteArray& userI
 
 	// Removed by its id: a failed read is no proof that the code is gone
 	if (!m_userVerificationCollectionCompPtr->RemoveElements({userId})){
-		QMutexLocker locker(&m_failedAttemptsMutex);
 		m_failedAttempts[userId] = s_maxFailedAttempts;
 
 		return false;
 	}
 
-	QMutexLocker locker(&m_failedAttemptsMutex);
 	m_failedAttempts.remove(userId);
 
 	return true;
@@ -225,6 +225,9 @@ void CUserVerificationControllerComp::CheckExpiredVerificationDataThread::run()
 		}
 
 		for (const imtbase::ICollectionInfo::Id& id : ids){
+			// Read and removed under the lock: a code generated in between is not expired
+			QMutexLocker locker(&m_parent.m_lifecycleMutex);
+
 			imtbase::IObjectCollection::DataPtr dataPtr;
 			if (m_parent.m_userVerificationCollectionCompPtr->GetObjectData(id, dataPtr)){
 				const imtauth::IUserVerification* userVerificationInfoPtr = dynamic_cast<const imtauth::IUserVerification*>(dataPtr.GetPtr());

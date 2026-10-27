@@ -882,21 +882,16 @@ RemoteCollectionView {
 
 						tenantEditor.creationHandled = true
 						let tenantId = tenantCommandsDelegate.documentManager.getDocumentObjectId(tenantEditor.documentId)
-						if (tenantEditor.tenantData && tenantEditor.tenantData.m_isActive === false){
-							PopupManager.addInfoMessage(qsTr("The organization \"%1\" was created inactive. Activate it to work in it.").arg(tenantEditor.tenantData.m_name), true)
-							inactiveCloseTimer.restart()
+						let isInactive = tenantEditor.tenantData && tenantEditor.tenantData.m_isActive === false
+						let tenantName = tenantEditor.tenantData ? tenantEditor.tenantData.m_name : ""
+
+						// A stored organization is edited only from inside it, so the creation document is done
+						tenantCommandsDelegate.documentManager.closeDocument(tenantEditor.documentId)
+						if (isInactive){
+							PopupManager.addInfoMessage(qsTr("The organization \"%1\" was created inactive. Activate it to work in it.").arg(tenantName), true)
 							return
 						}
 						container.switchToTenantAndNavigate(tenantId, ["Tenant", tenantId], {})
-					}
-
-					// Closed after the save has refreshed the editor, which still reads the document.
-					Timer {
-						id: inactiveCloseTimer
-						interval: 0
-						onTriggered: {
-							tenantCommandsDelegate.documentManager.closeDocument(tenantEditor.documentId, true)
-						}
 					}
 				}
 			}

@@ -38,15 +38,20 @@ bool CRelationshipDocumentValidatorComp::ValidateDocumentData(
 		return false;
 	}
 
-	// The end of an archived relationship is final: a later write would move it and join its period with a later one
+	// The end of an archived relationship is final: a later write would move it and join its period with a later one.
+	// A stored relationship has an object id; one that cannot be read may be archived, so it is not written.
 	if (m_relationshipCollectionCompPtr.IsValid() && !objectId.isEmpty()){
 		imtbase::IObjectCollection::DataPtr storedDataPtr;
-		if (m_relationshipCollectionCompPtr->GetObjectData(objectId, storedDataPtr)){
-			const imtauth::ITenantRelationshipInfo* storedPtr = dynamic_cast<const imtauth::ITenantRelationshipInfo*>(storedDataPtr.GetPtr());
-			if (storedPtr != nullptr && storedPtr->GetStatus() == imtauth::ITenantRelationshipInfo::TRS_ARCHIVED){
-				errorMessage = QStringLiteral("An ended relationship cannot be changed");
-				return false;
-			}
+		const imtauth::ITenantRelationshipInfo* storedPtr = m_relationshipCollectionCompPtr->GetObjectData(objectId, storedDataPtr)
+					? dynamic_cast<const imtauth::ITenantRelationshipInfo*>(storedDataPtr.GetPtr())
+					: nullptr;
+		if (storedPtr == nullptr){
+			errorMessage = QStringLiteral("The relationship could not be read. Try again.");
+			return false;
+		}
+		if (storedPtr->GetStatus() == imtauth::ITenantRelationshipInfo::TRS_ARCHIVED){
+			errorMessage = QStringLiteral("An ended relationship cannot be changed");
+			return false;
 		}
 	}
 

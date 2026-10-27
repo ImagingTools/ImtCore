@@ -86,8 +86,7 @@ ViewBase {
 			return
 		container.__permissionsRequested = true
 		container.permissionsProvider.productId = container.productId
-		var requestTenantId = container.tenantId || ""
-		container.permissionsProvider.requestPermissions(requestTenantId)
+		container.permissionsProvider.ensurePermissions(container.tenantId || "")
 	}
 
 	function __populatePermissionsTree() {

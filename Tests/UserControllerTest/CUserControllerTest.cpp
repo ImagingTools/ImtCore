@@ -2,7 +2,13 @@
 #include "CUserControllerTest.h"
 
 
+// STL includes
+#include <atomic>
+#include <functional>
+#include <thread>
+
 // Qt includes
+#include <QtCore/QThread>
 #include <QtCore/QUuid>
 
 // ACF includes
@@ -18,7 +24,9 @@
 #include <imtauth/CCredentialControllerComp.h>
 #include <imtauth/CUserInfo.h>
 #include <imtauth/CUserInfoComp.h>
+#include <imtauth/CTenantInfo.h>
 #include <imtauth/CTenantInvitation.h>
+#include <imtauth/ITenantManager.h>
 #include <imtauth/CUserVerification.h>
 #include <imtauth/CUserVerificationControllerComp.h>
 #include <imtauth/IUserVerificationCodeSender.h>
@@ -95,6 +103,22 @@ public:
 		}
 
 		return retVal.mid(offset, count);
+	}
+
+	// Runs once, right after the next object is read, while the reader is still inside the read
+	mutable std::function<void()> m_afterLoadHook;
+
+	// reimplemented (imtbase::IObjectCollection)
+	virtual bool GetObjectData(const Id& objectId, DataPtr& dataPtr, const iprm::IParamsSet* dataConfigurationPtr = nullptr) const override
+	{
+		const bool retVal = imtbase::CObjectCollectionBase::GetObjectData(objectId, dataPtr, dataConfigurationPtr);
+		if (m_afterLoadHook){
+			const std::function<void()> hook = m_afterLoadHook;
+			m_afterLoadHook = nullptr;
+			hook();
+		}
+
+		return retVal;
 	}
 
 protected:
@@ -285,6 +309,68 @@ protected:
 
 
 /**
+	One organization created by a user, whose reads can be made to fail.
+*/
+class CTestTenantManagerComp:
+			public icomp::CComponentBase,
+			virtual public imtauth::ITenantManager
+{
+public:
+	typedef icomp::CComponentBase BaseClass;
+
+	I_BEGIN_COMPONENT(CTestTenantManagerComp);
+		I_REGISTER_INTERFACE(imtauth::ITenantManager);
+	I_END_COMPONENT;
+
+	QByteArray m_creatorId;
+	QByteArray m_tenantId = NewId();
+	bool m_isSelectionFailing = false;
+	bool m_isLoadFailing = false;
+
+	// reimplemented (imtauth::ITenantManager)
+	virtual QByteArrayList GetTenantIds() const override { return {m_tenantId}; }
+	virtual imtauth::ITenantInfoUniquePtr GetTenant(const QByteArray& tenantId) const override
+	{
+		if (m_isLoadFailing || tenantId != m_tenantId){
+			return imtauth::ITenantInfoUniquePtr();
+		}
+
+		imtauth::ITenantInfoUniquePtr retVal(new imtauth::CIdentifiableTenantInfo);
+		retVal->SetCreatorId(m_creatorId);
+		retVal->SetOwnerId(NewId());
+
+		return retVal;
+	}
+	virtual QByteArrayList GetOwnedOrCreatedTenantIds(const QByteArray& userId, bool* isReadPtr = nullptr) const override
+	{
+		if (isReadPtr != nullptr){
+			*isReadPtr = !m_isSelectionFailing;
+		}
+
+		return !m_isSelectionFailing && userId == m_creatorId ? QByteArrayList({m_tenantId}) : QByteArrayList();
+	}
+	virtual QByteArrayList GetChildTenantIds(const QByteArray& /*tenantId*/, bool* isReadPtr = nullptr) const override
+	{
+		if (isReadPtr != nullptr){
+			*isReadPtr = true;
+		}
+
+		return QByteArrayList();
+	}
+	virtual QByteArrayList FindTenantIdsByName(const QString& /*tenantName*/) const override { return QByteArrayList(); }
+	virtual QByteArrayList GetTenantPermissions(const QByteArray& /*tenantId*/) const override { return QByteArrayList(); }
+	virtual QByteArray CreateTenant(const QString& /*tenantName*/, const QString& /*description*/, const QByteArray& /*ownerId*/, const QByteArray& /*creatorId*/, const QByteArray& /*parentTenantId*/) override { return QByteArray(); }
+	virtual bool RemoveTenant(const QByteArray& /*tenantId*/) override { return false; }
+	virtual bool UpdateTenant(const QByteArray& /*tenantId*/, const QString& /*tenantName*/, const QString& /*description*/, const QByteArray& /*ownerId*/, bool /*updateOwner*/) override { return false; }
+	virtual bool SetTenantActive(const QByteArray& /*tenantId*/, bool /*isActive*/) override { return false; }
+	virtual bool SetTenantPermissions(const QByteArray& /*tenantId*/, const QByteArrayList& /*permissions*/) override { return false; }
+	virtual bool SetTenantHierarchy(const QByteArray& /*tenantId*/, const QByteArray& /*parentTenantId*/) override { return false; }
+	virtual QByteArray GetSystemTenantId() const override { return QByteArray(); }
+	virtual bool EnsureSystemTenant() override { return false; }
+};
+
+
+/**
 	The user collection controller with its removal check callable from the test.
 */
 class CTestUserCollectionControllerComp: public imtauthgql::CUserCollectionControllerComp
@@ -305,7 +391,9 @@ public:
 	CRemovalFixture()
 	{
 		invitations->InitComponent();
+		tenants->InitComponent();
 		controller->SetRef("InvitationCollection", invitations);
+		controller->SetRef("TenantManager", tenants);
 		controller->InitComponent();
 	}
 
@@ -329,6 +417,7 @@ public:
 	}
 
 	icomp::TSimSharedComponentPtr<CTestInvitationCollectionComp> invitations;
+	icomp::TSimSharedComponentPtr<CTestTenantManagerComp> tenants;
 	icomp::TSimSharedComponentPtr<CTestUserCollectionControllerComp> controller;
 };
 
@@ -713,6 +802,32 @@ void CUserControllerTest::testRecoveryCodeOfAnotherUser_IsRefused()
 }
 
 
+void CUserControllerTest::testRecoveryCode_GeneratedDuringAConsumptionStays()
+{
+	CFixture fixture;
+	const QByteArray userId = NewId();
+	imtauth::CIdentifiableUserVerificationInfo oldCode;
+	QVERIFY(fixture.verification->GenerateVerificationData(userId, &oldCode));
+
+	// A new code is generated after an old-code request read the stored code: without one lock the generation completes
+	// inside that request, which then removes the new code
+	imtauth::CIdentifiableUserVerificationInfo newCode;
+	std::atomic<bool> isGenerated{false};
+	std::thread generation;
+	fixture.verifications->m_afterLoadHook = [&fixture, &userId, &newCode, &isGenerated, &generation](){
+		generation = std::thread([&fixture, &userId, &newCode, &isGenerated](){
+			isGenerated = fixture.verification->GenerateVerificationData(userId, &newCode);
+		});
+		QThread::msleep(200);
+	};
+	QVERIFY(fixture.verification->ConsumeVerification(userId, oldCode.GetVerificationCode()));
+	generation.join();
+
+	QVERIFY(isGenerated.load());
+	QVERIFY2(fixture.verification->VerifyUser(userId, newCode.GetVerificationCode()), "The newly sent code was removed");
+}
+
+
 void CUserControllerTest::testCheckEmailCode_DoesNotUseTheCode()
 {
 	CFixture fixture;
@@ -934,6 +1049,32 @@ void CUserControllerTest::testRemoveUsers_FailedInvitationRemovalIsRefused()
 	fixture.invitations->m_isRemovalFailing = false;
 	QVERIFY(fixture.RemoveUsers({userId}, errorMessage));
 	QVERIFY(fixture.invitations->GetElementIds().isEmpty());
+}
+
+
+void CUserControllerTest::testRemoveUsers_RefusedWhenTheirOrganizationsCannotBeRead()
+{
+	CRemovalFixture fixture;
+	const QByteArray userId = NewId();
+	const QByteArray invitationId = fixture.AddInvitation(userId);
+	fixture.tenants->m_creatorId = userId;
+
+	// An organization that cannot be read may be owned by the user and would be left with a removed owner
+	QString errorMessage;
+	fixture.tenants->m_isSelectionFailing = true;
+	QVERIFY(!fixture.RemoveUsers({userId}, errorMessage));
+	QVERIFY(!errorMessage.isEmpty());
+	fixture.tenants->m_isSelectionFailing = false;
+
+	fixture.tenants->m_isLoadFailing = true;
+	errorMessage.clear();
+	QVERIFY(!fixture.RemoveUsers({userId}, errorMessage));
+	QVERIFY(!errorMessage.isEmpty());
+	QCOMPARE(fixture.invitations->GetElementIds(), QByteArrayList({invitationId}));
+	fixture.tenants->m_isLoadFailing = false;
+
+	// The creator who does not own the organization is removed
+	QVERIFY2(fixture.RemoveUsers({userId}, errorMessage), qPrintable(errorMessage));
 }
 
 

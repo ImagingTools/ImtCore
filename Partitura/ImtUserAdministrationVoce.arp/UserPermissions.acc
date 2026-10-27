@@ -17,6 +17,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>/Administration/Users/View</Value>
+                                <Value>/OrganizationManagement/Members/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -24,6 +25,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>/Administration/Users/View</Value>
+                                <Value>/OrganizationManagement/Members/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -31,6 +33,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>/Administration/Users/View</Value>
+                                <Value>/OrganizationManagement/Members/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -38,6 +41,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>/Administration/Users/View</Value>
+                                <Value>/OrganizationManagement/Members/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -45,6 +49,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>/Administration/Users/View</Value>
+                                <Value>/OrganizationManagement/Members/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -52,6 +57,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>/Administration/Users/View</Value>
+                                <Value>/OrganizationManagement/Members/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -59,6 +65,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>/Administration/Users/View</Value>
+                                <Value>/OrganizationManagement/Members/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -66,6 +73,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>/Administration/Users/View</Value>
+                                <Value>/OrganizationManagement/Members/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -73,6 +81,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>/Administration/Users/View</Value>
+                                <Value>/OrganizationManagement/Members/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -80,6 +89,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>/Administration/Users/View</Value>
+                                <Value>/OrganizationManagement/Members/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -87,6 +97,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>/Administration/Users/Edit/Add</Value>
+                                <Value>/OrganizationManagement/Members/Edit/Add</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -94,6 +105,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>/Administration/Users/Edit/Add</Value>
+                                <Value>/OrganizationManagement/Members/Edit/Add</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -132,6 +144,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>/Administration/Users/Edit/Change</Value>
+                                <Value>/OrganizationManagement/Members/Edit/Change</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -139,6 +152,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>/Administration/Users/Edit/Change</Value>
+                                <Value>/OrganizationManagement/Members/Edit/Change</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -146,6 +160,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>/Administration/Users/Edit/Change</Value>
+                                <Value>/OrganizationManagement/Members/Edit/Change</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -182,6 +197,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>/Administration/Users/View</Value>
+                                <Value>/OrganizationManagement/Members/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -204,6 +220,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>/Administration/Users/Edit/Change</Value>
+                                <Value>/OrganizationManagement/Members/Edit/Change</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -226,6 +243,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>/Administration/Users/Edit/Add</Value>
+                                <Value>/OrganizationManagement/Members/Edit/Add</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -248,6 +266,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>/Administration/Users/View</Value>
+                                <Value>/OrganizationManagement/Members/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

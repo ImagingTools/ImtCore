@@ -5,6 +5,7 @@
 // Qt includes
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QSet>
 
 // ImtCore includes
 #include <imtgql/CGqlRequest.h>
@@ -31,6 +32,11 @@ bool CTenantNotificationPublisherComp::IsRequestSupported(const imtgql::CGqlRequ
 			return true;
 		}
 	}
+
+	if (gqlRequest.GetCommandId() == sdl::V1_0::imtauth::COnOrganizationMembersChangedGqlRequest::GetCommandId()){
+		return true;
+	}
+
 	return BaseClass::IsRequestSupported(gqlRequest);
 }
 
@@ -68,10 +74,17 @@ void CTenantNotificationPublisherComp::OnComponentDestroyed()
 void CTenantNotificationPublisherComp::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& changeSet)
 {
 	// The managers name each change, so only the organizations it touched are read
+	QSet<QByteArray> changedTenantIds;
 	for (const QVariantMap& event : imtauth::TenantEvent::GetEvents(changeSet)){
 		for (const Notification& notification : CreateNotifications(event)){
 			PublishNotification(notification);
 		}
+
+		changedTenantIds.insert(event.value(imtauth::TenantEvent::s_tenantId).toByteArray());
+	}
+
+	for (const QByteArray& tenantId : changedTenantIds){
+		PublishMembersChanged(tenantId);
 	}
 }
 
@@ -179,6 +192,31 @@ void CTenantNotificationPublisherComp::PublishNotification(const Notification& n
 	PublishDataFiltered(commandId, data, [targetUserId](const imtgql::CGqlRequest& gqlRequest) -> bool {
 		const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
 		return contextPtr != nullptr && contextPtr->GetUserId() == targetUserId;
+	});
+}
+
+
+void CTenantNotificationPublisherComp::PublishMembersChanged(const QByteArray& tenantId) const
+{
+	if (tenantId.isEmpty()){
+		return;
+	}
+
+	sdl::V1_0::imtauth::COrganizationMembersNotification sdlNotification;
+	sdlNotification.tenantId = tenantId;
+
+	QJsonObject jsonObject;
+	if (!sdlNotification.WriteToJsonObject(jsonObject)){
+		Q_ASSERT(false);
+		return;
+	}
+
+	const QByteArray data = QJsonDocument(jsonObject).toJson(QJsonDocument::Compact);
+
+	// An organization is edited only from inside it
+	PublishDataFiltered(sdl::V1_0::imtauth::COnOrganizationMembersChangedGqlRequest::GetCommandId(), data, [tenantId](const imtgql::CGqlRequest& gqlRequest) -> bool {
+		const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
+		return contextPtr != nullptr && contextPtr->GetTenantId() == tenantId;
 	});
 }
 

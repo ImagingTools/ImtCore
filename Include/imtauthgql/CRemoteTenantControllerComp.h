@@ -31,7 +31,7 @@ public:
 	// reimplemented (imtauth::ITenantManager)
 	virtual QByteArrayList GetTenantIds() const override;
 	virtual imtauth::ITenantInfoUniquePtr GetTenant(const QByteArray& tenantId) const override;
-	virtual QByteArrayList GetOwnedOrCreatedTenantIds(const QByteArray& userId) const override;
+	virtual QByteArrayList GetOwnedOrCreatedTenantIds(const QByteArray& userId, bool* isReadPtr = nullptr) const override;
 	virtual QByteArrayList GetChildTenantIds(const QByteArray& tenantId, bool* isReadPtr = nullptr) const override;
 	virtual QByteArrayList FindTenantIdsByName(const QString& tenantName) const override;
 	virtual QByteArrayList GetTenantPermissions(const QByteArray& tenantId) const override;

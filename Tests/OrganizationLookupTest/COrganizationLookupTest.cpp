@@ -1480,6 +1480,69 @@ void COrganizationLookupTest::testGetRelatedTenants_PartialReadIsNotRead()
 }
 
 
+void COrganizationLookupTest::testRemoveMembership_RefusedWhenItCannotBeRead()
+{
+	CTenantFixture tenants;
+	CMembershipFixture memberships;
+
+	icomp::TSimSharedComponentPtr<imtauth::CTenantMembershipManagerComp> manager;
+	manager->SetRef("MembershipCollection", memberships.collection);
+	manager->SetRef("TenantManager", tenants.manager);
+	manager->SetFactory("MembershipFactory", &memberships.membershipFactory);
+	manager->InitComponent();
+
+	const QByteArray ownerId = NewId();
+	const QByteArray memberId = NewId();
+	const QByteArray tenantId = tenants.Add(ownerId, ownerId);
+	const QByteArray ownerMembershipId = memberships.Add(ownerId, tenantId);
+	const QByteArray membershipId = memberships.Add(memberId, tenantId);
+
+	// Without the member and the organization the removal would notify nobody and could not be repeated
+	memberships.Collection().SetLoadFailingIds({membershipId});
+	QVERIFY(!manager->RemoveMembership(membershipId));
+	memberships.Collection().SetLoadFailingIds({});
+
+	// An organization that cannot be read may be owned by the member
+	tenants.Collection().SetLoadFailingIds({tenantId});
+	QVERIFY(!manager->RemoveMembership(membershipId));
+	QVERIFY(!manager->RemoveMembership(ownerMembershipId));
+	tenants.Collection().SetLoadFailingIds({});
+	QCOMPARE(Sorted(memberships.Collection().GetElementIds()), Sorted({ownerMembershipId, membershipId}));
+
+	QVERIFY(!manager->RemoveMembership(ownerMembershipId));
+	QVERIFY(manager->RemoveMembership(membershipId));
+	QCOMPARE(memberships.Collection().GetElementIds(), QByteArrayList({ownerMembershipId}));
+}
+
+
+void COrganizationLookupTest::testGetRelatedTenants_RelationshipReplacedDuringTheRead()
+{
+	CConnectionFixture fixture;
+
+	icomp::TSimSharedComponentPtr<imtauth::CTenantRelationshipProviderComp> provider;
+	provider->SetRef("ConnectionRequestManager", fixture.manager);
+	provider->InitComponent();
+
+	const QByteArray tenantId = NewId();
+	const QByteArray partnerId = NewId();
+	const QByteArray connectionId = fixture.AddConnection(tenantId, partnerId);
+	const QByteArray firstId = fixture.AddRelationship(connectionId, tenantId, partnerId);
+
+	// Once the ids are read, another request replaces the relationship: the new one is created, the old one archived.
+	// The pair was related all along, so its shares must not look ended.
+	fixture.Relationships().SetAfterLoadHook([&fixture, connectionId, tenantId, partnerId, firstId](){
+		fixture.AddRelationship(connectionId, tenantId, partnerId);
+		fixture.Manager().RemoveTenantRelationship(tenantId, firstId);
+	});
+
+	bool isRead = false;
+	const imtauth::RelatedTenantInfos relatedTenants = provider->GetRelatedTenants(tenantId, nullptr, &isRead);
+	QVERIFY(isRead);
+	QCOMPARE(relatedTenants.size(), 1);
+	QCOMPARE(relatedTenants[0].tenantId, partnerId);
+}
+
+
 void COrganizationLookupTest::testRemoveTenantRelationship_RepeatedRemovalKeepsTheEnd()
 {
 	CConnectionFixture fixture;
@@ -1551,6 +1614,19 @@ void COrganizationLookupTest::testValidateRelationship_RefusesAnEndedRelationshi
 	// The document service over the relationships could otherwise write an archived row
 	QVERIFY(!validator->ValidateDocumentData(endedId, *fixture.Manager().GetTenantRelationship(endedId), errorMessage));
 	QVERIFY(!errorMessage.isEmpty());
+
+	// A stored row that cannot be read may be archived; a new document has no object id
+	imtauth::ITenantRelationshipInfoUniquePtr activePtr = fixture.Manager().GetTenantRelationship(activeId);
+	fixture.Relationships().SetLoadFailingIds({activeId});
+	errorMessage.clear();
+	QVERIFY(!validator->ValidateDocumentData(activeId, *activePtr, errorMessage));
+	QVERIFY(!errorMessage.isEmpty());
+	fixture.Relationships().SetLoadFailingIds({});
+
+	imtauth::ITenantRelationshipInfoUniquePtr newPtr = fixture.Manager().GetTenantRelationship(endedId);
+	newPtr->SetSourceTenantId(NewId());
+	newPtr->SetStatus(imtauth::ITenantRelationshipInfo::TRS_ACTIVE);
+	QVERIFY2(validator->ValidateDocumentData(QByteArray(), *newPtr, errorMessage), qPrintable(errorMessage));
 }
 
 
@@ -1620,6 +1696,29 @@ void COrganizationLookupTest::testChildTenantIds_ReportsAFailedRead()
 	fixture.Collection().SetLoadFailingIds({});
 	fixture.Collection().SetSelectionFailing(true);
 	QVERIFY(fixture.Manager().GetChildTenantIds(parentId, &isRead).isEmpty());
+	QVERIFY(!isRead);
+}
+
+
+void COrganizationLookupTest::testOwnedOrCreated_ReportsAFailedRead()
+{
+	CTenantFixture fixture;
+
+	const QByteArray userId = NewId();
+	const QByteArray ownedId = fixture.Add(userId, userId);
+
+	bool isRead = false;
+	QCOMPARE(fixture.Manager().GetOwnedOrCreatedTenantIds(userId, &isRead), QByteArrayList({ownedId}));
+	QVERIFY(isRead);
+
+	// An organization that cannot be read may be owned by the user, who must not be removed then
+	fixture.Collection().SetLoadFailingIds({ownedId});
+	QVERIFY(fixture.Manager().GetOwnedOrCreatedTenantIds(userId, &isRead).isEmpty());
+	QVERIFY(!isRead);
+
+	fixture.Collection().SetLoadFailingIds({});
+	fixture.Collection().SetSelectionFailing(true);
+	QVERIFY(fixture.Manager().GetOwnedOrCreatedTenantIds(userId, &isRead).isEmpty());
 	QVERIFY(!isRead);
 }
 

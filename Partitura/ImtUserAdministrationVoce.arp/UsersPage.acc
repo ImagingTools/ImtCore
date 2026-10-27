@@ -486,7 +486,9 @@
                                         <Values>
                                             <Value>/Administration/Users/Edit/Remove</Value>
                                             <Value>/Administration/Users/Edit/Change</Value>
+                                            <Value>/OrganizationManagement/Members/Edit/Change</Value>
                                             <Value>/Administration/Users/View</Value>
+                                            <Value>/OrganizationManagement/Members/View</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -503,8 +505,10 @@
                                     <Data IsEnabled="true">
                                         <Values>
                                             <Value>/Administration/Users/Edit/Add</Value>
+                                            <Value>/OrganizationManagement/Members/Edit/Add</Value>
                                             <Value>/Administration/Users/Edit/Remove</Value>
                                             <Value>/Administration/Users/Edit/Change</Value>
+                                            <Value>/OrganizationManagement/Members/Edit/Change</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -512,8 +516,10 @@
                                     <Data IsEnabled="true">
                                         <Values>
                                             <Value>/Administration/Users/Edit/Add</Value>
+                                            <Value>/OrganizationManagement/Members/Edit/Add</Value>
                                             <Value>/Administration/Users/Edit/Remove</Value>
                                             <Value>/Administration/Users/Edit/Change</Value>
+                                            <Value>/OrganizationManagement/Members/Edit/Change</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -530,8 +536,10 @@
                                     <Data IsEnabled="true">
                                         <Values>
                                             <Value>/Administration/Users/Edit/Add</Value>
+                                            <Value>/OrganizationManagement/Members/Edit/Add</Value>
                                             <Value>/Administration/Users/Edit/Remove</Value>
                                             <Value>/Administration/Users/Edit/Change</Value>
+                                            <Value>/OrganizationManagement/Members/Edit/Change</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -558,7 +566,9 @@
                                     <Data IsEnabled="true">
                                         <Values>
                                             <Value>/Administration/Users/View</Value>
+                                            <Value>/OrganizationManagement/Members/View</Value>
                                             <Value>/Administration/Users/Edit/Change</Value>
+                                            <Value>/OrganizationManagement/Members/Edit/Change</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -572,6 +582,7 @@
                                     <Data IsEnabled="true">
                                         <Values>
                                             <Value>/Administration/Users/Edit/Add</Value>
+                                            <Value>/OrganizationManagement/Members/Edit/Add</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
