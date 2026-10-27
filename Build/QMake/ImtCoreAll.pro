@@ -576,7 +576,7 @@ CollectionDocumentServiceTest.file = ../../Tests/CollectionDocumentServiceTest/Q
 CollectionDocumentServiceTest.depends = imtbase imtdoc
 
 SUBDIRS += CollectionDocumentServiceIntegrationTestPck
-CollectionDocumentServiceIntegrationTestPck.file = ../../Tests/CollectionDocumentServiceIntegrationTest/Pck/QMake/CollectionDocumentServiceIntegrationTestPck.pro
+CollectionDocumentServiceIntegrationTestPck.file = ../../Tests/CollectionDocumentServiceIntegrationTest/CollectionDocumentServiceIntegrationTestPck/QMake/CollectionDocumentServiceIntegrationTestPck.pro
 CollectionDocumentServiceIntegrationTestPck.depends = imtdoc
 
 SUBDIRS += CollectionDocumentServiceIntegrationTest

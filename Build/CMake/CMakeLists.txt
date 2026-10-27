@@ -616,7 +616,7 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 		add_subdirectory("${TESTS_DIR}/CollectionDocumentServiceTest/CMake" "${AUX_INCLUDE_DIR}/CollectionDocumentServiceTest")
 		add_dependencies(CollectionDocumentServiceTest imtbase imtdoc)
 
-		add_subdirectory("${TESTS_DIR}/CollectionDocumentServiceIntegrationTest/Pck/CMake" "${AUX_INCLUDE_DIR}/CollectionDocumentServiceIntegrationTestPck")
+		add_subdirectory("${TESTS_DIR}/CollectionDocumentServiceIntegrationTest/CollectionDocumentServiceIntegrationTestPck/CMake" "${AUX_INCLUDE_DIR}/CollectionDocumentServiceIntegrationTestPck")
 		add_dependencies(CollectionDocumentServiceIntegrationTestPck imtdoc)
 
 		add_subdirectory("${TESTS_DIR}/CollectionDocumentServiceIntegrationTest/CMake" "${AUX_INCLUDE_DIR}/CollectionDocumentServiceIntegrationTest")
