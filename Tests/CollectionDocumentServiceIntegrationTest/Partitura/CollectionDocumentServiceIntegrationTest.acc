@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6560" Description="ACF"/>
-            <Version Id="1" Number="2449" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+            <Version Id="0" Number="6603" Description="ACF"/>
+            <Version Id="1" Number="2459" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="396033" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -39,9 +39,9 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>DocumentObject</Value>
-<Value>DocumentObject</Value>
-<Value>DocumentObject</Value>
-<Value>DocumentObject</Value>
+                                <Value>DocumentObject</Value>
+                                <Value>DocumentObject</Value>
+                                <Value>DocumentObject</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -73,9 +73,9 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>DocumentObject</Value>
-<Value>DocumentObject</Value>
-<Value>DocumentObject</Value>
-<Value>DocumentObject</Value>
+                                <Value>DocumentObject</Value>
+                                <Value>DocumentObject</Value>
+                                <Value>DocumentObject</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -131,9 +131,9 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>DocumentObject</Value>
-<Value>DocumentObject</Value>
-<Value>DocumentObject</Value>
-<Value>DocumentObject</Value>
+                                <Value>DocumentObject</Value>
+                                <Value>DocumentObject</Value>
+                                <Value>DocumentObject</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
