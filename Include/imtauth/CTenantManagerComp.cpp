@@ -10,11 +10,15 @@
 #include <istd/CChangeNotifier.h>
 #include <iprm/CIdParam.h>
 #include <iprm/CParamsSet.h>
+#include <ilog/CMessageContainer.h>
 
 // ImtCore includes
 #include <imtauth/ITenantInfo.h>
 #include <imtauth/imtauth.h>
+#include <imtauth/TenantEvents.h>
 #include <imtbase/imtbase.h>
+#include <imtbase/CComplexCollectionFilter.h>
+#include <imtauth/CollectionSelection.h>
 
 
 namespace imtauth
@@ -70,6 +74,121 @@ ITenantInfoUniquePtr CTenantManagerComp::GetTenant(const QByteArray& tenantId) c
 	}
 
 	return clonedTenant;
+}
+
+
+QByteArrayList CTenantManagerComp::GetOwnedOrCreatedTenantIds(const QByteArray& userId, bool* isReadPtr) const
+{
+	QByteArrayList retVal;
+	if (isReadPtr != nullptr){
+		*isReadPtr = m_tenantCollectionCompPtr.IsValid();
+	}
+
+	if (!m_tenantCollectionCompPtr.IsValid()){
+		return retVal;
+	}
+
+	// A collection that does not know the filter returns every organization
+	bool isRead = true;
+	for (const QByteArray& candidateId : CollectionSelection::SelectIds(*m_tenantCollectionCompPtr, CollectionSelection::AnyColumnEquals("OwnerId", "CreatorId", userId), QByteArrayList(), &isRead)){
+		ITenantInfoUniquePtr candidatePtr = GetTenant(candidateId);
+		if (!candidatePtr.IsValid()){
+			isRead = false;
+		}
+		else if (candidatePtr->GetOwnerId() == userId || candidatePtr->GetCreatorId() == userId){
+			retVal.append(candidateId);
+		}
+	}
+
+	if (isReadPtr != nullptr){
+		*isReadPtr = isRead;
+	}
+
+	return retVal;
+}
+
+
+QByteArrayList CTenantManagerComp::GetChildTenantIds(const QByteArray& tenantId, bool* isReadPtr) const
+{
+	QByteArrayList retVal;
+	if (isReadPtr != nullptr){
+		*isReadPtr = m_tenantCollectionCompPtr.IsValid();
+	}
+
+	if (!m_tenantCollectionCompPtr.IsValid() || tenantId.isEmpty()){
+		return retVal;
+	}
+
+	iprm::CIdParam parentTenantParam;
+	parentTenantParam.SetId(tenantId);
+
+	iprm::CParamsSet filterParams;
+	filterParams.SetEditableParameter("ParentTenantId", &parentTenantParam);
+
+	// A collection that does not know the filter returns every organization
+	ilog::CMessageContainer readErrors;
+	bool isRead = true;
+	for (const QByteArray& candidateId : m_tenantCollectionCompPtr->GetElementIds(0, -1, &filterParams, &readErrors)){
+		ITenantInfoUniquePtr candidatePtr = GetTenant(candidateId);
+		if (!candidatePtr.IsValid()){
+			isRead = false;
+		}
+		else if (candidatePtr->GetParentTenantId() == tenantId){
+			retVal.append(candidateId);
+		}
+	}
+
+	if (isReadPtr != nullptr){
+		*isReadPtr = isRead && readErrors.GetWorstCategory() < istd::IInformationProvider::IC_ERROR;
+	}
+
+	return retVal;
+}
+
+
+QByteArrayList CTenantManagerComp::FindTenantIdsByName(const QString& tenantName) const
+{
+	QByteArrayList retVal;
+	const QString name = tenantName.trimmed();
+	if (!m_tenantCollectionCompPtr.IsValid() || name.isEmpty()){
+		return retVal;
+	}
+
+	// The case-insensitive match of the database selects the candidates, the comparison below decides; SQLite ignores the case of ASCII letters only.
+	// A semicolon does not reach a selection query unchanged and a backslash escapes in LIKE, so the candidates match the longest part without them.
+	QString candidatePart;
+	QString part;
+	for (const QChar character : name + QChar(';')){
+		if (character == QChar(';') || character == QChar('\\')){
+			if (part.size() > candidatePart.size()){
+				candidatePart = part;
+			}
+			part.clear();
+		}
+		else{
+			part.append(character);
+		}
+	}
+
+	imtbase::IComplexCollectionFilter::FilterExpression filterExpr;
+	filterExpr.fieldFilters << imtbase::IComplexCollectionFilter::FieldFilter("Name", candidatePart, imtbase::IComplexCollectionFilter::FO_CONTAINS);
+
+	imtbase::CComplexCollectionFilter complexFilter;
+	complexFilter.SetFilterExpression(filterExpr);
+
+	iprm::CParamsSet filterParams;
+	if (!candidatePart.isEmpty()){
+		filterParams.SetEditableParameter("ComplexFilter", &complexFilter);
+	}
+
+	for (const QByteArray& candidateId : m_tenantCollectionCompPtr->GetElementIds(0, -1, &filterParams)){
+		ITenantInfoUniquePtr candidatePtr = GetTenant(candidateId);
+		if (candidatePtr.IsValid() && candidatePtr->GetTenantName().trimmed().compare(name, Qt::CaseInsensitive) == 0){
+			retVal.append(candidateId);
+		}
+	}
+
+	return retVal;
 }
 
 
@@ -188,6 +307,8 @@ bool CTenantManagerComp::UpdateTenant(const QByteArray& tenantId, const QString&
 
 	istd::CChangeNotifier changeNotifier(this);
 
+	const QByteArray previousOwnerId = tenantPtr->GetOwnerId();
+
 	tenantPtr->SetTenantName(tenantName);
 	tenantPtr->SetTenantDescription(description);
 	if (updateOwner){
@@ -198,6 +319,14 @@ bool CTenantManagerComp::UpdateTenant(const QByteArray& tenantId, const QString&
 	if (!m_tenantCollectionCompPtr->SetObjectData(tenantId, *tenantPtr)){
 		SendErrorMessage(0, QStringLiteral("Failed to update tenant '%1'").arg(tenantId), "CTenantManagerComp");
 		return false;
+	}
+
+	if (updateOwner && previousOwnerId != ownerId){
+		TenantEvent::Publish(this, {
+					{TenantEvent::s_type, TenantEvent::s_ownershipTransferred},
+					{TenantEvent::s_tenantId, tenantId},
+					{TenantEvent::s_previousOwnerId, previousOwnerId},
+					{TenantEvent::s_ownerId, ownerId}});
 	}
 
 	SendInfoMessage(0, QStringLiteral("Updated tenant '%1'").arg(tenantId), "CTenantManagerComp");
@@ -339,27 +468,6 @@ QByteArray CTenantManagerComp::GetSystemTenantId() const
 
 
 // private methods
-
-QByteArrayList CTenantManagerComp::GetChildTenantIds(const QByteArray& tenantId) const
-{
-	iprm::CIdParam parentTenantParam;
-	parentTenantParam.SetId(tenantId);
-
-	iprm::CParamsSet filterParams;
-	filterParams.SetEditableParameter("ParentTenantId", &parentTenantParam);
-
-	// A collection that does not know the filter returns every organization
-	QByteArrayList retVal;
-	for (const QByteArray& candidateId : m_tenantCollectionCompPtr->GetElementIds(0, -1, &filterParams)){
-		ITenantInfoUniquePtr candidatePtr = GetTenant(candidateId);
-		if (candidatePtr.IsValid() && candidatePtr->GetParentTenantId() == tenantId){
-			retVal.append(candidateId);
-		}
-	}
-
-	return retVal;
-}
-
 
 bool CTenantManagerComp::SetTenantPermissionsTree(const QByteArray& tenantId, const QByteArrayList& permissions, QSet<QByteArray>& visitedTenantIds)
 {

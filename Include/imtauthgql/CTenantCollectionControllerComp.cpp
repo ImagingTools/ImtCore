@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgql/CTenantCollectionControllerComp.h>
+#include <imtauthgql/TenantAccess.h>
+#include <imtauthgql/imtauthgql.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Tenants.h>
 
 
@@ -13,10 +15,24 @@
 #include <imtauth/ITenantInvitation.h>
 #include <imtauth/imtauth.h>
 #include <imtgql/IGqlContext.h>
+#include <imtgql/CGqlParamObject.h>
+#include <imtbase/imtbase.h>
+#include <imtbase/CComplexCollectionFilter.h>
 
 
 namespace imtauthgql
 {
+
+
+namespace
+{
+
+
+// Stands for the missing user of an anonymous request: no organization is related to it
+const QByteArray s_noUserId = QByteArrayLiteral("00000000-0000-0000-0000-000000000000");
+
+
+} // anonymous namespace
 
 
 // reimplemented (sdl::V1_0::imtauth::CTenantCollectionControllerCompBase)
@@ -143,18 +159,12 @@ void CTenantCollectionControllerComp::SetAdditionalFilters(
 	}
 
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
-	if (gqlContextPtr == nullptr){
-		return;
-	}
+	const imtauth::IUserInfo* userInfoPtr = gqlContextPtr != nullptr ? gqlContextPtr->GetUserInfo() : nullptr;
+	QByteArray userId = gqlContextPtr != nullptr ? gqlContextPtr->GetUserId() : QByteArray();
 
-	const imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
-	if (userInfoPtr == nullptr){
-		return;
-	}
-
-	QByteArray userId = gqlContextPtr->GetUserId();
-	if (userId.isEmpty()){
-		return;
+	// Nobody is related to an organization without a user, so an anonymous request selects nothing
+	if (userInfoPtr == nullptr || userId.isEmpty()){
+		userId = s_noUserId;
 	}
 
 	iprm::CIdParam* userIdParamPtr = new iprm::CIdParam();
@@ -162,9 +172,56 @@ void CTenantCollectionControllerComp::SetAdditionalFilters(
 	filterParamsPtr->SetEditableParameter("UserId", userIdParamPtr, true);
 
 	// System administrators get a global view, the others see only the tenants they are related to.
-	if (!userInfoPtr->IsAdmin()){
+	if (userInfoPtr == nullptr || !userInfoPtr->IsAdmin()){
 		filterParamsPtr->SetEditableParameter("RelatedTenantsOnly", new iprm::CEnableableParam(true), true);
 	}
+}
+
+
+// reimplemented (imtservergql::CObjectCollectionControllerCompBase)
+
+bool CTenantCollectionControllerComp::CheckObjectAccess(
+			const imtgql::CGqlRequest& gqlRequest,
+			const QByteArrayList& objectIds,
+			imtauth::IDocumentShareInfo::AccessLevel accessLevel,
+			QString& errorMessage) const
+{
+	if (!IsSuperuserRequest(gqlRequest) && m_objectCollectionCompPtr.IsValid()){
+		// An organization the user is not related to is reported as missing, like a document of another organization
+		for (const QByteArray& objectId : objectIds){
+			imtbase::IComplexCollectionFilter::FilterExpression filterExpr;
+			filterExpr.fieldFilters << imtbase::IComplexCollectionFilter::FieldFilter("Id", QString::fromUtf8(objectId));
+
+			imtbase::CComplexCollectionFilter complexFilter;
+			complexFilter.SetFilterExpression(filterExpr);
+
+			iprm::CParamsSet filterParams;
+			filterParams.SetEditableParameter("ComplexFilter", &complexFilter);
+			SetAdditionalFilters(gqlRequest, imtgql::CGqlParamObject(), &filterParams);
+
+			if (!imtbase::isValidUuid(objectId) || !m_objectCollectionCompPtr->GetElementIds(0, -1, &filterParams).contains(objectId)){
+				errorMessage = QStringLiteral("Object does not exist");
+				return false;
+			}
+		}
+	}
+
+	return BaseClass::CheckObjectAccess(gqlRequest, objectIds, accessLevel, errorMessage);
+}
+
+
+bool CTenantCollectionControllerComp::OnBeforeRemoveElements(const QByteArrayList& elementIds, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+{
+	// RemoveElementSet selects by the filter of the request without the access check of RemoveElements
+	if (!CheckObjectAccess(gqlRequest, elementIds, imtauth::IDocumentShareInfo::DAL_OWNER, errorMessage)){
+		return false;
+	}
+
+	if (m_objectCollectionCompPtr.IsValid() && !CheckTenantRemoval(*m_objectCollectionCompPtr, elementIds, errorMessage)){
+		return false;
+	}
+
+	return BaseClass::OnBeforeRemoveElements(elementIds, gqlRequest, errorMessage);
 }
 
 

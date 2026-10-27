@@ -40,7 +40,7 @@ ViewBase {
 
 	function __updateWhenVisible() {
 		if (proposalsPage.visible)
-			proposalsPage.updateGui()
+			updateTimer.restart()
 		else
 			proposalsPage.__updatePending = true
 	}
@@ -48,6 +48,15 @@ ViewBase {
 	onVisibleChanged: {
 		if (proposalsPage.visible && proposalsPage.__updatePending) {
 			proposalsPage.__updatePending = false
+			updateTimer.restart()
+		}
+	}
+
+	// The answer to an action and the notification of the same change come together: one reading serves both
+	Timer {
+		id: updateTimer
+		interval: 100
+		onTriggered: {
 			proposalsPage.updateGui()
 		}
 	}
@@ -145,23 +154,23 @@ ViewBase {
 		function onRelationshipProposalApproved(relationshipId) {
 			proposalsPage.processingProposalId = ""
 			PopupManager.addSuccessMessage(qsTr("Relationship proposal approved"), true)
-			proposalsPage.updateGui()
+			updateTimer.restart()
 		}
 
 		function onRelationshipProposalRejected() {
 			proposalsPage.processingProposalId = ""
 			PopupManager.addSuccessMessage(qsTr("Relationship proposal rejected"), true)
-			proposalsPage.updateGui()
+			updateTimer.restart()
 		}
 
 		function onRelationshipProposalCanceled() {
 			proposalsPage.processingProposalId = ""
 			PopupManager.addSuccessMessage(qsTr("Relationship proposal withdrawn"), true)
-			proposalsPage.updateGui()
+			updateTimer.restart()
 		}
 
 		function onRelationshipProposalCreated() {
-			proposalsPage.updateGui()
+			updateTimer.restart()
 		}
 
 		function onRequestFailed(message) {
@@ -214,7 +223,7 @@ ViewBase {
 				visible: incomingTable.elementsCount > 0
 				width: parent.width
 				height: incomingTable.contentHeight + incomingTable.headerHeight
-				canMoveColumns: false
+				canMoveColumns: true
 				selectable: false
 			}
 
@@ -240,7 +249,7 @@ ViewBase {
 				visible: outgoingTable.elementsCount > 0
 				width: parent.width
 				height: outgoingTable.contentHeight + outgoingTable.headerHeight
-				canMoveColumns: false
+				canMoveColumns: true
 				selectable: false
 			}
 		}

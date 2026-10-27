@@ -7,8 +7,8 @@
 #include <imod/TSingleModelObserverBase.h>
 
 // Qt includes
-#include <QMap>
-#include <QRecursiveMutex>
+#include <QList>
+#include <QVariantMap>
 
 // ImtCore includes
 #include <imtauth/ITenantInvitationManager.h>
@@ -25,9 +25,8 @@ namespace imtauthgql
 /**
 	Server-side publisher of the membership notifications of a user.
 
-	Every change of the observed managers is compared with a snapshot of all
-	memberships, invitations and owners, and each transition is announced to
-	the users it concerns:
+	The observed managers name each change they make (imtauth::TenantEvent),
+	and each one is announced to the users it concerns:
 	- InvitationReceived: the invited user (also when the invitation is resent)
 	- InvitationAccepted, InvitationRejected: the user who sent the invitation
 	- InvitationRevoked: the invited user
@@ -37,6 +36,9 @@ namespace imtauthgql
 
 	Notifications are delivered only to subscribers whose authenticated user
 	matches the target userId.
+
+	Any of the changes above and a new membership are also announced by OnOrganizationMembersChanged
+	to every subscriber whose session is in the organization.
 
 	The subscription endpoint name is configurable via the \c CommandId
 	attribute and defaults to "OnMembershipNotification".
@@ -78,29 +80,6 @@ protected:
 	I_REF(imod::IModel, m_invitationManagerModelCompPtr);
 
 private:
-	struct MembershipState
-	{
-		QByteArray userId;
-		QByteArray tenantId;
-		QByteArrayList organizationPermissions;
-	};
-
-	struct InvitationState
-	{
-		QByteArray userId;
-		QByteArray tenantId;
-		QByteArray invitedByUserId;
-		imtauth::ITenantInvitation::TenantInvitationStatus status = imtauth::ITenantInvitation::TIS_PENDING;
-		QString lastSentAt;
-	};
-
-	struct Snapshot
-	{
-		QMap<QByteArray, MembershipState> memberships;
-		QMap<QByteArray, InvitationState> invitations;
-		QMap<QByteArray, QByteArray> owners;
-	};
-
 	struct Notification
 	{
 		QByteArray targetUserId;
@@ -110,16 +89,12 @@ private:
 		QByteArray tenantId;
 	};
 
-	Snapshot TakeSnapshot() const;
-	QList<Notification> CompareSnapshots(const Snapshot& before, const Snapshot& after) const;
-
+	QList<Notification> CreateNotifications(const QVariantMap& event) const;
 	void PublishNotification(const Notification& notification) const;
+	void PublishMembersChanged(const QByteArray& tenantId) const;
 
 	QString FindTenantName(const QByteArray& tenantId) const;
-
-	Snapshot m_snapshot;
-	// Protects the snapshot from concurrent model notifications.
-	mutable QRecursiveMutex m_snapshotMutex;
+	QByteArray FindTenantOwnerId(const QByteArray& tenantId) const;
 };
 
 

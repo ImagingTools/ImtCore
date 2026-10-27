@@ -71,6 +71,8 @@ Item {
 	// selection off; a short list that never needs searching turns the filter off.
 	property bool filterEnabled: true
 	property bool selectionEnabled: true
+	// The borders of the columns can be dragged to resize them
+	property bool canMoveColumns: false
 	// Optional column-header row shown above the list, independent of the
 	// select-all bar above. Pairs a custom `delegateComponent`'s columns with
 	// matching titles; leave null (nothing shown) for the default delegate's
@@ -354,7 +356,7 @@ Item {
 			anchors.left: parent.left
 			anchors.right: parent.right
 			anchors.bottom: loadingMoreRow.top
-			canMoveColumns: false
+			canMoveColumns: root.canMoveColumns
 			selectable: root.selectionEnabled
 			isMultiSelect: true
 

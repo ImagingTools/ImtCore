@@ -33,6 +33,8 @@ public:
 
 private:
 	QString GetTenantName(const QByteArray& tenantId) const;
+	/// The partners of the tenant over the given relationships; isRead becomes false when one of them could not be read.
+	RelatedTenantInfos ReadRelatedTenants(const QByteArray& tenantId, const QByteArrayList& relationshipIds, bool& isRead) const;
 
 private:
 	I_REF(ITenantConnectionRequestManager, m_connectionRequestManagerCompPtr);

@@ -11,6 +11,7 @@
 // ImtCore includes
 #include <imtauth/ITenantManager.h>
 #include <imtauth/ITenantMembershipManager.h>
+#include <imtauth/ITenantInvitationManager.h>
 #include <imtauth/IUserManager.h>
 #include <imtauth/ICrossOrgGrant.h>
 #include <imtauth/IContract.h>
@@ -35,6 +36,7 @@ public:
 	I_BEGIN_COMPONENT(CTenantManagerControllerComp);
 		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager providing CRUD operations", true, "TenantManager");
 		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager for member operations", true, "MembershipManager");
+		I_ASSIGN(m_invitationManagerCompPtr, "InvitationManager", "Tenant invitation manager, revokes the invitations of a removed member", false, "InvitationManager");
 		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "Collection of users", true, "UserCollection");
 		I_ASSIGN(m_grantManagerCompPtr, "CrossOrgGrantManager", "Manager for cross-org grants", false, "CrossOrgGrantManager");
 		I_ASSIGN(m_contractManagerCompPtr, "ContractManager", "Manager for cooperation contracts", false, "ContractManager");
@@ -237,9 +239,13 @@ private:
 				const ::imtgql::CGqlRequest& gqlRequest,
 				const QByteArray& grantId,
 				QString& errorMessage) const;
+	// Revoke the active grants between two organizations, in both directions.
+	/// False when a grant could not be read or revoked, so some may still give access.
+	bool RevokeGrantsBetween(const QByteArray& tenantAId, const QByteArray& tenantBId) const;
 
 	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
 	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);
+	I_REF(imtauth::ITenantInvitationManager, m_invitationManagerCompPtr);
 	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
 	I_REF(imtauth::ICrossOrgGrant, m_grantManagerCompPtr);
 	I_REF(imtauth::IContract, m_contractManagerCompPtr);

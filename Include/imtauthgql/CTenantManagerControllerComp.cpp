@@ -40,18 +40,8 @@ bool HasTenantNameConflict(
 		return false;
 	}
 
-	const QByteArrayList tenantIds = tenantManager.GetTenantIds();
-	for (const QByteArray& id : tenantIds){
-		if (!excludeTenantId.isEmpty() && id == excludeTenantId){
-			continue;
-		}
-
-		imtauth::ITenantInfoUniquePtr tenantPtr = tenantManager.GetTenant(id);
-		if (!tenantPtr.IsValid()){
-			continue;
-		}
-
-		if (NormalizeTenantName(tenantPtr->GetTenantName()).compare(normalizedName, Qt::CaseInsensitive) == 0){
+	for (const QByteArray& id : tenantManager.FindTenantIdsByName(normalizedName)){
+		if (excludeTenantId.isEmpty() || id != excludeTenantId){
 			return true;
 		}
 	}
@@ -104,20 +94,20 @@ sdl::V1_0::imtauth::CGetTenantIdsPayload CTenantManagerControllerComp::OnGetTena
 	const bool isAdmin = userInfoPtr != nullptr && userInfoPtr->IsAdmin();
 
 	// Users other than administrators learn only the organizations they own, created, or belong to.
-	QByteArrayList ids;
-	for (const QByteArray& tenantId : m_tenantManagerCompPtr->GetTenantIds()){
-		bool isVisible = isAdmin;
-		if (!isVisible){
-			imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
-			isVisible = tenantPtr.IsValid() && (tenantPtr->GetOwnerId() == userId || tenantPtr->GetCreatorId() == userId);
-		}
-		if (!isVisible && m_membershipManagerCompPtr.IsValid()){
-			isVisible = m_membershipManagerCompPtr->IsMember(userId, tenantId);
-		}
-		if (isVisible){
-			ids.append(tenantId);
+	QByteArrayList visibleTenantIds;
+	if (!isAdmin){
+		visibleTenantIds = m_tenantManagerCompPtr->GetOwnedOrCreatedTenantIds(userId);
+		if (m_membershipManagerCompPtr.IsValid()){
+			for (const QByteArray& membershipId : m_membershipManagerCompPtr->GetMembershipsByUser(userId)){
+				imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
+				if (membershipPtr.IsValid() && membershipPtr->IsActive() && !visibleTenantIds.contains(membershipPtr->GetTenantId())){
+					visibleTenantIds.append(membershipPtr->GetTenantId());
+				}
+			}
 		}
 	}
+
+	const QByteArrayList ids = isAdmin ? m_tenantManagerCompPtr->GetTenantIds() : visibleTenantIds;
 
 	response.tenantIds.Emplace().FromList(ids);
 
@@ -173,13 +163,25 @@ sdl::V1_0::imtauth::CGetTenantRelationshipsPayload CTenantManagerControllerComp:
 		return response;
 	}
 
+	// A partial list would look like ended relationships to the product servers, which remove the shares of those
+	const QString readError = QStringLiteral("Unable to read the relationships of the organization");
+	bool isRead = false;
+	QByteArrayList relIds = m_connectionRequestManagerCompPtr->GetTenantRelationshipIds(tenantId, &isRead);
+	if (!isRead){
+		response.errorMessage = readError;
+		return response;
+	}
+
 	response.relationships.Emplace();
 
-	QByteArrayList relIds = m_connectionRequestManagerCompPtr->GetTenantRelationshipIds(tenantId);
+	QHash<QByteArray, QDateTime> relatedSinceByPartner;
 	for (const QByteArray& relId : relIds){
 		imtauth::ITenantRelationshipInfoUniquePtr relPtr = m_connectionRequestManagerCompPtr->GetTenantRelationship(relId);
 		if (!relPtr.IsValid()){
-			continue;
+			sdl::V1_0::imtauth::CGetTenantRelationshipsPayload failedResponse;
+			failedResponse.errorMessage = readError;
+
+			return failedResponse;
 		}
 
 		if (!isManager && relPtr->GetStatus() != imtauth::ITenantRelationshipInfo::TRS_ACTIVE){
@@ -201,6 +203,23 @@ sdl::V1_0::imtauth::CGetTenantRelationshipsPayload CTenantManagerControllerComp:
 			data.description = relPtr->GetDescription();
 			data.createdAt = relPtr->GetCreatedAt();
 			data.updatedAt = relPtr->GetUpdatedAt();
+		}
+
+		// The documents shared with a partner belong to the period the organizations have been related, so every member gets its start
+		const QByteArray partnerId = relPtr->GetSourceTenantId() == tenantId ? relPtr->GetTargetTenantId() : relPtr->GetSourceTenantId();
+		if (!relatedSinceByPartner.contains(partnerId)){
+			bool isHistoryRead = false;
+			relatedSinceByPartner.insert(partnerId, m_connectionRequestManagerCompPtr->GetRelatedSince(tenantId, partnerId, &isHistoryRead));
+			if (!isHistoryRead){
+				sdl::V1_0::imtauth::CGetTenantRelationshipsPayload failedResponse;
+				failedResponse.errorMessage = readError;
+
+				return failedResponse;
+			}
+		}
+		const QDateTime relatedSince = relatedSinceByPartner.value(partnerId);
+		if (relatedSince.isValid()){
+			data.relatedSince = relatedSince.toString(Qt::ISODateWithMs);
 		}
 
 		if (m_tenantManagerCompPtr.IsValid()){
@@ -263,7 +282,7 @@ sdl::V1_0::imtauth::CGetTenantPayload CTenantManagerControllerComp::OnGetTenant(
 	imtauth::ITenantInfoUniquePtr tenantInfoPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
 
 	if (!tenantInfoPtr.IsValid()){
-		response.errorMessage = QStringLiteral("Tenant not found");
+		response.errorMessage = QStringLiteral("Organization not found");
 		return response;
 	}
 
@@ -418,7 +437,7 @@ sdl::V1_0::imtauth::CCreateTenantPayload CTenantManagerControllerComp::OnCreateT
 
 	name = NormalizeTenantName(name);
 	if (name.isEmpty()){
-		response.errorMessage = QStringLiteral("Tenant name is required");
+		response.errorMessage = QStringLiteral("Organization name is required");
 		return response;
 	}
 
@@ -433,7 +452,7 @@ sdl::V1_0::imtauth::CCreateTenantPayload CTenantManagerControllerComp::OnCreateT
 	}
 
 	if (HasTenantNameConflict(*m_tenantManagerCompPtr.GetPtr(), name, QByteArray())){
-		response.errorMessage = QStringLiteral("Tenant with this name already exists");
+		response.errorMessage = QStringLiteral("An organization with this name already exists");
 		return response;
 	}
 
@@ -496,6 +515,12 @@ sdl::V1_0::imtauth::CRemoveTenantPayload CTenantManagerControllerComp::OnRemoveT
 		return response;
 	}
 
+	if (!CheckTenantRemoval(*m_tenantManagerCompPtr, {tenantId}, accessError)){
+		response.errorMessage = accessError;
+		response.success = false;
+		return response;
+	}
+
 	bool success = m_tenantManagerCompPtr->RemoveTenant(tenantId);
 
 	response.success = success;
@@ -538,7 +563,7 @@ sdl::V1_0::imtauth::CUpdateTenantPayload CTenantManagerControllerComp::OnUpdateT
 
 	imtauth::ITenantInfoUniquePtr currentTenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
 	if (!currentTenantPtr.IsValid()){
-		response.errorMessage = QStringLiteral("Tenant not found");
+		response.errorMessage = QStringLiteral("Organization not found");
 		response.success = false;
 		return response;
 	}
@@ -562,13 +587,13 @@ sdl::V1_0::imtauth::CUpdateTenantPayload CTenantManagerControllerComp::OnUpdateT
 	}
 	name = NormalizeTenantName(name);
 	if (name.isEmpty()){
-		response.errorMessage = QStringLiteral("Tenant name is required");
+		response.errorMessage = QStringLiteral("Organization name is required");
 		response.success = false;
 		return response;
 	}
 
 	if (HasTenantNameConflict(*m_tenantManagerCompPtr.GetPtr(), name, tenantId)){
-		response.errorMessage = QStringLiteral("Tenant with this name already exists");
+		response.errorMessage = QStringLiteral("An organization with this name already exists");
 		response.success = false;
 		return response;
 	}
@@ -618,19 +643,14 @@ sdl::V1_0::imtauth::CUpdateTenantPayload CTenantManagerControllerComp::OnUpdateT
 		}
 	}
 
-	// The scope goes first: a refused scope leaves the organization untouched
-	bool success = !hasPermissions || m_tenantManagerCompPtr->SetTenantPermissions(tenantId, newPermissions);
-	if (success){
-		success = m_tenantManagerCompPtr->UpdateTenant(tenantId, name, description, ownerId, updateOwner);
-	}
-
-	// Sync members with TenantMemberships
-	if (success && m_membershipManagerCompPtr.IsValid() && arguments.input->members){
-		// Get current member user IDs
-		QByteArrayList currentMembershipIds = m_membershipManagerCompPtr->GetMembershipsByTenant(tenantId);
-		QSet<QByteArray> currentUserIds;
-		QMap<QByteArray, QByteArray> userIdToMembershipId; // userId -> membershipId
-		for (const QByteArray& msId : currentMembershipIds){
+	// The members to sync are read before anything changes
+	const bool syncsMembers = m_membershipManagerCompPtr.IsValid() && arguments.input->members;
+	QSet<QByteArray> currentUserIds;
+	QMap<QByteArray, QByteArray> userIdToMembershipId; // userId -> membershipId
+	QSet<QByteArray> newUserIds;
+	QSet<QByteArray> keptUserIds;
+	if (syncsMembers){
+		for (const QByteArray& msId : m_membershipManagerCompPtr->GetMembershipsByTenant(tenantId)){
 			imtauth::ITenantMembershipUniquePtr msPtr = m_membershipManagerCompPtr->GetMembership(msId);
 			if (msPtr.IsValid()){
 				currentUserIds.insert(msPtr->GetUserId());
@@ -638,18 +658,42 @@ sdl::V1_0::imtauth::CUpdateTenantPayload CTenantManagerControllerComp::OnUpdateT
 			}
 		}
 
-		// Build new set
-		QSet<QByteArray> newUserIds;
 		for (const auto& member : *arguments.input->members){
 			if (member->id){
 				newUserIds << *member->id;
 			}
 		}
 
-		// Remove memberships for users no longer in the list
+		// The owner and the creator are never removed, as in the organization editor
+		keptUserIds = newUserIds;
+		keptUserIds << ownerId << currentTenantPtr->GetCreatorId();
+
+		// A removed member's pending invitations go first, as on the other removal paths. A failure stops before the organization
+		// and its members change; the invitations already revoked stay revoked, which takes away no member's access.
+		const imtgql::IGqlContext* removalContextPtr = gqlRequest.GetRequestContext();
+		const QByteArray revokedByUserId = removalContextPtr != nullptr ? removalContextPtr->GetUserId() : QByteArray();
 		for (const QByteArray& uid : currentUserIds){
-			if (!newUserIds.contains(uid)){
-				m_membershipManagerCompPtr->RemoveMembership(userIdToMembershipId[uid]);
+			if (!keptUserIds.contains(uid) && m_invitationManagerCompPtr.IsValid() && !m_invitationManagerCompPtr->RevokeInvitationsSentBy(tenantId, uid, revokedByUserId)){
+				response.errorMessage = QStringLiteral("The invitations a removed member sent could not be revoked. Try again.");
+				response.success = false;
+				return response;
+			}
+		}
+	}
+
+	// The scope goes first: a refused scope leaves the organization untouched
+	bool success = !hasPermissions || m_tenantManagerCompPtr->SetTenantPermissions(tenantId, newPermissions);
+	if (success){
+		success = m_tenantManagerCompPtr->UpdateTenant(tenantId, name, description, ownerId, updateOwner);
+	}
+
+	// Sync members with TenantMemberships
+	if (success && syncsMembers){
+		for (const QByteArray& uid : currentUserIds){
+			if (!keptUserIds.contains(uid) && !m_membershipManagerCompPtr->RemoveMembership(userIdToMembershipId[uid])){
+				response.errorMessage = QStringLiteral("A member could not be removed. Try again.");
+				response.success = false;
+				return response;
 			}
 		}
 
@@ -1875,6 +1919,23 @@ sdl::V1_0::imtauth::CRemoveConnectionPayload CTenantManagerControllerComp::OnRem
 		}
 	}
 	
+	// The access check above is for the given organization: the connection must be its own and active before anything ends
+	imtauth::ITenantConnectionInfoUniquePtr connectionPtr = m_connectionRequestManagerCompPtr->GetConnection(connectionId);
+	if (!connectionPtr.IsValid()
+				|| (connectionPtr->GetTenantAId() != tenantId && connectionPtr->GetTenantBId() != tenantId)
+				|| connectionPtr->GetStatus() != imtauth::ITenantConnectionInfo::CS_ACTIVE){
+		response.success = false;
+		response.errorMessage = QStringLiteral("Failed to remove connection");
+		return response;
+	}
+
+	// A grant needs an active connection: the grants end first, so a failure leaves the connection to remove again
+	if (!RevokeGrantsBetween(connectionPtr->GetTenantAId(), connectionPtr->GetTenantBId())){
+		response.success = false;
+		response.errorMessage = QStringLiteral("The grants between the organizations could not be revoked. Try again.");
+		return response;
+	}
+
 	bool success = m_connectionRequestManagerCompPtr->RemoveConnection(connectionId, tenantId);
 	response.success = success;
 	if (!success){
@@ -2101,6 +2162,13 @@ sdl::V1_0::imtauth::CApproveRelationshipProposalPayload CTenantManagerController
 	response.success = beforePtr.IsValid() && afterPtr.IsValid() && beforePtr->GetStatus() != afterPtr->GetStatus();
 	if (!*response.success){
 		response.errorMessage = QStringLiteral("The proposal is not waiting for approval by this organization");
+		return response;
+	}
+
+	// An applied proposal has a relationship behind it; without one the approval did not take effect
+	if (afterPtr->GetStatus() == imtauth::ITenantRelationshipProposalInfo::RPS_APPLIED && relationshipId.isEmpty()){
+		response.success = false;
+		response.errorMessage = QStringLiteral("The proposal could not be applied");
 		return response;
 	}
 	if (!relationshipId.isEmpty()){
@@ -2723,6 +2791,28 @@ bool CTenantManagerControllerComp::HasAccessToAnyTenant(
 	}
 
 	return false;
+}
+
+
+bool CTenantManagerControllerComp::RevokeGrantsBetween(const QByteArray& tenantAId, const QByteArray& tenantBId) const
+{
+	if (!m_grantManagerCompPtr.IsValid() || tenantAId.isEmpty() || tenantBId.isEmpty()){
+		return true;
+	}
+
+	bool isReadA = false;
+	bool isReadB = false;
+	const imtauth::CrossOrgGrants grants = m_grantManagerCompPtr->GetGrantsBySourceTenant(tenantAId, &isReadA) + m_grantManagerCompPtr->GetGrantsBySourceTenant(tenantBId, &isReadB);
+	bool isRevoked = isReadA && isReadB;
+	for (const imtauth::CrossOrgGrantInfo& grantInfo : grants){
+		const bool isBetween = (grantInfo.sourceTenantId == tenantAId && grantInfo.targetTenantId == tenantBId)
+					|| (grantInfo.sourceTenantId == tenantBId && grantInfo.targetTenantId == tenantAId);
+		if (isBetween && grantInfo.isActive && !m_grantManagerCompPtr->RevokeGrant(grantInfo.grantId)){
+			isRevoked = false;
+		}
+	}
+
+	return isRevoked;
 }
 
 

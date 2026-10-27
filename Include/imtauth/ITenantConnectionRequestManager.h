@@ -5,6 +5,7 @@
 // Qt includes
 #include <QtCore/QByteArray>
 #include <QtCore/QByteArrayList>
+#include <QtCore/QDateTime>
 #include <QtCore/QString>
 
 // ACF includes
@@ -55,9 +56,16 @@ public:
 	virtual bool CancelRelationshipProposal(const QByteArray& proposalId, const QByteArray& tenantId) = 0;
 	virtual QByteArrayList GetRelationshipProposalIds(const QByteArray& tenantId) const = 0;
 	virtual ITenantRelationshipProposalInfoUniquePtr GetRelationshipProposal(const QByteArray& proposalId) const = 0;
-	virtual QByteArrayList GetTenantRelationshipIds(const QByteArray& tenantId) const = 0;
+	/// \param isReadPtr [optional] False when the storage could not be read completely, so the list may miss relationships.
+	virtual QByteArrayList GetTenantRelationshipIds(const QByteArray& tenantId, bool* isReadPtr = nullptr) const = 0;
 	virtual ITenantRelationshipInfoUniquePtr GetTenantRelationship(const QByteArray& relationshipId) const = 0;
 	virtual bool RemoveTenantRelationship(const QByteArray& tenantId, const QByteArray& relationshipId) = 0;
+	/**
+		Start of the uninterrupted period in which the two tenants had an active relationship, archived relationships included.
+		Invalid when they have no active relationship now, or a start time is unknown.
+		\param isReadPtr [optional] False when the history could not be read completely, so the start may be too late.
+	*/
+	virtual QDateTime GetRelatedSince(const QByteArray& tenantId, const QByteArray& otherTenantId, bool* isReadPtr = nullptr) const = 0;
 };
 
 

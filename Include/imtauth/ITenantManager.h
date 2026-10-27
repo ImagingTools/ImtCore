@@ -18,6 +18,20 @@ class ITenantManager: virtual public istd::IChangeable
 public:
 	virtual QByteArrayList GetTenantIds() const = 0;
 	virtual ITenantInfoUniquePtr GetTenant(const QByteArray& tenantId) const = 0;
+	/**
+		Ids of the organizations the user owns or created.
+		\param isReadPtr [optional] False when the storage could not be read completely, so the list may miss some.
+	*/
+	virtual QByteArrayList GetOwnedOrCreatedTenantIds(const QByteArray& userId, bool* isReadPtr = nullptr) const = 0;
+	/**
+		Ids of the direct sub-organizations of an organization.
+		\param isReadPtr [optional] False when the storage could not be read completely, so the list may miss some.
+	*/
+	virtual QByteArrayList GetChildTenantIds(const QByteArray& tenantId, bool* isReadPtr = nullptr) const = 0;
+	/**
+		Ids of the organizations with the name, ignoring the case and the surrounding spaces.
+	*/
+	virtual QByteArrayList FindTenantIdsByName(const QString& tenantName) const = 0;
 	virtual QByteArrayList GetTenantPermissions(const QByteArray& tenantId) const = 0;
 	/**
 		Create an organization. A sub-organization of \c parentTenantId gets the default scope reduced to the scope of its parent.

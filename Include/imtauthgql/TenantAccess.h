@@ -9,6 +9,7 @@
 // ImtCore includes
 #include <imtauth/ITenantManager.h>
 #include <imtauth/ITenantMembershipManager.h>
+#include <imtbase/IObjectCollection.h>
 #include <imtgql/CGqlRequest.h>
 
 
@@ -92,6 +93,16 @@ bool CheckTenantPermissionsChange(
 	Call it after every save of a stored organization: it writes only the scopes that change, so a retry completes a cascade that failed earlier.
 */
 bool NarrowSubOrganizationPermissions(imtauth::ITenantManager& tenantManager, const QByteArray& tenantId, QString& errorMessage);
+
+/**
+	Check the removal of organizations: an organization with sub-organizations is removed only together with all of them.
+*/
+bool CheckTenantRemoval(const imtauth::ITenantManager& tenantManager, const QByteArrayList& tenantIds, QString& errorMessage);
+
+/**
+	\overload The sub-organizations are read from the collection of the organizations.
+*/
+bool CheckTenantRemoval(const imtbase::IObjectCollection& tenantCollection, const QByteArrayList& tenantIds, QString& errorMessage);
 
 
 } // namespace imtauthgql

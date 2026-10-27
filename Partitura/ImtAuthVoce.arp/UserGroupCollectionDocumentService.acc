@@ -278,6 +278,7 @@
                                     <Data IsEnabled="true">
                                         <Values>
                                             <Value>/Administration/Groups/View</Value>
+                                            <Value>/OrganizationManagement/Groups/View</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -314,6 +315,7 @@
                                     <Data IsEnabled="true">
                                         <Values>
                                             <Value>/Administration/Groups/Edit/Change</Value>
+                                            <Value>/OrganizationManagement/Groups/Edit/Change</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>

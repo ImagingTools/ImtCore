@@ -4,6 +4,9 @@
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Profile.h>
 
 
+// Qt includes
+#include <QtCore/QSet>
+
 // ACF includes
 #include <iprm/CParamsSet.h>
 #include <iprm/CIdParam.h>
@@ -49,6 +52,15 @@ sdl::V1_0::imtauth::CProfileData CProfileControllerComp::OnGetProfile(
 	}
 
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+
+	// A profile is shown to its user and to the superuser only
+	const QByteArray requestUserId = (gqlContextPtr != nullptr) ? gqlContextPtr->GetUserId() : QByteArray();
+	if ((requestUserId.isEmpty() || requestUserId != objectId) && !IsSuperuserRequest(gqlRequest)){
+		errorMessage = QStringLiteral("Unable to get a profile info. Error: Only the superuser can see the profile of another user");
+		SendWarningMessage(0, errorMessage, "CProfileControllerComp");
+
+		return sdl::V1_0::imtauth::CProfileData();
+	}
 
 	const imtauth::IUserInfo* userInfoPtr = nullptr;
 	imtbase::IObjectCollection::DataPtr dataPtr;
@@ -163,8 +175,8 @@ sdl::V1_0::imtauth::CProfileData CProfileControllerComp::OnGetProfile(
 
 sdl::V1_0::imtauth::CGetUserOrganizationsPayload CProfileControllerComp::OnGetUserOrganizations(
 			const sdl::V1_0::imtauth::CGetUserOrganizationsGqlRequest& getUserOrganizationsRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
-			QString& /*errorMessage*/) const
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
 {
 	sdl::V1_0::imtauth::CGetUserOrganizationsPayload response;
 	sdl::V1_0::imtauth::GetUserOrganizationsRequestArguments arguments = getUserOrganizationsRequest.GetRequestedArguments();
@@ -172,6 +184,16 @@ sdl::V1_0::imtauth::CGetUserOrganizationsPayload CProfileControllerComp::OnGetUs
 	QByteArray userId;
 	if (arguments.input->id){
 		userId = *arguments.input->id;
+	}
+
+	// The organizations of a user are his own business
+	const imtgql::IGqlContext* requestContextPtr = gqlRequest.GetRequestContext();
+	const QByteArray requestUserId = (requestContextPtr != nullptr) ? requestContextPtr->GetUserId() : QByteArray();
+	if ((requestUserId.isEmpty() || requestUserId != userId) && !IsSuperuserRequest(gqlRequest)){
+		errorMessage = QStringLiteral("Only the superuser can see the organizations of another user");
+		SendWarningMessage(0, errorMessage, "CProfileControllerComp");
+
+		return response;
 	}
 
 	if (!userId.isEmpty()){
@@ -191,9 +213,36 @@ imtsdl::TElementList<sdl::V1_0::imtauth::CProfileTenantInfo> CProfileControllerC
 		return organizationList;
 	}
 
+	// Only the organizations related to the user are loaded: the cost follows the user, not the system size
+	QByteArrayList homeTenantIds;
+	QSet<QByteArray> activeMemberTenantIds;
+	if (m_membershipManagerCompPtr.IsValid()){
+		for (const QByteArray& membershipId : m_membershipManagerCompPtr->GetMembershipsByUser(userId)){
+			imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
+			if (!membershipPtr.IsValid()){
+				continue;
+			}
+
+			const QByteArray tenantId = membershipPtr->GetTenantId();
+			if (!homeTenantIds.contains(tenantId)){
+				homeTenantIds.append(tenantId);
+			}
+			if (membershipPtr->IsActive()){
+				activeMemberTenantIds.insert(tenantId);
+			}
+		}
+	}
+
+	QByteArrayList relatedTenantIds = m_tenantManagerCompPtr->GetOwnedOrCreatedTenantIds(userId);
+	for (const QByteArray& tenantId : homeTenantIds){
+		if (activeMemberTenantIds.contains(tenantId) && !relatedTenantIds.contains(tenantId)){
+			relatedTenantIds.append(tenantId);
+		}
+	}
+
 	QByteArrayList directTenantIds;
 
-	for (const QByteArray& tenantId : m_tenantManagerCompPtr->GetTenantIds()){
+	for (const QByteArray& tenantId : relatedTenantIds){
 		imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
 		if (!tenantPtr.IsValid() || !tenantPtr->IsActive()){
 			continue;
@@ -201,12 +250,7 @@ imtsdl::TElementList<sdl::V1_0::imtauth::CProfileTenantInfo> CProfileControllerC
 
 		const bool isOwner = tenantPtr->GetOwnerId() == userId;
 		const bool isCreator = tenantPtr->GetCreatorId() == userId;
-		imtauth::ITenantMembershipUniquePtr membershipPtr;
-		if (m_membershipManagerCompPtr.IsValid()){
-			membershipPtr = m_membershipManagerCompPtr->FindMembership(userId, tenantId);
-		}
-
-		const bool isActiveMember = membershipPtr.IsValid() && membershipPtr->IsActive();
+		const bool isActiveMember = activeMemberTenantIds.contains(tenantId);
 		if (!isOwner && !isCreator && !isActiveMember){
 			continue;
 		}
@@ -236,21 +280,7 @@ imtsdl::TElementList<sdl::V1_0::imtauth::CProfileTenantInfo> CProfileControllerC
 
 	// Append delegated organizations via cross-org grants
 	if (m_crossOrgGrantCompPtr.IsValid() && m_membershipManagerCompPtr.IsValid()){
-		// Find the user's home tenant(s) and check for grants targeting them
-		const imtauth::ITenantMembershipManager::MembershipIds membershipIds =
-			m_membershipManagerCompPtr->GetMembershipsByUser(userId);
-
-		QByteArrayList homeTenantIds;
-		for (const QByteArray& membershipId : membershipIds){
-			imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
-			if (membershipPtr.IsValid()){
-				QByteArray tenantId = membershipPtr->GetTenantId();
-				if (!homeTenantIds.contains(tenantId)){
-					homeTenantIds.append(tenantId);
-				}
-			}
-		}
-
+		// The user's home tenants are checked for grants targeting them
 		for (const QByteArray& homeTenantId : homeTenantIds){
 			const imtauth::CrossOrgGrants grants = m_crossOrgGrantCompPtr->GetGrantsByTargetTenant(homeTenantId);
 			for (const imtauth::CrossOrgGrantInfo& grant : grants){

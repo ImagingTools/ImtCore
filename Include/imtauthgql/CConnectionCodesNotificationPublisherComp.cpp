@@ -4,11 +4,11 @@
 // Qt includes
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QMutexLocker>
 
 // ImtCore includes
 #include <imtgql/CGqlRequest.h>
 #include <imtgql/IGqlContext.h>
+#include <imtauth/TenantEvents.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Tenants.h>
 
 
@@ -39,50 +39,6 @@ void CConnectionCodesNotificationPublisherComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	// Initialize caches so that subsequent OnModelChanged() calls can
-	// detect new entries (those not present in the cache).
-	if (m_connectionRequestManagerCompPtr.IsValid() && m_tenantManagerCompPtr.IsValid()){
-		QMutexLocker locker(&m_cacheMutex);
-
-		// Cache connection requests from collection.
-		if (m_requestCollectionCompPtr.IsValid()){
-			for (const QByteArray& id : m_requestCollectionCompPtr->GetElementIds()){
-				imtbase::IObjectCollection::DataPtr dataPtr;
-				if (m_requestCollectionCompPtr->GetObjectData(id, dataPtr)){
-					const imtauth::ITenantConnectionRequestInfo* reqPtr =
-					dynamic_cast<const imtauth::ITenantConnectionRequestInfo*>(dataPtr.GetPtr());
-					if (reqPtr != nullptr){
-						CachedConnectionRequest entry;
-						entry.sourceTenantId = reqPtr->GetSourceTenantId();
-						entry.targetTenantId = reqPtr->GetTargetTenantId();
-						entry.status = reqPtr->GetStatus();
-						m_cachedRequests.insert(reqPtr->GetRequestId(), entry);
-					}
-				}
-			}
-		}
-
-		// Cache connections from collection.
-		if (m_connectionCollectionCompPtr.IsValid()){
-			for (const QByteArray& id : m_connectionCollectionCompPtr->GetElementIds()){
-				imtbase::IObjectCollection::DataPtr dataPtr;
-				if (m_connectionCollectionCompPtr->GetObjectData(id, dataPtr)){
-					const imtauth::ITenantConnectionInfo* connPtr =
-					dynamic_cast<const imtauth::ITenantConnectionInfo*>(dataPtr.GetPtr());
-					if (connPtr != nullptr){
-						CachedConnection entry;
-						entry.tenantAId = connPtr->GetTenantAId();
-						entry.tenantBId = connPtr->GetTenantBId();
-						entry.status = connPtr->GetStatus();
-						m_cachedConnections.insert(connPtr->GetConnectionId(), entry);
-					}
-				}
-			}
-		}
-
-		m_cachedProposals = ReadProposals();
-	}
-
 	if (m_connectionRequestManagerModelCompPtr.IsValid()){
 		BaseClass2::RegisterModel(m_connectionRequestManagerModelCompPtr.GetPtr(), 0);
 	}
@@ -99,203 +55,67 @@ void CConnectionCodesNotificationPublisherComp::OnComponentDestroyed()
 
 // reimplemented (imod::CMultiModelDispatcherBase)
 
-void CConnectionCodesNotificationPublisherComp::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
+void CConnectionCodesNotificationPublisherComp::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& changeSet)
 {
-	struct PendingNotification
-	{
-		QByteArray targetUserId;
-		sdl::V1_0::imtauth::EConnectionNotificationType notificationType;
-		QByteArray tenantId;
-		QByteArray relatedId;
-	};
+	using NotificationType = sdl::V1_0::imtauth::EConnectionNotificationType;
+	using RequestStatus = imtauth::ITenantConnectionRequestInfo::ConnectionRequestStatus;
+	using ProposalStatus = imtauth::ITenantRelationshipProposalInfo::RelationshipProposalStatus;
 
-	QList<PendingNotification> pendingNotifications;
+	// The manager names each change, so only the organizations it touched are read
+	for (const QVariantMap& event : imtauth::TenantEvent::GetEvents(changeSet)){
+		const QString type = event.value(imtauth::TenantEvent::s_type).toString();
+		const QByteArray sourceTenantId = event.value(imtauth::TenantEvent::s_sourceTenantId).toByteArray();
+		const QByteArray targetTenantId = event.value(imtauth::TenantEvent::s_targetTenantId).toByteArray();
+		const int status = event.value(imtauth::TenantEvent::s_status).toInt();
 
-	{
-		QMutexLocker locker(&m_cacheMutex);
-
-		if (!m_connectionRequestManagerCompPtr.IsValid() || !m_tenantManagerCompPtr.IsValid()){
-			return;
+		if (type == imtauth::TenantEvent::s_connectionRequestCreated){
+			if (status == RequestStatus::CRS_PENDING){
+				PublishNotification(FindTenantOwnerUserId(targetTenantId), NotificationType::ConnectionRequestReceived, targetTenantId,
+							event.value(imtauth::TenantEvent::s_requestId).toByteArray());
+			}
 		}
-
-		// --- Handle connection request changes ---
-		if (m_requestCollectionCompPtr.IsValid()){
-			QMap<QByteArray, CachedConnectionRequest> currentRequests;
-
-			for (const QByteArray& id : m_requestCollectionCompPtr->GetElementIds()){
-				imtbase::IObjectCollection::DataPtr dataPtr;
-				if (m_requestCollectionCompPtr->GetObjectData(id, dataPtr)){
-					const imtauth::ITenantConnectionRequestInfo* reqPtr =
-						dynamic_cast<const imtauth::ITenantConnectionRequestInfo*>(dataPtr.GetPtr());
-					if (reqPtr != nullptr){
-						CachedConnectionRequest entry;
-						entry.sourceTenantId = reqPtr->GetSourceTenantId();
-						entry.targetTenantId = reqPtr->GetTargetTenantId();
-						entry.status = reqPtr->GetStatus();
-						currentRequests.insert(reqPtr->GetRequestId(), entry);
-					}
-				}
+		else if (type == imtauth::TenantEvent::s_connectionRequestStatusChanged){
+			// The answer goes to the organization that asked
+			const QByteArray requestId = event.value(imtauth::TenantEvent::s_requestId).toByteArray();
+			if (status == RequestStatus::CRS_APPROVED){
+				PublishNotification(FindTenantOwnerUserId(sourceTenantId), NotificationType::ConnectionRequestApproved, sourceTenantId, requestId);
 			}
-
-			for (auto it = currentRequests.constBegin(); it != currentRequests.constEnd(); ++it){
-				const QByteArray& requestId = it.key();
-				const CachedConnectionRequest& current = it.value();
-
-				if (!m_cachedRequests.contains(requestId)){
-					if (current.status == imtauth::ITenantConnectionRequestInfo::CRS_PENDING){
-						QByteArray ownerUserId = FindTenantOwnerUserId(current.targetTenantId);
-						if (!ownerUserId.isEmpty()){
-							pendingNotifications.append({
-								ownerUserId,
-								sdl::V1_0::imtauth::EConnectionNotificationType::ConnectionRequestReceived,
-								current.targetTenantId,
-								requestId});
-						}
-					}
-					continue;
-				}
-
-				const CachedConnectionRequest& cached = m_cachedRequests.value(requestId);
-				if (cached.status == current.status){
-					continue;
-				}
-
-				if (current.status == imtauth::ITenantConnectionRequestInfo::CRS_APPROVED){
-					QByteArray ownerUserId = FindTenantOwnerUserId(current.sourceTenantId);
-					if (!ownerUserId.isEmpty()){
-						pendingNotifications.append({
-							ownerUserId,
-							sdl::V1_0::imtauth::EConnectionNotificationType::ConnectionRequestApproved,
-							current.sourceTenantId,
-							requestId});
-					}
-				}
-				else if (current.status == imtauth::ITenantConnectionRequestInfo::CRS_REJECTED){
-					QByteArray ownerUserId = FindTenantOwnerUserId(current.sourceTenantId);
-					if (!ownerUserId.isEmpty()){
-						pendingNotifications.append({
-							ownerUserId,
-							sdl::V1_0::imtauth::EConnectionNotificationType::ConnectionRequestRejected,
-							current.sourceTenantId,
-							requestId});
-					}
-				}
+			else if (status == RequestStatus::CRS_REJECTED){
+				PublishNotification(FindTenantOwnerUserId(sourceTenantId), NotificationType::ConnectionRequestRejected, sourceTenantId, requestId);
 			}
-
-			m_cachedRequests = currentRequests;
 		}
+		else if (type == imtauth::TenantEvent::s_connectionRemoved || type == imtauth::TenantEvent::s_relationshipRemoved){
+			const bool isConnection = type == imtauth::TenantEvent::s_connectionRemoved;
+			const NotificationType notificationType = isConnection ? NotificationType::ConnectionRemoved : NotificationType::RelationshipRemoved;
+			const QByteArray relatedId = event.value(isConnection ? imtauth::TenantEvent::s_connectionId : imtauth::TenantEvent::s_relationshipId).toByteArray();
 
-		// --- Handle connection changes ---
-		if (m_connectionCollectionCompPtr.IsValid()){
-			QMap<QByteArray, CachedConnection> currentConnections;
+			const QByteArray sourceOwnerUserId = FindTenantOwnerUserId(sourceTenantId);
+			PublishNotification(sourceOwnerUserId, notificationType, sourceTenantId, relatedId);
 
-			for (const QByteArray& id : m_connectionCollectionCompPtr->GetElementIds()){
-				imtbase::IObjectCollection::DataPtr dataPtr;
-				if (m_connectionCollectionCompPtr->GetObjectData(id, dataPtr)){
-					const imtauth::ITenantConnectionInfo* connPtr =
-						dynamic_cast<const imtauth::ITenantConnectionInfo*>(dataPtr.GetPtr());
-					if (connPtr != nullptr){
-						CachedConnection entry;
-						entry.tenantAId = connPtr->GetTenantAId();
-						entry.tenantBId = connPtr->GetTenantBId();
-						entry.status = connPtr->GetStatus();
-						currentConnections.insert(connPtr->GetConnectionId(), entry);
-					}
-				}
+			const QByteArray targetOwnerUserId = FindTenantOwnerUserId(targetTenantId);
+			if (targetOwnerUserId != sourceOwnerUserId){
+				PublishNotification(targetOwnerUserId, notificationType, targetTenantId, relatedId);
 			}
-
-			for (auto it = m_cachedConnections.constBegin(); it != m_cachedConnections.constEnd(); ++it){
-				const QByteArray& connectionId = it.key();
-				const CachedConnection& cached = it.value();
-
-				const bool removed = !currentConnections.contains(connectionId)
-					|| currentConnections.value(connectionId).status == imtauth::ITenantConnectionInfo::CS_REMOVED;
-				if (!removed || cached.status != imtauth::ITenantConnectionInfo::CS_ACTIVE){
-					continue;
-				}
-
-				QByteArray ownerAUserId = FindTenantOwnerUserId(cached.tenantAId);
-				if (!ownerAUserId.isEmpty()){
-					pendingNotifications.append({
-						ownerAUserId,
-						sdl::V1_0::imtauth::EConnectionNotificationType::ConnectionRemoved,
-						cached.tenantAId,
-						connectionId});
-				}
-
-				QByteArray ownerBUserId = FindTenantOwnerUserId(cached.tenantBId);
-				if (!ownerBUserId.isEmpty() && ownerBUserId != ownerAUserId){
-					pendingNotifications.append({
-						ownerBUserId,
-						sdl::V1_0::imtauth::EConnectionNotificationType::ConnectionRemoved,
-						cached.tenantBId,
-						connectionId});
-				}
-			}
-
-			m_cachedConnections = currentConnections;
 		}
-
-		// --- Handle relationship proposal changes ---
-		{
-			using ProposalStatus = imtauth::ITenantRelationshipProposalInfo::RelationshipProposalStatus;
-			using NotificationType = sdl::V1_0::imtauth::EConnectionNotificationType;
-
-			const QMap<QByteArray, CachedRelationshipProposal> currentProposals = ReadProposals();
-
-			for (auto it = currentProposals.constBegin(); it != currentProposals.constEnd(); ++it){
-				const QByteArray& proposalId = it.key();
-				const CachedRelationshipProposal& current = it.value();
-
-				if (!m_cachedProposals.contains(proposalId)){
-					pendingNotifications.append({
-						FindTenantOwnerUserId(current.counterpartyTenantId),
-						NotificationType::RelationshipProposalReceived,
-						current.counterpartyTenantId,
-						proposalId});
-					continue;
-				}
-
-				const ProposalStatus previousStatus = m_cachedProposals.value(proposalId).status;
-				if (previousStatus == current.status){
-					continue;
-				}
-
-				// The answer goes to the party that is waiting for it.
-				if (current.status == ProposalStatus::RPS_REJECTED){
-					pendingNotifications.append({
-						FindTenantOwnerUserId(current.initiatorTenantId),
-						NotificationType::RelationshipProposalRejected,
-						current.initiatorTenantId,
-						proposalId});
-				}
-				else if (current.status == ProposalStatus::RPS_APPROVED_BY_COUNTERPARTY
-							|| (current.status == ProposalStatus::RPS_APPLIED && previousStatus != ProposalStatus::RPS_APPROVED_BY_COUNTERPARTY)){
-					pendingNotifications.append({
-						FindTenantOwnerUserId(current.initiatorTenantId),
-						NotificationType::RelationshipProposalApproved,
-						current.initiatorTenantId,
-						proposalId});
-				}
-				else if (current.status == ProposalStatus::RPS_APPLIED){
-					pendingNotifications.append({
-						FindTenantOwnerUserId(current.counterpartyTenantId),
-						NotificationType::RelationshipProposalApproved,
-						current.counterpartyTenantId,
-						proposalId});
-				}
-			}
-
-			m_cachedProposals = currentProposals;
+		else if (type == imtauth::TenantEvent::s_proposalCreated){
+			PublishNotification(FindTenantOwnerUserId(targetTenantId), NotificationType::RelationshipProposalReceived, targetTenantId,
+						event.value(imtauth::TenantEvent::s_proposalId).toByteArray());
 		}
-	}
-
-	for (const PendingNotification& notification : std::as_const(pendingNotifications)){
-		PublishNotification(
-			notification.targetUserId,
-			notification.notificationType,
-			notification.tenantId,
-			notification.relatedId);
+		else if (type == imtauth::TenantEvent::s_proposalStatusChanged){
+			// The answer goes to the party that is waiting for it
+			const QByteArray proposalId = event.value(imtauth::TenantEvent::s_proposalId).toByteArray();
+			const int previousStatus = event.value(imtauth::TenantEvent::s_previousStatus).toInt();
+			if (status == ProposalStatus::RPS_REJECTED){
+				PublishNotification(FindTenantOwnerUserId(sourceTenantId), NotificationType::RelationshipProposalRejected, sourceTenantId, proposalId);
+			}
+			else if (status == ProposalStatus::RPS_APPROVED_BY_COUNTERPARTY
+						|| (status == ProposalStatus::RPS_APPLIED && previousStatus != ProposalStatus::RPS_APPROVED_BY_COUNTERPARTY)){
+				PublishNotification(FindTenantOwnerUserId(sourceTenantId), NotificationType::RelationshipProposalApproved, sourceTenantId, proposalId);
+			}
+			else if (status == ProposalStatus::RPS_APPLIED){
+				PublishNotification(FindTenantOwnerUserId(targetTenantId), NotificationType::RelationshipProposalApproved, targetTenantId, proposalId);
+			}
+		}
 	}
 }
 
@@ -331,6 +151,9 @@ void CConnectionCodesNotificationPublisherComp::PublishNotification(
 		case sdl::V1_0::imtauth::EConnectionNotificationType::RelationshipProposalRejected:
 			notification.proposalId = relatedId;
 			break;
+		case sdl::V1_0::imtauth::EConnectionNotificationType::RelationshipRemoved:
+			notification.relationshipId = relatedId;
+			break;
 	}
 
 	QJsonObject jsonObject;
@@ -356,35 +179,6 @@ void CConnectionCodesNotificationPublisherComp::PublishNotification(
 		}
 		return false;
 	});
-}
-
-
-QMap<QByteArray, CConnectionCodesNotificationPublisherComp::CachedRelationshipProposal> CConnectionCodesNotificationPublisherComp::ReadProposals() const
-{
-	QMap<QByteArray, CachedRelationshipProposal> proposals;
-	if (!m_connectionRequestManagerCompPtr.IsValid() || !m_tenantManagerCompPtr.IsValid()){
-		return proposals;
-	}
-
-	for (const QByteArray& tenantId : m_tenantManagerCompPtr->GetTenantIds()){
-		for (const QByteArray& proposalId : m_connectionRequestManagerCompPtr->GetRelationshipProposalIds(tenantId)){
-			if (proposals.contains(proposalId)){
-				continue;
-			}
-
-			imtauth::ITenantRelationshipProposalInfoUniquePtr proposalPtr = m_connectionRequestManagerCompPtr->GetRelationshipProposal(proposalId);
-			if (proposalPtr.IsValid()){
-				CachedRelationshipProposal entry;
-				entry.initiatorTenantId = proposalPtr->GetInitiatorTenantId();
-				entry.counterpartyTenantId = proposalPtr->GetCounterpartyTenantId();
-				entry.connectionId = proposalPtr->GetConnectionId();
-				entry.status = proposalPtr->GetStatus();
-				proposals.insert(proposalId, entry);
-			}
-		}
-	}
-
-	return proposals;
 }
 
 

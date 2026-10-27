@@ -62,6 +62,31 @@ ViewBase {
 		connectPage.updateGui()
 	}
 
+	// Notifications come in bursts and while the page is hidden: one reading when it is shown serves them all
+	property bool __updatePending: false
+
+	function __updateWhenVisible() {
+		if (connectPage.visible)
+			notificationUpdateTimer.restart()
+		else
+			connectPage.__updatePending = true
+	}
+
+	onVisibleChanged: {
+		if (connectPage.visible && connectPage.__updatePending) {
+			connectPage.__updatePending = false
+			notificationUpdateTimer.restart()
+		}
+	}
+
+	Timer {
+		id: notificationUpdateTimer
+		interval: 100
+		onTriggered: {
+			connectPage.updateGui()
+		}
+	}
+
 	Connections {
 		target: connectPage.apiClient
 
@@ -71,7 +96,7 @@ ViewBase {
 			codeInput.text = ""
 			messageInput.text = ""
 			PopupManager.addSuccessMessage(qsTr("Connection request sent successfully"), true)
-			connectPage.updateGui()
+			notificationUpdateTimer.restart()
 		}
 
 		function onConnectionRequestError(errorMessage) {
@@ -117,7 +142,7 @@ ViewBase {
 			connectPage.processingRequestId = ""
 			connectPage.processingRequestAction = ""
 			PopupManager.addSuccessMessage(qsTr("Connection request approved"), true)
-			connectPage.updateGui()
+			notificationUpdateTimer.restart()
 		}
 
 		function onConnectionRequestRejected() {
@@ -125,7 +150,7 @@ ViewBase {
 			connectPage.processingRequestId = ""
 			connectPage.processingRequestAction = ""
 			PopupManager.addSuccessMessage(qsTr("Connection request rejected"), true)
-			connectPage.updateGui()
+			notificationUpdateTimer.restart()
 		}
 
 		function onConnectionRequestCanceled() {
@@ -133,16 +158,25 @@ ViewBase {
 			connectPage.processingRequestId = ""
 			connectPage.processingRequestAction = ""
 			PopupManager.addSuccessMessage(qsTr("Connection request canceled"), true)
-			connectPage.updateGui()
+			notificationUpdateTimer.restart()
 		}
 
 		function onConnectionsReceived() {
 			connectPage.refreshConnectionsList()
 		}
 
+		function onSubscriptionConnectionCodesChanged(notification) {
+			connectPage.__updateWhenVisible()
+		}
+
+		function onSubscriptionsResumed() {
+			connectPage.__updateWhenVisible()
+		}
+
 		function onConnectionRemoved(connectionId) {
-			PopupManager.addSuccessMessage(qsTr("Connection removed"), true)
-			connectPage.updateGui()
+			// Keyed by the connection, as the notification of the same removal: one message for both
+			PopupManager.addSuccessMessage(qsTr("Connection removed"), true, "connection-removed-" + connectionId)
+			notificationUpdateTimer.restart()
 		}
 	}
 
@@ -402,7 +436,7 @@ ViewBase {
 				visible: connectPage.__canViewConnections && requestsTable.elementsCount > 0
 				width: parent.width
 				height: requestsTable.contentHeight + requestsTable.headerHeight
-				canMoveColumns: false
+				canMoveColumns: true
 				selectable: false
 			}
 
@@ -429,7 +463,7 @@ ViewBase {
 				visible: connectPage.__canViewConnections && sentRequestsTable.elementsCount > 0
 				width: parent.width
 				height: sentRequestsTable.contentHeight + sentRequestsTable.headerHeight
-				canMoveColumns: false
+				canMoveColumns: true
 				selectable: false
 			}
 
@@ -463,7 +497,7 @@ ViewBase {
 				visible: connectPage.__canViewConnections && connectionsTable.elementsCount > 0
 				width: parent.width
 				height: connectionsTable.contentHeight + connectionsTable.headerHeight
-				canMoveColumns: false
+				canMoveColumns: true
 				selectable: false
 			}
 		}

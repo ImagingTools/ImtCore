@@ -96,29 +96,29 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 	// the dozens fired right after a tenant switch: subscriptions re-registering,
 	// per-open-document queries, page reload) each re-triggered their own
 	// uncached GetTenant() round-trip - the exact flood seen after SelectTenant.
-	bool hasOrganizationAccess = false;
+	TokenTenantData tenantData;
 	if (!resolvedUserId.isEmpty()){
-		bool isTenantOwner = false;
-		QByteArrayList tenantPermissions;
-		if (!TryGetCachedTenantData(token, isTenantOwner, tenantPermissions, hasOrganizationAccess)){
+		if (!TryGetCachedTenantData(token, tenantData)){
 			bool isCreator = false;
 			if (m_tenantManagerCompPtr.IsValid() && !tenantId.isEmpty()){
 				imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
 				if (tenantPtr.IsValid()){
-					isTenantOwner = tenantPtr->GetOwnerId() == resolvedUserId;
+					tenantData.isTenantOwner = tenantPtr->GetOwnerId() == resolvedUserId;
 					isCreator = tenantPtr->GetCreatorId() == resolvedUserId;
-					tenantPermissions = tenantPtr->GetTenantPermissions();
+					tenantData.tenantPermissions = tenantPtr->GetTenantPermissions();
 				}
 			}
-			hasOrganizationAccess = HasOrganizationAccess(resolvedUserId, tenantId, isTenantOwner || isCreator);
-			StoreCachedTenantData(token, isTenantOwner, tenantPermissions, hasOrganizationAccess);
+			tenantData.hasOrganizationAccess = HasOrganizationAccess(resolvedUserId, tenantId, tenantData.isTenantOwner || isCreator);
+			tenantData.organizationPermissions = GetOrganizationPermissions(resolvedUserId, tenantId, tenantData.isTenantOwner || isCreator);
+			StoreCachedTenantData(token, tenantData);
 		}
 
-		if (isTenantOwner){
+		if (tenantData.isTenantOwner){
 			gqlContextPtr->SetIsTenantOwner(true);
 		}
 
-		gqlContextPtr->SetTenantPermissions(tenantPermissions);
+		gqlContextPtr->SetTenantPermissions(tenantData.tenantPermissions);
+		gqlContextPtr->SetOrganizationPermissions(tenantData.organizationPermissions);
 	}
 
 	if (m_userCollectionCompPtr.IsValid() && !resolvedUserId.isEmpty()){
@@ -133,6 +133,16 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 		// A failed read is denied too: a remote user service refuses a disabled user's requests.
 		if (userInfoPtr == nullptr || !userInfoPtr->IsEnabled()){
 			imtgql::CGqlRequestContextManager::Clear();
+
+			// A token resolved from the cache may belong to a session closed meanwhile (a tenant switch, a logout):
+			// the remote read is refused for that reason, and the client has to refresh rather than sign out.
+			if (userInfoPtr == nullptr && !isPat && m_slaveJwtSessionControllerCompPtr.IsValid()
+						&& m_slaveJwtSessionControllerCompPtr->ValidateJwt(token) == imtauth::IJwtSessionController::JS_EXPIRED){
+				InvalidateTokenCache(token);
+				SetError(error, imtgql::IGqlContextCreator::CCS_UNAUTHORIZED, QStringLiteral("The session of the token is closed."));
+				return nullptr;
+			}
+
 			SetError(
 						error,
 						imtgql::IGqlContextCreator::CCS_FORBIDDEN,
@@ -181,7 +191,7 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 			// The owner of the organization holds its whole permission scope, so the pages, commands and headers built from the permissions show all of it
 			imtauth::IUserInfo::FeatureIds grantedPermissions = imtgql::CollectTenantOwnerPermissions(*gqlContextPtr);
 			// Outside of any organization a user allowed to create one sees them too
-			if (hasOrganizationAccess || (tenantId.isEmpty() && imtauth::HasPermission(userInfoPtr->GetPermissions(productId), imtauth::s_addOrganizationPermission, false))){
+			if (tenantData.hasOrganizationAccess || (tenantId.isEmpty() && imtauth::HasPermission(userInfoPtr->GetPermissions(productId), imtauth::s_addOrganizationPermission, false))){
 				grantedPermissions += imtauth::GetOrganizationAccessPermissions();
 			}
 
@@ -523,6 +533,26 @@ bool CAuthenticationManagerComp::HasOrganizationAccess(const QByteArray& userId,
 	}
 
 	return false;
+}
+
+
+QByteArrayList CAuthenticationManagerComp::GetOrganizationPermissions(const QByteArray& userId, const QByteArray& tenantId, bool isOwnerOrCreator) const
+{
+	if (tenantId.isEmpty()){
+		return QByteArrayList();
+	}
+
+	if (isOwnerOrCreator){
+		return {imtauth::s_organizationManagementPermission};
+	}
+
+	if (!m_membershipManagerCompPtr.IsValid()){
+		return QByteArrayList();
+	}
+
+	imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->FindMembership(userId, tenantId);
+
+	return membershipPtr.IsValid() && membershipPtr->IsActive() ? membershipPtr->GetOrganizationPermissions() : QByteArrayList();
 }
 
 
@@ -916,7 +946,7 @@ void CAuthenticationManagerComp::InvalidateSessionTokenCache(const QByteArray& s
 }
 
 
-bool CAuthenticationManagerComp::TryGetCachedTenantData(const QByteArray& token, bool& isTenantOwner, QByteArrayList& tenantPermissions, bool& hasOrganizationAccess) const
+bool CAuthenticationManagerComp::TryGetCachedTenantData(const QByteArray& token, TokenTenantData& tenantData) const
 {
 	const qint64 ttlMs = m_tenantDataCacheTtlAttrPtr.IsValid() ? (static_cast<qint64>(*m_tenantDataCacheTtlAttrPtr) * 1000) : (10 * 1000);
 
@@ -926,14 +956,12 @@ bool CAuthenticationManagerComp::TryGetCachedTenantData(const QByteArray& token,
 		return false;
 	}
 
-	isTenantOwner = iter->isTenantOwner;
-	tenantPermissions = iter->tenantPermissions;
-	hasOrganizationAccess = iter->hasOrganizationAccess;
+	tenantData = iter->tenantData;
 	return true;
 }
 
 
-void CAuthenticationManagerComp::StoreCachedTenantData(const QByteArray& token, bool isTenantOwner, const QByteArrayList& tenantPermissions, bool hasOrganizationAccess) const
+void CAuthenticationManagerComp::StoreCachedTenantData(const QByteArray& token, const TokenTenantData& tenantData) const
 {
 	QMutexLocker cacheLocker(&m_tokenCacheMutex);
 	auto iter = m_tokenCache.find(token);
@@ -945,9 +973,7 @@ void CAuthenticationManagerComp::StoreCachedTenantData(const QByteArray& token, 
 		return;
 	}
 
-	iter->isTenantOwner = isTenantOwner;
-	iter->tenantPermissions = tenantPermissions;
-	iter->hasOrganizationAccess = hasOrganizationAccess;
+	iter->tenantData = tenantData;
 	iter->tenantDataResolvedAt = QDateTime::currentMSecsSinceEpoch();
 }
 

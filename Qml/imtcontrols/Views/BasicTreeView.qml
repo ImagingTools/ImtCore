@@ -94,6 +94,8 @@ Item {
     property bool   tristate: false
 
     property string filterText: ""
+    // Nodes a check reaches while the filter is set, see __buildFilteredVisible()
+    property var __checkParticipants: ({})
     property var    filterRole: []
     property int    filterDebounceMs: 300
 
@@ -1142,6 +1144,22 @@ Item {
                 matchMap[k] = true
         }
 
+        // A check under the filter reaches what matches it, also below a collapsed node, and the whole of a matching node
+        var participants = {}
+        var descendStack = []
+        for (var dk in matchMap) {
+            descendStack.push(dk)
+        }
+        while (descendStack.length > 0) {
+            var pk = descendStack.pop()
+            if (participants[pk]) continue
+            participants[pk] = true
+            var pn = __nodes[pk]
+            if (!pn) continue
+            for (var pc = 0; pc < pn.childrenKeys.length; ++pc)
+                descendStack.push(pn.childrenKeys[pc])
+        }
+
         // Propagate upwards from matches (only ancestors of matches get included)
         // Much faster than full post-order when filter is narrow (common case)
         var toPropagate = []
@@ -1158,6 +1176,11 @@ Item {
                 toPropagate.push(pkey)
             }
         }
+
+        for (var ak2 in matchMap) {
+            participants[ak2] = true
+        }
+        __checkParticipants = participants
 
         // When filter just changed, auto-expand ancestors of matches (same as before)
         if (autoExpand) {
@@ -1893,9 +1916,9 @@ Item {
         var changed = ({})
         var any = false
         var isFiltered = filterText.trim().length > 0
-        var keysToProcess = isFiltered ? __visibleKeys : []
-        if (!isFiltered) {
-            for (var k in __nodes)
+        var keysToProcess = []
+        for (var k in __nodes) {
+            if (!isFiltered || __checkParticipants[k])
                 keysToProcess.push(k)
         }
         for (var ii = 0; ii < keysToProcess.length; ++ii) {
@@ -1971,7 +1994,7 @@ Item {
                 var ck = n.childrenKeys[i]
                 var c = __nodes[ck]
                 if (c) {
-                    if (isFiltered && __visibleRowsByKey[ck] === undefined)
+                    if (isFiltered && !__checkParticipants[ck])
                         continue
                     stack.push(c)
                 }
@@ -1993,7 +2016,7 @@ Item {
                 var ck = prnt.childrenKeys[i]
                 var child = __nodes[ck]
                 if (!__shouldParticipateInCheck(child)) continue
-                if (isFiltered && __visibleRowsByKey[ck] === undefined)
+                if (isFiltered && !__checkParticipants[ck])
                     continue
                 hasParticipating = true
                 if (child.checked !== Qt.Checked)   allChecked = false

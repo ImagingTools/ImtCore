@@ -134,7 +134,8 @@ QtObject {
 				return
 			}
 
-			if (typeOperation === EDocumentOperationEnum.s_documentChanged){
+			// A document being closed is not read again
+			if (typeOperation === EDocumentOperationEnum.s_documentChanged && !root.documentManager.documentIsClosing(documentId)){
 				root.updateRepresentationForAllViews()
 			}
 

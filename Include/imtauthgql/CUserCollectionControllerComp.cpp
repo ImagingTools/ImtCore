@@ -14,6 +14,7 @@
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Users.h>
 #include <imtbase/CComplexCollectionFilter.h>
+#include <imtauth/CollectionSelection.h>
 #include <imtauth/CUserInfo.h>
 #include <imtgql/IGqlContext.h>
 #include <imtauth/ITenantManager.h>
@@ -829,10 +830,21 @@ bool CUserCollectionControllerComp::OnBeforeRemoveElements(const QByteArrayList&
 {
 	if (m_tenantManagerCompPtr.IsValid()){
 		for (const QByteArray& userId : elementIds){
-			QByteArrayList tenantIds = m_tenantManagerCompPtr->GetTenantIds();
+			// An organization that cannot be read may be owned by the user: it would be left with a removed owner
+			bool isRead = false;
+			const QByteArrayList tenantIds = m_tenantManagerCompPtr->GetOwnedOrCreatedTenantIds(userId, &isRead);
+			if (!isRead){
+				errorMessage = QStringLiteral("The organizations of user '%1' could not be read. Try again.").arg(QString::fromUtf8(userId));
+				return false;
+			}
+
 			for (const QByteArray& tenantId : tenantIds){
 				imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
-				if (tenantPtr.IsValid() && tenantPtr->GetOwnerId() == userId){
+				if (!tenantPtr.IsValid()){
+					errorMessage = QStringLiteral("The organizations of user '%1' could not be read. Try again.").arg(QString::fromUtf8(userId));
+					return false;
+				}
+				if (tenantPtr->GetOwnerId() == userId){
 					errorMessage = QStringLiteral("Cannot delete user '%1' who owns tenant '%2'. Transfer ownership first.")
 						.arg(QString::fromUtf8(userId), QString::fromUtf8(tenantId));
 					return false;
@@ -840,19 +852,62 @@ bool CUserCollectionControllerComp::OnBeforeRemoveElements(const QByteArrayList&
 			}
 		}
 	}
-	return BaseClass::OnBeforeRemoveElements(elementIds, gqlRequest, errorMessage);
+
+	if (!BaseClass::OnBeforeRemoveElements(elementIds, gqlRequest, errorMessage)){
+		return false;
+	}
+
+	// The invitations the user sent go before the user, after every check: an invitation is accepted without a look at its inviter.
+	// All users are read before anything is removed, so a failed read leaves every user as it was.
+	if (m_invitationCollectionCompPtr.IsValid()){
+		QByteArrayList sentIds;
+		for (const QByteArray& userId : elementIds){
+			bool isRead = false;
+			for (const QByteArray& invitationId : imtauth::CollectionSelection::SelectIds(
+						*m_invitationCollectionCompPtr, imtauth::CollectionSelection::ColumnEquals("InvitedByUserId", userId), QByteArrayList(), &isRead)){
+				imtbase::IObjectCollection::DataPtr dataPtr;
+				const imtauth::ITenantInvitation* invitationPtr = m_invitationCollectionCompPtr->GetObjectData(invitationId, dataPtr)
+							? dynamic_cast<const imtauth::ITenantInvitation*>(dataPtr.GetPtr())
+							: nullptr;
+				if (invitationPtr == nullptr){
+					isRead = false;
+				}
+				else if (invitationPtr->GetInvitedByUserId() == userId){
+					sentIds.append(invitationId);
+				}
+			}
+
+			if (!isRead){
+				errorMessage = QStringLiteral("The invitations user '%1' sent could not be read. Try again.").arg(QString::fromUtf8(userId));
+				return false;
+			}
+		}
+
+		if (!sentIds.isEmpty() && !m_invitationCollectionCompPtr->RemoveElements(sentIds)){
+			errorMessage = QStringLiteral("The invitations the users sent could not be removed. Try again.");
+			return false;
+		}
+	}
+
+	return true;
 }
 
 void CUserCollectionControllerComp::OnAfterRemoveElements(const QByteArrayList& elementIds, const ::imtgql::CGqlRequest& gqlRequest) const
 {
+	// What is left of a removed user grants nothing: a session or token is accepted only for an existing user, and the invitations
+	// the user sent were removed before; still a leftover must not go unnoticed
+	const auto reportLeftover = [this](const QByteArray& userId, const QString& leftover){
+		SendErrorMessage(0, QStringLiteral("The %1 of the removed user '%2' could not be removed").arg(leftover, QString::fromUtf8(userId)), "CUserCollectionControllerComp");
+	};
+
 	for (const QByteArray& userId : elementIds){
 		// 1. Clean TenantMemberships directly (bypasses owner protection; owner deletes are blocked in OnBefore)
 		QByteArrayList memIds;
 		if (m_membershipManagerCompPtr.IsValid()){
 			memIds = m_membershipManagerCompPtr->GetMembershipsByUser(userId);
 		}
-		if (m_membershipCollectionCompPtr.IsValid() && !memIds.isEmpty()){
-			m_membershipCollectionCompPtr->RemoveElements(memIds);
+		if (m_membershipCollectionCompPtr.IsValid() && !memIds.isEmpty() && !m_membershipCollectionCompPtr->RemoveElements(memIds)){
+			reportLeftover(userId, QStringLiteral("memberships"));
 		}
 
 		// 2. Force-clean any remaining TenantEntityBindings for this user (e.g. non-mem cases)
@@ -862,9 +917,12 @@ void CUserCollectionControllerComp::OnAfterRemoveElements(const QByteArrayList& 
 
 		// 3. Clean TenantInvitations where user is involved (as target, inviter or revoker)
 		if (m_invitationCollectionCompPtr.IsValid()){
-			QByteArrayList all = m_invitationCollectionCompPtr->GetElementIds();
+			imtauth::CollectionSelection::FilterExpression involvedExpression =
+						imtauth::CollectionSelection::AnyColumnEquals("UserId", "InvitedByUserId", userId);
+			involvedExpression.fieldFilters << imtauth::CollectionSelection::FieldFilter("RevokedByUserId", QString::fromUtf8(userId));
+
 			QByteArrayList toRemove;
-			for (const QByteArray& iid : all){
+			for (const QByteArray& iid : imtauth::CollectionSelection::SelectIds(*m_invitationCollectionCompPtr, involvedExpression)){
 				imtbase::IObjectCollection::DataPtr dptr;
 				if (m_invitationCollectionCompPtr->GetObjectData(iid, dptr)){
 					const imtauth::ITenantInvitation* inv = dynamic_cast<const imtauth::ITenantInvitation*>(dptr.GetPtr());
@@ -876,8 +934,8 @@ void CUserCollectionControllerComp::OnAfterRemoveElements(const QByteArrayList& 
 					}
 				}
 			}
-			if (!toRemove.isEmpty()){
-				m_invitationCollectionCompPtr->RemoveElements(toRemove);
+			if (!toRemove.isEmpty() && !m_invitationCollectionCompPtr->RemoveElements(toRemove)){
+				reportLeftover(userId, QStringLiteral("invitations"));
 			}
 		}
 
@@ -885,15 +943,17 @@ void CUserCollectionControllerComp::OnAfterRemoveElements(const QByteArrayList& 
 		if (m_personalAccessTokenManagerCompPtr.IsValid()){
 			QByteArrayList tids = m_personalAccessTokenManagerCompPtr->GetTokenIds(userId);
 			for (const QByteArray& tid : tids){
-				m_personalAccessTokenManagerCompPtr->DeleteToken(tid);
+				if (!m_personalAccessTokenManagerCompPtr->DeleteToken(tid)){
+					reportLeftover(userId, QStringLiteral("access token '%1'").arg(QString::fromUtf8(tid)));
+				}
 			}
 		}
 
 		// 5. Clean UserSessions for the user
 		if (m_sessionCollectionCompPtr.IsValid()){
-			QByteArrayList all = m_sessionCollectionCompPtr->GetElementIds();
 			QByteArrayList toRemove;
-			for (const QByteArray& sid : all){
+			const imtauth::CollectionSelection::FilterExpression userExpression = imtauth::CollectionSelection::ColumnEquals("UserId", userId);
+			for (const QByteArray& sid : imtauth::CollectionSelection::SelectIds(*m_sessionCollectionCompPtr, userExpression, {"UserId"})){
 				imtbase::IObjectCollection::DataPtr dptr;
 				if (m_sessionCollectionCompPtr->GetObjectData(sid, dptr)){
 					const imtauth::ISession* sess = dynamic_cast<const imtauth::ISession*>(dptr.GetPtr());
@@ -902,8 +962,8 @@ void CUserCollectionControllerComp::OnAfterRemoveElements(const QByteArrayList& 
 					}
 				}
 			}
-			if (!toRemove.isEmpty()){
-				m_sessionCollectionCompPtr->RemoveElements(toRemove);
+			if (!toRemove.isEmpty() && !m_sessionCollectionCompPtr->RemoveElements(toRemove)){
+				reportLeftover(userId, QStringLiteral("sessions"));
 			}
 		}
 	}
@@ -961,6 +1021,23 @@ void CUserCollectionControllerComp::SetAdditionalFilters(
 		// No active members: force an empty result instead of falling through to "no filter".
 		filterExpr.fieldFilters << imtbase::IComplexCollectionFilter::FieldFilter(
 					"DocumentId", QVariant(QString()), imtbase::IComplexCollectionFilter::FO_EQUAL);
+	}
+
+	// The restriction joins the filter of the request, which keeps its other settings (e.g. the sorting)
+	imtbase::IComplexCollectionFilter* requestFilterPtr = dynamic_cast<imtbase::IComplexCollectionFilter*>(filterParamsPtr->GetEditableParameter("ComplexFilter"));
+	if (requestFilterPtr != nullptr){
+		const imtbase::IComplexCollectionFilter::FilterExpression requestExpr = requestFilterPtr->GetFilterExpression();
+		if (requestExpr.fieldFilters.isEmpty() && requestExpr.filterExpressions.isEmpty()){
+			requestFilterPtr->SetFilterExpression(filterExpr);
+		}
+		else{
+			imtbase::IComplexCollectionFilter::FilterExpression combinedExpr;
+			combinedExpr.logicalOperation = imtbase::IComplexCollectionFilter::LO_AND;
+			combinedExpr.filterExpressions << requestExpr << filterExpr;
+			requestFilterPtr->SetFilterExpression(combinedExpr);
+		}
+
+		return;
 	}
 
 	imtbase::CComplexCollectionFilter* complexFilterPtr = new imtbase::CComplexCollectionFilter();

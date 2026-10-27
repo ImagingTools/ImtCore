@@ -35,6 +35,14 @@ protected:
 				const imtgql::CGqlParamObject& viewParamsGql,
 				iprm::CParamsSet* filterParamsPtr) const override;
 
+	// reimplemented (imtservergql::CObjectCollectionControllerCompBase)
+	virtual bool OnBeforeRemoveElements(const QByteArrayList& elementIds, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual bool CheckObjectAccess(
+				const imtgql::CGqlRequest& gqlRequest,
+				const QByteArrayList& objectIds,
+				imtauth::IDocumentShareInfo::AccessLevel accessLevel,
+				QString& errorMessage) const override;
+
 private:
 	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);
 	I_REF(imtauth::ITenantInvitationManager, m_invitationManagerCompPtr);

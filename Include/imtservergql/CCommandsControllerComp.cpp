@@ -71,8 +71,8 @@ sdl::V1_0::imtbase::CGuiElementContainer CCommandsControllerComp::OnGetCommands(
 		typeId = *arguments.input->typeId;
 	}
 
-	imtauth::IUserInfo::FeatureIds userPermissions;
-	bool isAdmin = false;
+	ElementAccess access;
+	access.permissionPath = GetPermissionPath(gqlRequest);
 	QByteArray languageId;
 	const imtgql::IGqlContext* gqlContextPtr = getCommandsRequest.GetRequestContext();
 	if (gqlContextPtr !=  nullptr){
@@ -80,18 +80,20 @@ sdl::V1_0::imtbase::CGuiElementContainer CCommandsControllerComp::OnGetCommands(
 
 		const imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
 		if (userInfoPtr != nullptr){
-			isAdmin = userInfoPtr->IsAdmin();
+			access.isAdmin = userInfoPtr->IsAdmin();
 		}
 
-		if (!isAdmin){
+		if (!access.isAdmin){
 			// Resolved once for the whole command tree: every element below is
 			// checked against it, and what those permissions require is the
 			// same for all of them.
-			userPermissions = GetUserPermissions(*gqlContextPtr);
+			access.userPermissions = GetUserPermissions(*gqlContextPtr);
+			access.isInOrganization = !gqlContextPtr->GetTenantId().isEmpty();
+			access.organizationPermissions = gqlContextPtr->GetOrganizationPermissions();
 		}
 	}
 
-	if (!GetRepresentationFromGuiElementContainer(*m_guiElementContainerCompPtr, response, languageId, userPermissions, isAdmin, GetPermissionPath(gqlRequest))){
+	if (!GetRepresentationFromGuiElementContainer(*m_guiElementContainerCompPtr, response, languageId, access)){
 		errorMessage = QStringLiteral("Unable to get commands for type-ID '%1'. Error: Get representation failed").arg(typeId);
 		SendErrorMessage(0, errorMessage, "CCommandsControllerComp");
 		return sdl::V1_0::imtbase::CGuiElementContainer();
@@ -113,9 +115,7 @@ bool CCommandsControllerComp::GetRepresentationFromGuiElementContainer(
 			const imtserverapp::IGuiElementContainer& guiElementContainer,
 			sdl::V1_0::imtbase::CGuiElementContainer& representation,
 			const QByteArray& languageId,
-			const imtauth::IUserInfo::FeatureIds& userPermissions,
-			bool isAdmin,
-			const QByteArray& permissionPath) const
+			const ElementAccess& access) const
 {
 	QByteArrayList elementIds = guiElementContainer.GetElementIds();
 	
@@ -128,9 +128,11 @@ bool CCommandsControllerComp::GetRepresentationFromGuiElementContainer(
 					m_commandPermissionsCompPtr.GetPtr(),
 					m_checkPermissionCompPtr.GetPtr(),
 					elementId,
-					userPermissions,
-					isAdmin,
-					permissionPath)){
+					access.userPermissions,
+					access.isAdmin,
+					access.permissionPath,
+					access.isInOrganization,
+					access.organizationPermissions)){
 				continue;
 			}
 			
@@ -142,7 +144,7 @@ bool CCommandsControllerComp::GetRepresentationFromGuiElementContainer(
 			const imtserverapp::IGuiElementContainer* subElementContainerPtr = guiElementPtr->GetSubElements();
 			if (subElementContainerPtr != nullptr){
 				sdl::V1_0::imtbase::CGuiElementContainer subElements;
-				if (!GetRepresentationFromGuiElementContainer(*subElementContainerPtr, subElements, languageId, userPermissions, isAdmin, permissionPath)){
+				if (!GetRepresentationFromGuiElementContainer(*subElementContainerPtr, subElements, languageId, access)){
 					return false;
 				}
 				

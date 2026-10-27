@@ -9,6 +9,9 @@
 // ACF includes
 #include <istd/CChangeNotifier.h>
 
+// ImtCore includes
+#include <imtauth/CollectionSelection.h>
+
 
 namespace imtauth
 {
@@ -133,14 +136,15 @@ ContractInfo CContractManagerComp::GetContract(const QByteArray& contractId) con
 }
 
 
-Contracts CContractManagerComp::CollectContracts(const std::function<bool(const ContractInfo&)>& predicate) const
+Contracts CContractManagerComp::CollectContracts(const QByteArray& columnId, const QByteArray& value, const std::function<bool(const ContractInfo&)>& predicate) const
 {
 	Contracts result;
 	if (!m_contractCollectionCompPtr.IsValid()){
 		return result;
 	}
 
-	for (const QByteArray& id : m_contractCollectionCompPtr->GetElementIds()){
+	// A collection that does not know the filter returns every id, the predicate still decides
+	for (const QByteArray& id : CollectionSelection::SelectIds(*m_contractCollectionCompPtr, CollectionSelection::ColumnEquals(columnId, value))){
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (m_contractCollectionCompPtr->GetObjectData(id, dataPtr)){
 			const IContractData* contractPtr = dynamic_cast<const IContractData*>(dataPtr.GetPtr());
@@ -159,7 +163,7 @@ Contracts CContractManagerComp::CollectContracts(const std::function<bool(const 
 
 Contracts CContractManagerComp::GetContractsBySourceTenant(const QByteArray& sourceTenantId) const
 {
-	return CollectContracts([&sourceTenantId](const ContractInfo& info){
+	return CollectContracts("SourceTenantId", sourceTenantId, [&sourceTenantId](const ContractInfo& info){
 		return info.sourceTenantId == sourceTenantId;
 	});
 }
@@ -167,7 +171,7 @@ Contracts CContractManagerComp::GetContractsBySourceTenant(const QByteArray& sou
 
 Contracts CContractManagerComp::GetContractsByTargetTenant(const QByteArray& targetTenantId) const
 {
-	return CollectContracts([&targetTenantId](const ContractInfo& info){
+	return CollectContracts("TargetTenantId", targetTenantId, [&targetTenantId](const ContractInfo& info){
 		return info.targetTenantId == targetTenantId;
 	});
 }
@@ -175,7 +179,7 @@ Contracts CContractManagerComp::GetContractsByTargetTenant(const QByteArray& tar
 
 Contracts CContractManagerComp::GetContractsByRelationship(const QByteArray& relationshipId) const
 {
-	return CollectContracts([&relationshipId](const ContractInfo& info){
+	return CollectContracts("RelationshipId", relationshipId, [&relationshipId](const ContractInfo& info){
 		return info.relationshipId == relationshipId;
 	});
 }

@@ -40,6 +40,7 @@ These rules apply across the organization unless a repository-specific `AGENTS.m
 - Update or add tests when behavior changes.
 - Check impacted call sites, configs, and data formats.
 - Do not leave known breakage unresolved.
+- For server-side changes, go through `Docs/Development/ServerChangeChecklist.md` before writing the code and again before asking for review.
 
 ## 7. Be careful with security and dependencies
 

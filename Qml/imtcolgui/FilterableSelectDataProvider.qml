@@ -27,6 +27,8 @@ QtObject {
 	property string collectionId
 	property int pageSize: 20
 	property bool multiSelect: false
+	// True when the owner refetches it on the notifications of its collection, so a view does not read it again after a change
+	property bool followsCollectionChanges: false
 
 	// --- Public read-only state (data) ---
 	readonly property var items: __internal.items

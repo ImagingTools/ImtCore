@@ -32,13 +32,21 @@ protected:
 	virtual bool CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 private:
+	// What the elements of a request are checked against, resolved once for the whole command tree
+	struct ElementAccess
+	{
+		imtauth::IUserInfo::FeatureIds userPermissions;
+		bool isAdmin = false;
+		QByteArray permissionPath;
+		bool isInOrganization = false;
+		QByteArrayList organizationPermissions;
+	};
+
 	bool GetRepresentationFromGuiElementContainer(
 			const imtserverapp::IGuiElementContainer& guiElementContainer,
 			sdl::V1_0::imtbase::CGuiElementContainer& representation,
 			const QByteArray& languageId,
-			const imtauth::IUserInfo::FeatureIds& userPermissions,
-			bool isAdmin,
-			const QByteArray& permissionPath) const;
+			const ElementAccess& access) const;
 	bool GetRepresentationFromGuiElement(
 	const imtserverapp::IGuiElementModel& guiElementModel,
 	sdl::V1_0::imtbase::CGuiElementModel& representation,

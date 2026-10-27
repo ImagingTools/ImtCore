@@ -111,16 +111,29 @@ inline bool CheckPermissions(
 		return true;
 	}
 
+	const QByteArrayList applicablePermissions = imtauth::SelectApplicablePermissions(permissions, !gqlContextPtr->GetTenantId().isEmpty());
+	if (applicablePermissions.isEmpty()){
+		refusalReason = QStringLiteral("none of '%1' applies here")
+				.arg(QString::fromUtf8(permissions.join(';')));
+
+		return false;
+	}
+
+	const imtauth::IUserInfo::FeatureIds heldPermissions = imtauth::CollectHeldPermissions(
+				GetUserPermissions(*gqlContextPtr),
+				gqlContextPtr->GetOrganizationPermissions(),
+				applicablePermissions);
+
 	const QByteArray permissionPath = GetPermissionPath(gqlRequest);
 	if (!permissionPath.isEmpty()){
-		if (!imtauth::IsPermissionPathDeclared(permissions, permissionPath)){
+		if (!imtauth::IsPermissionPathDeclared(applicablePermissions, permissionPath)){
 			refusalReason = QStringLiteral("the permission path '%1' is none of '%2' this request runs under")
-					.arg(QString::fromUtf8(permissionPath), QString::fromUtf8(permissions.join(';')));
+					.arg(QString::fromUtf8(permissionPath), QString::fromUtf8(applicablePermissions.join(';')));
 
 			return false;
 		}
 
-		if (!CheckUserPermissions(*gqlContextPtr, *permissionCheckerPtr, {permissionPath})){
+		if (!permissionCheckerPtr->CheckPermission(heldPermissions, {permissionPath})){
 			refusalReason = QStringLiteral("the user does not hold '%1'")
 					.arg(QString::fromUtf8(permissionPath));
 
@@ -130,9 +143,9 @@ inline bool CheckPermissions(
 		return true;
 	}
 
-	if (!CheckUserPermissions(*gqlContextPtr, *permissionCheckerPtr, permissions)){
+	if (!permissionCheckerPtr->CheckPermission(heldPermissions, applicablePermissions)){
 		refusalReason = QStringLiteral("the user holds none of '%1'")
-				.arg(QString::fromUtf8(permissions.join(';')));
+				.arg(QString::fromUtf8(applicablePermissions.join(';')));
 
 		return false;
 	}

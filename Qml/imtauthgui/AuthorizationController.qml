@@ -49,8 +49,12 @@ QtObject {
 	signal tenantMembershipRoleChanged(string tenantId, string userId, string role);
 	signal tenantMembershipRemoved(string tenantId, string userId);
 	signal tenantInvitationRevoked(string tenantId, string invitationId);
+	// The members or invitations of the organization of the session changed, whoever changed them
+	signal tenantMembersChanged(string tenantId);
 	// Membership notifications were lost while the connection was down; membership views re-read their data.
 	signal membershipNotificationsResumed();
+	// The organizations the user may switch to changed: what shows them reads them again
+	signal organizationsChanged();
 
 	// Properties to store remember me state and credentials
 	property bool rememberMe: false
@@ -68,6 +72,7 @@ QtObject {
 
 	property bool __refreshInProgress: false
 	property var __pendingRetryQueue: []
+	property bool __authFailedDuringSwitch: false
 
 	// Sign-in with external accounts: set per application in ACC (ExternalLoginEnabled), delivered with GetApplicationInfo.
 	readonly property bool externalLoginEnabled: ApplicationInfoProvider.externalLoginEnabled
@@ -105,11 +110,13 @@ QtObject {
 			return
 		root.refreshPendingInvitations()
 		__membershipSubscription.registerSubscription()
+		__organizationMembersSubscription.registerSubscription()
 		tenantCollectionListener.registerSubscription()
 	}
 
 	function __stopTenantTracking() {
 		__membershipSubscription.unRegisterSubscription()
+		__organizationMembersSubscription.unRegisterSubscription()
 		tenantCollectionListener.unRegisterSubscription()
 	}
 
@@ -190,6 +197,7 @@ QtObject {
 		root.__stopTenantTracking()
 		__refreshInProgress = false
 		__pendingRetryQueue = []
+		__authFailedDuringSwitch = false
 	}
 	// The application info can arrive after a restored session has already logged in.
 	onTenantsEnabledChanged: {
@@ -221,27 +229,31 @@ QtObject {
 			var tenantName = data.containsKey("tenantName") ? data.getData("tenantName") : ""
 			var role = data.containsKey("role") ? data.getData("role") : ""
 			var tName = tenantName ? tenantName : qsTr("an organization")
+			// The notification names the member it is about; the text is written for whoever receives it
+			var isAboutMe = userId !== "" && userId === root.getUserId()
+			// One message per kind and organization: a repeated notification replaces the shown one
+			var messageId = "membership-" + notificationType + "-" + tenantId
 
 			if (notificationType === "InvitationReceived" || notificationType === 0) {
-				PopupManager.addInfoMessage(qsTr("You have been invited to join \"%1\"").arg(tName), false)
+				PopupManager.addInfoMessage(qsTr("You have been invited to join \"%1\"").arg(tName), true, messageId)
 				root.tenantInvitationReceived(tenantId, tenantName, role)
 			} else if (notificationType === "InvitationAccepted" || notificationType === 1) {
-				PopupManager.addInfoMessage(qsTr("Invitation accepted for \"%1\"").arg(tName), false)
+				PopupManager.addInfoMessage(qsTr("Your invitation to \"%1\" was accepted").arg(tName), true, messageId)
 				root.tenantInvitationAccepted(tenantId, membershipId)
 			} else if (notificationType === "InvitationRejected" || notificationType === 2) {
-				PopupManager.addInfoMessage(qsTr("Invitation rejected for \"%1\"").arg(tName), false)
+				PopupManager.addInfoMessage(qsTr("Your invitation to \"%1\" was declined").arg(tName), true, messageId)
 				root.tenantInvitationRejected(tenantId, membershipId)
 			} else if (notificationType === "OwnershipTransferred" || notificationType === 3) {
-				PopupManager.addInfoMessage(qsTr("Ownership transferred for \"%1\"").arg(tName), false)
+				PopupManager.addInfoMessage(isAboutMe ? qsTr("You are now the owner of \"%1\"").arg(tName) : qsTr("The ownership of \"%1\" was transferred").arg(tName), true, messageId)
 				root.tenantOwnershipTransferred(tenantId)
 			} else if (notificationType === "MembershipRoleChanged" || notificationType === 4) {
-				PopupManager.addInfoMessage(qsTr("Role changed in \"%1\"").arg(tName), false)
+				PopupManager.addInfoMessage(qsTr("Your permissions in \"%1\" were changed").arg(tName), true, messageId)
 				root.tenantMembershipRoleChanged(tenantId, userId, role)
 			} else if (notificationType === "MembershipRemoved" || notificationType === 5) {
-				PopupManager.addInfoMessage(qsTr("Removed from \"%1\"").arg(tName), false)
+				PopupManager.addInfoMessage(isAboutMe ? qsTr("You are no longer a member of \"%1\"").arg(tName) : qsTr("A member is no longer in \"%1\"").arg(tName), true, messageId)
 				root.tenantMembershipRemoved(tenantId, userId)
 			} else if (notificationType === "InvitationRevoked" || notificationType === 6) {
-				PopupManager.addInfoMessage(qsTr("Invitation to join \"%1\" was revoked").arg(tName), false)
+				PopupManager.addInfoMessage(qsTr("Your invitation to join \"%1\" was withdrawn").arg(tName), true, messageId)
 				root.tenantInvitationRevoked(tenantId, membershipId)
 			}
 		}
@@ -249,6 +261,23 @@ QtObject {
 		onRefreshRequired: {
 			root.refreshPendingInvitations()
 			root.membershipNotificationsResumed()
+		}
+	}
+
+	// The members of the organization of the session; the server sends it to everybody working inside it
+	property SubscriptionClient __organizationMembersSubscription: SubscriptionClient {
+		gqlCommandId: "OnOrganizationMembersChanged"
+		autoSubscribe: false
+
+		function getHeaders() { return {} }
+
+		onMessageReceived: {
+			if (data && data.containsKey("tenantId"))
+				root.tenantMembersChanged(data.getData("tenantId"))
+		}
+
+		onRefreshRequired: {
+			root.tenantMembersChanged(root.currentTenantId)
 		}
 	}
 
@@ -396,6 +425,12 @@ QtObject {
 		if (root.__refreshInProgress)
 			return
 
+		// A request sent during a tenant switch carries the token the switch closes: it is repeated with the new one
+		if (root.__tenantSwitchInProgress) {
+			root.__authFailedDuringSwitch = true
+			return
+		}
+
 		if (!root.userTokenProvider.refreshToken || root.userTokenProvider.refreshToken === "") {
 			if (!root.isLoggedIn()) {
 				root.__pendingRetryQueue = []
@@ -431,6 +466,10 @@ QtObject {
 		// Re-register WS subscriptions that failed with the old access token.
 		Events.sendEvent("AccessTokenRefreshed", {})
 
+		root.__retryPendingRequests()
+	}
+
+	function __retryPendingRequests() {
 		var queue = root.__pendingRetryQueue
 		root.__pendingRetryQueue = []
 		for (var i = 0; i < queue.length; i++) {
@@ -522,6 +561,20 @@ QtObject {
 		root.currentTenantName = storage.value("tenantName", "");
 	}
 	
+	function notifyOrganizationsChanged(){
+		root.organizationsChanged();
+	}
+
+	// The name of the current organization as the server reports it now, e.g. after a rename
+	function updateCurrentTenantName(tenantName){
+		if (root.currentTenantId === "" || root.currentTenantName === tenantName){
+			return;
+		}
+
+		root.currentTenantName = tenantName;
+		storage.setValue("tenantName", tenantName);
+	}
+
 	function saveDataToStorage(){
 		storage.setValue("accessToken", userTokenProvider.accessToken);
 		storage.setValue("refreshToken", userTokenProvider.refreshToken);
@@ -741,6 +794,12 @@ QtObject {
 
 	function __completeTenantSwitch() {
 		__tenantSwitchInProgress = false
+		// Refused after the new token was taken over, or the switch failed: the token is refreshed
+		if (root.__authFailedDuringSwitch) {
+			root.__authFailedDuringSwitch = false
+			root.handleAuthFailure("", null)
+		}
+
 		if (!__hasPendingTenantSwitch)
 			return
 
@@ -1017,6 +1076,11 @@ QtObject {
 							XMLHttpRequest.QMLAuthRefreshToken = m_userSession.m_refreshToken
 							root.saveDataToStorage()
 						}
+						// The refusals so far were for the closed token
+						root.__authFailedDuringSwitch = false
+						root.__retryPendingRequests()
+						// The subscriptions still hold the closed session and the previous organization
+						Events.sendEvent("AccessTokenRefreshed", {})
 
 						root.refreshPermissions(function(){
 							root.tenantSelected(root.currentTenantId);

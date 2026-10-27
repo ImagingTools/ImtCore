@@ -43,6 +43,8 @@ public:
 	virtual imtauth::IUserInfo::FeatureIds GetImpliedPermissions() const override;
 	virtual bool IsTenantOwner() const override;
 	virtual void SetIsTenantOwner(bool isTenantOwner) override;
+	virtual QByteArrayList GetOrganizationPermissions() const override;
+	virtual void SetOrganizationPermissions(const QByteArrayList& permissions) override;
 	virtual Headers GetHeaders() const override;
 	virtual void SetHeaders(const Headers& headers) override;
 
@@ -77,6 +79,7 @@ private:
 	imtlic::IProductInfo* m_productInfoPtr;
 	QByteArrayList m_tenantPermissions;
 	bool m_isTenantOwner;
+	QByteArrayList m_organizationPermissions;
 	Headers m_headers;
 
 	// Resolving the implied permissions walks the whole feature tree of the

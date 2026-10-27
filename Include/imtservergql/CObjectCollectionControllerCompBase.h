@@ -308,6 +308,12 @@ protected:
 	virtual void PrepareFilters(const imtgql::CGqlRequest& gqlRequest, const imtgql::CGqlParamObject& viewParamsGql, iprm::CParamsSet& filterParams) const;
 
 	/**
+		Add the filters that limit a selection to what the requester may see: the additional filters and the tenant filter.
+		Every selection made for a request applies them, whatever the command.
+	*/
+	void AddAccessFilters(const imtgql::CGqlRequest& gqlRequest, const imtgql::CGqlParamObject& viewParamsGql, iprm::CParamsSet& filterParams) const;
+
+	/**
 		Set multiple optional additional filters to initially get a more refined collection.
 	*/
 	virtual void SetAdditionalFilters(const imtgql::CGqlRequest& gqlRequest,const imtgql::CGqlParamObject& viewParamsGql, iprm::CParamsSet* filterParams) const;

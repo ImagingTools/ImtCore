@@ -26,9 +26,9 @@ SimpleCollectionPage {
 
 	// Members use stateManager-driven model, not a data provider
 	listModel: __combinedModel
-	managePermissionIds: ["/OrganizationManagement/Members/Edit/Invite", "/OrganizationManagement/Members/Edit/Exclude", "/OrganizationManagement/Members/Edit/ChangeRole"]
-	createPermissionIds: ["/OrganizationManagement/Members/Edit/Invite"]
-	editPermissionIds: ["/OrganizationManagement/Members/Edit/ChangeRole"]
+	managePermissionIds: ["/OrganizationManagement/Members/Edit/Add", "/OrganizationManagement/Members/Edit/Change", "/OrganizationManagement/Members/Edit/Invite", "/OrganizationManagement/Members/Edit/Exclude", "/OrganizationManagement/Members/Edit/ChangeRole"]
+	createPermissionIds: ["/OrganizationManagement/Members/Edit/Add"]
+	editPermissionIds: ["/OrganizationManagement/Members/Edit/Change", "/OrganizationManagement/Members/Edit/ChangeRole"]
 	deletePermissionIds: ["/OrganizationManagement/Members/Edit/Exclude"]
 
 	readonly property bool __canCreateMember: stateManager
@@ -69,6 +69,23 @@ SimpleCollectionPage {
 				if (result === Enums.yes && membersPage.apiClient) {
 					var tid = membersPage.model ? membersPage.model.m_id : ""
 					membersPage.apiClient.transferOwnership(tid, memberActionMenu.targetUserId)
+				}
+			}
+		)
+	}
+
+	// Declared on the page: a callback declared inside the popup component loses the page on the web
+	function confirmExcludeMember(userId, userName) {
+		if (!membersPage.stateManager || !membersPage.stateManager.canExcludeOrganizationMember)
+			return
+
+		ModalDialogManager.showConfirmationDialog(
+			qsTr("Exclude Member"),
+			qsTr("Are you sure you want to exclude \"%1\" from this organization?").arg(userName),
+			function(result) {
+				if (result === Enums.yes && membersPage.apiClient) {
+					var tid = membersPage.model ? membersPage.model.m_id : ""
+					membersPage.apiClient.removeMember(tid, userId)
 				}
 			}
 		)
@@ -654,10 +671,11 @@ SimpleCollectionPage {
 		if (membersPage.__invitationStatus(invitation) !== "Pending")
 			return items
 		var stateManager = membersPage.stateManager
-		if (stateManager && stateManager.canInviteOrganizationMember)
+		// Who may invite may also take an invitation back
+		if (stateManager && stateManager.canInviteOrganizationMember) {
 			items.push({ text: qsTr("Resend Invitation"), action: "resend" })
-		if (stateManager && stateManager.canExcludeOrganizationMember)
 			items.push({ text: qsTr("Revoke Invitation"), action: "revoke" })
+		}
 		return items
 	}
 
@@ -779,19 +797,7 @@ SimpleCollectionPage {
 					}
 				}
 				else if (commandId === "Exclude") {
-					if (!membersPage.stateManager || !membersPage.stateManager.canExcludeOrganizationMember)
-						return
-
-					ModalDialogManager.showConfirmationDialog(
-						qsTr("Exclude Member"),
-						qsTr("Are you sure you want to exclude \"%1\" from this organization?").arg(memberActionMenu.targetUserName),
-						function(result) {
-							if (result === Enums.yes && membersPage.apiClient) {
-								var tenantIdExclude = membersPage.model ? membersPage.model.m_id : ""
-								membersPage.apiClient.removeMember(tenantIdExclude, memberActionMenu.targetUserId)
-							}
-						}
-					)
+					membersPage.confirmExcludeMember(memberActionMenu.targetUserId, memberActionMenu.targetUserName)
 				}
 				else if (commandId === "Transfer") {
 					if (membersPage.stateManager && membersPage.stateManager.isOwner)
@@ -826,7 +832,7 @@ SimpleCollectionPage {
 			onFinished: {
 				if (commandId === "resend" && membersPage.apiClient && membersPage.stateManager && membersPage.stateManager.canInviteOrganizationMember)
 					membersPage.apiClient.resendInvitation(inviteActionMenu.targetInvitationId)
-				else if (commandId === "revoke" && membersPage.apiClient && membersPage.stateManager && membersPage.stateManager.canExcludeOrganizationMember)
+				else if (commandId === "revoke" && membersPage.apiClient && membersPage.stateManager && membersPage.stateManager.canInviteOrganizationMember)
 					membersPage.confirmRevokeInvitation(inviteActionMenu.targetInvitationId, inviteActionMenu.targetUserName)
 			}
 		}
@@ -849,16 +855,7 @@ SimpleCollectionPage {
 			visible: memberActionMenu.showExclude
 			height: visible ? implicitHeight : 0
 			onTriggered: {
-				ModalDialogManager.showConfirmationDialog(
-					qsTr("Exclude Member"),
-					qsTr("Are you sure you want to exclude \"%1\" from this organization?").arg(memberActionMenu.targetUserName),
-					function(result) {
-						if (result === Enums.yes && membersPage.apiClient) {
-							var tenantId = membersPage.model ? membersPage.model.m_id : ""
-							membersPage.apiClient.removeMember(tenantId, memberActionMenu.targetUserId)
-						}
-					}
-				)
+				membersPage.confirmExcludeMember(memberActionMenu.targetUserId, memberActionMenu.targetUserName)
 			}
 		}
 
@@ -917,17 +914,43 @@ SimpleCollectionPage {
 			showSelectedGroup: true
 			filterPlaceholder: qsTr("Type or choose a user to invite")
 
+			// Users ticked in the popup; the invitations go only on the Invite button
+			property var newSelection: []
+
+			footerComponent: Component {
+				Item {
+					height: inviteButton.height
+
+					// The popup's keyboard reaches the Invite button after the list
+					property Item keyboardItem: inviteButton
+
+					Button {
+						id: inviteButton
+						anchors.right: parent.right
+						text: qsTr("Invite (%1)").arg(invitePopup.newSelection.length)
+						variant: "primary"
+						enabled: invitePopup.newSelection.length > 0
+						onClicked: {
+							if (membersPage.stateManager)
+								membersPage.stateManager.inviteSelectedUsers(invitePopup.newSelection)
+							invitePopup.closePopup()
+						}
+					}
+				}
+			}
+
 			onSelectionChanged: {
 				var arr = []
 				for (var i = 0; i < selectedIds.length; i++) {
 					var selId = selectedIds[i]
+					if (preselectedIds.indexOf(selId) >= 0)
+						continue
 					var selName = dataProvider ? dataProvider.getSelectedItemText(selId) : ""
 					if (!selName)
 						selName = selId
 					arr.push({id: selId, name: selName})
 				}
-				if (membersPage.stateManager)
-					membersPage.stateManager.inviteSelectedUsers(arr)
+				invitePopup.newSelection = arr
 			}
 
 			Component.onDestruction: {

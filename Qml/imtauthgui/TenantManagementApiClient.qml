@@ -164,6 +164,7 @@ QtObject {
 	property var tenantPermissions: []
 	signal tenantPermissionsReceived()
 	function fetchTenantPermissions(tenantId) {}
+	function invalidateTenantPermissions() {}
 
 	// --- Cross-org grants ---
 	property var crossOrgGrantDocumentManager: null

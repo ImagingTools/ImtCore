@@ -10,7 +10,10 @@
 #include <istd/CChangeNotifier.h>
 
 // ImtCore includes
+#include <imtbase/imtbase.h>
+#include <imtauth/TenantEvents.h>
 #include <imtdb/imtdb.h>
+#include <imtauth/CollectionSelection.h>
 
 
 namespace imtauth
@@ -64,7 +67,7 @@ ITenantInvitationManager::InvitationIds CTenantInvitationManagerComp::GetInvitat
 		return result;
 	}
 
-	for (const QByteArray& id : m_invitationCollectionCompPtr->GetElementIds()){
+	for (const QByteArray& id : GetCandidateInvitationIds("TenantId", tenantId)){
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (m_invitationCollectionCompPtr->GetObjectData(id, dataPtr)){
 			const ITenantInvitation* invitationPtr = dynamic_cast<const ITenantInvitation*>(dataPtr.GetPtr());
@@ -85,7 +88,7 @@ ITenantInvitationManager::InvitationIds CTenantInvitationManagerComp::GetInvitat
 		return result;
 	}
 
-	for (const QByteArray& id : m_invitationCollectionCompPtr->GetElementIds()){
+	for (const QByteArray& id : GetCandidateInvitationIds("UserId", userId)){
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (m_invitationCollectionCompPtr->GetObjectData(id, dataPtr)){
 			const ITenantInvitation* invitationPtr = dynamic_cast<const ITenantInvitation*>(dataPtr.GetPtr());
@@ -149,7 +152,7 @@ QByteArray CTenantInvitationManagerComp::CreateInvitation(const QByteArray& invi
 		return QByteArray();
 	}
 
-	if (invitedByUserId.isEmpty() || userId.isEmpty() || tenantId.isEmpty()){
+	if (!imtbase::isValidUuid(invitedByUserId) || !imtbase::isValidUuid(userId) || !imtbase::isValidUuid(tenantId)){
 		return QByteArray();
 	}
 
@@ -185,7 +188,13 @@ QByteArray CTenantInvitationManagerComp::CreateInvitation(const QByteArray& invi
 	invitationPtr->SetLastSentAt(now);
 
 	QByteArray storedId = m_invitationCollectionCompPtr->InsertNewObject("TenantInvitation", QString(), QString(), invitationPtr.GetPtr(), invitationId);
-	return storedId.isEmpty() ? QByteArray() : invitationId;
+	if (storedId.isEmpty()){
+		return QByteArray();
+	}
+
+	PublishInvitationEvent(TenantEvent::s_invitationSent, *invitationPtr);
+
+	return invitationId;
 }
 
 
@@ -222,7 +231,10 @@ QByteArray CTenantInvitationManagerComp::AcceptInvitation(const QByteArray& invi
 	invitationPtr->SetAcceptedAt(now);
 	invitationPtr->SetUpdatedAt(now);
 
-	StoreInvitation(invitationId, *invitationPtr);
+	if (StoreInvitation(invitationId, *invitationPtr)){
+		PublishInvitationEvent(TenantEvent::s_invitationStatusChanged, *invitationPtr);
+	}
+
 	return membershipId;
 }
 
@@ -253,7 +265,13 @@ bool CTenantInvitationManagerComp::RejectInvitation(const QByteArray& invitation
 	invitationPtr->SetRejectedAt(now);
 	invitationPtr->SetUpdatedAt(now);
 
-	return StoreInvitation(invitationId, *invitationPtr);
+	if (!StoreInvitation(invitationId, *invitationPtr)){
+		return false;
+	}
+
+	PublishInvitationEvent(TenantEvent::s_invitationStatusChanged, *invitationPtr);
+
+	return true;
 }
 
 
@@ -284,7 +302,42 @@ bool CTenantInvitationManagerComp::RevokeInvitation(const QByteArray& invitation
 	invitationPtr->SetRevokedByUserId(revokedByUserId);
 	invitationPtr->SetUpdatedAt(now);
 
-	return StoreInvitation(invitationId, *invitationPtr);
+	if (!StoreInvitation(invitationId, *invitationPtr)){
+		return false;
+	}
+
+	PublishInvitationEvent(TenantEvent::s_invitationStatusChanged, *invitationPtr);
+
+	return true;
+}
+
+
+bool CTenantInvitationManagerComp::RevokeInvitationsSentBy(const QByteArray& tenantId, const QByteArray& invitedByUserId, const QByteArray& revokedByUserId)
+{
+	if (!m_invitationCollectionCompPtr.IsValid()){
+		return false;
+	}
+
+	if (tenantId.isEmpty() || invitedByUserId.isEmpty()){
+		return true;
+	}
+
+	// An invitation that cannot be read may be a pending one of the member
+	bool isRevoked = true;
+	for (const QByteArray& invitationId : GetCandidateInvitationIds("TenantId", tenantId, &isRevoked)){
+		ITenantInvitationUniquePtr invitationPtr = GetInvitation(invitationId);
+		if (!invitationPtr.IsValid()){
+			isRevoked = false;
+			continue;
+		}
+
+		if (invitationPtr->GetTenantId() == tenantId && invitationPtr->GetInvitedByUserId() == invitedByUserId
+					&& GetEffectiveStatus(*invitationPtr) == ITenantInvitation::TIS_PENDING && !RevokeInvitation(invitationId, revokedByUserId)){
+			isRevoked = false;
+		}
+	}
+
+	return isRevoked;
 }
 
 
@@ -314,7 +367,13 @@ bool CTenantInvitationManagerComp::ResendInvitation(const QByteArray& invitation
 	invitationPtr->SetUpdatedAt(now);
 	invitationPtr->SetExpiresAt(CreateInvitationExpirationTime());
 
-	return StoreInvitation(invitationId, *invitationPtr);
+	if (!StoreInvitation(invitationId, *invitationPtr)){
+		return false;
+	}
+
+	PublishInvitationEvent(TenantEvent::s_invitationSent, *invitationPtr);
+
+	return true;
 }
 
 
@@ -331,6 +390,12 @@ ITenantInvitation::TenantInvitationStatus CTenantInvitationManagerComp::GetEffec
 }
 
 
+QByteArrayList CTenantInvitationManagerComp::GetCandidateInvitationIds(const QByteArray& columnId, const QByteArray& value, bool* isReadPtr) const
+{
+	return CollectionSelection::SelectIds(*m_invitationCollectionCompPtr, CollectionSelection::ColumnEquals(columnId, value), QByteArrayList(), isReadPtr);
+}
+
+
 bool CTenantInvitationManagerComp::StatusMatches(const ITenantInvitation& invitation, const Statuses& statuses) const
 {
 	if (statuses.isEmpty()){
@@ -338,6 +403,18 @@ bool CTenantInvitationManagerComp::StatusMatches(const ITenantInvitation& invita
 	}
 
 	return statuses.contains(GetEffectiveStatus(invitation));
+}
+
+
+void CTenantInvitationManagerComp::PublishInvitationEvent(const QString& eventType, const ITenantInvitation& invitation)
+{
+	TenantEvent::Publish(this, {
+				{TenantEvent::s_type, eventType},
+				{TenantEvent::s_invitationId, invitation.GetInvitationId()},
+				{TenantEvent::s_userId, invitation.GetUserId()},
+				{TenantEvent::s_tenantId, invitation.GetTenantId()},
+				{TenantEvent::s_invitedByUserId, invitation.GetInvitedByUserId()},
+				{TenantEvent::s_status, int(invitation.GetStatus())}});
 }
 
 

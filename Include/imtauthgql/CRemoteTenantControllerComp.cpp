@@ -124,8 +124,48 @@ imtauth::ITenantInfoUniquePtr CRemoteTenantControllerComp::GetTenant(const QByte
 	if (tenantData.ownerId){
 		tenantInfoPtr->SetOwnerId(*tenantData.ownerId);
 	}
+	if (tenantData.creatorId){
+		tenantInfoPtr->SetCreatorId(*tenantData.creatorId);
+	}
+	if (tenantData.parentTenantId){
+		tenantInfoPtr->SetParentTenantId(*tenantData.parentTenantId);
+	}
 
 	return tenantInfoPtr;
+}
+
+
+// The lookups below serve the authorization server, which owns the organizations; a product server has no query for them
+
+QByteArrayList CRemoteTenantControllerComp::GetOwnedOrCreatedTenantIds(const QByteArray& /*userId*/, bool* isReadPtr) const
+{
+	if (isReadPtr != nullptr){
+		*isReadPtr = false;
+	}
+
+	SendErrorMessage(0, QStringLiteral("The organizations of a user are not available from a product server"), "CRemoteTenantControllerComp");
+
+	return QByteArrayList();
+}
+
+
+QByteArrayList CRemoteTenantControllerComp::GetChildTenantIds(const QByteArray& /*tenantId*/, bool* isReadPtr) const
+{
+	if (isReadPtr != nullptr){
+		*isReadPtr = false;
+	}
+
+	SendErrorMessage(0, QStringLiteral("The sub-organizations are not available from a product server"), "CRemoteTenantControllerComp");
+
+	return QByteArrayList();
+}
+
+
+QByteArrayList CRemoteTenantControllerComp::FindTenantIdsByName(const QString& /*tenantName*/) const
+{
+	SendErrorMessage(0, QStringLiteral("The organizations by name are not available from a product server"), "CRemoteTenantControllerComp");
+
+	return QByteArrayList();
 }
 
 
@@ -391,10 +431,7 @@ imtauth::RelatedTenantInfos CRemoteTenantControllerComp::GetRelatedTenants(const
 	}
 
 	for (const auto& relationship : *payload.relationships){
-		if (		!relationship.has_value() ||
-					!relationship->status.has_value() ||
-					*relationship->status != tenantsdl::RelationshipStatus::Active ||
-					!imtauth::IsTenantRelationshipValidNow(relationship->validFrom.value_or(QString()), relationship->validUntil.value_or(QString()))){
+		if (!relationship.has_value() || !relationship->status.has_value() || *relationship->status != tenantsdl::RelationshipStatus::Active){
 			continue;
 		}
 
@@ -416,9 +453,19 @@ imtauth::RelatedTenantInfos CRemoteTenantControllerComp::GetRelatedTenants(const
 					? relationship->targetTenantName.value_or(QString())
 					: relationship->sourceTenantName.value_or(QString());
 
-		bool isKnown = relatedTenant.tenantId.isEmpty() || relatedTenant.tenantId == tenantId;
-		for (const imtauth::RelatedTenantInfo& knownTenant : retVal){
-			isKnown = isKnown || knownTenant.tenantId == relatedTenant.tenantId;
+		relatedTenant.isEffective = imtauth::IsTenantRelationshipValidNow(relationship->validFrom.value_or(QString()), relationship->validUntil.value_or(QString()));
+		relatedTenant.relatedSince = imtauth::ParseRelationshipTime(relationship->relatedSince.value_or(QString()));
+
+		if (relatedTenant.tenantId.isEmpty() || relatedTenant.tenantId == tenantId){
+			continue;
+		}
+
+		bool isKnown = false;
+		for (imtauth::RelatedTenantInfo& knownTenant : retVal){
+			if (knownTenant.tenantId == relatedTenant.tenantId){
+				isKnown = true;
+				knownTenant.isEffective = knownTenant.isEffective || relatedTenant.isEffective;
+			}
 		}
 
 		if (!isKnown){

@@ -53,6 +53,26 @@ QtObject {
         requestPermissions("")
     }
 
+    // The permissions of the product (tenantId "") or of an organization, requested once: the cached ones are given again
+    // until invalidateTenantPermissions(), which follows a change of the organization permission scope
+    function ensurePermissions(tenantId) {
+        var requestedTenantId = tenantId || ""
+        var isCached = requestedTenantId !== ""
+            ? permissionsProvider.tenantPermissionsTenantId === requestedTenantId
+            : permissionsProvider.allPermissions.length > 0
+        if (!isCached) {
+            permissionsProvider.requestPermissions(requestedTenantId)
+            return
+        }
+
+        permissionsProvider.permissionsReceived(requestedTenantId !== "" ? permissionsProvider.tenantPermissions : permissionsProvider.allPermissions, requestedTenantId)
+    }
+
+    function invalidateTenantPermissions() {
+        permissionsProvider.tenantPermissions = []
+        permissionsProvider.tenantPermissionsTenantId = ""
+    }
+
     // Request only the permissions available to the current user (su sees all).
     function requestUserPermissions() {}
 

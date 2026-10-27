@@ -79,6 +79,7 @@ input ChangePasswordInput {
 	login: ID
 	oldPassword: String
 	newPassword: String
+	verificationCode: String
 }
 
 input ChangePasswordPayload {

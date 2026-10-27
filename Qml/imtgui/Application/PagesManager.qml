@@ -116,9 +116,12 @@ Item {
             anchors.fill: container;
             visible: container.activePageIndex === model.index;
 
+            // Created shown with the new page list: the skeleton may have been started by a page of the old list,
+            // destroyed together with the timer that was to stop it
             Component.onCompleted: {
                 if (visible){
                     load();
+                    pageSkeleton.stop();
                 }
             }
 

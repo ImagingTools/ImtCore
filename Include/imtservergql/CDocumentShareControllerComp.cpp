@@ -32,6 +32,9 @@ sdl::V1_0::imtbase::CGetOrganizationDocumentSharesPayload CDocumentShareControll
 	sdl::V1_0::imtbase::GetOrganizationDocumentSharesRequestArguments arguments = getOrganizationDocumentSharesRequest.GetRequestedArguments();
 	const QString direction = arguments.input->direction.value_or(QString());
 
+	// The shares with the organizations the relationship ended with are revoked before they are shown
+	m_documentShareManagerCompPtr->RemoveUnrelatedShares(tenantId);
+
 	imtauth::DocumentShares shares;
 	if (direction == QStringLiteral("Incoming")){
 		shares = m_documentShareManagerCompPtr->GetIncomingShares(tenantId);

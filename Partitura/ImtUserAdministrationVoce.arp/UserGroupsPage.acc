@@ -287,7 +287,9 @@
                                         <Values>
                                             <Value>/Administration/Users/Edit/Remove</Value>
                                             <Value>/Administration/Users/Edit/Change</Value>
+                                            <Value>/OrganizationManagement/Members/Edit/Change</Value>
                                             <Value>/Administration/Users/View</Value>
+                                            <Value>/OrganizationManagement/Members/View</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -298,8 +300,11 @@
                                     <Data IsEnabled="true">
                                         <Values>
                                             <Value>/Administration/Groups/Edit/Add</Value>
+                                            <Value>/OrganizationManagement/Groups/Edit/Add</Value>
                                             <Value>/Administration/Groups/Edit/Remove</Value>
+                                            <Value>/OrganizationManagement/Groups/Edit/Remove</Value>
                                             <Value>/Administration/Groups/Edit/Change</Value>
+                                            <Value>/OrganizationManagement/Groups/Edit/Change</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -307,8 +312,11 @@
                                     <Data IsEnabled="true">
                                         <Values>
                                             <Value>/Administration/Groups/Edit/Add</Value>
+                                            <Value>/OrganizationManagement/Groups/Edit/Add</Value>
                                             <Value>/Administration/Groups/Edit/Remove</Value>
+                                            <Value>/OrganizationManagement/Groups/Edit/Remove</Value>
                                             <Value>/Administration/Groups/Edit/Change</Value>
+                                            <Value>/OrganizationManagement/Groups/Edit/Change</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -325,8 +333,11 @@
                                     <Data IsEnabled="true">
                                         <Values>
                                             <Value>/Administration/Groups/Edit/Add</Value>
+                                            <Value>/OrganizationManagement/Groups/Edit/Add</Value>
                                             <Value>/Administration/Groups/Edit/Remove</Value>
+                                            <Value>/OrganizationManagement/Groups/Edit/Remove</Value>
                                             <Value>/Administration/Groups/Edit/Change</Value>
+                                            <Value>/OrganizationManagement/Groups/Edit/Change</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -353,7 +364,9 @@
                                     <Data IsEnabled="true">
                                         <Values>
                                             <Value>/Administration/Groups/View</Value>
+                                            <Value>/OrganizationManagement/Groups/View</Value>
                                             <Value>/Administration/Groups/Edit/Change</Value>
+                                            <Value>/OrganizationManagement/Groups/Edit/Change</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -367,6 +380,7 @@
                                     <Data IsEnabled="true">
                                         <Values>
                                             <Value>/Administration/Groups/Edit/Add</Value>
+                                            <Value>/OrganizationManagement/Groups/Edit/Add</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -374,6 +388,7 @@
                                     <Data IsEnabled="true">
                                         <Values>
                                             <Value>/Administration/Groups/Edit/Remove</Value>
+                                            <Value>/OrganizationManagement/Groups/Edit/Remove</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>

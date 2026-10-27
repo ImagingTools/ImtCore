@@ -71,10 +71,20 @@ public:
 	virtual DocumentShares GetOutgoingShares(const QByteArray& ownerTenantId) const = 0;
 
 	/**
-		Organizations whose shares are effective for the tenant: the ones it currently has an active relationship with.
-		A share of any other organization stays stored but grants nothing, e.g. after the relationship ended.
+		Organizations whose shares are effective for the tenant: the ones it has a relationship with that is valid now.
+		A share of a relationship outside its validity period grants nothing but stays.
+		Reading the relationships anew removes the shares of the ended ones, as RemoveUnrelatedShares() does.
 	*/
 	virtual QByteArrayList GetShareOwnerTenantIds(const QByteArray& targetTenantId) const = 0;
+
+	/**
+		Remove the given and received shares of a tenant with the organizations it has no active relationship with any more,
+		or that are left from an earlier period of relationships.
+		Nothing is removed when the relationships of the tenant cannot be read.
+		The relationships read are reused for a while, a repeated call within that time removes nothing.
+		\return The number of the removed shares.
+	*/
+	virtual int RemoveUnrelatedShares(const QByteArray& tenantId) = 0;
 
 	/**
 		Number that changes whenever a share is stored or removed.

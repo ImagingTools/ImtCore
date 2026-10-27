@@ -76,8 +76,8 @@ SimpleCollectionPage {
 
 	Connections {
 		target: relationshipsPage.apiClient
+		// The list itself follows the notification of the relationships collection; reading it here too sent it twice
 		function onTenantRelationshipRemoved() {
-			relationshipsPage.refresh()
 			relationshipsPage.updateGui()
 		}
 		function onRelationshipProposalCreated() {
@@ -85,7 +85,6 @@ SimpleCollectionPage {
 			relationshipsPage.popEditor()
 		}
 		function onRelationshipProposalApproved(relationshipId) {
-			relationshipsPage.refresh()
 			relationshipsPage.updateGui()
 		}
 	}

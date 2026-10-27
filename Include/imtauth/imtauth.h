@@ -203,6 +203,87 @@ inline QByteArrayList GetOrganizationAccessPermissions()
 
 
 /**
+	The management of an organization from inside it: its owner and its creator hold this root, a member what the membership gives.
+*/
+static const inline QByteArray s_organizationManagementPermission = QByteArrayLiteral("/OrganizationManagement");
+
+
+/**
+	Tell whether the permission manages the inside of an organization (members, roles, groups, connections...).
+	It is held only inside the organization, through the ownership or the membership, never through a product role;
+	listing, creating and removing organizations are permissions of the product.
+*/
+inline bool IsOrganizationInternalPermission(const QByteArray& permission)
+{
+	static const QByteArrayList productPermissions = GetOrganizationAccessPermissions()
+				+ QByteArrayList{s_addOrganizationPermission, QByteArrayLiteral("/OrganizationManagement/Remove")};
+
+	return permission.startsWith(s_organizationManagementPermission + '/') && !productPermissions.contains(permission);
+}
+
+
+/**
+	Tell whether the permission administers the users, roles or groups of the product.
+	Inside an organization the organization permissions apply to them instead.
+*/
+inline bool IsUserAdministrationPermission(const QByteArray& permission)
+{
+	return permission.startsWith("/Administration/Users/")
+				|| permission.startsWith("/Administration/Roles/")
+				|| permission.startsWith("/Administration/Groups/");
+}
+
+
+/**
+	Select the declared permissions that apply in the context of a check: inside an organization its organization
+	permissions instead of the product administration of users, roles and groups, outside of one the product permissions only.
+*/
+inline QByteArrayList SelectApplicablePermissions(const QByteArrayList& declaredPermissions, bool isInOrganization)
+{
+	QByteArrayList retVal;
+	for (const QByteArray& permission : declaredPermissions){
+		const bool isApplicable = IsOrganizationInternalPermission(permission)
+					? isInOrganization
+					: !(isInOrganization && IsUserAdministrationPermission(permission));
+		if (isApplicable){
+			retVal.append(permission);
+		}
+	}
+
+	return retVal;
+}
+
+
+/**
+	Get the permissions held for a check of the applicable ones. The organization permissions come from the ownership,
+	which holds all of them, or the membership, never from the permissions of a role.
+*/
+inline QByteArrayList CollectHeldPermissions(
+			const QByteArrayList& userPermissions,
+			const QByteArrayList& organizationPermissions,
+			const QByteArrayList& applicablePermissions)
+{
+	QByteArrayList retVal = userPermissions;
+	retVal.removeIf([](const QByteArray& permission){
+		return IsOrganizationInternalPermission(permission);
+	});
+
+	if (!organizationPermissions.contains(s_organizationManagementPermission)){
+		return retVal + organizationPermissions;
+	}
+
+	for (const QByteArray& permission : applicablePermissions){
+		if (IsOrganizationInternalPermission(permission)){
+			retVal.append(permission);
+		}
+	}
+
+	return retVal;
+}
+
+
+
+/**
 	Tell whether the two organizations are linked by an active connection.
 */
 inline bool AreTenantsConnected(const ITenantConnectionRequestManager& connectionManager, const QByteArray& tenantId, const QByteArray& otherTenantId)

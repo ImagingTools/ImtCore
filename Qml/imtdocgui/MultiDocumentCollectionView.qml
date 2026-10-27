@@ -316,6 +316,13 @@ Item {
 			// loading.stop()
 		}
 
+		// A refused change is undone by reading the document again: the reason is told here
+		function onUpdateDocumentFailed(documentId, message){
+			if (message !== ""){
+				PopupManager.addErrorMessage(message, true)
+			}
+		}
+
 		function onUpdateRepresentationFailed(documentId, message){
 			tabView.setTabLoading(documentId, false)
 			if(message !==""){

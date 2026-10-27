@@ -283,7 +283,8 @@ ViewBase {
 	Connections {
 		target: root.documentManager
 		function onDocumentSaved(documentId) {
-			root.refresh()
+			if (!root.dataProvider || !root.dataProvider.followsCollectionChanges)
+				root.refresh()
 		}
 		function onDocumentNameChanged(documentId, oldName, newName) {
 			// A new document has no name yet; keep the "Create New ..." title
@@ -448,6 +449,7 @@ ViewBase {
 
 		SimpleCollectionTable {
 			id: collectionTable
+			canMoveColumns: true
 			model: root.effectiveModel
 			delegateComponent: root.delegateComponent
 			columnIds: root.columnIds

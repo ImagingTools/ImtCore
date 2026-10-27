@@ -1010,7 +1010,8 @@ sdl::V1_0::imtbase::CImportObjectPayload CObjectCollectionControllerCompBase::On
 		objectUuid = identifiableObjectPtr->GetObjectUuid();
 	}
 
-	if (m_objectCollectionCompPtr->GetElementIds().contains(objectUuid)){
+	imtbase::IObjectCollection::DataPtr existingDataPtr;
+	if (m_objectCollectionCompPtr->GetObjectData(objectUuid, existingDataPtr)){
 		errorMessage = QStringLiteral("Unable to import object with ID: '%1' to the collection. Error: The object already exists inside the collection").arg(objectUuid);
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 		QFile::remove(filePathTmp);
@@ -1141,7 +1142,7 @@ sdl::V1_0::imtbase::CGetCollectionHeadersPayload CObjectCollectionControllerComp
 
 sdl::V1_0::imtbase::CGetElementsCountPayload CObjectCollectionControllerCompBase::OnGetElementsCount(
 			const sdl::V1_0::imtbase::CGetElementsCountGqlRequest& getElementsCountRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtbase::CGetElementsCountPayload response;
@@ -1163,6 +1164,8 @@ sdl::V1_0::imtbase::CGetElementsCountPayload CObjectCollectionControllerCompBase
 		}
 	}
 
+	AddAccessFilters(gqlRequest, imtgql::CGqlParamObject(), filterParams);
+
 	response.count = m_objectCollectionCompPtr->GetElementsCount(&filterParams);
 
 	return response;
@@ -1171,7 +1174,7 @@ sdl::V1_0::imtbase::CGetElementsCountPayload CObjectCollectionControllerCompBase
 
 sdl::V1_0::imtbase::CGetElementIdsPayload CObjectCollectionControllerCompBase::OnGetElementIds(
 			const sdl::V1_0::imtbase::CGetElementIdsGqlRequest& getElementIdsRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtbase::CGetElementIdsPayload response;
@@ -1202,6 +1205,8 @@ sdl::V1_0::imtbase::CGetElementIdsPayload CObjectCollectionControllerCompBase::O
 			}
 		}
 	}
+
+	AddAccessFilters(gqlRequest, imtgql::CGqlParamObject(), filterParams);
 
 	imtbase::IObjectCollection::Ids ids = m_objectCollectionCompPtr->GetElementIds(offset, count, &filterParams);
 	response.elementIds.Emplace();
@@ -1735,6 +1740,11 @@ sdl::V1_0::imtbase::CGetDocumentSharesPayload CObjectCollectionControllerCompBas
 	if (GetOwnObjectIds(gqlRequest, {objectId}).isEmpty()){
 		errorMessage = QStringLiteral("Only the organization owning the document can see its shares");
 		return response;
+	}
+
+	const imtgql::IGqlContext* shareContextPtr = gqlRequest.GetRequestContext();
+	if (shareContextPtr != nullptr){
+		m_documentShareManagerCompPtr->RemoveUnrelatedShares(shareContextPtr->GetTenantId());
 	}
 
 	response.shares.Emplace();
@@ -2727,7 +2737,8 @@ QJsonObject CObjectCollectionControllerCompBase::ImportObject(const imtgql::CGql
 		objectUuid = identifiableObjectPtr->GetObjectUuid();
 	}
 
-	if (m_objectCollectionCompPtr->GetElementIds().contains(objectUuid)){
+	imtbase::IObjectCollection::DataPtr existingDataPtr;
+	if (m_objectCollectionCompPtr->GetObjectData(objectUuid, existingDataPtr)){
 		errorMessage = QStringLiteral("Unable to import object with ID: '%1' to the collection. Error: The object already exists inside the collection").arg(objectUuid);
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 		QFile::remove(filePathTmp);
@@ -3188,12 +3199,12 @@ istd::IChangeableUniquePtr CObjectCollectionControllerCompBase::CreateObjectFrom
 }
 
 
-void CObjectCollectionControllerCompBase::PrepareFilters(
+void CObjectCollectionControllerCompBase::AddAccessFilters(
 			const imtgql::CGqlRequest& gqlRequest,
-			const imtgql::CGqlParamObject& inputParamsGql,
+			const imtgql::CGqlParamObject& viewParamsGql,
 			iprm::CParamsSet& filterParams) const
 {
-	this->SetAdditionalFilters(gqlRequest, inputParamsGql, &filterParams);
+	this->SetAdditionalFilters(gqlRequest, viewParamsGql, &filterParams);
 
 	// Inject optional tenant filter
 	imtauth::CTenantFilterParam* tenantFilterPtr = CreateTenantFilterParam(gqlRequest);
@@ -3204,6 +3215,15 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 
 		filterParams.SetEditableParameter("TenantFilter", tenantFilterPtr, true);
 	}
+}
+
+
+void CObjectCollectionControllerCompBase::PrepareFilters(
+			const imtgql::CGqlRequest& gqlRequest,
+			const imtgql::CGqlParamObject& inputParamsGql,
+			iprm::CParamsSet& filterParams) const
+{
+	AddAccessFilters(gqlRequest, inputParamsGql, filterParams);
 
 	const imtgql::CGqlParamObject* complexFilterModelPtr = inputParamsGql.GetParamArgumentObjectPtr("filterModel");
 	const imtgql::CGqlParamObject* documentFilterModelPtr = inputParamsGql.GetParamArgumentObjectPtr("documentFilterModel");

@@ -115,7 +115,13 @@ QtObject {
 		if (!root.__permissionsProvider)
 			return
 		root.__permissionsProvider.productId = root.productId || ""
-		root.__permissionsProvider.requestPermissions(tenantId || root.tenantId || "")
+		root.__permissionsProvider.ensurePermissions(tenantId || root.tenantId || "")
+	}
+
+	// The permission scope of the organization changed: its permissions are read again when an editor needs them
+	function invalidateTenantPermissions() {
+		if (root.__permissionsProvider)
+			root.__permissionsProvider.invalidateTenantPermissions()
 	}
 
 	function fetchOrganizationPermissions(tenantId, userId) {
@@ -368,6 +374,10 @@ QtObject {
 							if (m_status === "Success"){
 								roleReprController.documentUpdated(roleReprController.documentId)
 							}
+							else{
+								roleReprController.updateDocumentFailed(roleReprController.documentId, m_message !== "" ? m_message : qsTr("The changes could not be saved"))
+								roleReprController.updateRepresentationFromDocument()
+							}
 						}
 					}
 				}
@@ -509,6 +519,10 @@ QtObject {
 							if (m_status === "Success"){
 								groupReprController.documentUpdated(groupReprController.documentId)
 							}
+							else{
+								groupReprController.updateDocumentFailed(groupReprController.documentId, m_message !== "" ? m_message : qsTr("The changes could not be saved"))
+								groupReprController.updateRepresentationFromDocument()
+							}
 						}
 					}
 				}
@@ -625,8 +639,8 @@ QtObject {
 
 			property MailRegExpValidator mailRegExp: MailRegExpValidator {}
 
+			// The collection hosts tell the reason of updateDocumentFailed
 			function __failValidation(message){
-				PopupManager.addErrorMessage(message, true)
 				updateDocumentFailed(documentId, message)
 			}
 
@@ -672,6 +686,10 @@ QtObject {
 						onFinished: {
 							if (m_status === "Success"){
 								userReprController.documentUpdated(userReprController.documentId)
+							}
+							else{
+								userReprController.updateDocumentFailed(userReprController.documentId, m_message !== "" ? m_message : qsTr("The changes could not be saved"))
+								userReprController.updateRepresentationFromDocument()
 							}
 						}
 					}

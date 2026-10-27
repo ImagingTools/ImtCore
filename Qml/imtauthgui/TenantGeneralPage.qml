@@ -39,6 +39,8 @@ ViewBase {
 		? (generalPage.stateManager.isNewTenant || generalPage.stateManager.canEditOrganization)
 		: false
 	readonly property bool __isNewTenant: generalPage.stateManager ? generalPage.stateManager.isNewTenant : false
+	// The users to pick the owner from are listed only to whoever may view users
+	readonly property bool __canPickOwner: PermissionsController.checkPermission("/Administration/Users/View")
 
 	function updateGui() {
 		if (!generalPage.tenantData) return
@@ -138,7 +140,7 @@ ViewBase {
 				// Until the organization is saved the creator picks its owner; afterwards it is transferred on the Members page
 				CollectionSelectElementView {
 					id: ownerSelect
-					visible: generalPage.__isNewTenant
+					visible: generalPage.__isNewTenant && generalPage.__canPickOwner
 					name: qsTr("Owner")
 					description: qsTr("The owner holds every available permission of the organization")
 					commandId: ImtauthUsersSdlCommandIds.s_usersList
@@ -152,6 +154,14 @@ ViewBase {
 					onItemSelected: {
 						generalPage.__selectOwner(itemId, item ? item.title : "")
 					}
+				}
+
+				TextElementView {
+					id: ownerSelfText
+					visible: generalPage.__isNewTenant && !generalPage.__canPickOwner
+					name: qsTr("Owner")
+					text: qsTr("You (the creator)")
+					description: qsTr("You become the owner. The ownership can be transferred to a member on the Members page later.")
 				}
 
 				TextElementView {

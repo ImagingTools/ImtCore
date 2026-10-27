@@ -212,6 +212,7 @@
                                     <Data IsEnabled="true">
                                         <Values>
                                             <Value>/Administration/Roles/View</Value>
+                                            <Value>/OrganizationManagement/Roles/View</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -248,6 +249,7 @@
                                     <Data IsEnabled="true">
                                         <Values>
                                             <Value>/Administration/Roles/Edit/Change</Value>
+                                            <Value>/OrganizationManagement/Roles/Edit/Change</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
