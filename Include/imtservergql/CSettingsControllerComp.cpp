@@ -10,6 +10,9 @@
 #include <iprm/CParamsSet.h>
 #include <iprm/CIdParam.h>
 
+// ImtCore includes
+#include <imtauth/IUserInfo.h>
+
 
 namespace imtservergql
 {
@@ -21,7 +24,7 @@ namespace imtservergql
 
 sdl::V1_0::imtbase::CSetSettingsPayload CSettingsControllerComp::OnSetSettings(
 			const sdl::V1_0::imtbase::CSetSettingsGqlRequest& setSettingsRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtbase::CSetSettingsPayload response;
@@ -29,6 +32,7 @@ sdl::V1_0::imtbase::CSetSettingsPayload CSettingsControllerComp::OnSetSettings(
 	sdl::V1_0::imtbase::SetSettingsRequestArguments arguments = setSettingsRequest.GetRequestedArguments();
 	if (!arguments.input || !arguments.input->userId.has_value()){
 		Q_ASSERT(false);
+		
 		return response;
 	}
 	
@@ -37,6 +41,13 @@ sdl::V1_0::imtbase::CSetSettingsPayload CSettingsControllerComp::OnSetSettings(
 	if (userId.isEmpty()){
 		errorMessage = QStringLiteral("Unable to set settings. User-ID is empty!");
 		SendErrorMessage(0, errorMessage, "CSettingsControllerComp");
+		return response;
+	}
+
+	if (!IsCallerAllowed(gqlRequest, userId)){
+		errorMessage = QStringLiteral("Unable to set settings for user '%1'. Error: The settings belong to another user").arg(QString(userId));
+		SendWarningMessage(0, errorMessage, "CSettingsControllerComp");
+		
 		return response;
 	}
 
@@ -53,6 +64,7 @@ sdl::V1_0::imtbase::CSetSettingsPayload CSettingsControllerComp::OnSetSettings(
 	if (!userSettingsPtr.IsValid()){
 		errorMessage = QStringLiteral("Unable to set settings for user '%1'. Error: User settings is invalid");
 		SendErrorMessage(0, errorMessage, "CSettingsControllerComp");
+		
 		return response;
 	}
 	
@@ -61,6 +73,7 @@ sdl::V1_0::imtbase::CSetSettingsPayload CSettingsControllerComp::OnSetSettings(
 		Q_ASSERT(false);
 		errorMessage = QStringLiteral("Unable to set settings for user '%1'. Error: User settings is invalid");
 		SendErrorMessage(0, errorMessage, "CSettingsControllerComp");
+		
 		return response;
 	}
 	
@@ -69,18 +82,21 @@ sdl::V1_0::imtbase::CSetSettingsPayload CSettingsControllerComp::OnSetSettings(
 	if (error.error != QJsonParseError::NoError){
 		errorMessage = QStringLiteral("Unable to set settings for user '%1'. Error: Settings json invalid").arg(userId);
 		SendErrorMessage(0, errorMessage, "CSettingsControllerComp");
+		
 		return response;
 	}
 	
 	if (!m_userSettingsRepresentationControllerCompPtr->GetDataModelFromRepresentation(representationDoc.object(), *paramSetPtr)){
 		errorMessage = QStringLiteral("Unable to set settings for user '%1'. Error: Get data model from representation failed").arg(userId);
 		SendErrorMessage(0, errorMessage, "CSettingsControllerComp");
+		
 		return response;
 	}
 	
 	if (!SetUserSettings(userId, *userSettingsPtr)){
 		errorMessage = QStringLiteral("Unable to set settings for user '%1'").arg(userId);
 		SendErrorMessage(0, errorMessage, "CSettingsControllerComp");
+		
 		return response;
 	}
 
@@ -126,6 +142,14 @@ sdl::V1_0::imtbase::CParamsSet CSettingsControllerComp::OnGetSettings(
 	if (userId.isEmpty()){
 		errorMessage = QStringLiteral("Unable to get settings. User-ID is empty!");
 		SendErrorMessage(0, errorMessage, "CSettingsControllerComp");
+		
+		return response;
+	}
+
+	if (!IsCallerAllowed(gqlRequest, userId)){
+		errorMessage = QStringLiteral("Unable to get settings for user '%1'. Error: The settings belong to another user").arg(QString(userId));
+		SendWarningMessage(0, errorMessage, "CSettingsControllerComp");
+		
 		return response;
 	}
 
@@ -144,6 +168,7 @@ sdl::V1_0::imtbase::CParamsSet CSettingsControllerComp::OnGetSettings(
 	if (!userSettingsPtr.IsValid()){
 		errorMessage = QStringLiteral("Unable to get settings for user '%1'. Error: User settings is invalid").arg(userId);
 		SendErrorMessage(0, errorMessage, "CSettingsControllerComp");
+		
 		return response;
 	}
 	
@@ -152,6 +177,7 @@ sdl::V1_0::imtbase::CParamsSet CSettingsControllerComp::OnGetSettings(
 	if (paramSetPtr == nullptr){
 		errorMessage = QStringLiteral("Unable to create representation for user settings. Error: Params set from user settings is invalid.");
 		SendErrorMessage(0, errorMessage, "CSettingsControllerComp");
+		
 		return response;
 	}
 	
@@ -159,12 +185,14 @@ sdl::V1_0::imtbase::CParamsSet CSettingsControllerComp::OnGetSettings(
 	if (!m_userSettingsRepresentationControllerCompPtr->GetRepresentationFromDataModel(*paramSetPtr, representationObject, &paramsSet)){
 		errorMessage = QStringLiteral("Unable to get settings for user '%1'. Error: Get representation failed").arg(userId);
 		SendErrorMessage(0, errorMessage, "CSettingsControllerComp");
+		
 		return response;
 	}
 	
 	if (!response.ReadFromJsonObject(representationObject)){
 		errorMessage = QStringLiteral("Unable to get settings for user '%1'. Error: Read from Json object failed").arg(userId);
 		SendErrorMessage(0, errorMessage, "CSettingsControllerComp");
+		
 		return response;
 	}
 	
@@ -245,6 +273,24 @@ sdl::V1_0::imtbase::CUrlParam CSettingsControllerComp::OnGetWebSocketUrl(
 
 // private methods
 
+bool CSettingsControllerComp::IsCallerAllowed(const ::imtgql::CGqlRequest& gqlRequest, const QByteArray& userId) const
+{
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr == nullptr){
+		return true;
+	}
+
+	const QByteArray callerId = gqlContextPtr->GetUserId();
+	if (callerId.isEmpty() || callerId == userId){
+		return true;
+	}
+
+	const imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
+
+	return userInfoPtr != nullptr && userInfoPtr->IsAdmin();
+}
+
+
 imtauth::IUserSettingsSharedPtr CSettingsControllerComp::GetOrCreateUserSettings(const QByteArray& userId) const
 {
 	if (userId.isEmpty()){
@@ -302,5 +348,4 @@ bool CSettingsControllerComp::SetUserSettings(const QByteArray& userId, const im
 
 
 } // namespace imtservergql
-
 
