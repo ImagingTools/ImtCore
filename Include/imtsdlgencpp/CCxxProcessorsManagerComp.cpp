@@ -20,12 +20,40 @@
 #include <imtsdl/CSdlEnum.h>
 #include <imtsdl/CSdlDocumentType.h>
 #include <imtsdl/CSdlRequest.h>
+#include <imtsdlgencpp/CQmlRegisterGeneratorComp.h>
+#include <imtsdlgencpp/CSdlQObjectGeneratorComp.h>
+#include <imtsdlgencpp/CSdlUnionObjectGeneratorComp.h>
 
 
 namespace imtsdlgencpp
 {
 
 // static helpers
+
+/**
+	The processors that generate the QObject based classes (<Type>Object, <Type>ObjectList, union objects)
+	and the QML types registration. Their output goes to the separate '<Schema>Objects' files.
+*/
+static bool IsQObjectProcessor(const ICxxFileProcessor* processorPtr)
+{
+	return dynamic_cast<const CSdlQObjectGeneratorComp*>(processorPtr) != nullptr ||
+		dynamic_cast<const CSdlUnionObjectGeneratorComp*>(processorPtr) != nullptr ||
+		dynamic_cast<const CQmlRegisterGeneratorComp*>(processorPtr) != nullptr;
+}
+
+
+/// \returns path of the file with QObject based classes for the given generated file path, i.e. 'Foo.h' -> 'FooObjects.h'
+static QString ToObjectsFilePath(const QString& filePath)
+{
+	const int extensionIndex = filePath.lastIndexOf('.');
+	if (extensionIndex < 0){
+		return filePath + QStringLiteral("Objects");
+	}
+
+	return filePath.left(extensionIndex) + QStringLiteral("Objects") + filePath.mid(extensionIndex);
+}
+
+
 CCxxProcessorsManagerComp::FilePtr GetFilePtrForEntry(const imtsdl::CSdlEntryBase& entry, const CCxxProcessorsManagerComp::EntryFileMap& map)
 {
 	if (map.isEmpty()){
@@ -61,11 +89,15 @@ void WriteDeclareMetaType(const QList<T>& entryList, QTextStream& stream)
 
 
 template <class T>
-bool CreateDirectivesFromEntryList(const QList<T>& entryList, QList<imtsdl::IncludeDirective>& output)
+bool CreateDirectivesFromEntryList(const QList<T>& entryList, QList<imtsdl::IncludeDirective>& output, bool isObjectsFile = false)
 {
 	for (const T& entry: entryList){
 		if (entry.IsExternal()){
-			const QString typeIncludePath = '<' + entry.GetTargetHeaderFilePath() + '>';
+			QString typeIncludePath = '<' + entry.GetTargetHeaderFilePath() + '>';
+			if (isObjectsFile){
+				typeIncludePath = '<' + ToObjectsFilePath(entry.GetTargetHeaderFilePath()) + '>';
+			}
+
 			if (typeIncludePath.isEmpty()){
 				qCritical() << QStringLiteral("Header path is empty %1 of %2").arg(entry.GetName(), entry.GetSchemaFilePath());
 				I_CRITICAL();
@@ -124,6 +156,10 @@ iproc::IProcessor::TaskState CCxxProcessorsManagerComp::DoProcessing(
 		cumulatedFiles << sourceFilePath;
 		cumulatedFiles << headerFilePath;
 		cumulatedFiles << fwdFilePath;
+		if (HasObjectEntries()){
+			cumulatedFiles << ToObjectsFilePath(sourceFilePath);
+			cumulatedFiles << ToObjectsFilePath(headerFilePath);
+		}
 
 		PrintFiles(std::cout, cumulatedFiles, m_argumentParserCompPtr->GetGeneratorType());
 		PrintFiles(m_argumentParserCompPtr->GetDepFilePath(), cumulatedFiles, *m_dependentSchemaListCompPtr);
@@ -140,6 +176,31 @@ iproc::IProcessor::TaskState CCxxProcessorsManagerComp::DoProcessing(
 		SendErrorMessage(0, "Can't create header files");
 
 		return TS_INVALID;
+	}
+
+	// the QObject based classes are placed to separate files, so the code that does not use them, does not pay for them
+	EntryFileMap objectHeaderFiles;
+	EntryFileMap objectSourceFiles;
+	if (HasObjectEntries()){
+		objectHeaderFiles = CreateObjectHeaderFiles(paramsPtr);
+		objectSourceFiles = CreateObjectSourceFiles(paramsPtr);
+	}
+
+	if (objectHeaderFiles.size() == 1){
+		const FilePtr& filePtr = objectHeaderFiles.first();
+		if (!filePtr || !BeginHeaderFile(*m_schemaParamsCompPtr, *filePtr, paramsPtr, true)){
+			SendErrorMessage(0, QStringLiteral("Unable to begin process objects header file"));
+
+			return TS_INVALID;
+		}
+	}
+	if (objectSourceFiles.size() == 1){
+		const FilePtr& filePtr = objectSourceFiles.first();
+		if (!filePtr || !BeginSourceFile(*m_schemaParamsCompPtr, *filePtr, paramsPtr)){
+			SendErrorMessage(0, QStringLiteral("Unable to begin process objects source file"));
+
+			return TS_INVALID;
+		}
 	}
 
 	// begin files (if it only one)
@@ -182,13 +243,13 @@ iproc::IProcessor::TaskState CCxxProcessorsManagerComp::DoProcessing(
 		return TS_INVALID;
 	}
 
-	if (!ProcessTypes(headerFiles, sourceFiles, paramsPtr)){
+	if (!ProcessTypes(headerFiles, sourceFiles, objectHeaderFiles, objectSourceFiles, paramsPtr)){
 		SendErrorMessage(0, "Unable to process types");
 
 		return TS_INVALID;
 	}
 
-	if (!ProcessUnions(headerFiles, sourceFiles, paramsPtr)){
+	if (!ProcessUnions(headerFiles, sourceFiles, objectHeaderFiles, objectSourceFiles, paramsPtr)){
 		SendErrorMessage(0, "Unable to process unions");
 
 		return TS_INVALID;
@@ -214,9 +275,23 @@ iproc::IProcessor::TaskState CCxxProcessorsManagerComp::DoProcessing(
 		imtsdl::CSdlType dummyType;
 		FilePtr sourceFilePtr = GetFilePtrForEntry(dummyType, sourceFiles);
 		FilePtr headerFilePtr = GetFilePtrForEntry(dummyType, headerFiles);
+		FilePtr objectSourceFilePtr = GetFilePtrForEntry(dummyType, objectSourceFiles);
+		FilePtr objectHeaderFilePtr = GetFilePtrForEntry(dummyType, objectHeaderFiles);
 		for (int i = 0; i < processorsCount; ++i){
 			ICxxFileProcessor* processorPtr = m_autoProcessorCompListPtr[i];
 			Q_ASSERT(processorPtr != nullptr);
+			if (IsQObjectProcessor(processorPtr)){
+				if (objectHeaderFilePtr && objectSourceFilePtr){
+					if (!processorPtr->ProcessEntry(dummyType, objectHeaderFilePtr.get(), objectSourceFilePtr.get(), paramsPtr)){
+						SendErrorMessage(0, "Processing failed");
+
+						return TS_INVALID;
+					}
+				}
+
+				continue;
+			}
+
 			// Only pass headerDevicePtr when sourceDevicePtr is also available.
 			// This prevents auto processors (e.g. GqlHandlerBaseClassGenerator) from
 			// writing class declarations into the .h file in CGM_HEADER_ONLY mode,
@@ -262,6 +337,23 @@ iproc::IProcessor::TaskState CCxxProcessorsManagerComp::DoProcessing(
 		}
 	}
 
+	if (objectHeaderFiles.size() == 1){
+		const FilePtr& filePtr = objectHeaderFiles.first();
+		if (!EndHeaderFile(*m_schemaParamsCompPtr, *filePtr, paramsPtr, true)){
+			SendErrorMessage(0, QStringLiteral("Unable to end process file '%1'").arg(filePtr->fileName()));
+
+			return TS_INVALID;
+		}
+	}
+	if (objectSourceFiles.size() == 1){
+		const FilePtr& filePtr = objectSourceFiles.first();
+		if (!EndSourceFile(*m_schemaParamsCompPtr, *filePtr, paramsPtr)){
+			SendErrorMessage(0, QStringLiteral("Unable to end process file '%1'").arg(filePtr->fileName()));
+
+			return TS_INVALID;
+		}
+	}
+
 	// generate forward declaration file
 	if (!GenerateForwardDeclarationFile(paramsPtr)){
 		SendErrorMessage(0, "Unable to generate forward declaration file");
@@ -278,25 +370,70 @@ iproc::IProcessor::TaskState CCxxProcessorsManagerComp::DoProcessing(
 bool CCxxProcessorsManagerComp::BeginHeaderFile(
 			const iprm::IParamsSet& entryParams,
 			QFile& headerFile,
-			const iprm::IParamsSet* /*paramsPtr*/) const
+			const iprm::IParamsSet* /*paramsPtr*/,
+			bool isObjectsFile) const
 {
 	// write pragma once first
 	QTextStream stream(&headerFile);
 	stream << QStringLiteral("#pragma once");
 	FeedStream(stream, 2, false);
 
+	if (isObjectsFile){
+		// the objects file extends the main one
+		stream << QStringLiteral("#include \"");
+		stream << QFileInfo(headerFile).baseName().chopped(QStringLiteral("Objects").length());
+		stream << QStringLiteral(".h\"");
+		FeedStream(stream, 2, false);
+
+		// special optional qt include
+		stream << QStringLiteral("#ifdef QT_QML_LIB");
+		FeedStream(stream, 1, false);
+		stream << QStringLiteral("#include <QtQml/QQmlEngine>");
+		FeedStream(stream, 1, false);
+		stream << QStringLiteral("#endif // QT_QML_LIB");
+		FeedStream(stream, 2, false);
+
+		// the objects of the types from other schemas
+		QList<imtsdl::IncludeDirective> objectsDirectivesList;
+		objectsDirectivesList << imtsdl::CSdlTools::CreateImtDirective("<imtbase/CItemModelBase.h>");
+		objectsDirectivesList << imtsdl::CSdlTools::CreateImtDirective("<imtsdl/TListModelBase.h>");
+		if (m_sdlUnionListCompPtr.IsValid()){
+			imtsdl::SdlUnionList list = m_sdlUnionListCompPtr->GetUnions(false);
+			CreateDirectivesFromEntryList(list, objectsDirectivesList, true);
+		}
+		if (m_sdlTypeListCompPtr.IsValid()){
+			imtsdl::SdlTypeList list = m_sdlTypeListCompPtr->GetSdlTypes(false);
+			CreateDirectivesFromEntryList(list, objectsDirectivesList, true);
+		}
+
+		QString lastRemark;
+		for (const imtsdl::IncludeDirective& directive: objectsDirectivesList){
+			if (directive.remark != lastRemark){
+				FeedStream(stream, 1, false);
+				stream << (directive.remark.startsWith(QStringLiteral("//")) ? QString() : QStringLiteral("// ")) << directive.remark;
+				FeedStream(stream, 1, false);
+				lastRemark = directive.remark;
+			}
+			stream << QStringLiteral("#include ") << directive.path;
+			FeedStream(stream, 1, false);
+		}
+		FeedStream(stream, 2, false);
+
+		// begin namespace
+		stream << QStringLiteral("namespace ");
+		stream << GetNamespaceFromSchemaParams(entryParams);
+		FeedStream(stream, 1, false);
+
+		stream << '{';
+		FeedStream(stream, 3, false);
+
+		return true;
+	}
+
 	// include forward declarations file (contains enum classes)
 	stream << QStringLiteral("#include \"");
 	stream << QFileInfo(headerFile).baseName();
 	stream << QStringLiteral("_fwd.h\"");
-	FeedStream(stream, 2, false);
-
-	// special optional qt include
-	stream << QStringLiteral("#ifdef QT_QML_LIB");
-	FeedStream(stream, 1, false);
-	stream << QStringLiteral("#include <QtQml/QQmlEngine>");
-	FeedStream(stream, 1, false);
-	stream << QStringLiteral("#endif // QT_QML_LIB");
 	FeedStream(stream, 2, false);
 
 	// write includes
@@ -416,7 +553,8 @@ bool CCxxProcessorsManagerComp::BeginSourceFile(
 bool CCxxProcessorsManagerComp::EndHeaderFile(
 			const iprm::IParamsSet& entryParams,
 			QFile& headerFile,
-			const iprm::IParamsSet* /*paramsPtr*/) const
+			const iprm::IParamsSet* /*paramsPtr*/,
+			bool isObjectsFile) const
 {
 	QTextStream stream(&headerFile);
 
@@ -425,7 +563,11 @@ bool CCxxProcessorsManagerComp::EndHeaderFile(
 	stream << '}';
 	stream << QStringLiteral(" // namespace ");
 	stream << sdlNamespace;
-	FeedStream(stream, 2, false);
+	FeedStream(stream, isObjectsFile ? 1 : 2, false);
+
+	if (isObjectsFile){
+		return true;
+	}
 
 	// add qt registration for QVariant
 	if (m_sdlTypeListCompPtr.IsValid()){
@@ -531,6 +673,8 @@ bool CCxxProcessorsManagerComp::ProcessEnums(
 bool CCxxProcessorsManagerComp::ProcessTypes(
 	const EntryFileMap& headerFiles,
 	const EntryFileMap& sourceFiles,
+	const EntryFileMap& objectHeaderFiles,
+	const EntryFileMap& objectSourceFiles,
 	const iprm::IParamsSet* paramsPtr) const
 {
 	if (!m_typeProcessorCompListPtr.IsValid() || !m_sdlTypeListCompPtr.IsValid()){
@@ -559,6 +703,15 @@ bool CCxxProcessorsManagerComp::ProcessTypes(
 		for (const imtsdl::CSdlUnion& sdlUinion: unionList){
 			stream << QStringLiteral("class ") << sdlUinion.GetName() << ';';
 			FeedStream(stream, 1, false);
+		}
+		FeedStream(stream, 1, false);
+	}
+
+	for (const FilePtr& objectHeaderFilePtr: objectHeaderFiles){
+		Q_ASSERT(objectHeaderFilePtr);
+
+		QTextStream stream(objectHeaderFilePtr.get());
+		for (const imtsdl::CSdlUnion& sdlUinion: unionList){
 			stream << QStringLiteral("class C")  << sdlUinion.GetName() << QStringLiteral("Object;");
 			FeedStream(stream, 1, false);
 			stream << QStringLiteral("class C")  << sdlUinion.GetName() << QStringLiteral("ObjectList;");
@@ -572,9 +725,15 @@ bool CCxxProcessorsManagerComp::ProcessTypes(
 	for (int i = 0; i < typeProcessorsCount; ++i){
 		ICxxFileProcessor* typeProcessorPtr = m_typeProcessorCompListPtr[i];
 		Q_ASSERT(typeProcessorPtr != nullptr);
+		const bool isQObjectProcessor = IsQObjectProcessor(typeProcessorPtr);
+		if (isQObjectProcessor && objectHeaderFiles.isEmpty() && objectSourceFiles.isEmpty()){
+			// the objects files are not generated
+			continue;
+		}
+
 		for (const imtsdl::CSdlType& sdlType: typeList){
-			FilePtr headerFilePtr = GetFilePtrForEntry(sdlType, headerFiles);
-			FilePtr sourceFilePtr = GetFilePtrForEntry(sdlType, sourceFiles);
+			FilePtr headerFilePtr = GetFilePtrForEntry(sdlType, isQObjectProcessor ? objectHeaderFiles : headerFiles);
+			FilePtr sourceFilePtr = GetFilePtrForEntry(sdlType, isQObjectProcessor ? objectSourceFiles : sourceFiles);
 			const bool ok = typeProcessorPtr->ProcessEntry(sdlType, headerFilePtr.get(), sourceFilePtr.get(), paramsPtr);
 			if (!ok){
 				SendErrorMessage(0, QStringLiteral("Unable to process type '%1'").arg(sdlType.GetName()));
@@ -591,6 +750,8 @@ bool CCxxProcessorsManagerComp::ProcessTypes(
 bool CCxxProcessorsManagerComp::ProcessUnions(
 			const EntryFileMap& headerFiles,
 			const EntryFileMap& sourceFiles,
+			const EntryFileMap& objectHeaderFiles,
+			const EntryFileMap& objectSourceFiles,
 			const iprm::IParamsSet* paramsPtr) const
 {
 	if (!m_unionProcessorCompListPtr.IsValid() || !m_sdlUnionListCompPtr.IsValid() || (headerFiles.isEmpty() && sourceFiles.isEmpty())){
@@ -609,9 +770,15 @@ bool CCxxProcessorsManagerComp::ProcessUnions(
 	for (int i = 0; i < unionProcessorsCount; ++i){
 		ICxxFileProcessor* unionProcessorPtr = m_unionProcessorCompListPtr[i];
 		Q_ASSERT(unionProcessorPtr != nullptr);
+		const bool isQObjectProcessor = IsQObjectProcessor(unionProcessorPtr);
+		if (isQObjectProcessor && objectHeaderFiles.isEmpty() && objectSourceFiles.isEmpty()){
+			// the objects files are not generated
+			continue;
+		}
+
 		for (const imtsdl::CSdlUnion& sdlUinion: unionList){
-			FilePtr headerFilePtr = GetFilePtrForEntry(sdlUinion, headerFiles);
-			FilePtr sourceFilePtr = GetFilePtrForEntry(sdlUinion, sourceFiles);
+			FilePtr headerFilePtr = GetFilePtrForEntry(sdlUinion, isQObjectProcessor ? objectHeaderFiles : headerFiles);
+			FilePtr sourceFilePtr = GetFilePtrForEntry(sdlUinion, isQObjectProcessor ? objectSourceFiles : sourceFiles);
 			Q_ASSERT(headerFilePtr || sourceFilePtr);
 			const bool ok = unionProcessorPtr->ProcessEntry(sdlUinion, headerFilePtr.get(), sourceFilePtr.get(), paramsPtr);
 			if (!ok){
@@ -865,10 +1032,12 @@ bool CCxxProcessorsManagerComp::GenerateForwardDeclarationFile(const iprm::IPara
 			for (const imtsdl::CSdlUnion& sdlUnion: unionList){
 				fwdStream << QStringLiteral("class ") << sdlUnion.GetName() << ';';
 				FeedStream(fwdStream, 1, false);
-				fwdStream << QStringLiteral("class C") << sdlUnion.GetName() << QStringLiteral("Object;");
-				FeedStream(fwdStream, 1, false);
-				fwdStream << QStringLiteral("class C") << sdlUnion.GetName() << QStringLiteral("ObjectList;");
-				FeedStream(fwdStream, 1, false);
+				if (HasObjectEntries()){
+					fwdStream << QStringLiteral("class C") << sdlUnion.GetName() << QStringLiteral("Object;");
+					FeedStream(fwdStream, 1, false);
+					fwdStream << QStringLiteral("class C") << sdlUnion.GetName() << QStringLiteral("ObjectList;");
+					FeedStream(fwdStream, 1, false);
+				}
 			}
 			FeedStream(fwdStream, 1, false);
 		}
@@ -983,6 +1152,53 @@ CCxxProcessorsManagerComp::EntryFileMap CCxxProcessorsManagerComp::CreateSourceF
 	retVal[QString()] = singleFilePtr;
 
 	return retVal;
+}
+
+
+CCxxProcessorsManagerComp::EntryFileMap CCxxProcessorsManagerComp::CreateObjectHeaderFiles(const iprm::IParamsSet* /*paramsPtr*/) const
+{
+	EntryFileMap retVal;
+
+	imtsdl::ISdlProcessArgumentsParser::CppGenerationMode mode = m_argumentParserCompPtr->GetCppGenerationMode();
+	if (mode == imtsdl::ISdlProcessArgumentsParser::CGM_IMPLEMENTATION_ONLY){
+		return retVal;
+	}
+
+	const QString outputFilePath = CalculateTargetCppFilesFromSchemaParams(*m_schemaParamsCompPtr, *m_argumentParserCompPtr)[imtsdl::ISdlProcessArgumentsParser::s_headerFileType];
+	FilePtr singleFilePtr = CreateFile(ToObjectsFilePath(outputFilePath));
+	if (!singleFilePtr){
+		return retVal;
+	}
+	retVal[QString()] = singleFilePtr;
+
+	return retVal;
+}
+
+
+CCxxProcessorsManagerComp::EntryFileMap CCxxProcessorsManagerComp::CreateObjectSourceFiles(const iprm::IParamsSet* /*paramsPtr*/) const
+{
+	EntryFileMap retVal;
+
+	imtsdl::ISdlProcessArgumentsParser::CppGenerationMode mode = m_argumentParserCompPtr->GetCppGenerationMode();
+	if (mode == imtsdl::ISdlProcessArgumentsParser::CGM_HEADER_ONLY){
+		return retVal;
+	}
+
+	const QString outputFilePath = CalculateTargetCppFilesFromSchemaParams(*m_schemaParamsCompPtr, *m_argumentParserCompPtr)[imtsdl::ISdlProcessArgumentsParser::s_sourceFileType];
+	FilePtr singleFilePtr = CreateFile(ToObjectsFilePath(outputFilePath));
+	if (!singleFilePtr){
+		return retVal;
+	}
+	retVal[QString()] = singleFilePtr;
+
+	return retVal;
+}
+
+
+bool CCxxProcessorsManagerComp::HasObjectEntries() const
+{
+	// the files are created even if the schema has nothing for them, so the build system knows the outputs without parsing the schema
+	return m_argumentParserCompPtr->IsObjectsGenerationEnabled();
 }
 
 

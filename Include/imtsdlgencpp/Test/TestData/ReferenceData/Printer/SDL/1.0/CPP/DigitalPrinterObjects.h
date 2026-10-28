@@ -1,0 +1,186 @@
+#pragma once
+
+#include "DigitalPrinter.h"
+
+#ifdef QT_QML_LIB
+#include <QtQml/QQmlEngine>
+#endif // QT_QML_LIB
+
+
+// ImtCore includes
+#include <imtbase/CItemModelBase.h>
+#include <imtsdl/TListModelBase.h>
+
+// custom types includes
+#include <modsdlsdl/SDL/1.0/CPP/PrinterBaseObjects.h>
+
+
+namespace sdl::V1_0::modsdl
+{
+
+
+
+
+
+
+class CDigitalPrinterSpecificationObjectList;
+
+class CDigitalPrinterSpecificationObject: public ::imtbase::CItemModelBase, public CDigitalPrinterSpecification
+{
+	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
+	Q_PROPERTY(QVariant m_base READ GetBase WRITE SetBase NOTIFY baseChanged)
+	Q_PROPERTY(QVariant m_printingTechnology READ GetPrintingTechnology WRITE SetPrintingTechnology NOTIFY printingTechnologyChanged)
+
+	typedef ::imtbase::CItemModelBase BaseClass;
+
+public:
+	CDigitalPrinterSpecificationObject(QObject* parent = nullptr);
+
+	QVariant GetBase();
+	QString Get__Typename() {return QStringLiteral("DigitalPrinterSpecification");}
+	void SetBase(const QVariant& v);
+	Q_INVOKABLE bool hasBase();
+	Q_INVOKABLE void emplaceBase();
+	void ResetBase();
+	QVariant GetPrintingTechnology();
+	void SetPrintingTechnology(const QVariant& v);
+	Q_INVOKABLE bool hasPrintingTechnology();
+	// CItemModelBase implemented
+	Q_INVOKABLE QString toJson() const override;
+	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
+	Q_INVOKABLE virtual bool fromObject(const QJsonObject& jsonObject) override;
+	Q_INVOKABLE QString toGraphQL() const override;
+	Q_INVOKABLE QVariant CreateObject(const QString& key) override;
+	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
+
+signals:
+	void baseChanged();
+	void printingTechnologyChanged();
+
+protected:
+	QVariant m_baseQObjectPtr;
+};
+
+
+
+
+
+class CDigitalPrinterSpecificationObjectList: public ::imtsdl::TListModelBase<sdl::V1_0::modsdl::CDigitalPrinterSpecification, sdl::V1_0::modsdl::CDigitalPrinterSpecificationObject>
+{
+	Q_OBJECT
+	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
+public:
+	typedef ::imtsdl::TListModelBase<sdl::V1_0::modsdl::CDigitalPrinterSpecification, sdl::V1_0::modsdl::CDigitalPrinterSpecificationObject> BaseClass;
+
+	explicit CDigitalPrinterSpecificationObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
+	Q_INVOKABLE QVariantMap get(int row) const override;
+	Q_INVOKABLE void append(sdl::V1_0::modsdl::CDigitalPrinterSpecificationObject* item);
+	Q_INVOKABLE sdl::V1_0::modsdl::CDigitalPrinterSpecificationObjectList* copyMe();
+	Q_INVOKABLE QString toJson();
+	Q_INVOKABLE QString toGraphQL();
+	Q_INVOKABLE void addElement(sdl::V1_0::modsdl::CDigitalPrinterSpecificationObject* item);
+	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::modsdl::CDigitalPrinterSpecificationObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::V1_0::modsdl::CDigitalPrinterSpecificationObject* item);
+	Q_INVOKABLE void remove(int index) override;
+	Q_INVOKABLE void clear() override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
+
+signals:
+	void countChanged();
+};
+
+
+
+class CDigitalPrinterObjectList;
+
+class CDigitalPrinterObject: public ::imtbase::CItemModelBase, public CDigitalPrinter
+{
+	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
+	Q_PROPERTY(QVariant m_base READ GetBase WRITE SetBase NOTIFY baseChanged)
+	Q_PROPERTY(QVariant m_printingTechnology READ GetPrintingTechnology WRITE SetPrintingTechnology NOTIFY printingTechnologyChanged)
+
+	typedef ::imtbase::CItemModelBase BaseClass;
+
+public:
+	CDigitalPrinterObject(QObject* parent = nullptr);
+
+	QVariant GetBase();
+	QString Get__Typename() {return QStringLiteral("DigitalPrinter");}
+	void SetBase(const QVariant& v);
+	Q_INVOKABLE bool hasBase();
+	Q_INVOKABLE void emplaceBase();
+	void ResetBase();
+	QVariant GetPrintingTechnology();
+	void SetPrintingTechnology(const QVariant& v);
+	Q_INVOKABLE bool hasPrintingTechnology();
+	// CItemModelBase implemented
+	Q_INVOKABLE QString toJson() const override;
+	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
+	Q_INVOKABLE virtual bool fromObject(const QJsonObject& jsonObject) override;
+	Q_INVOKABLE QString toGraphQL() const override;
+	Q_INVOKABLE QVariant CreateObject(const QString& key) override;
+	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
+
+signals:
+	void baseChanged();
+	void printingTechnologyChanged();
+
+protected:
+	QVariant m_baseQObjectPtr;
+};
+
+
+
+
+
+class CDigitalPrinterObjectList: public ::imtsdl::TListModelBase<sdl::V1_0::modsdl::CDigitalPrinter, sdl::V1_0::modsdl::CDigitalPrinterObject>
+{
+	Q_OBJECT
+	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
+public:
+	typedef ::imtsdl::TListModelBase<sdl::V1_0::modsdl::CDigitalPrinter, sdl::V1_0::modsdl::CDigitalPrinterObject> BaseClass;
+
+	explicit CDigitalPrinterObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
+	Q_INVOKABLE QVariantMap get(int row) const override;
+	Q_INVOKABLE void append(sdl::V1_0::modsdl::CDigitalPrinterObject* item);
+	Q_INVOKABLE sdl::V1_0::modsdl::CDigitalPrinterObjectList* copyMe();
+	Q_INVOKABLE QString toJson();
+	Q_INVOKABLE QString toGraphQL();
+	Q_INVOKABLE void addElement(sdl::V1_0::modsdl::CDigitalPrinterObject* item);
+	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::modsdl::CDigitalPrinterObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::V1_0::modsdl::CDigitalPrinterObject* item);
+	Q_INVOKABLE void remove(int index) override;
+	Q_INVOKABLE void clear() override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
+
+signals:
+	void countChanged();
+};
+
+
+#ifdef QT_QML_LIB
+[[maybe_unused]] static void RegisterDigitalPrinterQmlTypes()
+{
+	qmlRegisterType<CDigitalPrinterSpecificationObject>("modsdlDigitalPrinterSdl", 1, 0, "DigitalPrinterSpecification");
+	qmlRegisterType<CDigitalPrinterObject>("modsdlDigitalPrinterSdl", 1, 0, "DigitalPrinter");
+	qmlRegisterSingletonType<EnumPrintingTechnology>("modsdlDigitalPrinterSdl", 1, 0, "PrintingTechnology", [](QQmlEngine *engine, QJSEngine *scriptEngine) -> QObject * {
+		Q_UNUSED(engine)
+		Q_UNUSED(scriptEngine)
+
+		EnumPrintingTechnology *enumType = new EnumPrintingTechnology();
+		return enumType;
+	});
+}
+#endif
+
+} // namespace sdl::V1_0::modsdl

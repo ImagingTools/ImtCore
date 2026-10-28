@@ -66,6 +66,8 @@ public:
 	virtual QString GetDepFilePath() const = 0;
 	virtual CppGenerationMode GetCppGenerationMode() const = 0;
 	virtual TypenameWriteMode GetTypenameWriteMode() const = 0;
+	/// \returns false if the '<Schema>Objects' files with the QObject based classes (<Type>Object, <Type>ObjectList, union objects) and the QML types registration should not be generated
+	virtual bool IsObjectsGenerationEnabled() const = 0;
 
 	// template
 	virtual bool IsTemplateEnabled() const = 0;
