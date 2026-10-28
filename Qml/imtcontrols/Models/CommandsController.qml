@@ -144,15 +144,15 @@ QtObject {
 	}
 	
 	function setCommandIcon(commandId, icon){
-		setCommandProperty(commandId, "m_icon", icon)
+		setCommandProperty(commandId, "m_elementItemPath", icon)
 	}
 	
 	function setCommandName(commandId, commandName){
-		setCommandProperty(commandId, "m_commandName", commandName)
+		setCommandProperty(commandId, "m_elementName", commandName)
 	}
 	
 	function setCommandNotification(commandId, notification){
-		setCommandProperty(commandId, "m_commandStatus", notification)
+		setCommandProperty(commandId, "m_elementStatus", notification)
 	}
 	
 	function setCommandVisible(commandId, isVisible){
@@ -167,12 +167,43 @@ QtObject {
 		
 		for (let i = 0; i < commands.m_elements.count; i++){
 			let command = commands.m_elements.get(i).item;
-			if (command && command.m_commandId == commandId){
+			if (command && command.m_elementId == commandId){
 				return i;
 			}
 		}
 		
 		return -1;
+	}
+	
+	function getCommandsGroup(groupId){
+		if (!commands){
+			return null;
+		}
+		
+		for (let i = 0; i < commands.m_elements.count; i++){
+			let group = commands.m_elements.get(i).item;
+			if (group && group.m_elementId == groupId){
+				return group.m_subElements;
+			}
+		}
+		
+		return null;
+	}
+	
+	function getLeftCommandsGroup(){
+		return getCommandsGroup("Group1");
+	}
+	
+	function getCenterCommandsGroup(){
+		return getCommandsGroup("Group2");
+	}
+	
+	function getRightCommandsGroup(){
+		return getCommandsGroup("Group3");
+	}
+	
+	function getAdditionalCommandsGroup(){
+		return getCommandsGroup("Group4");
 	}
 	
 	function setIsToggleable(commandId, toggleable){
@@ -181,7 +212,7 @@ QtObject {
 	
 	function isToggleable(commandId){
 		let command = getCommandById(commandId);
-		if (!command){
+		if (command){
 			return command.m_toggleable;
 		}
 		
@@ -190,7 +221,7 @@ QtObject {
 	
 	function isToggled(commandId){
 		let command = getCommandById(commandId);
-		if (!command){
+		if (command){
 			return command.m_toggled;
 		}
 		
