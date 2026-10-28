@@ -137,13 +137,19 @@ class Text extends Item {
             let maxWidth = this.width__prevent ? this.width : 0
             if(eliding && maxWidth > 0 && width > maxWidth) width = maxWidth
 
+            // CSS elides only the end; the start and the middle are elided here
+            if((this.elide === Text.ElideLeft || this.elide === Text.ElideMiddle) && maxWidth > 0 && textMetrics.width > maxWidth){
+                this.__impl.innerText = this.__elidedText(maxWidth)
+            }
+
             this.contentWidth = width
             this.contentHeight = textMetrics.height
 
             Geometry.setAuto(this.__self, 'height', textMetrics.height, this.__self.constructor.meta.height)
             Geometry.setAuto(this.__self, 'width', width, this.__self.constructor.meta.width)
 
-            this.implicitWidth = width
+            // As in Qt, the implicit width is the whole text; only the painted (content) width is elided
+            this.implicitWidth = textMetrics.width
             this.implicitHeight = textMetrics.height
         } else {
             let textMetrics = JQApplication.TextController.measureText(this.text, this.font, !this.width__prevent ? 0 : this.width, this.wrapMode, isHTML, this.elide && this.wrapMode === Text.NoWrap)
@@ -195,6 +201,31 @@ class Text extends Item {
         super.SLOT_visibleChanged(oldValue, newValue)
 
         JQApplication.updateLater(this)
+    }
+
+    // The longest "…tail" (ElideLeft) or "head…tail" (ElideMiddle) that fits the width
+    __elidedText(maxWidth){
+        let text = this.text
+        let candidate = (count)=>{
+            if(this.elide === Text.ElideLeft) return '…' + text.slice(text.length - count)
+            return text.slice(0, Math.ceil(count / 2)) + '…' + text.slice(text.length - Math.floor(count / 2))
+        }
+
+        let best = '…'
+        let low = 0
+        let high = text.length
+        while(low <= high){
+            let middle = (low + high) >> 1
+            let value = candidate(middle)
+            if(JQApplication.TextController.measureTextFast(value, this.font).width <= maxWidth){
+                best = value
+                low = middle + 1
+            } else {
+                high = middle - 1
+            }
+        }
+
+        return best
     }
 
     __updateElide(){

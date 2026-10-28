@@ -13,24 +13,14 @@ module.exports = {
         return true
     },
 
+    // Searches from the item with active focus, like Qt
     __activateTabFocusTarget(target, forward){
         if(!target || typeof target.nextItemInFocusChain !== 'function') return false
 
-        let current = target
-        let steps = 0
+        let next = target.nextItemInFocusChain(forward)
+        if(!next || next === target) return false
 
-        while(steps < 1000){
-            current = current.nextItemInFocusChain(forward)
-            if(!current || current === target) return false
-
-            if(current.activeFocusOnTab && current.enabled && current.visible){
-                return this.__activateKeyNavigationTarget(current)
-            }
-
-            steps++
-        }
-
-        return false
+        return this.__activateKeyNavigationTarget(next)
     },
 
     // Makes the DOM keyboard event look like a Qt KeyEvent for QML handlers:
@@ -173,7 +163,12 @@ module.exports = {
             }
 
             if (e.key === 'Tab') {
-                let tabTarget = elements.length > 0 ? elements[elements.length - 1] : null
+                // The focus tree starts with the item that has active focus
+                let tabTarget = elements.length > 0 ? elements[0] : null
+                if(!e.shiftKey && tabTarget && tabTarget.__insertTab && tabTarget.__insertTab()){
+                    e.preventDefault()
+                    return
+                }
                 if (this.__activateTabFocusTarget(tabTarget, !e.shiftKey)){
                     e.preventDefault()
                     return

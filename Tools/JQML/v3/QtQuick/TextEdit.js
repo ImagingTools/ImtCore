@@ -143,8 +143,8 @@ class TextEdit extends Item {
             } else if(e.key === QtEnums.Key_Enter){
                 e.stopPropagation()
             } else if(e.key === QtEnums.Key_Tab){
+                // The browser must not move the focus; the Keys handlers get the Tab first, as in Qt
                 e.preventDefault()
-                e.stopPropagation()
             }
         }
 
@@ -395,6 +395,17 @@ class TextEdit extends Item {
             this.text = buff.join('')
             this.select(this.selectionEnd-replaced.length+text.length, this.selectionEnd-replaced.length+text.length)
         })
+    }
+    // A Tab that no Keys handler took is typed into the text, as Qt's TextEdit does
+    __insertTab(){
+        if(this.readOnly) return false
+
+        let buff = this.text.split('')
+        let start = this.selectionStart
+        buff.splice(start, this.selectionEnd - start, '\t')
+        this.text = buff.join('')
+        this.select(start + 1, start + 1)
+        return true
     }
     positionAt(x, y, position){
 
