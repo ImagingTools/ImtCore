@@ -15,6 +15,21 @@ Item {
     property int mainMargin: Style.marginM;
     property int panelWidth: Style.sizeHintXXXS;
 
+    // A narrow view keeps only the page icons, so the page itself is not squeezed.
+    readonly property bool compact: root.width > 0 && root.width - root.panelWidth < Style.sizeHintS;
+
+    function showNavTooltip(item, text){
+        // The decorator places the tooltip next to the tooltip item, so put the item over the page button.
+        let point = item.mapToItem(root, 0, 0);
+        navTooltip.x = point.x;
+        navTooltip.y = point.y;
+        navTooltip.width = item.width;
+        navTooltip.height = item.height;
+        navTooltip.targetItem = item;
+        navTooltip.text = text;
+        navTooltip.show(item.width, item.height / 2);
+    }
+
     signal pageLoaded(int index, var pageItem, string pageId);
 
     function clear(){
@@ -241,135 +256,173 @@ Item {
         anchors.topMargin: root.mainMargin;
         anchors.leftMargin: root.mainMargin;
 
-        width: root.panelWidth;
+        width: root.compact ? Style.iconSizeS + 2 * Style.marginM : root.panelWidth;
 
-        Column {
-            id: sidebarColumn;
+        // Pages that do not fit the height scroll instead of being cut off.
+        Flickable {
+            id: sidebarFlickable;
 
-            anchors.top: parent.top;
-            anchors.left: parent.left;
-            anchors.right: parent.right;
-            anchors.topMargin: Style.marginS;
+            anchors.fill: parent;
 
-            spacing: Style.spacingXS;
+            contentWidth: width;
+            contentHeight: sidebarColumn.height + 2 * Style.marginS;
+            boundsBehavior: Flickable.StopAtBounds;
+            interactive: contentHeight > height;
+            clip: true;
 
-            Repeater {
-                model: root.pagesModel;
+            Column {
+                id: sidebarColumn;
 
-                delegate: Item {
-                    id: navDelegate
-                    objectName: "Page_" + model.id;
+                y: Style.marginS;
+                width: sidebarFlickable.width - (sidebarScrollbar.visible ? sidebarScrollbar.width + Style.marginXS : 0);
 
-                    readonly property bool __isParentWithSubs: root.hasSubPages(model.id)
-                    readonly property bool __isSubpage: model.isSubpage
-                    readonly property string __parentId: model.parentId || ""
-                    readonly property bool __parentExpanded: __isSubpage ? root.isExpanded(__parentId) : true
-                    readonly property bool __isSelected: root.currentIndex === model.index
+                spacing: Style.spacingXS;
 
-                    visible: !__isSubpage || __parentExpanded
-                    width: sidebarColumn.width
-                    height: visible ? Style.controlHeightM : 0
+                Repeater {
+                    model: root.pagesModel;
 
-                    Rectangle {
-                        id: navItem
-                        anchors.fill: parent
-                        radius: Style.marginS
-                        color: navDelegate.__isSelected
-                            ? Style.selectedColor
-                            : navMouseArea.containsMouse ? Style.hover : "transparent"
+                    delegate: Item {
+                        id: navDelegate
+                        objectName: "Page_" + model.id;
 
-                        Row {
+                        readonly property bool __isParentWithSubs: root.hasSubPages(model.id)
+                        readonly property bool __isSubpage: model.isSubpage
+                        readonly property string __parentId: model.parentId || ""
+                        readonly property bool __parentExpanded: __isSubpage ? root.isExpanded(__parentId) : true
+                        // In the compact mode a collapsed parent shows the selection of its subpage
+                        readonly property bool __isSelected: root.currentIndex === model.index
+                            || (root.compact && __isParentWithSubs && !root.isExpanded(model.id) && root.currentIndex >= 0 && root.currentIndex < root.pagesModel.count
+                                && root.pagesModel.get(root.currentIndex).parentId === model.id)
+                        readonly property bool __hasIcon: !__isSubpage && (model.icon ? true : false)
+
+                        visible: !__isSubpage || __parentExpanded
+                        width: sidebarColumn.width
+                        height: visible ? Style.controlHeightM : 0
+
+                        Rectangle {
+                            id: navItem
                             anchors.fill: parent
-                            anchors.leftMargin: navDelegate.__isSubpage
-                                ? Style.marginM + Style.iconSizeS + Style.marginS
-                                : Style.marginM
-                            anchors.rightMargin: Style.marginM
-                            spacing: Style.marginS
+                            radius: Style.marginS
+                            color: navDelegate.__isSelected
+                                ? Style.selectedColor
+                                : navMouseArea.containsMouse ? Style.hover : "transparent"
+
+                            Row {
+                                anchors.fill: parent
+                                anchors.leftMargin: navDelegate.__isSubpage && !root.compact
+                                    ? Style.marginM + Style.iconSizeS + Style.marginS
+                                    : Style.marginM
+                                anchors.rightMargin: Style.marginM
+                                spacing: Style.marginS
+
+                                Image {
+                                    visible: !navDelegate.__isSubpage && model.icon
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: Style.iconSizeS
+                                    height: Style.iconSizeS
+                                    source: model.icon
+                                        ? (navDelegate.__isSelected
+                                            ? "qrc:/" + Style.getIconPath(model.icon, Icon.State.On, Icon.Mode.Selected)
+                                            : "qrc:/" + Style.getIconPath(model.icon, Icon.State.On, Icon.Mode.Normal))
+                                        : ""
+                                    sourceSize.width: width
+                                    sourceSize.height: height
+                                }
+
+                                // In the compact mode a page without an icon keeps the first letter of its name
+                                Text {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    visible: !root.compact || !navDelegate.__hasIcon
+                                    text: root.compact ? model.name.charAt(0) : model.name
+                                    font.family: Style.fontFamily
+                                    font.pixelSize: navDelegate.__isSubpage ? Style.fontSizeS : Style.fontSizeM
+                                    color: Style.textColor
+                                    elide: Text.ElideRight
+                                    width: root.compact ? Style.iconSizeS
+                                        : parent.width - (navDelegate.__hasIcon ? Style.iconSizeS + parent.spacing : 0)
+                                            - (navBadge.visible ? navBadge.width + parent.spacing : 0)
+                                }
+
+                                Text {
+                                    id: navBadge
+                                    visible: !root.compact && model.badge !== undefined && model.badge !== ""
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text: model.badge !== undefined ? model.badge : ""
+                                    font.family: Style.fontFamily
+                                    font.pixelSize: Style.fontSizeS
+                                    color: navDelegate.__isSelected ? Style.textSelectedColor : Style.subtitleColor
+                                }
+                            }
 
                             Image {
-                                visible: !navDelegate.__isSubpage && model.icon
-                                anchors.verticalCenter: parent.verticalCenter
-                                width: Style.iconSizeS
-                                height: Style.iconSizeS
-                                source: model.icon
-                                    ? (navDelegate.__isSelected
-                                        ? "qrc:/" + Style.getIconPath(model.icon, Icon.State.On, Icon.Mode.Selected)
-                                        : "qrc:/" + Style.getIconPath(model.icon, Icon.State.On, Icon.Mode.Normal))
-                                    : ""
+                                visible: navDelegate.__isParentWithSubs && !root.compact
+                                anchors.right: navItem.right
+                                anchors.rightMargin: Style.marginS
+                                anchors.verticalCenter: navItem.verticalCenter
+                                width: Style.iconSizeXS
+                                height: Style.iconSizeXS
+                                source: root.isExpanded(model.id)
+                                    ? "qrc:/" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal)
+                                    : "qrc:/" + Style.getIconPath("Icons/Right", Icon.State.On, Icon.Mode.Normal)
                                 sourceSize.width: width
                                 sourceSize.height: height
                             }
 
-                            Text {
-                                anchors.verticalCenter: parent.verticalCenter
-                                text: model.name
-                                font.family: Style.fontFamily
-                                font.pixelSize: navDelegate.__isSubpage ? Style.fontSizeS : Style.fontSizeM
-                                color: Style.textColor
-                                elide: Text.ElideRight
-                                width: parent.width - ((!navDelegate.__isSubpage && model.icon) ? Style.iconSizeS + parent.spacing : 0)
-                                    - (navBadge.visible ? navBadge.width + parent.spacing : 0)
-                            }
+                            MouseArea {
+                                id: navMouseArea
+                                objectName: "MouseArea";
 
-                            Text {
-                                id: navBadge
-                                visible: model.badge !== undefined && model.badge !== ""
-                                anchors.verticalCenter: parent.verticalCenter
-                                text: model.badge !== undefined ? model.badge : ""
-                                font.family: Style.fontFamily
-                                font.pixelSize: Style.fontSizeS
-                                color: navDelegate.__isSelected ? Style.textSelectedColor : Style.subtitleColor
-                            }
-                        }
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
 
-                        Image {
-                            visible: navDelegate.__isParentWithSubs
-                            anchors.right: navItem.right
-                            anchors.rightMargin: Style.marginS
-                            anchors.verticalCenter: navItem.verticalCenter
-                            width: Style.iconSizeXS
-                            height: Style.iconSizeXS
-                            source: root.isExpanded(model.id)
-                                ? "qrc:/" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal)
-                                : "qrc:/" + Style.getIconPath("Icons/Right", Icon.State.On, Icon.Mode.Normal)
-                            sourceSize.width: width
-                            sourceSize.height: height
-                        }
-
-                        MouseArea {
-                            id: navMouseArea
-                            objectName: "MouseArea";
-
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-
-                            onClicked: {
-                                if (navDelegate.__isParentWithSubs) {
-                                    var wasExpanded = root.isExpanded(model.id)
-                                    root.toggleExpanded(model.id)
-
-                                    if (!wasExpanded) {
-                                        var targetSubIndex = root.pagesModel.get(model.index).submenuVisited
-                                            ? root.getLastSubPageIndex(model.id)
-                                            : root.getFirstSubPageIndex(model.id)
-
-                                        if (targetSubIndex >= 0) {
-                                            root.activatePage(targetSubIndex)
-                                            return
-                                        }
-                                    } else {
-                                        root.currentIndex = model.index
-                                        return
+                                onContainsMouseChanged: {
+                                    if (navMouseArea.containsMouse && root.compact) {
+                                        root.showNavTooltip(navMouseArea, model.name)
+                                    }
+                                    else {
+                                        navTooltip.hide()
                                     }
                                 }
 
-                                root.activatePage(model.index)
+                                onClicked: {
+                                    if (navDelegate.__isParentWithSubs) {
+                                        var wasExpanded = root.isExpanded(model.id)
+                                        root.toggleExpanded(model.id)
+
+                                        if (!wasExpanded) {
+                                            var targetSubIndex = root.pagesModel.get(model.index).submenuVisited
+                                                ? root.getLastSubPageIndex(model.id)
+                                                : root.getFirstSubPageIndex(model.id)
+
+                                            if (targetSubIndex >= 0) {
+                                                root.activatePage(targetSubIndex)
+                                                return
+                                            }
+                                        } else {
+                                            root.currentIndex = model.index
+                                            return
+                                        }
+                                    }
+
+                                    root.activatePage(model.index)
+                                }
                             }
                         }
                     }
                 }
             }
+        }
+
+        CustomScrollbar {
+            id: sidebarScrollbar;
+
+            anchors.right: parent.right;
+            anchors.top: sidebarFlickable.top;
+            anchors.bottom: sidebarFlickable.bottom;
+
+            secondSize: Style.marginS;
+            targetItem: sidebarFlickable;
         }
     }
 
@@ -384,6 +437,14 @@ Item {
         width: 1;
         color: Style.borderColor;
         opacity: 0.5
+    }
+
+    // Names of the pages in the compact mode.
+    CustomTooltip {
+        id: navTooltip;
+
+        z: 10;
+        fitToTextWidth: true;
     }
 
     Item {

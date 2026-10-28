@@ -1759,6 +1759,9 @@ QtObject {
 		DocumentRepresentationController {
 			id: crossOrgGrantReprController
 
+			// A new grant shows the defaults of the server (active, the grantor), not empty SDL values
+			requestRepresentationOnCreate: true
+
 			representationModel: CrossOrgGrant {
 				m_id: UuidGenerator.generateUUID()
 			}

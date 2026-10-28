@@ -26,6 +26,7 @@
                             <Values>
                                 <Value>name</Value>
                                 <Value>description</Value>
+                                <Value>parentTenantName</Value>
                                 <Value>tenantRelationScope</Value>
                                 <Value>isActive</Value>
                                 <Value>createdAt</Value>
@@ -38,6 +39,7 @@
                             <Values>
                                 <Value>Name</Value>
                                 <Value>Description</Value>
+                                <Value>Parent</Value>
                                 <Value>Role</Value>
                                 <Value>Active</Value>
                                 <Value>Created</Value>

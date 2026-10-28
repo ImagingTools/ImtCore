@@ -86,6 +86,44 @@ TestCase {
 		}
 	}
 
+	// As the server: answers when the test says so, in pages, without the selected users
+	Component {
+		id: serverApiClientComp
+
+		QtObject {
+			property FilterableSelectDataProvider invitableUsersListDataProvider: FilterableSelectDataProvider {
+				multiSelect: true
+				pageSize: 20
+
+				property var requests: []
+
+				function executeRequest(requestId, count, offset, filter){
+					requests.push({"requestId": requestId, "count": count, "offset": offset})
+				}
+
+				function executeFetchByIds(requestId, ids){
+					onFetchByIdsSuccess(requestId, [])
+				}
+
+				function answer(){
+					let request = requests.shift()
+					let selectedIds = getSelectedIds()
+					let found = []
+					for (let i = 0; i < 60; ++i){
+						if (selectedIds.indexOf("u" + i) < 0){
+							found.push({"id": "u" + i, "title": "User " + i})
+						}
+					}
+					onRequestSuccess(request.requestId, found.slice(request.offset, request.offset + request.count))
+				}
+
+				function fail(){
+					onRequestError(requests.shift().requestId, "Server is down")
+				}
+			}
+		}
+	}
+
 	Component {
 		id: dialogViewComp
 
@@ -119,10 +157,10 @@ TestCase {
 		return null
 	}
 
-	function openInvitePopup(windowHeight, members){
+	function openInvitePopup(windowHeight, members, apiClient){
 		let dialogView = createTemporaryObject(dialogViewComp, testCase.parent, windowHeight ? {"height": windowHeight} : {})
 		let stateManager = createTemporaryObject(stateManagerComp, testCase, members ? {"pendingMembers": members} : {})
-		let page = createTemporaryObject(pageComp, testCase.parent, {"stateManager": stateManager, "apiClient": createTemporaryObject(apiClientComp, testCase)})
+		let page = createTemporaryObject(pageComp, testCase.parent, {"stateManager": stateManager, "apiClient": apiClient ? apiClient : createTemporaryObject(apiClientComp, testCase)})
 		wait(100)
 
 		let inviteLink = findItem(page, function(item){ return item.text === "+ Create Invitation" && item.visible })
@@ -379,5 +417,127 @@ TestCase {
 		wait(100)
 		compare(context.popup.newSelection.length, 0, "Return removes the selected user")
 		compare(context.stateManager.invitations.length, 0)
+	}
+
+	// Ticked users go to the group above the list, which gives way: the popup keeps its height
+	function test_tickingKeepsThePopupHeight(){
+		let context = openInvitePopup()
+		let height = context.popup.height
+
+		for (let i = 0; i < 5; ++i){
+			context.popup.handleItemClick(context.popup.getItemId(i), i)
+			wait(50)
+			compare(context.popup.height, height, (i + 1) + " ticked")
+		}
+
+		let list = findItem(context.popup, function(item){ return item.itemCount !== undefined && item.contentY !== undefined })
+		verify(list.height >= 3 * context.popup.itemHeight, "The list keeps three rows: " + list.height)
+	}
+
+	function openServerPopup(){
+		let apiClient = createTemporaryObject(serverApiClientComp, testCase)
+		let provider = apiClient.invitableUsersListDataProvider
+		let context = openInvitePopup(0, null, apiClient)
+		compare(provider.requests.length, 1, "The first page is asked")
+		provider.answer()
+		wait(50)
+		context.provider = provider
+		context.list = findItem(context.popup, function(item){ return item.itemCount !== undefined && item.contentY !== undefined })
+		context.statusBar = findItem(context.popup, function(item){ return item.objectName === "FilterableSelectPageStatus" })
+		// Not the caption of the busy ring
+		context.statusText = findItem(context.statusBar, function(item){ return item.text !== undefined && item.elide !== undefined && item.text !== "Loading..." })
+		return context
+	}
+
+	function loadingOverlayShown(popup){
+		return findItem(popup, function(item){ return item.objectName === "BusyIndicator" && item.indicatorSize === 30 && item.visible }) !== null
+	}
+
+	// Until the answer to a tick arrives, the list stays as it was: no blank list and no loading overlay
+	function test_tickKeepsTheRowsUntilTheAnswer(){
+		let context = openServerPopup()
+		compare(context.provider.items.length, 20)
+
+		context.popup.handleItemClick("u2", 2)
+		wait(50)
+		compare(context.provider.requests.length, 1, "The rows are read again")
+		compare(context.provider.items.length, 20, "The rows are kept meanwhile")
+		compare(context.list.itemCount, 20)
+		verify(!loadingOverlayShown(context.popup), "No loading overlay over the list")
+		verify(!context.statusBar.visible, "No loading bar either")
+
+		context.provider.answer()
+		wait(50)
+		compare(context.provider.items.length, 20)
+		compare(context.provider.items[2].id, "u3", "The ticked user left the list")
+	}
+
+	// A tick deep in the list reads all loaded rows at once, so the reader stays where they were
+	function test_tickReadsAllLoadedRows(){
+		let context = openServerPopup()
+		context.list.contentY = context.list.contentHeight - context.list.height
+		wait(50)
+		compare(context.provider.requests.length, 1, "The end of the list asks for the next page")
+		context.provider.answer()
+		wait(100)
+		compare(context.provider.items.length, 40)
+
+		context.list.contentY = 15 * context.popup.itemHeight
+		wait(50)
+		context.popup.handleItemClick("u16", 16)
+		wait(50)
+		compare(context.provider.requests.length, 1)
+		compare(context.provider.requests[0].count, 40, "All loaded rows are asked")
+		compare(context.provider.requests[0].offset, 0)
+
+		context.provider.fetchMore()
+		compare(context.provider.requests.length, 1, "No page is asked while the rows are read again")
+
+		context.provider.answer()
+		wait(100)
+		compare(context.provider.items.length, 40)
+		verify(context.provider.hasMore, "A full answer leaves more to load")
+		compare(context.list.contentY, 15 * context.popup.itemHeight, "The reader stays where they were")
+	}
+
+	// The next page is shown as a bar over the list; a failure there offers a retry and keeps the rows
+	function test_pageStatusBar(){
+		let context = openServerPopup()
+		verify(!context.statusBar.visible)
+
+		context.provider.fetchMore()
+		wait(50)
+		verify(context.statusBar.visible, "Loading the next page shows the bar")
+		compare(context.statusText.text, "Loading more...")
+
+		context.provider.fail()
+		wait(50)
+		verify(context.statusBar.visible, "A failure keeps the bar")
+		compare(context.statusText.text, "Loading failed. Click to retry")
+		compare(context.list.itemCount, 20, "The rows stay")
+
+		mouseClick(context.statusBar)
+		wait(50)
+		compare(context.provider.requests.length, 1, "A click retries")
+		compare(context.provider.requests[0].offset, 20, "The page that failed")
+		context.provider.answer()
+		wait(50)
+		verify(!context.statusBar.visible)
+		compare(context.provider.items.length, 40)
+	}
+
+	// A failed read after a tick is retried as that read, not as the next page
+	function test_failedReloadIsRetriedAsAReload(){
+		let context = openServerPopup()
+		context.popup.handleItemClick("u0", 0)
+		wait(50)
+		context.provider.fail()
+		wait(50)
+		compare(context.provider.items.length, 20, "The rows stay")
+
+		context.provider.retry()
+		compare(context.provider.requests.length, 1)
+		compare(context.provider.requests[0].offset, 0)
+		compare(context.provider.requests[0].count, 20)
 	}
 }

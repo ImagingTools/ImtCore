@@ -126,8 +126,6 @@ Column {
 				}
 			}
 
-			KeyNavigation.tab: nameInput_;
-			KeyNavigation.backtab: passwordInput_.visible ? confirmPassword : mailInput_;
 		}
 
 		RegularExpressionValidator {
@@ -156,8 +154,6 @@ Column {
 				}
 			}
 
-			KeyNavigation.tab: mailInput_;
-			KeyNavigation.backtab: usernameInput_;
 		}
 
 		RegularExpressionValidator {
@@ -184,8 +180,6 @@ Column {
 				container.emitUpdateModel();
 			}
 
-			KeyNavigation.tab: passwordInput_.visible ? passwordInput_ : usernameInput_;
-			KeyNavigation.backtab: nameInput_;
 		}
 
 		SwitchElementView {
@@ -310,8 +304,6 @@ Column {
 				passwordGroup.checkPassword();
 			}
 
-			KeyNavigation.tab: confirmPassword;
-			KeyNavigation.backtab: mailInput_;
 		}
 
 		TextInputElementView {
@@ -330,8 +322,6 @@ Column {
 			onEditingFinished: {
 				passwordGroup.checkPassword();
 			}
-			KeyNavigation.tab: usernameInput_;
-			KeyNavigation.backtab: passwordInput_;
 		}
 
 		ElementView {

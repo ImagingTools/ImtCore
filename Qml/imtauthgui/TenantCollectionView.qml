@@ -106,6 +106,7 @@ RemoteCollectionView {
 		table.setColumnContentById(TenantItemDataTypeMetaInfo.s_updatedAt, updatedAtCellDelegateComp)
 		table.setColumnContentById(TenantItemDataTypeMetaInfo.s_isActive, isActiveCellDelegateComp)
 		table.setColumnContentById(TenantItemDataTypeMetaInfo.s_tenantRelationScope, tenantRelationScopeCellDelegateComp)
+		table.setColumnContentById(TenantItemDataTypeMetaInfo.s_parentTenantName, parentTenantNameCellDelegateComp)
 	}
 
 	function acceptInvitation(invitationId) {
@@ -373,6 +374,34 @@ RemoteCollectionView {
 	}
 
 	Component {
+		id: parentTenantNameCellDelegateComp
+		TableCellDelegateBase {
+			id: parentTenantNameDelegate
+
+			// The colors stay bound to the style, so they follow a theme change
+			property string parentName: ""
+
+			onReused: {
+				var val = parentTenantNameDelegate.getValue()
+				parentTenantNameDelegate.parentName = val !== undefined && val !== null ? val.toString() : ""
+			}
+
+			Text {
+				id: parentTenantNameLabel
+				anchors.verticalCenter: parent.verticalCenter
+				anchors.left: parent.left
+				anchors.right: parent.right
+				anchors.leftMargin: Style.marginM
+				anchors.rightMargin: Style.marginM
+				elide: Text.ElideRight
+				font.pixelSize: Style.fontSizeM
+				text: parentTenantNameDelegate.parentName !== "" ? parentTenantNameDelegate.parentName : qsTr("No parent")
+				color: parentTenantNameDelegate.parentName !== "" ? Style.textColor : Style.inactiveTextColor
+			}
+		}
+	}
+
+	Component {
 		id: ownerIdCellDelegateComp
 		TableCellDelegateBase {
 			id: ownerIdDelegate
@@ -409,10 +438,11 @@ RemoteCollectionView {
 		id: isActiveCellDelegateComp
 		TableCellDelegateBase {
 			id: isActiveDelegate
+
+			property bool isActive: false
+
 			onReused: {
-				var val = isActiveDelegate.getValue()
-				isActiveLabel.text = val ? qsTr("Active") : qsTr("Inactive")
-				isActiveIndicator.color = val ? Style.successColor : Style.neutralEmphasisColor
+				isActiveDelegate.isActive = isActiveDelegate.getValue() ? true : false
 			}
 
 			Row {
@@ -427,7 +457,7 @@ RemoteCollectionView {
 					width: 10
 					height: 10
 					radius: width / 2
-					color: Style.neutralEmphasisColor
+					color: isActiveDelegate.isActive ? Style.successColor : Style.neutralEmphasisColor
 				}
 
 				Text {
@@ -435,6 +465,7 @@ RemoteCollectionView {
 					anchors.verticalCenter: parent.verticalCenter
 					font.pixelSize: Style.fontSizeM
 					color: Style.textColor
+					text: isActiveDelegate.isActive ? qsTr("Active") : qsTr("Inactive")
 				}
 			}
 		}

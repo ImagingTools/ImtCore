@@ -171,6 +171,7 @@ ControlBase {
         selectByMouse: true;
         clip: true;
         visible: containerTextField.decorator_.z < 0;
+        activeFocusOnTab: !textField.readOnly;
 
         onAccepted: {
             containerTextField.accepted();

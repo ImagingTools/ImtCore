@@ -176,6 +176,8 @@ ElementView {
 			border.width: 1
 			border.color: control.activeFocus || collectionSelectView.isOpen ? Style.iconColorOnSelected : Style.inputBorderColor
 
+			activeFocusOnTab: collectionSelectView.changeable
+
 			Keys.onSpacePressed: {
 				collectionSelectView.openPopup()
 			}

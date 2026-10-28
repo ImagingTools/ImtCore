@@ -263,6 +263,61 @@ TestCase {
 		compare(errors.length, 1)
 		compare(errors[0][1], "Refused by the server")
 	}
+	function findHeader(item){
+		if (item.getHeaderName !== undefined && item.setHeaderName !== undefined){
+			return item
+		}
+		for (let i = 0; i < item.children.length; ++i){
+			let found = findHeader(item.children[i])
+			if (found){
+				return found
+			}
+		}
+		return null
+	}
+
+	// Watches the header name of the document until stopped
+	function recordHeaderNames(header){
+		let names = []
+		let timer = Qt.createQmlObject("import QtQuick 2.12; Timer { interval: 5; repeat: true; running: true }", testCase)
+		timer.triggered.connect(function(){
+			let name = header.getHeaderName("doc")
+			if (names.length === 0 || names[names.length - 1] !== name){
+				names.push(name)
+			}
+		})
+		return {"names": names, "timer": timer}
+	}
+
+	// A document saved with each change is dirty only during the save: the name does not blink with "* "
+	function test_dirtyForTheSaveOnlyDoesNotMarkTheName(){
+		let context = createWorkspace()
+		context.service.handleDocumentOpened("doc", "obj-doc", typeId, "Org", false, false)
+		tryVerify(function(){ return findHeader(context.workspace).getHeaderName("doc") === "Org" }, 3000)
+		let record = recordHeaderNames(findHeader(context.workspace))
+
+		context.service.setDocumentIsDirty("doc", true)
+		wait(30)
+		context.service.setDocumentIsDirty("doc", false)
+		wait(500)
+
+		record.timer.destroy()
+		compare(record.names.join(" | "), "Org")
+	}
+
+	function test_unsavedChangesMarkTheName(){
+		let context = createWorkspace()
+		context.service.handleDocumentOpened("doc", "obj-doc", typeId, "Org", false, false)
+		let header = findHeader(context.workspace)
+		tryVerify(function(){ return header.getHeaderName("doc") === "Org" }, 3000)
+
+		context.service.setDocumentIsDirty("doc", true)
+		tryVerify(function(){ return header.getHeaderName("doc") === "* Org" }, 1000, "The mark comes once the change stays unsaved")
+
+		context.service.setDocumentIsDirty("doc", false)
+		compare(header.getHeaderName("doc"), "Org", "Saved: the mark goes at once")
+	}
+
 	// Editors without a collection host (e.g. role, user editors) use the service directly
 	function test_serviceAppliesTheListWithoutAView(){
 		let service = createTemporaryObject(serviceComp, testCase)

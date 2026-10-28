@@ -21,7 +21,7 @@ Item {
 	property bool expanded: false
 	readonly property real labelImplicitWidth: labelText.implicitWidth
 
-	readonly property bool __overflow: measureText.implicitWidth > valueText.width + 1
+	readonly property bool __overflow: detailsRow.text !== "" && valueText.implicitWidth > valueText.width + 1
 	readonly property string __fullText: detailsRow.separator !== "" ? detailsRow.text.split(detailsRow.separator).join("\n") : detailsRow.text
 
 	height: detailsRow.expanded ? Math.max(labelText.height, expandedArea.height) : labelText.height
@@ -36,14 +36,6 @@ Item {
 		text: detailsRow.label
 		font.pixelSize: Style.fontSizeS
 		color: Style.inactiveTextColor
-	}
-
-	// Measured apart: the web runtime caps implicitWidth of an eliding Text at its width.
-	BaseText {
-		id: measureText
-		visible: false
-		text: detailsRow.text
-		font.pixelSize: Style.fontSizeS
 	}
 
 	BaseText {

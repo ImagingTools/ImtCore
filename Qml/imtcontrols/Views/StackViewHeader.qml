@@ -8,6 +8,14 @@ Item {
     property string separation: "/"
     property bool initialItemTitleVisible: true
 
+    // Width the headers take without eliding, for a page that places its commands next to them
+    readonly property real implicitContentWidth: (buttonPanel.visible ? buttonPanel.width + Style.marginM : 0) + measureRow.implicitWidth
+
+    // A header that does not fit gets an equal share of the width and is elided, instead of running off the view
+    readonly property int __shownCount: headersModel.count > 0 && !root.initialItemTitleVisible ? headersModel.count - 1 : headersModel.count
+    readonly property real __itemMaxWidth: root.implicitContentWidth <= root.width || root.__shownCount <= 0 ? -1
+        : Math.max(0, (headersListView.width - (root.__shownCount - 1) * (2 * Style.marginM + separatorMeasure.implicitWidth)) / root.__shownCount)
+
     signal closeClicked()
     signal headerItemClicked(int index, string headerId)
 
@@ -84,6 +92,43 @@ Item {
 		}
 	}
     
+    // The headers laid out as shown, unelided, to measure them; transparent, as a hidden row is not laid out
+    Row {
+        id: measureRow;
+        opacity: 0;
+        enabled: false;
+        spacing: Style.marginM;
+
+        Repeater {
+            model: headersModel;
+            delegate: Row {
+                spacing: Style.marginM;
+                visible: model.index === 0 ? root.initialItemTitleVisible : true;
+
+                Text {
+                    font.pixelSize: Style.fontSizeXXL;
+                    font.family: Style.fontFamily;
+                    text: root.separation;
+                    visible: model.index === 1 && !root.initialItemTitleVisible ? false : model.index > 0;
+                }
+
+                Text {
+                    font.pixelSize: Style.fontSizeXXL;
+                    font.family: Style.fontFamily;
+                    text: model.name;
+                }
+            }
+        }
+    }
+
+    Text {
+        id: separatorMeasure;
+        opacity: 0;
+        font.pixelSize: Style.fontSizeXXL;
+        font.family: Style.fontFamily;
+        text: root.separation;
+    }
+
     ListView {
         id: headersListView;
 		anchors.verticalCenter: parent.verticalCenter
@@ -94,6 +139,7 @@ Item {
 		height: visible ? Style.controlHeightL : 0;
 		orientation: ListView.Horizontal;
 		boundsBehavior: Flickable.StopAtBounds;
+		clip: true;
 		visible: count === 1 && !root.initialItemTitleVisible ? false : true;
 		model: headersModel;
 		delegate: Item {
@@ -127,6 +173,8 @@ Item {
 				Text {
 					id: headerText;
 					anchors.verticalCenter: content.verticalCenter;
+					width: root.__itemMaxWidth >= 0 ? Math.min(implicitWidth, root.__itemMaxWidth) : implicitWidth;
+					elide: Text.ElideRight;
 					font.pixelSize: Style.fontSizeXXL;
 					font.family: Style.fontFamily;
 					font.underline: model.index < headersModel.count - 1 && headerItemMA.containsMouse

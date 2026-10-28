@@ -157,15 +157,26 @@ PopupView {
 	// the resize entirely instead of smoothing it. When there are fewer results than
 	// maxVisibleItems the list simply leaves blank space below, the same tradeoff
 	// any fixed-height dropdown/autocomplete makes.
+	// The selected group takes its place from the list, so ticking rows does not resize the popup either.
 	readonly property int __listStageHeight: root.maxVisibleItems > 0
-		? (root.embedded ? root.maxVisibleItems * root.itemHeight : Math.max(2 * root.itemHeight, Math.min(root.maxVisibleItems * root.itemHeight, root.__maxPopupHeight - root.__reservedHeight)))
+		? (root.embedded ? root.maxVisibleItems * root.itemHeight
+			: Math.max(2 * root.itemHeight, root.__stageHeight - (selectedGroup.visible ? selectedGroup.height + contentColumn.spacing : 0)))
 		: 200
 
-	// --- Private: everything but the list; on a short window the list gives way, so the footer (e.g. an apply button) stays reachable ---
+	// --- Private: the list and the selected group together ---
+	readonly property int __stageHeight: Math.min(root.maxVisibleItems * root.itemHeight, root.__maxPopupHeight - root.__reservedHeight)
+
+	// --- Private: the selected group without its rows: caption, separator and spacings ---
+	readonly property int __selectedGroupChromeHeight: Style.controlHeightS + 2 * selectedGroup.spacing + 1 + contentColumn.spacing
+
+	// --- Private: selected rows shown before the group scrolls; the list keeps three rows under it ---
+	readonly property int __selectedGroupRows: root.embedded || root.maxVisibleItems <= 0 ? root.maxSelectedGroupItems
+		: Math.max(1, Math.min(root.maxSelectedGroupItems, Math.floor((root.__stageHeight - 3 * root.itemHeight - root.__selectedGroupChromeHeight) / root.itemHeight)))
+
+	// --- Private: everything but the stage; on a short window the list gives way, so the footer (e.g. an apply button) stays reachable ---
 	readonly property int __reservedHeight: 2 * Style.marginL
 		+ (headerLoader.visible ? headerLoader.height + contentColumn.spacing : 0)
 		+ filterField.height + contentColumn.spacing
-		+ (selectedGroup.visible ? selectedGroup.height + contentColumn.spacing : 0)
 		+ (footerLoader.visible ? footerLoader.height + contentColumn.spacing : 0)
 
 	// --- Private: floor so loading/empty/error still show something in embedded
@@ -565,7 +576,7 @@ PopupView {
 			if (root.showSelectedGroup && root.dataProvider){
 				root.__internal.restoredContentY = popupListView.contentY
 				root.__internal.restoreAfterFetch = true
-				root.dataProvider.fetch(filterField.text)
+				root.dataProvider.reload()
 			}
 		}
 
@@ -748,11 +759,7 @@ PopupView {
 					id: selectedListContainer
 
 					width: parent.width
-					height: {
-						var totalHeight = root.__internal.selectedItemsCount * root.itemHeight
-						var maxHeight = root.maxSelectedGroupItems * root.itemHeight
-						return Math.min(totalHeight, maxHeight)
-					}
+					height: Math.min(root.__internal.selectedItemsCount, root.__selectedGroupRows) * root.itemHeight
 
 					ListView {
 						id: selectedListView
@@ -874,7 +881,7 @@ PopupView {
 
 						secondSize: 8
 						targetItem: selectedListView
-						visible: root.__internal.selectedItemsCount > root.maxSelectedGroupItems
+						visible: root.__internal.selectedItemsCount > root.__selectedGroupRows
 					}
 				}
 
@@ -930,6 +937,7 @@ PopupView {
 							&& root.dataProvider.error !== null
 							&& !root.dataProvider.isInitialLoading
 							&& !root.dataProvider.isPageLoading
+							&& root.dataProvider.items.length === 0
 
 					Text {
 						anchors.centerIn: parent
@@ -1002,6 +1010,64 @@ PopupView {
 					}
 				}
 
+				// The next page loading, or failing, shown as a bar over the last row of a filled list
+				Rectangle {
+					id: pageStatusBar
+
+					objectName: "FilterableSelectPageStatus"
+
+					// Above the hover block, which would take the retry click
+					z: 1
+
+					anchors.left: parent.left
+					anchors.right: parent.right
+					anchors.bottom: parent.bottom
+
+					height: root.itemHeight
+					color: Style.baseColor
+					visible: root.dataProvider
+							&& root.dataProvider.items.length > 0
+							&& !root.dataProvider.isInitialLoading
+							&& (root.dataProvider.isPageLoading || root.dataProvider.error !== null)
+
+					Rectangle {
+						width: parent.width
+						height: 1
+						color: Style.borderColor
+					}
+
+					Row {
+						anchors.centerIn: parent
+						spacing: Style.marginS
+
+						Loading {
+							anchors.verticalCenter: parent.verticalCenter
+							width: Style.iconSizeXS
+							height: Style.iconSizeXS
+							indicatorSize: Style.iconSizeXS
+							background.color: "transparent"
+							visible: pageStatusBar.visible && root.dataProvider.isPageLoading
+						}
+
+						Text {
+							anchors.verticalCenter: parent.verticalCenter
+							font.pixelSize: Style.fontSizeS
+							color: root.dataProvider && root.dataProvider.isPageLoading ? Style.placeHolderTextColor : Style.errorColor
+							text: root.dataProvider && root.dataProvider.isPageLoading ? qsTr("Loading more...") : qsTr("Loading failed. Click to retry")
+						}
+					}
+
+					MouseArea {
+						anchors.fill: parent
+						hoverEnabled: true
+						enabled: root.dataProvider && !root.dataProvider.isPageLoading
+						cursorShape: Qt.PointingHandCursor
+						onClicked: {
+							root.dataProvider.retry()
+						}
+					}
+				}
+
 				// Only a real pointer move ends the block: the block appears under a still pointer, and the list moves under it
 				// when the selected group changes, so the position is compared in the window
 				MouseArea {
@@ -1042,24 +1108,6 @@ PopupView {
 				visible: root.footerComponent !== null
 			}
 		}
-	}
-
-	// --- "Loading more..." overlay at the bottom of the list area ---
-	Text {
-		id: loadingMoreOverlay
-
-		anchors.bottom: body.bottom
-		anchors.bottomMargin: footerLoader.visible ? footerLoader.height + Style.marginM + Style.marginS : Style.marginS
-		anchors.horizontalCenter: body.horizontalCenter
-
-		visible: root.dataProvider
-				&& root.dataProvider.isPageLoading
-				&& root.dataProvider.items.length > 0
-
-		color: Style.placeHolderTextColor
-		font.pixelSize: Style.fontSizeS
-		font.italic: true
-		text: qsTr("Loading more...")
 	}
 
 	// --- Shadow (covers entire background including filter field) ---
@@ -1404,25 +1452,10 @@ PopupView {
 		}
 	}
 
+	// By the real height of the list: the selected group takes rows from it
 	function contentYCorrection(down_){
 		if (root.focusedIndex >= 0){
-			var contentY = popupListView.contentY
-			var itemH = root.itemHeight
-			var itemCount = root.dataProvider ? root.dataProvider.items.length : 0
-			var visibleCount = root.maxVisibleItems === -1 ? itemCount : Math.min(root.maxVisibleItems, itemCount)
-			if (visibleCount <= 0) return
-			var index = root.focusedIndex
-
-			if (down_){
-				if ((index + 1) * itemH > contentY + visibleCount * itemH){
-					popupListView.contentY = (index + 1) * itemH - visibleCount * itemH
-				}
-			}
-			else {
-				if (index * itemH < contentY){
-					popupListView.contentY = index * itemH
-				}
-			}
+			root.__scrollToRow(root.focusedIndex)
 		}
 	}
 
@@ -1430,7 +1463,7 @@ PopupView {
 		if (root.__internal.selectedFocusedIndex >= 0){
 			var contentY = selectedListView.contentY
 			var itemH = root.itemHeight
-			var visibleCount = root.maxSelectedGroupItems
+			var visibleCount = root.__selectedGroupRows
 			if (visibleCount <= 0) return
 			var index = root.__internal.selectedFocusedIndex
 

@@ -33,6 +33,15 @@ ControlBase {
 
 	property int mainMargin: Style.marginS;
 
+	activeFocusOnTab: checkBox.isActive;
+
+	Keys.onPressed: {
+		if (event.key === Qt.Key_Space && checkBox.isActive){
+			event.accepted = true;
+			checkBox.nextCheckState();
+		}
+	}
+
 	function nextCheckState(){
 		if(!tristate){
 			if(checkState == Qt.Unchecked){

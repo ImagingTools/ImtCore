@@ -427,8 +427,9 @@ SimpleCollectionPage {
 	Component {
 		id: memberHeaderButtonsComp
 
-		Row {
+		Flow {
 			id: headerButtonsRow
+			width: Math.min(membersPage.commandsLineWidth(headerButtonsRow), membersPage.contentWidth)
 			spacing: Style.marginL
 			visible: membersPage.__canCreateMember
 				|| membersPage.__canInviteMember
@@ -437,6 +438,8 @@ SimpleCollectionPage {
 
 			Text {
 				text: qsTr("Exclude")
+				width: Math.min(implicitWidth, membersPage.contentWidth)
+				elide: Text.ElideRight
 				font.pixelSize: Style.fontSizeM
 				font.bold: true
 				visible: membersPage.__canExcludeMember
@@ -488,6 +491,8 @@ SimpleCollectionPage {
 
 			Text {
 				text: qsTr("Edit")
+				width: Math.min(implicitWidth, membersPage.contentWidth)
+				elide: Text.ElideRight
 				font.pixelSize: Style.fontSizeM
 				font.bold: true
 				visible: membersPage.__canEditMember
@@ -523,6 +528,8 @@ SimpleCollectionPage {
 
 			Text {
 				text: "+ " + qsTr("Create User")
+				width: Math.min(implicitWidth, membersPage.contentWidth)
+				elide: Text.ElideRight
 				font.pixelSize: Style.fontSizeM
 				font.bold: true
 				visible: membersPage.__canCreateMember
@@ -543,6 +550,8 @@ SimpleCollectionPage {
 			Text {
 				id: inviteMemberBtn
 				text: "+ " + qsTr("Create Invitation")
+				width: Math.min(implicitWidth, membersPage.contentWidth)
+				elide: Text.ElideRight
 				font.pixelSize: Style.fontSizeM
 				font.bold: true
 				visible: membersPage.__canInviteMember

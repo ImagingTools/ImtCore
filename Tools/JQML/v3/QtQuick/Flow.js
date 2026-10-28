@@ -44,8 +44,9 @@ class Flow extends Item {
         this.__updateGeometry()
     }
 
+    // The direction and spacing set at creation reach the DOM only here: their change handlers do not run for them
     'SLOT_Component.completed'(){
-        JQApplication.updateLater(this)
+        this.__updateFlow()
     }
 
     SLOT_paddingChanged(oldValue, newValue){

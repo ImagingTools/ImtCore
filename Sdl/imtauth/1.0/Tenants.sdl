@@ -67,6 +67,7 @@ type TenantData {
 	pendingInvitations: [TenantInvitationEntry]
 	tenantPermissions: [ID]
 	parentTenantId: ID
+	parentTenantName: String
 	isSystemTenant: Boolean
 	canEditTenantPermissions: Boolean
 	parentTenantPermissions: [ID]
