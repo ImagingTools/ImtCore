@@ -61,6 +61,7 @@ QtObject {
 		__internal.isPageLoading = false
 		__internal.isReloading = false
 		__internal.reloadFailed = false
+		__internal.reloadPending = false
 		__internal.requestedCount = root.pageSize
 
 		__internal.requestId++
@@ -73,12 +74,17 @@ QtObject {
 		so a view neither blanks nor loses its scroll position (e.g. after a selection change).
 	*/
 	function reload(){
-		if (__internal.isInitialLoading || __internal.items.length === 0){
+		// One request at a time: a provider takes an answer for its latest request, so an overlapping reload waits
+		if (__internal.isInitialLoading || __internal.isPageLoading || __internal.isReloading){
+			__internal.reloadPending = true
+			return
+		}
+
+		if (__internal.items.length === 0){
 			root.fetch(__internal.currentFilter)
 			return
 		}
 
-		__internal.isPageLoading = false
 		__internal.isReloading = true
 		__internal.reloadFailed = false
 		__internal.error = null
@@ -99,14 +105,15 @@ QtObject {
 		Fetches the next page. Ignored if already loading or no more items.
 	*/
 	function fetchMore(){
-		if (__internal.isInitialLoading || __internal.isPageLoading || __internal.isReloading || !__internal.hasMore){
+		// After a failed reload the offsets no longer match the server list: the reload is retried first
+		if (__internal.isInitialLoading || __internal.isPageLoading || __internal.isReloading || __internal.reloadPending
+				|| __internal.reloadFailed || !__internal.hasMore){
 			return
 		}
 
 		__internal.isPageLoading = true
 		__internal.error = null
 		__internal.requestedCount = root.pageSize
-		__internal.reloadFailed = false
 
 		__internal.requestId++
 		root.dataChanged()
@@ -387,6 +394,15 @@ QtObject {
 			return
 		}
 
+		// A reload asked meanwhile reads the rows again: a reload answer it outdates is dropped, other answers are kept
+		var reloadAgain = __internal.reloadPending
+		__internal.reloadPending = false
+		if (reloadAgain && __internal.isReloading){
+			__internal.isReloading = false
+			root.reload()
+			return
+		}
+
 		var newItems = rawItems || []
 		// A reload replaces the rows it kept, a page is appended to them
 		var merged = __internal.isReloading ? [] : __internal.items.slice()
@@ -417,6 +433,10 @@ QtObject {
 		__internal.isReloading = false
 		__internal.error = null
 		root.dataChanged()
+
+		if (reloadAgain){
+			root.reload()
+		}
 	}
 
 	/*!
@@ -427,6 +447,16 @@ QtObject {
 	*/
 	function onRequestError(requestId, message, code){
 		if (requestId !== __internal.requestId){
+			return
+		}
+
+		// A reload asked meanwhile is the next request, whatever failed before it
+		if (__internal.reloadPending){
+			__internal.reloadPending = false
+			__internal.isInitialLoading = false
+			__internal.isPageLoading = false
+			__internal.isReloading = false
+			root.reload()
 			return
 		}
 
@@ -539,6 +569,7 @@ QtObject {
 		property bool isPageLoading: false
 		property bool isReloading: false
 		property bool reloadFailed: false
+		property bool reloadPending: false
 		property int requestedCount: 0
 		property bool hasMore: true
 		property var error: null

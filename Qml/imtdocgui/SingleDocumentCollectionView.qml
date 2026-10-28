@@ -136,7 +136,9 @@ Item {
 
 		interval: 300
 
+		// Stopped first: the header reads running, which the web runtime still reports inside onTriggered
 		onTriggered: {
+			dirtyMarkTimer.stop()
 			workspaceView.__updateDocumentHeader(workspaceView.__dirtyDocumentId)
 		}
 	}

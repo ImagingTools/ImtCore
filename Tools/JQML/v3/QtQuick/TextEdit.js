@@ -396,15 +396,17 @@ class TextEdit extends Item {
             this.select(this.selectionEnd-replaced.length+text.length, this.selectionEnd-replaced.length+text.length)
         })
     }
-    // A Tab that no Keys handler took is typed into the text, as Qt's TextEdit does
+    // A Tab that no Keys handler took is typed into the text at the caret of the textarea, as Qt's TextEdit does;
+    // selectionStart/End of the item are not kept in step with the caret, so the textarea is asked
     __insertTab(){
         if(this.readOnly) return false
 
-        let buff = this.text.split('')
-        let start = this.selectionStart
-        buff.splice(start, this.selectionEnd - start, '\t')
-        this.text = buff.join('')
-        this.select(start + 1, start + 1)
+        let start = this.__impl.selectionStart
+        let end = this.__impl.selectionEnd
+        this.text = this.text.slice(0, start) + '\t' + this.text.slice(end)
+        this.__impl.setSelectionRange(start + 1, start + 1)
+        this.selectionStart = start + 1
+        this.selectionEnd = start + 1
         return true
     }
     positionAt(x, y, position){

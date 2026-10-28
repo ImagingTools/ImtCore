@@ -75,15 +75,24 @@ TestCase {
 		verify(view.compact, "200 px are left for the page")
 		verify(flickable.width < wideWidth / 2, "the page list shrinks to the icons: " + flickable.width)
 
-		let sub = findItem(view, function(item){ return item.objectName === "Page_Sub1" })
-		verify(!sub.visible, "subpages are hidden")
+		let sub1 = findItem(view, function(item){ return item.objectName === "Page_Sub1" })
+		let sub2 = findItem(view, function(item){ return item.objectName === "Page_Sub2" })
+		verify(!sub1.visible, "subpages of a collapsed parent are hidden")
 
 		let parentPage = findItem(view, function(item){ return item.objectName === "Page_Page1" })
 		// The column lays the rows out again on the next polish
 		waitForRendering(view)
 		mouseClick(parentPage)
 		compare(view.currentIndex, view.getIndexById("Sub1"), "the parent opens its subpage")
-		verify(parentPage.__isSelected, "the parent shows the selection of its subpage")
+		verify(sub1.visible && sub2.visible, "every subpage stays reachable in the compact mode")
+
+		waitForRendering(view)
+		mouseClick(sub2)
+		compare(view.currentIndex, view.getIndexById("Sub2"))
+
+		mouseClick(parentPage)
+		verify(!sub2.visible)
+		verify(parentPage.__isSelected, "the collapsed parent shows the selection of its subpage")
 
 		view.width = 600
 		verify(!view.compact)

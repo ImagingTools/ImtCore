@@ -289,13 +289,13 @@ Item {
                         readonly property bool __isSubpage: model.isSubpage
                         readonly property string __parentId: model.parentId || ""
                         readonly property bool __parentExpanded: __isSubpage ? root.isExpanded(__parentId) : true
-                        // In the compact mode the subpages are hidden, so their parent shows the selection
+                        // In the compact mode a collapsed parent shows the selection of its subpage
                         readonly property bool __isSelected: root.currentIndex === model.index
-                            || (root.compact && __isParentWithSubs && root.currentIndex >= 0 && root.currentIndex < root.pagesModel.count
+                            || (root.compact && __isParentWithSubs && !root.isExpanded(model.id) && root.currentIndex >= 0 && root.currentIndex < root.pagesModel.count
                                 && root.pagesModel.get(root.currentIndex).parentId === model.id)
                         readonly property bool __hasIcon: !__isSubpage && (model.icon ? true : false)
 
-                        visible: !__isSubpage || (__parentExpanded && !root.compact)
+                        visible: !__isSubpage || __parentExpanded
                         width: sidebarColumn.width
                         height: visible ? Style.controlHeightM : 0
 
@@ -309,7 +309,7 @@ Item {
 
                             Row {
                                 anchors.fill: parent
-                                anchors.leftMargin: navDelegate.__isSubpage
+                                anchors.leftMargin: navDelegate.__isSubpage && !root.compact
                                     ? Style.marginM + Style.iconSizeS + Style.marginS
                                     : Style.marginM
                                 anchors.rightMargin: Style.marginM
@@ -386,15 +386,6 @@ Item {
                                 }
 
                                 onClicked: {
-                                    // The compact mode hides the subpages: their parent opens the one used last
-                                    if (navDelegate.__isParentWithSubs && root.compact) {
-                                        var compactSubIndex = root.getLastSubPageIndex(model.id)
-                                        if (compactSubIndex >= 0) {
-                                            root.activatePage(compactSubIndex)
-                                            return
-                                        }
-                                    }
-
                                     if (navDelegate.__isParentWithSubs) {
                                         var wasExpanded = root.isExpanded(model.id)
                                         root.toggleExpanded(model.id)

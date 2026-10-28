@@ -639,6 +639,12 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceCom
 	}
 	const int undoStepsBeforeChange = undoManagerPtr != nullptr ? undoManagerPtr->GetAvailableUndoSteps() : 0;
 
+	// The undo buffer drops its oldest step when full, so the step count may not grow: the document is restored from this copy then
+	istd::IChangeableSharedPtr previousDocumentPtr;
+	if (!tenantId.isEmpty()){
+		m_documentManagerCompPtr->GetDocumentData(userLogin, documentId, previousDocumentPtr);
+	}
+
 	m_documentManagerCompPtr->SetDocumentData(userLogin, documentId, *documentPtr);
 
 	// For new tenants do NOT auto-save — user will save manually.
@@ -670,6 +676,9 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceCom
 			const int changeSteps = undoManagerPtr != nullptr ? undoManagerPtr->GetAvailableUndoSteps() - undoStepsBeforeChange : 0;
 			if (changeSteps > 0){
 				undoManagerPtr->DoUndo(changeSteps);
+			}
+			else if (previousDocumentPtr.IsValid()){
+				m_documentManagerCompPtr->SetDocumentData(userLogin, documentId, *previousDocumentPtr);
 			}
 
 			return response;

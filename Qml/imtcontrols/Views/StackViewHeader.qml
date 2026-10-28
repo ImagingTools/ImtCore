@@ -14,7 +14,7 @@ Item {
     // A header that does not fit gets an equal share of the width and is elided, instead of running off the view
     readonly property int __shownCount: headersModel.count > 0 && !root.initialItemTitleVisible ? headersModel.count - 1 : headersModel.count
     readonly property real __itemMaxWidth: root.implicitContentWidth <= root.width || root.__shownCount <= 0 ? -1
-        : Math.max(Style.sizeHintBXS, (headersListView.width - (root.__shownCount - 1) * (2 * Style.marginM + separatorMeasure.implicitWidth)) / root.__shownCount)
+        : Math.max(0, (headersListView.width - (root.__shownCount - 1) * (2 * Style.marginM + separatorMeasure.implicitWidth)) / root.__shownCount)
 
     signal closeClicked()
     signal headerItemClicked(int index, string headerId)
@@ -173,7 +173,7 @@ Item {
 				Text {
 					id: headerText;
 					anchors.verticalCenter: content.verticalCenter;
-					width: root.__itemMaxWidth > 0 ? Math.min(implicitWidth, root.__itemMaxWidth) : implicitWidth;
+					width: root.__itemMaxWidth >= 0 ? Math.min(implicitWidth, root.__itemMaxWidth) : implicitWidth;
 					elide: Text.ElideRight;
 					font.pixelSize: Style.fontSizeXXL;
 					font.family: Style.fontFamily;

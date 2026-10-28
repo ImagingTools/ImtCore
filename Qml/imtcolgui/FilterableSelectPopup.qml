@@ -1452,25 +1452,10 @@ PopupView {
 		}
 	}
 
+	// By the real height of the list: the selected group takes rows from it
 	function contentYCorrection(down_){
 		if (root.focusedIndex >= 0){
-			var contentY = popupListView.contentY
-			var itemH = root.itemHeight
-			var itemCount = root.dataProvider ? root.dataProvider.items.length : 0
-			var visibleCount = root.maxVisibleItems === -1 ? itemCount : Math.min(root.maxVisibleItems, itemCount)
-			if (visibleCount <= 0) return
-			var index = root.focusedIndex
-
-			if (down_){
-				if ((index + 1) * itemH > contentY + visibleCount * itemH){
-					popupListView.contentY = (index + 1) * itemH - visibleCount * itemH
-				}
-			}
-			else {
-				if (index * itemH < contentY){
-					popupListView.contentY = index * itemH
-				}
-			}
+			root.__scrollToRow(root.focusedIndex)
 		}
 	}
 
