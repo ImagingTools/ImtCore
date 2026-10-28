@@ -135,17 +135,22 @@ istd::IChangeableUniquePtr CAddressControllerComp::CreateObjectFromRequest(
 	QJsonObject itemObj = jsonDoc.object();
 	addressInfoPtr->SetObjectUuid(objectId);
 
-	if (itemObj.contains(QStringLiteral("parentId"))){
-		QByteArray parentId = itemObj.value(QStringLiteral("parentId")).toVariant().toByteArray();
-
+	const QByteArray parentId = itemObj.value(QStringLiteral("parentId")).toVariant().toByteArray();
+	if (!parentId.isEmpty()){
+		/**
+			A parent that does not exist must not silently turn the address into a root of the tree.
+		*/
 		imtbase::IObjectCollection::DataPtr adrDataPtr;
-		if (m_objectCollectionCompPtr->GetObjectData(parentId, adrDataPtr)){
-			if (const auto* adrInfoPtr = adrDataPtr.GetPtr<const IAddressElementInfo>()){
-				QByteArrayList parentIds = adrInfoPtr->GetParentIds();
-				parentIds.append(parentId);
-				addressInfoPtr->SetParentIds(parentIds);
-			}
+		const auto* adrInfoPtr = m_objectCollectionCompPtr->GetObjectData(parentId, adrDataPtr) ? adrDataPtr.GetPtr<const IAddressElementInfo>() : nullptr;
+		if (adrInfoPtr == nullptr){
+			errorMessage = QStringLiteral("Unable to create address. Error: Parent address '%1' does not exist").arg(QString(parentId));
+
+			return nullptr;
 		}
+
+		QByteArrayList parentIds = adrInfoPtr->GetParentIds();
+		parentIds.append(parentId);
+		addressInfoPtr->SetParentIds(parentIds);
 	}
 
 	if (itemObj.contains(QStringLiteral("typeId"))){
