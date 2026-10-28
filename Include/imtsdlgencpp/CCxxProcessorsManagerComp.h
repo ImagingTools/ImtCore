@@ -153,7 +153,7 @@ private:
 		Creates and opens a file by name
 		\note all parent directories will be created
 	*/
-	[[nodiscard]] FilePtr CreateFile(const QString& filePath, bool temporary = false) const;
+	[[nodiscard]] FilePtr CreateFile(const QString& filePath) const;
 
 
 private:

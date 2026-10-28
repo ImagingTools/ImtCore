@@ -6,7 +6,6 @@
 
 // Qt includes
 #include <QtCore/QTemporaryDir>
-#include <QtCore/QTemporaryFile>
 #include <QtCore/QLockFile>
 #include <QtCore/QFileInfo>
 
@@ -253,6 +252,11 @@ iproc::IProcessor::TaskState CCxxProcessorsManagerComp::DoProcessing(
 
 			return TS_INVALID;
 		}
+	}
+
+	// the objects source file is already joined with the main one, so nobody uses it anymore
+	if (createdFiles.objectSourceFile && !createdFiles.objectSourceFile->remove()){
+		SendWarningMessage(0, QStringLiteral("Unable to remove the intermediate file '%1'. Error: %2").arg(createdFiles.objectSourceFile->fileName(), createdFiles.objectSourceFile->errorString()));
 	}
 
 	return TS_OK;
@@ -769,9 +773,8 @@ CCxxProcessorsManagerComp::EntryFileInfo CCxxProcessorsManagerComp::CreateFiles(
 
 		if (allFiles.contains(imtsdl::ISdlProcessArgumentsParser::s_objectSourceFileType)){
 			const QString objCppFilePath = allFiles[imtsdl::ISdlProcessArgumentsParser::s_objectSourceFileType];
-			// special case. we always deleting object source files after use, so we create them as temporary.
-			/// \todo think about this case should we always remove temporary object source files after use mb DON'T APPEND implementation data to .h file never
-			retVal.objectSourceFile = CreateFile(objCppFilePath, true);
+			// the objects source file is an intermediate one: the post processors join it with the main source file, and it is removed after the successful processing
+			retVal.objectSourceFile = CreateFile(objCppFilePath);
 			if (!retVal.objectSourceFile){
 				return {};
 			}
@@ -783,7 +786,7 @@ CCxxProcessorsManagerComp::EntryFileInfo CCxxProcessorsManagerComp::CreateFiles(
 }
 
 
-CCxxProcessorsManagerComp::FilePtr CCxxProcessorsManagerComp::CreateFile(const QString& filePath, bool temporary) const
+CCxxProcessorsManagerComp::FilePtr CCxxProcessorsManagerComp::CreateFile(const QString& filePath) const
 {
 	FilePtr nullPtr;
 
@@ -794,13 +797,7 @@ CCxxProcessorsManagerComp::FilePtr CCxxProcessorsManagerComp::CreateFile(const Q
 		return nullPtr;
 	}
 
-	FilePtr outputFilePtr;
-	if (temporary){
-		outputFilePtr = std::make_shared<QTemporaryFile>(filePath);
-	}
-	else {
-		outputFilePtr = std::make_shared<QFile>(filePath);
-	}
+	FilePtr outputFilePtr = std::make_shared<QFile>(filePath);
 
 	const bool isOpen = outputFilePtr->open(QIODevice::ReadWrite | QIODevice::Text | QIODevice::Truncate);
 	if (!isOpen){

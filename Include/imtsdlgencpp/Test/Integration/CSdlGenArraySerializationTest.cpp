@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include "CSdlGenTest.h"
+#include "CSdlGenIntegrationTest.h"
 
 
 // Qt includes
@@ -405,7 +405,7 @@ void ExpectInvalidArrayValueWarning()
 } // namespace
 
 
-void CSdlGenTest::TestArrayBackendsRoundTrip_data()
+void CSdlGenIntegrationTest::TestArrayBackendsRoundTrip_data()
 {
 	QTest::addColumn<int>("payloadCase");
 	QTest::newRow("populated and null elements") << int(VPC_FULL);
@@ -414,7 +414,7 @@ void CSdlGenTest::TestArrayBackendsRoundTrip_data()
 }
 
 
-void CSdlGenTest::TestArrayBackendsRoundTrip()
+void CSdlGenIntegrationTest::TestArrayBackendsRoundTrip()
 {
 	QFETCH(int, payloadCase);
 	const CArrayPayload source = CreatePayload(ValidPayloadCase(payloadCase));
@@ -439,7 +439,7 @@ void CSdlGenTest::TestArrayBackendsRoundTrip()
 }
 
 
-void CSdlGenTest::BenchmarkArrayGraphQlWriteMillionScalars()
+void CSdlGenIntegrationTest::BenchmarkArrayGraphQlWriteMillionScalars()
 {
 #ifndef IMT_ENABLE_BENCHMARK_TESTS
 	QSKIP("Benchmark test for GraphQl write with a million scalars.", 1);
@@ -457,7 +457,7 @@ void CSdlGenTest::BenchmarkArrayGraphQlWriteMillionScalars()
 }
 
 
-void CSdlGenTest::BenchmarkArrayGraphQlReadMillionScalars()
+void CSdlGenIntegrationTest::BenchmarkArrayGraphQlReadMillionScalars()
 {
 #ifndef IMT_ENABLE_BENCHMARK_TESTS
 	QSKIP("Benchmark test for GraphQl read with a million scalars.", 1);
@@ -480,13 +480,13 @@ void CSdlGenTest::BenchmarkArrayGraphQlReadMillionScalars()
 }
 
 
-void CSdlGenTest::TestArrayReadersRejectInvalidValues_data()
+void CSdlGenIntegrationTest::TestArrayReadersRejectInvalidValues_data()
 {
 	AddInvalidPayloadRows();
 }
 
 
-void CSdlGenTest::TestArrayReadersRejectInvalidValues()
+void CSdlGenIntegrationTest::TestArrayReadersRejectInvalidValues()
 {
 	QFETCH(int, invalidCase);
 	const auto typedCase = InvalidPayloadCase(invalidCase);
@@ -508,13 +508,13 @@ void CSdlGenTest::TestArrayReadersRejectInvalidValues()
 }
 
 
-void CSdlGenTest::TestArrayWritersRejectInvalidValues_data()
+void CSdlGenIntegrationTest::TestArrayWritersRejectInvalidValues_data()
 {
 	AddInvalidPayloadRows();
 }
 
 
-void CSdlGenTest::TestArrayWritersRejectInvalidValues()
+void CSdlGenIntegrationTest::TestArrayWritersRejectInvalidValues()
 {
 	QFETCH(int, invalidCase);
 	const CArrayPayload payload = CreateInvalidPayload(InvalidPayloadCase(invalidCase));
@@ -533,7 +533,7 @@ void CSdlGenTest::TestArrayWritersRejectInvalidValues()
 }
 
 
-void CSdlGenTest::TestArrayOptionalReadersPreserveMissingFields()
+void CSdlGenIntegrationTest::TestArrayOptionalReadersPreserveMissingFields()
 {
 	const CArrayPayload expected = CreatePayload(VPC_FULL);
 
@@ -551,7 +551,7 @@ void CSdlGenTest::TestArrayOptionalReadersPreserveMissingFields()
 }
 
 
-void CSdlGenTest::TestArrayQObjectBridge()
+void CSdlGenIntegrationTest::TestArrayQObjectBridge()
 {
 	CArrayPayloadObject object;
 	static_cast<CArrayPayload&>(object) = CreatePayload(VPC_FULL);
@@ -608,7 +608,7 @@ void CSdlGenTest::TestArrayQObjectBridge()
 }
 
 
-void CSdlGenTest::TestArrayJsonFileRoundTrip()
+void CSdlGenIntegrationTest::TestArrayJsonFileRoundTrip()
 {
 	QVERIFY2(m_arraySerializationOutputDirectory.isValid(), "Unable to create a temporary output directory");
 	QVERIFY2(QDir(s_rawDataDirectoryPath).exists(), qPrintable(s_rawDataDirectoryPath));
@@ -645,7 +645,7 @@ void CSdlGenTest::TestArrayJsonFileRoundTrip()
 }
 
 
-void CSdlGenTest::TestArrayGraphQlRequestFileRoundTrip()
+void CSdlGenIntegrationTest::TestArrayGraphQlRequestFileRoundTrip()
 {
 	QVERIFY2(m_arraySerializationOutputDirectory.isValid(), "Unable to create a temporary output directory");
 	QVERIFY2(QDir(s_rawDataDirectoryPath).exists(), qPrintable(s_rawDataDirectoryPath));
