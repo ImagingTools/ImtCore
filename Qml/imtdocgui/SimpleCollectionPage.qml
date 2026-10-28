@@ -69,6 +69,21 @@ ViewBase {
 	readonly property int contentWidth: Math.min(root.width - Style.marginXL * 2, Style.contentWidthMax)
 	readonly property int contentLeftMargin: Math.max((root.width - root.contentWidth) / 2, Style.marginXL)
 
+	// Width of a commands Flow laid out in one line, for its width: Math.min(commandsLineWidth(flow), contentWidth)
+	function commandsLineWidth(flow) {
+		var width = 0
+		var count = 0
+		for (var i = 0; i < flow.children.length; i++) {
+			var child = flow.children[i]
+			if (child.visible && child.width > 0) {
+				width += child.width
+				count++
+			}
+		}
+
+		return count > 0 ? width + (count - 1) * flow.spacing : 0
+	}
+
 	function removeItems(ids) {
 		console.warn("SimpleCollectionPage.removeItems() is not implemented; override it in the consumer.")
 	}
@@ -334,78 +349,101 @@ ViewBase {
 		}
 	}
 
-	Text {
-		id: createBtn
-		visible: root.showCreateButton && root.canCreate && root.__onListPage && root.__useDefaultButtons
+	// The commands share the line of the header while both fit, and go under it otherwise
+	readonly property real __commandsWidth: !root.__onListPage ? 0
+		: root.__useDefaultButtons ? defaultCommands.width : customHeaderButtonsLoader.width
+	readonly property real __commandsHeight: root.__useDefaultButtons ? defaultCommands.height : customHeaderButtonsLoader.height
+	readonly property bool __commandsBelow: root.__commandsWidth > 0
+		&& stackViewHeader.implicitContentWidth + Style.marginL + root.__commandsWidth > root.contentWidth
+
+	Item {
+		id: commandsLine
+		anchors.top: stackViewHeader.bottom
+		anchors.left: stackViewHeader.left
 		anchors.right: stackViewHeader.right
-		anchors.verticalCenter: stackViewHeader.verticalCenter
-		text: root.__createBtnText
-		font.pixelSize: Style.fontSizeM
-		font.bold: true
-		color: Style.linkColor
-
-		MouseArea {
-			anchors.fill: parent
-			hoverEnabled: true
-			cursorShape: Qt.PointingHandCursor
-			onClicked: {
-				if (root.canCreate)
-					root.openCreate()
-			}
-		}
+		height: root.__commandsBelow ? root.__commandsHeight + Style.marginS : 0
 	}
 
-	Text {
-		id: editBtn
-		visible: root.canEdit && root.__onListPage && root.__useDefaultButtons
-		anchors.right: createBtn.left
-		anchors.rightMargin: Style.marginL
-		anchors.verticalCenter: stackViewHeader.verticalCenter
-		text: qsTr("Edit")
-		font.pixelSize: Style.fontSizeM
-		font.bold: true
-		color: root.__selectedCount === 1 ? Style.linkColor : Style.inactiveTextColor
-		opacity: root.__selectedCount === 1 ? 1.0 : 0.5
+	Flow {
+		id: defaultCommands
+		anchors.right: stackViewHeader.right
+		width: Math.min(root.commandsLineWidth(defaultCommands), root.contentWidth)
+		anchors.verticalCenter: root.__commandsBelow ? undefined : stackViewHeader.verticalCenter
+		anchors.top: root.__commandsBelow ? commandsLine.top : undefined
+		spacing: Style.marginL
+		visible: root.__onListPage && root.__useDefaultButtons
 
-		MouseArea {
-			anchors.fill: parent
-			hoverEnabled: true
-			cursorShape: root.__selectedCount === 1 && root.canEdit ? Qt.PointingHandCursor : Qt.ArrowCursor
-			enabled: root.__selectedCount === 1 && root.canEdit
-			onClicked: {
-				if (!root.canEdit)
-					return
+		Text {
+			id: removeBtn
+			visible: root.canDelete
+			text: qsTr("Remove")
+			width: Math.min(implicitWidth, root.contentWidth)
+			elide: Text.ElideRight
+			font.pixelSize: Style.fontSizeM
+			font.bold: true
+			color: root.__selectedCount > 0 ? Style.errorColor : Style.inactiveTextColor
+			opacity: root.__selectedCount > 0 ? 1.0 : 0.5
 
-				var selId = root.selectionManager.selectedIds[0]
-				var item = root.__findItemById(selId)
-				if (item)
-					root.__openEdit(selId, item.title || item.id || "", item.description || "")
+			MouseArea {
+				anchors.fill: parent
+				hoverEnabled: true
+				cursorShape: root.__selectedCount > 0 && root.canDelete ? Qt.PointingHandCursor : Qt.ArrowCursor
+				enabled: root.__selectedCount > 0 && root.canDelete
+				onClicked: {
+					if (!root.canDelete)
+						return
+
+					root.confirmRemoveItems(root.selectionManager.selectedIds.slice(), "")
+				}
 			}
 		}
-	}
 
-	Text {
-		id: removeBtn
-		visible: root.canDelete && root.__onListPage && root.__useDefaultButtons
-		anchors.right: editBtn.left
-		anchors.rightMargin: Style.marginL
-		anchors.verticalCenter: stackViewHeader.verticalCenter
-		text: qsTr("Remove")
-		font.pixelSize: Style.fontSizeM
-		font.bold: true
-		color: root.__selectedCount > 0 ? Style.errorColor : Style.inactiveTextColor
-		opacity: root.__selectedCount > 0 ? 1.0 : 0.5
+		Text {
+			id: editBtn
+			visible: root.canEdit
+			text: qsTr("Edit")
+			width: Math.min(implicitWidth, root.contentWidth)
+			elide: Text.ElideRight
+			font.pixelSize: Style.fontSizeM
+			font.bold: true
+			color: root.__selectedCount === 1 ? Style.linkColor : Style.inactiveTextColor
+			opacity: root.__selectedCount === 1 ? 1.0 : 0.5
 
-		MouseArea {
-			anchors.fill: parent
-			hoverEnabled: true
-			cursorShape: root.__selectedCount > 0 && root.canDelete ? Qt.PointingHandCursor : Qt.ArrowCursor
-			enabled: root.__selectedCount > 0 && root.canDelete
-			onClicked: {
-				if (!root.canDelete)
-					return
+			MouseArea {
+				anchors.fill: parent
+				hoverEnabled: true
+				cursorShape: root.__selectedCount === 1 && root.canEdit ? Qt.PointingHandCursor : Qt.ArrowCursor
+				enabled: root.__selectedCount === 1 && root.canEdit
+				onClicked: {
+					if (!root.canEdit)
+						return
 
-				root.confirmRemoveItems(root.selectionManager.selectedIds.slice(), "")
+					var selId = root.selectionManager.selectedIds[0]
+					var item = root.__findItemById(selId)
+					if (item)
+						root.__openEdit(selId, item.title || item.id || "", item.description || "")
+				}
+			}
+		}
+
+		Text {
+			id: createBtn
+			visible: root.showCreateButton && root.canCreate
+			text: root.__createBtnText
+			width: Math.min(implicitWidth, root.contentWidth)
+			elide: Text.ElideRight
+			font.pixelSize: Style.fontSizeM
+			font.bold: true
+			color: Style.linkColor
+
+			MouseArea {
+				anchors.fill: parent
+				hoverEnabled: true
+				cursorShape: Qt.PointingHandCursor
+				onClicked: {
+					if (root.canCreate)
+						root.openCreate()
+				}
 			}
 		}
 	}
@@ -414,14 +452,15 @@ ViewBase {
 		id: customHeaderButtonsLoader
 		visible: !!root.headerButtonsComponent && root.__onListPage
 		anchors.right: stackViewHeader.right
-		anchors.verticalCenter: stackViewHeader.verticalCenter
+		anchors.verticalCenter: root.__commandsBelow ? undefined : stackViewHeader.verticalCenter
+		anchors.top: root.__commandsBelow ? commandsLine.top : undefined
 		sourceComponent: root.headerButtonsComponent
 		property var page: root
 	}
 
 	BaseText {
 		id: descriptionLabel
-		anchors.top: stackViewHeader.bottom
+		anchors.top: commandsLine.bottom
 		anchors.topMargin: Style.marginS
 		anchors.horizontalCenter: parent.horizontalCenter
 		width: root.contentWidth
@@ -433,7 +472,7 @@ ViewBase {
 
 	StackView {
 		id: collectionStackView
-		anchors.top: descriptionLabel.visible ? descriptionLabel.bottom : stackViewHeader.bottom
+		anchors.top: descriptionLabel.visible ? descriptionLabel.bottom : commandsLine.bottom
 		anchors.topMargin: Style.marginS
 		anchors.left: parent.left
 		anchors.right: parent.right

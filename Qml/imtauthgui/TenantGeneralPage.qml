@@ -50,6 +50,7 @@ ViewBase {
 			? generalPage.tenantData.m_isActive
 			: true
 		ownerText.text = generalPage.tenantData.m_ownerName
+		parentText.text = generalPage.tenantData.m_parentTenantName ? generalPage.tenantData.m_parentTenantName : qsTr("No parent")
 		ownerSelect.selectedId = generalPage.tenantData.m_ownerId
 		ownerSelect.selectedText = generalPage.tenantData.m_ownerName
 	}
@@ -129,12 +130,9 @@ ViewBase {
 					}
 				}
 
-				TextInputElementView {
-					id: parentInput
+				TextElementView {
+					id: parentText
 					name: qsTr("Parent organization")
-					readOnly: true
-					visible: generalPage.stateManager ? (generalPage.stateManager.isNewTenant && generalPage.stateManager.isSubOrganization) : false
-					text: AuthorizationController.currentTenantName
 				}
 
 				// Until the organization is saved the creator picks its owner; afterwards it is transferred on the Members page

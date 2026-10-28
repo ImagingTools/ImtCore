@@ -61,8 +61,9 @@ Item {
 				row.validUntil = share.m_validUntil ? String(share.m_validUntil).substring(0, 10) : ""
 				row.groupIds = groupIds
 				row.access = row.accessLevel === "Edit" ? qsTr("Edit") : qsTr("View")
-				row.state = sharesPage.stateText(row.status)
-				row.groups = groupIds.length > 0 ? String(groupIds.length) : ""
+				row.state = row.validUntil !== ""
+					? qsTr("%1, until %2").arg(sharesPage.stateText(row.status)).arg(row.validUntil)
+					: sharesPage.stateText(row.status)
 				rows.push(row)
 			}
 		}
@@ -105,6 +106,75 @@ Item {
 		setGroupsInput.m_shareId = shareId
 		setGroupsInput.m_groupIds = groupIds
 		setGroupsSender.send(setGroupsInput)
+	}
+
+	// The document gets the widest column, the menu button a fixed one, the other columns share the rest
+	function setColumnWidths(table, headers){
+		table.setWidth()
+		let documentIndex = headers.getHeaderIndex("objectName")
+		let actionsIndex = headers.getHeaderIndex("actions")
+		if (documentIndex < 0 || actionsIndex < 0 || table.widthDecorator.getItemsCount() <= Math.max(documentIndex, actionsIndex)){
+			return
+		}
+
+		table.widthDecorator.setData("WidthPercent", 40, documentIndex)
+		table.widthDecorator.setData("Width", Style.controlHeightM + Style.marginM, actionsIndex)
+		table.widthDecorator.setData("WidthPercent", -1, actionsIndex)
+		table.setWidth()
+	}
+
+	property var menuRow: null
+
+	function showShareActions(row, incoming, menuX, menuY){
+		sharesPage.menuRow = row
+		shareActionsModel.clear()
+		if (!incoming){
+			shareActionsModel.append({"id": "Revoke", "name": qsTr("Revoke"), "icon": "", "isEnabled": true})
+		}
+		else if (row.status === "Active"){
+			let groupsText = row.groupIds.length > 0 ? qsTr("Groups (%1)...").arg(row.groupIds.length) : qsTr("Groups...")
+			shareActionsModel.append({"id": "Groups", "name": groupsText, "icon": "", "isEnabled": true})
+			shareActionsModel.append({"id": "Decline", "name": qsTr("Decline"), "icon": "", "isEnabled": true})
+		}
+		else {
+			shareActionsModel.append({"id": "Accept", "name": qsTr("Accept"), "icon": "", "isEnabled": true})
+		}
+
+		ModalDialogManager.openDialog(shareActionsPopupComp, {"x": menuX, "y": menuY, "model": shareActionsModel})
+	}
+
+	function runShareAction(commandId){
+		let row = sharesPage.menuRow
+		if (!row){
+			return
+		}
+
+		if (commandId === "Groups"){
+			ModalDialogManager.openDialog(groupsDialogComp, {"shareId": row.id, "groupIds": row.groupIds})
+		}
+		else if (commandId === "Decline"){
+			sharesPage.setStatus(row.id, "Declined")
+		}
+		else if (commandId === "Accept"){
+			sharesPage.setStatus(row.id, "Active")
+		}
+		else if (commandId === "Revoke"){
+			sharesPage.removeShare(row.id)
+		}
+	}
+
+	ListModel {
+		id: shareActionsModel
+	}
+
+	Component {
+		id: shareActionsPopupComp
+
+		PopupMenuDialog {
+			onFinished: {
+				sharesPage.runShareAction(commandId)
+			}
+		}
 	}
 
 	CustomScrollbar {
@@ -166,7 +236,6 @@ Item {
 				visible: sharesPage.incomingShares.length > 0
 				width: parent.width
 				height: incomingTable.contentHeight + incomingTable.headerHeight
-				canMoveColumns: true
 				selectable: false
 				elements: sharesPage.incomingShares
 			}
@@ -192,7 +261,6 @@ Item {
 				visible: sharesPage.outgoingShares.length > 0
 				width: parent.width
 				height: outgoingTable.contentHeight + outgoingTable.headerHeight
-				canMoveColumns: true
 				selectable: false
 				elements: sharesPage.outgoingShares
 			}
@@ -205,15 +273,13 @@ Item {
 		Component.onCompleted: {
 			addHeader("objectName", qsTr("Document"), false, false)
 			addHeader("ownerTenantName", qsTr("From"), false, false)
-			addHeader("collectionId", qsTr("Collection"), false, false)
 			addHeader("access", qsTr("Access"), false, false)
 			addHeader("state", qsTr("State"), false, false)
-			addHeader("validUntil", qsTr("Valid until"), false, false)
-			addHeader("groups", qsTr("Groups"), false, false)
 			addHeader("actions", "", false, false)
 			incomingTable.headers = incomingHeaders
 			incomingTable.setColumnContentById("objectName", incomingDocumentCellComp)
 			incomingTable.setColumnContentById("actions", incomingActionsCellComp)
+			sharesPage.setColumnWidths(incomingTable, incomingHeaders)
 		}
 	}
 
@@ -223,15 +289,13 @@ Item {
 		Component.onCompleted: {
 			addHeader("objectName", qsTr("Document"), false, false)
 			addHeader("targetTenantName", qsTr("To"), false, false)
-			addHeader("collectionId", qsTr("Collection"), false, false)
 			addHeader("access", qsTr("Access"), false, false)
 			addHeader("state", qsTr("State"), false, false)
-			addHeader("validUntil", qsTr("Valid until"), false, false)
-			addHeader("groups", qsTr("Groups"), false, false)
 			addHeader("actions", "", false, false)
 			outgoingTable.headers = outgoingHeaders
 			outgoingTable.setColumnContentById("objectName", outgoingDocumentCellComp)
 			outgoingTable.setColumnContentById("actions", outgoingActionsCellComp)
+			sharesPage.setColumnWidths(outgoingTable, outgoingHeaders)
 		}
 	}
 
@@ -273,27 +337,25 @@ Item {
 		TableCellDelegateBase {
 			id: incomingActionsCell
 			readonly property var rowData: incomingActionsCell.getRowData()
-			readonly property bool isActive: incomingActionsCell.rowData ? incomingActionsCell.rowData.status === "Active" : false
 
-			Row {
-				anchors.verticalCenter: parent.verticalCenter
-				anchors.right: parent.right
-				anchors.rightMargin: Style.marginM
-				spacing: Style.marginS
-
-				Button {
-					text: qsTr("Groups")
-					visible: incomingActionsCell.isActive
-					onClicked: {
-						ModalDialogManager.openDialog(groupsDialogComp, {"shareId": incomingActionsCell.rowData.id, "groupIds": incomingActionsCell.rowData.groupIds})
+			ToolButton {
+				id: incomingActionsButton
+				objectName: "ShareActionsButton"
+				anchors.centerIn: parent
+				visible: incomingActionsCell.rowData !== null && incomingActionsCell.rowData !== undefined
+				tooltipText: qsTr("Actions")
+				iconSource: "qrc:/" + Style.getIconPath("Icons/More", Icon.State.On, Icon.Mode.Normal)
+				decorator: Component {
+					ToolButtonDecorator {
+						color: "transparent"
+						icon.width: Style.iconSizeXS
 					}
 				}
 
-				Button {
-					text: incomingActionsCell.isActive ? qsTr("Decline") : qsTr("Accept")
-					onClicked: {
-						sharesPage.setStatus(incomingActionsCell.rowData.id, incomingActionsCell.isActive ? "Declined" : "Active")
-					}
+				onClicked: {
+					// The menu ends at the button, so it stays inside the window at the right edge
+					let point = incomingActionsButton.mapToItem(null, incomingActionsButton.width - Style.sizeHintXXS, incomingActionsButton.height)
+					sharesPage.showShareActions(incomingActionsCell.rowData, true, point.x, point.y)
 				}
 			}
 		}
@@ -336,13 +398,23 @@ Item {
 			id: outgoingActionsCell
 			readonly property var rowData: outgoingActionsCell.getRowData()
 
-			Button {
-				anchors.verticalCenter: parent.verticalCenter
-				anchors.right: parent.right
-				anchors.rightMargin: Style.marginM
-				text: qsTr("Revoke")
+			ToolButton {
+				id: outgoingActionsButton
+				objectName: "ShareActionsButton"
+				anchors.centerIn: parent
+				visible: outgoingActionsCell.rowData !== null && outgoingActionsCell.rowData !== undefined
+				tooltipText: qsTr("Actions")
+				iconSource: "qrc:/" + Style.getIconPath("Icons/More", Icon.State.On, Icon.Mode.Normal)
+				decorator: Component {
+					ToolButtonDecorator {
+						color: "transparent"
+						icon.width: Style.iconSizeXS
+					}
+				}
+
 				onClicked: {
-					sharesPage.removeShare(outgoingActionsCell.rowData.id)
+					let point = outgoingActionsButton.mapToItem(null, outgoingActionsButton.width - Style.sizeHintXXS, outgoingActionsButton.height)
+					sharesPage.showShareActions(outgoingActionsCell.rowData, false, point.x, point.y)
 				}
 			}
 		}

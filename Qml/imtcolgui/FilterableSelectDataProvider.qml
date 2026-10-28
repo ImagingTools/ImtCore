@@ -59,10 +59,33 @@ QtObject {
 		__internal.currentOffset = 0
 		__internal.isInitialLoading = true
 		__internal.isPageLoading = false
+		__internal.isReloading = false
+		__internal.reloadFailed = false
+		__internal.requestedCount = root.pageSize
 
 		__internal.requestId++
 		root.dataChanged()
 		root.executeRequest(__internal.requestId, root.pageSize, 0, __internal.currentFilter)
+	}
+
+	/*!
+		Reads the loaded rows again in one request, keeping them until the answer replaces them,
+		so a view neither blanks nor loses its scroll position (e.g. after a selection change).
+	*/
+	function reload(){
+		if (__internal.isInitialLoading || __internal.items.length === 0){
+			root.fetch(__internal.currentFilter)
+			return
+		}
+
+		__internal.isPageLoading = false
+		__internal.isReloading = true
+		__internal.reloadFailed = false
+		__internal.error = null
+		__internal.requestedCount = Math.max(root.pageSize, __internal.items.length)
+
+		__internal.requestId++
+		root.executeRequest(__internal.requestId, __internal.requestedCount, 0, __internal.currentFilter)
 	}
 
 	/*!
@@ -76,12 +99,14 @@ QtObject {
 		Fetches the next page. Ignored if already loading or no more items.
 	*/
 	function fetchMore(){
-		if (__internal.isInitialLoading || __internal.isPageLoading || !__internal.hasMore){
+		if (__internal.isInitialLoading || __internal.isPageLoading || __internal.isReloading || !__internal.hasMore){
 			return
 		}
 
 		__internal.isPageLoading = true
 		__internal.error = null
+		__internal.requestedCount = root.pageSize
+		__internal.reloadFailed = false
 
 		__internal.requestId++
 		root.dataChanged()
@@ -94,6 +119,9 @@ QtObject {
 	function retry(){
 		if (__internal.items.length === 0){
 			root.fetch(__internal.currentFilter)
+		}
+		else if (__internal.reloadFailed){
+			root.reload()
 		}
 		else {
 			root.fetchMore()
@@ -360,10 +388,13 @@ QtObject {
 		}
 
 		var newItems = rawItems || []
-		var merged = __internal.items.slice()
+		// A reload replaces the rows it kept, a page is appended to them
+		var merged = __internal.isReloading ? [] : __internal.items.slice()
 		var ids = ({})
-		for (var k in __internal.knownIds){
-			ids[k] = true
+		if (!__internal.isReloading){
+			for (var k in __internal.knownIds){
+				ids[k] = true
+			}
 		}
 
 		for (var i = 0; i < newItems.length; i++){
@@ -380,9 +411,10 @@ QtObject {
 		__internal.knownIds = ids
 		__internal.items = merged
 		__internal.currentOffset = merged.length
-		__internal.hasMore = newItems.length >= root.pageSize
+		__internal.hasMore = newItems.length >= __internal.requestedCount
 		__internal.isInitialLoading = false
 		__internal.isPageLoading = false
+		__internal.isReloading = false
 		__internal.error = null
 		root.dataChanged()
 	}
@@ -400,6 +432,8 @@ QtObject {
 
 		__internal.isInitialLoading = false
 		__internal.isPageLoading = false
+		__internal.reloadFailed = __internal.isReloading
+		__internal.isReloading = false
 		__internal.error = {
 			message: message || "Unknown error",
 			code: code || "",
@@ -503,6 +537,9 @@ QtObject {
 		property string currentFilter: ""
 		property bool isInitialLoading: false
 		property bool isPageLoading: false
+		property bool isReloading: false
+		property bool reloadFailed: false
+		property int requestedCount: 0
 		property bool hasMore: true
 		property var error: null
 		// Selection state

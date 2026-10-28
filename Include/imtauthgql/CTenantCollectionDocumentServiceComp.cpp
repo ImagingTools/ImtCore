@@ -7,6 +7,9 @@
 #include <QMap>
 #include <QSet>
 
+// ACF includes
+#include <idoc/IUndoManager.h>
+
 // ImtCore includes
 #include <imtbase/COperationContext.h>
 #include <imtauth/CUserInfo.h>
@@ -278,6 +281,12 @@ sdl::V1_0::imtauth::CTenantData CTenantCollectionDocumentServiceComp::OnGetTenan
 	// Hierarchy fields
 	const QByteArray parentTenantId = tenantId.isEmpty() ? contextTenantId : tenantPtr->GetParentTenantId();
 	response.parentTenantId = parentTenantId;
+	if (!parentTenantId.isEmpty() && m_tenantManagerCompPtr.IsValid()){
+		imtauth::ITenantInfoUniquePtr parentTenantPtr = m_tenantManagerCompPtr->GetTenant(parentTenantId);
+		if (parentTenantPtr.IsValid()){
+			response.parentTenantName = parentTenantPtr->GetTenantName();
+		}
+	}
 	response.isSystemTenant = (tenantPtr->GetTenantId() == imtauth::GetSystemTenantId());
 
 	// Only the creator edits the scope; the owner and the members read it.
@@ -623,6 +632,13 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceCom
 		}
 	}
 
+	// A change the save refuses (a duplicate name, say) is undone below, so it neither stays in the document nor fails every next change
+	idoc::IUndoManager* undoManagerPtr = nullptr;
+	if (m_documentManagerCompPtr->GetDocumentUndoManager(userLogin, documentId, undoManagerPtr) != imtdoc::IDocumentService::OS_OK){
+		undoManagerPtr = nullptr;
+	}
+	const int undoStepsBeforeChange = undoManagerPtr != nullptr ? undoManagerPtr->GetAvailableUndoSteps() : 0;
+
 	m_documentManagerCompPtr->SetDocumentData(userLogin, documentId, *documentPtr);
 
 	// For new tenants do NOT auto-save — user will save manually.
@@ -650,6 +666,12 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceCom
 		const imtdoc::IDocumentService::TaskResult saveResult = m_documentManagerCompPtr->WaitForTaskFinished(saveTaskId);
 		if (saveResult.status != imtdoc::IDocumentService::OS_OK){
 			errorMessage = saveResult.errorMessage.isEmpty() ? QStringLiteral("The organization could not be saved") : saveResult.errorMessage;
+
+			const int changeSteps = undoManagerPtr != nullptr ? undoManagerPtr->GetAvailableUndoSteps() - undoStepsBeforeChange : 0;
+			if (changeSteps > 0){
+				undoManagerPtr->DoUndo(changeSteps);
+			}
+
 			return response;
 		}
 

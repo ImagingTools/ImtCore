@@ -68,6 +68,9 @@ ControlBase {
 		}
 	}
 
+	// Every policy except these two includes Qt.TabFocus
+	activeFocusOnTab: baseButton.focusPolicy !== Qt.NoFocus && baseButton.focusPolicy !== Qt.ClickFocus;
+
 	Keys.onPressed: {
 		if (!baseButton.enabled)
 			return

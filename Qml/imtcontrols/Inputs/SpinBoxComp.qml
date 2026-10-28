@@ -75,6 +75,18 @@ Item {
                 readOnly: !spinBox.editable || !spinBox.textInputEnabled;
                 editingFinishedTimerInterval: 1000
 
+                Keys.onUpPressed: {
+                    if (spinBox.baseElement && spinBox.editable){
+                        spinBox.baseElement.increase();
+                    }
+                }
+
+                Keys.onDownPressed: {
+                    if (spinBox.baseElement && spinBox.editable){
+                        spinBox.baseElement.decrease();
+                    }
+                }
+
                 onTextChanged: {
                     if (!spinBox.baseElement){
                         return
@@ -150,6 +162,8 @@ Item {
                     height: buttonsBlock.height/2 + mainRec.border.width/2;
                     iconSource: spinBox.icon;
                     rotation: 180
+                    // The arrow keys of the field step the value, so the step buttons stay out of the Tab order
+                    focusPolicy: Qt.NoFocus
                     enabled: !spinBox.editable ? false : !spinBox.baseElement ? true : spinBox.baseElement.value < spinBox.baseElement.to
 					decorator: Component{IconButtonDecorator{
 							icon.width: upButton.width - 2
@@ -168,8 +182,9 @@ Item {
                     
                     width: buttonColumn.width;
                     height: buttonsBlock.height/2 + mainRec.border.width/2;
-                    
+
                     iconSource: spinBox.icon;
+                    focusPolicy: Qt.NoFocus
 
                     enabled: !spinBox.editable ? false : !spinBox.baseElement ? true : spinBox.baseElement.value > spinBox.baseElement.from
 					decorator: Component{IconButtonDecorator{

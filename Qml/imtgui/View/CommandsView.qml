@@ -13,6 +13,7 @@ Item {
 	height: Style.controlHeightM;
 	
 	property alias contentWidth: content_.width;
+	readonly property alias spacing: content_.spacing;
 	property int maximumWidth: -1;
 	
 	property GuiElementModel commandsModel: GuiElementModel {};
@@ -59,20 +60,21 @@ Item {
 		priorityElements = []
 	}
 
-	function calcVisibleCommandsCount(){
-		let retVal = 0
+	// Widths and priorities of the commands that can be shown, in the order of priority
+	function commandSizes(){
+		let sizes = []
+		if (!internal.layoutReady){
+			return sizes
+		}
 
-		for (let j = 0; j < allElements.length; j++){
-			if (!allElements[j] || !allElements[j].element){
-				continue
-			}
-
-			if (allElements[j].element.m_visible){
-				retVal++
+		for (let i = 0; i < priorityElements.length; i++){
+			let item = priorityElements[i]
+			if (item.element && item.priority >= 0 && item.element.m_visible){
+				sizes.push({"width": item.maxWidth, "priority": item.priority})
 			}
 		}
 
-		return retVal
+		return sizes
 	}
 
 	function hasHiddenCommands(){
@@ -98,30 +100,27 @@ Item {
 
 		let maxWidth = Math.max(0, maximumWidth);
 		let totalWidth = 0;
-		let spacing = 1.3*content_.spacing;
+		let spacing = content_.spacing;
+		let fits = true;
 
+		// Commands are shown by priority while they fit; only the changed ones are touched, so a button does not blink
 		for (let i = 0; i < priorityElements.length; i++) {
 			let item = priorityElements[i];
-			if (item.element){
-				item.hidden = true
-			}
-		}
-
-		for (let i = 0; i < priorityElements.length; i++) {
-			let item = priorityElements[i];
-			if (!item.element || item.priority < 0 || !item.element.m_visible)
+			if (!item.element)
 				continue;
 
-			let elementWidth = item.maxWidth;
-			
-			let projectedWidth = totalWidth > 0 ? totalWidth + spacing + elementWidth : elementWidth;
-			
-			if (projectedWidth <= maxWidth) {
-				item.hidden = false
-				totalWidth = projectedWidth;
+			let shown = false;
+			if (fits && item.priority >= 0 && item.element.m_visible){
+				let projectedWidth = totalWidth > 0 ? totalWidth + spacing + item.maxWidth : item.maxWidth;
+				fits = projectedWidth <= maxWidth;
+				if (fits){
+					shown = true;
+					totalWidth = projectedWidth;
+				}
 			}
-			else {
-				break;
+
+			if (item.hidden === shown){
+				item.hidden = !shown;
 			}
 		}
 	}
@@ -151,9 +150,10 @@ Item {
 
 					Connections {
 						target: model.item
+						// The whole panel lays out again: a command shown or hidden changes the room of the others and the "more" button
 						function onModelChanged(){
 							button.checkHidden()
-							commandsItem.checkWidth()
+							commandsItem.updateWidth()
 						}
 					}
 

@@ -198,6 +198,15 @@ ControlBase {
 				: 0;
 	}
 	
+	activeFocusOnTab: !switchCustom.readOnly
+
+	Keys.onPressed: {
+		if (event.key === Qt.Key_Space && !switchCustom.readOnly){
+			event.accepted = true
+			switchCustom.setChecked(!switchCustom.checked, true)
+		}
+	}
+
 	MouseArea {
 		id: ma
 		objectName: "MouseArea"

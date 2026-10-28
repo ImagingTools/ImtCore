@@ -65,9 +65,11 @@ Rectangle {
 	// Marks the name with an asterisk, so a required field is visible before it is focused.
 	property bool isRequired: false
 
+	// Focus given to the row (KeyNavigation, forceActiveFocus) goes on to its control. The row loses focus
+	// to the control right away, so losing it must not take it from the control again.
 	onFocusChanged: {
-		if (controlItem){
-			controlItem.focus = focus
+		if (focus && controlItem){
+			controlItem.forceActiveFocus()
 		}
 	}
 	

@@ -84,8 +84,8 @@ Rectangle {
 				font.family: panel.path !== "" ? Style.fontFamilyBold : Style.fontFamily
 				font.pixelSize: Style.fontSizeM
 				color: panel.path !== "" ? Style.textColor : Style.inactiveTextColor
-				// The tail of a path tells it apart from its siblings.
-				elide: Text.ElideLeft
+				// The tail of a path tells it apart from its siblings; the hint is a sentence, cut at its end.
+				elide: panel.path !== "" ? Text.ElideLeft : Text.ElideRight
 			}
 
 			ToolButton {

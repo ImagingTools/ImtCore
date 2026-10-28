@@ -173,6 +173,16 @@ FocusScope {
             selectionColor: Style.textSelectedColor;
             selectByMouse: true;
             wrapMode: TextEdit.WordWrap;
+            activeFocusOnTab: !textEdit.readOnly;
+
+            // In a form Tab moves to the next field instead of typing a tab character.
+            Keys.onTabPressed: {
+                let next = textEdit.nextItemInFocusChain(true);
+                if (next){
+                    event.accepted = true;
+                    next.forceActiveFocus();
+                }
+            }
             clip: true;
 
             //for web, do not remove!!!

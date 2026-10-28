@@ -220,6 +220,7 @@ FocusScope {
 		clip: true;
 		
 		activeFocusOnPress: !containerTextField.readOnly;
+		activeFocusOnTab: !containerTextField.readOnly;
 		
 		onAccepted: {
 			containerTextField.accepted();
@@ -277,6 +278,8 @@ FocusScope {
 		height: width;
 
 		visible: containerTextField.passwordRevealVisible;
+		// A helper of the field: Tab goes from field to field
+		focusPolicy: Qt.NoFocus;
 		tooltipText: containerTextField.echoMode === TextInput.Password ? qsTr("Show password") : qsTr("Hide password");
 		iconSource: containerTextField.echoMode === TextInput.Password
 					? "../../../" + Style.getIconPath("Icons/ShownPassword", Icon.State.On, Icon.Mode.Normal)

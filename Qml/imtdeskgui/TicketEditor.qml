@@ -2998,6 +2998,16 @@ DocumentViewBase {
 										wrapMode: TextEdit.Wrap
 										textFormat: TextEdit.PlainText
 										KeyNavigation.backtab: editLockReasonInput.visible ? editLockReasonInput : editLockedCB
+										activeFocusOnTab: true
+
+										// Tab leaves the comment instead of typing a tab character
+										Keys.onTabPressed: {
+											let next = commentInputField.nextItemInFocusChain(true)
+											if (next) {
+												event.accepted = true
+												next.forceActiveFocus()
+											}
+										}
 										
 										onCursorRectangleChanged: {
 											var cy = cursorRectangle.y + y

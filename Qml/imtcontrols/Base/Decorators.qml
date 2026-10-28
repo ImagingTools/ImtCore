@@ -507,7 +507,7 @@ StyleComponents {
 				radius: !checkBoxItem.baseElement ? 0 : checkBoxItem.baseElement.radius;
 
 				border.width: 1;
-				border.color: !checkBoxItem.baseElement ? "transparent" : checkBoxItem.borderColor !=="" ? checkBoxItem.borderColor  : checkBoxItem.baseElement.isActive ? Style.inputBorderColor : Style.inactiveTextColor;
+				border.color: !checkBoxItem.baseElement ? "transparent" : checkBoxItem.borderColor !=="" ? checkBoxItem.borderColor : checkBoxItem.baseElement.activeFocus ? Style.focusRingColor : checkBoxItem.baseElement.isActive ? Style.inputBorderColor : Style.inactiveTextColor;
 
 				Image {
 					id: image;
@@ -594,6 +594,8 @@ StyleComponents {
 				color: !switchItem.baseElement ? "transparent" : switchItem.checked ? switchItem.baseElement.backgroundColorChecked :
 																					  switchItem.baseElement.backgroundColor;
 				radius: height;
+				border.width: switchItem.baseElement && switchItem.baseElement.activeFocus ? Style.focusRingWidth : 0;
+				border.color: Style.focusRingColor;
 
 				opacity: !switchItem.baseElement ? 0 : switchItem.baseElement.backgroundOpacity;
 

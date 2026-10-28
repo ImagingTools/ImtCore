@@ -230,6 +230,20 @@ ControlBase {
 		comboBoxContainer.clicked();
 	}
 
+	activeFocusOnTab: comboBoxContainer.changeable;
+
+	// The keys that open a combo box; the open list takes the arrows, Enter and Escape itself.
+	Keys.onPressed: {
+		if (comboBoxContainer.isOpen){
+			return;
+		}
+
+		if (event.key === Qt.Key_Space || event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Down){
+			event.accepted = true;
+			comboBoxContainer.onMouseAreaClicked();
+		}
+	}
+
 	MouseArea {
 		id: cbMouseArea;
 		objectName: "MouseArea"
