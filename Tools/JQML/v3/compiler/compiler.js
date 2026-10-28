@@ -723,9 +723,10 @@ function compile(options){
                 }
             } else if (meta[1][0] === "dot") {
                 let name = this.normalizePathName(meta[1]).join('.')
+                let objectValue = this.objectValueInstruction(meta[2])
                 this.assignProperties.push({
                     name: name,
-                    value: meta[2],
+                    value: objectValue || meta[2],
                 })
             } else {
                 let name = meta[1]
@@ -743,11 +744,11 @@ function compile(options){
                         this.qmlFile.context[this.id] = this
                     } else {
                         // meta[2][1] is null for anonymous functions ("prop: function(a) { ... }")
-                        if (meta[2][1] && meta[2][1][0] === 'qmlelem') {
-                            //console.log('=====', name)
+                        let objectValue = this.objectValueInstruction(meta[2])
+                        if (objectValue) {
                             this.assignProperties.push({
                                 name: name,//.join('.'),
-                                value: new Instruction(null, '', meta[2][1][1], meta[2][1][3], meta[2][1][2], this.qmlFile, meta[2][1].info, this),
+                                value: objectValue,
                             })
                         } else {
                             // let command = ''
@@ -1703,6 +1704,156 @@ function compile(options){
             return undefined
         }
 
+        // `prop: Rectangle {}` is an object literal. The same form after a dot
+        // (`table.rowDelegate: Rectangle {}`) must be one too, otherwise prepare()
+        // walks the element node as a statement list and recurses forever.
+        objectValueInstruction(stat) {
+            if (!stat || !stat[1] || stat[1][0] !== 'qmlelem') return null
+            return new Instruction(null, '', stat[1][1], stat[1][3], stat[1][2], this.qmlFile, stat[1].info, this)
+        }
+
+        lookupOwnProperty(name) {
+            for (let obj of this.defineProperties) {
+                if (obj.name !== name) continue
+                if (obj.type === 'alias') {
+                    return { alias: true, instruction: this }
+                }
+
+                let type = null
+                try {
+                    if (obj.type) type = this.getTypeInfo(obj.type).type
+                } catch {
+                    type = null
+                }
+                return {
+                    alias: false,
+                    path: {
+                        type: type,
+                        modifiers: obj.modifiers,
+                    },
+                }
+            }
+            return null
+        }
+
+        locateProperty(name) {
+            let own = this.lookupOwnProperty(name)
+            if (own) return own
+
+            let typeInfo = null
+            try {
+                typeInfo = this.getTypeInfo(this.extends)
+            } catch {
+                return null
+            }
+
+            let guard = 0
+            while (typeInfo && guard < 16) {
+                guard++
+                if (typeInfo.type instanceof QmlFile) {
+                    let found = typeInfo.type.instruction.lookupOwnProperty(name)
+                    if (found) return found
+                    try {
+                        typeInfo = typeInfo.type.instruction.getTypeInfo(typeInfo.type.instruction.extends)
+                    } catch {
+                        return null
+                    }
+                    continue
+                }
+
+                let meta = typeInfo.type && typeInfo.type.meta
+                if (meta && Object.prototype.hasOwnProperty.call(meta, name)) {
+                    let node = meta[name]
+                    return {
+                        alias: node.type === QtQml.alias,
+                        instruction: null,
+                        path: {
+                            type: node.typeTarget ? node.typeTarget : node.type,
+                            modifiers: node.modifiers,
+                        },
+                    }
+                }
+                return null
+            }
+            return null
+        }
+
+        followAlias(name, guard = 0) {
+            if (guard > 16) return null
+
+            for (let assignProperty of this.assignProperties) {
+                if (assignProperty.type !== 'alias' || assignProperty.name !== name) continue
+                let meta = assignProperty.value
+                if (!meta || meta[0] !== 'qmlaliasdef') return null
+
+                let rest = meta[3] ? String(meta[3]).split('.').filter(part => part !== '') : []
+                let target = this.qmlFile.context[meta[2]]
+                if (!target) return null
+                return { instruction: target, rest: rest }
+            }
+
+            try {
+                let typeInfo = this.getTypeInfo(this.extends)
+                if (typeInfo && typeInfo.type instanceof QmlFile) {
+                    return typeInfo.type.instruction.followAlias(name, guard + 1)
+                }
+            } catch {
+                return null
+            }
+            return null
+        }
+
+        // Walks `a.b.c`, including `property alias`, and returns the type of the last property.
+        // ListView.delegate is Component only after the alias chain, which is what makes
+        // `table.rowDelegate: Rectangle {}` a component the same way `delegate: Rectangle {}` is.
+        resolvePropertyPath(names) {
+            try {
+                let current = this
+                names = names.slice()
+                let index = 0
+                let guard = 0
+                while (index < names.length && guard < 32) {
+                    guard++
+                    let located = current.locateProperty(names[index])
+                    if (!located) return null
+
+                    if (located.alias) {
+                        if (!located.instruction) {
+                            return index === names.length - 1 ? located.path || null : null
+                        }
+                        let followed = located.instruction.followAlias(names[index])
+                        if (!followed) {
+                            return index === names.length - 1 ? located.path || { type: QtQml.alias } : null
+                        }
+
+                        current = followed.instruction
+                        if (followed.rest.length === 0) {
+                            names = names.slice(0, index).concat(names.slice(index + 1))
+                            if (index >= names.length) {
+                                return { type: current.getTypeInfo().type }
+                            }
+                            continue
+                        }
+
+                        names = names.slice(0, index).concat(followed.rest, names.slice(index + 1))
+                        continue
+                    }
+
+                    index++
+                    if (index >= names.length) return located.path
+
+                    if (located.path && located.path.type instanceof QmlFile) {
+                        current = located.path.type.instruction
+                        continue
+                    }
+                    return located.path
+                }
+            } catch {
+                return null
+            }
+            return null
+        }
+
         getProperties() {
             let code = new SourceNode()
             let lazyCode = new SourceNode()
@@ -1740,7 +1891,11 @@ function compile(options){
                         resultCode = lazyCode
                     }
 
-                    if (path.type === QtQml.Component && assignProperty.value.extends !== 'Component') {
+                    let assignType = path
+                    let leaf = this.resolvePropertyPath(assignNames)
+                    if (leaf && leaf.type) assignType = leaf
+
+                    if (assignType.type === QtQml.Component && assignProperty.value.extends !== 'Component') {
                         resultCode.add(`let ${assignProperty.value.name}=JQModules.QtQml.Component.create(null,__context,`)
                         resultCode.add('\n')
 

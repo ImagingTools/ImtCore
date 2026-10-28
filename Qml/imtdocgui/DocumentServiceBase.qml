@@ -97,6 +97,8 @@ QtObject {
 
 	onDocumentSaved: {
 		setDocumentIsNew(documentId, false)
+		// Undo info usually clears this. If that notice is missed, Save stays enabled and close asks to save again.
+		setDocumentIsDirty(documentId, false)
 	}
 
 	onUndoInfoReceived: {

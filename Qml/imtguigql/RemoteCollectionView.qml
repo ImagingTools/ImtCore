@@ -16,6 +16,7 @@ CollectionView {
 	loadingIndicatorDelay: 300
 
 	property string gqlGetListCommandId: root.collectionId + "List";
+	property Component listPayloadComp: null
 
 	// Invisible fields that will be requested for collection
 	property var additionalFieldIds: ["id", "name"]
@@ -88,12 +89,13 @@ CollectionView {
 	// The "name" field of the row, otherwise the value of the first column
 	function getElementDisplayName(index){
 		let elements = root.table.elements
-		if (elements.containsKey("name", index)){
-			return String(elements.getData("name", index))
+		if (elements.containsKey("m_name", index)){
+			return String(elements.getData("m_name", index))
 		}
 
 		let headerId = root.table.headers.getItemsCount() > 0 ? String(root.table.getHeaderId(0)) : ""
-		return headerId !== "" && elements.containsKey(headerId, index) ? String(elements.getData(headerId, index)) : ""
+		let fieldId = headerId !== "" ? "m_" + headerId : ""
+		return fieldId !== "" && elements.containsKey(fieldId, index) ? String(elements.getData(fieldId, index)) : ""
 	}
 
 	function shareDocuments(objectIds, targetTenantIds, accessLevel, validUntil, message){
@@ -101,7 +103,7 @@ CollectionView {
 		for (let i = 0; i < objectIds.length; i++){
 			let name = ""
 			for (let index = 0; index < root.table.elements.getItemsCount(); index++){
-				if (String(root.table.elements.getData("id", index)) === String(objectIds[i])){
+				if (String(root.table.elements.getData("m_id", index)) === String(objectIds[i])){
 					name = root.getElementDisplayName(index)
 					break
 				}
@@ -193,6 +195,7 @@ CollectionView {
 		CollectionRepresentation {
 			collectionId: root.collectionId;
 			gqlGetListCommandId: root.gqlGetListCommandId
+			listPayloadComp: root.listPayloadComp
 			requestedFields: root.requestedFields
 			permissionPaths: root.permissionPaths
 

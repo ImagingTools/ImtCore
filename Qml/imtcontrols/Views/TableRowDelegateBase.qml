@@ -138,7 +138,7 @@ Rectangle {
 	
 	onDoubleClicked: {
 		if (tableItem){
-			let retId = model.id || model.Id || ""
+			let retId = model.item && model.item.m_id !== undefined && model.item.m_id !== null ? model.item.m_id : ""
 			tableItem.doubleClicked(retId, model.index)
 		}
 	}

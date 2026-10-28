@@ -20,6 +20,9 @@ GqlModel {
 	property BaseClass sdlInputObject: null
 	property Component sdlInputObjectComp: null;
 
+	// When set, these names are the selection set. Otherwise the legacy notification { id } set is used.
+	property var selectionFieldIds: []
+
 	signal messageReceived(var data);
 
 	// Messages were missed (connection lost, or delivery disabled): re-read the state instead.
@@ -114,9 +117,16 @@ GqlModel {
 		else {
 			createQueryParams(query, inputParams)
 		}
-		var queryFields = Gql.GqlObject("notification");
-		queryFields.InsertField("id");
-		query.AddField(queryFields);
+		if (selectionFieldIds && selectionFieldIds.length > 0){
+			for (var i = 0; i < selectionFieldIds.length; i++){
+				query.AddField(Gql.GqlObject(selectionFieldIds[i]));
+			}
+		}
+		else{
+			var queryFields = Gql.GqlObject("notification");
+			queryFields.InsertField("id");
+			query.AddField(queryFields);
+		}
 
 		return query;
 	}

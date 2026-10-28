@@ -54,6 +54,7 @@
                                 <Value>Pages/GraphicsViewPage</Value>
                                 <Value>Pages/GridViewPage</Value>
                                 <Value>Pages/TestPage</Value>
+                                <Value>Pages/TestAreaPage</Value>
                                 <Value>Pages/SdlTestPage</Value>
                                 <Value>Pages/ReportsPage</Value>
                                 <Value>Pages/ReportTemplatesPage</Value>
@@ -72,6 +73,7 @@
                                 <Value>SlaveControllers</Value>
                                 <Value>ContactInfoController</Value>
                                 <Value>ParamsSetTestController</Value>
+                                <Value>TestAreaCollectionController</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -126,6 +128,20 @@
         <Element Id="ParamsSetTestController" PackageId="ControlsGalleryGqlPck" ComponentId="ParamsSetTestController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="TestAreaCollectionController" PackageId="ControlsGalleryGqlPck" ComponentId="TestAreaCollectionController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>GetCollectionHeaders</Value>
+                                <Value>TestAreaList</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
             </Data>
         </Element>
         <Element Id="SlaveControllers" PackageId="ImtServerGqlPck" ComponentId="GraphQLDemultiplexer">

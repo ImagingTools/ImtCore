@@ -10,6 +10,7 @@ RemoteCollectionView {
 	id: roleCollectionViewContainer;
 	
 	collectionId: "Roles";
+	listPayloadComp: Component { RolesListPayload {} }
 	visibleMetaInfo: true;
 	documentCollectionFilter: null
 

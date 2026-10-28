@@ -15,6 +15,7 @@ RemoteCollectionView {
 	visibleMetaInfo: false;
 
 	collectionId: "Products";
+	listPayloadComp: Component { ProductsListPayload {} }
 	documentCollectionFilter: null
 	additionalFieldIds: [ProductItemTypeMetaInfo.s_productId]
 	

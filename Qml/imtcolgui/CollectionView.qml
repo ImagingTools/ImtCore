@@ -385,14 +385,23 @@ Item {
 					return
 				}
 				
-				if (notificationModel.containsKey("totalCount")){
-					let totalCount = notificationModel.getData("totalCount")
-					container.pagination.countAllElements = totalCount;
+				if (notificationModel.containsKey){
+					if (notificationModel.containsKey("totalCount")){
+						container.pagination.countAllElements = notificationModel.getData("totalCount")
+					}
+
+					if (notificationModel.containsKey("pagesCount")){
+						container.pagination.pagesSize = notificationModel.getData("pagesCount")
+					}
 				}
-				
-				if (notificationModel.containsKey("pagesCount")){
-					let pagesCount = notificationModel.getData("pagesCount")
-					container.pagination.pagesSize = pagesCount;
+				else {
+					if (notificationModel.m_totalCount !== undefined && notificationModel.m_totalCount !== null){
+						container.pagination.countAllElements = notificationModel.m_totalCount
+					}
+
+					if (notificationModel.m_pagesCount !== undefined && notificationModel.m_pagesCount !== null){
+						container.pagination.pagesSize = notificationModel.m_pagesCount
+					}
 				}
 			}
 		}

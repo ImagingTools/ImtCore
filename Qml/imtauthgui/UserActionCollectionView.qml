@@ -7,6 +7,7 @@ import imtcolgui 1.0
 import imtcontrols 1.0
 import imtguigql 1.0
 import imtauthUsersSdl 1.0
+import imtauthUserActionsSdl 1.0
 import imtbaseComplexCollectionFilterSdl 1.0
 import imtbaseImtCollectionSdl 1.0
 import imtbaseImtBaseTypesSdl 1.0
@@ -17,6 +18,7 @@ RemoteCollectionView {
 	documentCollectionFilter: null
 	commandsControllerComp: null
 	collectionId: "UserActions"
+	listPayloadComp: Component { GetUserActionsPayload {} }
 	Component.onCompleted: {
 		registerFieldFilterDelegate("actionTypeId", actionDelegateFilterComp)
 

@@ -137,19 +137,19 @@ CollectionViewCommandsDelegateBase {
 		let indexes = collectionViewCommandsDelegateBase.collectionView.table.getSelectedIndexes();
 		for (let i = 0; i < indexes.length; i++){
 			let index = indexes[i];
-			if (elementsModel.containsKey("id", index)){
-				let itemId = elementsModel.getData("id", index);
-				let typeId = elementsModel.getData("typeId", index);
+			if (elementsModel.containsKey("m_id", index)){
+				let itemId = elementsModel.getData("m_id", index);
+				let typeId = elementsModel.getData("m_typeId", index);
 				let documentName = ""
-				let accessLevel = elementsModel.containsKey("sharingAccess", index) ? String(elementsModel.getData("sharingAccess", index)) : ""
+				let accessLevel = elementsModel.containsKey("m_sharingAccess", index) ? String(elementsModel.getData("m_sharingAccess", index)) : ""
 				if (collectionViewCommandsDelegateBase.documentManager){
 					collectionViewCommandsDelegateBase.documentManager.setObjectReadOnly(itemId, accessLevel === "View")
 				}
 
-				if (elementsModel.containsKey("name", index))
-					documentName = elementsModel.getData("name", index)
-				else if (elementsModel.containsKey("mainText", index))
-					documentName = elementsModel.getData("mainText", index)
+				if (elementsModel.containsKey("m_name", index))
+					documentName = elementsModel.getData("m_name", index)
+				else if (elementsModel.containsKey("m_mainText", index))
+					documentName = elementsModel.getData("m_mainText", index)
 
 				if (documentTypeIds.length === 0){
 					collectionViewCommandsDelegateBase.openDocumentEditor(itemId, documentTypeId, documentName);
@@ -177,8 +177,8 @@ CollectionViewCommandsDelegateBase {
 		let indexes = collectionViewCommandsDelegateBase.collectionView.table.getSelectedIndexes();
 		if (indexes.length > 0){
 			let index = indexes[0];
-			if (elementsModel.containsKey("id", index)){
-				let documentId = elementsModel.getData("id", index);
+			if (elementsModel.containsKey("m_id", index)){
+				let documentId = elementsModel.getData("m_id", index);
 				ModalDialogManager.openDialog(documentRevisionDialogComp, {"documentId": documentId});
 			}
 		}

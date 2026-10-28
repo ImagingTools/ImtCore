@@ -114,6 +114,15 @@ class QObject extends QBaseObject {
         }
     }
 
+    __initializeValue(value){
+        if(!(value instanceof QObject) || value.__completed || value.__destroyed || value.__destroying) return
+
+        value.__updatePrimaryProperties()
+        value.__updateProperties()
+        value.__complete()
+        value.__completeProperties()
+    }
+
     __updateProperty(propName){
         if(!(propName in this.__properties)) return
 
@@ -127,10 +136,7 @@ class QObject extends QBaseObject {
         delete this.__properties[propName]
 
         if(value instanceof QObject){
-            value.__updatePrimaryProperties()
-            value.__updateProperties()
-            value.__complete()
-            value.__completeProperties()
+            this.__initializeValue(value)
         }
 
         if(typeof value === 'function'){
@@ -149,7 +155,11 @@ class QObject extends QBaseObject {
     }
   
     __updateProperties(){
-        JQApplication.beginUpdate()
+        // A QML function or signal already opened a layer. Stay on it so
+        // geometry from this object and from the statements after createObject
+        // is applied once, when that handler returns.
+        let ownLayer = JQApplication.updateLayers.length === 0
+        if(ownLayer) JQApplication.beginUpdate()
 
         this.__prepareAliasProperties()
 
@@ -162,7 +172,7 @@ class QObject extends QBaseObject {
             child.__updateProperties()
         }
 
-        JQApplication.endUpdate()
+        if(ownLayer) JQApplication.endUpdate()
     }
 
     __completeProperty(propName){
@@ -173,10 +183,7 @@ class QObject extends QBaseObject {
             delete this.__properties[propName]
 
             let obj = this.__proxy[path[0]]
-            obj.__updatePrimaryProperties()
-            obj.__updateProperties()
-            obj.__complete()
-            obj.__completeProperties()
+            this.__initializeValue(obj)
         }
     }
 

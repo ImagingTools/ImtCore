@@ -4,6 +4,7 @@ import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtcontrols 1.0
 import imtguigql 1.0
+import imtbaseImtCollectionSdl 1.0
 
 RemoteCollectionView {
 	id: log;
@@ -70,9 +71,15 @@ RemoteCollectionView {
 		}
 	}
 	
+	Component {
+		id: messageListPayloadComp
+		MessageListPayload {}
+	}
+
 	dataControllerComp: Component { CollectionRepresentation {
 			collectionId: log.collectionId
 			gqlGetListCommandId: log.gqlGetListCommandId
+			listPayloadComp: log.listPayloadComp ? log.listPayloadComp : messageListPayloadComp
 			additionalFieldIds: log.additionalFieldIds
 
 			onElementSetRemoved: log.doUpdateGui()

@@ -17,6 +17,7 @@ DocumentServiceBase {
 	property SubscriptionClient documentManagerSubscription: SubscriptionClient{
 		autoSubscribe: false
 		sdlInputObject: root.collectionIdObj
+		selectionFieldIds: ["documentOperation", "documentId", "documentName", "objectId", "objectTypeId", "isDirty", "isLoading", "hasNameProvider"]
 
 		function getHeaders(){
 			return root.getHeaders()
@@ -62,6 +63,7 @@ DocumentServiceBase {
 	property SubscriptionClient undoManagerSubscription: SubscriptionClient {
 		autoSubscribe: false
 		sdlInputObject: root.collectionIdObj
+		selectionFieldIds: ["documentId", "isDirty", "availableUndoSteps", "availableRedoSteps"]
 
 		function getHeaders(){
 			return root.getHeaders()
@@ -79,13 +81,34 @@ DocumentServiceBase {
 
 	onCollectionIdChanged: {
 		if (collectionId !== ""){
-			root.collectionIdObj.m_collectionId = root.collectionId
-			documentManagerSubscription.gqlCommandId = "On" + "DocumentManagerChanged"
-			undoManagerSubscription.gqlCommandId = "On" + "UndoRedoChanged"
-			documentManagerSubscription.registerSubscription()
-			undoManagerSubscription.registerSubscription()
+			root.__registerDocumentSubscriptions()
 			getOpenedDocumentList()
 		}
+	}
+
+	// autoSubscribe is off, so a RegisterSubscription sent before SubscriptionManager exists is lost
+	// and DocumentDataLoaded never arrives. The manager announces itself later; register again then.
+	function __onSubscriptionManagerReady(){
+		root.__registerDocumentSubscriptions()
+	}
+
+	function __registerDocumentSubscriptions(){
+		if (root.collectionId === ""){
+			return
+		}
+
+		root.collectionIdObj.m_collectionId = root.collectionId
+		documentManagerSubscription.gqlCommandId = "On" + "DocumentManagerChanged"
+		undoManagerSubscription.gqlCommandId = "On" + "UndoRedoChanged"
+		documentManagerSubscription.registerSubscription()
+		undoManagerSubscription.registerSubscription()
+	}
+
+	Component.onCompleted: {
+		Events.subscribeEvent("SubscriptionManagerReady", root.__onSubscriptionManagerReady)
+		// The manager may already be listening: the register from onCollectionIdChanged was then kept,
+		// and a second one is ignored. If that first event was lost, this one is the registration.
+		root.__registerDocumentSubscriptions()
 	}
 
 	// Stops the notifications of this service. Its owner calls it on destruction: on the web the service can outlive
@@ -96,6 +119,7 @@ DocumentServiceBase {
 	}
 
 	Component.onDestruction: {
+		Events.unSubscribeEvent("SubscriptionManagerReady", root.__onSubscriptionManagerReady)
 		root.release()
 	}
 
@@ -339,13 +363,118 @@ DocumentServiceBase {
 	property CollectionUndoRedoInput collectionUndoRedoInput: CollectionUndoRedoInput {}
 	property UndoRedoInput undoRedoInput: UndoRedoInput {}
 
+	// DocumentDataLoaded is the usual way a document leaves the loading state. These
+	// collections can miss that notice, so the open-document list is read until the
+	// server reports the document is no longer loading. The list is not announced
+	// to the workspace: that handler would open every document the server still has.
+	property bool __loadingPollOnly: false
+	property bool __loadingPollBusy: false
+	property int __loadingPollsLeft: 0
+
+	property Timer __loadingPollTimer: Timer {
+		interval: 500
+		repeat: false
+		onTriggered: {
+			root.__pollLoadingDocuments()
+		}
+	}
+
+	function __watchLoadingDocuments(){
+		root.__loadingPollsLeft = 40
+		if (!root.__loadingPollTimer.running){
+			root.__loadingPollTimer.restart()
+		}
+	}
+
+	function __scheduleLoadingPoll(){
+		if (root.__loadingPollsLeft <= 0){
+			return
+		}
+
+		let ids = root.getOpenedDocumentIds()
+		for (let i = 0; i < ids.length; ++i){
+			if (root.documentIsLoading(ids[i])){
+				root.__loadingPollTimer.restart()
+				return
+			}
+		}
+	}
+
+	function __pollLoadingDocuments(){
+		if (root.__loadingPollsLeft <= 0){
+			return
+		}
+
+		let ids = root.getOpenedDocumentIds()
+		let loading = false
+		for (let i = 0; i < ids.length; ++i){
+			if (root.documentIsLoading(ids[i])){
+				loading = true
+				break
+			}
+		}
+		if (!loading){
+			return
+		}
+
+		root.__loadingPollsLeft = root.__loadingPollsLeft - 1
+		if (root.__loadingPollBusy){
+			root.__loadingPollTimer.restart()
+			return
+		}
+
+		root.__loadingPollOnly = true
+		root.__loadingPollBusy = true
+		root.collectionIdInput.m_collectionId = root.collectionId
+		root.getOpenedDocumentListRequest.send(root.collectionIdInput)
+	}
+
+	// The server writes isLoading only while it is true, so a missing value means the document is loaded.
+	function __applyLoadingFromList(documentInfoList){
+		if (!documentInfoList){
+			return
+		}
+
+		for (let i = 0; i < documentInfoList.count; ++i){
+			let documentInfo = documentInfoList.get(i).item
+			if (!documentInfo){
+				continue
+			}
+
+			let documentId = String(documentInfo.m_documentId)
+			if (!root.documentIsOpened(documentId)){
+				continue
+			}
+
+			if (documentInfo.m_isLoading !== true){
+				root.setDocumentIsLoading(documentId, false)
+			}
+		}
+	}
+
+	onDocumentOpened: {
+		root.__watchLoadingDocuments()
+	}
+
+	onDocumentCreated: {
+		root.__watchLoadingDocuments()
+	}
+
 	property GqlSdlRequestSender getOpenedDocumentListRequest: GqlSdlRequestSender {
 		permissionPath: root.permissionPaths[gqlCommandId] || ""
 		gqlCommandId: ImtbaseCollectionDocumentServiceSdlCommandIds.s_getOpenedDocumentList
 		sdlObjectComp: Component {
 			DocumentList {
 				onFinished: {
-					root.openedDocumentListReceived(m_documentList)
+					root.__loadingPollBusy = false
+					if (root.__loadingPollOnly){
+						root.__loadingPollOnly = false
+						root.__applyLoadingFromList(m_documentList)
+						root.__scheduleLoadingPoll()
+					}
+					else{
+						root.openedDocumentListReceived(m_documentList)
+					}
 				}
 			}
 		}
@@ -356,6 +485,13 @@ DocumentServiceBase {
 
 		// The workspace covers itself while the list loads; without this a failed request left it covered.
 		function onError(message, type){
+			root.__loadingPollBusy = false
+			if (root.__loadingPollOnly){
+				root.__loadingPollOnly = false
+				root.__scheduleLoadingPoll()
+				return
+			}
+
 			root.openedDocumentListReceiveFailed(message)
 		}
 	}
@@ -423,6 +559,9 @@ DocumentServiceBase {
 			DocumentOperationStatus {
 				onFinished: {
 					root.handleSaveDocumentResult(root.saveDocumentRequest.documentId, m_status, m_message, m_documentName)
+					if (m_status === "Success"){
+						root.getUndoInfo(root.saveDocumentRequest.documentId)
+					}
 				}
 			}
 		}

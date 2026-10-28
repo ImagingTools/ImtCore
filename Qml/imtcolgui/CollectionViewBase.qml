@@ -271,7 +271,7 @@ ViewBase {
 				if (count > 0){
 					let selectedIds = []
 					for (let i = 0; i < selection.length; i++){
-						let elementId = elements.getData("id", selection[i])
+						let elementId = elements.getData("m_id", selection[i])
 						selectedIds.push(elementId)
 					}
 					collectionViewBaseContainer.selectionManager.selectMultiple(selectedIds)
@@ -300,7 +300,7 @@ ViewBase {
 				let selectedIndexes = []
 				let selectedIds = []
 				for (let i = 0; i < count; i++){
-					let elementId = tableInternal.elements.getData("id", i)
+					let elementId = tableInternal.elements.getData("m_id", i)
 					if (collectionViewBaseContainer.selectionManager.isSelected(elementId)){
 						selectedIndexes.push(i)
 						selectedIds.push(elementId)

@@ -391,6 +391,33 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="TestAreaPage" PackageId="ImtCoreVoce" ComponentId="SingleDocPage">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="FixedItemQmlPath" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="../../TestAreaPage.qml"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IconPath" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Icons/Product"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="TestArea"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PageId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="TestArea"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="TestPage" PackageId="ImtCoreVoce" ComponentId="SingleDocPage">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -491,6 +518,7 @@
         <Component ExportedId="SdlTestPage" ComponentId="SdlTestPage"/>
         <Component ExportedId="TablePage" ComponentId="TablePage"/>
         <Component ExportedId="TableTreeViewPage" ComponentId="TableTreeViewPage"/>
+        <Component ExportedId="TestAreaPage" ComponentId="TestAreaPage"/>
         <Component ExportedId="TestPage" ComponentId="TestPage"/>
         <Component ExportedId="TreeViewPage" ComponentId="TreeViewPage"/>
         <Component ExportedId="ViewsPage" ComponentId="ViewsPage"/>

@@ -6,7 +6,8 @@ const handler = {
         let name = proxyTarget.meta.name
 
         if(target.signalsBlocked() || target.__destroyed) return
-            JQApplication.beginUpdate()
+            let ownLayer = JQApplication.updateLayers.length === 0
+            if(ownLayer) JQApplication.beginUpdate()
 
             let slotName = 'SLOT_' + name
 
@@ -47,7 +48,7 @@ const handler = {
             invokeConnections(connection => !connection.priority)
             global.queueFlag.pop()
             global.signalTargets.pop()
-            JQApplication.endUpdate()
+            if(ownLayer) JQApplication.endUpdate()
     },
     get(proxyTarget, key) {
         let target = proxyTarget.meta.parent

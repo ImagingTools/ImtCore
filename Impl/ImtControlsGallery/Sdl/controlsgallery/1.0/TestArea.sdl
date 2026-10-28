@@ -1,0 +1,50 @@
+schema {
+	query: Query
+	mutation: Mutation
+	subscription: Subscription
+	namespace: controlsgallery
+	version: 1.0
+}
+
+import {
+	"../../../../../Sdl/imtbase/1.0/ImtCollection.sdl"
+}
+
+type TestAreaItemData {
+	id: ID!
+	typeId: ID!
+	name: String
+	column1: String
+	column2: String
+	column3: String
+	column4: String
+	column5: String
+	column6: String
+	column7: String
+	column8: String
+	column9: String
+	column10: String
+	column11: String
+	column12: String
+	column13: String
+	column14: String
+	column15: String
+}
+
+type TestAreaListPayload {
+	items: [TestAreaItemData]
+	notification: NotificationItem
+}
+
+type Query {
+	TestAreaList (input: CreateSubCollectionInput): TestAreaListPayload!
+}
+
+collectionSchema {
+	type TestArea {
+		ref: TestAreaItemData
+		operations {
+			list: TestAreaList
+		}
+	}
+}

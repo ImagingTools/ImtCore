@@ -13,6 +13,7 @@ RemoteCollectionView {
 	id: userCollectionViewContainer;
 	
 	collectionId: "Users";
+	listPayloadComp: Component { UsersListPayload {} }
 	visibleMetaInfo: true;
 	documentCollectionFilter: null
 

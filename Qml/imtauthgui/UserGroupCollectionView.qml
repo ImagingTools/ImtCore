@@ -9,6 +9,7 @@ RemoteCollectionView {
 	id: userGroupCollectionViewContainer;
 	
 	collectionId: "Groups";
+	listPayloadComp: Component { GroupsListPayload {} }
 	visibleMetaInfo: true;
 	documentCollectionFilter: null
 	

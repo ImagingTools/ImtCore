@@ -432,6 +432,9 @@ Item {
 
 		function onDocumentSaved(documentId){
 			workspaceView.stopLoading(documentId)
+			if (workspaceView.collectionView){
+				workspaceView.collectionView.doUpdateGui()
+			}
 		}
 
 		function onSaveDocumentFailed(documentId, message){

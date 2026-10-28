@@ -138,19 +138,19 @@ CollectionViewCommandsDelegateBase{
 
 		let indexes = collectionView.table.getSelectedIndexes()
 		for (let i = 0; i < indexes.length; ++i){
-			if (!elementsModel.containsKey("id", indexes[i])){
-				console.error("Unable to edit element. Field: 'id' does not exists in the table model")
+			if (!elementsModel.containsKey("m_id", indexes[i])){
+				console.error("Unable to edit element. Field: 'm_id' does not exists in the table model")
 				return
 			}
 
-			if (!elementsModel.containsKey("typeId", indexes[i])){
-				console.error("Unable to edit element. Field: 'typeId' does not exists in the table model")
+			if (!elementsModel.containsKey("m_typeId", indexes[i])){
+				console.error("Unable to edit element. Field: 'm_typeId' does not exists in the table model")
 				return
 			}
 
-			let itemId = elementsModel.getData("id", indexes[i]);
-			let typeId = elementsModel.getData("typeId", indexes[i]);
-			let accessLevel = elementsModel.containsKey("sharingAccess", indexes[i]) ? String(elementsModel.getData("sharingAccess", indexes[i])) : ""
+			let itemId = elementsModel.getData("m_id", indexes[i]);
+			let typeId = elementsModel.getData("m_typeId", indexes[i]);
+			let accessLevel = elementsModel.containsKey("m_sharingAccess", indexes[i]) ? String(elementsModel.getData("m_sharingAccess", indexes[i])) : ""
 			documentManager.setObjectReadOnly(itemId, accessLevel === "View")
 
 			documentManager.openDocument(typeId, itemId)
@@ -193,8 +193,8 @@ CollectionViewCommandsDelegateBase{
 		let indexes = collectionView.table.getSelectedIndexes();
 		if (indexes.length > 0){
 			let index = indexes[0];
-			if (elementsModel.containsKey("id", index)){
-				let documentId = elementsModel.getData("id", index);
+			if (elementsModel.containsKey("m_id", index)){
+				let documentId = elementsModel.getData("m_id", index);
 				ModalDialogManager.openDialog(documentRevisionDialogComp, {"documentId": documentId});
 			}
 		}

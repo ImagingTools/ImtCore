@@ -34,6 +34,11 @@ I_EXPORT_COMPONENT(
 		"Params set test controller",
 		"ParamsSet Test Controller");
 
+I_EXPORT_COMPONENT(
+		TestAreaCollectionController,
+		"Test area collection controller",
+		"Test Area Collection Controller");
+
 
 } // namespace ControlsGalleryGqlPck
 

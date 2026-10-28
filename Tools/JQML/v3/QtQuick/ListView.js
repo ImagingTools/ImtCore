@@ -217,7 +217,7 @@ class ListView extends Flickable {
     }
 
     SLOT_modelChanged(oldValue, newVlaue) {
-        this.__clear()
+        this.__clear(true)
 
         if (oldValue && typeof oldValue === 'object' && !Array.isArray(oldValue) && !oldValue.__destroyed) {
             oldValue.__removeViewListener(this)
@@ -271,21 +271,29 @@ class ListView extends Flickable {
         this.__keyNavigationEnabledExplicit = true
     }
 
-    __clear() {
+    __clear(toCache = false) {
         this.blockSignals(true)
         this.__changeSet = []
 
         let removed = this.__items
         this.__items = {}
 
-        for (let c of this.__cache) {
-            if (c) c.destroy()
+        if(!toCache){
+            for (let c of this.__cache) {
+                if (c) c.destroy()
+            }
+
+            this.__cache = []
         }
 
-        this.__cache = []
-
-        for (let r in removed) {
-            if (removed[r]) removed[r].destroy()
+        if(toCache){
+            for (let r in removed) {
+                if (removed[r]) this.__toCache(removed[r])
+            }
+        } else {
+            for (let r in removed) {
+                if (removed[r]) removed[r].destroy()
+            }
         }
 
         // this.__middleWidth = 0

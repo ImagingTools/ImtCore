@@ -20,6 +20,7 @@ RemoteCollectionView {
 
 	property string permissionPath: ""
 	collectionId: "Tenants"
+	listPayloadComp: Component { GetTenantListPayload {} }
 	gqlGetListCommandId: ImtauthTenantsSdlCommandIds.s_getTenantList
 	documentCollectionFilter: null
 	additionalFieldIds: [
@@ -41,11 +42,11 @@ RemoteCollectionView {
 		if (commandId === "Switch") {
 			let indexes = table.getSelectedIndexes()
 			if (indexes.length === 1) {
-				let scope = table.elements.getData(TenantItemDataTypeMetaInfo.s_tenantRelationScope, indexes[0])
+				let scope = table.elements.getData("m_" + TenantItemDataTypeMetaInfo.s_tenantRelationScope, indexes[0])
 				if (scope === "Invited") return
-				let tenantId = table.elements.getData("id", indexes[0])
+				let tenantId = table.elements.getData("m_id", indexes[0])
 				if (!container.tenantIsActive(indexes[0])) {
-					let tenantName = table.elements.getData("name", indexes[0])
+					let tenantName = table.elements.getData("m_name", indexes[0])
 					ModalDialogManager.openDialog(activateDialogComp, {"tenantId": tenantId, "tenantName": tenantName || tenantId, "openEditor": false})
 					return
 				}
@@ -54,8 +55,8 @@ RemoteCollectionView {
 		} else if (commandId === "Leave") {
 			let indexes = table.getSelectedIndexes()
 			if (indexes.length === 1) {
-				let tenantId = table.elements.getData("id", indexes[0])
-				let tenantName = table.elements.getData("name", indexes[0])
+				let tenantId = table.elements.getData("m_id", indexes[0])
+				let tenantName = table.elements.getData("m_name", indexes[0])
 				ModalDialogManager.openDialog(leaveConfirmDialogComp, {"tenantId": tenantId, "tenantName": tenantName || tenantId})
 			}
 		}
@@ -117,8 +118,8 @@ RemoteCollectionView {
 		container.__pendingAcceptTenantId = ""
 		var rows = container.table ? container.table.elementsCount : 0
 		for (var r = 0; r < rows; r++) {
-			if (container.table.elements.getData(TenantItemDataTypeMetaInfo.s_invitationId, r) === invitationId) {
-				container.__pendingAcceptTenantId = container.table.elements.getData("id", r) || ""
+			if (container.table.elements.getData("m_" + TenantItemDataTypeMetaInfo.s_invitationId, r) === invitationId) {
+				container.__pendingAcceptTenantId = container.table.elements.getData("m_id", r) || ""
 				break
 			}
 		}
@@ -130,8 +131,8 @@ RemoteCollectionView {
 		container.__pendingRejectTenantId = ""
 		var rows = container.table ? container.table.elementsCount : 0
 		for (var r = 0; r < rows; r++) {
-			if (container.table.elements.getData(TenantItemDataTypeMetaInfo.s_invitationId, r) === invitationId) {
-				container.__pendingRejectTenantId = container.table.elements.getData("id", r) || ""
+			if (container.table.elements.getData("m_" + TenantItemDataTypeMetaInfo.s_invitationId, r) === invitationId) {
+				container.__pendingRejectTenantId = container.table.elements.getData("m_id", r) || ""
 				break
 			}
 		}
@@ -199,13 +200,13 @@ RemoteCollectionView {
 
 			onReused: {
 				if (rowIndex >= 0 && tenantRelationScopeDelegate && tenantRelationScopeDelegate.rowDelegate && tenantRelationScopeDelegate.rowDelegate.tableItem){
-					let scope = tenantRelationScopeDelegate.rowDelegate.tableItem.elements.getData(TenantItemDataTypeMetaInfo.s_tenantRelationScope, rowIndex);
+					let scope = tenantRelationScopeDelegate.rowDelegate.tableItem.elements.getData("m_" + TenantItemDataTypeMetaInfo.s_tenantRelationScope, rowIndex);
 					scopeValue = scope ? scope : ""
 
-					let invitationId = tenantRelationScopeDelegate.rowDelegate.tableItem.elements.getData(TenantItemDataTypeMetaInfo.s_invitationId, rowIndex);
+					let invitationId = tenantRelationScopeDelegate.rowDelegate.tableItem.elements.getData("m_" + TenantItemDataTypeMetaInfo.s_invitationId, rowIndex);
 					invitationIdValue = invitationId ? invitationId : ""
 
-					let invitedByName = tenantRelationScopeDelegate.rowDelegate.tableItem.elements.getData(TenantItemDataTypeMetaInfo.s_invitedByName, rowIndex);
+					let invitedByName = tenantRelationScopeDelegate.rowDelegate.tableItem.elements.getData("m_" + TenantItemDataTypeMetaInfo.s_invitedByName, rowIndex);
 					invitedByNameValue = invitedByName ? invitedByName : ""
 				}
 			}
@@ -544,7 +545,7 @@ RemoteCollectionView {
 	}
 
 	function tenantIsActive(index) {
-		return table.elements.getData(TenantItemDataTypeMetaInfo.s_isActive, index) !== false
+		return table.elements.getData("m_" + TenantItemDataTypeMetaInfo.s_isActive, index) !== false
 	}
 
 	// An inactive organization cannot be switched to, so it is activated first.
@@ -739,19 +740,19 @@ RemoteCollectionView {
 				let indexes = collectionView.table.getSelectedIndexes()
 				for (let i = 0; i < indexes.length; ++i){
 					let index = indexes[i]
-					if (!elementsModel.containsKey("id", index)){
+					if (!elementsModel.containsKey("m_id", index)){
 						continue
 					}
 
-					let scope = elementsModel.getData(TenantItemDataTypeMetaInfo.s_tenantRelationScope, index)
+					let scope = elementsModel.getData("m_" + TenantItemDataTypeMetaInfo.s_tenantRelationScope, index)
 					if (scope === "Invited") {
 						continue
 					}
 
-					let tenantId = elementsModel.getData("id", index)
+					let tenantId = elementsModel.getData("m_id", index)
 					if (tenantId && tenantId !== AuthorizationController.currentTenantId){
-						let tenantName = elementsModel.containsKey("name", index)
-								? elementsModel.getData("name", index)
+						let tenantName = elementsModel.containsKey("m_name", index)
+								? elementsModel.getData("m_name", index)
 								: tenantId
 						container.requestOpenTenantDocument(tenantId, tenantName, container.tenantIsActive(index))
 						return
@@ -760,20 +761,20 @@ RemoteCollectionView {
 
 				for (let i = 0; i < indexes.length; ++i){
 					let index = indexes[i]
-					if (!elementsModel.containsKey("id", index)){
-						console.error("Unable to edit element. Field: 'id' does not exists in the table model")
+					if (!elementsModel.containsKey("m_id", index)){
+						console.error("Unable to edit element. Field: 'm_id' does not exists in the table model")
 						return
 					}
 
-					if (!elementsModel.containsKey("typeId", index)){
-						console.error("Unable to edit element. Field: 'typeId' does not exists in the table model")
+					if (!elementsModel.containsKey("m_typeId", index)){
+						console.error("Unable to edit element. Field: 'm_typeId' does not exists in the table model")
 						return
 					}
 
-					let tenantId = elementsModel.getData("id", index)
-					let typeId = elementsModel.getData("typeId", index)
+					let tenantId = elementsModel.getData("m_id", index)
+					let typeId = elementsModel.getData("m_typeId", index)
 
-					let scope = elementsModel.getData(TenantItemDataTypeMetaInfo.s_tenantRelationScope, index)
+					let scope = elementsModel.getData("m_" + TenantItemDataTypeMetaInfo.s_tenantRelationScope, index)
 					if (scope === "Invited") {
 						continue
 					}
@@ -789,8 +790,8 @@ RemoteCollectionView {
 				if (singleSelection) {
 					let row = selection[0]
 
-					let tenantId = elementsModel.getData("id", row)
-					let scope = elementsModel.getData(TenantItemDataTypeMetaInfo.s_tenantRelationScope, row)
+					let tenantId = elementsModel.getData("m_id", row)
+					let scope = elementsModel.getData("m_" + TenantItemDataTypeMetaInfo.s_tenantRelationScope, row)
 
 					switchEnabled = tenantId !== AuthorizationController.currentTenantId && scope !== "Invited"
 					leaveEnabled = scope === "Member"

@@ -16,10 +16,12 @@ Item {
 	property string gqlImportCommandId: collectionId + "Import";
 	property string gqlExportCommandId: collectionId + "Export";
 
-	property TreeItemModel elementsModel: TreeItemModel {}
-	property var elementsSource: null
+	// SDL payload of the list command, for example UsersListPayload.
+	property Component listPayloadComp: null
+
+	property var elementsModel: null
 	property var headersModel: null
-	property TreeItemModel notificationModel: TreeItemModel {}
+	property var notificationModel: null
 	
 	property var additionalFieldIds: []
 	property var requestedFields: []
@@ -149,110 +151,29 @@ Item {
 			return;
 		}
 
+		if (!root.listPayloadComp){
+			console.error("Unable to update elements: list payload component is not set");
+			return;
+		}
+
 		root.beginUpdate();
-		elementsGqlModel.gqlCommandId = gqlGetListCommandId;
+		elementsRequest.gqlCommandId = gqlGetListCommandId;
 		collectionParams.m_collectionId = root.collectionId
 		collectionParams.m_count = count
 		collectionParams.m_offset = offset
 		collectionParams.m_selectionParams = paramsSet
 
-		elementsGqlModel.send(collectionParams)
+		elementsRequest.send(collectionParams)
 	}
 	
 	function clearElements(){
-		if (elementsModel){
-			elementsModel.clear()
-			elementsModel = null
-		}
-		elementsSource = null
-		
-		if (notificationModel){
-			notificationModel.clear()
-			notificationModel = null
-		}
-
+		elementsModel = null
+		notificationModel = null
 		elementsReceived(elementsModel)
 	}
 	
 	function getElementsRepresentation(){
 		return root.elementsModel;
-	}
-
-	function publishElements(items){
-		if (!root.canUpdateElementsInPlace(items)){
-			root.elementsModel = items;
-			root.elementsSource = null;
-			root.elementsReceived(root.elementsModel);
-			return;
-		}
-
-		root.elementsModel.setUpdateEnabled(false);
-		let count = items.getItemsCount();
-		for (let i = 0; i < count; i++){
-			root.copyElementRow(i, items);
-		}
-		root.elementsModel.setUpdateEnabled(true);
-		root.elementsSource = items;
-		root.elementsReceived(root.elementsModel);
-	}
-
-	function canUpdateElementsInPlace(items){
-		if (!items || !root.elementsModel || items === root.elementsModel){
-			return false;
-		}
-		if (!items.getItemsCount || !root.elementsModel.getItemsCount){
-			return false;
-		}
-		if (root.elementsModel.getItemsCount() === 0 || root.elementsModel.getItemsCount() !== items.getItemsCount()){
-			return false;
-		}
-		return true;
-	}
-
-	function copyElementRow(index, items){
-		let keys = items.getKeys(index);
-		for (let k = 0; k < keys.length; k++){
-			let key = keys[k];
-			if (key === "item"){
-				continue;
-			}
-			let value = items.getData(key, index);
-			if (value === null || value === undefined || typeof value !== "object"){
-				root.elementsModel.setData(key, value, index);
-			}
-		}
-
-		// Desktop CTreeItemModel has no get(): its rows hold no item objects.
-		if (typeof items.get !== "function" || typeof root.elementsModel.get !== "function"){
-			return;
-		}
-
-		let targetRow = root.elementsModel.get(index);
-		let sourceRow = items.get(index);
-		if (targetRow && sourceRow && targetRow.item && sourceRow.item){
-			root.copyItemFields(targetRow.item, sourceRow.item);
-		}
-	}
-
-	function copyItemFields(targetItem, sourceItem){
-		let ids = ["id", "name", "typeId"];
-		if (root.headersModel && root.headersModel.getItemsCount){
-			for (let i = 0; i < root.headersModel.getItemsCount(); i++){
-				let header = root.headersModel.get(i);
-				if (header && header.item && header.item.m_id){
-					ids.push(header.item.m_id);
-				}
-			}
-		}
-		for (let i = 0; i < root.additionalFieldIds.length; i++){
-			ids.push(root.additionalFieldIds[i]);
-		}
-		for (let i = 0; i < ids.length; i++){
-			let prop = "m_" + ids[i];
-			if (sourceItem[prop] !== undefined){
-				targetItem[prop] = sourceItem[prop];
-			}
-		}
 	}
 
 	function removeElements(elementIds){
@@ -583,48 +504,41 @@ Item {
 		return retVal
 	}
 
-	GqlRequestSender {
-		id: elementsGqlModel;
-		gqlCommandId: root.gqlGetListCommandId;
+	GqlSdlRequestSender {
+		id: elementsRequest
+		gqlCommandId: root.gqlGetListCommandId
 		permissionPath: root.permissionPaths[gqlCommandId] || ""
-		
-		function createQueryParams(query, params){
-			var viewParams = Gql.GqlObject("viewParams");
+		sdlObjectComp: root.listPayloadComp
 
-			var inputParams = Gql.GqlObject("input");
-			inputParams.fromObject(params);
-
-			root.addAdditionalInputParams(inputParams)
-			query.AddParam(inputParams);
-			
-			var queryFields = Gql.GqlObject("items");
-			let requestedFields = root.getRequestedFields()
-
-			for (let i = 0; i < requestedFields.length; ++i){
-				queryFields.InsertField(requestedFields[i])
+		function getRequestedFields(){
+			let items = Gql.GqlObject("items")
+			let fieldIds = root.getRequestedFields()
+			for (let i = 0; i < fieldIds.length; i++){
+				items.InsertField(fieldIds[i])
 			}
 
-			query.AddField(queryFields);
+			let notification = Gql.GqlObject("notification")
+			notification.InsertField("pagesCount")
+			notification.InsertField("totalCount")
+
+			let payload = Gql.GqlObject("payload")
+			payload.InsertFieldObject(items)
+			payload.InsertFieldObject(notification)
+			return payload
 		}
-		
-		function onResult(data){
-			if (data.containsKey("notification")){
-				root.notificationModel = data.getData("notification");
-			}
-			
-			if (data.containsKey("items")){
-				root.publishElements(data.getData("items"))
-			}
-		}
-		
+
 		function getHeaders(){
 			return root.getHeaders();
 		}
-		
-		onStateChanged: {
-			if (state !== "Loading"){
-				root.endUpdate();
+
+		onFinished: {
+			if (status > 0 && sdlObject){
+				root.notificationModel = sdlObject.m_notification
+				root.elementsModel = sdlObject.m_items
+				root.elementsReceived(root.elementsModel)
 			}
+
+			root.endUpdate()
 		}
 	}
 

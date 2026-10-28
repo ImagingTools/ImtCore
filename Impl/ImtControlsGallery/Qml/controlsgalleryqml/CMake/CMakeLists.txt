@@ -32,6 +32,9 @@ list(APPEND webdirs ${buildwebdir}/src/controlsgalleryContactInfoCollectionDocum
 list(APPEND webdirs ${AUX_INCLUDE_DIR}/controlsgallerysdl/SDL/1.0/QML/controlsgalleryParamsSetTestSdl)
 list(APPEND webdirs ${buildwebdir}/src/controlsgalleryParamsSetTestSdl)
 
+list(APPEND webdirs ${AUX_INCLUDE_DIR}/controlsgallerysdl/SDL/1.0/QML/controlsgalleryTestAreaSdl)
+list(APPEND webdirs ${buildwebdir}/src/controlsgalleryTestAreaSdl)
+
 # EjEditor QML module: needed by the default (jqml_compile_web2) web build, which compiles only the copied webdirs
 list(APPEND webdirs ${IMTCOREDIR}/3rdParty/EjQml/qml/EjEditor)
 list(APPEND webdirs ${buildwebdir}/src/EjEditor)

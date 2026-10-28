@@ -12,7 +12,7 @@ ViewCommandsDelegateBase {
 
 	property Item collectionView: null;
 
-	property string descriptionFieldId: "description";
+	property string descriptionFieldId: "m_description";
 	property string collectionId: collectionView  ? collectionView.collectionId : "";
 
 	property string removeDialogTitle: qsTr("Deleting a selected element");
@@ -172,8 +172,8 @@ ViewCommandsDelegateBase {
 	function receivedSelectionCount(selection, elementsModel){
 		let count = 0
 		for (let i = 0; i < selection.length; i++){
-			if (elementsModel && elementsModel.containsKey("sharingAccess", selection[i])){
-				let accessLevel = String(elementsModel.getData("sharingAccess", selection[i]))
+			if (elementsModel && elementsModel.containsKey("m_sharingAccess", selection[i])){
+				let accessLevel = String(elementsModel.getData("m_sharingAccess", selection[i]))
 				if (accessLevel === "View" || accessLevel === "Edit"){
 					count++
 				}
@@ -524,7 +524,7 @@ ViewCommandsDelegateBase {
 			let indexes = collectionViewCommandsDelegate.collectionView.table.getSelectedIndexes();
 			if (indexes.length > 0){
 				let index = indexes[0];
-				let selectedId = collectionViewCommandsDelegate.collectionView.table.elements.getData("id", index);
+				let selectedId = collectionViewCommandsDelegate.collectionView.table.elements.getData("m_id", index);
 				if (selectedId !== ""){
 					collectionViewCommandsDelegate.onExportDialogResult(selectedId, mimeType);
 				}
@@ -562,7 +562,7 @@ ViewCommandsDelegateBase {
 	function onRename(){
 		let indexes = collectionView.table.getSelectedIndexes();
 		if (indexes.length > 0){
-			let selectedName = collectionView.table.elements.getData("name", indexes[0]);
+			let selectedName = collectionView.table.elements.getData("m_name", indexes[0]);
 			ModalDialogManager.openDialog(renameDialog, {"message": qsTr("Please enter the name of the document:"), "inputValue": selectedName});
 		}
 	}
@@ -685,7 +685,7 @@ ViewCommandsDelegateBase {
 					let indexes = collectionViewCommandsDelegate.collectionView.table.getSelectedIndexes();
 					if (indexes.length >= 0){
 						let index = indexes[0];
-						let selectedId = collectionViewCommandsDelegate.collectionView.table.elements.getData("id", index)
+						let selectedId = collectionViewCommandsDelegate.collectionView.table.elements.getData("m_id", index)
 						collectionViewCommandsDelegate.collectionView.setElementDescription(selectedId, inputValue)
 					}
 				}
@@ -730,7 +730,7 @@ ViewCommandsDelegateBase {
 					let indexes = collectionViewCommandsDelegate.collectionView.table.getSelectedIndexes();
 					if (indexes.length >= 0){
 						let index = indexes[0];
-						let selectedId = collectionViewCommandsDelegate.collectionView.table.elements.getData("id", index)
+						let selectedId = collectionViewCommandsDelegate.collectionView.table.elements.getData("m_id", index)
 						collectionViewCommandsDelegate.collectionView.setElementName(selectedId, inputValue)
 					}
 				}

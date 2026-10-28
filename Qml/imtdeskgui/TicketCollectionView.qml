@@ -18,6 +18,7 @@ RemoteCollectionView {
 
 	property string permissionPath: ""
 	collectionId: "Tickets"
+	listPayloadComp: Component { TicketsListPayload {} }
 	gqlGetListCommandId: ImtdeskImtDeskSdlCommandIds.s_ticketsList
 	documentCollectionFilter: null
 

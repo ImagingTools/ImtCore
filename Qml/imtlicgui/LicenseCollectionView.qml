@@ -15,6 +15,7 @@ RemoteCollectionView {
 	visibleMetaInfo: false;
 
 	collectionId: "Licenses";
+	listPayloadComp: Component { LicensesListPayload {} }
 	documentCollectionFilter: null
 	
 	commandsDelegateComp: Component {DocumentCollectionViewDelegate {

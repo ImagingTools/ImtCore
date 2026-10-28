@@ -68,7 +68,23 @@ GqlRequest {
 		}
 		
 		if (sdlObject){
-			sdlObject.fromObject(data)
+			var parsed = true
+			try {
+				parsed = sdlObject.fromObject(data)
+			}
+			catch (error){
+				console.error("Unable to read", root.gqlCommandId, error)
+				root.onError(qsTr("The server response could not be read."), "")
+				return
+			}
+
+			// fromObject() returns false without finished() when a nested value cannot be read.
+			// Callers that clear their loading flag from onFinished() would otherwise wait forever.
+			if (parsed === false){
+				console.error("Unable to read", root.gqlCommandId)
+				root.onError(qsTr("The server response could not be read."), "")
+				return
+			}
 		}
 		
 		if (!sdlObject){

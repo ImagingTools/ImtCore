@@ -16,6 +16,7 @@ RemoteCollectionView {
 	visibleMetaInfo: false;
 
 	collectionId: "Features";
+	listPayloadComp: Component { FeaturesListPayload {} }
 	documentCollectionFilter: null
 	commandsDelegateComp: Component {DocumentCollectionViewDelegate {
 			revisionsPermissionPath: "/FeatureManagement/Revisions";

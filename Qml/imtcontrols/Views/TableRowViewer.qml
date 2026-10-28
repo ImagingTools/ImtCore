@@ -86,6 +86,7 @@ Row {
 				obj.setCellWidth();
 			}
 
+			// console.log("[TestArea] cell created", i, dataList.rowDelegate.tableItem.getHeaderId(i), "width", obj.width);
 			cell.contentItem = obj;
 		}
 	}
@@ -104,6 +105,7 @@ Row {
 			obj.setCellWidth();
 		}
 
+		// console.log("[TestArea] cell created", index, dataList.rowDelegate.tableItem.getHeaderId(index), "width", obj.width);
 		cell.contentItem = obj;
 	}
 
@@ -164,5 +166,3 @@ Row {
 		}
 	}
 }
-
-

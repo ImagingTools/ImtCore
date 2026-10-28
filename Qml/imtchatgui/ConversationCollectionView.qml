@@ -13,6 +13,7 @@ RemoteCollectionView {
 
 	property string permissionPath: ""
 	collectionId: "Conversations"
+	listPayloadComp: Component { ConversationsListPayload {} }
 	gqlGetListCommandId: ImtchatImtChatSdlCommandIds.s_conversationsList
 
 	Component.onCompleted: {

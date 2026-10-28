@@ -22,6 +22,7 @@
         <Element ComponentName="SdlTestPage" X="375" Y="525" Note=""/>
         <Element ComponentName="TablePage" X="825" Y="100" Note=""/>
         <Element ComponentName="TableTreeViewPage" X="375" Y="100" Note=""/>
+        <Element ComponentName="TestAreaPage" X="1275" Y="100" Note=""/>
         <Element ComponentName="TestPage" X="1050" Y="100" Note=""/>
         <Element ComponentName="TreeViewPage" X="600" Y="100" Note=""/>
         <Element ComponentName="ViewsPage" X="375" Y="375" Note=""/>
