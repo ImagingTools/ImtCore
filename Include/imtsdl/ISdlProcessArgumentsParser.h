@@ -18,6 +18,9 @@ class ISdlProcessArgumentsParser: virtual public istd::IPolymorphic
 public:
 	static inline const QString s_sourceFileType = QStringLiteral("CPP");
 	static inline const QString s_headerFileType = QStringLiteral("H");
+	static inline const QString s_objectHeaderFileType = QStringLiteral("O_H");
+	static inline const QString s_objectSourceFileType = QStringLiteral("O_CPP");
+	static inline const QString s_fwdHeaderFileType = QStringLiteral("FWD_H");
 
 public:
 	enum GeneratorType

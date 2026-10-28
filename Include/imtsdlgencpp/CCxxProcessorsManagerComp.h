@@ -13,6 +13,7 @@
 #include <imtsdl/ISdlDocumentTypeListProvider.h>
 #include <imtsdl/CSdlTools.h>
 #include <imtsdlgencpp/ICxxFileProcessor.h>
+#include <imtsdlgencpp/ICxxFilePostProcessor.h>
 #include <imtsdlgencpp/IIncludeDirectivesProvider.h>
 #include <imtsdlgencpp/CSdlGenTools.h>
 
@@ -37,10 +38,14 @@ public:
 	I_BEGIN_BASE_COMPONENT(CxxProcessorsManagerAttr1Comp)
 		I_ASSIGN_MULTI_0(m_enumProcessorCompListPtr, "EnumProcessorsList", "The list of C++ processors generation for enums", false)
 		I_ASSIGN_MULTI_0(m_unionProcessorCompListPtr, "UnionProcessorsList", "The list of C++ processors generation for unions", false)
+		I_ASSIGN_MULTI_0(m_unionObjectProcessorCompListPtr, "UnionObjectProcessorsList", "The list of C++ processors generation for QObject based classes of unions. Their output goes to the objects files", false)
 		I_ASSIGN_MULTI_0(m_typeProcessorCompListPtr, "TypeProcessorsList", "The list of C++ processors generation for types", false)
+		I_ASSIGN_MULTI_0(m_typeObjectProcessorCompListPtr, "TypeObjectProcessorsList", "The list of C++ processors generation for QObject based classes of types. Their output goes to the objects files", false)
 		I_ASSIGN_MULTI_0(m_documentTypeProcessorCompListPtr, "DocumentTypeProcessorsList", "The list of C++ processors generation for document types", false)
 		I_ASSIGN_MULTI_0(m_requestProcessorCompListPtr, "RequestProcessorsList", "The list of C++ processors generation for requests", false)
 		I_ASSIGN_MULTI_0(m_autoProcessorCompListPtr, "AutoProcessorsList", "The list of special C++ processors generation.", false)
+		I_ASSIGN_MULTI_0(m_autoObjectProcessorCompListPtr, "AutoObjectProcessorsList", "The list of special C++ processors generation for the objects files (QML types registration etc.).", false)
+		I_ASSIGN_MULTI_0(m_postProcessorCompListPtr, "PostProcessorsList", "The list of C++ post processors. They are called in the list order, when all files of the schema are ended", false)
 		I_ASSIGN_MULTI_0(m_includeDirectivesProviderListCompPtr, "IncludeDirectivesProviderList", "Providers of include directives, used to generate C(++) directives", false)
 
 	I_END_COMPONENT
@@ -48,10 +53,14 @@ public:
 protected:
 	I_MULTIREF(ICxxFileProcessor, m_enumProcessorCompListPtr);
 	I_MULTIREF(ICxxFileProcessor, m_unionProcessorCompListPtr);
+	I_MULTIREF(ICxxFileProcessor, m_unionObjectProcessorCompListPtr);
 	I_MULTIREF(ICxxFileProcessor, m_typeProcessorCompListPtr);
+	I_MULTIREF(ICxxFileProcessor, m_typeObjectProcessorCompListPtr);
 	I_MULTIREF(ICxxFileProcessor, m_documentTypeProcessorCompListPtr);
 	I_MULTIREF(ICxxFileProcessor, m_requestProcessorCompListPtr);
 	I_MULTIREF(ICxxFileProcessor, m_autoProcessorCompListPtr);
+	I_MULTIREF(ICxxFileProcessor, m_autoObjectProcessorCompListPtr);
+	I_MULTIREF(ICxxFilePostProcessor, m_postProcessorCompListPtr);
 	I_MULTIREF(IIncludeDirectivesProvider, m_includeDirectivesProviderListCompPtr);
 };
 
@@ -63,8 +72,10 @@ class CCxxProcessorsManagerComp: public CxxProcessorsManagerAttr1Comp,
 
 
 public:
-	typedef std::shared_ptr<QFile> FilePtr;
-	typedef QMap<QString/*EntryName*/, FilePtr> EntryFileMap;
+	typedef CxxEntryFileInfo::FilePtr FilePtr;
+	typedef CxxEntryFileInfo EntryFileInfo;
+	typedef QList< EntryFileInfo> EntryFileList;
+	typedef QMap<QString/*EntryName*/, EntryFileInfo> EntryFileMap;
 
 	typedef CxxProcessorsManagerAttr1Comp BaseClass;
 
@@ -101,66 +112,48 @@ private:
 	[[nodiscard]] bool BeginSourceFile(const iprm::IParamsSet& entryParams, QFile& headerFile, const iprm::IParamsSet* paramsPtr, const QString& objectsHeaderFileName = QString()) const;
 	[[nodiscard]] bool EndHeaderFile(const iprm::IParamsSet& entryParams, QFile& headerFile, const iprm::IParamsSet* paramsPtr, bool isObjectsFile = false) const;
 	[[nodiscard]] bool EndSourceFile(const iprm::IParamsSet& entryParams, QFile& sourceFile, const iprm::IParamsSet* paramsPtr) const;
-	/**
-		Appends the objects section and, if enabled, the includes of the moc output to the ended source file
-		\param objectsSourceFilePtr - the objects section, written by \c BeginSourceFile, the QObject processors and \c EndSourceFile. Can be NULL
-	*/
-	[[nodiscard]] bool AppendSourceFileTail(QFile& sourceFile, QFile* objectsSourceFilePtr) const;
 	bool ProcessEnums (
-				const EntryFileMap& headerFiles,
-				const EntryFileMap& sourceFiles,
+				const EntryFileInfo& files,
 				const iprm::IParamsSet* paramsPtr) const;
 	bool ProcessTypes (
-				const EntryFileMap& headerFiles,
-				const EntryFileMap& sourceFiles,
-				const EntryFileMap& objectHeaderFiles,
-				const EntryFileMap& objectSourceFiles,
+				const EntryFileInfo& files,
 				const iprm::IParamsSet* paramsPtr) const;
 	bool ProcessUnions(
-				const EntryFileMap& headerFiles,
-				const EntryFileMap& sourceFiles,
-				const EntryFileMap& objectHeaderFiles,
-				const EntryFileMap& objectSourceFiles,
+				const EntryFileInfo& files,
 				const iprm::IParamsSet* paramsPtr) const;
 	bool ProcessDocumentTypes(
-				const EntryFileMap& headerFiles,
-				const EntryFileMap& sourceFiles,
+				const EntryFileInfo& files,
 				const iprm::IParamsSet* paramsPtr) const;
 	bool ProcessRequests(
-				const EntryFileMap& headerFiles,
-				const EntryFileMap& sourceFiles,
+				const EntryFileInfo& files,
 				const iprm::IParamsSet* paramsPtr) const;
 
 	/**
-		Generates a forward declaration header file containing forward declarations
-		for all generated classes (types, unions, document types).
-		This enables consumers to use forward declarations instead of heavy full includes.
+		Processes all entries of \c entryList by \c processorList
+		\param headerFilePtr	- the header file to write. Can be NULL
+		\param sourceFilePtr	- the source file to write. Can be NULL
+		\param entryKind		- the kind of entries (for the error message)
 	*/
-	[[nodiscard]] bool GenerateForwardDeclarationFile(const iprm::IParamsSet* paramsPtr) const;
+	template <class ProcessorListT, class EntryListT>
+	[[nodiscard]] bool ProcessEntries(
+				const ProcessorListT& processorList,
+				const EntryListT& entryList,
+				QFile* headerFilePtr,
+				QFile* sourceFilePtr,
+				const iprm::IParamsSet* paramsPtr,
+				const QString& entryKind) const;
 
 	/**
-		Creates files for all types if split doesn't enabled, key[EntryName] will be empty, and only one pointer will be created and returned
+		Creates ALL files(.h, .cpp ...) for all types if split doesn't enabled, key[EntryName] will be empty, and only one pointer will be created and returned
 		\warning all files will be opened!
 		\note all file pointers MUST NOT be NULL
 	*/
-	[[nodiscard]] EntryFileMap CreateHeaderFiles(const iprm::IParamsSet* paramsPtr) const;
-	[[nodiscard]] EntryFileMap CreateSourceFiles(const iprm::IParamsSet* paramsPtr) const;
+	[[nodiscard]] EntryFileInfo CreateFiles() const;
 	/**
-		Creates the header file of the QObject based classes (<Schema>Objects.h), see \c CreateHeaderFiles,
-		and a temporary file for their implementation, which is appended to the main source file at the end
-		\note call only if \c HasObjectEntries() returns true
-	*/
-	[[nodiscard]] EntryFileMap CreateObjectHeaderFiles(const iprm::IParamsSet* paramsPtr) const;
-	[[nodiscard]] EntryFileMap CreateObjectSourceFiles(const iprm::IParamsSet* paramsPtr) const;
-	/**
-		\returns true if the QObject based classes are generated, i.e. the generation is not disabled with --no-objects
-	*/
-	[[nodiscard]] bool HasObjectEntries() const;
-	/**
-		Createsn and opens a file by name
+		Creates and opens a file by name
 		\note all parent directories will be created
 	*/
-	[[nodiscard]] FilePtr CreateFile(const QString& filePath) const;
+	[[nodiscard]] FilePtr CreateFile(const QString& filePath, bool temporary = false) const;
 
 
 private:

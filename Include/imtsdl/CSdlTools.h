@@ -159,6 +159,8 @@ public:
 	[[nodiscard]] static IncludeDirective CreateImtDirective(const QString& path);
 	[[nodiscard]] static IncludeDirective CreateCustomDirective(const QString& path);
 
+	static qint64 CopyData(QIODevice& source, QIODevice& destination);
+
 private:
 	[[nodiscard]] static QMap<QString/*type*/, QString/*path*/> CalculateTargetCppFilesFromSchemaParams(const iprm::IParamsSet& schemaParams, const QString& baseDirPath, const QString& defaultName = QString());
 
