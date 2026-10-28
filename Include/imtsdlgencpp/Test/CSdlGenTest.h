@@ -31,6 +31,9 @@ private Q_SLOTS:
 	void TestNestedFieldNameCollision();
 	void PrinterTest();
 	void SubstrateSpecifications();
+	void TestObjectsMocInclude();
+	void TestNoObjectsMocInclude();
+	void TestNoObjectsWithoutTemplate();
 
 	void cleanup();
 	void cleanupTestCase();

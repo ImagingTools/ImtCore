@@ -1072,6 +1072,11 @@ QMap<QString, QString> CSdlTools::CalculateTargetCppFilesFromSchemaParams(const 
 	if (!argumentParser.IsTemplateEnabled()){
 		const QString defaultName = QFileInfo(argumentParser.GetSchemaFilePath()).fileName();
 		QMap<QString, QString> joinRules = CalculateTargetCppFilesFromSchemaParams(schemaParams, argumentParser.GetOutputDirectoryPath(), defaultName);
+		if (!argumentParser.IsObjectsGenerationEnabled()){
+			// the presence of these keys means that the objects files should be generated
+			joinRules.remove(ISdlProcessArgumentsParser::s_objectHeaderFileType);
+			joinRules.remove(ISdlProcessArgumentsParser::s_objectSourceFileType);
+		}
 
 		return joinRules;
 	}

@@ -19,35 +19,40 @@ bool CCxxSourceTailPostProcessorComp::ProcessFiles(const CxxEntryFileInfo& files
 {
 	Q_ASSERT(m_argumentParserCompPtr.IsValid());
 
-	if (!files.sourceFile || !files.objectSourceFile){
-		// one source file per schema: nothing to join
+	if (!files.sourceFile){
 		return true;
 	}
 
 	QTextStream stream(files.sourceFile.get());
 
-	if (!files.objectSourceFile->seek(0)){
-		SendErrorMessage(0, QStringLiteral("Unable to read objects source file '%1'").arg(files.objectSourceFile->fileName()));
+	// the objects are optional (see '--no-objects'), the schema without them has only the main source file
+	if (files.objectSourceFile){
+		if (!files.objectSourceFile->seek(0)){
+			SendErrorMessage(0, QStringLiteral("Unable to read objects source file '%1'").arg(files.objectSourceFile->fileName()));
 
-		return false;
+			return false;
+		}
+
+		FeedStream(stream, 1, true);
+		CopyData(*files.objectSourceFile, *files.sourceFile);
 	}
 
-	FeedStream(stream, 1, true);
-	CopyData(*files.objectSourceFile, *files.sourceFile);
-
 	if (m_argumentParserCompPtr->IsMocIncludeEnabled()){
+		// the moc output of the main header (namespace and enums meta objects) is always required
 		const QFileInfo sourceFileInfo(*files.sourceFile);
 		FeedStream(stream, 2, false);
 		stream << QStringLiteral("#include \"moc_") << sourceFileInfo.fileName() << '"';
 		FeedStream(stream, 1, false);
 
-		const QFileInfo objectSourceFileInfo(*files.objectSourceFile);
-		if (sourceFileInfo.dir() != objectSourceFileInfo.dir()){
-			SendWarningMessage(0, QStringLiteral("Source file and object source file are in different directories"));
-		}
+		if (files.objectSourceFile){
+			const QFileInfo objectSourceFileInfo(*files.objectSourceFile);
+			if (sourceFileInfo.dir() != objectSourceFileInfo.dir()){
+				SendWarningMessage(0, QStringLiteral("Source file and object source file are in different directories"));
+			}
 
-		stream << QStringLiteral("#include \"moc_") << objectSourceFileInfo.fileName() << '"';
-		FeedStream(stream, 1, false);
+			stream << QStringLiteral("#include \"moc_") << objectSourceFileInfo.fileName() << '"';
+			FeedStream(stream, 1, false);
+		}
 	}
 
 	return true;

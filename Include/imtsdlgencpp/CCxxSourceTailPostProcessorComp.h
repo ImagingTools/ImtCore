@@ -16,9 +16,9 @@ namespace imtsdlgencpp
 
 
 /**
-	Joins the source files of the schema: appends the objects section (the implementation of the QObject based classes)
-	and, if enabled, the includes of the moc output to the main source file.
-	The files are processed, only if the schema has both the source and the objects source file.
+	Finishes the main source file of the schema: appends the objects section (the implementation of the QObject based classes),
+	if the schema has it, and, if enabled, the includes of the moc output.
+	The moc output of the main header is included always, the one of the objects header - only with the objects section.
 */
 class CCxxSourceTailPostProcessorComp:
 			public ilog::CLoggerComponentBase,

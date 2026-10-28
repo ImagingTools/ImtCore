@@ -5,6 +5,7 @@
 // Qt includes
 #include <QtTest/QTest>
 #include <QtCore/QBuffer>
+#include <QtCore/QDirIterator>
 #include <QtCore/QFile>
 
 // ACF includes
@@ -95,6 +96,30 @@ static bool CompareDirectories(const QString& dir1, const QString& dir2) {
 	}
 
 	return true;
+}
+
+
+static QStringList FindFiles(const QString& dirPath, const QString& nameFilter)
+{
+	QStringList retVal;
+
+	QDirIterator iterator(dirPath, QStringList() << nameFilter, QDir::Files, QDirIterator::Subdirectories);
+	while (iterator.hasNext()){
+		retVal << iterator.next();
+	}
+
+	return retVal;
+}
+
+
+static QByteArray ReadFileContent(const QString& filePath)
+{
+	QFile file(filePath);
+	if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
+		return QByteArray();
+	}
+
+	return file.readAll();
 }
 
 
@@ -392,6 +417,87 @@ void CSdlGenTest::SubstrateSpecifications()
 	argParserPtr->SetQmlEnabled(false);
 
 	ExecuteTest(testSuite, "SubstrateSpecifications.sdl", "Substrates", "substratesdl");
+}
+
+
+void CSdlGenTest::TestObjectsMocInclude()
+{
+	const QDir outputDir(m_tempOutputDir.absoluteFilePath("ObjectsMocInclude"));
+
+	CImtSdlGenTest testSuite;
+	PrepareSuite(testSuite, outputDir);
+
+	auto argParserPtr = testSuite.GetInterface<imtsdl::ISdlEditableProcessArgumentsParser>();
+	argParserPtr->SetCppEnabled();
+	argParserPtr->SetGqlEnabled();
+	argParserPtr->SetQmlEnabled(false);
+	argParserPtr->SetObjectsGenerationEnabled(true);
+	argParserPtr->SetMocIncludeEnabled(true);
+
+	ExecuteTest(testSuite, "ArraySerialization.sdl");
+
+	// the objects header is generated, the objects source is an intermediate file, joined with the main one and removed
+	QCOMPARE(FindFiles(outputDir.absolutePath(), "ArraySerializationObjects.h").size(), 1);
+	QCOMPARE(FindFiles(outputDir.absolutePath(), "ArraySerializationObjects.cpp*").size(), 0);
+
+	const QStringList sourceFiles = FindFiles(outputDir.absolutePath(), "ArraySerialization.cpp");
+	QCOMPARE(sourceFiles.size(), 1);
+
+	// both moc outputs are included, with the exact names, that are created by the build system
+	const QByteArray source = ReadFileContent(sourceFiles.first());
+	QVERIFY(source.contains("#include \"moc_ArraySerialization.cpp\""));
+	QVERIFY(source.contains("#include \"moc_ArraySerializationObjects.cpp\""));
+}
+
+
+void CSdlGenTest::TestNoObjectsMocInclude()
+{
+	const QDir outputDir(m_tempOutputDir.absoluteFilePath("NoObjectsMocInclude"));
+
+	CImtSdlGenTest testSuite;
+	PrepareSuite(testSuite, outputDir);
+
+	auto argParserPtr = testSuite.GetInterface<imtsdl::ISdlEditableProcessArgumentsParser>();
+	argParserPtr->SetCppEnabled();
+	argParserPtr->SetGqlEnabled();
+	argParserPtr->SetQmlEnabled(false);
+	argParserPtr->SetObjectsGenerationEnabled(false);
+	argParserPtr->SetMocIncludeEnabled(true);
+
+	ExecuteTest(testSuite, "ArraySerialization.sdl");
+
+	// nothing of objects is generated
+	QCOMPARE(FindFiles(outputDir.absolutePath(), "*Objects*").size(), 0);
+
+	const QStringList sourceFiles = FindFiles(outputDir.absolutePath(), "ArraySerialization.cpp");
+	QCOMPARE(sourceFiles.size(), 1);
+
+	// the main header still has the meta object (namespace, enums), and the build system doesn't compile its moc output separately
+	const QByteArray source = ReadFileContent(sourceFiles.first());
+	QVERIFY(source.contains("#include \"moc_ArraySerialization.cpp\""));
+	QVERIFY(!source.contains("Objects.cpp"));
+}
+
+
+void CSdlGenTest::TestNoObjectsWithoutTemplate()
+{
+	const QDir outputDir(m_tempOutputDir.absoluteFilePath("NoObjectsWithoutTemplate"));
+
+	CImtSdlGenTest testSuite;
+	PrepareSuite(testSuite, outputDir);
+
+	auto argParserPtr = testSuite.GetInterface<imtsdl::ISdlEditableProcessArgumentsParser>();
+	argParserPtr->SetCppEnabled();
+	argParserPtr->SetGqlEnabled();
+	argParserPtr->SetQmlEnabled(false);
+	argParserPtr->SetTemplateEnabled(false);
+	argParserPtr->SetObjectsGenerationEnabled(false);
+
+	ExecuteTest(testSuite, "ArraySerialization.sdl");
+
+	QCOMPARE(FindFiles(outputDir.absolutePath(), "ArraySerialization.h").size(), 1);
+	QCOMPARE(FindFiles(outputDir.absolutePath(), "ArraySerialization.cpp").size(), 1);
+	QCOMPARE(FindFiles(outputDir.absolutePath(), "*Objects*").size(), 0);
 }
 
 

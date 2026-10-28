@@ -698,6 +698,18 @@ void CSdlProcessArgumentsParserComp::SetTypenameWriteMode(TypenameWriteMode mode
 }
 
 
+void CSdlProcessArgumentsParserComp::SetObjectsGenerationEnabled(bool enabled)
+{
+	m_isObjectsGenerationEnabled = enabled;
+}
+
+
+void CSdlProcessArgumentsParserComp::SetMocIncludeEnabled(bool enabled)
+{
+	m_isMocIncludeEnabled = enabled;
+}
+
+
 // pseudo-implemented (protected) methods
 
 QList<QCommandLineOption> CSdlProcessArgumentsParserComp::PrepareCommandLineOptions()

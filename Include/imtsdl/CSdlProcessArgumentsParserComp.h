@@ -84,6 +84,8 @@ public:
 	virtual void SetTemplateIncludePath(const QString& templateIncludePath) override;
 	virtual void SetTemplateOutputPath(const QString& templateOutputPath) override;
 	virtual void SetTypenameWriteMode(TypenameWriteMode mode) override;
+	virtual void SetObjectsGenerationEnabled(bool enabled = true) override;
+	virtual void SetMocIncludeEnabled(bool enabled = true) override;
 
 
 protected:
