@@ -110,6 +110,9 @@ PopupView {
 	property string filterPlaceholder: qsTr("Filter...")
 	property string emptyText: qsTr("No items found")
 
+	// --- Corner radius of the filter field ---
+	property int filterRadius: Style.radiusL
+
 	// --- Optional header component (rendered above filter field) ---
 	property Component headerComponent: null
 
@@ -662,7 +665,7 @@ PopupView {
 				textSize: root.textSize
 				fontColor: root.fontColor
 				placeHolderText: root.filterPlaceholder
-				radius: Style.textFieldRadius
+				radius: root.filterRadius
 
 				// A click into the filter moves the focus off the footer as well
 				onTextInputFocusChanged: {

@@ -19,6 +19,8 @@ GridExtendingBaseDelegate 1.0 GridExtendingBaseDelegate.qml
 CollectionFilter 1.0 CollectionFilter.qml
 CollectionCommandsController 1.0 CollectionCommandsController.qml
 CollectionViewDelegate 1.0 CollectionViewDelegate.qml
+TagChip 1.0 TagChip.qml
+TableCellTagsDelegate 1.0 TableCellTagsDelegate.qml
 
 MessageCollectionFilterDecorator 1.0 MessageCollectionFilterDecorator.qml
 MessageCollectionFilter 1.0 MessageCollectionFilter.qml

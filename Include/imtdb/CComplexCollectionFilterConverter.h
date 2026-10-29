@@ -2,6 +2,9 @@
 #pragma once
 
 
+// STL includes
+#include <functional>
+
 // ImtCore includes
 #include <imtbase/IComplexCollectionFilter.h>
 
@@ -20,12 +23,22 @@ public:
 		SC_DUCKDB
 	};
 
+	/**
+		Renders a field filter itself instead of the converter.
+		Returns true if the field was handled; an empty result drops the field from the query.
+	*/
+	typedef std::function<bool(const imtbase::IComplexCollectionFilter::FieldFilter& filter, QString& sql)> FieldRenderer;
+
 	static QString CreateSqlSortQuery(const imtbase::IComplexCollectionFilter& filter);
 	static QString CreateSqlFilterQuery(const imtbase::IComplexCollectionFilter& filter, SqlContext sqlContext = SC_GENERAL);
+	static QString CreateSqlFilterQuery(const imtbase::IComplexCollectionFilter& filter, SqlContext sqlContext, const FieldRenderer& fieldRenderer);
 
 private:
 	static QString ProcessColumn(const imtbase::IComplexCollectionFilter::FieldFilter& filter, SqlContext sqlContext = SC_GENERAL);
-	static QString ProcessGroup(const imtbase::IComplexCollectionFilter::FilterExpression& filter, SqlContext sqlContext = SC_GENERAL);
+	static QString ProcessGroup(
+				const imtbase::IComplexCollectionFilter::FilterExpression& filter,
+				SqlContext sqlContext = SC_GENERAL,
+				const FieldRenderer* fieldRendererPtr = nullptr);
 	static QString ToSqlArray(const QVariantList& values);
 	/// A value as a DuckDB literal: a string or a QUuid is quoted, a number is written as it is.
 	static QString ToDuckDbLiteral(const QVariant& value);
