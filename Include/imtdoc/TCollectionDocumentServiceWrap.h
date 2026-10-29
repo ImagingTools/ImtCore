@@ -46,7 +46,8 @@ namespace imtdoc
 	  source element ID for later use during save.
 	The document source reference (\c WorkingDocument::documentSourceRef) of a
 	collection document is \c <objectId> or \c <objectId>/<revision>, the public
-	document URL is built from it by \c GetDocumentUrl.
+	document URL is built from it by \c GetDocumentUrl. Validators and name providers get
+	the object ID and the revision in the parameters created by \c imtdoc::CreateObjectSourceParams.
 
 	- **DoOpenDocument** — resolves the URL to a collection object ID, fetches
 	  the object data in a background thread, and supports single-copy sharing of
@@ -100,6 +101,7 @@ public:
 	virtual void DoCloseDocument(const QByteArray& taskId, const TaskParams& params) override;
 
 	virtual QUrl GetDocumentUrl(const WorkingDocument& document) const override;
+	virtual iprm::IParamsSetUniquePtr CreateDocumentSourceParams(const WorkingDocument& document) const override;
 
 	// reimplemented (imtdoc::IDocumentService)
 	virtual DocumentList GetOpenedDocumentList(const QByteArray& userId) const override;
@@ -616,6 +618,15 @@ template<class Base>
 inline QUrl TCollectionDocumentServiceWrap<Base>::GetDocumentUrl(const WorkingDocument& document) const
 {
 	return imtdoc::SourceRefToUrl(document.documentSourceRef);
+}
+
+
+template<class Base>
+inline iprm::IParamsSetUniquePtr TCollectionDocumentServiceWrap<Base>::CreateDocumentSourceParams(const WorkingDocument& document) const
+{
+	return imtdoc::CreateObjectSourceParams(
+				imtdoc::SourceRefToObjectId(document.documentSourceRef),
+				imtdoc::SourceRefToRevision(document.documentSourceRef));
 }
 
 

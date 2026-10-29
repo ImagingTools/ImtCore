@@ -5,6 +5,8 @@
 // ACF includes
 #include <idoc/IUndoManager.h>
 #include <iprm/CTextParam.h>
+#include <iprm/IIdParam.h>
+#include <imeas/INumericValue.h>
 
 // ImtCore includes
 #include <imtdoc/imtdoc.h>
@@ -16,6 +18,8 @@ namespace
 const QByteArray TEST_USER_ID = QByteArrayLiteral("testUser");
 const QByteArray TEST_USER_ID_2 = QByteArrayLiteral("testUser2");
 const QByteArray TEST_TYPE_ID = QByteArrayLiteral("TestType");
+// Name provider of this type appends the object ID and the revision from the document source parameters
+const QByteArray SOURCE_NAME_TYPE_ID = QByteArrayLiteral("TestType2");
 const QByteArray VALIDATED_TYPE_ID = QByteArrayLiteral("ValidatedType");
 const QByteArray VALIDATED_TYPE_ID_2 = QByteArrayLiteral("ValidatedType2");
 const QByteArray TEST_OBJECT_ID = QByteArrayLiteral("testObject123");
@@ -1353,6 +1357,92 @@ void CCollectionDocumentServiceIntegrationTest::SingleCopyRevisionSharedTest()
 
 	QCOMPARE(GetDocumentText(*m_singleCopyServicePtr, TEST_USER_ID_2, revisionDocId2), QStringLiteral("revisionData"));
 	QCOMPARE(GetDocumentText(*m_singleCopyServicePtr, TEST_USER_ID_2, headDocId), QStringLiteral("currentData"));
+}
+
+
+// Document source parameters tests
+
+void CCollectionDocumentServiceIntegrationTest::DocumentSourceParamsHelpersTest()
+{
+	iprm::IParamsSetUniquePtr paramsPtr = imtdoc::CreateObjectSourceParams(TEST_OBJECT_ID, 3);
+	QVERIFY(paramsPtr.IsValid());
+	QCOMPARE(imtdoc::GetObjectIdFromParams(*paramsPtr), TEST_OBJECT_ID);
+	QCOMPARE(imtdoc::GetRevisionFromParams(*paramsPtr), 3);
+
+	const iprm::IIdParam* objectIdParamPtr = dynamic_cast<const iprm::IIdParam*>(paramsPtr->GetParameter(imtdoc::s_objectIdParamId));
+	QVERIFY(objectIdParamPtr != nullptr);
+	QCOMPARE(objectIdParamPtr->GetId(), TEST_OBJECT_ID);
+
+	const imeas::INumericValue* revisionParamPtr = dynamic_cast<const imeas::INumericValue*>(paramsPtr->GetParameter(imtdoc::s_revisionParamId));
+	QVERIFY(revisionParamPtr != nullptr);
+	QCOMPARE(revisionParamPtr->GetValues().GetElementsCount(), 1);
+	QCOMPARE(revisionParamPtr->GetValues()[0], 3.0);
+
+	iprm::IParamsSetUniquePtr headParamsPtr = imtdoc::CreateObjectSourceParams(TEST_OBJECT_ID);
+	QVERIFY(headParamsPtr.IsValid());
+	QCOMPARE(imtdoc::GetObjectIdFromParams(*headParamsPtr), TEST_OBJECT_ID);
+	QCOMPARE(imtdoc::GetRevisionFromParams(*headParamsPtr), -1);
+	QVERIFY(headParamsPtr->GetParameter(imtdoc::s_revisionParamId) == nullptr);
+
+	iprm::IParamsSetUniquePtr emptyParamsPtr = imtdoc::CreateObjectSourceParams(QByteArray(), 3);
+	QVERIFY(emptyParamsPtr.IsValid());
+	QVERIFY(emptyParamsPtr->GetParamIds().isEmpty());
+	QVERIFY(imtdoc::GetObjectIdFromParams(*emptyParamsPtr).isEmpty());
+	QCOMPARE(imtdoc::GetRevisionFromParams(*emptyParamsPtr), -1);
+}
+
+
+void CCollectionDocumentServiceIntegrationTest::NameProviderSourceParamsNewDocumentTest()
+{
+	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, SOURCE_NAME_TYPE_ID);
+	QVERIFY(!docId.isEmpty());
+
+	QCOMPARE(SetDocumentText(*m_servicePtr, TEST_USER_ID, docId, QStringLiteral("new")), imtdoc::IDocumentService::OS_OK);
+	QCOMPARE(SaveDocument(*m_servicePtr, TEST_USER_ID, docId), imtdoc::IDocumentService::OS_OK);
+
+	// The name provider gets the ID of the inserted object
+	const QByteArray objectId = imtdoc::UrlToObjectId(FindDocumentInfo(*m_servicePtr, TEST_USER_ID, docId).url);
+	QVERIFY(!objectId.isEmpty());
+
+	QString name;
+	QCOMPARE(m_servicePtr->GetDocumentName(TEST_USER_ID, docId, name), imtdoc::IDocumentService::OS_OK);
+	QCOMPARE(name, NAME_PREFIX + QStringLiteral("new [%1]").arg(QString(objectId)));
+}
+
+
+void CCollectionDocumentServiceIntegrationTest::NameProviderSourceParamsOpenedDocumentTest()
+{
+	AddCollectionObject(TEST_OBJECT_ID, SOURCE_NAME_TYPE_ID, TEST_DOC_NAME, QStringLiteral("head"));
+
+	QByteArray docId = OpenDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_OBJECT_ID);
+	QVERIFY(!docId.isEmpty());
+
+	QCOMPARE(SaveDocument(*m_servicePtr, TEST_USER_ID, docId), imtdoc::IDocumentService::OS_OK);
+
+	const QString expectedName = NAME_PREFIX + QStringLiteral("head [%1]").arg(QString(TEST_OBJECT_ID));
+
+	QString name;
+	QCOMPARE(m_servicePtr->GetDocumentName(TEST_USER_ID, docId, name), imtdoc::IDocumentService::OS_OK);
+	QCOMPARE(name, expectedName);
+	QCOMPARE(m_collectionPtr->GetElementInfo(TEST_OBJECT_ID, imtbase::ICollectionInfo::EIT_NAME).toString(), expectedName);
+}
+
+
+void CCollectionDocumentServiceIntegrationTest::NameProviderSourceParamsRevisionTest()
+{
+	AddCollectionObject(TEST_OBJECT_ID, SOURCE_NAME_TYPE_ID, TEST_DOC_NAME);
+	const int revision = CreateObjectRevision(TEST_OBJECT_ID, QStringLiteral("revisionData"), QStringLiteral("currentData"));
+	QVERIFY(revision > 0);
+
+	QByteArray docId = OpenDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_OBJECT_ID, revision);
+	QVERIFY(!docId.isEmpty());
+
+	QCOMPARE(SaveDocument(*m_servicePtr, TEST_USER_ID, docId), imtdoc::IDocumentService::OS_OK);
+
+	// The name provider is called for the saved revision document
+	QString name;
+	QCOMPARE(m_servicePtr->GetDocumentName(TEST_USER_ID, docId, name), imtdoc::IDocumentService::OS_OK);
+	QCOMPARE(name, NAME_PREFIX + QStringLiteral("revisionData [%1/%2]").arg(QString(TEST_OBJECT_ID)).arg(revision));
 }
 
 

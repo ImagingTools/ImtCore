@@ -12,7 +12,7 @@ namespace imtauth
 
 // reimplemented (imtdoc::IDocumentNameProvider)
 
-QString CTenantDocumentNameProviderComp::GetDefaultDocumentName(const QUrl& /*url*/, const istd::IChangeable& document) const
+QString CTenantDocumentNameProviderComp::GetDefaultDocumentName(const iprm::IParamsSet& /*params*/, const istd::IChangeable& document) const
 {
 	const ITenantInfo* tenantPtr = dynamic_cast<const ITenantInfo*>(&document);
 	if (tenantPtr != nullptr){

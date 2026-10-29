@@ -6,9 +6,23 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QUrl>
 
+// ACF includes
+#include <iprm/IParamsSet.h>
+
 
 namespace imtdoc
 {
+
+
+/**
+	ID of the \c iprm::IIdParam with the collection object ID in the document source parameters.
+*/
+static const QByteArray s_objectIdParamId = QByteArrayLiteral("ObjectId");
+
+/**
+	ID of the \c imeas::INumericValue with the collection object revision in the document source parameters.
+*/
+static const QByteArray s_revisionParamId = QByteArrayLiteral("Revision");
 
 
 /**
@@ -61,6 +75,26 @@ QUrl SourceRefToUrl(const QByteArray& sourceRef);
 	Returns an empty reference for empty or invalid URLs.
 */
 QByteArray UrlToSourceRef(const QUrl& url);
+
+/**
+	Creates the document source parameters of the collection object \a objectId.
+	The parameter set contains the \c iprm::IIdParam \c s_objectIdParamId with the object ID and,
+	if \a revision is not negative, the \c imeas::INumericValue \c s_revisionParamId with the revision.
+	Returns an empty parameter set for an empty \a objectId (unsaved document).
+*/
+iprm::IParamsSetUniquePtr CreateObjectSourceParams(const QByteArray& objectId, int revision = -1);
+
+/**
+	Extracts the collection object ID from the document source parameters.
+	Returns an empty ID if the parameters do not reference a collection object (unsaved document).
+*/
+QByteArray GetObjectIdFromParams(const iprm::IParamsSet& params);
+
+/**
+	Extracts the collection object revision from the document source parameters.
+	Returns -1 if the parameters do not reference an object revision.
+*/
+int GetRevisionFromParams(const iprm::IParamsSet& params);
 
 
 } // namespace imtdoc

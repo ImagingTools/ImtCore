@@ -12,7 +12,7 @@ namespace imtdesk
 
 // reimplemented (imtdoc::IDocumentNameProvider)
 
-QString CTicketDocumentNameProviderComp::GetDefaultDocumentName(const QUrl& /*url*/, const istd::IChangeable& document) const
+QString CTicketDocumentNameProviderComp::GetDefaultDocumentName(const iprm::IParamsSet& /*params*/, const istd::IChangeable& document) const
 {
 	const ISupportTicket* ticketPtr = dynamic_cast<const ISupportTicket*>(&document);
 	if (ticketPtr != nullptr){

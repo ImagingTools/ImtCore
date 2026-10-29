@@ -5,6 +5,11 @@
 // Qt includes
 #include <QtCore/QList>
 
+// ACF includes
+#include <iprm/CIdParam.h>
+#include <iprm/CParamsSet.h>
+#include <imeas/CSimpleNumericValue.h>
+
 
 namespace imtdoc
 {
@@ -156,6 +161,56 @@ QByteArray UrlToSourceRef(const QUrl& url)
 	}
 
 	return ObjectIdToSourceRef(objectId, revision);
+}
+
+
+iprm::IParamsSetUniquePtr CreateObjectSourceParams(const QByteArray& objectId, int revision)
+{
+	iprm::CParamsSet* paramsSetPtr = new iprm::CParamsSet;
+	iprm::IParamsSetUniquePtr retVal(paramsSetPtr);
+
+	if (objectId.isEmpty()){
+		return retVal;
+	}
+
+	iprm::CIdParam* objectIdParamPtr = new iprm::CIdParam;
+	objectIdParamPtr->SetId(objectId);
+	paramsSetPtr->SetEditableParameter(s_objectIdParamId, objectIdParamPtr, true);
+
+	if (revision >= 0){
+		imeas::CSimpleNumericValue* revisionParamPtr = new imeas::CSimpleNumericValue;
+		revisionParamPtr->SetValues(imath::CVarVector(1, revision));
+		paramsSetPtr->SetEditableParameter(s_revisionParamId, revisionParamPtr, true);
+	}
+
+	return retVal;
+}
+
+
+QByteArray GetObjectIdFromParams(const iprm::IParamsSet& params)
+{
+	const iprm::IIdParam* objectIdParamPtr = dynamic_cast<const iprm::IIdParam*>(params.GetParameter(s_objectIdParamId));
+	if (objectIdParamPtr == nullptr){
+		return QByteArray();
+	}
+
+	return objectIdParamPtr->GetId();
+}
+
+
+int GetRevisionFromParams(const iprm::IParamsSet& params)
+{
+	const imeas::INumericValue* revisionParamPtr = dynamic_cast<const imeas::INumericValue*>(params.GetParameter(s_revisionParamId));
+	if (revisionParamPtr == nullptr){
+		return -1;
+	}
+
+	const imath::CVarVector values = revisionParamPtr->GetValues();
+	if (values.GetElementsCount() != 1 || values[0] < 0){
+		return -1;
+	}
+
+	return qRound(values[0]);
 }
 
 

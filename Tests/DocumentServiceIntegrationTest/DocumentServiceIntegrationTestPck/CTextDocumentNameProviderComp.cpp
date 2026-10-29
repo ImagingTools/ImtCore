@@ -5,6 +5,9 @@
 // ACF includes
 #include <iprm/ITextParam.h>
 
+// ImtCore includes
+#include <imtdoc/imtdoc.h>
+
 
 namespace DocumentServiceIntegrationTestPck
 {
@@ -12,18 +15,29 @@ namespace DocumentServiceIntegrationTestPck
 
 // reimplemented (imtdoc::IDocumentNameProvider)
 
-QString CTextDocumentNameProviderComp::GetDefaultDocumentName(const QUrl& /*url*/, const istd::IChangeable& document) const
+QString CTextDocumentNameProviderComp::GetDefaultDocumentName(const iprm::IParamsSet& params, const istd::IChangeable& document) const
 {
 	const iprm::ITextParam* textPtr = dynamic_cast<const iprm::ITextParam*>(&document);
 	if ((textPtr == nullptr) || textPtr->GetText().isEmpty()){
 		return QString();
 	}
 
-	if (!m_namePrefixAttrPtr.IsValid()){
-		return textPtr->GetText();
+	QString retVal = textPtr->GetText();
+	if (m_namePrefixAttrPtr.IsValid()){
+		retVal.prepend(*m_namePrefixAttrPtr);
 	}
 
-	return *m_namePrefixAttrPtr + textPtr->GetText();
+	if (!*m_appendSourceAttrPtr){
+		return retVal;
+	}
+
+	QString source = imtdoc::GetObjectIdFromParams(params);
+	const int revision = imtdoc::GetRevisionFromParams(params);
+	if (revision >= 0){
+		source += '/' + QString::number(revision);
+	}
+
+	return retVal + QStringLiteral(" [%1]").arg(source);
 }
 
 

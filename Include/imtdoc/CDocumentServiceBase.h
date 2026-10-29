@@ -17,6 +17,7 @@
 
 // ACF includes
 #include <idoc/IUndoManager.h>
+#include <iprm/IParamsSet.h>
 #include <imod/TMultiModelObserverBase.h>
 #include <imod/CMultiModelDispatcherBase.h>
 
@@ -72,6 +73,7 @@ namespace imtdoc
 	- Do*Document — to implement collection-specific open/save/close logic
 	  (see \c TCollectionDocumentServiceWrap).
 	- \c GetDocumentUrl — converts the document source reference to the public URL.
+	- \c CreateDocumentSourceParams — describes the document source for validators and name providers.
 	- \c GetDefaultDocumentName, \c HasDocumentNameProvider,
 	  \c ValidateDocumentData, \c GetDocumentServiceEventHandlers,
 	  \c IsSingleCopyMode — optional policy hooks.
@@ -221,6 +223,12 @@ protected:
 		build it from \c WorkingDocument::documentSourceRef.
 	*/
 	virtual QUrl GetDocumentUrl(const WorkingDocument& document) const;
+	/**
+		Creates the parameters of the document source passed to document validators and name providers.
+		The base implementation returns an empty parameter set, storage-specific subclasses
+		fill it from \c WorkingDocument::documentSourceRef.
+	*/
+	virtual iprm::IParamsSetUniquePtr CreateDocumentSourceParams(const WorkingDocument& document) const;
 	virtual QString GetDefaultDocumentName(const WorkingDocument& document) const;
 	virtual bool HasDocumentNameProvider(const QByteArray& typeId) const;
 	virtual bool ValidateDocumentData(

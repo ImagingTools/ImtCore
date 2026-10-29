@@ -21,12 +21,12 @@ namespace imtauth
 
 
 bool CRoleDocumentValidatorComp::ValidateDocumentData(
-			const QUrl& url,
+			const iprm::IParamsSet& params,
 			const istd::IChangeable& document,
 			QString& errorMessage,
 			const imtbase::IOperationContext* operationContextPtr) const
 {
-	const QByteArray objectId = imtdoc::UrlToObjectId(url);
+	const QByteArray objectId = imtdoc::GetObjectIdFromParams(params);
 
 	const imtauth::IRole* roleInfoPtr = dynamic_cast<const imtauth::IRole*>(&document);
 	if (roleInfoPtr == nullptr){

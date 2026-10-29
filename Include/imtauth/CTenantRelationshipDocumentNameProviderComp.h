@@ -27,7 +27,7 @@ public:
 	I_END_COMPONENT
 
 	// reimplemented (imtdoc::IDocumentNameProvider)
-	virtual QString GetDefaultDocumentName(const QUrl& url, const istd::IChangeable& document) const override;
+	virtual QString GetDefaultDocumentName(const iprm::IParamsSet& params, const istd::IChangeable& document) const override;
 
 private:
 	I_REF(imtbase::IObjectCollection, m_tenantCollectionCompPtr);

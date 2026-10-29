@@ -17,6 +17,8 @@ namespace DocumentServiceIntegrationTestPck
 	Test name provider for \c iprm::ITextParam documents.
 	The default document name is the configured prefix followed by the document text.
 	An empty name is returned for an empty text.
+	If \c AppendSource is enabled, the collection object ID and the object revision from
+	the document source parameters are appended: \c "<name> [<objectId>/<revision>]".
 */
 class CTextDocumentNameProviderComp:
 			public icomp::CComponentBase,
@@ -28,13 +30,15 @@ public:
 	I_BEGIN_COMPONENT(CTextDocumentNameProviderComp)
 		I_REGISTER_INTERFACE(imtdoc::IDocumentNameProvider);
 		I_ASSIGN(m_namePrefixAttrPtr, "NamePrefix", "Prefix of the generated document name", false, "");
+		I_ASSIGN(m_appendSourceAttrPtr, "AppendSource", "Append the object ID and the revision from the document source parameters", true, false);
 	I_END_COMPONENT
 
 	// reimplemented (imtdoc::IDocumentNameProvider)
-	virtual QString GetDefaultDocumentName(const QUrl& url, const istd::IChangeable& document) const override;
+	virtual QString GetDefaultDocumentName(const iprm::IParamsSet& params, const istd::IChangeable& document) const override;
 
 private:
 	I_ATTR(QString, m_namePrefixAttrPtr);
+	I_ATTR(bool, m_appendSourceAttrPtr);
 };
 
 

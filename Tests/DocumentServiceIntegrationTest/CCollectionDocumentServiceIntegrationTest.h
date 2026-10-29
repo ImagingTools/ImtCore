@@ -115,6 +115,12 @@ private slots:
 	void SaveDocumentSaveAsRevisionTest();
 	void SingleCopyRevisionSharedTest();
 
+	// Document source parameters tests
+	void DocumentSourceParamsHelpersTest();
+	void NameProviderSourceParamsNewDocumentTest();
+	void NameProviderSourceParamsOpenedDocumentTest();
+	void NameProviderSourceParamsRevisionTest();
+
 private:
 	/**
 		Inserts a text object into the shared collection if it does not exist yet.

@@ -13,7 +13,7 @@ namespace DocumentServiceIntegrationTestPck
 // reimplemented (imtdoc::IDocumentValidator)
 
 bool CTextDocumentValidatorComp::ValidateDocumentData(
-			const QUrl& /*url*/,
+			const iprm::IParamsSet& /*params*/,
 			const istd::IChangeable& document,
 			QString& errorMessage,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const

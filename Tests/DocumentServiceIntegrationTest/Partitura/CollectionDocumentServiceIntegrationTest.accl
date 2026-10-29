@@ -12,6 +12,7 @@
         <Element ComponentName="DocumentObject" X="125" Y="525" Note=""/>
         <Element ComponentName="ObjectCollection" X="350" Y="525" Note=""/>
         <Element ComponentName="SingleCopyCollectionDocumentService" X="975" Y="425" Note=""/>
+        <Element ComponentName="SourceTextDocumentNameProvider" X="250" Y="375" Note=""/>
         <Element ComponentName="TextDocumentNameProvider" X="250" Y="275" Note=""/>
         <Element ComponentName="TextDocumentValidator" X="500" Y="125" Note=""/>
         <Element ComponentName="TextDocumentValidatorWithMessage" X="450" Y="650" Note=""/>

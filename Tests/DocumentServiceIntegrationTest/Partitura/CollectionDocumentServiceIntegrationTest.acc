@@ -21,6 +21,7 @@
                             <Values>
                                 <Value>TextDocumentNameProvider</Value>
                                 <Value>TextDocumentNameProvider</Value>
+                                <Value>SourceTextDocumentNameProvider</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -50,8 +51,8 @@
                             <Values>
                                 <Value>ValidatedType</Value>
                                 <Value>ValidatedType2</Value>
-                                <Value>TestType</Value>
                                 <Value>TestType2</Value>
+                                <Value>TestType</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -113,6 +114,7 @@
                             <Values>
                                 <Value>TextDocumentNameProvider</Value>
                                 <Value>TextDocumentNameProvider</Value>
+                                <Value>SourceTextDocumentNameProvider</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -142,13 +144,25 @@
                             <Values>
                                 <Value>ValidatedType</Value>
                                 <Value>ValidatedType2</Value>
-                                <Value>TestType</Value>
                                 <Value>TestType2</Value>
+                                <Value>TestType</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="UndoManager" Type="Factory" ExportId="">
                         <Data IsEnabled="true" Value="UndoManager"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SourceTextDocumentNameProvider" PackageId="DocumentServiceIntegrationTestPck" ComponentId="TextDocumentNameProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="AppendSource" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="NamePrefix" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="Auto: "/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
