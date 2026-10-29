@@ -17,7 +17,6 @@ Item{
 		target: container.documentView
 
 		function onCommandsModelChanged(commandsModel){
-			console.log("COMMANDS_MODEL!!!!!!")
 			container.buttonPanelModel = null
 
 			if (!commandsModel){
