@@ -196,7 +196,7 @@ IDocumentService::DocumentList CDocumentServiceBase::GetOpenedDocumentList(const
 		DocumentListItem info;
 		info.documentId = id;
 		info.typeId = workingDocumentPtr->typeId;
-		info.url = workingDocumentPtr->url;
+		info.url = GetDocumentUrl(*workingDocumentPtr);
 		info.name = workingDocumentPtr->name;
 		info.isDirty = workingDocumentPtr->isDirty;
 		info.hasNameProvider = HasDocumentNameProvider(workingDocumentPtr->typeId);
@@ -469,7 +469,7 @@ IDocumentService::OperationStatus CDocumentServiceBase::CloseDocumentInternal(
 		}
 
 		typeId = workingDocumentPtr->typeId;
-		url = workingDocumentPtr->url;
+		url = GetDocumentUrl(*workingDocumentPtr);
 		name = workingDocumentPtr->name;
 		isDirty = workingDocumentPtr->isDirty;
 
@@ -561,7 +561,7 @@ IDocumentService::OperationStatus CDocumentServiceBase::SetDocumentName(
 		document.name = documentName;
 
 		typeId = document.typeId;
-		documentUrl = document.url;
+		documentUrl = GetDocumentUrl(document);
 		isDirty = document.isDirty;
 		userIds = GetDocumentUserIds(documentId);
 	}
@@ -942,7 +942,7 @@ QByteArrayList CDocumentServiceBase::GetDocumentUserIds(const QByteArray& docume
 
 bool CDocumentServiceBase::IsDocumentDirty(const WorkingDocument& document)
 {
-	if (document.url.isEmpty()){
+	if (document.documentSourceRef.isEmpty()){
 		return true;
 	}
 
@@ -968,7 +968,7 @@ void CDocumentServiceBase::OnDocumentDataLoaded(
 		}
 
 		typeId = documentPtr->typeId;
-		url = documentPtr->url;
+		url = GetDocumentUrl(*documentPtr);
 		name = documentPtr->name;
 		isDirty = documentPtr->isDirty;
 	}
@@ -1023,7 +1023,7 @@ void CDocumentServiceBase::OnUndoManagerChanged(int modelId)
 		userIds = GetDocumentUserIds(documentId);
 		docTypeId = document.typeId;
 		docName = document.name;
-		docUrl = document.url;
+		docUrl = GetDocumentUrl(document);
 		docUndoManagerPtr = document.undoManagerPtr;
 	}
 
@@ -1042,6 +1042,12 @@ void CDocumentServiceBase::OnUndoManagerChanged(int modelId)
 			}
 		}
 	}
+}
+
+
+QUrl CDocumentServiceBase::GetDocumentUrl(const WorkingDocument& /*document*/) const
+{
+	return QUrl();
 }
 
 
@@ -1133,7 +1139,7 @@ void CDocumentServiceBase::OnUpdate(imod::IModel* modelPtr, const istd::IChangea
 								documentId,
 								workingDocument.typeId,
 								workingDocument.name,
-								workingDocument.url,
+								GetDocumentUrl(workingDocument),
 								workingDocument.isDirty,
 								*changeablePtr,
 								changeSet);

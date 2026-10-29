@@ -31,6 +31,37 @@ QByteArray UrlToObjectId(const QUrl& url);
 */
 int UrlToRevision(const QUrl& url);
 
+/**
+	Returns the document source reference of the collection object \a objectId: \c <objectId>.
+	If \a revision is not negative, the reference addresses this revision of the object:
+	\c <objectId>/<revision>. Returns an empty reference for an empty \a objectId.
+*/
+QByteArray ObjectIdToSourceRef(const QByteArray& objectId, int revision = -1);
+
+/**
+	Extracts the collection object ID from a \c <objectId> or \c <objectId>/<revision>
+	document source reference. Returns an empty ID for empty or invalid references.
+*/
+QByteArray SourceRefToObjectId(const QByteArray& sourceRef);
+
+/**
+	Extracts the object revision from a \c <objectId>/<revision> document source reference.
+	Returns -1 if the reference does not address a revision or is invalid.
+*/
+int SourceRefToRevision(const QByteArray& sourceRef);
+
+/**
+	Converts the document source reference to the collection URL.
+	Returns an empty URL for empty or invalid references.
+*/
+QUrl SourceRefToUrl(const QByteArray& sourceRef);
+
+/**
+	Converts the collection URL to the document source reference.
+	Returns an empty reference for empty or invalid URLs.
+*/
+QByteArray UrlToSourceRef(const QUrl& url);
+
 
 } // namespace imtdoc
 

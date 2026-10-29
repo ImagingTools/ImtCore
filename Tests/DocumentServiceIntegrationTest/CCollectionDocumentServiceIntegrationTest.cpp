@@ -1174,6 +1174,26 @@ void CCollectionDocumentServiceIntegrationTest::RevisionUrlHelpersTest()
 	const QUrl tooManySegmentsUrl(QStringLiteral("collection:///") + TEST_OBJECT_ID + QStringLiteral("/1/2"));
 	QVERIFY(imtdoc::UrlToObjectId(tooManySegmentsUrl).isEmpty());
 	QCOMPARE(imtdoc::UrlToRevision(tooManySegmentsUrl), -1);
+
+	const QByteArray sourceRef = imtdoc::ObjectIdToSourceRef(TEST_OBJECT_ID, 3);
+	QCOMPARE(sourceRef, TEST_OBJECT_ID + QByteArrayLiteral("/3"));
+	QCOMPARE(imtdoc::SourceRefToObjectId(sourceRef), TEST_OBJECT_ID);
+	QCOMPARE(imtdoc::SourceRefToRevision(sourceRef), 3);
+	QCOMPARE(imtdoc::SourceRefToUrl(sourceRef), url);
+	QCOMPARE(imtdoc::UrlToSourceRef(url), sourceRef);
+
+	const QByteArray headSourceRef = imtdoc::ObjectIdToSourceRef(TEST_OBJECT_ID);
+	QCOMPARE(headSourceRef, TEST_OBJECT_ID);
+	QCOMPARE(imtdoc::SourceRefToRevision(headSourceRef), -1);
+	QCOMPARE(imtdoc::SourceRefToUrl(headSourceRef), headUrl);
+	QCOMPARE(imtdoc::UrlToSourceRef(headUrl), headSourceRef);
+
+	QVERIFY(imtdoc::ObjectIdToSourceRef(QByteArray()).isEmpty());
+	QVERIFY(imtdoc::SourceRefToUrl(QByteArray()).isEmpty());
+	QVERIFY(imtdoc::SourceRefToObjectId(TEST_OBJECT_ID + QByteArrayLiteral("/abc")).isEmpty());
+	QVERIFY(imtdoc::SourceRefToObjectId(TEST_OBJECT_ID + QByteArrayLiteral("/-1")).isEmpty());
+	QVERIFY(imtdoc::SourceRefToObjectId(TEST_OBJECT_ID + QByteArrayLiteral("/1/2")).isEmpty());
+	QVERIFY(imtdoc::UrlToSourceRef(invalidRevisionUrl).isEmpty());
 }
 
 

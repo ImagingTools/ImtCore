@@ -207,9 +207,9 @@ void CCollectionDocumentServiceComp::PrepareDocumentMap(DocumentMap& documentMap
 
 			DocumentInfo doc;
 			doc.documentId = documentId;
-			doc.objectId = imtdoc::UrlToObjectId(workingDocumentPtr->url);
+			doc.objectId = imtdoc::SourceRefToObjectId(workingDocumentPtr->documentSourceRef);
 			doc.typeId = workingDocumentPtr->typeId;
-			doc.url = workingDocumentPtr->url.toString();
+			doc.url = GetDocumentUrl(*workingDocumentPtr).toString();
 			doc.name = workingDocumentPtr->name;
 			doc.singleDocumentInstance = workingDocumentPtr->singleDocumentInstance;
 			documents.append(doc);
@@ -446,7 +446,7 @@ bool CCollectionDocumentServiceComp::RestoreSharedDocument(const DocumentInfo& d
 	}
 
 	const int revision = imtdoc::UrlToRevision(QUrl(documentInfo.url));
-	const UserDocumentPairList documents = FindDocumentsByUrl(imtdoc::ObjectIdToUrl(documentInfo.objectId, revision));
+	const UserDocumentPairList documents = FindDocumentsBySourceRef(imtdoc::ObjectIdToSourceRef(documentInfo.objectId, revision));
 	if (documents.isEmpty()){
 		return false;
 	}
@@ -511,7 +511,7 @@ bool CCollectionDocumentServiceComp::RestoreDocument(
 
 	WorkingDocument document;
 	document.typeId = typeId;
-	document.url = documentInfo.objectId.isEmpty() ? QUrl() : imtdoc::ObjectIdToUrl(documentInfo.objectId, revision);
+	document.documentSourceRef = imtdoc::ObjectIdToSourceRef(documentInfo.objectId, revision);
 	document.name = documentInfo.name;
 	document.objectPtr = objectPtr;
 	document.undoManagerPtr = undoManagerPtr;

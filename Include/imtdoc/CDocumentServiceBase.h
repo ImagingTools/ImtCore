@@ -71,6 +71,7 @@ namespace imtdoc
 	- \c CreateObject / \c CreateUndoManager — mandatory factories.
 	- Do*Document — to implement collection-specific open/save/close logic
 	  (see \c TCollectionDocumentServiceWrap).
+	- \c GetDocumentUrl — converts the document source reference to the public URL.
 	- \c GetDefaultDocumentName, \c HasDocumentNameProvider,
 	  \c ValidateDocumentData, \c GetDocumentServiceEventHandlers,
 	  \c IsSingleCopyMode — optional policy hooks.
@@ -214,6 +215,12 @@ protected:
 				const QByteArray& taskId,
 				const iprm::IParamsSet* initParamsPtr);
 
+	/**
+		Returns the public URL of the document source.
+		The base implementation returns an empty URL, storage-specific subclasses
+		build it from \c WorkingDocument::documentSourceRef.
+	*/
+	virtual QUrl GetDocumentUrl(const WorkingDocument& document) const;
 	virtual QString GetDefaultDocumentName(const WorkingDocument& document) const;
 	virtual bool HasDocumentNameProvider(const QByteArray& typeId) const;
 	virtual bool ValidateDocumentData(
@@ -259,7 +266,7 @@ protected:
 	struct WorkingDocument
 	{
 		QByteArray typeId;                         ///< Registered object type-ID.
-		QUrl url;                                  ///< URL of the document source, set by the storage-specific subclass (empty for unsaved documents).
+		QByteArray documentSourceRef;              ///< Storage-specific reference to the document source, set by the subclass (empty for unsaved documents).
 		QString name;                              ///< Current display name.
 		istd::IChangeableSharedPtr objectPtr;      ///< The document's data object.
 		idoc::IUndoManagerSharedPtr undoManagerPtr;///< Associated undo/redo manager.

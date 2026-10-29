@@ -101,7 +101,7 @@ QByteArray CCollectionDocumentServiceTest::SetupDocumentDirectly(
 	QMutexLocker locker(&manager.m_mutex);
 	auto& doc = manager.InsertDocument(userId, documentId);
 	doc.typeId = typeId;
-	doc.url = objectId.isEmpty() ? QUrl() : QUrl("collection:///" + objectId);
+	doc.documentSourceRef = objectId;
 	doc.name = name;
 	doc.objectPtr = istd::IChangeableSharedPtr(new CMockDocumentObject());
 	doc.undoManagerPtr = idoc::IUndoManagerSharedPtr(new CMockUndoManager());
@@ -974,7 +974,7 @@ void CCollectionDocumentServiceTest::SaveDocumentSaveAsUpdatesUrlTest()
 	QByteArray docId = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID, TEST_TYPE_ID, TEST_OBJECT_ID, TEST_DOC_NAME);
 	{
 		QMutexLocker locker(&m_managerPtr->m_mutex);
-		m_managerPtr->m_documents[docId].url = QUrl("collection:///" + TEST_OBJECT_ID);
+		m_managerPtr->m_documents[docId].documentSourceRef = TEST_OBJECT_ID;
 	}
 
 	// Saving under another name stores a copy as a new object

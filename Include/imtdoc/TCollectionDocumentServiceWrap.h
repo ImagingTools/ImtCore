@@ -44,6 +44,10 @@ namespace imtdoc
 	- **DoCreateNewDocument** — delegates to the base-class implementation (which
 	  creates a blank object via \c CreateObject) and records an optional proposed
 	  source element ID for later use during save.
+	The document source reference (\c WorkingDocument::documentSourceRef) of a
+	collection document is \c <objectId> or \c <objectId>/<revision>, the public
+	document URL is built from it by \c GetDocumentUrl.
+
 	- **DoOpenDocument** — resolves the URL to a collection object ID, fetches
 	  the object data in a background thread, and supports single-copy sharing of
 	  data across user sessions.  A \c collection:///<objectId>/<revision> URL
@@ -53,7 +57,7 @@ namespace imtdoc
 	- **DoSaveDocument** — validates the data, then either updates an existing
 	  collection element or inserts a new one (creating a copy when the name
 	  changes); fires \c CDocumentSavedEvent or \c CDocumentSavedAsEvent.
-	  After saving, the document URL does not address a revision anymore.
+	  After saving, the document does not address a revision anymore.
 	- **DoCloseDocument** — removes the document entry and fires
 	  \c CDocumentClosedEvent.
 	- **SetDocumentName** — renames the object in the collection (for saved
@@ -95,6 +99,8 @@ public:
 	virtual void DoSaveDocument(const QByteArray& taskId, const TaskParams& params) override;
 	virtual void DoCloseDocument(const QByteArray& taskId, const TaskParams& params) override;
 
+	virtual QUrl GetDocumentUrl(const WorkingDocument& document) const override;
+
 	// reimplemented (imtdoc::IDocumentService)
 	virtual DocumentList GetOpenedDocumentList(const QByteArray& userId) const override;
 	virtual OperationStatus SetDocumentName(const QByteArray& userId, const QByteArray& documentId, const QString& documentName) override;
@@ -118,11 +124,11 @@ protected:
 	UserDocumentPairList FindDocumentsByObjectId(const QByteArray& objectId) const;
 
 	/**
-		Returns the (userId, documentId) pairs of all opened documents with the URL \a url
-		(the same collection object and the same revision).
+		Returns the (userId, documentId) pairs of all opened documents with the source reference
+		\a documentSourceRef (the same collection object and the same revision).
 		\note \c m_mutex must be locked by the caller.
 	*/
-	UserDocumentPairList FindDocumentsByUrl(const QUrl& url) const;
+	UserDocumentPairList FindDocumentsBySourceRef(const QByteArray& documentSourceRef) const;
 
 private:
 	void OnDeferredDocumentDataLoaded(
@@ -159,7 +165,7 @@ inline typename TCollectionDocumentServiceWrap<Base>::UserDocumentPairList TColl
 	for (auto userIt = this->m_userDocumentIds.constBegin(); userIt != this->m_userDocumentIds.constEnd(); ++userIt){
 		for (const QByteArray& documentId : userIt.value()){
 			auto documentIt = this->m_documents.constFind(documentId);
-			if (documentIt != this->m_documents.constEnd() && imtdoc::UrlToObjectId(documentIt.value().url) == objectId){
+			if (documentIt != this->m_documents.constEnd() && imtdoc::SourceRefToObjectId(documentIt.value().documentSourceRef) == objectId){
 				result.append(qMakePair(userIt.key(), documentId));
 			}
 		}
@@ -170,15 +176,15 @@ inline typename TCollectionDocumentServiceWrap<Base>::UserDocumentPairList TColl
 
 
 template<class Base>
-inline typename TCollectionDocumentServiceWrap<Base>::UserDocumentPairList TCollectionDocumentServiceWrap<Base>::FindDocumentsByUrl(
-			const QUrl& url) const
+inline typename TCollectionDocumentServiceWrap<Base>::UserDocumentPairList TCollectionDocumentServiceWrap<Base>::FindDocumentsBySourceRef(
+			const QByteArray& documentSourceRef) const
 {
 	UserDocumentPairList result;
 
 	for (auto userIt = this->m_userDocumentIds.constBegin(); userIt != this->m_userDocumentIds.constEnd(); ++userIt){
 		for (const QByteArray& documentId : userIt.value()){
 			auto documentIt = this->m_documents.constFind(documentId);
-			if (documentIt != this->m_documents.constEnd() && documentIt.value().url == url){
+			if (documentIt != this->m_documents.constEnd() && documentIt.value().documentSourceRef == documentSourceRef){
 				result.append(qMakePair(userIt.key(), documentId));
 			}
 		}
@@ -330,7 +336,7 @@ inline void TCollectionDocumentServiceWrap<Base>::OnOpenDocumentThreadFinished(
 
 		document.name = documentName;
 		typeId = document.typeId;
-		documentUrl = document.url;
+		documentUrl = this->GetDocumentUrl(document);
 		isDirty = document.isDirty;
 		userIdsToNotify = this->GetDocumentUserIds(documentId);
 	}
@@ -395,7 +401,8 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 	}
 
 	const int revision = imtdoc::UrlToRevision(url);
-	const QUrl documentUrl = imtdoc::ObjectIdToUrl(objectId, revision);
+	const QByteArray documentSourceRef = imtdoc::ObjectIdToSourceRef(objectId, revision);
+	const QUrl documentUrl = imtdoc::SourceRefToUrl(documentSourceRef);
 	QByteArray documentId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
 	QByteArray sharedDocumentId;
@@ -412,7 +419,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 		QMutexLocker locker(&this->m_mutex);
 		for (const QByteArray& userDocumentId : this->GetUserDocumentIds(userId)){
 			const WorkingDocument* userDocPtr = this->FindDocument(userId, userDocumentId);
-			if (userDocPtr == nullptr || userDocPtr->url != documentUrl){
+			if (userDocPtr == nullptr || userDocPtr->documentSourceRef != documentSourceRef){
 				continue;
 			}
 
@@ -431,7 +438,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 
 		// Single-copy mode: an object revision already opened by any user is represented by one document
 		if (this->IsSingleCopyMode()){
-			const UserDocumentPairList openedDocuments = this->FindDocumentsByUrl(documentUrl);
+			const UserDocumentPairList openedDocuments = this->FindDocumentsBySourceRef(documentSourceRef);
 			if (!openedDocuments.isEmpty()){
 				sharedDocumentId = openedDocuments.first().second;
 
@@ -445,7 +452,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 
 		if (sharedDocumentId.isEmpty()){
 			WorkingDocument& reservedDoc = this->InsertDocument(userId, documentId);
-			reservedDoc.url = documentUrl;
+			reservedDoc.documentSourceRef = documentSourceRef;
 			reservedDoc.isLoading = true;
 			reservedDoc.singleDocumentInstance = params.singleDocumentInstance;
 		}
@@ -525,7 +532,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 		QMutexLocker locker(&this->m_mutex);
 		WorkingDocument& doc = this->InsertDocument(userId, documentId);
 		doc.typeId = objectTypeId;
-		doc.url = documentUrl;
+		doc.documentSourceRef = documentSourceRef;
 		doc.name = documentName;
 		doc.undoManagerPtr = undoManagerPtr;
 		doc.isDirty = false;
@@ -606,6 +613,13 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 
 
 template<class Base>
+inline QUrl TCollectionDocumentServiceWrap<Base>::GetDocumentUrl(const WorkingDocument& document) const
+{
+	return imtdoc::SourceRefToUrl(document.documentSourceRef);
+}
+
+
+template<class Base>
 inline typename TCollectionDocumentServiceWrap<Base>::DocumentList
 TCollectionDocumentServiceWrap<Base>::GetOpenedDocumentList(const QByteArray& userId) const
 {
@@ -644,7 +658,7 @@ TCollectionDocumentServiceWrap<Base>::SetDocumentName(
 			return IDocumentService::OS_OK;
 		}
 
-		objectId = imtdoc::UrlToObjectId(workingDocument.url);
+		objectId = imtdoc::SourceRefToObjectId(workingDocument.documentSourceRef);
 	}
 
 	if (!objectId.isEmpty()){
@@ -716,7 +730,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 	istd::CChangeGroup changeGroup(collectionPtr);
 
 	QString resultDocumentName = documentName;
-	const QByteArray currentObjectId = imtdoc::UrlToObjectId(workingDocumentPtr->url);
+	const QByteArray currentObjectId = imtdoc::SourceRefToObjectId(workingDocumentPtr->documentSourceRef);
 	if (!currentObjectId.isEmpty()){
 		// Create copy of the object
 		if (!resultDocumentName.isEmpty() && workingDocumentPtr->name != resultDocumentName){
@@ -750,7 +764,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 
 				// The document is now backed by the new object for every user holding it,
 				// so GetOpenedDocumentList() must report its URL
-				workingDocumentPtr->url = imtdoc::ObjectIdToUrl(newObjectId);
+				workingDocumentPtr->documentSourceRef = imtdoc::ObjectIdToSourceRef(newObjectId);
 				workingDocumentPtr->name = resultDocumentName;
 				workingDocumentPtr->isDirty = false;
 				workingDocumentPtr->undoManagerPtr->StoreDocumentState();
@@ -799,10 +813,10 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 			workingDocumentPtr->isDirty = false;
 
 			// A document opened from an object revision is now backed by the current object data
-			workingDocumentPtr->url = imtdoc::ObjectIdToUrl(currentObjectId);
+			workingDocumentPtr->documentSourceRef = imtdoc::ObjectIdToSourceRef(currentObjectId);
 
 			QByteArray savedTypeId = workingDocumentPtr->typeId;
-			QUrl savedUrl = workingDocumentPtr->url;
+			QUrl savedUrl = this->GetDocumentUrl(*workingDocumentPtr);
 			QString newName = workingDocumentPtr->name;
 			QByteArrayList userIds = this->GetDocumentUserIds(documentId);
 
@@ -852,8 +866,8 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 				params.operationContextPtr);
 
 	if (!savedObjectId.isEmpty()){
-		// A new document had no URL; it is now backed by the inserted object
-		workingDocumentPtr->url = imtdoc::ObjectIdToUrl(savedObjectId);
+		// A new document had no source; it is now backed by the inserted object
+		workingDocumentPtr->documentSourceRef = imtdoc::ObjectIdToSourceRef(savedObjectId);
 	}
 
 	if (this->HasDocumentNameProvider(workingDocumentPtr->typeId)){
