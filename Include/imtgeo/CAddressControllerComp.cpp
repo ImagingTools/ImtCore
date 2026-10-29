@@ -143,7 +143,7 @@ istd::IChangeableUniquePtr CAddressControllerComp::CreateObjectFromRequest(
 		imtbase::IObjectCollection::DataPtr adrDataPtr;
 		const auto* adrInfoPtr = m_objectCollectionCompPtr->GetObjectData(parentId, adrDataPtr) ? adrDataPtr.GetPtr<const IAddressElementInfo>() : nullptr;
 		if (adrInfoPtr == nullptr){
-			errorMessage = QStringLiteral("Unable to create address. Error: Parent address '%1' does not exist").arg(QString(parentId));
+			errorMessage = QStringLiteral("Unable to create address. Error: Parent address '%1' does not exist").arg(parentId);
 
 			return nullptr;
 		}

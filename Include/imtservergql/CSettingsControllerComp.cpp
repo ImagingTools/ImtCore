@@ -45,7 +45,7 @@ sdl::V1_0::imtbase::CSetSettingsPayload CSettingsControllerComp::OnSetSettings(
 	}
 
 	if (!IsCallerAllowed(gqlRequest, userId)){
-		errorMessage = QStringLiteral("Unable to set settings for user '%1'. Error: The settings belong to another user").arg(QString(userId));
+		errorMessage = QStringLiteral("Unable to set settings for user '%1'. Error: The settings belong to another user").arg(userId);
 		SendWarningMessage(0, errorMessage, "CSettingsControllerComp");
 		
 		return response;
@@ -62,7 +62,7 @@ sdl::V1_0::imtbase::CSetSettingsPayload CSettingsControllerComp::OnSetSettings(
 
 	imtauth::IUserSettingsSharedPtr userSettingsPtr = GetOrCreateUserSettings(userId);
 	if (!userSettingsPtr.IsValid()){
-		errorMessage = QStringLiteral("Unable to set settings for user '%1'. Error: User settings is invalid");
+		errorMessage = QStringLiteral("Unable to set settings for user '%1'. Error: User settings is invalid").arg(userId);
 		SendErrorMessage(0, errorMessage, "CSettingsControllerComp");
 		
 		return response;
@@ -71,7 +71,7 @@ sdl::V1_0::imtbase::CSetSettingsPayload CSettingsControllerComp::OnSetSettings(
 	iprm::IParamsSet* paramSetPtr = userSettingsPtr->GetSettings();
 	if (paramSetPtr == nullptr){
 		Q_ASSERT(false);
-		errorMessage = QStringLiteral("Unable to set settings for user '%1'. Error: User settings is invalid");
+		errorMessage = QStringLiteral("Unable to set settings for user '%1'. Error: User settings is invalid").arg(userId);
 		SendErrorMessage(0, errorMessage, "CSettingsControllerComp");
 		
 		return response;
@@ -147,7 +147,7 @@ sdl::V1_0::imtbase::CParamsSet CSettingsControllerComp::OnGetSettings(
 	}
 
 	if (!IsCallerAllowed(gqlRequest, userId)){
-		errorMessage = QStringLiteral("Unable to get settings for user '%1'. Error: The settings belong to another user").arg(QString(userId));
+		errorMessage = QStringLiteral("Unable to get settings for user '%1'. Error: The settings belong to another user").arg(userId);
 		SendWarningMessage(0, errorMessage, "CSettingsControllerComp");
 		
 		return response;
@@ -281,11 +281,14 @@ bool CSettingsControllerComp::IsCallerAllowed(const ::imtgql::CGqlRequest& gqlRe
 	}
 
 	const QByteArray callerId = gqlContextPtr->GetUserId();
-	if (callerId.isEmpty() || callerId == userId){
+	const imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
+	if (callerId.isEmpty() && userInfoPtr == nullptr){
 		return true;
 	}
 
-	const imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
+	if (!callerId.isEmpty() && callerId == userId){
+		return true;
+	}
 
 	return userInfoPtr != nullptr && userInfoPtr->IsAdmin();
 }
