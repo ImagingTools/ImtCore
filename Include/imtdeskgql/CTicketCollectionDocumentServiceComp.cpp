@@ -22,6 +22,7 @@
 #include <imtdeskgql/imtdeskgql.h>
 #include <imtdeskgql/TicketPermissions.h>
 #include <imtdoc/CDocumentSavedEvent.h>
+#include <imtdoc/imtdoc.h>
 #include <imtauth/IUserGroupInfoProvider.h>
 #include <imtauth/imtauth.h>
 #include <imtgql/IGqlContext.h>
@@ -619,7 +620,7 @@ bool CTicketCollectionDocumentServiceComp::ProcessEvent(imtdoc::CEventBase* even
 	if (savedEventPtr != nullptr){
 		QByteArray documentId = savedEventPtr->GetDocumentId();
 		QByteArray userId = savedEventPtr->GetUserId();
-		QByteArray objectId = savedEventPtr->GetDocumentUrl().toString().toUtf8().replace("collection:///", "");
+		QByteArray objectId = imtdoc::SourceRefToObjectId(savedEventPtr->GetDocumentSourceRef());
 
 		imtbase::IObjectCollection::DataPtr collectionDataPtr;
 		const imtdesk::ISupportTicket* dbTicketPtr = nullptr;

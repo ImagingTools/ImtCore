@@ -28,7 +28,7 @@ static const QString s_documentsKey = QStringLiteral("Documents");
 static const QString s_documentIdKey = QStringLiteral("DocumentId");
 static const QString s_objectIdKey = QStringLiteral("ObjectId");
 static const QString s_typeIdKey = QStringLiteral("TypeId");
-static const QString s_urlKey = QStringLiteral("Url");
+static const QString s_documentSourceRefKey = QStringLiteral("DocumentSourceRef");
 static const QString s_nameKey = QStringLiteral("Name");
 static const QString s_singleDocumentInstanceKey = QStringLiteral("SingleDocumentInstance");
 
@@ -197,17 +197,21 @@ void CCollectionDocumentServiceComp::PrepareDocumentMap(DocumentMap& documentMap
 {
 	documentMap.clear();
 
-	for (auto userIt = m_userDocuments.constBegin(); userIt != m_userDocuments.constEnd(); ++userIt){
+	for (auto userIt = m_userDocumentIds.constBegin(); userIt != m_userDocumentIds.constEnd(); ++userIt){
 		DocumentInfoList documents;
-		const WorkingDocumentList& docs = userIt.value();
-		for (auto docIt = docs.constBegin(); docIt != docs.constEnd(); ++docIt){
+		for (const QByteArray& documentId : userIt.value()){
+			const WorkingDocument* workingDocumentPtr = FindDocument(userIt.key(), documentId);
+			if (workingDocumentPtr == nullptr){
+				continue;
+			}
+
 			DocumentInfo doc;
-			doc.documentId = docIt.key();
-			doc.objectId = docIt.value().objectId;
-			doc.typeId = docIt.value().typeId;
-			doc.url = docIt.value().url.toString();
-			doc.name = docIt.value().name;
-			doc.singleDocumentInstance = docIt.value().singleDocumentInstance;
+			doc.documentId = documentId;
+			doc.objectId = imtdoc::SourceRefToObjectId(workingDocumentPtr->documentSourceRef);
+			doc.typeId = workingDocumentPtr->typeId;
+			doc.documentSourceRef = workingDocumentPtr->documentSourceRef;
+			doc.name = workingDocumentPtr->name;
+			doc.singleDocumentInstance = workingDocumentPtr->singleDocumentInstance;
 			documents.append(doc);
 		}
 
@@ -227,7 +231,7 @@ QJsonObject CCollectionDocumentServiceComp::DocumentMapToJson(const DocumentMap&
 			documentObject.insert(s_documentIdKey, QString(documentInfo.documentId));
 			documentObject.insert(s_objectIdKey, QString(documentInfo.objectId));
 			documentObject.insert(s_typeIdKey, QString(documentInfo.typeId));
-			documentObject.insert(s_urlKey, documentInfo.url);
+			documentObject.insert(s_documentSourceRefKey, QString(documentInfo.documentSourceRef));
 			documentObject.insert(s_nameKey, documentInfo.name);
 			documentObject.insert(s_singleDocumentInstanceKey, documentInfo.singleDocumentInstance);
 
@@ -293,7 +297,6 @@ bool CCollectionDocumentServiceComp::DocumentMapFromJson(const QJsonObject& root
 						|| documentObject.value(s_documentIdKey).toString().isEmpty()
 						|| !documentObject.value(s_objectIdKey).isString()
 						|| !documentObject.value(s_typeIdKey).isString()
-						|| !documentObject.value(s_urlKey).isString()
 						|| !documentObject.value(s_nameKey).isString()
 						|| !documentObject.value(s_singleDocumentInstanceKey).isBool()){
 				return false;
@@ -303,7 +306,9 @@ bool CCollectionDocumentServiceComp::DocumentMapFromJson(const QJsonObject& root
 			documentInfo.documentId = documentObject.value(s_documentIdKey).toString().toUtf8();
 			documentInfo.objectId = documentObject.value(s_objectIdKey).toString().toUtf8();
 			documentInfo.typeId = documentObject.value(s_typeIdKey).toString().toUtf8();
-			documentInfo.url = documentObject.value(s_urlKey).toString();
+			// States saved by older versions have no source reference, their documents are always the current objects
+			const QJsonValue documentSourceRefValue = documentObject.value(s_documentSourceRefKey);
+			documentInfo.documentSourceRef = documentSourceRefValue.isString() ? documentSourceRefValue.toString().toUtf8() : documentInfo.objectId;
 			documentInfo.name = documentObject.value(s_nameKey).toString();
 			documentInfo.singleDocumentInstance = documentObject.value(s_singleDocumentInstanceKey).toBool(false);
 
@@ -362,24 +367,16 @@ void CCollectionDocumentServiceComp::RemoveAllDocuments()
 	QMutexLocker locker(&m_mutex);
 	QSet<int> undoModelIds;
 
-	for (auto it = m_sharedDocuments.constBegin(); it != m_sharedDocuments.constEnd(); ++it){
-		if (it.value().undoManagerModelId >= 0){
-			undoModelIds.insert(it.value().undoManagerModelId);
-		}
-	}
-	for (auto userIt = m_userDocuments.constBegin(); userIt != m_userDocuments.constEnd(); ++userIt){
-		for (auto docIt = userIt.value().constBegin(); docIt != userIt.value().constEnd(); ++docIt){
-			if (docIt.value().undoManagerModelId >= 0){
-				undoModelIds.insert(docIt.value().undoManagerModelId);
-			}
+	for (auto docIt = m_documents.constBegin(); docIt != m_documents.constEnd(); ++docIt){
+		if (docIt.value().undoManagerModelId >= 0){
+			undoModelIds.insert(docIt.value().undoManagerModelId);
 		}
 	}
 	for (int modelId : undoModelIds){
 		m_undoManagerObserver.UnregisterModel(modelId);
 	}
 
-	m_userDocuments.clear();
-	m_sharedDocuments.clear();
+	ClearDocuments();
 }
 
 
@@ -434,35 +431,27 @@ void CCollectionDocumentServiceComp::ProcessSaveRequests()
 }
 
 
-bool CCollectionDocumentServiceComp::RestoreSharedDocument(const DocumentInfo& documentInfo, const QByteArray& userId)
+bool CCollectionDocumentServiceComp::RestoreSharedDocument(const DocumentInfo& documentInfo, const QByteArray& userId, bool isSingleCopyMode)
 {
-	if (documentInfo.objectId.isEmpty()){
-		return false;
-	}
-
 	QMutexLocker locker(&m_mutex);
-	auto sharedIt = m_sharedDocuments.find(documentInfo.objectId);
-	if (sharedIt == m_sharedDocuments.end()){
+
+	// The same document was already restored for another user
+	if (m_documents.contains(documentInfo.documentId)){
+		InsertDocument(userId, documentInfo.documentId);
+
+		return true;
+	}
+
+	if (!isSingleCopyMode || documentInfo.objectId.isEmpty()){
 		return false;
 	}
 
-	SharedDocumentData& shared = sharedIt.value();
-	WorkingDocument& document = m_userDocuments[userId][documentInfo.documentId];
+	const UserDocumentPairList documents = FindDocumentsBySourceRef(documentInfo.documentSourceRef);
+	if (documents.isEmpty()){
+		return false;
+	}
 
-	document.objectId = documentInfo.objectId;
-	document.typeId = shared.typeId;
-	document.url = documentInfo.url.isEmpty() ? ObjectIdToUrl(documentInfo.objectId) : QUrl(documentInfo.url);
-	document.name = documentInfo.name;
-	document.objectPtr = shared.objectPtr;
-	document.undoManagerPtr = shared.undoManagerPtr;
-	document.isLoading = shared.isLoading;
-	document.singleDocumentInstance = documentInfo.singleDocumentInstance;
-	document.undoManagerModelId = -1;
-	document.isDirty = shared.undoManagerPtr.IsValid()
-				? (shared.undoManagerPtr->GetDocumentChangeFlag() != idoc::IDocumentStateComparator::DCF_EQUAL)
-				: false;
-
-	shared.refCount++;
+	InsertDocument(userId, documents.first().second);
 
 	return true;
 }
@@ -474,7 +463,7 @@ bool CCollectionDocumentServiceComp::RestoreDocument(
 			bool isSingleCopyMode,
 			imtbase::IObjectCollection* collectionPtr)
 {
-	if (isSingleCopyMode && RestoreSharedDocument(documentInfo, userId)){
+	if (RestoreSharedDocument(documentInfo, userId, isSingleCopyMode)){
 		return true;
 	}
 
@@ -486,10 +475,23 @@ bool CCollectionDocumentServiceComp::RestoreDocument(
 		return false;
 	}
 
+	const int revision = imtdoc::SourceRefToRevision(documentInfo.documentSourceRef);
+
 	istd::IChangeableSharedPtr objectPtr;
 	if (!documentInfo.objectId.isEmpty()){
-		if (!collectionPtr->GetObjectData(documentInfo.objectId, objectPtr) || !objectPtr.IsValid()){
-			return false;
+		if (revision < 0){
+			if (!collectionPtr->GetObjectData(documentInfo.objectId, objectPtr) || !objectPtr.IsValid()){
+				return false;
+			}
+		}
+		else{
+			const imtbase::IRevisionController* revisionControllerPtr = collectionPtr->GetRevisionController();
+			idoc::MetaInfoPtr metaInfoPtr;
+			if (revisionControllerPtr == nullptr
+						|| !revisionControllerPtr->GetRevisionData(*collectionPtr, documentInfo.objectId, revision, objectPtr, metaInfoPtr)
+						|| !objectPtr.IsValid()){
+				return false;
+			}
 		}
 	}
 
@@ -508,9 +510,8 @@ bool CCollectionDocumentServiceComp::RestoreDocument(
 	}
 
 	WorkingDocument document;
-	document.objectId = documentInfo.objectId;
 	document.typeId = typeId;
-	document.url = documentInfo.url.isEmpty() ? ObjectIdToUrl(documentInfo.objectId) : QUrl(documentInfo.url);
+	document.documentSourceRef = imtdoc::ObjectIdToSourceRef(documentInfo.objectId, revision);
 	document.name = documentInfo.name;
 	document.objectPtr = objectPtr;
 	document.undoManagerPtr = undoManagerPtr;
@@ -519,26 +520,12 @@ bool CCollectionDocumentServiceComp::RestoreDocument(
 	document.singleDocumentInstance = documentInfo.singleDocumentInstance;
 	document.undoManagerModelId = -1;
 
-	if (isSingleCopyMode && !documentInfo.objectId.isEmpty()){
-		SharedDocumentData shared;
-		shared.typeId = document.typeId;
-		shared.name = document.name;
-		shared.objectPtr = document.objectPtr;
-		shared.undoManagerPtr = document.undoManagerPtr;
-		shared.refCount = 1;
-		shared.isLoading = false;
-		shared.undoManagerModelId = document.undoManagerModelId;
-
+	{
 		QMutexLocker locker(&m_mutex);
-		m_sharedDocuments[documentInfo.objectId] = shared;
-		m_userDocuments[userId][documentInfo.documentId] = document;
-	}
-	else{
-		QMutexLocker locker(&m_mutex);
-		m_userDocuments[userId][documentInfo.documentId] = document;
+		InsertDocument(userId, documentInfo.documentId) = document;
 	}
 
-	RegisterRestoredDocument(documentInfo, userId, isSingleCopyMode, undoManagerPtr);
+	RegisterRestoredDocument(documentInfo, userId, undoManagerPtr);
 
 	return true;
 }
@@ -547,18 +534,11 @@ bool CCollectionDocumentServiceComp::RestoreDocument(
 void CCollectionDocumentServiceComp::RegisterRestoredDocument(
 			const DocumentInfo& documentInfo,
 			const QByteArray& userId,
-			bool isSingleCopyMode,
 			const idoc::IUndoManagerSharedPtr& undoManagerPtr)
 {
-	auto& registeredDocument = m_userDocuments[userId][documentInfo.documentId];
+	WorkingDocument& registeredDocument = m_documents[documentInfo.documentId];
 
 	InitializeDocumentObservers(registeredDocument, userId, documentInfo.documentId);
-	if (isSingleCopyMode && !documentInfo.objectId.isEmpty()){
-		QMutexLocker locker(&m_mutex);
-		if (m_sharedDocuments.contains(documentInfo.objectId)){
-			m_sharedDocuments[documentInfo.objectId].undoManagerModelId = registeredDocument.undoManagerModelId;
-		}
-	}
 	registeredDocument.isDirty = undoManagerPtr->GetDocumentChangeFlag() != idoc::IDocumentStateComparator::DCF_EQUAL;
 	registeredDocument.isLoading = false;
 }

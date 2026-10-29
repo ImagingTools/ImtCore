@@ -11,6 +11,7 @@
 #include <imtbase/COperationContext.h>
 #include <imtauth/CUserInfo.h>
 #include <imtauthgql/imtauthgql.h>
+#include <imtdoc/imtdoc.h>
 #include <imtservergql/DocumentSharing.h>
 
 
@@ -37,13 +38,9 @@ CDM::CDocumentList CCollectionDocumentServiceControllerComp::OnGetOpenedDocument
 		for (const imtdoc::IDocumentService::DocumentListItem& info : list){
 			CDM::CDocumentInfo sdlInfo;
 
-			QString path = info.url.path();
-			QStringList parts = path.split('/', Qt::SkipEmptyParts);
-			QByteArray objectId = parts.count() > 0 ? parts.last().toUtf8() : QByteArray();
-
 			sdlInfo.documentId = info.documentId;
 			sdlInfo.documentName = info.name;
-			sdlInfo.objectId = objectId;
+			sdlInfo.objectId = imtdoc::SourceRefToObjectId(info.documentSourceRef);
 			sdlInfo.objectTypeId = info.typeId;
 			sdlInfo.isDirty = info.isDirty;
 			sdlInfo.hasNameProvider = info.hasNameProvider;
@@ -804,8 +801,7 @@ QByteArray CCollectionDocumentServiceControllerComp::GetCollectionObjectId(const
 	const imtdoc::IDocumentService::DocumentList documentList = m_documentManagerCompPtr->GetOpenedDocumentList(userId);
 	for (const imtdoc::IDocumentService::DocumentListItem& documentItem : documentList){
 		if (documentItem.documentId == documentId){
-			// Documents bound to a collection element carry a 'collection:///<objectId>' source URL.
-			return documentItem.url.path().mid(1).toUtf8();
+			return imtdoc::SourceRefToObjectId(documentItem.documentSourceRef);
 		}
 	}
 

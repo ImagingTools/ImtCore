@@ -84,7 +84,7 @@ private:
 		QByteArray documentId;
 		QByteArray objectId;
 		QByteArray typeId;
-		QString url;
+		QByteArray documentSourceRef;
 		QString name;
 		bool singleDocumentInstance = false;
 	};
@@ -100,7 +100,7 @@ private:
 	void RemoveAllDocuments();
 	void RequestSaveToFile(const QString& filePath);
 	void ProcessSaveRequests();
-	bool RestoreSharedDocument(const DocumentInfo& documentInfo, const QByteArray& userId);
+	bool RestoreSharedDocument(const DocumentInfo& documentInfo, const QByteArray& userId, bool isSingleCopyMode);
 	bool RestoreDocument(
 				const DocumentInfo& documentInfo,
 				const QByteArray& userId,
@@ -109,7 +109,6 @@ private:
 	void RegisterRestoredDocument(
 				const DocumentInfo& documentInfo,
 				const QByteArray& userId,
-				bool isSingleCopyMode,
 				const idoc::IUndoManagerSharedPtr& undoManagerPtr);
 
 private:

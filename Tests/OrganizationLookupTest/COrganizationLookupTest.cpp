@@ -45,6 +45,7 @@
 #include <imtauth/CUserVerificationControllerComp.h>
 #include <imtauth/CTenantRelationshipProviderComp.h>
 #include <imtauth/CRelationshipDocumentValidatorComp.h>
+#include <imtdoc/imtdoc.h>
 
 // Test includes
 #include "CTestCollectionComp.h"
@@ -1609,24 +1610,24 @@ void COrganizationLookupTest::testValidateRelationship_RefusesAnEndedRelationshi
 	const QByteArray endedId = fixture.AddRelationship(connectionId, NewId(), partnerId, imtauth::ITenantRelationshipInfo::TRS_ARCHIVED);
 
 	QString errorMessage;
-	QVERIFY2(validator->ValidateDocumentData(activeId, *fixture.Manager().GetTenantRelationship(activeId), errorMessage), qPrintable(errorMessage));
+	QVERIFY2(validator->ValidateDocumentData(*fixture.Manager().GetTenantRelationship(activeId), errorMessage, imtdoc::CreateObjectSourceParams(activeId).GetPtr()), qPrintable(errorMessage));
 
 	// The document service over the relationships could otherwise write an archived row
-	QVERIFY(!validator->ValidateDocumentData(endedId, *fixture.Manager().GetTenantRelationship(endedId), errorMessage));
+	QVERIFY(!validator->ValidateDocumentData(*fixture.Manager().GetTenantRelationship(endedId), errorMessage, imtdoc::CreateObjectSourceParams(endedId).GetPtr()));
 	QVERIFY(!errorMessage.isEmpty());
 
 	// A stored row that cannot be read may be archived; a new document has no object id
 	imtauth::ITenantRelationshipInfoUniquePtr activePtr = fixture.Manager().GetTenantRelationship(activeId);
 	fixture.Relationships().SetLoadFailingIds({activeId});
 	errorMessage.clear();
-	QVERIFY(!validator->ValidateDocumentData(activeId, *activePtr, errorMessage));
+	QVERIFY(!validator->ValidateDocumentData(*activePtr, errorMessage, imtdoc::CreateObjectSourceParams(activeId).GetPtr()));
 	QVERIFY(!errorMessage.isEmpty());
 	fixture.Relationships().SetLoadFailingIds({});
 
 	imtauth::ITenantRelationshipInfoUniquePtr newPtr = fixture.Manager().GetTenantRelationship(endedId);
 	newPtr->SetSourceTenantId(NewId());
 	newPtr->SetStatus(imtauth::ITenantRelationshipInfo::TRS_ACTIVE);
-	QVERIFY2(validator->ValidateDocumentData(QByteArray(), *newPtr, errorMessage), qPrintable(errorMessage));
+	QVERIFY2(validator->ValidateDocumentData(*newPtr, errorMessage), qPrintable(errorMessage));
 }
 
 

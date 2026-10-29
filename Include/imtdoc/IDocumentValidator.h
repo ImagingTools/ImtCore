@@ -5,9 +5,6 @@
 // ACF includes
 #include <istd/IPolymorphic.h>
 
-// Qt includes
-#include <QtCore/QByteArray>
-
 
 class QString;
 
@@ -17,6 +14,16 @@ namespace istd
 
 
 class IChangeable;
+
+
+}
+
+
+namespace iprm
+{
+
+
+class IParamsSet;
 
 
 }
@@ -55,17 +62,20 @@ public:
 	/**
 		Validate document data.
 		\return		true if document is valid, false otherwise.
-		\param		objectId		ID of the object being validated (empty for new documents not yet saved).
 		\param		document		document data to validate.
 		\param		errorMessage	output parameter with validation error description when return value is false.
 								When validation succeeds, errorMessage is left unchanged.
+		\param		paramsPtr		optional parameters of the document source, provided by the document service.
+								Can be null if the document source is not described (e.g.\ new documents not yet saved).
+								For collection-based documents use \c imtdoc::GetObjectIdFromParams to get the collection object ID
+								and \c imtdoc::GetRevisionFromParams to get the object revision.
 		\param		operationContextPtr		optional operation context providing information about who initiates the operation.
 		\note		Implementations must be thread-safe.
 	*/
 	virtual bool ValidateDocumentData(
-		const QByteArray& objectId,
 		const istd::IChangeable& document,
 		QString& errorMessage,
+		const iprm::IParamsSet* paramsPtr = nullptr,
 		const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
 };
 
