@@ -50,14 +50,6 @@ Item {
 	property bool contentReady: true
 	readonly property bool skeletonVisible: viewBase.skeletonEnabled && !viewBase.contentReady
 
-	// Skeleton: after showSkeleton() covers the content until the next GUI update has been laid out.
-	property bool skeletonEnabled: true
-	property Component skeletonComp: Component {
-		SkeletonFormView {}
-	}
-	property bool contentReady: true
-	readonly property bool skeletonVisible: viewBase.skeletonEnabled && !viewBase.contentReady
-
 	signal commandsModelChanged(var commandsModel)
 	signal commandActivated(string commandId)
 	signal commandActivatedWithParams(string commandId, var params)
