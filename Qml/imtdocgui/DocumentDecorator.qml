@@ -377,7 +377,7 @@ QtObject {
 			return
 		}
 
-		documentManager.doUndo(documentId, 1)
+		runAfterUpdates("Undo")
 	}
 
 	function onRedo(){
@@ -386,7 +386,7 @@ QtObject {
 			return
 		}
 
-		documentManager.doRedo(documentId, 1)
+		runAfterUpdates("Redo")
 	}
 
 	function onSave(){
@@ -539,9 +539,8 @@ QtObject {
 			_internal.deferredViews[index] = true
 		}
 
-		if (!succeeded && _internal.pendingSave){
-			_internal.pendingSave = false
-			documentManager.saveDocumentFailed(root.documentId, qsTr("The document was not saved: a change was not accepted"))
+		if (!succeeded){
+			cancelPendingCommands()
 		}
 
 		pruneOwnUpdates(index, Date.now())
@@ -555,7 +554,7 @@ QtObject {
 			flushDeferredView(i)
 		}
 
-		continuePendingSave()
+		continuePendingCommands()
 	}
 
 	// Drops finished updates, echoes that did not come in ownEchoTimeout and answers lost for ownUpdateTimeout.
@@ -635,17 +634,54 @@ QtObject {
 	// A save asked while updates are pending runs once they are answered: the server saves what the views hold.
 	// A refused update cancels it (saveDocumentFailed), so a save-and-close does not close.
 	function saveAfterUpdates(documentName){
-		_internal.pendingSave = true
-		_internal.pendingSaveName = documentName || ""
+		_internal.pendingCommands.push({"command": "Save", "documentName": documentName || ""})
 	}
 
-	function continuePendingSave(){
-		if (!_internal.pendingSave || hasPendingUpdates()){
+	// Save, Undo and Redo act on what the server holds: asked while own edits are pending, they wait for them, in their order.
+	// An undo sent before a queued edit would undo the step before it, and the edit, which sends the whole view, would redo it.
+	function runAfterUpdates(command){
+		if (hasPendingUpdates()){
+			_internal.pendingCommands.push({"command": command, "documentName": ""})
 			return
 		}
 
-		_internal.pendingSave = false
-		documentManager.saveDocument(root.documentId, _internal.pendingSaveName)
+		runCommand(command, "")
+	}
+
+	function runCommand(command, documentName){
+		if (command === "Save"){
+			documentManager.saveDocument(root.documentId, documentName)
+		}
+		else if (command === "Undo"){
+			documentManager.doUndo(root.documentId, 1)
+		}
+		else if (command === "Redo"){
+			documentManager.doRedo(root.documentId, 1)
+		}
+	}
+
+	function continuePendingCommands(){
+		if (_internal.pendingCommands.length === 0 || hasPendingUpdates()){
+			return
+		}
+
+		let commands = _internal.pendingCommands
+		_internal.pendingCommands = []
+		for (let i = 0; i < commands.length; ++i){
+			runCommand(commands[i].command, commands[i].documentName)
+		}
+	}
+
+	// A refused update leaves the views other than the server has them: the commands waiting for it are dropped
+	function cancelPendingCommands(){
+		let commands = _internal.pendingCommands
+		_internal.pendingCommands = []
+		for (let i = 0; i < commands.length; ++i){
+			if (commands[i].command === "Save"){
+				documentManager.saveDocumentFailed(root.documentId, qsTr("The document was not saved: a change was not accepted"))
+				return
+			}
+		}
 	}
 
 	function flushDeferredView(viewIndex){
@@ -668,7 +704,7 @@ QtObject {
 			}
 		}
 
-		continuePendingSave()
+		continuePendingCommands()
 
 		if (!tracked){
 			_internal.ownUpdatesTimer.stop()
@@ -761,8 +797,7 @@ QtObject {
 		property string startingChangeId: "" // Of the update being sent, see sendUpdate()
 		property var deferredViews: [] // Per view: read once its updates in flight are answered
 		property var queuedUpdates: [] // Per view: changeSet of the edits waiting for the answer to its update, or null
-		property bool pendingSave: false // A save waits for the pending updates, see saveAfterUpdates()
-		property string pendingSaveName: ""
+		property var pendingCommands: [] // Save, Undo and Redo waiting for the pending updates: [{command, documentName}], see runAfterUpdates()
 
 		property Timer answeredUpdatesTimer: Timer {
 			interval: 0

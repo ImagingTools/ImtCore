@@ -432,7 +432,9 @@ QtObject {
 
 	// JSON Patch (RFC 6902) that turns the model as it was before changeSet into the model now.
 	// Inserts and removes keep their order and indexes; changed values come after them with the current values.
-	// Without a known path the patch replaces the whole model. Null when the model cannot be serialized.
+	// Without a known path the patch replaces the whole model, as when a member is missing now (removePermissions()):
+	// whether it was there before the batch is unknown, and "remove" of a missing member is invalid.
+	// Null when the model cannot be serialized.
 	//   toJsonPatch([{"path": ["permissions", 4, "direct"], "operation": "set"}], role)
 	//     -> [{"op": "add", "path": "/permissions/4/direct", "value": true}]
 	//   ("add" of an object member replaces it; an element of a list by its index gets "replace")
@@ -513,7 +515,9 @@ QtObject {
 				patch.push({"op": "add", "path": toJsonPointer(path), "value": current.value})
 			}
 			else{
-				patch.push({"op": "remove", "path": toJsonPointer(path)})
+				// A member missing now may have been missing before too (created and removed in the batch):
+				// "remove" of it would be invalid, and the changeSet does not tell, so the whole model is replaced
+				return [{"op": "replace", "path": "", "value": json}]
 			}
 		}
 

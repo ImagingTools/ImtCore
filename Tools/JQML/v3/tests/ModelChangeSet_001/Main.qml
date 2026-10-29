@@ -357,8 +357,16 @@ Item {
 		let role = root.createRole()
 		root.permission(role, 0).modelChanged([])
 		root.check("manualEmpty.emissions", root.emissions, 1)
-		root.check("manualEmpty.length", root.lastChangeSet.length, 0)
-		root.check("manualEmpty.affected", ChangeSetHelper.isAffected(root.lastChangeSet, "name"), true)
+		root.check("manualEmpty", root.records, ["set permissions[0]"])
+		root.check("manualEmpty.affected", ChangeSetHelper.isAffected(root.lastChangeSet, "name"), false)
+
+		// An unknown change of a child is kept in the transaction of its owner
+		role = root.createRole()
+		role.beginChanges()
+		role.m_name = "Changed"
+		root.permission(role, 1).modelChanged([])
+		role.endChanges()
+		root.check("manualEmpty.transaction", root.records, ["set name", "set permissions[1]"])
 	}
 
 	// toJson escapes what needs it and leaves plain text as it is

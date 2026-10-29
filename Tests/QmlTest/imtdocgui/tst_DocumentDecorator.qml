@@ -546,6 +546,41 @@ TestCase {
 		compare(document.service.calls, [])
 	}
 
+	// An undo before the answer would undo the step before the edit, and the queued edit would bring the step back
+	function test_undoAndRedoWaitForPendingUpdates(){
+		let document = openDocument("Name", false)
+		let service = document.service
+		let controller = controllerOf(service)
+		edit(document.views[0])
+
+		decoratorOf(service).onUndo()
+		decoratorOf(service).onRedo()
+		compare(service.calls, [])
+
+		answer(controller, true)
+		compare(service.calls, [["undo", "doc", 1], ["redo", "doc", 1]])
+	}
+
+	function test_refusedUpdateCancelsPendingUndo(){
+		let document = openDocument("Name", false)
+		let service = document.service
+		let controller = controllerOf(service)
+		edit(document.views[0])
+
+		decoratorOf(service).onUndo()
+		answer(controller, false)
+		wait(0)
+
+		compare(service.calls, [])
+	}
+
+	function test_undoWithoutPendingUpdatesIsAtOnce(){
+		let document = openDocument("Name", false)
+
+		decoratorOf(document.service).onUndo()
+		compare(document.service.calls, [["undo", "doc", 1]])
+	}
+
 	function test_saveWithoutPendingUpdatesIsAtOnce(){
 		let document = openWaitingDocument()
 		document.view.hasChanges = false

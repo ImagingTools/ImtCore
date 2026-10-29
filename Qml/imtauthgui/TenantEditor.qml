@@ -193,7 +193,14 @@ DocumentViewBase {
 		id: representationRefreshTimer
 		interval: 100
 		onTriggered: {
-			if (!stateManager_.isNewTenant && container.representationController)
+			if (stateManager_.isNewTenant || !container.representationController)
+				return
+
+			// Through the document: the read waits while own edits of the organization are not applied yet,
+			// it would replace them otherwise (see DocumentDecorator.updateRepresentationForAllViews())
+			if (container.documentManager && container.documentId !== "")
+				container.documentManager.updateDocumentRepresentation(container.documentId)
+			else
 				container.representationController.updateRepresentationFromDocument()
 		}
 	}

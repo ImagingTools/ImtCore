@@ -378,9 +378,24 @@ TestCase {
 		let role = createRole()
 		permission(role, 0).modelChanged([])
 
+		// The child does not tell what changed in it: all of it may have, nothing outside it
 		compare(testCase.emissions, 1)
-		compare(testCase.lastChangeSet.length, 0)
-		verify(ChangeSetHelper.isAffected(testCase.lastChangeSet, "name"))
+		compare(testCase.records, ["set permissions[0]"])
+		verify(ChangeSetHelper.isAffected(testCase.lastChangeSet, "permissions[0].direct"))
+		verify(!ChangeSetHelper.isAffected(testCase.lastChangeSet, "name"))
+	}
+
+	// An unknown change of a child is kept in the transaction of its owner: the batch is not a name-only edit
+	function test_unknownChildChangeInTransaction(){
+		let role = createRole()
+		role.beginChanges()
+		role.m_name = "Changed"
+		permission(role, 1).modelChanged([])
+		role.endChanges()
+
+		compare(testCase.emissions, 1)
+		compare(testCase.records, ["set name", "set permissions[1]"])
+		verify(!ChangeSetHelper.isOnlyWithin(testCase.lastChangeSet, "name"))
 	}
 
 	// --- ChangeSetHelper
@@ -644,10 +659,14 @@ TestCase {
 		startPatch(role)
 		role.removePermissions()
 
-		compare(verifyPatch(role), [{"op": "remove", "path": "/permissions"}])
+		// Whether the member was there before is unknown: the whole model is replaced, never an invalid "remove"
+		let patch = verifyPatch(role)
+		compare(patch.length, 1)
+		compare(patch[0].op, "replace")
+		compare(patch[0].path, "")
 	}
 
-	// A member created and removed again: the receiver gets a remove of a member it may not have
+	// A member created and removed again: a "remove" of it would fail on the receiver, which never had it
 	function test_jsonPatchOfMemberCreatedAndRemoved(){
 		let role = createTemporaryObject(roleComp, testCase)
 		verify(role.createFromJson('{"id":"r1","name":"Role"}'))
@@ -658,8 +677,10 @@ TestCase {
 		role.m_permissions.appendElement(createAssignment("p0"))
 		role.removePermissions()
 
-		compare(ChangeSetHelper.toJsonPatch(testCase.collected, role), [{"op": "remove", "path": "/permissions"}])
-		verify(!("permissions" in JSON.parse(role.toJson())))
+		let patch = verifyPatch(role)
+		compare(patch.length, 1)
+		compare(patch[0].op, "replace")
+		compare(patch[0].path, "")
 	}
 
 	function test_jsonPatchOfSwap(){
@@ -720,6 +741,13 @@ TestCase {
 		startPatch(role)
 		permission(role, 0).modelChanged([])
 
+		// An element that does not tell what changed in it is replaced as a whole
+		compare(verifyPatch(role), [{"op": "replace", "path": "/permissions/0", "value": JSON.parse(role.toJson()).permissions[0]}])
+
+		// The model itself does not tell: the whole model is replaced
+		role = createRole()
+		startPatch(role)
+		role.modelChanged([])
 		compare(verifyPatch(role), [{"op": "replace", "path": "", "value": JSON.parse(role.toJson())}])
 	}
 

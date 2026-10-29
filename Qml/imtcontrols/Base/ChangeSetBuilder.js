@@ -104,6 +104,11 @@ function prependChildPath(object, child, changeSet){
 		step = location.index < 0 ? [getPathKey(object, location.name)] : [getPathKey(object, location.name), location.index]
 	}
 
+	// The child does not tell what changed in it: all of it may have. An empty changeSet would add nothing to a transaction.
+	if (!changeSet || changeSet.length === 0){
+		return [createChange(step, "set", location !== null ? location.name : "", child)]
+	}
+
 	let result = []
 	for (let i = 0; i < changeSet.length; ++i){
 		let change = changeSet[i]

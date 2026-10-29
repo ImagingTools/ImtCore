@@ -307,19 +307,9 @@ DocumentViewBase {
 		ticketData.m_comments.addElement(newItem)
 		
 		setBlockingUpdateModel(false)
+		// The comment gets its local ID when its update is written (TicketCollectionView.markSentComments()):
+		// an update queued behind another one is written later
 		ticketData.modelChanged([])
-
-		// Assign a temporary local ID to the newly-added comment so that
-		// subsequent doUpdateModel() calls (e.g. assignee change) do not
-		// re-send it as a new message. The server skips comments that
-		// already have an ID set.
-		// Suppress notifications during this assignment to avoid triggering
-		// a second UpdateTicketFromRepresentation request.
-		setBlockingUpdateModel(true)
-		newItem.enableNotifications = false
-		newItem.m_id = "local-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8)
-		newItem.enableNotifications = true
-		setBlockingUpdateModel(false)
 		ticketEditor.commentSubmitted(commentText)
 	}
 

@@ -328,6 +328,11 @@ class BaseClass extends QtObject {
 			step = location.index < 0 ? [this.getPathKey(location.name)] : [this.getPathKey(location.name), location.index]
 		}
 
+		// The child does not tell what changed in it: all of it may have. An empty changeSet would add nothing to a transaction.
+		if (!changeSet || changeSet.length === 0){
+			return [this.createChange(step, "set", location !== null ? location.name : "", child)]
+		}
+
 		let result = []
 		for (let change of changeSet){
 			let path = step !== null && change.path ? step.concat(change.path) : null
