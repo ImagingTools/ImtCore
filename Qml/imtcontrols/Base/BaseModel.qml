@@ -1,4 +1,5 @@
 import QtQuick 2.0
+import "ChangeSetBuilder.js" as ChangeSetBuilder
 
 ListModel {
 	property var owner: null
@@ -313,7 +314,7 @@ ListModel {
 			element.connectProperties()
 		}
 		this.insert(index, {item: element})
-		notifyOwner()
+		notifyOwner([{"operation": "insert", "index": index}])
 	}
 
 	function removeElement(index){
@@ -322,21 +323,28 @@ ListModel {
 		}
 
 		this.remove(index)
-		notifyOwner()
+		notifyOwner([{"operation": "remove", "index": index}])
 	}
 
+	// Reports operations on elements to the owner, see Docs/Development/ModelChangeSet.md
 	// Inside the owner's beginChanges()/endChanges() the change is reported once, at the end - as in the web runtime.
-	function notifyOwner(){
-		if (!owner){
+	function notifyOwner(operations){
+		if (!owner || owner.enableNotifications === false){
 			return
 		}
 
-		if (owner._internal && owner._internal.isTransaction){
-			owner._internal.countChanges++
-		}
-		else{
+		if (owner.getProperties === undefined || owner._internal === undefined){
 			owner.modelChanged([])
+
+			return
 		}
+
+		let changes = []
+		for (let i = 0; i < operations.length; ++i){
+			changes.push(ChangeSetBuilder.createListChange(owner, this, operations[i].operation, operations[i].index))
+		}
+
+		ChangeSetBuilder.reportChanges(owner, changes)
 	}
 
 	function getItemsCount(){
@@ -393,6 +401,8 @@ ListModel {
 
 		this.get(index1).item = item2
 		this.get(index2).item = item1
+
+		notifyOwner([{"operation": "set", "index": index1}, {"operation": "set", "index": index2}])
 
 		return true
 	}

@@ -10,6 +10,7 @@
 #include <imtgql/IGqlContext.h>
 #include <imtbase/ICollectionInfo.h>
 #include <imtauthgql/TenantAccess.h>
+#include <imtservergql/DocumentChange.h>
 
 // Generated includes
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/CrossOrgGrantCollectionDocumentService.h>
@@ -250,7 +251,7 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CCrossOrgGrantCollectionDocumentSer
 
 	grantDataPtr->SetGrantInfo(info);
 
-	m_documentManagerCompPtr->SetDocumentData(userLogin, documentId, *documentPtr);
+	m_documentManagerCompPtr->SetDocumentData(userLogin, documentId, *documentPtr, imtservergql::GetDocumentChangeId(gqlRequest));
 	response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Success;
 
 	return response;

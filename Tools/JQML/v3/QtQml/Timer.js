@@ -60,8 +60,15 @@ class Timer extends QtObject {
             return
         }
 
+        // As Qt, a single-shot timer is stopped before it triggers: start() in onTriggered runs it again
+        if(!this.repeat) {
+            this.stop()
+            this.triggered()
+            return
+        }
+
         this.triggered()
-        if(this.repeat && this.running) {
+        if(this.running) {
             if(this.__timer) clearTimeout(this.__timer)
             this.__timer = setTimeout(()=>{
                 this.__triggered()

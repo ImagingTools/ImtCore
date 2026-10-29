@@ -16,6 +16,7 @@
 #include <imtauth/ITenantInfo.h>
 #include <imtauth/IUserManager.h>
 #include <imtgql/IGqlContext.h>
+#include <imtservergql/DocumentChange.h>
 #include <imtdoc/CDocumentSavedEvent.h>
 #include <imtauth/imtauth.h>
 #include <imtauthgql/TenantAccess.h>
@@ -645,7 +646,7 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceCom
 		m_documentManagerCompPtr->GetDocumentData(userLogin, documentId, previousDocumentPtr);
 	}
 
-	m_documentManagerCompPtr->SetDocumentData(userLogin, documentId, *documentPtr);
+	m_documentManagerCompPtr->SetDocumentData(userLogin, documentId, *documentPtr, imtservergql::GetDocumentChangeId(gqlRequest));
 
 	// For new tenants do NOT auto-save — user will save manually.
 	// For existing tenants, save immediately after each change (like tickets).

@@ -50,6 +50,8 @@ static const inline QByteArray s_authenticationTokenHeaderId = QByteArrayLiteral
 static const inline QByteArray s_productIdHeaderId = QByteArrayLiteral("productid");
 static const inline QByteArray s_permissionPathHeaderId = QByteArrayLiteral("permissionPath");
 static const inline QByteArray s_languageIdHeaderId = QByteArrayLiteral("languageid");
+// Change-ID of a client edit of a document, see imtdoc::IDocumentService::SetDocumentData
+static const inline QByteArray s_documentChangeIdHeaderId = QByteArrayLiteral("documentChangeId");
 
 
 inline bool isValidUuid(const QByteArray& value)

@@ -48,6 +48,9 @@ RemoteCollectionView {
 				DocumentRepresentationController {
 					id: root
 
+					// A refused change stays in the editor
+					readBackOnRefusal: false
+
 					representationModel: ConversationData {}
 
 					function updateRepresentationFromDocument(){
@@ -67,44 +70,20 @@ RemoteCollectionView {
 					}
 
 					property DocumentId documentIdInput: DocumentId {}
-					property GqlSdlRequestSender getConversationRequest: GqlSdlRequestSender {
+					property DocumentRepresentationRequestSender getConversationRequest: DocumentRepresentationRequestSender {
+						representationController: root
 						permissionPath: container.permissionPath
 						gqlCommandId: ImtchatConversationCollectionDocumentServiceSdlCommandIds.s_getConversationRepresentation
 						sdlObjectComp: Component {
-							ConversationData {
-								onFinished: {
-									root.representationModel.copyFrom(this)
-									root.representationUpdated(root.documentId, root.representationModel)
-								}
-							}
-						}
-
-						function onError(message, type){
-							root.updateRepresentationFailed(root.documentId, message)
+							ConversationData {}
 						}
 					}
 
 					property UpdateConversationInput updateConversationInput: UpdateConversationInput {}
-					property GqlSdlRequestSender updateConversationRequest: GqlSdlRequestSender {
+					property DocumentUpdateRequestSender updateConversationRequest: DocumentUpdateRequestSender {
+						representationController: root
 						permissionPath: container.permissionPath
 						gqlCommandId: ImtchatConversationCollectionDocumentServiceSdlCommandIds.s_updateConversationFromRepresentation
-						requestType: 1
-						sdlObjectComp: Component {
-							DocumentOperationStatus {
-								onFinished: {
-									if (m_status === "Success"){
-										root.documentUpdated(root.documentId)
-									}
-									else{
-										root.updateDocumentFailed(root.documentId, m_message !== "" ? m_message : qsTr("The changes could not be saved"))
-									}
-								}
-							}
-						}
-
-						function onError(message, type){
-							root.updateDocumentFailed(root.documentId, message)
-						}
 					}
 				}
 			}

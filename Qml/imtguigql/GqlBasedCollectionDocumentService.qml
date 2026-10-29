@@ -51,7 +51,7 @@ DocumentServiceBase {
 				root.setDocumentName(documentId, documentName)
 			}
 
-			root.documentManagerChanged(operation, objectId, documentId, documentName)
+			root.documentManagerChanged(operation, objectId, documentId, documentName, data.getData("changeId") || "")
 		}
 
 		onRefreshRequired: {

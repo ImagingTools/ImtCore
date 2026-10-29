@@ -13,11 +13,14 @@
 #include <idoc/IUndoManager.h>
 #include <idoc/IDocumentStateComparator.h>
 #include <istd/IChangeable.h>
+#include <istd/CChangeNotifier.h>
+#include <imod/TModelWrap.h>
 #include <itest/CStandardTestExecutor.h>
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <imtdoc/CCollectionDocumentServiceBase.h>
+#include <imtdoc/CDocumentChangedEvent.h>
 #include <imtdoc/IDocumentServiceEventHandler.h>
 #include <imtdoc/IPersistentUndoManager.h>
 
@@ -107,6 +110,56 @@ private:
 	QByteArray m_data;
 	QList<imod::IObserver*> m_observers;
 };
+
+
+/**
+	Document data whose changes reach the observers through an ACF model, like those of a real document.
+*/
+class CNotifyingDocumentData: virtual public istd::IChangeable
+{
+public:
+	QByteArray GetData() const { return m_data; }
+
+	// reimplemented (istd::IChangeable)
+	virtual int GetSupportedOperations() const override { return SO_CLONE | SO_COPY; }
+
+	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/ = CM_WITHOUT_REFS) override
+	{
+		const CNotifyingDocumentData* otherPtr = dynamic_cast<const CNotifyingDocumentData*>(&object);
+		if (otherPtr == nullptr) {
+			return false;
+		}
+
+		istd::CChangeNotifier notifier(this);
+		m_data = otherPtr->m_data;
+
+		return true;
+	}
+
+	virtual istd::IChangeableUniquePtr CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
+
+	void SetData(const QByteArray& data)
+	{
+		istd::CChangeNotifier notifier(this);
+		m_data = data;
+	}
+
+private:
+	QByteArray m_data;
+};
+
+typedef imod::TModelWrap<CNotifyingDocumentData> CNotifyingDocument;
+
+
+inline istd::IChangeableUniquePtr CNotifyingDocumentData::CloneMe(CompatibilityMode mode) const
+{
+	istd::IChangeableUniquePtr clonePtr(new CNotifyingDocument);
+	if (clonePtr->CopyFrom(*this, mode)){
+		return clonePtr;
+	}
+
+	return nullptr;
+}
 
 
 /**
@@ -458,6 +511,7 @@ public:
 		QUrl documentUrl;
 		bool isDirty;
 		bool accepted;
+		QByteArray changeId; ///< Of a DocumentChangedEvent
 	};
 
 	CMockEventHandler()
@@ -496,6 +550,11 @@ public:
 		record.documentUrl = eventPtr->GetDocumentUrl();
 		record.isDirty = eventPtr->IsDocumentDirty();
 
+		const imtdoc::CDocumentChangedEvent* changedEventPtr = dynamic_cast<const imtdoc::CDocumentChangedEvent*>(eventPtr);
+		if (changedEventPtr != nullptr) {
+			record.changeId = changedEventPtr->GetChangeId();
+		}
+
 		if (m_shouldReject) {
 			eventPtr->Reject();
 		}
@@ -528,6 +587,7 @@ public:
 		, m_validateShouldFail(false)
 		, m_validationErrorMessage()
 		, m_singleCopyMode(false)
+		, m_createsNotifyingDocuments(false)
 	{
 		RegisterEventHandler(m_mockEventHandler);
 	}
@@ -548,6 +608,7 @@ public:
 	void SetValidateShouldFail(bool fail) { m_validateShouldFail = fail; }
 	void SetValidationErrorMessage(const QString& msg) { m_validationErrorMessage = msg; }
 	void SetSingleCopyMode(bool enabled) { m_singleCopyMode = enabled; }
+	void SetCreatesNotifyingDocuments(bool enabled) { m_createsNotifyingDocuments = enabled; }
 
 	// Expose protected methods for testing
 	using imtdoc::CDocumentServiceBase::FindDocument;
@@ -573,6 +634,10 @@ protected:
 	{
 		if (m_createObjectShouldFail) {
 			return istd::IChangeableUniquePtr();
+		}
+
+		if (m_createsNotifyingDocuments) {
+			return istd::IChangeableUniquePtr(new CNotifyingDocument());
 		}
 
 		return istd::IChangeableUniquePtr(new CMockDocumentObject());
@@ -636,6 +701,7 @@ private:
 	bool m_validateShouldFail;
 	QString m_validationErrorMessage;
 	bool m_singleCopyMode;
+	bool m_createsNotifyingDocuments;
 };
 
 
@@ -727,6 +793,10 @@ private slots:
 	void SetDocumentDataInvalidUserTest();
 	void SetDocumentDataInvalidDocumentTest();
 	void SetDocumentDataWhileLoadingTest();
+	void SetDocumentDataChangeIdReachesEventTest();
+	void SetDocumentDataWithoutChangeIdTest();
+	void ChangeIdIsNotKeptAfterWriteTest();
+	void SingleCopyChangeIdReachesAllUsersTest();
 
 	// SaveDocument tests
 	void SaveDocumentNewDocumentTest();

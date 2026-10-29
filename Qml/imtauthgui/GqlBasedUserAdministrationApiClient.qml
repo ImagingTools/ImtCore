@@ -344,49 +344,25 @@ QtObject {
 			property DocumentId getRoleInput: DocumentId {}
 			property UpdateRoleFromRepresentationInput updateRoleInput: UpdateRoleFromRepresentationInput {}
 
-			property GqlSdlRequestSender getRoleRequest: GqlSdlRequestSender {
+			property DocumentRepresentationRequestSender getRoleRequest: DocumentRepresentationRequestSender {
+				representationController: roleReprController
 				permissionPath: root.permissionPath
 				gqlCommandId: ImtauthRoleCollectionDocumentServiceSdlCommandIds.s_getRoleRepresentation
 				sdlObjectComp: Component {
-					RoleData {
-						onFinished: {
-							roleReprController.representationModel.copyFrom(this)
-							root.__applyDocumentObjectId(root.__roleDocumentService, roleReprController.documentId, roleReprController.representationModel)
-							roleReprController.representationUpdated(
-								roleReprController.documentId,
-								roleReprController.representationModel)
-						}
-					}
+					RoleData {}
 				}
 
-				function onError(message, type){
-					roleReprController.updateRepresentationFailed(roleReprController.documentId, message)
+				function getRepresentationModel(receivedModel, currentModel){
+					root.__applyDocumentObjectId(root.__roleDocumentService, roleReprController.documentId, receivedModel)
+
+					return receivedModel
 				}
 			}
 
-			property GqlSdlRequestSender updateRoleRequest: GqlSdlRequestSender {
+			property DocumentUpdateRequestSender updateRoleRequest: DocumentUpdateRequestSender {
+				representationController: roleReprController
 				permissionPath: root.permissionPath
 				gqlCommandId: ImtauthRoleCollectionDocumentServiceSdlCommandIds.s_updateRoleFromRepresentation
-				requestType: 1
-				sdlObjectComp: Component {
-					DocumentOperationStatus {
-						onFinished: {
-							if (m_status === "Success"){
-								roleReprController.documentUpdated(roleReprController.documentId)
-							}
-							else{
-								roleReprController.updateDocumentFailed(roleReprController.documentId, m_message !== "" ? m_message : qsTr("The changes could not be saved"))
-								roleReprController.updateRepresentationFromDocument()
-							}
-						}
-					}
-				}
-
-				function onError(message, type){
-					roleReprController.updateDocumentFailed(roleReprController.documentId, message)
-					// The refused change was not applied: show what the document holds.
-					roleReprController.updateRepresentationFromDocument()
-				}
 			}
 
 			property AssignmentsRefresher assignmentsRefresher: AssignmentsRefresher {
@@ -489,49 +465,25 @@ QtObject {
 			property DocumentId getGroupInput: DocumentId {}
 			property UpdateGroupFromRepresentationInput updateGroupInput: UpdateGroupFromRepresentationInput {}
 
-			property GqlSdlRequestSender getGroupRequest: GqlSdlRequestSender {
+			property DocumentRepresentationRequestSender getGroupRequest: DocumentRepresentationRequestSender {
+				representationController: groupReprController
 				permissionPath: root.permissionPath
 				gqlCommandId: ImtauthGroupCollectionDocumentServiceSdlCommandIds.s_getGroupRepresentation
 				sdlObjectComp: Component {
-					GroupData {
-						onFinished: {
-							groupReprController.representationModel.copyFrom(this)
-							root.__applyDocumentObjectId(root.__groupDocumentService, groupReprController.documentId, groupReprController.representationModel)
-							groupReprController.representationUpdated(
-								groupReprController.documentId,
-								groupReprController.representationModel)
-						}
-					}
+					GroupData {}
 				}
 
-				function onError(message, type){
-					groupReprController.updateRepresentationFailed(groupReprController.documentId, message)
+				function getRepresentationModel(receivedModel, currentModel){
+					root.__applyDocumentObjectId(root.__groupDocumentService, groupReprController.documentId, receivedModel)
+
+					return receivedModel
 				}
 			}
 
-			property GqlSdlRequestSender updateGroupRequest: GqlSdlRequestSender {
+			property DocumentUpdateRequestSender updateGroupRequest: DocumentUpdateRequestSender {
+				representationController: groupReprController
 				permissionPath: root.permissionPath
 				gqlCommandId: ImtauthGroupCollectionDocumentServiceSdlCommandIds.s_updateGroupFromRepresentation
-				requestType: 1
-				sdlObjectComp: Component {
-					DocumentOperationStatus {
-						onFinished: {
-							if (m_status === "Success"){
-								groupReprController.documentUpdated(groupReprController.documentId)
-							}
-							else{
-								groupReprController.updateDocumentFailed(groupReprController.documentId, m_message !== "" ? m_message : qsTr("The changes could not be saved"))
-								groupReprController.updateRepresentationFromDocument()
-							}
-						}
-					}
-				}
-
-				function onError(message, type){
-					groupReprController.updateDocumentFailed(groupReprController.documentId, message)
-					// The refused change was not applied: show what the document holds.
-					groupReprController.updateRepresentationFromDocument()
-				}
 			}
 
 			property AssignmentsRefresher assignmentsRefresher: AssignmentsRefresher {
@@ -657,49 +609,25 @@ QtObject {
 			property DocumentId getUserInput: DocumentId {}
 			property UpdateUserFromRepresentationInput updateUserInput: UpdateUserFromRepresentationInput {}
 
-			property GqlSdlRequestSender getUserRequest: GqlSdlRequestSender {
+			property DocumentRepresentationRequestSender getUserRequest: DocumentRepresentationRequestSender {
+				representationController: userReprController
 				permissionPath: root.permissionPath
 				gqlCommandId: ImtauthUserCollectionDocumentServiceSdlCommandIds.s_getUserRepresentation
 				sdlObjectComp: Component {
-					UserData {
-						onFinished: {
-							userReprController.representationModel.copyFrom(this)
-							root.__applyDocumentObjectId(root.__userDocumentService, userReprController.documentId, userReprController.representationModel)
-							userReprController.representationUpdated(
-								userReprController.documentId,
-								userReprController.representationModel)
-						}
-					}
+					UserData {}
 				}
 
-				function onError(message, type){
-					userReprController.updateRepresentationFailed(userReprController.documentId, message)
+				function getRepresentationModel(receivedModel, currentModel){
+					root.__applyDocumentObjectId(root.__userDocumentService, userReprController.documentId, receivedModel)
+
+					return receivedModel
 				}
 			}
 
-			property GqlSdlRequestSender updateUserRequest: GqlSdlRequestSender {
+			property DocumentUpdateRequestSender updateUserRequest: DocumentUpdateRequestSender {
+				representationController: userReprController
 				permissionPath: root.permissionPath
 				gqlCommandId: ImtauthUserCollectionDocumentServiceSdlCommandIds.s_updateUserFromRepresentation
-				requestType: 1
-				sdlObjectComp: Component {
-					DocumentOperationStatus {
-						onFinished: {
-							if (m_status === "Success"){
-								userReprController.documentUpdated(userReprController.documentId)
-							}
-							else{
-								userReprController.updateDocumentFailed(userReprController.documentId, m_message !== "" ? m_message : qsTr("The changes could not be saved"))
-								userReprController.updateRepresentationFromDocument()
-							}
-						}
-					}
-				}
-
-				function onError(message, type){
-					userReprController.updateDocumentFailed(userReprController.documentId, message)
-					// The refused change was not applied: show what the document holds.
-					userReprController.updateRepresentationFromDocument()
-				}
 			}
 
 			property AssignmentsRefresher assignmentsRefresher: AssignmentsRefresher {

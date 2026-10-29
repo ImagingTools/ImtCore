@@ -1759,6 +1759,9 @@ QtObject {
 		DocumentRepresentationController {
 			id: crossOrgGrantReprController
 
+			// A refused change stays in the editor
+			readBackOnRefusal: false
+
 			// A new grant shows the defaults of the server (active, the grantor), not empty SDL values
 			requestRepresentationOnCreate: true
 
@@ -1785,45 +1788,19 @@ QtObject {
 			property DocumentId getCrossOrgGrantInput: DocumentId {}
 			property UpdateGrantFromRepresentationInput updateCrossOrgGrantInputInput: UpdateGrantFromRepresentationInput {}
 
-			property GqlSdlRequestSender getCrossOrgGrantInputRequest: GqlSdlRequestSender {
+			property DocumentRepresentationRequestSender getCrossOrgGrantInputRequest: DocumentRepresentationRequestSender {
+				representationController: crossOrgGrantReprController
 				permissionPath: root.permissionPath
 				gqlCommandId: ImtauthCrossOrgGrantCollectionDocumentServiceSdlCommandIds.s_getGrantRepresentation
 				sdlObjectComp: Component {
-					CrossOrgGrant {
-						onFinished: {
-							crossOrgGrantReprController.representationModel.copyFrom(this)
-							crossOrgGrantReprController.representationUpdated(
-								crossOrgGrantReprController.documentId,
-								crossOrgGrantReprController.representationModel)
-						}
-					}
-				}
-
-				function onError(message, type){
-					crossOrgGrantReprController.updateRepresentationFailed(crossOrgGrantReprController.documentId, message)
+					CrossOrgGrant {}
 				}
 			}
 
-			property GqlSdlRequestSender updateCrossOrgGrantRequest: GqlSdlRequestSender {
+			property DocumentUpdateRequestSender updateCrossOrgGrantRequest: DocumentUpdateRequestSender {
+				representationController: crossOrgGrantReprController
 				permissionPath: root.permissionPath
 				gqlCommandId: ImtauthCrossOrgGrantCollectionDocumentServiceSdlCommandIds.s_updateGrantFromRepresentation
-				requestType: 1
-				sdlObjectComp: Component {
-					DocumentOperationStatus {
-						onFinished: {
-							if (m_status === "Success"){
-								crossOrgGrantReprController.documentUpdated(crossOrgGrantReprController.documentId)
-							}
-							else{
-								crossOrgGrantReprController.updateDocumentFailed(crossOrgGrantReprController.documentId, m_message !== "" ? m_message : qsTr("The changes could not be saved"))
-							}
-						}
-					}
-				}
-
-				function onError(message, type){
-					crossOrgGrantReprController.updateDocumentFailed(crossOrgGrantReprController.documentId, message)
-				}
 			}
 		}
 	}

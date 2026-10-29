@@ -270,9 +270,18 @@ public:
 		A deep copy of \a document is stored; the undo manager is \e not
 		automatically updated.
 
+		\param changeId  Change-ID of the client edit that \a document carries, taken from the
+		                 \c documentChangeId header of the request; it comes back in the
+		                 \c DocumentChanged notification, so the client knows its own change.
+		                 Empty for a change the server makes itself (rollback, event handling).
+
 		\return  \c OS_OK on success, or an appropriate error code.
 	*/
-	virtual OperationStatus SetDocumentData(const QByteArray& userId, const QByteArray& documentId, const istd::IChangeable& document) = 0;
+	virtual OperationStatus SetDocumentData(
+				const QByteArray& userId,
+				const QByteArray& documentId,
+				const istd::IChangeable& document,
+				const QByteArray& changeId = QByteArray()) = 0;
 
 	/**
 		\brief Invoke \a method on the live document object, under the service's internal lock.

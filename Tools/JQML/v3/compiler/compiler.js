@@ -893,6 +893,13 @@ function compile(options){
                         stat.value.add(';')
                         return stat
                     }
+                    // The default branch walks the node name as a string, char by char, without end
+                    case 'throw': {
+                        stat.value.add('throw ')
+                        this.prepare(tree[1], stat)
+                        stat.value.add(';')
+                        return stat
+                    }
                     case 'num': {
                         stat.value.add(tree[1].toString())
                         return stat
@@ -1400,7 +1407,8 @@ function compile(options){
                     case 'try': {
                         stat.value.add(`try{`)
                         this.prepare(tree[1], stat)
-                        if (tree[2][0]) {
+                        // try { } finally { } has no catch block: tree[2] is undefined
+                        if (tree[2] && tree[2][0]) {
                             let local = []
                             stat.ignore += tree[2][0]
                             stat.value.add(`}catch(${tree[2][0]}){`)
@@ -1411,7 +1419,7 @@ function compile(options){
                             this.prepare(tree[2][1], stat)
                             let index = stat.local.indexOf(local)
                             if (index >= 0) stat.local.splice(index, 1)
-                        } else {
+                        } else if (tree[2]) {
                             stat.value.add(`}catch{`)
                             this.prepare(tree[2][1], stat)
                         }

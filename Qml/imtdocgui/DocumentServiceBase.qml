@@ -64,7 +64,8 @@ QtObject {
 	signal undoInfoReceiveFailed(string documentId, string message)
 
 	// typeOperation: NewDocumentCreated, DocumentOpened, DocumentChanged, DocumentSaved, DocumentClosed
-	signal documentManagerChanged(string typeOperation, string objectId, string documentId, string documentName)
+	// changeId: of the client update that made a DocumentChanged, empty for other changes
+	signal documentManagerChanged(string typeOperation, string objectId, string documentId, string documentName, string changeId)
 	signal documentDataLoaded(string documentId)
 	signal startUpdateRepresentation(string documentId, var representation)
 	signal documentRepresentationUpdated(string documentId, var representation)

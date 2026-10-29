@@ -16,6 +16,7 @@
 #include <imtchat/IChatMessage.h>
 #include <imtchat/IChatService.h>
 #include <imtchat/IAttachmentStorage.h>
+#include <imtservergql/DocumentChange.h>
 #include <imtchat/IConversation.h>
 #include <imtbase/IObjectCollectionIterator.h>
 #include <imtbase/CCollectionFilter.h>
@@ -592,7 +593,7 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTicketCollectionDocumentServiceCom
 		}
 	}
 
-	m_documentManagerCompPtr->SetDocumentData(userLogin, documentId, *ticketPtr);
+	m_documentManagerCompPtr->SetDocumentData(userLogin, documentId, *ticketPtr, imtservergql::GetDocumentChangeId(gqlRequest));
 
 	// For new tickets (number == 0), do NOT auto-save — the user will save
 	// manually via the Undo/Redo/Save commands panel in the editor.

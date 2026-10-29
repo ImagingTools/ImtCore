@@ -81,6 +81,8 @@ type DocumentServiceNotification {
 	isDirty: Bool
 	isLoading: Bool
 	hasNameProvider: Bool
+	# Change-ID of the client edit that made a DocumentChanged, from its documentChangeId request header
+	changeId: ID
 }
 
 type SetDocumentNameInput {

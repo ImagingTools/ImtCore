@@ -91,7 +91,11 @@ public:
 	virtual OperationStatus SetDocumentName(const QByteArray& userId, const QByteArray& documentId, const QString& documentName) override;
 	virtual const istd::IChangeable* GetDocumentPtr(const QByteArray& userId, const QByteArray& documentId) const override;
 	virtual OperationStatus GetDocumentData(const QByteArray& userId, const QByteArray& documentId, istd::IChangeableSharedPtr& documentPtr) const override;
-	virtual OperationStatus SetDocumentData(const QByteArray& userId, const QByteArray& documentId, const istd::IChangeable& document) override;
+	virtual OperationStatus SetDocumentData(
+				const QByteArray& userId,
+				const QByteArray& documentId,
+				const istd::IChangeable& document,
+				const QByteArray& changeId = QByteArray()) override;
 	virtual OperationStatus ExecuteDocumentMethod(const QByteArray& userId, const QByteArray& documentId, const CDocumentMethod& method) override;
 	virtual OperationStatus GetDocumentUndoManager(
 				const QByteArray& userId,
@@ -307,9 +311,20 @@ protected:
 	typedef QList<UserDocumentPair> UserDocumentPairList;
 	UserDocumentPairList FindDocumentsByObjectId(const QByteArray& objectId) const;
 
+	/**
+		Change-ID of the c SetDocumentData that is writing a object on the current thread, empty otherwise.
+	*/
+	QByteArray GetWritingChangeId(const istd::IChangeable& object) const;
+
 	typedef QMap<QByteArray, WorkingDocument> WorkingDocumentList;
 	mutable QMap<QByteArray, WorkingDocumentList> m_userDocuments; ///< Two-level map: userId → documentId → WorkingDocument.
 	mutable QRecursiveMutex m_mutex; ///< Guards \c m_userDocuments and \c m_sharedDocuments.
+
+	// SetDocumentData copies into the object under m_mutex and OnUpdate runs inside that copy, on the same thread.
+	// A change notified meanwhile by another thread (e.g. an undo) must not get the ID, so the thread is compared first.
+	std::atomic<QThread*> m_writingThreadPtr = nullptr; ///< Thread running \c SetDocumentData.
+	std::atomic<const istd::IChangeable*> m_writingObjectPtr = nullptr; ///< Document object it writes.
+	QByteArray m_writingChangeId; ///< Change-ID of that write; read only on the writing thread.
 
 	QMap<QByteArray, SharedDocumentData> m_sharedDocuments; ///< Single-copy-mode shared entries (objectId → SharedDocumentData).
 

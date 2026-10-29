@@ -7,6 +7,7 @@
 #include <imtbasesdl/SDL/1.0/CPP/CollectionDocumentService.h>
 #include <imtbase/IObjectCollectionIterator.h>
 #include <imtaccount/IContactInfo.h>
+#include <imtservergql/DocumentChange.h>
 
 // ControlsGallery includes
 #include <controlsgallerysdl/SDL/1.0/CPP/ContactInfoCollectionDocumentService.h>
@@ -55,7 +56,7 @@ sdl::V1_0::controlsgallery::CContactInfoData CContactInfoCollectionDocumentServi
 
 sdl::V1_0::imtbase::CDocumentOperationStatus CContactInfoCollectionDocumentServiceComp::OnUpdateContactInfoFromRepresentation(
 			const sdl::V1_0::controlsgallery::CUpdateContactInfoFromRepresentationGqlRequest& updateContactInfoFromRepresentationRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	sdl::V1_0::controlsgallery::UpdateContactInfoFromRepresentationRequestArguments arguments = updateContactInfoFromRepresentationRequest.GetRequestedArguments();
@@ -99,7 +100,7 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CContactInfoCollectionDocumentServi
 		contactInfoPtr->SetEmail(*contactInfo.email);
 	}
 
-	m_documentManagerCompPtr->SetDocumentData("", documentId, *contactInfoPtr);
+	m_documentManagerCompPtr->SetDocumentData("", documentId, *contactInfoPtr, imtservergql::GetDocumentChangeId(gqlRequest));
 
 	response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Success;
 
@@ -174,7 +175,7 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CContactInfoCollectionDocumentServi
 		contactInfoPtr->SetEmail(*emailInfo.email);
 	}
 
-	m_documentManagerCompPtr->SetDocumentData("", documentId, *contactInfoPtr);
+	m_documentManagerCompPtr->SetDocumentData("", documentId, *contactInfoPtr, imtservergql::GetDocumentChangeId(gqlRequest));
 
 	response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Success;
 

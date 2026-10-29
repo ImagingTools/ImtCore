@@ -87,6 +87,12 @@ QNetworkRequest* CGqlClientEngineComp::CreateNetworkRequest(const imtgql::IGqlRe
 		if (!languageId.isEmpty()){
 			networkRequest->setRawHeader(imtbase::s_languageIdHeaderId, languageId);
 		}
+
+		// A forwarded edit keeps its change-ID, the remote server returns it in the DocumentChanged notification
+		QByteArray documentChangeId = contextPtr->GetHeaders().value(imtbase::s_documentChangeIdHeaderId.toLower());
+		if (!documentChangeId.isEmpty()){
+			networkRequest->setRawHeader(imtbase::s_documentChangeIdHeaderId, documentChangeId);
+		}
 	}
 
 	const QByteArray protocolVersion = request.GetProtocolVersion();

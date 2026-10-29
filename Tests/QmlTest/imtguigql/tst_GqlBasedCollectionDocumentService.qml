@@ -121,6 +121,34 @@ TestCase {
 		return JSON.stringify({"data": {"GetOpenedDocumentList": {"documentList": documents}}})
 	}
 
+	Component {
+		id: notificationComp
+
+		QtObject {
+			property var values: ({})
+
+			function getData(key){
+				return values[key]
+			}
+		}
+	}
+
+	function test_documentChangedPassesChangeId(){
+		let service = openDocument(false)
+		let spy = createTemporaryObject(spyComp, testCase, {"target": service, "signalName": "documentManagerChanged"})
+		let notification = createTemporaryObject(notificationComp, testCase, {"values": {
+			"documentOperation": "DocumentChanged", "documentId": "doc", "objectId": "obj", "documentName": "Name", "changeId": "change-1"}})
+		let plainNotification = createTemporaryObject(notificationComp, testCase, {"values": {
+			"documentOperation": "DocumentChanged", "documentId": "doc", "objectId": "obj", "documentName": "Name"}})
+
+		service.documentManagerSubscription.messageReceived(notification)
+		service.documentManagerSubscription.messageReceived(plainNotification)
+
+		compare(spy.count, 2)
+		compare(spy.signalArguments[0][4], "change-1")
+		compare(spy.signalArguments[1][4], "", "A change without the ID is not an own one")
+	}
+
 	function test_resyncClosesDocumentTheServerNoLongerHas(){
 		let service = openDocument(true)
 		let lostSpy = createTemporaryObject(spyComp, testCase, {"target": service, "signalName": "documentLost"})

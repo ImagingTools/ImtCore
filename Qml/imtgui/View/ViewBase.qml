@@ -53,7 +53,8 @@ Item {
 	signal commandsModelChanged(var commandsModel)
 	signal commandActivated(string commandId)
 	signal commandActivatedWithParams(string commandId, var params)
-	signal modelDataChanged(var view, var model)
+	// changeSet of model.modelChanged, see Docs/Development/ModelChangeSet.md
+	signal modelDataChanged(var view, var model, var changeSet)
 	signal guiUpdated(var view, var model)
 	signal guiVisibleChanged(var view, bool visible)
 
@@ -63,12 +64,12 @@ Item {
 
 	Connections {
 		target: viewBase.model
-		function onModelChanged(){
+		function onModelChanged(changeSet){
 			if (viewBase.internal__.blockingUpdateModel){
 				return
 			}
 
-			viewBase.modelDataChanged(viewBase, viewBase.model)
+			viewBase.modelDataChanged(viewBase, viewBase.model, changeSet)
 		}
 	}
 	

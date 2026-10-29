@@ -70,12 +70,12 @@ TestCase {
 		}
 	}
 
-	// A save the server refuses by its status is reported and the editor shows the stored document again
-	function test_refusedStatusIsReportedAndReloaded_data(){
+	// A save the server refuses by its status is reported; reading the document again is left to DocumentDecorator
+	function test_refusedStatusIsReported_data(){
 		return editors_data()
 	}
 
-	function test_refusedStatusIsReportedAndReloaded(data){
+	function test_refusedStatusIsReported(data){
 		let client = createTemporaryObject(clientComp, testCase)
 		let parts = editorParts(client, data.typeId)
 
@@ -87,20 +87,17 @@ TestCase {
 		let status = {}
 		status[data.update] = {"status": "Failed", "message": "Refused by the server"}
 		GqlTestTransport.queueResponse(data.update, JSON.stringify({"data": status}))
-		let representation = {}
-		representation[data.get] = {"id": "element-id", "name": "Stored"}
-		GqlTestTransport.queueResponse(data.get, JSON.stringify({"data": representation}))
 
 		controller.updateDocumentFromRepresentation()
 
 		tryCompare(failedSpy, "count", 1, 5000)
 		compare(failedSpy.signalArguments[0][1], "Refused by the server")
-		tryVerify(function(){ return controller.representationModel.m_name === "Stored" }, 5000, "The stored document is shown again")
 
 		wait(300)
 		let commands = GqlTestTransport.requestedCommands()
 		compare(commands.filter(function(command){ return command === data.update }).length, 1, "The refused change is sent once")
-		compare(commands.filter(function(command){ return command === data.get }).length, 1, "The document is read again once")
+		compare(commands.filter(function(command){ return command === data.get }).length, 0, "The controller does not read the document itself")
+		verify(controller.readBackOnRefusal, "DocumentDecorator reads the editor again after a refusal")
 	}
 
 	function test_storedDocumentKeepsTheElementId_data(){
