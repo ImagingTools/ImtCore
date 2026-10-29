@@ -160,9 +160,26 @@ QtObject {
 		return patternStep === "*" || patternStep === pathStep
 	}
 
+	// True when the insert or remove of change, at the step where it differs from pattern steps, moves the element
+	// the pattern names: a later index of the same list.
+	function isElementMoved(change, steps, stepIndex){
+		if (change.operation !== "insert" && change.operation !== "remove"){
+			return false
+		}
+
+		let path = change.path
+		if (stepIndex !== path.length - 1){
+			return false
+		}
+
+		return typeof steps[stepIndex] === "number" && typeof path[stepIndex] === "number" && steps[stepIndex] > path[stepIndex]
+	}
+
 	// True when one change may have changed the value at pattern: at it, inside it, or above it.
+	// An insert or a remove moves the later elements of its list, so it changes the values at their indexes too.
 	// For pattern "permissions[4]": true for ["permissions", 4, "direct"] (inside), ["permissions"] (above),
-	// a change without a path (unknown); false for ["name"] and ["permissions", 5].
+	// a change without a path (unknown), "remove" or "insert" of ["permissions", 1] (the element 4 moves);
+	// false for ["name"], "set" of ["permissions", 5] and "remove" of ["permissions", 5].
 	function changeAffects(change, pattern){
 		let steps = parsePattern(pattern)
 		let path = change.path
@@ -173,7 +190,7 @@ QtObject {
 		let count = Math.min(steps.length, path.length)
 		for (let i = 0; i < count; ++i){
 			if (!stepMatches(steps[i], path[i])){
-				return false
+				return isElementMoved(change, steps, i)
 			}
 		}
 

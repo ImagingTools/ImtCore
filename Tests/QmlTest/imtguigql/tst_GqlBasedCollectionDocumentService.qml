@@ -200,6 +200,10 @@ TestCase {
 		service.closeDocument("doc")
 
 		compare(controller.updateCount, 1, "The GUI state is written to the document before saving")
+		compare(service.calls, [], "The save waits for the answer to the update")
+
+		controller.documentUpdated(controller.documentId)
+		wait(0)
 		compare(service.calls, [["save", "doc"]])
 
 		service.handleSaveDocumentResult("doc", "Success", "", "")
@@ -209,12 +213,32 @@ TestCase {
 
 	function test_failedSaveKeepsDocumentOpen(){
 		let service = openDocument(true)
+		let controller = controllerOf(service)
 
 		service.closeDocument("doc")
+		controller.documentUpdated(controller.documentId)
+		wait(0)
 		service.handleSaveDocumentResult("doc", "Failed", "Disk full", "")
 		service.handleSaveDocumentResult("doc", "Success", "", "")
 
 		compare(service.calls, [["save", "doc"]])
+	}
+
+	// The update of the GUI state is refused: the document is neither saved nor closed
+	function test_refusedUpdateKeepsDocumentOpen(){
+		let service = openDocument(true)
+		let controller = controllerOf(service)
+		let failedSpy = createTemporaryObject(spyComp, testCase, {target: service, signalName: "saveDocumentFailed"})
+
+		service.closeDocument("doc")
+		controller.updateDocumentFailed(controller.documentId, "Refused")
+		wait(0)
+
+		compare(service.calls, [])
+		compare(failedSpy.count, 1)
+
+		service.handleSaveDocumentResult("doc", "Success", "", "")
+		compare(service.calls, [], "The cancelled save-and-close does not close on a later save")
 	}
 
 	function test_closeWithoutSaving(){

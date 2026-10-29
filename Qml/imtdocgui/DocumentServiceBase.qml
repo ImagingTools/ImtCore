@@ -392,6 +392,24 @@ QtObject {
 		return __internal.openedDocuments[index].documentDecorator.viewsAcceptSave()
 	}
 
+	// True while a view of the document has an update without an answer or edits queued behind it (see DocumentDecorator).
+	function documentHasPendingUpdates(documentId){
+		let index = getDocumentIndexByDocumentId(documentId)
+		if (index < 0){
+			return false
+		}
+
+		return __internal.openedDocuments[index].documentDecorator.hasPendingUpdates()
+	}
+
+	// Saves the document once its pending updates are answered; a refused update fails the save.
+	function saveDocumentAfterUpdates(documentId, documentName){
+		let index = getDocumentIndexByDocumentId(documentId)
+		if (index >= 0){
+			__internal.openedDocuments[index].documentDecorator.saveAfterUpdates(documentName)
+		}
+	}
+
 	// Writes the GUI state of the document views to the document.
 	function commitDocumentChanges(documentId){
 		let index = getDocumentIndexByDocumentId(documentId)

@@ -288,6 +288,11 @@ Item {
 		root.records = []
 		fieldFilter.m_filterOperations.push("Equal")
 		root.check("primitiveArray.inPlace", root.records, [])
+
+		// An array of values read by fromObject is a new value, unlike a list of SDL objects filled again
+		root.watch(fieldFilter)
+		fieldFilter.createFromJson('{"__typename":"FieldFilter","fieldId":"name","filterValue":"x","filterValueType":"String","filterOperations":["Equal"]}')
+		root.check("primitiveArray.fromObject", root.records.indexOf("set filterOperations") >= 0, true)
 	}
 
 	function testRelativeToListener(){

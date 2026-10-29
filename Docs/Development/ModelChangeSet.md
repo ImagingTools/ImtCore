@@ -74,7 +74,7 @@ Changes made between `beginChanges()` and `endChanges()` come in **one** `modelC
 
 | Function | Returns |
 |---|---|
-| `isAffected(changeSet, pattern)` | true when the value at `pattern` may have changed: a change at it, inside it or above it |
+| `isAffected(changeSet, pattern)` | true when the value at `pattern` may have changed: a change at it, inside it or above it, or an insert/remove before its index in the same list (the element moves) |
 | `isOnlyWithin(changeSet, pattern)` | true when every change lies inside `pattern`; false for an empty or unknown `changeSet` |
 | `filter(changeSet, pattern)` | the records that may have changed `pattern` |
 | `getRootKeys(changeSet)` | changed keys of the model itself, e.g. `["name", "permissions"]`; `null` when a path is unknown |

@@ -781,8 +781,10 @@ class BaseClass extends QtObject {
 
 			this._internal.removeAt(_key)
 
+			// Only a list of SDL objects (it has an element component) is filled again; an array of values is a new value, as in Qt.
+			// getPropertyType() does not tell them apart: it says "BaseModel" for an array of enum values too.
 			let current = this.__self[_key]
-			if (Array.isArray(sourceObject[key]) && current !== null && current !== undefined){
+			if (Array.isArray(sourceObject[key]) && current !== null && current !== undefined && this.createComponent(_key)){
 				refilledLists.push(_key)
 			}
 

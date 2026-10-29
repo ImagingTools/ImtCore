@@ -295,6 +295,18 @@ TestCase {
 		compare(testCase.records, [])
 	}
 
+	// An array of values read by fromObject is a new value, unlike a list of SDL objects filled again
+	function test_primitiveArrayOfFromObject(){
+		let groupFilter = createTemporaryObject(groupFilterComp, testCase)
+		verify(groupFilter.createFromJson(testCase.groupJson))
+		let fieldFilter = groupFilter.m_groupFilters.get(0).item.m_groupFilters.get(1).item.m_fieldFilters.get(1).item
+		watch(fieldFilter)
+
+		verify(fieldFilter.createFromJson('{"__typename":"FieldFilter","fieldId":"name","filterValue":"x","filterValueType":"String","filterOperations":["Equal"]}'))
+
+		verify(testCase.records.indexOf("set filterOperations") >= 0)
+	}
+
 	function test_pathIsRelativeToListener(){
 		let role = createRole()
 		let first = permission(role, 0)
@@ -401,6 +413,25 @@ TestCase {
 		let unknown = {"path": null, "operation": "set"}
 		verify(ChangeSetHelper.changeAffects(unknown, "name"))
 		verify(!ChangeSetHelper.changeIsWithin(unknown, ""))
+	}
+
+	// An insert or a remove moves the later elements of its list: the values at their indexes change
+	function test_insertAndRemoveAffectLaterIndexes(){
+		let removed = {"path": ["permissions", 0], "operation": "remove"}
+		let inserted = {"path": ["permissions", 1], "operation": "insert"}
+		verify(ChangeSetHelper.changeAffects(removed, "permissions[1].direct"))
+		verify(ChangeSetHelper.changeAffects(removed, "permissions[0]"))
+		verify(ChangeSetHelper.changeAffects(inserted, "permissions[4]"))
+		verify(ChangeSetHelper.changeAffects(inserted, "permissions[1].sources[0]"))
+		verify(!ChangeSetHelper.changeAffects(inserted, "permissions[0].direct"), "An earlier element does not move")
+		verify(!ChangeSetHelper.changeAffects({"path": ["permissions", 5], "operation": "remove"}, "permissions[1]"))
+		verify(!ChangeSetHelper.changeAffects({"path": ["permissions", 0], "operation": "set"}, "permissions[1]"), "A set moves nothing")
+		verify(!ChangeSetHelper.changeAffects({"path": ["parentRoles", 0], "operation": "remove"}, "permissions[1]"), "Another list")
+		verify(!ChangeSetHelper.changeAffects({"path": ["permissions", 0, "sources", 0], "operation": "remove"}, "permissions[1]"),
+			"A list inside an element moves only its own elements")
+
+		verify(ChangeSetHelper.isAffected([removed], "permissions[1].direct"))
+		compare(ChangeSetHelper.filter([removed, {"path": ["name"], "operation": "set"}], "permissions[3]").length, 1)
 	}
 
 	function test_roleEditorScenario(){

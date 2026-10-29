@@ -36,6 +36,24 @@ TestCase {
 		}
 	}
 
+	// Saves as GqlBasedCollectionDocumentService does: after the pending updates
+	Component {
+		id: waitingServiceComp
+
+		DocumentServiceBase {
+			property var calls: []
+
+			function saveDocument(documentId, documentName){
+				if (documentHasPendingUpdates(documentId)){
+					saveDocumentAfterUpdates(documentId, documentName)
+					return
+				}
+
+				calls.push(["save", documentId, documentName])
+			}
+		}
+	}
+
 	Component {
 		id: viewComp
 
@@ -445,6 +463,95 @@ TestCase {
 		answer(controller, true)
 		compare(controller.updateCount, 2)
 		compare(controller.lastChangeSet.length, 0)
+	}
+
+	// --- Reads and saves wait for own edits
+
+	// A read put off by a notification waits for the queued edits too: the read would replace them
+	function test_deferredReadWaitsForQueuedEdits(){
+		let document = openDocument("Name", false)
+		let service = document.service
+		let controller = controllerOf(service)
+		edit(document.views[0])
+		edit(document.views[0])
+
+		notifyChanged(service, "")
+		notifyChanged(service, ownChangeId(service, 0))
+		compare(controller.requestCount, 1, "The first update is applied, the queued edit is not sent yet")
+
+		answer(controller, true)
+		compare(controller.updateCount, 2)
+		compare(controller.requestCount, 1, "The queued edit is in flight")
+
+		answer(controller, true)
+		compare(controller.requestCount, 2)
+	}
+
+	function test_ownUpdateReadWaitsForQueuedEdits(){
+		let document = openDocument("Name", false)
+		let service = document.service
+		let controller = controllerOf(service)
+		controller.requestRepresentationOnUpdate = true
+		edit(document.views[0])
+		edit(document.views[0])
+
+		notifyChanged(service, ownChangeId(service, 0))
+		compare(controller.requestCount, 1)
+
+		answer(controller, true)
+		answer(controller, true)
+		compare(controller.updateCount, 2)
+		compare(controller.requestCount, 2)
+	}
+
+	function openWaitingDocument(){
+		let service = createTemporaryObject(waitingServiceComp, testCase)
+		service.registerDocumentViewData(typeId, viewTypeId, viewComp, controllerComp)
+		service.handleDocumentOpened("doc", "obj", typeId, "Name", false, false)
+		let view = addView(service)
+		service.setDocumentIsLoading("doc", false)
+		controllerOf(service).respond()
+
+		return {"service": service, "view": view, "controller": controllerOf(service)}
+	}
+
+	// Save sends the GUI state as an update: the document is saved after the updates are answered
+	function test_saveWaitsForPendingUpdates(){
+		let document = openWaitingDocument()
+		edit(document.view)
+		edit(document.view)
+
+		decoratorOf(document.service).onSave()
+		compare(document.service.calls, [])
+
+		answer(document.controller, true)
+		compare(document.controller.updateCount, 2)
+		compare(document.service.calls, [], "The queued edits are in flight")
+
+		answer(document.controller, true)
+		compare(document.service.calls, [["save", "doc", "Name"]])
+	}
+
+	function test_refusedUpdateCancelsPendingSave(){
+		let document = openWaitingDocument()
+		let failedSpy = createSpy(document.service, "saveDocumentFailed")
+		edit(document.view)
+
+		decoratorOf(document.service).onSave()
+		answer(document.controller, false)
+		wait(0)
+
+		compare(failedSpy.count, 1)
+		compare(failedSpy.signalArguments[0][0], "doc")
+		compare(document.service.calls, [])
+	}
+
+	function test_saveWithoutPendingUpdatesIsAtOnce(){
+		let document = openWaitingDocument()
+		document.view.hasChanges = false
+
+		decoratorOf(document.service).onSave()
+		compare(document.service.calls, [["save", "doc", "Name"]])
 	}
 
 	// --- DocumentUpdateRequestSender answering the decorator

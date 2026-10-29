@@ -416,10 +416,10 @@ QtObject {
 		}
 	}
 
-	// Reads every view again, e.g. after a reconnect; a view with an update in flight is read after its answer.
+	// Reads every view again, e.g. after a reconnect; a view with own edits pending is read after they are applied.
 	function updateRepresentationForAllViews(){
 		for (let i = 0; i < registeredViews.length; ++i){
-			if (hasUpdateInFlight(i)){
+			if (hasPendingEdits(i)){
 				_internal.deferredViews[i] = true
 			}
 			else{
@@ -491,7 +491,7 @@ QtObject {
 				}
 			}
 
-			if (hasUpdateInFlight(i)){
+			if (hasPendingEdits(i)){
 				_internal.deferredViews[i] = true
 				continue
 			}
@@ -539,6 +539,11 @@ QtObject {
 			_internal.deferredViews[index] = true
 		}
 
+		if (!succeeded && _internal.pendingSave){
+			_internal.pendingSave = false
+			documentManager.saveDocumentFailed(root.documentId, qsTr("The document was not saved: a change was not accepted"))
+		}
+
 		pruneOwnUpdates(index, Date.now())
 		_internal.answeredUpdatesTimer.start()
 	}
@@ -549,6 +554,8 @@ QtObject {
 			sendQueuedUpdate(i)
 			flushDeferredView(i)
 		}
+
+		continuePendingSave()
 	}
 
 	// Drops finished updates, echoes that did not come in ownEchoTimeout and answers lost for ownUpdateTimeout.
@@ -608,8 +615,41 @@ QtObject {
 		return false
 	}
 
+	// Own edits not applied yet: an update in flight or edits queued behind it. A read now would replace them:
+	// its answer may come before the server applies them, and a new model drops the queued edits.
+	function hasPendingEdits(viewIndex){
+		return hasUpdateInFlight(viewIndex) || _internal.queuedUpdates[viewIndex] !== null
+	}
+
+	// A view or a queue waits for an answer
+	function hasPendingUpdates(){
+		for (let i = 0; i < registeredViews.length; ++i){
+			if (hasUnansweredUpdate(i) || _internal.queuedUpdates[i] !== null){
+				return true
+			}
+		}
+
+		return false
+	}
+
+	// A save asked while updates are pending runs once they are answered: the server saves what the views hold.
+	// A refused update cancels it (saveDocumentFailed), so a save-and-close does not close.
+	function saveAfterUpdates(documentName){
+		_internal.pendingSave = true
+		_internal.pendingSaveName = documentName || ""
+	}
+
+	function continuePendingSave(){
+		if (!_internal.pendingSave || hasPendingUpdates()){
+			return
+		}
+
+		_internal.pendingSave = false
+		documentManager.saveDocument(root.documentId, _internal.pendingSaveName)
+	}
+
 	function flushDeferredView(viewIndex){
-		if (_internal.deferredViews[viewIndex] && !hasUpdateInFlight(viewIndex)){
+		if (_internal.deferredViews[viewIndex] && !hasPendingEdits(viewIndex)){
 			_internal.deferredViews[viewIndex] = false
 			updateRepresentation(viewIndex)
 		}
@@ -627,6 +667,8 @@ QtObject {
 				tracked = true
 			}
 		}
+
+		continuePendingSave()
 
 		if (!tracked){
 			_internal.ownUpdatesTimer.stop()
@@ -719,6 +761,8 @@ QtObject {
 		property string startingChangeId: "" // Of the update being sent, see sendUpdate()
 		property var deferredViews: [] // Per view: read once its updates in flight are answered
 		property var queuedUpdates: [] // Per view: changeSet of the edits waiting for the answer to its update, or null
+		property bool pendingSave: false // A save waits for the pending updates, see saveAfterUpdates()
+		property string pendingSaveName: ""
 
 		property Timer answeredUpdatesTimer: Timer {
 			interval: 0
