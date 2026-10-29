@@ -39,6 +39,7 @@ FieldFilterDelegate 1.0 Panels/FieldFilterDelegate.qml
 FilterDelegateBase 1.0 Panels/FilterDelegateBase.qml
 OptionsFilterDelegate 1.0 Panels/OptionsFilterDelegate.qml
 TimeFilterDelegate 1.0 Panels/TimeFilterDelegate.qml
+DocumentViewVerticalCommandsPanel 1.0 Panels/DocumentViewVerticalCommandsPanel.qml
 
 PageAboutProvider 1.0 Settings/PageAboutProvider.qml
 Preference 1.0 Settings/Preference.qml
