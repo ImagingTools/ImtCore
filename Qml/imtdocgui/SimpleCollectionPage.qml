@@ -65,6 +65,39 @@ ViewBase {
 	property var editPermissionIds: []
 	property var deletePermissionIds: []
 
+	// The editor that shows this page's headers in its own header (TenantEditor); null shows them here.
+	// It is told by updateSubHeaders() when editorOpen or editorTitle change.
+	property var headerHost: null
+	readonly property bool editorOpen: !root.__onListPage
+	// Title of the open create/edit editor, empty on the list
+	property string editorTitle: ""
+
+	onEditorOpenChanged: {
+		if (!root.editorOpen)
+			root.editorTitle = ""
+		if (root.headerHost)
+			root.headerHost.updateSubHeaders()
+	}
+	onEditorTitleChanged: {
+		if (root.headerHost)
+			root.headerHost.updateSubHeaders()
+	}
+
+	// Closes the open editor asking about its unsaved changes: callback(true) once the list is shown,
+	// callback(false) when the user keeps the editor
+	function requestCloseEditor(callback) {
+		if (!root.editorOpen) {
+			callback(true)
+			return
+		}
+		if (root.__activeShellView && root.__activeShellView.state === "content") {
+			root.__activeShellView.requestClose(callback)
+			return
+		}
+		root.__resetStackToList()
+		callback(true)
+	}
+
 	// Width of the centered content column; the table matches it.
 	readonly property int contentWidth: Math.min(root.width - Style.marginXL * 2, Style.contentWidthMax)
 	readonly property int contentLeftMargin: Math.max((root.width - root.contentWidth) / 2, Style.marginXL)
@@ -272,7 +305,8 @@ ViewBase {
 	function openCreate() {
 		__clearExtraPages()
 		root.__isCreating = true
-		stackViewHeader.addHeader("create", qsTr("Create New %1").arg(root.entityName))
+		root.editorTitle = qsTr("Create New %1").arg(root.entityName)
+		stackViewHeader.addHeader("create", root.editorTitle)
 		__pushEditorPage()
 	}
 
@@ -291,7 +325,8 @@ ViewBase {
 		root.__editItemId = itemId
 		root.__isCreating = false
 		__clearExtraPages()
-		stackViewHeader.addHeader("edit", itemName || qsTr("Edit %1").arg(root.entityName))
+		root.editorTitle = itemName || qsTr("Edit %1").arg(root.entityName)
+		stackViewHeader.addHeader("edit", root.editorTitle)
 		__pushEditorPage()
 	}
 
@@ -307,6 +342,8 @@ ViewBase {
 				return
 			stackViewHeader.setHeaderName("edit", newName)
 			stackViewHeader.setHeaderName("create", newName)
+			if (root.editorOpen)
+				root.editorTitle = newName
 		}
 	}
 
@@ -317,7 +354,8 @@ ViewBase {
 		anchors.left: parent.left
 		anchors.leftMargin: root.contentLeftMargin
 		width: root.contentWidth
-		height: Style.controlHeightL
+		height: visible ? Style.controlHeightL : 0
+		visible: !root.headerHost
 		initialItemTitleVisible: true
 
 		onCloseClicked: {
@@ -353,8 +391,21 @@ ViewBase {
 	readonly property real __commandsWidth: !root.__onListPage ? 0
 		: root.__useDefaultButtons ? defaultCommands.width : customHeaderButtonsLoader.width
 	readonly property real __commandsHeight: root.__useDefaultButtons ? defaultCommands.height : customHeaderButtonsLoader.height
+	// With the headers shown by headerHost the commands share the line of the search box instead
+	readonly property bool __commandsInFilterRow: !!root.headerHost && root.__commandsWidth > 0
+		&& root.__commandsWidth + Style.marginL + Style.sizeHintXXS <= root.contentWidth
 	readonly property bool __commandsBelow: root.__commandsWidth > 0
-		&& stackViewHeader.implicitContentWidth + Style.marginL + root.__commandsWidth > root.contentWidth
+		&& (root.headerHost ? !root.__commandsInFilterRow : stackViewHeader.implicitContentWidth + Style.marginL + root.__commandsWidth > root.contentWidth)
+
+	// The line the commands are centered on: the header, or the search box of the table when headerHost shows the headers
+	Item {
+		id: commandsRow
+		anchors.top: root.headerHost ? collectionStackView.top : stackViewHeader.top
+		anchors.topMargin: root.headerHost ? Style.marginM : 0
+		anchors.left: stackViewHeader.left
+		anchors.right: stackViewHeader.right
+		height: root.headerHost ? Style.controlHeightM : Style.controlHeightL
+	}
 
 	Item {
 		id: commandsLine
@@ -368,8 +419,9 @@ ViewBase {
 		id: defaultCommands
 		anchors.right: stackViewHeader.right
 		width: Math.min(root.commandsLineWidth(defaultCommands), root.contentWidth)
-		anchors.verticalCenter: root.__commandsBelow ? undefined : stackViewHeader.verticalCenter
-		anchors.top: root.__commandsBelow ? commandsLine.top : undefined
+		// One top anchor: switching between top and verticalCenter set both for a moment and stretched the height
+		anchors.top: root.__commandsBelow ? commandsLine.top : commandsRow.top
+		anchors.topMargin: root.__commandsBelow ? 0 : (commandsRow.height - defaultCommands.height) / 2
 		spacing: Style.marginL
 		visible: root.__onListPage && root.__useDefaultButtons
 
@@ -452,8 +504,8 @@ ViewBase {
 		id: customHeaderButtonsLoader
 		visible: !!root.headerButtonsComponent && root.__onListPage
 		anchors.right: stackViewHeader.right
-		anchors.verticalCenter: root.__commandsBelow ? undefined : stackViewHeader.verticalCenter
-		anchors.top: root.__commandsBelow ? commandsLine.top : undefined
+		anchors.top: root.__commandsBelow ? commandsLine.top : commandsRow.top
+		anchors.topMargin: root.__commandsBelow ? 0 : (commandsRow.height - customHeaderButtonsLoader.height) / 2
 		sourceComponent: root.headerButtonsComponent
 		property var page: root
 	}
@@ -498,6 +550,7 @@ ViewBase {
 			actionHandler: root
 			emptyText: root.__emptyText
 			filterPlaceholder: root.__filterPlaceholder
+			filterRightInset: root.__commandsInFilterRow ? root.__commandsWidth + Style.marginL : 0
 			initialLoading: root.dataProvider ? root.dataProvider.isInitialLoading : false
 			loadingMore: root.dataProvider ? root.dataProvider.isPageLoading : false
 			errorMessage: root.dataProvider && root.dataProvider.error
