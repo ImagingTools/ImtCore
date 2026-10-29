@@ -10,6 +10,7 @@
 
 // ImtCore includes
 #include <imtrest/IProtocolEngine.h>
+#include <imtrest/IHttpRequestBodyPolicy.h>
 
 
 namespace imtrest
@@ -25,6 +26,8 @@ public:
 
 	I_BEGIN_COMPONENT(CHttpProtocolEngineComp);
 		I_REGISTER_INTERFACE(IProtocolEngine)
+		I_ASSIGN(m_bodyPolicyCompPtr, "BodyPolicy", "Policy that decides about the body of a request after its headers are received, for example refuses a request with 413 or 401 before the body is read. Without it all bodies are received with the limit MaxBodySize", false, "BodyPolicy");
+		I_ASSIGN(m_maxBodySizeAttrPtr, "MaxBodySize", "Maximal size of the body of a request in bytes if the policy does not set its own limit. The request with a bigger body is refused with 413 before the body is read. 0 - no limit", true, 0);
 	I_END_COMPONENT
 
 	// reimplemented (IProtocolEngine)
@@ -42,6 +45,10 @@ public:
 				int statusCode,
 				const QByteArray& data,
 				const QByteArray& dataTypeId) const override;
+
+private:
+	I_REF(IHttpRequestBodyPolicy, m_bodyPolicyCompPtr);
+	I_ATTR(int, m_maxBodySizeAttrPtr);
 };
 
 

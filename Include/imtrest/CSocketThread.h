@@ -6,9 +6,13 @@
 #include <QtCore/QThread>
 #include <QtCore/QMutex>
 
+// STL includes
+#include <atomic>
+
 // ImtCore includes
 #include <imtrest/IRequestServlet.h>
 #include <imtrest/ITransport.h>
+#include <imtrest/CConnectionTimeoutTracker.h>
 #include <imtrest/CSocket.h>
 
 
@@ -42,6 +46,52 @@ public:
 	[[nodiscard]] bool IsSecureConnection() const;
 	void EnableSecureConnection(bool isSecureConnection = true);
 
+	/**
+		Get the time limits of the connections.
+	*/
+	[[nodiscard]] CConnectionTimeoutConfig GetConnectionTimeoutConfig() const;
+
+	/**
+		Get the limit of the unsent data of a socket in bytes: a streaming response is not read while the socket has so much
+		unsent data (see CHttpResponseBodyStreamer).
+	*/
+	[[nodiscard]] qint64 GetWriteHighWatermark() const;
+
+	/**
+		Get the type-ID of the protocol of the connection as a text (see IProtocolEngine::GetProtocolTypeId()).
+		The socket classes do not interpret it.
+	*/
+	[[nodiscard]] QByteArray GetProtocolTypeId() const;
+
+	/**
+		Remember how the response to the request that is being processed should be sent (see IRequest::IsConnectionPersistent(),
+		IRequest::IsResponseBodyOmitted() and IRequest::IsChunkedResponseAllowed()). It is called by the socket of the thread, the hints are read by the thread that
+		sends the response.
+	*/
+	void SetResponseHints(bool isConnectionClosing, bool isBodyOmitted, bool isChunkedAllowed);
+
+	/**
+		The connection is closed after the response to the request that is being processed.
+	*/
+	[[nodiscard]] bool IsConnectionClosing() const;
+
+	/**
+		The response to the request that is being processed has no content.
+	*/
+	[[nodiscard]] bool IsResponseBodyOmitted() const;
+
+	/**
+		The response to the request that is being processed can be sent with the chunked encoding.
+	*/
+	[[nodiscard]] bool IsChunkedResponseAllowed() const;
+
+	/**
+		Send a response with a body that is read by parts (see IStreamingResponse). It can be called from any thread: the response
+		is handed to the socket of the thread, which creates the source of the body and sends the response.
+		The hints are the properties of the request that is answered, see SetResponseHints().
+	*/
+	bool SendStreamingResponse(const ConstResponsePtr& response, bool isConnectionClosing, bool isBodyOmitted, bool isChunkedAllowed) const;
+
 	virtual imtrest::IRequestUniquePtr CreateRequest() const;
 
 	// reimplemented (QThread)
@@ -58,6 +108,7 @@ Q_SIGNALS:
 	void Error(QTcpSocket::SocketError socketerror);
 	void SocketDisconnected(QByteArray requestId);
 	void OnSendResponse(QByteArray data) const;
+	void OnSendStreamingResponse(imtrest::ConstResponsePtr response, bool isConnectionClosing, bool isBodyOmitted, bool isChunkedAllowed) const;
 	void Abort();
 
 private:
@@ -70,6 +121,9 @@ private:
 	Status m_status;
 	istd::TDelPtr<CSocket> m_socket;
 	bool m_isSecureConnection;
+	std::atomic<bool> m_isConnectionClosing;
+	std::atomic<bool> m_isResponseBodyOmitted;
+	std::atomic<bool> m_isChunkedResponseAllowed;
 	const QSslConfiguration& m_sslConfiguration;
 
 	mutable QByteArray m_requestId;

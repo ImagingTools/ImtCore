@@ -284,28 +284,73 @@ QSharedPointer<QSslKey> CSslConfigurationManagerComp::CreateSslKeyFromParams(con
 
 QSharedPointer<QSslCertificate> CSslConfigurationManagerComp::CreateSslCertificateFromParams(const iprm::IParamsSet& params) const
 {
-	QSharedPointer<QSslCertificate> retVal;
+	const QList<QSslCertificate> certificates = CreateSslCertificatesFromParams(params);
+	if (certificates.isEmpty()){
+		return {};
+	}
 
-	// setup format
-	iprm::TParamsPtr<iprm::ISelectionParam> encodingFormatSelectionParamPtr(&params, ParamKeys::s_encodingFormatParamKey);
-	QSsl::EncodingFormat qFormat = GetEncodingFormatFromParams(params);
+	return QSharedPointer<QSslCertificate>::create(certificates.first());
+}
+
+
+QList<QSslCertificate> CSslConfigurationManagerComp::CreateSslCertificatesFromParams(const iprm::IParamsSet& params) const
+{
+	const QSsl::EncodingFormat qFormat = GetEncodingFormatFromParams(params);
 
 	iprm::TParamsPtr<ifile::IFileNameParam> filePathParamPtr(&params, ParamKeys::s_filePathParamKey, false);
 	iprm::TParamsPtr<iprm::INameParam> encodedDataParamPtr(&params, ParamKeys::s_encodedDataParamKey, false);
 	if (filePathParamPtr.IsValid()){
 		QFile certFile(filePathParamPtr->GetPath());
 		if (!certFile.open(QIODevice::ReadOnly)){
-			return retVal;
+			SendErrorMessage(0, QStringLiteral("Unable to open SSL certificate file '%1'.").arg(filePathParamPtr->GetPath()));
+
+			return {};
 		}
-		retVal.reset(new QSslCertificate(&certFile, qFormat));
+
+		return QSslCertificate::fromDevice(&certFile, qFormat);
 	}
-	else if (encodedDataParamPtr.IsValid()){
-		const QByteArray encodedData = encodedDataParamPtr->GetName().toUtf8();
-		retVal.reset(new QSslCertificate(encodedData, qFormat));
+
+	if (encodedDataParamPtr.IsValid()){
+		return QSslCertificate::fromData(encodedDataParamPtr->GetName().toUtf8(), qFormat);
 	}
-	else{
-		SendCriticalMessage(0, "Unable to create SSL cert. File path and data is not provided", "Setup SSL cert");
-		I_CRITICAL();
+
+	SendCriticalMessage(0, "Unable to create SSL cert. File path and data is not provided", "Setup SSL cert");
+	I_CRITICAL();
+
+	return {};
+}
+
+
+QList<QSslCertificate> CSslConfigurationManagerComp::ComposeCertificateChain(const QList<QSslCertificate>& certificates, const QList<QSslCertificate>& additionalCertificates)
+{
+	QList<QSslCertificate> retVal = certificates;
+
+	for (const QSslCertificate& certificate : additionalCertificates){
+		if (!retVal.contains(certificate)){
+			retVal.append(certificate);
+		}
+	}
+
+	return retVal;
+}
+
+
+bool CSslConfigurationManagerComp::CreateSslCertificatesFromManager(const iprm::IParamsManager& manager, QList<QSslCertificate>& certificates) const
+{
+	bool retVal = true;
+
+	const int setsCount = manager.GetParamsSetsCount();
+	for (int i = 0; i < setsCount; ++i){
+		const iprm::IParamsSet* paramsSetPtr = manager.GetParamsSet(i);
+		const QList<QSslCertificate> setCertificates = (paramsSetPtr != nullptr) ? CreateSslCertificatesFromParams(*paramsSetPtr) : QList<QSslCertificate>();
+		if (setCertificates.isEmpty()){
+			SendErrorMessage(0, QStringLiteral("The certificate number %1 of the certificate chain is not read.").arg(i));
+			retVal = false;
+
+			continue;
+		}
+
+		certificates.append(setCertificates);
 	}
 
 	return retVal;
@@ -317,42 +362,39 @@ QSharedPointer<QSslCertificate> CSslConfigurationManagerComp::CreateSslCertifica
 bool CSslConfigurationManagerComp::CreateSslConfiguration(const iprm::IParamsSet& params, QSslConfiguration& output) const
 {
 	bool retValue = true;
-	// setup local certificate
+
+	// The certificates of the server: its own one first, then the intermediate ones if the file has them
+	QList<QSslCertificate> localCertificates;
 	iprm::TParamsPtr<iprm::IParamsSet> localCertificateParamPtr(&params, ParamKeys::s_localCertParamKey, false);
 	if (localCertificateParamPtr.IsValid()){
-		QSharedPointer<QSslCertificate> sslCertificalePtr = CreateSslCertificateFromParams(*localCertificateParamPtr);
-		if (!sslCertificalePtr.isNull()){
-			output.setLocalCertificate(*sslCertificalePtr);
-		}
-		else{
+		localCertificates = CreateSslCertificatesFromParams(*localCertificateParamPtr);
+		if (localCertificates.isEmpty()){
+			SendErrorMessage(0, "The local SSL certificate is not read: the file is missing or has no certificates.");
 			retValue = false;
 		}
 	}
 
-	// setup local certificate chain
+	// setup local certificate chain: the intermediate certificates that follow the certificate of the server
+	QList<QSslCertificate> additionalCertificates;
 	iprm::TParamsPtr<iprm::IParamsManager> localCertChainParamsPtr(&params, ParamKeys::s_localCertChainParamKey, false);
-	if (localCertChainParamsPtr.IsValid()){
-		QList<QSslCertificate> localCertificateChain;
-		/// \todo implement chain
-		SendErrorMessage(0, "Local certificate chain is not supported yet.");
-		if (!localCertificateChain.isEmpty()){
-			output.setLocalCertificateChain(localCertificateChain);
-		}
-		else{
-			retValue = false;
-		}
+	if (localCertChainParamsPtr.IsValid() && !CreateSslCertificatesFromManager(*localCertChainParamsPtr, additionalCertificates)){
+		retValue = false;
 	}
 
-	// setup CA certificate (optional: an unset file path means no CA cert is provided, not a failure)
+	const QList<QSslCertificate> localCertificateChain = ComposeCertificateChain(localCertificates, additionalCertificates);
+	if (!localCertificateChain.isEmpty()){
+		output.setLocalCertificateChain(localCertificateChain);
+	}
+
+	// setup CA certificates (optional: an unset file path means no CA cert is provided, not a failure)
+	QList<QSslCertificate> caCertificates;
 	iprm::TParamsPtr<iprm::IParamsSet> caCertificateParamsPtr(&params, ParamKeys::s_caCertParamKey, false);
 	if (caCertificateParamsPtr != nullptr){
 		iprm::TParamsPtr<ifile::IFileNameParam> caCertFilePathParamPtr(caCertificateParamsPtr.GetPtr(), ParamKeys::s_filePathParamKey, false);
 		if (caCertFilePathParamPtr.IsValid() && !caCertFilePathParamPtr->GetPath().isEmpty()){
-			QSharedPointer<QSslCertificate> sslCaCertificalePtr = CreateSslCertificateFromParams(*caCertificateParamsPtr);
-			if (!sslCaCertificalePtr.isNull()){
-				output.addCaCertificate(*sslCaCertificalePtr);
-			}
-			else{
+			caCertificates = CreateSslCertificatesFromParams(*caCertificateParamsPtr);
+			if (caCertificates.isEmpty()){
+				SendErrorMessage(0, "The CA certificate is not read: the file is missing or has no certificates.");
 				retValue = false;
 			}
 		}
@@ -360,15 +402,12 @@ bool CSslConfigurationManagerComp::CreateSslConfiguration(const iprm::IParamsSet
 
 	// setup CA certificate chain
 	iprm::TParamsPtr<iprm::IParamsManager> caCertificateChainParamsPtr(&params, ParamKeys::s_caChainCertParamKey, false);
-	if (caCertificateChainParamsPtr.IsValid()){
-		QList<QSslCertificate> caCertificateChain;
-		SendErrorMessage(0, "CA certificate chain is not supported yet.");
-		if (!caCertificateChain.isEmpty()){
-			output.setCaCertificates(caCertificateChain);
-		}
-		else{
-			retValue = false;
-		}
+	if (caCertificateChainParamsPtr.IsValid() && !CreateSslCertificatesFromManager(*caCertificateChainParamsPtr, caCertificates)){
+		retValue = false;
+	}
+
+	if (!caCertificates.isEmpty()){
+		output.addCaCertificates(caCertificates);
 	}
 
 	// setup private key
