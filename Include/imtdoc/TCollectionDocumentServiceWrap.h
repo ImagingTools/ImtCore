@@ -46,7 +46,8 @@ namespace imtdoc
 	  source element ID for later use during save.
 	The document source reference (\c WorkingDocument::documentSourceRef) of a
 	collection document is \c <objectId> or \c <objectId>/<revision>, the public
-	document URL is built from it by \c GetDocumentUrl. Validators and name providers get
+	document URL \c collection:///<objectId>[/<revision>] is built from it by \c GetDocumentUrl
+	and parsed by \c GetSourceRefFromUrl. Validators and name providers get
 	the object ID and the revision in the parameters created by \c imtdoc::CreateObjectSourceParams.
 
 	- **DoOpenDocument** — resolves the URL to a collection object ID, fetches
@@ -131,6 +132,12 @@ protected:
 		\note \c m_mutex must be locked by the caller.
 	*/
 	UserDocumentPairList FindDocumentsBySourceRef(const QByteArray& documentSourceRef) const;
+
+	/**
+		Converts the document URL \c collection:///<objectId>[/<revision>] to the document source reference.
+		Returns an empty reference for empty or invalid URLs.
+	*/
+	QByteArray GetSourceRefFromUrl(const QUrl& url) const;
 
 private:
 	void OnDeferredDocumentDataLoaded(
@@ -317,7 +324,7 @@ inline void TCollectionDocumentServiceWrap<Base>::OnOpenDocumentThreadFinished(
 	// A document stored without a name shows the one its type derives from the content; opening does not write it
 	QByteArray typeId;
 	QString documentName;
-	QUrl documentUrl;
+	QByteArray documentSourceRef;
 	bool isDirty = false;
 	{
 		QMutexLocker locker(&this->m_mutex);
@@ -338,7 +345,7 @@ inline void TCollectionDocumentServiceWrap<Base>::OnOpenDocumentThreadFinished(
 
 		document.name = documentName;
 		typeId = document.typeId;
-		documentUrl = this->GetDocumentUrl(document);
+		documentSourceRef = document.documentSourceRef;
 		isDirty = document.isDirty;
 		userIdsToNotify = this->GetDocumentUserIds(documentId);
 	}
@@ -346,7 +353,7 @@ inline void TCollectionDocumentServiceWrap<Base>::OnOpenDocumentThreadFinished(
 	for (const QByteArray& notifyUserId : userIdsToNotify){
 		for (IDocumentServiceEventHandler* handlerPtr : this->GetDocumentServiceEventHandlers()){
 			if (handlerPtr != nullptr){
-				CDocumentRenamedEvent event(notifyUserId, documentId, typeId, documentName, documentUrl, isDirty);
+				CDocumentRenamedEvent event(notifyUserId, documentId, typeId, documentName, documentSourceRef, isDirty);
 				handlerPtr->ProcessEvent(&event);
 			}
 		}
@@ -396,15 +403,14 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 		return;
 	}
 
-	const QByteArray objectId = imtdoc::UrlToObjectId(url);
+	const QByteArray documentSourceRef = GetSourceRefFromUrl(url);
+	const QByteArray objectId = imtdoc::SourceRefToObjectId(documentSourceRef);
 	if (objectId.isEmpty()){
 		this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("Invalid URL path")});
 		return;
 	}
 
-	const int revision = imtdoc::UrlToRevision(url);
-	const QByteArray documentSourceRef = imtdoc::ObjectIdToSourceRef(objectId, revision);
-	const QUrl documentUrl = imtdoc::SourceRefToUrl(documentSourceRef);
+	const int revision = imtdoc::SourceRefToRevision(documentSourceRef);
 	QByteArray documentId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
 	QByteArray sharedDocumentId;
@@ -470,7 +476,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 							sharedDocumentId,
 							sharedTypeId,
 							sharedName,
-							documentUrl,
+							documentSourceRef,
 							sharedIsDirty);
 				handlerPtr->ProcessEvent(&event);
 			}
@@ -549,7 +555,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 						documentId,
 						objectTypeId,
 						documentName,
-						documentUrl,
+						documentSourceRef,
 						false);
 			handlerPtr->ProcessEvent(&event);
 		}
@@ -617,7 +623,32 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 template<class Base>
 inline QUrl TCollectionDocumentServiceWrap<Base>::GetDocumentUrl(const WorkingDocument& document) const
 {
-	return imtdoc::SourceRefToUrl(document.documentSourceRef);
+	if (document.documentSourceRef.isEmpty()){
+		return QUrl();
+	}
+
+	return QUrl(QStringLiteral("collection:///") + document.documentSourceRef);
+}
+
+
+template<class Base>
+inline QByteArray TCollectionDocumentServiceWrap<Base>::GetSourceRefFromUrl(const QUrl& url) const
+{
+	if (url.scheme() != QStringLiteral("collection")){
+		return QByteArray();
+	}
+
+	QByteArray path = url.path().toUtf8();
+	if (!path.startsWith('/')){
+		return QByteArray();
+	}
+
+	path.remove(0, 1);
+	if (path.endsWith('/')){
+		path.chop(1);
+	}
+
+	return imtdoc::ObjectIdToSourceRef(imtdoc::SourceRefToObjectId(path), imtdoc::SourceRefToRevision(path));
 }
 
 
@@ -637,7 +668,7 @@ TCollectionDocumentServiceWrap<Base>::GetOpenedDocumentList(const QByteArray& us
 	DocumentList documentList = Base::GetOpenedDocumentList(userId);
 
 	for (DocumentListItem& item : documentList){
-		const int revision = imtdoc::UrlToRevision(item.url);
+		const int revision = imtdoc::SourceRefToRevision(GetSourceRefFromUrl(item.url));
 		if (revision >= 0){
 			item.name += QStringLiteral(" (Rev #%1)").arg(revision);
 		}
@@ -793,7 +824,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 									documentId,
 									savedTypeId,
 									resultDocumentName,
-									imtdoc::ObjectIdToUrl(newObjectId),
+									imtdoc::ObjectIdToSourceRef(newObjectId),
 									false);
 						handlerPtr->ProcessEvent(&event);
 					}
@@ -827,7 +858,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 			workingDocumentPtr->documentSourceRef = imtdoc::ObjectIdToSourceRef(currentObjectId);
 
 			QByteArray savedTypeId = workingDocumentPtr->typeId;
-			QUrl savedUrl = this->GetDocumentUrl(*workingDocumentPtr);
+			QByteArray savedSourceRef = workingDocumentPtr->documentSourceRef;
 			QString newName = workingDocumentPtr->name;
 			QByteArrayList userIds = this->GetDocumentUserIds(documentId);
 
@@ -842,7 +873,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 									documentId,
 									savedTypeId,
 									newName,
-									savedUrl,
+									savedSourceRef,
 									false);
 						handlerPtr->ProcessEvent(&event);
 					}
@@ -907,7 +938,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 							documentId,
 							savedTypeId,
 							resultDocumentName,
-							imtdoc::ObjectIdToUrl(savedObjectId),
+							imtdoc::ObjectIdToSourceRef(savedObjectId),
 							false);
 				handlerPtr->ProcessEvent(&event);
 			}

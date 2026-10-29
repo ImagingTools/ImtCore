@@ -83,7 +83,7 @@ bool CRecordingEventHandler::ProcessEvent(imtdoc::CEventBase* eventPtr)
 	event.documentId = eventPtr->GetDocumentId();
 	event.documentTypeId = eventPtr->GetDocumentTypeId();
 	event.documentName = eventPtr->GetDocumentName();
-	event.documentUrl = eventPtr->GetDocumentUrl();
+	event.documentSourceRef = eventPtr->GetDocumentSourceRef();
 	event.isDirty = eventPtr->IsDocumentDirty();
 
 	QMutexLocker locker(&m_mutex);

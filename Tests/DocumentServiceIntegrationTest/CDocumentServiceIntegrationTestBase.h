@@ -27,7 +27,7 @@ public:
 		QByteArray documentId;
 		QByteArray documentTypeId;
 		QString documentName;
-		QUrl documentUrl;
+		QByteArray documentSourceRef;
 		bool isDirty = false;
 	};
 

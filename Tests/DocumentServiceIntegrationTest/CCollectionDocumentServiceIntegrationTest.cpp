@@ -41,6 +41,25 @@ const QByteArray UNDO_REDO_CHANGED_EVENT = QByteArrayLiteral("DocumentUndoRedoCh
 
 const int WAIT_TIMEOUT = 5000;
 
+
+QUrl MakeCollectionUrl(const QByteArray& objectId, int revision = -1)
+{
+	if (revision < 0){
+		return QUrl(QStringLiteral("collection:///") + objectId);
+	}
+
+	return QUrl(QStringLiteral("collection:///") + objectId + '/' + QString::number(revision));
+}
+
+
+QByteArray GetObjectIdFromUrl(const QUrl& url)
+{
+	const QStringList parts = url.path().split('/', Qt::SkipEmptyParts);
+
+	return parts.isEmpty() ? QByteArray() : parts.first().toUtf8();
+}
+
+
 }
 
 
@@ -125,7 +144,7 @@ QByteArray CCollectionDocumentServiceIntegrationTest::OpenDocumentAndWaitForLoad
 {
 	imtdoc::IDocumentService::TaskParams params;
 	params.userId = userId;
-	params.url = imtdoc::ObjectIdToUrl(objectId, revision);
+	params.url = MakeCollectionUrl(objectId, revision);
 
 	QByteArray documentId;
 	if (ExecuteTask(service, imtdoc::IDocumentService::TT_OPEN, params, &documentId) != imtdoc::IDocumentService::OS_OK){
@@ -184,7 +203,7 @@ void CCollectionDocumentServiceIntegrationTest::CreateNewDocumentProposedSourceD
 	QCOMPARE(SaveDocument(*m_servicePtr, TEST_USER_ID, docId), imtdoc::IDocumentService::OS_OK);
 
 	QVERIFY2(m_collectionPtr->GetElementIds().contains(TEST_OBJECT_ID), "Proposed ID should be used as the collection object ID");
-	QCOMPARE(FindDocumentInfo(*m_servicePtr, TEST_USER_ID, docId).url, imtdoc::ObjectIdToUrl(TEST_OBJECT_ID));
+	QCOMPARE(FindDocumentInfo(*m_servicePtr, TEST_USER_ID, docId).url, MakeCollectionUrl(TEST_OBJECT_ID));
 }
 
 
@@ -200,7 +219,7 @@ void CCollectionDocumentServiceIntegrationTest::OpenDocumentSuccessTest()
 	imtdoc::IDocumentService::DocumentListItem info = FindDocumentInfo(*m_servicePtr, TEST_USER_ID, docId);
 	QCOMPARE(info.typeId, TEST_TYPE_ID);
 	QCOMPARE(info.name, TEST_DOC_NAME);
-	QCOMPARE(info.url, imtdoc::ObjectIdToUrl(TEST_OBJECT_ID));
+	QCOMPARE(info.url, MakeCollectionUrl(TEST_OBJECT_ID));
 	QVERIFY(!info.isDirty);
 	QCOMPARE(GetDocumentText(*m_servicePtr, TEST_USER_ID, docId), QStringLiteral("testData"));
 }
@@ -234,7 +253,7 @@ void CCollectionDocumentServiceIntegrationTest::OpenDocumentNonExistentObjectTes
 {
 	imtdoc::IDocumentService::TaskParams params;
 	params.userId = TEST_USER_ID;
-	params.url = imtdoc::ObjectIdToUrl(QByteArrayLiteral("nonExistentObject"));
+	params.url = MakeCollectionUrl(QByteArrayLiteral("nonExistentObject"));
 
 	QCOMPARE(ExecuteTask(*m_servicePtr, imtdoc::IDocumentService::TT_OPEN, params), imtdoc::IDocumentService::OS_FAILED);
 	QVERIFY(m_servicePtr->GetOpenedDocumentList(TEST_USER_ID).isEmpty());
@@ -265,7 +284,7 @@ void CCollectionDocumentServiceIntegrationTest::OpenDocumentIsLoadingTest()
 
 	imtdoc::IDocumentService::TaskParams params;
 	params.userId = TEST_USER_ID;
-	params.url = imtdoc::ObjectIdToUrl(TEST_OBJECT_ID);
+	params.url = MakeCollectionUrl(TEST_OBJECT_ID);
 
 	QByteArray taskId = m_servicePtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, params);
 	QVERIFY(!taskId.isEmpty());
@@ -286,7 +305,7 @@ void CCollectionDocumentServiceIntegrationTest::OpenDocumentCompletesBeforeDataL
 
 	imtdoc::IDocumentService::TaskParams params;
 	params.userId = TEST_USER_ID;
-	params.url = imtdoc::ObjectIdToUrl(TEST_OBJECT_ID);
+	params.url = MakeCollectionUrl(TEST_OBJECT_ID);
 
 	QByteArray taskId = m_servicePtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, params);
 	imtdoc::IDocumentService::TaskResult result = m_servicePtr->WaitForTaskFinished(taskId);
@@ -339,7 +358,7 @@ void CCollectionDocumentServiceIntegrationTest::OpenDocumentWithoutSingleInstanc
 
 	imtdoc::IDocumentService::TaskParams singleInstanceParams;
 	singleInstanceParams.userId = TEST_USER_ID;
-	singleInstanceParams.url = imtdoc::ObjectIdToUrl(TEST_OBJECT_ID);
+	singleInstanceParams.url = MakeCollectionUrl(TEST_OBJECT_ID);
 	singleInstanceParams.singleDocumentInstance = true;
 
 	QByteArray firstDocId;
@@ -480,7 +499,7 @@ void CCollectionDocumentServiceIntegrationTest::SaveDocumentNewDocumentTest()
 	imtdoc::IDocumentService::DocumentListItem info = FindDocumentInfo(*m_servicePtr, TEST_USER_ID, docId);
 	QVERIFY2(!info.isDirty, "Document should not be dirty after save");
 
-	const QByteArray objectId = imtdoc::UrlToObjectId(info.url);
+	const QByteArray objectId = GetObjectIdFromUrl(info.url);
 	QVERIFY(!objectId.isEmpty());
 	QCOMPARE(m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString(), TEST_DOC_NAME);
 
@@ -516,7 +535,7 @@ void CCollectionDocumentServiceIntegrationTest::SaveDocumentExistingDocumentTest
 
 	imtdoc::IDocumentService::DocumentListItem info = FindDocumentInfo(*m_servicePtr, TEST_USER_ID, docId);
 	QVERIFY(!info.isDirty);
-	QCOMPARE(info.url, imtdoc::ObjectIdToUrl(TEST_OBJECT_ID));
+	QCOMPARE(info.url, MakeCollectionUrl(TEST_OBJECT_ID));
 }
 
 
@@ -551,7 +570,7 @@ void CCollectionDocumentServiceIntegrationTest::SaveDocumentNewDocumentUpdatesUr
 
 	QCOMPARE(SaveDocument(*m_servicePtr, TEST_USER_ID, docId), imtdoc::IDocumentService::OS_OK);
 
-	const QByteArray objectId = imtdoc::UrlToObjectId(FindDocumentInfo(*m_servicePtr, TEST_USER_ID, docId).url);
+	const QByteArray objectId = GetObjectIdFromUrl(FindDocumentInfo(*m_servicePtr, TEST_USER_ID, docId).url);
 	QVERIFY2(!objectId.isEmpty(), "Saved document should have a collection URL");
 	QVERIFY(!idsBefore.contains(objectId));
 	QVERIFY(m_collectionPtr->GetElementIds().contains(objectId));
@@ -567,7 +586,7 @@ void CCollectionDocumentServiceIntegrationTest::SaveDocumentSaveAsUpdatesUrlTest
 
 	QCOMPARE(SaveDocument(*m_servicePtr, TEST_USER_ID, docId, QStringLiteral("Copy Name")), imtdoc::IDocumentService::OS_OK);
 
-	const QByteArray objectId = imtdoc::UrlToObjectId(FindDocumentInfo(*m_servicePtr, TEST_USER_ID, docId).url);
+	const QByteArray objectId = GetObjectIdFromUrl(FindDocumentInfo(*m_servicePtr, TEST_USER_ID, docId).url);
 	QVERIFY(!objectId.isEmpty());
 	QVERIFY2(objectId != TEST_OBJECT_ID, "Document should be backed by the copy after Save As");
 	QCOMPARE(m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString(), QStringLiteral("Copy Name"));
@@ -736,7 +755,7 @@ void CCollectionDocumentServiceIntegrationTest::SaveDocumentWithNameProviderTest
 	QCOMPARE(m_servicePtr->GetDocumentName(TEST_USER_ID, docId, name), imtdoc::IDocumentService::OS_OK);
 	QCOMPARE(name, expectedName);
 
-	const QByteArray objectId = imtdoc::UrlToObjectId(FindDocumentInfo(*m_servicePtr, TEST_USER_ID, docId).url);
+	const QByteArray objectId = GetObjectIdFromUrl(FindDocumentInfo(*m_servicePtr, TEST_USER_ID, docId).url);
 	QVERIFY(!objectId.isEmpty());
 	QCOMPARE(m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString(), expectedName);
 
@@ -845,9 +864,9 @@ void CCollectionDocumentServiceIntegrationTest::UndoAfterSaveMakesDocumentDirtyT
 }
 
 
-// ObjectIdToUrl tests
+// Document URL tests
 
-void CCollectionDocumentServiceIntegrationTest::ObjectIdToUrlTest()
+void CCollectionDocumentServiceIntegrationTest::OpenedDocumentUrlTest()
 {
 	AddCollectionObject(TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME);
 
@@ -861,21 +880,21 @@ void CCollectionDocumentServiceIntegrationTest::ObjectIdToUrlTest()
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::UrlToObjectIdTest()
+void CCollectionDocumentServiceIntegrationTest::SavedDocumentUrlTest()
 {
 	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID, TEST_DOC_NAME);
 	QVERIFY(!docId.isEmpty());
 	QCOMPARE(SaveDocument(*m_servicePtr, TEST_USER_ID, docId), imtdoc::IDocumentService::OS_OK);
 
 	// URL of the saved document references the inserted collection object
-	const QByteArray objectId = imtdoc::UrlToObjectId(FindDocumentInfo(*m_servicePtr, TEST_USER_ID, docId).url);
+	const QByteArray objectId = GetObjectIdFromUrl(FindDocumentInfo(*m_servicePtr, TEST_USER_ID, docId).url);
 	QVERIFY(!objectId.isEmpty());
 	QVERIFY(m_collectionPtr->GetElementIds().contains(objectId));
 
 	// The URL can be used to open the object
 	QByteArray openedDocId = OpenDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID_2, objectId);
 	QVERIFY(!openedDocId.isEmpty());
-	QCOMPARE(FindDocumentInfo(*m_servicePtr, TEST_USER_ID_2, openedDocId).url, imtdoc::ObjectIdToUrl(objectId));
+	QCOMPARE(FindDocumentInfo(*m_servicePtr, TEST_USER_ID_2, openedDocId).url, MakeCollectionUrl(objectId));
 }
 
 
@@ -887,7 +906,7 @@ void CCollectionDocumentServiceIntegrationTest::OpenDocumentAsyncCompletionTest(
 
 	imtdoc::IDocumentService::TaskParams params;
 	params.userId = TEST_USER_ID;
-	params.url = imtdoc::ObjectIdToUrl(TEST_OBJECT_ID);
+	params.url = MakeCollectionUrl(TEST_OBJECT_ID);
 
 	QByteArray taskId = m_servicePtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, params);
 	QVERIFY(!taskId.isEmpty());
@@ -935,7 +954,7 @@ void CCollectionDocumentServiceIntegrationTest::SingleCopySecondUserGetsDataLoad
 
 	imtdoc::IDocumentService::TaskParams params;
 	params.userId = TEST_USER_ID_2;
-	params.url = imtdoc::ObjectIdToUrl(TEST_OBJECT_ID);
+	params.url = MakeCollectionUrl(TEST_OBJECT_ID);
 
 	QByteArray docId2;
 	QCOMPARE(ExecuteTask(*m_singleCopyServicePtr, imtdoc::IDocumentService::TT_OPEN, params, &docId2), imtdoc::IDocumentService::OS_OK);
@@ -1071,8 +1090,8 @@ void CCollectionDocumentServiceIntegrationTest::SingleCopySaveAsUpdatesAllTest()
 	QCOMPARE(SaveDocument(*m_singleCopyServicePtr, TEST_USER_ID, docId, QStringLiteral("Saved As Copy")), imtdoc::IDocumentService::OS_OK);
 
 	const QUrl copyUrl = FindDocumentInfo(*m_singleCopyServicePtr, TEST_USER_ID, docId).url;
-	QVERIFY(imtdoc::UrlToObjectId(copyUrl) != TEST_OBJECT_ID);
-	QVERIFY(m_collectionPtr->GetElementIds().contains(imtdoc::UrlToObjectId(copyUrl)));
+	QVERIFY(GetObjectIdFromUrl(copyUrl) != TEST_OBJECT_ID);
+	QVERIFY(m_collectionPtr->GetElementIds().contains(GetObjectIdFromUrl(copyUrl)));
 
 	// Both users hold the same document, which is now backed by the copy
 	QCOMPARE(FindDocumentInfo(*m_singleCopyServicePtr, TEST_USER_ID_2, docId).url, copyUrl);
@@ -1155,49 +1174,32 @@ I_ADD_TEST(CCollectionDocumentServiceIntegrationTest);
 
 // Object revision tests
 
-void CCollectionDocumentServiceIntegrationTest::RevisionUrlHelpersTest()
+void CCollectionDocumentServiceIntegrationTest::RevisionSourceRefHelpersTest()
 {
-	const QUrl url = imtdoc::ObjectIdToUrl(TEST_OBJECT_ID, 3);
-	QCOMPARE(url.scheme(), QStringLiteral("collection"));
-	QCOMPARE(url.path(), QStringLiteral("/") + TEST_OBJECT_ID + QStringLiteral("/3"));
-	QCOMPARE(imtdoc::UrlToObjectId(url), TEST_OBJECT_ID);
-	QCOMPARE(imtdoc::UrlToRevision(url), 3);
-
-	const QUrl headUrl = imtdoc::ObjectIdToUrl(TEST_OBJECT_ID);
-	QCOMPARE(headUrl.path(), QStringLiteral("/") + TEST_OBJECT_ID);
-	QCOMPARE(imtdoc::UrlToObjectId(headUrl), TEST_OBJECT_ID);
-	QCOMPARE(imtdoc::UrlToRevision(headUrl), -1);
-
-	const QUrl invalidRevisionUrl(QStringLiteral("collection:///") + TEST_OBJECT_ID + QStringLiteral("/abc"));
-	QVERIFY(imtdoc::UrlToObjectId(invalidRevisionUrl).isEmpty());
-	QCOMPARE(imtdoc::UrlToRevision(invalidRevisionUrl), -1);
-
-	const QUrl negativeRevisionUrl(QStringLiteral("collection:///") + TEST_OBJECT_ID + QStringLiteral("/-1"));
-	QVERIFY(imtdoc::UrlToObjectId(negativeRevisionUrl).isEmpty());
-
-	const QUrl tooManySegmentsUrl(QStringLiteral("collection:///") + TEST_OBJECT_ID + QStringLiteral("/1/2"));
-	QVERIFY(imtdoc::UrlToObjectId(tooManySegmentsUrl).isEmpty());
-	QCOMPARE(imtdoc::UrlToRevision(tooManySegmentsUrl), -1);
-
 	const QByteArray sourceRef = imtdoc::ObjectIdToSourceRef(TEST_OBJECT_ID, 3);
 	QCOMPARE(sourceRef, TEST_OBJECT_ID + QByteArrayLiteral("/3"));
 	QCOMPARE(imtdoc::SourceRefToObjectId(sourceRef), TEST_OBJECT_ID);
 	QCOMPARE(imtdoc::SourceRefToRevision(sourceRef), 3);
-	QCOMPARE(imtdoc::SourceRefToUrl(sourceRef), url);
-	QCOMPARE(imtdoc::UrlToSourceRef(url), sourceRef);
 
 	const QByteArray headSourceRef = imtdoc::ObjectIdToSourceRef(TEST_OBJECT_ID);
 	QCOMPARE(headSourceRef, TEST_OBJECT_ID);
+	QCOMPARE(imtdoc::SourceRefToObjectId(headSourceRef), TEST_OBJECT_ID);
 	QCOMPARE(imtdoc::SourceRefToRevision(headSourceRef), -1);
-	QCOMPARE(imtdoc::SourceRefToUrl(headSourceRef), headUrl);
-	QCOMPARE(imtdoc::UrlToSourceRef(headUrl), headSourceRef);
+
+	QVERIFY(imtdoc::ObjectIdToSourceRef(QByteArray(), 3).isEmpty());
+
+	const QByteArray invalidRevisionRef = TEST_OBJECT_ID + QByteArrayLiteral("/abc");
+	QVERIFY(imtdoc::SourceRefToObjectId(invalidRevisionRef).isEmpty());
+	QCOMPARE(imtdoc::SourceRefToRevision(invalidRevisionRef), -1);
+
+	QVERIFY(imtdoc::SourceRefToObjectId(TEST_OBJECT_ID + QByteArrayLiteral("/-1")).isEmpty());
+
+	const QByteArray tooManySegmentsRef = TEST_OBJECT_ID + QByteArrayLiteral("/1/2");
+	QVERIFY(imtdoc::SourceRefToObjectId(tooManySegmentsRef).isEmpty());
+	QCOMPARE(imtdoc::SourceRefToRevision(tooManySegmentsRef), -1);
 
 	QVERIFY(imtdoc::ObjectIdToSourceRef(QByteArray()).isEmpty());
-	QVERIFY(imtdoc::SourceRefToUrl(QByteArray()).isEmpty());
-	QVERIFY(imtdoc::SourceRefToObjectId(TEST_OBJECT_ID + QByteArrayLiteral("/abc")).isEmpty());
-	QVERIFY(imtdoc::SourceRefToObjectId(TEST_OBJECT_ID + QByteArrayLiteral("/-1")).isEmpty());
-	QVERIFY(imtdoc::SourceRefToObjectId(TEST_OBJECT_ID + QByteArrayLiteral("/1/2")).isEmpty());
-	QVERIFY(imtdoc::UrlToSourceRef(invalidRevisionUrl).isEmpty());
+	QVERIFY(imtdoc::SourceRefToObjectId(QByteArray()).isEmpty());
 }
 
 
@@ -1213,9 +1215,19 @@ void CCollectionDocumentServiceIntegrationTest::OpenDocumentRevisionTest()
 	QCOMPARE(GetDocumentText(*m_servicePtr, TEST_USER_ID, docId), QStringLiteral("revisionData"));
 
 	imtdoc::IDocumentService::DocumentListItem info = FindDocumentInfo(*m_servicePtr, TEST_USER_ID, docId);
-	QCOMPARE(info.url, imtdoc::ObjectIdToUrl(TEST_OBJECT_ID, revision));
+	QCOMPARE(info.url, MakeCollectionUrl(TEST_OBJECT_ID, revision));
 	QCOMPARE(info.typeId, TEST_TYPE_ID);
 	QVERIFY(!info.isDirty);
+
+	const QByteArray revisionSourceRef = TEST_OBJECT_ID + '/' + QByteArray::number(revision);
+	bool hasOpenedEvent = false;
+	for (const CRecordingEventHandler::RecordedEvent& event : m_eventHandler.GetEvents()){
+		if (event.type == OPENED_EVENT && event.documentId == docId){
+			QCOMPARE(event.documentSourceRef, revisionSourceRef);
+			hasOpenedEvent = true;
+		}
+	}
+	QVERIFY(hasOpenedEvent);
 }
 
 
@@ -1243,7 +1255,7 @@ void CCollectionDocumentServiceIntegrationTest::OpenDocumentNonExistentRevisionT
 
 	imtdoc::IDocumentService::TaskParams params;
 	params.userId = TEST_USER_ID;
-	params.url = imtdoc::ObjectIdToUrl(TEST_OBJECT_ID, 42);
+	params.url = MakeCollectionUrl(TEST_OBJECT_ID, 42);
 
 	ExecuteTask(*m_servicePtr, imtdoc::IDocumentService::TT_OPEN, params);
 
@@ -1296,14 +1308,14 @@ void CCollectionDocumentServiceIntegrationTest::SaveDocumentRevisionRemovesRevis
 	QCOMPARE(textPtr->GetText(), QStringLiteral("revisionData"));
 
 	imtdoc::IDocumentService::DocumentListItem info = FindDocumentInfo(*m_servicePtr, TEST_USER_ID, docId);
-	QCOMPARE(info.url, imtdoc::ObjectIdToUrl(TEST_OBJECT_ID));
+	QCOMPARE(info.url, MakeCollectionUrl(TEST_OBJECT_ID));
 	QCOMPARE(info.name, TEST_DOC_NAME);
 	QVERIFY(!info.isDirty);
 
 	QTRY_VERIFY_WITH_TIMEOUT(m_eventHandler.HasEvent(SAVED_EVENT, TEST_USER_ID), WAIT_TIMEOUT);
 	for (const CRecordingEventHandler::RecordedEvent& event : m_eventHandler.GetEvents()){
 		if (event.type == SAVED_EVENT){
-			QCOMPARE(event.documentUrl, imtdoc::ObjectIdToUrl(TEST_OBJECT_ID));
+			QCOMPARE(event.documentSourceRef, TEST_OBJECT_ID);
 		}
 	}
 }
@@ -1324,10 +1336,10 @@ void CCollectionDocumentServiceIntegrationTest::SaveDocumentSaveAsRevisionTest()
 	QCOMPARE(m_collectionPtr->GetElementIds().count(), idsBefore.count() + 1);
 
 	imtdoc::IDocumentService::DocumentListItem info = FindDocumentInfo(*m_servicePtr, TEST_USER_ID, docId);
-	const QByteArray newObjectId = imtdoc::UrlToObjectId(info.url);
+	const QByteArray newObjectId = GetObjectIdFromUrl(info.url);
 	QVERIFY(!newObjectId.isEmpty());
 	QVERIFY(!idsBefore.contains(newObjectId));
-	QCOMPARE(imtdoc::UrlToRevision(info.url), -1);
+	QCOMPARE(info.url, MakeCollectionUrl(newObjectId));
 	QCOMPARE(info.name, QStringLiteral("Copy Name"));
 
 	// The original object is not changed
@@ -1400,7 +1412,7 @@ void CCollectionDocumentServiceIntegrationTest::NameProviderSourceParamsNewDocum
 	QCOMPARE(SaveDocument(*m_servicePtr, TEST_USER_ID, docId), imtdoc::IDocumentService::OS_OK);
 
 	// The name provider gets the ID of the inserted object
-	const QByteArray objectId = imtdoc::UrlToObjectId(FindDocumentInfo(*m_servicePtr, TEST_USER_ID, docId).url);
+	const QByteArray objectId = GetObjectIdFromUrl(FindDocumentInfo(*m_servicePtr, TEST_USER_ID, docId).url);
 	QVERIFY(!objectId.isEmpty());
 
 	QString name;

@@ -4,7 +4,6 @@
 
 // Qt includes
 #include <QtCore/QByteArray>
-#include <QtCore/QUrl>
 
 // ACF includes
 #include <iprm/IParamsSet.h>
@@ -26,26 +25,6 @@ static const QByteArray s_revisionParamId = QByteArrayLiteral("Revision");
 
 
 /**
-	Returns the URL of the collection object \a objectId: \c collection:///<objectId>.
-	If \a revision is not negative, the URL addresses this revision of the object:
-	\c collection:///<objectId>/<revision>.
-*/
-QUrl ObjectIdToUrl(const QByteArray& objectId, int revision = -1);
-
-/**
-	Extracts the collection object ID from a \c collection:///<objectId> or
-	\c collection:///<objectId>/<revision> URL.
-	Returns an empty ID for unsaved documents (empty URL) or invalid URLs.
-*/
-QByteArray UrlToObjectId(const QUrl& url);
-
-/**
-	Extracts the object revision from a \c collection:///<objectId>/<revision> URL.
-	Returns -1 if the URL does not address a revision or is invalid.
-*/
-int UrlToRevision(const QUrl& url);
-
-/**
 	Returns the document source reference of the collection object \a objectId: \c <objectId>.
 	If \a revision is not negative, the reference addresses this revision of the object:
 	\c <objectId>/<revision>. Returns an empty reference for an empty \a objectId.
@@ -63,18 +42,6 @@ QByteArray SourceRefToObjectId(const QByteArray& sourceRef);
 	Returns -1 if the reference does not address a revision or is invalid.
 */
 int SourceRefToRevision(const QByteArray& sourceRef);
-
-/**
-	Converts the document source reference to the collection URL.
-	Returns an empty URL for empty or invalid references.
-*/
-QUrl SourceRefToUrl(const QByteArray& sourceRef);
-
-/**
-	Converts the collection URL to the document source reference.
-	Returns an empty reference for empty or invalid URLs.
-*/
-QByteArray UrlToSourceRef(const QUrl& url);
 
 /**
 	Creates the document source parameters of the collection object \a objectId.

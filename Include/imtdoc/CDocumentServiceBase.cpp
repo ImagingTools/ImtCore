@@ -245,7 +245,7 @@ void CDocumentServiceBase::DoCreateNewDocument(const QByteArray& taskId, const T
 						documentId,
 						params.documentTypeId,
 						documentName,
-						QUrl(),
+						QByteArray(),
 						true);
 			handlerPtr->ProcessEvent(&event);
 		}
@@ -439,7 +439,7 @@ IDocumentService::OperationStatus CDocumentServiceBase::CloseDocumentInternal(
 			const QByteArray& documentId)
 {
 	QByteArray typeId;
-	QUrl url;
+	QByteArray documentSourceRef;
 	QString name;
 	bool isDirty = false;
 
@@ -469,7 +469,7 @@ IDocumentService::OperationStatus CDocumentServiceBase::CloseDocumentInternal(
 		}
 
 		typeId = workingDocumentPtr->typeId;
-		url = GetDocumentUrl(*workingDocumentPtr);
+		documentSourceRef = workingDocumentPtr->documentSourceRef;
 		name = workingDocumentPtr->name;
 		isDirty = workingDocumentPtr->isDirty;
 
@@ -483,7 +483,7 @@ IDocumentService::OperationStatus CDocumentServiceBase::CloseDocumentInternal(
 				documentId,
 				typeId,
 				name,
-				url,
+				documentSourceRef,
 				isDirty);
 			handlerPtr->ProcessEvent(&event);
 		}
@@ -537,7 +537,7 @@ IDocumentService::OperationStatus CDocumentServiceBase::SetDocumentName(
 			const QString& documentName)
 {
 	QByteArray typeId;
-	QUrl documentUrl;
+	QByteArray documentSourceRef;
 	bool isDirty = false;
 	QByteArrayList userIds;
 
@@ -561,7 +561,7 @@ IDocumentService::OperationStatus CDocumentServiceBase::SetDocumentName(
 		document.name = documentName;
 
 		typeId = document.typeId;
-		documentUrl = GetDocumentUrl(document);
+		documentSourceRef = document.documentSourceRef;
 		isDirty = document.isDirty;
 		userIds = GetDocumentUserIds(documentId);
 	}
@@ -575,7 +575,7 @@ IDocumentService::OperationStatus CDocumentServiceBase::SetDocumentName(
 							documentId,
 							typeId,
 							documentName,
-							documentUrl,
+							documentSourceRef,
 							isDirty);
 				handlerPtr->ProcessEvent(&event);
 			}
@@ -957,7 +957,7 @@ void CDocumentServiceBase::OnDocumentDataLoaded(
 {
 	QByteArray typeId;
 	QString name;
-	QUrl url;
+	QByteArray documentSourceRef;
 	bool isDirty = false;
 
 	{
@@ -968,7 +968,7 @@ void CDocumentServiceBase::OnDocumentDataLoaded(
 		}
 
 		typeId = documentPtr->typeId;
-		url = GetDocumentUrl(*documentPtr);
+		documentSourceRef = documentPtr->documentSourceRef;
 		name = documentPtr->name;
 		isDirty = documentPtr->isDirty;
 	}
@@ -988,7 +988,7 @@ void CDocumentServiceBase::OnDocumentDataLoaded(
 						documentId,
 						typeId,
 						name,
-						url,
+						documentSourceRef,
 						isDirty);
 			handlerPtr->ProcessEvent(&event);
 		}
@@ -1002,7 +1002,7 @@ void CDocumentServiceBase::OnUndoManagerChanged(int modelId)
 	QByteArrayList userIds;
 	QByteArray docTypeId;
 	QString docName;
-	QUrl docUrl;
+	QByteArray documentSourceRef;
 	bool newIsDirty = false;
 	idoc::IUndoManagerSharedPtr docUndoManagerPtr;
 
@@ -1023,7 +1023,7 @@ void CDocumentServiceBase::OnUndoManagerChanged(int modelId)
 		userIds = GetDocumentUserIds(documentId);
 		docTypeId = document.typeId;
 		docName = document.name;
-		docUrl = GetDocumentUrl(document);
+		documentSourceRef = document.documentSourceRef;
 		docUndoManagerPtr = document.undoManagerPtr;
 	}
 
@@ -1035,7 +1035,7 @@ void CDocumentServiceBase::OnUndoManagerChanged(int modelId)
 							documentId,
 							docTypeId,
 							docName,
-							docUrl,
+							documentSourceRef,
 							newIsDirty,
 							*docUndoManagerPtr);
 				handlerPtr->ProcessEvent(&event);
@@ -1145,7 +1145,7 @@ void CDocumentServiceBase::OnUpdate(imod::IModel* modelPtr, const istd::IChangea
 								documentId,
 								workingDocument.typeId,
 								workingDocument.name,
-								GetDocumentUrl(workingDocument),
+								workingDocument.documentSourceRef,
 								workingDocument.isDirty,
 								*changeablePtr,
 								changeSet);

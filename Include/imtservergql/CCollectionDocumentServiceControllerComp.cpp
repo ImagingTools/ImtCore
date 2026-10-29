@@ -11,7 +11,6 @@
 #include <imtbase/COperationContext.h>
 #include <imtauth/CUserInfo.h>
 #include <imtauthgql/imtauthgql.h>
-#include <imtdoc/imtdoc.h>
 #include <imtservergql/DocumentSharing.h>
 
 
@@ -40,7 +39,7 @@ CDM::CDocumentList CCollectionDocumentServiceControllerComp::OnGetOpenedDocument
 
 			QString path = info.url.path();
 			QStringList parts = path.split('/', Qt::SkipEmptyParts);
-			QByteArray objectId = parts.count() > 0 ? parts.last().toUtf8() : QByteArray();
+			QByteArray objectId = parts.count() > 0 ? parts.first().toUtf8() : QByteArray();
 
 			sdlInfo.documentId = info.documentId;
 			sdlInfo.documentName = info.name;
@@ -805,7 +804,9 @@ QByteArray CCollectionDocumentServiceControllerComp::GetCollectionObjectId(const
 	const imtdoc::IDocumentService::DocumentList documentList = m_documentManagerCompPtr->GetOpenedDocumentList(userId);
 	for (const imtdoc::IDocumentService::DocumentListItem& documentItem : documentList){
 		if (documentItem.documentId == documentId){
-			return imtdoc::UrlToObjectId(documentItem.url);
+			const QStringList parts = documentItem.url.path().split('/', Qt::SkipEmptyParts);
+
+			return parts.count() > 0 ? parts.first().toUtf8() : QByteArray();
 		}
 	}
 

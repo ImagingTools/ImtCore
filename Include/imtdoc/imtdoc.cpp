@@ -43,64 +43,7 @@ static bool ParseSourceRef(const QByteArray& sourceRef, QByteArray& objectId, in
 }
 
 
-static bool ParseUrl(const QUrl& url, QByteArray& objectId, int& revision)
-{
-	objectId.clear();
-	revision = -1;
-
-	if (url.scheme() != QStringLiteral("collection")){
-		return false;
-	}
-
-	QByteArray path = url.path().toUtf8();
-	if (!path.startsWith('/')){
-		return false;
-	}
-
-	path.remove(0, 1);
-	if (path.endsWith('/')){
-		path.chop(1);
-	}
-
-	return ParseSourceRef(path, objectId, revision);
-}
-
-
 // public methods
-
-QUrl ObjectIdToUrl(const QByteArray& objectId, int revision)
-{
-	if (revision < 0){
-		return QUrl(QStringLiteral("collection:///") + objectId);
-	}
-
-	return QUrl(QStringLiteral("collection:///") + objectId + '/' + QString::number(revision));
-}
-
-
-QByteArray UrlToObjectId(const QUrl& url)
-{
-	QByteArray objectId;
-	int revision = -1;
-	if (!ParseUrl(url, objectId, revision)){
-		return QByteArray();
-	}
-
-	return objectId;
-}
-
-
-int UrlToRevision(const QUrl& url)
-{
-	QByteArray objectId;
-	int revision = -1;
-	if (!ParseUrl(url, objectId, revision)){
-		return -1;
-	}
-
-	return revision;
-}
-
 
 QByteArray ObjectIdToSourceRef(const QByteArray& objectId, int revision)
 {
@@ -137,30 +80,6 @@ int SourceRefToRevision(const QByteArray& sourceRef)
 	}
 
 	return revision;
-}
-
-
-QUrl SourceRefToUrl(const QByteArray& sourceRef)
-{
-	QByteArray objectId;
-	int revision = -1;
-	if (!ParseSourceRef(sourceRef, objectId, revision)){
-		return QUrl();
-	}
-
-	return ObjectIdToUrl(objectId, revision);
-}
-
-
-QByteArray UrlToSourceRef(const QUrl& url)
-{
-	QByteArray objectId;
-	int revision = -1;
-	if (!ParseUrl(url, objectId, revision)){
-		return QByteArray();
-	}
-
-	return ObjectIdToSourceRef(objectId, revision);
 }
 
 

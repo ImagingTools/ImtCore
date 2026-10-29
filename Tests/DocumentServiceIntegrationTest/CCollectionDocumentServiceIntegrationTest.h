@@ -85,9 +85,9 @@ private slots:
 	void UndoRedoOpenedDocumentDirtyFlagTest();
 	void UndoAfterSaveMakesDocumentDirtyTest();
 
-	// ObjectIdToUrl tests
-	void ObjectIdToUrlTest();
-	void UrlToObjectIdTest();
+	// Document URL tests
+	void OpenedDocumentUrlTest();
+	void SavedDocumentUrlTest();
 
 	// Async document loading completion tests
 	void OpenDocumentAsyncCompletionTest();
@@ -106,7 +106,7 @@ private slots:
 	void SingleCopyUndoRedoSharedTest();
 
 	// Object revision tests
-	void RevisionUrlHelpersTest();
+	void RevisionSourceRefHelpersTest();
 	void OpenDocumentRevisionTest();
 	void OpenDocumentRevisionListNameSuffixTest();
 	void OpenDocumentNonExistentRevisionTest();

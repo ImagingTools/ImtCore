@@ -445,7 +445,7 @@ bool CCollectionDocumentServiceComp::RestoreSharedDocument(const DocumentInfo& d
 		return false;
 	}
 
-	const int revision = imtdoc::UrlToRevision(QUrl(documentInfo.url));
+	const int revision = imtdoc::SourceRefToRevision(GetSourceRefFromUrl(QUrl(documentInfo.url)));
 	const UserDocumentPairList documents = FindDocumentsBySourceRef(imtdoc::ObjectIdToSourceRef(documentInfo.objectId, revision));
 	if (documents.isEmpty()){
 		return false;
@@ -475,7 +475,7 @@ bool CCollectionDocumentServiceComp::RestoreDocument(
 		return false;
 	}
 
-	const int revision = imtdoc::UrlToRevision(QUrl(documentInfo.url));
+	const int revision = imtdoc::SourceRefToRevision(GetSourceRefFromUrl(QUrl(documentInfo.url)));
 
 	istd::IChangeableSharedPtr objectPtr;
 	if (!documentInfo.objectId.isEmpty()){

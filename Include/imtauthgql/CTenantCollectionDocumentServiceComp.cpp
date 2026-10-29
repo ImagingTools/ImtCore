@@ -14,6 +14,7 @@
 #include <imtauth/IUserManager.h>
 #include <imtgql/IGqlContext.h>
 #include <imtdoc/CDocumentSavedEvent.h>
+#include <imtdoc/imtdoc.h>
 #include <imtauth/imtauth.h>
 #include <imtauthgql/TenantAccess.h>
 
@@ -674,7 +675,7 @@ bool CTenantCollectionDocumentServiceComp::ProcessEvent(imtdoc::CEventBase* even
 	if (savedEventPtr != nullptr){
 		QByteArray documentId = savedEventPtr->GetDocumentId();
 		QByteArray userId = savedEventPtr->GetUserId();
-		QByteArray objectId = savedEventPtr->GetDocumentUrl().toString().toUtf8().replace("collection:///", "");
+		QByteArray objectId = imtdoc::SourceRefToObjectId(savedEventPtr->GetDocumentSourceRef());
 
 		istd::IChangeableSharedPtr documentPtr;
 		imtauth::ITenantInfo* documentTicketPtr = nullptr;

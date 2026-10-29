@@ -1575,25 +1575,35 @@ void CCollectionDocumentServiceTest::DocumentStorageInsertRemoveTest()
 
 
 // ======================================================================
-// ObjectIdToUrl test
+// Document URL tests
 // ======================================================================
 
-void CCollectionDocumentServiceTest::ObjectIdToUrlTest()
+void CCollectionDocumentServiceTest::GetDocumentUrlTest()
 {
-	QUrl url = imtdoc::ObjectIdToUrl("myObjectId");
+	CTestableDocumentService::WorkingDocument document;
+	QVERIFY(m_managerPtr->GetDocumentUrl(document).isEmpty());
+
+	document.documentSourceRef = QByteArrayLiteral("myObjectId");
+	QUrl url = m_managerPtr->GetDocumentUrl(document);
 	QCOMPARE(url.toString(), QString("collection:///myObjectId"));
 	QCOMPARE(url.scheme(), QString("collection"));
 	QVERIFY2(url.host().isEmpty(), "URL host should be empty");
+
+	document.documentSourceRef = QByteArrayLiteral("myObjectId/3");
+	QCOMPARE(m_managerPtr->GetDocumentUrl(document).toString(), QString("collection:///myObjectId/3"));
 }
 
 
-void CCollectionDocumentServiceTest::UrlToObjectIdTest()
+void CCollectionDocumentServiceTest::GetSourceRefFromUrlTest()
 {
-	QCOMPARE(imtdoc::UrlToObjectId(imtdoc::ObjectIdToUrl("myObjectId")), QByteArray("myObjectId"));
-	QVERIFY(imtdoc::UrlToObjectId(QUrl()).isEmpty());
-	QVERIFY(imtdoc::UrlToObjectId(QUrl("collection:///")).isEmpty());
-	QVERIFY(imtdoc::UrlToObjectId(QUrl("file:///myObjectId")).isEmpty());
-	QVERIFY(imtdoc::UrlToObjectId(QUrl("collection:///segment1/segment2")).isEmpty());
+	QCOMPARE(m_managerPtr->GetSourceRefFromUrl(QUrl("collection:///myObjectId")), QByteArray("myObjectId"));
+	QCOMPARE(m_managerPtr->GetSourceRefFromUrl(QUrl("collection:///myObjectId/3")), QByteArray("myObjectId/3"));
+	QVERIFY(m_managerPtr->GetSourceRefFromUrl(QUrl()).isEmpty());
+	QVERIFY(m_managerPtr->GetSourceRefFromUrl(QUrl("collection:///")).isEmpty());
+	QVERIFY(m_managerPtr->GetSourceRefFromUrl(QUrl("file:///myObjectId")).isEmpty());
+	QVERIFY(m_managerPtr->GetSourceRefFromUrl(QUrl("collection:///segment1/segment2")).isEmpty());
+	QVERIFY(m_managerPtr->GetSourceRefFromUrl(QUrl("collection:///myObjectId/-1")).isEmpty());
+	QVERIFY(m_managerPtr->GetSourceRefFromUrl(QUrl("collection:///myObjectId/1/2")).isEmpty());
 }
 
 

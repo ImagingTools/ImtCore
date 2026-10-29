@@ -157,7 +157,7 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentCreated(imtdoc::CEventBa
 	FillNameProviderFlag(notification);
 
 	sdl::V1_0::imtbase::CDocumentServiceNotification sdlNotification;
-	FillSdlNotification(notification, sdl::V1_0::imtbase::EDocumentOperation::NewDocumentCreated, sdlNotification);
+	FillSdlNotification(concreteEventPtr, notification, sdl::V1_0::imtbase::EDocumentOperation::NewDocumentCreated, sdlNotification);
 
 	PublishRepresentation(sdl::V1_0::imtbase::COnDocumentManagerChangedGqlRequest::GetCommandId(), notification.userId, sdlNotification);
 
@@ -179,7 +179,7 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentOpened(imtdoc::CEventBas
 	FillNameProviderFlag(notification);
 
 	sdl::V1_0::imtbase::CDocumentServiceNotification sdlNotification;
-	FillSdlNotification(notification, sdl::V1_0::imtbase::EDocumentOperation::DocumentOpened, sdlNotification);
+	FillSdlNotification(concreteEventPtr, notification, sdl::V1_0::imtbase::EDocumentOperation::DocumentOpened, sdlNotification);
 
 	PublishRepresentation(sdl::V1_0::imtbase::COnDocumentManagerChangedGqlRequest::GetCommandId(), notification.userId, sdlNotification);
 
@@ -200,7 +200,7 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentRenamed(imtdoc::CEventBa
 	FillDocumentNotification(concreteEventPtr, notification);
 
 	sdl::V1_0::imtbase::CDocumentServiceNotification sdlNotification;
-	FillSdlNotification(notification, sdl::V1_0::imtbase::EDocumentOperation::DocumentRenamed, sdlNotification);
+	FillSdlNotification(concreteEventPtr, notification, sdl::V1_0::imtbase::EDocumentOperation::DocumentRenamed, sdlNotification);
 
 	PublishRepresentation(sdl::V1_0::imtbase::COnDocumentManagerChangedGqlRequest::GetCommandId(), notification.userId, sdlNotification);
 
@@ -219,7 +219,7 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentChanged(imtdoc::CEventBa
 	FillDocumentNotification(concreteEventPtr, notification);
 
 	sdl::V1_0::imtbase::CDocumentServiceNotification sdlNotification;
-	FillSdlNotification(notification, sdl::V1_0::imtbase::EDocumentOperation::DocumentChanged, sdlNotification);
+	FillSdlNotification(concreteEventPtr, notification, sdl::V1_0::imtbase::EDocumentOperation::DocumentChanged, sdlNotification);
 
 	PublishRepresentation(sdl::V1_0::imtbase::COnDocumentManagerChangedGqlRequest::GetCommandId(), notification.userId, sdlNotification);
 	PublishRepresentation(sdl::V1_0::imtbase::COnDocumentChangedGqlRequest::GetCommandId(), notification.userId, sdlNotification, notification.documentId);
@@ -288,7 +288,7 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentSaved(imtdoc::CEventBase
 	FillDocumentNotification(concreteEventPtr, notification);
 
 	sdl::V1_0::imtbase::CDocumentServiceNotification sdlNotification;
-	FillSdlNotification(notification, sdl::V1_0::imtbase::EDocumentOperation::DocumentSaved, sdlNotification);
+	FillSdlNotification(concreteEventPtr, notification, sdl::V1_0::imtbase::EDocumentOperation::DocumentSaved, sdlNotification);
 
 	PublishRepresentation(sdl::V1_0::imtbase::COnDocumentManagerChangedGqlRequest::GetCommandId(), notification.userId, sdlNotification);
 
@@ -307,7 +307,7 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentSavedAs(imtdoc::CEventBa
 	FillDocumentNotification(concreteEventPtr, notification);
 
 	sdl::V1_0::imtbase::CDocumentServiceNotification sdlNotification;
-	FillSdlNotification(notification, sdl::V1_0::imtbase::EDocumentOperation::DocumentSavedAs, sdlNotification);
+	FillSdlNotification(concreteEventPtr, notification, sdl::V1_0::imtbase::EDocumentOperation::DocumentSavedAs, sdlNotification);
 
 	PublishRepresentation(sdl::V1_0::imtbase::COnDocumentManagerChangedGqlRequest::GetCommandId(), notification.userId, sdlNotification);
 
@@ -346,7 +346,7 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentDataLoaded(imtdoc::CEven
 	FillDocumentNotification(concreteEventPtr, notification);
 
 	sdl::V1_0::imtbase::CDocumentServiceNotification sdlNotification;
-	FillSdlNotification(notification, sdl::V1_0::imtbase::EDocumentOperation::DocumentDataLoaded, sdlNotification);
+	FillSdlNotification(concreteEventPtr, notification, sdl::V1_0::imtbase::EDocumentOperation::DocumentDataLoaded, sdlNotification);
 
 	PublishRepresentation(sdl::V1_0::imtbase::COnDocumentManagerChangedGqlRequest::GetCommandId(), notification.userId, sdlNotification);
 
@@ -361,13 +361,13 @@ void CCollectionDocumentServicePublisherComp::FillDocumentNotification(
 	notification.userId = eventPtr->GetUserId();
 	notification.documentId = eventPtr->GetDocumentId();
 	notification.typeId = eventPtr->GetDocumentTypeId();
-	notification.url = eventPtr->GetDocumentUrl();
 	notification.name = eventPtr->GetDocumentName();
 	notification.isDirty = eventPtr->IsDocumentDirty();
 }
 
 
 void CCollectionDocumentServicePublisherComp::FillSdlNotification(
+			const imtdoc::CEventBase* eventPtr,
 			const imtdoc::IDocumentService::DocumentNotification& notification,
 			sdl::V1_0::imtbase::EDocumentOperation operation,
 			sdl::V1_0::imtbase::CDocumentServiceNotification& sdlNotification) const
@@ -375,7 +375,7 @@ void CCollectionDocumentServicePublisherComp::FillSdlNotification(
 	sdlNotification.documentOperation = operation;
 	sdlNotification.documentId = notification.documentId;
 	sdlNotification.documentName = notification.name;
-	sdlNotification.objectId = ConvertUrlToObjectId(notification.url);
+	sdlNotification.objectId = imtdoc::SourceRefToObjectId(eventPtr->GetDocumentSourceRef());
 	sdlNotification.objectTypeId = notification.typeId;
 	sdlNotification.isDirty = notification.isDirty;
 	sdlNotification.hasNameProvider = notification.hasNameProvider;
@@ -398,12 +398,6 @@ void CCollectionDocumentServicePublisherComp::FillNameProviderFlag(
 			return;
 		}
 	}
-}
-
-
-QByteArray CCollectionDocumentServicePublisherComp::ConvertUrlToObjectId(const QUrl& url) const
-{
-	return imtdoc::UrlToObjectId(url);
 }
 
 

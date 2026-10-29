@@ -11,6 +11,7 @@
 #include <imtauth/CUserInfo.h>
 #include <imtauth/IUserInfo.h>
 #include <imtdoc/CDocumentSavedEvent.h>
+#include <imtdoc/imtdoc.h>
 #include <imtgql/IGqlContext.h>
 #include <imtauthgql/imtauthgql.h>
 #include <imtauthgql/CAssignmentCollector.h>
@@ -351,7 +352,7 @@ bool CUserCollectionDocumentServiceComp::ProcessEvent(imtdoc::CEventBase* eventP
 	QByteArray userId = savedEventPtr->GetUserId();
 
 	// The saved user is stored under this collection element ID
-	const QByteArray objectId = savedEventPtr->GetDocumentUrl().path().mid(1).toUtf8();
+	const QByteArray objectId = imtdoc::SourceRefToObjectId(savedEventPtr->GetDocumentSourceRef());
 	if (objectId.isEmpty()){
 		return true;
 	}
