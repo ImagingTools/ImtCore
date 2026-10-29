@@ -22,9 +22,8 @@ QString CDocumentServiceCompBase::GetDefaultDocumentName(const WorkingDocument& 
 	}
 
 	const iprm::IParamsSetUniquePtr sourceParamsPtr = CreateDocumentSourceParams(document);
-	Q_ASSERT(sourceParamsPtr.IsValid());
 
-	return nameProviderPtr->GetDefaultDocumentName(*sourceParamsPtr, *document.objectPtr);
+	return nameProviderPtr->GetDefaultDocumentName(*document.objectPtr, sourceParamsPtr.GetPtr());
 }
 
 
@@ -59,10 +58,9 @@ bool CDocumentServiceCompBase::ValidateDocumentData(
 	}
 
 	const iprm::IParamsSetUniquePtr sourceParamsPtr = CreateDocumentSourceParams(document);
-	Q_ASSERT(sourceParamsPtr.IsValid());
 
 	QString validationMessage;
-	if (!documentValidator->ValidateDocumentData(*sourceParamsPtr, *document.objectPtr, validationMessage, operationContextPtr)){
+	if (!documentValidator->ValidateDocumentData(*document.objectPtr, validationMessage, sourceParamsPtr.GetPtr(), operationContextPtr)){
 		status = OS_INVALID_DOCUMENT_DATA;
 		if (errorMessage != nullptr){
 			*errorMessage = validationMessage.isEmpty() ? GetInvalidDocumentMessage() : validationMessage;

@@ -225,8 +225,8 @@ protected:
 	virtual QUrl GetDocumentUrl(const WorkingDocument& document) const;
 	/**
 		Creates the parameters of the document source passed to document validators and name providers.
-		The base implementation returns an empty parameter set, storage-specific subclasses
-		fill it from \c WorkingDocument::documentSourceRef.
+		The base implementation returns an empty pointer (no document source parameters),
+		storage-specific subclasses create it from \c WorkingDocument::documentSourceRef.
 	*/
 	virtual iprm::IParamsSetUniquePtr CreateDocumentSourceParams(const WorkingDocument& document) const;
 	virtual QString GetDefaultDocumentName(const WorkingDocument& document) const;

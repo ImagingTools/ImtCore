@@ -12,9 +12,9 @@ namespace imtauth
 
 
 bool CCrossOrgGrantDocumentValidatorComp::ValidateDocumentData(
-			const iprm::IParamsSet& /*params*/,
 			const istd::IChangeable& document,
 			QString& errorMessage,
+			const iprm::IParamsSet* /*paramsPtr*/,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	const imtauth::ICrossOrgGrantData* grantData = dynamic_cast<const imtauth::ICrossOrgGrantData*>(&document);

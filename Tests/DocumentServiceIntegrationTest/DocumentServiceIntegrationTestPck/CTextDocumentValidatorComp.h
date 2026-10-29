@@ -32,9 +32,9 @@ public:
 
 	// reimplemented (imtdoc::IDocumentValidator)
 	virtual bool ValidateDocumentData(
-				const iprm::IParamsSet& params,
 				const istd::IChangeable& document,
 				QString& errorMessage,
+				const iprm::IParamsSet* paramsPtr,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
 
 private:

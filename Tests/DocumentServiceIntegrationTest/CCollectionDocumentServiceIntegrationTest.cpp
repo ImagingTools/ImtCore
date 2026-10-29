@@ -1366,8 +1366,8 @@ void CCollectionDocumentServiceIntegrationTest::DocumentSourceParamsHelpersTest(
 {
 	iprm::IParamsSetUniquePtr paramsPtr = imtdoc::CreateObjectSourceParams(TEST_OBJECT_ID, 3);
 	QVERIFY(paramsPtr.IsValid());
-	QCOMPARE(imtdoc::GetObjectIdFromParams(*paramsPtr), TEST_OBJECT_ID);
-	QCOMPARE(imtdoc::GetRevisionFromParams(*paramsPtr), 3);
+	QCOMPARE(imtdoc::GetObjectIdFromParams(paramsPtr.GetPtr()), TEST_OBJECT_ID);
+	QCOMPARE(imtdoc::GetRevisionFromParams(paramsPtr.GetPtr()), 3);
 
 	const iprm::IIdParam* objectIdParamPtr = dynamic_cast<const iprm::IIdParam*>(paramsPtr->GetParameter(imtdoc::s_objectIdParamId));
 	QVERIFY(objectIdParamPtr != nullptr);
@@ -1380,15 +1380,14 @@ void CCollectionDocumentServiceIntegrationTest::DocumentSourceParamsHelpersTest(
 
 	iprm::IParamsSetUniquePtr headParamsPtr = imtdoc::CreateObjectSourceParams(TEST_OBJECT_ID);
 	QVERIFY(headParamsPtr.IsValid());
-	QCOMPARE(imtdoc::GetObjectIdFromParams(*headParamsPtr), TEST_OBJECT_ID);
-	QCOMPARE(imtdoc::GetRevisionFromParams(*headParamsPtr), -1);
+	QCOMPARE(imtdoc::GetObjectIdFromParams(headParamsPtr.GetPtr()), TEST_OBJECT_ID);
+	QCOMPARE(imtdoc::GetRevisionFromParams(headParamsPtr.GetPtr()), -1);
 	QVERIFY(headParamsPtr->GetParameter(imtdoc::s_revisionParamId) == nullptr);
 
 	iprm::IParamsSetUniquePtr emptyParamsPtr = imtdoc::CreateObjectSourceParams(QByteArray(), 3);
-	QVERIFY(emptyParamsPtr.IsValid());
-	QVERIFY(emptyParamsPtr->GetParamIds().isEmpty());
-	QVERIFY(imtdoc::GetObjectIdFromParams(*emptyParamsPtr).isEmpty());
-	QCOMPARE(imtdoc::GetRevisionFromParams(*emptyParamsPtr), -1);
+	QVERIFY(!emptyParamsPtr.IsValid());
+	QVERIFY(imtdoc::GetObjectIdFromParams(nullptr).isEmpty());
+	QCOMPARE(imtdoc::GetRevisionFromParams(nullptr), -1);
 }
 
 

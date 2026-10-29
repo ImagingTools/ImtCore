@@ -166,12 +166,12 @@ QByteArray UrlToSourceRef(const QUrl& url)
 
 iprm::IParamsSetUniquePtr CreateObjectSourceParams(const QByteArray& objectId, int revision)
 {
+	if (objectId.isEmpty()){
+		return iprm::IParamsSetUniquePtr();
+	}
+
 	iprm::CParamsSet* paramsSetPtr = new iprm::CParamsSet;
 	iprm::IParamsSetUniquePtr retVal(paramsSetPtr);
-
-	if (objectId.isEmpty()){
-		return retVal;
-	}
 
 	iprm::CIdParam* objectIdParamPtr = new iprm::CIdParam;
 	objectIdParamPtr->SetId(objectId);
@@ -187,9 +187,13 @@ iprm::IParamsSetUniquePtr CreateObjectSourceParams(const QByteArray& objectId, i
 }
 
 
-QByteArray GetObjectIdFromParams(const iprm::IParamsSet& params)
+QByteArray GetObjectIdFromParams(const iprm::IParamsSet* paramsPtr)
 {
-	const iprm::IIdParam* objectIdParamPtr = dynamic_cast<const iprm::IIdParam*>(params.GetParameter(s_objectIdParamId));
+	if (paramsPtr == nullptr){
+		return QByteArray();
+	}
+
+	const iprm::IIdParam* objectIdParamPtr = dynamic_cast<const iprm::IIdParam*>(paramsPtr->GetParameter(s_objectIdParamId));
 	if (objectIdParamPtr == nullptr){
 		return QByteArray();
 	}
@@ -198,9 +202,13 @@ QByteArray GetObjectIdFromParams(const iprm::IParamsSet& params)
 }
 
 
-int GetRevisionFromParams(const iprm::IParamsSet& params)
+int GetRevisionFromParams(const iprm::IParamsSet* paramsPtr)
 {
-	const imeas::INumericValue* revisionParamPtr = dynamic_cast<const imeas::INumericValue*>(params.GetParameter(s_revisionParamId));
+	if (paramsPtr == nullptr){
+		return -1;
+	}
+
+	const imeas::INumericValue* revisionParamPtr = dynamic_cast<const imeas::INumericValue*>(paramsPtr->GetParameter(s_revisionParamId));
 	if (revisionParamPtr == nullptr){
 		return -1;
 	}

@@ -13,7 +13,6 @@
 // ACF includes
 #include <imod/IModel.h>
 #include <imod/IObserver.h>
-#include <iprm/CParamsSet.h>
 #include <istd/CChangeNotifier.h>
 
 // ImtCore includes
@@ -1054,7 +1053,7 @@ QUrl CDocumentServiceBase::GetDocumentUrl(const WorkingDocument& /*document*/) c
 
 iprm::IParamsSetUniquePtr CDocumentServiceBase::CreateDocumentSourceParams(const WorkingDocument& /*document*/) const
 {
-	return iprm::IParamsSetUniquePtr(new iprm::CParamsSet);
+	return iprm::IParamsSetUniquePtr();
 }
 
 

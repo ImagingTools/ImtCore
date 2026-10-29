@@ -18,12 +18,12 @@ namespace imtauth
 
 
 bool CUserGroupDocumentValidatorComp::ValidateDocumentData(
-			const iprm::IParamsSet& params,
 			const istd::IChangeable& document,
 			QString& errorMessage,
+			const iprm::IParamsSet* paramsPtr,
 			const imtbase::IOperationContext* operationContextPtr) const
 {
-	const QByteArray objectId = imtdoc::GetObjectIdFromParams(params);
+	const QByteArray objectId = imtdoc::GetObjectIdFromParams(paramsPtr);
 
 	const imtauth::IUserGroupInfo* userGroupInfoPtr = dynamic_cast<const imtauth::IUserGroupInfo*>(&document);
 	if (userGroupInfoPtr == nullptr){

@@ -34,7 +34,7 @@ public:
 	I_END_COMPONENT
 
 	// reimplemented (imtdoc::IDocumentNameProvider)
-	virtual QString GetDefaultDocumentName(const iprm::IParamsSet& params, const istd::IChangeable& document) const override;
+	virtual QString GetDefaultDocumentName(const istd::IChangeable& document, const iprm::IParamsSet* paramsPtr = nullptr) const override;
 
 private:
 	I_ATTR(QString, m_namePrefixAttrPtr);
