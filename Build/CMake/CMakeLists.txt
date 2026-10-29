@@ -17,6 +17,7 @@ message(VERBOSE "ImtCore ACFDIR_BUILD ${ACFDIR_BUILD}")
 
 option(AUTOMATIC_DB_BACKUPS "Enable automatic database backups" ON)
 option(BUILD_TESTING "Configures projects for testing" OFF)
+option(IMT_BUILD_SDL_INTEGRATION_TESTS "Build the SDL generator integration tests (require BUILD_TESTING, USE_QTDB and IMT_BUILD_TOOLS_ONLY=OFF)" OFF)
 option(USE_MDBX "Use 3rdParty/libmdbx" OFF)
 option(USE_DUCK_DB "Use 3rdParty/libduckdb" OFF)
 
@@ -133,6 +134,10 @@ add_dependencies(SdlCodeGenerator ImtCorePck ImtSdlPck ImtSdlGenCppPck ImtSdlGen
 imt_chain_windeploy_target(SdlCodeGenerator)
 
 #------ SDL tool tests ------
+if(IMT_BUILD_SDL_INTEGRATION_TESTS AND NOT (BUILD_TESTING AND USE_QTDB AND NOT IMT_BUILD_TOOLS_ONLY))
+	message(WARNING "IMT_BUILD_SDL_INTEGRATION_TESTS requires BUILD_TESTING=ON, USE_QTDB=ON and IMT_BUILD_TOOLS_ONLY=OFF. The SDL integration tests are skipped")
+endif()
+
 if (BUILD_TESTING)
 	add_subdirectory("${INCLUDE_DIR}/imtsdlgencpp/Test/CMake" "${AUX_INCLUDE_DIR}/ImtSdlGenCppTest")
 	imt_chain_windeploy_target(ImtSdlGenTest)
@@ -264,6 +269,11 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 
 		add_subdirectory("${INCLUDE_DIR}/imtservergql/CMake" "${AUX_INCLUDE_DIR}/imtservergql")
 		add_dependencies(imtservergql imtappsdl)
+
+		if(BUILD_TESTING AND IMT_BUILD_SDL_INTEGRATION_TESTS)
+			add_subdirectory("${INCLUDE_DIR}/imtsdlgencpp/Test/Integration/CMake" "${AUX_INCLUDE_DIR}/ImtSdlGenIntegrationTest")
+			imt_chain_windeploy_target(ImtSdlGenIntegrationTest)
+		endif()
 
 		if(USE_DUCK_DB)
 			add_subdirectory("${INCLUDE_DIR}/imtduckdb/CMake"	"${AUX_INCLUDE_DIR}/imtduckdb")

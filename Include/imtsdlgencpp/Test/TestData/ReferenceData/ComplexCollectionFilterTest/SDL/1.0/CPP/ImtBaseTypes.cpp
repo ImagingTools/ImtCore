@@ -4981,6 +4981,15 @@ if (jsonObject.contains("parameters") && jsonObject["parameters"].isNull()){
 
 
 
+} // namespace sdl::V1_0::imtbase
+
+#include "ImtBaseTypesObjects.h"
+
+
+namespace sdl::V1_0::imtbase
+{
+
+
 CTimeRangeObject::CTimeRangeObject(QObject* parent): ::imtbase::CItemModelBase(parent){
 
 	QObject::connect(this, &CTimeRangeObject::beginChanged, this, &CItemModelBase::OnInternalModelChanged);

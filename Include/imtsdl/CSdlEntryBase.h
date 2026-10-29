@@ -39,6 +39,15 @@ public:
 	[[nodiscard]] virtual QString GetSchemaFilePath() const;
 	virtual void SetSchemaFilePath(const QString& schemaFile);
 
+	[[nodiscard]] virtual QString GetObjectTargetHeaderFilePath() const;
+	virtual void SetObjectTargetHeaderFilePath(const QString& objectHeaderFile);
+
+	[[nodiscard]] virtual QString GetObjectTargetSourceFilePath() const;
+	virtual void SetObjectTargetSourceFilePath(const QString& objectSourceFile);
+
+	[[nodiscard]] virtual QString GetFwdHeaderTargetFilePath() const;
+	virtual void SetFwdHeaderTargetFilePath(const QString& fwdHeaderFile);
+
 	[[nodiscard]] virtual bool IsExternal() const;
 	virtual void SetExternal(bool isExternal);
 
@@ -53,7 +62,10 @@ protected:
 	QString m_targetHeaderFilePath;
 	QString m_schemaFilePath;
 	bool m_isExternal;
+	QString m_fwdHeaderTargetFilePath;
 	QString m_qmlImportDeclaration;
+	QString m_objectTargetHeaderFilePath;
+	QString m_objectTargetSourceFilePath;
 	std::shared_ptr<iprm::IParamsSet> m_schemaParamsPtr;
 };
 

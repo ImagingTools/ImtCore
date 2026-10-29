@@ -2627,6 +2627,897 @@ bool V1_0::substrate::CSubstrateSpecificationDocumentMetaInfo::OptReadFromJsonOb
 
 
 
+
+
+QByteArray CGetSubstrateSpecificationListGqlRequest::GetCommandId()
+{
+	return QByteArrayLiteral("GetSubstrateSpecificationList");
+}
+
+
+bool CGetSubstrateSpecificationListGqlRequest::SetupGqlRequest(::imtgql::CGqlRequest& gqlRequest, const GetSubstrateSpecificationListRequestArguments& requestArguments, const GetSubstrateSpecificationListRequestInfo& /*requestInfo*/)
+{
+	gqlRequest.SetCommandId(GetCommandId());
+
+	// writting input arguments
+	::imtgql::CGqlParamObject inputDataObject;
+	if (!requestArguments.input->WriteToGraphQlObject(inputDataObject)){
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to create GQL Object").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+
+		return false;
+	}
+	gqlRequest.AddParam("input", inputDataObject);
+
+	return true;
+}
+
+
+CGetSubstrateSpecificationListGqlRequest::CGetSubstrateSpecificationListGqlRequest(const ::imtgql::CGqlRequest& gqlRequest, bool optRead)
+	: m_isValid(true)
+{
+	m_gqlContextPtr = gqlRequest.GetRequestContext();
+
+	// reading input arguments
+	const ::imtgql::CGqlParamObject* inputDataObjectPtr = gqlRequest.GetParamObject("input");
+	if (inputDataObjectPtr != nullptr){
+					bool isInputRead;
+			if (optRead){
+				isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr);
+			}
+			else {
+				isInputRead = m_requestedArguments.input.emplace().ReadFromGraphQlObject(*inputDataObjectPtr);
+			}
+			m_isValid = isInputRead;
+			if (!isInputRead){
+				return;
+			}
+
+	}
+
+	// reading requested fields
+	const imtgql::CGqlFieldObject* requestedFieldsObjectPtr = nullptr;
+	if (!gqlRequest.GetFields().GetFieldIds().isEmpty()){
+		requestedFieldsObjectPtr = &gqlRequest.GetFields();
+		if (requestedFieldsObjectPtr != nullptr){
+			const QByteArrayList requestedIds = requestedFieldsObjectPtr->GetFieldIds();
+			if (!requestedIds.isEmpty()){
+				m_requestInfo.isItemsRequested = requestedIds.contains("items");
+				const imtgql::CGqlFieldObject* itemsRequestedFieldsPtr = requestedFieldsObjectPtr->GetFieldArgumentObjectPtr("items");
+				if (itemsRequestedFieldsPtr != nullptr){
+					const QByteArrayList itemsRequestedIds = itemsRequestedFieldsPtr->GetFieldIds();
+					if (!itemsRequestedIds.isEmpty()){
+						m_requestInfo.items.isIdRequested = true;
+						m_requestInfo.items.isTypeIdRequested = true;
+						m_requestInfo.items.isNameRequested = true;
+						m_requestInfo.items.isMaterialIdRequested = itemsRequestedIds.contains("materialId");
+						m_requestInfo.items.isMaterialNameRequested = itemsRequestedIds.contains("materialName");
+						m_requestInfo.items.isAddedRequested = itemsRequestedIds.contains("added");
+						m_requestInfo.items.isTimeStampRequested = itemsRequestedIds.contains("timeStamp");
+						m_requestInfo.items.isColorPreviewRequested = itemsRequestedIds.contains("colorPreview");
+					}
+				}
+			}
+		}
+	}
+}
+
+
+bool CGetSubstrateSpecificationListGqlRequest::IsValid() const
+{
+	return m_isValid;
+}
+
+
+const ::imtgql::IGqlContext* CGetSubstrateSpecificationListGqlRequest::GetRequestContext() const
+{
+	return m_gqlContextPtr;
+}
+
+
+const GetSubstrateSpecificationListRequestArguments& CGetSubstrateSpecificationListGqlRequest::GetRequestedArguments() const
+{
+	return m_requestedArguments;
+}
+
+
+GetSubstrateSpecificationListRequestInfo CGetSubstrateSpecificationListGqlRequest::GetRequestInfo() const
+{
+	return m_requestInfo;
+}
+
+
+QByteArray CGetSubstrateSpecificationGqlRequest::GetCommandId()
+{
+	return QByteArrayLiteral("GetSubstrateSpecification");
+}
+
+
+bool CGetSubstrateSpecificationGqlRequest::SetupGqlRequest(::imtgql::CGqlRequest& gqlRequest, const GetSubstrateSpecificationRequestArguments& requestArguments, const GetSubstrateSpecificationRequestInfo& /*requestInfo*/)
+{
+	gqlRequest.SetCommandId(GetCommandId());
+
+	// writting input arguments
+	::imtgql::CGqlParamObject inputDataObject;
+	if (!requestArguments.input->WriteToGraphQlObject(inputDataObject)){
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to create GQL Object").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+
+		return false;
+	}
+	gqlRequest.AddParam("input", inputDataObject);
+
+	return true;
+}
+
+
+CGetSubstrateSpecificationGqlRequest::CGetSubstrateSpecificationGqlRequest(const ::imtgql::CGqlRequest& gqlRequest, bool optRead)
+	: m_isValid(true)
+{
+	m_gqlContextPtr = gqlRequest.GetRequestContext();
+
+	// reading input arguments
+	const ::imtgql::CGqlParamObject* inputDataObjectPtr = gqlRequest.GetParamObject("input");
+	if (inputDataObjectPtr != nullptr){
+					bool isInputRead;
+			if (optRead){
+				isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr);
+			}
+			else {
+				isInputRead = m_requestedArguments.input.emplace().ReadFromGraphQlObject(*inputDataObjectPtr);
+			}
+			m_isValid = isInputRead;
+			if (!isInputRead){
+				return;
+			}
+
+	}
+
+	// reading requested fields
+	const imtgql::CGqlFieldObject* requestedFieldsObjectPtr = nullptr;
+	if (!gqlRequest.GetFields().GetFieldIds().isEmpty()){
+		requestedFieldsObjectPtr = &gqlRequest.GetFields();
+		if (requestedFieldsObjectPtr != nullptr){
+			const QByteArrayList requestedIds = requestedFieldsObjectPtr->GetFieldIds();
+		}
+	}
+}
+
+
+bool CGetSubstrateSpecificationGqlRequest::IsValid() const
+{
+	return m_isValid;
+}
+
+
+const ::imtgql::IGqlContext* CGetSubstrateSpecificationGqlRequest::GetRequestContext() const
+{
+	return m_gqlContextPtr;
+}
+
+
+const GetSubstrateSpecificationRequestArguments& CGetSubstrateSpecificationGqlRequest::GetRequestedArguments() const
+{
+	return m_requestedArguments;
+}
+
+
+GetSubstrateSpecificationRequestInfo CGetSubstrateSpecificationGqlRequest::GetRequestInfo() const
+{
+	return m_requestInfo;
+}
+
+
+QByteArray CGetOptionsListGqlRequest::GetCommandId()
+{
+	return QByteArrayLiteral("GetOptionsList");
+}
+
+
+bool CGetOptionsListGqlRequest::SetupGqlRequest(::imtgql::CGqlRequest& gqlRequest, const GetOptionsListRequestArguments& requestArguments, const GetOptionsListRequestInfo& /*requestInfo*/)
+{
+	gqlRequest.SetCommandId(GetCommandId());
+
+	// writting input arguments
+	::imtgql::CGqlParamObject inputDataObject;
+	if (!requestArguments.input->WriteToGraphQlObject(inputDataObject)){
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to create GQL Object").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+
+		return false;
+	}
+	gqlRequest.AddParam("input", inputDataObject);
+
+	return true;
+}
+
+
+CGetOptionsListGqlRequest::CGetOptionsListGqlRequest(const ::imtgql::CGqlRequest& gqlRequest, bool optRead)
+	: m_isValid(true)
+{
+	m_gqlContextPtr = gqlRequest.GetRequestContext();
+
+	// reading input arguments
+	const ::imtgql::CGqlParamObject* inputDataObjectPtr = gqlRequest.GetParamObject("input");
+	if (inputDataObjectPtr != nullptr){
+					bool isInputRead;
+			if (optRead){
+				isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr);
+			}
+			else {
+				isInputRead = m_requestedArguments.input.emplace().ReadFromGraphQlObject(*inputDataObjectPtr);
+			}
+			m_isValid = isInputRead;
+			if (!isInputRead){
+				return;
+			}
+
+	}
+
+	// reading requested fields
+	const imtgql::CGqlFieldObject* requestedFieldsObjectPtr = nullptr;
+	if (!gqlRequest.GetFields().GetFieldIds().isEmpty()){
+		requestedFieldsObjectPtr = &gqlRequest.GetFields();
+		if (requestedFieldsObjectPtr != nullptr){
+			const QByteArrayList requestedIds = requestedFieldsObjectPtr->GetFieldIds();
+			if (!requestedIds.isEmpty()){
+				m_requestInfo.isTotalCountRequested = requestedIds.contains("totalCount");
+				m_requestInfo.isOffsetRequested = requestedIds.contains("offset");
+				m_requestInfo.isOptionsRequested = requestedIds.contains("options");
+				const imtgql::CGqlFieldObject* optionsRequestedFieldsPtr = requestedFieldsObjectPtr->GetFieldArgumentObjectPtr("options");
+				if (optionsRequestedFieldsPtr != nullptr){
+					const QByteArrayList optionsRequestedIds = optionsRequestedFieldsPtr->GetFieldIds();
+					if (!optionsRequestedIds.isEmpty()){
+						m_requestInfo.options.isIdRequested = optionsRequestedIds.contains("id");
+						m_requestInfo.options.isNameRequested = optionsRequestedIds.contains("name");
+						m_requestInfo.options.isDescriptionRequested = optionsRequestedIds.contains("description");
+						m_requestInfo.options.isEnabledRequested = optionsRequestedIds.contains("enabled");
+					}
+				}
+			}
+		}
+	}
+}
+
+
+bool CGetOptionsListGqlRequest::IsValid() const
+{
+	return m_isValid;
+}
+
+
+const ::imtgql::IGqlContext* CGetOptionsListGqlRequest::GetRequestContext() const
+{
+	return m_gqlContextPtr;
+}
+
+
+const GetOptionsListRequestArguments& CGetOptionsListGqlRequest::GetRequestedArguments() const
+{
+	return m_requestedArguments;
+}
+
+
+GetOptionsListRequestInfo CGetOptionsListGqlRequest::GetRequestInfo() const
+{
+	return m_requestInfo;
+}
+
+
+QByteArray CInsertSubstrateSpecificationGqlRequest::GetCommandId()
+{
+	return QByteArrayLiteral("InsertSubstrateSpecification");
+}
+
+
+bool CInsertSubstrateSpecificationGqlRequest::SetupGqlRequest(::imtgql::CGqlRequest& gqlRequest, const InsertSubstrateSpecificationRequestArguments& requestArguments, const InsertSubstrateSpecificationRequestInfo& /*requestInfo*/)
+{
+	gqlRequest.SetCommandId(GetCommandId());
+
+	// writting input arguments
+	::imtgql::CGqlParamObject inputDataObject;
+	if (!requestArguments.input->WriteToGraphQlObject(inputDataObject)){
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to create GQL Object").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+
+		return false;
+	}
+	gqlRequest.AddParam("input", inputDataObject);
+
+	return true;
+}
+
+
+CInsertSubstrateSpecificationGqlRequest::CInsertSubstrateSpecificationGqlRequest(const ::imtgql::CGqlRequest& gqlRequest, bool optRead)
+	: m_isValid(true)
+{
+	m_gqlContextPtr = gqlRequest.GetRequestContext();
+
+	// reading input arguments
+	const ::imtgql::CGqlParamObject* inputDataObjectPtr = gqlRequest.GetParamObject("input");
+	if (inputDataObjectPtr != nullptr){
+					bool isInputRead;
+			if (optRead){
+				isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr);
+			}
+			else {
+				isInputRead = m_requestedArguments.input.emplace().ReadFromGraphQlObject(*inputDataObjectPtr);
+			}
+			m_isValid = isInputRead;
+			if (!isInputRead){
+				return;
+			}
+
+	}
+
+	// reading requested fields
+	const imtgql::CGqlFieldObject* requestedFieldsObjectPtr = nullptr;
+	if (!gqlRequest.GetFields().GetFieldIds().isEmpty()){
+		requestedFieldsObjectPtr = &gqlRequest.GetFields();
+		if (requestedFieldsObjectPtr != nullptr){
+			const QByteArrayList requestedIds = requestedFieldsObjectPtr->GetFieldIds();
+			if (!requestedIds.isEmpty()){
+				m_requestInfo.isIdRequested = true;
+			}
+		}
+	}
+}
+
+
+bool CInsertSubstrateSpecificationGqlRequest::IsValid() const
+{
+	return m_isValid;
+}
+
+
+const ::imtgql::IGqlContext* CInsertSubstrateSpecificationGqlRequest::GetRequestContext() const
+{
+	return m_gqlContextPtr;
+}
+
+
+const InsertSubstrateSpecificationRequestArguments& CInsertSubstrateSpecificationGqlRequest::GetRequestedArguments() const
+{
+	return m_requestedArguments;
+}
+
+
+InsertSubstrateSpecificationRequestInfo CInsertSubstrateSpecificationGqlRequest::GetRequestInfo() const
+{
+	return m_requestInfo;
+}
+
+
+QByteArray CUpdateSubstrateSpecificationGqlRequest::GetCommandId()
+{
+	return QByteArrayLiteral("UpdateSubstrateSpecification");
+}
+
+
+bool CUpdateSubstrateSpecificationGqlRequest::SetupGqlRequest(::imtgql::CGqlRequest& gqlRequest, const UpdateSubstrateSpecificationRequestArguments& requestArguments, const UpdateSubstrateSpecificationRequestInfo& /*requestInfo*/)
+{
+	gqlRequest.SetCommandId(GetCommandId());
+
+	// writting input arguments
+	::imtgql::CGqlParamObject inputDataObject;
+	if (!requestArguments.input->WriteToGraphQlObject(inputDataObject)){
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to create GQL Object").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+
+		return false;
+	}
+	gqlRequest.AddParam("input", inputDataObject);
+
+	return true;
+}
+
+
+CUpdateSubstrateSpecificationGqlRequest::CUpdateSubstrateSpecificationGqlRequest(const ::imtgql::CGqlRequest& gqlRequest, bool optRead)
+	: m_isValid(true)
+{
+	m_gqlContextPtr = gqlRequest.GetRequestContext();
+
+	// reading input arguments
+	const ::imtgql::CGqlParamObject* inputDataObjectPtr = gqlRequest.GetParamObject("input");
+	if (inputDataObjectPtr != nullptr){
+					bool isInputRead;
+			if (optRead){
+				isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr);
+			}
+			else {
+				isInputRead = m_requestedArguments.input.emplace().ReadFromGraphQlObject(*inputDataObjectPtr);
+			}
+			m_isValid = isInputRead;
+			if (!isInputRead){
+				return;
+			}
+
+	}
+
+	// reading requested fields
+	const imtgql::CGqlFieldObject* requestedFieldsObjectPtr = nullptr;
+	if (!gqlRequest.GetFields().GetFieldIds().isEmpty()){
+		requestedFieldsObjectPtr = &gqlRequest.GetFields();
+		if (requestedFieldsObjectPtr != nullptr){
+			const QByteArrayList requestedIds = requestedFieldsObjectPtr->GetFieldIds();
+			if (!requestedIds.isEmpty()){
+				m_requestInfo.isIdRequested = true;
+			}
+		}
+	}
+}
+
+
+bool CUpdateSubstrateSpecificationGqlRequest::IsValid() const
+{
+	return m_isValid;
+}
+
+
+const ::imtgql::IGqlContext* CUpdateSubstrateSpecificationGqlRequest::GetRequestContext() const
+{
+	return m_gqlContextPtr;
+}
+
+
+const UpdateSubstrateSpecificationRequestArguments& CUpdateSubstrateSpecificationGqlRequest::GetRequestedArguments() const
+{
+	return m_requestedArguments;
+}
+
+
+UpdateSubstrateSpecificationRequestInfo CUpdateSubstrateSpecificationGqlRequest::GetRequestInfo() const
+{
+	return m_requestInfo;
+}
+QMap<int, QByteArray> CSubstrateSpecificationCollectionControllerCompBase::GetSupportedCommandIds() const
+{
+	static QMap<int, QByteArray> retVal = {
+		std::make_pair(OT_GET, CGetSubstrateSpecificationGqlRequest::GetCommandId()),
+		std::make_pair(OT_NEW, CInsertSubstrateSpecificationGqlRequest::GetCommandId()),
+		std::make_pair(OT_UPDATE, CUpdateSubstrateSpecificationGqlRequest::GetCommandId()),
+		std::make_pair(OT_LIST, CGetSubstrateSpecificationListGqlRequest::GetCommandId()),
+	};
+
+	return retVal;
+}
+
+
+bool CSubstrateSpecificationCollectionControllerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
+{
+	const QByteArray commandId = gqlRequest.GetCommandId();
+	if (commandId == CGetSubstrateSpecificationGqlRequest::GetCommandId()){
+		return true;
+	}
+	else if (commandId == CInsertSubstrateSpecificationGqlRequest::GetCommandId()){
+		return true;
+	}
+	else if (commandId == CUpdateSubstrateSpecificationGqlRequest::GetCommandId()){
+		return true;
+	}
+	else if (commandId == CGetSubstrateSpecificationListGqlRequest::GetCommandId()){
+		return true;
+	}
+	else if (commandId == CGetOptionsListGqlRequest::GetCommandId()){
+		return true;
+	}
+
+	return BaseClass::IsRequestSupported(gqlRequest);
+}
+
+
+bool CSubstrateSpecificationCollectionControllerCompBase::GetOperationFromRequest(const ::imtgql::CGqlRequest& gqlRequest, ::imtgql::CGqlParamObject& gqlObject, QString& errorMessage, int& operationType) const
+{
+	const QByteArray commandId = gqlRequest.GetCommandId();
+
+	if (commandId == CGetSubstrateSpecificationGqlRequest::GetCommandId()){
+		operationType =  OT_GET;
+
+		return true;
+	}
+
+	if (commandId == CInsertSubstrateSpecificationGqlRequest::GetCommandId()){
+		operationType =  OT_NEW;
+
+		return true;
+	}
+
+	if (commandId == CUpdateSubstrateSpecificationGqlRequest::GetCommandId()){
+		operationType =  OT_UPDATE;
+
+		return true;
+	}
+
+	if (commandId == CGetSubstrateSpecificationListGqlRequest::GetCommandId()){
+		operationType =  OT_LIST;
+
+		return true;
+	}
+
+	if (commandId == CGetOptionsListGqlRequest::GetCommandId()){
+		return true;
+	}
+
+	return BaseClass::GetOperationFromRequest(gqlRequest, gqlObject, errorMessage, operationType);
+}
+
+
+bool CSubstrateSpecificationCollectionControllerCompBase::CreateRepresentationFromObject(const istd::IChangeable& data, const QByteArray& objectTypeId, const ::imtgql::CGqlRequest& gqlRequest, QJsonObject& dataObj, QString& errorMessage) const
+{
+	Q_UNUSED(objectTypeId);
+
+	const QByteArray commandId = gqlRequest.GetCommandId();
+
+	//GetSubstrateSpecification
+	if (commandId == CGetSubstrateSpecificationGqlRequest::GetCommandId()){
+		CGetSubstrateSpecificationGqlRequest getSubstrateSpecificationGqlRequest(gqlRequest, false);
+		V1_0::substrate::SubstrateSpecificationDocument representationObject;
+		const bool isRepresentationCreated = CreateRepresentationFromObject(data, getSubstrateSpecificationGqlRequest, representationObject, errorMessage);
+		if (!isRepresentationCreated){
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to create representation").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+
+			return false;
+		}
+
+		if (const V1_0::substrate::CCardboardSubstrateSpecification* cardboardSubstrateSpecificationVal = std::get_if<V1_0::substrate::CCardboardSubstrateSpecification>(&representationObject)){
+			const bool isAdded = cardboardSubstrateSpecificationVal->WriteToJsonObject(dataObj);
+			if (!isAdded){
+				return false;
+			}
+			dataObj["__typename"] = "CardboardSubstrateSpecification";
+		}
+		else if (const V1_0::substrate::CPaperSubstrateSpecification* paperSubstrateSpecificationVal = std::get_if<V1_0::substrate::CPaperSubstrateSpecification>(&representationObject)){
+			const bool isAdded = paperSubstrateSpecificationVal->WriteToJsonObject(dataObj);
+			if (!isAdded){
+				return false;
+			}
+			dataObj["__typename"] = "PaperSubstrateSpecification";
+		}
+		else if (const V1_0::substrate::CFilmSubstrateSpecification* filmSubstrateSpecificationVal = std::get_if<V1_0::substrate::CFilmSubstrateSpecification>(&representationObject)){
+			const bool isAdded = filmSubstrateSpecificationVal->WriteToJsonObject(dataObj);
+			if (!isAdded){
+				return false;
+			}
+			dataObj["__typename"] = "FilmSubstrateSpecification";
+		}
+
+		return true;
+	}
+
+	errorMessage = QStringLiteral("Bad request. Unexpected command-ID: '%1'").arg(commandId);
+
+	SendErrorMessage(0, errorMessage);
+
+	return false;
+}
+
+
+istd::IChangeableUniquePtr CSubstrateSpecificationCollectionControllerCompBase::CreateObjectFromRequest(const ::imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& errorMessage) const
+{
+	const QByteArray commandId = gqlRequest.GetCommandId();
+
+	//InsertSubstrateSpecification
+	if (commandId == CInsertSubstrateSpecificationGqlRequest::GetCommandId()){
+		CInsertSubstrateSpecificationGqlRequest insertSubstrateSpecificationGqlRequest(gqlRequest, false);
+		if (!insertSubstrateSpecificationGqlRequest.IsValid()){
+			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(commandId);
+			SendErrorMessage(0, errorMessage);
+
+			return nullptr;
+		}
+
+		return CreateObjectFromRepresentation(*insertSubstrateSpecificationGqlRequest.GetRequestedArguments().input->item, newObjectId, errorMessage);
+	}
+
+	errorMessage = QStringLiteral("Bad request. Unexpected command-ID: '%1'").arg(commandId);
+	SendErrorMessage(0, errorMessage);
+
+	return nullptr;
+}
+
+
+bool CSubstrateSpecificationCollectionControllerCompBase::UpdateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, istd::IChangeable& object, QString& errorMessage) const
+{
+	const QByteArray commandId = gqlRequest.GetCommandId();
+
+	//UpdateSubstrateSpecification
+	if (commandId == CUpdateSubstrateSpecificationGqlRequest::GetCommandId()){
+		CUpdateSubstrateSpecificationGqlRequest updateSubstrateSpecificationGqlRequest(gqlRequest, true);
+		return UpdateObjectFromRepresentationRequest(gqlRequest, updateSubstrateSpecificationGqlRequest, object, errorMessage);
+	}
+
+	errorMessage = QStringLiteral("Bad request. Unexpected command-ID: '%1'").arg(commandId);
+	SendErrorMessage(0, errorMessage);
+
+	return false;
+}
+
+
+::imtservergql::CObjectCollectionControllerCompBase::GqlItemSetupContext CSubstrateSpecificationCollectionControllerCompBase::CreateGqlItemSetupContext(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+{
+	const QByteArray commandId = gqlRequest.GetCommandId();
+	auto setupContext = std::make_shared<CGetSubstrateSpecificationListGqlRequest>(gqlRequest, false);
+	if (!setupContext->IsValid()){
+		errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(commandId);
+		SendErrorMessage(0, errorMessage);
+
+		return {};
+	}
+
+	return setupContext;
+}
+
+
+bool CSubstrateSpecificationCollectionControllerCompBase::SetupGqlItemWithContext(const ::imtgql::CGqlRequest& gqlRequest, const ::imtservergql::CObjectCollectionControllerCompBase::GqlItemSetupContext& setupContext, QJsonObject& itemObj, const ::imtbase::IObjectCollectionIterator* objectCollectionIterator, QString& errorMessage) const
+{
+	Q_UNUSED(gqlRequest);
+
+	if (objectCollectionIterator == nullptr){
+I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to create object iterator.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+
+		return false;
+	}
+
+	const auto typedSetupContext = std::static_pointer_cast<const CGetSubstrateSpecificationListGqlRequest>(setupContext);
+	if (!typedSetupContext){
+		errorMessage = QStringLiteral("Internal error. Invalid request setup context for command-ID: '%1'").arg(CGetSubstrateSpecificationListGqlRequest::GetCommandId());
+		SendErrorMessage(0, errorMessage);
+
+		return false;
+	}
+
+	//GetSubstrateSpecificationList
+	V1_0::substrate::CSubstrateSpecificationListItem representationObject;
+	const bool isRepresentationCreated = CreateRepresentationFromObject(*objectCollectionIterator, *typedSetupContext, representationObject, errorMessage);
+	if (!isRepresentationCreated){
+	I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to create representation").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+
+		return false;
+	}
+
+	const bool isRepresentationWritten = representationObject.WriteToJsonObject(itemObj);
+	if (!isRepresentationWritten){
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to Write TreeModel").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+
+		return false;
+	}
+
+	return true;
+
+}
+
+
+QJsonObject CSubstrateSpecificationCollectionControllerCompBase::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+{
+	const QString commandId = gqlRequest.GetCommandId();
+	QJsonObject modelObj;
+	QJsonObject dataModelObj;
+
+	// GetOptionsList
+	if (commandId == CGetOptionsListGqlRequest::GetCommandId()){
+		CGetOptionsListGqlRequest getOptionsListGqlRequest(gqlRequest, false);
+		if (!getOptionsListGqlRequest.IsValid()){
+			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(commandId);
+			SendErrorMessage(0, errorMessage);
+
+			return QJsonObject();
+		}
+
+		V1_0::imtbase::COptionsList replyPayload = OnGetOptionsList(getOptionsListGqlRequest, errorMessage);
+		if (!errorMessage.isEmpty()){
+			SendErrorMessage(0, QStringLiteral("The derived call [OnGetOptionsList] returned an error: %1").arg(errorMessage));
+
+			return QJsonObject();
+		}
+
+		const bool isModelCreated = replyPayload.WriteToJsonObject(dataModelObj);
+		if (!isModelCreated){
+			errorMessage = QStringLiteral("Internal error. Unable to create response for command-ID: '%1'").arg(commandId);
+			SendCriticalMessage(0, errorMessage);
+
+			return QJsonObject();
+		}
+
+		modelObj.insert(QStringLiteral("data"), dataModelObj); return modelObj;
+	}
+
+	return BaseClass::CreateInternalResponse(gqlRequest, errorMessage);
+}
+
+
+bool CSubstrateSpecificationsGqlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
+{
+	const QByteArray commandId = gqlRequest.GetCommandId();
+	if (commandId == CGetSubstrateSpecificationListGqlRequest::GetCommandId()){
+		return true;
+	}
+	else if (commandId == CGetSubstrateSpecificationGqlRequest::GetCommandId()){
+		return true;
+	}
+	else if (commandId == CGetOptionsListGqlRequest::GetCommandId()){
+		return true;
+	}
+	else if (commandId == CInsertSubstrateSpecificationGqlRequest::GetCommandId()){
+		return true;
+	}
+	else if (commandId == CUpdateSubstrateSpecificationGqlRequest::GetCommandId()){
+		return true;
+	}
+
+	return BaseClass::IsRequestSupported(gqlRequest);
+}
+
+
+QJsonObject CSubstrateSpecificationsGqlHandlerCompBase::CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+{
+	const QByteArray commandId = gqlRequest.GetCommandId();
+	QJsonObject modelObj;
+	QJsonObject dataModelObj;
+
+	// GetSubstrateSpecificationList
+	if (commandId == CGetSubstrateSpecificationListGqlRequest::GetCommandId()){
+		CGetSubstrateSpecificationListGqlRequest getSubstrateSpecificationListGqlRequest(gqlRequest, false);
+		if (!getSubstrateSpecificationListGqlRequest.IsValid()){
+			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(commandId);
+			SendErrorMessage(0, errorMessage);
+
+			return QJsonObject();
+		}
+
+		V1_0::substrate::CSubstrateSpecificationListResponse replyPayload = OnGetSubstrateSpecificationList(getSubstrateSpecificationListGqlRequest, gqlRequest, errorMessage);
+		if (!errorMessage.isEmpty()){
+			SendErrorMessage(0, QStringLiteral("The derived call [OnGetSubstrateSpecificationList] returned an error: %1").arg(errorMessage));
+
+			return QJsonObject();
+		}
+
+		const bool isModelCreated = replyPayload.WriteToJsonObject(dataModelObj);
+		if (!isModelCreated){
+			errorMessage = QStringLiteral("Internal error. Unable to create response for command-ID: '%1'").arg(commandId);
+			SendCriticalMessage(0, errorMessage);
+
+			return QJsonObject();
+		}
+
+		modelObj.insert(QStringLiteral("data"), dataModelObj); return modelObj;
+	}
+
+	// GetSubstrateSpecification
+	if (commandId == CGetSubstrateSpecificationGqlRequest::GetCommandId()){
+		CGetSubstrateSpecificationGqlRequest getSubstrateSpecificationGqlRequest(gqlRequest, false);
+		if (!getSubstrateSpecificationGqlRequest.IsValid()){
+			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(commandId);
+			SendErrorMessage(0, errorMessage);
+
+			return QJsonObject();
+		}
+
+		V1_0::substrate::SubstrateSpecificationDocument replyPayload = OnGetSubstrateSpecification(getSubstrateSpecificationGqlRequest, gqlRequest, errorMessage);
+		if (!errorMessage.isEmpty()){
+			SendErrorMessage(0, QStringLiteral("The derived call [OnGetSubstrateSpecification] returned an error: %1").arg(errorMessage));
+
+			return QJsonObject();
+		}
+
+		if (const V1_0::substrate::CCardboardSubstrateSpecification* cardboardSubstrateSpecificationVal = std::get_if<V1_0::substrate::CCardboardSubstrateSpecification>(&replyPayload)){
+			const bool isAdded = cardboardSubstrateSpecificationVal->WriteToJsonObject(dataModelObj);
+			if (!isAdded){
+				return QJsonObject();
+			}
+			dataModelObj["__typename"] = "CardboardSubstrateSpecification";
+		}
+		else if (const V1_0::substrate::CPaperSubstrateSpecification* paperSubstrateSpecificationVal = std::get_if<V1_0::substrate::CPaperSubstrateSpecification>(&replyPayload)){
+			const bool isAdded = paperSubstrateSpecificationVal->WriteToJsonObject(dataModelObj);
+			if (!isAdded){
+				return QJsonObject();
+			}
+			dataModelObj["__typename"] = "PaperSubstrateSpecification";
+		}
+		else if (const V1_0::substrate::CFilmSubstrateSpecification* filmSubstrateSpecificationVal = std::get_if<V1_0::substrate::CFilmSubstrateSpecification>(&replyPayload)){
+			const bool isAdded = filmSubstrateSpecificationVal->WriteToJsonObject(dataModelObj);
+			if (!isAdded){
+				return QJsonObject();
+			}
+			dataModelObj["__typename"] = "FilmSubstrateSpecification";
+		}
+		modelObj.insert(QStringLiteral("data"), dataModelObj); return modelObj;
+	}
+
+	// GetOptionsList
+	if (commandId == CGetOptionsListGqlRequest::GetCommandId()){
+		CGetOptionsListGqlRequest getOptionsListGqlRequest(gqlRequest, false);
+		if (!getOptionsListGqlRequest.IsValid()){
+			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(commandId);
+			SendErrorMessage(0, errorMessage);
+
+			return QJsonObject();
+		}
+
+		V1_0::imtbase::COptionsList replyPayload = OnGetOptionsList(getOptionsListGqlRequest, gqlRequest, errorMessage);
+		if (!errorMessage.isEmpty()){
+			SendErrorMessage(0, QStringLiteral("The derived call [OnGetOptionsList] returned an error: %1").arg(errorMessage));
+
+			return QJsonObject();
+		}
+
+		const bool isModelCreated = replyPayload.WriteToJsonObject(dataModelObj);
+		if (!isModelCreated){
+			errorMessage = QStringLiteral("Internal error. Unable to create response for command-ID: '%1'").arg(commandId);
+			SendCriticalMessage(0, errorMessage);
+
+			return QJsonObject();
+		}
+
+		modelObj.insert(QStringLiteral("data"), dataModelObj); return modelObj;
+	}
+
+	// InsertSubstrateSpecification
+	if (commandId == CInsertSubstrateSpecificationGqlRequest::GetCommandId()){
+		CInsertSubstrateSpecificationGqlRequest insertSubstrateSpecificationGqlRequest(gqlRequest, false);
+		if (!insertSubstrateSpecificationGqlRequest.IsValid()){
+			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(commandId);
+			SendErrorMessage(0, errorMessage);
+
+			return QJsonObject();
+		}
+
+		V1_0::substrate::CInputId replyPayload = OnInsertSubstrateSpecification(insertSubstrateSpecificationGqlRequest, gqlRequest, errorMessage);
+		if (!errorMessage.isEmpty()){
+			SendErrorMessage(0, QStringLiteral("The derived call [OnInsertSubstrateSpecification] returned an error: %1").arg(errorMessage));
+
+			return QJsonObject();
+		}
+
+		const bool isModelCreated = replyPayload.WriteToJsonObject(dataModelObj);
+		if (!isModelCreated){
+			errorMessage = QStringLiteral("Internal error. Unable to create response for command-ID: '%1'").arg(commandId);
+			SendCriticalMessage(0, errorMessage);
+
+			return QJsonObject();
+		}
+
+		modelObj.insert(QStringLiteral("data"), dataModelObj); return modelObj;
+	}
+
+	// UpdateSubstrateSpecification
+	if (commandId == CUpdateSubstrateSpecificationGqlRequest::GetCommandId()){
+		CUpdateSubstrateSpecificationGqlRequest updateSubstrateSpecificationGqlRequest(gqlRequest, false);
+		if (!updateSubstrateSpecificationGqlRequest.IsValid()){
+			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(commandId);
+			SendErrorMessage(0, errorMessage);
+
+			return QJsonObject();
+		}
+
+		V1_0::substrate::CInputId replyPayload = OnUpdateSubstrateSpecification(updateSubstrateSpecificationGqlRequest, gqlRequest, errorMessage);
+		if (!errorMessage.isEmpty()){
+			SendErrorMessage(0, QStringLiteral("The derived call [OnUpdateSubstrateSpecification] returned an error: %1").arg(errorMessage));
+
+			return QJsonObject();
+		}
+
+		const bool isModelCreated = replyPayload.WriteToJsonObject(dataModelObj);
+		if (!isModelCreated){
+			errorMessage = QStringLiteral("Internal error. Unable to create response for command-ID: '%1'").arg(commandId);
+			SendCriticalMessage(0, errorMessage);
+
+			return QJsonObject();
+		}
+
+		modelObj.insert(QStringLiteral("data"), dataModelObj); return modelObj;
+	}
+
+	errorMessage = QStringLiteral("Bad request. Unexpected command-ID: '%1'").arg(commandId);
+	SendErrorMessage(0, errorMessage);
+
+	return QJsonObject();
+}
+
+
+} // namespace sdl::V1_0::substrate
+
+#include "SubstrateSpecificationsObjects.h"
+
+
+namespace sdl::V1_0::substrate
+{
+
+
 CInputIdObject::CInputIdObject(QObject* parent): ::imtbase::CItemModelBase(parent){
 
 	QObject::connect(this, &CInputIdObject::idChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -5576,886 +6467,4 @@ QVariant CSubstrateSpecificationDocumentObjectList::getData(const QString& nameI
 	}
 	return QVariant();
 }
-
-
-QByteArray CGetSubstrateSpecificationListGqlRequest::GetCommandId()
-{
-	return QByteArrayLiteral("GetSubstrateSpecificationList");
-}
-
-
-bool CGetSubstrateSpecificationListGqlRequest::SetupGqlRequest(::imtgql::CGqlRequest& gqlRequest, const GetSubstrateSpecificationListRequestArguments& requestArguments, const GetSubstrateSpecificationListRequestInfo& /*requestInfo*/)
-{
-	gqlRequest.SetCommandId(GetCommandId());
-
-	// writting input arguments
-	::imtgql::CGqlParamObject inputDataObject;
-	if (!requestArguments.input->WriteToGraphQlObject(inputDataObject)){
-		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to create GQL Object").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-		return false;
-	}
-	gqlRequest.AddParam("input", inputDataObject);
-
-	return true;
-}
-
-
-CGetSubstrateSpecificationListGqlRequest::CGetSubstrateSpecificationListGqlRequest(const ::imtgql::CGqlRequest& gqlRequest, bool optRead)
-	: m_isValid(true)
-{
-	m_gqlContextPtr = gqlRequest.GetRequestContext();
-
-	// reading input arguments
-	const ::imtgql::CGqlParamObject* inputDataObjectPtr = gqlRequest.GetParamObject("input");
-	if (inputDataObjectPtr != nullptr){
-					bool isInputRead;
-			if (optRead){
-				isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr);
-			}
-			else {
-				isInputRead = m_requestedArguments.input.emplace().ReadFromGraphQlObject(*inputDataObjectPtr);
-			}
-			m_isValid = isInputRead;
-			if (!isInputRead){
-				return;
-			}
-
-	}
-
-	// reading requested fields
-	const imtgql::CGqlFieldObject* requestedFieldsObjectPtr = nullptr;
-	if (!gqlRequest.GetFields().GetFieldIds().isEmpty()){
-		requestedFieldsObjectPtr = &gqlRequest.GetFields();
-		if (requestedFieldsObjectPtr != nullptr){
-			const QByteArrayList requestedIds = requestedFieldsObjectPtr->GetFieldIds();
-			if (!requestedIds.isEmpty()){
-				m_requestInfo.isItemsRequested = requestedIds.contains("items");
-				const imtgql::CGqlFieldObject* itemsRequestedFieldsPtr = requestedFieldsObjectPtr->GetFieldArgumentObjectPtr("items");
-				if (itemsRequestedFieldsPtr != nullptr){
-					const QByteArrayList itemsRequestedIds = itemsRequestedFieldsPtr->GetFieldIds();
-					if (!itemsRequestedIds.isEmpty()){
-						m_requestInfo.items.isIdRequested = true;
-						m_requestInfo.items.isTypeIdRequested = true;
-						m_requestInfo.items.isNameRequested = true;
-						m_requestInfo.items.isMaterialIdRequested = itemsRequestedIds.contains("materialId");
-						m_requestInfo.items.isMaterialNameRequested = itemsRequestedIds.contains("materialName");
-						m_requestInfo.items.isAddedRequested = itemsRequestedIds.contains("added");
-						m_requestInfo.items.isTimeStampRequested = itemsRequestedIds.contains("timeStamp");
-						m_requestInfo.items.isColorPreviewRequested = itemsRequestedIds.contains("colorPreview");
-					}
-				}
-			}
-		}
-	}
-}
-
-
-bool CGetSubstrateSpecificationListGqlRequest::IsValid() const
-{
-	return m_isValid;
-}
-
-
-const ::imtgql::IGqlContext* CGetSubstrateSpecificationListGqlRequest::GetRequestContext() const
-{
-	return m_gqlContextPtr;
-}
-
-
-const GetSubstrateSpecificationListRequestArguments& CGetSubstrateSpecificationListGqlRequest::GetRequestedArguments() const
-{
-	return m_requestedArguments;
-}
-
-
-GetSubstrateSpecificationListRequestInfo CGetSubstrateSpecificationListGqlRequest::GetRequestInfo() const
-{
-	return m_requestInfo;
-}
-
-
-QByteArray CGetSubstrateSpecificationGqlRequest::GetCommandId()
-{
-	return QByteArrayLiteral("GetSubstrateSpecification");
-}
-
-
-bool CGetSubstrateSpecificationGqlRequest::SetupGqlRequest(::imtgql::CGqlRequest& gqlRequest, const GetSubstrateSpecificationRequestArguments& requestArguments, const GetSubstrateSpecificationRequestInfo& /*requestInfo*/)
-{
-	gqlRequest.SetCommandId(GetCommandId());
-
-	// writting input arguments
-	::imtgql::CGqlParamObject inputDataObject;
-	if (!requestArguments.input->WriteToGraphQlObject(inputDataObject)){
-		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to create GQL Object").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-		return false;
-	}
-	gqlRequest.AddParam("input", inputDataObject);
-
-	return true;
-}
-
-
-CGetSubstrateSpecificationGqlRequest::CGetSubstrateSpecificationGqlRequest(const ::imtgql::CGqlRequest& gqlRequest, bool optRead)
-	: m_isValid(true)
-{
-	m_gqlContextPtr = gqlRequest.GetRequestContext();
-
-	// reading input arguments
-	const ::imtgql::CGqlParamObject* inputDataObjectPtr = gqlRequest.GetParamObject("input");
-	if (inputDataObjectPtr != nullptr){
-					bool isInputRead;
-			if (optRead){
-				isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr);
-			}
-			else {
-				isInputRead = m_requestedArguments.input.emplace().ReadFromGraphQlObject(*inputDataObjectPtr);
-			}
-			m_isValid = isInputRead;
-			if (!isInputRead){
-				return;
-			}
-
-	}
-
-	// reading requested fields
-	const imtgql::CGqlFieldObject* requestedFieldsObjectPtr = nullptr;
-	if (!gqlRequest.GetFields().GetFieldIds().isEmpty()){
-		requestedFieldsObjectPtr = &gqlRequest.GetFields();
-		if (requestedFieldsObjectPtr != nullptr){
-			const QByteArrayList requestedIds = requestedFieldsObjectPtr->GetFieldIds();
-		}
-	}
-}
-
-
-bool CGetSubstrateSpecificationGqlRequest::IsValid() const
-{
-	return m_isValid;
-}
-
-
-const ::imtgql::IGqlContext* CGetSubstrateSpecificationGqlRequest::GetRequestContext() const
-{
-	return m_gqlContextPtr;
-}
-
-
-const GetSubstrateSpecificationRequestArguments& CGetSubstrateSpecificationGqlRequest::GetRequestedArguments() const
-{
-	return m_requestedArguments;
-}
-
-
-GetSubstrateSpecificationRequestInfo CGetSubstrateSpecificationGqlRequest::GetRequestInfo() const
-{
-	return m_requestInfo;
-}
-
-
-QByteArray CGetOptionsListGqlRequest::GetCommandId()
-{
-	return QByteArrayLiteral("GetOptionsList");
-}
-
-
-bool CGetOptionsListGqlRequest::SetupGqlRequest(::imtgql::CGqlRequest& gqlRequest, const GetOptionsListRequestArguments& requestArguments, const GetOptionsListRequestInfo& /*requestInfo*/)
-{
-	gqlRequest.SetCommandId(GetCommandId());
-
-	// writting input arguments
-	::imtgql::CGqlParamObject inputDataObject;
-	if (!requestArguments.input->WriteToGraphQlObject(inputDataObject)){
-		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to create GQL Object").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-		return false;
-	}
-	gqlRequest.AddParam("input", inputDataObject);
-
-	return true;
-}
-
-
-CGetOptionsListGqlRequest::CGetOptionsListGqlRequest(const ::imtgql::CGqlRequest& gqlRequest, bool optRead)
-	: m_isValid(true)
-{
-	m_gqlContextPtr = gqlRequest.GetRequestContext();
-
-	// reading input arguments
-	const ::imtgql::CGqlParamObject* inputDataObjectPtr = gqlRequest.GetParamObject("input");
-	if (inputDataObjectPtr != nullptr){
-					bool isInputRead;
-			if (optRead){
-				isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr);
-			}
-			else {
-				isInputRead = m_requestedArguments.input.emplace().ReadFromGraphQlObject(*inputDataObjectPtr);
-			}
-			m_isValid = isInputRead;
-			if (!isInputRead){
-				return;
-			}
-
-	}
-
-	// reading requested fields
-	const imtgql::CGqlFieldObject* requestedFieldsObjectPtr = nullptr;
-	if (!gqlRequest.GetFields().GetFieldIds().isEmpty()){
-		requestedFieldsObjectPtr = &gqlRequest.GetFields();
-		if (requestedFieldsObjectPtr != nullptr){
-			const QByteArrayList requestedIds = requestedFieldsObjectPtr->GetFieldIds();
-			if (!requestedIds.isEmpty()){
-				m_requestInfo.isTotalCountRequested = requestedIds.contains("totalCount");
-				m_requestInfo.isOffsetRequested = requestedIds.contains("offset");
-				m_requestInfo.isOptionsRequested = requestedIds.contains("options");
-				const imtgql::CGqlFieldObject* optionsRequestedFieldsPtr = requestedFieldsObjectPtr->GetFieldArgumentObjectPtr("options");
-				if (optionsRequestedFieldsPtr != nullptr){
-					const QByteArrayList optionsRequestedIds = optionsRequestedFieldsPtr->GetFieldIds();
-					if (!optionsRequestedIds.isEmpty()){
-						m_requestInfo.options.isIdRequested = optionsRequestedIds.contains("id");
-						m_requestInfo.options.isNameRequested = optionsRequestedIds.contains("name");
-						m_requestInfo.options.isDescriptionRequested = optionsRequestedIds.contains("description");
-						m_requestInfo.options.isEnabledRequested = optionsRequestedIds.contains("enabled");
-					}
-				}
-			}
-		}
-	}
-}
-
-
-bool CGetOptionsListGqlRequest::IsValid() const
-{
-	return m_isValid;
-}
-
-
-const ::imtgql::IGqlContext* CGetOptionsListGqlRequest::GetRequestContext() const
-{
-	return m_gqlContextPtr;
-}
-
-
-const GetOptionsListRequestArguments& CGetOptionsListGqlRequest::GetRequestedArguments() const
-{
-	return m_requestedArguments;
-}
-
-
-GetOptionsListRequestInfo CGetOptionsListGqlRequest::GetRequestInfo() const
-{
-	return m_requestInfo;
-}
-
-
-QByteArray CInsertSubstrateSpecificationGqlRequest::GetCommandId()
-{
-	return QByteArrayLiteral("InsertSubstrateSpecification");
-}
-
-
-bool CInsertSubstrateSpecificationGqlRequest::SetupGqlRequest(::imtgql::CGqlRequest& gqlRequest, const InsertSubstrateSpecificationRequestArguments& requestArguments, const InsertSubstrateSpecificationRequestInfo& /*requestInfo*/)
-{
-	gqlRequest.SetCommandId(GetCommandId());
-
-	// writting input arguments
-	::imtgql::CGqlParamObject inputDataObject;
-	if (!requestArguments.input->WriteToGraphQlObject(inputDataObject)){
-		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to create GQL Object").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-		return false;
-	}
-	gqlRequest.AddParam("input", inputDataObject);
-
-	return true;
-}
-
-
-CInsertSubstrateSpecificationGqlRequest::CInsertSubstrateSpecificationGqlRequest(const ::imtgql::CGqlRequest& gqlRequest, bool optRead)
-	: m_isValid(true)
-{
-	m_gqlContextPtr = gqlRequest.GetRequestContext();
-
-	// reading input arguments
-	const ::imtgql::CGqlParamObject* inputDataObjectPtr = gqlRequest.GetParamObject("input");
-	if (inputDataObjectPtr != nullptr){
-					bool isInputRead;
-			if (optRead){
-				isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr);
-			}
-			else {
-				isInputRead = m_requestedArguments.input.emplace().ReadFromGraphQlObject(*inputDataObjectPtr);
-			}
-			m_isValid = isInputRead;
-			if (!isInputRead){
-				return;
-			}
-
-	}
-
-	// reading requested fields
-	const imtgql::CGqlFieldObject* requestedFieldsObjectPtr = nullptr;
-	if (!gqlRequest.GetFields().GetFieldIds().isEmpty()){
-		requestedFieldsObjectPtr = &gqlRequest.GetFields();
-		if (requestedFieldsObjectPtr != nullptr){
-			const QByteArrayList requestedIds = requestedFieldsObjectPtr->GetFieldIds();
-			if (!requestedIds.isEmpty()){
-				m_requestInfo.isIdRequested = true;
-			}
-		}
-	}
-}
-
-
-bool CInsertSubstrateSpecificationGqlRequest::IsValid() const
-{
-	return m_isValid;
-}
-
-
-const ::imtgql::IGqlContext* CInsertSubstrateSpecificationGqlRequest::GetRequestContext() const
-{
-	return m_gqlContextPtr;
-}
-
-
-const InsertSubstrateSpecificationRequestArguments& CInsertSubstrateSpecificationGqlRequest::GetRequestedArguments() const
-{
-	return m_requestedArguments;
-}
-
-
-InsertSubstrateSpecificationRequestInfo CInsertSubstrateSpecificationGqlRequest::GetRequestInfo() const
-{
-	return m_requestInfo;
-}
-
-
-QByteArray CUpdateSubstrateSpecificationGqlRequest::GetCommandId()
-{
-	return QByteArrayLiteral("UpdateSubstrateSpecification");
-}
-
-
-bool CUpdateSubstrateSpecificationGqlRequest::SetupGqlRequest(::imtgql::CGqlRequest& gqlRequest, const UpdateSubstrateSpecificationRequestArguments& requestArguments, const UpdateSubstrateSpecificationRequestInfo& /*requestInfo*/)
-{
-	gqlRequest.SetCommandId(GetCommandId());
-
-	// writting input arguments
-	::imtgql::CGqlParamObject inputDataObject;
-	if (!requestArguments.input->WriteToGraphQlObject(inputDataObject)){
-		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to create GQL Object").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-		return false;
-	}
-	gqlRequest.AddParam("input", inputDataObject);
-
-	return true;
-}
-
-
-CUpdateSubstrateSpecificationGqlRequest::CUpdateSubstrateSpecificationGqlRequest(const ::imtgql::CGqlRequest& gqlRequest, bool optRead)
-	: m_isValid(true)
-{
-	m_gqlContextPtr = gqlRequest.GetRequestContext();
-
-	// reading input arguments
-	const ::imtgql::CGqlParamObject* inputDataObjectPtr = gqlRequest.GetParamObject("input");
-	if (inputDataObjectPtr != nullptr){
-					bool isInputRead;
-			if (optRead){
-				isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr);
-			}
-			else {
-				isInputRead = m_requestedArguments.input.emplace().ReadFromGraphQlObject(*inputDataObjectPtr);
-			}
-			m_isValid = isInputRead;
-			if (!isInputRead){
-				return;
-			}
-
-	}
-
-	// reading requested fields
-	const imtgql::CGqlFieldObject* requestedFieldsObjectPtr = nullptr;
-	if (!gqlRequest.GetFields().GetFieldIds().isEmpty()){
-		requestedFieldsObjectPtr = &gqlRequest.GetFields();
-		if (requestedFieldsObjectPtr != nullptr){
-			const QByteArrayList requestedIds = requestedFieldsObjectPtr->GetFieldIds();
-			if (!requestedIds.isEmpty()){
-				m_requestInfo.isIdRequested = true;
-			}
-		}
-	}
-}
-
-
-bool CUpdateSubstrateSpecificationGqlRequest::IsValid() const
-{
-	return m_isValid;
-}
-
-
-const ::imtgql::IGqlContext* CUpdateSubstrateSpecificationGqlRequest::GetRequestContext() const
-{
-	return m_gqlContextPtr;
-}
-
-
-const UpdateSubstrateSpecificationRequestArguments& CUpdateSubstrateSpecificationGqlRequest::GetRequestedArguments() const
-{
-	return m_requestedArguments;
-}
-
-
-UpdateSubstrateSpecificationRequestInfo CUpdateSubstrateSpecificationGqlRequest::GetRequestInfo() const
-{
-	return m_requestInfo;
-}
-QMap<int, QByteArray> CSubstrateSpecificationCollectionControllerCompBase::GetSupportedCommandIds() const
-{
-	static QMap<int, QByteArray> retVal = {
-		std::make_pair(OT_GET, CGetSubstrateSpecificationGqlRequest::GetCommandId()),
-		std::make_pair(OT_NEW, CInsertSubstrateSpecificationGqlRequest::GetCommandId()),
-		std::make_pair(OT_UPDATE, CUpdateSubstrateSpecificationGqlRequest::GetCommandId()),
-		std::make_pair(OT_LIST, CGetSubstrateSpecificationListGqlRequest::GetCommandId()),
-	};
-
-	return retVal;
-}
-
-
-bool CSubstrateSpecificationCollectionControllerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
-{
-	const QByteArray commandId = gqlRequest.GetCommandId();
-	if (commandId == CGetSubstrateSpecificationGqlRequest::GetCommandId()){
-		return true;
-	}
-	else if (commandId == CInsertSubstrateSpecificationGqlRequest::GetCommandId()){
-		return true;
-	}
-	else if (commandId == CUpdateSubstrateSpecificationGqlRequest::GetCommandId()){
-		return true;
-	}
-	else if (commandId == CGetSubstrateSpecificationListGqlRequest::GetCommandId()){
-		return true;
-	}
-	else if (commandId == CGetOptionsListGqlRequest::GetCommandId()){
-		return true;
-	}
-
-	return BaseClass::IsRequestSupported(gqlRequest);
-}
-
-
-bool CSubstrateSpecificationCollectionControllerCompBase::GetOperationFromRequest(const ::imtgql::CGqlRequest& gqlRequest, ::imtgql::CGqlParamObject& gqlObject, QString& errorMessage, int& operationType) const
-{
-	const QByteArray commandId = gqlRequest.GetCommandId();
-
-	if (commandId == CGetSubstrateSpecificationGqlRequest::GetCommandId()){
-		operationType =  OT_GET;
-
-		return true;
-	}
-
-	if (commandId == CInsertSubstrateSpecificationGqlRequest::GetCommandId()){
-		operationType =  OT_NEW;
-
-		return true;
-	}
-
-	if (commandId == CUpdateSubstrateSpecificationGqlRequest::GetCommandId()){
-		operationType =  OT_UPDATE;
-
-		return true;
-	}
-
-	if (commandId == CGetSubstrateSpecificationListGqlRequest::GetCommandId()){
-		operationType =  OT_LIST;
-
-		return true;
-	}
-
-	if (commandId == CGetOptionsListGqlRequest::GetCommandId()){
-		return true;
-	}
-
-	return BaseClass::GetOperationFromRequest(gqlRequest, gqlObject, errorMessage, operationType);
-}
-
-
-bool CSubstrateSpecificationCollectionControllerCompBase::CreateRepresentationFromObject(const istd::IChangeable& data, const QByteArray& objectTypeId, const ::imtgql::CGqlRequest& gqlRequest, QJsonObject& dataObj, QString& errorMessage) const
-{
-	Q_UNUSED(objectTypeId);
-
-	const QByteArray commandId = gqlRequest.GetCommandId();
-
-	//GetSubstrateSpecification
-	if (commandId == CGetSubstrateSpecificationGqlRequest::GetCommandId()){
-		CGetSubstrateSpecificationGqlRequest getSubstrateSpecificationGqlRequest(gqlRequest, false);
-		V1_0::substrate::SubstrateSpecificationDocument representationObject;
-		const bool isRepresentationCreated = CreateRepresentationFromObject(data, getSubstrateSpecificationGqlRequest, representationObject, errorMessage);
-		if (!isRepresentationCreated){
-		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to create representation").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-
-		if (const V1_0::substrate::CCardboardSubstrateSpecification* cardboardSubstrateSpecificationVal = std::get_if<V1_0::substrate::CCardboardSubstrateSpecification>(&representationObject)){
-			const bool isAdded = cardboardSubstrateSpecificationVal->WriteToJsonObject(dataObj);
-			if (!isAdded){
-				return false;
-			}
-			dataObj["__typename"] = "CardboardSubstrateSpecification";
-		}
-		else if (const V1_0::substrate::CPaperSubstrateSpecification* paperSubstrateSpecificationVal = std::get_if<V1_0::substrate::CPaperSubstrateSpecification>(&representationObject)){
-			const bool isAdded = paperSubstrateSpecificationVal->WriteToJsonObject(dataObj);
-			if (!isAdded){
-				return false;
-			}
-			dataObj["__typename"] = "PaperSubstrateSpecification";
-		}
-		else if (const V1_0::substrate::CFilmSubstrateSpecification* filmSubstrateSpecificationVal = std::get_if<V1_0::substrate::CFilmSubstrateSpecification>(&representationObject)){
-			const bool isAdded = filmSubstrateSpecificationVal->WriteToJsonObject(dataObj);
-			if (!isAdded){
-				return false;
-			}
-			dataObj["__typename"] = "FilmSubstrateSpecification";
-		}
-
-		return true;
-	}
-
-	errorMessage = QStringLiteral("Bad request. Unexpected command-ID: '%1'").arg(commandId);
-
-	SendErrorMessage(0, errorMessage);
-
-	return false;
-}
-
-
-istd::IChangeableUniquePtr CSubstrateSpecificationCollectionControllerCompBase::CreateObjectFromRequest(const ::imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& errorMessage) const
-{
-	const QByteArray commandId = gqlRequest.GetCommandId();
-
-	//InsertSubstrateSpecification
-	if (commandId == CInsertSubstrateSpecificationGqlRequest::GetCommandId()){
-		CInsertSubstrateSpecificationGqlRequest insertSubstrateSpecificationGqlRequest(gqlRequest, false);
-		if (!insertSubstrateSpecificationGqlRequest.IsValid()){
-			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(commandId);
-			SendErrorMessage(0, errorMessage);
-
-			return nullptr;
-		}
-
-		return CreateObjectFromRepresentation(*insertSubstrateSpecificationGqlRequest.GetRequestedArguments().input->item, newObjectId, errorMessage);
-	}
-
-	errorMessage = QStringLiteral("Bad request. Unexpected command-ID: '%1'").arg(commandId);
-	SendErrorMessage(0, errorMessage);
-
-	return nullptr;
-}
-
-
-bool CSubstrateSpecificationCollectionControllerCompBase::UpdateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, istd::IChangeable& object, QString& errorMessage) const
-{
-	const QByteArray commandId = gqlRequest.GetCommandId();
-
-	//UpdateSubstrateSpecification
-	if (commandId == CUpdateSubstrateSpecificationGqlRequest::GetCommandId()){
-		CUpdateSubstrateSpecificationGqlRequest updateSubstrateSpecificationGqlRequest(gqlRequest, true);
-		return UpdateObjectFromRepresentationRequest(gqlRequest, updateSubstrateSpecificationGqlRequest, object, errorMessage);
-	}
-
-	errorMessage = QStringLiteral("Bad request. Unexpected command-ID: '%1'").arg(commandId);
-	SendErrorMessage(0, errorMessage);
-
-	return false;
-}
-
-
-::imtservergql::CObjectCollectionControllerCompBase::GqlItemSetupContext CSubstrateSpecificationCollectionControllerCompBase::CreateGqlItemSetupContext(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
-{
-	const QByteArray commandId = gqlRequest.GetCommandId();
-	auto setupContext = std::make_shared<CGetSubstrateSpecificationListGqlRequest>(gqlRequest, false);
-	if (!setupContext->IsValid()){
-		errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(commandId);
-		SendErrorMessage(0, errorMessage);
-
-		return {};
-	}
-
-	return setupContext;
-}
-
-
-bool CSubstrateSpecificationCollectionControllerCompBase::SetupGqlItemWithContext(const ::imtgql::CGqlRequest& gqlRequest, const ::imtservergql::CObjectCollectionControllerCompBase::GqlItemSetupContext& setupContext, QJsonObject& itemObj, const ::imtbase::IObjectCollectionIterator* objectCollectionIterator, QString& errorMessage) const
-{
-	Q_UNUSED(gqlRequest);
-
-	if (objectCollectionIterator == nullptr){
-I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to create object iterator.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-		return false;
-	}
-
-	const auto typedSetupContext = std::static_pointer_cast<const CGetSubstrateSpecificationListGqlRequest>(setupContext);
-	if (!typedSetupContext){
-		errorMessage = QStringLiteral("Internal error. Invalid request setup context for command-ID: '%1'").arg(CGetSubstrateSpecificationListGqlRequest::GetCommandId());
-		SendErrorMessage(0, errorMessage);
-
-		return false;
-	}
-
-	//GetSubstrateSpecificationList
-	V1_0::substrate::CSubstrateSpecificationListItem representationObject;
-	const bool isRepresentationCreated = CreateRepresentationFromObject(*objectCollectionIterator, *typedSetupContext, representationObject, errorMessage);
-	if (!isRepresentationCreated){
-	I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to create representation").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-		return false;
-	}
-
-	const bool isRepresentationWritten = representationObject.WriteToJsonObject(itemObj);
-	if (!isRepresentationWritten){
-		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to Write TreeModel").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-		return false;
-	}
-
-	return true;
-
-}
-
-
-QJsonObject CSubstrateSpecificationCollectionControllerCompBase::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
-{
-	const QString commandId = gqlRequest.GetCommandId();
-	QJsonObject modelObj;
-	QJsonObject dataModelObj;
-
-	// GetOptionsList
-	if (commandId == CGetOptionsListGqlRequest::GetCommandId()){
-		CGetOptionsListGqlRequest getOptionsListGqlRequest(gqlRequest, false);
-		if (!getOptionsListGqlRequest.IsValid()){
-			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(commandId);
-			SendErrorMessage(0, errorMessage);
-
-			return QJsonObject();
-		}
-
-		V1_0::imtbase::COptionsList replyPayload = OnGetOptionsList(getOptionsListGqlRequest, errorMessage);
-		if (!errorMessage.isEmpty()){
-			SendErrorMessage(0, QStringLiteral("The derived call [OnGetOptionsList] returned an error: %1").arg(errorMessage));
-
-			return QJsonObject();
-		}
-
-		const bool isModelCreated = replyPayload.WriteToJsonObject(dataModelObj);
-		if (!isModelCreated){
-			errorMessage = QStringLiteral("Internal error. Unable to create response for command-ID: '%1'").arg(commandId);
-			SendCriticalMessage(0, errorMessage);
-
-			return QJsonObject();
-		}
-
-		modelObj.insert(QStringLiteral("data"), dataModelObj); return modelObj;
-	}
-
-	return BaseClass::CreateInternalResponse(gqlRequest, errorMessage);
-}
-
-
-bool CSubstrateSpecificationsGqlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
-{
-	const QByteArray commandId = gqlRequest.GetCommandId();
-	if (commandId == CGetSubstrateSpecificationListGqlRequest::GetCommandId()){
-		return true;
-	}
-	else if (commandId == CGetSubstrateSpecificationGqlRequest::GetCommandId()){
-		return true;
-	}
-	else if (commandId == CGetOptionsListGqlRequest::GetCommandId()){
-		return true;
-	}
-	else if (commandId == CInsertSubstrateSpecificationGqlRequest::GetCommandId()){
-		return true;
-	}
-	else if (commandId == CUpdateSubstrateSpecificationGqlRequest::GetCommandId()){
-		return true;
-	}
-
-	return BaseClass::IsRequestSupported(gqlRequest);
-}
-
-
-QJsonObject CSubstrateSpecificationsGqlHandlerCompBase::CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
-{
-	const QByteArray commandId = gqlRequest.GetCommandId();
-	QJsonObject modelObj;
-	QJsonObject dataModelObj;
-
-	// GetSubstrateSpecificationList
-	if (commandId == CGetSubstrateSpecificationListGqlRequest::GetCommandId()){
-		CGetSubstrateSpecificationListGqlRequest getSubstrateSpecificationListGqlRequest(gqlRequest, false);
-		if (!getSubstrateSpecificationListGqlRequest.IsValid()){
-			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(commandId);
-			SendErrorMessage(0, errorMessage);
-
-			return QJsonObject();
-		}
-
-		V1_0::substrate::CSubstrateSpecificationListResponse replyPayload = OnGetSubstrateSpecificationList(getSubstrateSpecificationListGqlRequest, gqlRequest, errorMessage);
-		if (!errorMessage.isEmpty()){
-			SendErrorMessage(0, QStringLiteral("The derived call [OnGetSubstrateSpecificationList] returned an error: %1").arg(errorMessage));
-
-			return QJsonObject();
-		}
-
-		const bool isModelCreated = replyPayload.WriteToJsonObject(dataModelObj);
-		if (!isModelCreated){
-			errorMessage = QStringLiteral("Internal error. Unable to create response for command-ID: '%1'").arg(commandId);
-			SendCriticalMessage(0, errorMessage);
-
-			return QJsonObject();
-		}
-
-		modelObj.insert(QStringLiteral("data"), dataModelObj); return modelObj;
-	}
-
-	// GetSubstrateSpecification
-	if (commandId == CGetSubstrateSpecificationGqlRequest::GetCommandId()){
-		CGetSubstrateSpecificationGqlRequest getSubstrateSpecificationGqlRequest(gqlRequest, false);
-		if (!getSubstrateSpecificationGqlRequest.IsValid()){
-			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(commandId);
-			SendErrorMessage(0, errorMessage);
-
-			return QJsonObject();
-		}
-
-		V1_0::substrate::SubstrateSpecificationDocument replyPayload = OnGetSubstrateSpecification(getSubstrateSpecificationGqlRequest, gqlRequest, errorMessage);
-		if (!errorMessage.isEmpty()){
-			SendErrorMessage(0, QStringLiteral("The derived call [OnGetSubstrateSpecification] returned an error: %1").arg(errorMessage));
-
-			return QJsonObject();
-		}
-
-		if (const V1_0::substrate::CCardboardSubstrateSpecification* cardboardSubstrateSpecificationVal = std::get_if<V1_0::substrate::CCardboardSubstrateSpecification>(&replyPayload)){
-			const bool isAdded = cardboardSubstrateSpecificationVal->WriteToJsonObject(dataModelObj);
-			if (!isAdded){
-				return QJsonObject();
-			}
-			dataModelObj["__typename"] = "CardboardSubstrateSpecification";
-		}
-		else if (const V1_0::substrate::CPaperSubstrateSpecification* paperSubstrateSpecificationVal = std::get_if<V1_0::substrate::CPaperSubstrateSpecification>(&replyPayload)){
-			const bool isAdded = paperSubstrateSpecificationVal->WriteToJsonObject(dataModelObj);
-			if (!isAdded){
-				return QJsonObject();
-			}
-			dataModelObj["__typename"] = "PaperSubstrateSpecification";
-		}
-		else if (const V1_0::substrate::CFilmSubstrateSpecification* filmSubstrateSpecificationVal = std::get_if<V1_0::substrate::CFilmSubstrateSpecification>(&replyPayload)){
-			const bool isAdded = filmSubstrateSpecificationVal->WriteToJsonObject(dataModelObj);
-			if (!isAdded){
-				return QJsonObject();
-			}
-			dataModelObj["__typename"] = "FilmSubstrateSpecification";
-		}
-		modelObj.insert(QStringLiteral("data"), dataModelObj); return modelObj;
-	}
-
-	// GetOptionsList
-	if (commandId == CGetOptionsListGqlRequest::GetCommandId()){
-		CGetOptionsListGqlRequest getOptionsListGqlRequest(gqlRequest, false);
-		if (!getOptionsListGqlRequest.IsValid()){
-			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(commandId);
-			SendErrorMessage(0, errorMessage);
-
-			return QJsonObject();
-		}
-
-		V1_0::imtbase::COptionsList replyPayload = OnGetOptionsList(getOptionsListGqlRequest, gqlRequest, errorMessage);
-		if (!errorMessage.isEmpty()){
-			SendErrorMessage(0, QStringLiteral("The derived call [OnGetOptionsList] returned an error: %1").arg(errorMessage));
-
-			return QJsonObject();
-		}
-
-		const bool isModelCreated = replyPayload.WriteToJsonObject(dataModelObj);
-		if (!isModelCreated){
-			errorMessage = QStringLiteral("Internal error. Unable to create response for command-ID: '%1'").arg(commandId);
-			SendCriticalMessage(0, errorMessage);
-
-			return QJsonObject();
-		}
-
-		modelObj.insert(QStringLiteral("data"), dataModelObj); return modelObj;
-	}
-
-	// InsertSubstrateSpecification
-	if (commandId == CInsertSubstrateSpecificationGqlRequest::GetCommandId()){
-		CInsertSubstrateSpecificationGqlRequest insertSubstrateSpecificationGqlRequest(gqlRequest, false);
-		if (!insertSubstrateSpecificationGqlRequest.IsValid()){
-			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(commandId);
-			SendErrorMessage(0, errorMessage);
-
-			return QJsonObject();
-		}
-
-		V1_0::substrate::CInputId replyPayload = OnInsertSubstrateSpecification(insertSubstrateSpecificationGqlRequest, gqlRequest, errorMessage);
-		if (!errorMessage.isEmpty()){
-			SendErrorMessage(0, QStringLiteral("The derived call [OnInsertSubstrateSpecification] returned an error: %1").arg(errorMessage));
-
-			return QJsonObject();
-		}
-
-		const bool isModelCreated = replyPayload.WriteToJsonObject(dataModelObj);
-		if (!isModelCreated){
-			errorMessage = QStringLiteral("Internal error. Unable to create response for command-ID: '%1'").arg(commandId);
-			SendCriticalMessage(0, errorMessage);
-
-			return QJsonObject();
-		}
-
-		modelObj.insert(QStringLiteral("data"), dataModelObj); return modelObj;
-	}
-
-	// UpdateSubstrateSpecification
-	if (commandId == CUpdateSubstrateSpecificationGqlRequest::GetCommandId()){
-		CUpdateSubstrateSpecificationGqlRequest updateSubstrateSpecificationGqlRequest(gqlRequest, false);
-		if (!updateSubstrateSpecificationGqlRequest.IsValid()){
-			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(commandId);
-			SendErrorMessage(0, errorMessage);
-
-			return QJsonObject();
-		}
-
-		V1_0::substrate::CInputId replyPayload = OnUpdateSubstrateSpecification(updateSubstrateSpecificationGqlRequest, gqlRequest, errorMessage);
-		if (!errorMessage.isEmpty()){
-			SendErrorMessage(0, QStringLiteral("The derived call [OnUpdateSubstrateSpecification] returned an error: %1").arg(errorMessage));
-
-			return QJsonObject();
-		}
-
-		const bool isModelCreated = replyPayload.WriteToJsonObject(dataModelObj);
-		if (!isModelCreated){
-			errorMessage = QStringLiteral("Internal error. Unable to create response for command-ID: '%1'").arg(commandId);
-			SendCriticalMessage(0, errorMessage);
-
-			return QJsonObject();
-		}
-
-		modelObj.insert(QStringLiteral("data"), dataModelObj); return modelObj;
-	}
-
-	errorMessage = QStringLiteral("Bad request. Unexpected command-ID: '%1'").arg(commandId);
-	SendErrorMessage(0, errorMessage);
-
-	return QJsonObject();
-}
-
-
 } // namespace sdl::V1_0::substrate

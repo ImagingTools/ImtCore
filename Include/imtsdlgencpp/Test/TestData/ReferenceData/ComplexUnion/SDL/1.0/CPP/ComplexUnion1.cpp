@@ -1087,6 +1087,15 @@ if (jsonObject.contains("OptionalPoints") && jsonObject["OptionalPoints"].isNull
 
 
 
+} // namespace sdl::V1_0::complextest
+
+#include "ComplexUnion1Objects.h"
+
+
+namespace sdl::V1_0::complextest
+{
+
+
 CPointObject::CPointObject(QObject* parent): ::imtbase::CItemModelBase(parent){
 
 	QObject::connect(this, &CPointObject::xChanged, this, &CItemModelBase::OnInternalModelChanged);

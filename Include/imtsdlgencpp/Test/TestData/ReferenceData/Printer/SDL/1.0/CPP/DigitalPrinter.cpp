@@ -629,6 +629,15 @@ bool V1_0::modsdl::CDigitalPrinter::OptReadFromJsonObject(const QJsonObject& jso
 
 
 
+} // namespace sdl::V1_0::modsdl
+
+#include "DigitalPrinterObjects.h"
+
+
+namespace sdl::V1_0::modsdl
+{
+
+
 CDigitalPrinterSpecificationObject::CDigitalPrinterSpecificationObject(QObject* parent): ::imtbase::CItemModelBase(parent){
 
 	QObject::connect(this, &CDigitalPrinterSpecificationObject::baseChanged, this, &CItemModelBase::OnInternalModelChanged);
