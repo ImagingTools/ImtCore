@@ -25,6 +25,7 @@
 #include <imtsdl/CGqlSchemaParser.h>
 #include <imtsdl/ISdlTypeListProvider.h>
 #include <imtsdl/CSdlType.h>
+#include <imtsdlgencpp/ICxxFilePostProcessor.h>
 
 
 namespace imtsdlgentest
@@ -774,6 +775,64 @@ void CSdlGenTest::TestDepFileDoesNotContainIntermediateFile()
 
 	// the intermediate file is removed after the processing, so it is not an output
 	QVERIFY(!depFile.contains("ArraySerializationObjects.cpp"));
+}
+
+
+void CSdlGenTest::TestSourceTailPostProcessor()
+{
+	const QDir outputDir(m_tempOutputDir.absoluteFilePath("SourceTailPostProcessor"));
+	QVERIFY(QDir().mkpath(outputDir.absolutePath()));
+
+	CImtSdlGenTest testSuite;
+	PrepareSuite(testSuite, outputDir);
+
+	auto argParserPtr = testSuite.GetInterface<imtsdl::ISdlEditableProcessArgumentsParser>();
+	argParserPtr->SetMocIncludeEnabled(true);
+
+	auto* postProcessorPtr = testSuite.GetInterface<imtsdlgencpp::ICxxFilePostProcessor>("CxxSourceTailPostProcessor");
+	QVERIFY(postProcessorPtr != nullptr);
+
+	const auto createFile = [&](const QString& name, const QByteArray& content, QIODevice::OpenMode mode) -> imtsdlgencpp::CxxEntryFileInfo::FilePtr {
+		auto filePtr = std::make_shared<QFile>(outputDir.absoluteFilePath(name));
+		if (!filePtr->open(QIODevice::WriteOnly | QIODevice::Truncate)){
+			return nullptr;
+		}
+		filePtr->write(content);
+		filePtr->close();
+
+		return filePtr->open(mode) ? filePtr : nullptr;
+	};
+
+	// the objects source is appended to the main one, with the moc includes
+	{
+		imtsdlgencpp::CxxEntryFileInfo files;
+		files.sourceFile = createFile("Foo.cpp", "// main source\n", QIODevice::ReadWrite | QIODevice::Append);
+		files.objectSourceFile = createFile("FooObjects.cpp", "// objects source\n", QIODevice::ReadOnly);
+		QVERIFY(files.sourceFile != nullptr);
+		QVERIFY(files.objectSourceFile != nullptr);
+
+		QVERIFY(postProcessorPtr->ProcessFiles(files));
+		files.sourceFile->close();
+
+		const QByteArray source = ReadFileContent(outputDir.absoluteFilePath("Foo.cpp"));
+		QVERIFY(source.startsWith("// main source"));
+		QVERIFY(source.contains("// objects source"));
+		QVERIFY(source.indexOf("// main source") < source.indexOf("// objects source"));
+		QVERIFY(source.contains("#include \"moc_Foo.cpp\""));
+		QVERIFY(source.contains("#include \"moc_FooObjects.cpp\""));
+	}
+
+	// the failed copying must fail the post processing: the objects source is removed after it, and the main one would be incomplete
+	{
+		imtsdlgencpp::CxxEntryFileInfo files;
+		// the main source is opened only for reading, so the writing fails
+		files.sourceFile = createFile("Bar.cpp", "// main source\n", QIODevice::ReadOnly);
+		files.objectSourceFile = createFile("BarObjects.cpp", "// objects source\n", QIODevice::ReadOnly);
+		QVERIFY(files.sourceFile != nullptr);
+		QVERIFY(files.objectSourceFile != nullptr);
+
+		QVERIFY(!postProcessorPtr->ProcessFiles(files));
+	}
 }
 
 

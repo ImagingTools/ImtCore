@@ -34,7 +34,11 @@ bool CCxxSourceTailPostProcessorComp::ProcessFiles(const CxxEntryFileInfo& files
 		}
 
 		FeedStream(stream, 1, true);
-		CopyData(*files.objectSourceFile, *files.sourceFile);
+		if (CopyData(*files.objectSourceFile, *files.sourceFile) < 0){
+			SendErrorMessage(0, QStringLiteral("Unable to append the objects source file '%1' to '%2'").arg(files.objectSourceFile->fileName(), files.sourceFile->fileName()));
+
+			return false;
+		}
 	}
 
 	if (m_argumentParserCompPtr->IsMocIncludeEnabled()){

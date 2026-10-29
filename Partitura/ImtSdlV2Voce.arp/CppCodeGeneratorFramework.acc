@@ -475,6 +475,7 @@
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="CxxProcessorsManager"/>
     </ExportedInterfaces>
     <ExportedComponents>
+        <Component ExportedId="CxxSourceTailPostProcessor" ComponentId="CxxSourceTailPostProcessor"/>
         <Component ExportedId="GqlCollectionControllerBaseClassGenerator" ComponentId="SdlGqlCodeGeneratorFramework/GqlCollectionControllerBaseClassGenerator"/>
         <Component ExportedId="GqlHandlerBaseClassGenerator" ComponentId="SdlGqlCodeGeneratorFramework/GqlHandlerBaseClassGenerator"/>
         <Component ExportedId="GqlWrapClassCodeGenerator" ComponentId="SdlGqlCodeGeneratorFramework/GqlWrapClassCodeGenerator"/>

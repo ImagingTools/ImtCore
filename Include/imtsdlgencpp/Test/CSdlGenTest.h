@@ -39,6 +39,7 @@ private Q_SLOTS:
 	void TestImportedObjectsGuardReportsMissingHeader();
 	void TestNoObjectsSchemaImportsSchema();
 	void TestIntermediateFileIsRemovedAfterFailure();
+	void TestSourceTailPostProcessor();
 	void TestDepFileDoesNotContainIntermediateFile();
 
 	void cleanup();

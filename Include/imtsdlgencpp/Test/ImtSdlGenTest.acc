@@ -147,6 +147,7 @@
         <Component ExportedId="BaseClassExtender" ComponentId="SdlCoreFramework/BaseClassExtender"/>
         <Component ExportedId="BasicRequestsProvider" ComponentId="SdlCoreFramework/BasicRequestsProvider"/>
         <Component ExportedId="CppCodeGeneratorFramework" ComponentId="CppCodeGeneratorFramework"/>
+        <Component ExportedId="CxxSourceTailPostProcessor" ComponentId="CppCodeGeneratorFramework/CxxSourceTailPostProcessor"/>
         <Component ExportedId="DependentSchemaList" ComponentId="SdlCoreFramework/DependentSchemaList"/>
         <Component ExportedId="GqlSchemaParser" ComponentId="SdlCoreFramework/GqlSchemaParser"/>
         <Component ExportedId="OriginalNamespace" ComponentId="SdlCoreFramework/OriginalNamespace"/>
