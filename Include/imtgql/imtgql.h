@@ -7,11 +7,38 @@
 
 // ImtCore includes
 #include <imtgql/CGqlRequest.h>
+#include <imtgql/IGqlContext.h>
 
 
 namespace imtgql
 {
 
+
+/**
+	Collect the permissions implied by the given ones in the product of the context,
+	limited to the permissions available to its organization.
+	\see imtlic::CollectImpliedPermissions
+*/
+imtauth::IUserInfo::FeatureIds CollectImpliedPermissions(const IGqlContext& gqlContext, const imtauth::IUserInfo::FeatureIds& permissions);
+
+/**
+	Every permission of the product of the context if the caller owns the organization of the context, otherwise none.
+	The owner of an organization holds its whole permission scope, whatever the roles.
+	\see imtlic::CollectProductPermissions
+*/
+imtauth::IUserInfo::FeatureIds CollectTenantOwnerPermissions(const IGqlContext& gqlContext);
+
+/**
+	The given permissions limited to the permission scope of the organization of the context.
+	The organization access permissions (\see imtauth::GetOrganizationAccessPermissions) are kept: they open the organizations whatever the scope.
+	Outside of any organization the permissions are returned unchanged.
+*/
+imtauth::IUserInfo::FeatureIds CollectTenantScopedPermissions(const IGqlContext& gqlContext, const imtauth::IUserInfo::FeatureIds& permissions);
+
+/**
+	The organization access permissions (\see imtauth::GetOrganizationAccessPermissions) the context grants to the given user.
+*/
+imtauth::IUserInfo::FeatureIds CollectOrganizationAccessPermissions(const IGqlContext& gqlContext, const QByteArray& userId);
 
 QByteArray GetLanguageIdFromRequest(const QList<CGqlParamObject>& inputParams);
 QByteArray GetDesignSchemeIdFromRequest(const QList<CGqlParamObject>& inputParams);

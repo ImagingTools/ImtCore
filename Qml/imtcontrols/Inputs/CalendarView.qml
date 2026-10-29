@@ -21,7 +21,7 @@ ListView{
 	property Component weekDayCellDelegate: weekDayCellComp;
 	property Component dayCellDelegate: dayCellComp;
 
-	property int radius: Style.radiusL;
+	property int radius: Style.radiusM;
 	property int weekDayListHeight: Style.headerHeight;
 
 	property ListModel dayOfWeekModel: ListModel{};
@@ -29,7 +29,7 @@ ListView{
 	property string color: Style.baseColor;
 	property string cellColor: Style.baseColor;
 	property string fontColor_cell: Style.textColor;
-	property int fontSize_cell: 12;
+	property int fontSize_cell: Style.fontSizeM;
 
 	property int gridCellWidth: Math.trunc(width/7);
 	property int gridCellHeight: Math.trunc((height - weekDayListHeight)/6);
@@ -112,9 +112,8 @@ ListView{
 				anchors.centerIn: parent;
 
 				font.family: Style.fontFamily;
-				font.pixelSize: calendarView.fontSize_cell;
-				font.bold: true;
-				color: calendarView.fontColor_cell;
+				font.pixelSize: Style.fontSizeS;
+				color: Style.subtitleColor;
 
 				text: model.name;
 			}

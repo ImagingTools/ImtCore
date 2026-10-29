@@ -16,6 +16,7 @@ RemoteCollectionView {
 	additionalFieldIds: [RoleItemDataTypeMetaInfo.s_productId, RoleItemDataTypeMetaInfo.s_parentRoles]
 	
 	commandsDelegateComp: Component {DocCollectionViewDelegate {
+			revisionsPermissionPath: "/Administration/Roles/Revisions";
 			collectionView: roleCollectionViewContainer;
 			documentManager: roleCollectionViewContainer.documentManager;
 
@@ -40,7 +41,11 @@ RemoteCollectionView {
 	
 	property string productId;
 	property var documentManager: null;
-	
+
+	Component.onCompleted: {
+		table.setSortingInfo(RoleItemDataTypeMetaInfo.s_roleName, "ASC");
+	}
+
 	function handleSubscription(dataModel){
 		roleCollectionViewContainer.doUpdateGui();
 	}

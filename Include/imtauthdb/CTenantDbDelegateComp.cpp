@@ -13,6 +13,7 @@
 #include <istd/TOptDelPtr.h>
 #include <imtauth/ITenantInfo.h>
 #include <iprm/IIdParam.h>
+#include <iprm/IEnableableParam.h>
 #include <iprm/ITextParam.h>
 #include <iprm/CParamsSet.h>
 #include <iprm/TParamsPtr.h>
@@ -161,8 +162,9 @@ CTenantDbDelegateComp::NewObjectQuery CTenantDbDelegateComp::CreateNewObjectQuer
 		id = QUuid::createUuid().toString(QUuid::WithoutBraces);
 	}
 
-	QString name = imtdb::EscapeSql(tenantPtr != nullptr ? tenantPtr->GetTenantName() : objectName);
-	QString description = imtdb::EscapeSql(tenantPtr != nullptr ? tenantPtr->GetTenantDescription() : objectDescription);
+	// The text goes through the statement split at ';', so it is encoded for it
+	QString name = imtdb::SqlEncode(tenantPtr != nullptr ? tenantPtr->GetTenantName() : objectName);
+	QString description = imtdb::SqlEncode(tenantPtr != nullptr ? tenantPtr->GetTenantDescription() : objectDescription);
 	QString ownerId = imtdb::EscapeSql(tenantPtr != nullptr ? QString::fromUtf8(tenantPtr->GetOwnerId()) : QString());
 	QString creatorId = imtdb::EscapeSql(tenantPtr != nullptr ? QString::fromUtf8(tenantPtr->GetCreatorId()) : QString());
 	bool isActive = tenantPtr != nullptr ? tenantPtr->IsActive() : true;
@@ -226,8 +228,8 @@ QByteArray CTenantDbDelegateComp::CreateUpdateObjectQuery(
 		"\"ParentTenantId\"='%8' "
 		"WHERE \"Id\"='%9';")
 		.arg(*m_tableNameAttrPtr)
-		.arg(imtdb::EscapeSql(tenantPtr->GetTenantName()))
-		.arg(imtdb::EscapeSql(tenantPtr->GetTenantDescription()))
+		.arg(imtdb::SqlEncode(tenantPtr->GetTenantName()))
+		.arg(imtdb::SqlEncode(tenantPtr->GetTenantDescription()))
 		.arg(imtdb::EscapeSql(QString::fromUtf8(tenantPtr->GetOwnerId())))
 		.arg(imtdb::EscapeSql(QString::fromUtf8(tenantPtr->GetCreatorId())))
 		.arg(tenantPtr->IsActive() ? "true" : "false")
@@ -288,7 +290,7 @@ QByteArray CTenantDbDelegateComp::CreateRenameObjectQuery(
 {
 	return QStringLiteral(R"(UPDATE "%1" SET "Name"='%2', "UpdatedAt"='%3' WHERE "Id"='%4';)")
 			.arg(*m_tableNameAttrPtr,
-				 imtdb::EscapeSql(newObjectName),
+				 imtdb::SqlEncode(newObjectName),
 				 imtdb::UtcNow(),
 				 imtdb::EscapeSql(QString::fromUtf8(objectId))).toUtf8();
 }
@@ -302,7 +304,7 @@ QByteArray CTenantDbDelegateComp::CreateDescriptionObjectQuery(
 {
 	return QStringLiteral(R"(UPDATE "%1" SET "Description"='%2', "UpdatedAt"='%3' WHERE "Id"='%4';)")
 			.arg(*m_tableNameAttrPtr,
-				 imtdb::EscapeSql(description),
+				 imtdb::SqlEncode(description),
 				 imtdb::UtcNow(),
 				 imtdb::EscapeSql(QString::fromUtf8(objectId))).toUtf8();
 }
@@ -380,8 +382,9 @@ QString CTenantDbDelegateComp::GetTenantRelationScopeSubquery(const QByteArray& 
 	const bool hasCrossOrgGrantsTable = !grantsTableName.isEmpty() && TableExists(grantsTableName);
 
 	QStringList relationCaseItems;
-	relationCaseItems << QStringLiteral(R"(WHEN "CreatorId"='%1' THEN 'Creator')").arg(escapedUserId);
+	// The current owner reads "Owner"; "Creator" is left for a creator who passed the ownership on.
 	relationCaseItems << QStringLiteral(R"(WHEN "OwnerId"='%1' THEN 'Owner')").arg(escapedUserId);
+	relationCaseItems << QStringLiteral(R"(WHEN "CreatorId"='%1' THEN 'Creator')").arg(escapedUserId);
 
 	if (hasMembershipsTable){
 		relationCaseItems << QString(
@@ -517,10 +520,9 @@ QString CTenantDbDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsS
 	QStringList additionalFilters;
 	const iprm::IParamsSet::Ids filterParamIds = filterParams.GetParamIds();
 
-	QByteArray userId = ExtractUserId(&filterParams);
-	if (!userId.isEmpty()){
-		// With TenantRelationScope as a computed column in the subquery,
-		// only show tenants where the user has a relationship (Owner, Member, Invited, or Delegated)
+	iprm::TParamsPtr<iprm::IEnableableParam> relatedOnlyParamPtr(&filterParams, "RelatedTenantsOnly", false);
+	if (relatedOnlyParamPtr.IsValid() && relatedOnlyParamPtr->IsEnabled() && !ExtractUserId(&filterParams).isEmpty()){
+		// TenantRelationScope is a computed column of the subquery: only the tenants the user is related to.
 		additionalFilters << QStringLiteral(R"("TenantRelationScope" IS NOT NULL)");
 	}
 
@@ -541,6 +543,13 @@ QString CTenantDbDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsS
 			if (!excludedTenantId.isEmpty()){
 				additionalFilters << QStringLiteral(R"("Id"<>'%1')").arg(imtdb::EscapeSql(QString::fromUtf8(excludedTenantId)));
 			}
+		}
+	}
+
+	if (filterParamIds.contains("ParentTenantId")){
+		iprm::TParamsPtr<iprm::IIdParam> parentTenantIdParamPtr(&filterParams, "ParentTenantId");
+		if (parentTenantIdParamPtr.IsValid() && !parentTenantIdParamPtr->GetId().isEmpty()){
+			additionalFilters << QStringLiteral(R"("ParentTenantId"='%1')").arg(imtdb::EscapeSql(QString::fromUtf8(parentTenantIdParamPtr->GetId())));
 		}
 	}
 

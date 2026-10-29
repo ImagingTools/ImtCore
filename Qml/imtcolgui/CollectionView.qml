@@ -43,6 +43,8 @@ Item {
 
 	property alias contentColor: container.contentColor;
 
+	property alias dialogManagerView: localView
+
 	property bool visibleMetaInfo: false;
 	property bool headerRightClickEnabled: true;
 	property bool commandsPanelVisible: true
@@ -191,6 +193,23 @@ Item {
 	function onEdit(id, index){
 		if (container.commandsDelegate){
 			container.commandsDelegate.commandHandle("Edit");
+		}
+	}
+
+	// Replacing the model resets ListView offsets; restore them after the new model lays out.
+	Timer {
+		id: restoreTableViewportTimer
+		interval: 0
+		repeat: false
+
+		property real contentXToRestore: 0
+		property real contentYToRestore: 0
+
+		onTriggered: {
+			let maxContentX = Math.max(container.table.originX, container.table.contentWidth - container.table.elementsListWidth + container.table.originX)
+			let maxContentY = Math.max(container.table.originY, container.table.contentHeight - container.table.elementsList.height + container.table.originY)
+			container.table.contentX = Math.min(contentXToRestore, maxContentX)
+			container.table.contentY = Math.min(contentYToRestore, maxContentY)
 		}
 	}
 	
@@ -384,8 +403,13 @@ Item {
 				collectionMetaInfo.elementMetaInfo = metaInfoData
 				collectionMetaInfo.stopLoading()
 			}
+
+			function onObjectMetaInfoReceiveFailed(message){
+				collectionMetaInfo.stopLoading()
+			}
 			
 			function onHeadersReceived(headers){
+				internal.headersReceived = true
 				container.table.headers = headers
 
 				let filteringIds = []
@@ -409,7 +433,21 @@ Item {
 			}
 
 			function onElementsReceived(elements){
-				container.table.elements = elements
+				let previousElements = container.table.elements;
+				let sameModel = previousElements === elements;
+				let preserveViewport = !sameModel && previousElements && elements;
+				if (preserveViewport && !restoreTableViewportTimer.running){
+					restoreTableViewportTimer.contentXToRestore = container.table.contentX
+					restoreTableViewportTimer.contentYToRestore = container.table.contentY
+				}
+				container.table.elements = elements;
+				if (sameModel){
+					container.table.restoreSelection();
+					container.table.refreshVisibleRows();
+				}
+				else if (preserveViewport){
+					restoreTableViewportTimer.restart()
+				}
 			}
 
 			function onNotificationModelChanged(){
@@ -451,6 +489,7 @@ Item {
 		QtObject {
 			id: internal;
 			property bool updateGuiRequired: false
+			property bool headersReceived: false
 		}
 		
 		Component.onCompleted: {
@@ -485,6 +524,11 @@ Item {
 		}
 
 		function doUpdateGui(){
+			// The headers reply loads the elements anyway; an earlier request would be thrown away.
+			if (root.loadingDataAfterHeadersReceived && !internal.headersReceived){
+				return
+			}
+
 			if (!root.backgroundUpdatesEnabled && !visible){
 				internal.updateGuiRequired = true
 				return
@@ -619,8 +663,15 @@ Item {
 			wrapMode: Text.WordWrap;
 			color: Style.textColor;
 			
-			text: qsTr("Please select an item for showing additional informations");
+			text: qsTr("Select an item to view additional information");
 		}
+	}
+
+	DialogManagerView{
+		id: localView
+		anchors.fill: parent
+		z: 1000
+		isMainView:false
 	}
 }
 

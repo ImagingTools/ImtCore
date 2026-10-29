@@ -17,7 +17,7 @@ Rectangle {
 	
 	property alias drawingContainer: drawingContainer_;
 	property alias stackView: stackView_;
-	property alias topPanel: topPanel_;
+	property alias topPanel: topPanelLoader_.item;
 	
 	property int mainMargin: Style.mainWindowMargin !== undefined ? Style.mainWindowMargin : 0;
 	property int pageMargin: Style.pageMargin !== undefined ? Style.pageMargin : 0;
@@ -28,6 +28,10 @@ Rectangle {
 	property alias menuPanelRadius: menuPanel.radius;
 	property alias loadPageByClick: pagesManager.loadByClick;
 	property bool canRecoveryPassword: true;
+
+	// Applications that decorate TopPanel themselves keep it; the ones that opt out
+	// hand its duties to the navigation rail and get the whole height for content.
+	readonly property bool topPanelVisible: Style.enableTopPanel !== undefined ? Style.enableTopPanel : true;
 
 	property SettingsController settingsController: SettingsController {}
 	
@@ -97,7 +101,7 @@ Rectangle {
 		z: 9
 		anchors.left: parent.left;
 		anchors.leftMargin: thumbnailDecoratorContainer.mainMargin;
-		anchors.top: topPanel_.bottom;
+		anchors.top: topPanelLoader_.bottom;
 		anchors.topMargin: thumbnailDecoratorContainer.mainMargin;
 		anchors.bottom: bottomPanel.top;
 		anchors.bottomMargin: thumbnailDecoratorContainer.mainMargin;
@@ -156,9 +160,9 @@ Rectangle {
 	PagesManager {
 		id: pagesManager;
 		
-		anchors.left: menuPanel.right;
+		anchors.left: menuPanel.visible ? menuPanel.right : parent.left;
 		anchors.right: thumbnailDecoratorContainer.right;
-		anchors.top: topPanel_.bottom;
+		anchors.top: topPanelLoader_.bottom;
 		anchors.bottom: thumbnailDecoratorContainer.bottom;
 		
 		anchors.topMargin: thumbnailDecoratorContainer.pageMargin;
@@ -171,14 +175,17 @@ Rectangle {
 	
 	DrawingContainer{
 		id: drawingContainer_;
-		z: topPanel_.z + 1;
+		z: topPanelLoader_.z + 1;
 		anchors.bottom: parent.bottom;
 		anchors.bottomMargin: 50;
 		edge: Qt.RightEdge;
 	}
 	
-	TopPanel {
-		id: topPanel_;
+	// Loaded rather than merely hidden: the panel brings a UserPanel of its own,
+	// which would otherwise sit here invisible and repeat every profile request
+	// the rail's account row already makes.
+	Loader {
+		id: topPanelLoader_;
 		
 		z: 10;
 		
@@ -186,7 +193,14 @@ Rectangle {
 		anchors.topMargin: thumbnailDecoratorContainer.mainMargin;
 		
 		width: parent.width;
-		height: Style.sizePanelsHeight !== undefined ? Style.sizePanelsHeight : 60;
+		height: !active ? 0 : Style.sizePanelsHeight !== undefined ? Style.sizePanelsHeight : 60;
+		
+		active: thumbnailDecoratorContainer.topPanelVisible;
+		sourceComponent: thumbnailDecoratorContainer.topPanelComp;
+	}
+	
+	property Component topPanelComp: Component {
+		TopPanel {}
 	}
 	
 	function showPreferencePage(){
@@ -197,15 +211,51 @@ Rectangle {
 	StackView {
 		id: stackView_;
 		
-		z: topPanel_.z + 1;
+		z: topPanelLoader_.z + 1;
 		
 		anchors.fill: parent;
+	}
+	
+	// The server address is edited in the preferences, and on desktop it has to be
+	// reachable before there is a session - sign-in and "no connection" both cover
+	// the rail that otherwise carries this button. Same z as the stack view and
+	// declared after it, so the dialogs below still come out on top.
+	ToolButton {
+		id: shellPreferenceButton;
+		objectName: "ShellPreferenceButton";
+		
+		z: stackView_.z;
+		
+		anchors.top: parent.top;
+		anchors.right: parent.right;
+		anchors.margins: Style.marginM;
+		
+		width: Style.controlHeightL;
+		height: width;
+		
+		visible: !thumbnailDecoratorContainer.topPanelVisible
+			&& Qt.platform.os !== "web"
+			&& stackView_.count > 0;
+		
+		tooltipText: qsTr("Settings");
+		iconSource: "qrc:/" + Style.getIconPath("Icons/Settings", Icon.State.On, Icon.Mode.Normal);
+		
+		decorator: Component {
+			ToolButtonDecorator {
+				icon.width: Style.iconSizeM;
+				radius: height / 2;
+			}
+		}
+		
+		onClicked: {
+			Events.sendEvent("ShowPreferencePage");
+		}
 	}
 	
 	DialogManagerView {
 		anchors.fill: parent;
 		
-		z: topPanel_.z + 1;
+		z: topPanelLoader_.z + 1;
 	}
 	
 	function showPage(pageComp){
@@ -221,7 +271,7 @@ Rectangle {
 			id: authorizationPage;
 			
 			anchors.fill: parent;
-			anchors.topMargin: topPanel_.height;
+			anchors.topMargin: topPanelLoader_.height;
 			
 			canRecoveryPassword: thumbnailDecoratorContainer.canRecoveryPassword;
 			
@@ -248,7 +298,7 @@ Rectangle {
 			id: superuserPasswordPage;
 
 			anchors.fill: parent;
-			anchors.topMargin: topPanel_.height;
+			anchors.topMargin: topPanelLoader_.height;
 
 			Component.onCompleted: {
 				Events.sendEvent("SetUserPanelEnabled", false);

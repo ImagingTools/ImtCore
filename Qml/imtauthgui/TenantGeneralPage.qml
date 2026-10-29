@@ -4,6 +4,9 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtcontrols 1.0
+import imtcolgui 1.0
+import imtauthgui 1.0
+import imtauthUsersSdl 1.0
 
 /**
  * TenantGeneralPage
@@ -13,8 +16,7 @@ import imtcontrols 1.0
  * Inherits ViewBase so that updates flow through the protected
  * doUpdateGui / doUpdateModel wrappers (re-entrance guard).
  *
- * Uses the same card-based layout as TenantConnectOrganizationPage and
- * TenantConnectionCodePage.
+ * Uses the same layout as the document editors: a section title over a card of label | field rows.
  */
 ViewBase {
 	id: generalPage
@@ -36,6 +38,9 @@ ViewBase {
 	readonly property bool __canEditIsActive: generalPage.stateManager
 		? (generalPage.stateManager.isNewTenant || generalPage.stateManager.canEditOrganization)
 		: false
+	readonly property bool __isNewTenant: generalPage.stateManager ? generalPage.stateManager.isNewTenant : false
+	// The users to pick the owner from are listed only to whoever may view users
+	readonly property bool __canPickOwner: PermissionsController.checkPermission("/Administration/Users/View")
 
 	function updateGui() {
 		if (!generalPage.tenantData) return
@@ -44,6 +49,19 @@ ViewBase {
 		isActiveSwitch.checked = generalPage.tenantData.m_isActive !== undefined
 			? generalPage.tenantData.m_isActive
 			: true
+		ownerText.text = generalPage.tenantData.m_ownerName
+		parentText.text = generalPage.tenantData.m_parentTenantName ? generalPage.tenantData.m_parentTenantName : qsTr("No parent")
+		ownerSelect.selectedId = generalPage.tenantData.m_ownerId
+		ownerSelect.selectedText = generalPage.tenantData.m_ownerName
+	}
+
+	// The creator picks the owner of a new organization; the owner holds every available permission
+	function __selectOwner(userId, userName) {
+		if (!generalPage.tenantData || userId === "")
+			return
+		generalPage.tenantData.m_ownerId = userId
+		generalPage.tenantData.m_ownerName = userName
+		generalPage.doUpdateModel()
 	}
 
 	function updateModel() {
@@ -53,121 +71,112 @@ ViewBase {
 		generalPage.tenantData.m_isActive = isActiveSwitch.checked
 	}
 
+	CustomScrollbar {
+		z: parent.z + 1
+		anchors.right: parent.right
+		anchors.top: flickable.top
+		anchors.bottom: flickable.bottom
+		secondSize: Style.marginM
+		targetItem: flickable
+	}
+
 	Flickable {
+		id: flickable
+
 		anchors.fill: parent
 		anchors.topMargin: Style.marginXL
 		contentHeight: mainColumn.height + Style.marginXL
+		boundsBehavior: Flickable.StopAtBounds
 		clip: true
 
 		Column {
 			id: mainColumn
+
 			anchors.horizontalCenter: parent.horizontalCenter
-			width: Math.min(parent.width - Style.marginXL * 2, 600)
-			spacing: Style.marginXL
+			width: Math.min(parent.width - Style.marginXL * 2, Style.contentWidthMax)
+			spacing: Style.marginM
 
-			Text {
-				text: qsTr("General")
-				font.pixelSize: Style.fontSizeXL
-				font.bold: true
-				color: Style.textColor
+			GroupHeaderView {
+				width: parent.width
+				title: qsTr("Organization")
 			}
 
-			Text {
-				text: qsTr("Basic workspace settings and configuration.")
-				font.pixelSize: Style.fontSizeM
-				color: Style.inactiveTextColor
-				wrapMode: Text.WordWrap
+			GroupElementView {
 				width: parent.width
-			}
 
-			Rectangle {
-				width: parent.width
-				height: settingsColumn.height + Style.marginL * 2
-				color: Style.backgroundColor2
-				radius: Style.radiusL
-				border.width: 1
-				border.color: Style.borderColor
+				TextInputElementView {
+					id: nameInput
 
-				Column {
-					id: settingsColumn
-					anchors.left: parent.left
-					anchors.right: parent.right
-					anchors.verticalCenter: parent.verticalCenter
-					anchors.margins: Style.marginL
-					spacing: Style.marginM
+					name: qsTr("Name")
+					placeHolderText: qsTr("Enter the organization name")
+					readOnly: !generalPage.__canEditName
 
-					Column {
-						width: parent.width
-						spacing: Style.marginXS
-
-						Text {
-							text: qsTr("Tenant Name")
-							font.pixelSize: Style.fontSizeS
-							color: Style.inactiveTextColor
-						}
-
-						CustomTextField {
-							id: nameInput
-							width: parent.width
-							height: Style.controlHeightM
-							textSize: Style.fontSizeM
-							readOnly: !generalPage.__canEditName
-							placeHolderText: qsTr("Enter the tenant name")
-
-							onEditingFinished: {
-								if (generalPage.tenantData && generalPage.tenantData.m_name !== nameInput.text)
-									generalPage.doUpdateModel()
-							}
-						}
-					}
-
-					Column {
-						width: parent.width
-						spacing: Style.marginXS
-
-						Text {
-							text: qsTr("Description")
-							font.pixelSize: Style.fontSizeS
-							color: Style.inactiveTextColor
-						}
-
-						CustomTextField {
-							id: descriptionInput
-							width: parent.width
-							height: Style.controlHeightM
-							textSize: Style.fontSizeM
-							readOnly: !generalPage.__canEditDescription
-							placeHolderText: qsTr("Enter the description")
-
-							onEditingFinished: {
-								if (generalPage.tenantData && generalPage.tenantData.m_description !== descriptionInput.text)
-									generalPage.doUpdateModel()
-							}
-						}
+					onEditingFinished: {
+						if (generalPage.tenantData && generalPage.tenantData.m_name !== nameInput.text)
+							generalPage.doUpdateModel()
 					}
 				}
-			}
 
-			Rectangle {
-				width: parent.width
-				height: 1
-				color: Style.borderColor
-			}
+				TextInputElementView {
+					id: descriptionInput
 
-			Row {
-				spacing: Style.marginM
+					name: qsTr("Description")
+					placeHolderText: qsTr("Enter the description")
+					readOnly: !generalPage.__canEditDescription
 
-				SwitchCustom {
+					onEditingFinished: {
+						if (generalPage.tenantData && generalPage.tenantData.m_description !== descriptionInput.text)
+							generalPage.doUpdateModel()
+					}
+				}
+
+				TextElementView {
+					id: parentText
+					name: qsTr("Parent organization")
+				}
+
+				// Until the organization is saved the creator picks its owner; afterwards it is transferred on the Members page
+				CollectionSelectElementView {
+					id: ownerSelect
+					visible: generalPage.__isNewTenant && generalPage.__canPickOwner
+					name: qsTr("Owner")
+					description: qsTr("The owner holds every available permission of the organization")
+					commandId: ImtauthUsersSdlCommandIds.s_usersList
+					fields: [UserItemDataTypeMetaInfo.s_id, UserItemDataTypeMetaInfo.s_name]
+					titleField: UserItemDataTypeMetaInfo.s_name
+					textFilterFieldIds: [UserItemDataTypeMetaInfo.s_name]
+					sortByField: UserItemDataTypeMetaInfo.s_name
+					placeHolderText: qsTr("You (the creator)")
+					filterPlaceholder: qsTr("Search for a user")
+
+					onItemSelected: {
+						generalPage.__selectOwner(itemId, item ? item.title : "")
+					}
+				}
+
+				TextElementView {
+					id: ownerSelfText
+					visible: generalPage.__isNewTenant && !generalPage.__canPickOwner
+					name: qsTr("Owner")
+					text: qsTr("You (the creator)")
+					description: qsTr("You become the owner. The ownership can be transferred to a member on the Members page later.")
+				}
+
+				TextElementView {
+					id: ownerText
+					visible: !generalPage.__isNewTenant
+					name: qsTr("Owner")
+				}
+
+				SwitchElementView {
 					id: isActiveSwitch
-					readOnly: !generalPage.__canEditIsActive
-					onCheckedChanged: generalPage.doUpdateModel()
-				}
 
-				Text {
-					text: qsTr("Active")
-					font.pixelSize: Style.fontSizeM
-					color: Style.textColor
-					anchors.verticalCenter: parent.verticalCenter
+					name: qsTr("Active")
+					readOnly: !generalPage.__canEditIsActive
+
+					onCheckedChanged: {
+						generalPage.doUpdateModel()
+					}
 				}
 			}
 		}

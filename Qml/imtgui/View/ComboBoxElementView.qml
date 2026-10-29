@@ -61,7 +61,7 @@ ElementView {
             id: cb;
             objectName: "ComboBox"
 
-            width: comboBoxElementView.controlWidth;
+            width: comboBoxElementView.fittedControlWidth;
             height: comboBoxElementView.controlHeight;
 
             Component.onCompleted: {

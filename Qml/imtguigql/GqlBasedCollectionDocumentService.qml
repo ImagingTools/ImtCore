@@ -7,7 +7,7 @@ import imtbaseUndoManagerSdl 1.0
 DocumentServiceBase {
 	id: root
 
-	property string context: ""
+	property var permissionPaths: ({})
 	property string collectionId
 
 	property CollectionId collectionIdObj: CollectionId{
@@ -53,6 +53,10 @@ DocumentServiceBase {
 
 			root.documentManagerChanged(operation, objectId, documentId, documentName)
 		}
+
+		onRefreshRequired: {
+			root.synchronizeDocuments()
+		}
 	}
 
 	property SubscriptionClient undoManagerSubscription: SubscriptionClient {
@@ -84,6 +88,17 @@ DocumentServiceBase {
 		}
 	}
 
+	// Stops the notifications of this service. Its owner calls it on destruction: on the web the service can outlive
+	// the owner (it is destroyed only when no reference is left), and a live subscription would keep acting on events.
+	function release(){
+		documentManagerSubscription.unRegisterSubscription()
+		undoManagerSubscription.unRegisterSubscription()
+	}
+
+	Component.onDestruction: {
+		root.release()
+	}
+
 	onDocumentServiceActivated: {
 		if (root.collectionId !== ""){
 			// getOpenedDocumentList()
@@ -92,6 +107,17 @@ DocumentServiceBase {
 
 	function getHeaders(){
 		return {}
+	}
+
+	// Catches up after a reconnect; the undo info tells which documents the server still has.
+	function synchronizeDocuments(){
+		let documentIds = getOpenedDocumentIds()
+		for (let i = 0; i < documentIds.length; ++i){
+			root.__resyncDocumentIds[documentIds[i]] = true
+			getUndoInfo(documentIds[i])
+		}
+
+		getOpenedDocumentList()
 	}
 
 	function getOpenedDocumentList(){
@@ -113,6 +139,11 @@ DocumentServiceBase {
 			return
 		}
 
+		// One navigation can ask for the same object twice before the first answer arrives.
+		if (root.__openingObjectIds[documentId]){
+			return
+		}
+
 		startOpenDocument(documentId, typeId)
 
 		if (openDocumentOverride){
@@ -120,6 +151,7 @@ DocumentServiceBase {
 			return
 		}
 
+		root.__openingObjectIds[documentId] = true
 		openDocumentRequest.typeId = typeId
 		objectIdInput.m_id = documentId
 		objectIdInput.m_collectionId = collectionId
@@ -200,6 +232,7 @@ DocumentServiceBase {
 				let savedFunc = function(savedDocumentId){
 					if (documentId === savedDocumentId){
 						documentSaved.disconnect(savedFunc)
+						saveDocumentFailed.disconnect(savedFailedFunc)
 						closeFunc(false)
 					}
 				}
@@ -210,6 +243,12 @@ DocumentServiceBase {
 						saveDocumentFailed.disconnect(savedFailedFunc)
 					}
 				}
+
+				if (!documentViewsAcceptSave(documentId)){
+					return
+				}
+
+				commitDocumentChanges(documentId)
 
 				documentSaved.connect(savedFunc)
 				saveDocumentFailed.connect(savedFailedFunc)
@@ -301,12 +340,14 @@ DocumentServiceBase {
 	property UndoRedoInput undoRedoInput: UndoRedoInput {}
 
 	property GqlSdlRequestSender getOpenedDocumentListRequest: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 		gqlCommandId: ImtbaseCollectionDocumentServiceSdlCommandIds.s_getOpenedDocumentList
 		sdlObjectComp: Component {
 			DocumentList {
 				onFinished: {
+					root.__applyLoadingStates(m_documentList)
 					root.openedDocumentListReceived(m_documentList)
+					root.__continueLoadingResync()
 				}
 			}
 		}
@@ -314,16 +355,70 @@ DocumentServiceBase {
 		function getHeaders(){
 			return root.getHeaders()
 		}
+
+		// The workspace covers itself while the list loads; without this a failed request left it covered.
+		function onError(message, type){
+			root.openedDocumentListReceiveFailed(message)
+			root.__continueLoadingResync()
+		}
+	}
+
+	// A DocumentDataLoaded lost on the way (e.g. a relay subscription refused with an expired token) must not keep
+	// the document loading forever: the opened document list tells the state, asked again while the server still loads.
+	property int __loadingResyncAttemptsLeft: 0
+
+	// Every editor of the service learns that a missed DocumentDataLoaded happened, not only the collection hosts
+	function __applyLoadingStates(documentInfoList){
+		for (let i = 0; i < documentInfoList.count; ++i){
+			let documentInfo = documentInfoList.get(i).item
+			let documentId = String(documentInfo.m_documentId)
+			if (root.documentIsOpened(documentId) && documentInfo.m_isLoading === false){
+				root.setDocumentIsLoading(documentId, false)
+			}
+		}
+	}
+
+	function __startLoadingResync(){
+		root.__loadingResyncAttemptsLeft = 6
+		root.loadingResyncTimer.restart()
+	}
+
+	function __continueLoadingResync(){
+		if (root.__loadingResyncAttemptsLeft > 0 && root.__hasLoadingDocument())
+			root.loadingResyncTimer.restart()
+	}
+
+	function __hasLoadingDocument(){
+		let documentIds = root.getOpenedDocumentIds()
+		for (let i = 0; i < documentIds.length; ++i){
+			if (root.documentIsLoading(documentIds[i]))
+				return true
+		}
+
+		return false
+	}
+
+	property Timer loadingResyncTimer: Timer {
+		interval: 5000
+		onTriggered: {
+			if (root.__loadingResyncAttemptsLeft > 0 && root.__hasLoadingDocument()){
+				root.__loadingResyncAttemptsLeft = root.__loadingResyncAttemptsLeft - 1
+				root.getOpenedDocumentList()
+			}
+		}
 	}
 
 	property GqlSdlRequestSender openDocumentRequest: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 		gqlCommandId: ImtbaseCollectionDocumentServiceSdlCommandIds.s_openDocument
 		requestType: 1
 		sdlObjectComp: Component {
 			DocumentInfo {
 				onFinished: {
-					root.handleDocumentOpened(m_documentId, m_objectId, m_objectTypeId, m_documentName, m_hasNameProvider, m_isDirty)
+					delete root.__openingObjectIds[m_objectId]
+					root.handleDocumentOpened(m_documentId, m_objectId, m_objectTypeId, m_documentName, m_hasNameProvider, m_isDirty, m_isLoading === false)
+					if (root.documentIsLoading(m_documentId))
+						root.__startLoadingResync()
 				}
 			}
 		}
@@ -335,18 +430,25 @@ DocumentServiceBase {
 		}
 
 		function onError(message, type){
+			root.__openingObjectIds = ({})
 			root.openDocumentFailed("", message)
 		}
 	}
 
+	// Object ids whose OpenDocument request has been sent and not answered yet.
+	property var __openingObjectIds: ({})
+
+	// Documents whose representation is re-read once the server confirms it still has them.
+	property var __resyncDocumentIds: ({})
+
 	property GqlSdlRequestSender createDocumentRequest: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 		gqlCommandId: ImtbaseCollectionDocumentServiceSdlCommandIds.s_createNewDocument
 		requestType: 1
 		sdlObjectComp: Component {
 			DocumentInfo {
 				onFinished: {
-					root.handleDocumentCreated(m_documentId, m_objectTypeId, m_documentName, m_hasNameProvider, root.createDocumentRequest.proposedObjectId, m_isDirty)
+					root.handleDocumentCreated(m_documentId, m_objectTypeId, m_documentName, m_hasNameProvider, root.createDocumentRequest.proposedObjectId, m_isDirty, true)
 				}
 			}
 		}
@@ -359,12 +461,12 @@ DocumentServiceBase {
 		}
 
 		function onError(message, type){
-			root.createDocumentFailed("", message)
+			root.createDocumentFailed(root.createDocumentRequest.typeId, message)
 		}
 	}
 
 	property GqlSdlRequestSender saveDocumentRequest: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 		gqlCommandId: ImtbaseCollectionDocumentServiceSdlCommandIds.s_saveDocument
 		requestType: 1
 		sdlObjectComp: Component {
@@ -387,7 +489,7 @@ DocumentServiceBase {
 	}
 
 	property GqlSdlRequestSender closeDocumentRequest: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 		gqlCommandId: ImtbaseCollectionDocumentServiceSdlCommandIds.s_closeDocument
 		requestType: 1
 		sdlObjectComp: Component {
@@ -405,12 +507,12 @@ DocumentServiceBase {
 		}
 
 		function onError(message, type){
-			root.closeDocumentFailed("", message)
+			root.closeDocumentFailed(root.closeDocumentRequest.documentId, message)
 		}
 	}
 
 	property GqlSdlRequestSender doUndoRequest: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 		gqlCommandId: ImtbaseCollectionDocumentServiceSdlCommandIds.s_doUndo
 		requestType: 1
 
@@ -434,7 +536,7 @@ DocumentServiceBase {
 	}
 
 	property GqlSdlRequestSender doRedoRequest: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 		gqlCommandId: ImtbaseCollectionDocumentServiceSdlCommandIds.s_doRedo
 		requestType: 1
 
@@ -458,12 +560,25 @@ DocumentServiceBase {
 	}
 
 	property GqlSdlRequestSender getUndoInfoRequest: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 		gqlCommandId: ImtbaseCollectionDocumentServiceSdlCommandIds.s_getUndoInfo
 		sdlObjectComp: Component {
 			UndoInfo {
 				onFinished: {
-					root.undoInfoReceived(m_documentId, m_availableUndoSteps, m_availableRedoSteps, m_isDirty)
+					let documentId = String(m_documentId)
+					let resync = root.__resyncDocumentIds[documentId] === true
+					delete root.__resyncDocumentIds[documentId]
+
+					if (m_status && String(m_status.m_status) === "InvalidDocumentId"){
+						root.handleDocumentLost(documentId)
+						return
+					}
+
+					root.undoInfoReceived(documentId, m_availableUndoSteps, m_availableRedoSteps, m_isDirty)
+
+					if (resync){
+						root.updateDocumentRepresentation(documentId)
+					}
 				}
 			}
 		}

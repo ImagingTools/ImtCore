@@ -20,7 +20,7 @@ FocusScope {
     property alias maximumLength: textField.maximumLength;
 
     property string placeHolderText;
-    property string focusColor: Style.textSelected;
+    property string focusColor: Style.textSelectedColor;
 
     property string fontColor: Style.textColor;
     property string placeHolderFontColor: Style.placeHolderTextColor;
@@ -84,7 +84,7 @@ FocusScope {
 
         radius: containerTextField.radius;
 
-        border.color: containerTextField.borderColorConst !== "" ? containerTextField.borderColorConst: textField.activeFocus ? containerTextField.borderColor : Style.hover;
+        border.color: containerTextField.borderColorConst !== "" ? containerTextField.borderColorConst: textField.activeFocus ? containerTextField.borderColor : Style.inputBorderColor;
 
         border.width: 1;
     }
@@ -156,7 +156,7 @@ FocusScope {
         echoMode: containerTextField.echoMode;
 
         verticalAlignment: TextInput.AlignVCenter;
-        selectionColor: Style.textSelected;
+        selectionColor: Style.textSelectedColor;
         selectByMouse: true;
         clip: true;
 

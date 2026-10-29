@@ -9,6 +9,7 @@
 // ImtCore includes
 #include <imtauth/IUserInfo.h>
 #include <imtbase/CComplexCollectionFilter.h>
+#include <imtdoc/imtdoc.h>
 
 
 namespace imtauth
@@ -16,11 +17,13 @@ namespace imtauth
 
 
 bool CUserDocumentValidatorComp::ValidateDocumentData(
-			const QByteArray& objectId,
 			const istd::IChangeable& document,
 			QString& errorMessage,
+			const iprm::IParamsSet* paramsPtr,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
+	const QByteArray objectId = imtdoc::GetObjectIdFromParams(paramsPtr);
+
 	const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(&document);
 	if (userInfoPtr == nullptr){
 		errorMessage = QStringLiteral("Invalid document type for user validation");
@@ -37,6 +40,14 @@ bool CUserDocumentValidatorComp::ValidateDocumentData(
 	if (name.isEmpty()){
 		errorMessage = QStringLiteral("Name cannot be empty");
 		return false;
+	}
+
+	// An account of the internal system logs in with its password.
+	for (const imtauth::IUserInfo::SystemInfo& systemInfo : userInfoPtr->GetSystemInfos()){
+		if (systemInfo.enabled && systemInfo.systemId.isEmpty() && userInfoPtr->GetPasswordHash().isEmpty()){
+			errorMessage = QStringLiteral("Password cannot be empty");
+			return false;
+		}
 	}
 
 	if (!m_userCollectionCompPtr.IsValid()){

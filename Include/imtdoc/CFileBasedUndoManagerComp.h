@@ -130,6 +130,7 @@ protected:
 				UndoList& undoList,
 				const iser::CArchiveTag& listTag,
 				const iser::CArchiveTag& stepTag) const;
+	void RemoveStoredStepsFromDisk() const;
 	void SetStepFileAutoRemoveEnabled(bool value);
 	UndoStep* CreateStep(iser::ISerializable& object, const QString& stepFileName);
 	bool RestoreObject(const UndoStep& state, iser::ISerializable& object);

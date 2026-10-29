@@ -23,6 +23,7 @@ enum FilterOperation
 	Less
 	Greater
 	Contains
+	StartsWith
 
 	# array semantics
 	ArrayHasAny

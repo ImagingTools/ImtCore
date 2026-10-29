@@ -17,7 +17,9 @@ ParamEditorBase {
 	}
 
 	property var settingsController: null
-	property int spacing: Style.marginXL
+	// Set by the parent when this set is shown inside a group frame
+	property bool grouped: false
+	property int spacing: grouped ? 0 : Style.marginXL
 
 	sourceComp: Component {
 		Column {
@@ -71,6 +73,14 @@ ParamEditorBase {
 						}
 					}
 					
+					Rectangle {
+						width: paramItem.width
+						height: 1
+						visible: composedParamsGui.grouped && model.index > 0
+						opacity: 0.5
+						color: Style.borderColor
+					}
+					
 					Loader {
 						id: elementLoader
 						onLoaded: {
@@ -99,7 +109,7 @@ ParamEditorBase {
 								Loader {
 									id: groupLoader
 									onLoaded: {
-										item.spacing = 0
+										item.grouped = true
 										item.settingsController = composedParamsGui.settingsController
 										
 										paramItem.itemOnLoaded(item)
@@ -116,21 +126,18 @@ ParamEditorBase {
 						target: paramItem
 						
 						function onWidthChanged(){
-							if (elementLoader.item){
-								if (elementLoader.item.border){
-									elementLoader.item.border.width = 0
-								}
-
-								elementLoader.item.width = paramItem.width
-							}
-							
-							if (groupLoader.item){
-								if (groupLoader.item.border){
-									groupLoader.item.border.width = 0
-								}
-								
-								groupLoader.item.width = paramItem.width
-							}
+							paramItem.updateItemWidth()
+						}
+					}
+					
+					function updateItemWidth(){
+						if (elementLoader.item){
+							elementLoader.item.width = paramItem.width
+						}
+						
+						// stay inside the group frame so its border is not painted over
+						if (groupLoader.item){
+							groupLoader.item.width = paramItem.width - 2 * groupElementView.border.width
 						}
 					}
 					
@@ -164,11 +171,13 @@ ParamEditorBase {
 							}
 						}
 
-						if (item.border){
-							item.border.width = 0
+						// inside a group the frame belongs to the group, not to each row
+						if (composedParamsGui.grouped && item.sourceItem && item.sourceItem.border){
+							item.sourceItem.border.width = 0
+							item.sourceItem.radius = 0
 						}
 
-						item.width = paramItem.width - 2 * groupElementView.border.width
+						updateItemWidth()
 					}
 				}
 			}

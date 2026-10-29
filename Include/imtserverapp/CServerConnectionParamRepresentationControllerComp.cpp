@@ -81,12 +81,14 @@ bool CServerConnectionParamRepresentationControllerComp::GetDataModelFromSdlRepr
 		serverConnectionParamPtr->SetHost(host);
 	}
 
-	if (sdlRepresentation.httpPort){
+	const imtcom::IServerConnectionInterface::ProtocolTypes supportedProtocols = serverConnectionParamPtr->GetSupportedProtocols();
+
+	if (sdlRepresentation.httpPort && supportedProtocols.contains(imtcom::IServerConnectionInterface::PT_HTTP)){
 		int httpPort = *sdlRepresentation.httpPort;
 		serverConnectionParamPtr->SetPort(imtcom::IServerConnectionInterface::PT_HTTP, httpPort);
 	}
 
-	if (sdlRepresentation.wsPort){
+	if (sdlRepresentation.wsPort && supportedProtocols.contains(imtcom::IServerConnectionInterface::PT_WEBSOCKET)){
 		int wsPort = *sdlRepresentation.wsPort;
 		serverConnectionParamPtr->SetPort(imtcom::IServerConnectionInterface::PT_WEBSOCKET, wsPort);
 	}

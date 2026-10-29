@@ -37,6 +37,9 @@ type ApplicationInfo {
 	webSocketUrl: UrlParam
 	userMode: UserManagementMode
 	superuser: SuperuserCheckResult
+	tenantsEnabled: Bool
+	externalLoginEnabled: Bool
+	documentSharingEnabled: Bool
 }
 
 input GetApplicationInfoInput {

@@ -10,7 +10,8 @@ Rectangle{
 
 	width: Style.sizeHintM;
 	height:  Style.controlHeightL;
-	radius: Style.size_TextFieldRadius;
+	radius: Style.textFieldRadius;
+	color: Style.baseColor;
 	border.color: Style.grayColor;
 	border.width: 1;
 

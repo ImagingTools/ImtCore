@@ -8,7 +8,7 @@ import imtguigql 1.0
 RemoteCollectionView {
 	id: log;
 
-	property string context: ""
+	property string permissionPath: ""
 	width: parent.width
 	height: Style.sizeHintXXS;
 
@@ -52,7 +52,7 @@ RemoteCollectionView {
 	}
 
 	GqlSdlRequestSender {
-		context: log.context
+		permissionPath: log.permissionPath
 		id: clearLogRequest
 		requestType: 1
 		gqlCommandId: log.clearLogCommandId

@@ -32,6 +32,9 @@ ViewCommandsDelegateBase {
 
 	property string importObjectTypeId;
 
+	// Edit opens one document per selected row; every open document costs its editor and data, so a large selection is refused.
+	property int maxOpenDocumentsCount: 5;
+
 	property bool canRename: false;
 	property bool canSetDescription: false;
 	property bool showingDisableObjects: false;
@@ -67,6 +70,17 @@ ViewCommandsDelegateBase {
 
 	ListModel {
 		id: extensionModel;
+	}
+
+	// After the table has restored its selection for the received rows
+	Timer {
+		id: commandsStateTimer
+		interval: 0
+		onTriggered: {
+			if (collectionViewCommandsDelegate.collectionView && collectionViewCommandsDelegate.collectionView.table){
+				collectionViewCommandsDelegate.updateItemSelection(collectionViewCommandsDelegate.collectionView.table.getSelectedIndexes())
+			}
+		}
 	}
 	
 	Connections {
@@ -115,6 +129,11 @@ ViewCommandsDelegateBase {
 	Connections {
 		id: controllerConnections;
 		target: null
+
+		// A refresh of the same rows refills the model in place: the table sees no new elements, the row values changed
+		function onElementsReceived(elements){
+			commandsStateTimer.restart()
+		}
 
 		function onImported(objectId){
 			PopupManager.addSuccessMessage(qsTr("The object has been successfully imported"), true);
@@ -165,12 +184,30 @@ ViewCommandsDelegateBase {
 		}
 	}
 
+	// Number of selected rows shared with the organization by another one (collections with document sharing only)
+	function receivedSelectionCount(selection, elementsModel){
+		let count = 0
+		for (let i = 0; i < selection.length; i++){
+			if (elementsModel && elementsModel.containsKey("sharingAccess", selection[i])){
+				let accessLevel = String(elementsModel.getData("sharingAccess", selection[i]))
+				if (accessLevel === "View" || accessLevel === "Edit"){
+					count++
+				}
+			}
+		}
+
+		return count
+	}
+
 	function updateStateBaseCommands(selection, commandsController, elementsModel){
 		if(commandsController){
+			let hasReceived = receivedSelectionCount(selection, elementsModel) > 0
+
 			// State commands
 			commandsController.setCommandIsEnabled("New", !showingDisableObjects);
 			commandsController.setCommandIsEnabled("Import", !showingDisableObjects);
-			commandsController.setCommandIsEnabled("Remove", selection.length > 0 && !showingDisableObjects);
+			commandsController.setCommandIsEnabled("Remove", selection.length > 0 && !showingDisableObjects && !hasReceived);
+			commandsController.setCommandIsEnabled("Share", selection.length > 0 && !showingDisableObjects && !hasReceived);
 			commandsController.setCommandIsEnabled("RemoveAll", !showingDisableObjects);
 			commandsController.setCommandIsEnabled("Edit", selection.length > 0 && !showingDisableObjects);
 			commandsController.setCommandIsEnabled("Export", selection.length === 1 && !showingDisableObjects);
@@ -585,7 +622,12 @@ ViewCommandsDelegateBase {
 				onRemoveAll(params);
 			}
 			else if (commandId === "Edit"){
-				onEdit(params);
+				if (collectionView.table.getSelectedIndexes().length > maxOpenDocumentsCount){
+					PopupManager.addWarningMessage(qsTr("No more than %1 documents can be opened at once").arg(maxOpenDocumentsCount), true);
+				}
+				else{
+					onEdit(params);
+				}
 			}
 			else if (commandId === "Import"){
 				onImport(params);

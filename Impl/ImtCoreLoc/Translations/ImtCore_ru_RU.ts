@@ -185,6 +185,14 @@
 <context>
     <name>Attribute</name>
     <message>
+        <source>Parent organization</source>
+        <translation>Родительская организация</translation>
+    </message>
+    <message>
+        <source>Members</source>
+        <translation>Участники</translation>
+    </message>
+    <message>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DdlCodeCreator/CDdlCodeCreator.cpp" line="+33"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+41"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+36"/>
@@ -5682,6 +5690,10 @@
         <translation>Объект был успешно импортирован</translation>
     </message>
     <message>
+        <source>No more than %1 documents can be opened at once</source>
+        <translation>Одновременно можно открыть не более %1 документов</translation>
+    </message>
+    <message>
         <location line="+107"/>
         <source>Duplicate</source>
         <translation>Дублировать</translation>
@@ -9138,8 +9150,8 @@ ID входных данных: </translation>
     </message>
     <message>
         <location line="+14"/>
-        <source>My tenants</source>
-        <translation>Мои тенанты</translation>
+        <source>My organizations</source>
+        <translation>Мои организации</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -9158,12 +9170,16 @@ ID входных данных: </translation>
     </message>
     <message>
         <location line="+43"/>
-        <source>Tenant</source>
-        <translation>Тенант</translation>
+        <source>Organization</source>
+        <translation>Организация</translation>
     </message>
 </context>
 <context>
     <name>TenantEditor</name>
+    <message>
+        <source>Available permissions</source>
+        <translation>Доступные права</translation>
+    </message>
     <message>
         <location filename="../../../Qml/imtauthgui/TenantEditor.qml" line="+104"/>
         <source>General</source>
@@ -9206,24 +9222,52 @@ ID входных данных: </translation>
 <context>
     <name>TenantGeneralPage</name>
     <message>
+        <source>Organization</source>
+        <translation>Организация</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Название</translation>
+    </message>
+    <message>
+        <source>Owner</source>
+        <translation>Владелец</translation>
+    </message>
+    <message>
+        <source>The owner holds every available permission of the organization</source>
+        <translation>Владелец получает все доступные права организации</translation>
+    </message>
+    <message>
+        <source>You (the creator)</source>
+        <translation>Вы (создатель)</translation>
+    </message>
+    <message>
+        <source>Search for a user</source>
+        <translation>Поиск пользователя</translation>
+    </message>
+    <message>
+        <source>Parent organization</source>
+        <translation>Родительская организация</translation>
+    </message>
+    <message>
         <location filename="../../../Qml/imtauthgui/TenantGeneralPage.qml" line="+80"/>
         <source>General</source>
         <translation>Общее</translation>
     </message>
     <message>
         <location line="+7"/>
-        <source>Basic workspace settings and configuration.</source>
-        <translation>Основные настройки и конфигурация рабочего пространства.</translation>
+        <source>Basic settings of the organization.</source>
+        <translation>Основные настройки организации.</translation>
     </message>
     <message>
         <location line="+18"/>
-        <source>Tenant Name</source>
-        <translation>Название тенанта</translation>
+        <source>Organization Name</source>
+        <translation>Название организации</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Enter the tenant name</source>
-        <translation>Введите название тенанта</translation>
+        <source>Enter the organization name</source>
+        <translation>Введите название организации</translation>
     </message>
     <message>
         <location line="+15"/>
@@ -9243,6 +9287,14 @@ ID входных данных: </translation>
 </context>
 <context>
     <name>TenantGroupsPage</name>
+    <message>
+        <source>Name</source>
+        <translation>Название</translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <translation>Описание</translation>
+    </message>
     <message>
         <location filename="../../../Qml/imtauthgui/TenantGroupsPage.qml" line="+65"/>
         <source>Groups</source>
@@ -9355,8 +9407,8 @@ ID входных данных: </translation>
     </message>
     <message>
         <location line="+4"/>
-        <source>Leave Workspace</source>
-        <translation>Покинуть рабочее пространство</translation>
+        <source>Leave Organization</source>
+        <translation>Покинуть организацию</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -9371,6 +9423,78 @@ ID входных данных: </translation>
 </context>
 <context>
     <name>TenantMembersPage</name>
+    <message>
+        <source>Name</source>
+        <translation>Имя</translation>
+    </message>
+    <message>
+        <source>Role</source>
+        <translation>Роль</translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation>Статус</translation>
+    </message>
+    <message>
+        <source>Details</source>
+        <translation>Подробности</translation>
+    </message>
+    <message>
+        <source>Member</source>
+        <translation>Участник</translation>
+    </message>
+    <message>
+        <source>Owner</source>
+        <translation>Владелец</translation>
+    </message>
+    <message>
+        <source>Creator</source>
+        <translation>Создатель</translation>
+    </message>
+    <message>
+        <source>Invited</source>
+        <translation>Приглашён</translation>
+    </message>
+    <message>
+        <source>Active</source>
+        <translation>Активный</translation>
+    </message>
+    <message>
+        <source>Pending</source>
+        <translation>Ожидание</translation>
+    </message>
+    <message>
+        <source>Expired</source>
+        <translation>Истёк</translation>
+    </message>
+    <message>
+        <source>Revoked</source>
+        <translation>Отозван</translation>
+    </message>
+    <message>
+        <source>You</source>
+        <translation>Вы</translation>
+    </message>
+    <message>
+        <source>%1 organization permission(s)</source>
+        <translation>Прав в организации: %1</translation>
+    </message>
+    <message>
+        <source>Actions</source>
+        <translation>Действия</translation>
+    </message>
+    <message>
+        <source>Resend Invitation</source>
+        <translation>Повторно отправить приглашение</translation>
+    </message>
+    <message>
+        <source>Revoke Invitation</source>
+        <translation>Отзыв приглашения</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to revoke the invitation of &quot;%1&quot;?</source>
+        <translation>Отозвать приглашение пользователя «%1»?</translation>
+    </message>
     <message>
         <location filename="../../../Qml/imtauthgui/TenantMembersPage.qml" line="+76"/>
         <source>Members</source>
@@ -9393,8 +9517,8 @@ ID входных данных: </translation>
     </message>
     <message>
         <location line="+34"/>
-        <source>Manage tenant members. Users created here automatically become members.</source>
-        <translation>Управление участниками тенанта. Созданные здесь пользователи автоматически становятся участниками.</translation>
+        <source>Manage the members of the organization. Users created here automatically become members.</source>
+        <translation>Управление участниками организации. Созданные здесь пользователи автоматически становятся участниками.</translation>
     </message>
     <message>
         <location line="+28"/>
@@ -9447,14 +9571,86 @@ ID входных данных: </translation>
 <context>
     <name>TenantPermissionsPage</name>
     <message>
+        <source>Other permissions</source>
+        <translation>Другие права</translation>
+    </message>
+    <message>
+        <source>Remove permissions</source>
+        <translation>Снятие прав</translation>
+    </message>
+    <message>
+        <source>%1 permission(s) will be taken from the owner, the roles and the sub-organizations of this organization. Continue?</source>
+        <translation>Прав будет снято у владельца, ролей и подорганизаций этой организации: %1. Продолжить?</translation>
+    </message>
+    <message>
+        <source>The permissions of this organization are chosen by its creator %1.</source>
+        <translation>Права этой организации выбирает её создатель %1.</translation>
+    </message>
+    <message>
+        <source>The permissions of this organization are chosen by its creator.</source>
+        <translation>Права этой организации выбирает её создатель.</translation>
+    </message>
+    <message>
+        <source>You are the owner: all of them are yours already.</source>
+        <translation>Вы владелец: все эти права у вас уже есть.</translation>
+    </message>
+    <message>
+        <source>The owner holds all of them.</source>
+        <translation>У владельца есть все эти права.</translation>
+    </message>
+    <message>
+        <source>Roles and members can be given only these permissions.</source>
+        <translation>Ролям и участникам можно выдать только эти права.</translation>
+    </message>
+    <message>
+        <source>Choose the product features available to this organization. The owner holds every chosen permission; roles and members can be given only them.</source>
+        <translation>Выберите возможности продукта, доступные этой организации. Владелец получает все выбранные права, ролям и участникам можно выдать только их.</translation>
+    </message>
+    <message>
+        <source>Only the permissions of the parent organization can be chosen.</source>
+        <translation>Выбрать можно только права родительской организации.</translation>
+    </message>
+    <message>
+        <source>A removed permission is taken from the owner, the roles and the sub-organizations.</source>
+        <translation>Снятое право снимается у владельца, ролей и подорганизаций.</translation>
+    </message>
+    <message>
+        <source>Available permissions (%1 of %2)</source>
+        <translation>Доступные права (%1 из %2)</translation>
+    </message>
+    <message>
+        <source>Available permissions (%1)</source>
+        <translation>Доступные права (%1)</translation>
+    </message>
+    <message>
+        <source>Selected only</source>
+        <translation>Только выбранные</translation>
+    </message>
+    <message>
+        <source>Available permissions</source>
+        <translation>Доступные права</translation>
+    </message>
+    <message>
+        <source>The roles and the owner of this organization hold nothing beyond these permissions. Only the creator of the organization changes them.</source>
+        <translation>Роли и владелец этой организации не получают ничего сверх этих прав. Изменять их может только создатель организации.</translation>
+    </message>
+    <message>
+        <source>Select which product features are available for this organization. Only the features of the parent organization can be chosen.</source>
+        <translation>Выберите, какие возможности продукта доступны для этой организации. Доступны только возможности родительской организации.</translation>
+    </message>
+    <message>
+        <source>Select which product features are available for this organization. Its roles and owner hold nothing beyond them.</source>
+        <translation>Выберите, какие возможности продукта доступны для этой организации. Её роли и владелец не получают ничего сверх них.</translation>
+    </message>
+    <message>
         <location filename="../../../Qml/imtauthgui/TenantPermissionsPage.qml" line="+117"/>
         <source>Permissions</source>
         <translation>Права</translation>
     </message>
     <message>
         <location line="+7"/>
-        <source>Select which product features are available for this tenant.</source>
-        <translation>Выберите, какие возможности продукта доступны для этого тенанта.</translation>
+        <source>Select which product features are available for this organization.</source>
+        <translation>Выберите, какие возможности продукта доступны для этой организации.</translation>
     </message>
     <message>
         <location line="+20"/>
@@ -9495,6 +9691,14 @@ ID входных данных: </translation>
 <context>
     <name>TenantRolesPage</name>
     <message>
+        <source>Name</source>
+        <translation>Название</translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <translation>Описание</translation>
+    </message>
+    <message>
         <location filename="../../../Qml/imtauthgui/TenantRolesPage.qml" line="+68"/>
         <source>Roles</source>
         <translation>Роли</translation>
@@ -9511,8 +9715,8 @@ ID входных данных: </translation>
     </message>
     <message>
         <location line="+16"/>
-        <source>Manage tenant roles and assign permissions to team members.</source>
-        <translation>Управление ролями тенанта и назначение прав участникам.</translation>
+        <source>Manage the roles of the organization and assign permissions to its members.</source>
+        <translation>Управление ролями организации и назначение прав участникам.</translation>
     </message>
     <message>
         <location line="+28"/>
@@ -10311,6 +10515,14 @@ ID входных данных: </translation>
 </context>
 <context>
     <name>UserCollectionView</name>
+    <message>
+        <source>Source</source>
+        <translation>Источник</translation>
+    </message>
+    <message>
+        <source>Never</source>
+        <translation>Никогда</translation>
+    </message>
     <message>
         <location filename="../../../Qml/imtauthgui/UserCollectionView.qml" line="+60"/>
         <source>System Info</source>
@@ -12744,6 +12956,17 @@ ID входных данных: </translation>
         <location filename="../../../Include/imtservergql/CStructureControllerCompBase.cpp" line="+300"/>
         <source>Internal error</source>
         <translation>Внутренняя ошибка</translation>
+    </message>
+</context>
+<context>
+    <name>PermissionDetailsPanel</name>
+    <message>
+        <source>The path is copied</source>
+        <translation>Путь скопирован</translation>
+    </message>
+    <message>
+        <source>Copy the full path</source>
+        <translation>Скопировать полный путь</translation>
     </message>
 </context>
 </TS>

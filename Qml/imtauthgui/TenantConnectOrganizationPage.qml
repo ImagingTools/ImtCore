@@ -62,6 +62,31 @@ ViewBase {
 		connectPage.updateGui()
 	}
 
+	// Notifications come in bursts and while the page is hidden: one reading when it is shown serves them all
+	property bool __updatePending: false
+
+	function __updateWhenVisible() {
+		if (connectPage.visible)
+			notificationUpdateTimer.restart()
+		else
+			connectPage.__updatePending = true
+	}
+
+	onVisibleChanged: {
+		if (connectPage.visible && connectPage.__updatePending) {
+			connectPage.__updatePending = false
+			notificationUpdateTimer.restart()
+		}
+	}
+
+	Timer {
+		id: notificationUpdateTimer
+		interval: 100
+		onTriggered: {
+			connectPage.updateGui()
+		}
+	}
+
 	Connections {
 		target: connectPage.apiClient
 
@@ -71,7 +96,7 @@ ViewBase {
 			codeInput.text = ""
 			messageInput.text = ""
 			PopupManager.addSuccessMessage(qsTr("Connection request sent successfully"), true)
-			connectPage.updateGui()
+			notificationUpdateTimer.restart()
 		}
 
 		function onConnectionRequestError(errorMessage) {
@@ -117,7 +142,7 @@ ViewBase {
 			connectPage.processingRequestId = ""
 			connectPage.processingRequestAction = ""
 			PopupManager.addSuccessMessage(qsTr("Connection request approved"), true)
-			connectPage.updateGui()
+			notificationUpdateTimer.restart()
 		}
 
 		function onConnectionRequestRejected() {
@@ -125,7 +150,7 @@ ViewBase {
 			connectPage.processingRequestId = ""
 			connectPage.processingRequestAction = ""
 			PopupManager.addSuccessMessage(qsTr("Connection request rejected"), true)
-			connectPage.updateGui()
+			notificationUpdateTimer.restart()
 		}
 
 		function onConnectionRequestCanceled() {
@@ -133,17 +158,39 @@ ViewBase {
 			connectPage.processingRequestId = ""
 			connectPage.processingRequestAction = ""
 			PopupManager.addSuccessMessage(qsTr("Connection request canceled"), true)
-			connectPage.updateGui()
+			notificationUpdateTimer.restart()
 		}
 
 		function onConnectionsReceived() {
 			connectPage.refreshConnectionsList()
 		}
 
-		function onConnectionRemoved(connectionId) {
-			PopupManager.addSuccessMessage(qsTr("Connection removed"), true)
-			connectPage.updateGui()
+		function onSubscriptionConnectionCodesChanged(notification) {
+			connectPage.__updateWhenVisible()
 		}
+
+		function onSubscriptionsResumed() {
+			connectPage.__updateWhenVisible()
+		}
+
+		function onConnectionRemoved(connectionId) {
+			// Keyed by the connection, as the notification of the same removal: one message for both
+			PopupManager.addSuccessMessage(qsTr("Connection removed"), true, "connection-removed-" + connectionId)
+			notificationUpdateTimer.restart()
+		}
+	}
+
+	function __date(value) {
+		return value ? new Date(value).toLocaleDateString() : "—"
+	}
+
+	function __requestRow(request, tenantName) {
+		var row = {}
+		row.id = request.id || ""
+		row.organization = tenantName ? tenantName : qsTr("Unknown Organization")
+		row.message = request.message || ""
+		row.date = connectPage.__date(request.createdAt)
+		return row
 	}
 
 	function refreshIncomingList() {
@@ -155,16 +202,16 @@ ViewBase {
 				var req = allRequests.get(i)
 				if (req.targetTenantId === connectPage.tenantData.m_id
 						&& req.status === "Pending") {
-					incoming.push(req)
+					incoming.push(connectPage.__requestRow(req, req.sourceTenantName))
 				}
 				if (req.sourceTenantId === connectPage.tenantData.m_id
 						&& req.status === "Pending") {
-					outgoing.push(req)
+					outgoing.push(connectPage.__requestRow(req, req.targetTenantName))
 				}
 			}
 		}
-		requestsList.model = incoming
-		sentRequestsList.model = outgoing
+		requestsTable.elements = incoming
+		sentRequestsTable.elements = outgoing
 
 		if (connectPage.lastIncomingRequestId !== "") {
 			var incomingStillVisible = false
@@ -222,11 +269,16 @@ ViewBase {
 			for (var i = 0; i < allConnections.count; ++i) {
 				var conn = allConnections.get(i)
 				if (conn.status === "Active") {
-					connections.push(conn)
+					var row = {}
+					row.id = conn.id || ""
+					row.organization = conn.partnerName ? conn.partnerName : qsTr("Unknown Organization")
+					row.owner = conn.partnerOwnerName || ""
+					row.date = connectPage.__date(conn.createdAt)
+					connections.push(row)
 				}
 			}
 		}
-		connectionsList.model = connections
+		connectionsTable.elements = connections
 	}
 
 	Flickable {
@@ -238,19 +290,20 @@ ViewBase {
 		Column {
 			id: mainColumn
 			anchors.horizontalCenter: parent.horizontalCenter
-			width: Math.min(parent.width - Style.marginXL * 2, 600)
-			spacing: Style.marginXL
+			width: Math.min(parent.width - Style.marginXL * 2, Style.contentWidthMax)
+			spacing: Style.marginM
 
-			Text {
-				text: qsTr("Connect Organization")
-				font.pixelSize: Style.fontSizeXL
-				font.bold: true
-				color: Style.textColor
+			// Width of the label column of the form rows, as in the document editors
+			readonly property int labelWidth: Math.min(Style.sizeHintS, Math.round(mainColumn.width * 0.35))
+
+			GroupHeaderView {
+				width: parent.width
+				title: qsTr("Connect Organization")
 			}
 
 			Text {
 				text: qsTr("Enter the Connection Code of the organization you want to connect with.")
-				font.pixelSize: Style.fontSizeM
+				font.pixelSize: Style.fontSizeS
 				color: Style.inactiveTextColor
 				wrapMode: Text.WordWrap
 				width: parent.width
@@ -259,8 +312,8 @@ ViewBase {
 			Rectangle {
 				width: parent.width
 				height: sendColumn.height + Style.marginL * 2
-				color: Style.backgroundColor2
-				radius: Style.radiusL
+				color: Style.baseColor
+				radius: Style.radiusM
 				border.width: 1
 				border.color: Style.borderColor
 
@@ -272,38 +325,60 @@ ViewBase {
 					anchors.margins: Style.marginL
 					spacing: Style.marginM
 
-					Column {
+					Item {
 						width: parent.width
-						spacing: Style.marginXS
+						height: Style.controlHeightM
 
 						Text {
+							anchors.left: parent.left
+							anchors.verticalCenter: parent.verticalCenter
+							width: mainColumn.labelWidth
 							text: qsTr("Connection Code")
-							font.pixelSize: Style.fontSizeS
-							color: Style.inactiveTextColor
+							font.family: Style.fontFamilyBold
+							font.pixelSize: Style.fontSizeM
+							font.bold: true
+							color: Style.textColor
+							elide: Text.ElideRight
 						}
 
 						CustomTextField {
 							id: codeInput
-							width: parent.width
+							anchors.right: parent.right
+							anchors.verticalCenter: parent.verticalCenter
+							width: parent.width - mainColumn.labelWidth - Style.marginL
 							height: Style.controlHeightM
 							textSize: Style.fontSizeM
 							placeHolderText: qsTr("Enter code...")
 						}
 					}
 
-					Column {
+					Rectangle {
 						width: parent.width
-						spacing: Style.marginXS
+						height: 1
+						color: Style.borderColor
+					}
+
+					Item {
+						width: parent.width
+						height: Style.controlHeightM
 
 						Text {
+							anchors.left: parent.left
+							anchors.verticalCenter: parent.verticalCenter
+							width: mainColumn.labelWidth
 							text: qsTr("Message (optional)")
-							font.pixelSize: Style.fontSizeS
-							color: Style.inactiveTextColor
+							font.family: Style.fontFamilyBold
+							font.pixelSize: Style.fontSizeM
+							font.bold: true
+							color: Style.textColor
+							elide: Text.ElideRight
 						}
 
 						CustomTextField {
 							id: messageInput
-							width: parent.width
+							anchors.right: parent.right
+							anchors.verticalCenter: parent.verticalCenter
+							width: parent.width - mainColumn.labelWidth - Style.marginL
 							height: Style.controlHeightM
 							textSize: Style.fontSizeM
 							placeHolderText: qsTr("Add a message...")
@@ -320,6 +395,8 @@ ViewBase {
 					}
 
 					Button {
+						anchors.right: parent.right
+						variant: "primary"
 						text: connectPage.sending ? qsTr("Sending...") : qsTr("Send Request")
 						enabled: codeInput.text.trim().length > 0 && !connectPage.sending && connectPage.__canConnectOrganization
 						onClicked: {
@@ -336,383 +413,267 @@ ViewBase {
 				}
 			}
 
-			Rectangle {
+			Item {
 				width: parent.width
-				height: 1
-				color: Style.borderColor
+				height: Style.marginM
 			}
 
-			Text {
-				text: qsTr("Incoming Requests")
-				font.pixelSize: Style.fontSizeL
-				font.bold: true
-				color: Style.textColor
+			GroupHeaderView {
+				width: parent.width
+				title: qsTr("Incoming Requests")
 				visible: connectPage.__canViewConnections
 			}
 
 			Text {
-				visible: requestsList.count === 0
+				visible: requestsTable.elementsCount === 0
 				text: qsTr("No pending incoming requests.")
-				font.pixelSize: Style.fontSizeM
+				font.pixelSize: Style.fontSizeS
 				color: Style.inactiveTextColor
 			}
 
-			ListView {
-				id: requestsList
-				visible: connectPage.__canViewConnections
+			Table {
+				id: requestsTable
+				visible: connectPage.__canViewConnections && requestsTable.elementsCount > 0
 				width: parent.width
-				height: requestsList.contentHeight
-				interactive: false
-				spacing: Style.marginS
-
-				delegate: Rectangle {
-					width: requestsList.width
-					height: incomingContent.height + Style.marginL * 2
-					color: Style.backgroundColor2
-					radius: Style.radiusL
-					border.width: 1
-					border.color: Style.borderColor
-
-					Column {
-						id: incomingContent
-						anchors.left: parent.left
-						anchors.right: incomingActions.left
-						anchors.leftMargin: Style.marginL
-						anchors.rightMargin: Style.marginS
-						anchors.verticalCenter: parent.verticalCenter
-						spacing: Style.marginXS
-
-						Text {
-							text: modelData.sourceTenantName ? modelData.sourceTenantName : qsTr("Unknown Organization")
-							font.pixelSize: Style.fontSizeM
-							font.bold: true
-							color: Style.textColor
-						}
-
-						Text {
-							visible: modelData.message ? modelData.message !== "" : false
-							text: modelData.message ? modelData.message : ""
-							font.pixelSize: Style.fontSizeS
-							color: Style.inactiveTextColor
-						}
-
-						Text {
-							text: qsTr("Received: %1").arg(
-								modelData.createdAt ? new Date(modelData.createdAt).toLocaleDateString() : "—")
-							font.pixelSize: Style.fontSizeXS
-							color: Style.inactiveTextColor
-						}
-
-						Text {
-							visible: modelData.id === connectPage.processingRequestId
-									 || (modelData.id === connectPage.lastIncomingRequestId && connectPage.lastIncomingRequestStatus !== "")
-							text: modelData.id === connectPage.processingRequestId
-								? (connectPage.processingRequestAction === "approve" ? qsTr("Approving...") : qsTr("Rejecting..."))
-								: connectPage.lastIncomingRequestStatus
-							font.pixelSize: Style.fontSizeXS
-							color: (modelData.id === connectPage.lastIncomingRequestId && connectPage.lastIncomingRequestStatusError)
-								? Style.errorColor : Style.inactiveTextColor
-						}
-					}
-
-					Row {
-						id: incomingActions
-						anchors.right: parent.right
-						anchors.rightMargin: Style.marginL
-						anchors.verticalCenter: parent.verticalCenter
-						spacing: Style.marginS
-
-						Rectangle {
-							width: approveBtnText.contentWidth + Style.marginL * 2
-							height: Style.controlHeightS
-							radius: Style.radiusM
-							color: connectPage.processingRequestId === modelData.id ? Style.inactiveTextColor : Style.successColor
-
-							Text {
-								id: approveBtnText
-								anchors.centerIn: parent
-								text: connectPage.processingRequestId === modelData.id ? qsTr("Approving...") : qsTr("Approve")
-								font.pixelSize: Style.fontSizeS
-								color: Style.highlightedTextColor
-							}
-
-							MouseArea {
-								anchors.fill: parent
-								cursorShape: Qt.PointingHandCursor
-								enabled: connectPage.processingRequestId === "" && connectPage.__canManageConnections
-								onClicked: {
-									if (connectPage.apiClient && connectPage.tenantData) {
-										connectPage.processingRequestId = modelData.id || ""
-										connectPage.processingRequestAction = "approve"
-										connectPage.__setIncomingStatus("", "", false)
-										connectPage.apiClient.approveConnectionRequest(
-											modelData.id, connectPage.tenantData.m_id)
-									}
-								}
-							}
-						}
-
-						Rectangle {
-							width: rejectBtnText.contentWidth + Style.marginL * 2
-							height: Style.controlHeightS
-							radius: Style.radiusM
-							color: connectPage.processingRequestId === modelData.id ? Style.inactiveTextColor : Style.dangerColor
-
-							Text {
-								id: rejectBtnText
-								anchors.centerIn: parent
-								text: connectPage.processingRequestId === modelData.id ? qsTr("Rejecting...") : qsTr("Reject")
-								font.pixelSize: Style.fontSizeS
-								color: Style.highlightedTextColor
-							}
-
-							MouseArea {
-								anchors.fill: parent
-								cursorShape: Qt.PointingHandCursor
-								enabled: connectPage.processingRequestId === "" && connectPage.__canManageConnections
-								onClicked: {
-									if (connectPage.apiClient && connectPage.tenantData) {
-										connectPage.processingRequestId = modelData.id || ""
-										connectPage.processingRequestAction = "reject"
-										connectPage.__setIncomingStatus("", "", false)
-										connectPage.apiClient.rejectConnectionRequest(
-											modelData.id, connectPage.tenantData.m_id)
-									}
-								}
-							}
-						}
-					}
-				}
+				height: requestsTable.contentHeight + requestsTable.headerHeight
+				canMoveColumns: true
+				selectable: false
 			}
 
-			Rectangle {
+			Item {
 				width: parent.width
-				height: 1
-				color: Style.borderColor
+				height: Style.marginM
 			}
 
-			Text {
-				text: qsTr("Sent Requests")
-				font.pixelSize: Style.fontSizeL
-				font.bold: true
-				color: Style.textColor
+			GroupHeaderView {
+				width: parent.width
+				title: qsTr("Sent Requests")
 				visible: connectPage.__canViewConnections
 			}
 
 			Text {
-				visible: sentRequestsList.count === 0
+				visible: sentRequestsTable.elementsCount === 0
 				text: qsTr("No pending sent requests.")
-				font.pixelSize: Style.fontSizeM
+				font.pixelSize: Style.fontSizeS
 				color: Style.inactiveTextColor
 			}
 
-			ListView {
-				id: sentRequestsList
-				visible: connectPage.__canViewConnections
+			Table {
+				id: sentRequestsTable
+				visible: connectPage.__canViewConnections && sentRequestsTable.elementsCount > 0
 				width: parent.width
-				height: sentRequestsList.contentHeight
-				interactive: false
-				spacing: Style.marginS
-
-				delegate: Rectangle {
-					width: sentRequestsList.width
-					height: sentContent.height + Style.marginL * 2
-					color: Style.backgroundColor2
-					radius: Style.radiusL
-					border.width: 1
-					border.color: Style.borderColor
-
-					Column {
-						id: sentContent
-						anchors.left: parent.left
-						anchors.right: sentActions.left
-						anchors.leftMargin: Style.marginL
-						anchors.rightMargin: Style.marginS
-						anchors.verticalCenter: parent.verticalCenter
-						spacing: Style.marginXS
-
-						Text {
-							text: modelData.targetTenantName ? modelData.targetTenantName : qsTr("Unknown Organization")
-							font.pixelSize: Style.fontSizeM
-							font.bold: true
-							color: Style.textColor
-						}
-
-						Text {
-							visible: modelData.message ? modelData.message !== "" : false
-							text: modelData.message ? modelData.message : ""
-							font.pixelSize: Style.fontSizeS
-							color: Style.inactiveTextColor
-						}
-
-						Text {
-							text: qsTr("Sent: %1").arg(
-								modelData.createdAt ? new Date(modelData.createdAt).toLocaleDateString() : "—")
-							font.pixelSize: Style.fontSizeXS
-							color: Style.inactiveTextColor
-						}
-
-						Text {
-							visible: modelData.id === connectPage.processingRequestId
-									 || (modelData.id === connectPage.lastSentRequestId && connectPage.lastSentRequestStatus !== "")
-							text: modelData.id === connectPage.processingRequestId
-								? qsTr("Canceling...")
-								: connectPage.lastSentRequestStatus
-							font.pixelSize: Style.fontSizeXS
-							color: (modelData.id === connectPage.lastSentRequestId && connectPage.lastSentRequestStatusError)
-								? Style.errorColor : Style.inactiveTextColor
-						}
-					}
-
-					Row {
-						id: sentActions
-						anchors.right: parent.right
-						anchors.rightMargin: Style.marginL
-						anchors.verticalCenter: parent.verticalCenter
-						spacing: Style.marginS
-
-						Rectangle {
-							width: cancelBtnText.contentWidth + Style.marginL * 2
-							height: Style.controlHeightS
-							radius: Style.radiusM
-							color: Style.inactiveTextColor
-
-							Text {
-								id: cancelBtnText
-								anchors.centerIn: parent
-								text: qsTr("Cancel")
-								font.pixelSize: Style.fontSizeS
-								color: Style.highlightedTextColor
-							}
-
-							MouseArea {
-								anchors.fill: parent
-								cursorShape: Qt.PointingHandCursor
-								enabled: connectPage.processingRequestId === "" && connectPage.__canConnectOrganization
-								onClicked: {
-									if (connectPage.apiClient && connectPage.tenantData) {
-										connectPage.processingRequestId = modelData.id || ""
-										connectPage.processingRequestAction = "cancel"
-										connectPage.__setSentStatus("", "", false)
-										connectPage.apiClient.cancelConnectionRequest(
-											modelData.id, connectPage.tenantData.m_id)
-									}
-								}
-							}
-						}
-					}
-				}
+				height: sentRequestsTable.contentHeight + sentRequestsTable.headerHeight
+				canMoveColumns: true
+				selectable: false
 			}
 
-			Rectangle {
+			Item {
 				width: parent.width
-				height: 1
-				color: Style.borderColor
+				height: Style.marginM
 			}
 
-			Text {
-				text: qsTr("Established Connections")
-				font.pixelSize: Style.fontSizeL
-				font.bold: true
-				color: Style.textColor
+			GroupHeaderView {
+				width: parent.width
+				title: qsTr("Established Connections")
 				visible: connectPage.__canViewConnections
 			}
 
 			Text {
 				text: qsTr("Organizations you are connected with.")
-				font.pixelSize: Style.fontSizeM
+				font.pixelSize: Style.fontSizeS
 				color: Style.inactiveTextColor
 				visible: connectPage.__canViewConnections
 			}
 
 			Text {
-				visible: connectionsList.count === 0
+				visible: connectionsTable.elementsCount === 0
 				text: qsTr("No established connections yet.")
-				font.pixelSize: Style.fontSizeM
+				font.pixelSize: Style.fontSizeS
 				color: Style.inactiveTextColor
 			}
 
-			ListView {
-				id: connectionsList
-				visible: connectPage.__canViewConnections
+			Table {
+				id: connectionsTable
+				visible: connectPage.__canViewConnections && connectionsTable.elementsCount > 0
 				width: parent.width
-				height: connectionsList.contentHeight
-				interactive: false
+				height: connectionsTable.contentHeight + connectionsTable.headerHeight
+				canMoveColumns: true
+				selectable: false
+			}
+		}
+	}
+
+	TableHeaders {
+		id: incomingHeaders
+
+		Component.onCompleted: {
+			addHeader("organization", qsTr("Organization"), false, false)
+			addHeader("message", qsTr("Message"), false, false)
+			addHeader("date", qsTr("Received"), false, false)
+			addHeader("state", qsTr("State"), false, false)
+			addHeader("actions", "", false, false)
+			requestsTable.headers = incomingHeaders
+			requestsTable.setColumnContentById("state", incomingStateCellComp)
+			requestsTable.setColumnContentById("actions", incomingActionsCellComp)
+		}
+	}
+
+	TableHeaders {
+		id: sentHeaders
+
+		Component.onCompleted: {
+			addHeader("organization", qsTr("Organization"), false, false)
+			addHeader("message", qsTr("Message"), false, false)
+			addHeader("date", qsTr("Sent"), false, false)
+			addHeader("state", qsTr("State"), false, false)
+			addHeader("actions", "", false, false)
+			sentRequestsTable.headers = sentHeaders
+			sentRequestsTable.setColumnContentById("state", sentStateCellComp)
+			sentRequestsTable.setColumnContentById("actions", sentActionsCellComp)
+		}
+	}
+
+	TableHeaders {
+		id: connectionsHeaders
+
+		Component.onCompleted: {
+			addHeader("organization", qsTr("Organization"), false, false)
+			addHeader("owner", qsTr("Owner"), false, false)
+			addHeader("date", qsTr("Connected since"), false, false)
+			addHeader("actions", "", false, false)
+			connectionsTable.headers = connectionsHeaders
+			connectionsTable.setColumnContentById("actions", connectionActionsCellComp)
+		}
+	}
+
+	Component {
+		id: incomingStateCellComp
+
+		TableCellDelegateBase {
+			id: incomingStateCell
+			readonly property string requestId: incomingStateCell.getRowData() ? (incomingStateCell.getRowData().id || "") : ""
+
+			Text {
+				anchors.verticalCenter: parent.verticalCenter
+				anchors.left: parent.left
+				anchors.leftMargin: Style.marginM
+				text: incomingStateCell.requestId === connectPage.processingRequestId
+					? (connectPage.processingRequestAction === "approve" ? qsTr("Approving...") : qsTr("Rejecting..."))
+					: (incomingStateCell.requestId === connectPage.lastIncomingRequestId ? connectPage.lastIncomingRequestStatus : "")
+				font.pixelSize: Style.fontSizeS
+				color: incomingStateCell.requestId === connectPage.lastIncomingRequestId && connectPage.lastIncomingRequestStatusError
+					? Style.errorColor : Style.inactiveTextColor
+			}
+		}
+	}
+
+	Component {
+		id: incomingActionsCellComp
+
+		TableCellDelegateBase {
+			id: incomingActionsCell
+			readonly property string requestId: incomingActionsCell.getRowData() ? (incomingActionsCell.getRowData().id || "") : ""
+
+			Row {
+				anchors.verticalCenter: parent.verticalCenter
+				anchors.right: parent.right
+				anchors.rightMargin: Style.marginM
 				spacing: Style.marginS
 
-				delegate: Rectangle {
-					width: connectionsList.width
-					height: connContent.height + Style.marginL * 2
-					color: Style.backgroundColor2
-					radius: Style.radiusL
-					border.width: 1
-					border.color: Style.borderColor
-
-					Column {
-						id: connContent
-						anchors.left: parent.left
-						anchors.right: connActions.left
-						anchors.leftMargin: Style.marginL
-						anchors.rightMargin: Style.marginS
-						anchors.verticalCenter: parent.verticalCenter
-						spacing: Style.marginXS
-
-						Text {
-							text: modelData.partnerName ? modelData.partnerName : qsTr("Unknown Organization")
-							font.pixelSize: Style.fontSizeM
-							font.bold: true
-							color: Style.textColor
-						}
-
-						Text {
-							visible: modelData.partnerOwnerName ? modelData.partnerOwnerName !== "" : false
-							text: qsTr("Owner: %1").arg(modelData.partnerOwnerName || "")
-							font.pixelSize: Style.fontSizeS
-							color: Style.inactiveTextColor
-						}
-
-						Text {
-							text: qsTr("Connected since: %1").arg(
-								modelData.createdAt ? new Date(modelData.createdAt).toLocaleDateString() : "—")
-							font.pixelSize: Style.fontSizeXS
-							color: Style.inactiveTextColor
+				Button {
+					variant: "primary"
+					text: qsTr("Approve")
+					enabled: connectPage.processingRequestId === "" && connectPage.__canManageConnections
+					onClicked: {
+						if (connectPage.apiClient && connectPage.tenantData) {
+							connectPage.processingRequestId = incomingActionsCell.requestId
+							connectPage.processingRequestAction = "approve"
+							connectPage.__setIncomingStatus("", "", false)
+							connectPage.apiClient.approveConnectionRequest(incomingActionsCell.requestId, connectPage.tenantData.m_id)
 						}
 					}
+				}
 
-					Row {
-						id: connActions
-						anchors.right: parent.right
-						anchors.rightMargin: Style.marginL
-						anchors.verticalCenter: parent.verticalCenter
-						spacing: Style.marginS
-
-						Rectangle {
-							width: removeBtnText.contentWidth + Style.marginL * 2
-							height: Style.controlHeightS
-							radius: Style.radiusM
-							color: Style.dangerColor
-
-							Text {
-								id: removeBtnText
-								anchors.centerIn: parent
-								text: qsTr("Remove")
-								font.pixelSize: Style.fontSizeS
-								color: Style.highlightedTextColor
-							}
-
-							MouseArea {
-								anchors.fill: parent
-								cursorShape: Qt.PointingHandCursor
-								enabled: connectPage.__canManageConnections
-								onClicked: {
-									if (connectPage.apiClient && connectPage.tenantData) {
-										connectPage.__connectionToRemoveId = modelData.id
-										connectPage.__connectionToRemoveName = modelData.partnerName || qsTr("Unknown Organization")
-										ModalDialogManager.openDialog(removeConnectionConfirmDialogComp)
-									}
-								}
-							}
+				Button {
+					text: qsTr("Reject")
+					enabled: connectPage.processingRequestId === "" && connectPage.__canManageConnections
+					onClicked: {
+						if (connectPage.apiClient && connectPage.tenantData) {
+							connectPage.processingRequestId = incomingActionsCell.requestId
+							connectPage.processingRequestAction = "reject"
+							connectPage.__setIncomingStatus("", "", false)
+							connectPage.apiClient.rejectConnectionRequest(incomingActionsCell.requestId, connectPage.tenantData.m_id)
 						}
+					}
+				}
+			}
+		}
+	}
+
+	Component {
+		id: sentStateCellComp
+
+		TableCellDelegateBase {
+			id: sentStateCell
+			readonly property string requestId: sentStateCell.getRowData() ? (sentStateCell.getRowData().id || "") : ""
+
+			Text {
+				anchors.verticalCenter: parent.verticalCenter
+				anchors.left: parent.left
+				anchors.leftMargin: Style.marginM
+				text: sentStateCell.requestId === connectPage.processingRequestId
+					? qsTr("Canceling...")
+					: (sentStateCell.requestId === connectPage.lastSentRequestId ? connectPage.lastSentRequestStatus : "")
+				font.pixelSize: Style.fontSizeS
+				color: sentStateCell.requestId === connectPage.lastSentRequestId && connectPage.lastSentRequestStatusError
+					? Style.errorColor : Style.inactiveTextColor
+			}
+		}
+	}
+
+	Component {
+		id: sentActionsCellComp
+
+		TableCellDelegateBase {
+			id: sentActionsCell
+			readonly property string requestId: sentActionsCell.getRowData() ? (sentActionsCell.getRowData().id || "") : ""
+
+			Button {
+				anchors.verticalCenter: parent.verticalCenter
+				anchors.right: parent.right
+				anchors.rightMargin: Style.marginM
+				text: qsTr("Cancel")
+				enabled: connectPage.processingRequestId === "" && connectPage.__canConnectOrganization
+				onClicked: {
+					if (connectPage.apiClient && connectPage.tenantData) {
+						connectPage.processingRequestId = sentActionsCell.requestId
+						connectPage.processingRequestAction = "cancel"
+						connectPage.__setSentStatus("", "", false)
+						connectPage.apiClient.cancelConnectionRequest(sentActionsCell.requestId, connectPage.tenantData.m_id)
+					}
+				}
+			}
+		}
+	}
+
+	Component {
+		id: connectionActionsCellComp
+
+		TableCellDelegateBase {
+			id: connectionActionsCell
+			readonly property var rowData: connectionActionsCell.getRowData()
+
+			Button {
+				anchors.verticalCenter: parent.verticalCenter
+				anchors.right: parent.right
+				anchors.rightMargin: Style.marginM
+				text: qsTr("Remove")
+				enabled: connectPage.__canManageConnections
+				onClicked: {
+					if (connectPage.apiClient && connectPage.tenantData && connectionActionsCell.rowData) {
+						connectPage.__connectionToRemoveId = connectionActionsCell.rowData.id
+						connectPage.__connectionToRemoveName = connectionActionsCell.rowData.organization
+						ModalDialogManager.openDialog(removeConnectionConfirmDialogComp)
 					}
 				}
 			}

@@ -1649,6 +1649,10 @@ void CObjectCollectionViewComp::TableModel::RemoveItem(const imtbase::IObjectCol
 			if (m_isPageMode){
 				int pageCount = m_totalRowCount / m_batchSize + (((m_totalRowCount % m_batchSize) != 0) ? 1 : 0);
 				m_parent.m_pageSelection.SetPageCount(pageCount);
+				int selectedPageIndex = m_parent.m_pageSelection.GetSelectedOptionIndex();
+				m_parent.m_pageSelection.SetSelectedOptionIndex(
+					pageCount > 0 ? qMin(selectedPageIndex, pageCount - 1) : -1
+				);
 			}
 
 			break;
@@ -1938,3 +1942,5 @@ void CObjectCollectionViewComp::TableModel::fetchMore(const QModelIndex& parent)
 
 
 } // namespace imtgui
+
+

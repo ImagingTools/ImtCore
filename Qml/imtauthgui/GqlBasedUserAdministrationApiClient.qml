@@ -27,11 +27,11 @@ import imtauthgui 1.0
 QtObject {
 	id: root
 
-	property string context: ""
+	property string permissionPath: ""
 
 	// Password policy for the user editor's password fields (imtauthgui owns no GQL).
 	property GqlBasedPasswordPolicyProvider passwordPolicy: GqlBasedPasswordPolicyProvider {
-		context: root.context
+		permissionPath: root.permissionPath
 	}
 
 	property string productId: AuthorizationController.productId
@@ -115,7 +115,13 @@ QtObject {
 		if (!root.__permissionsProvider)
 			return
 		root.__permissionsProvider.productId = root.productId || ""
-		root.__permissionsProvider.requestPermissions(tenantId || root.tenantId || "")
+		root.__permissionsProvider.ensurePermissions(tenantId || root.tenantId || "")
+	}
+
+	// The permission scope of the organization changed: its permissions are read again when an editor needs them
+	function invalidateTenantPermissions() {
+		if (root.__permissionsProvider)
+			root.__permissionsProvider.invalidateTenantPermissions()
 	}
 
 	function fetchOrganizationPermissions(tenantId, userId) {
@@ -126,7 +132,7 @@ QtObject {
 
 	property RemoveElementsInput __removeRoleInput: RemoveElementsInput {}
 	property GqlSdlRequestSender __removeRoleSender: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		requestType: 1
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_removeElements
 
@@ -139,7 +145,7 @@ QtObject {
 
 	property RemoveElementsInput __removeGroupInput: RemoveElementsInput {}
 	property GqlSdlRequestSender __removeGroupSender: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		requestType: 1
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_removeElements
 
@@ -162,6 +168,78 @@ QtObject {
 		root.__removeGroupSender.send(root.__removeGroupInput)
 	}
 
+	// Ids of the direct assignments of an SDL Assignment list.
+	function __directIds(assignments) {
+		var ids = []
+		for (var i = 0; assignments && i < assignments.count; i++) {
+			var assignment = assignments.get(i).item
+			if (assignment.m_direct)
+				ids.push(String(assignment.m_id))
+		}
+		return ids
+	}
+
+	// Selection of an Assignment list: id, name, direct and the paths it comes through.
+	function __assignmentsField(fieldId) {
+		var steps = Gql.GqlObject("steps")
+		steps.InsertField("kind")
+		steps.InsertField("id")
+		steps.InsertField("name")
+		var sources = Gql.GqlObject("sources")
+		sources.InsertFieldObject(steps)
+		var field = Gql.GqlObject(fieldId)
+		field.InsertField("id")
+		field.InsertField("name")
+		field.InsertField("direct")
+		field.InsertFieldObject(sources)
+		return field
+	}
+
+	// Representation query of an open document that asks only for the given assignment lists and the warnings.
+	function __addAssignmentsQuery(query, documentId, collectionId, fieldIds) {
+		var input = Gql.GqlObject("input")
+		input.InsertField("id", documentId)
+		input.InsertField("collectionId", collectionId)
+		query.AddParam(input)
+
+		var fields = Gql.GqlObject("fields")
+		for (var i = 0; i < fieldIds.length; i++)
+			fields.InsertFieldObject(root.__assignmentsField(fieldIds[i]))
+		var warnings = Gql.GqlObject("accessWarnings")
+		warnings.InsertField("code")
+		warnings.InsertField("ids")
+		warnings.InsertField("message")
+		fields.InsertFieldObject(warnings)
+		query.AddField(fields)
+	}
+
+	// Replaces an SDL list of the representation by a copy of the same list of an answer.
+	function __copyList(target, source, propertyId) {
+		if (!target[propertyId])
+			target["emplace" + propertyId.charAt(2).toUpperCase() + propertyId.slice(3)]()
+		target[propertyId].clear()
+		var items = source[propertyId]
+		for (var i = 0; items && i < items.count; i++) {
+			// Created like fromObject() does: copyMe() resolves its component by a relative path the web build cannot.
+			var element = target.createElement(propertyId).createObject(target)
+			element.fromJSON(items.get(i).item.toJson())
+			// The web BaseModel has no appendElement().
+			target[propertyId].insertElement(target[propertyId].count, element)
+		}
+	}
+
+	// Writes the given lists of an answer into the editor's model and lets the editor show them.
+	function __applyAssignments(controller, data, propertyIds) {
+		var view = controller.view
+		if (!view)
+			return
+		view.setBlockingUpdateModel(true)
+		for (var i = 0; i < propertyIds.length; i++)
+			root.__copyList(controller.representationModel, data, propertyIds[i])
+		view.setBlockingUpdateModel(false)
+		view.updateAssignments()
+	}
+
 	function __handleRoleDataReceived(roleData) {
 		if (!roleData)
 			return
@@ -170,8 +248,8 @@ QtObject {
 			description: roleData.m_description || "",
 			roleId: roleData.m_roleId || "",
 			productId: roleData.m_productId || "",
-			parentRoles: roleData.m_parentRoles || [],
-			permissions: roleData.m_permissions || "",
+			parentRoles: root.__directIds(roleData.m_parentRoles),
+			permissions: root.__directIds(roleData.m_permissions).join(";"),
 			isDefault: roleData.m_isDefault || false,
 			isGuest: roleData.m_isGuest || false
 		}
@@ -185,9 +263,9 @@ QtObject {
 			name: groupData.m_name || "",
 			description: groupData.m_description || "",
 			productId: groupData.m_productId || "",
-			roles: groupData.m_roles || [],
-			users: groupData.m_users || [],
-			parentGroups: groupData.m_parentGroups || []
+			roles: root.__directIds(groupData.m_roles),
+			users: root.__directIds(groupData.m_users),
+			parentGroups: root.__directIds(groupData.m_parentGroups)
 		}
 		root.groupDataReceived(data)
 	}
@@ -201,9 +279,9 @@ QtObject {
 			username: userData.m_username || "",
 			email: userData.m_email || "",
 			productId: userData.m_productId || "",
-			groups: userData.m_groups || [],
-			roles: userData.m_roles || [],
-			permissions: userData.m_permissions || []
+			groups: root.__directIds(userData.m_groups),
+			roles: root.__directIds(userData.m_roles),
+			permissions: root.__directIds(userData.m_permissions)
 		}
 		root.userDataReceived(data)
 	}
@@ -243,11 +321,7 @@ QtObject {
 			}
 
 			onDocumentIdChanged: {
-				if (documentId !== ""){
-					var objId = root.__roleDocumentService.getDocumentObjectId(documentId)
-					if (objId !== "")
-						representationModel.m_id = objId
-				}
+				root.__applyDocumentObjectId(root.__roleDocumentService, documentId, representationModel)
 			}
 
 			function updateRepresentationFromDocument(){
@@ -261,6 +335,7 @@ QtObject {
 			function updateDocumentFromRepresentation(){
 				startUpdateDocument(documentId)
 
+				root.__applyDocumentObjectId(root.__roleDocumentService, documentId, representationModel)
 				updateRoleInput.m_documentId = documentId
 				updateRoleInput.m_role = representationModel
 				updateRoleRequest.send(updateRoleInput)
@@ -270,12 +345,13 @@ QtObject {
 			property UpdateRoleFromRepresentationInput updateRoleInput: UpdateRoleFromRepresentationInput {}
 
 			property GqlSdlRequestSender getRoleRequest: GqlSdlRequestSender {
-				context: root.context
+				permissionPath: root.permissionPath
 				gqlCommandId: ImtauthRoleCollectionDocumentServiceSdlCommandIds.s_getRoleRepresentation
 				sdlObjectComp: Component {
 					RoleData {
 						onFinished: {
 							roleReprController.representationModel.copyFrom(this)
+							root.__applyDocumentObjectId(root.__roleDocumentService, roleReprController.documentId, roleReprController.representationModel)
 							roleReprController.representationUpdated(
 								roleReprController.documentId,
 								roleReprController.representationModel)
@@ -289,7 +365,7 @@ QtObject {
 			}
 
 			property GqlSdlRequestSender updateRoleRequest: GqlSdlRequestSender {
-				context: root.context
+				permissionPath: root.permissionPath
 				gqlCommandId: ImtauthRoleCollectionDocumentServiceSdlCommandIds.s_updateRoleFromRepresentation
 				requestType: 1
 				sdlObjectComp: Component {
@@ -298,12 +374,61 @@ QtObject {
 							if (m_status === "Success"){
 								roleReprController.documentUpdated(roleReprController.documentId)
 							}
+							else{
+								roleReprController.updateDocumentFailed(roleReprController.documentId, m_message !== "" ? m_message : qsTr("The changes could not be saved"))
+								roleReprController.updateRepresentationFromDocument()
+							}
 						}
 					}
 				}
 
 				function onError(message, type){
 					roleReprController.updateDocumentFailed(roleReprController.documentId, message)
+					// The refused change was not applied: show what the document holds.
+					roleReprController.updateRepresentationFromDocument()
+				}
+			}
+
+			property AssignmentsRefresher assignmentsRefresher: AssignmentsRefresher {
+				controller: roleReprController
+
+				onBusyChanged: {
+					if (roleReprController.view)
+						roleReprController.view.assignmentsUpdating = busy
+				}
+
+				onSendRequested: {
+					roleReprController.getRoleAssignmentsRequest.send()
+				}
+			}
+
+			property Connections viewConnections: Connections {
+				target: roleReprController.view
+
+				function onAssignmentsChanged(){
+					roleReprController.assignmentsRefresher.request()
+				}
+			}
+
+			property GqlSdlRequestSender getRoleAssignmentsRequest: GqlSdlRequestSender {
+				permissionPath: root.permissionPath
+				gqlCommandId: ImtauthRoleCollectionDocumentServiceSdlCommandIds.s_getRoleRepresentation
+				sdlObjectComp: Component {
+					RoleData {
+						onFinished: {
+							if (roleReprController.assignmentsRefresher.finished())
+								root.__applyAssignments(roleReprController, this, ["m_parentRoles", "m_permissions", "m_accessWarnings"])
+						}
+					}
+				}
+
+				function createQueryParams(query){
+					root.__addAssignmentsQuery(query, roleReprController.documentId, "Roles", ["parentRoles", "permissions"])
+				}
+
+				function onError(message, type){
+					roleReprController.assignmentsRefresher.failed()
+					PopupManager.addErrorMessage(message, true)
 				}
 			}
 		}
@@ -313,6 +438,17 @@ QtObject {
 	property Component __groupEditorComp: Component {
 		UserGroupView {
 			productId: root.productId
+			// Inside an organization only its permission scope can be given
+			permissionGroups: root.rolePermissionsTenantId !== "" ? root.tenantPermissions : root.allPermissions
+
+			Component.onCompleted: {
+				if (root.rolePermissionsTenantId !== ""){
+					root.fetchTenantPermissions(root.rolePermissionsTenantId)
+				}
+				else if (!root.allPermissions || root.allPermissions.length === 0){
+					root.fetchAllPermissions()
+				}
+			}
 			commandsControllerComp: Component {
 				GqlBasedCommandsController {
 					typeId: root.groupObjectTypeId
@@ -330,11 +466,7 @@ QtObject {
 			}
 
 			onDocumentIdChanged: {
-				if (documentId !== ""){
-					var objId = root.__groupDocumentService.getDocumentObjectId(documentId)
-					if (objId !== "")
-						representationModel.m_id = objId
-				}
+				root.__applyDocumentObjectId(root.__groupDocumentService, documentId, representationModel)
 			}
 
 			function updateRepresentationFromDocument(){
@@ -348,6 +480,7 @@ QtObject {
 			function updateDocumentFromRepresentation(){
 				startUpdateDocument(documentId)
 
+				root.__applyDocumentObjectId(root.__groupDocumentService, documentId, representationModel)
 				updateGroupInput.m_documentId = documentId
 				updateGroupInput.m_group = representationModel
 				updateGroupRequest.send(updateGroupInput)
@@ -357,12 +490,13 @@ QtObject {
 			property UpdateGroupFromRepresentationInput updateGroupInput: UpdateGroupFromRepresentationInput {}
 
 			property GqlSdlRequestSender getGroupRequest: GqlSdlRequestSender {
-				context: root.context
+				permissionPath: root.permissionPath
 				gqlCommandId: ImtauthGroupCollectionDocumentServiceSdlCommandIds.s_getGroupRepresentation
 				sdlObjectComp: Component {
 					GroupData {
 						onFinished: {
 							groupReprController.representationModel.copyFrom(this)
+							root.__applyDocumentObjectId(root.__groupDocumentService, groupReprController.documentId, groupReprController.representationModel)
 							groupReprController.representationUpdated(
 								groupReprController.documentId,
 								groupReprController.representationModel)
@@ -376,7 +510,7 @@ QtObject {
 			}
 
 			property GqlSdlRequestSender updateGroupRequest: GqlSdlRequestSender {
-				context: root.context
+				permissionPath: root.permissionPath
 				gqlCommandId: ImtauthGroupCollectionDocumentServiceSdlCommandIds.s_updateGroupFromRepresentation
 				requestType: 1
 				sdlObjectComp: Component {
@@ -385,12 +519,62 @@ QtObject {
 							if (m_status === "Success"){
 								groupReprController.documentUpdated(groupReprController.documentId)
 							}
+							else{
+								groupReprController.updateDocumentFailed(groupReprController.documentId, m_message !== "" ? m_message : qsTr("The changes could not be saved"))
+								groupReprController.updateRepresentationFromDocument()
+							}
 						}
 					}
 				}
 
 				function onError(message, type){
 					groupReprController.updateDocumentFailed(groupReprController.documentId, message)
+					// The refused change was not applied: show what the document holds.
+					groupReprController.updateRepresentationFromDocument()
+				}
+			}
+
+			property AssignmentsRefresher assignmentsRefresher: AssignmentsRefresher {
+				controller: groupReprController
+
+				onBusyChanged: {
+					if (groupReprController.view)
+						groupReprController.view.assignmentsUpdating = busy
+				}
+
+				onSendRequested: {
+					groupReprController.getGroupAssignmentsRequest.send()
+				}
+			}
+
+			property Connections viewConnections: Connections {
+				target: groupReprController.view
+
+				function onAssignmentsChanged(){
+					groupReprController.assignmentsRefresher.request()
+				}
+			}
+
+			// Members are not requested: they are edited here and inherit nothing.
+			property GqlSdlRequestSender getGroupAssignmentsRequest: GqlSdlRequestSender {
+				permissionPath: root.permissionPath
+				gqlCommandId: ImtauthGroupCollectionDocumentServiceSdlCommandIds.s_getGroupRepresentation
+				sdlObjectComp: Component {
+					GroupData {
+						onFinished: {
+							if (groupReprController.assignmentsRefresher.finished())
+								root.__applyAssignments(groupReprController, this, ["m_roles", "m_parentGroups", "m_permissions", "m_accessWarnings"])
+						}
+					}
+				}
+
+				function createQueryParams(query){
+					root.__addAssignmentsQuery(query, groupReprController.documentId, "Groups", ["roles", "parentGroups", "permissions"])
+				}
+
+				function onError(message, type){
+					groupReprController.assignmentsRefresher.failed()
+					PopupManager.addErrorMessage(message, true)
 				}
 			}
 		}
@@ -402,6 +586,17 @@ QtObject {
 			id: userEditor
 			productId: root.productId
 			passwordPolicy: root.passwordPolicy
+			// Inside an organization only its permission scope can be given
+			permissionGroups: root.rolePermissionsTenantId !== "" ? root.tenantPermissions : root.allPermissions
+
+			Component.onCompleted: {
+				if (root.rolePermissionsTenantId !== ""){
+					root.fetchTenantPermissions(root.rolePermissionsTenantId)
+				}
+				else if (!root.allPermissions || root.allPermissions.length === 0){
+					root.fetchAllPermissions()
+				}
+			}
 			commandsControllerComp: Component {
 				GqlBasedCommandsController {
 					typeId: root.userObjectTypeId
@@ -427,14 +622,11 @@ QtObject {
 
 			representationModel: UserData {
 				m_id: UuidGenerator.generateUUID()
+				m_enabled: true
 			}
 
 			onDocumentIdChanged: {
-				if (documentId !== ""){
-					var objId = root.__userDocumentService.getDocumentObjectId(documentId)
-					if (objId !== "")
-						representationModel.m_id = objId
-				}
+				root.__applyDocumentObjectId(root.__userDocumentService, documentId, representationModel)
 			}
 
 			function updateRepresentationFromDocument(){
@@ -447,14 +639,15 @@ QtObject {
 
 			property MailRegExpValidator mailRegExp: MailRegExpValidator {}
 
+			// The collection hosts tell the reason of updateDocumentFailed
 			function __failValidation(message){
-				PopupManager.addErrorMessage(message, true)
 				updateDocumentFailed(documentId, message)
 			}
 
 			function updateDocumentFromRepresentation(){
 				startUpdateDocument(documentId)
 
+				root.__applyDocumentObjectId(root.__userDocumentService, documentId, representationModel)
 				updateUserInput.m_documentId = documentId
 				updateUserInput.m_user = representationModel
 				updateUserInput.m_tenantId = root.tenantId
@@ -465,12 +658,13 @@ QtObject {
 			property UpdateUserFromRepresentationInput updateUserInput: UpdateUserFromRepresentationInput {}
 
 			property GqlSdlRequestSender getUserRequest: GqlSdlRequestSender {
-				context: root.context
+				permissionPath: root.permissionPath
 				gqlCommandId: ImtauthUserCollectionDocumentServiceSdlCommandIds.s_getUserRepresentation
 				sdlObjectComp: Component {
 					UserData {
 						onFinished: {
 							userReprController.representationModel.copyFrom(this)
+							root.__applyDocumentObjectId(root.__userDocumentService, userReprController.documentId, userReprController.representationModel)
 							userReprController.representationUpdated(
 								userReprController.documentId,
 								userReprController.representationModel)
@@ -484,7 +678,7 @@ QtObject {
 			}
 
 			property GqlSdlRequestSender updateUserRequest: GqlSdlRequestSender {
-				context: root.context
+				permissionPath: root.permissionPath
 				gqlCommandId: ImtauthUserCollectionDocumentServiceSdlCommandIds.s_updateUserFromRepresentation
 				requestType: 1
 				sdlObjectComp: Component {
@@ -493,14 +687,75 @@ QtObject {
 							if (m_status === "Success"){
 								userReprController.documentUpdated(userReprController.documentId)
 							}
+							else{
+								userReprController.updateDocumentFailed(userReprController.documentId, m_message !== "" ? m_message : qsTr("The changes could not be saved"))
+								userReprController.updateRepresentationFromDocument()
+							}
 						}
 					}
 				}
 
 				function onError(message, type){
 					userReprController.updateDocumentFailed(userReprController.documentId, message)
+					// The refused change was not applied: show what the document holds.
+					userReprController.updateRepresentationFromDocument()
 				}
 			}
+
+			property AssignmentsRefresher assignmentsRefresher: AssignmentsRefresher {
+				controller: userReprController
+
+				onBusyChanged: {
+					if (userReprController.view)
+						userReprController.view.assignmentsUpdating = busy
+				}
+
+				onSendRequested: {
+					userReprController.getUserAssignmentsRequest.send()
+				}
+			}
+
+			property Connections viewConnections: Connections {
+				target: userReprController.view
+
+				function onAssignmentsChanged(){
+					userReprController.assignmentsRefresher.request()
+				}
+			}
+
+			property GqlSdlRequestSender getUserAssignmentsRequest: GqlSdlRequestSender {
+				permissionPath: root.permissionPath
+				gqlCommandId: ImtauthUserCollectionDocumentServiceSdlCommandIds.s_getUserRepresentation
+				sdlObjectComp: Component {
+					UserData {
+						onFinished: {
+							if (userReprController.assignmentsRefresher.finished())
+								root.__applyAssignments(userReprController, this, ["m_roles", "m_groups", "m_permissions", "m_accessWarnings"])
+						}
+					}
+				}
+
+				function createQueryParams(query){
+					root.__addAssignmentsQuery(query, userReprController.documentId, "Users", ["roles", "groups", "permissions"])
+				}
+
+				function onError(message, type){
+					userReprController.assignmentsRefresher.failed()
+					PopupManager.addErrorMessage(message, true)
+				}
+			}
+		}
+	}
+
+	// The representation carries the ID of the collection element, which may become known only after the document was created.
+	function __applyDocumentObjectId(documentService, documentId, representationModel){
+		if (documentId === ""){
+			return
+		}
+
+		let objectId = documentService.getDocumentObjectId(documentId)
+		if (objectId !== ""){
+			representationModel.m_id = objectId
 		}
 	}
 

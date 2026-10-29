@@ -20,7 +20,7 @@ class Int extends Property {
             return 1
         }
 
-        if(value === false || value === '') {
+        if(value === false) {
             return 0
         }
 

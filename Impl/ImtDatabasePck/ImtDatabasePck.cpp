@@ -67,11 +67,6 @@ I_EXPORT_COMPONENT(
 			"Database Document File Store Garbage Collector GC Audit");
 
 I_EXPORT_COMPONENT(
-			RestoringDatabaseController,
-			"Restoring database controller",
-			"Restoring Restore Database Controller PostreSQL psql");
-
-I_EXPORT_COMPONENT(
 			SqlStructureDelegate,
 			"Delegate for the json-oriented hierarchical structure tables",
 			"Database Delegate Structure Json SQL");

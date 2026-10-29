@@ -159,7 +159,8 @@ QJsonObject CTableViewParamControllerComp::CreateInternalResponse(
 			return QJsonObject();
 		}
 
-		if (pageViewParamCollectionPtr->GetElementIds().contains(tableId)){
+		imtbase::IObjectCollection::DataPtr existingTableIdDataPtr;
+		if (pageViewParamCollectionPtr->GetObjectData(tableId, existingTableIdDataPtr)){
 			if (!pageViewParamCollectionPtr->SetObjectData(tableId, *paramSetPtr)){
 				errorMessage = QStringLiteral("Unable to create response for GraphQL request with ID: '%1'.").arg(commandId);
 				SendErrorMessage(0, errorMessage, "imtservergql::CTableViewParamControllerComp");
@@ -171,7 +172,8 @@ QJsonObject CTableViewParamControllerComp::CreateInternalResponse(
 			pageViewParamCollectionPtr->InsertNewObject("PageViewParam", "", "", paramSetPtr.GetPtr(), tableId);
 		}
 
-		if (m_userSettingsCollectionCompPtr->GetElementIds().contains(userId)){
+		imtbase::IObjectCollection::DataPtr existingUserIdDataPtr;
+		if (m_userSettingsCollectionCompPtr->GetObjectData(userId, existingUserIdDataPtr)){
 			if (!m_userSettingsCollectionCompPtr->SetObjectData(userId, *userSettingsPtr.GetPtr())){
 				errorMessage = QStringLiteral("Unable to create response for GraphQL request with ID: '%1'. Settings cannot be saved.").arg(commandId);
 				SendErrorMessage(0, errorMessage, "imtservergql::CTableViewParamControllerComp");

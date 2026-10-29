@@ -26,6 +26,7 @@ private slots:
 	void testEmptyTagListSelectsNothing();
 	void testCombinedGroups();
 	void testHostileTagIds();
+	void testDuckDbFilterContext();
 	void cleanupTestCase();
 
 private:
@@ -37,5 +38,4 @@ private:
 	QSqlDatabase m_database;
 	imtdb::CTagFilterSqlBuilder::Config m_config;
 };
-
 

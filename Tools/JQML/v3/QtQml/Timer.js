@@ -73,9 +73,22 @@ class Timer extends QtObject {
 
     __updateTimer(){
         if(this.__timer) clearTimeout(this.__timer)
+        // Every update cancels a pending zero-interval request
+        this.__request = (this.__request || 0) + 1
         if(this.triggeredOnStart && this.__completed) this.triggered()
 
-        if(this.running)
+        if(!this.running) return
+
+        // As Qt, a single zero-interval timer fires once the current event is processed: a setTimeout let the
+        // browser paint the state in between (columns resized on the next tick made scrollbars blink)
+        if(this.interval <= 0 && !this.repeat){
+            let request = this.__request
+            queueMicrotask(()=>{
+                if(request === this.__request && this.running) this.__triggered()
+            })
+            return
+        }
+
         this.__timer = setTimeout(()=>{
             this.__triggered()
         }, this.interval)

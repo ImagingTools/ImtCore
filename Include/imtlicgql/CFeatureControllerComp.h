@@ -29,7 +29,7 @@ protected:
 	virtual QJsonObject GetTreeItemModel(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual bool GetOperationFromRequest(const imtgql::CGqlRequest& gqlRequest, imtgql::CGqlParamObject& gqlObject, QString& errorMessage, int& operationType) const override;
 
-	bool CreateFeatureFromRepresentationModel(const imtbase::CTreeItemModel& representationModel, imtlic::CFeatureInfo& featureInfo, const QByteArray& objectId, QString& errorMessage) const;
+	bool CreateFeatureFromRepresentationModel(const imtbase::CTreeItemModel& representationModel, imtlic::CFeatureInfo& featureInfo, const QByteArray& objectId, QString& errorMessage, bool isRootFeature = true) const;
 	bool CreateRepresentationModelFromFeatureInfo(const imtlic::CFeatureInfo& featureInfo, const imtbase::CTreeItemModel* parentModelPtr, imtbase::CTreeItemModel& representationModel, QString& errorMessage) const;
 };
 

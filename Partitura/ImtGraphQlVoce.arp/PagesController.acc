@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6531" Description="ACF"/>
+            <Version Id="0" Number="6539" Description="ACF"/>
             <Version Id="1" Number="2438" Description="ACF-Solutions"/>
             <Version Id="1023" Number="396033" Description="Qt Framework"/>
         </VersionInfos>
@@ -37,12 +37,9 @@
                     <AttributeInfo Id="PagePermissions" Type="Id[]" ExportId="AdministrationPagePermissions">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ViewUsers</Value>
-                                <Value>ViewRoles</Value>
-                                <Value>ViewGroups</Value>
-                                <Value>ChangeUser</Value>
-                                <Value>ChangeRole</Value>
-                                <Value>ChangeGroups</Value>
+                                <Value>/Administration/Users/ViewPage</Value>
+                                <Value>/Administration/Roles/ViewPage</Value>
+                                <Value>/Administration/Groups/ViewPage</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -64,6 +61,7 @@
                                 <Value>Workspace</Value>
                                 <Value>SearchPage</Value>
                                 <Value>DeskPage</Value>
+                                <Value>TenantsPage</Value>
                                 <Value>AdministrationPage</Value>
                             </Values>
                         </Data>
@@ -244,6 +242,49 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="TenantsPage" PackageId="ImtGraphQlVoce" ComponentId="SingleDocumentGqlCollectionPage">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Alignment" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="64"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CollectionViewQmlPath" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="qrc:/qml/imtauthgui/TenantCollectionView.qml"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IconPath" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Icons/Organization"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IsEnabled" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IsVisible" Type="Boolean" ExportId="TenantsEnabled">
+                        <Data IsEnabled="true" Value="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Organizations"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PageId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Tenants"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PagePermissions" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>/OrganizationManagement/ViewPage</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="Workspace" PackageId="ImtCoreVoce" ComponentId="SingleDocPage">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -271,7 +312,7 @@
                     <AttributeInfo Id="PagePermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ViewWorkspace</Value>
+                                <Value>/WorkspaceManagement/ViewPage</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

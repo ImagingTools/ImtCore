@@ -516,7 +516,7 @@ bool CGqlSchemaParser::ProcessValue(SdlFieldList& output, bool* endOfReadPtr)
 		QByteArray valueType;
 		retVal = retVal && ReadToDelimeter("!]", valueType, &foundDelimeter);
 		if (foundDelimeter == '!'){
-			field.SetIsNonEmpty(true);
+			field.SetArrayElementsRequired(true);
 		}
 		field.SetType(valueType);
 		if (foundDelimeter != ']'){

@@ -17,12 +17,15 @@ import imtappApplicationSdl 1.0
 QtObject {
 	id: root;
 
-	property string context: ""
+	property string permissionPath: ""
 	property ApplicationInfo serverApplicationInfo: null;
 	property int webSocketPort: -1;
 	property string userMode: "";
 	property string superuserStatus: "";
 	property string superuserMessage: "";
+	property bool tenantsEnabled: false;
+	property bool externalLoginEnabled: false;
+	property bool documentSharingEnabled: false;
 
 	signal updated();
 
@@ -53,7 +56,7 @@ QtObject {
 	}
 
 	property GqlSdlRequestSender request : GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		gqlCommandId: ImtappApplicationSdlCommandIds.s_getApplicationInfo;
 		sdlObjectComp: Component { ApplicationInfo {
 			} }
@@ -64,6 +67,9 @@ QtObject {
 			}
 
 			root.serverApplicationInfo = sdlObject;
+			root.tenantsEnabled = sdlObject.m_tenantsEnabled === true;
+			root.externalLoginEnabled = sdlObject.m_externalLoginEnabled === true;
+			root.documentSharingEnabled = sdlObject.m_documentSharingEnabled === true;
 
 			if (sdlObject.m_webSocketUrl){
 				root.webSocketPort = sdlObject.m_webSocketUrl.m_port;

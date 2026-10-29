@@ -10,6 +10,9 @@
 // ACF includes
 #include <istd/CChangeNotifier.h>
 
+// ImtCore includes
+#include <imtauth/CollectionSelection.h>
+
 
 namespace imtauth
 {
@@ -152,16 +155,25 @@ CrossOrgGrantInfo CCrossOrgGrantManagerComp::GetGrant(const QByteArray& grantId)
 }
 
 
-CrossOrgGrants CCrossOrgGrantManagerComp::CollectGrants(const std::function<bool(const CrossOrgGrantInfo&)>& predicate) const
+CrossOrgGrants CCrossOrgGrantManagerComp::CollectGrants(const QByteArray& columnId, const QByteArray& value, const std::function<bool(const CrossOrgGrantInfo&)>& predicate, bool* isReadPtr) const
 {
 	CrossOrgGrants result;
+	if (isReadPtr != nullptr){
+		*isReadPtr = false;
+	}
+
 	if (!m_grantCollectionCompPtr.IsValid()){
 		return result;
 	}
 
-	for (const QByteArray& id : m_grantCollectionCompPtr->GetElementIds()){
+	// A collection that does not know the filter returns every id, the predicate still decides
+	bool isRead = true;
+	for (const QByteArray& id : CollectionSelection::SelectIds(*m_grantCollectionCompPtr, CollectionSelection::ColumnEquals(columnId, value), QByteArrayList(), &isRead)){
 		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (m_grantCollectionCompPtr->GetObjectData(id, dataPtr)){
+		if (!m_grantCollectionCompPtr->GetObjectData(id, dataPtr)){
+			isRead = false;
+		}
+		else{
 			const ICrossOrgGrantData* grantPtr = dynamic_cast<const ICrossOrgGrantData*>(dataPtr.GetPtr());
 			if (grantPtr != nullptr){
 				CrossOrgGrantInfo info = grantPtr->GetGrantInfo();
@@ -172,21 +184,25 @@ CrossOrgGrants CCrossOrgGrantManagerComp::CollectGrants(const std::function<bool
 		}
 	}
 
+	if (isReadPtr != nullptr){
+		*isReadPtr = isRead;
+	}
+
 	return result;
 }
 
 
-CrossOrgGrants CCrossOrgGrantManagerComp::GetGrantsBySourceTenant(const QByteArray& sourceTenantId) const
+CrossOrgGrants CCrossOrgGrantManagerComp::GetGrantsBySourceTenant(const QByteArray& sourceTenantId, bool* isReadPtr) const
 {
-	return CollectGrants([&sourceTenantId](const CrossOrgGrantInfo& info){
+	return CollectGrants("SourceTenantId", sourceTenantId, [&sourceTenantId](const CrossOrgGrantInfo& info){
 		return info.sourceTenantId == sourceTenantId;
-	});
+	}, isReadPtr);
 }
 
 
 CrossOrgGrants CCrossOrgGrantManagerComp::GetGrantsByTargetTenant(const QByteArray& targetTenantId) const
 {
-	return CollectGrants([&targetTenantId](const CrossOrgGrantInfo& info){
+	return CollectGrants("TargetTenantId", targetTenantId, [&targetTenantId](const CrossOrgGrantInfo& info){
 		return info.targetTenantId == targetTenantId;
 	});
 }
@@ -214,10 +230,6 @@ bool CCrossOrgGrantManagerComp::HasAccess(
 		const QByteArray& targetTenantId,
 		const QByteArray& roleId) const
 {
-	if (roleId.isEmpty()){
-		return true;
-	}
-
 	const CrossOrgGrants grants = GetGrantsByTargetTenant(targetTenantId);
 	for (const CrossOrgGrantInfo& info : grants){
 		if (info.sourceTenantId != sourceTenantId){
@@ -226,7 +238,7 @@ bool CCrossOrgGrantManagerComp::HasAccess(
 		if (!IsGrantEffective(info)){
 			continue;
 		}
-		if (info.roleIds.contains(roleId)){
+		if (roleId.isEmpty() || info.roleIds.contains(roleId)){
 			return true;
 		}
 	}

@@ -8,7 +8,7 @@ import imtbaseImtCollectionSdl 1.0
 CollectionDataController {
 	id: root
 
-	property string context: ""
+	property var permissionPaths: ({})
 	// HTTP headers !!!
 	function getHeaders(){
 		return {};
@@ -17,7 +17,7 @@ CollectionDataController {
 	// Collection Headers
 	property GetCollectionHeadersInput getCollectionHeadersInput : GetCollectionHeadersInput {}
 	property GqlSdlRequestSender getCollectionHeadersRequest : GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_getCollectionHeaders
 		sdlObjectComp: Component {
 			GetCollectionHeadersPayload {
@@ -40,7 +40,7 @@ CollectionDataController {
 	// Get Object Data
 	property GetObjectDataInput getObjectDataInput : GetObjectDataInput {}
 	property GqlSdlRequestSender getObjectDataRequest : GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_getObjectData
 		sdlObjectComp: Component {
 			GetObjectDataPayload {
@@ -64,7 +64,7 @@ CollectionDataController {
 	// Insert New Object
 	property InsertNewObjectInput insertNewObjectInput : InsertNewObjectInput {}
 	property GqlSdlRequestSender insertNewObjectRequest : GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_insertNewObject
 		requestType: 1
 		sdlObjectComp: Component {
@@ -101,7 +101,7 @@ CollectionDataController {
 	// Set Object Data
 	property SetObjectDataInput setObjectDataInput : SetObjectDataInput {}
 	property GqlSdlRequestSender setObjectDataRequest : GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_setObjectData
 		requestType: 1
 		sdlObjectComp: Component {
@@ -133,7 +133,7 @@ CollectionDataController {
 	// Remove Objects
 	property RemoveElementsInput removeElementsInput : RemoveElementsInput {}
 	property GqlSdlRequestSender removeElementsRequest : GqlSdlRequestSender{
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_removeElements
 		requestType: 1
 		sdlObjectComp: Component {
@@ -164,7 +164,7 @@ CollectionDataController {
 	// Remove Object Set
 	property RemoveElementSetInput removeElementSetInput : RemoveElementSetInput {}
 	property GqlSdlRequestSender removeElementSetRequest : GqlSdlRequestSender{
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_removeElementSet
 		requestType: 1
 		sdlObjectComp: Component {
@@ -195,7 +195,7 @@ CollectionDataController {
 	// Restore Objects
 	property RestoreObjectsInput restoreObjectsInput : RestoreObjectsInput {}
 	property GqlSdlRequestSender restoreObjectsRequest : GqlSdlRequestSender{
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_restoreObjects
 		requestType: 1
 		sdlObjectComp: Component {
@@ -220,7 +220,7 @@ CollectionDataController {
 	// Restore Object Set
 	property RestoreObjectSetInput restoreObjectSetInput : RestoreObjectSetInput {}
 	property GqlSdlRequestSender restoreObjectSetRequest : GqlSdlRequestSender{
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_restoreObjectSet
 		requestType: 1
 		sdlObjectComp: Component {
@@ -245,7 +245,7 @@ CollectionDataController {
 	// Set Object Name
 	property SetObjectNameInput setObjectNameInput : SetObjectNameInput {}
 	property GqlSdlRequestSender setObjectNameRequest : GqlSdlRequestSender{
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_setObjectName
 		requestType: 1
 		sdlObjectComp: Component {
@@ -276,7 +276,7 @@ CollectionDataController {
 	// Set Object Description
 	property SetObjectDescriptionInput setObjectDescriptionInput : SetObjectDescriptionInput {}
 	property GqlSdlRequestSender setObjectDescriptionRequest : GqlSdlRequestSender{
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_setObjectDescription
 		requestType: 1
 		sdlObjectComp: Component {
@@ -300,7 +300,7 @@ CollectionDataController {
 	// Create Sub Collection
 	property CreateSubCollectionInput createSubCollectionInput : CreateSubCollectionInput {}
 	property GqlSdlRequestSender createSubCollectionRequest : GqlSdlRequestSender{
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_createSubCollection
 		sdlObjectComp: Component {
 			CreateSubCollectionPayload {

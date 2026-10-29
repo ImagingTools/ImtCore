@@ -12,13 +12,13 @@ import Qt.labs.platform 1.0
 
 RemoteCollectionView {
 	id: featureCollectionViewContainer;
-	
-	property string context: ""
+
 	visibleMetaInfo: false;
-	
+
 	collectionId: "Features";
 	documentCollectionFilter: null
 	commandsDelegateComp: Component {DocumentCollectionViewDelegate {
+			revisionsPermissionPath: "/FeatureManagement/Revisions";
 			collectionView: featureCollectionViewContainer;
 			documentTypeIds: ["Feature"]
 			documentViewTypeIds: ["FeatureEditor"]
@@ -60,14 +60,16 @@ RemoteCollectionView {
 		id: dataControllerComp;
 		
 		GqlRequestDocumentDataController {
-			context: featureCollectionViewContainer.context
 			id: requestDocumentDataController
 			
 			property FeatureData featureData: documentModel
 			
 			gqlGetCommandId: ImtlicFeaturesSdlCommandIds.s_getFeatureItem;
+			getPermissionPath: "/FeatureManagement/View";
 			gqlUpdateCommandId: ImtlicFeaturesSdlCommandIds.s_updateFeature;
+			updatePermissionPath: "/FeatureManagement/Edit/Change";
 			gqlAddCommandId: ImtlicFeaturesSdlCommandIds.s_addFeature;
+			addPermissionPath: "/FeatureManagement/Edit/Add";
 			
 			typeId: "Feature";
 			documentName: featureData ? featureData.m_featureName: "";

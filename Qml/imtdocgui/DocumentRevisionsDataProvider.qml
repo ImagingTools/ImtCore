@@ -26,7 +26,7 @@ import imtbaseDocumentRevisionSdl 1.0
 FilterableSelectDataProvider {
 	id: root
 
-	property string context: ""
+	property string permissionPath: ""
 	property string documentId: ""
 	property string collectionId: ""
 	readonly property bool hasDocumentContext: root.documentId !== "" && root.collectionId !== ""
@@ -61,7 +61,7 @@ FilterableSelectDataProvider {
 	property GetRevisionInfoListInput __input: GetRevisionInfoListInput {}
 
 	property GqlSdlRequestSender __request: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		gqlCommandId: ImtbaseDocumentRevisionSdlCommandIds.s_getRevisionInfoList
 
 		sdlObjectComp: Component {

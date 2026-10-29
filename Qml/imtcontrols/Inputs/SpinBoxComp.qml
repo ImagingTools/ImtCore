@@ -49,10 +49,10 @@ Item {
 
         anchors.fill: parent;
 
-        color: Style.baseColor;
-        radius: Style.radiusM;
+        color: Style.inputBackgroundColor;
+        radius: Style.textFieldRadius;
         border.width: 1;
-        border.color: Style.borderColor;
+        border.color: Style.inputBorderColor;
         
         Item {
             id: numberBlock;
@@ -74,6 +74,18 @@ Item {
                 borderColorConst: "transparent";
                 readOnly: !spinBox.editable || !spinBox.textInputEnabled;
                 editingFinishedTimerInterval: 1000
+
+                Keys.onUpPressed: {
+                    if (spinBox.baseElement && spinBox.editable){
+                        spinBox.baseElement.increase();
+                    }
+                }
+
+                Keys.onDownPressed: {
+                    if (spinBox.baseElement && spinBox.editable){
+                        spinBox.baseElement.decrease();
+                    }
+                }
 
                 onTextChanged: {
                     if (!spinBox.baseElement){
@@ -150,6 +162,8 @@ Item {
                     height: buttonsBlock.height/2 + mainRec.border.width/2;
                     iconSource: spinBox.icon;
                     rotation: 180
+                    // The arrow keys of the field step the value, so the step buttons stay out of the Tab order
+                    focusPolicy: Qt.NoFocus
                     enabled: !spinBox.editable ? false : !spinBox.baseElement ? true : spinBox.baseElement.value < spinBox.baseElement.to
 					decorator: Component{IconButtonDecorator{
 							icon.width: upButton.width - 2
@@ -168,8 +182,9 @@ Item {
                     
                     width: buttonColumn.width;
                     height: buttonsBlock.height/2 + mainRec.border.width/2;
-                    
+
                     iconSource: spinBox.icon;
+                    focusPolicy: Qt.NoFocus
 
                     enabled: !spinBox.editable ? false : !spinBox.baseElement ? true : spinBox.baseElement.value > spinBox.baseElement.from
 					decorator: Component{IconButtonDecorator{
@@ -216,7 +231,9 @@ Item {
             if(spinBox.editable){
                 numberTextField.forceActiveFocus();
             }
-            mouse.accepted = false;
+
+            // Keep the click inside the input area so that underlying MouseAreas (e.g. table row) do not take the focus away
+            mouse.accepted = spinBox.editable && mouse.x < buttonColumn.mapToItem(wheelMa, 0, 0).x;
         }
         
         onWheel: {

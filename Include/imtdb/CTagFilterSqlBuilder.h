@@ -47,6 +47,7 @@ public:
 		QString entityIdExpression;
 
 		bool isSqlite = false;
+		bool isDuckDb = false;
 	};
 
 	static const QByteArray s_tagsFieldId;
@@ -68,5 +69,4 @@ public:
 
 
 } // namespace imtdb
-
 

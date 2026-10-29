@@ -112,11 +112,11 @@ ICollectionInfo::Id CFilterCollectionProxy::InsertNewObject(
 
 bool CFilterCollectionProxy::GetObjectData(const Id& objectId, DataPtr& dataPtr, const iprm::IParamsSet* /*dataConfigurationPtr*/) const
 {
-	if (!m_isObjectProxy){
-		return BaseClass::GetObjectData(objectId, dataPtr);
+	if (m_isObjectProxy){
+		return m_parent.GetObjectData(objectId, dataPtr);
 	}
 
-	return m_parent.GetObjectData(objectId, dataPtr);
+	return BaseClass::GetObjectData(objectId, dataPtr);
 }
 
 
@@ -182,6 +182,20 @@ bool CFilterCollectionProxy::InsertObjectIntoCollection(ObjectInfo info)
 	m_objects.push_back(info);
 
 	return true;
+}
+
+
+istd::IChangeableUniquePtr CFilterCollectionProxy::CreateDataCopy(const ObjectInfo& objectInfo) const
+{
+	istd::IChangeableUniquePtr retVal = BaseClass::CreateDataCopy(objectInfo);
+	if (retVal.IsValid()){
+		return retVal;
+	}
+
+	// The proxy has no factories registered for the inserted types, but the stored object can clone itself
+	retVal = objectInfo.dataPtr->CloneMe(objectInfo.copyMode);
+
+	return retVal;
 }
 
 

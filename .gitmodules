@@ -18,6 +18,10 @@
 	path = 3rdParty/icu
 	url = https://github.com/ImagingTools/icu.git
 	branch = main
+[submodule "3rdParty/libduckdb"]
+	path = 3rdParty/libduckdb
+	url = https://github.com/ImagingTools/libduckdb.git
+	branch = main
 [submodule "3rdParty/libmdbx"]
 	path = 3rdParty/libmdbx
 	url = https://github.com/ImagingTools/libmdbx.git
@@ -53,4 +57,8 @@
 [submodule "3rdParty/zstd"]
 	path = 3rdParty/zstd
 	url = https://github.com/ImagingTools/zstd.git
+	branch = main
+[submodule "3rdParty/EjQml"]
+	path = 3rdParty/EjQml
+	url = https://github.com/ImagingTools/EjQml.git
 	branch = main

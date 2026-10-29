@@ -10,13 +10,14 @@ import imtauthgui 1.0
 import imtauthUsersSdl 1.0
 import imtauthAuthorizationSdl 1.0
 import imtauthSessionsSdl 1.0
+import imtauthTenantsSdl 1.0
 import imtauthTenantMembershipsSdl 1.0
 import Qt.labs.settings 1.0
 
 QtObject {
 	id: root;
 	
-	property string context: ""
+	property string permissionPath: ""
 	property string productId: "";
 	
 	signal userModeChanged(string userMode);
@@ -32,6 +33,11 @@ QtObject {
 	signal registerSuccessfully();
 	signal registerFailed(string message, var violatedRules);
 
+	// --- Sign-in with external accounts (Google, Apple, Facebook) ---
+	signal externalLoginProvidersLoaded();
+	signal externalAccountLinked(string providerId);
+	signal externalLoginFailed(string message);
+
 	// --- Tenant membership lifecycle events ---
 	// Emitted by membership-aware views (e.g. TenantCollectionView) so other
 	// components anywhere in the app (e.g. an open TenantEditor) can react and
@@ -43,6 +49,12 @@ QtObject {
 	signal tenantMembershipRoleChanged(string tenantId, string userId, string role);
 	signal tenantMembershipRemoved(string tenantId, string userId);
 	signal tenantInvitationRevoked(string tenantId, string invitationId);
+	// The members or invitations of the organization of the session changed, whoever changed them
+	signal tenantMembersChanged(string tenantId);
+	// Membership notifications were lost while the connection was down; membership views re-read their data.
+	signal membershipNotificationsResumed();
+	// The organizations the user may switch to changed: what shows them reads them again
+	signal organizationsChanged();
 
 	// Properties to store remember me state and credentials
 	property bool rememberMe: false
@@ -55,19 +67,57 @@ QtObject {
 	property bool __tenantSwitchInProgress: false
 	property string __pendingTenantId: ""
 	property bool __hasPendingTenantSwitch: false
+	// An inactive organization cannot be selected; it is activated outside of any organization first.
+	property string __activationTenantId: ""
 
 	property bool __refreshInProgress: false
 	property var __pendingRetryQueue: []
+	property bool __authFailedDuringSwitch: false
+
+	// Sign-in with external accounts: set per application in ACC (ExternalLoginEnabled), delivered with GetApplicationInfo.
+	readonly property bool externalLoginEnabled: ApplicationInfoProvider.externalLoginEnabled
+	// Providers offered by the server: [{ "id", "name", "type" }]
+	property var externalLoginProviders: []
+	property bool externalLoginInProgress: false
+	property string externalLoginProviderId: ""
+	property string __externalLoginId: ""
+	property bool __externalLoginIsLink: false
+	property real __externalLoginDeadline: 0
+	// Prepared logins: [{ "providerId", "isLink", "loginId", "authorizationUrl", "preparedAt" }]
+	property var __preparedLogins: []
+	property var __prepareQueue: []
+	property var __preparingProvider: null
 	readonly property string authenticationTokenHeaderId: "x-authentication-token"
+
+	// Set per application in ACC and delivered with GetApplicationInfo; without tenants
+	// no tenant or organization request is sent at all.
+	readonly property bool tenantsEnabled: ApplicationInfoProvider.tenantsEnabled
 
 	// --- Pending invitations tracking ---
 	property int pendingInvitationsCount: 0
 	property var pendingInvitations: []
 
 	function refreshPendingInvitations() {
+		if (!root.tenantsEnabled)
+			return
 		if (!root.userTokenProvider.accessToken || root.userTokenProvider.accessToken === "")
 			return
 		__pendingInvitationsRequest.send(__pendingInvitationsInput)
+	}
+
+	function __startTenantTracking() {
+		if (!root.tenantsEnabled)
+			return
+		root.refreshPendingInvitations()
+		__membershipSubscription.registerSubscription()
+		__organizationMembersSubscription.registerSubscription()
+		tenantCollectionListener.registerSubscription()
+	}
+
+	function __stopTenantTracking() {
+		__membershipSubscription.unRegisterSubscription()
+		__organizationMembersSubscription.unRegisterSubscription()
+		tenantCollectionListener.unRegisterSubscription()
 	}
 
 	function __updatePendingInvitations(invitationsList) {
@@ -96,7 +146,7 @@ QtObject {
 	}
 
 	property GqlSdlRequestSender __pendingInvitationsRequest: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_getMyTenantInvitations
 
 		sdlObjectComp: Component {
@@ -134,16 +184,29 @@ QtObject {
 	onStoredRefreshTokenChanged: saveLoginSettings()
 
 	// Refresh pending invitations on relevant events (including when sender revokes)
+	onExternalLoginEnabledChanged: {
+		root.loadExternalLoginProviders()
+	}
+
 	onLoggedIn: {
-		refreshPendingInvitations()
-		__membershipSubscription.registerSubscription()
-		tenantCollectionListener.registerSubscription()
+		root.__clearPreparedLogins()
+		root.__startTenantTracking()
 	}
 	onLoggedOut: {
-		__membershipSubscription.unRegisterSubscription()
-		tenantCollectionListener.unRegisterSubscription()
+		root.__clearPreparedLogins()
+		root.__stopTenantTracking()
 		__refreshInProgress = false
 		__pendingRetryQueue = []
+		__authFailedDuringSwitch = false
+	}
+	// The application info can arrive after a restored session has already logged in.
+	onTenantsEnabledChanged: {
+		if (!root.userTokenProvider.accessToken || root.userTokenProvider.accessToken === "")
+			return
+		if (root.tenantsEnabled)
+			root.__startTenantTracking()
+		else
+			root.__stopTenantTracking()
 	}
 	onTenantInvitationReceived: refreshPendingInvitations()
 	onTenantInvitationAccepted: refreshPendingInvitations()
@@ -165,30 +228,56 @@ QtObject {
 			var tenantId = data.containsKey("tenantId") ? data.getData("tenantId") : ""
 			var tenantName = data.containsKey("tenantName") ? data.getData("tenantName") : ""
 			var role = data.containsKey("role") ? data.getData("role") : ""
-			var tName = tenantName ? tenantName : qsTr("a tenant")
+			var tName = tenantName ? tenantName : qsTr("an organization")
+			// The notification names the member it is about; the text is written for whoever receives it
+			var isAboutMe = userId !== "" && userId === root.getUserId()
+			// One message per kind and organization: a repeated notification replaces the shown one
+			var messageId = "membership-" + notificationType + "-" + tenantId
 
 			if (notificationType === "InvitationReceived" || notificationType === 0) {
-				PopupManager.addInfoMessage(qsTr("You have been invited to join \"%1\"").arg(tName), false)
+				PopupManager.addInfoMessage(qsTr("You have been invited to join \"%1\"").arg(tName), true, messageId)
 				root.tenantInvitationReceived(tenantId, tenantName, role)
 			} else if (notificationType === "InvitationAccepted" || notificationType === 1) {
-				PopupManager.addInfoMessage(qsTr("Invitation accepted for \"%1\"").arg(tName), false)
+				PopupManager.addInfoMessage(qsTr("Your invitation to \"%1\" was accepted").arg(tName), true, messageId)
 				root.tenantInvitationAccepted(tenantId, membershipId)
 			} else if (notificationType === "InvitationRejected" || notificationType === 2) {
-				PopupManager.addInfoMessage(qsTr("Invitation rejected for \"%1\"").arg(tName), false)
+				PopupManager.addInfoMessage(qsTr("Your invitation to \"%1\" was declined").arg(tName), true, messageId)
 				root.tenantInvitationRejected(tenantId, membershipId)
 			} else if (notificationType === "OwnershipTransferred" || notificationType === 3) {
-				PopupManager.addInfoMessage(qsTr("Ownership transferred for \"%1\"").arg(tName), false)
+				PopupManager.addInfoMessage(isAboutMe ? qsTr("You are now the owner of \"%1\"").arg(tName) : qsTr("The ownership of \"%1\" was transferred").arg(tName), true, messageId)
 				root.tenantOwnershipTransferred(tenantId)
 			} else if (notificationType === "MembershipRoleChanged" || notificationType === 4) {
-				PopupManager.addInfoMessage(qsTr("Role changed in \"%1\"").arg(tName), false)
+				PopupManager.addInfoMessage(qsTr("Your permissions in \"%1\" were changed").arg(tName), true, messageId)
 				root.tenantMembershipRoleChanged(tenantId, userId, role)
 			} else if (notificationType === "MembershipRemoved" || notificationType === 5) {
-				PopupManager.addInfoMessage(qsTr("Removed from \"%1\"").arg(tName), false)
+				PopupManager.addInfoMessage(isAboutMe ? qsTr("You are no longer a member of \"%1\"").arg(tName) : qsTr("A member is no longer in \"%1\"").arg(tName), true, messageId)
 				root.tenantMembershipRemoved(tenantId, userId)
 			} else if (notificationType === "InvitationRevoked" || notificationType === 6) {
-				PopupManager.addInfoMessage(qsTr("Invitation to join \"%1\" was revoked").arg(tName), false)
+				PopupManager.addInfoMessage(qsTr("Your invitation to join \"%1\" was withdrawn").arg(tName), true, messageId)
 				root.tenantInvitationRevoked(tenantId, membershipId)
 			}
+		}
+
+		onRefreshRequired: {
+			root.refreshPendingInvitations()
+			root.membershipNotificationsResumed()
+		}
+	}
+
+	// The members of the organization of the session; the server sends it to everybody working inside it
+	property SubscriptionClient __organizationMembersSubscription: SubscriptionClient {
+		gqlCommandId: "OnOrganizationMembersChanged"
+		autoSubscribe: false
+
+		function getHeaders() { return {} }
+
+		onMessageReceived: {
+			if (data && data.containsKey("tenantId"))
+				root.tenantMembersChanged(data.getData("tenantId"))
+		}
+
+		onRefreshRequired: {
+			root.tenantMembersChanged(root.currentTenantId)
 		}
 	}
 
@@ -336,6 +425,12 @@ QtObject {
 		if (root.__refreshInProgress)
 			return
 
+		// A request sent during a tenant switch carries the token the switch closes: it is repeated with the new one
+		if (root.__tenantSwitchInProgress) {
+			root.__authFailedDuringSwitch = true
+			return
+		}
+
 		if (!root.userTokenProvider.refreshToken || root.userTokenProvider.refreshToken === "") {
 			if (!root.isLoggedIn()) {
 				root.__pendingRetryQueue = []
@@ -371,6 +466,10 @@ QtObject {
 		// Re-register WS subscriptions that failed with the old access token.
 		Events.sendEvent("AccessTokenRefreshed", {})
 
+		root.__retryPendingRequests()
+	}
+
+	function __retryPendingRequests() {
 		var queue = root.__pendingRetryQueue
 		root.__pendingRetryQueue = []
 		for (var i = 0; i < queue.length; i++) {
@@ -462,6 +561,20 @@ QtObject {
 		root.currentTenantName = storage.value("tenantName", "");
 	}
 	
+	function notifyOrganizationsChanged(){
+		root.organizationsChanged();
+	}
+
+	// The name of the current organization as the server reports it now, e.g. after a rename
+	function updateCurrentTenantName(tenantName){
+		if (root.currentTenantId === "" || root.currentTenantName === tenantName){
+			return;
+		}
+
+		root.currentTenantName = tenantName;
+		storage.setValue("tenantName", tenantName);
+	}
+
 	function saveDataToStorage(){
 		storage.setValue("accessToken", userTokenProvider.accessToken);
 		storage.setValue("refreshToken", userTokenProvider.refreshToken);
@@ -650,8 +763,43 @@ QtObject {
 		selectTenantGqlSender.send(selectTenantInput)
 	}
 
+	// Activates the inactive organization and switches to it.
+	function activateTenant(tenantId) {
+		if (!tenantId)
+			return
+
+		root.__activationTenantId = tenantId
+		if (root.currentTenantId !== "") {
+			root.selectTenant("")
+			return
+		}
+
+		root.__continueTenantActivation()
+	}
+
+	function __continueTenantActivation() {
+		if (root.__activationTenantId === "" || root.currentTenantId !== "")
+			return
+
+		setTenantActiveInput.m_tenantId = root.__activationTenantId
+		setTenantActiveInput.m_isActive = true
+		setTenantActiveGqlSender.send(setTenantActiveInput)
+	}
+
+	function __reportTenantSelectionFailure(message) {
+		root.__activationTenantId = ""
+		root.tenantSelectionFailed(message)
+		PopupManager.addErrorMessage(message !== "" ? qsTr("Unable to switch the organization: %1").arg(message) : qsTr("Unable to switch the organization"), true)
+	}
+
 	function __completeTenantSwitch() {
 		__tenantSwitchInProgress = false
+		// Refused after the new token was taken over, or the switch failed: the token is refreshed
+		if (root.__authFailedDuringSwitch) {
+			root.__authFailedDuringSwitch = false
+			root.handleAuthFailure("", null)
+		}
+
 		if (!__hasPendingTenantSwitch)
 			return
 
@@ -706,7 +854,7 @@ QtObject {
 	}
 	
 	property GqlSdlRequestSender registerUserRequestSender: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		requestType: 1; // Mutation
 		gqlCommandId: ImtauthUsersSdlCommandIds.s_registerUser;
 
@@ -733,7 +881,7 @@ QtObject {
 	
 	property ChangePasswordInput changePasswordInput : ChangePasswordInput {}
 	property GqlSdlRequestSender changePasswordGqlSender: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		id: changePasswordRequestSender;
 		gqlCommandId: ImtauthUsersSdlCommandIds.s_changePassword;
 		
@@ -758,7 +906,7 @@ QtObject {
 	}
 
 	property GqlSdlRequestSender logoutGqlSender: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		gqlCommandId: ImtauthAuthorizationSdlCommandIds.s_logout;
 		inputObjectComp: Component {
 			TokenInput {}
@@ -774,7 +922,7 @@ QtObject {
 
 	property TokenInput getPermissionsInput: TokenInput {}
 	property GqlSdlRequestSender getPermissionsGqlSender: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		requestType: 1;
 		gqlCommandId: ImtauthAuthorizationSdlCommandIds.s_getPermissions;
 
@@ -800,7 +948,7 @@ QtObject {
 	}
 	
 	property GqlSdlRequestSender refreshTokenGqlSender: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		requestType: 1;
 		gqlCommandId: ImtauthSessionsSdlCommandIds.s_refreshToken;
 		inputObjectComp: Component {
@@ -855,7 +1003,7 @@ QtObject {
 	}
 
 	property GqlSdlRequestSender refreshTokenForLoginGqlSender: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		requestType: 1;
 		gqlCommandId: ImtauthSessionsSdlCommandIds.s_refreshToken;
 	
@@ -905,7 +1053,7 @@ QtObject {
 
 	property SelectTenantInput selectTenantInput: SelectTenantInput {}
 	property GqlSdlRequestSender selectTenantGqlSender: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		requestType: 1;
 		gqlCommandId: ImtauthSessionsSdlCommandIds.s_selectTenant;
 
@@ -928,10 +1076,16 @@ QtObject {
 							XMLHttpRequest.QMLAuthRefreshToken = m_userSession.m_refreshToken
 							root.saveDataToStorage()
 						}
+						// The refusals so far were for the closed token
+						root.__authFailedDuringSwitch = false
+						root.__retryPendingRequests()
+						// The subscriptions still hold the closed session and the previous organization
+						Events.sendEvent("AccessTokenRefreshed", {})
 
 						root.refreshPermissions(function(){
 							root.tenantSelected(root.currentTenantId);
 							root.__completeTenantSwitch()
+							root.__continueTenantActivation()
 						});
 					}
 					else{
@@ -949,7 +1103,7 @@ QtObject {
 						}
 
 						root.__tenantRemovalSwitchInProgress = false
-						root.tenantSelectionFailed(m_errorMessage || "");
+						root.__reportTenantSelectionFailure(m_errorMessage || "")
 						root.__completeTenantSwitch()
 					}
 				}
@@ -958,8 +1112,398 @@ QtObject {
 
 		function onError(message, type) {
 			root.__tenantRemovalSwitchInProgress = false
-			root.tenantSelectionFailed(message || "")
+			root.__reportTenantSelectionFailure(message || "")
 			root.__completeTenantSwitch()
+		}
+	}
+
+	property SetTenantActiveInput setTenantActiveInput: SetTenantActiveInput {}
+	property GqlSdlRequestSender setTenantActiveGqlSender: GqlSdlRequestSender {
+		permissionPath: root.permissionPath
+		requestType: 1
+		gqlCommandId: ImtauthTenantsSdlCommandIds.s_setTenantActive
+
+		sdlObjectComp: Component {
+			SetTenantActivePayload {
+				onFinished: {
+					let tenantId = root.__activationTenantId
+					root.__activationTenantId = ""
+					if (m_success){
+						root.selectTenant(tenantId)
+					}
+					else{
+						PopupManager.addErrorMessage(m_errorMessage || qsTr("Unable to activate the organization"), true)
+					}
+				}
+			}
+		}
+
+		function onError(message, type) {
+			root.__activationTenantId = ""
+			PopupManager.addErrorMessage(message || qsTr("Unable to activate the organization"), true)
+		}
+	}
+
+	// --- Sign-in with external accounts ---
+	// The provider page opens in the browser; the server receives its answer, this client polls for the result.
+	// A browser opens a window only within a click, so the logins are prepared before: the click opens a ready URL.
+
+	function loadExternalLoginProviders(){
+		if (!root.externalLoginEnabled){
+			root.cancelExternalLogin()
+			root.__clearPreparedLogins()
+			root.externalLoginProviders = []
+			root.externalLoginProvidersLoaded()
+			return
+		}
+
+		root.__sendWithoutAccessToken(externalLoginProvidersGqlSender)
+	}
+
+	function loginWithExternalProvider(providerId){
+		root.__beginExternalLogin(providerId, false)
+	}
+
+	function linkExternalAccount(providerId){
+		root.__beginExternalLogin(providerId, true)
+	}
+
+	function cancelExternalLogin(){
+		externalLoginPollTimer.stop()
+		root.__externalLoginId = ""
+		root.externalLoginInProgress = false
+		root.externalLoginProviderId = ""
+	}
+
+	// Prepares a login for every offered provider: sign-in (isLink false) or linking to the signed-in user.
+	function prepareExternalLogins(isLink){
+		let queue = root.__prepareQueue.slice()
+		for (let i = 0; i < root.externalLoginProviders.length; i++){
+			queue.push({ "providerId": String(root.externalLoginProviders[i].id), "isLink": isLink })
+		}
+		root.__prepareQueue = queue
+
+		root.__prepareNextExternalLogin()
+	}
+
+	function __prepareNextExternalLogin(){
+		if (prepareExternalLoginGqlSender.state === "Loading" || root.__prepareQueue.length === 0){
+			return
+		}
+
+		let queue = root.__prepareQueue.slice()
+		let next = queue.shift()
+		root.__prepareQueue = queue
+		root.__preparingProvider = next
+
+		prepareExternalLoginInput.m_providerId = next.providerId
+		prepareExternalLoginInput.m_productId = root.productId
+		prepareExternalLoginInput.m_link = next.isLink
+
+		if (next.isLink){
+			prepareExternalLoginGqlSender.send(prepareExternalLoginInput)
+		}
+		else{
+			root.__sendWithoutAccessToken(prepareExternalLoginGqlSender, prepareExternalLoginInput)
+		}
+	}
+
+	function __storePreparedLogin(loginId, authorizationUrl){
+		let prepared = root.__preparingProvider
+		root.__preparingProvider = null
+
+		if (prepared && loginId !== "" && authorizationUrl !== ""){
+			let logins = root.__preparedLogins.slice()
+			logins.push({
+				"providerId": prepared.providerId,
+				"isLink": prepared.isLink,
+				"loginId": loginId,
+				"authorizationUrl": authorizationUrl,
+				"preparedAt": Date.now()
+			})
+			root.__preparedLogins = logins
+		}
+
+		root.__prepareNextExternalLogin()
+	}
+
+	// Takes the prepared login of the provider; one older than 8 minutes is about to expire on the server.
+	function __takePreparedLogin(providerId, isLink){
+		let found = null
+		let logins = []
+		for (let i = 0; i < root.__preparedLogins.length; i++){
+			let login = root.__preparedLogins[i]
+			let isFresh = Date.now() - login.preparedAt < 8 * 60 * 1000
+			if (found === null && isFresh && login.providerId === providerId && login.isLink === isLink){
+				found = login
+			}
+			else if (isFresh){
+				logins.push(login)
+			}
+		}
+		root.__preparedLogins = logins
+
+		return found
+	}
+
+	function __clearPreparedLogins(){
+		root.__preparedLogins = []
+		root.__prepareQueue = []
+	}
+
+	function __beginExternalLogin(providerId, isLink){
+		if (root.externalLoginInProgress){
+			root.cancelExternalLogin()
+		}
+
+		root.externalLoginInProgress = true
+		root.externalLoginProviderId = providerId
+		root.__externalLoginIsLink = isLink
+
+		let prepared = root.__takePreparedLogin(providerId, isLink)
+		if (prepared !== null){
+			root.__startExternalLogin(prepared.loginId, prepared.authorizationUrl)
+
+			// A prepared login is single-use, the next attempt gets a new one.
+			let queue = root.__prepareQueue.slice()
+			queue.push({ "providerId": providerId, "isLink": isLink })
+			root.__prepareQueue = queue
+			root.__prepareNextExternalLogin()
+
+			return
+		}
+
+		beginExternalLoginInput.m_providerId = providerId
+		beginExternalLoginInput.m_productId = root.productId
+		beginExternalLoginInput.m_link = isLink
+
+		if (isLink){
+			beginExternalLoginGqlSender.send(beginExternalLoginInput)
+		}
+		else{
+			root.__sendWithoutAccessToken(beginExternalLoginGqlSender, beginExternalLoginInput)
+		}
+	}
+
+	function __startExternalLogin(loginId, authorizationUrl){
+		root.__externalLoginId = loginId
+		root.__externalLoginDeadline = Date.now() + 10 * 60 * 1000
+		externalLoginPollTimer.start()
+
+		Qt.openUrlExternally(authorizationUrl)
+	}
+
+	function __failExternalLogin(message){
+		let isLink = root.__externalLoginIsLink
+		root.cancelExternalLogin()
+
+		let errorText = (message && message !== "") ? message : qsTr("The sign-in could not be completed")
+		root.externalLoginFailed(errorText)
+		if (!isLink){
+			root.loginFailed(errorText)
+		}
+	}
+
+	function __pollExternalLogin(){
+		if (root.__externalLoginId === ""){
+			externalLoginPollTimer.stop()
+			return
+		}
+
+		if (Date.now() > root.__externalLoginDeadline){
+			root.__failExternalLogin(qsTr("The sign-in was not completed in time. Please try again."))
+			return
+		}
+
+		if (completeExternalLoginGqlSender.state === "Loading"){
+			return
+		}
+
+		completeExternalLoginInput.m_loginId = root.__externalLoginId
+		if (root.__externalLoginIsLink){
+			completeExternalLoginGqlSender.send(completeExternalLoginInput)
+		}
+		else{
+			root.__sendWithoutAccessToken(completeExternalLoginGqlSender, completeExternalLoginInput)
+		}
+	}
+
+	function __finishExternalLogin(status, message, authorization){
+		if (status === "Pending"){
+			return
+		}
+
+		let providerId = root.externalLoginProviderId
+
+		if (status === "SignedIn" && authorization){
+			root.cancelExternalLogin()
+			root.userTokenProvider.setLoginData(
+						authorization.m_refreshToken,
+						authorization.m_token,
+						authorization.m_userId,
+						authorization.m_username,
+						authorization.m_systemId,
+						root.normalizePermissions(authorization.m_permissions))
+			return
+		}
+
+		if (status === "Linked"){
+			root.cancelExternalLogin()
+			PopupManager.addSuccessMessage(qsTr("The account has been linked"), true)
+			root.externalAccountLinked(providerId)
+			return
+		}
+
+		root.__failExternalLogin(message)
+	}
+
+	property Timer externalLoginPollTimer: Timer {
+		interval: 2000
+		repeat: true
+
+		onTriggered: {
+			root.__pollExternalLogin()
+		}
+	}
+
+	property GqlSdlRequestSender externalLoginProvidersGqlSender: GqlSdlRequestSender {
+		permissionPath: root.permissionPath
+		gqlCommandId: ImtauthAuthorizationSdlCommandIds.s_getExternalLoginProviders
+
+		sdlObjectComp: Component {
+			ExternalLoginProviderList {
+				onFinished: {
+					let providers = []
+					if (m_providers){
+						for (let i = 0; i < m_providers.count; i++){
+							let provider = m_providers.get(i).item
+							if (provider){
+								providers.push({
+									"id": provider.m_id,
+									"name": provider.m_name,
+									"type": provider.m_providerType
+								})
+							}
+						}
+					}
+
+					root.externalLoginProviders = providers
+					root.externalLoginProvidersLoaded()
+
+					if (!root.isLoggedIn()){
+						root.__clearPreparedLogins()
+						root.prepareExternalLogins(false)
+					}
+				}
+			}
+		}
+
+		function createQueryParams(query){
+		}
+
+		function getHeaders(){
+			return root.__emptyAuthTokenHeaders()
+		}
+
+		function onError(message, type){
+			// Without the providers the page only offers the password sign-in.
+			console.warn("Auth: external login providers are not available:", message)
+			root.externalLoginProviders = []
+		}
+	}
+
+	property BeginExternalLoginInput beginExternalLoginInput: BeginExternalLoginInput {}
+	property GqlSdlRequestSender beginExternalLoginGqlSender: GqlSdlRequestSender {
+		permissionPath: root.permissionPath
+		requestType: 1
+		gqlCommandId: ImtauthAuthorizationSdlCommandIds.s_beginExternalLogin
+
+		sdlObjectComp: Component {
+			BeginExternalLoginPayload {
+				onFinished: {
+					if (m_loginId === "" || m_authorizationUrl === ""){
+						root.__failExternalLogin(m_message)
+						return
+					}
+
+					root.__startExternalLogin(m_loginId, m_authorizationUrl)
+				}
+			}
+		}
+
+		function getHeaders(){
+			return root.__externalLoginIsLink ? {} : root.__emptyAuthTokenHeaders()
+		}
+
+		function onError(message, type){
+			root.__failExternalLogin(message)
+		}
+	}
+
+	property BeginExternalLoginInput prepareExternalLoginInput: BeginExternalLoginInput {}
+	property GqlSdlRequestSender prepareExternalLoginGqlSender: GqlSdlRequestSender {
+		permissionPath: root.permissionPath
+		requestType: 1
+		gqlCommandId: ImtauthAuthorizationSdlCommandIds.s_beginExternalLogin
+
+		sdlObjectComp: Component {
+			BeginExternalLoginPayload {
+				onFinished: {
+					root.__storePreparedLogin(m_loginId, m_authorizationUrl)
+				}
+			}
+		}
+
+		function getHeaders(){
+			let isLink = root.__preparingProvider ? root.__preparingProvider.isLink : false
+			return isLink ? {} : root.__emptyAuthTokenHeaders()
+		}
+
+		function onError(message, type){
+			// Without a prepared login the click starts the login itself.
+			console.warn("Auth: external login could not be prepared:", message)
+			root.__storePreparedLogin("", "")
+		}
+	}
+
+	// A prepared login expires on the server after 10 minutes.
+	property Timer preparedLoginsRefreshTimer: Timer {
+		interval: 5 * 60 * 1000
+		repeat: true
+		running: root.__preparedLogins.length > 0
+
+		onTriggered: {
+			let queue = []
+			for (let i = 0; i < root.__preparedLogins.length; i++){
+				queue.push({ "providerId": root.__preparedLogins[i].providerId, "isLink": root.__preparedLogins[i].isLink })
+			}
+			root.__preparedLogins = []
+			root.__prepareQueue = queue
+			root.__prepareNextExternalLogin()
+		}
+	}
+
+	property ExternalLoginInput completeExternalLoginInput: ExternalLoginInput {}
+	property GqlSdlRequestSender completeExternalLoginGqlSender: GqlSdlRequestSender {
+		permissionPath: root.permissionPath
+		requestType: 1
+		gqlCommandId: ImtauthAuthorizationSdlCommandIds.s_completeExternalLogin
+
+		sdlObjectComp: Component {
+			ExternalLoginPayload {
+				onFinished: {
+					root.__finishExternalLogin(m_status, m_message, m_authorization)
+				}
+			}
+		}
+
+		function getHeaders(){
+			return root.__externalLoginIsLink ? {} : root.__emptyAuthTokenHeaders()
+		}
+
+		function onError(message, type){
+			// A failed poll is retried by the timer until the login expires.
+			console.warn("Auth: external login poll failed:", message)
 		}
 	}
 }

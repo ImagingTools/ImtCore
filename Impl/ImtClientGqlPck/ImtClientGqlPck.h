@@ -10,6 +10,7 @@
 #include <imtclientgql/CApiClientComp.h>
 #include <imtclientgql/CAsyncApiClientComp.h>
 #include <imtclientgql/CGqlClientSyncAdapterComp.h>
+#include <imtclientgql/CGqlHeartbeatCheckerComp.h>
 #include <imtclientgql/CGqlClientEngineComp.h>
 #include <imtclientgql/CGqlObjectCollectionComp.h>
 #include <imtclientgql/CGqlRemoteRepresentationControllerCompBase.h>
@@ -38,6 +39,7 @@ namespace ImtClientGqlPck
 typedef imtclientgql::CApiClientComp ApiClient;
 typedef imtclientgql::CAsyncApiClientComp AsyncApiClient;
 typedef imtclientgql::CGqlClientSyncAdapterComp GqlClientSyncAdapter;
+typedef icomp::TModelCompWrap<imtclientgql::CGqlHeartbeatCheckerComp> GqlHeartbeatChecker;
 typedef imtclientgql::CGqlClientEngineComp GraphQLClientEngine;
 typedef icomp::TModelCompWrap<imtclientgql::CGqlObjectCollectionComp> GqlObjectCollection;
 /// \todo change alias of CGqlRemoteRepresentationControllerCompBase and CGqlRemoteRepresentationControllerComp

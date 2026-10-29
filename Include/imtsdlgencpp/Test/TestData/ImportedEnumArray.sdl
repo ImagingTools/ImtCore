@@ -1,0 +1,12 @@
+schema {
+	namespace: enumconsumer
+	version: 1.0
+}
+
+import {
+	"ImportedEnum.sdl"
+}
+
+type ImportedEnumArray {
+	states: [ImportedState]
+}

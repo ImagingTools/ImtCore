@@ -10,6 +10,7 @@
 #include <imtbase/CComplexCollectionFilterHelper.h>
 #include <imtauth/IUserInfo.h>
 #include <imtauth/IUserGroupFilter.h>
+#include <imtauthdb/imtauthdb.h>
 
 
 namespace imtauthdb
@@ -28,13 +29,15 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserDatabaseDelegateComp::Create
 		const istd::IChangeable* valuePtr,
 		const imtbase::IOperationContext* operationContextPtr) const
 {
-	NewObjectQuery retVal = BaseClass::CreateNewObjectQuery(typeId, proposedObjectId, objectName, objectDescription, valuePtr, operationContextPtr);
-
 	auto userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(valuePtr);
 	if (userInfoPtr == nullptr){
 		return NewObjectQuery();
 	}
-	
+
+	// The searchable Name column must follow the user itself, whatever name the caller passed.
+	const QString userName = userInfoPtr->GetName().isEmpty() ? objectName : userInfoPtr->GetName();
+	NewObjectQuery retVal = BaseClass::CreateNewObjectQuery(typeId, proposedObjectId, userName, objectDescription, valuePtr, operationContextPtr);
+
 	if (m_userGroupCollectionCompPtr.IsValid() && m_userGroupDatabaseDelegateCompPtr.IsValid()){
 		QByteArrayList groupIds = userInfoPtr->GetGroups();
 		for (const QByteArray& groupId : groupIds){
@@ -43,11 +46,14 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserDatabaseDelegateComp::Create
 				auto userGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(dataPtr.GetPtr());
 				if (userGroupInfoPtr != nullptr){
 					userGroupInfoPtr->AddUser(proposedObjectId);
+
+					imtbase::COperationContext groupOperationContext;
+					AddReferenceOperation(groupOperationContext, operationContextPtr, "AddUser", "UserId", QT_TRANSLATE_NOOP("Attribute", "User"), QByteArray(), proposedObjectId);
 					retVal.query += m_userGroupDatabaseDelegateCompPtr->CreateUpdateObjectQuery(
 						*m_userGroupCollectionCompPtr,
 						groupId,
 						*userGroupInfoPtr,
-						operationContextPtr,
+						&groupOperationContext,
 						false);
 				}
 			}
@@ -83,6 +89,11 @@ QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 		return QByteArray();
 	}
 
+	const QString newName = userInfoPtr->GetName();
+	if (!newName.isEmpty() && newName != oldObjectPtr->GetName()){
+		retVal += CreateRenameObjectQuery(collection, objectId, newName, operationContextPtr);
+	}
+
 	if (useExternDelegate){
 		QByteArrayList oldGroupIds = oldObjectPtr->GetGroups();
 		QByteArrayList newGroupIds = userInfoPtr->GetGroups();
@@ -111,11 +122,13 @@ QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 						if (!userGroupInfoPtr->GetUsers().contains(objectId)){
 							userGroupInfoPtr->AddUser(objectId);
 
+							imtbase::COperationContext groupOperationContext;
+							AddReferenceOperation(groupOperationContext, operationContextPtr, "AddUser", "UserId", QT_TRANSLATE_NOOP("Attribute", "User"), QByteArray(), objectId);
 							retVal += m_userGroupDatabaseDelegateCompPtr->CreateUpdateObjectQuery(
 										*m_userGroupCollectionCompPtr,
 										groupId,
 										*userGroupInfoPtr,
-										operationContextPtr,
+										&groupOperationContext,
 										false);
 						}
 					}
@@ -129,11 +142,13 @@ QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 					if (userGroupInfoPtr != nullptr){
 						bool result = userGroupInfoPtr->RemoveUser(objectId);
 						if (result){
+							imtbase::COperationContext groupOperationContext;
+							AddReferenceOperation(groupOperationContext, operationContextPtr, "RemoveUser", "UserId", QT_TRANSLATE_NOOP("Attribute", "User"), objectId, QByteArray());
 							retVal += m_userGroupDatabaseDelegateCompPtr->CreateUpdateObjectQuery(
 										*m_userGroupCollectionCompPtr,
 										groupId,
 										*userGroupInfoPtr,
-										operationContextPtr,
+										&groupOperationContext,
 										false);
 						}
 					}
@@ -193,38 +208,34 @@ bool CUserDatabaseDelegateComp::CreateObjectFilterQuery(const iprm::IParamsSet& 
 
 QString CUserDatabaseDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const
 {
-	iprm::TParamsPtr<imtauth::IUserGroupFilter> groupFilterParamPtr(&filterParams, QByteArrayLiteral("GroupFilter"));
-	if (!groupFilterParamPtr.IsValid()){
-		return QString();
-	}
-
 	const bool isSqlite = IsSQLite();
 
-	QByteArrayList groupIds = groupFilterParamPtr->GetGroupIds();
-	if (groupIds.isEmpty()){
-		// An empty group list must not widen the selection to the whole collection, so it falls
-		// back to the filter's own user, like CUserActionDatabaseDelegateComp does. An empty user
-		// id then matches nothing.
-		const QString userId = SqlEncode(QString::fromUtf8(groupFilterParamPtr->GetUserId()));
+	QStringList conditions;
 
-		if (isSqlite){
-			return QStringLiteral(R"(json_extract(root."Document", '$.Id') = '%1')").arg(userId);
+	iprm::TParamsPtr<imtauth::IUserGroupFilter> groupFilterParamPtr(&filterParams, QByteArrayLiteral("GroupFilter"));
+	if (groupFilterParamPtr.IsValid()){
+		QByteArrayList groupIds = groupFilterParamPtr->GetGroupIds();
+		if (groupIds.isEmpty()){
+			// An empty group list must not widen the selection to the whole collection, so it falls
+			// back to the filter's own user, like CUserActionDatabaseDelegateComp does. An empty user
+			// id then matches nothing.
+			const QString userId = SqlEncode(QString::fromUtf8(groupFilterParamPtr->GetUserId()));
+
+			conditions << (isSqlite
+						? QStringLiteral(R"(json_extract(root."Document", '$.Id') = '%1')").arg(userId)
+						: QStringLiteral(R"(root."Document"->>'Id' = '%1')").arg(userId));
 		}
-
-		return QStringLiteral(R"(root."Document"->>'Id' = '%1')").arg(userId);
+		else{
+			conditions << CreateArrayContainsAnyQuery(isSqlite, QStringLiteral("Groups"), groupIds);
+		}
 	}
 
-	QStringList quotedGroupIds;
-	for (const QByteArray& groupId : groupIds){
-		quotedGroupIds << QStringLiteral("'%1'").arg(SqlEncode(QString::fromUtf8(groupId)));
+	const QByteArrayList roleIds = GetFilterIds(filterParams, s_roleFilterId);
+	if (!roleIds.isEmpty()){
+		conditions << CreateProductRolesContainAnyQuery(isSqlite, roleIds);
 	}
 
-	if (isSqlite){
-		return QStringLiteral(R"(EXISTS (SELECT 1 FROM json_each(json_extract(root."Document", '$.Groups')) AS userGroup WHERE userGroup.value IN (%1)))")
-				.arg(quotedGroupIds.join(','));
-	}
-
-	return QStringLiteral(R"((root."Document"->'Groups' ?| array[%1]))").arg(quotedGroupIds.join(','));
+	return conditions.join(QStringLiteral(" AND "));
 }
 
 
@@ -266,6 +277,41 @@ QByteArray CUserDatabaseDelegateComp::GetCustomColumnsQuery() const
 	return QByteArray(R"(
 			conn."Document"->>'LastConnection' as "LastConnection"
 	)");
+}
+
+
+// reimplemented (imtdb::CSqlDatabaseDocumentDelegateCompBase)
+
+QString CUserDatabaseDelegateComp::CreateTenantBindingFilterQuery(const QByteArray& tenantId, imtauth::TenantFilterMode filterMode) const
+{
+	// Users belong to no organization; in an organization its active members and its creator are visible
+	if (tenantId.isEmpty()){
+		return QString();
+	}
+
+	const bool hasSchema = m_tableSchemaAttrPtr.IsValid() && !(*m_tableSchemaAttrPtr).isEmpty();
+	const QString membershipsTableName = hasSchema
+				? QStringLiteral(R"(%1."TenantMemberships")").arg(QString::fromUtf8(*m_tableSchemaAttrPtr))
+				: QStringLiteral(R"("TenantMemberships")");
+	const QString tenantsTableName = hasSchema
+				? QStringLiteral(R"(%1."Tenants")").arg(QString::fromUtf8(*m_tableSchemaAttrPtr))
+				: QStringLiteral(R"("Tenants")");
+
+	const QString membershipLookup = IsSQLite()
+				? QStringLiteral(R"(SELECT 1 FROM %1 memberships WHERE memberships."UserId" = %2 AND memberships."TenantId" = '%3' AND memberships."IsActive" = 1)")
+				: QStringLiteral(R"(SELECT 1 FROM %1 memberships WHERE memberships."UserId"::text = %2 AND memberships."TenantId"::text = '%3' AND memberships."IsActive")");
+	const QString creatorLookup = IsSQLite()
+				? QStringLiteral(R"(SELECT 1 FROM %1 tenants WHERE tenants."CreatorId" = %2 AND tenants."Id" = '%3')")
+				: QStringLiteral(R"(SELECT 1 FROM %1 tenants WHERE tenants."CreatorId"::text = %2 AND tenants."Id"::text = '%3')");
+
+	const QString encodedTenantId = SqlEncode(QString::fromUtf8(tenantId));
+	const QString query = membershipLookup.arg(membershipsTableName, GetDocumentIdTextExpression(), encodedTenantId)
+				+ QStringLiteral(" UNION ALL ")
+				+ creatorLookup.arg(tenantsTableName, GetDocumentIdTextExpression(), encodedTenantId);
+
+	return filterMode == imtauth::TFM_EXCLUDE
+				? QStringLiteral("NOT EXISTS (%1)").arg(query)
+				: QStringLiteral("EXISTS (%1)").arg(query);
 }
 
 

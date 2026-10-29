@@ -19,7 +19,8 @@ public:
 	enum SqlContext
 	{
 		SC_GENERAL,
-		SC_POSTGRES
+		SC_POSTGRES,
+		SC_DUCKDB
 	};
 
 	/**
@@ -39,6 +40,8 @@ private:
 				SqlContext sqlContext = SC_GENERAL,
 				const FieldRenderer* fieldRendererPtr = nullptr);
 	static QString ToSqlArray(const QVariantList& values);
+	/// A value as a DuckDB literal: a string or a QUuid is quoted, a number is written as it is.
+	static QString ToDuckDbLiteral(const QVariant& value);
 };
 
 

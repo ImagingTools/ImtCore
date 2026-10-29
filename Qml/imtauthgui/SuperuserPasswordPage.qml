@@ -8,7 +8,7 @@ import imtauthUsersSdl 1.0
 
 Rectangle {
 	id: root;
-	property string context: ""
+	property string permissionPath: ""
 	objectName: "SuperuserPasswordPage"
 
 	anchors.fill: parent;
@@ -28,7 +28,7 @@ Rectangle {
 	// Reached before any API client exists, so the policy is instantiated here.
 	GqlBasedPasswordPolicyProvider {
 		id: passwordPolicyProvider;
-		context: root.context;
+		permissionPath: root.permissionPath;
 	}
 
 	Component.onCompleted: {
@@ -42,7 +42,7 @@ Rectangle {
 	}
 
 	GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		id: createSuperuserRequest;
 		requestType: 1; // Mutation
 		gqlCommandId: ImtauthUsersSdlCommandIds.s_createSuperuser;
@@ -222,6 +222,11 @@ Rectangle {
 				nameInput.showErrorWhenInvalid: false;
 				mailInput.showErrorWhenInvalid: false;
 				confirmPasswordInput.showErrorWhenInvalid: false;
+
+				// Without the inline errors the required fields are marked up front instead.
+				mailInput.isRequired: true;
+				passwordInput.isRequired: true;
+				confirmPasswordInput.isRequired: true;
 
 				onEmitUpdateModel: {
 					updateModel();

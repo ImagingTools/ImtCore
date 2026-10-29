@@ -25,9 +25,22 @@ private Q_SLOTS:
 	void TestComplexCollectionFilter();
 	void TestUnion();
 	void TestComplexUnion();
+	void TestArrayNullabilityParsing();
+	void TestImportedEnumArrayQObjectSetter();
+	void TestTreeModelExplicitNullKey();
 	void TestNestedFieldNameCollision();
 	void PrinterTest();
 	void SubstrateSpecifications();
+	void TestObjectsMocInclude();
+	void TestNoObjectsMocInclude();
+	void TestNoObjectsWithoutTemplate();
+	void TestTargetHeaderPathsOfLocalTypes();
+	void TestImportedObjectsIncludeIsGuarded();
+	void TestImportedObjectsGuardReportsMissingHeader();
+	void TestNoObjectsSchemaImportsSchema();
+	void TestIntermediateFileIsRemovedAfterFailure();
+	void TestSourceTailPostProcessor();
+	void TestDepFileDoesNotContainIntermediateFile();
 
 	void cleanup();
 	void cleanupTestCase();

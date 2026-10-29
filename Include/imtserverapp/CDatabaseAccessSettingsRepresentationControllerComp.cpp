@@ -58,8 +58,6 @@ bool CDatabaseAccessSettingsRepresentationControllerComp::GetSdlRepresentationFr
 	int port = databaseLoginSettingsPtr->GetPort();
 	sdlRepresentation.port = port;
 
-	sdlRepresentation.canBackupRestore = m_canBackupRestoreAttrPtr.IsValid() ? *m_canBackupRestoreAttrPtr : true;
-
 	return true;
 }
 

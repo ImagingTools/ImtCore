@@ -92,6 +92,13 @@ bool CCrossOrgGrantItemInfoProviderComp::FillParams(
 		paramsSetPtr->SetEditableParameter("roles", rolesParamPtr, true);
 	}
 
+	// State
+	{
+		iprm::CTextParam* activeParamPtr = new iprm::CTextParam;
+		activeParamPtr->SetText(grantInfo.isActive ? QStringLiteral("true") : QStringLiteral("false"));
+		paramsSetPtr->SetEditableParameter("isActive", activeParamPtr, true);
+	}
+
 	// Expiry
 	if (!grantInfo.expiresAt.isEmpty()){
 		iprm::CTextParam* expiryParamPtr = new iprm::CTextParam;

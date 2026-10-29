@@ -22,8 +22,8 @@ Rectangle {
 	// Backdrop
 	Rectangle {
 		anchors.fill: parent
-		color: "black"
-		opacity: 0.45
+		color: Style.overlayBackgroundColor
+		opacity: 0.5
 
 		MouseArea {
 			anchors.fill: parent
@@ -198,13 +198,14 @@ Rectangle {
 				spacing: Style.paddingS
 
 				Rectangle {
-					width: Style.buttonWidthM
+					width: cancelText.width + Style.paddingL * 2
 					height: Style.buttonHeightM
 					radius: Style.radiusS
 					color: "transparent"
 					border.color: Style.borderColor2
 
 					Text {
+						id: cancelText
 						anchors.centerIn: parent
 						text: qsTr("Cancel")
 						font.pixelSize: Style.fontSizeS
@@ -220,16 +221,18 @@ Rectangle {
 				}
 
 				Rectangle {
-					width: Style.buttonWidthM
+					width: submitText.width + Style.paddingL * 2
 					height: Style.buttonHeightM
 					radius: Style.radiusS
-					color: titleInput.text.trim().length > 0 ? Style.successColor : Style.buttonInactiveColor
+					color: Style.successColor
+					opacity: titleInput.text.trim().length > 0 ? 1 : 0.5
 
 					Text {
+						id: submitText
 						anchors.centerIn: parent
 						text: qsTr("Submit new issue")
 						font.pixelSize: Style.fontSizeS
-						color: "white"
+						color: Style.highlightedTextColor
 						font.bold: true
 					}
 

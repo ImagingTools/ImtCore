@@ -27,7 +27,7 @@ class RemoteFileController extends QtObject {
     })
 
 
-    SendFile(fileUrl){
+    sendFile(fileUrl){
         this.state = "Loading"
         var xhr = new XMLHttpRequest()     
 
@@ -65,7 +65,7 @@ class RemoteFileController extends QtObject {
 
     }
 
-    GetFile(fileHash, fileName) {
+    getFile(fileHash, fileName) {
         if (this.prefix == ""){
             this.prefix = "files"
         }
@@ -74,7 +74,7 @@ class RemoteFileController extends QtObject {
         QtFunctions.openUrlExternally(pathIn)
     }
 
-    DeleteFile(fileHash, fileUrl){
+    deleteFile(fileHash, fileUrl){
         if (this.prefix == ""){
             this.prefix = "files"
         }

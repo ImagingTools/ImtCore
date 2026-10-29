@@ -58,6 +58,7 @@ int main(int argc, char *argv[])
 	Q_INIT_RESOURCE(controlsgalleryqmlWeb);
 #endif
 	Q_INIT_RESOURCE(controlsgalleryqml);
+	Q_INIT_RESOURCE(EjEditor);
 	Q_INIT_RESOURCE(controlsgalleryContactInfosSdl);
 	Q_INIT_RESOURCE(controlsgalleryContactInfoCollectionDocumentServiceSdl);
 	Q_INIT_RESOURCE(imtguivars);

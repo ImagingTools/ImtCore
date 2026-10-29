@@ -143,19 +143,26 @@ module.exports = {
     event: null,
 
     entered: [],
+    enteredSet: new Set(),
     hovered: [],
+
+    __hitTestDepth: 0,
 
     add: function(obj){
         this.objects.add(obj)
+        this.__markHitTarget(obj)
     },
     addDropArea: function(obj){
         this.dropAreas.add(obj)
+        this.__markHitTarget(obj)
     },
     removeDropArea: function(obj){
         this.dropAreas.delete(obj)
+        this.__unmarkHitTarget(obj)
     },
     remove: function(obj){
         this.objects.delete(obj)
+        this.__unmarkHitTarget(obj)
         if(this.event){
             let index = this.event.path.indexOf(obj)
             while(index >= 0){
@@ -165,51 +172,67 @@ module.exports = {
         }
     },
 
+    __markHitTarget: function(obj){
+        if(!obj) return
+        let dom = obj.__DOM
+        if(!dom && typeof obj.__getDOM === 'function') dom = obj.__getDOM()
+        if(dom) dom.classList.add('jq-mouse')
+    },
+
+    __unmarkHitTarget: function(obj){
+        if(!obj || !obj.__DOM) return
+        if(this.objects.has(obj) || this.dropAreas.has(obj)) return
+        obj.__DOM.classList.remove('jq-mouse')
+    },
+
+    __beginHitTest: function(){
+        if(this.__hitTestDepth++ === 0){
+            document.documentElement.classList.add('jq-hittest')
+        }
+    },
+
+    __endHitTest: function(){
+        if(this.__hitTestDepth === 0) return
+        this.__hitTestDepth--
+        if(this.__hitTestDepth === 0){
+            document.documentElement.classList.remove('jq-hittest')
+        }
+    },
+
+    __elementsFromPoint: function(x, y){
+        this.__beginHitTest()
+        try {
+            return document.elementsFromPoint(x, y)
+        } finally {
+            this.__endHitTest()
+        }
+    },
+
     getObjectsFromPoint: function(x, y){
+        let elements = this.__elementsFromPoint(x, y)
         let result = []
 
-        for(let obj of this.objects){
-            let dom = obj.__getDOM()
-            dom.classList.add("pointer")
-        }
-
-        for(let el of document.elementsFromPoint(x, y)){
-            if(this.objects.has(el.qml) && !el.qml.__destroyed){
-                result.push(el.qml)
+        for(let i = 0; i < elements.length; i++){
+            let qml = elements[i].qml
+            if(qml && this.objects.has(qml) && !qml.__destroyed){
+                result.push(qml)
             }
-            
-        }
-
-        for(let obj of this.objects){
-            let dom = obj.__getDOM()
-            dom.classList.remove("pointer")
         }
 
         return result
     },
 
     getDropAreaFromPoint: function(x, y){
-        for(let obj of this.dropAreas){
-            if(!obj || obj.__destroyed) continue
-            let dom = obj.__getDOM()
-            dom.classList.add("pointer")
-        }
+        let elements = this.__elementsFromPoint(x, y)
 
-        let result = null
-        for(let el of document.elementsFromPoint(x, y)){
-            if(this.dropAreas.has(el.qml) && !el.qml.__destroyed && el.qml.enabled && el.qml.visible){
-                result = el.qml
-                break
+        for(let i = 0; i < elements.length; i++){
+            let qml = elements[i].qml
+            if(qml && this.dropAreas.has(qml) && !qml.__destroyed && qml.enabled && qml.visible){
+                return qml
             }
         }
 
-        for(let obj of this.dropAreas){
-            if(!obj || obj.__destroyed) continue
-            let dom = obj.__getDOM()
-            dom.classList.remove("pointer")
-        }
-
-        return result
+        return null
     },
 
     __getMouseAreaDragTarget: function(mouseArea){
@@ -333,6 +356,32 @@ module.exports = {
         this.__updateDropAreasForDragTarget(dragTarget)
     },
 
+    // As in Qt Quick, hover goes to the topmost hover-enabled MouseArea under
+    // the cursor (and its ancestors); hover-enabled MouseAreas beneath it, e.g.
+    // rows covered by a dialog overlay, must not react to the cursor.
+    __findHoverBlocker: function(event){
+        for(let obj of event.path){
+            if(!obj || obj.__destroyed || typeof obj.__acceptsHover !== 'function' || !obj.__acceptsHover()) continue
+
+            event.relative(obj)
+            if(event.x >= 0 && event.y >= 0 && event.x < obj.width && event.y < obj.height) return obj
+        }
+
+        return null
+    },
+
+    __isHoverBlocked: function(obj, blocker){
+        if(!blocker || obj === blocker || typeof obj.__acceptsHover !== 'function') return false
+
+        let parent = blocker.parent
+        while(parent){
+            if(parent === obj) return false
+            parent = parent.parent
+        }
+
+        return true
+    },
+
     __finishMouseAreaDrag: function(mouseArea){
         if(!mouseArea || mouseArea.__destroyed) return
 
@@ -372,17 +421,64 @@ module.exports = {
                 if(Math.abs(event.startY - event.originY) > 15) event.wasDragY = true
             }
 
+            let hoverBlocker = event.target ? null : this.__findHoverBlocker(event)
+
+            const pointerInside = (obj) => {
+                event.relative(obj)
+                return event.x >= 0 && event.y >= 0 && event.x < obj.width && event.y < obj.height
+            }
+
+            // Physical exits must precede entries into unrelated areas.
             let i = 0
             while(i < this.entered.length){
-                if(this.entered[i].__destroyed) {
+                let obj = this.entered[i]
+                if(obj.__destroyed) {
                     this.entered.splice(i, 1)
+                    this.enteredSet.delete(obj)
                     continue
                 }
 
-                event.relative(this.entered[i])
-                if(event.x < 0 || event.y < 0 || event.x >= this.entered[i].width || event.y >= this.entered[i].height) {
-                    if(typeof this.entered[i].__onMouseLeave === 'function') this.entered[i].__onMouseLeave(event)
+                if(!pointerInside(obj)) {
+                    if(typeof obj.__onMouseLeave === 'function') obj.__onMouseLeave(event)
                     this.entered.splice(i, 1)
+                    this.enteredSet.delete(obj)
+                } else {
+                    i++
+                }
+            }
+
+            // Enter the new topmost area before dispatching blocked exits.
+            // This keeps hover-dependent close buttons enabled during handoff.
+            i = 0
+            while(i < event.path.length){
+                let obj = event.path[i]
+                if(obj.__destroyed) {
+                    event.path.splice(i, 1)
+                    continue
+                }
+
+                if(!this.__isHoverBlocked(obj, hoverBlocker) && pointerInside(obj) && !this.enteredSet.has(obj)) {
+                    this.entered.push(obj)
+                    this.enteredSet.add(obj)
+                    if(typeof obj.__onMouseEnter === 'function') obj.__onMouseEnter(event)
+                }
+
+                i++
+            }
+
+            i = 0
+            while(i < this.entered.length){
+                let obj = this.entered[i]
+                if(obj.__destroyed) {
+                    this.entered.splice(i, 1)
+                    this.enteredSet.delete(obj)
+                    continue
+                }
+
+                if(!pointerInside(obj) || this.__isHoverBlocked(obj, hoverBlocker)) {
+                    if(typeof obj.__onMouseLeave === 'function') obj.__onMouseLeave(event)
+                    this.entered.splice(i, 1)
+                    this.enteredSet.delete(obj)
                 } else {
                     i++
                 }
@@ -390,19 +486,16 @@ module.exports = {
 
             i = 0
             while(i < event.path.length){
-                if(event.path[i].__destroyed) {
+                let obj = event.path[i]
+                if(obj.__destroyed) {
                     event.path.splice(i, 1)
                     continue
                 }
 
-                event.relative(event.path[i])
-                if(event.x >= 0 && event.y >= 0 && event.x < event.path[i].width && event.y < event.path[i].height){
-                    if(this.entered.indexOf(event.path[i]) < 0) {
-                        this.entered.push(event.path[i])
-                        if(typeof event.path[i].__onMouseEnter === 'function') event.path[i].__onMouseEnter(event)
-                    }
-                } 
-                if(typeof event.path[i].__onMouseMove === 'function') event.path[i].__onMouseMove(event)
+                if(!this.__isHoverBlocked(obj, hoverBlocker) && typeof obj.__onMouseMove === 'function') {
+                    event.relative(obj)
+                    obj.__onMouseMove(event)
+                }
 
                 i++
             }

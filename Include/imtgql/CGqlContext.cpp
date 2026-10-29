@@ -7,6 +7,9 @@
 #include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
 
+// ImtCore includes
+#include <imtgql/imtgql.h>
+
 
 namespace imtgql
 {
@@ -16,7 +19,9 @@ namespace imtgql
 
 CGqlContext::CGqlContext()
 	:m_userInfoPtr(nullptr)
+	,m_productInfoPtr(nullptr)
 	,m_isTenantOwner(false)
+	,m_areImpliedPermissionsResolved(false)
 {
 }
 
@@ -36,6 +41,8 @@ void CGqlContext::SetProductId(const QByteArray& productId)
 {
 	if (m_productId != productId){
 		istd::CChangeNotifier changeNotifier(this);
+
+		ResetImpliedPermissions();
 
 		m_productId = productId;
 	}
@@ -149,6 +156,8 @@ void CGqlContext::SetUserInfo(const imtauth::IUserInfo* userInfoPtr)
 	if (m_userInfoPtr.GetPtr() != userInfoPtr){
 		istd::CChangeNotifier changeNotifier(this);
 
+		ResetImpliedPermissions();
+
 		if (userInfoPtr != nullptr){
 			istd::IChangeableUniquePtr clonedUserPtr = userInfoPtr->CloneMe();
 			if (clonedUserPtr.IsValid()){
@@ -165,6 +174,62 @@ void CGqlContext::SetUserInfo(const imtauth::IUserInfo* userInfoPtr)
 }
 
 
+imtlic::IProductInfo* CGqlContext::GetProductInfo() const
+{
+	return m_productInfoPtr;
+}
+
+
+void CGqlContext::SetProductInfo(imtlic::IProductInfo* productInfoPtr)
+{
+	if (m_productInfoPtr != productInfoPtr){
+		istd::CChangeNotifier changeNotifier(this);
+
+		ResetImpliedPermissions();
+
+		m_productInfoPtr = productInfoPtr;
+	}
+}
+
+
+QByteArrayList CGqlContext::GetTenantPermissions() const
+{
+	return m_tenantPermissions;
+}
+
+
+void CGqlContext::SetTenantPermissions(const QByteArrayList& permissions)
+{
+	if (m_tenantPermissions != permissions){
+		istd::CChangeNotifier changeNotifier(this);
+
+		ResetImpliedPermissions();
+
+		m_tenantPermissions = permissions;
+	}
+}
+
+
+imtauth::IUserInfo::FeatureIds CGqlContext::GetImpliedPermissions() const
+{
+	QMutexLocker locker(&m_impliedPermissionsMutex);
+
+	if (!m_areImpliedPermissionsResolved){
+		m_areImpliedPermissionsResolved = true;
+
+		if (m_userInfoPtr.IsValid()){
+			const imtauth::IUserInfo::FeatureIds userPermissions = m_productId.isEmpty()
+						? m_userInfoPtr->GetPermissions()
+						: m_userInfoPtr->GetPermissions(m_productId);
+
+			m_impliedPermissions = imtgql::CollectImpliedPermissions(*this, userPermissions);
+		}
+	}
+
+	return m_impliedPermissions;
+}
+
+
 bool CGqlContext::IsTenantOwner() const
 {
 	return m_isTenantOwner;
@@ -177,6 +242,22 @@ void CGqlContext::SetIsTenantOwner(bool isTenantOwner)
 		istd::CChangeNotifier changeNotifier(this);
 
 		m_isTenantOwner = isTenantOwner;
+	}
+}
+
+
+QByteArrayList CGqlContext::GetOrganizationPermissions() const
+{
+	return m_organizationPermissions;
+}
+
+
+void CGqlContext::SetOrganizationPermissions(const QByteArrayList& permissions)
+{
+	if (m_organizationPermissions != permissions){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_organizationPermissions = permissions;
 	}
 }
 
@@ -268,9 +349,16 @@ bool CGqlContext::CopyFrom(const IChangeable &object, CompatibilityMode /*mode*/
 		m_tenantId = sourcePtr->m_tenantId;
 		m_productId = sourcePtr->m_productId;
 		m_headers = sourcePtr->m_headers;
+		m_productInfoPtr = sourcePtr->m_productInfoPtr;
+		m_tenantPermissions = sourcePtr->m_tenantPermissions;
 		m_isTenantOwner = sourcePtr->m_isTenantOwner;
+		m_organizationPermissions = sourcePtr->m_organizationPermissions;
 
 		SetUserInfo(sourcePtr->m_userInfoPtr.GetPtr());
+
+		// Resolved anew for the copy instead of being taken over: the source may
+		// be answering GetImpliedPermissions() on another thread right now.
+		ResetImpliedPermissions();
 
 		return true;
 	}
@@ -302,10 +390,26 @@ bool CGqlContext::ResetData(CompatibilityMode /*mode*/)
 	m_userId.clear();
 	m_tenantId.clear();
 	m_headers.clear();
+	m_productInfoPtr = nullptr;
+	m_tenantPermissions.clear();
 	m_isTenantOwner = false;
+	m_organizationPermissions.clear();
 	m_userInfoPtr.Reset();
 
+	ResetImpliedPermissions();
+
 	return true;
+}
+
+
+// private methods
+
+void CGqlContext::ResetImpliedPermissions()
+{
+	QMutexLocker locker(&m_impliedPermissionsMutex);
+
+	m_impliedPermissions.clear();
+	m_areImpliedPermissionsResolved = false;
 }
 
 

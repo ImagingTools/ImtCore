@@ -13,24 +13,40 @@ module.exports = {
         return true
     },
 
+    // Searches from the item with active focus, like Qt
     __activateTabFocusTarget(target, forward){
         if(!target || typeof target.nextItemInFocusChain !== 'function') return false
 
-        let current = target
-        let steps = 0
+        let next = target.nextItemInFocusChain(forward)
+        if(!next || next === target) return false
 
-        while(steps < 1000){
-            current = current.nextItemInFocusChain(forward)
-            if(!current || current === target) return false
+        return this.__activateKeyNavigationTarget(next)
+    },
 
-            if(current.activeFocusOnTab && current.enabled && current.visible){
-                return this.__activateKeyNavigationTarget(current)
-            }
+    // Makes the DOM keyboard event look like a Qt KeyEvent for QML handlers:
+    // adds 'modifiers' and converts letter/digit keys to Qt key codes (Qt.Key_A etc.)
+    __prepareKeyEvent(e){
+        let modifiers = QtEnums.NoModifier
+        if (e.shiftKey) modifiers |= QtEnums.ShiftModifier
+        if (e.ctrlKey) modifiers |= QtEnums.ControlModifier
+        if (e.altKey) modifiers |= QtEnums.AltModifier
+        if (e.metaKey) modifiers |= QtEnums.MetaModifier
+        e.modifiers = modifiers
 
-            steps++
+        if (typeof e.key !== 'string' || e.key.length !== 1) return
+
+        let qtKey = 0
+        let upperKey = e.key.toUpperCase()
+        if ((upperKey >= 'A' && upperKey <= 'Z') || (upperKey >= '0' && upperKey <= '9')) {
+            qtKey = upperKey.charCodeAt(0)
+        } else if ((e.ctrlKey || e.metaKey || e.altKey) && /^Key[A-Z]$/.test(e.code)) {
+            // Non-latin keyboard layouts: shortcuts like Ctrl+A use the physical key
+            qtKey = e.code.charCodeAt(3)
         }
 
-        return false
+        if (qtKey) {
+            Object.defineProperty(e, 'key', { value: qtKey, configurable: true })
+        }
     },
 
     add: function (obj) {
@@ -44,6 +60,8 @@ module.exports = {
     init: function () {
         window.onkeydown = (e) => {
             let elements = JQApplication.focusTree
+            let domKey = e.key
+            this.__prepareKeyEvent(e)
 
             for (let obj of elements) {
                 if (e.key === 'ArrowLeft') {
@@ -137,18 +155,28 @@ module.exports = {
                     obj['Keys.spacePressed'](e)
                     if (e.accepted) return
                 }
+                if (e.key === 'Escape') {
+                    e.accepted = false
+                    obj['Keys.escapePressed'](e)
+                    if (e.accepted) return
+                }
             }
 
             if (e.key === 'Tab') {
-                let tabTarget = elements.length > 0 ? elements[elements.length - 1] : null
+                // The focus tree starts with the item that has active focus
+                let tabTarget = elements.length > 0 ? elements[0] : null
+                if(!e.shiftKey && tabTarget && tabTarget.__insertTab && tabTarget.__insertTab()){
+                    e.preventDefault()
+                    return
+                }
                 if (this.__activateTabFocusTarget(tabTarget, !e.shiftKey)){
                     e.preventDefault()
                     return
                 }
             }
 
-            if (e.key === 'Shift' || e.key === 'Control' || e.key === 'Alt') return
-            let key = e.key
+            if (domKey === 'Shift' || domKey === 'Control' || domKey === 'Alt') return
+            let key = domKey
             if (e.key === 'ArrowLeft') key = 'Left'
             if (e.key === 'ArrowRight') key = 'Right'
             if (e.key === 'ArrowUp') key = 'Up'

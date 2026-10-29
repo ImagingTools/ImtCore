@@ -59,7 +59,7 @@ Item {
 				anchors.margins: Style.paddingM
 				text: messageBubbleRoot.content
 				font.pixelSize: Style.fontSizeS
-				color: messageBubbleRoot.isOwn ? "white" : Style.imaginToolsAccentColor
+				color: messageBubbleRoot.isOwn ? Style.highlightedTextColor : Style.imaginToolsAccentColor
 				wrapMode: Text.Wrap
 			}
 		}
@@ -84,6 +84,7 @@ Item {
 						anchors.centerIn: parent
 						text: modelData
 						font.pixelSize: Style.fontSizeXS
+						color: Style.textColor
 					}
 				}
 			}

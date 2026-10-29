@@ -161,15 +161,6 @@ void CUserGroupChangeGeneratorComp::CompareProductRoles(
 					QT_TRANSLATE_NOOP("Attribute", "Role"),
 					inOld ? oldGroupInfo.GetRoles(productId) : QByteArrayList(),
 					inNew ? newGroupInfo.GetRoles(productId) : QByteArrayList());
-
-		InsertListChanges(
-					documentChangeCollection,
-					"AddPermission",
-					"RemovePermission",
-					"Permission",
-					QT_TRANSLATE_NOOP("Attribute", "Permission"),
-					inOld ? oldGroupInfo.GetLocalPermissions(productId) : QByteArrayList(),
-					inNew ? newGroupInfo.GetLocalPermissions(productId) : QByteArrayList());
 	}
 
 	InsertListChanges(

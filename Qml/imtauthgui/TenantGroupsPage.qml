@@ -22,10 +22,12 @@ SimpleCollectionPage {
 	documentManager: apiClient ? apiClient.groupDocumentManager : null
 	objectTypeId: apiClient ? apiClient.groupObjectTypeId : ""
 	dataProvider: apiClient ? apiClient.groupListDataProvider : null
-	managePermissionIds: ["EditOrganizationGroup", "ChangeOrganizationGroup", "RemoveOrganizationGroup", "AddOrganizationGroup"]
-	createPermissionIds: ["AddOrganizationGroup", "EditOrganizationGroup"]
-	editPermissionIds: ["ChangeOrganizationGroup", "EditOrganizationGroup"]
-	deletePermissionIds: ["RemoveOrganizationGroup", "EditOrganizationGroup"]
+	columnIds: ["title", "description"]
+	columnNames: [qsTr("Name"), qsTr("Description")]
+	managePermissionIds: ["/OrganizationManagement/Groups/Edit/Change", "/OrganizationManagement/Groups/Edit/Remove", "/OrganizationManagement/Groups/Edit/Add"]
+	createPermissionIds: ["/OrganizationManagement/Groups/Edit/Add"]
+	editPermissionIds: ["/OrganizationManagement/Groups/Edit/Change"]
+	deletePermissionIds: ["/OrganizationManagement/Groups/Edit/Remove"]
 	function removeItems(ids) {
 		if (groupsPage.apiClient)
 			groupsPage.apiClient.removeGroups(ids)

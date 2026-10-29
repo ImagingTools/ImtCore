@@ -2,14 +2,17 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6556" Description="ACF"/>
-            <Version Id="1" Number="2449" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="396034" Description="Qt Framework"/>
+            <Version Id="0" Number="6601" Description="ACF"/>
+            <Version Id="1" Number="2459" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="ObjectCollectionChangeNotifier" X="550" Y="525" Note=""/>
-        <Element ComponentName="RemoteRepository" X="525" Y="300" Note=""/>
+        <Element ComponentName="GqlObjectCollection" X="600" Y="150" Note=""/>
+        <Element ComponentName="GqlObjectCollectionDelegate" X="250" Y="150" Note=""/>
+        <Element ComponentName="ObjectCollectionChangeNotifier" X="975" Y="150" Note=""/>
+        <Element ComponentName="ObjectCollectionSubscriber" X="625" Y="400" Note=""/>
+        <Element ComponentName="ParamSetRepresentation" X="175" Y="400" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

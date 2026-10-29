@@ -43,6 +43,15 @@ class AbstractItemModel {
             }
         }
 
+        if(typeof index === 'number'){
+            Object.defineProperty(model, '__rowIndex', {
+                value: index,
+                writable: true,
+                enumerable: false,
+                configurable: true,
+            })
+        }
+
         let proxy
         proxy = new Proxy(model, { 
             has(target, key){
@@ -83,7 +92,10 @@ class AbstractItemModel {
                 }
 
                 if(key === 'index') {
-                    if(!(key in target)) return parent.data.indexOf(proxy)
+                    if(!(key in target)) {
+                        if(typeof target.__rowIndex === 'number') return target.__rowIndex
+                        return parent.data.indexOf(proxy)
+                    }
                 }
                 if(key === '__self') {
                     return target

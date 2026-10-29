@@ -17,8 +17,8 @@ Rectangle {
 	// Backdrop
 	Rectangle {
 		anchors.fill: parent
-		color: "black"
-		opacity: 0.45
+		color: Style.overlayBackgroundColor
+		opacity: 0.5
 
 		MouseArea {
 			anchors.fill: parent
@@ -65,7 +65,9 @@ Rectangle {
 
 				Rectangle {
 					width: parent.width
+					height: Style.controlHeightM
 					radius: Style.radiusS
+					color: Style.baseColor
 					border.color: nameField.activeFocus ? Style.imaginToolsAccentColor : Style.borderColor2
 
 					TextInput {
@@ -73,7 +75,7 @@ Rectangle {
 						anchors.fill: parent
 						anchors.margins: Style.paddingS
 						font.pixelSize: Style.fontSizeS
-						color: Style.imaginToolsAccentColor
+						color: Style.textColor
 						clip: true
 						verticalAlignment: TextInput.AlignVCenter
 
@@ -81,6 +83,7 @@ Rectangle {
 							anchors.fill: parent
 							text: qsTr("Conversation name")
 							font.pixelSize: Style.fontSizeS
+							color: Style.placeHolderTextColor
 							verticalAlignment: Text.AlignVCenter
 							visible: nameField.text.length === 0
 						}
@@ -118,13 +121,14 @@ Rectangle {
 				spacing: Style.paddingS
 
 				Rectangle {
-					width: Style.buttonWidthM
+					width: cancelText.width + Style.paddingL * 2
 					height: Style.buttonHeightM
 					radius: Style.radiusS
 					color: "transparent"
 					border.color: Style.borderColor2
 
 					Text {
+						id: cancelText
 						anchors.centerIn: parent
 						text: qsTr("Cancel")
 						font.pixelSize: Style.fontSizeS
@@ -140,11 +144,14 @@ Rectangle {
 				}
 
 				Rectangle {
-					width: Style.buttonWidthM
+					width: createText.width + Style.paddingL * 2
 					height: Style.buttonHeightM
 					radius: Style.radiusS
+					color: Style.imaginToolsAccentColor
+					opacity: nameField.text.trim().length > 0 ? 1 : 0.5
 
 					Text {
+						id: createText
 						anchors.centerIn: parent
 						text: qsTr("Create")
 						font.pixelSize: Style.fontSizeS

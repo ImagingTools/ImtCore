@@ -325,6 +325,9 @@ class Item extends QtObject {
     }
 
     forceActiveFocus(){
+        let request = (JQApplication.focusRequestCount || 0) + 1
+        JQApplication.focusRequestCount = request
+
         JQApplication.focusTreeSuppressed++
         try {
             // Qt: setFocus(this) first, then ancestor FocusScopes.
@@ -343,6 +346,15 @@ class Item extends QtObject {
             JQApplication.focusTreeSuppressed--
         }
 
+        // A focus handler of this item gave the focus on (forceActiveFocus of another item): as in Qt, that later
+        // request stays, and only a focus scope keeps its focus flag for the item it contains
+        if(JQApplication.focusRequestCount !== request){
+            if(!(this instanceof JQModules.QtQuick.FocusScope)){
+                this.focus = false
+            }
+            return
+        }
+
         JQApplication.setFocusTree(this.__getTree(), {
             owner: this,
             immediate: true
@@ -359,23 +371,6 @@ class Item extends QtObject {
         }
 
         return tree
-    }
-
-    __setFocusTree(tree){
-        for(let child of this.children){
-            if(tree.indexOf(child) < 0){
-                if(!(typeof child.__isListViewDelegateItem === 'function' && child.__isListViewDelegateItem())){
-                    child.focus = false
-                }
-            }
-
-            // Don't recurse into FocusScopes — they manage their own children's
-            // internal focus state. In Qt, items inside a FocusScope don't fire
-            // focusChanged when the scope loses focus.
-            if(!(child instanceof JQModules.QtQuick.FocusScope)){
-                child.__setFocusTree(tree)
-            }
-        }
     }
 
     SLOT_parentChanged(oldValue, newValue){
@@ -741,25 +736,6 @@ class Item extends QtObject {
         }
     }
 
-    __getFirstFocusableDescendant(){
-        let current = this
-
-        while(current && current.children && current.children.length){
-            let nextChild = null
-            for(let child of current.children){
-                if(child && !child.__destroyed){
-                    nextChild = child
-                    break
-                }
-            }
-
-            if(!nextChild) break
-            current = nextChild
-        }
-
-        return current
-    }
-
     __getLastFocusableDescendant(){
         let current = this
 
@@ -780,11 +756,14 @@ class Item extends QtObject {
         return current
     }
 
+    // Pre-order: the first child comes next, then the next sibling. Jumping to the deepest
+    // descendant skipped every item that has children of its own (combo boxes, check boxes...).
     __getNextPreorderItem(){
         if(this.children && this.children.length){
-            let firstChild = this.__getFirstFocusableDescendant()
-            if(firstChild && firstChild !== this){
-                return firstChild
+            for(let child of this.children){
+                if(child && !child.__destroyed){
+                    return child
+                }
             }
         }
 
@@ -800,7 +779,7 @@ class Item extends QtObject {
             for(let i = index + 1; i < siblings.length; i++){
                 let sibling = siblings[i]
                 if(sibling && !sibling.__destroyed){
-                    return sibling.__getFirstFocusableDescendant ? sibling.__getFirstFocusableDescendant() : sibling
+                    return sibling
                 }
             }
 
@@ -827,12 +806,33 @@ class Item extends QtObject {
         return parent
     }
 
-    nextItemInFocusChain(forward = true){
-        if(forward){
-            return this.__getNextPreorderItem()
-        } else {
-            return this.__getPreviousPreorderItem()
+    __isShownInTree(){
+        for(let current = this; current; current = current.parent){
+            if(current.visible === false) return false
         }
+        return true
+    }
+
+    // As in Qt: the next item of the tab focus chain (activeFocusOnTab, enabled and shown),
+    // the chain being a ring; the item itself when it is the only one
+    nextItemInFocusChain(forward = true){
+        let root = this
+        while(root.parent) root = root.parent
+
+        let current = this
+        for(let steps = 0; steps < 100000; steps++){
+            current = forward ? current.__getNextPreorderItem() : current.__getPreviousPreorderItem()
+            if(!current){
+                current = forward ? root : root.__getLastFocusableDescendant()
+            }
+            if(current === this) return this
+
+            if(current.activeFocusOnTab && current.enabled && current.__isShownInTree()){
+                return current
+            }
+        }
+
+        return this
     }
 
     __destroy(){

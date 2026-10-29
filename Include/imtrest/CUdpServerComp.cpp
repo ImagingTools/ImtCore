@@ -88,7 +88,9 @@ bool CUdpServerComp::SendResponse(const QByteArray& requestId, ConstResponsePtr&
 
 			connect(sender, &CUdpSender::sended, this, &CUdpServerComp::SendedResponse);
 
-			return sender->SendResponse(response);
+			QByteArray data = response->GetData();
+
+			return sender->SendData(data);
 		}
 	}
 
@@ -98,20 +100,11 @@ bool CUdpServerComp::SendResponse(const QByteArray& requestId, ConstResponsePtr&
 
 bool CUdpServerComp::SendRequest(const QByteArray& requestId, ConstRequestPtr& request) const
 {
-	if (m_requests.GetCount() == 0){
-		return false;
-	}
+	Q_UNUSED(requestId)
+	Q_UNUSED(request)
 
-	for (int i = 0; i < m_requests.GetCount(); i++){
-		if (m_requests.GetAt(i)->GetRequestId() == requestId){
-			CUdpSender* sender = new CUdpSender(m_requests.GetAt(i));
-
-			connect(sender, &CUdpSender::sended, this, &CUdpServerComp::SendedResponse);
-
-			return sender->SendRequest(request);
-		}
-	}
-
+	// Sending outbound requests is not supported over this response-oriented UDP transport
+	// (matches the previous behavior, where the underlying transport only ever accepted responses).
 	return false;
 }
 

@@ -46,7 +46,11 @@ public:
 	virtual bool IsMember(const QByteArray& userId, const QByteArray& tenantId) const override;
 
 private:
-	bool IsOwnerMembership(const QByteArray& membershipId) const;
+	/**
+		Ids of the memberships that may match the user and/or the tenant (an empty id matches any).
+		The caller verifies the loaded membership: a collection that does not know the filter returns every id.
+	*/
+	QByteArrayList GetCandidateMembershipIds(const QByteArray& userId, const QByteArray& tenantId) const;
 	bool CleanupTenantAssignedUserData(const QByteArray& userId, const QByteArray& tenantId);
 
 	I_REF(imtbase::IObjectCollection, m_membershipCollectionCompPtr);

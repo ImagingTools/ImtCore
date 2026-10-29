@@ -25,7 +25,7 @@ DecoratorBase{
         radius: width;
         color: "transparent";
         border.width: 2;
-        border.color: !decorator.baseElement ? "transparent" : decorator.baseElement.checked ? decorator.selectedColor : "gray";
+        border.color: !decorator.baseElement ? "transparent" : decorator.baseElement.checked ? decorator.selectedColor : decorator.color;
 
         Rectangle{
             id: innerRec;
@@ -48,6 +48,7 @@ DecoratorBase{
         font.pixelSize: decorator.fontSize;
         font.bold: true;
         font.family: Style.fontFamily;
+        color: Style.textColor;
 
         text: decorator.baseElement ? qsTr(decorator.baseElement.text): "";
     }

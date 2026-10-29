@@ -161,6 +161,11 @@ I_EXPORT_COMPONENT(
 			"Collection Import Controller");
 
 I_EXPORT_COMPONENT(
+			DocumentShareController,
+			"GraphQL controller of the document shares of an organization",
+			"Document Share Controller");
+
+I_EXPORT_COMPONENT(
 			CollectionImportJobParamsFiller,
 			"Collection import job params filler",
 			"Collection Import Job Params Filler");

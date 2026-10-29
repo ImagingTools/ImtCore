@@ -16,7 +16,7 @@ import imtbaseComplexCollectionFilterSdl 1.0
 RemoteCollectionView {
 	id: container
 
-	property string context: ""
+	property string permissionPath: ""
 	collectionId: "Tickets"
 	gqlGetListCommandId: ImtdeskImtDeskSdlCommandIds.s_ticketsList
 	documentCollectionFilter: null
@@ -35,6 +35,36 @@ RemoteCollectionView {
 		table.setColumnContentById(TicketItemDataTypeMetaInfo.s_createdAt, createdAtCellDelegateComp)
 		table.setColumnContentById(TicketItemDataTypeMetaInfo.s_status, statusCellDelegateComp)
 		table.setColumnContentById(TicketItemDataTypeMetaInfo.s_priority, priorityCellDelegateComp)
+
+		if (table.headers.getItemsCount() > 0){
+			container.applyColumnWidths()
+		}
+	}
+
+	// The number is short and the title is what people read: fixed widths for the rest, title takes what is left.
+	function applyColumnWidths(){
+		ticketTableDecoratorModel.clear()
+		let cellWidthModel = ticketTableDecoratorModel.addTreeModel("CellWidth")
+		for (let i = 0; i < table.headers.getItemsCount(); i++){
+			let headerId = String(table.getHeaderId(i))
+			let width = -1
+			if (headerId === String(TicketItemDataTypeMetaInfo.s_number)){
+				width = Style.buttonWidthXL
+			}
+			else if (headerId === String(TicketItemDataTypeMetaInfo.s_status) || headerId === String(TicketItemDataTypeMetaInfo.s_priority)){
+				width = Style.sizeHintXXXS
+			}
+			else if (headerId === String(TicketItemDataTypeMetaInfo.s_assignee) || headerId === String(TicketItemDataTypeMetaInfo.s_createdAt)){
+				width = Style.sizeHintXXS
+			}
+			let index = cellWidthModel.insertNewItem()
+			cellWidthModel.setData("Width", width, index)
+		}
+		table.tableDecorator = ticketTableDecoratorModel
+	}
+
+	TreeItemModel {
+		id: ticketTableDecoratorModel
 	}
 
 
@@ -209,6 +239,9 @@ RemoteCollectionView {
 				DocumentRepresentationController {
 					id: root
 
+					// The context types a new ticket can link to only come with the server representation.
+					requestRepresentationOnCreate: true
+
 					representationModel: TicketData {
 						m_status: "Open"
 						m_ticketType: "SupportRequest"
@@ -237,7 +270,7 @@ RemoteCollectionView {
 
 					property DocumentId documentIdInput: DocumentId {}
 					property GqlSdlRequestSender getTicketRequest: GqlSdlRequestSender {
-						context: container.context
+						permissionPath: container.permissionPath
 						gqlCommandId: ImtdeskTicketCollectionDocumentServiceSdlCommandIds.s_getTicketRepresentation
 						sdlObjectComp: Component {
 							TicketData {
@@ -255,7 +288,7 @@ RemoteCollectionView {
 
 					property UpdateTicketInput updateTicketInput: UpdateTicketInput {}
 					property GqlSdlRequestSender updateTicketRequest: GqlSdlRequestSender {
-						context: container.context
+						permissionPath: container.permissionPath
 						gqlCommandId: ImtdeskTicketCollectionDocumentServiceSdlCommandIds.s_updateTicketFromRepresentation
 						requestType: 1
 						sdlObjectComp: Component {
@@ -263,6 +296,9 @@ RemoteCollectionView {
 								onFinished: {
 									if (m_status === "Success"){
 										root.documentUpdated(root.documentId)
+									}
+									else{
+										root.updateDocumentFailed(root.documentId, m_message)
 									}
 								}
 							}

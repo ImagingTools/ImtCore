@@ -26,19 +26,27 @@ class Rectangle extends Item {
     }
 
     __updateGradient(){
+        // Qt ignores the color of a rectangle with a gradient: it is painted again once the gradient is gone
+        this.SLOT_colorChanged(this.color, this.color)
+
+        if(!this.gradient){
+            this.__setDOMStyle({ backgroundImage: '' })
+            return
+        }
+
         if(this.gradient) {
             let style = []
             
             for(let stop of this.gradient.stops){
-                style.push(`${stop.color} ${stop.position*100}%`)
+                style.push(`${Color.toCss(stop.color)} ${stop.position*100}%`)
             }
             if(this.gradient.orientation == Gradient.Vertical){
                 this.__setDOMStyle({
-                    background: `linear-gradient(180deg, ${style.join(',')})`
+                    backgroundImage: `linear-gradient(180deg, ${style.join(',')})`
                 })
             } else {
                 this.__setDOMStyle({
-                    background: `linear-gradient(90deg, ${style.join(',')})`
+                    backgroundImage: `linear-gradient(90deg, ${style.join(',')})`
                 })
             }
         }
@@ -57,7 +65,7 @@ class Rectangle extends Item {
     }
 
     SLOT_colorChanged(oldValue, newValue){
-        let alphaMultiplier = newValue === 'transparent' ? 0 : this.JQOpacityMultiplier
+        let alphaMultiplier = newValue === 'transparent' || this.gradient ? 0 : this.JQOpacityMultiplier
         let rgba = Color.getRGBA(this.__proxy, 'color', this.__self.constructor.meta.color)
         this.__setDOMStyle({
             opacity: this.JQOpacityMultiplier > 0 ? 1 : 0,
@@ -74,7 +82,7 @@ class Rectangle extends Item {
     }
 
     SLOT_JQOpacityMultiplierChanged(oldValue, newValue){
-        let alphaMultiplier = this.color === 'transparent' ? 0 : newValue
+        let alphaMultiplier = this.color === 'transparent' || this.gradient ? 0 : newValue
         let rgba = Color.getRGBA(this.__proxy, 'color', this.__self.constructor.meta.color)
         this.__setDOMStyle({
             opacity: newValue > 0 ? 1 : 0,

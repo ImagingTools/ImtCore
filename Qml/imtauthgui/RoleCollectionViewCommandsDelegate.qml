@@ -5,6 +5,7 @@ import imtdocgui 1.0
 
 DocumentCollectionViewDelegate {
 	id: container;
+	revisionsPermissionPath: "/Administration/Roles/Revisions";
 	
 	removeDialogTitle: qsTr("Deleting a role");
 	removeMessage: qsTr("Delete the selected role ?");

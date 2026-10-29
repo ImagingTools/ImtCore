@@ -55,6 +55,18 @@ template <class T>
 			const QMap<QString, QString> targetPathList = CSdlTools::CalculateTargetCppFilesFromSchemaParams(schemaParams, argumentParser, true);
 			const QString headerFilePath = QDir::cleanPath(targetPathList[ISdlProcessArgumentsParser::s_headerFileType]);
 			sdlEntry.SetTargetHeaderFilePath(headerFilePath);
+			if (targetPathList.contains(ISdlProcessArgumentsParser::s_fwdHeaderFileType)){
+				const QString fwdHeaderFilePath = QDir::cleanPath(targetPathList[ISdlProcessArgumentsParser::s_fwdHeaderFileType]);
+				sdlEntry.SetFwdHeaderTargetFilePath(fwdHeaderFilePath);
+			}
+			if (targetPathList.contains(ISdlProcessArgumentsParser::s_objectHeaderFileType)){
+				const QString objectHeaderFilePath = QDir::cleanPath(targetPathList[ISdlProcessArgumentsParser::s_objectHeaderFileType]);
+				sdlEntry.SetObjectTargetHeaderFilePath(objectHeaderFilePath);
+			}
+			if (targetPathList.contains(ISdlProcessArgumentsParser::s_objectSourceFileType)){
+				const QString objectSourceFilePath = QDir::cleanPath(targetPathList[ISdlProcessArgumentsParser::s_objectSourceFileType]);
+				sdlEntry.SetObjectTargetSourceFilePath(objectSourceFilePath);
+			}
 		}
 
 		sdlEntry.SetExternal(isExternal);
@@ -737,6 +749,18 @@ bool CGqlSchemaParserComp::ValidateSchema()
 				const QMap<QString, QString> targetPathList = CalculateTargetCppFilesFromSchemaParams(*m_schemaParamsPtr, *m_argumentParserCompPtr, true);
 				const QString headerFilePath = QDir::cleanPath(targetPathList[ISdlProcessArgumentsParser::s_headerFileType]);
 				sdlRequest.SetTargetHeaderFilePath(headerFilePath);
+				if (targetPathList.contains(ISdlProcessArgumentsParser::s_fwdHeaderFileType)){
+					const QString fwdHeaderFilePath = QDir::cleanPath(targetPathList[ISdlProcessArgumentsParser::s_fwdHeaderFileType]);
+					sdlRequest.SetFwdHeaderTargetFilePath(fwdHeaderFilePath);
+				}
+				if (targetPathList.contains(ISdlProcessArgumentsParser::s_objectHeaderFileType)){
+					const QString objectHeaderFilePath = QDir::cleanPath(targetPathList[ISdlProcessArgumentsParser::s_objectHeaderFileType]);
+					sdlRequest.SetObjectTargetHeaderFilePath(objectHeaderFilePath);
+				}
+				if (targetPathList.contains(ISdlProcessArgumentsParser::s_objectSourceFileType)){
+					const QString objectSourceFilePath = QDir::cleanPath(targetPathList[ISdlProcessArgumentsParser::s_objectSourceFileType]);
+					sdlRequest.SetObjectTargetSourceFilePath(objectSourceFilePath);
+				}
 			}
 
 			sdlRequest.SetExternal(isExternal);

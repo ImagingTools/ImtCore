@@ -8,9 +8,48 @@ const { waitForStable } = require('./stability');
 const DEFAULT_TIMEOUT = 10000;
 // Short, separate bound for value READS, so an unbounded evaluate auto-wait can't hang the test.
 const READ_TIMEOUT = 1000;
+// Extra patience given ONCE `timeout` has already run out, but only while the page is demonstrably
+// still busy (a GraphQL round-trip queued behind others under worker contention, or a websocket
+// frame just landed) - not a flat extension, since a page that has gone genuinely quiet without the
+// target ever appearing is not going to change its mind by waiting longer.
+const SETTLE_GRACE_TIMEOUT = 20000;
+const SETTLE_RETRY_TIMEOUT = 2000;
 
 function fmtPath(path) {
   return Array.isArray(path) ? path.join(' > ') : String(path);
+}
+
+/**
+ * Wait for the DOM and network to actually go quiet (bounded by SETTLE_GRACE_TIMEOUT) and give
+ * `locator` one more, short look. Used once an initial wait has already failed.
+ * @param {import('@playwright/test').Page} page
+ * @param {import('@playwright/test').Locator} locator
+ */
+async function settleAndRecheck(page, locator) {
+  await waitForStable(page, { timeout: SETTLE_GRACE_TIMEOUT });
+  try {
+    await locator.waitFor({ state: 'visible', timeout: SETTLE_RETRY_TIMEOUT });
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
+/**
+ * Wait for `locator` to become visible within `timeout`; on failure, wait for the DOM and network to
+ * actually go quiet and give it one more, short look before giving up. Returns whether it ended up
+ * visible.
+ * @param {import('@playwright/test').Page} page
+ * @param {import('@playwright/test').Locator} locator
+ * @param {number} timeout
+ */
+async function waitVisibleWithGrace(page, locator, timeout) {
+  try {
+    await locator.waitFor({ state: 'visible', timeout });
+    return true;
+  } catch (_) {
+    return settleAndRecheck(page, locator);
+  }
 }
 
 /**
@@ -23,9 +62,7 @@ function fmtPath(path) {
 async function requireVisible(page, path, opts = {}) {
   const timeout = opts.timeout || DEFAULT_TIMEOUT;
   const locator = dom.byPath(page, path);
-  try {
-    await locator.waitFor({ state: 'visible', timeout });
-  } catch (_) {
+  if (!(await waitVisibleWithGrace(page, locator, timeout))) {
     const what = opts.what || 'element';
     throw new Error(
       [`GUI target not found: [${fmtPath(path)}] (${what}) after ${timeout}ms`, await dom.describePath(page, path)].join(
@@ -45,14 +82,17 @@ async function requireVisible(page, path, opts = {}) {
 async function click(page, path, opts = {}) {
   const self = await requireVisible(page, path, opts);
   const mouse = dom.mouseAreaOf(page, path);
+  const timeout = opts.timeout || DEFAULT_TIMEOUT;
   let target = mouse;
   try {
-    await mouse.waitFor({ state: 'visible', timeout: opts.timeout || DEFAULT_TIMEOUT });
+    await mouse.waitFor({ state: 'visible', timeout });
   } catch (_) {
-    // No MouseArea child means the element itself is clickable; one that exists but never became
-    // visible is still a failure.
-    if ((await dom.countAny(page, [...path, 'MouseArea'])) > 0) {
-      const timeout = opts.timeout || DEFAULT_TIMEOUT;
+    // No MouseArea child means the element itself is clickable, not a failure. One that EXISTS but
+    // never became visible may simply be arriving late under worker contention - give it the same
+    // settle-and-recheck grace as requireVisible before treating it as broken.
+    if ((await dom.countAny(page, [...path, 'MouseArea'])) === 0) {
+      target = self;
+    } else if (!(await settleAndRecheck(page, mouse))) {
       throw new Error(
         [
           `GUI click target has a MouseArea that never became visible: [${fmtPath(path)}] after ${timeout}ms`,
@@ -60,7 +100,6 @@ async function click(page, path, opts = {}) {
         ].join('\n')
       );
     }
-    target = self;
   }
   await target.scrollIntoViewIfNeeded();
   const box = await target.boundingBox();

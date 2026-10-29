@@ -8,9 +8,7 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="CheckPermissionOr" X="825" Y="450" Note=""/>
         <Element ComponentName="DocumentRevisionController" X="550" Y="225" Note=""/>
-        <Element ComponentName="RevisionPermissions" X="300" Y="450" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

@@ -34,7 +34,7 @@ public:
 public Q_SLOTS:
 	void HandleReadyRead();
 	void Disconnected();
-	void OnSendResponse(ConstResponsePtr response);
+	void OnSendResponse(QByteArray data);
 	void Abort();
 	void TimeOut();
 	void OnHandleSslErrors(QList<QSslError> errorList);

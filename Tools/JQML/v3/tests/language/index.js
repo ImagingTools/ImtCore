@@ -204,69 +204,34 @@ test('loadConfig with absolute path keeps inherited json absolute', () => {
     assert.ok(lang.configDirs.some(dir => path.normalize(dir) === path.normalize(childDir)), String(lang.configDirs))
 })
 
-test('infers IMTCOREDIR from ProLife config without process env', () => {
-    const { inferProjectEnv } = require('../../compiler/language')
-    const configPath = path.resolve(__dirname, '../../../../../ProLife/Qml/Include/prolifeqml/prolife.json')
-    if (!require('fs').existsSync(configPath)) return
-    const saved = {
-        IMTCOREDIR: process.env.IMTCOREDIR,
-        IMTCOREDIR_BUILD: process.env.IMTCOREDIR_BUILD,
-        PROLIFEDIR: process.env.PROLIFEDIR,
-        TARGETNAME: process.env.TARGETNAME,
-    }
-    delete process.env.IMTCOREDIR
-    delete process.env.IMTCOREDIR_BUILD
-    delete process.env.PROLIFEDIR
-    delete process.env.TARGETNAME
-    try {
-        const inferred = inferProjectEnv([configPath])
-        assert.ok(inferred.IMTCOREDIR, 'IMTCOREDIR')
-        assert.ok(inferred.PROLIFEDIR, 'PROLIFEDIR')
-        assert.ok(inferred.TARGETNAME, 'TARGETNAME')
-        assert.ok(require('fs').existsSync(path.join(inferred.IMTCOREDIR, 'Qml', 'web', 'imtcore.json')))
-        assert.ok(require('fs').existsSync(path.join(inferred.PROLIFEDIR, 'Qml', 'Include', 'prolifeqml', 'prolife.json')))
-    } finally {
-        for (const key of Object.keys(saved)) {
-            if (saved[key] == null) delete process.env[key]
-            else process.env[key] = saved[key]
-        }
-    }
-})
-
-test('ProLife config without env finds Acf and Item anchors', () => {
+test('config placeholders come from the given environment', () => {
     const fs = require('fs')
-    const configPath = path.resolve(__dirname, '../../../../../ProLife/Qml/Include/prolifeqml/prolife.json')
-    const webPath = path.resolve(__dirname, '../../../../../ProLife/Qml/Include/prolifeqml/ProLifeWeb.qml')
-    if (!fs.existsSync(configPath) || !fs.existsSync(webPath)) return
-    const saved = {
-        IMTCOREDIR: process.env.IMTCOREDIR,
-        IMTCOREDIR_BUILD: process.env.IMTCOREDIR_BUILD,
-        PROLIFEDIR: process.env.PROLIFEDIR,
-        TARGETNAME: process.env.TARGETNAME,
-    }
-    delete process.env.IMTCOREDIR
-    delete process.env.IMTCOREDIR_BUILD
-    delete process.env.PROLIFEDIR
-    delete process.env.TARGETNAME
-    try {
-        const lang = new LanguageService({ enginePath })
-        lang.setWorkspaceFolders([path.resolve(__dirname, '../../../../../ProLife')])
-        lang.loadConfig(configPath)
-        lang.indexQmlFile(webPath)
-        lang.indexQmlFile(path.resolve(__dirname, '../../../../../ProLife/Qml/Include/prolifeqml/ProLifeMain.qml'))
-        const hasAcf = [...lang.localTypes.values()].some(entry => entry.module === 'Acf')
-        assert.ok(hasAcf, 'Acf module was not indexed from inferred IMTCOREDIR')
-        const diags = lang.getDiagnostics(webPath, fs.readFileSync(webPath, 'utf8'))
-        const messages = diags.map(item => item.message)
-        assert.ok(!messages.some(msg => msg === 'Acf is not found'), messages.join(' | '))
-        assert.ok(!messages.some(msg => msg === 'com.imtcore.imtqml is not found'), messages.join(' | '))
-        assert.ok(!messages.some(msg => msg === 'anchors is not found'), messages.join(' | '))
-    } finally {
-        for (const key of Object.keys(saved)) {
-            if (saved[key] == null) delete process.env[key]
-            else process.env[key] = saved[key]
-        }
-    }
+    const os = require('os')
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'jqml-env-'))
+    const modDir = path.join(tmp, 'mods')
+    fs.mkdirSync(modDir)
+    fs.writeFileSync(path.join(modDir, 'qmldir'), 'module samplemod\nCard 1.0 Card.qml\n')
+    fs.writeFileSync(path.join(modDir, 'Card.qml'), 'import QtQuick\nItem { }\n')
+    const configPath = path.join(tmp, 'app.json')
+    fs.writeFileSync(configPath, JSON.stringify({
+        includes: [],
+        dirs: ['${JQML_SAMPLE_ROOT}/mods'],
+    }))
+
+    const unresolved = new LanguageService({ enginePath })
+    unresolved.loadConfig(configPath)
+    assert.ok((unresolved.configIssues || []).some(item => item.severity === 'error' && item.message.indexOf('was not resolved') >= 0), JSON.stringify(unresolved.configIssues))
+    assert.ok(![...unresolved.localTypes.values()].some(entry => entry.module === 'samplemod'))
+
+    const lang = new LanguageService({ enginePath, extraEnv: { JQML_SAMPLE_ROOT: tmp } })
+    lang.loadConfig(configPath)
+    const errors = (lang.configIssues || []).filter(item => item.severity === 'error')
+    assert.deepStrictEqual(errors, [], errors.map(item => item.message).join(' | '))
+    assert.ok([...lang.localTypes.values()].some(entry => entry.module === 'samplemod'))
+
+    const missing = new LanguageService({ enginePath })
+    missing.loadConfig(path.join(tmp, 'missing.json'))
+    assert.ok((missing.configIssues || []).some(item => item.severity === 'error' && item.message.indexOf('was not found') >= 0))
 })
 
 test('does not complete engine names starting with __', () => {
@@ -552,6 +517,118 @@ test('ProgressBar Style.sizeHintXS goes to StyleBase', () => {
     const locs = lang.getDefinition(bar, text, offset)
     assert.ok(locs.length, 'sizeHintXS definition in ProgressBar')
     assert.ok(locs.some(loc => /StyleBase\.qml$/i.test(String(loc.filePath).replace(/\\/g, '/')) || /Style\.qml$/i.test(String(loc.filePath).replace(/\\/g, '/'))), JSON.stringify(locs))
+})
+
+test('id used before its declaration and dotted import', () => {
+    const lang = service()
+    const file = path.join(fixtures, 'IdBeforeDecl.qml')
+    const text = [
+        'import QtQuick',
+        'import com.example.plugin 1.0',
+        '',
+        'Item {',
+        '    Thing {',
+        '        Component.onCompleted: box.width = 1',
+        '    }',
+        '    Rectangle {',
+        '        id: box',
+        '        width: 2',
+        '    }',
+        '}',
+        '',
+    ].join('\n')
+    const locs = lang.getDefinition(file, text, text.indexOf('box.width'))
+    assert.ok(locs.length, 'box definition')
+    const declLine = text.slice(0, text.indexOf('id: box')).split('\n').length - 1
+    assert.strictEqual(locs[0].range.start.line, declLine)
+
+    const missing = lang.getDiagnostics(file, text).find(item => item.message.indexOf('com.example.plugin') >= 0)
+    assert.ok(!missing, 'dotted cpp-style import is not an error when it is outside the config')
+
+    const hover = lang.getHover(file, text, text.indexOf('plugin'))
+    assert.ok(hover && String(hover.detail).indexOf('com.example.plugin') >= 0, hover && hover.detail)
+})
+
+test('cpp qml module is found from the configured environment', () => {
+    const fs = require('fs')
+    const os = require('os')
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'jqml-cpp-'))
+    const include = path.join(root, 'Include')
+    fs.mkdirSync(include)
+    fs.writeFileSync(path.join(include, 'Register.cpp'), 'qmlRegisterType<demo::Thing>("com.example.plugin", 1, 0, "Thing");\n')
+    const lang = new LanguageService({ enginePath, extraEnv: { JQML_CPP_ROOT: root } })
+    const file = path.join(root, 'Main.qml')
+    const text = [
+        'import QtQuick',
+        'import com.example.plugin 1.0',
+        'import MissingPlain',
+        'Item {',
+        '    Thing { id: thing }',
+        '}',
+        '',
+    ].join('\n')
+    const messages = lang.getDiagnostics(file, text).map(item => item.message)
+    assert.ok(messages.indexOf('com.example.plugin is not found') < 0, messages.join('; '))
+    assert.ok(messages.indexOf('Thing is not found') < 0, messages.join('; '))
+    assert.ok(messages.indexOf('MissingPlain is not found') >= 0, messages.join('; '))
+    const locs = lang.getDefinition(file, text, text.indexOf('com.example.plugin'))
+    assert.ok(locs.length, 'cpp module definition')
+    assert.ok(/Register\.cpp$/i.test(String(locs[0].filePath).replace(/\\/g, '/')), locs[0].filePath)
+})
+
+test('import after a dotted module opens that module qmldir', () => {
+    const fs = require('fs')
+    const os = require('os')
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'jqml-mod-'))
+    const mod = path.join(root, 'imtgui')
+    const sub = path.join(mod, 'Application')
+    fs.mkdirSync(sub, { recursive: true })
+    fs.writeFileSync(path.join(mod, 'qmldir'), 'module imtgui\n\nWidget 1.0 Application/Widget.qml\n')
+    fs.writeFileSync(path.join(sub, 'Widget.qml'), 'import QtQuick\nItem {}\n')
+    const lang = new LanguageService({ enginePath })
+    lang.indexQmldir(path.join(mod, 'qmldir'))
+    const file = path.join(root, 'Main.qml')
+    const text = [
+        'import com.imtcore.imtqml 1.0',
+        'import imtgui 1.0',
+        'Item { Widget {} }',
+        '',
+    ].join('\n')
+    const locs = lang.getDefinition(file, text, text.indexOf('imtgui'))
+    assert.ok(locs.length, 'imtgui definition')
+    assert.ok(/imtgui\/qmldir$/i.test(String(locs[0].filePath).replace(/\\/g, '/')), locs[0].filePath)
+    assert.strictEqual(locs[0].range.start.line, 0)
+    assert.strictEqual(locs[0].range.start.character, 'module '.length)
+})
+
+test('declaration site of id property and signal is the definition', () => {
+    const lang = service()
+    const file = path.join(fixtures, 'Declare.qml')
+    const lines = ['import QtQuick', 'Item {', '    id: root']
+    for (let i = 0; i < 180; i++) lines.push('    // pad')
+    lines.push('    property int count: 1', '    signal tapped()', '    function bump() {}', '}')
+    const text = lines.join('\r\n') + '\r\n'
+    function target(needle) {
+        const locs = lang.getDefinition(file, text, text.indexOf(needle))
+        assert.ok(locs.length, needle)
+        const line = text.split(/\n/)[locs[0].range.start.line].replace(/\r$/, '')
+        return line.slice(locs[0].range.start.character, locs[0].range.end.character)
+    }
+    assert.strictEqual(target('id:'), 'root')
+    assert.strictEqual(target('root'), 'root')
+    assert.strictEqual(target('property'), 'count')
+    assert.strictEqual(target('count'), 'count')
+    assert.strictEqual(target('signal'), 'tapped')
+    assert.strictEqual(target('tapped'), 'tapped')
+    assert.strictEqual(target('function'), 'bump')
+    assert.strictEqual(target('bump'), 'bump')
+    const countRefs = lang.getReferences(file, text, text.indexOf('property int count'))
+    assert.ok(countRefs.length >= 1, 'references from the property declaration')
+    const countText = countRefs.map(loc => {
+        const line = text.split(/\n/)[loc.range.start.line].replace(/\r$/, '')
+        return line.slice(loc.range.start.character, loc.range.end.character)
+    })
+    assert.ok(countText.indexOf('count') >= 0, countText.join(','))
 })
 
 console.log('')

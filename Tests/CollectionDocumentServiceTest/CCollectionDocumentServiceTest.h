@@ -455,7 +455,7 @@ public:
 		QByteArray documentId;
 		QByteArray documentTypeId;
 		QString documentName;
-		QUrl documentUrl;
+		QByteArray documentSourceRef;
 		bool isDirty;
 		bool accepted;
 	};
@@ -493,7 +493,7 @@ public:
 		record.documentId = eventPtr->GetDocumentId();
 		record.documentTypeId = eventPtr->GetDocumentTypeId();
 		record.documentName = eventPtr->GetDocumentName();
-		record.documentUrl = eventPtr->GetDocumentUrl();
+		record.documentSourceRef = eventPtr->GetDocumentSourceRef();
 		record.isDirty = eventPtr->IsDocumentDirty();
 
 		if (m_shouldReject) {
@@ -550,12 +550,16 @@ public:
 	void SetSingleCopyMode(bool enabled) { m_singleCopyMode = enabled; }
 
 	// Expose protected methods for testing
+	using imtdoc::CDocumentServiceBase::WorkingDocument;
 	using imtdoc::CDocumentServiceBase::FindDocument;
 	using imtdoc::CDocumentServiceBase::ValidateInputParams;
-	using imtdoc::CDocumentServiceBase::ObjectIdToUrl;
-	using imtdoc::CDocumentServiceBase::m_userDocuments;
+	using imtdoc::CDocumentServiceBase::InsertDocument;
+	using imtdoc::CDocumentServiceBase::CloseDocumentInternal;
+	using imtdoc::CDocumentServiceBase::m_documents;
+	using imtdoc::CDocumentServiceBase::m_userDocumentIds;
 	using imtdoc::CDocumentServiceBase::m_mutex;
-	using imtdoc::CDocumentServiceBase::m_sharedDocuments;
+	using imtdoc::CDocumentServiceBase::GetDocumentUserIds;
+	using imtdoc::CCollectionDocumentServiceBase::GetSourceRefFromUrl;
 
 protected:
 	// reimplemented (CCollectionDocumentServiceBase)
@@ -732,6 +736,8 @@ private slots:
 	void SaveDocumentNewDocumentTest();
 	void SaveDocumentExistingDocumentTest();
 	void SaveDocumentSaveAsTest();
+	void SaveDocumentNewDocumentUpdatesUrlTest();
+	void SaveDocumentSaveAsUpdatesUrlTest();
 	void SaveDocumentInvalidUserTest();
 	void SaveDocumentInvalidDocumentTest();
 	void SaveDocumentWhileLoadingTest();
@@ -775,9 +781,13 @@ private slots:
 	void ValidateInputParamsSuccessTest();
 	void ValidateInputParamsInvalidUserTest();
 	void ValidateInputParamsInvalidDocumentTest();
+	void ValidateInputParamsForeignDocumentTest();
 
-	// ObjectIdToUrl tests
-	void ObjectIdToUrlTest();
+	// Document storage tests
+	void DocumentStorageInsertRemoveTest();
+
+	// Document URL tests
+	void GetSourceRefFromUrlTest();
 
 	// Async document loading completion tests
 	void CreateNewDocumentAsyncCompletionTest();
@@ -795,6 +805,9 @@ private slots:
 	void SingleCopyCloseBothUsersTest();
 	void SingleCopySaveUpdatesAllTest();
 	void SingleCopySetDocumentNameUpdatesAllTest();
+	void SingleCopySaveAsUpdatesAllTest();
+	void SingleCopyReopenBySameUserTest();
+	void SingleCopyOneDocumentForAllUsersTest();
 
 private:
 	/**

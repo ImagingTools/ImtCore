@@ -661,7 +661,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::ListObjects(
 		return QJsonObject();
 	}
 
-	// GetElementsCount() returns the total count across all pages (from COUNT(*) OVER()),
+	// GetElementsCount() returns the total count across all pages,
 	// not just the number of records in the current page.
 	int elementsCount = objectCollectionIterator->GetElementsCount();
 
@@ -1075,7 +1075,8 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::ImportObject(const imtgql
 		objectUuid = identifiableObjectPtr->GetObjectUuid();
 	}
 
-	if (m_objectCollectionCompPtr->GetElementIds().contains(objectUuid)){
+	imtbase::IObjectCollection::DataPtr existingDataPtr;
+	if (m_objectCollectionCompPtr->GetObjectData(objectUuid, existingDataPtr)){
 		errorMessage = QStringLiteral("Unable to import object with ID: '%1' to the collection. Error: The object already exists inside the collection").arg(objectUuid);
 		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
 		QFile::remove(filePathTmp);

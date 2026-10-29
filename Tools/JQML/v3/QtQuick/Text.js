@@ -7,6 +7,7 @@ const Real = require('../QtQml/Real')
 const Geometry = require('../QtQml/Geometry')
 const Font = require('../QtQml/Font')
 const Signal = require('../QtQml/Signal')
+const RichTextSanitizer = require('../core/RichTextSanitizer')
 
 const tags = ['<a>','<abbr>','<address>','<area>','<article>','<aside>','<audio>','<b>','<base>','<bdi>','<bdo>','<blockquote>','<body>','<br>','<button>','<canvas>','<caption>','<cite>','<code>','<col>','<colgroup>','<data>','<datalist>','<dd>','<del>','<details>','<dfn>','<dialog>','<div>','<dl>','<dt>','<em>','<embed>','<fieldset>','<figcaption>','<figure>','<footer>','<form>','<h1>','<h2>','<h3>','<h4>','<h5>','<h6>','<head>','<header>','<hr>','<html>','<i>','<iframe>','<img>','<input>','<ins>','<kbd>','<label>','<legend>','<li>','<link>','<main>','<map>','<mark>','<meta>','<meter>','<nav>','<noscript>','<object>','<ol>','<optgroup>','<option>','<output>','<p>','<param>','<picture>','<pre>','<progress>','<q>','<ruby>','<rb>','<rt>','<rtc>','<rp>','<s>','<samp>','<script>','<section>','<select>','<small>','<source>','<span>','<strong>','<style>','<sub>','<summary>','<sup>','<table>','<tbody>','<td>','<template>','<textarea>','<tfoot>','<th>','<thead>','<time>','<title>','<tr>','<track>','<u>','<ul>','<var>','<video>','<wbr>']
 const regexp = /<[^<>]+>/g
@@ -121,21 +122,33 @@ class Text extends Item {
         // let textMetrics = JQApplication.TextController.measureText(this.text, this.font, this.width, this.wrapMode, this.textFormat, this.elide)
 
         if(isHTML){
-            this.__impl.innerHTML = this.text.replaceAll('<br>', '\r')
+            this.__impl.innerHTML = RichTextSanitizer.sanitize(this.text.replaceAll('<br>', '\r'))
         } else {
             this.__impl.innerText = this.text.replaceAll('<br>', '\r')
         }
 
-        //temp
-        if(this.wrapMode === Text.NoWrap && this.elide === Text.ElideNone && !isHTML){
+        // Single-line elide is CSS text-overflow. DOM measurement here forces a
+        // layout of the whole page once per Text.
+        let singleLine = this.wrapMode === Text.NoWrap || this.wrapMode === undefined
+        let eliding = this.elide === Text.ElideLeft || this.elide === Text.ElideMiddle || this.elide === Text.ElideRight
+        if(singleLine && !isHTML && (this.elide === Text.ElideNone || this.elide === undefined || eliding)){
             let textMetrics = JQApplication.TextController.measureTextFast(this.text, this.font)
+            let width = textMetrics.width
+            let maxWidth = this.width__prevent ? this.width : 0
+            if(eliding && maxWidth > 0 && width > maxWidth) width = maxWidth
 
-            this.contentWidth = textMetrics.width
+            // CSS elides only the end; the start and the middle are elided here
+            if((this.elide === Text.ElideLeft || this.elide === Text.ElideMiddle) && maxWidth > 0 && textMetrics.width > maxWidth){
+                this.__impl.innerText = this.__elidedText(maxWidth)
+            }
+
+            this.contentWidth = width
             this.contentHeight = textMetrics.height
 
             Geometry.setAuto(this.__self, 'height', textMetrics.height, this.__self.constructor.meta.height)
-            Geometry.setAuto(this.__self, 'width', textMetrics.width, this.__self.constructor.meta.width)
+            Geometry.setAuto(this.__self, 'width', width, this.__self.constructor.meta.width)
 
+            // As in Qt, the implicit width is the whole text; only the painted (content) width is elided
             this.implicitWidth = textMetrics.width
             this.implicitHeight = textMetrics.height
         } else {
@@ -188,6 +201,31 @@ class Text extends Item {
         super.SLOT_visibleChanged(oldValue, newValue)
 
         JQApplication.updateLater(this)
+    }
+
+    // The longest "…tail" (ElideLeft) or "head…tail" (ElideMiddle) that fits the width
+    __elidedText(maxWidth){
+        let text = this.text
+        let candidate = (count)=>{
+            if(this.elide === Text.ElideLeft) return '…' + text.slice(text.length - count)
+            return text.slice(0, Math.ceil(count / 2)) + '…' + text.slice(text.length - Math.floor(count / 2))
+        }
+
+        let best = '…'
+        let low = 0
+        let high = text.length
+        while(low <= high){
+            let middle = (low + high) >> 1
+            let value = candidate(middle)
+            if(JQApplication.TextController.measureTextFast(value, this.font).width <= maxWidth){
+                best = value
+                low = middle + 1
+            } else {
+                high = middle - 1
+            }
+        }
+
+        return best
     }
 
     __updateElide(){

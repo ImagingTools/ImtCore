@@ -1,9 +1,15 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtlicgql/CProductCollectionControllerComp.h>
 
+// Qt includes
+#include <QtCore/QFile>
+#include <QtCore/QMap>
+#include <QtCore/QTemporaryDir>
+
 // ACF includes
 #include <istd/TDelPtr.h>
 #include <iprm/CParamsSet.h>
+#include <idoc/IDocumentMetaInfo.h>
 
 // ImtCore includes
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
@@ -12,6 +18,7 @@
 #include <imtlic/CLicenseDefinition.h>
 #include <imtlic/CProductInfo.h>
 #include <imtlic/IFeatureInfo.h>
+#include <imtlicgql/imtlicgql.h>
 
 
 namespace imtlicgql
@@ -26,49 +33,141 @@ sdl::V1_0::imtbase::CImportObjectPayload CProductCollectionControllerComp::OnImp
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::V1_0::imtbase::CImportObjectPayload response = BaseClass::OnImportObject(importObjectRequest, gqlRequest, errorMessage);
-	if (response.success){
-		bool success = *response.success;
-		if (success){
-			QByteArray objectId;
-			if (response.objectId){
-				objectId = *response.objectId;
-			}
+	if (!CanImportProduct(importObjectRequest, errorMessage)){
+		SendErrorMessage(0, errorMessage, "CProductCollectionControllerComp");
 
-			imtbase::IObjectCollection::DataPtr dataPtr;
-			if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
-				imtlic::IProductInfo* productInfoPtr = dynamic_cast<imtlic::IProductInfo*>(dataPtr.GetPtr());
-				if (productInfoPtr != nullptr){
-					imtbase::IObjectCollection* featureCollectionPtr = productInfoPtr->GetFeatures();
-					if (featureCollectionPtr != nullptr){
-						imtbase::ICollectionInfo::Ids featureIds = m_featureCollectionCompPtr->GetElementIds();
-						imtbase::ICollectionInfo::Ids productFeatureIds = featureCollectionPtr->GetElementIds();
-						for (const imtbase::ICollectionInfo::Id& productFeatureId : productFeatureIds){
-							imtbase::IObjectCollection::DataPtr productFeatureDataPtr;
-							if (featureCollectionPtr->GetObjectData(productFeatureId, productFeatureDataPtr)){
-								const imtlic::IFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::IFeatureInfo*>(productFeatureDataPtr.GetPtr());
-								if (featureInfoPtr != nullptr){
-									if (!featureIds.contains(productFeatureId)){
-										QByteArray result = m_featureCollectionCompPtr->InsertNewObject(QByteArrayLiteral("Feature"), "", "", featureInfoPtr, productFeatureId);
-										if (result.isEmpty()){
-											SendWarningMessage(0, QStringLiteral("Unable to insert new feature with ID '%1' from product serialization").arg(productFeatureId), "CProductControllerComp");
-										}
-									}
-									else{
-										if (!m_featureCollectionCompPtr->SetObjectData(productFeatureId, *featureInfoPtr)){
-											SendWarningMessage(0, QStringLiteral("Unable to update feature with ID '%1' from product serialization").arg(productFeatureId), "CProductControllerComp");
-										}
-									}
-								}
-							}
-						}
-					}
-				}
+		sdl::V1_0::imtbase::CImportObjectPayload response;
+		response.success = false;
+
+		return response;
+	}
+
+	sdl::V1_0::imtbase::CImportObjectPayload response = BaseClass::OnImportObject(importObjectRequest, gqlRequest, errorMessage);
+	if (response.success && *response.success && response.objectId){
+		WriteImportedFeatures(*response.objectId);
+	}
+
+	return response;
+}
+
+
+void CProductCollectionControllerComp::WriteImportedFeatures(const QByteArray& objectId) const
+{
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	imtlic::IProductInfo* productInfoPtr = nullptr;
+	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
+		productInfoPtr = dynamic_cast<imtlic::IProductInfo*>(dataPtr.GetPtr());
+	}
+
+	imtbase::IObjectCollection* featureCollectionPtr = productInfoPtr != nullptr ? productInfoPtr->GetFeatures() : nullptr;
+	if (featureCollectionPtr == nullptr){
+		return;
+	}
+
+	const imtbase::ICollectionInfo::Ids catalogFeatureIds = m_featureCollectionCompPtr->GetElementIds();
+	for (const imtbase::ICollectionInfo::Id& productFeatureId : featureCollectionPtr->GetElementIds()){
+		imtbase::IObjectCollection::DataPtr productFeatureDataPtr;
+		if (!featureCollectionPtr->GetObjectData(productFeatureId, productFeatureDataPtr)){
+			continue;
+		}
+
+		const imtlic::IFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::IFeatureInfo*>(productFeatureDataPtr.GetPtr());
+		if (featureInfoPtr == nullptr){
+			continue;
+		}
+
+		if (!catalogFeatureIds.contains(productFeatureId)){
+			if (m_featureCollectionCompPtr->InsertNewObject(QByteArrayLiteral("Feature"), "", "", featureInfoPtr, productFeatureId).isEmpty()){
+				SendWarningMessage(0, QStringLiteral("Unable to insert new feature with ID '%1' from product serialization").arg(productFeatureId), "CProductCollectionControllerComp");
+			}
+		}
+		else if (!m_featureCollectionCompPtr->SetObjectData(productFeatureId, *featureInfoPtr)){
+			SendWarningMessage(0, QStringLiteral("Unable to update feature with ID '%1' from product serialization").arg(productFeatureId), "CProductCollectionControllerComp");
+		}
+	}
+}
+
+
+bool CProductCollectionControllerComp::CanImportProduct(
+			const sdl::V1_0::imtbase::CImportObjectGqlRequest& importObjectRequest,
+			QString& errorMessage) const
+{
+	sdl::V1_0::imtbase::ImportObjectRequestArguments arguments = importObjectRequest.GetRequestedArguments();
+	if (!arguments.input || !arguments.input->fileData || !arguments.input->mimeType){
+		return true;
+	}
+
+	imtbase::CMimeType mimeType;
+	const int index = GetMimeTypeIndex(*arguments.input->mimeType);
+	if (index < 0 || index >= m_filePersistenceCompPtr.GetCount() || m_filePersistenceCompPtr[index] == nullptr || !mimeType.FromString(*arguments.input->mimeType)){
+		// The import itself reports what is wrong with the request.
+		return true;
+	}
+
+	QTemporaryDir tempDir;
+	const QString filePath = tempDir.path() + QStringLiteral("/Product.") + GetExtensionFromMimeType(mimeType);
+	QFile file(filePath);
+	if (!file.open(QIODevice::WriteOnly)){
+		return true;
+	}
+	file.write(QByteArray::fromBase64(*arguments.input->fileData));
+	file.close();
+
+	imtlic::CIdentifiableProductInfo importedProduct;
+	if (m_filePersistenceCompPtr[index]->LoadFromFile(importedProduct, filePath) != ifile::IFilePersistence::OS_OK){
+		return true;
+	}
+
+	// One product id names one product: the import creates products, it does not replace them.
+	const QByteArray productId = importedProduct.GetProductId();
+	for (const imtbase::ICollectionInfo::Id& objectId : m_objectCollectionCompPtr->GetElementIds()){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
+			const imtlic::IProductInfo* productInfoPtr = dynamic_cast<const imtlic::IProductInfo*>(dataPtr.GetPtr());
+			if (productInfoPtr != nullptr && productInfoPtr->GetProductId() == productId){
+				errorMessage = QStringLiteral("The product '%1' already exists").arg(QString::fromUtf8(productId));
+
+				return false;
 			}
 		}
 	}
 
-	return response;
+	// A root feature already in the catalog under another uuid would give two features one path.
+	QMap<QByteArray, QByteArray> catalogRootIds;
+	for (const imtbase::ICollectionInfo::Id& catalogFeatureId : m_featureCollectionCompPtr->GetElementIds()){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (m_featureCollectionCompPtr->GetObjectData(catalogFeatureId, dataPtr)){
+			const imtlic::IFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::IFeatureInfo*>(dataPtr.GetPtr());
+			if (featureInfoPtr != nullptr){
+				catalogRootIds.insert(featureInfoPtr->GetFeatureId(), catalogFeatureId);
+			}
+		}
+	}
+
+	QStringList conflicts;
+	imtbase::IObjectCollection* featureCollectionPtr = importedProduct.GetFeatures();
+	if (featureCollectionPtr != nullptr){
+		for (const imtbase::ICollectionInfo::Id& productFeatureId : featureCollectionPtr->GetElementIds()){
+			imtbase::IObjectCollection::DataPtr dataPtr;
+			if (!featureCollectionPtr->GetObjectData(productFeatureId, dataPtr)){
+				continue;
+			}
+
+			const imtlic::IFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::IFeatureInfo*>(dataPtr.GetPtr());
+			const QByteArray catalogId = featureInfoPtr != nullptr ? catalogRootIds.value(featureInfoPtr->GetFeatureId()) : QByteArray();
+			if (!catalogId.isEmpty() && catalogId != productFeatureId){
+				conflicts << QString::fromUtf8(featureInfoPtr->GetFeatureId());
+			}
+		}
+	}
+
+	if (!conflicts.isEmpty()){
+		errorMessage = QStringLiteral("The feature catalog already has these root features under another uuid: %1").arg(conflicts.join(QStringLiteral(", ")));
+
+		return false;
+	}
+
+	return true;
 }
 
 
@@ -137,7 +236,12 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (requestInfo.items.isTypeIdRequested){
-		representationObject.typeId = QByteArray(m_objectCollectionCompPtr->GetObjectTypeId(objectId));
+		QByteArray typeId = objectCollectionIterator.GetObjectTypeId();
+		if (typeId.isEmpty()){
+			typeId = m_objectCollectionCompPtr->GetObjectTypeId(objectId);
+		}
+
+		representationObject.typeId = typeId;
 	}
 
 	if (requestInfo.items.isProductIdRequested){
@@ -153,7 +257,17 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (requestInfo.items.isDescriptionRequested){
-		QString description = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::ElementInfoType::EIT_DESCRIPTION).toString();
+		// Same lookup order as the collection's EIT_DESCRIPTION, but from the already fetched record
+		QString description;
+		idoc::MetaInfoPtr collectionMetaInfoPtr = objectCollectionIterator.GetCollectionMetaInfo();
+		if (collectionMetaInfoPtr.IsValid()){
+			description = collectionMetaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION).toString();
+		}
+
+		if (description.isEmpty() && metaInfo.IsValid()){
+			description = metaInfo->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION).toString();
+		}
+
 		representationObject.description = description;
 	}
 
@@ -486,22 +600,13 @@ bool CProductCollectionControllerComp::FillObjectFromRepresentation(
 	QByteArrayList featureIds;
 	if (!features.isEmpty()){
 		featureIds = features.split(';');
-
-		for (const QByteArray& featureId : featureIds){
-			imtbase::IObjectCollection::DataPtr dataPtr;
-			if (m_featureCollectionCompPtr->GetObjectData(featureId, dataPtr)){
-				const imtlic::IFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::IFeatureInfo*>(dataPtr.GetPtr());
-				if (featureInfoPtr != nullptr){
-					productInfoPtr->AddFeature(featureId, *featureInfoPtr);
-				}
-			}
-		}
+		featureIds.removeAll(QByteArray());
 	}
 
-	// Kept out of the loop above on purpose. Every id in "features" is a feature
-	// document id and is looked up as one; the ids below are nodes inside such a
-	// document and are never resolved against the collection. featureId is only
-	// matched against what the product actually has, to drop stale entries.
+	// Every id in "features" is a feature document id and is looked up as one;
+	// the ids below are nodes inside such a document and are never resolved
+	// against the collection. featureId is only matched against what the product
+	// actually has, to drop stale entries.
 	imtlic::IProductInfo::OptionalFeatureInfos optionalFeatures;
 	if (productDataRepresentation.optionalFeatures){
 		for (const sdl::V1_0::imtlic::CProductOptionalFeature& optionalFeature : productDataRepresentation.optionalFeatures->ToList()){
@@ -528,7 +633,36 @@ bool CProductCollectionControllerComp::FillObjectFromRepresentation(
 		}
 	}
 
-	productInfoPtr->SetOptionalFeatures(optionalFeatures);
+	// A feature is worth nothing without what it requires, so the product is
+	// completed here rather than trusted to arrive complete: the editor resolves
+	// the same requirements while the user works, but a product also arrives from
+	// an older client, from another one, or from a direct request - and a product
+	// missing a required feature is one whose generated product info silently
+	// drops that requirement (\see CProductInfoFileGeneratorComp).
+	const ProductFeatureClosure featureClosure = CompleteProductFeatures(
+			*m_featureCollectionCompPtr,
+			featureIds,
+			optionalFeatures);
+
+	for (const QByteArray& unresolvedRequirement : featureClosure.unresolvedRequirements){
+		SendWarningMessage(
+				0,
+				QStringLiteral("Product '%1' requires '%2', which no feature of the catalog carries")
+						.arg(name, QString::fromUtf8(unresolvedRequirement)),
+				"CProductCollectionControllerComp");
+	}
+
+	for (const QByteArray& featureId : featureClosure.featureIds){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (m_featureCollectionCompPtr->GetObjectData(featureId, dataPtr)){
+			const imtlic::IFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::IFeatureInfo*>(dataPtr.GetPtr());
+			if (featureInfoPtr != nullptr){
+				productInfoPtr->AddFeature(featureId, *featureInfoPtr);
+			}
+		}
+	}
+
+	productInfoPtr->SetOptionalFeatures(featureClosure.optionalFeatures);
 
 	return true;
 }

@@ -46,7 +46,7 @@ Rectangle {
 		anchors.centerIn: parent
 		text: ticketBadgeRoot.badgeLabel
 		font.pixelSize: Style.fontSizeM
-		color: "white"
+		color: Style.highlightedTextColor
 		font.bold: true
 	}
 }

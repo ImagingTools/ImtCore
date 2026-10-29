@@ -80,7 +80,13 @@ public:
 		FO_ARRAY_HAS_ALL,
 		FO_ARRAY_NOT_HAS_ALL,
 		FO_ARRAY_ILIKE_ANY,
-		FO_ARRAY_NOT_ILIKE_ANY
+		FO_ARRAY_NOT_ILIKE_ANY,
+
+		/**
+		* Field value begins with the filter value.
+		* Applies to string fields; the case is ignored where the database can (as for FO_CONTAINS).
+		*/
+		FO_STARTS_WITH
 	};
 	I_DECLARE_ENUM(FieldOperation,
 		FO_EQUAL,
@@ -97,7 +103,8 @@ public:
 		FO_ARRAY_HAS_ALL,
 		FO_ARRAY_NOT_HAS_ALL,
 		FO_ARRAY_ILIKE_ANY,
-		FO_ARRAY_NOT_ILIKE_ANY
+		FO_ARRAY_NOT_ILIKE_ANY,
+		FO_STARTS_WITH
 	);
 
 	enum LogicalOperation

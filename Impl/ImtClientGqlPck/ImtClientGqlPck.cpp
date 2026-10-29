@@ -31,6 +31,11 @@ I_EXPORT_COMPONENT(
 			"GraphQL Client Sync Adapter");
 
 I_EXPORT_COMPONENT(
+			GqlHeartbeatChecker,
+			"Connection status of a GraphQL server, checked by periodic GetApplicationInfo requests",
+			"GraphQL Heartbeat Connection Status Checker");
+
+I_EXPORT_COMPONENT(
 			GraphQLClientEngine,
 			"GraphQLClientEngine",
 			"GraphQL Client Engine");

@@ -26,6 +26,8 @@ void CStandardAccountMenuComp::OnGuiCreated()
 
 	LogoutFrame->installEventFilter(this);
 	PreferencesFrame->installEventFilter(this);
+	PreferencesFrame->setVisible(false);
+	Splitter2->setVisible(false);
 
 	if (m_loginCompPtr.IsValid()){
 		m_loginObserver.RegisterObject(m_loginCompPtr.GetPtr(), &CStandardAccountMenuComp::OnLoginUpdate);
@@ -97,6 +99,9 @@ void CStandardAccountMenuComp::OnLoginUpdate(const istd::IChangeable::ChangeSet&
 		userName.replace(" ", "");
 
 		Email->setVisible(false);
+
+		PreferencesFrame->setVisible(m_preferencesDialogCompPtr.IsValid());
+		Splitter2->setVisible(m_preferencesDialogCompPtr.IsValid());
 	}
 }
 

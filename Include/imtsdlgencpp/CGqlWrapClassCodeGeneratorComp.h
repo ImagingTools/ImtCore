@@ -59,10 +59,11 @@ public:
 private:
 	bool ProcessHeaderClassFile(const imtsdl::CSdlRequest& sdlRequest, QIODevice* headerDevicePtr, const iprm::IParamsSet* paramsPtr) const;
 	bool ProcessSourceClassFile(const imtsdl::CSdlRequest& sdlRequest, QIODevice* sourceDevicePtr, const iprm::IParamsSet* paramsPtr) const;
-	bool GenerateFieldRequestInfo(QTextStream& stream, const imtsdl::CSdlField& sdlField, uint hIndents = 1, bool createStructDefinition = false) const;
+	/// \c structName is the name of the struct the field info is written into, a type from \c parentTypeIds is not expanded again.
+	bool GenerateFieldRequestInfo(QTextStream& stream, const imtsdl::CSdlField& sdlField, const QString& structName, const QStringList& parentTypeIds = QStringList(), uint hIndents = 1, bool createStructDefinition = false) const;
 	void GenerateRequestParsing(QTextStream& stream, const imtsdl::CSdlRequest& sdlRequest, uint hIndents = 1) const;
 	void GenerateRequestedFieldsParsing(QTextStream& stream, const imtsdl::CSdlField& sdlField, const QString& idListContainerParamName, const QString& gqlObjectVarName, const QString& complexFieldName = QString(), uint hIndents = 1) const;
-	void GenerateRequestedFieldsParsing(QTextStream& stream, const imtsdl::CSdlType& sdlType, const QString& idListContainerParamName, const QString& gqlObjectVarName, const QString& complexFieldName = QString(), uint hIndents = 1) const;
+	void GenerateRequestedFieldsParsing(QTextStream& stream, const imtsdl::CSdlType& sdlType, const QString& idListContainerParamName, const QString& gqlObjectVarName, const QString& complexFieldName = QString(), uint hIndents = 1, const QStringList& processedTypeIds = QStringList()) const;
 	void GenerateRequestSetup(QTextStream& stream, const imtsdl::CSdlRequest& sdlRequest, uint hIndents = 1) const;
 
 	/// Create a unique local variable base name for the nested field path, e.g. "labch.color" -> "labch_color".

@@ -17,8 +17,10 @@
 
 // ImtCore includes
 #include <imtbase/imtbase.h>
+#include <imtauth/imtauth.h>
 #include <imtauth/IUserSettings.h>
 #include <imtgql/CGqlRequestContextManager.h>
+#include <imtgql/imtgql.h>
 
 
 namespace imtservergql
@@ -44,7 +46,12 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 	}
 
 	const QByteArray token = headers.value(imtbase::s_authenticationTokenHeaderId);
-	const QByteArray productId = headers.value(imtbase::s_productIdHeaderId);
+
+	// A server of one product checks its own permissions whatever product the client names.
+	QByteArray productId = m_productInfoCompPtr.IsValid() ? m_productInfoCompPtr->GetProductId() : QByteArray();
+	if (productId.isEmpty()){
+		productId = headers.value(imtbase::s_productIdHeaderId);
+	}
 	QByteArray resolvedUserId;
 	QByteArray tenantId;
 	QByteArrayList scopes;
@@ -72,11 +79,15 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 	gqlContextPtr->SetToken(token);
 	gqlContextPtr->SetHeaders(headers);
 	gqlContextPtr->SetProductId(productId);
+	gqlContextPtr->SetProductInfo(m_productInfoCompPtr.GetPtr());
 	if (isPat){
 		gqlContextPtr->SetScopes(scopes);
 	}
 
-	// Resolve tenant ownership flag. Cached alongside the rest of this token's
+	// Set before the tenant and the user are read: remote collections authenticate their requests with this context.
+	imtgql::CGqlRequestContextManager::SetContext(dynamic_cast<imtgql::IGqlContext*>(gqlContextPtr.GetPtr()));
+
+	// Resolve the scope, the ownership and the organization access of the token, cached for TenantDataCacheLifetime alongside the rest of this token's
 	// resolved claims (see TokenCacheEntry) instead of being looked up live on
 	// every call - CreateGqlContext() runs on every single incoming request AND
 	// every WebSocket subscription (re-)registration, and m_tenantManagerCompPtr
@@ -85,79 +96,117 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 	// the dozens fired right after a tenant switch: subscriptions re-registering,
 	// per-open-document queries, page reload) each re-triggered their own
 	// uncached GetTenant() round-trip - the exact flood seen after SelectTenant.
-	if (m_tenantManagerCompPtr.IsValid() && !tenantId.isEmpty() && !resolvedUserId.isEmpty()){
-		bool isTenantOwner = false;
-		if (!TryGetCachedTenantOwnership(token, isTenantOwner)){
-			imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
-			isTenantOwner = tenantPtr.IsValid() && tenantPtr->GetOwnerId() == resolvedUserId;
-			StoreCachedTenantOwnership(token, isTenantOwner);
+	TokenTenantData tenantData;
+	if (!resolvedUserId.isEmpty()){
+		if (!TryGetCachedTenantData(token, tenantData)){
+			bool isCreator = false;
+			if (m_tenantManagerCompPtr.IsValid() && !tenantId.isEmpty()){
+				imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
+				if (tenantPtr.IsValid()){
+					tenantData.isTenantOwner = tenantPtr->GetOwnerId() == resolvedUserId;
+					isCreator = tenantPtr->GetCreatorId() == resolvedUserId;
+					tenantData.tenantPermissions = tenantPtr->GetTenantPermissions();
+				}
+			}
+			tenantData.hasOrganizationAccess = HasOrganizationAccess(resolvedUserId, tenantId, tenantData.isTenantOwner || isCreator);
+			tenantData.organizationPermissions = GetOrganizationPermissions(resolvedUserId, tenantId, tenantData.isTenantOwner || isCreator);
+			StoreCachedTenantData(token, tenantData);
 		}
 
-		if (isTenantOwner){
+		if (tenantData.isTenantOwner){
 			gqlContextPtr->SetIsTenantOwner(true);
 		}
+
+		gqlContextPtr->SetTenantPermissions(tenantData.tenantPermissions);
+		gqlContextPtr->SetOrganizationPermissions(tenantData.organizationPermissions);
 	}
 
-	// Deny access for disabled accounts (IEC 62443-3-3 SR 1.3): tokens and sessions
-	// of a disabled user become unusable immediately, without removing the account.
 	if (m_userCollectionCompPtr.IsValid() && !resolvedUserId.isEmpty()){
 		imtbase::IObjectCollection::DataPtr userDataPtr;
+		const imtauth::IUserInfo* userInfoPtr = nullptr;
 		if (m_userCollectionCompPtr->GetObjectData(resolvedUserId, userDataPtr)){
-			const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(userDataPtr.GetPtr());
-			if (userInfoPtr != nullptr && !userInfoPtr->IsEnabled()){
-				SetError(
-							error,
-							imtgql::IGqlContextCreator::CCS_FORBIDDEN,
-							QStringLiteral("User account is disabled."));
+			userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(userDataPtr.GetPtr());
+		}
+
+		// Deny access for disabled accounts (IEC 62443-3-3 SR 1.3): tokens and sessions
+		// of a disabled user become unusable immediately, without removing the account.
+		// A failed read is denied too: a remote user service refuses a disabled user's requests.
+		if (userInfoPtr == nullptr || !userInfoPtr->IsEnabled()){
+			imtgql::CGqlRequestContextManager::Clear();
+
+			// A token resolved from the cache may belong to a session closed meanwhile (a tenant switch, a logout):
+			// the remote read is refused for that reason, and the client has to refresh rather than sign out.
+			if (userInfoPtr == nullptr && !isPat && m_slaveJwtSessionControllerCompPtr.IsValid()
+						&& m_slaveJwtSessionControllerCompPtr->ValidateJwt(token) == imtauth::IJwtSessionController::JS_EXPIRED){
+				InvalidateTokenCache(token);
+				SetError(error, imtgql::IGqlContextCreator::CCS_UNAUTHORIZED, QStringLiteral("The session of the token is closed."));
 				return nullptr;
 			}
+
+			SetError(
+						error,
+						imtgql::IGqlContextCreator::CCS_FORBIDDEN,
+						userInfoPtr == nullptr ? QStringLiteral("User account is not available.") : QStringLiteral("User account is disabled."));
+			return nullptr;
 		}
-	}
 
-	imtgql::CGqlRequestContextManager::SetContext(dynamic_cast<imtgql::IGqlContext*>(gqlContextPtr.GetPtr()));
+		if (isPat){
+			// For PAT: restrict the user's permissions to the intersection with the
+			// token's scopes. GetPermissions() now returns role- and local-permission
+			// derived permissions combined, so writing the intersection into local
+			// permissions (after stripping roles/groups) is enough to make
+			// GetPermissions() - the method every permission check in this codebase
+			// actually reads - report exactly that intersection. An empty scope list
+			// yields zero permissions (fail closed), not the full unrestricted user.
+			imtauth::IUserInfo::FeatureIds fullPermissions = userInfoPtr->GetPermissions(productId);
+			imtauth::IUserInfo::FeatureIds effectivePermissions;
+			for (const QByteArray& perm : fullPermissions){
+				if (imtauth::HasPermission(scopes, perm, false)){
+					effectivePermissions.append(perm);
+				}
+			}
 
-	if (m_userCollectionCompPtr.IsValid() && !resolvedUserId.isEmpty()){
-		imtbase::IObjectCollection::DataPtr userDataPtr;
-		if (m_userCollectionCompPtr->GetObjectData(resolvedUserId, userDataPtr)){
-			const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(userDataPtr.GetPtr());
+			istd::IChangeableUniquePtr clonedPtr = userInfoPtr->CloneMe();
+			imtauth::IUserInfo* mutableUserPtr = dynamic_cast<imtauth::IUserInfo*>(clonedPtr.GetPtr());
+			if (mutableUserPtr != nullptr){
+				// Strip roles/groups so no other code path can expand them back into
+				// unrestricted permissions; only the explicit scoped list applies.
+				const QByteArrayList products = mutableUserPtr->GetProducts();
+				for (const QByteArray& prod : products){
+					mutableUserPtr->SetRoles(prod, imtauth::IUserBaseInfo::RoleIds());
+				}
+				const imtauth::IUserGroupInfo::GroupIds groupIds = mutableUserPtr->GetGroups();
+				for (const QByteArray& groupId : groupIds){
+					mutableUserPtr->RemoveFromGroup(groupId);
+				}
+				mutableUserPtr->SetLocalPermissions(productId, effectivePermissions);
 
-			if (isPat && userInfoPtr != nullptr){
-				// For PAT: restrict the user's permissions to the intersection with the
-				// token's scopes. GetPermissions() now returns role- and local-permission
-				// derived permissions combined, so writing the intersection into local
-				// permissions (after stripping roles/groups) is enough to make
-				// GetPermissions() - the method every permission check in this codebase
-				// actually reads - report exactly that intersection. An empty scope list
-				// yields zero permissions (fail closed), not the full unrestricted user.
-				imtauth::IUserInfo::FeatureIds fullPermissions = userInfoPtr->GetPermissions(productId);
-				QSet<QByteArray> scopeSet(scopes.begin(), scopes.end());
-				imtauth::IUserInfo::FeatureIds effectivePermissions;
-				for (const QByteArray& perm : fullPermissions){
-					if (scopeSet.contains(perm)){
-						effectivePermissions.append(perm);
+				gqlContextPtr->SetUserInfo(mutableUserPtr);
+			}
+			else{
+				gqlContextPtr->SetUserInfo(nullptr);
+			}
+		}
+		else{
+			// The owner of the organization holds its whole permission scope, so the pages, commands and headers built from the permissions show all of it
+			imtauth::IUserInfo::FeatureIds grantedPermissions = imtgql::CollectTenantOwnerPermissions(*gqlContextPtr);
+			// Outside of any organization a user allowed to create one sees them too
+			if (tenantData.hasOrganizationAccess || (tenantId.isEmpty() && imtauth::HasPermission(userInfoPtr->GetPermissions(productId), imtauth::s_addOrganizationPermission, false))){
+				grantedPermissions += imtauth::GetOrganizationAccessPermissions();
+			}
+
+			istd::IChangeableUniquePtr grantedUserPtr = grantedPermissions.isEmpty() ? istd::IChangeableUniquePtr() : userInfoPtr->CloneMe();
+			imtauth::IUserInfo* grantedUserInfoPtr = dynamic_cast<imtauth::IUserInfo*>(grantedUserPtr.GetPtr());
+			if (grantedUserInfoPtr != nullptr){
+				imtauth::IUserInfo::FeatureIds localPermissions = grantedUserInfoPtr->GetLocalPermissions(productId);
+				for (const QByteArray& permission : grantedPermissions){
+					if (!localPermissions.contains(permission)){
+						localPermissions.append(permission);
 					}
 				}
+				grantedUserInfoPtr->SetLocalPermissions(productId, localPermissions);
 
-				istd::IChangeableUniquePtr clonedPtr = userInfoPtr->CloneMe();
-				imtauth::IUserInfo* mutableUserPtr = dynamic_cast<imtauth::IUserInfo*>(clonedPtr.GetPtr());
-				if (mutableUserPtr != nullptr){
-					// Strip roles/groups so no other code path can expand them back into
-					// unrestricted permissions; only the explicit scoped list applies.
-					const QByteArrayList products = mutableUserPtr->GetProducts();
-					for (const QByteArray& prod : products){
-						mutableUserPtr->SetRoles(prod, imtauth::IUserBaseInfo::RoleIds());
-					}
-					const imtauth::IUserGroupInfo::GroupIds groupIds = mutableUserPtr->GetGroups();
-					for (const QByteArray& groupId : groupIds){
-						mutableUserPtr->RemoveFromGroup(groupId);
-					}
-					mutableUserPtr->SetLocalPermissions(productId, effectivePermissions);
-
-					gqlContextPtr->SetUserInfo(mutableUserPtr);
-				}
-				else{
-					gqlContextPtr->SetUserInfo(nullptr);
-				}
+				gqlContextPtr->SetUserInfo(grantedUserInfoPtr);
 			}
 			else{
 				gqlContextPtr->SetUserInfo(userInfoPtr);
@@ -359,7 +408,13 @@ bool CAuthenticationManagerComp::RemoveSession(const QByteArray& sessionId) cons
 		return false;
 	}
 
-	return m_slaveJwtSessionControllerCompPtr->RemoveSession(sessionId);
+	if (!m_slaveJwtSessionControllerCompPtr->RemoveSession(sessionId)){
+		return false;
+	}
+
+	InvalidateSessionTokenCache(sessionId);
+
+	return true;
 }
 
 
@@ -450,6 +505,56 @@ void CAuthenticationManagerComp::InvalidateToken(const QByteArray& token) const
 
 
 // private methods
+
+bool CAuthenticationManagerComp::HasOrganizationAccess(const QByteArray& userId, const QByteArray& tenantId, bool isOwnerOrCreator) const
+{
+	if (!tenantId.isEmpty()){
+		// Without the memberships (a product server) the organization of the token is trusted
+		return isOwnerOrCreator || !m_membershipManagerCompPtr.IsValid() || m_membershipManagerCompPtr->IsMember(userId, tenantId);
+	}
+
+	if (m_membershipManagerCompPtr.IsValid()){
+		for (const QByteArray& membershipId : m_membershipManagerCompPtr->GetMembershipsByUser(userId)){
+			imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
+			if (membershipPtr.IsValid() && membershipPtr->IsActive()){
+				return true;
+			}
+		}
+	}
+
+	if (m_invitationManagerCompPtr.IsValid()){
+		const imtauth::ITenantInvitationManager::Statuses statuses{imtauth::ITenantInvitation::TIS_PENDING};
+		for (const QByteArray& invitationId : m_invitationManagerCompPtr->GetInvitationsByUser(userId, statuses)){
+			imtauth::ITenantInvitationUniquePtr invitationPtr = m_invitationManagerCompPtr->GetInvitation(invitationId);
+			if (invitationPtr.IsValid() && m_invitationManagerCompPtr->GetEffectiveStatus(*invitationPtr) == imtauth::ITenantInvitation::TIS_PENDING){
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+
+QByteArrayList CAuthenticationManagerComp::GetOrganizationPermissions(const QByteArray& userId, const QByteArray& tenantId, bool isOwnerOrCreator) const
+{
+	if (tenantId.isEmpty()){
+		return QByteArrayList();
+	}
+
+	if (isOwnerOrCreator){
+		return {imtauth::s_organizationManagementPermission};
+	}
+
+	if (!m_membershipManagerCompPtr.IsValid()){
+		return QByteArrayList();
+	}
+
+	imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->FindMembership(userId, tenantId);
+
+	return membershipPtr.IsValid() && membershipPtr->IsActive() ? membershipPtr->GetOrganizationPermissions() : QByteArrayList();
+}
+
 
 bool CAuthenticationManagerComp::ResolveUserId(
 			const QByteArray& token,
@@ -719,7 +824,24 @@ void CAuthenticationManagerComp::StoreCachedToken(
 
 	const qint64 cacheTtlSecs = (entry.expiresAt - now) / 1000;
 
+	QByteArray sessionId;
+	if (!isPat){
+		QByteArray claimUserId;
+		QByteArray claimTenantId;
+		qint64 claimExpSecs = 0;
+		ParseJwtClaims(token, claimUserId, claimTenantId, sessionId, claimExpSecs);
+	}
+
 	QMutexLocker cacheLocker(&m_tokenCacheMutex);
+	if (!sessionId.isEmpty()){
+		// A resolution that started before RemoveSession() must not re-insert
+		// a token of the removed session after its cache entries were swept.
+		auto revokedIter = m_revokedSessionIds.constFind(sessionId);
+		if (revokedIter != m_revokedSessionIds.constEnd() && *revokedIter > now){
+			return;
+		}
+	}
+
 	m_expiredTokenCache.remove(token);
 	m_tokenCache.insert(token, entry);
 	const int maxTokenCacheSize = m_maxTokenCacheSizeAttrPtr.IsValid() ? *m_maxTokenCacheSizeAttrPtr : 10000;
@@ -784,20 +906,62 @@ void CAuthenticationManagerComp::InvalidateTokenCache(const QByteArray& token) c
 }
 
 
-bool CAuthenticationManagerComp::TryGetCachedTenantOwnership(const QByteArray& token, bool& isTenantOwner) const
+void CAuthenticationManagerComp::InvalidateSessionTokenCache(const QByteArray& sessionId) const
 {
+	if (sessionId.isEmpty()){
+		return;
+	}
+
+	const qint64 now = QDateTime::currentMSecsSinceEpoch();
+	const qint64 tokenCacheTtlMs = m_tokenCacheTtlAttrPtr.IsValid() ? (static_cast<qint64>(*m_tokenCacheTtlAttrPtr) * 1000) : (30 * 1000);
+
+	QMutexLocker cacheLocker(&m_tokenCacheMutex);
+	for (auto iter = m_revokedSessionIds.begin(); iter != m_revokedSessionIds.end(); ){
+		if (*iter <= now){
+			iter = m_revokedSessionIds.erase(iter);
+		}
+		else{
+			++iter;
+		}
+	}
+
+	const int maxTokenCacheSize = m_maxTokenCacheSizeAttrPtr.IsValid() ? *m_maxTokenCacheSizeAttrPtr : 10000;
+	while (!m_revokedSessionIds.isEmpty() && m_revokedSessionIds.size() >= maxTokenCacheSize){
+		m_revokedSessionIds.erase(m_revokedSessionIds.begin());
+	}
+	m_revokedSessionIds.insert(sessionId, now + tokenCacheTtlMs);
+
+	for (auto iter = m_tokenCache.begin(); iter != m_tokenCache.end();){
+		QByteArray userId;
+		QByteArray tenantId;
+		QByteArray tokenSessionId;
+		qint64 expSecs = 0;
+		if (ParseJwtClaims(iter.key(), userId, tenantId, tokenSessionId, expSecs) && tokenSessionId == sessionId){
+			iter = m_tokenCache.erase(iter);
+		}
+		else{
+			++iter;
+		}
+	}
+}
+
+
+bool CAuthenticationManagerComp::TryGetCachedTenantData(const QByteArray& token, TokenTenantData& tenantData) const
+{
+	const qint64 ttlMs = m_tenantDataCacheTtlAttrPtr.IsValid() ? (static_cast<qint64>(*m_tenantDataCacheTtlAttrPtr) * 1000) : (10 * 1000);
+
 	QMutexLocker cacheLocker(&m_tokenCacheMutex);
 	auto iter = m_tokenCache.find(token);
-	if (iter == m_tokenCache.end() || !iter->tenantOwnershipResolved){
+	if (iter == m_tokenCache.end() || iter->tenantDataResolvedAt == 0 || QDateTime::currentMSecsSinceEpoch() - iter->tenantDataResolvedAt > ttlMs){
 		return false;
 	}
 
-	isTenantOwner = iter->isTenantOwner;
+	tenantData = iter->tenantData;
 	return true;
 }
 
 
-void CAuthenticationManagerComp::StoreCachedTenantOwnership(const QByteArray& token, bool isTenantOwner) const
+void CAuthenticationManagerComp::StoreCachedTenantData(const QByteArray& token, const TokenTenantData& tenantData) const
 {
 	QMutexLocker cacheLocker(&m_tokenCacheMutex);
 	auto iter = m_tokenCache.find(token);
@@ -809,8 +973,8 @@ void CAuthenticationManagerComp::StoreCachedTenantOwnership(const QByteArray& to
 		return;
 	}
 
-	iter->isTenantOwner = isTenantOwner;
-	iter->tenantOwnershipResolved = true;
+	iter->tenantData = tenantData;
+	iter->tenantDataResolvedAt = QDateTime::currentMSecsSinceEpoch();
 }
 
 

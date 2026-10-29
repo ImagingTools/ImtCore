@@ -162,6 +162,28 @@ void CTagFilterSqlBuilderTest::testHostileTagIds()
 }
 
 
+void CTagFilterSqlBuilderTest::testDuckDbFilterContext()
+{
+	imtdb::CTagFilterSqlBuilder::Config config = m_config;
+	config.isSqlite = false;
+	config.isDuckDb = true;
+
+	Filter::FilterExpression expression;
+	expression.fieldFilters << TagFilter(Filter::FO_ARRAY_HAS_ANY, {"a"});
+	expression.fieldFilters << Filter::FieldFilter(
+				QByteArrayLiteral("Values"),
+				QVariantList{QStringLiteral("a")},
+				Filter::FO_ARRAY_HAS_ANY);
+
+	imtbase::CComplexCollectionFilter filter;
+	filter.SetFilterExpression(expression);
+
+	const QString query = imtdb::CTagFilterSqlBuilder::CreateFilterQuery(filter, config);
+	QVERIFY(query.contains(QStringLiteral("EXISTS")));
+	QVERIFY(query.contains(QStringLiteral("list_contains")));
+}
+
+
 void CTagFilterSqlBuilderTest::cleanupTestCase()
 {
 	m_database.close();
@@ -243,5 +265,4 @@ bool CTagFilterSqlBuilderTest::Execute(const QString& queryText)
 
 
 I_ADD_TEST(CTagFilterSqlBuilderTest);
-
 

@@ -78,11 +78,18 @@ int CDesignTokenIconProcessorComp::Exec()
 			QDir resourceDir(m_inputDirName);
 			QDir colorResourceDir(m_inputDirName);
 			colorResourceDir.cdUp();
+			bool isColorResourceCopied = false;
 			for (const QFileInfo& possibleColorResourceDir : colorResourceDir.entryInfoList({(QString('*').append(styleName).append('*'))}, QDir::Dirs)){
 				if (possibleColorResourceDir.isDir()){
 					istd::CSystem::CopyDirectory(possibleColorResourceDir.absoluteFilePath(), outputDirName);
+					isColorResourceCopied = true;
 					break;
 				}
+			}
+
+			// SetColor() re-reads existing outputs, so stale icons would keep the old theme colors
+			if (!isColorResourceCopied){
+				istd::CSystem::RemoveDirectory(outputDirName);
 			}
 
 			QDir outputDir(outputDirName);

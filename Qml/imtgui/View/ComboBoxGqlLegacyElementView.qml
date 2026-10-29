@@ -90,7 +90,7 @@ ElementView {
 			id: cb;
 			color: Style.backgroundColor;
 
-			width: comboBoxGqlLegacyElementView.controlWidth;
+			width: comboBoxGqlLegacyElementView.fittedControlWidth;
 			height: comboBoxGqlLegacyElementView.controlHeight;
 
 			Component.onCompleted: {

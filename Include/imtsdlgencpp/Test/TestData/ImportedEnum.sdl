@@ -1,0 +1,13 @@
+schema {
+	namespace: externalenum
+	version: 1.0
+}
+
+enum ImportedState {
+	Disabled
+	Enabled
+}
+
+type ImportedEnumOwner {
+	state: ImportedState
+}

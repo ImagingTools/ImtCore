@@ -629,6 +629,15 @@ bool V1_0::modsdl::CDigitalPrinter::OptReadFromJsonObject(const QJsonObject& jso
 
 
 
+} // namespace sdl::V1_0::modsdl
+
+#include "DigitalPrinterObjects.h"
+
+
+namespace sdl::V1_0::modsdl
+{
+
+
 CDigitalPrinterSpecificationObject::CDigitalPrinterSpecificationObject(QObject* parent): ::imtbase::CItemModelBase(parent){
 
 	QObject::connect(this, &CDigitalPrinterSpecificationObject::baseChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -653,12 +662,12 @@ QVariant CDigitalPrinterSpecificationObject::GetBase()
 
 void CDigitalPrinterSpecificationObject::SetBase(const QVariant& v)
 {
-	if (v.isValid()){
+	if (v.isValid() && !v.isNull()){
 		sdl::V1_0::modsdl::CPrinterSpecificationBaseObject* itemPtr = v.value<sdl::V1_0::modsdl::CPrinterSpecificationBaseObject*>();
 		if (itemPtr != nullptr) CDigitalPrinterSpecification::base = (*itemPtr);
 	}
 	else {
-		CDigitalPrinterSpecification::base = nullptr;
+		CDigitalPrinterSpecification::base.SetNull();
 	}
 	m_baseQObjectPtr = v;
 
@@ -914,12 +923,12 @@ QVariant CDigitalPrinterObject::GetBase()
 
 void CDigitalPrinterObject::SetBase(const QVariant& v)
 {
-	if (v.isValid()){
+	if (v.isValid() && !v.isNull()){
 		sdl::V1_0::modsdl::CPrinterBaseObject* itemPtr = v.value<sdl::V1_0::modsdl::CPrinterBaseObject*>();
 		if (itemPtr != nullptr) CDigitalPrinter::base = (*itemPtr);
 	}
 	else {
-		CDigitalPrinter::base = nullptr;
+		CDigitalPrinter::base.SetNull();
 	}
 	m_baseQObjectPtr = v;
 

@@ -5,6 +5,7 @@
 #include <imtbasesdl/SDL/1.0/CPP/CollectionDocumentService.h>
 #include <imtgql/IGqlContext.h>
 #include <imtbasesdl/SDL/1.0/CPP/UndoManager.h>
+#include <imtauthgql/TenantAccess.h>
 
 
 namespace imtauthgql
@@ -52,15 +53,10 @@ CDM::CDocumentInfo CTenantCollectionDocumentServiceControllerComp::OnCreateNewDo
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const
 {
-	// Creating a new tenant is only allowed when the user has NOT selected
-	// any tenant (currentTenantId must be empty).
 	const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
-	if (contextPtr != nullptr){
-		QByteArray sessionTenantId = contextPtr->GetTenantId();
-		if (!sessionTenantId.isEmpty()){
-			errorMessage = QStringLiteral("Cannot create a new tenant while switched to an organization. Please deselect the current tenant first.");
-			return CDM::CDocumentInfo();
-		}
+	if (contextPtr == nullptr || !CanCreateOrganization(*contextPtr)){
+		errorMessage = QStringLiteral("Permission denied: /OrganizationManagement/Add");
+		return CDM::CDocumentInfo();
 	}
 
 	return BaseClass::OnCreateNewDocument(createNewDocumentRequest, gqlRequest, errorMessage);
@@ -78,7 +74,7 @@ CDM::CDocumentInfo CTenantCollectionDocumentServiceControllerComp::OnOpenDocumen
 	if (contextPtr != nullptr){
 		QByteArray sessionTenantId = contextPtr->GetTenantId();
 		if (sessionTenantId.isEmpty()){
-			errorMessage = QStringLiteral("Cannot open a tenant for editing without switching to it first. Please select the tenant.");
+			errorMessage = QStringLiteral("An organization can be edited only while you work in it. Switch to the organization first.");
 			return CDM::CDocumentInfo();
 		}
 
@@ -92,13 +88,57 @@ CDM::CDocumentInfo CTenantCollectionDocumentServiceControllerComp::OnOpenDocumen
 		if (arguments.input->id){
 			QByteArray requestedTenantId = *arguments.input->id;
 			if (!requestedTenantId.isEmpty() && requestedTenantId != sessionTenantId){
-				errorMessage = QStringLiteral("Cannot edit a tenant you are not currently switched to. Please switch to this organization first.");
+				errorMessage = QStringLiteral("An organization can be edited only while you work in it. Switch to the organization first.");
 				return CDM::CDocumentInfo();
 			}
 		}
 	}
 
 	return BaseClass::OnOpenDocument(openDocumentRequest, gqlRequest, errorMessage);
+}
+
+
+CDM::CDocumentOperationStatus CTenantCollectionDocumentServiceControllerComp::OnSaveDocument(
+		const CDM::CSaveDocumentGqlRequest& saveDocumentRequest,
+		const ::imtgql::CGqlRequest& gqlRequest,
+		QString& errorMessage) const
+{
+	QByteArray tenantId;
+	const auto& arguments = saveDocumentRequest.GetRequestedArguments();
+	if (arguments.input.has_value() && arguments.input->documentId){
+		const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
+		const QByteArray sessionTenantId = (contextPtr != nullptr) ? contextPtr->GetTenantId() : QByteArray();
+		tenantId = GetCollectionObjectId(GetUserId(gqlRequest), *arguments.input->documentId);
+		if (tenantId.isEmpty() && (contextPtr == nullptr || !CanCreateOrganization(*contextPtr))){
+			errorMessage = QStringLiteral("Permission denied: /OrganizationManagement/Add");
+			CDM::CDocumentOperationStatus retVal;
+			retVal.status = CDM::EDocumentOperationStatus::Failed;
+			retVal.message = errorMessage;
+			return retVal;
+		}
+
+		if (!tenantId.isEmpty() && tenantId != sessionTenantId){
+			errorMessage = QStringLiteral("An organization can be edited only while you work in it. Switch to the organization first.");
+			CDM::CDocumentOperationStatus retVal;
+			retVal.status = CDM::EDocumentOperationStatus::Failed;
+			retVal.message = errorMessage;
+			return retVal;
+		}
+	}
+
+	CDM::CDocumentOperationStatus retVal = BaseClass::OnSaveDocument(saveDocumentRequest, gqlRequest, errorMessage);
+	if (tenantId.isEmpty() || !m_tenantManagerCompPtr.IsValid() || !retVal.status || *retVal.status != CDM::EDocumentOperationStatus::Success){
+		return retVal;
+	}
+
+	// A save of a restored scope (e.g. after undo/redo) bypasses the representation update, so the sub-organizations are narrowed here.
+	// This also runs when the scope is unchanged, so retrying the save completes a cascade that failed earlier.
+	if (!NarrowSubOrganizationPermissions(*m_tenantManagerCompPtr, tenantId, errorMessage)){
+		retVal.status = CDM::EDocumentOperationStatus::Failed;
+		retVal.message = errorMessage;
+	}
+
+	return retVal;
 }
 
 

@@ -10,6 +10,7 @@
 // ImtCore includes
 #include <imtauth/CUserInfo.h>
 #include <imtbase/CComplexCollectionFilter.h>
+#include <imtauthgql/CAssignmentCollector.h>
 
 
 namespace imtauthgql
@@ -138,11 +139,7 @@ bool CUserRepresentationController::FillUserInfoFromRepresentation(
 		userInfoPtr->SetEnabled(*representation.enabled);
 	}
 
-	QByteArrayList roleIds;
-	if (representation.roles){
-		roleIds = representation.roles->ToList();
-	}
-	roleIds.removeAll("");
+	const QByteArrayList roleIds = CAssignmentCollector::GetDirectIds(representation.roles);
 	if (!roleIds.isEmpty()){
 		userInfoPtr->SetRoles(productId, roleIds);
 	}
@@ -150,11 +147,7 @@ bool CUserRepresentationController::FillUserInfoFromRepresentation(
 		userInfoPtr->RemoveProduct(productId);
 	}
 
-	QByteArrayList groupIds;
-	if (representation.groups){
-		groupIds = representation.groups->ToList();
-	}
-	groupIds.removeAll("");
+	const QByteArrayList groupIds = CAssignmentCollector::GetDirectIds(representation.groups);
 	for (const QByteArray& groupId : groupIds){
 		if (!groupId.isEmpty()){
 			userInfoPtr->AddToGroup(groupId);

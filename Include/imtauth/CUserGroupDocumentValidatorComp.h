@@ -16,7 +16,7 @@ namespace imtauth
 
 /**
 	Validates User Group documents before save.
-	Ensures group name is specified and unique.
+	Ensures group name is specified and unique within the same tenant.
 */
 class CUserGroupDocumentValidatorComp:
 			public icomp::CComponentBase,
@@ -31,7 +31,27 @@ public:
 	I_END_COMPONENT
 
 	// imtdoc::IDocumentValidator
-	virtual bool ValidateDocumentData(const QByteArray& objectId, const istd::IChangeable& document, QString& errorMessage, const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
+	virtual bool ValidateDocumentData(const istd::IChangeable& document, QString& errorMessage, const iprm::IParamsSet* paramsPtr = nullptr, const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
+
+	/**
+		Check that no other group of the tenant has the same name.
+		An empty tenant ID checks the groups of no organization.
+	*/
+	static bool CheckGroupNameUnique(
+				const imtbase::IObjectCollection& userGroupCollection,
+				const QByteArray& objectId,
+				const QString& name,
+				const QByteArray& tenantId,
+				QString& errorMessage);
+
+	/**
+		Check that every parent group belongs to the tenant (or, for an empty tenant ID, to no organization).
+	*/
+	static bool CheckParentGroupsInTenant(
+				const imtbase::IObjectCollection& userGroupCollection,
+				const QByteArrayList& parentGroupIds,
+				const QByteArray& tenantId,
+				QString& errorMessage);
 
 private:
 	I_REF(imtbase::IObjectCollection, m_userGroupCollectionCompPtr);

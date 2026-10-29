@@ -42,6 +42,7 @@ Rectangle {
 				anchors.fill: parent
 				text: chatSearchBarRoot.placeholderText
 				font.pixelSize: Style.fontSizeXS
+				color: Style.placeHolderTextColor
 				verticalAlignment: Text.AlignVCenter
 				visible: textInput.text.length === 0
 			}

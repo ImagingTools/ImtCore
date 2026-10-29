@@ -36,6 +36,7 @@ Q_ALWAYS_INLINE static void ImtCoreInitQmlCollectionResources()
 	Q_INIT_RESOURCE(imtbaseCollectionImportSdl);
 	Q_INIT_RESOURCE(imtbaseFilterableSelectSdl);
 	Q_INIT_RESOURCE(imtbaseImtCollectionSdl);
+	Q_INIT_RESOURCE(imtbaseDocumentSharesSdl);
 }
 
 

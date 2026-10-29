@@ -13,14 +13,19 @@ Item {
 	signal commandActivated(string commandId, var params);
 	
 	property GuiElementContainer commandsModel: GuiElementContainer {};
+	property alias centerCommandsWidth: centerCommands.width;
+	// False until the first commands model arrives; a skeleton stands in for the buttons meanwhile.
+	property bool commandsLoaded: false;
 	onCommandsModelChanged: {
 		updateGui()
 	}
-	
+
 	function updateGui(){
 		if (!commandsModel){
 			return;
 		}
+
+		commandsLoaded = true;
 
 		clearModel();
 
@@ -76,66 +81,138 @@ Item {
 			return;
 		}
 
-		commandsItem.checkCommandsWidth(0);
-
-		let needsButton = leftCommands.hasHiddenCommands() ||
-				centerCommands.hasHiddenCommands() ||
-				rightCommands.hasHiddenCommands();
-
+		// The "more" button takes its place only when a command does not fit without it
+		let needsButton = !commandsItem.fitCommands(0);
 		if (needsButton){
-			commandsItem.checkCommandsWidth(Style.controlHeightM + Style.marginM);
-
-			needsButton = leftCommands.hasHiddenCommands() ||
-					centerCommands.hasHiddenCommands() ||
-					rightCommands.hasHiddenCommands();
+			commandsItem.fitCommands(Style.controlHeightM);
 		}
 
 		button.visible = needsButton;
 	}
 
-	function checkCommandsWidth(reserved){
-		let available = Math.max(0, commandsItem.width - 2 * Style.marginM - reserved);
+	/*
+		Shows the commands of the whole panel by priority, each in its own group (alignment). Among commands
+		of the same priority the next one goes to the group that takes the least room. Once a command does
+		not fit, its group stops and no command of a lower priority is shown. Returns whether all commands fit.
+	*/
+	function fitCommands(reserved){
+		let views = [leftCommands, centerCommands, rightCommands];
+		let sizes = [leftCommands.commandSizes(), centerCommands.commandSizes(), rightCommands.commandSizes()];
+		let used = [0, 0, 0];
+		let counts = [0, 0, 0];
+		let open = [true, true, true];
+		// Priority of the first command that did not fit; lower ones are not shown
+		let stopPriority = -1;
 
-		let checkWidthFunc = function (commands, type){
-			commands.maximumWidth = commandsItem.computeMaxWidth(
-						type,
-						leftCommands.calcVisibleCommandsCount(),
-						centerCommands.calcVisibleCommandsCount(),
-						rightCommands.calcVisibleCommandsCount(),
-						available
-					)
-			commands.checkWidth()
+		while (true){
+			let group = -1;
+			for (let i = 0; i < 3; i++){
+				if (!open[i] || counts[i] >= sizes[i].length || sizes[i][counts[i]].priority < stopPriority){
+					continue;
+				}
+				if (group < 0){
+					group = i;
+					continue;
+				}
+				let priority = sizes[i][counts[i]].priority;
+				let groupPriority = sizes[group][counts[group]].priority;
+				if (priority > groupPriority || (priority === groupPriority && used[i] < used[group])){
+					group = i;
+				}
+			}
+			if (group < 0){
+				break;
+			}
+
+			let size = sizes[group][counts[group]];
+			let trial = used.slice();
+			trial[group] = used[group] + (counts[group] > 0 ? views[group].spacing : 0) + size.width;
+			if (commandsItem.__fits(trial[0], trial[1], trial[2], reserved)){
+				used = trial;
+				counts[group] += 1;
+			}
+			else {
+				open[group] = false;
+				stopPriority = Math.max(stopPriority, size.priority);
+			}
 		}
 
-		checkWidthFunc(leftCommands, "left")
-		checkWidthFunc(centerCommands, "center")
-		checkWidthFunc(rightCommands, "right")
+		for (let i = 0; i < 3; i++){
+			views[i].maximumWidth = used[i];
+			views[i].checkWidth();
+		}
+
+		return !leftCommands.hasHiddenCommands() && !centerCommands.hasHiddenCommands() && !rightCommands.hasHiddenCommands();
 	}
 
-	function computeMaxWidth(role, left, center, right, full) {
-		let hasLeft = left > 0;
-		let hasCenter = center > 0;
-		let hasRight = right > 0;
-		let visible = (hasLeft ? 1 : 0) + (hasCenter ? 1 : 0) + (hasRight ? 1 : 0);
-
-		// Left || Center || Right
-		if (visible === 1)
-			return full;
-
-		// Left && Center && Right
-		if (visible === 3) {
-			if (role === "center") return full * 0.4;
-			return full * 0.3;
+	// The side groups take the panel edges, the center one stays centered between them
+	function __fits(left, center, right, reserved){
+		if (center > 0){
+			return center / 2 + Style.marginM + Math.max(left, right + reserved) <= commandsItem.width / 2 - Style.marginM;
 		}
 
-		// Center && (Left || Right)
-		if (hasCenter) {
-			if (role === "center") return full * 0.4
-			return full * 0.3
+		return left + right + (left > 0 && right > 0 ? Style.marginM : 0) <= commandsItem.width - 2 * Style.marginM - reserved;
+	}
+
+	// Shown only when the commands take longer than skeletonDelay.interval, so a quick load does not flash it.
+	property bool skeletonDelayElapsed: false;
+
+	Timer {
+		id: skeletonDelay;
+		interval: 300;
+		running: !commandsItem.commandsLoaded;
+		onTriggered: {
+			commandsItem.skeletonDelayElapsed = true;
+		}
+	}
+
+	Item {
+		id: commandsSkeleton;
+
+		anchors.fill: parent;
+		visible: !commandsItem.commandsLoaded && commandsItem.skeletonDelayElapsed;
+
+		Row {
+			anchors.left: parent.left;
+			anchors.leftMargin: Style.marginM;
+			anchors.verticalCenter: parent.verticalCenter;
+			spacing: Style.marginS;
+
+			Repeater {
+				model: 2;
+
+				delegate: SkeletonBlock {
+					width: Style.controlHeightM * (index === 0 ? 2.5 : 2);
+					height: Style.controlHeightM - Style.marginXS;
+					animated: true;
+				}
+			}
 		}
 
-		// (Left && Right)
-		return full * 0.5;
+		Row {
+			anchors.horizontalCenter: parent.horizontalCenter;
+			anchors.verticalCenter: parent.verticalCenter;
+			spacing: Style.marginS;
+
+			Repeater {
+				model: 2;
+
+				delegate: SkeletonBlock {
+					width: Style.controlHeightM * 2.5;
+					height: Style.controlHeightM - Style.marginXS;
+					animated: true;
+				}
+			}
+		}
+
+		SkeletonBlock {
+			anchors.right: parent.right;
+			anchors.rightMargin: Style.marginM;
+			anchors.verticalCenter: parent.verticalCenter;
+			width: Style.controlHeightM * 3;
+			height: Style.controlHeightM - Style.marginXS;
+			animated: true;
+		}
 	}
 
 	CommandsView {
@@ -190,7 +267,7 @@ Item {
 		visible: false;
 		decorator: Component {
 			ToolButtonDecorator {
-				color: baseElement && baseElement.hovered  ? Style.hover : "transparent";
+				color: baseElement && baseElement.hovered  ? Style.toolButtonHoverColor : "transparent";
 				radius: height / 2;
 			}
 		}
@@ -265,7 +342,7 @@ Item {
 		PopupMenuDialog {
 			id: popupMenuDialog;
 			shownItemsCount: 20;
-			itemHeight: Style.controlHeightM;
+			itemHeight: Style.controlHeightS + Style.spacingXS;
 			onFinished: {
 				if (commandId !== ""){
 					commandsItem.commandActivated(commandId, null)

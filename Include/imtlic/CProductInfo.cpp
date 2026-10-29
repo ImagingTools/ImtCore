@@ -2,6 +2,13 @@
 #include <imtlic/CProductInfo.h>
 
 
+// STL includes
+#include <functional>
+
+// Qt includes
+#include <QtCore/QHash>
+#include <QtCore/QSet>
+
 // ACF includes
 #include <istd/CChangeNotifier.h>
 #include <istd/TSingleFactory.h>
@@ -314,6 +321,203 @@ bool CProductInfo::ResetData(CompatibilityMode mode)
 }
 
 
-} // namespace imtlic
+namespace
+{
 
+
+typedef QHash<QByteArray, QByteArrayList> RequirementsByPath;
+typedef QHash<QByteArray, QByteArrayList> LeavesByPath;
+
+
+/**
+	\return The leaves of the feature: the feature itself if it has no sub-features.
+*/
+QByteArrayList CollectFeatureRequirements(
+			const IFeatureInfo& featureInfo,
+			const QByteArray& parentPath,
+			RequirementsByPath& requirementsByPath,
+			LeavesByPath& leavesByPath,
+			const QByteArrayList& inheritedRequirements = QByteArrayList())
+{
+	const QByteArray featureId = featureInfo.GetFeatureId();
+	if (featureId.isEmpty()){
+		return QByteArrayList();
+	}
+
+	const QByteArray featurePath = parentPath + '/' + featureId;
+
+	// Requiring the own branch would hand out the siblings, so such requirements are dropped.
+	QByteArrayList requirements = inheritedRequirements;
+	for (const QByteArray& requirement : featureInfo.GetRequirements()){
+		if (!requirement.startsWith('/') || IsSameOrNestedFeaturePath(requirement, featurePath)){
+			continue;
+		}
+
+		if (!requirements.contains(requirement)){
+			requirements.append(requirement);
+		}
+	}
+	requirementsByPath.insert(featurePath, requirements);
+
+	QByteArrayList leaves;
+	const IFeatureInfo::FeatureInfoList& subFeatures = featureInfo.GetSubFeatures();
+	for (const IFeatureInfo::FeatureInfoPtr& subFeaturePtr : subFeatures){
+		if (subFeaturePtr.IsValid()){
+			leaves += CollectFeatureRequirements(*subFeaturePtr, featurePath, requirementsByPath, leavesByPath, requirements);
+		}
+	}
+
+	if (subFeatures.isEmpty()){
+		leaves.append(featurePath);
+	}
+	leavesByPath.insert(featurePath, leaves);
+
+	return leaves;
+}
+
+
+void CollectProductRequirements(
+			IProductInfo& productInfo,
+			RequirementsByPath& requirementsByPath,
+			LeavesByPath& leavesByPath)
+{
+	imtbase::IObjectCollection* featureCollectionPtr = productInfo.GetFeatures();
+	if (featureCollectionPtr == nullptr){
+		return;
+	}
+
+	// Reading an element hands out a deep copy of a whole feature tree, so the
+	// product is flattened once here and every lookup is answered from the maps.
+	const imtbase::ICollectionInfo::Ids elementIds = featureCollectionPtr->GetElementIds();
+	for (const imtbase::ICollectionInfo::Id& elementId : elementIds){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (!featureCollectionPtr->GetObjectData(elementId, dataPtr)){
+			continue;
+		}
+
+		const IFeatureInfo* featureInfoPtr = dynamic_cast<const IFeatureInfo*>(dataPtr.GetPtr());
+		if (featureInfoPtr != nullptr){
+			CollectFeatureRequirements(*featureInfoPtr, QByteArray(), requirementsByPath, leavesByPath);
+		}
+	}
+}
+
+
+} // anonymous namespace
+
+
+// public functions
+
+PermissionRequirements CollectPermissionRequirements(IProductInfo& productInfo)
+{
+	RequirementsByPath requirementsByPath;
+	LeavesByPath leavesByPath;
+	CollectProductRequirements(productInfo, requirementsByPath, leavesByPath);
+
+	PermissionRequirements retVal;
+	for (RequirementsByPath::const_iterator it = requirementsByPath.constBegin(); it != requirementsByPath.constEnd(); ++it){
+		QByteArrayList requiredLeaves;
+		for (const QByteArray& requirement : it.value()){
+			// A required group stands for every leaf in it: only leaves are ever held.
+			for (const QByteArray& leafPath : leavesByPath.value(requirement)){
+				if (!requiredLeaves.contains(leafPath)){
+					requiredLeaves.append(leafPath);
+				}
+			}
+		}
+
+		if (!requiredLeaves.isEmpty()){
+			retVal.insert(it.key(), requiredLeaves);
+		}
+	}
+
+	return retVal;
+}
+
+
+QByteArrayList CollectImpliedPermissions(IProductInfo& productInfo, const QByteArrayList& permissionIds)
+{
+	if (permissionIds.isEmpty()){
+		return QByteArrayList();
+	}
+
+	return CollectImpliedPermissions(CollectPermissionRequirements(productInfo), permissionIds);
+}
+
+
+QByteArrayList CollectImpliedPermissions(const PermissionRequirements& requirements, const QByteArrayList& permissionIds)
+{
+	QByteArrayList retVal;
+	if (requirements.isEmpty()){
+		return retVal;
+	}
+
+	QSet<QByteArray> knownPermissions(permissionIds.begin(), permissionIds.end());
+	QByteArrayList pendingPermissions = permissionIds;
+
+	while (!pendingPermissions.isEmpty()){
+		const QByteArray permissionId = pendingPermissions.takeFirst();
+
+		for (const QByteArray& leafPath : requirements.value(permissionId)){
+			if (knownPermissions.contains(leafPath)){
+				continue;
+			}
+
+			knownPermissions.insert(leafPath);
+			retVal.append(leafPath);
+			pendingPermissions.append(leafPath);
+		}
+	}
+
+	return retVal;
+}
+
+
+QByteArrayList CollectProductPermissions(IProductInfo& productInfo)
+{
+	QByteArrayList retVal;
+
+	imtbase::IObjectCollection* featureCollectionPtr = productInfo.GetFeatures();
+	if (featureCollectionPtr == nullptr){
+		return retVal;
+	}
+
+	std::function<void (const IFeatureInfo&, const QByteArray&)> collect = [&retVal, &collect](const IFeatureInfo& featureInfo, const QByteArray& parentPath){
+		const QByteArray featureId = featureInfo.GetFeatureId();
+		if (featureId.isEmpty()){
+			return;
+		}
+
+		const QByteArray featurePath = parentPath + '/' + featureId;
+		const IFeatureInfo::FeatureInfoList& subFeatures = featureInfo.GetSubFeatures();
+		if (subFeatures.isEmpty()){
+			if (featureInfo.IsPermission() && !retVal.contains(featurePath)){
+				retVal.append(featurePath);
+			}
+
+			return;
+		}
+
+		for (const IFeatureInfo::FeatureInfoPtr& subFeaturePtr : subFeatures){
+			if (subFeaturePtr.IsValid()){
+				collect(*subFeaturePtr, featurePath);
+			}
+		}
+	};
+
+	for (const imtbase::ICollectionInfo::Id& elementId : featureCollectionPtr->GetElementIds()){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (featureCollectionPtr->GetObjectData(elementId, dataPtr)){
+			const IFeatureInfo* featureInfoPtr = dynamic_cast<const IFeatureInfo*>(dataPtr.GetPtr());
+			if (featureInfoPtr != nullptr){
+				collect(*featureInfoPtr, QByteArray());
+			}
+		}
+	}
+
+	return retVal;
+}
+
+
+} // namespace imtlic
 

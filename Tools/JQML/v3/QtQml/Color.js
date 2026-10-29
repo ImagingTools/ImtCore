@@ -74,6 +74,41 @@ class Color extends Property {
         }
     }
 
+    static typeCasting(value){
+        if(value === undefined) throw 'Cannot assign [undefined] to color'
+        if(value === null || typeof value === 'number' || typeof value === 'boolean') return '#000000'
+        if(typeof value !== 'string') throw 'Cannot assign QJSValue to color'
+        if(value === '') return '#000000'
+
+        let lower = value.toLowerCase()
+        if(lower === 'transparent') return '#00000000'
+
+        let named = Color.colors[lower]
+        if(named) return named
+
+        if(lower[0] === '#') {
+            if(lower.length === 4) {
+                return `#${lower[1]}${lower[1]}${lower[2]}${lower[2]}${lower[3]}${lower[3]}`
+            }
+            if(lower.length === 5) {
+                return `#${lower[1]}${lower[1]}${lower[2]}${lower[2]}${lower[3]}${lower[3]}${lower[4]}${lower[4]}`
+            }
+            if(lower.length === 7 || lower.length === 9) return lower
+        }
+
+        return '#000000'
+    }
+
+    // Qt writes alpha first (#AARRGGBB) while CSS reads it last (#RRGGBBAA), so a raw 8-digit value must not reach a style.
+    static toCss(value){
+        let hex = (value === undefined || value === null) ? '#000000' : Color.typeCasting(String(value))
+        if(hex.length === 9){
+            let a = parseInt(hex[1]+hex[2], 16)/255
+            return `rgba(${parseInt(hex[3]+hex[4], 16)}, ${parseInt(hex[5]+hex[6], 16)}, ${parseInt(hex[7]+hex[8], 16)}, ${a})`
+        }
+        return hex
+    }
+
     static getDefaultValue(){
         return '#000000'
     }

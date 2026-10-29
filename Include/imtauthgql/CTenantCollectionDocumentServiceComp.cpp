@@ -7,12 +7,19 @@
 #include <QMap>
 #include <QSet>
 
+// ACF includes
+#include <idoc/IUndoManager.h>
+
 // ImtCore includes
+#include <imtbase/COperationContext.h>
+#include <imtauth/CUserInfo.h>
 #include <imtauth/ITenantInfo.h>
 #include <imtauth/IUserManager.h>
 #include <imtgql/IGqlContext.h>
 #include <imtdoc/CDocumentSavedEvent.h>
+#include <imtdoc/imtdoc.h>
 #include <imtauth/imtauth.h>
+#include <imtauthgql/TenantAccess.h>
 
 
 namespace
@@ -37,15 +44,23 @@ namespace
 }
 
 
-bool HasAnyPermission(const QByteArrayList& userPermissions, const QByteArrayList& requiredPermissions)
+// An unsaved organization is edited anywhere (inside one it becomes a sub-organization), a stored one only from inside it.
+bool IsOrganizationContextValid(
+			const imtdoc::IDocumentService& documentService,
+			const QByteArray& userId,
+			const QByteArray& documentId,
+			const QByteArray& contextTenantId)
 {
-	for (const QByteArray& permissionId : requiredPermissions){
-		if (!permissionId.isEmpty() && userPermissions.contains(permissionId)){
-			return true;
+	QByteArray storedTenantId;
+	const imtdoc::IDocumentService::DocumentList documentList = documentService.GetOpenedDocumentList(userId);
+	for (const imtdoc::IDocumentService::DocumentListItem& documentItem : documentList){
+		if (documentItem.documentId == documentId){
+			storedTenantId = imtdoc::SourceRefToObjectId(documentItem.documentSourceRef);
+			break;
 		}
 	}
 
-	return false;
+	return storedTenantId.isEmpty() || storedTenantId == contextTenantId;
 }
 
 
@@ -78,25 +93,7 @@ sdl::V1_0::imtauth::CTenantData CTenantCollectionDocumentServiceComp::OnGetTenan
 		return sdl::V1_0::imtauth::CTenantData();
 	}
 
-	istd::IChangeableSharedPtr documentPtr;
-	m_documentManagerCompPtr->GetDocumentData(userId, objectId, documentPtr);
-	if (!documentPtr.IsValid()){
-		errorMessage = QStringLiteral("Document not found");
-		return sdl::V1_0::imtauth::CTenantData();
-	}
-
-	const imtauth::ITenantInfo* tenantPtr = dynamic_cast<const imtauth::ITenantInfo*>(documentPtr.GetPtr());
-	if (tenantPtr == nullptr){
-		errorMessage = QStringLiteral("Invalid document type");
-		return sdl::V1_0::imtauth::CTenantData();
-	}
-
-	sdl::V1_0::imtauth::CTenantData response;
-	QByteArray tenantId = tenantPtr->GetTenantId();
-
 	QByteArray userObjectId;
-	// Server-side access control: user can only open TenantEditor if
-	// they have switched to this tenant (current tenant in JWT must match)
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 	QByteArray contextTenantId;
 	if (gqlContextPtr != nullptr){
@@ -104,12 +101,31 @@ sdl::V1_0::imtauth::CTenantData CTenantCollectionDocumentServiceComp::OnGetTenan
 		userObjectId = gqlContextPtr->GetUserId();
 	}
 
-	response.id = tenantId;
-
-	if (!tenantId.isEmpty() && !contextTenantId.isEmpty() && contextTenantId != tenantId){
-		errorMessage = QStringLiteral("Access denied: tenant context mismatch");
+	// A just created organization is still read back outside of any organization before the client switches into it.
+	if (!contextTenantId.isEmpty() && !IsOrganizationContextValid(*m_documentManagerCompPtr, userId, objectId, contextTenantId)){
+		errorMessage = QStringLiteral("An organization can be edited only while you work in it. Switch to the organization first.");
 		return sdl::V1_0::imtauth::CTenantData();
 	}
+
+	istd::IChangeableSharedPtr documentPtr;
+	m_documentManagerCompPtr->GetDocumentData(userId, objectId, documentPtr);
+	if (!documentPtr.IsValid()){
+		errorMessage = QStringLiteral("Document not found");
+		return sdl::V1_0::imtauth::CTenantData();
+	}
+
+	imtauth::ITenantInfo* tenantPtr = dynamic_cast<imtauth::ITenantInfo*>(documentPtr.GetPtr());
+	if (tenantPtr == nullptr){
+		errorMessage = QStringLiteral("Invalid document type");
+		return sdl::V1_0::imtauth::CTenantData();
+	}
+
+	SyncStoredData(*tenantPtr);
+
+	sdl::V1_0::imtauth::CTenantData response;
+	QByteArray tenantId = tenantPtr->GetTenantId();
+
+	response.id = tenantId;
 
 	bool isSystemAdmin = false;
 	if (gqlContextPtr != nullptr){
@@ -137,6 +153,10 @@ sdl::V1_0::imtauth::CTenantData CTenantCollectionDocumentServiceComp::OnGetTenan
 	response.description = tenantPtr->GetTenantDescription();
 	response.ownerId = tenantPtr->GetOwnerId();
 	response.creatorId = tenantPtr->GetCreatorId();
+	if (m_userCollectionCompPtr.IsValid()){
+		response.ownerName = imtauth::GetUserName(*m_userCollectionCompPtr, tenantPtr->GetOwnerId());
+		response.creatorName = imtauth::GetUserName(*m_userCollectionCompPtr, tenantPtr->GetCreatorId());
+	}
 	response.isActive = tenantPtr->IsActive();
 	response.createdAt = tenantPtr->GetCreatedAt();
 	response.updatedAt = tenantPtr->GetUpdatedAt();
@@ -260,8 +280,21 @@ sdl::V1_0::imtauth::CTenantData CTenantCollectionDocumentServiceComp::OnGetTenan
 	response.tenantPermissions.Emplace().FromList(tenantPtr->GetTenantPermissions());
 
 	// Hierarchy fields
-	response.parentTenantId = tenantPtr->GetParentTenantId();
+	const QByteArray parentTenantId = tenantId.isEmpty() ? contextTenantId : tenantPtr->GetParentTenantId();
+	response.parentTenantId = parentTenantId;
+	if (!parentTenantId.isEmpty() && m_tenantManagerCompPtr.IsValid()){
+		imtauth::ITenantInfoUniquePtr parentTenantPtr = m_tenantManagerCompPtr->GetTenant(parentTenantId);
+		if (parentTenantPtr.IsValid()){
+			response.parentTenantName = parentTenantPtr->GetTenantName();
+		}
+	}
 	response.isSystemTenant = (tenantPtr->GetTenantId() == imtauth::GetSystemTenantId());
+
+	// Only the creator edits the scope; the owner and the members read it.
+	response.canEditTenantPermissions = tenantId.isEmpty() || isCreator;
+	if (*response.canEditTenantPermissions && !parentTenantId.isEmpty() && m_tenantManagerCompPtr.IsValid()){
+		response.parentTenantPermissions.Emplace().FromList(m_tenantManagerCompPtr->GetTenantPermissions(parentTenantId));
+	}
 
 	return response;
 }
@@ -303,6 +336,11 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceCom
 
 	QByteArray userLogin = GetUserId(gqlRequest);
 
+	if (!IsOrganizationContextValid(*m_documentManagerCompPtr, userLogin, documentId, contextTenantId)){
+		errorMessage = QStringLiteral("An organization can be edited only while you work in it. Switch to the organization first.");
+		return response;
+	}
+
 	istd::IChangeableSharedPtr documentPtr;
 	m_documentManagerCompPtr->GetDocumentData(userLogin, documentId, documentPtr);
 	if (!documentPtr.IsValid()){
@@ -315,6 +353,8 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceCom
 		response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::InvalidDocumentId;
 		return response;
 	}
+
+	SyncStoredData(*tenantPtr);
 
 	sdl::V1_0::imtauth::CTenantData tenantData;
 	if (arguments.input->tenant){
@@ -334,7 +374,10 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceCom
 
 		QByteArrayList scopedPermissions;
 		for (const QByteArray& permissionId : contextUserPermissions){
-			if (!permissionId.isEmpty() && tenantPermissionSet.contains(permissionId)){
+			// A permission held in the old format ("EditUser") is the one the
+			// tenant grants as a path ("/Administration/EditUser"), so the two
+			// are matched by the common rule instead of by equality.
+			if (imtauth::HasPermission(tenantPermissionSet, permissionId)){
 				scopedPermissions.push_back(permissionId);
 			}
 		}
@@ -355,11 +398,6 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceCom
 		}
 	}
 
-	if (!tenantId.isEmpty() && !contextTenantId.isEmpty() && contextTenantId != tenantId){
-		errorMessage = QStringLiteral("Access denied: tenant context mismatch");
-		return response;
-	}
-
 	// Role-based access control for existing tenants
 	bool isCreator = !tenantId.isEmpty() && (tenantPtr->GetCreatorId() == contextUserId);
 	bool isOwner = !tenantId.isEmpty() && (tenantPtr->GetOwnerId() == contextUserId);
@@ -371,24 +409,17 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceCom
 		if (membershipPtr.IsValid() && membershipPtr->IsActive()){
 			isMember = true;
 			// isAdmin now based on having key org permission (replacing env role)
-		QByteArrayList orgP = membershipPtr->GetOrganizationPermissions();
-		isAdmin = isOwner || isCreator || orgP.contains("EditOrganizationMember") || orgP.contains("InviteOrganizationMember");
+		isAdmin = isOwner || isCreator || HasAnyOrganizationPermission(membershipPtr->GetOrganizationPermissions(), GetEditOrganizationMemberPermissions());
 		}
 	}
 	bool isNewTenant = tenantId.isEmpty();
 
-	const bool canChangeOrganizationName = isSystemAdmin || HasAnyPermission(effectiveUserPermissions,
-		QByteArrayList() << QByteArrayLiteral("ChangeOrganizationName") << QByteArrayLiteral("EditOrganization"));
-	const bool canChangeOrganizationDescription = isSystemAdmin || HasAnyPermission(effectiveUserPermissions,
-		QByteArrayList() << QByteArrayLiteral("ChangeOrganizationDescription") << QByteArrayLiteral("EditOrganization"));
-	const bool canChangeOrganizationState = isSystemAdmin || HasAnyPermission(effectiveUserPermissions,
-		QByteArrayList() << QByteArrayLiteral("EditOrganization"));
-	const bool canInviteOrganizationMember = isSystemAdmin || HasAnyPermission(effectiveUserPermissions,
-		QByteArrayList() << QByteArrayLiteral("InviteOrganizationMember") << QByteArrayLiteral("EditOrganizationMember"));
-	const bool canExcludeOrganizationMember = isSystemAdmin || HasAnyPermission(effectiveUserPermissions,
-		QByteArrayList() << QByteArrayLiteral("ExcludeOrganizationMember") << QByteArrayLiteral("EditOrganizationMember"));
-	const bool canChangeOrganizationMemberRole = isSystemAdmin || HasAnyPermission(effectiveUserPermissions,
-		QByteArrayList() << QByteArrayLiteral("ChangeOrganizationMemberRole") << QByteArrayLiteral("EditOrganizationMember"));
+	const bool canChangeOrganizationName = isSystemAdmin || HasAnyOrganizationPermission(effectiveUserPermissions, {s_changeOrganizationNamePermission});
+	const bool canChangeOrganizationDescription = isSystemAdmin || HasAnyOrganizationPermission(effectiveUserPermissions, {s_changeOrganizationDescriptionPermission});
+	const bool canChangeOrganizationState = isSystemAdmin || HasAnyOrganizationPermission(effectiveUserPermissions, GetEditOrganizationPermissions());
+	const bool canInviteOrganizationMember = isSystemAdmin || HasAnyOrganizationPermission(effectiveUserPermissions, {s_inviteOrganizationMemberPermission});
+	const bool canExcludeOrganizationMember = isSystemAdmin || HasAnyOrganizationPermission(effectiveUserPermissions, {s_excludeOrganizationMemberPermission});
+	const bool canChangeOrganizationMemberRole = isSystemAdmin || HasAnyOrganizationPermission(effectiveUserPermissions, {s_changeOrganizationMemberRolePermission});
 
 	// Block updates from non-members (e.g., invited users who haven't accepted yet)
 	if (!isNewTenant && !isOwner && !isCreator && !isMember){
@@ -400,12 +431,12 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceCom
 	const bool hasActiveChange = tenantData.isActive && (*tenantData.isActive != tenantPtr->IsActive());
 
 	if (hasNameChange && !isNewTenant && !isCreator && !isOwner && !canChangeOrganizationName){
-		errorMessage = QStringLiteral("Permission denied: ChangeOrganizationName");
+		errorMessage = QStringLiteral("Permission denied: /OrganizationManagement/Edit/ChangeName");
 		return response;
 	}
 
 	if (hasDescriptionChange && !isNewTenant && !isCreator && !isOwner && !canChangeOrganizationDescription){
-		errorMessage = QStringLiteral("Permission denied: ChangeOrganizationDescription");
+		errorMessage = QStringLiteral("Permission denied: /OrganizationManagement/Edit/ChangeDescription");
 		return response;
 	}
 
@@ -424,6 +455,17 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceCom
 
 	if (hasActiveChange){
 		tenantPtr->SetActive(*tenantData.isActive);
+	}
+
+	// The creator picks the owner until the organization is saved; afterwards the ownership is transferred
+	if (isNewTenant && tenantData.ownerId && !tenantData.ownerId->isEmpty() && *tenantData.ownerId != tenantPtr->GetOwnerId()){
+		imtbase::IObjectCollection::DataPtr ownerDataPtr;
+		if (!m_userCollectionCompPtr.IsValid() || !m_userCollectionCompPtr->GetObjectData(*tenantData.ownerId, ownerDataPtr)){
+			errorMessage = QStringLiteral("Owner user not found");
+			return response;
+		}
+
+		tenantPtr->SetOwnerId(*tenantData.ownerId);
 	}
 
 	// CreatorId and OwnerId are set once on first save.
@@ -459,6 +501,36 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceCom
 	if (isNewTenant && (tenantPtr->GetOwnerId().isEmpty() || tenantPtr->GetCreatorId().isEmpty())){
 		errorMessage = QStringLiteral("Unable to save tenant: OwnerId and CreatorId must be set");
 		return response;
+	}
+
+	if (isNewTenant){
+		tenantPtr->SetParentTenantId(contextTenantId);
+	}
+
+	bool hasPermissionsChange = false;
+	if (tenantData.tenantPermissions){
+		const QByteArrayList newPermissions = tenantData.tenantPermissions->ToList();
+		const QByteArrayList currentPermissions = tenantPtr->GetTenantPermissions();
+		hasPermissionsChange = QSet<QByteArray>(newPermissions.begin(), newPermissions.end()) != QSet<QByteArray>(currentPermissions.begin(), currentPermissions.end());
+		if (hasPermissionsChange){
+			if (!m_tenantManagerCompPtr.IsValid()){
+				errorMessage = QStringLiteral("Organization permissions cannot be changed: the tenant manager is not configured");
+				return response;
+			}
+
+			if (!CheckTenantPermissionsChange(
+						*m_tenantManagerCompPtr,
+						tenantPtr->GetCreatorId(),
+						tenantPtr->GetParentTenantId(),
+						currentPermissions,
+						newPermissions,
+						contextUserId,
+						errorMessage)){
+				return response;
+			}
+
+			tenantPtr->SetTenantPermissions(newPermissions);
+		}
 	}
 
 	// Only Owner/Admin can manage members (add/remove/change roles)
@@ -504,12 +576,12 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceCom
 		}
 
 		if (removesOthers && !isCreator && !isOwner && !isAdmin && !canExcludeOrganizationMember){
-			errorMessage = QStringLiteral("Permission denied: ExcludeOrganizationMember");
+			errorMessage = QStringLiteral("Permission denied: /OrganizationManagement/Members/Edit/Exclude");
 			return response;
 		}
 
 		if (!addedUserIds.isEmpty() && !isCreator && !isOwner && !isAdmin && !canInviteOrganizationMember){
-			errorMessage = QStringLiteral("Permission denied: InviteOrganizationMember");
+			errorMessage = QStringLiteral("Permission denied: /OrganizationManagement/Members/Edit/Invite");
 			return response;
 		}
 
@@ -517,9 +589,26 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceCom
 			// Creator/Owner/Admin can remove any member (except creator/owner) and add new ones
 			QByteArray ownerId = tenantPtr->GetOwnerId();
 			QByteArray creatorId = tenantPtr->GetCreatorId();
+			QByteArrayList excludedUserIds;
 			for (const QByteArray& existingUserId : currentUserIds){
 				if (!newUserIds.contains(existingUserId) && existingUserId != ownerId && existingUserId != creatorId){
-					m_membershipManagerCompPtr->RemoveMembership(userIdToMembershipId.value(existingUserId));
+					excludedUserIds << existingUserId;
+				}
+			}
+
+			// The invitations of the excluded members go first: after a membership is gone a failed revocation could not be repeated.
+			// A failure stops before the document and the members change; the invitations already revoked stay revoked.
+			for (const QByteArray& excludedUserId : excludedUserIds){
+				if (m_invitationManagerCompPtr.IsValid() && !m_invitationManagerCompPtr->RevokeInvitationsSentBy(tenantId, excludedUserId, contextUserId)){
+					errorMessage = QStringLiteral("The invitations an excluded member sent could not be revoked. Try again.");
+					return response;
+				}
+			}
+
+			for (const QByteArray& excludedUserId : excludedUserIds){
+				if (!m_membershipManagerCompPtr->RemoveMembership(userIdToMembershipId.value(excludedUserId))){
+					errorMessage = QStringLiteral("A member could not be excluded. Try again.");
+					return response;
 				}
 			}
 
@@ -531,14 +620,30 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceCom
 				}
 			}
 		} else if (isSelfLeaving){
-			// Non-admin member can only remove themselves
-			m_membershipManagerCompPtr->RemoveMembership(userIdToMembershipId.value(contextUserId));
-		}
+			// Non-admin member can only remove themselves; the own invitations go first
+			if (m_invitationManagerCompPtr.IsValid() && !m_invitationManagerCompPtr->RevokeInvitationsSentBy(tenantId, contextUserId, contextUserId)){
+				errorMessage = QStringLiteral("The invitations you sent could not be revoked. Try again.");
+				return response;
+			}
 
-		// Apply tenant permissions (only Creator can change permissions)
-		if (isCreator && tenantData.tenantPermissions){
-			tenantPtr->SetTenantPermissions(tenantData.tenantPermissions->ToList());
+			if (!m_membershipManagerCompPtr->RemoveMembership(userIdToMembershipId.value(contextUserId))){
+				errorMessage = QStringLiteral("You could not leave the organization. Try again.");
+				return response;
+			}
 		}
+	}
+
+	// A change the save refuses (a duplicate name, say) is undone below, so it neither stays in the document nor fails every next change
+	idoc::IUndoManager* undoManagerPtr = nullptr;
+	if (m_documentManagerCompPtr->GetDocumentUndoManager(userLogin, documentId, undoManagerPtr) != imtdoc::IDocumentService::OS_OK){
+		undoManagerPtr = nullptr;
+	}
+	const int undoStepsBeforeChange = undoManagerPtr != nullptr ? undoManagerPtr->GetAvailableUndoSteps() : 0;
+
+	// The undo buffer drops its oldest step when full, so the step count may not grow: the document is restored from this copy then
+	istd::IChangeableSharedPtr previousDocumentPtr;
+	if (!tenantId.isEmpty()){
+		m_documentManagerCompPtr->GetDocumentData(userLogin, documentId, previousDocumentPtr);
 	}
 
 	m_documentManagerCompPtr->SetDocumentData(userLogin, documentId, *documentPtr);
@@ -546,11 +651,45 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceCom
 	// For new tenants do NOT auto-save — user will save manually.
 	// For existing tenants, save immediately after each change (like tickets).
 	if (!tenantId.isEmpty()){
+		// The validator takes the initiating user from the operation context, it lives until the save task is finished.
+		imtbase::COperationContext operationContext;
+		if (gqlContextPtr != nullptr){
+			const imtauth::CIdentifiableUserInfo* contextIdentifiableUserInfoPtr = dynamic_cast<const imtauth::CIdentifiableUserInfo*>(gqlContextPtr->GetUserInfo());
+			if (contextIdentifiableUserInfoPtr != nullptr){
+				imtbase::IOperationContext::IdentifableObjectInfo ownerInfo;
+				ownerInfo.id = contextIdentifiableUserInfoPtr->GetObjectUuid();
+				ownerInfo.name = contextIdentifiableUserInfoPtr->GetName();
+				operationContext.SetOperationOwnerId(ownerInfo);
+			}
+
+			operationContext.SetTenantId(contextTenantId);
+		}
+
 		imtdoc::IDocumentService::TaskParams saveParams;
 		saveParams.userId = userLogin;
 		saveParams.documentId = documentId;
+		saveParams.operationContextPtr = gqlContextPtr != nullptr ? &operationContext : nullptr;
 		QByteArray saveTaskId = m_documentManagerCompPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_SAVE, saveParams);
-		m_documentManagerCompPtr->WaitForTaskFinished(saveTaskId);
+		const imtdoc::IDocumentService::TaskResult saveResult = m_documentManagerCompPtr->WaitForTaskFinished(saveTaskId);
+		if (saveResult.status != imtdoc::IDocumentService::OS_OK){
+			errorMessage = saveResult.errorMessage.isEmpty() ? QStringLiteral("The organization could not be saved") : saveResult.errorMessage;
+
+			const int changeSteps = undoManagerPtr != nullptr ? undoManagerPtr->GetAvailableUndoSteps() - undoStepsBeforeChange : 0;
+			if (changeSteps > 0){
+				undoManagerPtr->DoUndo(changeSteps);
+			}
+			else if (previousDocumentPtr.IsValid()){
+				m_documentManagerCompPtr->SetDocumentData(userLogin, documentId, *previousDocumentPtr);
+			}
+
+			return response;
+		}
+
+		// The stored scope is already the new one, so only the sub-organizations are narrowed here.
+		// This also runs when the scope is unchanged, so retrying the save completes a cascade that failed earlier.
+		if (m_tenantManagerCompPtr.IsValid() && !NarrowSubOrganizationPermissions(*m_tenantManagerCompPtr, tenantId, errorMessage)){
+			return response;
+		}
 	}
 
 	response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Success;
@@ -567,7 +706,7 @@ bool CTenantCollectionDocumentServiceComp::ProcessEvent(imtdoc::CEventBase* even
 	if (savedEventPtr != nullptr){
 		QByteArray documentId = savedEventPtr->GetDocumentId();
 		QByteArray userId = savedEventPtr->GetUserId();
-		QByteArray objectId = savedEventPtr->GetDocumentUrl().toString().toUtf8().replace("collection:///", "");
+		QByteArray objectId = imtdoc::SourceRefToObjectId(savedEventPtr->GetDocumentSourceRef());
 
 		istd::IChangeableSharedPtr documentPtr;
 		imtauth::ITenantInfo* documentTicketPtr = nullptr;
@@ -598,6 +737,33 @@ bool CTenantCollectionDocumentServiceComp::ProcessEvent(imtdoc::CEventBase* even
 	}
 
 	return true;
+}
+
+
+// private methods
+
+void CTenantCollectionDocumentServiceComp::SyncStoredData(imtauth::ITenantInfo& tenant) const
+{
+	const QByteArray tenantId = tenant.GetTenantId();
+	if (tenantId.isEmpty() || !m_tenantCollectionCompPtr.IsValid()){
+		return;
+	}
+
+	imtbase::IObjectCollection::DataPtr storedDataPtr;
+	if (!m_tenantCollectionCompPtr->GetObjectData(tenantId, storedDataPtr)){
+		return;
+	}
+
+	const imtauth::ITenantInfo* storedTenantPtr = dynamic_cast<const imtauth::ITenantInfo*>(storedDataPtr.GetPtr());
+	if (storedTenantPtr == nullptr){
+		return;
+	}
+
+	if (!storedTenantPtr->GetOwnerId().isEmpty()){
+		tenant.SetOwnerId(storedTenantPtr->GetOwnerId());
+	}
+
+	tenant.SetTenantPermissions(storedTenantPtr->GetTenantPermissions());
 }
 
 

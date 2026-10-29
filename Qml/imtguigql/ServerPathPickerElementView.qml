@@ -46,7 +46,7 @@ ElementView {
 		ServerPathPicker {
 			id: picker
 
-			width: pathPickerElement.controlWidth
+			width: pathPickerElement.fittedControlWidth
 			height: pathPickerElement.controlHeight
 			path: pathPickerElement.path
 			pathKind: pathPickerElement.pathKind

@@ -30,9 +30,7 @@
     <EmbeddedRegistries>
         <EmbededRegistry Id="DocumentRevision">
             <PositionMap>
-                <Element ComponentName="CheckPermissionOr" X="900" Y="200" Note=""/>
                 <Element ComponentName="RemoteDocumentRevisionController" X="575" Y="75" Note=""/>
-                <Element ComponentName="RevisionPermissions" X="250" Y="200" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>

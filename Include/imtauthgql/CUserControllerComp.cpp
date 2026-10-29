@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgql/CUserControllerComp.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Users.h>
+#include <imtauthgql/imtauthgql.h>
 
 
 // ACF includes
@@ -8,10 +9,23 @@
 
 // ImtCore includes
 #include <imtauth/CUserVerification.h>
+#include <imtauth/CollectionSelection.h>
+#include <imtservergql/imtservergql.h>
 
 
 namespace imtauthgql
 {
+
+
+namespace
+{
+
+
+// The permission UserItem requires to read another user
+static const QByteArray s_viewUsersPermissionId = QByteArrayLiteral("/Administration/Users/View");
+
+
+} // anonymous namespace
 
 
 // reimplemented (sdl::V1_0::imtauth::CUsersGqlHandlerCompBase)
@@ -47,9 +61,10 @@ sdl::V1_0::imtauth::CChangePasswordPayload CUserControllerComp::OnChangePassword
 	}
 
 	auto& inputArgument = *arguments.input;
-	QByteArray login;
+	// The answers name the account only as it was asked for: the login behind an e-mail stays unknown to who does not prove the account
+	QByteArray requestedLogin;
 	if (inputArgument.login){
-		login = *inputArgument.login;
+		requestedLogin = *inputArgument.login;
 	}
 
 	QString oldPassword;
@@ -62,7 +77,12 @@ sdl::V1_0::imtauth::CChangePasswordPayload CUserControllerComp::OnChangePassword
 		newPassword = *inputArgument.newPassword;
 	}
 
-	QByteArray userId = GetUserIdByLogin(login);
+	QByteArray verificationCode;
+	if (inputArgument.verificationCode){
+		verificationCode = inputArgument.verificationCode->toUtf8();
+	}
+
+	QByteArray userId = GetUserIdByLoginOrEmail(requestedLogin);
 
 	imtauth::IUserInfo* userInfoPtr = nullptr;
 	imtbase::IObjectCollection::DataPtr dataPtr;
@@ -70,20 +90,15 @@ sdl::V1_0::imtauth::CChangePasswordPayload CUserControllerComp::OnChangePassword
 		userInfoPtr = dynamic_cast<imtauth::IUserInfo*>(dataPtr.GetPtr());
 	}
 
+	// An unknown account is refused like a wrong password, so the answer does not tell which accounts exist
 	if (userInfoPtr == nullptr){
 		return CreateChangePasswordFailure(
-					QStringLiteral("Unable to change password for user '%1'. Error: The user does not exist").arg(login),
-					QStringList() << QStringLiteral("UnknownUser"));
+					QStringLiteral("Unable to change password for user '%1'. Error: Invalid login or password.").arg(QString::fromUtf8(requestedLogin)),
+					QStringList() << QStringLiteral("InvalidCredentials"));
 	}
 
-	imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
-	for (const imtauth::IUserInfo::SystemInfo& systemInfo : systemInfoList){
-		if (systemInfo.enabled && !systemInfo.systemId.isEmpty()){
-			return CreateChangePasswordFailure(
-						QStringLiteral("Unable to change password for user '%1'. Error: A user from an external system").arg(login),
-						QStringList() << QStringLiteral("ExternalUser"));
-		}
-	}
+	// The recovery may name the account by its e-mail; the credentials and the password hash use the login
+	const QByteArray login = userInfoPtr->GetId();
 
 	bool ok = false;
 	bool isAdminRequest = false;
@@ -101,17 +116,26 @@ sdl::V1_0::imtauth::CChangePasswordPayload CUserControllerComp::OnChangePassword
 		ok = m_credentialControllerCompPtr->CheckCredential(login, oldPassword.toUtf8());
 	}
 
-	if (m_userVerificationControllerCompPtr.IsValid()){
-		istd::TDelPtr<const imtauth::IUserVerification> verificationInfoPtr = m_userVerificationControllerCompPtr->GetVerificationData(userId);
-		if (verificationInfoPtr.IsValid() && !verificationInfoPtr->IsExpired()){
-			ok = true;
-		}
+	// The recovery proves the account by the code sent to its e-mail, not by a pending verification alone
+	bool isRecovery = false;
+	if (!ok && !verificationCode.isEmpty() && m_userVerificationControllerCompPtr.IsValid()){
+		ok = isRecovery = m_userVerificationControllerCompPtr->VerifyUser(userId, verificationCode);
 	}
 
 	if (!ok){
 		return CreateChangePasswordFailure(
-					QStringLiteral("Unable to change password for user '%1'. Error: Invalid login or password.").arg(login),
+					QStringLiteral("Unable to change password for user '%1'. Error: Invalid login or password.").arg(QString::fromUtf8(requestedLogin)),
 					QStringList() << QStringLiteral("InvalidCredentials"));
+	}
+
+	// Told only after the account is proven, so the kind of an account does not show its existence
+	imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
+	for (const imtauth::IUserInfo::SystemInfo& systemInfo : systemInfoList){
+		if (systemInfo.enabled && !systemInfo.systemId.isEmpty()){
+			return CreateChangePasswordFailure(
+						QStringLiteral("Unable to change password for user '%1'. Error: A user from an external system").arg(QString::fromUtf8(requestedLogin)),
+						QStringList() << QStringLiteral("ExternalUser"));
+		}
 	}
 
 	QByteArray passwordHash = m_hashCalculatorCompPtr->GenerateHash(login + newPassword.toUtf8());
@@ -136,6 +160,13 @@ sdl::V1_0::imtauth::CChangePasswordPayload CUserControllerComp::OnChangePassword
 						QStringLiteral("Unable to change password for user '%1'. Error: The password was already used and may not be reused").arg(login),
 						QStringList() << QStringLiteral("PasswordReused"));
 		}
+	}
+
+	// The code is used up before the password changes, so two requests with the same code cannot both change it
+	if (isRecovery && !m_userVerificationControllerCompPtr->ConsumeVerification(userId, verificationCode)){
+		return CreateChangePasswordFailure(
+					QStringLiteral("Unable to change password for user '%1'. Error: Invalid login or password.").arg(QString::fromUtf8(requestedLogin)),
+					QStringList() << QStringLiteral("InvalidCredentials"));
 	}
 
 	QByteArray previousPasswordHash = userInfoPtr->GetPasswordHash();
@@ -168,7 +199,7 @@ sdl::V1_0::imtauth::CChangePasswordPayload CUserControllerComp::OnChangePassword
 
 sdl::V1_0::imtauth::CRegisterUserPayload CUserControllerComp::OnRegisterUser(
 			const sdl::V1_0::imtauth::CRegisterUserGqlRequest& registerUserRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtauth::CRegisterUserPayload response;
@@ -214,6 +245,12 @@ sdl::V1_0::imtauth::CRegisterUserPayload CUserControllerComp::OnRegisterUser(
 
 	sdl::V1_0::imtauth::CUserData userData = *arguments.input->userData;
 
+	// Self-registration cannot grant access: only the superuser may register a user with roles or groups.
+	if (!IsSuperuserRequest(gqlRequest)){
+		userData.roles = nullptr;
+		userData.groups = nullptr;
+	}
+
 	QByteArray userId;
 	if (arguments.input->userData->id){
 		userId = *arguments.input->userData->id;
@@ -257,10 +294,11 @@ sdl::V1_0::imtauth::CRegisterUserPayload CUserControllerComp::OnRegisterUser(
 	if (m_passwordPolicyCompPtr.IsValid()){
 		QStringList violatedRuleIds;
 		if (!m_passwordPolicyCompPtr->ValidatePasswordStrength(*userData.username, password, violatedRuleIds)){
-			QString message = QStringLiteral("Unable to register user. Error: The password does not fulfill the password policy (%1)").arg(violatedRuleIds.join(", "));
+			QString message = QStringLiteral("The password does not fulfill the password policy (%1)").arg(violatedRuleIds.join(", "));
 			SendErrorMessage(0, message, "CUserControllerComp");
 
 			sdl::V1_0::imtauth::CRegisterUserPayload failurePayload;
+			failurePayload.id = QByteArray();
 			failurePayload.message = message;
 			failurePayload.violatedRules.emplace();
 			for (const QString& violatedRuleId : violatedRuleIds){
@@ -285,7 +323,9 @@ sdl::V1_0::imtauth::CRegisterUserPayload CUserControllerComp::OnRegisterUser(
 	response.id = userId;
 
 	if (m_roleCollectionCompPtr.IsValid()){
-		imtbase::IObjectCollection::Ids roleIds = m_roleCollectionCompPtr->GetElementIds();
+		// The roles of the product are the candidates for its default role
+		const imtbase::IObjectCollection::Ids roleIds = imtauth::CollectionSelection::SelectIds(
+					*m_roleCollectionCompPtr, imtauth::CollectionSelection::ColumnEquals("ProductId", productId), {"ProductId"});
 		for (const QByteArray& roleId : roleIds){
 			imtbase::IObjectCollection::DataPtr roleDataPtr;
 			if (m_roleCollectionCompPtr->GetObjectData(roleId, roleDataPtr)){
@@ -347,22 +387,8 @@ sdl::V1_0::imtauth::CCheckEmailPayload CUserControllerComp::OnCheckEmail(
 		return retVal;
 	}
 
-	QByteArray userId = GetUserIdByEmail(email);
-
-	const imtauth::IUserInfo* userInfoPtr = nullptr;
-	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (m_userCollectionCompPtr->GetObjectData(userId, dataPtr)){
-		userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
-	}
-
-	if (userInfoPtr == nullptr){
-		response.message = QStringLiteral("There are no users with email '%1' in the system").arg(email);
-		return retVal;
-	}
-
+	// Anyone may ask, so the answer neither names the account nor tells whether one exists
 	response.success = true;
-	response.userName = userInfoPtr->GetName();
-	response.login = userInfoPtr->GetId();
 
 	return retVal;
 }
@@ -390,20 +416,19 @@ sdl::V1_0::imtauth::CSendEmailCodePayload CUserControllerComp::OnSendEmailCode(
 	response.login = login;
 	response.success = false;
 
-	QByteArray objectId = GetUserIdByLogin(login);
-	imtauth::IUserInfoSharedPtr userInfoPtr = GetUserInfoByLogin(login);
-	if (!userInfoPtr.IsValid()){
-		response.message = QStringLiteral("Unable to send email code. Error: User is invalid");
+	const QByteArray objectId = GetUserIdByLoginOrEmail(login);
+	imtauth::IUserInfoSharedPtr userInfoPtr;
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	if (!objectId.isEmpty() && m_userCollectionCompPtr.IsValid() && m_userCollectionCompPtr->GetObjectData(objectId, dataPtr) && dataPtr.IsValid()){
+		userInfoPtr.SetCastedPtr<istd::IChangeable>(dataPtr);
 	}
-	else{
-		bool ok = SendUserCode(objectId, *userInfoPtr.GetPtr());
-		if (ok){
-			response.success = ok;
-		}
-		else{
-			response.message = QStringLiteral("Unable to send email code. Error: Unknown error");
-		}
+
+	// Unknown accounts and failed sendings get the same answer, so it tells no account exists; the failure is logged
+	if (userInfoPtr.IsValid()){
+		SendUserCode(objectId, *userInfoPtr.GetPtr());
 	}
+
+	response.success = true;
 
 	return retVal;
 }
@@ -429,7 +454,7 @@ sdl::V1_0::imtauth::CCheckEmailCodePayload CUserControllerComp::OnCheckEmailCode
 		login = *arguments.input->login;
 	}
 
-	QByteArray userId = GetUserIdByLogin(login);
+	QByteArray userId = GetUserIdByLoginOrEmail(login);
 
 	QString code;
 	if (arguments.input->code){
@@ -603,7 +628,7 @@ sdl::V1_0::imtauth::CCreateSuperuserPayload CUserControllerComp::OnCreateSuperus
 
 sdl::V1_0::imtauth::CUserObjectId CUserControllerComp::OnGetUserObjectId(
 			const sdl::V1_0::imtauth::CGetUserObjectIdGqlRequest& getUserObjectIdRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtauth::CUserObjectId response;
@@ -622,6 +647,17 @@ sdl::V1_0::imtauth::CUserObjectId CUserControllerComp::OnGetUserObjectId(
 	QByteArray login = *arguments.input->login;
 	QByteArray objectId = GetUserIdByLogin(login);
 
+	// The id of another account is told to whoever may view users, like UserItem
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	const QByteArray requestUserId = gqlContextPtr != nullptr ? gqlContextPtr->GetUserId() : QByteArray();
+	const bool isOwnAccount = !requestUserId.isEmpty() && requestUserId == objectId;
+	const bool mayViewUsers = gqlContextPtr != nullptr && imtauth::HasPermission(imtservergql::GetUserPermissions(*gqlContextPtr), s_viewUsersPermissionId);
+	if (!isOwnAccount && !mayViewUsers && !IsSuperuserRequest(gqlRequest)){
+		errorMessage = QStringLiteral("Unable to get user object-ID. Error: No permission to view other users");
+		SendWarningMessage(0, errorMessage, "CUserControllerComp");
+		return response;
+	}
+
 	response.objectId = objectId;
 
 	return response;
@@ -630,11 +666,17 @@ sdl::V1_0::imtauth::CUserObjectId CUserControllerComp::OnGetUserObjectId(
 
 sdl::V1_0::imtauth::CUnlockUserPayload CUserControllerComp::OnUnlockUser(
 			const sdl::V1_0::imtauth::CUnlockUserGqlRequest& unlockUserRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtauth::CUnlockUserPayload response;
 	response.success = false;
+
+	if (!IsSuperuserRequest(gqlRequest)){
+		errorMessage = QStringLiteral("Unable to unlock user account. Error: Only the superuser can unlock an account");
+		SendWarningMessage(0, errorMessage, "CUserControllerComp");
+		return response;
+	}
 
 	if (!m_accountLockoutControllerCompPtr.IsValid()){
 		errorMessage = QStringLiteral("Unable to unlock user account. Error: Component 'AccountLockoutController' was not set");
@@ -799,6 +841,21 @@ QByteArray CUserControllerComp::GetUserIdByLogin(const QByteArray& login) const
 	}
 
 	return QByteArray();
+}
+
+
+QByteArray CUserControllerComp::GetUserIdByLoginOrEmail(const QByteArray& loginOrEmail) const
+{
+	if (loginOrEmail.isEmpty() || !m_userCollectionCompPtr.IsValid()){
+		return QByteArray();
+	}
+
+	const QByteArray userId = GetUserIdByLogin(loginOrEmail);
+	if (!userId.isEmpty() || !loginOrEmail.contains('@')){
+		return userId;
+	}
+
+	return GetUserIdByEmail(QString::fromUtf8(loginOrEmail));
 }
 
 

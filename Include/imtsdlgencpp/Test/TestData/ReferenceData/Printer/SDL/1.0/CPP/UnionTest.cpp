@@ -358,6 +358,11 @@ bool V1_0::modsdl::CLink::WriteToModel(::imtbase::CTreeItemModel& model, int mod
 		::imtbase::CTreeItemModel* newStatusListModelPtr = model.AddTreeModel("statusList", modelIndex);
 		newStatusListModelPtr->setIsArray(true);
 		for (qsizetype statusListIndex = 0; statusListIndex < statusList->size(); ++statusListIndex){
+			if (!statusList->at(statusListIndex)){
+				newStatusListModelPtr->InsertNewItem();
+				newStatusListModelPtr->SetData(QByteArray(), QVariant(), statusListIndex);
+				continue;
+			}
 			QString statusListStringValue;
 			switch (*statusList->at(statusListIndex)){
 			case LinkStatus::OPEN:
@@ -373,6 +378,9 @@ bool V1_0::modsdl::CLink::WriteToModel(::imtbase::CTreeItemModel& model, int mod
 			newStatusListModelPtr->InsertNewItem();
 			newStatusListModelPtr->SetData(QByteArray(), statusListStringValue, statusListIndex);
 		}
+	}
+	else if (statusList.IsNull()){
+		model.SetData("statusList", QVariant(), modelIndex);
 	}
 
 
@@ -407,10 +415,17 @@ bool V1_0::modsdl::CLink::ReadFromModel(const ::imtbase::CTreeItemModel& model, 
 	}
 
 	::imtbase::CTreeItemModel* statusListModel = model.GetTreeItemModel("statusList", modelIndex);
+	if (model.ContainsKey("statusList", modelIndex) && statusListModel == nullptr){
+		statusList.SetNull();
+	}
 	if (statusListModel != nullptr){
 		int statusListCount = statusListModel->GetItemsCount();
 		imtsdl::TElementList<V1_0::modsdl::LinkStatus> statusListList;
 		for (int statusListIndex = 0; statusListIndex < statusListCount; ++statusListIndex){
+			if (!statusListModel->GetData(QByteArray(), statusListIndex).isValid()){
+				statusListList.AppendNull();
+				continue;
+			}
 			V1_0::modsdl::LinkStatus statusListData;
 			QString statusListStringValue = statusListModel->GetData(QByteArray(), statusListIndex).toString();
 			if(statusListStringValue == "OPEN"){
@@ -459,10 +474,17 @@ bool V1_0::modsdl::CLink::OptReadFromModel(const ::imtbase::CTreeItemModel& mode
 	}
 
 	::imtbase::CTreeItemModel* statusListModel = model.GetTreeItemModel("statusList", modelIndex);
+	if (model.ContainsKey("statusList", modelIndex) && statusListModel == nullptr){
+		statusList.SetNull();
+	}
 	if (statusListModel != nullptr){
 		int statusListCount = statusListModel->GetItemsCount();
 		imtsdl::TElementList<V1_0::modsdl::LinkStatus> statusListList;
 		for (int statusListIndex = 0; statusListIndex < statusListCount; ++statusListIndex){
+			if (!statusListModel->GetData(QByteArray(), statusListIndex).isValid()){
+				statusListList.AppendNull();
+				continue;
+			}
 			V1_0::modsdl::LinkStatus statusListData;
 			QString statusListStringValue = statusListModel->GetData(QByteArray(), statusListIndex).toString();
 			if(statusListStringValue == "OPEN"){
@@ -515,6 +537,10 @@ bool V1_0::modsdl::CLink::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObj
 	if (statusList){
 		QVariantList statusListDataObjectList;
 		for (qsizetype statusListIndex = 0; statusListIndex < statusList->size(); ++statusListIndex){
+			if (!statusList->at(statusListIndex)){
+				statusListDataObjectList << QVariant();
+				continue;
+			}
 			QString statusListStringValue;
 			switch (*statusList->at(statusListIndex)){
 			case LinkStatus::OPEN:
@@ -530,6 +556,9 @@ bool V1_0::modsdl::CLink::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObj
 			statusListDataObjectList << statusListStringValue;
 		}
 		gqlObject.InsertParam("statusList", statusListDataObjectList);
+	}
+	else if (statusList.IsNull()){
+		gqlObject.InsertParam("statusList", QVariant());
 	}
 
 	gqlObject.InsertParam("__typename", QVariant("Link"));
@@ -562,8 +591,8 @@ bool V1_0::modsdl::CLink::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject&
 		}
 	}
 
-	if (gqlObject.ContainsParam("statusList")){
-		statusList.emplace();
+	if (gqlObject.ContainsParam("statusList") && gqlObject["statusList"].isNull()){
+		statusList.SetNull();
 	}
 	if (gqlObject.ContainsParam("statusList") && !(gqlObject["statusList"].isNull())){
 		const QVariant statusListData = gqlObject["statusList"];
@@ -571,6 +600,10 @@ bool V1_0::modsdl::CLink::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject&
 		const qsizetype statusListElementsCount = statusListDataList.size();
 		statusList = imtsdl::TElementList<V1_0::modsdl::LinkStatus>();
 		for (qsizetype statusListIndex = 0; statusListIndex < statusListElementsCount; ++statusListIndex){
+			if (!statusListDataList[statusListIndex].isValid() || statusListDataList[statusListIndex].isNull()){
+				statusList->AppendNull();
+				continue;
+			}
 			const QString tempStatusList = statusListDataList[statusListIndex].toString();
 			V1_0::modsdl::LinkStatus statusListDataValue;
 			if(tempStatusList == "OPEN"){
@@ -613,8 +646,8 @@ bool V1_0::modsdl::CLink::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObje
 		}
 	}
 
-	if (gqlObject.ContainsParam("statusList")){
-		statusList.emplace();
+	if (gqlObject.ContainsParam("statusList") && gqlObject["statusList"].isNull()){
+		statusList.SetNull();
 	}
 	if (gqlObject.ContainsParam("statusList") && !(gqlObject["statusList"].isNull())){
 		const QVariant statusListData = gqlObject["statusList"];
@@ -622,6 +655,10 @@ bool V1_0::modsdl::CLink::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObje
 		const qsizetype statusListElementsCount = statusListDataList.size();
 		statusList = imtsdl::TElementList<V1_0::modsdl::LinkStatus>();
 		for (qsizetype statusListIndex = 0; statusListIndex < statusListElementsCount; ++statusListIndex){
+			if (!statusListDataList[statusListIndex].isValid() || statusListDataList[statusListIndex].isNull()){
+				statusList->AppendNull();
+				continue;
+			}
 			const QString tempStatusList = statusListDataList[statusListIndex].toString();
 			V1_0::modsdl::LinkStatus statusListDataValue;
 			if(tempStatusList == "OPEN"){
@@ -671,6 +708,10 @@ bool V1_0::modsdl::CLink::WriteToJsonObject(QJsonObject& jsonObject) const
 	if (statusList){
 		QJsonArray newStatusListArray;
 		for (qsizetype statusListIndex = 0; statusListIndex < statusList->size(); ++statusListIndex){
+			if (!statusList->at(statusListIndex)){
+				newStatusListArray << QJsonValue(QJsonValue::Null);
+				continue;
+			}
 			QString statusListStringValue;
 			switch (*statusList->at(statusListIndex)){
 			case LinkStatus::OPEN:
@@ -686,6 +727,9 @@ bool V1_0::modsdl::CLink::WriteToJsonObject(QJsonObject& jsonObject) const
 			newStatusListArray << statusListStringValue;
 		}
 		jsonObject["statusList"] = newStatusListArray;
+	}
+	else if (statusList.IsNull()){
+		jsonObject["statusList"] = QJsonValue(QJsonValue::Null);
 	}
 
 	jsonObject["__typename"] = "Link";
@@ -718,11 +762,18 @@ bool V1_0::modsdl::CLink::ReadFromJsonObject(const QJsonObject& jsonObject)
 		}
 	}
 
-	if (jsonObject.contains("statusList") && jsonObject["statusList"].isArray()){
+if (jsonObject.contains("statusList") && jsonObject["statusList"].isNull()){
+		statusList.SetNull();
+	}
+		if (jsonObject.contains("statusList") && jsonObject["statusList"].isArray()){
 		const QJsonArray statusListJsonArray = jsonObject["statusList"].toArray();
 		const qsizetype statusListArrayCount = statusListJsonArray.size();
 		statusList = imtsdl::TElementList<V1_0::modsdl::LinkStatus>();
 		for (qsizetype statusListIndex = 0; statusListIndex < statusListArrayCount; ++statusListIndex){
+			if (statusListJsonArray[statusListIndex].isNull()){
+				statusList->AppendNull();
+				continue;
+			}
 			const QString tempStatusList = statusListJsonArray[statusListIndex].toString();
 			V1_0::modsdl::LinkStatus statusListDataValue;
 			if(tempStatusList == "OPEN"){
@@ -765,11 +816,18 @@ bool V1_0::modsdl::CLink::OptReadFromJsonObject(const QJsonObject& jsonObject)
 		}
 	}
 
-	if (jsonObject.contains("statusList") && jsonObject["statusList"].isArray()){
+if (jsonObject.contains("statusList") && jsonObject["statusList"].isNull()){
+		statusList.SetNull();
+	}
+		if (jsonObject.contains("statusList") && jsonObject["statusList"].isArray()){
 		const QJsonArray statusListJsonArray = jsonObject["statusList"].toArray();
 		const qsizetype statusListArrayCount = statusListJsonArray.size();
 		statusList = imtsdl::TElementList<V1_0::modsdl::LinkStatus>();
 		for (qsizetype statusListIndex = 0; statusListIndex < statusListArrayCount; ++statusListIndex){
+			if (statusListJsonArray[statusListIndex].isNull()){
+				statusList->AppendNull();
+				continue;
+			}
 			const QString tempStatusList = statusListJsonArray[statusListIndex].toString();
 			V1_0::modsdl::LinkStatus statusListDataValue;
 			if(tempStatusList == "OPEN"){
@@ -825,6 +883,11 @@ bool V1_0::modsdl::CPrinterBase::WriteToModel(::imtbase::CTreeItemModel& model, 
 	::imtbase::CTreeItemModel* newLinkListModelPtr = model.AddTreeModel("linkList", modelIndex);
 	newLinkListModelPtr->setIsArray(true);
 	for (qsizetype linkListIndex = 0; linkListIndex < linkList->size(); ++linkListIndex){
+		if (!linkList->at(linkListIndex)){
+			newLinkListModelPtr->InsertNewItem();
+			newLinkListModelPtr->SetData(QByteArray(), QVariant(), linkListIndex);
+			continue;
+		}
 		newLinkListModelPtr->InsertNewItem();
 		if (!(linkList->at(linkListIndex)->WriteToModel(*newLinkListModelPtr, linkListIndex))){
 			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to write field '%3'").arg(__FILE__, QString::number(__LINE__), "linkList").toLocal8Bit().constData();)
@@ -862,9 +925,19 @@ bool V1_0::modsdl::CPrinterBase::WriteToModel(::imtbase::CTreeItemModel& model, 
 		}
 
 
+	if (!specificationList){
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "specificationList").toLocal8Bit().constData();)
+
+		return false;
+	}
 	::imtbase::CTreeItemModel* newSpecificationListModelPtr = model.AddTreeModel("specificationList", modelIndex);
 	newSpecificationListModelPtr->setIsArray(true);
 	for (qsizetype specificationListIndex = 0; specificationListIndex < specificationList->size(); ++specificationListIndex){
+		if (!specificationList->at(specificationListIndex)){
+			newSpecificationListModelPtr->InsertNewItem();
+			newSpecificationListModelPtr->SetData(QByteArray(), QVariant(), specificationListIndex);
+			continue;
+		}
 		QVariant specificationListVariantValue;
 		if (const V1_0::modsdl::CPrinterSpecificationBase* printerSpecificationBaseVal = std::get_if<V1_0::modsdl::CPrinterSpecificationBase>(specificationList->at(specificationListIndex).GetPtr())){
 			newSpecificationListModelPtr->InsertNewItem();
@@ -911,6 +984,10 @@ bool V1_0::modsdl::CPrinterBase::ReadFromModel(const ::imtbase::CTreeItemModel& 
 	int linkListCount = linkListModel->GetItemsCount();
 	imtsdl::TElementList<V1_0::modsdl::CLink> linkListList;
 	for (int linkListIndex = 0; linkListIndex < linkListCount; ++linkListIndex){
+		if (linkListModel->ContainsKey(QByteArray(), linkListIndex) && !linkListModel->GetData(QByteArray(), linkListIndex).isValid()){
+			linkListList.AppendNull();
+			continue;
+		}
 		V1_0::modsdl::CLink t_linkList;
 		if (!t_linkList.ReadFromModel(*linkListModel, linkListIndex)){
 			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "linkList").toLocal8Bit().constData();)
@@ -961,6 +1038,10 @@ bool V1_0::modsdl::CPrinterBase::ReadFromModel(const ::imtbase::CTreeItemModel& 
 	int specificationListCount = specificationListModel->GetItemsCount();
 	imtsdl::TElementList<V1_0::modsdl::PrinterSpecification> specificationListList;
 	for (int specificationListIndex = 0; specificationListIndex < specificationListCount; ++specificationListIndex){
+		if (specificationListModel->ContainsKey(QByteArray(), specificationListIndex) && !specificationListModel->GetData(QByteArray(), specificationListIndex).isValid()){
+			specificationListList.AppendNull();
+			continue;
+		}
 		V1_0::modsdl::PrinterSpecification specificationListData;
 		QVariant specificationListVariantValue = specificationListModel->GetData(QByteArray(), specificationListIndex);
 		QString specificationListDataTypename = specificationListModel->GetData("__typename", specificationListIndex).toString();
@@ -1010,6 +1091,10 @@ bool V1_0::modsdl::CPrinterBase::OptReadFromModel(const ::imtbase::CTreeItemMode
 		int linkListCount = linkListModel->GetItemsCount();
 		imtsdl::TElementList<V1_0::modsdl::CLink> linkListList;
 		for (int linkListIndex = 0; linkListIndex < linkListCount; ++linkListIndex){
+			if (linkListModel->ContainsKey(QByteArray(), linkListIndex) && !linkListModel->GetData(QByteArray(), linkListIndex).isValid()){
+				linkListList.AppendNull();
+				continue;
+			}
 			V1_0::modsdl::CLink t_linkList;
 			if (!t_linkList.OptReadFromModel(*linkListModel, linkListIndex)){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "linkList").toLocal8Bit().constData();)
@@ -1054,6 +1139,10 @@ bool V1_0::modsdl::CPrinterBase::OptReadFromModel(const ::imtbase::CTreeItemMode
 		int specificationListCount = specificationListModel->GetItemsCount();
 		imtsdl::TElementList<V1_0::modsdl::PrinterSpecification> specificationListList;
 		for (int specificationListIndex = 0; specificationListIndex < specificationListCount; ++specificationListIndex){
+			if (specificationListModel->ContainsKey(QByteArray(), specificationListIndex) && !specificationListModel->GetData(QByteArray(), specificationListIndex).isValid()){
+				specificationListList.AppendNull();
+				continue;
+			}
 			V1_0::modsdl::PrinterSpecification specificationListData;
 			QVariant specificationListVariantValue = specificationListModel->GetData(QByteArray(), specificationListIndex);
 			QString specificationListDataTypename = specificationListModel->GetData("__typename", specificationListIndex).toString();
@@ -1106,6 +1195,10 @@ bool V1_0::modsdl::CPrinterBase::WriteToGraphQlObject(::imtgql::CGqlParamObject&
 	}
 	QList<::imtgql::CGqlParamObject> linkListDataObjectList;
 	for (qsizetype linkListIndex = 0; linkListIndex < linkList->size(); ++linkListIndex){
+		if (!linkList->at(linkListIndex)){
+			linkListDataObjectList << ::imtgql::CGqlParamObject::CreateNull();
+			continue;
+		}
 		::imtgql::CGqlParamObject newLinkListGqlObject;
 		if (!linkList->at(linkListIndex)->WriteToGraphQlObject(newLinkListGqlObject)){
 			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "linkList").toLocal8Bit().constData();)
@@ -1142,8 +1235,17 @@ bool V1_0::modsdl::CPrinterBase::WriteToGraphQlObject(::imtgql::CGqlParamObject&
 	}
 	gqlObject.InsertParam("specification", specificationDataObject);
 
+	if (!specificationList){
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "specificationList").toLocal8Bit().constData();)
+
+		return false;
+	}
 	QList<::imtgql::CGqlParamObject> specificationListDataObjectList;
 	for (qsizetype specificationListIndex = 0; specificationListIndex < specificationList->size(); ++specificationListIndex){
+		if (!specificationList->at(specificationListIndex)){
+			specificationListDataObjectList << ::imtgql::CGqlParamObject::CreateNull();
+			continue;
+		}
 		::imtgql::CGqlParamObject specificationListDataObject;
 		if (const V1_0::modsdl::CPrinterSpecificationBase* printerSpecificationBaseVal = std::get_if<V1_0::modsdl::CPrinterSpecificationBase>(specificationList->at(specificationListIndex).GetPtr())){
 			if (!printerSpecificationBaseVal->WriteToGraphQlObject(specificationListDataObject)){
@@ -1179,7 +1281,7 @@ bool V1_0::modsdl::CPrinterBase::ReadFromGraphQlObject(const ::imtgql::CGqlParam
 		name = gqlObject["name"].toString();
 	}
 
-	if (!gqlObject.ContainsParam("linkList")){
+	if (!gqlObject.ContainsParam("linkList") || (gqlObject["linkList"].isNull())){
 		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "linkList").toLocal8Bit().constData();)
 
 		return false;
@@ -1188,9 +1290,9 @@ bool V1_0::modsdl::CPrinterBase::ReadFromGraphQlObject(const ::imtgql::CGqlParam
 	linkList = imtsdl::TElementList<V1_0::modsdl::CLink>();
 	for (qsizetype linkListIndex = 0; linkListIndex < linkListElementsCount; ++linkListIndex){
 		const ::imtgql::CGqlParamObject* linkListDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("linkList", linkListIndex);
-		if (linkListDataObjectPtr == nullptr){
-			qDebug() << "invalid type" << linkListDataObjectPtr;
-			return false;
+		if (linkListDataObjectPtr == nullptr || linkListDataObjectPtr->IsNull()){
+			linkList->AppendNull();
+			continue;
 		}
 		V1_0::modsdl::CLink tempLinkList;
 		if (!tempLinkList.ReadFromGraphQlObject(*linkListDataObjectPtr)){
@@ -1237,7 +1339,7 @@ bool V1_0::modsdl::CPrinterBase::ReadFromGraphQlObject(const ::imtgql::CGqlParam
 		specification = PrinterSpecification(specificationVariantValue.value<double>());
 	}
 
-	if (!gqlObject.ContainsParam("specificationList")){
+	if (!gqlObject.ContainsParam("specificationList") || (gqlObject["specificationList"].isNull())){
 		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "specificationList").toLocal8Bit().constData();)
 
 		return false;
@@ -1247,10 +1349,11 @@ bool V1_0::modsdl::CPrinterBase::ReadFromGraphQlObject(const ::imtgql::CGqlParam
 	specificationList = imtsdl::TElementList<V1_0::modsdl::PrinterSpecification>();
 	for (qsizetype specificationListIndex = 0; specificationListIndex < specificationListElementsCount; ++specificationListIndex){
 		const ::imtgql::CGqlParamObject* tempSpecificationList = specificationListDataList[specificationListIndex];
-		if (tempSpecificationList == nullptr){
-			return false;
+		QString specificationListDataValueTypename = (tempSpecificationList == nullptr || tempSpecificationList->IsNull()) ? QString() : tempSpecificationList->GetParamArgumentValue("__typename").toString();
+		if (specificationListDataList[specificationListIndex] == nullptr || specificationListDataList[specificationListIndex]->IsNull()){
+			specificationList->AppendNull();
+			continue;
 		}
-		QString specificationListDataValueTypename = tempSpecificationList->GetParamArgumentValue("__typename").toString();
 		V1_0::modsdl::PrinterSpecification specificationListDataValue;
 		if (specificationListDataValueTypename == "PrinterSpecificationBase") {
 			V1_0::modsdl::CPrinterSpecificationBase specificationListDataValueConvert;
@@ -1290,17 +1393,14 @@ bool V1_0::modsdl::CPrinterBase::OptReadFromGraphQlObject(const ::imtgql::CGqlPa
 		name = gqlObject["name"].toString();
 	}
 
-	if (gqlObject.ContainsParam("linkList")){
-		linkList.emplace();
-	}
-	if (gqlObject.ContainsParam("linkList") && (gqlObject.GetObjectsCount("linkList") > 0)){
+	if (gqlObject.ContainsParam("linkList") && !(gqlObject["linkList"].isNull())){
 		const qsizetype linkListElementsCount = gqlObject.GetObjectsCount("linkList");
 		linkList = imtsdl::TElementList<V1_0::modsdl::CLink>();
 		for (qsizetype linkListIndex = 0; linkListIndex < linkListElementsCount; ++linkListIndex){
 			const ::imtgql::CGqlParamObject* linkListDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("linkList", linkListIndex);
-			if (linkListDataObjectPtr == nullptr){
-				qDebug() << "invalid type" << linkListDataObjectPtr;
-				return false;
+			if (linkListDataObjectPtr == nullptr || linkListDataObjectPtr->IsNull()){
+				linkList->AppendNull();
+				continue;
 			}
 			V1_0::modsdl::CLink tempLinkList;
 			if (!tempLinkList.OptReadFromGraphQlObject(*linkListDataObjectPtr)){
@@ -1345,19 +1445,17 @@ bool V1_0::modsdl::CPrinterBase::OptReadFromGraphQlObject(const ::imtgql::CGqlPa
 		}
 	}
 
-	if (gqlObject.ContainsParam("specificationList")){
-		specificationList.emplace();
-	}
-	if (gqlObject.ContainsParam("specificationList")){
+	if (gqlObject.ContainsParam("specificationList") && !(gqlObject["specificationList"].isNull())){
 		const QList<const ::imtgql::CGqlParamObject*> specificationListDataList = gqlObject.GetParamArgumentObjectPtrList("specificationList");
 		const qsizetype specificationListElementsCount = specificationListDataList.size();
 		specificationList = imtsdl::TElementList<V1_0::modsdl::PrinterSpecification>();
 		for (qsizetype specificationListIndex = 0; specificationListIndex < specificationListElementsCount; ++specificationListIndex){
 			const ::imtgql::CGqlParamObject* tempSpecificationList = specificationListDataList[specificationListIndex];
-			if (tempSpecificationList == nullptr){
-				return false;
+			QString specificationListDataValueTypename = (tempSpecificationList == nullptr || tempSpecificationList->IsNull()) ? QString() : tempSpecificationList->GetParamArgumentValue("__typename").toString();
+			if (specificationListDataList[specificationListIndex] == nullptr || specificationListDataList[specificationListIndex]->IsNull()){
+				specificationList->AppendNull();
+				continue;
 			}
-			QString specificationListDataValueTypename = tempSpecificationList->GetParamArgumentValue("__typename").toString();
 			V1_0::modsdl::PrinterSpecification specificationListDataValue;
 			if (specificationListDataValueTypename == "PrinterSpecificationBase") {
 				V1_0::modsdl::CPrinterSpecificationBase specificationListDataValueConvert;
@@ -1405,6 +1503,10 @@ bool V1_0::modsdl::CPrinterBase::WriteToJsonObject(QJsonObject& jsonObject) cons
 	}
 	QJsonArray newLinkListArray;
 	for (qsizetype linkListIndex = 0; linkListIndex < linkList->size(); ++linkListIndex){
+		if (!linkList->at(linkListIndex)){
+			newLinkListArray << QJsonValue(QJsonValue::Null);
+			continue;
+		}
 		QJsonObject newLinkListJsonObject;
 		if (!linkList->at(linkListIndex)->WriteToJsonObject(newLinkListJsonObject)){
 			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "linkList").toLocal8Bit().constData();)
@@ -1452,8 +1554,17 @@ bool V1_0::modsdl::CPrinterBase::WriteToJsonObject(QJsonObject& jsonObject) cons
 	}
 
 
+	if (!specificationList){
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "specificationList").toLocal8Bit().constData();)
+
+		return false;
+	}
 	QJsonArray newSpecificationListArray;
 	for (qsizetype specificationListIndex = 0; specificationListIndex < specificationList->size(); ++specificationListIndex){
+		if (!specificationList->at(specificationListIndex)){
+			newSpecificationListArray << QJsonValue(QJsonValue::Null);
+			continue;
+		}
 		if (const V1_0::modsdl::CPrinterSpecificationBase* printerSpecificationBaseVal = std::get_if<V1_0::modsdl::CPrinterSpecificationBase>(specificationList->at(specificationListIndex).GetPtr())){
 			QJsonObject specificationListJsonObject;
 			const bool isspecificationListAdded = printerSpecificationBaseVal->WriteToJsonObject(specificationListJsonObject);
@@ -1508,6 +1619,10 @@ bool V1_0::modsdl::CPrinterBase::ReadFromJsonObject(const QJsonObject& jsonObjec
 	const qsizetype linkListArrayCount = linkListJsonArray.size();
 	linkList = imtsdl::TElementList<V1_0::modsdl::CLink>();
 	for (qsizetype linkListIndex = 0; linkListIndex < linkListArrayCount; ++linkListIndex){
+		if (linkListJsonArray[linkListIndex].isNull()){
+			linkList->AppendNull();
+			continue;
+		}
 		V1_0::modsdl::CLink tempLinkList;
 		if (!tempLinkList.ReadFromJsonObject(linkListJsonArray[linkListIndex].toObject())){
 			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "linkList").toLocal8Bit().constData();)
@@ -1564,6 +1679,10 @@ bool V1_0::modsdl::CPrinterBase::ReadFromJsonObject(const QJsonObject& jsonObjec
 	for (qsizetype specificationListIndex = 0; specificationListIndex < specificationListArrayCount; ++specificationListIndex){
 		const QVariant tempSpecificationList = specificationListJsonArray[specificationListIndex].toVariant();
 		QString specificationListDataValueTypename = specificationListJsonArray[specificationListIndex].toObject().value("__typename").toString();
+		if (specificationListJsonArray[specificationListIndex].isNull()){
+			specificationList->AppendNull();
+			continue;
+		}
 		V1_0::modsdl::PrinterSpecification specificationListDataValue;
 		if (specificationListDataValueTypename == "PrinterSpecificationBase") {
 			V1_0::modsdl::CPrinterSpecificationBase specificationListDataValueConvert;
@@ -1608,6 +1727,10 @@ bool V1_0::modsdl::CPrinterBase::OptReadFromJsonObject(const QJsonObject& jsonOb
 		const qsizetype linkListArrayCount = linkListJsonArray.size();
 		linkList = imtsdl::TElementList<V1_0::modsdl::CLink>();
 		for (qsizetype linkListIndex = 0; linkListIndex < linkListArrayCount; ++linkListIndex){
+			if (linkListJsonArray[linkListIndex].isNull()){
+				linkList->AppendNull();
+				continue;
+			}
 			V1_0::modsdl::CLink tempLinkList;
 			if (!tempLinkList.OptReadFromJsonObject(linkListJsonArray[linkListIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "linkList").toLocal8Bit().constData();)
@@ -1658,6 +1781,10 @@ bool V1_0::modsdl::CPrinterBase::OptReadFromJsonObject(const QJsonObject& jsonOb
 		for (qsizetype specificationListIndex = 0; specificationListIndex < specificationListArrayCount; ++specificationListIndex){
 			const QVariant tempSpecificationList = specificationListJsonArray[specificationListIndex].toVariant();
 			QString specificationListDataValueTypename = specificationListJsonArray[specificationListIndex].toObject().value("__typename").toString();
+			if (specificationListJsonArray[specificationListIndex].isNull()){
+				specificationList->AppendNull();
+				continue;
+			}
 			V1_0::modsdl::PrinterSpecification specificationListDataValue;
 			if (specificationListDataValueTypename == "PrinterSpecificationBase") {
 				V1_0::modsdl::CPrinterSpecificationBase specificationListDataValueConvert;
@@ -1692,6 +1819,243 @@ bool V1_0::modsdl::CPrinterBase::OptReadFromJsonObject(const QJsonObject& jsonOb
 }
 
 
+
+
+
+
+QByteArray CGetSpecificationsGqlRequest::GetCommandId()
+{
+	return QByteArrayLiteral("GetSpecifications");
+}
+
+
+bool CGetSpecificationsGqlRequest::SetupGqlRequest(::imtgql::CGqlRequest& gqlRequest, const GetSpecificationsRequestArguments& requestArguments, const GetSpecificationsRequestInfo& /*requestInfo*/)
+{
+	gqlRequest.SetCommandId(GetCommandId());
+
+	// writting input arguments
+	::imtgql::CGqlParamObject inputDataObject;
+	if (!requestArguments.input->WriteToGraphQlObject(inputDataObject)){
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to create GQL Object").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+
+		return false;
+	}
+	gqlRequest.AddParam("input", inputDataObject);
+
+	return true;
+}
+
+
+CGetSpecificationsGqlRequest::CGetSpecificationsGqlRequest(const ::imtgql::CGqlRequest& gqlRequest, bool optRead)
+	: m_isValid(true)
+{
+	m_gqlContextPtr = gqlRequest.GetRequestContext();
+
+	// reading input arguments
+	const ::imtgql::CGqlParamObject* inputDataObjectPtr = gqlRequest.GetParamObject("input");
+	if (inputDataObjectPtr != nullptr){
+					bool isInputRead;
+			if (optRead){
+				isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr);
+			}
+			else {
+				isInputRead = m_requestedArguments.input.emplace().ReadFromGraphQlObject(*inputDataObjectPtr);
+			}
+			m_isValid = isInputRead;
+			if (!isInputRead){
+				return;
+			}
+
+	}
+
+	// reading requested fields
+	const imtgql::CGqlFieldObject* requestedFieldsObjectPtr = nullptr;
+	if (!gqlRequest.GetFields().GetFieldIds().isEmpty()){
+		requestedFieldsObjectPtr = &gqlRequest.GetFields();
+		if (requestedFieldsObjectPtr != nullptr){
+			const QByteArrayList requestedIds = requestedFieldsObjectPtr->GetFieldIds();
+		}
+	}
+}
+
+
+bool CGetSpecificationsGqlRequest::IsValid() const
+{
+	return m_isValid;
+}
+
+
+const ::imtgql::IGqlContext* CGetSpecificationsGqlRequest::GetRequestContext() const
+{
+	return m_gqlContextPtr;
+}
+
+
+const GetSpecificationsRequestArguments& CGetSpecificationsGqlRequest::GetRequestedArguments() const
+{
+	return m_requestedArguments;
+}
+
+
+GetSpecificationsRequestInfo CGetSpecificationsGqlRequest::GetRequestInfo() const
+{
+	return m_requestInfo;
+}
+QMap<int, QByteArray> CPrinterCollectionControllerCompBase::GetSupportedCommandIds() const
+{
+	static QMap<int, QByteArray> retVal = {
+		std::make_pair(OT_GET, CGetSpecificationsGqlRequest::GetCommandId()),
+	};
+
+	return retVal;
+}
+
+
+bool CPrinterCollectionControllerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
+{
+	const QByteArray commandId = gqlRequest.GetCommandId();
+	if (commandId == CGetSpecificationsGqlRequest::GetCommandId()){
+		return true;
+	}
+
+	return BaseClass::IsRequestSupported(gqlRequest);
+}
+
+
+bool CPrinterCollectionControllerCompBase::GetOperationFromRequest(const ::imtgql::CGqlRequest& gqlRequest, ::imtgql::CGqlParamObject& gqlObject, QString& errorMessage, int& operationType) const
+{
+	const QByteArray commandId = gqlRequest.GetCommandId();
+
+	if (commandId == CGetSpecificationsGqlRequest::GetCommandId()){
+		operationType =  OT_GET;
+
+		return true;
+	}
+
+	return BaseClass::GetOperationFromRequest(gqlRequest, gqlObject, errorMessage, operationType);
+}
+
+
+bool CPrinterCollectionControllerCompBase::CreateRepresentationFromObject(const istd::IChangeable& data, const QByteArray& objectTypeId, const ::imtgql::CGqlRequest& gqlRequest, QJsonObject& dataObj, QString& errorMessage) const
+{
+	Q_UNUSED(objectTypeId);
+
+	const QByteArray commandId = gqlRequest.GetCommandId();
+
+	//GetSpecifications
+	if (commandId == CGetSpecificationsGqlRequest::GetCommandId()){
+		CGetSpecificationsGqlRequest getSpecificationsGqlRequest(gqlRequest, false);
+		V1_0::modsdl::PrinterSpecification representationObject;
+		const bool isRepresentationCreated = CreateRepresentationFromObject(data, getSpecificationsGqlRequest, representationObject, errorMessage);
+		if (!isRepresentationCreated){
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to create representation").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+
+			return false;
+		}
+
+		if (const V1_0::modsdl::CPrinterSpecificationBase* printerSpecificationBaseVal = std::get_if<V1_0::modsdl::CPrinterSpecificationBase>(&representationObject)){
+			const bool isAdded = printerSpecificationBaseVal->WriteToJsonObject(dataObj);
+			if (!isAdded){
+				return false;
+			}
+			dataObj["__typename"] = "PrinterSpecificationBase";
+		}
+		else if (const V1_0::modsdl::CLink* linkVal = std::get_if<V1_0::modsdl::CLink>(&representationObject)){
+			const bool isAdded = linkVal->WriteToJsonObject(dataObj);
+			if (!isAdded){
+				return false;
+			}
+			dataObj["__typename"] = "Link";
+		}
+		else if (const QString* stringVal = std::get_if<QString>(&representationObject)){
+			dataObj["representationObject"] = QJsonValue::fromVariant(*stringVal);
+		}
+		else if (const double* doubleVal = std::get_if<double>(&representationObject)){
+			dataObj["representationObject"] = QJsonValue::fromVariant(*doubleVal);
+		}
+
+		return true;
+	}
+
+	errorMessage = QStringLiteral("Bad request. Unexpected command-ID: '%1'").arg(commandId);
+
+	SendErrorMessage(0, errorMessage);
+
+	return false;
+}
+
+
+bool CUnionTestGqlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
+{
+	const QByteArray commandId = gqlRequest.GetCommandId();
+	if (commandId == CGetSpecificationsGqlRequest::GetCommandId()){
+		return true;
+	}
+
+	return BaseClass::IsRequestSupported(gqlRequest);
+}
+
+
+QJsonObject CUnionTestGqlHandlerCompBase::CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+{
+	const QByteArray commandId = gqlRequest.GetCommandId();
+	QJsonObject modelObj;
+	QJsonObject dataModelObj;
+
+	// GetSpecifications
+	if (commandId == CGetSpecificationsGqlRequest::GetCommandId()){
+		CGetSpecificationsGqlRequest getSpecificationsGqlRequest(gqlRequest, false);
+		if (!getSpecificationsGqlRequest.IsValid()){
+			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(commandId);
+			SendErrorMessage(0, errorMessage);
+
+			return QJsonObject();
+		}
+
+		V1_0::modsdl::PrinterSpecification replyPayload = OnGetSpecifications(getSpecificationsGqlRequest, gqlRequest, errorMessage);
+		if (!errorMessage.isEmpty()){
+			SendErrorMessage(0, QStringLiteral("The derived call [OnGetSpecifications] returned an error: %1").arg(errorMessage));
+
+			return QJsonObject();
+		}
+
+		if (const V1_0::modsdl::CPrinterSpecificationBase* printerSpecificationBaseVal = std::get_if<V1_0::modsdl::CPrinterSpecificationBase>(&replyPayload)){
+			const bool isAdded = printerSpecificationBaseVal->WriteToJsonObject(dataModelObj);
+			if (!isAdded){
+				return QJsonObject();
+			}
+			dataModelObj["__typename"] = "PrinterSpecificationBase";
+		}
+		else if (const V1_0::modsdl::CLink* linkVal = std::get_if<V1_0::modsdl::CLink>(&replyPayload)){
+			const bool isAdded = linkVal->WriteToJsonObject(dataModelObj);
+			if (!isAdded){
+				return QJsonObject();
+			}
+			dataModelObj["__typename"] = "Link";
+		}
+		else if (const QString* stringVal = std::get_if<QString>(&replyPayload)){
+			dataModelObj.insert("", *stringVal);
+		}
+		else if (const double* doubleVal = std::get_if<double>(&replyPayload)){
+			dataModelObj.insert("", *doubleVal);
+		}
+		modelObj.insert(QStringLiteral("data"), dataModelObj); return modelObj;
+	}
+
+	errorMessage = QStringLiteral("Bad request. Unexpected command-ID: '%1'").arg(commandId);
+	SendErrorMessage(0, errorMessage);
+
+	return QJsonObject();
+}
+
+
+} // namespace sdl::V1_0::modsdl
+
+#include "UnionTestObjects.h"
+
+
+namespace sdl::V1_0::modsdl
+{
 
 
 CCoordsObject::CCoordsObject(QObject* parent): ::imtbase::CItemModelBase(parent){
@@ -2148,14 +2512,43 @@ bool CLinkObject::hasStatus()
 
 QVariant CLinkObject::GetStatusList()
 {
-	
-	return QVariant();
+	if (!statusList) {return {};}
+
+	QVariantList tempStatusListList;
+	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::modsdl::LinkStatus>();
+	for (const auto& tempValue: statusList.value()){
+		tempStatusListList << (tempValue ? QVariant(QString::fromUtf8(metaEnum.valueToKey(int(*tempValue)))) : QVariant());
+	}
+
+	return tempStatusListList;
 }
 
 
 void CLinkObject::SetStatusList(const QVariant& v)
 {
-	
+	if (!v.isValid() || v.isNull()){
+		CLink::statusList.SetNull();
+		statusListChanged();
+		return;
+	}
+	if (!CLink::statusList){
+		CLink::statusList.emplace();
+	}
+	else{
+		CLink::statusList->clear();
+	}
+	for (const QVariant& tempValue: v.toList()){
+		if (!tempValue.isValid() || tempValue.isNull()){
+			CLink::statusList->AppendNull();
+			continue;
+		}
+		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::modsdl::LinkStatus>();
+		const int key = metaEnum.keyToValue(tempValue.toString().toUtf8());
+		if (key < 0){continue;}
+		istd::TNullableValue<sdl::V1_0::modsdl::LinkStatus> tempItem(static_cast<sdl::V1_0::modsdl::LinkStatus>(key));
+		CLink::statusList->append(tempItem);
+	}
+
 	statusListChanged();
 }
 
@@ -2368,6 +2761,7 @@ bool CPrinterBaseObject::hasName()
 
 QVariant CPrinterBaseObject::GetLinkList()
 {
+	if (!linkList) {return {};}
 	if (!m_linkListQObjectPtr.isValid()){
 		m_linkListQObjectPtr = CreateObject("linkList");
 		auto itemPtr = m_linkListQObjectPtr.value<sdl::V1_0::modsdl::CLinkObjectList*>();
@@ -2379,12 +2773,16 @@ QVariant CPrinterBaseObject::GetLinkList()
 
 void CPrinterBaseObject::SetLinkList(const QVariant& v)
 {
-	if (v.isValid()){
+	if (!v.isValid() || v.isNull()){return;}
+	if (v.isValid() && !v.isNull()){
 		sdl::V1_0::modsdl::CLinkObjectList* itemPtr = v.value<sdl::V1_0::modsdl::CLinkObjectList*>();
-		if (itemPtr != nullptr) CPrinterBase::linkList = itemPtr->Version_1_0;
+		if (itemPtr != nullptr){
+			if (!itemPtr->Version_1_0){return;}
+			CPrinterBase::linkList = itemPtr->Version_1_0;
+		}
 	}
 	else {
-		CPrinterBase::linkList = nullptr;
+		CPrinterBase::linkList.SetNull();
 	}
 	m_linkListQObjectPtr = v;
 
@@ -2467,7 +2865,7 @@ void CPrinterBaseObject::SetSpecification(const QVariant& v)
 		}
 	}
 	else {
-		CPrinterBase::specification = nullptr;
+		CPrinterBase::specification.SetNull();
 	}
 	m_specificationQObjectPtr = v;
 
@@ -2500,6 +2898,7 @@ void CPrinterBaseObject::ResetSpecification()
 
 QVariant CPrinterBaseObject::GetSpecificationList()
 {
+	if (!specificationList) {return {};}
 	if (!m_specificationListQObjectPtr.isValid()){
 		m_specificationListQObjectPtr = CreateObject("specificationList");
 		auto itemPtr = m_specificationListQObjectPtr.value<sdl::V1_0::modsdl::CPrinterSpecificationObjectList*>();
@@ -2511,12 +2910,16 @@ QVariant CPrinterBaseObject::GetSpecificationList()
 
 void CPrinterBaseObject::SetSpecificationList(const QVariant& v)
 {
-	if (v.isValid()){
+	if (!v.isValid() || v.isNull()){return;}
+	if (v.isValid() && !v.isNull()){
 		sdl::V1_0::modsdl::CPrinterSpecificationObjectList* itemPtr = v.value<sdl::V1_0::modsdl::CPrinterSpecificationObjectList*>();
-		if (itemPtr != nullptr) CPrinterBase::specificationList = itemPtr->Version_1_0;
+		if (itemPtr != nullptr){
+			if (!itemPtr->Version_1_0){return;}
+			CPrinterBase::specificationList = itemPtr->Version_1_0;
+		}
 	}
 	else {
-		CPrinterBase::specificationList = nullptr;
+		CPrinterBase::specificationList.SetNull();
 	}
 	m_specificationListQObjectPtr = v;
 
@@ -3012,232 +3415,4 @@ QVariant CPrinterSpecificationObjectList::getData(const QString& nameId, int ind
 	}
 	return QVariant();
 }
-
-
-QByteArray CGetSpecificationsGqlRequest::GetCommandId()
-{
-	return QByteArrayLiteral("GetSpecifications");
-}
-
-
-bool CGetSpecificationsGqlRequest::SetupGqlRequest(::imtgql::CGqlRequest& gqlRequest, const GetSpecificationsRequestArguments& requestArguments, const GetSpecificationsRequestInfo& /*requestInfo*/)
-{
-	gqlRequest.SetCommandId(GetCommandId());
-
-	// writting input arguments
-	::imtgql::CGqlParamObject inputDataObject;
-	if (!requestArguments.input->WriteToGraphQlObject(inputDataObject)){
-		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to create GQL Object").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-		return false;
-	}
-	gqlRequest.AddParam("input", inputDataObject);
-
-	return true;
-}
-
-
-CGetSpecificationsGqlRequest::CGetSpecificationsGqlRequest(const ::imtgql::CGqlRequest& gqlRequest, bool optRead)
-	: m_isValid(true)
-{
-	m_gqlContextPtr = gqlRequest.GetRequestContext();
-
-	// reading input arguments
-	const ::imtgql::CGqlParamObject* inputDataObjectPtr = gqlRequest.GetParamObject("input");
-	if (inputDataObjectPtr != nullptr){
-					bool isInputRead;
-			if (optRead){
-				isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr);
-			}
-			else {
-				isInputRead = m_requestedArguments.input.emplace().ReadFromGraphQlObject(*inputDataObjectPtr);
-			}
-			m_isValid = isInputRead;
-			if (!isInputRead){
-				return;
-			}
-
-	}
-
-	// reading requested fields
-	const imtgql::CGqlFieldObject* requestedFieldsObjectPtr = nullptr;
-	if (!gqlRequest.GetFields().GetFieldIds().isEmpty()){
-		requestedFieldsObjectPtr = gqlRequest.GetFields().GetFieldArgumentObjectPtr(gqlRequest.GetFields().GetFieldIds().constFirst());
-		if (requestedFieldsObjectPtr != nullptr){
-			const QByteArrayList requestedIds = requestedFieldsObjectPtr->GetFieldIds();
-		}
-	}
-}
-
-
-bool CGetSpecificationsGqlRequest::IsValid() const
-{
-	return m_isValid;
-}
-
-
-const ::imtgql::IGqlContext* CGetSpecificationsGqlRequest::GetRequestContext() const
-{
-	return m_gqlContextPtr;
-}
-
-
-const GetSpecificationsRequestArguments& CGetSpecificationsGqlRequest::GetRequestedArguments() const
-{
-	return m_requestedArguments;
-}
-
-
-GetSpecificationsRequestInfo CGetSpecificationsGqlRequest::GetRequestInfo() const
-{
-	return m_requestInfo;
-}
-QMap<int, QByteArray> CPrinterCollectionControllerCompBase::GetSupportedCommandIds() const
-{
-	static QMap<int, QByteArray> retVal = {
-		std::make_pair(OT_GET, CGetSpecificationsGqlRequest::GetCommandId()),
-	};
-
-	return retVal;
-}
-
-
-bool CPrinterCollectionControllerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
-{
-	const QByteArray commandId = gqlRequest.GetCommandId();
-	if (commandId == CGetSpecificationsGqlRequest::GetCommandId()){
-		return true;
-	}
-
-	return BaseClass::IsRequestSupported(gqlRequest);
-}
-
-
-bool CPrinterCollectionControllerCompBase::GetOperationFromRequest(const ::imtgql::CGqlRequest& gqlRequest, ::imtgql::CGqlParamObject& gqlObject, QString& errorMessage, int& operationType) const
-{
-	const QByteArray commandId = gqlRequest.GetCommandId();
-
-	if (commandId == CGetSpecificationsGqlRequest::GetCommandId()){
-		operationType =  OT_GET;
-
-		return true;
-	}
-
-	return BaseClass::GetOperationFromRequest(gqlRequest, gqlObject, errorMessage, operationType);
-}
-
-
-bool CPrinterCollectionControllerCompBase::CreateRepresentationFromObject(const istd::IChangeable& data, const QByteArray& objectTypeId, const ::imtgql::CGqlRequest& gqlRequest, QJsonObject& dataObj, QString& errorMessage) const
-{
-	Q_UNUSED(objectTypeId);
-
-	const QByteArray commandId = gqlRequest.GetCommandId();
-
-	//GetSpecifications
-	if (commandId == CGetSpecificationsGqlRequest::GetCommandId()){
-		CGetSpecificationsGqlRequest getSpecificationsGqlRequest(gqlRequest, false);
-		V1_0::modsdl::PrinterSpecification representationObject;
-		const bool isRepresentationCreated = CreateRepresentationFromObject(data, getSpecificationsGqlRequest, representationObject, errorMessage);
-		if (!isRepresentationCreated){
-		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to create representation").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-
-		if (const V1_0::modsdl::CPrinterSpecificationBase* printerSpecificationBaseVal = std::get_if<V1_0::modsdl::CPrinterSpecificationBase>(&representationObject)){
-			const bool isAdded = printerSpecificationBaseVal->WriteToJsonObject(dataObj);
-			if (!isAdded){
-				return false;
-			}
-			dataObj["__typename"] = "PrinterSpecificationBase";
-		}
-		else if (const V1_0::modsdl::CLink* linkVal = std::get_if<V1_0::modsdl::CLink>(&representationObject)){
-			const bool isAdded = linkVal->WriteToJsonObject(dataObj);
-			if (!isAdded){
-				return false;
-			}
-			dataObj["__typename"] = "Link";
-		}
-		else if (const QString* stringVal = std::get_if<QString>(&representationObject)){
-			dataObj["representationObject"] = QJsonValue::fromVariant(*stringVal);
-		}
-		else if (const double* doubleVal = std::get_if<double>(&representationObject)){
-			dataObj["representationObject"] = QJsonValue::fromVariant(*doubleVal);
-		}
-
-		return true;
-	}
-
-	errorMessage = QStringLiteral("Bad request. Unexpected command-ID: '%1'").arg(commandId);
-
-	SendErrorMessage(0, errorMessage);
-
-	return false;
-}
-
-
-bool CUnionTestGqlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
-{
-	const QByteArray commandId = gqlRequest.GetCommandId();
-	if (commandId == CGetSpecificationsGqlRequest::GetCommandId()){
-		return true;
-	}
-
-	return BaseClass::IsRequestSupported(gqlRequest);
-}
-
-
-QJsonObject CUnionTestGqlHandlerCompBase::CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
-{
-	const QByteArray commandId = gqlRequest.GetCommandId();
-	QJsonObject modelObj;
-	QJsonObject dataModelObj;
-
-	// GetSpecifications
-	if (commandId == CGetSpecificationsGqlRequest::GetCommandId()){
-		CGetSpecificationsGqlRequest getSpecificationsGqlRequest(gqlRequest, false);
-		if (!getSpecificationsGqlRequest.IsValid()){
-			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(commandId);
-			SendErrorMessage(0, errorMessage);
-
-			return QJsonObject();
-		}
-
-		V1_0::modsdl::PrinterSpecification replyPayload = OnGetSpecifications(getSpecificationsGqlRequest, gqlRequest, errorMessage);
-		if (!errorMessage.isEmpty()){
-			SendErrorMessage(0, QStringLiteral("The derived call [OnGetSpecifications] returned an error: %1").arg(errorMessage));
-
-			return QJsonObject();
-		}
-
-		if (const V1_0::modsdl::CPrinterSpecificationBase* printerSpecificationBaseVal = std::get_if<V1_0::modsdl::CPrinterSpecificationBase>(&replyPayload)){
-			const bool isAdded = printerSpecificationBaseVal->WriteToJsonObject(dataModelObj);
-			if (!isAdded){
-				return QJsonObject();
-			}
-			dataModelObj["__typename"] = "PrinterSpecificationBase";
-		}
-		else if (const V1_0::modsdl::CLink* linkVal = std::get_if<V1_0::modsdl::CLink>(&replyPayload)){
-			const bool isAdded = linkVal->WriteToJsonObject(dataModelObj);
-			if (!isAdded){
-				return QJsonObject();
-			}
-			dataModelObj["__typename"] = "Link";
-		}
-		else if (const QString* stringVal = std::get_if<QString>(&replyPayload)){
-			dataModelObj.insert("", *stringVal);
-		}
-		else if (const double* doubleVal = std::get_if<double>(&replyPayload)){
-			dataModelObj.insert("", *doubleVal);
-		}
-		modelObj.insert(QStringLiteral("data"), dataModelObj); return modelObj;
-	}
-
-	errorMessage = QStringLiteral("Bad request. Unexpected command-ID: '%1'").arg(commandId);
-	SendErrorMessage(0, errorMessage);
-
-	return QJsonObject();
-}
-
-
 } // namespace sdl::V1_0::modsdl

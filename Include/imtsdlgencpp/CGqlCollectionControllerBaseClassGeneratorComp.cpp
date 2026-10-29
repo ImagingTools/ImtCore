@@ -666,7 +666,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForSpecialReques
 
 	// [2] add error message if SDL request is not valid
 	FeedStreamHorizontally(stream, hIndents + 2);
-	stream << QStringLiteral("errorMessage = QString(\"Bad request. Unexpected request for command-ID: '%1'\").arg(commandId);");
+	stream << QStringLiteral("errorMessage = QStringLiteral(\"Bad request. Unexpected request for command-ID: '%1'\").arg(commandId);");
 	FeedStream(stream, 1, false);
 
 	// [2] add log message
@@ -709,7 +709,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForSpecialReques
 
 	// [2] send error message
 	FeedStreamHorizontally(stream, hIndents + 2);
-	stream << QStringLiteral("SendErrorMessage(0, QString(\"The derived call [");
+	stream << QStringLiteral("SendErrorMessage(0, QStringLiteral(\"The derived call [");
 	stream << QStringLiteral("On") << functionName;
 	stream << QStringLiteral("] returned an error: %1\").arg(errorMessage));");
 	FeedStream(stream, 2, false);
@@ -779,7 +779,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddPayloadModelWriteCode(
 
 		// [2] set error message
 		FeedStreamHorizontally(stream, hIndents + 2);
-		stream << QStringLiteral("errorMessage = QString(\"Internal error. Unable to create response for command-ID: '%1'\").arg(commandId);");
+		stream << QStringLiteral("errorMessage = QStringLiteral(\"Internal error. Unable to create response for command-ID: '%1'\").arg(commandId);");
 		FeedStream(stream, 1, false);
 
 		// [2] add log message
@@ -833,7 +833,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddOperationRequestMethodIm
 			QMapIterator suboperationIter(suboperations);
 #else
 			QMultiMapIterator suboperationIter(suboperations);
-#endif			
+#endif
 			while(suboperationIter.hasNext()){
 				auto suboperationIterValue = suboperationIter.next();
 				if (!requestList.contains(*suboperationIterValue)){
@@ -1012,7 +1012,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 		FeedStream(stream, 1, false);
 
 		FeedStreamHorizontally(stream, hIndents + 2);
-		stream << QStringLiteral("errorMessage = QString(\"Bad request. Unexpected request for command-ID: '%1'\").arg(commandId);");
+		stream << QStringLiteral("errorMessage = QStringLiteral(\"Bad request. Unexpected request for command-ID: '%1'\").arg(commandId);");
 		FeedStream(stream, 1, false);
 
 		FeedStreamHorizontally(stream, hIndents + 2);
@@ -1072,7 +1072,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 		FeedStream(stream, 1, false);
 
 		FeedStreamHorizontally(stream, hIndents + 2);
-		stream << QStringLiteral("errorMessage = QString(\"Internal error. Invalid request setup context for command-ID: '%1'\").arg(C") << requestClassName << QStringLiteral("::GetCommandId());");
+		stream << QStringLiteral("errorMessage = QStringLiteral(\"Internal error. Invalid request setup context for command-ID: '%1'\").arg(C") << requestClassName << QStringLiteral("::GetCommandId());");
 		FeedStream(stream, 1, false);
 
 		FeedStreamHorizontally(stream, hIndents + 2);
@@ -1210,7 +1210,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 		case imtsdl::CSdlDocumentType::OT_LIST:
 		case imtsdl::CSdlDocumentType::OT_GET:
 			FeedStreamHorizontally(stream, hIndents + 1);
-			stream << QStringLiteral("errorMessage = QString(\"Bad request. Unexpected command-ID: '%1'\").arg(commandId);");
+			stream << QStringLiteral("errorMessage = QStringLiteral(\"Bad request. Unexpected command-ID: '%1'\").arg(commandId);");
 			FeedStream(stream, 2, false);
 
 			// send log message
@@ -1225,7 +1225,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 		// create default section
 		// add error message
 			FeedStreamHorizontally(stream, hIndents + 1);
-			stream << QStringLiteral("errorMessage = QString(\"Bad request. Unexpected command-ID: '%1'\").arg(commandId);");
+			stream << QStringLiteral("errorMessage = QStringLiteral(\"Bad request. Unexpected command-ID: '%1'\").arg(commandId);");
 			FeedStream(stream, 1, false);
 
 		// send log message
@@ -1240,7 +1240,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 		// unexpected section
 		// add error message
 			FeedStreamHorizontally(stream, hIndents + 1);
-			stream << QStringLiteral("errorMessage = QString(\"Bad request. Unexpected command-ID: '%1'\").arg(commandId);");
+			stream << QStringLiteral("errorMessage = QStringLiteral(\"Bad request. Unexpected command-ID: '%1'\").arg(commandId);");
 			FeedStream(stream, 1, false);
 
 		// send log message
@@ -1356,7 +1356,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddSpecialMethodImplCode(
 	else{
 		// add error message
 		FeedStreamHorizontally(stream, hIndents);
-		stream << QStringLiteral("errorMessage = QString(\"Bad request. Unexpected command-ID: '%1'\").arg(commandId);");
+		stream << QStringLiteral("errorMessage = QStringLiteral(\"Bad request. Unexpected command-ID: '%1'\").arg(commandId);");
 		FeedStream(stream, 1, false);
 
 		// send log message
@@ -1593,7 +1593,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 
 		// [2] add error message if SDL request is not valid
 		FeedStreamHorizontally(stream, errorIndent);
-		stream << QStringLiteral("errorMessage = QString(\"Bad request. Unexpected request for command-ID: '%1'\").arg(commandId);");
+		stream << QStringLiteral("errorMessage = QStringLiteral(\"Bad request. Unexpected request for command-ID: '%1'\").arg(commandId);");
 		FeedStream(stream, 1, false);
 
 		// [2] add log message

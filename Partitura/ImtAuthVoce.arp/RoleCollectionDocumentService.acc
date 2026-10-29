@@ -10,6 +10,18 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
+        <Element Id="CachedRoleRepository" PackageId="ImtCorePck" ComponentId="CachedObjectCollection">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ObjectCacheLimit" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="500"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="RoleRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="CheckPermissionOr" PackageId="ImtAuthPck" ComponentId="CheckPermissionOr">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap/>
@@ -138,8 +150,8 @@
         <Element Id="RoleCollectionAdapter" PackageId="ImtAuthPck" ComponentId="RoleCollectionAdapter">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="RoleCollection" Type="Reference" ExportId="RoleRepository">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="RoleCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="CachedRoleRepository"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -199,8 +211,8 @@
                                 <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>ViewOrganizationRoles</Value>
-                                            <Value>ViewRoles</Value>
+                                            <Value>/Administration/Roles/View</Value>
+                                            <Value>/OrganizationManagement/Roles/View</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -236,8 +248,8 @@
                                 <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>ChangeOrganizationRole</Value>
-                                            <Value>ChangeRole</Value>
+                                            <Value>/Administration/Roles/Edit/Change</Value>
+                                            <Value>/OrganizationManagement/Roles/Edit/Change</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>

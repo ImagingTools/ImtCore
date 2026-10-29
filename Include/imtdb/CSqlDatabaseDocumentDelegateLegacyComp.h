@@ -94,6 +94,12 @@ public:
 				const imtbase::ICollectionInfo::Id& objectId,
 				int revision,
 				const QString& filePath) const override;
+	virtual bool GetRevisionData(
+				const imtbase::IObjectCollection& collection,
+				const imtbase::ICollectionInfo::Id& objectId,
+				int revision,
+				istd::IChangeableSharedPtr& dataPtr,
+				idoc::MetaInfoPtr& dataMetaInfoPtr) const override;
 	virtual bool DeleteRevision(
 				imtbase::IObjectCollection& collection,
 				const imtbase::ICollectionInfo::Id& objectId,

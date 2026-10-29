@@ -99,7 +99,7 @@ function defineCollectionSpec(fixtures, declaration) {
         // residue rather than of the collection. Cleared (and re-sorted) so the shot means one thing.
         await collection.clearAllFilters();
         if (stableSort) await collection.table.sortBy(stableSort);
-        await gui.checkScreenshot(page, `${prefix}-landing`, await collection.masks());
+        await gui.checkScreenshot(page, `${prefix}-landing`, () => collection.masks());
       });
     });
 
@@ -266,7 +266,7 @@ async function runScenario({ test, gui, page, user, collection, prefix, scenario
     test.skip(!(await collection.table.hasRows()), 'this collection is empty for this user');
     await collection.selectRow(0);
     await collection.runCommand(scenario.command);
-    await gui.checkScreenshot(page, firstName, await masks());
+    await gui.checkScreenshot(page, firstName, masks);
     // Shared page, no reload between tests - a modal left open blocks the next test's clicks.
     await gui.dismissDialog(page);
     return;
@@ -278,9 +278,9 @@ async function runScenario({ test, gui, page, user, collection, prefix, scenario
     // may have just made it exactly that - which flips both shots, sort arrow included.
     await collection.clearAllFilters();
     await collection.table.sortBy(scenario.sort);
-    await gui.checkScreenshot(page, firstName, await masks());
+    await gui.checkScreenshot(page, firstName, masks);
     await collection.table.sortBy(scenario.sort);
-    await gui.checkScreenshot(page, secondName, await masks());
+    await gui.checkScreenshot(page, secondName, masks);
     return;
   }
 
@@ -289,11 +289,11 @@ async function runScenario({ test, gui, page, user, collection, prefix, scenario
     // leaving them set would change what every later test in this serial block sees.
     const { size = 50, page: pageNumber = 2, restore = true } = scenario.pagination;
     await collection.pagination.setPageSize(size);
-    await gui.checkScreenshot(page, firstName, await masks());
+    await gui.checkScreenshot(page, firstName, masks);
     // A collection that fits on one page legitimately has no page-2 button.
     if (await collection.pagination.hasPage(pageNumber)) {
       await collection.pagination.goToPage(pageNumber);
-      await gui.checkScreenshot(page, secondName, await masks());
+      await gui.checkScreenshot(page, secondName, masks);
     }
     if (restore) {
       // Restoring the size doesn't reset the page (Pagination.qml only clamps on overflow) - go back first.
@@ -306,12 +306,12 @@ async function runScenario({ test, gui, page, user, collection, prefix, scenario
   if (scenario.clearAll) {
     for (const step of scenario.apply || []) await applyFilter({ test, collection, step });
     await collection.clearAllFilters();
-    await gui.checkScreenshot(page, firstName, await masks());
+    await gui.checkScreenshot(page, firstName, masks);
     return;
   }
 
   await applyFilter({ test, collection, step: scenario });
-  await gui.checkScreenshot(page, firstName, await masks());
+  await gui.checkScreenshot(page, firstName, masks);
 }
 
 async function applyFilter({ test, collection, step }) {

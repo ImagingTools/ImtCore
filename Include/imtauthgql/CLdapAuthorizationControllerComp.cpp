@@ -22,6 +22,7 @@
 #include <imtauth/CUserInfo.h>
 #include <imtauth/CLdapUserCollectionControllerComp.h>
 #include <imtbase/CComplexCollectionFilter.h>
+#include <imtbase/COperationContext.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Authorization.h>
 
 
@@ -328,7 +329,13 @@ sdl::V1_0::imtauth::CAuthorizationPayload CLdapAuthorizationControllerComp::OnAu
 							}
 
 							if (needsUpdate){
-								if (!m_userCollectionCompPtr->SetObjectData(userObjectId, *userInfoPtr.GetPtr())){
+								imtbase::IOperationContext::IdentifableObjectInfo ownerInfo;
+								ownerInfo.id = userObjectId;
+								ownerInfo.name = userInfoPtr->GetName();
+								imtbase::COperationContext operationContext;
+								operationContext.SetOperationOwnerId(ownerInfo);
+
+								if (!m_userCollectionCompPtr->SetObjectData(userObjectId, *userInfoPtr.GetPtr(), istd::IChangeable::CM_WITHOUT_REFS, &operationContext)){
 									SendWarningMessage(
 										0,
 										QStringLiteral("Unable to update user data for user '%1'").arg(userObjectId),

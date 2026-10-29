@@ -59,7 +59,12 @@ bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (requestInfo.items.isTypeIdRequested){
-		representationObject.typeId = QByteArray(m_objectCollectionCompPtr->GetObjectTypeId(objectId));
+		QByteArray typeId = objectCollectionIterator.GetObjectTypeId();
+		if (typeId.isEmpty()){
+			typeId = m_objectCollectionCompPtr->GetObjectTypeId(objectId);
+		}
+
+		representationObject.typeId = typeId;
 	}
 
 	if (requestInfo.items.isLicenseIdRequested){

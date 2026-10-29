@@ -52,6 +52,7 @@ public Q_SLOTS:
 	void onReadyReadStandardError();
 	void onReadyReadStandardOutput();
 	void onFinished(int exitCode, QProcess::ExitStatus exitStatus);
+	void onErrorOccurred(QProcess::ProcessError processError);
 
 private:
 	QStringList m_arguments;

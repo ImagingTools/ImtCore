@@ -916,6 +916,11 @@ bool V1_0::modsdl::CPrinterList::WriteToModel(::imtbase::CTreeItemModel& model, 
 		::imtbase::CTreeItemModel* newDataModelPtr = model.AddTreeModel("data", modelIndex);
 		newDataModelPtr->setIsArray(true);
 		for (qsizetype dataIndex = 0; dataIndex < data->size(); ++dataIndex){
+			if (!data->at(dataIndex)){
+				newDataModelPtr->InsertNewItem();
+				newDataModelPtr->SetData(QByteArray(), QVariant(), dataIndex);
+				continue;
+			}
 			newDataModelPtr->InsertNewItem();
 			if (!(data->at(dataIndex)->WriteToModel(*newDataModelPtr, dataIndex))){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to write field '%3'").arg(__FILE__, QString::number(__LINE__), "data").toLocal8Bit().constData();)
@@ -923,6 +928,9 @@ bool V1_0::modsdl::CPrinterList::WriteToModel(::imtbase::CTreeItemModel& model, 
 				return false;
 			}
 		}
+	}
+	else if (data.IsNull()){
+		model.SetData("data", QVariant(), modelIndex);
 	}
 
 	return true;
@@ -932,10 +940,17 @@ bool V1_0::modsdl::CPrinterList::WriteToModel(::imtbase::CTreeItemModel& model, 
 bool V1_0::modsdl::CPrinterList::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	::imtbase::CTreeItemModel* dataModel = model.GetTreeItemModel("data", modelIndex);
+	if (model.ContainsKey("data", modelIndex) && dataModel == nullptr){
+		data.SetNull();
+	}
 	if (dataModel != nullptr){
 		int dataCount = dataModel->GetItemsCount();
 		imtsdl::TElementList<V1_0::modsdl::CPrinterBase> dataList;
 		for (int dataIndex = 0; dataIndex < dataCount; ++dataIndex){
+			if (dataModel->ContainsKey(QByteArray(), dataIndex) && !dataModel->GetData(QByteArray(), dataIndex).isValid()){
+				dataList.AppendNull();
+				continue;
+			}
 			V1_0::modsdl::CPrinterBase t_data;
 			if (!t_data.ReadFromModel(*dataModel, dataIndex)){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "data").toLocal8Bit().constData();)
@@ -955,10 +970,17 @@ bool V1_0::modsdl::CPrinterList::ReadFromModel(const ::imtbase::CTreeItemModel& 
 bool V1_0::modsdl::CPrinterList::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	::imtbase::CTreeItemModel* dataModel = model.GetTreeItemModel("data", modelIndex);
+	if (model.ContainsKey("data", modelIndex) && dataModel == nullptr){
+		data.SetNull();
+	}
 	if (dataModel != nullptr){
 		int dataCount = dataModel->GetItemsCount();
 		imtsdl::TElementList<V1_0::modsdl::CPrinterBase> dataList;
 		for (int dataIndex = 0; dataIndex < dataCount; ++dataIndex){
+			if (dataModel->ContainsKey(QByteArray(), dataIndex) && !dataModel->GetData(QByteArray(), dataIndex).isValid()){
+				dataList.AppendNull();
+				continue;
+			}
 			V1_0::modsdl::CPrinterBase t_data;
 			if (!t_data.OptReadFromModel(*dataModel, dataIndex)){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "data").toLocal8Bit().constData();)
@@ -980,6 +1002,10 @@ bool V1_0::modsdl::CPrinterList::WriteToGraphQlObject(::imtgql::CGqlParamObject&
 	if (data){
 		QList<::imtgql::CGqlParamObject> dataDataObjectList;
 		for (qsizetype dataIndex = 0; dataIndex < data->size(); ++dataIndex){
+			if (!data->at(dataIndex)){
+				dataDataObjectList << ::imtgql::CGqlParamObject::CreateNull();
+				continue;
+			}
 			::imtgql::CGqlParamObject newDataGqlObject;
 			if (!data->at(dataIndex)->WriteToGraphQlObject(newDataGqlObject)){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "data").toLocal8Bit().constData();)
@@ -990,6 +1016,9 @@ bool V1_0::modsdl::CPrinterList::WriteToGraphQlObject(::imtgql::CGqlParamObject&
 		}
 		gqlObject.InsertParam("data", dataDataObjectList);
 	}
+	else if (data.IsNull()){
+		gqlObject.InsertParam("data", QVariant());
+	}
 
 	gqlObject.InsertParam("__typename", QVariant("PrinterList"));
 
@@ -999,17 +1028,17 @@ bool V1_0::modsdl::CPrinterList::WriteToGraphQlObject(::imtgql::CGqlParamObject&
 
 bool V1_0::modsdl::CPrinterList::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("data")){
-		data.emplace();
+	if (gqlObject.ContainsParam("data") && gqlObject["data"].isNull()){
+		data.SetNull();
 	}
-	if (gqlObject.ContainsParam("data") && (gqlObject.GetObjectsCount("data") > 0)){
+	if (gqlObject.ContainsParam("data") && !(gqlObject["data"].isNull())){
 		const qsizetype dataElementsCount = gqlObject.GetObjectsCount("data");
 		data = imtsdl::TElementList<V1_0::modsdl::CPrinterBase>();
 		for (qsizetype dataIndex = 0; dataIndex < dataElementsCount; ++dataIndex){
 			const ::imtgql::CGqlParamObject* dataDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("data", dataIndex);
-			if (dataDataObjectPtr == nullptr){
-				qDebug() << "invalid type" << dataDataObjectPtr;
-				return false;
+			if (dataDataObjectPtr == nullptr || dataDataObjectPtr->IsNull()){
+				data->AppendNull();
+				continue;
 			}
 			V1_0::modsdl::CPrinterBase tempData;
 			if (!tempData.ReadFromGraphQlObject(*dataDataObjectPtr)){
@@ -1027,17 +1056,17 @@ bool V1_0::modsdl::CPrinterList::ReadFromGraphQlObject(const ::imtgql::CGqlParam
 
 bool V1_0::modsdl::CPrinterList::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("data")){
-		data.emplace();
+	if (gqlObject.ContainsParam("data") && gqlObject["data"].isNull()){
+		data.SetNull();
 	}
-	if (gqlObject.ContainsParam("data") && (gqlObject.GetObjectsCount("data") > 0)){
+	if (gqlObject.ContainsParam("data") && !(gqlObject["data"].isNull())){
 		const qsizetype dataElementsCount = gqlObject.GetObjectsCount("data");
 		data = imtsdl::TElementList<V1_0::modsdl::CPrinterBase>();
 		for (qsizetype dataIndex = 0; dataIndex < dataElementsCount; ++dataIndex){
 			const ::imtgql::CGqlParamObject* dataDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("data", dataIndex);
-			if (dataDataObjectPtr == nullptr){
-				qDebug() << "invalid type" << dataDataObjectPtr;
-				return false;
+			if (dataDataObjectPtr == nullptr || dataDataObjectPtr->IsNull()){
+				data->AppendNull();
+				continue;
 			}
 			V1_0::modsdl::CPrinterBase tempData;
 			if (!tempData.OptReadFromGraphQlObject(*dataDataObjectPtr)){
@@ -1058,6 +1087,10 @@ bool V1_0::modsdl::CPrinterList::WriteToJsonObject(QJsonObject& jsonObject) cons
 	if (data){
 		QJsonArray newDataArray;
 		for (qsizetype dataIndex = 0; dataIndex < data->size(); ++dataIndex){
+			if (!data->at(dataIndex)){
+				newDataArray << QJsonValue(QJsonValue::Null);
+				continue;
+			}
 			QJsonObject newDataJsonObject;
 			if (!data->at(dataIndex)->WriteToJsonObject(newDataJsonObject)){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "data").toLocal8Bit().constData();)
@@ -1068,6 +1101,9 @@ bool V1_0::modsdl::CPrinterList::WriteToJsonObject(QJsonObject& jsonObject) cons
 		}
 		jsonObject["data"] = newDataArray;
 	}
+	else if (data.IsNull()){
+		jsonObject["data"] = QJsonValue(QJsonValue::Null);
+	}
 
 	jsonObject["__typename"] = "PrinterList";
 
@@ -1077,11 +1113,18 @@ bool V1_0::modsdl::CPrinterList::WriteToJsonObject(QJsonObject& jsonObject) cons
 
 bool V1_0::modsdl::CPrinterList::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
-	if (jsonObject.contains("data") && jsonObject["data"].isArray()){
+if (jsonObject.contains("data") && jsonObject["data"].isNull()){
+		data.SetNull();
+	}
+		if (jsonObject.contains("data") && jsonObject["data"].isArray()){
 		const QJsonArray dataJsonArray = jsonObject["data"].toArray();
 		const qsizetype dataArrayCount = dataJsonArray.size();
 		data = imtsdl::TElementList<V1_0::modsdl::CPrinterBase>();
 		for (qsizetype dataIndex = 0; dataIndex < dataArrayCount; ++dataIndex){
+			if (dataJsonArray[dataIndex].isNull()){
+				data->AppendNull();
+				continue;
+			}
 			V1_0::modsdl::CPrinterBase tempData;
 			if (!tempData.ReadFromJsonObject(dataJsonArray[dataIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "data").toLocal8Bit().constData();)
@@ -1098,11 +1141,18 @@ bool V1_0::modsdl::CPrinterList::ReadFromJsonObject(const QJsonObject& jsonObjec
 
 bool V1_0::modsdl::CPrinterList::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
-	if (jsonObject.contains("data") && jsonObject["data"].isArray()){
+if (jsonObject.contains("data") && jsonObject["data"].isNull()){
+		data.SetNull();
+	}
+		if (jsonObject.contains("data") && jsonObject["data"].isArray()){
 		const QJsonArray dataJsonArray = jsonObject["data"].toArray();
 		const qsizetype dataArrayCount = dataJsonArray.size();
 		data = imtsdl::TElementList<V1_0::modsdl::CPrinterBase>();
 		for (qsizetype dataIndex = 0; dataIndex < dataArrayCount; ++dataIndex){
+			if (dataJsonArray[dataIndex].isNull()){
+				data->AppendNull();
+				continue;
+			}
 			V1_0::modsdl::CPrinterBase tempData;
 			if (!tempData.OptReadFromJsonObject(dataJsonArray[dataIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "data").toLocal8Bit().constData();)
@@ -1117,6 +1167,140 @@ bool V1_0::modsdl::CPrinterList::OptReadFromJsonObject(const QJsonObject& jsonOb
 }
 
 
+
+
+
+
+QByteArray CGetPrintersGqlRequest::GetCommandId()
+{
+	return QByteArrayLiteral("GetPrinters");
+}
+
+
+bool CGetPrintersGqlRequest::SetupGqlRequest(::imtgql::CGqlRequest& gqlRequest, const GetPrintersRequestArguments& requestArguments, const GetPrintersRequestInfo& /*requestInfo*/)
+{
+	gqlRequest.SetCommandId(GetCommandId());
+
+	// writting input arguments
+
+	return true;
+}
+
+
+CGetPrintersGqlRequest::CGetPrintersGqlRequest(const ::imtgql::CGqlRequest& gqlRequest, bool optRead)
+	: m_isValid(true)
+{
+	Q_UNUSED(optRead)
+	m_isValid = true;
+	m_gqlContextPtr = gqlRequest.GetRequestContext();
+
+	// reading input arguments
+
+	// reading requested fields
+	const imtgql::CGqlFieldObject* requestedFieldsObjectPtr = nullptr;
+	if (!gqlRequest.GetFields().GetFieldIds().isEmpty()){
+		requestedFieldsObjectPtr = &gqlRequest.GetFields();
+		if (requestedFieldsObjectPtr != nullptr){
+			const QByteArrayList requestedIds = requestedFieldsObjectPtr->GetFieldIds();
+			if (!requestedIds.isEmpty()){
+				m_requestInfo.isDataRequested = requestedIds.contains("data");
+				const imtgql::CGqlFieldObject* dataRequestedFieldsPtr = requestedFieldsObjectPtr->GetFieldArgumentObjectPtr("data");
+				if (dataRequestedFieldsPtr != nullptr){
+					const QByteArrayList dataRequestedIds = dataRequestedFieldsPtr->GetFieldIds();
+					if (!dataRequestedIds.isEmpty()){
+						m_requestInfo.data.isNameRequested = dataRequestedIds.contains("name");
+						m_requestInfo.data.isSpecificationRequested = true;
+						m_requestInfo.data.isSimpleTestRequested = true;
+						m_requestInfo.data.isMixedTestRequested = true;
+					}
+				}
+			}
+		}
+	}
+}
+
+
+bool CGetPrintersGqlRequest::IsValid() const
+{
+	return m_isValid;
+}
+
+
+const ::imtgql::IGqlContext* CGetPrintersGqlRequest::GetRequestContext() const
+{
+	return m_gqlContextPtr;
+}
+
+
+const GetPrintersRequestArguments& CGetPrintersGqlRequest::GetRequestedArguments() const
+{
+	return m_requestedArguments;
+}
+
+
+GetPrintersRequestInfo CGetPrintersGqlRequest::GetRequestInfo() const
+{
+	return m_requestInfo;
+}
+bool CPrinterBaseGqlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
+{
+	const QByteArray commandId = gqlRequest.GetCommandId();
+	if (commandId == CGetPrintersGqlRequest::GetCommandId()){
+		return true;
+	}
+
+	return BaseClass::IsRequestSupported(gqlRequest);
+}
+
+
+QJsonObject CPrinterBaseGqlHandlerCompBase::CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+{
+	const QByteArray commandId = gqlRequest.GetCommandId();
+	QJsonObject modelObj;
+	QJsonObject dataModelObj;
+
+	// GetPrinters
+	if (commandId == CGetPrintersGqlRequest::GetCommandId()){
+		CGetPrintersGqlRequest getPrintersGqlRequest(gqlRequest, false);
+		if (!getPrintersGqlRequest.IsValid()){
+			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(commandId);
+			SendErrorMessage(0, errorMessage);
+
+			return QJsonObject();
+		}
+
+		V1_0::modsdl::CPrinterList replyPayload = OnGetPrinters(getPrintersGqlRequest, gqlRequest, errorMessage);
+		if (!errorMessage.isEmpty()){
+			SendErrorMessage(0, QStringLiteral("The derived call [OnGetPrinters] returned an error: %1").arg(errorMessage));
+
+			return QJsonObject();
+		}
+
+		const bool isModelCreated = replyPayload.WriteToJsonObject(dataModelObj);
+		if (!isModelCreated){
+			errorMessage = QStringLiteral("Internal error. Unable to create response for command-ID: '%1'").arg(commandId);
+			SendCriticalMessage(0, errorMessage);
+
+			return QJsonObject();
+		}
+
+		modelObj.insert(QStringLiteral("data"), dataModelObj); return modelObj;
+	}
+
+	errorMessage = QStringLiteral("Bad request. Unexpected command-ID: '%1'").arg(commandId);
+	SendErrorMessage(0, errorMessage);
+
+	return QJsonObject();
+}
+
+
+} // namespace sdl::V1_0::modsdl
+
+#include "PrinterBaseObjects.h"
+
+
+namespace sdl::V1_0::modsdl
+{
 
 
 CPrinterSpecificationBaseObject::CPrinterSpecificationBaseObject(QObject* parent): ::imtbase::CItemModelBase(parent){
@@ -1548,7 +1732,7 @@ void CPrinterBaseObject::SetSpecification(const QVariant& v)
 		}
 	}
 	else {
-		CPrinterBase::specification = nullptr;
+		CPrinterBase::specification.SetNull();
 	}
 	m_specificationQObjectPtr = v;
 
@@ -1604,7 +1788,7 @@ void CPrinterBaseObject::SetSimpleTest(const QVariant& v)
 		}
 	}
 	else {
-		CPrinterBase::simpleTest = nullptr;
+		CPrinterBase::simpleTest.SetNull();
 	}
 	m_simpleTestQObjectPtr = v;
 
@@ -1663,7 +1847,7 @@ void CPrinterBaseObject::SetMixedTest(const QVariant& v)
 		}
 	}
 	else {
-		CPrinterBase::mixedTest = nullptr;
+		CPrinterBase::mixedTest.SetNull();
 	}
 	m_mixedTestQObjectPtr = v;
 
@@ -1880,6 +2064,7 @@ CPrinterListObject::CPrinterListObject(QObject* parent): ::imtbase::CItemModelBa
 
 QVariant CPrinterListObject::GetData()
 {
+	if (!data) {return {};}
 	if (!m_dataQObjectPtr.isValid()){
 		m_dataQObjectPtr = CreateObject("data");
 		auto itemPtr = m_dataQObjectPtr.value<sdl::V1_0::modsdl::CPrinterBaseObjectList*>();
@@ -1891,12 +2076,14 @@ QVariant CPrinterListObject::GetData()
 
 void CPrinterListObject::SetData(const QVariant& v)
 {
-	if (v.isValid()){
+	if (v.isValid() && !v.isNull()){
 		sdl::V1_0::modsdl::CPrinterBaseObjectList* itemPtr = v.value<sdl::V1_0::modsdl::CPrinterBaseObjectList*>();
-		if (itemPtr != nullptr) CPrinterList::data = itemPtr->Version_1_0;
+		if (itemPtr != nullptr){
+			CPrinterList::data = itemPtr->Version_1_0;
+		}
 	}
 	else {
-		CPrinterList::data = nullptr;
+		CPrinterList::data.SetNull();
 	}
 	m_dataQObjectPtr = v;
 
@@ -2754,129 +2941,4 @@ QVariant CMixedUnionObjectList::getData(const QString& nameId, int index)
 	}
 	return QVariant();
 }
-
-
-QByteArray CGetPrintersGqlRequest::GetCommandId()
-{
-	return QByteArrayLiteral("GetPrinters");
-}
-
-
-bool CGetPrintersGqlRequest::SetupGqlRequest(::imtgql::CGqlRequest& gqlRequest, const GetPrintersRequestArguments& requestArguments, const GetPrintersRequestInfo& /*requestInfo*/)
-{
-	gqlRequest.SetCommandId(GetCommandId());
-
-	// writting input arguments
-
-	return true;
-}
-
-
-CGetPrintersGqlRequest::CGetPrintersGqlRequest(const ::imtgql::CGqlRequest& gqlRequest, bool optRead)
-	: m_isValid(true)
-{
-	Q_UNUSED(optRead)
-	m_isValid = true;
-	m_gqlContextPtr = gqlRequest.GetRequestContext();
-
-	// reading input arguments
-
-	// reading requested fields
-	const imtgql::CGqlFieldObject* requestedFieldsObjectPtr = nullptr;
-	if (!gqlRequest.GetFields().GetFieldIds().isEmpty()){
-		requestedFieldsObjectPtr = gqlRequest.GetFields().GetFieldArgumentObjectPtr(gqlRequest.GetFields().GetFieldIds().constFirst());
-		if (requestedFieldsObjectPtr != nullptr){
-			const QByteArrayList requestedIds = requestedFieldsObjectPtr->GetFieldIds();
-			if (!requestedIds.isEmpty()){
-				m_requestInfo.isDataRequested = requestedIds.contains("data");
-				const imtgql::CGqlFieldObject* dataRequestedFieldsPtr = requestedFieldsObjectPtr->GetFieldArgumentObjectPtr("data");
-				if (dataRequestedFieldsPtr != nullptr){
-					const QByteArrayList dataRequestedIds = dataRequestedFieldsPtr->GetFieldIds();
-					if (!dataRequestedIds.isEmpty()){
-						m_requestInfo.data.isNameRequested = dataRequestedIds.contains("name");
-						m_requestInfo.data.isSpecificationRequested = true;
-						m_requestInfo.data.isSimpleTestRequested = true;
-						m_requestInfo.data.isMixedTestRequested = true;
-					}
-				}
-			}
-		}
-	}
-}
-
-
-bool CGetPrintersGqlRequest::IsValid() const
-{
-	return m_isValid;
-}
-
-
-const ::imtgql::IGqlContext* CGetPrintersGqlRequest::GetRequestContext() const
-{
-	return m_gqlContextPtr;
-}
-
-
-const GetPrintersRequestArguments& CGetPrintersGqlRequest::GetRequestedArguments() const
-{
-	return m_requestedArguments;
-}
-
-
-GetPrintersRequestInfo CGetPrintersGqlRequest::GetRequestInfo() const
-{
-	return m_requestInfo;
-}
-bool CPrinterBaseGqlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
-{
-	const QByteArray commandId = gqlRequest.GetCommandId();
-	if (commandId == CGetPrintersGqlRequest::GetCommandId()){
-		return true;
-	}
-
-	return BaseClass::IsRequestSupported(gqlRequest);
-}
-
-
-QJsonObject CPrinterBaseGqlHandlerCompBase::CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
-{
-	const QByteArray commandId = gqlRequest.GetCommandId();
-	QJsonObject modelObj;
-	QJsonObject dataModelObj;
-
-	// GetPrinters
-	if (commandId == CGetPrintersGqlRequest::GetCommandId()){
-		CGetPrintersGqlRequest getPrintersGqlRequest(gqlRequest, false);
-		if (!getPrintersGqlRequest.IsValid()){
-			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(commandId);
-			SendErrorMessage(0, errorMessage);
-
-			return QJsonObject();
-		}
-
-		V1_0::modsdl::CPrinterList replyPayload = OnGetPrinters(getPrintersGqlRequest, gqlRequest, errorMessage);
-		if (!errorMessage.isEmpty()){
-			SendErrorMessage(0, QStringLiteral("The derived call [OnGetPrinters] returned an error: %1").arg(errorMessage));
-
-			return QJsonObject();
-		}
-
-		const bool isModelCreated = replyPayload.WriteToJsonObject(dataModelObj);
-		if (!isModelCreated){
-			errorMessage = QStringLiteral("Internal error. Unable to create response for command-ID: '%1'").arg(commandId);
-			SendCriticalMessage(0, errorMessage);
-
-			return QJsonObject();
-		}
-
-		modelObj.insert(QStringLiteral("data"), dataModelObj); return modelObj;
-	}
-
-	errorMessage = QStringLiteral("Bad request. Unexpected command-ID: '%1'").arg(commandId);
-	SendErrorMessage(0, errorMessage);
-
-	return QJsonObject();
-}
-
-
 } // namespace sdl::V1_0::modsdl

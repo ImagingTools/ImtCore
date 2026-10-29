@@ -20,13 +20,16 @@ class CGqlParamObject: virtual public iser::IObject
 {
 public:
 	CGqlParamObject();
+	static CGqlParamObject CreateNull();
 
 	QByteArrayList GetParamIds() const;
+	bool IsNull() const;
 	QVariant GetParamArgumentValue(const QByteArray& paramId) const;
 	CGqlParamObject* CreateParamObject(const QByteArray& paramId);
 	const CGqlParamObject* GetParamArgumentObjectPtr(const QByteArray& paramId, qsizetype index = 0) const;
 	qsizetype GetObjectsCount(const QByteArray& paramId) const;
 	QList<const CGqlParamObject*> GetParamArgumentObjectPtrList(const QByteArray& paramId) const;
+	bool IsNullArrayElement(const QByteArray& paramId, qsizetype index) const;
 	CGqlParamObject* GetParentObject() const;
 	void InsertParam(const QByteArray& paramId, const QVariant& value);
 	void InsertParam(const QByteArray& paramId, const imtgql::CGqlEnum& value);
@@ -58,6 +61,7 @@ protected:
 	QMap<QByteArray, QList<istd::TSharedInterfacePtr<CGqlParamObject>>> m_objectParamsArray;
 	QByteArray m_objectId;
 	CGqlParamObject* m_parentPtr;
+	bool m_isNull;
 };
 
 

@@ -37,8 +37,18 @@ Item {
 	property real viewContentY: viewContent.y
 	property real viewContentRightMargin: 0
 
-	property bool hasButtonPanel: false
-	property BaseModel buttonPanelModel: null
+	property bool hasLeftPanel: false
+
+	property alias dialogManagerView: localView
+	property alias leftPanelAlias: leftPanel
+
+	// Skeleton: after showSkeleton() covers the content until the next GUI update has been laid out.
+	property bool skeletonEnabled: true
+	property Component skeletonComp: Component {
+		SkeletonFormView {}
+	}
+	property bool contentReady: true
+	readonly property bool skeletonVisible: viewBase.skeletonEnabled && !viewBase.contentReady
 
 	signal commandsModelChanged(var commandsModel)
 	signal commandActivated(string commandId)
@@ -49,25 +59,6 @@ Item {
 
 	onModelChanged: {
 		doUpdateGui()
-	}
-
-onCommandsModelChanged: {
-
-		viewBase.buttonPanelModel = null
-
-		if (!hasButtonPanel || !commandsModel){
-
-			return
-		}
-		for (let i = 0; i < commandsModel.m_elements.count; i++){
-
-			let elementGroup = commandsModel.m_elements.get(i).item
-			if (elementGroup.m_alignment === -1){
-
-				viewBase.buttonPanelModel = elementGroup.m_subElements
-				break
-			}
-		}
 	}
 
 	Connections {
@@ -156,98 +147,67 @@ onCommandsModelChanged: {
 	}
 	
 	Rectangle{
-		id: buttonPanel
+		id: leftPanel
 		anchors.left: parent.left
 		anchors.top: separator.bottom
 		anchors.bottom: parent.bottom
-		width: viewBase.hasButtonPanel ? 0.5 * Style.sizeHintBXS : 0
+		width: viewBase.hasLeftPanel ? 0.5 * Style.sizeHintBXS : 0
+		color: viewBase.contentColor
 		clip: true
 
 		objectName: "ViewBase";
-
-
-		Rectangle{
-
-			anchors.top: parent.top
-			anchors.bottom: parent.bottom
-			anchors.right: parent.right
-
-			width: 1
-
-			color: Style.borderColor;
-			opacity: 0.5
-		}
-
-		ListView{
-			id: buttonsList
-
-			anchors.horizontalCenter: parent.horizontalCenter
-			anchors.verticalCenter: parent.verticalCenter
-
-			width: parent.width - Style.marginM
-			height: Math.min(parent.height - 2*Style.marginM, contentHeight)
-
-			boundsBehavior: Flickable.StopAtBounds
-
-			model: viewBase.buttonPanelModel
-
-			delegate: Item{
-				anchors.horizontalCenter: parent.horizontalCenter
-				width: buttonsList.width
-				height: visible ? width: 0
-
-				visible: model.item.m_visible
-
-				Item {
-					anchors.horizontalCenter: parent.horizontalCenter
-					width: parent.width - Style.marginM
-					height: width
-
-					Image {
-						id: imageName
-
-						width: parent.width
-						height: parent.height
-						sourceSize.width: width
-						sourceSize.height: height
-						source: "../../../../" + Style.getIconPath(model.item.m_elementItemPath, Icon.State.On, Icon.Mode.Normal);
-					}
-
-					MouseArea{
-						id: ma
-						anchors.fill: parent
-
-						hoverEnabled: true
-						cursorShape: Qt.PointingHandCursor
-						onClicked: {
-							let params = ({})
-							params.target = this
-							params.x = mouse.x
-							params.y = mouse.y
-							viewBase.commandActivated(model.item.m_elementId)
-							viewBase.commandActivatedWithParams(model.item.m_elementId, params)
-						}
-					}
-					TooltipArea {
-						anchors.fill: parent;
-
-						mouseArea: ma;
-						text: model.item.m_elementName
-					}
-				}
-			}
-		}
 	}
 
 	Rectangle {
 		id: viewContent;
 		anchors.top: separator.bottom;
-		anchors.left: buttonPanel.right;
+		anchors.left: leftPanel.right;
 		anchors.right: parent.right;
 		anchors.rightMargin: viewBase.viewContentRightMargin
 		anchors.bottom: parent.bottom;
 		objectName: "ViewBase";
 		color: viewBase.contentColor;
+	}
+
+	Loader {
+		id: skeletonLoader
+		anchors.top: separator.bottom
+		anchors.left: parent.left
+		anchors.right: parent.right
+		anchors.bottom: parent.bottom
+		z: 999
+		objectName: "ViewBase"
+		active: viewBase.skeletonVisible
+		sourceComponent: viewBase.skeletonComp
+	}
+
+	// One more frame so the editor is shown only after it has been laid out.
+	Timer {
+		id: contentReadyTimer
+		interval: 0
+		repeat: false
+
+		onTriggered: {
+			viewBase.contentReady = true
+		}
+	}
+
+	function showContent(){
+		contentReadyTimer.stop()
+		viewBase.contentReady = true
+	}
+
+	function showSkeleton(){
+		contentReadyTimer.stop()
+		viewBase.contentReady = false
+	}
+
+	DialogManagerView{
+		id: localView
+		anchors.fill: parent
+		z: 1000
+		isMainView:false
+		objectName: "ViewBase";
 	}
 	
 	Component.onCompleted: {
@@ -378,6 +338,10 @@ onCommandsModelChanged: {
 		updateGui();
 		
 		viewBase.internal__.blockingUpdateModel = false;
+
+		if (!viewBase.contentReady){
+			contentReadyTimer.restart()
+		}
 
 		guiUpdated(this, model)
 	}

@@ -11,14 +11,14 @@ import imtlicLicensesSdl 1.0
 
 RemoteCollectionView {
 	id: root;
-	
-	property string context: ""
+
 	visibleMetaInfo: false;
-	
+
 	collectionId: "Licenses";
 	documentCollectionFilter: null
 	
 	commandsDelegateComp: Component {DocumentCollectionViewDelegate {
+			revisionsPermissionPath: "/LicenseDefinitionManagement/Revisions";
 			collectionView: root;
 			documentTypeIds: ["License"]
 			documentViewTypeIds: ["LicenseEditor"]
@@ -53,14 +53,16 @@ RemoteCollectionView {
 		id: dataControllerComp;
 		
 		GqlRequestDocumentDataController {
-			context: root.context
 			id: requestDocumentDataController
 			
 			property LicenseDefinitionData licenseData: documentModel
 			
 			gqlGetCommandId: ImtlicLicensesSdlCommandIds.s_licenseItem;
+			getPermissionPath: "/LicenseDefinitionManagement/View";
 			gqlUpdateCommandId: ImtlicLicensesSdlCommandIds.s_licenseUpdate;
+			updatePermissionPath: "/LicenseDefinitionManagement/Edit/Change";
 			gqlAddCommandId: ImtlicLicensesSdlCommandIds.s_licenseAdd;
+			addPermissionPath: "/LicenseDefinitionManagement/Edit/Add";
 			
 			typeId: "License";
 			documentName: licenseData ? licenseData.m_licenseName: "";

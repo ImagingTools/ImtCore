@@ -30,6 +30,7 @@ RUN set -eux; \
       mesa-utils \
       mesa-vulkan-drivers \
       fonts-liberation \
+      fonts-noto-core \
       libappindicator3-1 \
       libasound2 \
       libatk-bridge2.0-0 \

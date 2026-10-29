@@ -11,6 +11,7 @@
 #include <istd/CChangeNotifier.h>
 
 // ImtCore includes
+#include <imtauth/CollectionSelection.h>
 #include <imtauth/IPersonalAccessToken.h>
 
 
@@ -100,8 +101,9 @@ bool CPersonalAccessTokenManagerComp::ValidateToken(
 	// Hash the provided token
 	QByteArray tokenHash = HashToken(rawToken);
 
-	// Find token by hash
-	imtbase::ICollectionInfo::Ids tokenIds = m_tokenCollectionCompPtr->GetElementIds();
+	// Find token by hash: the database selects the candidates, the comparison below decides
+	const imtbase::ICollectionInfo::Ids tokenIds = CollectionSelection::SelectIds(
+				*m_tokenCollectionCompPtr, CollectionSelection::ColumnEquals("TokenHash", tokenHash), {"TokenHash"});
 	for (const QByteArray& currentTokenId : std::as_const(tokenIds)){
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (!m_tokenCollectionCompPtr->GetObjectData(currentTokenId, dataPtr)){
@@ -158,7 +160,7 @@ QByteArrayList CPersonalAccessTokenManagerComp::GetTokenIds(const QByteArray& us
 		return result;
 	}
 
-	imtbase::ICollectionInfo::Ids tokenIds = m_tokenCollectionCompPtr->GetElementIds();
+	const imtbase::ICollectionInfo::Ids tokenIds = CollectionSelection::SelectIds(*m_tokenCollectionCompPtr, CollectionSelection::ColumnEquals("UserId", userId));
 	for (const QByteArray& tokenId : tokenIds){
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (!m_tokenCollectionCompPtr->GetObjectData(tokenId, dataPtr)){

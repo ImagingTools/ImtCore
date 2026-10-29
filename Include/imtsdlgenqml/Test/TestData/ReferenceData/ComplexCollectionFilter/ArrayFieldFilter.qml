@@ -29,6 +29,14 @@ BaseClass {
 		return (m_filterOperations !== undefined && m_filterOperations !== null)
 	}
 
+	function isArrayRequired(propertyId){
+		switch (propertyId){
+			case 'm_filterValues': return true
+			case 'm_filterOperations': return true
+		}
+		return false
+	}
+
 	function emplaceFilterValues(typename){
 		m_filterValues = []
 		this._internal.removeAt('m_filterValues')

@@ -9,7 +9,7 @@ DataModelController {
 	property string gqlCommandId
 	property var responseModel
 	property var inputModel
-	property string context
+	property string permissionPath
 
 	function saveDataModel(params, documentId, documentName, documentDescription, documentTypeId){
 		root.requestStarted(params)
@@ -36,8 +36,8 @@ DataModelController {
 		query.AddParam(inputObject)
 
 		let headers = root.getHeaders()
-		if (headers && root.context && root.context != "")
-			headers["context"] = root.context
+		if (headers && root.permissionPath && root.permissionPath != "")
+			headers["permissionPath"] = root.permissionPath
 
 		gqlRequest.setGqlQuery(query.GetQuery(), headers)
 	}

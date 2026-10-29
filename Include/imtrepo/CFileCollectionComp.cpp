@@ -307,65 +307,110 @@ bool CFileCollectionComp::ExportRevision(
 			int revision,
 			const QString& filePath) const
 {
-	if (!m_compressorCompPtr.IsValid()){
+	QString workingDirectoryPath;
+	QString objectDataFilePath;
+	if (!ExtractRevisionDataFile(collection, objectId, revision, workingDirectoryPath, objectDataFilePath)) {
+		return false;
+	}
+
+	const bool exportSucceeded = istd::CSystem::FileCopy(objectDataFilePath, filePath);
+	QDir(workingDirectoryPath).removeRecursively();
+	return exportSucceeded;
+}
+
+
+bool CFileCollectionComp::GetRevisionData(
+			const imtbase::IObjectCollection& collection,
+			const Id& objectId,
+			int revision,
+			istd::IChangeableSharedPtr& dataPtr,
+			idoc::MetaInfoPtr& dataMetaInfoPtr) const
+{
+	dataPtr.Reset();
+	dataMetaInfoPtr.Reset();
+
+	QString workingDirectoryPath;
+	QString objectDataFilePath;
+	if (!ExtractRevisionDataFile(collection, objectId, revision, workingDirectoryPath, objectDataFilePath)) {
+		return false;
+	}
+
+	dataPtr.FromUnique(CreateObjectFromFile(objectDataFilePath, collection.GetObjectTypeId(objectId)));
+	QDir(workingDirectoryPath).removeRecursively();
+	return dataPtr.IsValid();
+}
+
+
+bool CFileCollectionComp::ExtractRevisionDataFile(
+			const imtbase::IObjectCollection& collection,
+			const Id& objectId,
+			int revision,
+			QString& workingDirectoryPath,
+			QString& objectDataFilePath) const
+{
+	workingDirectoryPath.clear();
+	objectDataFilePath.clear();
+	if (!m_compressorCompPtr.IsValid() || revision <= 0 || objectId.isEmpty()) {
 		return false;
 	}
 
 	const IFileObjectCollection* collectionPtr = dynamic_cast<const IFileObjectCollection*>(&collection);
-	if (collectionPtr == nullptr){
+	if (collectionPtr == nullptr) {
 		return false;
 	}
 
 	CFileCollectionItem fileItemInfo;
-	if (!collectionPtr->GetFileInfo(objectId, fileItemInfo)){
+	if (!collectionPtr->GetFileInfo(objectId, fileItemInfo)) {
 		return false;
 	}
 
 	RevisionsContents revisionsContents;
-	if (LoadRevisionsContents(*collectionPtr, objectId, revisionsContents)){
-		if (revisionsContents.contains(revision)){
-			QString revisionsPath = QFileInfo(fileItemInfo.GetFilePath()).path() + "/Revisions";
-			QString revisionFilePath = revisionsPath + "/" + revisionsContents[revision].path;
+	if (!LoadRevisionsContents(*collectionPtr, objectId, revisionsContents) || !revisionsContents.contains(revision)) {
+		return false;
+	}
 
-			if (QFile(revisionFilePath).exists()){
-				QString tempPath = CreateWorkingDir();
-				QDir tempDir(tempPath);
+	const QString revisionFilePath =
+		QFileInfo(fileItemInfo.GetFilePath()).path() + "/Revisions/" + revisionsContents[revision].path;
+	if (!QFile::exists(revisionFilePath)) {
+		return false;
+	}
 
-				if (!tempPath.isEmpty()){
-					if (m_compressorCompPtr->DecompressFolder(revisionFilePath, tempPath)){
-						QString objectDataFilePath = tempPath + "/object.data";
+	workingDirectoryPath = CreateWorkingDir();
+	if (workingDirectoryPath.isEmpty()) {
+		SendErrorMessage(0, QT_TR_NOOP(QStringLiteral("Target folder '%1' could not be created").arg(workingDirectoryPath)));
+		return false;
+	}
 
-						if (QFile::exists(objectDataFilePath)){
-							if (revisionsContents[revision].repositoryRevision != *m_revisionAttrPtr){
-								RepositoryItemInfo repositoryItemInfo;
-								repositoryItemInfo.SetRepositoryItemFilePath(IRepositoryItemInfo::RFT_DATA, objectDataFilePath);
+	QDir workingDirectory(workingDirectoryPath);
+	if (!m_compressorCompPtr->DecompressFolder(revisionFilePath, workingDirectoryPath)) {
+		SendErrorMessage(0, QT_TR_NOOP(QStringLiteral("Revision '%1' could not be decompressed").arg(revisionFilePath)));
+		workingDirectory.removeRecursively();
+		workingDirectoryPath.clear();
+		return false;
+	}
 
-								if (!TransformRepositoryItem(repositoryItemInfo, revisionsContents[revision].repositoryRevision, *m_revisionAttrPtr)){
-									tempDir.removeRecursively();
-									return false;
-								}
-							}
+	objectDataFilePath = workingDirectoryPath + "/object.data";
+	if (!QFile::exists(objectDataFilePath)) {
+		workingDirectory.removeRecursively();
+		workingDirectoryPath.clear();
+		objectDataFilePath.clear();
+		return false;
+	}
 
-							if (istd::CSystem::FileCopy(objectDataFilePath, filePath)){
-								tempDir.removeRecursively();
-								return true;
-							}
-						}
-					}
-					else{
-						SendErrorMessage(0, QT_TR_NOOP(QStringLiteral("Revision '%1' could not be decompressed").arg(revisionFilePath)));
-					}
-
-					tempDir.removeRecursively();
-				}
-				else{
-					SendErrorMessage(0, QT_TR_NOOP(QStringLiteral("Target folder '%1' could not be created").arg(tempPath)));
-				}
-			}
+	if (revisionsContents[revision].repositoryRevision != *m_revisionAttrPtr) {
+		RepositoryItemInfo repositoryItemInfo;
+		repositoryItemInfo.SetRepositoryItemFilePath(IRepositoryItemInfo::RFT_DATA, objectDataFilePath);
+		if (!TransformRepositoryItem(
+				repositoryItemInfo, revisionsContents[revision].repositoryRevision, *m_revisionAttrPtr))
+		{
+			workingDirectory.removeRecursively();
+			workingDirectoryPath.clear();
+			objectDataFilePath.clear();
+			return false;
 		}
 	}
 
-	return false;
+	return true;
 }
 
 

@@ -22,7 +22,9 @@
 #include <imtdeskgql/imtdeskgql.h>
 #include <imtdeskgql/TicketPermissions.h>
 #include <imtdoc/CDocumentSavedEvent.h>
+#include <imtdoc/imtdoc.h>
 #include <imtauth/IUserGroupInfoProvider.h>
+#include <imtauth/imtauth.h>
 #include <imtgql/IGqlContext.h>
 
 
@@ -65,6 +67,18 @@ sdl::V1_0::imtdesk::CTicketData CTicketCollectionDocumentServiceComp::OnGetTicke
 	response.title = ticketPtr->GetTitle();
 	response.description = ticketPtr->GetDescription();
 	response.assigneeIds.Emplace().FromList(ticketPtr->GetAssigneeIds());
+
+	response.assignees.Emplace();
+	QList<sdl::V1_0::imtdesk::CAssigneeData> assigneeList;
+	for (const QByteArray& userId : ticketPtr->GetAssigneeIds()){
+		sdl::V1_0::imtdesk::CAssigneeData assignee;
+		assignee.id = userId;
+		if (m_userCollectionCompPtr.IsValid()){
+			assignee.name = imtauth::GetUserName(*m_userCollectionCompPtr, userId);
+		}
+		assigneeList << assignee;
+	}
+	response.assignees->FromList(assigneeList);
 	response.reporterId = ticketPtr->GetReporterId();
 	response.conversationId = ticketPtr->GetConversationId();
 	response.messageId = ticketPtr->GetMessageId();
@@ -345,7 +359,21 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTicketCollectionDocumentServiceCom
 	const bool canEditCoreFields = CanLockTicket(gqlRequest.GetRequestContext(), ticketPtr);
 	const bool titleChanged = ticketInfo.title && *ticketInfo.title != ticketPtr->GetTitle();
 	const bool descriptionChanged = ticketInfo.description && *ticketInfo.description != ticketPtr->GetDescription();
-	const bool assigneesChanged = ticketInfo.assigneeIds && ticketInfo.assigneeIds->ToList() != ticketPtr->GetAssigneeIds();
+	QByteArrayList newAssigneeIds;
+	bool hasNewAssigneeIds = false;
+	if (ticketInfo.assignees){
+		hasNewAssigneeIds = true;
+		for (const auto& a : *ticketInfo.assignees){
+			if (a && a->id){
+				newAssigneeIds << *a->id;
+			}
+		}
+	}
+	else if (ticketInfo.assigneeIds){
+		hasNewAssigneeIds = true;
+		newAssigneeIds = ticketInfo.assigneeIds->ToList();
+	}
+	const bool assigneesChanged = hasNewAssigneeIds && newAssigneeIds != ticketPtr->GetAssigneeIds();
 	const bool ticketTypeChanged = ticketInfo.ticketType
 			&& imtdeskgql::GetTicketTypeFromSdlType(*ticketInfo.ticketType) != ticketPtr->GetTicketType();
 	const bool priorityChanged = ticketInfo.priority
@@ -375,8 +403,8 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTicketCollectionDocumentServiceCom
 		}
 	}
 
-	if (ticketInfo.assigneeIds){
-		ticketPtr->SetAssigneeIds(ticketInfo.assigneeIds->ToList());
+	if (hasNewAssigneeIds){
+		ticketPtr->SetAssigneeIds(newAssigneeIds);
 	}
 
 	if (ticketInfo.conversationId){
@@ -592,7 +620,7 @@ bool CTicketCollectionDocumentServiceComp::ProcessEvent(imtdoc::CEventBase* even
 	if (savedEventPtr != nullptr){
 		QByteArray documentId = savedEventPtr->GetDocumentId();
 		QByteArray userId = savedEventPtr->GetUserId();
-		QByteArray objectId = savedEventPtr->GetDocumentUrl().toString().toUtf8().replace("collection:///", "");
+		QByteArray objectId = imtdoc::SourceRefToObjectId(savedEventPtr->GetDocumentSourceRef());
 
 		imtbase::IObjectCollection::DataPtr collectionDataPtr;
 		const imtdesk::ISupportTicket* dbTicketPtr = nullptr;

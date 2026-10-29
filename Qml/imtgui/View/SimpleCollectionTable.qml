@@ -45,6 +45,11 @@ import imtcontrols 1.0
  * loading/error/pagination properties are optional and only relevant for
  * the paginated-provider case above; a plain array/ListModel just leaves
  * them at their defaults.
+ *
+ * Setting `columnIds` (with `columnNames`) draws the rows with the standard imtcontrols
+ * Table instead of `delegateComponent`: `actionHandler.createRow(item)` turns an item into
+ * a row holding the column ids (the item's own fields when it returns null), `columnDelegateIds` and
+ * `columnDelegateComponents` give cell components. Rows are selected like in any collection table.
  */
 Item {
 	id: root
@@ -66,6 +71,8 @@ Item {
 	// selection off; a short list that never needs searching turns the filter off.
 	property bool filterEnabled: true
 	property bool selectionEnabled: true
+	// The borders of the columns can be dragged to resize them
+	property bool canMoveColumns: false
 	// Optional column-header row shown above the list, independent of the
 	// select-all bar above. Pairs a custom `delegateComponent`'s columns with
 	// matching titles; leave null (nothing shown) for the default delegate's
@@ -75,6 +82,12 @@ Item {
 	// Gap between rows. Leave at 0 for flush rows separated by the delegate's
 	// own divider; raise it for delegates drawn as detached cards.
 	property int itemSpacing: 0
+	property var columnIds: []
+	property var columnNames: []
+	property var columnDelegateIds: []
+	property var columnDelegateComponents: []
+	readonly property bool __tableMode: root.columnIds.length > 0
+	readonly property alias table: standardTable
 	// Optional pagination/loading state - see header comment above.
 	property bool initialLoading: false
 	property bool loadingMore: false
@@ -90,15 +103,40 @@ Item {
 		}
 	}
 
+	Timer {
+		id: loadMoreTimer
+		interval: 0
+		onTriggered: {
+			if (itemListView.count === 0 || root.loadingMore)
+				return
+
+			if (itemListView.contentHeight <= itemListView.height)
+				return
+			if (itemListView.atYEnd)
+				root.loadMoreRequested()
+		}
+	}
+
+	// Applies the kept position once more after the rows of the new page are created.
+	Timer {
+		id: pagingScrollTimer
+		interval: 0
+		onTriggered: {
+			if (itemListView.contentY < root.__pagingContentY)
+				itemListView.contentY = root.__pagingContentY
+		}
+	}
+
 	readonly property alias selectionManager: selectionManager_
 	readonly property string filterText: filterInput.text
-	readonly property int itemCount: itemListView.count
+	readonly property int itemCount: root.__tableMode ? standardTable.elementsCount : itemListView.count
 	// Single source of truth for the width of everything in this view, so the
 	// search box and the table below it can never drift apart.
 	readonly property int contentWidth: Math.min(root.width - root.horizontalMargin * 2, root.maximumWidth)
 	// Height this view would like, if the surrounding page can spare it.
 	readonly property real contentHeight: tableHeader.height + columnHeader.height + stateOverlay.height
-		+ itemListView.contentHeight + loadingMoreRow.height + tableFrame.borderWidth * 2
+		+ (root.__tableMode ? standardTable.contentHeight + standardTable.headerHeight : itemListView.contentHeight)
+		+ loadingMoreRow.height + tableFrame.borderWidth * 2
 
 	// Every keystroke, undebounced.
 	signal filterChanged(string text)
@@ -108,6 +146,8 @@ Item {
 	signal loadMoreRequested()
 	// User clicked the error message - retry the failed fetch here.
 	signal retryRequested()
+	// A row of the table was double-clicked.
+	signal itemDoubleClicked(string id)
 	// A row was clicked, single click. Only fired by the default delegate - a
 	// custom `delegateComponent` handles its own clicks and reports through
 	// whatever mechanism makes sense for it (e.g. `actionHandler`).
@@ -138,6 +178,49 @@ Item {
 
 	function clearSelection() {
 		selectionManager_.clear()
+		if (root.__tableMode)
+			standardTable.resetSelection(true)
+	}
+
+	function __rebuildRows() {
+		if (!root.__tableMode)
+			return
+		var rows = []
+		var count = !root.model ? 0 : (root.model.count !== undefined ? root.model.count : (root.model.length || 0))
+		for (var i = 0; i < count; i++) {
+			var item = root.itemAt(i)
+			if (!item)
+				continue
+			var row = root.actionHandler && root.actionHandler.createRow ? root.actionHandler.createRow(item) : null
+			if (!row) {
+				row = {}
+				for (var c = 0; c < root.columnIds.length; c++)
+					row[root.columnIds[c]] = item[root.columnIds[c]] !== undefined ? item[root.columnIds[c]] : ""
+			}
+			row.id = item.id
+			rows.push(row)
+		}
+		selectionManager_.clear()
+		standardTable.resetSelection(true)
+		standardTable.elements = rows
+	}
+
+	function __buildHeaders() {
+		for (var i = 0; i < root.columnIds.length; i++)
+			standardHeaders.addHeader(root.columnIds[i], root.columnNames[i] || "", false, false)
+		standardTable.headers = standardHeaders
+		for (var d = 0; d < root.columnDelegateIds.length; d++)
+			standardTable.setColumnContentById(root.columnDelegateIds[d], root.columnDelegateComponents[d])
+	}
+
+	onModelChanged: root.__rebuildRows()
+	onActionHandlerChanged: root.__rebuildRows()
+
+	Component.onCompleted: {
+		if (root.__tableMode) {
+			root.__buildHeaders()
+			root.__rebuildRows()
+		}
 	}
 
 	function selectAll() {
@@ -192,7 +275,7 @@ Item {
 
 		SimpleCollectionTableHeader {
 			id: tableHeader
-			visible: root.selectionEnabled
+			visible: root.selectionEnabled && !root.__tableMode
 			height: visible ? implicitHeight : 0
 			anchors.top: parent.top
 			anchors.left: parent.left
@@ -221,10 +304,13 @@ Item {
 
 		SimpleCollectionStateOverlay {
 			id: stateOverlay
+			// An empty table still shows its column headers above the message
+			z: standardTable.z + 1
 			anchors.top: columnHeader.bottom
+			anchors.topMargin: root.__tableMode && root.itemCount === 0 ? standardTable.headerHeight : 0
 			anchors.left: parent.left
 			anchors.right: parent.right
-			isEmpty: itemListView.count === 0
+			isEmpty: root.itemCount === 0
 			initialLoading: root.initialLoading
 			errorMessage: root.errorMessage
 			emptyText: root.emptyText
@@ -234,6 +320,7 @@ Item {
 
 		ListView {
 			id: itemListView
+			visible: !root.__tableMode
 			anchors.top: stateOverlay.visible ? stateOverlay.bottom : columnHeader.bottom
 			anchors.left: parent.left
 			anchors.right: parent.right
@@ -241,23 +328,66 @@ Item {
 			clip: true
 			spacing: root.itemSpacing
 			boundsBehavior: Flickable.StopAtBounds
-			model: root.model
+			model: root.__tableMode ? null : root.model
 			delegate: root.delegateComponent ? root.delegateComponent : defaultDelegateComponent
 
+			// A new model resets the list to the top. The page arrives with loadingMore already off; until then
+			// the model is only re-assigned. The rows are laid out first, or the position is clamped back to 0.
 			onModelChanged: {
-				if (root.__restorePagingScroll) {
+				if (root.__restorePagingScroll && !root.loadingMore) {
 					root.__restorePagingScroll = false
+					// The web runtime has no forceLayout(); there the timer below restores the position.
+					if (itemListView.forceLayout)
+						itemListView.forceLayout()
 					itemListView.contentY = root.__pagingContentY
+					pagingScrollTimer.restart()
 				}
 			}
 
-			onContentYChanged: {
-				if (itemListView.count === 0 || root.loadingMore)
-					return
+			// Checked on the next tick: when a page arrives, loadingMore goes off before the new model is
+			// set, and the list, shrinking back over the "Loading more" row, is at its end for a moment.
+			onContentYChanged: loadMoreTimer.restart()
+		}
 
-				if (itemListView.contentHeight <= itemListView.height)
+		Table {
+			id: standardTable
+			visible: root.__tableMode
+			anchors.top: stateOverlay.visible && root.itemCount > 0 ? stateOverlay.bottom : columnHeader.bottom
+			anchors.left: parent.left
+			anchors.right: parent.right
+			anchors.bottom: loadingMoreRow.top
+			canMoveColumns: root.canMoveColumns
+			selectable: root.selectionEnabled
+			isMultiSelect: true
+
+			onSelectionChanged: {
+				var ids = []
+				for (var i = 0; i < selection.length; i++) {
+					var item = standardTable.elements ? standardTable.elements[selection[i]] : null
+					if (item && item.id)
+						ids.push(item.id)
+				}
+				selectionManager_.clear()
+				selectionManager_.selectMultiple(ids)
+			}
+
+			onDoubleClicked: {
+				var item = standardTable.elements ? standardTable.elements[index] : null
+				if (item && item.id)
+					root.itemDoubleClicked(item.id)
+			}
+		}
+
+		TableHeaders {
+			id: standardHeaders
+		}
+
+		Connections {
+			target: root.__tableMode ? standardTable.elementsList : null
+			function onContentYChanged() {
+				if (root.loadingMore || !standardTable.elementsList.atYEnd)
 					return
-				if (itemListView.atYEnd)
+				if (standardTable.elementsList.contentHeight > standardTable.elementsList.height)
 					root.loadMoreRequested()
 			}
 		}
@@ -309,6 +439,7 @@ Item {
 		}
 
 		CustomScrollbar {
+			visible: !root.__tableMode
 			anchors.right: parent.right
 			anchors.top: columnHeader.bottom
 			anchors.bottom: parent.bottom

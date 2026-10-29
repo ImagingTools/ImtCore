@@ -6,10 +6,6 @@
 #include <imod/CMultiModelDispatcherBase.h>
 #include <imod/IModel.h>
 
-// Qt includes
-#include <QRecursiveMutex>
-#include <QMap>
-
 // ImtCore includes
 #include <imtauth/ICrossTenantMessage.h>
 #include <imtauth/ITenantManager.h>
@@ -78,11 +74,6 @@ private:
 
 	QByteArray FindTenantOwnerUserId(const QByteArray& tenantId) const;
 	QString FindTenantName(const QByteArray& tenantId) const;
-
-	// Cache of messageId → last known status for change detection.
-	mutable QMap<QByteArray, imtauth::CrossTenantMessageStatus> m_cachedMessageStatus;
-	// Protects the cache from concurrent access.
-	mutable QRecursiveMutex m_cacheMutex;
 };
 
 

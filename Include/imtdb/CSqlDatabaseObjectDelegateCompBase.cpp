@@ -4,6 +4,8 @@
 
 // Qt includes
 #include <QtCore/QFile>
+#include <QtCore/QRegularExpression>
+#include <QtCore/QStringList>
 #include <QtSql/QSqlRecord>
 #include <QtSql/QSqlError>
 
@@ -179,12 +181,19 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetSelectionQuery(
 		return QByteArray();
 	}
 
-	QString baseSelelectionQuery = GetBaseSelectionQuery();
+	const QString baseSelelectionQuery = selectionParamsPtr.IsValid()
+				? CreateBaseSelectionQuery(*selectionParamsPtr)
+				: GetBaseSelectionQuery();
+	if (baseSelelectionQuery.isEmpty()){
+		return QByteArray();
+	}
 
 	// SQLite does not support a top-level parenthesized SELECT statement, so skip the
 	// Qt '%<NUMBER>%' bug workaround wrapping on SQLite — it only affects Postgres drivers.
+	// DuckDB takes the same form for another reason: the wrapping cuts the page before the sort, so the rows
+	// of a page would be whichever the scan produced first, which the planner does not keep stable between runs.
 	QString retVal;
-	if (IsSqliteDriver()){
+	if (IsSqliteDriver() || IsDuckDbDriver()){
 		retVal = baseSelelectionQuery;
 		retVal += QStringLiteral(" ") + filterQuery;
 		retVal += QStringLiteral(" ") + sortQuery;
@@ -417,6 +426,50 @@ idoc::MetaInfoPtr CSqlDatabaseObjectDelegateCompBase::CreateObjectMetaInfo(const
 }
 
 
+QString CSqlDatabaseObjectDelegateCompBase::CreateBaseSelectionQuery(const iprm::IParamsSet& /*selectionParams*/) const
+{
+	return GetBaseSelectionQuery();
+}
+
+
+QString CSqlDatabaseObjectDelegateCompBase::CreateDistinctSelectionQuery(const QString& selectQuery, const iprm::IParamsSet& selectionParams) const
+{
+	if (IsSqliteDriver()){
+		return selectQuery;
+	}
+
+	iprm::TParamsPtr<imtbase::IComplexCollectionFilter> complexFilterPtr(&selectionParams, QByteArrayLiteral("ComplexFilter"), false);
+	if (!complexFilterPtr.IsValid()){
+		return selectQuery;
+	}
+
+	QStringList distinctColumns;
+	const imtbase::IComplexCollectionFilter::Fields& fields = complexFilterPtr->GetFields();
+	for (const imtbase::IComplexCollectionFilter::FieldInfo& field : fields){
+		if (field.metaInfo.isDistinct){
+			distinctColumns << QuoteIdentifier(QString::fromUtf8(field.id));
+		}
+	}
+
+	if (distinctColumns.isEmpty()){
+		return selectQuery;
+	}
+
+	const QString distinctOn = QStringLiteral("DISTINCT ON (%1)").arg(distinctColumns.join(QStringLiteral(", ")));
+
+	// DISTINCT ON goes right after the SELECT of the query, so that what the query selects (a column list, an EXCLUDE) stays
+	// as it is. A query that is DISTINCT already, or does not begin with a SELECT, is wrapped, which leaves its columns only.
+	static const QRegularExpression selectPattern(QStringLiteral(R"(^\s*SELECT\s+(?!DISTINCT\b))"), QRegularExpression::CaseInsensitiveOption);
+
+	const QRegularExpressionMatch selectMatch = selectPattern.match(selectQuery);
+	if (selectMatch.hasMatch()){
+		return QStringLiteral("SELECT %1 %2").arg(distinctOn, selectQuery.mid(selectMatch.capturedLength()));
+	}
+
+	return QStringLiteral("SELECT %1 * FROM (%2) AS _distinct").arg(distinctOn, selectQuery);
+}
+
+
 bool CSqlDatabaseObjectDelegateCompBase::SetObjectMetaInfoFromRecord(const QSqlRecord& /*record*/, idoc::IDocumentMetaInfo& /*metaInfo*/) const
 {
 	return false;
@@ -428,7 +481,7 @@ bool CSqlDatabaseObjectDelegateCompBase::CreatePaginationQuery(int offset, int c
 	paginationQuery.clear();
 
 	if (offset >= 0 && count > 0){
-		if (IsSqliteDriver()){
+		if (IsSqliteDriver() || IsDuckDbDriver()){
 			paginationQuery = QStringLiteral("LIMIT %1 OFFSET %2").arg(QString::number(count), QString::number(offset)).toUtf8();
 		}
 		else{
@@ -663,6 +716,12 @@ bool CSqlDatabaseObjectDelegateCompBase::IsSqliteDriver() const
 }
 
 
+bool CSqlDatabaseObjectDelegateCompBase::IsDuckDbDriver() const
+{
+	return m_databaseEngineCompPtr.IsValid() && m_databaseEngineCompPtr->GetDatabaseDriverId().compare(QByteArrayLiteral("DUCKDB"), Qt::CaseInsensitive) == 0;
+}
+
+
 bool CSqlDatabaseObjectDelegateCompBase::TableExists(const QString& tableName) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
@@ -675,6 +734,13 @@ bool CSqlDatabaseObjectDelegateCompBase::TableExists(const QString& tableName) c
 	if (driverId == QByteArrayLiteral("QPSQL")){
 		const QByteArray tableSchema = GetTableScheme();
 		const QString schemaName = tableSchema.isEmpty() ? QStringLiteral("public") : tableSchema;
+
+		tableExistsQuery = QStringLiteral("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = '%1' AND table_name = '%2');")
+								.arg(schemaName, tableName);
+	}
+	else if (driverId.compare(QByteArrayLiteral("DUCKDB"), Qt::CaseInsensitive) == 0){
+		const QByteArray tableSchema = GetTableScheme();
+		const QString schemaName = tableSchema.isEmpty() ? QStringLiteral("main") : tableSchema;
 
 		tableExistsQuery = QStringLiteral("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = '%1' AND table_name = '%2');")
 								.arg(schemaName, tableName);
@@ -877,9 +943,15 @@ QString CSqlDatabaseObjectDelegateCompBase::CreateComplexFilterQuery(
 			const std::function<void(QString&)>& postProcessor) const
 {
 	if (!IsTaggable()){
-		QString filterQuery = CComplexCollectionFilterConverter::CreateSqlFilterQuery(
-					collectionFilter,
-					IsSqliteDriver() ? CComplexCollectionFilterConverter::SC_GENERAL : CComplexCollectionFilterConverter::SC_POSTGRES);
+		CComplexCollectionFilterConverter::SqlContext sqlContext = CComplexCollectionFilterConverter::SC_POSTGRES;
+		if (IsSqliteDriver()){
+			sqlContext = CComplexCollectionFilterConverter::SC_GENERAL;
+		}
+		else if (IsDuckDbDriver()){
+			sqlContext = CComplexCollectionFilterConverter::SC_DUCKDB;
+		}
+
+		QString filterQuery = CComplexCollectionFilterConverter::CreateSqlFilterQuery(collectionFilter, sqlContext);
 		if (!filterQuery.isEmpty() && postProcessor){
 			postProcessor(filterQuery);
 		}
@@ -893,6 +965,7 @@ QString CSqlDatabaseObjectDelegateCompBase::CreateComplexFilterQuery(
 	config.entityType = QString::fromUtf8(*m_taggableEntityTypeAttrPtr);
 	config.entityIdExpression = entityIdExpression;
 	config.isSqlite = IsSqliteDriver();
+	config.isDuckDb = IsDuckDbDriver();
 
 	return CTagFilterSqlBuilder::CreateFilterQuery(collectionFilter, config, postProcessor);
 }

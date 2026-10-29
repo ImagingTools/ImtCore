@@ -5,6 +5,7 @@
 // Qt includes
 #include <QtCore/QJsonDocument>
 #include <QtTest/QTest>
+#include <QtCore/QDirIterator>
 #include <QtCore/QFile>
 #include <QtCore/QTemporaryDir>
 
@@ -201,6 +202,35 @@ void CSdlGenQmlTest::TestComplexCollectionFilter()
 }
 
 
+void CSdlGenQmlTest::TestArrayNullabilityDefaults()
+{
+	CImtSdlGenQmlTest testSuite;
+	PrepareSuite(testSuite, m_tempOutputDir);
+
+	auto argParserPtr = testSuite.GetInterface<imtsdl::ISdlEditableProcessArgumentsParser>();
+	argParserPtr->SetCppEnabled(false);
+	argParserPtr->SetGqlEnabled();
+	argParserPtr->SetQmlEnabled();
+	ExecuteTest(testSuite, "ArrayNullability.sdl");
+
+	QDirIterator iterator(m_tempOutputDir.absolutePath(), {QStringLiteral("Entity.qml")}, QDir::Files, QDirIterator::Subdirectories);
+	QVERIFY(iterator.hasNext());
+
+	QFile entityFile(iterator.next());
+	QVERIFY(entityFile.open(QIODevice::ReadOnly | QIODevice::Text));
+	const QByteArray entityQml = entityFile.readAll();
+	QVERIFY(entityQml.contains("property BaseModel m_requiredObjects: BaseModel { owner: entity }"));
+	QVERIFY(entityQml.contains("property BaseModel m_nullableObjectsWithRequiredElements: null"));
+	QVERIFY(entityQml.contains("property BaseModel m_nullableObjects: null"));
+	QVERIFY(entityQml.contains("property var m_requiredScalars: []"));
+	QVERIFY(entityQml.contains("property var m_nullableScalarsWithRequiredElements: null"));
+	QVERIFY(entityQml.contains("property var m_nullableScalars: null"));
+	QVERIFY(entityQml.contains("case 'm_requiredObjects': return true"));
+	QVERIFY(entityQml.contains("case 'm_nullableObjectsWithRequiredElements': return true"));
+	QVERIFY(!entityQml.contains("case 'm_nullableObjects': return true"));
+}
+
+
 void CSdlGenQmlTest::TestGenerationResultSerialization()
 {
 	// Create a generation result object
@@ -281,7 +311,7 @@ void CSdlGenQmlTest::TestAppendFoldersWithAutomaticTimestamp()
 	additionalFolders << tempDir.path() + "/folder3" << tempDir.path() + "/folder2"; // folder2 is duplicate
 	updateData.SetCreatedFolders(additionalFolders);
 	// Not setting createdAt, so current time should be used
-	
+
 	QVERIFY(imtsdlgenqml::CQmlGenTools::UpdateGenerationResult(testFilePath, updateData));
 
 	// Read back and verify
@@ -324,18 +354,18 @@ void CSdlGenQmlTest::TestAppendFoldersWithSpecificTimestamp()
 	updateData.SetCreatedFolders(additionalFolders);
 	QDateTime specificTime = QDateTime::fromString("2024-06-15T14:20:00.000Z", Qt::ISODateWithMs);
 	updateData.SetCreatedAt(specificTime);
-	
+
 	QVERIFY(imtsdlgenqml::CQmlGenTools::UpdateGenerationResult(testFilePath, updateData));
-	
+
 	// Read back and verify specific timestamp was used
 	imtsdlgenqml::CSdlQmlGenerationResult loadedResult;
 	QVERIFY(imtsdlgenqml::CQmlGenTools::ReadGenerationResultFile(loadedResult, testFilePath));
-	
+
 	// Should have all 3 folders now
 	QSet<QString> expectedFolders = initialFolders | additionalFolders;
 	QCOMPARE(loadedResult.GetCreatedFolders(), expectedFolders);
 	QCOMPARE(loadedResult.GetGeneratorVersion(), generatorVersion);
-	
+
 	// Verify the specific timestamp was used
 	QCOMPARE(loadedResult.GetCreatedAt().toMSecsSinceEpoch(), specificTime.toMSecsSinceEpoch());
 }
@@ -392,7 +422,7 @@ void CSdlGenQmlTest::TestGenerationResultJsonFormat()
 }
 
 
-void CSdlGenQmlTest::cleanup() 
+void CSdlGenQmlTest::cleanup()
 {
 	m_isAllTestsPassed = m_isAllTestsPassed && !QTest::currentTestFailed();
 }

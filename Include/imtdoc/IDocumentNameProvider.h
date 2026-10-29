@@ -6,13 +6,18 @@
 #include <istd/IPolymorphic.h>
 
 // Qt includes
-#include <QtCore/QByteArray>
 #include <QtCore/QString>
 
 
 namespace istd
 {
 class IChangeable;
+}
+
+
+namespace iprm
+{
+class IParamsSet;
 }
 
 
@@ -39,13 +44,18 @@ public:
 	/**
 		\brief Compute the default display name for a document.
 
-		\param objectId  Persistent ID of the collection element (empty for
-		                 documents not yet saved to the collection).
 		\param document  Current in-memory state of the document.
+		\param paramsPtr Optional parameters of the document source, provided by
+		                 the document service. Can be null if the document source
+		                 is not described (e.g.\ documents not yet saved).
+		                 For collection-based documents use
+		                 \c imtdoc::GetObjectIdFromParams to get the collection
+		                 object ID and \c imtdoc::GetRevisionFromParams to get
+		                 the object revision.
 		\return          The name to use, or an empty string if no name can be
 		                 derived.
 	*/
-	virtual QString GetDefaultDocumentName(const QByteArray& objectId, const istd::IChangeable& document) const = 0;
+	virtual QString GetDefaultDocumentName(const istd::IChangeable& document, const iprm::IParamsSet* paramsPtr = nullptr) const = 0;
 };
 
 

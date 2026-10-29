@@ -143,8 +143,8 @@ class TextEdit extends Item {
             } else if(e.key === QtEnums.Key_Enter){
                 e.stopPropagation()
             } else if(e.key === QtEnums.Key_Tab){
+                // The browser must not move the focus; the Keys handlers get the Tab first, as in Qt
                 e.preventDefault()
-                e.stopPropagation()
             }
         }
 
@@ -338,14 +338,34 @@ class TextEdit extends Item {
         this.text = ''
     }
     copy(){
-        navigator.clipboard.writeText(this.text.slice(this.selectionStart, this.selectionEnd))
+        this.__writeClipboardText(this.text.slice(this.selectionStart, this.selectionEnd))
     }
     cut(){
         let text = this.text.slice(this.selectionStart, this.selectionEnd)
-        navigator.clipboard.writeText(text).then(()=>{
-            this.text = this.text.slice(0, this.selectionStart) + this.text.slice(this.selectionEnd, this.text.length)
-            this.select(this.selectionStart, this.selectionStart)
-        })
+        this.__writeClipboardText(text)
+        this.text = this.text.slice(0, this.selectionStart) + this.text.slice(this.selectionEnd, this.text.length)
+        this.select(this.selectionStart, this.selectionStart)
+    }
+    // navigator.clipboard exists only in secure contexts (HTTPS, localhost); a server opened over
+    // plain HTTP falls back to the copy command, as TextInput does.
+    __writeClipboardText(text){
+        if(typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText){
+            navigator.clipboard.writeText(text).catch(()=>{})
+            return
+        }
+
+        let handler = (e)=>{
+            e.preventDefault()
+            e.stopImmediatePropagation()
+            if(e.clipboardData) e.clipboardData.setData('text/plain', text)
+        }
+        document.addEventListener('copy', handler, true)
+        try {
+            document.execCommand('copy')
+        } catch (e) {
+        } finally {
+            document.removeEventListener('copy', handler, true)
+        }
     }
     deselect(){
         document.getSelection().removeAllRanges()
@@ -366,12 +386,28 @@ class TextEdit extends Item {
 
     }
     paste(){
+        // Reading the clipboard needs a secure context; elsewhere only the browser's own paste works.
+        if(typeof navigator === 'undefined' || !navigator.clipboard || !navigator.clipboard.readText) return
+
         navigator.clipboard.readText().then((text) => {
             let buff = this.text.split('')
             let replaced = buff.splice(this.selectionStart, this.selectionEnd-this.selectionStart, text)
             this.text = buff.join('')
             this.select(this.selectionEnd-replaced.length+text.length, this.selectionEnd-replaced.length+text.length)
         })
+    }
+    // A Tab that no Keys handler took is typed into the text at the caret of the textarea, as Qt's TextEdit does;
+    // selectionStart/End of the item are not kept in step with the caret, so the textarea is asked
+    __insertTab(){
+        if(this.readOnly) return false
+
+        let start = this.__impl.selectionStart
+        let end = this.__impl.selectionEnd
+        this.text = this.text.slice(0, start) + '\t' + this.text.slice(end)
+        this.__impl.setSelectionRange(start + 1, start + 1)
+        this.selectionStart = start + 1
+        this.selectionEnd = start + 1
+        return true
     }
     positionAt(x, y, position){
 

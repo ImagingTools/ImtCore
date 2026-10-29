@@ -7,6 +7,7 @@ const MemoryController = require('./MemoryController')
 module.exports = {
     rootPath: '',
     root: null,
+    embeddedTranslations: null,
 
     init: function(){ 
         global.queueFlag = []
@@ -51,20 +52,33 @@ module.exports = {
                 return obj
             }
 
+            __translationPrefixes(){
+                if(typeof this.application === 'string') return [this.application]
+                if(Array.isArray(this.application)) return this.application
+                return []
+            }
+
+            __applyEmbeddedTranslations(){
+                let embedded = module.exports.embeddedTranslations
+                if(!embedded || !this.language || this.__languages[this.language]) return
+                this.__languages[this.language] = embedded[this.language] || {}
+            }
+
             translate(sourceText){
+                this.__applyEmbeddedTranslations()
                 let translatedText = this.__languages[this.language]
                 let result = translatedText ? translatedText[sourceText] : sourceText
                 return result ? result : sourceText
             }
 
             SLOT_languageChanged(oldValue, newValue){
-                if(this.application && this.language && !this.__languages[this.language]){
-                    let langPrefixList = []
-                    if(typeof this.application === 'string'){
-                        langPrefixList.push(this.application)
-                    } else if(Array.isArray(this.application)){
-                        langPrefixList = this.application
+                if(this.language && !this.__languages[this.language]){
+                    if(module.exports.embeddedTranslations){
+                        this.__applyEmbeddedTranslations()
+                        return
                     }
+                    if(!this.application) return
+                    let langPrefixList = this.__translationPrefixes()
                     for(let langPrefix of langPrefixList){
                         let xhr = new XMLHttpRequest()
                         if(langPrefix){
@@ -98,12 +112,26 @@ module.exports = {
         
         global.JSContext = Context.create()
 
-        // Qt QString.arg() — replaces %1, %2, ... with arguments
+        // Qt QString.arg(): each value replaces every occurrence of the lowest numbered place marker (%1..%99),
+        // so chained calls ("%1 of %2".arg(a).arg(b)) fill the markers in order
         if (!String.prototype.arg) {
             String.prototype.arg = function(...args) {
                 let result = String(this)
                 for (let i = 0; i < args.length; i++) {
-                    result = result.replace('%' + (i + 1), args[i] !== undefined && args[i] !== null ? String(args[i]) : '')
+                    let lowest = 0
+                    const markerRe = /%(\d{1,2})/g
+                    let match
+                    while ((match = markerRe.exec(result)) !== null) {
+                        const number = parseInt(match[1], 10)
+                        if (number > 0 && (lowest === 0 || number < lowest)) {
+                            lowest = number
+                        }
+                    }
+                    if (lowest === 0) {
+                        break
+                    }
+                    const value = args[i] !== undefined && args[i] !== null ? String(args[i]) : ''
+                    result = result.replace(new RegExp('%' + lowest + '(?!\\d)', 'g'), () => value)
                 }
                 return result
             }
@@ -326,6 +354,10 @@ module.exports = {
                 pointer-events: all;
             }
 
+            html.jq-hittest .jq-mouse {
+                pointer-events: all;
+            }
+
             .Window {
                 width: 100vw;
                 height: 100vh;
@@ -513,7 +545,17 @@ module.exports = {
             if(item && !item.__destroyed) newTree.push(item)
         }
 
-        this.root.__setFocusTree(newTree)
+        // Only the previous chain can still have focus. Walking the whole
+        // item tree here made every focus change visit every control.
+        // Items inside a FocusScope keep their own focus: the scope remembers
+        // which child was active, and the border of CustomTextField reads that.
+        let keep = new Set(newTree)
+        for(let item of oldTree){
+            if(!item || item.__destroyed || keep.has(item)) continue
+            if(this._isInsideFocusScope(item)) continue
+            if(item.focus) item.focus = false
+        }
+
         this.focusTree = newTree
         this._syncActiveFocus(oldTree, newTree)
     },
@@ -549,7 +591,9 @@ module.exports = {
 
         for(let item of oldTree){
             if(!item || item.__destroyed || shouldHave.has(item)) continue
-            this._clearDescendantActiveFocus(item, shouldHave)
+            if(item instanceof JQModules.QtQuick.FocusScope){
+                this._clearDescendantActiveFocus(item, shouldHave)
+            }
         }
 
         if(canActivate && owner instanceof JQModules.QtQuick.FocusScope){
@@ -557,14 +601,26 @@ module.exports = {
         }
     },
 
+    _isInsideFocusScope(item){
+        let parent = item.parent
+        while(parent){
+            if(parent instanceof JQModules.QtQuick.FocusScope) return true
+            parent = parent.parent
+        }
+        return false
+    },
+
     _clearDescendantActiveFocus(item, shouldHave){
         if(!item || !item.children) return
         for(let child of item.children){
             if(!child || child.__destroyed) continue
+            if(!child.focus && !child.activeFocus) continue
             if(!shouldHave.has(child) && child.activeFocus){
                 child.activeFocus = false
             }
-            this._clearDescendantActiveFocus(child, shouldHave)
+            if(child instanceof JQModules.QtQuick.FocusScope){
+                this._clearDescendantActiveFocus(child, shouldHave)
+            }
         }
     },
 

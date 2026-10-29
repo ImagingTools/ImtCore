@@ -21,6 +21,7 @@ ControlBase {
 
 	property bool centered: true;
 	property bool pinned: false;
+	// The app logo in the title bar.
 	property bool hasIcon: true;
 	property bool modal: false;
 
@@ -30,6 +31,9 @@ ControlBase {
 	property Item root: null;
 
 	property Item rootItem: null;
+	property var dialogManagerView: parentWindow ? parentWindow.dialogManagerView : undefined;
+	property int modality: Qt.ApplicationModal //Qt.ApplicationModal, Qt.WindowModal, Qt.NonModal
+	property var parentWindow: null
 
 	property ListModel buttonsModel: ListModel{};
 	property int buttonsModelCount: buttonsModel.count;
@@ -83,15 +87,28 @@ ControlBase {
 		enabled: false
 	}
 
-	function addButton(id, name, enabled, active){
+	// variant: "primary" | "danger" | "default"; empty lets DialogButtons pick it from the button id.
+	function addButton(id, name, enabled, active, variant){
 		if (enabled == undefined){
 			enabled = true
 		}
 		if(active == undefined){
 			active = false
 		}
+		if (variant == undefined){
+			variant = ""
+		}
 
-		buttonsModel.append({id: id, name:name, enabled: enabled, active: active})
+		buttonsModel.append({id: id, name:name, enabled: enabled, active: active, variant: variant})
+	}
+
+	function setButtonVariant(id, variant){
+		for(let i = 0; i < buttonsModel.count; i++){
+			if (buttonsModel.get(i).id === id){
+				buttonsModel.setProperty(i, "variant", variant);
+				break;
+			}
+		}
 	}
 
 	function setButtonActive(buttonIdArg){
@@ -101,7 +118,7 @@ ControlBase {
 	}
 
 	function insertButton(id, name, enabled, index){
-		buttonsModel.insert(index, {id: id, name:name, enabled: enabled})
+		buttonsModel.insert(index, {id: id, name:name, enabled: enabled, active: false, variant: ""})
 	}
 
 	function removeButton(id){
@@ -173,10 +190,10 @@ ControlBase {
 		if (dialogContainer.root){
 			if(!(dialogContainer.notClosingButtons & buttonId)){
 				if(dialogContainer.selfComp){
-					dialogContainer.root.closeByComp(dialogContainer.selfComp);
+					dialogContainer.root.closeByComp(dialogContainer.selfComp, dialogContainer.parentWindow);
 				}
 				else {
-					dialogContainer.root.closeDialog();
+					dialogContainer.root.closeDialog(undefined, dialogContainer.parentWindow);
 				}
 			}
 		}
@@ -246,16 +263,14 @@ ControlBase {
 			if(dialogContainer.root){
 				dialogContainer.closed()
 				if(dialogContainer.selfComp){
-					dialogContainer.root.closeByComp(dialogContainer.selfComp);
+					dialogContainer.root.closeByComp(dialogContainer.selfComp, dialogContainer.parentWindow);
 				}
 				else {
-					dialogContainer.root.closeDialog();
+					dialogContainer.root.closeDialog(undefined, dialogContainer.parentWindow);
 				}
 
 			}
 		}
-
-
 	}
 
 	ResizeItem{
@@ -264,6 +279,7 @@ ControlBase {
 		visible: dialogContainer.canResize;
 
 		targetItem: dialogContainer;
+		globalParent: dialogContainer.dialogManagerView ? dialogContainer.dialogManagerView : ModalDialogManager.activeView
 		onSizeChanged: {
 			if(dialogContainer.contentItem){
 				if(deltaWidth !== 0){

@@ -69,7 +69,8 @@ ComplexCollectionFilter{
 									   CONTAINS: "Contains",
 									   ARRAY_HAS_ANY: "ArrayHasAny",
 									   ARRAY_HAS_ALL: "ArrayHasAll",
-									   ARRAY_IS_EMPTY: "ArrayIsEmpty"
+									   ARRAY_IS_EMPTY: "ArrayIsEmpty",
+									   STARTS_WITH: "StartsWith"
 								   })
 
 	/*!

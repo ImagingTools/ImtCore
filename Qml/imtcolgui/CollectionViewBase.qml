@@ -109,18 +109,9 @@ ViewBase {
 
 		z: 1;
 
-		clip: filterAreaAnimation.running || !collectionViewBaseContainer.filterMenuVisible;
+		clip: !collectionViewBaseContainer.filterMenuVisible;
 
-		readonly property int targetHeight: collectionViewBaseContainer.filterMenuVisible ? (filterMenu_.height + 2 * Style.marginM) : 0;
-
-		height: filterArea.targetHeight;
-
-		onTargetHeightChanged: {
-			filterAreaAnimation.stop();
-			filterAreaAnimation.from = filterArea.height;
-			filterAreaAnimation.to = filterArea.targetHeight;
-			filterAreaAnimation.start();
-		}
+		height: collectionViewBaseContainer.filterMenuVisible ? (filterMenu_.height + 2 * Style.marginM) : 0;
 
 	FilterMenu {
 		id: filterMenu_;
@@ -160,15 +151,6 @@ ViewBase {
 			tableInternal.clearSortingInfo(beQuiet)
 		}
 	}
-	}
-
-	NumberAnimation {
-		id: filterAreaAnimation;
-
-		target: filterArea;
-		property: "height";
-		duration: 160;
-		easing.type: Easing.OutCubic;
 	}
 
 	onHeadersChanged: {
@@ -306,24 +288,40 @@ ViewBase {
 			}
 			
 			onElementsChanged: {
-				selectionBlock = true
-				resetSelection()
+				tableInternal.restoreSelection()
 
-				let elementsModel = collectionViewBaseContainer.dataController.elementsModel
-				let count = elementsModel.getItemsCount()
+				collectionViewBaseContainer.elementsChanged();
+			}
+
+			// Keeps only the selected ids still on this page: rows that went to another page (sorting, filtering)
+			// are not shown as selected, and commands like Edit or Remove must not act on them.
+			function restoreSelection(){
+				let count = !tableInternal.elements ? 0 : tableInternal.elements.getItemsCount()
 				let selectedIndexes = []
+				let selectedIds = []
 				for (let i = 0; i < count; i++){
-					let elementId = elementsModel.getData("id", i)
+					let elementId = tableInternal.elements.getData("id", i)
 					if (collectionViewBaseContainer.selectionManager.isSelected(elementId)){
 						selectedIndexes.push(i)
+						selectedIds.push(elementId)
 					}
 				}
 
-				selectionManager.selectMultiple(selectedIndexes)
-				
-				selectionBlock = false
+				let idsChanged = selectedIds.length !== collectionViewBaseContainer.selectionManager.selectedIds.length
+				if (idsChanged){
+					collectionViewBaseContainer.selectionManager.selectMultiple(selectedIds)
+				}
 
-				collectionViewBaseContainer.elementsChanged();
+				if (!tableInternal.selectionManager.arraysEqual(tableInternal.getSelectedIndexes(), selectedIndexes)){
+					tableInternal.selectionBlock = true
+					tableInternal.resetSelection()
+					tableInternal.selectionManager.selectMultiple(selectedIndexes)
+					tableInternal.selectionBlock = false
+				}
+
+				if (idsChanged){
+					collectionViewBaseContainer.selectionChanged(collectionViewBaseContainer.selectionManager.selectedIds, selectedIndexes)
+				}
 			}
 			
 			onHeadersChanged: {
@@ -521,7 +519,7 @@ ViewBase {
 				id: filterHint;
 
 				anchors.right: filterItem.left;
-				anchors.rightMargin: filterHint.slide;
+				anchors.rightMargin: Style.spacingXS;
 				anchors.verticalCenter: filterItem.verticalCenter;
 
 				z: 200;
@@ -529,10 +527,7 @@ ViewBase {
 				width: hintBody.width + Style.spacingS;
 				height: Style.controlHeightM;
 
-				visible: filterHint.opacity > 0;
-				opacity: 0;
-
-				property real slide: 0;
+				visible: filterHint.wanted;
 
 				Rectangle {
 					id: hintArrow;
@@ -576,54 +571,12 @@ ViewBase {
 					}
 				}
 
-				ParallelAnimation {
-					id: filterHintIn;
-
-					NumberAnimation {
-						target: filterHint;
-						property: "opacity";
-						to: 1;
-						duration: 120;
-						easing.type: Easing.OutQuad;
-					}
-
-					NumberAnimation {
-						target: filterHint;
-						property: "slide";
-						to: Style.spacingXS;
-						duration: 120;
-						easing.type: Easing.OutCubic;
-					}
-				}
-
-				NumberAnimation {
-					id: filterHintOut;
-
-					target: filterHint;
-					property: "opacity";
-					to: 0;
-					duration: 90;
-					easing.type: Easing.InQuad;
-				}
-
 				// Bound, not listened for: a mouse area that switches off never
 				// reports the pointer leaving, and a card driven by that signal
 				// alone would stay on screen. Read as a condition it goes as soon
 				// as the button stops being usable.
 				readonly property bool wanted: iconFilter.enabled && iconFilter.visible
 					&& iconFilter.mouseArea && iconFilter.mouseArea.containsMouse;
-
-				onWantedChanged: {
-					if (filterHint.wanted){
-						filterHintOut.stop();
-						filterHint.slide = 0;
-						filterHintIn.restart();
-					}
-					else{
-						filterHintIn.stop();
-						filterHintOut.restart();
-					}
-				}
 			}
 			}
 		}
@@ -652,7 +605,15 @@ ViewBase {
 		height: !visible ? 0 : Style.controlHeightM;
 		color: pagination_.color;
 		visible: collectionViewBaseContainer.hasPagination
-		
+
+		// Sets the paging footer apart from the rows, like a panel edge in VS Code.
+		Rectangle {
+			anchors.top: parent.top;
+			width: parent.width;
+			height: 1;
+			color: Style.borderColor;
+		}
+
 		Pagination {
 			id: pagination_;
 			anchors.horizontalCenter: parent.horizontalCenter;
@@ -671,14 +632,14 @@ ViewBase {
 		}
 	}
 
-	Loading {
+	// Covers the table only: the filters stay readable and usable while rows load.
+	SkeletonTableView {
 		id: loading_;
-		anchors.top: filterArea.top
+		anchors.top: backgroundTable.top
 		anchors.left: parent.left
 		anchors.right: parent.right
 		anchors.bottom: paginationObj.bottom
-		// baseColor is the Loading default and matches Agents/Services/Messages tables.
-		background.color: Style.baseColor
-		visible: false;
+		rowHeight: tableInternal.itemHeight
+		columnCount: tableInternal.columnCount > 0 ? Math.min(tableInternal.columnCount, 6) : 4
 	}
 }

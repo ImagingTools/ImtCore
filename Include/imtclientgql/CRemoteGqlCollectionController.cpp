@@ -5,6 +5,7 @@
 // ACF includes
 #include <idoc/CStandardDocumentMetaInfo.h>
 #include <imod/TModelWrap.h>
+#include <iprm/IOptionsList.h>
 #include <istd/CChangeNotifier.h>
 
 // ImtCore includes
@@ -284,7 +285,13 @@ const iprm::IOptionsList* CRemoteGqlCollectionController::GetObjectTypesInfo() c
 
 QByteArray CRemoteGqlCollectionController::GetObjectTypeId(const Id& objectId) const
 {
-	if (m_gqlObjectCollectionDelegatePtr != nullptr){
+	// A collection with a single object type needs no server round-trip to learn it.
+	const iprm::IOptionsList* typesInfoPtr = GetObjectTypesInfo();
+	if (typesInfoPtr != nullptr && typesInfoPtr->GetOptionsCount() == 1){
+		return typesInfoPtr->GetOptionId(0);
+	}
+
+	if (m_gqlClientPtr != nullptr && m_gqlObjectCollectionDelegatePtr != nullptr){
 		GqlRequestPtr requestPtr(m_gqlObjectCollectionDelegatePtr->CreateGetObjectTypeIdRequest(objectId));
 		if (requestPtr.IsValid()){
 			GqlResponsePtr responsePtr = m_gqlClientPtr->SendRequest(requestPtr);
@@ -309,28 +316,25 @@ idoc::MetaInfoPtr CRemoteGqlCollectionController::GetDataMetaInfo(const Id& obje
 		return retVal;
 	}
 
+	const QByteArray typeId = GetObjectTypeId(objectId);
+	if (m_metaInfoCreatorMap.contains(typeId)){
+		imtbase::IMetaInfoCreator* metaInfoCreatorPtr = m_metaInfoCreatorMap[typeId];
+		Q_ASSERT(metaInfoCreatorPtr != nullptr);
+
+		// The meta info is created from the object, so reading it also proves the object exists.
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (GetObjectData(objectId, dataPtr)){
+			metaInfoCreatorPtr->CreateMetaInfo(dataPtr.GetPtr(), typeId, retVal);
+		}
+
+		return retVal;
+	}
+
 	GqlRequestPtr requestPtr(m_gqlObjectCollectionDelegatePtr->CreateGetObjectDataMetaInfoRequest(objectId));
 	if (requestPtr.IsValid()){
 		GqlResponsePtr responsePtr = m_gqlClientPtr->SendRequest(requestPtr);
 		if (responsePtr.IsValid()){
-			QByteArray typeId = GetObjectTypeId(objectId);
-
-			idoc::MetaInfoPtr metaInfoPtr;
-			if (m_metaInfoCreatorMap.contains(typeId)){
-				imtbase::IMetaInfoCreator* metaInfoCreatorPtr = m_metaInfoCreatorMap[typeId];
-				Q_ASSERT(metaInfoCreatorPtr != nullptr);
-
-				// TODO: Read full object ?
-				imtbase::IObjectCollection::DataPtr dataPtr;
-				GetObjectData(objectId, dataPtr);
-
-				metaInfoCreatorPtr->CreateMetaInfo(dataPtr.GetPtr(), typeId, metaInfoPtr);
-			}
-			else{
-				metaInfoPtr.SetPtr(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>());
-			}
-
-			retVal = metaInfoPtr;
+			retVal.SetPtr(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>());
 		}
 	}
 

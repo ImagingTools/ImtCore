@@ -9,7 +9,7 @@ import imtbaseDocumentRevisionSdl 1.0
 
 Dialog {
 	id: documentRevisionDialog;
-	property string context: ""
+	property string permissionPath: ""
 	title: qsTr("Revisions (%1)").arg(documentRevisionDialog.contentItem ? documentRevisionDialog.contentItem.revisionsCount : 0);
 	canMove: false;
 	backgroundColor: Style.baseColor;
@@ -24,14 +24,16 @@ Dialog {
 
 	property string collectionId;
 	property string documentId;
+	// Permission area of the revisions of the collection, e.g. "/SensorManagement/Revisions".
+	property string revisionsPermissionPath: ""
 	property int selectedRevision: -1;
 
 	Component.onCompleted: {
-		if (PermissionsController.checkPermission("RestoreRevision")){
+		if (PermissionsController.checkPermission(documentRevisionDialog.revisionsPermissionPath + "/Restore")){
 			addButton(Enums.save, qsTr("Set this revision"), false)
 		}
 
-		if (PermissionsController.checkPermission("DeleteRevision")){
+		if (PermissionsController.checkPermission(documentRevisionDialog.revisionsPermissionPath + "/Delete")){
 			addButton(Enums.no, qsTr("Delete revision"), false)
 		}
 
@@ -40,7 +42,7 @@ Dialog {
 
 	onFinished: {
 		if (buttonId == Enums.save){
-			setRevisionRequest.send();
+			ModalDialogManager.openDialog(setRevisionConfirmDialog, {});
 		}
 		else if (buttonId == Enums.no){
 			ModalDialogManager.openDialog(removeRevisionConfirmDialog, {});
@@ -68,7 +70,7 @@ Dialog {
 	}
 
 	GqlSdlRequestSender {
-		context: documentRevisionDialog.context
+		permissionPath: documentRevisionDialog.permissionPath
 		id: setRevisionRequest;
 		requestType: 1;
 		gqlCommandId: ImtbaseDocumentRevisionSdlCommandIds.s_restoreRevision;
@@ -94,7 +96,7 @@ Dialog {
 	}
 
 	GqlSdlRequestSender {
-		context: documentRevisionDialog.context
+		permissionPath: documentRevisionDialog.permissionPath
 		id: deleteRevisionRequest;
 		gqlCommandId: ImtbaseDocumentRevisionSdlCommandIds.s_deleteRevision;
 		inputObjectComp: Component {
@@ -108,13 +110,27 @@ Dialog {
 		sdlObjectComp: Component { DeleteRevisionResponse {
 				onFinished: {
 					documentRevisionDialog.refresh()
-					PopupManager.addSuccessMessage(qsTr("The document revision has been successfully delete"));
+					PopupManager.addSuccessMessage(qsTr("The document revision has been successfully deleted"));
 				}
 			}
 		}
 
 		function getHeaders(){
 			return documentRevisionDialog.getHeaders();
+		}
+	}
+
+	Component {
+		id: setRevisionConfirmDialog;
+		MessageDialog {
+			width: Style.sizeHintM;
+			title: qsTr("Set revision");
+			message: qsTr("Restore the document to the selected revision ?");
+			onFinished: {
+				if (buttonId == Enums.yes){
+					setRevisionRequest.send()
+				}
+			}
 		}
 	}
 
@@ -168,6 +184,7 @@ Dialog {
 				anchors.margins: Style.marginL;
 				documentId: documentRevisionDialog.documentId;
 				collectionId: documentRevisionDialog.collectionId;
+				revisionsPermissionPath: documentRevisionDialog.revisionsPermissionPath;
 				selectable: true;
 				selectedRevision: documentRevisionDialog.selectedRevision;
 

@@ -33,6 +33,19 @@ Item {
 		}
 	}
 
+	// The affirmative action is the accent button, as in VS Code dialogs; the rest stay secondary.
+	function variantForButton(buttonId, variant){
+		if (variant !== undefined && variant !== ""){
+			return variant;
+		}
+
+		if (buttonId === Enums.ok || buttonId === Enums.yes || buttonId === Enums.save || buttonId === Enums.apply){
+			return "primary";
+		}
+
+		return "default";
+	}
+
 	function getButtonState(buttonId){
 		for (let i = 0; i < buttonsRepeater.model.count; i++){
 			let id = buttonsRepeater.model.get(i).id;
@@ -60,18 +73,11 @@ Item {
 				enabled: model.enabled;
 				focus: model.active !==undefined ? model.active: false;
 				text: model.name;
-				variant: model.variant !== undefined ? model.variant : "default";
+				variant: buttonsDialogContainer.variantForButton(model.id, model.variant);
 				widthFromDecorator: true;
 				decorator: Component {
 					ButtonDecorator {
-						id: dialogButtonDecorator
-
-						// Dialog buttons sit on a near-white chrome, so the default variant keeps its
-						// own white-based idle/hover language instead of the panel-tuned
-						// Style.buttonColor family. Filled variants use the shared palette unchanged.
-						variantColor: dialogButtonDecorator.isPrimary ? Style.buttonPrimaryColor : dialogButtonDecorator.isDanger ? Style.buttonDangerColor : Style.baseColor;
-						variantHoverColor: dialogButtonDecorator.isPrimary ? Style.buttonPrimaryHoverColor : dialogButtonDecorator.isDanger ? Style.buttonDangerHoverColor : Style.alternateBaseColor;
-						variantPressedColor: dialogButtonDecorator.isPrimary ? Style.buttonPrimaryPressedColor : dialogButtonDecorator.isDanger ? Style.buttonDangerPressedColor : Style.selectedColor;
+						widthDefault: Style.buttonWidthXL;
 					}
 				}
 				onClicked: {

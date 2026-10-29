@@ -48,7 +48,7 @@ function isTrackedRequest(req) {
 function trackNetwork(page) {
   let state = networkStateByPage.get(page);
   if (state) return state;
-  state = { pending: 0, inFlight: new Set(), waiters: [] };
+  state = { pending: 0, inFlight: new Set(), waiters: [], lastFrameAt: 0 };
   const settle = () => {
     if (state.pending === 0 && state.waiters.length) {
       const waiters = state.waiters;
@@ -72,6 +72,20 @@ function trackNetwork(page) {
   };
   page.on('requestfinished', onDone);
   page.on('requestfailed', onDone);
+
+  // The server pushes state over the SUBSCRIPTION socket, which is neither xhr nor fetch and so is
+  // invisible to the counter above. A brand-new document is marked dirty by a frame that lands AFTER
+  // the DOM has gone quiet, so a screenshot taken on DOM-quiet alone catches the toolbar before Save
+  // lights up - measured at 117 differing pixels on an otherwise identical page. A socket is
+  // long-lived, so there is nothing to drain: what matters is that no frame has arrived recently.
+  page.on('websocket', (ws) => {
+    const stamp = () => {
+      state.lastFrameAt = Date.now();
+    };
+    ws.on('framesent', stamp);
+    ws.on('framereceived', stamp);
+  });
+
   networkStateByPage.set(page, state);
   return state;
 }
@@ -155,9 +169,16 @@ async function waitForStable(page, options = {}) {
       await domQuietOnce(page, quietMs, Math.max(0, deadline - Date.now()));
 
       const state = networkStateByPage.get(page);
-      if (!state || state.pending === 0 || Date.now() >= deadline) break;
-      // A request was still in flight when the DOM went quiet - wait for it and loop for one more pass.
-      await waitForNetworkIdle(page, { timeout: Math.max(0, deadline - Date.now()) });
+      if (!state || Date.now() >= deadline) break;
+      if (state.pending > 0) {
+        // A request was still in flight when the DOM went quiet - wait for it and loop for one more pass.
+        await waitForNetworkIdle(page, { timeout: Math.max(0, deadline - Date.now()) });
+        continue;
+      }
+      // A subscription frame landed inside the quiet window, so the DOM it changes may not be drawn yet.
+      const sinceFrame = Date.now() - state.lastFrameAt;
+      if (sinceFrame >= quietMs) break;
+      await page.waitForTimeout(Math.min(quietMs - sinceFrame, Math.max(0, deadline - Date.now())));
     }
   } catch (err) {
     // A navigation can destroy the execution context mid-wait. Fall back to the DOM-ready signal and
@@ -175,4 +196,9 @@ async function waitForStable(page, options = {}) {
   await waitForBusyIndicatorGone(page);
 }
 
-module.exports = { waitForStable, waitForBusyIndicatorGone, waitForNetworkIdle, DEFAULTS };
+/** Attach the request/frame listeners now, so activity before the first wait is not missed. */
+function attachStabilityTracking(page) {
+  trackNetwork(page);
+}
+
+module.exports = { waitForStable, waitForBusyIndicatorGone, waitForNetworkIdle, attachStabilityTracking, DEFAULTS };

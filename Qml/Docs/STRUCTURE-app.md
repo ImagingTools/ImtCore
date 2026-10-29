@@ -2771,7 +2771,7 @@
 - `tryCloseDirtyDocument(string documentId, var callback)`
 - `documentViewRegistered(string typeId, string viewTypeId)`
 - `documentAlreadyOpened(string documentId, string typeId)`
-- `documentReady(string documentId)`
+- `documentReady(string documentId, string typeId, bool isNew, var representationController)`
 
 **Функции**
 

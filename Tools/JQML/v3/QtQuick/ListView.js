@@ -105,10 +105,22 @@ class ListView extends Flickable {
     }
 
     indexAt(x, y) {
-
+        let item = this.itemAt(x, y)
+        if (!item || !item.JQAbstractModel) return -1
+        return item.JQAbstractModel.index
     }
     itemAt(x, y) {
-
+        let horizontal = this.orientation === ListView.Horizontal
+        for (let key in this.__items) {
+            let item = this.__items[key]
+            if (!item) continue
+            if (horizontal) {
+                if (x >= item.x && x < item.x + item.width) return item
+            } else if (y >= item.y && y < item.y + item.height) {
+                return item
+            }
+        }
+        return null
     }
 
     itemAtIndex(index) {
@@ -133,7 +145,7 @@ class ListView extends Flickable {
         let origin = horizontal ? this.originX : this.originY
         let itemSize = item
             ? (horizontal ? item.width : item.height)
-            : (horizontal ? this.__middleWidth : this.__middleHeight)
+            : this.__itemExtent(horizontal)
         // An index outside the materialised window has no item yet, so its place
         // is estimated from the average item size, exactly as __getItemInfo does.
         let itemPos = item
@@ -298,7 +310,7 @@ class ListView extends Flickable {
         let index = this.currentIndex
 
         if (length <= 0) {
-            index = -1
+            // index = -1
         } else if (index < -1) {
             index = -1
         } else if (index >= length) {
@@ -310,12 +322,20 @@ class ListView extends Flickable {
         }
     }
 
+    __itemExtent(horizontal) {
+        let measured = horizontal ? this.__middleWidth : this.__middleHeight
+        if (measured > 0) return measured
+        return 0
+    }
+
     __getItemIndex(x, y){
-        if (this.orientation === ListView.Horizontal) {
-            return Math.ceil((x - this.originX) / (this.__middleWidth + this.spacing))
-        } else {
-            return Math.ceil((y - this.originY) / (this.__middleHeight + this.spacing))
+        let horizontal = this.orientation === ListView.Horizontal
+        let step = this.__itemExtent(horizontal) + this.spacing
+        if (!(step > 0)) return 0
+        if (horizontal) {
+            return Math.ceil((x - this.originX) / step)
         }
+        return Math.ceil((y - this.originY) / step)
     }
 
     __getItemInfo(index) {
@@ -351,47 +371,44 @@ class ListView extends Flickable {
         } else {
             exist = false
 
-            if (this.orientation === ListView.Horizontal) {
-                x = 0
-                if (this.__items[index - 1]) {
-                    x = this.__items[index - 1].x + this.__items[index - 1].width + this.spacing
-                } else if (this.__items[index + 1]) {
-                    x = this.__items[index + 1].x - this.__middleWidth - this.spacing
-                } else {
-                    if (index === 0) {
-                        x = this.originX
-                    } else {
-                        x = this.originX + (this.__middleWidth + this.spacing) * index
-                    }
+            let horizontal = this.orientation === ListView.Horizontal
+            let extent = this.__itemExtent(horizontal)
+            let origin = horizontal ? this.originX : this.originY
+            let prev = this.__items[index - 1]
+            let next = this.__items[index + 1]
+            let pos = origin
 
-                }
-                width = this.__middleWidth
+            if (prev) {
+                let prevPos = horizontal ? prev.x : prev.y
+                let prevSize = horizontal ? prev.width : prev.height
+                pos = prevPos + prevSize + this.spacing
+            } else if (next) {
+                let nextPos = horizontal ? next.x : next.y
+                pos = nextPos - extent - this.spacing
+            } else if (index !== 0) {
+                pos = origin + (extent + this.spacing) * index
+            }
 
-                if (x + width < this.contentX - this.cacheBuffer || x > this.contentX + this.width + this.cacheBuffer) {
-                    inner = false
-                } else {
-                    inner = true
-                }
+            if (horizontal) {
+                x = pos
+                width = extent
             } else {
-                y = 0
-                if (this.__items[index - 1]) {
-                    y = this.__items[index - 1].y + this.__items[index - 1].height + this.spacing
-                } else if (this.__items[index + 1]) {
-                    y = this.__items[index + 1].y - this.__middleHeight - this.spacing
-                } else {
-                    if (index === 0) {
-                        y = this.originY
-                    } else {
-                        y = this.originY + (this.__middleHeight + this.spacing) * index
-                    }
-                }
-                height = this.__middleHeight
+                y = pos
+                height = extent
+            }
 
-                if (y + height < this.contentY - this.cacheBuffer || y > this.contentY + this.height + this.cacheBuffer) {
-                    inner = false
-                } else {
-                    inner = true
-                }
+            let viewPos = horizontal ? this.contentX : this.contentY
+            let viewSize = horizontal ? this.width : this.height
+            let prevSize = prev ? (horizontal ? prev.width : prev.height) : 0
+            // Zero stride stacks every missing index on one point, and the
+            // viewport test would then accept the whole model.
+            let unknownStride = !(extent > 0) && !(this.spacing > 0)
+            if (index > 0 && unknownStride && !(prevSize > 0)) {
+                inner = false
+            } else if (pos + extent < viewPos - this.cacheBuffer || pos > viewPos + viewSize + this.cacheBuffer) {
+                inner = false
+            } else {
+                inner = true
             }
         }
 
@@ -580,22 +597,58 @@ class ListView extends Flickable {
         this.__items = shifted
     }
 
+    // The row is the __items key. JQAbstractModel.index can still name the
+    // pre-shift row, and following that index writes this same delegate.
+    __itemIndex(item) {
+        if (!item) return -1
+
+        for (let key of Object.keys(this.__items)) {
+            if (this.__items[key] === item) return Number(key)
+        }
+
+        return -1
+    }
+
     // Neighbour follow during insert/realign shoves the displaced row before the
     // new one has its final size, which leaves a gap (PopupContainer insert(0)).
+    // x/width shift the horizontal tail, y/height the vertical one. One pass
+    // under __aligning: each write emits xChanged/yChanged, and a nested follow
+    // either overflows a long list or loops on a stale model index.
     __followItemGeometry(item, horizontal) {
         if (this.__aligning) return
         if ((this.orientation === ListView.Horizontal) !== !!horizontal) return
 
-        let index = item && item.JQAbstractModel ? item.JQAbstractModel.index : -1
+        let index = this.__itemIndex(item)
         if (index < 0 || !this.__items[index + 1]) return
 
-        let next = this.__items[index + 1]
-        if (horizontal) {
-            let x = item.x + item.width + this.spacing
-            if (next.x !== x) next.x = x
-        } else {
-            let y = item.y + item.height + this.spacing
-            if (next.y !== y) next.y = y
+        let wasUpdating = this.__updating
+        this.__aligning = true
+        this.__updating = true
+        try {
+            let guard = 0
+            let limit = Math.max(this.count || 0, Object.keys(this.__items).length)
+
+            while (this.__items[index + 1] && guard < limit) {
+                let current = this.__items[index]
+                let next = this.__items[index + 1]
+                if (!current || next === current) break
+
+                if (horizontal) {
+                    let x = current.x + current.width + this.spacing
+                    if (next.x === x) break
+                    next.x = x
+                } else {
+                    let y = current.y + current.height + this.spacing
+                    if (next.y === y) break
+                    next.y = y
+                }
+
+                index++
+                guard++
+            }
+        } finally {
+            this.__aligning = false
+            if (!wasUpdating) delete this.__updating
         }
     }
 

@@ -8,7 +8,7 @@ import imtauthAuthorizationSdl 1.0
 QtObject {
     id: container;
 
-    property string context: ""
+    property string permissionPath: ""
 	property string accessToken: "";
 	property string refreshToken: "";
     property string login: "";
@@ -47,7 +47,7 @@ QtObject {
 	}
 
     property GqlSdlRequestSender request : GqlSdlRequestSender {
-        context: container.context
+        permissionPath: container.permissionPath
         gqlCommandId: ImtauthAuthorizationSdlCommandIds.s_authorization;
         sdlObjectComp:
             Component {

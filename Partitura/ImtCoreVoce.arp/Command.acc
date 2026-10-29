@@ -72,6 +72,20 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="CommandPermissionsJoiner" PackageId="ImtServerAppPck" ComponentId="CommandPermissionsProviderJoiner">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CommandPermissionsProvider" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>CommandPermissions</Value>
+                                <Value>SubCommandsPermissions</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="CommandRepresentationController" PackageId="ImtServerAppPck" ComponentId="GuiElementModelRepresentationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -108,6 +122,15 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="SubCommandsPermissions" PackageId="ImtServerAppPck" ComponentId="CommandPermissionsProviderJoiner">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CommandPermissionsProvider" Type="Reference[]" ExportId="SubCommands">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="SubElementsRepresentationController" PackageId="ImtServerAppPck" ComponentId="GuiElementContainerRepresentationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -127,7 +150,7 @@
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
         <Interface InterfaceId="imtauth::IPermissionChecker" ComponentId="CheckPermissionOr"/>
-        <Interface InterfaceId="imtserverapp::ICommandPermissionsProvider" ComponentId="CommandPermissions"/>
+        <Interface InterfaceId="imtserverapp::ICommandPermissionsProvider" ComponentId="CommandPermissionsJoiner"/>
         <Interface InterfaceId="imtserverapp::IGuiElementModel" ComponentId="Command"/>
         <Interface InterfaceId="imtserverapp::IRepresentationController" ComponentId="CommandRepresentationController"/>
         <Interface InterfaceId="istd::IChangeable" ComponentId="Command"/>

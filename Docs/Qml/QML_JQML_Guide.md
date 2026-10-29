@@ -284,6 +284,18 @@ Der JQML-Compiler wird automatisch während des Qt-Builds über `Config/QMake/We
 - Kompiliert bei Änderungen an QML-Dateien
 - Erzeugt eine `.qrc`-Datei, die in die Anwendung eingebettet wird
 
+Für JQML v3 wird die Funktion `jqCompileWeb` verwendet (QMake-Pendant zu `jq_compile_web` aus `Config/CMake/WebCompiler.cmake`):
+
+```
+jqCompileWeb(<buildwebdir>, <config.json>, <Start.qml>, <dataroot>, <appicon>, <Übersetzungsverzeichnisse>)
+```
+
+- QML-Quellen werden direkt aus den in der JSON-Konfiguration aufgeführten Verzeichnissen kompiliert (kein Kopieren nach `buildwebdir/src`)
+- Erzeugt `<buildwebdir>/Resources/qrc_$${TARGET}Web.cpp` (Ressourcenname `$${TARGET}Web`)
+- Die QML-SDL-Generierung (`Config/QMake/SdlConfiguration.pri`) erzeugt dafür `generation_info.json` neben den generierten QML-Modulen
+- Beispiel: `Impl/ImtControlsGallery/Qml/controlsgalleryqml/QMake/controlsgalleryqml.pro`
+- Die v2-Funktionen `prepareWebQml`/`compyleWeb` bleiben für bestehende Projekte erhalten
+
 ---
 
 ## Cross-Platform-Entwicklung

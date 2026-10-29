@@ -48,6 +48,7 @@
                             <Values>
                                 <Value>OnTenantsCollectionChanged</Value>
                                 <Value>OnMembershipNotification</Value>
+                                <Value>OnOrganizationMembersChanged</Value>
                                 <Value>OnConnectionCodesNotification</Value>
                                 <Value>OnTenantRelationshipsCollectionChanged</Value>
                                 <Value>OnCrossTenantMessageNotification</Value>
@@ -81,6 +82,13 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>Tenants</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RevisionPermissionPaths" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>/OrganizationManagement/Revisions</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

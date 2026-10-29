@@ -3,6 +3,7 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtguigql 1.0
 import imtdocgui 1.0
+import imtauthGroupsSdl 1.0
 
 RemoteCollectionView {
 	id: userGroupCollectionViewContainer;
@@ -15,6 +16,7 @@ RemoteCollectionView {
 	property var documentManager: null;
 	
 	commandsDelegateComp: Component {DocCollectionViewDelegate {
+			revisionsPermissionPath: "/Administration/Groups/Revisions";
 			collectionView: userGroupCollectionViewContainer;
 			documentManager: userGroupCollectionViewContainer.documentManager;
 
@@ -32,6 +34,11 @@ RemoteCollectionView {
 				}
 			}
 		}
+	}
+
+	Component.onCompleted: {
+		table.setSortingInfo(GroupItemDataTypeMetaInfo.s_name, "ASC");
+		table.nonSortableColumns = [GroupItemDataTypeMetaInfo.s_usersCount]
 	}
 
 	function handleSubscription(dataModel){

@@ -18,11 +18,39 @@ class ITenantManager: virtual public istd::IChangeable
 public:
 	virtual QByteArrayList GetTenantIds() const = 0;
 	virtual ITenantInfoUniquePtr GetTenant(const QByteArray& tenantId) const = 0;
+	/**
+		Ids of the organizations the user owns or created.
+		\param isReadPtr [optional] False when the storage could not be read completely, so the list may miss some.
+	*/
+	virtual QByteArrayList GetOwnedOrCreatedTenantIds(const QByteArray& userId, bool* isReadPtr = nullptr) const = 0;
+	/**
+		Ids of the direct sub-organizations of an organization.
+		\param isReadPtr [optional] False when the storage could not be read completely, so the list may miss some.
+	*/
+	virtual QByteArrayList GetChildTenantIds(const QByteArray& tenantId, bool* isReadPtr = nullptr) const = 0;
+	/**
+		Ids of the organizations with the name, ignoring the case and the surrounding spaces.
+	*/
+	virtual QByteArrayList FindTenantIdsByName(const QString& tenantName) const = 0;
 	virtual QByteArrayList GetTenantPermissions(const QByteArray& tenantId) const = 0;
-	virtual QByteArray CreateTenant(const QString& tenantName, const QString& description = QString(), const QByteArray& ownerId = QByteArray()) = 0;
+	/**
+		Create an organization. A sub-organization of \c parentTenantId gets the default scope reduced to the scope of its parent.
+		\param creatorId The user who creates it and alone edits its permission scope; the owner when empty.
+	*/
+	virtual QByteArray CreateTenant(
+				const QString& tenantName,
+				const QString& description = QString(),
+				const QByteArray& ownerId = QByteArray(),
+				const QByteArray& creatorId = QByteArray(),
+				const QByteArray& parentTenantId = QByteArray()) = 0;
 	virtual bool RemoveTenant(const QByteArray& tenantId) = 0;
 	virtual bool UpdateTenant(const QByteArray& tenantId, const QString& tenantName, const QString& description, const QByteArray& ownerId = QByteArray(), bool updateOwner = false) = 0;
 	virtual bool SetTenantActive(const QByteArray& tenantId, bool isActive) = 0;
+
+	/**
+		Set the permission scope of an organization and narrow the scopes of all its sub-organizations to it.
+	*/
+	virtual bool SetTenantPermissions(const QByteArray& tenantId, const QByteArrayList& permissions) = 0;
 
 	/**
 		Set hierarchy fields on an existing tenant.

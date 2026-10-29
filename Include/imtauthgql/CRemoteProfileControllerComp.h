@@ -2,6 +2,9 @@
 #pragma once
 
 
+// ACF includes
+#include <iqt/ITranslationManager.h>
+
 // ImtCore includes
 #include <imtlic/IProductInfo.h>
 #include <imtclientgql/TClientRequestManagerCompWrap.h>
@@ -21,6 +24,7 @@ public:
 
 	I_BEGIN_COMPONENT(CRemoteProfileControllerComp);
 		I_ASSIGN(m_productInfoCompPtr, "ProductInfo", "Product feature container", false, "ProductInfo");
+		I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translates the permission names of the profile", false, "TranslationManager");
 	I_END_COMPONENT;
 
 protected:
@@ -39,6 +43,7 @@ protected:
 
 private:
 	I_REF(imtlic::IProductInfo, m_productInfoCompPtr);
+	I_REF(iqt::ITranslationManager, m_translationManagerCompPtr);
 };
 
 

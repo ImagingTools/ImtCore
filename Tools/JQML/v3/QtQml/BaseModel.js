@@ -32,115 +32,133 @@ class BaseModel extends ListModel {
 		return item.getProperties()
 	}
 
+	hasNullElements(){
+		for(let i = 0; i < this.count; i++){
+			let item = this.get(i).item
+			if (item === null || item === undefined){
+				return true
+			}
+		}
+
+		return false
+	}
+
+	// Returns '' if a required array of an item is null or has null elements; scalars are not validated
 	toJson(){
 		let json = '['
 		for(let i = 0; i < this.count; i++){
+			if (i > 0) json += ','
+
 			let item = this.get(i).item
-			let list = this.getProperties(item)
-
-			json += '{'
-			let j = 0
-			for(let key of list){
-				if (item[key] == null){
-					json += '"' + item.getJSONKeyForProperty(key) + '": null'
-				}
-				else if(typeof item[key] === 'object'){
-					if (Array.isArray(item[key])){
-						json += '"' + item.getJSONKeyForProperty(key) + '":'
-
-						json += "["
-
-						for (let k = 0; k < item[key].length; k++){
-							if (k != 0){
-								json += ", "
-							}
-
-							if (typeof item[key][k] === "string"){
-								json += "\"" + this.escapeSpecialChars(item[key][k]) + "\""
-							}
-							else{
-								json += item[key][k]
-							}
-						}
-
-						json += "]"
-					}
-					else if (typeof item[key].toJson === "function"){
-						json += '"' + item.getJSONKeyForProperty(key) + '":' + item[key].toJson()
-					}
-				} else {
-					let value = item[key]
-					if (value === undefined){
-						value = null
-					}
-					let safeValue = item[key]
-					if (typeof safeValue === 'string'){
-						safeValue = this.escapeSpecialChars(safeValue)
-					}
-
-					json += '"' + item.getJSONKeyForProperty(key) + '":' + (typeof item[key] === 'string' ? '"' + safeValue + '"' : value)
-				}
-				if(j < list.size - 1) json += ','
-				j++
+			if (item === null || item === undefined){
+				json += 'null'
+				continue
 			}
-			json +='}'
 
-			if(i < this.count - 1) json += ','
+			let separator = '{'
+			for(let key of this.getProperties(item)){
+				let value = item[key]
+				let serializedValue
+				if (value == null){
+					if (!item.isArrayValueValid(key, value)){
+						return ''
+					}
+
+					serializedValue = ' null'
+				}
+				else if(typeof value === 'object'){
+					if (!item.isArrayValueValid(key, value)){
+						return ''
+					}
+
+					if (Array.isArray(value)){
+						serializedValue = "["
+						for (let k = 0; k < value.length; k++){
+							if (k != 0){
+								serializedValue += ", "
+							}
+
+							serializedValue += (typeof value[k] === "string") ? "\"" + this.escapeSpecialChars(value[k]) + "\"" : value[k]
+						}
+						serializedValue += "]"
+					}
+					else if (typeof value.toJson === "function"){
+						serializedValue = value.toJson()
+						if (serializedValue === ''){
+							return ''
+						}
+					}
+					else{
+						continue
+					}
+				}
+				else{
+					serializedValue = (typeof value === 'string') ? '"' + this.escapeSpecialChars(value) + '"' : value
+				}
+
+				json += separator + '"' + item.getJSONKeyForProperty(key) + '":' + serializedValue
+				separator = ','
+			}
+			json += (separator === '{') ? '{}' : '}'
 		}
 		json +=']'
 		return json
 	}
 
+	// Returns '' if a required array of an item is null or has null elements; scalars are not validated
 	toGraphQL(){
 		let graphQL = '['
 		for(let i = 0; i < this.count; i++){
+			if (i > 0) graphQL += ','
+
 			let item = this.get(i).item
-			let list = this.getProperties(item)
+			if (item === null || item === undefined){
+				graphQL += 'null'
+				continue
+			}
 
-			graphQL += '{'
-			let j = 0
-			for(let key of list){
-				if (item[key] == null){
-					graphQL += item.getJSONKeyForProperty(key) + ':null'
+			let separator = '{'
+			for(let key of this.getProperties(item)){
+				let value = item[key]
+				let serializedValue
+				if (value == null){
+					if (!item.isArrayValueValid(key, value)){
+						return ''
+					}
+
+					serializedValue = 'null'
 				}
-				else if(typeof item[key] === 'object'){
-					if (Array.isArray(item[key])){
-						graphQL +=  item.getJSONKeyForProperty(key) + ':'
+				else if(typeof value === 'object'){
+					if (!item.isArrayValueValid(key, value)){
+						return ''
+					}
 
-						graphQL += "["
-
-						for (let k = 0; k < item[key].length; k++){
+					if (Array.isArray(value)){
+						serializedValue = "["
+						for (let k = 0; k < value.length; k++){
 							if (k != 0){
-								graphQL += ", "
+								serializedValue += ", "
 							}
 
-							if (typeof item[key][k] === "string"){
-								graphQL += "\"" + this.escapeSpecialChars(item[key][k]) + "\""
-							}
-							else{
-								graphQL += item[key][k]
-							}
+							serializedValue += (typeof value[k] === "string") ? "\"" + this.escapeSpecialChars(value[k]) + "\"" : value[k]
 						}
-
-						graphQL += "]"
+						serializedValue += "]"
 					}
 					else{
-						graphQL += item.getJSONKeyForProperty(key) + ':' + item[key].toGraphQL()
+						serializedValue = value.toGraphQL()
+						if (serializedValue === ''){
+							return ''
+						}
 					}
-				} else {
-					let value = item[key]
-					if (value === undefined){
-						value = null
-					}
-
-					graphQL += item.getJSONKeyForProperty(key) + ':' + (typeof item[key] === 'string' ? '"' + this.escapeSpecialChars(item[key]) + '"' : value)
 				}
-				if(j < list.size - 1) graphQL += ','
-				j++
-			}
-			graphQL +='}'
+				else{
+					serializedValue = (typeof value === 'string') ? '"' + this.escapeSpecialChars(value) + '"' : value
+				}
 
-			if(i < this.count - 1) graphQL += ','
+				graphQL += separator + item.getJSONKeyForProperty(key) + ':' + serializedValue
+				separator = ','
+			}
+			graphQL += (separator === '{') ? '{}' : '}'
 		}
 		graphQL +=']'
 		return graphQL

@@ -35,6 +35,24 @@ Column {
 
 	property bool updatingGui: false;
 
+	// Validation messages appear only once a field is edited or revealValidationErrors() is called (sign-up form).
+	property bool deferValidationErrors: false;
+
+	function revealValidationErrors(){
+		usernameInput_.revealError();
+		nameInput_.revealError();
+		mailInput_.revealError();
+		if (confirmPassword.visible){
+			confirmPassword.revealError();
+			passwordGroup.checkPassword();
+		}
+	}
+
+	function inputsAcceptable(){
+		return usernameInput_.acceptableInput && nameInput_.acceptableInput && mailInput_.acceptableInput
+				&& (!passwordInput_.visible || container.passwordAccepted());
+	}
+
 	function updateGui(){
 		if (!container.userData){
 			return
@@ -53,6 +71,16 @@ Column {
 		container.updatingGui = false;
 	}
 
+	function passwordAccepted(){
+		if (passwordInput_.text === "" || passwordInput_.text !== confirmPassword.text){
+			return false;
+		}
+
+		let violatedRules = container.passwordPolicy ? container.passwordPolicy.validate(usernameInput_.text, passwordInput_.text) : [];
+
+		return violatedRules.length === 0;
+	}
+
 	function updateModel(){
 		if (!container.userData){
 			return
@@ -61,7 +89,10 @@ Column {
 		container.userData.m_username = usernameInput_.text;
 		container.userData.m_name = nameInput_.text;
 		container.userData.m_email = mailInput_.text;
-		container.userData.m_password = passwordInput_.text;
+		// An unconfirmed or rejected password never reaches the model, so the account cannot be saved with it.
+		if (passwordInput_.visible){
+			container.userData.m_password = container.passwordAccepted() ? passwordInput_.text : "";
+		}
 		if (container.accountEnabledAvailable){
 			container.userData.m_enabled = enabledSwitch_.checked;
 		}
@@ -83,6 +114,7 @@ Column {
 			placeHolderText: qsTr("Enter the username");
 			readOnly: container.readOnly;
 			showErrorWhenInvalid: true;
+			deferErrorUntilEdited: container.deferValidationErrors;
 			errorText: qsTr("Please enter the username");
 			textInputValidator: notEmptyRegexp;
 
@@ -94,8 +126,6 @@ Column {
 				}
 			}
 
-			KeyNavigation.tab: nameInput_;
-			KeyNavigation.backtab: passwordInput_.visible ? confirmPassword : mailInput_;
 		}
 
 		RegularExpressionValidator {
@@ -113,6 +143,7 @@ Column {
 			placeHolderText: qsTr("Enter the name");
 			readOnly: container.readOnly;
 			showErrorWhenInvalid: true;
+			deferErrorUntilEdited: container.deferValidationErrors;
 			errorText: qsTr("Please enter the name");
 			textInputValidator: notEmptyRegexp;
 
@@ -123,8 +154,6 @@ Column {
 				}
 			}
 
-			KeyNavigation.tab: mailInput_;
-			KeyNavigation.backtab: usernameInput_;
 		}
 
 		RegularExpressionValidator {
@@ -145,13 +174,12 @@ Column {
 			placeHolderText: qsTr("Enter the email");
 			readOnly: container.readOnly;
 			showErrorWhenInvalid: true;
+			deferErrorUntilEdited: container.deferValidationErrors;
 			errorText: qsTr("Please enter the email");
 			onEditingFinished: {
 				container.emitUpdateModel();
 			}
 
-			KeyNavigation.tab: passwordInput_.visible ? passwordInput_ : usernameInput_;
-			KeyNavigation.backtab: nameInput_;
 		}
 
 		SwitchElementView {
@@ -234,6 +262,12 @@ Column {
 				return;
 			}
 
+			// A sign-up form does not call the passwords different before the confirmation was typed.
+			if (container.deferValidationErrors && confirmPassword.text === "" && !confirmPassword.errorRevealed){
+				confirmPassword.bottomComp = emptyComp;
+				return;
+			}
+
 			if (passwordInput_.text !== confirmPassword.text){
 				confirmPassword.bottomComp = errorComp;
 
@@ -270,8 +304,6 @@ Column {
 				passwordGroup.checkPassword();
 			}
 
-			KeyNavigation.tab: confirmPassword;
-			KeyNavigation.backtab: mailInput_;
 		}
 
 		TextInputElementView {
@@ -284,13 +316,12 @@ Column {
 			readOnly: container.readOnly;
 			visible: passwordInput_.visible;
 			showErrorWhenInvalid: true;
+			deferErrorUntilEdited: container.deferValidationErrors;
 			errorText: qsTr("Please enter the password");
 			textInputValidator: notEmptyRegexp;
 			onEditingFinished: {
 				passwordGroup.checkPassword();
 			}
-			KeyNavigation.tab: usernameInput_;
-			KeyNavigation.backtab: passwordInput_;
 		}
 
 		ElementView {

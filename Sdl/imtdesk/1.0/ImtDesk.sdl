@@ -98,6 +98,13 @@ type TicketComment {
 	deleted: Boolean
 }
 
+# --- Assignee ---
+
+type AssigneeData {
+	id: ID!
+	name: String
+}
+
 # --- Ticket ---
 
 type TicketItemData {
@@ -121,6 +128,7 @@ type TicketData {
 	status: TicketStatus
 	stateReason: StateReason
 	priority: TicketPriority
+	assignees: [AssigneeData]
 	assigneeIds: [ID]
 	reporterId: ID
 	conversationId: ID

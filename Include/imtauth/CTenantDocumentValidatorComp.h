@@ -5,13 +5,23 @@
 // ACF includes
 #include <icomp/CComponentBase.h>
 
+// Qt includes
+#include <QtCore/QByteArrayList>
+
 // ImtCore includes
 #include <imtdoc/IDocumentValidator.h>
+#include <imtbase/IOperationContext.h>
 #include <imtbase/IObjectCollection.h>
 
 
 namespace imtauth
 {
+
+bool IsTenantPermissionScopeChangeAllowed(
+			const QByteArray& creatorId,
+			const QByteArrayList& currentPermissions,
+			const QByteArrayList& newPermissions,
+			const QByteArray& userId);
 
 
 /**
@@ -31,7 +41,7 @@ public:
 	I_END_COMPONENT
 
 	// imtdoc::IDocumentValidator
-	virtual bool ValidateDocumentData(const QByteArray& objectId, const istd::IChangeable& document, QString& errorMessage, const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
+	virtual bool ValidateDocumentData(const istd::IChangeable& document, QString& errorMessage, const iprm::IParamsSet* paramsPtr = nullptr, const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
 
 private:
 	I_REF(imtbase::IObjectCollection, m_tenantCollectionCompPtr);

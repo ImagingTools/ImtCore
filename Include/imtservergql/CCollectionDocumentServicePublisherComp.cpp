@@ -6,6 +6,7 @@
 // Qt includes
 #include <QtCore/QDateTime>
 #include <QtCore/QList>
+#include <QtCore/QMetaObject>
 #include <QtCore/QPair>
 
 // STL includes
@@ -24,6 +25,7 @@
 #include <imtdoc/CDocumentSavedAsEvent.h>
 #include <imtdoc/CDocumentSavedEvent.h>
 #include <imtdoc/CDocumentUndoRedoChangedEvent.h>
+#include <imtdoc/imtdoc.h>
 
 
 namespace imtservergql
@@ -37,6 +39,10 @@ namespace imtservergql
 void CCollectionDocumentServicePublisherComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
+
+	if (!IsAutoCloseEnabled()){
+		return;
+	}
 
 	QObject::connect(
 				&m_closeIdleDocumentsTimer,
@@ -53,6 +59,34 @@ void CCollectionDocumentServicePublisherComp::OnComponentDestroyed()
 	m_closeIdleDocumentsTimer.disconnect();
 
 	BaseClass::OnComponentDestroyed();
+}
+
+
+// reimplemented (imtgql::IGqlSubscriberController)
+
+bool CCollectionDocumentServicePublisherComp::RegisterSubscription(
+			const QByteArray& subscriptionId,
+			const imtgql::CGqlRequest& gqlRequest,
+			const imtrest::IRequest& networkRequest,
+			QString& errorMessage)
+{
+	if (!BaseClass::RegisterSubscription(subscriptionId, gqlRequest, networkRequest, errorMessage)){
+		return false;
+	}
+
+	const QByteArray userId = GetSubscriberUserId(gqlRequest);
+	MarkIndividualSubscription(userId, GetSubscribedDocumentId(gqlRequest));
+
+	if (gqlRequest.GetCommandId() == sdl::V1_0::imtbase::COnUndoRedoChangedGqlRequest::GetCommandId()){
+		QMetaObject::invokeMethod(
+			this,
+			"SendCachedUndoRedoNotificationsToSubscriber",
+			Qt::QueuedConnection,
+			Q_ARG(QByteArray, subscriptionId),
+			Q_ARG(QByteArray, userId));
+	}
+
+	return true;
 }
 
 
@@ -82,15 +116,7 @@ bool CCollectionDocumentServicePublisherComp::IsRequestSupported(const imtgql::C
 	}
 
 	if (gqlCommandId == sdl::V1_0::imtbase::COnDocumentChangedGqlRequest::GetCommandId()){
-		const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
-		if (inputParamPtr == nullptr){
-			return false;
-		}
-
-		QByteArray requestCollectionId = inputParamPtr->GetParamArgumentValue("collectionId").toByteArray();
-		QByteArray documentId = inputParamPtr->GetParamArgumentValue("id").toByteArray();
-
-		return requestCollectionId == collectionId && !documentId.isEmpty();
+		return !GetSubscribedDocumentId(gqlRequest).isEmpty();
 	}
 
 	return BaseClass::IsRequestSupported(gqlRequest);
@@ -131,7 +157,7 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentCreated(imtdoc::CEventBa
 	FillNameProviderFlag(notification);
 
 	sdl::V1_0::imtbase::CDocumentServiceNotification sdlNotification;
-	FillSdlNotification(notification, sdl::V1_0::imtbase::EDocumentOperation::NewDocumentCreated, sdlNotification);
+	FillSdlNotification(concreteEventPtr, notification, sdl::V1_0::imtbase::EDocumentOperation::NewDocumentCreated, sdlNotification);
 
 	PublishRepresentation(sdl::V1_0::imtbase::COnDocumentManagerChangedGqlRequest::GetCommandId(), notification.userId, sdlNotification);
 
@@ -153,7 +179,7 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentOpened(imtdoc::CEventBas
 	FillNameProviderFlag(notification);
 
 	sdl::V1_0::imtbase::CDocumentServiceNotification sdlNotification;
-	FillSdlNotification(notification, sdl::V1_0::imtbase::EDocumentOperation::DocumentOpened, sdlNotification);
+	FillSdlNotification(concreteEventPtr, notification, sdl::V1_0::imtbase::EDocumentOperation::DocumentOpened, sdlNotification);
 
 	PublishRepresentation(sdl::V1_0::imtbase::COnDocumentManagerChangedGqlRequest::GetCommandId(), notification.userId, sdlNotification);
 
@@ -174,7 +200,7 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentRenamed(imtdoc::CEventBa
 	FillDocumentNotification(concreteEventPtr, notification);
 
 	sdl::V1_0::imtbase::CDocumentServiceNotification sdlNotification;
-	FillSdlNotification(notification, sdl::V1_0::imtbase::EDocumentOperation::DocumentRenamed, sdlNotification);
+	FillSdlNotification(concreteEventPtr, notification, sdl::V1_0::imtbase::EDocumentOperation::DocumentRenamed, sdlNotification);
 
 	PublishRepresentation(sdl::V1_0::imtbase::COnDocumentManagerChangedGqlRequest::GetCommandId(), notification.userId, sdlNotification);
 
@@ -193,10 +219,10 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentChanged(imtdoc::CEventBa
 	FillDocumentNotification(concreteEventPtr, notification);
 
 	sdl::V1_0::imtbase::CDocumentServiceNotification sdlNotification;
-	FillSdlNotification(notification, sdl::V1_0::imtbase::EDocumentOperation::DocumentChanged, sdlNotification);
+	FillSdlNotification(concreteEventPtr, notification, sdl::V1_0::imtbase::EDocumentOperation::DocumentChanged, sdlNotification);
 
 	PublishRepresentation(sdl::V1_0::imtbase::COnDocumentManagerChangedGqlRequest::GetCommandId(), notification.userId, sdlNotification);
-	PublishRepresentation(sdl::V1_0::imtbase::COnDocumentChangedGqlRequest::GetCommandId(), notification.userId, sdlNotification);
+	PublishRepresentation(sdl::V1_0::imtbase::COnDocumentChangedGqlRequest::GetCommandId(), notification.userId, sdlNotification, notification.documentId);
 
 	return true;
 }
@@ -209,26 +235,38 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentUndoRedoChanged(imtdoc::
 		return false;
 	}
 
-	sdl::V1_0::imtbase::CUndoInfo sdlNotification;
-
-	sdlNotification.documentId = concreteEventPtr->GetDocumentId();
-	sdlNotification.status.emplace().status = sdl::V1_0::imtbase::EUndoStatus::Success;
-	sdlNotification.isDirty = concreteEventPtr->IsDocumentDirty();
-
 	const idoc::IUndoManager& undoManager = concreteEventPtr->GetUndoManager();
-	int availableUndoSteps = undoManager.GetAvailableUndoSteps();
-	int availableRedoSteps = undoManager.GetAvailableRedoSteps();
+	CachedUndoRedoState cachedState;
+	cachedState.isDirty = concreteEventPtr->IsDocumentDirty();
+	cachedState.availableUndoSteps = undoManager.GetAvailableUndoSteps();
+	cachedState.availableRedoSteps = undoManager.GetAvailableRedoSteps();
+	cachedState.undoLevelDescriptions.reserve(cachedState.availableUndoSteps);
+	cachedState.redoLevelDescriptions.reserve(cachedState.availableRedoSteps);
+	for (int i = 0; i < cachedState.availableUndoSteps; i++){
+		cachedState.undoLevelDescriptions.append(undoManager.GetUndoLevelDescription(i));
+	}
+	for (int i = 0; i < cachedState.availableRedoSteps; i++){
+		cachedState.redoLevelDescriptions.append(undoManager.GetRedoLevelDescription(i));
+	}
 
-	sdlNotification.availableUndoSteps = availableUndoSteps;
-	sdlNotification.availableRedoSteps = availableRedoSteps;
-	sdlNotification.undoLevelDescriptions.emplace();
-	sdlNotification.redoLevelDescriptions.emplace();
-	for (int i = 0; i < availableUndoSteps; i++){
-		sdlNotification.undoLevelDescriptions->append(undoManager.GetUndoLevelDescription(i));
+	const QByteArray documentId = concreteEventPtr->GetDocumentId();
+	{
+		QMutexLocker locker(&m_trackedDocumentsMutex);
+		TrackedDocument& trackedDocument = m_trackedDocuments[documentId];
+		trackedDocument.userId = concreteEventPtr->GetUserId();
+		trackedDocument.hasUndoRedoState = true;
+		trackedDocument.undoRedoState = cachedState;
 	}
-	for (int i = 0; i < availableRedoSteps; i++){
-		sdlNotification.redoLevelDescriptions->append(undoManager.GetRedoLevelDescription(i));
-	}
+
+	sdl::V1_0::imtbase::CUndoInfo sdlNotification;
+	FillUndoInfoFromCache(
+		documentId,
+		cachedState.isDirty,
+		cachedState.availableUndoSteps,
+		cachedState.availableRedoSteps,
+		cachedState.undoLevelDescriptions,
+		cachedState.redoLevelDescriptions,
+		sdlNotification);
 
 	PublishRepresentation(
 		sdl::V1_0::imtbase::COnUndoRedoChangedGqlRequest::GetCommandId(),
@@ -250,7 +288,7 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentSaved(imtdoc::CEventBase
 	FillDocumentNotification(concreteEventPtr, notification);
 
 	sdl::V1_0::imtbase::CDocumentServiceNotification sdlNotification;
-	FillSdlNotification(notification, sdl::V1_0::imtbase::EDocumentOperation::DocumentSaved, sdlNotification);
+	FillSdlNotification(concreteEventPtr, notification, sdl::V1_0::imtbase::EDocumentOperation::DocumentSaved, sdlNotification);
 
 	PublishRepresentation(sdl::V1_0::imtbase::COnDocumentManagerChangedGqlRequest::GetCommandId(), notification.userId, sdlNotification);
 
@@ -269,7 +307,7 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentSavedAs(imtdoc::CEventBa
 	FillDocumentNotification(concreteEventPtr, notification);
 
 	sdl::V1_0::imtbase::CDocumentServiceNotification sdlNotification;
-	FillSdlNotification(notification, sdl::V1_0::imtbase::EDocumentOperation::DocumentSavedAs, sdlNotification);
+	FillSdlNotification(concreteEventPtr, notification, sdl::V1_0::imtbase::EDocumentOperation::DocumentSavedAs, sdlNotification);
 
 	PublishRepresentation(sdl::V1_0::imtbase::COnDocumentManagerChangedGqlRequest::GetCommandId(), notification.userId, sdlNotification);
 
@@ -308,7 +346,7 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentDataLoaded(imtdoc::CEven
 	FillDocumentNotification(concreteEventPtr, notification);
 
 	sdl::V1_0::imtbase::CDocumentServiceNotification sdlNotification;
-	FillSdlNotification(notification, sdl::V1_0::imtbase::EDocumentOperation::DocumentDataLoaded, sdlNotification);
+	FillSdlNotification(concreteEventPtr, notification, sdl::V1_0::imtbase::EDocumentOperation::DocumentDataLoaded, sdlNotification);
 
 	PublishRepresentation(sdl::V1_0::imtbase::COnDocumentManagerChangedGqlRequest::GetCommandId(), notification.userId, sdlNotification);
 
@@ -323,13 +361,13 @@ void CCollectionDocumentServicePublisherComp::FillDocumentNotification(
 	notification.userId = eventPtr->GetUserId();
 	notification.documentId = eventPtr->GetDocumentId();
 	notification.typeId = eventPtr->GetDocumentTypeId();
-	notification.url = eventPtr->GetDocumentUrl();
 	notification.name = eventPtr->GetDocumentName();
 	notification.isDirty = eventPtr->IsDocumentDirty();
 }
 
 
 void CCollectionDocumentServicePublisherComp::FillSdlNotification(
+			const imtdoc::CEventBase* eventPtr,
 			const imtdoc::IDocumentService::DocumentNotification& notification,
 			sdl::V1_0::imtbase::EDocumentOperation operation,
 			sdl::V1_0::imtbase::CDocumentServiceNotification& sdlNotification) const
@@ -337,7 +375,7 @@ void CCollectionDocumentServicePublisherComp::FillSdlNotification(
 	sdlNotification.documentOperation = operation;
 	sdlNotification.documentId = notification.documentId;
 	sdlNotification.documentName = notification.name;
-	sdlNotification.objectId = ConvertUrlToObjectId(notification.url);
+	sdlNotification.objectId = imtdoc::SourceRefToObjectId(eventPtr->GetDocumentSourceRef());
 	sdlNotification.objectTypeId = notification.typeId;
 	sdlNotification.isDirty = notification.isDirty;
 	sdlNotification.hasNameProvider = notification.hasNameProvider;
@@ -363,16 +401,9 @@ void CCollectionDocumentServicePublisherComp::FillNameProviderFlag(
 }
 
 
-QByteArray CCollectionDocumentServicePublisherComp::ConvertUrlToObjectId(const QUrl& url) const
+bool CCollectionDocumentServicePublisherComp::IsAutoCloseEnabled() const
 {
-	QString path = url.path();
-
-	QStringList parts = path.split('/', Qt::SkipEmptyParts);
-	if (parts.count() == 1){
-		return parts.first().toUtf8();
-	}
-
-	return QByteArray();
+	return m_closeDocumentTimeoutAttrPtr.IsValid() && (*m_closeDocumentTimeoutAttrPtr > 0);
 }
 
 
@@ -380,7 +411,7 @@ void CCollectionDocumentServicePublisherComp::TrackDocument(
 			const QByteArray& userId,
 			const QByteArray& documentId) const
 {
-	if (documentId.isEmpty()){
+	if (documentId.isEmpty() || !IsAutoCloseEnabled()){
 		return;
 	}
 
@@ -388,7 +419,7 @@ void CCollectionDocumentServicePublisherComp::TrackDocument(
 
 	TrackedDocument& trackedDocument = m_trackedDocuments[documentId];
 	trackedDocument.userId = userId;
-	trackedDocument.lastSubscriberSeenMs = QDateTime::currentMSecsSinceEpoch();
+	trackedDocument.lastSubscriberSeenSecs = QDateTime::currentSecsSinceEpoch();
 }
 
 
@@ -400,27 +431,54 @@ void CCollectionDocumentServicePublisherComp::UntrackDocument(const QByteArray& 
 }
 
 
-bool CCollectionDocumentServicePublisherComp::HasActiveSingleDocumentChangedSubscriber(const QByteArray& documentId) const
+void CCollectionDocumentServicePublisherComp::MarkIndividualSubscription(
+			const QByteArray& userId,
+			const QByteArray& documentId) const
 {
-	const QByteArray commandId = sdl::V1_0::imtbase::COnDocumentChangedGqlRequest::GetCommandId();
+	if (documentId.isEmpty() || userId.isEmpty()){
+		return;
+	}
 
+	QMutexLocker locker(&m_trackedDocumentsMutex);
+
+	auto foundIter = m_trackedDocuments.find(documentId);
+	if (foundIter == m_trackedDocuments.end()){
+		return;
+	}
+
+	if (foundIter.value().userId != userId){
+		return;
+	}
+
+	foundIter.value().hasIndividualSubscription = true;
+	foundIter.value().lastSubscriberSeenSecs = QDateTime::currentSecsSinceEpoch();
+}
+
+
+bool CCollectionDocumentServicePublisherComp::HasActiveSingleDocumentChangedSubscriber(
+			const QByteArray& userId,
+			const QByteArray& documentId) const
+{
 	QMutexLocker locker(&m_mutex);
 
-	for (const RequestNetworks& entry : m_registeredSubscribers){
-		if (entry.gqlRequest.GetCommandId() != commandId){
-			continue;
-		}
+	return HasActiveSingleDocumentChangedSubscriberNoLock(userId, documentId);
+}
 
+
+bool CCollectionDocumentServicePublisherComp::HasActiveSingleDocumentChangedSubscriberNoLock(
+			const QByteArray& userId,
+			const QByteArray& documentId) const
+{
+	for (const RequestNetworks& entry : m_registeredSubscribers){
 		if (entry.networkRequests.isEmpty()){
 			continue;
 		}
 
-		const imtgql::CGqlParamObject* inputParamPtr = entry.gqlRequest.GetParamObject("input");
-		if (inputParamPtr == nullptr){
+		if (GetSubscribedDocumentId(entry.gqlRequest) != documentId){
 			continue;
 		}
 
-		if (inputParamPtr->GetParamArgumentValue("id").toByteArray() == documentId){
+		if (GetSubscriberUserId(entry.gqlRequest) == userId){
 			return true;
 		}
 	}
@@ -429,29 +487,163 @@ bool CCollectionDocumentServicePublisherComp::HasActiveSingleDocumentChangedSubs
 }
 
 
+QByteArray CCollectionDocumentServicePublisherComp::GetSubscribedDocumentId(const imtgql::CGqlRequest& gqlRequest) const
+{
+	if (!m_collectionIdAttrPtr.IsValid()){
+		return QByteArray();
+	}
+
+	if (gqlRequest.GetCommandId() != sdl::V1_0::imtbase::COnDocumentChangedGqlRequest::GetCommandId()){
+		return QByteArray();
+	}
+
+	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
+	if (inputParamPtr == nullptr){
+		return QByteArray();
+	}
+
+	if (inputParamPtr->GetParamArgumentValue("collectionId").toByteArray() != *m_collectionIdAttrPtr){
+		return QByteArray();
+	}
+
+	return inputParamPtr->GetParamArgumentValue("id").toByteArray();
+}
+
+
+QByteArray CCollectionDocumentServicePublisherComp::GetSubscriberUserId(const imtgql::CGqlRequest& gqlRequest) const
+{
+	const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
+	if (contextPtr != nullptr){
+		const imtauth::IUserInfo* userInfoPtr = contextPtr->GetUserInfo();
+		if (userInfoPtr != nullptr){
+			return userInfoPtr->GetId();
+		}
+	}
+
+	return QByteArray();
+}
+
+
+void CCollectionDocumentServicePublisherComp::FillUndoInfoFromCache(
+			const QByteArray& documentId,
+			bool isDirty,
+			int availableUndoSteps,
+			int availableRedoSteps,
+			const QList<QString>& undoLevelDescriptions,
+			const QList<QString>& redoLevelDescriptions,
+			sdl::V1_0::imtbase::CUndoInfo& sdlNotification) const
+{
+	sdlNotification.documentId = documentId;
+	sdlNotification.status.emplace().status = sdl::V1_0::imtbase::EUndoStatus::Success;
+	sdlNotification.isDirty = isDirty;
+	sdlNotification.availableUndoSteps = availableUndoSteps;
+	sdlNotification.availableRedoSteps = availableRedoSteps;
+	sdlNotification.undoLevelDescriptions.emplace();
+	sdlNotification.redoLevelDescriptions.emplace();
+	for (const QString& levelDescription : undoLevelDescriptions){
+		sdlNotification.undoLevelDescriptions->append(levelDescription);
+	}
+	for (const QString& levelDescription : redoLevelDescriptions){
+		sdlNotification.redoLevelDescriptions->append(levelDescription);
+	}
+}
+
+
+void CCollectionDocumentServicePublisherComp::SendCachedUndoRedoNotificationsToSubscriber(
+			const QByteArray& subscriptionId,
+			const QByteArray& userId)
+{
+	if (subscriptionId.isEmpty() || userId.isEmpty()){
+		return;
+	}
+
+	QMutexLocker subscribersLocker(&m_mutex);
+	QList<sdl::V1_0::imtbase::CUndoInfo> notifications;
+	{
+		QMutexLocker trackedDocumentsLocker(&m_trackedDocumentsMutex);
+		for (auto it = m_trackedDocuments.constBegin(); it != m_trackedDocuments.constEnd(); ++it){
+			const TrackedDocument& trackedDocument = it.value();
+			if (trackedDocument.userId != userId || !trackedDocument.hasUndoRedoState){
+				continue;
+			}
+
+			sdl::V1_0::imtbase::CUndoInfo notification;
+			FillUndoInfoFromCache(
+				it.key(),
+				trackedDocument.undoRedoState.isDirty,
+				trackedDocument.undoRedoState.availableUndoSteps,
+				trackedDocument.undoRedoState.availableRedoSteps,
+				trackedDocument.undoRedoState.undoLevelDescriptions,
+				trackedDocument.undoRedoState.redoLevelDescriptions,
+				notification);
+			notifications.append(notification);
+		}
+	}
+
+	const imtrest::IRequest* networkRequestPtr = nullptr;
+	for (const RequestNetworks& entry : m_registeredSubscribers){
+		auto foundIter = entry.networkRequests.constFind(subscriptionId);
+		if (foundIter == entry.networkRequests.constEnd()){
+			continue;
+		}
+
+		networkRequestPtr = foundIter.value();
+		break;
+	}
+
+	if (networkRequestPtr == nullptr){
+		return;
+	}
+
+	for (const sdl::V1_0::imtbase::CUndoInfo& notification : notifications){
+		QJsonObject jsonObject;
+		if (!notification.WriteToJsonObject(jsonObject)){
+			Q_ASSERT(false);
+			continue;
+		}
+
+		QJsonDocument jsonDoc;
+		jsonDoc.setObject(jsonObject);
+
+		PushDataToSubscriber(
+			subscriptionId,
+			sdl::V1_0::imtbase::COnUndoRedoChangedGqlRequest::GetCommandId(),
+			jsonDoc.toJson(QJsonDocument::Compact),
+			*networkRequestPtr);
+	}
+}
+
+
 void CCollectionDocumentServicePublisherComp::CloseIdleDocuments()
 {
-	if (!m_documentServiceCompPtr.IsValid()){
+	if (!m_documentServiceCompPtr.IsValid() || !IsAutoCloseEnabled()){
 		return;
 	}
 
 	const qint64 timeout = *m_closeDocumentTimeoutAttrPtr;
-	const qint64 now = QDateTime::currentMSecsSinceEpoch();
+	const qint64 now = QDateTime::currentSecsSinceEpoch();
 
 	QList<QPair<QByteArray, QByteArray> > documentsToClose; // userId, documentId
 
 	{
-		QMutexLocker locker(&m_trackedDocumentsMutex);
+		QMutexLocker subscribersLocker(&m_mutex);
+		QMutexLocker trackedDocumentsLocker(&m_trackedDocumentsMutex);
 
 		for (auto it = m_trackedDocuments.begin(); it != m_trackedDocuments.end(); ){
-			if (HasActiveSingleDocumentChangedSubscriber(it.key())){
-				it.value().lastSubscriberSeenMs = now;
+			if (!it.value().hasIndividualSubscription){
 				++it;
 
 				continue;
 			}
 
-			if ((now - it.value().lastSubscriberSeenMs) < timeout){
+			if (HasActiveSingleDocumentChangedSubscriberNoLock(it.value().userId, it.key())){
+				it.value().lastSubscriberSeenSecs = now;
+				++it;
+
+				continue;
+			}
+
+			if ((now - it.value().lastSubscriberSeenSecs) < timeout){
 				++it;
 
 				continue;

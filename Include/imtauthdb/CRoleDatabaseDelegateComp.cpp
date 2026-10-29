@@ -8,6 +8,8 @@
 
 // ImtCore includes
 #include <imtauth/CRole.h>
+#include <imtauth/IUserBaseInfo.h>
+#include <imtauthdb/imtauthdb.h>
 
 
 namespace imtauthdb
@@ -39,7 +41,61 @@ QByteArray CRoleDatabaseDelegateComp::CreateDeleteObjectsQuery(
 		}
 	}
 
-	return BaseClass::CreateDeleteObjectsQuery(collection, objectIds, operationContextPtr);
+	QByteArray retVal = BaseClass::CreateDeleteObjectsQuery(collection, objectIds, operationContextPtr);
+	if (retVal.isEmpty()){
+		return retVal;
+	}
+
+	// Users, groups and roles must not keep referencing the removed roles.
+	const QByteArrayList roleIds(objectIds.cbegin(), objectIds.cend());
+
+	iprm::CParamsSet roleFilterParams;
+	SetFilterIds(roleFilterParams, s_roleFilterId, roleIds);
+
+	auto removeRoles = [&roleIds](imtauth::IUserBaseInfo& userBaseInfo){
+		RemovedReferences removedReferences;
+		for (const QByteArray& productId : userBaseInfo.GetProducts()){
+			for (const QByteArray& roleId : roleIds){
+				if (userBaseInfo.RemoveRole(productId, roleId)){
+					removedReferences << RemovedReference{"RemoveRole", "RoleId", QT_TRANSLATE_NOOP("Attribute", "Role"), roleId};
+				}
+			}
+		}
+		return removedReferences;
+	};
+
+	if (m_userCollectionCompPtr.IsValid() && m_userDatabaseDelegateCompPtr.IsValid()){
+		retVal += CreateReferenceRemovalQuery<imtauth::IUserBaseInfo>(
+					*m_userCollectionCompPtr, *m_userDatabaseDelegateCompPtr, roleFilterParams, imtbase::ICollectionInfo::Ids(), removeRoles, operationContextPtr);
+	}
+
+	if (m_userGroupCollectionCompPtr.IsValid() && m_userGroupDatabaseDelegateCompPtr.IsValid()){
+		retVal += CreateReferenceRemovalQuery<imtauth::IUserBaseInfo>(
+					*m_userGroupCollectionCompPtr, *m_userGroupDatabaseDelegateCompPtr, roleFilterParams, imtbase::ICollectionInfo::Ids(), removeRoles, operationContextPtr);
+	}
+
+	iprm::CParamsSet parentFilterParams;
+	SetFilterIds(parentFilterParams, s_parentFilterId, roleIds);
+
+	retVal += CreateReferenceRemovalQuery<imtauth::IRole>(
+				collection,
+				*this,
+				parentFilterParams,
+				objectIds,
+				[&roleIds](imtauth::IRole& role){
+					RemovedReferences removedReferences;
+					const QByteArrayList parentRoleIds = role.GetIncludedRoles();
+					for (const QByteArray& roleId : roleIds){
+						if (parentRoleIds.contains(roleId)){
+							role.ExcludeRole(roleId);
+							removedReferences << RemovedReference{"RemoveParentRole", "ParentRoleId", QT_TRANSLATE_NOOP("Attribute", "Parent Role"), roleId};
+						}
+					}
+					return removedReferences;
+				},
+				operationContextPtr);
+
+	return retVal;
 }
 
 
@@ -66,10 +122,17 @@ bool CRoleDatabaseDelegateComp::SetCollectionItemMetaInfoFromRecord(const QSqlRe
 
 QString CRoleDatabaseDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const
 {
+	QStringList conditions;
+
+	const QByteArrayList parentRoleIds = GetFilterIds(filterParams, s_parentFilterId);
+	if (!parentRoleIds.isEmpty()){
+		conditions << CreateArrayContainsAnyQuery(IsSQLite(), QStringLiteral("ParentsRoles"), parentRoleIds);
+	}
+
 	iprm::TParamsPtr<iprm::IIdParam> idParamPtr(&filterParams, "ParentListFilter");
 	if (idParamPtr.IsValid()){
 		QByteArray targetId = idParamPtr->GetId();
-		return QStringLiteral(R"(
+		conditions << QStringLiteral(R"(
 			NOT EXISTS (
 				WITH RECURSIVE descendants AS (
 					SELECT g."DocumentId"
@@ -90,9 +153,9 @@ QString CRoleDatabaseDelegateComp::CreateAdditionalFiltersQuery(const iprm::IPar
 				WHERE d."DocumentId" = root."DocumentId"
 			)
 					)").arg(targetId);
-					}
+	}
 
-	return QString();
+	return conditions.join(QStringLiteral(" AND "));
 }
 
 

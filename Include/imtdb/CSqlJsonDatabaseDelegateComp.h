@@ -68,6 +68,12 @@ public:
 	virtual imtbase::IRevisionController::RevisionInfoList GetRevisionInfoList(
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId) const override;
+			virtual bool GetRevisionData(
+						const imtbase::IObjectCollection& collection,
+						const imtbase::ICollectionInfo::Id& objectId,
+						int revision,
+						istd::IChangeableSharedPtr& dataPtr,
+						idoc::MetaInfoPtr& dataMetaInfoPtr) const override;
 
 protected:
 	virtual bool WriteDataToMemory(const QByteArray& typeId, const istd::IChangeable& object, QByteArray& data) const override;

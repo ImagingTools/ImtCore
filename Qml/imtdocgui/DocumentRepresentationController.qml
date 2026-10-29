@@ -9,6 +9,9 @@ QtObject {
 	property var representationModel: null
 	property ViewBase view: null
 
+	// Load the representation of a newly created document from the server instead of using representationModel defaults.
+	property bool requestRepresentationOnCreate: false
+
 	signal startUpdateDocument(string documentId)
 	signal updateDocumentFailed(string documentId, string message)
 	signal documentUpdated(string documentId)

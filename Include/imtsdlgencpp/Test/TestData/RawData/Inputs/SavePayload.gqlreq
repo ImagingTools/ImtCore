@@ -1,0 +1,3 @@
+{
+  "query": "mutation SavePayload { SavePayload(input: { requiredObjects: [{ __typename: \"Attribute\", value: \"required\" }], nullableObjectsWithRequiredElements: [{ __typename: \"Attribute\", value: \"optional-required\" }], nullableObjects: [null, { __typename: \"Attribute\", value: \"nullable\" }], requiredScalars: [\"alpha\"], nullableScalarsWithRequiredElements: [\"beta\"], nullableScalars: [null, \"omega\"], __typename: \"ArrayPayload\" }) { accepted } }"
+}

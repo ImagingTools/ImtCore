@@ -7,6 +7,7 @@ import imtauthgui 1.0
 import imtauthProfileSdl 1.0
 import imtauthTenantMembershipsSdl 1.0
 import imtauthPersonalAccessTokensSdl 1.0
+import imtauthAuthorizationSdl 1.0
 import imtbaseImtCollectionSdl 1.0
 
 /**
@@ -28,11 +29,11 @@ import imtbaseImtCollectionSdl 1.0
 QtObject {
 	id: root
 
-	property string context: ""
+	property string permissionPath: ""
 
 	// Password policy for the profile's password section (imtauthgui owns no GQL).
 	property GqlBasedPasswordPolicyProvider passwordPolicy: GqlBasedPasswordPolicyProvider {
-		context: root.context
+		permissionPath: root.permissionPath
 	}
 
 	readonly property string __userId: AuthorizationController.userTokenProvider.userId
@@ -70,6 +71,10 @@ QtObject {
 	signal tokenDeleted(string message)
 	signal tokenRevoked(string message)
 
+	signal linkedAccountsReceived(var accounts, bool hasPassword)
+	signal accountUnlinked(string providerId)
+	signal linkedAccountOperationFailed(string message)
+
 	signal profileOperationFailed(string message)
 	signal organizationOperationFailed(string message)
 	signal tokenOperationFailed(string message)
@@ -79,7 +84,7 @@ QtObject {
 	// =========================================================================
 
 	property GqlSdlRequestSender getProfileRequest: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		gqlCommandId: ImtauthProfileSdlCommandIds.s_getProfile
 		sdlObjectComp: Component {
 			ProfileData {
@@ -104,7 +109,7 @@ QtObject {
 
 	property SetProfileInput __setProfileInput: SetProfileInput {}
 	property GqlSdlRequestSender setProfileRequest: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		gqlCommandId: ImtauthProfileSdlCommandIds.s_setProfile
 		sdlObjectComp: Component {
 			SetProfileResponse {
@@ -143,7 +148,7 @@ QtObject {
 	}
 
 	property GqlSdlRequestSender __organizationsRequest: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		requestType: 0
 		gqlCommandId: ImtauthProfileSdlCommandIds.s_getUserOrganizations
 		sdlObjectComp: Component {
@@ -195,7 +200,7 @@ QtObject {
 
 	property AcceptTenantInvitationInput __acceptInvitationInput: AcceptTenantInvitationInput {}
 	property GqlSdlRequestSender __acceptInvitationSender: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		requestType: 1
 		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_acceptTenantInvitation
 		sdlObjectComp: Component {
@@ -217,7 +222,7 @@ QtObject {
 
 	property RejectTenantInvitationInput __rejectInvitationInput: RejectTenantInvitationInput {}
 	property GqlSdlRequestSender __rejectInvitationSender: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		requestType: 1
 		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_rejectTenantInvitation
 		sdlObjectComp: Component {
@@ -255,7 +260,7 @@ QtObject {
 
 	property FindMembershipInput __findMembershipForLeaveInput: FindMembershipInput {}
 	property GqlSdlRequestSender __findMembershipForLeaveSender: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_findMembership
 		sdlObjectComp: Component {
 			FindMembershipPayload {
@@ -276,7 +281,7 @@ QtObject {
 
 	property RemoveMembershipInput __removeMembershipForLeaveInput: RemoveMembershipInput {}
 	property GqlSdlRequestSender __removeMembershipForLeaveSender: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		requestType: 1
 		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_removeMembership
 		sdlObjectComp: Component {
@@ -316,7 +321,7 @@ QtObject {
 	property UserIdInput __userIdInput: UserIdInput {}
 
 	property GqlSdlRequestSender __getTokenListRequest: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		gqlCommandId: ImtauthPersonalAccessTokensSdlCommandIds.s_getTokenList
 		sdlObjectComp: Component {
 			PersonalAccessTokenList {
@@ -328,7 +333,7 @@ QtObject {
 	}
 
 	property GqlSdlRequestSender __createTokenRequest: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		gqlCommandId: ImtauthPersonalAccessTokensSdlCommandIds.s_createToken
 		requestType: 1
 		sdlObjectComp: Component {
@@ -346,7 +351,7 @@ QtObject {
 	}
 
 	property GqlSdlRequestSender __deleteTokenRequest: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		gqlCommandId: ImtauthPersonalAccessTokensSdlCommandIds.s_deleteToken
 		requestType: 1
 		sdlObjectComp: Component {
@@ -364,7 +369,7 @@ QtObject {
 	}
 
 	property GqlSdlRequestSender __revokeTokenRequest: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		gqlCommandId: ImtauthPersonalAccessTokensSdlCommandIds.s_revokeToken
 		requestType: 1
 		sdlObjectComp: Component {
@@ -404,5 +409,77 @@ QtObject {
 	function revokeToken(tokenId) {
 		root.__inputId.m_id = tokenId
 		root.__revokeTokenRequest.send(root.__inputId)
+	}
+
+	// =========================================================================
+	// Linked external accounts
+	// =========================================================================
+
+	property GqlSdlRequestSender __getLinkedAccountsRequest: GqlSdlRequestSender {
+		permissionPath: root.permissionPath
+		gqlCommandId: ImtauthAuthorizationSdlCommandIds.s_getExternalIdentities
+		sdlObjectComp: Component {
+			ExternalIdentityList {
+				onFinished: {
+					let accounts = []
+					if (m_identities) {
+						for (let i = 0; i < m_identities.count; i++) {
+							let identity = m_identities.get(i).item
+							if (identity) {
+								accounts.push({
+									"providerId": identity.m_providerId,
+									"providerName": identity.m_providerName,
+									"providerType": identity.m_providerType,
+									"email": identity.m_email,
+									"linkedAt": identity.m_linkedAt,
+									"lastSignInAt": identity.m_lastSignInAt
+								})
+							}
+						}
+					}
+
+					root.linkedAccountsReceived(accounts, m_hasPassword === true)
+				}
+			}
+		}
+
+		function createQueryParams(query) {
+		}
+
+		function onError(message, type) {
+			root.linkedAccountOperationFailed(message)
+		}
+	}
+
+	property UnlinkExternalIdentityInput __unlinkAccountInput: UnlinkExternalIdentityInput {}
+	property GqlSdlRequestSender __unlinkAccountRequest: GqlSdlRequestSender {
+		permissionPath: root.permissionPath
+		gqlCommandId: ImtauthAuthorizationSdlCommandIds.s_unlinkExternalIdentity
+		requestType: 1
+		sdlObjectComp: Component {
+			UnlinkExternalIdentityPayload {
+				onFinished: {
+					if (m_ok) {
+						root.accountUnlinked(root.__unlinkAccountInput.m_providerId)
+						root.getLinkedAccounts()
+					} else {
+						root.linkedAccountOperationFailed(m_message)
+					}
+				}
+			}
+		}
+
+		function onError(message, type) {
+			root.linkedAccountOperationFailed(message)
+		}
+	}
+
+	function getLinkedAccounts() {
+		root.__getLinkedAccountsRequest.send()
+	}
+
+	function unlinkAccount(providerId) {
+		root.__unlinkAccountInput.m_providerId = providerId
+		root.__unlinkAccountRequest.send(root.__unlinkAccountInput)
 	}
 }

@@ -184,6 +184,7 @@ var OPERATORS = array_to_hash([
     "!=",
     "!==",
     "?",
+    "?.",
     "=",
     "+=",
     "-=",
@@ -804,6 +805,10 @@ function qmlweb_tokenizer($TEXT, document_type) {
         function grow(op) {
             if (!peek()) return op;
             var bigger = op + peek();
+            // Optional chaining is `?.` only when the next character is not a
+            // decimal digit. `cond?.5:0` is a ternary whose true branch is `.5`.
+            if (bigger == "?." && is_digit(S.text.charAt(S.pos + 1)))
+                return op;
             if (HOP(OPERATORS, bigger)) {
                 next();
                 return grow(bigger);
@@ -1434,6 +1439,18 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
     };
 
     function subscripts(expr, allow_calls) {
+        if (is("operator", "?.")) {
+            next();
+            if (is("punc", "[")) {
+                next();
+                return subscripts(as_(undefined, "sub", expr, prog1(expression, curry(expect, "]")), true), allow_calls);
+            }
+            if (allow_calls && is("punc", "(")) {
+                next();
+                return subscripts(as_(undefined, "call", expr, expr_list(")"), true), true);
+            }
+            return subscripts(as_(S.token, "dot", expr, as_name(), true), allow_calls);
+        }
         if (is("punc", ".")) {
             next();
             return subscripts(as_(S.token, "dot", expr, as_name()), allow_calls);
@@ -1447,6 +1464,14 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
             return subscripts(as_(undefined, "call", expr, expr_list(")")), true);
         }
         return expr;
+    };
+
+    function is_optional_chain(expr) {
+        while (expr && (expr[0] === "dot" || expr[0] === "sub" || expr[0] === "call")) {
+            if (expr[3] === true) return true;
+            expr = expr[1];
+        }
+        return false;
     };
 
     function maybe_unary(allow_calls) {
@@ -1498,6 +1523,7 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
     };
 
     function is_assignable(expr) {
+        if (is_optional_chain(expr)) return false;
         if (!exigent_mode) return true;
         switch (expr[0]+"") {
           case "dot":
@@ -1652,6 +1678,7 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
     var info = S.token
     var expr = maybe_assign(no_in);
     if (is("punc", "{")) {
+      if (is_optional_chain(expr)) unexpected();
       var qmlelem_name;
       if (expr[0] === "dot") {
         qmlelem_name = ["dot", expr[1][1], expr[2]];
@@ -1869,19 +1896,30 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
     }
   }
 
+  function skipPragmaArgument() {
+    if (!is("punc", ":")) return;
+    next();
+    if (is("name") || is("keyword") || is("string") || is("atom") || is("num")) {
+      next();
+    }
+  }
+
   function qml_pragma_statement() {
     next();
     next();
     var pragma = S.token.value;
     next();
+    skipPragmaArgument();
     return as_(undefined, "qmlpragma", pragma);
   }
 
   function qmlpragma() {
     next();
+    var info = S.token;
     var pragma = S.token.value;
     next();
-    return as_(S.prev, "qmlpragma", pragma);
+    skipPragmaArgument();
+    return as_(info, "qmlpragma", pragma);
   }
 
   function qmlimport() {
@@ -1972,7 +2010,10 @@ function qmlweb_jsparse(source) {
 
     switch (item[0]) {
       case "var":
-        obj.exports.push(item[1][0][0]);
+        // `var a = 1, b = 2` declares several names in one statement
+        for (var j = 0 ; j < item[1].length ; ++j) {
+          obj.exports.push(item[1][j][0]);
+        }
         break ;
       case "defun":
         obj.exports.push(item[1]);

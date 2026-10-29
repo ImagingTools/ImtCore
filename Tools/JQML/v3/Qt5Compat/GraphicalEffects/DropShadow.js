@@ -64,7 +64,7 @@ class DropShadow extends Item {
                     boxShadow: `${this.horizontalOffset}px ${this.verticalOffset}px ${this.radius}px ${this.spread}px rgba(${rgba.r},${rgba.g},${rgba.b},${this.color === 'transparent' ? 0 : rgba.a * this.opacity})`
                 })
             }
-        } else {
+        } else if(this.source){
             this.source.__setDOMStyle({
                 boxShadow: `unset`
             })

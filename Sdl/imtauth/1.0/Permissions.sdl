@@ -20,6 +20,8 @@ type PermissionEntry {
 	permissionId: ID!
 	displayName: String!
 	description: String
+	# Leaf permissions this one requires directly; holding it grants them too.
+	requirements: [ID]
 }
 
 # A top-level permission group (e.g. "Sensor Management").

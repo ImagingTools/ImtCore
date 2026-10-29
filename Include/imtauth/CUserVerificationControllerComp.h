@@ -3,6 +3,8 @@
 
 
 // Qt includes
+#include <QtCore/QHash>
+#include <QtCore/QMutex>
 #include <QtCore/QThread>
 
 // ACF includes
@@ -34,6 +36,8 @@ public:
 	virtual const imtauth::IUserVerification* GetVerificationData(const QByteArray& verificationId) const override;
 	virtual bool GenerateVerificationData(const QByteArray& userId, imtauth::IUserVerification* userVerificationPtr = nullptr) override;
 	virtual bool VerifyUser(const QByteArray& userId, const QByteArray& verificationCode) const override;
+	virtual bool RemoveVerificationData(const QByteArray& userId) override;
+	virtual bool ConsumeVerification(const QByteArray& userId, const QByteArray& verificationCode) override;
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
@@ -41,6 +45,10 @@ public:
 
 private:
 	int GenerateCode(int min, int max) const;
+	/// VerifyUser for a caller that holds m_lifecycleMutex.
+	bool VerifyLocked(const QByteArray& userId, const QByteArray& verificationCode) const;
+	/// A code that could not be removed stays blocked, so it cannot be used or guessed again. The caller holds m_lifecycleMutex.
+	bool RemoveVerification(const QByteArray& userId) const;
 
 	class CheckExpiredVerificationDataThread: public QThread
 	{
@@ -61,6 +69,11 @@ private:
 
 private:
 	CheckExpiredVerificationDataThread m_checkExpiredVerificationDataThread;
+
+	// A code is generated, checked, counted, consumed and removed one step at a time: a check between the read of a code and its
+	// removal could otherwise lift a block set meanwhile, or remove a code generated meanwhile
+	mutable QMutex m_lifecycleMutex;
+	mutable QHash<QByteArray, int> m_failedAttempts;
 };
 
 

@@ -1,0 +1,58 @@
+schema {
+	namespace: imtbase
+	version: 1.0
+	query: Query
+	mutation: Mutation
+}
+
+import {
+	"ImtBaseTypes.sdl"
+	"ImtCollection.sdl"
+}
+
+
+# Management of the document shares of the current organization, across all collections
+
+input GetOrganizationDocumentSharesInput {
+	direction: String! # Incoming or Outgoing
+}
+
+type GetOrganizationDocumentSharesPayload {
+	shares: [DocumentShare]
+}
+
+input SetDocumentSharesStatusInput {
+	shareIds: [ID]!
+	status: String! # Active or Declined
+}
+
+type SetDocumentSharesStatusPayload {
+	success: Boolean
+}
+
+input SetDocumentShareGroupsInput {
+	shareId: ID!
+	groupIds: [ID]
+}
+
+type SetDocumentShareGroupsPayload {
+	success: Boolean
+}
+
+input RemoveOrganizationDocumentSharesInput {
+	shareIds: [ID]!
+}
+
+type RemoveOrganizationDocumentSharesPayload {
+	success: Boolean
+}
+
+type Query {
+	GetOrganizationDocumentShares (input: GetOrganizationDocumentSharesInput): GetOrganizationDocumentSharesPayload!
+}
+
+type Mutation {
+	SetDocumentSharesStatus (input: SetDocumentSharesStatusInput): SetDocumentSharesStatusPayload!
+	SetDocumentShareGroups (input: SetDocumentShareGroupsInput): SetDocumentShareGroupsPayload!
+	RemoveOrganizationDocumentShares (input: RemoveOrganizationDocumentSharesInput): RemoveOrganizationDocumentSharesPayload!
+}

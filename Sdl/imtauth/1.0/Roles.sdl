@@ -8,6 +8,7 @@ schema {
 
 import {
 	"../../imtbase/1.0/ImtCollection.sdl"
+	"Assignments.sdl"
 }
 
 input RolesListInput {
@@ -38,10 +39,12 @@ type RoleData {
 	description: String
 	roleId: ID
 	productId: ID
-	parentRoles: [ID]
-	permissions: ID
+	parentRoles: [Assignment]
+	permissions: [Assignment]
 	isDefault: Bool
 	isGuest: Bool
+	# Read-only.
+	accessWarnings: [AccessWarning]
 }
 
 input RoleDataInput {

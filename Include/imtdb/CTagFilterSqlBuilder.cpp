@@ -87,9 +87,13 @@ QString CTagFilterSqlBuilder::CreateFilterQuery(
 			const Config& config,
 			const std::function<void(QString&)>& postProcessor)
 {
-	const CComplexCollectionFilterConverter::SqlContext sqlContext = config.isSqlite
-				? CComplexCollectionFilterConverter::SC_GENERAL
-				: CComplexCollectionFilterConverter::SC_POSTGRES;
+	CComplexCollectionFilterConverter::SqlContext sqlContext = CComplexCollectionFilterConverter::SC_POSTGRES;
+	if (config.isSqlite){
+		sqlContext = CComplexCollectionFilterConverter::SC_GENERAL;
+	}
+	else if (config.isDuckDb){
+		sqlContext = CComplexCollectionFilterConverter::SC_DUCKDB;
+	}
 
 	// Tag conditions enter the query as plain tokens, so the post-processing never rewrites their identifiers.
 	// The nonce keeps filter values supplied by the client from forging a token.
@@ -141,5 +145,4 @@ QString CTagFilterSqlBuilder::CreateFilterQuery(
 
 
 } // namespace imtdb
-
 

@@ -17,15 +17,17 @@ SimpleCollectionPage {
 
 	entityName: qsTr("Role")
 	entityNamePlural: qsTr("Roles")
-	descriptionText: qsTr("Manage tenant roles and assign permissions to team members.")
+	descriptionText: qsTr("Manage the roles of the organization and assign permissions to its members.")
 
 	documentManager: apiClient ? apiClient.roleDocumentManager : null
 	objectTypeId: apiClient ? apiClient.roleObjectTypeId : ""
 	dataProvider: apiClient ? apiClient.roleListDataProvider : null
-	managePermissionIds: ["EditOrganizationRole", "ChangeOrganizationRole", "RemoveOrganizationRole", "AddOrganizationRole"]
-	createPermissionIds: ["AddOrganizationRole", "EditOrganizationRole"]
-	editPermissionIds: ["ChangeOrganizationRole", "EditOrganizationRole"]
-	deletePermissionIds: ["RemoveOrganizationRole", "EditOrganizationRole"]
+	columnIds: ["title", "description"]
+	columnNames: [qsTr("Name"), qsTr("Description")]
+	managePermissionIds: ["/OrganizationManagement/Roles/Edit/Change", "/OrganizationManagement/Roles/Edit/Remove", "/OrganizationManagement/Roles/Edit/Add"]
+	createPermissionIds: ["/OrganizationManagement/Roles/Edit/Add"]
+	editPermissionIds: ["/OrganizationManagement/Roles/Edit/Change"]
+	deletePermissionIds: ["/OrganizationManagement/Roles/Edit/Remove"]
 	property string __lastPermissionsTenantId: ""
 
 	function removeItems(ids) {

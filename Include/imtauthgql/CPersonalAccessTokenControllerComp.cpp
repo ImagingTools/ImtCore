@@ -122,7 +122,7 @@ bool CPersonalAccessTokenControllerComp::AreRequestedScopesAllowed(
 				m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr,
 				m_roleInfoProviderCompPtr.IsValid() ? m_roleInfoProviderCompPtr.GetPtr() : nullptr);
 	for (const QByteArray& scope : scopes){
-		if (!callerPermissions.contains(scope)){
+		if (!imtauth::HasPermission(callerPermissions, scope)){
 			return false;
 		}
 	}

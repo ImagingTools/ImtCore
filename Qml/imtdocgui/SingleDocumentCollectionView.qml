@@ -16,6 +16,9 @@ Item {
 	property string reopenAfterCloseDocumentId: ""
 	property string reopenAfterCloseTypeId: ""
 	property string reopenAfterCloseObjectId: ""
+	// Header of the open document after the collection header, empty while the collection is shown
+	property string __documentHeaderId: ""
+	property string __dirtyDocumentId: ""
 
 	signal startLoading(string documentId)
 	signal stopLoading(string documentId)
@@ -39,7 +42,7 @@ Item {
 			if (restPath.length <= 1){
 				if (stackView.count > 1){
 					stackView.removePage(stackView.count - 1)
-					headersModel.removeAllAfterFirst()
+					workspaceView.__removeDocumentHeader()
 				}
 			}
 		}
@@ -47,11 +50,20 @@ Item {
 
 	NavigableItem {
 		id: navigableItem
+		// The rest of the path is the document id, consumed here.
+		forwardRest: false
 		onActivated: {
 			if (workspaceView.documentManager){
-				if (restPath.length >= 1){
+				if (params && params.createNew){
+					workspaceView.documentManager.createDocument(matchedPath)
+				}
+				else if (restPath.length >= 1){
 					let documentTypeId = matchedPath
 					let documentId = restPath[0]
+					if (params && params.readOnly !== undefined){
+						workspaceView.documentManager.setObjectReadOnly(documentId, params.readOnly === true)
+					}
+
 					workspaceView.documentManager.openDocument(documentTypeId, documentId)
 				}
 			}
@@ -60,15 +72,30 @@ Item {
 
 	function setCollectionViewComp(name, collectionViewComp){
 		stackView.addPage(collectionViewComp)
-		headersModel.addHeader(UuidGenerator.generateUUID(), name)
+		stackViewHeader.addHeader(UuidGenerator.generateUUID(), name)
 		stackView.setCurrentIndex(0)
 	}
 
+	function __removeDocumentHeader(){
+		if (workspaceView.__documentHeaderId !== ""){
+			stackViewHeader.removeHeader(workspaceView.__documentHeaderId)
+			workspaceView.__documentHeaderId = ""
+		}
+	}
+
+	function __closeCurrentDocument(){
+		if (workspaceView.documentManager){
+			let openedDocumentIds = workspaceView.documentManager.getOpenedDocumentIds()
+			if (openedDocumentIds.length > 0){
+				workspaceView.documentManager.closeDocument(openedDocumentIds[openedDocumentIds.length - 1])
+			}
+		}
+	}
+
 	function __showSingleDocument(documentId, name){
-		if (headersModel.count > 1){
-			let currentHeader = headersModel.get(headersModel.count - 1)
-			if (currentHeader.headerId === documentId){
-				headersModel.setHeaderName(documentId, name)
+		if (workspaceView.__documentHeaderId !== ""){
+			if (workspaceView.__documentHeaderId === documentId){
+				stackViewHeader.setHeaderName(documentId, name)
 				workspaceView.__closeOtherOpenedDocuments(documentId)
 				if (stackView.count > 1){
 					stackView.setCurrentIndex(stackView.count - 1)
@@ -79,13 +106,41 @@ Item {
 			while (stackView.count > 1){
 				stackView.removePage(stackView.count - 1)
 			}
-			headersModel.removeAllAfterFirst()
+			workspaceView.__removeDocumentHeader()
 		}
 
-		headersModel.addHeader(documentId, name)
+		stackViewHeader.addHeader(documentId, name)
+		workspaceView.__documentHeaderId = documentId
 		stackView.addPage(documentViewComp)
 		stackView.setCurrentIndex(stackView.count - 1)
 		workspaceView.__closeOtherOpenedDocuments(documentId)
+	}
+
+	// The name of the document in the header, with "* " while it has unsaved changes
+	function __updateDocumentHeader(documentId){
+		if (workspaceView.__documentHeaderId === ""){
+			return
+		}
+
+		let name = workspaceView.documentManager.getDocumentName(documentId)
+		if (name === ""){
+			name = workspaceView.documentManager.getDefaultDocumentName()
+		}
+		let isDirty = workspaceView.documentManager.documentIsDirty(documentId) && !dirtyMarkTimer.running
+		stackViewHeader.setHeaderName(documentId, isDirty ? "* " + name : name)
+	}
+
+	// A document saved with each change is dirty only for the moment of the save: the mark waits, so the name does not blink
+	Timer {
+		id: dirtyMarkTimer
+
+		interval: 300
+
+		// Stopped first: the header reads running, which the web runtime still reports inside onTriggered
+		onTriggered: {
+			dirtyMarkTimer.stop()
+			workspaceView.__updateDocumentHeader(workspaceView.__dirtyDocumentId)
+		}
 	}
 
 	function __closeOtherOpenedDocuments(activeDocumentId){
@@ -135,6 +190,10 @@ Item {
 			PopupManager.addErrorMessage(message, true)
 		}
 
+		function onDocumentLost(documentId, documentName){
+			PopupManager.addInfoMessage(qsTr("The document \"%1\" is no longer open on the server and was closed").arg(documentName), true)
+		}
+
 		function onDocumentGuiUpdated(documentId, representation){
 			if (!workspaceView.documentManager.documentIsLoading(documentId)){
 				workspaceView.stopLoading(documentId)
@@ -159,6 +218,13 @@ Item {
 			}
 		}
 
+		// A refused change is undone by reading the document again: the reason is told here
+		function onUpdateDocumentFailed(documentId, message){
+			if (message !== ""){
+				PopupManager.addErrorMessage(message, true)
+			}
+		}
+
 		function onDocumentManagerChanged(typeOperation, objectId, documentId, documentName){
 			if (typeOperation === EDocumentOperationEnum.s_newDocumentCreated ||
 					typeOperation === EDocumentOperationEnum.s_documentOpened){
@@ -167,20 +233,20 @@ Item {
 		}
 
 		function onDocumentNameChanged(documentId, oldName, newName){
-			if (headersModel.count > 1){
-				let isDirty = workspaceView.documentManager.documentIsDirty(documentId)
-				headersModel.setHeaderName(documentId, isDirty ? "* " + newName : newName)
-			}
+			workspaceView.__updateDocumentHeader(documentId)
 		}
 
 		function onDocumentIsDirtyChanged(documentId, isDirty){
-			if (headersModel.count > 1){
-				let name = workspaceView.documentManager.getDocumentName(documentId)
-				if (name === ""){
-					name = workspaceView.documentManager.getDefaultDocumentName()
-				}
-				headersModel.setHeaderName(documentId, isDirty ? "* " + name : name)
+			if (isDirty){
+				workspaceView.__dirtyDocumentId = documentId
+				dirtyMarkTimer.restart()
+				return
 			}
+
+			if (workspaceView.__dirtyDocumentId === documentId){
+				dirtyMarkTimer.stop()
+			}
+			workspaceView.__updateDocumentHeader(documentId)
 		}
 
 		// Open document signals
@@ -197,7 +263,10 @@ Item {
 			workspaceView.reopenAfterCloseTypeId = ""
 			workspaceView.reopenAfterCloseObjectId = ""
 			workspaceView.__showSingleDocument(documentId, name)
-			workspaceView.startLoading(documentId)
+			// The data can be loaded already: DocumentDataLoaded came before the document was shown
+			if (workspaceView.documentManager.documentIsLoading(documentId)){
+				workspaceView.startLoading(documentId)
+			}
 		}
 
 		function onDocumentAlreadyOpened(documentId, typeId){
@@ -235,12 +304,9 @@ Item {
 			workspaceView.reopenAfterCloseTypeId = ""
 			workspaceView.reopenAfterCloseObjectId = ""
 
-			if (headersModel.count > 1){
-				let currentHeader = headersModel.get(headersModel.count - 1)
-				if (currentHeader.headerId === documentId && stackView.count > 1){
-					stackView.removePage(stackView.count - 1)
-					headersModel.removeAllAfterFirst()
-				}
+			if (workspaceView.__documentHeaderId === documentId && stackView.count > 1){
+				stackView.removePage(stackView.count - 1)
+				workspaceView.__removeDocumentHeader()
 			}
 			workspaceView.stopLoading(documentId)
 
@@ -306,7 +372,9 @@ Item {
 			workspaceView.startLoading(documentId)
 		}
 
+		// A representation update that follows starts the indicator again; waiting for it left it on when none came.
 		function onUndoDone(documentId){
+			workspaceView.stopLoading(documentId)
 		}
 
 		function onUndoFailed(documentId, message){
@@ -320,6 +388,7 @@ Item {
 		}
 
 		function onRedoDone(documentId){
+			workspaceView.stopLoading(documentId)
 		}
 
 		function onRedoFailed(documentId, message){
@@ -371,101 +440,24 @@ Item {
 		color: Style.baseColor
 	}
 
-	ListModel {
-		id: headersModel
-
-		function addHeader(id, name){
-			let existingIndex = headersModel.getIndexById(id)
-			if (existingIndex >= 0){
-				headersModel.setProperty(existingIndex, "headerName", name)
-				return false
-			}
-			headersModel.append({headerId: id, headerName: name})
-			return true
-		}
-
-		function getIndexById(id){
-			for (let i = 0; i < headersModel.count; i++){
-				if (headersModel.get(i).headerId === id){
-					return i
-				}
-			}
-			return -1
-		}
-
-		function removeAllAfterFirst(){
-			while (headersModel.count > 1){
-				headersModel.remove(headersModel.count - 1)
-			}
-		}
-
-		function setHeaderName(id, name){
-			for (let i = 0; i < headersModel.count; i++){
-				if (headersModel.get(i).headerId === id){
-					headersModel.setProperty(i, "headerName", name)
-					return
-				}
-			}
-		}
-	}
-
-	Item {
-		id: headerBar
+	// The headers as in SimpleCollectionPage: the collection, then the open document;
+	// the back button or the collection header closes the document
+	StackViewHeader {
+		id: stackViewHeader
 		anchors.top: parent.top
 		anchors.left: parent.left
+		anchors.leftMargin: Style.marginM
 		anchors.right: parent.right
 		height: visible ? Style.controlHeightL : 0
-		visible: headersModel.count > 1
+		visible: workspaceView.__documentHeaderId !== ""
+		initialItemTitleVisible: true
 
-		ToolButton {
-			id: backButton
-			anchors.verticalCenter: parent.verticalCenter
-			anchors.left: parent.left
-			anchors.leftMargin: Style.marginM
-			width: Style.buttonWidthM
-			height: width
-			iconSource: "../../../" + Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Normal)
-			onClicked: {
-				if (workspaceView.documentManager){
-					let openedDocumentIds = workspaceView.documentManager.getOpenedDocumentIds()
-					if (openedDocumentIds.length > 0){
-						workspaceView.documentManager.closeDocument(openedDocumentIds[openedDocumentIds.length - 1])
-					}
-				}
-			}
+		onCloseClicked: {
+			workspaceView.__closeCurrentDocument()
 		}
 
-		ListView {
-			id: headersListView
-			anchors.verticalCenter: parent.verticalCenter
-			anchors.left: backButton.right
-			anchors.leftMargin: Style.marginM
-			anchors.right: parent.right
-			height: parent.height
-			orientation: ListView.Horizontal
-			boundsBehavior: Flickable.StopAtBounds
-			model: headersModel
-			delegate: Row {
-				height: headersListView.height
-				spacing: Style.marginM
-
-				Text {
-					anchors.verticalCenter: parent.verticalCenter
-					font.pixelSize: Style.fontSizeXXL
-					font.family: Style.fontFamily
-					color: Style.titleColor
-					text: "/"
-					visible: model.index > 0
-				}
-
-				Text {
-					anchors.verticalCenter: parent.verticalCenter
-					font.pixelSize: Style.fontSizeXXL
-					font.family: Style.fontFamily
-					color: Style.titleColor
-					text: model.headerName
-				}
-			}
+		onHeaderItemClicked: {
+			workspaceView.__closeCurrentDocument()
 		}
 	}
 
@@ -538,7 +530,7 @@ Item {
 
 	StackView {
 		id: stackView
-		anchors.top: headerBar.bottom
+		anchors.top: stackViewHeader.bottom
 		anchors.left: parent.left
 		anchors.right: parent.right
 		anchors.bottom: parent.bottom

@@ -3,7 +3,9 @@
 
 
 // ImtCore includes
+#include <imtauth/CollectionSelection.h>
 #include <imtauth/ITenantRelationshipInfo.h>
+#include <imtdoc/imtdoc.h>
 
 
 namespace imtauth
@@ -11,11 +13,13 @@ namespace imtauth
 
 
 bool CRelationshipDocumentValidatorComp::ValidateDocumentData(
-			const QByteArray& objectId,
 			const istd::IChangeable& document,
 			QString& errorMessage,
+			const iprm::IParamsSet* paramsPtr,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
+	const QByteArray objectId = imtdoc::GetObjectIdFromParams(paramsPtr);
+
 	const imtauth::ITenantRelationshipInfo* relInfo = dynamic_cast<const imtauth::ITenantRelationshipInfo*>(&document);
 	if (relInfo == nullptr){
 		errorMessage = QStringLiteral("Invalid document type for relationship validation");
@@ -37,6 +41,23 @@ bool CRelationshipDocumentValidatorComp::ValidateDocumentData(
 		return false;
 	}
 
+	// The end of an archived relationship is final: a later write would move it and join its period with a later one.
+	// A stored relationship has an object id; one that cannot be read may be archived, so it is not written.
+	if (m_relationshipCollectionCompPtr.IsValid() && !objectId.isEmpty()){
+		imtbase::IObjectCollection::DataPtr storedDataPtr;
+		const imtauth::ITenantRelationshipInfo* storedPtr = m_relationshipCollectionCompPtr->GetObjectData(objectId, storedDataPtr)
+					? dynamic_cast<const imtauth::ITenantRelationshipInfo*>(storedDataPtr.GetPtr())
+					: nullptr;
+		if (storedPtr == nullptr){
+			errorMessage = QStringLiteral("The relationship could not be read. Try again.");
+			return false;
+		}
+		if (storedPtr->GetStatus() == imtauth::ITenantRelationshipInfo::TRS_ARCHIVED){
+			errorMessage = QStringLiteral("An ended relationship cannot be changed");
+			return false;
+		}
+	}
+
 	// Check for duplicate relationship: same tenant pair with same role combination
 	// (including symmetric/mirror matches) is not allowed.
 	if (m_relationshipCollectionCompPtr.IsValid()){
@@ -45,7 +66,10 @@ bool CRelationshipDocumentValidatorComp::ValidateDocumentData(
 		const int srcRole = static_cast<int>(relInfo->GetSourceRole());
 		const int tgtRole = static_cast<int>(relInfo->GetTargetRole());
 
-		for (const QByteArray& existingId : m_relationshipCollectionCompPtr->GetElementIds()){
+		// Only the relationships of the same pair can be duplicates
+		const CollectionSelection::FilterExpression pairExpression =
+					CollectionSelection::PairInEitherOrder("SourceTenantId", "TargetTenantId", sourceTenantId, targetTenantId);
+		for (const QByteArray& existingId : CollectionSelection::SelectIds(*m_relationshipCollectionCompPtr, pairExpression)){
 			// Skip the document being edited (update case)
 			if (existingId == objectId){
 				continue;

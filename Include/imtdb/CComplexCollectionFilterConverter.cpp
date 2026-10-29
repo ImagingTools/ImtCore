@@ -1,5 +1,12 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtdb/CComplexCollectionFilterConverter.h>
+
+
+// Qt includes
+#include <QtCore/QStringList>
+#include <QtCore/QUuid>
+
+// ImtCore includes
 #include <imtdb/imtdb.h>
 
 
@@ -24,7 +31,8 @@ QMap<imtbase::IComplexCollectionFilter::FieldOperation, QString> stringOperation
 	{imtbase::IComplexCollectionFilter::FO_GREATER, ">"},
 	{imtbase::IComplexCollectionFilter::FO_NOT_LESS, ">="},
 	{imtbase::IComplexCollectionFilter::FO_NOT_GREATER, "<="},
-	{imtbase::IComplexCollectionFilter::FO_CONTAINS, "LIKE"}});
+	{imtbase::IComplexCollectionFilter::FO_CONTAINS, "LIKE"},
+	{imtbase::IComplexCollectionFilter::FO_STARTS_WITH, "LIKE"}});
 
 QSet<int> boolTypes({ QMetaType::Bool });
 QMap<imtbase::IComplexCollectionFilter::FieldOperation, QString> boolOperations({
@@ -139,11 +147,12 @@ QString CComplexCollectionFilterConverter::ProcessColumn(const imtbase::IComplex
 			break;
 		case QMetaType::LongLong:
 			filterValue = QString::number(filter.filterValue.toLongLong(&isOk));
-			type = "int";
+			type = "bigint";
 			break;
 		case QMetaType::ULongLong:
 			filterValue = QString::number(filter.filterValue.toULongLong(&isOk));
-			type = "int";
+			// PostgreSQL has no unsigned 64-bit type, and values above INT64_MAX do not fit bigint.
+			type = sqlContext == SC_DUCKDB ? "ubigint" : "numeric";
 			break;
 		case QMetaType::Double:
 			filterValue = QString::number(filter.filterValue.toDouble(&isOk));
@@ -154,7 +163,7 @@ QString CComplexCollectionFilterConverter::ProcessColumn(const imtbase::IComplex
 		}
 
 		if (isOk){
-			QString columnExpr = sqlContext == SC_POSTGRES ? QStringLiteral(R"(("%1")::%2)").arg(filter.fieldId, type)
+			QString columnExpr = sqlContext != SC_GENERAL ? QStringLiteral(R"(("%1")::%2)").arg(filter.fieldId, type)
 											: QStringLiteral(R"("%1")").arg(filter.fieldId);
 			retVal = QStringLiteral("%1 %2 %3").arg(columnExpr, numericOperations[filter.filterOperation], filterValue);
 		}
@@ -163,8 +172,11 @@ QString CComplexCollectionFilterConverter::ProcessColumn(const imtbase::IComplex
 		QString filterValue = SqlEncode(filter.filterValue.toString());
 
 		QString typeCast;
-		if (filter.filterOperation == imtbase::IComplexCollectionFilter::FO_CONTAINS){
-			filterValue.prepend("%");
+		if (filter.filterOperation == imtbase::IComplexCollectionFilter::FO_CONTAINS
+					|| filter.filterOperation == imtbase::IComplexCollectionFilter::FO_STARTS_WITH){
+			if (filter.filterOperation == imtbase::IComplexCollectionFilter::FO_CONTAINS){
+				filterValue.prepend("%");
+			}
 			filterValue.append("%");
 
 			switch (sqlContext){
@@ -172,6 +184,7 @@ QString CComplexCollectionFilterConverter::ProcessColumn(const imtbase::IComplex
 				stringOperations[filter.filterOperation] = "LIKE";
 				break;
 			case SC_POSTGRES:
+			case SC_DUCKDB:
 				stringOperations[filter.filterOperation] = "ILIKE";
 				break;
 			}
@@ -179,12 +192,12 @@ QString CComplexCollectionFilterConverter::ProcessColumn(const imtbase::IComplex
 			typeCast = sqlContext == SC_POSTGRES ? QStringLiteral("::text") : QString();
 		}
 
-		retVal = sqlContext == SC_POSTGRES ? QStringLiteral(R"(("%1")%2 %3 '%4')").arg(filter.fieldId, typeCast, stringOperations[filter.filterOperation], filterValue)
+		retVal = sqlContext != SC_GENERAL ? QStringLiteral(R"(("%1")%2 %3 '%4')").arg(filter.fieldId, typeCast, stringOperations[filter.filterOperation], filterValue)
 							: QStringLiteral(R"("%1" %2 '%3')").arg(filter.fieldId, stringOperations[filter.filterOperation], filterValue);
 	}
 	else if (boolTypes.contains(filter.filterValue.typeId()) && boolOperations.contains(filter.filterOperation)){
 		bool value = filter.filterValue.toBool();
-		QString columnExpr = sqlContext == SC_POSTGRES ? QStringLiteral(R"(coalesce(("%1")::bool, false))").arg(filter.fieldId)
+		QString columnExpr = sqlContext != SC_GENERAL ? QStringLiteral(R"(coalesce(("%1")::bool, false))").arg(filter.fieldId)
 										: QStringLiteral(R"("%1")").arg(filter.fieldId);
 		retVal = QStringLiteral("%1 %2 %3").arg(columnExpr, boolOperations[filter.filterOperation], value ? QStringLiteral("true") : QStringLiteral("false"));
 	}
@@ -197,19 +210,22 @@ QString CComplexCollectionFilterConverter::ProcessColumn(const imtbase::IComplex
 			filterValue = filter.filterValue.toDate().toString(Qt::ISODate);
 		}
 
-		QString columnExpr = sqlContext == SC_POSTGRES ? QStringLiteral(R"(("%1")::timestamp)").arg(filter.fieldId)
-																: QStringLiteral(R"("%1")").arg(filter.fieldId);
+		QString columnExpr = sqlContext != SC_GENERAL ? QStringLiteral(R"(("%1")::timestamp)").arg(filter.fieldId)
+														: QStringLiteral(R"("%1")").arg(filter.fieldId);
 		retVal = QStringLiteral("%1 %2 '%3'").arg(columnExpr, dateOperations[filter.filterOperation], filterValue);
 	}
-	else if (sqlContext == SC_POSTGRES && arrayOperations.contains(filter.filterOperation)){
+	else if ((sqlContext == SC_POSTGRES || sqlContext == SC_DUCKDB) && arrayOperations.contains(filter.filterOperation)){
 		const QString columnExpr = QStringLiteral(R"("%1")").arg(filter.fieldId);
+		const bool isDuckDb = sqlContext == SC_DUCKDB;
 
 		switch (filter.filterOperation){
 		case imtbase::IComplexCollectionFilter::FO_ARRAY_IS_EMPTY:
-			return QStringLiteral("coalesce(jsonb_array_length(%1), 0) = 0").arg(columnExpr);
+			return isDuckDb ? QStringLiteral("coalesce(len(%1), 0) = 0").arg(columnExpr)
+							: QStringLiteral("coalesce(jsonb_array_length(%1), 0) = 0").arg(columnExpr);
 
 		case imtbase::IComplexCollectionFilter::FO_ARRAY_NOT_IS_EMPTY:
-			return QStringLiteral("jsonb_array_length(%1) > 0").arg(columnExpr);
+			return isDuckDb ? QStringLiteral("len(%1) > 0").arg(columnExpr)
+							: QStringLiteral("jsonb_array_length(%1) > 0").arg(columnExpr);
 
 		case imtbase::IComplexCollectionFilter::FO_ARRAY_HAS_ANY:
 		case imtbase::IComplexCollectionFilter::FO_ARRAY_NOT_HAS_ANY:
@@ -220,20 +236,32 @@ QString CComplexCollectionFilterConverter::ProcessColumn(const imtbase::IComplex
 				return {};
 			}
 
-			const QString sqlArray = ToSqlArray(values);
+			const bool isAny = filter.filterOperation == imtbase::IComplexCollectionFilter::FO_ARRAY_HAS_ANY ||
+						filter.filterOperation == imtbase::IComplexCollectionFilter::FO_ARRAY_NOT_HAS_ANY;
+			const bool isNegated = filter.filterOperation == imtbase::IComplexCollectionFilter::FO_ARRAY_NOT_HAS_ANY ||
+						filter.filterOperation == imtbase::IComplexCollectionFilter::FO_ARRAY_NOT_HAS_ALL;
 
 			QString expr;
 
-			if (filter.filterOperation == imtbase::IComplexCollectionFilter::FO_ARRAY_HAS_ANY ||
-				filter.filterOperation == imtbase::IComplexCollectionFilter::FO_ARRAY_NOT_HAS_ANY){
-				expr = QStringLiteral("%1 ?| %2").arg(columnExpr, sqlArray);
+			if (isDuckDb){
+				// A DuckDB column is a native list (UUID[], VARCHAR[], INTEGER[], ...). The converter does not know the type of its
+				// elements, and a list literal handed to list_has_any/list_has_all has to be of that type, while the literal given
+				// to list_contains takes it. So every value is tested on its own: any is an OR of them, all is an AND.
+				QStringList containsConditions;
+				for (const QVariant& value : values){
+					containsConditions << QStringLiteral("list_contains(%1, %2)").arg(columnExpr, ToDuckDbLiteral(value));
+				}
+
+				expr = QStringLiteral("(%1)").arg(containsConditions.join(isAny ? QStringLiteral(" OR ") : QStringLiteral(" AND ")));
 			}
 			else{
-				expr = QStringLiteral("%1 ?& %2").arg(columnExpr, sqlArray);
+				const QString sqlArray = ToSqlArray(values);
+
+				expr = isAny ? QStringLiteral("%1 ?| %2").arg(columnExpr, sqlArray)
+							: QStringLiteral("%1 ?& %2").arg(columnExpr, sqlArray);
 			}
 
-			if (filter.filterOperation == imtbase::IComplexCollectionFilter::FO_ARRAY_NOT_HAS_ANY ||
-				filter.filterOperation == imtbase::IComplexCollectionFilter::FO_ARRAY_NOT_HAS_ALL){
+			if (isNegated){
 				expr.prepend("NOT (").append(")");
 			}
 
@@ -246,19 +274,23 @@ QString CComplexCollectionFilterConverter::ProcessColumn(const imtbase::IComplex
 					return {};
 				}
 
+				// The elements of a DuckDB list are of any type (UUID, INTEGER, ...), so they are compared as text.
+				const QString elementText = isDuckDb ? QStringLiteral("CAST(elem AS VARCHAR)") : QStringLiteral("elem");
+
 				QStringList likeConditions;
 				for (const QVariant& v : values){
 					QString pattern = SqlEncode(v.toString());
-					likeConditions << QStringLiteral("elem ILIKE '%%%1%%'").arg(pattern);
+					likeConditions << QStringLiteral("%1 ILIKE '%%%2%%'").arg(elementText, pattern);
 				}
 
-				QString expr = QStringLiteral(
-					"EXISTS ("
-					"SELECT 1 "
-					"FROM jsonb_array_elements_text(%1) AS elem "
-					"WHERE %2"
-					")"
-				).arg(columnExpr, likeConditions.join(" OR "));
+				QString expr;
+				if (isDuckDb){
+					expr = QStringLiteral("len(list_filter(%1, elem -> %2)) > 0").arg(columnExpr, likeConditions.join(" OR "));
+				}
+				else{
+					expr = QStringLiteral("EXISTS (SELECT 1 FROM jsonb_array_elements_text(%1) AS elem WHERE %2)")
+								.arg(columnExpr, likeConditions.join(" OR "));
+				}
 
 				if (filter.filterOperation == imtbase::IComplexCollectionFilter::FO_ARRAY_NOT_ILIKE_ANY){
 					expr.prepend("NOT (").append(")");
@@ -341,6 +373,20 @@ QString CComplexCollectionFilterConverter::ToSqlArray(const QVariantList& values
 	}
 	return QStringLiteral("ARRAY[%1]").arg(parts.join(QStringLiteral(", ")));
 };
+
+
+QString CComplexCollectionFilterConverter::ToDuckDbLiteral(const QVariant& value)
+{
+	if (value.typeId() == QMetaType::QUuid){
+		return QStringLiteral("'%1'").arg(value.toUuid().toString(QUuid::WithoutBraces));
+	}
+
+	if (value.typeId() == QMetaType::QString || value.typeId() == QMetaType::QByteArray){
+		return QStringLiteral("'%1'").arg(SqlEncode(value.toString()));
+	}
+
+	return value.toString();
+}
 
 
 } // namespace imtdb

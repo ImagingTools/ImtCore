@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="6390" Description="ACF"/>
+            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description>External Login Test Configuration</Description>
+    <Keywords>Test OIDC ExternalLogin</Keywords>
+    <ElementsList>
+        <Element Id="ExternalIdentity" PackageId="ImtAuthPck" ComponentId="ExternalIdentity">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="ExternalIdentityManager" PackageId="ImtAuthPck" ComponentId="ExternalIdentityManager">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="IdentityCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="IdentityCollection"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IdentityFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="ExternalIdentity"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ExternalLoginController" PackageId="ImtAuthPck" ComponentId="ExternalLoginController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CallbackUrl" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="https://app.example.com/ExternalLogin/Callback"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IdentityManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ExternalIdentityManager"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Providers" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>TestProvider</Value>
+                                <Value>UnconfiguredGoogleProvider</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestTimeout" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="5000"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="UserCollection"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="UserInfo"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="RegisteringLoginController" PackageId="ImtAuthPck" ComponentId="ExternalLoginController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="AllowRegistration" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CallbackUrl" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="https://app.example.com/ExternalLogin/Callback"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IdentityManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ExternalIdentityManager"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Providers" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>TestProvider</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestTimeout" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="5000"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="UserCollection"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="UserInfo"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="IdentityCollection" PackageId="ImtCorePck" ComponentId="ObjectCollection">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ObjectFactories" Type="Factory[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>ExternalIdentity</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectPersistenceList" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>JsonSerializer</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>ExternalIdentity</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeNames" Type="Text[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>External Identity</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="JsonSerializer" PackageId="FilePck" ComponentId="JsonFileSerializer">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="TestProvider" PackageId="ImtAuthPck" ComponentId="GenericOidcProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="AuthorizationEndpoint" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="http://127.0.0.1:18931/authorize"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ClientId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="test-client"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ClientSecret" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="test-secret"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Issuers" Type="String[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>http://127.0.0.1:18931</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProviderId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="testidp"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProviderName" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Test IdP"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TokenEndpoint" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="http://127.0.0.1:18931/token"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserInfoEndpoint" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="http://127.0.0.1:18931/userinfo"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SettingsAuthorizationEndpointParam" PackageId="BasePck" ComponentId="TextParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DefaultText" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value=" https://idp.example.org/authorize "/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SettingsClientIdParam" PackageId="BasePck" ComponentId="TextParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DefaultText" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="settings-client"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SettingsEmptyParam" PackageId="BasePck" ComponentId="TextParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="SettingsIssuerParam" PackageId="BasePck" ComponentId="TextParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DefaultText" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="https://idp.example.org"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SettingsNameParam" PackageId="BasePck" ComponentId="TextParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DefaultText" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Company Login"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SettingsProvider" PackageId="ImtAuthPck" ComponentId="GenericOidcProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="AuthorizationEndpoint" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="https://attribute.example.org/authorize"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="AuthorizationEndpointParam" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SettingsAuthorizationEndpointParam"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ClientId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="attribute-client"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ClientIdParam" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SettingsClientIdParam"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ClientSecret" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="attribute-secret"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ClientSecretParam" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SettingsEmptyParam"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IssuerParam" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SettingsIssuerParam"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Issuers" Type="String[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>https://attribute.example.org</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProviderNameParam" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SettingsNameParam"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TokenEndpoint" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="https://attribute.example.org/token"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TokenEndpointParam" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SettingsEmptyParam"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="UnconfiguredGoogleProvider" PackageId="ImtAuthPck" ComponentId="GoogleOidcProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="UserCollection" PackageId="ImtCorePck" ComponentId="ObjectCollection">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ObjectFactories" Type="Factory[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>UserInfo</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectPersistenceList" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>JsonSerializer</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>User</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeNames" Type="Text[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>User</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="UserInfo" PackageId="ImtAuthPck" ComponentId="UserInfo">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imtauth::IExternalLoginController" ComponentId="ExternalLoginController"/>
+    </ExportedInterfaces>
+    <ExportedComponents>
+        <Component ExportedId="ExternalIdentityManager" ComponentId="ExternalIdentityManager"/>
+        <Component ExportedId="ExternalLoginController" ComponentId="ExternalLoginController"/>
+        <Component ExportedId="RegisteringLoginController" ComponentId="RegisteringLoginController"/>
+        <Component ExportedId="SettingsProvider" ComponentId="SettingsProvider"/>
+        <Component ExportedId="UserCollection" ComponentId="UserCollection"/>
+    </ExportedComponents>
+</Acf>

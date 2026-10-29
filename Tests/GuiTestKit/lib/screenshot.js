@@ -33,20 +33,35 @@ const MAX_DIFF_PIXELS = 100;
 const THRESHOLD = 0.2;
 
 /**
+ * Settle the page, then work out the masks - in that order. A rect mask is geometry READ OFF the live
+ * page, so measuring it while a view is still filling sizes it to the rows that happen to be drawn at
+ * that instant; the screenshot that follows shows the finished table and the cells left uncovered fail
+ * the comparison. Pass `mask` as a function to have it evaluated here, once the page has settled.
+ */
+async function resolveMasks(page, mask) {
+  // JQML updates hover only on mousemove, so a clicked control stays highlighted and its tooltip stays up
+  // until a 3s timer closes it - in or out of the shot by timing alone. Off-page ends every hover.
+  await page.mouse.move(-1, -1);
+  await waitForStable(page, SCREENSHOT_SETTLE);
+  const resolved = typeof mask === 'function' ? await mask() : mask;
+  if (!resolved) return [];
+  return Array.isArray(resolved) ? resolved : [resolved];
+}
+
+/**
  * Compare the current page against a stored baseline. `name` is the logical snapshot name; the
  * per-user directory and platform suffix are applied by snapshotPathTemplate in playwright.config.js.
  * @param {import('@playwright/test').Page} page
  * @param {string} name
- * @param {Object|Object[]} [mask]  {path:[...]} or {x,y,width,height} (+ optional padding); or array
+ * @param {Object|Object[]|(() => any)} [mask]  {path:[...]} or {x,y,width,height} (+ optional
+ *   padding); an array of those; or a function returning either, evaluated after the page settles
  */
 async function checkScreenshot(page, name, mask) {
-  const masks = mask ? (Array.isArray(mask) ? mask : [mask]) : [];
+  const masks = await resolveMasks(page, mask);
   const handles = [];
   // Injected from the try so a mask that throws mid-loop is still cleaned up in finally.
   try {
     for (const m of masks) handles.push(await addMask(page, m));
-
-    await waitForStable(page, SCREENSHOT_SETTLE);
     // MAX_DIFF_PIXELS absorbs cross-machine font antialiasing and nothing else; non-deterministic
     // CONTENT still gets a mask, never this budget. THRESHOLD handles the rasterisation noise.
     await expect(page).toHaveScreenshot(`${name}.png`, { fullPage: true, threshold: THRESHOLD, maxDiffPixels: MAX_DIFF_PIXELS });
@@ -107,15 +122,14 @@ async function expectCount(page, path, expected, message) {
  * @param {import('@playwright/test').Page} page
  * @param {string[]} path  objectName path of the element to compare
  * @param {string} name
- * @param {Object|Object[]} [mask]
+ * @param {Object|Object[]|(() => any)} [mask]  see checkScreenshot
  */
 async function checkElementScreenshot(page, path, name, mask) {
-  const masks = mask ? (Array.isArray(mask) ? mask : [mask]) : [];
+  const masks = await resolveMasks(page, mask);
   const handles = [];
   try {
     for (const m of masks) handles.push(await addMask(page, m));
 
-    await waitForStable(page, SCREENSHOT_SETTLE);
     const locator = dom.byPath(page, path);
     await locator.waitFor({ state: 'visible' });
     await expect(locator).toHaveScreenshot(`${name}.png`, { threshold: THRESHOLD, maxDiffPixels: MAX_DIFF_PIXELS });

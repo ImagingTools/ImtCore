@@ -34,6 +34,18 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
+                    <AttributeInfo Id="ParametersDescription" Type="Text[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Activate it if you want your server to work using SSL</Value>
+                                <Value></Value>
+                                <Value></Value>
+                                <Value></Value>
+                                <Value></Value>
+                                <Value></Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                     <AttributeInfo Id="ParametersId" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
@@ -43,6 +55,18 @@
                                 <Value>PrivateKey</Value>
                                 <Value>VerifyMode</Value>
                                 <Value>Protocol</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParametersName" Type="Text[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Enable SSL</Value>
+                                <Value>Local Certificate</Value>
+                                <Value>CA Certificate</Value>
+                                <Value>Private Key</Value>
+                                <Value>Verify Mode</Value>
+                                <Value>SSL Protocol</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

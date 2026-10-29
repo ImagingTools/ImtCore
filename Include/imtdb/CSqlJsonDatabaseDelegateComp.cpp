@@ -640,6 +640,56 @@ imtbase::IRevisionController::RevisionInfoList CSqlJsonDatabaseDelegateComp::Get
 }
 
 
+bool CSqlJsonDatabaseDelegateComp::GetRevisionData(
+			const imtbase::IObjectCollection& /*collection*/,
+			const imtbase::ICollectionInfo::Id& objectId,
+			int revision,
+			istd::IChangeableSharedPtr& dataPtr,
+			idoc::MetaInfoPtr& dataMetaInfoPtr) const
+{
+	dataPtr.Reset();
+	dataMetaInfoPtr.Reset();
+	if (!m_databaseEngineCompPtr.IsValid() || objectId.isEmpty() || revision <= 0) {
+		return false;
+	}
+
+	QString schemaPrefix;
+	if (m_tableSchemaAttrPtr.IsValid()) {
+		schemaPrefix = QStringLiteral("%1.").arg(*m_tableSchemaAttrPtr);
+	}
+
+	const QByteArray query = QStringLiteral(
+		R"(SELECT * FROM %1"%2" WHERE "DocumentId" = '%3' AND "RevisionNumber" = %4;)" )
+				.arg(
+					schemaPrefix,
+					QString::fromUtf8(*m_tableNameAttrPtr),
+					SqlEncode(QString::fromUtf8(objectId)),
+					QString::number(revision))
+					.toUtf8();
+
+	QSqlError sqlError;
+	QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);
+	if (sqlError.type() != QSqlError::NoError || !sqlQuery.next()) {
+		return false;
+	}
+
+	const QSqlRecord record = sqlQuery.record();
+	dataPtr.FromUnique(CreateObjectFromRecord(record));
+	if (!dataPtr.IsValid()) {
+		return false;
+	}
+
+	idoc::MetaInfoPtr collectionItemMetaInfoPtr;
+	if (!CreateObjectInfoFromRecord(record, dataMetaInfoPtr, collectionItemMetaInfoPtr)) {
+		dataPtr.Reset();
+		dataMetaInfoPtr.Reset();
+		return false;
+	}
+
+	return true;
+}
+
+
 QByteArray CSqlJsonDatabaseDelegateComp::CreateOperationDescriptionQuery(
 	const QByteArray& objectId,
 	const imtbase::IOperationContext* operationContextPtr) const

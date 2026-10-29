@@ -38,6 +38,7 @@ columns: [
         editable: true,                     // editing allowed
         options: [],                        // for combo: array of strings OR [{value, text}]
         editor: null,                       // custom editor Component (overrides built-in editors)
+        delegate: null,                     // custom display Component (replaces the cell text)
         validator: null,                    // QValidator OR function(value, index) -> true | "error text"
         placeholder: "",                    // hint for the text editor
         width: 0,                           // fixed width in px (0 = stretch share of remaining width)
@@ -69,6 +70,23 @@ The editor is instantiated via `Loader` when the cell enters edit mode and
 unloaded after `commit()` / `cancel()`. If the delegate scrolls out of view
 the editor is canceled.
 
+### Custom cell delegate
+
+The component assigned to `column.delegate` replaces the built-in cell text
+(the expand arrow and the checkbox of a tree column stay). It is hosted by a
+`Loader` that fills the rest of the cell, and reads the row through that
+`Loader` as its `parent`:
+
+* `parent.value` — current cell value
+* `parent.nodeData` — the node's `data` object
+* `parent.selected` — the row is selected
+* `parent.nodeEnabled` — the node is enabled
+* `parent.hasChildren` — the node has children
+
+It is ignored for `bool` / `checkState` columns and hidden while the cell is
+being edited. Example: the two-line name/description cell of
+`imtauthgui/PermissionsTableView.qml`.
+
 ---
 
 ## Properties
@@ -88,6 +106,8 @@ the editor is canceled.
 | `allowDisabledEditing` | `false` | Allow editing of disabled nodes. |
 | `allowDisabledSelection` | `false` | Allow selecting of disabled nodes. |
 | `tristate` | `false` | Tri-state checkboxes. |
+| `hintRole` | `""` | Node `data` field with a hint (e.g. why the node is locked). Rows with a hint show `hintIcon` in the tree column and the hint in the row tooltip. |
+| `hintIcon` | `"Icons/Info"` | Icon shown next to nodes that have a hint. |
 | `skipDisabledOrNonCheckableOnCheck` | `true` | Exclude disabled / non-checkable nodes from check propagation. |
 | `filterText` | `""` | Filter text (case-insensitive substring). |
 | `filterRole` | `"text"` | Dot-path to the value used for filtering. |

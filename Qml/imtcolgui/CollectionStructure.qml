@@ -420,6 +420,7 @@ Item {
 
     SubscriptionClient {
         id: subscriptionClient;
+        deliveryEnabled: collectionStructureContainer.visible;
 
         property string ok: collectionStructureContainer.commandId !== "" && subscriptionClient.subscriptionId !== "";
         onOkChanged: {
@@ -435,10 +436,14 @@ Item {
             }
         }
 
+        onRefreshRequired: {
+            collectionStructureContainer.updateGui();
+        }
+
         onStateChanged: {
             console.log("SubscriptionClient onStateChanged", state);
 
-            if (state === "Ready"){
+            if (state === "Ready" && subscriptionClient.deliveryEnabled){
                 console.log("subscriptionClient Ready");
 
                 if (subscriptionClient.containsKey("data")){

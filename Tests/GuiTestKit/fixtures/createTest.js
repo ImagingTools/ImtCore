@@ -13,6 +13,7 @@ const path = require('path');
 const base = require('@playwright/test');
 const gui = require('../lib/gui');
 const { captureConsoleErrors } = require('../lib/consoleErrors');
+const { attachStabilityTracking } = require('../lib/stability');
 
 const PERMISSIONS_STORAGE_KEY = 'AuthorizationController/permissions';
 
@@ -106,6 +107,9 @@ function createGuiTest(users, { rootDir }) {
     // lib/consoleErrors.js): an uncaught pageerror hard-fails the test, while console.error/warn text
     // is attached to the report as diagnostic context. Only covers the default per-test `page`.
     page: async ({ page }, use, testInfo) => {
+      // At creation, not on the first wait: the subscription socket opens while the app boots, and
+      // Playwright only reports sockets opened after the listener is in place.
+      attachStabilityTracking(page);
       const finish = captureConsoleErrors(page);
       await use(page);
       await finish(testInfo);
@@ -135,6 +139,7 @@ function createGuiTest(users, { rootDir }) {
     const decorated = decorate(user);
     const context = await browser.newContext({ storageState: path.resolve(rootDir, authFile(user.key)) });
     const page = await context.newPage();
+    attachStabilityTracking(page);
     // Same browser-error watching as the default `page` fixture, but this page is shared across a
     // describe.serial block, so a pageerror can't be attributed to one test - log it instead of throwing.
     captureConsoleErrors(page, {

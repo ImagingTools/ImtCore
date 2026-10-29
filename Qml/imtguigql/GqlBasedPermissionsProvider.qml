@@ -18,7 +18,6 @@ import imtauthgui 1.0
 PermissionsProvider {
     id: root
 
-    property string context: ""
     property GetProductPermissionsInput __requestInput: GetProductPermissionsInput {}
     property GetUserPermissionsInput __userRequestInput: GetUserPermissionsInput {}
     property GetOrganizationPermissionsInput __orgRequestInput: GetOrganizationPermissionsInput {}
@@ -38,7 +37,7 @@ PermissionsProvider {
     }
 
     property GqlSdlRequestSender __requestSender: GqlSdlRequestSender {
-        context: root.context
+        permissionPath: root.permissionPath
         gqlCommandId: ImtauthPermissionsSdlCommandIds.s_getProductPermissions
 
         onFinished: root.__onRequestFailed(status, root.__pendingTenantId)
@@ -79,7 +78,7 @@ PermissionsProvider {
     }
 
     property GqlSdlRequestSender __userRequestSender: GqlSdlRequestSender {
-        context: root.context
+        permissionPath: root.permissionPath
         gqlCommandId: ImtauthPermissionsSdlCommandIds.s_getUserPermissions
 
         onFinished: root.__onRequestFailed(status, "")
@@ -115,7 +114,7 @@ PermissionsProvider {
     }
 
     property GqlSdlRequestSender __orgRequestSender: GqlSdlRequestSender {
-        context: root.context
+        permissionPath: root.permissionPath
         gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_getOrganizationPermissions
 
         onFinished: root.__onRequestFailed(status, root.__pendingOrgTenantId)
@@ -166,10 +165,12 @@ PermissionsProvider {
                     var entry = entries.get(ei).item
                     if (!entry)
                         continue
+                    // [ID] maps to a plain JS array.
                     groupObj.entries.push({
                         "permissionId": entry.m_permissionId || "",
                         "displayName": entry.m_displayName || "",
-                        "description": entry.m_description || ""
+                        "description": entry.m_description || "",
+                        "requirements": Array.isArray(entry.m_requirements) ? entry.m_requirements : []
                     })
                 }
             }

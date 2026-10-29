@@ -16,6 +16,7 @@
 const { defineConfig } = require('@playwright/test');
 const { buildProjects } = require('./buildProjects');
 const { resolveOutputPaths } = require('./output');
+const { machineWorkers } = require('./workers');
 
 /**
  * @param {object} opts
@@ -27,7 +28,7 @@ const { resolveOutputPaths } = require('./output');
  *   Validated against the full user list here, where that list is known.
  * @param {string} [opts.globalSetup]    path to the app's global-setup.js
  * @param {string} [opts.testDir]
- * @param {number} [opts.workers]
+ * @param {number} [opts.workers]       omit to size it to the machine (see workers.js)
  * @param {object} [opts.use]            merged over the defaults
  */
 function createGuiConfig({
@@ -37,7 +38,7 @@ function createGuiConfig({
   mutatingUserKeys,
   globalSetup,
   testDir = './tests',
-  workers = 10,
+  workers,
   use = {},
   ...overrides
 }) {
@@ -48,6 +49,15 @@ function createGuiConfig({
   }
 
   const output = resolveOutputPaths(rootDir);
+
+  if (workers === undefined) {
+    const sized = machineWorkers();
+    workers = sized.workers;
+    // The config is loaded by every worker process too; say it once, from the runner.
+    if (process.env.TEST_WORKER_INDEX === undefined) {
+      console.log(`GUI tests: ${workers} worker(s) (${sized.reason})`);
+    }
+  }
 
   // A stale or misspelled key matches nobody, every project then gets the grepInvert, and the whole
   // mutating phase vanishes into a green run.
@@ -76,9 +86,8 @@ function createGuiConfig({
     timeout: 60_000,
     expect: { timeout: 15_000 },
     forbidOnly: !!process.env.CI,
-    // Every project is one fixture USER, and these apps keep per-user state server-side, so two tests
-    // running as the SAME user concurrently share - and can corrupt - one workspace. Drop to 1 for a
-    // trustworthy single-pass verification run.
+    // Sized to the machine unless the app passes a number (see workers.js). Each spec file runs as its
+    // own user, so files can run side by side without sharing a server-side workspace.
     workers,
     // No retries - a flaky test reports red immediately instead of being masked by a re-run.
     retries: 0,
@@ -94,6 +103,8 @@ function createGuiConfig({
         ]
       : 'list',
     ...(globalSetup ? { globalSetup } : {}),
+    // Drops the empty per-test folders a passing run leaves in outputDir (see globalTeardown.js).
+    globalTeardown: require.resolve('./globalTeardown'),
     // A two-phase CI run invokes Playwright twice against this ONE config, and Playwright clears
     // outputDir at the start of every invocation - without per-phase paths the second phase wipes the
     // first's artifacts.

@@ -16,6 +16,7 @@ Rectangle {
 	signal removeRequested()
 
 	radius: Style.radiusS
+	color: Style.baseColor
 	border.color: Style.imaginToolsAccentColor
 	border.width: 1
 

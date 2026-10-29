@@ -130,12 +130,21 @@ Rectangle{
         scrollContainer.opacity = !scrollContainer.canFade;
     }
 
+    // On the next tick: showing or hiding inside a size change resizes the target, and with it this bar - a binding loop.
     onHeightChanged: {
-        setVisibleFunc();
+        sizeVisibleTimer.restart();
     }
 
     onWidthChanged: {
-        setVisibleFunc();
+        sizeVisibleTimer.restart();
+    }
+
+    Timer {
+        id: sizeVisibleTimer;
+        interval: 0;
+        onTriggered: {
+            scrollContainer.setVisibleFunc();
+        }
     }
 
     onTargetContentHeightChanged: {

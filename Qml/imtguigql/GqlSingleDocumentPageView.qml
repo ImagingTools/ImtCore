@@ -50,6 +50,13 @@ PageContainer {
 					"objectId=", root.objectId)
 	}
 
+	Component.onDestruction: {
+		MainDocumentService.unregisterDocumentService(root.documentManager)
+		if (root.documentManager && typeof root.documentManager.release === "function"){
+			root.documentManager.release()
+		}
+	}
+
 	onPageIdChanged: {
 		if (pageId !== ""){
 			MainDocumentService.registerDocumentService(pageId, documentManager)

@@ -81,11 +81,6 @@ I_EXPORT_COMPONENT(
 			"LDAP Authorization Controller");
 
 I_EXPORT_COMPONENT(
-			UserSerializableCollectionController,
-			"User serializable collection controller",
-			"User Serializable Collection Controller");
-
-I_EXPORT_COMPONENT(
 			UserSettingsController,
 			"Client settings controller",
 			"GraphQL Controller Model Client User");
@@ -194,6 +189,11 @@ I_EXPORT_COMPONENT(
 			ClientRequestPersonalAccessTokenManager,
 			"Client request personal access token manager",
 			"Client Request Personal Access Token Manager");
+
+I_EXPORT_COMPONENT(
+			ExternalLoginCallbackServlet,
+			"Redirect URI of the external identity providers",
+			"External Login Callback Servlet OIDC");
 
 I_EXPORT_COMPONENT(
 			TenantCollectionController,

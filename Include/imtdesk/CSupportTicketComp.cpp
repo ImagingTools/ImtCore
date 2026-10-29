@@ -544,7 +544,7 @@ bool CSupportTicketComp::ResetData(CompatibilityMode /*mode*/)
 	m_id.clear();
 	m_title.clear();
 	m_description.clear();
-	m_ticketType = TT_ACCESS_REQUEST;
+	m_ticketType = TT_SUPPORT_REQUEST;
 	m_status = TS_OPEN;
 	m_stateReason = SR_NONE;
 	m_priority = TP_MEDIUM;

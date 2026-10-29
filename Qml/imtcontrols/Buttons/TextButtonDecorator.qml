@@ -22,7 +22,7 @@ Item {
 
         radius: Style.buttonRadius;
 
-        color: commonButtonDecorator.baseButton.focus ? "red" : commonButtonDecorator.baseButton.color !== "" ? commonButtonDecorator.baseButton.color : commonButtonDecorator.baseButton.isHighlighted && commonButtonDecorator.baseButton.isHovered ? Style.hover :
+        color: commonButtonDecorator.baseButton.color !== "" ? commonButtonDecorator.baseButton.color : commonButtonDecorator.baseButton.isHighlighted && commonButtonDecorator.baseButton.isHovered ? Style.hover :
                                                                               commonButtonDecorator.baseButton.isHovered ? Style.selectedColor:
                                                                               Style.buttonColor;
 

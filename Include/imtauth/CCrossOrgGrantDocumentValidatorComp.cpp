@@ -4,6 +4,7 @@
 
 // ImtCore includes
 #include <imtauth/ICrossOrgGrantData.h>
+#include <imtauth/imtauth.h>
 
 
 namespace imtauth
@@ -11,9 +12,9 @@ namespace imtauth
 
 
 bool CCrossOrgGrantDocumentValidatorComp::ValidateDocumentData(
-			const QByteArray& /*objectId*/,
 			const istd::IChangeable& document,
 			QString& errorMessage,
+			const iprm::IParamsSet* /*paramsPtr*/,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	const imtauth::ICrossOrgGrantData* grantData = dynamic_cast<const imtauth::ICrossOrgGrantData*>(&document);
@@ -25,12 +26,17 @@ bool CCrossOrgGrantDocumentValidatorComp::ValidateDocumentData(
 	imtauth::CrossOrgGrantInfo info = grantData->GetGrantInfo();
 
 	if (info.targetTenantId.isEmpty()){
-		errorMessage = QStringLiteral("Target tenant must be specified");
+		errorMessage = QStringLiteral("Target organization must be specified");
 		return false;
 	}
 
 	if (info.roleIds.isEmpty()){
 		errorMessage = QStringLiteral("At least one role must be selected");
+		return false;
+	}
+
+	if (info.isActive && m_connectionManagerCompPtr.IsValid() && !imtauth::AreTenantsConnected(*m_connectionManagerCompPtr, info.sourceTenantId, info.targetTenantId)){
+		errorMessage = QStringLiteral("The organizations are not connected");
 		return false;
 	}
 
