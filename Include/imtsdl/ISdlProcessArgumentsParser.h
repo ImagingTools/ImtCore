@@ -22,6 +22,9 @@ public:
 	static inline const QString s_objectSourceFileType = QStringLiteral("O_CPP");
 	static inline const QString s_fwdHeaderFileType = QStringLiteral("FWD_H");
 
+	/// the suffix of the '<Schema>Objects' files. \note it is duplicated in the CMake config (see \c IMT_SDL_OBJECTS_SUFFIX in 'ImtCoreSdlCustomConfig.cmake')
+	static inline const QString s_objectsFileSuffix = QStringLiteral("Objects");
+
 public:
 	enum GeneratorType
 	{

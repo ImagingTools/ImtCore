@@ -12,9 +12,21 @@
 #include <imtsdl/TListModelBase.h>
 
 // custom types includes
+#if __has_include(<complextestsdl/SDL/1.0/CPP/ComplexUnion1Objects.h>)
 #include <complextestsdl/SDL/1.0/CPP/ComplexUnion1Objects.h>
+#else
+#error The objects header <complextestsdl/SDL/1.0/CPP/ComplexUnion1Objects.h> is not found. The schema, that defines the imported types, is probably generated without objects (NO_OBJECTS). Generate the objects for it or disable them for this schema.
+#endif
+#if __has_include(<imtbasesdl/SDL/1.0/CPP/ImtBaseTypesObjects.h>)
 #include <imtbasesdl/SDL/1.0/CPP/ImtBaseTypesObjects.h>
+#else
+#error The objects header <imtbasesdl/SDL/1.0/CPP/ImtBaseTypesObjects.h> is not found. The schema, that defines the imported types, is probably generated without objects (NO_OBJECTS). Generate the objects for it or disable them for this schema.
+#endif
+#if __has_include(<imtbasesdl/SDL/1.0/CPP/ComplexCollectionFilterObjects.h>)
 #include <imtbasesdl/SDL/1.0/CPP/ComplexCollectionFilterObjects.h>
+#else
+#error The objects header <imtbasesdl/SDL/1.0/CPP/ComplexCollectionFilterObjects.h> is not found. The schema, that defines the imported types, is probably generated without objects (NO_OBJECTS). Generate the objects for it or disable them for this schema.
+#endif
 
 
 namespace sdl::V1_0::complextest

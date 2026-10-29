@@ -12,7 +12,11 @@
 #include <imtsdl/TListModelBase.h>
 
 // custom types includes
+#if __has_include(<modsdlsdl/SDL/1.0/CPP/PrinterBaseObjects.h>)
 #include <modsdlsdl/SDL/1.0/CPP/PrinterBaseObjects.h>
+#else
+#error The objects header <modsdlsdl/SDL/1.0/CPP/PrinterBaseObjects.h> is not found. The schema, that defines the imported types, is probably generated without objects (NO_OBJECTS). Generate the objects for it or disable them for this schema.
+#endif
 
 
 namespace sdl::V1_0::modsdl

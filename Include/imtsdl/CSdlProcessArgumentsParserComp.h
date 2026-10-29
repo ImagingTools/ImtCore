@@ -85,6 +85,7 @@ public:
 	virtual void SetTemplateOutputPath(const QString& templateOutputPath) override;
 	virtual void SetTypenameWriteMode(TypenameWriteMode mode) override;
 	virtual void SetObjectsGenerationEnabled(bool enabled = true) override;
+	virtual void SetCppGenerationMode(CppGenerationMode mode) override;
 	virtual void SetMocIncludeEnabled(bool enabled = true) override;
 
 

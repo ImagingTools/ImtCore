@@ -1006,9 +1006,8 @@ QMap<QString, QString> CSdlTools::CalculateTargetCppFilesFromSchemaParams(const 
 	retVal.insert(ISdlProcessArgumentsParser::s_headerFileType, QDir::cleanPath(GetFileSystemAcceptableEntryPath(baseFilePath + QStringLiteral(".h"))));
 	retVal.insert(ISdlProcessArgumentsParser::s_sourceFileType, QDir::cleanPath(GetFileSystemAcceptableEntryPath(baseFilePath + QStringLiteral(".cpp"))));
 	retVal.insert(ISdlProcessArgumentsParser::s_fwdHeaderFileType, QDir::cleanPath(GetFileSystemAcceptableEntryPath(baseFilePath + QStringLiteral("_fwd.h"))));
-	/// \todo add '_Objects' suffix for disambiguation
-	retVal.insert(ISdlProcessArgumentsParser::s_objectHeaderFileType, QDir::cleanPath(GetFileSystemAcceptableEntryPath(baseFilePath + QStringLiteral("Objects.h"))));
-	retVal.insert(ISdlProcessArgumentsParser::s_objectSourceFileType, QDir::cleanPath(GetFileSystemAcceptableEntryPath(baseFilePath + QStringLiteral("Objects.cpp"))));
+	retVal.insert(ISdlProcessArgumentsParser::s_objectHeaderFileType, QDir::cleanPath(GetFileSystemAcceptableEntryPath(baseFilePath + ISdlProcessArgumentsParser::s_objectsFileSuffix + QStringLiteral(".h"))));
+	retVal.insert(ISdlProcessArgumentsParser::s_objectSourceFileType, QDir::cleanPath(GetFileSystemAcceptableEntryPath(baseFilePath + ISdlProcessArgumentsParser::s_objectsFileSuffix + QStringLiteral(".cpp"))));
 
 	return retVal;
 }
@@ -1054,13 +1053,13 @@ bool CSdlTools::UpdateTypeInfo(CSdlEntryBase& sdlEntry, const iprm::IParamsSet* 
 	const QString defaultName = QFileInfo(argumentParserPtr->GetSchemaFilePath()).fileName();
 	QMap<QString, QString> joinRules = CalculateTargetCppFilesFromSchemaParams(*schemaParamsPtr, argumentParserPtr->GetOutputDirectoryPath(), defaultName);
 
-	if (argumentParserPtr != nullptr && !argumentParserPtr->IsObjectsGenerationEnabled()){
-		if(joinRules.contains(ISdlProcessArgumentsParser::s_headerFileType)){
-			sdlEntry.SetTargetHeaderFilePath(QDir::cleanPath(joinRules[ISdlProcessArgumentsParser::s_headerFileType]));
-		}
-		if(joinRules.contains(ISdlProcessArgumentsParser::s_objectHeaderFileType)){
-			sdlEntry.SetObjectTargetHeaderFilePath(QDir::cleanPath(joinRules[ISdlProcessArgumentsParser::s_objectHeaderFileType]));
-		}
+	if (joinRules.contains(ISdlProcessArgumentsParser::s_headerFileType)){
+		sdlEntry.SetTargetHeaderFilePath(QDir::cleanPath(joinRules[ISdlProcessArgumentsParser::s_headerFileType]));
+	}
+
+	// the objects header exists only if the objects are generated
+	if (argumentParserPtr->IsObjectsGenerationEnabled() && joinRules.contains(ISdlProcessArgumentsParser::s_objectHeaderFileType)){
+		sdlEntry.SetObjectTargetHeaderFilePath(QDir::cleanPath(joinRules[ISdlProcessArgumentsParser::s_objectHeaderFileType]));
 	}
 
 	return true;
@@ -1114,9 +1113,8 @@ QMap<QString, QString> CSdlTools::CalculateTargetCppFilesFromSchemaParams(const 
 	retVal.insert(ISdlProcessArgumentsParser::s_fwdHeaderFileType, QDir::cleanPath(GetFileSystemAcceptableEntryPath(baseFilePath + QStringLiteral("_fwd.h"))));
 	retVal.insert(ISdlProcessArgumentsParser::s_sourceFileType, QDir::cleanPath(GetFileSystemAcceptableEntryPath(baseFilePath + QStringLiteral(".cpp"))));
 	if (argumentParser.IsObjectsGenerationEnabled()) {
-		/// \todo add '_Objects' suffix for disambiguation
-		retVal.insert(ISdlProcessArgumentsParser::s_objectHeaderFileType, QDir::cleanPath(GetFileSystemAcceptableEntryPath(baseFilePath + QStringLiteral("Objects.h"))));
-		retVal.insert(ISdlProcessArgumentsParser::s_objectSourceFileType, QDir::cleanPath(GetFileSystemAcceptableEntryPath(baseFilePath + QStringLiteral("Objects.cpp"))));
+		retVal.insert(ISdlProcessArgumentsParser::s_objectHeaderFileType, QDir::cleanPath(GetFileSystemAcceptableEntryPath(baseFilePath + ISdlProcessArgumentsParser::s_objectsFileSuffix + QStringLiteral(".h"))));
+		retVal.insert(ISdlProcessArgumentsParser::s_objectSourceFileType, QDir::cleanPath(GetFileSystemAcceptableEntryPath(baseFilePath + ISdlProcessArgumentsParser::s_objectsFileSuffix + QStringLiteral(".cpp"))));
 	}
 
 	return retVal;

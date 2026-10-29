@@ -1,6 +1,10 @@
 include (${CMAKE_CURRENT_LIST_DIR}/ImtSdlConfig.cmake)
 set(IMT_CONFIG_CMAKE_PATH "${CMAKE_CURRENT_LIST_DIR}/..")
 
+##< The suffix of the '<Schema>Objects' files (QObject based classes and QML types registration).
+##< WARNING it MUST be equal to \c ISdlProcessArgumentsParser::s_objectsFileSuffix
+set(IMT_SDL_OBJECTS_SUFFIX "Objects")
+
 
 ## DEPRECATED
 ## TODO remove it
@@ -91,7 +95,7 @@ macro(ImtCoreGetStaticCppDeps)
 	list(APPEND SDL_DEPS_VAR "${ARG_OUT_DIR}/${PROJECT_NAME}/SDL/${ARG_VERSION}/CPP/${SDL_SCHEMA_NAME}_fwd.h")
 	list(APPEND SDL_DEPS_VAR "${ARG_OUT_DIR}/${PROJECT_NAME}/SDL/${ARG_VERSION}/CPP/${SDL_SCHEMA_NAME}.cpp")
 	if (NOT ARG_NO_OBJECTS)
-		list(APPEND SDL_DEPS_VAR "${ARG_OUT_DIR}/${PROJECT_NAME}/SDL/${ARG_VERSION}/CPP/${SDL_SCHEMA_NAME}Objects.h")
+		list(APPEND SDL_DEPS_VAR "${ARG_OUT_DIR}/${PROJECT_NAME}/SDL/${ARG_VERSION}/CPP/${SDL_SCHEMA_NAME}${IMT_SDL_OBJECTS_SUFFIX}.h")
 	endif()
 
 	set(${ARG_RESULT_VARIABLE} ${SDL_DEPS_VAR})
@@ -222,6 +226,16 @@ macro (ImtCoreCustomConfigureSdlCpp)
 
 	set(${ARG_FOUND_DEPS} "${FOUND_DEPS}")
 
+	# Different schemas MUST NOT generate the same file, for example schemas 'Foo' and 'FooObjects':
+	# 'FooObjects.h' is the objects header of the 'Foo' schema and the main header of the 'FooObjects' one
+	get_property(SDL_REGISTERED_OUTPUTS GLOBAL PROPERTY IMT_SDL_GENERATED_OUTPUTS)
+	foreach(SDL_OUTPUT ${FOUND_DEPS})
+		if ("${SDL_OUTPUT}" IN_LIST SDL_REGISTERED_OUTPUTS)
+			message(FATAL_ERROR "SDL output file collision: '${SDL_OUTPUT}' is already generated from another schema, but '${ARG_SCHEMA_PATH}' (${PROJECT_NAME}) produces it too. Rename the schema.")
+		endif()
+		set_property(GLOBAL APPEND PROPERTY IMT_SDL_GENERATED_OUTPUTS "${SDL_OUTPUT}")
+	endforeach()
+
 	message(VERBOSE "CPP: FOUND for ${PROJECT_NAME} DEPS: ${FOUND_DEPS}")
 
 	GetSdlGeneratorPath(SDL_GENERATOR_EXE_PATH)
@@ -351,14 +365,24 @@ macro (ImtCoreCustomConfigureSdlCppQml)
 
 	set(booleanArgs
 		CXX
-		QML)
+		QML
+		NO_OBJECTS)
 	cmake_parse_arguments(ARG "${booleanArgs}" "${oneValueArgs}" "" ${ARGN})
 
+	# NOTE the QML part is generated independently of the C++ one: it contains its own QML types (the '.qml' files),
+	# so NO_OBJECTS (the C++ QObject classes, that are only needed to use the SDL types through the C++ models) is acceptable with QML
+
 	if (ARG_CXX)
+		set(SDL_CXX_EXTRA_ARGS)
+		if (ARG_NO_OBJECTS)
+			list(APPEND SDL_CXX_EXTRA_ARGS NO_OBJECTS)
+		endif()
+
 		ImtCoreCustomConfigureSdlCpp(
 			SCHEMA_PATH "${ARG_SCHEMA_PATH}"
 			VERSION "${ARG_VERSION}"
-			CUSTOM_OUTPUT_ROOT_DIR_PATH "${ARG_CUSTOM_OUTPUT_ROOT_DIR_PATH}")
+			CUSTOM_OUTPUT_ROOT_DIR_PATH "${ARG_CUSTOM_OUTPUT_ROOT_DIR_PATH}"
+			${SDL_CXX_EXTRA_ARGS})
 	endif()
 
 	if (ARG_QML)

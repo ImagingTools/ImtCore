@@ -34,6 +34,12 @@ private Q_SLOTS:
 	void TestObjectsMocInclude();
 	void TestNoObjectsMocInclude();
 	void TestNoObjectsWithoutTemplate();
+	void TestTargetHeaderPathsOfLocalTypes();
+	void TestImportedObjectsIncludeIsGuarded();
+	void TestImportedObjectsGuardReportsMissingHeader();
+	void TestNoObjectsSchemaImportsSchema();
+	void TestIntermediateFileIsRemovedAfterFailure();
+	void TestDepFileDoesNotContainIntermediateFile();
 
 	void cleanup();
 	void cleanupTestCase();

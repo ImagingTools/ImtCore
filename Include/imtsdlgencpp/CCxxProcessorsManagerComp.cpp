@@ -5,9 +5,11 @@
 #include <iostream>
 
 // Qt includes
+#include <QtCore/QDir>
 #include <QtCore/QTemporaryDir>
 #include <QtCore/QLockFile>
 #include <QtCore/QFileInfo>
+#include <QtCore/QScopeGuard>
 
 // ACF includes
 #include <istd/CSystem.h>
@@ -78,6 +80,9 @@ iproc::IProcessor::TaskState CCxxProcessorsManagerComp::DoProcessing(
 
 	if (m_argumentParserCompPtr->IsDependenciesMode() || !m_argumentParserCompPtr->GetDepFilePath().isEmpty()){
 		auto files = CalculateTargetCppFilesFromSchemaParams(*m_schemaParamsCompPtr, *m_argumentParserCompPtr);
+
+		// the objects source file is an intermediate one, it is joined with the main source file and removed, so it is not an output
+		files.remove(imtsdl::ISdlProcessArgumentsParser::s_objectSourceFileType);
 		QStringList cumulatedFiles = files.values();
 
 		PrintFiles(std::cout, cumulatedFiles, m_argumentParserCompPtr->GetGeneratorType());
@@ -95,6 +100,14 @@ iproc::IProcessor::TaskState CCxxProcessorsManagerComp::DoProcessing(
 
 		return TS_INVALID;
 	}
+
+	// the objects source file is an intermediate one: it is joined with the main source file by the post processors
+	// and nobody uses it anymore. Remove it on any result, to not leave it in the output directory after a failure
+	const auto removeIntermediateFile = qScopeGuard([&](){
+		if (createdFiles.objectSourceFile && !createdFiles.objectSourceFile->remove()){
+			SendWarningMessage(0, QStringLiteral("Unable to remove the intermediate file '%1'. Error: %2").arg(createdFiles.objectSourceFile->fileName(), createdFiles.objectSourceFile->errorString()));
+		}
+	});
 
 	if (createdFiles.headerFile){
 		if (!BeginHeaderFile(*m_schemaParamsCompPtr, *createdFiles.headerFile, paramsPtr)){
@@ -254,11 +267,6 @@ iproc::IProcessor::TaskState CCxxProcessorsManagerComp::DoProcessing(
 		}
 	}
 
-	// the objects source file is already joined with the main one, so nobody uses it anymore
-	if (createdFiles.objectSourceFile && !createdFiles.objectSourceFile->remove()){
-		SendWarningMessage(0, QStringLiteral("Unable to remove the intermediate file '%1'. Error: %2").arg(createdFiles.objectSourceFile->fileName(), createdFiles.objectSourceFile->errorString()));
-	}
-
 	return TS_OK;
 }
 
@@ -279,7 +287,7 @@ bool CCxxProcessorsManagerComp::BeginHeaderFile(
 	if (isObjectsFile){
 		// the objects file extends the main one
 		stream << QStringLiteral("#include \"");
-		stream << QFileInfo(headerFile).baseName().chopped(QStringLiteral("Objects").length());
+		stream << QFileInfo(headerFile).baseName().chopped(imtsdl::ISdlProcessArgumentsParser::s_objectsFileSuffix.length());
 		stream << QStringLiteral(".h\"");
 		FeedStream(stream, 2, false);
 
@@ -295,6 +303,9 @@ bool CCxxProcessorsManagerComp::BeginHeaderFile(
 		QList<imtsdl::IncludeDirective> objectsDirectivesList;
 		objectsDirectivesList << imtsdl::CSdlTools::CreateImtDirective("<imtbase/CItemModelBase.h>");
 		objectsDirectivesList << imtsdl::CSdlTools::CreateImtDirective("<imtsdl/TListModelBase.h>");
+
+		// all directives after these are the objects headers of the imported schemas
+		const int importedObjectsBegin = objectsDirectivesList.size();
 		if (m_sdlUnionListCompPtr.IsValid()){
 			imtsdl::SdlUnionList list = m_sdlUnionListCompPtr->GetUnions(false);
 			if (!CreateDirectivesFromEntryList(list, objectsDirectivesList, true)){
@@ -313,14 +324,34 @@ bool CCxxProcessorsManagerComp::BeginHeaderFile(
 		}
 
 		QString lastRemark;
-		for (const imtsdl::IncludeDirective& directive: objectsDirectivesList){
+		for (int i = 0; i < objectsDirectivesList.size(); ++i){
+			const imtsdl::IncludeDirective& directive = objectsDirectivesList[i];
 			if (directive.remark != lastRemark){
 				FeedStream(stream, 1, false);
 				stream << (directive.remark.startsWith(QStringLiteral("//")) ? QString() : QStringLiteral("// ")) << directive.remark;
 				FeedStream(stream, 1, false);
 				lastRemark = directive.remark;
 			}
+
+			if (i < importedObjectsBegin){
+				stream << QStringLiteral("#include ") << directive.path;
+				FeedStream(stream, 1, false);
+
+				continue;
+			}
+
+			// The imported schema may be generated without the objects (see '--no-objects'), and it is unknown here (it may be
+			// a schema of another project). So the check is done by the compiler, with the clear message instead of 'file not found'.
+			stream << QStringLiteral("#if __has_include(") << directive.path << ')';
+			FeedStream(stream, 1, false);
 			stream << QStringLiteral("#include ") << directive.path;
+			FeedStream(stream, 1, false);
+			stream << QStringLiteral("#else");
+			FeedStream(stream, 1, false);
+			stream << QStringLiteral("#error The objects header ") << directive.path;
+			stream << QStringLiteral(" is not found. The schema, that defines the imported types, is probably generated without objects (NO_OBJECTS). Generate the objects for it or disable them for this schema.");
+			FeedStream(stream, 1, false);
+			stream << QStringLiteral("#endif");
 			FeedStream(stream, 1, false);
 		}
 		FeedStream(stream, 2, false);

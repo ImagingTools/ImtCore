@@ -38,6 +38,10 @@ private Q_SLOTS:
 	void TestRequestedFieldsOfMutation();
 	void TestRequestedFieldsWithFieldNamedAsCommand();
 	void TestRequestedFieldsOfBuiltRequest();
+	void TestNoObjectsFilesAreNotGenerated();
+	void TestNoObjectsEnumMetaObject();
+	void TestNoObjectsJsonRoundTrip();
+	void TestNoObjectsImportedSchemaJsonRoundTrip();
 
 private:
 	QTemporaryDir m_arraySerializationOutputDirectory;

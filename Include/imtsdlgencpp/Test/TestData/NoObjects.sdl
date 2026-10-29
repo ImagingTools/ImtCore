@@ -1,0 +1,21 @@
+schema {
+	namespace: sdlgentestnoobjects
+	version: 1.0
+}
+
+
+enum Priority
+{
+	Low
+	Normal
+	High
+}
+
+
+type Task
+{
+	id: String!
+	priority: Priority!
+	tags: [String!]
+	estimate: Int
+}

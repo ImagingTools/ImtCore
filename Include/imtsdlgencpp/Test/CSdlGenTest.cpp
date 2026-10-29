@@ -6,7 +6,11 @@
 #include <QtTest/QTest>
 #include <QtCore/QBuffer>
 #include <QtCore/QDirIterator>
+#include <QtCore/QProcess>
+#include <QtCore/QStandardPaths>
+#include <QtCore/QTemporaryDir>
 #include <QtCore/QFile>
+#include <QtCore/QFileInfo>
 
 // ACF includes
 #include <istd/CSystem.h>
@@ -19,6 +23,8 @@
 #include <GeneratedFiles/ImtSdlGenTest/CImtSdlGenTest.h>
 #include <imtbase/CTreeItemModel.h>
 #include <imtsdl/CGqlSchemaParser.h>
+#include <imtsdl/ISdlTypeListProvider.h>
+#include <imtsdl/CSdlType.h>
 
 
 namespace imtsdlgentest
@@ -120,6 +126,30 @@ static QByteArray ReadFileContent(const QString& filePath)
 	}
 
 	return file.readAll();
+}
+
+
+/**
+	Parses the schema and runs the code generation.
+	Unlike \c ExecuteTest, it doesn't require the successful result of the generation, so it can be used to check the errors.
+*/
+static iproc::IProcessor::TaskState GenerateSchema(CImtSdlGenTest& testSuite, const QString& schemaFileName)
+{
+	auto* argParserPtr = testSuite.GetInterface<imtsdl::ISdlEditableProcessArgumentsParser>();
+	Q_ASSERT(argParserPtr != nullptr);
+
+	argParserPtr->SetSchemaFilePath(s_testDataDirectoryPath + '/' + schemaFileName);
+
+	auto* parserPtr = testSuite.GetInterface<iproc::IProcessor>("GqlSchemaParser");
+	Q_ASSERT(parserPtr != nullptr);
+	if (parserPtr->DoProcessing(nullptr, nullptr, nullptr, nullptr, nullptr) != iproc::IProcessor::TS_OK){
+		return iproc::IProcessor::TS_INVALID;
+	}
+
+	auto* generatorPtr = testSuite.GetInterface<iproc::IProcessor>("CppCodeGeneratorFramework");
+	Q_ASSERT(generatorPtr != nullptr);
+
+	return generatorPtr->DoProcessing(nullptr, nullptr, nullptr, nullptr, nullptr);
 }
 
 
@@ -447,6 +477,11 @@ void CSdlGenTest::TestObjectsMocInclude()
 	const QByteArray source = ReadFileContent(sourceFiles.first());
 	QVERIFY(source.contains("#include \"moc_ArraySerialization.cpp\""));
 	QVERIFY(source.contains("#include \"moc_ArraySerializationObjects.cpp\""));
+
+	// the objects header extends the main one, its name is the main header name with the objects suffix
+	const QStringList objectHeaders = FindFiles(outputDir.absolutePath(), "ArraySerializationObjects.h");
+	QCOMPARE(objectHeaders.size(), 1);
+	QVERIFY(ReadFileContent(objectHeaders.first()).contains("#include \"ArraySerialization.h\""));
 }
 
 
@@ -498,6 +533,247 @@ void CSdlGenTest::TestNoObjectsWithoutTemplate()
 	QCOMPARE(FindFiles(outputDir.absolutePath(), "ArraySerialization.h").size(), 1);
 	QCOMPARE(FindFiles(outputDir.absolutePath(), "ArraySerialization.cpp").size(), 1);
 	QCOMPARE(FindFiles(outputDir.absolutePath(), "*Objects*").size(), 0);
+}
+
+
+void CSdlGenTest::TestTargetHeaderPathsOfLocalTypes()
+{
+	struct Paths
+	{
+		QString header;
+		QString objectHeader;
+	};
+
+	const auto getPaths = [this](bool isObjectsEnabled, const QString& subDirName) -> Paths {
+		CImtSdlGenTest testSuite;
+		PrepareSuite(testSuite, QDir(m_tempOutputDir.absoluteFilePath(subDirName)));
+
+		auto argParserPtr = testSuite.GetInterface<imtsdl::ISdlEditableProcessArgumentsParser>();
+		argParserPtr->SetCppEnabled();
+		argParserPtr->SetGqlEnabled();
+		argParserPtr->SetQmlEnabled(false);
+		argParserPtr->SetObjectsGenerationEnabled(isObjectsEnabled);
+		argParserPtr->SetSchemaFilePath(s_testDataDirectoryPath + "/ArraySerialization.sdl");
+
+		auto* parserPtr = testSuite.GetInterface<iproc::IProcessor>("GqlSchemaParser");
+		if (parserPtr == nullptr || parserPtr->DoProcessing(nullptr, nullptr, nullptr, nullptr, nullptr) != iproc::IProcessor::TS_OK){
+			return Paths();
+		}
+
+		auto* typeListPtr = testSuite.GetInterface<imtsdl::ISdlTypeListProvider>();
+		if (typeListPtr == nullptr){
+			return Paths();
+		}
+
+		for (const imtsdl::CSdlType& sdlType: typeListPtr->GetSdlTypes(true)){
+			if (sdlType.GetName() == QStringLiteral("Attribute")){
+				return Paths{sdlType.GetTargetHeaderFilePath(), sdlType.GetObjectTargetHeaderFilePath()};
+			}
+		}
+
+		return Paths();
+	};
+
+	const Paths withObjects = getPaths(true, "TargetPathsWithObjects");
+	const Paths withoutObjects = getPaths(false, "TargetPathsWithoutObjects");
+
+	// the main header path of a local type is the same, regardless of the objects
+	QVERIFY(!withObjects.header.isEmpty());
+	QVERIFY(QDir::isAbsolutePath(withObjects.header));
+	QVERIFY(withObjects.header.endsWith(".h"));
+	QVERIFY(!withObjects.header.endsWith("Objects.h"));
+	QVERIFY(withObjects.header.contains(QStringLiteral("TargetPathsWithObjects")));
+	QVERIFY(withoutObjects.header.contains(QStringLiteral("TargetPathsWithoutObjects")));
+	QCOMPARE(QFileInfo(withObjects.header).fileName(), QFileInfo(withoutObjects.header).fileName());
+	QCOMPARE(QFileInfo(withObjects.header).dir().relativeFilePath(withObjects.header), QFileInfo(withoutObjects.header).dir().relativeFilePath(withoutObjects.header));
+
+	// the objects header exists only if the objects are generated
+	QVERIFY(withObjects.objectHeader.endsWith(QStringLiteral("Objects.h")));
+	QVERIFY(QDir::isAbsolutePath(withObjects.objectHeader));
+	QVERIFY(withoutObjects.objectHeader.isEmpty());
+}
+
+
+void CSdlGenTest::TestImportedObjectsIncludeIsGuarded()
+{
+	const QDir outputDir(m_tempOutputDir.absoluteFilePath("ImportedObjectsGuard"));
+
+	CImtSdlGenTest testSuite;
+	PrepareSuite(testSuite, outputDir);
+
+	auto argParserPtr = testSuite.GetInterface<imtsdl::ISdlEditableProcessArgumentsParser>();
+	argParserPtr->SetCppEnabled();
+	argParserPtr->SetGqlEnabled();
+	argParserPtr->SetQmlEnabled(false);
+	argParserPtr->SetObjectsGenerationEnabled(true);
+
+	ExecuteTest(testSuite, "ImportedEnumArray.sdl");
+
+	const QStringList objectHeaders = FindFiles(outputDir.absolutePath(), "ImportedEnumArrayObjects.h");
+	QCOMPARE(objectHeaders.size(), 1);
+	const QByteArray content = ReadFileContent(objectHeaders.first());
+
+	// the imported schema may be generated without the objects, it is checked by the compiler
+	const QByteArray importedHeader = "<externalenumsdl/SDL/1.0/CPP/ImportedEnumObjects.h>";
+	QVERIFY(content.contains("#if __has_include(" + importedHeader + ")\n#include " + importedHeader + "\n#else\n#error The objects header " + importedHeader));
+	QVERIFY(content.contains("NO_OBJECTS"));
+
+	// the includes of the own libraries are always required
+	QVERIFY(content.contains("#include <imtbase/CItemModelBase.h>"));
+	QVERIFY(!content.contains("#if __has_include(<imtbase/"));
+}
+
+
+void CSdlGenTest::TestImportedObjectsGuardReportsMissingHeader()
+{
+	const QString compilerPath = []() -> QString {
+		for (const QString& name: {QStringLiteral("c++"), QStringLiteral("clang++"), QStringLiteral("g++")}){
+			const QString path = QStandardPaths::findExecutable(name);
+			if (!path.isEmpty()){
+				return path;
+			}
+		}
+
+		return QString();
+	}();
+	if (compilerPath.isEmpty()){
+		QSKIP("A C++ compiler is not found");
+	}
+
+	// the generated guard, checked by the preprocessor of the compiler
+	const QDir outputDir(m_tempOutputDir.absoluteFilePath("ImportedObjectsGuardCompiler"));
+
+	CImtSdlGenTest testSuite;
+	PrepareSuite(testSuite, outputDir);
+
+	auto argParserPtr = testSuite.GetInterface<imtsdl::ISdlEditableProcessArgumentsParser>();
+	argParserPtr->SetCppEnabled();
+	argParserPtr->SetGqlEnabled();
+	argParserPtr->SetQmlEnabled(false);
+	argParserPtr->SetObjectsGenerationEnabled(true);
+
+	ExecuteTest(testSuite, "ImportedEnumArray.sdl");
+
+	const QStringList objectHeaders = FindFiles(outputDir.absolutePath(), "ImportedEnumArrayObjects.h");
+	QCOMPARE(objectHeaders.size(), 1);
+	const QByteArray content = ReadFileContent(objectHeaders.first());
+	const int guardBegin = content.indexOf("#if __has_include(");
+	const int guardEnd = content.indexOf("#endif", guardBegin);
+	QVERIFY(guardBegin >= 0 && guardEnd > guardBegin);
+
+	QTemporaryDir workDir;
+	QVERIFY(workDir.isValid());
+	QFile snippet(workDir.filePath("guard.cpp"));
+	QVERIFY(snippet.open(QIODevice::WriteOnly));
+	snippet.write(content.mid(guardBegin, guardEnd + 6 - guardBegin));
+	snippet.close();
+
+	const auto preprocess = [&](const QString& includeDirPath, QString& errorOutput) -> bool {
+		QProcess process;
+		process.start(compilerPath, {QStringLiteral("-E"), QStringLiteral("-x"), QStringLiteral("c++"), QStringLiteral("-I"), includeDirPath, snippet.fileName()});
+		if (!process.waitForFinished(60000)){
+			return false;
+		}
+		errorOutput = QString::fromLocal8Bit(process.readAllStandardError());
+
+		return process.exitStatus() == QProcess::NormalExit && process.exitCode() == 0;
+	};
+
+	// there is no objects header (the imported schema is generated without objects): the clear error
+	QTemporaryDir emptyIncludeDir;
+	QVERIFY(emptyIncludeDir.isValid());
+	QString errorOutput;
+	QVERIFY(!preprocess(emptyIncludeDir.path(), errorOutput));
+	QVERIFY2(errorOutput.contains("NO_OBJECTS"), qPrintable(errorOutput));
+	QVERIFY2(errorOutput.contains("ImportedEnumObjects.h"), qPrintable(errorOutput));
+
+	// the objects header exists: the guard is passed
+	QTemporaryDir includeDir;
+	QVERIFY(includeDir.isValid());
+	QVERIFY(QDir().mkpath(includeDir.filePath("externalenumsdl/SDL/1.0/CPP")));
+	QFile header(includeDir.filePath("externalenumsdl/SDL/1.0/CPP/ImportedEnumObjects.h"));
+	QVERIFY(header.open(QIODevice::WriteOnly));
+	header.close();
+	QVERIFY2(preprocess(includeDir.path(), errorOutput), qPrintable(errorOutput));
+}
+
+
+void CSdlGenTest::TestNoObjectsSchemaImportsSchema()
+{
+	// the schema without the objects imports another schema: no objects header is required
+	const QDir outputDir(m_tempOutputDir.absoluteFilePath("NoObjectsImportsSchema"));
+
+	CImtSdlGenTest testSuite;
+	PrepareSuite(testSuite, outputDir);
+
+	auto argParserPtr = testSuite.GetInterface<imtsdl::ISdlEditableProcessArgumentsParser>();
+	argParserPtr->SetCppEnabled();
+	argParserPtr->SetGqlEnabled();
+	argParserPtr->SetQmlEnabled(false);
+	argParserPtr->SetObjectsGenerationEnabled(false);
+
+	QCOMPARE(GenerateSchema(testSuite, "ImportedEnumArray.sdl"), iproc::IProcessor::TS_OK);
+	QCOMPARE(FindFiles(outputDir.absolutePath(), "*Objects*").size(), 0);
+	QCOMPARE(FindFiles(outputDir.absolutePath(), "ImportedEnumArray.cpp").size(), 1);
+
+	// the main header of the imported schema is still required
+	const QStringList headers = FindFiles(outputDir.absolutePath(), "ImportedEnumArray.h");
+	QCOMPARE(headers.size(), 1);
+	QVERIFY(ReadFileContent(headers.first()).contains("ImportedEnum.h"));
+}
+
+
+void CSdlGenTest::TestIntermediateFileIsRemovedAfterFailure()
+{
+	// The implementation-only mode is a failing one (the objects header is created in the header mode),
+	// the intermediate file is already created at this moment. In any case it must not stay in the output directory
+	const QDir outputDir(m_tempOutputDir.absoluteFilePath("IntermediateFileAfterFailure"));
+
+	CImtSdlGenTest testSuite;
+	PrepareSuite(testSuite, outputDir);
+
+	auto argParserPtr = testSuite.GetInterface<imtsdl::ISdlEditableProcessArgumentsParser>();
+	argParserPtr->SetCppEnabled();
+	argParserPtr->SetGqlEnabled();
+	argParserPtr->SetQmlEnabled(false);
+	argParserPtr->SetObjectsGenerationEnabled(true);
+	argParserPtr->SetCppGenerationMode(imtsdl::ISdlProcessArgumentsParser::CGM_IMPLEMENTATION_ONLY);
+
+	[[maybe_unused]] const iproc::IProcessor::TaskState result = GenerateSchema(testSuite, "ArraySerialization.sdl");
+
+	QCOMPARE(FindFiles(outputDir.absolutePath(), "*Objects.cpp*").size(), 0);
+}
+
+
+void CSdlGenTest::TestDepFileDoesNotContainIntermediateFile()
+{
+	const QDir outputDir(m_tempOutputDir.absoluteFilePath("DepFileOutputs"));
+
+	CImtSdlGenTest testSuite;
+	PrepareSuite(testSuite, outputDir);
+
+	const QString depFilePath = outputDir.absoluteFilePath("schema.depfile");
+
+	auto argParserPtr = testSuite.GetInterface<imtsdl::ISdlEditableProcessArgumentsParser>();
+	argParserPtr->SetCppEnabled();
+	argParserPtr->SetGqlEnabled();
+	argParserPtr->SetQmlEnabled(false);
+	argParserPtr->SetObjectsGenerationEnabled(true);
+	argParserPtr->SetDepFilePath(depFilePath);
+
+	ExecuteTest(testSuite, "ArraySerialization.sdl");
+
+	const QByteArray depFile = ReadFileContent(depFilePath);
+	QVERIFY(!depFile.isEmpty());
+
+	// the outputs
+	QVERIFY(depFile.contains("ArraySerialization.cpp"));
+	QVERIFY(depFile.contains("ArraySerialization.h"));
+	QVERIFY(depFile.contains("ArraySerialization_fwd.h"));
+	QVERIFY(depFile.contains("ArraySerializationObjects.h"));
+
+	// the intermediate file is removed after the processing, so it is not an output
+	QVERIFY(!depFile.contains("ArraySerializationObjects.cpp"));
 }
 
 

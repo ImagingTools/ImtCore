@@ -704,6 +704,12 @@ void CSdlProcessArgumentsParserComp::SetObjectsGenerationEnabled(bool enabled)
 }
 
 
+void CSdlProcessArgumentsParserComp::SetCppGenerationMode(CppGenerationMode mode)
+{
+	m_cppGenerationMode = mode;
+}
+
+
 void CSdlProcessArgumentsParserComp::SetMocIncludeEnabled(bool enabled)
 {
 	m_isMocIncludeEnabled = enabled;
