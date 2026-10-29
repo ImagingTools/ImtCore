@@ -98,7 +98,7 @@ void CDocumentServiceIntegrationTest::GetOpenedDocumentListAfterCreateTest()
 	QCOMPARE(list[0].typeId, TEST_TYPE_ID);
 	QVERIFY2(list[0].isDirty, "New document should be dirty");
 	QVERIFY2(!list[0].isLoading, "Document should be loaded");
-	QVERIFY2(list[0].url.isEmpty(), "New document should not have a URL");
+	QVERIFY2(list[0].documentSourceRef.isEmpty(), "New document should not have a source reference");
 }
 
 
@@ -1030,7 +1030,7 @@ void CDocumentServiceIntegrationTest::SaveDocumentNotSupportedTest()
 
 	imtdoc::IDocumentService::DocumentListItem info = FindDocumentInfo(*m_servicePtr, TEST_USER_ID, docId);
 	QVERIFY2(info.isDirty, "Document should stay dirty");
-	QVERIFY(info.url.isEmpty());
+	QVERIFY(info.documentSourceRef.isEmpty());
 }
 
 

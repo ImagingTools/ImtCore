@@ -9,6 +9,9 @@
 // ACF includes
 #include <idoc/IUndoManager.h>
 
+// ImtCore includes
+#include <imtdoc/imtdoc.h>
+
 
 namespace imtqml
 {
@@ -132,7 +135,7 @@ void CDocumentServiceBridge::GetOpenedDocumentList(
 		info.documentId = QString::fromUtf8(item.documentId);
 		info.typeId = QString::fromUtf8(item.typeId);
 		info.name = item.name;
-		info.objectId = item.url.path().mid(1); // strip leading '/'
+		info.objectId = imtdoc::SourceRefToObjectId(item.documentSourceRef);
 		info.hasNameProvider = item.hasNameProvider;
 		result.append(info);
 	}

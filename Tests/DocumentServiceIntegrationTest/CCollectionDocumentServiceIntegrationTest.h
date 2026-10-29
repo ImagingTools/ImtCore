@@ -86,8 +86,8 @@ private slots:
 	void UndoAfterSaveMakesDocumentDirtyTest();
 
 	// Document URL tests
-	void OpenedDocumentUrlTest();
-	void SavedDocumentUrlTest();
+	void OpenedDocumentSourceRefTest();
+	void SavedDocumentSourceRefTest();
 
 	// Async document loading completion tests
 	void OpenDocumentAsyncCompletionTest();

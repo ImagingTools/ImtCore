@@ -101,7 +101,6 @@ public:
 	virtual void DoSaveDocument(const QByteArray& taskId, const TaskParams& params) override;
 	virtual void DoCloseDocument(const QByteArray& taskId, const TaskParams& params) override;
 
-	virtual QUrl GetDocumentUrl(const WorkingDocument& document) const override;
 	virtual iprm::IParamsSetUniquePtr CreateDocumentSourceParams(const WorkingDocument& document) const override;
 
 	// reimplemented (imtdoc::IDocumentService)
@@ -132,6 +131,12 @@ protected:
 		\note \c m_mutex must be locked by the caller.
 	*/
 	UserDocumentPairList FindDocumentsBySourceRef(const QByteArray& documentSourceRef) const;
+
+	/**
+		Converts the document source reference to the document URL \c collection:///<objectId>[/<revision>].
+		Returns an empty URL for an empty reference.
+	*/
+	QUrl GetDocumentUrl(const WorkingDocument& document) const;
 
 	/**
 		Converts the document URL \c collection:///<objectId>[/<revision>] to the document source reference.
@@ -668,7 +673,7 @@ TCollectionDocumentServiceWrap<Base>::GetOpenedDocumentList(const QByteArray& us
 	DocumentList documentList = Base::GetOpenedDocumentList(userId);
 
 	for (DocumentListItem& item : documentList){
-		const int revision = imtdoc::SourceRefToRevision(GetSourceRefFromUrl(item.url));
+		const int revision = imtdoc::SourceRefToRevision(item.documentSourceRef);
 		if (revision >= 0){
 			item.name += QStringLiteral(" (Rev #%1)").arg(revision);
 		}

@@ -196,7 +196,7 @@ IDocumentService::DocumentList CDocumentServiceBase::GetOpenedDocumentList(const
 		DocumentListItem info;
 		info.documentId = id;
 		info.typeId = workingDocumentPtr->typeId;
-		info.url = GetDocumentUrl(*workingDocumentPtr);
+		info.documentSourceRef = workingDocumentPtr->documentSourceRef;
 		info.name = workingDocumentPtr->name;
 		info.isDirty = workingDocumentPtr->isDirty;
 		info.hasNameProvider = HasDocumentNameProvider(workingDocumentPtr->typeId);
@@ -1042,12 +1042,6 @@ void CDocumentServiceBase::OnUndoManagerChanged(int modelId)
 			}
 		}
 	}
-}
-
-
-QUrl CDocumentServiceBase::GetDocumentUrl(const WorkingDocument& /*document*/) const
-{
-	return QUrl();
 }
 
 

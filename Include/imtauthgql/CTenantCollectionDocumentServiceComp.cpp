@@ -52,7 +52,7 @@ bool IsOrganizationContextValid(
 	const imtdoc::IDocumentService::DocumentList documentList = documentService.GetOpenedDocumentList(userId);
 	for (const imtdoc::IDocumentService::DocumentListItem& documentItem : documentList){
 		if (documentItem.documentId == documentId){
-			storedTenantId = documentItem.url.path().mid(1).toUtf8();
+			storedTenantId = imtdoc::SourceRefToObjectId(documentItem.documentSourceRef);
 			break;
 		}
 	}

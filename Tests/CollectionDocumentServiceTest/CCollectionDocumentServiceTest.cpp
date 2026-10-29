@@ -958,7 +958,7 @@ void CCollectionDocumentServiceTest::SaveDocumentNewDocumentUpdatesUrlTest()
 	for (const auto& document : m_managerPtr->GetOpenedDocumentList(TEST_USER_ID)) {
 		if (document.documentId == docId) {
 			found = true;
-			QCOMPARE(document.url, QUrl("collection:///" + insertedId));
+			QCOMPARE(document.documentSourceRef, insertedId);
 		}
 	}
 	QVERIFY(found);
@@ -996,7 +996,7 @@ void CCollectionDocumentServiceTest::SaveDocumentSaveAsUpdatesUrlTest()
 	for (const auto& document : m_managerPtr->GetOpenedDocumentList(TEST_USER_ID)) {
 		if (document.documentId == docId) {
 			found = true;
-			QCOMPARE(document.url, QUrl("collection:///" + copyId));
+			QCOMPARE(document.documentSourceRef, copyId);
 		}
 	}
 	QVERIFY(found);
@@ -1948,15 +1948,15 @@ void CCollectionDocumentServiceTest::SingleCopySaveAsUpdatesAllTest()
 	auto result = m_managerPtr->WaitForTaskFinished(taskId);
 	QCOMPARE(result.status, imtdoc::IDocumentService::OS_OK);
 
-	const QUrl copyUrl("collection:///" + m_managerPtr->GetMockCollection().GetLastInsertedId());
+	const QByteArray copyId = m_managerPtr->GetMockCollection().GetLastInsertedId();
 
 	// Both users hold the same document, which is now backed by the copy
 	auto list1 = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID);
 	auto list2 = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID_2);
 	QCOMPARE(list1.size(), 1);
 	QCOMPARE(list2.size(), 1);
-	QCOMPARE(list1[0].url, copyUrl);
-	QCOMPARE(list2[0].url, copyUrl);
+	QCOMPARE(list1[0].documentSourceRef, copyId);
+	QCOMPARE(list2[0].documentSourceRef, copyId);
 
 	QCOMPARE(m_managerPtr->GetMockEventHandler().CountEventsOfType("DocumentSavedAsEvent"), 2);
 }
