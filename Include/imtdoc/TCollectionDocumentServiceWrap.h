@@ -45,9 +45,8 @@ namespace imtdoc
 	  creates a blank object via \c CreateObject) and records an optional proposed
 	  source element ID for later use during save.
 	The document source reference (\c WorkingDocument::documentSourceRef) of a
-	collection document is \c <objectId> or \c <objectId>/<revision>, the public
-	document URL \c collection:///<objectId>[/<revision>] is built from it by \c GetDocumentUrl
-	and parsed by \c GetSourceRefFromUrl. Validators and name providers get
+	collection document is \c <objectId> or \c <objectId>/<revision>, it is parsed
+	from the document URL \c collection:///<objectId>[/<revision>] by \c GetSourceRefFromUrl. Validators and name providers get
 	the object ID and the revision in the parameters created by \c imtdoc::CreateObjectSourceParams.
 
 	- **DoOpenDocument** — resolves the URL to a collection object ID, fetches
@@ -131,12 +130,6 @@ protected:
 		\note \c m_mutex must be locked by the caller.
 	*/
 	UserDocumentPairList FindDocumentsBySourceRef(const QByteArray& documentSourceRef) const;
-
-	/**
-		Converts the document source reference to the document URL \c collection:///<objectId>[/<revision>].
-		Returns an empty URL for an empty reference.
-	*/
-	QUrl GetDocumentUrl(const WorkingDocument& document) const;
 
 	/**
 		Converts the document URL \c collection:///<objectId>[/<revision>] to the document source reference.
@@ -622,17 +615,6 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 	QObject::connect(thread, &QThread::finished, thread, &QObject::deleteLater);
 
 	thread->start();
-}
-
-
-template<class Base>
-inline QUrl TCollectionDocumentServiceWrap<Base>::GetDocumentUrl(const WorkingDocument& document) const
-{
-	if (document.documentSourceRef.isEmpty()){
-		return QUrl();
-	}
-
-	return QUrl(QStringLiteral("collection:///") + document.documentSourceRef);
 }
 
 

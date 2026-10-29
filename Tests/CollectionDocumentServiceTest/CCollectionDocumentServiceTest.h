@@ -559,7 +559,6 @@ public:
 	using imtdoc::CDocumentServiceBase::m_userDocumentIds;
 	using imtdoc::CDocumentServiceBase::m_mutex;
 	using imtdoc::CDocumentServiceBase::GetDocumentUserIds;
-	using imtdoc::CCollectionDocumentServiceBase::GetDocumentUrl;
 	using imtdoc::CCollectionDocumentServiceBase::GetSourceRefFromUrl;
 
 protected:
@@ -788,7 +787,6 @@ private slots:
 	void DocumentStorageInsertRemoveTest();
 
 	// Document URL tests
-	void GetDocumentUrlTest();
 	void GetSourceRefFromUrlTest();
 
 	// Async document loading completion tests

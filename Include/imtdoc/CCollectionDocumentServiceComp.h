@@ -84,7 +84,7 @@ private:
 		QByteArray documentId;
 		QByteArray objectId;
 		QByteArray typeId;
-		QString url;
+		QByteArray documentSourceRef;
 		QString name;
 		bool singleDocumentInstance = false;
 	};

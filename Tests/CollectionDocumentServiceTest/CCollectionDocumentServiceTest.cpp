@@ -1578,22 +1578,6 @@ void CCollectionDocumentServiceTest::DocumentStorageInsertRemoveTest()
 // Document URL tests
 // ======================================================================
 
-void CCollectionDocumentServiceTest::GetDocumentUrlTest()
-{
-	CTestableDocumentService::WorkingDocument document;
-	QVERIFY(m_managerPtr->GetDocumentUrl(document).isEmpty());
-
-	document.documentSourceRef = QByteArrayLiteral("myObjectId");
-	QUrl url = m_managerPtr->GetDocumentUrl(document);
-	QCOMPARE(url.toString(), QString("collection:///myObjectId"));
-	QCOMPARE(url.scheme(), QString("collection"));
-	QVERIFY2(url.host().isEmpty(), "URL host should be empty");
-
-	document.documentSourceRef = QByteArrayLiteral("myObjectId/3");
-	QCOMPARE(m_managerPtr->GetDocumentUrl(document).toString(), QString("collection:///myObjectId/3"));
-}
-
-
 void CCollectionDocumentServiceTest::GetSourceRefFromUrlTest()
 {
 	QCOMPARE(m_managerPtr->GetSourceRefFromUrl(QUrl("collection:///myObjectId")), QByteArray("myObjectId"));

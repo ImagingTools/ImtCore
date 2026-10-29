@@ -28,7 +28,7 @@ static const QString s_documentsKey = QStringLiteral("Documents");
 static const QString s_documentIdKey = QStringLiteral("DocumentId");
 static const QString s_objectIdKey = QStringLiteral("ObjectId");
 static const QString s_typeIdKey = QStringLiteral("TypeId");
-static const QString s_urlKey = QStringLiteral("Url");
+static const QString s_documentSourceRefKey = QStringLiteral("DocumentSourceRef");
 static const QString s_nameKey = QStringLiteral("Name");
 static const QString s_singleDocumentInstanceKey = QStringLiteral("SingleDocumentInstance");
 
@@ -209,7 +209,7 @@ void CCollectionDocumentServiceComp::PrepareDocumentMap(DocumentMap& documentMap
 			doc.documentId = documentId;
 			doc.objectId = imtdoc::SourceRefToObjectId(workingDocumentPtr->documentSourceRef);
 			doc.typeId = workingDocumentPtr->typeId;
-			doc.url = GetDocumentUrl(*workingDocumentPtr).toString();
+			doc.documentSourceRef = workingDocumentPtr->documentSourceRef;
 			doc.name = workingDocumentPtr->name;
 			doc.singleDocumentInstance = workingDocumentPtr->singleDocumentInstance;
 			documents.append(doc);
@@ -231,7 +231,7 @@ QJsonObject CCollectionDocumentServiceComp::DocumentMapToJson(const DocumentMap&
 			documentObject.insert(s_documentIdKey, QString(documentInfo.documentId));
 			documentObject.insert(s_objectIdKey, QString(documentInfo.objectId));
 			documentObject.insert(s_typeIdKey, QString(documentInfo.typeId));
-			documentObject.insert(s_urlKey, documentInfo.url);
+			documentObject.insert(s_documentSourceRefKey, QString(documentInfo.documentSourceRef));
 			documentObject.insert(s_nameKey, documentInfo.name);
 			documentObject.insert(s_singleDocumentInstanceKey, documentInfo.singleDocumentInstance);
 
@@ -297,7 +297,6 @@ bool CCollectionDocumentServiceComp::DocumentMapFromJson(const QJsonObject& root
 						|| documentObject.value(s_documentIdKey).toString().isEmpty()
 						|| !documentObject.value(s_objectIdKey).isString()
 						|| !documentObject.value(s_typeIdKey).isString()
-						|| !documentObject.value(s_urlKey).isString()
 						|| !documentObject.value(s_nameKey).isString()
 						|| !documentObject.value(s_singleDocumentInstanceKey).isBool()){
 				return false;
@@ -307,7 +306,9 @@ bool CCollectionDocumentServiceComp::DocumentMapFromJson(const QJsonObject& root
 			documentInfo.documentId = documentObject.value(s_documentIdKey).toString().toUtf8();
 			documentInfo.objectId = documentObject.value(s_objectIdKey).toString().toUtf8();
 			documentInfo.typeId = documentObject.value(s_typeIdKey).toString().toUtf8();
-			documentInfo.url = documentObject.value(s_urlKey).toString();
+			// States saved by older versions have no source reference, their documents are always the current objects
+			const QJsonValue documentSourceRefValue = documentObject.value(s_documentSourceRefKey);
+			documentInfo.documentSourceRef = documentSourceRefValue.isString() ? documentSourceRefValue.toString().toUtf8() : documentInfo.objectId;
 			documentInfo.name = documentObject.value(s_nameKey).toString();
 			documentInfo.singleDocumentInstance = documentObject.value(s_singleDocumentInstanceKey).toBool(false);
 
@@ -445,8 +446,7 @@ bool CCollectionDocumentServiceComp::RestoreSharedDocument(const DocumentInfo& d
 		return false;
 	}
 
-	const int revision = imtdoc::SourceRefToRevision(GetSourceRefFromUrl(QUrl(documentInfo.url)));
-	const UserDocumentPairList documents = FindDocumentsBySourceRef(imtdoc::ObjectIdToSourceRef(documentInfo.objectId, revision));
+	const UserDocumentPairList documents = FindDocumentsBySourceRef(documentInfo.documentSourceRef);
 	if (documents.isEmpty()){
 		return false;
 	}
@@ -475,7 +475,7 @@ bool CCollectionDocumentServiceComp::RestoreDocument(
 		return false;
 	}
 
-	const int revision = imtdoc::SourceRefToRevision(GetSourceRefFromUrl(QUrl(documentInfo.url)));
+	const int revision = imtdoc::SourceRefToRevision(documentInfo.documentSourceRef);
 
 	istd::IChangeableSharedPtr objectPtr;
 	if (!documentInfo.objectId.isEmpty()){
