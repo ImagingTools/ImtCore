@@ -102,6 +102,11 @@ private:
 	static bool ServiceStateFromJson(const QJsonObject& rootObject, ServiceState& state);
 	bool IsStatePersistenceEnabled() const;
 	QString GetStateFilePath() const;
+	/**
+		Remove persisted data (undo/redo history, unsaved changes) of all documents.
+		Used when the state file cannot be read, since the data cannot be associated to any document.
+	*/
+	void RemovePersistedDocumentData() const;
 	bool RestoreServiceState(const ServiceState& state);
 	void RemoveAllDocuments();
 	void RequestSaveToFile(const QString& filePath);
