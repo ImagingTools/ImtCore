@@ -339,7 +339,7 @@ DocumentServiceBase.__internal
 `documentData` (создаётся фабрикой `documentDataFactory`):
 
 ```
-{ id, typeId, name, objectId, isDirty, isReadOnly, isNew, isLoading, isClosing,
+{ id, typeId, name, objectId, isDirty, isNew, isLoading, isClosing,
   views : { viewTypeId -> Item },
   documentDecorator : DocumentDecorator }
 ```
@@ -401,7 +401,6 @@ setAutoNamedTypeId(objectTypeId, hasNameProvider)
 setDocumentName(documentId, documentName)   // документа ещё нет -> уходит в cachedDocumentNames
 __internal.createDocumentData(documentId, objectTypeId, isNew=false)  // подхватывает кэш имени/objectId
 setDocumentObjectId(documentId, objectId)
-setDocumentIsReadOnly(documentId, isReadOnly)
 setDocumentIsLoading(documentId, true)
 documentOpened(documentId, objectTypeId)
 if (isDirty) setDocumentIsDirty(documentId, true)
@@ -411,8 +410,9 @@ if (isDirty) setDocumentIsDirty(documentId, true)
 документ можно только закрыть. Сервер отклоняет сохранение, переименование,
 изменение данных и undo/redo/resetUndo, а имя документа содержит суффикс
 ` (Rev #N)`. `DocumentDecorator` выключает команды `Undo`/`Redo`/`Save` для
-таких документов (`documentIsReadOnly(documentId)`, сигнал
-`documentIsReadOnlyChanged(documentId, isReadOnly)`).
+таких документов (`documentIsReadOnly(documentId)`). Флаг задаёт только сервер:
+он запоминается из ответа `OpenDocument` и из списка открытых документов,
+клиент изменить его не может.
 
 `documentOpened` дополнительно обрабатывается в самом `DocumentServiceBase`
 (`onDocumentOpened → createDocumentData`) — повторный вызов безопасен, так как

@@ -2758,7 +2758,6 @@
 - `requestDocumentName(string documentId, string typeId)`
 - `documentNameChanged(string documentId, string oldName, string newName)`
 - `documentIsDirtyChanged(string documentId, bool isDirty)`
-- `documentIsReadOnlyChanged(string documentId, bool isReadOnly)`
 - `startUndoInfoReceive(string documentId)`
 - `undoInfoReceived(string documentId, int availableUndoSteps, int availableRedoSteps, bool isDirty)`
 - `undoInfoReceiveFailed(string documentId, string message)`
@@ -2808,7 +2807,6 @@
 - `getDocumentName(documentId)`
 - `documentIsDirty(documentId)`
 - `documentIsReadOnly(documentId)`
-- `setDocumentIsReadOnly(documentId, isReadOnly)`
 - `documentIsLoading(documentId)`
 - `setDocumentIsLoading(documentId, isLoading)`
 - `setDocumentIsDirty(documentId, isDirty)`
