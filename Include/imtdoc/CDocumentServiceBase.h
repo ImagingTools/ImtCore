@@ -274,6 +274,7 @@ protected:
 		bool isDirty;                              ///< \c true when there are unsaved changes.
 		bool isLoading = false;                    ///< \c true while the background load is in progress.
 		bool singleDocumentInstance = false;       ///< \c true when the document was opened with \c TaskParams::singleDocumentInstance.
+		bool isReadOnly = false;                   ///< \c true when the document can only be closed: renaming, saving, data changes and undo/redo are rejected.
 		int undoManagerModelId = -1;               ///< Model registration ID in \c UndoManagerObserver.
 	};
 

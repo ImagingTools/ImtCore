@@ -60,6 +60,7 @@ QtObject {
 	signal requestDocumentName(string documentId, string typeId)
 	signal documentNameChanged(string documentId, string oldName, string newName)
 	signal documentIsDirtyChanged(string documentId, bool isDirty)
+	signal documentIsReadOnlyChanged(string documentId, bool isReadOnly)
 
 	signal startUndoInfoReceive(string documentId)
 	signal undoInfoReceived(string documentId, int availableUndoSteps, int availableRedoSteps, bool isDirty)
@@ -515,6 +516,31 @@ QtObject {
 		return __internal.openedDocuments[index].isDirty
 	}
 
+	// A read-only document (e.g. opened from an object revision) can only be closed
+	function documentIsReadOnly(documentId){
+		let index = getDocumentIndexByDocumentId(documentId)
+		if (index < 0){
+			return false
+		}
+
+		return __internal.openedDocuments[index].isReadOnly
+	}
+
+	function setDocumentIsReadOnly(documentId, isReadOnly){
+		let index = getDocumentIndexByDocumentId(documentId)
+		if (index < 0){
+			return
+		}
+
+		if (__internal.openedDocuments[index].isReadOnly === isReadOnly){
+			return
+		}
+
+		__internal.openedDocuments[index].isReadOnly = isReadOnly
+
+		documentIsReadOnlyChanged(documentId, isReadOnly)
+	}
+
 	function documentIsClosing(documentId){
 		let index = getDocumentIndexByDocumentId(documentId)
 		if (index < 0){
@@ -668,7 +694,8 @@ QtObject {
 	// to apply the standard DocumentService state transitions.
 
 	// isDataLoaded === true: the server already has the data, no DocumentDataLoaded notification is awaited.
-	function handleDocumentOpened(documentId, objectId, objectTypeId, documentName, hasNameProvider, isDirty, isDataLoaded){
+	// isReadOnly === true: the document can only be closed (e.g. it was opened from an object revision).
+	function handleDocumentOpened(documentId, objectId, objectTypeId, documentName, hasNameProvider, isDirty, isDataLoaded, isReadOnly){
 		setAutoNamedTypeId(objectTypeId, hasNameProvider)
 		setDocumentName(documentId, documentName)
 
@@ -678,6 +705,7 @@ QtObject {
 		// the documentOpened signal must not be emitted a second time.
 		if (documentIsOpened(documentId)){
 			setDocumentObjectId(documentId, objectId)
+			setDocumentIsReadOnly(documentId, isReadOnly === true)
 			if (isDirty)
 				setDocumentIsDirty(documentId, true)
 			if (isDataLoaded === true)
@@ -690,6 +718,7 @@ QtObject {
 
 		__internal.createDocumentData(documentId, objectTypeId, false)
 		setDocumentObjectId(documentId, objectId)
+		setDocumentIsReadOnly(documentId, isReadOnly === true)
 		setDocumentIsLoading(documentId, true)
 		documentOpened(documentId, objectTypeId)
 		if (isDirty)
@@ -843,6 +872,7 @@ QtObject {
 				property string name
 				property string objectId: ""
 				property bool isDirty: false
+				property bool isReadOnly: false
 				property bool isNew: true
 				property bool isLoading: false
 				property bool isClosing: false

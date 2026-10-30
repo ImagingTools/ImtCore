@@ -263,9 +263,11 @@ Item {
 				let objectTypeId = documentInfo.m_objectTypeId
 				let isDirty = documentInfo.m_isDirty
 				let hasNameProvider = documentInfo.m_hasNameProvider
+				let isReadOnly = documentInfo.m_isReadOnly === true
 
 				// Resync: the service refreshes open documents; a missed DocumentDataLoaded must not keep one loading.
 				if (workspaceView.documentManager.documentIsOpened(String(documentId))){
+					workspaceView.documentManager.setDocumentIsReadOnly(String(documentId), isReadOnly)
 					if (documentInfo.m_isLoading === false){
 						workspaceView.documentManager.setDocumentIsLoading(String(documentId), false)
 					}
@@ -281,6 +283,7 @@ Item {
 					workspaceView.documentManager.setDocumentName(documentId, documentName)
 					workspaceView.documentManager.documentOpened(documentId, objectTypeId)
 					workspaceView.documentManager.setDocumentObjectId(documentId, objectId)
+					workspaceView.documentManager.setDocumentIsReadOnly(documentId, isReadOnly)
 				}
 
 				workspaceView.documentManager.getUndoInfo(documentId)

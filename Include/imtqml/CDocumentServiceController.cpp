@@ -570,6 +570,7 @@ void CDocumentServiceController::getOpenedDocumentList()
 					entry.insert(QStringLiteral("objectTypeId"),    info.typeId);
 					entry.insert(QStringLiteral("objectId"),        info.objectId);
 					entry.insert(QStringLiteral("hasNameProvider"), info.hasNameProvider);
+					entry.insert(QStringLiteral("isReadOnly"),      info.isReadOnly);
 					documents.append(entry);
 				}
 				Q_EMIT self->openedDocumentListReceived(QVariant(documents));

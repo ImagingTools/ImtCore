@@ -53,16 +53,16 @@ namespace imtdoc
 	  the object data in a background thread, and supports single-copy sharing of
 	  data across user sessions.  A \c collection:///<objectId>/<revision> URL
 	  opens the object revision through the collection's \c IRevisionController.
-	- **GetOpenedDocumentList** — appends " (Rev #<revision>)" to the names of
-	  documents opened from an object revision.
+	  A revision document is read-only (it can only be closed) and its name has
+	  the suffix " (Rev #<revision>)".
 	- **DoSaveDocument** — validates the data, then either updates an existing
 	  collection element or inserts a new one (creating a copy when the name
 	  changes); fires \c CDocumentSavedEvent or \c CDocumentSavedAsEvent.
-	  After saving, the document does not address a revision anymore.
 	- **DoCloseDocument** — removes the document entry and fires
 	  \c CDocumentClosedEvent.
 	- **SetDocumentName** — renames the object in the collection (for saved
 	  documents) and delegates to the base implementation.
+	  Read-only documents are neither saved nor renamed.
 
 	Subclasses must implement \c GetCollection() to provide the backing
 	collection.
@@ -103,7 +103,6 @@ public:
 	virtual iprm::IParamsSetUniquePtr CreateDocumentSourceParams(const WorkingDocument& document) const override;
 
 	// reimplemented (imtdoc::IDocumentService)
-	virtual DocumentList GetOpenedDocumentList(const QByteArray& userId) const override;
 	virtual OperationStatus SetDocumentName(const QByteArray& userId, const QByteArray& documentId, const QString& documentName) override;
 
 protected:
@@ -136,6 +135,12 @@ protected:
 		Returns an empty reference for empty or invalid URLs.
 	*/
 	QByteArray GetSourceRefFromUrl(const QUrl& url) const;
+
+	/**
+		Returns the name of the document with the source reference \a documentSourceRef:
+		\a name with the suffix " (Rev #<revision>)" for a document opened from an object revision.
+	*/
+	static QString GetSourceRefDocumentName(const QString& name, const QByteArray& documentSourceRef);
 
 private:
 	void OnDeferredDocumentDataLoaded(
@@ -341,6 +346,7 @@ inline void TCollectionDocumentServiceWrap<Base>::OnOpenDocumentThreadFinished(
 			return;
 		}
 
+		documentName = GetSourceRefDocumentName(documentName, document.documentSourceRef);
 		document.name = documentName;
 		typeId = document.typeId;
 		documentSourceRef = document.documentSourceRef;
@@ -461,6 +467,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 			reservedDoc.documentSourceRef = documentSourceRef;
 			reservedDoc.isLoading = true;
 			reservedDoc.singleDocumentInstance = params.singleDocumentInstance;
+			reservedDoc.isReadOnly = revision >= 0;
 		}
 	}
 
@@ -532,6 +539,12 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 	}
 
 	QString documentName = collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
+
+	// A document without a name gets it from the name provider after loading
+	if (!documentName.isEmpty() || !this->HasDocumentNameProvider(objectTypeId)){
+		documentName = GetSourceRefDocumentName(documentName, documentSourceRef);
+	}
+
 	istd::CChangeNotifier notifier(this);
 
 	{
@@ -544,6 +557,9 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 		doc.isDirty = false;
 		doc.isLoading = true;
 		doc.singleDocumentInstance = params.singleDocumentInstance;
+
+		// An object revision can only be viewed
+		doc.isReadOnly = revision >= 0;
 	}
 
 	for (IDocumentServiceEventHandler* handlerPtr : this->GetDocumentServiceEventHandlers()){
@@ -649,19 +665,14 @@ inline iprm::IParamsSetUniquePtr TCollectionDocumentServiceWrap<Base>::CreateDoc
 
 
 template<class Base>
-inline typename TCollectionDocumentServiceWrap<Base>::DocumentList
-TCollectionDocumentServiceWrap<Base>::GetOpenedDocumentList(const QByteArray& userId) const
+inline QString TCollectionDocumentServiceWrap<Base>::GetSourceRefDocumentName(const QString& name, const QByteArray& documentSourceRef)
 {
-	DocumentList documentList = Base::GetOpenedDocumentList(userId);
-
-	for (DocumentListItem& item : documentList){
-		const int revision = imtdoc::SourceRefToRevision(item.documentSourceRef);
-		if (revision >= 0){
-			item.name += QStringLiteral(" (Rev #%1)").arg(revision);
-		}
+	const int revision = imtdoc::SourceRefToRevision(documentSourceRef);
+	if (revision < 0){
+		return name;
 	}
 
-	return documentList;
+	return QStringLiteral("%1 (Rev #%2)").arg(name).arg(revision).trimmed();
 }
 
 
@@ -683,6 +694,10 @@ TCollectionDocumentServiceWrap<Base>::SetDocumentName(
 		}
 
 		const WorkingDocument& workingDocument = this->m_documents[documentId];
+		if (workingDocument.isReadOnly){
+			return IDocumentService::OS_FAILED;
+		}
+
 		if (workingDocument.name == documentName){
 			return IDocumentService::OS_OK;
 		}
@@ -732,6 +747,11 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 
 	if (workingDocumentPtr->isLoading){
 		this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, documentId, QStringLiteral("Document is still loading")});
+		return;
+	}
+
+	if (workingDocumentPtr->isReadOnly){
+		this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, documentId, QStringLiteral("Document is read-only")});
 		return;
 	}
 
@@ -840,9 +860,6 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 				workingDocumentPtr->name = updatedName;
 			}
 			workingDocumentPtr->isDirty = false;
-
-			// A document opened from an object revision is now backed by the current object data
-			workingDocumentPtr->documentSourceRef = imtdoc::ObjectIdToSourceRef(currentObjectId);
 
 			QByteArray savedTypeId = workingDocumentPtr->typeId;
 			QByteArray savedSourceRef = workingDocumentPtr->documentSourceRef;

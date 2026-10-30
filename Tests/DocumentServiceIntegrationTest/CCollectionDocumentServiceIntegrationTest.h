@@ -111,8 +111,11 @@ private slots:
 	void OpenDocumentRevisionListNameSuffixTest();
 	void OpenDocumentNonExistentRevisionTest();
 	void OpenDocumentRevisionAndHeadSeparateTest();
-	void SaveDocumentRevisionRemovesRevisionFromUrlTest();
-	void SaveDocumentSaveAsRevisionTest();
+	void SaveDocumentRevisionFailsTest();
+	void SaveDocumentSaveAsRevisionFailsTest();
+	void SetDocumentNameRevisionFailsTest();
+	void SetDocumentDataRevisionFailsTest();
+	void CloseDocumentRevisionTest();
 	void SingleCopyRevisionSharedTest();
 
 	// Document source parameters tests

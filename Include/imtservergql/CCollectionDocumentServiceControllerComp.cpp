@@ -45,6 +45,7 @@ CDM::CDocumentList CCollectionDocumentServiceControllerComp::OnGetOpenedDocument
 			sdlInfo.isDirty = info.isDirty;
 			sdlInfo.hasNameProvider = info.hasNameProvider;
 			sdlInfo.isLoading = info.isLoading;
+			sdlInfo.isReadOnly = info.isReadOnly;
 
 			retVal.documentList->append(sdlInfo);
 		}
@@ -103,6 +104,7 @@ CDM::CDocumentInfo CCollectionDocumentServiceControllerComp::OnCreateNewDocument
 		retVal.isDirty = true;
 		retVal.hasNameProvider = false;
 		retVal.isLoading = false;
+		retVal.isReadOnly = false;
 
 		imtdoc::IDocumentService::DocumentList list = m_documentManagerCompPtr->GetOpenedDocumentList(userId);
 		for (const imtdoc::IDocumentService::DocumentListItem& info : list){
@@ -169,6 +171,7 @@ CDM::CDocumentInfo CCollectionDocumentServiceControllerComp::OnOpenDocument(
 		retVal.isDirty = false;
 		retVal.hasNameProvider = false;
 		retVal.isLoading = true;
+		retVal.isReadOnly = false;
 
 		imtdoc::IDocumentService::DocumentList list = m_documentManagerCompPtr->GetOpenedDocumentList(userId);
 		for (const imtdoc::IDocumentService::DocumentListItem& info : list){
@@ -177,6 +180,7 @@ CDM::CDocumentInfo CCollectionDocumentServiceControllerComp::OnOpenDocument(
 				retVal.objectTypeId = info.typeId;
 				retVal.hasNameProvider = info.hasNameProvider;
 				retVal.isLoading = info.isLoading;
+				retVal.isReadOnly = info.isReadOnly;
 				break;
 			}
 		}
@@ -264,6 +268,13 @@ CDM::CDocumentOperationStatus CCollectionDocumentServiceControllerComp::OnSetDoc
 	}
 
 	if (m_documentManagerCompPtr.IsValid()) {
+		if (IsDocumentReadOnly(userId, *documentId->documentId)){
+			errorMessage = QStringLiteral("Document is read-only");
+			retVal.status = CDM::EDocumentOperationStatus::Failed;
+
+			return retVal;
+		}
+
 		imtdoc::IDocumentService::OperationStatus status = m_documentManagerCompPtr->SetDocumentName(userId, *documentId->documentId, *documentId->documentName);
 		switch (status){
 		case imtdoc::IDocumentService::OS_OK:
@@ -316,6 +327,14 @@ CDM::CDocumentOperationStatus CCollectionDocumentServiceControllerComp::OnSaveDo
 	}
 
 	if (m_documentManagerCompPtr.IsValid()) {
+		if (IsDocumentReadOnly(userId, *saveDocumentInput->documentId)){
+			errorMessage = QStringLiteral("Document is read-only");
+			retVal.status = CDM::EDocumentOperationStatus::Failed;
+			retVal.message = errorMessage;
+
+			return retVal;
+		}
+
 		const QByteArray collectionObjectId = GetCollectionObjectId(userId, *saveDocumentInput->documentId);
 		const bool isNewObject = collectionObjectId.isEmpty();
 
@@ -572,6 +591,14 @@ sdl::V1_0::imtbase::CUndoStatus CCollectionDocumentServiceControllerComp::OnDoUn
 	}
 
 	if (m_documentManagerCompPtr.IsValid()) {
+		if (IsDocumentReadOnly(userId, documentId)){
+			errorMessage = QStringLiteral("Document is read-only");
+
+			retVal.status = sdl::V1_0::imtbase::EUndoStatus::Failed;
+
+			return retVal;
+		}
+
 		idoc::IUndoManager* undoManagerPtr = nullptr;
 		if (m_documentManagerCompPtr->GetDocumentUndoManager(userId, documentId, undoManagerPtr) != imtdoc::IDocumentService::OS_OK) {
 			errorMessage = "Undo manager not available";
@@ -640,6 +667,14 @@ sdl::V1_0::imtbase::CUndoStatus CCollectionDocumentServiceControllerComp::OnDoRe
 	}
 
 	if (m_documentManagerCompPtr.IsValid()) {
+		if (IsDocumentReadOnly(userId, documentId)){
+			errorMessage = QStringLiteral("Document is read-only");
+
+			retVal.status = sdl::V1_0::imtbase::EUndoStatus::Failed;
+
+			return retVal;
+		}
+
 		idoc::IUndoManager* undoManagerPtr = nullptr;
 		if (m_documentManagerCompPtr->GetDocumentUndoManager(userId, documentId, undoManagerPtr) != imtdoc::IDocumentService::OS_OK) {
 			errorMessage = "Undo manager not available";
@@ -701,6 +736,14 @@ sdl::V1_0::imtbase::CUndoStatus CCollectionDocumentServiceControllerComp::OnRese
 	}
 
 	if (m_documentManagerCompPtr.IsValid()) {
+		if (IsDocumentReadOnly(userId, *documentId->id)){
+			errorMessage = QStringLiteral("Document is read-only");
+
+			retVal.status = sdl::V1_0::imtbase::EUndoStatus::Failed;
+
+			return retVal;
+		}
+
 		idoc::IUndoManager* undoManagerPtr = nullptr;
 		if (m_documentManagerCompPtr->GetDocumentUndoManager(userId, *documentId->id, undoManagerPtr) != imtdoc::IDocumentService::OS_OK) {
 			errorMessage = "Undo manager not available";
@@ -787,6 +830,23 @@ bool CCollectionDocumentServiceControllerComp::CheckObjectAccess(
 	errorMessage = accessLevel == imtauth::IDocumentShareInfo::DAL_VIEW
 				? QStringLiteral("Document does not exist")
 				: QStringLiteral("The organization may not change the document");
+
+	return false;
+}
+
+
+bool CCollectionDocumentServiceControllerComp::IsDocumentReadOnly(const QByteArray& userId, const QByteArray& documentId) const
+{
+	if (!m_documentManagerCompPtr.IsValid()){
+		return false;
+	}
+
+	const imtdoc::IDocumentService::DocumentList documentList = m_documentManagerCompPtr->GetOpenedDocumentList(userId);
+	for (const imtdoc::IDocumentService::DocumentListItem& documentItem : documentList){
+		if (documentItem.documentId == documentId){
+			return documentItem.isReadOnly;
+		}
+	}
 
 	return false;
 }

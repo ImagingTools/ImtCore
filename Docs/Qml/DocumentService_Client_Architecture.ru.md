@@ -339,7 +339,7 @@ DocumentServiceBase.__internal
 `documentData` (создаётся фабрикой `documentDataFactory`):
 
 ```
-{ id, typeId, name, objectId, isDirty, isNew, isLoading, isClosing,
+{ id, typeId, name, objectId, isDirty, isReadOnly, isNew, isLoading, isClosing,
   views : { viewTypeId -> Item },
   documentDecorator : DocumentDecorator }
 ```
@@ -401,10 +401,18 @@ setAutoNamedTypeId(objectTypeId, hasNameProvider)
 setDocumentName(documentId, documentName)   // документа ещё нет -> уходит в cachedDocumentNames
 __internal.createDocumentData(documentId, objectTypeId, isNew=false)  // подхватывает кэш имени/objectId
 setDocumentObjectId(documentId, objectId)
+setDocumentIsReadOnly(documentId, isReadOnly)
 setDocumentIsLoading(documentId, true)
 documentOpened(documentId, objectTypeId)
 if (isDirty) setDocumentIsDirty(documentId, true)
 ```
+
+`DocumentInfo.isReadOnly == true` у документа, открытого из ревизии объекта: такой
+документ можно только закрыть. Сервер отклоняет сохранение, переименование,
+изменение данных и undo/redo/resetUndo, а имя документа содержит суффикс
+` (Rev #N)`. `DocumentDecorator` выключает команды `Undo`/`Redo`/`Save` для
+таких документов (`documentIsReadOnly(documentId)`, сигнал
+`documentIsReadOnlyChanged(documentId, isReadOnly)`).
 
 `documentOpened` дополнительно обрабатывается в самом `DocumentServiceBase`
 (`onDocumentOpened → createDocumentData`) — повторный вызов безопасен, так как
@@ -907,7 +915,8 @@ DocumentDecorator.onCommandActivated("Undo") -> onUndo()
 
 1. по undo-подписке — `undoInfoReceived(documentId, availableUndoSteps, availableRedoSteps, isDirty)`;
    `DocumentServiceBase.onUndoInfoReceived → setDocumentIsDirty(documentId, isDirty)`;
-   `DocumentDecorator` включает/выключает команды `Undo`/`Redo`/`Save` во всех view;
+   `DocumentDecorator` включает/выключает команды `Undo`/`Redo`/`Save` во всех view
+   (у read-only документов они всегда выключены);
 2. по document-подписке — `DocumentChanged`, что приводит к
    `updateRepresentationForAllViews()`, то есть перезагрузке representation
    (`initiatingView` здесь `null`, поэтому обновятся **все** видимые view).
