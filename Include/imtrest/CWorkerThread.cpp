@@ -79,7 +79,14 @@ void CWorkerThread::run()
 	}
 
 	if (!m_servletPtr.IsValid()){
-		Q_ASSERT(false);
+		qWarning() << "The worker thread has no servlet";
+
+		// The thread ends, the requests that are sent to it later are rejected in PostRequest()
+		SetStatus(ST_CLOSE);
+
+		if (m_requestPtr != nullptr){
+			RejectRequest(m_requestPtr, m_subCommandId);
+		}
 
 		return;
 	}
@@ -101,6 +108,9 @@ void CWorkerThread::PostRequest(const IRequest* requestPtr, const QByteArray& su
 {
 	CWorker* workerPtr = m_workerPtr.GetPtr();
 	if (workerPtr == nullptr){
+		// The worker could not start, the request would be lost without an answer
+		RejectRequest(requestPtr, subCommandId);
+
 		return;
 	}
 
@@ -115,6 +125,19 @@ void CWorkerThread::PostRequest(const IRequest* requestPtr, const QByteArray& su
 					workerPtr->ProcessRequest(requestPtr, subCommandId);
 				},
 				Qt::QueuedConnection);
+}
+
+
+void CWorkerThread::RejectRequest(const IRequest* requestPtr, const QByteArray& subCommandId)
+{
+	if (requestPtr != nullptr){
+		ConstResponsePtr responsePtr = CWorker::CreateInternalErrorResponse(*requestPtr);
+		if (responsePtr.IsValid()){
+			SendResponse(requestPtr->GetRequestId(), responsePtr);
+		}
+	}
+
+	NotifyFinished(requestPtr, subCommandId);
 }
 
 

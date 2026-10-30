@@ -71,6 +71,7 @@ protected:
 				const imtdoc::CEventBase* eventPtr,
 				imtdoc::IDocumentService::DocumentNotification& notification) const;
 	void FillSdlNotification(
+				const imtdoc::CEventBase* eventPtr,
 				const imtdoc::IDocumentService::DocumentNotification& notification,
 				sdl::V1_0::imtbase::EDocumentOperation operation,
 				sdl::V1_0::imtbase::CDocumentServiceNotification& sdlNotification) const;
@@ -82,7 +83,6 @@ protected:
 		the document service's internal locks (document created / document opened).
 	*/
 	void FillNameProviderFlag(imtdoc::IDocumentService::DocumentNotification& notification) const;
-	QByteArray ConvertUrlToObjectId(const QUrl& url) const;
 
 	/**
 		Return \c true when the automatic closing of idle documents is enabled,

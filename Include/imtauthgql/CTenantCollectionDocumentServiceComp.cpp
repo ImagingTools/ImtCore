@@ -18,6 +18,7 @@
 #include <imtgql/IGqlContext.h>
 #include <imtservergql/DocumentChange.h>
 #include <imtdoc/CDocumentSavedEvent.h>
+#include <imtdoc/imtdoc.h>
 #include <imtauth/imtauth.h>
 #include <imtauthgql/TenantAccess.h>
 
@@ -55,7 +56,7 @@ bool IsOrganizationContextValid(
 	const imtdoc::IDocumentService::DocumentList documentList = documentService.GetOpenedDocumentList(userId);
 	for (const imtdoc::IDocumentService::DocumentListItem& documentItem : documentList){
 		if (documentItem.documentId == documentId){
-			storedTenantId = documentItem.url.path().mid(1).toUtf8();
+			storedTenantId = imtdoc::SourceRefToObjectId(documentItem.documentSourceRef);
 			break;
 		}
 	}
@@ -706,7 +707,7 @@ bool CTenantCollectionDocumentServiceComp::ProcessEvent(imtdoc::CEventBase* even
 	if (savedEventPtr != nullptr){
 		QByteArray documentId = savedEventPtr->GetDocumentId();
 		QByteArray userId = savedEventPtr->GetUserId();
-		QByteArray objectId = savedEventPtr->GetDocumentUrl().toString().toUtf8().replace("collection:///", "");
+		QByteArray objectId = imtdoc::SourceRefToObjectId(savedEventPtr->GetDocumentSourceRef());
 
 		istd::IChangeableSharedPtr documentPtr;
 		imtauth::ITenantInfo* documentTicketPtr = nullptr;

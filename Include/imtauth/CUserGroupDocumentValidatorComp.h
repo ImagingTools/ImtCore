@@ -31,7 +31,7 @@ public:
 	I_END_COMPONENT
 
 	// imtdoc::IDocumentValidator
-	virtual bool ValidateDocumentData(const QByteArray& objectId, const istd::IChangeable& document, QString& errorMessage, const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
+	virtual bool ValidateDocumentData(const istd::IChangeable& document, QString& errorMessage, const iprm::IParamsSet* paramsPtr = nullptr, const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
 
 	/**
 		Check that no other group of the tenant has the same name.

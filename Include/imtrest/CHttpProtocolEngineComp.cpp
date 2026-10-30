@@ -5,6 +5,7 @@
 // ImtCore includes
 #include <imtrest/CHttpRequest.h>
 #include <imtrest/CHttpResponse.h>
+#include <imtrest/ProtocolTypeIds.h>
 
 
 namespace imtrest
@@ -17,7 +18,7 @@ namespace imtrest
 
 QByteArray CHttpProtocolEngineComp::GetProtocolTypeId() const
 {
-	return "http";
+	return ProtocolTypeIds::s_http;
 }
 
 
@@ -153,7 +154,15 @@ bool CHttpProtocolEngineComp::GetProtocolStatusCode(int statusCode, int& protoco
 
 imtrest::IRequestUniquePtr CHttpProtocolEngineComp::CreateRequest(const IRequestServlet& requestHandler) const
 {
-	return new CHttpRequest(requestHandler, *this);
+	auto* requestPtr = new CHttpRequest(requestHandler, *this);
+
+	requestPtr->SetDefaultMaxBodySize(m_maxBodySizeAttrPtr.IsValid() ? qint64(qMax(0, *m_maxBodySizeAttrPtr)) : 0);
+
+	if (m_bodyPolicyCompPtr.IsValid()){
+		requestPtr->SetBodyPolicy(*m_bodyPolicyCompPtr.GetPtr());
+	}
+
+	return requestPtr;
 }
 
 

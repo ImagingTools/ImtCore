@@ -33,6 +33,9 @@ public:
 	virtual void SetHeadersIncludePaths(const QStringList& includePaths) = 0;
 	virtual void SetDepFilePath(const QString& path) = 0;
 	virtual void SetTypenameWriteMode(TypenameWriteMode mode) = 0;
+	virtual void SetObjectsGenerationEnabled(bool enabled = true) = 0;
+	virtual void SetCppGenerationMode(CppGenerationMode mode) = 0;
+	virtual void SetMocIncludeEnabled(bool enabled = true) = 0;
 
 	// template
 	virtual void SetTemplateEnabled(bool enable = true) = 0;

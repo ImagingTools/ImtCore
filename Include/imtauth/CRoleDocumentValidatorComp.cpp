@@ -13,6 +13,7 @@
 #include <imtauth/IRole.h>
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtbase/IOperationContext.h>
+#include <imtdoc/imtdoc.h>
 
 
 namespace imtauth
@@ -20,11 +21,13 @@ namespace imtauth
 
 
 bool CRoleDocumentValidatorComp::ValidateDocumentData(
-			const QByteArray& objectId,
 			const istd::IChangeable& document,
 			QString& errorMessage,
+			const iprm::IParamsSet* paramsPtr,
 			const imtbase::IOperationContext* operationContextPtr) const
 {
+	const QByteArray objectId = imtdoc::GetObjectIdFromParams(paramsPtr);
+
 	const imtauth::IRole* roleInfoPtr = dynamic_cast<const imtauth::IRole*>(&document);
 	if (roleInfoPtr == nullptr){
 		errorMessage = QStringLiteral("Invalid document type for role validation");

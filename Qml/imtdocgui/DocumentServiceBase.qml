@@ -32,6 +32,8 @@ QtObject {
 	signal startCloseDocument(string documentId)
 	signal documentClosed(string documentId)
 	signal closeDocumentFailed(string documentId, string message)
+	// The document stays open: the user cancelled the close, or the save before it was refused or failed
+	signal closeDocumentCancelled(string documentId)
 	// The server no longer has the document; emitted right before documentClosed().
 	signal documentLost(string documentId, string documentName)
 
@@ -213,8 +215,45 @@ QtObject {
 		return resolvedName
 	}
 
-	function closeDocument(documentId){
+	// force - closes without asking about unsaved changes
+	function closeDocument(documentId, force){
 		console.warn("closeDocument() should be implemented in a subclass")
+	}
+
+	// Closes the document as closeDocument() does: callback(true) once it is closed, callback(false) when it stays open
+	function tryCloseDocument(documentId, callback){
+		if (!documentIsOpened(documentId)){
+			callback(true)
+			return
+		}
+
+		let finish = null
+		let closedFunc = function(closedDocumentId){
+			if (closedDocumentId === documentId){
+				finish(true)
+			}
+		}
+		let cancelledFunc = function(cancelledDocumentId){
+			if (cancelledDocumentId === documentId){
+				finish(false)
+			}
+		}
+		let failedFunc = function(failedDocumentId, message){
+			if (failedDocumentId === documentId){
+				finish(false)
+			}
+		}
+		finish = function(closed){
+			documentClosed.disconnect(closedFunc)
+			closeDocumentCancelled.disconnect(cancelledFunc)
+			closeDocumentFailed.disconnect(failedFunc)
+			callback(closed)
+		}
+
+		documentClosed.connect(closedFunc)
+		closeDocumentCancelled.connect(cancelledFunc)
+		closeDocumentFailed.connect(failedFunc)
+		closeDocument(documentId)
 	}
 
 	function doUndo(documentId, steps){

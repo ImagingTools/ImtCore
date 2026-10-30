@@ -13,7 +13,7 @@ CDocumentChangedEvent::CDocumentChangedEvent(
 			const QByteArray& documentId,
 			const QByteArray& documentTypeId,
 			const QString& documentName,
-			const QUrl& documentUrl,
+			const QByteArray& documentSourceRef,
 			bool isDirty,
 			const istd::IChangeable& document,
 			const istd::IChangeable::ChangeSet& changeSet,
@@ -26,7 +26,7 @@ CDocumentChangedEvent::CDocumentChangedEvent(
 	m_documentId = documentId;
 	m_documentTypeId = documentTypeId;
 	m_documentName = documentName;
-	m_documentUrl = documentUrl;
+	m_documentSourceRef = documentSourceRef;
 	m_isDirty = isDirty;
 }
 

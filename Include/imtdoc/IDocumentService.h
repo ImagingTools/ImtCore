@@ -153,7 +153,7 @@ public:
 	struct DocumentInfo
 	{
 		QByteArray typeId;        ///< Registered object type-ID of the document.
-		QUrl url;                 ///< Source URL (e.g.\ \c collection://\<objectId\>).
+		QByteArray documentSourceRef; ///< Storage-specific reference to the document source (e.g.\ \c <objectId>[/<revision>] for a collection), empty for unsaved documents.
 		QString name;             ///< Human-readable document name.
 		bool isDirty = false;     ///< \c true when the document has unsaved changes.
 		bool hasNameProvider = false; ///< \c true when a name provider is registered for this type.

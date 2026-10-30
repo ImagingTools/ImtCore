@@ -44,6 +44,13 @@ public:
 	imtrest::IRequestServlet* GetRequestServlet();
 	imtrest::IProtocolEngine* GetProtocolEngine();
 
+	[[nodiscard]] CConnectionTimeoutConfig GetConnectionTimeoutConfig() const;
+
+	/**
+		Get the limit of the unsent data of a socket in bytes, see CTcpServerComp::GetWriteHighWatermark().
+	*/
+	[[nodiscard]] qint64 GetWriteHighWatermark() const;
+
 	[[nodiscard]] bool IsSecureConnection() const;
 	void EnableSecureConnection(bool isSecureConnection = true);
 

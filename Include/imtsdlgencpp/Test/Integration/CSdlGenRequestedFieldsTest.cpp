@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include "CSdlGenTest.h"
+#include "CSdlGenIntegrationTest.h"
 
 
 // Qt includes
@@ -167,7 +167,7 @@ QByteArrayList GetUnsetItemFields(const QByteArray& prefix, const QByteArrayList
 } // namespace
 
 
-void CSdlGenTest::TestRequestedFields_data()
+void CSdlGenIntegrationTest::TestRequestedFields_data()
 {
 	QTest::addColumn<QByteArray>("query");
 	QTest::addColumn<QByteArrayList>("expectedUnsetFlags");
@@ -297,7 +297,7 @@ void CSdlGenTest::TestRequestedFields_data()
 }
 
 
-void CSdlGenTest::TestRequestedFields()
+void CSdlGenIntegrationTest::TestRequestedFields()
 {
 	QFETCH(QByteArray, query);
 	QFETCH(QByteArrayList, expectedUnsetFlags);
@@ -322,7 +322,7 @@ void CSdlGenTest::TestRequestedFields()
 }
 
 
-void CSdlGenTest::TestRequestedFieldsWithComplexArguments()
+void CSdlGenIntegrationTest::TestRequestedFieldsWithComplexArguments()
 {
 	// braces, brackets and keywords inside of the arguments must not leak into the selection set
 	const QByteArray query =
@@ -354,7 +354,7 @@ void CSdlGenTest::TestRequestedFieldsWithComplexArguments()
 }
 
 
-void CSdlGenTest::TestRequestedFieldsOfMutation()
+void CSdlGenIntegrationTest::TestRequestedFieldsOfMutation()
 {
 	// the output type of the command is the object itself, its fields are on the top level
 	const QByteArray query = "mutation SaveItem {SaveItem(input: {offset: 0}) {id name data {info {value}} node {parentNode {name}}}}";
@@ -378,7 +378,7 @@ void CSdlGenTest::TestRequestedFieldsOfMutation()
 }
 
 
-void CSdlGenTest::TestRequestedFieldsWithFieldNamedAsCommand()
+void CSdlGenIntegrationTest::TestRequestedFieldsWithFieldNamedAsCommand()
 {
 	// the only requested field has the name of the command and must not be taken for a wrapper of the selection set
 	const QByteArray query = "query Report {Report(input: {offset: 0}) {Report {title}}}";
@@ -394,7 +394,7 @@ void CSdlGenTest::TestRequestedFieldsWithFieldNamedAsCommand()
 }
 
 
-void CSdlGenTest::TestRequestedFieldsOfBuiltRequest()
+void CSdlGenIntegrationTest::TestRequestedFieldsOfBuiltRequest()
 {
 	// a request composed on the server side and the same request after a round trip through its query text
 	imtgql::CGqlFieldObject addressFields;

@@ -2475,6 +2475,15 @@ if (jsonObject.contains("distinctFields") && jsonObject["distinctFields"].isNull
 
 
 
+} // namespace sdl::V1_0::imtbase
+
+#include "ComplexCollectionFilterObjects.h"
+
+
+namespace sdl::V1_0::imtbase
+{
+
+
 CTimeFilterObject::CTimeFilterObject(QObject* parent): ::imtbase::CItemModelBase(parent){
 
 	QObject::connect(this, &CTimeFilterObject::timeRangeChanged, this, &CItemModelBase::OnInternalModelChanged);

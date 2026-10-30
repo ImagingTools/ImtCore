@@ -1169,6 +1169,140 @@ if (jsonObject.contains("data") && jsonObject["data"].isNull()){
 
 
 
+
+
+QByteArray CGetPrintersGqlRequest::GetCommandId()
+{
+	return QByteArrayLiteral("GetPrinters");
+}
+
+
+bool CGetPrintersGqlRequest::SetupGqlRequest(::imtgql::CGqlRequest& gqlRequest, const GetPrintersRequestArguments& requestArguments, const GetPrintersRequestInfo& /*requestInfo*/)
+{
+	gqlRequest.SetCommandId(GetCommandId());
+
+	// writting input arguments
+
+	return true;
+}
+
+
+CGetPrintersGqlRequest::CGetPrintersGqlRequest(const ::imtgql::CGqlRequest& gqlRequest, bool optRead)
+	: m_isValid(true)
+{
+	Q_UNUSED(optRead)
+	m_isValid = true;
+	m_gqlContextPtr = gqlRequest.GetRequestContext();
+
+	// reading input arguments
+
+	// reading requested fields
+	const imtgql::CGqlFieldObject* requestedFieldsObjectPtr = nullptr;
+	if (!gqlRequest.GetFields().GetFieldIds().isEmpty()){
+		requestedFieldsObjectPtr = &gqlRequest.GetFields();
+		if (requestedFieldsObjectPtr != nullptr){
+			const QByteArrayList requestedIds = requestedFieldsObjectPtr->GetFieldIds();
+			if (!requestedIds.isEmpty()){
+				m_requestInfo.isDataRequested = requestedIds.contains("data");
+				const imtgql::CGqlFieldObject* dataRequestedFieldsPtr = requestedFieldsObjectPtr->GetFieldArgumentObjectPtr("data");
+				if (dataRequestedFieldsPtr != nullptr){
+					const QByteArrayList dataRequestedIds = dataRequestedFieldsPtr->GetFieldIds();
+					if (!dataRequestedIds.isEmpty()){
+						m_requestInfo.data.isNameRequested = dataRequestedIds.contains("name");
+						m_requestInfo.data.isSpecificationRequested = true;
+						m_requestInfo.data.isSimpleTestRequested = true;
+						m_requestInfo.data.isMixedTestRequested = true;
+					}
+				}
+			}
+		}
+	}
+}
+
+
+bool CGetPrintersGqlRequest::IsValid() const
+{
+	return m_isValid;
+}
+
+
+const ::imtgql::IGqlContext* CGetPrintersGqlRequest::GetRequestContext() const
+{
+	return m_gqlContextPtr;
+}
+
+
+const GetPrintersRequestArguments& CGetPrintersGqlRequest::GetRequestedArguments() const
+{
+	return m_requestedArguments;
+}
+
+
+GetPrintersRequestInfo CGetPrintersGqlRequest::GetRequestInfo() const
+{
+	return m_requestInfo;
+}
+bool CPrinterBaseGqlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
+{
+	const QByteArray commandId = gqlRequest.GetCommandId();
+	if (commandId == CGetPrintersGqlRequest::GetCommandId()){
+		return true;
+	}
+
+	return BaseClass::IsRequestSupported(gqlRequest);
+}
+
+
+QJsonObject CPrinterBaseGqlHandlerCompBase::CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+{
+	const QByteArray commandId = gqlRequest.GetCommandId();
+	QJsonObject modelObj;
+	QJsonObject dataModelObj;
+
+	// GetPrinters
+	if (commandId == CGetPrintersGqlRequest::GetCommandId()){
+		CGetPrintersGqlRequest getPrintersGqlRequest(gqlRequest, false);
+		if (!getPrintersGqlRequest.IsValid()){
+			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(commandId);
+			SendErrorMessage(0, errorMessage);
+
+			return QJsonObject();
+		}
+
+		V1_0::modsdl::CPrinterList replyPayload = OnGetPrinters(getPrintersGqlRequest, gqlRequest, errorMessage);
+		if (!errorMessage.isEmpty()){
+			SendErrorMessage(0, QStringLiteral("The derived call [OnGetPrinters] returned an error: %1").arg(errorMessage));
+
+			return QJsonObject();
+		}
+
+		const bool isModelCreated = replyPayload.WriteToJsonObject(dataModelObj);
+		if (!isModelCreated){
+			errorMessage = QStringLiteral("Internal error. Unable to create response for command-ID: '%1'").arg(commandId);
+			SendCriticalMessage(0, errorMessage);
+
+			return QJsonObject();
+		}
+
+		modelObj.insert(QStringLiteral("data"), dataModelObj); return modelObj;
+	}
+
+	errorMessage = QStringLiteral("Bad request. Unexpected command-ID: '%1'").arg(commandId);
+	SendErrorMessage(0, errorMessage);
+
+	return QJsonObject();
+}
+
+
+} // namespace sdl::V1_0::modsdl
+
+#include "PrinterBaseObjects.h"
+
+
+namespace sdl::V1_0::modsdl
+{
+
+
 CPrinterSpecificationBaseObject::CPrinterSpecificationBaseObject(QObject* parent): ::imtbase::CItemModelBase(parent){
 
 	QObject::connect(this, &CPrinterSpecificationBaseObject::nameChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -2807,129 +2941,4 @@ QVariant CMixedUnionObjectList::getData(const QString& nameId, int index)
 	}
 	return QVariant();
 }
-
-
-QByteArray CGetPrintersGqlRequest::GetCommandId()
-{
-	return QByteArrayLiteral("GetPrinters");
-}
-
-
-bool CGetPrintersGqlRequest::SetupGqlRequest(::imtgql::CGqlRequest& gqlRequest, const GetPrintersRequestArguments& requestArguments, const GetPrintersRequestInfo& /*requestInfo*/)
-{
-	gqlRequest.SetCommandId(GetCommandId());
-
-	// writting input arguments
-
-	return true;
-}
-
-
-CGetPrintersGqlRequest::CGetPrintersGqlRequest(const ::imtgql::CGqlRequest& gqlRequest, bool optRead)
-	: m_isValid(true)
-{
-	Q_UNUSED(optRead)
-	m_isValid = true;
-	m_gqlContextPtr = gqlRequest.GetRequestContext();
-
-	// reading input arguments
-
-	// reading requested fields
-	const imtgql::CGqlFieldObject* requestedFieldsObjectPtr = nullptr;
-	if (!gqlRequest.GetFields().GetFieldIds().isEmpty()){
-		requestedFieldsObjectPtr = &gqlRequest.GetFields();
-		if (requestedFieldsObjectPtr != nullptr){
-			const QByteArrayList requestedIds = requestedFieldsObjectPtr->GetFieldIds();
-			if (!requestedIds.isEmpty()){
-				m_requestInfo.isDataRequested = requestedIds.contains("data");
-				const imtgql::CGqlFieldObject* dataRequestedFieldsPtr = requestedFieldsObjectPtr->GetFieldArgumentObjectPtr("data");
-				if (dataRequestedFieldsPtr != nullptr){
-					const QByteArrayList dataRequestedIds = dataRequestedFieldsPtr->GetFieldIds();
-					if (!dataRequestedIds.isEmpty()){
-						m_requestInfo.data.isNameRequested = dataRequestedIds.contains("name");
-						m_requestInfo.data.isSpecificationRequested = true;
-						m_requestInfo.data.isSimpleTestRequested = true;
-						m_requestInfo.data.isMixedTestRequested = true;
-					}
-				}
-			}
-		}
-	}
-}
-
-
-bool CGetPrintersGqlRequest::IsValid() const
-{
-	return m_isValid;
-}
-
-
-const ::imtgql::IGqlContext* CGetPrintersGqlRequest::GetRequestContext() const
-{
-	return m_gqlContextPtr;
-}
-
-
-const GetPrintersRequestArguments& CGetPrintersGqlRequest::GetRequestedArguments() const
-{
-	return m_requestedArguments;
-}
-
-
-GetPrintersRequestInfo CGetPrintersGqlRequest::GetRequestInfo() const
-{
-	return m_requestInfo;
-}
-bool CPrinterBaseGqlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
-{
-	const QByteArray commandId = gqlRequest.GetCommandId();
-	if (commandId == CGetPrintersGqlRequest::GetCommandId()){
-		return true;
-	}
-
-	return BaseClass::IsRequestSupported(gqlRequest);
-}
-
-
-QJsonObject CPrinterBaseGqlHandlerCompBase::CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
-{
-	const QByteArray commandId = gqlRequest.GetCommandId();
-	QJsonObject modelObj;
-	QJsonObject dataModelObj;
-
-	// GetPrinters
-	if (commandId == CGetPrintersGqlRequest::GetCommandId()){
-		CGetPrintersGqlRequest getPrintersGqlRequest(gqlRequest, false);
-		if (!getPrintersGqlRequest.IsValid()){
-			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(commandId);
-			SendErrorMessage(0, errorMessage);
-
-			return QJsonObject();
-		}
-
-		V1_0::modsdl::CPrinterList replyPayload = OnGetPrinters(getPrintersGqlRequest, gqlRequest, errorMessage);
-		if (!errorMessage.isEmpty()){
-			SendErrorMessage(0, QStringLiteral("The derived call [OnGetPrinters] returned an error: %1").arg(errorMessage));
-
-			return QJsonObject();
-		}
-
-		const bool isModelCreated = replyPayload.WriteToJsonObject(dataModelObj);
-		if (!isModelCreated){
-			errorMessage = QStringLiteral("Internal error. Unable to create response for command-ID: '%1'").arg(commandId);
-			SendCriticalMessage(0, errorMessage);
-
-			return QJsonObject();
-		}
-
-		modelObj.insert(QStringLiteral("data"), dataModelObj); return modelObj;
-	}
-
-	errorMessage = QStringLiteral("Bad request. Unexpected command-ID: '%1'").arg(commandId);
-	SendErrorMessage(0, errorMessage);
-
-	return QJsonObject();
-}
-
-
 } // namespace sdl::V1_0::modsdl

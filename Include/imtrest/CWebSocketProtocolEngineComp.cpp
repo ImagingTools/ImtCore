@@ -8,6 +8,7 @@
 // ImtCore includes
 #include <imtrest/CWebSocketRequest.h>
 #include <imtrest/CWebSocketResponse.h>
+#include <imtrest/ProtocolTypeIds.h>
 
 
 namespace imtrest
@@ -20,7 +21,7 @@ namespace imtrest
 
 QByteArray CWebSocketProtocolEngineComp::GetProtocolTypeId() const
 {
-	return "ws";
+	return ProtocolTypeIds::s_webSocket;
 }
 
 
