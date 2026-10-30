@@ -20,6 +20,13 @@ Item {
 	property string __documentHeaderId: ""
 	property string __dirtyDocumentId: ""
 
+	// The editor of the open document that continues the headers past it with addDocumentSubHeader() (TenantEditor).
+	// It implements canNavigateBack(), navigateBack(), navigateToHeader(headerId) and requestLeave(callback);
+	// without it the header closes the document as before.
+	property var subHeaderNavigator: null
+	// A close of the document is in progress: the header does not start another one
+	property bool __leaving: false
+
 	signal startLoading(string documentId)
 	signal stopLoading(string documentId)
 
@@ -76,9 +83,27 @@ Item {
 		stackView.setCurrentIndex(0)
 	}
 
+	// A header after the one of the open document; ignored while no document is shown
+	function addDocumentSubHeader(headerId, name){
+		if (workspaceView.__documentHeaderId !== ""){
+			stackViewHeader.addHeader(headerId, name)
+		}
+	}
+
+	// Removes the header and every header after it
+	function removeDocumentSubHeader(headerId){
+		while (stackViewHeader.getIndexById(headerId) >= 0){
+			stackViewHeader.popHeader()
+		}
+	}
+
+	function setDocumentSubHeaderName(headerId, name){
+		stackViewHeader.setHeaderName(headerId, name)
+	}
+
 	function __removeDocumentHeader(){
 		if (workspaceView.__documentHeaderId !== ""){
-			stackViewHeader.removeHeader(workspaceView.__documentHeaderId)
+			workspaceView.removeDocumentSubHeader(workspaceView.__documentHeaderId)
 			workspaceView.__documentHeaderId = ""
 		}
 	}
@@ -90,6 +115,41 @@ Item {
 				workspaceView.documentManager.closeDocument(openedDocumentIds[openedDocumentIds.length - 1])
 			}
 		}
+	}
+
+	// Leaves the open document from the header: first the editors open inside it, then the document itself,
+	// each asking about its unsaved changes; a cancel anywhere keeps everything open
+	function __leaveDocument(){
+		if (workspaceView.__leaving || !workspaceView.documentManager){
+			return
+		}
+
+		let openedDocumentIds = workspaceView.documentManager.getOpenedDocumentIds()
+		if (openedDocumentIds.length === 0){
+			return
+		}
+
+		let documentId = openedDocumentIds[openedDocumentIds.length - 1]
+		workspaceView.__leaving = true
+		let closeDocumentFunc = function(){
+			workspaceView.documentManager.tryCloseDocument(documentId, function(closed){
+				workspaceView.__leaving = false
+			})
+		}
+
+		if (!workspaceView.subHeaderNavigator){
+			closeDocumentFunc()
+			return
+		}
+
+		workspaceView.subHeaderNavigator.requestLeave(function(left){
+			if (left){
+				closeDocumentFunc()
+			}
+			else{
+				workspaceView.__leaving = false
+			}
+		})
 	}
 
 	function __showSingleDocument(documentId, name){
@@ -116,7 +176,7 @@ Item {
 		workspaceView.__closeOtherOpenedDocuments(documentId)
 	}
 
-	// The name of the document in the header, with "* " while it has unsaved changes
+	// The name of the document in the header, marked while it has unsaved changes
 	function __updateDocumentHeader(documentId){
 		if (workspaceView.__documentHeaderId === ""){
 			return
@@ -127,7 +187,8 @@ Item {
 			name = workspaceView.documentManager.getDefaultDocumentName()
 		}
 		let isDirty = workspaceView.documentManager.documentIsDirty(documentId) && !dirtyMarkTimer.running
-		stackViewHeader.setHeaderName(documentId, isDirty ? "* " + name : name)
+		stackViewHeader.setHeaderName(documentId, name)
+		stackViewHeader.setHeaderDirty(documentId, isDirty)
 	}
 
 	// A document saved with each change is dirty only for the moment of the save: the mark waits, so the name does not blink
@@ -414,9 +475,10 @@ Item {
 				}
 			}
 
+			let name = workspaceView.documentManager.getDocumentName(documentId)
 			ModalDialogManager.showConfirmationDialog(
 						qsTr("Save document"),
-						qsTr("Save all changes ?"),
+						name ? qsTr("Save changes to \"%1\"?").arg(name) : qsTr("Save all changes ?"),
 						dialogCallback)
 		}
 	}
@@ -440,24 +502,40 @@ Item {
 		color: Style.baseColor
 	}
 
-	// The headers as in SimpleCollectionPage: the collection, then the open document;
-	// the back button or the collection header closes the document
+	// The headers as in SimpleCollectionPage: the collection, then the open document and the headers its editor adds;
+	// the back button goes one level up, the collection header leaves the document
 	StackViewHeader {
 		id: stackViewHeader
 		anchors.top: parent.top
 		anchors.left: parent.left
 		anchors.leftMargin: Style.marginM
 		anchors.right: parent.right
-		height: visible ? Style.controlHeightL : 0
+		anchors.rightMargin: Style.marginL
+		height: visible ? Style.controlHeightL + Style.marginS : 0
 		visible: workspaceView.__documentHeaderId !== ""
 		initialItemTitleVisible: true
 
 		onCloseClicked: {
-			workspaceView.__closeCurrentDocument()
+			if (workspaceView.__leaving){
+				return
+			}
+			if (workspaceView.subHeaderNavigator && workspaceView.subHeaderNavigator.canNavigateBack()){
+				workspaceView.subHeaderNavigator.navigateBack()
+				return
+			}
+			workspaceView.__leaveDocument()
 		}
 
 		onHeaderItemClicked: {
-			workspaceView.__closeCurrentDocument()
+			if (workspaceView.__leaving){
+				return
+			}
+			let documentIndex = stackViewHeader.getIndexById(workspaceView.__documentHeaderId)
+			if (workspaceView.subHeaderNavigator && index >= documentIndex){
+				workspaceView.subHeaderNavigator.navigateToHeader(headerId)
+				return
+			}
+			workspaceView.__leaveDocument()
 		}
 	}
 
@@ -528,9 +606,21 @@ Item {
 		}
 	}
 
+	// Sets the headers apart from the document under them, as the separator of the pages in MultiPageView
+	Rectangle {
+		id: headerLine
+		anchors.top: stackViewHeader.bottom
+		anchors.left: parent.left
+		anchors.right: parent.right
+		height: visible ? 1 : 0
+		color: Style.borderColor
+		opacity: 0.5
+		visible: stackViewHeader.visible
+	}
+
 	StackView {
 		id: stackView
-		anchors.top: stackViewHeader.bottom
+		anchors.top: headerLine.bottom
 		anchors.left: parent.left
 		anchors.right: parent.right
 		anchors.bottom: parent.bottom

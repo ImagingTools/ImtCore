@@ -70,6 +70,8 @@ Item {
 	// A read-only list (document revisions, an entity's tickets) turns
 	// selection off; a short list that never needs searching turns the filter off.
 	property bool filterEnabled: true
+	// Width kept free right of the search box, for commands the page places on its line
+	property int filterRightInset: 0
 	property bool selectionEnabled: true
 	// The borders of the columns can be dragged to resize them
 	property bool canMoveColumns: false
@@ -252,7 +254,8 @@ Item {
 		anchors.top: parent.top
 		anchors.topMargin: root.__filterTopMargin
 		anchors.horizontalCenter: parent.horizontalCenter
-		width: root.contentWidth
+		anchors.horizontalCenterOffset: -root.filterRightInset / 2
+		width: root.contentWidth - root.filterRightInset
 		placeHolderText: root.filterPlaceholder
 
 		onTextChanged: {

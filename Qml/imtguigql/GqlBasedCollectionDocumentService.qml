@@ -220,10 +220,11 @@ DocumentServiceBase {
 		saveDocumentRequest.send(saveDocumentInput)
 	}
 
-	function closeDocument(documentId){
+	function closeDocument(documentId, force){
 		let closeFunc = function(result){
 			if (result === undefined){
 				// Cancel
+				closeDocumentCancelled(documentId)
 				return
 			}
 
@@ -241,10 +242,12 @@ DocumentServiceBase {
 					if (documentId === savedDocumentId){
 						documentSaved.disconnect(savedFunc)
 						saveDocumentFailed.disconnect(savedFailedFunc)
+						closeDocumentCancelled(documentId)
 					}
 				}
 
 				if (!documentViewsAcceptSave(documentId)){
+					closeDocumentCancelled(documentId)
 					return
 				}
 
@@ -271,7 +274,7 @@ DocumentServiceBase {
 			}
 		}
 
-		if (documentIsDirty(documentId)){
+		if (documentIsDirty(documentId) && !force){
 			tryCloseDirtyDocument(documentId, closeFunc)
 		}
 		else{

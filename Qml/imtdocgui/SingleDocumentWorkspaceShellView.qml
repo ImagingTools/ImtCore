@@ -134,6 +134,27 @@ Item {
 		documentManager.closeDocument(_internal.documentId)
 	}
 
+	// Closes the document as closeDocument() does: callback(true) once it is closed, callback(false) when the user keeps it
+	function requestClose(callback){
+		if (!documentManager || _internal.documentId === ""){
+			callback(true)
+			return
+		}
+		documentManager.tryCloseDocument(_internal.documentId, callback)
+	}
+
+	// The name the user knows the document by, for the question about its unsaved changes
+	function _dialogDocumentName(documentId){
+		let name = ""
+		if (typeof workspaceView.documentNameResolver === "function"){
+			name = workspaceView.documentNameResolver(documentId)
+		}
+		if (!name){
+			name = workspaceView.documentManager.getDocumentName(documentId)
+		}
+		return name ? name : ""
+	}
+
 	function _tryOpen(){
 		if (!documentManager){
 			return
@@ -349,9 +370,10 @@ Item {
 				}
 			}
 
+			let name = workspaceView._dialogDocumentName(documentId)
 			ModalDialogManager.showConfirmationDialog(
 						qsTr("Save document"),
-						qsTr("Save all changes ?"),
+						name !== "" ? qsTr("Save changes to \"%1\"?").arg(name) : qsTr("Save all changes ?"),
 						dialogCallback)
 		}
 
