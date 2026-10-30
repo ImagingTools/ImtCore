@@ -222,6 +222,13 @@ protected:
 		storage-specific subclasses create it from \c WorkingDocument::documentSourceRef.
 	*/
 	virtual iprm::IParamsSetUniquePtr CreateDocumentSourceParams(const WorkingDocument& document) const;
+	/**
+		Creates the data object of a document of the type \a typeId from its source reference \a documentSourceRef.
+		Used when restoring the opened documents. The base implementation returns an empty pointer,
+		storage-specific subclasses load the data from the document source.
+		If the returned pointer is empty, the data object is created with \c CreateObject.
+	*/
+	virtual istd::IChangeableSharedPtr CreateObjectFromSourceRef(const QByteArray& typeId, const QByteArray& documentSourceRef) const;
 	virtual QString GetDefaultDocumentName(const WorkingDocument& document) const;
 	virtual bool HasDocumentNameProvider(const QByteArray& typeId) const;
 	virtual bool ValidateDocumentData(

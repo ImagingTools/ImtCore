@@ -1,7 +1,8 @@
-# CCollectionDocumentServiceComp: state file persistence
+# Document service: state file persistence
 
-`imtdoc::CCollectionDocumentServiceComp` can save and restore the list of opened
-documents to/from a JSON file.
+`imtdoc::CDocumentServiceCompBase` (and therefore every document service component derived
+from it, e.g. `CDocumentServiceComp` and `CCollectionDocumentServiceComp`) can save and restore
+the list of opened documents to/from a JSON file.
 
 ## Automatic persistence
 
@@ -21,13 +22,17 @@ are created.
 
 The file contains the descriptions of the opened documents and, separately, the IDs of
 the documents opened by each user. A document shared by several users (single-copy mode)
-is described once. Document data itself is **not** stored; it is loaded from the
-collection on restore (documents that were never saved are restored as new empty documents).
-Unsaved changes are restored by a persistent undo manager (`IPersistentUndoManager`), if any.
+is described once. Document data itself is **not** stored. On restore the data object is
+created by the virtual method `CreateObjectFromSourceRef(typeId, documentSourceRef)`, which
+is implemented by storage-specific subclasses; if it fails (no source reference, the source is
+not available, or the subclass does not implement it), the data object is created by
+`CreateObject(typeId)` as a new empty document. Unsaved changes are restored by a persistent
+undo manager (`IPersistentUndoManager`), if any.
 
 `LoadFromFile()` validates the JSON strictly:
 - the root object must contain the arrays `Documents` and `Users`;
-- each document object must contain `DocumentId` (non-empty, unique), `TypeId`,
+- each document object must contain `DocumentId` (non-empty, unique), `TypeId`
+  (a document with an empty `TypeId` is not restored),
   `DocumentSourceRef`, `Name`, `IsReadOnly` and `SingleDocumentInstance`;
 - each user object must contain `UserId` and the array `DocumentIds`; every ID must
   reference an object in `Documents`.
@@ -38,9 +43,11 @@ all documents can no longer be associated to any document. In this case the comp
 (subdirectories of `RootFolder` for `CFileBasedUndoManagerComp`; files directly in
 `RootFolder` are kept).
 
-`DocumentSourceRef` is `<objectId>` or `<objectId>/<revision>`, empty for a document that
-was never saved. A document opened from an object revision is restored from this revision
-and stays read-only (`IsReadOnly`).
+`DocumentSourceRef` is stored as is; its format is defined by the service implementation
+and it is empty for a document that was never saved. `IsReadOnly` is restored as is.
+In `CCollectionDocumentServiceComp` the source reference is `<objectId>` or
+`<objectId>/<revision>`: the data is loaded from the collection object or its revision,
+and a document opened from a revision stays read-only.
 
 ```json
 {
