@@ -145,6 +145,7 @@ public:
 	// reimplemented (imtdoc::IPersistentUndoManager)
 	virtual void InitializeDocumentContext(const QByteArray& /*documentId*/, const QByteArray& /*documentTypeId*/) override {}
 	virtual void ResetHistory() override {}
+	virtual bool RemoveAllDocumentContexts() override { return true; }
 
 	// reimplemented (idoc::IDocumentStateComparator)
 	virtual bool HasStoredDocumentState() const override { return true; }

@@ -16,6 +16,7 @@
 
 // ImtCore includes
 #include <imtbase/imtbase.h>
+#include <imtdoc/IPersistentUndoManager.h>
 
 
 namespace imtdoc
@@ -47,6 +48,7 @@ bool CCollectionDocumentServiceComp::LoadFromFile(const QString& filePath)
 	QFile file(filePath);
 	if (!file.open(QIODevice::ReadOnly)){
 		SendErrorMessage(0, QStringLiteral("Cannot open document service state file '%1': %2").arg(filePath, file.errorString()));
+		RemovePersistedDocumentData();
 
 		return false;
 	}
@@ -58,6 +60,7 @@ bool CCollectionDocumentServiceComp::LoadFromFile(const QString& filePath)
 	const QJsonDocument jsonDocument = QJsonDocument::fromJson(fileData, &parseError);
 	if (parseError.error != QJsonParseError::NoError || !jsonDocument.isObject()){
 		SendErrorMessage(0, QStringLiteral("Cannot parse document service state file '%1': %2").arg(filePath, parseError.errorString()));
+		RemovePersistedDocumentData();
 
 		return false;
 	}
@@ -65,6 +68,7 @@ bool CCollectionDocumentServiceComp::LoadFromFile(const QString& filePath)
 	ServiceState state;
 	if (!ServiceStateFromJson(jsonDocument.object(), state)){
 		SendErrorMessage(0, QStringLiteral("Invalid content of document service state file '%1'").arg(filePath));
+		RemovePersistedDocumentData();
 
 		return false;
 	}
@@ -139,7 +143,13 @@ void CCollectionDocumentServiceComp::OnComponentCreated()
 	}
 
 	const QString filePath = GetStateFilePath();
-	if (filePath.isEmpty() || !QFileInfo::exists(filePath)){
+	if (filePath.isEmpty()){
+		return;
+	}
+
+	if (!QFileInfo::exists(filePath)){
+		RemovePersistedDocumentData();
+
 		return;
 	}
 
@@ -334,6 +344,20 @@ bool CCollectionDocumentServiceComp::ServiceStateFromJson(const QJsonObject& roo
 bool CCollectionDocumentServiceComp::IsStatePersistenceEnabled() const
 {
 	return m_statePersistenceEnablerCompPtr.IsValid() && m_statePersistenceEnablerCompPtr->IsEnabled();
+}
+
+
+void CCollectionDocumentServiceComp::RemovePersistedDocumentData() const
+{
+	idoc::IUndoManagerUniquePtr undoManagerPtr = CreateUndoManager();
+	IPersistentUndoManager* persistentUndoManagerPtr = dynamic_cast<IPersistentUndoManager*>(undoManagerPtr.GetPtr());
+	if (persistentUndoManagerPtr == nullptr){
+		return;
+	}
+
+	if (!persistentUndoManagerPtr->RemoveAllDocumentContexts()){
+		SendErrorMessage(0, QStringLiteral("Cannot remove persisted data of the documents"));
+	}
 }
 
 

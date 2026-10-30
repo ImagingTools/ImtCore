@@ -32,6 +32,12 @@ Unsaved changes are restored by a persistent undo manager (`IPersistentUndoManag
 - each user object must contain `UserId` and the array `DocumentIds`; every ID must
   reference an object in `Documents`.
 
+If the state file is missing, cannot be read or has invalid content, the persisted data of
+all documents can no longer be associated to any document. In this case the component calls
+`IPersistentUndoManager::RemoveAllDocumentContexts()`, which removes all document folders
+(subdirectories of `RootFolder` for `CFileBasedUndoManagerComp`; files directly in
+`RootFolder` are kept).
+
 `DocumentSourceRef` is `<objectId>` or `<objectId>/<revision>`, empty for a document that
 was never saved. A document opened from an object revision is restored from this revision
 and stays read-only (`IsReadOnly`).
