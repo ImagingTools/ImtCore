@@ -118,7 +118,7 @@ public:
 		QByteArray userId;
 		QByteArray documentTypeId;
 		QByteArray proposedSourceDocumentId;
-		QByteArray documentSourceRef; ///< Source reference of the document to open: \c <objectId> or \c <objectId>/<revision> (TT_OPEN only).
+		QByteArray documentSourceRef; ///< Implementation-specific reference to the document source to open (TT_OPEN only).
 		QByteArray documentId;
 		QString documentName;
 		const imtbase::IOperationContext* operationContextPtr = nullptr; ///< Optional operation context for tenant/owner propagation during save.
@@ -154,7 +154,7 @@ public:
 	struct DocumentInfo
 	{
 		QByteArray typeId;        ///< Registered object type-ID of the document.
-		QByteArray documentSourceRef; ///< Storage-specific reference to the document source (e.g.\ \c <objectId>[/<revision>] for a collection), empty for unsaved documents.
+		QByteArray documentSourceRef; ///< Implementation-specific reference to the document source, empty for unsaved documents.
 		QString name;             ///< Human-readable document name.
 		bool isDirty = false;     ///< \c true when the document has unsaved changes.
 		bool hasNameProvider = false; ///< \c true when a name provider is registered for this type.

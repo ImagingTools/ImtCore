@@ -132,8 +132,8 @@ protected:
 	/**
 		\brief Open an existing document addressed by \a params.documentSourceRef.
 
-		Resolves the source reference to a collection object ID, starts a background
-		thread to fetch the data, and fires \c CDocumentOpenedEvent
+		The interpretation of the source reference is up to the implementation.
+		The base implementation fails. An implementation fetches the data, fires \c CDocumentOpenedEvent
 		immediately.  Once the data is available \c CDocumentDataLoadedEvent
 		is fired from the main thread.
 	*/
