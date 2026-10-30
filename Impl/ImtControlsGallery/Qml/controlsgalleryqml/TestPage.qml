@@ -12,33 +12,28 @@ Rectangle {
 	color: Style.baseColor;
 
 	function fillModel(rowCount) {
-		if (headerModel.beginChanges)
-			headerModel.beginChanges();
-		if (dataModel.beginChanges)
-			dataModel.beginChanges();
-
-		headerModel.clear();
-		dataModel.clear();
+		let data = {
+			headers: [],
+			rows: []
+		};
 
 		for (let column = 0; column < 25; column++){
-			let headerIndex = headerModel.insertNewItem();
-			headerModel.setData("id", "c" + column, headerIndex);
-			headerModel.setData("name", qsTr("Колонка ") + (column + 1), headerIndex);
+			data.headers.push({
+				id: "c" + column,
+				name: qsTr("Колонка ") + (column + 1)
+			});
 		}
 
 		for (let row = 0; row < rowCount; row++){
-			let rowIndex = dataModel.insertNewItem();
+			let item = {};
 			for (let column = 0; column < 25; column++)
-				dataModel.setData("c" + column, (row + 1) + "." + (column + 1), rowIndex);
+				item["c" + column] = (row + 1) + "." + (column + 1);
+			data.rows.push(item);
 		}
 
-		if (headerModel.endChanges)
-			headerModel.endChanges();
-		if (dataModel.endChanges)
-			dataModel.endChanges();
-
-		canvasTable.headers = headerModel;
-		canvasTable.elements = dataModel;
+		tableDocument.fromJSON(JSON.stringify(data));
+		canvasTable.headers = tableDocument.m_headers;
+		canvasTable.elements = tableDocument.m_rows;
 		canvasTable.requestPaint();
 	}
 
@@ -119,11 +114,7 @@ Rectangle {
 		defaultColumnWidth: Style.sizeHintBXS;
 	}
 
-	TreeItemModel {
-		id: headerModel;
-	}
-
-	TreeItemModel {
-		id: dataModel;
+	CanvasTableSdlDocument {
+		id: tableDocument;
 	}
 }

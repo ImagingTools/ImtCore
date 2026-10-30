@@ -222,7 +222,7 @@ Item {
 		if (key === "")
 			return "";
 		let value = canvasTable.modelField(canvasTable.elements, rowIndex, key);
-		if (value === undefined || value === null)
+		if (value === undefined || value === null || value === "")
 			value = canvasTable.modelField(canvasTable.elements, rowIndex, "m_" + key);
 		if (value === undefined || value === null)
 			return "";

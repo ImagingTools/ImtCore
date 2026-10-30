@@ -14,6 +14,9 @@
         <file alias="IndicatorsRepresentaitonPage.qml">IndicatorsRepresentaitonPage.qml</file>
         <file alias="DialogsRepresentaitonPage.qml">DialogsRepresentaitonPage.qml</file>
         <file alias="TestPage.qml">TestPage.qml</file>
+        <file alias="CanvasTableSdlDocument.qml">CanvasTableSdlDocument.qml</file>
+        <file alias="CanvasTableHeaderSdl.qml">CanvasTableHeaderSdl.qml</file>
+        <file alias="CanvasTableRowSdl.qml">CanvasTableRowSdl.qml</file>
         <file alias="SdlTestPage.qml">SdlTestPage.qml</file>
         <file alias="CanvasPage.qml">CanvasPage.qml</file>
 	<file alias="GraphicsViewPage.qml">GraphicsViewPage.qml</file>
