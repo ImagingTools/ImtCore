@@ -137,6 +137,7 @@ void CDocumentServiceBridge::GetOpenedDocumentList(
 		info.name = item.name;
 		info.objectId = imtdoc::SourceRefToObjectId(item.documentSourceRef);
 		info.hasNameProvider = item.hasNameProvider;
+		info.isReadOnly = item.isReadOnly;
 		result.append(info);
 	}
 	PostToMainThread([cb = std::move(callback), result = std::move(result)]() mutable {
@@ -307,16 +308,28 @@ namespace
 /**
 	\brief Resolve the IUndoManager attached to a given document.
 	Returns \c nullptr and an error message in \a errorMessage on
-	failure.
+	failure. When \a isChangeRequired is \c true, read-only documents
+	are rejected.
 */
 idoc::IUndoManager* ResolveUndoManager(
 		imtdoc::IDocumentService* mgrPtr,
 		const QString& documentId,
-		QString& errorMessage)
+		QString& errorMessage,
+		bool isChangeRequired = true)
 {
 	if (mgrPtr == nullptr){
 		errorMessage = c_noManagerError;
 		return nullptr;
+	}
+	if (isChangeRequired){
+		const QByteArray documentIdUtf8 = documentId.toUtf8();
+		const imtdoc::IDocumentService::DocumentList list = mgrPtr->GetOpenedDocumentList(QByteArray());
+		for (const auto& item: list){
+			if (item.documentId == documentIdUtf8 && item.isReadOnly){
+				errorMessage = QStringLiteral("Document is read-only");
+				return nullptr;
+			}
+		}
 	}
 	idoc::IUndoManager* undoManagerPtr = nullptr;
 	const auto status = mgrPtr->GetDocumentUndoManager(
@@ -427,7 +440,7 @@ void CDocumentServiceBridge::GetUndoInfo(
 	}
 	QString errorMessage;
 	idoc::IUndoManager* undoManagerPtr = ResolveUndoManager(
-			m_documentManagerCompPtr.GetPtr(), documentId, errorMessage);
+			m_documentManagerCompPtr.GetPtr(), documentId, errorMessage, false);
 	if (undoManagerPtr == nullptr){
 		PostToMainThread([cb = std::move(callback), errorMessage]() mutable {
 				cb(0, 0, false, errorMessage);

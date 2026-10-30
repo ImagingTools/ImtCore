@@ -2758,6 +2758,7 @@
 - `requestDocumentName(string documentId, string typeId)`
 - `documentNameChanged(string documentId, string oldName, string newName)`
 - `documentIsDirtyChanged(string documentId, bool isDirty)`
+- `documentIsReadOnlyChanged(string documentId, bool isReadOnly)`
 - `startUndoInfoReceive(string documentId)`
 - `undoInfoReceived(string documentId, int availableUndoSteps, int availableRedoSteps, bool isDirty)`
 - `undoInfoReceiveFailed(string documentId, string message)`
@@ -2806,6 +2807,8 @@
 - `setDocumentName(documentId, name)`
 - `getDocumentName(documentId)`
 - `documentIsDirty(documentId)`
+- `documentIsReadOnly(documentId)`
+- `setDocumentIsReadOnly(documentId, isReadOnly)`
 - `documentIsLoading(documentId)`
 - `setDocumentIsLoading(documentId, isLoading)`
 - `setDocumentIsDirty(documentId, isDirty)`
@@ -2816,7 +2819,7 @@
 - `setDocumentServiceActiveView(view)`
 - `setAutoNamedTypeId(typeId, hasProvider)`
 - `hasDocumentNameProvider(typeId)`
-- `handleDocumentOpened(documentId, objectId, objectTypeId, documentName, hasNameProvider, isDirty)`
+- `handleDocumentOpened(documentId, objectId, objectTypeId, documentName, hasNameProvider, isDirty, isDataLoaded, isReadOnly)`
 - `handleDocumentCreated(documentId, objectTypeId, documentName, hasNameProvider, proposedObjectId, isDirty)`
 - `handleSaveDocumentResult(documentId, status, message, documentName)`
 - `handleCloseDocumentResult(documentId, status)`

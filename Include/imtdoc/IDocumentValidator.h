@@ -65,7 +65,7 @@ public:
 		\param		document		document data to validate.
 		\param		errorMessage	output parameter with validation error description when return value is false.
 								When validation succeeds, errorMessage is left unchanged.
-		\param		paramsPtr		optional parameters of the document source, provided by the document service.
+		\param		validationParams	optional parameters of the document source, provided by the document service.
 								Can be null if the document source is not described (e.g.\ new documents not yet saved).
 								For collection-based documents use \c imtdoc::GetObjectIdFromParams to get the collection object ID
 								and \c imtdoc::GetRevisionFromParams to get the object revision.
@@ -75,7 +75,7 @@ public:
 	virtual bool ValidateDocumentData(
 		const istd::IChangeable& document,
 		QString& errorMessage,
-		const iprm::IParamsSet* paramsPtr = nullptr,
+		const iprm::IParamsSet* validationParams = nullptr,
 		const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
 };
 

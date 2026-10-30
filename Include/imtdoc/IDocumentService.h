@@ -159,6 +159,7 @@ public:
 		bool hasNameProvider = false; ///< \c true when a name provider is registered for this type.
 		bool isLoading = false;   ///< \c true while the document data is still being loaded asynchronously.
 		bool singleDocumentInstance = false; ///< \c true when opened with \c TaskParams::singleDocumentInstance.
+		bool isReadOnly = false;  ///< \c true when the document can only be closed (e.g.\ a document opened from an object revision).
 	};
 
 	/**
@@ -242,6 +243,7 @@ public:
 		\param documentId    Instance ID of the document.
 		\param documentName  New name to assign.
 		\return              \c OS_OK on success, or an appropriate error code.
+		                     \c OS_FAILED for a read-only document.
 	*/
 	virtual OperationStatus SetDocumentName(const QByteArray& userId, const QByteArray& documentId, const QString& documentName) = 0;
 
@@ -271,6 +273,7 @@ public:
 		automatically updated.
 
 		\return  \c OS_OK on success, or an appropriate error code.
+		         \c OS_FAILED for a loading or read-only document.
 	*/
 	virtual OperationStatus SetDocumentData(const QByteArray& userId, const QByteArray& documentId, const istd::IChangeable& document) = 0;
 
@@ -282,7 +285,7 @@ public:
 
 		\return  \c OS_OK on success, or an appropriate error code. \c OS_FAILED also covers the case
 		         where the open document is not of the type \a method was bound to, in which case
-		         \a method was not called.
+		         \a method was not called, and a loading or read-only document.
 	*/
 	virtual OperationStatus ExecuteDocumentMethod(
 				const QByteArray& userId,

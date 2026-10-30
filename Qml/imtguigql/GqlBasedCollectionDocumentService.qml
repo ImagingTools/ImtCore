@@ -419,7 +419,7 @@ DocumentServiceBase {
 			DocumentInfo {
 				onFinished: {
 					delete root.__openingObjectIds[m_objectId]
-					root.handleDocumentOpened(m_documentId, m_objectId, m_objectTypeId, m_documentName, m_hasNameProvider, m_isDirty, m_isLoading === false)
+					root.handleDocumentOpened(m_documentId, m_objectId, m_objectTypeId, m_documentName, m_hasNameProvider, m_isDirty, m_isLoading === false, m_isReadOnly === true)
 					if (root.documentIsLoading(m_documentId))
 						root.__startLoadingResync()
 				}
