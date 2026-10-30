@@ -135,27 +135,6 @@ QtObject {
 			}
 		}
 
-		function onDocumentIsReadOnlyChanged(documentId, isReadOnly){
-			if (documentId !== root.documentId){
-				return
-			}
-
-			let isDirty = root.documentManager.documentIsDirty(documentId)
-			for (let i = 0; i < root.registeredViews.length; ++i){
-				if (root.registeredViews[i].commandsController){
-					root.registeredViews[i].commandsController.setCommandIsEnabled("Save", isDirty && !isReadOnly)
-					if (isReadOnly){
-						root.registeredViews[i].commandsController.setCommandIsEnabled("Undo", false)
-						root.registeredViews[i].commandsController.setCommandIsEnabled("Redo", false)
-					}
-				}
-			}
-
-			if (!isReadOnly){
-				root.documentManager.getUndoInfo(documentId)
-			}
-		}
-
 		function onDocumentManagerChanged(typeOperation, objectId, documentId, hasChanges){
 			if (documentId !== root.documentId){
 				return

@@ -370,11 +370,15 @@ DocumentServiceBase {
 	// the document loading forever: the opened document list tells the state, asked again while the server still loads.
 	property int __loadingResyncAttemptsLeft: 0
 
-	// Every editor of the service learns that a missed DocumentDataLoaded happened, not only the collection hosts
+	// Every editor of the service learns that a missed DocumentDataLoaded happened, not only the collection hosts.
+	// The read-only state is recorded before the hosts restore the listed documents.
 	function __applyLoadingStates(documentInfoList){
 		for (let i = 0; i < documentInfoList.count; ++i){
 			let documentInfo = documentInfoList.get(i).item
 			let documentId = String(documentInfo.m_documentId)
+			if (documentInfo.m_isReadOnly === true){
+				root.__internal.readOnlyDocumentIds[documentId] = true
+			}
 			if (root.documentIsOpened(documentId) && documentInfo.m_isLoading === false){
 				root.setDocumentIsLoading(documentId, false)
 			}
