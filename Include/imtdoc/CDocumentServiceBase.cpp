@@ -1058,6 +1058,12 @@ iprm::IParamsSetUniquePtr CDocumentServiceBase::CreateDocumentSourceParams(const
 }
 
 
+istd::IChangeableSharedPtr CDocumentServiceBase::CreateObjectFromSourceRef(const QByteArray& /*typeId*/, const QByteArray& /*documentSourceRef*/) const
+{
+	return istd::IChangeableSharedPtr();
+}
+
+
 QString CDocumentServiceBase::GetDefaultDocumentName(const WorkingDocument& /*document*/) const
 {
 	return QString();

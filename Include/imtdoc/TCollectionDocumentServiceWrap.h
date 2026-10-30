@@ -101,6 +101,7 @@ public:
 	virtual void DoCloseDocument(const QByteArray& taskId, const TaskParams& params) override;
 
 	virtual iprm::IParamsSetUniquePtr CreateDocumentSourceParams(const WorkingDocument& document) const override;
+	virtual istd::IChangeableSharedPtr CreateObjectFromSourceRef(const QByteArray& typeId, const QByteArray& documentSourceRef) const override;
 
 	// reimplemented (imtdoc::IDocumentService)
 	virtual OperationStatus SetDocumentName(const QByteArray& userId, const QByteArray& documentId, const QString& documentName) override;
@@ -628,6 +629,38 @@ inline iprm::IParamsSetUniquePtr TCollectionDocumentServiceWrap<Base>::CreateDoc
 	return imtdoc::CreateObjectSourceParams(
 				imtdoc::SourceRefToObjectId(document.documentSourceRef),
 				imtdoc::SourceRefToRevision(document.documentSourceRef));
+}
+
+
+template<class Base>
+inline istd::IChangeableSharedPtr TCollectionDocumentServiceWrap<Base>::CreateObjectFromSourceRef(
+			const QByteArray& /*typeId*/,
+			const QByteArray& documentSourceRef) const
+{
+	istd::IChangeableSharedPtr retVal;
+
+	const QByteArray objectId = imtdoc::SourceRefToObjectId(documentSourceRef);
+	imtbase::IObjectCollection* collectionPtr = GetCollection();
+	if (objectId.isEmpty() || collectionPtr == nullptr){
+		return retVal;
+	}
+
+	const int revision = imtdoc::SourceRefToRevision(documentSourceRef);
+	if (revision < 0){
+		if (!collectionPtr->GetObjectData(objectId, retVal)){
+			retVal.Reset();
+		}
+
+		return retVal;
+	}
+
+	const imtbase::IRevisionController* revisionControllerPtr = collectionPtr->GetRevisionController();
+	idoc::MetaInfoPtr metaInfoPtr;
+	if (revisionControllerPtr == nullptr || !revisionControllerPtr->GetRevisionData(*collectionPtr, objectId, revision, retVal, metaInfoPtr)){
+		retVal.Reset();
+	}
+
+	return retVal;
 }
 
 

@@ -2,14 +2,6 @@
 #pragma once
 
 
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QMutex>
-
-// ACF includes
-#include <ifile/IFileNameParam.h>
-#include <iprm/IEnableableParam.h>
-
 // ImtCore includes
 #include <imtdoc/TCollectionDocumentServiceWrap.h>
 #include <imtdoc/CDocumentServiceComp.h>
@@ -27,23 +19,18 @@ namespace imtdoc
 	service component for server-side multi-user scenarios.  It inherits
 	the full implementation from
 	\c TCollectionDocumentServiceWrap<CDocumentServiceComp> and adds only
-	the two ACF component attributes that complete the concrete class:
+	the ACF component attributes that complete the concrete class:
 
 	- \c "Collection" — reference to the \c IObjectCollection that provides
 	  persistent storage (required).
 	- \c "IsSingleCopyMode" — when \c true, all users that open the same
 	  collection element share a single in-memory data object and undo
 	  manager (default: \c false).
-	- \c "StateFilePath" — optional file path used by \c LoadFromFile /
-	  \c SaveToFile for persisting the list of opened documents in JSON format.
-	- \c "StatePersistenceEnabler" — optional switch.  When enabled, the
-	  list of opened documents is restored from \c "StateFilePath" on
-	  component creation and saved to it after each change of the service
-	  data model (open/create/close/save/rename of documents).
 
-	The JSON file contains the descriptions of the opened documents and,
-	separately, the IDs of the documents opened by each user; document data
-	is not stored.
+	State persistence of the opened documents (\c "StateFilePath",
+	\c "StatePersistenceEnabler") is inherited from \c CDocumentServiceCompBase;
+	the data of a restored document is loaded from the collection object
+	(or its revision) addressed by the document source reference.
 
 	Register it in the component descriptor with the interface
 	\c imtdoc::IDocumentService so that clients can obtain it via the ACF
@@ -58,18 +45,9 @@ public:
 		I_REGISTER_INTERFACE(imtdoc::IDocumentService)
 		I_ASSIGN(m_collectionCompPtr, "Collection", "Document collection containing related documents", true, "Collection");
 		I_ASSIGN(m_isSingleCopyModeAttrPtr, "IsSingleCopyMode", "When enabled, all users share a single copy of each document", false, false);
-		I_ASSIGN(m_stateFilePathCompPtr, "StateFilePath", "File path used to save/restore the list of opened documents", false, "StateFilePath");
-		I_ASSIGN(m_statePersistenceEnablerCompPtr, "StatePersistenceEnabler", "Enables restoring of opened documents on component creation and saving on each data model change", false, "StatePersistenceEnabler");
 	I_END_COMPONENT
 
 protected:
-	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated() override;
-	virtual void OnComponentDestroyed() override;
-
-	// reimplemented (istd::IChangeable)
-	virtual void OnEndChanges(const ChangeSet& changeSet) override;
-
 	// reimplemented (imtdoc::TCollectionDocumentServiceWrap)
 	virtual imtbase::IObjectCollection* GetCollection() const override;
 
@@ -77,62 +55,8 @@ protected:
 	virtual bool IsSingleCopyMode() const override;
 
 private:
-	bool LoadFromFile(const QString& filePath);
-	bool SaveToFile(const QString& filePath) const;
-
-	struct DocumentInfo
-	{
-		QByteArray documentId;
-		QByteArray typeId;
-		QByteArray documentSourceRef;
-		QString name;
-		bool isReadOnly = false;
-		bool singleDocumentInstance = false;
-	};
-	typedef QMap<QByteArray, DocumentInfo> DocumentInfoMap;
-
-	struct ServiceState
-	{
-		DocumentInfoMap documents; ///< documentId → document description.
-		UserDocumentIdsMap userDocumentIds; ///< userId → IDs of the documents opened by the user.
-	};
-
-	void PrepareServiceState(ServiceState& state) const;
-	static QJsonObject ServiceStateToJson(const ServiceState& state);
-	static bool ServiceStateFromJson(const QJsonObject& rootObject, ServiceState& state);
-	bool IsStatePersistenceEnabled() const;
-	QString GetStateFilePath() const;
-	/**
-		Remove persisted data (undo/redo history, unsaved changes) of all documents.
-		Used when the state file cannot be read, since the data cannot be associated to any document.
-	*/
-	void RemovePersistedDocumentData() const;
-	bool RestoreServiceState(const ServiceState& state);
-	void RemoveAllDocuments();
-	void RequestSaveToFile(const QString& filePath);
-	void ProcessSaveRequests();
-	bool RestoreSharedDocument(const DocumentInfo& documentInfo, const QByteArray& userId, bool isSingleCopyMode);
-	bool RestoreDocument(
-				const DocumentInfo& documentInfo,
-				const QByteArray& userId,
-				bool isSingleCopyMode,
-				imtbase::IObjectCollection* collectionPtr);
-	void RegisterRestoredDocument(
-				const DocumentInfo& documentInfo,
-				const QByteArray& userId,
-				const idoc::IUndoManagerSharedPtr& undoManagerPtr);
-
-private:
 	I_REF(imtbase::IObjectCollection, m_collectionCompPtr);
 	I_ATTR(bool, m_isSingleCopyModeAttrPtr);
-	I_REF(ifile::IFileNameParam, m_stateFilePathCompPtr);
-	I_REF(iprm::IEnableableParam, m_statePersistenceEnablerCompPtr);
-
-	std::atomic<bool> m_isStateLoading{false};
-	mutable QMutex m_stateFileMutex;
-	mutable QMutex m_saveRequestMutex;
-	QString m_lastRequestedStateFilePath;
-	bool m_isSaveRequestProcessingQueued = false;
 };
 
 
