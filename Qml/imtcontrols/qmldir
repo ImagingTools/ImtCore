@@ -128,6 +128,10 @@ OptionsListAdapter 1.0 Models/OptionsListAdapter.qml
 OptionsListManager 1.0 Models/OptionsListManager.qml
 NavigableItem 1.0 Models/NavigableItem.qml
 
+CanvasTable 1.0 ./Views/CanvasTable.qml
+CanvasTableCellDelegate 1.0 ./Views/CanvasTableCellDelegate.qml
+CanvasTableHeaderDelegate 1.0 ./Views/CanvasTableHeaderDelegate.qml
+CanvasTableRowDelegate 1.0 ./Views/CanvasTableRowDelegate.qml
 Table 1.0 ./Views/Table.qml
 TableHeaders 1.0 ./Views/TableHeaders.qml
 TableBase 1.0 ./Views/TableBase.qml
