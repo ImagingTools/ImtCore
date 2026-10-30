@@ -276,25 +276,25 @@ TestCase {
 		return null
 	}
 
-	// Watches the header name of the document until stopped
-	function recordHeaderNames(header){
-		let names = []
+	// Watches the name and the unsaved mark of the document header until stopped
+	function recordHeaderStates(header){
+		let states = []
 		let timer = Qt.createQmlObject("import QtQuick 2.12; Timer { interval: 5; repeat: true; running: true }", testCase)
 		timer.triggered.connect(function(){
-			let name = header.getHeaderName("doc")
-			if (names.length === 0 || names[names.length - 1] !== name){
-				names.push(name)
+			let state = header.getHeaderName("doc") + (header.getHeaderDirty("doc") ? " (dirty)" : "")
+			if (states.length === 0 || states[states.length - 1] !== state){
+				states.push(state)
 			}
 		})
-		return {"names": names, "timer": timer}
+		return {"states": states, "timer": timer}
 	}
 
-	// A document saved with each change is dirty only during the save: the name does not blink with "* "
+	// A document saved with each change is dirty only during the save: the mark does not blink
 	function test_dirtyForTheSaveOnlyDoesNotMarkTheName(){
 		let context = createWorkspace()
 		context.service.handleDocumentOpened("doc", "obj-doc", typeId, "Org", false, false)
 		tryVerify(function(){ return findHeader(context.workspace).getHeaderName("doc") === "Org" }, 3000)
-		let record = recordHeaderNames(findHeader(context.workspace))
+		let record = recordHeaderStates(findHeader(context.workspace))
 
 		context.service.setDocumentIsDirty("doc", true)
 		wait(30)
@@ -302,9 +302,10 @@ TestCase {
 		wait(500)
 
 		record.timer.destroy()
-		compare(record.names.join(" | "), "Org")
+		compare(record.states.join(" | "), "Org")
 	}
 
+	// The mark is kept apart from the name, which stays as it is
 	function test_unsavedChangesMarkTheName(){
 		let context = createWorkspace()
 		context.service.handleDocumentOpened("doc", "obj-doc", typeId, "Org", false, false)
@@ -312,10 +313,159 @@ TestCase {
 		tryVerify(function(){ return header.getHeaderName("doc") === "Org" }, 3000)
 
 		context.service.setDocumentIsDirty("doc", true)
-		tryVerify(function(){ return header.getHeaderName("doc") === "* Org" }, 1000, "The mark comes once the change stays unsaved")
+		tryVerify(function(){ return header.getHeaderDirty("doc") }, 1000, "The mark comes once the change stays unsaved")
+		compare(header.getHeaderName("doc"), "Org")
 
 		context.service.setDocumentIsDirty("doc", false)
-		compare(header.getHeaderName("doc"), "Org", "Saved: the mark goes at once")
+		verify(!header.getHeaderDirty("doc"), "Saved: the mark goes at once")
+	}
+
+	// The editor continuing the header (TenantEditor): records the calls, requestLeave answers with `leaveAnswer`
+	// or, when it is null, keeps the callback until the test answers it
+	Component {
+		id: navigatorComp
+
+		QtObject {
+			property bool hasSubLevel: false
+			property var leaveAnswer: true
+			property var calls: []
+			property var pendingLeave: null
+
+			function canNavigateBack(){
+				return hasSubLevel
+			}
+
+			function navigateBack(){
+				calls.push("back")
+			}
+
+			function navigateToHeader(headerId){
+				calls.push("header:" + headerId)
+			}
+
+			function requestLeave(callback){
+				calls.push("leave")
+				if (leaveAnswer === null){
+					pendingLeave = callback
+					return
+				}
+				callback(leaveAnswer)
+			}
+		}
+	}
+
+	// An open document with the section header of a navigator after it
+	function openWithNavigator(){
+		let context = createWorkspace()
+		context.service.handleDocumentOpened("doc", "obj-doc", typeId, "Org", false, false)
+		context.header = findHeader(context.workspace)
+		tryVerify(function(){ return context.header.getHeaderName("doc") === "Org" }, 3000)
+
+		context.navigator = createTemporaryObject(navigatorComp, testCase)
+		context.workspace.subHeaderNavigator = context.navigator
+		context.workspace.addDocumentSubHeader("section", "Members")
+
+		return context
+	}
+
+	function test_subHeadersFollowTheDocument(){
+		let context = openWithNavigator()
+		context.workspace.addDocumentSubHeader("editor", "John")
+		compare(context.header.getIndexById("section"), context.header.getIndexById("doc") + 1)
+		compare(context.header.getIndexById("editor"), context.header.getIndexById("doc") + 2)
+
+		context.workspace.removeDocumentSubHeader("section")
+		compare(context.header.getIndexById("section"), -1)
+		compare(context.header.getIndexById("editor"), -1, "The headers after it go too")
+		verify(context.header.getIndexById("doc") >= 0)
+
+		context.workspace.addDocumentSubHeader("section", "Members")
+		context.service.closeDocument("doc")
+		compare(context.header.getIndexById("section"), -1, "Closing the document takes its sub headers")
+	}
+
+	function test_subHeaderNeedsAnOpenDocument(){
+		let context = createWorkspace()
+
+		context.workspace.addDocumentSubHeader("section", "Members")
+
+		compare(findHeader(context.workspace).getIndexById("section"), -1)
+	}
+
+	function test_backClosesTheSubLevelFirst(){
+		let context = openWithNavigator()
+		context.navigator.hasSubLevel = true
+
+		context.header.closeClicked()
+
+		compare(context.navigator.calls, ["back"])
+		verify(context.service.documentIsOpened("doc"))
+	}
+
+	function test_backLeavesTheDocumentAtTheTopLevel(){
+		let context = openWithNavigator()
+
+		context.header.closeClicked()
+
+		compare(context.navigator.calls, ["leave"])
+		verify(!context.service.documentIsOpened("doc"))
+	}
+
+	function test_keptEditorKeepsTheDocument(){
+		let context = openWithNavigator()
+		context.navigator.leaveAnswer = false
+
+		context.header.closeClicked()
+
+		compare(context.navigator.calls, ["leave"])
+		verify(context.service.documentIsOpened("doc"))
+		compare(context.header.getIndexById("section"), context.header.getIndexById("doc") + 1)
+	}
+
+	function test_collectionHeaderLeavesTheDocument(){
+		let context = openWithNavigator()
+
+		context.header.headerItemClicked(0, "collection")
+
+		compare(context.navigator.calls, ["leave"])
+		verify(!context.service.documentIsOpened("doc"))
+	}
+
+	function test_headersFromTheDocumentOnGoToTheNavigator(){
+		let context = openWithNavigator()
+		context.workspace.addDocumentSubHeader("editor", "John")
+
+		context.header.headerItemClicked(context.header.getIndexById("doc"), "doc")
+		context.header.headerItemClicked(context.header.getIndexById("section"), "section")
+
+		compare(context.navigator.calls, ["header:doc", "header:section"])
+		verify(context.service.documentIsOpened("doc"))
+	}
+
+	// A second click while the editors are asked about does not start another close
+	function test_noSecondLeaveWhileLeaving(){
+		let context = openWithNavigator()
+		context.navigator.leaveAnswer = null
+
+		context.header.closeClicked()
+		context.header.closeClicked()
+		context.header.headerItemClicked(0, "collection")
+		compare(context.navigator.calls, ["leave"])
+
+		context.navigator.pendingLeave(false)
+		context.header.closeClicked()
+		compare(context.navigator.calls, ["leave", "leave"], "Answered: the header works again")
+	}
+
+	function test_withoutNavigatorBackClosesTheDocument(){
+		let context = createWorkspace()
+		context.service.handleDocumentOpened("doc", "obj-doc", typeId, "Org", false, false)
+		let header = findHeader(context.workspace)
+		tryVerify(function(){ return header.getHeaderName("doc") === "Org" }, 3000)
+
+		header.closeClicked()
+
+		verify(!context.service.documentIsOpened("doc"))
 	}
 
 	// Editors without a collection host (e.g. role, user editors) use the service directly

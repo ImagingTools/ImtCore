@@ -42,8 +42,14 @@ TestCase {
 			width: 10
 			height: 10
 
+			property bool accepts: true
+
 			function updateModel(){
 				model.modelChanged(null)
+			}
+
+			function acceptsSave(){
+				return accepts
 			}
 		}
 	}
@@ -214,5 +220,99 @@ TestCase {
 		service.closeDocument("doc")
 
 		compare(service.calls, [["close", "doc"]])
+	}
+
+	// A forced close is the one of an editor taken down: there is nobody to ask
+	function test_forcedCloseDoesNotAsk(){
+		let service = openDocument(undefined)
+
+		service.closeDocument("doc", true)
+
+		compare(controllerOf(service).updateCount, 0, "Nothing is saved")
+		compare(service.calls, [["close", "doc"]])
+	}
+
+	// The answers of tryCloseDocument, collected
+	function tryClose(service){
+		let answers = []
+		service.tryCloseDocument("doc", function(closed){
+			answers.push(closed)
+		})
+		return answers
+	}
+
+	function test_tryCloseAnswersOnceClosed(){
+		let service = openDocument(false)
+
+		let answers = tryClose(service)
+		compare(answers, [], "No answer before the server closed it")
+
+		service.handleCloseDocumentResult("doc", "Success")
+		compare(answers, [true])
+	}
+
+	function test_tryCloseAnswersOnTheCloseAfterTheSave(){
+		let service = openDocument(true)
+
+		let answers = tryClose(service)
+		service.handleSaveDocumentResult("doc", "Success", "", "")
+		compare(answers, [], "Saved, the close is still on the way")
+
+		service.handleCloseDocumentResult("doc", "Success")
+		compare(answers, [true])
+	}
+
+	// A later close of the same document is not taken for the answer of the cancelled one
+	function test_tryCloseCancelledAnswersOnce(){
+		let service = openDocument(undefined)
+
+		let answers = tryClose(service)
+		compare(answers, [false])
+
+		service.handleCloseDocumentResult("doc", "Success")
+		compare(answers, [false])
+	}
+
+	function test_tryCloseKeepsDocumentWhenSaveFails(){
+		let service = openDocument(true)
+
+		let answers = tryClose(service)
+		service.handleSaveDocumentResult("doc", "Failed", "Disk full", "")
+
+		compare(answers, [false])
+		compare(service.calls, [["save", "doc"]])
+		verify(service.documentIsOpened("doc"))
+	}
+
+	function test_tryCloseKeepsDocumentWhenTheViewRefusesTheSave(){
+		let service = openDocument(true)
+		let index = service.getDocumentIndexByDocumentId("doc")
+		service.__internal.openedDocuments[index].documentDecorator.registeredViews[0].accepts = false
+
+		let answers = tryClose(service)
+
+		compare(answers, [false])
+		compare(service.calls, [])
+	}
+
+	function test_tryCloseKeepsDocumentWhenTheCloseFails(){
+		let service = openDocument(false)
+
+		let answers = tryClose(service)
+		service.handleCloseDocumentResult("doc", "Failed")
+
+		compare(answers, [false])
+	}
+
+	function test_tryCloseOfANotOpenedDocument(){
+		let service = createTemporaryObject(serviceComp, testCase)
+		let answers = []
+
+		service.tryCloseDocument("doc", function(closed){
+			answers.push(closed)
+		})
+
+		compare(answers, [true])
+		compare(service.calls, [])
 	}
 }

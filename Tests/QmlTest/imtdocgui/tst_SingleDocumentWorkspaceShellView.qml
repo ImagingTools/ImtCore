@@ -16,6 +16,8 @@ TestCase {
 
 		DocumentServiceBase {
 			property string failure: ""
+			// The user cancels the close
+			property bool keepOpen: false
 
 			function openDocument(objectTypeId, objectId){
 				if (failure !== ""){
@@ -36,6 +38,10 @@ TestCase {
 			}
 
 			function closeDocument(documentId){
+				if (keepOpen){
+					closeDocumentCancelled(documentId)
+					return
+				}
 				documentClosed(documentId)
 			}
 		}
@@ -190,5 +196,31 @@ TestCase {
 		compare(closedSpy.count, 1)
 		compare(shell.state, "empty")
 		compare(shell.documentId, "")
+	}
+
+	function test_requestCloseAnswersClosed(){
+		let shell = openShell()
+		let closedSpy = createTemporaryObject(spyComp, testCase, {"target": shell, "signalName": "closed"})
+		let answers = []
+
+		shell.requestClose(function(closed){
+			answers.push(closed)
+		})
+
+		compare(answers, [true])
+		compare(closedSpy.count, 1, "The shell is closed before the answer")
+	}
+
+	function test_requestCloseAnswersKept(){
+		let shell = openShell()
+		shell.documentManager.keepOpen = true
+		let answers = []
+
+		shell.requestClose(function(closed){
+			answers.push(closed)
+		})
+
+		compare(answers, [false])
+		compare(shell.documentId, "doc", "The document stays open")
 	}
 }

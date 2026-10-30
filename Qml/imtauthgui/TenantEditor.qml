@@ -44,6 +44,121 @@ DocumentViewBase {
 	 */
 	readonly property bool isNewTenant: stateManager_.isNewTenant
 
+	// The view hosting the editor when it continues its header (SingleDocumentCollectionView): the section shown and
+	// the editor open in it are added after the organization, and the pages show no header of their own
+	property var __headerHost: null
+	// A close of an editor of a page is in progress: the header does not start another one
+	property bool __navigating: false
+
+	onDocumentManagerViewChanged: {
+		if (container.documentManagerView && typeof container.documentManagerView.addDocumentSubHeader === "function"){
+			container.__headerHost = container.documentManagerView
+			container.__headerHost.subHeaderNavigator = container
+			container.updateSubHeaders()
+		}
+	}
+
+	Component.onDestruction: {
+		if (container.__headerHost && container.__headerHost.subHeaderNavigator === container)
+			container.__headerHost.subHeaderNavigator = null
+	}
+
+	// The headers past the organization: the section shown, then the editor open in it
+	function updateSubHeaders(){
+		if (!container.__headerHost)
+			return
+		container.__headerHost.removeDocumentSubHeader("section")
+		var index = multiPageView.currentIndex
+		if (index < 0 || index >= multiPageView.pagesModel.count)
+			return
+		container.__headerHost.addDocumentSubHeader("section", multiPageView.pagesModel.get(index).name)
+		var page = multiPageView.getPageByIndex(index)
+		if (page && page.editorOpen === true)
+			container.__headerHost.addDocumentSubHeader("editor", page.editorTitle)
+	}
+
+	function __currentPage(){
+		return multiPageView.getPageByIndex(multiPageView.currentIndex)
+	}
+
+	function __hasOpenEditor(){
+		for (var i = 0; i < multiPageView.pagesModel.count; i++){
+			var page = multiPageView.getPageByIndex(i)
+			if (page && page.editorOpen === true)
+				return true
+		}
+		return false
+	}
+
+	// Closes the editor open in the section shown, asking about its unsaved changes
+	function __closeCurrentEditor(callback){
+		var page = container.__currentPage()
+		if (!page || page.editorOpen !== true){
+			callback(true)
+			return
+		}
+		container.__navigating = true
+		page.requestCloseEditor(function(closed){
+			container.__navigating = false
+			callback(closed)
+		})
+	}
+
+	// Closes the editors open in the sections from `index` on, each shown while it is asked about
+	function __closeEditorsFrom(index, callback){
+		for (var i = index; i < multiPageView.pagesModel.count; i++){
+			var page = multiPageView.getPageByIndex(i)
+			if (page && page.editorOpen === true){
+				var next = i + 1
+				multiPageView.activatePage(i)
+				container.__closeCurrentEditor(function(closed){
+					if (closed)
+						container.__closeEditorsFrom(next, callback)
+					else
+						callback(false)
+				})
+				return
+			}
+		}
+		callback(true)
+	}
+
+	// The navigator of the host header (see SingleDocumentCollectionView.subHeaderNavigator)
+	function canNavigateBack(){
+		var page = container.__currentPage()
+		return !!page && page.editorOpen === true
+	}
+
+	function navigateBack(){
+		if (container.__navigating)
+			return
+		container.__closeCurrentEditor(function(closed){})
+	}
+
+	// The section header closes the editor open in it, the organization header also goes to the first section
+	function navigateToHeader(headerId){
+		if (container.__navigating)
+			return
+		container.__closeCurrentEditor(function(closed){
+			if (closed && headerId !== "section")
+				multiPageView.activatePage(0)
+		})
+	}
+
+	// The editors of all sections are closed before the organization: the shown one first, then the hidden ones
+	function requestLeave(callback){
+		if (container.__navigating){
+			callback(false)
+			return
+		}
+		container.__closeCurrentEditor(function(closed){
+			if (closed)
+				container.__closeEditorsFrom(0, callback)
+			else
+				callback(false)
+		})
+	}
+
 	// --- Composition root ---
 	TenantEditorStateManager {
 		id: stateManager_
@@ -81,6 +196,10 @@ DocumentViewBase {
 		id: multiPageView
 		anchors.fill: parent
 		panelWidth: Style.sizeHintXXS
+
+		onCurrentIndexChanged: {
+			container.updateSubHeaders()
+		}
 
 		function updatePages() {
 			multiPageView.clear()
@@ -149,10 +268,23 @@ DocumentViewBase {
 			var key = container.__pagesKey()
 			if (key === container.__builtPagesKey)
 				return
+			// A rebuild destroys the pages with their editors: it waits until the user closes them
+			if (container.__hasOpenEditor()){
+				pagesUpdateRetryTimer.restart()
+				return
+			}
 			container.__builtPagesKey = key
 			multiPageView.updatePages()
 			// The rebuilt pages are new: the representation they missed is shown again
 			container.doUpdateGui()
+		}
+	}
+
+	Timer {
+		id: pagesUpdateRetryTimer
+		interval: 500
+		onTriggered: {
+			pagesUpdateTimer.restart()
 		}
 	}
 
@@ -286,6 +418,7 @@ DocumentViewBase {
 			model: container.tenantData
 			stateManager: stateManager_
 			apiClient: container.apiClient
+			headerHost: container.__headerHost ? container : null
 		}
 	}
 
@@ -296,6 +429,7 @@ DocumentViewBase {
 			model: container.tenantData
 			stateManager: stateManager_
 			apiClient: container.apiClient
+			headerHost: container.__headerHost ? container : null
 		}
 	}
 
@@ -306,6 +440,7 @@ DocumentViewBase {
 			model: container.tenantData
 			stateManager: stateManager_
 			apiClient: container.apiClient
+			headerHost: container.__headerHost ? container : null
 		}
 	}
 
@@ -326,6 +461,7 @@ DocumentViewBase {
 			model: container.tenantData
 			stateManager: stateManager_
 			apiClient: container.apiClient
+			headerHost: container.__headerHost ? container : null
 		}
 	}
 
@@ -343,6 +479,7 @@ DocumentViewBase {
 			model: container.tenantData
 			stateManager: stateManager_
 			apiClient: container.apiClient
+			headerHost: container.__headerHost ? container : null
 		}
 	}
 
@@ -373,6 +510,7 @@ DocumentViewBase {
 			model: container.tenantData
 			stateManager: stateManager_
 			apiClient: container.apiClient
+			headerHost: container.__headerHost ? container : null
 		}
 	}
 
@@ -393,6 +531,7 @@ DocumentViewBase {
 			model: container.tenantData
 			stateManager: stateManager_
 			apiClient: container.apiClient
+			headerHost: container.__headerHost ? container : null
 		}
 	}
 }
