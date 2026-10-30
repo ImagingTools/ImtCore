@@ -148,12 +148,10 @@ CDM::CDocumentInfo CCollectionDocumentServiceControllerComp::OnOpenDocument(
 		return retVal;
 	}
 
-	QUrl url(QStringLiteral("collection:///%1").arg(*objectId->id));
-
 	if (m_documentManagerCompPtr.IsValid()) {
 		imtdoc::IDocumentService::TaskParams taskParams;
 		taskParams.userId = userId;
-		taskParams.url = url;
+		taskParams.documentSourceRef = imtdoc::ObjectIdToSourceRef(*objectId->id);
 		taskParams.singleDocumentInstance = objectId->singleInstanceMode.value_or(false);
 		QByteArray taskId = m_documentManagerCompPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, taskParams);
 		imtdoc::IDocumentService::TaskResult taskResult = m_documentManagerCompPtr->WaitForTaskFinished(taskId);

@@ -42,16 +42,6 @@ const QByteArray UNDO_REDO_CHANGED_EVENT = QByteArrayLiteral("DocumentUndoRedoCh
 const int WAIT_TIMEOUT = 5000;
 
 
-QUrl MakeCollectionUrl(const QByteArray& objectId, int revision = -1)
-{
-	if (revision < 0){
-		return QUrl(QStringLiteral("collection:///") + objectId);
-	}
-
-	return QUrl(QStringLiteral("collection:///") + objectId + '/' + QString::number(revision));
-}
-
-
 }
 
 
@@ -136,7 +126,7 @@ QByteArray CCollectionDocumentServiceIntegrationTest::OpenDocumentAndWaitForLoad
 {
 	imtdoc::IDocumentService::TaskParams params;
 	params.userId = userId;
-	params.url = MakeCollectionUrl(objectId, revision);
+	params.documentSourceRef = imtdoc::ObjectIdToSourceRef(objectId, revision);
 
 	QByteArray documentId;
 	if (ExecuteTask(service, imtdoc::IDocumentService::TT_OPEN, params, &documentId) != imtdoc::IDocumentService::OS_OK){
@@ -217,24 +207,23 @@ void CCollectionDocumentServiceIntegrationTest::OpenDocumentSuccessTest()
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::OpenDocumentInvalidSchemeTest()
+void CCollectionDocumentServiceIntegrationTest::OpenDocumentEmptySourceRefTest()
 {
 	AddCollectionObject(TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME);
 
 	imtdoc::IDocumentService::TaskParams params;
 	params.userId = TEST_USER_ID;
-	params.url = QUrl(QStringLiteral("file:///") + TEST_OBJECT_ID);
 
 	QCOMPARE(ExecuteTask(*m_servicePtr, imtdoc::IDocumentService::TT_OPEN, params), imtdoc::IDocumentService::OS_FAILED);
 	QVERIFY(m_servicePtr->GetOpenedDocumentList(TEST_USER_ID).isEmpty());
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::OpenDocumentInvalidUrlTest()
+void CCollectionDocumentServiceIntegrationTest::OpenDocumentInvalidRevisionTest()
 {
 	imtdoc::IDocumentService::TaskParams params;
 	params.userId = TEST_USER_ID;
-	params.url = QUrl(QStringLiteral("collection:///"));
+	params.documentSourceRef = TEST_OBJECT_ID + QByteArrayLiteral("/abc");
 
 	QCOMPARE(ExecuteTask(*m_servicePtr, imtdoc::IDocumentService::TT_OPEN, params), imtdoc::IDocumentService::OS_FAILED);
 	QVERIFY(m_servicePtr->GetOpenedDocumentList(TEST_USER_ID).isEmpty());
@@ -245,7 +234,7 @@ void CCollectionDocumentServiceIntegrationTest::OpenDocumentNonExistentObjectTes
 {
 	imtdoc::IDocumentService::TaskParams params;
 	params.userId = TEST_USER_ID;
-	params.url = MakeCollectionUrl(QByteArrayLiteral("nonExistentObject"));
+	params.documentSourceRef = imtdoc::ObjectIdToSourceRef(QByteArrayLiteral("nonExistentObject"));
 
 	QCOMPARE(ExecuteTask(*m_servicePtr, imtdoc::IDocumentService::TT_OPEN, params), imtdoc::IDocumentService::OS_FAILED);
 	QVERIFY(m_servicePtr->GetOpenedDocumentList(TEST_USER_ID).isEmpty());
@@ -276,7 +265,7 @@ void CCollectionDocumentServiceIntegrationTest::OpenDocumentIsLoadingTest()
 
 	imtdoc::IDocumentService::TaskParams params;
 	params.userId = TEST_USER_ID;
-	params.url = MakeCollectionUrl(TEST_OBJECT_ID);
+	params.documentSourceRef = imtdoc::ObjectIdToSourceRef(TEST_OBJECT_ID);
 
 	QByteArray taskId = m_servicePtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, params);
 	QVERIFY(!taskId.isEmpty());
@@ -297,7 +286,7 @@ void CCollectionDocumentServiceIntegrationTest::OpenDocumentCompletesBeforeDataL
 
 	imtdoc::IDocumentService::TaskParams params;
 	params.userId = TEST_USER_ID;
-	params.url = MakeCollectionUrl(TEST_OBJECT_ID);
+	params.documentSourceRef = imtdoc::ObjectIdToSourceRef(TEST_OBJECT_ID);
 
 	QByteArray taskId = m_servicePtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, params);
 	imtdoc::IDocumentService::TaskResult result = m_servicePtr->WaitForTaskFinished(taskId);
@@ -320,24 +309,24 @@ void CCollectionDocumentServiceIntegrationTest::OpenDocumentDataLoadFailClosesDo
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::OpenDocumentWithHostTest()
+void CCollectionDocumentServiceIntegrationTest::OpenDocumentNegativeRevisionTest()
 {
 	AddCollectionObject(TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME);
 
 	imtdoc::IDocumentService::TaskParams params;
 	params.userId = TEST_USER_ID;
-	params.url = QUrl(QStringLiteral("collection://host/") + TEST_OBJECT_ID);
+	params.documentSourceRef = TEST_OBJECT_ID + QByteArrayLiteral("/-1");
 
 	QCOMPARE(ExecuteTask(*m_servicePtr, imtdoc::IDocumentService::TT_OPEN, params), imtdoc::IDocumentService::OS_FAILED);
 	QVERIFY(m_servicePtr->GetOpenedDocumentList(TEST_USER_ID).isEmpty());
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::OpenDocumentMultiplePathSegmentsTest()
+void CCollectionDocumentServiceIntegrationTest::OpenDocumentTooManySegmentsTest()
 {
 	imtdoc::IDocumentService::TaskParams params;
 	params.userId = TEST_USER_ID;
-	params.url = QUrl(QStringLiteral("collection:///segment1/segment2"));
+	params.documentSourceRef = TEST_OBJECT_ID + QByteArrayLiteral("/1/2");
 
 	QCOMPARE(ExecuteTask(*m_servicePtr, imtdoc::IDocumentService::TT_OPEN, params), imtdoc::IDocumentService::OS_FAILED);
 	QVERIFY(m_servicePtr->GetOpenedDocumentList(TEST_USER_ID).isEmpty());
@@ -350,7 +339,7 @@ void CCollectionDocumentServiceIntegrationTest::OpenDocumentWithoutSingleInstanc
 
 	imtdoc::IDocumentService::TaskParams singleInstanceParams;
 	singleInstanceParams.userId = TEST_USER_ID;
-	singleInstanceParams.url = MakeCollectionUrl(TEST_OBJECT_ID);
+	singleInstanceParams.documentSourceRef = imtdoc::ObjectIdToSourceRef(TEST_OBJECT_ID);
 	singleInstanceParams.singleDocumentInstance = true;
 
 	QByteArray firstDocId;
@@ -552,7 +541,7 @@ void CCollectionDocumentServiceIntegrationTest::SaveDocumentSaveAsTest()
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::SaveDocumentNewDocumentUpdatesUrlTest()
+void CCollectionDocumentServiceIntegrationTest::SaveDocumentNewDocumentUpdatesSourceRefTest()
 {
 	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID, TEST_DOC_NAME);
 	QVERIFY(!docId.isEmpty());
@@ -569,7 +558,7 @@ void CCollectionDocumentServiceIntegrationTest::SaveDocumentNewDocumentUpdatesUr
 }
 
 
-void CCollectionDocumentServiceIntegrationTest::SaveDocumentSaveAsUpdatesUrlTest()
+void CCollectionDocumentServiceIntegrationTest::SaveDocumentSaveAsUpdatesSourceRefTest()
 {
 	AddCollectionObject(TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME);
 
@@ -895,7 +884,7 @@ void CCollectionDocumentServiceIntegrationTest::OpenDocumentAsyncCompletionTest(
 
 	imtdoc::IDocumentService::TaskParams params;
 	params.userId = TEST_USER_ID;
-	params.url = MakeCollectionUrl(TEST_OBJECT_ID);
+	params.documentSourceRef = imtdoc::ObjectIdToSourceRef(TEST_OBJECT_ID);
 
 	QByteArray taskId = m_servicePtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, params);
 	QVERIFY(!taskId.isEmpty());
@@ -943,7 +932,7 @@ void CCollectionDocumentServiceIntegrationTest::SingleCopySecondUserGetsDataLoad
 
 	imtdoc::IDocumentService::TaskParams params;
 	params.userId = TEST_USER_ID_2;
-	params.url = MakeCollectionUrl(TEST_OBJECT_ID);
+	params.documentSourceRef = imtdoc::ObjectIdToSourceRef(TEST_OBJECT_ID);
 
 	QByteArray docId2;
 	QCOMPARE(ExecuteTask(*m_singleCopyServicePtr, imtdoc::IDocumentService::TT_OPEN, params, &docId2), imtdoc::IDocumentService::OS_OK);
@@ -1251,7 +1240,7 @@ void CCollectionDocumentServiceIntegrationTest::OpenDocumentNonExistentRevisionT
 
 	imtdoc::IDocumentService::TaskParams params;
 	params.userId = TEST_USER_ID;
-	params.url = MakeCollectionUrl(TEST_OBJECT_ID, 42);
+	params.documentSourceRef = imtdoc::ObjectIdToSourceRef(TEST_OBJECT_ID, 42);
 
 	ExecuteTask(*m_servicePtr, imtdoc::IDocumentService::TT_OPEN, params);
 

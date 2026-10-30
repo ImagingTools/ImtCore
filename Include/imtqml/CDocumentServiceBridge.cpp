@@ -4,7 +4,6 @@
 
 // Qt includes
 #include <QtCore/QCoreApplication>
-#include <QtCore/QUrl>
 
 // ACF includes
 #include <idoc/IUndoManager.h>
@@ -162,10 +161,9 @@ void CDocumentServiceBridge::OpenDocument(
 			});
 		return;
 	}
-	const QUrl url(QStringLiteral("collection:///") + documentId);
 	imtdoc::IDocumentService::TaskParams params;
 	params.userId = QByteArray();
-	params.url = url;
+	params.documentSourceRef = imtdoc::ObjectIdToSourceRef(documentId.toUtf8());
 	const QByteArray taskId = mgrPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, params);
 	const imtdoc::IDocumentService::TaskResult result = mgrPtr->WaitForTaskFinished(taskId);
 	if (result.status != imtdoc::IDocumentService::OS_OK || result.documentId.isEmpty()){

@@ -26,8 +26,10 @@ collection on restore (documents that were never saved are restored as new empty
 `LoadFromFile()` validates the JSON strictly:
 - the root object must contain `Users` and it must be an array;
 - each user object must contain both `UserId` and `Documents`;
-- each document object must contain `DocumentId`, `ObjectId`, `TypeId`, `Url`, `Name`,
-  and `SingleDocumentInstance`.
+- each document object must contain `DocumentId`, `ObjectId`, `TypeId`, `Name`,
+  and `SingleDocumentInstance`;
+- `DocumentSourceRef` (`<objectId>` or `<objectId>/<revision>`) is optional; states saved
+  by older versions do not have it, and their documents are restored from `ObjectId`.
 
 ```json
 {
@@ -39,7 +41,7 @@ collection on restore (documents that were never saved are restored as new empty
                     "DocumentId": "doc-1",
                     "ObjectId": "obj-1",
                     "TypeId": "Contact",
-                    "Url": "...",
+                    "DocumentSourceRef": "obj-1",
                     "Name": "Document name",
                     "SingleDocumentInstance": false
                 }
