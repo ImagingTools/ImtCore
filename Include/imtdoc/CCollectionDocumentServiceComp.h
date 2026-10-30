@@ -41,8 +41,9 @@ namespace imtdoc
 	  component creation and saved to it after each change of the service
 	  data model (open/create/close/save/rename of documents).
 
-	The JSON file contains user IDs and the metadata of their opened
-	documents; document data is not stored.
+	The JSON file contains the descriptions of the opened documents and,
+	separately, the IDs of the documents opened by each user; document data
+	is not stored.
 
 	Register it in the component descriptor with the interface
 	\c imtdoc::IDocumentService so that clients can obtain it via the ACF
@@ -82,21 +83,26 @@ private:
 	struct DocumentInfo
 	{
 		QByteArray documentId;
-		QByteArray objectId;
 		QByteArray typeId;
 		QByteArray documentSourceRef;
 		QString name;
+		bool isReadOnly = false;
 		bool singleDocumentInstance = false;
 	};
-	typedef QList<DocumentInfo> DocumentInfoList;
-	typedef QMap<QByteArray, DocumentInfoList> DocumentMap;
+	typedef QMap<QByteArray, DocumentInfo> DocumentInfoMap;
 
-	void PrepareDocumentMap(DocumentMap& documentMap) const;
-	static QJsonObject DocumentMapToJson(const DocumentMap& documentMap);
-	static bool DocumentMapFromJson(const QJsonObject& rootObject, DocumentMap& documentMap);
+	struct ServiceState
+	{
+		DocumentInfoMap documents; ///< documentId → document description.
+		UserDocumentIdsMap userDocumentIds; ///< userId → IDs of the documents opened by the user.
+	};
+
+	void PrepareServiceState(ServiceState& state) const;
+	static QJsonObject ServiceStateToJson(const ServiceState& state);
+	static bool ServiceStateFromJson(const QJsonObject& rootObject, ServiceState& state);
 	bool IsStatePersistenceEnabled() const;
 	QString GetStateFilePath() const;
-	bool RestoreDocumentMap(const DocumentMap& documentMap);
+	bool RestoreServiceState(const ServiceState& state);
 	void RemoveAllDocuments();
 	void RequestSaveToFile(const QString& filePath);
 	void ProcessSaveRequests();

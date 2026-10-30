@@ -19,33 +19,51 @@ are created.
 
 ## File content
 
-The file contains the same information as `Serialize()`: user IDs and the metadata of
-their opened documents. Document data itself is **not** stored; it is loaded from the
+The file contains the descriptions of the opened documents and, separately, the IDs of
+the documents opened by each user. A document shared by several users (single-copy mode)
+is described once. Document data itself is **not** stored; it is loaded from the
 collection on restore (documents that were never saved are restored as new empty documents).
+Unsaved changes are restored by a persistent undo manager (`IPersistentUndoManager`), if any.
 
 `LoadFromFile()` validates the JSON strictly:
-- the root object must contain `Users` and it must be an array;
-- each user object must contain both `UserId` and `Documents`;
-- each document object must contain `DocumentId`, `ObjectId`, `TypeId`, `Name`,
-  and `SingleDocumentInstance`;
-- `DocumentSourceRef` (`<objectId>` or `<objectId>/<revision>`) is optional; states saved
-  by older versions do not have it, and their documents are restored from `ObjectId`.
+- the root object must contain the arrays `Documents` and `Users`;
+- each document object must contain `DocumentId` (non-empty, unique), `TypeId`,
+  `DocumentSourceRef`, `Name`, `IsReadOnly` and `SingleDocumentInstance`;
+- each user object must contain `UserId` and the array `DocumentIds`; every ID must
+  reference an object in `Documents`.
+
+`DocumentSourceRef` is `<objectId>` or `<objectId>/<revision>`, empty for a document that
+was never saved. A document opened from an object revision is restored from this revision
+and stays read-only (`IsReadOnly`).
 
 ```json
 {
+    "Documents": [
+        {
+            "DocumentId": "doc-1",
+            "TypeId": "Contact",
+            "DocumentSourceRef": "obj-1",
+            "Name": "Document name",
+            "IsReadOnly": false,
+            "SingleDocumentInstance": false
+        },
+        {
+            "DocumentId": "doc-2",
+            "TypeId": "Contact",
+            "DocumentSourceRef": "obj-1/3",
+            "Name": "Document name (Rev #3)",
+            "IsReadOnly": true,
+            "SingleDocumentInstance": false
+        }
+    ],
     "Users": [
         {
             "UserId": "user-1",
-            "Documents": [
-                {
-                    "DocumentId": "doc-1",
-                    "ObjectId": "obj-1",
-                    "TypeId": "Contact",
-                    "DocumentSourceRef": "obj-1",
-                    "Name": "Document name",
-                    "SingleDocumentInstance": false
-                }
-            ]
+            "DocumentIds": ["doc-1", "doc-2"]
+        },
+        {
+            "UserId": "user-2",
+            "DocumentIds": ["doc-1"]
         }
     ]
 }
