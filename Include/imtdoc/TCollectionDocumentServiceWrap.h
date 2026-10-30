@@ -45,13 +45,13 @@ namespace imtdoc
 	  creates a blank object via \c CreateObject) and records an optional proposed
 	  source element ID for later use during save.
 	The document source reference (\c WorkingDocument::documentSourceRef) of a
-	collection document is \c <objectId> or \c <objectId>/<revision>, it is parsed
-	from the document URL \c collection:///<objectId>[/<revision>] by \c GetSourceRefFromUrl. Validators and name providers get
+	collection document is \c <objectId> or \c <objectId>/<revision>, it is passed
+	in \c TaskParams::documentSourceRef for \c TT_OPEN. Validators and name providers get
 	the object ID and the revision in the parameters created by \c imtdoc::CreateObjectSourceParams.
 
-	- **DoOpenDocument** — resolves the URL to a collection object ID, fetches
+	- **DoOpenDocument** — resolves the source reference to a collection object ID, fetches
 	  the object data in a background thread, and supports single-copy sharing of
-	  data across user sessions.  A \c collection:///<objectId>/<revision> URL
+	  data across user sessions.  A \c <objectId>/<revision> source reference
 	  opens the object revision through the collection's \c IRevisionController.
 	  A revision document is read-only (it can only be closed) and its name has
 	  the suffix " (Rev #<revision>)".
@@ -129,12 +129,6 @@ protected:
 		\note \c m_mutex must be locked by the caller.
 	*/
 	UserDocumentPairList FindDocumentsBySourceRef(const QByteArray& documentSourceRef) const;
-
-	/**
-		Converts the document URL \c collection:///<objectId>[/<revision>] to the document source reference.
-		Returns an empty reference for empty or invalid URLs.
-	*/
-	QByteArray GetSourceRefFromUrl(const QUrl& url) const;
 
 	/**
 		Returns the name of the document with the source reference \a documentSourceRef:
@@ -399,18 +393,12 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 			const QByteArray& taskId,
 			const TaskParams& params)
 {
-	const QUrl& url = params.url;
 	const QByteArray& userId = params.userId;
+	const QByteArray& documentSourceRef = params.documentSourceRef;
 
-	if (url.scheme() != "collection" || !url.host().isEmpty()){
-		this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("Invalid URL scheme")});
-		return;
-	}
-
-	const QByteArray documentSourceRef = GetSourceRefFromUrl(url);
 	const QByteArray objectId = imtdoc::SourceRefToObjectId(documentSourceRef);
 	if (objectId.isEmpty()){
-		this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("Invalid URL path")});
+		this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("Invalid document source reference")});
 		return;
 	}
 
@@ -635,27 +623,6 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 
 
 template<class Base>
-inline QByteArray TCollectionDocumentServiceWrap<Base>::GetSourceRefFromUrl(const QUrl& url) const
-{
-	if (url.scheme() != QStringLiteral("collection")){
-		return QByteArray();
-	}
-
-	QByteArray path = url.path().toUtf8();
-	if (!path.startsWith('/')){
-		return QByteArray();
-	}
-
-	path.remove(0, 1);
-	if (path.endsWith('/')){
-		path.chop(1);
-	}
-
-	return imtdoc::ObjectIdToSourceRef(imtdoc::SourceRefToObjectId(path), imtdoc::SourceRefToRevision(path));
-}
-
-
-template<class Base>
 inline iprm::IParamsSetUniquePtr TCollectionDocumentServiceWrap<Base>::CreateDocumentSourceParams(const WorkingDocument& document) const
 {
 	return imtdoc::CreateObjectSourceParams(
@@ -812,7 +779,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 				istd::CChangeNotifier notifier(this);
 
 				// The document is now backed by the new object for every user holding it,
-				// so GetOpenedDocumentList() must report its URL
+				// so GetOpenedDocumentList() must report its source reference
 				workingDocumentPtr->documentSourceRef = imtdoc::ObjectIdToSourceRef(newObjectId);
 				workingDocumentPtr->name = resultDocumentName;
 				workingDocumentPtr->isDirty = false;

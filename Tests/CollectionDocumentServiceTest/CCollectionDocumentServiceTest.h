@@ -559,7 +559,6 @@ public:
 	using imtdoc::CDocumentServiceBase::m_userDocumentIds;
 	using imtdoc::CDocumentServiceBase::m_mutex;
 	using imtdoc::CDocumentServiceBase::GetDocumentUserIds;
-	using imtdoc::CCollectionDocumentServiceBase::GetSourceRefFromUrl;
 
 protected:
 	// reimplemented (CCollectionDocumentServiceBase)
@@ -688,16 +687,16 @@ private slots:
 
 	// OpenDocument tests
 	void OpenDocumentSuccessTest();
-	void OpenDocumentInvalidSchemeTest();
-	void OpenDocumentInvalidUrlTest();
+	void OpenDocumentEmptySourceRefTest();
+	void OpenDocumentInvalidRevisionTest();
 	void OpenDocumentNonExistentObjectTest();
 	void OpenDocumentUndoManagerFailTest();
 	void OpenDocumentEventFiredTest();
 	void OpenDocumentIsLoadingTest();
 	void OpenDocumentCompletesBeforeDataLoadedTest();
 	void OpenDocumentDataLoadFailClosesDocumentTest();
-	void OpenDocumentWithHostTest();
-	void OpenDocumentMultiplePathSegmentsTest();
+	void OpenDocumentNegativeRevisionTest();
+	void OpenDocumentTooManySegmentsTest();
 	void OpenDocumentWithoutSingleInstanceModeFailsWhenSingleInstanceAlreadyOpenedTest();
 
 	// GetDocumentName tests
@@ -736,8 +735,8 @@ private slots:
 	void SaveDocumentNewDocumentTest();
 	void SaveDocumentExistingDocumentTest();
 	void SaveDocumentSaveAsTest();
-	void SaveDocumentNewDocumentUpdatesUrlTest();
-	void SaveDocumentSaveAsUpdatesUrlTest();
+	void SaveDocumentNewDocumentUpdatesSourceRefTest();
+	void SaveDocumentSaveAsUpdatesSourceRefTest();
 	void SaveDocumentInvalidUserTest();
 	void SaveDocumentInvalidDocumentTest();
 	void SaveDocumentWhileLoadingTest();
@@ -786,8 +785,8 @@ private slots:
 	// Document storage tests
 	void DocumentStorageInsertRemoveTest();
 
-	// Document URL tests
-	void GetSourceRefFromUrlTest();
+	// Document source reference tests
+	void SourceRefConversionTest();
 
 	// Async document loading completion tests
 	void CreateNewDocumentAsyncCompletionTest();

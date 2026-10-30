@@ -130,9 +130,9 @@ protected:
 	virtual void DoCreateNewDocument(const QByteArray& taskId, const TaskParams& params);
 
 	/**
-		\brief Open an existing document addressed by \a params.url.
+		\brief Open an existing document addressed by \a params.documentSourceRef.
 
-		Resolves the URL to a collection object ID, starts a background
+		Resolves the source reference to a collection object ID, starts a background
 		thread to fetch the data, and fires \c CDocumentOpenedEvent
 		immediately.  Once the data is available \c CDocumentDataLoadedEvent
 		is fired from the main thread.
@@ -195,7 +195,7 @@ protected:
 	*/
 	QByteArrayList GetDocumentUserIds(const QByteArray& documentId) const;
 	/**
-		A document that was never saved (no backing URL) is dirty regardless of its undo state;
+		A document that was never saved (no document source reference) is dirty regardless of its undo state;
 		otherwise it is dirty when the undo manager reports changes since the last save.
 	*/
 	static bool IsDocumentDirty(const WorkingDocument& document);

@@ -6,7 +6,8 @@
 #include <memory>
 
 // Qt includes
-#include <QtCore/QUrl>
+#include <QtCore/QByteArray>
+#include <QtCore/QString>
 
 // ACF includes
 #include <idoc/IUndoManager.h>
@@ -90,7 +91,7 @@ public:
 	enum TaskType
 	{
 		TT_NEW,   ///< Create a new blank document
-		TT_OPEN,  ///< Open an existing document from a URL
+		TT_OPEN,  ///< Open an existing document by its source reference
 		TT_SAVE,  ///< Save a document
 		TT_CLOSE  ///< Close a document
 	};
@@ -107,7 +108,7 @@ public:
 		| documentTypeId             |   X    |         |         |          |
 		| proposedSourceDocumentId   |  (opt) |         |         |          |
 		| initParamsPtr              |  (opt) |         |         |          |
-		| url                        |        |    X    |         |          |
+		| documentSourceRef          |        |    X    |         |          |
 		| documentId                 |        |         |    X    |    X     |
 		| documentName               |        |         |  (opt)  |          |
 		| singleDocumentInstance     |  (opt) |  (opt)  |         |          |
@@ -117,13 +118,13 @@ public:
 		QByteArray userId;
 		QByteArray documentTypeId;
 		QByteArray proposedSourceDocumentId;
-		QUrl url;
+		QByteArray documentSourceRef; ///< Source reference of the document to open: \c <objectId> or \c <objectId>/<revision> (TT_OPEN only).
 		QByteArray documentId;
 		QString documentName;
 		const imtbase::IOperationContext* operationContextPtr = nullptr; ///< Optional operation context for tenant/owner propagation during save.
 		const istd::IChangeable* defaultDataPtr = nullptr;
 		const iprm::IParamsSet* initParamsPtr = nullptr; ///< Optional initialization parameters passed to the init delegate (TT_NEW only).
-		bool singleDocumentInstance = false; ///< Optional. For \c TT_OPEN, when \c true the document is opened in single-instance mode: opening a second instance of an already-open document URL is forbidden. For \c TT_NEW, when \c true the newly created document is marked as single-instance so that it cannot be opened again elsewhere. Defaults to \c false.
+		bool singleDocumentInstance = false; ///< Optional. For \c TT_OPEN, when \c true the document is opened in single-instance mode: opening a second instance of an already-open document is forbidden. For \c TT_NEW, when \c true the newly created document is marked as single-instance so that it cannot be opened again elsewhere. Defaults to \c false.
 	};
 
 	/**
