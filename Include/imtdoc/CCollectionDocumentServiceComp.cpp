@@ -22,14 +22,15 @@ namespace imtdoc
 {
 
 
-static const QString s_usersKey = QStringLiteral("Users");
-static const QString s_userIdKey = QStringLiteral("UserId");
 static const QString s_documentsKey = QStringLiteral("Documents");
 static const QString s_documentIdKey = QStringLiteral("DocumentId");
-static const QString s_objectIdKey = QStringLiteral("ObjectId");
 static const QString s_typeIdKey = QStringLiteral("TypeId");
 static const QString s_documentSourceRefKey = QStringLiteral("DocumentSourceRef");
 static const QString s_nameKey = QStringLiteral("Name");
+static const QString s_isReadOnlyKey = QStringLiteral("IsReadOnly");
+static const QString s_usersKey = QStringLiteral("Users");
+static const QString s_userIdKey = QStringLiteral("UserId");
+static const QString s_documentIdsKey = QStringLiteral("DocumentIds");
 static const QString s_singleDocumentInstanceKey = QStringLiteral("SingleDocumentInstance");
 
 
@@ -61,8 +62,8 @@ bool CCollectionDocumentServiceComp::LoadFromFile(const QString& filePath)
 		return false;
 	}
 
-	DocumentMap documentMap;
-	if (!DocumentMapFromJson(jsonDocument.object(), documentMap)){
+	ServiceState state;
+	if (!ServiceStateFromJson(jsonDocument.object(), state)){
 		SendErrorMessage(0, QStringLiteral("Invalid content of document service state file '%1'").arg(filePath));
 
 		return false;
@@ -70,7 +71,7 @@ bool CCollectionDocumentServiceComp::LoadFromFile(const QString& filePath)
 
 	// The loaded state must not be written back to the file while it is being restored
 	m_isStateLoading = true;
-	const bool retVal = RestoreDocumentMap(documentMap);
+	const bool retVal = RestoreServiceState(state);
 	m_isStateLoading = false;
 
 	return retVal;
@@ -85,14 +86,14 @@ bool CCollectionDocumentServiceComp::SaveToFile(const QString& filePath) const
 		return false;
 	}
 
-	DocumentMap documentMap;
+	ServiceState state;
 	QMutexLocker documentLocker(&m_mutex);
-	PrepareDocumentMap(documentMap);
+	PrepareServiceState(state);
 
 	QMutexLocker locker(&m_stateFileMutex);
 	documentLocker.unlock();
 
-	const QByteArray fileData = QJsonDocument(DocumentMapToJson(documentMap)).toJson(QJsonDocument::Indented);
+	const QByteArray fileData = QJsonDocument(ServiceStateToJson(state)).toJson(QJsonDocument::Indented);
 
 	const QString directoryPath = QFileInfo(filePath).absolutePath();
 	if (!QDir().mkpath(directoryPath)){
@@ -193,72 +194,105 @@ bool CCollectionDocumentServiceComp::IsSingleCopyMode() const
 
 // private methods
 
-void CCollectionDocumentServiceComp::PrepareDocumentMap(DocumentMap& documentMap) const
+void CCollectionDocumentServiceComp::PrepareServiceState(ServiceState& state) const
 {
-	documentMap.clear();
+	state.documents.clear();
+	state.userDocumentIds = m_userDocumentIds;
 
-	for (auto userIt = m_userDocumentIds.constBegin(); userIt != m_userDocumentIds.constEnd(); ++userIt){
-		DocumentInfoList documents;
-		for (const QByteArray& documentId : userIt.value()){
-			const WorkingDocument* workingDocumentPtr = FindDocument(userIt.key(), documentId);
-			if (workingDocumentPtr == nullptr){
-				continue;
-			}
+	for (auto documentIt = m_documents.constBegin(); documentIt != m_documents.constEnd(); ++documentIt){
+		const WorkingDocument& workingDocument = documentIt.value();
 
-			DocumentInfo doc;
-			doc.documentId = documentId;
-			doc.objectId = imtdoc::SourceRefToObjectId(workingDocumentPtr->documentSourceRef);
-			doc.typeId = workingDocumentPtr->typeId;
-			doc.documentSourceRef = workingDocumentPtr->documentSourceRef;
-			doc.name = workingDocumentPtr->name;
-			doc.singleDocumentInstance = workingDocumentPtr->singleDocumentInstance;
-			documents.append(doc);
-		}
+		DocumentInfo documentInfo;
+		documentInfo.documentId = documentIt.key();
+		documentInfo.typeId = workingDocument.typeId;
+		documentInfo.documentSourceRef = workingDocument.documentSourceRef;
+		documentInfo.name = workingDocument.name;
+		documentInfo.isReadOnly = workingDocument.isReadOnly;
+		documentInfo.singleDocumentInstance = workingDocument.singleDocumentInstance;
 
-		documentMap.insert(userIt.key(), documents);
+		state.documents.insert(documentInfo.documentId, documentInfo);
 	}
 }
 
 
-QJsonObject CCollectionDocumentServiceComp::DocumentMapToJson(const DocumentMap& documentMap)
+QJsonObject CCollectionDocumentServiceComp::ServiceStateToJson(const ServiceState& state)
 {
+	QJsonArray documentsArray;
+	for (const DocumentInfo& documentInfo : state.documents){
+		QJsonObject documentObject;
+		documentObject.insert(s_documentIdKey, QString(documentInfo.documentId));
+		documentObject.insert(s_typeIdKey, QString(documentInfo.typeId));
+		documentObject.insert(s_documentSourceRefKey, QString(documentInfo.documentSourceRef));
+		documentObject.insert(s_nameKey, documentInfo.name);
+		documentObject.insert(s_isReadOnlyKey, documentInfo.isReadOnly);
+		documentObject.insert(s_singleDocumentInstanceKey, documentInfo.singleDocumentInstance);
+
+		documentsArray.append(documentObject);
+	}
+
 	QJsonArray usersArray;
-
-	for (auto userIt = documentMap.constBegin(); userIt != documentMap.constEnd(); ++userIt){
-		QJsonArray documentsArray;
-		for (const DocumentInfo& documentInfo : userIt.value()){
-			QJsonObject documentObject;
-			documentObject.insert(s_documentIdKey, QString(documentInfo.documentId));
-			documentObject.insert(s_objectIdKey, QString(documentInfo.objectId));
-			documentObject.insert(s_typeIdKey, QString(documentInfo.typeId));
-			documentObject.insert(s_documentSourceRefKey, QString(documentInfo.documentSourceRef));
-			documentObject.insert(s_nameKey, documentInfo.name);
-			documentObject.insert(s_singleDocumentInstanceKey, documentInfo.singleDocumentInstance);
-
-			documentsArray.append(documentObject);
+	for (auto userIt = state.userDocumentIds.constBegin(); userIt != state.userDocumentIds.constEnd(); ++userIt){
+		QJsonArray documentIdsArray;
+		for (const QByteArray& documentId : userIt.value()){
+			documentIdsArray.append(QString(documentId));
 		}
 
 		QJsonObject userObject;
 		userObject.insert(s_userIdKey, QString(userIt.key()));
-		userObject.insert(s_documentsKey, documentsArray);
+		userObject.insert(s_documentIdsKey, documentIdsArray);
 
 		usersArray.append(userObject);
 	}
 
 	QJsonObject rootObject;
+	rootObject.insert(s_documentsKey, documentsArray);
 	rootObject.insert(s_usersKey, usersArray);
 
 	return rootObject;
 }
 
 
-bool CCollectionDocumentServiceComp::DocumentMapFromJson(const QJsonObject& rootObject, DocumentMap& documentMap)
+bool CCollectionDocumentServiceComp::ServiceStateFromJson(const QJsonObject& rootObject, ServiceState& state)
 {
-	documentMap.clear();
+	state.documents.clear();
+	state.userDocumentIds.clear();
 
+	const QJsonValue documentsValue = rootObject.value(s_documentsKey);
 	const QJsonValue usersValue = rootObject.value(s_usersKey);
-	if (!usersValue.isArray()){
+	if (!documentsValue.isArray() || !usersValue.isArray()){
 		return false;
+	}
+
+	const QJsonArray documentsArray = documentsValue.toArray();
+	for (const QJsonValue& documentValue : documentsArray){
+		if (!documentValue.isObject()){
+			return false;
+		}
+
+		const QJsonObject documentObject = documentValue.toObject();
+		if (!documentObject.value(s_documentIdKey).isString()
+					|| documentObject.value(s_documentIdKey).toString().isEmpty()
+					|| !documentObject.value(s_typeIdKey).isString()
+					|| !documentObject.value(s_documentSourceRefKey).isString()
+					|| !documentObject.value(s_nameKey).isString()
+					|| !documentObject.value(s_isReadOnlyKey).isBool()
+					|| !documentObject.value(s_singleDocumentInstanceKey).isBool()){
+			return false;
+		}
+
+		DocumentInfo documentInfo;
+		documentInfo.documentId = documentObject.value(s_documentIdKey).toString().toUtf8();
+		documentInfo.typeId = documentObject.value(s_typeIdKey).toString().toUtf8();
+		documentInfo.documentSourceRef = documentObject.value(s_documentSourceRefKey).toString().toUtf8();
+		documentInfo.name = documentObject.value(s_nameKey).toString();
+		documentInfo.isReadOnly = documentObject.value(s_isReadOnlyKey).toBool();
+		documentInfo.singleDocumentInstance = documentObject.value(s_singleDocumentInstanceKey).toBool();
+
+		if (state.documents.contains(documentInfo.documentId)){
+			return false;
+		}
+
+		state.documents.insert(documentInfo.documentId, documentInfo);
 	}
 
 	const QJsonArray usersArray = usersValue.toArray();
@@ -268,54 +302,29 @@ bool CCollectionDocumentServiceComp::DocumentMapFromJson(const QJsonObject& root
 		}
 
 		const QJsonObject userObject = userValue.toObject();
-		if (!userObject.contains(s_userIdKey) || !userObject.contains(s_documentsKey)){
-			return false;
-		}
-
 		const QJsonValue userIdValue = userObject.value(s_userIdKey);
-		if (!userIdValue.isString()){
+		const QJsonValue documentIdsValue = userObject.value(s_documentIdsKey);
+		if (!userIdValue.isString() || !documentIdsValue.isArray()){
 			return false;
 		}
 
-		const QByteArray userId = userIdValue.toString().toUtf8();
+		QByteArrayList documentIds;
 
-		const QJsonValue documentsValue = userObject.value(s_documentsKey);
-		if (!documentsValue.isArray()){
-			return false;
-		}
-
-		DocumentInfoList documents;
-
-		const QJsonArray documentsArray = documentsValue.toArray();
-		for (const QJsonValue& documentValue : documentsArray){
-			if (!documentValue.isObject()){
+		const QJsonArray documentIdsArray = documentIdsValue.toArray();
+		for (const QJsonValue& documentIdValue : documentIdsArray){
+			if (!documentIdValue.isString()){
 				return false;
 			}
 
-			const QJsonObject documentObject = documentValue.toObject();
-			if (!documentObject.value(s_documentIdKey).isString()
-						|| documentObject.value(s_documentIdKey).toString().isEmpty()
-						|| !documentObject.value(s_objectIdKey).isString()
-						|| !documentObject.value(s_typeIdKey).isString()
-						|| !documentObject.value(s_nameKey).isString()
-						|| !documentObject.value(s_singleDocumentInstanceKey).isBool()){
+			const QByteArray documentId = documentIdValue.toString().toUtf8();
+			if (!state.documents.contains(documentId)){
 				return false;
 			}
 
-			DocumentInfo documentInfo;
-			documentInfo.documentId = documentObject.value(s_documentIdKey).toString().toUtf8();
-			documentInfo.objectId = documentObject.value(s_objectIdKey).toString().toUtf8();
-			documentInfo.typeId = documentObject.value(s_typeIdKey).toString().toUtf8();
-			// States saved by older versions have no source reference, their documents are always the current objects
-			const QJsonValue documentSourceRefValue = documentObject.value(s_documentSourceRefKey);
-			documentInfo.documentSourceRef = documentSourceRefValue.isString() ? documentSourceRefValue.toString().toUtf8() : documentInfo.objectId;
-			documentInfo.name = documentObject.value(s_nameKey).toString();
-			documentInfo.singleDocumentInstance = documentObject.value(s_singleDocumentInstanceKey).toBool(false);
-
-			documents.append(documentInfo);
+			documentIds.append(documentId);
 		}
 
-		documentMap.insert(userId, documents);
+		state.userDocumentIds.insert(userIdValue.toString().toUtf8(), documentIds);
 	}
 
 	return true;
@@ -334,7 +343,7 @@ QString CCollectionDocumentServiceComp::GetStateFilePath() const
 }
 
 
-bool CCollectionDocumentServiceComp::RestoreDocumentMap(const DocumentMap& documentMap)
+bool CCollectionDocumentServiceComp::RestoreServiceState(const ServiceState& state)
 {
 	istd::CChangeNotifier notifier(this);
 
@@ -347,14 +356,10 @@ bool CCollectionDocumentServiceComp::RestoreDocumentMap(const DocumentMap& docum
 		return false;
 	}
 
-	for (auto userIt = documentMap.constBegin(); userIt != documentMap.constEnd(); ++userIt){
+	for (auto userIt = state.userDocumentIds.constBegin(); userIt != state.userDocumentIds.constEnd(); ++userIt){
 		const QByteArray& userId = userIt.key();
-		for (const DocumentInfo& documentInfo : userIt.value()){
-			if (documentInfo.documentId.isEmpty()){
-				continue;
-			}
-
-			RestoreDocument(documentInfo, userId, isSingleCopyMode, collectionPtr);
+		for (const QByteArray& documentId : userIt.value()){
+			RestoreDocument(state.documents.value(documentId), userId, isSingleCopyMode, collectionPtr);
 		}
 	}
 
@@ -442,7 +447,7 @@ bool CCollectionDocumentServiceComp::RestoreSharedDocument(const DocumentInfo& d
 		return true;
 	}
 
-	if (!isSingleCopyMode || documentInfo.objectId.isEmpty()){
+	if (!isSingleCopyMode || documentInfo.documentSourceRef.isEmpty()){
 		return false;
 	}
 
@@ -467,9 +472,14 @@ bool CCollectionDocumentServiceComp::RestoreDocument(
 		return true;
 	}
 
+	const QByteArray objectId = imtdoc::SourceRefToObjectId(documentInfo.documentSourceRef);
+	if (objectId.isEmpty() && !documentInfo.documentSourceRef.isEmpty()){
+		return false;
+	}
+
 	QByteArray typeId = documentInfo.typeId;
-	if (typeId.isEmpty()){
-		typeId = collectionPtr->GetObjectTypeId(documentInfo.objectId);
+	if (typeId.isEmpty() && !objectId.isEmpty()){
+		typeId = collectionPtr->GetObjectTypeId(objectId);
 	}
 	if (typeId.isEmpty()){
 		return false;
@@ -478,9 +488,9 @@ bool CCollectionDocumentServiceComp::RestoreDocument(
 	const int revision = imtdoc::SourceRefToRevision(documentInfo.documentSourceRef);
 
 	istd::IChangeableSharedPtr objectPtr;
-	if (!documentInfo.objectId.isEmpty()){
+	if (!objectId.isEmpty()){
 		if (revision < 0){
-			if (!collectionPtr->GetObjectData(documentInfo.objectId, objectPtr) || !objectPtr.IsValid()){
+			if (!collectionPtr->GetObjectData(objectId, objectPtr) || !objectPtr.IsValid()){
 				return false;
 			}
 		}
@@ -488,7 +498,7 @@ bool CCollectionDocumentServiceComp::RestoreDocument(
 			const imtbase::IRevisionController* revisionControllerPtr = collectionPtr->GetRevisionController();
 			idoc::MetaInfoPtr metaInfoPtr;
 			if (revisionControllerPtr == nullptr
-						|| !revisionControllerPtr->GetRevisionData(*collectionPtr, documentInfo.objectId, revision, objectPtr, metaInfoPtr)
+						|| !revisionControllerPtr->GetRevisionData(*collectionPtr, objectId, revision, objectPtr, metaInfoPtr)
 						|| !objectPtr.IsValid()){
 				return false;
 			}
@@ -511,8 +521,9 @@ bool CCollectionDocumentServiceComp::RestoreDocument(
 
 	WorkingDocument document;
 	document.typeId = typeId;
-	document.documentSourceRef = imtdoc::ObjectIdToSourceRef(documentInfo.objectId, revision);
+	document.documentSourceRef = imtdoc::ObjectIdToSourceRef(objectId, revision);
 	document.name = documentInfo.name;
+	document.isReadOnly = documentInfo.isReadOnly;
 	document.objectPtr = objectPtr;
 	document.undoManagerPtr = undoManagerPtr;
 	document.isDirty = false;
