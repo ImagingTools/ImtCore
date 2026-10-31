@@ -2806,6 +2806,7 @@
 - `setDocumentName(documentId, name)`
 - `getDocumentName(documentId)`
 - `documentIsDirty(documentId)`
+- `documentIsReadOnly(documentId)`
 - `documentIsLoading(documentId)`
 - `setDocumentIsLoading(documentId, isLoading)`
 - `setDocumentIsDirty(documentId, isDirty)`
@@ -2816,7 +2817,7 @@
 - `setDocumentServiceActiveView(view)`
 - `setAutoNamedTypeId(typeId, hasProvider)`
 - `hasDocumentNameProvider(typeId)`
-- `handleDocumentOpened(documentId, objectId, objectTypeId, documentName, hasNameProvider, isDirty)`
+- `handleDocumentOpened(documentId, objectId, objectTypeId, documentName, hasNameProvider, isDirty, isDataLoaded, isReadOnly)`
 - `handleDocumentCreated(documentId, objectTypeId, documentName, hasNameProvider, proposedObjectId, isDirty)`
 - `handleSaveDocumentResult(documentId, status, message, documentName)`
 - `handleCloseDocumentResult(documentId, status)`

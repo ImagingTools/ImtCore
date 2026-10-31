@@ -127,6 +127,38 @@ void CFileBasedUndoManagerComp::ResetHistory()
 }
 
 
+bool CFileBasedUndoManagerComp::RemoveAllDocumentContexts()
+{
+	if (!m_rootFolderCompPtr.IsValid()){
+		return true;
+	}
+
+	const QString rootFolderPath = m_rootFolderCompPtr->GetPath();
+	if (rootFolderPath.isEmpty()){
+		return true;
+	}
+
+	QDir rootDirectory(rootFolderPath);
+	if (!rootDirectory.exists()){
+		return true;
+	}
+
+	// Document data is stored in subdirectories only, files in the root folder are kept
+	bool retVal = true;
+	const QStringList directoryNames = rootDirectory.entryList(QDir::Dirs | QDir::NoDotAndDotDot | QDir::Hidden);
+	for (const QString& directoryName : directoryNames){
+		QDir documentDirectory(rootDirectory.filePath(directoryName));
+		if (!documentDirectory.removeRecursively()){
+			SendWarningMessage(0, QObject::tr("Failed to remove undo data directory: ") + documentDirectory.absolutePath());
+
+			retVal = false;
+		}
+	}
+
+	return retVal;
+}
+
+
 void CFileBasedUndoManagerComp::ResetUndo()
 {
 	istd::CChangeNotifier notifier(this);

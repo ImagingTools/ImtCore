@@ -202,6 +202,7 @@ IDocumentService::DocumentList CDocumentServiceBase::GetOpenedDocumentList(const
 		info.hasNameProvider = HasDocumentNameProvider(workingDocumentPtr->typeId);
 		info.isLoading = workingDocumentPtr->isLoading;
 		info.singleDocumentInstance = workingDocumentPtr->singleDocumentInstance;
+		info.isReadOnly = workingDocumentPtr->isReadOnly;
 
 		list.append(info);
 	}
@@ -552,6 +553,12 @@ IDocumentService::OperationStatus CDocumentServiceBase::SetDocumentName(
 		}
 
 		WorkingDocument& document = m_documents[documentId];
+		if (document.isReadOnly){
+			notifier.Abort();
+
+			return OS_FAILED;
+		}
+
 		if (document.name == documentName){
 			notifier.Abort();
 
@@ -649,7 +656,7 @@ IDocumentService::OperationStatus CDocumentServiceBase::SetDocumentData(
 
 	WorkingDocument* workingDocumentPtr = &m_documents[documentId];
 
-	if (workingDocumentPtr->isLoading){
+	if (workingDocumentPtr->isLoading || workingDocumentPtr->isReadOnly){
 		return OS_FAILED;
 	}
 
@@ -673,7 +680,7 @@ IDocumentService::OperationStatus CDocumentServiceBase::ExecuteDocumentMethod(
 
 	WorkingDocument& workingDocument = m_documents[documentId];
 
-	if (workingDocument.isLoading){
+	if (workingDocument.isLoading || workingDocument.isReadOnly){
 		return OS_FAILED;
 	}
 
@@ -1048,6 +1055,12 @@ void CDocumentServiceBase::OnUndoManagerChanged(int modelId)
 iprm::IParamsSetUniquePtr CDocumentServiceBase::CreateDocumentSourceParams(const WorkingDocument& /*document*/) const
 {
 	return iprm::IParamsSetUniquePtr();
+}
+
+
+istd::IChangeableSharedPtr CDocumentServiceBase::CreateObjectFromSourceRef(const QByteArray& /*typeId*/, const QByteArray& /*documentSourceRef*/) const
+{
+	return istd::IChangeableSharedPtr();
 }
 
 

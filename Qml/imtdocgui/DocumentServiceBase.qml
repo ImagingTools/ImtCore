@@ -515,6 +515,12 @@ QtObject {
 		return __internal.openedDocuments[index].isDirty
 	}
 
+	// A read-only document (e.g. opened from an object revision) can only be closed.
+	// The flag comes from the server only (DocumentInfo.isReadOnly).
+	function documentIsReadOnly(documentId){
+		return __internal.readOnlyDocumentIds[documentId] === true
+	}
+
 	function documentIsClosing(documentId){
 		let index = getDocumentIndexByDocumentId(documentId)
 		if (index < 0){
@@ -668,8 +674,11 @@ QtObject {
 	// to apply the standard DocumentService state transitions.
 
 	// isDataLoaded === true: the server already has the data, no DocumentDataLoaded notification is awaited.
-	function handleDocumentOpened(documentId, objectId, objectTypeId, documentName, hasNameProvider, isDirty, isDataLoaded){
+	// isReadOnly === true: the document can only be closed (e.g. it was opened from an object revision).
+	function handleDocumentOpened(documentId, objectId, objectTypeId, documentName, hasNameProvider, isDirty, isDataLoaded, isReadOnly){
 		setAutoNamedTypeId(objectTypeId, hasNameProvider)
+		if (isReadOnly === true)
+			__internal.readOnlyDocumentIds[documentId] = true
 		setDocumentName(documentId, documentName)
 
 		// The document may already be known locally, e.g. when the
@@ -827,6 +836,7 @@ QtObject {
 		property var openedDocuments: [] // Array of objects {id, name, model, view, isDirty}
 		property var cachedDocumentNames: ({}) // DocumentId -> Name
 		property var cachedDocumentObjectIds: ({}) // DocumentId -> ObjectId
+		property var readOnlyDocumentIds: ({}) // DocumentId -> true for documents the server opened read-only
 		property var documentSaveNameResolvers: ({}) // DocumentId -> function(documentId): string
 		property var pendingDataLoaded: ({}) // DocumentId -> true for early DocumentDataLoaded notifications
 		property var autoNamedTypeIds: ({}) // TypeId -> true for types with automatic name providers
@@ -951,6 +961,7 @@ QtObject {
 			delete pendingDataLoaded[documentId]
 			delete readyEmitted[documentId]
 			delete cachedDocumentObjectIds[documentId]
+			delete readOnlyDocumentIds[documentId]
 			delete documentSaveNameResolvers[documentId]
 			let documentData = openedDocuments[index]
 			openedDocuments.splice(index, 1)

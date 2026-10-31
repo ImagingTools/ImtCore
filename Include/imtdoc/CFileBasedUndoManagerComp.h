@@ -95,6 +95,7 @@ public:
 	// reimplemented (imtdoc::IPersistentUndoManager)
 	virtual void InitializeDocumentContext(const QByteArray& documentId, const QByteArray& documentTypeId) override;
 	virtual void ResetHistory() override;
+	virtual bool RemoveAllDocumentContexts() override;
 
 	// reimplemented (imod::IObserver)
 	virtual bool OnModelAttached(imod::IModel* modelPtr, istd::IChangeable::ChangeSet& changeMask) override;

@@ -19,10 +19,10 @@ namespace imtauth
 bool CUserDocumentValidatorComp::ValidateDocumentData(
 			const istd::IChangeable& document,
 			QString& errorMessage,
-			const iprm::IParamsSet* paramsPtr,
+			const iprm::IParamsSet* validationParams,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
-	const QByteArray objectId = imtdoc::GetObjectIdFromParams(paramsPtr);
+	const QByteArray objectId = imtdoc::GetObjectIdFromParams(validationParams);
 
 	const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(&document);
 	if (userInfoPtr == nullptr){

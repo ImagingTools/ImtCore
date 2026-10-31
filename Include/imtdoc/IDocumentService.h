@@ -6,7 +6,8 @@
 #include <memory>
 
 // Qt includes
-#include <QtCore/QUrl>
+#include <QtCore/QByteArray>
+#include <QtCore/QString>
 
 // ACF includes
 #include <idoc/IUndoManager.h>
@@ -90,7 +91,7 @@ public:
 	enum TaskType
 	{
 		TT_NEW,   ///< Create a new blank document
-		TT_OPEN,  ///< Open an existing document from a URL
+		TT_OPEN,  ///< Open an existing document by its source reference
 		TT_SAVE,  ///< Save a document
 		TT_CLOSE  ///< Close a document
 	};
@@ -107,7 +108,7 @@ public:
 		| documentTypeId             |   X    |         |         |          |
 		| proposedSourceDocumentId   |  (opt) |         |         |          |
 		| initParamsPtr              |  (opt) |         |         |          |
-		| url                        |        |    X    |         |          |
+		| documentSourceRef          |        |    X    |         |          |
 		| documentId                 |        |         |    X    |    X     |
 		| documentName               |        |         |  (opt)  |          |
 		| singleDocumentInstance     |  (opt) |  (opt)  |         |          |
@@ -117,13 +118,13 @@ public:
 		QByteArray userId;
 		QByteArray documentTypeId;
 		QByteArray proposedSourceDocumentId;
-		QUrl url;
+		QByteArray documentSourceRef; ///< Implementation-specific reference to the document source to open (TT_OPEN only).
 		QByteArray documentId;
 		QString documentName;
 		const imtbase::IOperationContext* operationContextPtr = nullptr; ///< Optional operation context for tenant/owner propagation during save.
 		const istd::IChangeable* defaultDataPtr = nullptr;
 		const iprm::IParamsSet* initParamsPtr = nullptr; ///< Optional initialization parameters passed to the init delegate (TT_NEW only).
-		bool singleDocumentInstance = false; ///< Optional. For \c TT_OPEN, when \c true the document is opened in single-instance mode: opening a second instance of an already-open document URL is forbidden. For \c TT_NEW, when \c true the newly created document is marked as single-instance so that it cannot be opened again elsewhere. Defaults to \c false.
+		bool singleDocumentInstance = false; ///< Optional. For \c TT_OPEN, when \c true the document is opened in single-instance mode: opening a second instance of an already-open document is forbidden. For \c TT_NEW, when \c true the newly created document is marked as single-instance so that it cannot be opened again elsewhere. Defaults to \c false.
 	};
 
 	/**
@@ -153,12 +154,13 @@ public:
 	struct DocumentInfo
 	{
 		QByteArray typeId;        ///< Registered object type-ID of the document.
-		QByteArray documentSourceRef; ///< Storage-specific reference to the document source (e.g.\ \c <objectId>[/<revision>] for a collection), empty for unsaved documents.
+		QByteArray documentSourceRef; ///< Implementation-specific reference to the document source, empty for unsaved documents.
 		QString name;             ///< Human-readable document name.
 		bool isDirty = false;     ///< \c true when the document has unsaved changes.
 		bool hasNameProvider = false; ///< \c true when a name provider is registered for this type.
 		bool isLoading = false;   ///< \c true while the document data is still being loaded asynchronously.
 		bool singleDocumentInstance = false; ///< \c true when opened with \c TaskParams::singleDocumentInstance.
+		bool isReadOnly = false;  ///< \c true when the document can only be closed (e.g.\ a document opened from an object revision).
 	};
 
 	/**
@@ -242,6 +244,7 @@ public:
 		\param documentId    Instance ID of the document.
 		\param documentName  New name to assign.
 		\return              \c OS_OK on success, or an appropriate error code.
+		                     \c OS_FAILED for a read-only document.
 	*/
 	virtual OperationStatus SetDocumentName(const QByteArray& userId, const QByteArray& documentId, const QString& documentName) = 0;
 
@@ -271,6 +274,7 @@ public:
 		automatically updated.
 
 		\return  \c OS_OK on success, or an appropriate error code.
+		         \c OS_FAILED for a loading or read-only document.
 	*/
 	virtual OperationStatus SetDocumentData(const QByteArray& userId, const QByteArray& documentId, const istd::IChangeable& document) = 0;
 
@@ -282,7 +286,7 @@ public:
 
 		\return  \c OS_OK on success, or an appropriate error code. \c OS_FAILED also covers the case
 		         where the open document is not of the type \a method was bound to, in which case
-		         \a method was not called.
+		         \a method was not called, and a loading or read-only document.
 	*/
 	virtual OperationStatus ExecuteDocumentMethod(
 				const QByteArray& userId,

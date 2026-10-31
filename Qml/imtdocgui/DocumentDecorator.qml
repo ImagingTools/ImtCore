@@ -59,7 +59,11 @@ QtObject {
 
 			if (documentManager && view.commandsController){
 				let isDirty = documentManager.documentIsDirty(documentId)
-				view.commandsController.setCommandIsEnabled("Save", isDirty)
+				view.commandsController.setCommandIsEnabled("Save", isDirty && !isReadOnly())
+				if (isReadOnly()){
+					view.commandsController.setCommandIsEnabled("Undo", false)
+					view.commandsController.setCommandIsEnabled("Redo", false)
+				}
 			}
 
 			if (updateRepresentation){
@@ -108,11 +112,12 @@ QtObject {
 				return
 			}
 
+			let isReadOnly = root.isReadOnly()
 			for (let i = 0; i < root.registeredViews.length; ++i){
 				if (root.registeredViews[i].commandsController){
-					root.registeredViews[i].commandsController.setCommandIsEnabled("Undo", availableUndoSteps > 0)
-					root.registeredViews[i].commandsController.setCommandIsEnabled("Redo", availableRedoSteps > 0)
-					root.registeredViews[i].commandsController.setCommandIsEnabled("Save", isDirty)
+					root.registeredViews[i].commandsController.setCommandIsEnabled("Undo", availableUndoSteps > 0 && !isReadOnly)
+					root.registeredViews[i].commandsController.setCommandIsEnabled("Redo", availableRedoSteps > 0 && !isReadOnly)
+					root.registeredViews[i].commandsController.setCommandIsEnabled("Save", isDirty && !isReadOnly)
 				}
 			}
 		}
@@ -122,9 +127,10 @@ QtObject {
 				return
 			}
 
+			let isReadOnly = root.isReadOnly()
 			for (let i = 0; i < root.registeredViews.length; ++i){
 				if (root.registeredViews[i].commandsController){
-					root.registeredViews[i].commandsController.setCommandIsEnabled("Save", isDirty)
+					root.registeredViews[i].commandsController.setCommandIsEnabled("Save", isDirty && !isReadOnly)
 				}
 			}
 		}
@@ -340,9 +346,21 @@ QtObject {
 		viewUnregistered(view)
 	}
 
+	function isReadOnly(){
+		if (!documentManager || typeof documentManager.documentIsReadOnly !== "function"){
+			return false
+		}
+
+		return documentManager.documentIsReadOnly(documentId)
+	}
+
 	function onUndo(){
 		if (!documentManager){
 			console.error("Unable to handle Undo command. Error: Document manager is invalid")
+			return
+		}
+
+		if (isReadOnly()){
 			return
 		}
 
@@ -355,12 +373,20 @@ QtObject {
 			return
 		}
 
+		if (isReadOnly()){
+			return
+		}
+
 		documentManager.doRedo(documentId, 1)
 	}
 
 	function onSave(){
 		if (!documentManager){
 			console.error("Unable to handle Save command. Error: Document manager is invalid")
+			return
+		}
+
+		if (isReadOnly()){
 			return
 		}
 

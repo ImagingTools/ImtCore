@@ -94,6 +94,11 @@ protected:
 	QByteArray GetCollectionObjectId(const QByteArray& userId, const QByteArray& documentId) const;
 
 	/**
+		Check whether an open document instance can only be closed (e.g.\ it was opened from an object revision).
+	*/
+	bool IsDocumentReadOnly(const QByteArray& userId, const QByteArray& documentId) const;
+
+	/**
 		Check that the organization of the request may access the collection object with at least the given level.
 	*/
 	bool CheckObjectAccess(

@@ -43,16 +43,16 @@ private slots:
 
 	// OpenDocument tests
 	void OpenDocumentSuccessTest();
-	void OpenDocumentInvalidSchemeTest();
-	void OpenDocumentInvalidUrlTest();
+	void OpenDocumentEmptySourceRefTest();
+	void OpenDocumentInvalidRevisionTest();
 	void OpenDocumentNonExistentObjectTest();
 	void OpenDocumentUndoManagerFailTest();
 	void OpenDocumentEventFiredTest();
 	void OpenDocumentIsLoadingTest();
 	void OpenDocumentCompletesBeforeDataLoadedTest();
 	void OpenDocumentDataLoadFailClosesDocumentTest();
-	void OpenDocumentWithHostTest();
-	void OpenDocumentMultiplePathSegmentsTest();
+	void OpenDocumentNegativeRevisionTest();
+	void OpenDocumentTooManySegmentsTest();
 	void OpenDocumentWithoutSingleInstanceModeFailsWhenSingleInstanceAlreadyOpenedTest();
 
 	// SetDocumentName tests
@@ -68,8 +68,8 @@ private slots:
 	void SaveDocumentNewDocumentTest();
 	void SaveDocumentExistingDocumentTest();
 	void SaveDocumentSaveAsTest();
-	void SaveDocumentNewDocumentUpdatesUrlTest();
-	void SaveDocumentSaveAsUpdatesUrlTest();
+	void SaveDocumentNewDocumentUpdatesSourceRefTest();
+	void SaveDocumentSaveAsUpdatesSourceRefTest();
 	void SaveDocumentInvalidUserTest();
 	void SaveDocumentInvalidDocumentTest();
 	void SaveDocumentWhileLoadingTest();
@@ -85,7 +85,7 @@ private slots:
 	void UndoRedoOpenedDocumentDirtyFlagTest();
 	void UndoAfterSaveMakesDocumentDirtyTest();
 
-	// Document URL tests
+	// Document source reference tests
 	void OpenedDocumentSourceRefTest();
 	void SavedDocumentSourceRefTest();
 
@@ -111,8 +111,11 @@ private slots:
 	void OpenDocumentRevisionListNameSuffixTest();
 	void OpenDocumentNonExistentRevisionTest();
 	void OpenDocumentRevisionAndHeadSeparateTest();
-	void SaveDocumentRevisionRemovesRevisionFromUrlTest();
-	void SaveDocumentSaveAsRevisionTest();
+	void SaveDocumentRevisionFailsTest();
+	void SaveDocumentSaveAsRevisionFailsTest();
+	void SetDocumentNameRevisionFailsTest();
+	void SetDocumentDataRevisionFailsTest();
+	void CloseDocumentRevisionTest();
 	void SingleCopyRevisionSharedTest();
 
 	// Document source parameters tests

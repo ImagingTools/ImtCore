@@ -13,7 +13,7 @@ namespace imtauth
 
 // reimplemented (imtdoc::IDocumentNameProvider)
 
-QString CTenantRelationshipDocumentNameProviderComp::GetDefaultDocumentName(const istd::IChangeable& document, const iprm::IParamsSet* /*paramsPtr*/) const
+QString CTenantRelationshipDocumentNameProviderComp::GetDefaultDocumentName(const istd::IChangeable& document, const iprm::IParamsSet* /*nameGenerationParams*/) const
 {
 	const ITenantRelationshipInfo* relationshipPtr = dynamic_cast<const ITenantRelationshipInfo*>(&document);
 	if (relationshipPtr != nullptr){

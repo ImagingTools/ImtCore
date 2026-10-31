@@ -39,6 +39,16 @@ public:
 		\brief Remove undo/redo snapshots and keep only the current document snapshot.
 	*/
 	virtual void ResetHistory() = 0;
+
+	/**
+		\brief Remove the persisted undo/redo data of all documents.
+
+		Removes the stored history of every document handled by this kind of undo manager,
+		independently of the document context of this instance. Intended to clean up
+		orphaned data that can no longer be associated to any opened document.
+		\return \c true if all data has been removed.
+	*/
+	virtual bool RemoveAllDocumentContexts() = 0;
 };
 
 using IPersistentUndoManagerUniquePtr = istd::TUniqueInterfacePtr<IPersistentUndoManager>;

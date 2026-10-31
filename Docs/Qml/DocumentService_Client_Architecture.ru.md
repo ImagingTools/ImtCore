@@ -406,6 +406,14 @@ documentOpened(documentId, objectTypeId)
 if (isDirty) setDocumentIsDirty(documentId, true)
 ```
 
+`DocumentInfo.isReadOnly == true` у документа, открытого из ревизии объекта: такой
+документ можно только закрыть. Сервер отклоняет сохранение, переименование,
+изменение данных и undo/redo/resetUndo, а имя документа содержит суффикс
+` (Rev #N)`. `DocumentDecorator` выключает команды `Undo`/`Redo`/`Save` для
+таких документов (`documentIsReadOnly(documentId)`). Флаг задаёт только сервер:
+он запоминается из ответа `OpenDocument` и из списка открытых документов,
+клиент изменить его не может.
+
 `documentOpened` дополнительно обрабатывается в самом `DocumentServiceBase`
 (`onDocumentOpened → createDocumentData`) — повторный вызов безопасен, так как
 `createDocumentData` выходит, если документ уже есть.
@@ -907,7 +915,8 @@ DocumentDecorator.onCommandActivated("Undo") -> onUndo()
 
 1. по undo-подписке — `undoInfoReceived(documentId, availableUndoSteps, availableRedoSteps, isDirty)`;
    `DocumentServiceBase.onUndoInfoReceived → setDocumentIsDirty(documentId, isDirty)`;
-   `DocumentDecorator` включает/выключает команды `Undo`/`Redo`/`Save` во всех view;
+   `DocumentDecorator` включает/выключает команды `Undo`/`Redo`/`Save` во всех view
+   (у read-only документов они всегда выключены);
 2. по document-подписке — `DocumentChanged`, что приводит к
    `updateRepresentationForAllViews()`, то есть перезагрузке representation
    (`initiatingView` здесь `null`, поэтому обновятся **все** видимые view).
