@@ -59,9 +59,11 @@ namespace imtdoc
 	  or, if it fails, by \c CreateObject.  If the state file cannot be read,
 	  the persisted data of all documents is removed
 	  (\c IPersistentUndoManager::RemoveAllDocumentContexts).
+	- **Single-copy mode** — optional \c "IsSingleCopyMode" attribute.  When
+	  \c true, all users that open the same document source share a single
+	  in-memory data object and undo manager (default: \c false).
 
-	\note This class is an abstract base; it does not implement \c GetCollection
-	or \c IsSingleCopyMode.  Use \c CCollectionDocumentServiceComp for a
+	\note This class is an abstract base; it does not implement \c GetCollection.  Use \c CCollectionDocumentServiceComp for a
 	complete, ready-to-use component.
 */
 class CDocumentServiceCompBase: public ilog::CLoggerComponentBase, public imtdoc::CDocumentServiceBase
@@ -81,6 +83,7 @@ public:
 		I_ASSIGN_MULTI_0(m_documentInitDelegateCompPtr, "DocumentInitDelegates", "List of document initialization delegates related to registered type-IDs ('ObjectTypeIdList')", false);
 		I_ASSIGN(m_stateFilePathCompPtr, "StateFilePath", "File path used to save/restore the list of opened documents", false, "StateFilePath");
 		I_ASSIGN(m_statePersistenceEnablerCompPtr, "StatePersistenceEnabler", "Enables restoring of opened documents on component creation and saving on each data model change", false, "StatePersistenceEnabler");
+		I_ASSIGN(m_isSingleCopyModeAttrPtr, "IsSingleCopyMode", "When enabled, all users share a single copy of each document", false, false);
 	I_END_COMPONENT
 
 protected:
@@ -102,6 +105,7 @@ protected:
 	virtual QList<imtdoc::IDocumentServiceEventHandler*> GetDocumentServiceEventHandlers() const override;
 	virtual istd::IChangeableUniquePtr CreateObject(const QByteArray& typeId) const override;
 	virtual idoc::IUndoManagerUniquePtr CreateUndoManager() const override;
+	virtual bool IsSingleCopyMode() const override;
 	virtual bool OnDocumentCreated(const QByteArray& typeId, const iprm::IParamsSet* initParams, istd::IChangeable& document, QString& errorMessage) override;
 
 private:
@@ -161,6 +165,7 @@ protected:
 	I_MULTIREF(imtdoc::IDocumentInitDelegate, m_documentInitDelegateCompPtr);
 	I_REF(ifile::IFileNameParam, m_stateFilePathCompPtr);
 	I_REF(iprm::IEnableableParam, m_statePersistenceEnablerCompPtr);
+	I_ATTR(bool, m_isSingleCopyModeAttrPtr);
 
 private:
 	std::atomic<bool> m_isStateLoading{false};

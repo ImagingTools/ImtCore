@@ -209,6 +209,12 @@ idoc::IUndoManagerUniquePtr CDocumentServiceCompBase::CreateUndoManager() const
 }
 
 
+bool CDocumentServiceCompBase::IsSingleCopyMode() const
+{
+	return m_isSingleCopyModeAttrPtr.IsValid() && *m_isSingleCopyModeAttrPtr;
+}
+
+
 // private methods
 
 int CDocumentServiceCompBase::GetObjectFactoryIndex(const QByteArray& typeId) const
