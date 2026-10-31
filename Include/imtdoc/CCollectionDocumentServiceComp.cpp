@@ -16,12 +16,4 @@ imtbase::IObjectCollection* CCollectionDocumentServiceComp::GetCollection() cons
 }
 
 
-// reimplemented (imtdoc::CDocumentServiceBase)
-
-bool CCollectionDocumentServiceComp::IsSingleCopyMode() const
-{
-	return m_isSingleCopyModeAttrPtr.IsValid() && *m_isSingleCopyModeAttrPtr;
-}
-
-
 } // namespace imtdoc

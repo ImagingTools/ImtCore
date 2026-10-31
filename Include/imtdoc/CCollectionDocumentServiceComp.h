@@ -19,16 +19,12 @@ namespace imtdoc
 	service component for server-side multi-user scenarios.  It inherits
 	the full implementation from
 	\c TCollectionDocumentServiceWrap<CDocumentServiceComp> and adds only
-	the ACF component attributes that complete the concrete class:
+	the \c "Collection" reference to the \c IObjectCollection that provides
+	persistent storage (required).
 
-	- \c "Collection" — reference to the \c IObjectCollection that provides
-	  persistent storage (required).
-	- \c "IsSingleCopyMode" — when \c true, all users that open the same
-	  collection element share a single in-memory data object and undo
-	  manager (default: \c false).
-
-	State persistence of the opened documents (\c "StateFilePath",
-	\c "StatePersistenceEnabler") is inherited from \c CDocumentServiceCompBase;
+	Single-copy mode (\c "IsSingleCopyMode") and state persistence of the opened
+	documents (\c "StateFilePath", \c "StatePersistenceEnabler") are inherited
+	from \c CDocumentServiceCompBase;
 	the data of a restored document is loaded from the collection object
 	(or its revision) addressed by the document source reference.
 
@@ -44,19 +40,14 @@ public:
 	I_BEGIN_COMPONENT(CCollectionDocumentServiceComp)
 		I_REGISTER_INTERFACE(imtdoc::IDocumentService)
 		I_ASSIGN(m_collectionCompPtr, "Collection", "Document collection containing related documents", true, "Collection");
-		I_ASSIGN(m_isSingleCopyModeAttrPtr, "IsSingleCopyMode", "When enabled, all users share a single copy of each document", false, false);
 	I_END_COMPONENT
 
 protected:
 	// reimplemented (imtdoc::TCollectionDocumentServiceWrap)
 	virtual imtbase::IObjectCollection* GetCollection() const override;
 
-	// reimplemented (imtdoc::CDocumentServiceBase)
-	virtual bool IsSingleCopyMode() const override;
-
 private:
 	I_REF(imtbase::IObjectCollection, m_collectionCompPtr);
-	I_ATTR(bool, m_isSingleCopyModeAttrPtr);
 };
 
 
