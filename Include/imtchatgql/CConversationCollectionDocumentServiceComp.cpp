@@ -9,6 +9,7 @@
 
 // ImtCore includes
 #include <imtchat/IConversation.h>
+#include <imtservergql/DocumentChange.h>
 
 
 namespace imtchatgql
@@ -107,7 +108,7 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CConversationCollectionDocumentServ
 		convPtr->SetUpdatedAt(*convInfo.updatedAt);
 	}
 
-	m_documentManagerCompPtr->SetDocumentData(userId, documentId, *convPtr);
+	m_documentManagerCompPtr->SetDocumentData(userId, documentId, *convPtr, imtservergql::GetDocumentChangeId(gqlRequest));
 
 	response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Success;
 

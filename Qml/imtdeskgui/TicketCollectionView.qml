@@ -239,6 +239,9 @@ RemoteCollectionView {
 				DocumentRepresentationController {
 					id: root
 
+					// A refused change stays in the editor
+					readBackOnRefusal: false
+
 					// The context types a new ticket can link to only come with the server representation.
 					requestRepresentationOnCreate: true
 
@@ -266,47 +269,43 @@ RemoteCollectionView {
 						updateTicketInput.m_ticket = representationModel
 
 						updateTicketRequest.send(updateTicketInput)
+						root.markSentComments()
+					}
+
+					// A new comment is sent once: once its request is written, it gets a local ID, and the server skips comments with one.
+					// The ID is given here, not when the comment is added: a queued update is written later (see DocumentDecorator).
+					function markSentComments(){
+						let comments = representationModel ? representationModel.m_comments : null
+						if (!comments){
+							return
+						}
+
+						for (let i = 0; i < comments.count; ++i){
+							let comment = comments.get(i).item
+							if (comment && !comment.m_id){
+								comment.enableNotifications = false
+								comment.m_id = "local-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8)
+								comment.enableNotifications = true
+							}
+						}
 					}
 
 					property DocumentId documentIdInput: DocumentId {}
-					property GqlSdlRequestSender getTicketRequest: GqlSdlRequestSender {
+					property DocumentRepresentationRequestSender getTicketRequest: DocumentRepresentationRequestSender {
+						representationController: root
 						permissionPath: container.permissionPath
 						gqlCommandId: ImtdeskTicketCollectionDocumentServiceSdlCommandIds.s_getTicketRepresentation
 						sdlObjectComp: Component {
-							TicketData {
-								onFinished: {
-									root.representationModel.copyFrom(this)
-									root.representationUpdated(root.documentId, root.representationModel)
-								}
-							}
-						}
-
-						function onError(message, type){
-							root.updateRepresentationFailed(root.documentId, message)
+							TicketData {}
 						}
 					}
 
 					property UpdateTicketInput updateTicketInput: UpdateTicketInput {}
-					property GqlSdlRequestSender updateTicketRequest: GqlSdlRequestSender {
+					property DocumentUpdateRequestSender updateTicketRequest: DocumentUpdateRequestSender {
+						representationController: root
 						permissionPath: container.permissionPath
 						gqlCommandId: ImtdeskTicketCollectionDocumentServiceSdlCommandIds.s_updateTicketFromRepresentation
-						requestType: 1
-						sdlObjectComp: Component {
-							DocumentOperationStatus {
-								onFinished: {
-									if (m_status === "Success"){
-										root.documentUpdated(root.documentId)
-									}
-									else{
-										root.updateDocumentFailed(root.documentId, m_message)
-									}
-								}
-							}
-						}
-
-						function onError(message, type){
-							root.updateDocumentFailed(root.documentId, message)
-						}
+						refusalMessage: ""
 					}
 				}
 			}

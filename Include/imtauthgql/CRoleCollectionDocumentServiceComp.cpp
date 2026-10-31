@@ -9,6 +9,7 @@
 #include <imtauth/CRole.h>
 #include <imtauth/imtauth.h>
 #include <imtauthgql/CAssignmentCollector.h>
+#include <imtservergql/DocumentChange.h>
 
 // Generated includes
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/RoleCollectionDocumentService.h>
@@ -159,7 +160,7 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CRoleCollectionDocumentServiceComp:
 		rolePtr->SetLocalPermissions(CAssignmentCollector::GetDirectIds(roleData.permissions));
 	}
 
-	m_documentManagerCompPtr->SetDocumentData(userLogin, documentId, *documentPtr);
+	m_documentManagerCompPtr->SetDocumentData(userLogin, documentId, *documentPtr, imtservergql::GetDocumentChangeId(gqlRequest));
 
 	response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Success;
 

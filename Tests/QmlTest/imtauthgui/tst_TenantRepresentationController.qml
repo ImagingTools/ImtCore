@@ -48,12 +48,8 @@ TestCase {
 		return count
 	}
 
-	function storedRepresentation(){
-		return JSON.stringify({"data": {"GetTenantRepresentation": {"id": "tenant-id", "name": "Stored"}}})
-	}
-
-	// A refused save reports the reason of the server and shows the organization as stored
-	function test_refusedUpdateIsReportedAndReloaded_data(){
+	// A refused save reports the reason of the server; reading the organization again is left to DocumentDecorator
+	function test_refusedUpdateIsReported_data(){
 		return [
 			{
 				tag: "error",
@@ -73,14 +69,12 @@ TestCase {
 		]
 	}
 
-	function test_refusedUpdateIsReportedAndReloaded(data){
+	function test_refusedUpdateIsReported(data){
 		let controller = createController()
 		let failedSpy = createTemporaryObject(spyComp, testCase, {target: controller, signalName: "updateDocumentFailed"})
 		let updatedSpy = createTemporaryObject(spyComp, testCase, {target: controller, signalName: "documentUpdated"})
 
 		GqlTestTransport.queueResponse("UpdateTenantFromRepresentation", JSON.stringify(data.response))
-		GqlTestTransport.queueResponse("GetTenantRepresentation", storedRepresentation())
-
 		controller.updateDocumentFromRepresentation()
 
 		tryCompare(failedSpy, "count", 1, 5000)
@@ -88,12 +82,10 @@ TestCase {
 		compare(failedSpy.signalArguments[0][1], data.message)
 		compare(updatedSpy.count, 0, "A refused save is no saved document")
 
-		tryVerify(function(){ return controller.representationModel.m_name === "Stored" }, 5000, "The editor shows the stored organization again")
-
-		// Reading the stored organization again sends nothing more
 		wait(300)
 		compare(requestCount("UpdateTenantFromRepresentation"), 1, "The refused change is sent once")
-		compare(requestCount("GetTenantRepresentation"), 1, "The organization is read again once")
+		compare(requestCount("GetTenantRepresentation"), 0, "The controller does not read the organization itself")
+		verify(controller.readBackOnRefusal, "DocumentDecorator reads the editor again after a refusal")
 		compare(failedSpy.count, 1)
 	}
 

@@ -638,7 +638,8 @@ IDocumentService::OperationStatus CDocumentServiceBase::GetDocumentData(
 IDocumentService::OperationStatus CDocumentServiceBase::SetDocumentData(
 			const QByteArray& userId,
 			const QByteArray& documentId,
-			const istd::IChangeable& document)
+			const istd::IChangeable& document,
+			const QByteArray& changeId)
 {
 	QMutexLocker locker(&m_mutex);
 
@@ -653,7 +654,19 @@ IDocumentService::OperationStatus CDocumentServiceBase::SetDocumentData(
 		return OS_FAILED;
 	}
 
+	// An event handler may write again from OnUpdate (the mutex is recursive), so the outer write is restored
+	QThread* previousThreadPtr = m_writingThreadPtr.load();
+	const istd::IChangeable* previousObjectPtr = m_writingObjectPtr.load();
+	const QByteArray previousChangeId = m_writingChangeId;
+	m_writingChangeId = changeId;
+	m_writingObjectPtr = workingDocumentPtr->objectPtr.GetPtr();
+	m_writingThreadPtr = QThread::currentThread();
+
 	bool isCopySuccessful = workingDocumentPtr->objectPtr->CopyFrom(document);
+
+	m_writingThreadPtr = previousThreadPtr;
+	m_writingObjectPtr = previousObjectPtr;
+	m_writingChangeId = previousChangeId;
 
 	return isCopySuccessful ? OS_OK : OS_FAILED;
 }
@@ -1115,6 +1128,17 @@ bool CDocumentServiceBase::IsSingleCopyMode() const
 }
 
 
+QByteArray CDocumentServiceBase::GetWritingChangeId(const istd::IChangeable& object) const
+{
+	// The thread first: only the writing thread may read m_writingChangeId
+	if (m_writingThreadPtr.load() != QThread::currentThread() || m_writingObjectPtr.load() != &object){
+		return QByteArray();
+	}
+
+	return m_writingChangeId;
+}
+
+
 // reimplemented (imod::CMultiModelObserverBase)
 
 void CDocumentServiceBase::OnUpdate(imod::IModel* modelPtr, const istd::IChangeable::ChangeSet& changeSet)
@@ -1142,7 +1166,8 @@ void CDocumentServiceBase::OnUpdate(imod::IModel* modelPtr, const istd::IChangea
 								workingDocument.documentSourceRef,
 								workingDocument.isDirty,
 								*changeablePtr,
-								changeSet);
+								changeSet,
+								GetWritingChangeId(*changeablePtr));
 					handlerPtr->ProcessEvent(&event);
 				}
 			}

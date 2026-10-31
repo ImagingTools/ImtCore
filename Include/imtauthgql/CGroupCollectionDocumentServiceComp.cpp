@@ -10,6 +10,7 @@
 #include <imtauth/IUserGroupInfo.h>
 #include <imtauth/imtauth.h>
 #include <imtauthgql/CAssignmentCollector.h>
+#include <imtservergql/DocumentChange.h>
 
 // Generated includes
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/GroupCollectionDocumentService.h>
@@ -150,7 +151,7 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CGroupCollectionDocumentServiceComp
 		groupPtr->SetRoles(productId, CAssignmentCollector::GetDirectIds(groupData.roles));
 	}
 
-	m_documentManagerCompPtr->SetDocumentData(userLogin, documentId, *documentPtr);
+	m_documentManagerCompPtr->SetDocumentData(userLogin, documentId, *documentPtr, imtservergql::GetDocumentChangeId(gqlRequest));
 
 	response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Success;
 

@@ -284,7 +284,7 @@ Item {
 				}
 
 				workspaceView.documentManager.getUndoInfo(documentId)
-				workspaceView.documentManager.documentManagerChanged(EDocumentOperationEnum.s_documentChanged, objectId, documentId, documentName)
+				workspaceView.documentManager.documentManagerChanged(EDocumentOperationEnum.s_documentChanged, objectId, documentId, documentName, "")
 			}
 
 			globalLoading.stop()

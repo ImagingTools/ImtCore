@@ -221,6 +221,12 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentChanged(imtdoc::CEventBa
 	sdl::V1_0::imtbase::CDocumentServiceNotification sdlNotification;
 	FillSdlNotification(concreteEventPtr, notification, sdl::V1_0::imtbase::EDocumentOperation::DocumentChanged, sdlNotification);
 
+	// The client that made the change knows it by this ID
+	const QByteArray changeId = concreteEventPtr->GetChangeId();
+	if (!changeId.isEmpty()){
+		sdlNotification.changeId = changeId;
+	}
+
 	PublishRepresentation(sdl::V1_0::imtbase::COnDocumentManagerChangedGqlRequest::GetCommandId(), notification.userId, sdlNotification);
 	PublishRepresentation(sdl::V1_0::imtbase::COnDocumentChangedGqlRequest::GetCommandId(), notification.userId, sdlNotification, notification.documentId);
 

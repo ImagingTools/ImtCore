@@ -723,17 +723,19 @@ sequenceDiagram
     U->>V: правка поля
     V->>V: model.modelChanged
     Note over V: если blockingUpdateModel — сигнал не идёт дальше
-    V-->>D: modelDataChanged(view, model)
+    V-->>D: modelDataChanged(view, model, changeSet)
     D->>D: index = registeredViews.indexOf(view)
     alt updateCounters[index] > 0
         Note over D: изменение вызвано загрузкой representation — игнорируем
     else
-        D->>D: _internal.initiatingView = view
-        D->>RC: updateDocumentFromRepresentation()
+        D->>RC: updateDocumentFromRepresentation(changeSet)
+        RC-->>D: startUpdateDocument — ждём эхо своей правки
         RC->>S: Update<X>FromRepresentation
         S-->>S: применить к рабочей копии, обновить undo/isDirty
         S--)D: subscription DocumentChanged
-        D->>D: updateRepresentationForAllViews()  (кроме initiatingView)
+        D->>D: onDocumentChanged()  (своё эхо этого view пропускается)
+        S-->>RC: ответ
+        RC-->>D: documentUpdated / updateDocumentFailed
     end
 ```
 
@@ -741,9 +743,136 @@ sequenceDiagram
 меняет representation, что снова поднимает `modelChanged`; без этой проверки данные ушли
 бы обратно на сервер бесконечным циклом.
 
-`_internal.initiatingView` — защита от лишней перерисовки: view, который инициировал
-изменение, при последующем `DocumentChanged` пропускается (его GUI и так актуален).
-Флаг одноразовый — сбрасывается в начале `updateRepresentationForAllViews()`.
+`changeSet` описывает, что именно изменилось в модели (см. `Docs/Development/ModelChangeSet.md`):
+контроллер может по нему отправить на сервер не всю модель, а отдельную команду.
+
+#### Собственные правки и уведомления сервера
+
+Правка уходит по HTTP, а `DocumentChanged` приходит по WebSocket, поэтому уведомление
+о своей правке может прийти и до ответа, и после него. Свою правку view узнаёт по метке:
+
+- `DocumentDecorator.sendUpdate()` создаёт `changeId` и на время вызова
+  `updateDocumentFromRepresentation()` кладёт его в `DocumentRepresentationController.changeId`;
+- update-запрос контроллера (`DocumentUpdateRequestSender`, см. ниже) отправляет его
+  заголовком `documentChangeId` (`controller.getChangeHeaders()`);
+- сервер передаёт его в `IDocumentService::SetDocumentData(..., changeId)` только из записи,
+  которая применяет данные клиента (`imtservergql::GetDocumentChangeId(gqlRequest)`).
+  Откаты, `ProcessEvent`, undo/redo идут без метки (значение по умолчанию);
+- сервер, пересылающий запрос другому серверу (например, ProLife → Puma для организаций),
+  передаёт метку дальше: `CGqlClientEngineComp` ставит заголовок `documentChangeId`
+  из контекста запроса, остальные входящие заголовки не пересылаются;
+- уведомление `DocumentChanged` возвращает метку в поле `changeId`.
+
+Одна правка в полёте на view: правка, сделанная, пока у view есть отправка без ответа,
+не отправляется сразу. Её changeSet копится вместе с остальными и уходит одним update
+после ответа. Поэтому ответ всегда относится к единственной отправке, а правка, которую контроллер
+сам вызывает, пока отправляет (например, `m_id` после сохранения), не становится вложенной отправкой.
+Накопленный update и отложенное перечитывание запускаются после обработки ответа (Timer с интервалом 0),
+а не изнутри обработчика ответа запроса.
+
+Что следует за отказом, решает `DocumentDecorator` по `DocumentRepresentationController.readBackOnRefusal`:
+- `true` (по умолчанию) — накопленные правки выбрасываются (они сделаны поверх отклонённой),
+  view перечитывается, как только у него нет правки в полёте;
+- `false` — view остаётся как отредактирован, накопленные правки отправляются.
+
+Чтение, которое дало view новый объект модели, выбрасывает накопленные правки старой модели:
+новая модель уже содержит то, что есть на сервере. Декоратор находит view по его контроллеру
+и сам передаёт ему новую модель, даже если у контроллера не задан `view`.
+
+`DocumentDecorator` ведёт для каждого view список собственных отправок
+(`_internal.ownUpdates`) по сигналам контроллера:
+
+- `startUpdateDocument` — правка ушла с меткой;
+- `documentUpdated` — ответ пришёл, запись хранится ещё `ownEchoTimeout` (3 с) до её уведомления;
+- `updateDocumentFailed` — эхо не пропускается: сервер ничего не записал или откатил запись,
+  view должен перечитать документ.
+
+На `DocumentChanged` каждый view:
+
+1. если `changeId` совпал с его собственной правкой — **не** перечитывается
+   (сервер её применил, поэтому отложенное перечитывание выполняется, если других своих правок нет);
+2. иначе, если у него есть неприменённые свои правки (правка в полёте — нет ни ответа,
+   ни уведомления — или правки в очереди за ней), — перечитывание откладывается, пока они
+   не уйдут и не будут применены. Иначе чтение затёрло бы правку, которую сервер ещё не применил,
+   а новая модель выбросила бы очередь;
+3. иначе перечитывается.
+
+Так же откладывается перечитывание всех view при переподключении (`updateRepresentationForAllViews()`)
+и после своей правки при `requestRepresentationOnUpdate`.
+
+Сохранение ждёт своих правок: если у какого-то view документа есть правка без ответа или правки
+в очереди, `GqlBasedCollectionDocumentService.saveDocument()` откладывает сохранение
+(`DocumentServiceBase.saveDocumentAfterUpdates()`) до ответов на все правки. Иначе сервер сохранил
+бы документ без правок из очереди, а «сохранить и закрыть» потеряло бы их совсем. Отказ любой из
+этих правок отменяет сохранение через `saveDocumentFailed`, поэтому «сохранить и закрыть» документ
+не закрывает.
+
+Так же ждут Undo и Redo (`DocumentDecorator.runAfterUpdates()`): отмена до ответа отменила бы шаг
+перед правкой, а правка из очереди, которая отправляет view целиком, вернула бы его. Отложенные
+Save/Undo/Redo выполняются в порядке вызова; отказ правки отменяет их все.
+
+Редактор, которому нужно перечитать документ по своей причине (например, `TenantEditor` при смене
+членства), перечитывает его через `DocumentServiceBase.updateDocumentRepresentation()`, а не через
+контроллер напрямую: тогда чтение тоже ждёт применения своих правок.
+
+`DocumentRepresentationController.requestRepresentationOnUpdate` управляет только
+собственными правками view: `false` (по умолчанию) — эхо своей правки не перечитывается;
+`true` — view перечитывается после каждой своей правки (для документов, которые сервер
+дополняет сам). Чужие правки, undo/redo и откаты перечитываются всегда.
+
+Правка без ответа дольше `ownUpdateTimeout` (30 с) считается завершённой, а накопленные
+правки отправляются: это страховка от потерянного ответа. Оба отправителя отвечают контроллеру
+на любую ошибку, кроме 401: такой запрос `AuthorizationController` отправит снова после
+обновления токена, и ответ придёт от повторной отправки.
+
+Ограничения:
+- уведомление своей правки, пришедшее позже `ownEchoTimeout`, даст лишнее перечитывание;
+- update-запрос не на `DocumentUpdateRequestSender` (без заголовка `documentChangeId`) или сервис,
+  который не передаёт метку в `SetDocumentData`, оставляет правку без метки — view перечитает
+  свою правку.
+
+#### Запросы контроллера: `DocumentRepresentationRequestSender` и `DocumentUpdateRequestSender`
+
+Оба типа (`imtguigql`) наследуют `GqlSdlRequestSender` и отвечают контроллеру
+(`representationController`) его сигналами, поэтому в контроллере остаются только команда,
+`permissionPath` и SDL-тип.
+
+`DocumentRepresentationRequestSender` — запрос `Get...Representation`:
+- `sdlObjectComp` задаёт SDL-тип репрезентации;
+- `getRepresentationModel(receivedModel, currentModel)` возвращает модель, которую покажет
+  контроллер: `receivedModel` — модель, пришедшая с сервера, `currentModel` — модель контроллера
+  сейчас. По умолчанию возвращается `receivedModel` (без копирования). Переопределение может
+  дополнить её (например, `m_id` объекта), вернуть её часть или перенести нужные поля
+  в `currentModel` и вернуть его;
+- отправитель сам присваивает результат в `representationModel` (если модель другая) и один раз
+  отвечает `representationUpdated()`; контроллер при смене модели только передаёт её view;
+- полученная модель, на которой не построен результат, удаляется сразу, поэтому её части
+  копируются (`copyFrom()`), а не переносятся в `currentModel`; использованная удаляется,
+  когда её заменит следующая. Модель по умолчанию из контроллера не удаляется;
+- ошибка (кроме 401) → `updateRepresentationFailed(documentId, message)`.
+
+`DocumentUpdateRequestSender` — мутация `Update...FromRepresentation`:
+- заголовок `documentChangeId` из `representationController.changeId`;
+- `DocumentOperationStatus` `Success` → `documentUpdated()`;
+- отказ или ошибка (кроме 401) → `refuse(message)` → `updateDocumentFailed(documentId, message)`;
+  перечитывание после отказа делает декоратор (см. `readBackOnRefusal` выше);
+- отказ без сообщения получает `refusalMessage` (пустая строка — без сообщения);
+- `refuse()` переопределяется в экземпляре, если отказ показывается иначе (устройства ProLife).
+
+```qml
+property DocumentRepresentationRequestSender getRoleRequest: DocumentRepresentationRequestSender {
+	representationController: roleReprController
+	gqlCommandId: ImtauthRoleCollectionDocumentServiceSdlCommandIds.s_getRoleRepresentation
+	sdlObjectComp: Component {
+		RoleData {}
+	}
+}
+
+property DocumentUpdateRequestSender updateRoleRequest: DocumentUpdateRequestSender {
+	representationController: roleReprController
+	gqlCommandId: ImtauthRoleCollectionDocumentServiceSdlCommandIds.s_updateRoleFromRepresentation
+}
+```
 
 ### 5.4. Ошибки
 
@@ -810,8 +939,9 @@ onPageAdded(item, index):
   `representationModel`. Общего representation нет.
 - Все контроллеры зарегистрированы в **одном** `DocumentDecorator` документа.
 - При `DocumentChanged` (правка в любом view или изменение другим клиентом)
-  `updateRepresentationForAllViews()`:
-  - пропускает `initiatingView`;
+  `onDocumentChanged()`:
+  - пропускает view, который ждёт эхо своей правки (см. 5.3);
+  - откладывает view, чья правка ещё в полёте;
   - для **видимых** view сразу запускает `updateRepresentationFromDocument()`;
   - для **невидимых** — откладывает, добавляя в `_internal.requestUpdateViews`.
 - Когда невидимый view становится видимым (`guiVisibleChanged(view, true)`),
@@ -909,8 +1039,8 @@ DocumentDecorator.onCommandActivated("Undo") -> onUndo()
    `DocumentServiceBase.onUndoInfoReceived → setDocumentIsDirty(documentId, isDirty)`;
    `DocumentDecorator` включает/выключает команды `Undo`/`Redo`/`Save` во всех view;
 2. по document-подписке — `DocumentChanged`, что приводит к
-   `updateRepresentationForAllViews()`, то есть перезагрузке representation
-   (`initiatingView` здесь `null`, поэтому обновятся **все** видимые view).
+   `onDocumentChanged()`, то есть перезагрузке representation
+   (undo — не собственная правка view, поэтому обновятся **все** видимые view).
 
 `getUndoInfo(documentId)` — явный запрос состояния (используется, например, при
 восстановлении списка открытых документов).

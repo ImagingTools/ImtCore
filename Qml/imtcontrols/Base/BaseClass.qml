@@ -1,4 +1,5 @@
 import QtQuick 2.0
+import "ChangeSetBuilder.js" as ChangeSetBuilder
 
 QtObject {
 	id: root;
@@ -16,19 +17,15 @@ QtObject {
 		signal internalModelChanged(string name, var sender); // internal modelChanged
 
 		onInternalModelChanged: {
+			let change = {"path": [ChangeSetBuilder.getPathKey(root, name)], "operation": "set", "name": name, "sender": sender}
 			if (isTransaction){
-				let changeObj = {};
-				changeObj["name"] = name;
-				changeObj["sender"] = sender;
+				changeList.push(change)
+				countChanges++
 
-				changeList.push(changeObj)
-
-				countChanges++;
-
-				return;
+				return
 			}
 
-			root.modelChanged([{"name":name,"sender":sender}]);
+			root.modelChanged([change])
 		}
 
 		function startTransaction(){
@@ -82,14 +79,16 @@ QtObject {
 
 	onModelChanged: {
 		if(owner && owner.enableNotifications && owner.modelChanged){
+			// The path of this object in the owner goes in front, see Docs/Development/ModelChangeSet.md
+			let ownerChangeSet = owner.getProperties !== undefined ? ChangeSetBuilder.prependChildPath(owner, root, changeSet) : changeSet
 			if (owner._internal.isTransaction){
 				// concat() returns a new array rather than growing this one, so
 				// the batched changes were counted but never actually kept.
-				owner._internal.changeList = owner._internal.changeList.concat(changeSet)
+				owner._internal.changeList = owner._internal.changeList.concat(ownerChangeSet)
 				owner._internal.countChanges++
 			}
 			else{
-				owner.modelChanged(changeSet)
+				owner.modelChanged(ownerChangeSet)
 			}
 		}
 	}
@@ -543,6 +542,7 @@ QtObject {
 							obj.connectProperties()
 						}
 
+						// A list refilled in place is not reported: filling from data is a load, not an edit
 						if (isNewModel){
 							this[_key] = model
 							model.owner = this

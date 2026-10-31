@@ -4,6 +4,8 @@ const Var = require('./Var')
 const Signal = require('./Signal')
 const QtFunctions = require("../Qt/functions")
 
+const specialCharsPattern = /[\\"\n\r\t\f]/
+
 class BaseModel extends ListModel {
 	static meta = Object.assign({}, ListModel.meta, {
         dynamicRoles: { type: Bool, value: true },
@@ -20,6 +22,11 @@ class BaseModel extends ListModel {
 	}
 
 	escapeSpecialChars(jsonString) {
+		// Most strings have nothing to escape: one search instead of six replacements
+		if (!specialCharsPattern.test(jsonString)){
+			return jsonString
+		}
+
 		return jsonString.replace(/\\/g, "\\\\")
 		.replace(/\"/g, "\\\"")
 		.replace(/\n/g, "\\n")
@@ -259,25 +266,41 @@ class BaseModel extends ListModel {
 	}
 
 	addElement(element){
-		element.owner = this.owner
-		this.append({item: element})
-		if (this.owner){
-			if (this.owner._internal && this.owner._internal.isTransaction){
-				this.owner._internal.countChanges++
-			} else {
-				this.owner.modelChanged([])
-			}
-		}
+		this.insertElement(this.count, element)
+	}
+
+	appendElement(element){
+		this.insertElement(this.count, element)
 	}
 
 	removeElement(index){
+		if (index === undefined){
+			index = 0
+		}
+
 		this.remove(index)
-		if (this.owner){
-			if (this.owner._internal && this.owner._internal.isTransaction){
-				this.owner._internal.countChanges++
-			} else {
-				this.owner.modelChanged([])
-			}
+		this.notifyOwner([this.createOwnerChange("remove", index)])
+	}
+
+	createOwnerChange(operation, index){
+		if (this.owner && this.owner.createListChange !== undefined){
+			return this.owner.createListChange(this, operation, index)
+		}
+
+		return {"path": null, "operation": operation, "name": "", "sender": this}
+	}
+
+	// Inside the owner's beginChanges()/endChanges() the change is reported once, at the end - as in Qt.
+	notifyOwner(changes){
+		if (!this.owner || this.owner.enableNotifications === false){
+			return
+		}
+
+		if (this.owner.reportChanges !== undefined){
+			this.owner.reportChanges(changes)
+		}
+		else{
+			this.owner.modelChanged(changes)
 		}
 	}
 
@@ -316,19 +339,17 @@ class BaseModel extends ListModel {
 		this.get(index1).item = item2
 		this.get(index2).item = item1
 
+		this.notifyOwner([this.createOwnerChange("set", index1), this.createOwnerChange("set", index2)])
+
 		return true
 	}
 
 	insertElement(index, element){
-		element.owner = this.owner
-		this.insert(index, {item: element})
-		if (this.owner){
-			if (this.owner._internal && this.owner._internal.isTransaction){
-				this.owner._internal.countChanges++
-			} else {
-				this.owner.modelChanged([])
-			}
+		if (element !== null && element !== undefined){
+			element.owner = this.owner
 		}
+		this.insert(index, {item: element})
+		this.notifyOwner([this.createOwnerChange("insert", index)])
 	}
 }
 

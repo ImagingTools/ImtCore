@@ -51,7 +51,7 @@ DocumentServiceBase {
 				root.setDocumentName(documentId, documentName)
 			}
 
-			root.documentManagerChanged(operation, objectId, documentId, documentName)
+			root.documentManagerChanged(operation, objectId, documentId, documentName, data.getData("changeId") || "")
 		}
 
 		onRefreshRequired: {
@@ -203,6 +203,12 @@ DocumentServiceBase {
 	}
 
 	function saveDocument(documentId, documentName){
+		// The updates sent or queued before the save go first, the server saves what it holds then
+		if (root.documentHasPendingUpdates(documentId)){
+			root.saveDocumentAfterUpdates(documentId, documentName)
+			return
+		}
+
 		startSaveDocument(documentId)
 
 		if (saveDocumentOverride){

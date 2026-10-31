@@ -15,6 +15,7 @@
 #include <imtgql/IGqlContext.h>
 #include <imtauthgql/imtauthgql.h>
 #include <imtauthgql/CAssignmentCollector.h>
+#include <imtservergql/DocumentChange.h>
 #include <istd/IChangeable.h>
 
 // Generated includes
@@ -331,7 +332,7 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 	}
 
 
-	m_documentManagerCompPtr->SetDocumentData(userLogin, documentId, *documentPtr);
+	m_documentManagerCompPtr->SetDocumentData(userLogin, documentId, *documentPtr, imtservergql::GetDocumentChangeId(gqlRequest));
 
 	response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Success;
 

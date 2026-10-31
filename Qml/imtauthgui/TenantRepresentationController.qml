@@ -38,50 +38,21 @@ DocumentRepresentationController {
 		updateTenantRequest.send(updateTenantInput)
 	}
 
-	// The refused change was not applied: the reason is shown and the editor returns to what the document holds
-	function rejectUpdate(message){
-		root.updateDocumentFailed(root.documentId, message)
-		root.updateRepresentationFromDocument()
-	}
-
 	property DocumentId documentIdInput: DocumentId {}
-	property GqlSdlRequestSender getTenantRequest: GqlSdlRequestSender {
+	property DocumentRepresentationRequestSender getTenantRequest: DocumentRepresentationRequestSender {
+		representationController: root
 		permissionPath: root.permissionPath
 		gqlCommandId: ImtauthTenantCollectionDocumentServiceSdlCommandIds.s_getTenantRepresentation
 		sdlObjectComp: Component {
-			TenantData {
-				onFinished: {
-					root.representationModel.copyFrom(this)
-					root.representationUpdated(root.documentId, root.representationModel)
-				}
-			}
-		}
-
-		function onError(message, type){
-			root.updateRepresentationFailed(root.documentId, message)
+			TenantData {}
 		}
 	}
 
 	property UpdateTenantFromRepresentationInput updateTenantInput: UpdateTenantFromRepresentationInput {}
-	property GqlSdlRequestSender updateTenantRequest: GqlSdlRequestSender {
+	property DocumentUpdateRequestSender updateTenantRequest: DocumentUpdateRequestSender {
+		representationController: root
 		permissionPath: root.permissionPath
 		gqlCommandId: ImtauthTenantCollectionDocumentServiceSdlCommandIds.s_updateTenantFromRepresentation
-		requestType: 1
-		sdlObjectComp: Component {
-			DocumentOperationStatus {
-				onFinished: {
-					if (m_status === "Success"){
-						root.documentUpdated(root.documentId)
-					}
-					else{
-						root.rejectUpdate(m_message !== "" ? m_message : qsTr("The organization could not be saved"))
-					}
-				}
-			}
-		}
-
-		function onError(message, type){
-			root.rejectUpdate(message)
-		}
+		refusalMessage: qsTr("The organization could not be saved")
 	}
 }

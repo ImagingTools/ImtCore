@@ -866,6 +866,112 @@ void CCollectionDocumentServiceTest::SetDocumentDataWhileLoadingTest()
 
 
 // ======================================================================
+// Change-ID of a client edit
+// ======================================================================
+
+namespace
+{
+
+
+QList<QByteArray> GetChangedEventIds(const CMockEventHandler& handler)
+{
+	QList<QByteArray> changeIds;
+	for (const auto& event : handler.GetEvents()) {
+		if (event.type == "DocumentChangedEvent") {
+			changeIds.append(event.changeId);
+		}
+	}
+
+	return changeIds;
+}
+
+
+}
+
+
+void CCollectionDocumentServiceTest::SetDocumentDataChangeIdReachesEventTest()
+{
+	m_managerPtr->SetCreatesNotifyingDocuments(true);
+	QByteArray docId = CreateDocumentAndWaitForLoad(*m_managerPtr, TEST_USER_ID, TEST_TYPE_ID);
+	QVERIFY(!docId.isEmpty());
+	m_managerPtr->GetMockEventHandler().ClearEvents();
+
+	CNotifyingDocument newData;
+	newData.SetData("edited");
+	QCOMPARE(m_managerPtr->SetDocumentData(TEST_USER_ID, docId, newData, "change-1"), imtdoc::IDocumentService::OS_OK);
+
+	QCOMPARE(GetChangedEventIds(m_managerPtr->GetMockEventHandler()), QList<QByteArray>({"change-1"}));
+
+	const CNotifyingDocumentData* dataPtr = dynamic_cast<const CNotifyingDocumentData*>(m_managerPtr->GetDocumentPtr(TEST_USER_ID, docId));
+	QVERIFY(dataPtr != nullptr);
+	QCOMPARE(dataPtr->GetData(), QByteArray("edited"));
+}
+
+
+void CCollectionDocumentServiceTest::SetDocumentDataWithoutChangeIdTest()
+{
+	m_managerPtr->SetCreatesNotifyingDocuments(true);
+	QByteArray docId = CreateDocumentAndWaitForLoad(*m_managerPtr, TEST_USER_ID, TEST_TYPE_ID);
+	m_managerPtr->GetMockEventHandler().ClearEvents();
+
+	CNotifyingDocument newData;
+	newData.SetData("rolled back");
+	// Without a change-ID, as the server writes its own changes
+	QCOMPARE(m_managerPtr->SetDocumentData(TEST_USER_ID, docId, newData), imtdoc::IDocumentService::OS_OK);
+
+	QCOMPARE(GetChangedEventIds(m_managerPtr->GetMockEventHandler()), QList<QByteArray>({QByteArray()}));
+}
+
+
+// A change made after the write, e.g. by undo or an event handler, is not taken for the client edit
+void CCollectionDocumentServiceTest::ChangeIdIsNotKeptAfterWriteTest()
+{
+	m_managerPtr->SetCreatesNotifyingDocuments(true);
+	QByteArray docId = CreateDocumentAndWaitForLoad(*m_managerPtr, TEST_USER_ID, TEST_TYPE_ID);
+
+	CNotifyingDocument newData;
+	newData.SetData("edited");
+	QCOMPARE(m_managerPtr->SetDocumentData(TEST_USER_ID, docId, newData, "change-1"), imtdoc::IDocumentService::OS_OK);
+	m_managerPtr->GetMockEventHandler().ClearEvents();
+
+	QCOMPARE(
+		m_managerPtr->ExecuteDocumentMethod(TEST_USER_ID, docId, imtdoc::CDocumentMethod(&CNotifyingDocumentData::SetData, QByteArray("by server"))),
+		imtdoc::IDocumentService::OS_OK);
+
+	QCOMPARE(GetChangedEventIds(m_managerPtr->GetMockEventHandler()), QList<QByteArray>({QByteArray()}));
+}
+
+
+// In single-copy mode every user of the object is told; only the editing client knows the ID
+void CCollectionDocumentServiceTest::SingleCopyChangeIdReachesAllUsersTest()
+{
+	m_managerPtr->SetSingleCopyMode(true);
+	m_managerPtr->SetCreatesNotifyingDocuments(true);
+	istd::IChangeableSharedPtr sharedPtr(new CNotifyingDocument);
+	m_managerPtr->GetMockCollection().AddObject(TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME, sharedPtr);
+
+	QByteArray docId1 = OpenDocumentAndWaitForLoad(*m_managerPtr, TEST_USER_ID, TEST_OBJECT_ID);
+	QByteArray docId2 = OpenDocumentAndWaitForLoad(*m_managerPtr, TEST_USER_ID_2, TEST_OBJECT_ID);
+	QVERIFY(!docId1.isEmpty() && !docId2.isEmpty());
+	m_managerPtr->GetMockEventHandler().ClearEvents();
+
+	CNotifyingDocument newData;
+	newData.SetData("edited");
+	QCOMPARE(m_managerPtr->SetDocumentData(TEST_USER_ID, docId1, newData, "change-1"), imtdoc::IDocumentService::OS_OK);
+
+	QList<QByteArray> users;
+	for (const auto& event : m_managerPtr->GetMockEventHandler().GetEvents()) {
+		if (event.type == "DocumentChangedEvent") {
+			QCOMPARE(event.changeId, QByteArray("change-1"));
+			users.append(event.userId);
+		}
+	}
+	std::sort(users.begin(), users.end());
+	QCOMPARE(users, QList<QByteArray>({TEST_USER_ID, TEST_USER_ID_2}));
+}
+
+
+// ======================================================================
 // SaveDocument tests
 // ======================================================================
 

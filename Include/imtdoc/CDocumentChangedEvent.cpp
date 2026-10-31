@@ -16,9 +16,11 @@ CDocumentChangedEvent::CDocumentChangedEvent(
 			const QByteArray& documentSourceRef,
 			bool isDirty,
 			const istd::IChangeable& document,
-			const istd::IChangeable::ChangeSet& changeSet)
+			const istd::IChangeable::ChangeSet& changeSet,
+			const QByteArray& changeId)
 	:m_document(document),
-	m_changeSet(changeSet)
+	m_changeSet(changeSet),
+	m_changeId(changeId)
 {
 	m_userId = userId;
 	m_documentId = documentId;
@@ -38,6 +40,12 @@ const istd::IChangeable& CDocumentChangedEvent::GetDocument() const
 istd::IChangeable::ChangeSet CDocumentChangedEvent::GetChangeSet() const
 {
 	return m_changeSet;
+}
+
+
+QByteArray CDocumentChangedEvent::GetChangeId() const
+{
+	return m_changeId;
 }
 
 

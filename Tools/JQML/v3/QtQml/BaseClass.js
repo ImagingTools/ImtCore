@@ -7,34 +7,73 @@ const String = require("./String")
 const Signal = require("./Signal")
 const BaseModel = require("./BaseModel")
 
+const specialCharsPattern = /[\\"\n\r\t\f]/
+
+// The list elements found last by BaseClass.findChild, one per owner: edits of many elements of a list go in order,
+// so the next one is found next to it, on every level of a tree
+const lastElements = []
+const lastElementsLimit = 8
+
+// The owners are held weakly: a closed document must not stay in memory because it was edited last
+function findLastElement(owner){
+	for (let element of lastElements){
+		if (element.ownerRef.deref() === owner){
+			return element
+		}
+	}
+
+	return null
+}
+
+function rememberElement(owner, name, index){
+	let element = findLastElement(owner)
+	if (element === null){
+		if (lastElements.length >= lastElementsLimit){
+			lastElements.shift()
+		}
+		element = {"ownerRef": new WeakRef(owner), "name": name, "index": index}
+		lastElements.push(element)
+	}
+
+	element.name = name
+	element.index = index
+}
+
+// Element components of the lists: createElement() creates a new one each time.
+// By the class of the object (a name may be mangled in a minified bundle), then by list and element type.
+const elementComponents = new Map()
+
+function getElementComponent(object, propertyId, typename){
+	let typeComponents = elementComponents.get(object.__self.constructor)
+	if (typeComponents === undefined){
+		typeComponents = new Map()
+		elementComponents.set(object.__self.constructor, typeComponents)
+	}
+
+	let key = propertyId + "/" + (typename ? typename : "")
+	let component = typeComponents.get(key)
+	if (component === undefined){
+		component = object.createElement(propertyId, typename)
+		typeComponents.set(key, component)
+	}
+
+	return component
+}
+
 class Internal extends QtObject {
     static meta = Object.assign({}, QtObject.meta, {
-        isTransaction: { type: Bool, value: false },
-		countChanges: { type: Int, value: 0 },
-		changeList: { type: Var, value: null },
-		removed: { type: Var, value: null },
+		// isTransaction, countChanges, changeList and removed are plain fields: nothing binds to them,
+		// and a property notifies each change, which made every fromObject() transaction slow on the web
 		__typename: { type: String, value: '' },
 
-		isTransactionChanged: {type:Signal, args:[]},
-		countChangesChanged: {type:Signal, args:[]},
-		changeListChanged: {type:Signal, args:[]},
-		removedChanged: {type:Signal, args:[]},
 		__typenameChanged: {type:Signal, args:[]},
 
 		internalModelChanged: { type:Signal, args: ['name', 'sender'] },
     })
 
-	// removed = []
-	// changeList = []
 
 	SLOT_internalModelChanged(name, sender){
-		if (this.isTransaction){
-			let changeObj = {"name":name,"sender":sender}
-				this.changeList.push(changeObj)
-				this.countChanges++
-				return
-			}
-		this.__base.modelChanged([{"name":name,"sender":sender}])
+		this.__base.reportChanges([this.__base.createChange([this.__base.getPathKey(name)], "set", name, sender)])
 	}
 
 	startTransaction(){
@@ -123,9 +162,11 @@ class BaseClass extends QtObject {
 									if (_pureData['__typename']){
 										sourceTypename = _pureData['__typename']
 									}
-									let obj = target.__proxy.createElement(key, sourceTypename).createObject(target.__proxy)
+									let obj = getElementComponent(target.__proxy, key, sourceTypename).createObject(target.__proxy)
 
+									obj.enableNotifications = false
 									obj.fromObject(_pureData)
+									obj.enableNotifications = true
 									model.append({ item: obj })
 									obj.owner = target.__proxy
 								}
@@ -186,6 +227,9 @@ class BaseClass extends QtObject {
 		let proxy = super.create(parent, properties)
 
 		proxy._internal = Internal.create()
+		proxy._internal.isTransaction = false
+		proxy._internal.countChanges = 0
+		proxy._internal.changeList = null
 		proxy._internal.__base = proxy
 
 		return proxy
@@ -195,14 +239,117 @@ class BaseClass extends QtObject {
 
 	SLOT_modelChanged(changeSet){
 		if (this.owner && this.owner.enableNotifications && this.owner.modelChanged) {
+			let ownerChangeSet = this.owner.prependChildPath !== undefined ? this.owner.prependChildPath(this, changeSet) : changeSet
 			if (this.owner._internal.isTransaction){
-				this.owner._internal.changeList = this.owner._internal.changeList.concat(changeSet)
+				this.owner._internal.changeList = this.owner._internal.changeList.concat(ownerChangeSet)
 				this.owner._internal.countChanges++
 			}
 			else{
-				this.owner.modelChanged(changeSet)
+				this.owner.modelChanged(ownerChangeSet)
 			}
 		}
+	}
+
+	// A change record of modelChanged(changeSet), see Docs/Development/ModelChangeSet.md
+	createChange(path, operation, name, sender){
+		return {"path": path, "operation": operation, "name": name, "sender": sender}
+	}
+
+	// Path step of a property: its JSON key, as in the SDL schema.
+	getPathKey(propertyId){
+		let key = this.getJSONKeyForProperty(propertyId)
+		if (key === undefined || key === null || key === ""){
+			return propertyId
+		}
+
+		return key
+	}
+
+	// Reports changes of this object at once, or adds them to the open transaction.
+	reportChanges(changes){
+		if (this._internal.isTransaction){
+			this._internal.changeList = this._internal.changeList.concat(changes)
+			this._internal.countChanges++
+
+			return
+		}
+
+		this.modelChanged(changes)
+	}
+
+	// Property holding child directly or as a list element: {"name": "m_items", "index": 2}, index -1 for a direct child.
+	// Reads the stored values: a lazily loaded object that is not created yet cannot be the child.
+	findChild(child){
+		// Edits of many elements of a list go in order, so the next element is found next to the last one
+		let lastElement = findLastElement(this)
+		if (lastElement !== null){
+			let list = this.__self[lastElement.name]
+			if (list instanceof BaseModel){
+				for (let delta = 1; delta >= -1; delta--){
+					let index = lastElement.index + delta
+					if (index >= 0 && index < list.count && list.get(index).item === child){
+						lastElement.index = index
+						return {"name": lastElement.name, "index": index}
+					}
+				}
+			}
+		}
+
+		// A list is a property value itself, never an element: the lists need no scan
+		let isList = child instanceof BaseModel
+		for (let key of this.getProperties()) {
+			let value = this.__self[key]
+			if (value === null || value === undefined || typeof value !== "object"){
+				continue
+			}
+
+			if (value === child){
+				return {"name": key, "index": -1}
+			}
+
+			if (!isList && value instanceof BaseModel){
+				for (let k = 0; k < value.count; k++){
+					if (value.get(k).item === child){
+						rememberElement(this, key, k)
+						return {"name": key, "index": k}
+					}
+				}
+			}
+		}
+
+		return null
+	}
+
+	// The changes of child with the path of child in this object in front; the path is null when child is not found.
+	prependChildPath(child, changeSet){
+		let location = this.findChild(child)
+		let step = null
+		if (location !== null){
+			step = location.index < 0 ? [this.getPathKey(location.name)] : [this.getPathKey(location.name), location.index]
+		}
+
+		// The child does not tell what changed in it: all of it may have. An empty changeSet would add nothing to a transaction.
+		if (!changeSet || changeSet.length === 0){
+			return [this.createChange(step, "set", location !== null ? location.name : "", child)]
+		}
+
+		let result = []
+		for (let change of changeSet){
+			let path = step !== null && change.path ? step.concat(change.path) : null
+			result.push(this.createChange(path, change.operation ? change.operation : "set", change.name, change.sender))
+		}
+
+		return result
+	}
+
+	// Change of a list of this object: operation "insert", "remove" or "set" at the element index.
+	createListChange(list, operation, index){
+		let location = this.findChild(list)
+		if (location === null || location.index >= 0){
+			return this.createChange(null, operation, "", list)
+		}
+
+		return this.createChange([this.getPathKey(location.name), index], operation, location.name, list)
 	}
 
 	// SLOT_modelChanged(changeSet){
@@ -352,7 +499,7 @@ class BaseClass extends QtObject {
 							if (sourceObjectInner['__typename']){
 								sourceTypename = sourceObjectInner['__typename']
 							}
-							let obj = this.createElement(key, sourceTypename).createObject(this)
+							let obj = getElementComponent(this, key, sourceTypename).createObject(this)
 							obj.copyFrom(sourceObjectInner)
 							this[key].append({ item: obj })
 							obj.owner = this
@@ -602,6 +749,11 @@ class BaseClass extends QtObject {
 	}
 
 	escapeSpecialChars(jsonString) {
+		// Most strings have nothing to escape: one search instead of six replacements
+		if (!specialCharsPattern.test(jsonString)){
+			return jsonString
+		}
+
 		return jsonString.replace(/\\/g, "\\\\")
 		.replace(/\"/g, "\\\"")
 		.replace(/\n/g, "\\n")
@@ -611,6 +763,9 @@ class BaseClass extends QtObject {
 	}
 
 	fromObject(sourceObject) {
+		// One modelChanged for the whole object, as in Qt
+		this.beginChanges()
+
 		for(let objKey of this.getProperties()){
 			if (!(this.getJSONKeyForProperty(objKey) in sourceObject)){
 				if(this[objKey] && typeof this[objKey] === "object"){
@@ -625,10 +780,18 @@ class BaseClass extends QtObject {
 			}
 		}
 
+		let refilledLists = []
 		for (let key in sourceObject) {
 			let _key = "m_" + key[0].toLowerCase() + key.slice(1, key.length)
 
 			this._internal.removeAt(_key)
+
+			// Only a list of SDL objects (it has an element component) is filled again; an array of values is a new value, as in Qt.
+			// getPropertyType() does not tell them apart: it says "BaseModel" for an array of enum values too.
+			let current = this.__self[_key]
+			if (Array.isArray(sourceObject[key]) && current !== null && current !== undefined && this.createComponent(_key)){
+				refilledLists.push(_key)
+			}
 
 			if (sourceObject[key] === null){
 				this[_key] = null
@@ -637,6 +800,13 @@ class BaseClass extends QtObject {
 			}
 		}
 
+		// A list filled again is not reported, as in Qt: filling from data is a load, not an edit
+		if (refilledLists.length > 0){
+			this._internal.changeList = this._internal.changeList.filter(change => refilledLists.indexOf(change.name) < 0)
+			this._internal.countChanges = this._internal.changeList.length
+		}
+
+		this.endChanges()
 		this.finished()
 		
 		return true

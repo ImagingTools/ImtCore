@@ -38,9 +38,16 @@ public:
 				const QByteArray& documentSourceRef,
 				bool isDirty,
 				const istd::IChangeable& document,
-				const istd::IChangeable::ChangeSet& changeSet);
+				const istd::IChangeable::ChangeSet& changeSet,
+				const QByteArray& changeId);
 	const istd::IChangeable& GetDocument() const;
 	istd::IChangeable::ChangeSet GetChangeSet() const;
+
+	/**
+		Change-ID of the client edit that made this change, see \c IDocumentService::SetDocumentData.
+		Empty for a change the server made itself.
+	*/
+	QByteArray GetChangeId() const;
 
 	// reimplemented (CEventBase)
 	virtual QByteArray Type() const override;
@@ -48,6 +55,7 @@ public:
 private:
 	const istd::IChangeable& m_document;
 	const istd::IChangeable::ChangeSet& m_changeSet;
+	QByteArray m_changeId;
 };
 
 
