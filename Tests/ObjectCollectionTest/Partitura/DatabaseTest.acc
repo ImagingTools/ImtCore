@@ -84,7 +84,7 @@
                     <AttributeInfo Id="MigrationFolderPath" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="RelativeFileNameParam"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="Pasword" Type="Id" ExportId="">
+                    <AttributeInfo Id="Password" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="postgres"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Port" Type="Integer" ExportId="PgPort">
@@ -108,7 +108,7 @@
                     <AttributeInfo Id="HostName" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="localhost"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="Pasword" Type="Id" ExportId="">
+                    <AttributeInfo Id="Password" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="root"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Port" Type="Integer" ExportId="">

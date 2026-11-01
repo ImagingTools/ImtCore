@@ -4,7 +4,7 @@ This page describes how `imtdb::CDatabaseEngineComp` handles PostgreSQL credenti
 
 ## Behavior in ImtCore
 
-- **No default password.** The `Pasword` attribute of `CDatabaseAccessSettingsComp`, `CDatabaseEngineComp` and `CMongoDatabaseEngineComp` is empty by default, and so are the exported `Password` / `DefaultDatabasePassword` values in `DatabaseEngine.acc` and `ServerSettings.acc`.
+- **No default password.** The `Password` attribute of `CDatabaseAccessSettingsComp`, `CDatabaseEngineComp` and `CMongoDatabaseEngineComp` is empty by default, and so are the exported `Password` / `DefaultDatabasePassword` values in `DatabaseEngine.acc` and `ServerSettings.acc`.
   With an empty password the QPSQL driver does not pass one to `libpq`, so `libpq` uses `peer` authentication over the Unix socket or a password from `PGPASSFILE` / `~/.pgpass`.
 - **The password is never logged.** Connection details are not printed before the database is created.
 - **The password is write-only in the settings UI.** `CDatabaseAccessSettingsRepresentationControllerComp` does not send the password to the client. An empty password from the client means "unchanged"; a non-empty one replaces the stored password. To remove a stored password, edit the settings file.
@@ -16,7 +16,7 @@ This page describes how `imtdb::CDatabaseEngineComp` handles PostgreSQL credenti
 - To verify the server certificate, set the `ConnectOptions` attribute of `CDatabaseEngineComp`. Options are separated by `;` and are passed to `libpq` as is, after the flag-based options, so they take precedence:
 
 ```
-sslmode=verify-full;sslrootcert=/etc/rosa/db-ca.crt
+sslmode=verify-full;sslrootcert=/etc/<PRODUCT-NAME>/db-ca.crt
 ```
 
 ## Recommended deployment

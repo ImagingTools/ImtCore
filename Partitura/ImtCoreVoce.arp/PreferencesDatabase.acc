@@ -92,7 +92,7 @@
                     <AttributeInfo Id="HostName" Type="Id" ExportId="HostName">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="Pasword" Type="Id" ExportId="Pasword">
+                    <AttributeInfo Id="Password" Type="Id" ExportId="Password">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Port" Type="Integer" ExportId="Port">

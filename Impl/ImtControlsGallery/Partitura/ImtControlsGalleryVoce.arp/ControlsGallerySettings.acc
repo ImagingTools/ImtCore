@@ -214,7 +214,7 @@
                                 <AttributeInfo Id="DbName" Type="Id" ExportId="">
                                     <Data IsEnabled="true" Value="gallery"/>
                                 </AttributeInfo>
-                                <AttributeInfo Id="Pasword" Type="Id" ExportId="">
+                                <AttributeInfo Id="Password" Type="Id" ExportId="">
                                     <Data IsEnabled="true" Value="root"/>
                                 </AttributeInfo>
                             </AttributeInfoMap>
