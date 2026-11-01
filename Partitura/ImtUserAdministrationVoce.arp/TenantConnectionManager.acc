@@ -13,6 +13,9 @@
         <Element Id="ConnectionCodesNotificationPublisher" PackageId="ImtAuthGqlPck" ComponentId="ConnectionCodesNotificationPublisher">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="NotificationSender" Type="Reference" ExportId="NotificationSender">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
@@ -509,5 +512,6 @@
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="TenantConnectionRequestManager" ComponentId="TenantConnectionRequestManager"/>
+        <Component ExportedId="ConnectionCodesNotificationPublisher" ComponentId="ConnectionCodesNotificationPublisher"/>
     </ExportedComponents>
 </Acf>

@@ -1,0 +1,11 @@
+module imtnotifygui
+
+singleton NotificationCenter 1.0 NotificationCenter.qml
+singleton NotificationTypeRegistry 1.0 NotificationTypeRegistry.qml
+NotificationApiClient 1.0 NotificationApiClient.qml
+GqlBasedNotificationApiClient 1.0 GqlBasedNotificationApiClient.qml
+NotificationBell 1.0 NotificationBell.qml
+NotificationPanel 1.0 NotificationPanel.qml
+NotificationsPage 1.0 NotificationsPage.qml
+NotificationDelegate 1.0 NotificationDelegate.qml
+NotificationMessageFormat 1.0 NotificationMessageFormat.js

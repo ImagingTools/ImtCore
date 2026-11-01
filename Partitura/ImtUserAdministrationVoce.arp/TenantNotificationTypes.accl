@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="6418" Description="ACF"/>
+            <Version Id="1" Number="2408" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="InvitationReceived" X="100" Y="100" Note=""/>
+        <Element ComponentName="InvitationAccepted" X="100" Y="200" Note=""/>
+        <Element ComponentName="InvitationRejected" X="100" Y="300" Note=""/>
+        <Element ComponentName="InvitationRevoked" X="100" Y="400" Note=""/>
+        <Element ComponentName="OwnershipReceived" X="100" Y="500" Note=""/>
+        <Element ComponentName="OwnershipTransferred" X="100" Y="600" Note=""/>
+        <Element ComponentName="MembershipPermissionsChanged" X="100" Y="700" Note=""/>
+        <Element ComponentName="MembershipEnded" X="100" Y="800" Note=""/>
+        <Element ComponentName="MemberLeft" X="100" Y="900" Note=""/>
+        <Element ComponentName="CrossTenantMessageReceived" X="100" Y="1000" Note=""/>
+        <Element ComponentName="ConnectionRequestReceived" X="100" Y="1100" Note=""/>
+        <Element ComponentName="ConnectionRequestApproved" X="100" Y="1200" Note=""/>
+        <Element ComponentName="ConnectionRequestRejected" X="100" Y="1300" Note=""/>
+        <Element ComponentName="ConnectionRemoved" X="100" Y="1400" Note=""/>
+        <Element ComponentName="RelationshipProposalReceived" X="100" Y="1500" Note=""/>
+        <Element ComponentName="RelationshipProposalApproved" X="100" Y="1600" Note=""/>
+        <Element ComponentName="RelationshipProposalRejected" X="100" Y="1700" Note=""/>
+        <Element ComponentName="RelationshipRemoved" X="100" Y="1800" Note=""/>
+        <Element ComponentName="ObjectTenant" X="400" Y="100" Note=""/>
+        <Element ComponentName="ObjectTenantConnectionRequest" X="400" Y="200" Note=""/>
+        <Element ComponentName="ObjectTenantConnection" X="400" Y="300" Note=""/>
+        <Element ComponentName="ObjectTenantRelationshipProposal" X="400" Y="400" Note=""/>
+        <Element ComponentName="ObjectTenantRelationship" X="400" Y="500" Note=""/>
+        <Element ComponentName="ObjectCrossTenantMessage" X="400" Y="600" Note=""/>
+        <Element ComponentName="TypeList" X="700" Y="100" Note=""/>
+    </PositionMap>
+</Acf>

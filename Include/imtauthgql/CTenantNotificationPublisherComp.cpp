@@ -8,6 +8,8 @@
 #include <QSet>
 
 // ImtCore includes
+#include <imtauth/IUserInfo.h>
+#include <imtauthgql/TenantNotifications.h>
 #include <imtgql/CGqlRequest.h>
 #include <imtgql/IGqlContext.h>
 #include <imtauth/TenantEvents.h>
@@ -76,11 +78,20 @@ void CTenantNotificationPublisherComp::OnModelChanged(int /*modelId*/, const ist
 	// The managers name each change, so only the organizations it touched are read
 	QSet<QByteArray> changedTenantIds;
 	for (const QVariantMap& event : imtauth::TenantEvent::GetEvents(changeSet)){
-		for (const Notification& notification : CreateNotifications(event)){
-			PublishNotification(notification);
+		const QByteArray tenantId = event.value(imtauth::TenantEvent::s_tenantId).toByteArray();
+		if (m_inboxControllerCompPtr.IsValid() && event.value(imtauth::TenantEvent::s_type).toString() == imtauth::TenantEvent::s_membershipRemoved){
+			const QByteArray userId = event.value(imtauth::TenantEvent::s_userId).toByteArray();
+			if (!tenantId.isEmpty() && !userId.isEmpty()){
+				m_inboxControllerCompPtr->RemoveUserNotifications(tenantId, userId);
+			}
 		}
 
-		changedTenantIds.insert(event.value(imtauth::TenantEvent::s_tenantId).toByteArray());
+		for (const Notification& notification : CreateNotifications(event)){
+			PublishNotification(notification);
+			SendToNotificationCenter(notification);
+		}
+
+		changedTenantIds.insert(tenantId);
 	}
 
 	for (const QByteArray& tenantId : changedTenantIds){
@@ -116,7 +127,8 @@ QList<CTenantNotificationPublisherComp::Notification> CTenantNotificationPublish
 		const int status = event.value(imtauth::TenantEvent::s_status).toInt();
 		if (type == imtauth::TenantEvent::s_invitationSent){
 			if (status == imtauth::ITenantInvitation::TIS_PENDING){
-				notifications.append({userId, NotificationType::InvitationReceived, invitationId, userId, tenantId});
+				notifications.append({userId, NotificationType::InvitationReceived, invitationId, userId, tenantId,
+							event.value(imtauth::TenantEvent::s_invitedByUserId).toByteArray()});
 			}
 		}
 		else if (status == imtauth::ITenantInvitation::TIS_REVOKED){
@@ -147,6 +159,82 @@ QList<CTenantNotificationPublisherComp::Notification> CTenantNotificationPublish
 	}
 
 	return notifications;
+}
+
+
+void CTenantNotificationPublisherComp::SendToNotificationCenter(const Notification& notification) const
+{
+	namespace tn = TenantNotification;
+
+	imtnotify::INotificationSender* senderPtr = m_notificationSenderCompPtr.GetPtr();
+	if (senderPtr == nullptr || notification.targetUserId.isEmpty()){
+		return;
+	}
+
+	const QString tenantName = FindTenantName(notification.tenantId);
+	const imtnotify::ObjectLinkInfo tenantLink = tn::TenantLink(notification.tenantId, tenantName);
+	const bool isAboutTarget = notification.userId == notification.targetUserId;
+
+	// The user is not a member of the organization yet or any more: the notification is personal
+	const QByteArray invitationGroupKey = QByteArrayLiteral("invitation:") + notification.membershipId;
+
+	switch (notification.notificationType){
+	case NotificationType::InvitationReceived:
+		tn::Send(senderPtr, notification.targetUserId, QByteArray(), tn::s_invitationReceived, tenantLink, invitationGroupKey,
+					istd::IInformationProvider::IC_INFO, GetUserLink(notification.inviterId));
+		break;
+
+	case NotificationType::InvitationRevoked:
+		senderPtr->Withdraw(QByteArray(), QByteArray(), invitationGroupKey);
+		tn::Send(senderPtr, notification.targetUserId, QByteArray(), tn::s_invitationRevoked, tenantLink);
+		break;
+
+	case NotificationType::InvitationAccepted:
+	case NotificationType::InvitationRejected:
+		senderPtr->Withdraw(QByteArray(), QByteArray(), invitationGroupKey);
+		// The invited user answered: the actor
+		tn::Send(senderPtr, notification.targetUserId, notification.tenantId,
+					notification.notificationType == NotificationType::InvitationAccepted ? tn::s_invitationAccepted : tn::s_invitationRejected,
+					tenantLink, QByteArray(), istd::IInformationProvider::IC_INFO, GetUserLink(notification.userId));
+		break;
+
+	case NotificationType::OwnershipTransferred:
+		tn::Send(senderPtr, notification.targetUserId, notification.tenantId,
+					isAboutTarget ? tn::s_ownershipReceived : tn::s_ownershipTransferred,
+					tenantLink, QByteArray(), istd::IInformationProvider::IC_INFO, imtnotify::ObjectLinkInfo(),
+					{imtnotify::NotificationArgument::Object(QByteArrayLiteral("member"), GetUserLink(notification.userId))});
+		break;
+
+	case NotificationType::MembershipRoleChanged:
+		tn::Send(senderPtr, notification.targetUserId, notification.tenantId, tn::s_membershipPermissionsChanged, tenantLink);
+		break;
+
+	case NotificationType::MembershipRemoved:
+		if (isAboutTarget){
+			tn::Send(senderPtr, notification.targetUserId, QByteArray(), tn::s_membershipEnded, tenantLink, QByteArray(), istd::IInformationProvider::IC_WARNING);
+		}
+		else{
+			tn::Send(senderPtr, notification.targetUserId, notification.tenantId, tn::s_memberLeft, tenantLink, QByteArray(),
+						istd::IInformationProvider::IC_INFO, imtnotify::ObjectLinkInfo(),
+						{imtnotify::NotificationArgument::Object(QByteArrayLiteral("member"), GetUserLink(notification.userId))});
+		}
+		break;
+	}
+}
+
+
+imtnotify::ObjectLinkInfo CTenantNotificationPublisherComp::GetUserLink(const QByteArray& userId) const
+{
+	QString userName;
+	imtbase::IObjectCollection::DataPtr userDataPtr;
+	if (!userId.isEmpty() && m_userCollectionCompPtr.IsValid() && m_userCollectionCompPtr->GetObjectData(userId, userDataPtr)){
+		const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(userDataPtr.GetPtr());
+		if (userInfoPtr != nullptr){
+			userName = userInfoPtr->GetName();
+		}
+	}
+
+	return userId.isEmpty() ? imtnotify::ObjectLinkInfo() : TenantNotification::UserLink(userId, userName);
 }
 
 

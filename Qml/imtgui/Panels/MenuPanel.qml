@@ -65,6 +65,10 @@ Rectangle {
 	property string hintText: "";
 	property real hintY: 0;
 
+	// Badges by page id: kept apart from the page models, which are rebuilt on every login
+	property var badges: ({});
+	property int badgesRevision: 0;
+
 	// Without a top bar the rail has to carry the brand and the account controls
 	// itself. Applications that keep TopPanel keep the plain list of pages they
 	// always had.
@@ -239,6 +243,17 @@ Rectangle {
 				}
 			}
 		}
+
+		if ('badge' in data){
+			menuPanel.badges[pageId] = data["badge"];
+			menuPanel.badgesRevision++;
+		}
+	}
+
+	function getBadge(pageId){
+		let badge = menuPanel.badges[pageId];
+
+		return badge ? badge : "";
 	}
 
 	function clearModels(){
@@ -406,6 +421,7 @@ Rectangle {
 			}
 
 			text:  model["name"];
+			badge: menuPanel.badgesRevision >= 0 ? menuPanel.getBadge(model["id"]) : "";
 			textColor: Style.textColor;
 			fontName: menuPanel.fontName;
 			menuPanelRef: menuPanel;
@@ -863,6 +879,7 @@ anchors.topMargin: menuPanel.railMode ? Style.marginXS
 						height: Style.enableMenuPanelCollapse ? menuPanel.rowHeight : (decorator_ ? decorator_.height : 0);
 
 						text:  model["name"];
+						badge: menuPanel.badgesRevision >= 0 ? menuPanel.getBadge(model["id"]) : "";
 						textColor: Style.textColor;
 						menuPanelRef: menuPanel;
 						iconSource: (highlighted || selected) ? "../../../" + Style.getIconPath(model["icon"], "On", "Selected"):
@@ -897,6 +914,7 @@ anchors.topMargin: menuPanel.railMode ? Style.marginXS
 						height: Style.enableMenuPanelCollapse ? menuPanel.rowHeight : (decorator_ ? decorator_.height : 0);
 
 						text:  model["name"];
+						badge: menuPanel.badgesRevision >= 0 ? menuPanel.getBadge(model["id"]) : "";
 						textColor: Style.textColor;
 						menuPanelRef: menuPanel;
 						iconSource: (highlighted || selected) ? "../../../" + Style.getIconPath(model["icon"], "On", "Selected"):

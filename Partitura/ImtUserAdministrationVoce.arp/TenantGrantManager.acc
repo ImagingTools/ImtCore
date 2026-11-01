@@ -170,6 +170,9 @@
         <Element Id="CrossTenantMessageNotificationPublisher" PackageId="ImtAuthGqlPck" ComponentId="CrossTenantMessageNotificationPublisher">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="NotificationSender" Type="Reference" ExportId="NotificationSender">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
@@ -447,5 +450,6 @@
         <Component ExportedId="CrossOrgGrantManager" ComponentId="CrossOrgGrantManager"/>
         <Component ExportedId="CrossTenantMessageBroker" ComponentId="CrossTenantMessageBroker"/>
         <Component ExportedId="CrossTenantMessageProjection" ComponentId="CrossTenantMessageProjection"/>
+        <Component ExportedId="CrossTenantMessageNotificationPublisher" ComponentId="CrossTenantMessageNotificationPublisher"/>
     </ExportedComponents>
 </Acf>

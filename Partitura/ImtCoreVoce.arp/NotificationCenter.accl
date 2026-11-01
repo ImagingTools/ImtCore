@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="6418" Description="ACF"/>
+            <Version Id="1" Number="2408" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="CollectionCommands" X="1000" Y="950" Note=""/>
+        <Element ComponentName="CommandsController" X="1000" Y="800" Note=""/>
+        <Element ComponentName="Demultiplexer" X="1000" Y="550" Note=""/>
+        <Element ComponentName="MarkAllAsRead" X="1300" Y="950" Note=""/>
+        <Element ComponentName="MarkAsRead" X="1300" Y="800" Note=""/>
+        <Element ComponentName="NotificationSender" X="400" Y="250" Note=""/>
+        <Element ComponentName="NotificationCollection" X="400" Y="700" Note=""/>
+        <Element ComponentName="NotificationCollectionController" X="700" Y="700" Note=""/>
+        <Element ComponentName="NotificationCollectionDelegate" X="100" Y="700" Note=""/>
+        <Element ComponentName="NotificationCollectionHeaders" X="700" Y="950" Note=""/>
+        <Element ComponentName="NotificationInboxController" X="100" Y="400" Note=""/>
+        <Element ComponentName="NotificationPublisher" X="700" Y="100" Note=""/>
+        <Element ComponentName="NotificationRetention" X="100" Y="100" Note=""/>
+        <Element ComponentName="NotificationsController" X="700" Y="400" Note=""/>
+        <Element ComponentName="TenantNotificationTypes" X="100" Y="900" Note=""/>
+    </PositionMap>
+</Acf>

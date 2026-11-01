@@ -10,6 +10,17 @@ DecoratorBase {
 
     Component.onCompleted: {
         onLogout();
+
+        Events.subscribeEvent("NotificationCenterActiveChanged", topRightPanelDecorator.onNotificationCenterActiveChanged);
+        Events.sendEvent("NotificationCenterStateRequested");
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("NotificationCenterActiveChanged", topRightPanelDecorator.onNotificationCenterActiveChanged);
+    }
+
+    function onNotificationCenterActiveChanged(active){
+        notificationBellLoader.active = active;
     }
 
     Connections {
@@ -67,5 +78,17 @@ DecoratorBase {
 
 		width: Style.buttonWidthM;
 		height: width;
+    }
+
+    // Loaded by URL only while the notification center runs: applications without it do not need imtnotifygui
+    Loader {
+        id: notificationBellLoader;
+
+        anchors.right: parent ? parent.right : undefined;
+        anchors.rightMargin: Style.marginM;
+        anchors.verticalCenter: parent ? parent.verticalCenter : undefined;
+
+        active: false;
+        source: "qrc:/qml/imtnotifygui/NotificationBell.qml";
     }
 }

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="6418" Description="ACF"/>
+            <Version Id="1" Number="2408" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="Demultiplexer" X="700" Y="250" Note=""/>
+        <Element ComponentName="RemoteCommandsController" X="400" Y="550" Note=""/>
+        <Element ComponentName="RemoteNotificationCollectionController" X="400" Y="250" Note=""/>
+        <Element ComponentName="RemoteNotificationListController" X="400" Y="400" Note=""/>
+        <Element ComponentName="RemoteNotificationSender" X="100" Y="100" Note=""/>
+        <Element ComponentName="RemoteNotificationsController" X="400" Y="100" Note=""/>
+        <Element ComponentName="TenantNotificationTypes" X="100" Y="900" Note=""/>
+    </PositionMap>
+</Acf>

@@ -245,6 +245,9 @@
         <Element Id="TenantConnectionManager" PackageId="ImtUserAdministrationVoce" ComponentId="TenantConnectionManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="NotificationSender" Type="Reference" ExportId="NotificationSender">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -317,6 +320,9 @@
         <Element Id="TenantGrantManager" PackageId="ImtUserAdministrationVoce" ComponentId="TenantGrantManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="NotificationSender" Type="Reference" ExportId="NotificationSender">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="CrossOrgGrantRepository" Type="Reference" ExportId="CrossOrgGrantRepository">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -362,6 +368,12 @@
         <Element Id="TenantManager" PackageId="" ComponentId="TenantManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="NotificationSender" Type="Reference" ExportId="NotificationSender">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="NotificationInboxController" Type="Reference" ExportId="NotificationInboxController">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ContractManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="TenantContractManager/ContractManager"/>
                     </AttributeInfo>
@@ -525,12 +537,21 @@
                     <Element Id="TenantNotificationPublisher" PackageId="ImtAuthGqlPck" ComponentId="TenantNotificationPublisher">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
+                                <AttributeInfo Id="NotificationSender" Type="Reference" ExportId="NotificationSender">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
                                 <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
                                             <Value>OnMembershipNotification</Value>
                                         </Values>
                                     </Data>
+                                </AttributeInfo>
+                                <AttributeInfo Id="InboxController" Type="Reference" ExportId="NotificationInboxController">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="UserCollection" Type="Reference" ExportId="UserCollection">
+                                    <Data IsEnabled="false"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="InvitationManager" Type="Reference" ExportId="InvitationManager">
                                     <Data IsEnabled="false"/>
@@ -566,6 +587,7 @@
                 </ExportedInterfaces>
                 <ExportedComponents>
                     <Component ExportedId="TenantManager" ComponentId="TenantManager"/>
+                    <Component ExportedId="TenantNotificationPublisher" ComponentId="TenantNotificationPublisher"/>
                 </ExportedComponents>
             </Data>
         </EmbeddedRegistry>
@@ -629,5 +651,8 @@
         <Component ExportedId="TenantInvitationManager" ComponentId="TenantMembershipManager/TenantInvitationManager"/>
         <Component ExportedId="TenantManager" ComponentId="TenantManager/TenantManager"/>
         <Component ExportedId="TenantMembershipManager" ComponentId="TenantMembershipManager/TenantMembershipManager"/>
+        <Component ExportedId="ConnectionCodesNotificationPublisher" ComponentId="TenantConnectionManager/ConnectionCodesNotificationPublisher"/>
+        <Component ExportedId="CrossTenantMessageNotificationPublisher" ComponentId="TenantGrantManager/CrossTenantMessageNotificationPublisher"/>
+        <Component ExportedId="TenantNotificationPublisher" ComponentId="TenantManager/TenantNotificationPublisher"/>
     </ExportedComponents>
 </Acf>
