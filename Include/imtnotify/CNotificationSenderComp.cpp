@@ -163,18 +163,6 @@ bool CNotificationSenderComp::Withdraw(const QByteArray& productId, const QByteA
 
 bool CNotificationSenderComp::SendToInbox(const NotificationScope& scope, const Message& message)
 {
-	// The key is taken first, in one statement, so a repeated or concurrent message is stored once
-	if (!message.dedupKey.isEmpty()){
-		bool isNew = false;
-		if (!m_inboxControllerCompPtr->AddDedupKey(scope, message.dedupKey, isNew)){
-			return false;
-		}
-
-		if (!isNew){
-			return true;
-		}
-	}
-
 	CNotification notification;
 	notification.SetScope(scope);
 	notification.SetCategory(message.severity);
@@ -189,40 +177,10 @@ bool CNotificationSenderComp::SendToInbox(const NotificationScope& scope, const 
 	notification.SetSubject(CutLink(message.subject));
 	notification.SetGroupKey(message.groupKey);
 
-	if (Store(notification)){
-		return true;
-	}
+	// A repeated or concurrent message with the same dedup key is stored once
+	bool isStored = false;
 
-	// The message was not stored: a repeated one has to be stored then
-	if (!message.dedupKey.isEmpty()){
-		m_inboxControllerCompPtr->RemoveDedupKey(scope, message.dedupKey);
-	}
-
-	return false;
-}
-
-
-bool CNotificationSenderComp::Store(const INotification& notification)
-{
-	QByteArray notificationId;
-	if (!notification.GetGroupKey().isEmpty()){
-		if (!m_inboxControllerCompPtr->AddToGroup(notification, notificationId)){
-			return false;
-		}
-
-		if (!notificationId.isEmpty()){
-			return true;
-		}
-	}
-
-	if (m_inboxControllerCompPtr->Add(notification, notificationId)){
-		return true;
-	}
-
-	// A concurrent sender opened the group first: the unique index refused the second one
-	return		!notification.GetGroupKey().isEmpty() &&
-				m_inboxControllerCompPtr->AddToGroup(notification, notificationId) &&
-				!notificationId.isEmpty();
+	return m_inboxControllerCompPtr->Store(notification, message.dedupKey, isStored);
 }
 
 

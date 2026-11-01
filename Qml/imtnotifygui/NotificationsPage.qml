@@ -208,7 +208,7 @@ RemoteCollectionView {
 				}
 
 				var item = notificationsPage.getItem(titleCell.rowIndex)
-				titleIcon.source = Style.getIconPath(NotificationTypeRegistry.getIcon(item), Icon.State.On, Icon.Mode.Normal)
+				titleIcon.source = "qrc:/" + Style.getIconPath(NotificationTypeRegistry.getIcon(item), Icon.State.On, Icon.Mode.Normal)
 				titleLabel.text = NotificationTypeRegistry.getTitle(item)
 				detailsLabel.text = NotificationTypeRegistry.getDetails(item)
 				titleLabel.font.bold = !item.isRead

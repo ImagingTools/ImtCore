@@ -99,7 +99,7 @@ Rectangle {
 		sourceSize.width: width
 		sourceSize.height: height
 		source: notificationDelegate.notificationItem
-				? Style.getIconPath(NotificationTypeRegistry.typesRevision >= 0 ? NotificationTypeRegistry.getIcon(notificationDelegate.notificationItem) : "", Icon.State.On, Icon.Mode.Normal)
+				? "qrc:/" + Style.getIconPath(NotificationTypeRegistry.typesRevision >= 0 ? NotificationTypeRegistry.getIcon(notificationDelegate.notificationItem) : "", Icon.State.On, Icon.Mode.Normal)
 				: ""
 	}
 

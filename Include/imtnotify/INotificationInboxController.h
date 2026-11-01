@@ -28,27 +28,13 @@ class INotificationInboxController: virtual public istd::IChangeable
 {
 public:
 	/**
-		Store a new notification.
-		Fails if its inbox already has an unread notification of its group: add the event to that one instead.
+		Store the event of a notification in its inbox: add it to the unread notification of its group, or add a new one.
+		With a dedup key, an event whose key the inbox already has is not stored; the key and the notification are stored
+		in one transaction, so a stop between them neither loses the event nor stores it twice. A key is kept for the
+		retention period, also after its notification was grouped, read or removed.
+		\param isStored	false if the inbox already had the key.
 	*/
-	virtual bool Add(const INotification& notification, QByteArray& notificationId) = 0;
-
-	/**
-		Add the event of a notification to the unread notification of its group in its inbox, in one statement.
-		\param notificationId	the id of the updated notification; empty if the inbox has no unread notification of the group.
-	*/
-	virtual bool AddToGroup(const INotification& notification, QByteArray& notificationId) = 0;
-
-	/**
-		Remember a dedup key of an inbox in one statement; the key of an event already sent is not new.
-		A key is kept for the retention period, also after its notification was grouped, read or removed.
-	*/
-	virtual bool AddDedupKey(const NotificationScope& scope, const QByteArray& dedupKey, bool& isNew) = 0;
-
-	/**
-		Forget a dedup key, e.g. when its notification could not be stored.
-	*/
-	virtual bool RemoveDedupKey(const NotificationScope& scope, const QByteArray& dedupKey) = 0;
+	virtual bool Store(const INotification& notification, const QByteArray& dedupKey, bool& isStored) = 0;
 
 	virtual bool MarkRead(const NotificationScope& scope, const QByteArrayList& ids, QByteArrayList& changedIds) = 0;
 

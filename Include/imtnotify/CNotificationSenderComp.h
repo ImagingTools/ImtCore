@@ -38,7 +38,6 @@ public:
 
 private:
 	bool SendToInbox(const NotificationScope& scope, const Message& message);
-	bool Store(const INotification& notification);
 
 private:
 	I_REF(INotificationInboxController, m_inboxControllerCompPtr);

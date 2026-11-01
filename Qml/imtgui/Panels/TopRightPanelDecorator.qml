@@ -8,6 +8,9 @@ import imtcontrols 1.0
 DecoratorBase {
     id: topRightPanelDecorator;
 
+    // The bell gets its own place after the user panel and the preference button
+    implicitWidth: notificationBellLoader.active ? Style.sizeHintBXS + Style.buttonWidthM + Style.marginM : Style.sizeHintBXS;
+
     Component.onCompleted: {
         onLogout();
 

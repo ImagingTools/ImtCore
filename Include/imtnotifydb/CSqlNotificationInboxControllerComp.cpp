@@ -40,187 +40,43 @@ const QString s_changedRowColumns = QStringLiteral(R"("Id", "ProductId", "Tenant
 
 // reimplemented (imtnotify::INotificationInboxController)
 
-bool CSqlNotificationInboxControllerComp::Add(const imtnotify::INotification& notification, QByteArray& notificationId)
+bool CSqlNotificationInboxControllerComp::Store(const imtnotify::INotification& notification, const QByteArray& dedupKey, bool& isStored)
 {
-	notificationId.clear();
+	isStored = false;
 
 	if (!notification.GetScope().IsValid()){
 		return false;
 	}
 
-	const QByteArray id = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+	// The key and the notification are stored together: a stop between them neither loses the event nor stores it twice
+	if (!m_databaseEngineCompPtr->BeginTransaction()){
+		SendErrorMessage(0, QStringLiteral("A notification transaction could not be started"), "CSqlNotificationInboxControllerComp");
 
-	// A second unread notification of the same group is refused by the unique index "UIX_UserNotifications_OpenGroup"
-	QSqlQuery sqlQuery;
-	if (!ExecQuery(
-				QStringLiteral(
-							R"(INSERT INTO %1 ("Id", "ProductId", "TenantId", "RecipientId", "TypeId", "Severity", "Actors", )"
-							R"("SubjectId", "SubjectTypeId", "SubjectName", "Arguments", "Body", "SearchText", "GroupKey", "GroupCount", )"
-							R"("CreatedAt", "DeliveredAt", "ReadAt") )"
-							R"(VALUES (:Id, :ProductId, :TenantId, :RecipientId, :TypeId, :Severity, :Actors, )"
-							R"(:SubjectId, :SubjectTypeId, :SubjectName, :Arguments, :Body, :SearchText, :GroupKey, :GroupCount, )"
-							R"(:CreatedAt, :DeliveredAt, :ReadAt))").arg(s_tableName),
-				CreateBindValues(id, notification),
-				sqlQuery)){
 		return false;
 	}
 
-	notificationId = id;
-	PublishChange(imtnotify::NotificationChange::K_CREATED, notification.GetScope(), {id});
+	bool isNew = true;
+	QByteArray notificationId;
+	imtnotify::NotificationChange::Kind kind = imtnotify::NotificationChange::K_CREATED;
+
+	bool retVal = dedupKey.isEmpty() || ClaimDedupKey(notification.GetScope(), dedupKey, isNew);
+	if (retVal && isNew){
+		retVal = StoreEvent(notification, notificationId, kind);
+	}
+
+	if (!retVal || !m_databaseEngineCompPtr->FinishTransaction()){
+		m_databaseEngineCompPtr->CancelTransaction();
+
+		return false;
+	}
+
+	// The sessions learn only what was committed
+	if (!notificationId.isEmpty()){
+		isStored = true;
+		PublishChange(kind, notification.GetScope(), {notificationId});
+	}
 
 	return true;
-}
-
-
-bool CSqlNotificationInboxControllerComp::AddToGroup(const imtnotify::INotification& notification, QByteArray& notificationId)
-{
-	notificationId.clear();
-
-	if (!notification.GetScope().IsValid() || notification.GetGroupKey().isEmpty()){
-		return false;
-	}
-
-	QVariantMap groupValues;
-	BindScope(notification.GetScope(), groupValues);
-	groupValues.insert(QStringLiteral(":GroupKey"), Text(notification.GetGroupKey()));
-
-	// The actors of the group are merged here: the update changes the row only if they are still the ones read,
-	// otherwise a concurrent event changed the group and they are read again
-	for (int attempt = 0; attempt < s_maxGroupAttempts; ++attempt){
-		QSqlQuery groupQuery;
-		if (!ExecQuery(
-					QStringLiteral(R"(SELECT "Id", "Actors" FROM %1 WHERE %2 AND "GroupKey" = :GroupKey AND "ReadAt" IS NULL)")
-								.arg(s_tableName, s_exactInboxCondition),
-					groupValues,
-					groupQuery)){
-			return false;
-		}
-
-		if (!groupQuery.next()){
-			// No open group: the caller adds a new notification
-			return groupQuery.lastError().type() == QSqlError::NoError;
-		}
-
-		const QByteArray groupId = imtdb::VariantToByteArray(groupQuery.value(0));
-		const QString previousActors = groupQuery.value(1).toString();
-
-		imtnotify::CNotification groupNotification;
-		if (!groupNotification.CopyFrom(notification)){
-			return false;
-		}
-
-		groupNotification.SetActors(MergeActors(notification.GetActors(), ActorsFromJson(previousActors)));
-
-		QVariantMap bindValues = CreateBindValues(groupId, groupNotification);
-		bindValues.remove(QStringLiteral(":ProductId"));
-		bindValues.remove(QStringLiteral(":TenantId"));
-		bindValues.remove(QStringLiteral(":RecipientId"));
-		bindValues.remove(QStringLiteral(":GroupKey"));
-		bindValues.remove(QStringLiteral(":GroupCount"));
-		bindValues.remove(QStringLiteral(":DeliveredAt"));
-		bindValues.remove(QStringLiteral(":ReadAt"));
-		bindValues.insert(QStringLiteral(":PreviousActors"), previousActors);
-
-		// The group shows its latest event and is new again for the sessions; an earlier event that comes late only counts
-		QStringList latestEventValues;
-		for (const QString& column : {
-					QStringLiteral("TypeId"),
-					QStringLiteral("Severity"),
-					QStringLiteral("SubjectId"),
-					QStringLiteral("SubjectTypeId"),
-					QStringLiteral("SubjectName"),
-					QStringLiteral("Arguments"),
-					QStringLiteral("Body"),
-					QStringLiteral("SearchText"),
-					QStringLiteral("CreatedAt")}){
-			// Every placeholder once: a repeated named placeholder is not bound the same way by every driver
-			const QString eventTimePlaceholder = QStringLiteral(":EventTimeFor%1").arg(column);
-			bindValues.insert(eventTimePlaceholder, bindValues.value(QStringLiteral(":CreatedAt")));
-			latestEventValues.append(QStringLiteral(R"("%1" = CASE WHEN "CreatedAt" <= %2 THEN :%1 ELSE "%1" END)").arg(column, eventTimePlaceholder));
-		}
-
-		QSqlQuery sqlQuery;
-		if (!ExecQuery(
-					QStringLiteral(
-								R"(UPDATE %1 SET %2, "Actors" = :Actors, "GroupCount" = "GroupCount" + 1, "DeliveredAt" = NULL )"
-								R"(WHERE "Id" = :Id AND "ReadAt" IS NULL AND "Actors" = :PreviousActors RETURNING "Id")")
-								.arg(s_tableName, latestEventValues.join(QStringLiteral(", "))),
-					bindValues,
-					sqlQuery)){
-			return false;
-		}
-
-		QByteArrayList ids;
-		if (!ReadIds(sqlQuery, ids)){
-			return false;
-		}
-
-		if (!ids.isEmpty()){
-			notificationId = ids.first();
-			PublishChange(imtnotify::NotificationChange::K_UPDATED, notification.GetScope(), ids);
-
-			return true;
-		}
-	}
-
-	SendErrorMessage(0, QStringLiteral("Group '%1' changed too often to add an event").arg(QString::fromUtf8(notification.GetGroupKey())), "CSqlNotificationInboxControllerComp");
-
-	return false;
-}
-
-
-bool CSqlNotificationInboxControllerComp::AddDedupKey(const imtnotify::NotificationScope& scope, const QByteArray& dedupKey, bool& isNew)
-{
-	isNew = false;
-
-	if (!scope.IsValid() || dedupKey.isEmpty()){
-		return false;
-	}
-
-	QVariantMap bindValues;
-	BindScope(scope, bindValues);
-	bindValues.insert(QStringLiteral(":DedupKey"), Text(dedupKey));
-	bindValues.insert(QStringLiteral(":CreatedAt"), TimeToText(QDateTime::currentDateTimeUtc()));
-
-	// The primary key makes it one statement for concurrent senders: only one of them gets the row back
-	QSqlQuery sqlQuery;
-	if (!ExecQuery(
-				QStringLiteral(
-							R"(INSERT INTO %1 ("ProductId", "TenantId", "RecipientId", "DedupKey", "CreatedAt") )"
-							R"(VALUES (:ProductId, :TenantId, :RecipientId, :DedupKey, :CreatedAt) )"
-							R"(ON CONFLICT DO NOTHING RETURNING "DedupKey")").arg(s_dedupTableName),
-				bindValues,
-				sqlQuery)){
-		return false;
-	}
-
-	QByteArrayList keys;
-	if (!ReadIds(sqlQuery, keys)){
-		return false;
-	}
-
-	isNew = !keys.isEmpty();
-
-	return true;
-}
-
-
-bool CSqlNotificationInboxControllerComp::RemoveDedupKey(const imtnotify::NotificationScope& scope, const QByteArray& dedupKey)
-{
-	if (!scope.IsValid() || dedupKey.isEmpty()){
-		return false;
-	}
-
-	QVariantMap bindValues;
-	BindScope(scope, bindValues);
-	bindValues.insert(QStringLiteral(":DedupKey"), Text(dedupKey));
-
-	QSqlQuery sqlQuery;
-
-	return ExecQuery(
-				QStringLiteral(R"(DELETE FROM %1 WHERE %2 AND "DedupKey" = :DedupKey)").arg(s_dedupTableName, s_exactInboxCondition),
-				bindValues,
-				sqlQuery);
 }
 
 
@@ -423,6 +279,208 @@ bool CSqlNotificationInboxControllerComp::RemoveExpired(const QDateTime& created
 
 // private methods
 
+bool CSqlNotificationInboxControllerComp::StoreEvent(
+			const imtnotify::INotification& notification,
+			QByteArray& notificationId,
+			imtnotify::NotificationChange::Kind& kind)
+{
+	const bool isGrouped = !notification.GetGroupKey().isEmpty();
+	if (isGrouped){
+		if (!UpdateGroup(notification, notificationId)){
+			return false;
+		}
+
+		if (!notificationId.isEmpty()){
+			kind = imtnotify::NotificationChange::K_UPDATED;
+
+			return true;
+		}
+	}
+
+	if (!InsertNotification(notification, notificationId)){
+		return false;
+	}
+
+	if (!notificationId.isEmpty()){
+		kind = imtnotify::NotificationChange::K_CREATED;
+
+		return true;
+	}
+
+	// A concurrent event opened the group first
+	if (!isGrouped || !UpdateGroup(notification, notificationId)){
+		return false;
+	}
+
+	kind = imtnotify::NotificationChange::K_UPDATED;
+
+	return !notificationId.isEmpty();
+}
+
+
+bool CSqlNotificationInboxControllerComp::InsertNotification(const imtnotify::INotification& notification, QByteArray& notificationId)
+{
+	notificationId.clear();
+
+	const QByteArray id = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+
+	// A second open notification of the same group is not added: the unique index "UIX_UserNotifications_OpenGroup"
+	// makes the insert do nothing, without an error that would end the transaction
+	QSqlQuery sqlQuery;
+	if (!ExecQuery(
+				QStringLiteral(
+							R"(INSERT INTO %1 ("Id", "ProductId", "TenantId", "RecipientId", "TypeId", "Severity", "Actors", )"
+							R"("SubjectId", "SubjectTypeId", "SubjectName", "Arguments", "Body", "SearchText", "GroupKey", "GroupCount", )"
+							R"("CreatedAt", "DeliveredAt", "ReadAt") )"
+							R"(VALUES (:Id, :ProductId, :TenantId, :RecipientId, :TypeId, :Severity, :Actors, )"
+							R"(:SubjectId, :SubjectTypeId, :SubjectName, :Arguments, :Body, :SearchText, :GroupKey, :GroupCount, )"
+							R"(:CreatedAt, :DeliveredAt, :ReadAt) ON CONFLICT DO NOTHING RETURNING "Id")").arg(s_tableName),
+				CreateBindValues(id, notification),
+				sqlQuery)){
+		return false;
+	}
+
+	QByteArrayList ids;
+	if (!ReadIds(sqlQuery, ids)){
+		return false;
+	}
+
+	if (!ids.isEmpty()){
+		notificationId = ids.first();
+	}
+
+	return true;
+}
+
+
+bool CSqlNotificationInboxControllerComp::UpdateGroup(const imtnotify::INotification& notification, QByteArray& notificationId)
+{
+	notificationId.clear();
+
+	QVariantMap groupValues;
+	BindScope(notification.GetScope(), groupValues);
+	groupValues.insert(QStringLiteral(":GroupKey"), Text(notification.GetGroupKey()));
+
+	// The actors of the group are merged here: the update changes the row only if they are still the ones read,
+	// otherwise a concurrent event changed the group and they are read again
+	for (int attempt = 0; attempt < s_maxGroupAttempts; ++attempt){
+		QSqlQuery groupQuery;
+		if (!ExecQuery(
+					QStringLiteral(R"(SELECT "Id", "Actors" FROM %1 WHERE %2 AND "GroupKey" = :GroupKey AND "ReadAt" IS NULL)")
+								.arg(s_tableName, s_exactInboxCondition),
+					groupValues,
+					groupQuery)){
+			return false;
+		}
+
+		if (!groupQuery.next()){
+			// No open group
+			return groupQuery.lastError().type() == QSqlError::NoError;
+		}
+
+		const QByteArray groupId = imtdb::VariantToByteArray(groupQuery.value(0));
+		const QString previousActors = groupQuery.value(1).toString();
+
+		imtnotify::CNotification groupNotification;
+		if (!groupNotification.CopyFrom(notification)){
+			return false;
+		}
+
+		groupNotification.SetActors(MergeActors(notification.GetActors(), ActorsFromJson(previousActors)));
+
+		QVariantMap bindValues = CreateBindValues(groupId, groupNotification);
+		bindValues.remove(QStringLiteral(":ProductId"));
+		bindValues.remove(QStringLiteral(":TenantId"));
+		bindValues.remove(QStringLiteral(":RecipientId"));
+		bindValues.remove(QStringLiteral(":GroupKey"));
+		bindValues.remove(QStringLiteral(":GroupCount"));
+		bindValues.remove(QStringLiteral(":DeliveredAt"));
+		bindValues.remove(QStringLiteral(":ReadAt"));
+		bindValues.insert(QStringLiteral(":PreviousActors"), previousActors);
+
+		// The group shows its latest event and is new again for the sessions; an earlier event that comes late only counts
+		QStringList latestEventValues;
+		for (const QString& column : {
+					QStringLiteral("TypeId"),
+					QStringLiteral("Severity"),
+					QStringLiteral("SubjectId"),
+					QStringLiteral("SubjectTypeId"),
+					QStringLiteral("SubjectName"),
+					QStringLiteral("Arguments"),
+					QStringLiteral("Body"),
+					QStringLiteral("SearchText"),
+					QStringLiteral("CreatedAt")}){
+			// Every placeholder once: a repeated named placeholder is not bound the same way by every driver
+			const QString eventTimePlaceholder = QStringLiteral(":EventTimeFor%1").arg(column);
+			bindValues.insert(eventTimePlaceholder, bindValues.value(QStringLiteral(":CreatedAt")));
+			latestEventValues.append(QStringLiteral(R"("%1" = CASE WHEN "CreatedAt" <= %2 THEN :%1 ELSE "%1" END)").arg(column, eventTimePlaceholder));
+		}
+
+		QSqlQuery sqlQuery;
+		if (!ExecQuery(
+					QStringLiteral(
+								R"(UPDATE %1 SET %2, "Actors" = :Actors, "GroupCount" = "GroupCount" + 1, "DeliveredAt" = NULL )"
+								R"(WHERE "Id" = :Id AND "ReadAt" IS NULL AND "Actors" = :PreviousActors RETURNING "Id")")
+								.arg(s_tableName, latestEventValues.join(QStringLiteral(", "))),
+					bindValues,
+					sqlQuery)){
+			return false;
+		}
+
+		QByteArrayList ids;
+		if (!ReadIds(sqlQuery, ids)){
+			return false;
+		}
+
+		if (!ids.isEmpty()){
+			notificationId = ids.first();
+
+			return true;
+		}
+	}
+
+	SendErrorMessage(0, QStringLiteral("Group '%1' changed too often to add an event").arg(QString::fromUtf8(notification.GetGroupKey())), "CSqlNotificationInboxControllerComp");
+
+	return false;
+}
+
+
+bool CSqlNotificationInboxControllerComp::ClaimDedupKey(const imtnotify::NotificationScope& scope, const QByteArray& dedupKey, bool& isNew)
+{
+	isNew = false;
+
+	if (!scope.IsValid() || dedupKey.isEmpty()){
+		return false;
+	}
+
+	QVariantMap bindValues;
+	BindScope(scope, bindValues);
+	bindValues.insert(QStringLiteral(":DedupKey"), Text(dedupKey));
+	bindValues.insert(QStringLiteral(":CreatedAt"), TimeToText(QDateTime::currentDateTimeUtc()));
+
+	// The primary key makes it one statement for concurrent senders: only one of them gets the row back
+	QSqlQuery sqlQuery;
+	if (!ExecQuery(
+				QStringLiteral(
+							R"(INSERT INTO %1 ("ProductId", "TenantId", "RecipientId", "DedupKey", "CreatedAt") )"
+							R"(VALUES (:ProductId, :TenantId, :RecipientId, :DedupKey, :CreatedAt) )"
+							R"(ON CONFLICT DO NOTHING RETURNING "DedupKey")").arg(s_dedupTableName),
+				bindValues,
+				sqlQuery)){
+		return false;
+	}
+
+	QByteArrayList keys;
+	if (!ReadIds(sqlQuery, keys)){
+		return false;
+	}
+
+	isNew = !keys.isEmpty();
+
+	return true;
+}
+
+
 bool CSqlNotificationInboxControllerComp::ExecQuery(const QString& query, const QVariantMap& bindValues, QSqlQuery& sqlQuery) const
 {
 	QSqlError sqlError;
@@ -548,7 +606,15 @@ void CSqlNotificationInboxControllerComp::PublishChange(
 	change.kind = kind;
 	change.scope = scope;
 	change.createdUntil = createdUntil;
-	if (kind != imtnotify::NotificationChange::K_ALL_READ){
+
+	// A bound reaches only the sessions of this inbox; a personal inbox is seen in sessions that hold notifications of
+	// other inboxes too, so they learn the ids
+	if (kind == imtnotify::NotificationChange::K_ALL_READ && scope.IsPersonal()){
+		change.kind = imtnotify::NotificationChange::K_READ;
+		change.createdUntil = QDateTime();
+	}
+
+	if (change.kind != imtnotify::NotificationChange::K_ALL_READ){
 		change.ids = ids;
 	}
 

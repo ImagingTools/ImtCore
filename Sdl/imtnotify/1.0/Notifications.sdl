@@ -181,7 +181,8 @@ enum NotificationEventKind {
 
 # Pushed to every session of the user in the tenant and product of the notification.
 # Created and Updated carry the notifications, Read and Removed their ids, AllRead the time up to which the
-# notifications are read.
+# notifications of the inbox of the session are read. A personal inbox is seen in sessions of other inboxes too: its
+# notifications marked all read come as Read with their ids.
 type NotificationEvent {
 	kind: NotificationEventKind!
 	items: [UserNotification]

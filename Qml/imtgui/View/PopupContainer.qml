@@ -160,7 +160,8 @@ Item {
 						text: defaultDelegateRoot.messageText
 						textFormat: defaultDelegateRoot.plainText ? Text.PlainText : Text.AutoText
 						wrapMode: Text.WordWrap
-						maximumLineCount: defaultDelegateRoot.messageDetails !== "" ? 2 : 0
+						// Two lines next to the details; otherwise the default of Qt, unlimited (INT_MAX), not 0
+						maximumLineCount: defaultDelegateRoot.messageDetails !== "" ? 2 : 2147483647
 						elide: defaultDelegateRoot.messageDetails !== "" ? Text.ElideRight : Text.ElideNone
 						color: Style.textColor
 						font.family: defaultDelegateRoot.messageDetails !== "" ? Style.fontFamilyBold : Style.fontFamily

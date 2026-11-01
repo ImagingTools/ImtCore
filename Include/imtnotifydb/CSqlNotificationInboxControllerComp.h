@@ -37,10 +37,7 @@ public:
 	I_END_COMPONENT;
 
 	// reimplemented (imtnotify::INotificationInboxController)
-	virtual bool Add(const imtnotify::INotification& notification, QByteArray& notificationId) override;
-	virtual bool AddToGroup(const imtnotify::INotification& notification, QByteArray& notificationId) override;
-	virtual bool AddDedupKey(const imtnotify::NotificationScope& scope, const QByteArray& dedupKey, bool& isNew) override;
-	virtual bool RemoveDedupKey(const imtnotify::NotificationScope& scope, const QByteArray& dedupKey) override;
+	virtual bool Store(const imtnotify::INotification& notification, const QByteArray& dedupKey, bool& isStored) override;
 	virtual bool MarkRead(const imtnotify::NotificationScope& scope, const QByteArrayList& ids, QByteArrayList& changedIds) override;
 	virtual bool MarkAllRead(const imtnotify::NotificationScope& scope, const QDateTime& createdUntil, QByteArrayList& changedIds) override;
 	virtual bool MarkDelivered(const imtnotify::NotificationScope& scope, const QByteArrayList& ids, QByteArrayList& changedIds) override;
@@ -51,6 +48,22 @@ public:
 	virtual bool RemoveExpired(const QDateTime& createdBefore, int maxCount, bool& isComplete) override;
 
 private:
+	/**
+		The event of a notification: added to the open group of its inbox, else a new notification.
+	*/
+	bool StoreEvent(const imtnotify::INotification& notification, QByteArray& notificationId, imtnotify::NotificationChange::Kind& kind);
+
+	/**
+		A new notification; an empty id if the inbox already has an open notification of its group.
+	*/
+	bool InsertNotification(const imtnotify::INotification& notification, QByteArray& notificationId);
+
+	/**
+		The event added to the open notification of its group; an empty id if the inbox has none.
+	*/
+	bool UpdateGroup(const imtnotify::INotification& notification, QByteArray& notificationId);
+
+	bool ClaimDedupKey(const imtnotify::NotificationScope& scope, const QByteArray& dedupKey, bool& isNew);
 	bool ExecQuery(const QString& query, const QVariantMap& bindValues, QSqlQuery& sqlQuery) const;
 	bool ReadIds(QSqlQuery& sqlQuery, QByteArrayList& ids) const;
 
