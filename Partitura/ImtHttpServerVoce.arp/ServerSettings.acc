@@ -68,7 +68,7 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Pasword" Type="Id" ExportId="DefaultDatabasePassword">
-                        <Data IsEnabled="true" Value="root"/>
+                        <Data IsEnabled="true" Value=""/>
                     </AttributeInfo>
                     <AttributeInfo Id="Port" Type="Integer" ExportId="DefaultDatabasePort">
                         <Data IsEnabled="false"/>

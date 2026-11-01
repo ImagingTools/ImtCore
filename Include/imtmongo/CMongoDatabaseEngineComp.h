@@ -48,7 +48,7 @@ public:
 		I_ASSIGN(m_dbTypeAttrPtr, "DbType", "The property holds database connections using the driver", true, "MongoDB");
 		I_ASSIGN(m_dbNameAttrPtr, "DbName", "The property holds connection's database name", true, "agisbil");
 		I_ASSIGN(m_userNameAttrPtr, "UserName", "The property holds connection's user name", true, "postgres");
-		I_ASSIGN(m_paswordAttrPtr, "Pasword", "The property holds connection's password.", true, "12345");
+		I_ASSIGN(m_paswordAttrPtr, "Pasword", "The property holds connection's password.", true, "");
 		I_ASSIGN(m_hostNameAttrPtr, "HostName", "The property holds connection's host name.", true, "localhost");
 		I_ASSIGN(m_maintenanceDatabaseNameAttrPtr, "MaintainanceDatabase", "Name of Maintenance database. It's necessary for creating database if it not exists", true, "postgres");
 		I_ASSIGN(m_migrationFolderPathCompPtr, "MigrationFolderPath", "The property holds the folder contains SQL migraton script", false, "MigrationFolderPath");

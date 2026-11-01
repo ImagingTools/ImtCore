@@ -49,8 +49,7 @@ bool CDatabaseAccessSettingsRepresentationControllerComp::GetSdlRepresentationFr
 	QString host = databaseLoginSettingsPtr->GetHost();
 	sdlRepresentation.host = host;
 
-	QString password = databaseLoginSettingsPtr->GetPassword();
-	sdlRepresentation.password = password;
+	// The password is write-only: it is never sent to the client.
 
 	QString userName = databaseLoginSettingsPtr->GetUserName();
 	sdlRepresentation.username = userName;
@@ -84,7 +83,8 @@ bool CDatabaseAccessSettingsRepresentationControllerComp::GetDataModelFromSdlRep
 		databaseLoginSettingsPtr->SetHost(*sdlRepresentation.host);
 	}
 
-	if (sdlRepresentation.password){
+	// An empty password means "not changed", because the client never receives the current one.
+	if (sdlRepresentation.password && !sdlRepresentation.password->isEmpty()){
 		databaseLoginSettingsPtr->SetPassword(*sdlRepresentation.password);
 	}
 

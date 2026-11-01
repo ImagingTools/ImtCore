@@ -59,6 +59,7 @@ ParamEditorBase {
 					id: passwordInput_
 					name: qsTr("Password")
 					echoMode: TextInput.Password
+					placeHolderText: qsTr("Leave empty to keep the current password")
 					text: dbEditor.databaseParams ? dbEditor.databaseParams.m_password : ""
 					onEditingFinished: {
 						dbEditor.databaseParams.m_password = text
