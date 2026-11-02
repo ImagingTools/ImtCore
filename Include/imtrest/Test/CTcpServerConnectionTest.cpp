@@ -2,10 +2,15 @@
 #include "CTcpServerConnectionTest.h"
 
 
+// STL includes
+#include <atomic>
+#include <memory>
+
 // Qt includes
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QMutex>
 #include <QtCore/QMutexLocker>
+#include <QtCore/QThread>
 #include <QtNetwork/QHostAddress>
 #include <QtNetwork/QTcpServer>
 #include <QtNetwork/QTcpSocket>
@@ -19,6 +24,8 @@
 #include <imtrest/CHttpProtocolEngineComp.h>
 #include <imtrest/CHttpRequest.h>
 #include <imtrest/CTcpServerComp.h>
+#include <imtrest/IHttpRequestBodyPolicy.h>
+#include <imtrest/IHttpRequestBodySink.h>
 #include <imtrest/IRequestServlet.h>
 #include <imtrest/IResponseDispatcher.h>
 
@@ -108,7 +115,84 @@ private:
 };
 
 
+/**
+	Receiver of a body that works slowly (it takes \c bytesPerSecond): it counts the bytes that it has processed. The socket is read
+	in the thread of the connection by the same code that gives the body to the receiver, so the reading must keep pace with it.
+*/
+class CSlowBodySink: virtual public imtrest::IHttpRequestBodySink
+{
+public:
+	CSlowBodySink(const std::shared_ptr<std::atomic<qint64>>& processedSizePtr, qint64 bytesPerSecond)
+		:m_processedSizePtr(processedSizePtr),
+		m_bytesPerSecond(bytesPerSecond)
+	{
+	}
+
+	// reimplemented (imtrest::IHttpRequestBodySink)
+	bool Write(const char* /*data*/, qint64 size) override
+	{
+		QThread::usleep(static_cast<unsigned long>(size * 1000000 / m_bytesPerSecond));
+
+		*m_processedSizePtr += size;
+
+		return true;
+	}
+
+	bool Finish() override
+	{
+		return true;
+	}
+
+	void Abort() override
+	{
+	}
+
+private:
+	std::shared_ptr<std::atomic<qint64>> m_processedSizePtr;
+	qint64 m_bytesPerSecond;
+};
+
+
+/**
+	Policy that gives the body of a request (if it has one) to the slow receiver, the request without a body is received to the memory.
+*/
+class CSlowBodyPolicyComp:
+			public icomp::CComponentBase,
+			virtual public imtrest::IHttpRequestBodyPolicy
+{
+public:
+	typedef icomp::CComponentBase BaseClass;
+
+	I_BEGIN_COMPONENT(CSlowBodyPolicyComp);
+		I_REGISTER_INTERFACE(imtrest::IHttpRequestBodyPolicy);
+	I_END_COMPONENT;
+
+	qint64 GetProcessedSize() const
+	{
+		return *m_processedSizePtr;
+	}
+
+	// reimplemented (imtrest::IHttpRequestBodyPolicy)
+	BodyDecision DecideBody(const imtrest::CHttpRequest& requestHead) const override
+	{
+		BodyDecision decision;
+
+		if (requestHead.GetHeaderValue("content-length").toLongLong() > 0){
+			decision.mode = BM_STREAM;
+			decision.maxBodySize = 0;
+			decision.sinkPtr = std::make_shared<CSlowBodySink>(m_processedSizePtr, 32 * s_mebibyte);
+		}
+
+		return decision;
+	}
+
+private:
+	std::shared_ptr<std::atomic<qint64>> m_processedSizePtr = std::make_shared<std::atomic<qint64>>(0);
+};
+
+
 typedef icomp::TSimSharedComponentPtr<CHoldingServletComp> Servlet;
+typedef icomp::TSimSharedComponentPtr<CSlowBodyPolicyComp> SlowBodyPolicy;
 typedef icomp::TSimSharedComponentPtr<imtrest::CHttpProtocolEngineComp> Engine;
 typedef icomp::TSimSharedComponentPtr<imtcom::CServerConnectionInterfaceParamComp> Connection;
 typedef icomp::TSimComponentWrap<imtrest::CTcpServerComp> TcpServer;
@@ -131,11 +215,17 @@ int FindFreePort()
 */
 struct SServer
 {
-	explicit SServer(int threadsLimit)
+	explicit SServer(int threadsLimit, bool isSlowBody = false)
 	{
 		port = FindFreePort();
 
 		servlet->InitComponent();
+
+		if (isSlowBody){
+			bodyPolicy->InitComponent();
+			engine->SetRef("BodyPolicy", bodyPolicy);
+		}
+
 		engine->InitComponent();
 
 		connection->SetIntAttr("DefaultHttpPort", port);
@@ -179,6 +269,7 @@ struct SServer
 
 	int port = 0;
 	Servlet servlet;
+	SlowBodyPolicy bodyPolicy;
 	Engine engine;
 	Connection connection;
 	TcpServer server;
@@ -438,6 +529,49 @@ void CTcpServerConnectionTest::NextRequestIsReceivedAfterResponseTest()
 	QCOMPARE(heldList.size(), 1);
 	QCOMPARE(heldList.first().path, QByteArray("/second"));
 	QCOMPARE(heldList.first().bodySize, bodySize);
+
+	QCOMPARE(server.RespondToHeld(), 1);
+	QTRY_COMPARE_WITH_TIMEOUT(client.GetResponseCount(), 2, 5000);
+}
+
+
+// After the response the limit of the read buffer is removed. The socket is read by the same thread that gives the body to the receiver,
+// so Qt must not take the data far ahead of it: the client can pass to the network only what the receiver has processed, plus the buffers
+// of the network. If the data piled up in the memory of the server, the client would send all the body long before the receiver gets it.
+void CTcpServerConnectionTest::SocketIsReadAsFastAsBodyIsReceivedTest()
+{
+	SServer server(5, true);
+	QVERIFY(server.IsListening());
+
+	CClient client;
+	QVERIFY(client.Connect(server.port));
+
+	client.SendGet("/first");
+	QTRY_COMPARE_WITH_TIMEOUT(server.servlet->GetHeld().size(), 1, 5000);
+	QCOMPARE(server.RespondToHeld(), 1);
+
+	// The request is finished, the limit is removed
+	QTRY_COMPARE_WITH_TIMEOUT(client.GetResponseCount(), 1, 5000);
+
+	const qint64 bodySize = 64 * s_mebibyte;
+	CBigUpload upload(client.GetSocket(), "/upload", bodySize);
+
+	QElapsedTimer timer;
+	timer.start();
+	while ((timer.elapsed() < 60000) && !upload.IsAllSent()){
+		upload.Pump();
+		QTest::qWait(1);
+	}
+	QVERIFY(upload.IsAllSent());
+
+	const qint64 processedSize = server.bodyPolicy->GetProcessedSize();
+	QVERIFY2(processedSize >= bodySize - 24 * s_mebibyte, qPrintable(QStringLiteral("The client has sent the whole body (%1 MiB), but the receiver has processed only %2 MiB: the server has taken the data ahead of the processing")
+				.arg(bodySize / s_mebibyte).arg(processedSize / s_mebibyte)));
+
+	// The whole body is received and the request is answered
+	QTRY_COMPARE_WITH_TIMEOUT(server.servlet->GetHeld().size(), 1, 30000);
+	QCOMPARE(server.servlet->GetHeld().first().path, QByteArray("/upload"));
+	QCOMPARE(server.bodyPolicy->GetProcessedSize(), bodySize);
 
 	QCOMPARE(server.RespondToHeld(), 1);
 	QTRY_COMPARE_WITH_TIMEOUT(client.GetResponseCount(), 2, 5000);

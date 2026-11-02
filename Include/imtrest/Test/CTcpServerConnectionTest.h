@@ -22,6 +22,9 @@ private slots:
 	void ReadBufferIsLimitedWhileRequestIsHandledTest();
 	void NextRequestIsReceivedAfterResponseTest();
 
+	// After the response the socket is read together with the parsing of the request: the data do not pile up in the read buffer
+	void SocketIsReadAsFastAsBodyIsReceivedTest();
+
 	// The pipelined requests must not pile up their responses in the memory while a slow client does not read the previous one
 	void PipelinedRequestsWaitForResponseToBeDeliveredTest();
 
