@@ -105,8 +105,10 @@ public:
 	virtual QByteArray GetRequestId() const override;
 
 	/**
-		The connection is closed after the response if the request is \c HTTP/1.0 without \c Connection: \c keep-alive
-		or has \c Connection: \c close (RFC 9112, section 9.3). It is known after the headers are received.
+		The connection is kept after the response only for a client of HTTP/1.1 or newer without \c Connection: \c close.
+		The connection of a client of \c HTTP/1.0 is always closed, even if the request has \c Connection: \c keep-alive: such a connection
+		is persistent only if the server confirms it with \c Connection: \c keep-alive in the response (RFC 9112, section 9.3), and the
+		sender does not confirm it (it takes the persistence of the connection from the server). It is known after the headers are received.
 	*/
 	virtual bool IsConnectionPersistent() const override;
 
