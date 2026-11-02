@@ -21,9 +21,8 @@ namespace imtnotifygql
 
 /**
 	Sender of a product server: hands the notifications to the notification center of the authorization server.
-	It sends with the access token of the server account (scope imtnotify::GetSendScope of the product), never with the
-	session of a user. The token is a secret and is read only from the environment variable named by AccessTokenVariable;
-	without it nothing is sent.
+	It sends with the session of the user whose request made the change; a change made outside of a user request is not
+	sent. A product server has no identity of its own yet (ImagingTools/ImtCore#1059).
 	Sending is queued: Send and Withdraw return at once and an own thread delivers the requests one by one in their order.
 	A request the authorization server did not answer is repeated a few times, then dropped; a refused one is dropped
 	at once. A notification without a dedup key gets one, so a repeated request does not deliver it twice.
@@ -37,7 +36,6 @@ public:
 
 	I_BEGIN_COMPONENT(CRemoteNotificationSenderComp);
 		I_REGISTER_INTERFACE(imtnotify::INotificationSender);
-		I_ASSIGN(m_accessTokenVariableAttrPtr, "AccessTokenVariable", "Environment variable holding the access token of the server account", true, "IMT_NOTIFICATION_ACCESS_TOKEN");
 	I_END_COMPONENT;
 
 	// reimplemented (imtnotify::INotificationSender)
@@ -55,6 +53,9 @@ private:
 		bool isWithdraw = false;
 		Audience audience;
 		Message message;
+
+		// The session of the user whose request made the change
+		QByteArray accessToken;
 	};
 
 	enum DeliveryResult
@@ -69,13 +70,11 @@ private:
 	DeliveryResult Deliver(const Request& request) const;
 
 	/**
-		Give the request the context of the server account; false if no token is configured.
+		Take the session of the current user request; false outside of one.
 	*/
-	bool SetupServerContext(imtgql::CGqlRequest& gqlRequest, const QByteArray& productId) const;
+	bool TakeCallerSession(Request& request) const;
 
 private:
-	I_ATTR(QByteArray, m_accessTokenVariableAttrPtr);
-
 	QMutex m_queueMutex;
 	QWaitCondition m_queueCondition;
 	QList<Request> m_queue;

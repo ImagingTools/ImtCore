@@ -245,15 +245,6 @@ struct NotificationChange
 
 
 /**
-	Scope of a personal access token that may send and withdraw the notifications of the product, e.g. "notifications:send:ProLife".
-*/
-inline QByteArray GetSendScope(const QByteArray& productId)
-{
-	return QByteArrayLiteral("notifications:send:") + productId;
-}
-
-
-/**
 	At most \c maxLength characters of a text, never half of a surrogate pair.
 */
 inline QString CutText(const QString& text, int maxLength)

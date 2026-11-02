@@ -9,6 +9,7 @@
 
 // ImtCore includes
 #include <imtgql/CGqlContext.h>
+#include <imtgql/CGqlRequestContextManager.h>
 #include <imtnotifygql/imtnotifygql.h>
 
 
@@ -39,7 +40,7 @@ bool CRemoteNotificationSenderComp::Send(const Audience& audience, const Message
 		request.message.dedupKey = QByteArrayLiteral("request:") + QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 	}
 
-	return Enqueue(request);
+	return TakeCallerSession(request) && Enqueue(request);
 }
 
 
@@ -51,7 +52,7 @@ bool CRemoteNotificationSenderComp::Withdraw(const QByteArray& productId, const 
 	request.audience.tenantId = tenantId;
 	request.message.groupKey = groupKey;
 
-	return Enqueue(request);
+	return TakeCallerSession(request) && Enqueue(request);
 }
 
 
@@ -151,10 +152,16 @@ void CRemoteNotificationSenderComp::RunQueue()
 
 CRemoteNotificationSenderComp::DeliveryResult CRemoteNotificationSenderComp::Deliver(const Request& request) const
 {
-	imtgql::CGqlRequest gqlRequest;
-	if (!SetupServerContext(gqlRequest, request.audience.productId)){
+	if (!HasApiClient()){
 		return DR_REFUSED;
 	}
+
+	imtgql::IGqlContextUniquePtr contextPtr(new imtgql::CGqlContext);
+	contextPtr->SetToken(request.accessToken);
+	contextPtr->SetProductId(request.audience.productId);
+
+	imtgql::CGqlRequest gqlRequest;
+	gqlRequest.SetGqlContext(imtgql::IGqlContextSharedPtr::CreateFromUnique(std::move(contextPtr)));
 
 	if (request.isWithdraw){
 		sdl::V1_0::imtnotify::WithdrawNotificationsRequestArguments arguments;
@@ -210,23 +217,18 @@ CRemoteNotificationSenderComp::DeliveryResult CRemoteNotificationSenderComp::Del
 }
 
 
-bool CRemoteNotificationSenderComp::SetupServerContext(imtgql::CGqlRequest& gqlRequest, const QByteArray& productId) const
+bool CRemoteNotificationSenderComp::TakeCallerSession(Request& request) const
 {
-	const QByteArray variableName = m_accessTokenVariableAttrPtr.IsValid() && !(*m_accessTokenVariableAttrPtr).isEmpty()
-				? *m_accessTokenVariableAttrPtr
-				: QByteArrayLiteral("IMT_NOTIFICATION_ACCESS_TOKEN");
-	const QByteArray accessToken = qgetenv(variableName.constData());
-
-	if (!HasApiClient() || accessToken.isEmpty()){
-		SendWarningMessage(0, QStringLiteral("No access token of the server account is configured, notifications are not sent"), "CRemoteNotificationSenderComp");
+	const imtgql::IGqlContext* contextPtr = imtgql::CGqlRequestContextManager::GetContext();
+	if (contextPtr == nullptr || contextPtr->GetToken().isEmpty()){
+		SendWarningMessage(0, QStringLiteral("Notification '%1' was made outside of a user request and is not sent")
+					.arg(QString::fromUtf8(request.isWithdraw ? request.message.groupKey : request.message.typeId)),
+					"CRemoteNotificationSenderComp");
 
 		return false;
 	}
 
-	imtgql::IGqlContextUniquePtr contextPtr(new imtgql::CGqlContext);
-	contextPtr->SetToken(accessToken);
-	contextPtr->SetProductId(productId);
-	gqlRequest.SetGqlContext(imtgql::IGqlContextSharedPtr::CreateFromUnique(std::move(contextPtr)));
+	request.accessToken = contextPtr->GetToken();
 
 	return true;
 }

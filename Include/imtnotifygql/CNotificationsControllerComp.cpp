@@ -382,7 +382,8 @@ sdl::V1_0::imtnotify::CNotificationsSentPayload CNotificationsControllerComp::On
 
 bool CNotificationsControllerComp::CanSend(const ::imtgql::CGqlRequest& gqlRequest, const QByteArray& productId, QString& errorMessage) const
 {
-	// Fails closed: a server sends only with an access token for sending to its own product, never with a session of a user
+	// Any signed-in user may send for the product of the request until a product server has an identity of its own
+	// (ImagingTools/ImtCore#1059)
 	if (!m_senderCompPtr.IsValid()){
 		errorMessage = QStringLiteral("Sending notifications is not available");
 
@@ -396,8 +397,8 @@ bool CNotificationsControllerComp::CanSend(const ::imtgql::CGqlRequest& gqlReque
 		return false;
 	}
 
-	if (!contextPtr->GetScopes().contains(imtnotify::GetSendScope(productId))){
-		errorMessage = QStringLiteral("The access token may not send notifications of the product");
+	if (contextPtr->GetUserId().isEmpty()){
+		errorMessage = QStringLiteral("Notifications are sent only by a signed-in user");
 
 		return false;
 	}

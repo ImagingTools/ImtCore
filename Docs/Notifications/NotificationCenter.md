@@ -19,7 +19,7 @@ There is **one** notification center: on the authorization server (Puma). A prod
                          Puma (authorization server)
    organization events ──INotificationSender──► CNotificationSenderComp ──► INotificationInboxController ──► table UserNotifications
                                                    ▲          │ every change              (collection Notifications reads it)
-     SendNotification (server account) ───────────┤          ▼
+     SendNotification (session of the user) ──────┤          ▼
      inbox commands (session of the user) ────────┘   CNotificationPublisherComp ──OnNotificationEvent──┐
                                                                                                          │
                          Product server (ProLife, ...)                                                   │
@@ -93,11 +93,11 @@ m_notificationSenderCompPtr->Send(audience, message);
 
 ### On a product server
 
-The same interface: `PumaGQLClientEngine` exports `NotificationSender` (the remote sender). It sends `SendNotification` to Puma with a **personal access token of a server account**, never with the session of a user, so a user cannot notify other users.
+The same interface: `PumaGQLClientEngine` exports `NotificationSender` (the remote sender). It sends `SendNotification` to Puma with the **session of the user whose request made the change**; a change made outside of a user request is not sent and a warning is logged.
 
-- Puma accepts `SendNotification` and `WithdrawNotifications` only with a personal access token that has the scope `notifications:send:<productId>` (`imtnotify::GetSendScope`), only for that product and for at most 100 users; a session of a user, an administrator included, may not send. With a tenant, every recipient must be a member of it, otherwise nothing is sent. Create the token for a dedicated server account with this scope only.
+- Puma accepts `SendNotification` and `WithdrawNotifications` from any signed-in user, only for the product of the request and for at most 100 users. With a tenant, every recipient must be a member of it, otherwise nothing is sent.
+- **Known hole:** a product server has no identity of its own yet, so any signed-in user of a product can send or withdraw notifications of that product, with any actor. The fix is a product server account, ImagingTools/ImtCore#1059.
 - The sender checks the lengths: the type and the ids of the objects at most 100 characters, the group and dedup keys at most 200; longer names and `Text`/`Object` values are cut to 200 and the body to 500, never in the middle of a surrogate pair; a `Number` or `DateTime` value longer than 200 is refused, since cutting it would change it. It refuses more than 10 arguments, an argument id other than ASCII letters, digits and `_`, a repeated one, one of the standard values (`subject`, `actor`, `actors`, `count`), a `Number` that is no number and a `DateTime` that is no ISO 8601 time.
-- The token is a secret and a registry is compiled into the executable: the server reads it only from the environment variable `IMT_NOTIFICATION_ACCESS_TOKEN` (attribute `AccessTokenVariable`). Without a token nothing is sent and a warning is logged.
 
 Send after the business change has succeeded. On a product server sending is queued: the call returns at once and an own thread of `CRemoteNotificationSenderComp` delivers the requests one by one, in their order (at most 1000 wait). A request Puma did not answer is repeated up to five times every 30 seconds, then dropped; a refused one (GraphQL error) is dropped at once. Both are logged and do not cancel the change. A notification without a dedup key gets `request:<uuid>`, so a repeated request does not deliver it twice.
 
@@ -105,7 +105,7 @@ Send after the business change has succeeded. On a product server sending is que
 
 **Puma** (`PumaServerBase.acc`): element `NotificationCenter` (`ImtCoreVoce`) with `DatabaseEngine`, `TenantMembershipManager` (the membership check of `SendNotification`) and `UserCollection` (the notifications of a removed user are removed); it is a GraphQL handler (`PumaHandlers/ExternGqlRequestHandlers`) and a subscriber controller (`WebSocketServerFramework/GqlSubscriberControllers`); `TenantController/NotificationSender` points at `NotificationCenter/NotificationSender` and `TenantController/NotificationInboxController` at `NotificationCenter/NotificationInboxController` (a removed member loses the notifications of the organization). The servers call `ImtCoreInitNotifySqlResources()` and link `ImtCore::imtnotifydb`. The composite also serves the collection `Notifications`: `CNotificationCollectionControllerComp` over a `SqlDatabaseCollection` with `CNotificationDbDelegateComp`, headers `typeId` (the subject and the type label), `severity`, `createdAt`.
 
-**Product servers**: nothing to add for the inbox — `AuthorizableServerFramework` contains it. Set `ProductId` (already set by every product) and provide the token. `OnNotificationEvent` is relayed by `RemoteTenantController`; the commands of the collection `Notifications` (`UserNotificationsList`, `GetCollectionHeaders`, ...) are forwarded by `RemoteNotificationCenter`.
+**Product servers**: nothing to add for the inbox — `AuthorizableServerFramework` contains it. Set `ProductId` (already set by every product). `OnNotificationEvent` is relayed by `RemoteTenantController`; the commands of the collection `Notifications` (`UserNotificationsList`, `GetCollectionHeaders`, ...) are forwarded by `RemoteNotificationCenter`.
 
 A `.acc` registry is compiled into the executable: re-run CMake after a change.
 

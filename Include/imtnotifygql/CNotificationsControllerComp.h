@@ -90,8 +90,8 @@ private:
 	bool GetCallerScope(const ::imtgql::CGqlRequest& gqlRequest, imtnotify::NotificationScope& scope, QString& errorMessage) const;
 
 	/**
-		Whether the caller may send notifications of the product: the access token of the request has the scope
-		imtnotify::GetSendScope(productId) and the request is made for that product. Refuses when no sender is configured.
+		Whether the caller may send notifications of the product: a signed-in user, the request made for that product.
+		Refuses when no sender is configured.
 	*/
 	bool CanSend(const ::imtgql::CGqlRequest& gqlRequest, const QByteArray& productId, QString& errorMessage) const;
 

@@ -122,9 +122,9 @@ type NotificationsChangedPayload {
 }
 
 
-# Sending by a product server to the notification center of the authorization server.
-# Allowed only to a personal access token with the scope notifications:send:<productId>, for that product and at most
-# 100 users; a session of a user, an administrator included, may not send.
+# Sending by a product server to the notification center of the authorization server, with the session of the user
+# whose request made the change: allowed to a signed-in user, for the product of the request and at most 100 users.
+# A product server has no identity of its own yet (ImagingTools/ImtCore#1059).
 # Empty tenantId or productId sends a personal notification, visible in every tenant or product of the user.
 input SendNotificationInput {
 	productId: ID
