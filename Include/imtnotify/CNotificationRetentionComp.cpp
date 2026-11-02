@@ -69,9 +69,7 @@ void CNotificationRetentionComp::OnModelChanged(int /*modelId*/, const istd::ICh
 	const imtbase::ICollectionInfo::ElementsRemoveInfo removeInfo =
 				changeSet.GetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENTS_REMOVED).value<imtbase::ICollectionInfo::ElementsRemoveInfo>();
 	for (const QByteArray& userId : removeInfo.elementIds){
-		if (!m_inboxControllerCompPtr->RemoveUserNotifications(QByteArray(), userId)){
-			SendErrorMessage(0, QStringLiteral("The notifications of the removed user '%1' could not be removed").arg(QString::fromUtf8(userId)), "CNotificationRetentionComp");
-		}
+		RemoveUserNotifications(userId);
 	}
 }
 
@@ -82,6 +80,16 @@ void CNotificationRetentionComp::RemoveExpired()
 {
 	const int checkInterval = qMax(1, *m_checkIntervalHoursAttrPtr) * 3600 * 1000;
 
+	QSet<QByteArray> userIds;
+	{
+		QMutexLocker locker(&m_pendingUserIdsMutex);
+		userIds.swap(m_pendingUserIds);
+	}
+
+	for (const QByteArray& userId : userIds){
+		RemoveUserNotifications(userId);
+	}
+
 	const QDateTime createdBefore = QDateTime::currentDateTimeUtc().addDays(-qMax(1, *m_retentionDaysAttrPtr));
 	bool isComplete = true;
 	if (!m_inboxControllerCompPtr->RemoveExpired(createdBefore, s_maxRemovedCount, isComplete)){
@@ -89,6 +97,19 @@ void CNotificationRetentionComp::RemoveExpired()
 	}
 
 	m_timer.start(isComplete ? checkInterval : s_portionDelay);
+}
+
+
+void CNotificationRetentionComp::RemoveUserNotifications(const QByteArray& userId)
+{
+	if (userId.isEmpty() || m_inboxControllerCompPtr->RemoveUserNotifications(QByteArray(), userId)){
+		return;
+	}
+
+	SendErrorMessage(0, QStringLiteral("The notifications of the removed user '%1' could not be removed, retrying").arg(QString::fromUtf8(userId)), "CNotificationRetentionComp");
+
+	QMutexLocker locker(&m_pendingUserIdsMutex);
+	m_pendingUserIds.insert(userId);
 }
 
 

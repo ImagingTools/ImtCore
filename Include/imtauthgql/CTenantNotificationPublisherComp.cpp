@@ -22,6 +22,16 @@ namespace imtauthgql
 using NotificationType = sdl::V1_0::imtauth::EMembershipNotificationType;
 
 
+namespace
+{
+
+
+const int s_cleanupRetryInterval = 60 * 1000;
+
+
+} // namespace
+
+
 // protected methods
 
 // reimplemented (imtgql::IGqlSubscriberController)
@@ -60,11 +70,21 @@ void CTenantNotificationPublisherComp::OnComponentCreated()
 	if (m_membershipManagerModelCompPtr.IsValid()){
 		RegisterModel(m_membershipManagerModelCompPtr.GetPtr(), 2);
 	}
+
+	if (m_inboxControllerCompPtr.IsValid()){
+		QObject::connect(&m_retryTimer, &QTimer::timeout, [this](){
+			RetryMemberCleanups();
+		});
+
+		m_retryTimer.start(s_cleanupRetryInterval);
+	}
 }
 
 
 void CTenantNotificationPublisherComp::OnComponentDestroyed()
 {
+	m_retryTimer.stop();
+
 	BaseClass2::UnregisterAllModels();
 
 	BaseClass::OnComponentDestroyed();
@@ -79,11 +99,8 @@ void CTenantNotificationPublisherComp::OnModelChanged(int /*modelId*/, const ist
 	QSet<QByteArray> changedTenantIds;
 	for (const QVariantMap& event : imtauth::TenantEvent::GetEvents(changeSet)){
 		const QByteArray tenantId = event.value(imtauth::TenantEvent::s_tenantId).toByteArray();
-		if (m_inboxControllerCompPtr.IsValid() && event.value(imtauth::TenantEvent::s_type).toString() == imtauth::TenantEvent::s_membershipRemoved){
-			const QByteArray userId = event.value(imtauth::TenantEvent::s_userId).toByteArray();
-			if (!tenantId.isEmpty() && !userId.isEmpty()){
-				m_inboxControllerCompPtr->RemoveUserNotifications(tenantId, userId);
-			}
+		if (event.value(imtauth::TenantEvent::s_type).toString() == imtauth::TenantEvent::s_membershipRemoved){
+			RemoveMemberNotifications(tenantId, event.value(imtauth::TenantEvent::s_userId).toByteArray());
 		}
 
 		for (const Notification& notification : CreateNotifications(event)){
@@ -101,6 +118,40 @@ void CTenantNotificationPublisherComp::OnModelChanged(int /*modelId*/, const ist
 
 
 // private methods
+
+void CTenantNotificationPublisherComp::RemoveMemberNotifications(const QByteArray& tenantId, const QByteArray& userId)
+{
+	if (!m_inboxControllerCompPtr.IsValid() || tenantId.isEmpty() || userId.isEmpty()){
+		return;
+	}
+
+	if (!m_inboxControllerCompPtr->RemoveUserNotifications(tenantId, userId)){
+		SendErrorMessage(0, QStringLiteral("The notifications of organization '%1' could not be removed for user '%2', retrying")
+					.arg(QString::fromUtf8(tenantId), QString::fromUtf8(userId)),
+					"CTenantNotificationPublisherComp");
+
+		QMutexLocker locker(&m_pendingMemberCleanupsMutex);
+		m_pendingMemberCleanups.insert(qMakePair(tenantId, userId));
+	}
+}
+
+
+void CTenantNotificationPublisherComp::RetryMemberCleanups()
+{
+	QSet<QPair<QByteArray, QByteArray>> cleanups;
+	{
+		QMutexLocker locker(&m_pendingMemberCleanupsMutex);
+		cleanups.swap(m_pendingMemberCleanups);
+	}
+
+	for (const QPair<QByteArray, QByteArray>& cleanup : cleanups){
+		// A member who came back keeps the notifications of the new membership
+		if (!m_membershipManagerCompPtr->IsMember(cleanup.second, cleanup.first)){
+			RemoveMemberNotifications(cleanup.first, cleanup.second);
+		}
+	}
+}
+
 
 QList<CTenantNotificationPublisherComp::Notification> CTenantNotificationPublisherComp::CreateNotifications(const QVariantMap& event) const
 {

@@ -8,6 +8,7 @@
 // ImtCore includes
 #include <imtnotify/CNotification.h>
 #include <imtnotify/NotificationMessageFormat.h>
+#include <imtnotify/NotificationTypes.h>
 
 
 namespace imtnotify
@@ -45,6 +46,13 @@ bool IsArgumentId(const QByteArray& id)
 
 bool IsArgumentValueValid(const NotificationArgument& argument)
 {
+	// A cut number or time would change its meaning: only a name is cut
+	if (argument.kind == NotificationArgument::K_NUMBER || argument.kind == NotificationArgument::K_DATE_TIME){
+		if (argument.value.size() > s_maxNameLength){
+			return false;
+		}
+	}
+
 	if (argument.kind == NotificationArgument::K_NUMBER){
 		bool isNumber = false;
 		argument.value.toDouble(&isNumber);
@@ -89,7 +97,9 @@ NotificationArguments CutArguments(const NotificationArguments& arguments)
 {
 	NotificationArguments retVal = arguments;
 	for (NotificationArgument& argument : retVal){
-		argument.value = argument.value.left(s_maxNameLength);
+		if (argument.kind == NotificationArgument::K_TEXT || argument.kind == NotificationArgument::K_OBJECT){
+			argument.value = CutText(argument.value, s_maxNameLength);
+		}
 	}
 
 	return retVal;
@@ -99,7 +109,7 @@ NotificationArguments CutArguments(const NotificationArguments& arguments)
 ObjectLinkInfo CutLink(const ObjectLinkInfo& link)
 {
 	ObjectLinkInfo retVal = link;
-	retVal.name = link.name.left(s_maxNameLength);
+	retVal.name = CutText(link.name, s_maxNameLength);
 
 	return retVal;
 }
@@ -155,7 +165,17 @@ bool CNotificationSenderComp::Send(const Audience& audience, const Message& mess
 
 bool CNotificationSenderComp::Withdraw(const QByteArray& productId, const QByteArray& tenantId, const QByteArray& groupKey)
 {
-	return !groupKey.isEmpty() && m_inboxControllerCompPtr->RemoveGroup(productId, tenantId, groupKey);
+	if (groupKey.isEmpty()){
+		return false;
+	}
+
+	if (!m_inboxControllerCompPtr->RemoveGroup(productId, tenantId, groupKey)){
+		SendErrorMessage(0, QStringLiteral("The notifications of group '%1' could not be withdrawn").arg(QString::fromUtf8(groupKey)), "CNotificationSenderComp");
+
+		return false;
+	}
+
+	return true;
 }
 
 
@@ -166,7 +186,7 @@ bool CNotificationSenderComp::SendToInbox(const NotificationScope& scope, const 
 	CNotification notification;
 	notification.SetScope(scope);
 	notification.SetCategory(message.severity);
-	notification.SetDescription(message.body.left(s_maxBodyLength));
+	notification.SetDescription(CutText(message.body, s_maxBodyLength));
 	if (!message.actor.IsEmpty()){
 		notification.SetActors({CutLink(message.actor)});
 	}

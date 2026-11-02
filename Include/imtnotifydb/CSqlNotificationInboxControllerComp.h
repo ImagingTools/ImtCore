@@ -89,6 +89,23 @@ private:
 				imtnotify::NotificationChange::Kind kind,
 				QByteArrayList& changedIds,
 				const QDateTime& createdUntil = QDateTime());
+
+	struct InboxChange
+	{
+		imtnotify::NotificationScope scope;
+		QByteArrayList ids;
+	};
+
+	/**
+		The changed rows grouped by inbox, told later: a change made in a transaction is told after its commit.
+	*/
+	bool ReadInboxChanges(QSqlQuery& sqlQuery, QByteArrayList& changedIds, QList<InboxChange>& changes) const;
+	void PublishChanges(imtnotify::NotificationChange::Kind kind, const QList<InboxChange>& changes, const QDateTime& createdUntil = QDateTime());
+
+	/**
+		Remove the dedup keys and the notifications matching the conditions in one transaction.
+	*/
+	bool RemoveWithKeys(const QString& keyCondition, const QString& condition, const QVariantMap& bindValues);
 	void PublishChange(
 				imtnotify::NotificationChange::Kind kind,
 				const imtnotify::NotificationScope& scope,

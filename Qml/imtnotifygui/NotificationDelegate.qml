@@ -6,7 +6,7 @@ import imtcontrols 1.0
 
 /**
  * One notification of a list: severity mark, icon, text, time, unread dot and remove button.
- * A click opens the notification through NotificationCenter.
+ * A click, or Enter and Space when the row has the focus of Tab, opens the notification.
  */
 Rectangle {
 	id: notificationDelegate
@@ -25,6 +25,29 @@ Rectangle {
 	width: parent ? parent.width : Style.sizeHintS
 	height: contentColumn.height + 2 * Style.marginM
 	color: mouseArea.containsMouse ? Style.alternateBaseColor : Style.baseColor
+	border.color: Style.focusRingColor
+	border.width: notificationDelegate.activeFocus ? Style.focusRingWidth : 0
+
+	activeFocusOnTab: true
+
+	Keys.onReturnPressed: {
+		notificationDelegate.openNotification()
+	}
+
+	Keys.onEnterPressed: {
+		notificationDelegate.openNotification()
+	}
+
+	Keys.onSpacePressed: {
+		notificationDelegate.openNotification()
+	}
+
+	function openNotification(){
+		if (notificationDelegate.notificationItem){
+			notificationDelegate.actions.open(notificationDelegate.notificationItem)
+			notificationDelegate.opened()
+		}
+	}
 
 	function severityColor(){
 		if (!notificationDelegate.notificationItem){
@@ -68,10 +91,7 @@ Rectangle {
 		cursorShape: Qt.PointingHandCursor
 
 		onClicked: {
-			if (notificationDelegate.notificationItem){
-				notificationDelegate.actions.open(notificationDelegate.notificationItem)
-				notificationDelegate.opened()
-			}
+			notificationDelegate.openNotification()
 		}
 	}
 

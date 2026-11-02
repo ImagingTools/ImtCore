@@ -186,23 +186,10 @@ bool CSqlNotificationInboxControllerComp::RemoveGroup(const QByteArray& productI
 	bindValues.insert(QStringLiteral(":GroupKey"), Text(groupKey));
 
 	// The withdrawn event can happen again, e.g. a removed assignee assigned again
-	QSqlQuery dedupQuery;
-	if (!ExecQuery(
-				QStringLiteral(R"(DELETE FROM %1 WHERE "ProductId" = :ProductId AND "TenantId" = :TenantId AND "DedupKey" = :GroupKey)")
-							.arg(s_dedupTableName),
-				bindValues,
-				dedupQuery)){
-		return false;
-	}
-
-	QSqlQuery sqlQuery;
-	QByteArrayList removedIds;
-
-	return ExecQuery(
-				QStringLiteral(R"(DELETE FROM %1 WHERE "ProductId" = :ProductId AND "TenantId" = :TenantId AND "GroupKey" = :GroupKey AND "GroupKey" <> '' RETURNING %2)")
-							.arg(s_tableName, s_changedRowColumns),
-				bindValues,
-				sqlQuery) && ReadChangedRows(sqlQuery, imtnotify::NotificationChange::K_REMOVED, removedIds);
+	return RemoveWithKeys(
+				QStringLiteral(R"("ProductId" = :ProductId AND "TenantId" = :TenantId AND "DedupKey" = :GroupKey)"),
+				QStringLiteral(R"("ProductId" = :ProductId AND "TenantId" = :TenantId AND "GroupKey" = :GroupKey AND "GroupKey" <> '')"),
+				bindValues);
 }
 
 
@@ -221,18 +208,7 @@ bool CSqlNotificationInboxControllerComp::RemoveUserNotifications(const QByteArr
 		bindValues.insert(QStringLiteral(":TenantId"), Text(tenantId));
 	}
 
-	QSqlQuery dedupQuery;
-	if (!ExecQuery(QStringLiteral("DELETE FROM %1 WHERE %2").arg(s_dedupTableName, condition), bindValues, dedupQuery)){
-		return false;
-	}
-
-	QSqlQuery sqlQuery;
-	QByteArrayList removedIds;
-
-	return ExecQuery(
-				QStringLiteral("DELETE FROM %1 WHERE %2 RETURNING %3").arg(s_tableName, condition, s_changedRowColumns),
-				bindValues,
-				sqlQuery) && ReadChangedRows(sqlQuery, imtnotify::NotificationChange::K_REMOVED, removedIds);
+	return RemoveWithKeys(condition, condition, bindValues);
 }
 
 
@@ -555,38 +531,82 @@ bool CSqlNotificationInboxControllerComp::ReadChangedRows(
 			QByteArrayList& changedIds,
 			const QDateTime& createdUntil)
 {
+	QList<InboxChange> changes;
+	if (!ReadInboxChanges(sqlQuery, changedIds, changes)){
+		return false;
+	}
+
+	PublishChanges(kind, changes, createdUntil);
+
+	return true;
+}
+
+
+bool CSqlNotificationInboxControllerComp::ReadInboxChanges(QSqlQuery& sqlQuery, QByteArrayList& changedIds, QList<InboxChange>& changes) const
+{
 	// A personal notification belongs to its own inbox: its change reaches the sessions of every tenant and product of the user
-	QList<imtnotify::NotificationScope> scopes;
-	QList<QByteArrayList> scopeIds;
-	QHash<QByteArray, int> scopeIndexes;
+	QHash<QByteArray, int> changeIndexes;
 	while (sqlQuery.next()){
-		imtnotify::NotificationScope scope;
-		scope.productId = imtdb::VariantToByteArray(sqlQuery.value(1));
-		scope.tenantId = imtdb::VariantToByteArray(sqlQuery.value(2));
-		scope.userId = imtdb::VariantToByteArray(sqlQuery.value(3));
+		InboxChange change;
+		change.scope.productId = imtdb::VariantToByteArray(sqlQuery.value(1));
+		change.scope.tenantId = imtdb::VariantToByteArray(sqlQuery.value(2));
+		change.scope.userId = imtdb::VariantToByteArray(sqlQuery.value(3));
 
 		const QByteArray id = imtdb::VariantToByteArray(sqlQuery.value(0));
 		changedIds.append(id);
 
-		const QByteArray scopeKey = scope.productId + '\x1f' + scope.tenantId + '\x1f' + scope.userId;
-		const auto indexIter = scopeIndexes.constFind(scopeKey);
-		if (indexIter == scopeIndexes.constEnd()){
-			scopeIndexes.insert(scopeKey, scopes.size());
-			scopes.append(scope);
-			scopeIds.append(QByteArrayList() << id);
+		const QByteArray scopeKey = change.scope.productId + '\x1f' + change.scope.tenantId + '\x1f' + change.scope.userId;
+		const auto indexIter = changeIndexes.constFind(scopeKey);
+		if (indexIter == changeIndexes.constEnd()){
+			changeIndexes.insert(scopeKey, changes.size());
+			change.ids.append(id);
+			changes.append(change);
 		}
 		else{
-			scopeIds[*indexIter].append(id);
+			changes[*indexIter].ids.append(id);
 		}
 	}
 
-	if (sqlQuery.lastError().type() != QSqlError::NoError){
+	return sqlQuery.lastError().type() == QSqlError::NoError;
+}
+
+
+void CSqlNotificationInboxControllerComp::PublishChanges(
+			imtnotify::NotificationChange::Kind kind,
+			const QList<InboxChange>& changes,
+			const QDateTime& createdUntil)
+{
+	for (const InboxChange& change : changes){
+		PublishChange(kind, change.scope, change.ids, createdUntil);
+	}
+}
+
+
+bool CSqlNotificationInboxControllerComp::RemoveWithKeys(const QString& keyCondition, const QString& condition, const QVariantMap& bindValues)
+{
+	// Without its notification a kept key would refuse the event, without its key a kept notification would be told again
+	if (!m_databaseEngineCompPtr->BeginTransaction()){
+		SendErrorMessage(0, QStringLiteral("A notification transaction could not be started"), "CSqlNotificationInboxControllerComp");
+
 		return false;
 	}
 
-	for (int i = 0; i < scopes.size(); ++i){
-		PublishChange(kind, scopes[i], scopeIds[i], createdUntil);
+	QSqlQuery dedupQuery;
+	QSqlQuery sqlQuery;
+	QByteArrayList removedIds;
+	QList<InboxChange> changes;
+	const bool retVal =
+				ExecQuery(QStringLiteral("DELETE FROM %1 WHERE %2").arg(s_dedupTableName, keyCondition), bindValues, dedupQuery) &&
+				ExecQuery(QStringLiteral("DELETE FROM %1 WHERE %2 RETURNING %3").arg(s_tableName, condition, s_changedRowColumns), bindValues, sqlQuery) &&
+				ReadInboxChanges(sqlQuery, removedIds, changes);
+
+	if (!retVal || !m_databaseEngineCompPtr->FinishTransaction()){
+		m_databaseEngineCompPtr->CancelTransaction();
+
+		return false;
 	}
+
+	PublishChanges(imtnotify::NotificationChange::K_REMOVED, changes);
 
 	return true;
 }

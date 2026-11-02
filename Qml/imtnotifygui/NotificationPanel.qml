@@ -17,10 +17,19 @@ PopupView {
 	width: Style.sizeHintS
 	height: background.height
 	forceFocus: true
+	escapeEnabled: true
 
 	function close(){
 		if (notificationPanel.root){
 			notificationPanel.root.closeDialog()
+		}
+	}
+
+	Shortcut {
+		sequence: "Escape"
+		enabled: notificationPanel.escapeEnabled
+		onActivated: {
+			notificationPanel.close()
 		}
 	}
 

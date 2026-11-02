@@ -254,6 +254,19 @@ inline QByteArray GetSendScope(const QByteArray& productId)
 
 
 /**
+	At most \c maxLength characters of a text, never half of a surrogate pair.
+*/
+inline QString CutText(const QString& text, int maxLength)
+{
+	if (text.size() <= maxLength){
+		return text;
+	}
+
+	return text.left(maxLength > 0 && text.at(maxLength - 1).isHighSurrogate() ? maxLength - 1 : maxLength);
+}
+
+
+/**
 	Ids of the selection parameters (iprm::IIdParam) restricting a collection of the notifications to the inbox of a session.
 	Without the user the selection is empty.
 */

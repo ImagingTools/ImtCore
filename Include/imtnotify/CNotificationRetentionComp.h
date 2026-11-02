@@ -3,6 +3,8 @@
 
 
 // Qt includes
+#include <QtCore/QMutex>
+#include <QtCore/QSet>
 #include <QtCore/QTimer>
 
 // ACF includes
@@ -20,7 +22,8 @@ namespace imtnotify
 
 /**
 	Keeps the notifications only as long as they are of use: removes the ones older than the retention period from
-	every inbox, periodically, and all of a user removed from the collection of the users.
+	every inbox, periodically, and all of a user removed from the collection of the users; a failed removal of a user is
+	retried with the next periodic one.
 	The sessions are told the removed notifications by the inbox controller.
 */
 class CNotificationRetentionComp:
@@ -48,6 +51,7 @@ protected:
 
 private:
 	void RemoveExpired();
+	void RemoveUserNotifications(const QByteArray& userId);
 
 private:
 	I_REF(INotificationInboxController, m_inboxControllerCompPtr);
@@ -56,6 +60,10 @@ private:
 	I_ATTR(int, m_checkIntervalHoursAttrPtr);
 
 	QTimer m_timer;
+
+	// Removed users whose notifications could not be removed yet
+	QSet<QByteArray> m_pendingUserIds;
+	QMutex m_pendingUserIdsMutex;
 };
 
 

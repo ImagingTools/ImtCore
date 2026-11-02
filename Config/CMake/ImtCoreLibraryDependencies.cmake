@@ -81,6 +81,7 @@ declare_target_dependencies(imtaccount				imtbase Acf::iimg)
 declare_target_dependencies(imtapp					Acf::ifile)
 declare_target_dependencies(imtauth					imtdoc imtlic imtmail Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Gui Qt${QT_VERSION_MAJOR}::Svg)
 declare_target_dependencies(imtauthdb				imtdb imtgql Qt${QT_VERSION_MAJOR}::Sql)
+# imtnotifygql: the server registries of imtauthgql (AuthorizableServerFramework.acc, TenantController.acc) contain the notification center
 declare_target_dependencies(imtauthgql				imtservergql imtnotifygql Qt${QT_VERSION_MAJOR}::Sql)
 declare_target_dependencies(imtauthgui				imtaccount imtgui imtqml)
 declare_target_dependencies(imtchat					imtdb Qt${QT_VERSION_MAJOR}::Sql)

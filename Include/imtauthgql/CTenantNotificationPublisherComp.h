@@ -8,6 +8,10 @@
 
 // Qt includes
 #include <QList>
+#include <QMutex>
+#include <QPair>
+#include <QSet>
+#include <QTimer>
 #include <QVariantMap>
 
 // ImtCore includes
@@ -101,6 +105,12 @@ private:
 		QByteArray inviterId = QByteArray();
 	};
 
+	/**
+		A removed member loses the notifications of the organization; a failed removal is retried.
+	*/
+	void RemoveMemberNotifications(const QByteArray& tenantId, const QByteArray& userId);
+	void RetryMemberCleanups();
+
 	QList<Notification> CreateNotifications(const QVariantMap& event) const;
 	void PublishNotification(const Notification& notification) const;
 
@@ -113,6 +123,12 @@ private:
 	QString FindTenantName(const QByteArray& tenantId) const;
 	imtnotify::ObjectLinkInfo GetUserLink(const QByteArray& userId) const;
 	QByteArray FindTenantOwnerId(const QByteArray& tenantId) const;
+
+private:
+	// Tenant and user of the removed memberships whose notifications could not be removed yet
+	QSet<QPair<QByteArray, QByteArray>> m_pendingMemberCleanups;
+	QMutex m_pendingMemberCleanupsMutex;
+	QTimer m_retryTimer;
 };
 
 

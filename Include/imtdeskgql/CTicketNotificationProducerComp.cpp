@@ -153,7 +153,7 @@ void CTicketNotificationProducerComp::OnMessageAdded(const QByteArray& messageId
 
 	QString preview = messagePtr->GetContent().simplified();
 	if (preview.length() > s_maxPreviewLength){
-		preview = preview.left(s_maxPreviewLength) + QStringLiteral("…");
+		preview = imtnotify::CutText(preview, s_maxPreviewLength) + QStringLiteral("…");
 	}
 
 	imtnotify::INotificationSender::Message message;
