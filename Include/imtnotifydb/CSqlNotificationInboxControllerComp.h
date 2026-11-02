@@ -43,7 +43,7 @@ public:
 	virtual bool MarkDelivered(const imtnotify::NotificationScope& scope, const QByteArrayList& ids, QByteArrayList& changedIds) override;
 	virtual bool MarkAllDelivered(const imtnotify::NotificationScope& scope, const QDateTime& createdUntil, QByteArrayList& changedIds) override;
 	virtual bool Remove(const imtnotify::NotificationScope& scope, const QByteArrayList& ids, QByteArrayList& removedIds) override;
-	virtual bool RemoveGroup(const QByteArray& productId, const QByteArray& tenantId, const QByteArray& groupKey) override;
+	virtual bool RemoveGroup(const QByteArray& productId, const QByteArray& tenantId, const QByteArray& groupKey, const QByteArrayList& userIds) override;
 	virtual bool RemoveUserNotifications(const QByteArray& tenantId, const QByteArray& userId) override;
 	virtual bool RemoveExpired(const QDateTime& createdBefore, int maxCount, bool& isComplete) override;
 

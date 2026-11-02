@@ -77,9 +77,10 @@ public:
 	virtual bool Send(const Audience& audience, const Message& message) = 0;
 
 	/**
-		Remove the notifications of a group from every inbox of the tenant, e.g. when an invitation is revoked.
+		Remove the notifications of a group from the inboxes of the product and tenant of the audience, e.g. when an
+		invitation is revoked: of its users, or of every user when it names none.
 	*/
-	virtual bool Withdraw(const QByteArray& productId, const QByteArray& tenantId, const QByteArray& groupKey) = 0;
+	virtual bool Withdraw(const Audience& audience, const QByteArray& groupKey) = 0;
 };
 
 

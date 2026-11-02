@@ -34,7 +34,7 @@ public:
 
 	// reimplemented (imtnotify::INotificationSender)
 	virtual bool Send(const Audience& audience, const Message& message) override;
-	virtual bool Withdraw(const QByteArray& productId, const QByteArray& tenantId, const QByteArray& groupKey) override;
+	virtual bool Withdraw(const Audience& audience, const QByteArray& groupKey) override;
 
 private:
 	bool SendToInbox(const NotificationScope& scope, const Message& message);

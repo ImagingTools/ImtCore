@@ -17,6 +17,7 @@
 #include <imtauth/ITenantRelationshipInfo.h>
 #include <imtauth/ITenantManager.h>
 #include <imtservergql/CGqlPublisherCompBase.h>
+#include <imtbase/IObjectCollection.h>
 #include <imtnotify/INotificationSender.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Tenants_fwd.h>
 
@@ -58,6 +59,7 @@ public:
 		I_ASSIGN_TO(m_connectionRequestManagerModelCompPtr, m_connectionRequestManagerCompPtr, true);
 		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager for resolving tenant owners", true, "TenantManager");
 		I_ASSIGN(m_notificationSenderCompPtr, "NotificationSender", "Notification center that keeps the notifications of the users", false, "NotificationSender");
+		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "Users: the name of the user who made the change", false, "UserCollection");
 	I_END_COMPONENT;
 
 protected:
@@ -76,6 +78,7 @@ protected:
 	I_REF(imod::IModel, m_connectionRequestManagerModelCompPtr);
 	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
 	I_REF(imtnotify::INotificationSender, m_notificationSenderCompPtr);
+	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
 
 private:
 	void PublishNotification(

@@ -174,9 +174,9 @@ bool CSqlNotificationInboxControllerComp::Remove(const imtnotify::NotificationSc
 }
 
 
-bool CSqlNotificationInboxControllerComp::RemoveGroup(const QByteArray& productId, const QByteArray& tenantId, const QByteArray& groupKey)
+bool CSqlNotificationInboxControllerComp::RemoveGroup(const QByteArray& productId, const QByteArray& tenantId, const QByteArray& groupKey, const QByteArrayList& userIds)
 {
-	if (groupKey.isEmpty()){
+	if (groupKey.isEmpty() || userIds.size() > s_maxIdsPerRequest){
 		return false;
 	}
 
@@ -185,10 +185,16 @@ bool CSqlNotificationInboxControllerComp::RemoveGroup(const QByteArray& productI
 	bindValues.insert(QStringLiteral(":TenantId"), Text(tenantId));
 	bindValues.insert(QStringLiteral(":GroupKey"), Text(groupKey));
 
+	// Only the inboxes of these users
+	QString recipientCondition;
+	if (!userIds.isEmpty()){
+		recipientCondition = QStringLiteral(R"( AND "RecipientId" IN (%1))").arg(BindIds(userIds, bindValues));
+	}
+
 	// The withdrawn event can happen again, e.g. a removed assignee assigned again
 	return RemoveWithKeys(
-				QStringLiteral(R"("ProductId" = :ProductId AND "TenantId" = :TenantId AND "DedupKey" = :GroupKey)"),
-				QStringLiteral(R"("ProductId" = :ProductId AND "TenantId" = :TenantId AND "GroupKey" = :GroupKey AND "GroupKey" <> '')"),
+				QStringLiteral(R"("ProductId" = :ProductId AND "TenantId" = :TenantId AND "DedupKey" = :GroupKey)") + recipientCondition,
+				QStringLiteral(R"("ProductId" = :ProductId AND "TenantId" = :TenantId AND "GroupKey" = :GroupKey AND "GroupKey" <> '')") + recipientCondition,
 				bindValues);
 }
 

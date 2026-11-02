@@ -122,6 +122,11 @@ private:
 
 	QString FindTenantName(const QByteArray& tenantId) const;
 	imtnotify::ObjectLinkInfo GetUserLink(const QByteArray& userId) const;
+
+	/**
+		The user whose request made the change, named from the users when the request has no name.
+	*/
+	imtnotify::ObjectLinkInfo GetRequestUserLink() const;
 	QByteArray FindTenantOwnerId(const QByteArray& tenantId) const;
 
 private:

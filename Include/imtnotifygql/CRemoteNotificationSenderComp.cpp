@@ -44,12 +44,11 @@ bool CRemoteNotificationSenderComp::Send(const Audience& audience, const Message
 }
 
 
-bool CRemoteNotificationSenderComp::Withdraw(const QByteArray& productId, const QByteArray& tenantId, const QByteArray& groupKey)
+bool CRemoteNotificationSenderComp::Withdraw(const Audience& audience, const QByteArray& groupKey)
 {
 	Request request;
 	request.isWithdraw = true;
-	request.audience.productId = productId;
-	request.audience.tenantId = tenantId;
+	request.audience = audience;
 	request.message.groupKey = groupKey;
 
 	return TakeCallerSession(request) && Enqueue(request);
@@ -169,6 +168,11 @@ CRemoteNotificationSenderComp::DeliveryResult CRemoteNotificationSenderComp::Del
 		arguments.input->productId = request.audience.productId;
 		arguments.input->tenantId = request.audience.tenantId;
 		arguments.input->groupKey = request.message.groupKey;
+		if (!request.audience.userIds.isEmpty()){
+			imtsdl::TElementList<QByteArray> userIds;
+			userIds.FromList(request.audience.userIds);
+			arguments.input->userIds = userIds;
+		}
 		if (!sdl::V1_0::imtnotify::CWithdrawNotificationsGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
 			return DR_REFUSED;
 		}

@@ -49,7 +49,7 @@ There is **one** notification center: on the authorization server (Puma). A prod
 | `imtauthgql::CTenantNotificationPublisherComp` | invitation received / accepted / declined / withdrawn, ownership, permissions changed, membership ended, member left | invitation and end of membership: personal; others: the tenant in every product (no product is set) |
 | `imtauthgql::CConnectionCodesNotificationPublisherComp` | connection requests and relationship proposals received / approved / rejected, connection and relationship removed | the tenant of the owner |
 | `imtauthgql::CCrossTenantMessageNotificationPublisherComp` | new message from another tenant | the target tenant |
-| `imtdeskgql::CTicketNotificationProducerComp` | new message of a ticket (reporter and assignees but the sender), assigned to a ticket | personal in the product |
+| `imtdeskgql::CTicketNotificationProducerComp` | new message of a ticket (reporter and assignees but the sender), assigned to a ticket; a removed assignee loses both (the reporter keeps the messages) | personal in the product |
 
 Types: a module declares each of its notification types as an element `NotificationType` (`ImtNotifyGqlPck`, `imtnotify::INotificationTypeInfo`) with `TypeId`, `Name` (the label) and `IconPath`, and each type of the objects of its notifications as a `NotificationType` without an icon ("Organization" for `Tenant`, "Ticket" for `SupportTicket`). A `NotificationTypeList` (`imtnotify::INotificationTypeList`) lists them in `Types` and `ObjectTypes`; the composite of the module exports it: `ImtUserAdministrationVoce/TenantNotificationTypes` for the organizations, `ImtDeskVoce/TicketNotificationTypes` for the tickets. The labels are texts of the `.acc` file: their translations are in the `.ts` of the module, context `Attribute`, and the server translates them into the language of the client. A server lists the type lists of the modules it runs in `NotificationTypes` of its notifications controller: Puma the organization types; a product server always knows the organization types (inside `RemoteNotificationCenter`, not exported), a product adds only its own lists through `AuthorizableServerFramework/ProductNotificationTypes` (ProLife: the tickets). A client shows a notification as `Organization "Test"` with the label of its type. A product with its own notification type adds its list there; neither Puma nor ImtCore change.
 
@@ -62,13 +62,14 @@ The producers observe their models, so they have to exist from the start of the 
 ```
 Created ──► Delivered ──► Read ──► removed by the user or by retention
    ├──► grouped: an unread notification with the same group key is updated (groupCount + 1, new again)
-   └──► withdrawn: INotificationSender::Withdraw(product, tenant, groupKey) removes it from every inbox
+   └──► withdrawn: INotificationSender::Withdraw(audience, groupKey) removes it from the inboxes of the users of the audience,
+        or of every user when it names none
 ```
 
 - **Delivered** means a session has received it (push or sync). Undelivered notifications pop up at the next login.
 - **Read** implies delivered.
 - A second `Send` with the same **dedup key** in the same inbox is ignored, also after the first one was grouped, read or removed by the user. Withdrawing a group forgets the dedup keys equal to its group key, so the event can be told again.
-- The **actor** never receives a notification about the own action.
+- The **actor** never receives a notification about the own action. The organization, connection and relationship notifications take the user of the request as their actor (`TenantNotification::RequestUserLink`), so an owner who removes a member, hands the organization over or ends a relationship is not told about it, a member who leaves is not told that the membership ended, and the other party sees who did it.
 
 ## Sending
 
@@ -95,7 +96,7 @@ m_notificationSenderCompPtr->Send(audience, message);
 
 The same interface: `PumaGQLClientEngine` exports `NotificationSender` (the remote sender). It sends `SendNotification` to Puma with the **session of the user whose request made the change**; a change made outside of a user request is not sent and a warning is logged.
 
-- Puma accepts `SendNotification` and `WithdrawNotifications` from any signed-in user, only for the product of the request and for at most 100 users. With a tenant, every recipient must be a member of it, otherwise nothing is sent.
+- Puma accepts `SendNotification` and `WithdrawNotifications` from any signed-in user, only for the product of the request and for at most 100 users (`WithdrawNotifications` without `userIds` withdraws the group from every inbox). With a tenant, every recipient must be a member of it, otherwise nothing is sent.
 - **Known hole:** a product server has no identity of its own yet, so any signed-in user of a product can send or withdraw notifications of that product, with any actor. The fix is a product server account, ImagingTools/ImtCore#1059.
 - The sender checks the lengths: the type and the ids of the objects at most 100 characters, the group and dedup keys at most 200; longer names and `Text`/`Object` values are cut to 200 and the body to 500, never in the middle of a surrogate pair; a `Number` or `DateTime` value longer than 200 is refused, since cutting it would change it. It refuses more than 10 arguments, an argument id other than ASCII letters, digits and `_`, a repeated one, one of the standard values (`subject`, `actor`, `actors`, `count`), a `Number` that is no number and a `DateTime` that is no ISO 8601 time.
 

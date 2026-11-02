@@ -236,13 +236,13 @@ void CTenantNotificationPublisherComp::SendToNotificationCenter(const Notificati
 		break;
 
 	case NotificationType::InvitationRevoked:
-		senderPtr->Withdraw(QByteArray(), QByteArray(), invitationGroupKey);
+		tn::Withdraw(senderPtr, QByteArray(), invitationGroupKey);
 		tn::Send(senderPtr, notification.targetUserId, QByteArray(), tn::s_invitationRevoked, tenantLink);
 		break;
 
 	case NotificationType::InvitationAccepted:
 	case NotificationType::InvitationRejected:
-		senderPtr->Withdraw(QByteArray(), QByteArray(), invitationGroupKey);
+		tn::Withdraw(senderPtr, QByteArray(), invitationGroupKey);
 		// The invited user answered: the actor
 		tn::Send(senderPtr, notification.targetUserId, notification.tenantId,
 					notification.notificationType == NotificationType::InvitationAccepted ? tn::s_invitationAccepted : tn::s_invitationRejected,
@@ -252,7 +252,7 @@ void CTenantNotificationPublisherComp::SendToNotificationCenter(const Notificati
 	case NotificationType::OwnershipTransferred:
 		tn::Send(senderPtr, notification.targetUserId, notification.tenantId,
 					isAboutTarget ? tn::s_ownershipReceived : tn::s_ownershipTransferred,
-					tenantLink, QByteArray(), istd::IInformationProvider::IC_INFO, imtnotify::ObjectLinkInfo(),
+					tenantLink, QByteArray(), istd::IInformationProvider::IC_INFO, GetRequestUserLink(),
 					{imtnotify::NotificationArgument::Object(QByteArrayLiteral("member"), GetUserLink(notification.userId))});
 		break;
 
@@ -262,11 +262,12 @@ void CTenantNotificationPublisherComp::SendToNotificationCenter(const Notificati
 
 	case NotificationType::MembershipRemoved:
 		if (isAboutTarget){
-			tn::Send(senderPtr, notification.targetUserId, QByteArray(), tn::s_membershipEnded, tenantLink, QByteArray(), istd::IInformationProvider::IC_WARNING);
+			tn::Send(senderPtr, notification.targetUserId, QByteArray(), tn::s_membershipEnded, tenantLink, QByteArray(), istd::IInformationProvider::IC_WARNING,
+						GetRequestUserLink());
 		}
 		else{
 			tn::Send(senderPtr, notification.targetUserId, notification.tenantId, tn::s_memberLeft, tenantLink, QByteArray(),
-						istd::IInformationProvider::IC_INFO, imtnotify::ObjectLinkInfo(),
+						istd::IInformationProvider::IC_INFO, GetRequestUserLink(),
 						{imtnotify::NotificationArgument::Object(QByteArrayLiteral("member"), GetUserLink(notification.userId))});
 		}
 		break;
@@ -274,18 +275,17 @@ void CTenantNotificationPublisherComp::SendToNotificationCenter(const Notificati
 }
 
 
+imtnotify::ObjectLinkInfo CTenantNotificationPublisherComp::GetRequestUserLink() const
+{
+	return TenantNotification::RequestUserLink(m_userCollectionCompPtr.GetPtr());
+}
+
+
 imtnotify::ObjectLinkInfo CTenantNotificationPublisherComp::GetUserLink(const QByteArray& userId) const
 {
-	QString userName;
-	imtbase::IObjectCollection::DataPtr userDataPtr;
-	if (!userId.isEmpty() && m_userCollectionCompPtr.IsValid() && m_userCollectionCompPtr->GetObjectData(userId, userDataPtr)){
-		const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(userDataPtr.GetPtr());
-		if (userInfoPtr != nullptr){
-			userName = userInfoPtr->GetName();
-		}
-	}
-
-	return userId.isEmpty() ? imtnotify::ObjectLinkInfo() : TenantNotification::UserLink(userId, userName);
+	return userId.isEmpty()
+				? imtnotify::ObjectLinkInfo()
+				: TenantNotification::UserLink(userId, TenantNotification::FindUserName(m_userCollectionCompPtr.GetPtr(), userId));
 }
 
 

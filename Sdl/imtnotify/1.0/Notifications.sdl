@@ -140,10 +140,12 @@ input SendNotificationInput {
 	dedupKey: ID
 }
 
+# Empty userIds withdraws the group from the inbox of every user, at most 100 users otherwise
 input WithdrawNotificationsInput {
 	productId: ID
 	tenantId: ID
 	groupKey: ID!
+	userIds: [ID]
 }
 
 type NotificationsSentPayload {

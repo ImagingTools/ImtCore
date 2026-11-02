@@ -212,8 +212,17 @@ void CTicketNotificationProducerComp::OnTicketChanged(const QByteArray& ticketId
 
 	const QByteArray productId = GetProductId();
 
+	// A removed assignee has no access to the ticket any more: the assignment and the messages lead nowhere.
+	// The reporter keeps the access.
 	for (const QByteArray& assigneeId : std::as_const(removedAssignees)){
-		m_notificationSenderCompPtr->Withdraw(productId, QByteArray(), GetAssigneeKey(ticketId, assigneeId));
+		imtnotify::INotificationSender::Audience audience;
+		audience.productId = productId;
+		audience.userIds = {assigneeId};
+
+		m_notificationSenderCompPtr->Withdraw(audience, GetAssigneeKey(ticketId, assigneeId));
+		if (assigneeId != ticketPtr->GetReporterId()){
+			m_notificationSenderCompPtr->Withdraw(audience, GetMessagesKey(ticketId));
+		}
 	}
 
 	if (addedAssignees.isEmpty()){
@@ -253,12 +262,13 @@ void CTicketNotificationProducerComp::OnTicketRemoved(const QByteArray& ticketId
 	}
 
 	// The notifications of a removed ticket lead nowhere
-	const QByteArray productId = GetProductId();
+	imtnotify::INotificationSender::Audience audience;
+	audience.productId = GetProductId();
 	for (const QByteArray& assigneeId : std::as_const(assigneeIds)){
-		m_notificationSenderCompPtr->Withdraw(productId, QByteArray(), GetAssigneeKey(ticketId, assigneeId));
+		m_notificationSenderCompPtr->Withdraw(audience, GetAssigneeKey(ticketId, assigneeId));
 	}
 
-	m_notificationSenderCompPtr->Withdraw(productId, QByteArray(), GetMessagesKey(ticketId));
+	m_notificationSenderCompPtr->Withdraw(audience, GetMessagesKey(ticketId));
 }
 
 

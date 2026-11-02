@@ -163,13 +163,13 @@ bool CNotificationSenderComp::Send(const Audience& audience, const Message& mess
 }
 
 
-bool CNotificationSenderComp::Withdraw(const QByteArray& productId, const QByteArray& tenantId, const QByteArray& groupKey)
+bool CNotificationSenderComp::Withdraw(const Audience& audience, const QByteArray& groupKey)
 {
 	if (groupKey.isEmpty()){
 		return false;
 	}
 
-	if (!m_inboxControllerCompPtr->RemoveGroup(productId, tenantId, groupKey)){
+	if (!m_inboxControllerCompPtr->RemoveGroup(audience.productId, audience.tenantId, groupKey, audience.userIds)){
 		SendErrorMessage(0, QStringLiteral("The notifications of group '%1' could not be withdrawn").arg(QString::fromUtf8(groupKey)), "CNotificationSenderComp");
 
 		return false;

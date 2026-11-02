@@ -267,9 +267,9 @@ void CConnectionCodesNotificationPublisherComp::SendToNotificationCenter(
 					tn::TenantLink(partnerTenantId, FindTenantName(partnerTenantId))));
 	}
 
-	// The owner hears about it inside the organization concerned
+	// The owner hears about it inside the organization concerned, unless the owner made the change
 	tn::Send(m_notificationSenderCompPtr.GetPtr(), targetUserId, tenantId, typeId, subject, GetGroupKey(notificationType, relatedId), severity,
-				imtnotify::ObjectLinkInfo(), arguments);
+				tn::RequestUserLink(m_userCollectionCompPtr.GetPtr()), arguments);
 }
 
 
@@ -288,7 +288,7 @@ QString CConnectionCodesNotificationPublisherComp::FindTenantName(const QByteArr
 void CConnectionCodesNotificationPublisherComp::WithdrawFromNotificationCenter(const QByteArray& tenantId, const QByteArray& groupKey) const
 {
 	if (m_notificationSenderCompPtr.IsValid() && !tenantId.isEmpty() && !groupKey.isEmpty()){
-		m_notificationSenderCompPtr->Withdraw(QByteArray(), tenantId, groupKey);
+		TenantNotification::Withdraw(m_notificationSenderCompPtr.GetPtr(), tenantId, groupKey);
 	}
 }
 

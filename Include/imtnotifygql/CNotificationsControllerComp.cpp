@@ -366,7 +366,21 @@ sdl::V1_0::imtnotify::CNotificationsSentPayload CNotificationsControllerComp::On
 	if (!CanSend(gqlRequest, productId, errorMessage)){
 		return response;
 	}
-	if (!m_senderCompPtr->Withdraw(productId, tenantId, *arguments.input->groupKey)){
+
+	imtnotify::INotificationSender::Audience audience;
+	audience.productId = productId;
+	audience.tenantId = tenantId;
+	if (arguments.input->userIds){
+		audience.userIds = arguments.input->userIds->ToList();
+	}
+
+	if (audience.userIds.size() > s_maxRecipients){
+		errorMessage = QStringLiteral("A group is withdrawn from at most %1 users").arg(s_maxRecipients);
+
+		return response;
+	}
+
+	if (!m_senderCompPtr->Withdraw(audience, *arguments.input->groupKey)){
 		errorMessage = QStringLiteral("The notifications could not be withdrawn");
 
 		return response;

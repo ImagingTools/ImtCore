@@ -3,6 +3,10 @@
 
 
 // ImtCore includes
+#include <imtauth/IUserInfo.h>
+#include <imtbase/IObjectCollection.h>
+#include <imtgql/CGqlRequestContextManager.h>
+#include <imtgql/IGqlContext.h>
 #include <imtnotify/INotificationSender.h>
 
 
@@ -86,6 +90,60 @@ inline imtnotify::ObjectLinkInfo UserLink(const QByteArray& userId, const QStrin
 	retVal.name = userName;
 
 	return retVal;
+}
+
+
+/**
+	The name of a user, empty if the user cannot be read.
+*/
+inline QString FindUserName(const imtbase::IObjectCollection* userCollectionPtr, const QByteArray& userId)
+{
+	imtbase::IObjectCollection::DataPtr userDataPtr;
+	if (userCollectionPtr == nullptr || userId.isEmpty() || !userCollectionPtr->GetObjectData(userId, userDataPtr)){
+		return QString();
+	}
+
+	const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(userDataPtr.GetPtr());
+
+	return userInfoPtr != nullptr ? userInfoPtr->GetName() : QString();
+}
+
+
+/**
+	The user whose request made the change: the actor of its notifications, who is not told about the own action.
+	The name comes from the users: the user of a request context may have none. Empty outside of a request.
+*/
+inline imtnotify::ObjectLinkInfo RequestUserLink(const imtbase::IObjectCollection* userCollectionPtr)
+{
+	const imtgql::IGqlContext* contextPtr = imtgql::CGqlRequestContextManager::GetContext();
+	if (contextPtr == nullptr || contextPtr->GetUserId().isEmpty()){
+		return imtnotify::ObjectLinkInfo();
+	}
+
+	const QByteArray userId = contextPtr->GetUserId();
+	const imtauth::IUserInfo* userInfoPtr = contextPtr->GetUserInfo();
+	QString userName = userInfoPtr != nullptr ? userInfoPtr->GetName() : QString();
+	if (userName.isEmpty()){
+		userName = FindUserName(userCollectionPtr, userId);
+	}
+
+	return UserLink(userId, userName);
+}
+
+
+/**
+	Withdraw a group from every inbox of the tenant.
+*/
+inline bool Withdraw(imtnotify::INotificationSender* senderPtr, const QByteArray& tenantId, const QByteArray& groupKey)
+{
+	if (senderPtr == nullptr){
+		return false;
+	}
+
+	imtnotify::INotificationSender::Audience audience;
+	audience.tenantId = tenantId;
+
+	return senderPtr->Withdraw(audience, groupKey);
 }
 
 

@@ -53,10 +53,10 @@ public:
 	virtual bool Remove(const NotificationScope& scope, const QByteArrayList& ids, QByteArrayList& removedIds) = 0;
 
 	/**
-		Remove the notifications of a group from every inbox of the tenant and product. Its key can be sent again:
-		the dedup keys equal to the group key are forgotten too.
+		Remove the notifications of a group from the inboxes of the tenant and product: of the given users, or of every
+		user when none is given. Its key can be sent again: the dedup keys equal to the group key are forgotten too.
 	*/
-	virtual bool RemoveGroup(const QByteArray& productId, const QByteArray& tenantId, const QByteArray& groupKey) = 0;
+	virtual bool RemoveGroup(const QByteArray& productId, const QByteArray& tenantId, const QByteArray& groupKey, const QByteArrayList& userIds) = 0;
 
 	/**
 		Remove the notifications of a user in a tenant, in every product; an empty tenant removes all of them.
