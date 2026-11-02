@@ -226,11 +226,11 @@ QtObject {
 			return
 		}
 
+		// The count follows the event "Removed", which names only what the server removed
 		for (var i = 0; i < ids.length; i++){
 			var index = root.__findIndex(ids[i])
 			if (index >= 0){
 				root.itemsModel.remove(index)
-				root.totalCount = Math.max(0, root.totalCount - 1)
 			}
 		}
 
@@ -345,7 +345,9 @@ QtObject {
 				if (index >= 0){
 					root.itemsModel.remove(index)
 				}
-				else{
+
+				// An updated group can be older than the loaded rows: it exists already
+				if (kind === "Created" && index < 0){
 					root.totalCount = root.totalCount + 1
 				}
 
@@ -380,11 +382,13 @@ QtObject {
 		}
 		else if (kind === "Removed"){
 			for (var k = 0; k < ids.length; k++){
+				// Also a row that is not loaded yet, or one this session removed already
 				var removedIndex = root.__findIndex(ids[k])
 				if (removedIndex >= 0){
 					root.itemsModel.remove(removedIndex)
-					root.totalCount = Math.max(0, root.totalCount - 1)
 				}
+
+				root.totalCount = Math.max(0, root.totalCount - 1)
 			}
 		}
 

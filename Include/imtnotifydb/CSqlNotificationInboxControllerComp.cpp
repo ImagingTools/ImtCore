@@ -223,29 +223,41 @@ bool CSqlNotificationInboxControllerComp::RemoveExpired(const QDateTime& created
 	QVariantMap bindValues;
 	bindValues.insert(QStringLiteral(":CreatedBefore"), TimeToText(createdBefore));
 
+	// A portion is removed whole or not at all, and the sessions learn it after the commit
+	if (!m_databaseEngineCompPtr->BeginTransaction()){
+		SendErrorMessage(0, QStringLiteral("A notification transaction could not be started"), "CSqlNotificationInboxControllerComp");
+
+		return false;
+	}
+
 	QSqlQuery dedupQuery;
-	if (!ExecQuery(
+	QSqlQuery sqlQuery;
+	QByteArrayList removedIds;
+	QList<InboxChange> changes;
+	bool retVal = ExecQuery(
 				QStringLiteral(
 							R"(DELETE FROM %1 WHERE ("ProductId", "TenantId", "RecipientId", "DedupKey") IN )"
 							R"((SELECT "ProductId", "TenantId", "RecipientId", "DedupKey" FROM %1 WHERE "CreatedAt" < :CreatedBefore LIMIT %2))")
 							.arg(s_dedupTableName).arg(maxCount),
 				bindValues,
-				dedupQuery)){
-		return false;
-	}
+				dedupQuery);
 
-	const int removedKeyCount = dedupQuery.numRowsAffected();
+	const int removedKeyCount = retVal ? dedupQuery.numRowsAffected() : 0;
 
-	QSqlQuery sqlQuery;
-	QByteArrayList removedIds;
-	if (!ExecQuery(
+	retVal = retVal && ExecQuery(
 				QStringLiteral(
 							R"(DELETE FROM %1 WHERE "Id" IN (SELECT "Id" FROM %1 WHERE "CreatedAt" < :CreatedBefore LIMIT %2) RETURNING %3)")
 							.arg(s_tableName).arg(maxCount).arg(s_changedRowColumns),
 				bindValues,
-				sqlQuery) || !ReadChangedRows(sqlQuery, imtnotify::NotificationChange::K_REMOVED, removedIds)){
+				sqlQuery) && ReadInboxChanges(sqlQuery, removedIds, changes);
+
+	if (!retVal || !m_databaseEngineCompPtr->FinishTransaction()){
+		m_databaseEngineCompPtr->CancelTransaction();
+
 		return false;
 	}
+
+	PublishChanges(imtnotify::NotificationChange::K_REMOVED, changes);
 
 	isComplete = removedIds.size() < maxCount && removedKeyCount < maxCount;
 
