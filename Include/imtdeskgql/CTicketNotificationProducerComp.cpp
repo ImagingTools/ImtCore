@@ -329,8 +329,12 @@ imtnotify::ObjectLinkInfo CTicketNotificationProducerComp::GetCurrentActor() con
 		retVal.id = contextPtr->GetUserId();
 		retVal.typeId = QByteArrayLiteral("User");
 
+		// A product server may have no user in the context: the name comes from the users then, as for a message
 		const imtauth::IUserInfo* userInfoPtr = contextPtr->GetUserInfo();
 		retVal.name = userInfoPtr != nullptr ? userInfoPtr->GetName() : QString();
+		if (retVal.name.isEmpty()){
+			retVal.name = FindUserName(retVal.id);
+		}
 	}
 
 	return retVal;
