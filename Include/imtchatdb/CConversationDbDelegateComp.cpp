@@ -199,6 +199,12 @@ QByteArray CConversationDbDelegateComp::CreateDescriptionObjectQuery(
 }
 
 
+QString CConversationDbDelegateComp::GetCreationTimeColumn() const
+{
+	return QStringLiteral("CreatedAt");
+}
+
+
 idoc::MetaInfoPtr CConversationDbDelegateComp::CreateObjectMetaInfo(const QByteArray& typeId) const
 {
 	return BaseClass::CreateObjectMetaInfo(typeId);

@@ -59,6 +59,7 @@ protected:
 	// reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
 	virtual idoc::MetaInfoPtr CreateObjectMetaInfo(const QByteArray& typeId) const override;
 	virtual bool SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const override;
+	virtual QString GetCreationTimeColumn() const override;
 
 private:
 	I_FACT(imtchat::IConversation, m_conversationFactCompPtr);

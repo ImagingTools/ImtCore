@@ -32,46 +32,6 @@ const int s_maxFilterDepth = 4;
 const int s_maxSearchWords = 10;
 
 
-QDateTime AddTimeUnits(const QDateTime& time, imtbase::ITimeFilterParam::TimeUnit unit, int count)
-{
-	switch (unit){
-	case imtbase::ITimeFilterParam::TU_HOUR:
-		return time.addSecs(qint64(count) * 3600);
-	case imtbase::ITimeFilterParam::TU_DAY:
-		return time.addDays(count);
-	case imtbase::ITimeFilterParam::TU_WEEK:
-		return time.addDays(qint64(count) * 7);
-	case imtbase::ITimeFilterParam::TU_MONTH:
-		return time.addMonths(count);
-	case imtbase::ITimeFilterParam::TU_YEAR:
-		return time.addYears(count);
-	default:
-		return time;
-	}
-}
-
-
-QDateTime GetTimeUnitStart(const QDateTime& time, imtbase::ITimeFilterParam::TimeUnit unit)
-{
-	const QDate date = time.date();
-
-	switch (unit){
-	case imtbase::ITimeFilterParam::TU_HOUR:
-		return QDateTime(date, QTime(time.time().hour(), 0), QTimeZone::UTC);
-	case imtbase::ITimeFilterParam::TU_DAY:
-		return QDateTime(date, QTime(0, 0), QTimeZone::UTC);
-	case imtbase::ITimeFilterParam::TU_WEEK:
-		return QDateTime(date.addDays(1 - date.dayOfWeek()), QTime(0, 0), QTimeZone::UTC);
-	case imtbase::ITimeFilterParam::TU_MONTH:
-		return QDateTime(QDate(date.year(), date.month(), 1), QTime(0, 0), QTimeZone::UTC);
-	case imtbase::ITimeFilterParam::TU_YEAR:
-		return QDateTime(QDate(date.year(), 1, 1), QTime(0, 0), QTimeZone::UTC);
-	default:
-		return time;
-	}
-}
-
-
 QByteArray GetIdParam(const iprm::IParamsSet& params, const QByteArray& paramId)
 {
 	iprm::TParamsPtr<iprm::IIdParam> idParamPtr(&params, paramId, false);
@@ -317,30 +277,9 @@ bool CNotificationDbDelegateComp::CreateTimeFilterQuery(
 	timeFilterQuery.clear();
 
 	// The units are counted in UTC
-	const QDateTime now = QDateTime::currentDateTimeUtc();
-	const imtbase::ITimeFilterParam::TimeUnit unit = timeFilter.GetTimeUnit();
-
 	QDateTime begin;
 	QDateTime end;
-	if (unit == imtbase::ITimeFilterParam::TU_CUSTOM){
-		const imtbase::CTimeRange timeRange = timeFilter.GetTimeRange();
-		begin = timeRange.GetBeginTime();
-		end = timeRange.GetEndTime();
-	}
-	else{
-		switch (timeFilter.GetInterpretationMode()){
-		case imtbase::ITimeFilterParam::IM_FOR:
-			begin = AddTimeUnits(now, unit, -qMax(1, timeFilter.GetUnitMultiplier()));
-			break;
-		case imtbase::ITimeFilterParam::IM_CURRENT:
-			begin = GetTimeUnitStart(now, unit);
-			break;
-		case imtbase::ITimeFilterParam::IM_LAST:
-			end = GetTimeUnitStart(now, unit);
-			begin = AddTimeUnits(end, unit, -1);
-			break;
-		}
-	}
+	imtdb::GetTimeFilterBounds(timeFilter, QDateTime::currentDateTimeUtc(), begin, end);
 
 	QStringList conditions;
 	if (begin.isValid()){
