@@ -90,7 +90,7 @@ void CHttpBodyPolicyRouterComp::OnComponentCreated()
 	BaseClass::OnComponentCreated();
 
 	if (!m_defaultPolicyCompPtr.IsValid()){
-		SendErrorMessage(0, QStringLiteral("The default policy is not set, the requests with a body whose path does not match any of the prefixes will be refused"));
+		SendErrorMessage(0, QStringLiteral("The default policy is not set, all the requests whose path does not match any of the prefixes (with or without a body) will be refused with 500"));
 	}
 
 	if (m_pathPrefixesAttrPtr.GetCount() != m_policiesCompPtr.GetCount()){

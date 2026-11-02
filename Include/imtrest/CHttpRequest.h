@@ -177,6 +177,11 @@ private:
 
 	QByteArray CreateRejectMessage() const;
 
+	/**
+		The request is made by a client of HTTP/1.1 or newer.
+	*/
+	bool IsHttp11() const;
+
 protected:
 	http_parser m_httpParser;
 	QHostAddress m_remoteAddress;

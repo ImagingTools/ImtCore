@@ -674,13 +674,14 @@ void CHttpRequestTest::ConnectionPersistenceTest_data()
 	QTest::addColumn<QByteArray>("request");
 	QTest::addColumn<bool>("isPersistent");
 
-	// RFC 9112, section 9.3: HTTP/1.1 is persistent unless the client says "close", HTTP/1.0 only with "keep-alive"
+	// RFC 9112, section 9.3: HTTP/1.1 is persistent unless the client says "close", HTTP/1.0 only with "keep-alive" that the server
+	// confirms in the response. The sender does not confirm it, so the connection of HTTP/1.0 is always closed
 	QTest::newRow("HTTP/1.1") << QByteArray("GET / HTTP/1.1\r\nHost: a\r\n\r\n") << true;
 	QTest::newRow("HTTP/1.1 close") << QByteArray("GET / HTTP/1.1\r\nConnection: close\r\n\r\n") << false;
 	QTest::newRow("HTTP/1.1 Close") << QByteArray("GET / HTTP/1.1\r\nConnection: Close\r\n\r\n") << false;
 	QTest::newRow("HTTP/1.1 keep-alive") << QByteArray("GET / HTTP/1.1\r\nConnection: keep-alive\r\n\r\n") << true;
 	QTest::newRow("HTTP/1.0") << QByteArray("GET / HTTP/1.0\r\n\r\n") << false;
-	QTest::newRow("HTTP/1.0 keep-alive") << QByteArray("GET / HTTP/1.0\r\nConnection: keep-alive\r\n\r\n") << true;
+	QTest::newRow("HTTP/1.0 keep-alive") << QByteArray("GET / HTTP/1.0\r\nConnection: keep-alive\r\n\r\n") << false;
 	QTest::newRow("HTTP/1.0 close") << QByteArray("GET / HTTP/1.0\r\nConnection: close\r\n\r\n") << false;
 	QTest::newRow("POST with body") << QByteArray("POST / HTTP/1.1\r\nContent-Length: 2\r\nConnection: close\r\n\r\nhi") << false;
 }
