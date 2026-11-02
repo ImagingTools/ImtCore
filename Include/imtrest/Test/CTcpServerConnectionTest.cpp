@@ -158,12 +158,14 @@ struct SServer
 	/**
 		Answer all requests that the servlet keeps with \c 200, the body of the response is the path of the request.
 	*/
-	int RespondToHeld()
+	int RespondToHeld(int bodySize = -1)
 	{
 		const QList<CHoldingServletComp::SHeldRequest> heldList = servlet->TakeHeld();
 
 		for (const CHoldingServletComp::SHeldRequest& held : heldList){
-			imtrest::ConstResponsePtr responsePtr(engine->CreateResponse(*held.requestPtr, imtrest::IProtocolEngine::SC_OK, held.path, QByteArrayLiteral("text/plain")).PopInterfacePtr());
+			const QByteArray body = (bodySize >= 0) ? QByteArray(bodySize, 'x') : held.path;
+
+			imtrest::ConstResponsePtr responsePtr(engine->CreateResponse(*held.requestPtr, imtrest::IProtocolEngine::SC_OK, body, QByteArrayLiteral("text/plain")).PopInterfacePtr());
 
 			imtrest::IResponseDispatcher* dispatcherPtr = &server;
 			dispatcherPtr->SendResponse(held.requestId, responsePtr);
@@ -192,8 +194,27 @@ public:
 	CClient()
 	{
 		QObject::connect(&m_socket, &QTcpSocket::readyRead, &m_socket, [this](){
-			m_received.append(m_socket.readAll());
+			if (m_isReading){
+				m_received.append(m_socket.readAll());
+			}
 		});
+	}
+
+	/**
+		A client that does not read: the responses stay in the buffers of the connection.
+	*/
+	void SetReading(bool isReading)
+	{
+		m_isReading = isReading;
+
+		if (m_isReading && (m_socket.bytesAvailable() > 0)){
+			m_received.append(m_socket.readAll());
+		}
+	}
+
+	void SendRaw(const QByteArray& data)
+	{
+		m_socket.write(data);
 	}
 
 	bool Connect(int port)
@@ -231,6 +252,7 @@ public:
 private:
 	QTcpSocket m_socket;
 	QByteArray m_received;
+	bool m_isReading = true;
 };
 
 
@@ -419,6 +441,54 @@ void CTcpServerConnectionTest::NextRequestIsReceivedAfterResponseTest()
 
 	QCOMPARE(server.RespondToHeld(), 1);
 	QTRY_COMPARE_WITH_TIMEOUT(client.GetResponseCount(), 2, 5000);
+}
+
+
+// A client that does not read its responses sends many requests at once (pipelining). The next request is not handled before the
+// response to the previous one is delivered to the network, otherwise the responses pile up in the memory of the server.
+void CTcpServerConnectionTest::PipelinedRequestsWaitForResponseToBeDeliveredTest()
+{
+	SServer server(5);
+	QVERIFY(server.IsListening());
+
+	CClient client;
+	QVERIFY(client.Connect(server.port));
+
+	client.GetSocket().setReadBufferSize(64 * 1024);
+	client.SetReading(false);
+
+	const int requestCount = 30;
+	const int bodySize = int(2 * s_mebibyte);
+
+	QByteArray requests;
+	for (int i = 0; i < requestCount; ++i){
+		requests += "GET /r" + QByteArray::number(i) + " HTTP/1.1\r\nHost: test\r\n\r\n";
+	}
+	client.SendRaw(requests);
+
+	int respondedCount = 0;
+	QElapsedTimer timer;
+	timer.start();
+	while (timer.elapsed() < 2000){
+		respondedCount += server.RespondToHeld(bodySize);
+		QTest::qWait(10);
+	}
+
+	// The buffers of the network take only a few responses, the others wait for the client
+	QVERIFY2(respondedCount <= 12, qPrintable(QStringLiteral("The server has handled %1 of %2 requests (%3 MiB of responses) while the client reads nothing")
+				.arg(respondedCount).arg(requestCount).arg(respondedCount * bodySize / s_mebibyte)));
+
+	// The client reads again: all requests are served in their order
+	client.SetReading(true);
+
+	timer.restart();
+	while ((timer.elapsed() < 30000) && (respondedCount < requestCount)){
+		respondedCount += server.RespondToHeld(bodySize);
+		QTest::qWait(10);
+	}
+
+	QCOMPARE(respondedCount, requestCount);
+	QTRY_COMPARE_WITH_TIMEOUT(client.GetResponseCount(), requestCount, 30000);
 }
 
 

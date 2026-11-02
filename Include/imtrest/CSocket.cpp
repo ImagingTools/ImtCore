@@ -16,9 +16,9 @@ namespace
 {
 
 
-// While a request is handled nobody reads the socket, and Qt does not limit its read buffer by default: a client could fill the
-// memory of the server with the data of the next request, that is not parsed yet and so is not limited by the policy of the body
-// or by the timeouts. With the limit Qt stops reading from the network, and TCP slows the client down. The limit is not exact:
+// While a request is handled and its response is sent, nobody reads the socket, and Qt does not limit its read buffer by default:
+// a client could fill the memory of the server with the data of the next request, that is not parsed yet and so is not limited by
+// the policy of the body or by the timeouts. With the limit Qt stops reading from the network, and TCP slows the client down. The limit is not exact:
 // the part that is read already stays in the buffer (for TLS it is a whole record or more).
 const qint64 s_busyReadBufferSize = qint64(64) * 1024;
 
@@ -74,6 +74,9 @@ CSocket::CSocket(CSocketThread* rootSocket, IRequest* request, bool secureConnec
 
 	connect(m_socket.data(), &QTcpSocket::disconnected, this, &CSocket::Disconnected, Qt::DirectConnection);
 	connect(m_socket.data(), &QTcpSocket::readyRead, this, &CSocket::HandleReadyRead, Qt::DirectConnection);
+
+	// After the watcher, that is connected earlier: it has registered the written data when the request is finished
+	connect(m_socket.data(), &QTcpSocket::bytesWritten, this, &CSocket::OnBytesWritten, Qt::DirectConnection);
 }
 
 
@@ -265,20 +268,39 @@ void CSocket::OnSendStreamingResponse(imtrest::ConstResponsePtr response, bool i
 
 // private methods
 
+void CSocket::OnBytesWritten()
+{
+	if (m_isFinishPending){
+		FinishRequest();
+	}
+}
+
+
 void CSocket::FinishRequest()
 {
-	if (m_isRequestInProgress){
-		m_isRequestInProgress = false;
+	if (!m_isRequestInProgress){
+		return;
+	}
 
-		// The socket is read again: the limit is removed, so Qt goes on reading from the network
-		if (!m_socket.isNull()){
-			m_socket->setReadBufferSize(0);
-		}
+	// The response is written to the socket, but a slow client can be still receiving it. The next request waits until the written data
+	// are sent, otherwise the responses of the pipelined requests pile up in the memory. The read limit stays meanwhile.
+	if (!m_socket.isNull() && m_socket->isOpen() && (m_socket->bytesToWrite() > 0)){
+		m_isFinishPending = true;
 
-		// The next request can be already in the socket, no signal will tell about it
-		if (!m_socket.isNull() && (m_socket->bytesAvailable() > 0)){
-			QMetaObject::invokeMethod(this, &CSocket::HandleReadyRead, Qt::QueuedConnection);
-		}
+		return;
+	}
+
+	m_isFinishPending = false;
+	m_isRequestInProgress = false;
+
+	// The socket is read again: the limit is removed, so Qt goes on reading from the network
+	if (!m_socket.isNull()){
+		m_socket->setReadBufferSize(0);
+	}
+
+	// The next request can be already in the socket, no signal will tell about it
+	if (!m_socket.isNull() && (m_socket->bytesAvailable() > 0)){
+		QMetaObject::invokeMethod(this, &CSocket::HandleReadyRead, Qt::QueuedConnection);
 	}
 }
 

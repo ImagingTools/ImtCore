@@ -22,6 +22,9 @@ private slots:
 	void ReadBufferIsLimitedWhileRequestIsHandledTest();
 	void NextRequestIsReceivedAfterResponseTest();
 
+	// The pipelined requests must not pile up their responses in the memory while a slow client does not read the previous one
+	void PipelinedRequestsWaitForResponseToBeDeliveredTest();
+
 	// More connections than threads: the connections wait in the queue and are served one after another
 	void QueuedConnectionsAreServedTest();
 };
