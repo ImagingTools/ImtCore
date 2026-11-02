@@ -325,9 +325,11 @@ class ImtCoreConan(ConanFile):
         self.cpp_info.bindirs = []
         self.cpp_info.includedirs = [os.path.join("AuxInclude", self._include_folder_suffix()), "Include", "Impl"]
         self.cpp_info.libdirs = [os.path.join("Lib", self._build_folder_suffix())]
-        # prioritize base libs on which other libs depend
-        libs = 'imtappsdl imtapp imtbasesdl imtdesign imtbase'.split()
-        self.cpp_info.libs = [lib for lib in self._collect_libs() if lib not in libs] + libs
+        # prioritize base libs on which other libs depend, a lib goes before the libs it depends on
+        libs = ('imtaccount imtappsdl imtapp imtauth imtgui imtdb imtdoc imtcol imthype imtlog imtreport imtsdl '
+                'imtserverapp imtbasesdl imtservice imtrest imtcom imtgql imtlic imtstyle imtwidgets imtdesign imtbase').split()
+        collected = self._collect_libs()
+        self.cpp_info.libs = [lib for lib in collected if lib not in libs] + [lib for lib in libs if lib in collected]
 
         # To support editable mode we need explicitly assign same values to conan v2 fields,
         # probably limitation of conan 1.x when using v2 features
