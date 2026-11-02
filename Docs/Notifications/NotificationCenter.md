@@ -139,7 +139,7 @@ Component.onCompleted: {
 
 `NotificationsPage` shows the whole collection of the user in the current tenant and product. The list is the ordinary server collection `Notifications` in a `RemoteCollectionView`:
 
-- search, the filters State (unread / read), Severity, Type and the date filter of the filter panel, sorting by the columns, paging — all done by the server;
+- search, the switch "Unread only", the filters Severity and Type and the date filter of the filter panel, sorting by the columns, paging — all done by the server;
 - the unread count as a badge on the menu entry of the page (`UpdatePageVisualStatus` with `badge`) and on `NotificationBell`;
 - the commands come from the server like those of every collection: `CommandsController` with `TypeId` `Notifications` in `NotificationCenter.acc` (`MarkAsRead`, the standard `Remove`, `MarkAllAsRead`), forwarded by `RemoteCommandsController` on a product server. The page enables them by the selection and the unread count; `Remove` is the standard `RemoveElements` of the collection, which `CNotificationCollectionControllerComp` does through the inbox of the caller, so the sessions learn it;
 - a double click marks the notification read and opens its object, as a click in the panel does;

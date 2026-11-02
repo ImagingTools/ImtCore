@@ -134,7 +134,7 @@ RemoteCollectionView {
 
 	Component.onCompleted: {
 		notificationsPage.table.setSortingInfo("createdAt", "DESC")
-		notificationsPage.registerFieldFilterDelegate("readFilter", readFilterComp)
+		notificationsPage.registerFieldFilterDelegate("unreadOnlyFilter", unreadOnlyFilterComp)
 		notificationsPage.registerFieldFilterDelegate("severityFilter", severityFilterComp)
 		notificationsPage.registerFieldFilterDelegate("typeFilter", typeFilterComp)
 	}
@@ -310,18 +310,16 @@ RemoteCollectionView {
 		TableCellDateDelegate {}
 	}
 
+	// One click to what is still to be seen
 	Component {
-		id: readFilterComp
+		id: unreadOnlyFilterComp
 
-		FieldFilterDelegate {
-			name: qsTr("State")
+		EnableableFilterDelegate {
+			name: qsTr("Unread only")
 			defaultFieldFilter.m_fieldId: "isRead"
 			defaultFieldFilter.m_filterValueType: "Bool"
-
-			Component.onCompleted: {
-				createAndAddOption("false", qsTr("Unread"), "", true)
-				createAndAddOption("true", qsTr("Read"), "", true)
-			}
+			defaultFieldFilter.m_filterOperations: ["Equal"]
+			filterValue: "false"
 		}
 	}
 
