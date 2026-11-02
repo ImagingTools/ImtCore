@@ -7,6 +7,7 @@
 #include <QSet>
 
 // ImtCore includes
+#include <imtauthgql/TenantNotifications.h>
 #include <imtgql/CGqlRequest.h>
 #include <imtgql/IGqlContext.h>
 #include <imtauth/TenantEvents.h>
@@ -135,11 +136,25 @@ void CCrossTenantMessageNotificationPublisherComp::OnModelChanged(int /*modelId*
 
 		if (isCreated){
 			// A new message goes to the owner of the target organization
+			const QByteArray ownerUserId = FindTenantOwnerUserId(message.targetTenantId);
+			const QString sourceTenantName = FindTenantName(message.sourceTenantId);
 			PublishNotification(
-						FindTenantOwnerUserId(message.targetTenantId),
+						ownerUserId,
 						sdl::V1_0::imtauth::ECrossTenantMessageNotificationType::MessageReceived,
 						message,
-						FindTenantName(message.sourceTenantId));
+						sourceTenantName);
+
+			imtnotify::ObjectLinkInfo subject;
+			subject.id = message.messageId;
+			subject.typeId = QByteArrayLiteral("CrossTenantMessage");
+			subject.name = sourceTenantName;
+
+			TenantNotification::Send(
+						m_notificationSenderCompPtr.GetPtr(),
+						ownerUserId,
+						message.targetTenantId,
+						TenantNotification::s_crossTenantMessageReceived,
+						subject);
 		}
 		else{
 			// The answer flows back to the owner of the source organization

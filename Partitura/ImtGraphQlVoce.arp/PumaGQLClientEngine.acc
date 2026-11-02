@@ -94,6 +94,7 @@
                                 <Value>RemoteProfileController</Value>
                                 <Value>JwtSessionControllerProxy</Value>
                                 <Value>RemotePersonalAccessTokenController</Value>
+                                <Value>RemoteNotificationCenter</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -242,6 +243,30 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="RemoteNotificationCenter" PackageId="ImtCoreVoce" ComponentId="RemoteNotificationCenter">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApiClient"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProductId" Type="Id" ExportId="ProductId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProductNotificationTypes" Type="Reference[]" ExportId="ProductNotificationTypes">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -745,5 +770,6 @@
         <Component ExportedId="UserGroupInfoProvider" ComponentId="RemoteRepositories/UserGroupInfoProvider"/>
         <Component ExportedId="UserRemoteRepository" ComponentId="RemoteRepositories/UserRemoteRepository"/>
         <Component ExportedId="UserSessionRemoteRepository" ComponentId="RemoteRepositories/UserSessionRemoteRepository"/>
+        <Component ExportedId="NotificationSender" ComponentId="RemoteNotificationCenter/NotificationSender"/>
     </ExportedComponents>
 </Acf>

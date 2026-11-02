@@ -185,6 +185,206 @@
 <context>
     <name>Attribute</name>
     <message>
+        <source>{actor} invited you to &quot;{subject}&quot;</source>
+        <translation>Приглашение в «{subject}» от {actor}</translation>
+    </message>
+    <message>
+        <source>{actor} accepted the invitation to &quot;{subject}&quot;</source>
+        <translation>Приглашение в «{subject}» принято: {actor}</translation>
+    </message>
+    <message>
+        <source>{actor} declined the invitation to &quot;{subject}&quot;</source>
+        <translation>Приглашение в «{subject}» отклонено: {actor}</translation>
+    </message>
+    <message>
+        <source>The invitation to &quot;{subject}&quot; was withdrawn</source>
+        <translation>Приглашение в «{subject}» отозвано</translation>
+    </message>
+    <message>
+        <source>You are now the owner of &quot;{subject}&quot;</source>
+        <translation>Теперь вы владелец «{subject}»</translation>
+    </message>
+    <message>
+        <source>{member} is now the owner of &quot;{subject}&quot;</source>
+        <translation>Новый владелец «{subject}»: {member}</translation>
+    </message>
+    <message>
+        <source>Your permissions in &quot;{subject}&quot; were changed</source>
+        <translation>Ваши права в «{subject}» изменены</translation>
+    </message>
+    <message>
+        <source>You are no longer a member of &quot;{subject}&quot;</source>
+        <translation>Вы больше не участник «{subject}»</translation>
+    </message>
+    <message>
+        <source>{member} is no longer a member of &quot;{subject}&quot;</source>
+        <translation>{member} больше не участник «{subject}»</translation>
+    </message>
+    <message>
+        <source>New message from &quot;{subject}&quot;</source>
+        <translation>Новое сообщение от «{subject}»</translation>
+    </message>
+    <message>
+        <source>&quot;{partner}&quot; wants to connect to &quot;{subject}&quot;</source>
+        <translation>«{partner}» хочет подключиться к «{subject}»</translation>
+    </message>
+    <message>
+        <source>&quot;{partner}&quot; accepted the connection request of &quot;{subject}&quot;</source>
+        <translation>Запрос «{subject}» на подключение к «{partner}» принят</translation>
+    </message>
+    <message>
+        <source>&quot;{partner}&quot; declined the connection request of &quot;{subject}&quot;</source>
+        <translation>Запрос «{subject}» на подключение к «{partner}» отклонён</translation>
+    </message>
+    <message>
+        <source>The connection of &quot;{subject}&quot; with &quot;{partner}&quot; was removed</source>
+        <translation>Подключение «{subject}» к «{partner}» удалено</translation>
+    </message>
+    <message>
+        <source>&quot;{partner}&quot; proposes a relationship to &quot;{subject}&quot;</source>
+        <translation>«{partner}» предлагает связь с «{subject}»</translation>
+    </message>
+    <message>
+        <source>The relationship of &quot;{subject}&quot; with &quot;{partner}&quot; was accepted</source>
+        <translation>Связь «{subject}» с «{partner}» принята</translation>
+    </message>
+    <message>
+        <source>The relationship proposal of &quot;{subject}&quot; with &quot;{partner}&quot; was declined</source>
+        <translation>Предложение о связи «{subject}» с «{partner}» отклонено</translation>
+    </message>
+    <message>
+        <source>The relationship of &quot;{subject}&quot; with &quot;{partner}&quot; ended</source>
+        <translation>Связь «{subject}» с «{partner}» завершена</translation>
+    </message>
+    <message>
+        <source>{count, plural, =1 {New message in &quot;{subject}&quot;} other {# new messages in &quot;{subject}&quot;}}</source>
+        <translation>{count, plural, =1 {Новое сообщение в «{subject}»} one {# новое сообщение в «{subject}»} few {# новых сообщения в «{subject}»} many {# новых сообщений в «{subject}»} other {# нового сообщения в «{subject}»}}</translation>
+    </message>
+    <message>
+        <source>{actor} assigned you to &quot;{subject}&quot;</source>
+        <translation>{actor} назначает вас на «{subject}»</translation>
+    </message>
+    <message>
+        <source>Organization</source>
+        <translation>Организация</translation>
+    </message>
+    <message>
+        <source>Connection request</source>
+        <translation>Запрос на подключение</translation>
+    </message>
+    <message>
+        <source>Connection</source>
+        <translation>Подключение</translation>
+    </message>
+    <message>
+        <source>Relationship proposal</source>
+        <translation>Предложение о связи</translation>
+    </message>
+    <message>
+        <source>Relationship</source>
+        <translation>Связь</translation>
+    </message>
+    <message>
+        <source>Message from organization</source>
+        <translation>Сообщение от организации</translation>
+    </message>
+    <message>
+        <source>Invitation received</source>
+        <translation>Получено приглашение</translation>
+    </message>
+    <message>
+        <source>Invitation accepted</source>
+        <translation>Приглашение принято</translation>
+    </message>
+    <message>
+        <source>Invitation declined</source>
+        <translation>Приглашение отклонено</translation>
+    </message>
+    <message>
+        <source>Invitation withdrawn</source>
+        <translation>Приглашение отозвано</translation>
+    </message>
+    <message>
+        <source>Ownership received</source>
+        <translation>Вы стали владельцем</translation>
+    </message>
+    <message>
+        <source>Ownership transferred</source>
+        <translation>Владение передано</translation>
+    </message>
+    <message>
+        <source>Permissions changed</source>
+        <translation>Права изменены</translation>
+    </message>
+    <message>
+        <source>Membership ended</source>
+        <translation>Участие завершено</translation>
+    </message>
+    <message>
+        <source>Member left</source>
+        <translation>Участник вышел</translation>
+    </message>
+    <message>
+        <source>Connection request received</source>
+        <translation>Получен запрос на подключение</translation>
+    </message>
+    <message>
+        <source>Connection request approved</source>
+        <translation>Запрос на подключение одобрен</translation>
+    </message>
+    <message>
+        <source>Connection request rejected</source>
+        <translation>Запрос на подключение отклонён</translation>
+    </message>
+    <message>
+        <source>Connection removed</source>
+        <translation>Подключение удалено</translation>
+    </message>
+    <message>
+        <source>Relationship proposal received</source>
+        <translation>Получено предложение о связи</translation>
+    </message>
+    <message>
+        <source>Relationship proposal approved</source>
+        <translation>Предложение о связи одобрено</translation>
+    </message>
+    <message>
+        <source>Relationship proposal rejected</source>
+        <translation>Предложение о связи отклонено</translation>
+    </message>
+    <message>
+        <source>Relationship ended</source>
+        <translation>Связь прекращена</translation>
+    </message>
+    <message>
+        <source>New message</source>
+        <translation>Новое сообщение</translation>
+    </message>
+    <message>
+        <source>Ticket assigned</source>
+        <translation>Назначена заявка</translation>
+    </message>
+    <message>
+        <source>Notifications</source>
+        <translation>Уведомления</translation>
+    </message>
+    <message>
+        <source>Notification</source>
+        <translation>Уведомление</translation>
+    </message>
+    <message>
+        <source>Severity</source>
+        <translation>Важность</translation>
+    </message>
+    <message>
+        <source>Mark as read</source>
+        <translation>Отметить как прочитанное</translation>
+    </message>
+    <message>
+        <source>Mark all as read</source>
+        <translation>Отметить все как прочитанные</translation>
+    </message>
+    <message>
         <source>Parent organization</source>
         <translation>Родительская организация</translation>
     </message>
@@ -12967,6 +13167,108 @@ ID входных данных: </translation>
     <message>
         <source>Copy the full path</source>
         <translation>Скопировать полный путь</translation>
+    </message>
+</context>
+<context>
+    <name>NotificationBell</name>
+    <message>
+        <source>Notifications</source>
+        <translation>Уведомления</translation>
+    </message>
+    <message>
+        <source>Notifications: %1 unread</source>
+        <translation>Уведомления: непрочитанных %1</translation>
+    </message>
+</context>
+<context>
+    <name>NotificationDelegate</name>
+    <message>
+        <source>Mark as read</source>
+        <translation>Отметить как прочитанное</translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation>Удалить</translation>
+    </message>
+</context>
+<context>
+    <name>NotificationPanel</name>
+    <message>
+        <source>All notifications</source>
+        <translation>Все уведомления</translation>
+    </message>
+    <message>
+        <source>Mark all as read</source>
+        <translation>Отметить все как прочитанные</translation>
+    </message>
+    <message>
+        <source>No notifications</source>
+        <translation>Нет уведомлений</translation>
+    </message>
+    <message>
+        <source>Notifications</source>
+        <translation>Уведомления</translation>
+    </message>
+</context>
+<context>
+    <name>NotificationCenter</name>
+    <message>
+        <source>%1 new notifications while you were away</source>
+        <translation>Новых уведомлений, пока вас не было: %1</translation>
+    </message>
+</context>
+<context>
+    <name>NotificationsPage</name>
+    <message>
+        <source>Critical</source>
+        <translation>Критично</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Ошибка</translation>
+    </message>
+    <message>
+        <source>Information</source>
+        <translation>Информация</translation>
+    </message>
+    <message>
+        <source>Read</source>
+        <translation>Прочитанные</translation>
+    </message>
+    <message>
+        <source>Remove the selected notifications?</source>
+        <translation>Удалить выбранные уведомления?</translation>
+    </message>
+    <message>
+        <source>Removing notifications</source>
+        <translation>Удаление уведомлений</translation>
+    </message>
+    <message>
+        <source>Severity</source>
+        <translation>Важность</translation>
+    </message>
+    <message>
+        <source>State</source>
+        <translation>Состояние</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Тип</translation>
+    </message>
+    <message>
+        <source>Unread</source>
+        <translation>Непрочитанные</translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation>Предупреждение</translation>
+    </message>
+</context>
+<context>
+    <name>NotificationTypeRegistry</name>
+    <message>
+        <source>%1 &quot;%2&quot;</source>
+        <translation>%1 «%2»</translation>
     </message>
 </context>
 </TS>

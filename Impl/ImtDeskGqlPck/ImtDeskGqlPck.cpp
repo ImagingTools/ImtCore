@@ -31,14 +31,9 @@ I_EXPORT_COMPONENT(
 			"Entity Context Tickets Controller");
 
 I_EXPORT_COMPONENT(
-			TicketMessageNotifier,
-			"Ticket message subscription publisher (notifies ticket reporter/assignees about new messages)",
-			"Ticket Message Notifier");
-
-I_EXPORT_COMPONENT(
-			TicketAssigneeNotifier,
-			"Ticket assignee change subscription publisher (notifies newly added assignees)",
-			"Ticket Assignee Notifier");
+			TicketNotificationProducer,
+			"Sends the notifications of the tickets (new messages, new assignees) to the notification center",
+			"Ticket Notification Producer");
 
 
 } // namespace ImtDeskGqlPck

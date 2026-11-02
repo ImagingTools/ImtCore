@@ -65,6 +65,12 @@
         <Element Id="DeskController" PackageId="ImtDeskVoce" ComponentId="DeskController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ProductId" Type="Id" ExportId="ProductId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="NotificationSender" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaClientEngine/NotificationSender"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -191,6 +197,9 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProductNotificationTypes" Type="Reference[]" ExportId="ProductNotificationTypes">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -340,5 +349,7 @@
         <Component ExportedId="UserSessionRemoteRepository" ComponentId="PumaClientEngine/UserSessionRemoteRepository"/>
         <Component ExportedId="UserSettingsRepository" ComponentId="UserSettingsRepository/UserSettingsRepository"/>
         <Component ExportedId="WebSocketServerFramework" ComponentId="WebSocketServerFramework"/>
+        <Component ExportedId="NotificationSender" ComponentId="PumaClientEngine/NotificationSender"/>
+        <Component ExportedId="TicketNotificationProducer" ComponentId="DeskController/TicketNotificationProducer"/>
     </ExportedComponents>
 </Acf>

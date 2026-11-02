@@ -328,7 +328,7 @@ permissions(product, tenant) = user's roles in the product
 - **R8.3. Role and group cycles are forbidden:** a parent role/group that closes a cycle is rejected with an error (`CreatesRoleCycle`, `CreatesGroupCycle`).
 - **R8.4. Prohibitions** are stored but **not applied** when calculating permissions (13.8). Do not use them.
 - **R8.5.** For remote consumers (ProLife, etc.), role-derived permissions are **materialized** in a serializable copy of the user (`CUserCollectionControllerComp::CreateAdaptedObjectData`); otherwise, a PAT user without roles has no permissions.
-- **R8.6.** Users can see their assigned roles and groups regardless of permissions: reading their **own** roles (including delegated roles) and groups does not require a check. Other users' roles and groups require permissions (groups currently differ; see 13.7).
+- **R8.6.** Users can see their assigned roles and groups regardless of permissions: reading their **own** roles (including delegated roles) and groups does not require a check. Other users' roles and groups require permissions (groups currently differ; see 13.7). A user can also view their **own account** in every organization of the session, including one entered by delegated access, where they are not a member: the organization filter does not hide it (`CUserCollectionControllerComp::CheckObjectAccess`, viewing only). A product server reads the account of the token on every request; without this the delegated organization answered 403 to everything.
 
 ## 9. Privileged principals
 

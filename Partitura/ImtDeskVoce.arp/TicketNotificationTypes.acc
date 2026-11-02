@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="6418" Description="ACF"/>
+            <Version Id="1" Number="2408" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description>Notification types of the support tickets and the types of their objects</Description>
+    <Keywords>Notification</Keywords>
+    <ElementsList>
+        <Element Id="ObjectSupportTicket" PackageId="ImtNotifyGqlPck" ComponentId="NotificationType">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Ticket"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="SupportTicket"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="TicketAssigned" PackageId="ImtNotifyGqlPck" ComponentId="NotificationType">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="IconPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Icons/Assignment"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Message" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="{actor} assigned you to &quot;{subject}&quot;"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Ticket assigned"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="imtdesk.TicketAssigned"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="TicketMessage" PackageId="ImtNotifyGqlPck" ComponentId="NotificationType">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="IconPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Icons/Message"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Message" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="{count, plural, =1 {New message in &quot;{subject}&quot;} other {# new messages in &quot;{subject}&quot;}}"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="New message"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="imtdesk.TicketMessage"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="TypeList" PackageId="ImtNotifyGqlPck" ComponentId="NotificationTypeList">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ObjectTypes" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>ObjectSupportTicket</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Types" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>TicketMessage</Value>
+                                <Value>TicketAssigned</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imtnotify::INotificationTypeList" ComponentId="TypeList"/>
+    </ExportedInterfaces>
+    <ExportedComponents/>
+</Acf>

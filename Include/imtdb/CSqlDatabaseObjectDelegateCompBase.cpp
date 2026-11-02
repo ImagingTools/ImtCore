@@ -528,33 +528,25 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateFilterQuery(const iprm::IParamsSe
 
 	const QString additionalFilters = CreateAdditionalFiltersQuery(filterParams);
 
-	if (!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty() || !additionalFilters.isEmpty()){
-		filterQuery = QStringLiteral(" WHERE ");
-	}
-
-	filterQuery += objectFilterQuery;
-	if (!objectFilterQuery.isEmpty() && !textFilterQuery.isEmpty()){
-		filterQuery += QStringLiteral(" AND ");
+	QStringList conditions;
+	if (!objectFilterQuery.isEmpty()){
+		conditions << objectFilterQuery;
 	}
 
 	if (!textFilterQuery.isEmpty()){
-		filterQuery += '(' + textFilterQuery + ')';
-	}
-
-	if ((!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty()) && !timeFilterQuery.isEmpty()){
-		filterQuery += QStringLiteral(" AND ");
+		conditions << '(' + textFilterQuery + ')';
 	}
 
 	if (!timeFilterQuery.isEmpty()){
-		filterQuery += '(' + timeFilterQuery + ')';
+		conditions << '(' + timeFilterQuery + ')';
 	}
 
-	if ((!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty() || !timeFilterQuery.isEmpty()) && !additionalFilters.isEmpty()){
-		filterQuery += QStringLiteral(" AND ");
+	if (!additionalFilters.isEmpty()){
+		conditions << '(' + additionalFilters + ')';
 	}
 
-	if(!additionalFilters.isEmpty()){
-		filterQuery += '(' + additionalFilters + ')';
+	if (!conditions.isEmpty()){
+		filterQuery = QStringLiteral(" WHERE ") + conditions.join(QStringLiteral(" AND "));
 	}
 
 	return true;
@@ -661,11 +653,50 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateTextFilterQuery(const imtbase::IC
 }
 
 
-bool CSqlDatabaseObjectDelegateCompBase::CreateTimeFilterQuery(const imtbase::ITimeFilterParam& /*timeFilter*/, QString& /*timeFilterQuery*/, const QString& /*timeFieldId*/) const
+bool CSqlDatabaseObjectDelegateCompBase::CreateTimeFilterQuery(const imtbase::ITimeFilterParam& timeFilter, QString& timeFilterQuery, const QString& /*timeFieldId*/) const
 {
-	/// Implementation meant for derived classes
+	timeFilterQuery.clear();
+
+	const QString column = GetCreationTimeColumn();
+	if (column.isEmpty()){
+		return true;
+	}
+
+	QDateTime begin;
+	QDateTime end;
+	GetTimeFilterBounds(timeFilter, QDateTime::currentDateTimeUtc(), begin, end);
+
+	// The column is TEXT in SQLite and TIMESTAMP or TEXT in PostgreSQL: both sides are read as times, in UTC
+	const bool isSqlite = IsSqliteDriver();
+	const QString columnTime = isSqlite
+				? QStringLiteral(R"(datetime("%1"))").arg(column)
+				: QStringLiteral(R"(CAST("%1" AS TIMESTAMP))").arg(column);
+	const QString timeFormat = QStringLiteral("yyyy-MM-dd HH:mm:ss");
+
+	QStringList conditions;
+	if (begin.isValid()){
+		const QString beginText = begin.toUTC().toString(timeFormat);
+		conditions << (isSqlite
+					? QStringLiteral("%1 >= datetime('%2')").arg(columnTime, beginText)
+					: QStringLiteral("%1 >= TIMESTAMP '%2'").arg(columnTime, beginText));
+	}
+
+	if (end.isValid()){
+		const QString endText = end.toUTC().toString(timeFormat);
+		conditions << (isSqlite
+					? QStringLiteral("%1 < datetime('%2')").arg(columnTime, endText)
+					: QStringLiteral("%1 < TIMESTAMP '%2'").arg(columnTime, endText));
+	}
+
+	timeFilterQuery = conditions.join(QStringLiteral(" AND "));
 
 	return true;
+}
+
+
+QString CSqlDatabaseObjectDelegateCompBase::GetCreationTimeColumn() const
+{
+	return QString();
 }
 
 

@@ -1,0 +1,527 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="6418" Description="ACF"/>
+            <Version Id="1" Number="2408" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description>Notification types of the organizations and the types of their objects</Description>
+    <Keywords>Notification</Keywords>
+    <ElementsList>
+        <Element Id="ConnectionRemoved" PackageId="ImtNotifyGqlPck" ComponentId="NotificationType">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="IconPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Icons/Link"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Message" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="The connection of &quot;{subject}&quot; with &quot;{partner}&quot; was removed"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Connection removed"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParameterIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>partner</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="imtauth.ConnectionRemoved"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ConnectionRequestApproved" PackageId="ImtNotifyGqlPck" ComponentId="NotificationType">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="IconPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Icons/Link"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Message" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="&quot;{partner}&quot; accepted the connection request of &quot;{subject}&quot;"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Connection request approved"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParameterIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>partner</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="imtauth.ConnectionRequestApproved"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ConnectionRequestReceived" PackageId="ImtNotifyGqlPck" ComponentId="NotificationType">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="IconPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Icons/Link"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Message" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="&quot;{partner}&quot; wants to connect to &quot;{subject}&quot;"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Connection request received"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParameterIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>partner</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="imtauth.ConnectionRequestReceived"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ConnectionRequestRejected" PackageId="ImtNotifyGqlPck" ComponentId="NotificationType">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="IconPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Icons/Link"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Message" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="&quot;{partner}&quot; declined the connection request of &quot;{subject}&quot;"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Connection request rejected"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParameterIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>partner</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="imtauth.ConnectionRequestRejected"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="CrossTenantMessageReceived" PackageId="ImtNotifyGqlPck" ComponentId="NotificationType">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="IconPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Icons/Message"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Message" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="New message from &quot;{subject}&quot;"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="New message"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="imtauth.CrossTenantMessageReceived"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="InvitationAccepted" PackageId="ImtNotifyGqlPck" ComponentId="NotificationType">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="IconPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Icons/Organization"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Message" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="{actor} accepted the invitation to &quot;{subject}&quot;"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Invitation accepted"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="imtauth.InvitationAccepted"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="InvitationReceived" PackageId="ImtNotifyGqlPck" ComponentId="NotificationType">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="IconPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Icons/Organization"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Message" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="{actor} invited you to &quot;{subject}&quot;"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Invitation received"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="imtauth.InvitationReceived"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="InvitationRejected" PackageId="ImtNotifyGqlPck" ComponentId="NotificationType">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="IconPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Icons/Organization"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Message" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="{actor} declined the invitation to &quot;{subject}&quot;"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Invitation declined"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="imtauth.InvitationRejected"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="InvitationRevoked" PackageId="ImtNotifyGqlPck" ComponentId="NotificationType">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="IconPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Icons/Organization"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Message" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="The invitation to &quot;{subject}&quot; was withdrawn"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Invitation withdrawn"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="imtauth.InvitationRevoked"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="MemberLeft" PackageId="ImtNotifyGqlPck" ComponentId="NotificationType">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="IconPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Icons/MultipleUser"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Message" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="{member} is no longer a member of &quot;{subject}&quot;"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Member left"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParameterIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>member</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="imtauth.MemberLeft"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="MembershipEnded" PackageId="ImtNotifyGqlPck" ComponentId="NotificationType">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="IconPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Icons/MultipleUser"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Message" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="You are no longer a member of &quot;{subject}&quot;"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Membership ended"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="imtauth.MembershipEnded"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="MembershipPermissionsChanged" PackageId="ImtNotifyGqlPck" ComponentId="NotificationType">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="IconPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Icons/Key"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Message" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Your permissions in &quot;{subject}&quot; were changed"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Permissions changed"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="imtauth.MembershipPermissionsChanged"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ObjectCrossTenantMessage" PackageId="ImtNotifyGqlPck" ComponentId="NotificationType">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Message from organization"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="CrossTenantMessage"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ObjectTenant" PackageId="ImtNotifyGqlPck" ComponentId="NotificationType">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Organization"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Tenant"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ObjectTenantConnection" PackageId="ImtNotifyGqlPck" ComponentId="NotificationType">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Connection"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="TenantConnection"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ObjectTenantConnectionRequest" PackageId="ImtNotifyGqlPck" ComponentId="NotificationType">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Connection request"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="TenantConnectionRequest"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ObjectTenantRelationship" PackageId="ImtNotifyGqlPck" ComponentId="NotificationType">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Relationship"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="TenantRelationship"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ObjectTenantRelationshipProposal" PackageId="ImtNotifyGqlPck" ComponentId="NotificationType">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Relationship proposal"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="TenantRelationshipProposal"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="OwnershipReceived" PackageId="ImtNotifyGqlPck" ComponentId="NotificationType">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="IconPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Icons/Crown"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Message" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="You are now the owner of &quot;{subject}&quot;"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Ownership received"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="imtauth.OwnershipReceived"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="OwnershipTransferred" PackageId="ImtNotifyGqlPck" ComponentId="NotificationType">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="IconPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Icons/Crown"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Message" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="{member} is now the owner of &quot;{subject}&quot;"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Ownership transferred"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParameterIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>member</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="imtauth.OwnershipTransferred"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="RelationshipProposalApproved" PackageId="ImtNotifyGqlPck" ComponentId="NotificationType">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="IconPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Icons/Link"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Message" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="The relationship of &quot;{subject}&quot; with &quot;{partner}&quot; was accepted"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Relationship proposal approved"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParameterIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>partner</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="imtauth.RelationshipProposalApproved"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="RelationshipProposalReceived" PackageId="ImtNotifyGqlPck" ComponentId="NotificationType">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="IconPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Icons/Link"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Message" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="&quot;{partner}&quot; proposes a relationship to &quot;{subject}&quot;"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Relationship proposal received"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParameterIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>partner</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="imtauth.RelationshipProposalReceived"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="RelationshipProposalRejected" PackageId="ImtNotifyGqlPck" ComponentId="NotificationType">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="IconPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Icons/Link"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Message" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="The relationship proposal of &quot;{subject}&quot; with &quot;{partner}&quot; was declined"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Relationship proposal rejected"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParameterIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>partner</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="imtauth.RelationshipProposalRejected"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="RelationshipRemoved" PackageId="ImtNotifyGqlPck" ComponentId="NotificationType">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="IconPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Icons/Link"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Message" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="The relationship of &quot;{subject}&quot; with &quot;{partner}&quot; ended"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Relationship ended"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParameterIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>partner</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="imtauth.RelationshipRemoved"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="TypeList" PackageId="ImtNotifyGqlPck" ComponentId="NotificationTypeList">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ObjectTypes" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>ObjectTenant</Value>
+                                <Value>ObjectTenantConnectionRequest</Value>
+                                <Value>ObjectTenantConnection</Value>
+                                <Value>ObjectTenantRelationshipProposal</Value>
+                                <Value>ObjectTenantRelationship</Value>
+                                <Value>ObjectCrossTenantMessage</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Types" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>InvitationReceived</Value>
+                                <Value>InvitationAccepted</Value>
+                                <Value>InvitationRejected</Value>
+                                <Value>InvitationRevoked</Value>
+                                <Value>OwnershipReceived</Value>
+                                <Value>OwnershipTransferred</Value>
+                                <Value>MembershipPermissionsChanged</Value>
+                                <Value>MembershipEnded</Value>
+                                <Value>MemberLeft</Value>
+                                <Value>CrossTenantMessageReceived</Value>
+                                <Value>ConnectionRequestReceived</Value>
+                                <Value>ConnectionRequestApproved</Value>
+                                <Value>ConnectionRequestRejected</Value>
+                                <Value>ConnectionRemoved</Value>
+                                <Value>RelationshipProposalReceived</Value>
+                                <Value>RelationshipProposalApproved</Value>
+                                <Value>RelationshipProposalRejected</Value>
+                                <Value>RelationshipRemoved</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imtnotify::INotificationTypeList" ComponentId="TypeList"/>
+    </ExportedInterfaces>
+    <ExportedComponents/>
+</Acf>

@@ -13,6 +13,9 @@
         <Element Id="RootDataController" PackageId="ImtCoreVoce" ComponentId="RootDataController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="NotificationsPageVisible" Type="Boolean" ExportId="NotificationsPageVisible">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="AdminPageVisible" Type="Boolean" ExportId="AdminPageVisible">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

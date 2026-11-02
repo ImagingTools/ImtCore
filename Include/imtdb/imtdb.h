@@ -3,9 +3,11 @@
 
 
 // Qt includes
+#include <QtCore/QDateTime>
 #include <QtCore/QString>
 
 // ImtCore includes
+#include <imtbase/ITimeFilterParam.h>
 #include <imtdb/IDatabaseEngine.h>
 
 
@@ -265,6 +267,16 @@ QString SqlValue(int value, bool useDefaultIfEmpty = false);
  * \return "NULL" or "DEFAULT" if the input is 0.0, otherwise the string representation of the double.
  */
 QString SqlValue(double value, bool useDefaultIfEmpty = false);
+
+
+/**
+ * \brief The UTC times a time filter selects: from \a begin (inclusive) to \a end (exclusive).
+ *
+ * An invalid time leaves that side open. The units are counted from \a now: "for" goes back by the multiplier,
+ * "current" starts at the beginning of the unit, "last" is the whole previous unit. A custom range takes whole days,
+ * its end day included, as the time filter of the client chooses days.
+ */
+void GetTimeFilterBounds(const imtbase::ITimeFilterParam& timeFilter, const QDateTime& now, QDateTime& begin, QDateTime& end);
 
 
 } // namespace imtdb

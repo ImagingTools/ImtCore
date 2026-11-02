@@ -103,6 +103,15 @@ protected:
 				const imtgql::CGqlParamObject& viewParamsGql,
 				iprm::CParamsSet* filterParamsPtr) const override;
 
+	/**
+		A user may view the own account in every organization of the session, also in one entered by delegated access.
+	*/
+	virtual bool CheckObjectAccess(
+				const imtgql::CGqlRequest& gqlRequest,
+				const QByteArrayList& objectIds,
+				imtauth::IDocumentShareInfo::AccessLevel accessLevel,
+				QString& errorMessage) const override;
+
 	// reimplemented (imtservergql::CPermissibleGqlRequestHandlerComp)
 	virtual bool CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 

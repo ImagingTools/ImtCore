@@ -17,6 +17,7 @@ DecoratorBase {
 	readonly property bool isSelected: !leftPanelElement.baseElement ? false : leftPanelElement.baseElement.selected;
 	readonly property bool isHighlighted: !leftPanelElement.baseElement ? false : leftPanelElement.baseElement.highlighted;
 	readonly property string title: !leftPanelElement.baseElement ? "" : leftPanelElement.baseElement.text;
+	readonly property string badge: !leftPanelElement.baseElement ? "" : leftPanelElement.baseElement.badge;
 	readonly property int iconSize: !leftPanelElement.panel ? Style.menuPanelIconSize : leftPanelElement.panel.iconSize;
 
 	property bool textIsCropped: helperText.width > description.width;
@@ -95,13 +96,52 @@ DecoratorBase {
 		source: leftPanelElement.baseElement && leftPanelElement.baseElement.iconSource ? leftPanelElement.baseElement.iconSource : "";
 	}
 
+	// Folded, the row has no room for the badge text: a dot on the icon says there is one
+	Rectangle {
+		id: badgeDot;
+
+		anchors.top: image.top;
+		anchors.right: image.right;
+
+		width: Style.spacingM;
+		height: width;
+		radius: width / 2;
+		visible: leftPanelElement.collapsed && leftPanelElement.badge !== "";
+		color: Style.imaginToolsAccentColor;
+	}
+
+	Rectangle {
+		id: badgeRect;
+
+		anchors.right: parent.right;
+		anchors.rightMargin: Style.marginL;
+		anchors.verticalCenter: parent.verticalCenter;
+
+		height: Style.fontSizeXS + Style.marginXS;
+		width: Math.max(height, badgeText.width + Style.marginS);
+		radius: height / 2;
+		visible: !leftPanelElement.collapsed && leftPanelElement.badge !== "";
+		color: Style.imaginToolsAccentColor;
+
+		Text {
+			id: badgeText;
+
+			anchors.centerIn: parent;
+
+			text: leftPanelElement.badge;
+			color: Style.highlightedTextColor;
+			font.family: Style.fontFamilyBold;
+			font.pixelSize: Style.fontSizeXS;
+		}
+	}
+
 	Text {
 		id: description;
 
 		anchors.left: image.right;
 		anchors.leftMargin: Style.marginM;
-		anchors.right: parent.right;
-		anchors.rightMargin: Style.marginL;
+		anchors.right: badgeRect.visible ? badgeRect.left : parent.right;
+		anchors.rightMargin: badgeRect.visible ? Style.marginS : Style.marginL;
 		anchors.verticalCenter: parent.verticalCenter;
 
 		// Switched, not faded: a fade on every row is work on every frame of the

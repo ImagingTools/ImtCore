@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="6418" Description="ACF"/>
+            <Version Id="1" Number="2408" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="TicketMessage" X="100" Y="100" Note=""/>
+        <Element ComponentName="TicketAssigned" X="100" Y="200" Note=""/>
+        <Element ComponentName="ObjectSupportTicket" X="400" Y="100" Note=""/>
+        <Element ComponentName="TypeList" X="700" Y="100" Note=""/>
+    </PositionMap>
+</Acf>

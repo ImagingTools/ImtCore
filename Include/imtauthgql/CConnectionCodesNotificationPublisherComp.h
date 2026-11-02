@@ -17,6 +17,8 @@
 #include <imtauth/ITenantRelationshipInfo.h>
 #include <imtauth/ITenantManager.h>
 #include <imtservergql/CGqlPublisherCompBase.h>
+#include <imtbase/IObjectCollection.h>
+#include <imtnotify/INotificationSender.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Tenants_fwd.h>
 
 
@@ -56,6 +58,8 @@ public:
 		I_ASSIGN(m_connectionRequestManagerCompPtr, "ConnectionRequestManager", "Connection request manager to observe", true, "TenantConnectionRequestManager");
 		I_ASSIGN_TO(m_connectionRequestManagerModelCompPtr, m_connectionRequestManagerCompPtr, true);
 		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager for resolving tenant owners", true, "TenantManager");
+		I_ASSIGN(m_notificationSenderCompPtr, "NotificationSender", "Notification center that keeps the notifications of the users", false, "NotificationSender");
+		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "Users: the name of the user who made the change", false, "UserCollection");
 	I_END_COMPONENT;
 
 protected:
@@ -73,14 +77,26 @@ protected:
 	I_REF(imtauth::ITenantConnectionRequestManager, m_connectionRequestManagerCompPtr);
 	I_REF(imod::IModel, m_connectionRequestManagerModelCompPtr);
 	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
+	I_REF(imtnotify::INotificationSender, m_notificationSenderCompPtr);
+	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
 
 private:
 	void PublishNotification(
 				const QByteArray& targetUserId,
 				sdl::V1_0::imtauth::EConnectionNotificationType notificationType,
 				const QByteArray& tenantId,
-				const QByteArray& relatedId) const;
+				const QByteArray& relatedId,
+				const QByteArray& partnerTenantId) const;
 
+	void SendToNotificationCenter(
+				const QByteArray& targetUserId,
+				sdl::V1_0::imtauth::EConnectionNotificationType notificationType,
+				const QByteArray& tenantId,
+				const QByteArray& relatedId,
+				const QByteArray& partnerTenantId) const;
+	QString FindTenantName(const QByteArray& tenantId) const;
+	void WithdrawFromNotificationCenter(const QByteArray& tenantId, const QByteArray& groupKey) const;
+	static QByteArray GetGroupKey(sdl::V1_0::imtauth::EConnectionNotificationType notificationType, const QByteArray& relatedId);
 	QByteArray FindTenantOwnerUserId(const QByteArray& tenantId) const;
 };
 

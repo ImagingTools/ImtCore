@@ -52,7 +52,8 @@ DecoratorBase {
         id: rightPanel;
         z: 100;
         anchors.right: parent.right;
-		width: Style.sizeHintBXS;
+		// A decorator that needs more room, e.g. for the notification bell, says so by its implicit width
+		width: Math.max(Style.sizeHintBXS, rightPanel.decorator_ ? rightPanel.decorator_.implicitWidth : 0);
         height: topPanelDecorator.height;
     }
 }
