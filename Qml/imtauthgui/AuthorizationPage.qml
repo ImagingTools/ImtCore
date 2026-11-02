@@ -19,6 +19,9 @@ Rectangle {
 	property bool canRecoveryPassword: true;
 	property bool canRegisterUser: true;
 
+	// PasswordPolicyController instance for the sign-up form, injected by the owner.
+	property var passwordPolicy: null;
+
 	property string appName: context ? context.appName : ""
 	
 	property bool isAuthenticating: false;
@@ -701,6 +704,7 @@ Rectangle {
 							id: userGeneralEditor;
 							width: flickable.width;
 							userData: userDataModel;
+							passwordPolicy: authPageContainer.passwordPolicy;
 							deferValidationErrors: true;
 
 							onEmitUpdateModel: {

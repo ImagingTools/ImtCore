@@ -102,9 +102,16 @@ rule evaluation and the texts derived from a `violatedRules` list), and
 actual `GetPasswordPolicy` request, so `imtauthgui` stays free of GQL.
 
 An instance is injected into the views: `GqlBasedProfileApiClient` and
-`GqlBasedUserAdministrationApiClient` expose it as `passwordPolicy`, while the two pre-login
-screens (`SuperuserPasswordPage`, `PasswordRecoveryDialog`) create their own. A view without
-an injected policy keeps working — only the extra checks are skipped.
+`GqlBasedUserAdministrationApiClient` expose it as `passwordPolicy`, while the pre-login
+screens create their own (`SuperuserPasswordPage`, `PasswordRecoveryDialog`) or get it from
+`ThumbnailDecorator` (the sign-up form of `AuthorizationPage`, via its `passwordPolicy`
+property). A view without an injected policy keeps working — only the extra checks are skipped.
+
+Wherever a password is set (user creation, sign-up, superuser setup, password change and
+recovery) the rules are listed next to the input via `requirementsText()`, so the user knows
+them before typing: length range, required character classes, "different from the login",
+"not commonly used" (if a blocklist is configured) and — only for a change of an existing
+password — "different from the last N ones".
 
 ### User data model
 

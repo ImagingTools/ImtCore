@@ -141,7 +141,7 @@ Column {
 	Text {
 		width: parent.width;
 		wrapMode: Text.WordWrap;
-		text: root.policy ? root.policy.requirementsText() : "";
+		text: root.policy ? root.policy.requirementsText(true) : "";
 		visible: (text !== "") && (root.errorText === "");
 		color: Style.inactiveTextColor;
 		font.family: Style.fontFamily;
