@@ -242,6 +242,7 @@ private:
 	QList<FOpenedDocument>             m_openedDocuments;
 	QHash<QString, QList<FViewEntry>>  m_documentTypeEditors;
 	QHash<QString, QString>            m_cachedDocumentNames;
+	QHash<QString, bool>               m_cachedDocumentReadOnlyStates;
 	QHash<QString, bool>               m_autoNamedTypeIds;
 	QPointer<QObject>                  m_documentManagerActiveView;
 };

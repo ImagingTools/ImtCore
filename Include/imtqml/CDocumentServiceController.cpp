@@ -510,6 +510,12 @@ void CDocumentServiceController::CreateDocumentDataInternal(
 		m_cachedDocumentNames.erase(cachedNameIt);
 	}
 
+	const auto cachedReadOnlyIt = m_cachedDocumentReadOnlyStates.find(id);
+	if (cachedReadOnlyIt != m_cachedDocumentReadOnlyStates.end()){
+		data.isReadOnly = cachedReadOnlyIt.value();
+		m_cachedDocumentReadOnlyStates.erase(cachedReadOnlyIt);
+	}
+
 	m_openedDocuments.append(data);
 	Q_EMIT openedDocumentIdsChanged();
 }
@@ -574,6 +580,14 @@ void CDocumentServiceController::getOpenedDocumentList()
 				QVariantList documents;
 				documents.reserve(list.size());
 				for (const auto& info : list){
+					const int index = self->IndexOfDocument(info.documentId);
+					if (index >= 0){
+						self->m_openedDocuments[index].isReadOnly = info.isReadOnly;
+					}
+					else{
+						self->m_cachedDocumentReadOnlyStates.insert(info.documentId, info.isReadOnly);
+					}
+
 					QVariantMap entry;
 					entry.insert(QStringLiteral("documentId"),      info.documentId);
 					entry.insert(QStringLiteral("documentName"),    info.name);
@@ -584,6 +598,7 @@ void CDocumentServiceController::getOpenedDocumentList()
 					documents.append(entry);
 				}
 				Q_EMIT self->openedDocumentListReceived(QVariant(documents));
+				self->m_cachedDocumentReadOnlyStates.clear();
 			});
 }
 
