@@ -23,6 +23,8 @@ QtObject {
 	signal userModeChanged(string userMode);
 	signal superuserExistResult(string status, string error);
 	signal loginFailed(string message);
+	// The credentials are right, but the password has expired and must be changed before the login
+	signal passwordChangeRequired();
 	
 	signal loggedIn();
 	signal loggedOut();
@@ -530,10 +532,19 @@ QtObject {
 			root.refreshPermissions(function(){
 				root.loggedIn();
 			});
+
+			if (passwordExpiresInDays > 0){
+				PopupManager.addWarningMessage(qsTr("Your password expires in %1 day(s). Please change it in your profile.").arg(passwordExpiresInDays), true);
+				passwordExpiresInDays = 0;
+			}
 		}
 		
 		onFailed: {
 			root.loginFailed(message || "");
+		}
+
+		onPasswordExpired: {
+			root.passwordChangeRequired();
 		}
 	}
 	

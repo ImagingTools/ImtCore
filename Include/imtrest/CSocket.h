@@ -52,7 +52,13 @@ public Q_SLOTS:
 
 private:
 	/**
-		The response to the request that is being processed is finished: the next request can be parsed.
+		Some data of the socket are sent: if the request waits for it, it is finished now.
+	*/
+	void OnBytesWritten();
+
+	/**
+		The response to the request that is being processed is written: the next request can be parsed as soon as the response is
+		sent to the network, that is when the write buffer of the socket is empty (a slow client can receive a big response for a long time).
 	*/
 	void FinishRequest();
 
@@ -83,9 +89,12 @@ private:
 
 	CConnectionTimeoutBehavior m_behavior;
 
-	// A request is passed to the handler and its response is not written yet. The next request is not parsed meanwhile,
+	// A request is passed to the handler and its response is not sent to the network yet. The next request is not parsed meanwhile,
 	// its data wait in the socket (only for the protocols with the cycle of a request and a response).
 	bool m_isRequestInProgress = false;
+
+	// The response of the request is written, but the socket still has unsent data: the request is finished when they are sent.
+	bool m_isFinishPending = false;
 
 	// Sender of the streaming responses of the protocol of the connection, it is empty if the protocol has no streaming responses.
 	IStreamingResponseSenderPtr m_streamingSenderPtr;

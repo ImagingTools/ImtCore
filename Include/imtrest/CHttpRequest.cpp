@@ -466,7 +466,9 @@ QByteArray CHttpRequest::GetRequestId() const
 
 bool CHttpRequest::IsConnectionPersistent() const
 {
-	return http_should_keep_alive(&m_httpParser) != 0;
+	// A connection of HTTP/1.0 is kept only if the server confirms it with "Connection: keep-alive" (RFC 9112, section 9.3), and the
+	// sender does not confirm it (it takes the persistence of the connection from the server), so such a connection is closed
+	return IsHttp11OrNewer() && (http_should_keep_alive(&m_httpParser) != 0);
 }
 
 
@@ -478,7 +480,7 @@ bool CHttpRequest::IsResponseBodyOmitted() const
 
 bool CHttpRequest::IsChunkedResponseAllowed() const
 {
-	return (m_httpParser.http_major > 1) || ((m_httpParser.http_major == 1) && (m_httpParser.http_minor >= 1));
+	return IsHttp11OrNewer();
 }
 
 
@@ -687,10 +689,9 @@ void CHttpRequest::DecideBody()
 
 	// A server does not send 1xx responses to HTTP/1.0 and ignores the expectation (RFC 9110, sections 10.1.1 and 15.2),
 	// a client does not wait for 100 if there is no body
-	const bool isHttp11 = (m_httpParser.http_major > 1) || ((m_httpParser.http_major == 1) && (m_httpParser.http_minor >= 1));
 	const bool isBodyExpected = isChunked || (isLengthKnown && (m_httpParser.content_length > 0));
 
-	m_isContinueExpected = isHttp11 && isBodyExpected;
+	m_isContinueExpected = IsHttp11OrNewer() && isBodyExpected;
 }
 
 
@@ -745,6 +746,12 @@ QByteArray CHttpRequest::CreateRejectMessage() const
 	qWarning() << "The response with the status" << m_rejectStatusCode << "cannot be built";
 
 	return CConnectionTimeoutBehavior::CreateHttpInternalServerErrorResponse(QDateTime::currentDateTimeUtc(), true);
+}
+
+
+bool CHttpRequest::IsHttp11OrNewer() const
+{
+	return (m_httpParser.http_major > 1) || ((m_httpParser.http_major == 1) && (m_httpParser.http_minor >= 1));
 }
 
 

@@ -3566,6 +3566,10 @@
         <source>Password changed successfully</source>
         <translation>Пароль успешно изменен</translation>
     </message>
+    <message>
+        <source>Your password expires in %1 day(s). Please change it in your profile.</source>
+        <translation>Срок действия пароля истекает через %1 дн. Смените его в профиле.</translation>
+    </message>
 </context>
 <context>
     <name>AuthorizationPage</name>
@@ -3629,6 +3633,18 @@
         <location line="-333"/>
         <source>Welcome to</source>
         <translation>Добро пожаловать в</translation>
+    </message>
+    <message>
+        <source>Unable to change the password.</source>
+        <translation>Не удалось изменить пароль.</translation>
+    </message>
+    <message>
+        <source>Your password has expired</source>
+        <translation>Срок действия пароля истёк</translation>
+    </message>
+    <message>
+        <source>Unable to register the user</source>
+        <translation>Не удалось зарегистрировать пользователя</translation>
     </message>
 </context>
 <context>
@@ -7506,6 +7522,81 @@
     </message>
 </context>
 <context>
+    <name>PasswordPolicyController</name>
+    <message>
+        <source>at least %1 characters</source>
+        <translation>не менее %1 символов</translation>
+    </message>
+    <message>
+        <source>at most %1 characters</source>
+        <translation>не более %1 символов</translation>
+    </message>
+    <message>
+        <source>a lowercase letter</source>
+        <translation>строчная буква</translation>
+    </message>
+    <message>
+        <source>an uppercase letter</source>
+        <translation>заглавная буква</translation>
+    </message>
+    <message>
+        <source>a digit</source>
+        <translation>цифра</translation>
+    </message>
+    <message>
+        <source>a special character</source>
+        <translation>специальный символ</translation>
+    </message>
+    <message>
+        <source>a password different from the login</source>
+        <translation>пароль, отличный от логина</translation>
+    </message>
+    <message>
+        <source>a password that is not commonly used</source>
+        <translation>пароль, который не входит в число распространённых</translation>
+    </message>
+    <message>
+        <source>a password different from the last %1 ones</source>
+        <translation>пароль, отличный от %1 последних</translation>
+    </message>
+    <message>
+        <source>a password that was not used before</source>
+        <translation>пароль, который не использовался ранее</translation>
+    </message>
+    <message>
+        <source>The current password is not correct.</source>
+        <translation>Текущий пароль указан неверно.</translation>
+    </message>
+    <message>
+        <source>The password was changed too recently and cannot be changed again yet.</source>
+        <translation>Пароль был изменён слишком недавно, его пока нельзя сменить снова.</translation>
+    </message>
+    <message>
+        <source>This account is managed by an external system, its password cannot be changed here.</source>
+        <translation>Эта учётная запись управляется внешней системой, её пароль нельзя изменить здесь.</translation>
+    </message>
+    <message>
+        <source>This account no longer exists.</source>
+        <translation>Эта учётная запись больше не существует.</translation>
+    </message>
+    <message>
+        <source>The password could not be changed. Please try again later.</source>
+        <translation>Не удалось изменить пароль. Попробуйте позже.</translation>
+    </message>
+    <message>
+        <source>The password does not meet the requirements: %1.</source>
+        <translation>Пароль не соответствует требованиям: %1.</translation>
+    </message>
+    <message>
+        <source>, </source>
+        <translation>, </translation>
+    </message>
+    <message>
+        <source>Password requirements:</source>
+        <translation>Требования к паролю:</translation>
+    </message>
+</context>
+<context>
     <name>PasswordRecoveryDialog</name>
     <message>
         <location filename="../../../Qml/imtauthgui/PasswordRecoveryDialog.qml" line="+15"/>
@@ -7608,6 +7699,10 @@
         <location line="+142"/>
         <source>Password changed successfully</source>
         <translation>Пароль успешно изменен</translation>
+    </message>
+    <message>
+        <source>Unable to change the password.</source>
+        <translation>Не удалось изменить пароль.</translation>
     </message>
 </context>
 <context>
@@ -7833,6 +7928,97 @@
         <location line="+21"/>
         <source>Category</source>
         <translation>Категория</translation>
+    </message>
+</context>
+<context>
+    <name>ProfileGeneralPage</name>
+    <message>
+        <source>Profile saved</source>
+        <translation>Профиль сохранён</translation>
+    </message>
+    <message>
+        <source>Unable to save the profile.</source>
+        <translation>Не удалось сохранить профиль.</translation>
+    </message>
+    <message>
+        <source>Account</source>
+        <translation>Учётная запись</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Имя</translation>
+    </message>
+    <message>
+        <source>Enter the name</source>
+        <translation>Введите имя</translation>
+    </message>
+    <message>
+        <source>Email Address</source>
+        <translation>Адрес электронной почты</translation>
+    </message>
+    <message>
+        <source>Enter the email</source>
+        <translation>Введите адрес электронной почты</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation>Сохранить</translation>
+    </message>
+    <message>
+        <source>Password changed</source>
+        <translation>Пароль изменён</translation>
+    </message>
+    <message>
+        <source>Unable to change the password. Check your current password and try again.</source>
+        <translation>Не удалось изменить пароль. Проверьте текущий пароль и попробуйте снова.</translation>
+    </message>
+    <message>
+        <source>Password</source>
+        <translation>Пароль</translation>
+    </message>
+    <message>
+        <source>Change</source>
+        <translation>Изменить</translation>
+    </message>
+    <message>
+        <source>Current password</source>
+        <translation>Текущий пароль</translation>
+    </message>
+    <message>
+        <source>Enter your current password</source>
+        <translation>Введите текущий пароль</translation>
+    </message>
+    <message>
+        <source>New password</source>
+        <translation>Новый пароль</translation>
+    </message>
+    <message>
+        <source>Enter a new password</source>
+        <translation>Введите новый пароль</translation>
+    </message>
+    <message>
+        <source>Confirm new password</source>
+        <translation>Подтверждение нового пароля</translation>
+    </message>
+    <message>
+        <source>Re-enter the new password</source>
+        <translation>Повторите новый пароль</translation>
+    </message>
+    <message>
+        <source>Passwords don&apos;t match</source>
+        <translation>Пароли не совпадают</translation>
+    </message>
+    <message>
+        <source>Changing password…</source>
+        <translation>Изменение пароля…</translation>
+    </message>
+    <message>
+        <source>Update password</source>
+        <translation>Обновить пароль</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Отмена</translation>
     </message>
 </context>
 <context>
@@ -9210,6 +9396,26 @@ Errors: 0</source>
         <location line="+30"/>
         <source>OK</source>
         <translation>ОК</translation>
+    </message>
+    <message>
+        <source>Unable to create the administrator account</source>
+        <translation>Не удалось создать учётную запись администратора</translation>
+    </message>
+    <message>
+        <source>Unable to reach server</source>
+        <translation>Не удалось связаться с сервером</translation>
+    </message>
+    <message>
+        <source>Create the administrator account</source>
+        <translation>Создайте учётную запись администратора</translation>
+    </message>
+    <message>
+        <source>This server doesn&apos;t have one yet. Set a name and password below - you&apos;ll sign in with them right after.</source>
+        <translation>На этом сервере её ещё нет. Задайте имя и пароль ниже — сразу после этого вы войдёте с ними.</translation>
+    </message>
+    <message>
+        <source>Create account</source>
+        <translation>Создать учётную запись</translation>
     </message>
 </context>
 <context>
@@ -10892,6 +11098,10 @@ ID входных данных: </translation>
         <location line="+10"/>
         <source>Change Password</source>
         <translation>Изменить пароль</translation>
+    </message>
+    <message>
+        <source>Unable to change the password.</source>
+        <translation>Не удалось изменить пароль.</translation>
     </message>
 </context>
 <context>
