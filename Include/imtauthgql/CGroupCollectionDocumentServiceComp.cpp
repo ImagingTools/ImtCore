@@ -151,6 +151,8 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CGroupCollectionDocumentServiceComp
 	}
 
 	if (m_documentManagerCompPtr->SetDocumentData(userLogin, documentId, *documentPtr) != imtdoc::IDocumentService::OS_OK){
+		errorMessage = QStringLiteral("Unable to update document data. Error: SetDocumentData failed");
+		response.message = errorMessage;
 		return response;
 	}
 
