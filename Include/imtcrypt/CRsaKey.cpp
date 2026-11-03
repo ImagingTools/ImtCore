@@ -2,50 +2,60 @@
 #include <imtcrypt/CRsaKey.h>
 
 
+// STL includes
+#include <memory>
+
 // OpenSSL includes
+#include <openssl/evp.h>
 #include <openssl/rsa.h>
-#include <openssl/pem.h>
 
 
 namespace imtcrypt
 {
 
 
+namespace
+{
+
+
+// For RSA keys i2d_PrivateKey and i2d_PublicKey write PKCS#1 DER (RSAPrivateKey and RSAPublicKey)
+template <typename EncodeFunction>
+QByteArray EncodeKey(EVP_PKEY* key, EncodeFunction encode)
+{
+	const int length = encode(key, nullptr);
+	if (length <= 0){
+		return QByteArray();
+	}
+
+	QByteArray result(length, '\0');
+	uchar* data = reinterpret_cast<uchar*>(result.data());
+	encode(key, &data);
+
+	return result;
+}
+
+
+} // namespace
+
+
 void CRsaKey::GenerateRsaKeys()
 {
-	RSA* keypair = RSA_new();
-	BIGNUM *e = BN_new();
-	BN_set_word(e, RSA_F4);
-	constexpr int keyLength = 512;
-	if (RSA_generate_key_ex(keypair, keyLength, e, nullptr) != 0){
-		RSA* privKey;
-		RSA* pubKey;
-		privKey = RSAPrivateKey_dup(keypair);
-		pubKey = RSAPublicKey_dup(keypair);
-		if (privKey != nullptr){
-			RSA_free(privKey);
-		}
-		if (pubKey != nullptr){
-			RSA_free(pubKey);
-		}
+	constexpr int keyLength = 2048;
 
-		BIO *bio = BIO_new(BIO_s_mem());
-		i2d_RSAPrivateKey_bio(bio, privKey);
-
-		int bioLength = BIO_pending(bio);
-		m_privateKey.resize(bioLength);
-
-		BIO_read(bio, m_privateKey.data(), bioLength);
-
-		i2d_RSAPublicKey_bio(bio, pubKey);
-
-		bioLength = BIO_pending(bio);
-		m_publicKey.resize(bioLength);
-
-		BIO_read(bio, m_publicKey.data(), bioLength);
-
-		BIO_free_all(bio);
+	std::unique_ptr<EVP_PKEY_CTX, decltype(&EVP_PKEY_CTX_free)> context(EVP_PKEY_CTX_new_id(EVP_PKEY_RSA, nullptr), &EVP_PKEY_CTX_free);
+	if (!context || EVP_PKEY_keygen_init(context.get()) <= 0 || EVP_PKEY_CTX_set_rsa_keygen_bits(context.get(), keyLength) <= 0){
+		return;
 	}
+
+	EVP_PKEY* keyPairPtr = nullptr;
+	if (EVP_PKEY_keygen(context.get(), &keyPairPtr) <= 0){
+		return;
+	}
+
+	std::unique_ptr<EVP_PKEY, decltype(&EVP_PKEY_free)> keyPair(keyPairPtr, &EVP_PKEY_free);
+
+	m_privateKey = EncodeKey(keyPair.get(), i2d_PrivateKey);
+	m_publicKey = EncodeKey(keyPair.get(), i2d_PublicKey);
 }
 
 
