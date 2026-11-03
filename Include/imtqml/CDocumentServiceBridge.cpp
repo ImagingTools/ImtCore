@@ -181,15 +181,23 @@ void CDocumentServiceBridge::OpenDocument(
 	info.typeId = typeId;
 	info.objectId = documentId;
 	const imtdoc::IDocumentService::DocumentList documentList = mgrPtr->GetOpenedDocumentList(QByteArray());
+	bool isDocumentFound = false;
 	for (const auto& item: documentList){
 		if (item.documentId == result.documentId){
+			info.typeId = QString::fromUtf8(item.typeId);
+			info.objectId = QString::fromUtf8(imtdoc::SourceRefToObjectId(item.documentSourceRef));
+			info.name = item.name;
+			info.hasNameProvider = item.hasNameProvider;
 			info.isReadOnly = item.isReadOnly;
+			isDocumentFound = true;
 			break;
 		}
 	}
-	QString name;
-	if (mgrPtr->GetDocumentName(QByteArray(), result.documentId, name) == imtdoc::IDocumentService::OS_OK){
-		info.name = name;
+	if (!isDocumentFound){
+		QString name;
+		if (mgrPtr->GetDocumentName(QByteArray(), result.documentId, name) == imtdoc::IDocumentService::OS_OK){
+			info.name = name;
+		}
 	}
 	PostToMainThread([cb = std::move(callback), info = std::move(info)]() mutable {
 			cb(info, QString());
