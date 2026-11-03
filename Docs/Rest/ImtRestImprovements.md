@@ -2399,7 +2399,7 @@ Qt продолжает забирать данные из сети и скла�
 **Решение.** Соединение клиента HTTP/1.0 всегда закрывается после ответа (`Connection: close`); `IsConnectionPersistent()` истинно
 только для HTTP/1.1 и новее без `Connection: close`. Подтверждать `keep-alive` пришлось бы, меняя `ResponseOptions`, подсказки
 `CSocketThread` и `IStreamingResponseSender::Hints`, ради редких клиентов, которые не знают HTTP/1.1. Проверка версии вынесена в
-`CHttpRequest::IsHttp11()`: та же проверка решает, можно ли отправлять `chunked` и `100 Continue`.
+`CHttpRequest::IsHttp11OrNewer()`: та же проверка решает, можно ли отправлять `chunked` и `100 Continue`.
 
 **Совместимость.** Клиенты HTTP/1.0 с `keep-alive` (`ab -k`, старые прокси) теряют постоянное соединение, которого у них и не было:
 сервер его не подтверждал. Клиенты HTTP/1.1 (браузеры, curl, Qt) не затронуты.

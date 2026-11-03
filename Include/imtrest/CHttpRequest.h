@@ -182,7 +182,7 @@ private:
 	/**
 		The request is made by a client of HTTP/1.1 or newer.
 	*/
-	bool IsHttp11() const;
+	bool IsHttp11OrNewer() const;
 
 protected:
 	http_parser m_httpParser;
