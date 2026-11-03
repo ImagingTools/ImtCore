@@ -40,7 +40,7 @@ QByteArray EncodeKey(EVP_PKEY* key, EncodeFunction encode)
 
 void CRsaKey::GenerateRsaKeys()
 {
-	constexpr int keyLength = 512;
+	constexpr int keyLength = 2048;
 
 	std::unique_ptr<EVP_PKEY_CTX, decltype(&EVP_PKEY_CTX_free)> context(EVP_PKEY_CTX_new_id(EVP_PKEY_RSA, nullptr), &EVP_PKEY_CTX_free);
 	if (!context || EVP_PKEY_keygen_init(context.get()) <= 0 || EVP_PKEY_CTX_set_rsa_keygen_bits(context.get(), keyLength) <= 0){
