@@ -285,9 +285,8 @@ Item {
 				// make the application version kind (e.g. "Beta Version") and the build time visible in the UI
 				pageAboutProvider.serverVersion = pageAboutProvider.formatVersion(serverApplicationInfo.m_version, serverApplicationInfo.m_versionKind, serverApplicationInfo.m_buildTime)
 
-				// set on a product server while its authorization server (Puma) is reachable
-				let authServer = serverApplicationInfo.m_authServer
-				pageAboutProvider.authServerVersion = authServer ? pageAboutProvider.formatVersion(authServer.m_version, authServer.m_versionKind, authServer.m_buildTime) : ""
+				// services the server depends on (e.g. the authorization server) with their runtime status
+				pageAboutProvider.dependencies = serverApplicationInfo.m_dependencies ? serverApplicationInfo.m_dependencies : null
 
 				AuthorizationController.productId = serverApplicationInfo.m_applicationId
 			}
@@ -396,12 +395,18 @@ Item {
 		ServerLogProvider {}
 	}
 	
+	Component {
+		id: serviceDependencyViewComp
+		ServiceDependencyView {}
+	}
+	
 	ThumbnailDecorator {
 		id: thumbnailDecorator;
 		
 		anchors.fill: parent;
 		Component.onCompleted: {
 			settingsController.registerParamEditor("ServerLog", serverLogProviderComp)
+			settingsController.registerParamEditor("ServiceDependency", serviceDependencyViewComp)
 		}
 		
 		function fillPreferenceParamsSet(){

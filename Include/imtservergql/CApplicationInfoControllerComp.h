@@ -9,8 +9,9 @@
 // ImtCore includes
 #include <imtauth/ISuperuserProvider.h>
 #include <imtcom/IServerConnectionInterface.h>
-#include <imtcom/IServerVersionInfoProvider.h>
+#include <imtcom/IServiceInfoProvider.h>
 #include <imtdb/IDatabaseServerConnectionChecker.h>
+#include <imtsdl/TElementList.h>
 #include <GeneratedFiles/imtappsdl/SDL/1.0/CPP/Application_fwd.h>
 
 
@@ -41,7 +42,7 @@ public:
 		I_ASSIGN(m_userModeSelectionParamCompPtr, "UserModeSelectionParam", "Optional reference used to fold the user-management mode into the response (replaces a separate GetUserMode call)", false, "SelectionParam");
 		I_ASSIGN(m_superuserProviderCompPtr, "SuperuserProvider", "Optional reference used to fold the superuser-exists status into the response (replaces a separate CheckSuperuserExists call)", false, "SuperuserProvider");
 		I_ASSIGN(m_databaseConnectionCheckerCompPtr, "DatabaseConnectionChecker", "Optional database connectivity check performed before the superuser lookup", false, "DatabaseConnectionChecker");
-		I_ASSIGN(m_authServerVersionInfoCompPtr, "AuthServerVersionInfo", "Optional version of the authorization server (Puma) of the product, reported as authServer while it is known", false, "AuthServerVersionInfo");
+		I_ASSIGN_MULTI_0(m_serviceDependenciesCompPtr, "ServiceDependencies", "Optional services the application depends on, e.g. the authorization server; reported as dependencies with their runtime status and own dependencies", false);
 		I_ASSIGN(m_tenantsEnabledAttrPtr, "TenantsEnabled", "Whether the application uses tenants (organizations); clients skip all tenant requests when disabled", true, false);
 		I_ASSIGN(m_externalLoginEnabledAttrPtr, "ExternalLoginEnabled", "Whether the client offers sign-in with external accounts (Google, Apple, Facebook, ...) configured on the authorization server", true, false);
 		I_ASSIGN(m_documentSharingEnabledAttrPtr, "DocumentSharingEnabled", "Whether documents can be shared between related organizations; clients show the shared documents of an organization", true, false);
@@ -61,7 +62,10 @@ private:
 	void FillWebSocketUrl(ApplicationInfo& applicationInfo) const;
 	void FillUserMode(ApplicationInfo& applicationInfo) const;
 	void FillSuperuserStatus(ApplicationInfo& applicationInfo) const;
-	void FillAuthServerVersion(ApplicationInfo& applicationInfo) const;
+	void FillServiceDependencies(ApplicationInfo& applicationInfo) const;
+	static imtsdl::TElementList<sdl::V1_0::imtapp::CServiceInfo> CreateDependencyList(
+				const QList<imtcom::IServiceInfoProvider::ServiceInfo>& dependencies,
+				int depth);
 
 protected:
 	I_REF(ibase::IApplicationInfo, m_applicationInfoCompPtr);
@@ -70,7 +74,7 @@ protected:
 	I_REF(iprm::ISelectionParam, m_userModeSelectionParamCompPtr);
 	I_REF(imtauth::ISuperuserProvider, m_superuserProviderCompPtr);
 	I_REF(imtdb::IDatabaseServerConnectionChecker, m_databaseConnectionCheckerCompPtr);
-	I_REF(imtcom::IServerVersionInfoProvider, m_authServerVersionInfoCompPtr);
+	I_MULTIREF(imtcom::IServiceInfoProvider, m_serviceDependenciesCompPtr);
 	I_ATTR(bool, m_tenantsEnabledAttrPtr);
 	I_ATTR(bool, m_externalLoginEnabledAttrPtr);
 	I_ATTR(bool, m_documentSharingEnabledAttrPtr);

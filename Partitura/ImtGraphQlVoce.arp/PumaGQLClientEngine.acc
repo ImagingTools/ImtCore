@@ -46,9 +46,12 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="AuthServerVersionInfo" PackageId="ImtClientGqlPck" ComponentId="RemoteServerVersionInfo">
+        <Element Id="AuthServerVersionInfo" PackageId="ImtClientGqlPck" ComponentId="RemoteServiceInfo">
             <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ServiceId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="AuthServer"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="AsyncClient" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="AsyncApiClient"/>
                     </AttributeInfo>

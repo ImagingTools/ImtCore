@@ -116,9 +116,9 @@ I_EXPORT_COMPONENT(
 			"Remote Filterable Select Controller");
 
 I_EXPORT_COMPONENT(
-			RemoteServerVersionInfo,
-			"Version of a remote server, requested by GetApplicationInfo on each connection",
-			"Remote Server Version Info Build Time");
+			RemoteServiceInfo,
+			"Runtime status and version of a remote service the application depends on, requested by GetApplicationInfo on each connection",
+			"Remote Service Info Status Version Build Time Dependencies");
 
 
 } // namespace ImtClientGqlPck

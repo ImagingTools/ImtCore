@@ -25,17 +25,27 @@ type SuperuserCheckResult {
 	message: String
 }
 
-type ServerVersionInfo {
+enum ServiceStatus {
+	UNKNOWN
+	DISCONNECTED
+	CONNECTED
+}
+
+type ServiceInfo {
+	serviceId: ID
+	status: ServiceStatus
+	applicationName: String
 	version: String
 	versionKind: String
 	buildTime: String
+	dependencies: [ServiceInfo]
 }
 
 type ApplicationInfo {
 	version: String
 	versionKind: String
 	buildTime: String
-	authServer: ServerVersionInfo
+	dependencies: [ServiceInfo]
 	companyName: String
 	productName: String
 	applicationId: String

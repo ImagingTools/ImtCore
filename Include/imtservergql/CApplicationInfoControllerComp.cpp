@@ -17,6 +17,10 @@ namespace imtservergql
 {
 
 
+// Bounds the dependency tree, e.g. when two services depend on each other
+static const int s_maxDependencyDepth = 8;
+
+
 // protected methods
 
 // reimplemented (sdl::V1_0::imtapp::CApplicationGqlHandlerCompBase)
@@ -97,7 +101,7 @@ CApplicationInfoControllerComp::ApplicationInfo CApplicationInfoControllerComp::
 	FillWebSocketUrl(applicationInfo);
 	FillUserMode(applicationInfo);
 	FillSuperuserStatus(applicationInfo);
-	FillAuthServerVersion(applicationInfo);
+	FillServiceDependencies(applicationInfo);
 
 	applicationInfo.tenantsEnabled = m_tenantsEnabledAttrPtr.IsValid() ? *m_tenantsEnabledAttrPtr : false;
 	applicationInfo.externalLoginEnabled = m_externalLoginEnabledAttrPtr.IsValid() ? *m_externalLoginEnabledAttrPtr : false;
@@ -228,29 +232,74 @@ void CApplicationInfoControllerComp::FillSuperuserStatus(ApplicationInfo& applic
 }
 
 
-void CApplicationInfoControllerComp::FillAuthServerVersion(ApplicationInfo& applicationInfo) const
+void CApplicationInfoControllerComp::FillServiceDependencies(ApplicationInfo& applicationInfo) const
 {
-	if (!m_authServerVersionInfoCompPtr.IsValid()){
+	if (!m_serviceDependenciesCompPtr.IsValid()){
 		return;
 	}
 
-	imtcom::IServerVersionInfoProvider::ServerVersionInfo versionInfo;
-	if (!m_authServerVersionInfoCompPtr->GetServerVersionInfo(versionInfo)){
+	QList<imtcom::IServiceInfoProvider::ServiceInfo> dependencies;
+	const int count = m_serviceDependenciesCompPtr.GetCount();
+	for (int i = 0; i < count; ++i){
+		const imtcom::IServiceInfoProvider* serviceInfoProviderPtr = m_serviceDependenciesCompPtr[i];
+		if (serviceInfoProviderPtr != nullptr){
+			dependencies << serviceInfoProviderPtr->GetServiceInfo();
+		}
+	}
+
+	if (dependencies.isEmpty()){
 		return;
 	}
 
-	sdl::V1_0::imtapp::CServerVersionInfo authServer;
-	if (!versionInfo.version.isEmpty()){
-		authServer.version = versionInfo.version;
-	}
-	if (!versionInfo.versionKind.isEmpty()){
-		authServer.versionKind = versionInfo.versionKind;
-	}
-	if (versionInfo.buildTime.isValid()){
-		authServer.buildTime = versionInfo.buildTime.toUTC().toString(Qt::ISODate);
+	applicationInfo.dependencies = CreateDependencyList(dependencies, 1);
+}
+
+
+imtsdl::TElementList<sdl::V1_0::imtapp::CServiceInfo> CApplicationInfoControllerComp::CreateDependencyList(
+			const QList<imtcom::IServiceInfoProvider::ServiceInfo>& dependencies,
+			int depth)
+{
+	imtsdl::TElementList<sdl::V1_0::imtapp::CServiceInfo> dependencyList;
+	if (depth > s_maxDependencyDepth){
+		return dependencyList;
 	}
 
-	applicationInfo.authServer = std::move(authServer);
+	for (const imtcom::IServiceInfoProvider::ServiceInfo& dependency : dependencies){
+		sdl::V1_0::imtapp::CServiceInfo dependencyData;
+		dependencyData.serviceId = dependency.serviceId;
+
+		switch (dependency.status){
+		case imtcom::IConnectionStatusProvider::CS_CONNECTED:
+			dependencyData.status = sdl::V1_0::imtapp::ServiceStatus::CONNECTED;
+			break;
+		case imtcom::IConnectionStatusProvider::CS_DISCONNECTED:
+			dependencyData.status = sdl::V1_0::imtapp::ServiceStatus::DISCONNECTED;
+			break;
+		default:
+			dependencyData.status = sdl::V1_0::imtapp::ServiceStatus::UNKNOWN;
+			break;
+		}
+
+		if (!dependency.applicationName.isEmpty()){
+			dependencyData.applicationName = dependency.applicationName;
+		}
+		if (!dependency.version.isEmpty()){
+			dependencyData.version = dependency.version;
+		}
+		if (!dependency.versionKind.isEmpty()){
+			dependencyData.versionKind = dependency.versionKind;
+		}
+		if (dependency.buildTime.isValid()){
+			dependencyData.buildTime = dependency.buildTime.toUTC().toString(Qt::ISODate);
+		}
+		if (!dependency.dependencies.isEmpty()){
+			dependencyData.dependencies = CreateDependencyList(dependency.dependencies, depth + 1);
+		}
+
+		dependencyList << dependencyData;
+	}
+
+	return dependencyList;
 }
 
 

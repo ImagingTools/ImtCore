@@ -3,6 +3,7 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtbaseImtBaseTypesSdl 1.0
+import imtappApplicationSdl 1.0
 
 ParamsSetController {
 	id: root;
@@ -14,7 +15,8 @@ ParamsSetController {
 	}
 	
 	property string serverVersion
-	property string authServerVersion
+	// Services the server depends on, with their own dependencies (ServiceInfo list of GetApplicationInfo)
+	property var dependencies: null
 	
 	Component.onCompleted: {
 		createRepresentation()
@@ -25,8 +27,7 @@ ParamsSetController {
 		createRepresentation()
 	}
 	
-	onAuthServerVersionChanged: {
-		authServerVersionText.m_text = root.authServerVersion
+	onDependenciesChanged: {
 		createRepresentation()
 	}
 	
@@ -34,9 +35,8 @@ ParamsSetController {
 		m_text: root.serverVersion
 	}
 	
-	property TextParam authServerVersionText: TextParam {
-		m_text: root.authServerVersion
-	}
+	// Data of one dependency row, m_version holds the formatted version, see ServiceDependencyView
+	property ServiceInfo dependencyRowInfo: ServiceInfo {}
 	
 	// "1.0.11563 - Beta Version (03.11.2026 14:25)", buildTime is an ISO date in UTC
 	function formatVersion(version, versionKind, buildTime){
@@ -52,13 +52,43 @@ ParamsSetController {
 		return text
 	}
 	
+	// One row per service, a nested service is named by its path, e.g. "Puma / Lisa"
+	function addDependencyParams(dependencyList, parentName, parentId){
+		if (!dependencyList){
+			return
+		}
+	
+		for (let i = 0; i < dependencyList.getItemsCount(); ++i){
+			let dependency = dependencyList.get(i).item
+			if (!dependency){
+				continue
+			}
+	
+			let serviceId = dependency.m_serviceId ? String(dependency.m_serviceId) : ""
+			let applicationName = dependency.m_applicationName ? String(dependency.m_applicationName) : ""
+			let name = applicationName !== "" ? applicationName : serviceId
+			if (parentName !== ""){
+				name = parentName + " / " + name
+			}
+	
+			let id = parentId + "/" + i
+	
+			root.dependencyRowInfo.m_serviceId = serviceId
+			root.dependencyRowInfo.m_status = dependency.m_status ? dependency.m_status : "UNKNOWN"
+			root.dependencyRowInfo.m_applicationName = applicationName
+			root.dependencyRowInfo.m_version = formatVersion(dependency.m_version, dependency.m_versionKind, dependency.m_buildTime)
+	
+			addParam("ServiceDependency", id, name, "", root.dependencyRowInfo.toJson())
+	
+			addDependencyParams(dependency.m_dependencies, name, id)
+		}
+	}
+	
 	function createRepresentation(){
 		clearParamsSet()
 	
 		addParam(ParamTypeIdsTypeMetaInfo.s_textView, "ServerVersion", qsTr("Server Version"), "", serverVersionText.toJson())
-		if (root.authServerVersion !== ""){
-			addParam(ParamTypeIdsTypeMetaInfo.s_textView, "AuthServerVersion", qsTr("Puma Version"), "", authServerVersionText.toJson())
-		}
+		addDependencyParams(root.dependencies, "", "ServiceDependency")
 		addParam("ServerLog", "ServerLog", qsTr("Server Log"), "", "")
 	}
 }

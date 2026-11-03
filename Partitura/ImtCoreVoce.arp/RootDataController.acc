@@ -51,7 +51,7 @@
                     <AttributeInfo Id="ApplicationPreferences" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="AppPreferences"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="AuthServerVersionInfo" Type="Reference" ExportId="AuthServerVersionInfo">
+                    <AttributeInfo Id="ServiceDependencies" Type="Reference[]" ExportId="ServiceDependencies">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DatabaseConnectionChecker" Type="Reference" ExportId="DatabaseConnectionChecker">
