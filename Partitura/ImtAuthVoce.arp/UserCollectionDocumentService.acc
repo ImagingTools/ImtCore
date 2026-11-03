@@ -214,6 +214,9 @@
                     <AttributeInfo Id="MembershipManager" Type="Reference" ExportId="MembershipManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="PasswordPolicy" Type="Reference" ExportId="PasswordPolicy">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="PermissionChecker" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="CheckPermissionOr"/>
                     </AttributeInfo>

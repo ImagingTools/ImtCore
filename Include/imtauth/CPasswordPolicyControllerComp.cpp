@@ -161,7 +161,9 @@ IPasswordPolicy::LifetimeStatus CPasswordPolicyControllerComp::GetPasswordLifeti
 		return LS_EXPIRED;
 	}
 
-	daysUntilExpiration = static_cast<int>(currentTime.daysTo(expirationTime));
+	// Rounded up: a password that expires in a few hours still has 1 day, not 0
+	const qint64 secondsPerDay = 24 * 60 * 60;
+	daysUntilExpiration = static_cast<int>((currentTime.secsTo(expirationTime) + secondsPerDay - 1) / secondsPerDay);
 
 	int warningPeriod = m_expirationWarningPeriodAttrPtr.IsValid() ? *m_expirationWarningPeriodAttrPtr : PasswordPolicyDefaults::EXPIRATION_WARNING_PERIOD;
 	if (warningPeriod > 0 && daysUntilExpiration <= warningPeriod){

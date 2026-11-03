@@ -3622,6 +3622,10 @@
         <source>Password changed successfully</source>
         <translation>Password cambiata con successo</translation>
     </message>
+    <message>
+        <source>Your password expires in %1 day(s). Please change it in your profile.</source>
+        <translation>La password scade tra %1 giorno/i. Cambiala nel tuo profilo.</translation>
+    </message>
 </context>
 <context>
     <name>AuthorizationPage</name>
@@ -3682,6 +3686,18 @@
         <location line="+10" />
         <source>Close</source>
         <translation>Chiudi</translation>
+    </message>
+    <message>
+        <source>Unable to change the password.</source>
+        <translation>Impossibile cambiare la password.</translation>
+    </message>
+    <message>
+        <source>Your password has expired</source>
+        <translation>La password è scaduta</translation>
+    </message>
+    <message>
+        <source>Unable to register the user</source>
+        <translation>Impossibile registrare l&apos;utente</translation>
     </message>
 </context>
 <context>
@@ -7468,6 +7484,81 @@
     </message>
 </context>
 <context>
+    <name>PasswordPolicyController</name>
+    <message>
+        <source>at least %1 characters</source>
+        <translation>almeno %1 caratteri</translation>
+    </message>
+    <message>
+        <source>at most %1 characters</source>
+        <translation>al massimo %1 caratteri</translation>
+    </message>
+    <message>
+        <source>a lowercase letter</source>
+        <translation>una lettera minuscola</translation>
+    </message>
+    <message>
+        <source>an uppercase letter</source>
+        <translation>una lettera maiuscola</translation>
+    </message>
+    <message>
+        <source>a digit</source>
+        <translation>una cifra</translation>
+    </message>
+    <message>
+        <source>a special character</source>
+        <translation>un carattere speciale</translation>
+    </message>
+    <message>
+        <source>a password different from the login</source>
+        <translation>una password diversa dal nome utente</translation>
+    </message>
+    <message>
+        <source>a password that is not commonly used</source>
+        <translation>una password non di uso comune</translation>
+    </message>
+    <message>
+        <source>a password different from the last %1 ones</source>
+        <translation>una password diversa dalle ultime %1</translation>
+    </message>
+    <message>
+        <source>a password that was not used before</source>
+        <translation>una password mai usata prima</translation>
+    </message>
+    <message>
+        <source>The current password is not correct.</source>
+        <translation>La password attuale non è corretta.</translation>
+    </message>
+    <message>
+        <source>The password was changed too recently and cannot be changed again yet.</source>
+        <translation>La password è stata cambiata troppo di recente e non può ancora essere cambiata di nuovo.</translation>
+    </message>
+    <message>
+        <source>This account is managed by an external system, its password cannot be changed here.</source>
+        <translation>Questo account è gestito da un sistema esterno, la sua password non può essere cambiata qui.</translation>
+    </message>
+    <message>
+        <source>This account no longer exists.</source>
+        <translation>Questo account non esiste più.</translation>
+    </message>
+    <message>
+        <source>The password could not be changed. Please try again later.</source>
+        <translation>Impossibile cambiare la password. Riprova più tardi.</translation>
+    </message>
+    <message>
+        <source>The password does not meet the requirements: %1.</source>
+        <translation>La password non soddisfa i requisiti: %1.</translation>
+    </message>
+    <message>
+        <source>, </source>
+        <translation>, </translation>
+    </message>
+    <message>
+        <source>Password requirements:</source>
+        <translation>Requisiti della password:</translation>
+    </message>
+</context>
+<context>
     <name>PasswordRecoveryDialog</name>
     <message>
         <location filename="../../../Qml/imtauthgui/PasswordRecoveryDialog.qml" line="+15" />
@@ -7569,6 +7660,10 @@
         <location line="+142" />
         <source>Password changed successfully</source>
         <translation>Password cambiata con successo</translation>
+    </message>
+    <message>
+        <source>Unable to change the password.</source>
+        <translation>Impossibile cambiare la password.</translation>
     </message>
 </context>
 <context>
@@ -7808,6 +7903,97 @@
         <location line="+21" />
         <source>Category</source>
         <translation>Categoria</translation>
+    </message>
+</context>
+<context>
+    <name>ProfileGeneralPage</name>
+    <message>
+        <source>Profile saved</source>
+        <translation>Profilo salvato</translation>
+    </message>
+    <message>
+        <source>Unable to save the profile.</source>
+        <translation>Impossibile salvare il profilo.</translation>
+    </message>
+    <message>
+        <source>Account</source>
+        <translation>Account</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Nome</translation>
+    </message>
+    <message>
+        <source>Enter the name</source>
+        <translation>Inserisci il nome</translation>
+    </message>
+    <message>
+        <source>Email Address</source>
+        <translation>Indirizzo e-mail</translation>
+    </message>
+    <message>
+        <source>Enter the email</source>
+        <translation>Inserisci l&apos;e-mail</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation>Salva</translation>
+    </message>
+    <message>
+        <source>Password changed</source>
+        <translation>Password cambiata</translation>
+    </message>
+    <message>
+        <source>Unable to change the password. Check your current password and try again.</source>
+        <translation>Impossibile cambiare la password. Controlla la password attuale e riprova.</translation>
+    </message>
+    <message>
+        <source>Password</source>
+        <translation>Password</translation>
+    </message>
+    <message>
+        <source>Change</source>
+        <translation>Cambia</translation>
+    </message>
+    <message>
+        <source>Current password</source>
+        <translation>Password attuale</translation>
+    </message>
+    <message>
+        <source>Enter your current password</source>
+        <translation>Inserisci la password attuale</translation>
+    </message>
+    <message>
+        <source>New password</source>
+        <translation>Nuova password</translation>
+    </message>
+    <message>
+        <source>Enter a new password</source>
+        <translation>Inserisci una nuova password</translation>
+    </message>
+    <message>
+        <source>Confirm new password</source>
+        <translation>Conferma la nuova password</translation>
+    </message>
+    <message>
+        <source>Re-enter the new password</source>
+        <translation>Reinserisci la nuova password</translation>
+    </message>
+    <message>
+        <source>Passwords don&apos;t match</source>
+        <translation>Le password non corrispondono</translation>
+    </message>
+    <message>
+        <source>Changing password…</source>
+        <translation>Modifica della password…</translation>
+    </message>
+    <message>
+        <source>Update password</source>
+        <translation>Aggiorna password</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Annulla</translation>
     </message>
 </context>
 <context>
@@ -9084,6 +9270,26 @@ Errori: 0</translation>
         <source>OK</source>
         <translation>OK</translation>
     </message>
+    <message>
+        <source>Unable to create the administrator account</source>
+        <translation>Impossibile creare l&apos;account amministratore</translation>
+    </message>
+    <message>
+        <source>Unable to reach server</source>
+        <translation>Server non raggiungibile</translation>
+    </message>
+    <message>
+        <source>Create the administrator account</source>
+        <translation>Crea l&apos;account amministratore</translation>
+    </message>
+    <message>
+        <source>This server doesn&apos;t have one yet. Set a name and password below - you&apos;ll sign in with them right after.</source>
+        <translation>Questo server non ne ha ancora uno. Imposta nome e password qui sotto: accederai con questi subito dopo.</translation>
+    </message>
+    <message>
+        <source>Create account</source>
+        <translation>Crea account</translation>
+    </message>
 </context>
 <context>
     <name>TDocumentWorkspaceGuiCompBase</name>
@@ -9520,6 +9726,10 @@ ID input: </translation>
         <location line="+10" />
         <source>Change Password</source>
         <translation>Cambia password</translation>
+    </message>
+    <message>
+        <source>Unable to change the password.</source>
+        <translation>Impossibile cambiare la password.</translation>
     </message>
 </context>
 <context>

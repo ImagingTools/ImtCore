@@ -61,6 +61,10 @@ private slots:
 	void testDefaults_UnsetAttributes();
 	void testDefaults_HistoryIsKeptWhenUnconfigured();
 
+	// Helpers used on every path that sets a password
+	void testCheckNewPassword_StrengthAndReuse();
+	void testStoreNewPasswordHash_RecordsTheChange();
+
 private:
 	QString m_imtCorePath;
 	QString m_registryFile;

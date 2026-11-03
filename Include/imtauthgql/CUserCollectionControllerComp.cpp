@@ -15,6 +15,7 @@
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Users.h>
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtauth/CollectionSelection.h>
+#include <imtauth/PasswordPolicyUtils.h>
 #include <imtauth/CUserInfo.h>
 #include <imtgql/IGqlContext.h>
 #include <imtauth/ITenantManager.h>
@@ -546,9 +547,16 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateObjectFromRepres
 				return nullptr;
 			}
 
-			password = m_hashCalculatorCompPtr->GenerateHash(*userDataRepresentation.username + password.toUtf8());
+			const QByteArray login = *userDataRepresentation.username;
+			const QByteArray passwordHash = m_hashCalculatorCompPtr->GenerateHash(login + password.toUtf8());
 
-			userInfoPtr->SetPasswordHash(password.toUtf8());
+			QStringList violatedRuleIds;
+			if (!imtauth::CheckNewPassword(m_passwordPolicyCompPtr.GetPtr(), *userInfoPtr, login, password, passwordHash, violatedRuleIds)){
+				errorMessage = QStringLiteral("The password does not fulfill the password policy (%1)").arg(violatedRuleIds.join(", "));
+				return nullptr;
+			}
+
+			imtauth::StoreNewPasswordHash(*userInfoPtr, passwordHash, m_passwordPolicyCompPtr.GetPtr());
 
 			break;
 		}

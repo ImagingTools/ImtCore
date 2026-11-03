@@ -19,6 +19,9 @@ IEC 62443-4-2 CR 1.7 "Strength of password-based authentication" for security le
 | `imtauth::IPasswordPolicy` | `Include/imtauth/IPasswordPolicy.h` | Policy interface (strength, history, lifetime) |
 | `imtauth::CPasswordPolicyControllerComp` | `Include/imtauth/CPasswordPolicyControllerComp.{h,cpp}` | Configurable policy implementation (`PasswordPolicy` component in `ImtAuthPck`) |
 | `imtauthgql::CUserControllerComp` | `Include/imtauthgql/CUserControllerComp.{h,cpp}` | Enforces strength, reuse and minimum age on `ChangePassword`, `RegisterUser` and `CreateSuperuser` |
+| `imtauthgql::CUserCollectionControllerComp`, `imtauthgql::CUserCollectionDocumentServiceComp` | `Include/imtauthgql/` | Enforce strength and reuse on a password an administrator sets for a new user (`UserAdd`, user editor); no minimum age |
+| `imtauthgql::CGqlJwtSessionControllerComp` | `Include/imtauthgql/CGqlJwtSessionControllerComp.{h,cpp}` | Refuses `RefreshToken` once the password has expired |
+| `imtauth::StoreNewPasswordHash` | `Include/imtauth/PasswordPolicyUtils.h` | Stores a new hash and records the change (history, change time) on every path that sets a password |
 | `imtauthgql::CAuthorizationControllerComp` | `Include/imtauthgql/CAuthorizationControllerComp.{h,cpp}` | Evaluates password lifetime on `Authorization`/`UserToken` |
 
 The `PasswordPolicy` reference on both controllers is **optional**. If it is not wired,
@@ -80,7 +83,14 @@ behavior.
   password via `ChangePassword`).
 - If the password expires within `ExpirationWarningPeriod` days, the login succeeds and the
   payload carries `passwordExpiresInDays` so clients can prompt the user to change the
-  password before it expires.
+  password before it expires. The value is rounded up: a password that expires in a few hours
+  reports 1 day.
+- `RefreshToken` is refused (`ok = false`) and the session removed once the password has expired
+  or must be changed, so a remembered session does not outlive the password. The user signs in
+  again and is sent to the change-password flow. This needs `PasswordPolicy` and `UserCollection`
+  wired into `GqlJwtSessionController` (done in Puma). Users with an enabled external account (e.g.
+  LDAP) are skipped, as the session does not tell which system signed them in. A user that cannot
+  be read gets no new token.
 - The QML client (`AuthorizationPage`) opens a change-password dialog on `passwordExpired`,
   changes the password with the one just entered and repeats the login; a pending expiration
   is shown as a warning after the login. The product registry must wire the same `PasswordPolicy`
