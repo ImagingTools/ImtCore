@@ -60,6 +60,7 @@ QtObject {
 	signal requestDocumentName(string documentId, string typeId)
 	signal documentNameChanged(string documentId, string oldName, string newName)
 	signal documentIsDirtyChanged(string documentId, bool isDirty)
+	signal documentIsReadOnlyChanged(string documentId)
 
 	signal startUndoInfoReceive(string documentId)
 	signal undoInfoReceived(string documentId, int availableUndoSteps, int availableRedoSteps, bool isDirty)

@@ -377,7 +377,10 @@ DocumentServiceBase {
 			let documentInfo = documentInfoList.get(i).item
 			let documentId = String(documentInfo.m_documentId)
 			if (documentInfo.m_isReadOnly === true){
+				let wasReadOnly = root.documentIsReadOnly(documentId)
 				root.__internal.readOnlyDocumentIds[documentId] = true
+				if (!wasReadOnly)
+					root.documentIsReadOnlyChanged(documentId)
 			}
 			if (root.documentIsOpened(documentId) && documentInfo.m_isLoading === false){
 				root.setDocumentIsLoading(documentId, false)

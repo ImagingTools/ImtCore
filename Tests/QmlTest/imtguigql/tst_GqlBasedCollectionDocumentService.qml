@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import QtTest 1.12
 import imtgui 1.0
+import imtcontrols 1.0
 import imtdocgui 1.0
 import imtguigql 1.0
 import imtqmltest 1.0
@@ -43,6 +44,8 @@ TestCase {
 			height: 10
 
 			property bool accepts: true
+
+			commandsController: CommandsController {}
 
 			function updateModel(){
 				model.modelChanged(null)
@@ -169,6 +172,25 @@ TestCase {
 		tryVerify(function(){ return GqlTestTransport.requestCount === 1 }, 5000)
 		wait(50)
 		compare(controller.requestCount, requestsBefore, "A plain undo info request does not reload the views")
+	}
+
+	function test_resyncDisablesCommandsWhenDocumentBecomesReadOnly(){
+		let service = openDocument(true)
+		let decorator = service.__internal.openedDocuments[service.getDocumentIndexByDocumentId("doc")].documentDecorator
+		let commandsController = decorator.registeredViews[0].commandsController
+		commandsController.setCommandIsEnabled("Undo", true)
+		commandsController.setCommandIsEnabled("Redo", true)
+		commandsController.setCommandIsEnabled("Save", true)
+
+		service.__applyLoadingStates({
+			count: 1,
+			get: function(){ return {item: {"m_documentId": "doc", "m_isReadOnly": true, "m_isLoading": false}} }
+		})
+
+		verify(service.documentIsReadOnly("doc"))
+		compare(commandsController.pendingChanges["Undo"].m_enabled, false)
+		compare(commandsController.pendingChanges["Redo"].m_enabled, false)
+		compare(commandsController.pendingChanges["Save"].m_enabled, false)
 	}
 
 	function test_saveOnCloseWritesViewsFirst(){

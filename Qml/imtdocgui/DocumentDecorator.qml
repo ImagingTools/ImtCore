@@ -135,6 +135,20 @@ QtObject {
 			}
 		}
 
+		function onDocumentIsReadOnlyChanged(documentId){
+			if (documentId !== root.documentId || !root.isReadOnly()){
+				return
+			}
+
+			for (let i = 0; i < root.registeredViews.length; ++i){
+				if (root.registeredViews[i].commandsController){
+					root.registeredViews[i].commandsController.setCommandIsEnabled("Undo", false)
+					root.registeredViews[i].commandsController.setCommandIsEnabled("Redo", false)
+					root.registeredViews[i].commandsController.setCommandIsEnabled("Save", false)
+				}
+			}
+		}
+
 		function onDocumentManagerChanged(typeOperation, objectId, documentId, hasChanges){
 			if (documentId !== root.documentId){
 				return
