@@ -150,7 +150,9 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CGroupCollectionDocumentServiceComp
 		groupPtr->SetRoles(productId, CAssignmentCollector::GetDirectIds(groupData.roles));
 	}
 
-	m_documentManagerCompPtr->SetDocumentData(userLogin, documentId, *documentPtr);
+	if (m_documentManagerCompPtr->SetDocumentData(userLogin, documentId, *documentPtr) != imtdoc::IDocumentService::OS_OK){
+		return response;
+	}
 
 	response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Success;
 
