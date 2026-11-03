@@ -30,11 +30,12 @@ Column {
 
 		root.accepted = matching && (violatedRules.length === 0);
 
-		if (!matching){
-			root.errorText = qsTr("Passwords don't match");
-		}
-		else if (violatedRules.length > 0){
+		// Nothing is reported for an empty form, so the requirements stay visible until the user types
+		if (violatedRules.length > 0){
 			root.errorText = root.policy.describeFailure(violatedRules, "");
+		}
+		else if (!matching && newPasswordInput2.text !== ""){
+			root.errorText = qsTr("Passwords don't match");
 		}
 		else{
 			root.errorText = "";

@@ -696,6 +696,7 @@
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="Demultiplexer"/>
     </ExportedInterfaces>
     <ExportedComponents>
+        <Component ExportedId="PasswordPolicy" ComponentId="PasswordPolicy"/>
         <Component ExportedId="SmtpMessageCreator" ComponentId="SmtpMessageCreator"/>
         <Component ExportedId="UserChangeGenerator" ComponentId="UserChangeGenerator"/>
     </ExportedComponents>

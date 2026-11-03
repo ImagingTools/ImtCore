@@ -81,6 +81,10 @@ behavior.
 - If the password expires within `ExpirationWarningPeriod` days, the login succeeds and the
   payload carries `passwordExpiresInDays` so clients can prompt the user to change the
   password before it expires.
+- The QML client (`AuthorizationPage`) opens a change-password dialog on `passwordExpired`,
+  changes the password with the one just entered and repeats the login; a pending expiration
+  is shown as a warning after the login. The product registry must wire the same `PasswordPolicy`
+  instance into the login controller and into `UsersPage` (exported as `UsersPage/PasswordPolicy`).
 
 ### Policy publication (`GetPasswordPolicy` query)
 
