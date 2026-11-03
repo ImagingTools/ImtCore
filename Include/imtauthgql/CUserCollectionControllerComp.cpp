@@ -657,14 +657,6 @@ bool CUserCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 		return false;
 	}
 
-	// The password hash includes the login and UserUpdate takes no password, so a new login would lock the user out
-	if (userData.username && *userData.username != userInfoPtr->GetId() && !userInfoPtr->GetPasswordHash().isEmpty()){
-		errorMessage = QStringLiteral("The login of a user with a password can be changed only together with the password");
-		SendWarningMessage(0, errorMessage, "CUserCollectionControllerComp");
-
-		return false;
-	}
-
 	QByteArray objectId = userInfoPtr->GetObjectUuid();
 
 	QByteArrayList groupIds = userInfoPtr->GetGroups();

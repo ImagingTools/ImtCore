@@ -230,7 +230,6 @@ DocumentViewBase {
 
 				userGeneralEditor.passwordInput.visible = container.isNew;
 				userGeneralEditor.changePasswordButton.visible = !container.isNew;
-				userGeneralEditor.usernameEditable = container.isNew;
 			}
 
 			function checkSystemId(){

@@ -85,10 +85,7 @@ behavior.
   payload carries `passwordExpiresInDays` so clients can prompt the user to change the
   password before it expires. The value is rounded up: a password that expires in a few hours
   reports 1 day.
-- The login of a user with a password can be changed only together with the password: the hash includes
-  the login. `UserUpdate` refuses a new login, the user editor accepts it only with the password, and
-  shows the login of a saved user read-only. The collection representation (`UserItem`) does not
-  return the password hash.
+- The collection representation (`UserItem`) does not return the password hash.
 - `RefreshToken` is refused (`ok = false`) and the session removed once the password has expired
   or must be changed, so a remembered session does not outlive the password. The user signs in
   again and is sent to the change-password flow. This needs `PasswordPolicy` and `UserCollection`

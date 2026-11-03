@@ -267,45 +267,31 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 		userPtr->AddToSystem(systemInfo);
 	}
 
-	// The password hash includes the login: a renamed user gets a hash of the new login, which needs the password
-	bool hasInternalSystem = false;
-	for (const imtauth::IUserInfo::SystemInfo& systemInfo : userPtr->GetSystemInfos()){
-		if (systemInfo.enabled && systemInfo.systemId.isEmpty()){
-			hasInternalSystem = true;
-			break;
-		}
-	}
+	// Handle password: hash when user is in internal system (empty systemId, enabled)
+	if (userData.password){
+		QByteArray username = userPtr->GetId();
+		if (!username.isEmpty() && m_hashCalculatorCompPtr.IsValid()){
+			for (const imtauth::IUserInfo::SystemInfo& systemInfo : userPtr->GetSystemInfos()){
+				if (systemInfo.enabled && systemInfo.systemId.isEmpty()){
+					const QString password = *userData.password;
+					const QByteArray passwordHash = password.isEmpty() ? QByteArray() : m_hashCalculatorCompPtr->GenerateHash(username + password.toUtf8());
+					// The editor sends the whole representation on every change: only a different password is a new one
+					const bool isSamePasswordOfRenamedUser = !passwordHash.isEmpty() && previousUsername != username
+								&& m_hashCalculatorCompPtr->GenerateHash(previousUsername + password.toUtf8()) == userPtr->GetPasswordHash();
+					if (isSamePasswordOfRenamedUser){
+						userPtr->SetPasswordHash(passwordHash);
+					}
+					else if (!passwordHash.isEmpty() && passwordHash != userPtr->GetPasswordHash()){
+						QStringList violatedRuleIds;
+						if (!imtauth::CheckNewPassword(m_passwordPolicyCompPtr.GetPtr(), *userPtr, username, password, passwordHash, violatedRuleIds)){
+							response.message = QStringLiteral("The password does not fulfill the password policy (%1)").arg(violatedRuleIds.join(", "));
+							return response;
+						}
 
-	const QByteArray username = userPtr->GetId();
-	if (hasInternalSystem && !username.isEmpty() && m_hashCalculatorCompPtr.IsValid()){
-		QString password;
-		if (userData.password){
-			password = *userData.password;
-		}
-
-		const QByteArray storedPasswordHash = userPtr->GetPasswordHash();
-		if (password.isEmpty()){
-			if (username != previousUsername && !storedPasswordHash.isEmpty()){
-				response.message = QStringLiteral("The login of a user with a password can be changed only together with the password");
-				return response;
-			}
-		}
-		else{
-			const QByteArray passwordHash = m_hashCalculatorCompPtr->GenerateHash(username + password.toUtf8());
-			// The editor sends the whole representation on every change: only a different password is a new one
-			const bool isSamePasswordOfRenamedUser = username != previousUsername
-						&& m_hashCalculatorCompPtr->GenerateHash(previousUsername + password.toUtf8()) == storedPasswordHash;
-			if (isSamePasswordOfRenamedUser){
-				userPtr->SetPasswordHash(passwordHash);
-			}
-			else if (passwordHash != storedPasswordHash){
-				QStringList violatedRuleIds;
-				if (!imtauth::CheckNewPassword(m_passwordPolicyCompPtr.GetPtr(), *userPtr, username, password, passwordHash, violatedRuleIds)){
-					response.message = QStringLiteral("The password does not fulfill the password policy (%1)").arg(violatedRuleIds.join(", "));
-					return response;
+						imtauth::StoreNewPasswordHash(*userPtr, passwordHash, m_passwordPolicyCompPtr.GetPtr());
+					}
+					break;
 				}
-
-				imtauth::StoreNewPasswordHash(*userPtr, passwordHash, m_passwordPolicyCompPtr.GetPtr());
 			}
 		}
 	}
