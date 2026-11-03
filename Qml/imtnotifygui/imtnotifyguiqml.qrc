@@ -1,0 +1,14 @@
+<RCC>
+    <qresource prefix="/qml">
+        <file alias="imtnotifygui/qmldir">qmldir</file>
+        <file alias="imtnotifygui/NotificationCenter.qml">NotificationCenter.qml</file>
+        <file alias="imtnotifygui/NotificationApiClient.qml">NotificationApiClient.qml</file>
+        <file alias="imtnotifygui/GqlBasedNotificationApiClient.qml">GqlBasedNotificationApiClient.qml</file>
+        <file alias="imtnotifygui/NotificationTypeRegistry.qml">NotificationTypeRegistry.qml</file>
+        <file alias="imtnotifygui/NotificationBell.qml">NotificationBell.qml</file>
+        <file alias="imtnotifygui/NotificationPanel.qml">NotificationPanel.qml</file>
+        <file alias="imtnotifygui/NotificationsPage.qml">NotificationsPage.qml</file>
+        <file alias="imtnotifygui/NotificationDelegate.qml">NotificationDelegate.qml</file>
+        <file alias="imtnotifygui/NotificationMessageFormat.js">NotificationMessageFormat.js</file>
+    </qresource>
+</RCC>

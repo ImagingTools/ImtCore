@@ -18,6 +18,7 @@
         <Element ComponentName="SearchPage" X="100" Y="700" Note=""/>
         <Element ComponentName="TenantsPage" X="1125" Y="575" Note=""/>
         <Element ComponentName="Workspace" X="325" Y="700" Note=""/>
+        <Element ComponentName="NotificationsPage" X="900" Y="700" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

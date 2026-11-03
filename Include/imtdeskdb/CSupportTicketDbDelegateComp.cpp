@@ -582,6 +582,12 @@ void CSupportTicketDbDelegateComp::OnComponentCreated()
 }
 
 
+QString CSupportTicketDbDelegateComp::GetCreationTimeColumn() const
+{
+	return QStringLiteral("CreatedAt");
+}
+
+
 idoc::MetaInfoPtr CSupportTicketDbDelegateComp::CreateObjectMetaInfo(const QByteArray& typeId) const
 {
 	return BaseClass::CreateObjectMetaInfo(typeId);

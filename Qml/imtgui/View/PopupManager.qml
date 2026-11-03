@@ -10,31 +10,44 @@ QtObject {
 
 	property PopupContainer popupContainer: null;
 
+	// A message added with options.clickable was clicked
+	signal messageClicked(string id);
+
+	property Connections __containerConnections: Connections {
+		target: root.popupContainer;
+
+		function onMessageClicked(id){
+			root.messageClicked(id);
+		}
+	}
+
 	function registerPopupContainer(popup){
 		popupContainer = popup;
 	}
 
-	function addErrorMessage(text, autoClose, id){
+	// options (optional): {"messageDetails": second line, "messageIcon": icon instead of the one of the type,
+	// "plainText": show the texts as they are, "clickable": the message emits messageClicked}
+	function addErrorMessage(text, autoClose, id, options){
 		if (popupContainer){
-			popupContainer.addMessage("error", text, autoClose, id)
+			popupContainer.addMessage("error", text, autoClose, id, options)
 		}
 	}
 
-	function addWarningMessage(text, autoClose, id){
+	function addWarningMessage(text, autoClose, id, options){
 		if (popupContainer){
-			popupContainer.addMessage("warning", text, autoClose, id)
+			popupContainer.addMessage("warning", text, autoClose, id, options)
 		}
 	}
 
-	function addSuccessMessage(text, autoClose, id){
+	function addSuccessMessage(text, autoClose, id, options){
 		if (popupContainer){
-			popupContainer.addMessage("success", text, autoClose, id)
+			popupContainer.addMessage("success", text, autoClose, id, options)
 		}
 	}
 
-	function addInfoMessage(text, autoClose, id){
+	function addInfoMessage(text, autoClose, id, options){
 		if (popupContainer){
-			popupContainer.addMessage("info", text, autoClose, id)
+			popupContainer.addMessage("info", text, autoClose, id, options)
 		}
 	}
 

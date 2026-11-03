@@ -201,9 +201,8 @@ QtObject {
 				"tenantName": data.containsKey("tenantName") ? data.getData("tenantName") : ""
 			}
 
+			// The notification center keeps the message for the owner; here only the state of the views follows
 			if (notificationType === "MessageReceived" || notificationType === 0) {
-				var tName = notification.tenantName ? notification.tenantName : qsTr("another organization")
-				PopupManager.addInfoMessage(qsTr("New cross-tenant message from \"%1\"").arg(tName), true)
 				root.subscriptionCrossTenantMessageReceived(notification)
 			} else if (notificationType === "MessageStatusChanged" || notificationType === 1) {
 				root.subscriptionCrossTenantMessageStatusChanged(notification)
@@ -230,15 +229,7 @@ QtObject {
 				"relationshipId": data.containsKey("relationshipId") ? data.getData("relationshipId") : ""
 			}
 
-			// The partner may end a connection or a relationship: the owners of both organizations are told.
-			// The message is keyed by the connection or relationship, so the page's own message of the same removal is replaced.
-			var type = notification.notificationType
-			if (type === "ConnectionRemoved" || type === 3) {
-				PopupManager.addInfoMessage(qsTr("A connection of your organization with another one was removed"), true, "connection-removed-" + notification.connectionId)
-			} else if (type === "RelationshipRemoved" || type === 7) {
-				PopupManager.addInfoMessage(qsTr("A relationship of your organization with another one was ended"), true, "relationship-removed-" + notification.relationshipId)
-			}
-
+			// The notification center tells the owners; here only the state of the views follows
 			root.subscriptionConnectionCodesChanged(notification)
 		}
 

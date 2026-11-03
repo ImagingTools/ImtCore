@@ -8,13 +8,20 @@
 
 // Qt includes
 #include <QList>
+#include <QMutex>
+#include <QPair>
+#include <QSet>
+#include <QTimer>
 #include <QVariantMap>
 
 // ImtCore includes
 #include <imtauth/ITenantInvitationManager.h>
 #include <imtauth/ITenantMembershipManager.h>
 #include <imtauth/ITenantManager.h>
+#include <imtbase/IObjectCollection.h>
 #include <imtservergql/CGqlPublisherCompBase.h>
+#include <imtnotify/INotificationInboxController.h>
+#include <imtnotify/INotificationSender.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/TenantMemberships_fwd.h>
 
 
@@ -58,6 +65,9 @@ public:
 		I_ASSIGN_TO(m_tenantManagerModelCompPtr, m_tenantManagerCompPtr, false);
 		I_ASSIGN(m_invitationManagerCompPtr, "InvitationManager", "Tenant invitation manager to observe for invitation lifecycle changes", false, "TenantInvitationManager");
 		I_ASSIGN_TO(m_invitationManagerModelCompPtr, m_invitationManagerCompPtr, false);
+		I_ASSIGN(m_notificationSenderCompPtr, "NotificationSender", "Notification center that keeps the notifications of the users", false, "NotificationSender");
+		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "Users: the names of the users the notifications are about", false, "UserCollection");
+		I_ASSIGN(m_inboxControllerCompPtr, "InboxController", "Inboxes of the users: a removed member loses the notifications of the organization", false, "InboxController");
 	I_END_COMPONENT;
 
 protected:
@@ -78,6 +88,9 @@ protected:
 	I_REF(imod::IModel, m_tenantManagerModelCompPtr);
 	I_REF(imtauth::ITenantInvitationManager, m_invitationManagerCompPtr);
 	I_REF(imod::IModel, m_invitationManagerModelCompPtr);
+	I_REF(imtnotify::INotificationSender, m_notificationSenderCompPtr);
+	I_REF(imtnotify::INotificationInboxController, m_inboxControllerCompPtr);
+	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
 
 private:
 	struct Notification
@@ -87,14 +100,40 @@ private:
 		QByteArray membershipId;
 		QByteArray userId;
 		QByteArray tenantId;
+
+		// Who sent an invitation
+		QByteArray inviterId = QByteArray();
 	};
+
+	/**
+		A removed member loses the notifications of the organization; a failed removal is retried.
+	*/
+	void RemoveMemberNotifications(const QByteArray& tenantId, const QByteArray& userId);
+	void RetryMemberCleanups();
 
 	QList<Notification> CreateNotifications(const QVariantMap& event) const;
 	void PublishNotification(const Notification& notification) const;
+
+	/**
+		Keep the notification in the inbox of its user; an invitation that is answered or revoked is withdrawn.
+	*/
+	void SendToNotificationCenter(const Notification& notification) const;
 	void PublishMembersChanged(const QByteArray& tenantId) const;
 
 	QString FindTenantName(const QByteArray& tenantId) const;
+	imtnotify::ObjectLinkInfo GetUserLink(const QByteArray& userId) const;
+
+	/**
+		The user whose request made the change, named from the users when the request has no name.
+	*/
+	imtnotify::ObjectLinkInfo GetRequestUserLink() const;
 	QByteArray FindTenantOwnerId(const QByteArray& tenantId) const;
+
+private:
+	// Tenant and user of the removed memberships whose notifications could not be removed yet
+	QSet<QPair<QByteArray, QByteArray>> m_pendingMemberCleanups;
+	QMutex m_pendingMemberCleanupsMutex;
+	QTimer m_retryTimer;
 };
 
 

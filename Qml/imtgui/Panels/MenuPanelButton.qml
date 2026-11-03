@@ -9,6 +9,8 @@ ControlBase {
     decorator: Style.menuPanelButtonDecorator;
 
     property string text: "";
+    // Short text on the entry, e.g. an unread count; empty shows none
+    property string badge: "";
     property string iconSource: "";
 	property string textColor: Style.textColor;
     property string fontName: "";

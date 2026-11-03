@@ -515,6 +515,12 @@ QByteArray CTenantDbDelegateComp::GetCountQuery(const iprm::IParamsSet* paramsPt
 }
 
 
+QString CTenantDbDelegateComp::GetCreationTimeColumn() const
+{
+	return QStringLiteral("CreatedAt");
+}
+
+
 QString CTenantDbDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const
 {
 	QStringList additionalFilters;

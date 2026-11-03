@@ -118,6 +118,12 @@ protected:
 	virtual bool CreateTextFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& textFilterQuery) const;
 	virtual bool CreateTimeFilterQuery(const imtbase::ITimeFilterParam& timeFilter, QString& timeFilterQuery, const QString& timeFieldId = QStringLiteral(R"(root1."TimeStamp")")) const;
 	virtual QString CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const;
+
+	/**
+		The column of the creation time the time filter of a collection selects by; empty: the collection has none and
+		the time filter selects every object.
+	*/
+	virtual QString GetCreationTimeColumn() const;
 	virtual bool CreateSortQuery(const imtbase::ICollectionFilter& collectionFilter, QString& sortQuery) const;
 	virtual bool CreateSortQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& sortQuery) const;
 	virtual QString EncodeTextArgument(const QString& argument) const;

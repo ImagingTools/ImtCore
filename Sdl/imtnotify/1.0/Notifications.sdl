@@ -1,0 +1,238 @@
+schema {
+	query: Query
+	mutation: Mutation
+	subscription: Subscription
+	namespace: imtnotify
+	version: 1.0
+}
+
+import {
+	"../../imtbase/1.0/ImtBaseTypes.sdl"
+	"../../imtbase/1.0/ImtCollection.sdl"
+}
+
+
+# The notification center of a user. Every operation works on the inbox of the caller:
+# the user, the tenant and the product are taken from the request context, never from the input.
+
+
+# The categories of istd::IInformationProvider
+enum NotificationSeverity {
+	Info
+	Warning
+	Error
+	Critical
+}
+
+
+# How the client shows a value of a notification: a text and the name of an object as they are,
+# a number and a time (ISO 8601 UTC) by its locale
+enum NotificationArgumentKind {
+	Text
+	Number
+	DateTime
+	Object
+}
+
+# A value the message of the type puts in by its id, e.g. "partner", the other organization of a connection request.
+# value is the text, the number, the time or the name of the object; objectId and objectTypeId are set for an object.
+type NotificationArgument {
+	id: ID!
+	kind: NotificationArgumentKind!
+	value: String
+	objectId: ID
+	objectTypeId: ID
+}
+
+
+# One notification of the inbox: what happened, never a text in a language.
+# typeId names the event ("imtdesk.TicketAssigned"); its label, icon and message are in the catalog NotificationTypes.
+# actors (the latest ones of a group, the newest first), subject and arguments keep the names they had when the event
+# happened; the client shows and opens the subject.
+# body is a text a user wrote, e.g. the beginning of a message; it is shown as it is.
+type UserNotification {
+	id: ID!
+	typeId: ID!
+	severity: NotificationSeverity!
+	actors: [ObjectLink]
+	subject: ObjectLink
+	arguments: [NotificationArgument]
+	body: String
+	groupCount: Int!
+	createdAt: String!
+	isDelivered: Boolean!
+	isRead: Boolean!
+}
+
+
+# A page of the inbox, newest first
+input NotificationsListInput {
+	offset: Int
+	pageSize: Int
+}
+
+type NotificationsListPayload {
+	items: [UserNotification]
+	totalCount: Int!
+	unreadCount: Int!
+}
+
+# The unread count of the inbox alone, one count in the storage
+type NotificationsUnreadCountPayload {
+	unreadCount: Int!
+}
+
+
+# The state a client loads after login and after every reconnect
+input NotificationsSyncInput {
+	pageSize: Int
+	maxUndelivered: Int
+}
+
+# undelivered are the newest of them up to maxUndelivered; undeliveredCount counts all of them.
+# syncedAt is the time of the server: AcknowledgeAllNotificationsDelivered with it confirms only what this answer counted.
+type NotificationsSyncPayload {
+	items: [UserNotification]
+	totalCount: Int!
+	unreadCount: Int!
+	undelivered: [UserNotification]
+	undeliveredCount: Int!
+	syncedAt: String!
+}
+
+
+input NotificationIdsInput {
+	ids: [ID]!
+}
+
+input MarkAllNotificationsReadInput {
+	# The notifications created after this time stay unread; empty marks all
+	createdUntil: String
+}
+
+input AcknowledgeAllNotificationsDeliveredInput {
+	# The notifications created after this time stay undelivered; empty acknowledges all
+	createdUntil: String
+}
+
+# changedIds are the changed notifications of a change of some of them; the changes of all of them do not list them
+type NotificationsChangedPayload {
+	changedIds: [ID]
+	unreadCount: Int!
+}
+
+
+# Sending by a product server to the notification center of the authorization server, with the session of the user
+# whose request made the change: allowed to a signed-in user, for the product of the request and at most 100 users.
+# A product server has no identity of its own yet (ImagingTools/ImtCore#1059).
+# Empty tenantId or productId sends a personal notification, visible in every tenant or product of the user.
+input SendNotificationInput {
+	productId: ID
+	tenantId: ID
+	userIds: [ID]!
+	typeId: ID!
+	severity: NotificationSeverity
+	actor: ObjectLink
+	subject: ObjectLink
+	body: String
+	arguments: [NotificationArgument]
+	groupKey: ID
+	dedupKey: ID
+}
+
+# Empty userIds withdraws the group from the inbox of every user, at most 100 users otherwise
+input WithdrawNotificationsInput {
+	productId: ID
+	tenantId: ID
+	groupKey: ID!
+	userIds: [ID]
+}
+
+type NotificationsSentPayload {
+	success: Boolean!
+}
+
+
+# An entry of the catalog: the label in the language of the request, the icon and the message (both empty for an
+# object type). The message is an ICU MessageFormat pattern: {subject}, {actor}, {actors}, {count} and the arguments
+# by their ids, "plural" and "select"; an empty one shows the subject with the type of its object.
+type NotificationTypeInfo {
+	id: ID!
+	name: String
+	icon: String
+	message: String
+}
+
+# The catalog the server of the client knows, its own and that of the modules it runs: the notification types and
+# the types of the objects they are about ("Organization" for "Tenant"), so a client shows 'Organization "Test"'
+type NotificationTypesPayload {
+	types: [NotificationTypeInfo]
+	objectTypes: [NotificationTypeInfo]
+	# The language of the labels and messages: the client chooses the plural forms by it
+	languageId: ID
+}
+
+
+enum NotificationEventKind {
+	Created
+	Updated
+	Read
+	AllRead
+	Removed
+}
+
+# Pushed to every session of the user in the tenant and product of the notification.
+# Created and Updated carry the notifications, Read and Removed their ids, AllRead the time up to which the
+# notifications of the inbox of the session are read. A personal inbox is seen in sessions of other inboxes too: its
+# notifications marked all read come as Read with their ids.
+type NotificationEvent {
+	kind: NotificationEventKind!
+	items: [UserNotification]
+	ids: [ID]
+	createdUntil: String
+	unreadCount: Int!
+}
+
+
+# The inbox as a collection (collectionId "Notifications"), filtered and sorted by the server
+input UserNotificationsListInput {
+	viewParams: CollectionViewParams
+}
+
+type UserNotificationsListPayload {
+	items: [UserNotification]
+	notification: NotificationItem
+}
+
+
+type Query {
+	NotificationsList (input: NotificationsListInput): NotificationsListPayload!
+	UserNotificationsList (input: UserNotificationsListInput): UserNotificationsListPayload!
+	NotificationsSync (input: NotificationsSyncInput): NotificationsSyncPayload!
+	NotificationTypes: NotificationTypesPayload!
+	NotificationsUnreadCount: NotificationsUnreadCountPayload!
+}
+
+type Mutation {
+	MarkNotificationsRead (input: NotificationIdsInput): NotificationsChangedPayload!
+	MarkAllNotificationsRead (input: MarkAllNotificationsReadInput): NotificationsChangedPayload!
+	AcknowledgeNotificationsDelivered (input: NotificationIdsInput): NotificationsChangedPayload!
+	AcknowledgeAllNotificationsDelivered (input: AcknowledgeAllNotificationsDeliveredInput): NotificationsChangedPayload!
+	RemoveNotifications (input: NotificationIdsInput): NotificationsChangedPayload!
+	SendNotification (input: SendNotificationInput): NotificationsSentPayload!
+	WithdrawNotifications (input: WithdrawNotificationsInput): NotificationsSentPayload!
+}
+
+type Subscription {
+	OnNotificationEvent: NotificationEvent!
+}
+
+
+collectionSchema {
+	type Notification {
+		ref: UserNotification
+		operations {
+			list: UserNotificationsList
+		}
+	}
+}

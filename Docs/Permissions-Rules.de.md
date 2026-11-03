@@ -328,7 +328,7 @@ Berechtigungen(product, tenant) = Rollen des Benutzers im Produkt
 - **R8.3. Zyklen in Rollen und Gruppen sind verboten:** Eine Elternrolle/-gruppe, die einen Zyklus schließt, wird mit Fehler abgelehnt (`CreatesRoleCycle`, `CreatesGroupCycle`).
 - **R8.4. Verbote (`prohibitions`)** werden gespeichert, aber bei der Berechnung von Berechtigungen **nicht angewendet** (13.8). Nicht verwenden.
 - **R8.5.** Für entfernte Verbraucher (ProLife usw.) werden aus Rollen stammende Berechtigungen in einer serialisierbaren Benutzerkopie **materialisiert** (`CUserCollectionControllerComp::CreateAdaptedObjectData`); andernfalls hat ein PAT-Benutzer ohne Rollen keine Berechtigungen.
-- **R8.6.** Benutzer sehen ihre zugeordneten Rollen und Gruppen unabhängig von Berechtigungen: Das Lesen eigener Rollen (einschließlich delegierter) und Gruppen wird ohne Prüfung zugelassen. Rollen und Gruppen anderer Benutzer erfordern Berechtigungen (bei Gruppen ist dies derzeit abweichend, siehe 13.7).
+- **R8.6.** Benutzer sehen ihre zugeordneten Rollen und Gruppen unabhängig von Berechtigungen: Das Lesen eigener Rollen (einschließlich delegierter) und Gruppen wird ohne Prüfung zugelassen. Rollen und Gruppen anderer Benutzer erfordern Berechtigungen (bei Gruppen ist dies derzeit abweichend, siehe 13.7). Das **eigene Konto** sehen Benutzer ebenfalls in jeder Organisation der Sitzung, auch in einer per delegiertem Zugriff betretenen, in der sie kein Mitglied sind: Der Organisationsfilter blendet es nicht aus (`CUserCollectionControllerComp::CheckObjectAccess`, nur Lesen). Ein Produktserver liest das Konto des Tokens bei jeder Anfrage; ohne dies antwortete die delegierte Organisation auf alles mit 403.
 
 ## 9. Privilegierte Identitäten
 

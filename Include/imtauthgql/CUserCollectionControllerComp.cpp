@@ -751,6 +751,26 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateAdaptedObjectDat
 
 // reimplemented (imtservergql::CPermissibleGqlRequestHandlerComp)
 
+bool CUserCollectionControllerComp::CheckObjectAccess(
+			const imtgql::CGqlRequest& gqlRequest,
+			const QByteArrayList& objectIds,
+			imtauth::IDocumentShareInfo::AccessLevel accessLevel,
+			QString& errorMessage) const
+{
+	// Only viewing: a change of the own account follows the rules of the organization
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (		accessLevel == imtauth::IDocumentShareInfo::DAL_VIEW &&
+				gqlContextPtr != nullptr &&
+				!gqlContextPtr->GetUserId().isEmpty() &&
+				!objectIds.isEmpty() &&
+				objectIds.count(gqlContextPtr->GetUserId()) == objectIds.size()){
+		return true;
+	}
+
+	return BaseClass::CheckObjectAccess(gqlRequest, objectIds, accessLevel, errorMessage);
+}
+
+
 bool CUserCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	QByteArray requestOwnerId;

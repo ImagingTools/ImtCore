@@ -19,3 +19,4 @@ CREATE TABLE IF NOT EXISTS "Tickets"
     "ClosedAt"       TEXT,
     "ResolvedAt"     TEXT
 );
+CREATE INDEX IF NOT EXISTS "IX_Tickets_ConversationId" ON "Tickets" ("ConversationId");

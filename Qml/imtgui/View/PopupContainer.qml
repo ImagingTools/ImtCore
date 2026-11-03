@@ -16,6 +16,10 @@ Item {
 	property int __nextAutoId: 0
 	property var __customComponents: ({})
 	property var __customProperties: ({})
+	property var __messageOptions: ({})
+
+	// A message added with options.clickable was clicked; it is closed afterwards
+	signal messageClicked(string id)
 
 	Component {
 		id: __defaultDelegate
@@ -31,6 +35,12 @@ Item {
 			property bool closable: false
 			property var popupContainer: null
 
+			// Options of the message: a second line, an icon instead of the one of the type, text shown as it is, a click
+			property string messageDetails: ""
+			property string messageIcon: ""
+			property bool plainText: false
+			property bool clickable: false
+
 			readonly property string accentColor: messageType === "error" ? Style.popupErrorAccentColor
 					: messageType === "warning" ? Style.popupWarningAccentColor
 					: messageType === "success" ? Style.popupSuccessAccentColor
@@ -41,7 +51,9 @@ Item {
 					: messageType === "success" ? Style.popupSuccessBackgroundColor
 					: Style.popupInfoBackgroundColor
 
-			readonly property string iconSource: messageType === "warning"
+			readonly property string iconSource: messageIcon !== ""
+					? "../../../" + Style.getIconPath(messageIcon, Icon.State.On, Icon.Mode.Normal)
+					: messageType === "warning"
 					? "../../../" + Style.getIconPath("Icons/Alert", Icon.State.On, Icon.Mode.Normal)
 					: messageType === "error"
 					? "../../../" + Style.getIconPath("Icons/Error", Icon.State.On, Icon.Mode.Normal)
@@ -86,6 +98,20 @@ Item {
 				duration: 200
 			}
 
+			MouseArea {
+				id: messageMouseArea
+				anchors.fill: parent
+				visible: defaultDelegateRoot.clickable
+				hoverEnabled: true
+				cursorShape: Qt.PointingHandCursor
+				onClicked: {
+					if (defaultDelegateRoot.popupContainer){
+						defaultDelegateRoot.popupContainer.messageClicked(defaultDelegateRoot.messageId)
+						defaultDelegateRoot.popupContainer.removeMessageById(defaultDelegateRoot.messageId)
+					}
+				}
+			}
+
 			Rectangle {
 				id: accentRail
 				anchors.left: parent.left
@@ -122,14 +148,36 @@ Item {
 					}
 				}
 
-				BaseText {
-					id: messageTextItem
+				Column {
+					id: textColumn
 					width: Math.max(0, contentRow.width - iconArea.width - closeButton.width - 2 * contentRow.spacing)
 					anchors.verticalCenter: parent.verticalCenter
-					text: defaultDelegateRoot.messageText
-					wrapMode: Text.WordWrap
-					color: Style.textColor
-					font.pixelSize: Style.fontSizeM
+					spacing: Style.marginXS
+
+					BaseText {
+						id: messageTextItem
+						width: parent.width
+						text: defaultDelegateRoot.messageText
+						textFormat: defaultDelegateRoot.plainText ? Text.PlainText : Text.AutoText
+						wrapMode: Text.WordWrap
+						// Two lines next to the details; otherwise the default of Qt, unlimited (INT_MAX), not 0
+						maximumLineCount: defaultDelegateRoot.messageDetails !== "" ? 2 : 2147483647
+						elide: defaultDelegateRoot.messageDetails !== "" ? Text.ElideRight : Text.ElideNone
+						color: Style.textColor
+						font.family: defaultDelegateRoot.messageDetails !== "" ? Style.fontFamilyBold : Style.fontFamily
+						font.pixelSize: Style.fontSizeM
+					}
+
+					BaseText {
+						id: messageDetailsItem
+						width: parent.width
+						visible: defaultDelegateRoot.messageDetails !== ""
+						text: defaultDelegateRoot.messageDetails
+						textFormat: defaultDelegateRoot.plainText ? Text.PlainText : Text.AutoText
+						elide: Text.ElideRight
+						color: Style.subtitleColor
+						font.pixelSize: Style.fontSizeS
+					}
 				}
 
 				Rectangle {
@@ -212,6 +260,16 @@ Item {
 						if (item.hasOwnProperty("popupContainer"))
 							item.popupContainer = popupContainer
 
+						var options = popupContainer.__messageOptions[model.id]
+						if (options){
+							var optionKeys = Object.keys(options)
+							for (var o = 0; o < optionKeys.length; o++){
+								if (item.hasOwnProperty(optionKeys[o])){
+									item[optionKeys[o]] = options[optionKeys[o]]
+								}
+							}
+						}
+
 						var extra = popupContainer.__customProperties[model.id]
 						if (extra){
 							var keys = Object.keys(extra)
@@ -250,11 +308,15 @@ Item {
 			if (__customProperties.hasOwnProperty(lastId)){
 				delete __customProperties[lastId]
 			}
+			if (__messageOptions.hasOwnProperty(lastId)){
+				delete __messageOptions[lastId]
+			}
 			popupModel.remove(lastIndex)
 		}
 	}
 
-	function addMessage(type, text, autoClose, id){
+	// options (optional): messageDetails, messageIcon, plainText, clickable - see the default delegate
+	function addMessage(type, text, autoClose, id, options){
 		if (autoClose === undefined || autoClose === null){
 			autoClose = type === "success" || type === "info"
 		}
@@ -267,6 +329,13 @@ Item {
 		let existingIndex = findMessage(id)
 		if (existingIndex >= 0){
 			popupModel.remove(existingIndex)
+		}
+
+		if (options){
+			__messageOptions[id] = options
+		}
+		else if (__messageOptions.hasOwnProperty(id)){
+			delete __messageOptions[id]
 		}
 
 		popupModel.insert(0, { "type": type, "text": text, "closable": autoClose, "id": id })
@@ -316,6 +385,9 @@ Item {
 			if (__customProperties.hasOwnProperty(id)){
 				delete __customProperties[id]
 			}
+			if (__messageOptions.hasOwnProperty(id)){
+				delete __messageOptions[id]
+			}
 		}
 	}
 
@@ -340,5 +412,6 @@ Item {
 		popupModel.clear()
 		__customComponents = {}
 		__customProperties = {}
+		__messageOptions = {}
 	}
 }
