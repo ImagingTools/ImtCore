@@ -582,7 +582,11 @@ void CDocumentServiceController::getOpenedDocumentList()
 				for (const auto& info : list){
 					const int index = self->IndexOfDocument(info.documentId);
 					if (index >= 0){
+						const bool wasReadOnly = self->m_openedDocuments[index].isReadOnly;
 						self->m_openedDocuments[index].isReadOnly = info.isReadOnly;
+						if (wasReadOnly != info.isReadOnly){
+							Q_EMIT self->documentIsReadOnlyChanged(info.documentId);
+						}
 					}
 					else{
 						self->m_cachedDocumentReadOnlyStates.insert(info.documentId, info.isReadOnly);

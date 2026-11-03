@@ -187,6 +187,7 @@ Q_SIGNALS:
 	void requestDocumentName(const QString& documentId, const QString& typeId);
 	void documentNameChanged(const QString& documentId, const QString& oldName, const QString& newName);
 	void documentIsDirtyChanged(const QString& documentId, bool isDirty);
+	void documentIsReadOnlyChanged(const QString& documentId);
 
 	void startUndoInfoReceive(const QString& documentId);
 	void undoInfoReceived(const QString& documentId, int availableUndoSteps, int availableRedoSteps, bool isDirty);
