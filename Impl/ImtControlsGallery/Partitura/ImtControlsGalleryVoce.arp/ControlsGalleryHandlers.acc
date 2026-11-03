@@ -55,8 +55,6 @@
                                 <Value>Pages/GridViewPage</Value>
                                 <Value>Pages/TestPage</Value>
                                 <Value>Pages/SdlTestPage</Value>
-                                <Value>Pages/ReportsPage</Value>
-                                <Value>Pages/ReportTemplatesPage</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
