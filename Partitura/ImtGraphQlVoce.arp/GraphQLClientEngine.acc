@@ -22,6 +22,18 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="AsyncApiClient" PackageId="ImtClientGqlPck" ComponentId="AsyncApiClient">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProtocolEngine" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="GraphQLClientEngine"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="GraphQLClientEngine" PackageId="ImtClientGqlPck" ComponentId="GraphQLClientEngine">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -59,5 +71,6 @@
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="ApiClient" ComponentId="ApiClient"/>
+        <Component ExportedId="AsyncApiClient" ComponentId="AsyncApiClient"/>
     </ExportedComponents>
 </Acf>

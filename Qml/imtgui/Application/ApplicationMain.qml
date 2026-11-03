@@ -286,6 +286,7 @@ Item {
 				pageAboutProvider.serverVersion = pageAboutProvider.formatVersion(serverApplicationInfo.m_version, serverApplicationInfo.m_versionKind, serverApplicationInfo.m_buildTime)
 
 				// services the server depends on (e.g. the authorization server) with their runtime status
+				pageAboutProvider.serverName = serverApplicationInfo.m_applicationName
 				pageAboutProvider.dependencies = serverApplicationInfo.m_dependencies ? serverApplicationInfo.m_dependencies : null
 
 				AuthorizationController.productId = serverApplicationInfo.m_applicationId

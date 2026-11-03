@@ -50,9 +50,12 @@ void CRemoteServiceInfoComp::OnComponentCreated()
 
 	m_serviceInfo.serviceId = *m_serviceIdAttrPtr;
 
-	BaseClass2::RegisterModel(m_connectionStatusModelCompPtr.GetPtr());
+	// An auto instance is created before QCoreApplication, the connection (e.g. its SSL setup) must not be created that early
+	QMetaObject::invokeMethod(this, [this](){
+		BaseClass2::RegisterModel(m_connectionStatusModelCompPtr.GetPtr());
 
-	UpdateServiceInfo();
+		UpdateServiceInfo();
+	}, Qt::QueuedConnection);
 }
 
 
