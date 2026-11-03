@@ -94,6 +94,8 @@ public Q_SLOTS:
 	bool documentIsDirty(const QString& documentId) const;
 	void setDocumentIsDirty(const QString& documentId, bool isDirty);
 
+	bool documentIsReadOnly(const QString& documentId) const;
+
 	bool documentIsLoading(const QString& documentId) const;
 	void setDocumentIsLoading(const QString& documentId, bool isLoading);
 
@@ -221,6 +223,7 @@ private:
 		QString name;
 		QString objectId;
 		bool isDirty = false;
+		bool isReadOnly = false;
 		bool isNew = true;
 		bool isLoading = false;
 		bool isClosing = false;

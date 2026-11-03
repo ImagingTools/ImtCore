@@ -701,7 +701,8 @@ IDocumentService::OperationStatus CDocumentServiceBase::GetDocumentUndoManager(
 		return validationStatus;
 	}
 
-	undoManagerPtr = m_documents[documentId].undoManagerPtr.GetPtr();
+	undoManagerPtr = m_documents[documentId].isReadOnly ?
+		nullptr : m_documents[documentId].undoManagerPtr.GetPtr();
 
 	return OS_OK;
 }

@@ -115,6 +115,7 @@ private slots:
 	void SaveDocumentSaveAsRevisionFailsTest();
 	void SetDocumentNameRevisionFailsTest();
 	void SetDocumentDataRevisionFailsTest();
+	void UndoManagerRevisionReadOnlyTest();
 	void CloseDocumentRevisionTest();
 	void SingleCopyRevisionSharedTest();
 

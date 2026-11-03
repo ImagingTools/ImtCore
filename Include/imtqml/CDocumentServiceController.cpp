@@ -241,6 +241,16 @@ void CDocumentServiceController::setDocumentIsDirty(const QString& documentId, b
 }
 
 
+bool CDocumentServiceController::documentIsReadOnly(const QString& documentId) const
+{
+	int idx = IndexOfDocument(documentId);
+	if (idx < 0){
+		return false;
+	}
+	return m_openedDocuments[idx].isReadOnly;
+}
+
+
 bool CDocumentServiceController::documentIsLoading(const QString& documentId) const
 {
 	int idx = IndexOfDocument(documentId);

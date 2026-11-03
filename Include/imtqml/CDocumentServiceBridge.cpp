@@ -180,6 +180,13 @@ void CDocumentServiceBridge::OpenDocument(
 	info.documentId = QString::fromUtf8(result.documentId);
 	info.typeId = typeId;
 	info.objectId = documentId;
+	const imtdoc::IDocumentService::DocumentList documentList = mgrPtr->GetOpenedDocumentList(QByteArray());
+	for (const auto& item: documentList){
+		if (item.documentId == result.documentId){
+			info.isReadOnly = item.isReadOnly;
+			break;
+		}
+	}
 	QString name;
 	if (mgrPtr->GetDocumentName(QByteArray(), result.documentId, name) == imtdoc::IDocumentService::OS_OK){
 		info.name = name;

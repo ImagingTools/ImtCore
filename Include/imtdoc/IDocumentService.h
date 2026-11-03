@@ -297,7 +297,8 @@ public:
 		\brief Retrieve the undo manager associated with an open document.
 
 		\param undoManagerPtr  Receives a raw (non-owning) pointer to the undo
-		                       manager on success.
+		                       manager on success. For read-only documents,
+		                       mutating undo-manager operations are disabled.
 		\return                \c OS_OK on success, or an appropriate error code.
 	*/
 	virtual OperationStatus GetDocumentUndoManager(

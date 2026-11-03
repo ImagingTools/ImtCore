@@ -1357,8 +1357,22 @@ void CCollectionDocumentServiceIntegrationTest::SetDocumentDataRevisionFailsTest
 
 	idoc::IUndoManager* undoManagerPtr = nullptr;
 	QCOMPARE(m_servicePtr->GetDocumentUndoManager(TEST_USER_ID, docId, undoManagerPtr), imtdoc::IDocumentService::OS_OK);
-	QVERIFY(undoManagerPtr != nullptr);
-	QCOMPARE(undoManagerPtr->GetAvailableUndoSteps(), 0);
+	QVERIFY(undoManagerPtr == nullptr);
+}
+
+
+void CCollectionDocumentServiceIntegrationTest::UndoManagerRevisionReadOnlyTest()
+{
+	AddCollectionObject(TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME);
+	const int revision = CreateObjectRevision(TEST_OBJECT_ID, QStringLiteral("revisionData"), QStringLiteral("currentData"));
+	QVERIFY(revision > 0);
+
+	QByteArray docId = OpenDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_OBJECT_ID, revision);
+	QVERIFY(!docId.isEmpty());
+
+	idoc::IUndoManager* undoManagerPtr = nullptr;
+	QCOMPARE(m_servicePtr->GetDocumentUndoManager(TEST_USER_ID, docId, undoManagerPtr), imtdoc::IDocumentService::OS_OK);
+	QVERIFY(undoManagerPtr == nullptr);
 }
 
 
