@@ -345,8 +345,8 @@ module.exports = {
                     result += pad(date.getSeconds(), count)
                     break
                 case 'z':
-                    count = count >= 3 ? 3 : 1
-                    result += count === 3 ? pad(date.getMilliseconds(), 3) : date.getMilliseconds().toString()
+                    count = Math.min(count, 3)
+                    result += count === 1 ? date.getMilliseconds().toString() : pad(date.getMilliseconds(), count)
                     break
                 case 'A':
                 case 'a':
