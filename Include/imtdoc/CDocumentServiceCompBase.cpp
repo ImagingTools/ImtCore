@@ -520,6 +520,10 @@ bool CDocumentServiceCompBase::IsStatePersistenceEnabled() const
 
 void CDocumentServiceCompBase::RemovePersistedDocumentData() const
 {
+	if (!m_persistUndoManagerFactPtr.IsValid() || !m_undoManagerFactPtr.IsValid()){
+		return;
+	}
+
 	idoc::IUndoManagerUniquePtr undoManagerPtr = CreateUndoManager();
 	IPersistentUndoManager* persistentUndoManagerPtr = dynamic_cast<IPersistentUndoManager*>(undoManagerPtr.GetPtr());
 	if (persistentUndoManagerPtr == nullptr){
