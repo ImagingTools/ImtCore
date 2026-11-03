@@ -7456,6 +7456,11 @@
         <source>Server Version</source>
         <translation>Версия сервера</translation>
     </message>
+    <message>
+        <location line="+2"/>
+        <source>Puma Version</source>
+        <translation>Версия Puma</translation>
+    </message>
 </context>
 <context>
     <name>Pagination</name>

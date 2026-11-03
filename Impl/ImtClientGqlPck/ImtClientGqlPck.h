@@ -27,6 +27,7 @@
 #include <imtclientgql/CRemoteCommandsControllerComp.h>
 #include <imtclientgql/CRemoteFileSystemStructureProviderComp.h>
 #include <imtclientgql/CRemoteFilterableSelectControllerComp.h>
+#include <imtclientgql/CRemoteServerVersionInfoComp.h>
 
 
 /**
@@ -57,6 +58,7 @@ typedef imtclientgql::CObjectCollectionSubscriberComp ObjectCollectionSubscriber
 typedef imtclientgql::CRemoteCommandsControllerComp RemoteCommandsController;
 typedef imtclientgql::CRemoteFileSystemStructureProviderComp RemoteFileSystemStructureProvider;
 typedef imtclientgql::CRemoteFilterableSelectControllerComp RemoteFilterableSelectController;
+typedef imtclientgql::CRemoteServerVersionInfoComp RemoteServerVersionInfo;
 
 
 } // namespace ImtClientGqlPck

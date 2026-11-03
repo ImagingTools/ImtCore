@@ -31,6 +31,33 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="AsyncApiClient" PackageId="ImtClientGqlPck" ComponentId="AsyncApiClient">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProtocolEngine" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="GraphQLClientEngine"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Timeout" Type="Real" ExportId="Timeout">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="AuthServerVersionInfo" PackageId="ImtClientGqlPck" ComponentId="RemoteServerVersionInfo">
+            <Data IsEnabled="true" Flags="1">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="AsyncClient" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="AsyncApiClient"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ConnectionStatus" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Subscription/ConnectionStatusProvider"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="ConnectionSubscriber" PackageId="ImtServerGqlPck" ComponentId="ConnectionStatusSubscriberController">
             <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap>
@@ -757,6 +784,7 @@
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="SubscriberDemultiplexer"/>
     </ExportedInterfaces>
     <ExportedComponents>
+        <Component ExportedId="AuthServerVersionInfo" ComponentId="AuthServerVersionInfo"/>
         <Component ExportedId="CachedGroupCollection" ComponentId="RemoteRepositories/CachedGroupCollection"/>
         <Component ExportedId="CachedRoleCollection" ComponentId="RemoteRepositories/CachedRoleCollection"/>
         <Component ExportedId="CachedUserCollection" ComponentId="RemoteRepositories/CachedUserCollection"/>

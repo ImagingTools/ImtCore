@@ -251,6 +251,133 @@ module.exports = {
             bottom: y + height
         }
     },
+    // Qt.formatDateTime / formatDate / formatTime, see doc.qt.io/qt-6/qml-qtqml-qt.html#formatDateTime-method
+    __formatDateTime(value, format, defaultOptions){
+        let date = value instanceof Date ? value : new Date(value)
+        if(isNaN(date.getTime())) return ''
+
+        if(typeof format !== 'string'){
+            return date.toLocaleString(undefined, defaultOptions)
+        }
+
+        // h is 1-12 when the format shows AM/PM
+        let hasAmPm = /[Aa]/.test(format.replace(/'[^']*'/g, ''))
+        let pad = (number, size) => number.toString().padStart(size, '0')
+        let hours12 = date.getHours() % 12 === 0 ? 12 : date.getHours() % 12
+
+        let result = ''
+        let i = 0
+        while(i < format.length){
+            let ch = format[i]
+
+            if(ch === "'"){
+                if(format[i + 1] === "'"){
+                    result += "'"
+                    i += 2
+                    continue
+                }
+                // quoted text, '' inside it is a single quote
+                i++
+                while(i < format.length){
+                    if(format[i] === "'"){
+                        if(format[i + 1] !== "'") break
+                        i++
+                    }
+                    result += format[i]
+                    i++
+                }
+                i++
+                continue
+            }
+
+            if((ch === 'A' || ch === 'a') && (format[i + 1] === 'P' || format[i + 1] === 'p')){
+                let text = date.getHours() < 12 ? 'AM' : 'PM'
+                result += ch === 'A' ? text : text.toLowerCase()
+                i += 2
+                continue
+            }
+
+            let count = 1
+            while(format[i + count] === ch) count++
+
+            switch(ch){
+                case 'd':
+                    count = Math.min(count, 4)
+                    if(count <= 2) result += pad(date.getDate(), count)
+                    else result += date.toLocaleDateString(undefined, {weekday: count === 3 ? 'short' : 'long'})
+                    break
+                case 'M':
+                    count = Math.min(count, 4)
+                    if(count <= 2){
+                        result += pad(date.getMonth() + 1, count)
+                    } else {
+                        // formatted together with the day for the form used in a date, like QLocale::monthName
+                        let parts = new Intl.DateTimeFormat(undefined, {day: 'numeric', month: count === 3 ? 'short' : 'long'}).formatToParts(date)
+                        let month = parts.find(part => part.type === 'month')
+                        result += month ? month.value : ''
+                    }
+                    break
+                case 'y':
+                    if(count >= 4){
+                        count = 4
+                        result += pad(date.getFullYear(), 4)
+                    } else if(count >= 2){
+                        count = 2
+                        result += pad(date.getFullYear() % 100, 2)
+                    } else {
+                        result += ch
+                    }
+                    break
+                case 'h':
+                    count = Math.min(count, 2)
+                    result += pad(hasAmPm ? hours12 : date.getHours(), count)
+                    break
+                case 'H':
+                    count = Math.min(count, 2)
+                    result += pad(date.getHours(), count)
+                    break
+                case 'm':
+                    count = Math.min(count, 2)
+                    result += pad(date.getMinutes(), count)
+                    break
+                case 's':
+                    count = Math.min(count, 2)
+                    result += pad(date.getSeconds(), count)
+                    break
+                case 'z':
+                    count = count >= 3 ? 3 : 1
+                    result += count === 3 ? pad(date.getMilliseconds(), 3) : date.getMilliseconds().toString()
+                    break
+                case 'A':
+                case 'a':
+                    count = 1
+                    result += date.getHours() < 12 ? (ch === 'A' ? 'AM' : 'am') : (ch === 'A' ? 'PM' : 'pm')
+                    break
+                case 't': {
+                    count = 1
+                    let zone = date.toLocaleTimeString(undefined, {timeZoneName: 'short'}).split(' ')
+                    result += zone[zone.length - 1]
+                    break
+                }
+                default:
+                    result += format.substring(i, i + count)
+                    break
+            }
+
+            i += count
+        }
+
+        return result
+    },
+    formatDateTime(dateTime, format){
+        return this.__formatDateTime(dateTime, format, {dateStyle: 'short', timeStyle: 'short'})
+    },
+    formatDate(date, format){
+        return this.__formatDateTime(date, format, {dateStyle: 'short'})
+    },
+    formatTime(time, format){
+        return this.__formatDateTime(time, format, {timeStyle: 'short'})
+    },
     atob: function(data){
         return atob(data)
     },

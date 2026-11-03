@@ -25,9 +25,17 @@ type SuperuserCheckResult {
 	message: String
 }
 
+type ServerVersionInfo {
+	version: String
+	versionKind: String
+	buildTime: String
+}
+
 type ApplicationInfo {
 	version: String
 	versionKind: String
+	buildTime: String
+	authServer: ServerVersionInfo
 	companyName: String
 	productName: String
 	applicationId: String

@@ -331,6 +331,7 @@
     <ExportedComponents>
         <Component ExportedId="AttachmentStorage" ComponentId="DeskController/AttachmentStorage"/>
         <Component ExportedId="AuthenticationManager" ComponentId="AuthenticationManager"/>
+        <Component ExportedId="AuthServerVersionInfo" ComponentId="PumaClientEngine/AuthServerVersionInfo"/>
         <Component ExportedId="CachedGroupCollection" ComponentId="PumaClientEngine/CachedGroupCollection"/>
         <Component ExportedId="CachedRoleCollection" ComponentId="PumaClientEngine/CachedRoleCollection"/>
         <Component ExportedId="CachedUserCollection" ComponentId="PumaClientEngine/CachedUserCollection"/>

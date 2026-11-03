@@ -115,6 +115,11 @@ I_EXPORT_COMPONENT(
 			"Remote filterable select controller",
 			"Remote Filterable Select Controller");
 
+I_EXPORT_COMPONENT(
+			RemoteServerVersionInfo,
+			"Version of a remote server, requested by GetApplicationInfo on each connection",
+			"Remote Server Version Info Build Time");
+
 
 } // namespace ImtClientGqlPck
 

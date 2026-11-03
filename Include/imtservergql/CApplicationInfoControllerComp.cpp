@@ -4,6 +4,8 @@
 
 
 // Qt includes
+#include <QtCore/QCoreApplication>
+#include <QtCore/QFileInfo>
 #include <QtCore/QUrl>
 
 // ACF includes
@@ -46,6 +48,10 @@ CApplicationInfoControllerComp::ApplicationInfo CApplicationInfoControllerComp::
 	QString versionKindText = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_VERSION_KIND);
 	if (!versionKindText.isEmpty()){
 		applicationInfo.versionKind = versionKindText;
+	}
+
+	if (!m_buildTime.isEmpty()){
+		applicationInfo.buildTime = m_buildTime;
 	}
 
 	using AppAttribute = ibase::IApplicationInfo::ApplicationAttribute;
@@ -91,12 +97,27 @@ CApplicationInfoControllerComp::ApplicationInfo CApplicationInfoControllerComp::
 	FillWebSocketUrl(applicationInfo);
 	FillUserMode(applicationInfo);
 	FillSuperuserStatus(applicationInfo);
+	FillAuthServerVersion(applicationInfo);
 
 	applicationInfo.tenantsEnabled = m_tenantsEnabledAttrPtr.IsValid() ? *m_tenantsEnabledAttrPtr : false;
 	applicationInfo.externalLoginEnabled = m_externalLoginEnabledAttrPtr.IsValid() ? *m_externalLoginEnabledAttrPtr : false;
 	applicationInfo.documentSharingEnabled = m_documentSharingEnabledAttrPtr.IsValid() ? *m_documentSharingEnabledAttrPtr : false;
 
 	return applicationInfo;
+}
+
+
+// reimplemented (icomp::CComponentBase)
+
+void CApplicationInfoControllerComp::OnComponentCreated()
+{
+	BaseClass::OnComponentCreated();
+
+	// Read once: a replaced executable is not the one that is running
+	QFileInfo executableInfo(QCoreApplication::applicationFilePath());
+	if (executableInfo.exists()){
+		m_buildTime = executableInfo.lastModified().toUTC().toString(Qt::ISODate);
+	}
 }
 
 
@@ -204,6 +225,32 @@ void CApplicationInfoControllerComp::FillSuperuserStatus(ApplicationInfo& applic
 	}
 
 	applicationInfo.superuser = std::move(superuser);
+}
+
+
+void CApplicationInfoControllerComp::FillAuthServerVersion(ApplicationInfo& applicationInfo) const
+{
+	if (!m_authServerVersionInfoCompPtr.IsValid()){
+		return;
+	}
+
+	imtcom::IServerVersionInfoProvider::ServerVersionInfo versionInfo;
+	if (!m_authServerVersionInfoCompPtr->GetServerVersionInfo(versionInfo)){
+		return;
+	}
+
+	sdl::V1_0::imtapp::CServerVersionInfo authServer;
+	if (!versionInfo.version.isEmpty()){
+		authServer.version = versionInfo.version;
+	}
+	if (!versionInfo.versionKind.isEmpty()){
+		authServer.versionKind = versionInfo.versionKind;
+	}
+	if (versionInfo.buildTime.isValid()){
+		authServer.buildTime = versionInfo.buildTime.toUTC().toString(Qt::ISODate);
+	}
+
+	applicationInfo.authServer = std::move(authServer);
 }
 
 

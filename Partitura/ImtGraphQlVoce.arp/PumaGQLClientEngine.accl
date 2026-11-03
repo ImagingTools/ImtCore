@@ -9,6 +9,8 @@
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="ApiClient" X="600" Y="375" Note=""/>
+        <Element ComponentName="AsyncApiClient" X="1250" Y="375" Note=""/>
+        <Element ComponentName="AuthServerVersionInfo" X="1250" Y="525" Note=""/>
         <Element ComponentName="ConnectionSubscriber" X="950" Y="400" Note=""/>
         <Element ComponentName="DocumentRevision" X="425" Y="475" Note=""/>
         <Element ComponentName="GqlDemultiplexer" X="275" Y="75" Note=""/>
