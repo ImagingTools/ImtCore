@@ -84,8 +84,8 @@ typedef QMap<QByteArray, QByteArray> HeaderValues;
 
 
 const QByteArray s_request(
-			"POST /api/graphql?product=dogma HTTP/1.1\r\n"
-			"Host: localhost:7380\r\n"
+			"POST /api/graphql?product=alpha HTTP/1.1\r\n"
+			"Host: localhost:8080\r\n"
 			"Content-Type: application/json\r\n"
 			"Authorization: Bearer 0123456789abcdef\r\n"
 			"Accept: text/html\r\n"
@@ -135,7 +135,7 @@ bool ParseParts(imtrest::CHttpRequest& request, const QByteArrayList& parts)
 void VerifyParsedRequest(const imtrest::CHttpRequest& request)
 {
 	HeaderValues expectedHeaders;
-	expectedHeaders.insert("host", "localhost:7380");
+	expectedHeaders.insert("host", "localhost:8080");
 	expectedHeaders.insert("content-type", "application/json");
 	expectedHeaders.insert("authorization", "Bearer 0123456789abcdef");
 	expectedHeaders.insert("accept", "text/html, application/json");
@@ -146,8 +146,8 @@ void VerifyParsedRequest(const imtrest::CHttpRequest& request)
 	QCOMPARE(GetHeaderValues(request), expectedHeaders);
 	QCOMPARE(request.GetUrl().path(), QStringLiteral("/api/graphql"));
 	QCOMPARE(request.GetUrl().host(), QStringLiteral("localhost"));
-	QCOMPARE(request.GetUrl().port(), 7380);
-	QCOMPARE(request.GetCommandParams().value("product"), QByteArray("dogma"));
+	QCOMPARE(request.GetUrl().port(), 8080);
+	QCOMPARE(request.GetCommandParams().value("product"), QByteArray("alpha"));
 	QCOMPARE(request.GetBody(), QByteArray("{\"query\":1}"));
 }
 
@@ -236,13 +236,13 @@ void CHttpRequestTest::SplitUrlAndHostTest()
 	CProtocolEngineStub engine;
 	imtrest::CHttpRequest request(servlet, engine);
 
-	QVERIFY(ParseParts(request, {"GET /api/gra", "phql?product=dogma HTTP/1.1\r\nHost: local", "host:7380\r\n\r\n"}));
+	QVERIFY(ParseParts(request, {"GET /api/gra", "phql?product=alpha HTTP/1.1\r\nHost: local", "host:8080\r\n\r\n"}));
 
 	QCOMPARE(request.GetState(), imtrest::IRequest::RS_MESSAGE_COMPLETE);
 	QCOMPARE(request.GetCommandId(), QByteArray("/api/graphql"));
-	QCOMPARE(request.GetCommandParams().value("product"), QByteArray("dogma"));
+	QCOMPARE(request.GetCommandParams().value("product"), QByteArray("alpha"));
 	QCOMPARE(request.GetUrl().host(), QStringLiteral("localhost"));
-	QCOMPARE(request.GetUrl().port(), 7380);
+	QCOMPARE(request.GetUrl().port(), 8080);
 }
 
 
