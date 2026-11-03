@@ -278,7 +278,7 @@ ViewBase {
 					if (violations.length > 0)
 						return passwordSection.policy.describeFailure(violations, "")
 
-					return passwordSection.policy.requirementsText()
+					return passwordSection.policy.requirementsText(true)
 				}
 
 				function canSubmit() {

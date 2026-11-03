@@ -10,6 +10,7 @@
 // ImtCore includes
 #include <imtauth/CUserVerification.h>
 #include <imtauth/CollectionSelection.h>
+#include <imtauth/PasswordPolicyUtils.h>
 #include <imtservergql/imtservergql.h>
 
 
@@ -169,16 +170,7 @@ sdl::V1_0::imtauth::CChangePasswordPayload CUserControllerComp::OnChangePassword
 					QStringList() << QStringLiteral("InvalidCredentials"));
 	}
 
-	QByteArray previousPasswordHash = userInfoPtr->GetPasswordHash();
-	userInfoPtr->SetPasswordHash(passwordHash);
-
-	if (m_passwordPolicyCompPtr.IsValid()){
-		m_passwordPolicyCompPtr->OnPasswordChanged(*userInfoPtr, previousPasswordHash);
-	}
-	else{
-		userInfoPtr->SetPasswordChangedAt(QDateTime::currentDateTimeUtc());
-		userInfoPtr->SetMustChangePassword(false);
-	}
+	imtauth::StoreNewPasswordHash(*userInfoPtr, passwordHash, m_passwordPolicyCompPtr.GetPtr());
 
 	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr =  nullptr;
 	if (m_userOperationContextControllerCompPtr.IsValid()){
@@ -291,34 +283,25 @@ sdl::V1_0::imtauth::CRegisterUserPayload CUserControllerComp::OnRegisterUser(
 		return sdl::V1_0::imtauth::CRegisterUserPayload();
 	}
 
-	if (m_passwordPolicyCompPtr.IsValid()){
-		QStringList violatedRuleIds;
-		if (!m_passwordPolicyCompPtr->ValidatePasswordStrength(*userData.username, password, violatedRuleIds)){
-			QString message = QStringLiteral("The password does not fulfill the password policy (%1)").arg(violatedRuleIds.join(", "));
-			SendErrorMessage(0, message, "CUserControllerComp");
+	const QByteArray passwordHash = m_hashCalculatorCompPtr->GenerateHash(*userData.username + password.toUtf8());
 
-			sdl::V1_0::imtauth::CRegisterUserPayload failurePayload;
-			failurePayload.id = QByteArray();
-			failurePayload.message = message;
-			failurePayload.violatedRules.emplace();
-			for (const QString& violatedRuleId : violatedRuleIds){
-				failurePayload.violatedRules->append(violatedRuleId);
-			}
+	QStringList violatedRuleIds;
+	if (!imtauth::CheckNewPassword(m_passwordPolicyCompPtr.GetPtr(), *userInfoPtr, *userData.username, password, passwordHash, violatedRuleIds)){
+		QString message = QStringLiteral("The password does not fulfill the password policy (%1)").arg(violatedRuleIds.join(", "));
+		SendErrorMessage(0, message, "CUserControllerComp");
 
-			return failurePayload;
+		sdl::V1_0::imtauth::CRegisterUserPayload failurePayload;
+		failurePayload.id = QByteArray();
+		failurePayload.message = message;
+		failurePayload.violatedRules.emplace();
+		for (const QString& violatedRuleId : violatedRuleIds){
+			failurePayload.violatedRules->append(violatedRuleId);
 		}
+
+		return failurePayload;
 	}
 
-	password = m_hashCalculatorCompPtr->GenerateHash(*userData.username + password.toUtf8());
-
-	userInfoPtr->SetPasswordHash(password.toUtf8());
-
-	if (m_passwordPolicyCompPtr.IsValid()){
-		m_passwordPolicyCompPtr->OnPasswordChanged(*userInfoPtr, QByteArray());
-	}
-	else{
-		userInfoPtr->SetPasswordChangedAt(QDateTime::currentDateTimeUtc());
-	}
+	imtauth::StoreNewPasswordHash(*userInfoPtr, passwordHash, m_passwordPolicyCompPtr.GetPtr());
 
 	response.id = userId;
 
@@ -588,28 +571,19 @@ sdl::V1_0::imtauth::CCreateSuperuserPayload CUserControllerComp::OnCreateSuperus
 	QByteArray objectId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 	QByteArray login = "su";
 
-	if (m_passwordPolicyCompPtr.IsValid()){
-		QStringList violatedRuleIds;
-		if (!m_passwordPolicyCompPtr->ValidatePasswordStrength(login, password, violatedRuleIds)){
-			response.message = QStringLiteral("Unable to create superuser. Error: The password does not fulfill the password policy (%1)").arg(violatedRuleIds.join(", "));
-			return retVal;
-		}
-	}
+	const QByteArray passwordHash = m_hashCalculatorCompPtr->GenerateHash(login + password.toUtf8());
 
-	QString passwordHash = m_hashCalculatorCompPtr->GenerateHash(login + password.toUtf8());
+	QStringList violatedRuleIds;
+	if (!imtauth::CheckNewPassword(m_passwordPolicyCompPtr.GetPtr(), *superuserInfoPtr, login, password, passwordHash, violatedRuleIds)){
+		response.message = QStringLiteral("Unable to create superuser. Error: The password does not fulfill the password policy (%1)").arg(violatedRuleIds.join(", "));
+		return retVal;
+	}
 
 	userIdentifierPtr->SetObjectUuid(objectId);
 	superuserInfoPtr->SetId(login);
 	superuserInfoPtr->SetName(name);
 	superuserInfoPtr->SetMail(mail);
-	superuserInfoPtr->SetPasswordHash(passwordHash.toUtf8());
-
-	if (m_passwordPolicyCompPtr.IsValid()){
-		m_passwordPolicyCompPtr->OnPasswordChanged(*superuserInfoPtr, QByteArray());
-	}
-	else{
-		superuserInfoPtr->SetPasswordChangedAt(QDateTime::currentDateTimeUtc());
-	}
+	imtauth::StoreNewPasswordHash(*superuserInfoPtr, passwordHash, m_passwordPolicyCompPtr.GetPtr());
 
 	imtauth::IUserInfo::SystemInfo systemInfo;
 	superuserInfoPtr->AddToSystem(systemInfo);

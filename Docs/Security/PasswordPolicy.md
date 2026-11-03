@@ -19,6 +19,9 @@ IEC 62443-4-2 CR 1.7 "Strength of password-based authentication" for security le
 | `imtauth::IPasswordPolicy` | `Include/imtauth/IPasswordPolicy.h` | Policy interface (strength, history, lifetime) |
 | `imtauth::CPasswordPolicyControllerComp` | `Include/imtauth/CPasswordPolicyControllerComp.{h,cpp}` | Configurable policy implementation (`PasswordPolicy` component in `ImtAuthPck`) |
 | `imtauthgql::CUserControllerComp` | `Include/imtauthgql/CUserControllerComp.{h,cpp}` | Enforces strength, reuse and minimum age on `ChangePassword`, `RegisterUser` and `CreateSuperuser` |
+| `imtauthgql::CUserCollectionControllerComp`, `imtauthgql::CUserCollectionDocumentServiceComp` | `Include/imtauthgql/` | Enforce strength and reuse on a password an administrator sets for a new user (`UserAdd`, user editor); no minimum age |
+| `imtauthgql::CGqlJwtSessionControllerComp` | `Include/imtauthgql/CGqlJwtSessionControllerComp.{h,cpp}` | Refuses `RefreshToken` once the password has expired |
+| `imtauth::StoreNewPasswordHash` | `Include/imtauth/PasswordPolicyUtils.h` | Stores a new hash and records the change (history, change time) on every path that sets a password |
 | `imtauthgql::CAuthorizationControllerComp` | `Include/imtauthgql/CAuthorizationControllerComp.{h,cpp}` | Evaluates password lifetime on `Authorization`/`UserToken` |
 
 The `PasswordPolicy` reference on both controllers is **optional**. If it is not wired,
@@ -32,7 +35,7 @@ the behavior is identical to previous releases (no policy enforcement).
 | `MaxPasswordLength` | Integer | 128 | Maximum password length (0 = unlimited). Keep large to support passphrases. |
 | `RequireLowercase` | Boolean | false | Require at least one lowercase letter. |
 | `RequireUppercase` | Boolean | false | Require at least one uppercase letter. |
-| `RequireDigit` | Boolean | false | Require at least one digit. |
+| `RequireDigit` | Boolean | false | Require at least one ASCII digit (0-9); the client mirrors the check and has no Unicode digit table. |
 | `RequireSpecialChar` | Boolean | false | Require at least one special character. |
 | `RejectLoginAsPassword` | Boolean | true | Reject passwords equal to the login (case-insensitive). |
 | `BlocklistFilePath` | Text | (empty) | Path to a text file with blocked passwords, one per line (e.g. a list of commonly used or compromised passwords). Comparison is case-insensitive. |
@@ -80,7 +83,19 @@ behavior.
   password via `ChangePassword`).
 - If the password expires within `ExpirationWarningPeriod` days, the login succeeds and the
   payload carries `passwordExpiresInDays` so clients can prompt the user to change the
-  password before it expires.
+  password before it expires. The value is rounded up: a password that expires in a few hours
+  reports 1 day.
+- The collection representation (`UserItem`) does not return the password hash.
+- `RefreshToken` is refused (`ok = false`) and the session removed once the password has expired
+  or must be changed, so a remembered session does not outlive the password. The user signs in
+  again and is sent to the change-password flow. This needs `PasswordPolicy` and `UserCollection`
+  wired into `GqlJwtSessionController` (done in Puma). Users with an enabled external account (e.g.
+  LDAP) are skipped, as the session does not tell which system signed them in. A user that cannot
+  be read gets no new token.
+- The QML client (`AuthorizationPage`) opens a change-password dialog on `passwordExpired`,
+  changes the password with the one just entered and repeats the login; a pending expiration
+  is shown as a warning after the login. The product registry must wire the same `PasswordPolicy`
+  instance into the login controller and into `UsersPage` (exported as `UsersPage/PasswordPolicy`).
 
 ### Policy publication (`GetPasswordPolicy` query)
 
@@ -102,9 +117,16 @@ rule evaluation and the texts derived from a `violatedRules` list), and
 actual `GetPasswordPolicy` request, so `imtauthgui` stays free of GQL.
 
 An instance is injected into the views: `GqlBasedProfileApiClient` and
-`GqlBasedUserAdministrationApiClient` expose it as `passwordPolicy`, while the two pre-login
-screens (`SuperuserPasswordPage`, `PasswordRecoveryDialog`) create their own. A view without
-an injected policy keeps working — only the extra checks are skipped.
+`GqlBasedUserAdministrationApiClient` expose it as `passwordPolicy`, while the pre-login
+screens create their own (`SuperuserPasswordPage`, `PasswordRecoveryDialog`) or get it from
+`ThumbnailDecorator` (the sign-up form of `AuthorizationPage`, via its `passwordPolicy`
+property). A view without an injected policy keeps working — only the extra checks are skipped.
+
+Wherever a password is set (user creation, sign-up, superuser setup, password change and
+recovery) the rules are listed next to the input via `requirementsText(includeHistory)`, so the user knows
+them before typing: length range, required character classes, "different from the login",
+"not commonly used" (if a blocklist is configured) and — only for a change of an existing
+password — "different from the last N ones".
 
 ### User data model
 

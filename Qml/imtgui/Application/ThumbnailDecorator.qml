@@ -34,6 +34,11 @@ Rectangle {
 	readonly property bool topPanelVisible: Style.enableTopPanel !== undefined ? Style.enableTopPanel : true;
 
 	property SettingsController settingsController: SettingsController {}
+
+	// Password rules for the sign-up form, reached before any API client exists.
+	GqlBasedPasswordPolicyProvider {
+		id: passwordPolicyProvider;
+	}
 	
 	Component.onCompleted: {
 		Events.subscribeEvent("StartLoading", thumbnailDecoratorContainer.startLoading);
@@ -274,6 +279,7 @@ Rectangle {
 			anchors.topMargin: topPanelLoader_.height;
 			
 			canRecoveryPassword: thumbnailDecoratorContainer.canRecoveryPassword;
+			passwordPolicy: passwordPolicyProvider;
 			
 			Component.onCompleted: {
 				Events.sendEvent("SetUserPanelEnabled", false);

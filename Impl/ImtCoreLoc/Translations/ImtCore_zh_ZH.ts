@@ -3614,6 +3614,10 @@
         <source>Password changed successfully</source>
         <translation>密码修改成功</translation>
     </message>
+    <message>
+        <source>Your password expires in %1 day(s). Please change it in your profile.</source>
+        <translation>您的密码将在 %1 天后过期。请在个人资料中修改。</translation>
+    </message>
 </context>
 <context>
     <name>AuthorizationPage</name>
@@ -3674,6 +3678,18 @@
         <location line="+10"/>
         <source>Close</source>
         <translation>关闭</translation>
+    </message>
+    <message>
+        <source>Unable to change the password.</source>
+        <translation>无法修改密码。</translation>
+    </message>
+    <message>
+        <source>Your password has expired</source>
+        <translation>您的密码已过期</translation>
+    </message>
+    <message>
+        <source>Unable to register the user</source>
+        <translation>无法注册用户</translation>
     </message>
 </context>
 <context>
@@ -7429,6 +7445,81 @@
     </message>
 </context>
 <context>
+    <name>PasswordPolicyController</name>
+    <message>
+        <source>at least %1 characters</source>
+        <translation>至少 %1 个字符</translation>
+    </message>
+    <message>
+        <source>at most %1 characters</source>
+        <translation>最多 %1 个字符</translation>
+    </message>
+    <message>
+        <source>a lowercase letter</source>
+        <translation>一个小写字母</translation>
+    </message>
+    <message>
+        <source>an uppercase letter</source>
+        <translation>一个大写字母</translation>
+    </message>
+    <message>
+        <source>a digit</source>
+        <translation>一个数字</translation>
+    </message>
+    <message>
+        <source>a special character</source>
+        <translation>一个特殊字符</translation>
+    </message>
+    <message>
+        <source>a password different from the login</source>
+        <translation>与登录名不同的密码</translation>
+    </message>
+    <message>
+        <source>a password that is not commonly used</source>
+        <translation>不常见的密码</translation>
+    </message>
+    <message>
+        <source>a password different from the last %1 ones</source>
+        <translation>与最近 %1 个密码不同的密码</translation>
+    </message>
+    <message>
+        <source>a password that was not used before</source>
+        <translation>以前未使用过的密码</translation>
+    </message>
+    <message>
+        <source>The current password is not correct.</source>
+        <translation>当前密码不正确。</translation>
+    </message>
+    <message>
+        <source>The password was changed too recently and cannot be changed again yet.</source>
+        <translation>密码修改时间过近，暂时不能再次修改。</translation>
+    </message>
+    <message>
+        <source>This account is managed by an external system, its password cannot be changed here.</source>
+        <translation>此账户由外部系统管理，无法在此修改其密码。</translation>
+    </message>
+    <message>
+        <source>This account no longer exists.</source>
+        <translation>此账户已不存在。</translation>
+    </message>
+    <message>
+        <source>The password could not be changed. Please try again later.</source>
+        <translation>无法修改密码。请稍后重试。</translation>
+    </message>
+    <message>
+        <source>The password does not meet the requirements: %1.</source>
+        <translation>密码不符合要求：%1。</translation>
+    </message>
+    <message>
+        <source>, </source>
+        <translation>、</translation>
+    </message>
+    <message>
+        <source>Password requirements:</source>
+        <translation>密码要求：</translation>
+    </message>
+</context>
+<context>
     <name>PasswordRecoveryDialog</name>
     <message>
         <location filename="../../../Qml/imtauthgui/PasswordRecoveryDialog.qml" line="+15"/>
@@ -7530,6 +7621,10 @@
         <location line="+142"/>
         <source>Password changed successfully</source>
         <translation>密码修改成功</translation>
+    </message>
+    <message>
+        <source>Unable to change the password.</source>
+        <translation>无法修改密码。</translation>
     </message>
 </context>
 <context>
@@ -7769,6 +7864,97 @@
         <location line="+21"/>
         <source>Category</source>
         <translation>类别</translation>
+    </message>
+</context>
+<context>
+    <name>ProfileGeneralPage</name>
+    <message>
+        <source>Profile saved</source>
+        <translation>个人资料已保存</translation>
+    </message>
+    <message>
+        <source>Unable to save the profile.</source>
+        <translation>无法保存个人资料。</translation>
+    </message>
+    <message>
+        <source>Account</source>
+        <translation>账户</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>名称</translation>
+    </message>
+    <message>
+        <source>Enter the name</source>
+        <translation>输入名称</translation>
+    </message>
+    <message>
+        <source>Email Address</source>
+        <translation>电子邮件地址</translation>
+    </message>
+    <message>
+        <source>Enter the email</source>
+        <translation>输入电子邮件</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation>保存</translation>
+    </message>
+    <message>
+        <source>Password changed</source>
+        <translation>密码已修改</translation>
+    </message>
+    <message>
+        <source>Unable to change the password. Check your current password and try again.</source>
+        <translation>无法修改密码。请检查当前密码后重试。</translation>
+    </message>
+    <message>
+        <source>Password</source>
+        <translation>密码</translation>
+    </message>
+    <message>
+        <source>Change</source>
+        <translation>修改</translation>
+    </message>
+    <message>
+        <source>Current password</source>
+        <translation>当前密码</translation>
+    </message>
+    <message>
+        <source>Enter your current password</source>
+        <translation>输入当前密码</translation>
+    </message>
+    <message>
+        <source>New password</source>
+        <translation>新密码</translation>
+    </message>
+    <message>
+        <source>Enter a new password</source>
+        <translation>输入新密码</translation>
+    </message>
+    <message>
+        <source>Confirm new password</source>
+        <translation>确认新密码</translation>
+    </message>
+    <message>
+        <source>Re-enter the new password</source>
+        <translation>再次输入新密码</translation>
+    </message>
+    <message>
+        <source>Passwords don&apos;t match</source>
+        <translation>密码不一致</translation>
+    </message>
+    <message>
+        <source>Changing password…</source>
+        <translation>正在修改密码…</translation>
+    </message>
+    <message>
+        <source>Update password</source>
+        <translation>更新密码</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>取消</translation>
     </message>
 </context>
 <context>
@@ -9026,6 +9212,26 @@ Errors: 0</source>
         <source>OK</source>
         <translation>正常</translation>
     </message>
+    <message>
+        <source>Unable to create the administrator account</source>
+        <translation>无法创建管理员账户</translation>
+    </message>
+    <message>
+        <source>Unable to reach server</source>
+        <translation>无法连接服务器</translation>
+    </message>
+    <message>
+        <source>Create the administrator account</source>
+        <translation>创建管理员账户</translation>
+    </message>
+    <message>
+        <source>This server doesn&apos;t have one yet. Set a name and password below - you&apos;ll sign in with them right after.</source>
+        <translation>此服务器还没有管理员账户。请在下方设置名称和密码，随后即可用它们登录。</translation>
+    </message>
+    <message>
+        <source>Create account</source>
+        <translation>创建账户</translation>
+    </message>
 </context>
 <context>
     <name>TDocumentWorkspaceGuiCompBase</name>
@@ -9462,6 +9668,10 @@ Input-ID: </source>
         <location line="+10"/>
         <source>Change Password</source>
         <translation>修改密码</translation>
+    </message>
+    <message>
+        <source>Unable to change the password.</source>
+        <translation>无法修改密码。</translation>
     </message>
 </context>
 <context>

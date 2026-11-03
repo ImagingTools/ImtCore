@@ -7,6 +7,7 @@
 // ImtCore includes
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Sessions.h>
 #include <imtauth/ITenantInfo.h>
+#include <imtauth/IUserInfo.h>
 #include <imtgql/IGqlContext.h>
 #include <imtauthgql/imtauthgql.h>
 
@@ -198,9 +199,21 @@ sdl::V1_0::imtauth::CRefreshTokenPayload CGqlJwtSessionControllerComp::OnRefresh
 
 	imtauth::IJwtSessionController::UserSession userSession;
 	response.ok = m_jwtSessionControllerCompPtr->RefreshToken(refreshToken, userSession);
-	if (response.ok){
-		response.userSession = CreateUserSessionData(userSession);
+	if (!response.ok){
+		return response;
 	}
+
+	// A refresh is no new login, but the password lifetime ends the session like any other
+	if (IsPasswordChangeRequired(userSession.userId)){
+		SendWarningMessage(0, QStringLiteral("Token refresh refused: the password of user '%1' has expired or must be changed").arg(QString::fromUtf8(userSession.userId)));
+
+		m_jwtSessionControllerCompPtr->RemoveSession(m_jwtSessionControllerCompPtr->GetSessionFromJwt(userSession.accessToken));
+		response.ok = false;
+
+		return response;
+	}
+
+	response.userSession = CreateUserSessionData(userSession);
 
 	return response;
 }
@@ -437,6 +450,49 @@ sdl::V1_0::imtauth::CGetTenantFromJwtPayload CGqlJwtSessionControllerComp::OnGet
 
 
 // private methods
+
+bool CGqlJwtSessionControllerComp::IsPasswordChangeRequired(const QByteArray& userId) const
+{
+	if (!m_passwordPolicyCompPtr.IsValid() || !m_userCollectionCompPtr.IsValid()){
+		return false;
+	}
+
+	// Fails closed: a user that cannot be read gets no new token
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	if (!m_userCollectionCompPtr->GetObjectData(userId, dataPtr)){
+		return true;
+	}
+
+	const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
+	if (userInfoPtr == nullptr){
+		return true;
+	}
+
+	// The session does not tell which system signed the user in, so a user with an external account
+	// (e.g. LDAP) is left to that system, as its login skips the lifetime check as well
+	bool hasInternalPassword = false;
+	for (const imtauth::IUserInfo::SystemInfo& systemInfo : userInfoPtr->GetSystemInfos()){
+		if (!systemInfo.enabled){
+			continue;
+		}
+
+		if (!systemInfo.systemId.isEmpty()){
+			return false;
+		}
+
+		hasInternalPassword = true;
+	}
+
+	if (!hasInternalPassword){
+		return false;
+	}
+
+	int daysUntilExpiration = -1;
+	const imtauth::IPasswordPolicy::LifetimeStatus lifetimeStatus = m_passwordPolicyCompPtr->GetPasswordLifetimeStatus(*userInfoPtr, daysUntilExpiration);
+
+	return lifetimeStatus == imtauth::IPasswordPolicy::LS_EXPIRED || lifetimeStatus == imtauth::IPasswordPolicy::LS_CHANGE_REQUIRED;
+}
+
 
 QByteArray CGqlJwtSessionControllerComp::GetAuthenticatedUserId(const ::imtgql::CGqlRequest& gqlRequest) const
 {

@@ -19,9 +19,9 @@ Dialog {
 	
 	Keys.onPressed: {
 		if (event.key === Qt.Key_Return){
-			let enabled = rootDialog.buttons.getButtonState(Enums.ok);
+			let enabled = rootDialog.buttons.getButtonState(Enums.save);
 			if (enabled){
-				rootDialog.finished(Enums.ok)
+				rootDialog.finished(Enums.save)
 			}
 		}
 	}
