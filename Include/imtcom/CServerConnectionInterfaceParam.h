@@ -7,10 +7,6 @@
 
 #undef SetPort
 
-#ifdef Q_OS_WIN
-#undef SetPort
-#endif
-
 
 namespace imtcom
 {

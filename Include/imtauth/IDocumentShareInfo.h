@@ -11,6 +11,8 @@
 #include <iser/IObject.h>
 #include <istd/TSmartPtr.h>
 
+#undef GetMessage
+
 
 namespace imtauth
 {
