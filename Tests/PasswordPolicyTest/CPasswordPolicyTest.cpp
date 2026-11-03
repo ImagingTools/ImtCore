@@ -144,6 +144,10 @@ void CPasswordPolicyTest::testPasswordStrength_MissingDigit()
 	QStringList violatedRuleIds;
 	QVERIFY(!m_passwordPolicyPtr->ValidatePasswordStrength("user1", "LongPassword", violatedRuleIds));
 	QVERIFY(violatedRuleIds.contains("DigitRequired"));
+
+	// Only 0-9 count, as on the client: an Arabic-Indic digit is a special character
+	QVERIFY(!m_passwordPolicyPtr->ValidatePasswordStrength("user1", QString("LongPassword") + QChar(0x0663), violatedRuleIds));
+	QVERIFY(violatedRuleIds.contains("DigitRequired"));
 }
 
 

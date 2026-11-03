@@ -597,8 +597,7 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 	QString name = userInfoPtr->GetName();
 	representationPayload.name = QString(name);
 
-	QByteArray password = userInfoPtr->GetPasswordHash();
-	representationPayload.password = QString(password);
+	// The password hash is never sent to a client
 
 	QString mail = userInfoPtr->GetMail();
 	representationPayload.email = QString(mail);
@@ -654,6 +653,14 @@ bool CUserCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 	if (userInfoPtr == nullptr){
 		errorMessage = QStringLiteral("Unable to cast user instance to identifable object. Error: Invalid object");
 		SendErrorMessage(0, errorMessage, "CUserCollectionControllerComp");
+
+		return false;
+	}
+
+	// The password hash includes the login and UserUpdate takes no password, so a new login would lock the user out
+	if (userData.username && *userData.username != userInfoPtr->GetId() && !userInfoPtr->GetPasswordHash().isEmpty()){
+		errorMessage = QStringLiteral("The login of a user with a password can be changed only together with the password");
+		SendWarningMessage(0, errorMessage, "CUserCollectionControllerComp");
 
 		return false;
 	}

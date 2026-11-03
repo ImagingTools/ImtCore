@@ -57,7 +57,8 @@ bool CPasswordPolicyControllerComp::ValidatePasswordStrength(const QByteArray& l
 		else if (character.isUpper()){
 			hasUppercase = true;
 		}
-		else if (character.isDigit()){
+		// ASCII digits only: the client mirrors this rule and has no Unicode digit table
+		else if (character >= QLatin1Char('0') && character <= QLatin1Char('9')){
 			hasDigit = true;
 		}
 		else if (!character.isSpace()){

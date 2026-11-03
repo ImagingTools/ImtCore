@@ -12,6 +12,9 @@ Column {
 	property UserData userData;
 	property bool readOnly: false;
 
+	// The password hash includes the login, so the login of a saved user is not edited here
+	property bool usernameEditable: true;
+
 	// PasswordPolicyController instance, injected by the owning view.
 	property var passwordPolicy: null;
 
@@ -112,7 +115,7 @@ Column {
 
 			name: qsTr("Username");
 			placeHolderText: qsTr("Enter the username");
-			readOnly: container.readOnly;
+			readOnly: container.readOnly || !container.usernameEditable;
 			showErrorWhenInvalid: true;
 			deferErrorUntilEdited: container.deferValidationErrors;
 			errorText: qsTr("Please enter the username");

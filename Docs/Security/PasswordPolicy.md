@@ -35,7 +35,7 @@ the behavior is identical to previous releases (no policy enforcement).
 | `MaxPasswordLength` | Integer | 128 | Maximum password length (0 = unlimited). Keep large to support passphrases. |
 | `RequireLowercase` | Boolean | false | Require at least one lowercase letter. |
 | `RequireUppercase` | Boolean | false | Require at least one uppercase letter. |
-| `RequireDigit` | Boolean | false | Require at least one digit. |
+| `RequireDigit` | Boolean | false | Require at least one ASCII digit (0-9); the client mirrors the check and has no Unicode digit table. |
 | `RequireSpecialChar` | Boolean | false | Require at least one special character. |
 | `RejectLoginAsPassword` | Boolean | true | Reject passwords equal to the login (case-insensitive). |
 | `BlocklistFilePath` | Text | (empty) | Path to a text file with blocked passwords, one per line (e.g. a list of commonly used or compromised passwords). Comparison is case-insensitive. |
@@ -85,6 +85,10 @@ behavior.
   payload carries `passwordExpiresInDays` so clients can prompt the user to change the
   password before it expires. The value is rounded up: a password that expires in a few hours
   reports 1 day.
+- The login of a user with a password can be changed only together with the password: the hash includes
+  the login. `UserUpdate` refuses a new login, the user editor accepts it only with the password, and
+  shows the login of a saved user read-only. The collection representation (`UserItem`) does not
+  return the password hash.
 - `RefreshToken` is refused (`ok = false`) and the session removed once the password has expired
   or must be changed, so a remembered session does not outlive the password. The user signs in
   again and is sent to the change-password flow. This needs `PasswordPolicy` and `UserCollection`
@@ -122,7 +126,7 @@ screens create their own (`SuperuserPasswordPage`, `PasswordRecoveryDialog`) or 
 property). A view without an injected policy keeps working — only the extra checks are skipped.
 
 Wherever a password is set (user creation, sign-up, superuser setup, password change and
-recovery) the rules are listed next to the input via `requirementsText()`, so the user knows
+recovery) the rules are listed next to the input via `requirementsText(includeHistory)`, so the user knows
 them before typing: length range, required character classes, "different from the login",
 "not commonly used" (if a blocklist is configured) and — only for a change of an existing
 password — "different from the last N ones".
