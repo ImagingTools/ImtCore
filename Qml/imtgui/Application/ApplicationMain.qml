@@ -282,14 +282,12 @@ Item {
 				context.appName = serverApplicationInfo.m_applicationName;
 				Style.logoIconName = serverApplicationInfo.m_logoIconName;
 
-				// make the application version kind (e.g. "Beta Version") visible in the UI
-				let serverVersion = serverApplicationInfo.m_version ? serverApplicationInfo.m_version : "";
-				let versionKind = serverApplicationInfo.m_versionKind ? serverApplicationInfo.m_versionKind : "";
-				if (versionKind !== ""){
-					serverVersion = serverVersion === "" ? versionKind : serverVersion + " - " + versionKind;
-				}
+				// make the application version kind (e.g. "Beta Version") and the build time visible in the UI
+				pageAboutProvider.serverVersion = pageAboutProvider.formatVersion(serverApplicationInfo.m_version, serverApplicationInfo.m_versionKind, serverApplicationInfo.m_buildTime)
 
-				pageAboutProvider.serverVersion = serverVersion
+				// services the server depends on (e.g. the authorization server) with their runtime status
+				pageAboutProvider.serverName = serverApplicationInfo.m_applicationName
+				pageAboutProvider.dependencies = serverApplicationInfo.m_dependencies ? serverApplicationInfo.m_dependencies : null
 
 				AuthorizationController.productId = serverApplicationInfo.m_applicationId
 			}
@@ -398,12 +396,18 @@ Item {
 		ServerLogProvider {}
 	}
 	
+	Component {
+		id: serviceDependencyViewComp
+		ServiceDependencyView {}
+	}
+	
 	ThumbnailDecorator {
 		id: thumbnailDecorator;
 		
 		anchors.fill: parent;
 		Component.onCompleted: {
 			settingsController.registerParamEditor("ServerLog", serverLogProviderComp)
+			settingsController.registerParamEditor("ServiceDependency", serviceDependencyViewComp)
 		}
 		
 		function fillPreferenceParamsSet(){

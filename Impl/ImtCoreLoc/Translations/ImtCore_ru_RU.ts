@@ -7463,14 +7463,19 @@
 <context>
     <name>PageAboutProvider</name>
     <message>
-        <location filename="../../../Qml/imtgui/Settings/PageAboutProvider.qml" line="+37"/>
+        <location filename="../../../Qml/imtgui/Settings/PageAboutProvider.qml" line="+98"/>
         <source>Server Log</source>
         <translation>Серверный лог</translation>
     </message>
     <message>
-        <location line="-1"/>
+        <location line="-11"/>
         <source>Server Version</source>
         <translation>Версия сервера</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Services</source>
+        <translation>Сервисы</translation>
     </message>
 </context>
 <context>
@@ -9190,6 +9195,24 @@ Errors: 0</source>
         <location line="+13"/>
         <source>Save file</source>
         <translation>Сохранение файла</translation>
+    </message>
+</context>
+<context>
+    <name>ServiceDependencyView</name>
+    <message>
+        <location filename="../../../Qml/imtgui/Settings/ServiceDependencyView.qml" line="+66"/>
+        <source>Connected</source>
+        <translation>Подключено</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Not connected</source>
+        <translation>Нет подключения</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Unknown</source>
+        <translation>Неизвестно</translation>
     </message>
 </context>
 <context>

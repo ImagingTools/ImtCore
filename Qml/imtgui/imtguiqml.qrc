@@ -45,6 +45,7 @@
         <file alias="imtgui/Settings/PreferenceButton.qml">Settings/PreferenceButton.qml</file>
         <file alias="imtgui/Settings/PreferenceDialog.qml">Settings/PreferenceDialog.qml</file>
         <file alias="imtgui/Settings/ServerLogProvider.qml">Settings/ServerLogProvider.qml</file>
+        <file alias="imtgui/Settings/ServiceDependencyView.qml">Settings/ServiceDependencyView.qml</file>
         <file alias="imtgui/Settings/SettingsObserver.qml">Settings/SettingsObserver.qml</file>
         <file alias="imtgui/Settings/SettingsProvider.qml">Settings/SettingsProvider.qml</file>
         <file alias="imtgui/Settings/SettingsController.qml">Settings/SettingsController.qml</file>

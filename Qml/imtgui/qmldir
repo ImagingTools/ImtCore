@@ -46,6 +46,7 @@ Preference 1.0 Settings/Preference.qml
 PreferenceDialog 1.0 Settings/PreferenceDialog.qml
 PreferenceButton 1.0 Settings/PreferenceButton.qml
 ServerLogProvider 1.0 Settings/ServerLogProvider.qml
+ServiceDependencyView 1.0 Settings/ServiceDependencyView.qml
 SettingsObserver 1.0 Settings/SettingsObserver.qml
 SettingsProvider 1.0 Settings/SettingsProvider.qml
 SettingsController 1.0 Settings/SettingsController.qml

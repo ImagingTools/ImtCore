@@ -37,6 +37,9 @@
                     <AttributeInfo Id="AuthOptionIndex" Type="Integer" ExportId="AuthOptionIndex">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ServiceDependencies" Type="Reference[]" ExportId="ServiceDependencies">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="DatabaseConnectionChecker" Type="Reference" ExportId="DatabaseConnectionChecker">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
