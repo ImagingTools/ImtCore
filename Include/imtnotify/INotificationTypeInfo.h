@@ -9,6 +9,8 @@
 // ACF includes
 #include <istd/IPolymorphic.h>
 
+#undef GetMessage
+
 
 namespace imtnotify
 {

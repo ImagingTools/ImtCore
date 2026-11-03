@@ -10,6 +10,8 @@
 #include <QString>
 #include <QList>
 
+#undef GetMessage
+
 
 namespace imtauth
 {
