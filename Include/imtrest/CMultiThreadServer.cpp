@@ -183,10 +183,13 @@ void CMultiThreadServer::Disconnected(QByteArray requestId)
 	}
 
 	qintptr descriptor = PopSocketDescriptor();
-	CSocketThread* threadSocket = new CSocketThread(descriptor, m_isSecureConnection, m_sslConfiguration, this);
+	auto* threadSocket = new CSocketThread(descriptor, m_isSecureConnection, m_sslConfiguration, this);
 
 	m_threadSocketList.append(threadSocket);
-	connect(threadSocket, &CSocketThread::SocketDisconnected, this, &CMultiThreadServer::Disconnected, Qt::DirectConnection);
+
+	// The signal comes from the thread of the connection. A direct call would run in that thread: it would wait for itself, delete its
+	// own running thread and create the next thread there, with this object as the parent that lives in another thread.
+	connect(threadSocket, &CSocketThread::SocketDisconnected, this, &CMultiThreadServer::Disconnected, Qt::QueuedConnection);
 
 	threadSocket->start();
 }

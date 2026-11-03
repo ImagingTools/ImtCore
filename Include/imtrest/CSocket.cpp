@@ -12,6 +12,20 @@ namespace imtrest
 {
 
 
+namespace
+{
+
+
+// While a request is handled and its response is sent, nobody reads the socket, and Qt does not limit its read buffer by default:
+// a client could fill the memory of the server with the data of the next request, that is not parsed yet and so is not limited by
+// the policy of the body or by the timeouts. With the limit Qt stops reading from the network, and TCP slows the client down. The limit is not exact:
+// the part that is read already stays in the buffer (for TLS it is a whole record or more).
+const qint64 s_busyReadBufferSize = qint64(64) * 1024;
+
+
+} // namespace
+
+
 CSocket::CSocket(CSocketThread* rootSocket, IRequest* request, bool secureConnection, const QSslConfiguration& sslConfiguration, qintptr socketDescriptor)
 	:QObject(),
 	m_rootSocket(rootSocket),
@@ -60,6 +74,9 @@ CSocket::CSocket(CSocketThread* rootSocket, IRequest* request, bool secureConnec
 
 	connect(m_socket.data(), &QTcpSocket::disconnected, this, &CSocket::Disconnected, Qt::DirectConnection);
 	connect(m_socket.data(), &QTcpSocket::readyRead, this, &CSocket::HandleReadyRead, Qt::DirectConnection);
+
+	// After the watcher, that is connected earlier: it has registered the written data when the request is finished
+	connect(m_socket.data(), &QTcpSocket::bytesWritten, this, &CSocket::OnBytesWritten, Qt::DirectConnection);
 }
 
 
@@ -173,6 +190,9 @@ void CSocket::HandleReadyRead()
 
 	// The response comes through OnSendResponse() later, so the flag is set before the handler starts.
 	m_isRequestInProgress = m_behavior.IsRequestResponseCycle();
+	if (m_isRequestInProgress){
+		m_socket->setReadBufferSize(s_busyReadBufferSize);
+	}
 
 	// Start request handler. A failure of the handler must not take the connection thread down and must not leave the
 	// client without a response.
@@ -182,6 +202,9 @@ void CSocket::HandleReadyRead()
 		requestHandlerPtr->ProcessRequest(*requestPtr);
 	}
 	catch (...){
+		// The request belongs to the handler since the call and it is not known whether the handler has taken it, so it is not deleted
+		// here: a possible leak is better than deleting a request that the handler uses. The handler is expected not to throw (the
+		// exception is possible only if it runs out of memory), so this branch is a safety net and normally is never executed.
 		qWarning() << "The request handler failed";
 
 		if (m_behavior.createServerErrorMessage){
@@ -245,15 +268,39 @@ void CSocket::OnSendStreamingResponse(imtrest::ConstResponsePtr response, bool i
 
 // private methods
 
+void CSocket::OnBytesWritten()
+{
+	if (m_isFinishPending){
+		FinishRequest();
+	}
+}
+
+
 void CSocket::FinishRequest()
 {
-	if (m_isRequestInProgress){
-		m_isRequestInProgress = false;
+	if (!m_isRequestInProgress){
+		return;
+	}
 
-		// The next request can be already in the socket, no signal will tell about it
-		if (!m_socket.isNull() && (m_socket->bytesAvailable() > 0)){
-			QMetaObject::invokeMethod(this, &CSocket::HandleReadyRead, Qt::QueuedConnection);
-		}
+	// The response is written to the socket, but a slow client can be still receiving it. The next request waits until the written data
+	// are sent, otherwise the responses of the pipelined requests pile up in the memory. The read limit stays meanwhile.
+	if (!m_socket.isNull() && m_socket->isOpen() && (m_socket->bytesToWrite() > 0)){
+		m_isFinishPending = true;
+
+		return;
+	}
+
+	m_isFinishPending = false;
+	m_isRequestInProgress = false;
+
+	// The socket is read again: the limit is removed, so Qt goes on reading from the network
+	if (!m_socket.isNull()){
+		m_socket->setReadBufferSize(0);
+	}
+
+	// The next request can be already in the socket, no signal will tell about it
+	if (!m_socket.isNull() && (m_socket->bytesAvailable() > 0)){
+		QMetaObject::invokeMethod(this, &CSocket::HandleReadyRead, Qt::QueuedConnection);
 	}
 }
 

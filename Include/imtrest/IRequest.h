@@ -76,7 +76,7 @@ public:
 
 	/**
 		Returns \c false if the connection should be closed after the response to the request, for example because
-		the client asked for it.
+		the client asked for it. For HTTP it is always \c false for a client of HTTP/1.0 (see CHttpRequest::IsConnectionPersistent()).
 	*/
 	virtual bool IsConnectionPersistent() const = 0;
 

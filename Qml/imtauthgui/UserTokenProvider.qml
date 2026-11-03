@@ -18,8 +18,12 @@ QtObject {
     property var permissions: [];
     property bool isTokenGlobal: true
 
+    // Days until the password expires, reported by the last login (0 = no warning)
+    property int passwordExpiresInDays: 0;
+
     signal accepted();
     signal failed(string message);
+    signal passwordExpired();
 
     property string modelState: container.authorizationGqlModel.state;
 
@@ -61,6 +65,14 @@ QtObject {
                         return;
                     }
 
+                    // The password must be changed first: the payload carries no token either.
+                    if (m_passwordExpired === true){
+                        container.passwordExpired();
+
+                        return;
+                    }
+
+                    container.passwordExpiresInDays = m_passwordExpiresInDays;
                     container.setLoginData(m_refreshToken, m_token, m_userId, m_username, m_systemId, m_permissions.split(';'))
                 }
             }

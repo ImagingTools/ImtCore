@@ -10,6 +10,7 @@
 // ImtCore includes
 #include <imtauth/CUserInfo.h>
 #include <imtauth/IUserInfo.h>
+#include <imtauth/PasswordPolicyUtils.h>
 #include <imtdoc/CDocumentSavedEvent.h>
 #include <imtdoc/imtdoc.h>
 #include <imtgql/IGqlContext.h>
@@ -208,6 +209,9 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 	if (userData.email){
 		userPtr->SetMail(*userData.email);
 	}
+	// The password hash includes the login, so a renamed user with an unchanged password is recognized below
+	const QByteArray previousUsername = userPtr->GetId();
+
 	if (userData.username){
 		userPtr->SetId(*userData.username);
 	}
@@ -269,10 +273,22 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 		if (!username.isEmpty() && m_hashCalculatorCompPtr.IsValid()){
 			for (const imtauth::IUserInfo::SystemInfo& systemInfo : userPtr->GetSystemInfos()){
 				if (systemInfo.enabled && systemInfo.systemId.isEmpty()){
-					QString password = *userData.password;
-					if (!password.isEmpty()){
-						password = m_hashCalculatorCompPtr->GenerateHash(username + password.toUtf8());
-						userPtr->SetPasswordHash(password.toUtf8());
+					const QString password = *userData.password;
+					const QByteArray passwordHash = password.isEmpty() ? QByteArray() : m_hashCalculatorCompPtr->GenerateHash(username + password.toUtf8());
+					// The editor sends the whole representation on every change: only a different password is a new one
+					const bool isSamePasswordOfRenamedUser = !passwordHash.isEmpty() && previousUsername != username
+								&& m_hashCalculatorCompPtr->GenerateHash(previousUsername + password.toUtf8()) == userPtr->GetPasswordHash();
+					if (isSamePasswordOfRenamedUser){
+						userPtr->SetPasswordHash(passwordHash);
+					}
+					else if (!passwordHash.isEmpty() && passwordHash != userPtr->GetPasswordHash()){
+						QStringList violatedRuleIds;
+						if (!imtauth::CheckNewPassword(m_passwordPolicyCompPtr.GetPtr(), *userPtr, username, password, passwordHash, violatedRuleIds)){
+							response.message = QStringLiteral("The password does not fulfill the password policy (%1)").arg(violatedRuleIds.join(", "));
+							return response;
+						}
+
+						imtauth::StoreNewPasswordHash(*userPtr, passwordHash, m_passwordPolicyCompPtr.GetPtr());
 					}
 					break;
 				}

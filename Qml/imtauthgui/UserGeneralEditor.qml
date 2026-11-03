@@ -297,6 +297,7 @@ Column {
 			objectName: "PasswordInput";
 			name: qsTr("Password");
 			placeHolderText: qsTr("Enter the password");
+			description: container.passwordPolicy ? container.passwordPolicy.requirementsText(false) : "";
 			echoMode: TextInput.Password;
 			readOnly: container.readOnly;
 			visible: passwordGroup.visible;

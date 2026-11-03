@@ -2427,6 +2427,13 @@
     </message>
 </context>
 <context>
+    <name>AuthorizationController</name>
+    <message>
+        <source>Your password expires in %1 day(s). Please change it in your profile.</source>
+        <translation>تنتهي صلاحية كلمة المرور خلال %1 يوم. يرجى تغييرها في ملفك الشخصي.</translation>
+    </message>
+</context>
+<context>
     <name>AuthorizationPage</name>
     <message>
         <location filename="../../../Include/imtcontrols/Qml/imtcontrols/Dialogs/AuthorizationPage.qml" line="+168"/>
@@ -2465,6 +2472,18 @@
         <location filename="../../../Qml/imtauthgui/AuthorizationPage.qml" line="+68"/>
         <source>Password recovery</source>
         <translation>استعادة كلمة المرور</translation>
+    </message>
+    <message>
+        <source>Unable to change the password.</source>
+        <translation>تعذر تغيير كلمة المرور.</translation>
+    </message>
+    <message>
+        <source>Your password has expired</source>
+        <translation>انتهت صلاحية كلمة المرور</translation>
+    </message>
+    <message>
+        <source>Unable to register the user</source>
+        <translation>تعذر تسجيل المستخدم</translation>
     </message>
 </context>
 <context>
@@ -5137,6 +5156,88 @@
     </message>
 </context>
 <context>
+    <name>PasswordPolicyController</name>
+    <message>
+        <source>at least %1 characters</source>
+        <translation>%1 أحرف على الأقل</translation>
+    </message>
+    <message>
+        <source>at most %1 characters</source>
+        <translation>%1 حرفًا على الأكثر</translation>
+    </message>
+    <message>
+        <source>a lowercase letter</source>
+        <translation>حرف صغير</translation>
+    </message>
+    <message>
+        <source>an uppercase letter</source>
+        <translation>حرف كبير</translation>
+    </message>
+    <message>
+        <source>a digit</source>
+        <translation>رقم</translation>
+    </message>
+    <message>
+        <source>a special character</source>
+        <translation>رمز خاص</translation>
+    </message>
+    <message>
+        <source>a password different from the login</source>
+        <translation>كلمة مرور مختلفة عن اسم تسجيل الدخول</translation>
+    </message>
+    <message>
+        <source>a password that is not commonly used</source>
+        <translation>كلمة مرور غير شائعة الاستخدام</translation>
+    </message>
+    <message>
+        <source>a password different from the last %1 ones</source>
+        <translation>كلمة مرور مختلفة عن آخر %1 كلمات مرور</translation>
+    </message>
+    <message>
+        <source>a password that was not used before</source>
+        <translation>كلمة مرور لم تُستخدم من قبل</translation>
+    </message>
+    <message>
+        <source>The current password is not correct.</source>
+        <translation>كلمة المرور الحالية غير صحيحة.</translation>
+    </message>
+    <message>
+        <source>The password was changed too recently and cannot be changed again yet.</source>
+        <translation>تم تغيير كلمة المرور مؤخرًا جدًا ولا يمكن تغييرها مرة أخرى بعد.</translation>
+    </message>
+    <message>
+        <source>This account is managed by an external system, its password cannot be changed here.</source>
+        <translation>يُدار هذا الحساب بواسطة نظام خارجي، ولا يمكن تغيير كلمة مروره هنا.</translation>
+    </message>
+    <message>
+        <source>This account no longer exists.</source>
+        <translation>هذا الحساب لم يعد موجودًا.</translation>
+    </message>
+    <message>
+        <source>The password could not be changed. Please try again later.</source>
+        <translation>تعذر تغيير كلمة المرور. يرجى المحاولة لاحقًا.</translation>
+    </message>
+    <message>
+        <source>The password does not meet the requirements: %1.</source>
+        <translation>كلمة المرور لا تستوفي المتطلبات: %1.</translation>
+    </message>
+    <message>
+        <source>, </source>
+        <translation>، </translation>
+    </message>
+    <message>
+        <source>Password requirements:</source>
+        <translation>متطلبات كلمة المرور:</translation>
+    </message>
+</context>
+<context>
+    <name>PasswordRecoveryDialog</name>
+    <message>
+        <source>Unable to change the password.</source>
+        <translation>تعذر تغيير كلمة المرور.</translation>
+    </message>
+</context>
+<context>
     <name>PathPicker</name>
     <message>
         <location filename="../../../Include/imtcontrols/Qml/imtcontrols/Inputs/PathPicker.qml" line="+69"/>
@@ -5261,6 +5362,97 @@
         <location line="+21"/>
         <source>Category</source>
         <translation>الفئة</translation>
+    </message>
+</context>
+<context>
+    <name>ProfileGeneralPage</name>
+    <message>
+        <source>Profile saved</source>
+        <translation>تم حفظ الملف الشخصي</translation>
+    </message>
+    <message>
+        <source>Unable to save the profile.</source>
+        <translation>تعذر حفظ الملف الشخصي.</translation>
+    </message>
+    <message>
+        <source>Account</source>
+        <translation>الحساب</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>الاسم</translation>
+    </message>
+    <message>
+        <source>Enter the name</source>
+        <translation>أدخل الاسم</translation>
+    </message>
+    <message>
+        <source>Email Address</source>
+        <translation>عنوان البريد الإلكتروني</translation>
+    </message>
+    <message>
+        <source>Enter the email</source>
+        <translation>أدخل البريد الإلكتروني</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation>حفظ</translation>
+    </message>
+    <message>
+        <source>Password changed</source>
+        <translation>تم تغيير كلمة المرور</translation>
+    </message>
+    <message>
+        <source>Unable to change the password. Check your current password and try again.</source>
+        <translation>تعذر تغيير كلمة المرور. تحقق من كلمة المرور الحالية وحاول مرة أخرى.</translation>
+    </message>
+    <message>
+        <source>Password</source>
+        <translation>كلمة المرور</translation>
+    </message>
+    <message>
+        <source>Change</source>
+        <translation>تغيير</translation>
+    </message>
+    <message>
+        <source>Current password</source>
+        <translation>كلمة المرور الحالية</translation>
+    </message>
+    <message>
+        <source>Enter your current password</source>
+        <translation>أدخل كلمة المرور الحالية</translation>
+    </message>
+    <message>
+        <source>New password</source>
+        <translation>كلمة المرور الجديدة</translation>
+    </message>
+    <message>
+        <source>Enter a new password</source>
+        <translation>أدخل كلمة مرور جديدة</translation>
+    </message>
+    <message>
+        <source>Confirm new password</source>
+        <translation>تأكيد كلمة المرور الجديدة</translation>
+    </message>
+    <message>
+        <source>Re-enter the new password</source>
+        <translation>أعد إدخال كلمة المرور الجديدة</translation>
+    </message>
+    <message>
+        <source>Passwords don&apos;t match</source>
+        <translation>كلمتا المرور غير متطابقتين</translation>
+    </message>
+    <message>
+        <source>Changing password…</source>
+        <translation>جارٍ تغيير كلمة المرور…</translation>
+    </message>
+    <message>
+        <source>Update password</source>
+        <translation>تحديث كلمة المرور</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>إلغاء</translation>
     </message>
 </context>
 <context>
@@ -6502,6 +6694,26 @@ Errors: 0</source>
         <source>OK</source>
         <translation>OK</translation>
     </message>
+    <message>
+        <source>Unable to create the administrator account</source>
+        <translation>تعذر إنشاء حساب المسؤول</translation>
+    </message>
+    <message>
+        <source>Unable to reach server</source>
+        <translation>تعذر الوصول إلى الخادم</translation>
+    </message>
+    <message>
+        <source>Create the administrator account</source>
+        <translation>إنشاء حساب المسؤول</translation>
+    </message>
+    <message>
+        <source>This server doesn&apos;t have one yet. Set a name and password below - you&apos;ll sign in with them right after.</source>
+        <translation>لا يوجد حساب على هذا الخادم بعد. عيّن اسمًا وكلمة مرور أدناه، وستسجّل الدخول بهما مباشرة بعد ذلك.</translation>
+    </message>
+    <message>
+        <source>Create account</source>
+        <translation>إنشاء حساب</translation>
+    </message>
 </context>
 <context>
     <name>TDocumentWorkspaceGuiCompBase</name>
@@ -6672,6 +6884,13 @@ Errors: 0</source>
         <location line="+17"/>
         <source>Enter the email</source>
         <translation>أدخل البريد الإلكتروني</translation>
+    </message>
+</context>
+<context>
+    <name>UserGeneralEditor</name>
+    <message>
+        <source>Unable to change the password.</source>
+        <translation>تعذر تغيير كلمة المرور.</translation>
     </message>
 </context>
 <context>

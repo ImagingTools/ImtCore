@@ -46,7 +46,10 @@ set(DEPLOY_QT_QML_DIRS "${IMTCOREDIR}/Qml")
 deploy_qt(TARGET ${PROJECT_NAME})
 
 
-if(WIN32)
-	file(COPY ${IMTCOREDIR}/3rdParty/openssl/1.1/lib/x64/libcrypto-1_1-x64.dll DESTINATION ${IMTCOREDIR}/Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME})
-	file(COPY ${IMTCOREDIR}/3rdParty/openssl/1.1/lib/x64/libssl-1_1-x64.dll DESTINATION ${IMTCOREDIR}/Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME})
+if(WIN32 AND NOT USE_FIND_PACKAGE)
+	file(GLOB OPENSSL_DLLS
+		${OPENSSLDIR}/lib/x64/libcrypto-*.dll
+		${OPENSSLDIR}/lib/x64/libssl-*.dll
+	)
+	file(COPY ${OPENSSL_DLLS} DESTINATION ${IMTCOREDIR}/Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME})
 endif()

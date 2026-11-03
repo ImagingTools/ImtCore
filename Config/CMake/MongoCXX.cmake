@@ -11,7 +11,6 @@ if (Boost_FOUND)
 endif ()
 
 include(${IMTCOREDIR}/Config/CMake/OpenSSL.cmake)
-set (OPENSSL_ROOT_DIR "${IMTCOREDIR}/3rdParty/openssl/1.1/")
 #find_package(OpenSSL REQUIRED)
 #if ( OPENSSL_FOUND )
 #		message(STATUS "OpenSSL Found: ${OPENSSL_VERSION}")

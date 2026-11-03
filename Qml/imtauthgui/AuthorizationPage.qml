@@ -19,6 +19,9 @@ Rectangle {
 	property bool canRecoveryPassword: true;
 	property bool canRegisterUser: true;
 
+	// PasswordPolicyController instance for the sign-up form, injected by the owner.
+	property var passwordPolicy: null;
+
 	property string appName: context ? context.appName : ""
 	
 	property bool isAuthenticating: false;
@@ -85,6 +88,41 @@ Rectangle {
 
 		function onLoggedIn(){
 			authPageContainer.isAuthenticating = false;
+		}
+
+		function onPasswordChangeRequired(){
+			authPageContainer.isAuthenticating = false;
+			ModalDialogManager.openDialog(expiredPasswordDialogComp, {});
+		}
+	}
+
+	// The expired password is changed with the one just entered, then the login is repeated with the new one.
+	Connections {
+		id: expiredPasswordConnections;
+		target: AuthorizationController;
+		enabled: false;
+
+		property string newPassword: "";
+
+		function onChangePasswordSuccessfully(){
+			expiredPasswordConnections.enabled = false;
+			passwordTextInput.text = expiredPasswordConnections.newPassword;
+			expiredPasswordConnections.newPassword = "";
+			authPageContainer.isAuthenticating = true;
+			authPageContainer.login(loginTextInput.text, passwordTextInput.text);
+		}
+
+		function onChangePasswordFailed(message, violatedRules){
+			expiredPasswordConnections.enabled = false;
+			expiredPasswordConnections.newPassword = "";
+			authPageContainer.isAuthenticating = false;
+
+			let fallback = qsTr("Unable to change the password.");
+			PopupManager.addErrorMessage(
+						authPageContainer.passwordPolicy
+							? authPageContainer.passwordPolicy.describeFailure(violatedRules, fallback)
+							: fallback,
+						true);
 		}
 	}
 
@@ -624,6 +662,28 @@ Rectangle {
 		}//bodyColumn
 	}
 
+	Component {
+		id: expiredPasswordDialogComp;
+		ChangePasswordDialog {
+			title: qsTr("Your password has expired");
+			currentPasswordInputVisible: false;
+			login: loginTextInput.text;
+			policy: authPageContainer.passwordPolicy;
+			onFinished: {
+				if (buttonId == Enums.save){
+					authPageContainer.isAuthenticating = true;
+					expiredPasswordConnections.newPassword = contentItem.newPassword;
+					expiredPasswordConnections.enabled = true;
+					AuthorizationController.changePassword(loginTextInput.text, passwordTextInput.text, contentItem.newPassword);
+				}
+				else{
+					passwordTextInput.text = "";
+					passwordTextInput.forceActiveFocus();
+				}
+			}
+		}
+	}
+
 	Component{
 		id: passwordRecoveryDialogComp;
 		PasswordRecoveryDialog {}
@@ -653,7 +713,12 @@ Rectangle {
 
 				function onRegisterFailed(message, violatedRules){
 					registerDialog.buttons.setButtonState(Enums.save, true);
-					PopupManager.addErrorMessage(message !== "" ? message : qsTr("Unable to register the user"), true, "RegisterUserError");
+					let fallback = message !== "" ? message : qsTr("Unable to register the user");
+					PopupManager.addErrorMessage(
+								authPageContainer.passwordPolicy
+									? authPageContainer.passwordPolicy.describeFailure(violatedRules, fallback)
+									: fallback,
+								true, "RegisterUserError");
 				}
 			}
 
@@ -701,6 +766,7 @@ Rectangle {
 							id: userGeneralEditor;
 							width: flickable.width;
 							userData: userDataModel;
+							passwordPolicy: authPageContainer.passwordPolicy;
 							deferValidationErrors: true;
 
 							onEmitUpdateModel: {

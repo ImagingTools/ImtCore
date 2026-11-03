@@ -323,6 +323,9 @@
                     <AttributeInfo Id="HeadersProvider" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="CollectionHeadersProvider"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="PasswordPolicy" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PasswordPolicy"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -696,6 +699,7 @@
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="Demultiplexer"/>
     </ExportedInterfaces>
     <ExportedComponents>
+        <Component ExportedId="PasswordPolicy" ComponentId="PasswordPolicy"/>
         <Component ExportedId="SmtpMessageCreator" ComponentId="SmtpMessageCreator"/>
         <Component ExportedId="UserChangeGenerator" ComponentId="UserChangeGenerator"/>
     </ExportedComponents>

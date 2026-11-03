@@ -72,6 +72,11 @@ bool CSimpleLoginWrapComp::Login(const QString& userName, const QString& passwor
 			return false;
 		}
 
+		// An expired password or a deactivated account is answered without a token
+		if (!response.token || response.token->isEmpty()){
+			return false;
+		}
+
 		m_loggedUserPassword = password.toUtf8();
 
 		if (response.userId){

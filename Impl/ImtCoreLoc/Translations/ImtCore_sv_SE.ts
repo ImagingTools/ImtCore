@@ -3583,6 +3583,10 @@
         <source>Password changed successfully</source>
         <translation>Lösenordet har ändrats</translation>
     </message>
+    <message>
+        <source>Your password expires in %1 day(s). Please change it in your profile.</source>
+        <translation>Ditt lösenord går ut om %1 dag(ar). Ändra det i din profil.</translation>
+    </message>
 </context>
 <context>
     <name>AuthorizationPage</name>
@@ -3643,6 +3647,18 @@
         <location line="+10"/>
         <source>Close</source>
         <translation>Stäng</translation>
+    </message>
+    <message>
+        <source>Unable to change the password.</source>
+        <translation>Det gick inte att ändra lösenordet.</translation>
+    </message>
+    <message>
+        <source>Your password has expired</source>
+        <translation>Ditt lösenord har gått ut</translation>
+    </message>
+    <message>
+        <source>Unable to register the user</source>
+        <translation>Det gick inte att registrera användaren</translation>
     </message>
 </context>
 <context>
@@ -7223,6 +7239,81 @@
     </message>
 </context>
 <context>
+    <name>PasswordPolicyController</name>
+    <message>
+        <source>at least %1 characters</source>
+        <translation>minst %1 tecken</translation>
+    </message>
+    <message>
+        <source>at most %1 characters</source>
+        <translation>högst %1 tecken</translation>
+    </message>
+    <message>
+        <source>a lowercase letter</source>
+        <translation>en liten bokstav</translation>
+    </message>
+    <message>
+        <source>an uppercase letter</source>
+        <translation>en stor bokstav</translation>
+    </message>
+    <message>
+        <source>a digit</source>
+        <translation>en siffra</translation>
+    </message>
+    <message>
+        <source>a special character</source>
+        <translation>ett specialtecken</translation>
+    </message>
+    <message>
+        <source>a password different from the login</source>
+        <translation>ett lösenord som skiljer sig från inloggningsnamnet</translation>
+    </message>
+    <message>
+        <source>a password that is not commonly used</source>
+        <translation>ett lösenord som inte är vanligt förekommande</translation>
+    </message>
+    <message>
+        <source>a password different from the last %1 ones</source>
+        <translation>ett lösenord som skiljer sig från de %1 senaste</translation>
+    </message>
+    <message>
+        <source>a password that was not used before</source>
+        <translation>ett lösenord som inte har använts tidigare</translation>
+    </message>
+    <message>
+        <source>The current password is not correct.</source>
+        <translation>Det nuvarande lösenordet är felaktigt.</translation>
+    </message>
+    <message>
+        <source>The password was changed too recently and cannot be changed again yet.</source>
+        <translation>Lösenordet ändrades för nyligen och kan inte ändras igen ännu.</translation>
+    </message>
+    <message>
+        <source>This account is managed by an external system, its password cannot be changed here.</source>
+        <translation>Kontot hanteras av ett externt system, dess lösenord kan inte ändras här.</translation>
+    </message>
+    <message>
+        <source>This account no longer exists.</source>
+        <translation>Kontot finns inte längre.</translation>
+    </message>
+    <message>
+        <source>The password could not be changed. Please try again later.</source>
+        <translation>Lösenordet kunde inte ändras. Försök igen senare.</translation>
+    </message>
+    <message>
+        <source>The password does not meet the requirements: %1.</source>
+        <translation>Lösenordet uppfyller inte kraven: %1.</translation>
+    </message>
+    <message>
+        <source>, </source>
+        <translation>, </translation>
+    </message>
+    <message>
+        <source>Password requirements:</source>
+        <translation>Krav på lösenordet:</translation>
+    </message>
+</context>
+<context>
     <name>PasswordRecoveryDialog</name>
     <message>
         <location filename="../../../Qml/imtauthgui/PasswordRecoveryDialog.qml" line="+15"/>
@@ -7324,6 +7415,10 @@
         <location line="+142"/>
         <source>Password changed successfully</source>
         <translation>Lösenordet har ändrats</translation>
+    </message>
+    <message>
+        <source>Unable to change the password.</source>
+        <translation>Det gick inte att ändra lösenordet.</translation>
     </message>
 </context>
 <context>
@@ -7548,6 +7643,97 @@
         <location line="+21"/>
         <source>Category</source>
         <translation>Kategori</translation>
+    </message>
+</context>
+<context>
+    <name>ProfileGeneralPage</name>
+    <message>
+        <source>Profile saved</source>
+        <translation>Profilen har sparats</translation>
+    </message>
+    <message>
+        <source>Unable to save the profile.</source>
+        <translation>Det gick inte att spara profilen.</translation>
+    </message>
+    <message>
+        <source>Account</source>
+        <translation>Konto</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Namn</translation>
+    </message>
+    <message>
+        <source>Enter the name</source>
+        <translation>Ange namnet</translation>
+    </message>
+    <message>
+        <source>Email Address</source>
+        <translation>E-postadress</translation>
+    </message>
+    <message>
+        <source>Enter the email</source>
+        <translation>Ange e-postadressen</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation>Spara</translation>
+    </message>
+    <message>
+        <source>Password changed</source>
+        <translation>Lösenordet har ändrats</translation>
+    </message>
+    <message>
+        <source>Unable to change the password. Check your current password and try again.</source>
+        <translation>Det gick inte att ändra lösenordet. Kontrollera ditt nuvarande lösenord och försök igen.</translation>
+    </message>
+    <message>
+        <source>Password</source>
+        <translation>Lösenord</translation>
+    </message>
+    <message>
+        <source>Change</source>
+        <translation>Ändra</translation>
+    </message>
+    <message>
+        <source>Current password</source>
+        <translation>Nuvarande lösenord</translation>
+    </message>
+    <message>
+        <source>Enter your current password</source>
+        <translation>Ange ditt nuvarande lösenord</translation>
+    </message>
+    <message>
+        <source>New password</source>
+        <translation>Nytt lösenord</translation>
+    </message>
+    <message>
+        <source>Enter a new password</source>
+        <translation>Ange ett nytt lösenord</translation>
+    </message>
+    <message>
+        <source>Confirm new password</source>
+        <translation>Bekräfta nytt lösenord</translation>
+    </message>
+    <message>
+        <source>Re-enter the new password</source>
+        <translation>Ange det nya lösenordet igen</translation>
+    </message>
+    <message>
+        <source>Passwords don&apos;t match</source>
+        <translation>Lösenorden stämmer inte överens</translation>
+    </message>
+    <message>
+        <source>Changing password…</source>
+        <translation>Lösenordet ändras…</translation>
+    </message>
+    <message>
+        <source>Update password</source>
+        <translation>Uppdatera lösenord</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Avbryt</translation>
     </message>
 </context>
 <context>
@@ -8698,6 +8884,26 @@ Fel: 0</translation>
         <source>OK</source>
         <translation>OK</translation>
     </message>
+    <message>
+        <source>Unable to create the administrator account</source>
+        <translation>Det gick inte att skapa administratörskontot</translation>
+    </message>
+    <message>
+        <source>Unable to reach server</source>
+        <translation>Servern kan inte nås</translation>
+    </message>
+    <message>
+        <source>Create the administrator account</source>
+        <translation>Skapa administratörskontot</translation>
+    </message>
+    <message>
+        <source>This server doesn&apos;t have one yet. Set a name and password below - you&apos;ll sign in with them right after.</source>
+        <translation>Servern har inget ännu. Ange namn och lösenord nedan – du loggar in med dem direkt efteråt.</translation>
+    </message>
+    <message>
+        <source>Create account</source>
+        <translation>Skapa konto</translation>
+    </message>
 </context>
 <context>
     <name>TDocumentWorkspaceGuiCompBase</name>
@@ -9109,6 +9315,10 @@ Indata-ID: </translation>
         <location line="+10"/>
         <source>Change Password</source>
         <translation>Ändra lösenord</translation>
+    </message>
+    <message>
+        <source>Unable to change the password.</source>
+        <translation>Det gick inte att ändra lösenordet.</translation>
     </message>
 </context>
 <context>

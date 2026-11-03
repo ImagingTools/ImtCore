@@ -13,6 +13,7 @@
 // ImtCore includes
 #include <imtauth/CPasswordPolicyControllerComp.h>
 #include <imtauth/CUserInfo.h>
+#include <imtauth/PasswordPolicyUtils.h>
 #include <imtcore/Version.h>
 
 
@@ -143,6 +144,10 @@ void CPasswordPolicyTest::testPasswordStrength_MissingDigit()
 	QStringList violatedRuleIds;
 	QVERIFY(!m_passwordPolicyPtr->ValidatePasswordStrength("user1", "LongPassword", violatedRuleIds));
 	QVERIFY(violatedRuleIds.contains("DigitRequired"));
+
+	// Only 0-9 count, as on the client: an Arabic-Indic digit is a special character
+	QVERIFY(!m_passwordPolicyPtr->ValidatePasswordStrength("user1", QString("LongPassword") + QChar(0x0663), violatedRuleIds));
+	QVERIFY(violatedRuleIds.contains("DigitRequired"));
 }
 
 
@@ -258,8 +263,12 @@ void CPasswordPolicyTest::testLifetimeStatus_ExpiresSoon()
 
 	int daysUntilExpiration = -1;
 	QCOMPARE(m_passwordPolicyPtr->GetPasswordLifetimeStatus(userInfo, daysUntilExpiration), imtauth::IPasswordPolicy::LS_EXPIRES_SOON);
-	QVERIFY(daysUntilExpiration >= 0);
-	QVERIFY(daysUntilExpiration <= 14);
+	QCOMPARE(daysUntilExpiration, 5);
+
+	// A few hours before the expiration there is still 1 day left, not 0
+	userInfo.SetPasswordChangedAt(QDateTime::currentDateTimeUtc().addDays(-90).addSecs(3 * 60 * 60));
+	QCOMPARE(m_passwordPolicyPtr->GetPasswordLifetimeStatus(userInfo, daysUntilExpiration), imtauth::IPasswordPolicy::LS_EXPIRES_SOON);
+	QCOMPARE(daysUntilExpiration, 1);
 }
 
 
@@ -414,6 +423,54 @@ void CPasswordPolicyTest::testDefaults_HistoryIsKeptWhenUnconfigured()
 
 	QCOMPARE(userInfo.GetPasswordHistory(), QByteArrayList() << "hash-old");
 	QVERIFY(m_unconfiguredPasswordPolicyPtr->IsPasswordReused(userInfo, "hash-old"));
+}
+
+
+// Helpers used on every path that sets a password
+
+void CPasswordPolicyTest::testCheckNewPassword_StrengthAndReuse()
+{
+	imtauth::CUserInfo userInfo = MakeUserInfo("hash-current", QByteArrayList() << "hash-previous");
+
+	QStringList violatedRuleIds;
+	QVERIFY(imtauth::CheckNewPassword(m_passwordPolicyPtr, userInfo, "user1", "Str0ngPassword", "hash-new", violatedRuleIds));
+	QVERIFY(violatedRuleIds.isEmpty());
+
+	QVERIFY(!imtauth::CheckNewPassword(m_passwordPolicyPtr, userInfo, "user1", "Sh0rt", "hash-new", violatedRuleIds));
+	QVERIFY(violatedRuleIds.contains("MinLength"));
+
+	// A strong password is still refused if it is one of the remembered ones
+	violatedRuleIds.clear();
+	QVERIFY(!imtauth::CheckNewPassword(m_passwordPolicyPtr, userInfo, "user1", "Str0ngPassword", "hash-previous", violatedRuleIds));
+	QCOMPARE(violatedRuleIds, QStringList() << "PasswordReused");
+
+	// Without a policy every password is accepted
+	violatedRuleIds.clear();
+	QVERIFY(imtauth::CheckNewPassword(nullptr, userInfo, "user1", "1", "hash-current", violatedRuleIds));
+	QVERIFY(violatedRuleIds.isEmpty());
+}
+
+
+void CPasswordPolicyTest::testStoreNewPasswordHash_RecordsTheChange()
+{
+	imtauth::CUserInfo userInfo = MakeUserInfo("hash-current", QByteArrayList(), QDateTime::currentDateTimeUtc().addDays(-100), true);
+
+	imtauth::StoreNewPasswordHash(userInfo, "hash-new", m_passwordPolicyPtr);
+
+	QCOMPARE(userInfo.GetPasswordHash(), QByteArray("hash-new"));
+	QCOMPARE(userInfo.GetPasswordHistory(), QByteArrayList() << "hash-current");
+	QVERIFY(userInfo.GetPasswordChangedAt().secsTo(QDateTime::currentDateTimeUtc()) < 60);
+	QVERIFY(!userInfo.MustChangePassword());
+
+	// Without a policy the lifetime still starts now, but no history is kept
+	imtauth::CUserInfo otherUserInfo = MakeUserInfo("hash-current", QByteArrayList(), QDateTime::currentDateTimeUtc().addDays(-100), true);
+
+	imtauth::StoreNewPasswordHash(otherUserInfo, "hash-new", nullptr);
+
+	QCOMPARE(otherUserInfo.GetPasswordHash(), QByteArray("hash-new"));
+	QVERIFY(otherUserInfo.GetPasswordHistory().isEmpty());
+	QVERIFY(otherUserInfo.GetPasswordChangedAt().secsTo(QDateTime::currentDateTimeUtc()) < 60);
+	QVERIFY(!otherUserInfo.MustChangePassword());
 }
 
 

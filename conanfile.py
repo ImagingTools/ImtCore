@@ -81,7 +81,7 @@ class ImtCoreConan(ConanFile):
             self.requires("qt/[>=6.8]@gmg/system")
 
         self.requires("quazip/[~1]@gmg/stable")
-        self.requires("openssl/[~1.1]")
+        self.requires("openssl/[>=1.1 <4]")
         self.requires("acf/[~1]@gmg/stable")
         self.requires("acfsln/[~1]@gmg/stable")
         self.requires("iacf/[~1]@gmg/stable")

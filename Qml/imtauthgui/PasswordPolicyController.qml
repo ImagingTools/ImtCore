@@ -163,12 +163,12 @@ QtObject {
 			return fallbackMessage;
 		}
 
-		// Unlike requirementsText(), a violated rule can be a whole-password condition such as "different from the login".
 		return qsTr("The password does not meet the requirements: %1.").arg(requirements.join(qsTr(", ")));
 	}
 
-	// Hint shown next to the input, before anything was typed.
-	function requirementsText(){
+	// Hint shown next to the input, so the user knows all rules before typing.
+	// includeHistory: the reuse rule only applies when an existing password is changed.
+	function requirementsText(includeHistory){
 		if (!root.loaded){
 			return "";
 		}
@@ -177,6 +177,10 @@ QtObject {
 
 		if (root.minLength > 0){
 			requirements.push(root.describeRule("MinLength"));
+		}
+
+		if (root.maxLength > 0){
+			requirements.push(root.describeRule("MaxLength"));
 		}
 
 		if (root.requireLowercase){
@@ -195,10 +199,27 @@ QtObject {
 			requirements.push(root.describeRule("SpecialCharRequired"));
 		}
 
+		if (root.rejectLoginAsPassword){
+			requirements.push(root.describeRule("LoginAsPassword"));
+		}
+
+		if (root.blocklistUsed){
+			requirements.push(root.describeRule("BlocklistedPassword"));
+		}
+
+		if (includeHistory && root.historyDepth > 0){
+			requirements.push(root.describeRule("PasswordReused"));
+		}
+
 		if (requirements.length <= 0){
 			return "";
 		}
 
-		return qsTr("The password must contain %1.").arg(requirements.join(qsTr(", ")));
+		let text = qsTr("Password requirements:");
+		for (let index = 0; index < requirements.length; ++index){
+			text += "\n\u2022 " + requirements[index];
+		}
+
+		return text;
 	}
 }
