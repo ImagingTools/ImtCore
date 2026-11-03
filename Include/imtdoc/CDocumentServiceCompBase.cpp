@@ -703,7 +703,7 @@ bool CDocumentServiceCompBase::RestoreDocument(const DocumentInfo& documentInfo,
 
 	WorkingDocument& registeredDocument = m_documents[documentInfo.documentId];
 	InitializeDocumentObservers(registeredDocument, userId, documentInfo.documentId);
-	registeredDocument.isDirty = undoManagerPtr->GetDocumentChangeFlag() != idoc::IDocumentStateComparator::DCF_EQUAL;
+	registeredDocument.isDirty = IsDocumentDirty(registeredDocument);
 	registeredDocument.isLoading = false;
 
 	return true;
