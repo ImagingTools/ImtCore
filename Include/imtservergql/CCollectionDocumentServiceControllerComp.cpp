@@ -508,7 +508,7 @@ sdl::V1_0::imtbase::CUndoInfo CCollectionDocumentServiceControllerComp::OnGetUnd
 			return retVal;
 		}
 
-		if (status != imtdoc::IDocumentService::OS_OK){
+		if (status != imtdoc::IDocumentService::OS_OK || undoManagerPtr == nullptr){
 			errorMessage = "Undo manager not available";
 
 			retVal.status->status = sdl::V1_0::imtbase::EUndoStatus::Failed;
@@ -598,7 +598,7 @@ sdl::V1_0::imtbase::CUndoStatus CCollectionDocumentServiceControllerComp::OnDoUn
 		}
 
 		idoc::IUndoManager* undoManagerPtr = nullptr;
-		if (m_documentManagerCompPtr->GetDocumentUndoManager(userId, documentId, undoManagerPtr) != imtdoc::IDocumentService::OS_OK) {
+		if (m_documentManagerCompPtr->GetDocumentUndoManager(userId, documentId, undoManagerPtr) != imtdoc::IDocumentService::OS_OK || undoManagerPtr == nullptr) {
 			errorMessage = "Undo manager not available";
 
 			retVal.status = sdl::V1_0::imtbase::EUndoStatus::Failed;
@@ -674,7 +674,7 @@ sdl::V1_0::imtbase::CUndoStatus CCollectionDocumentServiceControllerComp::OnDoRe
 		}
 
 		idoc::IUndoManager* undoManagerPtr = nullptr;
-		if (m_documentManagerCompPtr->GetDocumentUndoManager(userId, documentId, undoManagerPtr) != imtdoc::IDocumentService::OS_OK) {
+		if (m_documentManagerCompPtr->GetDocumentUndoManager(userId, documentId, undoManagerPtr) != imtdoc::IDocumentService::OS_OK || undoManagerPtr == nullptr) {
 			errorMessage = "Undo manager not available";
 
 			retVal.status = sdl::V1_0::imtbase::EUndoStatus::Failed;
@@ -743,7 +743,7 @@ sdl::V1_0::imtbase::CUndoStatus CCollectionDocumentServiceControllerComp::OnRese
 		}
 
 		idoc::IUndoManager* undoManagerPtr = nullptr;
-		if (m_documentManagerCompPtr->GetDocumentUndoManager(userId, *documentId->id, undoManagerPtr) != imtdoc::IDocumentService::OS_OK) {
+		if (m_documentManagerCompPtr->GetDocumentUndoManager(userId, *documentId->id, undoManagerPtr) != imtdoc::IDocumentService::OS_OK || undoManagerPtr == nullptr) {
 			errorMessage = "Undo manager not available";
 
 			retVal.status = sdl::V1_0::imtbase::EUndoStatus::Failed;
