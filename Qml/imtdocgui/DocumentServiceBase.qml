@@ -678,8 +678,12 @@ QtObject {
 	// isReadOnly === true: the document can only be closed (e.g. it was opened from an object revision).
 	function handleDocumentOpened(documentId, objectId, objectTypeId, documentName, hasNameProvider, isDirty, isDataLoaded, isReadOnly){
 		setAutoNamedTypeId(objectTypeId, hasNameProvider)
-		if (isReadOnly === true)
+		if (isReadOnly === true){
+			let wasReadOnly = documentIsReadOnly(documentId)
 			__internal.readOnlyDocumentIds[documentId] = true
+			if (!wasReadOnly)
+				documentIsReadOnlyChanged(documentId)
+		}
 		setDocumentName(documentId, documentName)
 
 		// The document may already be known locally, e.g. when the
