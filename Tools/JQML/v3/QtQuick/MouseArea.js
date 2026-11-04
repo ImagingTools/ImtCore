@@ -70,9 +70,18 @@ class MouseArea extends Item {
         return this.hoverEnabled && this.enabled && this.visible
     }
 
+    __resetPressed(mouse){
+        if(!this.__self.pressed) return
+
+        this.__self.pressed = false
+        this.pressedChanged(mouse)
+    }
+
     __onMouseCanceled(mouse){
         if(!this.enabled || !this.visible) return
 
+        this.__pressed = false
+        this.__resetPressed(mouse)
         this.canceled()
     }
 
@@ -173,7 +182,7 @@ class MouseArea extends Item {
     __onMouseClick(mouse){
         if(!this.enabled || !this.visible || !(mouse.button & this.acceptedButtons)) return
 
-        this.__self.pressed = false
+        this.__resetPressed(mouse)
 
         if(mouse.target === this && this.__pressed){
             this.__emitComposedClick(mouse)
@@ -185,7 +194,7 @@ class MouseArea extends Item {
     __onMouseDblClick(mouse){
         if(!this.enabled || !this.visible || !(mouse.button & this.acceptedButtons)) return
 
-        this.__self.pressed = false
+        this.__resetPressed(mouse)
 
         if(mouse.target === this && this.__pressed){
             this.clicked(mouse)

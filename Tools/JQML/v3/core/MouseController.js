@@ -393,10 +393,223 @@ module.exports = {
         }
     },
 
-    init: function(){   
-        window.addEventListener('mousemove', (e)=>{
-            let event = this.event ? this.event : new QmlMouseEvent({path: this.getObjectsFromPoint(e.pageX, e.pageY)})
-            
+    __touchPointerId: null,
+    __lastTouchTime: -Infinity,
+    __touchSuppressInterval: 1000,
+
+    __isTouchPointer: function(e){
+        return e.pointerType === 'touch' || e.pointerType === 'pen'
+    },
+
+    // Browsers emulate mouse events (and a click) after a touch or pen
+    // interaction. They are already handled through pointer events.
+    __isEmulatedMouseEvent: function(){
+        if(this.__touchPointerId !== null) return true
+
+        return performance.now() - this.__lastTouchTime < this.__touchSuppressInterval
+    },
+
+    __isEditableElement: function(element){
+        if(!element || !element.tagName) return false
+        if(element.isContentEditable) return true
+
+        let tagName = element.tagName.toUpperCase()
+
+        return tagName === 'INPUT' || tagName === 'TEXTAREA' || tagName === 'SELECT'
+    },
+
+    __clearHover: function(skipObj){
+        let event = new QmlMouseEvent()
+        let entered = this.entered
+
+        this.entered = []
+        this.enteredSet.clear()
+
+        for(let obj of entered){
+            if(!obj || obj.__destroyed || obj === skipObj) continue
+            if(typeof obj.__onMouseLeave === 'function') obj.__onMouseLeave(event)
+        }
+    },
+
+    __cancelPress: function(){
+        let event = this.event
+        if(!event || !(event instanceof QmlMouseEvent)){
+            this.event = null
+            return
+        }
+
+        for(let handler of this.activePointerHandlers){
+            if(!handler || handler.__destroyed) continue
+            if(typeof handler.__onMouseCanceled === 'function') handler.__onMouseCanceled(event)
+        }
+        this.activePointerHandlers.clear()
+
+        let target = event.target
+        if(target && !target.__destroyed){
+            if(typeof target.__onMouseCanceled === 'function') target.__onMouseCanceled(event)
+            this.__finishMouseAreaDrag(target)
+        }
+
+        this.event = null
+    },
+
+    __onMouseMove: function(e){
+        let event = this.event ? this.event : new QmlMouseEvent({path: this.getObjectsFromPoint(e.clientX, e.clientY)})
+        
+        let modifiers = QtEnums.NoModifier
+        if(e.shiftKey) {
+            modifiers |= QtEnums.ShiftModifier
+        }
+        if(e.altKey) {
+            modifiers |= QtEnums.AltModifier
+        }
+        if(e.ctrlKey) {
+            modifiers |= QtEnums.ControlModifier
+        }
+
+        event.modifiers = modifiers
+        event.moveX = event.originX - e.clientX
+        event.moveY = event.originY - e.clientY
+        event.originX = e.clientX
+        event.originY = e.clientY
+
+        JQApplication.resetCursor('unset')
+
+        if(event.pressed){
+            if(Math.abs(event.startX - event.originX) > 15) event.wasDragX = true
+            if(Math.abs(event.startY - event.originY) > 15) event.wasDragY = true
+        }
+
+        let hoverBlocker = event.target ? null : this.__findHoverBlocker(event)
+
+        const pointerInside = (obj) => {
+            event.relative(obj)
+            return event.x >= 0 && event.y >= 0 && event.x < obj.width && event.y < obj.height
+        }
+
+        // Physical exits must precede entries into unrelated areas.
+        let i = 0
+        while(i < this.entered.length){
+            let obj = this.entered[i]
+            if(obj.__destroyed) {
+                this.entered.splice(i, 1)
+                this.enteredSet.delete(obj)
+                continue
+            }
+
+            if(!pointerInside(obj)) {
+                if(typeof obj.__onMouseLeave === 'function') obj.__onMouseLeave(event)
+                this.entered.splice(i, 1)
+                this.enteredSet.delete(obj)
+            } else {
+                i++
+            }
+        }
+
+        // Enter the new topmost area before dispatching blocked exits.
+        // This keeps hover-dependent close buttons enabled during handoff.
+        i = 0
+        while(i < event.path.length){
+            let obj = event.path[i]
+            if(obj.__destroyed) {
+                event.path.splice(i, 1)
+                continue
+            }
+
+            if(!this.__isHoverBlocked(obj, hoverBlocker) && pointerInside(obj) && !this.enteredSet.has(obj)) {
+                this.entered.push(obj)
+                this.enteredSet.add(obj)
+                if(typeof obj.__onMouseEnter === 'function') obj.__onMouseEnter(event)
+            }
+
+            i++
+        }
+
+        i = 0
+        while(i < this.entered.length){
+            let obj = this.entered[i]
+            if(obj.__destroyed) {
+                this.entered.splice(i, 1)
+                this.enteredSet.delete(obj)
+                continue
+            }
+
+            if(!pointerInside(obj) || this.__isHoverBlocked(obj, hoverBlocker)) {
+                if(typeof obj.__onMouseLeave === 'function') obj.__onMouseLeave(event)
+                this.entered.splice(i, 1)
+                this.enteredSet.delete(obj)
+            } else {
+                i++
+            }
+        }
+
+        i = 0
+        while(i < event.path.length){
+            let obj = event.path[i]
+            if(obj.__destroyed) {
+                event.path.splice(i, 1)
+                continue
+            }
+
+            if(!this.__isHoverBlocked(obj, hoverBlocker) && typeof obj.__onMouseMove === 'function') {
+                event.relative(obj)
+                obj.__onMouseMove(event)
+            }
+
+            i++
+        }
+
+        let activeHandlers = []
+        for(let handler of this.activePointerHandlers){
+            if(!handler || handler.__destroyed || !handler.active){
+                this.activePointerHandlers.delete(handler)
+                continue
+            }
+            if(event.path.indexOf(handler) < 0){
+                activeHandlers.push(handler)
+            }
+        }
+
+        for(let handler of activeHandlers){
+            if(typeof handler.__onMouseMove === 'function') handler.__onMouseMove(event)
+        }
+    },
+
+    __onMouseDown: function(e){
+        this.event = new QmlMouseEvent({pressed: true})
+
+        let modifiers = QtEnums.NoModifier
+        if(e.shiftKey) {
+            modifiers |= QtEnums.ShiftModifier
+        }
+        if(e.altKey) {
+            modifiers |= QtEnums.AltModifier
+        }
+        if(e.ctrlKey) {
+            modifiers |= QtEnums.ControlModifier
+        }
+
+        this.event.modifiers = modifiers
+        this.event.fillButton(e)
+        this.event.originX = e.clientX
+        this.event.originY = e.clientY
+        this.event.startX = e.clientX
+        this.event.startY = e.clientY
+        this.event.path = this.getObjectsFromPoint(e.clientX, e.clientY)
+
+        for(let obj of this.event.path){
+            this.event.accepted = true
+            this.event.relative(obj)
+            if(typeof obj.__onMouseDown === 'function') obj.__onMouseDown(this.event)
+            if(obj.active && this.activePointerHandlers.indexOf && false){}
+            if(obj.active && this.activePointerHandlers.add){
+                this.activePointerHandlers.add(obj)
+            }
+        }
+    },
+
+    __onMouseUp: function(e){
+        if(this.event){
             let modifiers = QtEnums.NoModifier
             if(e.shiftKey) {
                 modifiers |= QtEnums.ShiftModifier
@@ -408,116 +621,92 @@ module.exports = {
                 modifiers |= QtEnums.ControlModifier
             }
 
-            event.modifiers = modifiers
-            event.moveX = event.originX - e.pageX
-            event.moveY = event.originY - e.pageY
-            event.originX = e.pageX
-            event.originY = e.pageY
+            this.event.modifiers = modifiers
 
-            JQApplication.resetCursor('unset')
+            this.event.fillButton(e)
+            this.event.originX = e.clientX
+            this.event.originY = e.clientY
 
-            if(event.pressed){
-                if(Math.abs(event.startX - event.originX) > 15) event.wasDragX = true
-                if(Math.abs(event.startY - event.originY) > 15) event.wasDragY = true
-            }
-
-            let hoverBlocker = event.target ? null : this.__findHoverBlocker(event)
-
-            const pointerInside = (obj) => {
-                event.relative(obj)
-                return event.x >= 0 && event.y >= 0 && event.x < obj.width && event.y < obj.height
-            }
-
-            // Physical exits must precede entries into unrelated areas.
-            let i = 0
-            while(i < this.entered.length){
-                let obj = this.entered[i]
-                if(obj.__destroyed) {
-                    this.entered.splice(i, 1)
-                    this.enteredSet.delete(obj)
-                    continue
-                }
-
-                if(!pointerInside(obj)) {
-                    if(typeof obj.__onMouseLeave === 'function') obj.__onMouseLeave(event)
-                    this.entered.splice(i, 1)
-                    this.enteredSet.delete(obj)
-                } else {
-                    i++
-                }
-            }
-
-            // Enter the new topmost area before dispatching blocked exits.
-            // This keeps hover-dependent close buttons enabled during handoff.
-            i = 0
-            while(i < event.path.length){
-                let obj = event.path[i]
-                if(obj.__destroyed) {
-                    event.path.splice(i, 1)
-                    continue
-                }
-
-                if(!this.__isHoverBlocked(obj, hoverBlocker) && pointerInside(obj) && !this.enteredSet.has(obj)) {
-                    this.entered.push(obj)
-                    this.enteredSet.add(obj)
-                    if(typeof obj.__onMouseEnter === 'function') obj.__onMouseEnter(event)
-                }
-
-                i++
-            }
-
-            i = 0
-            while(i < this.entered.length){
-                let obj = this.entered[i]
-                if(obj.__destroyed) {
-                    this.entered.splice(i, 1)
-                    this.enteredSet.delete(obj)
-                    continue
-                }
-
-                if(!pointerInside(obj) || this.__isHoverBlocked(obj, hoverBlocker)) {
-                    if(typeof obj.__onMouseLeave === 'function') obj.__onMouseLeave(event)
-                    this.entered.splice(i, 1)
-                    this.enteredSet.delete(obj)
-                } else {
-                    i++
-                }
-            }
-
-            i = 0
-            while(i < event.path.length){
-                let obj = event.path[i]
-                if(obj.__destroyed) {
-                    event.path.splice(i, 1)
-                    continue
-                }
-
-                if(!this.__isHoverBlocked(obj, hoverBlocker) && typeof obj.__onMouseMove === 'function') {
-                    event.relative(obj)
-                    obj.__onMouseMove(event)
-                }
-
-                i++
-            }
-
-            let activeHandlers = []
             for(let handler of this.activePointerHandlers){
-                if(!handler || handler.__destroyed || !handler.active){
-                    this.activePointerHandlers.delete(handler)
-                    continue
-                }
-                if(event.path.indexOf(handler) < 0){
-                    activeHandlers.push(handler)
-                }
+                if(!handler || handler.__destroyed) continue
+                if(typeof handler.__onMouseUp === 'function') handler.__onMouseUp(this.event)
+            }
+            
+            if(this.event.target) {
+                this.event.relative(this.event.target)
+                if(typeof this.event.target.__onMouseUp === 'function') this.event.target.__onMouseUp(this.event)
+                this.__finishMouseAreaDrag(this.event.target)
             }
 
-            for(let handler of activeHandlers){
-                if(typeof handler.__onMouseMove === 'function') handler.__onMouseMove(event)
-            }
+            this.activePointerHandlers.clear()
+        }
+    },
 
+    __onPointerDown: function(e){
+        if(!this.__isTouchPointer(e) || !e.isPrimary || this.__touchPointerId !== null) return
+
+        this.__touchPointerId = e.pointerId
+        this.__lastTouchTime = performance.now()
+
+        // Keeps native focus and caret handling for text inputs.
+        if(!this.__isEditableElement(e.target)) e.preventDefault()
+
+        // No hover before the press for touch: enter happens with the press itself.
+        this.__onMouseDown(e)
+    },
+
+    __onPointerMove: function(e){
+        if(!this.__isTouchPointer(e) || e.pointerId !== this.__touchPointerId) return
+
+        this.__lastTouchTime = performance.now()
+
+        if(this.event) this.__onMouseMove(e)
+    },
+
+    __onPointerUp: function(e){
+        if(!this.__isTouchPointer(e) || e.pointerId !== this.__touchPointerId) return
+
+        this.__touchPointerId = null
+        this.__lastTouchTime = performance.now()
+
+        let target = this.event ? this.event.target : null
+
+        this.__onMouseUp(e)
+        if(this.event) this.event.fillButton(e)
+        this.click(e)
+
+        this.__clearHover(target)
+    },
+
+    __onPointerCancel: function(e){
+        if(!this.__isTouchPointer(e) || e.pointerId !== this.__touchPointerId) return
+
+        this.__touchPointerId = null
+        this.__lastTouchTime = performance.now()
+
+        this.__cancelPress()
+        this.__clearHover(null)
+    },
+
+    init: function(){
+        window.addEventListener('pointerdown', (e)=>{
+            this.__onPointerDown(e)
         })
-
+        window.addEventListener('pointermove', (e)=>{
+            this.__onPointerMove(e)
+        })
+        window.addEventListener('pointerup', (e)=>{
+            this.__onPointerUp(e)
+        })
+        window.addEventListener('pointercancel', (e)=>{
+            this.__onPointerCancel(e)
+        })
+        window.addEventListener('mousemove', (e)=>{
+            if(this.__isEmulatedMouseEvent()) return
+            this.__onMouseMove(e)
+        })
         window.addEventListener('click', (e)=>{
+            if(this.__isEmulatedMouseEvent()) return
             if(this.event) this.event.fillButton(e)
             this.click(e)
         })
@@ -525,71 +714,19 @@ module.exports = {
             e.preventDefault()
         })
         window.addEventListener('mousedown', (e)=>{
-            this.event = new QmlMouseEvent({pressed: true})
-
-            let modifiers = QtEnums.NoModifier
-            if(e.shiftKey) {
-                modifiers |= QtEnums.ShiftModifier
-            }
-            if(e.altKey) {
-                modifiers |= QtEnums.AltModifier
-            }
-            if(e.ctrlKey) {
-                modifiers |= QtEnums.ControlModifier
-            }
-
-            this.event.modifiers = modifiers
-            this.event.fillButton(e)
-            this.event.originX = e.pageX
-            this.event.originY = e.pageY
-            this.event.startX = e.pageX
-            this.event.startY = e.pageY
-            this.event.path = this.getObjectsFromPoint(e.pageX, e.pageY)
-
-            for(let obj of this.event.path){
-                this.event.accepted = true
-                this.event.relative(obj)
-                if(typeof obj.__onMouseDown === 'function') obj.__onMouseDown(this.event)
-                if(obj.active && this.activePointerHandlers.indexOf && false){}
-                if(obj.active && this.activePointerHandlers.add){
-                    this.activePointerHandlers.add(obj)
-                }
-            }
+            if(this.__isEmulatedMouseEvent()) return
+            this.__onMouseDown(e)
         })
         window.addEventListener('mouseup', (e)=>{
-            if(this.event){
-                let modifiers = QtEnums.NoModifier
-                if(e.shiftKey) {
-                    modifiers |= QtEnums.ShiftModifier
-                }
-                if(e.altKey) {
-                    modifiers |= QtEnums.AltModifier
-                }
-                if(e.ctrlKey) {
-                    modifiers |= QtEnums.ControlModifier
-                }
-
-                this.event.modifiers = modifiers
-
-                this.event.fillButton(e)
-                this.event.originX = e.pageX
-                this.event.originY = e.pageY
-
-                for(let handler of this.activePointerHandlers){
-                    if(!handler || handler.__destroyed) continue
-                    if(typeof handler.__onMouseUp === 'function') handler.__onMouseUp(this.event)
-                }
-                
-                if(this.event.target) {
-                    this.event.relative(this.event.target)
-                    if(typeof this.event.target.__onMouseUp === 'function') this.event.target.__onMouseUp(this.event)
-                    this.__finishMouseAreaDrag(this.event.target)
-                }
-
-                this.activePointerHandlers.clear()
-            }
+            if(this.__isEmulatedMouseEvent()) return
+            this.__onMouseUp(e)
         })
         window.addEventListener('contextmenu', (e)=>{
+            if(this.__isEmulatedMouseEvent()){
+                e.preventDefault()
+                return
+            }
+
             let modifiers = QtEnums.NoModifier
             if(e.shiftKey) {
                 modifiers |= QtEnums.ShiftModifier
@@ -606,15 +743,6 @@ module.exports = {
             e.preventDefault()
             this.click(e)
         })
-        // window.addEventListener('touchstart', (e)=>{
-
-        // })
-        // window.addEventListener('touchend', (e)=>{
-
-        // })
-        // window.addEventListener('touchmove', (e)=>{
-
-        // })
         window.addEventListener('wheel', (e)=>{
             this.event = new QmlWheelEvent()
 
@@ -630,11 +758,11 @@ module.exports = {
             }
 
             this.event.modifiers = modifiers
-            this.event.originX = e.pageX
-            this.event.originY = e.pageY
+            this.event.originX = e.clientX
+            this.event.originY = e.clientY
             this.event.angleDelta.x = e.deltaX / 8
             this.event.angleDelta.y = -e.deltaY / 8
-            this.event.path = this.getObjectsFromPoint(e.pageX, e.pageY)
+            this.event.path = this.getObjectsFromPoint(e.clientX, e.clientY)
 
             for(let obj of this.event.path){
                 if(!this.event.accepted || !this.event.target){
@@ -654,8 +782,8 @@ module.exports = {
             let event = this.event
             JQApplication.beginUpdate()
 
-            event.originX = e.pageX
-            event.originY = e.pageY
+            event.originX = e.clientX
+            event.originY = e.clientY
             event.relative(event.target)
 
             let _button = this.buttons[event.button]
