@@ -10,6 +10,7 @@
 
 // ImtCore includes
 #include <imtdb/IDatabaseEngine.h>
+#include <imtdb/ISqlDatabaseObjectDelegate.h>
 #include <imtnotify/INotificationInboxController.h>
 
 
@@ -34,6 +35,7 @@ public:
 		I_REGISTER_INTERFACE(imtnotify::INotificationInboxController);
 		I_REGISTER_INTERFACE(istd::IChangeable);
 		I_ASSIGN(m_databaseEngineCompPtr, "DatabaseEngine", "Database engine of the notification tables", true, "DatabaseEngine");
+		I_ASSIGN(m_tableDelegateCompPtr, "TableDelegate", "Delegate that creates the notification tables, it is created before the first statement", true, "TableDelegate");
 	I_END_COMPONENT;
 
 	// reimplemented (imtnotify::INotificationInboxController)
@@ -46,6 +48,10 @@ public:
 	virtual bool RemoveGroup(const QByteArray& productId, const QByteArray& tenantId, const QByteArray& groupKey, const QByteArrayList& userIds) override;
 	virtual bool RemoveUserNotifications(const QByteArray& tenantId, const QByteArray& userId) override;
 	virtual bool RemoveExpired(const QDateTime& createdBefore, int maxCount, bool& isComplete) override;
+
+protected:
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
 
 private:
 	/**
@@ -114,6 +120,7 @@ private:
 
 private:
 	I_REF(imtdb::IDatabaseEngine, m_databaseEngineCompPtr);
+	I_REF(imtdb::ISqlDatabaseObjectDelegate, m_tableDelegateCompPtr);
 };
 
 

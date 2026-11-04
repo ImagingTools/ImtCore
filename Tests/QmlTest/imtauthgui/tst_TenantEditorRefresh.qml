@@ -28,10 +28,9 @@ TestCase {
 
 		QtObject {
 			property string rolePermissionsTenantId: ""
-
-			signal subscriptionInvitationAccepted(string tenantId, string membershipId)
-			signal subscriptionOwnershipTransferred(string tenantId)
-			signal ownershipTransferred()
+			property QtObject userDocumentManager: QtObject {
+				signal documentSaved(string documentId)
+			}
 		}
 	}
 
@@ -63,29 +62,28 @@ TestCase {
 		return editor
 	}
 
-	// The API client relays the notification AuthorizationController receives: one reading serves both
-	function test_aRelayedNotificationReadsOnce(){
+	// The server tells it to every session of the organization, also when it asks them again after a reconnect
+	function test_aBurstOfNotificationsReadsOnce(){
 		let apiClient = createTemporaryObject(apiClientComp, testCase)
 		let controller = createTemporaryObject(controllerComp, testCase)
 		createEditor(apiClient, controller)
 
-		apiClient.subscriptionInvitationAccepted("tenant-id", "membership-id")
-		AuthorizationController.tenantInvitationAccepted("tenant-id", "membership-id")
+		AuthorizationController.tenantMembersChanged("tenant-id")
+		AuthorizationController.tenantMembersChanged("tenant-id")
 
 		tryCompare(controller, "readCount", 1, 3000)
 		wait(300)
 		compare(controller.readCount, 1)
 	}
 
-	// An own transfer of ownership and its notification read once
+	// An own change of a member and its notification read once
 	function test_anOwnChangeAndItsNotificationReadOnce(){
 		let apiClient = createTemporaryObject(apiClientComp, testCase)
 		let controller = createTemporaryObject(controllerComp, testCase)
 		createEditor(apiClient, controller)
 
-		apiClient.ownershipTransferred()
-		apiClient.subscriptionOwnershipTransferred("tenant-id")
-		AuthorizationController.tenantOwnershipTransferred("tenant-id")
+		apiClient.userDocumentManager.documentSaved("document-id")
+		AuthorizationController.tenantMembersChanged("tenant-id")
 
 		tryCompare(controller, "readCount", 1, 3000)
 		wait(300)
@@ -97,7 +95,7 @@ TestCase {
 		let controller = createTemporaryObject(controllerComp, testCase)
 		createEditor(apiClient, controller)
 
-		apiClient.subscriptionInvitationAccepted("other-id", "membership-id")
+		AuthorizationController.tenantMembersChanged("other-id")
 		wait(400)
 		compare(controller.readCount, 0)
 	}

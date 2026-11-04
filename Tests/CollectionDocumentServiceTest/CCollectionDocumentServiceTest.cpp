@@ -201,7 +201,7 @@ void CCollectionDocumentServiceTest::CreateNewDocumentUndoManagerFailTest()
 	params.documentTypeId = TEST_TYPE_ID;
 
 	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_NEW, params);
-	QVERIFY2(taskId.isEmpty(), "BeginDocumentTask should return empty task ID when undo manager creation fails");
+	QCOMPARE(m_managerPtr->WaitForTaskFinished(taskId).status, imtdoc::IDocumentService::OS_FAILED);
 
 	auto list = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID);
 	QVERIFY2(list.isEmpty(), "No documents should be created when undo manager fails");
@@ -363,7 +363,7 @@ void CCollectionDocumentServiceTest::OpenDocumentEmptySourceRefTest()
 	params.userId = TEST_USER_ID;
 
 	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, params);
-	QVERIFY2(taskId.isEmpty(), "BeginDocumentTask should fail with empty source reference");
+	QCOMPARE(m_managerPtr->WaitForTaskFinished(taskId).status, imtdoc::IDocumentService::OS_FAILED);
 }
 
 
@@ -374,7 +374,7 @@ void CCollectionDocumentServiceTest::OpenDocumentInvalidRevisionTest()
 	params.documentSourceRef = QByteArrayLiteral("objectId/abc");
 
 	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, params);
-	QVERIFY2(taskId.isEmpty(), "BeginDocumentTask should fail with non-numeric revision");
+	QCOMPARE(m_managerPtr->WaitForTaskFinished(taskId).status, imtdoc::IDocumentService::OS_FAILED);
 }
 
 
@@ -385,7 +385,7 @@ void CCollectionDocumentServiceTest::OpenDocumentNonExistentObjectTest()
 	params.documentSourceRef = QByteArrayLiteral("nonexistentObject");
 
 	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, params);
-	QVERIFY2(taskId.isEmpty(), "BeginDocumentTask should fail for non-existent object");
+	QCOMPARE(m_managerPtr->WaitForTaskFinished(taskId).status, imtdoc::IDocumentService::OS_FAILED);
 }
 
 
@@ -401,7 +401,7 @@ void CCollectionDocumentServiceTest::OpenDocumentUndoManagerFailTest()
 	params.documentSourceRef = TEST_OBJECT_ID;
 
 	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, params);
-	QVERIFY2(taskId.isEmpty(), "BeginDocumentTask should fail when undo manager creation fails");
+	QCOMPARE(m_managerPtr->WaitForTaskFinished(taskId).status, imtdoc::IDocumentService::OS_FAILED);
 }
 
 
@@ -514,7 +514,7 @@ void CCollectionDocumentServiceTest::OpenDocumentNegativeRevisionTest()
 	params.documentSourceRef = QByteArrayLiteral("objectId/-1");
 
 	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, params);
-	QVERIFY2(taskId.isEmpty(), "BeginDocumentTask should fail with negative revision");
+	QCOMPARE(m_managerPtr->WaitForTaskFinished(taskId).status, imtdoc::IDocumentService::OS_FAILED);
 }
 
 
@@ -525,7 +525,7 @@ void CCollectionDocumentServiceTest::OpenDocumentTooManySegmentsTest()
 	params.documentSourceRef = QByteArrayLiteral("objectId/1/2");
 
 	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, params);
-	QVERIFY2(taskId.isEmpty(), "BeginDocumentTask should fail when source reference has too many segments");
+	QCOMPARE(m_managerPtr->WaitForTaskFinished(taskId).status, imtdoc::IDocumentService::OS_FAILED);
 }
 
 
@@ -1748,8 +1748,8 @@ void CCollectionDocumentServiceTest::SingleCopySecondUserGetsDataLoadedEventTest
 	QVERIFY2(!docId2.isEmpty(), "Second user should open document successfully");
 
 	// Second user should have received DocumentDataLoaded event
-	int dataLoadedCount = m_managerPtr->GetMockEventHandler().CountEventsOfType("DocumentDataLoadedEvent");
-	QVERIFY2(dataLoadedCount >= 1, "DocumentDataLoaded event should be fired for second user joining shared document");
+	// The event for the joining user is posted to the event loop
+	QTRY_VERIFY2_WITH_TIMEOUT(m_managerPtr->GetMockEventHandler().CountEventsOfType("DocumentDataLoadedEvent") >= 1, "DocumentDataLoaded event should be fired for second user joining shared document", 5000);
 
 	// Verify the event was for the second user
 	bool foundForUser2 = false;

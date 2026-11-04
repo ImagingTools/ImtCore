@@ -335,6 +335,16 @@ bool CFileCollectionComp::GetRevisionData(
 		return false;
 	}
 
+	// A revision keeps the data as "object.data", but the persistence of the object chooses a file by its extension
+	CFileCollectionItem fileItemInfo;
+	const IFileObjectCollection* collectionPtr = dynamic_cast<const IFileObjectCollection*>(&collection);
+	if ((collectionPtr != nullptr) && collectionPtr->GetFileInfo(objectId, fileItemInfo)){
+		const QString typedFilePath = objectDataFilePath + QStringLiteral(".") + QFileInfo(fileItemInfo.GetFilePath()).suffix();
+		if (QFile::rename(objectDataFilePath, typedFilePath)){
+			objectDataFilePath = typedFilePath;
+		}
+	}
+
 	dataPtr.FromUnique(CreateObjectFromFile(objectDataFilePath, collection.GetObjectTypeId(objectId)));
 	QDir(workingDirectoryPath).removeRecursively();
 	return dataPtr.IsValid();
@@ -991,7 +1001,7 @@ QString CFileCollectionComp::CalculateFolderPathInRepository(
 	int count = 0;
 	QString newDirPath = targetDirPath;
 	while (QFileInfo::exists(newDirPath)){
-		newDirPath = QStringLiteral("%1 - %2").arg(targetDirPath, ++count);
+		newDirPath = QStringLiteral("%1 - %2").arg(targetDirPath).arg(++count);
 	}
 
 	if (newDirPath != targetDirPath){

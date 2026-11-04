@@ -6,6 +6,9 @@
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
 
+// ACF includes
+#include <itest/CStandardTestExecutor.h>
+
 
 void CFileSystemStructureProviderTest::initTestCase()
 {
@@ -597,3 +600,6 @@ QString CFileSystemStructureProviderTest::CreateFile(const QString& relativePath
 
 	return fullPath;
 }
+
+
+I_ADD_TEST(CFileSystemStructureProviderTest);
