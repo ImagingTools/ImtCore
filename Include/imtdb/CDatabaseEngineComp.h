@@ -27,12 +27,21 @@ namespace imtdb
 {
 
 
+/**
+	Attributes of the engine that are declared apart from CDatabaseEngineComp: the static information of a component is built in one
+	function, and the compiler of Windows (MSVC) limits the number of the objects with a constructor that a function may have (error C2603).
+	CDatabaseEngineComp is close to this limit, so a new attribute is declared here.
+*/
 class CDatabaseEngineAttr: public ilog::CLoggerComponentBase
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 	I_BEGIN_COMPONENT(CDatabaseEngineAttr);
+		I_ASSIGN(m_connectionConfiguratorCompPtr, "ConnectionConfigurator", "Sets up every connection that the engine opens (the engine has a connection for every thread), for example the settings of a concrete database. Without it the connections keep the defaults of the driver", false, "ConnectionConfigurator");
 	I_END_COMPONENT;
+
+protected:
+	I_REF(imtdb::IDatabaseConnectionConfigurator, m_connectionConfiguratorCompPtr);
 };
 
 
@@ -66,7 +75,6 @@ public:
 		I_ASSIGN(m_autoCreateTablesAttrPtr, "AutoCreateTables", "The property holds behavior to create tables on startup.\n Possible values:\n0 - will not create new tables;\n1 - will create tables once;\n2 - will create tables at each startup", true, 1);
 		I_ASSIGN(m_portAttrPtr, "Port", "The property holds connection's port number", true, 5432);
 		I_ASSIGN(m_migrationControllerCompPtr, "MigrationController", "Migration controller", false, "MigrationController");
-		I_ASSIGN(m_connectionConfiguratorCompPtr, "ConnectionConfigurator", "Sets up every connection that the engine opens (the engine has a connection for every thread), for example the settings of a concrete database. Without it the connections keep the defaults of the driver", false, "ConnectionConfigurator");
 	I_END_COMPONENT;
 
 	CDatabaseEngineComp();
@@ -178,7 +186,6 @@ private:
 	I_ATTR(int, m_autoCreateTablesAttrPtr);
 	I_ATTR(int, m_portAttrPtr);
 	I_REF(imtdb::IMigrationController, m_migrationControllerCompPtr);
-	I_REF(imtdb::IDatabaseConnectionConfigurator, m_connectionConfiguratorCompPtr);
 
 	imtbase::TModelUpdateBinder<imtdb::IDatabaseLoginSettings, CDatabaseEngineComp> m_databaseAccessObserver;
 
