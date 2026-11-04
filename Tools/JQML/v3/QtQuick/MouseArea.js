@@ -78,10 +78,11 @@ class MouseArea extends Item {
     }
 
     __onMouseCanceled(mouse){
-        if(!this.enabled || !this.visible) return
-
         this.__pressed = false
         this.__resetPressed(mouse)
+
+        if(!this.enabled || !this.visible) return
+
         this.canceled()
     }
 
@@ -180,15 +181,15 @@ class MouseArea extends Item {
     }
 
     __onMouseClick(mouse){
-        if(!this.enabled || !this.visible || !(mouse.button & this.acceptedButtons)) return
-
+        let wasPressed = this.__pressed
+        this.__pressed = false
         this.__resetPressed(mouse)
 
-        if(mouse.target === this && this.__pressed){
+        if(!this.enabled || !this.visible || !(mouse.button & this.acceptedButtons)) return
+
+        if(mouse.target === this && wasPressed){
             this.__emitComposedClick(mouse)
         }
-
-        this.__pressed = false 
     }
 
     __onMouseDblClick(mouse){
