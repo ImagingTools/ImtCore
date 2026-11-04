@@ -97,7 +97,8 @@ bool CSqliteConnectionConfiguratorComp::ConfigureConnection(QSqlDatabase& databa
 	const QString busyTimeout = QString::number(*m_busyTimeoutAttrPtr);
 	SetPragma(databaseConnection, QStringLiteral("busy_timeout"), busyTimeout, errors);
 
-	// SQLite takes the name of the journal mode only
+	// SQLite takes the name of the journal mode only. I_DECLARE_ENUM drops the prefix before the first underscore and makes the rest
+	// lower case (JM_WAL -> "wal"), so the names of the enumeration must keep the form <prefix>_<SQLite name>
 	const QString journalMode = QString::fromLatin1(ToString(JournalMode(*m_journalModeAttrPtr)));
 	SetPragma(databaseConnection, QStringLiteral("journal_mode"), journalMode, errors);
 
