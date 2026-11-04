@@ -283,6 +283,9 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="TableDelegate" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="NotificationCollectionDelegate"/>
+                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
