@@ -170,7 +170,8 @@ void CPersonalAccessTokenTest::testGetTokenIds()
 	QVERIFY2(m_tokenManagerPtr != nullptr, "Token manager not initialized");
 	
 	// Create multiple tokens for the same user
-	QByteArray userId = "test_user_multi";
+	// The token collection selects by the user column, which holds UUIDs
+	QByteArray userId = "7f3c2a10-5d1e-4c7b-9a42-1b6e8d0f3a11";
 	QString name1 = "Token 1";
 	QString name2 = "Token 2";
 	QString name3 = "Token 3";
@@ -255,7 +256,8 @@ void CPersonalAccessTokenTest::testDeleteToken()
 	QVERIFY2(m_tokenManagerPtr != nullptr, "Token manager not initialized");
 	
 	// Create a token
-	QByteArray userId = "test_user_delete";
+	// The token collection selects by the user column, which holds UUIDs
+	QByteArray userId = "2b9e4d77-8c03-4f16-a5d1-6c0f7e3b9d22";
 	QString name = "Delete Test Token";
 	QByteArrayList scopes;
 	scopes << "read:api";

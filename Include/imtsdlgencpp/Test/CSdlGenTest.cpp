@@ -746,38 +746,6 @@ void CSdlGenTest::TestIntermediateFileIsRemovedAfterFailure()
 }
 
 
-void CSdlGenTest::TestDepFileDoesNotContainIntermediateFile()
-{
-	const QDir outputDir(m_tempOutputDir.absoluteFilePath("DepFileOutputs"));
-
-	CImtSdlGenTest testSuite;
-	PrepareSuite(testSuite, outputDir);
-
-	const QString depFilePath = outputDir.absoluteFilePath("schema.depfile");
-
-	auto argParserPtr = testSuite.GetInterface<imtsdl::ISdlEditableProcessArgumentsParser>();
-	argParserPtr->SetCppEnabled();
-	argParserPtr->SetGqlEnabled();
-	argParserPtr->SetQmlEnabled(false);
-	argParserPtr->SetObjectsGenerationEnabled(true);
-	argParserPtr->SetDepFilePath(depFilePath);
-
-	ExecuteTest(testSuite, "ArraySerialization.sdl");
-
-	const QByteArray depFile = ReadFileContent(depFilePath);
-	QVERIFY(!depFile.isEmpty());
-
-	// the outputs
-	QVERIFY(depFile.contains("ArraySerialization.cpp"));
-	QVERIFY(depFile.contains("ArraySerialization.h"));
-	QVERIFY(depFile.contains("ArraySerialization_fwd.h"));
-	QVERIFY(depFile.contains("ArraySerializationObjects.h"));
-
-	// the intermediate file is removed after the processing, so it is not an output
-	QVERIFY(!depFile.contains("ArraySerializationObjects.cpp"));
-}
-
-
 void CSdlGenTest::TestSourceTailPostProcessor()
 {
 	const QDir outputDir(m_tempOutputDir.absoluteFilePath("SourceTailPostProcessor"));

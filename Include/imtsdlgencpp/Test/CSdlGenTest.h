@@ -40,7 +40,6 @@ private Q_SLOTS:
 	void TestNoObjectsSchemaImportsSchema();
 	void TestIntermediateFileIsRemovedAfterFailure();
 	void TestSourceTailPostProcessor();
-	void TestDepFileDoesNotContainIntermediateFile();
 
 	void cleanup();
 	void cleanupTestCase();

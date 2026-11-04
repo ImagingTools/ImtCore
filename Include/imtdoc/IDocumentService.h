@@ -140,9 +140,9 @@ public:
 	/**
 		\brief Immediate-error output for \c BeginDocumentTask.
 
-		Populated only when \c BeginDocumentTask cannot even create
-		the task (e.g.\ missing required parameters).  In that case
-		the method returns an empty task ID.
+		Populated when the task fails already during its setup (e.g.\ missing
+		required parameters).  The returned task ID stays valid and
+		\c WaitForTaskFinished gives the same failure.
 	*/
 	struct Error
 	{
@@ -191,11 +191,10 @@ public:
 		\param params    Input parameters (see \c TaskParams for which
 		                 fields are required per task type).
 		\param errorPtr  Optional.  Receives an immediate error description
-		                 when the task cannot be created at all.  In that
-		                 case the method returns an empty \c QByteArray.
+		                 when the task fails already during its setup.
 		\return          A unique task ID that can be passed to
-		                 \c WaitForTaskFinished, or empty on immediate
-		                 failure.
+		                 \c WaitForTaskFinished; a failure of the task is
+		                 reported by its result.
 	*/
 	virtual QByteArray BeginDocumentTask(
 				TaskType taskType,
