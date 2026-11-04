@@ -15,7 +15,6 @@ include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 include(${ACFDIR}/Config/CMake/DeployQt.cmake)
 
-# The components of the packages that the composition uses
 target_link_libraries(${PROJECT_NAME} PRIVATE
 	imtdb
 	Acf::ifile
