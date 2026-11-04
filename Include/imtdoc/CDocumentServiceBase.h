@@ -130,10 +130,10 @@ protected:
 	virtual void DoCreateNewDocument(const QByteArray& taskId, const TaskParams& params);
 
 	/**
-		\brief Open an existing document addressed by \a params.url.
+		\brief Open an existing document addressed by \a params.documentSourceRef.
 
-		Resolves the URL to a collection object ID, starts a background
-		thread to fetch the data, and fires \c CDocumentOpenedEvent
+		The interpretation of the source reference is up to the implementation.
+		The base implementation fails. An implementation fetches the data, fires \c CDocumentOpenedEvent
 		immediately.  Once the data is available \c CDocumentDataLoadedEvent
 		is fired from the main thread.
 	*/
@@ -195,7 +195,7 @@ protected:
 	*/
 	QByteArrayList GetDocumentUserIds(const QByteArray& documentId) const;
 	/**
-		A document that was never saved (no backing URL) is dirty regardless of its undo state;
+		A document that was never saved (no document source reference) is dirty regardless of its undo state;
 		otherwise it is dirty when the undo manager reports changes since the last save.
 	*/
 	static bool IsDocumentDirty(const WorkingDocument& document);
@@ -222,6 +222,13 @@ protected:
 		storage-specific subclasses create it from \c WorkingDocument::documentSourceRef.
 	*/
 	virtual iprm::IParamsSetUniquePtr CreateDocumentSourceParams(const WorkingDocument& document) const;
+	/**
+		Creates the data object of a document of the type \a typeId from its source reference \a documentSourceRef.
+		Used when restoring the opened documents. The base implementation returns an empty pointer,
+		storage-specific subclasses load the data from the document source.
+		If the returned pointer is empty, the data object is created with \c CreateObject.
+	*/
+	virtual istd::IChangeableSharedPtr CreateObjectFromSourceRef(const QByteArray& typeId, const QByteArray& documentSourceRef) const;
 	virtual QString GetDefaultDocumentName(const WorkingDocument& document) const;
 	virtual bool HasDocumentNameProvider(const QByteArray& typeId) const;
 	virtual bool ValidateDocumentData(
@@ -274,6 +281,7 @@ protected:
 		bool isDirty;                              ///< \c true when there are unsaved changes.
 		bool isLoading = false;                    ///< \c true while the background load is in progress.
 		bool singleDocumentInstance = false;       ///< \c true when the document was opened with \c TaskParams::singleDocumentInstance.
+		bool isReadOnly = false;                   ///< \c true when the document can only be closed: renaming, saving, data changes and undo/redo are rejected.
 		int undoManagerModelId = -1;               ///< Model registration ID in \c UndoManagerObserver.
 	};
 

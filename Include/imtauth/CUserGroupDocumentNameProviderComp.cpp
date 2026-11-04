@@ -12,7 +12,7 @@ namespace imtauth
 
 // reimplemented (imtdoc::IDocumentNameProvider)
 
-QString CUserGroupDocumentNameProviderComp::GetDefaultDocumentName(const istd::IChangeable& document, const iprm::IParamsSet* /*paramsPtr*/) const
+QString CUserGroupDocumentNameProviderComp::GetDefaultDocumentName(const istd::IChangeable& document, const iprm::IParamsSet* /*nameGenerationParams*/) const
 {
 	const IUserBaseInfo* userBaseInfoPtr = dynamic_cast<const IUserBaseInfo*>(&document);
 	if (userBaseInfoPtr != nullptr){

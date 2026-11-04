@@ -94,6 +94,8 @@ public Q_SLOTS:
 	bool documentIsDirty(const QString& documentId) const;
 	void setDocumentIsDirty(const QString& documentId, bool isDirty);
 
+	bool documentIsReadOnly(const QString& documentId) const;
+
 	bool documentIsLoading(const QString& documentId) const;
 	void setDocumentIsLoading(const QString& documentId, bool isLoading);
 
@@ -185,6 +187,7 @@ Q_SIGNALS:
 	void requestDocumentName(const QString& documentId, const QString& typeId);
 	void documentNameChanged(const QString& documentId, const QString& oldName, const QString& newName);
 	void documentIsDirtyChanged(const QString& documentId, bool isDirty);
+	void documentIsReadOnlyChanged(const QString& documentId);
 
 	void startUndoInfoReceive(const QString& documentId);
 	void undoInfoReceived(const QString& documentId, int availableUndoSteps, int availableRedoSteps, bool isDirty);
@@ -221,6 +224,7 @@ private:
 		QString name;
 		QString objectId;
 		bool isDirty = false;
+		bool isReadOnly = false;
 		bool isNew = true;
 		bool isLoading = false;
 		bool isClosing = false;
@@ -239,6 +243,7 @@ private:
 	QList<FOpenedDocument>             m_openedDocuments;
 	QHash<QString, QList<FViewEntry>>  m_documentTypeEditors;
 	QHash<QString, QString>            m_cachedDocumentNames;
+	QHash<QString, bool>               m_cachedDocumentReadOnlyStates;
 	QHash<QString, bool>               m_autoNamedTypeIds;
 	QPointer<QObject>                  m_documentManagerActiveView;
 };

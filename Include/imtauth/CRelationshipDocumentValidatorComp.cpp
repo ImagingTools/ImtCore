@@ -15,10 +15,10 @@ namespace imtauth
 bool CRelationshipDocumentValidatorComp::ValidateDocumentData(
 			const istd::IChangeable& document,
 			QString& errorMessage,
-			const iprm::IParamsSet* paramsPtr,
+			const iprm::IParamsSet* validationParams,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
-	const QByteArray objectId = imtdoc::GetObjectIdFromParams(paramsPtr);
+	const QByteArray objectId = imtdoc::GetObjectIdFromParams(validationParams);
 
 	const imtauth::ITenantRelationshipInfo* relInfo = dynamic_cast<const imtauth::ITenantRelationshipInfo*>(&document);
 	if (relInfo == nullptr){

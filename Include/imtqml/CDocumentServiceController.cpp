@@ -241,6 +241,16 @@ void CDocumentServiceController::setDocumentIsDirty(const QString& documentId, b
 }
 
 
+bool CDocumentServiceController::documentIsReadOnly(const QString& documentId) const
+{
+	int idx = IndexOfDocument(documentId);
+	if (idx < 0){
+		return false;
+	}
+	return m_openedDocuments[idx].isReadOnly;
+}
+
+
 bool CDocumentServiceController::documentIsLoading(const QString& documentId) const
 {
 	int idx = IndexOfDocument(documentId);
@@ -500,6 +510,12 @@ void CDocumentServiceController::CreateDocumentDataInternal(
 		m_cachedDocumentNames.erase(cachedNameIt);
 	}
 
+	const auto cachedReadOnlyIt = m_cachedDocumentReadOnlyStates.find(id);
+	if (cachedReadOnlyIt != m_cachedDocumentReadOnlyStates.end()){
+		data.isReadOnly = cachedReadOnlyIt.value();
+		m_cachedDocumentReadOnlyStates.erase(cachedReadOnlyIt);
+	}
+
 	m_openedDocuments.append(data);
 	Q_EMIT openedDocumentIdsChanged();
 }
@@ -564,15 +580,29 @@ void CDocumentServiceController::getOpenedDocumentList()
 				QVariantList documents;
 				documents.reserve(list.size());
 				for (const auto& info : list){
+					const int index = self->IndexOfDocument(info.documentId);
+					if (index >= 0){
+						const bool wasReadOnly = self->m_openedDocuments[index].isReadOnly;
+						self->m_openedDocuments[index].isReadOnly = info.isReadOnly;
+						if (wasReadOnly != info.isReadOnly){
+							Q_EMIT self->documentIsReadOnlyChanged(info.documentId);
+						}
+					}
+					else{
+						self->m_cachedDocumentReadOnlyStates.insert(info.documentId, info.isReadOnly);
+					}
+
 					QVariantMap entry;
 					entry.insert(QStringLiteral("documentId"),      info.documentId);
 					entry.insert(QStringLiteral("documentName"),    info.name);
 					entry.insert(QStringLiteral("objectTypeId"),    info.typeId);
 					entry.insert(QStringLiteral("objectId"),        info.objectId);
 					entry.insert(QStringLiteral("hasNameProvider"), info.hasNameProvider);
+					entry.insert(QStringLiteral("isReadOnly"),      info.isReadOnly);
 					documents.append(entry);
 				}
 				Q_EMIT self->openedDocumentListReceived(QVariant(documents));
+				self->m_cachedDocumentReadOnlyStates.clear();
 			});
 }
 
@@ -607,6 +637,14 @@ void CDocumentServiceController::openDocument(const QString& typeId, const QStri
 				self->setDocumentName(info.documentId, info.name);
 				self->CreateDocumentDataInternal(info.documentId, info.typeId, false);
 				self->setDocumentObjectId(info.documentId, info.objectId);
+				const int index = self->IndexOfDocument(info.documentId);
+				if (index >= 0){
+					const bool wasReadOnly = self->m_openedDocuments[index].isReadOnly;
+					self->m_openedDocuments[index].isReadOnly = info.isReadOnly;
+					if (wasReadOnly != info.isReadOnly){
+						Q_EMIT self->documentIsReadOnlyChanged(info.documentId);
+					}
+				}
 				self->setDocumentIsLoading(info.documentId, true);
 				Q_EMIT self->documentOpened(info.documentId, info.typeId);
 			});

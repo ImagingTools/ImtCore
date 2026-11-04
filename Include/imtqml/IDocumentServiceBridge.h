@@ -49,6 +49,7 @@ public:
 		QString name;
 		QString objectId;
 		bool hasNameProvider = false;
+		bool isReadOnly = false;
 	};
 
 	enum OperationStatus

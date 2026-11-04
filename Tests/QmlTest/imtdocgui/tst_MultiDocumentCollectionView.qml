@@ -89,9 +89,9 @@ TestCase {
 		return null
 	}
 
-	function documentInfo(documentId, isLoading){
+	function documentInfo(documentId, isLoading, isReadOnly){
 		return {"documentId": documentId, "documentName": documentId, "objectTypeId": typeId, "objectId": "obj-" + documentId,
-			"isDirty": false, "hasNameProvider": false, "isLoading": isLoading}
+			"isDirty": false, "hasNameProvider": false, "isLoading": isLoading, "isReadOnly": isReadOnly === true}
 	}
 
 	function receiveDocumentList(context, documents){
@@ -147,6 +147,15 @@ TestCase {
 		verify(context.service.documentIsOpened("other"))
 		compare(context.tabView.tabModel.count, tabCount + 1)
 		verify(context.tabView.getIndexById("other") >= 0)
+	}
+
+	function test_listOpensReadOnlyDocument(){
+		let context = createWorkspace()
+
+		receiveDocumentList(context, [documentInfo("revision", false, true)])
+
+		verify(context.service.documentIsOpened("revision"))
+		verify(context.service.documentIsReadOnly("revision"))
 	}
 
 	function test_lostDocumentLosesItsTab(){

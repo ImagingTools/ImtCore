@@ -752,7 +752,7 @@ void CDocumentServiceIntegrationTest::UndoRedoNewDocumentStaysDirtyTest()
 	m_eventHandler.ClearEvents();
 	QVERIFY(undoManagerPtr->DoUndo());
 
-	// A document without URL has never been saved, so it is dirty even in the initial state
+	// A document without source reference has never been saved, so it is dirty even in the initial state
 	QVERIFY2(FindDocumentInfo(*m_servicePtr, TEST_USER_ID, docId).isDirty, "New document should stay dirty after undo");
 
 	const QList<CRecordingEventHandler::RecordedEvent> events = m_eventHandler.GetEvents();
@@ -1012,7 +1012,7 @@ void CDocumentServiceIntegrationTest::OpenDocumentNotSupportedTest()
 {
 	imtdoc::IDocumentService::TaskParams params;
 	params.userId = TEST_USER_ID;
-	params.url = QUrl(QStringLiteral("collection:///") + TEST_OBJECT_ID);
+	params.documentSourceRef = TEST_OBJECT_ID;
 
 	QByteArray docId;
 	QCOMPARE(ExecuteTask(*m_servicePtr, imtdoc::IDocumentService::TT_OPEN, params, &docId), imtdoc::IDocumentService::OS_FAILED);

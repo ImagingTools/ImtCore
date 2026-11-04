@@ -59,6 +59,7 @@ type DocumentInfo {
 	isDirty: Bool
 	hasNameProvider: Bool
 	isLoading: Bool
+	isReadOnly: Bool
 }
 
 type DocumentList {

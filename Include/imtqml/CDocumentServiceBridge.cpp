@@ -4,7 +4,6 @@
 
 // Qt includes
 #include <QtCore/QCoreApplication>
-#include <QtCore/QUrl>
 
 // ACF includes
 #include <idoc/IUndoManager.h>
@@ -137,6 +136,7 @@ void CDocumentServiceBridge::GetOpenedDocumentList(
 		info.name = item.name;
 		info.objectId = imtdoc::SourceRefToObjectId(item.documentSourceRef);
 		info.hasNameProvider = item.hasNameProvider;
+		info.isReadOnly = item.isReadOnly;
 		result.append(info);
 	}
 	PostToMainThread([cb = std::move(callback), result = std::move(result)]() mutable {
@@ -161,10 +161,9 @@ void CDocumentServiceBridge::OpenDocument(
 			});
 		return;
 	}
-	const QUrl url(QStringLiteral("collection:///") + documentId);
 	imtdoc::IDocumentService::TaskParams params;
 	params.userId = QByteArray();
-	params.url = url;
+	params.documentSourceRef = imtdoc::ObjectIdToSourceRef(documentId.toUtf8());
 	const QByteArray taskId = mgrPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, params);
 	const imtdoc::IDocumentService::TaskResult result = mgrPtr->WaitForTaskFinished(taskId);
 	if (result.status != imtdoc::IDocumentService::OS_OK || result.documentId.isEmpty()){
@@ -181,9 +180,24 @@ void CDocumentServiceBridge::OpenDocument(
 	info.documentId = QString::fromUtf8(result.documentId);
 	info.typeId = typeId;
 	info.objectId = documentId;
-	QString name;
-	if (mgrPtr->GetDocumentName(QByteArray(), result.documentId, name) == imtdoc::IDocumentService::OS_OK){
-		info.name = name;
+	const imtdoc::IDocumentService::DocumentList documentList = mgrPtr->GetOpenedDocumentList(QByteArray());
+	bool isDocumentFound = false;
+	for (const auto& item: documentList){
+		if (item.documentId == result.documentId){
+			info.typeId = QString::fromUtf8(item.typeId);
+			info.objectId = QString::fromUtf8(imtdoc::SourceRefToObjectId(item.documentSourceRef));
+			info.name = item.name;
+			info.hasNameProvider = item.hasNameProvider;
+			info.isReadOnly = item.isReadOnly;
+			isDocumentFound = true;
+			break;
+		}
+	}
+	if (!isDocumentFound){
+		QString name;
+		if (mgrPtr->GetDocumentName(QByteArray(), result.documentId, name) == imtdoc::IDocumentService::OS_OK){
+			info.name = name;
+		}
 	}
 	PostToMainThread([cb = std::move(callback), info = std::move(info)]() mutable {
 			cb(info, QString());
@@ -307,16 +321,28 @@ namespace
 /**
 	\brief Resolve the IUndoManager attached to a given document.
 	Returns \c nullptr and an error message in \a errorMessage on
-	failure.
+	failure. When \a isChangeRequired is \c true, read-only documents
+	are rejected.
 */
 idoc::IUndoManager* ResolveUndoManager(
 		imtdoc::IDocumentService* mgrPtr,
 		const QString& documentId,
-		QString& errorMessage)
+		QString& errorMessage,
+		bool isChangeRequired = true)
 {
 	if (mgrPtr == nullptr){
 		errorMessage = c_noManagerError;
 		return nullptr;
+	}
+	if (isChangeRequired){
+		const QByteArray documentIdUtf8 = documentId.toUtf8();
+		const imtdoc::IDocumentService::DocumentList list = mgrPtr->GetOpenedDocumentList(QByteArray());
+		for (const auto& item: list){
+			if (item.documentId == documentIdUtf8 && item.isReadOnly){
+				errorMessage = QStringLiteral("Document is read-only");
+				return nullptr;
+			}
+		}
 	}
 	idoc::IUndoManager* undoManagerPtr = nullptr;
 	const auto status = mgrPtr->GetDocumentUndoManager(
@@ -427,7 +453,7 @@ void CDocumentServiceBridge::GetUndoInfo(
 	}
 	QString errorMessage;
 	idoc::IUndoManager* undoManagerPtr = ResolveUndoManager(
-			m_documentManagerCompPtr.GetPtr(), documentId, errorMessage);
+			m_documentManagerCompPtr.GetPtr(), documentId, errorMessage, false);
 	if (undoManagerPtr == nullptr){
 		PostToMainThread([cb = std::move(callback), errorMessage]() mutable {
 				cb(0, 0, false, errorMessage);

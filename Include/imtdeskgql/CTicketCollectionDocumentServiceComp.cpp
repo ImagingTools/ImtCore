@@ -593,7 +593,11 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTicketCollectionDocumentServiceCom
 		}
 	}
 
-	m_documentManagerCompPtr->SetDocumentData(userLogin, documentId, *ticketPtr);
+	if (m_documentManagerCompPtr->SetDocumentData(userLogin, documentId, *ticketPtr) != imtdoc::IDocumentService::OS_OK){
+		errorMessage = QStringLiteral("Unable to update document data. Error: SetDocumentData failed");
+		response.message = errorMessage;
+		return response;
+	}
 
 	// For new tickets (number == 0), do NOT auto-save — the user will save
 	// manually via the Undo/Redo/Save commands panel in the editor.

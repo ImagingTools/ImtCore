@@ -15,7 +15,7 @@ namespace DocumentServiceIntegrationTestPck
 
 // reimplemented (imtdoc::IDocumentNameProvider)
 
-QString CTextDocumentNameProviderComp::GetDefaultDocumentName(const istd::IChangeable& document, const iprm::IParamsSet* paramsPtr) const
+QString CTextDocumentNameProviderComp::GetDefaultDocumentName(const istd::IChangeable& document, const iprm::IParamsSet* nameGenerationParams) const
 {
 	const iprm::ITextParam* textPtr = dynamic_cast<const iprm::ITextParam*>(&document);
 	if ((textPtr == nullptr) || textPtr->GetText().isEmpty()){
@@ -31,8 +31,8 @@ QString CTextDocumentNameProviderComp::GetDefaultDocumentName(const istd::IChang
 		return retVal;
 	}
 
-	QString source = imtdoc::GetObjectIdFromParams(paramsPtr);
-	const int revision = imtdoc::GetRevisionFromParams(paramsPtr);
+	QString source = imtdoc::GetObjectIdFromParams(nameGenerationParams);
+	const int revision = imtdoc::GetRevisionFromParams(nameGenerationParams);
 	if (revision >= 0){
 		source += '/' + QString::number(revision);
 	}
