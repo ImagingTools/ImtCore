@@ -593,6 +593,14 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 			add_subdirectory("${INCLUDE_DIR}/imtrest/Test/CMake" "${AUX_INCLUDE_DIR}/imtrest/Test")
 			add_dependencies(imtrestTest imtrest)
 			imt_chain_windeploy_target(imtrestTest)
+
+			# The composition of the test is compiled by ARXC from Include/imtdb/Test/Partitura/DatabaseEnginesTest.acc,
+			# so the packages of the composition must be built before. ImtDatabasePck is not created on Android.
+			if(NOT ANDROID)
+				add_subdirectory("${INCLUDE_DIR}/imtdb/Test/CMake" "${AUX_INCLUDE_DIR}/imtdb/Test")
+				add_dependencies(imtdbTest imtdb ImtDatabasePck)
+				imt_chain_windeploy_target(imtdbTest)
+			endif()
 		endif()
 
 		if(USE_MDBX)

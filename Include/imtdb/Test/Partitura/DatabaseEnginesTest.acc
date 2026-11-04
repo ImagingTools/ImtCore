@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5715" Description="ACF"/>
+            <Version Id="1" Number="2459" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395267" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description>Test of the engines of a SQLite database: the common engine (the settings of the driver are not changed) and the engine with the configurator of the connections. The paths of the database files and the settings of the configurator are the exported attributes, the test sets them before it gets the components. The engine FailingEngine works with a memory database, where the WAL mode of the configurator cannot be set</Description>
+    <Keywords>Database SQLite Test Company='ImagingTools' Project='&quot;Core Framework&quot;'</Keywords>
+    <ElementsList>
+        <Element Id="ConfiguredDatabasePath" PackageId="FilePck" ComponentId="FileNameParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DefaultPath" Type="String" ExportId="ConfiguredDatabasePath">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PathType" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="1"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="CommonDatabasePath" PackageId="FilePck" ComponentId="FileNameParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DefaultPath" Type="String" ExportId="CommonDatabasePath">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PathType" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="1"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ConnectionConfigurator" PackageId="ImtDatabasePck" ComponentId="SqliteConnectionConfigurator">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="BusyTimeoutMs" Type="Integer" ExportId="BusyTimeoutMs">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ForeignKeys" Type="Boolean" ExportId="ForeignKeys">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="JournalMode" Type="Integer" ExportId="JournalMode">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Synchronous" Type="Integer" ExportId="Synchronous">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ConfiguredEngine" PackageId="ImtDatabasePck" ComponentId="SqlDatabaseEngine">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ConnectionConfigurator" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ConnectionConfigurator"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DbPath" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ConfiguredDatabasePath"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DbType" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="QSQLITE"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="CommonEngine" PackageId="ImtDatabasePck" ComponentId="SqlDatabaseEngine">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DbPath" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="CommonDatabasePath"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DbType" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="QSQLITE"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="FailingDatabasePath" PackageId="FilePck" ComponentId="FileNameParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DefaultPath" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value=":memory:"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PathType" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="1"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="FailingEngine" PackageId="ImtDatabasePck" ComponentId="SqlDatabaseEngine">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ConnectionConfigurator" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ConnectionConfigurator"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DbPath" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="FailingDatabasePath"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DbType" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="QSQLITE"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces/>
+    <ExportedComponents>
+        <Component ExportedId="CommonEngine" ComponentId="CommonEngine"/>
+        <Component ExportedId="ConfiguredEngine" ComponentId="ConfiguredEngine"/>
+        <Component ExportedId="ConnectionConfigurator" ComponentId="ConnectionConfigurator"/>
+        <Component ExportedId="FailingEngine" ComponentId="FailingEngine"/>
+    </ExportedComponents>
+</Acf>

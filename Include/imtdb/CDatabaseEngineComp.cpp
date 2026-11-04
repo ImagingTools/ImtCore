@@ -283,6 +283,9 @@ bool CDatabaseEngineComp::OpenDatabase() const
 	databaseConnection = InitDatabase(databaseDriverTypeId);
 
 	retVal = databaseConnection.open();
+	if (retVal){
+		retVal = ConfigureConnection(databaseConnection);
+	}
 
 	return retVal;
 }
@@ -315,6 +318,10 @@ bool CDatabaseEngineComp::CreateDatabase(int flags) const
 			SendErrorMessage(0, QStringLiteral("\n\t| Database could not be connected""\n\t| Error: %1").arg(databaseConnection.lastError().text()));
 
 			return retVal;
+		}
+
+		if (!ConfigureConnection(databaseConnection)){
+			return false;
 		}
 
 		if (flags & DCF_CREATE_DATABASE_META){
@@ -461,6 +468,30 @@ void CDatabaseEngineComp::OnComponentDestroyed()
 
 // private methods
 
+bool CDatabaseEngineComp::ConfigureConnection(QSqlDatabase& databaseConnection) const
+{
+	if (!m_connectionConfiguratorCompPtr.IsValid()){
+		return true;
+	}
+
+	QString errorMessage;
+	if (m_connectionConfiguratorCompPtr->ConfigureConnection(databaseConnection, errorMessage)){
+		return true;
+	}
+
+	SendErrorMessage(0, QStringLiteral("The connection to the database '%1' is not set up and is not used: %2").arg(GetDatabaseName(), errorMessage), __FILE__);
+
+	// The connection is removed, not only closed: Qt opens a closed connection again when it is requested by the name
+	// (QSqlDatabase::database()), and the engine would work with it without the setup
+	const QString connectionName = databaseConnection.connectionName();
+	databaseConnection.close();
+	databaseConnection = QSqlDatabase();
+	QSqlDatabase::removeDatabase(connectionName);
+
+	return false;
+}
+
+
 bool CDatabaseEngineComp::EnsureDatabaseConnected(QSqlError* sqlError) const
 {
 	QString databaseConnectionName = GetConnectionName();
@@ -493,6 +524,11 @@ bool CDatabaseEngineComp::EnsureDatabaseConnected(QSqlError* sqlError) const
 
 	if(sqlError != nullptr){
 		*sqlError = databaseConnection.lastError();
+
+		// The caller must see that the connection is not available, the reason is in the log
+		if (!isOpened && (sqlError->type() == QSqlError::NoError)){
+			*sqlError = QSqlError(QString(), QStringLiteral("Database '%1' could not be connected").arg(GetDatabaseName()), QSqlError::ConnectionError);
+		}
 	}
 
 	return isOpened;
@@ -503,6 +539,14 @@ bool CDatabaseEngineComp::EnsureDatabaseCreated() const
 {
 	bool retVal = OpenDatabase();
 	if (!retVal){
+		// A SQLite database is a file, there is no server to connect to and no database to create on it: the check of the server below is made
+		// for a database server (it would open a file named as the maintenance database in the current directory)
+		if (GetDatabaseDriverId().compare(QByteArrayLiteral("QSQLITE"), Qt::CaseInsensitive) == 0){
+			SendErrorMessage(0, QStringLiteral("The SQLite database '%1' could not be opened").arg(GetDatabaseName()), __FILE__);
+
+			return false;
+		}
+
 		QString errorMessage;
 		bool isServerConnected = CheckDatabaseConnection(errorMessage);
 		if (isServerConnected){
