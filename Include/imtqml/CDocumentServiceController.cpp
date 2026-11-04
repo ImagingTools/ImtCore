@@ -639,7 +639,11 @@ void CDocumentServiceController::openDocument(const QString& typeId, const QStri
 				self->setDocumentObjectId(info.documentId, info.objectId);
 				const int index = self->IndexOfDocument(info.documentId);
 				if (index >= 0){
+					const bool wasReadOnly = self->m_openedDocuments[index].isReadOnly;
 					self->m_openedDocuments[index].isReadOnly = info.isReadOnly;
+					if (wasReadOnly != info.isReadOnly){
+						Q_EMIT self->documentIsReadOnlyChanged(info.documentId);
+					}
 				}
 				self->setDocumentIsLoading(info.documentId, true);
 				Q_EMIT self->documentOpened(info.documentId, info.typeId);
