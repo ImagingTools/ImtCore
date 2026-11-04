@@ -22,6 +22,11 @@ I_EXPORT_COMPONENT(
 			"SQL Database");
 
 I_EXPORT_COMPONENT(
+			SqliteConnectionConfigurator,
+			"Settings of the connections to a SQLite database (WAL, synchronization, foreign keys, busy timeout)",
+			"SQL SQLite Database Connection Configurator");
+
+I_EXPORT_COMPONENT(
 			SqlDatabaseCollection,
 			"SQL-based object collection",
 			"SQL Database");

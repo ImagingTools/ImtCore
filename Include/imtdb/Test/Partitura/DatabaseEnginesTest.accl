@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5715" Description="ACF"/>
+            <Version Id="1" Number="2459" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395267" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="CommonDatabasePath" X="100" Y="425" Note=""/>
+        <Element ComponentName="CommonEngine" X="400" Y="425" Note=""/>
+        <Element ComponentName="ConfiguredDatabasePath" X="100" Y="125" Note=""/>
+        <Element ComponentName="ConfiguredEngine" X="400" Y="125" Note=""/>
+        <Element ComponentName="ConnectionConfigurator" X="725" Y="125" Note=""/>
+        <Element ComponentName="FailingDatabasePath" X="100" Y="725" Note=""/>
+        <Element ComponentName="FailingEngine" X="400" Y="725" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

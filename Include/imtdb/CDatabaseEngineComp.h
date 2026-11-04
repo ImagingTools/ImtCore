@@ -13,6 +13,7 @@
 // ImtCore includes
 #include <imtbase/TModelUpdateBinder.h>
 #include <imtdb/IDatabaseEngine.h>
+#include <imtdb/IDatabaseConnectionConfigurator.h>
 #include <imtdb/IDatabaseServerConnectionChecker.h>
 #include <imtdb/CDatabaseAccessSettings.h>
 #include <imtdb/IMigrationController.h>
@@ -65,6 +66,7 @@ public:
 		I_ASSIGN(m_autoCreateTablesAttrPtr, "AutoCreateTables", "The property holds behavior to create tables on startup.\n Possible values:\n0 - will not create new tables;\n1 - will create tables once;\n2 - will create tables at each startup", true, 1);
 		I_ASSIGN(m_portAttrPtr, "Port", "The property holds connection's port number", true, 5432);
 		I_ASSIGN(m_migrationControllerCompPtr, "MigrationController", "Migration controller", false, "MigrationController");
+		I_ASSIGN(m_connectionConfiguratorCompPtr, "ConnectionConfigurator", "Sets up every connection that the engine opens (the engine has a connection for every thread), for example the settings of a concrete database. Without it the connections keep the defaults of the driver", false, "ConnectionConfigurator");
 	I_END_COMPONENT;
 
 	CDatabaseEngineComp();
@@ -114,6 +116,13 @@ private:
 		\return \c true if the database could not be connected successfully or \c false otherwise.
 	 */
 	bool EnsureDatabaseConnected(QSqlError* sqlError = nullptr) const;
+
+	/**
+		Set up the connection that is just opened by the configurator (if the engine has it). If the connection cannot be set up, the reason
+		is written to the log and the connection is closed: the engine does not work with a connection that is not what it was asked for.
+		\return	\c true if the connection is set up or there is no configurator.
+	*/
+	bool ConfigureConnection(QSqlDatabase& databaseConnection) const;
 
 	/**
 		Ensure that the database is created and ready to use.
@@ -169,6 +178,7 @@ private:
 	I_ATTR(int, m_autoCreateTablesAttrPtr);
 	I_ATTR(int, m_portAttrPtr);
 	I_REF(imtdb::IMigrationController, m_migrationControllerCompPtr);
+	I_REF(imtdb::IDatabaseConnectionConfigurator, m_connectionConfiguratorCompPtr);
 
 	imtbase::TModelUpdateBinder<imtdb::IDatabaseLoginSettings, CDatabaseEngineComp> m_databaseAccessObserver;
 

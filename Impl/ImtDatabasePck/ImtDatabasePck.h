@@ -8,6 +8,7 @@
 
 // ImtCore includes
 #include <imtdb/CDatabaseEngineComp.h>
+#include <imtdb/CSqliteConnectionConfiguratorComp.h>
 #include <imtdb/CSqlDatabaseObjectCollectionComp.h>
 #include <imtdb/CDatabaseAccessSettingsComp.h>
 #include <imtdb/CSqlDatabaseDocumentDelegateLegacyComp.h>
@@ -40,6 +41,7 @@ namespace ImtDatabasePck
 
 
 typedef imtdb::CDatabaseEngineComp SqlDatabaseEngine;
+typedef imtdb::CSqliteConnectionConfiguratorComp SqliteConnectionConfigurator;
 typedef icomp::TModelCompWrap<imtdb::CSqlDatabaseObjectCollectionComp> SqlDatabaseCollection;
 typedef icomp::TModelCompWrap<imtdb::CDatabaseAccessSettingsComp> DatabaseAccessSettings;
 typedef imtdb::CSqlDatabaseDocumentDelegateLegacyComp SqlDatabaseDocumentDelegateLegacy;
