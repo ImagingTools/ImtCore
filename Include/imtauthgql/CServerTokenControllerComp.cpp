@@ -159,6 +159,9 @@ sdl::V1_0::imtauth::CRevokeServerTokenPayload CServerTokenControllerComp::OnRevo
 	if (!*response.success){
 		errorMessage = QStringLiteral("Unable to revoke the server token");
 	}
+	else if (m_tokenCacheCompPtr.IsValid()){
+		m_tokenCacheCompPtr->ForgetToken(tokenId);
+	}
 
 	return response;
 }

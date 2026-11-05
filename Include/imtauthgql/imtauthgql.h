@@ -1784,6 +1784,66 @@ inline bool CheckGrantedPermissions(
 
 
 /**
+	Check a change of the account of a user, which acts in all products: the caller needs the permission
+	in every product where the user has a role. One's own account and the inside of an organization are not bound.
+*/
+inline bool CheckSharedUserChange(
+			const imtgql::IGqlContext* gqlContextPtr,
+			const QByteArray& userId,
+			const imtauth::IUserBaseInfo& user,
+			const QByteArray& permission,
+			QString& errorMessage)
+{
+	const imtauth::IUserInfo* callerPtr = gqlContextPtr != nullptr ? gqlContextPtr->GetUserInfo() : nullptr;
+	if (callerPtr == nullptr || callerPtr->IsAdmin() || gqlContextPtr->GetUserId() == userId || !gqlContextPtr->GetTenantId().isEmpty()){
+		return true;
+	}
+
+	for (const QByteArray& productId : user.GetProducts()){
+		if (!imtauth::HasPermission(callerPtr->GetPermissions(productId), permission)){
+			errorMessage = QStringLiteral("The user also works in the product '%1', where you may not change it").arg(QString::fromUtf8(productId));
+
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+/**
+	Check what joining a group gives in the other products: the caller has to hold it there.
+*/
+inline bool CheckGroupGrantsInOtherProducts(
+			const imtgql::IGqlContext* gqlContextPtr,
+			const imtauth::IUserGroupInfo& group,
+			QString& errorMessage)
+{
+	const imtauth::IUserInfo* callerPtr = gqlContextPtr != nullptr ? gqlContextPtr->GetUserInfo() : nullptr;
+	if (callerPtr == nullptr || callerPtr->IsAdmin() || !gqlContextPtr->GetTenantId().isEmpty()){
+		return true;
+	}
+
+	for (const QByteArray& productId : group.GetProducts()){
+		if (productId == gqlContextPtr->GetProductId()){
+			continue;
+		}
+
+		const QByteArrayList heldPermissions = callerPtr->GetPermissions(productId);
+		for (const QByteArray& permission : group.GetPermissions(productId)){
+			if (!imtauth::HasPermission(heldPermissions, permission)){
+				errorMessage = QStringLiteral("The group gives permissions in the product '%1' that you do not hold").arg(QString::fromUtf8(productId));
+
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
+
+/**
 	Check that a change of a user or a group leaves the assignments of the other products as they are.
 	\param previousPtr The stored object, null for a new one.
 */

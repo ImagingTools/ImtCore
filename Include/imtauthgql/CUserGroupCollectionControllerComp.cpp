@@ -544,6 +544,10 @@ bool CUserGroupCollectionControllerComp::CheckGroupGrants(
 		hasNewUsers = hasNewUsers || !previousUsers.contains(userId);
 	}
 
+	if (hasNewUsers && !CheckGroupGrantsInOtherProducts(gqlContextPtr, group, errorMessage)){
+		return false;
+	}
+
 	// New members get all permissions of the group, the others only what the change adds
 	const QByteArrayList previousPermissions = (previousPtr != nullptr && !hasNewUsers) ? previousPtr->GetPermissions(productId) : QByteArrayList();
 

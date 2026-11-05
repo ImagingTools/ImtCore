@@ -18,6 +18,8 @@ namespace imtauth
 class CUserInfo: virtual public IUserInfo, public CUserBaseInfo
 {
 public:
+	const IUserGroupInfoProvider* GetUserGroupProvider() const { return m_userGroupInfoProviderPtr; }
+
 	typedef CUserBaseInfo BaseClass;
 
 	// reimplemented (iser::IUserInfo)

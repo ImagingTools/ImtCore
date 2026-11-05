@@ -473,6 +473,10 @@ sdl::V1_0::imtauth::CRevokeTokenPayload CPersonalAccessTokenControllerComp::OnRe
 		response.message = errorMessage;
 	}
 
+	if (*response.success && m_tokenCacheCompPtr.IsValid()){
+		m_tokenCacheCompPtr->ForgetToken(tokenId);
+	}
+
 	return response;
 }
 

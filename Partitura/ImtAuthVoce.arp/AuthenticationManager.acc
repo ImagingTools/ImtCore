@@ -64,6 +64,7 @@
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
         <Interface InterfaceId="imtauth::IJwtSessionController" ComponentId="AuthenticationManager"/>
+        <Interface InterfaceId="imtauth::IPersonalAccessTokenCache" ComponentId="AuthenticationManager"/>
         <Interface InterfaceId="imtgql::IGqlContextCreator" ComponentId="AuthenticationManager"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="AuthenticationManager"/>
     </ExportedInterfaces>

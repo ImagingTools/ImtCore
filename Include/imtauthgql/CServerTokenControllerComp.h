@@ -3,6 +3,7 @@
 
 
 // ImtCore includes
+#include <imtauth/IPersonalAccessTokenCache.h>
 #include <imtauth/IPersonalAccessTokenManager.h>
 #include <imtbase/IObjectCollection.h>
 
@@ -25,6 +26,7 @@ public:
 
 	I_BEGIN_COMPONENT(CServerTokenControllerComp);
 		I_ASSIGN(m_tokenManagerCompPtr, "PersonalAccessTokenManager", "Personal access token manager", true, "PersonalAccessTokenManager");
+		I_ASSIGN(m_tokenCacheCompPtr, "PersonalAccessTokenCache", "Forgets a revoked token at once", false, "PersonalAccessTokenCache");
 		I_ASSIGN(m_productCollectionCompPtr, "ProductCollection", "Catalog of connected products: a token is issued for a product of the catalog", true, "ProductCollection");
 	I_END_COMPONENT;
 
@@ -48,6 +50,7 @@ private:
 
 private:
 	I_REF(imtauth::IPersonalAccessTokenManager, m_tokenManagerCompPtr);
+	I_REF(imtauth::IPersonalAccessTokenCache, m_tokenCacheCompPtr);
 	I_REF(imtbase::IObjectCollection, m_productCollectionCompPtr);
 };
 

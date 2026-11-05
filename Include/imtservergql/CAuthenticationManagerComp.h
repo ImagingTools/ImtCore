@@ -14,6 +14,7 @@
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <imtgql/IGqlContextCreator.h>
+#include <imtauth/IPersonalAccessTokenCache.h>
 #include <imtauth/IJwtSessionController.h>
 #include <imtauth/IPersonalAccessTokenManager.h>
 #include <imtauth/ITenantInvitationManager.h>
@@ -26,13 +27,34 @@ namespace imtservergql
 {
 
 
-class CAuthenticationManagerComp:
+/**
+	What the authentication knows about the tokens of servers. A base of its own: one component
+	function can hold only a limited number of static objects, and the manager reached it.
+*/
+class CServerTokenAuthenticationCompBase:
 			public ilog::CLoggerComponentBase,
+			virtual public imtauth::IPersonalAccessTokenCache
+{
+public:
+	typedef ilog::CLoggerComponentBase BaseClass;
+
+	I_BEGIN_BASE_COMPONENT(CServerTokenAuthenticationCompBase);
+		I_REGISTER_INTERFACE(imtauth::IPersonalAccessTokenCache);
+		I_ASSIGN(m_serverProductIdAttrPtr, "ServerProductId", "ID of this server in the tokens of other servers, when no product info names it", false, "");
+	I_END_COMPONENT;
+
+protected:
+	I_ATTR(QByteArray, m_serverProductIdAttrPtr);
+};
+
+
+class CAuthenticationManagerComp:
+			public CServerTokenAuthenticationCompBase,
 			virtual public imtgql::IGqlContextCreator,
 			virtual public imtauth::IJwtSessionController
 {
 public:
-	typedef ilog::CLoggerComponentBase BaseClass;
+	typedef CServerTokenAuthenticationCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CAuthenticationManagerComp);
 		I_REGISTER_INTERFACE(imtgql::IGqlContextCreator);
@@ -47,7 +69,6 @@ public:
 		I_ASSIGN(m_invitationManagerCompPtr, "InvitationManager", "Pending invitations that give a user outside of any organization access to the organizations", false, "InvitationManager");
 		I_ASSIGN(m_productInfoCompPtr, "FeatureContainer", "Product the permissions of a request are checked against", false, "FeatureContainer");
 		I_ASSIGN(m_patPrefixAttrPtr, "PatPrefix", "Personal Access Token prefix", false, "imt_pat_");
-		I_ASSIGN(m_serverProductIdAttrPtr, "ServerProductId", "ID of this server in the tokens of other servers, when no product info names it", false, "");
 		I_ASSIGN(m_maxTokenCacheSizeAttrPtr, "MaxTokenCacheSize", "Maximum number of cached tokens", false, 10000);
 		I_ASSIGN(m_tokenCacheTtlAttrPtr, "TokenCacheLifetime", "Token cache lifetime (in secs)", false, 5 * 60);
 		I_ASSIGN(m_tenantDataCacheTtlAttrPtr, "TenantDataCacheLifetime", "How long the scope, the ownership and the organization access of a token are cached (in secs)", false, 10);
@@ -121,6 +142,9 @@ private:
 		TryAwaitOrClaimTokenResolution() so cache-check and claim-check happen
 		under one continuous critical section.
 	*/
+	// reimplemented (imtauth::IPersonalAccessTokenCache)
+	virtual void ForgetToken(const QByteArray& tokenId) override;
+
 	bool GetCachedPatProducts(const QByteArray& token, QByteArray& productId, QByteArray& clientProductId) const;
 	bool TryReadCachedTokenLocked(
 				const QByteArray& token,
@@ -232,7 +256,6 @@ private:
 	I_REF(imtauth::ITenantInvitationManager, m_invitationManagerCompPtr);
 	I_REF(imtlic::IProductInfo, m_productInfoCompPtr);
 	I_ATTR(QByteArray, m_patPrefixAttrPtr);
-	I_ATTR(QByteArray, m_serverProductIdAttrPtr);
 	I_ATTR(int, m_maxTokenCacheSizeAttrPtr);
 	I_ATTR(int, m_tokenCacheTtlAttrPtr);
 	I_ATTR(int, m_tenantDataCacheTtlAttrPtr);

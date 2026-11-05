@@ -942,6 +942,20 @@ void CAuthenticationManagerComp::StoreExpiredToken(const QByteArray& token) cons
 }
 
 
+void CAuthenticationManagerComp::ForgetToken(const QByteArray& tokenId)
+{
+	QMutexLocker cacheLocker(&m_tokenCacheMutex);
+	for (auto iter = m_tokenCache.begin(); iter != m_tokenCache.end(); ){
+		if (iter->isPat && iter->tokenId == tokenId){
+			iter = m_tokenCache.erase(iter);
+		}
+		else{
+			++iter;
+		}
+	}
+}
+
+
 void CAuthenticationManagerComp::InvalidateTokenCache(const QByteArray& token) const
 {
 	QMutexLocker cacheLocker(&m_tokenCacheMutex);

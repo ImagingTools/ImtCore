@@ -201,6 +201,12 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 
 	const QByteArray contextProductId = gqlRequest.GetRequestContext() != nullptr ? gqlRequest.GetRequestContext()->GetProductId() : QByteArray();
 	const QByteArrayList previousPermissions = userPtr->GetPermissions(contextProductId);
+	const istd::IChangeableUniquePtr previousPtr = userPtr->CloneMe();
+	const imtauth::IUserInfo* previousUserPtr = dynamic_cast<const imtauth::IUserInfo*>(previousPtr.GetPtr());
+	if (previousUserPtr == nullptr){
+		errorMessage = QStringLiteral("Unable to copy the user");
+		return response;
+	}
 
 	// A stored user keeps its UUID: the editor sends the ID of its own representation.
 	if (userData.id && userPtr->GetObjectUuid().isEmpty()){
@@ -354,6 +360,29 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 
 	if (!CheckGrantedPermissions(gqlRequest.GetRequestContext(), previousPermissions, userPtr->GetPermissions(contextProductId), errorMessage)){
 		return response;
+	}
+
+	// An unsaved new user has no other products yet, so the checks below only bind stored accounts
+	const bool isAccountChanged = previousUserPtr->GetId() != userPtr->GetId() || previousUserPtr->GetName() != userPtr->GetName() || previousUserPtr->GetMail() != userPtr->GetMail()
+				|| previousUserPtr->IsEnabled() != userPtr->IsEnabled() || previousUserPtr->GetPasswordHash() != userPtr->GetPasswordHash();
+	if (isAccountChanged && !CheckSharedUserChange(gqlRequest.GetRequestContext(), userPtr->GetObjectUuid(), *previousUserPtr, QByteArrayLiteral("/Administration/Users/Edit/Change"), errorMessage)){
+		return response;
+	}
+
+	for (const QByteArray& groupId : userPtr->GetGroups()){
+		if (previousUserPtr->GetGroups().contains(groupId)){
+			continue;
+		}
+
+		const imtauth::IUserGroupInfoProvider* groupProviderPtr = userPtr->GetUserGroupProvider();
+		const imtauth::IUserGroupInfoSharedPtr groupPtr = groupProviderPtr != nullptr ? groupProviderPtr->GetUserGroup(groupId) : imtauth::IUserGroupInfoSharedPtr();
+		if (!groupPtr.IsValid()){
+			errorMessage = QStringLiteral("Unable to read the group '%1'").arg(QString::fromUtf8(groupId));
+			return response;
+		}
+		if (!CheckGroupGrantsInOtherProducts(gqlRequest.GetRequestContext(), *groupPtr, errorMessage)){
+			return response;
+		}
 	}
 
 

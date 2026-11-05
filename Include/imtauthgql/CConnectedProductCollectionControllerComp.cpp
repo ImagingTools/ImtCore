@@ -179,6 +179,10 @@ bool CConnectedProductCollectionControllerComp::OnBeforeRemoveElements(const QBy
 
 				return false;
 			}
+
+			if (m_tokenCacheCompPtr.IsValid()){
+				m_tokenCacheCompPtr->ForgetToken(tokenId);
+			}
 		}
 	}
 

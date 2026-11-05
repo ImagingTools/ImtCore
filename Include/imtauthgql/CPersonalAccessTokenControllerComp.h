@@ -3,6 +3,7 @@
 
 
 // ImtCore includes
+#include <imtauth/IPersonalAccessTokenCache.h>
 #include <imtauth/IPersonalAccessTokenManager.h>
 #include <imtauth/ITenantEntityBindingManager.h>
 #include <imtauth/IDelegatedAccess.h>
@@ -24,6 +25,7 @@ public:
 	I_BEGIN_COMPONENT(CPersonalAccessTokenControllerComp);
 		I_ASSIGN(m_tokenManagerCompPtr, "PersonalAccessTokenManager", "Personal access token manager", true, "PersonalAccessTokenManager");
 		I_ASSIGN(m_tokenFactoryCompPtr, "TokenFactory", "Factory for creating token instances", true, "PersonalAccessTokenFactory");
+		I_ASSIGN(m_tokenCacheCompPtr, "PersonalAccessTokenCache", "Forgets a revoked token at once", false, "PersonalAccessTokenCache");
 		I_ASSIGN(m_bindingManagerCompPtr, "BindingManager", "Tenant entity binding manager for tenant-scoped adaptation of user roles/groups/permissions", false, "TenantEntityBindingManager");
 		I_ASSIGN(m_delegatedAccessCompPtr, "DelegatedAccess", "Delegated access resolver for cross-org grants", false, "DelegatedAccessResolver");
 		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager", false, "TenantMembershipManager");
@@ -103,6 +105,7 @@ private:
 
 private:
 	I_REF(imtauth::IPersonalAccessTokenManager, m_tokenManagerCompPtr);
+	I_REF(imtauth::IPersonalAccessTokenCache, m_tokenCacheCompPtr);
 	I_FACT(imtauth::IPersonalAccessToken, m_tokenFactoryCompPtr);
 	I_REF(imtauth::ITenantEntityBindingManager, m_bindingManagerCompPtr);
 	I_REF(imtauth::IDelegatedAccess, m_delegatedAccessCompPtr);

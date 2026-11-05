@@ -166,6 +166,9 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CGroupCollectionDocumentServiceComp
 	for (const QByteArray& userId : groupPtr->GetUsers()){
 		hasNewUsers = hasNewUsers || !previousUsers.contains(userId);
 	}
+	if (hasNewUsers && !CheckGroupGrantsInOtherProducts(gqlRequest.GetRequestContext(), *groupPtr, errorMessage)){
+		return response;
+	}
 	if (!CheckGrantedPermissions(gqlRequest.GetRequestContext(), hasNewUsers ? QByteArrayList() : previousPermissions, groupPtr->GetPermissions(contextProductId), errorMessage)){
 		return response;
 	}
