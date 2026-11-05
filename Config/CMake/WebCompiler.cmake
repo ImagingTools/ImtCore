@@ -246,7 +246,7 @@ function(jqml3_qmldir_qml_files out_var config_path)
 	execute_process(
 		COMMAND ${CMAKE_COMMAND} -E env ${_jqml_env}
 			"${NODE_EXE}"
-			"${IMTCOREDIR}/Tools/JQML/v3/compiler/compiler.js"
+			"${IMTCOREDIR}/Tools/JQML/v4/compiler/compiler.js"
 			--list-qml
 			-c "${config_path}"
 			${_jqml_entry_arg}
@@ -349,11 +349,11 @@ function(jq_compile_web)
 		COMMAND ${CMAKE_COMMAND} -E make_directory ${buildwebdir}
 		COMMAND ${PYTHONEXE} ${IMTCOREDIR}/Tools/JQML/v3/preparesources.py ${webdirs_n}
 		COMMAND ${PYTHONEXE} ${IMTCOREDIR}/Tools/JQML/v3/generate_translations_qrc.py ${TRANSLATIONS_QRC_FILE} ${TRANSLATION_SRC_DIRS}
-		WORKING_DIRECTORY ${IMTCOREDIR}/Tools/JQML/v3
+		WORKING_DIRECTORY ${IMTCOREDIR}/Tools/JQML/v4
 		COMMAND ${CMAKE_COMMAND} -E env ${envvar}
 		TARGETNAME=${TARGETNAME}
 		${NODE_EXE}
-		${IMTCOREDIR}/Tools/JQML/v3/compiler/compiler.js
+		${IMTCOREDIR}/Tools/JQML/v4/compiler/compiler.js
 		-n index
 		-i ${appicon}
 		-o ${buildwebdir}/Resources/
@@ -368,11 +368,11 @@ function(jq_compile_web)
 		OUTPUT
 		${buildwebdir}/Resources/index.js
 		POST_BUILD
-		WORKING_DIRECTORY ${IMTCOREDIR}/Tools/JQML/v3
+		WORKING_DIRECTORY ${IMTCOREDIR}/Tools/JQML/v4
 		COMMAND ${CMAKE_COMMAND} -E env ${envvar}
 		TARGETNAME=${TARGETNAME}
 		${NODE_EXE}
-		${IMTCOREDIR}/Tools/JQML/v3/compiler/compiler.js
+		${IMTCOREDIR}/Tools/JQML/v4/compiler/compiler.js
 		-c ${inputjs}
 		-n index
 		-o ${buildwebdir}/Resources/
