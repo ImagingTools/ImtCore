@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtdesign/CDesignTokenArgumentsParserComp.h>
 
 
@@ -119,6 +118,9 @@ void CDesignTokenArgumentsParserComp::SetArguments(int argc, char** argv)
 	m_commands.insert(AA_WEB, "-W");
 	m_commands.insert(AA_QML, "--qml");
 	m_commands.insert(AA_COMMON, "--common");
+	// QMultiMap supports multiple values per key - both flags work
+	m_commands.insert(AA_FIGMA_TOKEN_FILE_PATH, "--figma");
+	m_commands.insert(AA_FIGMA_TOKEN_FILE_PATH, "-figma");
 }
 
 
