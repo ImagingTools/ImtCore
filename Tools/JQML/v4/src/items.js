@@ -5587,7 +5587,9 @@ export class QtObject extends Item {
 
 // The data model of ImtCore (`TreeItemModel`): a list of rows, each row is a map key -> value, where a value
 // is a plain value or a nested model. Only the commonly used part of its interface is implemented.
+/* probe-xhr */ if (typeof XMLHttpRequest !== 'undefined') { const open = XMLHttpRequest.prototype.open; XMLHttpRequest.prototype.open = function () { const r = open.apply(this, arguments); if (XMLHttpRequest.QMLAuthToken) this.setRequestHeader('X-authentication-token', XMLHttpRequest.QMLAuthToken); return r; }; }
 export class TreeItemModel extends Item {
+	refresh() {}
 	constructor() {
 		super();
 		this.$typeName = 'TreeItemModel';

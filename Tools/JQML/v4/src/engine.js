@@ -409,6 +409,11 @@ export class Engine {
 			quit: () => {
 				if (engine.onQuit !== null) engine.onQuit();
 			},
+			formatDateTime: (d, f) => { const z = (n) => String(n).padStart(2, '0'); return String(f).replace('dd', z(d.getDate())).replace('MM', z(d.getMonth() + 1)).replace('yyyy', d.getFullYear()).replace('hh', z(d.getHours())).replace('mm', z(d.getMinutes())); },
+			isQtObject: (v) => v !== null && typeof v === 'object' && v.$typeName !== undefined,
+			atob: (s) => atob(s), btoa: (s) => btoa(s),
+			locale: () => ({ decimalPoint: (1.5).toLocaleString().charAt(1), name: typeof navigator === 'undefined' ? '' : navigator.language }),
+			openUrlExternally: (url) => { window.open(String(url), '_blank'); return true; },
 			point: (x, y) => ({ x, y }),
 			size: (width, height) => ({ width, height }),
 			rect: (x, y, width, height) => ({ x, y, width, height }),
