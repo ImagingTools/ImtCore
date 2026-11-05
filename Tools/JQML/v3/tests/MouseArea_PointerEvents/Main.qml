@@ -261,7 +261,48 @@ Item {
             dispatchPointer(window, "pointermove", 1009, outsideX, outsideY)
             dispatchPointer(window, "pointermove", 1009, point.x, point.y)
             dispatchPointer(window, "pointerup", 1009, point.x, point.y)
-            return verify(root.clickedCount === 1, "release back inside the area did not emit clicked")
+            if(!verify(root.clickedCount === 1, "release back inside the area did not emit clicked")) return false
+
+            // A release outside ends the click sequence, even right after a real click.
+            startFirstClick()
+            tap(area)
+            dispatchPointer(dom, "pointerdown", 1010, point.x, point.y)
+            dispatchPointer(window, "pointerup", 1010, outsideX, outsideY)
+            tap(area)
+            return verify(root.doubleClickedCount === 0, "tap after a release outside was classified as a double click")
+        }
+
+        // The press enters the area through the first move, so it holds containsMouse.
+        function pressAndEnter(pointerId, point) {
+            dispatchPointer(area.__getDOM(), "pointerdown", pointerId, point.x, point.y)
+            dispatchPointer(window, "pointermove", pointerId, point.x + 1, point.y)
+            return verify(area.containsMouse, "move during a press did not enter the area")
+        }
+
+        function checkHoverCleared() {
+            let point = pressPoint(area)
+
+            if(!pressAndEnter(1011, point)) return false
+            area.enabled = false
+            dispatchPointer(window, "pointerup", 1011, point.x, point.y)
+            area.enabled = true
+            if(!verify(!area.containsMouse, "area disabled before the release kept containsMouse")) return false
+
+            if(!pressAndEnter(1012, point)) return false
+            area.visible = false
+            dispatchPointer(window, "pointerup", 1012, point.x, point.y)
+            area.visible = true
+            if(!verify(!area.containsMouse, "area hidden before the release kept containsMouse")) return false
+
+            if(!pressAndEnter(1013, point)) return false
+            dispatchPointer(window, "pointercancel", 1013, point.x, point.y)
+            if(!verify(!area.containsMouse, "pointercancel kept containsMouse")) return false
+
+            if(!pressAndEnter(1014, point)) return false
+            area.enabled = false
+            dispatchPointer(window, "pointercancel", 1014, point.x, point.y)
+            area.enabled = true
+            return verify(!area.containsMouse, "area disabled before pointercancel kept containsMouse")
         }
 
         function checkContextMenuWithoutPress(message) {
@@ -277,6 +318,7 @@ Item {
                 && checkCancel()
                 && checkDisabledBeforeRelease()
                 && checkReleaseOutside()
+                && checkHoverCleared()
                 && checkContextMenuWithoutPress("contextmenu right after touch was not suppressed")
         }
 

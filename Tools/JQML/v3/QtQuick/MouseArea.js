@@ -99,7 +99,8 @@ class MouseArea extends Item {
     }
 
     __onMouseLeave(mouse){
-        if(!this.enabled || !this.visible) return
+        // A disabled or hidden area still has to drop the hover it holds.
+        if((!this.enabled || !this.visible) && !this.containsMouse && !this.__entered) return
 
         if((this.hoverEnabled && !mouse.target) || (mouse.target === this)){
             this.containsMouse = false

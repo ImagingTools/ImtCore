@@ -427,6 +427,7 @@ module.exports = {
 
         for(let obj of entered){
             if(!obj || obj.__destroyed || obj === skipObj) continue
+            event.target = obj
             if(typeof obj.__onMouseLeave === 'function') obj.__onMouseLeave(event)
         }
     },
@@ -802,6 +803,8 @@ module.exports = {
             let _button = this.buttons[event.button]
 
             if(releasedOutside){
+                _button.timeStamp = 0
+                _button.target = null
                 event.target.__onMouseReleasedOutside(event)
             } else if(e.timeStamp - _button.timeStamp > 300 || _button.target !== event.target){
                 _button.timeStamp = e.timeStamp
