@@ -6,7 +6,7 @@
 // and root of the enclosing components (delegates have a parent scope), and finally the globals
 // (Math, JSON, Date, console, Qt, Item, time).
 
-import { Animation, ANIMATION_TYPES, AnchorLine, BindingValue, BUILTIN_TYPES, ComponentItem, createSdlObject, duringChange, FILE_DIALOG_MODES, flushDeclarativeFocus, getFocusItem, hooks, Item, ListModel, ListView, linkToOwner, Loader, modelCount, modelScopeData, modelVersion, Placeholder, queueDeclarativeFocus, readRows, readUntracked, Repeater, resetFocus, setSceneActive, Stack, Timer, TRANSFORM_ORIGIN, TreeItemModel } from './items.js';
+import { Animation, ANIMATION_TYPES, AnchorLine, BindingValue, BUILTIN_TYPES, COMPONENT_ENUM_VALUE, ComponentItem, createSdlObject, duringChange, FILE_DIALOG_MODES, flushDeclarativeFocus, getFocusItem, hooks, Item, ListModel, ListView, linkToOwner, Loader, modelCount, modelScopeData, modelVersion, Placeholder, queueDeclarativeFocus, readRows, readUntracked, Repeater, resetFocus, setSceneActive, Stack, Timer, TRANSFORM_ORIGIN, TreeItemModel } from './items.js';
 import { fonts } from './fonts.js';
 import { KEY, MODIFIERS, NAMED_KEY_HANDLERS, qtKeyEvent } from './keys.js';
 import { QmlError, escapeSourceBreaks, tokenize, topLevelNames } from './lexer.js';
@@ -130,7 +130,7 @@ const IGNORED_TYPES = new Set([
 	'InnerShadow', 'FastBlur', 'GaussianBlur', 'ColorOverlay', 'OpacityMask', 'LinearGradient', 'RadialGradient', 'Blend',
 	'BrightnessContrast', 'Colorize', 'Desaturate', 'DisplacementMap', 'HueSaturation', 'ShaderEffect', 'ShaderEffectSource',
 	'Translate', 'Rotation', 'Scale', 'Matrix4x4', 'DoubleValidator', 'IntValidator',
-	'RegularExpressionValidator', 'RegExpValidator',
+	'RegExpValidator',
 ]);
 
 // Enumerations whose values are not interpreted by the engine: each name stands for itself.
@@ -567,7 +567,7 @@ export class Engine {
 			Loader: Object.freeze({ Null: 0, Ready: 1, Loading: 2, Error: 3 }),
 			WebSocket: Object.freeze({ Connecting: 0, Open: 1, Closing: 2, Closed: 3, Error: 4 }),
 			// Component.status and the mode argument of Qt.createComponent.
-			Component: Object.freeze({ Null: 0, Ready: 1, Loading: 2, Error: 3, PreferSynchronous: 0, Asynchronous: 1 }),
+			Component: COMPONENT_ENUM_VALUE,
 			Canvas: CANVAS,
 			Gradient: enumObject(['Vertical', 'Horizontal']),
 			FileDialog: Object.freeze(Object.fromEntries(FILE_DIALOG_MODES.map((name, index) => [name, index]))),
@@ -619,6 +619,8 @@ export class Engine {
 			if (this.host !== null) this.host.$update();
 		};
 		hooks.changed = (item, name) => this.fireChanged(item, name);
+		hooks.changeSignal = (item, name) => this.defineChangeSignal(item, name);
+		hooks.initializeProperty = (item, name) => this.initializeProperty(item, name);
 		hooks.release = (item) => this.releaseSubtree(item);
 		hooks.breakBinding = (item, name) => this.dropBinding(item, name);
 		hooks.depend = (item, name, trusted) => this.depend(item, name, trusted);
@@ -895,6 +897,12 @@ export class Engine {
 	}
 
 	// ----- bindings -----
+
+	initializeProperty(item, name) {
+		if (item.$bindings === null) return;
+		const binding = item.$bindings.find((entry) => entry.key === name);
+		if (binding !== undefined && !binding.hasLast && !binding.evaluating && binding.writing === 0) this.evaluateOne(binding, true);
+	}
 
 	addBinding(owner, path, fn, line, file = '') {
 		const key = path.join('.');
@@ -2465,7 +2473,7 @@ export class Engine {
 	// `item.nameChanged.connect(fn)` for a declared property: the property is polled like an `onNameChanged` handler.
 	defineChangeSignal(item, name) {
 		const signalName = name + 'Changed';
-		if (signalName in item) return;
+		if (Object.prototype.hasOwnProperty.call(item, signalName)) return item[signalName];
 		const connected = [];
 		const signal = () => {};
 		signal.connect = (fn) => {
@@ -2486,6 +2494,7 @@ export class Engine {
 			connected.splice(at, 1);
 		};
 		Object.defineProperty(item, signalName, { value: signal, enumerable: false, configurable: true, writable: true });
+		return signal;
 	}
 
 	declareProperty(item, prop, scope) {
@@ -2878,10 +2887,15 @@ export class Engine {
 	}
 
 	releaseItem(item, dead) {
+		if (item.$released) return;
+		item.$released = true;
 		if (item.$destruction !== undefined) {
 			const list = item.$destruction;
 			item.$destruction = undefined;
 			for (const entry of list) this.guard(() => entry.fn.call(item), `handler 'Component.onDestruction' (${entry.file})`, entry.line);
+		}
+		if (item.$component !== undefined) {
+			this.guard(() => item.$component.$emit('destruction'), 'signal \'Component.destruction\'', 0);
 		}
 		if (item.$links !== undefined) {
 			const links = item.$links;
@@ -2951,6 +2965,15 @@ export class Engine {
 		this.pendingImages.clear();
 	}
 
+	async svgImageSource(source) {
+		const response = await fetch(source);
+		if (!response.ok) throw new QmlError(`HTTP ${response.status} loading '${source}'`);
+		const text = await response.text();
+		// Chromium taints network SVGs containing foreignObject, even an unused Illustrator switch branch.
+		// A data URL preserves the SVG while fetch still enforces the original server's CORS policy.
+		return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(text)}`;
+	}
+
 	loadImage(image, source) {
 		const Picture = globalThis.Image;
 		if (source === '') {
@@ -2983,15 +3006,27 @@ export class Engine {
 		}
 		const attempt = (n) => {
 			const picture = new Picture();
+			picture.crossOrigin = 'anonymous';
 			picture.onload = () => {
-				if (image.$source === source) image.$setImage(picture, 1);
+				if (image.$source === source && !image.$destroyed) image.$setImage(picture, 1);
 			};
-			picture.onerror = () => {
-				if (image.$source !== source) return;
+			const failed = (error) => {
+				if (image.$source !== source || image.$destroyed) return;
 				if (n + 1 < candidates.length) attempt(n + 1);
-				else image.$setImage(null, 3);
+				else {
+					image.$setImage(null, 3);
+					if (error !== undefined) this.report(`Image '${source}'`, error, 0);
+				}
 			};
-			picture.src = candidates[n];
+			picture.onerror = () => failed();
+			const candidate = candidates[n];
+			if (typeof fetch === 'function' && /\.svg(?:[?#]|$)/i.test(candidate)) {
+				this.svgImageSource(candidate).then((prepared) => {
+					if (image.$source === source && !image.$destroyed) picture.src = prepared;
+				}, failed);
+			} else {
+				picture.src = candidate;
+			}
 		};
 		attempt(0);
 	}

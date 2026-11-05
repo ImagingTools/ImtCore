@@ -42,6 +42,8 @@ export const hooks = {
 	completing: null,
 	// (item, name) => void: a custom property that has `onNameChanged` handlers got a new value.
 	changed: null,
+	changeSignal: null,
+	initializeProperty: null,
 	release: null,
 	// > 0 while the engine itself writes a value (a binding result, an initial value): such writes keep the binding.
 	engineWrite: 0,
@@ -422,7 +424,19 @@ export function linkToOwner(source, fn, undo) {
 // stays hit-testable, steals hover from the button, and the tooltip open/close flickers.
 const BREAKS_BINDING = new Set(['x', 'y', 'width', 'height', 'visible', 'opacity', 'enabled']);
 
+function defineNotifySignal(proto, name) {
+	const signalName = name + 'Changed';
+	if (signalName in proto) return;
+	Object.defineProperty(proto, signalName, {
+		get() {
+			return hooks.changeSignal(this, name);
+		},
+		configurable: true,
+	});
+}
+
 function defineProp(proto, name, get, set, trusted = false) {
+	defineNotifySignal(proto, name);
 	Object.defineProperty(proto, name, {
 		get() {
 			noteRead(this, name, trusted);
@@ -443,6 +457,7 @@ function defineProp(proto, name, get, set, trusted = false) {
 }
 
 function defineReadOnly(proto, name, get, message = `Cannot assign to read-only property '${name}'`, trusted = false) {
+	defineNotifySignal(proto, name);
 	Object.defineProperty(proto, name, {
 		get() {
 			noteRead(this, name, trusted);
@@ -653,6 +668,8 @@ const OBJECT_NAMES_UNSCOPABLE = [
 	'__defineGetter__', '__defineSetter__', '__lookupGetter__', '__lookupSetter__', '__proto__',
 ];
 
+export const COMPONENT_ENUM_VALUE = Object.freeze({ Null: 0, Ready: 1, Loading: 2, Error: 3, PreferSynchronous: 0, Asynchronous: 1 });
+
 export class Item {
 	constructor() {
 		this.$typeName = 'Item';
@@ -837,7 +854,7 @@ export class Item {
 			signal.params = params;
 		}
 		// A property of the same name (MouseArea.pressed) stays a property.
-		if (!(name in this)) {
+		if (!(name in this) || (name.endsWith('Changed') && !Object.prototype.hasOwnProperty.call(this, name))) {
 			const emit = (...args) => this.$emit(name, args);
 			// signal.connect(fn) / signal.disconnect(fn)
 			emit.connect = (fn) => {
@@ -899,6 +916,7 @@ export class Item {
 		store[name] = initial;
 		Object.defineProperty(this, name, {
 			get() {
+				if (!this.$constructing && hooks.initializeProperty !== null) hooks.initializeProperty(this, name);
 				noteRead(this, name, true);
 				return store[name];
 			},
@@ -1396,6 +1414,18 @@ Item.prototype.$contentSized = false;
 
 Object.defineProperty(Item.prototype, Symbol.unscopables, {
 	value: Object.fromEntries(OBJECT_NAMES_UNSCOPABLE.map((name) => [name, true])),
+});
+
+Object.defineProperty(Item.prototype, 'Component', {
+	get() {
+		if (this.$component === undefined) {
+			this.$component = new QtObject();
+			Object.assign(this.$component, COMPONENT_ENUM_VALUE);
+			this.$component.$declareSignal('destruction', []);
+		}
+		return this.$component;
+	},
+	configurable: true,
 });
 
 defineProp(
@@ -3781,6 +3811,15 @@ export class ImageItem extends Item {
 			const ctx = canvas.getContext('2d');
 			ctx.imageSmoothingEnabled = !nearest;
 			ctx.drawImage(this.$img, 0, 0, pw, ph);
+			try {
+				ctx.getImageData(0, 0, 1, 1);
+			} catch (error) {
+				if (error.name !== 'SecurityError') throw error;
+				if (this.$page !== null) r.dropPage(this.$page);
+				this.$setImage(null, 3);
+				hooks.report(error, `Image '${this.$source}'`);
+				return;
+			}
 			if (this.$page !== null) r.dropPage(this.$page);
 			this.$page = { canvas, context: null, texture: null, dirty: true, size: Math.max(pw, ph), nearest };
 			this.$pageKey = key;
@@ -5017,7 +5056,7 @@ readOnlyProp('cursorVisible', function () {
 	return this.$active;
 });
 readOnlyProp('acceptableInput', function () {
-	return true;
+	return this.validator === null || this.validator === undefined || this.validator.accepts(this.text);
 });
 readOnlyProp('canUndo', function () {
 	return this.$undo.length > 0 && (this.$multi || !this.$readOnly);
@@ -5400,8 +5439,10 @@ export function modelVersion(model) {
 // The variables a delegate sees for row `index`: `index`, `modelData`, `model` and one variable per role.
 export function modelScopeData(model, index) {
 	const raw = typeof model === 'number' ? index : model instanceof ListModel || model instanceof TreeItemModel ? model.$rows[index] : Array.isArray(model) ? model[index] : undefined;
-	const roles = isRecord(raw) ? raw : {};
-	const modelData = raw;
+	const roles = isRecord(raw) ? (model instanceof TreeItemModel ? new Proxy(raw, {
+		get: (target, key) => Object.prototype.hasOwnProperty.call(target, key) ? model.getData(key, index) : target[key],
+	}) : raw) : {};
+	const modelData = model instanceof TreeItemModel && isRecord(raw) ? roles : raw;
 	const proxy = new Proxy(roles, {
 		get: (target, key) => (key === 'index' ? index : key === 'modelData' ? modelData : target[key]),
 		set: (target, key, value) => {
@@ -5472,6 +5513,7 @@ export class ListModel extends Item {
 			}
 			return;
 		}
+		noteWrite(this, 'count');
 		if (hooks.changed === null) return;
 		if (hooks.engineWrite > 0 && (hooks.completing === null || !hooks.completing())) return;
 		hooks.changed(this, 'count');
@@ -5648,6 +5690,25 @@ export class QtObject extends Item {
 	}
 }
 
+export class RegularExpressionValidator extends QtObject {
+	constructor() {
+		super();
+		this.$typeName = 'RegularExpressionValidator';
+		this.$expression = /.*/;
+	}
+
+	accepts(text) {
+		const expression = this.regularExpression;
+		const match = new RegExp(`(?:${expression.source})(?![\\s\\S])`, expression.flags.replace(/[gy]/g, '')).exec(String(text));
+		return match !== null && match.index === 0 && match[0].length === String(text).length;
+	}
+}
+
+defineField(RegularExpressionValidator.prototype, 'regularExpression', '$expression', (value) => {
+	if (!(value instanceof RegExp)) throw new QmlError('regularExpression must be a regular expression');
+	return value;
+});
+
 // The data model of ImtCore (`TreeItemModel`): a list of rows, each row is a map key -> value, where a value
 // is a plain value or a nested model. Only the commonly used part of its interface is implemented.
 /* probe-xhr */ if (typeof XMLHttpRequest !== 'undefined') { const open = XMLHttpRequest.prototype.open; XMLHttpRequest.prototype.open = function () { const r = open.apply(this, arguments); if (XMLHttpRequest.QMLAuthToken) this.setRequestHeader('X-authentication-token', XMLHttpRequest.QMLAuthToken); return r; }; }
@@ -5714,7 +5775,7 @@ export class TreeItemModel extends Item {
 		const row = this.$rows[index];
 		if (row === undefined || !Object.prototype.hasOwnProperty.call(row, key)) return '';
 		const value = row[key];
-		return value !== null && typeof value === 'object' && !(value instanceof Date) ? TreeItemModel.$wrap(value) : value;
+		return isRecord(value) || Array.isArray(value) ? TreeItemModel.$wrap(value) : value;
 	}
 
 	getTreeItemModel(key, index = 0) {
@@ -6822,6 +6883,7 @@ readsRows(TreeItemModel, ['get'], true);
 readsUntracked(SdlList, ['get']);
 
 export const BUILTIN_TYPES = new Map([
+	['RegularExpressionValidator', RegularExpressionValidator],
 	['Settings', Settings],
 	['WebSocket', WebSocketItem],
 	['GqlModel', GqlModel],
