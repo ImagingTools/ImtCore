@@ -4,6 +4,7 @@
 
 // std includes
 #include <algorithm>
+#include <optional>
 
 // Qt includes
 #include <QtCore/QList>
@@ -401,6 +402,64 @@ void CStorageLinkTest::testLinksInContainer()
 	QCOMPARE(links[0]->m_value, 2);
 	QCOMPARE(links[1]->m_value, 100);
 	QCOMPARE(links[2]->m_value, 0);
+}
+
+
+void CStorageLinkTest::testOptionalInterface()
+{
+	imtbase::CMemoryStorageResolver storage;
+
+	// Empty link behaves like an empty optional
+	DataLink link;
+	QVERIFY(!link.has_value());
+	QVERIFY(!link);
+	QVERIFY(link.IsNull());
+	QCOMPARE(link.value_or(CLinkTestData(99)).m_value, 99);
+
+	bool exceptionThrown = false;
+	try{
+		link.value();
+	}
+	catch (const std::bad_optional_access&){
+		exceptionThrown = true;
+	}
+	QVERIFY(exceptionThrown);
+
+	DataLink nullLink(std::nullopt);
+	QVERIFY(!nullLink);
+
+	// Engaged link
+	link.SetResolver(&storage);
+	QVERIFY(link.Insert(CreateData(5)));
+	QVERIFY(link.has_value());
+	QVERIFY(link);
+	QCOMPARE(link.value().m_value, 5);
+	QCOMPARE((*link).m_value, 5);
+	QCOMPARE(link->m_value, 5);
+	QCOMPARE(link.value_or(CLinkTestData(99)).m_value, 5);
+
+	// A link with an ID of a missing object is not engaged, although it is not null
+	DataLink dangling("missing-id");
+	dangling.SetResolver(&storage);
+	QVERIFY(!dangling.IsNull());
+	QVERIFY(!dangling.has_value());
+	QVERIFY(!dangling);
+
+	// reset only clears the link: the object remains in the storage
+	DataLink second(link.GetObjectId());
+	second.SetResolver(&storage);
+
+	link.reset();
+	QVERIFY(link.IsNull());
+	QVERIFY(!link.has_value());
+	QVERIFY(link.GetResolver() == &storage);
+	QCOMPARE(storage.GetObjectsCount(), 1);
+	QVERIFY(second.has_value());
+
+	second = std::nullopt;
+	QVERIFY(second.IsNull());
+	QVERIFY(!second);
+	QCOMPARE(storage.GetObjectsCount(), 1);
 }
 
 
