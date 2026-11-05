@@ -171,6 +171,21 @@ function focusLeaf(item) {
 	return cur;
 }
 
+function enclosingListView(item) {
+	for (let p = item.$parent; p !== null; p = p.$parent) {
+		if (p instanceof ListView) return p;
+	}
+	return null;
+}
+
+// True when `leaf` is the list or an ancestor of it (host FocusScope already owns this subtree).
+function focusHostOwnsList(list, leaf) {
+	for (let p = list; p !== null; p = p.$parent) {
+		if (p === leaf) return true;
+	}
+	return false;
+}
+
 function updateChain(item) {
 	let root = item;
 	while (root.$parent !== null) root = root.$parent;
@@ -1272,13 +1287,23 @@ export class Item {
 	forceActiveFocus() {
 		const gen = ++forceGen;
 		setItemFocus(this, true, gen);
-		let parent = this.$parent;
-		while (parent !== null) {
-			if (parent.$isFocusScope && nearestScope(parent) !== null) setItemFocus(parent, true, gen);
-			parent = parent.$parent;
+		// Qt: ListView is a FocusScope and may set `focus: true` on the current row without
+		// giving that row activeFocus until the view itself is in the active chain. A later
+		// forceActiveFocus on that row (e.g. control chrome rebuild) must not climb out of the
+		// still-inactive view — that would activate the row when the dialog/popup takes focus.
+		const list = enclosingListView(this);
+		const scopedListCurrent =
+			list !== null && list.$scopeFocus === this && !list.$focus && (activeLeaf === null || !focusHostOwnsList(list, activeLeaf));
+		if (!scopedListCurrent) {
+			let parent = this.$parent;
+			while (parent !== null) {
+				if (parent.$isFocusScope && nearestScope(parent) !== null) setItemFocus(parent, true, gen);
+				parent = parent.$parent;
+			}
 		}
 		// A handler may already have moved the focus to another item.
 		if (!sceneActive || !this.$focus) return;
+		if (scopedListCurrent) return;
 		activeLeaf = focusLeaf(this);
 		refreshActive();
 	}
@@ -2943,8 +2968,7 @@ export class ListView extends Item {
 		this.$isFocusScope = true;
 		this.$clip = true;
 		this.$model = 0;
-		// Qt: no current row until one is chosen. Mapping unset/invalid → 0 made ComboBox popups
-		// focus the first delegate and paint ButtonDecorator's focus ring.
+		// Qt starts at -1; assigning a non-empty model selects row 0 (see $syncCurrentIndex).
 		this.$currentIndex = -1;
 		this.$spacing = 0;
 		this.$orientation = 2; // Qt.Vertical
@@ -3158,8 +3182,10 @@ export class ListView extends Item {
 		}
 		if (this.createDelegate === null || count === 0) {
 			this.$releaseWhere(() => false);
+			this.$syncCurrentIndex(0);
 			return;
 		}
+		this.$syncCurrentIndex(count);
 
 		const horizontal = this.$horizontal;
 		if (this.$rowHeight <= 0) {
@@ -3273,9 +3299,15 @@ export class ListView extends Item {
 		return item === undefined ? null : item;
 	}
 
+	// Qt: a non-empty model with no current selects 0; an explicit currentIndex (e.g. `currentIndex: 1`
+	// before the model is ready) must survive empty intermediate arranges — do not force -1 on count 0.
+	$syncCurrentIndex(count) {
+		if (count <= 0) return;
+		if (this.$currentIndex < 0) this.$currentIndex = 0;
+		else if (this.$currentIndex >= count) this.$currentIndex = count - 1;
+	}
+
 	// The current delegate is the focused item of the view, without taking the window's focus.
-	// currentIndex < 0 (Qt default / ComboBox placeholder): do not focus a delegate — focusing
-	// item 0 makes Button.qml's onDecoratorChanged call forceActiveFocus and paints a focus ring.
 	$focusCurrent() {
 		const index = this.$currentIndex;
 		if (!(index >= 0)) return;
