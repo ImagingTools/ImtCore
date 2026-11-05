@@ -13,6 +13,12 @@
         <file alias="imtauthgui/UserTokenProvider.qml">UserTokenProvider.qml</file>
         <file alias="imtauthgui/RoleCollectionViewCommandsDelegate.qml">RoleCollectionViewCommandsDelegate.qml</file>
         <file alias="imtauthgui/RoleCollectionView.qml">RoleCollectionView.qml</file>
+        <file alias="imtauthgui/ConnectedProductsView.qml">ConnectedProductsView.qml</file>
+        <file alias="imtauthgui/ServerTokenApiClient.qml">ServerTokenApiClient.qml</file>
+        <file alias="imtauthgui/ProductPermissionStatusProvider.qml">ProductPermissionStatusProvider.qml</file>
+        <file alias="imtauthgui/ConnectedProductView.qml">ConnectedProductView.qml</file>
+        <file alias="imtauthgui/ConnectedProductTokensPage.qml">ConnectedProductTokensPage.qml</file>
+        <file alias="imtauthgui/ConnectedProductPermissionsPage.qml">ConnectedProductPermissionsPage.qml</file>
         <file alias="imtauthgui/RoleView.qml">RoleView.qml</file>
         <file alias="imtauthgui/UserGroupView.qml">UserGroupView.qml</file>
         <file alias="imtauthgui/PermissionsProvider.qml">PermissionsProvider.qml</file>

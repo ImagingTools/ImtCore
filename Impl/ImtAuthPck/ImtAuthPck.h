@@ -97,6 +97,7 @@ namespace ImtAuthPck
 typedef icomp::TModelCompWrap<imtauth::CRoleComp> Role;
 typedef icomp::TModelCompWrap<imtauth::CConnectedProductComp> ConnectedProduct;
 typedef imtauth::CConnectedProductDocumentValidatorComp ConnectedProductDocumentValidator;
+typedef imtauth::CConnectedProductDocumentNameProviderComp ConnectedProductDocumentNameProvider;
 typedef icomp::TModelCompWrap<imtauth::CProductPermissionSnapshotComp> ProductPermissionSnapshot;
 typedef imtauth::CRoleMetaInfoCreatorComp RoleMetaInfoCreator;
 typedef icomp::TModelCompWrap<imtauth::CUserInfoComp> UserInfo;

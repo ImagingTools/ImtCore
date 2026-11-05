@@ -31,6 +31,11 @@ I_EXPORT_COMPONENT(
 			"Product Permission Snapshot");
 
 I_EXPORT_COMPONENT(
+			ConnectedProductDocumentNameProvider,
+			"Names a catalog entry after its product",
+			"Connected Product Document Name Provider");
+
+I_EXPORT_COMPONENT(
 			ConnectedProductDocumentValidator,
 			"Validator of the catalog entries of products",
 			"Connected Product Document Validator");
