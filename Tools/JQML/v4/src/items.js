@@ -2943,6 +2943,9 @@ export class ListView extends Item {
 		this.$isFocusScope = true;
 		this.$clip = true;
 		this.$model = 0;
+		// Qt: no current row until one is chosen. Mapping unset/invalid → 0 made ComboBox popups
+		// focus the first delegate and paint ButtonDecorator's focus ring.
+		this.$currentIndex = -1;
 		this.$spacing = 0;
 		this.$orientation = 2; // Qt.Vertical
 		this.$contentX = 0;
@@ -3271,8 +3274,12 @@ export class ListView extends Item {
 	}
 
 	// The current delegate is the focused item of the view, without taking the window's focus.
+	// currentIndex < 0 (Qt default / ComboBox placeholder): do not focus a delegate — focusing
+	// item 0 makes Button.qml's onDecoratorChanged call forceActiveFocus and paints a focus ring.
 	$focusCurrent() {
-		const current = this.$delegates.get(this.$currentIndex > 0 ? this.$currentIndex : 0);
+		const index = this.$currentIndex;
+		if (!(index >= 0)) return;
+		const current = this.$delegates.get(index);
 		if (current !== undefined && !current.$focus) {
 			current.focus = true;
 			// The first current item notifies twice; later rebuilds notify once.
@@ -3302,6 +3309,17 @@ defineProp(
 );
 defineField(ListView.prototype, 'spacing', '$spacing', toFloat);
 defineField(ListView.prototype, 'reuseItems', '$reuseItems', toBool);
+defineProp(
+	ListView.prototype,
+	'currentIndex',
+	function () {
+		return this.$currentIndex;
+	},
+	function (value) {
+		const n = Math.trunc(Number(value));
+		this.$currentIndex = Number.isFinite(n) ? n : -1;
+	},
+);
 function defineListContent(name, field) {
 	defineProp(
 		ListView.prototype,
