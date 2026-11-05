@@ -852,6 +852,7 @@ class Item extends QtObject {
     __onMouseUp(mouse){}
     __onMouseClick(mouse){}
     __onMouseDblClick(mouse){}
+    __onMouseReleasedOutside(mouse){}
     __onWheel(wheel){}
 }
 

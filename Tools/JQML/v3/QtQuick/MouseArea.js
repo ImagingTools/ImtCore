@@ -70,7 +70,17 @@ class MouseArea extends Item {
         return this.hoverEnabled && this.enabled && this.visible
     }
 
+    __resetPressed(mouse){
+        if(!this.__self.pressed) return
+
+        this.__self.pressed = false
+        this.pressedChanged(mouse)
+    }
+
     __onMouseCanceled(mouse){
+        this.__pressed = false
+        this.__resetPressed(mouse)
+
         if(!this.enabled || !this.visible) return
 
         this.canceled()
@@ -89,7 +99,8 @@ class MouseArea extends Item {
     }
 
     __onMouseLeave(mouse){
-        if(!this.enabled || !this.visible) return
+        // A disabled or hidden area still has to drop the hover it holds.
+        if((!this.enabled || !this.visible) && !this.containsMouse && !this.__entered) return
 
         if((this.hoverEnabled && !mouse.target) || (mouse.target === this)){
             this.containsMouse = false
@@ -171,28 +182,33 @@ class MouseArea extends Item {
     }
 
     __onMouseClick(mouse){
+        let wasPressed = this.__pressed
+        this.__pressed = false
+        this.__resetPressed(mouse)
+
         if(!this.enabled || !this.visible || !(mouse.button & this.acceptedButtons)) return
 
-        this.__self.pressed = false
-
-        if(mouse.target === this && this.__pressed){
+        if(mouse.target === this && wasPressed){
             this.__emitComposedClick(mouse)
         }
-
-        this.__pressed = false 
     }
 
     __onMouseDblClick(mouse){
+        let wasPressed = this.__pressed
+        this.__pressed = false
+        this.__resetPressed(mouse)
+
         if(!this.enabled || !this.visible || !(mouse.button & this.acceptedButtons)) return
 
-        this.__self.pressed = false
-
-        if(mouse.target === this && this.__pressed){
+        if(mouse.target === this && wasPressed){
             this.clicked(mouse)
             this.__emitComposedDoubleClick(mouse)
         }
+    }
 
+    __onMouseReleasedOutside(mouse){
         this.__pressed = false
+        this.__resetPressed(mouse)
     }
 
     __onWheel(wheel){
