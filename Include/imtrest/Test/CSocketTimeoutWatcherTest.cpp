@@ -71,6 +71,31 @@ private:
 };
 
 
+/**
+	The socket of a client that does not read: nothing written to it leaves it.
+	A real socket cannot show it: on Windows the system takes any response from it, whatever the client reads.
+*/
+class CStalledSocket: public QTcpSocket
+{
+public:
+	qint64 bytesToWrite() const override
+	{
+		return m_unsentSize;
+	}
+
+protected:
+	qint64 writeData(const char* /*data*/, qint64 size) override
+	{
+		m_unsentSize += size;
+
+		return size;
+	}
+
+private:
+	qint64 m_unsentSize = 0;
+};
+
+
 imtrest::CConnectionTimeoutConfig CreateConfig(int requestInactivityMs, int keepAliveMs, int lingeringCloseMs)
 {
 	imtrest::CConnectionTimeoutConfig config;
@@ -375,19 +400,19 @@ void CSocketTimeoutWatcherTest::KeepAliveConnectionIsReusedTest()
 
 void CSocketTimeoutWatcherTest::StalledResponseIsAbortedTest()
 {
-	CConnectedSockets sockets;
+	QTcpServer server;
+	QVERIFY(server.listen(QHostAddress::LocalHost, 0));
 
-	QVERIFY(sockets.Open());
+	CStalledSocket socket;
+	socket.connectToHost(QHostAddress::LocalHost, server.serverPort());
+	QVERIFY(socket.waitForConnected(5000));
 
-	// The client does not read the response, so it cannot be sent:
-	sockets.GetClient().setReadBufferSize(1024);
-
-	imtrest::CSocketTimeoutWatcher watcher(sockets.GetServerSocket(), CreateConfig(300, 5000, 300), CreateHttpBehavior());
+	imtrest::CSocketTimeoutWatcher watcher(socket, CreateConfig(300, 5000, 300), CreateHttpBehavior());
 	QSignalSpy timedOutSpy(&watcher, &imtrest::CSocketTimeoutWatcher::TimedOut);
 
 	watcher.OnDataReceived();
 	watcher.OnRequestCompleted();
-	watcher.WriteResponse(QByteArray(16 * 1024 * 1024, 'x'));
+	watcher.WriteResponse(s_response);
 
 	QCOMPARE(watcher.GetPhase(), Tracker::P_SENDING);
 

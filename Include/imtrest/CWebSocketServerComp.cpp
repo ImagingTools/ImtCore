@@ -336,7 +336,7 @@ void CWebSocketServerComp::HandleNewConnections()
 	while (QWebSocket* webSocketPtr = webSocketServerPtr->nextPendingConnection()){
 #if QT_VERSION >= QT_VERSION_CHECK(6,4,0)
 		QString subprotocol = webSocketPtr->subprotocol();
-		QString message = QStringLiteral("Handle new web socket connection, (Subprotocol: '%1', Threads: %2)").arg(subprotocol, m_webSocketThreadList.count()) ;
+		QString message = QStringLiteral("Handle new web socket connection, (Subprotocol: '%1', Threads: %2)").arg(subprotocol).arg(m_webSocketThreadList.count()) ;
 		SendVerboseMessage(message, "CWebSocketServerComp");
 
 		if (!subprotocol.isEmpty() && !supportedSubprotocols.contains(subprotocol)) {

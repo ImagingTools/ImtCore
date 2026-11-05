@@ -271,6 +271,19 @@ bool CSqlNotificationInboxControllerComp::RemoveExpired(const QDateTime& created
 }
 
 
+// protected methods
+
+// reimplemented (icomp::CComponentBase)
+
+void CSqlNotificationInboxControllerComp::OnComponentCreated()
+{
+	BaseClass::OnComponentCreated();
+
+	// The delegate creates the tables when it is created, the statements of this controller need them
+	m_tableDelegateCompPtr.EnsureInitialized();
+}
+
+
 // private methods
 
 bool CSqlNotificationInboxControllerComp::StoreEvent(
