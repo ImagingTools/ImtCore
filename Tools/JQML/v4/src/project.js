@@ -347,16 +347,46 @@ export class Project {
 		await Promise.all(tasks);
 	}
 
+	// `qrc:/Fonts/Name.ttf` is the Qt resource of imtstylecontrolsqml; on disk the files live next to
+	// the Acf module as `../Fonts/Name.ttf`. The compiler FS has no qrc, so those paths are rewritten.
+	fontFileCandidates(path) {
+		const normalized = normalizePath(path);
+		const out = [normalized];
+		const qrcFonts = /^qrc:\/+Fonts\/([^/]+)$/i.exec(normalized);
+		if (qrcFonts) {
+			const file = qrcFonts[1];
+			const underFonts = `Fonts/${file}`;
+			out.push(underFonts);
+			for (const dirs of this.moduleDirs.values()) {
+				for (const dir of dirs) out.push(joinPath(dirname(dir), underFonts));
+			}
+			for (const dir of this.importPaths) {
+				out.push(joinPath(dir, underFonts), joinPath(dirname(dir), underFonts));
+			}
+		}
+		return out;
+	}
+
 	async addFont(path) {
 		if (this.fontFamilies.has(path)) return;
 		this.fontFamilies.set(path, '');
-		const buffer = await this.fs.readBytes(path);
+		let buffer = null;
+		let resolved = path;
+		for (const candidate of this.fontFileCandidates(path)) {
+			buffer = await this.fs.readBytes(candidate);
+			if (buffer !== null) {
+				resolved = candidate;
+				break;
+			}
+		}
 		if (buffer === null) {
 			this.fontFamilies.delete(path);
 			return;
 		}
-		const name = basename(path).replace(/\.[^.]*$/, '');
-		this.fontFamilies.set(path, await fonts.registerFont(buffer, name));
+		const name = basename(resolved).replace(/\.[^.]*$/, '');
+		const family = await fonts.registerFont(buffer, name);
+		this.fontFamilies.set(path, family);
+		if (resolved !== path) this.fontFamilies.set(resolved, family);
 	}
 
 	// Paths where a component type used in `fromFile` can be: `Name` in the directory of the file and

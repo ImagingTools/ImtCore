@@ -11,7 +11,7 @@ import { fonts } from './fonts.js';
 import { KEY, MODIFIERS, NAMED_KEY_HANDLERS, qtKeyEvent } from './keys.js';
 import { QmlError, escapeSourceBreaks, tokenize, topLevelNames } from './lexer.js';
 import { callableHandler } from './parser.js';
-import { dirname, hslaString, joinPath, normalizePath, parseColor, resolvePath, rgbaString, SCRIPT_IMPORT_RE } from './util.js';
+import { basename, dirname, hslaString, joinPath, normalizePath, parseColor, resolvePath, rgbaString, SCRIPT_IMPORT_RE } from './util.js';
 
 const MAX_COMPONENT_DEPTH = 50;
 const MAX_ERRORS = 20;
@@ -144,6 +144,113 @@ const QT_ENUMS = [
 	'CaseInsensitive', 'CaseSensitive', 'ScrollBarAlwaysOn', 'ScrollBarAlwaysOff',
 	'ScrollBarAsNeeded', 'Dialog', 'Popup', 'Window', 'FramelessWindowHint',
 ];
+
+// Qt.formatDateTime / formatDate / formatTime — Qt format tokens (d, M, y, h, H, m, s, z, AP/ap, t).
+// See doc.qt.io/qt-6/qml-qtqml-qt.html#formatDateTime-method. Non-string formats use locale defaults.
+function formatDateTime(value, format, defaultOptions) {
+	const date = value instanceof Date ? value : new Date(value);
+	if (Number.isNaN(date.getTime())) return '';
+	if (typeof format !== 'string') return date.toLocaleString(undefined, defaultOptions);
+
+	const hasAmPm = /[Aa]/.test(format.replace(/'[^']*'/g, ''));
+	const pad = (number, size) => String(number).padStart(size, '0');
+	const hours12 = date.getHours() % 12 === 0 ? 12 : date.getHours() % 12;
+	let result = '';
+	let i = 0;
+	while (i < format.length) {
+		const ch = format[i];
+		if (ch === "'") {
+			if (format[i + 1] === "'") {
+				result += "'";
+				i += 2;
+				continue;
+			}
+			i++;
+			while (i < format.length) {
+				if (format[i] === "'") {
+					if (format[i + 1] !== "'") break;
+					i++;
+				}
+				result += format[i];
+				i++;
+			}
+			i++;
+			continue;
+		}
+		if ((ch === 'A' || ch === 'a') && (format[i + 1] === 'P' || format[i + 1] === 'p')) {
+			const text = date.getHours() < 12 ? 'AM' : 'PM';
+			result += ch === 'A' ? text : text.toLowerCase();
+			i += 2;
+			continue;
+		}
+		let count = 1;
+		while (format[i + count] === ch) count++;
+		switch (ch) {
+			case 'd':
+				count = Math.min(count, 4);
+				if (count <= 2) result += pad(date.getDate(), count);
+				else result += date.toLocaleDateString(undefined, { weekday: count === 3 ? 'short' : 'long' });
+				break;
+			case 'M':
+				count = Math.min(count, 4);
+				if (count <= 2) {
+					result += pad(date.getMonth() + 1, count);
+				} else {
+					const parts = new Intl.DateTimeFormat(undefined, { day: 'numeric', month: count === 3 ? 'short' : 'long' }).formatToParts(date);
+					const month = parts.find((part) => part.type === 'month');
+					result += month ? month.value : '';
+				}
+				break;
+			case 'y':
+				if (count >= 4) {
+					count = 4;
+					result += pad(date.getFullYear(), 4);
+				} else if (count >= 2) {
+					count = 2;
+					result += pad(date.getFullYear() % 100, 2);
+				} else {
+					result += ch;
+				}
+				break;
+			case 'h':
+				count = Math.min(count, 2);
+				result += pad(hasAmPm ? hours12 : date.getHours(), count);
+				break;
+			case 'H':
+				count = Math.min(count, 2);
+				result += pad(date.getHours(), count);
+				break;
+			case 'm':
+				count = Math.min(count, 2);
+				result += pad(date.getMinutes(), count);
+				break;
+			case 's':
+				count = Math.min(count, 2);
+				result += pad(date.getSeconds(), count);
+				break;
+			case 'z':
+				count = Math.min(count, 3);
+				result += count === 1 ? String(date.getMilliseconds()) : pad(date.getMilliseconds(), count);
+				break;
+			case 'A':
+			case 'a':
+				count = 1;
+				result += date.getHours() < 12 ? (ch === 'A' ? 'AM' : 'am') : (ch === 'A' ? 'PM' : 'pm');
+				break;
+			case 't': {
+				count = 1;
+				const zone = date.toLocaleTimeString(undefined, { timeZoneName: 'short' }).split(' ');
+				result += zone[zone.length - 1];
+				break;
+			}
+			default:
+				result += format.substring(i, i + count);
+				break;
+		}
+		i += count;
+	}
+	return result;
+}
 
 // Qt::CursorShape — numeric so MouseArea.cursorShape bindings match desktop Qt.
 const CURSOR = Object.freeze({
@@ -424,6 +531,9 @@ export class Engine {
 				const second = parseColor(String(b));
 				return first !== null && second !== null && first.rgb === second.rgb && first.A === second.A;
 			},
+			formatDateTime: (dateTime, format) => formatDateTime(dateTime, format, { dateStyle: 'short', timeStyle: 'short' }),
+			formatDate: (date, format) => formatDateTime(date, format, { dateStyle: 'short' }),
+			formatTime: (time, format) => formatDateTime(time, format, { timeStyle: 'short' }),
 		});
 		this.globals = Object.create(null);
 		Object.assign(this.globals, {
@@ -2887,8 +2997,24 @@ export class Engine {
 			loader.$status = 'Null';
 			return;
 		}
+		if (this.project === null) {
+			loader.$name = '';
+			loader.$status = 'Error';
+			return;
+		}
+		// Prefer the path relative to the FontLoader's file; StyleBase hosts the loaders while
+		// Style.qml often names fonts next to the Acf module (`../Fonts/...`), so also match by file name.
 		const path = resolvePath(source, loader.$directory);
-		const family = this.project === null ? undefined : this.project.fontFamilies.get(path);
+		let family = this.project.fontFamilies.get(path);
+		if (!family) {
+			const file = basename(String(source).replace(/^qrc:\/*/, ''));
+			for (const [registered, name] of this.project.fontFamilies) {
+				if (name && basename(registered) === file) {
+					family = name;
+					break;
+				}
+			}
+		}
 		if (family) {
 			loader.$name = family;
 			loader.$status = 'Ready';
@@ -2898,6 +3024,7 @@ export class Engine {
 		}
 	}
 }
+
 
 function safeStringify(value) {
 	try {

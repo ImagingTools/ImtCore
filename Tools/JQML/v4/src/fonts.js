@@ -30,23 +30,26 @@ function splitFamilies(list) {
 		.filter((name) => name.length > 0);
 }
 
+// Offset of the first font in a TrueType/OpenType file (or the first face of a 'ttcf' collection).
+function fontTableBase(view) {
+	return view.getUint32(0) === 0x74746366 ? view.getUint32(12) : 0;
+}
+
+function findTable(view, base, tag) {
+	const tableCount = view.getUint16(base + 4);
+	for (let t = 0; t < tableCount; t++) {
+		const record = base + 12 + 16 * t;
+		if (view.getUint32(record) === tag) return view.getUint32(record + 8);
+	}
+	return 0;
+}
+
 // The family name stored in the 'name' table of a TrueType/OpenType file.
 export function parseFontFamily(buffer) {
 	try {
 		const view = new DataView(buffer);
-		let base = 0;
-		if (view.getUint32(0) === 0x74746366) {
-			base = view.getUint32(12); // 'ttcf': the first font of a collection
-		}
-		const tableCount = view.getUint16(base + 4);
-		let nameOffset = 0;
-		for (let t = 0; t < tableCount; t++) {
-			const record = base + 12 + 16 * t;
-			if (view.getUint32(record) === 0x6e616d65) {
-				nameOffset = view.getUint32(record + 8);
-				break;
-			}
-		}
+		const base = fontTableBase(view);
+		const nameOffset = findTable(view, base, 0x6e616d65);
 		if (nameOffset === 0) return null;
 
 		const count = view.getUint16(nameOffset + 2);
@@ -75,6 +78,20 @@ export function parseFontFamily(buffer) {
 		return best;
 	} catch {
 		return null;
+	}
+}
+
+// OS/2.usWeightClass (100–900). FontFace defaults to 400; without this, Bold.ttf registered as
+// family "Ubuntu" steals the regular face and every label looks heavy.
+export function parseFontWeight(buffer) {
+	try {
+		const view = new DataView(buffer);
+		const os2 = findTable(view, fontTableBase(view), 0x4f532f32);
+		if (os2 === 0) return 400;
+		const weight = view.getUint16(os2 + 4);
+		return weight >= 100 && weight <= 900 ? weight : 400;
+	} catch {
+		return 400;
 	}
 }
 
@@ -284,9 +301,10 @@ export class FontManager {
 	async registerFont(buffer, fallbackName) {
 		const family = parseFontFamily(buffer) || fallbackName;
 		if (!family) return '';
+		const weight = parseFontWeight(buffer);
 		if (typeof FontFace !== 'undefined' && typeof document !== 'undefined') {
 			try {
-				const face = new FontFace(family, buffer);
+				const face = new FontFace(family, buffer, { weight: String(weight) });
 				await face.load();
 				document.fonts.add(face);
 			} catch {
