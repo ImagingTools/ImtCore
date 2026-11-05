@@ -91,7 +91,8 @@ bool CPersonalAccessTokenManagerComp::ValidateToken(
 			const QByteArray& rawToken,
 			QByteArray& userId,
 			QByteArray& tokenId,
-			QByteArrayList& scopes) const
+			QByteArrayList& scopes,
+			QByteArray* productIdPtr) const
 {
 	if (!m_tokenCollectionCompPtr.IsValid()){
 		SendErrorMessage(0, "Token collection not configured", "CPersonalAccessTokenManagerComp");
@@ -141,6 +142,9 @@ bool CPersonalAccessTokenManagerComp::ValidateToken(
 		userId = tokenPtr->GetUserId();
 		tokenId = tokenPtr->GetId();
 		scopes = tokenPtr->GetScopes();
+		if (productIdPtr != nullptr){
+			*productIdPtr = tokenPtr->GetProductId();
+		}
 
 		return true;
 	}

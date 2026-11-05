@@ -26,6 +26,7 @@
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Tenants.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Permissions.h>
 #include <imtauthgql/CAssignmentCollector.h>
+#include <imtservergql/imtservergql.h>
 
 
 // Qt includes
@@ -1703,6 +1704,114 @@ inline imtauth::OrderRequestStatus FromSdlOrderStatus(sdl::V1_0::imtauth::OrderR
 	default:
 		return imtauth::ORS_RECEIVED;
 	}
+}
+
+
+/**
+	Check that the request may work with the data of the given product.
+	A permission held in a role acts only on the objects of the product of this role; a superuser is not bound.
+*/
+inline bool CheckAdministeredProduct(const imtgql::IGqlContext* gqlContextPtr, const QByteArray& productId, QString& errorMessage)
+{
+	// Without a user the permission check of the command decides
+	const imtauth::IUserInfo* userInfoPtr = gqlContextPtr != nullptr ? gqlContextPtr->GetUserInfo() : nullptr;
+	if (userInfoPtr == nullptr || userInfoPtr->IsAdmin()){
+		return true;
+	}
+
+	if (productId.isEmpty() || productId != gqlContextPtr->GetProductId()){
+		errorMessage = QStringLiteral("The data of the product '%1' is not available in this context").arg(QString::fromUtf8(productId));
+
+		return false;
+	}
+
+	return true;
+}
+
+
+/**
+	Check the products named in the input of an administration command: input.productId and input.item.productId.
+*/
+inline bool CheckAdministeredProducts(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage)
+{
+	const imtgql::CGqlParamObject* inputPtr = gqlRequest.GetParamObject("input");
+	if (inputPtr == nullptr){
+		return true;
+	}
+
+	const QByteArray productId = inputPtr->GetParamArgumentValue("productId").toByteArray();
+	if (!productId.isEmpty() && !CheckAdministeredProduct(gqlRequest.GetRequestContext(), productId, errorMessage)){
+		return false;
+	}
+
+	const imtgql::CGqlParamObject* itemPtr = inputPtr->GetParamArgumentObjectPtr("item");
+	const QByteArray itemProductId = itemPtr != nullptr ? itemPtr->GetParamArgumentValue("productId").toByteArray() : QByteArray();
+
+	return itemProductId.isEmpty() || CheckAdministeredProduct(gqlRequest.GetRequestContext(), itemProductId, errorMessage);
+}
+
+
+/**
+	Check that the caller holds every permission a change adds: nobody can give what he does not have himself.
+	Inside an organization the permission scope of the organization limits what its roles hold.
+*/
+inline bool CheckGrantedPermissions(
+			const imtgql::IGqlContext* gqlContextPtr,
+			const QByteArrayList& previousPermissions,
+			const QByteArrayList& permissions,
+			QString& errorMessage)
+{
+	const imtauth::IUserInfo* userInfoPtr = gqlContextPtr != nullptr ? gqlContextPtr->GetUserInfo() : nullptr;
+	if (userInfoPtr != nullptr && userInfoPtr->IsAdmin()){
+		return true;
+	}
+
+	if (gqlContextPtr != nullptr && !gqlContextPtr->GetTenantId().isEmpty()){
+		return true;
+	}
+
+	const QByteArrayList heldPermissions = gqlContextPtr != nullptr ? imtservergql::GetUserPermissions(*gqlContextPtr) : QByteArrayList();
+	for (const QByteArray& permission : permissions){
+		if (!previousPermissions.contains(permission) && !imtauth::HasPermission(heldPermissions, permission)){
+			errorMessage = QStringLiteral("The permission '%1' cannot be granted: you do not hold it").arg(QString::fromUtf8(permission));
+
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+/**
+	Check that a change of a user or a group leaves the assignments of the other products as they are.
+	\param previousPtr The stored object, null for a new one.
+*/
+inline bool CheckOtherProductsUnchanged(
+			const imtgql::IGqlContext* gqlContextPtr,
+			const imtauth::IUserBaseInfo* previousPtr,
+			const imtauth::IUserBaseInfo& current,
+			QString& errorMessage)
+{
+	const imtauth::IUserInfo* userInfoPtr = gqlContextPtr != nullptr ? gqlContextPtr->GetUserInfo() : nullptr;
+	if (userInfoPtr != nullptr && userInfoPtr->IsAdmin()){
+		return true;
+	}
+
+	const QByteArray ownProductId = gqlContextPtr != nullptr ? gqlContextPtr->GetProductId() : QByteArray();
+	const QByteArrayList previousProducts = previousPtr != nullptr ? previousPtr->GetProducts() : QByteArrayList();
+	for (const QByteArray& productId : previousProducts + current.GetProducts()){
+		const QByteArrayList previousRoles = previousPtr != nullptr ? previousPtr->GetRoles(productId) : QByteArrayList();
+		const QByteArrayList previousPermissions = previousPtr != nullptr ? previousPtr->GetLocalPermissions(productId) : QByteArrayList();
+		if (productId != ownProductId
+					&& (previousRoles != current.GetRoles(productId) || previousPermissions != current.GetLocalPermissions(productId))){
+			errorMessage = QStringLiteral("The data of the product '%1' is not available in this context").arg(QString::fromUtf8(productId));
+
+			return false;
+		}
+	}
+
+	return true;
 }
 
 

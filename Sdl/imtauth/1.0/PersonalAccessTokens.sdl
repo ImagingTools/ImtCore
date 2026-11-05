@@ -68,6 +68,7 @@ type ValidateTokenPayload
 {
 	valid: Boolean!
 	userId: ID
+	productId: ID
 	scopes: [ID]
 	message: String
 }

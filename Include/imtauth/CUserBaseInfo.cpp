@@ -194,7 +194,14 @@ void CUserBaseInfo::SetProhibitions(const FeatureIds &prohibitions)
 
 QByteArrayList CUserBaseInfo::GetProducts() const
 {
-	return m_rolesMap.keys();
+	QByteArrayList retVal = m_rolesMap.keys();
+	for (auto it = m_permissionsMap.cbegin(); it != m_permissionsMap.cend(); ++it){
+		if (!retVal.contains(it.key())){
+			retVal.append(it.key());
+		}
+	}
+
+	return retVal;
 }
 
 

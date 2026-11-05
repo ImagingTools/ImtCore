@@ -10,6 +10,7 @@
 #include <imtauth/IUserGroupInfo.h>
 #include <imtauth/imtauth.h>
 #include <imtauthgql/CAssignmentCollector.h>
+#include <imtauthgql/imtauthgql.h>
 
 // Generated includes
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/GroupCollectionDocumentService.h>
@@ -59,10 +60,13 @@ sdl::V1_0::imtauth::CGroupData CGroupCollectionDocumentServiceComp::OnGetGroupRe
 	response.name = groupPtr->GetName();
 	response.description = groupPtr->GetDescription();
 
-	// Roles are productId-scoped on IUserBaseInfo; without a tenant context
-	// here the roles of all products are collected.
+	// Roles are productId-scoped on IUserBaseInfo; only a superuser sees the roles of all products.
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	const imtauth::IUserInfo* contextUserPtr = gqlContextPtr != nullptr ? gqlContextPtr->GetUserInfo() : nullptr;
+	const QByteArray productId = (contextUserPtr != nullptr && !contextUserPtr->IsAdmin()) ? gqlContextPtr->GetProductId() : QByteArray();
+
 	CAssignmentCollector collector;
-	collector.CollectGroup(*groupPtr, groupPtr->GetObjectUuid(), QByteArray(), getGroupRepresentationRequest.GetRequestInfo().isUsersRequested);
+	collector.CollectGroup(*groupPtr, groupPtr->GetObjectUuid(), productId, getGroupRepresentationRequest.GetRequestInfo().isUsersRequested);
 	collector.FillGroup(response);
 
 	return response;
@@ -102,6 +106,10 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CGroupCollectionDocumentServiceComp
 		response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::InvalidDocumentId;
 		return response;
 	}
+
+	const QByteArray contextProductId = gqlRequest.GetRequestContext() != nullptr ? gqlRequest.GetRequestContext()->GetProductId() : QByteArray();
+	const QByteArrayList previousPermissions = groupPtr->GetPermissions(contextProductId);
+	const QByteArrayList previousUsers = groupPtr->GetUsers();
 
 	sdl::V1_0::imtauth::CGroupData groupData;
 	if (arguments.input->group){
@@ -147,7 +155,19 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CGroupCollectionDocumentServiceComp
 
 	if (groupData.roles && groupData.productId){
 		QByteArray productId = *groupData.productId;
+		if (!CheckAdministeredProduct(gqlRequest.GetRequestContext(), productId, errorMessage)){
+			return response;
+		}
 		groupPtr->SetRoles(productId, CAssignmentCollector::GetDirectIds(groupData.roles));
+	}
+
+	// New members get all permissions of the group, the others only what the change adds
+	bool hasNewUsers = false;
+	for (const QByteArray& userId : groupPtr->GetUsers()){
+		hasNewUsers = hasNewUsers || !previousUsers.contains(userId);
+	}
+	if (!CheckGrantedPermissions(gqlRequest.GetRequestContext(), hasNewUsers ? QByteArrayList() : previousPermissions, groupPtr->GetPermissions(contextProductId), errorMessage)){
+		return response;
 	}
 
 	if (m_documentManagerCompPtr->SetDocumentData(userLogin, documentId, *documentPtr) != imtdoc::IDocumentService::OS_OK){

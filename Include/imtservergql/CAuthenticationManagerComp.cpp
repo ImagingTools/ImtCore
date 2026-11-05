@@ -63,6 +63,22 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 			SetError(error, authStatus, authErrorMessage);
 			return nullptr;
 		}
+
+		// A token works only for its product, whatever product the client names
+		if (isPat){
+			QByteArray tokenProductId;
+			const QByteArray headerProductId = headers.value(imtbase::s_productIdHeaderId);
+			if (!GetCachedPatProductId(token, tokenProductId)
+						|| (!tokenProductId.isEmpty() && ((m_productInfoCompPtr.IsValid() && tokenProductId != productId)
+									|| (!headerProductId.isEmpty() && tokenProductId != headerProductId)))){
+				SetError(error, imtgql::IGqlContextCreator::CCS_FORBIDDEN, QStringLiteral("The personal access token is not valid for this product."));
+				return nullptr;
+			}
+
+			if (!tokenProductId.isEmpty()){
+				productId = tokenProductId;
+			}
+		}
 	}
 
 	imtgql::IGqlContextUniquePtr gqlContextPtr = CreateContextInstance();
@@ -599,7 +615,8 @@ bool CAuthenticationManagerComp::ResolveUserId(
 			return false;
 		}
 
-		if (!m_patManagerCompPtr->ValidateToken(token, userId, tokenId, scopes)){
+		QByteArray tokenProductId;
+		if (!m_patManagerCompPtr->ValidateToken(token, userId, tokenId, scopes, &tokenProductId)){
 			errorMessage = QStringLiteral("Invalid personal access token.");
 			status = imtgql::IGqlContextCreator::CCS_FORBIDDEN;
 			SendWarningMessage(
@@ -617,7 +634,7 @@ bool CAuthenticationManagerComp::ResolveUserId(
 			return false;
 		}
 
-		StoreCachedToken(token, userId, tenantId, tokenId, scopes, true);
+		StoreCachedToken(token, userId, tenantId, tokenId, scopes, true, 0, tokenProductId);
 		return true;
 	}
 
@@ -723,6 +740,19 @@ bool CAuthenticationManagerComp::TryGetCachedToken(
 }
 
 
+bool CAuthenticationManagerComp::GetCachedPatProductId(const QByteArray& token, QByteArray& productId) const
+{
+	QMutexLocker cacheLocker(&m_tokenCacheMutex);
+	auto iter = m_tokenCache.constFind(token);
+	if (iter == m_tokenCache.constEnd()){
+		return false;
+	}
+
+	productId = iter->patProductId;
+	return true;
+}
+
+
 bool CAuthenticationManagerComp::TryReadCachedTokenLocked(
 			const QByteArray& token,
 			QByteArray& userId,
@@ -802,9 +832,11 @@ void CAuthenticationManagerComp::StoreCachedToken(
 			const QByteArray& tokenId,
 			const QByteArrayList& scopes,
 			bool isPat,
-			qint64 jwtExpSecs) const
+			qint64 jwtExpSecs,
+			const QByteArray& patProductId) const
 {
 	TokenCacheEntry entry;
+	entry.patProductId = patProductId;
 	entry.userId = userId;
 	entry.tenantId = tenantId;
 	entry.tokenId = tokenId;
