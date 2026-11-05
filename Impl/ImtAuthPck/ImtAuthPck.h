@@ -8,6 +8,9 @@
 
 // ImtCore includes
 #include <imtauth/CRoleComp.h>
+#include <imtauth/CConnectedProduct.h>
+#include <imtauth/CConnectedProductDocumentValidatorComp.h>
+#include <imtauth/CProductPermissionSnapshot.h>
 #include <imtauth/CRoleMetaInfoCreatorComp.h>
 #include <imtauth/CUserInfoMetaInfoCreatorComp.h>
 #include <imtauth/CUserInfoComp.h>
@@ -92,6 +95,9 @@ namespace ImtAuthPck
 
 
 typedef icomp::TModelCompWrap<imtauth::CRoleComp> Role;
+typedef icomp::TModelCompWrap<imtauth::CConnectedProductComp> ConnectedProduct;
+typedef imtauth::CConnectedProductDocumentValidatorComp ConnectedProductDocumentValidator;
+typedef icomp::TModelCompWrap<imtauth::CProductPermissionSnapshotComp> ProductPermissionSnapshot;
 typedef imtauth::CRoleMetaInfoCreatorComp RoleMetaInfoCreator;
 typedef icomp::TModelCompWrap<imtauth::CUserInfoComp> UserInfo;
 typedef icomp::TModelCompWrap<

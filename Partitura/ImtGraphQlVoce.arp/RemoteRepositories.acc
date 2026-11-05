@@ -49,6 +49,9 @@
         <Element Id="GroupRemoteRepository" PackageId="ImtGraphQlVoce" ComponentId="RemoteRepository">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ServerCredentialProvider" Type="Reference" ExportId="ServerCredentialProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -122,6 +125,9 @@
         <Element Id="RoleRemoteRepository" PackageId="ImtGraphQlVoce" ComponentId="RemoteRepository">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ServerCredentialProvider" Type="Reference" ExportId="ServerCredentialProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -240,6 +246,9 @@
         <Element Id="UserRemoteRepository" PackageId="ImtGraphQlVoce" ComponentId="RemoteRepository">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ServerCredentialProvider" Type="Reference" ExportId="ServerCredentialProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -295,6 +304,9 @@
         <Element Id="UserSessionRemoteRepository" PackageId="ImtGraphQlVoce" ComponentId="RemoteRepository">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ServerCredentialProvider" Type="Reference" ExportId="ServerCredentialProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

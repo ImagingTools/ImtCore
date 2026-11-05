@@ -10,6 +10,21 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
+        <Element Id="ServerCredential" PackageId="ImtClientGqlPck" ComponentId="ServerCredentialProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="EnvironmentVariable" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="IMT_PUMA_SERVER_CREDENTIAL"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="ApiClient" PackageId="ImtClientGqlPck" ComponentId="ApiClient">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -281,6 +296,9 @@
         <Element Id="RemoteNotificationCenter" PackageId="ImtCoreVoce" ComponentId="RemoteNotificationCenter">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ServerCredentialProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ServerCredential"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ApiClient"/>
                     </AttributeInfo>
@@ -344,6 +362,9 @@
         <Element Id="RemoteRepositories" PackageId="ImtGraphQlVoce" ComponentId="RemoteRepositories">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ServerCredentialProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ServerCredential"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ApiClient"/>
                     </AttributeInfo>
@@ -774,6 +795,8 @@
                     <Interface InterfaceId="istd::IPolymorphic" ComponentId="Demultiplexer"/>
                 </ExportedInterfaces>
                 <ExportedComponents>
+        <Component ExportedId="ApiClient" ComponentId="ApiClient"/>
+        <Component ExportedId="ServerCredential" ComponentId="ServerCredential"/>
                     <Component ExportedId="RemoteAuthorizationController" ComponentId="RemoteAuthorizationController"/>
                 </ExportedComponents>
             </Data>

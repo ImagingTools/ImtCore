@@ -6,6 +6,7 @@
 #include <QtCore/QTimeZone>
 
 // ImtCore includes
+#include <imtauth/imtauth.h>
 #include <imtgql/CGqlRequest.h>
 #include <imtnotifygql/imtnotifygql.h>
 
@@ -396,8 +397,6 @@ sdl::V1_0::imtnotify::CNotificationsSentPayload CNotificationsControllerComp::On
 
 bool CNotificationsControllerComp::CanSend(const ::imtgql::CGqlRequest& gqlRequest, const QByteArray& productId, QString& errorMessage) const
 {
-	// Any signed-in user may send for the product of the request until a product server has an identity of its own
-	// (ImagingTools/ImtCore#1059)
 	if (!m_senderCompPtr.IsValid()){
 		errorMessage = QStringLiteral("Sending notifications is not available");
 
@@ -405,14 +404,20 @@ bool CNotificationsControllerComp::CanSend(const ::imtgql::CGqlRequest& gqlReque
 	}
 
 	const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
-	if (contextPtr == nullptr || productId.isEmpty() || contextPtr->GetProductId() != productId){
+	if (contextPtr == nullptr || contextPtr->GetClientProductId().isEmpty()){
+		errorMessage = QStringLiteral("Notifications are sent only by the server of a product");
+
+		return false;
+	}
+
+	if (productId.isEmpty() || contextPtr->GetClientProductId() != productId){
 		errorMessage = QStringLiteral("Notifications are sent only to the product of the sender");
 
 		return false;
 	}
 
-	if (contextPtr->GetUserId().isEmpty()){
-		errorMessage = QStringLiteral("Notifications are sent only by a signed-in user");
+	if (!imtauth::HasPermission(contextPtr->GetScopes(), imtauth::s_serverNotificationsSendPermission, false)){
+		errorMessage = QStringLiteral("The token of the server may not send notifications");
 
 		return false;
 	}

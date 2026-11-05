@@ -4,6 +4,7 @@
 
 // ImtCore includes
 #include <imtauth/IPersonalAccessTokenManager.h>
+#include <imtbase/IObjectCollection.h>
 
 // Generated includes
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/ServerTokens_fwd.h>
@@ -24,6 +25,7 @@ public:
 
 	I_BEGIN_COMPONENT(CServerTokenControllerComp);
 		I_ASSIGN(m_tokenManagerCompPtr, "PersonalAccessTokenManager", "Personal access token manager", true, "PersonalAccessTokenManager");
+		I_ASSIGN(m_productCollectionCompPtr, "ProductCollection", "Catalog of connected products: a token is issued for a product of the catalog", true, "ProductCollection");
 	I_END_COMPONENT;
 
 protected:
@@ -46,6 +48,7 @@ private:
 
 private:
 	I_REF(imtauth::IPersonalAccessTokenManager, m_tokenManagerCompPtr);
+	I_REF(imtbase::IObjectCollection, m_productCollectionCompPtr);
 };
 
 

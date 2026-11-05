@@ -1,0 +1,47 @@
+schema {
+	query: Query
+	mutation: Mutation
+	namespace: imtauth
+	version: 1.0
+}
+
+import {
+	"Permissions.sdl"
+}
+
+type PublishedPermissionLanguage {
+	languageId: ID!
+	groups: [PermissionGroup]
+}
+
+type PublishProductPermissionsInput {
+	productId: ID!
+	productVersion: String
+	languages: [PublishedPermissionLanguage]
+}
+
+type PublishProductPermissionsPayload {
+	success: Boolean!
+	# False when the published tree is the stored one.
+	changed: Boolean
+	message: String
+}
+
+input ProductPermissionStatusInput {
+	productId: ID!
+}
+
+type ProductPermissionStatus {
+	productId: ID!
+	isPublished: Boolean!
+	productVersion: String
+	publishedAt: String
+}
+
+type Query {
+	GetProductPermissionStatus (input: ProductPermissionStatusInput!): ProductPermissionStatus!
+}
+
+type Mutation {
+	PublishProductPermissions (input: PublishProductPermissionsInput!): PublishProductPermissionsPayload!
+}

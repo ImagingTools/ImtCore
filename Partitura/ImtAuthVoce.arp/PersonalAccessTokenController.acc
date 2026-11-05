@@ -66,21 +66,6 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ServerTokenController" PackageId="ImtAuthGqlPck" ComponentId="ServerTokenController">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="PersonalAccessTokenManager" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PersonalAccessTokenManager"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="PersonalAccessTokenSqlRepository" PackageId="ImtAuthVoce" ComponentId="PersonalAccessTokenSqlRepository">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -106,6 +91,5 @@
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="PersonalAccessTokenManager" ComponentId="PersonalAccessTokenManager"/>
-        <Component ExportedId="ServerTokenController" ComponentId="ServerTokenController"/>
     </ExportedComponents>
 </Acf>

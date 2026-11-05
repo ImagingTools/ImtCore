@@ -6,6 +6,7 @@
 #include <QtCore/QDateTime>
 
 // ImtCore includes
+#include <imtauth/CConnectedProductDocumentValidatorComp.h>
 #include <imtauth/IPersonalAccessToken.h>
 #include <imtauth/imtauth.h>
 #include <imtgql/IGqlContext.h>
@@ -95,6 +96,12 @@ sdl::V1_0::imtauth::CCreateServerTokenPayload CServerTokenControllerComp::OnCrea
 
 	if (clientProductId == productId){
 		errorMessage = QStringLiteral("A server token is issued for another server");
+
+		return response;
+	}
+
+	if (!imtauth::CConnectedProductDocumentValidatorComp::HasProduct(*m_productCollectionCompPtr, clientProductId)){
+		errorMessage = QStringLiteral("The product '%1' is not connected").arg(QString::fromUtf8(clientProductId));
 
 		return response;
 	}

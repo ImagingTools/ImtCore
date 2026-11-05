@@ -112,6 +112,9 @@
                     <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="GqlObjectCollection"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ServerCredentialProvider" Type="Reference" ExportId="ServerCredentialProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="SubscriptionManager" Type="Reference" ExportId="SubscriptionManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

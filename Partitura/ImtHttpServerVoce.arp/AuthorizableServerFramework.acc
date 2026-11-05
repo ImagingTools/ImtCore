@@ -160,6 +160,30 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="ProductPermissionPublisher" PackageId="ImtAuthGqlPck" ComponentId="ProductPermissionPublisher">
+            <Data IsEnabled="true" Flags="1">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaClientEngine/ApiClient"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="FeatureContainer" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="IdentifiableProductInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ServerCredentialProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaClientEngine/ServerCredential"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="PumaClientEngine" PackageId="ImtGraphQlVoce" ComponentId="PumaGQLClientEngine">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>

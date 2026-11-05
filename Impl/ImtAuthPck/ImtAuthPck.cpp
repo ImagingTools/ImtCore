@@ -21,6 +21,21 @@ I_EXPORT_COMPONENT(
 			"Role");
 
 I_EXPORT_COMPONENT(
+			ConnectedProduct,
+			"Catalog entry of a connected product",
+			"Connected Product");
+
+I_EXPORT_COMPONENT(
+			ProductPermissionSnapshot,
+			"Permission tree published by a product",
+			"Product Permission Snapshot");
+
+I_EXPORT_COMPONENT(
+			ConnectedProductDocumentValidator,
+			"Validator of the catalog entries of products",
+			"Connected Product Document Validator");
+
+I_EXPORT_COMPONENT(
 			RoleMetaInfoCreator,
 			"Role metainfo creator",
 			"Role Metainfo Creator");

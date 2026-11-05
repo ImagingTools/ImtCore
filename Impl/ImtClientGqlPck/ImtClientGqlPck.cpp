@@ -16,6 +16,11 @@ I_EXPORT_PACKAGE(
 			IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools"));
 
 I_EXPORT_COMPONENT(
+			ServerCredentialProvider,
+			"Token of this server from an environment variable",
+			"Server Credential Provider");
+
+I_EXPORT_COMPONENT(
 			ApiClient,
 			"General API client",
 			"GraphQL API Client");

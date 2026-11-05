@@ -186,6 +186,31 @@ I_EXPORT_COMPONENT(
 			"Personal Access Token Controller");
 
 I_EXPORT_COMPONENT(
+			ConnectedProductCollectionController,
+			"Collection controller of the catalog of connected products",
+			"Connected Product Collection Controller");
+
+I_EXPORT_COMPONENT(
+			ConnectedProductCollectionDocumentService,
+			"Document service of the catalog of connected products",
+			"Connected Product Collection Document Service");
+
+I_EXPORT_COMPONENT(
+			ProductPermissionCatalog,
+			"Stores the permission trees products publish",
+			"Product Permission Catalog");
+
+I_EXPORT_COMPONENT(
+			ProductPermissionPublisher,
+			"Sends the permission tree of this product to the authorization server",
+			"Product Permission Publisher");
+
+I_EXPORT_COMPONENT(
+			PublishedPermissionsProvider,
+			"Answers permission tree requests from the published trees",
+			"Published Permissions Provider");
+
+I_EXPORT_COMPONENT(
 			ServerTokenController,
 			"Controller of the tokens of product servers",
 			"Server Token Controller");

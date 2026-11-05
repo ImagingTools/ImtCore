@@ -43,6 +43,11 @@
 #include <imtauthgql/CPermissionsProviderComp.h>
 #include <imtauthgql/CPersonalAccessTokenControllerComp.h>
 #include <imtauthgql/CServerTokenControllerComp.h>
+#include <imtauthgql/CProductPermissionCatalogComp.h>
+#include <imtauthgql/CProductPermissionPublisherComp.h>
+#include <imtauthgql/CPublishedPermissionsProviderComp.h>
+#include <imtauthgql/CConnectedProductCollectionControllerComp.h>
+#include <imtauthgql/CConnectedProductCollectionDocumentServiceComp.h>
 #include <imtauthgql/CClientRequestPersonalAccessTokenManagerComp.h>
 #include <imtauthgql/CExternalLoginCallbackServletComp.h>
 #include <imtauthgql/CTenantCollectionControllerComp.h>
@@ -114,6 +119,11 @@ typedef imtauthgql::CTokenBasedPermissionsProviderComp ClientRequestTokenBasedPe
 typedef imtauthgql::CPermissionsProviderComp PermissionsProvider;
 typedef imtauthgql::CPersonalAccessTokenControllerComp PersonalAccessTokenController;
 typedef imtauthgql::CServerTokenControllerComp ServerTokenController;
+typedef imtauthgql::CProductPermissionCatalogComp ProductPermissionCatalog;
+typedef imtauthgql::CProductPermissionPublisherComp ProductPermissionPublisher;
+typedef imtauthgql::CPublishedPermissionsProviderComp PublishedPermissionsProvider;
+typedef imtauthgql::CConnectedProductCollectionControllerComp ConnectedProductCollectionController;
+typedef imtauthgql::CConnectedProductCollectionDocumentServiceComp ConnectedProductCollectionDocumentService;
 typedef icomp::TModelCompWrap<imtauthgql::CClientRequestPersonalAccessTokenManagerComp> ClientRequestPersonalAccessTokenManager;
 typedef imtauthgql::CExternalLoginCallbackServletComp ExternalLoginCallbackServlet;
 typedef imtauthgql::CTenantCollectionControllerComp TenantCollectionController;
