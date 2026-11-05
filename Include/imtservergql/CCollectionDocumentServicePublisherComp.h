@@ -9,6 +9,7 @@
 #include <QtCore/QTimer>
 
 // ImtCore includes
+#include <imtdoc/IDocumentChangeNotificationConverter.h>
 #include <imtdoc/IDocumentService.h>
 #include <imtdoc/IDocumentServiceEventHandler.h>
 #include <imtservergql/CGqlPublisherCompBase.h>
@@ -34,6 +35,8 @@ public:
 		I_REGISTER_INTERFACE(imtdoc::IDocumentServiceEventHandler)
 		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "Collection ID", true, "DummyCollection");
 		I_ASSIGN(m_documentServiceCompPtr, "DocumentService", "Document service used to close documents without active subscribers", false, "DocumentService");
+		I_ASSIGN_MULTI_0(m_documentTypeIdsAttrPtr, "DocumentTypeIds", "List of document type-IDs related to converters ('DocumentChangeNotificationConverters')", false);
+		I_ASSIGN_MULTI_0(m_convertersCompPtr, "DocumentChangeNotificationConverters", "List of converters of document change sets to notification change IDs related to document types ('DocumentChangeNotificationConverterObjectTypeIdList')", false);
 		I_ASSIGN(m_closeDocumentTimeoutAttrPtr, "CloseDocumentTimeout", "Time (in seconds) a document may stay open after its last individual OnDocumentChanged subscriber is gone before it is closed. Values less or equal to zero disable automatic closing", true, 30);
 	I_END_COMPONENT;
 
@@ -128,6 +131,7 @@ protected:
 				const QList<QString>& undoLevelDescriptions,
 				const QList<QString>& redoLevelDescriptions,
 				sdl::V1_0::imtbase::CUndoInfo& sdlNotification) const;
+	const imtdoc::IDocumentChangeNotificationConverter* GetDocumentChangeNotificationConverter(const QByteArray& typeId) const;
 
 	template<class Representation>
 	void PublishRepresentation(
@@ -147,8 +151,10 @@ protected Q_SLOTS:
 				const QByteArray& userId);
 
 private:
-	I_REF(imtdoc::IDocumentService, m_documentServiceCompPtr);
 	I_ATTR(QByteArray, m_collectionIdAttrPtr);
+	I_REF(imtdoc::IDocumentService, m_documentServiceCompPtr);
+	I_MULTIATTR(QByteArray, m_documentTypeIdsAttrPtr);
+	I_MULTIREF(imtdoc::IDocumentChangeNotificationConverter, m_convertersCompPtr);
 	I_ATTR(int, m_closeDocumentTimeoutAttrPtr);
 
 private:

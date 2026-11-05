@@ -220,6 +220,14 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentChanged(imtdoc::CEventBa
 
 	sdl::V1_0::imtbase::CDocumentServiceNotification sdlNotification;
 	FillSdlNotification(concreteEventPtr, notification, sdl::V1_0::imtbase::EDocumentOperation::DocumentChanged, sdlNotification);
+	const imtdoc::IDocumentChangeNotificationConverter* converterPtr = GetDocumentChangeNotificationConverter(notification.typeId);
+	if (converterPtr != nullptr){
+		const QByteArrayList changeIds = converterPtr->GetChangeNotificationIds(
+					concreteEventPtr->GetChangeSet(),
+					concreteEventPtr->GetDocument());
+		sdlNotification.changeIds.Emplace();
+		sdlNotification.changeIds->FromList(changeIds);
+	}
 
 	PublishRepresentation(sdl::V1_0::imtbase::COnDocumentManagerChangedGqlRequest::GetCommandId(), notification.userId, sdlNotification);
 	PublishRepresentation(sdl::V1_0::imtbase::COnDocumentChangedGqlRequest::GetCommandId(), notification.userId, sdlNotification, notification.documentId);
@@ -546,6 +554,21 @@ void CCollectionDocumentServicePublisherComp::FillUndoInfoFromCache(
 	for (const QString& levelDescription : redoLevelDescriptions){
 		sdlNotification.redoLevelDescriptions->append(levelDescription);
 	}
+}
+
+
+const imtdoc::IDocumentChangeNotificationConverter* CCollectionDocumentServicePublisherComp::GetDocumentChangeNotificationConverter(const QByteArray& typeId) const
+{
+	int typeIdCount = m_documentTypeIdsAttrPtr.GetCount();
+	int converterCount = m_convertersCompPtr.GetCount();
+	int count = qMin(typeIdCount, converterCount);
+	for (int i = 0; i < count; i++){
+		if (m_documentTypeIdsAttrPtr[i] == typeId){
+			return m_convertersCompPtr[i];
+		}
+	}
+
+	return nullptr;
 }
 
 

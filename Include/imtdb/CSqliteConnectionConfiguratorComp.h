@@ -67,17 +67,17 @@ public:
 	*/
 	enum Synchronous
 	{
-		S_OFF = 0,
-		S_NORMAL = 1,
-		S_FULL = 2,
-		S_EXTRA = 3
+		SYNC_OFF = 0,
+		SYNC_NORMAL = 1,
+		SYNC_FULL = 2,
+		SYNC_EXTRA = 3
 	};
-	I_DECLARE_ENUM(Synchronous, S_OFF, S_NORMAL, S_FULL, S_EXTRA)
+	I_DECLARE_ENUM(Synchronous, SYNC_OFF, SYNC_NORMAL, SYNC_FULL, SYNC_EXTRA)
 
 	I_BEGIN_COMPONENT(CSqliteConnectionConfiguratorComp);
 		I_REGISTER_INTERFACE(IDatabaseConnectionConfigurator);
 		I_ASSIGN(m_journalModeAttrPtr, "JournalMode", "Journal mode of the database file.\nPossible values:\n0 - DELETE (the default of the driver);\n1 - TRUNCATE;\n2 - PERSIST;\n3 - MEMORY;\n4 - WAL (the readers and the writer do not block each other, needs a local file system);\n5 - OFF", true, JM_WAL);
-		I_ASSIGN(m_synchronousAttrPtr, "Synchronous", "Synchronization of the writes with the disk.\nPossible values:\n0 - OFF;\n1 - NORMAL (with WAL: a power failure can lose the last commits, but cannot damage the database);\n2 - FULL (the default of the driver);\n3 - EXTRA", true, S_NORMAL);
+		I_ASSIGN(m_synchronousAttrPtr, "Synchronous", "Synchronization of the writes with the disk.\nPossible values:\n0 - OFF;\n1 - NORMAL (with WAL: a power failure can lose the last commits, but cannot damage the database);\n2 - FULL (the default of the driver);\n3 - EXTRA", true, SYNC_NORMAL);
 		I_ASSIGN(m_foreignKeysAttrPtr, "ForeignKeys", "If enabled, the references between the tables (REFERENCES) are checked, SQLite does not check them by default", true, true);
 		I_ASSIGN(m_busyTimeoutAttrPtr, "BusyTimeoutMs", "Time in milliseconds that a connection waits for a lock of another connection before it fails with 'database is locked'. 0 - does not wait", true, 5000);
 	I_END_COMPONENT;
@@ -101,5 +101,3 @@ private:
 
 
 } // namespace imtdb
-
-

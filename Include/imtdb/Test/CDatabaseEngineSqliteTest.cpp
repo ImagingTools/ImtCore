@@ -280,12 +280,12 @@ void CDatabaseEngineSqliteTest::ConfiguratorSetsValuesTest_data()
 	QTest::addColumn<QString>("expectedBusyTimeout");
 
 	// The numbers of the attributes are the values of the enumerations of the configurator
-	QTest::newRow("DELETE, OFF, no foreign keys, no waiting") << int(Configurator::JM_DELETE) << int(Configurator::S_OFF) << false << 0 << "delete" << "0" << "0";
-	QTest::newRow("TRUNCATE, NORMAL") << int(Configurator::JM_TRUNCATE) << int(Configurator::S_NORMAL) << true << 1234 << "truncate" << "1" << "1234";
-	QTest::newRow("PERSIST, FULL") << int(Configurator::JM_PERSIST) << int(Configurator::S_FULL) << true << 5000 << "persist" << "1" << "5000";
-	QTest::newRow("MEMORY, EXTRA") << int(Configurator::JM_MEMORY) << int(Configurator::S_EXTRA) << true << 10 << "memory" << "1" << "10";
-	QTest::newRow("WAL, FULL") << int(Configurator::JM_WAL) << int(Configurator::S_FULL) << false << 60000 << "wal" << "0" << "60000";
-	QTest::newRow("OFF, NORMAL") << int(Configurator::JM_OFF) << int(Configurator::S_NORMAL) << true << 5000 << "off" << "1" << "5000";
+	QTest::newRow("DELETE, OFF, no foreign keys, no waiting") << int(Configurator::JM_DELETE) << int(Configurator::SYNC_OFF) << false << 0 << "delete" << "0" << "0";
+	QTest::newRow("TRUNCATE, NORMAL") << int(Configurator::JM_TRUNCATE) << int(Configurator::SYNC_NORMAL) << true << 1234 << "truncate" << "1" << "1234";
+	QTest::newRow("PERSIST, FULL") << int(Configurator::JM_PERSIST) << int(Configurator::SYNC_FULL) << true << 5000 << "persist" << "1" << "5000";
+	QTest::newRow("MEMORY, EXTRA") << int(Configurator::JM_MEMORY) << int(Configurator::SYNC_EXTRA) << true << 10 << "memory" << "1" << "10";
+	QTest::newRow("WAL, FULL") << int(Configurator::JM_WAL) << int(Configurator::SYNC_FULL) << false << 60000 << "wal" << "0" << "60000";
+	QTest::newRow("OFF, NORMAL") << int(Configurator::JM_OFF) << int(Configurator::SYNC_NORMAL) << true << 5000 << "off" << "1" << "5000";
 }
 
 
@@ -578,5 +578,3 @@ void CDatabaseEngineSqliteTest::WriteIsNotBlockedByUnfinishedReadTest()
 
 
 I_ADD_TEST(CDatabaseEngineSqliteTest);
-
-
