@@ -720,6 +720,20 @@ void CDocumentServiceIntegrationTest::ExecuteDocumentMethodWithResultTest()
 }
 
 
+void CDocumentServiceIntegrationTest::ExecuteDocumentConstMethodWithResultTest()
+{
+	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
+	QVERIFY(!docId.isEmpty());
+
+	QCOMPARE(SetDocumentText(*m_servicePtr, TEST_USER_ID, docId, QStringLiteral("first")), imtdoc::IDocumentService::OS_OK);
+
+	QString text;
+	const imtdoc::CDocumentMethod method(&iprm::ITextParam::GetText, text);
+	QCOMPARE(m_servicePtr->ExecuteDocumentMethod(TEST_USER_ID, docId, method), imtdoc::IDocumentService::OS_OK);
+	QCOMPARE(text, QStringLiteral("first"));
+}
+
+
 void CDocumentServiceIntegrationTest::UndoRedoChangedEventFiredTest()
 {
 	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID, TEST_DOC_NAME);
