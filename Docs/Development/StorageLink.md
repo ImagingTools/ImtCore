@@ -34,11 +34,28 @@ registry.RegisterResolver(&addressResolver);
 imtbase::StorageLinkBase::SetDefaultResolverProvider(&registry);
 
 imtbase::StorageLink<CAddress> link(addressId);
-link->SetCity("Berlin");
-link.Save();
+if (link){
+	link->SetCity("Berlin");
+	link.Save();
+}
 ```
 
 Different application profiles register different resolvers for the same storage IDs; the data model does not change.
+
+## Optional-like interface
+
+`StorageLink<T>` follows `std::optional<T>`:
+
+| Member | Meaning |
+|---|---|
+| `has_value()`, `explicit operator bool` | The linked object is available. Loads it on the first call. |
+| `value()` | The object; throws `std::bad_optional_access` if it is not available. |
+| `value_or(default)` | A copy of the object or of the default value. Requires `T` to be copy constructible. |
+| `operator*`, `operator->` | Unchecked access (asserts in debug). Use after `has_value()`. |
+| `reset()`, `= std::nullopt` | Clears the link target. The stored object stays in the storage; use `Remove()` to delete it. |
+| `IsNull()` | The link has no object ID. Cheap, never loads. |
+
+Differences to `std::optional`: copies of a link refer to the same stored object, and a link with an ID of a missing object is not null but has no value.
 
 ## Rules
 
