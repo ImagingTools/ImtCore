@@ -34,6 +34,9 @@
                     <AttributeInfo Id="PersonalAccessTokenManager" Type="Reference" ExportId="PersonalAccessTokenManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ServerProductId" Type="Id" ExportId="ServerProductId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="SlaveJwtSessionController" Type="Reference" ExportId="SlaveJwtSessionController">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

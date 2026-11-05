@@ -34,6 +34,12 @@ public:
 	virtual QByteArray GetProductId() const = 0;
 	virtual void SetProductId(const QByteArray& productId) = 0;
 
+	/**
+		Get the product whose server sends this request, empty for a request of a user.
+	*/
+	virtual QByteArray GetClientProductId() const = 0;
+	virtual void SetClientProductId(const QByteArray& clientProductId) = 0;
+
 	virtual QByteArray GetLanguageId() const = 0;
 	virtual void SetLanguageId(const QByteArray& languageId) = 0;
 

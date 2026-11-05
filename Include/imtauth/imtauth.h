@@ -188,6 +188,20 @@ inline QByteArrayList RestrictPermissions(const QByteArrayList& permissions, con
 
 
 /**
+	Permissions a server token can hold. They belong to the server receiving the requests, not to a product tree.
+*/
+static const inline QByteArray s_serverNotificationsSendPermission = QByteArrayLiteral("/ProductServer/Notifications/Send");
+static const inline QByteArray s_serverCollectionsWatchPermission = QByteArrayLiteral("/ProductServer/Collections/Watch");
+static const inline QByteArray s_serverPermissionsPublishPermission = QByteArrayLiteral("/ProductServer/Permissions/Publish");
+
+
+inline QByteArrayList GetServerTokenPermissions()
+{
+	return {s_serverNotificationsSendPermission, s_serverCollectionsWatchPermission, s_serverPermissionsPublishPermission};
+}
+
+
+/**
 	ID of the filter parameter (iprm::IIdParam) that selects the roles of one product.
 */
 static const inline QByteArray s_roleProductFilterId = QByteArrayLiteral("RoleProductFilter");

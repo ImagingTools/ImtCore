@@ -279,13 +279,15 @@ sdl::V1_0::imtauth::CValidateTokenPayload CPersonalAccessTokenControllerComp::On
 	QByteArray tokenId;
 	QByteArrayList scopes;
 	QByteArray productId;
-	bool isValid = m_tokenManagerCompPtr->ValidateToken(rawToken, userId, tokenId, scopes, &productId);
+	QByteArray clientProductId;
+	bool isValid = m_tokenManagerCompPtr->ValidateToken(rawToken, userId, tokenId, scopes, &productId, &clientProductId);
 
 	response.valid = isValid;
 
 	if (isValid){
 		response.userId = userId;
 		response.productId = productId;
+		response.clientProductId = clientProductId;
 		response.scopes.Emplace().FromList(scopes);
 		response.message = "Token is valid";
 	}

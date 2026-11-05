@@ -65,6 +65,22 @@ void CPersonalAccessToken::SetProductId(const QByteArray& productId)
 }
 
 
+QByteArray CPersonalAccessToken::GetClientProductId() const
+{
+	return m_clientProductId;
+}
+
+
+void CPersonalAccessToken::SetClientProductId(const QByteArray& clientProductId)
+{
+	if (m_clientProductId != clientProductId){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_clientProductId = clientProductId;
+	}
+}
+
+
 QString CPersonalAccessToken::GetName() const
 {
 	return m_name;
@@ -232,6 +248,11 @@ bool CPersonalAccessToken::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_productId);
 	retVal = retVal && archive.EndTag(productIdTag);
 
+	static iser::CArchiveTag clientProductIdTag("ClientProductId", "Product whose server uses the token");
+	retVal = retVal && archive.BeginTag(clientProductIdTag);
+	retVal = retVal && archive.Process(m_clientProductId);
+	retVal = retVal && archive.EndTag(clientProductIdTag);
+
 	static iser::CArchiveTag nameTag("Name", "Token name");
 	retVal = retVal && archive.BeginTag(nameTag);
 	retVal = retVal && archive.Process(m_name);
@@ -285,6 +306,7 @@ bool CPersonalAccessToken::CopyFrom(const istd::IChangeable& object, Compatibili
 	m_id = tokenPtr->m_id;
 	m_userId = tokenPtr->m_userId;
 	m_productId = tokenPtr->m_productId;
+	m_clientProductId = tokenPtr->m_clientProductId;
 	m_name = tokenPtr->m_name;
 	m_description = tokenPtr->m_description;
 	m_tokenHash = tokenPtr->m_tokenHash;
@@ -307,6 +329,7 @@ bool CPersonalAccessToken::IsEqual(const IChangeable& object) const
 		retVal = retVal && (m_id == sourcePtr->m_id);
 		retVal = retVal && (m_userId == sourcePtr->m_userId);
 		retVal = retVal && (m_productId == sourcePtr->m_productId);
+		retVal = retVal && (m_clientProductId == sourcePtr->m_clientProductId);
 		retVal = retVal && (m_name == sourcePtr->m_name);
 		retVal = retVal && (m_description == sourcePtr->m_description);
 		retVal = retVal && (m_tokenHash == sourcePtr->m_tokenHash);
@@ -339,6 +362,7 @@ bool CPersonalAccessToken::ResetData(CompatibilityMode /*mode*/)
 	m_id.clear();
 	m_userId.clear();
 	m_productId.clear();
+	m_clientProductId.clear();
 	m_name.clear();
 	m_description.clear();
 	m_tokenHash.clear();

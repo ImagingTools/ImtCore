@@ -1,0 +1,62 @@
+schema {
+	query: Query
+	mutation: Mutation
+	namespace: imtauth
+	version: 1.0
+}
+
+import {
+	"../../imtbase/1.0/ImtCollection.sdl"
+}
+
+# A personal access token without an owner: it identifies a server of a product.
+type ServerToken
+{
+	id: ID!
+	clientProductId: ID!
+	productId: ID!
+	name: String!
+	description: String
+	scopes: [ID]
+	createdAt: String
+	lastUsedAt: String
+	revoked: Bool
+}
+
+type ServerTokenList
+{
+	tokens: [ServerToken]
+}
+
+input ServerTokenListInput {
+	clientProductId: ID!
+}
+
+input CreateServerTokenInput {
+	clientProductId: ID!
+	productId: ID!
+	name: String!
+	description: String
+	scopes: [ID]
+}
+
+type CreateServerTokenPayload {
+	id: ID
+	token: ID
+	success: Boolean!
+	message: String
+}
+
+type RevokeServerTokenPayload {
+	success: Boolean!
+	message: String
+}
+
+type Query {
+	GetServerTokenList (input: ServerTokenListInput!): ServerTokenList!
+}
+
+type Mutation {
+	CreateServerToken (input: CreateServerTokenInput!): CreateServerTokenPayload!
+	RevokeServerToken (input: InputId!): RevokeServerTokenPayload!
+}

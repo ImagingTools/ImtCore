@@ -47,6 +47,7 @@ public:
 		I_ASSIGN(m_invitationManagerCompPtr, "InvitationManager", "Pending invitations that give a user outside of any organization access to the organizations", false, "InvitationManager");
 		I_ASSIGN(m_productInfoCompPtr, "FeatureContainer", "Product the permissions of a request are checked against", false, "FeatureContainer");
 		I_ASSIGN(m_patPrefixAttrPtr, "PatPrefix", "Personal Access Token prefix", false, "imt_pat_");
+		I_ASSIGN(m_serverProductIdAttrPtr, "ServerProductId", "ID of this server in the tokens of other servers, when no product info names it", false, "");
 		I_ASSIGN(m_maxTokenCacheSizeAttrPtr, "MaxTokenCacheSize", "Maximum number of cached tokens", false, 10000);
 		I_ASSIGN(m_tokenCacheTtlAttrPtr, "TokenCacheLifetime", "Token cache lifetime (in secs)", false, 5 * 60);
 		I_ASSIGN(m_tenantDataCacheTtlAttrPtr, "TenantDataCacheLifetime", "How long the scope, the ownership and the organization access of a token are cached (in secs)", false, 10);
@@ -88,6 +89,7 @@ private:
 		QByteArrayList scopes;
 		bool isPat = false;
 		QByteArray patProductId;
+		QByteArray patClientProductId;
 		qint64 expiresAt = 0;
 
 		// Organization data of the token, resolved lazily (see TryGetCachedTenantData /
@@ -119,7 +121,7 @@ private:
 		TryAwaitOrClaimTokenResolution() so cache-check and claim-check happen
 		under one continuous critical section.
 	*/
-	bool GetCachedPatProductId(const QByteArray& token, QByteArray& productId) const;
+	bool GetCachedPatProducts(const QByteArray& token, QByteArray& productId, QByteArray& clientProductId) const;
 	bool TryReadCachedTokenLocked(
 				const QByteArray& token,
 				QByteArray& userId,
@@ -161,7 +163,8 @@ private:
 				const QByteArrayList& scopes,
 				bool isPat,
 				qint64 jwtExpSecs = 0,
-				const QByteArray& patProductId = QByteArray()) const;
+				const QByteArray& patProductId = QByteArray(),
+				const QByteArray& patClientProductId = QByteArray()) const;
 	void StoreExpiredToken(const QByteArray& token) const;
 	void InvalidateTokenCache(const QByteArray& token) const;
 	void InvalidateSessionTokenCache(const QByteArray& sessionId) const;
@@ -229,6 +232,7 @@ private:
 	I_REF(imtauth::ITenantInvitationManager, m_invitationManagerCompPtr);
 	I_REF(imtlic::IProductInfo, m_productInfoCompPtr);
 	I_ATTR(QByteArray, m_patPrefixAttrPtr);
+	I_ATTR(QByteArray, m_serverProductIdAttrPtr);
 	I_ATTR(int, m_maxTokenCacheSizeAttrPtr);
 	I_ATTR(int, m_tokenCacheTtlAttrPtr);
 	I_ATTR(int, m_tenantDataCacheTtlAttrPtr);

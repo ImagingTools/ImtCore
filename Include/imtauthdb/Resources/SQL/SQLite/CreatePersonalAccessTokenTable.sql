@@ -3,8 +3,9 @@ CREATE TABLE IF NOT EXISTS "PersonalAccessTokens"
     "Id"         TEXT PRIMARY KEY,
     "Name"       TEXT NOT NULL,
     "Description" TEXT NOT NULL DEFAULT '',
-    "UserId"     TEXT NOT NULL,
+    "UserId"     TEXT,
     "ProductId"  TEXT,
+    "ClientProductId" TEXT,
     "TokenHash"  BLOB NOT NULL,
     -- Code stores scopes as comma-separated string, kept as text for compatibility
     "Scopes"     TEXT NOT NULL DEFAULT '',

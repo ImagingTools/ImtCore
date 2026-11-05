@@ -29,7 +29,8 @@ IPersonalAccessTokenManager::TokenCreationResult CPersonalAccessTokenManagerComp
 			const QString& name,
 			const QString& description,
 			const QByteArrayList& scopes,
-			const QDateTime& expiresAt)
+			const QDateTime& expiresAt,
+			const QByteArray& clientProductId)
 {
 	TokenCreationResult result;
 	result.success = false;
@@ -61,6 +62,7 @@ IPersonalAccessTokenManager::TokenCreationResult CPersonalAccessTokenManagerComp
 	tokenPtr->SetId(tokenId);
 	tokenPtr->SetUserId(userId);
 	tokenPtr->SetProductId(productId);
+	tokenPtr->SetClientProductId(clientProductId);
 	tokenPtr->SetName(name);
 	tokenPtr->SetDescription(description);
 	tokenPtr->SetTokenHash(tokenHash);
@@ -92,7 +94,8 @@ bool CPersonalAccessTokenManagerComp::ValidateToken(
 			QByteArray& userId,
 			QByteArray& tokenId,
 			QByteArrayList& scopes,
-			QByteArray* productIdPtr) const
+			QByteArray* productIdPtr,
+			QByteArray* clientProductIdPtr) const
 {
 	if (!m_tokenCollectionCompPtr.IsValid()){
 		SendErrorMessage(0, "Token collection not configured", "CPersonalAccessTokenManagerComp");
@@ -145,6 +148,9 @@ bool CPersonalAccessTokenManagerComp::ValidateToken(
 		if (productIdPtr != nullptr){
 			*productIdPtr = tokenPtr->GetProductId();
 		}
+		if (clientProductIdPtr != nullptr){
+			*clientProductIdPtr = tokenPtr->GetClientProductId();
+		}
 
 		return true;
 	}
@@ -152,6 +158,19 @@ bool CPersonalAccessTokenManagerComp::ValidateToken(
 	SendWarningMessage(0, "Token validation failed: token not found", "CPersonalAccessTokenManagerComp");
 
 	return false;
+}
+
+
+QByteArrayList CPersonalAccessTokenManagerComp::GetServerTokenIds(const QByteArray& clientProductId) const
+{
+	if (!m_tokenCollectionCompPtr.IsValid() || clientProductId.isEmpty()){
+		return QByteArrayList();
+	}
+
+	const imtbase::ICollectionInfo::Ids tokenIds = CollectionSelection::SelectIds(
+				*m_tokenCollectionCompPtr, CollectionSelection::ColumnEquals("ClientProductId", clientProductId), {"ClientProductId"});
+
+	return QByteArrayList(tokenIds.cbegin(), tokenIds.cend());
 }
 
 

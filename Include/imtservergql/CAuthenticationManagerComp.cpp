@@ -54,6 +54,7 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 	}
 	QByteArray resolvedUserId;
 	QByteArray tenantId;
+	QByteArray clientProductId;
 	QByteArrayList scopes;
 	bool isPat = false;
 	if (!token.isEmpty()){
@@ -64,19 +65,25 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 			return nullptr;
 		}
 
-		// A token works only for its product, whatever product the client names
 		if (isPat){
 			QByteArray tokenProductId;
 			const QByteArray headerProductId = headers.value(imtbase::s_productIdHeaderId);
-			if (!GetCachedPatProductId(token, tokenProductId)
-						|| (!tokenProductId.isEmpty() && ((m_productInfoCompPtr.IsValid() && tokenProductId != productId)
-									|| (!headerProductId.isEmpty() && tokenProductId != headerProductId)))){
-				SetError(error, imtgql::IGqlContextCreator::CCS_FORBIDDEN, QStringLiteral("The personal access token is not valid for this product."));
-				return nullptr;
+			bool isTokenAccepted = GetCachedPatProducts(token, tokenProductId, clientProductId);
+			if (isTokenAccepted && !clientProductId.isEmpty()){
+				// The token of a server names the server accepting it and the product using it
+				const QByteArray serverProductId = m_serverProductIdAttrPtr.IsValid() ? QByteArray(*m_serverProductIdAttrPtr) : productId;
+				isTokenAccepted = tokenProductId == serverProductId && (headerProductId.isEmpty() || headerProductId == clientProductId);
+				productId = clientProductId;
+			}
+			else if (isTokenAccepted && !tokenProductId.isEmpty()){
+				// A token works only for its product, whatever product the client names
+				isTokenAccepted = (!m_productInfoCompPtr.IsValid() || tokenProductId == productId) && (headerProductId.isEmpty() || tokenProductId == headerProductId);
+				productId = tokenProductId;
 			}
 
-			if (!tokenProductId.isEmpty()){
-				productId = tokenProductId;
+			if (!isTokenAccepted){
+				SetError(error, imtgql::IGqlContextCreator::CCS_FORBIDDEN, QStringLiteral("The personal access token is not valid for this product."));
+				return nullptr;
 			}
 		}
 	}
@@ -95,6 +102,7 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 	gqlContextPtr->SetToken(token);
 	gqlContextPtr->SetHeaders(headers);
 	gqlContextPtr->SetProductId(productId);
+	gqlContextPtr->SetClientProductId(clientProductId);
 	gqlContextPtr->SetProductInfo(m_productInfoCompPtr.GetPtr());
 	if (isPat){
 		gqlContextPtr->SetScopes(scopes);
@@ -616,7 +624,8 @@ bool CAuthenticationManagerComp::ResolveUserId(
 		}
 
 		QByteArray tokenProductId;
-		if (!m_patManagerCompPtr->ValidateToken(token, userId, tokenId, scopes, &tokenProductId)){
+		QByteArray tokenClientProductId;
+		if (!m_patManagerCompPtr->ValidateToken(token, userId, tokenId, scopes, &tokenProductId, &tokenClientProductId)){
 			errorMessage = QStringLiteral("Invalid personal access token.");
 			status = imtgql::IGqlContextCreator::CCS_FORBIDDEN;
 			SendWarningMessage(
@@ -634,7 +643,7 @@ bool CAuthenticationManagerComp::ResolveUserId(
 			return false;
 		}
 
-		StoreCachedToken(token, userId, tenantId, tokenId, scopes, true, 0, tokenProductId);
+		StoreCachedToken(token, userId, tenantId, tokenId, scopes, true, 0, tokenProductId, tokenClientProductId);
 		return true;
 	}
 
@@ -740,7 +749,7 @@ bool CAuthenticationManagerComp::TryGetCachedToken(
 }
 
 
-bool CAuthenticationManagerComp::GetCachedPatProductId(const QByteArray& token, QByteArray& productId) const
+bool CAuthenticationManagerComp::GetCachedPatProducts(const QByteArray& token, QByteArray& productId, QByteArray& clientProductId) const
 {
 	QMutexLocker cacheLocker(&m_tokenCacheMutex);
 	auto iter = m_tokenCache.constFind(token);
@@ -749,6 +758,7 @@ bool CAuthenticationManagerComp::GetCachedPatProductId(const QByteArray& token, 
 	}
 
 	productId = iter->patProductId;
+	clientProductId = iter->patClientProductId;
 	return true;
 }
 
@@ -833,10 +843,12 @@ void CAuthenticationManagerComp::StoreCachedToken(
 			const QByteArrayList& scopes,
 			bool isPat,
 			qint64 jwtExpSecs,
-			const QByteArray& patProductId) const
+			const QByteArray& patProductId,
+			const QByteArray& patClientProductId) const
 {
 	TokenCacheEntry entry;
 	entry.patProductId = patProductId;
+	entry.patClientProductId = patClientProductId;
 	entry.userId = userId;
 	entry.tenantId = tenantId;
 	entry.tokenId = tokenId;

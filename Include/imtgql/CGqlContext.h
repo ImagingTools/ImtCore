@@ -22,6 +22,8 @@ public:
 	// reimplemented (IGqlContext)
 	virtual QByteArray GetProductId() const override;
 	virtual void SetProductId(const QByteArray& productId) override;
+	virtual QByteArray GetClientProductId() const override;
+	virtual void SetClientProductId(const QByteArray& clientProductId) override;
 	virtual QByteArray GetLanguageId() const override;
 	virtual void SetLanguageId(const QByteArray& languageId) override;
 	virtual QByteArray GetDesignScheme() const override;
@@ -68,6 +70,7 @@ private:
 	QByteArray m_userId;
 	QByteArray m_tenantId;
 	QByteArray m_productId;
+	QByteArray m_clientProductId;
 	QByteArray m_languageId;
 	QByteArray m_designScheme;
 	QByteArray m_token;

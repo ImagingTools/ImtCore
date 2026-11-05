@@ -48,7 +48,8 @@ imtauth::IPersonalAccessTokenManager::TokenCreationResult CClientRequestPersonal
 			const QString& name,
 			const QString& description,
 			const QByteArrayList& scopes,
-			const QDateTime& expiresAt)
+			const QDateTime& expiresAt,
+			const QByteArray& /*clientProductId*/)
 {
 	namespace tokensdl = sdl::V1_0::imtauth;
 
@@ -106,7 +107,7 @@ imtauth::IPersonalAccessTokenManager::TokenCreationResult CClientRequestPersonal
 }
 
 
-bool CClientRequestPersonalAccessTokenManagerComp::ValidateToken(const QByteArray& rawToken, QByteArray& userId, QByteArray& tokenId, QByteArrayList& scopes, QByteArray* productIdPtr) const
+bool CClientRequestPersonalAccessTokenManagerComp::ValidateToken(const QByteArray& rawToken, QByteArray& userId, QByteArray& tokenId, QByteArrayList& scopes, QByteArray* productIdPtr, QByteArray* clientProductIdPtr) const
 {
 	namespace tokensdl = sdl::V1_0::imtauth;
 
@@ -140,10 +141,21 @@ bool CClientRequestPersonalAccessTokenManagerComp::ValidateToken(const QByteArra
 		*productIdPtr = *payload.productId;
 	}
 
+	if (clientProductIdPtr != nullptr && payload.clientProductId.has_value()){
+		*clientProductIdPtr = *payload.clientProductId;
+	}
+
 	// The SDL schema's ValidateTokenPayload does not include a tokenId field
 	tokenId = QByteArray();
 
 	return true;
+}
+
+
+QByteArrayList CClientRequestPersonalAccessTokenManagerComp::GetServerTokenIds(const QByteArray& /*clientProductId*/) const
+{
+	// The tokens of servers are managed on the authorization server only
+	return QByteArrayList();
 }
 
 

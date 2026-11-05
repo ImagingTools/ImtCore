@@ -186,6 +186,11 @@ I_EXPORT_COMPONENT(
 			"Personal Access Token Controller");
 
 I_EXPORT_COMPONENT(
+			ServerTokenController,
+			"Controller of the tokens of product servers",
+			"Server Token Controller");
+
+I_EXPORT_COMPONENT(
 			ClientRequestPersonalAccessTokenManager,
 			"Client request personal access token manager",
 			"Client Request Personal Access Token Manager");
