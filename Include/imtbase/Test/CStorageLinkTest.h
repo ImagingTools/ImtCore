@@ -27,5 +27,6 @@ private slots:
 	void testStorageParams();
 	void testSerialization();
 	void testLinksInContainer();
+	void testOptionalInterface();
 	void cleanupTestCase();
 };
