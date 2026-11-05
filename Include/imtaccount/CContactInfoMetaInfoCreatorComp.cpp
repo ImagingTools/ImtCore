@@ -38,12 +38,8 @@ bool CContactInfoMetaInfoCreatorComp::CreateMetaInfo(
 		return false;
 	}
 
-	metaInfoPtr->SetMetaInfo(IContactInfo::MIT_MAIL, contactPtr->GetEmail());
-	metaInfoPtr->SetMetaInfo(IContactInfo::MIT_GENDER_TYPE, contactPtr->GetGenderType());
-	metaInfoPtr->SetMetaInfo(IContactInfo::MIT_BIRTHDAY, contactPtr->GetBirthday());
-	metaInfoPtr->SetMetaInfo(IContactInfo::MIT_FIRST_NAME, contactPtr->GetNameField(IContactInfo::NFT_FIRST_NAME));
-	metaInfoPtr->SetMetaInfo(IContactInfo::MIT_LAST_NAME, contactPtr->GetNameField(IContactInfo::NFT_LAST_NAME));
-	metaInfoPtr->SetMetaInfo(IContactInfo::MIT_NICKNAME, contactPtr->GetNameField(IContactInfo::NFT_NICKNAME));
+	metaInfoPtr->SetMetaInfo(IContactInfo::MIT_EMAIL, contactPtr->GetEmail());
+	metaInfoPtr->SetMetaInfo(IContactInfo::MIT_PHONE, contactPtr->GetPhone());
 
 	return true;
 }
@@ -54,18 +50,10 @@ bool CContactInfoMetaInfoCreatorComp::CreateMetaInfo(
 QString CContactInfoMetaInfoCreatorComp::MetaInfo::GetMetaInfoName(int metaInfoType) const
 {
 	switch (metaInfoType){
-	case IContactInfo::MIT_MAIL:
+	case IContactInfo::MIT_EMAIL:
 		return QObject::tr("EMail");
-	case IContactInfo::MIT_GENDER_TYPE:
-		return QObject::tr("Gender");
-	case IContactInfo::MIT_BIRTHDAY:
-		return QObject::tr("Birthday");
-	case IContactInfo::MIT_FIRST_NAME:
-		return QObject::tr("First Name");
-	case IContactInfo::MIT_LAST_NAME:
-		return QObject::tr("Last Name");
-	case IContactInfo::MIT_NICKNAME:
-		return QObject::tr("Nickname");
+	case IContactInfo::MIT_PHONE:
+		return QObject::tr("Phone");
 	}
 
 	return BaseClass::GetMetaInfoName(metaInfoType);
