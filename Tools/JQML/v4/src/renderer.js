@@ -12,6 +12,9 @@ const WORDS = 5; // x, y, u, v, color
 const FRINGE_MITER_LIMIT = 3;
 const DRAW = 0;
 const STATE = 1;
+// Canvas AA reads heavier than Qt/DirectWrite on dark-on-light UI. Raise coverage to this power for
+// dark glyphs; light glyphs keep gamma 1 so white-on-accent fringes are not eaten.
+const COVERAGE_GAMMA = 1.6;
 
 const VERTEX_SHADER = `#version 300 es
 in vec2 aPos;
@@ -32,11 +35,20 @@ precision mediump float;
 in vec2 vUv;
 in vec4 vColor;
 uniform sampler2D uTex;
+uniform float uCoverageGamma;
 out vec4 outColor;
 void main() {
 	vec4 c = vColor;
 	c.rgb *= c.a;
-	outColor = texture(uTex, vUv) * c;
+	vec4 tex = texture(uTex, vUv);
+	if (uCoverageGamma > 1.0) {
+		float cov = tex.a;
+		float lum = dot(vColor.rgb, vec3(0.2126, 0.7152, 0.0722));
+		float g = mix(uCoverageGamma, 1.0, clamp(lum, 0.0, 1.0));
+		cov = pow(max(cov, 0.0), g);
+		tex = vec4(cov, cov, cov, cov);
+	}
+	outColor = tex * c;
 }`;
 
 export class Renderer {
@@ -124,7 +136,9 @@ export class Renderer {
 		}
 		gl.useProgram(program);
 		this.uView = gl.getUniformLocation(program, 'uView');
+		this.uCoverageGamma = gl.getUniformLocation(program, 'uCoverageGamma');
 		gl.uniform1i(gl.getUniformLocation(program, 'uTex'), 0);
+		gl.uniform1f(this.uCoverageGamma, 0.0);
 
 		this.vao = gl.createVertexArray();
 		gl.bindVertexArray(this.vao);
@@ -230,12 +244,18 @@ export class Renderer {
 			gl.bufferSubData(gl.ARRAY_BUFFER, 0, this.f32, 0, this.nv * WORDS);
 			gl.bufferSubData(gl.ELEMENT_ARRAY_BUFFER, 0, this.indices, 0, this.ni);
 			let bound = null;
+			let coverageOn = null;
 			for (const cmd of this.cmds) {
 				if (cmd.op === STATE) {
 					cmd.fn(gl);
 					continue;
 				}
 				const page = cmd.page;
+				const wantCoverage = page !== null && page.coverage === true;
+				if (wantCoverage !== coverageOn) {
+					gl.uniform1f(this.uCoverageGamma, wantCoverage ? COVERAGE_GAMMA : 0.0);
+					coverageOn = wantCoverage;
+				}
 				if (page !== null && page !== bound) {
 					this.uploadPage(page);
 					bound = page;

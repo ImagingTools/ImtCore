@@ -8,9 +8,6 @@ const PAGE_SIZE = 1024;
 const MAX_PAGES = 4;
 const GLYPH_PAD = 1;
 const MAX_RASTER_PX = 256;
-// Canvas grayscale AA looks heavier than Qt/DirectWrite. Raising coverage to this power thins the
-// fringes toward a ClearType-like stem without changing metrics.
-const COVERAGE_GAMMA = 1.6;
 const GENERIC_FAMILIES = new Set(['serif', 'sans-serif', 'monospace', 'cursive', 'fantasy', 'system-ui', 'ui-monospace']);
 
 function makeCanvas(width, height) {
@@ -108,9 +105,19 @@ export class GlyphAtlas {
 
 	newPage() {
 		const canvas = makeCanvas(PAGE_SIZE, PAGE_SIZE);
-		// Glyphs are post-processed with getImageData (coverage gamma); prefer a readable backing store.
-		const context = canvas ? canvas.getContext('2d', { willReadFrequently: true }) : null;
-		const page = { canvas, context, texture: null, dirty: true, cursorX: 0, cursorY: 4, rowHeight: 0, size: PAGE_SIZE };
+		const context = canvas ? canvas.getContext('2d') : null;
+		// `coverage`: renderer applies luminance-aware stem gamma (dark text thins, light text keeps fringes).
+		const page = {
+			canvas,
+			context,
+			texture: null,
+			dirty: true,
+			coverage: true,
+			cursorX: 0,
+			cursorY: 4,
+			rowHeight: 0,
+			size: PAGE_SIZE,
+		};
 		this.clearPage(page);
 		this.pages.push(page);
 		return page;
@@ -437,7 +444,6 @@ export class FontManager {
 		if (slot === null) return null;
 		slot.page.context.fillStyle = '#fff';
 		draw(slot.page.context, slot.x, slot.y);
-		sharpenGlyphCoverage(slot.page.context, slot.x, slot.y, boxW, boxH);
 
 		const size = slot.page.size;
 		let y0;
@@ -458,29 +464,6 @@ export class FontManager {
 			v1: (slot.y + boxH) / size,
 		};
 	}
-}
-
-// Pull soft AA fringes toward transparent so stems read closer to desktop hinting.
-function sharpenGlyphCoverage(context, x, y, w, h) {
-	if (!context || w <= 0 || h <= 0 || typeof context.getImageData !== 'function') return;
-	let image;
-	try {
-		image = context.getImageData(x, y, w, h);
-	} catch {
-		return;
-	}
-	const data = image.data;
-	for (let i = 0; i < data.length; i += 4) {
-		const a = data[i + 3];
-		if (a === 0 || a === 255) continue;
-		const coverage = Math.pow(a / 255, COVERAGE_GAMMA);
-		const value = Math.round(coverage * 255);
-		data[i] = value;
-		data[i + 1] = value;
-		data[i + 2] = value;
-		data[i + 3] = value;
-	}
-	context.putImageData(image, x, y);
 }
 
 export const fonts = new FontManager();
