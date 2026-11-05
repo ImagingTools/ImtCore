@@ -10,7 +10,7 @@ const GLYPH_PAD = 1;
 const MAX_RASTER_PX = 256;
 // Canvas grayscale AA looks heavier than Qt/DirectWrite. Raising coverage to this power thins the
 // fringes toward a ClearType-like stem without changing metrics.
-const COVERAGE_GAMMA = 2.0;
+const COVERAGE_GAMMA = 1.6;
 const GENERIC_FAMILIES = new Set(['serif', 'sans-serif', 'monospace', 'cursive', 'fantasy', 'system-ui', 'ui-monospace']);
 
 function makeCanvas(width, height) {

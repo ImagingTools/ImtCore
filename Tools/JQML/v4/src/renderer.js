@@ -251,15 +251,15 @@ export class Renderer {
 	}
 
 	// Binds the texture of a page, creating it and uploading the canvas when needed.
+	// `page.nearest`: sharp UI images (1:1). Glyph atlas pages leave it unset and keep LINEAR.
 	uploadPage(page) {
 		const gl = this.gl;
 		if (page.texture === null) {
 			page.texture = gl.createTexture();
 			gl.bindTexture(gl.TEXTURE_2D, page.texture);
-			// Glyphs are rasterized at device pixels and snapped when upright; NEAREST keeps stems
-			// from thickening under LINEAR. MIN stays LINEAR for scaled/rotated text.
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+			const filter = page.nearest ? gl.NEAREST : gl.LINEAR;
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, filter);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, filter);
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 			page.dirty = true;
@@ -368,13 +368,26 @@ export class Renderer {
 		if (this.reserve(4, 6)) {
 			const { ma, mb, mc, md, me, mf } = this;
 			const color = this.packRgba(255, 255, 255, opacity);
-			const x1 = x + w;
-			const y1 = y + h;
 			const base = this.nv;
-			this.vertex(ma * x + mc * y + me, mb * x + md * y + mf, u0, v0, color);
-			this.vertex(ma * x1 + mc * y + me, mb * x1 + md * y + mf, u1, v0, color);
-			this.vertex(ma * x1 + mc * y1 + me, mb * x1 + md * y1 + mf, u1, v1, color);
-			this.vertex(ma * x + mc * y1 + me, mb * x + md * y1 + mf, u0, v1, color);
+			// Sub-pixel quads + LINEAR smear icon edges; snap when the transform is upright.
+			if (mb === 0 && mc === 0) {
+				const dpr = this.dpr;
+				const x0 = Math.round((ma * x + me) * dpr) / dpr;
+				const y0 = Math.round((md * y + mf) * dpr) / dpr;
+				const x1 = Math.round((ma * (x + w) + me) * dpr) / dpr;
+				const y1 = Math.round((md * (y + h) + mf) * dpr) / dpr;
+				this.vertex(x0, y0, u0, v0, color);
+				this.vertex(x1, y0, u1, v0, color);
+				this.vertex(x1, y1, u1, v1, color);
+				this.vertex(x0, y1, u0, v1, color);
+			} else {
+				const x1 = x + w;
+				const y1 = y + h;
+				this.vertex(ma * x + mc * y + me, mb * x + md * y + mf, u0, v0, color);
+				this.vertex(ma * x1 + mc * y + me, mb * x1 + md * y + mf, u1, v0, color);
+				this.vertex(ma * x1 + mc * y1 + me, mb * x1 + md * y1 + mf, u1, v1, color);
+				this.vertex(ma * x + mc * y1 + me, mb * x + md * y1 + mf, u0, v1, color);
+			}
 			const idx = this.indices;
 			let i = this.ni;
 			idx[i++] = base;

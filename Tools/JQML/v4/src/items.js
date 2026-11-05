@@ -3711,15 +3711,28 @@ export class ImageItem extends Item {
 		const full = { w: fit.w / (fit.u1 - fit.u0), h: fit.h / (fit.v1 - fit.v0) };
 		const pw = Math.min(2048, Math.max(1, Math.round(full.w * k)));
 		const ph = Math.min(2048, Math.max(1, Math.round(full.h * k)));
-		const key = `${pw}x${ph}`;
+		const nw = this.$naturalWidth;
+		const nh = this.$naturalHeight;
+		// Integer (or near-1:1) scales keep bitmap icons crisp; fractional scales need smoothing.
+		const sx = nw > 0 ? pw / nw : 0;
+		const sy = nh > 0 ? ph / nh : 0;
+		const integerScale =
+			sx > 0 &&
+			sy > 0 &&
+			Math.abs(sx - Math.round(sx)) < 0.02 &&
+			Math.abs(sy - Math.round(sy)) < 0.02;
+		const nearest = integerScale || (sx > 0 && sy > 0 && sx <= 1.02 && sy <= 1.02);
+		const key = `${pw}x${ph}:${nearest ? 1 : 0}`;
 		if (this.$page === null || this.$pageKey !== key) {
 			if (typeof document === 'undefined') return;
 			const canvas = document.createElement('canvas');
 			canvas.width = pw;
 			canvas.height = ph;
-			canvas.getContext('2d').drawImage(this.$img, 0, 0, pw, ph);
+			const ctx = canvas.getContext('2d');
+			ctx.imageSmoothingEnabled = !nearest;
+			ctx.drawImage(this.$img, 0, 0, pw, ph);
 			if (this.$page !== null) r.dropPage(this.$page);
-			this.$page = { canvas, context: null, texture: null, dirty: true, size: Math.max(pw, ph) };
+			this.$page = { canvas, context: null, texture: null, dirty: true, size: Math.max(pw, ph), nearest };
 			this.$pageKey = key;
 		}
 		r.image(this.$page, fit.x, fit.y, fit.w, fit.h, fit.u0, fit.v0, fit.u1, fit.v1, opacity);
