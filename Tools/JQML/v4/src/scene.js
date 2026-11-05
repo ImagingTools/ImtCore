@@ -171,6 +171,11 @@ export class Scene {
 		this.syncCursor();
 	}
 
+	pointerDoubleClick(x, y, button = 0) {
+		const target = this.root.$itemAt(x, y, false, button);
+		if (target !== null && typeof target.$mouseDoubleClicked === 'function') target.$mouseDoubleClicked(button);
+	}
+
 	pointerLeave() {
 		this.setHovered(null);
 		this.syncCursor();

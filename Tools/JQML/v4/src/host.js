@@ -28,6 +28,10 @@ export function attachCanvas(canvas, scene, engine, options = {}) {
 		if (e.button !== 0 && e.button !== 2) return;
 		scene.pointerUp(...position(e));
 	});
+	canvas.addEventListener('dblclick', (e) => {
+		if (e.button !== 0 && e.button !== 2) return;
+		scene.pointerDoubleClick(...position(e), e.button);
+	});
 	canvas.addEventListener('contextmenu', (e) => e.preventDefault());
 	canvas.addEventListener('pointerleave', () => {
 		if (scene.pressed === null) scene.pointerLeave();

@@ -2533,6 +2533,11 @@ export class MouseArea extends Item {
 	$mouseClicked() {
 		this.$emit('clicked', [this.$mouseEvent()]);
 	}
+
+	$mouseDoubleClicked(button) {
+		this.$pressButton = button;
+		this.$emit('doubleClicked', [this.$mouseEvent()]);
+	}
 }
 
 defineReadOnly(MouseArea.prototype, 'containsMouse', function () {
@@ -3783,7 +3788,7 @@ export class ImageItem extends Item {
 	}
 
 	$paint(r, opacity) {
-		if (this.$status !== 1 || this.$img === null || this.$aw <= 0 || this.$ah <= 0) return;
+		if ((this.$status !== 1 && this.$status !== 2) || this.$img === null || this.$aw <= 0 || this.$ah <= 0) return;
 		const fit = this.$fit();
 		if (fit.w <= 0 || fit.h <= 0) return;
 		const k = r.dpr * Math.max(1, Math.abs(r.ma));
