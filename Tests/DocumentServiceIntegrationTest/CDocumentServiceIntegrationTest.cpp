@@ -705,6 +705,21 @@ void CDocumentServiceIntegrationTest::UndoRedoExecuteDocumentMethodTest()
 }
 
 
+void CDocumentServiceIntegrationTest::ExecuteDocumentMethodWithResultTest()
+{
+	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
+	QVERIFY(!docId.isEmpty());
+
+	QCOMPARE(SetDocumentText(*m_servicePtr, TEST_USER_ID, docId, QStringLiteral("first")), imtdoc::IDocumentService::OS_OK);
+
+	bool isReset = false;
+	const imtdoc::CDocumentMethod method(&istd::IChangeable::ResetData, isReset, istd::IChangeable::CM_WITHOUT_REFS);
+	QCOMPARE(m_servicePtr->ExecuteDocumentMethod(TEST_USER_ID, docId, method), imtdoc::IDocumentService::OS_OK);
+	QVERIFY2(isReset, "Result of the document method should be returned");
+	QCOMPARE(GetDocumentText(*m_servicePtr, TEST_USER_ID, docId), QString());
+}
+
+
 void CDocumentServiceIntegrationTest::UndoRedoChangedEventFiredTest()
 {
 	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID, TEST_DOC_NAME);

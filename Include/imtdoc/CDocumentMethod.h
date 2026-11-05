@@ -30,8 +30,9 @@ namespace imtdoc
 	declaring the method needn't derive from \c istd::IChangeable, it only has to be a base of the
 	same concrete document object. \c static_cast cannot express this.
 
-	Only \c void -returning, non-\c const methods can be bound, and their parameters must be taken by
-	value or by \c const reference - see the constructor.
+	Only non-\c const methods can be bound, and their parameters must be taken by value or by \c const
+	reference - see the constructors. The result of a non-\c void method is written to a variable
+	passed to the constructor.
 
 	\par Example
 	\code
@@ -39,6 +40,12 @@ namespace imtdoc
 					userId,
 					documentId,
 					imtdoc::CDocumentMethod(&MyDocument::AddItems, items));
+
+		bool isRemoved = false;
+		documentServicePtr->ExecuteDocumentMethod(
+					userId,
+					documentId,
+					imtdoc::CDocumentMethod(&MyDocument::RemoveItem, isRemoved, itemId));
 	\endcode
 */
 class CDocumentMethod
@@ -70,6 +77,37 @@ public:
 					}
 
 					(documentPtr->*method)(args...);
+
+					return true;
+				})
+	{
+	}
+
+	/**
+		\brief Bind \a method and \a args, to be invoked later against a document of type \a Document;
+		the result of \a method is written to \a ret.
+
+		\a Ret is deduced from \a method alone, \a ret only has to hold its decayed type.
+		\a ret is referenced, not copied, so it must outlive every invocation of this object.
+		\a ret is left unchanged if the method was not called.
+	*/
+	template <typename Ret, typename Document, typename... Args>
+	explicit CDocumentMethod(Ret (Document::*method)(Args...), std::decay_t<Ret>& ret, std::decay_t<Args>... args) :
+				m_invoke([method,
+							retPtr = &ret,
+#if __cplusplus >= 202002L // C++20 or newer
+							...args = std::move(args)
+#else
+							args...
+#endif
+							](istd::IChangeable& document) {
+					auto* documentPtr = dynamic_cast<Document*>(&document);
+					Q_ASSERT(documentPtr != nullptr);
+					if (documentPtr == nullptr){
+						return false;
+					}
+
+					*retPtr = (documentPtr->*method)(args...);
 
 					return true;
 				})
