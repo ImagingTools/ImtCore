@@ -673,9 +673,16 @@ module.exports = {
 
         this.__onMouseUp(e)
         if(this.event) this.event.fillButton(e)
-        this.click(e)
+        this.click(e, this.__isReleasedOutside(e))
 
         this.__clearHover(target)
+    },
+
+    // Qt: a press released outside the area is not a click.
+    __isReleasedOutside: function(e){
+        if(!this.event || !this.event.target) return false
+
+        return this.getObjectsFromPoint(e.clientX, e.clientY).indexOf(this.event.target) < 0
     },
 
     __onPointerCancel: function(e){
@@ -708,7 +715,7 @@ module.exports = {
         window.addEventListener('click', (e)=>{
             if(this.__isEmulatedMouseEvent()) return
             if(this.event) this.event.fillButton(e)
-            this.click(e)
+            this.click(e, this.__isReleasedOutside(e))
         })
         window.addEventListener('dblclick', (e)=>{
             e.preventDefault()
@@ -723,6 +730,12 @@ module.exports = {
         })
         window.addEventListener('contextmenu', (e)=>{
             if(this.__isEmulatedMouseEvent()){
+                e.preventDefault()
+                return
+            }
+
+            // Long press and the menu key arrive without an active press.
+            if(!this.event){
                 e.preventDefault()
                 return
             }
@@ -775,7 +788,7 @@ module.exports = {
         })
     },
 
-    click: function(e){
+    click: function(e, releasedOutside){
         if(this.event && this.event.target){
             if(this.event.target.__destroyed) return
             
@@ -788,7 +801,9 @@ module.exports = {
 
             let _button = this.buttons[event.button]
 
-            if(e.timeStamp - _button.timeStamp > 300 || _button.target !== event.target){
+            if(releasedOutside){
+                event.target.__onMouseReleasedOutside(event)
+            } else if(e.timeStamp - _button.timeStamp > 300 || _button.target !== event.target){
                 _button.timeStamp = e.timeStamp
                 _button.target = event.target
                 event.target.__onMouseClick(event)

@@ -193,16 +193,21 @@ class MouseArea extends Item {
     }
 
     __onMouseDblClick(mouse){
-        if(!this.enabled || !this.visible || !(mouse.button & this.acceptedButtons)) return
-
+        let wasPressed = this.__pressed
+        this.__pressed = false
         this.__resetPressed(mouse)
 
-        if(mouse.target === this && this.__pressed){
+        if(!this.enabled || !this.visible || !(mouse.button & this.acceptedButtons)) return
+
+        if(mouse.target === this && wasPressed){
             this.clicked(mouse)
             this.__emitComposedDoubleClick(mouse)
         }
+    }
 
+    __onMouseReleasedOutside(mouse){
         this.__pressed = false
+        this.__resetPressed(mouse)
     }
 
     __onWheel(wheel){
