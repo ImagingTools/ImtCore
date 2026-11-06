@@ -821,6 +821,9 @@ export class Engine {
 			}
 			for (const exported of names) define(exported, () => (load() === null ? undefined : load()[exported]));
 			define(name, () => load());
+			// A script with no top-level names (a UMD library such as moment.js) is reached through a global that it sets itself:
+			// nothing would load it, so it runs at once, like the import of a module in Qt.
+			if (source !== undefined && names.length === 0) load();
 		}
 	}
 

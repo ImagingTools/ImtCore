@@ -1498,6 +1498,9 @@ defineProp(
 	Item.prototype,
 	'width',
 	function () {
+		// A `width` that is a binding is worked out when another binding reads it (`Math.max(a.width, b.width)` of items made
+		// after the reader): its first value is not 0 for them.
+		if (this.$bindings !== null && !this.$constructing && hooks.initializeProperty !== null) hooks.initializeProperty(this, 'width');
 		this.$ensureGeometry();
 		// `$w === 0` means unset (use the laid-out `$aw`). An explicit negative width must be
 		// readable as-is: ButtonDecorator cancels contentSpacing with `width: -Style.marginM`.
@@ -1521,6 +1524,7 @@ defineProp(
 	Item.prototype,
 	'height',
 	function () {
+		if (this.$bindings !== null && !this.$constructing && hooks.initializeProperty !== null) hooks.initializeProperty(this, 'height');
 		this.$ensureGeometry();
 		if (this.$anchors !== null && this.$anchors.$affectsHeight) return this.$ah;
 		if (this.$h < 0) return this.$h;
@@ -3304,7 +3308,9 @@ export class ListView extends Item {
 				this.createDelegate = null;
 				return;
 			}
-			// Prefer the explicit size binding; fall back to the laid-out size after create.
+			// Prefer the explicit size binding; fall back to the laid-out size after create. Reading the size works out a binding.
+			if (horizontal) probe.width;
+			else probe.height;
 			const extent = horizontal
 				? probe.$w > 0
 					? probe.$w
@@ -5890,6 +5896,11 @@ export class TreeItemModel extends Item {
 		this.$ensureRow(index)[key] = model;
 		this.$touch();
 		return model;
+	}
+
+	// The C++ model takes the other model as the value of the key (it is not copied).
+	setExternTreeModel(key, value, index = 0) {
+		return this.setData(key, value, index);
 	}
 
 	insertNewItem(index) {
