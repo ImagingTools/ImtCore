@@ -16,18 +16,36 @@
 namespace imtauth
 {
 
+
 #ifdef Q_OS_WIN
 namespace
 {
+
+
 class ComScope
 {
 public:
-	ComScope(): m_result(CoInitializeEx(nullptr, COINIT_MULTITHREADED)) {}
-	~ComScope() { if (SUCCEEDED(m_result)){ CoUninitialize(); } }
-	bool IsValid() const { return SUCCEEDED(m_result) || m_result == RPC_E_CHANGED_MODE; }
+	ComScope()
+		:m_result(CoInitializeEx(nullptr, COINIT_MULTITHREADED))
+	{
+	}
+
+	~ComScope()
+	{
+		if (SUCCEEDED(m_result)){
+			CoUninitialize();
+		}
+	}
+
+	bool IsValid() const
+	{
+		return SUCCEEDED(m_result) || m_result == RPC_E_CHANGED_MODE;
+	}
+
 private:
 	HRESULT m_result;
 };
+
 
 QByteArray SidString(void* data, DWORD size)
 {
@@ -46,6 +64,7 @@ QByteArray SidString(void* data, DWORD size)
 	LocalFree(text);
 	return result;
 }
+
 
 bool ReadSidArray(const VARIANT& value, QByteArray& sid)
 {
@@ -67,6 +86,8 @@ bool ReadSidArray(const VARIANT& value, QByteArray& sid)
 	SafeArrayUnaccessData(value.parray);
 	return !sid.isEmpty();
 }
+
+
 }
 #endif
 
@@ -149,8 +170,12 @@ bool CLdapGroupDirectory::DiscoverGroups(const QString& pattern, QMap<QByteArray
 				ADS_OCTET_STRING value = sidColumn.pADsValues[0].OctetString;
 				sid = SidString(value.lpValue, value.dwLength);
 			}
-			if (hasName){ search->FreeColumn(&nameColumn); }
-			if (hasSid){ search->FreeColumn(&sidColumn); }
+			if (hasName){
+				search->FreeColumn(&nameColumn);
+			}
+			if (hasSid){
+				search->FreeColumn(&sidColumn);
+			}
 			if (sid.isEmpty() || name.isEmpty() || found.size() >= 10000){
 				ok = false;
 				break;
@@ -159,9 +184,13 @@ bool CLdapGroupDirectory::DiscoverGroups(const QString& pattern, QMap<QByteArray
 		}
 		ok = ok && row == S_ADS_NOMORE_ROWS;
 	}
-	if (handle != nullptr){ search->CloseSearchHandle(handle); }
+	if (handle != nullptr){
+		search->CloseSearchHandle(handle);
+	}
 	search->Release();
-	if (ok){ groups = found; }
+	if (ok){
+		groups = found;
+	}
 	return ok;
 #else
 	return false;
@@ -232,10 +261,14 @@ bool CLdapGroupDirectory::GetSecurityGroups(const QByteArray& userSid, QByteArra
 		QByteArray groupSid;
 		ok = SUCCEEDED(SafeArrayGetElement(memberships.parray, &index, &value)) && ReadSidArray(value, groupSid);
 		VariantClear(&value);
-		if (ok && !found.contains(groupSid)){ found.append(groupSid); }
+		if (ok && !found.contains(groupSid)){
+			found.append(groupSid);
+		}
 	}
 	VariantClear(&memberships);
-	if (ok){ groupSids = found; }
+	if (ok){
+		groupSids = found;
+	}
 	return ok;
 #else
 	Q_UNUSED(userSid)
