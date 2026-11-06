@@ -73,6 +73,31 @@ type DocumentTypeId {
 	singleDocumentInstance: Bool
 }
 
+## Kind of change of a node or parameter relative to the previous document state
+enum EChangeOperation {
+	Added
+	Removed
+	Modified
+}
+
+## Scalar value of a changed parameter
+union ChangeParameterValue = Double | String | Int | Bool
+
+## Leaf of the change tree: one changed scalar value
+type ChangeParameter {
+	id: ID!										# Parameter ID; defined by the schema of the document type
+	operation: EChangeOperation!
+	value: ChangeParameterValue					# New value; not set for Removed
+}
+
+## Inner node of the change tree: a changed part of the document
+type ChangeNode {
+	id: ID!										# Node ID; defined by the schema of the document type
+	operation: EChangeOperation!
+	parameters: [ChangeParameter]
+	nodes: [ChangeNode]
+}
+
 type DocumentServiceNotification {
 	documentOperation: EDocumentOperation!
 	documentId: ID!
@@ -84,6 +109,7 @@ type DocumentServiceNotification {
 	hasNameProvider: Bool
 	changeIds: [ID]								# Populated only for DocumentChanged notifications; IDs are defined in the schema of the document controller for this document type
 	requestId: ID								# DocumentChanged only: ID of the client request that made the change (X-Request-ID header)
+	changes: [ChangeNode]						# DocumentChanged only: tree of changes; root node IDs match changeIds
 }
 
 type SetDocumentNameInput {
