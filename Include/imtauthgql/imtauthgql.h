@@ -635,6 +635,7 @@ namespace imtauthgql
 {
 
 
+/** Serializes edits to a user with updates to that user's directory-owned roles. */
 /**
 	Collect flat permission entries from a feature subtree.
 	A permission is identified by the full path of its feature, e.g. "/Administration/EditUser/AddUser".
@@ -1298,7 +1299,7 @@ inline istd::IChangeableUniquePtr AdaptUserForTenant(
 	roles, its groups, their parent groups and the roles of those groups.
 	Parent roles, parent groups and group roles count only when they are
 	visible in the tenant, so an entity of another organization grants nothing.
-	Without a tenant this is IUserBaseInfo::GetPermissions().
+	Without a tenant, directory roles are traversed with the global binding filter.
 */
 inline imtauth::IUserBaseInfo::FeatureIds GetTenantUserPermissions(
 				const imtauth::IUserInfo& userInfo,
@@ -1308,7 +1309,9 @@ inline imtauth::IUserBaseInfo::FeatureIds GetTenantUserPermissions(
 				imtauth::IRoleInfoProvider* roleInfoProvider)
 {
 	const imtauth::IRoleInfoProvider* roleProviderPtr = (roleInfoProvider != nullptr) ? roleInfoProvider : userInfo.GetRoleProvider();
-	if (tenantId.isEmpty() || bindingManager == nullptr || roleProviderPtr == nullptr){
+	const imtauth::CUserBaseInfo* directoryUser = dynamic_cast<const imtauth::CUserBaseInfo*>(&userInfo);
+	const bool hasDirectoryRoles = directoryUser != nullptr && !directoryUser->GetDirectoryRoles(productId).isEmpty();
+	if (bindingManager == nullptr || roleProviderPtr == nullptr || (tenantId.isEmpty() && !hasDirectoryRoles)){
 		return userInfo.GetPermissions(productId);
 	}
 

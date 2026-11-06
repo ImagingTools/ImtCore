@@ -6,6 +6,9 @@
 #include <imtauth/CRole.h>
 #include <imtauth/IUserBaseInfo.h>
 
+// Qt includes
+#include <QtCore/QMutex>
+
 
 namespace imtauth
 {
@@ -26,6 +29,7 @@ public:
 	void SetDirectoryRoles(const QByteArray& productId, const RoleIds& roles);
 	bool ResolveDirectoryRoles(const QByteArray& productId, RoleIds& roles, FeatureIds& permissions) const;
 	static bool IsReservedProductId(const QByteArray& productId);
+	static QMutex& GetUserUpdateMutex(const QByteArray& userId);
 
 	// reimplemented (iser::IUserBaseInfo)
 	virtual const imtlic::IFeatureInfoProvider* GetPermissionProvider() const override;

@@ -38,6 +38,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>UserToken</Value>
+                                <Value>Authorization</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

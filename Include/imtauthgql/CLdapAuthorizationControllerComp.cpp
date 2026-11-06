@@ -308,23 +308,31 @@ QJsonObject CLdapAuthorizationControllerComp::CreateInternalResponse(
 		QJsonObject catalogs;
 		QString catalogError;
 		if (!ReadGroupCatalog(catalogs, catalogError)){
-			// The catalog never grants access; an unreadable one is rebuilt from the directory.
-			catalogs = QJsonObject();
-		}
-		if (hasGroups){
-			catalogs.insert(product, CreateCatalogEntry(pattern, groups));
-		}
-		else if (catalogs.value(product).toObject().value("pattern").toString() != pattern){
-			catalogs.remove(product);
-		}
-		if (WriteGroupCatalog(catalogs, catalogError)){
-			if (hasGroups){
-				MarkSynchronized(QStringList{product});
+			locker.unlock();
+			fileLock.unlock();
+			catalogError.clear();
+			if (!SynchronizeDirectoryGroups(catalogError)){
+				SetSynchronizationError(catalogError);
+				SendWarningMessage(0, catalogError, s_logSource);
 			}
+			locker.relock();
 		}
 		else{
-			SetSynchronizationError(catalogError);
-			SendErrorMessage(0, catalogError, s_logSource);
+			if (hasGroups){
+				catalogs.insert(product, CreateCatalogEntry(pattern, groups));
+			}
+			else if (catalogs.value(product).toObject().value("pattern").toString() != pattern){
+				catalogs.remove(product);
+			}
+			if (WriteGroupCatalog(catalogs, catalogError)){
+				if (hasGroups){
+					MarkSynchronized(QStringList{product});
+				}
+			}
+			else{
+				SetSynchronizationError(catalogError);
+				SendErrorMessage(0, catalogError, s_logSource);
+			}
 		}
 	}
 	else if (command == "DiscoverLdapGroups"){
@@ -374,7 +382,13 @@ QJsonObject CLdapAuthorizationControllerComp::CreateInternalResponse(
 		QJsonObject catalogs;
 		QString catalogError;
 		if (!ReadGroupCatalog(catalogs, catalogError)){
-			catalogs = QJsonObject();
+			locker.unlock();
+			catalogError.clear();
+			SynchronizeDirectoryGroups(catalogError);
+			locker.relock();
+			if (!ReadGroupCatalog(catalogs, catalogError)){
+				catalogs = QJsonObject();
+			}
 		}
 		response.insert("groups", CreateCatalogRows(catalogs.value(product).toObject(), settings.value("pattern").toString()));
 		QMutexLocker statusLocker(&m_directoryStatusMutex);
@@ -485,6 +499,7 @@ bool CLdapAuthorizationControllerComp::PrepareAuthorization(
 	}
 	QByteArray objectId = GetUserObjectId(userInfo.GetId());
 	imtbase::IObjectCollection::DataPtr data;
+	QMutexLocker userUpdateLocker(&imtauth::CUserBaseInfo::GetUserUpdateMutex(objectId));
 	if (objectId.isEmpty() || !m_userCollectionCompPtr.IsValid() ||
 		!m_userCollectionCompPtr->GetObjectData(objectId, data)){
 		errorMessage = QStringLiteral("Unable to load LDAP role grants");
@@ -1012,6 +1027,7 @@ sdl::V1_0::imtauth::CAuthorizationPayload CLdapAuthorizationControllerComp::OnAu
 					}
 				}
 				else{
+					QMutexLocker userUpdateLocker(&imtauth::CUserBaseInfo::GetUserUpdateMutex(userObjectId));
 					imtbase::IObjectCollection::DataPtr dataPtr;
 					if (m_userCollectionCompPtr->GetObjectData(userObjectId, dataPtr)){
 						userInfoPtr.MoveCastedPtr(dataPtr.GetPtr()->CloneMe());
@@ -1026,6 +1042,8 @@ sdl::V1_0::imtauth::CAuthorizationPayload CLdapAuthorizationControllerComp::OnAu
 							for (const imtauth::IUserInfo::SystemInfo& system : userInfoPtr->GetSystemInfos()){
 								if (system.systemId == *m_systemIdAttrPtr){
 									if (!system.enabled){
+										userUpdateLocker.unlock();
+
 										return BaseClass::OnAuthorization(authorizationRequest, gqlRequest, errorMessage);
 									}
 									hasLdapSystem = true;
@@ -1084,6 +1102,7 @@ sdl::V1_0::imtauth::CAuthorizationPayload CLdapAuthorizationControllerComp::OnAu
 								}
 							}
 						}
+						userUpdateLocker.unlock();
 					}
 				}
 

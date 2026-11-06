@@ -27,8 +27,11 @@ private slots:
 	void testDisabledMappingAllowsLegacyProductlessLogin();
 	void testIdentityAndProviderFailuresDenyMappedGrants();
 	void testDirectoryRolesRespectTenantBindings();
+	void testGlobalDirectoryRoleInheritanceRespectsTenantBindings();
 	void testNotificationsSynchronizeGroupList();
 	void testFailedDirectoryReadKeepsGroupList();
+	void testCorruptCatalogRecoversOnRead();
+	void testSaveWithCorruptCatalogRecoversAllProducts();
 	void testReconnectResynchronizesGroupList();
 	void testGroupListIsProductScopedAndServerOwned();
 	void testUnsupportedNotificationsAreReported();

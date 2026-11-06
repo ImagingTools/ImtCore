@@ -18,6 +18,7 @@
 // ImtCore includes
 #include <imtbase/imtbase.h>
 #include <imtauth/imtauth.h>
+#include <imtauth/CUserBaseInfo.h>
 #include <imtauth/IUserSettings.h>
 #include <imtgql/CGqlRequestContextManager.h>
 #include <imtgql/imtgql.h>
@@ -172,8 +173,12 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 				// Strip roles/groups so no other code path can expand them back into
 				// unrestricted permissions; only the explicit scoped list applies.
 				const QByteArrayList products = mutableUserPtr->GetProducts();
+				imtauth::CUserBaseInfo* directoryUserPtr = dynamic_cast<imtauth::CUserBaseInfo*>(mutableUserPtr);
 				for (const QByteArray& prod : products){
 					mutableUserPtr->SetRoles(prod, imtauth::IUserBaseInfo::RoleIds());
+					if (directoryUserPtr != nullptr){
+						directoryUserPtr->SetDirectoryRoles(prod, imtauth::IUserBaseInfo::RoleIds());
+					}
 				}
 				const imtauth::IUserGroupInfo::GroupIds groupIds = mutableUserPtr->GetGroups();
 				for (const QByteArray& groupId : groupIds){

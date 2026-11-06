@@ -39,6 +39,7 @@ const QString GroupSid("S-1-5-21-1");
 const QByteArray FirstRole("11111111-1111-4111-8111-111111111111");
 const QByteArray SecondRole("22222222-2222-4222-8222-222222222222");
 const QByteArray ForeignRole("33333333-3333-4333-8333-333333333333");
+const QByteArray TenantBoundParentRole("88888888-8888-4888-8888-888888888888");
 const QByteArray MemberObjectId("44444444-4444-4444-8444-444444444444");
 const QByteArray NewMemberObjectId("55555555-5555-4555-8555-555555555555");
 const QByteArray TenantA("66666666-6666-4666-8666-666666666666");
@@ -704,6 +705,27 @@ void CLdapGroupMappingTest::testDirectoryRolesRespectTenantBindings()
 }
 
 
+void CLdapGroupMappingTest::testGlobalDirectoryRoleInheritanceRespectsTenantBindings()
+{
+	CFixture fixture;
+	fixture.AddRole(TenantBoundParentRole, Product, "/TenantBound");
+	imtbase::IObjectCollection::DataPtr roleData;
+	QVERIFY(fixture.roles->GetObjectData(FirstRole, roleData));
+	imtauth::IRole* role = dynamic_cast<imtauth::IRole*>(roleData.GetPtr());
+	QVERIFY(role != nullptr);
+	QVERIFY(role->IncludeRole(TenantBoundParentRole));
+	QVERIFY(fixture.roles->SetObjectData(FirstRole, *role));
+	fixture.user.SetDirectoryRoles(Product, {FirstRole});
+
+	CBindings bindings;
+	QVERIFY(bindings.AddBinding(TenantB, "Roles", TenantBoundParentRole));
+	auto globalPermissions = imtauthgql::GetEffectiveUserPermissions(MemberObjectId, fixture.user,
+		QByteArray(), Product, &bindings, nullptr, nullptr, &fixture.provider.GetImpl());
+
+	QCOMPARE(globalPermissions, QByteArrayList({"/First"}));
+}
+
+
 void CLdapGroupMappingTest::testNotificationsSynchronizeGroupList()
 {
 	CFixture fixture;
@@ -766,6 +788,44 @@ void CLdapGroupMappingTest::testFailedDirectoryReadKeepsGroupList()
 	data = fixture.GroupSettings();
 	QCOMPARE(CFixture::GroupIds(data), QStringList({QStringLiteral("S-1-5-21-3")}));
 	QVERIFY(data.value("synchronizationError").toString().isEmpty());
+}
+
+
+void CLdapGroupMappingTest::testCorruptCatalogRecoversOnRead()
+{
+	CFixture fixture;
+	QFile catalog(fixture.fileName + QStringLiteral(".groups.json"));
+	QVERIFY(catalog.open(QIODevice::WriteOnly | QIODevice::Truncate));
+	QCOMPARE(catalog.write(QByteArrayLiteral("{invalid")), qint64(8));
+	catalog.close();
+
+	QJsonObject data = fixture.GroupSettings();
+
+	QCOMPARE(CFixture::GroupIds(data), QStringList({GroupSid, QStringLiteral("S-1-5-21-3")}));
+}
+
+
+void CLdapGroupMappingTest::testSaveWithCorruptCatalogRecoversAllProducts()
+{
+	CFixture fixture;
+	fixture.controller->available.insert("S-1-5-21-5", QStringLiteral("Other-Group"));
+	QFile settingsFile(fixture.fileName);
+	QVERIFY(settingsFile.open(QIODevice::WriteOnly | QIODevice::Truncate));
+	QJsonObject otherSettings{{"enabled", false}, {"pattern", "Other-*"}, {"mappings", QJsonObject()}};
+	QByteArray settingsData = QJsonDocument(QJsonObject{{"version", 1}, {"products", QJsonObject{
+		{QString::fromUtf8(Product), fixture.Settings()}, {QString::fromUtf8(OtherProduct), otherSettings}}}}).toJson();
+	QCOMPARE(settingsFile.write(settingsData), qint64(settingsData.size()));
+	settingsFile.close();
+
+	QFile catalog(fixture.fileName + QStringLiteral(".groups.json"));
+	QVERIFY(catalog.open(QIODevice::WriteOnly | QIODevice::Truncate));
+	QCOMPARE(catalog.write(QByteArrayLiteral("{invalid")), qint64(8));
+	catalog.close();
+
+	QString error;
+	fixture.AdminRequest("SaveLdapGroupSettings", true, fixture.Settings(false), error);
+	QVERIFY(error.isEmpty());
+	QCOMPARE(CFixture::GroupIds(fixture.GroupSettings(OtherProduct)), QStringList({QStringLiteral("S-1-5-21-5")}));
 }
 
 

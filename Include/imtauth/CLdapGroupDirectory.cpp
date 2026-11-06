@@ -207,12 +207,12 @@ bool CLdapGroupDirectory::GetSecurityGroups(const QByteArray& userSid, QByteArra
 		return false;
 	}
 	PSID binarySid = nullptr;
-	if (userSid.isEmpty() || !ConvertStringSidToSidW(qUtf16Printable(userSid), &binarySid)){
+	QString sidString = QString::fromUtf8(userSid);
+	if (sidString.isEmpty() || !ConvertStringSidToSidW(qUtf16Printable(sidString), &binarySid)){
 		return false;
 	}
-	QByteArray hexSid(static_cast<const char*>(binarySid), GetLengthSid(binarySid));
 	LocalFree(binarySid);
-	QString path = QStringLiteral("LDAP://<SID=%1>").arg(QString::fromLatin1(hexSid.toHex()));
+	QString path = QStringLiteral("LDAP://<SID=%1>").arg(sidString);
 	IADs* user = nullptr;
 	if (FAILED(ADsOpenObject(reinterpret_cast<LPCWSTR>(path.utf16()), nullptr, nullptr,
 		ADS_SECURE_AUTHENTICATION | ADS_USE_SIGNING | ADS_USE_SEALING, IID_IADs, reinterpret_cast<void**>(&user)))){

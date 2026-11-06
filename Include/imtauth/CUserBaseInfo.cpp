@@ -26,6 +26,13 @@ const QByteArray DirectoryProductPrefix("urn:imt:directory-roles:");
 }
 
 
+QMutex& CUserBaseInfo::GetUserUpdateMutex(const QByteArray& userId)
+{
+	static QMutex mutexes[64];
+	return mutexes[qHash(userId) % 64];
+}
+
+
 IUserBaseInfo::RoleIds CUserBaseInfo::GetDirectoryRoles(const QByteArray& productId) const
 {
 	if (IsReservedProductId(productId)){ return RoleIds(); }
