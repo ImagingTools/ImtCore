@@ -64,6 +64,9 @@
         <Element Id="AuthServerVersionInfo" PackageId="ImtClientGqlPck" ComponentId="RemoteServiceInfo">
             <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ServerCredentialProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ServerCredential"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ServiceId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="AuthServer"/>
                     </AttributeInfo>
