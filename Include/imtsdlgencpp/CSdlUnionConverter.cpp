@@ -60,6 +60,7 @@ QString CSdlUnionConverter::GetScalarUnionMatchCondition(const QString& sdlType,
 	const QString isIntegral =
 				typeExpr + QStringLiteral(" == QMetaType::Int || ") +
 				typeExpr + QStringLiteral(" == QMetaType::UInt || ") +
+				typeExpr + QStringLiteral(" == QMetaType::Long || ") +
 				typeExpr + QStringLiteral(" == QMetaType::LongLong || ") +
 				typeExpr + QStringLiteral(" == QMetaType::ULongLong");
 	const QString isFloating =
