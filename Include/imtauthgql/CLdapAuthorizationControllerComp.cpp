@@ -1143,7 +1143,7 @@ sdl::V1_0::imtauth::CAuthorizationPayload CLdapAuthorizationControllerComp::OnAu
 
 bool CLdapAuthorizationControllerComp::IsGroupSettingsConfigured() const
 {
-	return m_groupSettingsFileAttrPtr.IsValid() && !m_groupSettingsFileAttrPtr->isEmpty();
+	return m_groupSettingsFileAttrPtr.IsValid() && !(*m_groupSettingsFileAttrPtr).isEmpty();
 }
 
 
