@@ -15,6 +15,7 @@ set(TEST_DATA_DIR "${PROJECT_SOURCE_DIR}/../../TestData")
 add_custom_target(${PROJECT_NAME}-SDL-related-files SOURCES
 	"${TEST_DATA_DIR}/ArraySerialization.sdl"
 	"${TEST_DATA_DIR}/RequestedFields.sdl"
+	"${TEST_DATA_DIR}/ScalarUnion.sdl"
 	"${TEST_DATA_DIR}/NoObjects.sdl"
 	"${TEST_DATA_DIR}/NoObjectsConsumer.sdl")
 
@@ -32,6 +33,13 @@ block()
 	set(PROJECT_NAME sdlgentestsdl)
 	ImtCoreCustomConfigureSdlCpp(
 		SCHEMA_PATH "${TEST_DATA_DIR}/RequestedFields.sdl"
+		VERSION "1.0")
+endblock()
+
+block()
+	set(PROJECT_NAME sdlgentestsdl)
+	ImtCoreCustomConfigureSdlCpp(
+		SCHEMA_PATH "${TEST_DATA_DIR}/ScalarUnion.sdl"
 		VERSION "1.0")
 endblock()
 
