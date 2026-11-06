@@ -2,6 +2,9 @@
 #include <imtservergql/CWebSocketServletComp.h>
 
 
+// STL includes
+#include <algorithm>
+
 // Qt includes
 #include <QtCore/QMultiHash>
 #include <QtCore/QJsonArray>
@@ -526,6 +529,8 @@ void CWebSocketServletComp::CheckTokenSubscriptions() const
 {
 	const int intervalMs = *m_tokenCheckIntervalAttrPtr * 1000;
 
+	QHash<QByteArray, QByteArrayList> scopesOfTokens;
+
 	QMutexLocker locker(&m_tokenSubscriptionsMutex);
 
 	while (!m_isTokenCheckStopped){
@@ -555,10 +560,20 @@ void CWebSocketServletComp::CheckTokenSubscriptions() const
 			}
 
 			const bool isRefused = status != imtgql::IGqlContextCreator::CCS_OK;
+
+			// Its server must not go on serving from its caches what the token may no longer read: it subscribes again with an empty cache
+			std::sort(scopes.begin(), scopes.end());
+			const auto knownScopesIter = scopesOfTokens.constFind(token);
+			const bool areScopesChanged = !isRefused && knownScopesIter != scopesOfTokens.constEnd() && *knownScopesIter != scopes;
+			scopesOfTokens.insert(token, scopes);
+
 			const QList<TokenSubscription> subscriptionsOfToken = subscriptionsOfTokens.values(token);
 			for (const TokenSubscription& subscription : subscriptionsOfToken){
 				if (isRefused){
 					DropTokenSubscription(subscription, errorMessage);
+				}
+				else if (areScopesChanged){
+					DropTokenSubscription(subscription, QStringLiteral("The permissions of the token have changed"));
 				}
 				else if (!subscription.requiredPermission.isEmpty() && !imtauth::HasPermission(scopes, subscription.requiredPermission, false)){
 					DropTokenSubscription(subscription, QStringLiteral("The token no longer holds '%1'").arg(QString::fromUtf8(subscription.requiredPermission)));
