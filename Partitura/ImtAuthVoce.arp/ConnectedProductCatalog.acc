@@ -27,6 +27,10 @@
                             <Values>
                                 <Value>productName</Value>
                                 <Value>productId</Value>
+                                <Value>status</Value>
+                                <Value>productVersion</Value>
+                                <Value>tokenCreatedAt</Value>
+                                <Value>lastUsedAt</Value>
                                 <Value>productDescription</Value>
                             </Values>
                         </Data>
@@ -45,6 +49,10 @@
                             <Values>
                                 <Value>Name</Value>
                                 <Value>Product-ID</Value>
+                                <Value>Status</Value>
+                                <Value>Version</Value>
+                                <Value>Token issued</Value>
+                                <Value>Last used</Value>
                                 <Value>Description</Value>
                             </Values>
                         </Data>
@@ -169,6 +177,15 @@
         <Element Id="ProductCollectionController" PackageId="ImtAuthGqlPck" ComponentId="ConnectedProductCollectionController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="OwnProductId" Type="Id" ExportId="OwnProductId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="OwnProductName" Type="String" ExportId="OwnProductName">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SnapshotCollection" Type="Reference" ExportId="SnapshotRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="PersonalAccessTokenCache" Type="Reference" ExportId="PersonalAccessTokenCache">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

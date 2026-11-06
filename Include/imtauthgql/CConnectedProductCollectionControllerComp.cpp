@@ -7,6 +7,7 @@
 
 // ImtCore includes
 #include <imtauth/CConnectedProductDocumentValidatorComp.h>
+#include <imtauth/CProductPermissionSnapshot.h>
 #include <imtauthgql/imtauthgql.h>
 #include <imtbase/IObjectCollectionIterator.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/ConnectedProducts.h>
@@ -14,6 +15,10 @@
 
 namespace imtauthgql
 {
+
+
+// A server with a token reports at least every few minutes: it publishes and its subscriptions are checked
+static const qint64 s_onlineSeconds = 10 * 60;
 
 
 // reimplemented (sdl::V1_0::imtauth::CConnectedProductCollectionControllerCompBase)
@@ -48,6 +53,7 @@ bool CConnectedProductCollectionControllerComp::CreateRepresentationFromObject(
 	if (requestInfo.items.isProductDescriptionRequested){
 		representationObject.productDescription = productPtr->GetProductDescription();
 	}
+	FillServerState(productPtr->GetProductId(), listRequest, representationObject);
 	if (requestInfo.items.isAddedRequested){
 		representationObject.added = objectCollectionIterator.GetElementInfo("Added").toDateTime().toUTC().toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
 	}
@@ -171,6 +177,12 @@ bool CConnectedProductCollectionControllerComp::OnBeforeRemoveElements(const QBy
 			return false;
 		}
 
+		if (m_ownProductIdAttrPtr.IsValid() && productPtr->GetProductId() == *m_ownProductIdAttrPtr){
+			errorMessage = QStringLiteral("This server cannot be removed from its own catalog");
+
+			return false;
+		}
+
 		// A removed product keeps no working server; a failed revocation keeps the product to repeat the removal
 		for (const QByteArray& tokenId : m_tokenManagerCompPtr->GetServerTokenIds(productPtr->GetProductId())){
 			imtauth::IPersonalAccessTokenSharedPtr tokenPtr = m_tokenManagerCompPtr->GetToken(tokenId);
@@ -200,7 +212,110 @@ bool CConnectedProductCollectionControllerComp::CheckPermissions(const imtgql::C
 		return false;
 	}
 
+	EnsureOwnProduct();
+
 	return true;
+}
+
+
+// private methods
+
+void CConnectedProductCollectionControllerComp::EnsureOwnProduct() const
+{
+	if (!m_ownProductIdAttrPtr.IsValid() || QByteArray(*m_ownProductIdAttrPtr).isEmpty()){
+		return;
+	}
+
+	QMutexLocker locker(&m_ownProductMutex);
+	if (m_isOwnProductEnsured){
+		return;
+	}
+
+	const QByteArray productId = *m_ownProductIdAttrPtr;
+	const QString name = m_ownProductNameAttrPtr.IsValid() ? QString(*m_ownProductNameAttrPtr) : QString::fromUtf8(productId);
+
+	if (imtauth::CConnectedProductDocumentValidatorComp::HasProduct(*m_objectCollectionCompPtr, productId)){
+		m_isOwnProductEnsured = true;
+
+		return;
+	}
+
+	imtauth::IConnectedProductUniquePtr instancePtr = m_productFactCompPtr.CreateInstance();
+	imtauth::CIdentifiableConnectedProduct* productPtr = dynamic_cast<imtauth::CIdentifiableConnectedProduct*>(instancePtr.GetPtr());
+	if (productPtr == nullptr){
+		return;
+	}
+
+	const QByteArray objectId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
+	productPtr->SetObjectUuid(objectId);
+	productPtr->SetProductId(productId);
+	productPtr->SetProductName(name);
+
+	m_isOwnProductEnsured = !m_objectCollectionCompPtr->InsertNewObject("ConnectedProduct", name, QString(), productPtr, objectId).isEmpty();
+}
+
+
+void CConnectedProductCollectionControllerComp::FillServerState(
+			const QByteArray& productId,
+			const sdl::V1_0::imtauth::CConnectedProductsListGqlRequest& listRequest,
+			sdl::V1_0::imtauth::CConnectedProductItemData& representationObject) const
+{
+	const auto requestInfo = listRequest.GetRequestInfo();
+
+	if (requestInfo.items.isProductVersionRequested && m_snapshotCollectionCompPtr.IsValid()){
+		const QByteArray snapshotId = imtauth::FindProductPermissionSnapshot(*m_snapshotCollectionCompPtr, productId);
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		const imtauth::CProductPermissionSnapshot* snapshotPtr = !snapshotId.isEmpty() && m_snapshotCollectionCompPtr->GetObjectData(snapshotId, dataPtr) ? dynamic_cast<const imtauth::CProductPermissionSnapshot*>(dataPtr.GetPtr()) : nullptr;
+		if (snapshotPtr != nullptr){
+			representationObject.productVersion = snapshotPtr->GetProductVersion();
+		}
+	}
+
+	if (!requestInfo.items.isStatusRequested && !requestInfo.items.isTokenCreatedAtRequested && !requestInfo.items.isLastUsedAtRequested){
+		return;
+	}
+
+	QDateTime oldestTokenTime;
+	QDateTime lastUsedTime;
+	bool hasActiveToken = false;
+	for (const QByteArray& tokenId : m_tokenManagerCompPtr->GetServerTokenIds(productId)){
+		imtauth::IPersonalAccessTokenSharedPtr tokenPtr = m_tokenManagerCompPtr->GetToken(tokenId);
+		if (!tokenPtr.IsValid() || tokenPtr->IsRevoked()){
+			continue;
+		}
+
+		hasActiveToken = true;
+		if (!oldestTokenTime.isValid() || tokenPtr->GetCreatedAt() < oldestTokenTime){
+			oldestTokenTime = tokenPtr->GetCreatedAt();
+		}
+		if (tokenPtr->GetLastUsedAt().isValid() && (!lastUsedTime.isValid() || tokenPtr->GetLastUsedAt() > lastUsedTime)){
+			lastUsedTime = tokenPtr->GetLastUsedAt();
+		}
+	}
+
+	if (requestInfo.items.isTokenCreatedAtRequested && oldestTokenTime.isValid()){
+		representationObject.tokenCreatedAt = oldestTokenTime.toLocalTime().toString("dd.MM.yyyy");
+	}
+	if (requestInfo.items.isLastUsedAtRequested && lastUsedTime.isValid()){
+		representationObject.lastUsedAt = lastUsedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
+	}
+	if (requestInfo.items.isStatusRequested){
+		QString status;
+		if (m_ownProductIdAttrPtr.IsValid() && productId == *m_ownProductIdAttrPtr){
+			status = QStringLiteral("This server");
+		}
+		else if (!hasActiveToken){
+			status = QStringLiteral("No token");
+		}
+		else if (!lastUsedTime.isValid()){
+			status = QStringLiteral("Never connected");
+		}
+		else{
+			status = lastUsedTime.secsTo(QDateTime::currentDateTimeUtc()) < s_onlineSeconds ? QStringLiteral("Online") : QStringLiteral("Offline");
+		}
+
+		representationObject.status = status;
+	}
 }
 
 

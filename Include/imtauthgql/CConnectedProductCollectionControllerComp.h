@@ -6,6 +6,7 @@
 #include <imtauth/CConnectedProduct.h>
 #include <imtauth/IPersonalAccessTokenCache.h>
 #include <imtauth/IPersonalAccessTokenManager.h>
+#include <imtbase/IObjectCollection.h>
 #include <imtservergql/CObjectCollectionControllerCompBase.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/ConnectedProducts_fwd.h>
 
@@ -26,6 +27,9 @@ public:
 		I_ASSIGN(m_productFactCompPtr, "ProductFactory", "Factory of the catalog entries", true, "ProductFactory");
 		I_ASSIGN(m_tokenManagerCompPtr, "PersonalAccessTokenManager", "Revokes the tokens of a removed product", true, "PersonalAccessTokenManager");
 		I_ASSIGN(m_tokenCacheCompPtr, "PersonalAccessTokenCache", "Forgets a revoked token at once", false, "PersonalAccessTokenCache");
+		I_ASSIGN(m_snapshotCollectionCompPtr, "SnapshotCollection", "Published permission trees, they give the version of a product", false, "SnapshotCollection");
+		I_ASSIGN(m_ownProductIdAttrPtr, "OwnProductId", "This server in its own catalog: the entry is created with the first request and cannot be removed", false, "");
+		I_ASSIGN(m_ownProductNameAttrPtr, "OwnProductName", "Name of this server in its own catalog", false, "");
 	I_END_COMPONENT;
 
 protected:
@@ -57,6 +61,20 @@ protected:
 	virtual bool CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 private:
+	void EnsureOwnProduct() const;
+	void FillServerState(
+				const QByteArray& productId,
+				const sdl::V1_0::imtauth::CConnectedProductsListGqlRequest& listRequest,
+				sdl::V1_0::imtauth::CConnectedProductItemData& representationObject) const;
+
+private:
+	I_REF(imtbase::IObjectCollection, m_snapshotCollectionCompPtr);
+	I_ATTR(QByteArray, m_ownProductIdAttrPtr);
+	I_ATTR(QString, m_ownProductNameAttrPtr);
+
+	mutable QMutex m_ownProductMutex;
+	mutable bool m_isOwnProductEnsured = false;
+
 	I_FACT(imtauth::IConnectedProduct, m_productFactCompPtr);
 	I_REF(imtauth::IPersonalAccessTokenManager, m_tokenManagerCompPtr);
 	I_REF(imtauth::IPersonalAccessTokenCache, m_tokenCacheCompPtr);

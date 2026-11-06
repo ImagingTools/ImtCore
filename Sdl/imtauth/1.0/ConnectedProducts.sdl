@@ -20,6 +20,10 @@ type ConnectedProductItemData {
 	productId: ID
 	productName: String!
 	productDescription: String
+	status: String
+	productVersion: String
+	tokenCreatedAt: String
+	lastUsedAt: String
 	added: String
 	lastModified: String
 }
