@@ -123,8 +123,6 @@ protected:
 	virtual void OnAfterRemoveElements(const QByteArrayList& elementIds, const ::imtgql::CGqlRequest& gqlRequest) const override;
 
 protected:
-	bool CheckJoinedGroups(const imtgql::IGqlContext* gqlContextPtr, const QByteArrayList& previousGroups, const QByteArrayList& groups, QString& errorMessage) const;
-
 	I_REF(imtauth::IRoleInfoProvider, m_roleInfoProviderCompPtr);
 	I_REF(imtauth::IUserGroupInfoProvider, m_userGroupInfoProviderCompPtr);
 	I_FACT(imtauth::IUserInfo, m_userInfoFactCompPtr);

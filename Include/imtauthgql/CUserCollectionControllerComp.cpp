@@ -30,7 +30,6 @@ namespace imtauthgql
 {
 
 
-static const QByteArray s_changeUserPermission = QByteArrayLiteral("/Administration/Users/Edit/Change");
 static const QByteArray s_removeUserPermission = QByteArrayLiteral("/Administration/Users/Edit/Remove");
 
 
@@ -690,13 +689,11 @@ bool CUserCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 		return false;
 	}
 
-	const bool isAccountChanged = previousUserPtr->GetId() != userInfoPtr->GetId() || previousUserPtr->GetName() != userInfoPtr->GetName() || previousUserPtr->GetMail() != userInfoPtr->GetMail()
-				|| previousUserPtr->IsEnabled() != userInfoPtr->IsEnabled() || previousUserPtr->GetPasswordHash() != userInfoPtr->GetPasswordHash();
-	if (isAccountChanged && !CheckSharedUserChange(rawGqlRequest.GetRequestContext(), objectId, *previousUserPtr, s_changeUserPermission, errorMessage)){
+	if (!CheckUserAccountChange(rawGqlRequest.GetRequestContext(), objectId, *previousUserPtr, *userInfoPtr, errorMessage)){
 		return false;
 	}
 
-	if (!CheckJoinedGroups(rawGqlRequest.GetRequestContext(), previousUserPtr->GetGroups(), userInfoPtr->GetGroups(), errorMessage)){
+	if (!CheckJoinedUserGroups(rawGqlRequest.GetRequestContext(), m_userGroupInfoProviderCompPtr.GetPtr(), previousUserPtr->GetGroups(), userInfoPtr->GetGroups(), errorMessage)){
 		return false;
 	}
 
@@ -830,8 +827,21 @@ bool CUserCollectionControllerComp::CheckObjectData(const imtgql::CGqlRequest& g
 
 	imtbase::IObjectCollection::DataPtr storedDataPtr;
 	const imtauth::IUserInfo* storedUserPtr = nullptr;
-	if (!objectId.isEmpty() && m_objectCollectionCompPtr->GetObjectData(objectId, storedDataPtr)){
-		storedUserPtr = dynamic_cast<const imtauth::IUserInfo*>(storedDataPtr.GetPtr());
+	if (!objectId.isEmpty()){
+		storedUserPtr = m_objectCollectionCompPtr->GetObjectData(objectId, storedDataPtr) ? dynamic_cast<const imtauth::IUserInfo*>(storedDataPtr.GetPtr()) : nullptr;
+		if (storedUserPtr == nullptr){
+			errorMessage = QStringLiteral("Unable to read the user '%1'").arg(QString::fromUtf8(objectId));
+
+			return false;
+		}
+
+		if (!CheckUserAccountChange(gqlContextPtr, objectId, *storedUserPtr, *userInfoPtr, errorMessage)){
+			return false;
+		}
+	}
+
+	if (!CheckJoinedUserGroups(gqlContextPtr, m_userGroupInfoProviderCompPtr.GetPtr(), storedUserPtr != nullptr ? storedUserPtr->GetGroups() : QByteArrayList(), userInfoPtr->GetGroups(), errorMessage)){
+		return false;
 	}
 
 	if (!CheckOtherProductsUnchanged(gqlContextPtr, storedUserPtr, *userInfoPtr, errorMessage)){
@@ -921,33 +931,6 @@ QJsonObject CUserCollectionControllerComp::InsertObject(
 
 
 // reimplemented (imtservergql::CObjectCollectionControllerCompBase)
-bool CUserCollectionControllerComp::CheckJoinedGroups(
-			const imtgql::IGqlContext* gqlContextPtr,
-			const QByteArrayList& previousGroups,
-			const QByteArrayList& groups,
-			QString& errorMessage) const
-{
-	for (const QByteArray& groupId : groups){
-		if (previousGroups.contains(groupId)){
-			continue;
-		}
-
-		const imtauth::IUserGroupInfoSharedPtr groupPtr = m_userGroupInfoProviderCompPtr->GetUserGroup(groupId);
-		if (!groupPtr.IsValid()){
-			errorMessage = QStringLiteral("Unable to read the group '%1'").arg(QString::fromUtf8(groupId));
-
-			return false;
-		}
-
-		if (!CheckGroupGrantsInOtherProducts(gqlContextPtr, *groupPtr, errorMessage)){
-			return false;
-		}
-	}
-
-	return true;
-}
-
-
 bool CUserCollectionControllerComp::OnBeforeRemoveElements(const QByteArrayList& elementIds, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	for (const QByteArray& userId : elementIds){

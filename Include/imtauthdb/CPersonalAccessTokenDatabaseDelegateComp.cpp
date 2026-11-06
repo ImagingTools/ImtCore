@@ -255,6 +255,7 @@ QByteArray CPersonalAccessTokenDatabaseDelegateComp::CreateUpdateObjectQuery(
 	const QString userIdSql = userId.isEmpty() ? "NULL" : QStringLiteral("'%1'").arg(SqlEncode(userId));
 	const QString revokedSql = revoked ? "TRUE" : "FALSE";
 
+	// A revocation stays: a writer that read the token before it must not undo it
 	const QByteArray retVal = QString(
 		"UPDATE \"PersonalAccessTokens\" SET "
 		"\"Name\"='%1', "
@@ -265,7 +266,7 @@ QByteArray CPersonalAccessTokenDatabaseDelegateComp::CreateUpdateObjectQuery(
 		"\"Scopes\"='%6', "
 		"\"LastUsedAt\"=%7, "
 		"\"ExpiresAt\"=%8, "
-		"\"Revoked\"=%9, "
+		"\"Revoked\"=(\"Revoked\" OR %9), "
 		"\"ClientProductId\"=%10 "
 		"WHERE \"Id\"='%11';")
 		.arg(SqlEncode(name))

@@ -12,14 +12,6 @@ namespace imtservergql
 
 // protected methods
 
-// reimplemented (imtgql::IGqlSubscriberController)
-
-bool CModelChangeNotifierComp::IsOpenFor(SubscriberKind subscriberKind, const imtgql::CGqlRequest& /*gqlRequest*/) const
-{
-	return subscriberKind == SK_SERVER;
-}
-
-
 // reimplemented (icomp::CComponentBase)
 
 void CModelChangeNotifierComp::OnComponentCreated()

@@ -36,6 +36,8 @@ public:
 	virtual imtgql::IGqlContextUniquePtr CreateGqlContext(
 				const imtgql::IGqlContext::Headers& headers,
 				imtgql::IGqlContextCreator::ContextCreationError& error) const override;
+	virtual bool IsRevocableToken(const QByteArray& token) const override;
+	virtual ContextCreationStatus CheckToken(const QByteArray& token, QString& errorMessage) const override;
 
 private:
 	I_FACT(imtgql::IGqlContext, m_gqlContextFactCompPtr);

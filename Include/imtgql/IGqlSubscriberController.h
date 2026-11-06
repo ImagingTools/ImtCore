@@ -15,11 +15,12 @@ class IGqlSubscriberController: virtual public istd::IPolymorphic
 {
 public:
 	/**
-		Who subscribes without being a user.
+		Who subscribes.
 	*/
 	enum SubscriberKind
 	{
 		SK_ANONYMOUS,
+		SK_USER,
 		SK_SERVER
 	};
 

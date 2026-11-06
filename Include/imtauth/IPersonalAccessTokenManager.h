@@ -73,14 +73,23 @@ public:
 		\param[out] userId User ID associated with the token (if valid)
 		\param[out] tokenId Token ID associated with the token (if valid)
 		\param[out] scopes Permission scopes granted to the token (if valid)
+		\param[out] isCheckFailedPtr Optional: set when the token could not be checked, so false says nothing about the token
 		\return True if token is valid, false if invalid, revoked, or expired
 	*/
-	virtual bool ValidateToken(const QByteArray& rawToken, QByteArray& userId, QByteArray& tokenId, QByteArrayList& scopes, QByteArray* productIdPtr = nullptr, QByteArray* clientProductIdPtr = nullptr) const = 0;
+	virtual bool ValidateToken(
+				const QByteArray& rawToken,
+				QByteArray& userId,
+				QByteArray& tokenId,
+				QByteArrayList& scopes,
+				QByteArray* productIdPtr = nullptr,
+				QByteArray* clientProductIdPtr = nullptr,
+				bool* isCheckFailedPtr = nullptr) const = 0;
 
 	/**
 		Get the tokens of the servers of a product.
+		\param[out] isReadPtr Optional: false when the tokens could not be read, so an empty list is not "no tokens"
 	*/
-	virtual QByteArrayList GetServerTokenIds(const QByteArray& clientProductId) const = 0;
+	virtual QByteArrayList GetServerTokenIds(const QByteArray& clientProductId, bool* isReadPtr = nullptr) const = 0;
 
 	/**
 		Get list of token IDs for a specific user.

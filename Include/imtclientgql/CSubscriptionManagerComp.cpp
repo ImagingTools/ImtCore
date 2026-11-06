@@ -270,6 +270,7 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 			const auto foundIt = m_registeredClients.find(subscriptionId);
 			if (foundIt != m_registeredClients.end()){
 				foundIt->m_status = IGqlSubscriptionClient::SS_REGISTERED;
+				foundIt->m_isRefusalReported = false;
 
 				// Dispatched outside the lock, like MT_DATA below.
 				locker.unlock();
@@ -345,10 +346,15 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 			if (foundIt != m_registeredClients.end()){
 				foundIt->m_status = IGqlSubscriptionClient::SS_REFUSED;
 				const QByteArray commandId = foundIt->m_request.GetCommandId();
+				const bool isReported = foundIt->m_isRefusalReported;
+				foundIt->m_isRefusalReported = true;
 
 				locker.unlock();
-				SendErrorMessage(0, QStringLiteral("The server refused the subscription '%1': %2").arg(QString::fromUtf8(commandId), QString::fromUtf8(body)), QStringLiteral("CSubscriptionManagerComp"));
+				if (!isReported){
+					SendErrorMessage(0, QStringLiteral("The server refused the subscription '%1': %2").arg(QString::fromUtf8(commandId), QString::fromUtf8(body)), QStringLiteral("CSubscriptionManagerComp"));
+				}
 				UpdateCustomerSubscriptionStatuses(subscriptionId, QString::fromUtf8(body));
+				ScheduleRefusedRetry();
 
 				return imtrest::ConstResponsePtr();
 			}
@@ -665,6 +671,50 @@ void CSubscriptionManagerComp::OnComponentCreated()
 
 	if (m_accessTokenProviderModelCompPtr.IsValid()){
 		m_accessTokenProviderModelCompPtr->AttachObserver(&m_accessTokenObserver);
+	}
+}
+
+
+void CSubscriptionManagerComp::ScheduleRefusedRetry() const
+{
+	if (m_isRefusedRetryScheduled.exchange(true)){
+		return;
+	}
+
+	QMetaObject::invokeMethod(const_cast<CSubscriptionManagerComp*>(this), [this](){
+		QTimer::singleShot(*m_refusedRetryIntervalAttrPtr * 1000, const_cast<CSubscriptionManagerComp*>(this), [this](){
+			m_isRefusedRetryScheduled = false;
+
+			RetryRefusedSubscriptions();
+		});
+	}, Qt::QueuedConnection);
+}
+
+
+void CSubscriptionManagerComp::RetryRefusedSubscriptions() const
+{
+	QByteArrayList subscriptionIds;
+	{
+		QMutexLocker locker(&m_registeredClientsMutex);
+		subscriptionIds = m_registeredClients.keys();
+	}
+
+	for (const QByteArray& subscriptionId : subscriptionIds){
+		imtgql::CGqlRequest request;
+		{
+			QMutexLocker locker(&m_registeredClientsMutex);
+			const auto foundIt = m_registeredClients.find(subscriptionId);
+			if (foundIt == m_registeredClients.end() || foundIt->m_status != IGqlSubscriptionClient::SS_REFUSED){
+				continue;
+			}
+
+			foundIt->m_status = IGqlSubscriptionClient::SS_IN_REGISTRATION;
+			foundIt->m_isRegistrationSent = true;
+			request = foundIt->m_request;
+		}
+
+		// Sent outside the lock, see ReregisterSubscriptions()
+		SubscriptionRegister(request, subscriptionId);
 	}
 }
 

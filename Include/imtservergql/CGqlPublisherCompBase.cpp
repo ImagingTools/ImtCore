@@ -32,9 +32,10 @@ bool CGqlPublisherCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlReq
 }
 
 
-bool CGqlPublisherCompBase::IsOpenFor(SubscriberKind /*subscriberKind*/, const imtgql::CGqlRequest& /*gqlRequest*/) const
+bool CGqlPublisherCompBase::IsOpenFor(SubscriberKind subscriberKind, const imtgql::CGqlRequest& /*gqlRequest*/) const
 {
-	return false;
+	// What a publisher sends a user is its own business: it filters the events by the subscriber
+	return subscriberKind == SK_USER;
 }
 
 

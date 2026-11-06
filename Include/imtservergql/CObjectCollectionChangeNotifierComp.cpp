@@ -44,7 +44,14 @@ bool CObjectCollectionChangeNotifierComp::IsRequestSupported(const imtgql::CGqlR
 
 bool CObjectCollectionChangeNotifierComp::IsOpenFor(SubscriberKind subscriberKind, const imtgql::CGqlRequest& /*gqlRequest*/) const
 {
-	return subscriberKind == SK_SERVER;
+	switch (subscriberKind){
+	case SK_USER:
+		return *m_isOpenToUsersAttrPtr || m_readPermissionsAttrPtr.GetCount() > 0;
+	case SK_SERVER:
+		return *m_isOpenToServersAttrPtr;
+	default:
+		return false;
+	}
 }
 
 

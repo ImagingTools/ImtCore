@@ -6,6 +6,7 @@
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
+#include <imtauth/IPersonalAccessTokenCache.h>
 #include <imtauth/IPersonalAccessTokenManager.h>
 #include <imtbase/IObjectCollection.h>
 
@@ -25,6 +26,7 @@ public:
 		I_REGISTER_INTERFACE(imtauth::IPersonalAccessTokenManager);
 		I_ASSIGN(m_tokenCollectionCompPtr, "TokenCollection", "Personal access token collection", true, "PersonalAccessTokenCollection");
 		I_ASSIGN(m_tokenFactoryCompPtr, "TokenFactory", "Personal access token factory", true, "PersonalAccessTokenFactory");
+		I_ASSIGN(m_tokenCacheCompPtr, "PersonalAccessTokenCache", "Forgets a revoked or deleted token at once", false, "PersonalAccessTokenCache");
 	I_END_COMPONENT;
 
 	// reimplemented (imtauth::IPersonalAccessTokenManager)
@@ -36,8 +38,15 @@ public:
 		const QByteArrayList& scopes,
 		const QDateTime& expiresAt,
 				const QByteArray& clientProductId = QByteArray()) override;
-	virtual bool ValidateToken(const QByteArray& rawToken, QByteArray& userId, QByteArray& tokenId, QByteArrayList& scopes, QByteArray* productIdPtr = nullptr, QByteArray* clientProductIdPtr = nullptr) const override;
-	virtual QByteArrayList GetServerTokenIds(const QByteArray& clientProductId) const override;
+	virtual bool ValidateToken(
+				const QByteArray& rawToken,
+				QByteArray& userId,
+				QByteArray& tokenId,
+				QByteArrayList& scopes,
+				QByteArray* productIdPtr = nullptr,
+				QByteArray* clientProductIdPtr = nullptr,
+				bool* isCheckFailedPtr = nullptr) const override;
+	virtual QByteArrayList GetServerTokenIds(const QByteArray& clientProductId, bool* isReadPtr = nullptr) const override;
 	virtual QByteArrayList GetTokenIds(const QByteArray& userId) const override;
 	virtual IPersonalAccessTokenSharedPtr GetToken(const QByteArray& tokenId) const override;
 	virtual bool RevokeToken(const QByteArray& tokenId) override;
@@ -55,6 +64,7 @@ private:
 private:
 	I_REF(imtbase::IObjectCollection, m_tokenCollectionCompPtr);
 	I_FACT(imtauth::IPersonalAccessToken, m_tokenFactoryCompPtr);
+	I_REF(imtauth::IPersonalAccessTokenCache, m_tokenCacheCompPtr);
 };
 
 

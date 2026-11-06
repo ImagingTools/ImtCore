@@ -186,9 +186,6 @@
                     <AttributeInfo Id="SnapshotCollection" Type="Reference" ExportId="SnapshotRepository">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="PersonalAccessTokenCache" Type="Reference" ExportId="PersonalAccessTokenCache">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="HeadersProvider" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="CollectionHeadersProvider"/>
                     </AttributeInfo>
@@ -340,9 +337,6 @@
         <Element Id="ServerTokenController" PackageId="ImtAuthGqlPck" ComponentId="ServerTokenController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="PersonalAccessTokenCache" Type="Reference" ExportId="PersonalAccessTokenCache">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

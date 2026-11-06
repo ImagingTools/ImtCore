@@ -18,9 +18,6 @@
         <Element Id="PersonalAccessTokenController" PackageId="ImtAuthGqlPck" ComponentId="PersonalAccessTokenController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="PersonalAccessTokenCache" Type="Reference" ExportId="PersonalAccessTokenCache">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="BindingManager" Type="Reference" ExportId="BindingManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -55,6 +52,9 @@
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PersonalAccessTokenCache" Type="Reference" ExportId="PersonalAccessTokenCache">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TokenCollection" Type="Reference" ExportId="">

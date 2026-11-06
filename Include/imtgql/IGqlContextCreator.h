@@ -34,6 +34,17 @@ public:
 	virtual IGqlContextUniquePtr CreateGqlContext(
 				const IGqlContext::Headers& headers,
 				ContextCreationError& error) const = 0;
+
+	/**
+		Tell whether the token lives until it is revoked, so what it holds must be checked again later.
+	*/
+	virtual bool IsRevocableToken(const QByteArray& token) const = 0;
+
+	/**
+		Check the token only, without creating a context for its owner.
+		\return CCS_INTERNAL_ERROR when the token could not be checked: that says nothing about the token.
+	*/
+	virtual ContextCreationStatus CheckToken(const QByteArray& token, QString& errorMessage) const = 0;
 };
 
 

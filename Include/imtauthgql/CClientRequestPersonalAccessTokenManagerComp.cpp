@@ -107,9 +107,21 @@ imtauth::IPersonalAccessTokenManager::TokenCreationResult CClientRequestPersonal
 }
 
 
-bool CClientRequestPersonalAccessTokenManagerComp::ValidateToken(const QByteArray& rawToken, QByteArray& userId, QByteArray& tokenId, QByteArrayList& scopes, QByteArray* productIdPtr, QByteArray* clientProductIdPtr) const
+bool CClientRequestPersonalAccessTokenManagerComp::ValidateToken(
+			const QByteArray& rawToken,
+			QByteArray& userId,
+			QByteArray& tokenId,
+			QByteArrayList& scopes,
+			QByteArray* productIdPtr,
+			QByteArray* clientProductIdPtr,
+			bool* isCheckFailedPtr) const
 {
 	namespace tokensdl = sdl::V1_0::imtauth;
+
+	// Stays set until the authorization server gave an answer about the token
+	if (isCheckFailedPtr != nullptr){
+		*isCheckFailedPtr = true;
+	}
 
 	tokensdl::ValidateTokenRequestArguments arguments;
 	arguments.input.emplace();
@@ -125,7 +137,15 @@ bool CClientRequestPersonalAccessTokenManagerComp::ValidateToken(const QByteArra
 
 	QString errorMessage;
 	tokensdl::CValidateTokenPayload payload = OnValidateToken(validateTokenRequest, gqlRequest, errorMessage);
-	if (!payload.valid.has_value() || !*payload.valid){
+	if (!payload.valid.has_value()){
+		return false;
+	}
+
+	if (isCheckFailedPtr != nullptr){
+		*isCheckFailedPtr = false;
+	}
+
+	if (!*payload.valid){
 		return false;
 	}
 
@@ -152,8 +172,12 @@ bool CClientRequestPersonalAccessTokenManagerComp::ValidateToken(const QByteArra
 }
 
 
-QByteArrayList CClientRequestPersonalAccessTokenManagerComp::GetServerTokenIds(const QByteArray& /*clientProductId*/) const
+QByteArrayList CClientRequestPersonalAccessTokenManagerComp::GetServerTokenIds(const QByteArray& /*clientProductId*/, bool* isReadPtr) const
 {
+	if (isReadPtr != nullptr){
+		*isReadPtr = false;
+	}
+
 	// The tokens of servers are managed on the authorization server only
 	return QByteArrayList();
 }

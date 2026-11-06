@@ -145,6 +145,10 @@ private:
 	// reimplemented (imtauth::IPersonalAccessTokenCache)
 	virtual void ForgetToken(const QByteArray& tokenId) override;
 
+	// reimplemented (imtgql::IGqlContextCreator)
+	virtual bool IsRevocableToken(const QByteArray& token) const override;
+	virtual ContextCreationStatus CheckToken(const QByteArray& token, QString& errorMessage) const override;
+
 	bool GetCachedPatProducts(const QByteArray& token, QByteArray& productId, QByteArray& clientProductId) const;
 	bool TryReadCachedTokenLocked(
 				const QByteArray& token,
@@ -269,6 +273,9 @@ private:
 	// m_tokenCacheMutex so an in-flight validation/refresh cannot restore a
 	// revoked session's token after InvalidateSessionTokenCache() swept it.
 	mutable QHash<QByteArray, qint64> m_revokedSessionIds;
+
+	// The same for personal access tokens: token ID -> time until a validation may still be in flight
+	mutable QHash<QByteArray, qint64> m_forgottenTokenIds;
 
 	// Tokens currently being resolved by some thread via ResolveUserId(), so
 	// concurrent callers for the same token can wait for that result instead

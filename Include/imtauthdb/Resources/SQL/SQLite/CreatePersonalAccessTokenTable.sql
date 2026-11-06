@@ -14,3 +14,12 @@ CREATE TABLE IF NOT EXISTS "PersonalAccessTokens"
     "ExpiresAt"  TEXT,
     "Revoked"    INTEGER NOT NULL DEFAULT 0
 );
+
+CREATE UNIQUE INDEX IF NOT EXISTS "IX_PersonalAccessTokens_TokenHash"
+    ON "PersonalAccessTokens" ("TokenHash");
+
+CREATE INDEX IF NOT EXISTS "IX_PersonalAccessTokens_ClientProductId"
+    ON "PersonalAccessTokens" ("ClientProductId") WHERE "ClientProductId" IS NOT NULL;
+
+CREATE INDEX IF NOT EXISTS "IX_PersonalAccessTokens_UserId"
+    ON "PersonalAccessTokens" ("UserId");

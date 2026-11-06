@@ -538,11 +538,7 @@ bool CUserGroupCollectionControllerComp::CheckGroupGrants(
 	}
 
 	const QByteArray productId = gqlContextPtr != nullptr ? gqlContextPtr->GetProductId() : QByteArray();
-	const QByteArrayList previousUsers = previousPtr != nullptr ? previousPtr->GetUsers() : QByteArrayList();
-	bool hasNewUsers = false;
-	for (const QByteArray& userId : group.GetUsers()){
-		hasNewUsers = hasNewUsers || !previousUsers.contains(userId);
-	}
+	const bool hasNewUsers = HasNewGroupMembers(previousPtr != nullptr ? previousPtr->GetUsers() : QByteArrayList(), group.GetUsers());
 
 	if (hasNewUsers && !CheckGroupGrantsInOtherProducts(gqlContextPtr, group, errorMessage)){
 		return false;

@@ -19,6 +19,9 @@ namespace imtauth
 {
 
 
+static const qint64 s_lastUsedPrecisionSeconds = 60;
+
+
 // public methods
 
 // reimplemented (imtauth::IPersonalAccessTokenManager)
@@ -95,10 +98,18 @@ bool CPersonalAccessTokenManagerComp::ValidateToken(
 			QByteArray& tokenId,
 			QByteArrayList& scopes,
 			QByteArray* productIdPtr,
-			QByteArray* clientProductIdPtr) const
+			QByteArray* clientProductIdPtr,
+			bool* isCheckFailedPtr) const
 {
+	if (isCheckFailedPtr != nullptr){
+		*isCheckFailedPtr = false;
+	}
+
 	if (!m_tokenCollectionCompPtr.IsValid()){
 		SendErrorMessage(0, "Token collection not configured", "CPersonalAccessTokenManagerComp");
+		if (isCheckFailedPtr != nullptr){
+			*isCheckFailedPtr = true;
+		}
 		return false;
 	}
 
@@ -106,12 +117,23 @@ bool CPersonalAccessTokenManagerComp::ValidateToken(
 	QByteArray tokenHash = HashToken(rawToken);
 
 	// Find token by hash: the database selects the candidates, the comparison below decides
+	bool isRead = false;
 	const imtbase::ICollectionInfo::Ids tokenIds = CollectionSelection::SelectIds(
-				*m_tokenCollectionCompPtr, CollectionSelection::ColumnEquals("TokenHash", tokenHash), {"TokenHash"});
+				*m_tokenCollectionCompPtr, CollectionSelection::ColumnEquals("TokenHash", tokenHash), {"TokenHash"}, &isRead);
+	if (!isRead){
+		if (isCheckFailedPtr != nullptr){
+			*isCheckFailedPtr = true;
+		}
+		return false;
+	}
+
 	for (const QByteArray& currentTokenId : std::as_const(tokenIds)){
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (!m_tokenCollectionCompPtr->GetObjectData(currentTokenId, dataPtr)){
-			continue;
+			if (isCheckFailedPtr != nullptr){
+				*isCheckFailedPtr = true;
+			}
+			return false;
 		}
 
 		IPersonalAccessToken* tokenPtr = dynamic_cast<IPersonalAccessToken*>(dataPtr.GetPtr());
@@ -161,14 +183,18 @@ bool CPersonalAccessTokenManagerComp::ValidateToken(
 }
 
 
-QByteArrayList CPersonalAccessTokenManagerComp::GetServerTokenIds(const QByteArray& clientProductId) const
+QByteArrayList CPersonalAccessTokenManagerComp::GetServerTokenIds(const QByteArray& clientProductId, bool* isReadPtr) const
 {
+	if (isReadPtr != nullptr){
+		*isReadPtr = m_tokenCollectionCompPtr.IsValid();
+	}
+
 	if (!m_tokenCollectionCompPtr.IsValid() || clientProductId.isEmpty()){
 		return QByteArrayList();
 	}
 
 	const imtbase::ICollectionInfo::Ids tokenIds = CollectionSelection::SelectIds(
-				*m_tokenCollectionCompPtr, CollectionSelection::ColumnEquals("ClientProductId", clientProductId), {"ClientProductId"});
+				*m_tokenCollectionCompPtr, CollectionSelection::ColumnEquals("ClientProductId", clientProductId), {"ClientProductId"}, isReadPtr);
 
 	return QByteArrayList(tokenIds.cbegin(), tokenIds.cend());
 }
@@ -262,6 +288,10 @@ bool CPersonalAccessTokenManagerComp::RevokeToken(const QByteArray& tokenId)
 
 	SendInfoMessage(0, QStringLiteral("Revoked token '%1'").arg(tokenId), "CPersonalAccessTokenManagerComp");
 
+	if (m_tokenCacheCompPtr.IsValid()){
+		m_tokenCacheCompPtr->ForgetToken(tokenId);
+	}
+
 	return true;
 }
 
@@ -283,7 +313,13 @@ bool CPersonalAccessTokenManagerComp::UpdateLastUsedAt(const QByteArray& tokenId
 		return false;
 	}
 
-	tokenPtr->SetLastUsedAt(QDateTime::currentDateTimeUtc());
+	// Every check of a working server comes here: a minute is exact enough and saves the writes
+	const QDateTime now = QDateTime::currentDateTimeUtc();
+	if (tokenPtr->GetLastUsedAt().isValid() && tokenPtr->GetLastUsedAt().secsTo(now) < s_lastUsedPrecisionSeconds){
+		return true;
+	}
+
+	tokenPtr->SetLastUsedAt(now);
 
 	return m_tokenCollectionCompPtr->SetObjectData(tokenId, *tokenPtr);
 }
@@ -305,6 +341,10 @@ bool CPersonalAccessTokenManagerComp::DeleteToken(const QByteArray& tokenId)
 	}
 
 	SendInfoMessage(0, QStringLiteral("Deleted token '%1'").arg(tokenId), "CPersonalAccessTokenManagerComp");
+
+	if (m_tokenCacheCompPtr.IsValid()){
+		m_tokenCacheCompPtr->ForgetToken(tokenId);
+	}
 
 	return true;
 }

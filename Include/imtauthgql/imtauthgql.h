@@ -1843,6 +1843,75 @@ inline bool CheckGroupGrantsInOtherProducts(
 }
 
 
+static const inline QByteArray s_changeUserPermission = QByteArrayLiteral("/Administration/Users/Edit/Change");
+
+
+/**
+	Check a change of the account of a stored user, the same for each way of storing a user.
+*/
+inline bool CheckUserAccountChange(
+			const imtgql::IGqlContext* gqlContextPtr,
+			const QByteArray& userId,
+			const imtauth::IUserInfo& previous,
+			const imtauth::IUserInfo& current,
+			QString& errorMessage)
+{
+	const bool isChanged = previous.GetId() != current.GetId() || previous.GetName() != current.GetName() || previous.GetMail() != current.GetMail()
+				|| previous.IsEnabled() != current.IsEnabled() || previous.GetPasswordHash() != current.GetPasswordHash();
+
+	return !isChanged || CheckSharedUserChange(gqlContextPtr, userId, previous, s_changeUserPermission, errorMessage);
+}
+
+
+/**
+	Check what the groups a user joins give in the other products.
+	\param groupProviderPtr Reads the joined groups.
+*/
+inline bool CheckJoinedUserGroups(
+			const imtgql::IGqlContext* gqlContextPtr,
+			const imtauth::IUserGroupInfoProvider* groupProviderPtr,
+			const QByteArrayList& previousGroups,
+			const QByteArrayList& groups,
+			QString& errorMessage)
+{
+	const QSet<QByteArray> previousSet(previousGroups.cbegin(), previousGroups.cend());
+	for (const QByteArray& groupId : groups){
+		if (previousSet.contains(groupId)){
+			continue;
+		}
+
+		const imtauth::IUserGroupInfoSharedPtr groupPtr = groupProviderPtr != nullptr ? groupProviderPtr->GetUserGroup(groupId) : imtauth::IUserGroupInfoSharedPtr();
+		if (!groupPtr.IsValid()){
+			errorMessage = QStringLiteral("Unable to read the group '%1'").arg(QString::fromUtf8(groupId));
+
+			return false;
+		}
+
+		if (!CheckGroupGrantsInOtherProducts(gqlContextPtr, *groupPtr, errorMessage)){
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+/**
+	Tell whether the group gets members it did not have: they receive all its permissions.
+*/
+inline bool HasNewGroupMembers(const QByteArrayList& previousUsers, const QByteArrayList& users)
+{
+	const QSet<QByteArray> previousSet(previousUsers.cbegin(), previousUsers.cend());
+	for (const QByteArray& userId : users){
+		if (!previousSet.contains(userId)){
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
 /**
 	Check that a change of a user or a group leaves the assignments of the other products as they are.
 	\param previousPtr The stored object, null for a new one.

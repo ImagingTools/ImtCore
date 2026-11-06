@@ -625,9 +625,10 @@ bool CAuthenticationManagerComp::ResolveUserId(
 
 		QByteArray tokenProductId;
 		QByteArray tokenClientProductId;
-		if (!m_patManagerCompPtr->ValidateToken(token, userId, tokenId, scopes, &tokenProductId, &tokenClientProductId)){
-			errorMessage = QStringLiteral("Invalid personal access token.");
-			status = imtgql::IGqlContextCreator::CCS_FORBIDDEN;
+		bool isCheckFailed = false;
+		if (!m_patManagerCompPtr->ValidateToken(token, userId, tokenId, scopes, &tokenProductId, &tokenClientProductId, &isCheckFailed)){
+			errorMessage = isCheckFailed ? QStringLiteral("The personal access token could not be checked.") : QStringLiteral("Invalid personal access token.");
+			status = isCheckFailed ? imtgql::IGqlContextCreator::CCS_INTERNAL_ERROR : imtgql::IGqlContextCreator::CCS_FORBIDDEN;
 			SendWarningMessage(
 						0,
 						QStringLiteral("ResolveUserId: invalid PAT %1")
@@ -886,6 +887,14 @@ void CAuthenticationManagerComp::StoreCachedToken(
 		}
 	}
 
+	// The same for a validation that started before the token was revoked
+	if (isPat && !tokenId.isEmpty()){
+		auto forgottenIter = m_forgottenTokenIds.constFind(tokenId);
+		if (forgottenIter != m_forgottenTokenIds.constEnd() && *forgottenIter > now){
+			return;
+		}
+	}
+
 	m_expiredTokenCache.remove(token);
 	m_tokenCache.insert(token, entry);
 	const int maxTokenCacheSize = m_maxTokenCacheSizeAttrPtr.IsValid() ? *m_maxTokenCacheSizeAttrPtr : 10000;
@@ -942,9 +951,43 @@ void CAuthenticationManagerComp::StoreExpiredToken(const QByteArray& token) cons
 }
 
 
+imtgql::IGqlContextCreator::ContextCreationStatus CAuthenticationManagerComp::CheckToken(const QByteArray& token, QString& errorMessage) const
+{
+	QByteArray userId;
+	QByteArray tenantId;
+	QByteArrayList scopes;
+	bool isPat = false;
+	ContextCreationStatus status = CCS_OK;
+	if (!ResolveUserId(token, userId, tenantId, scopes, isPat, errorMessage, status)){
+		return status;
+	}
+
+	return CCS_OK;
+}
+
+
+bool CAuthenticationManagerComp::IsRevocableToken(const QByteArray& token) const
+{
+	return IsPatToken(token);
+}
+
+
 void CAuthenticationManagerComp::ForgetToken(const QByteArray& tokenId)
 {
+	const qint64 now = QDateTime::currentMSecsSinceEpoch();
+	const qint64 tokenCacheTtlMs = m_tokenCacheTtlAttrPtr.IsValid() ? (static_cast<qint64>(*m_tokenCacheTtlAttrPtr) * 1000) : (30 * 1000);
+
 	QMutexLocker cacheLocker(&m_tokenCacheMutex);
+	for (auto iter = m_forgottenTokenIds.begin(); iter != m_forgottenTokenIds.end(); ){
+		if (*iter <= now){
+			iter = m_forgottenTokenIds.erase(iter);
+		}
+		else{
+			++iter;
+		}
+	}
+	m_forgottenTokenIds.insert(tokenId, now + tokenCacheTtlMs);
+
 	for (auto iter = m_tokenCache.begin(); iter != m_tokenCache.end(); ){
 		if (iter->isPat && iter->tokenId == tokenId){
 			iter = m_tokenCache.erase(iter);

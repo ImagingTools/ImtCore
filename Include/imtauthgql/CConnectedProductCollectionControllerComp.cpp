@@ -184,16 +184,20 @@ bool CConnectedProductCollectionControllerComp::OnBeforeRemoveElements(const QBy
 		}
 
 		// A removed product keeps no working server; a failed revocation keeps the product to repeat the removal
-		for (const QByteArray& tokenId : m_tokenManagerCompPtr->GetServerTokenIds(productPtr->GetProductId())){
+		bool isRead = false;
+		const QByteArrayList tokenIds = m_tokenManagerCompPtr->GetServerTokenIds(productPtr->GetProductId(), &isRead);
+		if (!isRead){
+			errorMessage = QStringLiteral("The tokens of the product '%1' could not be read. Try again.").arg(QString::fromUtf8(productPtr->GetProductId()));
+
+			return false;
+		}
+
+		for (const QByteArray& tokenId : tokenIds){
 			imtauth::IPersonalAccessTokenSharedPtr tokenPtr = m_tokenManagerCompPtr->GetToken(tokenId);
 			if (!tokenPtr.IsValid() || (!tokenPtr->IsRevoked() && !m_tokenManagerCompPtr->RevokeToken(tokenId))){
 				errorMessage = QStringLiteral("Unable to revoke the token '%1' of the product").arg(QString::fromUtf8(tokenId));
 
 				return false;
-			}
-
-			if (m_tokenCacheCompPtr.IsValid()){
-				m_tokenCacheCompPtr->ForgetToken(tokenId);
 			}
 		}
 	}

@@ -4,7 +4,6 @@
 
 // ImtCore includes
 #include <imtauth/CConnectedProduct.h>
-#include <imtauth/IPersonalAccessTokenCache.h>
 #include <imtauth/IPersonalAccessTokenManager.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtservergql/CObjectCollectionControllerCompBase.h>
@@ -26,7 +25,6 @@ public:
 	I_BEGIN_COMPONENT(CConnectedProductCollectionControllerComp);
 		I_ASSIGN(m_productFactCompPtr, "ProductFactory", "Factory of the catalog entries", true, "ProductFactory");
 		I_ASSIGN(m_tokenManagerCompPtr, "PersonalAccessTokenManager", "Revokes the tokens of a removed product", true, "PersonalAccessTokenManager");
-		I_ASSIGN(m_tokenCacheCompPtr, "PersonalAccessTokenCache", "Forgets a revoked token at once", false, "PersonalAccessTokenCache");
 		I_ASSIGN(m_snapshotCollectionCompPtr, "SnapshotCollection", "Published permission trees, they give the version of a product", false, "SnapshotCollection");
 		I_ASSIGN(m_ownProductIdAttrPtr, "OwnProductId", "This server in its own catalog: the entry is created with the first request and cannot be removed", false, "");
 		I_ASSIGN(m_ownProductNameAttrPtr, "OwnProductName", "Name of this server in its own catalog", false, "");
@@ -77,7 +75,6 @@ private:
 
 	I_FACT(imtauth::IConnectedProduct, m_productFactCompPtr);
 	I_REF(imtauth::IPersonalAccessTokenManager, m_tokenManagerCompPtr);
-	I_REF(imtauth::IPersonalAccessTokenCache, m_tokenCacheCompPtr);
 };
 
 

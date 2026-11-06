@@ -36,6 +36,7 @@ public:
 		I_ASSIGN(m_gqlContextCreatorCompPtr, "GqlContextCreator", "GraphQL-related context creator", false, "AuthenticationManager");
 		I_ASSIGN(m_requestManagerCompPtr, "RequestManager", "Response dispatcher of the server, tells a client its subscription was dropped", false, "RequestManager");
 		I_ASSIGN(m_isAnonymousDeniedAttrPtr, "DenyAnonymousSubscriptions", "Only channels declared open take a subscriber who has not logged in. For a server with authorization", true, false);
+		I_ASSIGN(m_isUndeclaredUserChannelDeniedAttrPtr, "DenyUndeclaredUserSubscriptions", "A user subscribes only to channels that declare who reads them", true, false);
 		I_ASSIGN(m_tokenCheckIntervalAttrPtr, "TokenCheckInterval", "Interval in seconds of checking the access tokens that hold subscriptions", true, 30);
 	I_END_COMPONENT
 
@@ -77,8 +78,11 @@ private:
 	{
 		QByteArray subscriptionId;
 		imtgql::IGqlSubscriberController* controllerPtr = nullptr;
-		imtgql::IGqlContext::Headers headers;
+		QByteArray token;
 		const imtrest::IRequest* requestPtr = nullptr;
+
+		// Only compared: the request is destroyed with it
+		const QObject* connectionPtr = nullptr;
 	};
 
 	bool IsSubscriberAllowed(const imtgql::IGqlSubscriberController& controller, const imtgql::CGqlRequest& gqlRequest) const;
@@ -91,6 +95,7 @@ private:
 	I_REF(imtgql::IGqlContextCreator, m_gqlContextCreatorCompPtr);
 	I_REF(imtrest::IResponseDispatcher, m_requestManagerCompPtr);
 	I_ATTR(bool, m_isAnonymousDeniedAttrPtr);
+	I_ATTR(bool, m_isUndeclaredUserChannelDeniedAttrPtr);
 	I_ATTR(int, m_tokenCheckIntervalAttrPtr);
 
 	mutable QList<TokenSubscription> m_tokenSubscriptions;

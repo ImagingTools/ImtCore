@@ -30,9 +30,6 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (imtgql::IGqlSubscriberController)
-	virtual bool IsOpenFor(SubscriberKind subscriberKind, const imtgql::CGqlRequest& gqlRequest) const override;
-
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 	virtual void OnComponentDestroyed() override;

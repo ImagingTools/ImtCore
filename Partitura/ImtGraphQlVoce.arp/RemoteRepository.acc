@@ -79,6 +79,12 @@
         <Element Id="ObjectCollectionChangeNotifier" PackageId="ImtServerGqlPck" ComponentId="ObjectCollectionChangeNotifier">
             <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ReadPermissions" Type="Id[]" ExportId="ReadPermissions">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="OpenToUsers" Type="Boolean" ExportId="OpenToUsers">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="SubscriptionCommandId">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

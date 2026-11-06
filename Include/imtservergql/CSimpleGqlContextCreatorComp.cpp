@@ -15,6 +15,18 @@ namespace imtservergql
 
 // reimplemented (imtgql::IGqlContextCreator)
 
+bool CSimpleGqlContextCreatorComp::IsRevocableToken(const QByteArray& /*token*/) const
+{
+	return false;
+}
+
+
+imtgql::IGqlContextCreator::ContextCreationStatus CSimpleGqlContextCreatorComp::CheckToken(const QByteArray& /*token*/, QString& /*errorMessage*/) const
+{
+	return CCS_OK;
+}
+
+
 imtgql::IGqlContextUniquePtr CSimpleGqlContextCreatorComp::CreateGqlContext(
 			const imtgql::IGqlContext::Headers& headers,
 			imtgql::IGqlContextCreator::ContextCreationError& error) const

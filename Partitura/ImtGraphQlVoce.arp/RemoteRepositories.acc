@@ -49,6 +49,14 @@
         <Element Id="GroupRemoteRepository" PackageId="ImtGraphQlVoce" ComponentId="RemoteRepository">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ReadPermissions" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>/Administration/Groups/View</Value>
+                                <Value>/OrganizationManagement/Groups/View</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                     <AttributeInfo Id="ServerCredentialProvider" Type="Reference" ExportId="ServerCredentialProvider">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -125,6 +133,14 @@
         <Element Id="RoleRemoteRepository" PackageId="ImtGraphQlVoce" ComponentId="RemoteRepository">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ReadPermissions" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>/Administration/Roles/View</Value>
+                                <Value>/OrganizationManagement/Roles/View</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                     <AttributeInfo Id="ServerCredentialProvider" Type="Reference" ExportId="ServerCredentialProvider">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -246,6 +262,14 @@
         <Element Id="UserRemoteRepository" PackageId="ImtGraphQlVoce" ComponentId="RemoteRepository">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ReadPermissions" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>/Administration/Users/View</Value>
+                                <Value>/OrganizationManagement/Members/View</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                     <AttributeInfo Id="ServerCredentialProvider" Type="Reference" ExportId="ServerCredentialProvider">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -304,6 +328,13 @@
         <Element Id="UserSessionRemoteRepository" PackageId="ImtGraphQlVoce" ComponentId="RemoteRepository">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ReadPermissions" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>/Administration/Users/View</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                     <AttributeInfo Id="ServerCredentialProvider" Type="Reference" ExportId="ServerCredentialProvider">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

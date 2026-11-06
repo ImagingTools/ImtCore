@@ -363,28 +363,13 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 	}
 
 	// An unsaved new user has no other products yet, so the checks below only bind stored accounts
-	const bool isAccountChanged = previousUserPtr->GetId() != userPtr->GetId() || previousUserPtr->GetName() != userPtr->GetName() || previousUserPtr->GetMail() != userPtr->GetMail()
-				|| previousUserPtr->IsEnabled() != userPtr->IsEnabled() || previousUserPtr->GetPasswordHash() != userPtr->GetPasswordHash();
-	if (isAccountChanged && !CheckSharedUserChange(gqlRequest.GetRequestContext(), userPtr->GetObjectUuid(), *previousUserPtr, QByteArrayLiteral("/Administration/Users/Edit/Change"), errorMessage)){
+	if (!CheckUserAccountChange(gqlRequest.GetRequestContext(), userPtr->GetObjectUuid(), *previousUserPtr, *userPtr, errorMessage)){
 		return response;
 	}
 
-	for (const QByteArray& groupId : userPtr->GetGroups()){
-		if (previousUserPtr->GetGroups().contains(groupId)){
-			continue;
-		}
-
-		const imtauth::IUserGroupInfoProvider* groupProviderPtr = userPtr->GetUserGroupProvider();
-		const imtauth::IUserGroupInfoSharedPtr groupPtr = groupProviderPtr != nullptr ? groupProviderPtr->GetUserGroup(groupId) : imtauth::IUserGroupInfoSharedPtr();
-		if (!groupPtr.IsValid()){
-			errorMessage = QStringLiteral("Unable to read the group '%1'").arg(QString::fromUtf8(groupId));
-			return response;
-		}
-		if (!CheckGroupGrantsInOtherProducts(gqlRequest.GetRequestContext(), *groupPtr, errorMessage)){
-			return response;
-		}
+	if (!CheckJoinedUserGroups(gqlRequest.GetRequestContext(), userPtr->GetUserGroupProvider(), previousUserPtr->GetGroups(), userPtr->GetGroups(), errorMessage)){
+		return response;
 	}
-
 
 	if (m_documentManagerCompPtr->SetDocumentData(userLogin, documentId, *documentPtr) != imtdoc::IDocumentService::OS_OK){
 		errorMessage = QStringLiteral("Unable to update document data. Error: SetDocumentData failed");

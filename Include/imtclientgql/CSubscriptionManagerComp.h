@@ -11,6 +11,7 @@
 #include <QtCore/QTimer>
 
 // stdlib
+#include <atomic>
 #include <memory>
 
 // ACF includes
@@ -71,6 +72,7 @@ public:
 		I_ASSIGN(m_accessTokenProviderCompPtr, "AccessTokenProvider", "Provider of the current access token", false, "AccessTokenProvider");
 		I_ASSIGN_TO(m_accessTokenProviderModelCompPtr, m_accessTokenProviderCompPtr, false);
 		I_ASSIGN(m_requestTimeoutMsAttrPtr, "RequestTimeoutMs", "Async request timeout (ms)", false, 100000);
+		I_ASSIGN(m_refusedRetryIntervalAttrPtr, "RefusedRetryInterval", "Interval in seconds of sending a refused subscription again", true, 300);
 	I_END_COMPONENT;
 
 	// reimplemented (imtclientgql::IGqlSubscriptionManager)
@@ -130,6 +132,12 @@ Q_SIGNALS:
 
 private:
 	void UpdateCustomerSubscriptionStatuses(const QByteArray& subscriptionId, const QString& message = QString()) const;
+
+	/**
+		A refused subscription is sent again after a while: the reason may be gone while the connection stays.
+	*/
+	void ScheduleRefusedRetry() const;
+	void RetryRefusedSubscriptions() const;
 	virtual imtrest::ConstResponsePtr CreateErrorResponse(const QByteArray& errorMessage, const imtrest::IRequest& request) const;
 
 	struct PendingAsync
@@ -174,6 +182,8 @@ private:
 	I_REF(imod::IModel, m_accessTokenProviderModelCompPtr);
 	I_REF(imtrest::IProtocolEngine, m_engineCompPtr);
 	I_ATTR(int, m_requestTimeoutMsAttrPtr);
+	I_ATTR(int, m_refusedRetryIntervalAttrPtr);
+	mutable std::atomic<bool> m_isRefusedRetryScheduled = false;
 
 	AccessTokenObserver m_accessTokenObserver;
 
@@ -184,6 +194,7 @@ private:
 		QByteArray m_clientId;
 		IGqlSubscriptionClient::SubscriptionStatus m_status = IGqlSubscriptionClient::SS_UNKNOWN;
 		bool m_isRegistrationSent = false; // over the current connection, the answer is awaited
+		bool m_isRefusalReported = false; // once, a retry is refused the same way
 		QList<std::shared_ptr<ClientRegistration>> m_clients;
 	};
 

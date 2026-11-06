@@ -30,7 +30,9 @@ public:
 		I_ASSIGN_TO(m_objectCollectionModelCompPtr, m_objectCollectionCompPtr, true);
 		I_ASSIGN(m_isSendItemSource, "IsSendItemSource", "Object collection", false, false);
 		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "Collection-ID", false, "");
-		I_ASSIGN_MULTI_0(m_readPermissionsAttrPtr, "ReadPermissions", "Permissions reading this collection: a user needs one of them. Without them any user may subscribe", false);
+		I_ASSIGN_MULTI_0(m_readPermissionsAttrPtr, "ReadPermissions", "Permissions reading this collection: a user needs one of them", false);
+		I_ASSIGN(m_isOpenToUsersAttrPtr, "OpenToUsers", "Any user may subscribe: the events tell nothing a user may not know", true, false);
+		I_ASSIGN(m_isOpenToServersAttrPtr, "OpenToServers", "The servers of products watch this collection", true, false);
 	I_END_COMPONENT;
 
 protected:
@@ -56,6 +58,8 @@ protected:
 	I_ATTR(bool, m_isSendItemSource);
 	I_ATTR(QByteArray, m_collectionIdAttrPtr);
 	I_MULTIATTR(QByteArray, m_readPermissionsAttrPtr);
+	I_ATTR(bool, m_isOpenToUsersAttrPtr);
+	I_ATTR(bool, m_isOpenToServersAttrPtr);
 };
 
 

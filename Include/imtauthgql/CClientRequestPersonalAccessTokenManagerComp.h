@@ -35,8 +35,15 @@ public:
 				const QByteArrayList& scopes,
 				const QDateTime& expiresAt,
 				const QByteArray& clientProductId = QByteArray()) override;
-	virtual bool ValidateToken(const QByteArray& rawToken, QByteArray& userId, QByteArray& tokenId, QByteArrayList& scopes, QByteArray* productIdPtr = nullptr, QByteArray* clientProductIdPtr = nullptr) const override;
-	virtual QByteArrayList GetServerTokenIds(const QByteArray& clientProductId) const override;
+	virtual bool ValidateToken(
+				const QByteArray& rawToken,
+				QByteArray& userId,
+				QByteArray& tokenId,
+				QByteArrayList& scopes,
+				QByteArray* productIdPtr = nullptr,
+				QByteArray* clientProductIdPtr = nullptr,
+				bool* isCheckFailedPtr = nullptr) const override;
+	virtual QByteArrayList GetServerTokenIds(const QByteArray& clientProductId, bool* isReadPtr = nullptr) const override;
 	virtual QByteArrayList GetTokenIds(const QByteArray& userId) const override;
 	virtual imtauth::IPersonalAccessTokenSharedPtr GetToken(const QByteArray& tokenId) const override;
 	virtual bool RevokeToken(const QByteArray& tokenId) override;

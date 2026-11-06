@@ -3,6 +3,7 @@
 
 
 // Qt includes
+#include <QtCore/QMultiHash>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
@@ -296,13 +297,14 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 		QString errorMessage;
 		if (subscriberControllerPtr->RegisterSubscription(subscriptionId, gqlRequest, request, errorMessage)){
 			// A token is revoked long after the subscription is made, a session ends by itself
-			const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
-			if (contextPtr != nullptr && (!contextPtr->GetClientProductId().isEmpty() || !contextPtr->GetScopes().isEmpty())){
+			const QByteArray token = gqlHeaders.value(imtbase::s_authenticationTokenHeaderId);
+			if (m_gqlContextCreatorCompPtr->IsRevocableToken(token)){
 				TokenSubscription subscription;
 				subscription.subscriptionId = subscriptionId;
 				subscription.controllerPtr = subscriberControllerPtr;
-				subscription.headers = gqlHeaders;
+				subscription.token = token;
 				subscription.requestPtr = &request;
+				subscription.connectionPtr = webSocketRequest->parent();
 
 				AddTokenSubscription(subscription);
 				webSocketRequestPtr->RegisterRequestEventHandler(const_cast<CWebSocketServletComp*>(this));
@@ -339,6 +341,16 @@ imtrest::ConstResponsePtr CWebSocketServletComp::UnregisterSubscription(const im
 	}
 
 	const QByteArray subscriptionId = webSocketRequest->GetRequestId();
+
+	{
+		// The stop comes in a request of its own over the same connection
+		QMutexLocker locker(&m_tokenSubscriptionsMutex);
+		for (int index = m_tokenSubscriptions.size() - 1; index >= 0; index--){
+			if (m_tokenSubscriptions[index].subscriptionId == subscriptionId && m_tokenSubscriptions[index].connectionPtr == webSocketRequest->parent()){
+				m_tokenSubscriptions.removeAt(index);
+			}
+		}
+	}
 
 	for (int index = 0; index < m_gqlSubscriberControllersCompPtr.GetCount(); index++){
 		imtgql::IGqlSubscriberController* controllerPtr = m_gqlSubscriberControllersCompPtr[index];
@@ -469,11 +481,12 @@ bool CWebSocketServletComp::IsSubscriberAllowed(const imtgql::IGqlSubscriberCont
 					&& controller.IsOpenFor(imtgql::IGqlSubscriberController::SK_SERVER, gqlRequest);
 	}
 
-	if (*m_isAnonymousDeniedAttrPtr && contextPtr->GetUserInfo() == nullptr){
-		return controller.IsOpenFor(imtgql::IGqlSubscriberController::SK_ANONYMOUS, gqlRequest);
+	const imtauth::IUserInfo* userInfoPtr = contextPtr->GetUserInfo();
+	if (userInfoPtr == nullptr){
+		return !*m_isAnonymousDeniedAttrPtr || controller.IsOpenFor(imtgql::IGqlSubscriberController::SK_ANONYMOUS, gqlRequest);
 	}
 
-	return true;
+	return !*m_isUndeclaredUserChannelDeniedAttrPtr || userInfoPtr->IsAdmin() || controller.IsOpenFor(imtgql::IGqlSubscriberController::SK_USER, gqlRequest);
 }
 
 
@@ -507,13 +520,24 @@ void CWebSocketServletComp::CheckTokenSubscriptions() const
 
 		locker.unlock();
 
+		QMultiHash<QByteArray, TokenSubscription> subscriptionsOfTokens;
 		for (const TokenSubscription& subscription : subscriptions){
-			imtgql::IGqlContextCreator::ContextCreationError contextError;
-			const imtgql::IGqlContextUniquePtr contextPtr = m_gqlContextCreatorCompPtr->CreateGqlContext(subscription.headers, contextError);
-			imtgql::CGqlRequestContextManager::Clear();
+			subscriptionsOfTokens.insert(subscription.token, subscription);
+		}
 
-			if (!contextPtr.IsValid()){
-				DropTokenSubscription(subscription, contextError.message);
+		const QList<QByteArray> tokens = subscriptionsOfTokens.uniqueKeys();
+		for (const QByteArray& token : tokens){
+			QString errorMessage;
+			const imtgql::IGqlContextCreator::ContextCreationStatus status = m_gqlContextCreatorCompPtr->CheckToken(token, errorMessage);
+
+			// A token that could not be checked is kept: a restart of the authorization server must not end subscriptions
+			if (status != imtgql::IGqlContextCreator::CCS_UNAUTHORIZED && status != imtgql::IGqlContextCreator::CCS_FORBIDDEN){
+				continue;
+			}
+
+			const QList<TokenSubscription> subscriptionsOfToken = subscriptionsOfTokens.values(token);
+			for (const TokenSubscription& subscription : subscriptionsOfToken){
+				DropTokenSubscription(subscription, errorMessage);
 			}
 		}
 
