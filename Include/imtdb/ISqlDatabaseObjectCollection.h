@@ -9,6 +9,8 @@
 namespace imtdb
 {
 
+class IDatabaseEngine;
+
 
 /**
  * @interface ISqlDatabaseObjectCollection
@@ -89,6 +91,8 @@ public:
 	 * @see SetInternalTransactionsEnabled()
 	 */
 	virtual bool AreInternalTransactionsEnabled() const = 0;
+	virtual bool IsTransactionRollbackOnly() const { return false; }
+	virtual const IDatabaseEngine* GetDatabaseEngine() const { return nullptr; }
 
 	/**
 	 * @brief Enables or disables internal transaction wrapping

@@ -21,6 +21,7 @@
 #include <imtdb/IDependentMetaInfoNotifier.h>
 #include <QtCore/QSet>
 #include <imtdb/ISqlDatabaseObjectDelegate.h>
+#include <imtdb/IDatabaseDependencyProcessor.h>
 #include <imtdb/IDatabaseLoginSettings.h>
 
 
@@ -50,6 +51,7 @@ public:
 		I_ASSIGN(m_objectCollectionFactoryCompPtr, "ObjectCollectionFactory", "Factory used for object collection creation", false, "ObjectCollectionFactory");
 		I_ASSIGN(m_dbEngineCompPtr, "DatabaseEngine", "Database engine used for low level SQL quering", true, "DatabaseEngine");
 		I_ASSIGN(m_objectDelegateCompPtr, "ObjectDelegate", "Database object delegate used for creation of C++ objects from the SQL record", true, "ObjectDelegate");
+		I_ASSIGN(m_dependencyProcessorCompPtr, "DependencyProcessor", "Synchronous dependency updates before committing source changes", false, "");
 		I_ASSIGN(m_metaInfoCreatorCompPtr, "MetaInfoCreator", "Meta-info creator", false, "MetaInfoCreator");
 		I_ASSIGN(m_databaseAccessSettingsCompPtr, "DatabaseAccessSettings", "Database access settings", false, "DatabaseAccessSettings");
 		I_ASSIGN(m_collectionDataControllerCompPtr, "CollectionDataController", "Data export/import controller for the collection", false, "DataController");
@@ -65,6 +67,8 @@ public:
 	virtual QByteArray GetDatabaseId() const override;
 	virtual bool AreInternalTransactionsEnabled() const override;
 	virtual bool SetInternalTransactionsEnabled(bool isEnabled) override;
+	bool IsTransactionRollbackOnly() const override;
+	const IDatabaseEngine* GetDatabaseEngine() const override { return m_dbEngineCompPtr.GetPtr(); }
 
 	// reimplemented (imtbase::IObjectCollection)
 	virtual const imtbase::IRevisionController* GetRevisionController() const override;
@@ -149,6 +153,8 @@ protected:
 	virtual void OnComponentDestroyed() override;
 	
 private:
+	bool ExecuteDependencyMutation(const QByteArray& query, const QVariantMap& bindings,
+		const imtbase::ICollectionInfo::Ids& ids, bool removed);
 	void AddOperationContextToChangeSet(const imtbase::IOperationContext& operationContext, istd::IChangeable::ChangeSet& changeSet) const;
 
 protected:
@@ -157,6 +163,7 @@ protected:
 private:
 	I_FACT(imtbase::IObjectCollection, m_objectCollectionFactoryCompPtr);
 	I_REF(ISqlDatabaseObjectDelegate, m_objectDelegateCompPtr);
+	I_REF(IDatabaseDependencyProcessor, m_dependencyProcessorCompPtr);
 	I_REF(imtbase::IMetaInfoCreator, m_metaInfoCreatorCompPtr);
 	I_REF(imtdb::IDatabaseLoginSettings, m_databaseAccessSettingsCompPtr);
 	I_REF(imtbase::ICollectionDataController, m_collectionDataControllerCompPtr);
@@ -169,6 +176,10 @@ private:
 	mutable QRecursiveMutex m_transactionDisableCountersMutex;
 	QMap<Qt::HANDLE, int> m_transactionDisableCounters;
 	QMap<Qt::HANDLE, QSet<QByteArray>> m_pendingMetadataNotifications;
+	QMap<Qt::HANDLE, int> m_metadataNotificationDepth;
+	QMap<Qt::HANDLE, QSet<QByteArray>> m_pendingDependencyRemovals;
+	QSet<Qt::HANDLE> m_discardMetadataNotifications;
+	QSet<Qt::HANDLE> m_rollbackOnlyThreads;
 };
 
 

@@ -1091,10 +1091,10 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::PrepareInsertNewObjectQuery(
 	const bool useMetaData = m_useDataMetaInfoAttrPtr.IsValid() ? *m_useDataMetaInfoAttrPtr : false;
 	if (useMetaData && m_metaInfoCreatorCompPtr.IsValid() && m_jsonBasedMetaInfoDelegateCompPtr.IsValid()){
 		idoc::MetaInfoPtr metaInfoPtr;
-		if (m_metaInfoCreatorCompPtr->CreateMetaInfo(&object, typeId, metaInfoPtr) && metaInfoPtr.IsValid()){
-			if (!m_jsonBasedMetaInfoDelegateCompPtr->ToJsonRepresentation(*metaInfoPtr.GetPtr(), metaInfoRepresentation, typeId)){
-				SendWarningMessage(0, QStringLiteral("Unable to create meta info representation for the object '%1' from the table '%2'").arg(objectId, GetTableName()));
-			}
+		if (!m_metaInfoCreatorCompPtr->CreateMetaInfo(&object, typeId, metaInfoPtr) || !metaInfoPtr.IsValid() ||
+			!m_jsonBasedMetaInfoDelegateCompPtr->ToJsonRepresentation(*metaInfoPtr.GetPtr(), metaInfoRepresentation, typeId)) {
+			SendErrorMessage(0, QStringLiteral("Unable to create meta info representation for the object '%1' from the table '%2'").arg(objectId, GetTableName()));
+			return {};
 		}
 	}
 
