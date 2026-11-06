@@ -355,7 +355,12 @@ public:
 		typedef MethodResult<Ret> Result;
 
 		static_assert(
-					std::is_void_v<Ret> || std::is_constructible_v<typename Result::Value, Ret>,
+					std::is_void_v<Ret> || std::is_constructible_v<
+								typename Result::Value,
+								std::conditional_t<
+											std::is_reference_v<Ret>,
+											std::add_lvalue_reference_t<std::remove_reference_t<Ret>>,
+											Ret>>,
 					"Method result cannot be stored in MethodResult::value, return it by value or by copyable reference");
 
 		Result result;
@@ -514,7 +519,13 @@ private:
 			value.emplace();
 		}
 		else{
-			value.emplace(std::invoke(method, document, std::forward<Args>(args)...));
+			if constexpr (std::is_reference_v<Ret>){
+				auto&& methodResult = std::invoke(method, document, std::forward<Args>(args)...);
+				value.emplace(methodResult);
+			}
+			else{
+				value.emplace(std::invoke(method, document, std::forward<Args>(args)...));
+			}
 		}
 	}
 };
@@ -524,4 +535,3 @@ private:
 
 
 Q_DECLARE_METATYPE(imtdoc::IDocumentService::DocumentNotification);
-

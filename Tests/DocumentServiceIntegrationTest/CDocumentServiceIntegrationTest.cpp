@@ -789,6 +789,24 @@ void CDocumentServiceIntegrationTest::HandleDocumentInvalidParamsTest()
 }
 
 
+void CDocumentServiceIntegrationTest::HandleDocumentWhileLoadingTest()
+{
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.documentTypeId = TEST_TYPE_ID;
+
+	QVERIFY(!m_servicePtr->BeginDocumentTask(imtdoc::IDocumentService::TT_NEW, params).isEmpty());
+
+	const imtdoc::IDocumentService::DocumentList list = m_servicePtr->GetOpenedDocumentList(TEST_USER_ID);
+	QCOMPARE(list.size(), 1);
+	QVERIFY(list[0].isLoading);
+
+	auto result = m_servicePtr->HandleDocument(TEST_USER_ID, list[0].documentId, &iprm::ITextParam::GetText);
+	QCOMPARE(result.status, imtdoc::IDocumentService::OS_FAILED);
+	QVERIFY(!result.value.has_value());
+}
+
+
 void CDocumentServiceIntegrationTest::UndoRedoChangedEventFiredTest()
 {
 	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID, TEST_DOC_NAME);
@@ -1119,5 +1137,4 @@ void CDocumentServiceIntegrationTest::SaveDocumentNotSupportedTest()
 
 
 I_ADD_TEST(CDocumentServiceIntegrationTest);
-
 
