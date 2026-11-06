@@ -2708,12 +2708,20 @@ export class Engine {
 		const targetFn = this.compile('expr', parts.length > 1 ? parts.slice(0, -1).join('.') : last, '', scope, item);
 		const whole = parts.length === 1;
 		const name = prop.name;
+		const first = parts[0];
+		// The target of an alias is an id of the same component (or a property of the item). Until that item is created
+		// the name must not be found in the scopes around: a view inside of a view that has an item with the same id
+		// (`container`) would write to the outer one.
+		const resolveTarget = () => {
+			if (!Object.prototype.hasOwnProperty.call(scope.ids, first) && !(first in item)) return undefined;
+			return targetFn.call(item);
+		};
 		if (item.$aliases === undefined) item.$aliases = new Set();
 		item.$aliases.add(name);
 		Object.defineProperty(item, name, {
 			get() {
 				try {
-					const target = targetFn.call(item);
+					const target = resolveTarget();
 					if (whole) return target;
 					return target === undefined || target === null ? undefined : target[last];
 				} catch {
@@ -2724,7 +2732,7 @@ export class Engine {
 				if (whole) throw new QmlError(`Cannot assign to the alias '${name}' of an item`);
 				let target;
 				try {
-					target = targetFn.call(item);
+					target = resolveTarget();
 				} catch {
 					target = undefined;
 				}
