@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtdb/CSqlDatabaseObjectCollectionComp.h>
+#include <algorithm>
 
 
 // Qt includes
@@ -32,6 +33,49 @@ CSqlDatabaseObjectCollectionComp::CSqlDatabaseObjectCollectionComp()
 	:m_databaseAccessObserver(*this),
 	m_isInitialized(false)
 {
+}
+
+
+void CSqlDatabaseObjectCollectionComp::BeginDeferredNotifications()
+{
+	QMutexLocker locker(&m_transactionDisableCountersMutex);
+	m_pendingMetadataNotifications.insert(QThread::currentThreadId(), {});
+}
+
+
+void CSqlDatabaseObjectCollectionComp::NotifyMetadataChanged(const imtbase::ICollectionInfo::Ids& ids)
+{
+	if (ids.isEmpty()) {
+		return;
+	}
+	{
+		QMutexLocker locker(&m_transactionDisableCountersMutex);
+		auto pending = m_pendingMetadataNotifications.find(QThread::currentThreadId());
+		if (pending != m_pendingMetadataNotifications.end()) {
+			for (const auto& id : ids) {
+				pending.value().insert(id);
+			}
+			return;
+		}
+	}
+	istd::IChangeable::ChangeSet changes(imtbase::IObjectCollection::CF_METADATA_CHANGED);
+	changes.SetChangeInfo(imtbase::IObjectCollection::CN_METADATA_CHANGED_IDS, QVariant::fromValue(ids));
+	istd::CChangeNotifier notifier(this, &changes);
+}
+
+
+void CSqlDatabaseObjectCollectionComp::CompleteDeferredNotifications(bool committed)
+{
+	imtbase::ICollectionInfo::Ids ids;
+	{
+		QMutexLocker locker(&m_transactionDisableCountersMutex);
+		const auto pending = m_pendingMetadataNotifications.take(QThread::currentThreadId());
+		if (committed) {
+			ids = pending.values();
+		}
+	}
+	std::sort(ids.begin(), ids.end());
+	NotifyMetadataChanged(ids);
 }
 
 

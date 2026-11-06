@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtdb/CSqlDatabaseTransactionManagerComp.h>
+#include <imtdb/IDependentMetaInfoNotifier.h>
 
 
 namespace imtdb
@@ -20,6 +21,9 @@ bool CSqlDatabaseTransactionManagerComp::StartTransaction()
 		for (int i = 0; i < m_collectionCompPtr.GetCount(); i++){
 			if (m_collectionCompPtr[i] != nullptr){
 				m_collectionCompPtr[i]->SetInternalTransactionsEnabled(false);
+				if (auto* notifier = dynamic_cast<IDependentMetaInfoNotifier*>(m_collectionCompPtr[i])) {
+					notifier->BeginDeferredNotifications();
+				}
 			}
 		}
 
@@ -36,13 +40,19 @@ bool CSqlDatabaseTransactionManagerComp::CancelTransaction()
 		return false;
 	}
 
+	if (!m_databaseEngineCompPtr->CancelTransaction()) {
+		return false;
+	}
 	for (int i = 0; i < m_collectionCompPtr.GetCount(); i++){
 		if (m_collectionCompPtr[i] != nullptr){
 			m_collectionCompPtr[i]->SetInternalTransactionsEnabled(true);
+			if (auto* notifier = dynamic_cast<IDependentMetaInfoNotifier*>(m_collectionCompPtr[i])) {
+				notifier->CompleteDeferredNotifications(false);
+			}
 		}
 	}
 
-	return m_databaseEngineCompPtr->CancelTransaction();
+	return true;
 }
 
 
@@ -52,13 +62,21 @@ bool CSqlDatabaseTransactionManagerComp::EndTransaction()
 		return false;
 	}
 
+	if (!m_databaseEngineCompPtr->FinishTransaction()) {
+		return false;
+	}
 	for (int i = 0; i < m_collectionCompPtr.GetCount(); i++){
 		if (m_collectionCompPtr[i] != nullptr){
 			m_collectionCompPtr[i]->SetInternalTransactionsEnabled(true);
 		}
 	}
 
-	return m_databaseEngineCompPtr->FinishTransaction();
+	for (int i = 0; i < m_collectionCompPtr.GetCount(); i++) {
+		if (auto* notifier = dynamic_cast<IDependentMetaInfoNotifier*>(m_collectionCompPtr[i])) {
+			notifier->CompleteDeferredNotifications(true);
+		}
+	}
+	return true;
 }
 
 

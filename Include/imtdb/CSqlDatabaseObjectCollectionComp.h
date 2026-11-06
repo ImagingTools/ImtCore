@@ -18,6 +18,8 @@
 #include <imtbase/IMetaInfoCreator.h>
 #include <imtbase/TModelUpdateBinder.h>
 #include <imtdb/IDatabaseEngine.h>
+#include <imtdb/IDependentMetaInfoNotifier.h>
+#include <QtCore/QSet>
 #include <imtdb/ISqlDatabaseObjectDelegate.h>
 #include <imtdb/IDatabaseLoginSettings.h>
 
@@ -32,7 +34,8 @@ namespace imtdb
 class CSqlDatabaseObjectCollectionComp:
 			public QObject,
 			public ilog::CLoggerComponentBase,
-			virtual public imtdb::ISqlDatabaseObjectCollection
+			virtual public imtdb::ISqlDatabaseObjectCollection,
+			virtual public IDependentMetaInfoNotifier
 {
 	Q_OBJECT
 public:
@@ -40,6 +43,7 @@ public:
 
 	I_BEGIN_COMPONENT(CSqlDatabaseObjectCollectionComp);
 		I_REGISTER_INTERFACE(imtdb::ISqlDatabaseObjectCollection);
+		I_REGISTER_INTERFACE(IDependentMetaInfoNotifier);
 		I_REGISTER_INTERFACE(imtbase::IObjectCollection);
 		I_REGISTER_INTERFACE(imtbase::IObjectCollectionInfo);
 		I_REGISTER_INTERFACE(imtbase::ICollectionInfo);
@@ -53,6 +57,9 @@ public:
 	I_END_COMPONENT;
 
 	CSqlDatabaseObjectCollectionComp();
+	void BeginDeferredNotifications() override;
+	void NotifyMetadataChanged(const imtbase::ICollectionInfo::Ids& ids) override;
+	void CompleteDeferredNotifications(bool committed) override;
 
 	// reimplemented (ISqlDatabaseObjectCollection)
 	virtual QByteArray GetDatabaseId() const override;
@@ -161,6 +168,7 @@ private:
 
 	mutable QRecursiveMutex m_transactionDisableCountersMutex;
 	QMap<Qt::HANDLE, int> m_transactionDisableCounters;
+	QMap<Qt::HANDLE, QSet<QByteArray>> m_pendingMetadataNotifications;
 };
 
 

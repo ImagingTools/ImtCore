@@ -7,6 +7,7 @@ namespace imtbase
 {
 
 const QByteArray IObjectCollection::CN_OBJECT_DATA_CHANGED = QByteArrayLiteral("imtbase:IObjectCollection::ObjectDataChanged");
+const QByteArray IObjectCollection::CN_METADATA_CHANGED_IDS = QByteArrayLiteral("imtbase:IObjectCollection::MetadataChangedIds");
 
 
 IHierarchicalStructure* IObjectCollection::GetCollectionStructure() const
