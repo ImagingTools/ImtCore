@@ -7,6 +7,7 @@
 
 // Qt includes
 #include <QtCore/QMutex>
+#include <QtCore/QJsonObject>
 
 // ImtCore includes
 #include <imtauthgql/CAuthorizationControllerComp.h>
@@ -25,9 +26,18 @@ public:
 		I_ASSIGN(m_systemIdAttrPtr, "SystemId", "System-ID", false, "Ldap");
 		I_ASSIGN(m_roleCollectionCompPtr, "RoleCollection", "Role collection", false, "RoleCollection");
 		I_ASSIGN(m_enableableParamCompPtr, "LdapEnableableParam", "Ldap enableable param", false, "LdapEnableableParam");
+		I_ASSIGN(m_groupSettingsFileAttrPtr, "LdapGroupSettingsFile", "Absolute path to persistent LDAP group mapping JSON; empty disables administration and mapping", false, "");
 	I_END_COMPONENT;
 
+	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
+
 protected:
+	virtual QJsonObject CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual bool PrepareAuthorization(imtauth::CUserInfo& userInfo, const QByteArray& productId, QString& errorMessage) const override;
+	virtual bool DiscoverDirectoryGroups(const QString& pattern, QMap<QByteArray, QString>& groups) const;
+	virtual bool ReadDirectoryMembership(const QByteArray& login, QByteArrayList& groups) const;
+	bool ReadGroupSettings(QJsonObject& settings, QString& errorMessage) const;
+	bool ValidateGroupSettings(const QJsonObject& settings, const QByteArray& productId, QString& errorMessage) const;
 	enum RoleType
 	{
 		RT_DEFAULT,
@@ -70,11 +80,17 @@ protected:
 				const sdl::V1_0::imtauth::CAuthorizationGqlRequest& authorizationRequest,
 				const imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CAuthorizationPayload OnUserToken(
+				const sdl::V1_0::imtauth::CUserTokenGqlRequest& userTokenRequest,
+				const imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 
 private:
 	I_REF(iprm::IEnableableParam, m_enableableParamCompPtr);
 	I_REF(imtbase::IObjectCollection, m_roleCollectionCompPtr);
 	I_ATTR(QByteArray, m_systemIdAttrPtr);
+	I_ATTR(QString, m_groupSettingsFileAttrPtr);
+	mutable QMutex m_groupSettingsMutex;
 
 	/**
 		Guards concurrent access to the role collection while a default or guest
@@ -86,5 +102,3 @@ private:
 
 
 } // namespace imtauthgql
-
-

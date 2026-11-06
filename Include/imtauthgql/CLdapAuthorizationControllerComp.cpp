@@ -12,6 +12,13 @@
 
 // Qt includes
 #include <QtCore/QMutexLocker>
+#include <QtCore/QFile>
+#include <QtCore/QFileInfo>
+#include <QtCore/QSaveFile>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonArray>
+#include <QtCore/QRegularExpression>
+#include <QtCore/QLockFile>
 
 // ACF includes
 #include <iprm/CTextParam.h>
@@ -21,6 +28,9 @@
 // ImtCore includes
 #include <imtauth/CUserInfo.h>
 #include <imtauth/CLdapUserCollectionControllerComp.h>
+#include <imtauth/CLdapGroupDirectory.h>
+#include <imtauth/CollectionSelection.h>
+#include <imtauthgql/imtauthgql.h>
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtbase/COperationContext.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Authorization.h>
@@ -28,6 +38,318 @@
 
 namespace imtauthgql
 {
+
+namespace
+{
+bool IsGroupCommand(const QByteArray& command)
+{
+	return command == "LdapGroupSettings" || command == "SaveLdapGroupSettings" || command == "DiscoverLdapGroups";
+}
+
+bool IsProductId(const QByteArray& productId)
+{
+	return !productId.isEmpty() && productId.size() <= 256 && !productId.startsWith("urn:imt:directory-roles:");
+}
+}
+
+
+bool CLdapAuthorizationControllerComp::IsRequestSupported(const imtgql::CGqlRequest& request) const
+{
+	return IsGroupCommand(request.GetCommandId()) || BaseClass::IsRequestSupported(request);
+}
+
+
+bool CLdapAuthorizationControllerComp::DiscoverDirectoryGroups(const QString& pattern, QMap<QByteArray, QString>& groups) const
+{
+	return imtauth::CLdapGroupDirectory::DiscoverGroups(pattern, groups);
+}
+
+
+bool CLdapAuthorizationControllerComp::ReadDirectoryMembership(const QByteArray& login, QByteArrayList& groups) const
+{
+	return imtauth::CLdapGroupDirectory::GetSecurityGroups(login, groups);
+}
+
+
+bool CLdapAuthorizationControllerComp::ReadGroupSettings(QJsonObject& settings, QString& errorMessage) const
+{
+	settings = QJsonObject();
+	if (!m_groupSettingsFileAttrPtr.IsValid() || m_groupSettingsFileAttrPtr->isEmpty()){
+		return true;
+	}
+	QFile file(*m_groupSettingsFileAttrPtr);
+	if (!QFileInfo(file).isAbsolute()){
+		errorMessage = QStringLiteral("LDAP group settings require an absolute server-side file path");
+		return false;
+	}
+	if (!file.exists()){
+		return true;
+	}
+	if (!file.open(QIODevice::ReadOnly) || file.size() > 1024 * 1024){
+		errorMessage = QStringLiteral("Unable to read LDAP group settings");
+		return false;
+	}
+	QJsonParseError parseError;
+	QJsonDocument document = QJsonDocument::fromJson(file.readAll(), &parseError);
+	if (file.error() != QFileDevice::NoError || parseError.error != QJsonParseError::NoError || !document.isObject() ||
+		document.object().value("version").toInt() != 1 || !document.object().value("products").isObject()){
+		errorMessage = QStringLiteral("Invalid LDAP group settings file");
+		return false;
+	}
+	settings = document.object().value("products").toObject();
+	return true;
+}
+
+
+bool CLdapAuthorizationControllerComp::ValidateGroupSettings(
+	const QJsonObject& settings, const QByteArray& productId, QString& errorMessage) const
+{
+	if (!IsProductId(productId) || !settings.value("enabled").isBool() ||
+		!settings.value("pattern").isString() || !settings.value("mappings").isObject()){
+		errorMessage = QStringLiteral("Invalid LDAP group settings");
+		return false;
+	}
+	QString pattern = settings.value("pattern").toString();
+	QJsonObject mappings = settings.value("mappings").toObject();
+	if (pattern.size() > 256 || pattern.contains(QChar('\0')) || mappings.size() > 1000 ||
+		(settings.value("enabled").toBool() && pattern.isEmpty())){
+		errorMessage = QStringLiteral("A group-name pattern is required (only '*' is a wildcard)");
+		return false;
+	}
+	static const QRegularExpression sidExpression(QStringLiteral("^S-1-[0-9]+(?:-[0-9]+)+$"));
+	for (auto mapping = mappings.begin(); mapping != mappings.end(); ++mapping){
+		if (!sidExpression.match(mapping.key()).hasMatch() || !mapping.value().isArray() ||
+			mapping.value().toArray().size() > 256){
+			errorMessage = QStringLiteral("Invalid LDAP group mapping");
+			return false;
+		}
+		for (const QJsonValue& value : mapping.value().toArray()){
+			imtbase::IObjectCollection::DataPtr roleData;
+			QByteArray roleId = value.toString().toUtf8();
+			if (!value.isString() || roleId.isEmpty() || !m_roleCollectionCompPtr.IsValid() ||
+				!m_roleCollectionCompPtr->GetObjectData(roleId, roleData)){
+				errorMessage = QStringLiteral("Unable to read a mapped role");
+				return false;
+			}
+			const imtauth::IRole* role = dynamic_cast<const imtauth::IRole*>(roleData.GetPtr());
+			if (role == nullptr || role->GetProductId() != productId){
+				errorMessage = QStringLiteral("A mapped role does not belong to this product");
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
+
+QJsonObject CLdapAuthorizationControllerComp::CreateInternalResponse(
+	const imtgql::CGqlRequest& request, QString& errorMessage) const
+{
+	const QByteArray command = request.GetCommandId();
+	if (!IsGroupCommand(command)){
+		return BaseClass::CreateInternalResponse(request, errorMessage);
+	}
+	if (!IsSuperuserRequest(request)){
+		errorMessage = QStringLiteral("LDAP group administration requires a superuser");
+		return QJsonObject();
+	}
+	if (!m_groupSettingsFileAttrPtr.IsValid() || m_groupSettingsFileAttrPtr->isEmpty()){
+		errorMessage = QStringLiteral("LDAP group administration is not configured");
+		return QJsonObject();
+	}
+	const imtgql::CGqlParamObject* input = request.GetParamObject("input");
+	QByteArray productId = input != nullptr ? input->GetParamArgumentValue("productId").toByteArray() : QByteArray();
+	if (!IsProductId(productId)){
+		errorMessage = QStringLiteral("A valid product ID is required");
+		return QJsonObject();
+	}
+	if ((command == "SaveLdapGroupSettings") != (request.GetRequestType() == imtgql::IGqlRequest::RT_MUTATION)){
+		errorMessage = QStringLiteral("Invalid LDAP group request type");
+		return QJsonObject();
+	}
+	QMutexLocker locker(&m_groupSettingsMutex);
+	QLockFile fileLock(*m_groupSettingsFileAttrPtr + QStringLiteral(".lock"));
+	if (command == "SaveLdapGroupSettings" && !fileLock.tryLock(1000)){
+		errorMessage = QStringLiteral("LDAP group settings are being updated");
+		return QJsonObject();
+	}
+	QJsonObject products;
+	if (!ReadGroupSettings(products, errorMessage)){
+		return QJsonObject();
+	}
+	const QString product = QString::fromUtf8(productId);
+	QJsonObject settings = products.value(product).toObject();
+	if (!products.contains(product)){
+		settings = QJsonObject{{"enabled", false}, {"pattern", ""}, {"mappings", QJsonObject()}};
+	}
+	QJsonObject response;
+	if (command == "SaveLdapGroupSettings"){
+		QByteArray json = input->GetParamArgumentValue("settings").toString().toUtf8();
+		QJsonParseError parseError;
+		QJsonDocument document = QJsonDocument::fromJson(json, &parseError);
+		if (json.size() > 512 * 1024 || parseError.error != QJsonParseError::NoError || !document.isObject()){
+			errorMessage = QStringLiteral("Invalid LDAP group settings JSON");
+			return QJsonObject();
+		}
+		settings = document.object();
+		if (!ValidateGroupSettings(settings, productId, errorMessage)){
+			return QJsonObject();
+		}
+		if (settings.value("enabled").toBool()){
+			QMap<QByteArray, QString> groups;
+			if (!DiscoverDirectoryGroups(settings.value("pattern").toString(), groups)){
+				errorMessage = QStringLiteral("Unable to discover AD security groups");
+				return QJsonObject();
+			}
+			QJsonObject mappings = settings.value("mappings").toObject();
+			for (auto it = mappings.begin(); it != mappings.end(); ++it){
+				if (!groups.contains(it.key().toUtf8())){
+					errorMessage = QStringLiteral("A mapped group does not match the directory pattern");
+					return QJsonObject();
+				}
+			}
+		}
+		products.insert(product, settings);
+		QByteArray data = QJsonDocument(QJsonObject{{"version", 1}, {"products", products}}).toJson();
+		if (data.size() > 1024 * 1024){
+			errorMessage = QStringLiteral("LDAP group settings are too large");
+			return QJsonObject();
+		}
+		QSaveFile file(*m_groupSettingsFileAttrPtr);
+		if (!file.open(QIODevice::WriteOnly) ||
+			!file.setPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner) ||
+			file.write(data) != data.size() || !file.commit()){
+			errorMessage = QStringLiteral("Unable to persist LDAP group settings");
+			return QJsonObject();
+		}
+		response.insert("ok", true);
+	}
+	else if (command == "DiscoverLdapGroups"){
+		QString pattern = input->GetParamArgumentValue("pattern").toString();
+		QMap<QByteArray, QString> groups;
+		if (!DiscoverDirectoryGroups(pattern, groups)){
+			errorMessage = QStringLiteral("Unable to discover AD security groups");
+			return QJsonObject();
+		}
+		QJsonArray groupRows;
+		for (auto it = groups.begin(); it != groups.end(); ++it){
+			groupRows.append(QJsonObject{{"id", QString::fromUtf8(it.key())}, {"name", it.value()}});
+		}
+		response.insert("groups", groupRows);
+	}
+	if (command == "LdapGroupSettings"){
+		if (!m_roleCollectionCompPtr.IsValid()){
+			errorMessage = QStringLiteral("LDAP role collection is not configured");
+			return QJsonObject();
+		}
+		bool complete = false;
+		QByteArrayList ids = imtauth::CollectionSelection::SelectIds(*m_roleCollectionCompPtr,
+			imtauth::CollectionSelection::ColumnEquals("ProductId", productId), {"ProductId"}, &complete);
+		QJsonArray roles;
+		if (!complete){
+			errorMessage = QStringLiteral("Unable to select product roles");
+			return QJsonObject();
+		}
+		for (const QByteArray& id : ids){
+			imtbase::IObjectCollection::DataPtr data;
+			if (!m_roleCollectionCompPtr->GetObjectData(id, data)){
+				errorMessage = QStringLiteral("Unable to read product roles");
+				return QJsonObject();
+			}
+			const imtauth::IRole* role = dynamic_cast<const imtauth::IRole*>(data.GetPtr());
+			if (role == nullptr){
+				errorMessage = QStringLiteral("Invalid role data");
+				return QJsonObject();
+			}
+			if (role->GetProductId() == productId){
+				roles.append(QJsonObject{{"id", QString::fromUtf8(id)}, {"name", role->GetRoleName()}});
+			}
+		}
+		response.insert("roles", roles);
+	}
+	response.insert("settings", QString::fromUtf8(QJsonDocument(settings).toJson(QJsonDocument::Compact)));
+	return QJsonObject{{"data", response}};
+}
+
+
+bool CLdapAuthorizationControllerComp::PrepareAuthorization(
+	imtauth::CUserInfo& userInfo, const QByteArray& productId, QString& errorMessage) const
+{
+	QMutexLocker locker(&m_groupSettingsMutex);
+	if (!IsProductId(productId)){
+		if (productId.isEmpty() && userInfo.GetDirectoryRoles(productId).isEmpty()){
+			// Legacy clients may omit the product only when directory mapping is not configured.
+			if (!m_groupSettingsFileAttrPtr.IsValid() || m_groupSettingsFileAttrPtr->isEmpty()){
+				return true;
+			}
+		}
+		errorMessage = QStringLiteral("LDAP group authorization requires a product ID");
+		return false;
+	}
+	bool ldapUser = false;
+	for (const imtauth::IUserInfo::SystemInfo& system : userInfo.GetSystemInfos()){
+		ldapUser = ldapUser || (system.enabled && system.systemId == *m_systemIdAttrPtr);
+	}
+	QByteArrayList roles;
+	if (ldapUser && m_enableableParamCompPtr.IsValid() && m_enableableParamCompPtr->IsEnabled()){
+		QJsonObject products;
+		if (!ReadGroupSettings(products, errorMessage)){
+			return false;
+		}
+		QJsonValue product = products.value(QString::fromUtf8(productId));
+		if (!product.isUndefined() && !product.isObject()){
+			errorMessage = QStringLiteral("Invalid product LDAP group settings");
+			return false;
+		}
+		QJsonObject settings = product.toObject();
+		if (!settings.isEmpty() && !ValidateGroupSettings(settings, productId, errorMessage)){
+			return false;
+		}
+		if (settings.value("enabled").toBool()){
+			QByteArrayList memberships;
+			QMap<QByteArray, QString> groups;
+			if (!ReadDirectoryMembership(userInfo.GetId(), memberships) ||
+				!DiscoverDirectoryGroups(settings.value("pattern").toString(), groups)){
+				errorMessage = QStringLiteral("Unable to refresh AD security group membership");
+				return false;
+			}
+			QJsonObject mappings = settings.value("mappings").toObject();
+			for (const QByteArray& sid : memberships){
+				if (!groups.contains(sid)){
+					continue;
+				}
+				for (const QJsonValue& role : mappings.value(QString::fromUtf8(sid)).toArray()){
+					QByteArray roleId = role.toString().toUtf8();
+					if (!roles.contains(roleId)){ roles.append(roleId); }
+				}
+			}
+		}
+	}
+	if (roles == userInfo.GetDirectoryRoles(productId)){
+		return true;
+	}
+	// Reload before changing only our source-owned grants; manual assignments are never removed.
+	QByteArray objectId = GetUserObjectId(userInfo.GetId());
+	imtbase::IObjectCollection::DataPtr data;
+	if (objectId.isEmpty() || !m_userCollectionCompPtr.IsValid() ||
+		!m_userCollectionCompPtr->GetObjectData(objectId, data)){
+		errorMessage = QStringLiteral("Unable to load LDAP role grants");
+		return false;
+	}
+	istd::IChangeableUniquePtr copy = data->CloneMe();
+	imtauth::CUserInfo* storedUser = dynamic_cast<imtauth::CUserInfo*>(copy.GetPtr());
+	if (storedUser == nullptr || storedUser->GetId() != userInfo.GetId()){
+		errorMessage = QStringLiteral("Invalid LDAP user data");
+		return false;
+	}
+	storedUser->SetDirectoryRoles(productId, roles);
+	if (!m_userCollectionCompPtr->SetObjectData(objectId, *storedUser)){
+		errorMessage = QStringLiteral("Unable to persist LDAP role grants");
+		return false;
+	}
+	userInfo.SetDirectoryRoles(productId, roles);
+	return true;
+}
 
 
 // protected methods
@@ -208,6 +530,23 @@ QByteArray CLdapAuthorizationControllerComp::GetUserObjectIdBySid(const QByteArr
 }
 
 
+sdl::V1_0::imtauth::CAuthorizationPayload CLdapAuthorizationControllerComp::OnUserToken(
+	const sdl::V1_0::imtauth::CUserTokenGqlRequest& userTokenRequest,
+	const imtgql::CGqlRequest& gqlRequest,
+	QString& errorMessage) const
+{
+	if (m_enableableParamCompPtr.IsValid() && m_enableableParamCompPtr->IsEnabled()){
+		sdl::V1_0::imtauth::CAuthorizationGqlRequest authorizationRequest(gqlRequest, false);
+		if (!authorizationRequest.IsValid()){
+			errorMessage = QStringLiteral("Invalid LDAP authorization request");
+			return sdl::V1_0::imtauth::CAuthorizationPayload();
+		}
+		return OnAuthorization(authorizationRequest, gqlRequest, errorMessage);
+	}
+	return BaseClass::OnUserToken(userTokenRequest, gqlRequest, errorMessage);
+}
+
+
 sdl::V1_0::imtauth::CAuthorizationPayload CLdapAuthorizationControllerComp::OnAuthorization(
 			const sdl::V1_0::imtauth::CAuthorizationGqlRequest& authorizationRequest,
 			const imtgql::CGqlRequest& gqlRequest,
@@ -240,6 +579,11 @@ sdl::V1_0::imtauth::CAuthorizationPayload CLdapAuthorizationControllerComp::OnAu
 				password = inputArgument.password->toUtf8();
 			}
 
+			qint64 remainingLockoutSecs = 0;
+			if (IsAccountLocked(login, &remainingLockoutSecs)){
+				return CreateAccountLockedResponse(login, remainingLockoutSecs, errorMessage);
+			}
+
 			QByteArray userObjectId = GetUserObjectId(login);
 
 			// If user not found by login name, try to find by SID
@@ -253,6 +597,7 @@ sdl::V1_0::imtauth::CAuthorizationPayload CLdapAuthorizationControllerComp::OnAu
 
 			bool ok = CheckCredential(*m_systemIdAttrPtr, login, password);
 			if (ok){
+				RegisterAccessAttempt(login, true);
 				EnsureRoleExists(productId, RT_GUEST, "Guest", "Guest", "Guest role");
 
 				QByteArray defaultRoleId = EnsureRoleExists(productId, RT_DEFAULT, "Default", "Default", "Default role");
@@ -367,5 +712,3 @@ sdl::V1_0::imtauth::CAuthorizationPayload CLdapAuthorizationControllerComp::OnAu
 
 
 } // namespace imtauthgql
-
-

@@ -17,6 +17,14 @@ class CUserBaseInfo: virtual public IUserBaseInfo
 public:
 	CUserBaseInfo();
 
+	/**
+		Directory grants are stored separately from manually assigned roles.
+		The reserved product key uses the existing Products archive representation,
+		so old user archives need no migration.
+	*/
+	RoleIds GetDirectoryRoles(const QByteArray& productId) const;
+	void SetDirectoryRoles(const QByteArray& productId, const RoleIds& roles);
+
 	// reimplemented (iser::IUserBaseInfo)
 	virtual const imtlic::IFeatureInfoProvider* GetPermissionProvider() const override;
 	virtual const imtauth::IRoleInfoProvider* GetRoleProvider() const override;
@@ -66,6 +74,5 @@ protected:
 
 
 } // namespace imtauth
-
 
 

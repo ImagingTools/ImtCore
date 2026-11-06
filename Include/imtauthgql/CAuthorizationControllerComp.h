@@ -49,6 +49,7 @@ public:
 	I_END_COMPONENT;
 
 protected:
+	virtual bool PrepareAuthorization(imtauth::CUserInfo& userInfo, const QByteArray& productId, QString& errorMessage) const;
 	bool ParseDataFromGqlRequest(const imtgql::CGqlRequest& gqlRequest, QByteArray& login, QByteArray& password, QByteArray& productId) const;
 	QByteArray GetUserObjectId(const QByteArray& login) const;
 	bool CheckCredential(const QByteArray& systemId, const QByteArray& login, const QByteArray& password) const;
@@ -152,4 +153,3 @@ protected:
 
 
 } // namespace imtauthgql
-

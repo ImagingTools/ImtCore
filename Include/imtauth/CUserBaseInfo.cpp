@@ -19,6 +19,29 @@
 namespace imtauth
 {
 
+namespace
+{
+const QByteArray DirectoryProductPrefix("urn:imt:directory-roles:");
+}
+
+
+IUserBaseInfo::RoleIds CUserBaseInfo::GetDirectoryRoles(const QByteArray& productId) const
+{
+	return m_rolesMap.value(DirectoryProductPrefix + productId);
+}
+
+
+void CUserBaseInfo::SetDirectoryRoles(const QByteArray& productId, const RoleIds& roles)
+{
+	istd::CChangeNotifier notifier(this);
+	if (roles.isEmpty()){
+		m_rolesMap.remove(DirectoryProductPrefix + productId);
+	}
+	else{
+		m_rolesMap.insert(DirectoryProductPrefix + productId, roles);
+	}
+}
+
 
 // public methods
 
@@ -94,12 +117,17 @@ void CUserBaseInfo::SetDescription(const QString& description)
 IUserBaseInfo::FeatureIds CUserBaseInfo::GetPermissions(const QByteArray& productId) const
 {
 	IUserBaseInfo::FeatureIds allPermissions;
+	if (productId.startsWith(DirectoryProductPrefix)){
+		return allPermissions;
+	}
 
 	if (m_roleProviderPtr != nullptr){
 		RoleIds roleIds;
 		if (productId.isEmpty()){
 			for (auto it = m_rolesMap.cbegin(); it != m_rolesMap.cend(); ++it){
-				roleIds += it.value();
+				if (!it.key().startsWith(DirectoryProductPrefix)){
+					roleIds += it.value();
+				}
 			}
 		}
 		else{
@@ -116,6 +144,26 @@ IUserBaseInfo::FeatureIds CUserBaseInfo::GetPermissions(const QByteArray& produc
 				for (const QByteArray& perm : std::as_const(rolePerms)){
 					if (!allPermissions.contains(perm)){
 						allPermissions << perm;
+					}
+
+					for (auto it = m_rolesMap.cbegin(); it != m_rolesMap.cend(); ++it){
+						if (!it.key().startsWith(DirectoryProductPrefix)){
+							continue;
+						}
+						QByteArray directoryProduct = it.key().mid(DirectoryProductPrefix.size());
+						if (!productId.isEmpty() && productId != directoryProduct){
+							continue;
+						}
+						for (const QByteArray& roleId : it.value()){
+							imtauth::IRoleUniquePtr role = m_roleProviderPtr->GetRole(roleId);
+							if (role.IsValid() && role->GetProductId() == directoryProduct){
+								for (const QByteArray& permission : role->GetPermissions()){
+									if (!allPermissions.contains(permission)){
+										allPermissions.append(permission);
+									}
+								}
+							}
+						}
 					}
 				}
 			}
@@ -194,12 +242,23 @@ void CUserBaseInfo::SetProhibitions(const FeatureIds &prohibitions)
 
 QByteArrayList CUserBaseInfo::GetProducts() const
 {
-	return m_rolesMap.keys();
+	QByteArrayList products;
+	for (auto it = m_rolesMap.cbegin(); it != m_rolesMap.cend(); ++it){
+		QByteArray product = it.key();
+		if (product.startsWith(DirectoryProductPrefix)){
+			product = product.mid(DirectoryProductPrefix.size());
+		}
+		if (!products.contains(product)){
+			products.append(product);
+		}
+	}
+	return products;
 }
 
 
 bool CUserBaseInfo::RemoveProduct(const QByteArray& productId)
 {
+	m_rolesMap.remove(DirectoryProductPrefix + productId);
 	bool ok = false;
 	if (m_permissionsMap.contains(productId)){
 		m_permissionsMap.remove(productId);
@@ -498,5 +557,3 @@ bool CUserBaseInfo::ResetData(CompatibilityMode /*mode*/)
 
 
 } // namespace imtauth
-
-

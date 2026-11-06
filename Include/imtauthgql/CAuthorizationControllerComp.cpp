@@ -223,6 +223,12 @@ void CAuthorizationControllerComp::RegisterAccessAttempt(const QByteArray& login
 }
 
 
+bool CAuthorizationControllerComp::PrepareAuthorization(imtauth::CUserInfo&, const QByteArray&, QString&) const
+{
+	return true;
+}
+
+
 sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateAuthorizationSuccessfulResponse(
 			imtauth::CUserInfo& userInfo,
 			const QByteArray& systemId,
@@ -230,6 +236,10 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateAu
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtauth::CAuthorizationPayload payload;
+
+	if (!PrepareAuthorization(userInfo, productId, errorMessage)){
+		return payload;
+	}
 
 	QByteArray login = userInfo.GetId();
 	QByteArray objectId = GetUserObjectId(login);
