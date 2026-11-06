@@ -35,8 +35,9 @@ protected:
 	virtual QJsonObject CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual bool PrepareAuthorization(imtauth::CUserInfo& userInfo, const QByteArray& productId, QString& errorMessage) const override;
 	virtual bool DiscoverDirectoryGroups(const QString& pattern, QMap<QByteArray, QString>& groups) const;
-	virtual bool ReadDirectoryMembership(const QByteArray& login, QByteArrayList& groups) const;
-	bool ReadGroupSettings(QJsonObject& settings, QString& errorMessage) const;
+	virtual bool ReadDirectoryMembership(const QByteArray& userSid, QByteArrayList& groups) const;
+	virtual QByteArray GetDirectoryUserSid(const QByteArray& login) const;
+	bool ReadGroupSettings(QJsonObject& settings, QString& errorMessage, bool allowMissing = false) const;
 	bool ValidateGroupSettings(const QJsonObject& settings, const QByteArray& productId, QString& errorMessage) const;
 	enum RoleType
 	{
@@ -44,7 +45,7 @@ protected:
 		RT_GUEST
 	};
 
-	virtual QByteArray CheckExistsRole(const QByteArray& productId, RoleType roleType) const;
+	virtual QByteArray CheckExistsRole(const QByteArray& productId, RoleType roleType, bool* isReadPtr = nullptr) const;
 	/**
 		Atomically ensure that a default or guest role exists for the given product.
 
@@ -73,7 +74,7 @@ protected:
 				bool isDefault,
 				bool isGuest) const;
 	virtual istd::TUniqueInterfacePtr<imtauth::IUserInfo> CreateUserInfoFromLdapUser(const QByteArray& ldapUserId) const;
-	QByteArray GetUserObjectIdBySid(const QByteArray& sid) const;
+	QByteArray GetUserObjectIdBySid(const QByteArray& sid, bool* isReadPtr = nullptr) const;
 
 	// reimplemented (CAuthorizationControllerComp)
 	virtual sdl::V1_0::imtauth::CAuthorizationPayload OnAuthorization(

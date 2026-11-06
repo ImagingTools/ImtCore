@@ -16,16 +16,25 @@ Item {
 	property string selectedGroup: ""
 	property var selectedRoles: []
 	property string command: ""
+	property string requestProductId: ""
 	property bool loaded: false
+	property bool initialized: false
 	property bool updatingRoles: false
 	property bool busy: request.state === "Loading"
 
-	Component.onCompleted: root.load()
-	onProductIdChanged: root.load()
+	Component.onCompleted: {
+		root.initialized = true
+		root.load()
+	}
+	onProductIdChanged: {
+		if (root.initialized)
+			root.load()
+	}
 
 	function load() {
 		root.loaded = false
 		root.selectedGroup = ""
+		root.selectedRoles = []
 		root.groups = []
 		root.roles = []
 		root.mappings = ({})
@@ -37,6 +46,7 @@ Item {
 		if (root.busy || !AuthorizationController.loggedUserIsSuperuser())
 			return
 		root.command = command
+		root.requestProductId = root.productId
 		let query = Gql.GqlRequest(command === "SaveLdapGroupSettings" ? "mutation" : "query", command)
 		let input = Gql.GqlObject("input")
 		input.InsertField("productId", root.productId)
@@ -54,10 +64,17 @@ Item {
 		roles.InsertField("name")
 		query.AddField(roles)
 		status.text = ""
-		request.setGqlQuery(query.GetQuery())
+		let headers = {}
+		headers["productId"] = root.productId
+		headers[AuthorizationController.authenticationTokenHeaderId] = AuthorizationController.userTokenProvider.accessToken
+		request.setGqlQuery(query.GetQuery(), headers)
 	}
 
 	function receive(json) {
+		if (root.requestProductId !== root.productId) {
+			root.load()
+			return
+		}
 		try {
 			let response = JSON.parse(json)
 			if (!response.data || !response.data[root.command]) {
@@ -85,8 +102,11 @@ Item {
 				root.groups = rows
 				root.selectGroup("")
 			}
-			else {
+			else if (data.ok === true) {
 				status.text = qsTr("Saved. Directory roles are refreshed at the next sign-in.")
+			}
+			else {
+				status.text = qsTr("LDAP group settings were not saved")
 			}
 		}
 		catch (error) {
@@ -122,6 +142,11 @@ Item {
 		root.send("SaveLdapGroupSettings", {settings: JSON.stringify(settings)})
 	}
 
+	function clearMappings() {
+		root.mappings = ({})
+		root.selectGroup(root.selectedGroup)
+	}
+
 	GqlRequest {
 		id: request
 		onStateChanged: {
@@ -134,7 +159,7 @@ Item {
 
 	Column {
 		id: body
-		anchors.fill: parent
+		anchors.fill: root
 		anchors.margins: Style.marginM
 		spacing: Style.marginM
 		enabled: !root.busy && AuthorizationController.loggedUserIsSuperuser()
@@ -164,7 +189,7 @@ Item {
 				onClicked: root.send("DiscoverLdapGroups", {pattern: pattern.text})
 			}
 			Button {
-				id: save
+				id: saveButton
 				width: 120
 				height: Style.controlHeightM
 				text: qsTr("Save")
@@ -177,6 +202,14 @@ Item {
 				height: Style.controlHeightM
 				text: qsTr("Reload")
 				onClicked: root.load()
+			}
+			Button {
+				id: clearButton
+				width: 160
+				height: Style.controlHeightM
+				text: qsTr("Clear mappings")
+				enabled: root.loaded
+				onClicked: root.clearMappings()
 			}
 		}
 		Text {

@@ -2,9 +2,6 @@
 #include <imtauth/CLdapGroupDirectory.h>
 
 
-// ImtCore includes
-#include <imtauth/CLdapUserCollectionControllerComp.h>
-
 #ifdef Q_OS_WIN
 #include <windows.h>
 #include <sddl.h>
@@ -34,7 +31,7 @@ private:
 
 QByteArray SidString(void* data, DWORD size)
 {
-	if (size < 8){
+	if (data == nullptr || size < 8){
 		return QByteArray();
 	}
 	const SID* sid = static_cast<const SID*>(data);
@@ -86,7 +83,8 @@ bool CLdapGroupDirectory::DiscoverGroups(const QString& pattern, QMap<QByteArray
 		return false;
 	}
 	IADs* root = nullptr;
-	if (FAILED(ADsGetObject(L"LDAP://rootDSE", IID_IADs, reinterpret_cast<void**>(&root)))){
+	if (FAILED(ADsOpenObject(L"LDAP://rootDSE", nullptr, nullptr,
+		ADS_SECURE_AUTHENTICATION | ADS_USE_SIGNING | ADS_USE_SEALING, IID_IADs, reinterpret_cast<void**>(&root)))){
 		return false;
 	}
 	VARIANT namingContext;
@@ -104,7 +102,8 @@ bool CLdapGroupDirectory::DiscoverGroups(const QString& pattern, QMap<QByteArray
 		return false;
 	}
 	IDirectorySearch* search = nullptr;
-	if (FAILED(ADsGetObject(reinterpret_cast<LPCWSTR>(path.utf16()), IID_IDirectorySearch, reinterpret_cast<void**>(&search)))){
+	if (FAILED(ADsOpenObject(reinterpret_cast<LPCWSTR>(path.utf16()), nullptr, nullptr,
+		ADS_SECURE_AUTHENTICATION | ADS_USE_SIGNING | ADS_USE_SEALING, IID_IDirectorySearch, reinterpret_cast<void**>(&search)))){
 		return false;
 	}
 	ADS_SEARCHPREF_INFO preferences[2] = {};
@@ -141,10 +140,12 @@ bool CLdapGroupDirectory::DiscoverGroups(const QString& pattern, QMap<QByteArray
 			bool hasSid = SUCCEEDED(search->GetColumn(handle, sidAttribute, &sidColumn));
 			QByteArray sid;
 			QString name;
-			if (hasName && nameColumn.dwNumValues == 1 && nameColumn.dwADsType == ADSTYPE_CASE_IGNORE_STRING){
+			if (hasName && nameColumn.pADsValues != nullptr && nameColumn.dwNumValues == 1 &&
+				nameColumn.dwADsType == ADSTYPE_CASE_IGNORE_STRING){
 				name = QString::fromWCharArray(nameColumn.pADsValues[0].CaseIgnoreString);
 			}
-			if (hasSid && sidColumn.dwNumValues == 1 && sidColumn.dwADsType == ADSTYPE_OCTET_STRING){
+			if (hasSid && sidColumn.pADsValues != nullptr && sidColumn.dwNumValues == 1 &&
+				sidColumn.dwADsType == ADSTYPE_OCTET_STRING){
 				ADS_OCTET_STRING value = sidColumn.pADsValues[0].OctetString;
 				sid = SidString(value.lpValue, value.dwLength);
 			}
@@ -168,7 +169,7 @@ bool CLdapGroupDirectory::DiscoverGroups(const QString& pattern, QMap<QByteArray
 }
 
 
-bool CLdapGroupDirectory::GetSecurityGroups(const QByteArray& login, QByteArrayList& groupSids)
+bool CLdapGroupDirectory::GetSecurityGroups(const QByteArray& userSid, QByteArrayList& groupSids)
 {
 	groupSids.clear();
 #ifdef Q_OS_WIN
@@ -176,16 +177,16 @@ bool CLdapGroupDirectory::GetSecurityGroups(const QByteArray& login, QByteArrayL
 	if (!com.IsValid()){
 		return false;
 	}
-	QByteArray sid = CLdapUserCollectionControllerComp::GetSidForUser(login);
 	PSID binarySid = nullptr;
-	if (sid.isEmpty() || !ConvertStringSidToSidW(qUtf16Printable(sid), &binarySid)){
+	if (userSid.isEmpty() || !ConvertStringSidToSidW(qUtf16Printable(userSid), &binarySid)){
 		return false;
 	}
 	QByteArray hexSid(static_cast<const char*>(binarySid), GetLengthSid(binarySid));
 	LocalFree(binarySid);
 	QString path = QStringLiteral("LDAP://<SID=%1>").arg(QString::fromLatin1(hexSid.toHex()));
 	IADs* user = nullptr;
-	if (FAILED(ADsGetObject(reinterpret_cast<LPCWSTR>(path.utf16()), IID_IADs, reinterpret_cast<void**>(&user)))){
+	if (FAILED(ADsOpenObject(reinterpret_cast<LPCWSTR>(path.utf16()), nullptr, nullptr,
+		ADS_SECURE_AUTHENTICATION | ADS_USE_SIGNING | ADS_USE_SEALING, IID_IADs, reinterpret_cast<void**>(&user)))){
 		return false;
 	}
 	// tokenGroups includes transitive security membership and the primary group.
@@ -221,10 +222,11 @@ bool CLdapGroupDirectory::GetSecurityGroups(const QByteArray& login, QByteArrayL
 	LONG last = -1;
 	if (ok){
 		ok = SUCCEEDED(SafeArrayGetLBound(memberships.parray, 1, &first)) &&
-			SUCCEEDED(SafeArrayGetUBound(memberships.parray, 1, &last)) && last >= first;
+			SUCCEEDED(SafeArrayGetUBound(memberships.parray, 1, &last)) && last >= first && qint64(last) - first < 10000;
 	}
 	QByteArrayList found;
-	for (LONG index = first; ok && index <= last; ++index){
+	for (qint64 position = first; ok && position <= last; ++position){
+		LONG index = LONG(position);
 		VARIANT value;
 		VariantInit(&value);
 		QByteArray groupSid;
@@ -236,7 +238,7 @@ bool CLdapGroupDirectory::GetSecurityGroups(const QByteArray& login, QByteArrayL
 	if (ok){ groupSids = found; }
 	return ok;
 #else
-	Q_UNUSED(login)
+	Q_UNUSED(userSid)
 	return false;
 #endif
 }

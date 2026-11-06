@@ -24,6 +24,8 @@ public:
 	*/
 	RoleIds GetDirectoryRoles(const QByteArray& productId) const;
 	void SetDirectoryRoles(const QByteArray& productId, const RoleIds& roles);
+	bool ResolveDirectoryRoles(const QByteArray& productId, RoleIds& roles, FeatureIds& permissions) const;
+	static bool IsReservedProductId(const QByteArray& productId);
 
 	// reimplemented (iser::IUserBaseInfo)
 	virtual const imtlic::IFeatureInfoProvider* GetPermissionProvider() const override;
@@ -74,5 +76,3 @@ protected:
 
 
 } // namespace imtauth
-
-

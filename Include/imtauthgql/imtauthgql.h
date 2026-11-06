@@ -32,6 +32,7 @@
 #include <QtCore/QSet>
 #include <QtCore/QByteArrayList>
 #include <imtauth/IUserInfo.h>
+#include <imtauth/CUserBaseInfo.h>
 #include <imtauth/IUserGroupInfoProvider.h>
 #include <imtauth/imtauth.h>
 
@@ -1078,6 +1079,18 @@ inline imtauth::IUserBaseInfo::RoleIds GetTenantUserRoles(
 				imtauth::ITenantEntityBindingManager* bindingManager)
 {
 	imtauth::IUserBaseInfo::RoleIds retVal = userInfo.GetRoles(productId);
+	const imtauth::CUserBaseInfo* directoryUser = dynamic_cast<const imtauth::CUserBaseInfo*>(&userInfo);
+	if (directoryUser != nullptr){
+		imtauth::IUserBaseInfo::RoleIds directoryRoles;
+		imtauth::IUserBaseInfo::FeatureIds directoryPermissions;
+		if (directoryUser->ResolveDirectoryRoles(productId, directoryRoles, directoryPermissions)){
+			for (const QByteArray& roleId : directoryRoles){
+				if (!retVal.contains(roleId) && ShouldKeepEntityForTenant(bindingManager, tenantId, "Roles", roleId)){
+					retVal.append(roleId);
+				}
+			}
+		}
+	}
 
 	const imtauth::IUserGroupInfoProvider* groupProviderPtr = userInfo.GetUserGroupProvider();
 	if (groupProviderPtr == nullptr){
@@ -1161,6 +1174,19 @@ inline istd::IChangeableUniquePtr AdaptUserForTenant(
 		}
 	}
 
+	QByteArrayList filteredDirectoryRoles;
+	const imtauth::CUserBaseInfo* directoryUser = dynamic_cast<const imtauth::CUserBaseInfo*>(userInfoPtr);
+	if (directoryUser != nullptr && !productId.isEmpty()){
+		for (const QByteArray& roleId : directoryUser->GetDirectoryRoles(productId)){
+			if (ShouldKeepEntityForTenant(bindingManager, tenantId, rolesEntity, roleId)){
+				filteredDirectoryRoles.append(roleId);
+			}
+			else{
+				anyFilterChange = true;
+			}
+		}
+	}
+
 	QByteArrayList filteredGroups;
 	QByteArrayList userGroups = userInfoPtr->GetGroups();
 	for (int i = 0; i < userGroups.size(); ++i){
@@ -1234,6 +1260,10 @@ inline istd::IChangeableUniquePtr AdaptUserForTenant(
 	if (anyFilterChange){
 		if (!productId.isEmpty()){
 			adaptedUserInfoPtr->SetRoles(productId, filteredRoles);
+			imtauth::CUserBaseInfo* adaptedDirectoryUser = dynamic_cast<imtauth::CUserBaseInfo*>(adaptedUserInfoPtr);
+			if (adaptedDirectoryUser != nullptr){
+				adaptedDirectoryUser->SetDirectoryRoles(productId, filteredDirectoryRoles);
+			}
 		}
 		// reset groups to filtered list
 		QByteArrayList currGroups = adaptedUserInfoPtr->GetGroups();

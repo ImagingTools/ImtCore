@@ -17,7 +17,7 @@ class CLdapGroupDirectory
 public:
 	// Keys are immutable AD security identifiers, values are display names.
 	static bool DiscoverGroups(const QString& pattern, QMap<QByteArray, QString>& groups);
-	static bool GetSecurityGroups(const QByteArray& login, QByteArrayList& groupSids);
+	static bool GetSecurityGroups(const QByteArray& userSid, QByteArrayList& groupSids);
 };
 
 

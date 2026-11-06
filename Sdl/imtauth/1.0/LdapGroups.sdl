@@ -1,0 +1,46 @@
+schema {
+	query: Query
+	mutation: Mutation
+	namespace: imtauth
+	version: 1.0
+}
+
+type LdapDirectoryGroup {
+	id: ID!
+	name: String!
+}
+
+type LdapProductRole {
+	id: ID!
+	name: String!
+}
+
+type LdapGroupSettingsPayload {
+	settings: String!
+	ok: Boolean
+	groups: [LdapDirectoryGroup]
+	roles: [LdapProductRole]
+}
+
+input LdapGroupSettingsInput {
+	productId: ID!
+}
+
+input DiscoverLdapGroupsInput {
+	productId: ID!
+	pattern: String!
+}
+
+input SaveLdapGroupSettingsInput {
+	productId: ID!
+	settings: String!
+}
+
+type Query {
+	LdapGroupSettings(input: LdapGroupSettingsInput!): LdapGroupSettingsPayload!
+	DiscoverLdapGroups(input: DiscoverLdapGroupsInput!): LdapGroupSettingsPayload!
+}
+
+type Mutation {
+	SaveLdapGroupSettings(input: SaveLdapGroupSettingsInput!): LdapGroupSettingsPayload!
+}

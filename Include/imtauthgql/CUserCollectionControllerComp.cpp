@@ -164,7 +164,9 @@ bool CUserCollectionControllerComp::FillObjectFromRepresentation(
 		userInfoPtr->SetRoles(productId, roleIds);
 	}
 	else{
+		const QByteArrayList directoryRoles = userInfoPtr->GetDirectoryRoles(productId);
 		userInfoPtr->RemoveProduct(productId);
+		userInfoPtr->SetDirectoryRoles(productId, directoryRoles);
 	}
 
 	const QByteArrayList groupIds = CAssignmentCollector::GetDirectIds(representation.groups);

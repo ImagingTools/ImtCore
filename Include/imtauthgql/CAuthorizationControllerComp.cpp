@@ -5,6 +5,7 @@
 
 // ACF includes
 #include <iprm/CParamsSet.h>
+#include <ilog/CMessageContainer.h>
 
 // ImtCore includes
 #include <imtbase/CComplexCollectionFilter.h>
@@ -40,8 +41,13 @@ bool CAuthorizationControllerComp::ParseDataFromGqlRequest(
 }
 
 
-QByteArray CAuthorizationControllerComp::GetUserObjectId(const QByteArray& login) const
+QByteArray CAuthorizationControllerComp::GetUserObjectId(const QByteArray& login, bool* isReadPtr) const
 {
+	if (isReadPtr != nullptr){ *isReadPtr = true; }
+	if (!m_userCollectionCompPtr.IsValid() || login.isEmpty()){
+		if (isReadPtr != nullptr){ *isReadPtr = false; }
+		return QByteArray();
+	}
 	imtbase::IComplexCollectionFilter::FieldFilter fieldFilter;
 	fieldFilter.fieldId = "Id";
 	fieldFilter.filterValue = login;
@@ -55,12 +61,34 @@ QByteArray CAuthorizationControllerComp::GetUserObjectId(const QByteArray& login
 	iprm::CParamsSet filterParam;
 	filterParam.SetEditableParameter("ComplexFilter", &complexFilter);
 
-	imtbase::IObjectCollection::Ids userIds = m_userCollectionCompPtr->GetElementIds(0, -1, &filterParam);
-	if (userIds.isEmpty()){
+	ilog::CMessageContainer readErrors;
+	imtbase::IObjectCollection::Ids userIds = m_userCollectionCompPtr->GetElementIds(0, -1, &filterParam, &readErrors);
+	if (readErrors.GetWorstCategory() >= istd::IInformationProvider::IC_ERROR){
+		if (isReadPtr != nullptr){ *isReadPtr = false; }
 		return QByteArray();
 	}
 
-	return userIds[0];
+	QByteArray result;
+	for (const QByteArray& userId : userIds){
+		imtbase::IObjectCollection::DataPtr data;
+		if (!m_userCollectionCompPtr->GetObjectData(userId, data)){
+			if (isReadPtr != nullptr){ *isReadPtr = false; }
+			return QByteArray();
+		}
+		const imtauth::IUserInfo* user = dynamic_cast<const imtauth::IUserInfo*>(data.GetPtr());
+		if (user == nullptr){
+			if (isReadPtr != nullptr){ *isReadPtr = false; }
+			return QByteArray();
+		}
+		if (user->GetId() == login){
+			if (!result.isEmpty()){
+				if (isReadPtr != nullptr){ *isReadPtr = false; }
+				return QByteArray();
+			}
+			result = userId;
+		}
+	}
+	return result;
 }
 
 
