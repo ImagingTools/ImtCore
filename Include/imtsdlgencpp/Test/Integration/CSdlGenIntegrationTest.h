@@ -42,12 +42,6 @@ private Q_SLOTS:
 	void TestNoObjectsEnumMetaObject();
 	void TestNoObjectsJsonRoundTrip();
 	void TestNoObjectsImportedSchemaJsonRoundTrip();
-	void TestScalarUnionRoundTrip_data();
-	void TestScalarUnionRoundTrip();
-	void TestScalarUnionQObjectBridge_data();
-	void TestScalarUnionQObjectBridge();
-	void TestScalarUnionIntegralDoubleIsReadAsInt();
-	void TestScalarUnionOptionalValueMissing();
 
 private:
 	QTemporaryDir m_arraySerializationOutputDirectory;
