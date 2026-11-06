@@ -20,6 +20,9 @@ type LdapGroupSettingsPayload {
 	ok: Boolean
 	groups: [LdapDirectoryGroup]
 	roles: [LdapProductRole]
+	notificationState: String
+	synchronizedAt: String
+	synchronizationError: String
 }
 
 input LdapGroupSettingsInput {

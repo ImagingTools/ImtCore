@@ -58,6 +58,9 @@
                     <AttributeInfo Id="LdapGroupSettingsFile" Type="String" ExportId="LdapGroupSettingsFile">
                         <Data IsEnabled="true" Value=""/>
                     </AttributeInfo>
+                    <AttributeInfo Id="LdapGroupChangeNotifications" Type="Boolean" ExportId="LdapGroupChangeNotifications">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="RoleCollection" Type="Reference" ExportId="RoleCollection">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

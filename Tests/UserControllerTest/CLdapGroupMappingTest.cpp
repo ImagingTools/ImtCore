@@ -21,6 +21,7 @@
 // ImtCore includes
 #include <imtbase/CObjectCollectionBase.h>
 #include <imtbase/IComplexCollectionFilter.h>
+#include <imtauth/CLdapGroupChangeListener.h>
 #include <imtauth/CRoleCollectionAdapterComp.h>
 #include <imtauth/CUserInfo.h>
 #include <imtauthgql/CLdapAuthorizationControllerComp.h>
@@ -203,14 +204,15 @@ public:
 	using BaseClass::PrepareAuthorization;
 	using BaseClass::OnAuthorization;
 	using BaseClass::OnUserToken;
+	using BaseClass::OnDirectoryChangeEvent;
 	bool failDirectory = false;
 	const imtauth::IRoleInfoProvider* userRoleProvider = nullptr;
 	QByteArrayList memberships{GroupSid.toUtf8()};
+	QMap<QByteArray, QString> available{{GroupSid.toUtf8(), QStringLiteral("Product-Operators")},
+		{"S-1-5-21-3", QStringLiteral("Product-Reviewers")}};
 
 	virtual bool DiscoverDirectoryGroups(const QString& pattern, QMap<QByteArray, QString>& groups) const override
 	{
-		const QMap<QByteArray, QString> available{{GroupSid.toUtf8(), QStringLiteral("Product-Operators")},
-			{"S-1-5-21-3", QStringLiteral("Product-Reviewers")}};
 		QString expression = QRegularExpression::escape(pattern);
 		expression.replace("\\*", ".*");
 		QRegularExpression matcher("\\A" + expression + "\\z", QRegularExpression::CaseInsensitiveOption);
@@ -246,7 +248,7 @@ public:
 class CFixture
 {
 public:
-	CFixture()
+	explicit CFixture(bool notifications = false)
 	{
 		fileName = QStringLiteral(".ldap-group-mapping-%1.json").arg(QUuid::createUuid().toString(QUuid::WithoutBraces));
 		users->InitComponent();
@@ -261,6 +263,8 @@ public:
 		controller->SetRef("RoleCollection", roles);
 		controller->SetRef("LdapEnableableParam", enabled);
 		controller->SetStringAttr("LdapGroupSettingsFile", QDir::current().absoluteFilePath(fileName));
+		// A real listener would connect to the domain of a Windows test machine.
+		controller->SetBoolAttr("LdapGroupChangeNotifications", notifications);
 		controller->InsertMultiRef("CredentialControllers", credentials);
 		controller->InsertMultiAttr("SystemIds", QByteArray("Ldap"));
 		controller->InitComponent();
@@ -287,6 +291,7 @@ public:
 	{
 		QFile::remove(fileName);
 		QFile::remove(fileName + ".lock");
+		QFile::remove(fileName + ".groups.json");
 	}
 
 	void AddRole(const QByteArray& id, const QByteArray& product, const QByteArray& permission)
@@ -342,11 +347,12 @@ public:
 		return controller->OnAuthorization(typed, request, error);
 	}
 
-	QJsonObject AdminRequest(const QByteArray& command, bool superuser, const QJsonObject& settings, QString& error)
+	QJsonObject AdminRequest(const QByteArray& command, bool superuser, const QJsonObject& settings, QString& error,
+		const QByteArray& productId = Product)
 	{
 		imtgql::CGqlRequest request(command == "SaveLdapGroupSettings" ? imtgql::IGqlRequest::RT_MUTATION : imtgql::IGqlRequest::RT_QUERY, command);
 		imtgql::CGqlParamObject input;
-		input.InsertParam("productId", Product);
+		input.InsertParam("productId", productId);
 		input.InsertParam("pattern", QStringLiteral("Product-*"));
 		input.InsertParam("settings", QString::fromUtf8(QJsonDocument(settings).toJson()));
 		request.AddParam("input", input);
@@ -354,6 +360,43 @@ public:
 		if (superuser){ context->SetUserInfo(&admin); }
 		request.SetGqlContext(context);
 		return controller->CreateResponse(request, error);
+	}
+
+	QJsonObject GroupSettings(const QByteArray& productId = Product)
+	{
+		QString error;
+		QJsonObject data = AdminRequest("LdapGroupSettings", true, QJsonObject(), error, productId).value("data").toObject();
+		if (!error.isEmpty()){
+			return QJsonObject();
+		}
+
+		return data;
+	}
+
+	static QMap<QString, QString> Groups(const QJsonObject& data)
+	{
+		QMap<QString, QString> groups;
+		for (const QJsonValue& row : data.value("groups").toArray()){
+			groups.insert(row.toObject().value("id").toString(), row.toObject().value("name").toString());
+		}
+
+		return groups;
+	}
+
+	static QStringList GroupIds(const QJsonObject& data)
+	{
+		QStringList ids;
+		for (const QJsonValue& row : data.value("groups").toArray()){
+			ids.append(row.toObject().value("id").toString());
+		}
+		ids.sort();
+
+		return ids;
+	}
+
+	void Notify(imtauth::CLdapGroupChangeListener::Event event, const QString& message = QString())
+	{
+		controller->OnDirectoryChangeEvent(event, message);
 	}
 
 	QString fileName;
@@ -658,6 +701,143 @@ void CLdapGroupMappingTest::testDirectoryRolesRespectTenantBindings()
 	QVERIFY(globalPermissions.isEmpty());
 	QCOMPARE(fixture.user.GetDirectoryRoles(Product), QByteArrayList({FirstRole, SecondRole}));
 	QCOMPARE(fixture.user.GetRoles(Product), QByteArrayList({FirstRole}));
+}
+
+
+void CLdapGroupMappingTest::testNotificationsSynchronizeGroupList()
+{
+	CFixture fixture;
+	QVERIFY(CFixture::Groups(fixture.GroupSettings()).isEmpty());
+	fixture.Notify(imtauth::CLdapGroupChangeListener::E_CONNECTED);
+	QJsonObject data = fixture.GroupSettings();
+	QCOMPARE(data.value("notificationState").toString(), QStringLiteral("Connected"));
+	QVERIFY(!data.value("synchronizedAt").toString().isEmpty());
+	QVERIFY(data.value("synchronizationError").toString().isEmpty());
+	QCOMPARE(CFixture::Groups(data), (QMap<QString, QString>{
+		{GroupSid, QStringLiteral("Product-Operators")},
+		{QStringLiteral("S-1-5-21-3"), QStringLiteral("Product-Reviewers")}}));
+
+	// Rename, creation, and a new group outside the pattern.
+	fixture.controller->available.insert("S-1-5-21-3", QStringLiteral("Product-Auditors"));
+	fixture.controller->available.insert("S-1-5-21-4", QStringLiteral("Product-New"));
+	fixture.controller->available.insert("S-1-5-21-5", QStringLiteral("Other-Group"));
+	fixture.Notify(imtauth::CLdapGroupChangeListener::E_GROUPS_CHANGED);
+	QCOMPARE(CFixture::Groups(fixture.GroupSettings()), (QMap<QString, QString>{
+		{GroupSid, QStringLiteral("Product-Operators")},
+		{QStringLiteral("S-1-5-21-3"), QStringLiteral("Product-Auditors")},
+		{QStringLiteral("S-1-5-21-4"), QStringLiteral("Product-New")}}));
+
+	// Deletion of a mapped group and a rename out of the pattern.
+	fixture.controller->available.remove(GroupSid.toUtf8());
+	fixture.controller->available.insert("S-1-5-21-3", QStringLiteral("Retired-Auditors"));
+	fixture.Notify(imtauth::CLdapGroupChangeListener::E_GROUPS_CHANGED);
+	data = fixture.GroupSettings();
+	QCOMPARE(CFixture::Groups(data), (QMap<QString, QString>{{QStringLiteral("S-1-5-21-4"), QStringLiteral("Product-New")}}));
+
+	// The administrator-owned mapping of the deleted group stays; the new group is not mapped automatically.
+	QJsonObject settings = QJsonDocument::fromJson(data.value("settings").toString().toUtf8()).object();
+	QCOMPARE(settings.value("mappings").toObject(), fixture.Settings().value("mappings").toObject());
+	imtbase::IObjectCollection::DataPtr stored;
+	QVERIFY(fixture.Stored(stored) != nullptr);
+	QCOMPARE(fixture.Stored(stored)->GetRoles(Product), QByteArrayList({FirstRole}));
+	QVERIFY(fixture.Stored(stored)->GetDirectoryRoles(Product).isEmpty());
+
+	// The deleted group no longer grants roles at sign-in; manual roles are kept.
+	QString error;
+	QVERIFY2(fixture.Refresh(error), qPrintable(error));
+	QVERIFY(fixture.user.GetDirectoryRoles(Product).isEmpty());
+	QCOMPARE(fixture.user.GetRoles(Product), QByteArrayList({FirstRole}));
+}
+
+
+void CLdapGroupMappingTest::testFailedDirectoryReadKeepsGroupList()
+{
+	CFixture fixture;
+	fixture.Notify(imtauth::CLdapGroupChangeListener::E_CONNECTED);
+	QCOMPARE(int(CFixture::Groups(fixture.GroupSettings()).size()), 2);
+	fixture.controller->available.remove(GroupSid.toUtf8());
+	fixture.controller->failDirectory = true;
+	fixture.Notify(imtauth::CLdapGroupChangeListener::E_GROUPS_CHANGED);
+	QJsonObject data = fixture.GroupSettings();
+	QCOMPARE(int(CFixture::Groups(data).size()), 2);
+	QVERIFY(!data.value("synchronizationError").toString().isEmpty());
+	fixture.controller->failDirectory = false;
+	fixture.Notify(imtauth::CLdapGroupChangeListener::E_GROUPS_CHANGED);
+	data = fixture.GroupSettings();
+	QCOMPARE(CFixture::GroupIds(data), QStringList({QStringLiteral("S-1-5-21-3")}));
+	QVERIFY(data.value("synchronizationError").toString().isEmpty());
+}
+
+
+void CLdapGroupMappingTest::testReconnectResynchronizesGroupList()
+{
+	CFixture fixture;
+	fixture.Notify(imtauth::CLdapGroupChangeListener::E_CONNECTED);
+	fixture.controller->available.insert("S-1-5-21-3", QStringLiteral("Product-Auditors"));
+	fixture.Notify(imtauth::CLdapGroupChangeListener::E_DISCONNECTED, QStringLiteral("Connection lost"));
+	QJsonObject data = fixture.GroupSettings();
+	QCOMPARE(data.value("notificationState").toString(), QStringLiteral("Disconnected"));
+	QVERIFY(data.value("synchronizationError").toString().contains(QStringLiteral("Connection lost")));
+	QCOMPARE(CFixture::Groups(data).value(QStringLiteral("S-1-5-21-3")), QStringLiteral("Product-Reviewers"));
+	fixture.Notify(imtauth::CLdapGroupChangeListener::E_CONNECTED);
+	data = fixture.GroupSettings();
+	QCOMPARE(data.value("notificationState").toString(), QStringLiteral("Connected"));
+	QCOMPARE(CFixture::Groups(data).value(QStringLiteral("S-1-5-21-3")), QStringLiteral("Product-Auditors"));
+}
+
+
+void CLdapGroupMappingTest::testGroupListIsProductScopedAndServerOwned()
+{
+	CFixture fixture;
+	QFile file(fixture.fileName);
+	QVERIFY(file.open(QIODevice::WriteOnly | QIODevice::Truncate));
+	QJsonObject other{{"enabled", false}, {"pattern", "Other-*"}, {"mappings", QJsonObject()}};
+	QByteArray document = QJsonDocument(QJsonObject{{"version", 1}, {"products", QJsonObject{
+		{QString::fromUtf8(Product), fixture.Settings()}, {QString::fromUtf8(OtherProduct), other}}}}).toJson();
+	QCOMPARE(file.write(document), qint64(document.size()));
+	file.close();
+	fixture.controller->available.insert("S-1-5-21-5", QStringLiteral("Other-Group"));
+	fixture.Notify(imtauth::CLdapGroupChangeListener::E_CONNECTED);
+	QCOMPARE(CFixture::GroupIds(fixture.GroupSettings(OtherProduct)), QStringList({QStringLiteral("S-1-5-21-5")}));
+	QCOMPARE(int(CFixture::Groups(fixture.GroupSettings()).size()), 2);
+
+	// A client cannot store group names; the list follows the saved pattern.
+	QJsonObject settings = fixture.Settings();
+	settings.insert("pattern", QStringLiteral("Product-Op*"));
+	settings.insert("groups", QJsonObject{{QStringLiteral("S-1-5-21-9"), QStringLiteral("Forged")}});
+	QString error;
+	QJsonObject data = fixture.AdminRequest("SaveLdapGroupSettings", true, settings, error).value("data").toObject();
+	QVERIFY2(error.isEmpty(), qPrintable(error));
+	QCOMPARE(CFixture::GroupIds(data), QStringList({GroupSid}));
+	QVERIFY(!QJsonDocument::fromJson(data.value("settings").toString().toUtf8()).object().contains("groups"));
+	QCOMPARE(CFixture::GroupIds(fixture.GroupSettings()), QStringList({GroupSid}));
+	QCOMPARE(CFixture::GroupIds(fixture.GroupSettings(OtherProduct)), QStringList({QStringLiteral("S-1-5-21-5")}));
+	QVERIFY(file.open(QIODevice::ReadOnly));
+	QJsonObject saved = QJsonDocument::fromJson(file.readAll()).object().value("products").toObject();
+	QVERIFY(!saved.value(QString::fromUtf8(Product)).toObject().contains("groups"));
+}
+
+
+void CLdapGroupMappingTest::testUnsupportedNotificationsAreReported()
+{
+	CFixture disabled;
+	QCOMPARE(disabled.GroupSettings().value("notificationState").toString(), QStringLiteral("Disabled"));
+#ifdef Q_OS_WIN
+	QSKIP("Windows uses the Active Directory change-notification listener");
+#else
+	QVERIFY(!imtauth::CLdapGroupChangeListener::IsSupported());
+	imtauth::CLdapGroupChangeListener listener;
+	QString error;
+	QVERIFY(!listener.Start([](imtauth::CLdapGroupChangeListener::Event, const QString&){}, error));
+	QVERIFY(!error.isEmpty());
+	QVERIFY(!listener.IsRunning());
+	CFixture fixture(true);
+	QJsonObject data = fixture.GroupSettings();
+	QCOMPARE(data.value("notificationState").toString(), QStringLiteral("Unsupported"));
+	QVERIFY(!data.value("synchronizationError").toString().isEmpty());
+	QVERIFY(data.value("synchronizedAt").toString().isEmpty());
+	QVERIFY(CFixture::Groups(data).isEmpty());
+#endif
 }
 
 

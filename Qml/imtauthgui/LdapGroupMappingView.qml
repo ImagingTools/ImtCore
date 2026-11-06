@@ -38,6 +38,7 @@ Item {
 		root.groups = []
 		root.roles = []
 		root.mappings = ({})
+		synchronization.text = ""
 		if (root.productId !== "" && AuthorizationController.loggedUserIsSuperuser())
 			root.send("LdapGroupSettings", {})
 	}
@@ -63,6 +64,9 @@ Item {
 		roles.InsertField("id")
 		roles.InsertField("name")
 		query.AddField(roles)
+		query.AddField(Gql.GqlObject("notificationState"))
+		query.AddField(Gql.GqlObject("synchronizedAt"))
+		query.AddField(Gql.GqlObject("synchronizationError"))
 		status.text = ""
 		let headers = {}
 		headers["productId"] = root.productId
@@ -88,21 +92,16 @@ Item {
 				pattern.text = settings.pattern
 				root.mappings = settings.mappings
 				root.roles = data.roles
+				root.showGroups(data.groups ? data.groups : [])
+				root.showSynchronization(data)
 				root.loaded = true
 			}
 			else if (root.command === "DiscoverLdapGroups") {
-				let rows = data.groups
-				let ids = []
-				for (let index = 0; index < rows.length; ++index)
-					ids.push(rows[index].id)
-				for (let sid in root.mappings) {
-					if (ids.indexOf(sid) < 0)
-						rows.push({id: sid, name: sid + " " + qsTr("(unavailable; clear its roles before saving)")})
-				}
-				root.groups = rows
-				root.selectGroup("")
+				root.showGroups(data.groups)
 			}
 			else if (data.ok === true) {
+				root.showGroups(data.groups ? data.groups : [])
+				root.showSynchronization(data)
 				status.text = qsTr("Saved. Directory roles are refreshed at the next sign-in.")
 			}
 			else {
@@ -112,6 +111,27 @@ Item {
 		catch (error) {
 			status.text = qsTr("Invalid LDAP group response")
 		}
+	}
+
+	function showGroups(rows) {
+		let ids = []
+		for (let index = 0; index < rows.length; ++index)
+			ids.push(rows[index].id)
+		for (let sid in root.mappings) {
+			if (ids.indexOf(sid) < 0)
+				rows.push({id: sid, name: sid + " " + qsTr("(unavailable; clear its roles before saving)")})
+		}
+		root.groups = rows
+		root.selectGroup("")
+	}
+
+	function showSynchronization(data) {
+		let text = qsTr("Directory change notifications: ") + data.notificationState
+		if (data.synchronizedAt)
+			text += ". " + qsTr("Group list synchronized: ") + data.synchronizedAt
+		if (data.synchronizationError)
+			text += ". " + data.synchronizationError
+		synchronization.text = text
 	}
 
 	function selectGroup(sid) {
@@ -213,6 +233,12 @@ Item {
 			}
 		}
 		Text {
+			id: synchronization
+			width: body.width
+			wrapMode: Text.WordWrap
+			color: Style.textColor
+		}
+		Text {
 			id: groupTitle
 			text: qsTr("Select a directory group")
 			color: Style.textColor
@@ -241,7 +267,7 @@ Item {
 		ListView {
 			id: roleList
 			width: body.width
-			height: Math.max(80, root.height - 400)
+			height: Math.max(80, root.height - 440)
 			clip: true
 			model: root.roles
 			delegate: CheckBox {

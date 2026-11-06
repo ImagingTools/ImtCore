@@ -12,6 +12,7 @@
 
 // Qt includes
 #include <QtCore/QMutexLocker>
+#include <QtCore/QDateTime>
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
 #include <QtCore/QSaveFile>
@@ -51,6 +52,51 @@ bool IsProductId(const QByteArray& productId)
 	return !productId.isEmpty() && productId.size() <= 256 && !productId.contains('\0') &&
 		!imtauth::CUserBaseInfo::IsReservedProductId(productId);
 }
+
+
+bool IsGroupSid(const QString& sid)
+{
+	static const QRegularExpression sidExpression(QStringLiteral("^S-1-[0-9]+(?:-[0-9]+)+$"));
+
+	return sidExpression.match(sid).hasMatch();
+}
+
+
+QJsonObject CreateCatalogEntry(const QString& pattern, const QMap<QByteArray, QString>& groups)
+{
+	QJsonObject groupNames;
+	for (auto it = groups.constBegin(); it != groups.constEnd(); ++it){
+		groupNames.insert(QString::fromUtf8(it.key()), it.value());
+	}
+
+	return QJsonObject{{"pattern", pattern}, {"groups", groupNames}};
+}
+
+
+QJsonArray CreateCatalogRows(const QJsonObject& catalog, const QString& pattern)
+{
+	QJsonArray rows;
+
+	// A catalog of another pattern does not describe the groups of the current settings.
+	if (pattern.isEmpty() || catalog.value("pattern").toString() != pattern){
+		return rows;
+	}
+
+	QJsonObject groups = catalog.value("groups").toObject();
+	for (auto it = groups.constBegin(); it != groups.constEnd(); ++it){
+		if (IsGroupSid(it.key()) && it.value().isString() && !it.value().toString().isEmpty()){
+			rows.append(QJsonObject{{"id", it.key()}, {"name", it.value().toString()}});
+		}
+	}
+
+	return rows;
+}
+
+
+const char* const s_logSource = "imtauthgql::CLdapAuthorizationControllerComp";
+const qint64 s_maximumCatalogSize = 16 * 1024 * 1024;
+
+
 }
 
 
@@ -80,7 +126,7 @@ QByteArray CLdapAuthorizationControllerComp::GetDirectoryUserSid(const QByteArra
 bool CLdapAuthorizationControllerComp::ReadGroupSettings(QJsonObject& settings, QString& errorMessage, bool allowMissing) const
 {
 	settings = QJsonObject();
-	if (!m_groupSettingsFileAttrPtr.IsValid() || m_groupSettingsFileAttrPtr->isEmpty()){
+	if (!IsGroupSettingsConfigured()){
 		return true;
 	}
 	QFile file(*m_groupSettingsFileAttrPtr);
@@ -125,10 +171,9 @@ bool CLdapAuthorizationControllerComp::ValidateGroupSettings(
 		errorMessage = QStringLiteral("A group-name pattern is required (only '*' is a wildcard)");
 		return false;
 	}
-	static const QRegularExpression sidExpression(QStringLiteral("^S-1-[0-9]+(?:-[0-9]+)+$"));
 	QByteArrayList pendingRoles;
 	for (auto mapping = mappings.begin(); mapping != mappings.end(); ++mapping){
-		if (!sidExpression.match(mapping.key()).hasMatch() || !mapping.value().isArray() ||
+		if (!IsGroupSid(mapping.key()) || !mapping.value().isArray() ||
 			mapping.value().toArray().size() > 256){
 			errorMessage = QStringLiteral("Invalid LDAP group mapping");
 			return false;
@@ -178,7 +223,7 @@ QJsonObject CLdapAuthorizationControllerComp::CreateInternalResponse(
 		errorMessage = QStringLiteral("LDAP group administration requires a superuser");
 		return QJsonObject();
 	}
-	if (!m_groupSettingsFileAttrPtr.IsValid() || m_groupSettingsFileAttrPtr->isEmpty()){
+	if (!IsGroupSettingsConfigured()){
 		errorMessage = QStringLiteral("LDAP group administration is not configured");
 		return QJsonObject();
 	}
@@ -220,12 +265,20 @@ QJsonObject CLdapAuthorizationControllerComp::CreateInternalResponse(
 		if (!ValidateGroupSettings(settings, productId, errorMessage)){
 			return QJsonObject();
 		}
+		// Only the administrator-owned fields are stored; the group catalog is owned by the server.
+		settings = QJsonObject{
+			{"enabled", settings.value("enabled")},
+			{"pattern", settings.value("pattern")},
+			{"mappings", settings.value("mappings")}};
+		const QString pattern = settings.value("pattern").toString();
+		QMap<QByteArray, QString> groups;
+		bool hasGroups = false;
 		if (settings.value("enabled").toBool()){
-			QMap<QByteArray, QString> groups;
-			if (!DiscoverDirectoryGroups(settings.value("pattern").toString(), groups)){
+			if (!DiscoverDirectoryGroups(pattern, groups)){
 				errorMessage = QStringLiteral("Unable to discover AD security groups");
 				return QJsonObject();
 			}
+			hasGroups = true;
 			QJsonObject mappings = settings.value("mappings").toObject();
 			for (auto it = mappings.begin(); it != mappings.end(); ++it){
 				if (!groups.contains(it.key().toUtf8())){
@@ -233,6 +286,10 @@ QJsonObject CLdapAuthorizationControllerComp::CreateInternalResponse(
 					return QJsonObject();
 				}
 			}
+		}
+		else if (!pattern.isEmpty()){
+			// Disabled settings may be saved while the directory is unavailable; the catalog is then refreshed later.
+			hasGroups = DiscoverDirectoryGroups(pattern, groups);
 		}
 		products.insert(product, settings);
 		QByteArray data = QJsonDocument(QJsonObject{{"version", 1}, {"products", products}}).toJson();
@@ -248,6 +305,27 @@ QJsonObject CLdapAuthorizationControllerComp::CreateInternalResponse(
 			return QJsonObject();
 		}
 		response.insert("ok", true);
+		QJsonObject catalogs;
+		QString catalogError;
+		if (!ReadGroupCatalog(catalogs, catalogError)){
+			// The catalog never grants access; an unreadable one is rebuilt from the directory.
+			catalogs = QJsonObject();
+		}
+		if (hasGroups){
+			catalogs.insert(product, CreateCatalogEntry(pattern, groups));
+		}
+		else if (catalogs.value(product).toObject().value("pattern").toString() != pattern){
+			catalogs.remove(product);
+		}
+		if (WriteGroupCatalog(catalogs, catalogError)){
+			if (hasGroups){
+				MarkSynchronized(QStringList{product});
+			}
+		}
+		else{
+			SetSynchronizationError(catalogError);
+			SendErrorMessage(0, catalogError, s_logSource);
+		}
 	}
 	else if (command == "DiscoverLdapGroups"){
 		QString pattern = input->GetParamArgumentValue("pattern").toString();
@@ -292,6 +370,21 @@ QJsonObject CLdapAuthorizationControllerComp::CreateInternalResponse(
 		}
 		response.insert("roles", roles);
 	}
+	if (command != "DiscoverLdapGroups"){
+		QJsonObject catalogs;
+		QString catalogError;
+		if (!ReadGroupCatalog(catalogs, catalogError)){
+			catalogs = QJsonObject();
+		}
+		response.insert("groups", CreateCatalogRows(catalogs.value(product).toObject(), settings.value("pattern").toString()));
+		QMutexLocker statusLocker(&m_directoryStatusMutex);
+		QStringList problems;
+		problems << m_notificationMessage << m_synchronizationError << catalogError;
+		problems.removeAll(QString());
+		response.insert("notificationState", m_notificationState.isEmpty() ? QStringLiteral("Disabled") : m_notificationState);
+		response.insert("synchronizedAt", m_synchronizedAt.value(product));
+		response.insert("synchronizationError", problems.join(QStringLiteral(" ")));
+	}
 	response.insert("settings", QString::fromUtf8(QJsonDocument(settings).toJson(QJsonDocument::Compact)));
 	return QJsonObject{{"data", response}};
 }
@@ -316,7 +409,7 @@ bool CLdapAuthorizationControllerComp::PrepareAuthorization(
 					return false;
 				}
 			}
-			if (!m_groupSettingsFileAttrPtr.IsValid() || m_groupSettingsFileAttrPtr->isEmpty()){
+			if (!IsGroupSettingsConfigured()){
 				return true;
 			}
 			QJsonObject products;
@@ -417,6 +510,169 @@ bool CLdapAuthorizationControllerComp::PrepareAuthorization(
 		return false;
 	}
 	return true;
+}
+
+
+bool CLdapAuthorizationControllerComp::SynchronizeDirectoryGroups(QString& errorMessage) const
+{
+	if (!IsGroupSettingsConfigured()){
+		return true;
+	}
+
+	QMap<QString, QString> patterns;
+	{
+		QMutexLocker locker(&m_groupSettingsMutex);
+
+		QJsonObject products;
+		if (!ReadGroupSettings(products, errorMessage, true)){
+			return false;
+		}
+
+		for (auto it = products.constBegin(); it != products.constEnd(); ++it){
+			QString pattern = it.value().toObject().value("pattern").toString();
+			if (IsProductId(it.key().toUtf8()) && !pattern.isEmpty()){
+				patterns.insert(it.key(), pattern);
+			}
+		}
+	}
+
+	// The directory is read without the settings lock, so a slow domain controller does not block sign-ins.
+	QMap<QString, QMap<QByteArray, QString>> discoveredGroups;
+	QStringList failedProducts;
+	for (auto it = patterns.constBegin(); it != patterns.constEnd(); ++it){
+		QMap<QByteArray, QString> groups;
+		if (DiscoverDirectoryGroups(it.value(), groups)){
+			discoveredGroups.insert(it.key(), groups);
+		}
+		else{
+			failedProducts.append(it.key());
+		}
+	}
+
+	QMutexLocker locker(&m_groupSettingsMutex);
+
+	QLockFile fileLock(*m_groupSettingsFileAttrPtr + QStringLiteral(".lock"));
+	if (!fileLock.tryLock(5000)){
+		errorMessage = QStringLiteral("LDAP group settings are being updated; the directory group list was not synchronized");
+
+		return false;
+	}
+
+	QJsonObject products;
+	if (!ReadGroupSettings(products, errorMessage, true)){
+		return false;
+	}
+
+	QJsonObject previousCatalogs;
+	QString catalogError;
+	if (!ReadGroupCatalog(previousCatalogs, catalogError)){
+		// The catalog never grants access; an unreadable one is rebuilt from the directory.
+		SendWarningMessage(0, catalogError, s_logSource);
+
+		previousCatalogs = QJsonObject();
+	}
+
+	QJsonObject catalogs;
+	QStringList synchronizedProducts;
+	for (auto it = products.constBegin(); it != products.constEnd(); ++it){
+		QString pattern = it.value().toObject().value("pattern").toString();
+		if (!IsProductId(it.key().toUtf8()) || pattern.isEmpty()){
+			continue;
+		}
+
+		if (discoveredGroups.contains(it.key()) && patterns.value(it.key()) == pattern){
+			catalogs.insert(it.key(), CreateCatalogEntry(pattern, discoveredGroups.value(it.key())));
+			synchronizedProducts.append(it.key());
+		}
+		else if (previousCatalogs.value(it.key()).toObject().value("pattern").toString() == pattern){
+			// A failed read or a pattern changed meanwhile keeps the last complete group list.
+			catalogs.insert(it.key(), previousCatalogs.value(it.key()));
+		}
+	}
+
+	if (catalogs != previousCatalogs && !WriteGroupCatalog(catalogs, errorMessage)){
+		return false;
+	}
+
+	MarkSynchronized(synchronizedProducts);
+
+	if (!failedProducts.isEmpty()){
+		errorMessage = QStringLiteral("Unable to read the AD security groups of product(s) %1; their last synchronized group list is kept").arg(failedProducts.join(QStringLiteral(", ")));
+
+		return false;
+	}
+
+	return true;
+}
+
+
+void CLdapAuthorizationControllerComp::OnDirectoryChangeEvent(imtauth::CLdapGroupChangeListener::Event event, const QString& message)
+{
+	if (event == imtauth::CLdapGroupChangeListener::E_UNSUPPORTED){
+		SetNotificationState(QStringLiteral("Unsupported"), message);
+		SendErrorMessage(0, message, s_logSource);
+
+		return;
+	}
+
+	if (event == imtauth::CLdapGroupChangeListener::E_DISCONNECTED){
+		SetNotificationState(QStringLiteral("Disconnected"), message);
+		SendWarningMessage(0, message, s_logSource);
+
+		return;
+	}
+
+	if (event == imtauth::CLdapGroupChangeListener::E_CONNECTED){
+		SetNotificationState(QStringLiteral("Connected"), QString());
+	}
+
+	QString errorMessage;
+	if (SynchronizeDirectoryGroups(errorMessage)){
+		SetSynchronizationError(QString());
+	}
+	else{
+		SetSynchronizationError(errorMessage);
+		SendErrorMessage(0, errorMessage, s_logSource);
+	}
+}
+
+
+// reimplemented (icomp::CComponentBase)
+
+void CLdapAuthorizationControllerComp::OnComponentCreated()
+{
+	BaseClass::OnComponentCreated();
+
+	// The LDAP enable parameter may be restored after component creation, so it does not gate the listener.
+	// Configuring the settings file opts into group mapping; the group list never grants access.
+	bool isNotificationEnabled = m_groupChangeNotificationsAttrPtr.IsValid() && *m_groupChangeNotificationsAttrPtr;
+	if (!IsGroupSettingsConfigured() || !isNotificationEnabled){
+		SetNotificationState(QStringLiteral("Disabled"), QString());
+
+		return;
+	}
+
+	SetNotificationState(QStringLiteral("Connecting"), QString());
+
+	QString errorMessage;
+	bool isStarted = m_groupChangeListener.Start(
+				[this](imtauth::CLdapGroupChangeListener::Event event, const QString& message){
+					OnDirectoryChangeEvent(event, message);
+				},
+				errorMessage);
+	if (!isStarted){
+		SetNotificationState(QStringLiteral("Unsupported"), errorMessage);
+		SendErrorMessage(0, errorMessage, s_logSource);
+	}
+}
+
+
+void CLdapAuthorizationControllerComp::OnComponentDestroyed()
+{
+	// The listener thread calls this component; it must have ended before any member is released.
+	m_groupChangeListener.Stop();
+
+	BaseClass::OnComponentDestroyed();
 }
 
 
@@ -848,6 +1104,101 @@ sdl::V1_0::imtauth::CAuthorizationPayload CLdapAuthorizationControllerComp::OnAu
 	}
 
 	return BaseClass::OnAuthorization(authorizationRequest, gqlRequest, errorMessage);
+}
+
+
+// private methods
+
+bool CLdapAuthorizationControllerComp::IsGroupSettingsConfigured() const
+{
+	return m_groupSettingsFileAttrPtr.IsValid() && !m_groupSettingsFileAttrPtr->isEmpty();
+}
+
+
+QString CLdapAuthorizationControllerComp::GetGroupCatalogFilePath() const
+{
+	return *m_groupSettingsFileAttrPtr + QStringLiteral(".groups.json");
+}
+
+
+bool CLdapAuthorizationControllerComp::ReadGroupCatalog(QJsonObject& catalogs, QString& errorMessage) const
+{
+	catalogs = QJsonObject();
+
+	QFile file(GetGroupCatalogFilePath());
+	if (!file.exists()){
+		return true;
+	}
+
+	if (!file.open(QIODevice::ReadOnly) || file.size() > s_maximumCatalogSize){
+		errorMessage = QStringLiteral("Unable to read the directory group list");
+
+		return false;
+	}
+
+	QJsonParseError parseError;
+	QJsonDocument document = QJsonDocument::fromJson(file.readAll(), &parseError);
+	if (file.error() != QFileDevice::NoError || parseError.error != QJsonParseError::NoError || !document.isObject() ||
+		document.object().value("version").toInt() != 1 || !document.object().value("products").isObject()){
+		errorMessage = QStringLiteral("Invalid directory group list file");
+
+		return false;
+	}
+
+	catalogs = document.object().value("products").toObject();
+
+	return true;
+}
+
+
+bool CLdapAuthorizationControllerComp::WriteGroupCatalog(const QJsonObject& catalogs, QString& errorMessage) const
+{
+	QByteArray data = QJsonDocument(QJsonObject{{"version", 1}, {"products", catalogs}}).toJson();
+	if (data.size() > s_maximumCatalogSize){
+		errorMessage = QStringLiteral("The directory group list is too large");
+
+		return false;
+	}
+
+	QSaveFile file(GetGroupCatalogFilePath());
+	if (!file.open(QIODevice::WriteOnly) ||
+		!file.setPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner) ||
+		file.write(data) != data.size() ||
+		!file.commit()){
+		errorMessage = QStringLiteral("Unable to persist the directory group list");
+
+		return false;
+	}
+
+	return true;
+}
+
+
+void CLdapAuthorizationControllerComp::SetNotificationState(const QString& state, const QString& message)
+{
+	QMutexLocker locker(&m_directoryStatusMutex);
+
+	m_notificationState = state;
+	m_notificationMessage = message;
+}
+
+
+void CLdapAuthorizationControllerComp::MarkSynchronized(const QStringList& products) const
+{
+	QMutexLocker locker(&m_directoryStatusMutex);
+
+	const QString now = QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
+	for (const QString& product : products){
+		m_synchronizedAt.insert(product, now);
+	}
+}
+
+
+void CLdapAuthorizationControllerComp::SetSynchronizationError(const QString& errorMessage) const
+{
+	QMutexLocker locker(&m_directoryStatusMutex);
+
+	m_synchronizationError = errorMessage;
 }
 
 

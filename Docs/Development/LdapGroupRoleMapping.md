@@ -4,9 +4,17 @@
 
 This opt-in feature extends `imtauthgql::CLdapAuthorizationControllerComp` on Windows.
 No Puma files are changed. Puma's `Partitura/PumaVoce.arp/Authorization.acc` already
-instantiates this component; configure its new attribute in the consuming product.
+instantiates this component; configure its new attributes in the consuming product.
 The shared `ImtAuthVoce.arp/AuthorizationController.acc` also exposes the LDAP
 controller and these optional settings.
+
+Puma's `Authorization.acc` does not yet export `LdapGroupSettingsFile` or
+`LdapGroupChangeNotifications`, and no Puma page shows the directory group list.
+Until Puma sets the settings file, neither mapping nor notifications are active there.
+The synchronized directory group list is separate from Puma's internal user groups
+(`GroupRepository`): directory groups are not copied into it, because a user group
+grants its roles to its stored members, while directory membership is evaluated only
+from Active Directory at sign-in.
 
 1. Connect the existing persistent `UserCollection` and `RoleCollection`,
    `LdapEnableableParam`, and LDAP credential controller (`SystemId = Ldap`).
@@ -35,11 +43,67 @@ controller and these optional settings.
    Groups are identified by immutable SIDs, not display names. An unavailable group
    remains visible by SID so its mappings can be removed. **Clear mappings** also
    permits recovery after deleting a mapped role.
+6. Keep `LdapGroupChangeNotifications` enabled (default) to receive Active Directory
+   change notifications and keep the product group lists synchronized (see below).
+   The service identity must be allowed to see deleted objects for deletions to be
+   pushed immediately; otherwise a deletion is picked up by the next notification
+   or reconnect.
 
 The shared LDAP controller remains disabled unless `LdapEnableableParam` is enabled.
 With mapping disabled, existing default-role provisioning and manual assignments
 remain in effect. Mapping adds roles; it does not replace the legacy default role.
 Review default-role permissions before enabling directory-controlled access.
+
+## Directory change notifications and group list
+
+With a configured `LdapGroupSettingsFile`, the component starts a listener thread
+(`imtauth::CLdapGroupChangeListener`). It binds to a domain controller of the service
+identity's domain with Negotiate, signing and sealing, checks that the root entry
+announces the Active Directory notification control `1.2.840.113556.1.4.528`
+(`LDAP_SERVER_NOTIFICATION_OID`), and registers one persistent asynchronous subtree
+search on `defaultNamingContext` with that control and the show-deleted control.
+The domain controller pushes changes; nothing is polled. Changes of objects whose
+`objectClass` contains `group` (creation, rename, move, membership or deletion) are
+coalesced (2 s quiet time, at most 30 s delay) into one synchronization.
+
+A synchronization runs at every registration (startup and every reconnect, because
+changes made while disconnected are not delivered) and after each coalesced change.
+For each product with a pattern it reads the matching security groups with the same
+paged, fail-closed discovery as the administration page and replaces the product's
+**group list** in `<LdapGroupSettingsFile>.groups.json`:
+
+- created or renamed-into-pattern groups are added without any role mapping;
+  mappings, and therefore privileges, are only ever created by a superuser;
+- renamed groups keep their SID and mappings and show the new name;
+- deleted or renamed-out-of-pattern groups disappear from the list. Their mappings
+  stay in the settings file and are shown as unavailable until a superuser clears
+  them; sign-in already ignores them because membership is matched against a live
+  discovery of the pattern;
+- a product whose groups cannot be read completely keeps its last complete list,
+  and the error is reported; a pattern changed during the read keeps the old list;
+- manual role assignments and stored directory grants of users are never changed.
+
+The list file is server-owned and advisory: it never grants access, sign-in does
+not read it, and an unreadable list is rebuilt from the directory. Clients cannot
+write it; saved settings keep only `enabled`, `pattern` and `mappings`. Saving
+settings refreshes the list of that product when the directory can be read.
+
+Reconnects back off from 5 s to 5 minutes. A directory server that does not offer
+the notification control (for example a generic LDAP server) and every non-Windows
+platform are reported as `Unsupported` in the log and on the administration page;
+there is no polling fallback, so the list then changes only when settings are saved.
+Shutdown stops and joins the listener before the component is released; it can
+take up to the LDAP connect timeout (30 s) or the duration of a running discovery.
+
+Active Directory limits the number of notification searches per connection and per
+server (`MaxNotificationPerConn`); each component uses one. Subtree notifications
+report every change in the domain; the listener filters group objects on the client.
+
+`LdapGroupSettings` and `SaveLdapGroupSettings` return the product's synchronized
+`groups`, `notificationState` (`Disabled`, `Connecting`, `Connected`, `Disconnected`,
+`Unsupported`), `synchronizedAt` (UTC, since server start) and `synchronizationError`.
+The Directory groups page shows the list and this state when it is loaded or
+reloaded. It is not pushed to an open page; press **Reload** to see later changes.
 
 ## Authorization and persistence
 
@@ -90,7 +154,8 @@ retain prior rights until sign-in/session revocation; directory outages refuse
 new mapped sign-ins but do not invalidate existing sessions. Revoke sessions and
 tokens operationally when immediate removal is required. Disabling LDAP or clearing
 the settings-file attribute removes saved directory grants on the next product
-sign-in, not immediately. Do not downgrade a deployment with active directory
+sign-in, not immediately. A change notification updates the group list only; it
+does not change the stored grants of users or end sessions. Do not downgrade a deployment with active directory
 grants: older binaries do not understand their source namespace.
 
 ## Administration API
@@ -100,7 +165,8 @@ resolved superuser context on the server; a hidden UI is not the security bounda
 Queries cannot save settings. `SaveLdapGroupSettings` requires a mutation.
 
 - `LdapGroupSettings(input: {productId})`: JSON-encoded `settings` and `roles`
-  (`id` is the role **object ID**, `name` its display name).
+  (`id` is the role **object ID**, `name` its display name), the synchronized
+  `groups` of the saved pattern and the synchronization state.
 - `DiscoverLdapGroups(input: {productId, pattern})`: matching `groups` (`id` is SID).
 - `SaveLdapGroupSettings(input: {productId, settings})`: `ok` and saved `settings`.
 
@@ -131,8 +197,15 @@ executable. It covers both login commands, stored permission queries, all-role
 union, product isolation, membership revocation, manual-role preservation,
 archive/clone/reset, disabled/corrupt settings, failed persistence, superuser
 checks, cross-product role rejection, tenant isolation and settings persistence.
+Notification tests feed listener events into the component and cover creation,
+rename, deletion and rename out of the pattern, kept mappings and manual roles, a
+failed directory read, disconnect/reconnect, product isolation, a forged client
+list and the explicit `Unsupported` state on non-Windows platforms.
 
 Build `UserControllerTest` with the repository's existing CMake/ACF setup and run
 its standard test executor. Windows integration still requires a real domain:
 verify nested/primary membership, signed/sealed directory binding, a group rename,
 directory/global-catalog failure, and both login commands before production rollout.
+For notifications, also verify on a domain: registration (`Connected`), group
+creation, rename, deletion (with and without deleted-object visibility), domain
+controller restart and reconnect, and service shutdown while connected.
