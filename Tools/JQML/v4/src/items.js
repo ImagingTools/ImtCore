@@ -3882,6 +3882,21 @@ defineReadOnly(ImageItem.prototype, 'paintedHeight', function () {
 
 // A viewport onto its children: they are shifted by (-contentX, -contentY). Scrolls with the wheel and by
 // dragging an empty part of the viewport (a child that accepts the mouse keeps its own presses); no kinetic flick.
+class FlickableContentItem extends Item {
+	constructor(view) {
+		super();
+		this.$flickable = view;
+	}
+
+	get $implicitWidth() {
+		return this.$flickable.$aw;
+	}
+
+	get $implicitHeight() {
+		return this.$flickable.$ah;
+	}
+}
+
 export class Flickable extends Item {
 	constructor() {
 		super();
@@ -3893,7 +3908,7 @@ export class Flickable extends Item {
 		this.$interactive = true;
 		this.$dragFrom = null;
 		// As in Qt the visual children live in contentItem, which is the only entry of `children`.
-		this.$content = new Item();
+		this.$content = new FlickableContentItem(this);
 		super.$adopt(this.$content);
 	}
 
