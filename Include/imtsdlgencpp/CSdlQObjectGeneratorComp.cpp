@@ -524,6 +524,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 							imtsdl::CSdlField sdlField;
 							sdlField.SetType(sdlType);
 							bool isScalarCustom = false;
+							bool isScalarEnum = false;
 							const QString convertedType = OptListConvertTypeWithNamespaceStruct(
 								sdlField,
 								GetNamespaceFromSchemaParams(scalarUnionPtr->GetSchemaParams()),
@@ -534,10 +535,10 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 								&isScalarCustom,
 								nullptr,
 								nullptr,
-								nullptr,
+								&isScalarEnum,
 								nullptr,
 								false);
-							if (isScalarCustom){
+							if (isScalarCustom && !isScalarEnum){
 								continue;
 							}
 
@@ -548,7 +549,13 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 							FeedStream(stream, 1, false);
 
 							FeedStreamHorizontally(stream, 2);
-							stream << QStringLiteral("return QVariant(*") << valueVarName << QStringLiteral(");");
+							if (isScalarEnum){
+								// enum alternatives are returned as keys, like enum fields
+								stream << QStringLiteral("return QString::fromUtf8(QMetaEnum::fromType<") << convertedType << QStringLiteral(">().valueToKey(int(*") << valueVarName << QStringLiteral(")));");
+							}
+							else{
+								stream << QStringLiteral("return QVariant(*") << valueVarName << QStringLiteral(");");
+							}
 							FeedStream(stream, 1, false);
 
 							FeedStreamHorizontally(stream);
@@ -570,6 +577,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 							imtsdl::CSdlField sdlField;
 							sdlField.SetType(sdlType);
 							bool isCustom = false;
+							bool isAlternativeEnum = false;
 							QString convertedType = OptListConvertTypeWithNamespaceStruct(
 								sdlField,
 								GetNamespaceFromSchemaParams(sdlUnion->GetSchemaParams()),
@@ -580,11 +588,11 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 								&isCustom,
 								nullptr,
 								nullptr,
-								nullptr,
+								&isAlternativeEnum,
 								nullptr,
 								false);
-							if (!isCustom){
-								// scalar alternatives are returned above
+							if (!isCustom || isAlternativeEnum){
+								// scalar and enum alternatives are returned above
 								continue;
 							}
 
@@ -875,11 +883,12 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 
 				if (sdlUnion != nullptr){
 					QList<QPair<QString, QString>> scalarTypeList;
-					QList<QPair<QString, QString>> floatingScalarTypeList;
+					QStringList enumTypeList;
 					for (const auto& sdlType : sdlUnion->GetTypes()){
 						imtsdl::CSdlField sdlField;
 						sdlField.SetType(sdlType);
 						bool isCustom = false;
+						bool isAlternativeEnum = false;
 						QString convertedType = OptListConvertTypeWithNamespaceStruct(
 							sdlField,
 							GetNamespaceFromSchemaParams(sdlUnion->GetSchemaParams()),
@@ -890,17 +899,17 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 							&isCustom,
 							nullptr,
 							nullptr,
-							nullptr,
+							&isAlternativeEnum,
 							nullptr,
 							false);
+						if (isAlternativeEnum){
+							enumTypeList << convertedType;
+
+							continue;
+						}
+
 						if (!isCustom){
-							// floating alternatives accept any number, so they are checked last
-							if (sdlType == QStringLiteral("Double") || sdlType == QStringLiteral("Float")){
-								floatingScalarTypeList << qMakePair(sdlType, convertedType);
-							}
-							else{
-								scalarTypeList << qMakePair(sdlType, convertedType);
-							}
+							scalarTypeList << qMakePair(sdlType, convertedType);
 
 							continue;
 						}
@@ -932,18 +941,40 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 						FeedStream(stream, 1, false);
 					}
 
-					scalarTypeList << floatingScalarTypeList;
+					// enum alternatives are set by their keys, they are checked before the string alternatives
 					bool isFirstScalar = true;
-					for (const QPair<QString, QString>& scalarType : std::as_const(scalarTypeList)){
+					for (const QString& enumType : std::as_const(enumTypeList)){
+						const QString enumValue = QStringLiteral("QMetaEnum::fromType<") + enumType + QStringLiteral(">().keyToValue(v.toString().toUtf8())");
+
 						FeedStreamHorizontally(stream, 2);
 						if (!isFirstScalar){
 							stream << QStringLiteral("else ");
 						}
-						stream << QStringLiteral("if (") << CSdlUnionConverter::GetScalarUnionMatchCondition(scalarType.first, QStringLiteral("v"), scalarType.second) << QStringLiteral("){");
+						stream << QStringLiteral("if ((v.userType() == QMetaType::QString || v.userType() == QMetaType::QByteArray) && ") << enumValue << QStringLiteral(" > -1){");
 						FeedStream(stream, 1, false);
 
 						FeedStreamHorizontally(stream, 3);
-						stream << dataClassName << QStringLiteral("::") << field.GetId() << QStringLiteral(" = v.value<") << scalarType.second << QStringLiteral(">();");
+						stream << dataClassName << QStringLiteral("::") << field.GetId() << QStringLiteral(" = static_cast<") << enumType << QStringLiteral(">(") << enumValue << QStringLiteral(");");
+						FeedStream(stream, 1, false);
+
+						FeedStreamHorizontally(stream, 2);
+						stream << '}';
+						FeedStream(stream, 1, false);
+
+						isFirstScalar = false;
+					}
+
+					const QList<QPair<QString, QString>> scalarMatchList = CSdlUnionConverter::GetScalarUnionMatchConditions(scalarTypeList, QStringLiteral("v"), false);
+					for (const QPair<QString, QString>& scalarMatch : scalarMatchList){
+						FeedStreamHorizontally(stream, 2);
+						if (!isFirstScalar){
+							stream << QStringLiteral("else ");
+						}
+						stream << QStringLiteral("if (") << scalarMatch.second << QStringLiteral("){");
+						FeedStream(stream, 1, false);
+
+						FeedStreamHorizontally(stream, 3);
+						stream << dataClassName << QStringLiteral("::") << field.GetId() << QStringLiteral(" = v.value<") << scalarMatch.first << QStringLiteral(">();");
 						FeedStream(stream, 1, false);
 
 						FeedStreamHorizontally(stream, 2);
