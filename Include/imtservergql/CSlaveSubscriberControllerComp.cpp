@@ -27,6 +27,19 @@ bool CSlaveSubscriberControllerComp::IsRequestSupported(const imtgql::CGqlReques
 }
 
 
+bool CSlaveSubscriberControllerComp::IsOpenFor(SubscriberKind subscriberKind, const imtgql::CGqlRequest& gqlRequest) const
+{
+	for (int index = 0; index < m_subscriberControllerListCompPtr.GetCount(); index++){
+		imtgql::IGqlSubscriberController* publisherPtr = m_subscriberControllerListCompPtr[index];
+		if (publisherPtr != nullptr && publisherPtr->IsRequestSupported(gqlRequest)){
+			return publisherPtr->IsOpenFor(subscriberKind, gqlRequest);
+		}
+	}
+
+	return false;
+}
+
+
 bool CSlaveSubscriberControllerComp::RegisterSubscription(
 			const QByteArray& subscriptionId,
 			const imtgql::CGqlRequest& gqlRequest,

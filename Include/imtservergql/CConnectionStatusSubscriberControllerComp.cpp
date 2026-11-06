@@ -35,6 +35,13 @@ QString CConnectionStatusSubscriberControllerComp::CreateBodySubscription() cons
 
 // reimplemented (imtservergql::CGqlPublisherCompBase)
 
+bool CConnectionStatusSubscriberControllerComp::IsOpenFor(SubscriberKind /*subscriberKind*/, const imtgql::CGqlRequest& /*gqlRequest*/) const
+{
+	// The login page shows it, and it tells nothing but the state of a connection
+	return true;
+}
+
+
 bool CConnectionStatusSubscriberControllerComp::RegisterSubscription(
 			const QByteArray& subscriptionId,
 			const imtgql::CGqlRequest& gqlRequest,

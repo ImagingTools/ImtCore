@@ -82,6 +82,9 @@
         <Element Id="WebSocketServlet" PackageId="ImtServerGqlPck" ComponentId="WebSocketServlet">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="DenyAnonymousSubscriptions" Type="Boolean" ExportId="DenyAnonymousSubscriptions">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="GqlContextCreator" Type="Reference" ExportId="AuthenticationManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

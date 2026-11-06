@@ -30,12 +30,13 @@ public:
 		I_ASSIGN_TO(m_objectCollectionModelCompPtr, m_objectCollectionCompPtr, true);
 		I_ASSIGN(m_isSendItemSource, "IsSendItemSource", "Object collection", false, false);
 		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "Collection-ID", false, "");
-		I_ASSIGN_MULTI_0(m_readPermissionsAttrPtr, "ReadPermissions", "Permissions reading this collection: a user needs one of them, a server the permission to watch collections. Without them the channel is open", false);
+		I_ASSIGN_MULTI_0(m_readPermissionsAttrPtr, "ReadPermissions", "Permissions reading this collection: a user needs one of them. Without them any user may subscribe", false);
 	I_END_COMPONENT;
 
 protected:
 	// reimplemented (imtgql::IGqlSubscriberController)
 	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
+	virtual bool IsOpenFor(SubscriberKind subscriberKind, const imtgql::CGqlRequest& gqlRequest) const override;
 	virtual bool RegisterSubscription(
 				const QByteArray& subscriptionId,
 				const imtgql::CGqlRequest& gqlRequest,

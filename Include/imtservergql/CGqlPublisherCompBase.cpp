@@ -32,6 +32,12 @@ bool CGqlPublisherCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlReq
 }
 
 
+bool CGqlPublisherCompBase::IsOpenFor(SubscriberKind /*subscriberKind*/, const imtgql::CGqlRequest& /*gqlRequest*/) const
+{
+	return false;
+}
+
+
 bool CGqlPublisherCompBase::RegisterSubscription(
 			const QByteArray& subscriptionId,
 			const imtgql::CGqlRequest& gqlRequest,

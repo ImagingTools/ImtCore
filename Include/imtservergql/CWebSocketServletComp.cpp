@@ -10,6 +10,7 @@
 #include <QtCore/QScopeGuard>
 
 // ImtCore includes
+#include <imtauth/imtauth.h>
 #include <imtrest/IRequest.h>
 #include <imtrest/IProtocolEngine.h>
 #include <imtrest/CWebSocketRequest.h>
@@ -288,6 +289,10 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 			return imtrest::ConstResponsePtr();
 		}
 
+		if (!IsSubscriberAllowed(*subscriberControllerPtr, gqlRequest)){
+			return CreateErrorResponse(QStringLiteral("The subscription '%1' is not allowed").arg(QString::fromUtf8(commandId)).toUtf8(), request);
+		}
+
 		QString errorMessage;
 		if (subscriberControllerPtr->RegisterSubscription(subscriptionId, gqlRequest, request, errorMessage)){
 			// A token is revoked long after the subscription is made, a session ends by itself
@@ -447,6 +452,26 @@ void CWebSocketServletComp::OnComponentDestroyed()
 
 
 // private methods
+
+bool CWebSocketServletComp::IsSubscriberAllowed(const imtgql::IGqlSubscriberController& controller, const imtgql::CGqlRequest& gqlRequest) const
+{
+	const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
+	if (contextPtr == nullptr){
+		return false;
+	}
+
+	if (!contextPtr->GetClientProductId().isEmpty()){
+		return imtauth::HasPermission(contextPtr->GetScopes(), imtauth::s_serverCollectionsWatchPermission, false)
+					&& controller.IsOpenFor(imtgql::IGqlSubscriberController::SK_SERVER, gqlRequest);
+	}
+
+	if (*m_isAnonymousDeniedAttrPtr && contextPtr->GetUserInfo() == nullptr){
+		return controller.IsOpenFor(imtgql::IGqlSubscriberController::SK_ANONYMOUS, gqlRequest);
+	}
+
+	return true;
+}
+
 
 void CWebSocketServletComp::AddTokenSubscription(const TokenSubscription& subscription) const
 {

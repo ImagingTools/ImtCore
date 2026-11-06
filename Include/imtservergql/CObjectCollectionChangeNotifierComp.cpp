@@ -42,6 +42,12 @@ bool CObjectCollectionChangeNotifierComp::IsRequestSupported(const imtgql::CGqlR
 }
 
 
+bool CObjectCollectionChangeNotifierComp::IsOpenFor(SubscriberKind subscriberKind, const imtgql::CGqlRequest& /*gqlRequest*/) const
+{
+	return subscriberKind == SK_SERVER;
+}
+
+
 bool CObjectCollectionChangeNotifierComp::RegisterSubscription(
 			const QByteArray& subscriptionId,
 			const imtgql::CGqlRequest& gqlRequest,
@@ -54,7 +60,8 @@ bool CObjectCollectionChangeNotifierComp::RegisterSubscription(
 
 		bool isAllowed = false;
 		if (contextPtr != nullptr && !contextPtr->GetClientProductId().isEmpty()){
-			isAllowed = imtauth::HasPermission(contextPtr->GetScopes(), imtauth::s_serverCollectionsWatchPermission, false);
+			// The servlet has checked the server
+			isAllowed = true;
 		}
 		else if (userInfoPtr != nullptr){
 			isAllowed = userInfoPtr->IsAdmin();
