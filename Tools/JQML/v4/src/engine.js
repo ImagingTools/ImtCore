@@ -382,6 +382,10 @@ class Scope {
 		this.parent = parent;
 		this.file = file;
 		this.ids = Object.create(null);
+		// The roles, `model` and `modelData` of a delegate. Like in Qt they are properties of the context: below the ids of the
+		// component and the properties of the objects (a `Loader` inside of a delegate with the role `item` sees its own
+		// `item`).
+		this.context = Object.create(null);
 		this.root = null;
 		this.data = null; // model data of a delegate scope (replaced when a ListView reuses the delegate)
 	}
@@ -960,26 +964,44 @@ export class Engine {
 		const levels = [];
 		for (let s = scope; s !== null; s = s.parent) levels.push(s);
 		const depth = levels.length;
-		const key = `${depth}\n${kind}\n${params}\n${code}`;
+		// The levels that are delegates have a context (roles) that is looked up after the objects of the level.
+		let contexts = '';
+		for (const level of levels) contexts += level.data !== null ? '1' : '0';
+		const key = `${depth}\n${contexts}\n${kind}\n${params}\n${code}`;
 		let factory = this.factories.get(key);
 		if (factory === undefined) {
 			const names = ['__g'];
 			let open = 'with (__g) {';
+			let closing = 2 * depth + 2;
 			// Like Qt, the ids of the component win over the properties of the item itself (`editorView: editorView`).
 			for (let l = depth - 1; l >= 1; l--) {
+				if (contexts[l] === '1') {
+					open += `with (__c${l}) {`;
+					closing++;
+				}
 				open += `with (__r${l}) { with (__i${l}) {`;
 			}
+			if (depth > 0 && contexts[0] === '1') {
+				open += 'with (__c0) {';
+				closing++;
+			}
 			open += depth > 0 ? 'with (__r0) { with (__self) { with (__i0) {' : 'with (__self) {';
-			for (let l = 0; l < depth; l++) names.push(`__r${l}`, `__i${l}`);
+			for (let l = 0; l < depth; l++) {
+				if (contexts[l] === '1') names.push(`__c${l}`);
+				names.push(`__r${l}`, `__i${l}`);
+			}
 			names.push('__self');
 			const js = escapeSourceBreaks(code);
 			const body = kind === 'expr' ? `return (${js}\n);` : js;
-			const source = `${open} return function (${params}) {\n${body}\n}; ${'}'.repeat(2 * depth + 2)}`;
+			const source = `${open} return function (${params}) {\n${body}\n}; ${'}'.repeat(closing)}`;
 			factory = new Function(...names, source);
 			this.factories.set(key, factory);
 		}
 		const args = [this.globals];
-		for (const scopeLevel of levels) args.push(scopeLevel.root === null ? EMPTY : scopeLevel.root, scopeLevel.ids);
+		for (const scopeLevel of levels) {
+			if (scopeLevel.data !== null) args.push(scopeLevel.context);
+			args.push(scopeLevel.root === null ? EMPTY : scopeLevel.root, scopeLevel.ids);
+		}
 		args.push(self);
 		return factory(...args);
 	}
@@ -1406,12 +1428,57 @@ export class Engine {
 	createRepeaterDelegate(repeater, delegate, parent, index) {
 		const scope = new Scope(delegate.scope, delegate.scope.file);
 		this.applyModelData(scope, repeater.$model, index);
+		// Every item created below the delegate with the row's index carries its own `index` property: it is kept to give
+		// the delegate another index when rows are inserted or removed before it.
+		const indexed = [];
+		const outer = this.indexTrack;
+		this.indexTrack = indexed;
 		try {
-			return this.createItem(delegate.def, scope, parent, [], index, delegate.depth);
+			const item = this.createItem(delegate.def, scope, parent, [], index, delegate.depth);
+			if (item !== null) {
+				item.$delegateScope = scope;
+				item.$delegateIndexed = indexed;
+			}
+			return item;
 		} catch (error) {
 			this.report('Repeater delegate', error, error instanceof QmlError ? error.line : 0);
 			return null;
+		} finally {
+			this.indexTrack = outer;
 		}
+	}
+
+	// The delegates whose row is still in the model, with the new index of the row: Map(index -> delegate). Like in Qt a
+	// delegate stays with its row when other rows are inserted or removed (the dialog below a popup that closes must not be
+	// made again). Empty if the model has no rows that can be told apart.
+	repeaterDelegatesThatStay(repeater) {
+		const stay = new Map();
+		const model = repeater.$model;
+		const before = repeater.$lastRows;
+		if (!(model instanceof ListModel) || before === null || before === undefined) return stay;
+		const position = new Map();
+		const rows = model.$rows;
+		for (let i = 0; i < rows.length; i++) position.set(rows[i], i);
+		repeater.$built.forEach((item, index) => {
+			if (item.$delegateScope === undefined) return;
+			const now = position.get(before[index]);
+			if (now !== undefined && !stay.has(now)) stay.set(now, item);
+		});
+		return stay;
+	}
+
+	// Points a delegate at another row (the same row at another index).
+	rebindRepeaterDelegate(repeater, item, index) {
+		const scope = item.$delegateScope;
+		if (scope.data !== null && scope.data.index === index) return;
+		this.applyModelData(scope, repeater.$model, index);
+		for (const indexed of item.$delegateIndexed) {
+			if (indexed.$custom === null || indexed.$custom.index === index) continue;
+			indexed.$custom.index = index;
+			this.markReaders(indexed, 'index');
+			if (indexed.$chg !== undefined) this.fireChanged(indexed, 'index');
+		}
+		this.refreshDelegateBindings(item);
 	}
 
 	// Puts freshly built delegates just after the repeater (or after the delegates already there).
@@ -1430,13 +1497,16 @@ export class Engine {
 		if (repeater.$growing) return;
 		repeater.$growing = true;
 		try {
+			const delegate = this.repeaterDelegate(repeater);
+			const stay = delegate === null ? new Map() : this.repeaterDelegatesThatStay(repeater);
+			const kept = new Set(stay.values());
 			for (const old of repeater.$built) {
+				if (kept.has(old)) continue;
 				this.releaseSubtree(old);
 				parent.$removeChild(old);
 			}
 			repeater.$built = [];
 
-			const delegate = this.repeaterDelegate(repeater);
 			if (delegate === null) return;
 			if (count > MAX_REPEATER_COUNT) count = MAX_REPEATER_COUNT;
 
@@ -1444,6 +1514,13 @@ export class Engine {
 			this.indexTrack = null; // the repeater's items have their own `index`
 			// Each delegate is its own component: complete it before creating the next, in index order.
 			for (let i = 0; i < count; i++) {
+				if (stay.has(i)) {
+					const item = stay.get(i);
+					this.rebindRepeaterDelegate(repeater, item, i);
+					this.placeRepeaterItems(repeater, parent, [item]);
+					repeater.$built.push(item);
+					continue;
+				}
 				const mark = this.completed.length;
 				const item = this.createRepeaterDelegate(repeater, delegate, parent, i);
 				if (item === null) break;
@@ -1500,17 +1577,17 @@ export class Engine {
 		if (!fresh) {
 			// Reused delegate: the variables read the new row through `scope.data`; only new roles need a variable.
 			for (const key of Object.keys(scope.data.roles)) {
-				if (Object.getOwnPropertyDescriptor(scope.ids, key) === undefined) this.defineRole(scope, key);
+				if (Object.getOwnPropertyDescriptor(scope.context, key) === undefined) this.defineRole(scope, key);
 			}
 			return;
 		}
 		for (const key of Object.keys(scope.data.roles)) this.defineRole(scope, key);
-		Object.defineProperty(scope.ids, 'model', { get: () => (readRows(scope.data.source), scope.data.model), set: (v) => (scope.data.model = v), enumerable: true, configurable: true });
-		Object.defineProperty(scope.ids, 'modelData', { get: () => (readRows(scope.data.source), scope.data.modelData), set: (v) => (scope.data.modelData = v), enumerable: true, configurable: true });
+		Object.defineProperty(scope.context, 'model', { get: () => (readRows(scope.data.source), scope.data.model), set: (v) => (scope.data.model = v), enumerable: true, configurable: true });
+		Object.defineProperty(scope.context, 'modelData', { get: () => (readRows(scope.data.source), scope.data.modelData), set: (v) => (scope.data.modelData = v), enumerable: true, configurable: true });
 	}
 
 	defineRole(scope, key) {
-		Object.defineProperty(scope.ids, key, { get: () => (readRows(scope.data.source), scope.data.roles[key]), enumerable: true, configurable: true });
+		Object.defineProperty(scope.context, key, { get: () => (readRows(scope.data.source), scope.data.roles[key]), enumerable: true, configurable: true });
 	}
 
 	// Evaluates every binding once and assigns the values that changed.
@@ -2034,7 +2111,7 @@ export class Engine {
 				let modelScope = null;
 				if (this.lenient) {
 					for (let s = scope; s !== null; s = s.parent) {
-						if (Object.getOwnPropertyDescriptor(s.ids, 'modelData') !== undefined) {
+						if (Object.getOwnPropertyDescriptor(s.context, 'modelData') !== undefined) {
 							modelScope = s;
 							break;
 						}
