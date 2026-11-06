@@ -158,6 +158,9 @@
         <Element Id="GraphQLClientEngine" PackageId="ImtClientGqlPck" ComponentId="GraphQLClientEngine">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ServerCredentialProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ServerCredential"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ServerConnectionInterface" Type="Reference" ExportId="ServerConnectionInterface">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -447,6 +450,9 @@
         <Element Id="Subscription" PackageId="ImtClientVoce" ComponentId="SubscriptionManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ServerCredentialProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ServerCredential"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

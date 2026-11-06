@@ -13,6 +13,9 @@
         <Element Id="AuthenticationManager" PackageId="ImtServerGqlPck" ComponentId="AuthenticationManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ProductServerRequestPolicy" Type="Reference" ExportId="ProductServerRequestPolicy">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="FeatureContainer" Type="Reference" ExportId="FeatureContainer">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

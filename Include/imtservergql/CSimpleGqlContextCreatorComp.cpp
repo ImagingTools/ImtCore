@@ -21,9 +21,17 @@ bool CSimpleGqlContextCreatorComp::IsRevocableToken(const QByteArray& /*token*/)
 }
 
 
-imtgql::IGqlContextCreator::ContextCreationStatus CSimpleGqlContextCreatorComp::CheckToken(const QByteArray& /*token*/, QString& /*errorMessage*/) const
+imtgql::IGqlContextCreator::ContextCreationStatus CSimpleGqlContextCreatorComp::CheckToken(const QByteArray& /*token*/, QByteArrayList& /*scopes*/, QString& /*errorMessage*/) const
 {
 	return CCS_OK;
+}
+
+
+bool CSimpleGqlContextCreatorComp::CheckRequestAccess(const imtgql::CGqlRequest& /*gqlRequest*/, QByteArray& requiredPermission, QString& /*errorMessage*/) const
+{
+	requiredPermission.clear();
+
+	return true;
 }
 
 

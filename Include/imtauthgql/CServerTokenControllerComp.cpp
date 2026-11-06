@@ -87,7 +87,7 @@ sdl::V1_0::imtauth::CCreateServerTokenPayload CServerTokenControllerComp::OnCrea
 	const QByteArray productId = arguments.input->productId ? QByteArray(*arguments.input->productId) : QByteArray();
 	const QString name = arguments.input->name ? QString(*arguments.input->name) : QString();
 	const QString description = arguments.input->description ? QString(*arguments.input->description) : QString();
-	const QByteArrayList scopes = arguments.input->scopes ? arguments.input->scopes->ToList() : QByteArrayList();
+	QByteArrayList scopes = arguments.input->scopes ? arguments.input->scopes->ToList() : QByteArrayList();
 
 	if (clientProductId.isEmpty() || productId.isEmpty() || name.isEmpty()){
 		errorMessage = QStringLiteral("The client product, the receiving product and the name are required");
@@ -107,13 +107,8 @@ sdl::V1_0::imtauth::CCreateServerTokenPayload CServerTokenControllerComp::OnCrea
 		return response;
 	}
 
-	const QByteArrayList serverPermissions = imtauth::GetServerTokenPermissions();
-	for (const QByteArray& scope : scopes){
-		if (!serverPermissions.contains(scope)){
-			errorMessage = QStringLiteral("The permission '%1' cannot be given to a server").arg(QString::fromUtf8(scope));
-
-			return response;
-		}
+	if (!imtauth::NormalizeServerTokenPermissions(productId, scopes, errorMessage)){
+		return response;
 	}
 
 	// No expiration: it would stop a working server
@@ -159,6 +154,90 @@ sdl::V1_0::imtauth::CRevokeServerTokenPayload CServerTokenControllerComp::OnRevo
 	response.success = m_tokenManagerCompPtr->RevokeToken(tokenId);
 	if (!*response.success){
 		errorMessage = QStringLiteral("Unable to revoke the server token");
+	}
+
+	return response;
+}
+
+
+sdl::V1_0::imtauth::CRevokeServerTokenPayload CServerTokenControllerComp::OnUpdateServerTokenScopes(
+			const sdl::V1_0::imtauth::CUpdateServerTokenScopesGqlRequest& updateServerTokenScopesRequest,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	sdl::V1_0::imtauth::CRevokeServerTokenPayload response;
+	response.success = false;
+
+	if (!CheckSuperuserSession(gqlRequest, errorMessage)){
+		return response;
+	}
+
+	const auto arguments = updateServerTokenScopesRequest.GetRequestedArguments();
+	const QByteArray tokenId = arguments.input.has_value() && arguments.input->id ? QByteArray(*arguments.input->id) : QByteArray();
+	QByteArrayList scopes = arguments.input.has_value() && arguments.input->scopes ? arguments.input->scopes->ToList() : QByteArrayList();
+
+	// Personal tokens of users are not changed here
+	const imtauth::IPersonalAccessTokenSharedPtr tokenPtr = m_tokenManagerCompPtr->GetToken(tokenId);
+	if (!tokenPtr.IsValid() || tokenPtr->GetClientProductId().isEmpty()){
+		errorMessage = QStringLiteral("The server token does not exist");
+
+		return response;
+	}
+
+	if (tokenPtr->IsRevoked()){
+		errorMessage = QStringLiteral("The server token is revoked");
+
+		return response;
+	}
+
+	if (!imtauth::NormalizeServerTokenPermissions(tokenPtr->GetProductId(), scopes, errorMessage)){
+		return response;
+	}
+
+	response.success = m_tokenManagerCompPtr->SetTokenScopes(tokenId, scopes);
+	if (!*response.success){
+		errorMessage = QStringLiteral("Unable to change the permissions of the server token");
+	}
+
+	return response;
+}
+
+
+sdl::V1_0::imtauth::CServerTokenReceiverList CServerTokenControllerComp::OnGetServerTokenReceivers(
+			const sdl::V1_0::imtauth::CGetServerTokenReceiversGqlRequest& getServerTokenReceiversRequest,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	sdl::V1_0::imtauth::CServerTokenReceiverList response;
+
+	if (!CheckSuperuserSession(gqlRequest, errorMessage)){
+		return response;
+	}
+
+	// A server takes no token of its own
+	const auto arguments = getServerTokenReceiversRequest.GetRequestedArguments();
+	const QByteArray clientProductId = arguments.input.has_value() && arguments.input->clientProductId ? QByteArray(*arguments.input->clientProductId) : QByteArray();
+
+	auto& receivers = response.productServers.Emplace();
+	for (const QByteArray& receiverId : imtauth::GetServerTokenReceivers()){
+		if (receiverId == clientProductId){
+			continue;
+		}
+
+		sdl::V1_0::imtauth::CServerTokenReceiver receiver;
+		receiver.productId = receiverId;
+
+		auto& permissions = receiver.permissions.Emplace();
+		for (const imtauth::ServerPermissionInfo& permissionInfo : imtauth::GetServerTokenPermissions(receiverId)){
+			sdl::V1_0::imtauth::CServerTokenPermission permission;
+			permission.id = permissionInfo.id;
+			permission.name = permissionInfo.name;
+			permission.description = permissionInfo.description;
+			permission.required = permissionInfo.isRequired;
+			permissions.append(permission);
+		}
+
+		receivers.append(receiver);
 	}
 
 	return response;

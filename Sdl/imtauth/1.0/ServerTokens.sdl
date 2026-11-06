@@ -52,11 +52,42 @@ type RevokeServerTokenPayload {
 	message: String
 }
 
+# What a server token can be allowed on its receiving server.
+type ServerTokenPermission
+{
+	id: ID!
+	name: String!
+	description: String
+	required: Bool
+}
+
+type ServerTokenReceiver
+{
+	productId: ID!
+	permissions: [ServerTokenPermission]
+}
+
+type ServerTokenReceiverList
+{
+	productServers: [ServerTokenReceiver]
+}
+
+input ServerTokenReceiversInput {
+	clientProductId: ID
+}
+
+input UpdateServerTokenScopesInput {
+	id: ID!
+	scopes: [ID]
+}
+
 type Query {
 	GetServerTokenList (input: ServerTokenListInput!): ServerTokenList!
+	GetServerTokenReceivers (input: ServerTokenReceiversInput): ServerTokenReceiverList!
 }
 
 type Mutation {
 	CreateServerToken (input: CreateServerTokenInput!): CreateServerTokenPayload!
 	RevokeServerToken (input: InputId!): RevokeServerTokenPayload!
+	UpdateServerTokenScopes (input: UpdateServerTokenScopesInput!): RevokeServerTokenPayload!
 }

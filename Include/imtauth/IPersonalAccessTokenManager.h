@@ -122,6 +122,11 @@ public:
 	virtual bool RevokeToken(const QByteArray& tokenId) = 0;
 
 	/**
+		Change the permissions of a token; the next request with the token holds the new ones.
+	*/
+	virtual bool SetTokenScopes(const QByteArray& tokenId, const QByteArrayList& scopes) = 0;
+
+	/**
 		Update the last used timestamp for a token.
 
 		Records when the token was last successfully used for authentication.

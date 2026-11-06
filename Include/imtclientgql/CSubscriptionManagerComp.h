@@ -29,6 +29,7 @@
 #include <imtgql/CGqlRequest.h>
 #include <imtclientgql/IAsyncGqlClient.h>
 #include <imtclientgql/IGqlSubscriptionManager.h>
+#include <imtclientgql/IServerCredentialProvider.h>
 
 
 namespace imtclientgql
@@ -72,6 +73,7 @@ public:
 		I_ASSIGN(m_accessTokenProviderCompPtr, "AccessTokenProvider", "Provider of the current access token", false, "AccessTokenProvider");
 		I_ASSIGN_TO(m_accessTokenProviderModelCompPtr, m_accessTokenProviderCompPtr, false);
 		I_ASSIGN(m_requestTimeoutMsAttrPtr, "RequestTimeoutMs", "Async request timeout (ms)", false, 100000);
+		I_ASSIGN(m_serverCredentialCompPtr, "ServerCredentialProvider", "Token of this server, sent with every message to prove the product it comes through", false, "ServerCredentialProvider");
 		I_ASSIGN(m_refusedRetryIntervalAttrPtr, "RefusedRetryInterval", "Interval in seconds of sending a refused subscription again", true, 300);
 	I_END_COMPONENT;
 
@@ -137,6 +139,7 @@ private:
 		A refused subscription is sent again after a while: the reason may be gone while the connection stays.
 	*/
 	void ScheduleRefusedRetry() const;
+	QByteArray GetServerToken() const;
 	void RetryRefusedSubscriptions() const;
 	virtual imtrest::ConstResponsePtr CreateErrorResponse(const QByteArray& errorMessage, const imtrest::IRequest& request) const;
 
@@ -183,6 +186,7 @@ private:
 	I_REF(imtrest::IProtocolEngine, m_engineCompPtr);
 	I_ATTR(int, m_requestTimeoutMsAttrPtr);
 	I_ATTR(int, m_refusedRetryIntervalAttrPtr);
+	I_REF(IServerCredentialProvider, m_serverCredentialCompPtr);
 	mutable std::atomic<bool> m_isRefusedRetryScheduled = false;
 
 	AccessTokenObserver m_accessTokenObserver;

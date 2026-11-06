@@ -18,7 +18,7 @@ namespace imtrest
 
 
 // A frame carries the token of the sender, and the token of a server does not expire: it must not reach a log
-static const QRegularExpression s_authenticationTokenExpression(QStringLiteral(R"re("x-authentication-token"\s*:\s*"[^"]*")re"), QRegularExpression::CaseInsensitiveOption);
+static const QRegularExpression s_authenticationTokenExpression(QStringLiteral(R"re("(x-authentication-token|x-server-token)"\s*:\s*"[^"]*")re"), QRegularExpression::CaseInsensitiveOption);
 
 
 
@@ -155,7 +155,7 @@ void CWebSocketThread::ProcessTextMessage(const QString& textMessage)
 	}
 
 	QString message = QStringLiteral("Web socket text message received: %1").arg(textMessage);
-	message.replace(s_authenticationTokenExpression, QStringLiteral("\"x-authentication-token\":\"***\""));
+	message.replace(s_authenticationTokenExpression, QStringLiteral("\"\\1\":\"***\""));
 	m_server->SendVerboseMessage(message, "CWebSocketServerComp");
 
 	imtrest::IRequestUniquePtr newRequestPtr = m_enginePtr->CreateRequest(*m_requestServerHandlerPtr);

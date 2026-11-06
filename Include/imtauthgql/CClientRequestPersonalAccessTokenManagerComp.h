@@ -44,6 +44,7 @@ public:
 				QByteArray* clientProductIdPtr = nullptr,
 				bool* isCheckFailedPtr = nullptr) const override;
 	virtual QByteArrayList GetServerTokenIds(const QByteArray& clientProductId, bool* isReadPtr = nullptr) const override;
+	virtual bool SetTokenScopes(const QByteArray& tokenId, const QByteArrayList& scopes) override;
 	virtual QByteArrayList GetTokenIds(const QByteArray& userId) const override;
 	virtual imtauth::IPersonalAccessTokenSharedPtr GetToken(const QByteArray& tokenId) const override;
 	virtual bool RevokeToken(const QByteArray& tokenId) override;

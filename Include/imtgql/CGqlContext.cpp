@@ -47,6 +47,38 @@ void CGqlContext::SetClientProductId(const QByteArray& clientProductId)
 }
 
 
+QByteArray CGqlContext::GetServerProductId() const
+{
+	return m_serverProductId;
+}
+
+
+void CGqlContext::SetServerProductId(const QByteArray& serverProductId)
+{
+	if (m_serverProductId != serverProductId){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_serverProductId = serverProductId;
+	}
+}
+
+
+QByteArrayList CGqlContext::GetServerScopes() const
+{
+	return m_serverScopes;
+}
+
+
+void CGqlContext::SetServerScopes(const QByteArrayList& scopes)
+{
+	if (m_serverScopes != scopes){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_serverScopes = scopes;
+	}
+}
+
+
 QByteArray CGqlContext::GetProductId() const
 {
 	return m_productId;
@@ -317,6 +349,11 @@ bool CGqlContext::Serialize(iser::IArchive &archive)
 	retVal = retVal && archive.Process(m_clientProductId);
 	retVal = retVal && archive.EndTag(clientProductTag);
 
+	iser::CArchiveTag serverProductTag("ServerProductId", "Product whose server sent or forwarded the request", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(serverProductTag);
+	retVal = retVal && archive.Process(m_serverProductId);
+	retVal = retVal && archive.EndTag(serverProductTag);
+
 	iser::CArchiveTag designSchemeTag("DesignScheme", "Design scheme", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(designSchemeTag);
 	retVal = retVal && archive.Process(m_designScheme);
@@ -370,6 +407,8 @@ bool CGqlContext::CopyFrom(const IChangeable &object, CompatibilityMode /*mode*/
 		m_tenantId = sourcePtr->m_tenantId;
 		m_productId = sourcePtr->m_productId;
 		m_clientProductId = sourcePtr->m_clientProductId;
+		m_serverProductId = sourcePtr->m_serverProductId;
+		m_serverScopes = sourcePtr->m_serverScopes;
 		m_headers = sourcePtr->m_headers;
 		m_productInfoPtr = sourcePtr->m_productInfoPtr;
 		m_tenantPermissions = sourcePtr->m_tenantPermissions;
@@ -407,6 +446,8 @@ bool CGqlContext::ResetData(CompatibilityMode /*mode*/)
 	m_languageId.clear();
 	m_productId.clear();
 	m_clientProductId.clear();
+	m_serverProductId.clear();
+	m_serverScopes.clear();
 	m_designScheme.clear();
 	m_token.clear();
 	m_scopes.clear();

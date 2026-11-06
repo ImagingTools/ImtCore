@@ -33,6 +33,25 @@ namespace
 	The product and the language the request was resolved for, as the HTTP client sends them: a web client served by a
 	product server sends no product, the server knows it.
 */
+/**
+	The token of this server names the product only: the rights of a request come from the token of its user.
+	The same headers a client sent here are dropped: they are not this server's to forward.
+*/
+void InsertServerToken(const QByteArray& serverToken, QJsonObject& headersObject)
+{
+	for (const QString& headerId : headersObject.keys()){
+		if (headerId.compare(QString(imtbase::s_serverTokenHeaderId), Qt::CaseInsensitive) == 0
+					|| headerId.compare(QString(imtbase::s_administeredProductHeaderId), Qt::CaseInsensitive) == 0){
+			headersObject.remove(headerId);
+		}
+	}
+
+	if (!serverToken.isEmpty()){
+		headersObject[QString(imtbase::s_serverTokenHeaderId)] = QString(serverToken);
+	}
+}
+
+
 void InsertContextHeaders(const imtgql::IGqlContext& context, QJsonObject& headersObject)
 {
 	const QByteArray productId = context.GetProductId();
@@ -443,6 +462,7 @@ QFuture<CSubscriptionManagerComp::GqlResult> CSubscriptionManagerComp::SendReque
 
 		InsertContextHeaders(*contextPtr, headersObject);
 	}
+	InsertServerToken(GetServerToken(), headersObject);
 	dataObject["headers"] = headersObject;
 
 	const QByteArray queryData = QJsonDocument(dataObject).toJson(QJsonDocument::Compact);
@@ -559,6 +579,7 @@ bool CSubscriptionManagerComp::SubscriptionRegister(const imtgql::CGqlRequest& s
 
 		InsertContextHeaders(*contextPtr, headersObject);
 	}
+	InsertServerToken(GetServerToken(), headersObject);
 
 	// The request context is a clone taken when the subscription was created, so
 	// its token is the one that was current back then. The server authenticates
@@ -672,6 +693,12 @@ void CSubscriptionManagerComp::OnComponentCreated()
 	if (m_accessTokenProviderModelCompPtr.IsValid()){
 		m_accessTokenProviderModelCompPtr->AttachObserver(&m_accessTokenObserver);
 	}
+}
+
+
+QByteArray CSubscriptionManagerComp::GetServerToken() const
+{
+	return m_serverCredentialCompPtr.IsValid() ? m_serverCredentialCompPtr->GetServerToken() : QByteArray();
 }
 
 

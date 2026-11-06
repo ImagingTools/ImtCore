@@ -290,19 +290,27 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 			return imtrest::ConstResponsePtr();
 		}
 
-		if (!IsSubscriberAllowed(*subscriberControllerPtr, gqlRequest)){
+		QByteArray requiredPermission;
+		if (!IsSubscriberAllowed(*subscriberControllerPtr, gqlRequest, requiredPermission)){
 			return CreateErrorResponse(QStringLiteral("The subscription '%1' is not allowed").arg(QString::fromUtf8(commandId)).toUtf8(), request);
 		}
 
 		QString errorMessage;
 		if (subscriberControllerPtr->RegisterSubscription(subscriptionId, gqlRequest, request, errorMessage)){
-			// A token is revoked long after the subscription is made, a session ends by itself
-			const QByteArray token = gqlHeaders.value(imtbase::s_authenticationTokenHeaderId);
+			// A token is revoked or narrowed long after the subscription is made, a session ends by itself.
+			// A subscription forwarded by the server of a product lives as long as the token of that server.
+			const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
+			QByteArray token = gqlHeaders.value(imtbase::s_authenticationTokenHeaderId);
+			if (contextPtr != nullptr && !contextPtr->GetServerProductId().isEmpty() && contextPtr->GetClientProductId().isEmpty()){
+				token = gqlHeaders.value(imtbase::s_serverTokenHeaderId);
+			}
+
 			if (m_gqlContextCreatorCompPtr->IsRevocableToken(token)){
 				TokenSubscription subscription;
 				subscription.subscriptionId = subscriptionId;
 				subscription.controllerPtr = subscriberControllerPtr;
 				subscription.token = token;
+				subscription.requiredPermission = requiredPermission;
 				subscription.requestPtr = &request;
 				subscription.connectionPtr = webSocketRequest->parent();
 
@@ -469,16 +477,26 @@ void CWebSocketServletComp::OnComponentDestroyed()
 
 // private methods
 
-bool CWebSocketServletComp::IsSubscriberAllowed(const imtgql::IGqlSubscriberController& controller, const imtgql::CGqlRequest& gqlRequest) const
+bool CWebSocketServletComp::IsSubscriberAllowed(
+			const imtgql::IGqlSubscriberController& controller,
+			const imtgql::CGqlRequest& gqlRequest,
+			QByteArray& requiredPermission) const
 {
 	const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
 	if (contextPtr == nullptr){
 		return false;
 	}
 
+	// The server of a product the subscription comes through
+	QString accessError;
+	if (!m_gqlContextCreatorCompPtr->CheckRequestAccess(gqlRequest, requiredPermission, accessError)){
+		SendWarningMessage(0, accessError, QStringLiteral("CWebSocketServletComp"));
+
+		return false;
+	}
+
 	if (!contextPtr->GetClientProductId().isEmpty()){
-		return imtauth::HasPermission(contextPtr->GetScopes(), imtauth::s_serverCollectionsWatchPermission, false)
-					&& controller.IsOpenFor(imtgql::IGqlSubscriberController::SK_SERVER, gqlRequest);
+		return controller.IsOpenFor(imtgql::IGqlSubscriberController::SK_SERVER, gqlRequest);
 	}
 
 	const imtauth::IUserInfo* userInfoPtr = contextPtr->GetUserInfo();
@@ -528,16 +546,23 @@ void CWebSocketServletComp::CheckTokenSubscriptions() const
 		const QList<QByteArray> tokens = subscriptionsOfTokens.uniqueKeys();
 		for (const QByteArray& token : tokens){
 			QString errorMessage;
-			const imtgql::IGqlContextCreator::ContextCreationStatus status = m_gqlContextCreatorCompPtr->CheckToken(token, errorMessage);
+			QByteArrayList scopes;
+			const imtgql::IGqlContextCreator::ContextCreationStatus status = m_gqlContextCreatorCompPtr->CheckToken(token, scopes, errorMessage);
 
 			// A token that could not be checked is kept: a restart of the authorization server must not end subscriptions
-			if (status != imtgql::IGqlContextCreator::CCS_UNAUTHORIZED && status != imtgql::IGqlContextCreator::CCS_FORBIDDEN){
+			if (status == imtgql::IGqlContextCreator::CCS_INTERNAL_ERROR){
 				continue;
 			}
 
+			const bool isRefused = status != imtgql::IGqlContextCreator::CCS_OK;
 			const QList<TokenSubscription> subscriptionsOfToken = subscriptionsOfTokens.values(token);
 			for (const TokenSubscription& subscription : subscriptionsOfToken){
-				DropTokenSubscription(subscription, errorMessage);
+				if (isRefused){
+					DropTokenSubscription(subscription, errorMessage);
+				}
+				else if (!subscription.requiredPermission.isEmpty() && !imtauth::HasPermission(scopes, subscription.requiredPermission, false)){
+					DropTokenSubscription(subscription, QStringLiteral("The token no longer holds '%1'").arg(QString::fromUtf8(subscription.requiredPermission)));
+				}
 			}
 		}
 

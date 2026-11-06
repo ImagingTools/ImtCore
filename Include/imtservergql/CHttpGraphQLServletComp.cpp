@@ -126,6 +126,14 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 		}
 
 		m_lastRequest.SetGqlContext(std::move(gqlContextPtr));
+
+		QByteArray requiredPermission;
+		QString accessError;
+		if (!m_gqlContextCreatorCompPtr->CheckRequestAccess(m_lastRequest, requiredPermission, accessError)){
+			SendWarningMessage(0, QStringLiteral("HTTP GraphQL request refused (403 Forbidden): %1").arg(accessError), QStringLiteral("GraphQL - servlet"));
+
+			return CreateResponse(StatusCode::SC_FORBIDDEN, QByteArray(), request);
+		}
 	}
 	else{
 		// No GqlContextCreator wired for this servlet's assembly: every request is

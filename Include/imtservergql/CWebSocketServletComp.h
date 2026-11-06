@@ -79,13 +79,14 @@ private:
 		QByteArray subscriptionId;
 		imtgql::IGqlSubscriberController* controllerPtr = nullptr;
 		QByteArray token;
+		QByteArray requiredPermission; // of the token of a server
 		const imtrest::IRequest* requestPtr = nullptr;
 
 		// Only compared: the request is destroyed with it
 		const QObject* connectionPtr = nullptr;
 	};
 
-	bool IsSubscriberAllowed(const imtgql::IGqlSubscriberController& controller, const imtgql::CGqlRequest& gqlRequest) const;
+	bool IsSubscriberAllowed(const imtgql::IGqlSubscriberController& controller, const imtgql::CGqlRequest& gqlRequest, QByteArray& requiredPermission) const;
 	void AddTokenSubscription(const TokenSubscription& subscription) const;
 	void CheckTokenSubscriptions() const;
 	void DropTokenSubscription(const TokenSubscription& subscription, const QString& reason) const;

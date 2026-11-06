@@ -21,6 +21,7 @@
 #include <imtauth/ITenantManager.h>
 #include <imtauth/ITenantMembershipManager.h>
 #include <imtlic/IProductInfo.h>
+#include <imtservergql/IProductServerRequestPolicy.h>
 
 
 namespace imtservergql
@@ -40,11 +41,13 @@ public:
 
 	I_BEGIN_BASE_COMPONENT(CServerTokenAuthenticationCompBase);
 		I_REGISTER_INTERFACE(imtauth::IPersonalAccessTokenCache);
-		I_ASSIGN(m_serverProductIdAttrPtr, "ServerProductId", "ID of this server in the tokens of other servers, when no product info names it", false, "");
+		I_ASSIGN(m_serverProductIdAttrPtr, "ServerProductId", "ID of this server in the tokens of other servers. Set, it refuses a request of another product without a token of its server", false, "");
+		I_ASSIGN(m_requestPolicyCompPtr, "ProductServerRequestPolicy", "What the servers of products may send; without it they may send nothing", false, "ProductServerRequestPolicy");
 	I_END_COMPONENT;
 
 protected:
 	I_ATTR(QByteArray, m_serverProductIdAttrPtr);
+	I_REF(IProductServerRequestPolicy, m_requestPolicyCompPtr);
 };
 
 
@@ -147,7 +150,19 @@ private:
 
 	// reimplemented (imtgql::IGqlContextCreator)
 	virtual bool IsRevocableToken(const QByteArray& token) const override;
-	virtual ContextCreationStatus CheckToken(const QByteArray& token, QString& errorMessage) const override;
+	virtual ContextCreationStatus CheckToken(const QByteArray& token, QByteArrayList& scopes, QString& errorMessage) const override;
+	virtual bool CheckRequestAccess(const imtgql::CGqlRequest& gqlRequest, QByteArray& requiredPermission, QString& errorMessage) const override;
+
+	/**
+		Resolve the token of the server of a product: valid, issued for this server.
+		\param[out] clientProductId	The product whose server holds the token.
+		\param[out] scopes			What the server may do here.
+	*/
+	bool ResolveServerToken(
+				const QByteArray& serverToken,
+				QByteArray& clientProductId,
+				QByteArrayList& scopes,
+				imtgql::IGqlContextCreator::ContextCreationError& error) const;
 
 	bool GetCachedPatProducts(const QByteArray& token, QByteArray& productId, QByteArray& clientProductId) const;
 	bool TryReadCachedTokenLocked(
@@ -192,7 +207,8 @@ private:
 				bool isPat,
 				qint64 jwtExpSecs = 0,
 				const QByteArray& patProductId = QByteArray(),
-				const QByteArray& patClientProductId = QByteArray()) const;
+				const QByteArray& patClientProductId = QByteArray(),
+				qint64 resolutionStartedAt = 0) const;
 	void StoreExpiredToken(const QByteArray& token) const;
 	void InvalidateTokenCache(const QByteArray& token) const;
 	void InvalidateSessionTokenCache(const QByteArray& sessionId) const;
@@ -274,7 +290,7 @@ private:
 	// revoked session's token after InvalidateSessionTokenCache() swept it.
 	mutable QHash<QByteArray, qint64> m_revokedSessionIds;
 
-	// The same for personal access tokens: token ID -> time until a validation may still be in flight
+	// The same for personal access tokens: token ID -> when it was revoked or changed; a validation started before is not cached
 	mutable QHash<QByteArray, qint64> m_forgottenTokenIds;
 
 	// Tokens currently being resolved by some thread via ResolveUserId(), so

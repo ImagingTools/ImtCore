@@ -172,6 +172,13 @@ bool CClientRequestPersonalAccessTokenManagerComp::ValidateToken(
 }
 
 
+bool CClientRequestPersonalAccessTokenManagerComp::SetTokenScopes(const QByteArray& /*tokenId*/, const QByteArrayList& /*scopes*/)
+{
+	// The tokens of servers are managed on the authorization server only
+	return false;
+}
+
+
 QByteArrayList CClientRequestPersonalAccessTokenManagerComp::GetServerTokenIds(const QByteArray& /*clientProductId*/, bool* isReadPtr) const
 {
 	if (isReadPtr != nullptr){

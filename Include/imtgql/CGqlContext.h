@@ -24,6 +24,10 @@ public:
 	virtual void SetProductId(const QByteArray& productId) override;
 	virtual QByteArray GetClientProductId() const override;
 	virtual void SetClientProductId(const QByteArray& clientProductId) override;
+	virtual QByteArray GetServerProductId() const override;
+	virtual void SetServerProductId(const QByteArray& serverProductId) override;
+	virtual QByteArrayList GetServerScopes() const override;
+	virtual void SetServerScopes(const QByteArrayList& scopes) override;
 	virtual QByteArray GetLanguageId() const override;
 	virtual void SetLanguageId(const QByteArray& languageId) override;
 	virtual QByteArray GetDesignScheme() const override;
@@ -71,6 +75,8 @@ private:
 	QByteArray m_tenantId;
 	QByteArray m_productId;
 	QByteArray m_clientProductId;
+	QByteArray m_serverProductId;
+	QByteArrayList m_serverScopes;
 	QByteArray m_languageId;
 	QByteArray m_designScheme;
 	QByteArray m_token;

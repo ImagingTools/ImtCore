@@ -3,6 +3,7 @@
 
 
 // Qt includes
+#include <QtCore/QSet>
 #include <QtCore/QString>
 
 // ImtCore includes
@@ -188,16 +189,112 @@ inline QByteArrayList RestrictPermissions(const QByteArrayList& permissions, con
 
 
 /**
-	Permissions a server token can hold. They belong to the server receiving the requests, not to a product tree.
+	Permissions a server token can hold. They belong to the server receiving the requests, not to a product tree,
+	and bound what reaches that server through the product; the user of a request still needs permissions of its own.
 */
+static const inline QByteArray s_serverAuthorizationPermission = QByteArrayLiteral("/ProductServer/Authorization");
 static const inline QByteArray s_serverNotificationsSendPermission = QByteArrayLiteral("/ProductServer/Notifications/Send");
-static const inline QByteArray s_serverCollectionsWatchPermission = QByteArrayLiteral("/ProductServer/Collections/Watch");
 static const inline QByteArray s_serverPermissionsPublishPermission = QByteArrayLiteral("/ProductServer/Permissions/Publish");
 
+static const inline QByteArray s_authorizationServerProductId = QByteArrayLiteral("Puma");
+static const inline QByteArray s_licenseServerProductId = QByteArrayLiteral("Lisa");
 
-inline QByteArrayList GetServerTokenPermissions()
+
+struct ServerPermissionInfo
 {
-	return {s_serverNotificationsSendPermission, s_serverCollectionsWatchPermission, s_serverPermissionsPublishPermission};
+	QByteArray id;
+	QString name;
+	QString description;
+	bool isRequired = false;
+};
+
+
+/**
+	The servers that take tokens of other servers.
+*/
+inline QByteArrayList GetServerTokenReceivers()
+{
+	return {s_authorizationServerProductId, s_licenseServerProductId};
+}
+
+
+/**
+	The permissions a token for the given receiving server can hold, empty for a server that takes no tokens.
+*/
+inline QList<ServerPermissionInfo> GetServerTokenPermissions(const QByteArray& receiverProductId)
+{
+	if (receiverProductId == s_authorizationServerProductId){
+		return {
+			{s_serverAuthorizationPermission, QStringLiteral("Authorization"), QStringLiteral("Sign-in of users through the product: sessions, profiles, passwords, and reading the users, roles, groups and organizations their permissions come from"), true},
+			{"/ProductServer/Tokens/Validate", QStringLiteral("Accept personal tokens"), QStringLiteral("The product accepts personal access tokens of users")},
+			{"/ProductServer/Tokens/Edit", QStringLiteral("Manage personal tokens"), QStringLiteral("Users manage their personal access tokens in the product")},
+			{"/ProductServer/Users/View", QStringLiteral("Users: view"), QStringLiteral("Read users and their sessions")},
+			{"/ProductServer/Users/Edit", QStringLiteral("Users: edit"), QStringLiteral("Administer users on the pages of the product")},
+			{"/ProductServer/Roles/View", QStringLiteral("Roles: view"), QStringLiteral("Read roles")},
+			{"/ProductServer/Roles/Edit", QStringLiteral("Roles: edit"), QStringLiteral("Administer roles on the pages of the product")},
+			{"/ProductServer/Groups/View", QStringLiteral("Groups: view"), QStringLiteral("Read groups")},
+			{"/ProductServer/Groups/Edit", QStringLiteral("Groups: edit"), QStringLiteral("Administer groups on the pages of the product")},
+			{"/ProductServer/Organizations/View", QStringLiteral("Organizations: view"), QStringLiteral("Read organizations, members, relationships and invitations")},
+			{"/ProductServer/Organizations/Edit", QStringLiteral("Organizations: edit"), QStringLiteral("Administer organizations on the pages of the product")},
+			{"/ProductServer/Watch/Users", QStringLiteral("Watch users"), QStringLiteral("Changes of users and sessions, for the caches of the product")},
+			{"/ProductServer/Watch/Roles", QStringLiteral("Watch roles"), QStringLiteral("Changes of roles")},
+			{"/ProductServer/Watch/Groups", QStringLiteral("Watch groups"), QStringLiteral("Changes of groups")},
+			{"/ProductServer/Watch/Organizations", QStringLiteral("Watch organizations"), QStringLiteral("Events of organizations for the users of the product")},
+			{"/ProductServer/Notifications/View", QStringLiteral("Notification center"), QStringLiteral("Users read their notifications in the product")},
+			{s_serverNotificationsSendPermission, QStringLiteral("Send notifications"), QStringLiteral("The product sends notifications to its users")},
+			{s_serverPermissionsPublishPermission, QStringLiteral("Publish permissions"), QStringLiteral("The product publishes its permission tree")}
+		};
+	}
+
+	if (receiverProductId == s_licenseServerProductId){
+		return {
+			{"/ProductServer/Licenses/View", QStringLiteral("Licenses: view"), QStringLiteral("Read license definitions")},
+			{"/ProductServer/Products/View", QStringLiteral("Products: view"), QStringLiteral("Read products")},
+			{"/ProductServer/Features/View", QStringLiteral("Features: view"), QStringLiteral("Read features")},
+			{"/ProductServer/Watch/Licenses", QStringLiteral("Watch licenses"), QStringLiteral("Changes of license definitions")},
+			{"/ProductServer/Watch/Products", QStringLiteral("Watch products"), QStringLiteral("Changes of products")},
+			{"/ProductServer/Watch/Features", QStringLiteral("Watch features"), QStringLiteral("Changes of features")}
+		};
+	}
+
+	return {};
+}
+
+
+/**
+	Check the permissions of a token for a receiving server and add the ones it must hold.
+*/
+inline bool NormalizeServerTokenPermissions(const QByteArray& receiverProductId, QByteArrayList& scopes, QString& errorMessage)
+{
+	const QList<ServerPermissionInfo> permissions = GetServerTokenPermissions(receiverProductId);
+	if (permissions.isEmpty()){
+		errorMessage = QStringLiteral("The server '%1' takes no tokens of other servers").arg(QString::fromUtf8(receiverProductId));
+
+		return false;
+	}
+
+	// In the order of the catalog, each once
+	const QSet<QByteArray> requested(scopes.cbegin(), scopes.cend());
+	QSet<QByteArray> knownIds;
+	QByteArrayList normalized;
+	for (const ServerPermissionInfo& permission : permissions){
+		knownIds.insert(permission.id);
+		if (permission.isRequired || requested.contains(permission.id)){
+			normalized.append(permission.id);
+		}
+	}
+
+	for (const QByteArray& scope : requested){
+		if (!knownIds.contains(scope)){
+			errorMessage = QStringLiteral("The permission '%1' cannot be given to a server of '%2'").arg(QString::fromUtf8(scope), QString::fromUtf8(receiverProductId));
+
+			return false;
+		}
+	}
+
+	scopes = normalized;
+
+	return true;
 }
 
 

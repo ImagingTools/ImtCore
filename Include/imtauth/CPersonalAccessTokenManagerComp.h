@@ -50,6 +50,7 @@ public:
 	virtual QByteArrayList GetTokenIds(const QByteArray& userId) const override;
 	virtual IPersonalAccessTokenSharedPtr GetToken(const QByteArray& tokenId) const override;
 	virtual bool RevokeToken(const QByteArray& tokenId) override;
+	virtual bool SetTokenScopes(const QByteArray& tokenId, const QByteArrayList& scopes) override;
 	virtual bool UpdateLastUsedAt(const QByteArray& tokenId) override;
 	virtual bool DeleteToken(const QByteArray& tokenId) override;
 

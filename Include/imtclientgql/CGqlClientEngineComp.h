@@ -9,6 +9,7 @@
 // ImtCore includes
 #include <imtcom/IServerConnectionInterface.h>
 #include <imtclientgql/IClientProtocolEngine.h>
+#include <imtclientgql/IServerCredentialProvider.h>
 
 
 namespace imtclientgql
@@ -27,6 +28,7 @@ public:
 		I_ASSIGN(m_serverConnectionCompPtr, "ServerConnectionInterface", "Server connnection settings", false, "ServerConnectionInterface");
 		I_ASSIGN(m_prefixServerAttrPtr, "ServerPrefix", "Prefix Server", false, "/");
 		I_ASSIGN(m_applicationInfoCompPtr, "ApplicationInfo", "Application info", false, "ApplicationInfo");
+		I_ASSIGN(m_serverCredentialCompPtr, "ServerCredentialProvider", "Token of this server, sent with every request to prove the product the request comes through", false, "ServerCredentialProvider");
 	I_END_COMPONENT;
 
 	CGqlClientEngineComp();
@@ -38,6 +40,7 @@ private:
 	I_ATTR(QByteArray, m_prefixServerAttrPtr);
 	I_REF(imtcom::IServerConnectionInterface, m_serverConnectionCompPtr);
 	I_REF(ibase::IApplicationInfo, m_applicationInfoCompPtr);
+	I_REF(IServerCredentialProvider, m_serverCredentialCompPtr);
 };
 
 

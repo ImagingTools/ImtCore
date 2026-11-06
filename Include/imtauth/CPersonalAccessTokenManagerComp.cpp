@@ -297,6 +297,39 @@ bool CPersonalAccessTokenManagerComp::RevokeToken(const QByteArray& tokenId)
 }
 
 
+bool CPersonalAccessTokenManagerComp::SetTokenScopes(const QByteArray& tokenId, const QByteArrayList& scopes)
+{
+	if (!m_tokenCollectionCompPtr.IsValid()){
+		SendErrorMessage(0, "Token collection not configured", "CPersonalAccessTokenManagerComp");
+		return false;
+	}
+
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	IPersonalAccessToken* tokenPtr = m_tokenCollectionCompPtr->GetObjectData(tokenId, dataPtr) ? dynamic_cast<IPersonalAccessToken*>(dataPtr.GetPtr()) : nullptr;
+	if (tokenPtr == nullptr){
+		SendErrorMessage(0, QStringLiteral("Token '%1' not found").arg(QString::fromUtf8(tokenId)), "CPersonalAccessTokenManagerComp");
+		return false;
+	}
+
+	istd::CChangeNotifier changeNotifier(this);
+
+	tokenPtr->SetScopes(scopes);
+
+	if (!m_tokenCollectionCompPtr->SetObjectData(tokenId, *tokenPtr)){
+		SendErrorMessage(0, QStringLiteral("Failed to update token '%1'").arg(QString::fromUtf8(tokenId)), "CPersonalAccessTokenManagerComp");
+		return false;
+	}
+
+	SendInfoMessage(0, QStringLiteral("Changed the permissions of token '%1'").arg(QString::fromUtf8(tokenId)), "CPersonalAccessTokenManagerComp");
+
+	if (m_tokenCacheCompPtr.IsValid()){
+		m_tokenCacheCompPtr->ForgetToken(tokenId);
+	}
+
+	return true;
+}
+
+
 bool CPersonalAccessTokenManagerComp::UpdateLastUsedAt(const QByteArray& tokenId)
 {
 	if (!m_tokenCollectionCompPtr.IsValid()){

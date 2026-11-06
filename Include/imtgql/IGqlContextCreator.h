@@ -42,9 +42,17 @@ public:
 
 	/**
 		Check the token only, without creating a context for its owner.
+		\param scopes The permissions of a personal access token.
 		\return CCS_INTERNAL_ERROR when the token could not be checked: that says nothing about the token.
 	*/
-	virtual ContextCreationStatus CheckToken(const QByteArray& token, QString& errorMessage) const = 0;
+	virtual ContextCreationStatus CheckToken(const QByteArray& token, QByteArrayList& scopes, QString& errorMessage) const = 0;
+
+	/**
+		Check that the server of a product the request comes through may send it.
+		A request of a client of this server passes.
+		\param requiredPermission The permission of the server token the request needs, empty when it needs none.
+	*/
+	virtual bool CheckRequestAccess(const CGqlRequest& gqlRequest, QByteArray& requiredPermission, QString& errorMessage) const = 0;
 };
 
 

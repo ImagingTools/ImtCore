@@ -42,6 +42,14 @@ protected:
 				const sdl::V1_0::imtauth::CRevokeServerTokenGqlRequest& revokeServerTokenRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CRevokeServerTokenPayload OnUpdateServerTokenScopes(
+				const sdl::V1_0::imtauth::CUpdateServerTokenScopesGqlRequest& updateServerTokenScopesRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CServerTokenReceiverList OnGetServerTokenReceivers(
+				const sdl::V1_0::imtauth::CGetServerTokenReceiversGqlRequest& getServerTokenReceiversRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 
 private:
 	bool CheckSuperuserSession(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;

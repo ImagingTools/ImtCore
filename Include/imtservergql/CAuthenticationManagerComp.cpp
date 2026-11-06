@@ -88,6 +88,33 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 		}
 	}
 
+	// A request of another product comes through the server of that product, which proves it with its own token
+	QByteArray serverProductId = clientProductId;
+	QByteArrayList serverScopes = clientProductId.isEmpty() ? QByteArrayList() : scopes;
+	const QByteArray ownProductId = m_serverProductIdAttrPtr.IsValid() ? QByteArray(*m_serverProductIdAttrPtr) : QByteArray();
+	if (clientProductId.isEmpty() && !ownProductId.isEmpty()){
+		const QByteArray headerProductId = headers.value(imtbase::s_productIdHeaderId);
+		const QByteArray serverToken = headers.value(imtbase::s_serverTokenHeaderId);
+		if (!serverToken.isEmpty()){
+			if (!ResolveServerToken(serverToken, serverProductId, serverScopes, error)){
+				return nullptr;
+			}
+
+			if (!headerProductId.isEmpty() && headerProductId != serverProductId){
+				SetError(error, imtgql::IGqlContextCreator::CCS_FORBIDDEN, QStringLiteral("The token of the server is not the token of the product '%1'.").arg(QString::fromUtf8(headerProductId)));
+				return nullptr;
+			}
+
+			if (productId.isEmpty()){
+				productId = serverProductId;
+			}
+		}
+		else if (!headerProductId.isEmpty() && headerProductId != ownProductId){
+			SetError(error, imtgql::IGqlContextCreator::CCS_FORBIDDEN, QStringLiteral("The product '%1' is not connected: its server sends no valid token.").arg(QString::fromUtf8(headerProductId)));
+			return nullptr;
+		}
+	}
+
 	imtgql::IGqlContextUniquePtr gqlContextPtr = CreateContextInstance();
 	if (!gqlContextPtr.IsValid()){
 		SetError(
@@ -103,6 +130,8 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 	gqlContextPtr->SetHeaders(headers);
 	gqlContextPtr->SetProductId(productId);
 	gqlContextPtr->SetClientProductId(clientProductId);
+	gqlContextPtr->SetServerProductId(serverProductId);
+	gqlContextPtr->SetServerScopes(serverScopes);
 	gqlContextPtr->SetProductInfo(m_productInfoCompPtr.GetPtr());
 	if (isPat){
 		gqlContextPtr->SetScopes(scopes);
@@ -236,6 +265,19 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 				gqlContextPtr->SetUserInfo(userInfoPtr);
 			}
 		}
+	}
+
+	// The console of this server administers another product: a superuser in a session of its own only
+	const QByteArray administeredProductId = headers.value(imtbase::s_administeredProductHeaderId);
+	if (!administeredProductId.isEmpty() && administeredProductId != productId){
+		const imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
+		if (userInfoPtr == nullptr || !userInfoPtr->IsAdmin() || isPat || !serverProductId.isEmpty()){
+			imtgql::CGqlRequestContextManager::Clear();
+			SetError(error, imtgql::IGqlContextCreator::CCS_FORBIDDEN, QStringLiteral("Only a superuser administers another product."));
+			return nullptr;
+		}
+
+		gqlContextPtr->SetProductId(administeredProductId);
 	}
 
 	const QByteArray forwardedLanguageId = headers.value(imtbase::s_languageIdHeaderId);
@@ -626,6 +668,7 @@ bool CAuthenticationManagerComp::ResolveUserId(
 		QByteArray tokenProductId;
 		QByteArray tokenClientProductId;
 		bool isCheckFailed = false;
+		const qint64 resolutionStartedAt = QDateTime::currentMSecsSinceEpoch();
 		if (!m_patManagerCompPtr->ValidateToken(token, userId, tokenId, scopes, &tokenProductId, &tokenClientProductId, &isCheckFailed)){
 			errorMessage = isCheckFailed ? QStringLiteral("The personal access token could not be checked.") : QStringLiteral("Invalid personal access token.");
 			status = isCheckFailed ? imtgql::IGqlContextCreator::CCS_INTERNAL_ERROR : imtgql::IGqlContextCreator::CCS_FORBIDDEN;
@@ -644,7 +687,7 @@ bool CAuthenticationManagerComp::ResolveUserId(
 			return false;
 		}
 
-		StoreCachedToken(token, userId, tenantId, tokenId, scopes, true, 0, tokenProductId, tokenClientProductId);
+		StoreCachedToken(token, userId, tenantId, tokenId, scopes, true, 0, tokenProductId, tokenClientProductId, resolutionStartedAt);
 		return true;
 	}
 
@@ -845,7 +888,8 @@ void CAuthenticationManagerComp::StoreCachedToken(
 			bool isPat,
 			qint64 jwtExpSecs,
 			const QByteArray& patProductId,
-			const QByteArray& patClientProductId) const
+			const QByteArray& patClientProductId,
+			qint64 resolutionStartedAt) const
 {
 	TokenCacheEntry entry;
 	entry.patProductId = patProductId;
@@ -887,10 +931,10 @@ void CAuthenticationManagerComp::StoreCachedToken(
 		}
 	}
 
-	// The same for a validation that started before the token was revoked
+	// The same for a validation that started before the token was revoked or changed
 	if (isPat && !tokenId.isEmpty()){
 		auto forgottenIter = m_forgottenTokenIds.constFind(tokenId);
-		if (forgottenIter != m_forgottenTokenIds.constEnd() && *forgottenIter > now){
+		if (forgottenIter != m_forgottenTokenIds.constEnd() && *forgottenIter >= resolutionStartedAt){
 			return;
 		}
 	}
@@ -951,11 +995,10 @@ void CAuthenticationManagerComp::StoreExpiredToken(const QByteArray& token) cons
 }
 
 
-imtgql::IGqlContextCreator::ContextCreationStatus CAuthenticationManagerComp::CheckToken(const QByteArray& token, QString& errorMessage) const
+imtgql::IGqlContextCreator::ContextCreationStatus CAuthenticationManagerComp::CheckToken(const QByteArray& token, QByteArrayList& scopes, QString& errorMessage) const
 {
 	QByteArray userId;
 	QByteArray tenantId;
-	QByteArrayList scopes;
 	bool isPat = false;
 	ContextCreationStatus status = CCS_OK;
 	if (!ResolveUserId(token, userId, tenantId, scopes, isPat, errorMessage, status)){
@@ -963,6 +1006,62 @@ imtgql::IGqlContextCreator::ContextCreationStatus CAuthenticationManagerComp::Ch
 	}
 
 	return CCS_OK;
+}
+
+
+bool CAuthenticationManagerComp::CheckRequestAccess(const imtgql::CGqlRequest& gqlRequest, QByteArray& requiredPermission, QString& errorMessage) const
+{
+	requiredPermission.clear();
+
+	const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
+	const QByteArray serverProductId = contextPtr != nullptr ? contextPtr->GetServerProductId() : QByteArray();
+	if (serverProductId.isEmpty()){
+		return true;
+	}
+
+	if (!m_requestPolicyCompPtr.IsValid() || !m_requestPolicyCompPtr->FindRequiredPermission(gqlRequest, requiredPermission)){
+		errorMessage = QStringLiteral("The request '%1' is closed to the servers of products").arg(QString::fromUtf8(gqlRequest.GetCommandId()));
+
+		return false;
+	}
+
+	if (!requiredPermission.isEmpty() && !imtauth::HasPermission(contextPtr->GetServerScopes(), requiredPermission, false)){
+		errorMessage = QStringLiteral("The server of '%1' may not send '%2': its token lacks '%3'")
+					.arg(QString::fromUtf8(serverProductId), QString::fromUtf8(gqlRequest.GetCommandId()), QString::fromUtf8(requiredPermission));
+
+		return false;
+	}
+
+	return true;
+}
+
+
+bool CAuthenticationManagerComp::ResolveServerToken(
+			const QByteArray& serverToken,
+			QByteArray& clientProductId,
+			QByteArrayList& scopes,
+			imtgql::IGqlContextCreator::ContextCreationError& error) const
+{
+	QByteArray userId;
+	QByteArray tenantId;
+	bool isPat = false;
+	QString errorMessage;
+	ContextCreationStatus status = CCS_OK;
+	if (!IsPatToken(serverToken) || !ResolveUserId(serverToken, userId, tenantId, scopes, isPat, errorMessage, status) || !isPat){
+		SetError(error, status == CCS_OK ? CCS_FORBIDDEN : status, errorMessage.isEmpty() ? QStringLiteral("The token of the server is not valid.") : errorMessage);
+
+		return false;
+	}
+
+	QByteArray tokenProductId;
+	const QByteArray ownProductId = *m_serverProductIdAttrPtr;
+	if (!GetCachedPatProducts(serverToken, tokenProductId, clientProductId) || clientProductId.isEmpty() || tokenProductId != ownProductId){
+		SetError(error, CCS_FORBIDDEN, QStringLiteral("The token of the server is not issued for this server."));
+
+		return false;
+	}
+
+	return true;
 }
 
 
@@ -977,16 +1076,17 @@ void CAuthenticationManagerComp::ForgetToken(const QByteArray& tokenId)
 	const qint64 now = QDateTime::currentMSecsSinceEpoch();
 	const qint64 tokenCacheTtlMs = m_tokenCacheTtlAttrPtr.IsValid() ? (static_cast<qint64>(*m_tokenCacheTtlAttrPtr) * 1000) : (30 * 1000);
 
+	// A validation in flight lasts far less than the lifetime of the cache
 	QMutexLocker cacheLocker(&m_tokenCacheMutex);
 	for (auto iter = m_forgottenTokenIds.begin(); iter != m_forgottenTokenIds.end(); ){
-		if (*iter <= now){
+		if (*iter + tokenCacheTtlMs <= now){
 			iter = m_forgottenTokenIds.erase(iter);
 		}
 		else{
 			++iter;
 		}
 	}
-	m_forgottenTokenIds.insert(tokenId, now + tokenCacheTtlMs);
+	m_forgottenTokenIds.insert(tokenId, now);
 
 	for (auto iter = m_tokenCache.begin(); iter != m_tokenCache.end(); ){
 		if (iter->isPat && iter->tokenId == tokenId){

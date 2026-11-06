@@ -33,9 +33,13 @@ QtObject {
 				var originalOnReadyStateChange = xhr.onreadystatechange;
 				var gqlRequestRef = xhr.gqlRequest;
 
-				let requestProductId = AuthorizationController.administeredProductId || AuthorizationController.productId
-				if (requestProductId) {
-					xhr.setRequestHeader("productId", requestProductId);
+				if (AuthorizationController.productId) {
+					xhr.setRequestHeader("productId", AuthorizationController.productId);
+				}
+
+				// The server takes it from a superuser only; the request stays one of this application
+				if (AuthorizationController.administeredProductId) {
+					xhr.setRequestHeader("administeredProductId", AuthorizationController.administeredProductId);
 				}
 
 				xhr.onreadystatechange = function(){
