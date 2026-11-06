@@ -166,6 +166,12 @@
                     <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaClientEngine/ApiClient"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ConnectionStatus" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaClientEngine/ConnectionStatus"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="FeatureContainer" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="IdentifiableProductInfo"/>
                     </AttributeInfo>

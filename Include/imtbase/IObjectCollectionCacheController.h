@@ -19,6 +19,22 @@ class IObjectCollectionCacheController : virtual public istd::IPolymorphic
 {
 public:
 	/**
+		Flags a source collection reports to the caches observing it.
+	*/
+	enum SourceChangeFlags
+	{
+		/**
+			The changes of the source are not reported any more, so nothing read from it may be kept.
+		*/
+		CF_SOURCE_UNWATCHED = 20000,
+
+		/**
+			The changes of the source are reported again.
+		*/
+		CF_SOURCE_WATCHED
+	};
+
+	/**
 		Invalidates all cached data (filtered sub-collections and individual object data).
 		Subsequent calls to accessors will fetch fresh data from the underlying collection.
 		This can be used to force cache refresh in scenarios where the base collection

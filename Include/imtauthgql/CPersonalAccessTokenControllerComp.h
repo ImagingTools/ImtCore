@@ -3,7 +3,6 @@
 
 
 // ImtCore includes
-#include <imtauth/IPersonalAccessTokenCache.h>
 #include <imtauth/IPersonalAccessTokenManager.h>
 #include <imtauth/ITenantEntityBindingManager.h>
 #include <imtauth/IDelegatedAccess.h>

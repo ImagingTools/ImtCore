@@ -9,6 +9,7 @@
 // ImtCore includes
 #include <imtgql/CGqlRequest.h>
 #include <imtgql/IGqlContext.h>
+#include <imtrest/IProtocolEngine.h>
 
 
 namespace imtservergql
@@ -206,10 +207,44 @@ void CPublisherSubscriberBridgeComp::OnResponseReceived(
 
 
 void CPublisherSubscriberBridgeComp::OnSubscriptionStatusChanged(
-			const QByteArray& /*subscriptionId*/,
-			const SubscriptionStatus& /*status*/,
+			const QByteArray& subscriptionId,
+			const SubscriptionStatus& status,
 			const QString& /*message*/)
 {
+	if (status != SS_REFUSED || !m_requestManagerCompPtr.IsValid()){
+		return;
+	}
+
+	QByteArrayList clientSubscriptionIds;
+	{
+		QMutexLocker bridgeLocker(&m_bridgeMutex);
+		clientSubscriptionIds = m_upstreamToClientsMap.value(subscriptionId);
+	}
+
+	// The clients were told the subscription is made: without this they wait for events that never come
+	QMutexLocker locker(&m_mutex);
+	for (const QByteArray& clientSubscriptionId : clientSubscriptionIds){
+		for (const RequestNetworks& entry : m_registeredSubscribers){
+			const imtrest::IRequest* networkRequestPtr = entry.networkRequests.value(clientSubscriptionId);
+			if (networkRequestPtr == nullptr){
+				continue;
+			}
+
+			const QByteArray body = QStringLiteral(R"({"id": "%1","type": "error","payload": [{"message": "The server behind this one refused the subscription","extensions": {"type": "Warning"}}]})")
+						.arg(QString::fromUtf8(clientSubscriptionId)).toUtf8();
+
+			imtrest::ConstResponsePtr responsePtr(networkRequestPtr->GetProtocolEngine().CreateResponse(
+						*networkRequestPtr,
+						imtrest::IProtocolEngine::SC_OPERATION_NOT_AVAILABLE,
+						body,
+						QByteArrayLiteral("text/html; charset=utf-8")).PopInterfacePtr());
+			if (responsePtr.IsValid()){
+				m_requestManagerCompPtr->SendResponse(networkRequestPtr->GetRequestId(), responsePtr);
+			}
+
+			break;
+		}
+	}
 }
 
 

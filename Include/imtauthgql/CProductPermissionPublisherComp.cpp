@@ -11,6 +11,7 @@
 
 // ImtCore includes
 #include <imtauthgql/imtauthgql.h>
+#include <imtcom/IConnectionStatusProvider.h>
 #include <imtgql/CGqlContext.h>
 #include <imtgql/CGqlRequest.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/ProductPermissionCatalog.h>
@@ -26,7 +27,6 @@ namespace
 
 const int s_firstDelay = 5000;
 const int s_retryDelay = 30000;
-const int s_repeatDelay = 5 * 60000;
 
 
 } // namespace
@@ -50,12 +50,32 @@ void CProductPermissionPublisherComp::OnComponentCreated()
 		m_threadPtr = QThread::create([this](){ Run(); });
 		m_threadPtr->setObjectName(QStringLiteral("ProductPermissionPublisher"));
 		m_threadPtr->start();
+
+		if (m_connectionStatusModelCompPtr.IsValid()){
+			m_connectionStatusModelCompPtr->AttachObserver(this);
+		}
 	}, Qt::QueuedConnection);
+}
+
+
+// reimplemented (imod::CSingleModelObserverBase)
+
+void CProductPermissionPublisherComp::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
+{
+	if (!changeSet.Contains(imtcom::IConnectionStatusProvider::CF_CONNECTED)){
+		return;
+	}
+
+	QMutexLocker locker(&m_mutex);
+	m_isPublishNeeded = true;
+	m_condition.wakeAll();
 }
 
 
 void CProductPermissionPublisherComp::OnComponentDestroyed()
 {
+	EnsureModelDetached();
+
 	{
 		QMutexLocker locker(&m_mutex);
 		m_isStopping = true;
@@ -81,7 +101,7 @@ bool CProductPermissionPublisherComp::Publish() const
 	sdl::V1_0::imtauth::PublishProductPermissionsRequestArguments arguments;
 	arguments.input.emplace();
 	arguments.input->productId = productId;
-	arguments.input->productVersion = QCoreApplication::applicationVersion();
+	arguments.input->productVersion = GetProductVersion();
 
 	QByteArrayList languageIds;
 	if (m_translationManagerCompPtr.IsValid()){
@@ -150,12 +170,35 @@ bool CProductPermissionPublisherComp::Publish() const
 }
 
 
+QString CProductPermissionPublisherComp::GetProductVersion() const
+{
+	if (!m_applicationInfoCompPtr.IsValid()){
+		return QString();
+	}
+
+	const iser::IVersionInfo& versionInfo = m_applicationInfoCompPtr->GetVersionInfo();
+	const int mainVersion = m_applicationInfoCompPtr->GetMainVersionId();
+
+	quint32 versionNumber = 0;
+
+	return versionInfo.GetVersionNumber(mainVersion, versionNumber) ? versionInfo.GetEncodedVersionName(mainVersion, versionNumber) : QString();
+}
+
+
 void CProductPermissionPublisherComp::Run()
 {
 	int delay = s_firstDelay;
 
 	QMutexLocker locker(&m_mutex);
 	while (!m_isStopping){
+		if (!m_isPublishNeeded){
+			m_condition.wait(&m_mutex);
+
+			delay = s_firstDelay;
+
+			continue;
+		}
+
 		const QDeadlineTimer deadline(delay);
 		while (!m_isStopping && !deadline.hasExpired()){
 			m_condition.wait(&m_mutex, deadline);
@@ -164,11 +207,16 @@ void CProductPermissionPublisherComp::Run()
 			break;
 		}
 
+		m_isPublishNeeded = false;
+
 		locker.unlock();
 		const bool isPublished = Publish();
 		locker.relock();
 
-		delay = isPublished ? s_repeatDelay : s_retryDelay;
+		if (!isPublished){
+			m_isPublishNeeded = true;
+			delay = s_retryDelay;
+		}
 	}
 }
 

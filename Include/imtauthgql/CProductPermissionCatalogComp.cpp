@@ -107,7 +107,17 @@ sdl::V1_0::imtauth::CPublishProductPermissionsPayload CProductPermissionCatalogC
 	const QByteArray hash = QCryptographicHash::hash(tree, QCryptographicHash::Sha256).toHex();
 	const QString version = arguments.input->productVersion ? QString(*arguments.input->productVersion) : QString();
 
-	QByteArray snapshotId = imtauth::FindProductPermissionSnapshot(*m_snapshotCollectionCompPtr, productId);
+	// One writer at a time: two publications must not create two trees of a product
+	QMutexLocker publishLocker(&m_publishMutex);
+
+	// A tree that could not be found must not be stored as a second one
+	bool isRead = false;
+	QByteArray snapshotId = imtauth::FindProductPermissionSnapshot(*m_snapshotCollectionCompPtr, productId, &isRead);
+	if (!isRead){
+		errorMessage = QStringLiteral("Unable to read the stored permission tree");
+
+		return response;
+	}
 
 	imtauth::CIdentifiableProductPermissionSnapshot snapshot;
 	if (!snapshotId.isEmpty()){

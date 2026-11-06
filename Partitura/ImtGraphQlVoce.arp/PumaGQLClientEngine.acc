@@ -820,6 +820,7 @@
         <Component ExportedId="GroupRemoteRepository" ComponentId="RemoteRepositories/GroupRemoteRepository"/>
         <Component ExportedId="RemoteAuthorizationController" ComponentId="RemoteControllers/RemoteAuthorizationController"/>
         <Component ExportedId="ServerCredential" ComponentId="ServerCredential"/>
+        <Component ExportedId="ConnectionStatus" ComponentId="Subscription/ConnectionStatusProvider"/>
         <Component ExportedId="RemotePersonalAccessTokenController" ComponentId="RemotePersonalAccessTokenController"/>
         <Component ExportedId="RemoteTenantController" ComponentId="RemoteTenantController/RemoteTenantController"/>
         <Component ExportedId="RoleRemoteRepository" ComponentId="RemoteRepositories/RoleRemoteRepository"/>

@@ -22,6 +22,7 @@ namespace imtauth
 static const qint64 s_lastUsedPrecisionSeconds = 60;
 
 
+
 // public methods
 
 // reimplemented (imtauth::IPersonalAccessTokenManager)

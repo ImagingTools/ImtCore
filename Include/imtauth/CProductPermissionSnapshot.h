@@ -75,8 +75,9 @@ public:
 
 /**
 	Find the ID of the snapshot of a product, empty when the product has not published yet.
+	\param isReadPtr [optional] False when the collection could not be read, so empty says nothing about the product.
 */
-QByteArray FindProductPermissionSnapshot(const imtbase::IObjectCollection& snapshotCollection, const QByteArray& productId);
+QByteArray FindProductPermissionSnapshot(const imtbase::IObjectCollection& snapshotCollection, const QByteArray& productId, bool* isReadPtr = nullptr);
 
 
 } // namespace imtauth

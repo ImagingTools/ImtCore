@@ -20,6 +20,9 @@ namespace imtauthgql
 // A server with a token reports at least every few minutes: it publishes and its subscriptions are checked
 static const qint64 s_onlineSeconds = 10 * 60;
 
+// A stored tree holds all the languages of a product, the list of products needs only its version
+static const qint64 s_publishedVersionLifetimeMs = 60 * 1000;
+
 
 // reimplemented (sdl::V1_0::imtauth::CConnectedProductCollectionControllerCompBase)
 
@@ -210,15 +213,22 @@ bool CConnectedProductCollectionControllerComp::OnBeforeRemoveElements(const QBy
 
 bool CConnectedProductCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	if (!IsSuperuserRequest(gqlRequest)){
-		errorMessage = QStringLiteral("The catalog of products is available to a superuser only");
+	if (!IsSuperuserSessionRequest(gqlRequest)){
+		errorMessage = QStringLiteral("The catalog of products is available to a superuser session only");
 
 		return false;
 	}
 
+	return true;
+}
+
+
+QJsonObject CConnectedProductCollectionControllerComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+{
+	// With the first request: at the start of the server the database may not be there yet
 	EnsureOwnProduct();
 
-	return true;
+	return BaseClass::CreateInternalResponse(gqlRequest, errorMessage);
 }
 
 
@@ -238,7 +248,13 @@ void CConnectedProductCollectionControllerComp::EnsureOwnProduct() const
 	const QByteArray productId = *m_ownProductIdAttrPtr;
 	const QString name = m_ownProductNameAttrPtr.IsValid() ? QString(*m_ownProductNameAttrPtr) : QString::fromUtf8(productId);
 
-	if (imtauth::CConnectedProductDocumentValidatorComp::HasProduct(*m_objectCollectionCompPtr, productId)){
+	bool isRead = false;
+	const bool hasProduct = imtauth::CConnectedProductDocumentValidatorComp::HasProduct(*m_objectCollectionCompPtr, productId, &isRead);
+	if (!isRead){
+		return;
+	}
+
+	if (hasProduct){
 		m_isOwnProductEnsured = true;
 
 		return;
@@ -259,6 +275,33 @@ void CConnectedProductCollectionControllerComp::EnsureOwnProduct() const
 }
 
 
+QString CConnectedProductCollectionControllerComp::GetPublishedVersion(const QByteArray& productId) const
+{
+	if (!m_snapshotCollectionCompPtr.IsValid()){
+		return QString();
+	}
+
+	const qint64 now = QDateTime::currentMSecsSinceEpoch();
+	{
+		QMutexLocker locker(&m_publishedVersionsMutex);
+		const auto foundIt = m_publishedVersions.constFind(productId);
+		if (foundIt != m_publishedVersions.constEnd() && foundIt->expiresAt > now){
+			return foundIt->version;
+		}
+	}
+
+	const QByteArray snapshotId = imtauth::FindProductPermissionSnapshot(*m_snapshotCollectionCompPtr, productId);
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	const imtauth::CProductPermissionSnapshot* snapshotPtr = !snapshotId.isEmpty() && m_snapshotCollectionCompPtr->GetObjectData(snapshotId, dataPtr) ? dynamic_cast<const imtauth::CProductPermissionSnapshot*>(dataPtr.GetPtr()) : nullptr;
+	const QString version = snapshotPtr != nullptr ? snapshotPtr->GetProductVersion() : QString();
+
+	QMutexLocker locker(&m_publishedVersionsMutex);
+	m_publishedVersions.insert(productId, {version, now + s_publishedVersionLifetimeMs});
+
+	return version;
+}
+
+
 void CConnectedProductCollectionControllerComp::FillServerState(
 			const QByteArray& productId,
 			const sdl::V1_0::imtauth::CConnectedProductsListGqlRequest& listRequest,
@@ -266,13 +309,8 @@ void CConnectedProductCollectionControllerComp::FillServerState(
 {
 	const auto requestInfo = listRequest.GetRequestInfo();
 
-	if (requestInfo.items.isProductVersionRequested && m_snapshotCollectionCompPtr.IsValid()){
-		const QByteArray snapshotId = imtauth::FindProductPermissionSnapshot(*m_snapshotCollectionCompPtr, productId);
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		const imtauth::CProductPermissionSnapshot* snapshotPtr = !snapshotId.isEmpty() && m_snapshotCollectionCompPtr->GetObjectData(snapshotId, dataPtr) ? dynamic_cast<const imtauth::CProductPermissionSnapshot*>(dataPtr.GetPtr()) : nullptr;
-		if (snapshotPtr != nullptr){
-			representationObject.productVersion = snapshotPtr->GetProductVersion();
-		}
+	if (requestInfo.items.isProductVersionRequested){
+		representationObject.productVersion = GetPublishedVersion(productId);
 	}
 
 	if (!requestInfo.items.isStatusRequested && !requestInfo.items.isTokenCreatedAtRequested && !requestInfo.items.isLastUsedAtRequested){

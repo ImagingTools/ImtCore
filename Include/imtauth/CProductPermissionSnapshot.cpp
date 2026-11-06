@@ -3,6 +3,7 @@
 
 
 // ACF includes
+#include <ilog/CMessageContainer.h>
 #include <iprm/CParamsSet.h>
 #include <iser/CArchiveTag.h>
 #include <iser/CPrimitiveTypesSerializer.h>
@@ -190,7 +191,7 @@ bool CProductPermissionSnapshot::ResetData(CompatibilityMode /*mode*/)
 }
 
 
-QByteArray FindProductPermissionSnapshot(const imtbase::IObjectCollection& snapshotCollection, const QByteArray& productId)
+QByteArray FindProductPermissionSnapshot(const imtbase::IObjectCollection& snapshotCollection, const QByteArray& productId, bool* isReadPtr)
 {
 	imtbase::CComplexCollectionFilter::FilterExpression filterExpr;
 	filterExpr.fieldFilters << imtbase::IComplexCollectionFilter::FieldFilter("ProductId", QString::fromUtf8(productId));
@@ -201,7 +202,11 @@ QByteArray FindProductPermissionSnapshot(const imtbase::IObjectCollection& snaps
 	iprm::CParamsSet filterParams;
 	filterParams.SetEditableParameter("ComplexFilter", &complexFilter);
 
-	const imtbase::ICollectionInfo::Ids ids = snapshotCollection.GetElementIds(0, 1, &filterParams);
+	ilog::CMessageContainer readErrors;
+	const imtbase::ICollectionInfo::Ids ids = snapshotCollection.GetElementIds(0, 1, &filterParams, &readErrors);
+	if (isReadPtr != nullptr){
+		*isReadPtr = readErrors.GetWorstCategory() < istd::IInformationProvider::IC_ERROR;
+	}
 
 	return ids.isEmpty() ? QByteArray() : ids.first();
 }

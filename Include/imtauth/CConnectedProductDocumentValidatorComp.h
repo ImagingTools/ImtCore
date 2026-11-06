@@ -69,7 +69,8 @@ public:
 	/**
 		Tell whether the catalog has an entry of the product.
 	*/
-	static bool HasProduct(const imtbase::IObjectCollection& productCollection, const QByteArray& productId);
+	/// \param isReadPtr [optional] False when the catalog could not be read, so false says nothing about the product.
+	static bool HasProduct(const imtbase::IObjectCollection& productCollection, const QByteArray& productId, bool* isReadPtr = nullptr);
 
 private:
 	I_REF(imtbase::IObjectCollection, m_productCollectionCompPtr);

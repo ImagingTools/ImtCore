@@ -8,6 +8,7 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
+#include <imtbase/IObjectCollectionCacheController.h>
 #include <imtclientgql/CSubscriberCompBase.h>
 
 

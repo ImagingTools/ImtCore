@@ -2,6 +2,10 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QHash>
+#include <QtCore/QMutex>
+
 // ImtCore includes
 #include <imtauth/CConnectedProduct.h>
 #include <imtauth/IPersonalAccessTokenManager.h>
@@ -57,9 +61,11 @@ protected:
 
 	// reimplemented (imtservergql::CPermissibleGqlRequestHandlerComp)
 	virtual bool CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual QJsonObject CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 private:
 	void EnsureOwnProduct() const;
+	QString GetPublishedVersion(const QByteArray& productId) const;
 	void FillServerState(
 				const QByteArray& productId,
 				const sdl::V1_0::imtauth::CConnectedProductsListGqlRequest& listRequest,
@@ -72,6 +78,14 @@ private:
 
 	mutable QMutex m_ownProductMutex;
 	mutable bool m_isOwnProductEnsured = false;
+
+	struct PublishedVersion
+	{
+		QString version;
+		qint64 expiresAt = 0;
+	};
+	mutable QHash<QByteArray, PublishedVersion> m_publishedVersions;
+	mutable QMutex m_publishedVersionsMutex;
 
 	I_FACT(imtauth::IConnectedProduct, m_productFactCompPtr);
 	I_REF(imtauth::IPersonalAccessTokenManager, m_tokenManagerCompPtr);

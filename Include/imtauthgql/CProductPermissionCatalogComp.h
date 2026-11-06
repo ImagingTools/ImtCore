@@ -2,6 +2,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QMutex>
+
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/ProductPermissionCatalog_fwd.h>
@@ -36,6 +39,8 @@ protected:
 
 private:
 	I_REF(imtbase::IObjectCollection, m_snapshotCollectionCompPtr);
+
+	mutable QMutex m_publishMutex;
 };
 
 

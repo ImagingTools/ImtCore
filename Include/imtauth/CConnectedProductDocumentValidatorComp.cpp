@@ -3,6 +3,7 @@
 
 
 // ACF includes
+#include <ilog/CMessageContainer.h>
 #include <iprm/CParamsSet.h>
 
 // ImtCore includes
@@ -18,7 +19,8 @@ namespace imtauth
 static imtbase::ICollectionInfo::Ids SelectProductEntries(
 			const imtbase::IObjectCollection& productCollection,
 			const QByteArray& objectId,
-			const QByteArray& productId)
+			const QByteArray& productId,
+			bool& isRead)
 {
 	imtbase::CComplexCollectionFilter::FilterExpression filterExpr;
 	filterExpr.logicalOperation = imtbase::IComplexCollectionFilter::LO_AND;
@@ -34,7 +36,11 @@ static imtbase::ICollectionInfo::Ids SelectProductEntries(
 	iprm::CParamsSet filterParams;
 	filterParams.SetEditableParameter("ComplexFilter", &complexFilter);
 
-	return productCollection.GetElementIds(0, -1, &filterParams);
+	ilog::CMessageContainer readErrors;
+	const imtbase::ICollectionInfo::Ids ids = productCollection.GetElementIds(0, -1, &filterParams, &readErrors);
+	isRead = readErrors.GetWorstCategory() < istd::IInformationProvider::IC_ERROR;
+
+	return ids;
 }
 
 
@@ -79,7 +85,15 @@ bool CConnectedProductDocumentValidatorComp::CheckProductIdUnique(
 		return false;
 	}
 
-	if (!SelectProductEntries(productCollection, objectId, productId).isEmpty()){
+	bool isRead = false;
+	const imtbase::ICollectionInfo::Ids ids = SelectProductEntries(productCollection, objectId, productId, isRead);
+	if (!isRead){
+		errorMessage = QStringLiteral("The catalog of products could not be read. Try again.");
+
+		return false;
+	}
+
+	if (!ids.isEmpty()){
 		errorMessage = QStringLiteral("The product '%1' is already connected").arg(QString::fromUtf8(productId));
 
 		return false;
@@ -89,9 +103,15 @@ bool CConnectedProductDocumentValidatorComp::CheckProductIdUnique(
 }
 
 
-bool CConnectedProductDocumentValidatorComp::HasProduct(const imtbase::IObjectCollection& productCollection, const QByteArray& productId)
+bool CConnectedProductDocumentValidatorComp::HasProduct(const imtbase::IObjectCollection& productCollection, const QByteArray& productId, bool* isReadPtr)
 {
-	return !productId.isEmpty() && !SelectProductEntries(productCollection, QByteArray(), productId).isEmpty();
+	bool isRead = true;
+	const bool hasProduct = !productId.isEmpty() && !SelectProductEntries(productCollection, QByteArray(), productId, isRead).isEmpty();
+	if (isReadPtr != nullptr){
+		*isReadPtr = isRead;
+	}
+
+	return hasProduct;
 }
 
 

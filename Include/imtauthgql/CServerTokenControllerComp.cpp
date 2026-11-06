@@ -9,6 +9,7 @@
 #include <imtauth/CConnectedProductDocumentValidatorComp.h>
 #include <imtauth/IPersonalAccessToken.h>
 #include <imtauth/imtauth.h>
+#include <imtauthgql/imtauthgql.h>
 #include <imtgql/IGqlContext.h>
 
 // Generated includes
@@ -168,11 +169,7 @@ sdl::V1_0::imtauth::CRevokeServerTokenPayload CServerTokenControllerComp::OnRevo
 
 bool CServerTokenControllerComp::CheckSuperuserSession(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
-	const imtauth::IUserInfo* userInfoPtr = gqlContextPtr != nullptr ? gqlContextPtr->GetUserInfo() : nullptr;
-
-	// A personal token of the superuser must not issue identities of servers
-	if (userInfoPtr == nullptr || !userInfoPtr->IsAdmin() || gqlContextPtr->GetToken().startsWith(QByteArrayLiteral("imt_pat_"))){
+	if (!IsSuperuserSessionRequest(gqlRequest)){
 		errorMessage = QStringLiteral("Server tokens are managed by a superuser session");
 
 		return false;

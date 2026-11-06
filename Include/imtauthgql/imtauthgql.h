@@ -1018,6 +1018,16 @@ inline bool IsSuperuserRequest(const imtgql::CGqlRequest& gqlRequest)
 	return (contextUserInfoPtr != nullptr) && contextUserInfoPtr->IsAdmin();
 }
 
+
+/**
+	The superuser in a session of its own: a personal token of the superuser must not manage the identities of servers.
+*/
+inline bool IsSuperuserSessionRequest(const imtgql::CGqlRequest& gqlRequest)
+{
+	return IsSuperuserRequest(gqlRequest) && !gqlRequest.GetRequestContext()->GetToken().startsWith(QByteArrayLiteral("imt_pat_"));
+}
+
+
 /**
 	Adapts (filters) the roles, groups and permissions of a user according to the
 	current tenant context, and enriches with delegated roles when appropriate.

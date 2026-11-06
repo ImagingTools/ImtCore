@@ -118,7 +118,7 @@ void CObjectCollectionSubscriberComp::OnSubscriptionStatusChanged(const QByteArr
 	locker.unlock();
 
 	if (wasWatched != isWatched && m_objectCollectionCompPtr.IsValid()){
-		istd::IChangeable::ChangeSet changeSet(isWatched ? imtbase::IObjectCollection::CF_SOURCE_WATCHED : imtbase::IObjectCollection::CF_SOURCE_UNWATCHED);
+		istd::IChangeable::ChangeSet changeSet(isWatched ? imtbase::IObjectCollectionCacheController::CF_SOURCE_WATCHED : imtbase::IObjectCollectionCacheController::CF_SOURCE_UNWATCHED);
 		istd::CChangeNotifier notifier(m_objectCollectionCompPtr.GetPtr(), &changeSet);
 	}
 }
