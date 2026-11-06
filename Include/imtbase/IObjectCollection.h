@@ -32,11 +32,13 @@ public:
 	typedef istd::IChangeableSharedPtr DataPtr;
 
 	static const QByteArray CN_OBJECT_DATA_CHANGED;
+	static const QByteArray CN_METADATA_CHANGED_IDS;
 	typedef NotifierInfo ObjectDataChanged;
 
 	enum ChangeFlags
 	{
-		CF_OBJECT_DATA_CHANGED = CF_LAST
+		CF_OBJECT_DATA_CHANGED = CF_LAST,
+		CF_METADATA_CHANGED
 	};
 
 	/**

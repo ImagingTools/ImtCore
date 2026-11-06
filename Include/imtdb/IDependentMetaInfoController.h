@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
+#include <optional>
 
 // ACF includes
 #include <istd/IPolymorphic.h>
@@ -104,6 +105,11 @@ public:
 	 */
 	struct DependentMetaInfo
 	{
+		struct SourceRevisionGuard
+		{
+			QString tableName;
+			quint64 expectedRevision = 0;
+		};
 		/**
 		 * @brief ID of the object whose metadata should be updated
 		 * 
@@ -133,6 +139,7 @@ public:
 		 * For example, ["Updated Name", "newemail@example.com"].
 		 */
 		QStringList metaInfoValues;
+		std::optional<SourceRevisionGuard> sourceRevisionGuard;
 	};
 
 	/**

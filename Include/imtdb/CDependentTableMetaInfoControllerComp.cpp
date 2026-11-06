@@ -71,20 +71,36 @@ void CDependentTableMetaInfoControllerComp::OnUpdate(const istd::IChangeable::Ch
 
 	dependentMetaInfo.objectId = elementId;
 	dependentMetaInfo.dependentKey = *m_metaInfoIdAttrPtr;
+	if (m_objectCollectionCompPtr.IsValid()) {
+		const auto metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(elementId);
+		if (metaInfo.IsValid()) {
+			const auto value = metaInfo->GetMetaInfo(imtbase::ICollectionInfo::MIT_REVISION);
+			bool validRevision = false;
+			const qlonglong revision = value.toLongLong(&validRevision);
+			if (validRevision && revision >= 0) {
+				dependentMetaInfo.sourceRevisionGuard = IDependentMetaInfoController::DependentMetaInfo::SourceRevisionGuard{
+					*m_dependentTableNameAttrPtr, static_cast<quint64>(revision)};
+			}
+		}
+	}
 
 	bool isDocumentSource = m_isDocumentSourceAttrPtr.IsValid() ? *m_isDocumentSourceAttrPtr : true;
+	bool metaInfoValuesAreJson =
+		m_metaInfoValuesAreJsonAttrPtr.IsValid() ? *m_metaInfoValuesAreJsonAttrPtr : false;
 
 	for (int i = 0; i < m_metaInfoNameAttrPtr.GetCount(); i++){
 		QString metaInfoName = m_metaInfoNameAttrPtr[i];
 		QString dependentMetaInfoName = m_dependentMetaInfoNameAttrPtr[i];
 
 		dependentMetaInfo.metaInfoIds << metaInfoName;
-		QString selectValue =
-			QStringLiteral(R"((SELECT "%0"->>'%1' FROM "%2" WHERE "State" = 'Active' AND "DocumentId" = '%3' LIMIT 1)
-					)").arg(isDocumentSource ? "Document" : "DataMetaInfo",
-							dependentMetaInfoName,
-							*m_dependentTableNameAttrPtr,
-							elementId);
+		const QString valueOperator = metaInfoValuesAreJson ? QStringLiteral("->") : QStringLiteral("->>");
+		QString selectValue = QStringLiteral(
+			"(SELECT \"%1\"%2'%3' FROM \"%4\" WHERE \"State\" = 'Active' AND \"DocumentId\" = '%5' LIMIT 1)")
+						.arg(isDocumentSource ? QStringLiteral("Document") : QStringLiteral("DataMetaInfo"),
+							 valueOperator,
+							 dependentMetaInfoName,
+							 *m_dependentTableNameAttrPtr,
+							 elementId);
 
 		dependentMetaInfo.metaInfoValues << selectValue;
 	}

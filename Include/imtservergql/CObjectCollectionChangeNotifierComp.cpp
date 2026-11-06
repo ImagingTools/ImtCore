@@ -77,6 +77,23 @@ void CObjectCollectionChangeNotifierComp::OnUpdate(const istd::IChangeable::Chan
 	}
 
 	QByteArray itemId;
+	if (changeSet.Contains(imtbase::IObjectCollection::CF_METADATA_CHANGED)) {
+		const auto ids = changeSet.GetChangeInfo(imtbase::IObjectCollection::CN_METADATA_CHANGED_IDS)
+			.value<imtbase::ICollectionInfo::Ids>();
+		for (const auto& id : ids) {
+			QJsonObject update;
+			update.insert("typeOperation", "updated");
+			update.insert("itemId", QString::fromUtf8(id));
+			const auto payload = QJsonDocument(update).toJson(QJsonDocument::Compact);
+			if (!collectionChangedCommandId.isEmpty()) { PublishData(collectionChangedCommandId, payload); }
+			for (int index = 0; index < m_commandIdsAttrPtr.GetCount(); ++index) {
+				if (m_commandIdsAttrPtr[index] != collectionChangedCommandId) {
+					PublishData(m_commandIdsAttrPtr[index], payload);
+				}
+			}
+		}
+		return;
+	}
 	QJsonObject dataObject;
 	bool isRemoved = false;
 	bool recognized = false;

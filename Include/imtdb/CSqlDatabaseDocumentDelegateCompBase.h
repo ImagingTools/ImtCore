@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
+#include <imtdb/IDependentMetaInfoNotifier.h>
 
 
 // ACF includes
@@ -62,6 +63,7 @@ public:
 		I_ASSIGN(m_metaInfoCreatorCompPtr, "MetaInfoCreator", "Creator of metainformation of object data", false, "MetaInfoCreator");
 		I_ASSIGN(m_jsonBasedMetaInfoDelegateCompPtr, "JsonBasedMetaInfoDelegate", "Delegate for converting document metainfo to JSON representation", false, "JsonBasedMetaInfoDelegate");
 		I_ASSIGN(m_sqlJsonXPathExtractorCompPtr, "SqlJsonXPathExtractor", "SQL json X-Path extractor", false, "SqlJsonXPathExtractor");
+		I_ASSIGN(m_dependentMetaInfoNotifierCompPtr, "DependentMetaInfoNotifier", "Collection notified after dependent metadata changes", false, "");
 	I_END_COMPONENT
 
 	// reimplemented (icomp::CComponentBase)
@@ -201,6 +203,7 @@ protected:
 	
 protected:
 	virtual bool CreateObjectFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& filterQuery) const override;
+	bool SetCollectionItemMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const override;
 	virtual bool CreateTextFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& textFilterQuery) const override;
 	virtual void SubstituteFieldIds(QString& query, bool castToStr = true) const;
 	virtual QByteArray GetObjectSelectionQuery(const QByteArray& objectId, const iprm::IParamsSet* paramsPtr = nullptr) const;
@@ -220,6 +223,7 @@ protected:
 	I_REF(imtbase::IMetaInfoCreator, m_metaInfoCreatorCompPtr);
 	I_REF(imtdb::IJsonBasedMetaInfoDelegate, m_jsonBasedMetaInfoDelegateCompPtr);
 	I_REF(imtdb::ISqlJsonXPathExtractor, m_sqlJsonXPathExtractorCompPtr);
+	I_REF(imtdb::IDependentMetaInfoNotifier, m_dependentMetaInfoNotifierCompPtr);
 	mutable bool m_tenantBindingTableInitialized = false;
 	mutable bool m_documentShareTableInitialized = false;
 };

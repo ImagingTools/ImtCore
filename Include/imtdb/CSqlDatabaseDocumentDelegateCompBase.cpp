@@ -5,6 +5,8 @@
 // Qt includes
 #include <QtCore/QDateTime>
 #include <QtCore/QFile>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
 #include <QtCore/QRegularExpression>
 #include <QtCore/QRegularExpressionMatch>
 #include <QtCore/QUuid>
@@ -887,6 +889,23 @@ bool CSqlDatabaseDocumentDelegateCompBase::DeleteRevision(
 
 // reimplemented (imtdb::IDependentMetaInfoController)
 
+bool CSqlDatabaseDocumentDelegateCompBase::SetCollectionItemMetaInfoFromRecord(
+	const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const
+{
+	if (!BaseClass::SetCollectionItemMetaInfoFromRecord(record, metaInfo)) {
+		return false;
+	}
+	if (record.contains(QString::fromUtf8(s_revisionInfoColumn))) {
+		const auto revisionInfo = QJsonDocument::fromJson(record.value(QString::fromUtf8(s_revisionInfoColumn)).toByteArray()).object();
+		const auto revision = revisionInfo.value(QString::fromUtf8(s_revisionNumberKey));
+		if (revision.isDouble() && revision.toDouble() >= 0) {
+			metaInfo.SetMetaInfo(imtbase::ICollectionInfo::MIT_REVISION, revision.toVariant().toLongLong());
+		}
+	}
+	return true;
+}
+
+
 bool CSqlDatabaseDocumentDelegateCompBase::UpdateDependentMetaInfo(const DependentMetaInfo& metaInfo) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
@@ -910,13 +929,35 @@ bool CSqlDatabaseDocumentDelegateCompBase::UpdateDependentMetaInfo(const Depende
 	QString jsonbUpdate = QStringLiteral(R"("%1")").arg(s_dataMetaInfoColumn);
 
 	for (int i = 0; i < metaInfo.metaInfoIds.size(); i++){
-		jsonbUpdate = QStringLiteral("jsonb_set(%1, '{%2}', to_jsonb(%3))").arg(jsonbUpdate, metaInfo.metaInfoIds[i], metaInfo.metaInfoValues[i]);
+		const QString fieldId = SqlEncode(metaInfo.metaInfoIds[i]);
+		jsonbUpdate = QStringLiteral(
+			"CASE WHEN (%3) IS NULL THEN (%1 - '%2') ELSE jsonb_set(%1, ARRAY['%2'], to_jsonb(%3)) END")
+			.arg(jsonbUpdate, fieldId, metaInfo.metaInfoValues[i]);
 	}
 
-	query += jsonbUpdate + QStringLiteral(" WHERE %1 = '%2';").arg(CreateJsonExtractSql(s_dataMetaInfoColumn, metaInfo.dependentKey), metaInfo.objectId);
+	query += jsonbUpdate + QStringLiteral(" WHERE %1 = '%2' AND \"State\" = 'Active'")
+		.arg(CreateJsonExtractSql(s_dataMetaInfoColumn, metaInfo.dependentKey), SqlEncode(metaInfo.objectId));
+	if (metaInfo.sourceRevisionGuard) {
+		const auto& guard = *metaInfo.sourceRevisionGuard;
+		if (guard.tableName.isEmpty()) {
+			return false;
+		}
+		QString sourceTable = guard.tableName;
+		sourceTable.replace(QLatin1Char('"'), QStringLiteral("\"\""));
+		query += QStringLiteral(
+			" AND (SELECT MAX(%1) FROM %2\"%3\""
+			" WHERE \"DocumentId\" = '%4' AND \"State\" = 'Active') = %5")
+			.arg(CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int),
+				schemaPrefix, sourceTable, SqlEncode(metaInfo.objectId), QString::number(guard.expectedRevision));
+	}
+	const bool notify = m_dependentMetaInfoNotifierCompPtr.IsValid();
+	if (notify) {
+		query += QStringLiteral(" RETURNING \"%1\"").arg(QString::fromUtf8(*m_objectIdColumnAttrPtr));
+	}
+	query += QLatin1Char(';');
 
 	QSqlError sqlError;
-	m_databaseEngineCompPtr->ExecSqlQuery(query.toUtf8(), &sqlError);
+	QSqlQuery result = m_databaseEngineCompPtr->ExecSqlQuery(query.toUtf8(), &sqlError);
 	if (sqlError.type() != QSqlError::NoError){
 		SendErrorMessage(0, sqlError.text(), "CSqlDatabaseDocumentDelegateCompBase");
 		qDebug() << "SQL-error" << sqlError.text();
@@ -924,6 +965,15 @@ bool CSqlDatabaseDocumentDelegateCompBase::UpdateDependentMetaInfo(const Depende
 		return false;
 	}
 
+	if (notify) {
+		imtbase::ICollectionInfo::Ids ids;
+		while (result.next()) {
+			const QByteArray id = result.value(0).toByteArray();
+			if (!ids.contains(id)) { ids.append(id); }
+		}
+		if (result.lastError().isValid()) { return false; }
+		m_dependentMetaInfoNotifierCompPtr->NotifyMetadataChanged(ids);
+	}
 	return true;
 }
 
@@ -943,12 +993,12 @@ bool CSqlDatabaseDocumentDelegateCompBase::ClearDependentMetaInfo(const MetaFiel
 	QString jsonbExpr = QStringLiteral(R"("%1")").arg(s_dataMetaInfoColumn);
 
 	for (const QString& metaInfoId : metaInfo.metaInfoIds){
-		jsonbExpr = QStringLiteral("jsonb_set(%1, '{%2}', to_jsonb(''::text))")
-			.arg(jsonbExpr, metaInfoId);
+		jsonbExpr = QStringLiteral("(%1 - '%2')")
+			.arg(jsonbExpr, SqlEncode(metaInfoId));
 	}
 
-	jsonbExpr = QStringLiteral("jsonb_set(%1, '{%2}', to_jsonb(''::text))")
-		.arg(jsonbExpr, metaInfo.dependentKey);
+	jsonbExpr = QStringLiteral("(%1 - '%2')")
+		.arg(jsonbExpr, SqlEncode(metaInfo.dependentKey));
 
 	QStringList quotedIds;
 	for (const QByteArray& id : metaInfo.objectIds) {
@@ -956,7 +1006,7 @@ bool CSqlDatabaseDocumentDelegateCompBase::ClearDependentMetaInfo(const MetaFiel
 		quotedIds << QStringLiteral("'%1'").arg(escapedId);
 	}
 
-	QString whereClause = QStringLiteral("%1 IN (%2)")
+	QString whereClause = QStringLiteral("%1 IN (%2) AND \"State\" = 'Active'")
 		.arg(CreateJsonExtractSql(s_dataMetaInfoColumn, metaInfo.dependentKey), quotedIds.join(", "));
 
 	QString schemaPrefix;
@@ -964,7 +1014,7 @@ bool CSqlDatabaseDocumentDelegateCompBase::ClearDependentMetaInfo(const MetaFiel
 		schemaPrefix = QStringLiteral("%1.").arg(*m_tableSchemaAttrPtr);
 	}
 
-	QString fullQuery = QStringLiteral(R"(UPDATE %1 "%2" SET "%3" = %4 WHERE %5;)")
+	QString fullQuery = QStringLiteral(R"(UPDATE %1 "%2" SET "%3" = %4 WHERE %5)")
 		.arg(
 				/*1*/ schemaPrefix,
 				/*2*/ tableName,
@@ -972,8 +1022,13 @@ bool CSqlDatabaseDocumentDelegateCompBase::ClearDependentMetaInfo(const MetaFiel
 				/*4*/ jsonbExpr,
 				/*5*/ whereClause);
 
+	const bool notify = m_dependentMetaInfoNotifierCompPtr.IsValid();
+	if (notify) {
+		fullQuery += QStringLiteral(" RETURNING \"%1\"").arg(QString::fromUtf8(*m_objectIdColumnAttrPtr));
+	}
+	fullQuery += QLatin1Char(';');
 	QSqlError sqlError;
-	m_databaseEngineCompPtr->ExecSqlQuery(fullQuery.toUtf8(), &sqlError);
+	QSqlQuery result = m_databaseEngineCompPtr->ExecSqlQuery(fullQuery.toUtf8(), &sqlError);
 
 	if (sqlError.type() != QSqlError::NoError){
 		SendErrorMessage(0, sqlError.text(), "CSqlDatabaseDocumentDelegateCompBase");
@@ -981,6 +1036,15 @@ bool CSqlDatabaseDocumentDelegateCompBase::ClearDependentMetaInfo(const MetaFiel
 		return false;
 	}
 
+	if (notify) {
+		imtbase::ICollectionInfo::Ids ids;
+		while (result.next()) {
+			const QByteArray id = result.value(0).toByteArray();
+			if (!ids.contains(id)) { ids.append(id); }
+		}
+		if (result.lastError().isValid()) { return false; }
+		m_dependentMetaInfoNotifierCompPtr->NotifyMetadataChanged(ids);
+	}
 	return true;
 }
 
