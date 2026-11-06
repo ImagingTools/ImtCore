@@ -6,6 +6,9 @@
 #include <imtauth/CRole.h>
 #include <imtauth/IUserBaseInfo.h>
 
+// Qt includes
+#include <QtCore/QMutex>
+
 
 namespace imtauth
 {
@@ -16,6 +19,21 @@ class CUserBaseInfo: virtual public IUserBaseInfo
 
 public:
 	CUserBaseInfo();
+
+	/**
+		Directory grants are stored separately from manually assigned roles.
+		The reserved product key uses the existing Products archive representation,
+		so old user archives need no migration.
+	*/
+	RoleIds GetDirectoryRoles(const QByteArray& productId) const;
+	void SetDirectoryRoles(const QByteArray& productId, const RoleIds& roles);
+	/**
+		Check if the product is assigned manually, ignoring directory-owned grants.
+	*/
+	bool HasManualProduct(const QByteArray& productId) const;
+	bool ResolveDirectoryRoles(const QByteArray& productId, RoleIds& roles, FeatureIds& permissions) const;
+	static bool IsReservedProductId(const QByteArray& productId);
+	static QMutex& GetUserUpdateMutex(const QByteArray& userId);
 
 	// reimplemented (iser::IUserBaseInfo)
 	virtual const imtlic::IFeatureInfoProvider* GetPermissionProvider() const override;
@@ -66,6 +84,3 @@ protected:
 
 
 } // namespace imtauth
-
-
-

@@ -4,6 +4,7 @@
 
 // Qt includes
 #include <QSet>
+#include <QtCore/QMutexLocker>
 
 // ACF includes
 #include <iprm/CTextParam.h>
@@ -28,6 +29,29 @@
 
 namespace imtauthgql
 {
+
+
+sdl::V1_0::imtbase::CSetObjectDataPayload CUserCollectionControllerComp::OnSetObjectData(
+			const sdl::V1_0::imtbase::CSetObjectDataGqlRequest& setObjectDataRequest,
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	const imtgql::CGqlParamObject* input = gqlRequest.GetParamObject("input");
+	QByteArray objectId = input != nullptr ? input->GetParamArgumentValue("objectId").toByteArray() : QByteArray();
+	QMutexLocker locker(&imtauth::CUserBaseInfo::GetUserUpdateMutex(objectId));
+	return BaseClass::OnSetObjectData(setObjectDataRequest, gqlRequest, errorMessage);
+}
+
+
+QJsonObject CUserCollectionControllerComp::UpdateObject(
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	const imtgql::CGqlParamObject* input = gqlRequest.GetParamObject("input");
+	QByteArray objectId = input != nullptr ? input->GetParamArgumentValue("id").toByteArray() : QByteArray();
+	QMutexLocker locker(&imtauth::CUserBaseInfo::GetUserUpdateMutex(objectId));
+	return BaseClass::UpdateObject(gqlRequest, errorMessage);
+}
 
 
 // protected methods
@@ -164,7 +188,9 @@ bool CUserCollectionControllerComp::FillObjectFromRepresentation(
 		userInfoPtr->SetRoles(productId, roleIds);
 	}
 	else{
+		const QByteArrayList directoryRoles = userInfoPtr->GetDirectoryRoles(productId);
 		userInfoPtr->RemoveProduct(productId);
+		userInfoPtr->SetDirectoryRoles(productId, directoryRoles);
 	}
 
 	const QByteArrayList groupIds = CAssignmentCollector::GetDirectIds(representation.groups);

@@ -11,6 +11,7 @@ SingleDocumentWorkspacePageView {
     pageName: qsTr("Administration");
 
     property string productId;
+    property bool ldapGroupMappingAvailable: false;
     property string webSocketUrl;
 
     signal commandsModelChanged(var commandsModel);
@@ -41,7 +42,9 @@ SingleDocumentWorkspacePageView {
         id: administrationViewComp;
 
         AdministrationView {
+            id: administrationView
             productId: container.productId;
+            ldapGroupMappingAvailable: container.ldapGroupMappingAvailable;
         }
     }
 
@@ -92,5 +95,4 @@ SingleDocumentWorkspacePageView {
         AuthorizationController.logoutForce();
     }
 }
-
 

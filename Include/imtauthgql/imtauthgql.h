@@ -32,6 +32,7 @@
 #include <QtCore/QSet>
 #include <QtCore/QByteArrayList>
 #include <imtauth/IUserInfo.h>
+#include <imtauth/CUserBaseInfo.h>
 #include <imtauth/IUserGroupInfoProvider.h>
 #include <imtauth/imtauth.h>
 
@@ -634,6 +635,7 @@ namespace imtauthgql
 {
 
 
+/** Serializes edits to a user with updates to that user's directory-owned roles. */
 /**
 	Collect flat permission entries from a feature subtree.
 	A permission is identified by the full path of its feature, e.g. "/Administration/EditUser/AddUser".
@@ -1078,6 +1080,18 @@ inline imtauth::IUserBaseInfo::RoleIds GetTenantUserRoles(
 				imtauth::ITenantEntityBindingManager* bindingManager)
 {
 	imtauth::IUserBaseInfo::RoleIds retVal = userInfo.GetRoles(productId);
+	const imtauth::CUserBaseInfo* directoryUser = dynamic_cast<const imtauth::CUserBaseInfo*>(&userInfo);
+	if (directoryUser != nullptr){
+		imtauth::IUserBaseInfo::RoleIds directoryRoles;
+		imtauth::IUserBaseInfo::FeatureIds directoryPermissions;
+		if (directoryUser->ResolveDirectoryRoles(productId, directoryRoles, directoryPermissions)){
+			for (const QByteArray& roleId : directoryRoles){
+				if (!retVal.contains(roleId) && ShouldKeepEntityForTenant(bindingManager, tenantId, "Roles", roleId)){
+					retVal.append(roleId);
+				}
+			}
+		}
+	}
 
 	const imtauth::IUserGroupInfoProvider* groupProviderPtr = userInfo.GetUserGroupProvider();
 	if (groupProviderPtr == nullptr){
@@ -1161,6 +1175,19 @@ inline istd::IChangeableUniquePtr AdaptUserForTenant(
 		}
 	}
 
+	QByteArrayList filteredDirectoryRoles;
+	const imtauth::CUserBaseInfo* directoryUser = dynamic_cast<const imtauth::CUserBaseInfo*>(userInfoPtr);
+	if (directoryUser != nullptr && !productId.isEmpty()){
+		for (const QByteArray& roleId : directoryUser->GetDirectoryRoles(productId)){
+			if (ShouldKeepEntityForTenant(bindingManager, tenantId, rolesEntity, roleId)){
+				filteredDirectoryRoles.append(roleId);
+			}
+			else{
+				anyFilterChange = true;
+			}
+		}
+	}
+
 	QByteArrayList filteredGroups;
 	QByteArrayList userGroups = userInfoPtr->GetGroups();
 	for (int i = 0; i < userGroups.size(); ++i){
@@ -1234,6 +1261,10 @@ inline istd::IChangeableUniquePtr AdaptUserForTenant(
 	if (anyFilterChange){
 		if (!productId.isEmpty()){
 			adaptedUserInfoPtr->SetRoles(productId, filteredRoles);
+			imtauth::CUserBaseInfo* adaptedDirectoryUser = dynamic_cast<imtauth::CUserBaseInfo*>(adaptedUserInfoPtr);
+			if (adaptedDirectoryUser != nullptr){
+				adaptedDirectoryUser->SetDirectoryRoles(productId, filteredDirectoryRoles);
+			}
 		}
 		// reset groups to filtered list
 		QByteArrayList currGroups = adaptedUserInfoPtr->GetGroups();
@@ -1268,7 +1299,7 @@ inline istd::IChangeableUniquePtr AdaptUserForTenant(
 	roles, its groups, their parent groups and the roles of those groups.
 	Parent roles, parent groups and group roles count only when they are
 	visible in the tenant, so an entity of another organization grants nothing.
-	Without a tenant this is IUserBaseInfo::GetPermissions().
+	Without a tenant, directory roles are traversed with the global binding filter.
 */
 inline imtauth::IUserBaseInfo::FeatureIds GetTenantUserPermissions(
 				const imtauth::IUserInfo& userInfo,
@@ -1278,7 +1309,9 @@ inline imtauth::IUserBaseInfo::FeatureIds GetTenantUserPermissions(
 				imtauth::IRoleInfoProvider* roleInfoProvider)
 {
 	const imtauth::IRoleInfoProvider* roleProviderPtr = (roleInfoProvider != nullptr) ? roleInfoProvider : userInfo.GetRoleProvider();
-	if (tenantId.isEmpty() || bindingManager == nullptr || roleProviderPtr == nullptr){
+	const imtauth::CUserBaseInfo* directoryUser = dynamic_cast<const imtauth::CUserBaseInfo*>(&userInfo);
+	const bool hasDirectoryRoles = directoryUser != nullptr && !directoryUser->GetDirectoryRoles(productId).isEmpty();
+	if (bindingManager == nullptr || roleProviderPtr == nullptr || (tenantId.isEmpty() && !hasDirectoryRoles)){
 		return userInfo.GetPermissions(productId);
 	}
 

@@ -15,6 +15,7 @@ Item {
 	signal multiPageUpdated();
 
 	property string productId: AuthorizationController.productId
+	property bool ldapGroupMappingAvailable: false
 	// Part of the product this view works in; scopes its permission checks.
 	property string permissionPath: ""
 	property GqlBasedUserAdministrationApiClient apiClient: GqlBasedUserAdministrationApiClient {
@@ -60,6 +61,7 @@ Item {
 		updatePageName("Roles", qsTr("Roles"));
 		updatePageName("Users", qsTr("Users"));
 		updatePageName("Groups", qsTr("Groups"));
+		updatePageName("DirectoryGroups", qsTr("Directory groups"));
 
 		onCustomPagesLocalizationChanged();
 	}
@@ -148,6 +150,14 @@ Item {
 		}
 	}
 
+	Component {
+		id: directoryGroupsComp
+		LdapGroupMappingView {
+			id: directoryGroups
+			productId: administrationContainer.productId
+		}
+	}
+
 	MultiPageView {
 		id: multiPageView;
 
@@ -159,7 +169,7 @@ Item {
 		NavigableItem {
 			id: adminNavigation
 			parentSegment: "Administration"
-			paths: ["Roles", "Users", "Groups"]
+			paths: ["Roles", "Users", "Groups", "DirectoryGroups"]
 			// The sub-page a path asked for, applied again when the page model is (re)built. Kept here and not on
 			// the page view: a path delivered while the page is being created arrives before the view sets its defaults.
 			property string requestedPageId: ""
@@ -247,6 +257,8 @@ Item {
 			addSubPage("Roles", qsTr("Roles"), roleCollectionComp, "Icons/Role")
 			addSubPage("Users", qsTr("Users"), userCollectionComp, "Icons/Account")
 			addSubPage("Groups", qsTr("Groups"), userGroupCollectionComp, "Icons/MultipleUser")
+			if (administrationContainer.ldapGroupMappingAvailable && AuthorizationController.loggedUserIsSuperuser())
+				multiPageView.addPage("DirectoryGroups", qsTr("Directory groups"), directoryGroupsComp, "Icons/MultipleUser")
 
 			// The initial sub-page is part of opening the page, not a navigation of its own.
 			let requestedIndex = adminNavigation.requestedPageId !== "" ? multiPageView.getIndexById(adminNavigation.requestedPageId) : -1;

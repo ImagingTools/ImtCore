@@ -4,6 +4,7 @@
 
 // Qt includes
 #include <QtCore/QByteArrayList>
+#include <QtCore/QSet>
 
 // ACF includes
 #include <istd/CChangeNotifier.h>
@@ -18,6 +19,83 @@
 
 namespace imtauth
 {
+
+namespace
+{
+const QByteArray DirectoryProductPrefix("urn:imt:directory-roles:");
+}
+
+
+QMutex& CUserBaseInfo::GetUserUpdateMutex(const QByteArray& userId)
+{
+	static QMutex mutexes[64];
+	return mutexes[qHash(userId) % 64];
+}
+
+
+IUserBaseInfo::RoleIds CUserBaseInfo::GetDirectoryRoles(const QByteArray& productId) const
+{
+	if (IsReservedProductId(productId)){ return RoleIds(); }
+	return m_rolesMap.value(DirectoryProductPrefix + productId);
+}
+
+
+void CUserBaseInfo::SetDirectoryRoles(const QByteArray& productId, const RoleIds& roles)
+{
+	if (productId.isEmpty() || IsReservedProductId(productId)){ return; }
+	istd::CChangeNotifier notifier(this);
+	if (roles.isEmpty()){
+		m_rolesMap.remove(DirectoryProductPrefix + productId);
+	}
+	else{
+		m_rolesMap.insert(DirectoryProductPrefix + productId, roles);
+	}
+}
+
+
+bool CUserBaseInfo::HasManualProduct(const QByteArray& productId) const
+{
+	if (IsReservedProductId(productId)){
+		return false;
+	}
+
+	return m_rolesMap.contains(productId);
+}
+
+
+bool CUserBaseInfo::IsReservedProductId(const QByteArray& productId)
+{
+	return productId.startsWith(DirectoryProductPrefix);
+}
+
+bool CUserBaseInfo::ResolveDirectoryRoles(const QByteArray& productId, RoleIds& roles, FeatureIds& permissions) const
+{
+	roles.clear();
+	permissions.clear();
+	RoleIds roots = GetDirectoryRoles(productId);
+	QByteArrayList pending = roots;
+	QSet<QByteArray> visited;
+	FeatureIds resolved;
+	while (!pending.isEmpty()){
+		QByteArray roleId = pending.takeFirst();
+		if (visited.contains(roleId)){ continue; }
+		visited.insert(roleId);
+		if (m_roleProviderPtr == nullptr || visited.size() > 10000){
+			return false;
+		}
+		imtauth::IRoleUniquePtr role = m_roleProviderPtr->GetRole(roleId);
+		if (!role.IsValid() || role->GetProductId() != productId){
+			return false;
+		}
+		for (const QByteArray& permission : role->GetLocalPermissions()){
+			if (!resolved.contains(permission)){ resolved.append(permission); }
+		}
+		pending += role->GetIncludedRoles();
+	}
+	roles = roots;
+	permissions = resolved;
+	return true;
+}
 
 
 // public methods
@@ -94,12 +172,17 @@ void CUserBaseInfo::SetDescription(const QString& description)
 IUserBaseInfo::FeatureIds CUserBaseInfo::GetPermissions(const QByteArray& productId) const
 {
 	IUserBaseInfo::FeatureIds allPermissions;
+	if (IsReservedProductId(productId)){
+		return allPermissions;
+	}
 
 	if (m_roleProviderPtr != nullptr){
 		RoleIds roleIds;
 		if (productId.isEmpty()){
 			for (auto it = m_rolesMap.cbegin(); it != m_rolesMap.cend(); ++it){
-				roleIds += it.value();
+				if (!IsReservedProductId(it.key())){
+					roleIds += it.value();
+				}
 			}
 		}
 		else{
@@ -116,6 +199,25 @@ IUserBaseInfo::FeatureIds CUserBaseInfo::GetPermissions(const QByteArray& produc
 				for (const QByteArray& perm : std::as_const(rolePerms)){
 					if (!allPermissions.contains(perm)){
 						allPermissions << perm;
+					}
+				}
+			}
+		}
+
+		for (auto it = m_rolesMap.cbegin(); it != m_rolesMap.cend(); ++it){
+			if (!IsReservedProductId(it.key())){
+				continue;
+			}
+			QByteArray directoryProduct = it.key().mid(DirectoryProductPrefix.size());
+			if (!productId.isEmpty() && productId != directoryProduct){
+				continue;
+			}
+			RoleIds directoryRoles;
+			FeatureIds directoryPermissions;
+			if (ResolveDirectoryRoles(directoryProduct, directoryRoles, directoryPermissions)){
+				for (const QByteArray& permission : directoryPermissions){
+					if (!allPermissions.contains(permission)){
+						allPermissions.append(permission);
 					}
 				}
 			}
@@ -160,6 +262,7 @@ IUserBaseInfo::FeatureIds CUserBaseInfo::GetLocalPermissions(const QByteArray& p
 
 void CUserBaseInfo::SetLocalPermissions(const QByteArray& productId, const FeatureIds& permissions)
 {
+	if (IsReservedProductId(productId)){ return; }
 	bool ok = true;
 	if (m_permissionsMap.contains(productId)){
 		FeatureIds currentFeatureIds = m_permissionsMap.value(productId);
@@ -194,35 +297,38 @@ void CUserBaseInfo::SetProhibitions(const FeatureIds &prohibitions)
 
 QByteArrayList CUserBaseInfo::GetProducts() const
 {
-	return m_rolesMap.keys();
+	QByteArrayList products;
+	for (auto it = m_rolesMap.cbegin(); it != m_rolesMap.cend(); ++it){
+		QByteArray product = it.key();
+		if (IsReservedProductId(product)){
+			product = product.mid(DirectoryProductPrefix.size());
+		}
+		if (!products.contains(product)){
+			products.append(product);
+		}
+	}
+	return products;
 }
 
 
 bool CUserBaseInfo::RemoveProduct(const QByteArray& productId)
 {
-	bool ok = false;
-	if (m_permissionsMap.contains(productId)){
-		m_permissionsMap.remove(productId);
-
-		ok = true;
+	if (IsReservedProductId(productId)){ return false; }
+	if (!m_permissionsMap.contains(productId) && !m_rolesMap.contains(productId) &&
+		!m_rolesMap.contains(DirectoryProductPrefix + productId)){
+		return false;
 	}
-
-	if (m_rolesMap.contains(productId)){
-		m_rolesMap.remove(productId);
-
-		ok = true;
-	}
-
-	if (ok){
-		istd::CChangeNotifier changeNotifier(this);
-	}
-
-	return false;
+	istd::CChangeNotifier changeNotifier(this);
+	m_permissionsMap.remove(productId);
+	m_rolesMap.remove(productId);
+	m_rolesMap.remove(DirectoryProductPrefix + productId);
+	return true;
 }
 
 
 IUserBaseInfo::RoleIds CUserBaseInfo::GetRoles(const QByteArray& productId) const
 {
+	if (IsReservedProductId(productId)){ return RoleIds(); }
 	if (m_rolesMap.contains(productId)){
 		return m_rolesMap.value(productId);
 	}
@@ -233,6 +339,7 @@ IUserBaseInfo::RoleIds CUserBaseInfo::GetRoles(const QByteArray& productId) cons
 
 void CUserBaseInfo::SetRoles(const QByteArray& productId, const RoleIds &roles)
 {
+	if (IsReservedProductId(productId)){ return; }
 	bool ok = true;
 	if (m_rolesMap.contains(productId)){
 		RoleIds currentRoleIds = m_rolesMap.value(productId);
@@ -251,6 +358,7 @@ void CUserBaseInfo::SetRoles(const QByteArray& productId, const RoleIds &roles)
 
 void CUserBaseInfo::AddRole(const QByteArray& productId, const QByteArray& roleId)
 {
+	if (IsReservedProductId(productId)){ return; }
 	bool isChanged = false;
 	if (!m_rolesMap.contains(productId)){
 		m_rolesMap.insert(productId, RoleIds());
@@ -275,6 +383,7 @@ void CUserBaseInfo::AddRole(const QByteArray& productId, const QByteArray& roleI
 
 bool CUserBaseInfo::RemoveRole(const QByteArray& productId, const QByteArray& roleId)
 {
+	if (IsReservedProductId(productId)){ return false; }
 	if (m_rolesMap.contains(productId)){
 		RoleIds roleIds = m_rolesMap.value(productId);
 		if (roleIds.contains(roleId)){
@@ -498,5 +607,3 @@ bool CUserBaseInfo::ResetData(CompatibilityMode /*mode*/)
 
 
 } // namespace imtauth
-
-
