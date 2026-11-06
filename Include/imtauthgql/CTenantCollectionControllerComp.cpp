@@ -217,6 +217,14 @@ bool CTenantCollectionControllerComp::OnBeforeRemoveElements(const QByteArrayLis
 		return false;
 	}
 
+	for (const QByteArray& tenantId : elementIds){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		const imtauth::ITenantInfo* tenantPtr = m_objectCollectionCompPtr->GetObjectData(tenantId, dataPtr) ? dynamic_cast<const imtauth::ITenantInfo*>(dataPtr.GetPtr()) : nullptr;
+		if (!CheckTenantRemovalAccess(gqlRequest.GetRequestContext(), tenantPtr, errorMessage)){
+			return false;
+		}
+	}
+
 	if (m_objectCollectionCompPtr.IsValid() && !CheckTenantRemoval(*m_objectCollectionCompPtr, elementIds, errorMessage)){
 		return false;
 	}

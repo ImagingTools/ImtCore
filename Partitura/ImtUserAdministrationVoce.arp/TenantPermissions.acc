@@ -125,28 +125,28 @@
                     <AttributeInfo Id="RemoveElementSetPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/OrganizationManagement/Remove</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="RemoveElementsPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/OrganizationManagement/Remove</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="RestoreObjectSetPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/OrganizationManagement/Remove</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="RestoreObjectsPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/OrganizationManagement/Remove</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -738,7 +738,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/OrganizationManagement/Remove</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
