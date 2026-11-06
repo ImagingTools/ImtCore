@@ -6,7 +6,7 @@
 // and root of the enclosing components (delegates have a parent scope), and finally the globals
 // (Math, JSON, Date, console, Qt, Item, time).
 
-import { Animation, ANIMATION_TYPES, AnchorLine, BindingValue, BUILTIN_TYPES, COMPONENT_ENUM_VALUE, ComponentItem, createSdlObject, duringChange, FILE_DIALOG_MODES, flushDeclarativeFocus, getFocusItem, hooks, Item, ListModel, ListView, linkToOwner, Loader, modelCount, modelScopeData, modelVersion, Placeholder, queueDeclarativeFocus, readRows, readUntracked, Repeater, resetFocus, setSceneActive, Stack, Timer, TRANSFORM_ORIGIN, TreeItemModel } from './items.js';
+import { Animation, ANIMATION_TYPES, AnchorLine, BindingValue, BUILTIN_TYPES, COMPONENT_ENUM_VALUE, ComponentItem, Coordinate, createSdlObject, duringChange, FILE_DIALOG_MODES, flushDeclarativeFocus, getFocusItem, hooks, Item, ListModel, ListView, linkToOwner, Loader, MapItemView, modelCount, modelScopeData, modelVersion, Placeholder, queueDeclarativeFocus, readRows, readUntracked, Repeater, resetFocus, setSceneActive, Stack, Timer, TRANSFORM_ORIGIN, TreeItemModel } from './items.js';
 import { fonts } from './fonts.js';
 import { KEY, MODIFIERS, NAMED_KEY_HANDLERS, qtKeyEvent } from './keys.js';
 import { QmlError, escapeSourceBreaks, tokenize, topLevelNames } from './lexer.js';
@@ -546,6 +546,7 @@ export class Engine {
 			JSON,
 			Date,
 			Qt: qt,
+			QtPositioning: Object.freeze({ coordinate: (latitude, longitude, altitude) => new Coordinate(latitude, longitude, altitude) }),
 			context: this.context,
 			Item: TRANSFORM_ORIGIN,
 			Text: Object.freeze({ ...enumObject(TEXT_ENUMS), ...ALIGN, ...WRAP, ...ELIDE }),
@@ -1900,8 +1901,8 @@ export class Engine {
 			item = new TreeItemModel();
 		} else if (this.lenient && type === 'ListModel') {
 			item = new ListModel();
-		} else if (this.lenient && type === 'Repeater') {
-			item = new Repeater();
+		} else if (this.lenient && (type === 'Repeater' || type === 'MapItemView')) {
+			item = type === 'MapItemView' ? new MapItemView() : new Repeater();
 			this.repeaters.add(item);
 		} else if (this.lenient && ANIMATION_TYPES.has(type)) {
 			item = new Animation(this, type);

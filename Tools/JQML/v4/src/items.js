@@ -6875,6 +6875,1143 @@ defineProp(
 	},
 );
 
+// ----- Map (QtLocation / QtPositioning) -----
+
+// `Map` draws Web Mercator tiles (the `osm` plugin: tile.openstreetmap.org, or `osm.mapping.custom.host`) and keeps the
+// map items (MapQuickItem, MapCircle, MapRectangle, MapPolyline, MapPolygon, MapItemView delegates) that are its children
+// at their coordinates. The map arranges them like a layout does, so the mouse reaches the items inside a MapQuickItem.
+// Dragging pans, the wheel and a double click zoom around the pointer; `gesture.enabled` switches this off.
+
+const MAP_TILE = 256;
+const MAP_MAX_LATITUDE = 85.0511287798;
+const MAP_MAX_ZOOM = 30; // like Qt; the tiles end at MAP_MAX_TILE_ZOOM and are enlarged above it
+const MAP_MAX_TILE_ZOOM = 19;
+const MAP_ZOOM_PER_NOTCH = 0.5;
+const MAP_MAX_TILES = 256;
+const MAP_CIRCLE_STEPS = 72;
+const MAP_EARTH_RADIUS = 6371007.2; // QGeoCoordinate
+const MAP_DEFAULT_TILES = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+const MAP_DEFAULT_COPYRIGHT = '© OpenStreetMap contributors';
+const MAP_BACKGROUND = parseColor('#e5e3df');
+const MAP_ATTRIBUTION_BACKGROUND = { ...WHITE, a: 0.7 };
+const MAP_ATTRIBUTION_COLOR = parseColor('#333333');
+const MAP_TRANSPARENT = { ...BLACK, a: 0 };
+
+const geoRad = (degrees) => (degrees * Math.PI) / 180;
+const geoDeg = (radians) => (radians * 180) / Math.PI;
+const geoWrapLongitude = (lon) => ((((lon + 180) % 360) + 360) % 360) - 180;
+const geoX = (lon, size) => ((lon + 180) / 360) * size;
+const geoY = (lat, size) => {
+	const s = Math.sin(geoRad(clamp(lat, -MAP_MAX_LATITUDE, MAP_MAX_LATITUDE)));
+	return (0.5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI)) * size;
+};
+const geoLon = (x, size) => (x / size) * 360 - 180;
+const geoLat = (y, size) => geoDeg(Math.atan(Math.sinh(Math.PI * (1 - (2 * y) / size))));
+
+// `QtPositioning.coordinate(latitude, longitude, altitude)`.
+export class Coordinate {
+	constructor(latitude = NaN, longitude = NaN, altitude = NaN) {
+		this.latitude = Number(latitude);
+		this.longitude = Number(longitude);
+		this.altitude = Number(altitude);
+	}
+
+	get isValid() {
+		return this.latitude >= -90 && this.latitude <= 90 && this.longitude >= -180 && this.longitude <= 180;
+	}
+
+	distanceTo(other) {
+		const a = asCoordinate(other);
+		if (!this.isValid || !a.isValid) return 0;
+		const dLat = geoRad(a.latitude - this.latitude);
+		const dLon = geoRad(a.longitude - this.longitude);
+		const h = Math.sin(dLat / 2) ** 2 + Math.cos(geoRad(this.latitude)) * Math.cos(geoRad(a.latitude)) * Math.sin(dLon / 2) ** 2;
+		return 2 * MAP_EARTH_RADIUS * Math.asin(Math.min(1, Math.sqrt(h)));
+	}
+
+	azimuthTo(other) {
+		const a = asCoordinate(other);
+		if (!this.isValid || !a.isValid) return 0;
+		const p1 = geoRad(this.latitude);
+		const p2 = geoRad(a.latitude);
+		const dLon = geoRad(a.longitude - this.longitude);
+		const y = Math.sin(dLon) * Math.cos(p2);
+		const x = Math.cos(p1) * Math.sin(p2) - Math.sin(p1) * Math.cos(p2) * Math.cos(dLon);
+		return (geoDeg(Math.atan2(y, x)) + 360) % 360;
+	}
+
+	atDistanceAndAzimuth(distance, azimuth = 0, distanceUp = 0) {
+		if (!this.isValid) return new Coordinate();
+		const d = Number(distance) / MAP_EARTH_RADIUS;
+		const bearing = geoRad(Number(azimuth));
+		const p1 = geoRad(this.latitude);
+		const p2 = Math.asin(Math.sin(p1) * Math.cos(d) + Math.cos(p1) * Math.sin(d) * Math.cos(bearing));
+		const dLon = Math.atan2(Math.sin(bearing) * Math.sin(d) * Math.cos(p1), Math.cos(d) - Math.sin(p1) * Math.sin(p2));
+		return new Coordinate(geoDeg(p2), geoWrapLongitude(this.longitude + geoDeg(dLon)), this.altitude + Number(distanceUp));
+	}
+
+	toString() {
+		return `${this.latitude}, ${this.longitude}`;
+	}
+}
+
+function asCoordinate(value) {
+	if (value instanceof Coordinate) return value;
+	if (value !== null && typeof value === 'object' && 'latitude' in value && 'longitude' in value) {
+		return new Coordinate(value.latitude, value.longitude, value.altitude === undefined ? NaN : value.altitude);
+	}
+	return new Coordinate();
+}
+
+function asCoordinateList(value) {
+	if (value === null || value === undefined || typeof value.length !== 'number') return [];
+	const list = [];
+	for (let i = 0; i < value.length; i++) list.push(asCoordinate(value[i]));
+	return list;
+}
+
+// `anchorPoint { x, y }` of a MapQuickItem.
+class MapAnchorGroup {
+	constructor(owner) {
+		this.$owner = owner;
+		this.$x = 0;
+		this.$y = 0;
+	}
+}
+MapAnchorGroup.prototype.$group = 'anchorPoint';
+for (const axis of ['x', 'y']) {
+	defineGroupProp(
+		MapAnchorGroup.prototype,
+		'anchorPoint',
+		axis,
+		function () {
+			return this[`$${axis}`];
+		},
+		function (v) {
+			this[`$${axis}`] = toFloat(v);
+			this.$owner.$update();
+		},
+	);
+}
+
+// `border { color, width }` and `line { color, width }` of a map item.
+function defineMapLineGroup(group, colorField, widthField) {
+	class LineGroup {
+		constructor(owner) {
+			this.$owner = owner;
+		}
+	}
+	LineGroup.prototype.$group = group;
+	defineGroupProp(
+		LineGroup.prototype,
+		group,
+		'color',
+		function () {
+			return colorToString(this.$owner[colorField]);
+		},
+		function (v) {
+			this.$owner[colorField] = toColor(v);
+			this.$owner.$update();
+		},
+	);
+	defineGroupProp(
+		LineGroup.prototype,
+		group,
+		'width',
+		function () {
+			return this.$owner[widthField];
+		},
+		function (v) {
+			this.$owner[widthField] = Math.max(0, toFloat(v));
+			this.$owner.$update();
+		},
+	);
+	return LineGroup;
+}
+const MapBorderGroup = defineMapLineGroup('border', '$borderColor', '$borderWidth');
+const MapLineGroup = defineMapLineGroup('line', '$lineColor', '$lineWidth');
+
+class MapGestureGroup {
+	constructor(owner) {
+		this.$owner = owner;
+	}
+}
+MapGestureGroup.prototype.$group = 'gesture';
+defineGroupProp(
+	MapGestureGroup.prototype,
+	'gesture',
+	'enabled',
+	function () {
+		return this.$owner.$gestureOn;
+	},
+	function (v) {
+		this.$owner.$gestureOn = toBool(v);
+	},
+);
+
+// ----- Plugin -----
+
+export class PluginParameter extends Item {
+	constructor() {
+		super();
+		this.$typeName = 'PluginParameter';
+		this.$nonVisual = true;
+		this.$name = '';
+		this.$value = undefined;
+	}
+}
+defineField(PluginParameter.prototype, 'name', '$name', toStr);
+defineProp(
+	PluginParameter.prototype,
+	'value',
+	function () {
+		return this.$value;
+	},
+	function (v) {
+		this.$value = v;
+		this.$update();
+	},
+);
+
+// `Plugin { name: "osm"; PluginParameter { name: "osm.mapping.custom.host"; value: "https://tiles.example.com/" } }`.
+export class PluginItem extends Item {
+	constructor() {
+		super();
+		this.$typeName = 'Plugin';
+		this.$nonVisual = true;
+		this.$name = '';
+	}
+
+	$params() {
+		return this.$children.filter((child) => child instanceof PluginParameter);
+	}
+}
+defineField(PluginItem.prototype, 'name', '$name', toStr);
+
+// ----- Map items -----
+
+// A child of the map that the map places by coordinates while it arranges its children.
+class MapObject extends Item {
+	constructor() {
+		super();
+		this.$map = null;
+		this.$placed = true;
+	}
+
+	$place(map) {
+		this.$map = map;
+	}
+
+	// The coordinates that fitViewportToMapItems() has to show.
+	$collect(points) {}
+
+	$render(r, opacity) {
+		if (this.$placed) super.$render(r, opacity);
+	}
+
+	$itemAt(px, py, wheel = false, button = -1) {
+		return this.$placed ? super.$itemAt(px, py, wheel, button) : null;
+	}
+}
+
+export class MapQuickItem extends MapObject {
+	constructor() {
+		super();
+		this.$typeName = 'MapQuickItem';
+		this.$coordinate = new Coordinate();
+		this.$anchor = null;
+		this.$source = null;
+		this.$zoomLevel = 0;
+	}
+
+	$anchorGroup() {
+		return this.$anchor !== null ? this.$anchor : (this.$anchor = new MapAnchorGroup(this));
+	}
+
+	get $implicitWidth() {
+		const s = this.$source;
+		return s === null ? 0 : s.$w > 0 ? s.$w : s.$effW;
+	}
+
+	get $implicitHeight() {
+		const s = this.$source;
+		return s === null ? 0 : s.$h > 0 ? s.$h : s.$effH;
+	}
+
+	$place(map) {
+		this.$map = map;
+		if (!this.$coordinate.isValid) {
+			this.$placed = false;
+			return;
+		}
+		const p = map.$project(this.$coordinate);
+		const ax = this.$anchor === null ? 0 : this.$anchor.$x;
+		const ay = this.$anchor === null ? 0 : this.$anchor.$y;
+		let scale = 1;
+		if (this.$zoomLevel > 0) {
+			// An item with a zoomLevel keeps its size at that zoom level and scales with the map.
+			scale = Math.pow(2, map.$zoom - this.$zoomLevel);
+			this.$origin = TRANSFORM_ORIGIN.TopLeft;
+			this.$scale = scale;
+		}
+		this.$ax = p.x - ax * scale;
+		this.$ay = p.y - ay * scale;
+		this.$placed = true;
+	}
+
+	$collect(points) {
+		if (this.$coordinate.isValid) points.push(this.$coordinate);
+	}
+}
+
+// As in Qt, x and y of an item are where the map put it.
+for (const axis of ['x', 'y']) {
+	defineProp(
+		MapQuickItem.prototype,
+		axis,
+		function () {
+			// Qt places the items after the component is complete.
+			const completing = hooks.completing !== null && hooks.completing();
+			return this.$placed && !completing ? this[`$a${axis}`] : this[`$${axis}`];
+		},
+		function (v) {
+			this[`$${axis}`] = toFloat(v);
+		},
+		true,
+	);
+}
+defineField(MapQuickItem.prototype, 'coordinate', '$coordinate', asCoordinate);
+defineField(MapQuickItem.prototype, 'zoomLevel', '$zoomLevel', toFloat);
+defineProp(
+	MapQuickItem.prototype,
+	'anchorPoint',
+	function () {
+		return this.$anchorGroup();
+	},
+	function (v) {
+		if (v === null || typeof v !== 'object') return;
+		const group = this.$anchorGroup();
+		group.$x = v.x === undefined ? 0 : toFloat(v.x);
+		group.$y = v.y === undefined ? 0 : toFloat(v.y);
+		this.$update();
+	},
+);
+defineProp(
+	MapQuickItem.prototype,
+	'sourceItem',
+	function () {
+		return this.$source;
+	},
+	function (v) {
+		const next = v instanceof Item ? v : null;
+		if (next === this.$source) return;
+		const old = this.$source;
+		if (old !== null) {
+			const at = this.$children.indexOf(old);
+			if (at >= 0) this.$children.splice(at, 1);
+			old.$parent = null;
+		}
+		this.$source = next;
+		if (next !== null) this.$adopt(next);
+		this.$update();
+	},
+);
+
+// The shapes are painted over the whole map, in the coordinates of the map.
+class MapShape extends MapObject {
+	$place(map) {
+		this.$map = map;
+		this.$ax = 0;
+		this.$ay = 0;
+		this.$aw = map.$aw;
+		this.$ah = map.$ah;
+		this.$placed = true;
+	}
+}
+
+function defineMapColor(proto, name, field) {
+	defineProp(
+		proto,
+		name,
+		function () {
+			return colorToString(this[field]);
+		},
+		function (v) {
+			this[field] = toColor(v);
+			this.$update();
+		},
+	);
+}
+
+// A shape with a fill color and a border.
+class MapFilledShape extends MapShape {
+	constructor() {
+		super();
+		this.$color = MAP_TRANSPARENT;
+		this.$borderColor = BLACK;
+		this.$borderWidth = 1;
+		this.$border = null;
+	}
+
+	get border() {
+		return this.$border !== null ? this.$border : (this.$border = new MapBorderGroup(this));
+	}
+}
+defineMapColor(MapFilledShape.prototype, 'color', '$color');
+
+export class MapCircle extends MapFilledShape {
+	constructor() {
+		super();
+		this.$typeName = 'MapCircle';
+		this.$center = new Coordinate();
+		this.$radius = 0;
+	}
+
+	$outline() {
+		const points = [];
+		for (let i = 0; i < MAP_CIRCLE_STEPS; i++) {
+			const p = this.$map.$project(this.$center.atDistanceAndAzimuth(this.$radius, (i * 360) / MAP_CIRCLE_STEPS));
+			points.push(p.x, p.y);
+		}
+		return points;
+	}
+
+	$paint(r, opacity) {
+		if (this.$map === null || !this.$center.isValid || !(this.$radius > 0)) return;
+		const points = this.$outline();
+		fillMapConvex(r, points, this.$color, opacity);
+		strokeMapPath(r, points, true, this.$borderWidth, this.$borderColor, opacity);
+	}
+
+	$collect(points) {
+		if (!this.$center.isValid || !(this.$radius > 0)) return;
+		for (const azimuth of [0, 90, 180, 270]) points.push(this.$center.atDistanceAndAzimuth(this.$radius, azimuth));
+	}
+}
+defineField(MapCircle.prototype, 'center', '$center', asCoordinate);
+defineField(MapCircle.prototype, 'radius', '$radius', toFloat);
+
+export class MapRectangle extends MapFilledShape {
+	constructor() {
+		super();
+		this.$typeName = 'MapRectangle';
+		this.$topLeft = new Coordinate();
+		this.$bottomRight = new Coordinate();
+	}
+
+	$paint(r, opacity) {
+		if (this.$map === null || !this.$topLeft.isValid || !this.$bottomRight.isValid) return;
+		const a = this.$map.$project(this.$topLeft);
+		const b = this.$map.$project(this.$bottomRight);
+		const points = [a.x, a.y, b.x, a.y, b.x, b.y, a.x, b.y];
+		fillMapConvex(r, points, this.$color, opacity);
+		strokeMapPath(r, points, true, this.$borderWidth, this.$borderColor, opacity);
+	}
+
+	$collect(points) {
+		if (this.$topLeft.isValid) points.push(this.$topLeft);
+		if (this.$bottomRight.isValid) points.push(this.$bottomRight);
+	}
+}
+defineField(MapRectangle.prototype, 'topLeft', '$topLeft', asCoordinate);
+defineField(MapRectangle.prototype, 'bottomRight', '$bottomRight', asCoordinate);
+
+// The path of a polyline or a polygon and the methods that edit it.
+class MapPathShape extends MapFilledShape {
+	constructor() {
+		super();
+		this.$path = [];
+	}
+
+	$points() {
+		const points = [];
+		for (const c of this.$path) {
+			if (!c.isValid) continue;
+			const p = this.$map.$project(c);
+			points.push(p.x, p.y);
+		}
+		return points;
+	}
+
+	$collect(points) {
+		for (const c of this.$path) if (c.isValid) points.push(c);
+	}
+
+	pathLength() {
+		readUntracked('pathLength()');
+		return this.$path.length;
+	}
+
+	coordinateAt(index) {
+		readUntracked('coordinateAt()');
+		return this.$path[index] === undefined ? new Coordinate() : this.$path[index];
+	}
+
+	addCoordinate(coordinate) {
+		this.$path.push(asCoordinate(coordinate));
+		this.$update();
+		noteWrite(this, 'path');
+	}
+
+	insertCoordinate(index, coordinate) {
+		const at = clamp(Math.trunc(Number(index)) || 0, 0, this.$path.length);
+		this.$path.splice(at, 0, asCoordinate(coordinate));
+		this.$update();
+		noteWrite(this, 'path');
+	}
+
+	setCoordinate(index, coordinate) {
+		if (this.$path[index] === undefined) return;
+		this.$path[index] = asCoordinate(coordinate);
+		this.$update();
+		noteWrite(this, 'path');
+	}
+
+	removeCoordinate(coordinate) {
+		const target = asCoordinate(coordinate);
+		const at = this.$path.findIndex((c) => c.latitude === target.latitude && c.longitude === target.longitude);
+		if (at < 0) return;
+		this.$path.splice(at, 1);
+		this.$update();
+		noteWrite(this, 'path');
+	}
+}
+defineProp(
+	MapPathShape.prototype,
+	'path',
+	function () {
+		return this.$path.slice();
+	},
+	function (v) {
+		this.$path = asCoordinateList(v);
+		this.$update();
+	},
+);
+
+export class MapPolyline extends MapPathShape {
+	constructor() {
+		super();
+		this.$typeName = 'MapPolyline';
+		this.$lineColor = BLACK;
+		this.$lineWidth = 1;
+		this.$line = null;
+	}
+
+	get line() {
+		return this.$line !== null ? this.$line : (this.$line = new MapLineGroup(this));
+	}
+
+	$paint(r, opacity) {
+		if (this.$map === null) return;
+		strokeMapPath(r, this.$points(), false, this.$lineWidth, this.$lineColor, opacity);
+	}
+}
+
+export class MapPolygon extends MapPathShape {
+	constructor() {
+		super();
+		this.$typeName = 'MapPolygon';
+	}
+
+	$paint(r, opacity) {
+		if (this.$map === null) return;
+		const points = this.$points();
+		fillMapPolygon(r, points, this.$color, opacity);
+		strokeMapPath(r, points, true, this.$borderWidth, this.$borderColor, opacity);
+	}
+}
+
+// The delegates of a MapItemView are children of the map: it is a Repeater whose parent is the map.
+export class MapItemView extends Repeater {
+	constructor() {
+		super();
+		this.$typeName = 'MapItemView';
+		this.$autoFit = false;
+	}
+}
+defineField(MapItemView.prototype, 'autoFitViewport', '$autoFit', toBool);
+
+// ----- Drawing helpers of the map items (flat [x0, y0, x1, y1, ...] points in map coordinates) -----
+
+function fillMapConvex(r, points, color, opacity) {
+	if (color.a <= 0 || points.length < 6) return;
+	r.fillPolygon(points, r.pack(color, opacity), true);
+}
+
+// Ear clipping: the triangles (indexes into the points) of a simple polygon.
+function triangulate(points) {
+	const n = points.length >> 1;
+	const order = [];
+	for (let i = 0; i < n; i++) order.push(i);
+	let area = 0;
+	for (let i = 0; i < n; i++) {
+		const j = (i + 1) % n;
+		area += points[2 * i] * points[2 * j + 1] - points[2 * j] * points[2 * i + 1];
+	}
+	if (area < 0) order.reverse();
+	const cross = (a, b, px, py) => (points[2 * b] - points[2 * a]) * (py - points[2 * a + 1]) - (points[2 * b + 1] - points[2 * a + 1]) * (px - points[2 * a]);
+	const out = [];
+	let v = 0;
+	let guard = n * n;
+	while (order.length > 3 && guard-- > 0) {
+		const m = order.length;
+		const a = order[(v + m - 1) % m];
+		const b = order[v % m];
+		const c = order[(v + 1) % m];
+		let ear = cross(a, b, points[2 * c], points[2 * c + 1]) > 0;
+		for (let k = 0; ear && k < m; k++) {
+			const p = order[k];
+			if (p === a || p === b || p === c) continue;
+			const px = points[2 * p];
+			const py = points[2 * p + 1];
+			if (cross(a, b, px, py) >= 0 && cross(b, c, px, py) >= 0 && cross(c, a, px, py) >= 0) ear = false;
+		}
+		if (ear) {
+			out.push(a, b, c);
+			order.splice(v % m, 1);
+			v %= order.length;
+		} else {
+			v = (v + 1) % m;
+		}
+	}
+	for (let i = 1; i + 1 < order.length; i++) out.push(order[0], order[i], order[i + 1]);
+	return out;
+}
+
+function fillMapPolygon(r, points, color, opacity) {
+	if (color.a <= 0 || points.length < 6) return;
+	r.fillTriangles(points, triangulate(points), r.pack(color, opacity), true);
+}
+
+function fillMapDisc(r, x, y, radius, packed) {
+	const points = [];
+	for (let i = 0; i < 12; i++) {
+		const a = (i * Math.PI) / 6;
+		points.push(x + radius * Math.cos(a), y + radius * Math.sin(a));
+	}
+	r.fillPolygon(points, packed, true);
+}
+
+// A line of the given width through the points (a closed path also joins the last point with the first).
+function strokeMapPath(r, points, closed, width, color, opacity) {
+	const n = points.length >> 1;
+	if (width <= 0 || color.a <= 0 || n < 2) return;
+	const packed = r.pack(color, opacity);
+	const segments = closed ? n : n - 1;
+	const half = width / 2;
+	for (let i = 0; i < segments; i++) {
+		const j = (i + 1) % n;
+		const x0 = points[2 * i];
+		const y0 = points[2 * i + 1];
+		const dx = points[2 * j] - x0;
+		const dy = points[2 * j + 1] - y0;
+		const length = Math.hypot(dx, dy);
+		if (length < 1e-6) continue;
+		const nx = (-dy / length) * half;
+		const ny = (dx / length) * half;
+		r.fillPolygon([x0 + nx, y0 + ny, points[2 * j] + nx, points[2 * j + 1] + ny, points[2 * j] - nx, points[2 * j + 1] - ny, x0 - nx, y0 - ny], packed, true);
+	}
+	// Round joins close the gaps between the segments. Overlapping translucent discs would show, so they are only for opaque lines.
+	if (width >= 3 && packed >>> 24 === 255) {
+		for (let i = closed ? 0 : 1; i < (closed ? n : n - 1); i++) fillMapDisc(r, points[2 * i], points[2 * i + 1], half, packed);
+	}
+}
+
+// ----- Map -----
+
+export class MapItem extends Item {
+	constructor() {
+		super();
+		this.$typeName = 'Map';
+		this.$clip = true;
+		this.$plugin = null;
+		this.$center = new Coordinate(0, 0);
+		this.$zoom = 8;
+		this.$minZoom = 0;
+		this.$maxZoom = MAP_MAX_ZOOM;
+		this.$color = MAP_BACKGROUND;
+		this.$copyrights = true;
+		this.$gestureOn = true;
+		this.$gesture = null;
+		this.$tiles = new Map();
+		this.$template = '';
+		this.$tick = 0;
+		this.$drag = null;
+		this.$pointer = null;
+		this.$attribution = null;
+		this.$renderer = null;
+		this.$warned = false;
+	}
+
+	get gesture() {
+		return this.$gesture !== null ? this.$gesture : (this.$gesture = new MapGestureGroup(this));
+	}
+
+	// ----- projection -----
+
+	$world() {
+		return MAP_TILE * Math.pow(2, this.$zoom);
+	}
+
+	// The position in the map of a coordinate (the copy of the world nearest to the center).
+	$project(coordinate) {
+		const size = this.$world();
+		let dx = geoX(coordinate.longitude, size) - geoX(this.$center.longitude, size);
+		dx -= Math.round(dx / size) * size;
+		const dy = geoY(coordinate.latitude, size) - geoY(this.$center.latitude, size);
+		return { x: this.$aw / 2 + dx, y: this.$ah / 2 + dy };
+	}
+
+	$fromWorld(x, y) {
+		const size = this.$world();
+		return new Coordinate(geoLat(clamp(y, 0, size), size), geoWrapLongitude(geoLon(x, size)));
+	}
+
+	$coordinateAt(px, py) {
+		const size = this.$world();
+		return this.$fromWorld(geoX(this.$center.longitude, size) + (px - this.$aw / 2), geoY(this.$center.latitude, size) + (py - this.$ah / 2));
+	}
+
+	// Moves the center so that the coordinate is at (px, py).
+	$alignCoordinate(coordinate, px, py) {
+		const size = this.$world();
+		this.center = this.$fromWorld(geoX(coordinate.longitude, size) - (px - this.$aw / 2), geoY(coordinate.latitude, size) - (py - this.$ah / 2));
+	}
+
+	// The smallest zoom level: the whole world has to fill the larger side of the map, like in Qt.
+	$effectiveMinZoom() {
+		const size = Math.max(this.$aw, this.$ah);
+		return Math.max(this.$minZoom, size > MAP_TILE ? Math.min(Math.log2(size / MAP_TILE), this.$maxZoom) : 0);
+	}
+
+	$zoomAt(zoom, px, py) {
+		const target = clamp(zoom, this.$effectiveMinZoom(), this.$maxZoom);
+		if (target === this.$zoom) return;
+		const anchor = this.$coordinateAt(px, py);
+		this.zoomLevel = target;
+		this.$alignCoordinate(anchor, px, py);
+		this.$drag = null;
+	}
+
+	// ----- children -----
+
+	$arrange() {
+		// A map that became smaller than the world at its zoom level has to zoom in.
+		const minZoom = this.$effectiveMinZoom();
+		if (this.$zoom < minZoom) {
+			this.$zoom = minZoom;
+			reportMapChange(this, 'zoomLevel');
+		}
+		for (const child of this.$children) {
+			if (child instanceof MapObject) child.$place(this);
+		}
+	}
+
+	$fitPoints(points) {
+		if (points.length === 0 || this.$aw <= 0 || this.$ah <= 0) return;
+		let minLat = 90;
+		let maxLat = -90;
+		let minLon = 180;
+		let maxLon = -180;
+		for (const c of points) {
+			minLat = Math.min(minLat, c.latitude);
+			maxLat = Math.max(maxLat, c.latitude);
+			minLon = Math.min(minLon, c.longitude);
+			maxLon = Math.max(maxLon, c.longitude);
+		}
+		const top = geoY(maxLat, 1);
+		const bottom = geoY(minLat, 1);
+		let zoom = this.$maxZoom;
+		if (maxLon > minLon) zoom = Math.min(zoom, Math.log2(this.$aw / (MAP_TILE * ((maxLon - minLon) / 360))));
+		if (bottom > top) zoom = Math.min(zoom, Math.log2(this.$ah / (MAP_TILE * (bottom - top))));
+		// Qt shows the items at the whole zoom level that still contains all of them.
+		this.zoomLevel = Math.floor(zoom);
+		this.center = new Coordinate(geoLat((top + bottom) / 2, 1), (minLon + maxLon) / 2);
+	}
+
+	$mapPoints(visibleOnly) {
+		const points = [];
+		for (const child of this.$children) {
+			if (child instanceof MapObject && (!visibleOnly || child.$visible)) child.$collect(points);
+		}
+		return points;
+	}
+
+	get mapItems() {
+		return this.$children.filter((child) => child instanceof MapObject);
+	}
+
+	fitViewportToMapItems() {
+		this.$fitPoints(this.$mapPoints(false));
+	}
+
+	fitViewportToVisibleMapItems() {
+		this.$fitPoints(this.$mapPoints(true));
+	}
+
+	addMapItem(item) {
+		if (item instanceof MapObject) this.$adopt(item);
+	}
+
+	removeMapItem(item) {
+		if (item instanceof MapObject && this.$children.includes(item)) this.$removeChild(item);
+	}
+
+	clearMapItems() {
+		for (const child of this.$children.slice()) {
+			if (child instanceof MapObject) this.$removeChild(child);
+		}
+	}
+
+	// The coordinate at a position of the map, invalid outside of it when clipToViewPort is true.
+	toCoordinate(position, clipToViewPort = true) {
+		readUntracked('toCoordinate()');
+		this.$ensureGeometry();
+		if (position === null || typeof position !== 'object') return new Coordinate();
+		const x = Number(position.x);
+		const y = Number(position.y);
+		if (!Number.isFinite(x) || !Number.isFinite(y)) return new Coordinate();
+		if (clipToViewPort && (x < 0 || y < 0 || x > this.$aw || y > this.$ah)) return new Coordinate();
+		return this.$coordinateAt(x, y);
+	}
+
+	// The position in the map of a coordinate, (NaN, NaN) outside of it when clipToViewPort is true.
+	fromCoordinate(coordinate, clipToViewPort = true) {
+		readUntracked('fromCoordinate()');
+		this.$ensureGeometry();
+		const c = asCoordinate(coordinate);
+		if (!c.isValid) return { x: NaN, y: NaN };
+		const p = this.$project(c);
+		if (clipToViewPort && (p.x < 0 || p.y < 0 || p.x > this.$aw || p.y > this.$ah)) return { x: NaN, y: NaN };
+		return p;
+	}
+
+	alignCoordinateToPoint(coordinate, point) {
+		const c = asCoordinate(coordinate);
+		if (!c.isValid || point === null || typeof point !== 'object') return;
+		this.$alignCoordinate(c, Number(point.x), Number(point.y));
+	}
+
+	pan(dx, dy) {
+		const size = this.$world();
+		this.center = this.$fromWorld(geoX(this.$center.longitude, size) + Number(dx), geoY(this.$center.latitude, size) + Number(dy));
+	}
+
+	clearData() {
+		this.$dropTiles();
+		this.$update();
+	}
+
+	// ----- mouse -----
+
+	get $acceptsMouse() {
+		return this.$gestureOn;
+	}
+
+	get $acceptsWheel() {
+		return this.$gestureOn;
+	}
+
+	$mousePressAt(sceneX, sceneY) {
+		const size = this.$world();
+		this.$drag = { x: sceneX, y: sceneY, wx: geoX(this.$center.longitude, size), wy: geoY(this.$center.latitude, size) };
+		this.$pointer = { x: sceneX - this.$sx, y: sceneY - this.$sy };
+	}
+
+	$mouseMoveAt(sceneX, sceneY) {
+		this.$pointer = { x: sceneX - this.$sx, y: sceneY - this.$sy };
+		const drag = this.$drag;
+		if (drag === null || !this.$gestureOn) return;
+		this.center = this.$fromWorld(drag.wx - (sceneX - drag.x), drag.wy - (sceneY - drag.y));
+	}
+
+	$pressChanged(pressed) {
+		if (!pressed) this.$drag = null;
+	}
+
+	$mouseWheel(notches, sceneX, sceneY) {
+		const px = sceneX === undefined ? this.$aw / 2 : sceneX - this.$sx;
+		const py = sceneY === undefined ? this.$ah / 2 : sceneY - this.$sy;
+		this.$zoomAt(this.$zoom + notches * MAP_ZOOM_PER_NOTCH, px, py);
+	}
+
+	$mouseDoubleClicked(button) {
+		if (button !== 0 || !this.$gestureOn || this.$pointer === null) return;
+		this.$zoomAt(this.$zoom + 1, this.$pointer.x, this.$pointer.y);
+	}
+
+	// ----- tiles -----
+
+	$tileTemplate() {
+		let host = '';
+		for (const parameter of this.$plugin.$params()) {
+			if (parameter.$name === 'osm.mapping.custom.host' || parameter.$name === 'osm.mapping.host') host = String(parameter.$value);
+		}
+		if (host === '') return MAP_DEFAULT_TILES;
+		if (/\{z\}|%z/.test(host)) return host.replace(/%z/g, '{z}').replace(/%x/g, '{x}').replace(/%y/g, '{y}');
+		return `${host.replace(/\/+$/, '')}/{z}/{x}/{y}.png`;
+	}
+
+	$copyrightText() {
+		for (const parameter of this.$plugin.$params()) {
+			if (parameter.$name === 'osm.mapping.copyright') return String(parameter.$value);
+		}
+		return this.$template === MAP_DEFAULT_TILES ? MAP_DEFAULT_COPYRIGHT : '';
+	}
+
+	$dropTiles() {
+		if (this.$renderer !== null) {
+			for (const entry of this.$tiles.values()) if (entry.page !== null) this.$renderer.dropPage(entry.page);
+		}
+		this.$tiles.clear();
+	}
+
+	$tile(z, x, y) {
+		const key = `${z}/${x}/${y}`;
+		let entry = this.$tiles.get(key);
+		if (entry === undefined) {
+			entry = { status: 2, img: null, page: null, used: 0 };
+			this.$tiles.set(key, entry);
+			this.$loadTile(entry, this.$template.replace(/\{z\}/g, z).replace(/\{x\}/g, x).replace(/\{y\}/g, y));
+		}
+		entry.used = this.$tick;
+		return entry;
+	}
+
+	$loadTile(entry, url) {
+		const Picture = globalThis.Image;
+		if (typeof Picture !== 'function' || typeof document === 'undefined') {
+			entry.status = 3;
+			return;
+		}
+		const picture = new Picture();
+		picture.crossOrigin = 'anonymous';
+		picture.onload = () => {
+			if (this.$destroyed) return;
+			entry.img = picture;
+			entry.status = 1;
+			this.$update();
+		};
+		picture.onerror = () => {
+			entry.status = 3;
+		};
+		picture.src = url;
+	}
+
+	// The texture page of a loaded tile, or null while it is not ready.
+	$tilePage(r, entry) {
+		if (entry.page !== null) return entry.page;
+		if (entry.status !== 1 || entry.img === null || typeof document === 'undefined') return null;
+		const size = Math.min(512, entry.img.naturalWidth || MAP_TILE);
+		const canvas = document.createElement('canvas');
+		canvas.width = size;
+		canvas.height = size;
+		const context = canvas.getContext('2d');
+		context.drawImage(entry.img, 0, 0, size, size);
+		try {
+			context.getImageData(0, 0, 1, 1);
+		} catch (error) {
+			if (error.name !== 'SecurityError') throw error;
+			const source = entry.img.src;
+			entry.status = 3;
+			entry.img = null;
+			hooks.report(error, `Map tile '${source}'`);
+			return null;
+		}
+		entry.img = null;
+		entry.page = { canvas, context: null, texture: null, dirty: true, size, nearest: false };
+		return entry.page;
+	}
+
+	$drawTile(r, z, x, y, px, py, size, opacity) {
+		const entry = this.$tile(z, x, y);
+		const page = this.$tilePage(r, entry);
+		if (page !== null) {
+			r.image(page, px, py, size, size, 0, 0, 1, 1, opacity);
+			return;
+		}
+		// While a tile loads, the part of a tile of a lower zoom level that covers it is shown.
+		for (let d = 1; d <= 3 && z - d >= 0; d++) {
+			const parent = this.$tiles.get(`${z - d}/${x >> d}/${y >> d}`);
+			if (parent === undefined) continue;
+			const parentPage = this.$tilePage(r, parent);
+			if (parentPage === null) continue;
+			parent.used = this.$tick;
+			const span = 1 / (1 << d);
+			const u = (x & ((1 << d) - 1)) * span;
+			const v = (y & ((1 << d) - 1)) * span;
+			r.image(parentPage, px, py, size, size, u, v, u + span, v + span, opacity);
+			return;
+		}
+	}
+
+	$paintTiles(r, opacity) {
+		const z = clamp(Math.floor(this.$zoom), 0, MAP_MAX_TILE_ZOOM);
+		const size = MAP_TILE * Math.pow(2, this.$zoom - z);
+		const count = 1 << z;
+		const world = this.$world();
+		const left = geoX(this.$center.longitude, world) - this.$aw / 2;
+		const top = geoY(this.$center.latitude, world) - this.$ah / 2;
+		const x0 = Math.floor(left / size);
+		const x1 = Math.floor((left + this.$aw) / size);
+		const y0 = Math.max(0, Math.floor(top / size));
+		const y1 = Math.min(count - 1, Math.floor((top + this.$ah) / size));
+		if ((x1 - x0 + 1) * (y1 - y0 + 1) > 400) return;
+		for (let ty = y0; ty <= y1; ty++) {
+			for (let tx = x0; tx <= x1; tx++) {
+				this.$drawTile(r, z, ((tx % count) + count) % count, ty, tx * size - left, ty * size - top, size, opacity);
+			}
+		}
+		if (this.$tiles.size > MAP_MAX_TILES) this.$evictTiles(r);
+	}
+
+	// Drops the tiles that were not shown for the longest time.
+	$evictTiles(r) {
+		const old = [...this.$tiles.entries()].filter(([, entry]) => entry.used !== this.$tick).sort((a, b) => a[1].used - b[1].used);
+		for (let i = 0; i < old.length && this.$tiles.size > MAP_MAX_TILES * 0.75; i++) {
+			if (old[i][1].page !== null) r.dropPage(old[i][1].page);
+			this.$tiles.delete(old[i][0]);
+		}
+	}
+
+	// ----- drawing -----
+
+	$renderContent(r, opacity) {
+		const clipToken = r.beginClip(this.$aw, this.$ah);
+		if (clipToken === null) return;
+		this.$paint(r, opacity);
+		const children = this.$hasZOrder() ? this.$childrenByZ() : this.$children;
+		for (let i = 0; i < children.length; i++) children[i].$render(r, opacity);
+		this.$paintOverlay(r, opacity);
+		r.endClip(clipToken);
+	}
+
+	$paint(r, opacity) {
+		drawRectangle(r, r.pack(this.$color, opacity), 0, 0, 0, false, 0, 0, this.$aw, this.$ah);
+		if (this.$plugin === null) return;
+		if (this.$plugin.$name !== 'osm') {
+			if (!this.$warned) {
+				this.$warned = true;
+				console.warn(`Map: the plugin '${this.$plugin.$name}' is not supported, only 'osm' is`);
+			}
+			return;
+		}
+		this.$renderer = r;
+		this.$tick++;
+		const template = this.$tileTemplate();
+		if (template !== this.$template) {
+			this.$dropTiles();
+			this.$template = template;
+		}
+		this.$paintTiles(r, opacity);
+	}
+
+	$paintOverlay(r, opacity) {
+		if (!this.$copyrights || this.$plugin === null || this.$plugin.$name !== 'osm') return;
+		const text = this.$copyrightText();
+		if (text === '') return;
+		let label = this.$attribution;
+		if (label === null) {
+			label = this.$attribution = new Text();
+			label.$pixelSize = 11;
+			label.$color = MAP_ATTRIBUTION_COLOR;
+		}
+		label.$text = text;
+		const metrics = label.$metrics();
+		label.$aw = Math.ceil(metrics.implicitWidth);
+		label.$ah = Math.ceil(metrics.implicitHeight);
+		const w = label.$aw + 8;
+		const h = label.$ah + 4;
+		const x = this.$aw - w;
+		const y = this.$ah - h;
+		drawRectangle(r, r.pack(MAP_ATTRIBUTION_BACKGROUND, opacity), 0, 0, 0, false, x, y, w, h);
+		const a = r.ma, b = r.mb, c = r.mc, d = r.md, e = r.me, f = r.mf;
+		r.translate(x + 4, y + 2);
+		label.$paint(r, opacity);
+		r.setMatrix(a, b, c, d, e, f);
+	}
+
+	$destroy() {
+		this.$dropTiles();
+		super.$destroy();
+	}
+}
+
+// A change of a property that the map itself makes (a drag, the wheel) reports `onXChanged` like a script write.
+function reportMapChange(map, name) {
+	if (hooks.changed !== null && map.$chg !== undefined) hooks.changed(map, name);
+}
+
+defineProp(
+	MapItem.prototype,
+	'center',
+	function () {
+		return this.$center;
+	},
+	function (v) {
+		const c = asCoordinate(v);
+		if (!c.isValid) return;
+		const next = new Coordinate(clamp(c.latitude, -MAP_MAX_LATITUDE, MAP_MAX_LATITUDE), c.longitude, c.altitude);
+		if (next.latitude === this.$center.latitude && next.longitude === this.$center.longitude) return;
+		this.$center = next;
+		this.$update();
+		reportMapChange(this, 'center');
+	},
+);
+defineProp(
+	MapItem.prototype,
+	'zoomLevel',
+	function () {
+		return this.$zoom;
+	},
+	function (v) {
+		if (toFloat(v) < 0) return;
+		const next = clamp(toFloat(v), this.$effectiveMinZoom(), this.$maxZoom);
+		if (next === this.$zoom) return;
+		this.$zoom = next;
+		this.$update();
+		reportMapChange(this, 'zoomLevel');
+	},
+);
+defineProp(
+	MapItem.prototype,
+	'minimumZoomLevel',
+	function () {
+		return this.$effectiveMinZoom();
+	},
+	function (v) {
+		this.$minZoom = clamp(toFloat(v), 0, MAP_MAX_ZOOM);
+		if (this.$zoom < this.$minZoom) this.zoomLevel = this.$minZoom;
+	},
+);
+defineProp(
+	MapItem.prototype,
+	'maximumZoomLevel',
+	function () {
+		return this.$maxZoom;
+	},
+	function (v) {
+		this.$maxZoom = clamp(toFloat(v), 0, MAP_MAX_ZOOM);
+		if (this.$zoom > this.$maxZoom) this.zoomLevel = this.$maxZoom;
+	},
+);
+defineProp(
+	MapItem.prototype,
+	'plugin',
+	function () {
+		return this.$plugin;
+	},
+	function (v) {
+		const next = v instanceof PluginItem ? v : null;
+		if (next === this.$plugin) return;
+		this.$plugin = next;
+		this.$warned = false;
+		this.$update();
+	},
+);
+defineMapColor(MapItem.prototype, 'color', '$color');
+defineField(MapItem.prototype, 'copyrightsVisible', '$copyrights', toBool);
+
 // The rows of a model change without a property being written: a binding that reads them runs on every pass.
 function readsUntracked(type, names) {
 	for (const name of names) {
@@ -6921,6 +8058,15 @@ export const BUILTIN_TYPES = new Map([
 	['ScrollBar', ScrollBar],
 	['FontLoader', FontLoader],
 	['Image', ImageItem],
+	['Map', MapItem],
+	['Plugin', PluginItem],
+	['PluginParameter', PluginParameter],
+	['MapQuickItem', MapQuickItem],
+	['MapCircle', MapCircle],
+	['MapRectangle', MapRectangle],
+	['MapPolyline', MapPolyline],
+	['MapPolygon', MapPolygon],
+	['MapItemView', MapItemView],
 	['Flickable', Flickable],
 	['TextEdit', TextEdit],
 	['TextInput', TextInput],

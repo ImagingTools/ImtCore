@@ -195,7 +195,7 @@ export class Scene {
 
 	wheel(x, y, notches) {
 		const target = this.root.$itemAt(x, y, true);
-		if (target !== null) target.$mouseWheel(notches);
+		if (target !== null) target.$mouseWheel(notches, x, y);
 	}
 
 	// Key events go to the item with the active focus; true if a handler accepted the event.
