@@ -412,17 +412,23 @@ export class Project {
 	}
 
 	// `qrc:/Fonts/Name.ttf` is the Qt resource of imtstylecontrolsqml; on disk the files live next to
-	// the Acf module as `../Fonts/Name.ttf`. The compiler FS has no qrc, so those paths are rewritten.
+	// the Acf module as `../Fonts/Name.ttf` (or in `Resources/Fonts` of the library). The compiler FS has no qrc, so
+	// those paths are rewritten.
 	fontFileCandidates(path) {
 		const normalized = normalizePath(path);
 		const out = [normalized];
-		const qrcFonts = /^qrc:\/+Fonts\/([^/]+)$/i.exec(normalized);
+		// `qrc:/Fonts/Name.ttf` and `/Fonts/Name.ttf` (a FontLoader of a Qt resource, whose qrc prefix is /Fonts).
+		const qrcFonts = /^(?:qrc:)?\/+Fonts\/([^/]+)$/i.exec(normalized);
 		if (qrcFonts) {
 			const file = qrcFonts[1];
 			const underFonts = `Fonts/${file}`;
 			out.push(underFonts);
 			for (const dirs of this.moduleDirs.values()) {
-				for (const dir of dirs) out.push(joinPath(dirname(dir), underFonts));
+				for (const dir of dirs) {
+					out.push(joinPath(dirname(dir), underFonts));
+					// the resources of a library: <library>/Qml/Acf is the module, <library>/Resources/Fonts the fonts
+					out.push(joinPath(dirname(dirname(dir)), `Resources/${underFonts}`));
+				}
 			}
 			for (const dir of this.importPaths) {
 				out.push(joinPath(dir, underFonts), joinPath(dirname(dir), underFonts));

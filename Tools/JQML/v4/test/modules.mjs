@@ -73,5 +73,15 @@ check('a type that only an earlier directory declares stays', app.root.commonNam
 const swapped = await run(['app', 'lib']);
 check('the order of the directories decides', [swapped.root.styleName, swapped.root.badgeName], ['library', 'library badge']);
 
+// ----- the fonts of a Qt resource -----
+
+// A FontLoader names `/Fonts/Name.ttf` or `qrc:/Fonts/Name.ttf`: the file is next to the Qml folder of the module.
+const fontProject = new Project(new MemoryFS(), { modules: { Acf: ['lib/Qml/Acf'] } });
+const slash = fontProject.fontFileCandidates('/Fonts/Ubuntu-Light.ttf');
+check('a font of /Fonts is looked up next to the module', slash.includes('lib/Qml/Fonts/Ubuntu-Light.ttf'), true);
+check('a font of /Fonts is looked up in Resources/Fonts of the library', slash.includes('lib/Resources/Fonts/Ubuntu-Light.ttf'), true);
+check('qrc:/Fonts is looked up the same way', fontProject.fontFileCandidates('qrc:/Fonts/Ubuntu-Light.ttf').includes('lib/Qml/Fonts/Ubuntu-Light.ttf'), true);
+check('another path is not rewritten', fontProject.fontFileCandidates('Other/x.ttf'), ['Other/x.ttf']);
+
 console.log(failures === 0 ? 'All good' : `${failures} failed`);
 process.exit(failures === 0 ? 0 : 1);
