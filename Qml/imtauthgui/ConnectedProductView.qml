@@ -32,14 +32,26 @@ ViewBase {
 	}
 
 	Component.onDestruction: {
-		AuthorizationController.administeredProductId = ""
+		container.releaseAdministeredProduct()
 	}
 
 	// The administration works in the context of its product, the rest of the console in its own.
 	function updateAdministeredProduct(){
 		let isAdministering = container.visible
 					&& multiPageView.currentIndex === multiPageView.getIndexById("Administration")
-		AuthorizationController.administeredProductId = isAdministering ? container.storedProductId : ""
+		if (isAdministering){
+			AuthorizationController.administeredProductId = container.storedProductId
+		}
+		else{
+			container.releaseAdministeredProduct()
+		}
+	}
+
+	// Another opened product may be administered by now, its context stays
+	function releaseAdministeredProduct(){
+		if (AuthorizationController.administeredProductId === container.storedProductId){
+			AuthorizationController.administeredProductId = ""
+		}
 	}
 
 	function updateGui(){

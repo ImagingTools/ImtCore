@@ -545,13 +545,7 @@ DocumentViewBase {
 					addButtonText: qsTr("Add Role")
 					visible: false
 
-					// The role list is scoped by product, as a header and as an input field.
-					function getHeaders(){
-						let headers = {}
-						headers["productId"] = container.productId
-						return headers
-					}
-
+					// The role list is scoped by product. The header of the product comes from the application.
 					function setCustomInputParams(inputParams){
 						if (container.productId){
 							inputParams.InsertField(RoleItemInputTypeMetaInfo.s_productId, container.productId)

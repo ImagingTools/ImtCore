@@ -171,7 +171,7 @@ protected:
 
 		IGqlClient::GqlResponsePtr responsePtr = m_apiClientCompPtr->SendRequest(requestPtr);
 		if (!responsePtr.IsValid()){
-			errorMessage = QStringLiteral("Response is invalid");
+			errorMessage = QStringLiteral("The remote server did not answer or refused this server. The reason is in the log of the servers.");
 			return SdlClass();
 		}
 

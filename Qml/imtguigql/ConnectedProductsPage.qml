@@ -18,18 +18,6 @@ ConnectedProductsView {
 		collectionId: "ConnectedProducts"
 	}
 
-	GqlBasedServerTokenApiClient {
-		id: gqlTokenApiClient
-	}
-
-	GqlBasedProductPermissionStatusProvider {
-		id: gqlPermissionStatusProvider
-	}
-
-	GqlBasedPermissionsProvider {
-		id: gqlPermissionsProvider
-	}
-
 	Component.onCompleted: {
 		gqlDocumentService.registerDocumentViewData("ConnectedProduct", "Editor", productEditorComp, productControllerComp)
 	}
@@ -45,6 +33,19 @@ ConnectedProductsView {
 				GqlBasedCommandsController {
 					typeId: "ConnectedProduct"
 				}
+			}
+
+			// Each opened product has its own services: their models and signals belong to one product
+			GqlBasedServerTokenApiClient {
+				id: gqlTokenApiClient
+			}
+
+			GqlBasedProductPermissionStatusProvider {
+				id: gqlPermissionStatusProvider
+			}
+
+			GqlBasedPermissionsProvider {
+				id: gqlPermissionsProvider
 			}
 		}
 	}

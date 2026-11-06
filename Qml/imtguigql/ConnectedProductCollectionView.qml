@@ -42,6 +42,13 @@ RemoteCollectionView {
 		table.setSortingInfo(ConnectedProductItemDataTypeMetaInfo.s_productName, "ASC")
 	}
 
+	// The state of a server changes without a change of the collection
+	onVisibleChanged: {
+		if (productCollectionView.visible){
+			productCollectionView.doUpdateGui()
+		}
+	}
+
 	function handleSubscription(dataModel){
 		productCollectionView.doUpdateGui()
 	}

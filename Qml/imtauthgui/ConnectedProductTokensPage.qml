@@ -450,10 +450,10 @@ Item {
 								Repeater {
 									model: receiversModel
 
-									delegate: CheckBox {
+									delegate: RadioButton {
 										objectName: "ServerTokenReceiver" + model.productId
 										text: model.productId
-										checkState: tokenDialog.receiverId === model.productId ? Qt.Checked : Qt.Unchecked
+										checked: tokenDialog.receiverId === model.productId
 										onClicked: {
 											tokenDialog.selectedScopes = []
 											tokenDialog.receiverId = model.productId
@@ -498,9 +498,10 @@ Item {
 									CheckBox {
 										objectName: "ServerTokenPermission" + model.permissionId
 										text: model.required ? model.name + " " + qsTr("(required)") : model.name
-										enabled: !model.required
+										isActive: !model.required
 										checkState: tokenDialog.isSelected(model.permissionId) ? Qt.Checked : Qt.Unchecked
-										onClicked: {
+
+										function nextCheckState(){
 											tokenDialog.togglePermission(model.permissionId)
 										}
 									}
