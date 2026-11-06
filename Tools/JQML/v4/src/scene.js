@@ -1,6 +1,6 @@
 // The scene: the root item, the frame (layout, bindings, painting) and the mouse input.
 
-import { getFocusItem, Item, setDestroyObserver, setFocusItem, setFrameLoop } from './items.js';
+import { DragHandler, getFocusItem, Item, setDestroyObserver, setFocusItem, setFrameLoop, WheelHandler } from './items.js';
 
 const MAX_PASSES = 10;
 
@@ -67,6 +67,8 @@ export class Scene {
 		this.hovered = null;
 		this.pressed = null;
 		this.pressedButton = 0;
+		// The DragHandlers that a press went to: the first one that moves far enough takes the drag.
+		this.dragging = [];
 		this.$cursorCss = '';
 
 		this.frameHandler = null; // (seconds) => void, called before every frame
@@ -141,7 +143,27 @@ export class Scene {
 
 	// ----- input (CSS pixel coordinates in the scene) -----
 
+	// A DragHandler that starts takes the drag from the others and from the item that was pressed (a MouseArea).
+	moveHandlers(x, y) {
+		if (this.dragging.length === 0) return;
+		for (const handler of this.dragging.slice()) {
+			if (!this.dragging.includes(handler)) continue;
+			const wasActive = handler.$active;
+			// An item that prevents stealing keeps the press: the handler does not start.
+			if (!wasActive && this.pressed !== null && this.pressed.$preventStealing === true) continue;
+			if (!handler.$move(x, y) || wasActive) continue;
+			for (const other of this.dragging) if (other !== handler) other.$release(true);
+			this.dragging = [handler];
+			const target = this.pressed;
+			if (target !== null && target.$preventStealing !== true) {
+				this.pressed = null;
+				target.$pressChanged(false);
+			}
+		}
+	}
+
 	pointerMove(x, y) {
+		this.moveHandlers(x, y);
 		if (this.pressed !== null) this.pressed.$mouseMoveAt(x, y);
 		this.setHovered(this.root.$itemAt(x, y));
 		if (this.hovered !== null && this.hovered !== this.pressed) this.hovered.$mouseMoveAt(x, y);
@@ -153,6 +175,16 @@ export class Scene {
 		this.setHovered(button === 0 ? target : this.root.$itemAt(x, y));
 		this.pressed = target;
 		this.pressedButton = button;
+		this.dragging = [];
+		const hits = [];
+		this.root.$handlerItems(x, y, DragHandler, hits);
+		for (const item of hits) {
+			for (const handler of item.$handlers(DragHandler)) {
+				if (!handler.$acceptsButton(button)) continue;
+				handler.$press(x, y, item);
+				this.dragging.push(handler);
+			}
+		}
 		if (target !== null) {
 			target.$pressButton = button;
 			target.$pressChanged(true);
@@ -162,6 +194,8 @@ export class Scene {
 	}
 
 	pointerUp(x, y) {
+		for (const handler of this.dragging) handler.$release(false);
+		this.dragging = [];
 		const target = this.pressed;
 		this.pressed = null;
 		if (target !== null) {
@@ -194,6 +228,14 @@ export class Scene {
 	}
 
 	wheel(x, y, notches) {
+		const hits = [];
+		this.root.$handlerItems(x, y, WheelHandler, hits);
+		let taken = false;
+		for (const item of hits) {
+			for (const handler of item.$handlers(WheelHandler)) taken = handler.$wheel(notches, x, y, item) || taken;
+			if (taken) break;
+		}
+		if (taken) return;
 		const target = this.root.$itemAt(x, y, true);
 		if (target !== null) target.$mouseWheel(notches, x, y);
 	}

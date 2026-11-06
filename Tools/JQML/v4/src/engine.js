@@ -6,7 +6,7 @@
 // and root of the enclosing components (delegates have a parent scope), and finally the globals
 // (Math, JSON, Date, console, Qt, Item, time).
 
-import { Animation, ANIMATION_TYPES, AnchorLine, BindingValue, BUILTIN_TYPES, COMPONENT_ENUM_VALUE, ComponentItem, Coordinate, createSdlObject, duringChange, FILE_DIALOG_MODES, flushDeclarativeFocus, getFocusItem, hooks, Item, ListModel, ListView, linkToOwner, Loader, MapItemView, modelCount, modelScopeData, modelVersion, Placeholder, queueDeclarativeFocus, readRows, readUntracked, Repeater, resetFocus, setSceneActive, Stack, Timer, TRANSFORM_ORIGIN, TreeItemModel } from './items.js';
+import { Animation, ANIMATION_TYPES, AnchorLine, BindingValue, BUILTIN_TYPES, COMPONENT_ENUM_VALUE, ComponentItem, Coordinate, createSdlObject, duringChange, FILE_DIALOG_MODES, flushDeclarativeFocus, getFocusItem, hooks, Item, ListModel, ListView, linkToOwner, Loader, MapItemView, modelCount, modelScopeData, modelVersion, Placeholder, POINTER_DEVICE, queueDeclarativeFocus, readRows, readUntracked, Repeater, resetFocus, setSceneActive, Stack, Timer, TRANSFORM_ORIGIN, TreeItemModel } from './items.js';
 import { fonts } from './fonts.js';
 import { KEY, MODIFIERS, NAMED_KEY_HANDLERS, qtKeyEvent } from './keys.js';
 import { QmlError, escapeSourceBreaks, tokenize, topLevelNames } from './lexer.js';
@@ -508,7 +508,7 @@ export class Engine {
 			WheelFocus: 0xf,
 			...KEY,
 			...MODIFIERS,
-			platform: Object.freeze({ os: 'web' }),
+			platform: Object.freeze({ os: 'web', pluginName: 'web' }),
 			application: Object.freeze({ arguments: [], name: '', version: '' }),
 			createObject: (type, parent, props) => engine.createObject(type, parent, props),
 			createComponent: (url, second, third) => engine.createComponent(url, second, third),
@@ -546,6 +546,7 @@ export class Engine {
 			JSON,
 			Date,
 			Qt: qt,
+			PointerDevice: POINTER_DEVICE,
 			QtPositioning: Object.freeze({ coordinate: (latitude, longitude, altitude) => new Coordinate(latitude, longitude, altitude) }),
 			context: this.context,
 			Item: TRANSFORM_ORIGIN,

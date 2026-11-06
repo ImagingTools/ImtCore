@@ -301,6 +301,12 @@ class Parser {
 		}
 
 		const name = this.parseDottedName();
+		if (this.isP('{') && !isUpper(name[0])) {
+			// `coordinate { latitude: 1; longitude: 2 }`: a group of properties, the same as `coordinate.latitude: 1`.
+			const group = this.parseObject(name, first);
+			for (const prop of group.properties) def.properties.push({ ...prop, name: `${name}.${prop.name}` });
+			return;
+		}
 		if (this.isP('{')) {
 			def.children.push(this.parseObject(name, first));
 			return;

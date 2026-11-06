@@ -1407,6 +1407,38 @@ export class Item {
 	$pressChanged(pressed) {}
 
 	$mouseClicked() {}
+
+	// The enabled handlers of a kind (WheelHandler, DragHandler) among the children.
+	$handlers(kind) {
+		const found = [];
+		for (const child of this.$children) {
+			if (child instanceof kind && child.$enabled) found.push(child);
+		}
+		return found;
+	}
+
+	// The items under a scene position that have an enabled handler of the kind, deepest first.
+	$handlerItems(px, py, kind, found) {
+		if (!this.$visible) return;
+		if (this.$rotation !== 0 || this.$scale !== 1) {
+			if (this.$scale === 0) return;
+			const fraction = ORIGIN_FRACTIONS[this.$origin];
+			const ox = this.$sx + fraction[0] * this.$aw;
+			const oy = this.$sy + fraction[1] * this.$ah;
+			const radians = (this.$rotation * Math.PI) / 180;
+			const cos = Math.cos(radians);
+			const sin = Math.sin(radians);
+			const dx = px - ox;
+			const dy = py - oy;
+			px = ox + (dx * cos + dy * sin) / this.$scale;
+			py = oy + (-dx * sin + dy * cos) / this.$scale;
+		}
+		const inside = px >= this.$sx && py >= this.$sy && px < this.$sx + this.$aw && py < this.$sy + this.$ah;
+		if (this.$clip && !inside) return;
+		const children = this.$hasZOrder() ? this.$childrenByZ() : this.$children;
+		for (let i = children.length - 1; i >= 0; i--) children[i].$handlerItems(px, py, kind, found);
+		if (inside && this.$handlers(kind).length > 0) found.push(this);
+	}
 }
 
 // Types whose own size follows their children: a change below them changes how their parent places them.
@@ -6880,13 +6912,13 @@ defineProp(
 // `Map` draws Web Mercator tiles (the `osm` plugin: tile.openstreetmap.org, or `osm.mapping.custom.host`) and keeps the
 // map items (MapQuickItem, MapCircle, MapRectangle, MapPolyline, MapPolygon, MapItemView delegates) that are its children
 // at their coordinates. The map arranges them like a layout does, so the mouse reaches the items inside a MapQuickItem.
-// Dragging pans, the wheel and a double click zoom around the pointer; `gesture.enabled` switches this off.
+// Like the Map of Qt 6 it is not interactive by itself: a WheelHandler (property: "zoomLevel") and a DragHandler
+// (onTranslationChanged: pan()) inside of it move it.
 
 const MAP_TILE = 256;
 const MAP_MAX_LATITUDE = 85.0511287798;
 const MAP_MAX_ZOOM = 30; // like Qt; the tiles end at MAP_MAX_TILE_ZOOM and are enlarged above it
 const MAP_MAX_TILE_ZOOM = 19;
-const MAP_ZOOM_PER_NOTCH = 0.5;
 const MAP_MAX_TILES = 256;
 const MAP_CIRCLE_STEPS = 72;
 const MAP_EARTH_RADIUS = 6371007.2; // QGeoCoordinate
@@ -6956,11 +6988,27 @@ export class Coordinate {
 }
 
 function asCoordinate(value) {
-	if (value instanceof Coordinate) return value;
+	if (value instanceof Coordinate) return new Coordinate(value.latitude, value.longitude, value.altitude);
 	if (value !== null && typeof value === 'object' && 'latitude' in value && 'longitude' in value) {
 		return new Coordinate(value.latitude, value.longitude, value.altitude === undefined ? NaN : value.altitude);
 	}
 	return new Coordinate();
+}
+
+// What the property of an item returns: writing its latitude or longitude (`coordinate { latitude: 1 }`,
+// `center.latitude = 1`) changes the item.
+function liveCoordinate(coordinate, changed) {
+	return new Proxy(coordinate, {
+		// The engine writes into the members of an object that has an owner (`coordinate { latitude: 1 }`).
+		has(target, name) {
+			return name === '$owner' || name in target;
+		},
+		set(target, name, value) {
+			target[name] = name === 'latitude' || name === 'longitude' || name === 'altitude' ? Number(value) : value;
+			changed();
+			return true;
+		},
+	});
 }
 
 function asCoordinateList(value) {
@@ -7030,24 +7078,6 @@ function defineMapLineGroup(group, colorField, widthField) {
 }
 const MapBorderGroup = defineMapLineGroup('border', '$borderColor', '$borderWidth');
 const MapLineGroup = defineMapLineGroup('line', '$lineColor', '$lineWidth');
-
-class MapGestureGroup {
-	constructor(owner) {
-		this.$owner = owner;
-	}
-}
-MapGestureGroup.prototype.$group = 'gesture';
-defineGroupProp(
-	MapGestureGroup.prototype,
-	'gesture',
-	'enabled',
-	function () {
-		return this.$owner.$gestureOn;
-	},
-	function (v) {
-		this.$owner.$gestureOn = toBool(v);
-	},
-);
 
 // ----- Plugin -----
 
@@ -7119,6 +7149,7 @@ export class MapQuickItem extends MapObject {
 		super();
 		this.$typeName = 'MapQuickItem';
 		this.$coordinate = new Coordinate();
+		this.$live = null;
 		this.$anchor = null;
 		this.$source = null;
 		this.$zoomLevel = 0;
@@ -7180,7 +7211,18 @@ for (const axis of ['x', 'y']) {
 		true,
 	);
 }
-defineField(MapQuickItem.prototype, 'coordinate', '$coordinate', asCoordinate);
+defineProp(
+	MapQuickItem.prototype,
+	'coordinate',
+	function () {
+		return this.$live !== null ? this.$live : (this.$live = liveCoordinate(this.$coordinate, () => this.$update()));
+	},
+	function (v) {
+		this.$coordinate = asCoordinate(v);
+		this.$live = null;
+		this.$update();
+	},
+);
 defineField(MapQuickItem.prototype, 'zoomLevel', '$zoomLevel', toFloat);
 defineProp(
 	MapQuickItem.prototype,
@@ -7264,6 +7306,7 @@ export class MapCircle extends MapFilledShape {
 		super();
 		this.$typeName = 'MapCircle';
 		this.$center = new Coordinate();
+		this.$live = null;
 		this.$radius = 0;
 	}
 
@@ -7288,7 +7331,18 @@ export class MapCircle extends MapFilledShape {
 		for (const azimuth of [0, 90, 180, 270]) points.push(this.$center.atDistanceAndAzimuth(this.$radius, azimuth));
 	}
 }
-defineField(MapCircle.prototype, 'center', '$center', asCoordinate);
+defineProp(
+	MapCircle.prototype,
+	'center',
+	function () {
+		return this.$live !== null ? this.$live : (this.$live = liveCoordinate(this.$center, () => this.$update()));
+	},
+	function (v) {
+		this.$center = asCoordinate(v);
+		this.$live = null;
+		this.$update();
+	},
+);
 defineField(MapCircle.prototype, 'radius', '$radius', toFloat);
 
 export class MapRectangle extends MapFilledShape {
@@ -7526,25 +7580,19 @@ export class MapItem extends Item {
 		this.$clip = true;
 		this.$plugin = null;
 		this.$center = new Coordinate(0, 0);
+		this.$live = null;
+		this.$ready = false;
 		this.$zoom = 8;
 		this.$minZoom = 0;
 		this.$maxZoom = MAP_MAX_ZOOM;
 		this.$color = MAP_BACKGROUND;
 		this.$copyrights = true;
-		this.$gestureOn = true;
-		this.$gesture = null;
 		this.$tiles = new Map();
 		this.$template = '';
 		this.$tick = 0;
-		this.$drag = null;
-		this.$pointer = null;
 		this.$attribution = null;
 		this.$renderer = null;
 		this.$warned = false;
-	}
-
-	get gesture() {
-		return this.$gesture !== null ? this.$gesture : (this.$gesture = new MapGestureGroup(this));
 	}
 
 	// ----- projection -----
@@ -7584,15 +7632,6 @@ export class MapItem extends Item {
 		return Math.max(this.$minZoom, size > MAP_TILE ? Math.min(Math.log2(size / MAP_TILE), this.$maxZoom) : 0);
 	}
 
-	$zoomAt(zoom, px, py) {
-		const target = clamp(zoom, this.$effectiveMinZoom(), this.$maxZoom);
-		if (target === this.$zoom) return;
-		const anchor = this.$coordinateAt(px, py);
-		this.zoomLevel = target;
-		this.$alignCoordinate(anchor, px, py);
-		this.$drag = null;
-	}
-
 	// ----- children -----
 
 	$arrange() {
@@ -7601,6 +7640,12 @@ export class MapItem extends Item {
 		if (this.$zoom < minZoom) {
 			this.$zoom = minZoom;
 			reportMapChange(this, 'zoomLevel');
+		}
+		// The map is ready once it has a plugin and a size.
+		if (!this.$ready && this.$plugin !== null && this.$aw > 0 && this.$ah > 0) {
+			this.$ready = true;
+			markReaders(this, 'mapReady');
+			reportMapChange(this, 'mapReady');
 		}
 		for (const child of this.$children) {
 			if (child instanceof MapObject) child.$place(this);
@@ -7700,44 +7745,6 @@ export class MapItem extends Item {
 	clearData() {
 		this.$dropTiles();
 		this.$update();
-	}
-
-	// ----- mouse -----
-
-	get $acceptsMouse() {
-		return this.$gestureOn;
-	}
-
-	get $acceptsWheel() {
-		return this.$gestureOn;
-	}
-
-	$mousePressAt(sceneX, sceneY) {
-		const size = this.$world();
-		this.$drag = { x: sceneX, y: sceneY, wx: geoX(this.$center.longitude, size), wy: geoY(this.$center.latitude, size) };
-		this.$pointer = { x: sceneX - this.$sx, y: sceneY - this.$sy };
-	}
-
-	$mouseMoveAt(sceneX, sceneY) {
-		this.$pointer = { x: sceneX - this.$sx, y: sceneY - this.$sy };
-		const drag = this.$drag;
-		if (drag === null || !this.$gestureOn) return;
-		this.center = this.$fromWorld(drag.wx - (sceneX - drag.x), drag.wy - (sceneY - drag.y));
-	}
-
-	$pressChanged(pressed) {
-		if (!pressed) this.$drag = null;
-	}
-
-	$mouseWheel(notches, sceneX, sceneY) {
-		const px = sceneX === undefined ? this.$aw / 2 : sceneX - this.$sx;
-		const py = sceneY === undefined ? this.$ah / 2 : sceneY - this.$sy;
-		this.$zoomAt(this.$zoom + notches * MAP_ZOOM_PER_NOTCH, px, py);
-	}
-
-	$mouseDoubleClicked(button) {
-		if (button !== 0 || !this.$gestureOn || this.$pointer === null) return;
-		this.$zoomAt(this.$zoom + 1, this.$pointer.x, this.$pointer.y);
 	}
 
 	// ----- tiles -----
@@ -7946,7 +7953,15 @@ defineProp(
 	MapItem.prototype,
 	'center',
 	function () {
-		return this.$center;
+		if (this.$live === null) {
+			this.$live = liveCoordinate(this.$center, () => {
+				// The next read returns a new object, so that onCenterChanged sees a change.
+				this.$live = null;
+				this.$update();
+				reportMapChange(this, 'center');
+			});
+		}
+		return this.$live;
 	},
 	function (v) {
 		const c = asCoordinate(v);
@@ -7954,10 +7969,14 @@ defineProp(
 		const next = new Coordinate(clamp(c.latitude, -MAP_MAX_LATITUDE, MAP_MAX_LATITUDE), c.longitude, c.altitude);
 		if (next.latitude === this.$center.latitude && next.longitude === this.$center.longitude) return;
 		this.$center = next;
+		this.$live = null;
 		this.$update();
 		reportMapChange(this, 'center');
 	},
 );
+defineReadOnly(MapItem.prototype, 'mapReady', function () {
+	return this.$ready;
+});
 defineProp(
 	MapItem.prototype,
 	'zoomLevel',
@@ -8012,6 +8031,252 @@ defineProp(
 defineMapColor(MapItem.prototype, 'color', '$color');
 defineField(MapItem.prototype, 'copyrightsVisible', '$copyrights', toBool);
 
+// ----- Pointer handlers (WheelHandler, DragHandler) -----
+
+// What the scene delivers to a handler: the handlers of the items under the pointer, deepest item first.
+export const POINTER_DEVICE = Object.freeze({
+	UnknownDevice: 0,
+	Mouse: 1,
+	TouchScreen: 2,
+	TouchPad: 4,
+	Puck: 8,
+	Stylus: 16,
+	Airbrush: 32,
+	AllDevices: 0x7fffffff,
+});
+const DRAG_THRESHOLD = 10;
+
+// A change of a property that a handler makes itself reports `onXChanged` like a script write.
+function reportHandlerChange(item, name) {
+	noteWrite(item, name);
+	if (hooks.changed !== null && item.$chg !== undefined) hooks.changed(item, name);
+}
+
+function buttonBits(value) {
+	const bits = { NoButton: 0, LeftButton: 1, RightButton: 2, MiddleButton: 4, AllButtons: 7 };
+	if (typeof value === 'string') return value in bits ? bits[value] : 1;
+	return typeof value === 'number' && value !== 0 ? value : 7;
+}
+
+class PointerHandler extends Item {
+	constructor(type) {
+		super();
+		this.$typeName = type;
+		this.$nonVisual = true;
+		this.$targetGiven = false;
+		this.$target = null;
+		this.$acceptedValue = 'LeftButton';
+		this.$buttons = 1;
+	}
+
+	// The item that the handler changes: its parent unless `target` was assigned.
+	get $targetItem() {
+		return this.$targetGiven ? this.$target : this.$parent;
+	}
+
+	$acceptsButton(button) {
+		return (this.$buttons & (button === 2 ? 2 : button === 1 ? 4 : 1)) !== 0;
+	}
+}
+defineProp(
+	PointerHandler.prototype,
+	'target',
+	function () {
+		return this.$targetItem;
+	},
+	function (v) {
+		this.$targetGiven = true;
+		this.$target = v instanceof Item ? v : null;
+	},
+);
+defineProp(
+	PointerHandler.prototype,
+	'acceptedButtons',
+	function () {
+		return this.$acceptedValue;
+	},
+	function (v) {
+		this.$acceptedValue = v;
+		this.$buttons = buttonBits(v);
+	},
+);
+
+// `WheelHandler { property: "zoomLevel"; rotationScale: 1 / 120 }`: the wheel adds angle * rotationScale to the property
+// of the target (one notch is 120).
+export class WheelHandler extends PointerHandler {
+	constructor() {
+		super('WheelHandler');
+		this.$property = '';
+		this.$rotationScale = 1;
+		this.$wheelRotation = 0;
+		this.$orientation = 2;
+		this.$devices = POINTER_DEVICE.AllDevices;
+		this.$declareSignal('wheel', ['event']);
+	}
+
+	// True if the handler took the event.
+	$wheel(notches, x, y, item) {
+		if (!this.$enabled || (this.$devices & 5) === 0) return false;
+		const vertical = this.$orientation !== 1;
+		const angle = notches * 120;
+		const delta = (vertical ? angle : 0) * this.$rotationScale;
+		this.$wheelRotation += delta;
+		reportHandlerChange(this, 'rotation');
+		const target = this.$targetItem;
+		if (this.$property !== '' && target !== null && target !== undefined) {
+			target[this.$property] = Number(target[this.$property]) + delta;
+		}
+		const px = x - item.$sx;
+		const py = y - item.$sy;
+		this.$emit('wheel', [{ x: px, y: py, angleDelta: { x: vertical ? 0 : angle, y: vertical ? angle : 0 }, pixelDelta: { x: 0, y: 0 }, modifiers: 0, inverted: false, accepted: true, position: { x: px, y: py }, scenePosition: { x, y } }]);
+		return true;
+	}
+}
+defineField(WheelHandler.prototype, 'property', '$property', toStr);
+defineField(WheelHandler.prototype, 'rotationScale', '$rotationScale', toFloat);
+defineField(WheelHandler.prototype, 'acceptedDevices', '$devices', (v) => (typeof v === 'number' ? v : 5));
+defineField(WheelHandler.prototype, 'orientation', '$orientation', (v) => (v === 1 || v === 'Horizontal' ? 1 : 2));
+defineReadOnly(WheelHandler.prototype, 'rotation', function () {
+	return this.$wheelRotation;
+});
+
+// An axis of a DragHandler: `xAxis.enabled`, `xAxis.minimum`, `xAxis.maximum`.
+class DragAxis {
+	constructor(owner, name) {
+		this.$owner = owner;
+		this.$name = name;
+		this.$enabled = true;
+		this.$minimum = -Number.MAX_VALUE;
+		this.$maximum = Number.MAX_VALUE;
+	}
+}
+DragAxis.prototype.$group = 'axis';
+for (const [name, field, coerce] of [
+	['enabled', '$enabled', toBool],
+	['minimum', '$minimum', toFloat],
+	['maximum', '$maximum', toFloat],
+]) {
+	defineGroupProp(
+		DragAxis.prototype,
+		'axis',
+		name,
+		function () {
+			return this[field];
+		},
+		function (v) {
+			this[field] = coerce(v);
+		},
+	);
+}
+
+// `DragHandler { target: null; onTranslationChanged: map.pan(-delta.x, -delta.y) }`: a press over the parent that moves
+// by more than the drag threshold starts the drag (and takes it from a MouseArea below). The target, the parent unless
+// it is null, follows the pointer.
+export class DragHandler extends PointerHandler {
+	constructor() {
+		super('DragHandler');
+		this.$threshold = DRAG_THRESHOLD;
+		this.$active = false;
+		this.$pressed = null;
+		this.$item = null;
+		this.$persistent = { x: 0, y: 0 };
+		this.$translation = { x: 0, y: 0 };
+		this.$centroidPoint = { x: 0, y: 0 };
+		this.$start = null;
+		this.$xAxis = new DragAxis(this, 'xAxis');
+		this.$yAxis = new DragAxis(this, 'yAxis');
+		this.$declareSignal('translationChanged', ['delta']);
+		this.$declareSignal('canceled', []);
+	}
+
+	get xAxis() {
+		return this.$xAxis;
+	}
+
+	get yAxis() {
+		return this.$yAxis;
+	}
+
+	$press(x, y, item) {
+		this.$pressed = { x, y };
+		this.$item = item;
+		this.$centroidPoint = { x, y };
+	}
+
+	$setActive(active) {
+		if (this.$active === active) return;
+		this.$active = active;
+		reportHandlerChange(this, 'active');
+	}
+
+	// True when the drag starts with this move.
+	$move(x, y) {
+		if (this.$pressed === null || !this.$enabled) return false;
+		this.$centroidPoint = { x, y };
+		const dx = this.$xAxis.$enabled ? x - this.$pressed.x : 0;
+		const dy = this.$yAxis.$enabled ? y - this.$pressed.y : 0;
+		let started = false;
+		if (!this.$active) {
+			const over = (this.$xAxis.$enabled && Math.abs(dx) >= this.$threshold) || (this.$yAxis.$enabled && Math.abs(dy) >= this.$threshold);
+			if (!over) return false;
+			const target = this.$targetItem;
+			this.$start = target === null || target === undefined ? null : { x: target.$x, y: target.$y };
+			started = true;
+			this.$setActive(true);
+		}
+		const total = { x: this.$persistent.x + dx, y: this.$persistent.y + dy };
+		const delta = { x: total.x - this.$translation.x, y: total.y - this.$translation.y };
+		this.$translation = total;
+		const target = this.$targetItem;
+		if (this.$start !== null && target !== null && target !== undefined) {
+			if (this.$xAxis.$enabled) target.x = clamp(this.$start.x + dx, this.$xAxis.$minimum, this.$xAxis.$maximum);
+			if (this.$yAxis.$enabled) target.y = clamp(this.$start.y + dy, this.$yAxis.$minimum, this.$yAxis.$maximum);
+		}
+		if (delta.x !== 0 || delta.y !== 0) {
+			reportHandlerChange(this, 'translation');
+			this.$emit('translationChanged', [delta]);
+		}
+		return started;
+	}
+
+	// The drag is over (the button was released) or another handler took it.
+	$release(canceled) {
+		this.$pressed = null;
+		if (this.$active) {
+			this.$persistent = { x: this.$translation.x, y: this.$translation.y };
+			this.$start = null;
+			this.$setActive(false);
+			if (canceled) this.$emit('canceled', []);
+		}
+	}
+}
+defineField(DragHandler.prototype, 'dragThreshold', '$threshold', toFloat);
+defineReadOnly(DragHandler.prototype, 'active', function () {
+	return this.$active;
+});
+defineReadOnly(DragHandler.prototype, 'translation', function () {
+	return this.$translation;
+});
+defineReadOnly(DragHandler.prototype, 'activeTranslation', function () {
+	return this.$active && this.$pressed !== null ? { x: this.$translation.x - this.$persistent.x, y: this.$translation.y - this.$persistent.y } : { x: 0, y: 0 };
+});
+defineReadOnly(DragHandler.prototype, 'persistentTranslation', function () {
+	return this.$persistent;
+});
+defineReadOnly(DragHandler.prototype, 'centroid', function () {
+	const item = this.$item === null ? this.$parent : this.$item;
+	const scene = this.$centroidPoint;
+	const press = this.$pressed === null ? scene : this.$pressed;
+	const ox = item === null || item === undefined ? 0 : item.$sx;
+	const oy = item === null || item === undefined ? 0 : item.$sy;
+	return {
+		position: { x: scene.x - ox, y: scene.y - oy },
+		scenePosition: { x: scene.x, y: scene.y },
+		pressPosition: { x: press.x - ox, y: press.y - oy },
+		scenePressPosition: { x: press.x, y: press.y },
+	};
+});
+
 // The rows of a model change without a property being written: a binding that reads them runs on every pass.
 function readsUntracked(type, names) {
 	for (const name of names) {
@@ -8058,6 +8323,8 @@ export const BUILTIN_TYPES = new Map([
 	['ScrollBar', ScrollBar],
 	['FontLoader', FontLoader],
 	['Image', ImageItem],
+	['WheelHandler', WheelHandler],
+	['DragHandler', DragHandler],
 	['Map', MapItem],
 	['Plugin', PluginItem],
 	['PluginParameter', PluginParameter],
