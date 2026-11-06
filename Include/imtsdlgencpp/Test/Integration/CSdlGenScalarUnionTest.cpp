@@ -12,8 +12,8 @@
 #include <QtTest/QTest>
 
 // ImtCore includes
-#include <GeneratedFiles/sdlgentestsdl/SDL/1.0/CPP/ScalarUnion.h>
-#include <GeneratedFiles/sdlgentestsdl/SDL/1.0/CPP/ScalarUnionObjects.h>
+#include <GeneratedFiles/sdlgentestunionsdl/SDL/1.0/CPP/ScalarUnion.h>
+#include <GeneratedFiles/sdlgentestunionsdl/SDL/1.0/CPP/ScalarUnionObjects.h>
 #include <imtbase/CTreeItemModel.h>
 #include <imtgql/CGqlParamObject.h>
 

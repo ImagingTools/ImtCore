@@ -36,14 +36,32 @@ block()
 		VERSION "1.0")
 endblock()
 
+add_dependencies(sdlgentestsdl SdlCodeGenerator)
+
+# The library with the code of 'ScalarUnion.sdl'. Its namespace is 'sdlgentestunion', so the library name must be 'sdlgentestunionsdl'.
+# The same library is used by ImtCoreQmlTest, so the QML part is generated too, if QML is used
+add_library(sdlgentestunionsdl STATIC)
+
 block()
-	set(PROJECT_NAME sdlgentestsdl)
-	ImtCoreCustomConfigureSdlCpp(
-		SCHEMA_PATH "${TEST_DATA_DIR}/ScalarUnion.sdl"
-		VERSION "1.0")
+	set(PROJECT_NAME sdlgentestunionsdl)
+	if (USE_QTQML)
+		ImtCoreCustomConfigureSdlCppQml(CXX QML
+			SCHEMA_PATH "${TEST_DATA_DIR}/ScalarUnion.sdl"
+			VERSION "1.0")
+	else()
+		ImtCoreCustomConfigureSdlCpp(
+			SCHEMA_PATH "${TEST_DATA_DIR}/ScalarUnion.sdl"
+			VERSION "1.0")
+	endif()
 endblock()
 
-add_dependencies(sdlgentestsdl SdlCodeGenerator)
+add_dependencies(sdlgentestunionsdl SdlCodeGenerator)
+
+target_link_libraries(sdlgentestunionsdl PUBLIC
+	imtbase
+	imtgql
+	imtservergql
+)
 
 # The library with the code, generated WITHOUT the QObject based classes ('<Schema>Objects' files, see NO_OBJECTS).
 # The schemas of the library import each other, so all of them are generated without the objects
@@ -79,6 +97,7 @@ target_link_libraries(sdlgentestsdl PUBLIC
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
 	sdlgentestsdl
+	sdlgentestunionsdl
 	sdlgentestnoobjectssdl
 	imtbase
 	imtgql
