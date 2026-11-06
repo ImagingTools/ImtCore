@@ -87,6 +87,7 @@ private:
 		QByteArray tokenId;
 		QByteArrayList scopes;
 		bool isPat = false;
+		QByteArray patProductId;
 		qint64 expiresAt = 0;
 
 		// Organization data of the token, resolved lazily (see TryGetCachedTenantData /
@@ -118,6 +119,7 @@ private:
 		TryAwaitOrClaimTokenResolution() so cache-check and claim-check happen
 		under one continuous critical section.
 	*/
+	bool GetCachedPatProductId(const QByteArray& token, QByteArray& productId) const;
 	bool TryReadCachedTokenLocked(
 				const QByteArray& token,
 				QByteArray& userId,
@@ -158,7 +160,8 @@ private:
 				const QByteArray& tokenId,
 				const QByteArrayList& scopes,
 				bool isPat,
-				qint64 jwtExpSecs = 0) const;
+				qint64 jwtExpSecs = 0,
+				const QByteArray& patProductId = QByteArray()) const;
 	void StoreExpiredToken(const QByteArray& token) const;
 	void InvalidateTokenCache(const QByteArray& token) const;
 	void InvalidateSessionTokenCache(const QByteArray& sessionId) const;

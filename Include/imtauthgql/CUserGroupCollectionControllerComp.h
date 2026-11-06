@@ -68,6 +68,7 @@ protected:
 				istd::IChangeable& object,
 				QString& errorMessage) const override;
 	virtual istd::IChangeableUniquePtr CreateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& errorMessage) const override;
+	virtual bool CheckObjectData(const imtgql::CGqlRequest& gqlRequest, const QByteArray& objectId, const istd::IChangeable& object, QString& errorMessage) const override;
 
 	// reimplemented (imtservergql::CPermissibleGqlRequestHandlerComp)
 	virtual bool CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
@@ -81,6 +82,10 @@ protected:
 	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);
 
 private:
+	/**
+		Check the roles a group gets and, as its members hold them too, the users it gets.
+	*/
+	bool CheckGroupGrants(const imtgql::CGqlRequest& gqlRequest, const imtauth::IUserGroupInfo* previousPtr, const imtauth::IUserGroupInfo& group, QString& errorMessage) const;
 	bool ValidateGroupForTenant(const imtgql::CGqlRequest& gqlRequest, const imtauth::IUserGroupInfo& userGroup, const QByteArray& objectId, QString& errorMessage) const;
 };
 

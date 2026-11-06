@@ -9,6 +9,7 @@
 #include <imtauth/CRole.h>
 #include <imtauth/imtauth.h>
 #include <imtauthgql/CAssignmentCollector.h>
+#include <imtauthgql/imtauthgql.h>
 
 // Generated includes
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/RoleCollectionDocumentService.h>
@@ -50,6 +51,11 @@ sdl::V1_0::imtauth::CRoleData CRoleCollectionDocumentServiceComp::OnGetRoleRepre
 	const imtauth::CIdentifiableRoleInfo* rolePtr = dynamic_cast<const imtauth::CIdentifiableRoleInfo*>(documentPtr.GetPtr());
 	if (rolePtr == nullptr){
 		errorMessage = QStringLiteral("Invalid document type");
+		return sdl::V1_0::imtauth::CRoleData();
+	}
+
+	// A new document has no product yet
+	if (!rolePtr->GetProductId().isEmpty() && !CheckAdministeredProduct(gqlRequest.GetRequestContext(), rolePtr->GetProductId(), errorMessage)){
 		return sdl::V1_0::imtauth::CRoleData();
 	}
 
@@ -104,6 +110,12 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CRoleCollectionDocumentServiceComp:
 		return response;
 	}
 
+	if (!rolePtr->GetProductId().isEmpty() && !CheckAdministeredProduct(gqlRequest.GetRequestContext(), rolePtr->GetProductId(), errorMessage)){
+		return response;
+	}
+
+	const QByteArrayList previousPermissions = rolePtr->GetPermissions();
+
 	sdl::V1_0::imtauth::CRoleData roleData;
 	if (arguments.input->role){
 		roleData = *arguments.input->role;
@@ -123,6 +135,13 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CRoleCollectionDocumentServiceComp:
 		rolePtr->SetRoleId(*roleData.roleId);
 	}
 	if (roleData.productId){
+		if (!rolePtr->GetProductId().isEmpty() && rolePtr->GetProductId() != *roleData.productId){
+			errorMessage = QStringLiteral("The product of a role cannot be changed");
+			return response;
+		}
+		if (!CheckAdministeredProduct(gqlRequest.GetRequestContext(), *roleData.productId, errorMessage)){
+			return response;
+		}
 		rolePtr->SetProductId(*roleData.productId);
 	}
 	if (roleData.isDefault){
@@ -157,6 +176,11 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CRoleCollectionDocumentServiceComp:
 
 	if (roleData.permissions){
 		rolePtr->SetLocalPermissions(CAssignmentCollector::GetDirectIds(roleData.permissions));
+	}
+
+	if (!CheckAdministeredProduct(gqlRequest.GetRequestContext(), rolePtr->GetProductId(), errorMessage)
+				|| !CheckGrantedPermissions(gqlRequest.GetRequestContext(), previousPermissions, rolePtr->GetPermissions(), errorMessage)){
+		return response;
 	}
 
 	m_documentManagerCompPtr->SetDocumentData(userLogin, documentId, *documentPtr);

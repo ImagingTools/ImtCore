@@ -188,6 +188,12 @@ inline QByteArrayList RestrictPermissions(const QByteArrayList& permissions, con
 
 
 /**
+	ID of the filter parameter (iprm::IIdParam) that selects the roles of one product.
+*/
+static const inline QByteArray s_roleProductFilterId = QByteArrayLiteral("RoleProductFilter");
+
+
+/**
 	Permission to create an organization.
 */
 static const inline QByteArray s_addOrganizationPermission = QByteArrayLiteral("/OrganizationManagement/Add");

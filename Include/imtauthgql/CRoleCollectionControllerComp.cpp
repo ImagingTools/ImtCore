@@ -387,6 +387,37 @@ bool CRoleCollectionControllerComp::CreateRepresentationFromObject(
 
 void CRoleCollectionControllerComp::SetAdditionalFilters(
 			const imtgql::CGqlRequest& gqlRequest,
+			const imtgql::CGqlParamObject& /*viewParamsGql*/,
+			iprm::CParamsSet* filterParamsPtr) const
+{
+	if (filterParamsPtr == nullptr){
+		return;
+	}
+
+	// Only a superuser may look at the roles of another product or of all products
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	const imtauth::IUserInfo* userInfoPtr = gqlContextPtr != nullptr ? gqlContextPtr->GetUserInfo() : nullptr;
+	const bool isBound = userInfoPtr != nullptr && !userInfoPtr->IsAdmin();
+	const QByteArray productId = isBound ? gqlContextPtr->GetProductId() : GetInputArgumentFromRequest(gqlRequest, "productId").toByteArray();
+	if (productId.isEmpty() && !isBound){
+		return;
+	}
+
+	istd::TDelPtr<iprm::CIdParam> productFilterPtr(new iprm::CIdParam());
+	productFilterPtr->SetId(productId);
+	filterParamsPtr->SetEditableParameter(imtauth::s_roleProductFilterId, productFilterPtr.PopPtr(), true);
+}
+
+
+bool CRoleCollectionControllerComp::OnBeforeRemoveElements(const QByteArrayList& elementIds, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+{
+	return CheckObjectAccess(gqlRequest, elementIds, imtauth::IDocumentShareInfo::DAL_OWNER, errorMessage)
+				&& BaseClass::OnBeforeRemoveElements(elementIds, gqlRequest, errorMessage);
+}
+
+
+void CRoleCollectionControllerComp::SetAdditionalFilters(
+			const imtgql::CGqlRequest& gqlRequest,
 			imtbase::CComplexCollectionFilter& complexFilter) const
 {
 	QByteArray productId = GetInputArgumentFromRequest(gqlRequest, "productId").toByteArray();
@@ -405,6 +436,10 @@ void CRoleCollectionControllerComp::SetAdditionalFilters(
 
 bool CRoleCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
+	if (!CheckAdministeredProducts(gqlRequest, errorMessage)){
+		return false;
+	}
+
 	QByteArray commandId = gqlRequest.GetCommandId();
 
 	// A role the user holds in the current tenant, delegated ones included, is always readable.
@@ -473,13 +508,30 @@ bool CRoleCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 		return false;
 	}
 
+	const QByteArrayList previousPermissions = roleInfoPtr->GetPermissions();
+
 	QByteArrayList includedRole = roleInfoPtr->GetIncludedRoles();
 	for (const QByteArray& roleId : includedRole){
 		roleInfoPtr->ExcludeRole(roleId);
 	}
 
+	const QByteArray storedProductId = roleInfoPtr->GetProductId();
+
 	QByteArray objectId = roleInfoPtr->GetObjectUuid();
 	if (!FillObjectFromRepresentation(roleDataRepresentation, object, objectId, errorMessage)){
+		return false;
+	}
+
+	if (roleInfoPtr->GetProductId().isEmpty()){
+		roleInfoPtr->SetProductId(storedProductId);
+	}
+	else if (roleInfoPtr->GetProductId() != storedProductId){
+		errorMessage = QStringLiteral("The product of a role cannot be changed");
+
+		return false;
+	}
+
+	if (!CheckGrantedPermissions(rawGqlRequest.GetRequestContext(), previousPermissions, roleInfoPtr->GetPermissions(), errorMessage)){
 		return false;
 	}
 
@@ -502,7 +554,86 @@ istd::IChangeableUniquePtr CRoleCollectionControllerComp::CreateObjectFromReques
 		return nullptr;
 	}
 
+	if (!CheckAdministeredProduct(gqlRequest.GetRequestContext(), roleInfoPtr->GetProductId(), errorMessage)
+				|| !CheckGrantedPermissions(gqlRequest.GetRequestContext(), QByteArrayList(), roleInfoPtr->GetPermissions(), errorMessage)){
+		return nullptr;
+	}
+
 	return objectPtr;
+}
+
+
+bool CRoleCollectionControllerComp::CheckObjectData(const imtgql::CGqlRequest& gqlRequest, const QByteArray& objectId, const istd::IChangeable& object, QString& errorMessage) const
+{
+	const imtauth::IRole* roleInfoPtr = dynamic_cast<const imtauth::IRole*>(&object);
+	if (roleInfoPtr == nullptr){
+		errorMessage = QStringLiteral("Invalid role data");
+
+		return false;
+	}
+
+	if (!CheckAdministeredProduct(gqlRequest.GetRequestContext(), roleInfoPtr->GetProductId(), errorMessage)){
+		return false;
+	}
+
+	QByteArrayList previousPermissions;
+	bool wasGuest = false;
+	bool wasDefault = false;
+	imtbase::IObjectCollection::DataPtr storedDataPtr;
+	if (!objectId.isEmpty() && m_objectCollectionCompPtr->GetObjectData(objectId, storedDataPtr)){
+		const imtauth::IRole* storedRolePtr = dynamic_cast<const imtauth::IRole*>(storedDataPtr.GetPtr());
+		if (storedRolePtr == nullptr || storedRolePtr->GetProductId() != roleInfoPtr->GetProductId()){
+			errorMessage = QStringLiteral("The product of a role cannot be changed");
+
+			return false;
+		}
+		previousPermissions = storedRolePtr->GetPermissions();
+		wasGuest = storedRolePtr->IsGuest();
+		wasDefault = storedRolePtr->IsDefault();
+	}
+
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	const imtauth::IUserInfo* userInfoPtr = gqlContextPtr != nullptr ? gqlContextPtr->GetUserInfo() : nullptr;
+	if ((userInfoPtr == nullptr || !userInfoPtr->IsAdmin()) && (roleInfoPtr->IsGuest() != wasGuest || roleInfoPtr->IsDefault() != wasDefault)){
+		errorMessage = QStringLiteral("Only the admin can change the default/guest role");
+
+		return false;
+	}
+
+	return CheckGrantedPermissions(gqlContextPtr, previousPermissions, roleInfoPtr->GetPermissions(), errorMessage)
+				&& ValidateRoleForTenant(gqlRequest, *roleInfoPtr, objectId, errorMessage);
+}
+
+
+bool CRoleCollectionControllerComp::CheckObjectAccess(
+			const imtgql::CGqlRequest& gqlRequest,
+			const QByteArrayList& objectIds,
+			imtauth::IDocumentShareInfo::AccessLevel accessLevel,
+			QString& errorMessage) const
+{
+	if (!BaseClass::CheckObjectAccess(gqlRequest, objectIds, accessLevel, errorMessage)){
+		return false;
+	}
+
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	const imtauth::IUserInfo* userInfoPtr = gqlContextPtr != nullptr ? gqlContextPtr->GetUserInfo() : nullptr;
+	if (userInfoPtr == nullptr || userInfoPtr->IsAdmin()){
+		return true;
+	}
+
+	for (const QByteArray& objectId : objectIds){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		const imtauth::IRole* roleInfoPtr = m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr) ? dynamic_cast<const imtauth::IRole*>(dataPtr.GetPtr()) : nullptr;
+		QString productErrorMessage;
+		if (roleInfoPtr == nullptr || !CheckAdministeredProduct(gqlContextPtr, roleInfoPtr->GetProductId(), productErrorMessage)){
+			// The objects of other products are reported as missing, like those of other organizations
+			errorMessage = QStringLiteral("Object does not exist");
+
+			return false;
+		}
+	}
+
+	return true;
 }
 
 
@@ -538,7 +669,11 @@ bool CRoleCollectionControllerComp::ValidateRoleForTenant(
 		return false;
 	}
 
-	return imtauth::CRoleDocumentValidatorComp::CheckParentRolesInTenant(*m_objectCollectionCompPtr, role.GetIncludedRoles(), tenantId, errorMessage);
+	if (!imtauth::CRoleDocumentValidatorComp::CheckParentRolesInTenant(*m_objectCollectionCompPtr, role.GetIncludedRoles(), tenantId, errorMessage)){
+		return false;
+	}
+
+	return imtauth::CRoleDocumentValidatorComp::CheckParentRolesInProduct(*m_objectCollectionCompPtr, role.GetIncludedRoles(), role.GetProductId(), errorMessage);
 }
 
 
