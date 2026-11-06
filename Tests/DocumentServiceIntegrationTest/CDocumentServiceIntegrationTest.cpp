@@ -29,6 +29,16 @@ const QByteArray UNDO_REDO_CHANGED_EVENT = QByteArrayLiteral("DocumentUndoRedoCh
 
 const int WAIT_TIMEOUT = 5000;
 
+
+class CUnrelatedDocument: public istd::IChangeable
+{
+public:
+	int GetValue() const
+	{
+		return 1;
+	}
+};
+
 }
 
 
@@ -731,6 +741,51 @@ void CDocumentServiceIntegrationTest::ExecuteDocumentConstMethodWithResultTest()
 	const imtdoc::CDocumentMethod method(&iprm::ITextParam::GetText, text);
 	QCOMPARE(m_servicePtr->ExecuteDocumentMethod(TEST_USER_ID, docId, method), imtdoc::IDocumentService::OS_OK);
 	QCOMPARE(text, QStringLiteral("first"));
+}
+
+
+void CDocumentServiceIntegrationTest::HandleDocumentTest()
+{
+	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
+	QVERIFY(!docId.isEmpty());
+
+	idoc::IUndoManager* undoManagerPtr = nullptr;
+	QCOMPARE(m_servicePtr->GetDocumentUndoManager(TEST_USER_ID, docId, undoManagerPtr), imtdoc::IDocumentService::OS_OK);
+	QVERIFY(undoManagerPtr != nullptr);
+
+	auto setResult = m_servicePtr->HandleDocument(TEST_USER_ID, docId, &iprm::ITextParam::SetText, QStringLiteral("first"));
+	QCOMPARE(setResult.status, imtdoc::IDocumentService::OS_OK);
+	QVERIFY(setResult.value.has_value());
+	QCOMPARE(undoManagerPtr->GetAvailableUndoSteps(), 1);
+
+	auto getResult = m_servicePtr->HandleDocument(TEST_USER_ID, docId, &iprm::ITextParam::GetText);
+	QCOMPARE(getResult.status, imtdoc::IDocumentService::OS_OK);
+	QVERIFY(getResult.value.has_value());
+	QCOMPARE(*getResult.value, QStringLiteral("first"));
+
+	auto resetResult = m_servicePtr->HandleDocument(TEST_USER_ID, docId, &istd::IChangeable::ResetData, istd::IChangeable::CM_WITHOUT_REFS);
+	QCOMPARE(resetResult.status, imtdoc::IDocumentService::OS_OK);
+	QVERIFY(resetResult.value.has_value());
+	QVERIFY(*resetResult.value);
+	QCOMPARE(GetDocumentText(*m_servicePtr, TEST_USER_ID, docId), QString());
+}
+
+
+void CDocumentServiceIntegrationTest::HandleDocumentInvalidParamsTest()
+{
+	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_TYPE_ID);
+	QVERIFY(!docId.isEmpty());
+
+	QCOMPARE(
+				m_servicePtr->HandleDocument(QByteArrayLiteral("invalidUser"), docId, &iprm::ITextParam::GetText).status,
+				imtdoc::IDocumentService::OS_INVALID_USER_ID);
+	QCOMPARE(
+				m_servicePtr->HandleDocument(TEST_USER_ID, QByteArrayLiteral("invalidDocId"), &iprm::ITextParam::GetText).status,
+				imtdoc::IDocumentService::OS_INVALID_DOCUMENT_ID);
+
+	auto wrongTypeResult = m_servicePtr->HandleDocument(TEST_USER_ID, docId, &CUnrelatedDocument::GetValue);
+	QCOMPARE(wrongTypeResult.status, imtdoc::IDocumentService::OS_FAILED);
+	QVERIFY(!wrongTypeResult.value.has_value());
 }
 
 

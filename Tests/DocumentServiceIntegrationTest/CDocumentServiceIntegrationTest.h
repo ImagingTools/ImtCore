@@ -99,6 +99,8 @@ private slots:
 	void UndoRedoExecuteDocumentMethodTest();
 	void ExecuteDocumentMethodWithResultTest();
 	void ExecuteDocumentConstMethodWithResultTest();
+	void HandleDocumentTest();
+	void HandleDocumentInvalidParamsTest();
 	void UndoRedoChangedEventFiredTest();
 	void UndoRedoNewDocumentStaysDirtyTest();
 	void UndoRedoDocumentsIsolationTest();

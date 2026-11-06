@@ -114,6 +114,9 @@ public:
 protected:
 	struct WorkingDocument;
 
+	// reimplemented (imtdoc::IDocumentService)
+	virtual OperationStatus AccessDocument(const QByteArray& userId, const QByteArray& documentId, IDocumentAccessor& accessor) override;
+
 	// Protected virtual methods for task dispatch — override in
 	// subclasses to provide task-type-specific behaviour.
 	// Each method must call \c CompleteTask exactly once (synchronously
