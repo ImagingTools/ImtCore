@@ -3396,11 +3396,13 @@ export class ListView extends Item {
 				item.$aw = ext;
 				item.$ah = this.$ah;
 			} else {
-				item.$x = 0;
+				// A list that is wider than its view (a table with `contentWidth`) moves its rows with `contentX`; a row is as wide
+				// as it says, the view's width if it does not say.
+				item.$x = -this.$contentX;
 				item.$y = cursor - offset;
 				item.$ax = item.$x;
 				item.$ay = item.$y;
-				item.$aw = this.$aw;
+				item.$aw = item.$w > 0 ? item.$w : this.$aw;
 				item.$ah = ext;
 			}
 			cursor += ext + spacing;
