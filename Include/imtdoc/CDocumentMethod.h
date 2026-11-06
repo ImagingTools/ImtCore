@@ -147,7 +147,7 @@ private:
 	}
 
 private:
-	std::function<bool(istd::IChangeable&)> m_invoke;
+	Invoker m_invoke;
 };
 
 
