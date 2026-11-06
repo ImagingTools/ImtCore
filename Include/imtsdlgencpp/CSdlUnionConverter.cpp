@@ -580,10 +580,12 @@ void CSdlUnionConverter::WriteUnionConversionFromData(
 {
 	bool isFirstIteration = true;
 	QList<QPair<QString, QString>> scalarTypes;
+	QStringList enumTypes;
 	for (const auto& sdlType : sdlUnion.GetTypes()){
 		imtsdl::CSdlField field;
 		field.SetType(sdlType);
 		bool isCustom = false;
+		bool isEnum = false;
 		QString convertedType = imtsdlgencpp::CSdlGenTools::OptListConvertTypeWithNamespaceStruct(
 			field,
 			relatedNamespace,
@@ -594,9 +596,15 @@ void CSdlUnionConverter::WriteUnionConversionFromData(
 			&isCustom,
 			nullptr,
 			nullptr,
-			nullptr,
+			&isEnum,
 			nullptr,
 			false);
+
+		if (isEnum){
+			enumTypes << convertedType;
+
+			continue;
+		}
 
 		// scalar alternatives are checked after the custom ones in the special order
 		if (!isCustom){
@@ -689,7 +697,14 @@ void CSdlUnionConverter::WriteUnionConversionFromData(
 			QString readVariable = QStringLiteral("is") + imtsdl::CSdlTools::GetCapitalizedValue(targetName) + QStringLiteral("Read");
 			FeedStreamHorizontally(stream, hIndents + 1);
 			stream << QStringLiteral("const bool ") << readVariable << QStringLiteral(" = ");
-			stream << tempVar << QStringLiteral(".ReadFromGraphQlObject(*") << arraySourceVariableName << QStringLiteral(");");
+			stream << tempVar << QStringLiteral(".ReadFromGraphQlObject(*");
+			if (conversionType == CT_GQL_SCALAR){
+				stream << QStringLiteral("gqlObject.GetParamArgumentObjectPtr(\"") << targetVariableName << QStringLiteral("\")");
+			}
+			else{
+				stream << arraySourceVariableName;
+			}
+			stream << QStringLiteral(");");
 			FeedStream(stream, 1, false);
 
 			FeedStreamHorizontally(stream, hIndents + 1);
@@ -723,6 +738,28 @@ void CSdlUnionConverter::WriteUnionConversionFromData(
 	if (conversionType == CT_GQL_ARRAY){
 		variantExpression += QStringLiteral("->GetParamArgumentValue(\"\")");
 	}
+	for (const QString& enumType : std::as_const(enumTypes)){
+		const QString enumValue = QStringLiteral("QMetaEnum::fromType<") + enumType + QStringLiteral(">().keyToValue(") + variantExpression + QStringLiteral(".toString().toUtf8())");
+
+		FeedStreamHorizontally(stream, hIndents);
+		if (!isFirstIteration){
+			stream << QStringLiteral("else ");
+		}
+		stream << QStringLiteral("if ((") << variantExpression << QStringLiteral(".userType() == QMetaType::QString || ")
+			<< variantExpression << QStringLiteral(".userType() == QMetaType::QByteArray) && ") << enumValue << QStringLiteral(" > -1){");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << targetVariableName << QStringLiteral(" = ") << sdlUnion.GetName() << QStringLiteral("(static_cast<") << enumType << QStringLiteral(">(") << enumValue << QStringLiteral("));");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, hIndents);
+		stream << QStringLiteral("}");
+		FeedStream(stream, 1, false);
+
+		isFirstIteration = false;
+	}
+
 	const bool isJsonSource = conversionType == CT_JSON_SCALAR || conversionType == CT_JSON_ARRAY;
 	const QList<QPair<QString, QString>> scalarMatches = GetScalarUnionMatchConditions(scalarTypes, variantExpression, isJsonSource);
 	for (const QPair<QString, QString>& scalarMatch : scalarMatches){
