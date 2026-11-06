@@ -11,7 +11,7 @@
 import { spawn } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { appendFile, readFile, readdir, stat } from 'node:fs/promises';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, isAbsolute, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Engine } from '../../src/engine.js';
 import { Project } from '../../src/project.js';
@@ -37,7 +37,7 @@ class DirFS {
 
 	async readText(path) {
 		try {
-			return await readFile(join(this.dir, path), 'utf8');
+			return await readFile(isAbsolute(path) ? path : join(this.dir, path), 'utf8');
 		} catch {
 			return null;
 		}
@@ -45,7 +45,7 @@ class DirFS {
 
 	async readBytes(path) {
 		try {
-			const data = await readFile(join(this.dir, path));
+			const data = await readFile(isAbsolute(path) ? path : join(this.dir, path));
 			return data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
 		} catch {
 			return null;
@@ -178,7 +178,9 @@ async function runWeb(testDir, importDirs) {
 	engine.lenient = true;
 
 	try {
-	const project = new Project(new DirFS(testDir), { importPaths: importDirs.map((dir) => resolve(testDir, dir)) });
+	// `qml -I a -I b` puts every folder in front of the import paths: the last one is searched first.
+	const importPaths = importDirs.map((dir) => resolve(testDir, dir)).reverse();
+	const project = new Project(new DirFS(testDir), { importPaths });
 	await project.load('Main.qml');
 
 	engine.reset();

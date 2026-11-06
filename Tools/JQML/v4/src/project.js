@@ -99,13 +99,36 @@ const FONT_FILE_RE = /(["'])([^"'\n]+\.(?:ttf|otf|woff2?))\1/gi;
 const QML_FILE_RE = /(["'])([\w./-]+\.qml)\1/g;
 
 // `Type 1.0 path/File.qml` lines of a qmldir file; singletons, internal types and other directives are ignored.
-const QMLDIR_TYPE_RE = /^(singleton\s+)?([A-Z]\w*)\s+\d+(?:\.\d+)?\s+(\S+\.(?:qml|js))\s*$/;
+const QMLDIR_TYPE_RE = /^(singleton\s+)?([A-Z]\w*)\s+(\d+)(?:\.(\d+))?\s+(\S+\.(?:qml|js))\s*$/;
+
+// The newest of the declarations `{ major, minor, path }` of a name; the first one among equal versions.
+function newest(entries) {
+	let best = entries[0];
+	for (const entry of entries) {
+		if (entry.major > best.major || (entry.major === best.major && entry.minor > best.minor)) best = entry;
+	}
+	return best;
+}
+
+// The declaration that an import of `version` ({ major, minor } or null for the latest) gets: the newest one of its
+// major version that is not above it. An import that nothing fits gets the newest, which is more than Qt gives.
+function pickVersion(entries, version) {
+	if (entries === undefined || entries.length === 0) return undefined;
+	if (version !== null && version !== undefined) {
+		const fitting = entries.filter((entry) => entry.major === version.major && entry.minor <= version.minor);
+		if (fitting.length > 0) return newest(fitting);
+	}
+	return newest(entries);
+}
 
 export class Project {
 	// options.importPaths: folders searched for `<Module>/qmldir` to resolve `import Module 1.0`.
 	// options.modules: module name -> directory (or array of directories) whose qmldir files declare the module;
 	// checked before importPaths. Several directories may declare the same module (the compiler config lists
-	// `imtcontrols` and `imtcontrols/Popup/Internal` separately), their types are merged, the first one wins.
+	// `imtcontrols` and `imtcontrols/Popup/Internal` separately), their types are merged. A type or a singleton that
+	// several of them declare comes from the last directory: the config lists the directories of its includes first, so
+	// the application overrides a library, like in the JQML v3 compiler (the `Style` of an application replaces the
+	// one of the library).
 	constructor(fs, options = {}) {
 		this.fs = fs;
 		this.importPaths = options.importPaths || [];
@@ -113,7 +136,10 @@ export class Project {
 		for (const [name, dirs] of Object.entries(options.modules || {})) {
 			this.moduleDirs.set(name, Array.isArray(dirs) ? dirs : [dirs]);
 		}
-		this.modules = new Map(); // module name -> Map(type name -> path), null if not found
+		this.modules = new Map(); // module name -> Map(type name -> path of the newest version), null if not found
+		this.moduleTypeVersions = new Map(); // module name -> Map(type name -> [{ major, minor, path }])
+		this.moduleSingletons = new Map(); // module name -> Map(singleton name -> [{ major, minor, path }])
+		this.dirSingletons = new Map(); // directory -> Map(singleton name -> path) of its qmldir
 		this.moduleLoads = new Map(); // module name -> Promise
 		this.pending = []; // promises of singleton documents still being discovered
 		this.singletons = new Map(); // singleton name -> path (of all loaded modules)
@@ -123,7 +149,8 @@ export class Project {
 		this.scripts = new Map(); // path -> source
 		this.fontFamilies = new Map(); // path -> family name ('' if it could not be loaded)
 		this.missing = new Set();
-		this.directoryLoads = new Set();
+		this.directoryLoads = new Map(); // directory -> Promise of the read of its qmldir
+		this.directoryGlobal = new Set(); // directories whose singletons are global names
 	}
 
 	// Loads the main document and everything it refers to. Throws a QmlError if the main file is
@@ -204,11 +231,16 @@ export class Project {
 		const explicit = this.moduleDirs.get(name);
 		if (explicit !== undefined) {
 			const types = new Map();
-			for (const dir of explicit) {
+			const versions = new Map();
+			const singletons = new Map();
+			// The first declaration is kept, so the last directory goes first.
+			for (const dir of [...explicit].reverse()) {
 				const source = await this.fs.readText(joinPath(dir, 'qmldir'));
-				if (source !== null) this.readQmldir(dir, source, types);
+				if (source !== null) this.readQmldir(dir, source, types, versions, singletons);
 			}
 			this.modules.set(name, types);
+			this.moduleTypeVersions.set(name, versions);
+			this.moduleSingletons.set(name, singletons);
 			return;
 		}
 		for (const base of this.importPaths) {
@@ -216,19 +248,26 @@ export class Project {
 			const source = await this.fs.readText(joinPath(dir, 'qmldir'));
 			if (source === null) continue;
 			const types = new Map();
-			this.readQmldir(dir, source, types);
+			const versions = new Map();
+			const singletons = new Map();
+			this.readQmldir(dir, source, types, versions, singletons);
 			this.modules.set(name, types);
+			this.moduleTypeVersions.set(name, versions);
+			this.moduleSingletons.set(name, singletons);
 			return;
 		}
 	}
 
-	// Registers the types, singletons and JavaScript files of one qmldir in `types`.
-	readQmldir(dir, source, types) {
-		const singletons = [];
+	// Registers the types, singletons and JavaScript files of one qmldir: `types` get the newest version of a type,
+	// `versions` and `singletonVersions` all of them. What an earlier call declared wins over a later one.
+	readQmldir(dir, source, types, versions = new Map(), singletonVersions = new Map()) {
+		const singletonPaths = [];
+		const local = new Map();
+		const localSingletons = new Map();
 		for (const line of source.split(/\r?\n/)) {
 			const match = QMLDIR_TYPE_RE.exec(line.trim());
 			if (match === null) continue;
-			const path = joinPath(dir, match[3]);
+			const path = joinPath(dir, match[5]);
 			if (path.endsWith('.js')) {
 				if (!this.jsModules.has(match[2])) {
 					this.jsModules.set(match[2], path);
@@ -236,17 +275,28 @@ export class Project {
 				}
 				continue;
 			}
+			const entry = { major: Number(match[3]), minor: Number(match[4] || 0), path };
+			const target = match[1] ? singletonVersions : versions;
+			if (!target.has(match[2])) target.set(match[2], []);
+			target.get(match[2]).push(entry);
 			if (match[1]) {
-				if (!this.singletons.has(match[2])) {
-					this.singletons.set(match[2], path);
-					singletons.push(path);
-				}
-			} else if (!types.has(match[2])) {
-				types.set(match[2], path);
+				singletonPaths.push(path);
+				if (!localSingletons.has(match[2])) localSingletons.set(match[2], []);
+				localSingletons.get(match[2]).push(entry);
+			} else {
+				if (!local.has(match[2])) local.set(match[2], []);
+				local.get(match[2]).push(entry);
 			}
 		}
+		for (const [name, entries] of local) {
+			if (!types.has(name)) types.set(name, newest(entries).path);
+		}
+		// The global name of a singleton is its newest version.
+		for (const [name, entries] of localSingletons) {
+			if (!this.singletons.has(name)) this.singletons.set(name, newest(entries).path);
+		}
 		// Singleton documents are discovered later by load() (they may import this very module).
-		for (const path of singletons) this.pending.push(this.addSingleton(path));
+		for (const path of singletonPaths) this.pending.push(this.addSingleton(path));
 	}
 
 	async addSingleton(path) {
@@ -255,29 +305,43 @@ export class Project {
 		if (doc !== null) await this.discover(doc);
 	}
 
-	// `import "Internal"`: the `singleton` and JavaScript lines of the qmldir of an imported directory (an aliased
-	// import only contributes its JavaScript files).
-	async addDirectorySingletons(dir, jsOnly = false) {
-		const key = jsOnly ? `${dir}#js` : dir;
-		if (this.directoryLoads.has(key)) return;
-		this.directoryLoads.add(key);
+	// `import "Internal"`: the `singleton` and JavaScript lines of the qmldir of an imported directory. The singletons
+	// are global names, except those of a directory that is imported with an alias (`Alias.Name`).
+	async addDirectorySingletons(dir, aliased = false) {
+		let loading = this.directoryLoads.get(dir);
+		if (loading === undefined) {
+			loading = this.readDirectory(dir);
+			this.directoryLoads.set(dir, loading);
+		}
+		await loading;
+		const singletons = this.dirSingletons.get(dir);
+		if (aliased || singletons === undefined || this.directoryGlobal.has(dir)) return;
+		this.directoryGlobal.add(dir);
+		for (const [name, path] of singletons) {
+			if (!this.singletons.has(name)) this.singletons.set(name, path);
+		}
+	}
+
+	async readDirectory(dir) {
 		const source = await this.fs.readText(joinPath(dir, 'qmldir'));
 		if (source === null) return;
+		const singletons = new Map();
 		for (const line of source.split(/\r?\n/)) {
 			const match = QMLDIR_TYPE_RE.exec(line.trim());
 			if (match === null) continue;
-			const path = joinPath(dir, match[3]);
-			if (match[3].endsWith('.js')) {
+			const path = joinPath(dir, match[5]);
+			if (match[5].endsWith('.js')) {
 				if (!this.jsModules.has(match[2])) {
 					this.jsModules.set(match[2], path);
 					this.pending.push(this.addScript(path));
 				}
 				continue;
 			}
-			if (jsOnly || !match[1] || this.singletons.has(match[2])) continue;
-			this.singletons.set(match[2], path);
+			if (!match[1] || singletons.has(match[2])) continue;
+			singletons.set(match[2], path);
 			this.pending.push(this.addSingleton(path));
 		}
+		this.dirSingletons.set(dir, singletons);
 	}
 
 	async discover(doc) {
@@ -389,40 +453,59 @@ export class Project {
 		if (resolved !== path) this.fontFamilies.set(resolved, family);
 	}
 
-	// Paths where a component type used in `fromFile` can be: `Name` in the directory of the file and
-	// in imported directories without alias, `Alias.Name` in the directory imported as Alias.
+	// The imports of a document that are modules or directories, in the order of the file.
+	fileImports(doc) {
+		if (doc.imports !== undefined) return doc.imports;
+		const list = [];
+		if (doc.def) {
+			for (const imp of doc.def.imports) {
+				if (!imp.path.endsWith('.js')) list.push({ kind: 'directory', path: imp.path, alias: imp.alias, version: null, line: imp.line });
+			}
+			for (const m of doc.def.modules) list.push({ kind: 'module', name: m.name, alias: m.alias, version: m.version === undefined ? null : m.version, line: m.line });
+			list.sort((a, b) => a.line - b.line);
+		}
+		doc.imports = list;
+		return list;
+	}
+
+	// The path of a type of a module for an import of `version`.
+	moduleTypePath(module, name, version) {
+		const versions = this.moduleTypeVersions.get(module);
+		const entry = pickVersion(versions === undefined ? undefined : versions.get(name), version);
+		if (entry !== undefined) return entry.path;
+		const types = this.modules.get(module);
+		return types ? types.get(name) : undefined;
+	}
+
+	// The path of a singleton of a module for an import of `version`.
+	moduleSingletonPath(module, name, version) {
+		const singletons = this.moduleSingletons.get(module);
+		const entry = pickVersion(singletons === undefined ? undefined : singletons.get(name), version);
+		return entry === undefined ? undefined : entry.path;
+	}
+
+	// Paths where a component type used in `fromFile` can be, the best first. Like in Qt the later import wins over an
+	// earlier one, and every import wins over the directory of the file: `Name` in the imported directories and modules
+	// without alias, then in the directory of the file; `Alias.Name` in what is imported as Alias.
 	candidates(type, fromFile) {
 		const from = this.docs.get(fromFile);
 		const dir = dirname(fromFile);
-		const imports = from && from.def ? from.def.imports : [];
-		const modules = from && from.def ? from.def.modules : [];
+		const imports = from ? this.fileImports(from) : [];
 		const out = [];
-		const moduleType = (module, name) => {
-			const types = this.modules.get(module);
-			const path = types ? types.get(name) : undefined;
-			if (path !== undefined) out.push(path);
-		};
 		const dot = type.indexOf('.');
-		if (dot >= 0) {
-			const alias = type.slice(0, dot);
-			const name = type.slice(dot + 1);
-			for (const imp of imports) {
-				if (imp.alias === alias && !imp.path.endsWith('.js')) {
-					out.push(joinPath(resolvePath(imp.path, dir), `${name}.qml`));
-				}
+		const alias = dot >= 0 ? type.slice(0, dot) : '';
+		const name = dot >= 0 ? type.slice(dot + 1) : type;
+		for (let i = imports.length - 1; i >= 0; i--) {
+			const imp = imports[i];
+			if (imp.alias !== alias) continue;
+			if (imp.kind === 'directory') {
+				out.push(joinPath(resolvePath(imp.path, dir), `${name}.qml`));
+			} else {
+				const path = this.moduleTypePath(imp.name, name, imp.version);
+				if (path !== undefined) out.push(path);
 			}
-			for (const m of modules) {
-				if (m.alias === alias) moduleType(m.name, name);
-			}
-			return out;
 		}
-		out.push(joinPath(dir, `${type}.qml`));
-		for (const imp of imports) {
-			if (!imp.alias && !imp.path.endsWith('.js')) out.push(joinPath(resolvePath(imp.path, dir), `${type}.qml`));
-		}
-		for (const m of modules) {
-			if (!m.alias) moduleType(m.name, type);
-		}
+		if (dot < 0) out.push(joinPath(dir, `${type}.qml`));
 		return out;
 	}
 

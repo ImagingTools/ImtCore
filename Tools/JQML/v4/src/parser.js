@@ -109,15 +109,20 @@ class Parser {
 			} else if (isImport && this.peek().t === 'id') {
 				const name = this.parseDottedName('Expected a module name');
 				let alias = '';
+				let version = null;
 				while (this.peek().t !== 'eof' && !this.peek().nl) {
 					if (this.isId('as') && this.peek(1).t === 'id') {
 						this.next();
 						alias = this.next().v;
+					} else if (this.peek().t === 'num' && version === null) {
+						// `import Module 2.1`: the types of the version 2.1 and the lower ones of the major version 2.
+						const parts = this.next().v.split('.');
+						version = { major: Number(parts[0]), minor: Number(parts[1] || 0) };
 					} else {
 						this.next();
 					}
 				}
-				modules.push({ name, alias, line });
+				modules.push({ name, alias, version, line });
 			}
 			while (this.peek().t !== 'eof' && !this.peek().nl) this.next();
 		}

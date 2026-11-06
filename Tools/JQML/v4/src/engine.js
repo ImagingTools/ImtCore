@@ -447,6 +447,9 @@ export class Engine {
 		this.ignoredProperties = new Map(); // 'Type.property' -> count
 		this.changeHandlers = [];
 		this.singletons = new Map(); // name -> { path, item }
+		this.singletonEntries = new Map(); // path -> { path, item }: a singleton file is created once
+		this.fileLayers = new Map(); // file -> the names that only that file sees (see fileLayer), or null
+		this.ambiguousSingletons = new Set(); // names of singletons that several files declare
 		this.loaders = new Set();
 		this.repeaters = new Set();
 		this.connections = new Set(); // Connections items
@@ -724,6 +727,9 @@ export class Engine {
 		for (const name of this.jsGlobals) delete this.globals[name];
 		this.jsGlobals = [];
 		this.singletons.clear();
+		this.singletonEntries.clear();
+		this.fileLayers.clear();
+		this.ambiguousSingletons.clear();
 		this.errors = [];
 		this.errorSet.clear();
 		this.completed = [];
@@ -768,8 +774,9 @@ export class Engine {
 
 	// `pragma Singleton` types of the imported modules become global names, created on first use.
 	setupSingletons() {
+		this.ambiguousSingletons = this.findAmbiguousSingletons();
 		for (const [name, path] of this.project.singletons) {
-			const entry = { path, item: undefined };
+			const entry = this.singletonEntry(path);
 			this.singletons.set(name, entry);
 			Object.defineProperty(this.globals, name, {
 				get: () => this.singleton(entry),
@@ -813,6 +820,83 @@ export class Engine {
 		}
 	}
 
+	singletonEntry(path) {
+		let entry = this.singletonEntries.get(path);
+		if (entry === undefined) {
+			entry = { path, item: undefined };
+			this.singletonEntries.set(path, entry);
+		}
+		return entry;
+	}
+
+	// The names that more than one file declares as a singleton (in different modules or directories): a file gets the one
+	// of its own imports, the later import first. The other names are global.
+	findAmbiguousSingletons() {
+		const project = this.project;
+		const paths = new Map();
+		const add = (name, path) => {
+			if (path === undefined) return;
+			if (!paths.has(name)) paths.set(name, new Set());
+			paths.get(name).add(path);
+		};
+		// Several versions of a singleton are several files: an import picks one of them. A singleton that the directories
+		// of one module declare in the same version is one file, the one of the last directory.
+		for (const singletons of project.moduleSingletons.values()) {
+			for (const [name, entries] of singletons) {
+				const versions = new Set(entries.map((entry) => `${entry.major}.${entry.minor}`));
+				if (versions.size > 1) for (const entry of entries) add(name, entry.path);
+				else add(name, entries[0].path);
+			}
+		}
+		for (const singletons of project.dirSingletons.values()) {
+			for (const [name, path] of singletons) add(name, path);
+		}
+		const ambiguous = new Set();
+		for (const [name, set] of paths) if (set.size > 1) ambiguous.add(name);
+		return ambiguous;
+	}
+
+	// What a file sees besides the global names: `Alias.Singleton` of what it imports as Alias, and the singletons that
+	// several files declare, as its own imports give them. Null if there is nothing.
+	fileLayer(file) {
+		if (this.fileLayers.has(file)) return this.fileLayers.get(file);
+		let layer = null;
+		const doc = this.project === null ? undefined : this.project.docs.get(file);
+		if (doc && doc.def) {
+			const define = (target, name, path) => {
+				Object.defineProperty(target, name, {
+					get: () => this.singleton(this.singletonEntry(path)),
+					enumerable: true,
+					configurable: true,
+				});
+			};
+			// The imports in the order of the file: a later one overrides the names of an earlier one.
+			for (const imp of this.project.fileImports(doc)) {
+				const singletons = new Map();
+				if (imp.kind === 'directory') {
+					const declared = this.project.dirSingletons.get(resolvePath(imp.path, dirname(file)));
+					if (declared !== undefined) for (const [name, path] of declared) singletons.set(name, path);
+				} else {
+					const declared = this.project.moduleSingletons.get(imp.name);
+					if (declared !== undefined) {
+						for (const name of declared.keys()) singletons.set(name, this.project.moduleSingletonPath(imp.name, name, imp.version));
+					}
+				}
+				if (singletons.size === 0) continue;
+				if (layer === null) layer = Object.create(null);
+				if (imp.alias) {
+					if (!Object.prototype.hasOwnProperty.call(layer, imp.alias)) layer[imp.alias] = Object.create(null);
+					for (const [name, path] of singletons) define(layer[imp.alias], name, path);
+				} else {
+					for (const [name, path] of singletons) if (this.ambiguousSingletons.has(name)) define(layer, name, path);
+				}
+			}
+			if (layer !== null && Object.keys(layer).length === 0) layer = null;
+		}
+		this.fileLayers.set(file, layer);
+		return layer;
+	}
+
 	singleton(entry) {
 		if (entry.item !== undefined) return entry.item;
 		entry.item = null; // while it is being created
@@ -826,6 +910,8 @@ export class Engine {
 
 	newScope(parent, file) {
 		const scope = new Scope(parent, file);
+		const layer = this.project === null ? null : this.fileLayer(file);
+		if (layer !== null) scope.ids = Object.create(layer);
 		const doc = this.project === null ? undefined : this.project.docs.get(file);
 		if (doc && doc.def) {
 			for (const imp of doc.def.imports) {
@@ -2344,6 +2430,8 @@ export class Engine {
 	// `Qt.AlignCenter` and `FlexboxLayout.Row`: a member of a global enum object, assigned once.
 	enumConstant(tokens) {
 		if (tokens.length !== 4 || tokens[0].t !== 'id' || tokens[1].t !== 'p' || tokens[1].v !== '.' || tokens[2].t !== 'id') return NOT_CONSTANT;
+		// A singleton that several files declare is another one in every file: its members are not constant.
+		if (this.ambiguousSingletons.has(tokens[0].v)) return NOT_CONSTANT;
 		const obj = this.globals[tokens[0].v];
 		if (obj === null || obj === undefined || typeof obj !== 'object') return NOT_CONSTANT;
 		const value = obj[tokens[2].v];
