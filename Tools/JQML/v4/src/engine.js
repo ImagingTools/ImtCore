@@ -1844,11 +1844,22 @@ export class Engine {
 			i = start - 1;
 		}
 		this.completing++;
+		// A Loader can complete inside a binding pass. Its handlers are scripts: dependent
+		// bindings must update synchronously, and assignments must replace existing bindings.
+		const trackingPass = this.trackingPass;
+		const engineWrite = hooks.engineWrite;
+		const reading = hooks.reading;
+		this.trackingPass = 0;
+		hooks.engineWrite = 0;
+		hooks.reading = null;
 		try {
 			for (const entry of ordered) {
 				this.guard(() => entry.fn.call(entry.item), `handler 'Component.onCompleted' (${entry.file})`, entry.line);
 			}
 		} finally {
+			this.trackingPass = trackingPass;
+			hooks.engineWrite = engineWrite;
+			hooks.reading = reading;
 			this.completing--;
 			// The offscreen window becomes active once the first completion batch has finished.
 			// Handlers that ran inside it still saw activeFocus as false.

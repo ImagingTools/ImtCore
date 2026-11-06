@@ -29,6 +29,55 @@ async function load(source, files = {}) {
 }
 
 const checks = {
+	async 'Loader completion inside a binding pass updates dependent properties before the next statement'() {
+		for (const incremental of [true, false]) {
+			const { root, engine, settle } = await load(`
+				import QtQuick
+				Item {
+					id: root
+					property var events: []
+					property bool showPage: true
+					property int input: 1
+					property int overridden: root.input * 2
+					property alias pageLoader: loader
+					Loader {
+						id: loader
+						active: false
+						sourceComponent: Component {
+							Item {
+								id: page
+								width: 792
+								height: 192
+								property bool compl: false
+								property bool ready: page.compl && page.height > 0 && page.width > 0
+								property int count: page.ready ? 3 : 0
+								onReadyChanged: if (page.ready) root.events.push("fill")
+								Component.onCompleted: {
+									page.compl = true
+									root.overridden = 77
+									root.input = 3
+									root.events.push("completed:" + page.ready + ":" + page.count)
+								}
+							}
+						}
+					}
+				}
+			`);
+			engine.incremental = incremental;
+			engine.addBinding(root.pageLoader, ['active'], () => root.showPage, 0);
+			engine.evaluateBindings();
+			assert.deepEqual(root.events, ['fill', 'completed:true:3'], `incremental=${incremental}`);
+			assert.equal(root.pageLoader.item.ready, true);
+			assert.equal(root.overridden, 77, 'completion assignments must replace bindings');
+			settle();
+			assert.deepEqual(root.events, ['fill', 'completed:true:3']);
+			assert.equal(root.overridden, 77);
+			root.showPage = false;
+			settle();
+			assert.equal(root.pageLoader.item, null, 'the outer Loader binding must remain active');
+		}
+	},
+
 	async 'Flickable content item uses viewport width when contentWidth is omitted'() {
 		const { root, settle } = await load(`
 			import QtQuick
