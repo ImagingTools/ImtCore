@@ -1025,6 +1025,19 @@ sdl::V1_0::imtauth::CAuthorizationPayload CLdapAuthorizationControllerComp::OnAu
 						errorMessage = QStringLiteral("Unable to insert LDAP user to the collection");
 						return sdl::V1_0::imtauth::CAuthorizationPayload();
 					}
+
+					// Reload the stored user, so it has the role provider of the persistent collection.
+					imtbase::IObjectCollection::DataPtr insertedDataPtr;
+					if (!m_userCollectionCompPtr->GetObjectData(retVal, insertedDataPtr)){
+						errorMessage = QStringLiteral("Unable to load the inserted LDAP user");
+						return sdl::V1_0::imtauth::CAuthorizationPayload();
+					}
+
+					userInfoPtr.MoveCastedPtr(insertedDataPtr->CloneMe());
+					if (!userInfoPtr.IsValid()){
+						errorMessage = QStringLiteral("Invalid inserted LDAP user data");
+						return sdl::V1_0::imtauth::CAuthorizationPayload();
+					}
 				}
 				else{
 					QMutexLocker userUpdateLocker(&imtauth::CUserBaseInfo::GetUserUpdateMutex(userObjectId));
@@ -1083,8 +1096,8 @@ sdl::V1_0::imtauth::CAuthorizationPayload CLdapAuthorizationControllerComp::OnAu
 								}
 							}
 
-							QByteArrayList products = userInfoPtr->GetProducts();
-							if (!products.contains(productId)){
+							// Directory-owned grants add roles; they do not replace default-role provisioning.
+							if (!userInfoPtr->HasManualProduct(productId)){
 								userInfoPtr->AddRole(productId, defaultRoleId);
 								needsUpdate = true;
 							}

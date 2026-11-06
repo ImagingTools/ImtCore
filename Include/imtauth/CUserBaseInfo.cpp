@@ -52,6 +52,17 @@ void CUserBaseInfo::SetDirectoryRoles(const QByteArray& productId, const RoleIds
 	}
 }
 
+
+bool CUserBaseInfo::HasManualProduct(const QByteArray& productId) const
+{
+	if (IsReservedProductId(productId)){
+		return false;
+	}
+
+	return m_rolesMap.contains(productId);
+}
+
+
 bool CUserBaseInfo::IsReservedProductId(const QByteArray& productId)
 {
 	return productId.startsWith(DirectoryProductPrefix);

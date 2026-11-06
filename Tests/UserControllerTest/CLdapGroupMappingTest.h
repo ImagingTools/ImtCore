@@ -15,6 +15,7 @@ private slots:
 	void testDirectoryRolesSurviveArchiveCloneAndReset();
 	void testBothLoginCommandsRefreshStoredPermissions();
 	void testBothLoginCommandsProvisionNewUsers();
+	void testDirectoryOnlyProductKeepsDefaultRoleProvisioning();
 	void testDirectoryFailureDeniesBothLoginCommands();
 	void testFailedCollectionReadsDenyLogin();
 	void testFailedPersistenceDeniesLogin();

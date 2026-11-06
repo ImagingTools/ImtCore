@@ -46,6 +46,13 @@ const QByteArray TenantA("66666666-6666-4666-8666-666666666666");
 const QByteArray TenantB("77777777-7777-4777-8777-777777777777");
 
 
+class CUser: public imtauth::CIdentifiableUserInfo
+{
+public:
+	void SetProvider(const imtauth::IRoleInfoProvider* provider) { m_roleProviderPtr = provider; }
+};
+
+
 class CCollection:
 			public icomp::CComponentBase,
 			public imtbase::CObjectCollectionBase
@@ -59,6 +66,8 @@ public:
 
 	bool failWrite = false;
 	bool failRead = false;
+	// Emulates the user factory of a persistent collection, which attaches the role provider on load.
+	const imtauth::IRoleInfoProvider* userRoleProvider = nullptr;
 
 	virtual bool SetObjectData(const Id& id, const istd::IChangeable& value,
 		CompatibilityMode mode = CM_WITHOUT_REFS, const imtbase::IOperationContext* context = nullptr) override
@@ -69,8 +78,20 @@ public:
 
 	virtual bool GetObjectData(const Id& id, DataPtr& data, const iprm::IParamsSet* params = nullptr) const override
 	{
-		return !QUuid(QString::fromUtf8(id)).isNull() && !failRead &&
-			CObjectCollectionBase::GetObjectData(id, data, params);
+		if (QUuid(QString::fromUtf8(id)).isNull() || failRead || !CObjectCollectionBase::GetObjectData(id, data, params)){
+			return false;
+		}
+		const auto* user = dynamic_cast<const imtauth::CIdentifiableUserInfo*>(data.GetPtr());
+		if (user == nullptr || user->GetRoleProvider() != nullptr || userRoleProvider == nullptr){
+			return true;
+		}
+		istd::IChangeableUniquePtr loaded(new CUser);
+		if (!loaded->CopyFrom(*user)){
+			return false;
+		}
+		static_cast<CUser*>(loaded.GetPtr())->SetProvider(userRoleProvider);
+		data.FromUnique(std::move(loaded));
+		return true;
 	}
 
 	virtual Ids GetElementIds(int offset = 0, int count = -1, const iprm::IParamsSet* params = nullptr,
@@ -109,12 +130,6 @@ public:
 	}
 };
 
-
-class CUser: public imtauth::CIdentifiableUserInfo
-{
-public:
-	void SetProvider(const imtauth::IRoleInfoProvider* provider) { m_roleProviderPtr = provider; }
-};
 
 class CBindings:
 			public icomp::CComponentBase,
@@ -207,7 +222,6 @@ public:
 	using BaseClass::OnUserToken;
 	using BaseClass::OnDirectoryChangeEvent;
 	bool failDirectory = false;
-	const imtauth::IRoleInfoProvider* userRoleProvider = nullptr;
 	QByteArrayList memberships{GroupSid.toUtf8()};
 	QMap<QByteArray, QString> available{{GroupSid.toUtf8(), QStringLiteral("Product-Operators")},
 		{"S-1-5-21-3", QStringLiteral("Product-Reviewers")}};
@@ -240,7 +254,6 @@ public:
 		user->SetName("New member");
 		user->SetSid("S-1-5-21-2");
 		user->SetMail("member@example.invalid");
-		user->SetProvider(userRoleProvider);
 		return user;
 	}
 };
@@ -256,7 +269,7 @@ public:
 		roles->InitComponent();
 		provider->SetRef("RoleCollection", roles);
 		provider->InitComponent();
-		controller->userRoleProvider = &provider.GetImpl();
+		users->userRoleProvider = &provider.GetImpl();
 		enabled->SetEnabled(true);
 		enabled->InitComponent();
 		credentials->InitComponent();
@@ -898,6 +911,26 @@ void CLdapGroupMappingTest::testUnsupportedNotificationsAreReported()
 	QVERIFY(data.value("synchronizedAt").toString().isEmpty());
 	QVERIFY(CFixture::Groups(data).isEmpty());
 #endif
+}
+
+
+void CLdapGroupMappingTest::testDirectoryOnlyProductKeepsDefaultRoleProvisioning()
+{
+	CFixture fixture;
+	QVERIFY(fixture.user.RemoveRole(Product, FirstRole));
+	fixture.user.SetDirectoryRoles(Product, {FirstRole, SecondRole});
+	QVERIFY(fixture.users->SetObjectData(MemberObjectId, fixture.user));
+	QString error;
+	auto payload = fixture.SignIn("Authorization", error);
+	QVERIFY2(error.isEmpty(), qPrintable(error));
+	QVERIFY(payload.token.HasValue());
+	imtbase::IObjectCollection::DataPtr data;
+	auto* stored = fixture.Stored(data);
+	QVERIFY(stored != nullptr);
+	QVERIFY(stored->HasManualProduct(Product));
+	QCOMPARE(stored->GetRoles(Product).size(), 1);
+	QVERIFY(!stored->GetRoles(Product).contains(FirstRole));
+	QCOMPARE(stored->GetDirectoryRoles(Product), QByteArrayList({FirstRole, SecondRole}));
 }
 
 

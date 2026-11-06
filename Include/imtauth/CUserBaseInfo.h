@@ -27,6 +27,10 @@ public:
 	*/
 	RoleIds GetDirectoryRoles(const QByteArray& productId) const;
 	void SetDirectoryRoles(const QByteArray& productId, const RoleIds& roles);
+	/**
+		Check if the product is assigned manually, ignoring directory-owned grants.
+	*/
+	bool HasManualProduct(const QByteArray& productId) const;
 	bool ResolveDirectoryRoles(const QByteArray& productId, RoleIds& roles, FeatureIds& permissions) const;
 	static bool IsReservedProductId(const QByteArray& productId);
 	static QMutex& GetUserUpdateMutex(const QByteArray& userId);
