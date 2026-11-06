@@ -88,6 +88,7 @@
 #include <imtauth/CUserGroupDocumentValidatorComp.h>
 #include <imtauth/CDelegatedAccessResolverComp.h>
 #include <imtauth/COrganizationsPermissionsProviderComp.h>
+#include <imtauth/CProductServerPermissionsProviderComp.h>
 
 
 namespace ImtAuthPck
@@ -113,6 +114,7 @@ typedef imtauth::CRoleCollectionAdapterComp RoleCollectionAdapter;
 typedef imtauth::CUserCollectionAdapterComp UserCollectionAdapter;
 typedef imtauth::CCheckPermissionCompBase CheckPermissions;
 typedef imtauth::COrganizationsPermissionsProviderComp OrganizationsPermissionsProvider;
+typedef imtauth::CProductServerPermissionsProviderComp ProductServerPermissionsProvider;
 typedef imtauth::CCheckPermissionOrComp CheckPermissionOr;
 typedef icomp::TModelCompWrap<imtauth::CUserSettingsComp> UserSettings;
 typedef imtauth::CUserGroupInfoProviderComp UserGroupInfoProvider;

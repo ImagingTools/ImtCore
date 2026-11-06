@@ -206,6 +206,11 @@ I_EXPORT_COMPONENT(
 			"Product Permission Publisher");
 
 I_EXPORT_COMPONENT(
+			AuthorizationServerProductInfo,
+			"The permission tree of this product with the permissions of the authorization server its token allows",
+			"Authorization Server Product Info");
+
+I_EXPORT_COMPONENT(
 			PublishedPermissionsProvider,
 			"Answers permission tree requests from the published trees",
 			"Published Permissions Provider");

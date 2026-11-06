@@ -44,6 +44,69 @@ ServerTokenApiClient {
 		root.__scopesRequest.send(root.__scopesInput)
 	}
 
+	function __parseServers(serversList){
+		let result = []
+		if (!serversList){
+			return result
+		}
+
+		for (let i = 0; i < serversList.count; ++i){
+			let server = serversList.get(i).item
+			if (!server){
+				continue
+			}
+
+			result.push({
+				"productId": String(server.m_productId),
+				"groups": root.__parseGroups(server.m_groups),
+				"requiredPermissions": Array.isArray(server.m_requiredPermissions) ? server.m_requiredPermissions : []
+			})
+		}
+
+		return result
+	}
+
+	function __parseGroups(groupsList){
+		let result = []
+		if (!groupsList){
+			return result
+		}
+
+		for (let gi = 0; gi < groupsList.count; ++gi){
+			let group = groupsList.get(gi).item
+			if (!group){
+				continue
+			}
+
+			let groupObj = {
+				"groupId": group.m_groupId ? String(group.m_groupId) : "",
+				"groupName": group.m_groupName ? String(group.m_groupName) : "",
+				"entries": []
+			}
+
+			let entries = group.m_entries
+			if (entries){
+				for (let ei = 0; ei < entries.count; ++ei){
+					let entry = entries.get(ei).item
+					if (!entry){
+						continue
+					}
+
+					groupObj.entries.push({
+						"permissionId": entry.m_permissionId ? String(entry.m_permissionId) : "",
+						"displayName": entry.m_displayName ? String(entry.m_displayName) : "",
+						"description": entry.m_description ? String(entry.m_description) : "",
+						"requirements": Array.isArray(entry.m_requirements) ? entry.m_requirements : []
+					})
+				}
+			}
+
+			result.push(groupObj)
+		}
+
+		return result
+	}
+
 	property string __productId: ""
 	property ServerTokenListInput __listInput: ServerTokenListInput {}
 	property CreateServerTokenInput __createInput: CreateServerTokenInput {}
@@ -56,7 +119,7 @@ ServerTokenApiClient {
 		sdlObjectComp: Component {
 			ServerTokenReceiverList {
 				onFinished: {
-					root.productServers = m_productServers
+					root.productServers = root.__parseServers(m_productServers)
 					root.productServersReceived()
 				}
 			}

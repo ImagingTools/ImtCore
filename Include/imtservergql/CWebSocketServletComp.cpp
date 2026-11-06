@@ -575,7 +575,7 @@ void CWebSocketServletComp::CheckTokenSubscriptions() const
 				else if (areScopesChanged){
 					DropTokenSubscription(subscription, QStringLiteral("The permissions of the token have changed"));
 				}
-				else if (!subscription.requiredPermission.isEmpty() && !imtauth::HasPermission(scopes, subscription.requiredPermission, false)){
+				else if (!subscription.requiredPermission.isEmpty() && !imtauth::HasPermission(scopes, subscription.requiredPermission)){
 					DropTokenSubscription(subscription, QStringLiteral("The token no longer holds '%1'").arg(QString::fromUtf8(subscription.requiredPermission)));
 				}
 			}

@@ -81,6 +81,11 @@ I_EXPORT_COMPONENT(
 			"Organizations Permissions Provider");
 
 I_EXPORT_COMPONENT(
+			ProductServerPermissionsProvider,
+			"Permissions of the servers of products at this server",
+			"Product Server Permissions Provider");
+
+I_EXPORT_COMPONENT(
 			CheckPermissionOr,
 			"Check Permission Or",
 			"Check Permission Or");

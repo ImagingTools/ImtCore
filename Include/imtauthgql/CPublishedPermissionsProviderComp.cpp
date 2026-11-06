@@ -64,40 +64,32 @@ sdl::V1_0::imtauth::CGetProductPermissionsPayload CPublishedPermissionsProviderC
 
 	auto& groups = response.groups.Emplace();
 
-	const QByteArray snapshotId = imtauth::FindProductPermissionSnapshot(*m_snapshotCollectionCompPtr, productId);
-	if (snapshotId.isEmpty()){
-		return response;
-	}
-
-	imtbase::IObjectCollection::DataPtr dataPtr;
-	const imtauth::CProductPermissionSnapshot* snapshotPtr = m_snapshotCollectionCompPtr->GetObjectData(snapshotId, dataPtr) ? dynamic_cast<const imtauth::CProductPermissionSnapshot*>(dataPtr.GetPtr()) : nullptr;
-	if (snapshotPtr == nullptr){
-		errorMessage = QStringLiteral("Unable to read the permission tree of the product '%1'").arg(QString::fromUtf8(productId));
-		response.errorMessage = errorMessage;
-
-		return response;
-	}
-
 	sdl::V1_0::imtauth::CPermissionTree tree;
-	if (!tree.ReadFromJsonObject(QJsonDocument::fromJson(snapshotPtr->GetTree()).object())){
+	if (!ReadPublishedPermissionTree(*m_snapshotCollectionCompPtr, productId, tree)){
 		errorMessage = QStringLiteral("Unable to read the permission tree of the product '%1'").arg(QString::fromUtf8(productId));
 		response.errorMessage = errorMessage;
 
 		return response;
 	}
 
-	if (!tree.groups){
-		return response;
+	imtsdl::TElementList<sdl::V1_0::imtauth::CPermissionGroup> allGroups;
+	if (tree.groups){
+		allGroups = *tree.groups;
+	}
+
+	// The roles of a product hold the permissions of this server too; a product that did not publish has none of its own
+	if (m_permissionTreeCompPtr.IsValid() && productId != m_permissionTreeCompPtr->GetProductId()){
+		BuildPermissionGroups<sdl::V1_0::imtauth::CPermissionGroup, sdl::V1_0::imtauth::CPermissionEntry>(m_permissionTreeCompPtr.GetPtr(), nullptr, allGroups, QByteArray(), nullptr);
 	}
 
 	if (tenantId.isEmpty() || !m_tenantManagerCompPtr.IsValid()){
-		groups = *tree.groups;
+		groups = allGroups;
 
 		return response;
 	}
 
 	const QByteArrayList allowedPermissions = m_tenantManagerCompPtr->GetTenantPermissions(tenantId);
-	for (sdl::V1_0::imtauth::CPermissionGroup group : tree.groups->ToList()){
+	for (sdl::V1_0::imtauth::CPermissionGroup group : allGroups.ToList()){
 		imtsdl::TElementList<sdl::V1_0::imtauth::CPermissionEntry> entries;
 		if (group.entries){
 			for (const sdl::V1_0::imtauth::CPermissionEntry& entry : group.entries->ToList()){

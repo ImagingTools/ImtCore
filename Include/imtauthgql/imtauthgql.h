@@ -14,6 +14,7 @@
 #include <imtauth/IDelegatedAccess.h>
 #include <imtauth/ITenantMembershipManager.h>
 #include <imtauth/IRoleInfoProvider.h>
+#include <imtauth/CProductPermissionSnapshot.h>
 #include <istd/IChangeable.h>
 #include <imtauth/ICrossTenantMessage.h>
 #include <imtauth/IOrderRequest.h>
@@ -30,6 +31,8 @@
 
 
 // Qt includes
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
 #include <QtCore/QSet>
 #include <QtCore/QByteArrayList>
 #include <imtauth/IUserInfo.h>
@@ -909,6 +912,60 @@ inline void BuildPermissionGroupsFromProvider(
 
 		groups.append(group);
 	}
+}
+
+
+/**
+	Read the permission tree a product published. A product that has not published has an empty tree.
+	\return false if the stored tree could not be read.
+*/
+inline bool ReadPublishedPermissionTree(
+			const imtbase::IObjectCollection& snapshotCollection,
+			const QByteArray& productId,
+			sdl::V1_0::imtauth::CPermissionTree& tree)
+{
+	tree = sdl::V1_0::imtauth::CPermissionTree();
+
+	bool isRead = false;
+	const QByteArray snapshotId = imtauth::FindProductPermissionSnapshot(snapshotCollection, productId, &isRead);
+	if (!isRead){
+		return false;
+	}
+
+	if (snapshotId.isEmpty()){
+		return true;
+	}
+
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	const imtauth::CProductPermissionSnapshot* snapshotPtr = snapshotCollection.GetObjectData(snapshotId, dataPtr)
+				? dynamic_cast<const imtauth::CProductPermissionSnapshot*>(dataPtr.GetPtr())
+				: nullptr;
+
+	return snapshotPtr != nullptr && tree.ReadFromJsonObject(QJsonDocument::fromJson(snapshotPtr->GetTree()).object());
+}
+
+
+/**
+	Copy a feature with its sub-features as a feature of the SDL type TFeature.
+*/
+template<typename TFeature>
+inline void CopyFeature(const imtlic::IFeatureInfo& featureInfo, TFeature& feature)
+{
+	feature.featureId = featureInfo.GetFeatureId();
+	feature.name = featureInfo.GetFeatureName();
+	feature.description = featureInfo.GetFeatureDescription();
+	feature.requirements.Emplace().FromList(featureInfo.GetRequirements());
+
+	imtsdl::TElementList<TFeature> subFeatures;
+	for (const imtlic::IFeatureInfo::FeatureInfoPtr& subFeaturePtr : featureInfo.GetSubFeatures()){
+		if (subFeaturePtr.IsValid()){
+			TFeature subFeature;
+			CopyFeature<TFeature>(*subFeaturePtr, subFeature);
+			subFeatures.append(subFeature);
+		}
+	}
+
+	feature.subFeatures = subFeatures;
 }
 
 

@@ -7,6 +7,7 @@ schema {
 
 import {
 	"../../imtbase/1.0/ImtCollection.sdl"
+	"Permissions.sdl"
 }
 
 # A personal access token without an owner: it identifies a server of a product.
@@ -52,19 +53,28 @@ type RevokeServerTokenPayload {
 	message: String
 }
 
-# What a server token can be allowed on its receiving server.
-type ServerTokenPermission
-{
-	id: ID!
-	name: String!
-	description: String
-	required: Bool
-}
-
+# What a server token can be allowed on its receiving server: the permission tree of that server.
 type ServerTokenReceiver
 {
 	productId: ID!
-	permissions: [ServerTokenPermission]
+	groups: [PermissionGroup]
+	# Held by every token for this server.
+	requiredPermissions: [ID]
+}
+
+# A permission of the receiving server with its sub-permissions.
+type ServerFeature
+{
+	featureId: ID!
+	name: String
+	description: String
+	requirements: [ID]
+	subFeatures: [ServerFeature]
+}
+
+type ServerFeatureList
+{
+	features: [ServerFeature]
 }
 
 type ServerTokenReceiverList
@@ -84,6 +94,8 @@ input UpdateServerTokenScopesInput {
 type Query {
 	GetServerTokenList (input: ServerTokenListInput!): ServerTokenList!
 	GetServerTokenReceivers (input: ServerTokenReceiversInput): ServerTokenReceiverList!
+	# The permissions of this server the token of the calling product server allows, for the roles of that product.
+	GetServerTokenFeatures (input: ServerTokenReceiversInput): ServerFeatureList!
 }
 
 type Mutation {

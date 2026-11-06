@@ -46,7 +46,7 @@ sdl::V1_0::imtauth::CPublishProductPermissionsPayload CProductPermissionCatalogC
 	// Only the server of the product publishes its tree
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 	if (gqlContextPtr == nullptr || productId.isEmpty() || gqlContextPtr->GetClientProductId() != productId
-				|| !imtauth::HasPermission(gqlContextPtr->GetScopes(), imtauth::s_serverPermissionsPublishPermission, false)){
+				|| !imtauth::HasPermission(gqlContextPtr->GetScopes(), imtauth::s_productServerPublishPermissionsPermission, false)){
 		errorMessage = QStringLiteral("The permissions of the product '%1' are published by its server only").arg(QString::fromUtf8(productId));
 
 		return response;

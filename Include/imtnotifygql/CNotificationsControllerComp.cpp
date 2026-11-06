@@ -416,7 +416,7 @@ bool CNotificationsControllerComp::CanSend(const ::imtgql::CGqlRequest& gqlReque
 		return false;
 	}
 
-	if (!imtauth::HasPermission(contextPtr->GetScopes(), imtauth::s_serverNotificationsSendPermission, false)){
+	if (!imtauth::HasPermission(contextPtr->GetScopes(), imtauth::s_productServerSendNotificationsPermission, false)){
 		errorMessage = QStringLiteral("The token of the server may not send notifications");
 
 		return false;

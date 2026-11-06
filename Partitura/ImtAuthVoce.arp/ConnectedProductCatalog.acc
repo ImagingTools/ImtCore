@@ -264,6 +264,11 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="ProductServerPermissions" PackageId="ImtAuthPck" ComponentId="ProductServerPermissionsProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
         <Element Id="PublishedPermissionsProvider" PackageId="ImtAuthGqlPck" ComponentId="PublishedPermissionsProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -277,6 +282,9 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TenantManager" Type="Reference" ExportId="TenantManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PermissionTree" Type="Reference" ExportId="PermissionTree">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -348,6 +356,20 @@
                     </AttributeInfo>
                     <AttributeInfo Id="ProductCollection" Type="Reference" ExportId="ProductRepository">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PermissionTree" Type="Reference" ExportId="PermissionTree">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProductServerPermissions" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ProductServerPermissions"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequiredPermissions" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>/ProductServer/SignIn</Value>
+                                <Value>/ProductServer/PublishPermissions</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

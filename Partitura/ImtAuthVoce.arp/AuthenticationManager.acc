@@ -19,6 +19,9 @@
                     <AttributeInfo Id="FeatureContainer" Type="Reference" ExportId="FeatureContainer">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="PermissionTree" Type="Reference" ExportId="PermissionTree">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="GqlContextFactory" Type="Factory" ExportId="">
                         <Data IsEnabled="true" Value="GqlContext"/>
                     </AttributeInfo>

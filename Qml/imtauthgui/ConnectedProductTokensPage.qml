@@ -25,25 +25,27 @@ Item {
 		}
 	}
 
-	// The permissions a token for the server can hold, from the catalog of the authorization server
-	function getServerPermissions(receiverId){
+	// The server taking tokens with its permission tree, from the catalog of the authorization server
+	function getServer(receiverId){
 		let servers = tokensPage.apiClient ? tokensPage.apiClient.productServers : null
 		if (!servers){
 			return null
 		}
 
-		for (let i = 0; i < servers.getItemsCount(); ++i){
-			let server = servers.get(i).item
-			if (server && String(server.m_productId) === receiverId){
-				return server.m_permissions
+		for (let i = 0; i < servers.length; ++i){
+			if (servers[i].productId === receiverId){
+				return servers[i]
 			}
 		}
 
 		return null
 	}
 
+	// A new token is for the authorization server: it issues tokens for itself only
 	function openTokenDialog(tokenId, receiverId, scopes){
-		ModalDialogManager.openDialog(tokenDialogComp, {"tokenId": tokenId, "receiverId": receiverId, "initialScopes": scopes})
+		let servers = tokensPage.apiClient ? tokensPage.apiClient.productServers : null
+		let receiver = receiverId === "" && servers && servers.length > 0 ? servers[0].productId : receiverId
+		ModalDialogManager.openDialog(tokenDialogComp, {"tokenId": tokenId, "receiverId": receiver, "initialScopes": scopes})
 	}
 
 	Connections {
@@ -243,8 +245,8 @@ Item {
 		Dialog {
 			id: tokenDialog
 			title: tokenDialog.tokenId === "" ? qsTr("New server token") : qsTr("Permissions of the token")
-			width: 560
-			height: 640
+			width: 680
+			height: 840
 			backgroundColor: Style.baseColor
 
 			// Set by openDialog after the dialog is created
@@ -254,20 +256,16 @@ Item {
 
 			property string tokenName: ""
 			property string tokenDescription: ""
-			property var selectedScopes: []
+			property bool hasPermissions: false
+
+			// Set by the content when it is created
+			property var permissionsView: null
 
 			onReceiverIdChanged: {
-				if (tokenDialog.receiverId === "" && receiversModel.count > 0){
-					tokenDialog.receiverId = receiversModel.get(0).productId
-
-					return
-				}
-
 				tokenDialog.updatePermissions()
 			}
 
 			onInitialScopesChanged: {
-				tokenDialog.selectedScopes = tokenDialog.initialScopes ? tokenDialog.initialScopes.slice(0) : []
 				tokenDialog.updatePermissions()
 			}
 
@@ -275,108 +273,44 @@ Item {
 				tokenDialog.updateApplyButton()
 			}
 
-			ListModel {
-				id: receiversModel
-			}
-
-			ListModel {
-				id: permissionsModel
-			}
-
-			function updateReceivers(){
-				receiversModel.clear()
-
-				let servers = tokensPage.apiClient ? tokensPage.apiClient.productServers : null
-				if (servers){
-					for (let i = 0; i < servers.getItemsCount(); ++i){
-						let server = servers.get(i).item
-						if (server){
-							receiversModel.append({"productId": String(server.m_productId)})
-						}
-					}
-				}
-
-				if (tokenDialog.receiverId === "" && receiversModel.count > 0){
-					tokenDialog.receiverId = receiversModel.get(0).productId
-				}
-			}
-
-			// The required permissions are always held
+			// The tree of the receiving server; the permissions every token holds are checked and locked
 			function updatePermissions(){
-				permissionsModel.clear()
-
-				let permissions = tokensPage.getServerPermissions(tokenDialog.receiverId)
-				if (!permissions){
-					tokenDialog.updateApplyButton()
-
+				if (!tokenDialog.permissionsView){
 					return
 				}
 
-				let scopes = tokenDialog.selectedScopes.slice(0)
-				for (let i = 0; i < permissions.getItemsCount(); ++i){
-					let permission = permissions.get(i).item
-					let permissionId = String(permission.m_id)
-					let isRequired = permission.m_required === true
-					permissionsModel.append({
-						"permissionId": permissionId,
-						"name": String(permission.m_name),
-						"description": permission.m_description ? String(permission.m_description) : "",
-						"required": isRequired
-					})
+				let server = tokensPage.getServer(tokenDialog.receiverId)
+				let groups = server ? server.groups : []
+				tokenDialog.hasPermissions = groups.length > 0
 
-					if (isRequired && scopes.indexOf(permissionId) < 0){
-						scopes.push(permissionId)
-					}
+				tokenDialog.permissionsView.rebuildFromFlatArray(groups)
+				tokenDialog.permissionsView.applySelection(tokenDialog.initialScopes ? tokenDialog.initialScopes : [])
+
+				let locked = {}
+				let required = server ? server.requiredPermissions : []
+				for (let i = 0; i < required.length; ++i){
+					locked[required[i]] = qsTr("Every token for this server holds it")
 				}
+				tokenDialog.permissionsView.setLockedPermissions(locked)
 
-				tokenDialog.selectedScopes = scopes
 				tokenDialog.updateApplyButton()
-			}
-
-			function isSelected(permissionId){
-				return tokenDialog.selectedScopes.indexOf(permissionId) >= 0
-			}
-
-			function togglePermission(permissionId){
-				let scopes = tokenDialog.selectedScopes.slice(0)
-				let index = scopes.indexOf(permissionId)
-				if (index >= 0){
-					scopes.splice(index, 1)
-				}
-				else{
-					scopes.push(permissionId)
-				}
-
-				tokenDialog.selectedScopes = scopes
-			}
-
-			// "SignIn": the required permissions and the changes of users, "All": everything
-			function selectPreset(presetId){
-				let scopes = []
-				for (let i = 0; i < permissionsModel.count; ++i){
-					let permission = permissionsModel.get(i)
-					if (presetId === "All" || permission.required || permission.permissionId === "/ProductServer/Watch/Users"){
-						scopes.push(permission.permissionId)
-					}
-				}
-
-				tokenDialog.selectedScopes = scopes
 			}
 
 			function updateApplyButton(){
 				let isNameSet = tokenDialog.tokenId !== "" || tokenDialog.tokenName !== ""
-				tokenDialog.setButtonEnabled(Enums.apply, isNameSet && tokenDialog.receiverId !== "" && permissionsModel.count > 0)
+				tokenDialog.setButtonEnabled(Enums.apply, isNameSet && tokenDialog.receiverId !== "" && tokenDialog.hasPermissions)
 			}
 
 			onFinished: {
-				if (buttonId !== Enums.apply)
+				if (buttonId !== Enums.apply || !tokenDialog.permissionsView)
 					return
 
+				let scopes = tokenDialog.permissionsView.getCheckedIds(false)
 				if (tokenDialog.tokenId === ""){
-					tokensPage.apiClient.createToken(tokensPage.productId, tokenDialog.receiverId, tokenDialog.tokenName, tokenDialog.tokenDescription, tokenDialog.selectedScopes)
+					tokensPage.apiClient.createToken(tokensPage.productId, tokenDialog.receiverId, tokenDialog.tokenName, tokenDialog.tokenDescription, scopes)
 				}
 				else{
-					tokensPage.apiClient.updateTokenScopes(tokensPage.productId, tokenDialog.tokenId, tokenDialog.selectedScopes)
+					tokensPage.apiClient.updateTokenScopes(tokensPage.productId, tokenDialog.tokenId, scopes)
 				}
 			}
 
@@ -385,137 +319,105 @@ Item {
 				addButton(Enums.apply, qsTr("Apply"), false)
 				addButton(Enums.cancel, qsTr("Cancel"), true)
 
-				tokenDialog.updateReceivers()
 			}
 
 			contentComp: Component {
 				Item {
+					id: dialogContent
 					width: tokenDialog.width
 					height: tokenDialog.height - 3 * Style.controlHeightM - 2 * Style.marginXL
 
-					Flickable {
-						id: dialogFlickable
-						anchors.fill: parent
+					Component.onCompleted: {
+						tokenDialog.permissionsView = permissionsView
+						tokenDialog.updatePermissions()
+					}
+
+					Column {
+						id: headerColumn
+						anchors.top: parent.top
 						anchors.topMargin: Style.marginL
-						contentWidth: width
-						contentHeight: dialogContent.height + Style.marginL
+						anchors.horizontalCenter: parent.horizontalCenter
+						width: parent.width - 2 * Style.marginXL
+						spacing: Style.marginM
+
+						BaseText {
+							visible: tokenDialog.tokenId === ""
+							text: qsTr("Name")
+						}
+
+						CustomTextField {
+							objectName: "ServerTokenNameInput"
+							visible: tokenDialog.tokenId === ""
+							width: parent.width
+							height: Style.controlHeightM
+							onTextChanged: {
+								tokenDialog.tokenName = text.trim()
+								tokenDialog.updateApplyButton()
+							}
+						}
+
+						BaseText {
+							visible: tokenDialog.tokenId === ""
+							text: qsTr("Description")
+						}
+
+						CustomTextField {
+							objectName: "ServerTokenDescriptionInput"
+							visible: tokenDialog.tokenId === ""
+							width: parent.width
+							height: Style.controlHeightM
+							onTextChanged: {
+								tokenDialog.tokenDescription = text
+							}
+						}
+
+						BaseText {
+							text: qsTr("Server accepting the token: %1").arg(tokenDialog.receiverId)
+						}
+
+						BaseText {
+							text: qsTr("Permissions")
+							font.bold: true
+						}
+					}
+
+					Rectangle {
+						id: permissionsArea
+						anchors.top: headerColumn.bottom
+						anchors.topMargin: Style.marginS
+						anchors.bottom: parent.bottom
+						anchors.left: headerColumn.left
+						anchors.right: headerColumn.right
+						color: Style.baseColor
+						border.width: 1
+						border.color: Style.borderColor
+						radius: Style.radiusM
 						clip: true
-						boundsBehavior: Flickable.StopAtBounds
 
-						Column {
-							id: dialogContent
-							anchors.horizontalCenter: parent.horizontalCenter
-							width: dialogFlickable.width - 2 * Style.marginXL
-							spacing: Style.marginM
+						PermissionsTableView {
+							id: permissionsView
+							objectName: "ServerTokenPermissionsView"
+							anchors.fill: parent
+							anchors.leftMargin: Style.marginM
+							anchors.rightMargin: Style.marginM
+							anchors.topMargin: Style.marginXS
+							anchors.bottomMargin: Style.marginS
+							controlPanelTopMargin: Style.marginS
+							treeTopMargin: Style.marginXS
+							treeBottomMargin: Style.marginS
+							readOnly: false
+							showControlPanel: true
+							visible: tokenDialog.hasPermissions
+						}
 
-							BaseText {
-								visible: tokenDialog.tokenId === ""
-								text: qsTr("Name")
-							}
-
-							CustomTextField {
-								objectName: "ServerTokenNameInput"
-								visible: tokenDialog.tokenId === ""
-								width: parent.width
-								height: Style.controlHeightM
-								onTextChanged: {
-									tokenDialog.tokenName = text.trim()
-									tokenDialog.updateApplyButton()
-								}
-							}
-
-							BaseText {
-								visible: tokenDialog.tokenId === ""
-								text: qsTr("Description")
-							}
-
-							CustomTextField {
-								objectName: "ServerTokenDescriptionInput"
-								visible: tokenDialog.tokenId === ""
-								width: parent.width
-								height: Style.controlHeightM
-								onTextChanged: {
-									tokenDialog.tokenDescription = text
-								}
-							}
-
-							BaseText {
-								text: tokenDialog.tokenId === "" ? qsTr("Server accepting the token") : qsTr("Server accepting the token: %1").arg(tokenDialog.receiverId)
-							}
-
-							Row {
-								visible: tokenDialog.tokenId === ""
-								spacing: Style.marginL
-
-								Repeater {
-									model: receiversModel
-
-									delegate: RadioButton {
-										objectName: "ServerTokenReceiver" + model.productId
-										text: model.productId
-										checked: tokenDialog.receiverId === model.productId
-										onClicked: {
-											tokenDialog.selectedScopes = []
-											tokenDialog.receiverId = model.productId
-										}
-									}
-								}
-							}
-
-							Row {
-								spacing: Style.marginM
-
-								BaseText {
-									anchors.verticalCenter: parent.verticalCenter
-									text: qsTr("Permissions")
-									font.bold: true
-								}
-
-								Button {
-									objectName: "ServerTokenSignInPresetButton"
-									text: qsTr("Sign-in only")
-									onClicked: {
-										tokenDialog.selectPreset("SignIn")
-									}
-								}
-
-								Button {
-									objectName: "ServerTokenAllPresetButton"
-									text: qsTr("All")
-									onClicked: {
-										tokenDialog.selectPreset("All")
-									}
-								}
-							}
-
-							Repeater {
-								model: permissionsModel
-
-								delegate: Column {
-									width: dialogContent.width
-									spacing: Style.spacingXS
-
-									CheckBox {
-										objectName: "ServerTokenPermission" + model.permissionId
-										text: model.required ? model.name + " " + qsTr("(required)") : model.name
-										isActive: !model.required
-										checkState: tokenDialog.isSelected(model.permissionId) ? Qt.Checked : Qt.Unchecked
-
-										function nextCheckState(){
-											tokenDialog.togglePermission(model.permissionId)
-										}
-									}
-
-									BaseText {
-										visible: model.description !== ""
-										width: parent.width
-										leftPadding: Style.marginXL
-										text: model.description
-										color: Style.inactiveTextColor
-										wrapMode: Text.WordWrap
-									}
-								}
-							}
+						BaseText {
+							anchors.centerIn: parent
+							width: parent.width - 2 * Style.marginXL
+							horizontalAlignment: Text.AlignHCenter
+							wrapMode: Text.WordWrap
+							text: qsTr("The server has not published its permissions yet: start it with a token first.")
+							color: Style.inactiveTextColor
+							visible: !tokenDialog.hasPermissions
 						}
 					}
 				}

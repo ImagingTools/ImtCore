@@ -11,7 +11,7 @@ QtObject {
 	// Model of the tokens of the last requested product; each item has m_id, m_productId, m_scopes and m_revoked.
 	property var tokens: null
 
-	// Model of the servers taking tokens; each item has m_productId and m_permissions (m_id, m_name, m_description, m_required).
+	// The servers taking tokens: [{productId, groups, requiredPermissions}], groups as PermissionsTableView.rebuildFromFlatArray takes them.
 	property var productServers: null
 
 	signal tokensReceived()

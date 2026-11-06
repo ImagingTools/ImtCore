@@ -132,7 +132,7 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 	gqlContextPtr->SetClientProductId(clientProductId);
 	gqlContextPtr->SetServerProductId(serverProductId);
 	gqlContextPtr->SetServerScopes(serverScopes);
-	gqlContextPtr->SetProductInfo(m_productInfoCompPtr.GetPtr());
+	gqlContextPtr->SetProductInfo(m_productInfoCompPtr.IsValid() ? m_productInfoCompPtr.GetPtr() : m_permissionTreeCompPtr.GetPtr());
 	if (isPat){
 		gqlContextPtr->SetScopes(scopes);
 	}
@@ -1025,7 +1025,7 @@ bool CAuthenticationManagerComp::CheckRequestAccess(const imtgql::CGqlRequest& g
 		return false;
 	}
 
-	if (!requiredPermission.isEmpty() && !imtauth::HasPermission(contextPtr->GetServerScopes(), requiredPermission, false)){
+	if (!requiredPermission.isEmpty() && !imtauth::HasPermission(contextPtr->GetServerScopes(), requiredPermission)){
 		errorMessage = QStringLiteral("The server of '%1' may not send '%2': its token lacks '%3'")
 					.arg(QString::fromUtf8(serverProductId), QString::fromUtf8(gqlRequest.GetCommandId()), QString::fromUtf8(requiredPermission));
 

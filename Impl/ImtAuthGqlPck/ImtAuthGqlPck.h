@@ -45,6 +45,7 @@
 #include <imtauthgql/CServerTokenControllerComp.h>
 #include <imtauthgql/CProductPermissionCatalogComp.h>
 #include <imtauthgql/CProductPermissionPublisherComp.h>
+#include <imtauthgql/CAuthorizationServerProductInfoComp.h>
 #include <imtauthgql/CPublishedPermissionsProviderComp.h>
 #include <imtauthgql/CConnectedProductCollectionControllerComp.h>
 #include <imtauthgql/CConnectedProductCollectionDocumentServiceComp.h>
@@ -121,6 +122,7 @@ typedef imtauthgql::CPersonalAccessTokenControllerComp PersonalAccessTokenContro
 typedef imtauthgql::CServerTokenControllerComp ServerTokenController;
 typedef imtauthgql::CProductPermissionCatalogComp ProductPermissionCatalog;
 typedef imtauthgql::CProductPermissionPublisherComp ProductPermissionPublisher;
+typedef imtauthgql::CAuthorizationServerProductInfoComp AuthorizationServerProductInfo;
 typedef imtauthgql::CPublishedPermissionsProviderComp PublishedPermissionsProvider;
 typedef imtauthgql::CConnectedProductCollectionControllerComp ConnectedProductCollectionController;
 typedef imtauthgql::CConnectedProductCollectionDocumentServiceComp ConnectedProductCollectionDocumentService;
