@@ -32,10 +32,60 @@ ServerTokenApiClient {
 		root.__revokeRequest.send(root.__revokeInput)
 	}
 
+	function requestProductServers(productId){
+		root.__receiversInput.m_clientProductId = productId
+		root.__receiversRequest.send(root.__receiversInput)
+	}
+
+	function updateTokenScopes(productId, tokenId, scopes){
+		root.__productId = productId
+		root.__scopesInput.m_id = tokenId
+		root.__scopesInput.m_scopes = scopes
+		root.__scopesRequest.send(root.__scopesInput)
+	}
+
 	property string __productId: ""
 	property ServerTokenListInput __listInput: ServerTokenListInput {}
 	property CreateServerTokenInput __createInput: CreateServerTokenInput {}
 	property InputId __revokeInput: InputId {}
+	property ServerTokenReceiversInput __receiversInput: ServerTokenReceiversInput {}
+	property UpdateServerTokenScopesInput __scopesInput: UpdateServerTokenScopesInput {}
+
+	property GqlSdlRequestSender __receiversRequest: GqlSdlRequestSender {
+		gqlCommandId: ImtauthServerTokensSdlCommandIds.s_getServerTokenReceivers
+		sdlObjectComp: Component {
+			ServerTokenReceiverList {
+				onFinished: {
+					root.productServers = m_productServers
+					root.productServersReceived()
+				}
+			}
+		}
+
+		function onError(message, type){
+			root.operationFailed(message)
+		}
+	}
+
+	property GqlSdlRequestSender __scopesRequest: GqlSdlRequestSender {
+		gqlCommandId: ImtauthServerTokensSdlCommandIds.s_updateServerTokenScopes
+		requestType: 1
+		sdlObjectComp: Component {
+			RevokeServerTokenPayload {
+				onFinished: {
+					if (!m_success){
+						root.operationFailed(m_message)
+					}
+
+					root.requestTokens(root.__productId)
+				}
+			}
+		}
+
+		function onError(message, type){
+			root.operationFailed(message)
+		}
+	}
 
 	property GqlSdlRequestSender __listRequest: GqlSdlRequestSender {
 		gqlCommandId: ImtauthServerTokensSdlCommandIds.s_getServerTokenList

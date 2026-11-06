@@ -21,7 +21,29 @@ Item {
 	Component.onCompleted: {
 		if (tokensPage.apiClient){
 			tokensPage.apiClient.requestTokens(tokensPage.productId)
+			tokensPage.apiClient.requestProductServers(tokensPage.productId)
 		}
+	}
+
+	// The permissions a token for the server can hold, from the catalog of the authorization server
+	function getServerPermissions(receiverId){
+		let servers = tokensPage.apiClient ? tokensPage.apiClient.productServers : null
+		if (!servers){
+			return null
+		}
+
+		for (let i = 0; i < servers.getItemsCount(); ++i){
+			let server = servers.get(i).item
+			if (server && String(server.m_productId) === receiverId){
+				return server.m_permissions
+			}
+		}
+
+		return null
+	}
+
+	function openTokenDialog(tokenId, receiverId, scopes){
+		ModalDialogManager.openDialog(tokenDialogComp, {"tokenId": tokenId, "receiverId": receiverId, "initialScopes": scopes})
 	}
 
 	Connections {
@@ -60,7 +82,7 @@ Item {
 				anchors.verticalCenter: parent.verticalCenter
 				text: qsTr("New Token")
 				onClicked: {
-					ModalDialogManager.openDialog(addTokenDialogComp, {})
+					tokensPage.openTokenDialog("", "", [])
 				}
 			}
 		}
@@ -79,13 +101,41 @@ Item {
 					addHeader("createdAt", qsTr("Created"))
 					addHeader("lastUsedAt", qsTr("Last used"))
 					addHeader("revoked", qsTr("Revoked"))
+					addHeader("permissions", "")
 					addHeader("revoke", "")
 					tokenTable.headers = this
 				}
 			}
 
 			onHeadersChanged: {
+				setColumnContentById("permissions", permissionsColumnComp)
 				setColumnContentById("revoke", revokeColumnComp)
+			}
+
+			Component {
+				id: permissionsColumnComp
+
+				TableCellDelegateBase {
+					id: permissionsDelegate
+
+					ToolButton {
+						id: permissionsButton
+						objectName: "ServerTokenPermissionsButton"
+						anchors.centerIn: parent
+						width: Style.buttonWidthM
+						height: width
+						iconSource: "qrc:/" + Style.getIconPath("Icons/Edit", Icon.State.On, Icon.Mode.Normal)
+						tooltipText: qsTr("Change the permissions of the token")
+						onClicked: {
+							let token = tokenTable.elements.get(permissionsDelegate.rowIndex).item
+							tokensPage.openTokenDialog(String(token.m_id), String(token.m_productId), token.m_scopes ? token.m_scopes : [])
+						}
+					}
+
+					onReused: {
+						permissionsButton.enabled = !tokenTable.elements.get(permissionsDelegate.rowIndex).item.m_revoked
+					}
+				}
 			}
 
 			Component {
@@ -188,123 +238,282 @@ Item {
 	}
 
 	Component {
-		id: addTokenDialogComp
+		id: tokenDialogComp
 
 		Dialog {
-			id: addDialog
-			title: qsTr("New server token")
-			width: 520
-			height: 420
+			id: tokenDialog
+			title: tokenDialog.tokenId === "" ? qsTr("New server token") : qsTr("Permissions of the token")
+			width: 560
+			height: 640
 			backgroundColor: Style.baseColor
 
-			property string receiverId: "Puma"
+			// Set by openDialog after the dialog is created
+			property string tokenId: ""
+			property string receiverId: ""
+			property var initialScopes: []
+
 			property string tokenName: ""
 			property string tokenDescription: ""
-			property bool canWatch: true
-			property bool canSend: true
-			property bool canPublish: true
+			property var selectedScopes: []
+
+			onReceiverIdChanged: {
+				if (tokenDialog.receiverId === "" && receiversModel.count > 0){
+					tokenDialog.receiverId = receiversModel.get(0).productId
+
+					return
+				}
+
+				tokenDialog.updatePermissions()
+			}
+
+			onInitialScopesChanged: {
+				tokenDialog.selectedScopes = tokenDialog.initialScopes ? tokenDialog.initialScopes.slice(0) : []
+				tokenDialog.updatePermissions()
+			}
+
+			onTokenIdChanged: {
+				tokenDialog.updateApplyButton()
+			}
+
+			ListModel {
+				id: receiversModel
+			}
+
+			ListModel {
+				id: permissionsModel
+			}
+
+			function updateReceivers(){
+				receiversModel.clear()
+
+				let servers = tokensPage.apiClient ? tokensPage.apiClient.productServers : null
+				if (servers){
+					for (let i = 0; i < servers.getItemsCount(); ++i){
+						let server = servers.get(i).item
+						if (server){
+							receiversModel.append({"productId": String(server.m_productId)})
+						}
+					}
+				}
+
+				if (tokenDialog.receiverId === "" && receiversModel.count > 0){
+					tokenDialog.receiverId = receiversModel.get(0).productId
+				}
+			}
+
+			// The required permissions are always held
+			function updatePermissions(){
+				permissionsModel.clear()
+
+				let permissions = tokensPage.getServerPermissions(tokenDialog.receiverId)
+				if (!permissions){
+					tokenDialog.updateApplyButton()
+
+					return
+				}
+
+				let scopes = tokenDialog.selectedScopes.slice(0)
+				for (let i = 0; i < permissions.getItemsCount(); ++i){
+					let permission = permissions.get(i).item
+					let permissionId = String(permission.m_id)
+					let isRequired = permission.m_required === true
+					permissionsModel.append({
+						"permissionId": permissionId,
+						"name": String(permission.m_name),
+						"description": permission.m_description ? String(permission.m_description) : "",
+						"required": isRequired
+					})
+
+					if (isRequired && scopes.indexOf(permissionId) < 0){
+						scopes.push(permissionId)
+					}
+				}
+
+				tokenDialog.selectedScopes = scopes
+				tokenDialog.updateApplyButton()
+			}
+
+			function isSelected(permissionId){
+				return tokenDialog.selectedScopes.indexOf(permissionId) >= 0
+			}
+
+			function togglePermission(permissionId){
+				let scopes = tokenDialog.selectedScopes.slice(0)
+				let index = scopes.indexOf(permissionId)
+				if (index >= 0){
+					scopes.splice(index, 1)
+				}
+				else{
+					scopes.push(permissionId)
+				}
+
+				tokenDialog.selectedScopes = scopes
+			}
+
+			// "SignIn": the required permissions and the changes of users, "All": everything
+			function selectPreset(presetId){
+				let scopes = []
+				for (let i = 0; i < permissionsModel.count; ++i){
+					let permission = permissionsModel.get(i)
+					if (presetId === "All" || permission.required || permission.permissionId === "/ProductServer/Watch/Users"){
+						scopes.push(permission.permissionId)
+					}
+				}
+
+				tokenDialog.selectedScopes = scopes
+			}
 
 			function updateApplyButton(){
-				addDialog.setButtonEnabled(Enums.apply, addDialog.tokenName !== "" && addDialog.receiverId !== "")
+				let isNameSet = tokenDialog.tokenId !== "" || tokenDialog.tokenName !== ""
+				tokenDialog.setButtonEnabled(Enums.apply, isNameSet && tokenDialog.receiverId !== "" && permissionsModel.count > 0)
 			}
 
 			onFinished: {
 				if (buttonId !== Enums.apply)
 					return
 
-				let scopes = []
-				if (addDialog.canWatch)
-					scopes.push("/ProductServer/Collections/Watch")
-				if (addDialog.canSend)
-					scopes.push("/ProductServer/Notifications/Send")
-				if (addDialog.canPublish)
-					scopes.push("/ProductServer/Permissions/Publish")
-
-				tokensPage.apiClient.createToken(tokensPage.productId, addDialog.receiverId, addDialog.tokenName, addDialog.tokenDescription, scopes)
+				if (tokenDialog.tokenId === ""){
+					tokensPage.apiClient.createToken(tokensPage.productId, tokenDialog.receiverId, tokenDialog.tokenName, tokenDialog.tokenDescription, tokenDialog.selectedScopes)
+				}
+				else{
+					tokensPage.apiClient.updateTokenScopes(tokensPage.productId, tokenDialog.tokenId, tokenDialog.selectedScopes)
+				}
 			}
 
 			Component.onCompleted: {
 				clearButtons()
-				addButton(Enums.apply, qsTr("Issue"), false)
+				addButton(Enums.apply, qsTr("Apply"), false)
 				addButton(Enums.cancel, qsTr("Cancel"), true)
+
+				tokenDialog.updateReceivers()
 			}
 
 			contentComp: Component {
 				Item {
-					width: addDialog.width
-					height: dialogContent.height
+					width: tokenDialog.width
+					height: tokenDialog.height - 3 * Style.controlHeightM - 2 * Style.marginXL
 
-					Column {
-						id: dialogContent
-						anchors.horizontalCenter: parent.horizontalCenter
-						anchors.top: parent.top
+					Flickable {
+						id: dialogFlickable
+						anchors.fill: parent
 						anchors.topMargin: Style.marginL
-						width: parent.width - 2 * Style.marginXL
-						spacing: Style.marginM
+						contentWidth: width
+						contentHeight: dialogContent.height + Style.marginL
+						clip: true
+						boundsBehavior: Flickable.StopAtBounds
 
-						BaseText {
-							text: qsTr("Name")
-						}
+						Column {
+							id: dialogContent
+							anchors.horizontalCenter: parent.horizontalCenter
+							width: dialogFlickable.width - 2 * Style.marginXL
+							spacing: Style.marginM
 
-						CustomTextField {
-							objectName: "ServerTokenNameInput"
-							width: parent.width
-							height: Style.controlHeightM
-							onTextChanged: {
-								addDialog.tokenName = text.trim()
-								addDialog.updateApplyButton()
+							BaseText {
+								visible: tokenDialog.tokenId === ""
+								text: qsTr("Name")
 							}
-						}
 
-						BaseText {
-							text: qsTr("Server accepting the token")
-						}
-
-						CustomTextField {
-							objectName: "ServerTokenReceiverInput"
-							width: parent.width
-							height: Style.controlHeightM
-							text: addDialog.receiverId
-							onTextChanged: {
-								addDialog.receiverId = text.trim()
-								addDialog.updateApplyButton()
+							CustomTextField {
+								objectName: "ServerTokenNameInput"
+								visible: tokenDialog.tokenId === ""
+								width: parent.width
+								height: Style.controlHeightM
+								onTextChanged: {
+									tokenDialog.tokenName = text.trim()
+									tokenDialog.updateApplyButton()
+								}
 							}
-						}
 
-						BaseText {
-							text: qsTr("Description")
-						}
-
-						CustomTextField {
-							objectName: "ServerTokenDescriptionInput"
-							width: parent.width
-							height: Style.controlHeightM
-							onTextChanged: {
-								addDialog.tokenDescription = text
+							BaseText {
+								visible: tokenDialog.tokenId === ""
+								text: qsTr("Description")
 							}
-						}
 
-						CheckBox {
-							text: qsTr("Watch collections")
-							checkState: addDialog.canWatch ? Qt.Checked : Qt.Unchecked
-							onClicked: {
-								addDialog.canWatch = !addDialog.canWatch
+							CustomTextField {
+								objectName: "ServerTokenDescriptionInput"
+								visible: tokenDialog.tokenId === ""
+								width: parent.width
+								height: Style.controlHeightM
+								onTextChanged: {
+									tokenDialog.tokenDescription = text
+								}
 							}
-						}
 
-						CheckBox {
-							text: qsTr("Send notifications")
-							checkState: addDialog.canSend ? Qt.Checked : Qt.Unchecked
-							onClicked: {
-								addDialog.canSend = !addDialog.canSend
+							BaseText {
+								text: tokenDialog.tokenId === "" ? qsTr("Server accepting the token") : qsTr("Server accepting the token: %1").arg(tokenDialog.receiverId)
 							}
-						}
 
-						CheckBox {
-							text: qsTr("Publish permissions")
-							checkState: addDialog.canPublish ? Qt.Checked : Qt.Unchecked
-							onClicked: {
-								addDialog.canPublish = !addDialog.canPublish
+							Row {
+								visible: tokenDialog.tokenId === ""
+								spacing: Style.marginL
+
+								Repeater {
+									model: receiversModel
+
+									delegate: CheckBox {
+										objectName: "ServerTokenReceiver" + model.productId
+										text: model.productId
+										checkState: tokenDialog.receiverId === model.productId ? Qt.Checked : Qt.Unchecked
+										onClicked: {
+											tokenDialog.selectedScopes = []
+											tokenDialog.receiverId = model.productId
+										}
+									}
+								}
+							}
+
+							Row {
+								spacing: Style.marginM
+
+								BaseText {
+									anchors.verticalCenter: parent.verticalCenter
+									text: qsTr("Permissions")
+									font.bold: true
+								}
+
+								Button {
+									objectName: "ServerTokenSignInPresetButton"
+									text: qsTr("Sign-in only")
+									onClicked: {
+										tokenDialog.selectPreset("SignIn")
+									}
+								}
+
+								Button {
+									objectName: "ServerTokenAllPresetButton"
+									text: qsTr("All")
+									onClicked: {
+										tokenDialog.selectPreset("All")
+									}
+								}
+							}
+
+							Repeater {
+								model: permissionsModel
+
+								delegate: Column {
+									width: dialogContent.width
+									spacing: Style.spacingXS
+
+									CheckBox {
+										objectName: "ServerTokenPermission" + model.permissionId
+										text: model.required ? model.name + " " + qsTr("(required)") : model.name
+										enabled: !model.required
+										checkState: tokenDialog.isSelected(model.permissionId) ? Qt.Checked : Qt.Unchecked
+										onClicked: {
+											tokenDialog.togglePermission(model.permissionId)
+										}
+									}
+
+									BaseText {
+										visible: model.description !== ""
+										width: parent.width
+										leftPadding: Style.marginXL
+										text: model.description
+										color: Style.inactiveTextColor
+										wrapMode: Text.WordWrap
+									}
+								}
 							}
 						}
 					}
