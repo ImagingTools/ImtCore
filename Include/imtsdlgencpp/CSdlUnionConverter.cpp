@@ -30,6 +30,67 @@ void FeedStream(QTextStream& stream, uint indents, bool flush)
 }
 
 
+static bool IsFloatingScalarType(const QString& sdlType)
+{
+	return sdlType == QStringLiteral("Double") || sdlType == QStringLiteral("Float");
+}
+
+
+static QStringList GetOrderedUnionTypes(const imtsdl::CSdlUnion& sdlUnion)
+{
+	// floating alternatives accept any number, so they must be checked after integral ones
+	QStringList retVal;
+	QStringList floatingTypes;
+	for (const QString& sdlType : sdlUnion.GetTypes()){
+		if (IsFloatingScalarType(sdlType)){
+			floatingTypes << sdlType;
+		}
+		else{
+			retVal << sdlType;
+		}
+	}
+
+	return retVal + floatingTypes;
+}
+
+
+QString CSdlUnionConverter::GetScalarUnionMatchCondition(const QString& sdlType, const QString& variantExpression, const QString& convertedType)
+{
+	const QString typeExpr = variantExpression + QStringLiteral(".userType()");
+	const QString isIntegral =
+				typeExpr + QStringLiteral(" == QMetaType::Int || ") +
+				typeExpr + QStringLiteral(" == QMetaType::UInt || ") +
+				typeExpr + QStringLiteral(" == QMetaType::LongLong || ") +
+				typeExpr + QStringLiteral(" == QMetaType::ULongLong");
+	const QString isFloating =
+				typeExpr + QStringLiteral(" == QMetaType::Double || ") +
+				typeExpr + QStringLiteral(" == QMetaType::Float");
+
+	if (sdlType == QStringLiteral("Bool") || sdlType == QStringLiteral("Boolean")){
+		return typeExpr + QStringLiteral(" == QMetaType::Bool");
+	}
+
+	if (sdlType == QStringLiteral("String") || sdlType == QStringLiteral("ID")){
+		return typeExpr + QStringLiteral(" == QMetaType::QString || ") + typeExpr + QStringLiteral(" == QMetaType::QByteArray");
+	}
+
+	if (	sdlType == QStringLiteral("Int") ||
+			sdlType == QStringLiteral("Integer") ||
+			sdlType == QStringLiteral("Long") ||
+			sdlType == QStringLiteral("LongLong")){
+		// integral values transferred as floating numbers (e.g. JSON) are accepted too
+		return isIntegral + QStringLiteral(" || ((") + isFloating + QStringLiteral(") && ") +
+					variantExpression + QStringLiteral(".toDouble() == double(") + variantExpression + QStringLiteral(".toLongLong()))");
+	}
+
+	if (IsFloatingScalarType(sdlType)){
+		return isIntegral + QStringLiteral(" || ") + isFloating;
+	}
+
+	return variantExpression + QStringLiteral(".canConvert<") + convertedType + QStringLiteral(">()");
+}
+
+
 /**
 	\todo make a refactoring replace 'text' types and methods to static values.
 		\example 'WriteToJsonObject' -> 'CSdlClassJsonModificatorComp::s_writeMethodName'
@@ -68,8 +129,8 @@ void CSdlUnionConverter::WriteConversionFromUnion(
 	}
 	const QString completeTypeName = typeNamespace + sdlUnion.GetName();
 
-	// for GQL create a container object (GQL Spec limitaion?)
-	if (conversionType == CT_GQL_SCALAR || conversionType == CT_GQL_ARRAY){
+	// for GQL arrays create a container object (GQL Spec limitaion?)
+	if (conversionType == CT_GQL_ARRAY){
 		FeedStreamHorizontally(stream, hIndents);
 		stream << QStringLiteral("::imtgql::CGqlParamObject ");
 		stream << targetName;
@@ -199,6 +260,12 @@ void CSdlUnionConverter::WriteConversionFromUnion(
 				}
 			}
 			else if (conversionType == CT_GQL_SCALAR || conversionType == CT_GQL_ARRAY){
+				if (conversionType == CT_GQL_SCALAR){
+					FeedStreamHorizontally(stream, hIndents + 1);
+					stream << QStringLiteral("::imtgql::CGqlParamObject ") << targetName << QStringLiteral("DataObject;");
+					FeedStream(stream, 1, false);
+				}
+
 				FeedStreamHorizontally(stream, hIndents + 1);
 				stream << QStringLiteral("if (!") << valName << QStringLiteral("->WriteToGraphQlObject(");
 				stream << targetName;
@@ -219,6 +286,12 @@ void CSdlUnionConverter::WriteConversionFromUnion(
 				stream << QStringLiteral("DataObject.InsertParam(\"__typename\", QVariant(\"");
 				stream << sdlType << QStringLiteral("\"));");
 				FeedStream(stream, 1, false);
+
+				if (conversionType == CT_GQL_SCALAR){
+					FeedStreamHorizontally(stream, hIndents + 1);
+					stream << QStringLiteral("gqlObject.InsertParam(\"") << targetName << QStringLiteral("\", ") << targetName << QStringLiteral("DataObject);");
+					FeedStream(stream, 1, false);
+				}
 			}
 			else if (conversionType == CT_JSON_SCALAR){
 				if (!customModelTarget.isEmpty()){
@@ -318,7 +391,12 @@ void CSdlUnionConverter::WriteConversionFromUnion(
 			}
 		}
 		else{
-			if (conversionType == CT_GQL_SCALAR || conversionType == CT_GQL_ARRAY){
+			if (conversionType == CT_GQL_SCALAR){
+				FeedStreamHorizontally(stream, hIndents + 1);
+				stream << QStringLiteral("gqlObject.InsertParam(\"") << targetName << QStringLiteral("\", QVariant(*") << valName << QStringLiteral("));");
+				FeedStream(stream, 1, false);
+			}
+			else if (conversionType == CT_GQL_ARRAY){
 				FeedStreamHorizontally(stream, hIndents + 1);
 				stream << targetName;
 				stream << QStringLiteral("DataObject");
@@ -374,7 +452,13 @@ void CSdlUnionConverter::WriteConversionFromUnion(
 				FeedStreamHorizontally(stream, hIndents + 1);
 
 
-				if (!addCommand.isEmpty()){
+				if (!addCommand.isEmpty() && conversionType == CT_MODEL_SCALAR){
+					stream << addCommand << '"' << targetName << QStringLiteral("\", *") << valName << QStringLiteral(", ") << modelIndex << QStringLiteral(");");
+				}
+				else if (!addCommand.isEmpty() && conversionType == CT_MODEL_ARRAY){
+					stream << addCommand << QStringLiteral("QByteArray(), *") << valName << QStringLiteral(", ") << modelIndex << QStringLiteral(");");
+				}
+				else if (!addCommand.isEmpty()){
 					stream << addCommand << QStringLiteral("\"\", *") << valName << QStringLiteral(");");
 				}
 				else{
@@ -400,16 +484,6 @@ void CSdlUnionConverter::WriteConversionFromUnion(
 		stream << QStringLiteral("DataObject;");
 		FeedStream(stream, 1, false);
 	}
-
-	// and finally for GQL write a *container*
-	if (conversionType == CT_GQL_SCALAR){
-		FeedStreamHorizontally(stream, hIndents);
-		stream << QStringLiteral("gqlObject.InsertParam(\"");
-		stream << targetName;
-		stream << QStringLiteral("\", ");
-		stream << targetName;
-		stream << QStringLiteral("DataObject);");
-	}
 }
 
 
@@ -429,7 +503,7 @@ void CSdlUnionConverter::WriteUnionConversionFromData(
 			const QString& arraySourceVariableName)
 {
 	bool isFirstIteration = true;
-	for (const auto& sdlType : sdlUnion.GetTypes()){
+	for (const auto& sdlType : GetOrderedUnionTypes(sdlUnion)){
 		imtsdl::CSdlField field;
 		field.SetType(sdlType);
 		bool isCustom = false;
@@ -555,21 +629,18 @@ void CSdlUnionConverter::WriteUnionConversionFromData(
 			}
 		}
 		else{
-			stream << QStringLiteral("if (") << sourceVariableName;
+			QString variantExpression = sourceVariableName;
 			if (conversionType == CT_GQL_ARRAY){
-				stream << QStringLiteral("->GetParamArgumentValue(\"\")");
+				variantExpression += QStringLiteral("->GetParamArgumentValue(\"\")");
 			}
-			stream << QStringLiteral(".canConvert<") << convertedType << QStringLiteral(">()){");
+			stream << QStringLiteral("if (") << GetScalarUnionMatchCondition(sdlType, variantExpression, convertedType) << QStringLiteral("){");
 			FeedStream(stream, 1, false);
 
 			FeedStreamHorizontally(stream, hIndents + 1);
 			stream << targetVariableName;
 			stream << QStringLiteral(" = ");
 			stream << sdlUnion.GetName() << QStringLiteral("(");
-			stream << sourceVariableName;
-			if (conversionType == CT_GQL_ARRAY){
-				stream << QStringLiteral("->GetParamArgumentValue(\"\")");
-			}
+			stream << variantExpression;
 			stream << QStringLiteral(".value<") << convertedType << QStringLiteral(">());");
 			FeedStream(stream, 1, false);
 		}

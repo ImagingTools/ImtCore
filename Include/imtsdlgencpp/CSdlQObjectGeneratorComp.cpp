@@ -9,6 +9,7 @@
 #include <imtsdl/CSdlEntryBase.h>
 #include <imtsdl/CSdlType.h>
 #include <imtsdl/CSdlField.h>
+#include <imtsdlgencpp/CSdlUnionConverter.h>
 
 
 namespace imtsdlgencpp
@@ -516,6 +517,48 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 			}
 			else{
 				if (isUnion && !isArray){
+					const auto* scalarUnionPtr = dynamic_cast<const imtsdl::CSdlUnion*>(sdlEntryField.get());
+					if (scalarUnionPtr != nullptr){
+						// scalar alternatives are returned as plain values
+						for (const auto& sdlType : scalarUnionPtr->GetTypes()){
+							imtsdl::CSdlField sdlField;
+							sdlField.SetType(sdlType);
+							bool isScalarCustom = false;
+							const QString convertedType = OptListConvertTypeWithNamespaceStruct(
+								sdlField,
+								GetNamespaceFromSchemaParams(scalarUnionPtr->GetSchemaParams()),
+								*m_sdlTypeListCompPtr,
+								*m_sdlEnumListCompPtr,
+								*m_sdlUnionListCompPtr,
+								true,
+								&isScalarCustom,
+								nullptr,
+								nullptr,
+								nullptr,
+								nullptr,
+								false);
+							if (isScalarCustom){
+								continue;
+							}
+
+							const QString valueVarName = GetValueVariableName(sdlType);
+							stream << QStringLiteral("if (const ") << convertedType << QStringLiteral("* ") << valueVarName << QStringLiteral(" = std::get_if<") << convertedType << QStringLiteral(">((");
+							stream << dataClassName << QStringLiteral("::") << field.GetId();
+							stream << QStringLiteral(").GetPtr())){");
+							FeedStream(stream, 1, false);
+
+							FeedStreamHorizontally(stream, 2);
+							stream << QStringLiteral("return QVariant(*") << valueVarName << QStringLiteral(");");
+							FeedStream(stream, 1, false);
+
+							FeedStreamHorizontally(stream);
+							stream << '}';
+							FeedStream(stream, 1, false);
+
+							FeedStreamHorizontally(stream);
+						}
+					}
+
 					stream << QStringLiteral("if (m_") << GetDecapitalizedValue(field.GetId());
 					stream << QStringLiteral("QObjectPtr.isValid()){");
 					FeedStream(stream, 1, false);
@@ -540,6 +583,11 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 								nullptr,
 								nullptr,
 								false);
+							if (!isCustom){
+								// scalar alternatives are returned above
+								continue;
+							}
+
 							FeedStreamHorizontally(stream, 2);
 							const QString sourceVariableName = dataClassName + QStringLiteral("::") + field.GetId();
 
@@ -826,7 +874,8 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 				const auto* sdlUnion = dynamic_cast<const imtsdl::CSdlUnion*>(sdlEntryField.get());
 
 				if (sdlUnion != nullptr){
-					// QList<QString> convertedTypeList;
+					QList<QPair<QString, QString>> scalarTypeList;
+					QList<QPair<QString, QString>> floatingScalarTypeList;
 					for (const auto& sdlType : sdlUnion->GetTypes()){
 						imtsdl::CSdlField sdlField;
 						sdlField.SetType(sdlType);
@@ -844,6 +893,18 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 							nullptr,
 							nullptr,
 							false);
+						if (!isCustom){
+							// floating alternatives accept any number, so they are checked last
+							if (sdlType == QStringLiteral("Double") || sdlType == QStringLiteral("Float")){
+								floatingScalarTypeList << qMakePair(sdlType, convertedType);
+							}
+							else{
+								scalarTypeList << qMakePair(sdlType, convertedType);
+							}
+
+							continue;
+						}
+
 						FeedStreamHorizontally(stream, 2);
 						const QString sourceVariableName = dataClassName + QStringLiteral("::") + field.GetId();
 						QString objectConvertedType = convertedType;
@@ -869,6 +930,27 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 						FeedStreamHorizontally(stream, 2);
 						stream << QStringLiteral("}");;
 						FeedStream(stream, 1, false);
+					}
+
+					scalarTypeList << floatingScalarTypeList;
+					bool isFirstScalar = true;
+					for (const QPair<QString, QString>& scalarType : std::as_const(scalarTypeList)){
+						FeedStreamHorizontally(stream, 2);
+						if (!isFirstScalar){
+							stream << QStringLiteral("else ");
+						}
+						stream << QStringLiteral("if (") << CSdlUnionConverter::GetScalarUnionMatchCondition(scalarType.first, QStringLiteral("v"), scalarType.second) << QStringLiteral("){");
+						FeedStream(stream, 1, false);
+
+						FeedStreamHorizontally(stream, 3);
+						stream << dataClassName << QStringLiteral("::") << field.GetId() << QStringLiteral(" = v.value<") << scalarType.second << QStringLiteral(">();");
+						FeedStream(stream, 1, false);
+
+						FeedStreamHorizontally(stream, 2);
+						stream << '}';
+						FeedStream(stream, 1, false);
+
+						isFirstScalar = false;
 					}
 				}
 			}

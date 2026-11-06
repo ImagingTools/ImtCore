@@ -33,6 +33,12 @@ public:
 		CT_JSON_ARRAY = 48
 	};
 
+	/**
+		Creates C++ condition which checks whether a QVariant (\c variantExpression) holds a value of the scalar SDL type \c sdlType.
+		\note floating types accept integral values too, so they must be checked after integral ones.
+	*/
+	static QString GetScalarUnionMatchCondition(const QString& sdlType, const QString& variantExpression, const QString& convertedType);
+
 	// generate methods
 	static void WriteConversionFromUnion(
 				QTextStream& stream,

@@ -494,9 +494,8 @@ void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(
 			if (hasComplexTypes){
 				stream << QStringLiteral("QString ");
 				stream << GetDecapitalizedValue(field.GetId());
-				stream << QStringLiteral("Typename = model.GetTreeItemModel(\"");
-				stream << field.GetId();
-				stream << QStringLiteral("\", modelIndex)->GetData(\"__typename\").toString();");
+				stream << QStringLiteral("Typename = model.GetTreeItemModel(\"") << field.GetId() << QStringLiteral("\", modelIndex) != nullptr ? ");
+				stream << QStringLiteral("model.GetTreeItemModel(\"") << field.GetId() << QStringLiteral("\", modelIndex)->GetData(\"__typename\").toString() : QString();");
 				FeedStream(stream, 1, false);
 			}
 
@@ -565,9 +564,8 @@ void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(
 				FeedStreamHorizontally(stream, 2);
 				stream << QStringLiteral("QString ");
 				stream << GetDecapitalizedValue(field.GetId());
-				stream << QStringLiteral("Typename = model.GetTreeItemModel(\"");
-				stream << field.GetId();
-				stream << QStringLiteral("\", modelIndex)->GetData(\"__typename\").toString();");
+				stream << QStringLiteral("Typename = model.GetTreeItemModel(\"") << field.GetId() << QStringLiteral("\", modelIndex) != nullptr ? ");
+				stream << QStringLiteral("model.GetTreeItemModel(\"") << field.GetId() << QStringLiteral("\", modelIndex)->GetData(\"__typename\").toString() : QString();");
 				FeedStream(stream, 1, false);
 			}
 
