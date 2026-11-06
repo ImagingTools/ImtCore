@@ -1507,6 +1507,7 @@ defineProp(
 	},
 	function (v) {
 		v = toFloat(v);
+		this.$wSet = true;
 		if (this.$w !== v) {
 			this.$w = v;
 			this.$update();
@@ -1527,6 +1528,7 @@ defineProp(
 	},
 	function (v) {
 		v = toFloat(v);
+		this.$hSet = true;
 		if (this.$h !== v) {
 			this.$h = v;
 			this.$update();
@@ -3045,6 +3047,7 @@ export class ListView extends Item {
 		this.$builtModel = undefined;
 		this.$builtVersion = -1;
 		this.$builtCount = -1;
+		this.$builtRows = null; // the row objects of the model when the delegates were made (ListModel, TreeItemModel)
 		this.$delegates = new Map();
 		this.$reuseItems = false;
 		this.$pool = []; // delegates kept for reuse (`reuseItems: true`), detached from the children
@@ -3119,9 +3122,16 @@ export class ListView extends Item {
 				this.$recordExtent(index, size);
 				return size;
 			}
+			// A delegate that was laid out and was given the size 0 takes no space, like in Qt: a row that a binding hides
+			// with `height: 0` (a closed branch of a tree). A delegate that has no size of its own (or was not laid out
+			// yet) is not measured: the rows count as the first one.
+			if (!Number.isNaN(item.$lh) && (this.$horizontal ? item.$wSet === true : item.$hSet === true)) {
+				this.$recordExtent(index, 0);
+				return 0;
+			}
 		}
 		const remembered = this.$extents[index];
-		if (remembered > 0) return remembered;
+		if (remembered >= 0) return remembered;
 		return this.$rowHeight > 0 ? this.$rowHeight : 40;
 	}
 
@@ -3175,6 +3185,30 @@ export class ListView extends Item {
 		const delta = notches * WHEEL_NOTCH_PX;
 		if (this.$horizontal) this.contentX = clamp(this.$contentX - delta, 0, this.$maxContentX);
 		else this.contentY = clamp(this.$contentY - delta, 0, this.$maxContentY);
+	}
+
+	// A copy of the row objects of the model, or null if it has none that can be told apart.
+	$modelRows() {
+		const model = this.$model;
+		return model instanceof ListModel || (model instanceof TreeItemModel && model.$wrapped !== true) ? model.$rows.slice() : null;
+	}
+
+	// The delegates whose row is still in the model, with the new index of the row: a Map(index -> delegate). They are
+	// taken out of `$delegates`. Empty if the model is another one or its rows cannot be told apart.
+	$rowsThatStay() {
+		const stay = new Map();
+		const before = this.$builtRows;
+		const rows = this.$builtModel === this.$model ? this.$modelRows() : null;
+		if (before === null || rows === null || this.rebindDelegate === null) return stay;
+		const position = new Map();
+		for (let i = 0; i < rows.length; i++) position.set(rows[i], i);
+		for (const [index, item] of [...this.$delegates]) {
+			const now = position.get(before[index]);
+			if (now === undefined || stay.has(now)) continue;
+			stay.set(now, item);
+			this.$delegates.delete(index);
+		}
+		return stay;
 	}
 
 	$releaseWhere(keep) {
@@ -3241,11 +3275,20 @@ export class ListView extends Item {
 		if (this.$builtModel !== this.$model || this.$builtVersion !== version || this.$builtCount !== count) {
 			// The model changed: the delegates are created again. The old current item does not log a focus loss.
 			this.$scopeFocus = null;
+			// Like in Qt a delegate stays with its row when rows are inserted or removed: its `index` changes. Otherwise
+			// the delegate of a row that a handler is working on (it inserted the children of the row) becomes another row
+			// from the pool in the middle of the handler, and `model.index` changes under it.
+			const stay = this.$rowsThatStay();
 			this.$releaseWhere(() => false);
+			for (const [index, item] of stay) {
+				this.$delegates.set(index, item);
+				this.rebindDelegate(item, index);
+			}
 			this.$resetExtents();
 			this.$builtModel = this.$model;
 			this.$builtVersion = version;
 			this.$builtCount = count;
+			this.$builtRows = this.$modelRows();
 		}
 		if (this.createDelegate === null || count === 0) {
 			this.$releaseWhere(() => false);
