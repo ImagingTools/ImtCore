@@ -1,0 +1,6 @@
+{
+    "includes": [
+        "${QMLWEB_TEST_BASE}/base.json"
+    ],
+    "dirs": []
+}

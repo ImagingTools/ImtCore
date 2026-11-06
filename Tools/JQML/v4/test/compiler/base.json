@@ -1,0 +1,7 @@
+{
+    "includes": [],
+    "dirs": [
+        "modules/Widgets"
+    ],
+    "translation_dir": "translations"
+}

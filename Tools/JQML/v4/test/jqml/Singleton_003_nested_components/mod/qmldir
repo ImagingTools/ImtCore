@@ -1,0 +1,2 @@
+module mod
+singleton SharedState 1.0 SharedState.qml
