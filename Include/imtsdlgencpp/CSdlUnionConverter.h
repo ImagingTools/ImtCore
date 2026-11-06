@@ -33,6 +33,23 @@ public:
 		CT_JSON_ARRAY = 48
 	};
 
+	/**
+		Creates C++ conditions which select the scalar alternative of a union for a QVariant (\c variantExpression).
+		\param scalarTypes	pairs of the SDL type and the converted C++ type of the scalar alternatives in declaration order.
+		\param isJsonSource	the value is read from JSON, see the note below.
+		\return pairs of the converted C++ type and the condition in the order in which they must be checked (as an 'if/else if' chain).
+		At first every alternative is matched by its native metatype only, so e.g. a \c long value is never narrowed to an \c Int alternative.
+		Values whose metatype matches no alternative (e.g. \c Short, \c UInt or integers read from JSON) are matched afterwards:
+		integral alternatives (in declaration order) accept any integral number and any integral-valued floating number which fits into their range,
+		floating alternatives accept any number.
+		\note JSON has no separate integer type, so its numbers have an ambiguous type. For JSON sources integral-valued floating numbers
+		are not matched by floating alternatives at first, i.e. they are read as integers if the union has an integral alternative which can hold the value.
+	*/
+	static QList<QPair<QString, QString>> GetScalarUnionMatchConditions(
+				const QList<QPair<QString, QString>>& scalarTypes,
+				const QString& variantExpression,
+				bool isJsonSource);
+
 	// generate methods
 	static void WriteConversionFromUnion(
 				QTextStream& stream,
