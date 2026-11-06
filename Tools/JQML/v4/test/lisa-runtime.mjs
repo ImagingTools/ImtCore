@@ -147,7 +147,7 @@ const checks = {
 			image.source = 'replacement.png';
 			let painted = false;
 			image.$paint({ dpr: 1, ma: 1, image() { painted = true; } }, 1);
-			assert.equal(image.status, 2);
+			assert.equal(image.status, 1);
 			assert.equal(image.$img, current);
 			assert.equal(painted, true);
 		} finally {
@@ -155,6 +155,108 @@ const checks = {
 			else globalThis.document = savedDocument;
 			if (savedImage === undefined) delete globalThis.Image;
 			else globalThis.Image = savedImage;
+		}
+	},
+
+	async 'Ready-bound tab icon slots do not collapse during source changes'() {
+		const savedImage = globalThis.Image;
+		const savedDocument = globalThis.document;
+		const requests = [];
+		try {
+			globalThis.Image = class {
+				naturalWidth = 16;
+				naturalHeight = 16;
+				set src(source) { requests.push({ source, picture: this }); }
+			};
+			globalThis.document = {};
+			const { root, settle } = await load(`
+				import QtQuick
+				Item {
+					id: tab
+					property bool selected: false
+					property alias icon: picture
+					property alias slot: iconSlot
+					Item {
+						id: iconSlot
+						visible: picture.status === Image.Ready
+						width: visible ? picture.width : 0
+						height: 16
+						Image {
+							id: picture
+							width: 16
+							height: 16
+							source: tab.selected ? "active.png" : "normal.png"
+						}
+					}
+				}
+			`);
+			assert.equal(root.icon.status, 2);
+			assert.equal(root.slot.visible, false);
+			assert.equal(root.slot.width, 0);
+			requests[0].picture.onload();
+			settle();
+			const current = root.icon.$img;
+			assert.equal(root.slot.visible, true);
+			assert.equal(root.slot.width, 16);
+
+			root.selected = true;
+			settle();
+			assert.equal(requests[1].source, 'active.png');
+			assert.equal(root.icon.status, 1);
+			assert.equal(root.icon.$img, current);
+			assert.equal(root.slot.visible, true);
+			assert.equal(root.slot.width, 16);
+			requests[1].picture.onload();
+			settle();
+			assert.equal(root.icon.$img, requests[1].picture);
+
+			root.selected = false;
+			settle();
+			root.selected = true;
+			settle();
+			requests[2].picture.onload();
+			requests[2].picture.onerror();
+			settle();
+			assert.equal(root.icon.$img, requests[1].picture, 'a stale replacement must not overwrite the current picture');
+			assert.equal(root.slot.visible, true);
+			assert.equal(root.slot.width, 16);
+			requests[3].picture.onload();
+			settle();
+			assert.equal(root.icon.$img, requests[3].picture);
+
+			root.icon.source = 'missing.png';
+			settle();
+			assert.equal(root.slot.visible, true);
+			requests[4].picture.onerror();
+			settle();
+			assert.equal(root.icon.status, 3);
+			assert.equal(root.icon.$img, null);
+			assert.equal(root.slot.visible, false);
+			assert.equal(root.slot.width, 0);
+
+			root.icon.source = 'retry.png';
+			settle();
+			assert.equal(root.icon.status, 2);
+			requests[5].picture.onload();
+			settle();
+			assert.equal(root.slot.visible, true);
+			root.icon.source = 'pending.png';
+			settle();
+			assert.equal(root.slot.visible, true);
+			root.icon.source = '';
+			settle();
+			assert.equal(root.icon.status, 0);
+			assert.equal(root.icon.$img, null);
+			assert.equal(root.slot.visible, false);
+			assert.equal(root.slot.width, 0);
+			requests[6].picture.onload();
+			settle();
+			assert.equal(root.icon.status, 0, 'clearing a source must invalidate pending callbacks');
+		} finally {
+			if (savedImage === undefined) delete globalThis.Image;
+			else globalThis.Image = savedImage;
+			if (savedDocument === undefined) delete globalThis.document;
+			else globalThis.document = savedDocument;
 		}
 	},
 

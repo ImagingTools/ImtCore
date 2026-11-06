@@ -3875,7 +3875,8 @@ defineProp(
 		v = toStr(v);
 		if (v === this.$source) return;
 		this.$source = v;
-		this.$status = v === '' ? 0 : 2;
+		// A retained picture stays Ready so status-bound parents do not hide it during replacement.
+		this.$status = v === '' ? 0 : this.$img === null ? 2 : 1;
 		hooks.loadImage(this, v);
 		this.$update();
 	},
