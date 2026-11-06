@@ -97,6 +97,8 @@ private slots:
 	void RedoRestoresDocumentDataTest();
 	void UndoRedoNewChangeClearsRedoTest();
 	void UndoRedoExecuteDocumentMethodTest();
+	void ExecuteDocumentMethodWithResultTest();
+	void ExecuteDocumentConstMethodWithResultTest();
 	void UndoRedoChangedEventFiredTest();
 	void UndoRedoNewDocumentStaysDirtyTest();
 	void UndoRedoDocumentsIsolationTest();
