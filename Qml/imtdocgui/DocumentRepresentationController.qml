@@ -19,10 +19,12 @@ QtObject {
 	// Only for a representation whose data that view does not change, including what the server derives from it.
 	property bool updateOnDocumentViewChange: true
 
-	// Sources of a change, see isUpdateRequired()
-	readonly property string ownChange: "Own"						// the update of this controller
-	readonly property string documentViewChange: "DocumentView"	// the update of another view of this document in this client
-	readonly property string externalChange: "External"			// another session, an undo, the server
+	// The source of a change, see isUpdateRequired()
+	enum ChangeSource {
+		Own,			// the update of this controller
+		DocumentView,	// the update of another view of this document in this client
+		External		// another session, an undo, the server
+	}
 
 	signal startUpdateDocument(string documentId)
 	signal updateDocumentFailed(string documentId, string message)
@@ -47,14 +49,14 @@ QtObject {
 
 	// Decides whether the representation is read again after the document changed.
 	// changeIds: the changed parts of the document; empty when unknown, then the representation is read.
-	// changeSource: ownChange (its result is in the representation already), documentViewChange or externalChange.
+	// changeSource: a value of ChangeSource; the result of an own change is in the representation already.
 	// Default: the own change is not read, another one is read if it touches observedChangeIds.
 	function isUpdateRequired(changeIds, changeSource){
-		if (changeSource === root.ownChange){
+		if (changeSource === DocumentRepresentationController.ChangeSource.Own){
 			return false
 		}
 
-		if (changeSource === root.documentViewChange && !root.updateOnDocumentViewChange){
+		if (changeSource === DocumentRepresentationController.ChangeSource.DocumentView && !root.updateOnDocumentViewChange){
 			return false
 		}
 

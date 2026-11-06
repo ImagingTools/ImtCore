@@ -781,9 +781,9 @@ sequenceDiagram
 
    | `changeSource` | Когда |
    |---|---|
-   | `ownChange` (`"Own"`) | Изменение вызвало обновление этого view |
-   | `documentViewChange` (`"DocumentView"`) | Изменение вызвало обновление другого view этого документа в этом клиенте |
-   | `externalChange` (`"External"`) | Другая вкладка или сессия, undo, сервер: метка не найдена ни у одного view |
+   | `DocumentRepresentationController.ChangeSource.Own` | Изменение вызвало обновление этого view |
+   | `DocumentRepresentationController.ChangeSource.DocumentView` | Изменение вызвало обновление другого view этого документа в этом клиенте |
+   | `DocumentRepresentationController.ChangeSource.External` | Другая вкладка или сессия, undo, сервер: метка не найдена ни у одного view |
 3. Если контроллер ответил `true`, видимый view читается сразу, скрытый — при показе. View, чьё
    последнее чтение не удалось, читается при любом изменении.
 

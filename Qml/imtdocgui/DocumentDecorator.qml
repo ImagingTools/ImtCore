@@ -338,16 +338,15 @@ QtObject {
 		let sourceViewIndex = findSourceViewIndex(sourceId)
 
 		for (let i = 0; i < registeredViews.length; ++i){
-			let representationController = registeredRepresentation[i]
-			let changeSource = representationController.externalChange
+			let changeSource = DocumentRepresentationController.ChangeSource.External
 			if (i === sourceViewIndex){
-				changeSource = representationController.ownChange
+				changeSource = DocumentRepresentationController.ChangeSource.Own
 			}
 			else if (sourceViewIndex >= 0){
-				changeSource = representationController.documentViewChange
+				changeSource = DocumentRepresentationController.ChangeSource.DocumentView
 			}
 
-			if (_internal.failedViews[i] || representationController.isUpdateRequired(ids, changeSource)){
+			if (_internal.failedViews[i] || registeredRepresentation[i].isUpdateRequired(ids, changeSource)){
 				updateRepresentation(i)
 			}
 		}
