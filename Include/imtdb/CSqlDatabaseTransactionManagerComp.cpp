@@ -61,6 +61,12 @@ bool CSqlDatabaseTransactionManagerComp::EndTransaction()
 	if (!IsCollectionsInOneDatabase() || !m_databaseEngineCompPtr.IsValid()){
 		return false;
 	}
+	for (int index = 0; index < m_collectionCompPtr.GetCount(); ++index) {
+		if (m_collectionCompPtr[index] != nullptr && m_collectionCompPtr[index]->IsTransactionRollbackOnly()) {
+			CancelTransaction();
+			return false;
+		}
+	}
 
 	if (!m_databaseEngineCompPtr->FinishTransaction()) {
 		return false;

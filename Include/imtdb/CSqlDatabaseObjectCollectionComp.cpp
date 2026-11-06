@@ -38,8 +38,17 @@ CSqlDatabaseObjectCollectionComp::CSqlDatabaseObjectCollectionComp()
 
 void CSqlDatabaseObjectCollectionComp::BeginDeferredNotifications()
 {
-	QMutexLocker locker(&m_transactionDisableCountersMutex);
-	m_pendingMetadataNotifications.insert(QThread::currentThreadId(), {});
+	{
+		QMutexLocker locker(&m_transactionDisableCountersMutex);
+		const auto thread = QThread::currentThreadId();
+		if (m_metadataNotificationDepth[thread]++ == 0) {
+			m_pendingMetadataNotifications.insert(thread, {});
+			m_pendingDependencyRemovals.insert(thread, {});
+			m_rollbackOnlyThreads.remove(thread);
+			m_discardMetadataNotifications.remove(thread);
+		}
+	}
+	if (m_dependencyProcessorCompPtr.IsValid()) { m_dependencyProcessorCompPtr->BeginDeferredNotifications(); }
 }
 
 
@@ -66,16 +75,37 @@ void CSqlDatabaseObjectCollectionComp::NotifyMetadataChanged(const imtbase::ICol
 
 void CSqlDatabaseObjectCollectionComp::CompleteDeferredNotifications(bool committed)
 {
+	if (m_dependencyProcessorCompPtr.IsValid()) { m_dependencyProcessorCompPtr->CompleteDeferredNotifications(committed); }
 	imtbase::ICollectionInfo::Ids ids;
+	imtbase::ICollectionInfo::Ids removedIds;
 	{
 		QMutexLocker locker(&m_transactionDisableCountersMutex);
-		const auto pending = m_pendingMetadataNotifications.take(QThread::currentThreadId());
-		if (committed) {
+		const auto thread = QThread::currentThreadId();
+		auto depth = m_metadataNotificationDepth.find(thread);
+		if (depth == m_metadataNotificationDepth.end()) { return; }
+		if (!committed) { m_discardMetadataNotifications.insert(thread); }
+		if (--depth.value() > 0) { return; }
+		m_metadataNotificationDepth.erase(depth);
+		const auto pending = m_pendingMetadataNotifications.take(thread);
+		const auto removals = m_pendingDependencyRemovals.take(thread);
+		if (committed && !m_discardMetadataNotifications.contains(thread)) {
 			ids = pending.values();
+			removedIds = removals.values();
+			for (const auto& id : removedIds) { ids.removeAll(id); }
 		}
+		m_discardMetadataNotifications.remove(thread);
+		m_rollbackOnlyThreads.remove(thread);
 	}
 	std::sort(ids.begin(), ids.end());
 	NotifyMetadataChanged(ids);
+	if (!removedIds.isEmpty()) {
+		std::sort(removedIds.begin(), removedIds.end());
+		imtbase::ICollectionInfo::MultiElementNotifierInfo info;
+		info.elementIds = removedIds;
+		istd::IChangeable::ChangeSet changes(CF_REMOVED);
+		changes.SetChangeInfo(CN_ELEMENTS_REMOVED, QVariant::fromValue(info));
+		istd::CChangeNotifier notifier(this, &changes);
+	}
 }
 
 
@@ -255,6 +285,9 @@ bool CSqlDatabaseObjectCollectionComp::RemoveElements(const Ids& elementIds, con
 
 		return false;
 	}
+	if (m_dependencyProcessorCompPtr.IsValid()) {
+		return ExecuteDependencyMutation(query, {}, elementIds, true);
+	}
 
 	imtbase::ICollectionInfo::MultiElementNotifierInfo notifierInfo;
 	notifierInfo.elementIds = elementIds;
@@ -295,6 +328,9 @@ bool CSqlDatabaseObjectCollectionComp::RemoveElementSet(
 
 	imtbase::ICollectionInfo::MultiElementNotifierInfo notifierInfo;
 	notifierInfo.elementIds = GetElementIds(0, -1, selectionParamsPtr);
+	if (m_dependencyProcessorCompPtr.IsValid()) {
+		return notifierInfo.elementIds.isEmpty() || RemoveElements(notifierInfo.elementIds, operationContextPtr);
+	}
 
 	istd::IChangeable::ChangeSet changeSet(CF_REMOVED);
 	changeSet.SetChangeInfo(CN_ELEMENTS_REMOVED, QVariant::fromValue(notifierInfo));
@@ -450,6 +486,9 @@ bool CSqlDatabaseObjectCollectionComp::SetObjectData(
 		SendErrorMessage(0, "Database query could not be created", "Database collection");
 
 		return false;
+	}
+	if (m_dependencyProcessorCompPtr.IsValid()) {
+		return ExecuteDependencyMutation(objectQuery.query, objectQuery.bindValues, {objectId}, false);
 	}
 
 	istd::IChangeable::ChangeSet changeSet(CF_OBJECT_DATA_CHANGED);
@@ -956,6 +995,50 @@ bool CSqlDatabaseObjectCollectionComp::IsObjectTypeSupported(const QByteArray& t
 	}
 
 	return false;
+}
+
+
+bool CSqlDatabaseObjectCollectionComp::IsTransactionRollbackOnly() const
+{
+	QMutexLocker locker(&m_transactionDisableCountersMutex);
+	return m_rollbackOnlyThreads.contains(QThread::currentThreadId());
+}
+
+
+bool CSqlDatabaseObjectCollectionComp::ExecuteDependencyMutation(const QByteArray& query,
+	const QVariantMap& bindings, const imtbase::ICollectionInfo::Ids& ids, bool removed)
+{
+	if (!m_dbEngineCompPtr.IsValid() || IsTransactionRollbackOnly()) { return false; }
+	const bool ownsTransaction = AreInternalTransactionsEnabled();
+	if (!ownsTransaction) {
+		QMutexLocker locker(&m_transactionDisableCountersMutex);
+		if (!m_metadataNotificationDepth.contains(QThread::currentThreadId())) { return false; }
+	}
+	if (ownsTransaction) {
+		if (!m_dbEngineCompPtr->BeginTransaction()) { return false; }
+		SetInternalTransactionsEnabled(false);
+		BeginDeferredNotifications();
+	}
+	bool success = bindings.isEmpty() ? ExecuteTransaction(query) : ExecuteTransaction(query, bindings);
+	if (success) {
+		success = m_dependencyProcessorCompPtr->ProcessDependencies(*m_dbEngineCompPtr.GetPtr(), ids, removed);
+	}
+	if (success && removed) {
+		QMutexLocker locker(&m_transactionDisableCountersMutex);
+		for (const auto& id : ids) { m_pendingDependencyRemovals[QThread::currentThreadId()].insert(id); }
+	}
+	else if (success) { NotifyMetadataChanged(ids); }
+	if (ownsTransaction) {
+		if (success) { success = m_dbEngineCompPtr->FinishTransaction(); }
+		if (!success) { m_dbEngineCompPtr->CancelTransaction(); }
+		SetInternalTransactionsEnabled(true);
+		CompleteDeferredNotifications(success);
+	}
+	else if (!success) {
+		QMutexLocker locker(&m_transactionDisableCountersMutex);
+		m_rollbackOnlyThreads.insert(QThread::currentThreadId());
+	}
+	return success;
 }
 
 
