@@ -7,7 +7,7 @@ import imtbaseImtCollectionSdl 1.0
 Rectangle {
 	id: container;
 	
-	color: Style.baseColor;
+	color: (decaratorLoader.item && decaratorLoader.item.color !==undefined) ? decaratorLoader.item.color : Style.baseColor;
 	
 	clip: true;
 
@@ -43,9 +43,6 @@ Rectangle {
 		anchors.fill: parent
 		sourceComponent: Style.metaInfoPanelDecorator
 		onItemChanged: {
-			if(item && item.color !==undefined){
-				container.color = item.color
-			}
 		}
 	}
 
