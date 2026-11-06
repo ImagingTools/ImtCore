@@ -121,9 +121,8 @@ QByteArray CSubscriptionManagerComp::RegisterSubscription(
 	if (m_connectionStatusProviderCompPtr->GetConnectionStatus() == imtcom::IConnectionStatusProvider::CS_CONNECTED){
 		{
 			QMutexLocker registeredLocker(&m_registeredClientsMutex);
-			// The answer of the server may have come already
-			if (m_registeredClients.contains(subscriptionId) && m_registeredClients[subscriptionId].m_status != IGqlSubscriptionClient::SS_REFUSED){
-				m_registeredClients[subscriptionId].m_status = IGqlSubscriptionClient::SS_REGISTERED;
+			if (m_registeredClients.contains(subscriptionId)){
+				m_registeredClients[subscriptionId].m_isRegistrationSent = true;
 			}
 		}
 
@@ -192,15 +191,14 @@ void CSubscriptionManagerComp::OnUpdate(const istd::IChangeable::ChangeSet& chan
 	for (const QByteArray& subscriptionId : subscriptionIds){
 		if (changeSet.Contains(imtcom::IConnectionStatusProvider::CF_CONNECTED)){
 			if (m_registeredClients[subscriptionId].m_clientId == clientId){
-				const bool isRegistered = SubscriptionRegister(m_registeredClients[subscriptionId].m_request, subscriptionId);
-				m_registeredClients[subscriptionId].m_status = isRegistered
-						? IGqlSubscriptionClient::SS_REGISTERED
-						: IGqlSubscriptionClient::SS_IN_REGISTRATION;
+				m_registeredClients[subscriptionId].m_isRegistrationSent = SubscriptionRegister(m_registeredClients[subscriptionId].m_request, subscriptionId);
+				m_registeredClients[subscriptionId].m_status = IGqlSubscriptionClient::SS_IN_REGISTRATION;
 			}
 		}
 		else{
 			if (m_registeredClients[subscriptionId].m_clientId == clientId){
 				m_registeredClients[subscriptionId].m_status = IGqlSubscriptionClient::SS_IN_REGISTRATION;
+				m_registeredClients[subscriptionId].m_isRegistrationSent = false;
 			}
 		}
 	}
@@ -249,12 +247,13 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 			// keys() is a copy, so it stays valid while the lock is released below;
 			// the map itself must be re-checked on every iteration for the same reason.
 			for (const QByteArray& subscriptionId : m_registeredClients.keys()){
-				const auto foundIt = m_registeredClients.constFind(subscriptionId);
-				if (foundIt == m_registeredClients.constEnd()){
+				const auto foundIt = m_registeredClients.find(subscriptionId);
+				if (foundIt == m_registeredClients.end()){
 					continue;
 				}
 
-				if (foundIt->m_status == IGqlSubscriptionClient::SS_IN_REGISTRATION){
+				if (foundIt->m_status == IGqlSubscriptionClient::SS_IN_REGISTRATION && !foundIt->m_isRegistrationSent){
+					foundIt->m_isRegistrationSent = true;
 					istd::IChangeableUniquePtr objectPtr(foundIt->m_request.CloneMe());
 					locker.unlock();
 					auto requestPtr = dynamic_cast<imtgql::CGqlRequest*>(objectPtr.GetPtr());

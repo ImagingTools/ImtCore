@@ -308,6 +308,10 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 				webSocketRequestPtr->RegisterRequestEventHandler(const_cast<CWebSocketServletComp*>(this));
 			}
 
+			if (webSocketRequest->GetMethodType() == imtrest::CWebSocketRequest::MT_START){
+				return CreateDataResponse(QStringLiteral(R"({"type": "start_ack","id": "%1"})").arg(QString::fromUtf8(subscriptionId)).toUtf8(), request);
+			}
+
 			return imtrest::ConstResponsePtr();
 		}
 

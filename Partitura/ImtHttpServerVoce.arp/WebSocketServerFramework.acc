@@ -97,6 +97,9 @@
                     <AttributeInfo Id="RequestManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="WebSocketServer"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="TokenCheckInterval" Type="Integer" ExportId="TokenCheckInterval">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

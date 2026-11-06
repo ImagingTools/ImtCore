@@ -104,16 +104,16 @@ void CObjectCollectionSubscriberComp::OnResponseReceived(const QByteArray& subsc
 
 void CObjectCollectionSubscriberComp::OnSubscriptionStatusChanged(const QByteArray& subscriptionId, const SubscriptionStatus& status, const QString& /*message*/)
 {
-	QMutexLocker locker(&m_refusedSubscriptionIdsMutex);
+	QMutexLocker locker(&m_unconfirmedSubscriptionIdsMutex);
 
-	const bool wasWatched = m_refusedSubscriptionIds.isEmpty();
-	if (status == SS_REFUSED){
-		m_refusedSubscriptionIds.insert(subscriptionId);
+	const bool wasWatched = m_unconfirmedSubscriptionIds.isEmpty();
+	if (status == SS_REGISTERED){
+		m_unconfirmedSubscriptionIds.remove(subscriptionId);
 	}
 	else{
-		m_refusedSubscriptionIds.remove(subscriptionId);
+		m_unconfirmedSubscriptionIds.insert(subscriptionId);
 	}
-	const bool isWatched = m_refusedSubscriptionIds.isEmpty();
+	const bool isWatched = m_unconfirmedSubscriptionIds.isEmpty();
 
 	locker.unlock();
 

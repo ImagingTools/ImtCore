@@ -183,6 +183,7 @@ private:
 		imtgql::CGqlRequest m_request;
 		QByteArray m_clientId;
 		IGqlSubscriptionClient::SubscriptionStatus m_status = IGqlSubscriptionClient::SS_UNKNOWN;
+		bool m_isRegistrationSent = false; // over the current connection, the answer is awaited
 		QList<std::shared_ptr<ClientRegistration>> m_clients;
 	};
 

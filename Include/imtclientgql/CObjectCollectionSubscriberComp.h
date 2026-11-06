@@ -32,8 +32,8 @@ protected:
 private:
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
 
-	QSet<QByteArray> m_refusedSubscriptionIds;
-	QMutex m_refusedSubscriptionIdsMutex;
+	QSet<QByteArray> m_unconfirmedSubscriptionIds;
+	QMutex m_unconfirmedSubscriptionIdsMutex;
 };
 
 
