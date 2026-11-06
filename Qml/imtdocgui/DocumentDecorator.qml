@@ -149,14 +149,14 @@ QtObject {
 			}
 		}
 
-		function onDocumentManagerChanged(typeOperation, objectId, documentId, hasChanges){
+		function onDocumentManagerChanged(typeOperation, objectId, documentId, documentName, sourceId, changeIds){
 			if (documentId !== root.documentId){
 				return
 			}
 
 			// A document being closed is not read again
 			if (typeOperation === EDocumentOperationEnum.s_documentChanged && !root.documentManager.documentIsClosing(documentId)){
-				root.updateRepresentationForAllViews()
+				root.onDocumentChanged(sourceId, changeIds)
 			}
 
 			if (typeOperation === EDocumentOperationEnum.s_documentSaved){
@@ -298,8 +298,35 @@ QtObject {
 				// must not trigger reverse updateDocumentFromRepresentation.
 				return
 			}
-			_internal.initiatingView = view
-			registeredRepresentation[index].updateDocumentFromRepresentation()
+			sendUpdate(index)
+		}
+	}
+
+	// Writes the representation of the view to the document; the source ID of the update tells its change notification
+	function sendUpdate(viewIndex){
+		let sourceId = registeredRepresentation[viewIndex].updateDocumentFromRepresentation()
+		if (!sourceId){
+			return
+		}
+
+		let sourceIds = _internal.ownSourceIds[viewIndex]
+		sourceIds.push(sourceId)
+		if (sourceIds.length > _internal.maxOwnSourceIds){
+			sourceIds.shift()
+		}
+		_internal.ownSourceIds[viewIndex] = sourceIds
+	}
+
+	// Each controller decides whether its representation is read again; a view whose last read failed is read anyway.
+	// A change without a source (another session, an undo, the server) is own for no view.
+	function onDocumentChanged(sourceId, changeIds){
+		let ids = changeIds ? changeIds : []
+
+		for (let i = 0; i < registeredViews.length; ++i){
+			let isOwnChange = !!sourceId && _internal.ownSourceIds[i].indexOf(sourceId) >= 0
+			if (_internal.failedViews[i] || registeredRepresentation[i].isUpdateRequired(ids, isOwnChange)){
+				updateRepresentation(i)
+			}
 		}
 	}
 
@@ -318,6 +345,7 @@ QtObject {
 		registeredRepresentation.push(representationController)
 		_internal.updateCounters.push(0)
 		_internal.failedViews.push(false)
+		_internal.ownSourceIds.push([])
 		
 		viewRegistered(view, representationController, updateRepr)
 	}
@@ -346,15 +374,12 @@ QtObject {
 		registeredRepresentation.splice(index, 1)
 		_internal.updateCounters.splice(index, 1)
 		_internal.failedViews.splice(index, 1)
+		_internal.ownSourceIds.splice(index, 1)
 		_internal.viewConnections.splice(index, 1)
 
 		let requestIndex = _internal.requestUpdateViews.indexOf(view)
 		if (requestIndex >= 0){
 			_internal.requestUpdateViews.splice(requestIndex, 1)
-		}
-
-		if (_internal.initiatingView === view){
-			_internal.initiatingView = null
 		}
 
 		viewUnregistered(view)
@@ -426,13 +451,8 @@ QtObject {
 	}
 
 	function updateRepresentationForAllViews(){
-		let skipView = _internal.initiatingView
-		_internal.initiatingView = null
-
 		for (let i = 0; i < registeredViews.length; ++i){
-			if (registeredViews[i] !== skipView){
-				updateRepresentation(i)
-			}
+			updateRepresentation(i)
 		}
 	}
 
@@ -501,7 +521,7 @@ QtObject {
 	function updateDocumentForAllViews(){
 		for (let i = 0; i < registeredViews.length; ++i){
 			registeredViews[i].setBlockingUpdateModel(true)
-			registeredRepresentation[i].updateDocumentFromRepresentation()
+			sendUpdate(i)
 		}
 	}
 
@@ -511,6 +531,8 @@ QtObject {
 		property var updateCounters: []
 		property var failedViews: []
 		property var viewConnections: []
-		property var initiatingView: null
+		// Source IDs of the last updates of each view; the oldest are dropped
+		property var ownSourceIds: []
+		property int maxOwnSourceIds: 16
 	}
 }

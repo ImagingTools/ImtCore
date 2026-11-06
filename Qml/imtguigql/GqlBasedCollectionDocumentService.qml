@@ -51,7 +51,10 @@ DocumentServiceBase {
 				root.setDocumentName(documentId, documentName)
 			}
 
-			root.documentManagerChanged(operation, objectId, documentId, documentName)
+			// The source of a change is the request that made it, see GqlSdlRequestSender.send()
+			let sourceId = data.containsKey("requestId") ? String(data.getData("requestId")) : ""
+
+			root.documentManagerChanged(operation, objectId, documentId, documentName, sourceId, root.__getChangeIds(data))
 		}
 
 		onRefreshRequired: {
@@ -107,6 +110,20 @@ DocumentServiceBase {
 
 	function getHeaders(){
 		return {}
+	}
+
+	// The changeIds of a notification as strings, empty when the server does not tell what changed.
+	// Copied at once: the next message overwrites the notification model.
+	function __getChangeIds(notification){
+		let changeIds = []
+		let changeIdsModel = notification.containsKey("changeIds") ? notification.getData("changeIds") : null
+		if (changeIdsModel && changeIdsModel.getItemsCount){
+			for (let i = 0; i < changeIdsModel.getItemsCount(); ++i){
+				changeIds.push(String(changeIdsModel.getData("", i)))
+			}
+		}
+
+		return changeIds
 	}
 
 	// Catches up after a reconnect; the undo info tells which documents the server still has.

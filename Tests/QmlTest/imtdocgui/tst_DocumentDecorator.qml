@@ -66,6 +66,9 @@ TestCase {
 		DocumentRepresentationController {
 			property int requestCount: 0
 			property int updateCount: 0
+			// false: the update tells no source, e.g. a controller that does not return one
+			property bool hasSource: true
+			property string sentSourceId: ""
 
 			representationModel: QtObject {
 				signal modelChanged(var changeSet)
@@ -79,6 +82,9 @@ TestCase {
 			function updateDocumentFromRepresentation(){
 				updateCount++
 				startUpdateDocument(documentId)
+				sentSourceId = hasSource ? documentId + "-update-" + updateCount + "-" + Math.random() : ""
+
+				return sentSourceId
 			}
 
 			function respond(){
@@ -211,27 +217,124 @@ TestCase {
 		compare(document.service.calls, [["undo", "doc", 1], ["redo", "doc", 1]])
 	}
 
-	function test_documentChangedReloadsOtherViews(){
+	function notifyChanged(service, sourceId, changeIds){
+		service.documentManagerChanged(EDocumentOperationEnum.s_documentChanged, "obj", "doc", "Name", sourceId, changeIds)
+	}
+
+	function test_ownChangeIsNotReadBack(){
 		let document = openDocument("Name", false, 2)
 		let service = document.service
 
 		document.views[0].model.modelChanged(null)
-		service.documentManagerChanged(EDocumentOperationEnum.s_documentChanged, "obj", "doc", "Name")
+		let sourceId = controllerOf(service, 0).sentSourceId
+		notifyChanged(service, sourceId, [])
 
-		compare(controllerOf(service, 0).requestCount, 1, "The view that made the change is not reloaded")
+		compare(controllerOf(service, 0).requestCount, 1, "The view whose update made the change is not read")
+		compare(controllerOf(service, 1).requestCount, 2, "The change of another view is read")
+
+		notifyChanged(service, sourceId, [])
+
+		compare(controllerOf(service, 0).requestCount, 1, "Every change of the own update is own")
+	}
+
+	function test_foreignChangeIsRead(){
+		let document = openDocument("Name", false, 2)
+		let service = document.service
+
+		document.views[0].model.modelChanged(null)
+		notifyChanged(service, "", [])
+
+		compare(controllerOf(service, 0).requestCount, 2, "A change without a source is read by every view")
 		compare(controllerOf(service, 1).requestCount, 2)
 
-		service.documentManagerChanged(EDocumentOperationEnum.s_documentChanged, "obj", "doc", "Name")
+		notifyChanged(service, "1b4e28ba-2fa1-11d2-883f-0016d3cca427", [])
 
-		compare(controllerOf(service, 0).requestCount, 2)
+		compare(controllerOf(service, 0).requestCount, 3, "A change of another session is read")
 		compare(controllerOf(service, 1).requestCount, 3)
+	}
+
+	function test_updateWithoutSourceIsNotOwn(){
+		let document = openDocument("Name", false)
+		let service = document.service
+		let controller = controllerOf(service)
+		controller.hasSource = false
+
+		document.views[0].model.modelChanged(null)
+		notifyChanged(service, "1b4e28ba-2fa1-11d2-883f-0016d3cca427", [])
+
+		compare(controller.requestCount, 2, "A controller that returns no source has no own changes")
+	}
+
+	function test_observedChangeIds(){
+		let document = openDocument("Name", false, 3)
+		let service = document.service
+		controllerOf(service, 0).observedChangeIds = ["licenses"]
+		controllerOf(service, 1).observedChangeIds = ["name"]
+
+		notifyChanged(service, "", ["name", "comments"])
+
+		compare(controllerOf(service, 0).requestCount, 1, "A change of parts the controller does not observe is not read")
+		compare(controllerOf(service, 1).requestCount, 2, "A change of an observed part is read")
+		compare(controllerOf(service, 2).requestCount, 2, "A controller without observedChangeIds reads every change")
+
+		notifyChanged(service, "", [])
+
+		compare(controllerOf(service, 0).requestCount, 2, "Unknown changeIds are read by every controller")
+	}
+
+	function test_ownChangeIsNotReadEvenIfObserved(){
+		let document = openDocument("Name", false)
+		let service = document.service
+		let controller = controllerOf(service)
+		controller.observedChangeIds = ["name"]
+
+		document.views[0].model.modelChanged(null)
+		notifyChanged(service, controller.sentSourceId, ["name"])
+
+		compare(controller.requestCount, 1)
+	}
+
+	function test_eachViewKeepsItsLastSources(){
+		let document = openDocument("Name", false, 2)
+		let service = document.service
+
+		document.views[0].model.modelChanged(null)
+		let firstSourceId = controllerOf(service, 0).sentSourceId
+		for (let i = 0; i < 16; ++i){
+			document.views[1].model.modelChanged(null)
+		}
+
+		notifyChanged(service, firstSourceId, [])
+
+		compare(controllerOf(service, 0).requestCount, 1, "Updates of another view do not push out the sources of this one")
+
+		for (let i = 0; i < 16; ++i){
+			document.views[0].model.modelChanged(null)
+		}
+
+		notifyChanged(service, firstSourceId, [])
+
+		compare(controllerOf(service, 0).requestCount, 2, "Only the last 16 sources of a view are kept")
+	}
+
+	function test_failedViewIsReadOnAnyChange(){
+		let document = openDocument("Name", false)
+		let service = document.service
+		let controller = controllerOf(service)
+		controller.observedChangeIds = ["licenses"]
+
+		service.updateDocumentRepresentation("doc")
+		controller.updateRepresentationFailed("doc", "Error")
+		notifyChanged(service, "", ["name"])
+
+		compare(controller.requestCount, 3, "A view whose read failed is read again")
 	}
 
 	function test_notificationsForOtherDocumentsAreIgnored(){
 		let document = openDocument("Name", false)
 
-		document.service.documentManagerChanged(EDocumentOperationEnum.s_documentChanged, "other", "otherDoc", "Other")
-		document.service.documentManagerChanged(EDocumentOperationEnum.s_documentSaved, "other", "otherDoc", "Other")
+		document.service.documentManagerChanged(EDocumentOperationEnum.s_documentChanged, "other", "otherDoc", "Other", "", [])
+		document.service.documentManagerChanged(EDocumentOperationEnum.s_documentSaved, "other", "otherDoc", "Other", "", [])
 
 		compare(controllerOf(document.service).requestCount, 1)
 		compare(document.views[0].savedCount, 0)
@@ -240,7 +343,7 @@ TestCase {
 	function test_documentSavedNotificationReachesViews(){
 		let document = openDocument("Name", false, 2)
 
-		document.service.documentManagerChanged(EDocumentOperationEnum.s_documentSaved, "obj", "doc", "Name")
+		document.service.documentManagerChanged(EDocumentOperationEnum.s_documentSaved, "obj", "doc", "Name", "", [])
 
 		compare(document.views[0].savedCount, 1)
 		compare(document.views[1].savedCount, 1)
@@ -267,7 +370,7 @@ TestCase {
 		let controller = controllerOf(document.service)
 
 		view.visible = false
-		document.service.documentManagerChanged(EDocumentOperationEnum.s_documentChanged, "obj", "doc", "Name")
+		notifyChanged(document.service, "", [])
 
 		compare(controller.requestCount, 1)
 
