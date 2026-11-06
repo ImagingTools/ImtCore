@@ -95,6 +95,20 @@ bool CWebSocketServletComp::SendRequest(const QByteArray& /*requestId*/, imtrest
 }
 
 
+// reimplemented (imtrest::IRequestEventHandler)
+
+void CWebSocketServletComp::OnRequestDestroyed(imtrest::IRequest* request)
+{
+	QMutexLocker locker(&m_tokenSubscriptionsMutex);
+
+	for (int index = m_tokenSubscriptions.size() - 1; index >= 0; index--){
+		if (m_tokenSubscriptions[index].requestPtr == request){
+			m_tokenSubscriptions.removeAt(index);
+		}
+	}
+}
+
+
 // protected methods
 
 imtrest::ConstResponsePtr CWebSocketServletComp::InitConnection(const imtrest::IRequest& request) const
@@ -276,6 +290,19 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 
 		QString errorMessage;
 		if (subscriberControllerPtr->RegisterSubscription(subscriptionId, gqlRequest, request, errorMessage)){
+			// A token is revoked long after the subscription is made, a session ends by itself
+			const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
+			if (contextPtr != nullptr && (!contextPtr->GetClientProductId().isEmpty() || !contextPtr->GetScopes().isEmpty())){
+				TokenSubscription subscription;
+				subscription.subscriptionId = subscriptionId;
+				subscription.controllerPtr = subscriberControllerPtr;
+				subscription.headers = gqlHeaders;
+				subscription.requestPtr = &request;
+
+				AddTokenSubscription(subscription);
+				webSocketRequestPtr->RegisterRequestEventHandler(const_cast<CWebSocketServletComp*>(this));
+			}
+
 			return imtrest::ConstResponsePtr();
 		}
 
@@ -394,6 +421,103 @@ imtrest::ConstResponsePtr CWebSocketServletComp::CreateErrorResponse(
 	}
 
 	return responsePtr;
+}
+
+
+// reimplemented (icomp::CComponentBase)
+
+void CWebSocketServletComp::OnComponentDestroyed()
+{
+	QThread* threadPtr = nullptr;
+	{
+		QMutexLocker locker(&m_tokenSubscriptionsMutex);
+		m_isTokenCheckStopped = true;
+		m_tokenCheckStopCondition.wakeAll();
+		threadPtr = m_tokenCheckThreadPtr;
+		m_tokenCheckThreadPtr = nullptr;
+	}
+
+	if (threadPtr != nullptr){
+		threadPtr->wait();
+		delete threadPtr;
+	}
+
+	BaseClass::OnComponentDestroyed();
+}
+
+
+// private methods
+
+void CWebSocketServletComp::AddTokenSubscription(const TokenSubscription& subscription) const
+{
+	QMutexLocker locker(&m_tokenSubscriptionsMutex);
+
+	m_tokenSubscriptions.append(subscription);
+
+	if (m_tokenCheckThreadPtr == nullptr && !m_isTokenCheckStopped){
+		m_tokenCheckThreadPtr = QThread::create([this](){ CheckTokenSubscriptions(); });
+		m_tokenCheckThreadPtr->setObjectName(QStringLiteral("WebSocketTokenCheck"));
+		m_tokenCheckThreadPtr->start();
+	}
+}
+
+
+void CWebSocketServletComp::CheckTokenSubscriptions() const
+{
+	const int intervalMs = *m_tokenCheckIntervalAttrPtr * 1000;
+
+	QMutexLocker locker(&m_tokenSubscriptionsMutex);
+
+	while (!m_isTokenCheckStopped){
+		m_tokenCheckStopCondition.wait(&m_tokenSubscriptionsMutex, intervalMs);
+		if (m_isTokenCheckStopped){
+			break;
+		}
+
+		const QList<TokenSubscription> subscriptions = m_tokenSubscriptions;
+
+		locker.unlock();
+
+		for (const TokenSubscription& subscription : subscriptions){
+			imtgql::IGqlContextCreator::ContextCreationError contextError;
+			const imtgql::IGqlContextUniquePtr contextPtr = m_gqlContextCreatorCompPtr->CreateGqlContext(subscription.headers, contextError);
+			imtgql::CGqlRequestContextManager::Clear();
+
+			if (!contextPtr.IsValid()){
+				DropTokenSubscription(subscription, contextError.message);
+			}
+		}
+
+		locker.relock();
+	}
+}
+
+
+void CWebSocketServletComp::DropTokenSubscription(const TokenSubscription& subscription, const QString& reason) const
+{
+	// Under the lock the request is alive: its destructor waits for it in OnRequestDestroyed
+	QMutexLocker locker(&m_tokenSubscriptionsMutex);
+
+	for (int index = 0; index < m_tokenSubscriptions.size(); index++){
+		if (m_tokenSubscriptions[index].subscriptionId != subscription.subscriptionId || m_tokenSubscriptions[index].requestPtr != subscription.requestPtr){
+			continue;
+		}
+
+		m_tokenSubscriptions.removeAt(index);
+
+		subscription.controllerPtr->UnregisterSubscription(subscription.subscriptionId);
+
+		SendWarningMessage(0, QStringLiteral("Subscription '%1' dropped: %2").arg(QString::fromUtf8(subscription.requestPtr->GetCommandId()), reason), QStringLiteral("CWebSocketServletComp"));
+
+		if (m_requestManagerCompPtr.IsValid()){
+			imtrest::ConstResponsePtr responsePtr = CreateErrorResponse(QStringLiteral("Forbidden: %1").arg(reason).toUtf8(), *subscription.requestPtr, false);
+			if (responsePtr.IsValid()){
+				m_requestManagerCompPtr->SendResponse(subscription.requestPtr->GetRequestId(), responsePtr);
+			}
+		}
+
+		return;
+	}
 }
 
 

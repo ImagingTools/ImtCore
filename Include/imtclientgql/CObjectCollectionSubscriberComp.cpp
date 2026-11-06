@@ -102,6 +102,28 @@ void CObjectCollectionSubscriberComp::OnResponseReceived(const QByteArray& subsc
 }
 
 
+void CObjectCollectionSubscriberComp::OnSubscriptionStatusChanged(const QByteArray& subscriptionId, const SubscriptionStatus& status, const QString& /*message*/)
+{
+	QMutexLocker locker(&m_refusedSubscriptionIdsMutex);
+
+	const bool wasWatched = m_refusedSubscriptionIds.isEmpty();
+	if (status == SS_REFUSED){
+		m_refusedSubscriptionIds.insert(subscriptionId);
+	}
+	else{
+		m_refusedSubscriptionIds.remove(subscriptionId);
+	}
+	const bool isWatched = m_refusedSubscriptionIds.isEmpty();
+
+	locker.unlock();
+
+	if (wasWatched != isWatched && m_objectCollectionCompPtr.IsValid()){
+		istd::IChangeable::ChangeSet changeSet(isWatched ? imtbase::IObjectCollection::CF_SOURCE_WATCHED : imtbase::IObjectCollection::CF_SOURCE_UNWATCHED);
+		istd::CChangeNotifier notifier(m_objectCollectionCompPtr.GetPtr(), &changeSet);
+	}
+}
+
+
 } // namespace imtclientgql
 
 

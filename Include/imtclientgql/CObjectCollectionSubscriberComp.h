@@ -2,6 +2,10 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QMutex>
+#include <QtCore/QSet>
+
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <imtclientgql/CSubscriberCompBase.h>
@@ -23,9 +27,13 @@ public:
 protected:
 	// reimplemented (imtgql::IGqlSubscriptionClient)
 	virtual void OnResponseReceived(const QByteArray& subscriptionId, const QByteArray& subscriptionData) override;
+	virtual void OnSubscriptionStatusChanged(const QByteArray& subscriptionId, const SubscriptionStatus& status, const QString& message) override;
 
 private:
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
+
+	QSet<QByteArray> m_refusedSubscriptionIds;
+	QMutex m_refusedSubscriptionIdsMutex;
 };
 
 

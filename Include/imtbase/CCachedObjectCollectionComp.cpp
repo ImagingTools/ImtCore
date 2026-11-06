@@ -53,8 +53,15 @@ void CCachedObjectCollectionComp::OnComponentDestroyed()
 
 // reimplemented (imod::CMultiModelDispatcherBase)
 
-void CCachedObjectCollectionComp::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
+void CCachedObjectCollectionComp::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet)
 {
+	if (modelId == 0 && changeSet.Contains(CF_SOURCE_UNWATCHED)){
+		m_isSourceUnwatched = true;
+	}
+	else if (modelId == 0 && changeSet.Contains(CF_SOURCE_WATCHED)){
+		m_isSourceUnwatched = false;
+	}
+
 	InvalidateCache();
 }
 
@@ -197,6 +204,10 @@ bool CCachedObjectCollectionComp::GetObjectData(const Id& objectId, DataPtr& dat
 		return false;
 	}
 
+	if (m_isSourceUnwatched){
+		return m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr);
+	}
+
 	{
 		QReadLocker locker(&m_lock);
 
@@ -213,7 +224,7 @@ bool CCachedObjectCollectionComp::GetObjectData(const Id& objectId, DataPtr& dat
 	}
 
 	bool retVal = m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr);
-	if (retVal && dataPtr.IsValid()){
+	if (retVal && dataPtr.IsValid() && !m_isSourceUnwatched){
 		istd::IChangeableUniquePtr cachedCopyPtr = dataPtr->CloneMe();
 		if (cachedCopyPtr.IsValid()){
 			DataPtr cachedDataPtr;
@@ -261,6 +272,10 @@ bool CCachedObjectCollectionComp::SetObjectData(
 
 IObjectCollectionUniquePtr CCachedObjectCollectionComp::CreateSubCollection(int offset, int count, const iprm::IParamsSet *selectionParamsPtr) const
 {
+	if (m_isSourceUnwatched && m_objectCollectionCompPtr.IsValid()){
+		return m_objectCollectionCompPtr->CreateSubCollection(offset, count, selectionParamsPtr);
+	}
+
 	FilteredCollectionPtr collectionCacheItemPtr = GetFilteredCollection(offset, count, selectionParamsPtr);
 	if (collectionCacheItemPtr != nullptr){
 		return collectionCacheItemPtr->cachePtr->CreateSubCollection(0, -1, nullptr);
@@ -313,6 +328,10 @@ QByteArray CCachedObjectCollectionComp::GetObjectTypeId(const Id& objectId) cons
 
 idoc::MetaInfoPtr CCachedObjectCollectionComp::GetDataMetaInfo(const Id& objectId) const
 {
+	if (m_isSourceUnwatched && m_objectCollectionCompPtr.IsValid()){
+		return m_objectCollectionCompPtr->GetDataMetaInfo(objectId);
+	}
+
 	QReadLocker locker(&m_lock);
 
 	for (int index = 0; index < m_cachedCollections.size(); index++){
@@ -342,6 +361,10 @@ ICollectionInfo::Ids CCachedObjectCollectionComp::GetElementIds(
 			const iprm::IParamsSet* selectionParamsPtr,
 			ilog::IMessageConsumer* logPtr) const
 {
+	if (m_isSourceUnwatched && m_objectCollectionCompPtr.IsValid()){
+		return m_objectCollectionCompPtr->GetElementIds(offset, count, selectionParamsPtr, logPtr);
+	}
+
 	FilteredCollectionPtr collectionCacheItemPtr = GetFilteredCollection(offset, count, selectionParamsPtr);
 	if (collectionCacheItemPtr != nullptr){
 		return collectionCacheItemPtr->cachePtr->GetElementIds(0, -1, nullptr, logPtr);
@@ -364,6 +387,10 @@ bool CCachedObjectCollectionComp::GetSubsetInfo(
 
 QVariant CCachedObjectCollectionComp::GetElementInfo(const Id& elementId, int infoType, ilog::IMessageConsumer* logPtr) const
 {
+	if (m_isSourceUnwatched && m_objectCollectionCompPtr.IsValid()){
+		return m_objectCollectionCompPtr->GetElementInfo(elementId, infoType, logPtr);
+	}
+
 	QReadLocker locker(&m_lock);
 
 	for (int index = 0; index < m_cachedCollections.size(); index++){
@@ -379,6 +406,10 @@ QVariant CCachedObjectCollectionComp::GetElementInfo(const Id& elementId, int in
 
 idoc::MetaInfoPtr CCachedObjectCollectionComp::GetElementMetaInfo(const Id& elementId, ilog::IMessageConsumer* logPtr) const
 {
+	if (m_isSourceUnwatched && m_objectCollectionCompPtr.IsValid()){
+		return m_objectCollectionCompPtr->GetElementMetaInfo(elementId, logPtr);
+	}
+
 	QReadLocker locker(&m_lock);
 
 	for (int index = 0; index < m_cachedCollections.size(); index++){
@@ -466,7 +497,7 @@ CCachedObjectCollectionComp::FilteredCollectionPtr CCachedObjectCollectionComp::
 			int count,
 			const iprm::IParamsSet* selectionParamsPtr) const
 {
-	if (!m_objectCollectionCompPtr.IsValid()){
+	if (!m_objectCollectionCompPtr.IsValid() || m_isSourceUnwatched){
 		return nullptr;
 	}
 

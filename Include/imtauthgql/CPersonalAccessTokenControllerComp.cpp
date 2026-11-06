@@ -285,6 +285,9 @@ sdl::V1_0::imtauth::CValidateTokenPayload CPersonalAccessTokenControllerComp::On
 	response.valid = isValid;
 
 	if (isValid){
+		// A receiving server caches the answer, so this is the only trace of the token being used there
+		m_tokenManagerCompPtr->UpdateLastUsedAt(tokenId);
+
 		response.userId = userId;
 		response.productId = productId;
 		response.clientProductId = clientProductId;

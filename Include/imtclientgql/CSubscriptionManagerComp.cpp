@@ -121,7 +121,8 @@ QByteArray CSubscriptionManagerComp::RegisterSubscription(
 	if (m_connectionStatusProviderCompPtr->GetConnectionStatus() == imtcom::IConnectionStatusProvider::CS_CONNECTED){
 		{
 			QMutexLocker registeredLocker(&m_registeredClientsMutex);
-			if (m_registeredClients.contains(subscriptionId)){
+			// The answer of the server may have come already
+			if (m_registeredClients.contains(subscriptionId) && m_registeredClients[subscriptionId].m_status != IGqlSubscriptionClient::SS_REFUSED){
 				m_registeredClients[subscriptionId].m_status = IGqlSubscriptionClient::SS_REGISTERED;
 			}
 		}
@@ -340,6 +341,18 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 		{
 			const QString key = QString::fromUtf8(webSocketRequest->GetQueryId());
 			QByteArray body = webSocketRequest->GetBody();
+			const QByteArray subscriptionId = rootObject.value("id").toString().toUtf8();
+			const auto foundIt = m_registeredClients.find(subscriptionId);
+			if (foundIt != m_registeredClients.end()){
+				foundIt->m_status = IGqlSubscriptionClient::SS_REFUSED;
+				const QByteArray commandId = foundIt->m_request.GetCommandId();
+
+				locker.unlock();
+				SendErrorMessage(0, QStringLiteral("The server refused the subscription '%1': %2").arg(QString::fromUtf8(commandId), QString::fromUtf8(body)), QStringLiteral("CSubscriptionManagerComp"));
+				UpdateCustomerSubscriptionStatuses(subscriptionId, QString::fromUtf8(body));
+
+				return imtrest::ConstResponsePtr();
+			}
 			{
 				const QJsonDocument envelope = QJsonDocument::fromJson(body);
 				if (envelope.isObject()){

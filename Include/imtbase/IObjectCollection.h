@@ -36,7 +36,17 @@ public:
 
 	enum ChangeFlags
 	{
-		CF_OBJECT_DATA_CHANGED = CF_LAST
+		CF_OBJECT_DATA_CHANGED = CF_LAST,
+
+		/**
+			The changes of this collection are not reported any more, so nothing read from it may be kept.
+		*/
+		CF_SOURCE_UNWATCHED,
+
+		/**
+			The changes of this collection are reported again.
+		*/
+		CF_SOURCE_WATCHED
 	};
 
 	/**

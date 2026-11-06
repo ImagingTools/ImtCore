@@ -4,6 +4,7 @@
 
 // Qt includes
 #include <QtCore/QMutex>
+#include <QtCore/QObject>
 #include <QtCore/QThread>
 #include <QtCore/QWaitCondition>
 
@@ -26,7 +27,9 @@ namespace imtauthgql
 	Repeated regularly, so a reconnected server or a new version is seen soon; the receiver stores only a changed tree.
 	A failure does not touch the work of the server: it is logged and repeated.
 */
-class CProductPermissionPublisherComp: public imtclientgql::TClientRequestManagerCompWrap<ilog::CLoggerComponentBase>
+class CProductPermissionPublisherComp:
+			public QObject,
+			public imtclientgql::TClientRequestManagerCompWrap<ilog::CLoggerComponentBase>
 {
 public:
 	typedef imtclientgql::TClientRequestManagerCompWrap<ilog::CLoggerComponentBase> BaseClass;

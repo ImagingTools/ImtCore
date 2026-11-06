@@ -795,8 +795,6 @@
                     <Interface InterfaceId="istd::IPolymorphic" ComponentId="Demultiplexer"/>
                 </ExportedInterfaces>
                 <ExportedComponents>
-        <Component ExportedId="ApiClient" ComponentId="ApiClient"/>
-        <Component ExportedId="ServerCredential" ComponentId="ServerCredential"/>
                     <Component ExportedId="RemoteAuthorizationController" ComponentId="RemoteAuthorizationController"/>
                 </ExportedComponents>
             </Data>
@@ -810,6 +808,7 @@
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="SubscriberDemultiplexer"/>
     </ExportedInterfaces>
     <ExportedComponents>
+        <Component ExportedId="ApiClient" ComponentId="ApiClient"/>
         <Component ExportedId="AuthServerVersionInfo" ComponentId="AuthServerVersionInfo"/>
         <Component ExportedId="CachedGroupCollection" ComponentId="RemoteRepositories/CachedGroupCollection"/>
         <Component ExportedId="CachedRoleCollection" ComponentId="RemoteRepositories/CachedRoleCollection"/>
@@ -817,6 +816,7 @@
         <Component ExportedId="ConnectionSubscriber" ComponentId="ConnectionSubscriber"/>
         <Component ExportedId="GroupRemoteRepository" ComponentId="RemoteRepositories/GroupRemoteRepository"/>
         <Component ExportedId="RemoteAuthorizationController" ComponentId="RemoteControllers/RemoteAuthorizationController"/>
+        <Component ExportedId="ServerCredential" ComponentId="ServerCredential"/>
         <Component ExportedId="RemotePersonalAccessTokenController" ComponentId="RemotePersonalAccessTokenController"/>
         <Component ExportedId="RemoteTenantController" ComponentId="RemoteTenantController/RemoteTenantController"/>
         <Component ExportedId="RoleRemoteRepository" ComponentId="RemoteRepositories/RoleRemoteRepository"/>

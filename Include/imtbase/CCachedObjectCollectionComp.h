@@ -7,6 +7,7 @@
 #include <QtCore/QVector>
 
 // std includes
+#include <atomic>
 #include <memory>
 
 // ACF includes
@@ -167,6 +168,7 @@ private:
 
 	int m_operationFlags;
 	mutable QReadWriteLock m_lock;
+	std::atomic<bool> m_isSourceUnwatched = false;
 };
 
 

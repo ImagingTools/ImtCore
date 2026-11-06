@@ -40,14 +40,17 @@ void CProductPermissionPublisherComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	// Without a token there is nothing to do; the credential provider has reported that
-	if (m_serverCredentialCompPtr->GetServerToken().isEmpty()){
-		return;
-	}
+	// An auto instance is created before QCoreApplication, the client (e.g. its SSL setup) must wait for the event loop
+	QMetaObject::invokeMethod(this, [this](){
+		// Without a token there is nothing to do; the credential provider has reported that
+		if (m_serverCredentialCompPtr->GetServerToken().isEmpty()){
+			return;
+		}
 
-	m_threadPtr = QThread::create([this](){ Run(); });
-	m_threadPtr->setObjectName(QStringLiteral("ProductPermissionPublisher"));
-	m_threadPtr->start();
+		m_threadPtr = QThread::create([this](){ Run(); });
+		m_threadPtr->setObjectName(QStringLiteral("ProductPermissionPublisher"));
+		m_threadPtr->start();
+	}, Qt::QueuedConnection);
 }
 
 
