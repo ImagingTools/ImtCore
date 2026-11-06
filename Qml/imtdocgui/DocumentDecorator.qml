@@ -317,14 +317,37 @@ QtObject {
 		_internal.ownSourceIds[viewIndex] = sourceIds
 	}
 
+	// Index of the view whose update made the change, -1 for a change of another session, an undo or the server
+	function findSourceViewIndex(sourceId){
+		if (!sourceId){
+			return -1
+		}
+
+		for (let i = 0; i < _internal.ownSourceIds.length; ++i){
+			if (_internal.ownSourceIds[i].indexOf(sourceId) >= 0){
+				return i
+			}
+		}
+
+		return -1
+	}
+
 	// Each controller decides whether its representation is read again; a view whose last read failed is read anyway.
-	// A change without a source (another session, an undo, the server) is own for no view.
 	function onDocumentChanged(sourceId, changeIds){
 		let ids = changeIds ? changeIds : []
+		let sourceViewIndex = findSourceViewIndex(sourceId)
 
 		for (let i = 0; i < registeredViews.length; ++i){
-			let isOwnChange = !!sourceId && _internal.ownSourceIds[i].indexOf(sourceId) >= 0
-			if (_internal.failedViews[i] || registeredRepresentation[i].isUpdateRequired(ids, isOwnChange)){
+			let representationController = registeredRepresentation[i]
+			let changeSource = representationController.externalChange
+			if (i === sourceViewIndex){
+				changeSource = representationController.ownChange
+			}
+			else if (sourceViewIndex >= 0){
+				changeSource = representationController.documentViewChange
+			}
+
+			if (_internal.failedViews[i] || representationController.isUpdateRequired(ids, changeSource)){
 				updateRepresentation(i)
 			}
 		}

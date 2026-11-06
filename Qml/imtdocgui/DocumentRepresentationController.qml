@@ -15,6 +15,15 @@ QtObject {
 	// changeIds of the document parts this representation shows (defined by the document type); empty: every change matters
 	property var observedChangeIds: []
 
+	// false: a change made by another view of this document in this client is not read again.
+	// Only for a representation whose data that view does not change, including what the server derives from it.
+	property bool updateOnDocumentViewChange: true
+
+	// Sources of a change, see isUpdateRequired()
+	readonly property string ownChange: "Own"						// the update of this controller
+	readonly property string documentViewChange: "DocumentView"	// the update of another view of this document in this client
+	readonly property string externalChange: "External"			// another session, an undo, the server
+
 	signal startUpdateDocument(string documentId)
 	signal updateDocumentFailed(string documentId, string message)
 	signal documentUpdated(string documentId)
@@ -38,10 +47,14 @@ QtObject {
 
 	// Decides whether the representation is read again after the document changed.
 	// changeIds: the changed parts of the document; empty when unknown, then the representation is read.
-	// isOwnChange: the change was made by the update of this controller, its result is in the representation already.
+	// changeSource: ownChange (its result is in the representation already), documentViewChange or externalChange.
 	// Default: the own change is not read, another one is read if it touches observedChangeIds.
-	function isUpdateRequired(changeIds, isOwnChange){
-		if (isOwnChange){
+	function isUpdateRequired(changeIds, changeSource){
+		if (changeSource === root.ownChange){
+			return false
+		}
+
+		if (changeSource === root.documentViewChange && !root.updateOnDocumentViewChange){
 			return false
 		}
 

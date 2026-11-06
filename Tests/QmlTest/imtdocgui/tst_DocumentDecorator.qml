@@ -317,6 +317,27 @@ TestCase {
 		compare(controllerOf(service, 0).requestCount, 2, "Only the last 16 sources of a view are kept")
 	}
 
+	function test_changeOfAnotherViewCanBeSkipped(){
+		let document = openDocument("Name", false, 3)
+		let service = document.service
+		controllerOf(service, 1).updateOnDocumentViewChange = false
+
+		document.views[0].model.modelChanged(null)
+		notifyChanged(service, controllerOf(service, 0).sentSourceId, [])
+
+		compare(controllerOf(service, 0).requestCount, 1, "The own change is not read")
+		compare(controllerOf(service, 1).requestCount, 1, "The change of another view of this document is skipped on request")
+		compare(controllerOf(service, 2).requestCount, 2, "By default the change of another view is read")
+
+		notifyChanged(service, "1b4e28ba-2fa1-11d2-883f-0016d3cca427", [])
+
+		compare(controllerOf(service, 1).requestCount, 2, "An external change is read")
+
+		notifyChanged(service, "", [])
+
+		compare(controllerOf(service, 1).requestCount, 3, "A change without a source is read")
+	}
+
 	function test_failedViewIsReadOnAnyChange(){
 		let document = openDocument("Name", false)
 		let service = document.service

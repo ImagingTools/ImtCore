@@ -664,7 +664,8 @@ DocumentRepresentationController {
 
     // перечитывать ли representation после изменения документа на сервере, см. 5.4
     property var observedChangeIds: []      // части документа, которые показывает representation
-    function isUpdateRequired(changeIds, isOwnChange)
+    property bool updateOnDocumentViewChange: true  // false: правки других view этого документа не читать
+    function isUpdateRequired(changeIds, changeSource)
 }
 ```
 
@@ -745,7 +746,7 @@ sequenceDiagram
         D->>D: запомнить sourceId для view
         S-->>S: применить к рабочей копии, обновить undo/isDirty
         S--)D: subscription DocumentChanged {requestId → sourceId, changeIds}
-        D->>RC: isUpdateRequired(changeIds, isOwnChange) для каждого view
+        D->>RC: isUpdateRequired(changeIds, changeSource) для каждого view
     end
 ```
 
@@ -776,7 +777,13 @@ sequenceDiagram
 1. `DocumentDecorator.sendUpdate()` запоминает `sourceId` для своего view: у каждого view хранятся 16 последних.
    Контроллер, который ничего не вернул, своих изменений не имеет: у него перечитывается всё.
 2. При `DocumentChanged` декоратор находит view по `sourceId` и спрашивает **каждый** контроллер
-   `isUpdateRequired(changeIds, isOwnChange)`. `isOwnChange` истинно только у view, чьё обновление вызвало изменение.
+   `isUpdateRequired(changeIds, changeSource)`. Источник изменения для контроллера:
+
+   | `changeSource` | Когда |
+   |---|---|
+   | `ownChange` (`"Own"`) | Изменение вызвало обновление этого view |
+   | `documentViewChange` (`"DocumentView"`) | Изменение вызвало обновление другого view этого документа в этом клиенте |
+   | `externalChange` (`"External"`) | Другая вкладка или сессия, undo, сервер: метка не найдена ни у одного view |
 3. Если контроллер ответил `true`, видимый view читается сразу, скрытый — при показе. View, чьё
    последнее чтение не удалось, читается при любом изменении.
 
@@ -789,10 +796,16 @@ observedChangeIds: ["licenses", "permissions"]
 | Ситуация | Решение |
 |---|---|
 | Своё изменение | Не читать |
+| Изменение другого view этого документа при `updateOnDocumentViewChange: false` | Не читать |
 | `changeIds` пустой (неизвестно, что изменилось: undo, нет конвертера) | Читать |
 | `observedChangeIds` пустой (контроллер не фильтрует) | Читать |
 | Есть пересечение `changeIds` и `observedChangeIds` | Читать |
 | Пересечения нет | Не читать |
+
+`updateOnDocumentViewChange: false` подходит view, данные которого другие view документа не меняют, включая
+то, что сервер пересчитывает из их правок. Иначе view покажет старые значения до следующего внешнего
+изменения. Когда сервер начнёт присылать `changeIds`, точнее объявить `observedChangeIds`: они отсекают
+нерелевантные изменения из любого источника.
 
 Для особых случаев контроллер переопределяет `isUpdateRequired`. Например, если сервер сам дописывает
 документ во время правки (номер заявки), своё изменение тоже нужно читать: «своё» — это всё, что сервер
@@ -870,7 +883,7 @@ onPageAdded(item, index):
 - Все контроллеры зарегистрированы в **одном** `DocumentDecorator` документа.
 - При `DocumentChanged` (правка в любом view или изменение другим клиентом)
   `onDocumentChanged(sourceId, changeIds)`:
-  - спрашивает каждый контроллер `isUpdateRequired(changeIds, isOwnChange)` (см. 5.4);
+  - спрашивает каждый контроллер `isUpdateRequired(changeIds, changeSource)` (см. 5.4);
   - для **видимых** view сразу запускает `updateRepresentationFromDocument()`;
   - для **невидимых** — откладывает, добавляя в `_internal.requestUpdateViews`.
 - Когда невидимый view становится видимым (`guiVisibleChanged(view, true)`),
