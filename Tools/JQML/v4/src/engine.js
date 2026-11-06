@@ -1444,6 +1444,11 @@ export class Engine {
 			if (this.syncBindingItems()) {
 				this.runBindingPass();
 				this.runBindingPass();
+				// Publish restored sizes through the remaining readers before a Binding can stamp
+				// its stale value back onto the target and erase that size notification.
+				for (const binding of this.dirty) this.queueSubscriber(binding);
+				this.dirty.clear();
+				this.drainSubscribers();
 				this.syncBindingItems();
 			}
 			this.retry.clear();
