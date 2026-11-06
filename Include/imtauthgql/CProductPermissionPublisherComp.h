@@ -13,7 +13,6 @@
 #include <ilog/TLoggerCompWrap.h>
 #include <imod/CSingleModelObserverBase.h>
 #include <imod/IModel.h>
-#include <iqt/ITranslationManager.h>
 
 // ImtCore includes
 #include <imtclientgql/IServerCredentialProvider.h>
@@ -26,7 +25,7 @@ namespace imtauthgql
 
 
 /**
-	The server of a product sends its permission tree to the authorization server, in all its languages,
+	The server of a product sends its permission tree, untranslated, to the authorization server
 	at the start and after each reconnection; the receiver stores only a changed tree.
 	A failure does not touch the work of the server: it is logged and repeated.
 */
@@ -40,7 +39,6 @@ public:
 
 	I_BEGIN_COMPONENT(CProductPermissionPublisherComp);
 		I_ASSIGN(m_productInfoCompPtr, "FeatureContainer", "The product and its permission tree", true, "FeatureContainer");
-		I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translations of the permission tree", false, "TranslationManager");
 		I_ASSIGN(m_serverCredentialCompPtr, "ServerCredentialProvider", "Token of this server", true, "ServerCredentialProvider");
 		I_ASSIGN(m_applicationInfoCompPtr, "ApplicationInfo", "Version of the product", false, "ApplicationInfo");
 		I_ASSIGN(m_connectionStatusModelCompPtr, "ConnectionStatus", "Connection to the authorization server: a reconnection publishes again", false, "ConnectionStatus");
@@ -61,7 +59,6 @@ private:
 
 private:
 	I_REF(imtlic::IProductInfo, m_productInfoCompPtr);
-	I_REF(iqt::ITranslationManager, m_translationManagerCompPtr);
 	I_REF(imtclientgql::IServerCredentialProvider, m_serverCredentialCompPtr);
 	I_REF(ibase::IApplicationInfo, m_applicationInfoCompPtr);
 	I_REF(imod::IModel, m_connectionStatusModelCompPtr);

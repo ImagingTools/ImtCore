@@ -3,7 +3,6 @@
 
 
 // Qt includes
-#include <QtCore/QJsonArray>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 
@@ -79,57 +78,39 @@ sdl::V1_0::imtauth::CGetProductPermissionsPayload CPublishedPermissionsProviderC
 		return response;
 	}
 
-	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
-	const QString languageId = gqlContextPtr != nullptr ? QString::fromUtf8(gqlContextPtr->GetLanguageId()) : QString();
+	sdl::V1_0::imtauth::CPermissionTree tree;
+	if (!tree.ReadFromJsonObject(QJsonDocument::fromJson(snapshotPtr->GetTree()).object())){
+		errorMessage = QStringLiteral("Unable to read the permission tree of the product '%1'").arg(QString::fromUtf8(productId));
+		response.errorMessage = errorMessage;
 
-	// A language the product does not have falls back to the first one it published
-	const QJsonArray languages = QJsonDocument::fromJson(snapshotPtr->GetTree()).array();
-	QJsonObject languageObject = languages.isEmpty() ? QJsonObject() : languages.first().toObject();
-	for (const QJsonValue& value : languages){
-		if (value.toObject().value("languageId").toString() == languageId){
-			languageObject = value.toObject();
-		}
+		return response;
 	}
 
-	const bool isScoped = !tenantId.isEmpty() && m_tenantManagerCompPtr.IsValid();
-	const QByteArrayList allowedPermissions = isScoped ? m_tenantManagerCompPtr->GetTenantPermissions(tenantId) : QByteArrayList();
+	if (!tree.groups){
+		return response;
+	}
 
-	const QJsonArray groupArray = languageObject.value("groups").toArray();
-	for (const QJsonValue& groupValue : groupArray){
-		const QJsonObject groupObject = groupValue.toObject();
+	if (tenantId.isEmpty() || !m_tenantManagerCompPtr.IsValid()){
+		groups = *tree.groups;
 
+		return response;
+	}
+
+	const QByteArrayList allowedPermissions = m_tenantManagerCompPtr->GetTenantPermissions(tenantId);
+	for (sdl::V1_0::imtauth::CPermissionGroup group : tree.groups->ToList()){
 		imtsdl::TElementList<sdl::V1_0::imtauth::CPermissionEntry> entries;
-		const QJsonArray entryArray = groupObject.value("entries").toArray();
-		for (const QJsonValue& entryValue : entryArray){
-			const QJsonObject entryObject = entryValue.toObject();
-			const QByteArray permissionId = entryObject.value("permissionId").toString().toUtf8();
-			if (isScoped && !imtauth::HasPermission(allowedPermissions, permissionId)){
-				continue;
+		if (group.entries){
+			for (const sdl::V1_0::imtauth::CPermissionEntry& entry : group.entries->ToList()){
+				if (entry.permissionId && imtauth::HasPermission(allowedPermissions, *entry.permissionId)){
+					entries.append(entry);
+				}
 			}
-
-			QByteArrayList requirements;
-			const QJsonArray requirementArray = entryObject.value("requirements").toArray();
-			for (const QJsonValue& requirement : requirementArray){
-				requirements.append(requirement.toString().toUtf8());
-			}
-
-			sdl::V1_0::imtauth::CPermissionEntry entry;
-			entry.permissionId = permissionId;
-			entry.displayName = entryObject.value("displayName").toString();
-			entry.description = entryObject.value("description").toString();
-			entry.requirements.Emplace().FromList(requirements);
-			entries.append(entry);
 		}
 
-		if (entries.isEmpty()){
-			continue;
+		if (!entries.isEmpty()){
+			group.entries = entries;
+			groups.append(group);
 		}
-
-		sdl::V1_0::imtauth::CPermissionGroup group;
-		group.groupId = groupObject.value("groupId").toString().toUtf8();
-		group.groupName = groupObject.value("groupName").toString();
-		group.entries = entries;
-		groups.append(group);
 	}
 
 	return response;

@@ -5,7 +5,6 @@
 // Qt includes
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QDateTime>
-#include <QtCore/QJsonArray>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 #include <QtCore/QUuid>
@@ -26,40 +25,6 @@ namespace
 
 
 const qsizetype s_maxTreeSize = 16 * 1024 * 1024;
-
-
-QJsonArray CreateGroupsJson(const imtsdl::TElementList<sdl::V1_0::imtauth::CPermissionGroup>& groups)
-{
-	QJsonArray retVal;
-	for (const sdl::V1_0::imtauth::CPermissionGroup& group : groups.ToList()){
-		QJsonArray entries;
-		if (group.entries){
-			for (const sdl::V1_0::imtauth::CPermissionEntry& entry : group.entries->ToList()){
-				QJsonArray requirements;
-				if (entry.requirements){
-					for (const QByteArray& requirement : entry.requirements->ToList()){
-						requirements.append(QString::fromUtf8(requirement));
-					}
-				}
-
-				QJsonObject entryObject;
-				entryObject["permissionId"] = entry.permissionId ? QString::fromUtf8(*entry.permissionId) : QString();
-				entryObject["displayName"] = entry.displayName ? *entry.displayName : QString();
-				entryObject["description"] = entry.description ? *entry.description : QString();
-				entryObject["requirements"] = requirements;
-				entries.append(entryObject);
-			}
-		}
-
-		QJsonObject groupObject;
-		groupObject["groupId"] = group.groupId ? QString::fromUtf8(*group.groupId) : QString();
-		groupObject["groupName"] = group.groupName ? *group.groupName : QString();
-		groupObject["entries"] = entries;
-		retVal.append(groupObject);
-	}
-
-	return retVal;
-}
 
 
 } // namespace
@@ -87,17 +52,14 @@ sdl::V1_0::imtauth::CPublishProductPermissionsPayload CProductPermissionCatalogC
 		return response;
 	}
 
-	QJsonArray languages;
-	if (arguments.input->languages){
-		for (const sdl::V1_0::imtauth::CPublishedPermissionLanguage& language : arguments.input->languages->ToList()){
-			QJsonObject languageObject;
-			languageObject["languageId"] = language.languageId ? QString::fromUtf8(*language.languageId) : QString();
-			languageObject["groups"] = language.groups ? CreateGroupsJson(*language.groups) : QJsonArray();
-			languages.append(languageObject);
-		}
+	QJsonObject treeObject;
+	if (!arguments.input->tree || !arguments.input->tree->WriteToJsonObject(treeObject)){
+		errorMessage = QStringLiteral("The permission tree is not valid");
+
+		return response;
 	}
 
-	const QByteArray tree = QJsonDocument(languages).toJson(QJsonDocument::Compact);
+	const QByteArray tree = QJsonDocument(treeObject).toJson(QJsonDocument::Compact);
 	if (tree.size() > s_maxTreeSize){
 		errorMessage = QStringLiteral("The permission tree is too large");
 

@@ -20,7 +20,7 @@ namespace imtauthgql
 // A server with a token reports at least every few minutes: it publishes and its subscriptions are checked
 static const qint64 s_onlineSeconds = 10 * 60;
 
-// A stored tree holds all the languages of a product, the list of products needs only its version
+// A stored tree holds the whole permission tree of a product, the list of products needs only its version
 static const qint64 s_publishedVersionLifetimeMs = 60 * 1000;
 
 

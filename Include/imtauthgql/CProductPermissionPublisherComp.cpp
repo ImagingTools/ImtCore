@@ -6,9 +6,6 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDeadlineTimer>
 
-// ACF includes
-#include <iprm/IOptionsList.h>
-
 // ImtCore includes
 #include <imtauthgql/imtauthgql.h>
 #include <imtcom/IConnectionStatusProvider.h>
@@ -103,31 +100,14 @@ bool CProductPermissionPublisherComp::Publish() const
 	arguments.input->productId = productId;
 	arguments.input->productVersion = GetProductVersion();
 
-	QByteArrayList languageIds;
-	if (m_translationManagerCompPtr.IsValid()){
-		const iprm::IOptionsList& languages = m_translationManagerCompPtr->GetLanguagesInfo();
-		for (int i = 0; i < languages.GetOptionsCount(); i++){
-			languageIds.append(languages.GetOptionId(i));
-		}
-	}
-	if (languageIds.isEmpty()){
-		languageIds.append(QByteArray());
-	}
-
-	imtsdl::TElementList<sdl::V1_0::imtauth::CPublishedPermissionLanguage> languageList;
-	for (const QByteArray& languageId : languageIds){
-		sdl::V1_0::imtauth::CPublishedPermissionLanguage language;
-		language.languageId = languageId;
-		language.groups.Emplace();
-		BuildPermissionGroups<sdl::V1_0::imtauth::CPermissionGroup, sdl::V1_0::imtauth::CPermissionEntry>(
-					m_productInfoCompPtr.GetPtr(),
-					m_translationManagerCompPtr.IsValid() ? m_translationManagerCompPtr.GetPtr() : nullptr,
-					*language.groups,
-					languageId,
-					nullptr);
-		languageList.append(language);
-	}
-	arguments.input->languages = languageList;
+	sdl::V1_0::imtauth::CPermissionTree tree;
+	BuildPermissionGroups<sdl::V1_0::imtauth::CPermissionGroup, sdl::V1_0::imtauth::CPermissionEntry>(
+				m_productInfoCompPtr.GetPtr(),
+				nullptr,
+				tree.groups.Emplace(),
+				QByteArray(),
+				nullptr);
+	arguments.input->tree = tree;
 
 	imtgql::IGqlContextUniquePtr contextPtr(new imtgql::CGqlContext);
 	contextPtr->SetToken(m_serverCredentialCompPtr->GetServerToken());

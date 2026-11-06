@@ -9,15 +9,11 @@ import {
 	"Permissions.sdl"
 }
 
-type PublishedPermissionLanguage {
-	languageId: ID!
-	groups: [PermissionGroup]
-}
-
 type PublishProductPermissionsInput {
 	productId: ID!
 	productVersion: String
-	languages: [PublishedPermissionLanguage]
+	# The names are in the language of the product sources, the authorization server does not translate them.
+	tree: PermissionTree
 }
 
 type PublishProductPermissionsPayload {
