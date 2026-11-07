@@ -181,7 +181,7 @@ bool CConnectedProductCollectionControllerComp::OnBeforeRemoveElements(const QBy
 			return false;
 		}
 
-		if (m_ownProductIdAttrPtr.IsValid() && productPtr->GetProductId() == *m_ownProductIdAttrPtr){
+		if (!GetOwnProductId().isEmpty() && productPtr->GetProductId() == GetOwnProductId()){
 			errorMessage = QStringLiteral("This server cannot be removed from its own catalog");
 
 			return false;
@@ -237,7 +237,8 @@ QJsonObject CConnectedProductCollectionControllerComp::CreateInternalResponse(co
 
 void CConnectedProductCollectionControllerComp::EnsureOwnProduct() const
 {
-	if (!m_ownProductIdAttrPtr.IsValid() || QByteArray(*m_ownProductIdAttrPtr).isEmpty()){
+	const QByteArray productId = GetOwnProductId();
+	if (productId.isEmpty()){
 		return;
 	}
 
@@ -246,8 +247,7 @@ void CConnectedProductCollectionControllerComp::EnsureOwnProduct() const
 		return;
 	}
 
-	const QByteArray productId = *m_ownProductIdAttrPtr;
-	const QString name = m_ownProductNameAttrPtr.IsValid() ? QString(*m_ownProductNameAttrPtr) : QString::fromUtf8(productId);
+	const QString name = m_ownProductCompPtr->GetName().isEmpty() ? QString::fromUtf8(productId) : m_ownProductCompPtr->GetName();
 
 	bool isRead = false;
 	const bool hasProduct = imtauth::CConnectedProductDocumentValidatorComp::HasProduct(*m_objectCollectionCompPtr, productId, &isRead);
@@ -273,6 +273,12 @@ void CConnectedProductCollectionControllerComp::EnsureOwnProduct() const
 	productPtr->SetProductName(name);
 
 	m_isOwnProductEnsured = !m_objectCollectionCompPtr->InsertNewObject("ConnectedProduct", name, QString(), productPtr, objectId).isEmpty();
+}
+
+
+QByteArray CConnectedProductCollectionControllerComp::GetOwnProductId() const
+{
+	return m_ownProductCompPtr.IsValid() ? m_ownProductCompPtr->GetProductId() : QByteArray();
 }
 
 
@@ -344,7 +350,7 @@ void CConnectedProductCollectionControllerComp::FillServerState(
 	}
 	if (requestInfo.items.isStatusRequested){
 		QString status;
-		if (m_ownProductIdAttrPtr.IsValid() && productId == *m_ownProductIdAttrPtr){
+		if (!GetOwnProductId().isEmpty() && productId == GetOwnProductId()){
 			status = QStringLiteral("This server");
 		}
 		else if (!hasActiveToken){

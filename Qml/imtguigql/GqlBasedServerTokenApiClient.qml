@@ -11,107 +11,55 @@ import imtguigql 1.0
 ServerTokenApiClient {
 	id: root
 
-	function requestTokens(productId){
-		root.__listInput.m_clientProductId = productId
+	function requestTokens(){
+		root.__listInput.m_clientProductId = root.productId
 		root.__listRequest.send(root.__listInput)
 	}
 
-	function createToken(productId, receiverId, name, description, scopes){
-		root.__productId = productId
-		root.__createInput.m_clientProductId = productId
-		root.__createInput.m_productId = receiverId
+	function createToken(name, description, scopes){
+		root.__createInput.m_clientProductId = root.productId
 		root.__createInput.m_name = name
 		root.__createInput.m_description = description
 		root.__createInput.m_scopes = scopes
 		root.__createRequest.send(root.__createInput)
 	}
 
-	function revokeToken(productId, tokenId){
-		root.__productId = productId
+	function revokeToken(tokenId){
 		root.__revokeInput.m_id = tokenId
 		root.__revokeRequest.send(root.__revokeInput)
 	}
 
-	function requestProductServer(productId){
-		root.__receiversInput.m_clientProductId = productId
-		root.__receiversRequest.send(root.__receiversInput)
+	function requestProductServer(){
+		root.__receiverInput.m_clientProductId = root.productId
+		root.__receiverRequest.send(root.__receiverInput)
 	}
 
-	function updateTokenScopes(productId, tokenId, scopes){
-		root.__productId = productId
+	function updateTokenScopes(tokenId, scopes){
 		root.__scopesInput.m_id = tokenId
 		root.__scopesInput.m_scopes = scopes
 		root.__scopesRequest.send(root.__scopesInput)
 	}
 
-	// The server answers with itself only, or with nothing when it gives the product no token
-	function __parseServer(serversList){
-		let server = serversList && serversList.count > 0 ? serversList.get(0).item : null
-		if (!server){
-			return null
-		}
-
+	function __parseServer(server){
 		return {
 			"productId": String(server.m_productId),
-			"groups": root.__parseGroups(server.m_groups),
+			"groups": PermissionGroups.toFlatArray(server.m_groups),
 			"requiredPermissions": Array.isArray(server.m_requiredPermissions) ? server.m_requiredPermissions : []
 		}
 	}
 
-	function __parseGroups(groupsList){
-		let result = []
-		if (!groupsList){
-			return result
-		}
-
-		for (let gi = 0; gi < groupsList.count; ++gi){
-			let group = groupsList.get(gi).item
-			if (!group){
-				continue
-			}
-
-			let groupObj = {
-				"groupId": group.m_groupId ? String(group.m_groupId) : "",
-				"groupName": group.m_groupName ? String(group.m_groupName) : "",
-				"entries": []
-			}
-
-			let entries = group.m_entries
-			if (entries){
-				for (let ei = 0; ei < entries.count; ++ei){
-					let entry = entries.get(ei).item
-					if (!entry){
-						continue
-					}
-
-					groupObj.entries.push({
-						"permissionId": entry.m_permissionId ? String(entry.m_permissionId) : "",
-						"displayName": entry.m_displayName ? String(entry.m_displayName) : "",
-						"description": entry.m_description ? String(entry.m_description) : "",
-						"requirements": Array.isArray(entry.m_requirements) ? entry.m_requirements : []
-					})
-				}
-			}
-
-			result.push(groupObj)
-		}
-
-		return result
-	}
-
-	property string __productId: ""
 	property ServerTokenListInput __listInput: ServerTokenListInput {}
 	property CreateServerTokenInput __createInput: CreateServerTokenInput {}
 	property InputId __revokeInput: InputId {}
-	property ServerTokenReceiversInput __receiversInput: ServerTokenReceiversInput {}
+	property ServerTokenReceiverInput __receiverInput: ServerTokenReceiverInput {}
 	property UpdateServerTokenScopesInput __scopesInput: UpdateServerTokenScopesInput {}
 
-	property GqlSdlRequestSender __receiversRequest: GqlSdlRequestSender {
-		gqlCommandId: ImtauthServerTokensSdlCommandIds.s_getServerTokenReceivers
+	property GqlSdlRequestSender __receiverRequest: GqlSdlRequestSender {
+		gqlCommandId: ImtauthServerTokensSdlCommandIds.s_getServerTokenReceiver
 		sdlObjectComp: Component {
-			ServerTokenReceiverList {
+			ServerTokenReceiver {
 				onFinished: {
-					root.productServer = root.__parseServer(m_productServers)
+					root.productServer = root.__parseServer(this)
 				}
 			}
 		}
@@ -125,13 +73,13 @@ ServerTokenApiClient {
 		gqlCommandId: ImtauthServerTokensSdlCommandIds.s_updateServerTokenScopes
 		requestType: 1
 		sdlObjectComp: Component {
-			RevokeServerTokenPayload {
+			UpdateServerTokenScopesPayload {
 				onFinished: {
 					if (!m_success){
 						root.operationFailed(m_message)
 					}
 
-					root.requestTokens(root.__productId)
+					root.requestTokens()
 				}
 			}
 		}
@@ -164,7 +112,7 @@ ServerTokenApiClient {
 				onFinished: {
 					if (m_success){
 						root.tokenCreated(m_token)
-						root.requestTokens(root.__productId)
+						root.requestTokens()
 					}
 					else{
 						root.operationFailed(m_message)
@@ -188,7 +136,7 @@ ServerTokenApiClient {
 						root.operationFailed(m_message)
 					}
 
-					root.requestTokens(root.__productId)
+					root.requestTokens()
 				}
 			}
 		}

@@ -74,7 +74,6 @@ public:
 		I_ASSIGN_TO(m_accessTokenProviderModelCompPtr, m_accessTokenProviderCompPtr, false);
 		I_ASSIGN(m_requestTimeoutMsAttrPtr, "RequestTimeoutMs", "Async request timeout (ms)", false, 100000);
 		I_ASSIGN(m_serverCredentialCompPtr, "ServerCredentialProvider", "Token of this server, sent with every message to prove the product it comes through", false, "ServerCredentialProvider");
-		I_ASSIGN(m_refusedRetryIntervalAttrPtr, "RefusedRetryInterval", "Interval in seconds of sending a refused subscription again", true, 60);
 	I_END_COMPONENT;
 
 	// reimplemented (imtclientgql::IGqlSubscriptionManager)
@@ -185,7 +184,6 @@ private:
 	I_REF(imod::IModel, m_accessTokenProviderModelCompPtr);
 	I_REF(imtrest::IProtocolEngine, m_engineCompPtr);
 	I_ATTR(int, m_requestTimeoutMsAttrPtr);
-	I_ATTR(int, m_refusedRetryIntervalAttrPtr);
 	I_REF(IServerCredentialProvider, m_serverCredentialCompPtr);
 	mutable std::atomic<bool> m_isRefusedRetryScheduled = false;
 

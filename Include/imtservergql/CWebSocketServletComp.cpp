@@ -14,7 +14,6 @@
 #include <QtCore/QScopeGuard>
 
 // ImtCore includes
-#include <imtauth/imtauth.h>
 #include <imtrest/IRequest.h>
 #include <imtrest/IProtocolEngine.h>
 #include <imtrest/CWebSocketRequest.h>
@@ -293,8 +292,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 			return imtrest::ConstResponsePtr();
 		}
 
-		QByteArray requiredPermission;
-		if (!IsSubscriberAllowed(*subscriberControllerPtr, gqlRequest, requiredPermission)){
+		if (!IsSubscriberAllowed(*subscriberControllerPtr, gqlRequest)){
 			return CreateErrorResponse(QStringLiteral("The subscription '%1' is not allowed").arg(QString::fromUtf8(commandId)).toUtf8(), request);
 		}
 
@@ -303,19 +301,16 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 			// A token is revoked or narrowed long after the subscription is made, a session ends by itself.
 			// A subscription forwarded by the server of a product lives as long as the token of that server.
 			const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
-			QByteArray token = gqlHeaders.value(imtbase::s_authenticationTokenHeaderId);
-			const bool isServerToken = contextPtr != nullptr && !contextPtr->GetServerProductId().isEmpty() && contextPtr->GetClientProductId().isEmpty();
-			if (isServerToken){
-				token = gqlHeaders.value(imtbase::s_serverTokenHeaderId);
-			}
-
+			const bool isServerRequest = !contextPtr->GetServerProductId().isEmpty();
+			const bool isForwarded = isServerRequest && contextPtr->GetClientProductId().isEmpty();
+			const QByteArray token = gqlHeaders.value(isForwarded ? imtbase::s_serverTokenHeaderId : imtbase::s_authenticationTokenHeaderId);
 			if (m_gqlContextCreatorCompPtr->IsRevocableToken(token)){
 				TokenSubscription subscription;
 				subscription.subscriptionId = subscriptionId;
 				subscription.controllerPtr = subscriberControllerPtr;
 				subscription.token = token;
-				subscription.isServerToken = isServerToken;
-				subscription.requiredPermission = requiredPermission;
+				subscription.scopes = isServerRequest ? contextPtr->GetServerScopes() : contextPtr->GetScopes();
+				std::sort(subscription.scopes.begin(), subscription.scopes.end());
 				subscription.requestPtr = &request;
 				subscription.connectionPtr = webSocketRequest->parent();
 
@@ -484,8 +479,7 @@ void CWebSocketServletComp::OnComponentDestroyed()
 
 bool CWebSocketServletComp::IsSubscriberAllowed(
 			const imtgql::IGqlSubscriberController& controller,
-			const imtgql::CGqlRequest& gqlRequest,
-			QByteArray& requiredPermission) const
+			const imtgql::CGqlRequest& gqlRequest) const
 {
 	const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
 	if (contextPtr == nullptr){
@@ -494,7 +488,7 @@ bool CWebSocketServletComp::IsSubscriberAllowed(
 
 	// The server of a product the subscription comes through
 	QString accessError;
-	if (!m_gqlContextCreatorCompPtr->CheckRequestAccess(gqlRequest, requiredPermission, accessError)){
+	if (!m_gqlContextCreatorCompPtr->CheckRequestAccess(gqlRequest, accessError)){
 		SendWarningMessage(0, accessError, QStringLiteral("CWebSocketServletComp"));
 
 		return false;
@@ -531,8 +525,6 @@ void CWebSocketServletComp::CheckTokenSubscriptions() const
 {
 	const int intervalMs = *m_tokenCheckIntervalAttrPtr * 1000;
 
-	QHash<QByteArray, QByteArrayList> scopesOfTokens;
-
 	QMutexLocker locker(&m_tokenSubscriptionsMutex);
 
 	while (!m_isTokenCheckStopped){
@@ -550,18 +542,11 @@ void CWebSocketServletComp::CheckTokenSubscriptions() const
 			subscriptionsOfTokens.insert(subscription.token, subscription);
 		}
 
-		// The scopes are remembered across checks, only for the tokens that still hold subscriptions
-		for (auto iter = scopesOfTokens.begin(); iter != scopesOfTokens.end();){
-			iter = subscriptionsOfTokens.contains(iter.key()) ? std::next(iter) : scopesOfTokens.erase(iter);
-		}
-
 		const QList<QByteArray> tokens = subscriptionsOfTokens.uniqueKeys();
 		for (const QByteArray& token : tokens){
 			QString errorMessage;
 			QByteArrayList scopes;
-			const imtgql::IGqlContextCreator::ContextCreationStatus status = subscriptionsOfTokens.value(token).isServerToken
-						? m_gqlContextCreatorCompPtr->CheckServerToken(token, scopes, errorMessage)
-						: m_gqlContextCreatorCompPtr->CheckToken(token, scopes, errorMessage);
+			const imtgql::IGqlContextCreator::ContextCreationStatus status = m_gqlContextCreatorCompPtr->CheckToken(token, scopes, errorMessage);
 
 			// A token that could not be checked is kept: a restart of the authorization server must not end subscriptions
 			if (status == imtgql::IGqlContextCreator::CCS_INTERNAL_ERROR){
@@ -572,20 +557,14 @@ void CWebSocketServletComp::CheckTokenSubscriptions() const
 
 			// Its server must not go on serving from its caches what the token may no longer read: it subscribes again with an empty cache
 			std::sort(scopes.begin(), scopes.end());
-			const auto knownScopesIter = scopesOfTokens.constFind(token);
-			const bool areScopesChanged = !isRefused && knownScopesIter != scopesOfTokens.constEnd() && *knownScopesIter != scopes;
-			scopesOfTokens.insert(token, scopes);
 
 			const QList<TokenSubscription> subscriptionsOfToken = subscriptionsOfTokens.values(token);
 			for (const TokenSubscription& subscription : subscriptionsOfToken){
 				if (isRefused){
 					DropTokenSubscription(subscription, errorMessage);
 				}
-				else if (areScopesChanged){
+				else if (subscription.scopes != scopes){
 					DropTokenSubscription(subscription, QStringLiteral("The permissions of the token have changed"));
-				}
-				else if (!subscription.requiredPermission.isEmpty() && !imtauth::HasPermission(scopes, subscription.requiredPermission)){
-					DropTokenSubscription(subscription, QStringLiteral("The token no longer holds '%1'").arg(QString::fromUtf8(subscription.requiredPermission)));
 				}
 			}
 		}

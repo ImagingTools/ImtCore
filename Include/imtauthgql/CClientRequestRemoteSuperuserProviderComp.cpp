@@ -3,7 +3,7 @@
 
 
 // ImtCore includes
-#include <imtgql/CGqlContext.h>
+#include <imtgql/imtgql.h>
 #include <imtgql/CGqlRequest.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Users.h>
 
@@ -26,7 +26,7 @@ imtauth::ISuperuserProvider::ExistsStatus CClientRequestRemoteSuperuserProviderC
 	imtgql::CGqlRequest gqlRequest;
 
 	// This server asks for itself: the credentials of the request being served must not travel along
-	gqlRequest.SetGqlContext(imtgql::IGqlContextSharedPtr::CreateFromUnique(imtgql::IGqlContextUniquePtr(new imtgql::CGqlContext)));
+	imtgql::SetServerRequestContext(gqlRequest);
 
 	if (userssdl::CCheckSuperuserExistsGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
 		typedef userssdl::CCheckSuperuserPayload Response;

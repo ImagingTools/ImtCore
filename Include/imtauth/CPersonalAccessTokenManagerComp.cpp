@@ -289,9 +289,6 @@ bool CPersonalAccessTokenManagerComp::RevokeToken(const QByteArray& tokenId)
 
 	SendInfoMessage(0, QStringLiteral("Revoked token '%1'").arg(tokenId), "CPersonalAccessTokenManagerComp");
 
-	if (m_tokenCacheCompPtr.IsValid()){
-		m_tokenCacheCompPtr->ForgetToken(tokenId);
-	}
 
 	return true;
 }
@@ -322,9 +319,6 @@ bool CPersonalAccessTokenManagerComp::SetTokenScopes(const QByteArray& tokenId, 
 
 	SendInfoMessage(0, QStringLiteral("Changed the permissions of token '%1'").arg(QString::fromUtf8(tokenId)), "CPersonalAccessTokenManagerComp");
 
-	if (m_tokenCacheCompPtr.IsValid()){
-		m_tokenCacheCompPtr->ForgetToken(tokenId);
-	}
 
 	return true;
 }
@@ -376,9 +370,6 @@ bool CPersonalAccessTokenManagerComp::DeleteToken(const QByteArray& tokenId)
 
 	SendInfoMessage(0, QStringLiteral("Deleted token '%1'").arg(tokenId), "CPersonalAccessTokenManagerComp");
 
-	if (m_tokenCacheCompPtr.IsValid()){
-		m_tokenCacheCompPtr->ForgetToken(tokenId);
-	}
 
 	return true;
 }

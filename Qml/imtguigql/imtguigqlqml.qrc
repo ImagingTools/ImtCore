@@ -42,7 +42,7 @@
 	<file alias="imtguigql/GqlBasedPasswordPolicyProvider.qml">GqlBasedPasswordPolicyProvider.qml</file>
 	<file alias="imtguigql/GqlBasedPermissionsProvider.qml">GqlBasedPermissionsProvider.qml</file>
 	<file alias="imtguigql/GqlBasedServerTokenApiClient.qml">GqlBasedServerTokenApiClient.qml</file>
-	<file alias="imtguigql/GqlBasedProductPermissionStatusProvider.qml">GqlBasedProductPermissionStatusProvider.qml</file>
+	<file alias="imtguigql/PermissionGroups.js">PermissionGroups.js</file>
 	<file alias="imtguigql/ConnectedProductCollectionView.qml">ConnectedProductCollectionView.qml</file>
 	<file alias="imtguigql/ConnectedProductDocumentController.qml">ConnectedProductDocumentController.qml</file>
 	<file alias="imtguigql/ConnectedProductsPage.qml">ConnectedProductsPage.qml</file>

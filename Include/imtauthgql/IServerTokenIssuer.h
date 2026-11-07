@@ -76,7 +76,6 @@ public:
 	virtual bool SetTokenScopes(
 				const ServerInfo& server,
 				const QByteArray& sessionToken,
-				const QByteArray& clientProductId,
 				const QByteArray& tokenId,
 				QByteArrayList& scopes,
 				QString& errorMessage) const = 0;

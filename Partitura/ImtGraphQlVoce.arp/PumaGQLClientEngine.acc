@@ -13,8 +13,8 @@
         <Element Id="ServerCredential" PackageId="ImtClientGqlPck" ComponentId="ServerCredentialProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="EnvironmentVariable" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="IMT_PUMA_SERVER_CREDENTIAL"/>
+                    <AttributeInfo Id="ServerProductId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Puma"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>

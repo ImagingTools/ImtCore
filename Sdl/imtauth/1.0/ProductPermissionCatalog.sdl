@@ -1,5 +1,4 @@
 schema {
-	query: Query
 	mutation: Mutation
 	namespace: imtauth
 	version: 1.0
@@ -23,20 +22,6 @@ type PublishProductPermissionsPayload {
 	message: String
 }
 
-input ProductPermissionStatusInput {
-	productId: ID!
-}
-
-type ProductPermissionStatus {
-	productId: ID!
-	isPublished: Boolean!
-	productVersion: String
-	publishedAt: String
-}
-
-type Query {
-	GetProductPermissionStatus (input: ProductPermissionStatusInput!): ProductPermissionStatus!
-}
 
 type Mutation {
 	PublishProductPermissions (input: PublishProductPermissionsInput!): PublishProductPermissionsPayload!

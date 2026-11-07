@@ -85,39 +85,23 @@ sdl::V1_0::imtauth::CCreateServerTokenPayload CServerTokenControllerComp::OnCrea
 	}
 
 	const QByteArray clientProductId = arguments.input->clientProductId ? QByteArray(*arguments.input->clientProductId) : QByteArray();
-	const QByteArray productId = arguments.input->productId ? QByteArray(*arguments.input->productId) : QByteArray();
 	const QString name = arguments.input->name ? QString(*arguments.input->name) : QString();
 	const QString description = arguments.input->description ? QString(*arguments.input->description) : QString();
 	QByteArrayList scopes = arguments.input->scopes ? arguments.input->scopes->ToList() : QByteArrayList();
 
-	if (clientProductId.isEmpty() || productId.isEmpty() || name.isEmpty()){
-		errorMessage = QStringLiteral("The client product, the receiving product and the name are required");
+	if (name.isEmpty()){
+		errorMessage = QStringLiteral("The name of the token is required");
 
 		return response;
 	}
 
-	if (clientProductId == productId){
-		errorMessage = QStringLiteral("A server token is issued for another server");
-
-		return response;
-	}
-
-	bool isRead = true;
-	if (!m_clientProductCatalogCompPtr->IsClientProduct(clientProductId, &isRead)){
-		errorMessage = isRead
-					? QStringLiteral("The product '%1' is not a client of this server").arg(QString::fromUtf8(clientProductId))
-					: QStringLiteral("The client products of this server could not be read");
-
-		return response;
-	}
-
-	if (!NormalizeScopes(productId, scopes, errorMessage)){
+	if (!CheckClientProduct(clientProductId, errorMessage) || !NormalizeScopes(scopes, errorMessage)){
 		return response;
 	}
 
 	// No expiration: it would stop a working server
 	const imtauth::IPersonalAccessTokenManager::TokenCreationResult result = m_tokenManagerCompPtr->CreateToken(
-				QByteArray(), productId, name, description, scopes, QDateTime(), clientProductId);
+				QByteArray(), GetOwnProductId(), name, description, scopes, QDateTime(), clientProductId);
 	if (!result.success){
 		errorMessage = QStringLiteral("Unable to create the server token");
 
@@ -127,6 +111,7 @@ sdl::V1_0::imtauth::CCreateServerTokenPayload CServerTokenControllerComp::OnCrea
 	response.success = true;
 	response.id = result.tokenId;
 	response.token = result.rawToken;
+	response.scopes.Emplace().FromList(scopes);
 
 	return response;
 }
@@ -164,12 +149,12 @@ sdl::V1_0::imtauth::CRevokeServerTokenPayload CServerTokenControllerComp::OnRevo
 }
 
 
-sdl::V1_0::imtauth::CRevokeServerTokenPayload CServerTokenControllerComp::OnUpdateServerTokenScopes(
+sdl::V1_0::imtauth::CUpdateServerTokenScopesPayload CServerTokenControllerComp::OnUpdateServerTokenScopes(
 			const sdl::V1_0::imtauth::CUpdateServerTokenScopesGqlRequest& updateServerTokenScopesRequest,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::V1_0::imtauth::CRevokeServerTokenPayload response;
+	sdl::V1_0::imtauth::CUpdateServerTokenScopesPayload response;
 	response.success = false;
 
 	if (!CheckSuperuserSession(gqlRequest, errorMessage)){
@@ -194,53 +179,44 @@ sdl::V1_0::imtauth::CRevokeServerTokenPayload CServerTokenControllerComp::OnUpda
 		return response;
 	}
 
-	if (!NormalizeScopes(tokenPtr->GetProductId(), scopes, errorMessage)){
+	if (!NormalizeScopes(scopes, errorMessage)){
 		return response;
 	}
 
 	response.success = m_tokenManagerCompPtr->SetTokenScopes(tokenId, scopes);
 	if (!*response.success){
 		errorMessage = QStringLiteral("Unable to change the permissions of the server token");
+
+		return response;
 	}
+
+	response.scopes.Emplace().FromList(scopes);
 
 	return response;
 }
 
 
-sdl::V1_0::imtauth::CServerTokenReceiverList CServerTokenControllerComp::OnGetServerTokenReceivers(
-			const sdl::V1_0::imtauth::CGetServerTokenReceiversGqlRequest& getServerTokenReceiversRequest,
+sdl::V1_0::imtauth::CServerTokenReceiver CServerTokenControllerComp::OnGetServerTokenReceiver(
+			const sdl::V1_0::imtauth::CGetServerTokenReceiverGqlRequest& getServerTokenReceiverRequest,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::V1_0::imtauth::CServerTokenReceiverList response;
+	sdl::V1_0::imtauth::CServerTokenReceiver response;
 
-	if (!CheckSuperuserSession(gqlRequest, errorMessage)){
-		return response;
-	}
-
-	// A server takes no token of its own
-	const auto arguments = getServerTokenReceiversRequest.GetRequestedArguments();
+	const auto arguments = getServerTokenReceiverRequest.GetRequestedArguments();
 	const QByteArray clientProductId = arguments.input.has_value() && arguments.input->clientProductId ? QByteArray(*arguments.input->clientProductId) : QByteArray();
-
-	// This server issues tokens for itself only: another server manages its own connections
-	auto& receivers = response.productServers.Emplace();
-	if (clientProductId == GetOwnProductId()){
+	if (!CheckSuperuserSession(gqlRequest, errorMessage) || !CheckClientProduct(clientProductId, errorMessage)){
 		return response;
-	}
-
-	sdl::V1_0::imtauth::CServerTokenReceiver receiver;
-	receiver.productId = GetOwnProductId();
-	if (!GetReceiverGroups(GetOwnProductId(), receiver.groups.Emplace(), errorMessage)){
-		return sdl::V1_0::imtauth::CServerTokenReceiverList();
 	}
 
 	QByteArrayList requiredPermissions;
 	for (int i = 0; i < m_requiredPermissionsAttrPtr.GetCount(); i++){
 		requiredPermissions.append(m_requiredPermissionsAttrPtr[i]);
 	}
-	receiver.requiredPermissions.Emplace().FromList(requiredPermissions);
 
-	receivers.append(receiver);
+	response.productId = GetOwnProductId();
+	response.groups = GetTokenGroups();
+	response.requiredPermissions.Emplace().FromList(requiredPermissions);
 
 	return response;
 }
@@ -297,56 +273,46 @@ QByteArray CServerTokenControllerComp::GetOwnProductId() const
 }
 
 
-bool CServerTokenControllerComp::GetReceiverGroups(
-			const QByteArray& receiverProductId,
-			imtsdl::TElementList<sdl::V1_0::imtauth::CPermissionGroup>& groups,
-			QString& errorMessage) const
+bool CServerTokenControllerComp::CheckClientProduct(const QByteArray& clientProductId, QString& errorMessage) const
 {
-	groups = imtsdl::TElementList<sdl::V1_0::imtauth::CPermissionGroup>();
-
-	if (receiverProductId != GetOwnProductId()){
-		errorMessage = QStringLiteral("This server issues tokens for itself only: '%1' manages its own connections").arg(QString::fromUtf8(receiverProductId));
+	if (clientProductId.isEmpty() || clientProductId == GetOwnProductId()){
+		errorMessage = QStringLiteral("A server token is issued to the server of another product");
 
 		return false;
 	}
 
-	// The tree resolves the requirements
-	imtlic::CProductInfo tree;
-	tree.SetProductId(receiverProductId);
-	AddTokenFeatures(tree);
+	bool isRead = true;
+	if (!m_clientProductCatalogCompPtr->IsClientProduct(clientProductId, &isRead)){
+		errorMessage = isRead
+					? QStringLiteral("The product '%1' is not a client of this server").arg(QString::fromUtf8(clientProductId))
+					: QStringLiteral("The client products of this server could not be read");
 
-	BuildPermissionGroups<sdl::V1_0::imtauth::CPermissionGroup, sdl::V1_0::imtauth::CPermissionEntry>(&tree, nullptr, groups, QByteArray(), nullptr);
+		return false;
+	}
 
 	return true;
 }
 
 
-bool CServerTokenControllerComp::NormalizeScopes(const QByteArray& receiverProductId, QByteArrayList& scopes, QString& errorMessage) const
+imtsdl::TElementList<sdl::V1_0::imtauth::CPermissionGroup> CServerTokenControllerComp::GetTokenGroups() const
 {
+	imtlic::CProductInfo tree;
+	BuildTokenTree(tree);
+
 	imtsdl::TElementList<sdl::V1_0::imtauth::CPermissionGroup> groups;
-	if (!GetReceiverGroups(receiverProductId, groups, errorMessage)){
-		return false;
-	}
+	BuildPermissionGroups<sdl::V1_0::imtauth::CPermissionGroup, sdl::V1_0::imtauth::CPermissionEntry>(&tree, nullptr, groups, QByteArray(), nullptr);
+
+	return groups;
+}
+
+
+bool CServerTokenControllerComp::NormalizeScopes(QByteArrayList& scopes, QString& errorMessage) const
+{
+	imtlic::CProductInfo tree;
+	BuildTokenTree(tree);
 
 	// Only the permissions of the tree are held, in its order
-	QByteArrayList catalog;
-	imtlic::PermissionRequirements requirements;
-	for (const sdl::V1_0::imtauth::CPermissionGroup& group : groups.ToList()){
-		if (!group.entries){
-			continue;
-		}
-
-		for (const sdl::V1_0::imtauth::CPermissionEntry& entry : group.entries->ToList()){
-			if (!entry.permissionId){
-				continue;
-			}
-
-			catalog.append(*entry.permissionId);
-			if (entry.requirements){
-				requirements.insert(*entry.permissionId, entry.requirements->ToList());
-			}
-		}
-	}
+	const QByteArrayList catalog = imtlic::CollectProductPermissions(tree);
 
 	QByteArrayList requested = scopes;
 	for (int i = 0; i < m_requiredPermissionsAttrPtr.GetCount(); i++){
@@ -365,13 +331,13 @@ bool CServerTokenControllerComp::NormalizeScopes(const QByteArray& receiverProdu
 		}
 
 		if (!isKnown){
-			errorMessage = QStringLiteral("The permission '%1' cannot be given to a server of '%2'").arg(QString::fromUtf8(permissionId), QString::fromUtf8(receiverProductId));
+			errorMessage = QStringLiteral("The permission '%1' cannot be given to a server token").arg(QString::fromUtf8(permissionId));
 
 			return false;
 		}
 	}
 
-	held += imtlic::CollectImpliedPermissions(requirements, held);
+	held += imtlic::CollectImpliedPermissions(tree, held);
 
 	const QSet<QByteArray> heldSet(held.cbegin(), held.cend());
 	scopes.clear();
@@ -382,6 +348,14 @@ bool CServerTokenControllerComp::NormalizeScopes(const QByteArray& receiverProdu
 	}
 
 	return true;
+}
+
+
+void CServerTokenControllerComp::BuildTokenTree(imtlic::CProductInfo& tree) const
+{
+	// The tree resolves the requirements
+	tree.SetProductId(GetOwnProductId());
+	AddTokenFeatures(tree);
 }
 
 

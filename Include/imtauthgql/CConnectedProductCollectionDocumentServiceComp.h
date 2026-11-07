@@ -3,6 +3,7 @@
 
 
 // ImtCore includes
+#include <imtbase/IObjectCollection.h>
 #include <imtdoc/IDocumentService.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/ConnectedProductCollectionDocumentService_fwd.h>
 
@@ -22,6 +23,7 @@ public:
 
 	I_BEGIN_COMPONENT(CConnectedProductCollectionDocumentServiceComp)
 		I_ASSIGN(m_documentManagerCompPtr, "CollectionDocumentService", "Collection document manager", false, "CollectionDocumentService");
+		I_ASSIGN(m_snapshotCollectionCompPtr, "SnapshotCollection", "Published permission trees, they give the version and the time of the publication", false, "SnapshotCollection");
 	I_END_COMPONENT
 
 protected:
@@ -37,6 +39,7 @@ protected:
 
 private:
 	I_REF(imtdoc::IDocumentService, m_documentManagerCompPtr);
+	I_REF(imtbase::IObjectCollection, m_snapshotCollectionCompPtr);
 };
 
 

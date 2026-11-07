@@ -3,8 +3,7 @@
 
 
 // ImtCore includes
-#include <imtbase/imtbase.h>
-#include <imtgql/CGqlContext.h>
+#include <imtgql/imtgql.h>
 #include <imtgql/CGqlRequest.h>
 #include <GeneratedFiles/imtappsdl/SDL/1.0/CPP/Application.h>
 
@@ -12,6 +11,9 @@
 namespace imtclientgql
 {
 
+
+// A token is checked every five minutes
+static const int s_credentialCheckInterval = 5 * 60 * 1000;
 
 // Bounds the tree, e.g. when two services depend on each other
 static const int s_maxDependencyDepth = 8;
@@ -58,7 +60,7 @@ void CRemoteServiceInfoComp::OnComponentCreated()
 
 		if (m_serverCredentialCompPtr.IsValid() && !m_serverCredentialCompPtr->GetServerToken().isEmpty()){
 			connect(&m_credentialCheckTimer, &QTimer::timeout, this, [this](){ UpdateServiceInfo(); });
-			m_credentialCheckTimer.start(*m_credentialCheckIntervalAttrPtr * 1000);
+			m_credentialCheckTimer.start(s_credentialCheckInterval);
 		}
 
 		UpdateServiceInfo();
@@ -119,15 +121,7 @@ void CRemoteServiceInfoComp::SendInfoRequest(bool useToken)
 	}
 
 	if (useToken){
-		const QByteArray serverToken = m_serverCredentialCompPtr->GetServerToken();
-
-		imtgql::IGqlContext::Headers headers;
-		headers.insert(imtbase::s_authenticationTokenHeaderId, serverToken);
-
-		imtgql::IGqlContextUniquePtr contextPtr(new imtgql::CGqlContext);
-		contextPtr->SetToken(serverToken);
-		contextPtr->SetHeaders(headers);
-		request.SetGqlContext(imtgql::IGqlContextSharedPtr::CreateFromUnique(std::move(contextPtr)));
+		imtgql::SetServerRequestContext(request, m_serverCredentialCompPtr->GetServerToken());
 	}
 
 	m_asyncClientCompPtr->SendModelRequest<sdl::V1_0::imtapp::CApplicationInfo>(request).then(this, [this, requestId, useToken](const GqlModelResult<sdl::V1_0::imtapp::CApplicationInfo>& result) {

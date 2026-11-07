@@ -27,16 +27,8 @@ imtgql::IGqlContextCreator::ContextCreationStatus CSimpleGqlContextCreatorComp::
 }
 
 
-imtgql::IGqlContextCreator::ContextCreationStatus CSimpleGqlContextCreatorComp::CheckServerToken(const QByteArray& /*token*/, QByteArrayList& /*scopes*/, QString& /*errorMessage*/) const
+bool CSimpleGqlContextCreatorComp::CheckRequestAccess(const imtgql::CGqlRequest& /*gqlRequest*/, QString& /*errorMessage*/) const
 {
-	return CCS_OK;
-}
-
-
-bool CSimpleGqlContextCreatorComp::CheckRequestAccess(const imtgql::CGqlRequest& /*gqlRequest*/, QByteArray& requiredPermission, QString& /*errorMessage*/) const
-{
-	requiredPermission.clear();
-
 	return true;
 }
 

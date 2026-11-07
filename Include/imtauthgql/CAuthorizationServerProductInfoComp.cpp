@@ -10,10 +10,13 @@
 #include <QtCore/QSet>
 
 // ImtCore includes
+#include <imtauthgql/imtauthgql.h>
 #include <imtcom/IConnectionStatusProvider.h>
+#include <imtgql/imtgql.h>
 #include <imtgql/CGqlContext.h>
 #include <imtgql/CGqlRequest.h>
 #include <imtlic/CFeatureInfo.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/ProductPermissionCatalog.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/ServerTokens.h>
 
 
@@ -23,6 +26,9 @@ namespace imtauthgql
 
 namespace
 {
+
+
+const int s_retryDelay = 30000;
 
 
 void CopyServerFeature(const sdl::V1_0::imtauth::CServerFeature& serverFeature, imtlic::CFeatureInfo& featureInfo)
@@ -232,7 +238,9 @@ void CAuthorizationServerProductInfoComp::OnUpdate(const istd::IChangeable::Chan
 	}
 
 	QMutexLocker locker(&m_runMutex);
+	m_isPublishNeeded = true;
 	m_isFetchNeeded = true;
+	m_isReconnected = true;
 	m_runCondition.wakeAll();
 }
 
@@ -303,13 +311,68 @@ void CAuthorizationServerProductInfoComp::Invalidate()
 }
 
 
+bool CAuthorizationServerProductInfoComp::Publish() const
+{
+	const QByteArray productId = m_productInfoCompPtr->GetProductId();
+
+	sdl::V1_0::imtauth::PublishProductPermissionsRequestArguments arguments;
+	arguments.input.emplace();
+	arguments.input->productId = productId;
+	arguments.input->productVersion = GetProductVersion();
+
+	sdl::V1_0::imtauth::CPermissionTree tree;
+	BuildPermissionGroups<sdl::V1_0::imtauth::CPermissionGroup, sdl::V1_0::imtauth::CPermissionEntry>(
+				m_productInfoCompPtr.GetPtr(),
+				nullptr,
+				tree.groups.Emplace(),
+				QByteArray(),
+				nullptr);
+	arguments.input->tree = tree;
+
+	imtgql::IGqlContextUniquePtr contextPtr(new imtgql::CGqlContext);
+	contextPtr->SetToken(m_serverCredentialCompPtr->GetServerToken());
+	contextPtr->SetProductId(productId);
+
+	imtgql::CGqlRequest gqlRequest;
+	gqlRequest.SetGqlContext(imtgql::IGqlContextSharedPtr::CreateFromUnique(std::move(contextPtr)));
+	if (!sdl::V1_0::imtauth::CPublishProductPermissionsGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
+		return false;
+	}
+
+	QString errorMessage;
+	const sdl::V1_0::imtauth::CPublishProductPermissionsPayload payload = SendModelRequest<sdl::V1_0::imtauth::CPublishProductPermissionsPayload>(gqlRequest, errorMessage);
+	if (!errorMessage.isEmpty() || !payload.success || !*payload.success){
+		SendWarningMessage(0, QStringLiteral("The authorization server did not accept the permissions: %1").arg(errorMessage), "CAuthorizationServerProductInfoComp");
+
+		return false;
+	}
+
+	return true;
+}
+
+
+QString CAuthorizationServerProductInfoComp::GetProductVersion() const
+{
+	if (!m_applicationInfoCompPtr.IsValid()){
+		return QString();
+	}
+
+	const iser::IVersionInfo& versionInfo = m_applicationInfoCompPtr->GetVersionInfo();
+	const int mainVersion = m_applicationInfoCompPtr->GetMainVersionId();
+
+	quint32 versionNumber = 0;
+
+	return versionInfo.GetVersionNumber(mainVersion, versionNumber) ? versionInfo.GetEncodedVersionName(mainVersion, versionNumber) : QString();
+}
+
+
 bool CAuthorizationServerProductInfoComp::Fetch()
 {
 	sdl::V1_0::imtauth::GetServerTokenFeaturesRequestArguments arguments;
 
 	// This server asks for itself: its token goes with every request
 	imtgql::CGqlRequest gqlRequest;
-	gqlRequest.SetGqlContext(imtgql::IGqlContextSharedPtr::CreateFromUnique(imtgql::IGqlContextUniquePtr(new imtgql::CGqlContext)));
+	imtgql::SetServerRequestContext(gqlRequest);
 	if (!sdl::V1_0::imtauth::CGetServerTokenFeaturesGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
 		return false;
 	}
@@ -363,25 +426,37 @@ bool CAuthorizationServerProductInfoComp::Fetch()
 
 void CAuthorizationServerProductInfoComp::Run()
 {
-	const int refreshIntervalMs = qMax(1, *m_refreshIntervalAttrPtr) * 1000;
-
 	QMutexLocker locker(&m_runMutex);
 	while (!m_isStopping){
-		if (!m_isFetchNeeded){
-			const QDeadlineTimer deadline(refreshIntervalMs);
-			while (!m_isStopping && !m_isFetchNeeded && !deadline.hasExpired()){
-				m_runCondition.wait(&m_runMutex, deadline);
-			}
-			if (m_isStopping){
-				break;
-			}
+		if (!m_isPublishNeeded && !m_isFetchNeeded){
+			m_runCondition.wait(&m_runMutex);
+
+			continue;
 		}
 
+		const bool isPublishNeeded = m_isPublishNeeded;
+		const bool isFetchNeeded = m_isFetchNeeded;
+		m_isPublishNeeded = false;
 		m_isFetchNeeded = false;
+		m_isReconnected = false;
 
 		locker.unlock();
-		Fetch();
+		const bool isPublished = !isPublishNeeded || Publish();
+		const bool isFetched = !isFetchNeeded || Fetch();
 		locker.relock();
+
+		if (isPublished && isFetched){
+			continue;
+		}
+
+		// A failed step is repeated later, or at once when the connection comes back
+		m_isPublishNeeded = m_isPublishNeeded || !isPublished;
+		m_isFetchNeeded = m_isFetchNeeded || !isFetched;
+
+		const QDeadlineTimer deadline(s_retryDelay);
+		while (!m_isStopping && !m_isReconnected && !deadline.hasExpired()){
+			m_runCondition.wait(&m_runMutex, deadline);
+		}
 	}
 }
 

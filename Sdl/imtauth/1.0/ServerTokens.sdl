@@ -33,9 +33,9 @@ input ServerTokenListInput {
 	clientProductId: ID!
 }
 
+# The token is issued by this server for itself.
 input CreateServerTokenInput {
 	clientProductId: ID!
-	productId: ID!
 	name: String!
 	description: String
 	scopes: [ID]
@@ -44,6 +44,15 @@ input CreateServerTokenInput {
 type CreateServerTokenPayload {
 	id: ID
 	token: ID
+	# The permissions the token holds: the requested ones with the ones they require.
+	scopes: [ID]
+	success: Boolean!
+	message: String
+}
+
+type UpdateServerTokenScopesPayload {
+	# The permissions the token holds: the requested ones with the ones they require.
+	scopes: [ID]
 	success: Boolean!
 	message: String
 }
@@ -53,7 +62,7 @@ type RevokeServerTokenPayload {
 	message: String
 }
 
-# What a server token can be allowed on its receiving server: the permission tree of that server.
+# This server as the receiver of the tokens of a client product: the permissions a token can hold.
 type ServerTokenReceiver
 {
 	productId: ID!
@@ -77,13 +86,8 @@ type ServerFeatureList
 	features: [ServerFeature]
 }
 
-type ServerTokenReceiverList
-{
-	productServers: [ServerTokenReceiver]
-}
-
-input ServerTokenReceiversInput {
-	clientProductId: ID
+input ServerTokenReceiverInput {
+	clientProductId: ID!
 }
 
 input UpdateServerTokenScopesInput {
@@ -93,7 +97,7 @@ input UpdateServerTokenScopesInput {
 
 type Query {
 	GetServerTokenList (input: ServerTokenListInput!): ServerTokenList!
-	GetServerTokenReceivers (input: ServerTokenReceiversInput): ServerTokenReceiverList!
+	GetServerTokenReceiver (input: ServerTokenReceiverInput!): ServerTokenReceiver!
 	# The permissions of this server the token of the calling product server allows, for the roles of that product.
 	GetServerTokenFeatures: ServerFeatureList!
 }
@@ -101,5 +105,5 @@ type Query {
 type Mutation {
 	CreateServerToken (input: CreateServerTokenInput!): CreateServerTokenPayload!
 	RevokeServerToken (input: InputId!): RevokeServerTokenPayload!
-	UpdateServerTokenScopes (input: UpdateServerTokenScopesInput!): RevokeServerTokenPayload!
+	UpdateServerTokenScopes (input: UpdateServerTokenScopesInput!): UpdateServerTokenScopesPayload!
 }

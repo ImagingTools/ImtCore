@@ -8,7 +8,10 @@ import QtQuick 2.12
  * This file MUST NOT import imtguigql or any SDL module.
  */
 QtObject {
-	// Model of the tokens of the last requested product; each item has m_id, m_productId, m_scopes and m_revoked.
+	// The client product whose tokens are managed
+	property string productId: ""
+
+	// Model of the tokens of the product; each item has m_id, m_productId, m_scopes and m_revoked.
 	property var tokens: null
 
 	// This server, which issues the tokens for itself: {productId, groups, requiredPermissions},
@@ -18,9 +21,9 @@ QtObject {
 	signal tokenCreated(string token)
 	signal operationFailed(string message)
 
-	function requestTokens(productId) {}
-	function requestProductServer(productId) {}
-	function createToken(productId, receiverId, name, description, scopes) {}
-	function updateTokenScopes(productId, tokenId, scopes) {}
-	function revokeToken(productId, tokenId) {}
+	function requestTokens() {}
+	function requestProductServer() {}
+	function createToken(name, description, scopes) {}
+	function updateTokenScopes(tokenId, scopes) {}
+	function revokeToken(tokenId) {}
 }

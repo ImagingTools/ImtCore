@@ -17,7 +17,6 @@ ViewBase {
 	contentColor: Style.baseColor
 
 	property var tokenApiClient: null
-	property var permissionStatusProvider: null
 	property var permissionsProvider: null
 
 	// The ID of the saved product. Tokens, roles and the tree refer to it, so it stays once stored.
@@ -113,7 +112,8 @@ ViewBase {
 
 		ConnectedProductPermissionsPage {
 			productId: container.storedProductId
-			statusProvider: container.permissionStatusProvider
+			productVersion: container.model && container.model.m_productVersion ? String(container.model.m_productVersion) : ""
+			publishedAt: container.model && container.model.m_publishedAt ? String(container.model.m_publishedAt) : ""
 			permissionsProvider: container.permissionsProvider
 		}
 	}

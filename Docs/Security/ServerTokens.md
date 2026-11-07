@@ -7,7 +7,7 @@ The calling server sends the token in the header `x-server-token` with its produ
 ```
 Operator (Agentino or the Puma console)        Receiving server (Puma, Lisa, ...)           Calling server (ProLife, ...)
    | Authorization (superuser of the receiver) --> session
-   | GetServerTokenReceivers (clientProductId) --> permission tree the token can hold
+   | GetServerTokenReceiver (clientProductId)  --> permission tree the token can hold
    | CreateServerToken / UpdateServerTokenScopes / RevokeServerToken
    |                                             <-- token value (only at creation)
    | the value reaches the calling server (Agentino passes it in IMT_<RECEIVER>_SERVER_CREDENTIAL)
@@ -25,8 +25,8 @@ Operator (Agentino or the Puma console)        Receiving server (Puma, Lisa, ...
 | Allowed clients | `imtauth::IClientProductCatalog` | `ClientProductCatalog` names them in the configuration; `ConnectedClientProductCatalog` takes the connected products (Puma). |
 | Permissions of a token | `ProductServerPermissions` of the controller | A dedicated tree (Puma: `/ProductServer/...`). Without it, the permission tree of the server itself. |
 | Token storage | `ImtAuthVoce/PersonalAccessTokenStore` | The `PersonalAccessTokens` table of the server (created automatically). |
-| Check of a request | `imtservergql::CAuthenticationManagerComp` | `ServerProductId` refuses another product without a token; `ServerTokenManager` is where the tokens of this server are checked, for requests and for the periodic check of subscriptions (`CheckServerToken`). A token is looked up there first in both `x-server-token` and the authentication header: a product sends its own server token in the authentication header for its subscriptions. Either way it stands for its client product and is bounded by the policy. A server token kept anywhere else is refused. |
-| What a client may send | `ProductServerRequestPolicy` | Every command or collection a client may call, with the permission it needs. Anything not declared is refused. |
+| Check of a request | `imtservergql::CAuthenticationManagerComp` | `ServerProductId` refuses another product without a token; `ServerTokenManager` is where the tokens of this server are checked, for requests and for the periodic check of subscriptions: a subscription ends when its token is refused or holds other permissions than when it subscribed. A token is looked up there first in both `x-server-token` and the authentication header: a product sends its own server token in the authentication header for its subscriptions. Either way it stands for its client product and is bounded by the policy. A server token kept anywhere else is refused. |
+| What a client may send | `ProductServerRequestPolicy` | Every command or collection a client may call, with the permission it needs; an empty permission opens a command to any connected server. Reading one object of a collection needs its object-read permission or its view permission, opening a document only reads it. Anything not declared is refused. |
 
 `ImtAuthVoce/ServerTokenReceiver` puts the controller, the client catalog and the token store together.
 
@@ -48,9 +48,6 @@ A product that uses `AuthorizableServerFramework` needs four changes in its serv
             </AttributeInfo>
             <AttributeInfo Id="PermissionTree" Type="Reference" ExportId="">
                 <Data IsEnabled="true" Value="AuthorizableServerFramework"/>
-            </AttributeInfo>
-            <AttributeInfo Id="PersonalAccessTokenCache" Type="Reference" ExportId="">
-                <Data IsEnabled="true" Value="AuthorizableServerFramework/AuthenticationManager"/>
             </AttributeInfo>
         </AttributeInfoMap>
     </Data>

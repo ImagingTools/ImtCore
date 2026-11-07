@@ -129,44 +129,4 @@ sdl::V1_0::imtauth::CPublishProductPermissionsPayload CProductPermissionCatalogC
 }
 
 
-sdl::V1_0::imtauth::CProductPermissionStatus CProductPermissionCatalogComp::OnGetProductPermissionStatus(
-			const sdl::V1_0::imtauth::CGetProductPermissionStatusGqlRequest& statusRequest,
-			const ::imtgql::CGqlRequest& gqlRequest,
-			QString& errorMessage) const
-{
-	sdl::V1_0::imtauth::CProductPermissionStatus response;
-
-	if (!IsSuperuserRequest(gqlRequest)){
-		errorMessage = QStringLiteral("The catalog of products is available to a superuser only");
-
-		return response;
-	}
-
-	const auto arguments = statusRequest.GetRequestedArguments();
-	const QByteArray productId = arguments.input.has_value() && arguments.input->productId ? QByteArray(*arguments.input->productId) : QByteArray();
-
-	response.productId = productId;
-	response.isPublished = false;
-
-	const QByteArray snapshotId = imtauth::FindProductPermissionSnapshot(*m_snapshotCollectionCompPtr, productId);
-	if (snapshotId.isEmpty()){
-		return response;
-	}
-
-	imtbase::IObjectCollection::DataPtr dataPtr;
-	const imtauth::CProductPermissionSnapshot* snapshotPtr = m_snapshotCollectionCompPtr->GetObjectData(snapshotId, dataPtr) ? dynamic_cast<const imtauth::CProductPermissionSnapshot*>(dataPtr.GetPtr()) : nullptr;
-	if (snapshotPtr == nullptr){
-		errorMessage = QStringLiteral("Unable to read the stored permission tree");
-
-		return response;
-	}
-
-	response.isPublished = true;
-	response.productVersion = snapshotPtr->GetProductVersion();
-	response.publishedAt = snapshotPtr->GetPublishedAt().toString(Qt::ISODate);
-
-	return response;
-}
-
-
 } // namespace imtauthgql

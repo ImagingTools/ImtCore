@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgql/CRemoteUserControllerComp.h>
-#include <imtgql/CGqlContext.h>
+#include <imtgql/imtgql.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Users.h>
 
 
@@ -17,7 +17,7 @@ imtauth::ISuperuserProvider::ExistsStatus CRemoteUserControllerComp::SuperuserEx
 	imtgql::CGqlRequest gqlRequest(imtgql::IGqlRequest::RT_QUERY, sdl::V1_0::imtauth::CCheckSuperuserExistsGqlRequest::GetCommandId());
 
 	// This server asks for itself: the credentials of the request being served must not travel along
-	gqlRequest.SetGqlContext(imtgql::IGqlContextSharedPtr::CreateFromUnique(imtgql::IGqlContextUniquePtr(new imtgql::CGqlContext)));
+	imtgql::SetServerRequestContext(gqlRequest);
 
 	sdl::V1_0::imtauth::CCheckSuperuserExistsGqlRequest checkSuperuserExistsGqlRequest(gqlRequest, false);
 

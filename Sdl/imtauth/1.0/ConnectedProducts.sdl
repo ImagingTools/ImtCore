@@ -38,6 +38,9 @@ type ConnectedProductData {
 	productId: ID
 	name: String
 	description: String
+	# Read only: the permission tree the product published last, empty before it publishes.
+	productVersion: String
+	publishedAt: String
 }
 
 input ConnectedProductDataInput {

@@ -25,7 +25,7 @@ public:
 
 	I_BEGIN_COMPONENT(CServerCredentialProviderComp);
 		I_REGISTER_INTERFACE(IServerCredentialProvider);
-		I_ASSIGN(m_environmentVariableAttrPtr, "EnvironmentVariable", "Name of the environment variable holding the token", true, "IMT_PUMA_SERVER_CREDENTIAL");
+		I_ASSIGN(m_serverProductIdAttrPtr, "ServerProductId", "Product of the server the token is for; it names the environment variable holding the token", true, "");
 	I_END_COMPONENT;
 
 	// reimplemented (imtclientgql::IServerCredentialProvider)
@@ -36,7 +36,7 @@ protected:
 	virtual void OnComponentCreated() override;
 
 private:
-	I_ATTR(QByteArray, m_environmentVariableAttrPtr);
+	I_ATTR(QByteArray, m_serverProductIdAttrPtr);
 
 	QByteArray m_token;
 };

@@ -201,13 +201,8 @@ I_EXPORT_COMPONENT(
 			"Product Permission Catalog");
 
 I_EXPORT_COMPONENT(
-			ProductPermissionPublisher,
-			"Sends the permission tree of this product to the authorization server",
-			"Product Permission Publisher");
-
-I_EXPORT_COMPONENT(
 			AuthorizationServerProductInfo,
-			"The permission tree of this product with the permissions of the authorization server its token allows",
+			"Publishes the permission tree of this product to the authorization server and adds the permissions the authorization server gives",
 			"Authorization Server Product Info");
 
 I_EXPORT_COMPONENT(

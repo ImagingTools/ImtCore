@@ -10,6 +10,7 @@
 #include <imtauth/IConnectedProduct.h>
 #include <imtauth/IPersonalAccessTokenManager.h>
 #include <imtbase/IObjectCollection.h>
+#include <imtlic/IProductInfo.h>
 #include <imtservergql/CObjectCollectionControllerCompBase.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/ConnectedProducts_fwd.h>
 
@@ -30,8 +31,7 @@ public:
 		I_ASSIGN(m_productFactCompPtr, "ProductFactory", "Factory of the catalog entries", true, "ProductFactory");
 		I_ASSIGN(m_tokenManagerCompPtr, "PersonalAccessTokenManager", "Revokes the tokens of a removed product", true, "PersonalAccessTokenManager");
 		I_ASSIGN(m_snapshotCollectionCompPtr, "SnapshotCollection", "Published permission trees, they give the version of a product", false, "SnapshotCollection");
-		I_ASSIGN(m_ownProductIdAttrPtr, "OwnProductId", "This server in its own catalog: the entry is created with the first request and cannot be removed", false, "");
-		I_ASSIGN(m_ownProductNameAttrPtr, "OwnProductName", "Name of this server in its own catalog", false, "");
+		I_ASSIGN(m_ownProductCompPtr, "OwnProduct", "This server in its own catalog: the entry is created with the first request and cannot be removed", false, "OwnProduct");
 	I_END_COMPONENT;
 
 protected:
@@ -66,6 +66,7 @@ protected:
 private:
 	void EnsureOwnProduct() const;
 	QString GetPublishedVersion(const QByteArray& productId) const;
+	QByteArray GetOwnProductId() const;
 	void FillServerState(
 				const QByteArray& productId,
 				const sdl::V1_0::imtauth::CConnectedProductsListGqlRequest& listRequest,
@@ -73,8 +74,7 @@ private:
 
 private:
 	I_REF(imtbase::IObjectCollection, m_snapshotCollectionCompPtr);
-	I_ATTR(QByteArray, m_ownProductIdAttrPtr);
-	I_ATTR(QString, m_ownProductNameAttrPtr);
+	I_REF(imtlic::IProductInfo, m_ownProductCompPtr);
 
 	mutable QMutex m_ownProductMutex;
 	mutable bool m_isOwnProductEnsured = false;

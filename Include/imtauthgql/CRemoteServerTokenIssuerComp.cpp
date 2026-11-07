@@ -51,33 +51,18 @@ bool CRemoteServerTokenIssuerComp::GetPermissions(
 			sdl::V1_0::imtauth::CServerTokenReceiver& permissions,
 			QString& errorMessage) const
 {
-	sdl::V1_0::imtauth::GetServerTokenReceiversRequestArguments arguments;
+	sdl::V1_0::imtauth::GetServerTokenReceiverRequestArguments arguments;
 	arguments.input.emplace();
 	arguments.input->clientProductId = clientProductId;
 
 	imtgql::CGqlRequest gqlRequest;
-	if (!sdl::V1_0::imtauth::CGetServerTokenReceiversGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
+	if (!sdl::V1_0::imtauth::CGetServerTokenReceiverGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
 		return false;
 	}
 
-	const sdl::V1_0::imtauth::CServerTokenReceiverList payload = Send<sdl::V1_0::imtauth::CServerTokenReceiverList>(server, sessionToken, gqlRequest, errorMessage);
-	if (!errorMessage.isEmpty()){
-		return false;
-	}
+	permissions = Send<sdl::V1_0::imtauth::CServerTokenReceiver>(server, sessionToken, gqlRequest, errorMessage);
 
-	if (payload.productServers){
-		for (const sdl::V1_0::imtauth::CServerTokenReceiver& receiver : payload.productServers->ToList()){
-			if (receiver.productId && *receiver.productId == server.productId){
-				permissions = receiver;
-
-				return true;
-			}
-		}
-	}
-
-	errorMessage = QStringLiteral("The server '%1' issues no tokens for '%2'").arg(QString::fromUtf8(server.productId), QString::fromUtf8(clientProductId));
-
-	return false;
+	return errorMessage.isEmpty();
 }
 
 
@@ -94,7 +79,6 @@ bool CRemoteServerTokenIssuerComp::IssueToken(
 	sdl::V1_0::imtauth::CreateServerTokenRequestArguments arguments;
 	arguments.input.emplace();
 	arguments.input->clientProductId = clientProductId;
-	arguments.input->productId = server.productId;
 	arguments.input->name = name;
 	arguments.input->scopes.Emplace().FromList(scopes);
 
@@ -116,15 +100,15 @@ bool CRemoteServerTokenIssuerComp::IssueToken(
 
 	tokenId = *payload.id;
 	token = *payload.token;
+	scopes = payload.scopes ? payload.scopes->ToList() : QByteArrayList();
 
-	return GetTokenScopes(server, sessionToken, clientProductId, tokenId, scopes, errorMessage);
+	return true;
 }
 
 
 bool CRemoteServerTokenIssuerComp::SetTokenScopes(
 			const ServerInfo& server,
 			const QByteArray& sessionToken,
-			const QByteArray& clientProductId,
 			const QByteArray& tokenId,
 			QByteArrayList& scopes,
 			QString& errorMessage) const
@@ -139,7 +123,7 @@ bool CRemoteServerTokenIssuerComp::SetTokenScopes(
 		return false;
 	}
 
-	const sdl::V1_0::imtauth::CRevokeServerTokenPayload payload = Send<sdl::V1_0::imtauth::CRevokeServerTokenPayload>(server, sessionToken, gqlRequest, errorMessage);
+	const sdl::V1_0::imtauth::CUpdateServerTokenScopesPayload payload = Send<sdl::V1_0::imtauth::CUpdateServerTokenScopesPayload>(server, sessionToken, gqlRequest, errorMessage);
 	if (!errorMessage.isEmpty()){
 		return false;
 	}
@@ -150,7 +134,9 @@ bool CRemoteServerTokenIssuerComp::SetTokenScopes(
 		return false;
 	}
 
-	return GetTokenScopes(server, sessionToken, clientProductId, tokenId, scopes, errorMessage);
+	scopes = payload.scopes ? payload.scopes->ToList() : QByteArrayList();
+
+	return true;
 }
 
 
@@ -211,44 +197,6 @@ Payload CRemoteServerTokenIssuerComp::Send(const ServerInfo& server, const QByte
 	}
 
 	return imtclientgql::CClientRequestModelHelpers::ParseModelResponse<Payload>(responsePtr->GetResponseData(), gqlRequest.GetCommandId(), errorMessage);
-}
-
-
-bool CRemoteServerTokenIssuerComp::GetTokenScopes(
-			const ServerInfo& server,
-			const QByteArray& sessionToken,
-			const QByteArray& clientProductId,
-			const QByteArray& tokenId,
-			QByteArrayList& scopes,
-			QString& errorMessage) const
-{
-	sdl::V1_0::imtauth::GetServerTokenListRequestArguments arguments;
-	arguments.input.emplace();
-	arguments.input->clientProductId = clientProductId;
-
-	imtgql::CGqlRequest gqlRequest;
-	if (!sdl::V1_0::imtauth::CGetServerTokenListGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
-		return false;
-	}
-
-	const sdl::V1_0::imtauth::CServerTokenList payload = Send<sdl::V1_0::imtauth::CServerTokenList>(server, sessionToken, gqlRequest, errorMessage);
-	if (!errorMessage.isEmpty()){
-		return false;
-	}
-
-	if (payload.tokens){
-		for (const sdl::V1_0::imtauth::CServerToken& serverToken : payload.tokens->ToList()){
-			if (serverToken.id && *serverToken.id == tokenId){
-				scopes = serverToken.scopes ? serverToken.scopes->ToList() : QByteArrayList();
-
-				return true;
-			}
-		}
-	}
-
-	errorMessage = QStringLiteral("The server '%1' has no token '%2'").arg(QString::fromUtf8(server.productId), QString::fromUtf8(tokenId));
-
-	return false;
 }
 
 

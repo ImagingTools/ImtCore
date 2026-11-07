@@ -3,8 +3,7 @@
 
 
 // ImtCore includes
-#include <imtbase/imtbase.h>
-#include <imtgql/CGqlContext.h>
+#include <imtgql/imtgql.h>
 #include <imtgql/CGqlRequest.h>
 
 
@@ -62,13 +61,7 @@ void CSubscriberCompBase::OnComponentCreated()
 
 			const QByteArray serverToken = m_serverCredentialCompPtr.IsValid() ? m_serverCredentialCompPtr->GetServerToken() : QByteArray();
 			if (!serverToken.isEmpty()){
-				imtgql::IGqlContext::Headers headers;
-				headers.insert(imtbase::s_authenticationTokenHeaderId, serverToken);
-
-				imtgql::IGqlContextUniquePtr contextPtr(new imtgql::CGqlContext);
-				contextPtr->SetToken(serverToken);
-				contextPtr->SetHeaders(headers);
-				gqlRequest.SetGqlContext(imtgql::IGqlContextSharedPtr::CreateFromUnique(std::move(contextPtr)));
+				imtgql::SetServerRequestContext(gqlRequest, serverToken);
 			}
 
 			m_subscriptionIds << m_subscriptionManagerCompPtr->RegisterSubscription(gqlRequest, *this);

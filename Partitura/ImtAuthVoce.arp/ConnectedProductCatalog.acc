@@ -186,10 +186,7 @@
         <Element Id="ProductCollectionController" PackageId="ImtAuthGqlPck" ComponentId="ConnectedProductCollectionController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="OwnProductId" Type="Id" ExportId="OwnProductId">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="OwnProductName" Type="String" ExportId="OwnProductName">
+                    <AttributeInfo Id="OwnProduct" Type="Reference" ExportId="PermissionTree">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SnapshotCollection" Type="Reference" ExportId="SnapshotRepository">
@@ -236,6 +233,9 @@
                         <Data IsEnabled="true" Value="CollectionDocumentService"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SnapshotCollection" Type="Reference" ExportId="SnapshotRepository">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">

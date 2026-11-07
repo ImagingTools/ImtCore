@@ -49,7 +49,6 @@ public:
 	virtual bool SetTokenScopes(
 				const ServerInfo& server,
 				const QByteArray& sessionToken,
-				const QByteArray& clientProductId,
 				const QByteArray& tokenId,
 				QByteArrayList& scopes,
 				QString& errorMessage) const override;
@@ -59,16 +58,6 @@ private:
 	template<class Payload>
 	Payload Send(const ServerInfo& server, const QByteArray& sessionToken, imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 
-	/**
-		The permissions the token holds: the server completes the requested ones.
-	*/
-	bool GetTokenScopes(
-				const ServerInfo& server,
-				const QByteArray& sessionToken,
-				const QByteArray& clientProductId,
-				const QByteArray& tokenId,
-				QByteArrayList& scopes,
-				QString& errorMessage) const;
 };
 
 

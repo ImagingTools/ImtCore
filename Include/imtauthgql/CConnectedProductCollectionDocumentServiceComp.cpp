@@ -4,6 +4,7 @@
 
 // ImtCore includes
 #include <imtauth/CConnectedProduct.h>
+#include <imtauth/CProductPermissionSnapshot.h>
 #include <imtauthgql/imtauthgql.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/ConnectedProductCollectionDocumentService.h>
 
@@ -43,6 +44,25 @@ sdl::V1_0::imtauth::CConnectedProductData CConnectedProductCollectionDocumentSer
 	response.productId = productPtr->GetProductId();
 	response.name = productPtr->GetProductName();
 	response.description = productPtr->GetProductDescription();
+
+	if (m_snapshotCollectionCompPtr.IsValid()){
+		bool isRead = false;
+		const QByteArray snapshotId = imtauth::FindProductPermissionSnapshot(*m_snapshotCollectionCompPtr, productPtr->GetProductId(), &isRead);
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		const imtauth::CProductPermissionSnapshot* snapshotPtr = !snapshotId.isEmpty() && m_snapshotCollectionCompPtr->GetObjectData(snapshotId, dataPtr)
+					? dynamic_cast<const imtauth::CProductPermissionSnapshot*>(dataPtr.GetPtr())
+					: nullptr;
+		if (!isRead || (!snapshotId.isEmpty() && snapshotPtr == nullptr)){
+			errorMessage = QStringLiteral("Unable to read the stored permission tree");
+
+			return sdl::V1_0::imtauth::CConnectedProductData();
+		}
+
+		if (snapshotPtr != nullptr){
+			response.productVersion = snapshotPtr->GetProductVersion();
+			response.publishedAt = snapshotPtr->GetPublishedAt().toString(Qt::ISODate);
+		}
+	}
 
 	return response;
 }

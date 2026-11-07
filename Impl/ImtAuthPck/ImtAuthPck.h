@@ -156,7 +156,7 @@ typedef icomp::TModelCompWrap<
 						imtauth::IPersonalAccessToken,
 						iser::ISerializable,
 						istd::IChangeable>> PersonalAccessToken;
-typedef imtauth::CPersonalAccessTokenManagerComp PersonalAccessTokenManager;
+typedef icomp::TModelCompWrap<imtauth::CPersonalAccessTokenManagerComp> PersonalAccessTokenManager;
 typedef imtauth::CPersonalAccessTokenMetaInfoCreatorComp PersonalAccessTokenMetaInfoCreator;
 typedef icomp::TModelCompWrap<
 			icomp::TMakeComponentWrap <

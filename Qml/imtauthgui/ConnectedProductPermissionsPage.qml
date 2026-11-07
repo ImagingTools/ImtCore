@@ -14,34 +14,20 @@ Item {
 	anchors.fill: parent
 
 	property string productId: ""
-	property var statusProvider: null
 	property var permissionsProvider: null
 
-	property string statusText: ""
-	property bool isPublished: false
+	// The last publication of the tree, empty before the product publishes
+	property string productVersion: ""
+	property string publishedAt: ""
+	readonly property bool isPublished: permissionsPage.publishedAt !== ""
+	readonly property string statusText: permissionsPage.isPublished
+				? qsTr("Version %1, published %2").arg(permissionsPage.productVersion).arg(permissionsPage.publishedAt)
+				: qsTr("The product has not published its permissions yet: its server needs a token with the permission to publish.")
 
 	Component.onCompleted: {
-		if (permissionsPage.statusProvider){
-			permissionsPage.statusProvider.requestStatus(permissionsPage.productId)
-		}
 		if (permissionsPage.permissionsProvider){
 			permissionsPage.permissionsProvider.productId = permissionsPage.productId
 			permissionsPage.permissionsProvider.requestAllPermissions()
-		}
-	}
-
-	Connections {
-		target: permissionsPage.statusProvider
-
-		function onStatusReceived(isPublished, version, publishedAt){
-			permissionsPage.isPublished = isPublished
-			permissionsPage.statusText = isPublished
-						? qsTr("Version %1, published %2").arg(version).arg(publishedAt)
-						: qsTr("The product has not published its permissions yet: its server needs a token with the permission to publish.")
-		}
-
-		function onRequestFailed(message){
-			permissionsPage.statusText = message
 		}
 	}
 

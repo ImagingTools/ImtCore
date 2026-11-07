@@ -48,17 +48,10 @@ public:
 	virtual ContextCreationStatus CheckToken(const QByteArray& token, QByteArrayList& scopes, QString& errorMessage) const = 0;
 
 	/**
-		CheckToken() for the token another server proves itself with (header x-server-token): it is checked where
-		this server keeps the tokens it issued.
-	*/
-	virtual ContextCreationStatus CheckServerToken(const QByteArray& token, QByteArrayList& scopes, QString& errorMessage) const = 0;
-
-	/**
 		Check that the server of a product the request comes through may send it.
 		A request of a client of this server passes.
-		\param requiredPermission The permission of the server token the request needs, empty when it needs none.
 	*/
-	virtual bool CheckRequestAccess(const CGqlRequest& gqlRequest, QByteArray& requiredPermission, QString& errorMessage) const = 0;
+	virtual bool CheckRequestAccess(const CGqlRequest& gqlRequest, QString& errorMessage) const = 0;
 };
 
 

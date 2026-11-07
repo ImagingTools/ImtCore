@@ -8,6 +8,7 @@
 // ImtCore includes
 #include <imtauth/IClientProductCatalog.h>
 #include <imtauth/IPersonalAccessTokenManager.h>
+#include <imtlic/CProductInfo.h>
 #include <imtlic/IFeatureInfoProvider.h>
 #include <imtlic/IProductInfo.h>
 #include <imtsdl/TElementList.h>
@@ -54,12 +55,12 @@ protected:
 				const sdl::V1_0::imtauth::CRevokeServerTokenGqlRequest& revokeServerTokenRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::V1_0::imtauth::CRevokeServerTokenPayload OnUpdateServerTokenScopes(
+	virtual sdl::V1_0::imtauth::CUpdateServerTokenScopesPayload OnUpdateServerTokenScopes(
 				const sdl::V1_0::imtauth::CUpdateServerTokenScopesGqlRequest& updateServerTokenScopesRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::V1_0::imtauth::CServerTokenReceiverList OnGetServerTokenReceivers(
-				const sdl::V1_0::imtauth::CGetServerTokenReceiversGqlRequest& getServerTokenReceiversRequest,
+	virtual sdl::V1_0::imtauth::CServerTokenReceiver OnGetServerTokenReceiver(
+				const sdl::V1_0::imtauth::CGetServerTokenReceiverGqlRequest& getServerTokenReceiverRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 	virtual sdl::V1_0::imtauth::CServerFeatureList OnGetServerTokenFeatures(
@@ -72,19 +73,25 @@ private:
 	QByteArray GetOwnProductId() const;
 
 	/**
-		The permissions a token for the receiving server can hold, as groups of the tree of that server.
-		\return false if the tree could not be read or the server takes no tokens.
+		Check that this server issues tokens to the product: one of its clients, not this server itself.
 	*/
-	bool GetReceiverGroups(
-				const QByteArray& receiverProductId,
-				imtsdl::TElementList<sdl::V1_0::imtauth::CPermissionGroup>& groups,
-				QString& errorMessage) const;
+	bool CheckClientProduct(const QByteArray& clientProductId, QString& errorMessage) const;
 
 	/**
-		Check the permissions of a token for a receiving server and complete them: a group stands for its permissions,
+		The permissions a token can hold, as groups of the tree they are given from.
+	*/
+	imtsdl::TElementList<sdl::V1_0::imtauth::CPermissionGroup> GetTokenGroups() const;
+
+	/**
+		Check the permissions of a token and complete them: a group stands for its permissions,
 		then the ones every token holds and the ones they require are added.
 	*/
-	bool NormalizeScopes(const QByteArray& receiverProductId, QByteArrayList& scopes, QString& errorMessage) const;
+	bool NormalizeScopes(QByteArrayList& scopes, QString& errorMessage) const;
+
+	/**
+		The tree a token is given from: this server with the roots of the permissions a token may hold.
+	*/
+	void BuildTokenTree(imtlic::CProductInfo& tree) const;
 
 	/**
 		The roots of the tree a token is given from, as identifiable features.

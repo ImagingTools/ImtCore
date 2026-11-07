@@ -6,6 +6,18 @@ namespace imtservergql
 {
 
 
+namespace
+{
+
+
+// Commands of the protocol of a remote collection
+const QByteArrayList s_objectReadCommandIds = {"GetObjectData", "GetElementInfo", "GetElementMetaInfo", "GetDataMetaInfo", "GetObjectTypeId"};
+const QByteArrayList s_documentReadCommandIds = {"OpenDocument", "CloseDocument"};
+
+
+} // namespace
+
+
 // public methods
 
 // reimplemented (IProductServerRequestPolicy)
@@ -15,10 +27,6 @@ bool CProductServerRequestPolicyComp::FindRequiredPermission(const imtgql::CGqlR
 	permission.clear();
 
 	const QByteArray commandId = gqlRequest.GetCommandId();
-	if (m_openCommandIdsAttrPtr.FindValue(commandId) >= 0){
-		return true;
-	}
-
 	const int commandIndex = m_commandIdsAttrPtr.FindValue(commandId);
 	if (commandIndex >= 0){
 		if (commandIndex >= m_commandPermissionsAttrPtr.GetCount()){
@@ -38,7 +46,7 @@ bool CProductServerRequestPolicyComp::FindRequiredPermission(const imtgql::CGqlR
 	}
 
 	// Reading one object has its own permission where the collection names one, the view permission otherwise
-	const bool isObjectReading = m_objectReadCommandIdsAttrPtr.FindValue(commandId) >= 0;
+	const bool isObjectReading = s_objectReadCommandIds.contains(commandId);
 	if (isObjectReading && collectionIndex < m_collectionObjectReadPermissionsAttrPtr.GetCount()){
 		permission = m_collectionObjectReadPermissionsAttrPtr[collectionIndex];
 		if (!permission.isEmpty()){
@@ -48,7 +56,7 @@ bool CProductServerRequestPolicyComp::FindRequiredPermission(const imtgql::CGqlR
 
 	const bool isReading = isObjectReading
 				|| gqlRequest.GetRequestType() != imtgql::IGqlRequest::RT_MUTATION
-				|| m_viewCommandIdsAttrPtr.FindValue(commandId) >= 0;
+				|| s_documentReadCommandIds.contains(commandId);
 	const auto& permissions = isReading ? m_collectionViewPermissionsAttrPtr : m_collectionEditPermissionsAttrPtr;
 	if (collectionIndex >= permissions.GetCount()){
 		return false;

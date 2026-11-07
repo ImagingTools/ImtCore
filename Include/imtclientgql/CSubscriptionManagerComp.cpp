@@ -29,6 +29,10 @@ namespace
 {
 
 
+// A refused subscription is sent again in a minute
+const int s_refusedRetryInterval = 60 * 1000;
+
+
 /**
 	The product and the language the request was resolved for, as the HTTP client sends them: a web client served by a
 	product server sends no product, the server knows it.
@@ -709,7 +713,7 @@ void CSubscriptionManagerComp::ScheduleRefusedRetry() const
 	}
 
 	QMetaObject::invokeMethod(const_cast<CSubscriptionManagerComp*>(this), [this](){
-		QTimer::singleShot(*m_refusedRetryIntervalAttrPtr * 1000, const_cast<CSubscriptionManagerComp*>(this), [this](){
+		QTimer::singleShot(s_refusedRetryInterval, const_cast<CSubscriptionManagerComp*>(this), [this](){
 			m_isRefusedRetryScheduled = false;
 
 			RetryRefusedSubscriptions();

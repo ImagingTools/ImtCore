@@ -12,6 +12,7 @@
 #include <QtCore/QWaitCondition>
 
 // ACF includes
+#include <ibase/IApplicationInfo.h>
 #include <ilog/TLoggerCompWrap.h>
 #include <imod/CSingleModelObserverBase.h>
 #include <imod/IModel.h>
@@ -30,8 +31,9 @@ namespace imtauthgql
 /**
 	The permission tree of this product with the permissions of the authorization server, for the roles of the product:
 	those permissions belong to the authorization server, which gives them out.
-	The tree is fetched at the start, after each reconnection and periodically, and replaces the served one when it changes.
-	Every tree is kept until the end: a request may still read the one it got.
+	At the start and after each reconnection this server publishes its own tree there, untranslated, and fetches the
+	permissions of the authorization server; a failed step is repeated. A fetched tree replaces the served one when it
+	changes, and every tree is kept until the end: a request may still read the one it got.
 */
 class CAuthorizationServerProductInfoComp:
 			public QObject,
@@ -48,8 +50,8 @@ public:
 		I_REGISTER_INTERFACE(iser::ISerializable);
 		I_ASSIGN(m_productInfoCompPtr, "ProductInfo", "Permission tree of this product", true, "ProductInfo");
 		I_ASSIGN(m_serverCredentialCompPtr, "ServerCredentialProvider", "Token of this server: without it nothing is fetched", false, "ServerCredentialProvider");
-		I_ASSIGN(m_connectionStatusModelCompPtr, "ConnectionStatus", "Connection to the authorization server: a reconnection fetches the tree again", false, "ConnectionStatus");
-		I_ASSIGN(m_refreshIntervalAttrPtr, "RefreshInterval", "Interval in seconds of fetching the permissions again: the token of the product may change", true, 60);
+		I_ASSIGN(m_connectionStatusModelCompPtr, "ConnectionStatus", "Connection to the authorization server: a reconnection publishes and fetches again", false, "ConnectionStatus");
+		I_ASSIGN(m_applicationInfoCompPtr, "ApplicationInfo", "Version of the product, published with its tree", false, "ApplicationInfo");
 	I_END_COMPONENT;
 
 	// reimplemented (imtlic::IProductInfo)
@@ -92,6 +94,8 @@ private:
 	imtlic::CProductInfo& GetCurrent() const;
 	ProductInfoPtr CreateTree() const;
 	void Invalidate();
+	bool Publish() const;
+	QString GetProductVersion() const;
 	bool Fetch();
 	void Run();
 
@@ -99,7 +103,7 @@ private:
 	I_REF(imtlic::IProductInfo, m_productInfoCompPtr);
 	I_REF(imtclientgql::IServerCredentialProvider, m_serverCredentialCompPtr);
 	I_REF(imod::IModel, m_connectionStatusModelCompPtr);
-	I_ATTR(int, m_refreshIntervalAttrPtr);
+	I_REF(ibase::IApplicationInfo, m_applicationInfoCompPtr);
 
 	mutable QMutex m_treeMutex;
 	mutable ProductInfoList m_trees;
@@ -111,7 +115,9 @@ private:
 	QMutex m_runMutex;
 	QWaitCondition m_runCondition;
 	bool m_isStopping = false;
+	bool m_isPublishNeeded = true;
 	bool m_isFetchNeeded = true;
+	bool m_isReconnected = false;
 };
 
 

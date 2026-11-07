@@ -570,6 +570,45 @@ void CAuthenticationManagerComp::InvalidateToken(const QByteArray& token) const
 }
 
 
+// protected methods
+
+// reimplemented (icomp::CComponentBase)
+
+void CAuthenticationManagerComp::OnComponentCreated()
+{
+	BaseClass::OnComponentCreated();
+
+	// A revoked or changed token is validated again at its next request
+	for (imtauth::IPersonalAccessTokenManager* managerPtr : {m_patManagerCompPtr.GetPtr(), m_serverTokenManagerCompPtr.GetPtr()}){
+		imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(managerPtr);
+		if (modelPtr != nullptr){
+			modelPtr->AttachObserver(this);
+		}
+	}
+}
+
+
+void CAuthenticationManagerComp::OnComponentDestroyed()
+{
+	EnsureModelsDetached();
+
+	BaseClass::OnComponentDestroyed();
+}
+
+
+// reimplemented (imod::CMultiModelObserverBase)
+
+void CAuthenticationManagerComp::OnUpdate(imod::IModel* /*modelPtr*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
+{
+	QMutexLocker cacheLocker(&m_tokenCacheMutex);
+	m_lastTokenChangeAt = QDateTime::currentMSecsSinceEpoch();
+
+	for (auto iter = m_tokenCache.begin(); iter != m_tokenCache.end(); ){
+		iter = iter->isPat ? m_tokenCache.erase(iter) : std::next(iter);
+	}
+}
+
+
 // private methods
 
 bool CAuthenticationManagerComp::HasOrganizationAccess(const QByteArray& userId, const QByteArray& tenantId, bool isOwnerOrCreator) const
@@ -644,24 +683,11 @@ bool CAuthenticationManagerComp::ResolveUserId(
 		return false;
 	}
 
-	// Otherwise a personal token of a user. A token of a server issued elsewhere is no identity here
+	// Otherwise a personal token of a user; a token of a server issued elsewhere names another receiver and is refused
 	errorMessage.clear();
 	status = imtgql::IGqlContextCreator::CCS_OK;
-	if (!ResolveToken(token, m_patManagerCompPtr.GetPtr(), userId, tenantId, scopes, isPat, errorMessage, status)){
-		return false;
-	}
 
-	QByteArray tokenProductId;
-	QByteArray tokenClientProductId;
-	if (GetCachedPatProducts(token, tokenProductId, tokenClientProductId) && !tokenClientProductId.isEmpty()){
-		InvalidateTokenCache(token);
-		errorMessage = QStringLiteral("The token of the server is not issued by this server.");
-		status = imtgql::IGqlContextCreator::CCS_FORBIDDEN;
-
-		return false;
-	}
-
-	return true;
+	return ResolveToken(token, m_patManagerCompPtr.GetPtr(), userId, tenantId, scopes, isPat, errorMessage, status);
 }
 
 
@@ -975,12 +1001,9 @@ void CAuthenticationManagerComp::StoreCachedToken(
 		}
 	}
 
-	// The same for a validation that started before the token was revoked or changed
-	if (isPat && !tokenId.isEmpty()){
-		auto forgottenIter = m_forgottenTokenIds.constFind(tokenId);
-		if (forgottenIter != m_forgottenTokenIds.constEnd() && *forgottenIter >= resolutionStartedAt){
-			return;
-		}
+	// The same for a validation that started before a token was revoked or changed
+	if (isPat && resolutionStartedAt <= m_lastTokenChangeAt){
+		return;
 	}
 
 	m_expiredTokenCache.remove(token);
@@ -1053,36 +1076,15 @@ imtgql::IGqlContextCreator::ContextCreationStatus CAuthenticationManagerComp::Ch
 }
 
 
-imtgql::IGqlContextCreator::ContextCreationStatus CAuthenticationManagerComp::CheckServerToken(const QByteArray& token, QByteArrayList& scopes, QString& errorMessage) const
+bool CAuthenticationManagerComp::CheckRequestAccess(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	if (!m_serverProductIdAttrPtr.IsValid()){
-		errorMessage = QStringLiteral("This server takes no tokens of servers.");
-
-		return CCS_FORBIDDEN;
-	}
-
-	QByteArray clientProductId;
-	ContextCreationError error;
-	if (!ResolveServerToken(token, clientProductId, scopes, error)){
-		errorMessage = error.message;
-
-		return error.status;
-	}
-
-	return CCS_OK;
-}
-
-
-bool CAuthenticationManagerComp::CheckRequestAccess(const imtgql::CGqlRequest& gqlRequest, QByteArray& requiredPermission, QString& errorMessage) const
-{
-	requiredPermission.clear();
-
 	const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
 	const QByteArray serverProductId = contextPtr != nullptr ? contextPtr->GetServerProductId() : QByteArray();
 	if (serverProductId.isEmpty()){
 		return true;
 	}
 
+	QByteArray requiredPermission;
 	if (!m_requestPolicyCompPtr.IsValid() || !m_requestPolicyCompPtr->FindRequiredPermission(gqlRequest, requiredPermission)){
 		errorMessage = QStringLiteral("The request '%1' is closed to the servers of products").arg(QString::fromUtf8(gqlRequest.GetCommandId()));
 
@@ -1133,34 +1135,6 @@ bool CAuthenticationManagerComp::ResolveServerToken(
 bool CAuthenticationManagerComp::IsRevocableToken(const QByteArray& token) const
 {
 	return IsPatToken(token);
-}
-
-
-void CAuthenticationManagerComp::ForgetToken(const QByteArray& tokenId)
-{
-	const qint64 now = QDateTime::currentMSecsSinceEpoch();
-	const qint64 tokenCacheTtlMs = m_tokenCacheTtlAttrPtr.IsValid() ? (static_cast<qint64>(*m_tokenCacheTtlAttrPtr) * 1000) : (30 * 1000);
-
-	// A validation in flight lasts far less than the lifetime of the cache
-	QMutexLocker cacheLocker(&m_tokenCacheMutex);
-	for (auto iter = m_forgottenTokenIds.begin(); iter != m_forgottenTokenIds.end(); ){
-		if (*iter + tokenCacheTtlMs <= now){
-			iter = m_forgottenTokenIds.erase(iter);
-		}
-		else{
-			++iter;
-		}
-	}
-	m_forgottenTokenIds.insert(tokenId, now);
-
-	for (auto iter = m_tokenCache.begin(); iter != m_tokenCache.end(); ){
-		if (iter->isPat && iter->tokenId == tokenId){
-			iter = m_tokenCache.erase(iter);
-		}
-		else{
-			++iter;
-		}
-	}
 }
 
 

@@ -32,10 +32,6 @@ protected:
 				const sdl::V1_0::imtauth::CPublishProductPermissionsGqlRequest& publishRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::V1_0::imtauth::CProductPermissionStatus OnGetProductPermissionStatus(
-				const sdl::V1_0::imtauth::CGetProductPermissionStatusGqlRequest& statusRequest,
-				const ::imtgql::CGqlRequest& gqlRequest,
-				QString& errorMessage) const override;
 
 private:
 	I_REF(imtbase::IObjectCollection, m_snapshotCollectionCompPtr);

@@ -21,9 +21,6 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="PersonalAccessTokenCache" Type="Reference" ExportId="PersonalAccessTokenCache">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="TokenCollection" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PersonalAccessTokenSqlRepository/PersonalAccessTokenRepository"/>
                     </AttributeInfo>

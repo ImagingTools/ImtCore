@@ -2,20 +2,32 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtauthgui 1.0
+import imtdocgui 1.0
 import imtguigql 1.0
 
 /**
- * Composes the page of the connected products with its GraphQL services.
+ * The page of the connected products with its GraphQL services.
  */
-ConnectedProductsView {
+Item {
 	id: page
 
-	documentManager: gqlDocumentService
-	collectionViewComp: productListComp
+	anchors.fill: parent
 
 	GqlBasedCollectionDocumentService {
 		id: gqlDocumentService
 		collectionId: "ConnectedProducts"
+	}
+
+	MultiDocumentCollectionView {
+		anchors.fill: parent
+		documentManager: gqlDocumentService
+		historyPath: "ConnectedProducts"
+		contentColor: Style.baseColor
+		pageIcon: "Icons/Product"
+
+		Component.onCompleted: {
+			setCollectionViewComp(qsTr("Products"), productListComp)
+		}
 	}
 
 	Component.onCompleted: {
@@ -27,7 +39,6 @@ ConnectedProductsView {
 
 		ConnectedProductView {
 			tokenApiClient: gqlTokenApiClient
-			permissionStatusProvider: gqlPermissionStatusProvider
 			permissionsProvider: gqlPermissionsProvider
 			commandsControllerComp: Component {
 				GqlBasedCommandsController {
@@ -38,10 +49,6 @@ ConnectedProductsView {
 			// Each opened product has its own services: their models and signals belong to one product
 			GqlBasedServerTokenApiClient {
 				id: gqlTokenApiClient
-			}
-
-			GqlBasedProductPermissionStatusProvider {
-				id: gqlPermissionStatusProvider
 			}
 
 			GqlBasedPermissionsProvider {

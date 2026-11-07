@@ -20,8 +20,9 @@ Item {
 
 	Component.onCompleted: {
 		if (tokensPage.apiClient){
-			tokensPage.apiClient.requestTokens(tokensPage.productId)
-			tokensPage.apiClient.requestProductServer(tokensPage.productId)
+			tokensPage.apiClient.productId = tokensPage.productId
+			tokensPage.apiClient.requestTokens()
+			tokensPage.apiClient.requestProductServer()
 		}
 	}
 
@@ -66,7 +67,7 @@ Item {
 				anchors.verticalCenter: parent.verticalCenter
 				text: qsTr("New Token")
 				onClicked: {
-					tokensPage.openTokenDialog("", "", [])
+					tokensPage.openTokenDialog("", [])
 				}
 			}
 		}
@@ -168,7 +169,7 @@ Item {
 
 			onFinished: {
 				if (buttonId === Enums.yes)
-					tokensPage.apiClient.revokeToken(tokensPage.productId, tokenId)
+					tokensPage.apiClient.revokeToken(tokenId)
 			}
 		}
 	}
@@ -236,7 +237,6 @@ Item {
 
 			property string tokenName: ""
 			property string tokenDescription: ""
-			property bool hasPermissions: false
 
 			// Set by the content when it is created
 			property var permissionsView: null
@@ -257,44 +257,36 @@ Item {
 				}
 			}
 
-			// The tree of the receiving server; the permissions every token holds are checked and locked
 			function updatePermissions(){
 				if (!tokenDialog.permissionsView){
 					return
 				}
 
 				let server = tokensPage.apiClient ? tokensPage.apiClient.productServer : null
-				let groups = server ? server.groups : []
-				tokenDialog.hasPermissions = groups.length > 0
-
-				tokenDialog.permissionsView.rebuildFromFlatArray(groups)
-				tokenDialog.permissionsView.applySelection(tokenDialog.initialScopes ? tokenDialog.initialScopes : [])
-
-				let locked = {}
-				let required = server ? server.requiredPermissions : []
-				for (let i = 0; i < required.length; ++i){
-					locked[required[i]] = qsTr("Every token for this server holds it")
-				}
-				tokenDialog.permissionsView.setLockedPermissions(locked)
+				tokenDialog.permissionsView.setPermissions(
+							server ? server.groups : [],
+							server ? server.requiredPermissions : [],
+							tokenDialog.initialScopes ? tokenDialog.initialScopes : [])
 
 				tokenDialog.updateApplyButton()
 			}
 
 			function updateApplyButton(){
 				let isNameSet = tokenDialog.tokenId !== "" || tokenDialog.tokenName !== ""
-				tokenDialog.setButtonEnabled(Enums.apply, isNameSet && tokenDialog.hasPermissions)
+				let hasPermissions = tokenDialog.permissionsView !== null && tokenDialog.permissionsView.hasPermissions
+				tokenDialog.setButtonEnabled(Enums.apply, isNameSet && hasPermissions)
 			}
 
 			onFinished: {
 				if (buttonId !== Enums.apply || !tokenDialog.permissionsView)
 					return
 
-				let scopes = tokenDialog.permissionsView.getCheckedIds(false)
+				let scopes = tokenDialog.permissionsView.getCheckedIds()
 				if (tokenDialog.tokenId === ""){
-					tokensPage.apiClient.createToken(tokensPage.productId, tokensPage.apiClient.productServer.productId, tokenDialog.tokenName, tokenDialog.tokenDescription, scopes)
+					tokensPage.apiClient.createToken(tokenDialog.tokenName, tokenDialog.tokenDescription, scopes)
 				}
 				else{
-					tokensPage.apiClient.updateTokenScopes(tokensPage.productId, tokenDialog.tokenId, scopes)
+					tokensPage.apiClient.updateTokenScopes(tokenDialog.tokenId, scopes)
 				}
 			}
 
@@ -302,7 +294,6 @@ Item {
 				clearButtons()
 				addButton(Enums.apply, qsTr("Apply"), false)
 				addButton(Enums.cancel, qsTr("Cancel"), true)
-
 			}
 
 			contentComp: Component {
@@ -361,42 +352,14 @@ Item {
 						}
 					}
 
-					Rectangle {
-						id: permissionsArea
+					ServerTokenPermissionsView {
+						id: permissionsView
+						tableObjectName: "ServerTokenPermissionsView"
 						anchors.top: headerColumn.bottom
 						anchors.topMargin: Style.marginS
 						anchors.bottom: parent.bottom
 						anchors.left: headerColumn.left
 						anchors.right: headerColumn.right
-						color: Style.baseColor
-						border.width: 1
-						border.color: Style.borderColor
-						radius: Style.radiusM
-						clip: true
-
-						PermissionsTableView {
-							id: permissionsView
-							objectName: "ServerTokenPermissionsView"
-							anchors.fill: parent
-							anchors.leftMargin: Style.marginM
-							anchors.rightMargin: Style.marginM
-							anchors.topMargin: Style.marginXS
-							anchors.bottomMargin: Style.marginS
-							controlPanelTopMargin: Style.marginS
-							treeTopMargin: Style.marginXS
-							treeBottomMargin: Style.marginS
-							visible: tokenDialog.hasPermissions
-						}
-
-						BaseText {
-							anchors.centerIn: parent
-							width: parent.width - 2 * Style.marginXL
-							horizontalAlignment: Text.AlignHCenter
-							wrapMode: Text.WordWrap
-							text: qsTr("This server has no permissions to give to a token of this product.")
-							color: Style.inactiveTextColor
-							visible: !tokenDialog.hasPermissions
-						}
 					}
 				}
 			}

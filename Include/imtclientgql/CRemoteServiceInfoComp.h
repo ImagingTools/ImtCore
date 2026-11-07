@@ -55,7 +55,6 @@ public:
 		I_ASSIGN(m_connectionStatusCompPtr, "ConnectionStatus", "Status of the connection to the remote service, the information is requested on each connection", true, "ConnectionStatus");
 		I_ASSIGN_TO(m_connectionStatusModelCompPtr, m_connectionStatusCompPtr, true);
 		I_ASSIGN(m_serverCredentialCompPtr, "ServerCredentialProvider", "Token of this server at the remote service, its state is reported with the information", false, "ServerCredentialProvider");
-		I_ASSIGN(m_credentialCheckIntervalAttrPtr, "CredentialCheckInterval", "Interval in seconds of checking the token", true, 300);
 	I_END_COMPONENT;
 
 	// reimplemented (imtcom::IServiceInfoProvider)
@@ -87,7 +86,6 @@ private:
 	I_REF(imtcom::IConnectionStatusProvider, m_connectionStatusCompPtr);
 	I_REF(imod::IModel, m_connectionStatusModelCompPtr);
 	I_REF(IServerCredentialProvider, m_serverCredentialCompPtr);
-	I_ATTR(int, m_credentialCheckIntervalAttrPtr);
 
 	mutable QMutex m_serviceInfoMutex;
 	ServiceInfo m_serviceInfo;

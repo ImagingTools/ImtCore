@@ -79,16 +79,15 @@ private:
 		QByteArray subscriptionId;
 		imtgql::IGqlSubscriberController* controllerPtr = nullptr;
 		QByteArray token;
-		// The token is the one of a server (x-server-token), checked where this server keeps such tokens
-		bool isServerToken = false;
-		QByteArray requiredPermission; // of the token of a server
+		// Sorted; the subscription ends when the token holds other permissions
+		QByteArrayList scopes;
 		const imtrest::IRequest* requestPtr = nullptr;
 
 		// Only compared: the request is destroyed with it
 		const QObject* connectionPtr = nullptr;
 	};
 
-	bool IsSubscriberAllowed(const imtgql::IGqlSubscriberController& controller, const imtgql::CGqlRequest& gqlRequest, QByteArray& requiredPermission) const;
+	bool IsSubscriberAllowed(const imtgql::IGqlSubscriberController& controller, const imtgql::CGqlRequest& gqlRequest) const;
 	void AddTokenSubscription(const TokenSubscription& subscription) const;
 	void CheckTokenSubscriptions() const;
 	void DropTokenSubscription(const TokenSubscription& subscription, const QString& reason) const;
