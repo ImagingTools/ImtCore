@@ -43,6 +43,9 @@
                     <AttributeInfo Id="ServerProductId" Type="Id" ExportId="ServerProductId">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ServerTokenManager" Type="Reference" ExportId="ServerTokenManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="SlaveJwtSessionController" Type="Reference" ExportId="SlaveJwtSessionController">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

@@ -7,7 +7,6 @@
 #include <QtCore/QSet>
 
 // ImtCore includes
-#include <imtauth/CConnectedProductDocumentValidatorComp.h>
 #include <imtauth/IPersonalAccessToken.h>
 #include <imtauth/imtauth.h>
 #include <imtauthgql/imtauthgql.h>
@@ -103,8 +102,11 @@ sdl::V1_0::imtauth::CCreateServerTokenPayload CServerTokenControllerComp::OnCrea
 		return response;
 	}
 
-	if (!imtauth::CConnectedProductDocumentValidatorComp::HasProduct(*m_productCollectionCompPtr, clientProductId)){
-		errorMessage = QStringLiteral("The product '%1' is not connected").arg(QString::fromUtf8(clientProductId));
+	bool isRead = true;
+	if (!m_clientProductCatalogCompPtr->IsClientProduct(clientProductId, &isRead)){
+		errorMessage = isRead
+					? QStringLiteral("The product '%1' is not a client of this server").arg(QString::fromUtf8(clientProductId))
+					: QStringLiteral("The client products of this server could not be read");
 
 		return response;
 	}
@@ -316,21 +318,10 @@ bool CServerTokenControllerComp::GetReceiverGroups(
 		return false;
 	}
 
-	// A product takes only an identifiable feature at its root; the tree resolves the requirements
+	// The tree resolves the requirements
 	imtlic::CProductInfo tree;
 	tree.SetProductId(receiverProductId);
-	for (const imtbase::ICollectionInfo::Id& elementId : m_serverPermissionsCompPtr->GetFeatureList().GetElementIds()){
-		const imtlic::IFeatureInfoSharedPtr featureInfoPtr = m_serverPermissionsCompPtr->GetFeatureInfo(elementId);
-		if (!featureInfoPtr.IsValid()){
-			continue;
-		}
-
-		imtlic::CIdentifiableFeatureInfo featureInfo;
-		if (featureInfo.imtlic::CFeatureInfo::CopyFrom(*featureInfoPtr)){
-			featureInfo.SetObjectUuid(elementId);
-			tree.AddFeature(elementId, featureInfo);
-		}
-	}
+	AddTokenFeatures(tree);
 
 	BuildPermissionGroups<sdl::V1_0::imtauth::CPermissionGroup, sdl::V1_0::imtauth::CPermissionEntry>(&tree, nullptr, groups, QByteArray(), nullptr);
 
@@ -399,6 +390,45 @@ bool CServerTokenControllerComp::NormalizeScopes(const QByteArray& receiverProdu
 	}
 
 	return true;
+}
+
+
+void CServerTokenControllerComp::AddTokenFeatures(imtlic::IProductInfo& tree) const
+{
+	// A product takes only an identifiable feature at its root
+	auto addFeature = [&tree](const QByteArray& featureId, const imtlic::IFeatureInfo& sourceInfo){
+		imtlic::CIdentifiableFeatureInfo featureInfo;
+		if (featureInfo.imtlic::CFeatureInfo::CopyFrom(sourceInfo)){
+			featureInfo.SetObjectUuid(featureId);
+			tree.AddFeature(featureId, featureInfo);
+		}
+	};
+
+	if (m_serverPermissionsCompPtr.IsValid()){
+		for (const imtbase::ICollectionInfo::Id& featureId : m_serverPermissionsCompPtr->GetFeatureList().GetElementIds()){
+			const imtlic::IFeatureInfoSharedPtr featureInfoPtr = m_serverPermissionsCompPtr->GetFeatureInfo(featureId);
+			if (featureInfoPtr.IsValid()){
+				addFeature(featureId, *featureInfoPtr);
+			}
+		}
+
+		return;
+	}
+
+	imtbase::IObjectCollection* featureCollectionPtr = m_permissionTreeCompPtr->GetFeatures();
+	if (featureCollectionPtr == nullptr){
+		return;
+	}
+
+	for (const imtbase::ICollectionInfo::Id& featureId : featureCollectionPtr->GetElementIds()){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		const imtlic::IFeatureInfo* featureInfoPtr = featureCollectionPtr->GetObjectData(featureId, dataPtr)
+					? dynamic_cast<const imtlic::IFeatureInfo*>(dataPtr.GetPtr())
+					: nullptr;
+		if (featureInfoPtr != nullptr){
+			addFeature(featureId, *featureInfoPtr);
+		}
+	}
 }
 
 

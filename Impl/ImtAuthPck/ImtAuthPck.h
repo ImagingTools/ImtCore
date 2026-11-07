@@ -9,6 +9,8 @@
 // ImtCore includes
 #include <imtauth/CRoleComp.h>
 #include <imtauth/CConnectedProduct.h>
+#include <imtauth/CClientProductCatalogComp.h>
+#include <imtauth/CConnectedClientProductCatalogComp.h>
 #include <imtauth/CConnectedProductDocumentValidatorComp.h>
 #include <imtauth/CProductPermissionSnapshot.h>
 #include <imtauth/CRoleMetaInfoCreatorComp.h>
@@ -115,6 +117,8 @@ typedef imtauth::CUserCollectionAdapterComp UserCollectionAdapter;
 typedef imtauth::CCheckPermissionCompBase CheckPermissions;
 typedef imtauth::COrganizationsPermissionsProviderComp OrganizationsPermissionsProvider;
 typedef imtauth::CProductServerPermissionsProviderComp ProductServerPermissionsProvider;
+typedef imtauth::CClientProductCatalogComp ClientProductCatalog;
+typedef imtauth::CConnectedClientProductCatalogComp ConnectedClientProductCatalog;
 typedef imtauth::CCheckPermissionOrComp CheckPermissionOr;
 typedef icomp::TModelCompWrap<imtauth::CUserSettingsComp> UserSettings;
 typedef imtauth::CUserGroupInfoProviderComp UserGroupInfoProvider;

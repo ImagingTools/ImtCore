@@ -10,6 +10,15 @@
     <Description>Catalog of the connected products and the tokens of their servers</Description>
     <Keywords></Keywords>
     <ElementsList>
+        <Element Id="ClientProductCatalog" PackageId="ImtAuthPck" ComponentId="ConnectedClientProductCatalog">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ProductCollection" Type="Reference" ExportId="ProductRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="CollectionHeadersProvider" PackageId="ImtColPck" ComponentId="CollectionHeadersProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -354,8 +363,8 @@
                     <AttributeInfo Id="PersonalAccessTokenManager" Type="Reference" ExportId="PersonalAccessTokenManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ProductCollection" Type="Reference" ExportId="ProductRepository">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="ClientProductCatalog" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ClientProductCatalog"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PermissionTree" Type="Reference" ExportId="PermissionTree">
                         <Data IsEnabled="false"/>

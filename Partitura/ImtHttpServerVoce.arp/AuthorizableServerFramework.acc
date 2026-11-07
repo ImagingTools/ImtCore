@@ -28,6 +28,9 @@
                     <AttributeInfo Id="PersonalAccessTokenManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaClientEngine/RemotePersonalAccessTokenController"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ServerTokenManager" Type="Reference" ExportId="ServerTokenManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="SlaveJwtSessionController" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaClientEngine"/>
                     </AttributeInfo>

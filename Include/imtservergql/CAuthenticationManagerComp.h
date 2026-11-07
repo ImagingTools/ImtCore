@@ -43,11 +43,13 @@ public:
 		I_REGISTER_INTERFACE(imtauth::IPersonalAccessTokenCache);
 		I_ASSIGN(m_serverProductIdAttrPtr, "ServerProductId", "ID of this server in the tokens of other servers. Set, it refuses a request of another product without a token of its server", false, "");
 		I_ASSIGN(m_requestPolicyCompPtr, "ProductServerRequestPolicy", "What the servers of products may send; without it they may send nothing", false, "ProductServerRequestPolicy");
+		I_ASSIGN(m_serverTokenManagerCompPtr, "ServerTokenManager", "Where the tokens this server issued for other servers are kept; without it they are checked by the personal access token manager", false, "ServerTokenManager");
 	I_END_COMPONENT;
 
 protected:
 	I_ATTR(QByteArray, m_serverProductIdAttrPtr);
 	I_REF(IProductServerRequestPolicy, m_requestPolicyCompPtr);
+	I_REF(imtauth::IPersonalAccessTokenManager, m_serverTokenManagerCompPtr);
 };
 
 
@@ -127,6 +129,19 @@ private:
 
 	bool ResolveUserId(
 				const QByteArray& token,
+				QByteArray& userId,
+				QByteArray& tenantId,
+				QByteArrayList& scopes,
+				bool& isPat,
+				QString& errorMessage,
+				imtgql::IGqlContextCreator::ContextCreationStatus& status) const;
+
+	/**
+		ResolveUserId() with the manager that checks a personal access token, so that the tokens of servers can be kept apart from the tokens of users.
+	*/
+	bool ResolveToken(
+				const QByteArray& token,
+				imtauth::IPersonalAccessTokenManager* patManagerPtr,
 				QByteArray& userId,
 				QByteArray& tenantId,
 				QByteArrayList& scopes,

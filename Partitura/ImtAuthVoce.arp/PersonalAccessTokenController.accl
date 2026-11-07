@@ -10,8 +10,7 @@
     <PositionMap>
         <Element ComponentName="PersonalAccessToken" X="600" Y="100" Note=""/>
         <Element ComponentName="PersonalAccessTokenController" X="250" Y="100" Note=""/>
-        <Element ComponentName="PersonalAccessTokenManager" X="1000" Y="100" Note=""/>
-        <Element ComponentName="PersonalAccessTokenSqlRepository" X="575" Y="500" Note=""/>
+        <Element ComponentName="PersonalAccessTokenStore" X="1000" Y="100" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

@@ -631,6 +631,20 @@ bool CAuthenticationManagerComp::ResolveUserId(
 			QString& errorMessage,
 			imtgql::IGqlContextCreator::ContextCreationStatus& status) const
 {
+	return ResolveToken(token, m_patManagerCompPtr.GetPtr(), userId, tenantId, scopes, isPat, errorMessage, status);
+}
+
+
+bool CAuthenticationManagerComp::ResolveToken(
+			const QByteArray& token,
+			imtauth::IPersonalAccessTokenManager* patManagerPtr,
+			QByteArray& userId,
+			QByteArray& tenantId,
+			QByteArrayList& scopes,
+			bool& isPat,
+			QString& errorMessage,
+			imtgql::IGqlContextCreator::ContextCreationStatus& status) const
+{
 	JwtState cachedState = JwtState::JS_NONE;
 	if (TryAwaitOrClaimTokenResolution(token, userId, tenantId, scopes, isPat, cachedState)){
 		if (cachedState == JwtState::JS_EXPIRED){
@@ -653,7 +667,7 @@ bool CAuthenticationManagerComp::ResolveUserId(
 		bool isTokenValid = false;
 		isPat = true;
 		scopes.clear();
-		if (!m_patManagerCompPtr.IsValid()){
+		if (patManagerPtr == nullptr){
 			errorMessage = QStringLiteral("Personal access token manager is not configured.");
 			// Misconfiguration is an operational fault, not a client auth failure.
 			status = imtgql::IGqlContextCreator::CCS_INTERNAL_ERROR;
@@ -669,7 +683,7 @@ bool CAuthenticationManagerComp::ResolveUserId(
 		QByteArray tokenClientProductId;
 		bool isCheckFailed = false;
 		const qint64 resolutionStartedAt = QDateTime::currentMSecsSinceEpoch();
-		if (!m_patManagerCompPtr->ValidateToken(token, userId, tokenId, scopes, &tokenProductId, &tokenClientProductId, &isCheckFailed)){
+		if (!patManagerPtr->ValidateToken(token, userId, tokenId, scopes, &tokenProductId, &tokenClientProductId, &isCheckFailed)){
 			errorMessage = isCheckFailed ? QStringLiteral("The personal access token could not be checked.") : QStringLiteral("Invalid personal access token.");
 			status = isCheckFailed ? imtgql::IGqlContextCreator::CCS_INTERNAL_ERROR : imtgql::IGqlContextCreator::CCS_FORBIDDEN;
 			SendWarningMessage(
@@ -680,7 +694,7 @@ bool CAuthenticationManagerComp::ResolveUserId(
 		}
 		else{
 			isTokenValid = true;
-			m_patManagerCompPtr->UpdateLastUsedAt(tokenId);
+			patManagerPtr->UpdateLastUsedAt(tokenId);
 		}
 
 		if (!isTokenValid){
@@ -1047,7 +1061,8 @@ bool CAuthenticationManagerComp::ResolveServerToken(
 	bool isPat = false;
 	QString errorMessage;
 	ContextCreationStatus status = CCS_OK;
-	if (!IsPatToken(serverToken) || !ResolveUserId(serverToken, userId, tenantId, scopes, isPat, errorMessage, status) || !isPat){
+	imtauth::IPersonalAccessTokenManager* tokenManagerPtr = m_serverTokenManagerCompPtr.IsValid() ? m_serverTokenManagerCompPtr.GetPtr() : m_patManagerCompPtr.GetPtr();
+	if (!IsPatToken(serverToken) || !ResolveToken(serverToken, tokenManagerPtr, userId, tenantId, scopes, isPat, errorMessage, status) || !isPat){
 		SetError(error, status == CCS_OK ? CCS_FORBIDDEN : status, errorMessage.isEmpty() ? QStringLiteral("The token of the server is not valid.") : errorMessage);
 
 		return false;
