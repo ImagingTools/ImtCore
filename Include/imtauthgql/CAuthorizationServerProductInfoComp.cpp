@@ -306,7 +306,6 @@ void CAuthorizationServerProductInfoComp::Invalidate()
 bool CAuthorizationServerProductInfoComp::Fetch()
 {
 	sdl::V1_0::imtauth::GetServerTokenFeaturesRequestArguments arguments;
-	arguments.input.emplace();
 
 	// This server asks for itself: its token goes with every request
 	imtgql::CGqlRequest gqlRequest;

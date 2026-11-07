@@ -7,7 +7,7 @@
 #include <QtCore/QMutex>
 
 // ImtCore includes
-#include <imtauth/CConnectedProduct.h>
+#include <imtauth/IConnectedProduct.h>
 #include <imtauth/IPersonalAccessTokenManager.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtservergql/CObjectCollectionControllerCompBase.h>

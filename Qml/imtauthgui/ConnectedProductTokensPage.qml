@@ -21,31 +21,13 @@ Item {
 	Component.onCompleted: {
 		if (tokensPage.apiClient){
 			tokensPage.apiClient.requestTokens(tokensPage.productId)
-			tokensPage.apiClient.requestProductServers(tokensPage.productId)
+			tokensPage.apiClient.requestProductServer(tokensPage.productId)
 		}
 	}
 
-	// The server taking tokens with its permission tree, from the catalog of the authorization server
-	function getServer(receiverId){
-		let servers = tokensPage.apiClient ? tokensPage.apiClient.productServers : null
-		if (!servers){
-			return null
-		}
-
-		for (let i = 0; i < servers.length; ++i){
-			if (servers[i].productId === receiverId){
-				return servers[i]
-			}
-		}
-
-		return null
-	}
-
-	// A new token is for the authorization server: it issues tokens for itself only
-	function openTokenDialog(tokenId, receiverId, scopes){
-		let servers = tokensPage.apiClient ? tokensPage.apiClient.productServers : null
-		let receiver = receiverId === "" && servers && servers.length > 0 ? servers[0].productId : receiverId
-		ModalDialogManager.openDialog(tokenDialogComp, {"tokenId": tokenId, "receiverId": receiver, "initialScopes": scopes})
+	// The tokens are issued by this server for itself
+	function openTokenDialog(tokenId, scopes){
+		ModalDialogManager.openDialog(tokenDialogComp, {"tokenId": tokenId, "initialScopes": scopes})
 	}
 
 	Connections {
@@ -99,7 +81,6 @@ Item {
 			TableHeaders {
 				Component.onCompleted: {
 					addHeader("name", qsTr("Name"))
-					addHeader("productId", qsTr("Server"))
 					addHeader("createdAt", qsTr("Created"))
 					addHeader("lastUsedAt", qsTr("Last used"))
 					addHeader("revoked", qsTr("Revoked"))
@@ -130,7 +111,7 @@ Item {
 						tooltipText: qsTr("Change the permissions of the token")
 						onClicked: {
 							let token = tokenTable.elements.get(permissionsDelegate.rowIndex).item
-							tokensPage.openTokenDialog(String(token.m_id), String(token.m_productId), token.m_scopes ? token.m_scopes : [])
+							tokensPage.openTokenDialog(String(token.m_id), token.m_scopes ? token.m_scopes : [])
 						}
 					}
 
@@ -251,7 +232,6 @@ Item {
 
 			// Set by openDialog after the dialog is created
 			property string tokenId: ""
-			property string receiverId: ""
 			property var initialScopes: []
 
 			property string tokenName: ""
@@ -261,10 +241,6 @@ Item {
 			// Set by the content when it is created
 			property var permissionsView: null
 
-			onReceiverIdChanged: {
-				tokenDialog.updatePermissions()
-			}
-
 			onInitialScopesChanged: {
 				tokenDialog.updatePermissions()
 			}
@@ -273,13 +249,21 @@ Item {
 				tokenDialog.updateApplyButton()
 			}
 
+			Connections {
+				target: tokensPage.apiClient
+
+				function onProductServerChanged(){
+					tokenDialog.updatePermissions()
+				}
+			}
+
 			// The tree of the receiving server; the permissions every token holds are checked and locked
 			function updatePermissions(){
 				if (!tokenDialog.permissionsView){
 					return
 				}
 
-				let server = tokensPage.getServer(tokenDialog.receiverId)
+				let server = tokensPage.apiClient ? tokensPage.apiClient.productServer : null
 				let groups = server ? server.groups : []
 				tokenDialog.hasPermissions = groups.length > 0
 
@@ -298,7 +282,7 @@ Item {
 
 			function updateApplyButton(){
 				let isNameSet = tokenDialog.tokenId !== "" || tokenDialog.tokenName !== ""
-				tokenDialog.setButtonEnabled(Enums.apply, isNameSet && tokenDialog.receiverId !== "" && tokenDialog.hasPermissions)
+				tokenDialog.setButtonEnabled(Enums.apply, isNameSet && tokenDialog.hasPermissions)
 			}
 
 			onFinished: {
@@ -307,7 +291,7 @@ Item {
 
 				let scopes = tokenDialog.permissionsView.getCheckedIds(false)
 				if (tokenDialog.tokenId === ""){
-					tokensPage.apiClient.createToken(tokensPage.productId, tokenDialog.receiverId, tokenDialog.tokenName, tokenDialog.tokenDescription, scopes)
+					tokensPage.apiClient.createToken(tokensPage.productId, tokensPage.apiClient.productServer.productId, tokenDialog.tokenName, tokenDialog.tokenDescription, scopes)
 				}
 				else{
 					tokensPage.apiClient.updateTokenScopes(tokensPage.productId, tokenDialog.tokenId, scopes)
@@ -372,10 +356,6 @@ Item {
 						}
 
 						BaseText {
-							text: qsTr("Server accepting the token: %1").arg(tokenDialog.receiverId)
-						}
-
-						BaseText {
 							text: qsTr("Permissions")
 							font.bold: true
 						}
@@ -405,8 +385,6 @@ Item {
 							controlPanelTopMargin: Style.marginS
 							treeTopMargin: Style.marginXS
 							treeBottomMargin: Style.marginS
-							readOnly: false
-							showControlPanel: true
 							visible: tokenDialog.hasPermissions
 						}
 
@@ -415,7 +393,7 @@ Item {
 							width: parent.width - 2 * Style.marginXL
 							horizontalAlignment: Text.AlignHCenter
 							wrapMode: Text.WordWrap
-							text: qsTr("The server has not published its permissions yet: start it with a token first.")
+							text: qsTr("This server has no permissions to give to a token of this product.")
 							color: Style.inactiveTextColor
 							visible: !tokenDialog.hasPermissions
 						}

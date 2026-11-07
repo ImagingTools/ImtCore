@@ -900,7 +900,6 @@ Dialog {
 			return qsTr("Loading…")
 		if (root.filterText !== "" && entriesModel.count === 0)
 			return qsTr("No items match \"%1\"").arg(root.filterText)
-		// The allowed file types are always shown in extensionHintBar
 		if (root.selectedPaths.length > 0 && !root.selectionIsValid())
 			return root.selectionKindHint()
 		if (root.multiSelect && root.selectedPaths.length > 1)

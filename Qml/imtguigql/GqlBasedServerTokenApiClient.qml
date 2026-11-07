@@ -32,7 +32,7 @@ ServerTokenApiClient {
 		root.__revokeRequest.send(root.__revokeInput)
 	}
 
-	function requestProductServers(productId){
+	function requestProductServer(productId){
 		root.__receiversInput.m_clientProductId = productId
 		root.__receiversRequest.send(root.__receiversInput)
 	}
@@ -44,26 +44,18 @@ ServerTokenApiClient {
 		root.__scopesRequest.send(root.__scopesInput)
 	}
 
-	function __parseServers(serversList){
-		let result = []
-		if (!serversList){
-			return result
+	// The server answers with itself only, or with nothing when it gives the product no token
+	function __parseServer(serversList){
+		let server = serversList && serversList.count > 0 ? serversList.get(0).item : null
+		if (!server){
+			return null
 		}
 
-		for (let i = 0; i < serversList.count; ++i){
-			let server = serversList.get(i).item
-			if (!server){
-				continue
-			}
-
-			result.push({
-				"productId": String(server.m_productId),
-				"groups": root.__parseGroups(server.m_groups),
-				"requiredPermissions": Array.isArray(server.m_requiredPermissions) ? server.m_requiredPermissions : []
-			})
+		return {
+			"productId": String(server.m_productId),
+			"groups": root.__parseGroups(server.m_groups),
+			"requiredPermissions": Array.isArray(server.m_requiredPermissions) ? server.m_requiredPermissions : []
 		}
-
-		return result
 	}
 
 	function __parseGroups(groupsList){
@@ -119,8 +111,7 @@ ServerTokenApiClient {
 		sdlObjectComp: Component {
 			ServerTokenReceiverList {
 				onFinished: {
-					root.productServers = root.__parseServers(m_productServers)
-					root.productServersReceived()
+					root.productServer = root.__parseServer(m_productServers)
 				}
 			}
 		}
@@ -156,7 +147,6 @@ ServerTokenApiClient {
 			ServerTokenList {
 				onFinished: {
 					root.tokens = m_tokens
-					root.tokensReceived()
 				}
 			}
 		}
@@ -194,6 +184,10 @@ ServerTokenApiClient {
 		sdlObjectComp: Component {
 			RevokeServerTokenPayload {
 				onFinished: {
+					if (!m_success){
+						root.operationFailed(m_message)
+					}
+
 					root.requestTokens(root.__productId)
 				}
 			}

@@ -6,6 +6,7 @@
 #include <QtCore/QUuid>
 
 // ImtCore includes
+#include <imtauth/CConnectedProduct.h>
 #include <imtauth/CConnectedProductDocumentValidatorComp.h>
 #include <imtauth/CProductPermissionSnapshot.h>
 #include <imtauthgql/imtauthgql.h>

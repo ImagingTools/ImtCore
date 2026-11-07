@@ -2,12 +2,7 @@
 #include <imtauthgql/CPublishedPermissionsProviderComp.h>
 
 
-// Qt includes
-#include <QtCore/QJsonDocument>
-#include <QtCore/QJsonObject>
-
 // ImtCore includes
-#include <imtauth/CProductPermissionSnapshot.h>
 #include <imtauth/imtauth.h>
 #include <imtauthgql/imtauthgql.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Permissions.h>

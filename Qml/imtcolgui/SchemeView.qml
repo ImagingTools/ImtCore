@@ -75,10 +75,6 @@ Rectangle {
 		}
 	}
 	
-	onSelectedIndexChanged: {
-		console.log("SchemeView.qml onSelectedIndexChanged", selectedIndex)
-	}
-
 	function designSchemeChanged(scheme){
 		canvas.requestPaint();
 	}
@@ -183,7 +179,6 @@ Rectangle {
 			//     return;
 			// }
 			// let id = objectsModel.getData("id", canvas.selectedIndex);
-			console.log("Go inside");
 		}
 	}
 	
@@ -626,7 +621,6 @@ Rectangle {
 				ctx.strokeStyle = canvas.gridColor;
 				ctx.globalAlpha = canvas.gridOpacity;
 
-				
 				for(let i = 0; i * step < canvas.backgroundWidth; i++){//vertical lines
 					let x1 = i * step;
 					let y1 =  0 ;
@@ -981,7 +975,6 @@ Rectangle {
 				let complexIntersection = true;
 				if(hasMargin){
 					angle = findAngle(x1_link, y1_link,intersection.x, intersection.y)
-					//console.log("angle: ", angle)
 					
 					let quarter =  Math.trunc(angle/(Math.PI/2))
 					let add = 0;
@@ -1135,7 +1128,6 @@ Rectangle {
 		sequence: "Ctrl+C";
 		enabled: true;
 		onActivated: {
-			console.log("Ctrl+C");
 			canvasPage.copySignal(canvas.selectedIndex);
 		}
 	}
@@ -1146,7 +1138,6 @@ Rectangle {
 		sequence: "Ctrl+V";
 		enabled: true;
 		onActivated: {
-			console.log("Ctrl+V");
 			canvasPage.pasteSignal(canvas.selectedIndex);
 		}
 	}
@@ -1156,7 +1147,6 @@ Rectangle {
 		sequence: "Delete";
 		enabled: true;
 		onActivated: {
-			console.log("Delete");
 			canvasPage.deleteSignal(canvas.selectedIndex);
 		}
 	}
@@ -1165,7 +1155,6 @@ Rectangle {
 		sequence: "Ctrl+Z";
 		enabled: true;
 		onActivated: {
-			console.log("Ctrl+Z");
 			canvasPage.revertSignal();
 		}
 	}
@@ -1174,7 +1163,6 @@ Rectangle {
 		sequence: "F2";
 		enabled: true;
 		onActivated: {
-			console.log("F2");
 			canvasPage.renameSignal(canvas.selectedIndex);
 		}
 	}
@@ -1215,7 +1203,6 @@ Rectangle {
 	}
 	
 	function deleteObjectFunc(index){
-		console.log("DELETE OBJECT: ", index);
 		let id = canvasPage.objectsModel.get(index).item.m_id;
 		
 		//remove links

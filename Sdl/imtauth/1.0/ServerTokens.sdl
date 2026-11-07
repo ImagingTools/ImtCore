@@ -95,7 +95,7 @@ type Query {
 	GetServerTokenList (input: ServerTokenListInput!): ServerTokenList!
 	GetServerTokenReceivers (input: ServerTokenReceiversInput): ServerTokenReceiverList!
 	# The permissions of this server the token of the calling product server allows, for the roles of that product.
-	GetServerTokenFeatures (input: ServerTokenReceiversInput): ServerFeatureList!
+	GetServerTokenFeatures: ServerFeatureList!
 }
 
 type Mutation {

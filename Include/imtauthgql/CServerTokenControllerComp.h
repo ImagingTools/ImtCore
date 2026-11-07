@@ -93,7 +93,7 @@ private:
 
 	/**
 		Calls the visitor for each root of the permission tree of this server.
-		eturn false if this server has no permission tree.
+		\return false if this server has no permission tree.
 	*/
 	bool VisitTreeFeatures(const std::function<void(const QByteArray&, const imtlic::IFeatureInfo&)>& visitor) const;
 

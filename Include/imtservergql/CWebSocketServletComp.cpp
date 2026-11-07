@@ -550,6 +550,11 @@ void CWebSocketServletComp::CheckTokenSubscriptions() const
 			subscriptionsOfTokens.insert(subscription.token, subscription);
 		}
 
+		// The scopes are remembered across checks, only for the tokens that still hold subscriptions
+		for (auto iter = scopesOfTokens.begin(); iter != scopesOfTokens.end();){
+			iter = subscriptionsOfTokens.contains(iter.key()) ? std::next(iter) : scopesOfTokens.erase(iter);
+		}
+
 		const QList<QByteArray> tokens = subscriptionsOfTokens.uniqueKeys();
 		for (const QByteArray& token : tokens){
 			QString errorMessage;

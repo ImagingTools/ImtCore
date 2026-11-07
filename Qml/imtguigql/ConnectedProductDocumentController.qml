@@ -2,7 +2,6 @@
 import QtQuick 2.12
 import com.imtcore.imtqml 1.0
 import imtdocgui 1.0
-import imtbaseImtCollectionSdl 1.0
 import imtbaseCollectionDocumentServiceSdl 1.0
 import imtauthConnectedProductsSdl 1.0
 import imtauthConnectedProductCollectionDocumentServiceSdl 1.0
