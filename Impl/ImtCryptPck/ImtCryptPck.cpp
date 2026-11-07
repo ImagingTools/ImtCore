@@ -35,6 +35,11 @@ I_EXPORT_COMPONENT(
 			"MD5 Hash Calculator",
 			"MD5 Hash Calculator");
 
+I_EXPORT_COMPONENT(
+			SystemSecretProtector,
+			"Protection of a secret at rest by the operating system",
+			"Secret Protection DPAPI");
+
 
 } // namespace ImtCryptPck
 

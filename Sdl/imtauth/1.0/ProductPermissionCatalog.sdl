@@ -1,0 +1,28 @@
+schema {
+	mutation: Mutation
+	namespace: imtauth
+	version: 1.0
+}
+
+import {
+	"Permissions.sdl"
+}
+
+type PublishProductPermissionsInput {
+	productId: ID!
+	productVersion: String
+	# The names are in the language of the product sources, the authorization server does not translate them.
+	tree: PermissionTree
+}
+
+type PublishProductPermissionsPayload {
+	success: Boolean!
+	# False when the published tree is the stored one.
+	changed: Boolean
+	message: String
+}
+
+
+type Mutation {
+	PublishProductPermissions (input: PublishProductPermissionsInput!): PublishProductPermissionsPayload!
+}

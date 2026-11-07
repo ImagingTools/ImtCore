@@ -28,6 +28,33 @@ namespace imtcom
 class IServiceInfoProvider: virtual public istd::IPolymorphic
 {
 public:
+	/**
+		State of the token this server uses at the service.
+	*/
+	enum CredentialStatus
+	{
+		/**
+			This server does not use a token at the service.
+		*/
+		CRS_NOT_USED,
+		CRS_VALID,
+
+		/**
+			The token is not configured.
+		*/
+		CRS_MISSING,
+
+		/**
+			The service refuses the token: it is wrong, revoked or issued for another product.
+		*/
+		CRS_REJECTED,
+
+		/**
+			The service does not answer, the token could not be checked.
+		*/
+		CRS_UNAVAILABLE
+	};
+
 	struct ServiceInfo
 	{
 		/**
@@ -44,6 +71,7 @@ public:
 		QString version;
 		QString versionKind;
 		QDateTime buildTime;
+		CredentialStatus credentialStatus = CRS_NOT_USED;
 
 		/**
 			Services the service itself depends on.

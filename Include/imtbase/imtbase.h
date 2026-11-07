@@ -48,6 +48,10 @@ constexpr T narrow_cast(U v) noexcept
 static const inline QByteArray s_protocolVersionHeaderId = QByteArrayLiteral("X-Protocol-Version");
 static const inline QByteArray s_authenticationTokenHeaderId = QByteArrayLiteral("x-authentication-token");
 static const inline QByteArray s_productIdHeaderId = QByteArrayLiteral("productid");
+// The token of the product server a request comes through; the user of the request has a token of its own
+static const inline QByteArray s_serverTokenHeaderId = QByteArrayLiteral("x-server-token");
+// The product the console of the authorization server administers, for a superuser only
+static const inline QByteArray s_administeredProductHeaderId = QByteArrayLiteral("administeredproductid");
 static const inline QByteArray s_permissionPathHeaderId = QByteArrayLiteral("permissionPath");
 static const inline QByteArray s_languageIdHeaderId = QByteArrayLiteral("languageid");
 

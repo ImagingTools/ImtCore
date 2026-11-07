@@ -14,6 +14,10 @@ add_custom_target(${PROJECT_NAME}-SDL-related-files SOURCES
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/Sessions.sdl
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/UserActions.sdl
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/PersonalAccessTokens.sdl
+			${CMAKE_CURRENT_LIST_DIR}/../1.0/ServerTokens.sdl
+			${CMAKE_CURRENT_LIST_DIR}/../1.0/ProductPermissionCatalog.sdl
+			${CMAKE_CURRENT_LIST_DIR}/../1.0/ConnectedProducts.sdl
+			${CMAKE_CURRENT_LIST_DIR}/../1.0/ConnectedProductCollectionDocumentService.sdl
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/Tenants.sdl
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/TenantCollectionDocumentService.sdl
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/RelationshipCollectionDocumentService.sdl
@@ -60,6 +64,22 @@ ImtCoreCustomConfigureSdlCppQml(CXX QML
 
 ImtCoreCustomConfigureSdlCppQml(CXX QML
 			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/UserActions.sdl"
+			VERSION		"1.0")
+
+ImtCoreCustomConfigureSdlCppQml(CXX QML
+			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/ConnectedProducts.sdl"
+			VERSION		"1.0")
+
+ImtCoreCustomConfigureSdlCppQml(CXX QML
+			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/ConnectedProductCollectionDocumentService.sdl"
+			VERSION		"1.0")
+
+ImtCoreCustomConfigureSdlCppQml(CXX QML
+			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/ProductPermissionCatalog.sdl"
+			VERSION		"1.0")
+
+ImtCoreCustomConfigureSdlCppQml(CXX QML
+			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/ServerTokens.sdl"
 			VERSION		"1.0")
 
 ImtCoreCustomConfigureSdlCppQml(CXX QML

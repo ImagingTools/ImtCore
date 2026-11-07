@@ -15,9 +15,25 @@ class IGqlSubscriberController: virtual public istd::IPolymorphic
 {
 public:
 	/**
+		Who subscribes.
+	*/
+	enum SubscriberKind
+	{
+		SK_ANONYMOUS,
+		SK_USER,
+		SK_SERVER
+	};
+
+	/**
 		Get IDs of the supported commands.
 	*/
 	virtual bool IsRequestSupported(const CGqlRequest& gqlRequest) const = 0;
+
+	/**
+		Tell whether this channel is declared open for such a subscriber. A channel is closed unless it says so.
+		imtservergql::CGqlPublisherCompBase opens its channels to signed-in users only: its publishers filter the events by the subscriber.
+	*/
+	virtual bool IsOpenFor(SubscriberKind subscriberKind, const CGqlRequest& gqlRequest) const = 0;
 
 	/**
 		Register subscriprion for a GraphQL-based request.

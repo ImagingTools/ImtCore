@@ -75,10 +75,6 @@ Rectangle {
 		}
 	}
 	
-	onSelectedIndexChanged: {
-		console.log("SchemeView.qml onSelectedIndexChanged", selectedIndex)
-	}
-
 	function designSchemeChanged(scheme){
 		canvas.requestPaint();
 	}
@@ -118,20 +114,46 @@ Rectangle {
 		requestPaint()
 	}
 	
+	// Fits the objects of the scheme, or the whole sheet when there are none
 	function zoomToFit(){
-		if (canvas.backgroundWidth == 0 | canvas.backgroundHeight == 0){
+		let bounds = canvasPage.getContentBounds()
+		if (bounds.width <= 0 || bounds.height <= 0 || canvas.width <= 0 || canvas.height <= 0){
 			return
 		}
-		
-		let scaleCoeff_ = (canvas.width - Style.marginM * 2) / canvas.backgroundWidth;
-		let scaleCoeff_h = (canvas.height - Style.marginM * 2) / canvas.backgroundHeight;
-		if (scaleCoeff_ > scaleCoeff_h){
-			scaleCoeff_ = scaleCoeff_h
+
+		let margin = Style.marginXL * 2
+		let scaleCoeff_ = Math.min((canvas.width - margin * 2) / bounds.width, (canvas.height - margin * 2) / bounds.height)
+		// A few objects are not blown up
+		scaleCoeff_ = Math.min(scaleCoeff_, 1.2)
+		if (scaleCoeff_ <= 0){
+			return
 		}
-		canvas.setScale(scaleCoeff_, canvas.width / 2, canvas.height / 2)
-		
-		canvas.deltaX = canvasPage.width / 2 - backgroundRec.width / 2
-		canvas.deltaY = canvasPage.height / 2 - backgroundRec.height / 2
+
+		canvas.scaleCoeff = scaleCoeff_
+		canvas.scaleCoeffPrev = scaleCoeff_
+		canvas.deltaX = canvas.width / 2 - (bounds.x + bounds.width / 2) * scaleCoeff_
+		canvas.deltaY = canvas.height / 2 - (bounds.y + bounds.height / 2) * scaleCoeff_
+	}
+
+	function getContentBounds(){
+		if (canvasPage.objectsModel.count === 0){
+			return {"x": 0, "y": 0, "width": canvas.backgroundWidth, "height": canvas.backgroundHeight}
+		}
+
+		let left = Number.MAX_VALUE
+		let top = Number.MAX_VALUE
+		let right = -Number.MAX_VALUE
+		let bottom = -Number.MAX_VALUE
+		for (let i = 0; i < canvasPage.objectsModel.count; i++){
+			let item = canvasPage.objectsModel.get(i).item
+			let width_ = item.m_width ? item.m_width : canvas.mainRec_width
+			left = Math.min(left, item.m_x)
+			top = Math.min(top, item.m_y)
+			right = Math.max(right, item.m_x + width_ + canvas.shadowSize)
+			bottom = Math.max(bottom, item.m_y + canvas.mainRec_height + canvas.shadowSize)
+		}
+
+		return {"x": left, "y": top, "width": right - left, "height": bottom - top}
 	}
 	
 	function requestPaint(){
@@ -157,7 +179,6 @@ Rectangle {
 			//     return;
 			// }
 			// let id = objectsModel.getData("id", canvas.selectedIndex);
-			console.log("Go inside");
 		}
 	}
 	
@@ -222,9 +243,7 @@ Rectangle {
 			}
 			
 			onPressed: {
-				console.log("onPressed", canvas.selectedIndex)
 				canvas.selectedIndex = -1;
-				console.log("canvasPage.objectsModel", canvasPage.objectsModel.toJson())
 				for(let i = 0; i < canvasPage.objectsModel.count; i++){
 					let item = canvasPage.objectsModel.get(i).item;
 					let x_ = item.m_x;
@@ -239,7 +258,6 @@ Rectangle {
 					height_ = height_  * canvas.scaleCoeff;
 					
 					let ok = checkInsideMovingItem(x_, y_, width_, height_);
-					console.log("ok", ok, i)
 					if(ok){
 						canvas.selectedIndex = i;
 					}
@@ -453,7 +471,7 @@ Rectangle {
 			property int fontSizeS: canvasPage.objectSecondaryFontSize
 			property int radius_: Style.radiusXS
 			property int borderShift: 4
-			property int shadowSize: 6
+			property int shadowSize: 3
 			
 			property int backgroundStep: 30
 			property int backgroundWidth: 1024
@@ -477,16 +495,30 @@ Rectangle {
 			property string linkColor: Style.borderColor2
 			property string mainTextColor: Style.textColor
 			property string secondTextColor: Style.inactiveTextColor
-			property string gridColor: Style.imagingToolsGradient1;
+			// The grid is drawn faint with the border color, which suits every theme
+			property string gridColor: Style.borderColor;
+			property real gridOpacity: 0.35;
 			property string backgroundBorderColor: Style.borderColor; // Style.alternateBaseColor;
 			property string backgroundColor: Style.baseColor;
 			property string innerFrameColor: "transparent";
 			
 			onSelectedIndexChanged: {
 				canvasPage.selectedIndex = selectedIndex
-				console.log("Canvas.qml onSelectedIndexChanged", selectedIndex)
 			}
 			
+			// A theme sets the colors of Style after its change event, so the canvas follows the colors themselves
+			onBackgroundColorChanged: {
+				requestPaint()
+			}
+
+			onMainTextColorChanged: {
+				requestPaint()
+			}
+
+			onGridColorChanged: {
+				requestPaint()
+			}
+
 			onWidthChanged: {
 				requestPaint()
 			}
@@ -587,8 +619,8 @@ Rectangle {
 				
 				ctx.fillStyle = canvas.gridColor;
 				ctx.strokeStyle = canvas.gridColor;
-				
-				
+				ctx.globalAlpha = canvas.gridOpacity;
+
 				for(let i = 0; i * step < canvas.backgroundWidth; i++){//vertical lines
 					let x1 = i * step;
 					let y1 =  0 ;
@@ -613,6 +645,7 @@ Rectangle {
 					ctx.stroke();
 				}
 				
+				ctx.globalAlpha = 1;
 				ctx.strokeStyle = canvas.backgroundBorderColor;
 				ctx.lineWidth = 2;
 				ctx.beginPath()
@@ -711,7 +744,7 @@ Rectangle {
 				let shadowSize = canvas.shadowSize;
 				ctx.lineWidth = 2 ;
 				// ctx.fillStyle = selected ? Qt.rgba(0.2, 0.8, 0, 0.3) : Qt.rgba(0, 0, 0, 0.2);
-				ctx.fillStyle = Qt.rgba(0, 0, 0, 0.2);
+				ctx.fillStyle = Qt.rgba(0, 0, 0, 0.1);
 				ctx.beginPath()
 				ctx.roundedRect(x_ + shadowSize, y_ + shadowSize, mainRecWidth, canvas.mainRec_height , canvas.radius_, canvas.radius_);
 				ctx.fill();
@@ -942,7 +975,6 @@ Rectangle {
 				let complexIntersection = true;
 				if(hasMargin){
 					angle = findAngle(x1_link, y1_link,intersection.x, intersection.y)
-					//console.log("angle: ", angle)
 					
 					let quarter =  Math.trunc(angle/(Math.PI/2))
 					let add = 0;
@@ -1096,7 +1128,6 @@ Rectangle {
 		sequence: "Ctrl+C";
 		enabled: true;
 		onActivated: {
-			console.log("Ctrl+C");
 			canvasPage.copySignal(canvas.selectedIndex);
 		}
 	}
@@ -1107,7 +1138,6 @@ Rectangle {
 		sequence: "Ctrl+V";
 		enabled: true;
 		onActivated: {
-			console.log("Ctrl+V");
 			canvasPage.pasteSignal(canvas.selectedIndex);
 		}
 	}
@@ -1117,7 +1147,6 @@ Rectangle {
 		sequence: "Delete";
 		enabled: true;
 		onActivated: {
-			console.log("Delete");
 			canvasPage.deleteSignal(canvas.selectedIndex);
 		}
 	}
@@ -1126,7 +1155,6 @@ Rectangle {
 		sequence: "Ctrl+Z";
 		enabled: true;
 		onActivated: {
-			console.log("Ctrl+Z");
 			canvasPage.revertSignal();
 		}
 	}
@@ -1135,7 +1163,6 @@ Rectangle {
 		sequence: "F2";
 		enabled: true;
 		onActivated: {
-			console.log("F2");
 			canvasPage.renameSignal(canvas.selectedIndex);
 		}
 	}
@@ -1176,7 +1203,6 @@ Rectangle {
 	}
 	
 	function deleteObjectFunc(index){
-		console.log("DELETE OBJECT: ", index);
 		let id = canvasPage.objectsModel.get(index).item.m_id;
 		
 		//remove links

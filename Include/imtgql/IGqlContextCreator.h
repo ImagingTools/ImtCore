@@ -34,6 +34,24 @@ public:
 	virtual IGqlContextUniquePtr CreateGqlContext(
 				const IGqlContext::Headers& headers,
 				ContextCreationError& error) const = 0;
+
+	/**
+		Tell whether the token lives until it is revoked, so what it holds must be checked again later.
+	*/
+	virtual bool IsRevocableToken(const QByteArray& token) const = 0;
+
+	/**
+		Check the token only, without creating a context for its owner.
+		\param scopes The permissions of a personal access token.
+		\return CCS_INTERNAL_ERROR when the token could not be checked: that says nothing about the token.
+	*/
+	virtual ContextCreationStatus CheckToken(const QByteArray& token, QByteArrayList& scopes, QString& errorMessage) const = 0;
+
+	/**
+		Check that the server of a product the request comes through may send it.
+		A request of a client of this server passes.
+	*/
+	virtual bool CheckRequestAccess(const CGqlRequest& gqlRequest, QString& errorMessage) const = 0;
 };
 
 

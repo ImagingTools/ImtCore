@@ -5,6 +5,8 @@
 // ImtCore includes
 #include <iqt/iqt.h>
 #include <imtauth/imtauth.h>
+#include <imtbase/imtbase.h>
+#include <imtgql/CGqlContext.h>
 #include <imtlic/IProductInfo.h>
 
 
@@ -130,6 +132,21 @@ QByteArray GetTranslation(const iqt::ITranslationManager* translationManagerPtr,
 	QByteArray languageId = gqlContextPtr->GetLanguageId();
 
 	return iqt::GetTranslation(translationManagerPtr, phrase, languageId, context);
+}
+
+
+void SetServerRequestContext(CGqlRequest& gqlRequest, const QByteArray& serverToken)
+{
+	IGqlContextUniquePtr contextPtr(new CGqlContext);
+	if (!serverToken.isEmpty()){
+		IGqlContext::Headers headers;
+		headers.insert(imtbase::s_authenticationTokenHeaderId, serverToken);
+
+		contextPtr->SetToken(serverToken);
+		contextPtr->SetHeaders(headers);
+	}
+
+	gqlRequest.SetGqlContext(IGqlContextSharedPtr::CreateFromUnique(std::move(contextPtr)));
 }
 
 

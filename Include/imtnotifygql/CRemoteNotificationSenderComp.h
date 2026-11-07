@@ -12,6 +12,7 @@
 
 // ImtCore includes
 #include <imtclientgql/TClientRequestManagerCompWrap.h>
+#include <imtclientgql/IServerCredentialProvider.h>
 #include <imtnotify/INotificationSender.h>
 
 
@@ -21,8 +22,7 @@ namespace imtnotifygql
 
 /**
 	Sender of a product server: hands the notifications to the notification center of the authorization server.
-	It sends with the session of the user whose request made the change; a change made outside of a user request is not
-	sent. A product server has no identity of its own yet (ImagingTools/ImtCore#1059).
+	It sends with the token of this server, so a change made outside of a user request is sent as well.
 	Sending is queued: Send and Withdraw return at once and an own thread delivers the requests one by one in their order.
 	A request the authorization server did not answer is repeated a few times, then dropped; a refused one is dropped
 	at once. A notification without a dedup key gets one, so a repeated request does not deliver it twice.
@@ -36,6 +36,7 @@ public:
 
 	I_BEGIN_COMPONENT(CRemoteNotificationSenderComp);
 		I_REGISTER_INTERFACE(imtnotify::INotificationSender);
+		I_ASSIGN(m_serverCredentialCompPtr, "ServerCredentialProvider", "Token of this server", true, "ServerCredentialProvider");
 	I_END_COMPONENT;
 
 	// reimplemented (imtnotify::INotificationSender)
@@ -53,9 +54,6 @@ private:
 		bool isWithdraw = false;
 		Audience audience;
 		Message message;
-
-		// The session of the user whose request made the change
-		QByteArray accessToken;
 	};
 
 	enum DeliveryResult
@@ -69,10 +67,8 @@ private:
 	void RunQueue();
 	DeliveryResult Deliver(const Request& request) const;
 
-	/**
-		Take the session of the current user request; false outside of one.
-	*/
-	bool TakeCallerSession(Request& request) const;
+private:
+	I_REF(imtclientgql::IServerCredentialProvider, m_serverCredentialCompPtr);
 
 private:
 	QMutex m_queueMutex;

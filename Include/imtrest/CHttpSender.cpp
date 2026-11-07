@@ -15,6 +15,9 @@ namespace
 {
 
 
+const QByteArray s_tokenSymbols("!#$%&'*+-.^_`|~");
+
+
 // Token (RFC 9110, section 5.6.2)
 bool IsTokenChar(char c)
 {
@@ -22,9 +25,7 @@ bool IsTokenChar(char c)
 		return true;
 	}
 
-	static const QByteArray symbols("!#$%&'*+-.^_`|~");
-
-	return symbols.contains(c);
+	return s_tokenSymbols.contains(c);
 }
 
 

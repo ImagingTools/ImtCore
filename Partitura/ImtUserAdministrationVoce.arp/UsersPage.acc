@@ -702,5 +702,6 @@
         <Component ExportedId="PasswordPolicy" ComponentId="PasswordPolicy"/>
         <Component ExportedId="SmtpMessageCreator" ComponentId="SmtpMessageCreator"/>
         <Component ExportedId="UserChangeGenerator" ComponentId="UserChangeGenerator"/>
+        <Component ExportedId="UserListController" ComponentId="UserListController"/>
     </ExportedComponents>
 </Acf>

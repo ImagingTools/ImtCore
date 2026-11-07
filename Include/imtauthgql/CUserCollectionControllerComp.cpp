@@ -30,6 +30,9 @@ namespace imtauthgql
 {
 
 
+static const QByteArray s_removeUserPermission = QByteArrayLiteral("/Administration/Users/Edit/Remove");
+
+
 // protected methods
 
 bool CUserCollectionControllerComp::FillObjectFromRepresentation(
@@ -686,6 +689,14 @@ bool CUserCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 		return false;
 	}
 
+	if (!CheckUserAccountChange(rawGqlRequest.GetRequestContext(), objectId, *previousUserPtr, *userInfoPtr, errorMessage)){
+		return false;
+	}
+
+	if (!CheckJoinedUserGroups(rawGqlRequest.GetRequestContext(), m_userGroupInfoProviderCompPtr.GetPtr(), previousUserPtr->GetGroups(), userInfoPtr->GetGroups(), errorMessage)){
+		return false;
+	}
+
 	return CheckOtherProductsUnchanged(rawGqlRequest.GetRequestContext(), previousUserPtr, *userInfoPtr, errorMessage)
 				&& CheckGrantedPermissions(rawGqlRequest.GetRequestContext(), previousPermissions, userInfoPtr->GetPermissions(contextProductId), errorMessage);
 }
@@ -816,8 +827,21 @@ bool CUserCollectionControllerComp::CheckObjectData(const imtgql::CGqlRequest& g
 
 	imtbase::IObjectCollection::DataPtr storedDataPtr;
 	const imtauth::IUserInfo* storedUserPtr = nullptr;
-	if (!objectId.isEmpty() && m_objectCollectionCompPtr->GetObjectData(objectId, storedDataPtr)){
-		storedUserPtr = dynamic_cast<const imtauth::IUserInfo*>(storedDataPtr.GetPtr());
+	if (!objectId.isEmpty()){
+		storedUserPtr = m_objectCollectionCompPtr->GetObjectData(objectId, storedDataPtr) ? dynamic_cast<const imtauth::IUserInfo*>(storedDataPtr.GetPtr()) : nullptr;
+		if (storedUserPtr == nullptr){
+			errorMessage = QStringLiteral("Unable to read the user '%1'").arg(QString::fromUtf8(objectId));
+
+			return false;
+		}
+
+		if (!CheckUserAccountChange(gqlContextPtr, objectId, *storedUserPtr, *userInfoPtr, errorMessage)){
+			return false;
+		}
+	}
+
+	if (!CheckJoinedUserGroups(gqlContextPtr, m_userGroupInfoProviderCompPtr.GetPtr(), storedUserPtr != nullptr ? storedUserPtr->GetGroups() : QByteArrayList(), userInfoPtr->GetGroups(), errorMessage)){
+		return false;
 	}
 
 	if (!CheckOtherProductsUnchanged(gqlContextPtr, storedUserPtr, *userInfoPtr, errorMessage)){
@@ -909,6 +933,20 @@ QJsonObject CUserCollectionControllerComp::InsertObject(
 // reimplemented (imtservergql::CObjectCollectionControllerCompBase)
 bool CUserCollectionControllerComp::OnBeforeRemoveElements(const QByteArrayList& elementIds, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
+	for (const QByteArray& userId : elementIds){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		const imtauth::IUserInfo* userPtr = m_objectCollectionCompPtr->GetObjectData(userId, dataPtr) ? dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr()) : nullptr;
+		if (userPtr == nullptr){
+			errorMessage = QStringLiteral("Unable to read the user '%1'").arg(QString::fromUtf8(userId));
+
+			return false;
+		}
+
+		if (!CheckSharedUserChange(gqlRequest.GetRequestContext(), userId, *userPtr, s_removeUserPermission, errorMessage)){
+			return false;
+		}
+	}
+
 	if (m_tenantManagerCompPtr.IsValid()){
 		for (const QByteArray& userId : elementIds){
 			// An organization that cannot be read may be owned by the user: it would be left with a removed owner

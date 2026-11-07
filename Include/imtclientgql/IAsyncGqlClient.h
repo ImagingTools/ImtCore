@@ -57,7 +57,11 @@ public:
 			The answer is not a JSON object or does not match the requested model.
 			Only reported by \c SendModelRequest.
 		*/
-		EC_INVALID_RESPONSE
+		EC_INVALID_RESPONSE,
+		/**
+			The server refused the credentials of the request.
+		*/
+		EC_ACCESS_DENIED
 	};
 
 	struct GqlResult

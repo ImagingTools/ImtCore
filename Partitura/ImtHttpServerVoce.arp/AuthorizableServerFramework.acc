@@ -13,14 +13,23 @@
         <Element Id="AuthenticationManager" PackageId="ImtAuthVoce" ComponentId="AuthenticationManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ProductServerRequestPolicy" Type="Reference" ExportId="ProductServerRequestPolicy">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ServerProductId" Type="Id" ExportId="ServerProductId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="FeatureContainer" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="IdentifiableProductInfo"/>
+                        <Data IsEnabled="true" Value="AuthorizationServerProductInfo"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PersonalAccessTokenManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaClientEngine/RemotePersonalAccessTokenController"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ServerTokenManager" Type="Reference" ExportId="ServerTokenManager">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SlaveJwtSessionController" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaClientEngine"/>
@@ -134,6 +143,33 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="AuthorizationServerProductInfo" PackageId="ImtAuthGqlPck" ComponentId="AuthorizationServerProductInfo">
+            <Data IsEnabled="true" Flags="1">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaClientEngine/ApiClient"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ConnectionStatus" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaClientEngine/ConnectionStatus"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProductInfo" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="IdentifiableProductInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ServerCredentialProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaClientEngine/ServerCredential"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="IdentifiableProductInfo" PackageId="ImtLicensePck" ComponentId="IdentifiableProductInfo">
             <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap/>
@@ -143,7 +179,7 @@
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="FeatureContainer" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="IdentifiableProductInfo"/>
+                        <Data IsEnabled="true" Value="AuthorizationServerProductInfo"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
@@ -283,6 +319,12 @@
                     <AttributeInfo Id="AuthenticationManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="AuthenticationManager"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="DenyUndeclaredUserSubscriptions" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DenyAnonymousSubscriptions" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="GqlSubscriberControllers" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
@@ -336,7 +378,7 @@
         <Component ExportedId="CachedRoleCollection" ComponentId="PumaClientEngine/CachedRoleCollection"/>
         <Component ExportedId="CachedUserCollection" ComponentId="PumaClientEngine/CachedUserCollection"/>
         <Component ExportedId="ConnectionSubscriber" ComponentId="PumaClientEngine/ConnectionSubscriber"/>
-        <Component ExportedId="FeatureContainer" ComponentId="IdentifiableProductInfo"/>
+        <Component ExportedId="FeatureContainer" ComponentId="AuthorizationServerProductInfo"/>
         <Component ExportedId="ExternalLoginCallbackHandler" ComponentId="PumaClientEngine/RemoteAuthorizationController"/>
         <Component ExportedId="GroupRemoteRepository" ComponentId="PumaClientEngine/GroupRemoteRepository"/>
         <Component ExportedId="HttpServerFramework" ComponentId="HttpServerFramework"/>

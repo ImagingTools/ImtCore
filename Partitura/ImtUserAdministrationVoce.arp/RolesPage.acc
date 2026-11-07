@@ -471,6 +471,7 @@
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="RoleChangeGenerator" ComponentId="RoleChangeGenerator"/>
+        <Component ExportedId="RolesDataController" ComponentId="RolesDataController"/>
         <Component ExportedId="RoleCollectionAdapter" ComponentId="RoleCollectionAdapter"/>
     </ExportedComponents>
 </Acf>

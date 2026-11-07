@@ -503,13 +503,8 @@ sdl::V1_0::imtauth::CRemoveTenantPayload CTenantManagerControllerComp::OnRemoveT
 	}
 
 	QString accessError;
-	if (!HasTenantManageAccess(
-				*m_tenantManagerCompPtr.GetPtr(),
-				m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr,
-				gqlRequest,
-				tenantId,
-				QByteArrayList(),
-				accessError)){
+	const imtauth::ITenantInfoUniquePtr removedTenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
+	if (!CheckTenantRemovalAccess(gqlRequest.GetRequestContext(), removedTenantPtr.GetPtr(), accessError)){
 		response.errorMessage = accessError;
 		response.success = false;
 		return response;

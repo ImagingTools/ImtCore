@@ -201,6 +201,12 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 
 	const QByteArray contextProductId = gqlRequest.GetRequestContext() != nullptr ? gqlRequest.GetRequestContext()->GetProductId() : QByteArray();
 	const QByteArrayList previousPermissions = userPtr->GetPermissions(contextProductId);
+	const istd::IChangeableUniquePtr previousPtr = userPtr->CloneMe();
+	const imtauth::IUserInfo* previousUserPtr = dynamic_cast<const imtauth::IUserInfo*>(previousPtr.GetPtr());
+	if (previousUserPtr == nullptr){
+		errorMessage = QStringLiteral("Unable to copy the user");
+		return response;
+	}
 
 	// A stored user keeps its UUID: the editor sends the ID of its own representation.
 	if (userData.id && userPtr->GetObjectUuid().isEmpty()){
@@ -356,6 +362,14 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 		return response;
 	}
 
+	// An unsaved new user has no other products yet, so the checks below only bind stored accounts
+	if (!CheckUserAccountChange(gqlRequest.GetRequestContext(), userPtr->GetObjectUuid(), *previousUserPtr, *userPtr, errorMessage)){
+		return response;
+	}
+
+	if (!CheckJoinedUserGroups(gqlRequest.GetRequestContext(), userPtr->GetUserGroupProvider(), previousUserPtr->GetGroups(), userPtr->GetGroups(), errorMessage)){
+		return response;
+	}
 
 	if (m_documentManagerCompPtr->SetDocumentData(userLogin, documentId, *documentPtr) != imtdoc::IDocumentService::OS_OK){
 		errorMessage = QStringLiteral("Unable to update document data. Error: SetDocumentData failed");

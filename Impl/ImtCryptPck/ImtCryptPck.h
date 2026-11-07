@@ -12,6 +12,7 @@
 #include <imtcrypt/CEncryption.h>
 #include <imtcrypt/CEncryptionBasedPersistenceComp.h>
 #include <imtcrypt/CStaticEncryptionKeyProviderComp.h>
+#include <imtcrypt/CSystemSecretProtectorComp.h>
 
 
 namespace ImtCryptPck
@@ -24,6 +25,7 @@ typedef icomp::TMakeComponentWrap<
 typedef imtcrypt::CEncryptionBasedPersistenceComp EncryptionBasePersistence;
 typedef icomp::TModelCompWrap<imtcrypt::CStaticEncryptionKeyProviderComp> StaticEncryptionKeyProvider;
 typedef icomp::TMakeComponentWrap<imtcrypt::CMD5HashCalculator, imtcrypt::IHashGenerator> HashCalculator;
+typedef imtcrypt::CSystemSecretProtectorComp SystemSecretProtector;
 
 
 } // namespace ImtCryptPck

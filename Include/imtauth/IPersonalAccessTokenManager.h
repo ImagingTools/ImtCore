@@ -59,7 +59,8 @@ public:
 		const QString& name,
 		const QString& description,
 		const QByteArrayList& scopes,
-		const QDateTime& expiresAt) = 0;
+		const QDateTime& expiresAt,
+				const QByteArray& clientProductId = QByteArray()) = 0;
 
 	/**
 		Validate a personal access token.
@@ -72,9 +73,23 @@ public:
 		\param[out] userId User ID associated with the token (if valid)
 		\param[out] tokenId Token ID associated with the token (if valid)
 		\param[out] scopes Permission scopes granted to the token (if valid)
+		\param[out] isCheckFailedPtr Optional: set when the token could not be checked, so false says nothing about the token
 		\return True if token is valid, false if invalid, revoked, or expired
 	*/
-	virtual bool ValidateToken(const QByteArray& rawToken, QByteArray& userId, QByteArray& tokenId, QByteArrayList& scopes, QByteArray* productIdPtr = nullptr) const = 0;
+	virtual bool ValidateToken(
+				const QByteArray& rawToken,
+				QByteArray& userId,
+				QByteArray& tokenId,
+				QByteArrayList& scopes,
+				QByteArray* productIdPtr = nullptr,
+				QByteArray* clientProductIdPtr = nullptr,
+				bool* isCheckFailedPtr = nullptr) const = 0;
+
+	/**
+		Get the tokens of the servers of a product.
+		\param[out] isReadPtr Optional: false when the tokens could not be read, so an empty list is not "no tokens"
+	*/
+	virtual QByteArrayList GetServerTokenIds(const QByteArray& clientProductId, bool* isReadPtr = nullptr) const = 0;
 
 	/**
 		Get list of token IDs for a specific user.
@@ -105,6 +120,11 @@ public:
 		\return True if token was revoked successfully, false if token not found
 	*/
 	virtual bool RevokeToken(const QByteArray& tokenId) = 0;
+
+	/**
+		Change the permissions of a token; the next request with the token holds the new ones.
+	*/
+	virtual bool SetTokenScopes(const QByteArray& tokenId, const QByteArrayList& scopes) = 0;
 
 	/**
 		Update the last used timestamp for a token.

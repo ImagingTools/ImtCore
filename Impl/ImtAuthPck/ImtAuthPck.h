@@ -8,6 +8,12 @@
 
 // ImtCore includes
 #include <imtauth/CRoleComp.h>
+#include <imtauth/CConnectedProductComp.h>
+#include <imtauth/CConnectedProductDocumentNameProviderComp.h>
+#include <imtauth/CClientProductCatalogComp.h>
+#include <imtauth/CConnectedClientProductCatalogComp.h>
+#include <imtauth/CConnectedProductDocumentValidatorComp.h>
+#include <imtauth/CProductPermissionSnapshotComp.h>
 #include <imtauth/CRoleMetaInfoCreatorComp.h>
 #include <imtauth/CUserInfoMetaInfoCreatorComp.h>
 #include <imtauth/CUserInfoComp.h>
@@ -85,6 +91,7 @@
 #include <imtauth/CUserGroupDocumentValidatorComp.h>
 #include <imtauth/CDelegatedAccessResolverComp.h>
 #include <imtauth/COrganizationsPermissionsProviderComp.h>
+#include <imtauth/CProductServerPermissionsProviderComp.h>
 
 
 namespace ImtAuthPck
@@ -92,6 +99,10 @@ namespace ImtAuthPck
 
 
 typedef icomp::TModelCompWrap<imtauth::CRoleComp> Role;
+typedef icomp::TModelCompWrap<imtauth::CConnectedProductComp> ConnectedProduct;
+typedef imtauth::CConnectedProductDocumentValidatorComp ConnectedProductDocumentValidator;
+typedef imtauth::CConnectedProductDocumentNameProviderComp ConnectedProductDocumentNameProvider;
+typedef icomp::TModelCompWrap<imtauth::CProductPermissionSnapshotComp> ProductPermissionSnapshot;
 typedef imtauth::CRoleMetaInfoCreatorComp RoleMetaInfoCreator;
 typedef icomp::TModelCompWrap<imtauth::CUserInfoComp> UserInfo;
 typedef icomp::TModelCompWrap<
@@ -106,6 +117,9 @@ typedef imtauth::CRoleCollectionAdapterComp RoleCollectionAdapter;
 typedef imtauth::CUserCollectionAdapterComp UserCollectionAdapter;
 typedef imtauth::CCheckPermissionCompBase CheckPermissions;
 typedef imtauth::COrganizationsPermissionsProviderComp OrganizationsPermissionsProvider;
+typedef imtauth::CProductServerPermissionsProviderComp ProductServerPermissionsProvider;
+typedef imtauth::CClientProductCatalogComp ClientProductCatalog;
+typedef imtauth::CConnectedClientProductCatalogComp ConnectedClientProductCatalog;
 typedef imtauth::CCheckPermissionOrComp CheckPermissionOr;
 typedef icomp::TModelCompWrap<imtauth::CUserSettingsComp> UserSettings;
 typedef imtauth::CUserGroupInfoProviderComp UserGroupInfoProvider;
@@ -142,7 +156,7 @@ typedef icomp::TModelCompWrap<
 						imtauth::IPersonalAccessToken,
 						iser::ISerializable,
 						istd::IChangeable>> PersonalAccessToken;
-typedef imtauth::CPersonalAccessTokenManagerComp PersonalAccessTokenManager;
+typedef icomp::TModelCompWrap<imtauth::CPersonalAccessTokenManagerComp> PersonalAccessTokenManager;
 typedef imtauth::CPersonalAccessTokenMetaInfoCreatorComp PersonalAccessTokenMetaInfoCreator;
 typedef icomp::TModelCompWrap<
 			icomp::TMakeComponentWrap <

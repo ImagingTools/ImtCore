@@ -31,9 +31,18 @@ enum ServiceStatus {
 	CONNECTED
 }
 
+enum ServerCredentialStatus {
+	NOT_USED
+	VALID
+	MISSING
+	REJECTED
+	UNAVAILABLE
+}
+
 type ServiceInfo {
 	serviceId: ID
 	status: ServiceStatus
+	credentialStatus: ServerCredentialStatus
 	applicationName: String
 	version: String
 	versionKind: String

@@ -1,0 +1,26 @@
+schema {
+	namespace: imtauth
+	version: 1.0
+
+	query: Query
+	mutation: Mutation
+}
+
+import {
+	"ConnectedProducts.sdl"
+	"../../imtbase/1.0/CollectionDocumentService.sdl"
+	"../../imtbase/1.0/UndoManager.sdl"
+}
+
+type UpdateConnectedProductFromRepresentationInput {
+	documentId: ID!
+	product: ConnectedProductData!
+}
+
+type Query {
+	GetConnectedProductRepresentation(input: DocumentId): ConnectedProductData!
+}
+
+type Mutation {
+	UpdateConnectedProductFromRepresentation(input: UpdateConnectedProductFromRepresentationInput): DocumentOperationStatus!
+}

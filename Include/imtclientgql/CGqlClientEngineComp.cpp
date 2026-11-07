@@ -89,6 +89,12 @@ QNetworkRequest* CGqlClientEngineComp::CreateNetworkRequest(const imtgql::IGqlRe
 		}
 	}
 
+	// It names the product only: the rights of a request come from the token of its user
+	const QByteArray serverToken = m_serverCredentialCompPtr.IsValid() ? m_serverCredentialCompPtr->GetServerToken() : QByteArray();
+	if (!serverToken.isEmpty()){
+		networkRequest->setRawHeader(imtbase::s_serverTokenHeaderId, serverToken);
+	}
+
 	const QByteArray protocolVersion = request.GetProtocolVersion();
 	if (!protocolVersion.isEmpty()){
 		networkRequest->setRawHeader(imtbase::s_protocolVersionHeaderId, protocolVersion);

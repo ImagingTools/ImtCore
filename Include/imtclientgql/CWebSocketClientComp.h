@@ -217,6 +217,8 @@ private:
 	mutable QWebSocket m_webSocket;
 	QTimer m_refreshTimer;
 	State m_state = ST_IDLE;
+	// A connection attempt failed: the retries are not logged until the client connects or the settings change
+	bool m_isRetrying = false;
 	mutable QMap<QString, QByteArray> m_queryDataMap;
 	istd::TPointerVector<imtrest::IRequest> m_startQueries;
 	istd::TPointerVector<imtrest::IRequest> m_cacheQueries;

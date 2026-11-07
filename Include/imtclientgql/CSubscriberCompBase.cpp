@@ -3,6 +3,7 @@
 
 
 // ImtCore includes
+#include <imtgql/imtgql.h>
 #include <imtgql/CGqlRequest.h>
 
 
@@ -57,6 +58,11 @@ void CSubscriberCompBase::OnComponentCreated()
 			imtgql::CGqlFieldObject subscriptionField;
 			subscriptionField.InsertField("id");
 			gqlRequest.AddField("data", subscriptionField);
+
+			const QByteArray serverToken = m_serverCredentialCompPtr.IsValid() ? m_serverCredentialCompPtr->GetServerToken() : QByteArray();
+			if (!serverToken.isEmpty()){
+				imtgql::SetServerRequestContext(gqlRequest, serverToken);
+			}
 
 			m_subscriptionIds << m_subscriptionManagerCompPtr->RegisterSubscription(gqlRequest, *this);
 		}

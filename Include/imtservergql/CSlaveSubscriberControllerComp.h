@@ -27,6 +27,7 @@ public:
 
 	// reimplemented (imtgql::IGqlSubscriberController)
 	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
+	virtual bool IsOpenFor(SubscriberKind subscriberKind, const imtgql::CGqlRequest& gqlRequest) const override;
 	virtual bool RegisterSubscription(
 		const QByteArray& subscriptionId,
 		const imtgql::CGqlRequest& gqlRequest,

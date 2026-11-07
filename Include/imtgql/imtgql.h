@@ -44,6 +44,13 @@ QByteArray GetLanguageIdFromRequest(const QList<CGqlParamObject>& inputParams);
 QByteArray GetDesignSchemeIdFromRequest(const QList<CGqlParamObject>& inputParams);
 QByteArray GetTranslation(const iqt::ITranslationManager* translationManagerPtr, const CGqlRequest& gqlRequest, const QByteArray& phrase, const QByteArray& context);
 
+/**
+	Make a request this server sends on its own behalf: it gets a context of its own, so the credentials of a request
+	being served do not travel along.
+	\param serverToken	[optional] The token of this server, sent as the authentication of the request.
+*/
+void SetServerRequestContext(CGqlRequest& gqlRequest, const QByteArray& serverToken = QByteArray());
+
 
 } // namespace imtqml
 

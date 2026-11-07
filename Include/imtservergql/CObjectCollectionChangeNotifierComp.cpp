@@ -2,6 +2,11 @@
 #include <imtservergql/CObjectCollectionChangeNotifierComp.h>
 
 
+// ImtCore includes
+#include <imtauth/imtauth.h>
+#include <imtservergql/imtservergql.h>
+
+
 // Qt includes
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonDocument>
@@ -34,6 +39,54 @@ bool CObjectCollectionChangeNotifierComp::IsRequestSupported(const imtgql::CGqlR
 	}
 
 	return BaseClass::IsRequestSupported(gqlRequest);
+}
+
+
+bool CObjectCollectionChangeNotifierComp::IsOpenFor(SubscriberKind subscriberKind, const imtgql::CGqlRequest& /*gqlRequest*/) const
+{
+	switch (subscriberKind){
+	case SK_USER:
+		return *m_isOpenToUsersAttrPtr || m_readPermissionsAttrPtr.GetCount() > 0;
+	case SK_SERVER:
+		return *m_isOpenToServersAttrPtr;
+	default:
+		return false;
+	}
+}
+
+
+bool CObjectCollectionChangeNotifierComp::RegisterSubscription(
+			const QByteArray& subscriptionId,
+			const imtgql::CGqlRequest& gqlRequest,
+			const imtrest::IRequest& networkRequest,
+			QString& errorMessage)
+{
+	if (m_readPermissionsAttrPtr.GetCount() > 0){
+		const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
+		const imtauth::IUserInfo* userInfoPtr = contextPtr != nullptr ? contextPtr->GetUserInfo() : nullptr;
+
+		bool isAllowed = false;
+		if (contextPtr != nullptr && !contextPtr->GetClientProductId().isEmpty()){
+			// The servlet has checked the server
+			isAllowed = true;
+		}
+		else if (userInfoPtr != nullptr){
+			isAllowed = userInfoPtr->IsAdmin();
+
+			const QByteArrayList heldPermissions = imtservergql::GetUserPermissions(*contextPtr) + contextPtr->GetOrganizationPermissions();
+			for (int i = 0; !isAllowed && i < m_readPermissionsAttrPtr.GetCount(); i++){
+				isAllowed = imtauth::HasPermission(heldPermissions, m_readPermissionsAttrPtr[i]);
+			}
+		}
+
+		if (!isAllowed){
+			errorMessage = QStringLiteral("The subscription '%1' is not allowed").arg(QString::fromUtf8(gqlRequest.GetCommandId()));
+
+			return false;
+		}
+	}
+
+	return BaseClass::RegisterSubscription(subscriptionId, gqlRequest, networkRequest, errorMessage);
 }
 
 

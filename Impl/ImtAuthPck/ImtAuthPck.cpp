@@ -21,6 +21,26 @@ I_EXPORT_COMPONENT(
 			"Role");
 
 I_EXPORT_COMPONENT(
+			ConnectedProduct,
+			"Catalog entry of a connected product",
+			"Connected Product");
+
+I_EXPORT_COMPONENT(
+			ProductPermissionSnapshot,
+			"Permission tree published by a product",
+			"Product Permission Snapshot");
+
+I_EXPORT_COMPONENT(
+			ConnectedProductDocumentNameProvider,
+			"Names a catalog entry after its product",
+			"Connected Product Document Name Provider");
+
+I_EXPORT_COMPONENT(
+			ConnectedProductDocumentValidator,
+			"Validator of the catalog entries of products",
+			"Connected Product Document Validator");
+
+I_EXPORT_COMPONENT(
 			RoleMetaInfoCreator,
 			"Role metainfo creator",
 			"Role Metainfo Creator");
@@ -59,6 +79,21 @@ I_EXPORT_COMPONENT(
 			OrganizationsPermissionsProvider,
 			"Organizations permissions provider",
 			"Organizations Permissions Provider");
+
+I_EXPORT_COMPONENT(
+			ProductServerPermissionsProvider,
+			"Permissions of the servers of products at this server",
+			"Product Server Permissions Provider");
+
+I_EXPORT_COMPONENT(
+			ClientProductCatalog,
+			"Products whose servers may be given a token of this server, named in the configuration",
+			"Client Product Catalog");
+
+I_EXPORT_COMPONENT(
+			ConnectedClientProductCatalog,
+			"Products whose servers may be given a token of this server: the connected products",
+			"Connected Client Product Catalog");
 
 I_EXPORT_COMPONENT(
 			CheckPermissionOr,

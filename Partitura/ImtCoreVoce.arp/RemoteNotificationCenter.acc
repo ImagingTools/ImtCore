@@ -101,6 +101,9 @@
         <Element Id="RemoteNotificationSender" PackageId="ImtNotifyGqlPck" ComponentId="RemoteNotificationSender">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ServerCredentialProvider" Type="Reference" ExportId="ServerCredentialProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

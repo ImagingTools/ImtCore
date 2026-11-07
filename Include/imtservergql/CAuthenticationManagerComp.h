@@ -4,6 +4,7 @@
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
+#include <imod/CMultiModelObserverBase.h>
 
 // Qt includes
 #include <QtCore/QHash>
@@ -20,19 +21,43 @@
 #include <imtauth/ITenantManager.h>
 #include <imtauth/ITenantMembershipManager.h>
 #include <imtlic/IProductInfo.h>
+#include <imtservergql/IProductServerRequestPolicy.h>
 
 
 namespace imtservergql
 {
 
 
-class CAuthenticationManagerComp:
-			public ilog::CLoggerComponentBase,
-			virtual public imtgql::IGqlContextCreator,
-			virtual public imtauth::IJwtSessionController
+/**
+	What the authentication knows about the tokens of servers. A base of its own: one component
+	function can hold only a limited number of static objects, and the manager reached it.
+*/
+class CServerTokenAuthenticationCompBase: public ilog::CLoggerComponentBase
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
+
+	I_BEGIN_BASE_COMPONENT(CServerTokenAuthenticationCompBase);
+		I_ASSIGN(m_serverProductIdAttrPtr, "ServerProductId", "ID of this server in the tokens of other servers. Set, it refuses a request of another product without a token of its server", false, "");
+		I_ASSIGN(m_requestPolicyCompPtr, "ProductServerRequestPolicy", "What the servers of products may send; without it they may send nothing", false, "ProductServerRequestPolicy");
+		I_ASSIGN(m_serverTokenManagerCompPtr, "ServerTokenManager", "Where the tokens this server issued for other servers are kept; without it they are checked by the personal access token manager", false, "ServerTokenManager");
+	I_END_COMPONENT;
+
+protected:
+	I_ATTR(QByteArray, m_serverProductIdAttrPtr);
+	I_REF(IProductServerRequestPolicy, m_requestPolicyCompPtr);
+	I_REF(imtauth::IPersonalAccessTokenManager, m_serverTokenManagerCompPtr);
+};
+
+
+class CAuthenticationManagerComp:
+			public CServerTokenAuthenticationCompBase,
+			virtual public imtgql::IGqlContextCreator,
+			virtual public imtauth::IJwtSessionController,
+			protected imod::CMultiModelObserverBase
+{
+public:
+	typedef CServerTokenAuthenticationCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CAuthenticationManagerComp);
 		I_REGISTER_INTERFACE(imtgql::IGqlContextCreator);
@@ -46,6 +71,7 @@ public:
 		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Memberships that give a user outside of any organization access to the organizations", false, "MembershipManager");
 		I_ASSIGN(m_invitationManagerCompPtr, "InvitationManager", "Pending invitations that give a user outside of any organization access to the organizations", false, "InvitationManager");
 		I_ASSIGN(m_productInfoCompPtr, "FeatureContainer", "Product the permissions of a request are checked against", false, "FeatureContainer");
+		I_ASSIGN(m_permissionTreeCompPtr, "PermissionTree", "Permissions whose requirements are resolved here when the server serves several products: it does not name the product of a request", false, "PermissionTree");
 		I_ASSIGN(m_patPrefixAttrPtr, "PatPrefix", "Personal Access Token prefix", false, "imt_pat_");
 		I_ASSIGN(m_maxTokenCacheSizeAttrPtr, "MaxTokenCacheSize", "Maximum number of cached tokens", false, 10000);
 		I_ASSIGN(m_tokenCacheTtlAttrPtr, "TokenCacheLifetime", "Token cache lifetime (in secs)", false, 5 * 60);
@@ -56,6 +82,9 @@ public:
 	virtual imtgql::IGqlContextUniquePtr CreateGqlContext(
 				const imtgql::IGqlContext::Headers& headers,
 				imtgql::IGqlContextCreator::ContextCreationError& error) const override;
+	virtual bool IsRevocableToken(const QByteArray& token) const override;
+	virtual ContextCreationStatus CheckToken(const QByteArray& token, QByteArrayList& scopes, QString& errorMessage) const override;
+	virtual bool CheckRequestAccess(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 	// reimplemented (imtauth::IJwtSessionController)
 	virtual bool ValidateSession(const QByteArray& sessionId) const override;
@@ -68,6 +97,14 @@ public:
 	virtual QByteArray GetTenantFromJwt(const QByteArray& jwt) const override;
 	virtual QByteArray GetSessionFromJwt(const QByteArray& jwt) const override;
 	virtual void InvalidateToken(const QByteArray& token) const override;
+
+protected:
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
+	virtual void OnComponentDestroyed() override;
+
+	// reimplemented (imod::CMultiModelObserverBase)
+	virtual void OnUpdate(imod::IModel* modelPtr, const istd::IChangeable::ChangeSet& changeSet) override;
 
 private:
 	// Organization data of a token
@@ -88,6 +125,7 @@ private:
 		QByteArrayList scopes;
 		bool isPat = false;
 		QByteArray patProductId;
+		QByteArray patClientProductId;
 		qint64 expiresAt = 0;
 
 		// Organization data of the token, resolved lazily (see TryGetCachedTenantData /
@@ -106,6 +144,19 @@ private:
 				bool& isPat,
 				QString& errorMessage,
 				imtgql::IGqlContextCreator::ContextCreationStatus& status) const;
+
+	/**
+		ResolveUserId() with the manager that checks a personal access token, so that the tokens of servers can be kept apart from the tokens of users.
+	*/
+	bool ResolveToken(
+				const QByteArray& token,
+				imtauth::IPersonalAccessTokenManager* patManagerPtr,
+				QByteArray& userId,
+				QByteArray& tenantId,
+				QByteArrayList& scopes,
+				bool& isPat,
+				QString& errorMessage,
+				imtgql::IGqlContextCreator::ContextCreationStatus& status) const;
 	bool TryGetCachedToken(
 				const QByteArray& token,
 				QByteArray& userId,
@@ -114,12 +165,24 @@ private:
 				bool& isPat) const;
 
 	/**
+		Resolve the token of the server of a product: valid, issued for this server.
+		\param[out] clientProductId	The product whose server holds the token.
+		\param[out] scopes			What the server may do here.
+	*/
+	bool ResolveServerToken(
+				const QByteArray& serverToken,
+				QByteArray& clientProductId,
+				QByteArrayList& scopes,
+				imtgql::IGqlContextCreator::ContextCreationError& error) const;
+
+	bool GetCachedPatProducts(const QByteArray& token, QByteArray& productId, QByteArray& clientProductId) const;
+
+	/**
 		Cache lookup identical to TryGetCachedToken(), except it assumes
 		m_tokenCacheMutex is already held by the caller. Used internally by
 		TryAwaitOrClaimTokenResolution() so cache-check and claim-check happen
 		under one continuous critical section.
 	*/
-	bool GetCachedPatProductId(const QByteArray& token, QByteArray& productId) const;
 	bool TryReadCachedTokenLocked(
 				const QByteArray& token,
 				QByteArray& userId,
@@ -161,7 +224,9 @@ private:
 				const QByteArrayList& scopes,
 				bool isPat,
 				qint64 jwtExpSecs = 0,
-				const QByteArray& patProductId = QByteArray()) const;
+				const QByteArray& patProductId = QByteArray(),
+				const QByteArray& patClientProductId = QByteArray(),
+				qint64 resolutionStartedAt = 0) const;
 	void StoreExpiredToken(const QByteArray& token) const;
 	void InvalidateTokenCache(const QByteArray& token) const;
 	void InvalidateSessionTokenCache(const QByteArray& sessionId) const;
@@ -228,6 +293,7 @@ private:
 	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);
 	I_REF(imtauth::ITenantInvitationManager, m_invitationManagerCompPtr);
 	I_REF(imtlic::IProductInfo, m_productInfoCompPtr);
+	I_REF(imtlic::IProductInfo, m_permissionTreeCompPtr);
 	I_ATTR(QByteArray, m_patPrefixAttrPtr);
 	I_ATTR(int, m_maxTokenCacheSizeAttrPtr);
 	I_ATTR(int, m_tokenCacheTtlAttrPtr);
@@ -242,6 +308,9 @@ private:
 	// m_tokenCacheMutex so an in-flight validation/refresh cannot restore a
 	// revoked session's token after InvalidateSessionTokenCache() swept it.
 	mutable QHash<QByteArray, qint64> m_revokedSessionIds;
+
+	// The same for personal access tokens: when the token managers last changed; a validation started before is not cached
+	mutable qint64 m_lastTokenChangeAt = 0;
 
 	// Tokens currently being resolved by some thread via ResolveUserId(), so
 	// concurrent callers for the same token can wait for that result instead

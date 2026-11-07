@@ -18,6 +18,7 @@
 #include <imtservergql/CGqlContextControllerComp.h>
 #include <imtservergql/CObjectProviderComp.h>
 #include <imtservergql/CWebSocketServletComp.h>
+#include <imtservergql/CProductServerRequestPolicyComp.h>
 #include <imtservergql/CCollectionObjectProviderComp.h>
 #include <imtservergql/COperationContextControllerComp.h>
 #include <imtservergql/CObjectCollectionChangeNotifierComp.h>
@@ -59,6 +60,7 @@ namespace ImtServerGqlPck
 
 typedef imtservergql::CHttpGraphQLServletComp GraphQLServlet;
 typedef imtservergql::CWebSocketServletComp WebSocketServlet;
+typedef imtservergql::CProductServerRequestPolicyComp ProductServerRequestPolicy;
 typedef imtservergql::CGqlDemultiplexerComp GraphQLDemultiplexer;
 typedef imtservergql::CGqlRepresentationDataControllerComp GqlRepresentationDataController;
 typedef imtservergql::CUserSettingsControllerComp UserSettingsController;

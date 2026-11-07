@@ -19,7 +19,7 @@ bool CSqlDatabaseDocumentDelegateComp::WriteDataToMemory(const QByteArray& /*typ
 		return false;
 	}
 
-	iser::CJsonMemWriteArchive archive(m_versionInfoCompPtr.GetPtr());
+	iser::CJsonMemWriteArchive archive(m_versionInfoCompPtr.GetPtr(), IsHeaderSerialized());
 	if (!serializableObjectPtr->Serialize(archive)){
 		SendErrorMessage(0, "Unable to write data to memory. Error: Serialization failed", "CSqlDatabaseDocumentDelegateComp");
 		return false;
@@ -39,13 +39,21 @@ bool CSqlDatabaseDocumentDelegateComp::ReadDataFromMemory(const QByteArray& /*ty
 		return false;
 	}
 
-	iser::CJsonMemReadArchive archive(data);
+	iser::CJsonMemReadArchive archive(data, IsHeaderSerialized());
 	if (!serializableObjectPtr->Serialize(archive)){
 		SendErrorMessage(0, "Unable to read data from memory. Error: Serialization failed", "CSqlDatabaseDocumentDelegateComp");
 		return false;
 	}
 
 	return true;
+}
+
+
+// private methods
+
+bool CSqlDatabaseDocumentDelegateComp::IsHeaderSerialized() const
+{
+	return !m_serializeHeaderAttrPtr.IsValid() || *m_serializeHeaderAttrPtr;
 }
 
 

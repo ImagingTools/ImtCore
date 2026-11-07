@@ -16,6 +16,7 @@
 #include <imtbase/IOperationContextController.h>
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtservergql/CPermissibleGqlRequestHandlerComp.h>
+#include <imtservergql/IObjectChangeChecker.h>
 #include <imtgql/IGqlRequestExtractor.h>
 #include <imtbase/IComplexCollectionFilter.h>
 #include <imtbase/CMimeType.h>
@@ -40,7 +41,7 @@ namespace imtservergql
 {
 
 
-class CObjectCollectionControllerAttrCompBase: 
+class CObjectCollectionControllerAttrCompBase:
 			virtual public imtgql::IGqlRequestExtractor,
 			virtual public imtbase::ISearchController,
 			public sdl::V1_0::imtbase::CImtCollectionGqlHandlerCompBase
@@ -63,12 +64,15 @@ protected:
 };
 
 
-class CObjectCollectionControllerCompBase: public CObjectCollectionControllerAttrCompBase
+class CObjectCollectionControllerCompBase:
+			public CObjectCollectionControllerAttrCompBase,
+			virtual public IObjectChangeChecker
 {
 public:
 	typedef CObjectCollectionControllerAttrCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CObjectCollectionControllerCompBase);
+		I_REGISTER_INTERFACE(IObjectChangeChecker);
 		I_ASSIGN_MULTI_0(m_replaceableFieldsAttrPtr, "ReplaceableFilterFields", "List of filter fields to be replaced", false);
 		I_ASSIGN_MULTI_0(m_replacementFieldsAttrPtr, "ReplacementFilterFields", "List of filter fields to replace with", false);
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
@@ -207,6 +211,13 @@ public:
 	// reimplemented (imtservergql::CGqlRequestHandlerCompBase)
 	virtual QJsonObject CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
+
+	// reimplemented (IObjectChangeChecker)
+	virtual bool CheckObjectChange(
+				const imtgql::CGqlRequest& gqlRequest,
+				const QByteArray& objectId,
+				const istd::IChangeable* dataPtr,
+				QString& errorMessage) const override;
 
 	// reimplemented (imtgql::IGqlRequestExtractor)
 	virtual istd::IChangeableUniquePtr ExtractObject(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& errorMessage) const override;

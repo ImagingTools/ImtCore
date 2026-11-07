@@ -82,6 +82,12 @@
         <Element Id="WebSocketServlet" PackageId="ImtServerGqlPck" ComponentId="WebSocketServlet">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="DenyUndeclaredUserSubscriptions" Type="Boolean" ExportId="DenyUndeclaredUserSubscriptions">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DenyAnonymousSubscriptions" Type="Boolean" ExportId="DenyAnonymousSubscriptions">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="GqlContextCreator" Type="Reference" ExportId="AuthenticationManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -89,6 +95,12 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="WebSocketServer"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TokenCheckInterval" Type="Integer" ExportId="TokenCheckInterval">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">

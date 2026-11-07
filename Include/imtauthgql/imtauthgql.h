@@ -14,6 +14,7 @@
 #include <imtauth/IDelegatedAccess.h>
 #include <imtauth/ITenantMembershipManager.h>
 #include <imtauth/IRoleInfoProvider.h>
+#include <imtauth/CProductPermissionSnapshot.h>
 #include <istd/IChangeable.h>
 #include <imtauth/ICrossTenantMessage.h>
 #include <imtauth/IOrderRequest.h>
@@ -30,6 +31,8 @@
 
 
 // Qt includes
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
 #include <QtCore/QSet>
 #include <QtCore/QByteArrayList>
 #include <imtauth/IUserInfo.h>
@@ -913,6 +916,60 @@ inline void BuildPermissionGroupsFromProvider(
 
 
 /**
+	Read the permission tree a product published. A product that has not published has an empty tree.
+	\return false if the stored tree could not be read.
+*/
+inline bool ReadPublishedPermissionTree(
+			const imtbase::IObjectCollection& snapshotCollection,
+			const QByteArray& productId,
+			sdl::V1_0::imtauth::CPermissionTree& tree)
+{
+	tree = sdl::V1_0::imtauth::CPermissionTree();
+
+	bool isRead = false;
+	const QByteArray snapshotId = imtauth::FindProductPermissionSnapshot(snapshotCollection, productId, &isRead);
+	if (!isRead){
+		return false;
+	}
+
+	if (snapshotId.isEmpty()){
+		return true;
+	}
+
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	const imtauth::CProductPermissionSnapshot* snapshotPtr = snapshotCollection.GetObjectData(snapshotId, dataPtr)
+				? dynamic_cast<const imtauth::CProductPermissionSnapshot*>(dataPtr.GetPtr())
+				: nullptr;
+
+	return snapshotPtr != nullptr && tree.ReadFromJsonObject(QJsonDocument::fromJson(snapshotPtr->GetTree()).object());
+}
+
+
+/**
+	Copy a feature with its sub-features as a feature of the SDL type TFeature.
+*/
+template<typename TFeature>
+inline void CopyFeature(const imtlic::IFeatureInfo& featureInfo, TFeature& feature)
+{
+	feature.featureId = featureInfo.GetFeatureId();
+	feature.name = featureInfo.GetFeatureName();
+	feature.description = featureInfo.GetFeatureDescription();
+	feature.requirements.Emplace().FromList(featureInfo.GetRequirements());
+
+	imtsdl::TElementList<TFeature> subFeatures;
+	for (const imtlic::IFeatureInfo::FeatureInfoPtr& subFeaturePtr : featureInfo.GetSubFeatures()){
+		if (subFeaturePtr.IsValid()){
+			TFeature subFeature;
+			CopyFeature<TFeature>(*subFeaturePtr, subFeature);
+			subFeatures.append(subFeature);
+		}
+	}
+
+	feature.subFeatures = subFeatures;
+}
+
+
+/**
 	Add to held permissions what they imply through the feature requirements of the product,
 	with the paths each one is required through, and give them the display names of the product.
 	\param availablePermissions Permissions the organization may hold; empty sets no limit.
@@ -1017,6 +1074,16 @@ inline bool IsSuperuserRequest(const imtgql::CGqlRequest& gqlRequest)
 
 	return (contextUserInfoPtr != nullptr) && contextUserInfoPtr->IsAdmin();
 }
+
+
+/**
+	The superuser in a session of its own: a personal token of the superuser must not manage the identities of servers.
+*/
+inline bool IsSuperuserSessionRequest(const imtgql::CGqlRequest& gqlRequest)
+{
+	return IsSuperuserRequest(gqlRequest) && !gqlRequest.GetRequestContext()->GetToken().startsWith(QByteArrayLiteral("imt_pat_"));
+}
+
 
 /**
 	Adapts (filters) the roles, groups and permissions of a user according to the
@@ -1780,6 +1847,135 @@ inline bool CheckGrantedPermissions(
 	}
 
 	return true;
+}
+
+
+/**
+	Check a change of the account of a user, which acts in all products: the caller needs the permission
+	in every product where the user has a role. One's own account and the inside of an organization are not bound.
+*/
+inline bool CheckSharedUserChange(
+			const imtgql::IGqlContext* gqlContextPtr,
+			const QByteArray& userId,
+			const imtauth::IUserBaseInfo& user,
+			const QByteArray& permission,
+			QString& errorMessage)
+{
+	const imtauth::IUserInfo* callerPtr = gqlContextPtr != nullptr ? gqlContextPtr->GetUserInfo() : nullptr;
+	if (callerPtr == nullptr || callerPtr->IsAdmin() || gqlContextPtr->GetUserId() == userId || !gqlContextPtr->GetTenantId().isEmpty()){
+		return true;
+	}
+
+	for (const QByteArray& productId : user.GetProducts()){
+		if (!imtauth::HasPermission(callerPtr->GetPermissions(productId), permission)){
+			errorMessage = QStringLiteral("The user also works in the product '%1', where you may not change it").arg(QString::fromUtf8(productId));
+
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+/**
+	Check what joining a group gives in the other products: the caller has to hold it there.
+*/
+inline bool CheckGroupGrantsInOtherProducts(
+			const imtgql::IGqlContext* gqlContextPtr,
+			const imtauth::IUserGroupInfo& group,
+			QString& errorMessage)
+{
+	const imtauth::IUserInfo* callerPtr = gqlContextPtr != nullptr ? gqlContextPtr->GetUserInfo() : nullptr;
+	if (callerPtr == nullptr || callerPtr->IsAdmin() || !gqlContextPtr->GetTenantId().isEmpty()){
+		return true;
+	}
+
+	for (const QByteArray& productId : group.GetProducts()){
+		if (productId == gqlContextPtr->GetProductId()){
+			continue;
+		}
+
+		const QByteArrayList heldPermissions = callerPtr->GetPermissions(productId);
+		for (const QByteArray& permission : group.GetPermissions(productId)){
+			if (!imtauth::HasPermission(heldPermissions, permission)){
+				errorMessage = QStringLiteral("The group gives permissions in the product '%1' that you do not hold").arg(QString::fromUtf8(productId));
+
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
+
+static const inline QByteArray s_changeUserPermission = QByteArrayLiteral("/Administration/Users/Edit/Change");
+
+
+/**
+	Check a change of the account of a stored user, the same for each way of storing a user.
+*/
+inline bool CheckUserAccountChange(
+			const imtgql::IGqlContext* gqlContextPtr,
+			const QByteArray& userId,
+			const imtauth::IUserInfo& previous,
+			const imtauth::IUserInfo& current,
+			QString& errorMessage)
+{
+	const bool isChanged = previous.GetId() != current.GetId() || previous.GetName() != current.GetName() || previous.GetMail() != current.GetMail()
+				|| previous.IsEnabled() != current.IsEnabled() || previous.GetPasswordHash() != current.GetPasswordHash();
+
+	return !isChanged || CheckSharedUserChange(gqlContextPtr, userId, previous, s_changeUserPermission, errorMessage);
+}
+
+
+/**
+	Check what the groups a user joins give in the other products.
+	\param groupProviderPtr Reads the joined groups.
+*/
+inline bool CheckJoinedUserGroups(
+			const imtgql::IGqlContext* gqlContextPtr,
+			const imtauth::IUserGroupInfoProvider* groupProviderPtr,
+			const QByteArrayList& previousGroups,
+			const QByteArrayList& groups,
+			QString& errorMessage)
+{
+	const QSet<QByteArray> previousSet(previousGroups.cbegin(), previousGroups.cend());
+	for (const QByteArray& groupId : groups){
+		if (previousSet.contains(groupId)){
+			continue;
+		}
+
+		const imtauth::IUserGroupInfoSharedPtr groupPtr = groupProviderPtr != nullptr ? groupProviderPtr->GetUserGroup(groupId) : imtauth::IUserGroupInfoSharedPtr();
+		if (!groupPtr.IsValid()){
+			errorMessage = QStringLiteral("Unable to read the group '%1'").arg(QString::fromUtf8(groupId));
+
+			return false;
+		}
+
+		if (!CheckGroupGrantsInOtherProducts(gqlContextPtr, *groupPtr, errorMessage)){
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+/**
+	Tell whether the group gets members it did not have: they receive all its permissions.
+*/
+inline bool HasNewGroupMembers(const QByteArrayList& previousUsers, const QByteArrayList& users)
+{
+	const QSet<QByteArray> previousSet(previousUsers.cbegin(), previousUsers.cend());
+	for (const QByteArray& userId : users){
+		if (!previousSet.contains(userId)){
+			return true;
+		}
+	}
+
+	return false;
 }
 
 

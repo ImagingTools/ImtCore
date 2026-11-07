@@ -3,6 +3,7 @@
 
 
 // Qt includes
+#include <QtCore/QSet>
 #include <QtCore/QString>
 
 // ImtCore includes
