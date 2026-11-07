@@ -22,6 +22,9 @@ import imtbaseFileSystemSdl 1.0
 Dialog {
 	id: root
 
+	// The keyboard drives the listing from the start; without it the keys reach the page under the dialog
+	forceFocus: true
+
 	property string permissionPath: ""
 	title: root.computeTitle()
 	width: Math.max(Style.sizeHintXXL, Math.min(ModalDialogManager.activeView.width - 100, 1000))
@@ -97,6 +100,8 @@ Dialog {
 	// True while the name filter field has focus — suppresses Enter→activate so
 	// typing a filter does not open the highlighted row.
 	property bool filterFieldFocused: false
+	// The filter field lives in contentComp, whose ids are not visible here
+	property Item filterFieldItem: null
 	// Set when the filter changes while a request is in flight; applied after load.
 	property bool __pendingFilterRefresh: false
 	// Set for a same-folder reload (sort / filter / refresh): keep the current
@@ -781,7 +786,24 @@ Dialog {
 
 	// Keyboard model mirrors BasicTreeView: arrows move, Enter opens/confirms,
 	// Backspace goes up, Home/End jump, Space toggles in multi-select.
+	function focusFilterField(){
+		if (root.filterFieldItem){
+			root.filterFieldItem.forceInputFocus()
+		}
+	}
+
 	function handleKey(event){
+		// Tab moves between the listing and the filter and never leaves the dialog
+		if (event.key === Qt.Key_Tab || event.key === Qt.Key_Backtab){
+			if (root.filterFieldFocused){
+				root.forceActiveFocus()
+			}
+			else{
+				root.focusFilterField()
+			}
+
+			return true
+		}
 		if (root.filterFieldFocused){
 			// Leave typing keys to the filter field; only Backspace for "up" is
 			// suppressed while the field is empty (field uses Backspace itself).
@@ -983,7 +1005,7 @@ Dialog {
 	Shortcut {
 		sequence: "Ctrl+F"
 		context: Qt.ApplicationShortcut
-		onActivated: filterField.forceActiveFocus()
+		onActivated: root.focusFilterField()
 	}
 
 	onFinished: {
@@ -1013,8 +1035,11 @@ Dialog {
 				target: root
 
 				function onRevealIndexChanged(){
-					if (root.revealIndex >= 0)
+					if (root.revealIndex >= 0){
+						// The rows of a listing loaded in this pass are not laid out yet
+						entriesView.forceLayout()
 						entriesView.positionViewAtIndex(root.revealIndex, ListView.Center)
+					}
 				}
 			}
 
@@ -1110,6 +1135,10 @@ Dialog {
 					color: Style.baseColor
 					borderWidth: filterField.textInputActiveFocus ? 1 : 0
 					placeHolderText: qsTr("Search %1").arg(root.currentFolderName())
+
+					Component.onCompleted: {
+						root.filterFieldItem = filterField
+					}
 
 					// Debounced re-query so each keystroke does not hit the agent.
 					onSearchChanged: {
@@ -1426,7 +1455,7 @@ Dialog {
 										width: Math.max(0, parent.width - entryIcon.width - parent.spacing)
 										anchors.verticalCenter: parent.verticalCenter
 										text: model.name
-										color: rowRoot.rowSelected ? Style.textSelectedColor : Style.textColor
+										color: Style.textColor
 										font.pixelSize: Style.fontSizeM
 										font.bold: model.isDir
 										elide: Text.ElideRight
@@ -1443,7 +1472,7 @@ Dialog {
 								horizontalAlignment: root.atDrivesRoot ? Text.AlignRight : Text.AlignLeft
 								verticalAlignment: Text.AlignVCenter
 								text: root.atDrivesRoot ? model.freeText : model.dateText
-								color: rowRoot.rowSelected ? Style.textSelectedColor : Style.textColor
+								color: Style.textColor
 								opacity: 0.75
 								font.pixelSize: Style.fontSizeS
 								elide: Text.ElideRight
@@ -1456,7 +1485,7 @@ Dialog {
 								horizontalAlignment: Text.AlignRight
 								verticalAlignment: Text.AlignVCenter
 								text: root.atDrivesRoot ? model.totalText : model.sizeText
-								color: rowRoot.rowSelected ? Style.textSelectedColor : Style.textColor
+								color: Style.textColor
 								opacity: 0.75
 								font.pixelSize: Style.fontSizeS
 							}
