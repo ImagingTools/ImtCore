@@ -289,6 +289,7 @@ void CWebSocketClientComp::OnWebSocketConnected()
 	}
 
 	SetState(ST_CONNECTED);
+	m_isRetrying = false;
 
 	SendInfoMessage(0, "WebSocket connected", "CWebSocketClientComp");
 
@@ -316,7 +317,13 @@ void CWebSocketClientComp::OnWebSocketConnected()
 
 void CWebSocketClientComp::OnWebSocketDisconnected()
 {
-	SendInfoMessage(0, "WebSocket disconnected", "CWebSocketClientComp");
+	if (m_state != ST_CONNECTING){
+		SendInfoMessage(0, "WebSocket disconnected", "CWebSocketClientComp");
+	}
+	else if (!m_isRetrying){
+		SendInfoMessage(0, QStringLiteral("WebSocket server is unavailable, retrying every %1 s").arg(m_refreshTimer.interval() / 1000), "CWebSocketClientComp");
+		m_isRetrying = true;
+	}
 
 	m_connectionStatusProvider.SetConnectionStatus(imtcom::IConnectionStatusProvider::CS_DISCONNECTED);
 	m_startQueries.Reset();
@@ -537,7 +544,9 @@ void CWebSocketClientComp::EnsureWebSocketConnection()
 		}
 	}
 
-	SendInfoMessage(0, QStringLiteral("Try connect to the WebSocket-server: Host: %1; Port: %2, Protocol: %3").arg(url.host(), QString::number(url.port()), url.scheme()));
+	if (!m_isRetrying){
+		SendInfoMessage(0, QStringLiteral("Try connect to the WebSocket-server: Host: %1; Port: %2, Protocol: %3").arg(url.host(), QString::number(url.port()), url.scheme()));
+	}
 
 #if QT_VERSION >= QT_VERSION_CHECK(6,4,0)
 	QWebSocketHandshakeOptions handshakeOptions;
@@ -574,6 +583,7 @@ void CWebSocketClientComp::OpenConnection()
 
 	// open() rejects an invalid URL synchronously and emits no disconnected()
 	if (m_webSocket.state() == QAbstractSocket::UnconnectedState){
+		m_isRetrying = true;
 		SetState(ST_WAITING_RETRY);
 		m_refreshTimer.start();
 	}
@@ -640,6 +650,9 @@ void CWebSocketClientComp::ProcessDisconnectRequest()
 void CWebSocketClientComp::ProcessSettingsChanged()
 {
 	Q_ASSERT(QThread::currentThread() == thread());
+
+	// A new server deserves its own first attempt in the log
+	m_isRetrying = false;
 
 	switch (m_state){
 	case ST_CONNECTING:
