@@ -631,7 +631,37 @@ bool CAuthenticationManagerComp::ResolveUserId(
 			QString& errorMessage,
 			imtgql::IGqlContextCreator::ContextCreationStatus& status) const
 {
-	return ResolveToken(token, m_patManagerCompPtr.GetPtr(), userId, tenantId, scopes, isPat, errorMessage, status);
+	if (!m_serverTokenManagerCompPtr.IsValid() || !IsPatToken(token)){
+		return ResolveToken(token, m_patManagerCompPtr.GetPtr(), userId, tenantId, scopes, isPat, errorMessage, status);
+	}
+
+	// A server sends the token this server issued for it also as its own token (its subscriptions, its service info)
+	if (ResolveToken(token, m_serverTokenManagerCompPtr.GetPtr(), userId, tenantId, scopes, isPat, errorMessage, status)){
+		return true;
+	}
+
+	if (status == imtgql::IGqlContextCreator::CCS_INTERNAL_ERROR){
+		return false;
+	}
+
+	// Otherwise a personal token of a user. A token of a server issued elsewhere is no identity here
+	errorMessage.clear();
+	status = imtgql::IGqlContextCreator::CCS_OK;
+	if (!ResolveToken(token, m_patManagerCompPtr.GetPtr(), userId, tenantId, scopes, isPat, errorMessage, status)){
+		return false;
+	}
+
+	QByteArray tokenProductId;
+	QByteArray tokenClientProductId;
+	if (GetCachedPatProducts(token, tokenProductId, tokenClientProductId) && !tokenClientProductId.isEmpty()){
+		InvalidateTokenCache(token);
+		errorMessage = QStringLiteral("The token of the server is not issued by this server.");
+		status = imtgql::IGqlContextCreator::CCS_FORBIDDEN;
+
+		return false;
+	}
+
+	return true;
 }
 
 
@@ -1017,6 +1047,26 @@ imtgql::IGqlContextCreator::ContextCreationStatus CAuthenticationManagerComp::Ch
 	ContextCreationStatus status = CCS_OK;
 	if (!ResolveUserId(token, userId, tenantId, scopes, isPat, errorMessage, status)){
 		return status;
+	}
+
+	return CCS_OK;
+}
+
+
+imtgql::IGqlContextCreator::ContextCreationStatus CAuthenticationManagerComp::CheckServerToken(const QByteArray& token, QByteArrayList& scopes, QString& errorMessage) const
+{
+	if (!m_serverProductIdAttrPtr.IsValid()){
+		errorMessage = QStringLiteral("This server takes no tokens of servers.");
+
+		return CCS_FORBIDDEN;
+	}
+
+	QByteArray clientProductId;
+	ContextCreationError error;
+	if (!ResolveServerToken(token, clientProductId, scopes, error)){
+		errorMessage = error.message;
+
+		return error.status;
 	}
 
 	return CCS_OK;

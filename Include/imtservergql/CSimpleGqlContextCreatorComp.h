@@ -38,6 +38,7 @@ public:
 				imtgql::IGqlContextCreator::ContextCreationError& error) const override;
 	virtual bool IsRevocableToken(const QByteArray& token) const override;
 	virtual ContextCreationStatus CheckToken(const QByteArray& token, QByteArrayList& scopes, QString& errorMessage) const override;
+	virtual ContextCreationStatus CheckServerToken(const QByteArray& token, QByteArrayList& scopes, QString& errorMessage) const override;
 	virtual bool CheckRequestAccess(const imtgql::CGqlRequest& gqlRequest, QByteArray& requiredPermission, QString& errorMessage) const override;
 
 private:

@@ -79,6 +79,8 @@ private:
 		QByteArray subscriptionId;
 		imtgql::IGqlSubscriberController* controllerPtr = nullptr;
 		QByteArray token;
+		// The token is the one of a server (x-server-token), checked where this server keeps such tokens
+		bool isServerToken = false;
 		QByteArray requiredPermission; // of the token of a server
 		const imtrest::IRequest* requestPtr = nullptr;
 

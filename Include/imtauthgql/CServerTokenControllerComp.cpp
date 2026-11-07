@@ -261,24 +261,16 @@ sdl::V1_0::imtauth::CServerFeatureList CServerTokenControllerComp::OnGetServerTo
 		return response;
 	}
 
-	imtbase::IObjectCollection* featureCollectionPtr = m_permissionTreeCompPtr->GetFeatures();
-	if (featureCollectionPtr == nullptr){
+	auto& features = response.features.Emplace();
+	const bool hasTree = VisitTreeFeatures([&features](const QByteArray& /*featureId*/, const imtlic::IFeatureInfo& featureInfo){
+		sdl::V1_0::imtauth::CServerFeature feature;
+		CopyFeature<sdl::V1_0::imtauth::CServerFeature>(featureInfo, feature);
+		features.append(feature);
+	});
+	if (!hasTree){
 		errorMessage = QStringLiteral("This server has no permission tree");
 
-		return response;
-	}
-
-	auto& features = response.features.Emplace();
-	for (const imtbase::ICollectionInfo::Id& elementId : featureCollectionPtr->GetElementIds()){
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		const imtlic::IFeatureInfo* featureInfoPtr = featureCollectionPtr->GetObjectData(elementId, dataPtr)
-					? dynamic_cast<const imtlic::IFeatureInfo*>(dataPtr.GetPtr())
-					: nullptr;
-		if (featureInfoPtr != nullptr){
-			sdl::V1_0::imtauth::CServerFeature feature;
-			CopyFeature<sdl::V1_0::imtauth::CServerFeature>(*featureInfoPtr, feature);
-			features.append(feature);
-		}
+		return sdl::V1_0::imtauth::CServerFeatureList();
 	}
 
 	return response;
@@ -415,9 +407,15 @@ void CServerTokenControllerComp::AddTokenFeatures(imtlic::IProductInfo& tree) co
 		return;
 	}
 
+	VisitTreeFeatures(addFeature);
+}
+
+
+bool CServerTokenControllerComp::VisitTreeFeatures(const std::function<void(const QByteArray&, const imtlic::IFeatureInfo&)>& visitor) const
+{
 	imtbase::IObjectCollection* featureCollectionPtr = m_permissionTreeCompPtr->GetFeatures();
 	if (featureCollectionPtr == nullptr){
-		return;
+		return false;
 	}
 
 	for (const imtbase::ICollectionInfo::Id& featureId : featureCollectionPtr->GetElementIds()){
@@ -426,9 +424,11 @@ void CServerTokenControllerComp::AddTokenFeatures(imtlic::IProductInfo& tree) co
 					? dynamic_cast<const imtlic::IFeatureInfo*>(dataPtr.GetPtr())
 					: nullptr;
 		if (featureInfoPtr != nullptr){
-			addFeature(featureId, *featureInfoPtr);
+			visitor(featureId, *featureInfoPtr);
 		}
 	}
+
+	return true;
 }
 
 

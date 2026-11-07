@@ -2,6 +2,9 @@
 #pragma once
 
 
+// STL includes
+#include <functional>
+
 // ImtCore includes
 #include <imtauth/IClientProductCatalog.h>
 #include <imtauth/IPersonalAccessTokenManager.h>
@@ -87,6 +90,12 @@ private:
 		The roots of the tree a token is given from, as identifiable features.
 	*/
 	void AddTokenFeatures(imtlic::IProductInfo& tree) const;
+
+	/**
+		Calls the visitor for each root of the permission tree of this server.
+		eturn false if this server has no permission tree.
+	*/
+	bool VisitTreeFeatures(const std::function<void(const QByteArray&, const imtlic::IFeatureInfo&)>& visitor) const;
 
 private:
 	I_REF(imtauth::IPersonalAccessTokenManager, m_tokenManagerCompPtr);

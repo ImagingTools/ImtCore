@@ -25,7 +25,7 @@ Operator (Agentino or the Puma console)        Receiving server (Puma, Lisa, ...
 | Allowed clients | `imtauth::IClientProductCatalog` | `ClientProductCatalog` names them in the configuration; `ConnectedClientProductCatalog` takes the connected products (Puma). |
 | Permissions of a token | `ProductServerPermissions` of the controller | A dedicated tree (Puma: `/ProductServer/...`). Without it, the permission tree of the server itself. |
 | Token storage | `ImtAuthVoce/PersonalAccessTokenStore` | The `PersonalAccessTokens` table of the server (created automatically). |
-| Check of a request | `imtservergql::CAuthenticationManagerComp` | `ServerProductId` refuses another product without a token; `ServerTokenManager` is where the tokens of this server are checked. |
+| Check of a request | `imtservergql::CAuthenticationManagerComp` | `ServerProductId` refuses another product without a token; `ServerTokenManager` is where the tokens of this server are checked, for requests and for the periodic check of subscriptions (`CheckServerToken`). With a separate `ServerTokenManager`, a token of a server is accepted only in `x-server-token`. |
 | What a client may send | `ProductServerRequestPolicy` | Every command or collection a client may call, with the permission it needs. Anything not declared is refused. |
 
 `ImtAuthVoce/ServerTokenReceiver` puts the controller, the client catalog and the token store together.
@@ -77,5 +77,7 @@ The tokens are still issued and kept by the product.
 ## Known limitations
 
 - A token has no expiration: it would stop a working server. Replace it by issuing a new one.
+- Without `ProductServerPermissions` a token may be given any permission of the tree of the server, `Edit` ones included.
+  Only `ProductServerRequestPolicy` limits what a client really does, so declare there only what the clients need.
 - The receiver checks requests that carry a token or a foreign `x-product-id` with a user session.
   A command the receiver serves without any authentication stays open; the policy does not close it.

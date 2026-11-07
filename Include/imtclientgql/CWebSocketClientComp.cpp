@@ -365,8 +365,11 @@ void CWebSocketClientComp::OnWebSocketError(QAbstractSocket::SocketError error)
 
 void CWebSocketClientComp::OnSslErrors(const QList<QSslError>& sslErrors)
 {
-	for (const QSslError& error : sslErrors){
-		SendErrorMessage(0, QStringLiteral("SSL client error: %1").arg(error.errorString()));
+	// A retry meets the same errors again
+	if (!m_isRetrying){
+		for (const QSslError& error : sslErrors){
+			SendErrorMessage(0, QStringLiteral("SSL client error: %1").arg(error.errorString()));
+		}
 	}
 
 	m_webSocket.ignoreSslErrors(sslErrors);
@@ -583,6 +586,9 @@ void CWebSocketClientComp::OpenConnection()
 
 	// open() rejects an invalid URL synchronously and emits no disconnected()
 	if (m_webSocket.state() == QAbstractSocket::UnconnectedState){
+		if (!m_isRetrying){
+			SendErrorMessage(0, QStringLiteral("The address of the WebSocket server is not valid, retrying every %1 s").arg(m_refreshTimer.interval() / 1000), "CWebSocketClientComp");
+		}
 		m_isRetrying = true;
 		SetState(ST_WAITING_RETRY);
 		m_refreshTimer.start();
@@ -618,6 +624,9 @@ void CWebSocketClientComp::ProcessConnectRequest()
 
 void CWebSocketClientComp::ProcessDisconnectRequest()
 {
+	// The next connection reports its first attempt again
+	m_isRetrying = false;
+
 	switch (m_state){
 	case ST_CONNECTING:
 		SetState(ST_DISCONNECTING);

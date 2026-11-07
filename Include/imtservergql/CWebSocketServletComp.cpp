@@ -304,7 +304,8 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 			// A subscription forwarded by the server of a product lives as long as the token of that server.
 			const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
 			QByteArray token = gqlHeaders.value(imtbase::s_authenticationTokenHeaderId);
-			if (contextPtr != nullptr && !contextPtr->GetServerProductId().isEmpty() && contextPtr->GetClientProductId().isEmpty()){
+			const bool isServerToken = contextPtr != nullptr && !contextPtr->GetServerProductId().isEmpty() && contextPtr->GetClientProductId().isEmpty();
+			if (isServerToken){
 				token = gqlHeaders.value(imtbase::s_serverTokenHeaderId);
 			}
 
@@ -313,6 +314,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 				subscription.subscriptionId = subscriptionId;
 				subscription.controllerPtr = subscriberControllerPtr;
 				subscription.token = token;
+				subscription.isServerToken = isServerToken;
 				subscription.requiredPermission = requiredPermission;
 				subscription.requestPtr = &request;
 				subscription.connectionPtr = webSocketRequest->parent();
@@ -552,7 +554,9 @@ void CWebSocketServletComp::CheckTokenSubscriptions() const
 		for (const QByteArray& token : tokens){
 			QString errorMessage;
 			QByteArrayList scopes;
-			const imtgql::IGqlContextCreator::ContextCreationStatus status = m_gqlContextCreatorCompPtr->CheckToken(token, scopes, errorMessage);
+			const imtgql::IGqlContextCreator::ContextCreationStatus status = subscriptionsOfTokens.value(token).isServerToken
+						? m_gqlContextCreatorCompPtr->CheckServerToken(token, scopes, errorMessage)
+						: m_gqlContextCreatorCompPtr->CheckToken(token, scopes, errorMessage);
 
 			// A token that could not be checked is kept: a restart of the authorization server must not end subscriptions
 			if (status == imtgql::IGqlContextCreator::CCS_INTERNAL_ERROR){
