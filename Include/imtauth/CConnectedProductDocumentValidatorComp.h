@@ -7,31 +7,11 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
-#include <imtdoc/IDocumentNameProvider.h>
 #include <imtdoc/IDocumentValidator.h>
 
 
 namespace imtauth
 {
-
-
-/**
-	The name of a catalog entry is the name of its product.
-*/
-class CConnectedProductDocumentNameProviderComp:
-			public icomp::CComponentBase,
-			virtual public imtdoc::IDocumentNameProvider
-{
-public:
-	typedef icomp::CComponentBase BaseClass;
-
-	I_BEGIN_COMPONENT(CConnectedProductDocumentNameProviderComp)
-		I_REGISTER_INTERFACE(imtdoc::IDocumentNameProvider);
-	I_END_COMPONENT
-
-	// reimplemented (imtdoc::IDocumentNameProvider)
-	virtual QString GetDefaultDocumentName(const istd::IChangeable& document, const iprm::IParamsSet* nameParams = nullptr) const override;
-};
 
 
 /**

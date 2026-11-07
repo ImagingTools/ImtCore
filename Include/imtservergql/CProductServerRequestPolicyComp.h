@@ -35,7 +35,7 @@ public:
 		I_ASSIGN_MULTI_0(m_collectionEditPermissionsAttrPtr, "CollectionEditPermissions", "Permission to edit each collection, in the order of CollectionIds", false);
 		I_ASSIGN_MULTI_0(m_viewCommandIdsAttrPtr, "ViewCommandIds", "Mutations of a collection that only read it, e.g. opening a document", false);
 		I_ASSIGN_MULTI_0(m_objectReadCommandIdsAttrPtr, "ObjectReadCommandIds", "Commands of a collection reading one object of it", false);
-		I_ASSIGN_MULTI_0(m_collectionObjectReadPermissionsAttrPtr, "CollectionObjectReadPermissions", "Permission to read one object of each collection, in the order of CollectionIds", false);
+		I_ASSIGN_MULTI_0(m_collectionObjectReadPermissionsAttrPtr, "CollectionObjectReadPermissions", "Permission to read one object of each collection, in the order of CollectionIds; without one the view permission of the collection is needed", false);
 	I_END_COMPONENT;
 
 	// reimplemented (IProductServerRequestPolicy)

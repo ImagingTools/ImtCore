@@ -189,15 +189,6 @@ inline QByteArrayList RestrictPermissions(const QByteArrayList& permissions, con
 
 
 /**
-	Permissions of a server token for what the server of a product does on its own behalf at the authorization server.
-	Their tree is CProductServerPermissionsProviderComp; the other permissions of a token come from the tree of its receiver.
-*/
-static const inline QByteArray s_productServerSignInPermission = QByteArrayLiteral("/ProductServer/SignIn");
-static const inline QByteArray s_productServerPublishPermissionsPermission = QByteArrayLiteral("/ProductServer/PublishPermissions");
-static const inline QByteArray s_productServerSendNotificationsPermission = QByteArrayLiteral("/ProductServer/Notifications/Send");
-
-
-/**
 	ID of the filter parameter (iprm::IIdParam) that selects the roles of one product.
 */
 static const inline QByteArray s_roleProductFilterId = QByteArrayLiteral("RoleProductFilter");

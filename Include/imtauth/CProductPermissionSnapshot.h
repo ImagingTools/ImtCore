@@ -6,7 +6,6 @@
 #include <QtCore/QDateTime>
 
 // ACF includes
-#include <icomp/CComponentBase.h>
 #include <iser/ISerializable.h>
 
 // ImtCore includes
@@ -57,20 +56,6 @@ private:
 
 
 typedef imtbase::TIdentifiableWrap<CProductPermissionSnapshot> CIdentifiableProductPermissionSnapshot;
-
-
-class CProductPermissionSnapshotComp:
-			public icomp::CComponentBase,
-			public CIdentifiableProductPermissionSnapshot
-{
-public:
-	typedef icomp::CComponentBase BaseClass;
-
-	I_BEGIN_COMPONENT(CProductPermissionSnapshotComp);
-		I_REGISTER_INTERFACE(iser::ISerializable);
-		I_REGISTER_INTERFACE(istd::IChangeable);
-	I_END_COMPONENT;
-};
 
 
 /**

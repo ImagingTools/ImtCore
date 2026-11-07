@@ -8,11 +8,12 @@
 
 // ImtCore includes
 #include <imtauth/CRoleComp.h>
-#include <imtauth/CConnectedProduct.h>
+#include <imtauth/CConnectedProductComp.h>
+#include <imtauth/CConnectedProductDocumentNameProviderComp.h>
 #include <imtauth/CClientProductCatalogComp.h>
 #include <imtauth/CConnectedClientProductCatalogComp.h>
 #include <imtauth/CConnectedProductDocumentValidatorComp.h>
-#include <imtauth/CProductPermissionSnapshot.h>
+#include <imtauth/CProductPermissionSnapshotComp.h>
 #include <imtauth/CRoleMetaInfoCreatorComp.h>
 #include <imtauth/CUserInfoMetaInfoCreatorComp.h>
 #include <imtauth/CUserInfoComp.h>

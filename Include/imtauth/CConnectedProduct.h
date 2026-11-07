@@ -2,9 +2,6 @@
 #pragma once
 
 
-// ACF includes
-#include <icomp/CComponentBase.h>
-
 // ImtCore includes
 #include <imtauth/IConnectedProduct.h>
 #include <imtbase/TIdentifiableWrap.h>
@@ -43,21 +40,6 @@ private:
 
 
 typedef imtbase::TIdentifiableWrap<CConnectedProduct> CIdentifiableConnectedProduct;
-
-
-class CConnectedProductComp:
-			public icomp::CComponentBase,
-			public CIdentifiableConnectedProduct
-{
-public:
-	typedef icomp::CComponentBase BaseClass;
-
-	I_BEGIN_COMPONENT(CConnectedProductComp);
-		I_REGISTER_INTERFACE(IConnectedProduct);
-		I_REGISTER_INTERFACE(iser::ISerializable);
-		I_REGISTER_INTERFACE(istd::IChangeable);
-	I_END_COMPONENT;
-};
 
 
 } // namespace imtauth

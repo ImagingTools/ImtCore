@@ -44,16 +44,6 @@ static imtbase::ICollectionInfo::Ids SelectProductEntries(
 }
 
 
-// reimplemented (imtdoc::IDocumentNameProvider)
-
-QString CConnectedProductDocumentNameProviderComp::GetDefaultDocumentName(const istd::IChangeable& document, const iprm::IParamsSet* /*nameParams*/) const
-{
-	const IConnectedProduct* productPtr = dynamic_cast<const IConnectedProduct*>(&document);
-
-	return productPtr != nullptr ? productPtr->GetProductName() : QString();
-}
-
-
 // reimplemented (imtdoc::IDocumentValidator)
 
 bool CConnectedProductDocumentValidatorComp::ValidateDocumentData(

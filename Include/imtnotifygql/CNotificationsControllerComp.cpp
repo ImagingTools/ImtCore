@@ -6,7 +6,6 @@
 #include <QtCore/QTimeZone>
 
 // ImtCore includes
-#include <imtauth/imtauth.h>
 #include <imtgql/CGqlRequest.h>
 #include <imtnotifygql/imtnotifygql.h>
 
@@ -412,12 +411,6 @@ bool CNotificationsControllerComp::CanSend(const ::imtgql::CGqlRequest& gqlReque
 
 	if (productId.isEmpty() || contextPtr->GetClientProductId() != productId){
 		errorMessage = QStringLiteral("Notifications are sent only to the product of the sender");
-
-		return false;
-	}
-
-	if (!imtauth::HasPermission(contextPtr->GetScopes(), imtauth::s_productServerSendNotificationsPermission, false)){
-		errorMessage = QStringLiteral("The token of the server may not send notifications");
 
 		return false;
 	}

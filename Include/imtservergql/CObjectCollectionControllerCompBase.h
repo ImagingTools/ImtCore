@@ -41,9 +41,6 @@ namespace imtservergql
 {
 
 
-class IObjectChangeChecker;
-
-
 class CObjectCollectionControllerAttrCompBase:
 			virtual public imtgql::IGqlRequestExtractor,
 			virtual public imtbase::ISearchController,

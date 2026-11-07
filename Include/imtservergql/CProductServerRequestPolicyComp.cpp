@@ -37,19 +37,24 @@ bool CProductServerRequestPolicyComp::FindRequiredPermission(const imtgql::CGqlR
 		return false;
 	}
 
+	// Reading one object has its own permission where the collection names one, the view permission otherwise
 	const bool isObjectReading = m_objectReadCommandIdsAttrPtr.FindValue(commandId) >= 0;
-	const bool isReading = gqlRequest.GetRequestType() != imtgql::IGqlRequest::RT_MUTATION || m_viewCommandIdsAttrPtr.FindValue(commandId) >= 0;
 	if (isObjectReading && collectionIndex < m_collectionObjectReadPermissionsAttrPtr.GetCount()){
 		permission = m_collectionObjectReadPermissionsAttrPtr[collectionIndex];
-	}
-	else{
-		const auto& permissions = isReading ? m_collectionViewPermissionsAttrPtr : m_collectionEditPermissionsAttrPtr;
-		if (collectionIndex >= permissions.GetCount()){
-			return false;
+		if (!permission.isEmpty()){
+			return true;
 		}
-
-		permission = permissions[collectionIndex];
 	}
+
+	const bool isReading = isObjectReading
+				|| gqlRequest.GetRequestType() != imtgql::IGqlRequest::RT_MUTATION
+				|| m_viewCommandIdsAttrPtr.FindValue(commandId) >= 0;
+	const auto& permissions = isReading ? m_collectionViewPermissionsAttrPtr : m_collectionEditPermissionsAttrPtr;
+	if (collectionIndex >= permissions.GetCount()){
+		return false;
+	}
+
+	permission = permissions[collectionIndex];
 
 	return !permission.isEmpty();
 }
