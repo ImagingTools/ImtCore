@@ -79,6 +79,9 @@
                     <AttributeInfo Id="ObjectTypes" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Types"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="SerializeHeader" Type="Boolean" ExportId="SerializeHeader">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="SqlJsonXPathExtractor" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="SqliteXPathExtractor"/>
                     </AttributeInfo>
