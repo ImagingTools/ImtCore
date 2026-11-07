@@ -211,6 +211,11 @@ I_EXPORT_COMPONENT(
 			"Authorization Server Product Info");
 
 I_EXPORT_COMPONENT(
+			RemoteServerTokenIssuer,
+			"The server tokens a remote server issues for itself, managed with a superuser session there",
+			"Remote Server Token Issuer");
+
+I_EXPORT_COMPONENT(
 			PublishedPermissionsProvider,
 			"Answers permission tree requests from the published trees",
 			"Published Permissions Provider");

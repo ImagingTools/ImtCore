@@ -28,4 +28,14 @@ public:
 };
 
 
+/**
+	Name of the environment variable a server reads its token for the server of the given product from,
+	e.g. IMT_PUMA_SERVER_CREDENTIAL; whoever starts the server passes the token in it.
+*/
+inline QByteArray GetServerCredentialVariableName(const QByteArray& serverProductId)
+{
+	return QByteArrayLiteral("IMT_") + serverProductId.toUpper() + QByteArrayLiteral("_SERVER_CREDENTIAL");
+}
+
+
 } // namespace imtclientgql
