@@ -878,16 +878,13 @@ Dialog {
 			return qsTr("Loading…")
 		if (root.filterText !== "" && entriesModel.count === 0)
 			return qsTr("No items match \"%1\"").arg(root.filterText)
-		if (root.hasExtensionFilter && entriesModel.count === 0 && root.filterText === "")
-			return root.extensionFilterHint()
+		// The allowed file types are always shown in extensionHintBar
 		if (root.selectedPaths.length > 0 && !root.selectionIsValid())
 			return root.selectionKindHint()
 		if (root.multiSelect && root.selectedPaths.length > 1)
 			return qsTr("%1 items selected").arg(root.selectedPaths.length)
 		if (root.selectedPath !== "")
 			return root.selectedPath
-		if (root.hasExtensionFilter)
-			return root.extensionFilterHint()
 		return qsTr("Nothing selected")
 	}
 
