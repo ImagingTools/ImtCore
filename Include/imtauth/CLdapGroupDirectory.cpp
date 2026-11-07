@@ -30,12 +30,14 @@ public:
 	{
 	}
 
+
 	~ComScope()
 	{
 		if (SUCCEEDED(m_result)){
 			CoUninitialize();
 		}
 	}
+
 
 	bool IsValid() const
 	{

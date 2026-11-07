@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include "CLdapGroupMappingTest.h"
 
+
 // Qt includes
 #include <QtCore/QDir>
 #include <QtCore/QFile>
@@ -32,6 +33,8 @@
 
 namespace
 {
+
+
 const QByteArray Product("Product");
 const QByteArray OtherProduct("OtherProduct");
 const QByteArray Login("DOMAIN\\member");
@@ -49,7 +52,10 @@ const QByteArray TenantB("77777777-7777-4777-8777-777777777777");
 class CUser: public imtauth::CIdentifiableUserInfo
 {
 public:
-	void SetProvider(const imtauth::IRoleInfoProvider* provider) { m_roleProviderPtr = provider; }
+	void SetProvider(const imtauth::IRoleInfoProvider* provider)
+	{
+		m_roleProviderPtr = provider;
+	}
 };
 
 
@@ -59,6 +65,7 @@ class CCollection:
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
+
 	I_BEGIN_COMPONENT(CCollection);
 		I_REGISTER_INTERFACE(imtbase::IObjectCollection);
 		I_REGISTER_INTERFACE(imtbase::ICollectionInfo);
@@ -69,8 +76,11 @@ public:
 	// Emulates the user factory of a persistent collection, which attaches the role provider on load.
 	const imtauth::IRoleInfoProvider* userRoleProvider = nullptr;
 
-	virtual bool SetObjectData(const Id& id, const istd::IChangeable& value,
-		CompatibilityMode mode = CM_WITHOUT_REFS, const imtbase::IOperationContext* context = nullptr) override
+	virtual bool SetObjectData(
+				const Id& id,
+				const istd::IChangeable& value,
+				CompatibilityMode mode = CM_WITHOUT_REFS,
+				const imtbase::IOperationContext* context = nullptr) override
 	{
 		return !QUuid(QString::fromUtf8(id)).isNull() && !failWrite &&
 			CObjectCollectionBase::SetObjectData(id, value, mode, context);
@@ -94,8 +104,11 @@ public:
 		return true;
 	}
 
-	virtual Ids GetElementIds(int offset = 0, int count = -1, const iprm::IParamsSet* params = nullptr,
-		ilog::IMessageConsumer* log = nullptr) const override
+	virtual Ids GetElementIds(
+				int offset = 0,
+				int count = -1,
+				const iprm::IParamsSet* params = nullptr,
+				ilog::IMessageConsumer* log = nullptr) const override
 	{
 		Ids result;
 		iprm::TParamsPtr<imtbase::IComplexCollectionFilter> filter(params, "ComplexFilter", false);
@@ -124,7 +137,9 @@ public:
 					}
 				}
 			}
-			if (matches){ result.append(id); }
+			if (matches){
+				result.append(id);
+			}
 		}
 		return result.mid(offset, count);
 	}
@@ -137,48 +152,64 @@ class CBindings:
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
+
 	I_BEGIN_COMPONENT(CBindings);
 		I_REGISTER_INTERFACE(imtauth::ITenantEntityBindingManager);
 	I_END_COMPONENT;
 
 	virtual bool AddBinding(const QByteArray& tenant, const QByteArray& type, const QByteArray& id) override
 	{
-		if (QUuid(QString::fromUtf8(tenant)).isNull() || type.isEmpty() || QUuid(QString::fromUtf8(id)).isNull()){ return false; }
+		if (QUuid(QString::fromUtf8(tenant)).isNull() || type.isEmpty() || QUuid(QString::fromUtf8(id)).isNull()){
+			return false;
+		}
+
 		m_bindings[type][id].insert(tenant);
 		return true;
 	}
+
 	virtual bool RemoveBinding(const QByteArray& tenant, const QByteArray& type, const QByteArray& id) override
 	{
 		m_bindings[type][id].remove(tenant);
 		return true;
 	}
+
 	virtual bool RemoveAllBindingsForEntity(const QByteArray& type, const QByteArray& id) override
 	{
 		m_bindings[type].remove(id);
 		return true;
 	}
+
 	virtual bool RemoveAllBindingsForTenant(const QByteArray& tenant, const QByteArray& type) override
 	{
-		for (auto it = m_bindings[type].begin(); it != m_bindings[type].end(); ++it){ it.value().remove(tenant); }
+		for (auto it = m_bindings[type].begin(); it != m_bindings[type].end(); ++it){
+			it.value().remove(tenant);
+		}
+
 		return true;
 	}
+
 	virtual bool HasBinding(const QByteArray& tenant, const QByteArray& type, const QByteArray& id) const override
 	{
 		return m_bindings.value(type).value(id).contains(tenant);
 	}
+
 	virtual bool HasAnyTenantBinding(const QByteArray& type, const QByteArray& id) const override
 	{
 		return !m_bindings.value(type).value(id).isEmpty();
 	}
+
 	virtual QByteArrayList GetEntityIds(const QByteArray& tenant, const QByteArray& type) const override
 	{
 		QByteArrayList ids;
 		const auto entities = m_bindings.value(type);
 		for (auto it = entities.begin(); it != entities.end(); ++it){
-			if (it.value().contains(tenant)){ ids.append(it.key()); }
+			if (it.value().contains(tenant)){
+				ids.append(it.key());
+			}
 		}
 		return ids;
 	}
+
 private:
 	QMap<QByteArray, QMap<QByteArray, QSet<QByteArray>>> m_bindings;
 };
@@ -187,11 +218,18 @@ private:
 class CAdmin: public imtauth::CUserInfo
 {
 public:
-	virtual bool IsAdmin() const override { return true; }
+	virtual bool IsAdmin() const override
+	{
+		return true;
+	}
+
 	virtual istd::IChangeableUniquePtr CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override
 	{
 		istd::IChangeableUniquePtr clone(new CAdmin);
-		if (!clone->CopyFrom(*this, mode)){ return nullptr; }
+		if (!clone->CopyFrom(*this, mode)){
+			return nullptr;
+		}
+
 		return clone;
 	}
 };
@@ -214,6 +252,7 @@ class CController: public imtauthgql::CLdapAuthorizationControllerComp
 {
 public:
 	typedef imtauthgql::CLdapAuthorizationControllerComp BaseClass;
+
 	I_BEGIN_COMPONENT(CController);
 	I_END_COMPONENT;
 
@@ -233,19 +272,24 @@ public:
 		QRegularExpression matcher("\\A" + expression + "\\z", QRegularExpression::CaseInsensitiveOption);
 		groups.clear();
 		for (auto it = available.begin(); it != available.end(); ++it){
-			if (matcher.match(it.value()).hasMatch()){ groups.insert(it.key(), it.value()); }
+			if (matcher.match(it.value()).hasMatch()){
+				groups.insert(it.key(), it.value());
+			}
 		}
 		return !pattern.isEmpty() && pattern.size() <= 256 && !failDirectory;
 	}
+
 	virtual bool ReadDirectoryMembership(const QByteArray& userSid, QByteArrayList& groups) const override
 	{
 		groups = memberships;
 		return userSid == "S-1-5-21-2" && !failDirectory;
 	}
+
 	virtual QByteArray GetDirectoryUserSid(const QByteArray&) const override
 	{
 		return QByteArray("S-1-5-21-2");
 	}
+
 	virtual istd::TUniqueInterfacePtr<imtauth::IUserInfo> CreateUserInfoFromLdapUser(const QByteArray& login) const override
 	{
 		CUser* user = new CUser;
@@ -328,7 +372,10 @@ public:
 	bool WriteSettings(bool on = true)
 	{
 		QFile file(fileName);
-		if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)){ return false; }
+		if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)){
+			return false;
+		}
+
 		QByteArray data = QJsonDocument(QJsonObject{{"version", 1},
 			{"products", QJsonObject{{QString::fromUtf8(Product), Settings(on)}}}}).toJson();
 		return file.write(data) == data.size();
@@ -341,7 +388,10 @@ public:
 
 	imtauth::CUserInfo* Stored(imtbase::IObjectCollection::DataPtr& data)
 	{
-		if (!users->GetObjectData(MemberObjectId, data)){ return nullptr; }
+		if (!users->GetObjectData(MemberObjectId, data)){
+			return nullptr;
+		}
+
 		return dynamic_cast<imtauth::CUserInfo*>(data.GetPtr());
 	}
 
@@ -361,8 +411,12 @@ public:
 		return controller->OnAuthorization(typed, request, error);
 	}
 
-	QJsonObject AdminRequest(const QByteArray& command, bool superuser, const QJsonObject& settings, QString& error,
-		const QByteArray& productId = Product)
+	QJsonObject AdminRequest(
+				const QByteArray& command,
+				bool superuser,
+				const QJsonObject& settings,
+				QString& error,
+				const QByteArray& productId = Product)
 	{
 		imtgql::CGqlRequest request(command == "SaveLdapGroupSettings" ? imtgql::IGqlRequest::RT_MUTATION : imtgql::IGqlRequest::RT_QUERY, command);
 		imtgql::CGqlParamObject input;
@@ -371,7 +425,10 @@ public:
 		input.InsertParam("settings", QString::fromUtf8(QJsonDocument(settings).toJson()));
 		request.AddParam("input", input);
 		imtgql::IGqlContextSharedPtr context(new imtgql::CGqlContext);
-		if (superuser){ context->SetUserInfo(&admin); }
+		if (superuser){
+			context->SetUserInfo(&admin);
+		}
+
 		request.SetGqlContext(context);
 		return controller->CreateResponse(request, error);
 	}

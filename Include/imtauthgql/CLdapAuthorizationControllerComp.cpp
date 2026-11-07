@@ -40,12 +40,16 @@
 namespace imtauthgql
 {
 
+
 namespace
 {
+
+
 bool IsGroupCommand(const QByteArray& command)
 {
 	return command == "LdapGroupSettings" || command == "SaveLdapGroupSettings" || command == "DiscoverLdapGroups";
 }
+
 
 bool IsProductId(const QByteArray& productId)
 {
@@ -117,6 +121,7 @@ bool CLdapAuthorizationControllerComp::ReadDirectoryMembership(const QByteArray&
 	return imtauth::CLdapGroupDirectory::GetSecurityGroups(userSid, groups);
 }
 
+
 QByteArray CLdapAuthorizationControllerComp::GetDirectoryUserSid(const QByteArray& login) const
 {
 	return imtauth::CLdapUserCollectionControllerComp::GetSidForUser(login);
@@ -157,7 +162,9 @@ bool CLdapAuthorizationControllerComp::ReadGroupSettings(QJsonObject& settings, 
 
 
 bool CLdapAuthorizationControllerComp::ValidateGroupSettings(
-	const QJsonObject& settings, const QByteArray& productId, QString& errorMessage) const
+			const QJsonObject& settings,
+			const QByteArray& productId,
+			QString& errorMessage) const
 {
 	if (!IsProductId(productId) || !settings.value("enabled").isBool() ||
 		!settings.value("pattern").isString() || !settings.value("mappings").isObject()){
@@ -193,7 +200,10 @@ bool CLdapAuthorizationControllerComp::ValidateGroupSettings(
 	QSet<QByteArray> visited;
 	while (!pendingRoles.isEmpty()){
 		QByteArray roleId = pendingRoles.takeFirst();
-		if (visited.contains(roleId)){ continue; }
+		if (visited.contains(roleId)){
+			continue;
+		}
+
 		visited.insert(roleId);
 		imtbase::IObjectCollection::DataPtr roleData;
 		if (visited.size() > 10000 || !m_roleCollectionCompPtr.IsValid() ||
@@ -405,7 +415,9 @@ QJsonObject CLdapAuthorizationControllerComp::CreateInternalResponse(
 
 
 bool CLdapAuthorizationControllerComp::PrepareAuthorization(
-	imtauth::CUserInfo& userInfo, const QByteArray& productId, QString& errorMessage) const
+			imtauth::CUserInfo& userInfo,
+			const QByteArray& productId,
+			QString& errorMessage) const
 {
 	QMutexLocker locker(&m_groupSettingsMutex);
 	bool ldapUser = false;
@@ -480,7 +492,9 @@ bool CLdapAuthorizationControllerComp::PrepareAuthorization(
 				}
 				for (const QJsonValue& role : mappings.value(QString::fromUtf8(sid)).toArray()){
 					QByteArray roleId = role.toString().toUtf8();
-					if (!roles.contains(roleId)){ roles.append(roleId); }
+					if (!roles.contains(roleId)){
+						roles.append(roleId);
+					}
 				}
 			}
 		}
@@ -695,12 +709,21 @@ void CLdapAuthorizationControllerComp::OnComponentDestroyed()
 
 QByteArray CLdapAuthorizationControllerComp::CheckExistsRole(const QByteArray& productId, RoleType roleType, bool* isReadPtr) const
 {
-	if (isReadPtr != nullptr){ *isReadPtr = false; }
+	if (isReadPtr != nullptr){
+		*isReadPtr = false;
+	}
+
 	if (m_roleCollectionCompPtr.IsValid()){
 		bool complete = false;
 		imtbase::IObjectCollection::Ids roleIds = imtauth::CollectionSelection::SelectIds(
-			*m_roleCollectionCompPtr, imtauth::CollectionSelection::ColumnEquals("ProductId", productId), {"ProductId"}, &complete);
-		if (!complete){ return QByteArray(); }
+					*m_roleCollectionCompPtr,
+					imtauth::CollectionSelection::ColumnEquals("ProductId", productId),
+					{"ProductId"},
+					&complete);
+		if (!complete){
+			return QByteArray();
+		}
+
 		QByteArray result;
 		for (const QByteArray& roleId : roleIds){
 			imtbase::IObjectCollection::DataPtr roleDataPtr;
@@ -713,11 +736,18 @@ QByteArray CLdapAuthorizationControllerComp::CheckExistsRole(const QByteArray& p
 						result = roleId;
 					}
 				}
-				else{ return QByteArray(); }
+				else{
+					return QByteArray();
+				}
 			}
-			else{ return QByteArray(); }
+			else{
+				return QByteArray();
+			}
 		}
-		if (isReadPtr != nullptr){ *isReadPtr = true; }
+		if (isReadPtr != nullptr){
+			*isReadPtr = true;
+		}
+
 		return result;
 	}
 
@@ -863,20 +893,32 @@ istd::TUniqueInterfacePtr<imtauth::IUserInfo> CLdapAuthorizationControllerComp::
 
 QByteArray CLdapAuthorizationControllerComp::GetUserObjectIdBySid(const QByteArray& sid, bool* isReadPtr) const
 {
-	if (isReadPtr != nullptr){ *isReadPtr = true; }
+	if (isReadPtr != nullptr){
+		*isReadPtr = true;
+	}
+
 	if (sid.isEmpty()){
 		return QByteArray();
 	}
 
 	if (!m_userCollectionCompPtr.IsValid()){
-		if (isReadPtr != nullptr){ *isReadPtr = false; }
+		if (isReadPtr != nullptr){
+			*isReadPtr = false;
+		}
+
 		return QByteArray();
 	}
 	bool complete = false;
 	imtbase::IObjectCollection::Ids userIds = imtauth::CollectionSelection::SelectIds(
-		*m_userCollectionCompPtr, imtauth::CollectionSelection::ColumnEquals("Sid", sid), {"Sid"}, &complete);
+				*m_userCollectionCompPtr,
+				imtauth::CollectionSelection::ColumnEquals("Sid", sid),
+				{"Sid"},
+				&complete);
 	if (!complete){
-		if (isReadPtr != nullptr){ *isReadPtr = false; }
+		if (isReadPtr != nullptr){
+			*isReadPtr = false;
+		}
+
 		return QByteArray();
 	}
 	QByteArray result;
@@ -885,19 +927,28 @@ QByteArray CLdapAuthorizationControllerComp::GetUserObjectIdBySid(const QByteArr
 		if (m_userCollectionCompPtr->GetObjectData(userId, dataPtr)){
 			const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
 			if (userInfoPtr == nullptr){
-				if (isReadPtr != nullptr){ *isReadPtr = false; }
+				if (isReadPtr != nullptr){
+					*isReadPtr = false;
+				}
+
 				return QByteArray();
 			}
 			if (userInfoPtr->GetSid() == sid){
 				if (!result.isEmpty()){
-					if (isReadPtr != nullptr){ *isReadPtr = false; }
+					if (isReadPtr != nullptr){
+						*isReadPtr = false;
+					}
+
 					return QByteArray();
 				}
 				result = userId;
 			}
 		}
 		else{
-			if (isReadPtr != nullptr){ *isReadPtr = false; }
+			if (isReadPtr != nullptr){
+				*isReadPtr = false;
+			}
+
 			return QByteArray();
 		}
 	}

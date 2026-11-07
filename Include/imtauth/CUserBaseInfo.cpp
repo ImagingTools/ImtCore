@@ -20,9 +20,14 @@
 namespace imtauth
 {
 
+
 namespace
 {
+
+
 const QByteArray DirectoryProductPrefix("urn:imt:directory-roles:");
+
+
 }
 
 
@@ -35,14 +40,20 @@ QMutex& CUserBaseInfo::GetUserUpdateMutex(const QByteArray& userId)
 
 IUserBaseInfo::RoleIds CUserBaseInfo::GetDirectoryRoles(const QByteArray& productId) const
 {
-	if (IsReservedProductId(productId)){ return RoleIds(); }
+	if (IsReservedProductId(productId)){
+		return RoleIds();
+	}
+
 	return m_rolesMap.value(DirectoryProductPrefix + productId);
 }
 
 
 void CUserBaseInfo::SetDirectoryRoles(const QByteArray& productId, const RoleIds& roles)
 {
-	if (productId.isEmpty() || IsReservedProductId(productId)){ return; }
+	if (productId.isEmpty() || IsReservedProductId(productId)){
+		return;
+	}
+
 	istd::CChangeNotifier notifier(this);
 	if (roles.isEmpty()){
 		m_rolesMap.remove(DirectoryProductPrefix + productId);
@@ -78,7 +89,10 @@ bool CUserBaseInfo::ResolveDirectoryRoles(const QByteArray& productId, RoleIds& 
 	FeatureIds resolved;
 	while (!pending.isEmpty()){
 		QByteArray roleId = pending.takeFirst();
-		if (visited.contains(roleId)){ continue; }
+		if (visited.contains(roleId)){
+			continue;
+		}
+
 		visited.insert(roleId);
 		if (m_roleProviderPtr == nullptr || visited.size() > 10000){
 			return false;
@@ -88,7 +102,9 @@ bool CUserBaseInfo::ResolveDirectoryRoles(const QByteArray& productId, RoleIds& 
 			return false;
 		}
 		for (const QByteArray& permission : role->GetLocalPermissions()){
-			if (!resolved.contains(permission)){ resolved.append(permission); }
+			if (!resolved.contains(permission)){
+				resolved.append(permission);
+			}
 		}
 		pending += role->GetIncludedRoles();
 	}
@@ -262,7 +278,10 @@ IUserBaseInfo::FeatureIds CUserBaseInfo::GetLocalPermissions(const QByteArray& p
 
 void CUserBaseInfo::SetLocalPermissions(const QByteArray& productId, const FeatureIds& permissions)
 {
-	if (IsReservedProductId(productId)){ return; }
+	if (IsReservedProductId(productId)){
+		return;
+	}
+
 	bool ok = true;
 	if (m_permissionsMap.contains(productId)){
 		FeatureIds currentFeatureIds = m_permissionsMap.value(productId);
@@ -313,7 +332,10 @@ QByteArrayList CUserBaseInfo::GetProducts() const
 
 bool CUserBaseInfo::RemoveProduct(const QByteArray& productId)
 {
-	if (IsReservedProductId(productId)){ return false; }
+	if (IsReservedProductId(productId)){
+		return false;
+	}
+
 	if (!m_permissionsMap.contains(productId) && !m_rolesMap.contains(productId) &&
 		!m_rolesMap.contains(DirectoryProductPrefix + productId)){
 		return false;
@@ -328,7 +350,10 @@ bool CUserBaseInfo::RemoveProduct(const QByteArray& productId)
 
 IUserBaseInfo::RoleIds CUserBaseInfo::GetRoles(const QByteArray& productId) const
 {
-	if (IsReservedProductId(productId)){ return RoleIds(); }
+	if (IsReservedProductId(productId)){
+		return RoleIds();
+	}
+
 	if (m_rolesMap.contains(productId)){
 		return m_rolesMap.value(productId);
 	}
@@ -339,7 +364,10 @@ IUserBaseInfo::RoleIds CUserBaseInfo::GetRoles(const QByteArray& productId) cons
 
 void CUserBaseInfo::SetRoles(const QByteArray& productId, const RoleIds &roles)
 {
-	if (IsReservedProductId(productId)){ return; }
+	if (IsReservedProductId(productId)){
+		return;
+	}
+
 	bool ok = true;
 	if (m_rolesMap.contains(productId)){
 		RoleIds currentRoleIds = m_rolesMap.value(productId);
@@ -358,7 +386,10 @@ void CUserBaseInfo::SetRoles(const QByteArray& productId, const RoleIds &roles)
 
 void CUserBaseInfo::AddRole(const QByteArray& productId, const QByteArray& roleId)
 {
-	if (IsReservedProductId(productId)){ return; }
+	if (IsReservedProductId(productId)){
+		return;
+	}
+
 	bool isChanged = false;
 	if (!m_rolesMap.contains(productId)){
 		m_rolesMap.insert(productId, RoleIds());
@@ -383,7 +414,10 @@ void CUserBaseInfo::AddRole(const QByteArray& productId, const QByteArray& roleI
 
 bool CUserBaseInfo::RemoveRole(const QByteArray& productId, const QByteArray& roleId)
 {
-	if (IsReservedProductId(productId)){ return false; }
+	if (IsReservedProductId(productId)){
+		return false;
+	}
+
 	if (m_rolesMap.contains(productId)){
 		RoleIds roleIds = m_rolesMap.value(productId);
 		if (roleIds.contains(roleId)){

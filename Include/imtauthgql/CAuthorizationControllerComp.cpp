@@ -43,9 +43,15 @@ bool CAuthorizationControllerComp::ParseDataFromGqlRequest(
 
 QByteArray CAuthorizationControllerComp::GetUserObjectId(const QByteArray& login, bool* isReadPtr) const
 {
-	if (isReadPtr != nullptr){ *isReadPtr = true; }
+	if (isReadPtr != nullptr){
+		*isReadPtr = true;
+	}
+
 	if (!m_userCollectionCompPtr.IsValid() || login.isEmpty()){
-		if (isReadPtr != nullptr){ *isReadPtr = false; }
+		if (isReadPtr != nullptr){
+			*isReadPtr = false;
+		}
+
 		return QByteArray();
 	}
 	imtbase::IComplexCollectionFilter::FieldFilter fieldFilter;
@@ -64,7 +70,10 @@ QByteArray CAuthorizationControllerComp::GetUserObjectId(const QByteArray& login
 	ilog::CMessageContainer readErrors;
 	imtbase::IObjectCollection::Ids userIds = m_userCollectionCompPtr->GetElementIds(0, -1, &filterParam, &readErrors);
 	if (readErrors.GetWorstCategory() >= istd::IInformationProvider::IC_ERROR){
-		if (isReadPtr != nullptr){ *isReadPtr = false; }
+		if (isReadPtr != nullptr){
+			*isReadPtr = false;
+		}
+
 		return QByteArray();
 	}
 
@@ -72,17 +81,26 @@ QByteArray CAuthorizationControllerComp::GetUserObjectId(const QByteArray& login
 	for (const QByteArray& userId : userIds){
 		imtbase::IObjectCollection::DataPtr data;
 		if (!m_userCollectionCompPtr->GetObjectData(userId, data)){
-			if (isReadPtr != nullptr){ *isReadPtr = false; }
+			if (isReadPtr != nullptr){
+				*isReadPtr = false;
+			}
+
 			return QByteArray();
 		}
 		const imtauth::IUserInfo* user = dynamic_cast<const imtauth::IUserInfo*>(data.GetPtr());
 		if (user == nullptr){
-			if (isReadPtr != nullptr){ *isReadPtr = false; }
+			if (isReadPtr != nullptr){
+				*isReadPtr = false;
+			}
+
 			return QByteArray();
 		}
 		if (user->GetId() == login){
 			if (!result.isEmpty()){
-				if (isReadPtr != nullptr){ *isReadPtr = false; }
+				if (isReadPtr != nullptr){
+					*isReadPtr = false;
+				}
+
 				return QByteArray();
 			}
 			result = userId;

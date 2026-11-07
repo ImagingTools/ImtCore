@@ -55,6 +55,7 @@ public:
 	{
 	}
 
+
 	~ConnectionScope()
 	{
 		if (m_connectionPtr != nullptr){
@@ -74,6 +75,7 @@ public:
 		:messagePtr(nullptr)
 	{
 	}
+
 
 	~MessageScope()
 	{
@@ -457,5 +459,4 @@ bool CLdapGroupChangeListener::WaitForStop(int milliseconds)
 
 
 } // namespace imtauth
-
 
