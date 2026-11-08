@@ -16,17 +16,24 @@ class Connections extends QtObject {
 
     __connectionsInfo = {}
 
+    // MouseArea: the property 'pressed' takes the name of Qt's pressed(mouse), the signal is pressedEvent
+    __getSignal(target, signalName){
+        let sig = target[signalName]
+        if(signalName === 'pressed' && !(sig && sig.connect)) sig = target.pressedEvent
+        return sig
+    }
+
     SLOT_targetChanged(oldValue, newValue){
         for(let signalName in this.__connectionsInfo){
             let slotName = this.__connectionsInfo[signalName]
 
             if(oldValue){
-                let sig = oldValue[signalName]
+                let sig = this.__getSignal(oldValue, signalName)
                 if(sig && sig.disconnect) sig.disconnect(this, this[slotName])
                 else if(!this.ignoreUnknownSignals) console.warn(`Connections: signal '${signalName}' not found on target (disconnect)`)
             }
             if(newValue){
-                let sig = newValue[signalName]
+                let sig = this.__getSignal(newValue, signalName)
                 if(sig && sig.connect) sig.connect(this, this[slotName])
                 else if(!this.ignoreUnknownSignals) console.warn(`Connections: signal '${signalName}' not found on target (connect)`)
             }
@@ -38,7 +45,7 @@ class Connections extends QtObject {
             let slotName = this.__connectionsInfo[signalName]
         
             if(this.target){
-                let sig = this.target[signalName]
+                let sig = this.__getSignal(this.target, signalName)
                 if(sig && sig.disconnect) sig.disconnect(this, this[slotName])
             }
         }
