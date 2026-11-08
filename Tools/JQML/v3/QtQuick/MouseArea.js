@@ -135,8 +135,9 @@ class MouseArea extends Item {
             if(!this.__entered) this.entered()
             this.mouseX = mouse.x
             this.mouseY = mouse.y
-            this.pressedChanged(mouse)
+            // Qt: pressed(mouse) comes before pressedChanged
             this.pressedEvent(mouse)
+            this.pressedChanged(mouse)
 
             if(mouse.accepted) mouse.target = this
         }

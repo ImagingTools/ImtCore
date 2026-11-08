@@ -15,11 +15,11 @@ Item {
         color: "#1a1a2e"
         focus: true
 
-        Keys.onTabPressed: function(event) {
+        Keys.onTabPressed: {
             root.tabCount += 1
             event.accepted = root.acceptTab
         }
-        Keys.onBacktabPressed: function(event) {
+        Keys.onBacktabPressed: {
             root.backtabCount += 1
             event.accepted = root.acceptTab
         }

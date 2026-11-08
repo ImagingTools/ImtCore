@@ -35,23 +35,29 @@ Item {
     }
 
     // Qt: forceLayout() applies the pending model changes at once, before the next frame
-    Component.onCompleted: {
-        for (let i = 0; i < 10; i++) {
-            listModel.append({ "text": "item" + i })
+    Timer {
+        id: startTimer
+        interval: 20
+        onTriggered: {
+            for (let i = 0; i < 10; i++) {
+                listModel.append({ "text": "item" + i })
+            }
+            view.forceLayout()
+            console.log("append", view.count, root.itemText(0), root.itemY(0), root.itemText(1), root.itemY(1))
+
+            listModel.insert(0, { "text": "front" })
+            view.forceLayout()
+            console.log("insert", view.count, root.itemText(0), root.itemText(1), root.itemY(1))
+
+            listModel.remove(0)
+            view.forceLayout()
+            console.log("remove", view.count, root.itemText(0), root.itemY(0))
+
+            view.positionViewAtIndex(9, ListView.End)
+            console.log("position", view.contentY)
+            Qt.quit()
         }
-        view.forceLayout()
-        console.log("append", view.count, root.itemText(0), root.itemY(0), root.itemText(1), root.itemY(1))
-
-        listModel.insert(0, { "text": "front" })
-        view.forceLayout()
-        console.log("insert", view.count, root.itemText(0), root.itemText(1), root.itemY(1))
-
-        listModel.remove(0)
-        view.forceLayout()
-        console.log("remove", view.count, root.itemText(0), root.itemY(0))
-
-        view.positionViewAtIndex(9, ListView.End)
-        console.log("position", view.contentY)
-        Qt.quit()
     }
+
+    Component.onCompleted: startTimer.start()
 }
