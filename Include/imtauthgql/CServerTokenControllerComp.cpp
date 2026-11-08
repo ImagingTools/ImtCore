@@ -39,8 +39,16 @@ sdl::V1_0::imtauth::CServerTokenList CServerTokenControllerComp::OnGetServerToke
 	const auto arguments = getServerTokenListRequest.GetRequestedArguments();
 	const QByteArray clientProductId = arguments.input.has_value() && arguments.input->clientProductId ? QByteArray(*arguments.input->clientProductId) : QByteArray();
 
+	bool isRead = false;
+	const QByteArrayList tokenIds = m_tokenManagerCompPtr->GetServerTokenIds(clientProductId, &isRead);
+	if (!isRead){
+		errorMessage = QStringLiteral("The server tokens could not be read");
+
+		return response;
+	}
+
 	auto& tokens = response.tokens.Emplace();
-	for (const QByteArray& tokenId : m_tokenManagerCompPtr->GetServerTokenIds(clientProductId)){
+	for (const QByteArray& tokenId : tokenIds){
 		const imtauth::IPersonalAccessTokenSharedPtr tokenPtr = m_tokenManagerCompPtr->GetToken(tokenId);
 		if (!tokenPtr.IsValid()){
 			errorMessage = QStringLiteral("Unable to read the server token '%1'").arg(QString::fromUtf8(tokenId));

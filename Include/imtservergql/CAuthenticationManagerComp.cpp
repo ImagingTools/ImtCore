@@ -55,6 +55,7 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 	QByteArray resolvedUserId;
 	QByteArray tenantId;
 	QByteArray clientProductId;
+	QByteArray userTokenProductId;
 	QByteArrayList scopes;
 	bool isPat = false;
 	if (!token.isEmpty()){
@@ -78,6 +79,7 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 			else if (isTokenAccepted && !tokenProductId.isEmpty()){
 				// A token works only for its product, whatever product the client names
 				isTokenAccepted = (!m_productInfoCompPtr.IsValid() || tokenProductId == productId) && (headerProductId.isEmpty() || tokenProductId == headerProductId);
+				userTokenProductId = tokenProductId;
 				productId = tokenProductId;
 			}
 
@@ -102,6 +104,12 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 
 			if (!headerProductId.isEmpty() && headerProductId != serverProductId){
 				SetError(error, imtgql::IGqlContextCreator::CCS_FORBIDDEN, QStringLiteral("The token of the server is not the token of the product '%1'.").arg(QString::fromUtf8(headerProductId)));
+				return nullptr;
+			}
+
+			// A personal token of a user goes only through the server of its product
+			if (!userTokenProductId.isEmpty() && userTokenProductId != serverProductId){
+				SetError(error, imtgql::IGqlContextCreator::CCS_FORBIDDEN, QStringLiteral("The personal access token is not for the product of the server."));
 				return nullptr;
 			}
 

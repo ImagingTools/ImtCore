@@ -327,7 +327,8 @@ void CConnectedProductCollectionControllerComp::FillServerState(
 	QDateTime oldestTokenTime;
 	QDateTime lastUsedTime;
 	bool hasActiveToken = false;
-	for (const QByteArray& tokenId : m_tokenManagerCompPtr->GetServerTokenIds(productId)){
+	bool areTokensRead = false;
+	for (const QByteArray& tokenId : m_tokenManagerCompPtr->GetServerTokenIds(productId, &areTokensRead)){
 		imtauth::IPersonalAccessTokenSharedPtr tokenPtr = m_tokenManagerCompPtr->GetToken(tokenId);
 		if (!tokenPtr.IsValid() || tokenPtr->IsRevoked()){
 			continue;
@@ -352,6 +353,9 @@ void CConnectedProductCollectionControllerComp::FillServerState(
 		QString status;
 		if (!GetOwnProductId().isEmpty() && productId == GetOwnProductId()){
 			status = QStringLiteral("This server");
+		}
+		else if (!areTokensRead){
+			status = QStringLiteral("Unknown");
 		}
 		else if (!hasActiveToken){
 			status = QStringLiteral("No token");

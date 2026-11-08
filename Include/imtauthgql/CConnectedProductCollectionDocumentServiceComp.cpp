@@ -83,7 +83,13 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CConnectedProductCollectionDocument
 	}
 
 	const auto arguments = updateRequest.GetRequestedArguments();
-	const QByteArray documentId = arguments.input->documentId ? QByteArray(*arguments.input->documentId) : QByteArray();
+	if (!arguments.input.has_value() || !arguments.input->documentId){
+		response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::InvalidDocumentId;
+
+		return response;
+	}
+
+	const QByteArray documentId = *arguments.input->documentId;
 	const QByteArray userLogin = GetUserId(gqlRequest);
 
 	istd::IChangeableSharedPtr documentPtr;
