@@ -12,6 +12,7 @@ RemoteCollectionView {
 	collectionId: "ConnectedProducts"
 	visibleMetaInfo: false
 	documentCollectionFilter: null
+	showRemoteChangesAlert: false
 
 	additionalFieldIds: [ConnectedProductItemDataTypeMetaInfo.s_productId]
 
@@ -47,9 +48,5 @@ RemoteCollectionView {
 		if (productCollectionView.visible){
 			productCollectionView.doUpdateGui()
 		}
-	}
-
-	function handleSubscription(dataModel){
-		productCollectionView.doUpdateGui()
 	}
 }

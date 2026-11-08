@@ -20,9 +20,6 @@ Item {
 	property string productVersion: ""
 	property string publishedAt: ""
 	readonly property bool isPublished: permissionsPage.publishedAt !== ""
-	readonly property string statusText: permissionsPage.isPublished
-				? qsTr("Version %1, published %2").arg(permissionsPage.productVersion).arg(permissionsPage.publishedAt)
-				: qsTr("The product has not published its permissions yet: its server needs a token with the permission to publish.")
 
 	Component.onCompleted: {
 		if (permissionsPage.permissionsProvider){
@@ -45,7 +42,9 @@ Item {
 		anchors.left: parent.left
 		anchors.right: parent.right
 		anchors.margins: Style.marginXL
-		text: permissionsPage.statusText
+		text: permissionsPage.isPublished
+				? qsTr("Version %1, published %2").arg(permissionsPage.productVersion).arg(permissionsPage.publishedAt)
+				: qsTr("The product has not published its permissions yet: its server needs a token with the permission to publish.")
 		wrapMode: Text.WordWrap
 	}
 

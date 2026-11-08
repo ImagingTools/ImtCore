@@ -670,9 +670,6 @@ bool CUserCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 		return false;
 	}
 
-	const QByteArray contextProductId = rawGqlRequest.GetRequestContext() != nullptr ? rawGqlRequest.GetRequestContext()->GetProductId() : QByteArray();
-	const QByteArrayList previousPermissions = previousUserPtr->GetPermissions(contextProductId);
-
 	QByteArrayList groupIds = userInfoPtr->GetGroups();
 	for (const QByteArray& groupId : groupIds){
 		if (!groupId.isEmpty()){
@@ -689,16 +686,7 @@ bool CUserCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 		return false;
 	}
 
-	if (!CheckUserAccountChange(rawGqlRequest.GetRequestContext(), objectId, *previousUserPtr, *userInfoPtr, errorMessage)){
-		return false;
-	}
-
-	if (!CheckJoinedUserGroups(rawGqlRequest.GetRequestContext(), m_userGroupInfoProviderCompPtr.GetPtr(), previousUserPtr->GetGroups(), userInfoPtr->GetGroups(), errorMessage)){
-		return false;
-	}
-
-	return CheckOtherProductsUnchanged(rawGqlRequest.GetRequestContext(), previousUserPtr, *userInfoPtr, errorMessage)
-				&& CheckGrantedPermissions(rawGqlRequest.GetRequestContext(), previousPermissions, userInfoPtr->GetPermissions(contextProductId), errorMessage);
+	return CheckUserGrants(rawGqlRequest, objectId, previousUserPtr, *userInfoPtr, errorMessage);
 }
 
 
@@ -822,9 +810,6 @@ bool CUserCollectionControllerComp::CheckObjectData(const imtgql::CGqlRequest& g
 		return false;
 	}
 
-	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
-	const QByteArray productId = gqlContextPtr != nullptr ? gqlContextPtr->GetProductId() : QByteArray();
-
 	imtbase::IObjectCollection::DataPtr storedDataPtr;
 	const imtauth::IUserInfo* storedUserPtr = nullptr;
 	if (!objectId.isEmpty()){
@@ -834,21 +819,9 @@ bool CUserCollectionControllerComp::CheckObjectData(const imtgql::CGqlRequest& g
 
 			return false;
 		}
-
-		if (!CheckUserAccountChange(gqlContextPtr, objectId, *storedUserPtr, *userInfoPtr, errorMessage)){
-			return false;
-		}
 	}
 
-	if (!CheckJoinedUserGroups(gqlContextPtr, m_userGroupInfoProviderCompPtr.GetPtr(), storedUserPtr != nullptr ? storedUserPtr->GetGroups() : QByteArrayList(), userInfoPtr->GetGroups(), errorMessage)){
-		return false;
-	}
-
-	if (!CheckOtherProductsUnchanged(gqlContextPtr, storedUserPtr, *userInfoPtr, errorMessage)){
-		return false;
-	}
-
-	return CheckGrantedPermissions(gqlContextPtr, storedUserPtr != nullptr ? storedUserPtr->GetPermissions(productId) : QByteArrayList(), userInfoPtr->GetPermissions(productId), errorMessage);
+	return CheckUserGrants(gqlRequest, objectId, storedUserPtr, *userInfoPtr, errorMessage);
 }
 
 
@@ -1162,6 +1135,34 @@ void CUserCollectionControllerComp::SetAdditionalFilters(
 	imtbase::CComplexCollectionFilter* complexFilterPtr = new imtbase::CComplexCollectionFilter();
 	complexFilterPtr->SetFilterExpression(filterExpr);
 	filterParamsPtr->SetEditableParameter("ComplexFilter", complexFilterPtr, true);
+}
+
+
+// private methods
+
+bool CUserCollectionControllerComp::CheckUserGrants(
+			const imtgql::CGqlRequest& gqlRequest,
+			const QByteArray& objectId,
+			const imtauth::IUserInfo* previousPtr,
+			const imtauth::IUserInfo& user,
+			QString& errorMessage) const
+{
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	const QByteArray productId = gqlContextPtr != nullptr ? gqlContextPtr->GetProductId() : QByteArray();
+
+	if (previousPtr != nullptr && !CheckUserAccountChange(gqlContextPtr, objectId, *previousPtr, user, errorMessage)){
+		return false;
+	}
+
+	if (!CheckJoinedUserGroups(gqlContextPtr, m_userGroupInfoProviderCompPtr.GetPtr(), previousPtr != nullptr ? previousPtr->GetGroups() : QByteArrayList(), user.GetGroups(), errorMessage)){
+		return false;
+	}
+
+	if (!CheckOtherProductsUnchanged(gqlContextPtr, previousPtr, user, errorMessage)){
+		return false;
+	}
+
+	return CheckGrantedPermissions(gqlContextPtr, previousPtr != nullptr ? previousPtr->GetPermissions(productId) : QByteArrayList(), user.GetPermissions(productId), errorMessage);
 }
 
 

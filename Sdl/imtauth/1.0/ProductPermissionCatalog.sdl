@@ -19,7 +19,6 @@ type PublishProductPermissionsPayload {
 	success: Boolean!
 	# False when the published tree is the stored one.
 	changed: Boolean
-	message: String
 }
 
 

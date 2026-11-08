@@ -59,10 +59,17 @@ typedef imtbase::TIdentifiableWrap<CProductPermissionSnapshot> CIdentifiableProd
 
 
 /**
-	Find the ID of the snapshot of a product, empty when the product has not published yet.
-	\param isReadPtr [optional] False when the collection could not be read, so empty says nothing about the product.
+	Get the snapshot of a product, null when the product has not published yet.
+	\param dataPtr Keeps the returned snapshot alive.
+	\param isReadPtr [optional] False when the collection or the found snapshot could not be read, so null says nothing about the product.
+	\param idPtr [optional] ID of the found snapshot, empty when the product has not published yet.
 */
-QByteArray FindProductPermissionSnapshot(const imtbase::IObjectCollection& snapshotCollection, const QByteArray& productId, bool* isReadPtr = nullptr);
+const CProductPermissionSnapshot* GetProductPermissionSnapshot(
+			const imtbase::IObjectCollection& snapshotCollection,
+			const QByteArray& productId,
+			imtbase::IObjectCollection::DataPtr& dataPtr,
+			bool* isReadPtr = nullptr,
+			QByteArray* idPtr = nullptr);
 
 
 } // namespace imtauth

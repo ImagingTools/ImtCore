@@ -2,7 +2,12 @@
 #include <imtauthgql/CPublishedPermissionsProviderComp.h>
 
 
+// Qt includes
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
+
 // ImtCore includes
+#include <imtauth/CProductPermissionSnapshot.h>
 #include <imtauth/imtauth.h>
 #include <imtauthgql/imtauthgql.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Permissions.h>
@@ -10,6 +15,35 @@
 
 namespace imtauthgql
 {
+
+
+namespace
+{
+
+
+/**
+	Read the permission tree a product published. A product that has not published has an empty tree.
+	\return false if the stored tree could not be read.
+*/
+bool ReadPublishedPermissionTree(
+			const imtbase::IObjectCollection& snapshotCollection,
+			const QByteArray& productId,
+			sdl::V1_0::imtauth::CPermissionTree& tree)
+{
+	tree = sdl::V1_0::imtauth::CPermissionTree();
+
+	bool isRead = false;
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	const imtauth::CProductPermissionSnapshot* snapshotPtr = imtauth::GetProductPermissionSnapshot(snapshotCollection, productId, dataPtr, &isRead);
+	if (!isRead){
+		return false;
+	}
+
+	return snapshotPtr == nullptr || tree.ReadFromJsonObject(QJsonDocument::fromJson(snapshotPtr->GetTree()).object());
+}
+
+
+} // anonymous namespace
 
 
 // reimplemented (sdl::V1_0::imtauth::CPermissionsGqlHandlerCompBase)

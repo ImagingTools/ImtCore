@@ -93,7 +93,7 @@ bool CRemoteServerTokenIssuerComp::IssueToken(
 	}
 
 	if (!payload.success || !*payload.success || !payload.id || !payload.token){
-		errorMessage = payload.message ? QString(*payload.message) : QStringLiteral("The server '%1' did not issue the token").arg(QString::fromUtf8(server.productId));
+		errorMessage = QStringLiteral("The server '%1' did not issue the token").arg(QString::fromUtf8(server.productId));
 
 		return false;
 	}
@@ -129,7 +129,7 @@ bool CRemoteServerTokenIssuerComp::SetTokenScopes(
 	}
 
 	if (!payload.success || !*payload.success){
-		errorMessage = payload.message ? QString(*payload.message) : QStringLiteral("The server '%1' did not change the token").arg(QString::fromUtf8(server.productId));
+		errorMessage = QStringLiteral("The server '%1' did not change the token").arg(QString::fromUtf8(server.productId));
 
 		return false;
 	}
@@ -157,7 +157,7 @@ bool CRemoteServerTokenIssuerComp::RevokeToken(const ServerInfo& server, const Q
 	}
 
 	if (!payload.success || !*payload.success){
-		errorMessage = payload.message ? QString(*payload.message) : QStringLiteral("The server '%1' did not revoke the token").arg(QString::fromUtf8(server.productId));
+		errorMessage = QStringLiteral("The server '%1' did not revoke the token").arg(QString::fromUtf8(server.productId));
 
 		return false;
 	}

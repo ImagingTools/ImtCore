@@ -8,83 +8,12 @@
 // ACF includes
 #include <istd/TDelPtr.h>
 
-// ImtCore includes
-#include <imtlic/CFeatureInfo.h>
-
 
 namespace imtauth
 {
 
 
-namespace
-{
-
-
-imtlic::CFeatureInfo* CreatePermission(
-			const QByteArray& featureId,
-			const char* featureName,
-			const char* featureDescription,
-			const QByteArrayList& requirements = QByteArrayList())
-{
-	imtlic::CFeatureInfo* featureInfoPtr = new imtlic::CFeatureInfo;
-	featureInfoPtr->SetFeatureId(featureId);
-	featureInfoPtr->SetFeatureName(featureName);
-	featureInfoPtr->SetFeatureDescription(featureDescription);
-	featureInfoPtr->SetOptional(false);
-	featureInfoPtr->SetIsPermission(true);
-	featureInfoPtr->SetRequirements(requirements);
-
-	return featureInfoPtr;
-}
-
-
-imtlic::CFeatureInfo* AddPermission(
-			imtlic::CFeatureInfo& parent,
-			const QByteArray& featureId,
-			const char* featureName,
-			const char* featureDescription,
-			const QByteArrayList& requirements = QByteArrayList())
-{
-	imtlic::CFeatureInfo* featureInfoPtr = CreatePermission(featureId, featureName, featureDescription, requirements);
-	parent.InsertSubFeature(imtlic::IFeatureInfo::FeatureInfoPtr(featureInfoPtr));
-
-	return featureInfoPtr;
-}
-
-
-} // anonymous namespace
-
-
-// public methods
-
-imtlic::IFeatureInfoSharedPtr CProductServerPermissionsProviderComp::GetFeatureInfo(const QByteArray& featureId) const
-{
-	imtlic::IFeatureInfoSharedPtr direct = m_featureCollection.GetFeatureInfo(featureId);
-	if (direct.IsValid()){
-		return direct;
-	}
-
-	return m_featureCollection.FindFeatureById(featureId);
-}
-
-
-const imtbase::ICollectionInfo& CProductServerPermissionsProviderComp::GetFeatureList() const
-{
-	return m_featureCollection.GetFeatureList();
-}
-
-
 // protected methods
-
-void CProductServerPermissionsProviderComp::OnComponentCreated()
-{
-	BaseClass::OnComponentCreated();
-
-	CreateFeatures();
-}
-
-
-// private methods
 
 void CProductServerPermissionsProviderComp::CreateFeatures()
 {

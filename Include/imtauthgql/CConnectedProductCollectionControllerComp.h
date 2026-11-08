@@ -65,6 +65,11 @@ protected:
 
 private:
 	void EnsureOwnProduct() const;
+	imtauth::IConnectedProductUniquePtr CreateProductEntry(
+				const QByteArray& objectId,
+				const QByteArray& productId,
+				const QString& name,
+				const QString& description) const;
 	QString GetPublishedVersion(const QByteArray& productId) const;
 	QByteArray GetOwnProductId() const;
 	void FillServerState(

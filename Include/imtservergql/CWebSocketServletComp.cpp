@@ -105,11 +105,9 @@ void CWebSocketServletComp::OnRequestDestroyed(imtrest::IRequest* request)
 {
 	QMutexLocker locker(&m_tokenSubscriptionsMutex);
 
-	for (int index = m_tokenSubscriptions.size() - 1; index >= 0; index--){
-		if (m_tokenSubscriptions[index].requestPtr == request){
-			m_tokenSubscriptions.removeAt(index);
-		}
-	}
+	m_tokenSubscriptions.removeIf([request](const TokenSubscription& subscription){
+		return subscription.requestPtr == request;
+	});
 }
 
 
@@ -353,11 +351,9 @@ imtrest::ConstResponsePtr CWebSocketServletComp::UnregisterSubscription(const im
 	{
 		// The stop comes in a request of its own over the same connection
 		QMutexLocker locker(&m_tokenSubscriptionsMutex);
-		for (int index = m_tokenSubscriptions.size() - 1; index >= 0; index--){
-			if (m_tokenSubscriptions[index].subscriptionId == subscriptionId && m_tokenSubscriptions[index].connectionPtr == webSocketRequest->parent()){
-				m_tokenSubscriptions.removeAt(index);
-			}
-		}
+		m_tokenSubscriptions.removeIf([&subscriptionId, webSocketRequest](const TokenSubscription& subscription){
+			return subscription.subscriptionId == subscriptionId && subscription.connectionPtr == webSocketRequest->parent();
+		});
 	}
 
 	for (int index = 0; index < m_gqlSubscriberControllersCompPtr.GetCount(); index++){

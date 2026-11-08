@@ -21,6 +21,34 @@ namespace imtauthgql
 {
 
 
+namespace
+{
+
+
+// Copy a feature with its sub-features
+void CopyFeature(const imtlic::IFeatureInfo& featureInfo, sdl::V1_0::imtauth::CServerFeature& feature)
+{
+	feature.featureId = featureInfo.GetFeatureId();
+	feature.name = featureInfo.GetFeatureName();
+	feature.description = featureInfo.GetFeatureDescription();
+	feature.requirements.Emplace().FromList(featureInfo.GetRequirements());
+
+	imtsdl::TElementList<sdl::V1_0::imtauth::CServerFeature> subFeatures;
+	for (const imtlic::IFeatureInfo::FeatureInfoPtr& subFeaturePtr : featureInfo.GetSubFeatures()){
+		if (subFeaturePtr.IsValid()){
+			sdl::V1_0::imtauth::CServerFeature subFeature;
+			CopyFeature(*subFeaturePtr, subFeature);
+			subFeatures.append(subFeature);
+		}
+	}
+
+	feature.subFeatures = subFeatures;
+}
+
+
+} // namespace
+
+
 // protected methods
 
 // reimplemented (sdl::V1_0::imtauth::CServerTokensGqlHandlerCompBase)
@@ -140,11 +168,7 @@ sdl::V1_0::imtauth::CRevokeServerTokenPayload CServerTokenControllerComp::OnRevo
 	const auto arguments = revokeServerTokenRequest.GetRequestedArguments();
 	const QByteArray tokenId = arguments.input.has_value() && arguments.input->id ? QByteArray(*arguments.input->id) : QByteArray();
 
-	// Personal tokens of users are not revoked here
-	const imtauth::IPersonalAccessTokenSharedPtr tokenPtr = m_tokenManagerCompPtr->GetToken(tokenId);
-	if (!tokenPtr.IsValid() || tokenPtr->GetClientProductId().isEmpty()){
-		errorMessage = QStringLiteral("The server token does not exist");
-
+	if (!GetServerToken(tokenId, errorMessage).IsValid()){
 		return response;
 	}
 
@@ -173,11 +197,8 @@ sdl::V1_0::imtauth::CUpdateServerTokenScopesPayload CServerTokenControllerComp::
 	const QByteArray tokenId = arguments.input.has_value() && arguments.input->id ? QByteArray(*arguments.input->id) : QByteArray();
 	QByteArrayList scopes = arguments.input.has_value() && arguments.input->scopes ? arguments.input->scopes->ToList() : QByteArrayList();
 
-	// Personal tokens of users are not changed here
-	const imtauth::IPersonalAccessTokenSharedPtr tokenPtr = m_tokenManagerCompPtr->GetToken(tokenId);
-	if (!tokenPtr.IsValid() || tokenPtr->GetClientProductId().isEmpty()){
-		errorMessage = QStringLiteral("The server token does not exist");
-
+	const imtauth::IPersonalAccessTokenSharedPtr tokenPtr = GetServerToken(tokenId, errorMessage);
+	if (!tokenPtr.IsValid()){
 		return response;
 	}
 
@@ -217,14 +238,15 @@ sdl::V1_0::imtauth::CServerTokenReceiver CServerTokenControllerComp::OnGetServer
 		return response;
 	}
 
-	QByteArrayList requiredPermissions;
-	for (int i = 0; i < m_requiredPermissionsAttrPtr.GetCount(); i++){
-		requiredPermissions.append(m_requiredPermissionsAttrPtr[i]);
-	}
+	imtlic::CProductInfo tree;
+	BuildTokenTree(tree);
+
+	imtsdl::TElementList<sdl::V1_0::imtauth::CPermissionGroup> groups;
+	BuildPermissionGroups<sdl::V1_0::imtauth::CPermissionGroup, sdl::V1_0::imtauth::CPermissionEntry>(&tree, nullptr, groups, QByteArray(), nullptr);
 
 	response.productId = GetOwnProductId();
-	response.groups = GetTokenGroups();
-	response.requiredPermissions.Emplace().FromList(requiredPermissions);
+	response.groups = groups;
+	response.requiredPermissions.Emplace().FromList(GetRequiredPermissions());
 
 	return response;
 }
@@ -248,7 +270,7 @@ sdl::V1_0::imtauth::CServerFeatureList CServerTokenControllerComp::OnGetServerTo
 	auto& features = response.features.Emplace();
 	const bool hasTree = VisitTreeFeatures([&features](const QByteArray& /*featureId*/, const imtlic::IFeatureInfo& featureInfo){
 		sdl::V1_0::imtauth::CServerFeature feature;
-		CopyFeature<sdl::V1_0::imtauth::CServerFeature>(featureInfo, feature);
+		CopyFeature(featureInfo, feature);
 		features.append(feature);
 	});
 	if (!hasTree){
@@ -302,15 +324,28 @@ bool CServerTokenControllerComp::CheckClientProduct(const QByteArray& clientProd
 }
 
 
-imtsdl::TElementList<sdl::V1_0::imtauth::CPermissionGroup> CServerTokenControllerComp::GetTokenGroups() const
+QByteArrayList CServerTokenControllerComp::GetRequiredPermissions() const
 {
-	imtlic::CProductInfo tree;
-	BuildTokenTree(tree);
+	QByteArrayList requiredPermissions;
+	for (int i = 0; i < m_requiredPermissionsAttrPtr.GetCount(); i++){
+		requiredPermissions.append(m_requiredPermissionsAttrPtr[i]);
+	}
 
-	imtsdl::TElementList<sdl::V1_0::imtauth::CPermissionGroup> groups;
-	BuildPermissionGroups<sdl::V1_0::imtauth::CPermissionGroup, sdl::V1_0::imtauth::CPermissionEntry>(&tree, nullptr, groups, QByteArray(), nullptr);
+	return requiredPermissions;
+}
 
-	return groups;
+
+imtauth::IPersonalAccessTokenSharedPtr CServerTokenControllerComp::GetServerToken(const QByteArray& tokenId, QString& errorMessage) const
+{
+	// Personal tokens of users are not touched here
+	const imtauth::IPersonalAccessTokenSharedPtr tokenPtr = m_tokenManagerCompPtr->GetToken(tokenId);
+	if (!tokenPtr.IsValid() || tokenPtr->GetClientProductId().isEmpty()){
+		errorMessage = QStringLiteral("The server token does not exist");
+
+		return imtauth::IPersonalAccessTokenSharedPtr();
+	}
+
+	return tokenPtr;
 }
 
 
@@ -323,9 +358,7 @@ bool CServerTokenControllerComp::NormalizeScopes(QByteArrayList& scopes, QString
 	const QByteArrayList catalog = imtlic::CollectProductPermissions(tree);
 
 	QByteArrayList requested = scopes;
-	for (int i = 0; i < m_requiredPermissionsAttrPtr.GetCount(); i++){
-		requested.append(m_requiredPermissionsAttrPtr[i]);
-	}
+	requested += GetRequiredPermissions();
 
 	// A group stands for the permissions in it
 	QByteArrayList held;
@@ -363,12 +396,7 @@ void CServerTokenControllerComp::BuildTokenTree(imtlic::CProductInfo& tree) cons
 {
 	// The tree resolves the requirements
 	tree.SetProductId(GetOwnProductId());
-	AddTokenFeatures(tree);
-}
 
-
-void CServerTokenControllerComp::AddTokenFeatures(imtlic::IProductInfo& tree) const
-{
 	// A product takes only an identifiable feature at its root
 	auto addFeature = [&tree](const QByteArray& featureId, const imtlic::IFeatureInfo& sourceInfo){
 		imtlic::CIdentifiableFeatureInfo featureInfo;

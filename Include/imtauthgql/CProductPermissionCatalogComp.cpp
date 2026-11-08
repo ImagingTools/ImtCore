@@ -72,7 +72,9 @@ sdl::V1_0::imtauth::CPublishProductPermissionsPayload CProductPermissionCatalogC
 
 	// A tree that could not be found must not be stored as a second one
 	bool isRead = false;
-	QByteArray snapshotId = imtauth::FindProductPermissionSnapshot(*m_snapshotCollectionCompPtr, productId, &isRead);
+	QByteArray snapshotId;
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	const imtauth::CProductPermissionSnapshot* storedPtr = imtauth::GetProductPermissionSnapshot(*m_snapshotCollectionCompPtr, productId, dataPtr, &isRead, &snapshotId);
 	if (!isRead){
 		errorMessage = QStringLiteral("Unable to read the stored permission tree");
 
@@ -80,21 +82,11 @@ sdl::V1_0::imtauth::CPublishProductPermissionsPayload CProductPermissionCatalogC
 	}
 
 	imtauth::CIdentifiableProductPermissionSnapshot snapshot;
-	if (!snapshotId.isEmpty()){
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		const imtauth::CProductPermissionSnapshot* storedPtr = m_snapshotCollectionCompPtr->GetObjectData(snapshotId, dataPtr) ? dynamic_cast<const imtauth::CProductPermissionSnapshot*>(dataPtr.GetPtr()) : nullptr;
-		if (storedPtr == nullptr){
-			errorMessage = QStringLiteral("Unable to read the stored permission tree");
+	if (storedPtr != nullptr && storedPtr->GetTreeHash() == hash && storedPtr->GetProductVersion() == version){
+		response.success = true;
+		response.changed = false;
 
-			return response;
-		}
-
-		if (storedPtr->GetTreeHash() == hash && storedPtr->GetProductVersion() == version){
-			response.success = true;
-			response.changed = false;
-
-			return response;
-		}
+		return response;
 	}
 
 	snapshot.SetProductId(productId);

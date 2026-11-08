@@ -73,10 +73,6 @@ ParamEditorBase {
 		return qsTr("Unknown")
 	}
 
-	function isCredentialFailed(credentialStatus){
-		return credentialStatus === "MISSING" || credentialStatus === "REJECTED"
-	}
-
 	function getCredentialText(credentialStatus){
 		if (credentialStatus === "MISSING"){
 			return qsTr("no server token")
@@ -163,8 +159,8 @@ ParamEditorBase {
 								x: serviceDependencyView.versionX
 								width: rowItem.width - x
 								elide: Text.ElideRight
-								color: model.status === "DISCONNECTED" || serviceDependencyView.isCredentialFailed(model.credentialStatus) ? Style.dangerColor : Style.textColor
-								text: serviceDependencyView.isCredentialFailed(model.credentialStatus) ? serviceDependencyView.getStatusText(model.status, model.version) + " - " + serviceDependencyView.getCredentialText(model.credentialStatus) : serviceDependencyView.getStatusText(model.status, model.version)
+								color: model.status === "DISCONNECTED" || serviceDependencyView.getCredentialText(model.credentialStatus) !== "" ? Style.dangerColor : Style.textColor
+								text: serviceDependencyView.getStatusText(model.status, model.version) + (serviceDependencyView.getCredentialText(model.credentialStatus) !== "" ? " - " + serviceDependencyView.getCredentialText(model.credentialStatus) : "")
 							}
 						}
 					}

@@ -122,6 +122,18 @@ protected:
 	virtual bool OnBeforeRemoveElements(const QByteArrayList& elementIds, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual void OnAfterRemoveElements(const QByteArrayList& elementIds, const ::imtgql::CGqlRequest& gqlRequest) const override;
 
+private:
+	/**
+		Check the changes of a user a request is allowed to make: the account, the groups, the other products and the granted permissions.
+		\param previousPtr The stored user; null for a new one.
+	*/
+	bool CheckUserGrants(
+				const imtgql::CGqlRequest& gqlRequest,
+				const QByteArray& objectId,
+				const imtauth::IUserInfo* previousPtr,
+				const imtauth::IUserInfo& user,
+				QString& errorMessage) const;
+
 protected:
 	I_REF(imtauth::IRoleInfoProvider, m_roleInfoProviderCompPtr);
 	I_REF(imtauth::IUserGroupInfoProvider, m_userGroupInfoProviderCompPtr);

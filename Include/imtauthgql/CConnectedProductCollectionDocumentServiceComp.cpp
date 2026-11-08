@@ -47,12 +47,9 @@ sdl::V1_0::imtauth::CConnectedProductData CConnectedProductCollectionDocumentSer
 
 	if (m_snapshotCollectionCompPtr.IsValid()){
 		bool isRead = false;
-		const QByteArray snapshotId = imtauth::FindProductPermissionSnapshot(*m_snapshotCollectionCompPtr, productPtr->GetProductId(), &isRead);
 		imtbase::IObjectCollection::DataPtr dataPtr;
-		const imtauth::CProductPermissionSnapshot* snapshotPtr = !snapshotId.isEmpty() && m_snapshotCollectionCompPtr->GetObjectData(snapshotId, dataPtr)
-					? dynamic_cast<const imtauth::CProductPermissionSnapshot*>(dataPtr.GetPtr())
-					: nullptr;
-		if (!isRead || (!snapshotId.isEmpty() && snapshotPtr == nullptr)){
+		const imtauth::CProductPermissionSnapshot* snapshotPtr = imtauth::GetProductPermissionSnapshot(*m_snapshotCollectionCompPtr, productPtr->GetProductId(), dataPtr, &isRead);
+		if (!isRead){
 			errorMessage = QStringLiteral("Unable to read the stored permission tree");
 
 			return sdl::V1_0::imtauth::CConnectedProductData();

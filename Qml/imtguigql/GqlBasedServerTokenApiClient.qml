@@ -40,14 +40,6 @@ ServerTokenApiClient {
 		root.__scopesRequest.send(root.__scopesInput)
 	}
 
-	function __parseServer(server){
-		return {
-			"productId": String(server.m_productId),
-			"groups": PermissionGroups.toFlatArray(server.m_groups),
-			"requiredPermissions": Array.isArray(server.m_requiredPermissions) ? server.m_requiredPermissions : []
-		}
-	}
-
 	property ServerTokenListInput __listInput: ServerTokenListInput {}
 	property CreateServerTokenInput __createInput: CreateServerTokenInput {}
 	property InputId __revokeInput: InputId {}
@@ -59,7 +51,10 @@ ServerTokenApiClient {
 		sdlObjectComp: Component {
 			ServerTokenReceiver {
 				onFinished: {
-					root.productServer = root.__parseServer(this)
+					root.productServer = {
+						"groups": PermissionGroups.toFlatArray(m_groups),
+						"requiredPermissions": Array.isArray(m_requiredPermissions) ? m_requiredPermissions : []
+					}
 				}
 			}
 		}
@@ -75,10 +70,6 @@ ServerTokenApiClient {
 		sdlObjectComp: Component {
 			UpdateServerTokenScopesPayload {
 				onFinished: {
-					if (!m_success){
-						root.operationFailed(m_message)
-					}
-
 					root.requestTokens()
 				}
 			}
@@ -110,13 +101,8 @@ ServerTokenApiClient {
 		sdlObjectComp: Component {
 			CreateServerTokenPayload {
 				onFinished: {
-					if (m_success){
-						root.tokenCreated(m_token)
-						root.requestTokens()
-					}
-					else{
-						root.operationFailed(m_message)
-					}
+					root.tokenCreated(m_token)
+					root.requestTokens()
 				}
 			}
 		}
@@ -132,10 +118,6 @@ ServerTokenApiClient {
 		sdlObjectComp: Component {
 			RevokeServerTokenPayload {
 				onFinished: {
-					if (!m_success){
-						root.operationFailed(m_message)
-					}
-
 					root.requestTokens()
 				}
 			}

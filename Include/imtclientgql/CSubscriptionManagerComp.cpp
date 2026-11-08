@@ -33,21 +33,23 @@ namespace
 const int s_refusedRetryInterval = 60 * 1000;
 
 
-/**
-	The product and the language the request was resolved for, as the HTTP client sends them: a web client served by a
-	product server sends no product, the server knows it.
-*/
+void RemoveHeader(QJsonObject& headersObject, const QByteArray& headerKey)
+{
+	for (const QString& headerId : headersObject.keys()){
+		if (headerId.compare(QString(headerKey), Qt::CaseInsensitive) == 0){
+			headersObject.remove(headerId);
+		}
+	}
+}
+
+
 /**
 	The token of this server names the product only: the rights of a request come from the token of its user.
 	The same headers a client sent here are dropped: they are not this server's to forward.
 */
 void InsertServerToken(const QByteArray& serverToken, QJsonObject& headersObject)
 {
-	for (const QString& headerId : headersObject.keys()){
-		if (headerId.compare(QString(imtbase::s_serverTokenHeaderId), Qt::CaseInsensitive) == 0){
-			headersObject.remove(headerId);
-		}
-	}
+	RemoveHeader(headersObject, imtbase::s_serverTokenHeaderId);
 
 	if (!serverToken.isEmpty()){
 		headersObject[QString(imtbase::s_serverTokenHeaderId)] = QString(serverToken);
@@ -55,15 +57,15 @@ void InsertServerToken(const QByteArray& serverToken, QJsonObject& headersObject
 }
 
 
+/**
+	The product and the language the request was resolved for, as the HTTP client sends them: a web client served by a
+	product server sends no product, the server knows it.
+*/
 void InsertContextHeaders(const imtgql::IGqlContext& context, QJsonObject& headersObject)
 {
 	const QByteArray productId = context.GetProductId();
 	if (!productId.isEmpty()){
-		for (const QString& headerId : headersObject.keys()){
-			if (headerId.compare(QString(imtbase::s_productIdHeaderId), Qt::CaseInsensitive) == 0){
-				headersObject.remove(headerId);
-			}
-		}
+		RemoveHeader(headersObject, imtbase::s_productIdHeaderId);
 
 		headersObject[QString(imtbase::s_productIdHeaderId)] = QString(productId);
 	}

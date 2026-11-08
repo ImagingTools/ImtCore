@@ -3,8 +3,6 @@
 
 
 // ACF includes
-#include <ilog/CMessageContainer.h>
-#include <iprm/CParamsSet.h>
 #include <iser/CArchiveTag.h>
 #include <iser/CPrimitiveTypesSerializer.h>
 #include <iser/IArchive.h>
@@ -12,7 +10,7 @@
 #include <istd/TDelPtr.h>
 
 // ImtCore includes
-#include <imtbase/CComplexCollectionFilter.h>
+#include <imtauth/CollectionSelection.h>
 
 
 namespace imtauth
@@ -191,24 +189,31 @@ bool CProductPermissionSnapshot::ResetData(CompatibilityMode /*mode*/)
 }
 
 
-QByteArray FindProductPermissionSnapshot(const imtbase::IObjectCollection& snapshotCollection, const QByteArray& productId, bool* isReadPtr)
+const CProductPermissionSnapshot* GetProductPermissionSnapshot(
+			const imtbase::IObjectCollection& snapshotCollection,
+			const QByteArray& productId,
+			imtbase::IObjectCollection::DataPtr& dataPtr,
+			bool* isReadPtr,
+			QByteArray* idPtr)
 {
-	imtbase::CComplexCollectionFilter::FilterExpression filterExpr;
-	filterExpr.fieldFilters << imtbase::IComplexCollectionFilter::FieldFilter("ProductId", QString::fromUtf8(productId));
+	bool isRead = false;
+	const QByteArrayList ids = CollectionSelection::SelectIds(snapshotCollection, CollectionSelection::ColumnEquals("ProductId", productId), {"ProductId"}, &isRead);
+	const QByteArray snapshotId = ids.isEmpty() ? QByteArray() : ids.first();
 
-	imtbase::CComplexCollectionFilter complexFilter;
-	complexFilter.SetFilterExpression(filterExpr);
-
-	iprm::CParamsSet filterParams;
-	filterParams.SetEditableParameter("ComplexFilter", &complexFilter);
-
-	ilog::CMessageContainer readErrors;
-	const imtbase::ICollectionInfo::Ids ids = snapshotCollection.GetElementIds(0, 1, &filterParams, &readErrors);
-	if (isReadPtr != nullptr){
-		*isReadPtr = readErrors.GetWorstCategory() < istd::IInformationProvider::IC_ERROR;
+	const CProductPermissionSnapshot* snapshotPtr = nullptr;
+	if (!snapshotId.isEmpty() && snapshotCollection.GetObjectData(snapshotId, dataPtr)){
+		snapshotPtr = dynamic_cast<const CProductPermissionSnapshot*>(dataPtr.GetPtr());
 	}
 
-	return ids.isEmpty() ? QByteArray() : ids.first();
+	if (isReadPtr != nullptr){
+		*isReadPtr = isRead && (snapshotId.isEmpty() || snapshotPtr != nullptr);
+	}
+
+	if (idPtr != nullptr){
+		*idPtr = snapshotId;
+	}
+
+	return snapshotPtr;
 }
 
 

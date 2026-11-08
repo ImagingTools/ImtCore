@@ -86,23 +86,23 @@ istd::IChangeableUniquePtr CConnectedProductCollectionControllerComp::CreateObje
 		return nullptr;
 	}
 
-	imtauth::IConnectedProductUniquePtr instancePtr = m_productFactCompPtr.CreateInstance();
-	imtauth::CIdentifiableConnectedProduct* productPtr = dynamic_cast<imtauth::CIdentifiableConnectedProduct*>(instancePtr.GetPtr());
-	if (productPtr == nullptr){
+	QByteArray objectId = representation.id ? QByteArray(*representation.id) : QByteArray();
+	if (objectId.isEmpty()){
+		objectId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
+	}
+
+	imtauth::IConnectedProductUniquePtr instancePtr = CreateProductEntry(
+				objectId,
+				productId,
+				name,
+				representation.description ? QString(*representation.description) : QString());
+	if (!instancePtr.IsValid()){
 		errorMessage = QStringLiteral("Unable to create a product entry");
 
 		return nullptr;
 	}
 
-	newObjectId = representation.id ? QByteArray(*representation.id) : QByteArray();
-	if (newObjectId.isEmpty()){
-		newObjectId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
-	}
-
-	productPtr->SetObjectUuid(newObjectId);
-	productPtr->SetProductId(productId);
-	productPtr->SetProductName(name);
-	productPtr->SetProductDescription(representation.description ? QString(*representation.description) : QString());
+	newObjectId = objectId;
 
 	return instancePtr;
 }
@@ -212,15 +212,9 @@ bool CConnectedProductCollectionControllerComp::OnBeforeRemoveElements(const QBy
 
 // reimplemented (imtservergql::CPermissibleGqlRequestHandlerComp)
 
-bool CConnectedProductCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+bool CConnectedProductCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& /*errorMessage*/) const
 {
-	if (!IsSuperuserSessionRequest(gqlRequest)){
-		errorMessage = QStringLiteral("The catalog of products is available to a superuser session only");
-
-		return false;
-	}
-
-	return true;
+	return IsSuperuserSessionRequest(gqlRequest);
 }
 
 
@@ -261,18 +255,34 @@ void CConnectedProductCollectionControllerComp::EnsureOwnProduct() const
 		return;
 	}
 
-	imtauth::IConnectedProductUniquePtr instancePtr = m_productFactCompPtr.CreateInstance();
-	imtauth::CIdentifiableConnectedProduct* productPtr = dynamic_cast<imtauth::CIdentifiableConnectedProduct*>(instancePtr.GetPtr());
-	if (productPtr == nullptr){
+	const QByteArray objectId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
+	imtauth::IConnectedProductUniquePtr instancePtr = CreateProductEntry(objectId, productId, name, QString());
+	if (!instancePtr.IsValid()){
 		return;
 	}
 
-	const QByteArray objectId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
+	m_isOwnProductEnsured = !m_objectCollectionCompPtr->InsertNewObject("ConnectedProduct", name, QString(), instancePtr.GetPtr(), objectId).isEmpty();
+}
+
+
+imtauth::IConnectedProductUniquePtr CConnectedProductCollectionControllerComp::CreateProductEntry(
+			const QByteArray& objectId,
+			const QByteArray& productId,
+			const QString& name,
+			const QString& description) const
+{
+	imtauth::IConnectedProductUniquePtr instancePtr = m_productFactCompPtr.CreateInstance();
+	imtauth::CIdentifiableConnectedProduct* productPtr = dynamic_cast<imtauth::CIdentifiableConnectedProduct*>(instancePtr.GetPtr());
+	if (productPtr == nullptr){
+		return nullptr;
+	}
+
 	productPtr->SetObjectUuid(objectId);
 	productPtr->SetProductId(productId);
 	productPtr->SetProductName(name);
+	productPtr->SetProductDescription(description);
 
-	m_isOwnProductEnsured = !m_objectCollectionCompPtr->InsertNewObject("ConnectedProduct", name, QString(), productPtr, objectId).isEmpty();
+	return instancePtr;
 }
 
 
@@ -297,9 +307,8 @@ QString CConnectedProductCollectionControllerComp::GetPublishedVersion(const QBy
 		}
 	}
 
-	const QByteArray snapshotId = imtauth::FindProductPermissionSnapshot(*m_snapshotCollectionCompPtr, productId);
 	imtbase::IObjectCollection::DataPtr dataPtr;
-	const imtauth::CProductPermissionSnapshot* snapshotPtr = !snapshotId.isEmpty() && m_snapshotCollectionCompPtr->GetObjectData(snapshotId, dataPtr) ? dynamic_cast<const imtauth::CProductPermissionSnapshot*>(dataPtr.GetPtr()) : nullptr;
+	const imtauth::CProductPermissionSnapshot* snapshotPtr = imtauth::GetProductPermissionSnapshot(*m_snapshotCollectionCompPtr, productId, dataPtr);
 	const QString version = snapshotPtr != nullptr ? snapshotPtr->GetProductVersion() : QString();
 
 	QMutexLocker locker(&m_publishedVersionsMutex);

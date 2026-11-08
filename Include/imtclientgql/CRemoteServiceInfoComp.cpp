@@ -105,12 +105,13 @@ void CRemoteServiceInfoComp::UpdateServiceInfo()
 		SetServiceStatus(imtcom::IConnectionStatusProvider::CS_UNKNOWN);
 	}
 
-	SendInfoRequest(!serverToken.isEmpty());
+	SendInfoRequest(serverToken);
 }
 
 
-void CRemoteServiceInfoComp::SendInfoRequest(bool useToken)
+void CRemoteServiceInfoComp::SendInfoRequest(const QByteArray& serverToken)
 {
+	const bool useToken = !serverToken.isEmpty();
 	const int requestId = ++m_lastRequestId;
 
 	imtgql::CGqlRequest request;
@@ -121,7 +122,7 @@ void CRemoteServiceInfoComp::SendInfoRequest(bool useToken)
 	}
 
 	if (useToken){
-		imtgql::SetServerRequestContext(request, m_serverCredentialCompPtr->GetServerToken());
+		imtgql::SetServerRequestContext(request, serverToken);
 	}
 
 	m_asyncClientCompPtr->SendModelRequest<sdl::V1_0::imtapp::CApplicationInfo>(request).then(this, [this, requestId, useToken](const GqlModelResult<sdl::V1_0::imtapp::CApplicationInfo>& result) {
@@ -140,7 +141,7 @@ void CRemoteServiceInfoComp::OnRequestFinished(int requestId, bool isTokenUsed, 
 		SetCredentialStatus(CRS_REJECTED);
 
 		// The service is there, its information does not depend on the token
-		SendInfoRequest(false);
+		SendInfoRequest(QByteArray());
 
 		return;
 	}

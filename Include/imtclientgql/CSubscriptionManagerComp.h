@@ -134,11 +134,12 @@ Q_SIGNALS:
 private:
 	void UpdateCustomerSubscriptionStatuses(const QByteArray& subscriptionId, const QString& message = QString()) const;
 
+	QByteArray GetServerToken() const;
+
 	/**
 		A refused subscription is sent again after a while: the reason may be gone while the connection stays.
 	*/
 	void ScheduleRefusedRetry() const;
-	QByteArray GetServerToken() const;
 	void RetryRefusedSubscriptions() const;
 	virtual imtrest::ConstResponsePtr CreateErrorResponse(const QByteArray& errorMessage, const imtrest::IRequest& request) const;
 

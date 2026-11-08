@@ -60,7 +60,7 @@ public:
 		const QString& description,
 		const QByteArrayList& scopes,
 		const QDateTime& expiresAt,
-				const QByteArray& clientProductId = QByteArray()) = 0;
+			const QByteArray& clientProductId = QByteArray()) = 0;
 
 	/**
 		Validate a personal access token.

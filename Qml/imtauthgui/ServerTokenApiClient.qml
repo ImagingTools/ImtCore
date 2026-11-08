@@ -14,7 +14,7 @@ QtObject {
 	// Model of the tokens of the product; each item has m_id, m_productId, m_scopes and m_revoked.
 	property var tokens: null
 
-	// This server, which issues the tokens for itself: {productId, groups, requiredPermissions},
+	// This server, which issues the tokens for itself: {groups, requiredPermissions},
 	// groups as PermissionsTableView.rebuildFromFlatArray takes them; null until it is read.
 	property var productServer: null
 

@@ -7,6 +7,7 @@
 
 // ImtCore includes
 #include <imtauth/IClientProductCatalog.h>
+#include <imtauth/IPersonalAccessToken.h>
 #include <imtauth/IPersonalAccessTokenManager.h>
 #include <imtlic/CProductInfo.h>
 #include <imtlic/IFeatureInfoProvider.h>
@@ -78,9 +79,14 @@ private:
 	bool CheckClientProduct(const QByteArray& clientProductId, QString& errorMessage) const;
 
 	/**
-		The permissions a token can hold, as groups of the tree they are given from.
+		The permissions every token for this server holds.
 	*/
-	imtsdl::TElementList<sdl::V1_0::imtauth::CPermissionGroup> GetTokenGroups() const;
+	QByteArrayList GetRequiredPermissions() const;
+
+	/**
+		The server token of the id. Personal tokens of users are not server tokens.
+	*/
+	imtauth::IPersonalAccessTokenSharedPtr GetServerToken(const QByteArray& tokenId, QString& errorMessage) const;
 
 	/**
 		Check the permissions of a token and complete them: a group stands for its permissions,
@@ -92,11 +98,6 @@ private:
 		The tree a token is given from: this server with the roots of the permissions a token may hold.
 	*/
 	void BuildTokenTree(imtlic::CProductInfo& tree) const;
-
-	/**
-		The roots of the tree a token is given from, as identifiable features.
-	*/
-	void AddTokenFeatures(imtlic::IProductInfo& tree) const;
 
 	/**
 		Calls the visitor for each root of the permission tree of this server.

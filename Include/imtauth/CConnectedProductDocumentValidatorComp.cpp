@@ -2,13 +2,9 @@
 #include <imtauth/CConnectedProductDocumentValidatorComp.h>
 
 
-// ACF includes
-#include <ilog/CMessageContainer.h>
-#include <iprm/CParamsSet.h>
-
 // ImtCore includes
+#include <imtauth/CollectionSelection.h>
 #include <imtauth/IConnectedProduct.h>
-#include <imtbase/CComplexCollectionFilter.h>
 #include <imtdoc/imtdoc.h>
 
 
@@ -22,25 +18,12 @@ static imtbase::ICollectionInfo::Ids SelectProductEntries(
 			const QByteArray& productId,
 			bool& isRead)
 {
-	imtbase::CComplexCollectionFilter::FilterExpression filterExpr;
-	filterExpr.logicalOperation = imtbase::IComplexCollectionFilter::LO_AND;
-	filterExpr.fieldFilters << imtbase::IComplexCollectionFilter::FieldFilter("ProductId", QString::fromUtf8(productId));
+	CollectionSelection::FilterExpression filterExpr = CollectionSelection::ColumnEquals("ProductId", productId);
 	if (!objectId.isEmpty()){
-		filterExpr.fieldFilters << imtbase::IComplexCollectionFilter::FieldFilter(
-					"DocumentId", QString::fromUtf8(objectId), imtbase::IComplexCollectionFilter::FO_NOT_EQUAL);
+		filterExpr.fieldFilters << CollectionSelection::FieldFilter("DocumentId", QString::fromUtf8(objectId), imtbase::IComplexCollectionFilter::FO_NOT_EQUAL);
 	}
 
-	imtbase::CComplexCollectionFilter complexFilter;
-	complexFilter.SetFilterExpression(filterExpr);
-
-	iprm::CParamsSet filterParams;
-	filterParams.SetEditableParameter("ComplexFilter", &complexFilter);
-
-	ilog::CMessageContainer readErrors;
-	const imtbase::ICollectionInfo::Ids ids = productCollection.GetElementIds(0, -1, &filterParams, &readErrors);
-	isRead = readErrors.GetWorstCategory() < istd::IInformationProvider::IC_ERROR;
-
-	return ids;
+	return CollectionSelection::SelectIds(productCollection, filterExpr, {"ProductId"}, &isRead);
 }
 
 

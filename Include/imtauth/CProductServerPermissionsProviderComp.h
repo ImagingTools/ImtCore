@@ -2,12 +2,8 @@
 #pragma once
 
 
-// ACF includes
-#include <icomp/CComponentBase.h>
-
 // ImtCore includes
-#include <imtlic/IFeatureInfoProvider.h>
-#include <imtlic/CFeatureContainer.h>
+#include <imtauth/CStaticPermissionsProviderCompBase.h>
 
 
 namespace imtauth
@@ -19,29 +15,17 @@ namespace imtauth
 	They are given to server tokens only, never to roles: no product tree holds them.
 */
 class CProductServerPermissionsProviderComp:
-			public icomp::CComponentBase,
-			virtual public imtlic::IFeatureInfoProvider
+			public CStaticPermissionsProviderCompBase
 {
 public:
-	typedef icomp::CComponentBase BaseClass;
+	typedef CStaticPermissionsProviderCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CProductServerPermissionsProviderComp)
-		I_REGISTER_INTERFACE(imtlic::IFeatureInfoProvider);
 	I_END_COMPONENT
 
-	// reimplemented (IFeatureInfoProvider)
-	virtual imtlic::IFeatureInfoSharedPtr GetFeatureInfo(const QByteArray& featureId) const override;
-	virtual const imtbase::ICollectionInfo& GetFeatureList() const override;
-
 protected:
-	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated() override;
-
-private:
-	void CreateFeatures();
-
-private:
-	imtlic::CFeatureContainer m_featureCollection;
+	// reimplemented (CStaticPermissionsProviderCompBase)
+	virtual void CreateFeatures() override;
 };
 
 

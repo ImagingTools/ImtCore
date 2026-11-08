@@ -2,11 +2,6 @@
 #include <imtclientgql/CServerCredentialProviderComp.h>
 
 
-// Qt includes
-#include <QtCore/QByteArray>
-#include <QtCore/qglobal.h>
-
-
 namespace imtclientgql
 {
 

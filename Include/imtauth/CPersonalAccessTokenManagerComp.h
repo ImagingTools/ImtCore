@@ -35,7 +35,7 @@ public:
 		const QString& description,
 		const QByteArrayList& scopes,
 		const QDateTime& expiresAt,
-				const QByteArray& clientProductId = QByteArray()) override;
+			const QByteArray& clientProductId = QByteArray()) override;
 	virtual bool ValidateToken(
 				const QByteArray& rawToken,
 				QByteArray& userId,

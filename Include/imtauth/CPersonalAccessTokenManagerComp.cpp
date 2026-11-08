@@ -22,7 +22,6 @@ namespace imtauth
 static const qint64 s_lastUsedPrecisionSeconds = 60;
 
 
-
 // public methods
 
 // reimplemented (imtauth::IPersonalAccessTokenManager)
@@ -289,7 +288,6 @@ bool CPersonalAccessTokenManagerComp::RevokeToken(const QByteArray& tokenId)
 
 	SendInfoMessage(0, QStringLiteral("Revoked token '%1'").arg(tokenId), "CPersonalAccessTokenManagerComp");
 
-
 	return true;
 }
 
@@ -318,7 +316,6 @@ bool CPersonalAccessTokenManagerComp::SetTokenScopes(const QByteArray& tokenId, 
 	}
 
 	SendInfoMessage(0, QStringLiteral("Changed the permissions of token '%1'").arg(QString::fromUtf8(tokenId)), "CPersonalAccessTokenManagerComp");
-
 
 	return true;
 }
@@ -369,7 +366,6 @@ bool CPersonalAccessTokenManagerComp::DeleteToken(const QByteArray& tokenId)
 	}
 
 	SendInfoMessage(0, QStringLiteral("Deleted token '%1'").arg(tokenId), "CPersonalAccessTokenManagerComp");
-
 
 	return true;
 }

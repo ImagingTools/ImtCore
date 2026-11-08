@@ -70,7 +70,7 @@ protected:
 
 private:
 	void UpdateServiceInfo();
-	void SendInfoRequest(bool useToken);
+	void SendInfoRequest(const QByteArray& serverToken);
 	void OnRequestFinished(int requestId, bool isTokenUsed, const GqlModelResult<sdl::V1_0::imtapp::CApplicationInfo>& result);
 	void SetCredentialStatus(CredentialStatus status);
 	void SetServiceStatus(imtcom::IConnectionStatusProvider::ConnectionStatus status);
