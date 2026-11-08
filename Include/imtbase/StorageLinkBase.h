@@ -106,8 +106,8 @@ public:
 	void Unload();
 
 	/**
-		Save the loaded object to the storage.
-		\return \c false, if the link is empty, not bound or the storage rejected the data. If the object is not loaded, there is nothing to save and the result is \c true.
+		Update the stored object with the loaded data.
+		\return \c false, if the link is empty, not bound, the object doesn't exist in the storage or the storage rejected the data. If the object is not loaded, there is nothing to save and the result is \c true.
 	*/
 	bool Save() const;
 
@@ -129,9 +129,9 @@ protected:
 	istd::IChangeableSharedPtr LoadData() const;
 
 	/**
-		Insert the object into the storage and point the link to it.
+		Replace the loaded object. The storage is not changed until Save is called.
 	*/
-	bool InsertData(const istd::IChangeableSharedPtr& dataPtr, const QString& name);
+	void SetData(const istd::IChangeableSharedPtr& dataPtr);
 
 private:
 	Id m_objectId;

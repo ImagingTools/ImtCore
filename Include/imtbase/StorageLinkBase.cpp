@@ -141,6 +141,11 @@ bool StorageLinkBase::Save() const
 		return false;
 	}
 
+	// The object must already exist in the storage
+	if (!resolverPtr->LoadObject(m_objectId).IsValid()){
+		return false;
+	}
+
 	if (!m_dataPtr.IsValid()){
 		return true;
 	}
@@ -216,22 +221,9 @@ istd::IChangeableSharedPtr StorageLinkBase::LoadData() const
 }
 
 
-bool StorageLinkBase::InsertData(const istd::IChangeableSharedPtr& dataPtr, const QString& name)
+void StorageLinkBase::SetData(const istd::IChangeableSharedPtr& dataPtr)
 {
-	IStorageResolver* resolverPtr = GetResolver();
-	if ((resolverPtr == nullptr) || !dataPtr.IsValid()){
-		return false;
-	}
-
-	const Id objectId = resolverPtr->InsertObject(dataPtr, name);
-	if (objectId.isEmpty()){
-		return false;
-	}
-
-	m_objectId = objectId;
 	m_dataPtr = dataPtr;
-
-	return true;
 }
 
 
