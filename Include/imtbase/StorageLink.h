@@ -101,10 +101,9 @@ public:
 	ObjectPtr GetObject() const;
 
 	/**
-		Insert the object into the storage and point the link to it.
-		The link must be bound to a resolver (also for the default storage).
+		Replace the loaded object. The storage is updated only by Save.
 	*/
-	bool Insert(const ObjectPtr& objectPtr, const QString& name = QString());
+	StorageLink& operator=(const ObjectPtr& objectPtr);
 
 	/**
 		Unchecked access to the linked object. The object is valid as long as this link is alive and not unloaded or re-targeted.
@@ -209,9 +208,11 @@ typename StorageLink<T>::ObjectPtr StorageLink<T>::GetObject() const
 
 
 template <class T>
-bool StorageLink<T>::Insert(const ObjectPtr& objectPtr, const QString& name)
+StorageLink<T>& StorageLink<T>::operator=(const ObjectPtr& objectPtr)
 {
-	return InsertData(istd::IChangeableSharedPtr(objectPtr), name);
+	SetData(istd::IChangeableSharedPtr(objectPtr));
+
+	return *this;
 }
 
 

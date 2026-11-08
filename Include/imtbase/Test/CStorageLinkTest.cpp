@@ -81,6 +81,15 @@ istd::TSharedInterfacePtr<CLinkTestData> CreateData(int value)
 }
 
 
+DataLink CreateLink(imtbase::IStorageResolver& resolver, int value, const QString& name = QString())
+{
+	DataLink link(resolver.InsertObject(CreateData(value), name));
+	link.SetResolver(&resolver);
+
+	return link;
+}
+
+
 void SetupCollection(imtbase::CObjectCollection& collection)
 {
 	collection.SetOperationFlags(imtbase::IObjectCollection::OF_ALL);
@@ -121,9 +130,7 @@ void CStorageLinkTest::testMemoryResolverLiveObject()
 {
 	imtbase::CMemoryStorageResolver resolver;
 
-	DataLink first;
-	first.SetResolver(&resolver);
-	QVERIFY(first.Insert(CreateData(10)));
+	DataLink first = CreateLink(resolver, 10);
 	QVERIFY(!first.IsNull());
 	QCOMPARE(resolver.GetObjectsCount(), 1);
 
@@ -149,9 +156,7 @@ void CStorageLinkTest::testCollectionResolverSnapshot()
 
 	imtbase::CCollectionStorageResolver resolver(collection, s_typeId);
 
-	DataLink link;
-	link.SetResolver(&resolver);
-	QVERIFY(link.Insert(CreateData(5), "Item"));
+	DataLink link = CreateLink(resolver, 5, "Item");
 	QCOMPARE(collection.GetElementsCount(), 1);
 
 	DataLink other(link.GetObjectId());
@@ -186,9 +191,7 @@ void CStorageLinkTest::testCollectionResolverInsertAndRemove()
 
 	imtbase::CCollectionStorageResolver resolver(collection, s_typeId);
 
-	DataLink link;
-	link.SetResolver(&resolver);
-	QVERIFY(link.Insert(CreateData(1)));
+	DataLink link = CreateLink(resolver, 1);
 
 	DataLink copy = link;
 
@@ -331,9 +334,7 @@ void CStorageLinkTest::testStorageParams()
 	imtbase::CCollectionStorageResolver collectionResolver(collection, s_typeId);
 	imtbase::CMemoryStorageResolver memoryResolver;
 
-	DataLink collectionLink;
-	collectionLink.SetResolver(&collectionResolver);
-	QVERIFY(collectionLink.Insert(CreateData(1), "Named item"));
+	DataLink collectionLink = CreateLink(collectionResolver, 1, "Named item");
 
 	QVariantMap params = collectionLink.GetStorageParams();
 	QCOMPARE(params["storage"].toString(), QString("collection"));
@@ -341,9 +342,7 @@ void CStorageLinkTest::testStorageParams()
 	QCOMPARE(params["typeId"].toByteArray(), s_typeId);
 	QCOMPARE(params["name"].toString(), QString("Named item"));
 
-	DataLink memoryLink;
-	memoryLink.SetResolver(&memoryResolver);
-	QVERIFY(memoryLink.Insert(CreateData(1)));
+	DataLink memoryLink = CreateLink(memoryResolver, 1);
 	QCOMPARE(memoryLink.GetStorageParams()["storage"].toString(), QString("memory"));
 }
 
@@ -352,9 +351,7 @@ void CStorageLinkTest::testSerialization()
 {
 	imtbase::CMemoryStorageResolver storage;
 
-	DataLink source;
-	source.SetResolver(&storage);
-	QVERIFY(source.Insert(CreateData(7)));
+	DataLink source = CreateLink(storage, 7);
 	source.SetLink(source.GetObjectId(), "images");
 
 	iser::CMemoryWriteArchive writeArchive;
@@ -384,10 +381,7 @@ void CStorageLinkTest::testLinksInContainer()
 
 	QList<DataLink> links;
 	for (int i = 0; i < 3; ++i){
-		DataLink link;
-		link.SetResolver(&storage);
-		QVERIFY(link.Insert(CreateData(i)));
-		links.append(link);
+		links.append(CreateLink(storage, i));
 	}
 
 	QCOMPARE(storage.GetObjectsCount(), 3);
@@ -429,8 +423,7 @@ void CStorageLinkTest::testOptionalInterface()
 	QVERIFY(!nullLink);
 
 	// Engaged link
-	link.SetResolver(&storage);
-	QVERIFY(link.Insert(CreateData(5)));
+	link = CreateLink(storage, 5);
 	QVERIFY(link.has_value());
 	QVERIFY(link);
 	QCOMPARE(link.value().m_value, 5);
