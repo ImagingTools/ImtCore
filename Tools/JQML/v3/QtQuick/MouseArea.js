@@ -40,7 +40,8 @@ class MouseArea extends Item {
 		exited: { type:Signal, args:[] },
 		canceled: { type:Signal, args:[] },
 		pressAndHold: { type:Signal, args:['mouse'] },
-		// pressed: { type:Signal, args:['mouse'] },
+		// Qt's pressed(mouse): the property 'pressed' takes the name, so onPressed is compiled to this signal
+		pressedEvent: { type:Signal, args:['mouse'] },
 		released: { type:Signal, args:['mouse'] },
 		wheel: { type:Signal, args:['wheel'] },
         clicked: { type:Signal, args:['mouse'] },
@@ -135,6 +136,7 @@ class MouseArea extends Item {
             this.mouseX = mouse.x
             this.mouseY = mouse.y
             this.pressedChanged(mouse)
+            this.pressedEvent(mouse)
 
             if(mouse.accepted) mouse.target = this
         }

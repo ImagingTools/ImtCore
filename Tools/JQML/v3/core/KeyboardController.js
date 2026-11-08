@@ -49,6 +49,12 @@ module.exports = {
         }
     },
 
+    __acceptKey(e){
+        if (e.key === 'Tab') {
+            e.preventDefault()
+        }
+    },
+
     add: function (obj) {
         this.shortcuts.push(obj)
     },
@@ -106,18 +112,19 @@ module.exports = {
                     }
                 }
 
+                // Qt: an accepted key goes no further, so the browser must not act on it either (Tab would move the DOM focus)
                 e.accepted = false
                 obj['Keys.pressed'](e)
-                if (e.accepted) return
+                if (e.accepted) return this.__acceptKey(e)
 
                 if (e.key === 'Tab' && e.shiftKey) {
                     e.accepted = false
                     obj['Keys.backtabPressed'](e)
-                    if (e.accepted) return
+                    if (e.accepted) return this.__acceptKey(e)
                 } else if (e.key === 'Tab') {
                     e.accepted = false
                     obj['Keys.tabPressed'](e)
-                    if (e.accepted) return
+                    if (e.accepted) return this.__acceptKey(e)
                 }
 
                 if (e.key === 'ArrowLeft') {
