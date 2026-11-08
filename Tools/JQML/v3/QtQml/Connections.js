@@ -18,9 +18,8 @@ class Connections extends QtObject {
 
     // MouseArea: the property 'pressed' takes the name of Qt's pressed(mouse), the signal is pressedEvent
     __getSignal(target, signalName){
-        let sig = target[signalName]
-        if(signalName === 'pressed' && !(sig && sig.connect)) sig = target.pressedEvent
-        return sig
+        if(signalName === 'pressed' && target instanceof require("../QtQuick/MouseArea")) return target.pressedEvent
+        return target[signalName]
     }
 
     SLOT_targetChanged(oldValue, newValue){

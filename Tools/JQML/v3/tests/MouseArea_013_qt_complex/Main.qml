@@ -177,6 +177,22 @@ Window {
         tc.mouseMove(dragArea, 90, 40)
         tc.mouseRelease(dragArea, 90, 40)
         report("drag " + dragTarget.x + "," + dragTarget.y)
+
+        reset()
+        dragArea.drag.maximumX = 1000
+        tc.mousePress(dragArea, 10, 10)
+        tc.mouseMove(dragArea, 25, 18)
+        tc.mouseMove(dragArea, 40, 30)
+        tc.mouseMove(dragArea, 45, 33)
+        tc.mouseRelease(dragArea, 45, 33)
+        dragArea.drag.maximumX = 240
+        report("dragFree " + dragTarget.x + "," + dragTarget.y)
+
+        reset()
+        tc.mousePress(dragArea, 10, 10)
+        tc.mouseMove(dragArea, 50, 45)
+        tc.mouseRelease(dragArea, 50, 45)
+        report("dragOneMove " + dragTarget.x + "," + dragTarget.y)
     }
 
     Timer {
