@@ -447,7 +447,7 @@ module.exports = {
         </style>`)
 
         this.root = JQModules.QtQuick.Item.create()
-        this.root.__complete()
+        this.root.__completeRoot()
 
         window.addEventListener('resize', ()=>{
             this.beginUpdate()

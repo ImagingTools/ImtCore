@@ -58,8 +58,10 @@ class MouseArea extends Item {
     }
 
     __pressed = false
-    __entered = false
-    __timer = null
+    __keepMouseGrab = false
+    __longPress = false
+    __doubleClick = false
+    __holdTimer = null
 
     SLOT_cursorShapeChanged(oldValue, newValue){
         this.__setDOMStyle({
@@ -67,151 +69,231 @@ class MouseArea extends Item {
         })
     }
 
+    SLOT_visibleChanged(oldValue, newValue){
+        super.SLOT_visibleChanged(oldValue, newValue)
+
+        // Qt: an area hidden while pressed is no longer the grabber
+        if(!this.visible && this.__pressed) this.__ungrab(true)
+    }
+
     __acceptsHover(){
         return this.hoverEnabled && this.enabled && this.visible
     }
 
-    __resetPressed(mouse){
-        if(!this.__self.pressed) return
-
-        this.__self.pressed = false
-        this.pressedChanged(mouse)
-    }
-
-    __onMouseCanceled(mouse){
-        this.__pressed = false
-        this.__resetPressed(mouse)
-
-        if(!this.enabled || !this.visible) return
-
-        this.canceled()
-    }
-
-    __onMouseEnter(mouse){
-        if(!this.enabled || !this.visible) return
-
-        if((this.hoverEnabled && !mouse.target) || (mouse.target === this)){
-            this.containsMouse = true
-            this.__entered = true
-            // JQApplication.setCursor(this.cursorShape) 
-            this.entered(mouse)
-            return true
-        }
-    }
-
-    __onMouseLeave(mouse){
-        // A disabled or hidden area still has to drop the hover it holds.
-        if((!this.enabled || !this.visible) && !this.containsMouse && !this.__entered) return
-
-        if((this.hoverEnabled && !mouse.target) || (mouse.target === this)){
-            this.containsMouse = false
-            this.__entered = false
-            this.exited(mouse)
-        }
-    }
-
-    __onMouseMove(mouse){
-        if(!this.enabled || !this.visible) return
-
-        if((this.hoverEnabled && !mouse.target) || (mouse.target === this && this.__pressed)){
-            this.mouseX = mouse.x
-            this.mouseY = mouse.y
-            // console.log(this)
-            JQApplication.setCursor(this.cursorShape)
-            this.positionChanged(mouse)
-
-            if(mouse.target === this && this.__pressed){
-                JQApplication.MouseController.__updateMouseAreaDrag(this, mouse)
-            }
-        }
-    }
-
-    __onMouseDown(mouse){
-        if(!this.enabled || !this.visible || !(mouse.button & this.acceptedButtons)) return
-
-        if(!mouse.target){
-            this.__pressed = true
-            this.__self.pressed = true
-            if(!this.__entered) this.entered()
-            this.mouseX = mouse.x
-            this.mouseY = mouse.y
-            // Qt: pressed(mouse) comes before pressedChanged
-            this.pressedEvent(mouse)
-            this.pressedChanged(mouse)
-
-            if(mouse.accepted) mouse.target = this
-        }
-    }
-
-    __onMouseUp(mouse){
-        if(!this.enabled || !this.visible || !(mouse.button & this.acceptedButtons)) return
-
-        if(!mouse.target || mouse.target === this){
-            this.mouseX = mouse.x
-            this.mouseY = mouse.y
-            this.released(mouse)
-        }
-    }
-
-    __hasComposedHandler(name){
+    __hasHandler(name){
         let self = this.__self
         if(typeof self['SLOT_' + name] === 'function') return true
         let list = self.__connections[name]
         return !!(list && list.length)
     }
 
-    __emitComposedClick(mouse){
-        if(!this.enabled || !this.visible || !(mouse.button & this.acceptedButtons)){
-            mouse.accepted = false
-            return
-        }
-
-        this.mouseX = mouse.x
-        this.mouseY = mouse.y
-        mouse.accepted = this.__hasComposedHandler('clicked')
-        this.clicked(mouse)
+    // Qt emits pressedChanged and containsPressChanged without comparing the values
+    __emitPressedChanged(mouse){
+        this.__self.pressed = this.__pressed
+        this.pressedChanged(mouse)
+        this.__self.containsPress = this.__pressed && this.containsMouse
+        this.containsPressChanged()
     }
 
-    __emitComposedDoubleClick(mouse){
-        if(!this.enabled || !this.visible || !(mouse.button & this.acceptedButtons)){
-            mouse.accepted = false
+    // Qt: QQuickMouseArea::setHovered
+    __setHovered(hovered){
+        if(this.containsMouse === hovered) return
+
+        this.__self.containsMouse = hovered
+        this.containsMouseChanged()
+        if(hovered) this.entered()
+        else this.exited()
+        if(this.__pressed){
+            this.__self.containsPress = this.__pressed && this.containsMouse
+            this.containsPressChanged()
+        }
+    }
+
+    __setPosition(mouse){
+        this.mouseX = mouse.x
+        this.mouseY = mouse.y
+    }
+
+    __contains(mouse){
+        return mouse.x >= 0 && mouse.y >= 0 && mouse.x < this.width && mouse.y < this.height
+    }
+
+    __isDragActive(){
+        let drag = this.drag
+        return !!(drag && typeof drag === 'object' && drag.active)
+    }
+
+    __stopHoldTimer(){
+        if(this.__holdTimer !== null){
+            clearTimeout(this.__holdTimer)
+            this.__holdTimer = null
+        }
+    }
+
+    // Qt: QQuickMouseArea::timerEvent
+    __startHoldTimer(mouse){
+        this.__stopHoldTimer()
+        let button = mouse.button
+        let buttons = mouse.buttons
+        let modifiers = mouse.modifiers
+        this.__holdTimer = setTimeout(()=>{
+            this.__holdTimer = null
+            if(this.__destroyed || !this.__pressed || this.__isDragActive() || !this.containsMouse) return
+
+            this.__longPress = true
+            let event = {
+                x: this.mouseX,
+                y: this.mouseY,
+                button: button,
+                buttons: buttons,
+                modifiers: modifiers,
+                wasHeld: true,
+                isClick: false,
+                accepted: this.__hasHandler('pressAndHold'),
+            }
+            this.pressAndHold(event)
+            if(!event.accepted) JQApplication.MouseController.__propagateComposedEvent(event, this, 'pressAndHold')
+            // Nobody handled the long press: the click is allowed
+            if(!event.accepted) this.__longPress = false
+        }, this.pressAndHoldInterval)
+    }
+
+    // Qt: QQuickMouseArea::ungrabMouse
+    __ungrab(lostHover){
+        this.__stopHoldTimer()
+        if(!this.__pressed) return
+
+        this.__pressed = false
+        this.__self.pressed = false
+        this.__doubleClick = false
+        this.canceled()
+        this.__emitPressedChanged()
+
+        if(lostHover && this.containsMouse){
+            this.__self.containsMouse = false
+            this.containsMouseChanged()
+        }
+    }
+
+    __onMouseCanceled(mouse){
+        this.__ungrab(true)
+    }
+
+    // Hover without a press, as QQuickMouseArea::hoverEnterEvent
+    __onMouseEnter(mouse){
+        if(this.__pressed || mouse.target || !this.__acceptsHover()) return
+
+        this.__setPosition(mouse)
+        this.__setHovered(true)
+        return true
+    }
+
+    __onMouseLeave(mouse){
+        if(this.__pressed) return
+
+        this.__setHovered(false)
+    }
+
+    __onMouseMove(mouse){
+        if(mouse.target === this && this.__pressed){
+            // Qt: QQuickMouseArea::mouseMoveEvent
+            this.__setHovered(this.__contains(mouse))
+            JQApplication.MouseController.__updateMouseAreaDrag(this, mouse)
+            this.__setPosition(mouse)
+            JQApplication.setCursor(this.cursorShape)
+            this.positionChanged(mouse)
             return
         }
 
-        this.mouseX = mouse.x
-        this.mouseY = mouse.y
-        mouse.accepted = this.__hasComposedHandler('doubleClicked')
+        // Qt: QQuickMouseArea::hoverMoveEvent emits only when the position changes
+        if(mouse.target || !this.__acceptsHover() || !this.containsMouse) return
+        JQApplication.setCursor(this.cursorShape)
+        if(this.mouseX === mouse.x && this.mouseY === mouse.y) return
+
+        this.__setPosition(mouse)
+        this.positionChanged(mouse)
+    }
+
+    // Qt: QQuickMouseArea::mousePressEvent and setPressed(true)
+    __onMouseDown(mouse){
+        if(mouse.target || !this.enabled || !this.visible || !(mouse.button & this.acceptedButtons)) return
+
+        this.__longPress = false
+        this.__setPosition(mouse)
+        this.__setHovered(true)
+
+        let wasPressed = this.__pressed
+        mouse.accepted = true
+        mouse.wasHeld = false
+        mouse.isClick = false
+        this.__pressed = true
+        this.__self.pressed = true
+        if(!this.__doubleClick) this.pressedEvent(mouse)
+
+        if(!mouse.accepted){
+            this.__pressed = false
+            this.__self.pressed = false
+            if(!this.hoverEnabled) this.__setHovered(false)
+        }
+
+        if(!wasPressed) this.__emitPressedChanged(mouse)
+
+        if(mouse.accepted){
+            mouse.target = this
+            JQApplication.MouseController.__startMouseAreaDrag(this, mouse)
+            this.__startHoldTimer(mouse)
+        }
+    }
+
+    // Qt: QQuickMouseArea::mouseDoubleClickEvent, delivered after the second press
+    __onMouseDoubleClick(mouse){
+        if(!this.enabled) return
+
+        let connected = this.__hasHandler('doubleClicked')
+        mouse.accepted = connected
+        mouse.isClick = true
+        mouse.wasHeld = false
         this.doubleClicked(mouse)
+        if(!mouse.accepted) JQApplication.MouseController.__propagateComposedEvent(mouse, this, 'dblclick')
+        if(this.__pressed) this.__doubleClick = connected || mouse.accepted
     }
 
-    __onMouseClick(mouse){
-        let wasPressed = this.__pressed
-        this.__pressed = false
-        this.__resetPressed(mouse)
-
-        if(!this.enabled || !this.visible || !(mouse.button & this.acceptedButtons)) return
-
-        if(mouse.target === this && wasPressed){
-            this.__emitComposedClick(mouse)
+    // Qt: QQuickMouseArea::mouseReleaseEvent and setPressed(false)
+    __onMouseUp(mouse){
+        this.__stopHoldTimer()
+        if(!this.__pressed){
+            this.__doubleClick = false
+            return
         }
-    }
 
-    __onMouseDblClick(mouse){
-        let wasPressed = this.__pressed
+        let isClick = !this.__isDragActive() && this.containsMouse
         this.__pressed = false
-        this.__resetPressed(mouse)
+        this.__setPosition(mouse)
+        mouse.isClick = isClick
+        mouse.wasHeld = this.__longPress
+        mouse.accepted = true
+        this.__self.pressed = false
+        this.released(mouse)
+        this.__emitPressedChanged(mouse)
 
-        if(!this.enabled || !this.visible || !(mouse.button & this.acceptedButtons)) return
-
-        if(mouse.target === this && wasPressed){
+        if(isClick && !this.__longPress && !this.__doubleClick){
+            mouse.accepted = this.__hasHandler('clicked')
             this.clicked(mouse)
-            this.__emitComposedDoubleClick(mouse)
+            if(!mouse.accepted) JQApplication.MouseController.__propagateComposedEvent(mouse, this, 'click')
         }
+
+        if(!this.hoverEnabled) this.__setHovered(false)
+        this.__doubleClick = false
     }
 
-    __onMouseReleasedOutside(mouse){
-        this.__pressed = false
-        this.__resetPressed(mouse)
+    // An area under the one that rejected a click, double click or press and hold (propagateComposedEvents)
+    __emitComposed(mouse, signalName){
+        if(!this.enabled || !this.visible || !(mouse.button & this.acceptedButtons) || !this.__hasHandler(signalName) || !this.__contains(mouse)) return false
+
+        // It is connected: the handler has to reject it explicitly to let it go further
+        mouse.accepted = true
+        this[signalName](mouse)
+        return true
     }
 
     __onWheel(wheel){
@@ -225,6 +307,7 @@ class MouseArea extends Item {
     }
 
     __destroy(){
+        this.__stopHoldTimer()
         JQApplication.MouseController.remove(this)
         super.__destroy()
     }

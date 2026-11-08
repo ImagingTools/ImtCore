@@ -10,6 +10,8 @@ class QmlMouseEvent {
     flags = 0
     modifiers = QtEnums.NoModifier
     wasHeld = false
+    isClick = false
+    isClick = false
     originX = 0
     originY = 0
     x = 0
@@ -117,30 +119,12 @@ module.exports = {
     dropAreas: new Set(),
     activePointerHandlers: new Set(),
 
-    buttons: {
-        0: {
-            timeStamp: 0,
-            target: null,
-        },
-        1: {
-            timeStamp: 0,
-            target: null,
-        },
-        2: {
-            timeStamp: 0,
-            target: null,
-        },
-        3: {
-            timeStamp: 0,
-            target: null,
-        },
-        4: {
-            timeStamp: 0,
-            target: null,
-        },
-    },
-    
     event: null,
+
+    // Qt defaults (QPlatformTheme): used when the browser gives no click count, as for touch
+    __doubleClickInterval: 400,
+    __doubleClickDistance: 5,
+    __lastPress: null,
 
     entered: [],
     enteredSet: new Set(),
@@ -324,36 +308,74 @@ module.exports = {
         }
     },
 
+    __startMouseAreaDrag: function(mouseArea, mouse){
+        mouseArea.__dragMoved = false
+        mouseArea.__dragOverThreshold = false
+        mouseArea.__stealMouse = mouseArea.preventStealing
+        mouseArea.__keepMouseGrab = mouseArea.__stealMouse
+        mouseArea.__dragStartScene = { x: mouse.originX, y: mouse.originY }
+        this.__setMouseAreaDragActive(mouseArea, false)
+    },
+
+    // Qt: QQuickMouseArea::mouseMoveEvent, the drag part
     __updateMouseAreaDrag: function(mouseArea, mouse){
-        if(!mouseArea || !mouse || !mouse.pressed) return
+        if(!mouseArea || !mouse || !mouseArea.__dragStartScene) return
 
         let drag = mouseArea.drag
-        if(!drag || typeof drag !== 'object') return
-
         let dragTarget = this.__getMouseAreaDragTarget(mouseArea)
         if(!dragTarget) return
 
-        this.__setMouseAreaDragActive(mouseArea, true)
-
-        let axis = Number(drag.axis)
-        if(!Number.isFinite(axis)) axis = 2
-
-        let dragTargetActive = !(dragTarget.Drag && dragTarget.Drag.active !== undefined) || !!dragTarget.Drag.active
-        if(dragTargetActive){
-            if(axis === 2 || axis === 0){
-                dragTarget.x -= mouse.moveX
-                if(Number.isFinite(Number(drag.minimumX)) && dragTarget.x < Number(drag.minimumX)) dragTarget.x = Number(drag.minimumX)
-                if(Number.isFinite(Number(drag.maximumX)) && dragTarget.x > Number(drag.maximumX)) dragTarget.x = Number(drag.maximumX)
-            }
-
-            if(axis === 2 || axis === 1){
-                dragTarget.y -= mouse.moveY
-                if(Number.isFinite(Number(drag.minimumY)) && dragTarget.y < Number(drag.minimumY)) dragTarget.y = Number(drag.minimumY)
-                if(Number.isFinite(Number(drag.maximumY)) && dragTarget.y > Number(drag.maximumY)) dragTarget.y = Number(drag.maximumY)
-            }
+        if(!mouseArea.__dragMoved){
+            mouseArea.__dragTargetStart = { x: dragTarget.x, y: dragTarget.y }
         }
 
-        this.__updateDropAreasForDragTarget(dragTarget)
+        let axis = Number(drag.axis)
+        let dragX = (axis & 1) !== 0
+        let dragY = (axis & 2) !== 0
+        let start = mouseArea.__dragTargetStart
+        let deltaX = mouse.originX - mouseArea.__dragStartScene.x
+        let deltaY = mouse.originY - mouseArea.__dragStartScene.y
+
+        if(mouseArea.__keepMouseGrab && mouseArea.__stealMouse && mouseArea.__dragOverThreshold && !drag.active){
+            this.__setMouseAreaDragActive(mouseArea, true)
+        }
+
+        let targetX = dragTarget.x
+        let targetY = dragTarget.y
+        let dragPosX = targetX
+        let dragPosY = targetY
+        let boundedX = targetX
+        let boundedY = targetY
+        if(dragX){
+            dragPosX = start.x + deltaX
+            boundedX = Math.max(Number(drag.minimumX), Math.min(dragPosX, Number(drag.maximumX)))
+        }
+        if(dragY){
+            dragPosY = start.y + deltaY
+            boundedY = Math.max(Number(drag.minimumY), Math.min(dragPosY, Number(drag.maximumY)))
+        }
+
+        if(drag.active){
+            dragTarget.x = boundedX
+            dragTarget.y = boundedY
+        }
+
+        let threshold = Number(drag.threshold)
+        let overThresholdX = Math.abs(dragPosX - start.x) > threshold
+        let overThresholdY = Math.abs(dragPosY - start.y) > threshold
+        if(!mouseArea.__dragOverThreshold && ((targetX !== boundedX && overThresholdX) || (targetY !== boundedY && overThresholdY))){
+            mouseArea.__dragOverThreshold = true
+            if(drag.smoothed) mouseArea.__dragStartScene = { x: mouse.originX, y: mouse.originY }
+        }
+
+        if(!mouseArea.__keepMouseGrab && mouseArea.__dragOverThreshold){
+            mouseArea.__keepMouseGrab = true
+            mouseArea.__stealMouse = true
+        }
+
+        mouseArea.__dragMoved = true
+
+        if(drag.active) this.__updateDropAreasForDragTarget(dragTarget)
     },
 
     // As in Qt Quick, hover goes to the topmost hover-enabled MouseArea under
@@ -387,6 +409,10 @@ module.exports = {
 
         let dragTarget = this.__getMouseAreaDragTarget(mouseArea)
         this.__setMouseAreaDragActive(mouseArea, false)
+        mouseArea.__dragStartScene = null
+        mouseArea.__dragOverThreshold = false
+        mouseArea.__stealMouse = false
+        if(!mouseArea.preventStealing) mouseArea.__keepMouseGrab = false
 
         if(dragTarget){
             this.__finishDropAreasForDragTarget(dragTarget)
@@ -455,6 +481,11 @@ module.exports = {
     },
 
     __onMouseMove: function(e){
+        let lastPress = this.__lastPress
+        if(lastPress && (Math.abs(e.clientX - lastPress.x) > this.__doubleClickDistance || Math.abs(e.clientY - lastPress.y) > this.__doubleClickDistance)){
+            this.__lastPress = null
+        }
+
         let event = this.event ? this.event : new QmlMouseEvent({path: this.getObjectsFromPoint(e.clientX, e.clientY)})
         
         let modifiers = QtEnums.NoModifier
@@ -598,15 +629,36 @@ module.exports = {
         this.event.startY = e.clientY
         this.event.path = this.getObjectsFromPoint(e.clientX, e.clientY)
 
+        let isDoubleClick = this.__isDoubleClick(e, this.event.button)
+
         for(let obj of this.event.path){
             this.event.accepted = true
             this.event.relative(obj)
             if(typeof obj.__onMouseDown === 'function') obj.__onMouseDown(this.event)
-            if(obj.active && this.activePointerHandlers.indexOf && false){}
             if(obj.active && this.activePointerHandlers.add){
                 this.activePointerHandlers.add(obj)
             }
         }
+
+        // Qt: the double click event follows the second press
+        let target = this.event.target
+        if(isDoubleClick && target && !target.__destroyed && typeof target.__onMouseDoubleClick === 'function'){
+            this.event.relative(target)
+            target.__onMouseDoubleClick(this.event)
+        }
+    },
+
+    // Qt (QGuiApplicationPrivate::processMouseEvent): a second press of the same button in time and place; the press after a double click starts again
+    __isDoubleClick: function(e, button){
+        if(e.detail > 0) return e.detail % 2 === 0
+
+        let now = performance.now()
+        let last = this.__lastPress
+        let isDoubleClick = !!last && last.button === button && now - last.time < this.__doubleClickInterval
+            && Math.abs(e.clientX - last.x) <= this.__doubleClickDistance && Math.abs(e.clientY - last.y) <= this.__doubleClickDistance
+
+        this.__lastPress = isDoubleClick ? null : { time: now, button: button, x: e.clientX, y: e.clientY }
+        return isDoubleClick
     },
 
     __onMouseUp: function(e){
@@ -633,13 +685,18 @@ module.exports = {
                 if(typeof handler.__onMouseUp === 'function') handler.__onMouseUp(this.event)
             }
             
-            if(this.event.target) {
-                this.event.relative(this.event.target)
-                if(typeof this.event.target.__onMouseUp === 'function') this.event.target.__onMouseUp(this.event)
-                this.__finishMouseAreaDrag(this.event.target)
+            // Qt has no separate click event: the release emits released and clicked
+            let target = this.event.target
+            if(target && !target.__destroyed) {
+                JQApplication.beginUpdate()
+                this.event.relative(target)
+                if(typeof target.__onMouseUp === 'function') target.__onMouseUp(this.event)
+                this.__finishMouseAreaDrag(target)
+                JQApplication.endUpdate()
             }
 
             this.activePointerHandlers.clear()
+            this.event = null
         }
     },
 
@@ -670,20 +727,11 @@ module.exports = {
         this.__touchPointerId = null
         this.__lastTouchTime = performance.now()
 
-        let target = this.event ? this.event.target : null
-
+        if(this.event) this.__onMouseMove(e)
         this.__onMouseUp(e)
-        if(this.event) this.event.fillButton(e)
-        this.click(e, this.__isReleasedOutside(e))
 
-        this.__clearHover(target)
-    },
-
-    // Qt: a press released outside the area is not a click.
-    __isReleasedOutside: function(e){
-        if(!this.event || !this.event.target) return false
-
-        return this.getObjectsFromPoint(e.clientX, e.clientY).indexOf(this.event.target) < 0
+        // No hover after a touch
+        this.__clearHover(null)
     },
 
     __onPointerCancel: function(e){
@@ -713,11 +761,6 @@ module.exports = {
             if(this.__isEmulatedMouseEvent()) return
             this.__onMouseMove(e)
         })
-        window.addEventListener('click', (e)=>{
-            if(this.__isEmulatedMouseEvent()) return
-            if(this.event) this.event.fillButton(e)
-            this.click(e, this.__isReleasedOutside(e))
-        })
         window.addEventListener('dblclick', (e)=>{
             e.preventDefault()
         })
@@ -730,35 +773,11 @@ module.exports = {
             this.__onMouseUp(e)
         })
         window.addEventListener('contextmenu', (e)=>{
-            if(this.__isEmulatedMouseEvent()){
-                e.preventDefault()
-                return
-            }
-
-            // Long press and the menu key arrive without an active press.
-            if(!this.event){
-                e.preventDefault()
-                return
-            }
-
-            let modifiers = QtEnums.NoModifier
-            if(e.shiftKey) {
-                modifiers |= QtEnums.ShiftModifier
-            }
-            if(e.altKey) {
-                modifiers |= QtEnums.AltModifier
-            }
-            if(e.ctrlKey) {
-                modifiers |= QtEnums.ControlModifier
-            }
-
-            this.event.modifiers = modifiers
-            this.event.fillButton(e)
+            // The press and the release of the right button are handled as any other
             e.preventDefault()
-            this.click(e)
         })
         window.addEventListener('wheel', (e)=>{
-            this.event = new QmlWheelEvent()
+            let event = new QmlWheelEvent()
 
             let modifiers = QtEnums.NoModifier
             if(e.shiftKey) {
@@ -771,87 +790,46 @@ module.exports = {
                 modifiers |= QtEnums.ControlModifier
             }
 
-            this.event.modifiers = modifiers
-            this.event.originX = e.clientX
-            this.event.originY = e.clientY
-            this.event.angleDelta.x = e.deltaX / 8
-            this.event.angleDelta.y = -e.deltaY / 8
-            this.event.path = this.getObjectsFromPoint(e.clientX, e.clientY)
+            event.modifiers = modifiers
+            event.originX = e.clientX
+            event.originY = e.clientY
+            event.angleDelta.x = -e.deltaX / 8
+            event.angleDelta.y = -e.deltaY / 8
+            event.path = this.getObjectsFromPoint(e.clientX, e.clientY)
 
-            for(let obj of this.event.path){
-                if(!this.event.accepted || !this.event.target){
-                    this.event.relative(obj)
-                    if(typeof obj.__onWheel === 'function') obj.__onWheel(this.event)
+            for(let obj of event.path){
+                if(!event.accepted || !event.target){
+                    event.relative(obj)
+                    if(typeof obj.__onWheel === 'function') obj.__onWheel(event)
                 }
             }
 
-            this.event = null
         })
     },
 
-    click: function(e, releasedOutside){
-        if(this.event && this.event.target){
-            if(this.event.target.__destroyed) return
-            
-            let event = this.event
-            JQApplication.beginUpdate()
-
-            event.originX = e.clientX
-            event.originY = e.clientY
-            event.relative(event.target)
-
-            let _button = this.buttons[event.button]
-
-            if(releasedOutside){
-                _button.timeStamp = 0
-                _button.target = null
-                event.target.__onMouseReleasedOutside(event)
-            } else if(e.timeStamp - _button.timeStamp > 300 || _button.target !== event.target){
-                _button.timeStamp = e.timeStamp
-                _button.target = event.target
-                event.target.__onMouseClick(event)
-                this.__propagateComposedEvent(event, event.target, 'click')
-            } else {
-                event.target.__onMouseDblClick(event)
-                this.__propagateComposedEvent(event, event.target, 'dblclick')
-            }
-            
-            event.target.__onMouseLeave(event)
-
-            JQApplication.endUpdate()
-        }
-
-        this.event = null
+    __composedSignals: {
+        click: 'clicked',
+        dblclick: 'doubleClicked',
+        pressAndHold: 'pressAndHold',
     },
 
+    // Qt: QQuickMouseAreaPrivate::propagate, every MouseArea at the point but the origin, topmost first
     __propagateComposedEvent: function(event, origin, kind){
         if(!event || !origin || origin.__destroyed) return
         if(!origin.propagateComposedEvents || event.accepted) return
 
-        let path = event.path && event.path.length ? event.path : this.getObjectsFromPoint(event.originX, event.originY)
-        let start = 0
-        for(let i = 0; i < path.length; i++){
-            if(path[i] === origin){
-                start = i + 1
-                break
-            }
-        }
+        let originRect = origin.__DOM.getBoundingClientRect()
+        let sceneX = originRect.left + event.x
+        let sceneY = originRect.top + event.y
+        let signalName = this.__composedSignals[kind]
 
-        for(let i = start; i < path.length; i++){
-            let obj = path[i]
-            if(!obj || obj === origin || obj.__destroyed) continue
+        for(let obj of this.getObjectsFromPoint(sceneX, sceneY)){
+            if(obj === origin || obj.__destroyed || typeof obj.__emitComposed !== 'function') continue
 
-            if(kind === 'click'){
-                if(typeof obj.__emitComposedClick !== 'function') continue
-                event.relative(obj)
-                obj.__emitComposedClick(event)
-            } else {
-                if(typeof obj.__emitComposedDoubleClick !== 'function') continue
-                event.relative(obj)
-                obj.__emitComposedDoubleClick(event)
-            }
-
-            if(event.accepted) return
+            let rect = obj.__DOM.getBoundingClientRect()
+            event.x = sceneX - rect.left
+            event.y = sceneY - rect.top
+            if(obj.__emitComposed(event, signalName) && event.accepted) return
         }
     },
 }
