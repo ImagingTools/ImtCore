@@ -2512,6 +2512,9 @@ export class Engine {
 		if (tokens.length !== 4 || tokens[0].t !== 'id' || tokens[1].t !== 'p' || tokens[1].v !== '.' || tokens[2].t !== 'id') return NOT_CONSTANT;
 		// A singleton that several files declare is another one in every file: its members are not constant.
 		if (this.ambiguousSingletons.has(tokens[0].v)) return NOT_CONSTANT;
+		// A property of a `pragma Singleton` file is a property like any other (`Style.baseColor` is set when the theme is
+		// applied, `Style.logo` is a binding): it is read again when it changes.
+		if (this.singletons.has(tokens[0].v)) return NOT_CONSTANT;
 		const obj = this.globals[tokens[0].v];
 		if (obj === null || obj === undefined || typeof obj !== 'object') return NOT_CONSTANT;
 		const value = obj[tokens[2].v];
