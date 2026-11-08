@@ -118,7 +118,15 @@ QByteArray CSubscriptionManagerComp::RegisterSubscription(
 
 	for (QByteArray subscriptionId : m_registeredClients.keys()){
 		if (m_registeredClients[subscriptionId].m_request.IsEqual(subscriptionRequest) && m_registeredClients[subscriptionId].m_clientId == clientId){
-			m_registeredClients[subscriptionId].m_clients.append(createRegistration());
+			const std::shared_ptr<ClientRegistration> registrationPtr = createRegistration();
+			m_registeredClients[subscriptionId].m_clients.append(registrationPtr);
+			const IGqlSubscriptionClient::SubscriptionStatus status = m_registeredClients[subscriptionId].m_status;
+
+			locker.unlock();
+
+			// The subscription is shared and under way: the new client learns where it stands
+			QMutexLocker dispatchLocker(&registrationPtr->dispatchMutex);
+			subscriptionClient.OnSubscriptionStatusChanged(subscriptionId, status, QString());
 
 			return subscriptionId;
 		}

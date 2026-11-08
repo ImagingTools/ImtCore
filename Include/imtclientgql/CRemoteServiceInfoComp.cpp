@@ -137,11 +137,10 @@ void CRemoteServiceInfoComp::OnRequestFinished(int requestId, bool isTokenUsed, 
 		return;
 	}
 
+	// The service answered and refused the token
 	if (isTokenUsed && result.errorCategory == IAsyncGqlClient::EC_ACCESS_DENIED){
 		SetCredentialStatus(CRS_REJECTED);
-
-		// The service is there, its information does not depend on the token
-		SendInfoRequest(QByteArray());
+		SetServiceStatus(imtcom::IConnectionStatusProvider::CS_CONNECTED);
 
 		return;
 	}

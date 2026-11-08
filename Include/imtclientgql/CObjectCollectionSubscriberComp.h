@@ -30,11 +30,20 @@ protected:
 	virtual void OnResponseReceived(const QByteArray& subscriptionId, const QByteArray& subscriptionData) override;
 	virtual void OnSubscriptionStatusChanged(const QByteArray& subscriptionId, const SubscriptionStatus& status, const QString& message) override;
 
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
+
+private:
+	void UpdateSourceWatched();
+
 private:
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
 
-	QSet<QByteArray> m_unconfirmedSubscriptionIds;
-	QMutex m_unconfirmedSubscriptionIdsMutex;
+	QSet<QByteArray> m_confirmedSubscriptionIds;
+	bool m_areSubscriptionsRegistered = false;
+	// -1 until the cache is told the first time
+	int m_watchedState = -1;
+	QMutex m_confirmedSubscriptionIdsMutex;
 };
 
 

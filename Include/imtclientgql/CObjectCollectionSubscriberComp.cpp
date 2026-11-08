@@ -104,20 +104,58 @@ void CObjectCollectionSubscriberComp::OnResponseReceived(const QByteArray& subsc
 
 void CObjectCollectionSubscriberComp::OnSubscriptionStatusChanged(const QByteArray& subscriptionId, const SubscriptionStatus& status, const QString& /*message*/)
 {
-	QMutexLocker locker(&m_unconfirmedSubscriptionIdsMutex);
-
-	const bool wasWatched = m_unconfirmedSubscriptionIds.isEmpty();
-	if (status == SS_REGISTERED){
-		m_unconfirmedSubscriptionIds.remove(subscriptionId);
+	{
+		QMutexLocker locker(&m_confirmedSubscriptionIdsMutex);
+		if (status == SS_REGISTERED){
+			m_confirmedSubscriptionIds.insert(subscriptionId);
+		}
+		else{
+			m_confirmedSubscriptionIds.remove(subscriptionId);
+		}
 	}
-	else{
-		m_unconfirmedSubscriptionIds.insert(subscriptionId);
-	}
-	const bool isWatched = m_unconfirmedSubscriptionIds.isEmpty();
 
+	UpdateSourceWatched();
+}
+
+
+// reimplemented (icomp::CComponentBase)
+
+void CObjectCollectionSubscriberComp::OnComponentCreated()
+{
+	BaseClass::OnComponentCreated();
+
+	{
+		QMutexLocker locker(&m_confirmedSubscriptionIdsMutex);
+		m_areSubscriptionsRegistered = true;
+	}
+
+	// Pending or failed registrations: the cache is bypassed until the server confirms
+	UpdateSourceWatched();
+}
+
+
+// private methods
+
+void CObjectCollectionSubscriberComp::UpdateSourceWatched()
+{
+	QMutexLocker locker(&m_confirmedSubscriptionIdsMutex);
+	if (!m_areSubscriptionsRegistered){
+		return;
+	}
+
+	bool isWatched = true;
+	for (const QByteArray& subscriptionId : m_subscriptionIds){
+		isWatched = isWatched && m_confirmedSubscriptionIds.contains(subscriptionId);
+	}
+
+	if (m_watchedState == int(isWatched)){
+		return;
+	}
+
+	m_watchedState = int(isWatched);
 	locker.unlock();
 
-	if (wasWatched != isWatched && m_objectCollectionCompPtr.IsValid()){
+	if (m_objectCollectionCompPtr.IsValid()){
 		istd::IChangeable::ChangeSet changeSet(isWatched ? imtbase::IObjectCollectionCacheController::CF_SOURCE_WATCHED : imtbase::IObjectCollectionCacheController::CF_SOURCE_UNWATCHED);
 		istd::CChangeNotifier notifier(m_objectCollectionCompPtr.GetPtr(), &changeSet);
 	}
