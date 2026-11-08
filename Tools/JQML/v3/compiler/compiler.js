@@ -1951,9 +1951,8 @@ function compile(options){
             let typeInfo = this.getTypeInfo()
 
             for (let connectedSignal of this.connectedSignals) {
-                // Qt: onPressed runs on a press only, onPressedChanged on every change of the property
                 if (typeInfo.typeBase.isAssignableFrom(JQModules.QtQuick.MouseArea) && connectedSignal.slotName === 'onPressed') {
-                    connectedSignal.slotName = 'onPressedEvent'
+                    connectedSignal.slotName = 'onPressedChanged'
                 }
                 let names = connectedSignal.slotName.replaceAll("['", '').replaceAll("']", '').split('.')
                 let signalName = ''

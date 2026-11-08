@@ -93,6 +93,7 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 	// A request of another product comes through the server of that product, which proves it with its own token
 	QByteArray serverProductId = clientProductId;
 	QByteArrayList serverScopes = clientProductId.isEmpty() ? QByteArrayList() : scopes;
+	QByteArray foreignProductId;
 	const QByteArray ownProductId = m_serverProductIdAttrPtr.IsValid() ? QByteArray(*m_serverProductIdAttrPtr) : QByteArray();
 	if (clientProductId.isEmpty() && !ownProductId.isEmpty()){
 		const QByteArray headerProductId = headers.value(imtbase::s_productIdHeaderId);
@@ -118,8 +119,8 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 			}
 		}
 		else if (!headerProductId.isEmpty() && headerProductId != ownProductId){
-			SetError(error, imtgql::IGqlContextCreator::CCS_FORBIDDEN, QStringLiteral("The product '%1' is not connected: its server sends no valid token.").arg(QString::fromUtf8(headerProductId)));
-			return nullptr;
+			// Without a token of its server only a superuser session works for another product; decided once the user is known
+			foreignProductId = headerProductId;
 		}
 	}
 
@@ -275,17 +276,15 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 		}
 	}
 
-	// The console of this server administers another product: a superuser in a session of its own only
-	const QByteArray administeredProductId = headers.value(imtbase::s_administeredProductHeaderId);
-	if (!administeredProductId.isEmpty() && administeredProductId != productId){
+	if (!foreignProductId.isEmpty()){
 		const imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
-		if (userInfoPtr == nullptr || !userInfoPtr->IsAdmin() || isPat || !serverProductId.isEmpty()){
+		if (userInfoPtr == nullptr || !userInfoPtr->IsAdmin() || isPat){
 			imtgql::CGqlRequestContextManager::Clear();
-			SetError(error, imtgql::IGqlContextCreator::CCS_FORBIDDEN, QStringLiteral("Only a superuser administers another product."));
+			SetError(error, imtgql::IGqlContextCreator::CCS_FORBIDDEN, QStringLiteral("The product '%1' is not connected: its server sends no valid token.").arg(QString::fromUtf8(foreignProductId)));
 			return nullptr;
 		}
 
-		gqlContextPtr->SetProductId(administeredProductId);
+		gqlContextPtr->SetProductId(foreignProductId);
 	}
 
 	const QByteArray forwardedLanguageId = headers.value(imtbase::s_languageIdHeaderId);

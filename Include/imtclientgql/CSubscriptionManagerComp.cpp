@@ -44,8 +44,7 @@ const int s_refusedRetryInterval = 60 * 1000;
 void InsertServerToken(const QByteArray& serverToken, QJsonObject& headersObject)
 {
 	for (const QString& headerId : headersObject.keys()){
-		if (headerId.compare(QString(imtbase::s_serverTokenHeaderId), Qt::CaseInsensitive) == 0
-					|| headerId.compare(QString(imtbase::s_administeredProductHeaderId), Qt::CaseInsensitive) == 0){
+		if (headerId.compare(QString(imtbase::s_serverTokenHeaderId), Qt::CaseInsensitive) == 0){
 			headersObject.remove(headerId);
 		}
 	}

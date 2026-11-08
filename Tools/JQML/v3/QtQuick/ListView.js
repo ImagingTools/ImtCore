@@ -132,13 +132,6 @@ class ListView extends Flickable {
     positionViewAtEnd() {
         this.positionViewAtIndex(this.count - 1, ListView.End)
     }
-    // Qt: responds at once to the model changes that are batched until the next frame
-    forceLayout() {
-        if (this.__changeSet.length > 0) {
-            this.__updateView()
-        }
-        this.__updateGeometry()
-    }
     positionViewAtIndex(index, mode) {
         index = Number(index)
         if (!Number.isFinite(index) || index < 0 || index >= this.count) return
