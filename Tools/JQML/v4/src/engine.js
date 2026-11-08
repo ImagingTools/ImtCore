@@ -126,7 +126,7 @@ const ALIAS_RE = /^\s*([A-Za-z_$][\w$]*(?:\s*\.\s*[A-Za-z_$][\w$]*)*)\s*$/;
 // change how an item looks over time.
 const IGNORED_TYPES = new Set([
 	'Behavior', 'ScriptAction', 'PropertyAction', 'AnchorAnimation', 'ParentAnimation', 'State', 'Transition', 'PropertyChanges',
-	'AnchorChanges', 'StateChangeScript', 'ParentChange', 'StateGroup', 'DropShadow', 'Glow', 'RectangularGlow',
+	'AnchorChanges', 'StateChangeScript', 'ParentChange', 'StateGroup', 'Glow', 'RectangularGlow',
 	'InnerShadow', 'FastBlur', 'GaussianBlur', 'ColorOverlay', 'OpacityMask', 'LinearGradient', 'RadialGradient', 'Blend',
 	'BrightnessContrast', 'Colorize', 'Desaturate', 'DisplacementMap', 'HueSaturation', 'ShaderEffect', 'ShaderEffectSource',
 	'Translate', 'Rotation', 'Scale', 'Matrix4x4', 'DoubleValidator', 'IntValidator',

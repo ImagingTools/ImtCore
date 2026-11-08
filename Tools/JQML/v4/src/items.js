@@ -1139,6 +1139,12 @@ export class Item {
 				x = hc - w / 2 + an.$hco;
 			}
 
+			// The height of a text that wraps is the height at the width that the anchors have just given.
+			if (this.$h <= 0 && w !== this.$aw) {
+				this.$aw = w;
+				h = this.$effH;
+			}
+
 			if (vs === vs && ve === ve) {
 				y = vs + an.$tm;
 				h = Math.max(0, ve - an.$bm - y);
@@ -2198,6 +2204,92 @@ defineFontField('italic', '$italic', toBool);
 defineFontField('underline', '$underline', toBool);
 defineFontField('strikeout', '$strikeout', toBool);
 
+// `DropShadow` of Qt5Compat.GraphicalEffects: the outline of its `source` (a Rectangle, with its radius), moved by the offsets,
+// with a soft edge of `radius` pixels. The soft edge is a few outlines that are one inside the other, each one a little more opaque.
+export class DropShadow extends Item {
+	constructor() {
+		super();
+		this.$typeName = 'DropShadow';
+		this.$source = null;
+		this.$hOffset = 0;
+		this.$vOffset = 0;
+		this.$blur = 4;
+		this.$spread = 0;
+		this.$color = BLACK;
+	}
+
+	$paint(r, opacity) {
+		const color = this.$color;
+		if (color.a === 0 || this.$aw <= 0 || this.$ah <= 0) return;
+		const source = this.$source;
+		const corner = source instanceof Rectangle ? source.$radius : 0;
+		const blur = Math.max(this.$blur, 0);
+		const spread = Math.min(Math.max(this.$spread, 0), 1) * blur;
+		const steps = Math.max(1, Math.min(Math.ceil(blur), 12));
+		const aa = corner > 0 || blur > 0;
+		let covered = 0;
+		for (let step = 1; step <= steps; step++) {
+			// From the outermost outline (blur away from the edge) to the innermost (blur inside of it): the opacity of a point
+			// goes up like a smooth step.
+			const grow = blur * (1 - (2 * (step - 1)) / steps) + spread;
+			const t = step / steps;
+			const target = t * t * (3 - 2 * t);
+			const alpha = (target - covered) / (1 - covered);
+			covered = target;
+			if (alpha <= 0) continue;
+			const x = this.$hOffset - grow;
+			const y = this.$vOffset - grow;
+			fillRounded(r, r.pack(color, opacity * alpha), x, y, this.$aw + 2 * grow, this.$ah + 2 * grow, Math.max(corner + grow, 0), aa);
+		}
+		// The effect shows its source over the shadow: the inside of the outline is the source, not the shadow. A source that
+		// covers the same box (`anchors.fill: source`) is painted again here.
+		if (
+			source instanceof Rectangle &&
+			source.$parent === this.$parent &&
+			Math.abs(source.$ax - this.$ax) < 0.5 &&
+			Math.abs(source.$ay - this.$ay) < 0.5 &&
+			Math.abs(source.$aw - this.$aw) < 0.5 &&
+			Math.abs(source.$ah - this.$ah) < 0.5
+		) {
+			source.$paint(r, opacity * source.$opacity);
+		}
+	}
+}
+
+defineProp(
+	DropShadow.prototype,
+	'color',
+	function () {
+		return colorToString(this.$color);
+	},
+	function (v) {
+		this.$color = toColor(v);
+		this.$update();
+	},
+	true,
+);
+defineProp(
+	DropShadow.prototype,
+	'source',
+	function () {
+		return this.$source;
+	},
+	function (v) {
+		const source = v === undefined ? null : v;
+		if (this.$source !== source) {
+			this.$source = source;
+			this.$update();
+		}
+	},
+	true,
+);
+for (const [name, field] of [['horizontalOffset', '$hOffset'], ['verticalOffset', '$vOffset'], ['radius', '$blur'], ['spread', '$spread']]) {
+	defineField(DropShadow.prototype, name, field, toFloat);
+}
+for (const name of ['samples', 'cached', 'fast', 'transparentBorder']) {
+	defineField(DropShadow.prototype, name, `$${name}`, (v) => v);
+}
+
 export class Text extends Item {
 	constructor() {
 		super();
@@ -2266,7 +2358,8 @@ export class Text extends Item {
 		const info = this.$fontInfo();
 		const rich = this.$format === 'RichText' || this.$format === 'StyledText';
 		const source = rich ? richPlain(this.$text) : this.$text;
-		const explicit = this.$w > 0 ? this.$w : 0;
+		// The width that the anchors give (`anchors.left` and `anchors.right`) wraps the text like a `width` does.
+		const explicit = this.$w > 0 ? this.$w : this.$aw > 0 ? this.$aw : 0;
 		const wrap = explicit > 0 && wraps(this.$wrap);
 		const natural = blockMetrics(info, source, false, Infinity);
 		const laid = wrap ? blockMetrics(info, source, true, explicit) : natural;
@@ -2366,6 +2459,9 @@ defineReadOnly(Text.prototype, 'contentWidth', function () {
 });
 defineReadOnly(Text.prototype, 'contentHeight', function () {
 	return this.$metrics().contentHeight;
+});
+defineReadOnly(Text.prototype, 'lineCount', function () {
+	return this.$measure().lines.length;
 });
 
 // ----- Canvas -----
@@ -6031,7 +6127,45 @@ export class Stack extends Item {
 		return child.$w > 0 ? child.$w : child.$aw > 0 ? child.$aw : child.$effW;
 	}
 
+	// The size of a `Flow` whose width (height, for a vertical one) is known: the children wrap at it, as `$arrange` does.
+	$flowContent(limit) {
+		const pad = this.$padding > 0 ? this.$padding : 0;
+		const vertical = this.$vertical;
+		let pos = pad;
+		let lineSize = 0;
+		let longest = 0;
+		let total = 0;
+		let lines = 0;
+		for (const child of this.$children) {
+			if (!child.$visible || child.$nonVisual) continue;
+			const along = Stack.$size(child, vertical);
+			const across = Stack.$size(child, !vertical);
+			if (along <= 0 || across <= 0) continue;
+			if (pos > pad && pos + along > limit - pad) {
+				total += lineSize;
+				lines++;
+				pos = pad;
+				lineSize = 0;
+			}
+			longest = Math.max(longest, pos + along);
+			pos += along + this.$spacing;
+			lineSize = Math.max(lineSize, across);
+		}
+		if (lineSize > 0) {
+			total += lineSize;
+			lines++;
+		}
+		if (lines > 1) total += this.$spacing * (lines - 1);
+		const main = longest + pad;
+		const cross = total + 2 * pad;
+		return vertical ? [cross, main] : [main, cross];
+	}
+
 	$content() {
+		if (this.$flow) {
+			const limit = this.$vertical ? (this.$h > 0 ? this.$h : this.$ah) : this.$w > 0 ? this.$w : this.$aw;
+			if (limit > 0) return this.$flowContent(limit);
+		}
 		let main = 0;
 		let cross = 0;
 		let count = 0;
@@ -8369,6 +8503,7 @@ export const BUILTIN_TYPES = new Map([
 	['FileDialog', FileDialog],
 	['Item', Item],
 	['Rectangle', Rectangle],
+	['DropShadow', DropShadow],
 	['Text', Text],
 	['Canvas', Canvas],
 	['MouseArea', MouseArea],

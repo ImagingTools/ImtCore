@@ -1,7 +1,8 @@
 // How rectangles are painted: a border around a see-through fill must stay a ring.
 // `node test/paint.mjs`
 import { CanvasContext } from '../src/canvas.js';
-import { drawRectangle, Rectangle } from '../src/items.js';
+import { DropShadow, drawRectangle, Rectangle } from '../src/items.js';
+import { parseColor } from '../src/util.js';
 
 const OPAQUE = 0xff0000ff;
 const CLEAR = 0x00000000;
@@ -106,6 +107,47 @@ check('an invalid fillStyle is ignored', styled.fillStyle, '#ff0000');
 check('an invalid strokeStyle is ignored', styled.strokeStyle, '#00ff00');
 styled.fillStyle = 'blue';
 check('a valid fillStyle still applies', styled.fillStyle, 'blue');
+
+// A DropShadow: the outline of its source, moved by the offsets, softer towards the outside, and nothing beyond blur + offset.
+{
+	const source = new Rectangle();
+	source.$radius = 6;
+	const shadow = new DropShadow();
+	shadow.$aw = 100;
+	shadow.$ah = 40;
+	shadow.$source = source;
+	shadow.$color = parseColor('#80000000');
+	shadow.$hOffset = 2;
+	shadow.$vOffset = 2;
+	shadow.$blur = 6;
+	const shapes = [];
+	const r = {
+		pack: (color, opacity) => Math.round(color.a * opacity * 255),
+		fillQuad: (x, y, w, h, alpha) => shapes.push({ x, y, w, h, alpha }),
+		fillQuadAA: (x, y, w, h, alpha) => shapes.push({ x, y, w, h, alpha }),
+		fillPolygon: (points, alpha) => {
+			const xs = points.filter((_, i) => i % 2 === 0);
+			const ys = points.filter((_, i) => i % 2 === 1);
+			shapes.push({ x: Math.min(...xs), y: Math.min(...ys), w: Math.max(...xs) - Math.min(...xs), h: Math.max(...ys) - Math.min(...ys), alpha });
+		},
+	};
+	source.$aw = 100;
+	source.$ah = 40;
+	shadow.$paint(r, 1);
+	const over = shapes.pop();
+	check('the source is painted over the shadow, in its box', [over.x, over.y, over.w, over.h, over.alpha].join(','), '0,0,100,40,255');
+	const right = Math.max(...shapes.map((s) => s.x + s.w));
+	const bottom = Math.max(...shapes.map((s) => s.y + s.h));
+	const left = Math.min(...shapes.map((s) => s.x));
+	check('the shadow reaches blur + offset beyond the right edge', Math.round(right), 108);
+	check('and beyond the bottom edge', Math.round(bottom), 48);
+	check('and not further to the left than blur - offset', Math.round(left), -4);
+	check('and is the more opaque the nearer to the middle', shapes[shapes.length - 1].w < shapes[0].w, true);
+	shadow.$color = parseColor('#00000000');
+	const none = [];
+	shadow.$paint({ pack: () => 0, fillQuad: () => none.push(1), fillPolygon: () => none.push(1) }, 1);
+	check('a see-through colour paints nothing', none.length, 0);
+}
 
 console.log(failures === 0 ? 'All good' : `${failures} failed`);
 process.exit(failures === 0 ? 0 : 1);
