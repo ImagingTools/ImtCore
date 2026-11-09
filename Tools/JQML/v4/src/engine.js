@@ -410,6 +410,12 @@ function describe(error) {
 	return String(error);
 }
 
+// The running binding reads the data of the row of a delegate (`model`, `modelData`, a role): see refreshDelegateBindings().
+function readRow(source) {
+	if (hooks.reading !== null) hooks.reading.readsRow = true;
+	readRows(source);
+}
+
 export class Engine {
 	constructor() {
 		this.project = null;
@@ -1045,7 +1051,7 @@ export class Engine {
 				return;
 			}
 		}
-		const binding = { owner, path, key, fn, line, file, last: undefined, hasLast: false, failed: false, failures: 0, dItems: null, dNames: null, nOld: 0, nCur: 0, diverged: false, curItems: null, curNames: null, queued: false, evaluating: false, writing: 0, runs: 0, seq: this.bindingSeq++, volatile: false, volatileNow: false, layoutNow: false, dataOnly: false, why: null, inHeap: false };
+		const binding = { owner, path, key, fn, line, file, last: undefined, hasLast: false, failed: false, failures: 0, dItems: null, dNames: null, nOld: 0, nCur: 0, diverged: false, curItems: null, curNames: null, queued: false, evaluating: false, writing: 0, runs: 0, seq: this.bindingSeq++, volatile: false, volatileNow: false, layoutNow: false, dataOnly: false, readsRow: true, why: null, inHeap: false };
 		owner.$bindings.push(binding);
 		this.bindings.add(binding);
 		this.fresh.push(binding);
@@ -1278,6 +1284,7 @@ export class Engine {
 		binding.evaluating = true;
 		binding.volatileNow = false;
 		binding.layoutNow = false;
+		binding.readsRow = false;
 		binding.why = null;
 		const run = ++binding.runs;
 		const previous = hooks.reading;
@@ -1604,12 +1611,12 @@ export class Engine {
 			return;
 		}
 		for (const key of Object.keys(scope.data.roles)) this.defineRole(scope, key);
-		Object.defineProperty(scope.context, 'model', { get: () => (readRows(scope.data.source), scope.data.model), set: (v) => (scope.data.model = v), enumerable: true, configurable: true });
-		Object.defineProperty(scope.context, 'modelData', { get: () => (readRows(scope.data.source), scope.data.modelData), set: (v) => (scope.data.modelData = v), enumerable: true, configurable: true });
+		Object.defineProperty(scope.context, 'model', { get: () => (readRow(scope.data.source), scope.data.model), set: (v) => (scope.data.model = v), enumerable: true, configurable: true });
+		Object.defineProperty(scope.context, 'modelData', { get: () => (readRow(scope.data.source), scope.data.modelData), set: (v) => (scope.data.modelData = v), enumerable: true, configurable: true });
 	}
 
 	defineRole(scope, key) {
-		Object.defineProperty(scope.context, key, { get: () => (readRows(scope.data.source), scope.data.roles[key]), enumerable: true, configurable: true });
+		Object.defineProperty(scope.context, key, { get: () => (readRow(scope.data.source), scope.data.roles[key]), enumerable: true, configurable: true });
 	}
 
 	// Evaluates every binding once and assigns the values that changed.
@@ -1724,10 +1731,20 @@ export class Engine {
 		// Qt reports every width change before every height change when a layout sets both.
 		const heights = [];
 		for (const handler of this.changeHandlers) {
+			// A property of the component that was declared in QML runs its handlers when it is assigned (see fireChanged), so a
+			// poll would find nothing: the 9000 handlers of a table were read in every frame, 9 ms of it.
+			if (handler.immediate === undefined && handler.hasLast) handler.immediate = this.runsAtAssignment(handler);
+			if (handler.immediate === true) continue;
 			if (handler.property === 'height') heights.push(handler);
 			else this.runChangeHandler(handler);
 		}
 		for (const handler of heights) this.runChangeHandler(handler);
+	}
+
+	// Whether the handler runs when its property is assigned (a property that was declared in QML), not only when it is polled.
+	runsAtAssignment(handler) {
+		const store = handler.item.$custom;
+		return store !== null && store !== undefined && handler.property in store;
 	}
 
 	runChangeHandler(handler) {
@@ -2381,7 +2398,10 @@ export class Engine {
 		for (const entry of list) this.guard(() => entry.fn.call(item), `handler '${where}' (${entry.file})`, entry.line);
 	}
 
-	// Re-runs every binding under a reused ListView delegate so `model.role` / `model.index` pick up the new row.
+	// Re-runs the bindings under a reused ListView delegate that read the row (`model`, `modelData`, a role), so they pick up the
+	// new row: such a read is not announced when the row changes. The others do not depend on the row and are not run again: a
+	// delegate of a table has some 900 bindings, and a row rebound for a jump of the scroll bar ran them all. A binding that was not
+	// evaluated yet, that failed or that reads something untracked is run as well.
 	refreshDelegateBindings(root) {
 		const stack = [root];
 		while (stack.length > 0) {
@@ -2390,6 +2410,8 @@ export class Engine {
 			const list = item.$bindings;
 			if (list !== null && list !== undefined) {
 				for (const binding of list) {
+					// The readers of `index` were marked when the index of the delegate changed.
+					if (!binding.readsRow && binding.runs > 0 && !binding.failed && !binding.volatileNow && !this.dirty.has(binding)) continue;
 					binding.hasLast = false;
 					this.evaluateOne(binding, false);
 				}
