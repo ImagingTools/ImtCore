@@ -462,11 +462,12 @@ export class Engine {
 		// the next frame (`wantFrame`) when it has more to publish.
 		this.frameId = 0;
 		this.wantFrame = false;
-		// What the bindings that read the rows of a model or a count (`dataOnly`) can change with: a script ran, or a model
-		// was touched. They run again in the first pass of a frame and after that only when it moved.
+		// The bindings that read the rows of a model, or the count of a view (`dataOnly`), cannot be told that the rows changed when
+		// the model is a plain array or a nested model that was made again on reading. A model changes by a call of its own
+		// (`setData`, `append`, ...), and every one of them moves `dataEpoch`: those bindings run again when it moved, not on every
+		// pass (a hidden grid of 200 cards cost 15 ms of each frame). An array changed in place is not seen, as in Qt.
 		this.dataEpoch = 0;
 		this.dataSeen = -1;
-		this.dataFrame = -1;
 		this.pendingImages = new Set();
 		// The pictures that were asked for, by the addresses they are looked up at (see loadImage): an icon used by many items
 		// (the arrows of a tree) is requested from the server once.
@@ -1096,8 +1097,9 @@ export class Engine {
 		if (binding === null) return;
 		if (!trusted) {
 			binding.volatileNow = true;
-			// What a count says changes with the rows of a model, and that is a script's doing (see `dataEpoch`).
-			if (name !== 'count') binding.layoutNow = true;
+			// The count of a view or a repeater changes with the rows of its model (see `dataEpoch`); any other count (the children of
+			// a layout) and any other untracked read goes with the layout.
+			if (name !== 'count' || item.$model === undefined) binding.layoutNow = true;
 			if (binding.why === null) binding.why = `${item.$typeName}.${name}`;
 		}
 		const n = binding.nCur;
@@ -1670,8 +1672,7 @@ export class Engine {
 			this.dirty.clear();
 			for (const binding of this.retry) if (!binding.inHeap && !binding.failed) this.pushPending(binding);
 			this.retry.clear();
-			const withData = this.dataFrame !== this.frameId || this.dataSeen !== this.dataEpoch;
-			this.dataFrame = this.frameId;
+			const withData = this.dataSeen !== this.dataEpoch;
 			this.dataSeen = this.dataEpoch;
 			for (const binding of this.volatile) if (!binding.inHeap && (withData || !binding.dataOnly)) this.pushPending(binding);
 			while (this.passHeap.length > 0) {
@@ -2057,7 +2058,6 @@ export class Engine {
 	}
 
 	guard(fn, where, line) {
-		this.dataEpoch++;
 		try {
 			return fn();
 		} catch (error) {
