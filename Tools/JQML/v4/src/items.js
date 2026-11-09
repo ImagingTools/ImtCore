@@ -3161,6 +3161,7 @@ export class ListView extends Item {
 		this.$builtRows = null; // the row objects of the model when the delegates were made (ListModel, TreeItemModel)
 		this.$delegates = new Map();
 		this.$reuseItems = false;
+		this.$cacheBuffer = 0; // how far past the view (px) the delegates stay built
 		this.$pool = []; // delegates kept for reuse (`reuseItems: true`), detached from the children
 		this.$extents = []; // measured width (horizontal) / height (vertical) per index for variable-size rows
 		this.$extentSum = 0; // sum of the measured extents, so the content length does not visit every row
@@ -3280,12 +3281,17 @@ export class ListView extends Item {
 		return this.$extentSum + (count - measured) * base + Math.max(0, count - 1) * Math.max(0, this.$spacing);
 	}
 
+	// A content size that was assigned (a table sets the sum of the widths of its columns) is the scroll range of its axis, the same
+	// that `contentWidth` reports. The length measured from the delegates stays for the rest: it keeps the sizes that the
+	// delegates had when they were built, and these are out of date once a column was resized while they were not.
 	get $maxContentX() {
-		return Math.max(0, this.$contentLength - this.$aw);
+		const set = this.$contentWidthSet;
+		return Math.max(0, (set !== undefined && set >= 0 ? set : this.$contentLength) - this.$aw);
 	}
 
 	get $maxContentY() {
-		return Math.max(0, this.$contentLength - this.$ah);
+		const set = this.$contentHeightSet;
+		return Math.max(0, (set !== undefined && set >= 0 ? set : this.$contentLength) - this.$ah);
 	}
 
 	get $acceptsWheel() {
@@ -3440,25 +3446,30 @@ export class ListView extends Item {
 
 		const spacing = Math.max(0, this.$spacing);
 		const viewSpan = horizontal ? this.$aw : this.$ah;
+		// Like in Qt the delegates within the cache buffer stay built, so a header of a table keeps the widths of all its columns
+		// while it scrolls instead of handing a delegate over to another column.
+		const buffer = Math.max(0, this.$cacheBuffer);
+		const lowEdge = Math.max(0, offset - buffer);
+		const highEdge = offset + viewSpan + buffer;
 		let pos = 0;
 		let first = 0;
 		if (this.$oddExtents === 0) {
 			// Every measured row has the probe's size: the first row is a division, not a walk over 100k rows.
 			const step = this.$rowHeight + spacing;
-			first = Math.max(0, Math.min(count - 1, Math.floor(offset / step)));
+			first = Math.max(0, Math.min(count - 1, Math.floor(lowEdge / step)));
 			pos = first * step;
-			while (first > 0 && pos > offset) {
+			while (first > 0 && pos > lowEdge) {
 				first--;
 				pos -= step;
 			}
 		}
-		while (first < count - 1 && pos + this.$extentAt(first) + spacing <= offset) {
+		while (first < count - 1 && pos + this.$extentAt(first) + spacing <= lowEdge) {
 			pos += this.$extentAt(first) + spacing;
 			first++;
 		}
 		let last = first;
 		let end = pos;
-		while (last < count - 1 && end < offset + viewSpan) {
+		while (last < count - 1 && end < highEdge) {
 			end += this.$extentAt(last) + spacing;
 			last++;
 		}
@@ -3478,7 +3489,7 @@ export class ListView extends Item {
 		while (last < count - 1) {
 			let span = 0;
 			for (let i = first; i <= last; i++) span += this.$extentAt(i) + (i < last ? spacing : 0);
-			if (pos + span >= offset + viewSpan) break;
+			if (pos + span >= highEdge) break;
 			last++;
 			if (this.$delegates.has(last)) continue;
 			const delegate = this.createDelegate(last);
@@ -3566,6 +3577,7 @@ defineProp(
 );
 defineField(ListView.prototype, 'spacing', '$spacing', toFloat);
 defineField(ListView.prototype, 'reuseItems', '$reuseItems', toBool);
+defineField(ListView.prototype, 'cacheBuffer', '$cacheBuffer', toFloat);
 defineProp(
 	ListView.prototype,
 	'currentIndex',
