@@ -473,8 +473,7 @@ function defineProp(proto, name, get, set, trusted = false) {
 				hooks.installBinding(this, [name], value.fn);
 				return;
 			}
-			if (BREAKS_BINDING.has(name)) scriptWrite(this, name);
-			else if (hooks.engineWrite === 0 && this.$bindings !== null && hooks.breakUnrun !== null) hooks.breakUnrun(this, name);
+			scriptWrite(this, name);
 			set.call(this, value);
 			noteWrite(this, name);
 		},
