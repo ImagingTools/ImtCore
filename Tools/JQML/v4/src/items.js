@@ -388,8 +388,23 @@ let layingOut = false;
 // True while the scene runs its layout and binding passes: only there a geometry read may take the frame request.
 let frameLoop = false;
 
+// The number of the frame that is being drawn: the work that a list defers is limited per frame.
+let frameNumber = 0;
+// How many rows of the cache buffer a list builds in a frame (the bindings of a row run at the end of the frame, so the time of the
+// building itself says little about what a row costs).
+const LAZY_BUILD_ROWS = 2;
+
+// The lists that have rows of their cache buffer left to build: they ask for the next frame when the frame is done.
+const lazyViews = new Set();
+
+export function flushLazyViews() {
+	for (const view of lazyViews) view.$update();
+	lazyViews.clear();
+}
+
 export function setFrameLoop(on) {
 	frameLoop = on;
+	if (on) frameNumber++;
 }
 
 // Bumped by every $update(): an item that found the layout current at this value still finds it so.
@@ -3201,6 +3216,7 @@ export class ListView extends Item {
 	}
 
 	$destroy() {
+		lazyViews.delete(this);
 		for (const item of this.$pool) item.$destroy();
 		this.$pool = [];
 		super.$destroy();
@@ -3329,10 +3345,13 @@ export class ListView extends Item {
 	}
 
 	$releaseWhere(keep) {
+		// The pool holds as many delegates as the list had built: a jump to another place reuses all of them, instead of building
+		// the rows of the cache buffer anew (a row that is made costs several times as much as one that is rebound).
+		const capacity = Math.max(MAX_POOLED_DELEGATES, this.$delegates.size);
 		for (const [index, item] of [...this.$delegates]) {
 			if (keep(index)) continue;
 			this.$delegates.delete(index);
-			if (this.$reuseItems && this.rebindDelegate !== null && this.$pool.length < MAX_POOLED_DELEGATES) {
+			if (this.$reuseItems && this.rebindDelegate !== null && this.$pool.length < capacity) {
 				const at = this.$children.indexOf(item);
 				if (at >= 0) this.$children.splice(at, 1);
 				item.$parent = this;
@@ -3475,21 +3494,82 @@ export class ListView extends Item {
 		}
 
 		this.$releaseWhere((index) => index >= first && index <= last);
-		for (let i = first; i <= last; i++) {
-			if (this.$delegates.has(i)) continue;
-			const delegate = this.createDelegate(i);
-			if (delegate === null) {
-				this.createDelegate = null;
-				break;
+		// The rows of the view are built at once. The rows of the cache buffer are built from the view outwards, as much as fits
+		// in the time of a frame (Qt builds them in the background): a jump of the scroll bar then costs the rows that are seen,
+		// not all the rows of the buffer.
+		let wanted = highEdge;
+		if (buffer > 0) {
+			let viewFirst = -1;
+			let viewLast = first - 1;
+			let at = pos;
+			for (let i = first; i <= last; i++) {
+				const ext = this.$extentAt(i);
+				if (viewFirst < 0 && at + ext > offset) viewFirst = i;
+				if (at < offset + viewSpan) viewLast = i;
+				at += ext + spacing;
 			}
-			this.$delegates.set(i, delegate);
+			if (viewFirst < 0) viewFirst = last;
+			if (viewLast < viewFirst) viewLast = viewFirst;
+			if (this.$lazyFrame !== frameNumber) {
+				this.$lazyFrame = frameNumber;
+				this.$lazySpent = 0;
+			}
+			const make = (i) => {
+				if (this.$delegates.has(i)) return true;
+				const delegate = this.createDelegate(i);
+				if (delegate === null) {
+					this.createDelegate = null;
+					return false;
+				}
+				this.$delegates.set(i, delegate);
+				return true;
+			};
+			let ok = true;
+			for (let i = viewFirst; i <= viewLast && ok; i++) ok = make(i);
+			let before = viewFirst - 1;
+			let after = viewLast + 1;
+			while (ok && (before >= first || after <= last)) {
+				// The rows that are built stay, whatever is left of the budget of the frame.
+				while (after <= last && this.$delegates.has(after)) after++;
+				while (before >= first && this.$delegates.has(before)) before--;
+				if (before < first && after > last) break;
+				if (this.$lazySpent >= LAZY_BUILD_ROWS) break;
+				if (after <= last) {
+					ok = make(after++);
+					this.$lazySpent++;
+				}
+				if (ok && before >= first) {
+					ok = make(before--);
+					this.$lazySpent++;
+				}
+			}
+			if (before >= first || after <= last) {
+				// Built from the view outwards: the rows that are left are built in the next frames.
+				const builtFirst = Math.max(first, before + 1);
+				for (let i = first; i < builtFirst; i++) pos += this.$extentAt(i) + spacing;
+				first = builtFirst;
+				last = Math.min(last, after - 1);
+				wanted = offset + viewSpan;
+				this.$releaseWhere((index) => index >= first && index <= last);
+				lazyViews.add(this);
+			}
+		} else {
+			for (let i = first; i <= last; i++) {
+				if (this.$delegates.has(i)) continue;
+				const delegate = this.createDelegate(i);
+				if (delegate === null) {
+					this.createDelegate = null;
+					break;
+				}
+				this.$delegates.set(i, delegate);
+			}
 		}
 
 		// Newly created delegates may have real sizes — grow the window if the estimate was short.
 		while (last < count - 1) {
 			let span = 0;
 			for (let i = first; i <= last; i++) span += this.$extentAt(i) + (i < last ? spacing : 0);
-			if (pos + span >= highEdge) break;
+			if (pos + span >= wanted) break;
 			last++;
 			if (this.$delegates.has(last)) continue;
 			const delegate = this.createDelegate(last);
@@ -5707,12 +5787,14 @@ export class ListModel extends Item {
 			if (child.$row !== undefined) this.$rows.push(child.$row);
 		}
 		this.$children = [];
-		this.$touch();
+		this.$touch(true);
 	}
 
-	$touch() {
+	// A model that was just made has no readers that cannot be told about it, so it does not move `dataEpoch`: a row of a table with a
+	// ListModel of its own would otherwise run the bindings of the rows of all the other models again, for every row that is built.
+	$touch(fresh = false) {
 		this.$version++;
-		hooks.touch();
+		if (!fresh) hooks.touch();
 		markReaders(this, '$rows');
 		markReaders(this, 'count');
 		notifyViews(this);

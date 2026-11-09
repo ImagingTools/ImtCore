@@ -175,7 +175,7 @@ for (const x of [150, 700, 1100, 0, 1180, 300]) {
 const tall = root.tallList;
 check('a vertical cache buffer builds rows 0..8 (60 + 100 px)', [...tall.$delegates.keys()].sort((a, b) => a - b), [0, 1, 2, 3, 4, 5, 6, 7, 8]);
 tall.contentY = 400;
-frames();
+frames(20);
 check('and rows on both sides of the view', [...tall.$delegates.keys()].sort((a, b) => a - b), [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28]);
 
 check('the scroll range of a vertical list is its assigned content height', root.fixedList.$maxContentY, 500 - 60);

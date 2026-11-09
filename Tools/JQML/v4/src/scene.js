@@ -1,6 +1,6 @@
 // The scene: the root item, the frame (layout, bindings, painting) and the mouse input.
 
-import { DragHandler, getFocusItem, Item, setDestroyObserver, setFocusItem, setFrameLoop, WheelHandler } from './items.js';
+import { DragHandler, flushLazyViews, getFocusItem, Item, setDestroyObserver, setFocusItem, setFrameLoop, WheelHandler } from './items.js';
 
 const MAX_PASSES = 10;
 
@@ -117,6 +117,8 @@ export class Scene {
 				if (!root.$updateRequested && engine.dirty.size === 0) break;
 			}
 			if (engine.dirty.size > 0) root.$updateRequested = true;
+			// A list builds the rows of its cache buffer a few in a frame.
+			flushLazyViews();
 			// A Binding with `delayed: true` has a value left for the next frame.
 			if (engine.wantFrame) {
 				engine.wantFrame = false;

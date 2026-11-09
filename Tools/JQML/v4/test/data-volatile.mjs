@@ -22,6 +22,16 @@ Item {
 	property alias probe: label
 	property alias rowsView: view
 	property var plain: [1, 2, 3]
+	property alias maker: comp
+
+	Component {
+		id: comp
+		Item {
+			ListModel {
+				ListElement { a: 1 }
+			}
+		}
+	}
 
 	TreeItemModel {
 		id: treeModel
@@ -107,6 +117,12 @@ check('the bindings of the layout run on every frame', layoutProbe.runs > before
 root.tree.getTreeItemModel('items').setData('a', 5, 0);
 for (let i = 0; i < 3; i++) frame();
 check('a model that was changed by a call of its own moves the bindings of its rows', root.probe.text, '5');
+
+// A model that is made with its object has no readers yet: it must not make the bindings of other rows run again.
+const epoch = engine.dataEpoch;
+const made = root.maker.createObject(root);
+check('an object with a ListModel of its own is made', made !== null, true);
+check('and making it does not move the data epoch', engine.dataEpoch, epoch);
 
 console.log(failures === 0 ? 'All good' : `${failures} failed`);
 process.exit(failures === 0 ? 0 : 1);
