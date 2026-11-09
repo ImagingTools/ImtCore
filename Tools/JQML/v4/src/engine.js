@@ -2599,6 +2599,12 @@ export class Engine {
 			}
 			return;
 		}
+		if (group.$owner === undefined && group !== item && group.$bindings !== undefined && item.$aliases !== undefined && item.$aliases.has(path[0])) {
+			// `tableRowViewer.height: 40` on a use of a component that aliases `tableRowViewer` to one of its items replaces the
+			// `height` binding that item has, as in Qt; otherwise the old binding writes over the new one when its inputs change.
+			this.dropBinding(group, path[1]);
+			return;
+		}
 		if (group.$owner === undefined || group.$owner === item || group.$group === undefined) return;
 		this.dropBinding(group.$owner, `${group.$group}.${path[1]}`);
 	}
