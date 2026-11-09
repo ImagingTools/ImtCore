@@ -459,6 +459,9 @@ export class Engine {
 		this.connections = new Set(); // Connections items
 		this.qmlBindings = new Set(); // Binding items
 		this.pendingImages = new Set();
+		// The pictures that were asked for, by the addresses they are looked up at (see loadImage): an icon used by many items
+		// (the arrows of a tree) is requested from the server once.
+		this.imageCache = new Map();
 		this.animations = new Set();
 		this.carets = new Set(); // editors with the focus: their text cursor blinks
 		this.fresh = []; // bindings created since they were last evaluated
@@ -3207,25 +3210,50 @@ export class Engine {
 				if (!candidates.includes(stripped)) candidates.push(stripped);
 			}
 		}
+		// The same addresses give the same picture: it is requested once, items that ask meanwhile wait for it, items that ask
+		// later get it at once (on the next handler pass, as a picture that was loaded). A failed request is not kept, the
+		// next item asks again.
+		const key = candidates.join('\n');
+		let entry = this.imageCache.get(key);
+		if (entry !== undefined && entry.picture !== null) {
+			this.queueImage(image, entry.picture, 1);
+			return;
+		}
+		if (entry !== undefined) {
+			entry.waiters.push({ image, source });
+			return;
+		}
+		entry = { picture: null, waiters: [{ image, source }] };
+		this.imageCache.set(key, entry);
+		const finish = (picture, error) => {
+			const waiters = entry.waiters;
+			entry.waiters = [];
+			if (picture !== null) entry.picture = picture;
+			else this.imageCache.delete(key);
+			let reported = false;
+			for (const waiter of waiters) {
+				if (waiter.image.$source !== waiter.source || waiter.image.$destroyed) continue;
+				if (picture !== null) waiter.image.$setImage(picture, 1);
+				else {
+					waiter.image.$setImage(null, 3);
+					if (error !== undefined && !reported) this.report(`Image '${waiter.source}'`, error, 0);
+					reported = true;
+				}
+			}
+		};
 		const attempt = (n) => {
 			const picture = new Picture();
 			picture.crossOrigin = 'anonymous';
-			picture.onload = () => {
-				if (image.$source === source && !image.$destroyed) image.$setImage(picture, 1);
-			};
+			picture.onload = () => finish(picture);
 			const failed = (error) => {
-				if (image.$source !== source || image.$destroyed) return;
 				if (n + 1 < candidates.length) attempt(n + 1);
-				else {
-					image.$setImage(null, 3);
-					if (error !== undefined) this.report(`Image '${source}'`, error, 0);
-				}
+				else finish(null, error);
 			};
 			picture.onerror = () => failed();
 			const candidate = candidates[n];
 			if (typeof fetch === 'function' && /\.svg(?:[?#]|$)/i.test(candidate)) {
 				this.svgImageSource(candidate).then((prepared) => {
-					if (image.$source === source && !image.$destroyed) picture.src = prepared;
+					picture.src = prepared;
 				}, failed);
 			} else {
 				picture.src = candidate;
