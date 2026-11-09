@@ -3,6 +3,7 @@
 
 
 // ImtCore includes
+#include <imtauth/imtauth.h>
 #include <imtbase/CUrlParam.h>
 #include <imtgql/CGqlContext.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Authorization.h>
@@ -16,11 +17,11 @@ namespace imtauthgql
 
 // reimplemented (IServerTokenIssuer)
 
-QByteArray CRemoteServerTokenIssuerComp::SignIn(const ServerInfo& server, const QString& login, const QString& password, QString& errorMessage) const
+QByteArray CRemoteServerTokenIssuerComp::SignInSuperuser(const ServerInfo& server, const QString& password, QString& errorMessage) const
 {
 	sdl::V1_0::imtauth::AuthorizationRequestArguments arguments;
 	arguments.input.emplace();
-	arguments.input->login = login;
+	arguments.input->login = QString::fromUtf8(imtauth::s_superuserLogin);
 	arguments.input->password = password;
 	arguments.input->productId = server.productId;
 

@@ -195,6 +195,12 @@ static const inline QByteArray s_roleProductFilterId = QByteArrayLiteral("RolePr
 
 
 /**
+	Login of the superuser; it cannot be changed.
+*/
+static const inline QByteArray s_superuserLogin = QByteArrayLiteral("su");
+
+
+/**
 	Permission to create an organization.
 */
 static const inline QByteArray s_addOrganizationPermission = QByteArrayLiteral("/OrganizationManagement/Add");

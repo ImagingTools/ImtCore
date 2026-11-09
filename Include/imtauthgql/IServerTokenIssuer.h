@@ -40,10 +40,10 @@ public:
 	};
 
 	/**
-		Sign a superuser in at the server.
+		Sign the superuser in at the server.
 		\return the token of the session, empty if the sign-in failed.
 	*/
-	virtual QByteArray SignIn(const ServerInfo& server, const QString& login, const QString& password, QString& errorMessage) const = 0;
+	virtual QByteArray SignInSuperuser(const ServerInfo& server, const QString& password, QString& errorMessage) const = 0;
 
 	/**
 		Get the permissions a token of the client product can hold at the server.

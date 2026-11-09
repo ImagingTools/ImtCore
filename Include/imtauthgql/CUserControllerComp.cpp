@@ -477,7 +477,7 @@ sdl::V1_0::imtauth::CCheckSuperuserPayload CUserControllerComp::OnCheckSuperuser
 		}
 	}
 
-	imtauth::IUserInfoSharedPtr userInfoPtr = GetUserInfoByLogin("su");
+	imtauth::IUserInfoSharedPtr userInfoPtr = GetUserInfoByLogin(imtauth::s_superuserLogin);
 	if (!userInfoPtr.IsValid()){
 		response.status = sdl::V1_0::imtauth::ExistsStatus::NOT_EXISTS;
 		return retVal;
@@ -512,7 +512,7 @@ sdl::V1_0::imtauth::CCreateSuperuserPayload CUserControllerComp::OnCreateSuperus
 	response.success = false;
 	response.message = "";
 
-	imtauth::IUserInfoSharedPtr userInfoPtr = GetUserInfoByLogin("su");
+	imtauth::IUserInfoSharedPtr userInfoPtr = GetUserInfoByLogin(imtauth::s_superuserLogin);
 	if (userInfoPtr.IsValid()){
 		response.message = QStringLiteral("Superuser already exists");
 
@@ -569,7 +569,7 @@ sdl::V1_0::imtauth::CCreateSuperuserPayload CUserControllerComp::OnCreateSuperus
 	}
 
 	QByteArray objectId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
-	QByteArray login = "su";
+	QByteArray login = imtauth::s_superuserLogin;
 
 	const QByteArray passwordHash = m_hashCalculatorCompPtr->GenerateHash(login + password.toUtf8());
 

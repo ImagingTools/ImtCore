@@ -30,7 +30,7 @@ public:
 	I_END_COMPONENT;
 
 	// reimplemented (IServerTokenIssuer)
-	virtual QByteArray SignIn(const ServerInfo& server, const QString& login, const QString& password, QString& errorMessage) const override;
+	virtual QByteArray SignInSuperuser(const ServerInfo& server, const QString& password, QString& errorMessage) const override;
 	virtual bool GetPermissions(
 				const ServerInfo& server,
 				const QByteArray& sessionToken,
