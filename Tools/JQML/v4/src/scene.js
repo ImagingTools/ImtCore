@@ -235,7 +235,9 @@ export class Scene {
 		el.style.cursor = css;
 	}
 
-	wheel(x, y, notches) {
+	// `notches` is the vertical wheel, `horizontalNotches` the horizontal one; positive scrolls towards the start. The event goes
+	// to the innermost view under the pointer and on to the one around it while a view hands it on (see wheelAxis in items.js).
+	wheel(x, y, notches, horizontalNotches = 0) {
 		const hits = [];
 		this.root.$handlerItems(x, y, WheelHandler, hits);
 		let taken = false;
@@ -244,8 +246,9 @@ export class Scene {
 			if (taken) break;
 		}
 		if (taken) return;
-		const target = this.root.$itemAt(x, y, true);
-		if (target !== null) target.$mouseWheel(notches, x, y);
+		for (let item = this.root.$itemAt(x, y, true); item !== null; item = item.$parent) {
+			if (item.$mouseWheel(notches, x, y, horizontalNotches)) return;
+		}
 	}
 
 	// Key events go to the item with the active focus; true if a handler accepted the event.

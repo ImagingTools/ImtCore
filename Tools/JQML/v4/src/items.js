@@ -567,9 +567,20 @@ function toTransformOrigin(value) {
 	);
 }
 
-// Pixels per wheel notch. The page reports a pixel wheel delta as delta / 100 notches, so 100 scrolls 1:1 with the
-// pointer (a trackpad), and a mouse notch (100 pixels) scrolls as far as in a browser.
-const WHEEL_NOTCH_PX = 100;
+// Pixels per wheel notch: what Qt scrolls a view for one notch of a mouse wheel (3 lines of 24 pixels). The page reports a pixel
+// wheel delta as delta / 100 notches, so a mouse notch (100 pixels) scrolls as Qt does.
+const WHEEL_NOTCH_PX = 72;
+
+// Scrolls one axis of a view by the wheel and tells whether the view took the event. Qt hands the event on, whole, to the item
+// below when the view could not move the whole step (it cannot scroll this way, or the end of its range is nearer than the step);
+// a step that ends exactly at the end is the view's. `notches` > 0 scrolls towards the start.
+function wheelAxis(view, property, current, max, notches) {
+	if (notches === 0 || max <= 0) return false;
+	const wanted = current - notches * WHEEL_NOTCH_PX;
+	const target = clamp(wanted, 0, max);
+	if (target !== current) view[property] = target;
+	return target === wanted;
+}
 
 // ----- Anchors -----
 
@@ -3327,10 +3338,10 @@ export class ListView extends Item {
 		return true;
 	}
 
-	$mouseWheel(notches) {
-		const delta = notches * WHEEL_NOTCH_PX;
-		if (this.$horizontal) this.contentX = clamp(this.$contentX - delta, 0, this.$maxContentX);
-		else this.contentY = clamp(this.$contentY - delta, 0, this.$maxContentY);
+	// A list scrolls along its own axis only: a vertical wheel does not move a horizontal list (Qt).
+	$mouseWheel(notches, x, y, horizontalNotches = 0) {
+		if (this.$horizontal) return wheelAxis(this, 'contentX', this.$contentX, this.$maxContentX, horizontalNotches);
+		return wheelAxis(this, 'contentY', this.$contentY, this.$maxContentY, notches);
 	}
 
 	// A copy of the row objects of the model, or null if it has none that can be told apart.
@@ -4261,13 +4272,14 @@ export class Flickable extends Item {
 	}
 
 	get $acceptsWheel() {
-		return this.$interactive && (this.$maxContentX > 0 || this.$maxContentY > 0);
+		return this.$interactive;
 	}
 
-	$mouseWheel(notches) {
-		const delta = notches * WHEEL_NOTCH_PX;
-		if (this.$maxContentY > 0) this.contentY = clamp(this.$contentY - delta, 0, this.$maxContentY);
-		else this.contentX = clamp(this.$contentX - delta, 0, this.$maxContentX);
+	$mouseWheel(notches, x, y, horizontalNotches = 0) {
+		if (!this.$interactive) return false;
+		const vertical = wheelAxis(this, 'contentY', this.$contentY, this.$maxContentY, notches);
+		const horizontal = wheelAxis(this, 'contentX', this.$contentX, this.$maxContentX, horizontalNotches);
+		return vertical || horizontal;
 	}
 
 	$mousePressAt(sceneX, sceneY) {

@@ -41,7 +41,8 @@ export function attachCanvas(canvas, scene, engine, options = {}) {
 		(e) => {
 			e.preventDefault();
 			const [x, y] = position(e);
-			scene.wheel(x, y, -e.deltaY / (e.deltaMode === 1 ? 3 : 100));
+			const unit = e.deltaMode === 1 ? 3 : 100;
+			scene.wheel(x, y, -e.deltaY / unit, -e.deltaX / unit);
 		},
 		{ passive: false },
 	);
