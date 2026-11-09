@@ -109,6 +109,7 @@ export class Scene {
 		setFrameLoop(true);
 		try {
 			const engine = this.engine;
+			engine.frameId++;
 			for (let pass = 0; pass < MAX_PASSES; pass++) {
 				root.$updateRequested = false;
 				root.$layout();
@@ -116,6 +117,11 @@ export class Scene {
 				if (!root.$updateRequested && engine.dirty.size === 0) break;
 			}
 			if (engine.dirty.size > 0) root.$updateRequested = true;
+			// A Binding with `delayed: true` has a value left for the next frame.
+			if (engine.wantFrame) {
+				engine.wantFrame = false;
+				root.$updateRequested = true;
+			}
 			if (engine.auditMode && engine.auditSweep() > 0) root.$updateRequested = true;
 		} finally {
 			setFrameLoop(false);

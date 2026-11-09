@@ -351,6 +351,8 @@ export function readUntracked(what = 'untracked') {
 	const binding = hooks.reading;
 	if (binding !== null) {
 		binding.volatileNow = true;
+		// The rows of a model change by a script's doing, the other things (a position, a content size) with the layout.
+		if (what !== 'rows') binding.layoutNow = true;
 		if (binding.why === null) binding.why = what;
 	}
 }

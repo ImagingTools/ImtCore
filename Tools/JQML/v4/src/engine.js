@@ -458,6 +458,15 @@ export class Engine {
 		this.repeaters = new Set();
 		this.connections = new Set(); // Connections items
 		this.qmlBindings = new Set(); // Binding items
+		// The number of the frame that the scene draws; a Binding item with `delayed: true` publishes once per frame, and asks for
+		// the next frame (`wantFrame`) when it has more to publish.
+		this.frameId = 0;
+		this.wantFrame = false;
+		// What the bindings that read the rows of a model or a count (`dataOnly`) can change with: a script ran, or a model
+		// was touched. They run again in the first pass of a frame and after that only when it moved.
+		this.dataEpoch = 0;
+		this.dataSeen = -1;
+		this.dataFrame = -1;
 		this.pendingImages = new Set();
 		// The pictures that were asked for, by the addresses they are looked up at (see loadImage): an icon used by many items
 		// (the arrows of a tree) is requested from the server once.
@@ -628,6 +637,7 @@ export class Engine {
 			return true;
 		};
 		hooks.touch = () => {
+			this.dataEpoch++;
 			if (this.host !== null) this.host.$update();
 		};
 		hooks.changed = (item, name) => this.fireChanged(item, name);
@@ -1034,7 +1044,7 @@ export class Engine {
 				return;
 			}
 		}
-		const binding = { owner, path, key, fn, line, file, last: undefined, hasLast: false, failed: false, failures: 0, dItems: null, dNames: null, nOld: 0, nCur: 0, diverged: false, curItems: null, curNames: null, queued: false, evaluating: false, writing: 0, runs: 0, seq: this.bindingSeq++, volatile: false, volatileNow: false, why: null, inHeap: false };
+		const binding = { owner, path, key, fn, line, file, last: undefined, hasLast: false, failed: false, failures: 0, dItems: null, dNames: null, nOld: 0, nCur: 0, diverged: false, curItems: null, curNames: null, queued: false, evaluating: false, writing: 0, runs: 0, seq: this.bindingSeq++, volatile: false, volatileNow: false, layoutNow: false, dataOnly: false, why: null, inHeap: false };
 		owner.$bindings.push(binding);
 		this.bindings.add(binding);
 		this.fresh.push(binding);
@@ -1086,6 +1096,8 @@ export class Engine {
 		if (binding === null) return;
 		if (!trusted) {
 			binding.volatileNow = true;
+			// What a count says changes with the rows of a model, and that is a script's doing (see `dataEpoch`).
+			if (name !== 'count') binding.layoutNow = true;
 			if (binding.why === null) binding.why = `${item.$typeName}.${name}`;
 		}
 		const n = binding.nCur;
@@ -1263,6 +1275,7 @@ export class Engine {
 		if (binding.failed || binding.evaluating || binding.owner.$destroyed || binding.owner.$bindings === null) return;
 		binding.evaluating = true;
 		binding.volatileNow = false;
+		binding.layoutNow = false;
 		binding.why = null;
 		const run = ++binding.runs;
 		const previous = hooks.reading;
@@ -1282,6 +1295,7 @@ export class Engine {
 		// A binding that failed is retried on every pass: what it needs may not be announced.
 		if (thrown && binding.why === null) binding.why = 'thrown';
 		this.setVolatile(binding, !binding.failed && (thrown || binding.volatileNow));
+		binding.dataOnly = !thrown && !binding.failed && binding.volatileNow && !binding.layoutNow;
 		if (thrown || binding.failed) return;
 		if (binding.hasLast && (sameValue(value, binding.last) || (binding.snap !== undefined && sameValue(value, binding.snap)))) return;
 		const audited = this.auditing !== null ? { binding, last: binding.last, value } : null;
@@ -1656,7 +1670,10 @@ export class Engine {
 			this.dirty.clear();
 			for (const binding of this.retry) if (!binding.inHeap && !binding.failed) this.pushPending(binding);
 			this.retry.clear();
-			for (const binding of this.volatile) if (!binding.inHeap) this.pushPending(binding);
+			const withData = this.dataFrame !== this.frameId || this.dataSeen !== this.dataEpoch;
+			this.dataFrame = this.frameId;
+			this.dataSeen = this.dataEpoch;
+			for (const binding of this.volatile) if (!binding.inHeap && (withData || !binding.dataOnly)) this.pushPending(binding);
 			while (this.passHeap.length > 0) {
 				const binding = this.popPending();
 				this.cursor = binding.seq;
@@ -2040,6 +2057,7 @@ export class Engine {
 	}
 
 	guard(fn, where, line) {
+		this.dataEpoch++;
 		try {
 			return fn();
 		} catch (error) {
@@ -2856,13 +2874,27 @@ export class Engine {
 		return false;
 	}
 
+	// `delayed: true` is published at the end of the event loop in Qt: once per frame here. A value that depends on what it
+	// changes (the left margin of a text that is centered by its own width) then moves one step a frame, and a step below a
+	// hundredth is the end of it (each step is half of the one before).
 	bindingItemChanged(item) {
+		const changed = this.bindingItemDiffers(item);
+		if (!changed || item.delayed !== true) return changed;
+		if (item.$syncFrame === this.frameId) {
+			this.wantFrame = true;
+			return false;
+		}
+		return true;
+	}
+
+	bindingItemDiffers(item) {
 		if (item.when === false) return false;
 		const state = item.$bind;
 		const target = item.target;
 		const property = item.property;
 		if (target === null || target === undefined || typeof target !== 'object' || typeof property !== 'string' || property === '') return false;
-		if (!(state.has && state.target === target && state.property === property && sameValue(state.value, item.value))) return true;
+		const close = (a, b) => item.delayed === true && state.has && typeof a === 'number' && typeof b === 'number' && Math.abs(a - b) < 0.01;
+		if (!(state.has && state.target === target && state.property === property && (sameValue(state.value, item.value) || close(state.value, item.value)))) return true;
 		// Another binding may have overwritten the target after we last wrote (ControlBase: content
 		// width binding vs Binding pushing an explicit control width of 300).
 		try {
@@ -2895,6 +2927,7 @@ export class Engine {
 			state.target = target;
 			state.property = property;
 			state.value = value;
+			item.$syncFrame = this.frameId;
 			// Keep the target's own binding (Qt 5): it takes over again when its inputs change. Dropping it
 			// freezes ControlBase button width at the pre-layout size (content.width still 0).
 			this.guard(() => this.assign(target, property.split('.'), value), `Binding '${property}'`, 0);
