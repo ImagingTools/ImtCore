@@ -10,7 +10,6 @@
 #include <imtauth/CRoleComp.h>
 #include <imtauth/CConnectedProductComp.h>
 #include <imtauth/CConnectedProductDocumentNameProviderComp.h>
-#include <imtauth/CClientProductCatalogComp.h>
 #include <imtauth/CConnectedClientProductCatalogComp.h>
 #include <imtauth/CConnectedProductDocumentValidatorComp.h>
 #include <imtauth/CProductPermissionSnapshotComp.h>
@@ -118,7 +117,6 @@ typedef imtauth::CUserCollectionAdapterComp UserCollectionAdapter;
 typedef imtauth::CCheckPermissionCompBase CheckPermissions;
 typedef imtauth::COrganizationsPermissionsProviderComp OrganizationsPermissionsProvider;
 typedef imtauth::CProductServerPermissionsProviderComp ProductServerPermissionsProvider;
-typedef imtauth::CClientProductCatalogComp ClientProductCatalog;
 typedef imtauth::CConnectedClientProductCatalogComp ConnectedClientProductCatalog;
 typedef imtauth::CCheckPermissionOrComp CheckPermissionOr;
 typedef icomp::TModelCompWrap<imtauth::CUserSettingsComp> UserSettings;

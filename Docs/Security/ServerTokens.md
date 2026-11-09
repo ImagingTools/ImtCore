@@ -23,7 +23,7 @@ Operator (Agentino or the Puma console)        Receiving server (Puma, Lisa, ...
 | Part | Component | Role |
 |---|---|---|
 | Token commands | `imtauthgql::CServerTokenControllerComp` | Adds client products, issues, lists, changes and revokes the tokens of this server. A superuser session only. |
-| Allowed clients | `imtauth::IClientProductCatalog` | `ClientProductCatalog` names them in the configuration and refuses to add one; `ConnectedClientProductCatalog` takes the connected products (Puma) and adds a product on `AddServerTokenClient`, so a configurator (Agentino) sets up the whole connection. |
+| Allowed clients | `imtauth::IClientProductCatalog` | `ConnectedClientProductCatalog`: the client products in a table of the receiver (`ConnectedProductRepository`, the product chooses the one of its database). `AddServerTokenClient` adds a product, so a configurator (Agentino) sets up the whole connection. Puma shows the same table as its catalog of products. |
 | Permissions of a token | `ProductServerPermissions` of the controller | A dedicated tree (Puma: `/ProductServer/...`). Without it, the permission tree of the server itself. |
 | Token storage | `ImtAuthVoce/PersonalAccessTokenStore` | The `PersonalAccessTokens` table of the server (created automatically). |
 | Check of a request | `imtservergql::CAuthenticationManagerComp` | `ServerProductId` refuses another product without a token; `ServerTokenManager` is where the tokens of this server are checked, for requests and for the periodic check of subscriptions: a subscription ends when its token is refused or holds other permissions than when it subscribed. A token is looked up there first in both `x-server-token` and the authentication header: a product sends its own server token in the authentication header for its subscriptions. Either way it stands for its client product and is bounded by the policy. A server token kept anywhere else is refused. |
@@ -35,17 +35,26 @@ Operator (Agentino or the Puma console)        Receiving server (Puma, Lisa, ...
 
 A product that uses `AuthorizableServerFramework` needs four changes in its server registry.
 
-1. Add the receiver:
+1. Add the table of the client products and the receiver:
 
 ```xml
+<Element Id="ClientProductRepository" PackageId="ImtUserAdministrationVoce" ComponentId="ConnectedProductRepository">
+    <Data IsEnabled="true" Flags="0">
+        <AttributeInfoMap>
+            <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
+                <Data IsEnabled="true" Value="DatabaseEngine"/>
+            </AttributeInfo>
+        </AttributeInfoMap>
+    </Data>
+</Element>
 <Element Id="ServerTokenReceiver" PackageId="ImtAuthVoce" ComponentId="ServerTokenReceiver">
     <Data IsEnabled="true" Flags="0">
         <AttributeInfoMap>
-            <AttributeInfo Id="ClientProductIds" Type="Id[]" ExportId="">
-                <Data IsEnabled="true"><Values><Value>ProLife</Value></Values></Data>
-            </AttributeInfo>
             <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
                 <Data IsEnabled="true" Value="DatabaseEngine"/>
+            </AttributeInfo>
+            <AttributeInfo Id="ProductRepository" Type="Reference" ExportId="">
+                <Data IsEnabled="true" Value="ClientProductRepository"/>
             </AttributeInfo>
             <AttributeInfo Id="PermissionTree" Type="Reference" ExportId="">
                 <Data IsEnabled="true" Value="AuthorizableServerFramework"/>
@@ -55,7 +64,7 @@ A product that uses `AuthorizableServerFramework` needs four changes in its serv
 </Element>
 ```
 
-   Optional attributes: `RequiredPermissions` (every token holds them) and `ProductServerPermissions` (a tree other than the tree of the product).
+   With SQLite the table is `SQLiteConnectedProductRepository`. Optional attributes: `RequiredPermissions` (every token holds them) and `ProductServerPermissions` (a tree other than the tree of the product).
 
 2. Let `AuthorizableServerFramework` check the tokens there and name the server:
    `ServerTokenManager` = `ServerTokenReceiver/ServerTokenManager`, `ServerProductId` = the product ID.

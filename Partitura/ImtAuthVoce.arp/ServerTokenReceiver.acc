@@ -10,13 +10,21 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="ClientProductCatalog" PackageId="ImtAuthPck" ComponentId="ClientProductCatalog">
+        <Element Id="ClientProductCatalog" PackageId="ImtAuthPck" ComponentId="ConnectedClientProductCatalog">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="ProductIds" Type="Id[]" ExportId="ClientProductIds">
+                    <AttributeInfo Id="ProductCollection" Type="Reference" ExportId="ProductRepository">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ProductFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="ConnectedProduct"/>
+                    </AttributeInfo>
                 </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ConnectedProduct" PackageId="ImtAuthPck" ComponentId="ConnectedProduct">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
             </Data>
         </Element>
         <Element Id="ServerTokenController" PackageId="ImtAuthGqlPck" ComponentId="ServerTokenController">

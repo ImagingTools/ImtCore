@@ -9,6 +9,7 @@
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="ClientProductCatalog" X="250" Y="100" Note=""/>
+        <Element ComponentName="ConnectedProduct" X="50" Y="100" Note=""/>
         <Element ComponentName="ServerTokenController" X="600" Y="100" Note=""/>
         <Element ComponentName="TokenStore" X="950" Y="100" Note=""/>
     </PositionMap>
