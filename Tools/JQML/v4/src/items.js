@@ -42,6 +42,8 @@ export const hooks = {
 	completing: null,
 	// (item, name) => void: a custom property that has `onNameChanged` handlers got a new value.
 	changed: null,
+	// (item) => void: the x, y, width or height of an item that has change handlers got another value.
+	geometry: null,
 	changeSignal: null,
 	initializeProperty: null,
 	release: null,
@@ -375,9 +377,15 @@ function noteWrite(item, name) {
 	if (item !== null && item !== undefined && hooks.notify !== null) hooks.notify(item, name);
 }
 
+// The geometry of an item changed: the engine polls the `onWidthChanged` handlers (and the like) of the items that it was told of.
+function noteGeometry(item) {
+	if (hooks.geometry !== null && item.$chg !== undefined) hooks.geometry(item);
+}
+
 // A script write (and a binding it updates inside onCompleted) reports onXChanged before the next line.
 // Binding updates during a normal sweep stay with the polled pass, so width still runs before height.
 function notifyGeometry(item, name) {
+	noteGeometry(item);
 	if (hooks.changed === null) return;
 	if (hooks.engineWrite > 0 && (hooks.completing === null || !hooks.completing())) return;
 	hooks.changed(item, name);
@@ -1030,18 +1038,22 @@ export class Item {
 		if (!Object.is(this.$ax, this.$gx)) {
 			this.$gx = this.$ax;
 			markReaders(this, 'x');
+			noteGeometry(this);
 		}
 		if (!Object.is(this.$ay, this.$gy)) {
 			this.$gy = this.$ay;
 			markReaders(this, 'y');
+			noteGeometry(this);
 		}
 		if (!Object.is(this.$aw, this.$gw)) {
 			this.$gw = this.$aw;
 			markReaders(this, 'width');
+			noteGeometry(this);
 		}
 		if (!Object.is(this.$ah, this.$gh)) {
 			this.$gh = this.$ah;
 			markReaders(this, 'height');
+			noteGeometry(this);
 		}
 	}
 

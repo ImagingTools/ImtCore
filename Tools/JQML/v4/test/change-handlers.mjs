@@ -82,7 +82,7 @@ engine.runChangeHandler = (handler) => {
 polled.clear();
 frames(10);
 check('a handler of a declared property is not polled', [polled.get('onCountChanged'), polled.get('onViaBindingChanged')], [undefined, undefined]);
-check('a handler of an alias and of a size is still polled', [polled.get('onInnerChanged') > 0, polled.get('onWidthChanged') > 0], [true, true]);
+check('a handler of an alias is still polled, one of a size only when the layout moved it', [polled.get('onInnerChanged') > 0, polled.get('onWidthChanged')], [true, undefined]);
 
 root.trace = '';
 root.count = 3;

@@ -416,6 +416,9 @@ function readRow(source) {
 	readRows(source);
 }
 
+// The properties whose change handlers are polled only for the items whose geometry changed.
+const GEOMETRY_PROPERTIES = new Set(["x", "y", "width", "height"]);
+
 export class Engine {
 	constructor() {
 		this.project = null;
@@ -456,6 +459,11 @@ export class Engine {
 		this.unknownTypes = new Map(); // type -> count
 		this.ignoredProperties = new Map(); // 'Type.property' -> count
 		this.changeHandlers = [];
+		// The items whose x, y, width or height changed since their handlers were polled last: only these are polled (see runChangeHandlers).
+		this.geoDirty = new Set();
+		// For tests: poll the other geometry handlers too, and tell which of them would have run.
+		this.auditGeometry = typeof process !== "undefined" && process.env !== undefined && process.env.JQML_AUDIT_GEOMETRY === "1";
+		this.geometryMisses = [];
 		this.singletons = new Map(); // name -> { path, item }
 		this.singletonEntries = new Map(); // path -> { path, item }: a singleton file is created once
 		this.fileLayers = new Map(); // file -> the names that only that file sees (see fileLayer), or null
@@ -655,6 +663,7 @@ export class Engine {
 		hooks.depend = (item, name, trusted) => this.depend(item, name, trusted);
 		hooks.notify = (item, name) => this.notify(item, name);
 		hooks.dirty = (item, name) => this.markReaders(item, name);
+		hooks.geometry = (item) => this.geoDirty.add(item);
 		hooks.reloadLoader = (loader) => this.updateLoader(loader);
 		hooks.clipboardWrite = (text, html) => {
 			this.clipboard = { text, html };
@@ -1730,7 +1739,16 @@ export class Engine {
 	runChangeHandlers() {
 		// Qt reports every width change before every height change when a layout sets both.
 		const heights = [];
+		// The handlers of x, y, width and height are polled only for the items whose geometry changed (the layout reports it when it
+		// commits a value, a setter when it gets another one): reading `width` of an item first works out its layout, and a table
+		// has 1000 such handlers. A handler that was never polled (no `last` yet) is polled as well.
+		const moved = this.geoDirty;
+		if (moved.size > 0) this.geoDirty = new Set();
 		for (const handler of this.changeHandlers) {
+			if (handler.hasLast && GEOMETRY_PROPERTIES.has(handler.property) && !moved.has(handler.item) && !this.geoDirty.has(handler.item)) {
+				if (this.auditGeometry && !handler.failed) this.auditGeometryHandler(handler);
+				continue;
+			}
 			// A property of the component that was declared in QML runs its handlers when it is assigned (see fireChanged), so a
 			// poll would find nothing: the 9000 handlers of a table were read in every frame, 9 ms of it.
 			if (handler.immediate === undefined && handler.hasLast) handler.immediate = this.runsAtAssignment(handler);
@@ -1739,6 +1757,15 @@ export class Engine {
 			else this.runChangeHandler(handler);
 		}
 		for (const handler of heights) this.runChangeHandler(handler);
+	}
+
+	// A geometry handler that was not polled: it must not have found a change.
+	auditGeometryHandler(handler) {
+		const value = handler.item[handler.property];
+		if (value === handler.last || (value !== value && handler.last !== handler.last)) return;
+		const where = `${handler.item.$typeName}.${handler.property} (${handler.file}:${handler.line})`;
+		this.geometryMisses.push(where);
+		console.error(`GEOMETRY MISS ${where}: ${handler.last} -> ${value}`);
 	}
 
 	// Whether the handler runs when its property is assigned (a property that was declared in QML), not only when it is polled.
