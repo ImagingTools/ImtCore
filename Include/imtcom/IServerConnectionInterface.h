@@ -128,9 +128,15 @@ public:
 	enum ConnectionFlags
 	{
 		CF_DEFAULT = 0x1,	///< Default insecure connection (HTTP, WS)
-		CF_SECURE = 0x2		///< Secure connection with SSL/TLS encryption (HTTPS, WSS)
+		CF_SECURE = 0x2,	///< Secure connection with SSL/TLS encryption (HTTPS, WSS)
+		/**
+			Web clients reach the WebSocket on the origin of the HTTP page (same scheme, host and port),
+			at the path /<application id>/wssub, instead of on the WebSocket port.
+			Set when a reverse proxy in front of the server forwards that path to the WebSocket port.
+		*/
+		CF_WEBSOCKET_SAME_ORIGIN = 0x4
 	};
-	I_DECLARE_FLAGS(ConnectionFlags, CF_DEFAULT, CF_SECURE);
+	I_DECLARE_FLAGS(ConnectionFlags, CF_DEFAULT, CF_SECURE, CF_WEBSOCKET_SAME_ORIGIN);
 
 	/**
 		\typedef ProtocolTypes
