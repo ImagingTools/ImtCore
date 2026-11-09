@@ -2613,12 +2613,8 @@ function compile(options){
         }
 
         toCode() {
-            if(this.meta.exports.length > 1){
-                return `function(){${this.meta.source}; return {${this.meta.exports.join(',')}}}()`
-            } else {
-                return `function(){${this.meta.source}; return ${this.meta.exports.join(',')}}()`
-            }
-            
+            // As in Qt, the qualifier of a library holds its top-level names, a single one too
+            return `function(){${this.meta.source}; return {${this.meta.exports.join(',')}}}()`
         }
     }
 
