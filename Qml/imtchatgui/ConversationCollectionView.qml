@@ -63,7 +63,7 @@ RemoteCollectionView {
 						updateConversationInput.m_documentId = documentId
 						updateConversationInput.m_conversation = representationModel
 
-						updateConversationRequest.send(updateConversationInput)
+						return updateConversationRequest.send(updateConversationInput)
 					}
 
 					property DocumentId documentIdInput: DocumentId {}

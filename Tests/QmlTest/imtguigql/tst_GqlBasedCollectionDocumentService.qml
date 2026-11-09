@@ -5,6 +5,7 @@ import imtcontrols 1.0
 import imtdocgui 1.0
 import imtguigql 1.0
 import imtqmltest 1.0
+import com.imtcore.imtqml 1.0
 
 TestCase {
 	id: testCase
@@ -128,6 +129,35 @@ TestCase {
 
 	function documentListResponse(documents){
 		return JSON.stringify({"data": {"GetOpenedDocumentList": {"documentList": documents}}})
+	}
+
+	Component {
+		id: notificationComp
+
+		TreeItemModel {}
+	}
+
+	function notification(json){
+		let model = createTemporaryObject(notificationComp, testCase)
+		verify(model.createFromJson(json))
+
+		return model
+	}
+
+	function test_documentChangedCarriesRequestAndChangeIds(){
+		let service = createTemporaryObject(serviceComp, testCase)
+		let changedSpy = createTemporaryObject(spyComp, testCase, {"target": service, "signalName": "documentManagerChanged"})
+
+		service.documentManagerSubscription.messageReceived(notification(
+					'{"documentOperation":"DocumentChanged","documentId":"doc","documentName":"Name","requestId":"request-1","changeIds":["name","licenses"]}'))
+		service.documentManagerSubscription.messageReceived(notification(
+					'{"documentOperation":"DocumentChanged","documentId":"doc","documentName":"Name"}'))
+
+		compare(changedSpy.count, 2)
+		compare(changedSpy.signalArguments[0][4], "request-1")
+		compare(changedSpy.signalArguments[0][5], ["name", "licenses"])
+		compare(changedSpy.signalArguments[1][4], "", "No request ID: a change without a client request")
+		compare(changedSpy.signalArguments[1][5], [], "No changeIds: unknown what changed")
 	}
 
 	function test_resyncClosesDocumentTheServerNoLongerHas(){

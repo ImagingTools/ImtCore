@@ -53,6 +53,8 @@ static const inline QByteArray s_serverTokenHeaderId = QByteArrayLiteral("x-serv
 // The product the console of the authorization server administers, for a superuser only
 static const inline QByteArray s_permissionPathHeaderId = QByteArrayLiteral("permissionPath");
 static const inline QByteArray s_languageIdHeaderId = QByteArrayLiteral("languageid");
+// Unique ID of a client request; e.g. a DocumentChanged notification names the request that made the change
+static const inline QByteArray s_requestIdHeaderId = QByteArrayLiteral("X-Request-ID");
 
 
 inline bool isValidUuid(const QByteArray& value)

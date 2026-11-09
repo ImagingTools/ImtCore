@@ -97,6 +97,11 @@ private slots:
 	void RedoRestoresDocumentDataTest();
 	void UndoRedoNewChangeClearsRedoTest();
 	void UndoRedoExecuteDocumentMethodTest();
+	void ExecuteDocumentMethodWithResultTest();
+	void ExecuteDocumentConstMethodWithResultTest();
+	void HandleDocumentTest();
+	void HandleDocumentInvalidParamsTest();
+	void HandleDocumentWhileLoadingTest();
 	void UndoRedoChangedEventFiredTest();
 	void UndoRedoNewDocumentStaysDirtyTest();
 	void UndoRedoDocumentsIsolationTest();
@@ -140,5 +145,4 @@ private:
 	istd::TDelPtr<ipackage::CComponentAccessor> m_accessorPtr;
 	imtdoc::IDocumentService* m_servicePtr = nullptr;
 };
-
 

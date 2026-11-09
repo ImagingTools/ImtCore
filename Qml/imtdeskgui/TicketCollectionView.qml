@@ -265,7 +265,7 @@ RemoteCollectionView {
 						updateTicketInput.m_documentId = documentId
 						updateTicketInput.m_ticket = representationModel
 
-						updateTicketRequest.send(updateTicketInput)
+						return updateTicketRequest.send(updateTicketInput)
 					}
 
 					property DocumentId documentIdInput: DocumentId {}
