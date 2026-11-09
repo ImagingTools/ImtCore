@@ -419,11 +419,7 @@ bool CLdapAuthorizationControllerComp::PrepareAuthorization(
 			const QByteArray& productId,
 			QString& errorMessage) const
 {
-	QMutexLocker locker(&m_groupSettingsMutex);
-	bool ldapUser = false;
-	for (const imtauth::IUserInfo::SystemInfo& system : userInfo.GetSystemInfos()){
-		ldapUser = ldapUser || (system.enabled && system.systemId == *m_systemIdAttrPtr);
-	}
+	const bool ldapUser = IsLdapUser(userInfo);
 	if (!ldapUser && userInfo.GetDirectoryRoles(productId).isEmpty()){
 		return true;
 	}
@@ -439,8 +435,11 @@ bool CLdapAuthorizationControllerComp::PrepareAuthorization(
 				return true;
 			}
 			QJsonObject products;
-			if (!ReadGroupSettings(products, errorMessage)){
-				return false;
+			{
+				QMutexLocker locker(&m_groupSettingsMutex);
+				if (!ReadGroupSettings(products, errorMessage)){
+					return false;
+				}
 			}
 			bool mappingEnabled = false;
 			for (auto it = products.begin(); it != products.end(); ++it){
@@ -457,65 +456,71 @@ bool CLdapAuthorizationControllerComp::PrepareAuthorization(
 		errorMessage = QStringLiteral("LDAP group authorization requires a product ID");
 		return false;
 	}
+
+	// The settings are read under the mutex, the directory is queried without it,
+	// so a slow directory request does not block other sign-ins and the mapping administration.
+	const bool mappingActive = ldapUser && m_enableableParamCompPtr.IsValid() && m_enableableParamCompPtr->IsEnabled();
+	QJsonObject settings;
+	if (mappingActive && !ReadProductGroupSettings(productId, settings, errorMessage)){
+		return false;
+	}
+
 	QByteArrayList roles;
-	if (ldapUser && m_enableableParamCompPtr.IsValid() && m_enableableParamCompPtr->IsEnabled()){
-		QJsonObject products;
-		if (!ReadGroupSettings(products, errorMessage)){
+	QByteArray sid;
+	const bool mappingEnabled = settings.value("enabled").toBool();
+	if (mappingEnabled){
+		QByteArrayList memberships;
+		QMap<QByteArray, QString> groups;
+		sid = GetDirectoryUserSid(userInfo.GetId());
+		if (sid.isEmpty() || userInfo.GetSid() != sid){
+			errorMessage = QStringLiteral("Unable to verify the stored LDAP account identity");
 			return false;
 		}
-		QJsonValue product = products.value(QString::fromUtf8(productId));
-		if (!product.isUndefined() && !product.isObject()){
-			errorMessage = QStringLiteral("Invalid product LDAP group settings");
+		if (!ReadDirectoryMembership(sid, memberships) ||
+			!DiscoverDirectoryGroups(settings.value("pattern").toString(), groups)){
+			errorMessage = QStringLiteral("Unable to refresh AD security group membership");
 			return false;
 		}
-		QJsonObject settings = product.toObject();
-		if (!product.isUndefined() && !ValidateGroupSettings(settings, productId, errorMessage)){
-			return false;
-		}
-		if (settings.value("enabled").toBool()){
-			QByteArrayList memberships;
-			QMap<QByteArray, QString> groups;
-			QByteArray sid = GetDirectoryUserSid(userInfo.GetId());
-			if (sid.isEmpty() || userInfo.GetSid() != sid){
-				errorMessage = QStringLiteral("Unable to verify the stored LDAP account identity");
-				return false;
+		QJsonObject mappings = settings.value("mappings").toObject();
+		for (const QByteArray& groupSid : memberships){
+			if (!groups.contains(groupSid)){
+				continue;
 			}
-			if (!ReadDirectoryMembership(sid, memberships) ||
-				!DiscoverDirectoryGroups(settings.value("pattern").toString(), groups)){
-				errorMessage = QStringLiteral("Unable to refresh AD security group membership");
-				return false;
-			}
-			QJsonObject mappings = settings.value("mappings").toObject();
-			for (const QByteArray& sid : memberships){
-				if (!groups.contains(sid)){
-					continue;
-				}
-				for (const QJsonValue& role : mappings.value(QString::fromUtf8(sid)).toArray()){
-					QByteArray roleId = role.toString().toUtf8();
-					if (!roles.contains(roleId)){
-						roles.append(roleId);
-					}
+			for (const QJsonValue& role : mappings.value(QString::fromUtf8(groupSid)).toArray()){
+				QByteArray roleId = role.toString().toUtf8();
+				if (!roles.contains(roleId)){
+					roles.append(roleId);
 				}
 			}
 		}
 	}
-	if (roles == userInfo.GetDirectoryRoles(productId)){
-		if (!roles.isEmpty() && userInfo.GetRoleProvider() == nullptr){
-			errorMessage = QStringLiteral("LDAP mapped users require a configured role provider");
+
+	// Grants computed from outdated settings are not committed; the sign-in has to be repeated.
+	if (mappingActive){
+		QJsonObject currentSettings;
+		if (!ReadProductGroupSettings(productId, currentSettings, errorMessage)){
 			return false;
 		}
-		return true;
+		if (currentSettings != settings){
+			errorMessage = QStringLiteral("LDAP group settings changed during sign-in");
+			return false;
+		}
 	}
-	// Reload before changing only our source-owned grants; manual assignments are never removed.
+
+	// Compared with the current stored user, not with the snapshot of the sign-in:
+	// an overlapping sign-in or a user save may have changed the grants meanwhile.
 	if (!m_userCollectionCompPtr.IsValid()){
 		errorMessage = QStringLiteral("LDAP user collection is not configured");
 		return false;
 	}
-	QByteArray objectId = GetUserObjectId(userInfo.GetId());
-	imtbase::IObjectCollection::DataPtr data;
+	const QByteArray objectId = GetUserObjectId(userInfo.GetId());
+	if (objectId.isEmpty()){
+		errorMessage = QStringLiteral("Unable to load LDAP role grants");
+		return false;
+	}
 	QMutexLocker userUpdateLocker(&imtauth::CUserBaseInfo::GetUserUpdateMutex(objectId));
-	if (objectId.isEmpty() || !m_userCollectionCompPtr.IsValid() ||
-		!m_userCollectionCompPtr->GetObjectData(objectId, data)){
+	imtbase::IObjectCollection::DataPtr data;
+	if (!m_userCollectionCompPtr->GetObjectData(objectId, data)){
 		errorMessage = QStringLiteral("Unable to load LDAP role grants");
 		return false;
 	}
@@ -525,12 +530,30 @@ bool CLdapAuthorizationControllerComp::PrepareAuthorization(
 		errorMessage = QStringLiteral("Invalid LDAP user data");
 		return false;
 	}
-	if (!roles.isEmpty() && storedUser->GetRoleProvider() == nullptr){
-		errorMessage = QStringLiteral("LDAP mapped users require a configured persistent user role provider");
+	if (mappingEnabled && storedUser->GetSid() != sid){
+		errorMessage = QStringLiteral("Unable to verify the stored LDAP account identity");
 		return false;
 	}
+
+	// An account unlinked from LDAP meanwhile keeps no directory grants.
+	if (!IsLdapUser(*storedUser)){
+		roles.clear();
+	}
+
+	const bool changed = (roles != storedUser->GetDirectoryRoles(productId));
 	storedUser->SetDirectoryRoles(productId, roles);
-	if (!m_userCollectionCompPtr->SetObjectData(objectId, *storedUser)){
+
+	// A mapped role the user cannot resolve would be dropped silently by GetPermissions().
+	if (!roles.isEmpty()){
+		imtauth::IUserBaseInfo::RoleIds resolvedRoles;
+		imtauth::IUserBaseInfo::FeatureIds resolvedPermissions;
+		if (!storedUser->ResolveDirectoryRoles(productId, resolvedRoles, resolvedPermissions)){
+			errorMessage = QStringLiteral("Unable to resolve the LDAP mapped roles through the persistent user role provider");
+			return false;
+		}
+	}
+
+	if (changed && !m_userCollectionCompPtr->SetObjectData(objectId, *storedUser)){
 		errorMessage = QStringLiteral("Unable to persist LDAP role grants");
 		return false;
 	}
@@ -1037,7 +1060,6 @@ sdl::V1_0::imtauth::CAuthorizationPayload CLdapAuthorizationControllerComp::OnAu
 
 			bool ok = CheckCredential(*m_systemIdAttrPtr, login, password);
 			if (ok){
-				RegisterAccessAttempt(login, true);
 				QByteArray guestRoleId = EnsureRoleExists(productId, RT_GUEST, "Guest", "Guest", "Guest role");
 
 				QByteArray defaultRoleId = EnsureRoleExists(productId, RT_DEFAULT, "Default", "Default", "Default role");
@@ -1089,6 +1111,8 @@ sdl::V1_0::imtauth::CAuthorizationPayload CLdapAuthorizationControllerComp::OnAu
 						errorMessage = QStringLiteral("Invalid inserted LDAP user data");
 						return sdl::V1_0::imtauth::CAuthorizationPayload();
 					}
+
+					RegisterAccessAttempt(login, true);
 				}
 				else{
 					QMutexLocker userUpdateLocker(&imtauth::CUserBaseInfo::GetUserUpdateMutex(userObjectId));
@@ -1096,30 +1120,26 @@ sdl::V1_0::imtauth::CAuthorizationPayload CLdapAuthorizationControllerComp::OnAu
 					if (m_userCollectionCompPtr->GetObjectData(userObjectId, dataPtr)){
 						userInfoPtr.MoveCastedPtr(dataPtr.GetPtr()->CloneMe());
 						if (userInfoPtr.IsValid()){
-							// Reached only after CheckCredential succeeded, so naming the account state is safe.
+							// The directory password signs in only accounts an administrator linked to LDAP;
+							// other accounts keep their own credential systems.
+							bool hasLdapSystem = false;
+							for (const imtauth::IUserInfo::SystemInfo& system : userInfoPtr->GetSystemInfos()){
+								hasLdapSystem = hasLdapSystem || (system.enabled && system.systemId == *m_systemIdAttrPtr);
+							}
+							if (!hasLdapSystem){
+								userUpdateLocker.unlock();
+
+								return AuthorizeStoredUser(login, password, productId, *m_systemIdAttrPtr, errorMessage);
+							}
+
+							RegisterAccessAttempt(login, true);
+
+							// Reached only after the LDAP credentials of a linked account succeeded, so naming the account state is safe.
 							if (!userInfoPtr->IsEnabled()){
 								return CreateAccountDisabledResponse(login);
 							}
 
 							bool needsUpdate = false;
-							bool hasLdapSystem = false;
-							for (const imtauth::IUserInfo::SystemInfo& system : userInfoPtr->GetSystemInfos()){
-								if (system.systemId == *m_systemIdAttrPtr){
-									if (!system.enabled){
-										userUpdateLocker.unlock();
-
-										return BaseClass::OnAuthorization(authorizationRequest, gqlRequest, errorMessage);
-									}
-									hasLdapSystem = true;
-								}
-							}
-							if (!hasLdapSystem){
-								imtauth::IUserInfo::SystemInfo system;
-								system.systemId = *m_systemIdAttrPtr;
-								system.systemName = "LDAP";
-								userInfoPtr->AddToSystem(system);
-								needsUpdate = true;
-							}
 
 							// Update login in case the user logged in with a different format
 							if (userInfoPtr->GetId() != login){
@@ -1173,7 +1193,7 @@ sdl::V1_0::imtauth::CAuthorizationPayload CLdapAuthorizationControllerComp::OnAu
 				if (userInfoPtr.IsValid()){
 					userInfoPtr->SetId(login);
 					sdl::V1_0::imtauth::CAuthorizationPayload retVal;
-					retVal = CreateAuthorizationSuccessfulResponse(*userInfoPtr.GetPtr(), *m_systemIdAttrPtr, productId, errorMessage);
+					retVal = CreateAuthorizationResponseWithLifetimeCheck(*userInfoPtr.GetPtr(), *m_systemIdAttrPtr, productId, errorMessage);
 
 					return retVal;
 				}
@@ -1183,6 +1203,9 @@ sdl::V1_0::imtauth::CAuthorizationPayload CLdapAuthorizationControllerComp::OnAu
 
 				return retVal;
 			}
+
+			// The LDAP password was checked already, so only the other credential systems of the account are tried.
+			return AuthorizeStoredUser(login, password, productId, *m_systemIdAttrPtr, errorMessage);
 		}
 	}
 
@@ -1191,6 +1214,45 @@ sdl::V1_0::imtauth::CAuthorizationPayload CLdapAuthorizationControllerComp::OnAu
 
 
 // private methods
+
+bool CLdapAuthorizationControllerComp::IsLdapUser(const imtauth::IUserInfo& userInfo) const
+{
+	for (const imtauth::IUserInfo::SystemInfo& system : userInfo.GetSystemInfos()){
+		if (system.enabled && system.systemId == *m_systemIdAttrPtr){
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+bool CLdapAuthorizationControllerComp::ReadProductGroupSettings(const QByteArray& productId, QJsonObject& settings, QString& errorMessage) const
+{
+	settings = QJsonObject();
+
+	QJsonObject products;
+	{
+		QMutexLocker locker(&m_groupSettingsMutex);
+		if (!ReadGroupSettings(products, errorMessage)){
+			return false;
+		}
+	}
+
+	QJsonValue product = products.value(QString::fromUtf8(productId));
+	if (product.isUndefined()){
+		return true;
+	}
+	if (!product.isObject()){
+		errorMessage = QStringLiteral("Invalid product LDAP group settings");
+		return false;
+	}
+
+	settings = product.toObject();
+
+	return ValidateGroupSettings(settings, productId, errorMessage);
+}
+
 
 bool CLdapAuthorizationControllerComp::IsGroupSettingsConfigured() const
 {

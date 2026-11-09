@@ -151,6 +151,24 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 			return nullptr;
 		}
 
+		// Directory roles are bound to organizations like any other role, so only the ones visible in the organization of the request count
+		istd::IChangeableUniquePtr scopedUserPtr;
+		const imtauth::CUserBaseInfo* directoryUserPtr = dynamic_cast<const imtauth::CUserBaseInfo*>(userInfoPtr);
+		if (directoryUserPtr != nullptr && directoryUserPtr->HasDirectoryRoles()){
+			scopedUserPtr = userInfoPtr->CloneMe();
+			imtauth::CUserBaseInfo* scopedBaseInfoPtr = dynamic_cast<imtauth::CUserBaseInfo*>(scopedUserPtr.GetPtr());
+			const imtauth::IUserInfo* scopedUserInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(scopedUserPtr.GetPtr());
+			if (scopedBaseInfoPtr == nullptr || scopedUserInfoPtr == nullptr){
+				imtgql::CGqlRequestContextManager::Clear();
+
+				SetError(error, imtgql::IGqlContextCreator::CCS_INTERNAL_ERROR, QStringLiteral("User account could not be prepared."));
+				return nullptr;
+			}
+
+			scopedBaseInfoPtr->ScopeDirectoryRoles(tenantId, m_bindingManagerCompPtr.IsValid() ? m_bindingManagerCompPtr.GetPtr() : nullptr);
+			userInfoPtr = scopedUserInfoPtr;
+		}
+
 		if (isPat){
 			// For PAT: restrict the user's permissions to the intersection with the
 			// token's scopes. GetPermissions() now returns role- and local-permission

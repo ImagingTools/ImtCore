@@ -397,6 +397,11 @@ I_EXPORT_COMPONENT(
 			"User Document Validator");
 
 I_EXPORT_COMPONENT(
+			UserDocumentSaveDelegate,
+			"User document save delegate keeping the stored directory role grants",
+			"User Document Save Delegate");
+
+I_EXPORT_COMPONENT(
 			UserGroupDocumentValidator,
 			"User group document validator",
 			"User Group Document Validator");

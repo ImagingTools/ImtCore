@@ -68,6 +68,13 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
+                    <AttributeInfo Id="DocumentSaveDelegates" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>UserDocumentSaveDelegate</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                     <AttributeInfo Id="DocumentServiceEventHandlers" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
@@ -233,6 +240,11 @@
             </Data>
         </Element>
         <Element Id="UserDocumentNameProvider" PackageId="ImtAuthPck" ComponentId="UserDocumentNameProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="UserDocumentSaveDelegate" PackageId="ImtAuthPck" ComponentId="UserDocumentSaveDelegate">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap/>
             </Data>

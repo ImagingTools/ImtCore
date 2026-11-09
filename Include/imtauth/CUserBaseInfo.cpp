@@ -15,6 +15,7 @@
 // ImtCore includes
 #include <imtcore/Version.h>
 #include <imtbase/IObjectCollection.h>
+#include <imtauth/ITenantEntityBindingManager.h>
 
 
 namespace imtauth
@@ -26,6 +27,21 @@ namespace
 
 
 const QByteArray DirectoryProductPrefix("urn:imt:directory-roles:");
+
+
+bool IsRoleVisibleInTenant(const ITenantEntityBindingManager* bindingManagerPtr, const QByteArray& tenantId, const QByteArray& roleId)
+{
+	if (bindingManagerPtr == nullptr){
+		return true;
+	}
+
+	const QByteArray rolesEntity = QByteArrayLiteral("Roles");
+	if (tenantId.isEmpty()){
+		return !bindingManagerPtr->HasAnyTenantBinding(rolesEntity, roleId);
+	}
+
+	return bindingManagerPtr->HasBinding(tenantId, rolesEntity, roleId);
+}
 
 
 }
@@ -111,6 +127,116 @@ bool CUserBaseInfo::ResolveDirectoryRoles(const QByteArray& productId, RoleIds& 
 	roles = roots;
 	permissions = resolved;
 	return true;
+}
+
+
+bool CUserBaseInfo::HasDirectoryRoles() const
+{
+	for (auto it = m_rolesMap.cbegin(); it != m_rolesMap.cend(); ++it){
+		if (IsReservedProductId(it.key())){
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+void CUserBaseInfo::CopyDirectoryRolesFrom(const CUserBaseInfo& source)
+{
+	QMap<QByteArray, QByteArrayList> rolesMap;
+	for (auto it = m_rolesMap.cbegin(); it != m_rolesMap.cend(); ++it){
+		if (!IsReservedProductId(it.key())){
+			rolesMap.insert(it.key(), it.value());
+		}
+	}
+
+	for (auto it = source.m_rolesMap.cbegin(); it != source.m_rolesMap.cend(); ++it){
+		if (IsReservedProductId(it.key())){
+			rolesMap.insert(it.key(), it.value());
+		}
+	}
+
+	if (rolesMap == m_rolesMap){
+		return;
+	}
+
+	istd::CChangeNotifier notifier(this);
+	m_rolesMap = rolesMap;
+}
+
+
+void CUserBaseInfo::ScopeDirectoryRoles(const QByteArray& tenantId, const ITenantEntityBindingManager* bindingManagerPtr)
+{
+	if (!HasDirectoryRoles()){
+		return;
+	}
+
+	QMap<QByteArray, QByteArrayList> rolesMap;
+	QMap<QByteArray, QByteArrayList> permissionsMap = m_permissionsMap;
+	for (auto it = m_rolesMap.cbegin(); it != m_rolesMap.cend(); ++it){
+		if (!IsReservedProductId(it.key())){
+			rolesMap.insert(it.key(), it.value());
+			continue;
+		}
+
+		const QByteArray productId = it.key().mid(DirectoryProductPrefix.size());
+		RoleIds directoryRoles;
+		FeatureIds directoryPermissions;
+		if (!ResolveDirectoryRoles(productId, directoryRoles, directoryPermissions)){
+			continue;
+		}
+
+		QByteArrayList pendingRoleIds;
+		for (const QByteArray& roleId : std::as_const(directoryRoles)){
+			if (IsRoleVisibleInTenant(bindingManagerPtr, tenantId, roleId)){
+				pendingRoleIds.append(roleId);
+			}
+		}
+
+		FeatureIds scopedPermissions;
+		QSet<QByteArray> visitedRoleIds;
+		while (!pendingRoleIds.isEmpty()){
+			const QByteArray roleId = pendingRoleIds.takeFirst();
+			if (visitedRoleIds.contains(roleId)){
+				continue;
+			}
+
+			visitedRoleIds.insert(roleId);
+
+			imtauth::IRoleUniquePtr rolePtr = m_roleProviderPtr->GetRole(roleId);
+			if (!rolePtr.IsValid()){
+				continue;
+			}
+
+			for (const QByteArray& permission : rolePtr->GetLocalPermissions()){
+				if (!scopedPermissions.contains(permission)){
+					scopedPermissions.append(permission);
+				}
+			}
+
+			for (const QByteArray& parentRoleId : rolePtr->GetIncludedRoles()){
+				if (IsRoleVisibleInTenant(bindingManagerPtr, tenantId, parentRoleId)){
+					pendingRoleIds.append(parentRoleId);
+				}
+			}
+		}
+
+		if (scopedPermissions.isEmpty()){
+			continue;
+		}
+
+		FeatureIds& productPermissions = permissionsMap[productId];
+		for (const QByteArray& permission : std::as_const(scopedPermissions)){
+			if (!productPermissions.contains(permission)){
+				productPermissions.append(permission);
+			}
+		}
+	}
+
+	istd::CChangeNotifier notifier(this);
+	m_rolesMap = rolesMap;
+	m_permissionsMap = permissionsMap;
 }
 
 

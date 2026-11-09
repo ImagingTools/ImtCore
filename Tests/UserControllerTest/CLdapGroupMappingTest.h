@@ -29,6 +29,9 @@ private slots:
 	void testIdentityAndProviderFailuresDenyMappedGrants();
 	void testDirectoryRolesRespectTenantBindings();
 	void testGlobalDirectoryRoleInheritanceRespectsTenantBindings();
+	void testUnlinkedLocalAccountIgnoresDirectoryPassword();
+	void testGlobalPermissionsHideTenantBoundDirectoryRoles();
+	void testUserSavesKeepStoredDirectoryRoles();
 	void testNotificationsSynchronizeGroupList();
 	void testFailedDirectoryReadKeepsGroupList();
 	void testCorruptCatalogRecoversOnRead();

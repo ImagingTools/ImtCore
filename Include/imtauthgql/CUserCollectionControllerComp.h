@@ -125,6 +125,7 @@ protected:
 	// reimplemented (imtservergql::CObjectCollectionControllerCompBase) for tenant-dependent cleanup
 	virtual bool OnBeforeRemoveElements(const QByteArrayList& elementIds, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual void OnAfterRemoveElements(const QByteArrayList& elementIds, const ::imtgql::CGqlRequest& gqlRequest) const override;
+	virtual bool OnBeforeSetObjectData(const QByteArray& objectId, istd::IChangeable& object, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 protected:
 	I_REF(imtauth::IRoleInfoProvider, m_roleInfoProviderCompPtr);

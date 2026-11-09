@@ -19,6 +19,9 @@
                     <AttributeInfo Id="DocumentNameProviders" Type="Reference[]" ExportId="DocumentNameProviders">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="DocumentSaveDelegates" Type="Reference[]" ExportId="DocumentSaveDelegates">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="DocumentServiceEventHandler" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>

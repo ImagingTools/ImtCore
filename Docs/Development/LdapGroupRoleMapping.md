@@ -113,6 +113,19 @@ read using the account SID. It includes nested security groups and the primary
 group, not merely direct `memberOf` entries. The role set is the union of **every**
 matching mapped security group. The discovered pattern is checked again on login,
 so a renamed group that no longer matches cannot continue adding grants.
+Grants are refreshed only after a successful credential check, never on account
+lockout, an expired-password response, or a failed password.
+
+An existing local account is never linked to the directory implicitly. If the
+stored user has no enabled `Ldap` system entry, a matching Windows password is
+ignored and only the account's own enabled systems are checked; an administrator
+must add the LDAP system to the user explicitly. A failed LDAP password check also
+falls back only to the user's other enabled systems.
+
+The refresh reloads the stored user under the per-user update lock, verifies the
+account SID and the mapped roles against it, and persists only changed directory
+grants. Settings are read under the settings mutex but the directory is queried
+without it; if the settings change during a sign-in, the sign-in is refused.
 
 Mappings are product-scoped and can reference only existing roles of that product.
 Every enabled mapping's roles are validated before login/save; an unreadable/deleted/foreign
@@ -136,7 +149,17 @@ permission queries retain directory grants. Disabling mapping or removing group
 membership removes only directory grants at the next successful sign-in.
 Tenant-aware role/permission queries include directory roles through the same
 binding filters as manual roles; tenant adaptation changes a clone, not the
-persisted source assignments.
+persisted source assignments. Sign-in global permissions and the request context
+of `CAuthenticationManagerComp` hide directory roles (and inherited roles) bound
+to another tenant; connect the same `BindingManager` to the authorization
+controller and to `AuthenticationManager` for this. Group permissions of the user
+are kept in the global and tenant-less results.
+
+Saving a user cannot change directory grants: the stored grants replace the
+submitted ones in `CUserCollectionControllerComp` (via the
+`CObjectCollectionControllerCompBase::OnBeforeSetObjectData` hook) and, for the
+document service, in `imtauth::CUserDocumentSaveDelegateComp`, which
+`UserCollectionDocumentService.acc` connects through `DocumentSaveDelegates`.
 
 Settings use versioned JSON, one document for all products, atomic `QSaveFile`
 replacement, an in-process mutex and an interprocess save lock. Saves preserve
@@ -196,7 +219,9 @@ returns an error, never a partial trusted group list.
 executable. It covers both login commands, stored permission queries, all-role
 union, product isolation, membership revocation, manual-role preservation,
 archive/clone/reset, disabled/corrupt settings, failed persistence, superuser
-checks, cross-product role rejection, tenant isolation and settings persistence.
+checks, cross-product role rejection, tenant isolation and settings persistence,
+tenant-bound directory roles in sign-in global permissions, no implicit linking of
+local accounts and preservation of stored directory grants on user saves.
 Notification tests feed listener events into the component and cover creation,
 rename, deletion and rename out of the pattern, kept mappings and manual roles, a
 failed directory read, disconnect/reconnect, product isolation, a forged client

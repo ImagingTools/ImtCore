@@ -19,6 +19,7 @@
 // ImtCore includes
 #include <imtdoc/CDocumentServiceBase.h>
 #include <imtdoc/IDocumentInitDelegate.h>
+#include <imtdoc/IDocumentSaveDelegate.h>
 #include <imtdoc/IDocumentNameProvider.h>
 #include <imtdoc/IPersistentUndoManager.h>
 #include <imtdoc/IDocumentValidator.h>
@@ -81,6 +82,7 @@ public:
 		I_ASSIGN_MULTI_0(m_objectFactListCompPtr, "ObjectFactories", "List of object factories related to registered type-IDs ('ObjectTypeIdList')", true);
 		I_ASSIGN_MULTI_0(m_documentValidatorCompPtr, "DocumentValidators", "List of document data validators related to registered type-IDs ('ObjectTypeIdList')", false);
 		I_ASSIGN_MULTI_0(m_documentInitDelegateCompPtr, "DocumentInitDelegates", "List of document initialization delegates related to registered type-IDs ('ObjectTypeIdList')", false);
+		I_ASSIGN_MULTI_0(m_documentSaveDelegateCompPtr, "DocumentSaveDelegates", "List of delegates writing saved documents over their collection objects, related to registered type-IDs ('ObjectTypeIdList')", false);
 		I_ASSIGN(m_stateFilePathCompPtr, "StateFilePath", "File path used to save/restore the list of opened documents", false, "StateFilePath");
 		I_ASSIGN(m_statePersistenceEnablerCompPtr, "StatePersistenceEnabler", "Enables restoring of opened documents on component creation and saving on each data model change", false, "StatePersistenceEnabler");
 		I_ASSIGN(m_isSingleCopyModeAttrPtr, "IsSingleCopyMode", "When enabled, all users share a single copy of each document", false, false);
@@ -107,6 +109,12 @@ protected:
 	virtual idoc::IUndoManagerUniquePtr CreateUndoManager() const override;
 	virtual bool IsSingleCopyMode() const override;
 	virtual bool OnDocumentCreated(const QByteArray& typeId, const iprm::IParamsSet* initParams, istd::IChangeable& document, QString& errorMessage) override;
+
+	/**
+		Get the delegate writing saved documents of the type over their collection objects.
+		\return nullptr if no delegate is registered for the type.
+	*/
+	const imtdoc::IDocumentSaveDelegate* GetDocumentSaveDelegate(const QByteArray& typeId) const;
 
 private:
 	// Reserve 170000000-170000099 for imtdoc validation warnings to avoid collisions with other message IDs.
@@ -163,6 +171,7 @@ protected:
 	I_MULTIFACT(istd::IChangeable, m_objectFactListCompPtr);
 	I_MULTIREF(imtdoc::IDocumentValidator, m_documentValidatorCompPtr);
 	I_MULTIREF(imtdoc::IDocumentInitDelegate, m_documentInitDelegateCompPtr);
+	I_MULTIREF(imtdoc::IDocumentSaveDelegate, m_documentSaveDelegateCompPtr);
 	I_REF(ifile::IFileNameParam, m_stateFilePathCompPtr);
 	I_REF(iprm::IEnableableParam, m_statePersistenceEnablerCompPtr);
 	I_ATTR(bool, m_isSingleCopyModeAttrPtr);

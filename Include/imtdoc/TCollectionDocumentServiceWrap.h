@@ -26,6 +26,7 @@
 #include <imtdoc/CDocumentRenamedEvent.h>
 #include <imtdoc/CDocumentSavedAsEvent.h>
 #include <imtdoc/CDocumentSavedEvent.h>
+#include <imtdoc/IDocumentSaveDelegate.h>
 
 
 namespace imtdoc
@@ -843,7 +844,10 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 		}
 
 		// Update object
-		bool res = collectionPtr->SetObjectData(currentObjectId, *documentSnapshotPtr, istd::IChangeable::CM_WITHOUT_REFS, params.operationContextPtr);
+		const IDocumentSaveDelegate* saveDelegatePtr = this->GetDocumentSaveDelegate(workingDocumentPtr->typeId);
+		bool res = (saveDelegatePtr != nullptr) ?
+					saveDelegatePtr->UpdateCollectionObject(*collectionPtr, currentObjectId, *documentSnapshotPtr, params.operationContextPtr) :
+					collectionPtr->SetObjectData(currentObjectId, *documentSnapshotPtr, istd::IChangeable::CM_WITHOUT_REFS, params.operationContextPtr);
 
 		if (res){
 			QString updatedName;

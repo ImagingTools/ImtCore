@@ -1295,11 +1295,39 @@ inline istd::IChangeableUniquePtr AdaptUserForTenant(
 
 
 /**
+	Get the permissions of a user outside of any organization: the ones reported by
+	GetPermissions(), except that directory roles and their parent roles count only
+	when they are bound to no organization.
+	\see imtauth::CUserBaseInfo::ScopeDirectoryRoles
+*/
+inline imtauth::IUserBaseInfo::FeatureIds GetGlobalUserPermissions(
+				const imtauth::IUserInfo& userInfo,
+				const QByteArray& productId,
+				const imtauth::ITenantEntityBindingManager* bindingManager)
+{
+	const imtauth::CUserBaseInfo* directoryUserPtr = dynamic_cast<const imtauth::CUserBaseInfo*>(&userInfo);
+	if (directoryUserPtr == nullptr || !directoryUserPtr->HasDirectoryRoles()){
+		return userInfo.GetPermissions(productId);
+	}
+
+	istd::IChangeableUniquePtr scopedPtr = userInfo.CloneMe();
+	imtauth::CUserBaseInfo* scopedUserPtr = dynamic_cast<imtauth::CUserBaseInfo*>(scopedPtr.GetPtr());
+	if (scopedUserPtr == nullptr){
+		return imtauth::IUserBaseInfo::FeatureIds();
+	}
+
+	scopedUserPtr->ScopeDirectoryRoles(QByteArray(), bindingManager);
+
+	return scopedUserPtr->GetPermissions(productId);
+}
+
+
+/**
 	Get the permissions of a tenant-adapted user: its roles and their parent
 	roles, its groups, their parent groups and the roles of those groups.
 	Parent roles, parent groups and group roles count only when they are
 	visible in the tenant, so an entity of another organization grants nothing.
-	Without a tenant, directory roles are traversed with the global binding filter.
+	Without a tenant, the global permissions are returned (GetGlobalUserPermissions).
 */
 inline imtauth::IUserBaseInfo::FeatureIds GetTenantUserPermissions(
 				const imtauth::IUserInfo& userInfo,
@@ -1309,10 +1337,12 @@ inline imtauth::IUserBaseInfo::FeatureIds GetTenantUserPermissions(
 				imtauth::IRoleInfoProvider* roleInfoProvider)
 {
 	const imtauth::IRoleInfoProvider* roleProviderPtr = (roleInfoProvider != nullptr) ? roleInfoProvider : userInfo.GetRoleProvider();
-	const imtauth::CUserBaseInfo* directoryUser = dynamic_cast<const imtauth::CUserBaseInfo*>(&userInfo);
-	const bool hasDirectoryRoles = directoryUser != nullptr && !directoryUser->GetDirectoryRoles(productId).isEmpty();
-	if (bindingManager == nullptr || roleProviderPtr == nullptr || (tenantId.isEmpty() && !hasDirectoryRoles)){
+	if (bindingManager == nullptr || roleProviderPtr == nullptr){
 		return userInfo.GetPermissions(productId);
+	}
+
+	if (tenantId.isEmpty()){
+		return GetGlobalUserPermissions(userInfo, productId, bindingManager);
 	}
 
 	const QByteArray rolesEntity = QByteArrayLiteral("Roles");

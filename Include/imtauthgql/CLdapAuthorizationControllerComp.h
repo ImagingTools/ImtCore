@@ -111,6 +111,12 @@ protected:
 				QString& errorMessage) const override;
 
 private:
+	bool IsLdapUser(const imtauth::IUserInfo& userInfo) const;
+	/**
+		Reads the group settings of the product under the settings mutex.
+		\param settings	empty if the product has no settings.
+	*/
+	bool ReadProductGroupSettings(const QByteArray& productId, QJsonObject& settings, QString& errorMessage) const;
 	bool IsGroupSettingsConfigured() const;
 	QString GetGroupCatalogFilePath() const;
 	bool ReadGroupCatalog(QJsonObject& catalogs, QString& errorMessage) const;

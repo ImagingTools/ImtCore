@@ -82,6 +82,7 @@
 #include <imtauth/CCrossOrgGrantDocumentValidatorComp.h>
 #include <imtauth/CRoleDocumentValidatorComp.h>
 #include <imtauth/CUserDocumentValidatorComp.h>
+#include <imtauth/CUserDocumentSaveDelegateComp.h>
 #include <imtauth/CUserGroupDocumentValidatorComp.h>
 #include <imtauth/CDelegatedAccessResolverComp.h>
 #include <imtauth/COrganizationsPermissionsProviderComp.h>
@@ -193,6 +194,7 @@ typedef imtauth::CCrossOrgGrantDocumentValidatorComp CrossOrgGrantDocumentValida
 typedef imtauth::CRelationshipDocumentValidatorComp RelationshipDocumentValidator;
 typedef imtauth::CRoleDocumentValidatorComp RoleDocumentValidator;
 typedef imtauth::CUserDocumentValidatorComp UserDocumentValidator;
+typedef imtauth::CUserDocumentSaveDelegateComp UserDocumentSaveDelegate;
 typedef imtauth::CUserGroupDocumentValidatorComp UserGroupDocumentValidator;
 typedef imtauth::CDelegatedAccessResolverComp DelegatedAccessResolver;
 

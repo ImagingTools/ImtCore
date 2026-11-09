@@ -317,9 +317,11 @@ public:
 		enabled->SetEnabled(true);
 		enabled->InitComponent();
 		credentials->InitComponent();
+		bindings->InitComponent();
 		controller->SetRef("UserCollection", users);
 		controller->SetRef("RoleCollection", roles);
 		controller->SetRef("LdapEnableableParam", enabled);
+		controller->SetRef("BindingManager", bindings);
 		controller->SetStringAttr("LdapGroupSettingsFile", QDir::current().absoluteFilePath(fileName));
 		// A real listener would connect to the domain of a Windows test machine.
 		controller->SetBoolAttr("LdapGroupChangeNotifications", notifications);
@@ -478,6 +480,7 @@ public:
 	icomp::TSimSharedComponentPtr<imtauth::CRoleCollectionAdapterComp> provider;
 	icomp::TSimSharedComponentPtr<CEnabledComp> enabled;
 	icomp::TSimSharedComponentPtr<CCredentialsComp> credentials;
+	icomp::TSimSharedComponentPtr<CBindings> bindings;
 	icomp::TSimSharedComponentPtr<CController> controller;
 };
 }
@@ -990,6 +993,73 @@ void CLdapGroupMappingTest::testDirectoryOnlyProductKeepsDefaultRoleProvisioning
 	QCOMPARE(stored->GetRoles(Product).size(), 1);
 	QVERIFY(!stored->GetRoles(Product).contains(FirstRole));
 	QCOMPARE(stored->GetDirectoryRoles(Product), QByteArrayList({FirstRole, SecondRole}));
+}
+
+
+void CLdapGroupMappingTest::testUnlinkedLocalAccountIgnoresDirectoryPassword()
+{
+	CFixture fixture;
+	CUser stored;
+	QVERIFY(stored.CopyFrom(fixture.user));
+	QVERIFY(stored.RemoveFromSystem("Ldap"));
+	QVERIFY(fixture.users->SetObjectData(MemberObjectId, stored));
+	QString error;
+	auto payload = fixture.SignIn("Authorization", error);
+	QVERIFY(!payload.token.HasValue());
+	imtbase::IObjectCollection::DataPtr data;
+	auto* storedPtr = fixture.Stored(data);
+	QVERIFY(storedPtr != nullptr);
+	QVERIFY(storedPtr->GetSystemInfos().isEmpty());
+	QVERIFY(storedPtr->GetDirectoryRoles(Product).isEmpty());
+}
+
+
+void CLdapGroupMappingTest::testGlobalPermissionsHideTenantBoundDirectoryRoles()
+{
+	CFixture fixture;
+	QVERIFY(fixture.bindings->AddBinding(TenantB, "Roles", SecondRole));
+	QString error;
+	auto payload = fixture.SignIn("Authorization", error);
+	QVERIFY2(error.isEmpty(), qPrintable(error));
+	QVERIFY(payload.token.HasValue());
+	QVERIFY(payload.permissions.HasValue());
+	QCOMPARE(*payload.permissions, QByteArray("/First"));
+
+	imtbase::IObjectCollection::DataPtr data;
+	auto* stored = fixture.Stored(data);
+	QVERIFY(stored != nullptr);
+	QCOMPARE(stored->GetDirectoryRoles(Product), QByteArrayList({FirstRole, SecondRole}));
+
+	istd::IChangeableUniquePtr globalPtr = stored->CloneMe();
+	auto* globalUser = dynamic_cast<imtauth::CUserInfo*>(globalPtr.GetPtr());
+	QVERIFY(globalUser != nullptr);
+	globalUser->ScopeDirectoryRoles(QByteArray(), &fixture.bindings.GetImpl());
+	QVERIFY(!globalUser->HasDirectoryRoles());
+	QCOMPARE(globalUser->GetPermissions(Product), QByteArrayList({"/First"}));
+
+	istd::IChangeableUniquePtr tenantPtr = stored->CloneMe();
+	auto* tenantUser = dynamic_cast<imtauth::CUserInfo*>(tenantPtr.GetPtr());
+	QVERIFY(tenantUser != nullptr);
+	tenantUser->ScopeDirectoryRoles(TenantB, &fixture.bindings.GetImpl());
+	QVERIFY(tenantUser->GetPermissions(Product).contains("/Second"));
+	QVERIFY(stored->HasDirectoryRoles());
+}
+
+
+void CLdapGroupMappingTest::testUserSavesKeepStoredDirectoryRoles()
+{
+	CFixture fixture;
+	CUser stored;
+	QVERIFY(stored.CopyFrom(fixture.user));
+	stored.SetDirectoryRoles(Product, {SecondRole});
+	CUser edited;
+	QVERIFY(edited.CopyFrom(fixture.user));
+	edited.SetDirectoryRoles(Product, {FirstRole});
+	edited.SetDirectoryRoles(OtherProduct, {ForeignRole});
+	edited.CopyDirectoryRolesFrom(stored);
+	QCOMPARE(edited.GetDirectoryRoles(Product), QByteArrayList({SecondRole}));
+	QVERIFY(edited.GetDirectoryRoles(OtherProduct).isEmpty());
+	QCOMPARE(edited.GetRoles(Product), QByteArrayList({FirstRole}));
 }
 
 
