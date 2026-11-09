@@ -33,7 +33,7 @@ Operator (Agentino or the Puma console)        Receiving server (Puma, Lisa, ...
 
 ## Making a product a receiver
 
-A product that uses `AuthorizableServerFramework` needs four changes in its server registry.
+A product that uses `AuthorizableServerFramework` needs four changes in its server registry and one in its settings plugin.
 
 1. Add the table of the client products and the receiver:
 
@@ -71,6 +71,9 @@ A product that uses `AuthorizableServerFramework` needs four changes in its serv
 3. Add `ServerTokenReceiver` to the GraphQL request handlers of the server, before `AuthorizableServerFramework`.
 4. Declare in `ProductServerRequestPolicy` every command and collection the clients call, with the permission each needs.
    The permissions are the IDs of the tree, for example `/ProductManagement/View`.
+
+5. In the settings plugin of the product, list the input connection in `ServerTokenConnectionIds` of its `ConnectionCollection`
+   (`imtservice::IServerTokenReceiverInfo`). Agentino offers a token only for a connection to such an input.
 
 The calling product reads the token from `IMT_<RECEIVER>_SERVER_CREDENTIAL`
 (`imtclientgql::GetServerCredentialVariableName`) and sends it with every request to the receiver.
