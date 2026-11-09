@@ -465,7 +465,7 @@
     </message>
     <message>
         <source>Notifications</source>
-        <translation type="vanished">Уведомления</translation>
+        <translation>Уведомления</translation>
     </message>
     <message>
         <source>Notification</source>
@@ -633,7 +633,7 @@
     </message>
     <message>
         <source>Search</source>
-        <translation type="vanished">Поиск</translation>
+        <translation>Поиск</translation>
     </message>
     <message>
         <source>qrc:/qml/imtauthgui/AdministrationView.qml</source>
@@ -641,7 +641,7 @@
     </message>
     <message>
         <source>Admin</source>
-        <translation type="vanished">Админ</translation>
+        <translation>Администрирование</translation>
     </message>
     <message>
         <source>Alias</source>
@@ -1024,7 +1024,7 @@
     </message>
     <message>
         <source>Support</source>
-        <translation type="vanished">Поддержка</translation>
+        <translation>Поддержка</translation>
     </message>
     <message>
         <source>Attachment</source>
@@ -1300,7 +1300,11 @@
     </message>
     <message>
         <source>Workspace</source>
-        <translation type="vanished">Рабочее пространство</translation>
+        <translation>Рабочее пространство</translation>
+    </message>
+    <message>
+        <source>Organizations</source>
+        <translation>Организации</translation>
     </message>
     <message>
         <source>Icons/Dashboard</source>
