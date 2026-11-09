@@ -117,9 +117,12 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 				productId = serverProductId;
 			}
 		}
-		else if (!headerProductId.isEmpty() && headerProductId != ownProductId){
+		else{
 			// Without a token of its server only a superuser session works for another product; decided once the user is known
-			foreignProductId = headerProductId;
+			const QByteArray requestProductId = userTokenProductId.isEmpty() ? headerProductId : userTokenProductId;
+			if (!requestProductId.isEmpty() && requestProductId != ownProductId){
+				foreignProductId = requestProductId;
+			}
 		}
 	}
 

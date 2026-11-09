@@ -22,7 +22,6 @@ namespace imtauthgql
 static const qint64 s_onlineSeconds = 10 * 60;
 
 // A stored tree holds the whole permission tree of a product, the list of products needs only its version
-static const qint64 s_publishedVersionLifetimeMs = 60 * 1000;
 
 
 // reimplemented (sdl::V1_0::imtauth::CConnectedProductCollectionControllerCompBase)
@@ -298,23 +297,10 @@ QString CConnectedProductCollectionControllerComp::GetPublishedVersion(const QBy
 		return QString();
 	}
 
-	const qint64 now = QDateTime::currentMSecsSinceEpoch();
-	{
-		QMutexLocker locker(&m_publishedVersionsMutex);
-		const auto foundIt = m_publishedVersions.constFind(productId);
-		if (foundIt != m_publishedVersions.constEnd() && foundIt->expiresAt > now){
-			return foundIt->version;
-		}
-	}
-
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	const imtauth::CProductPermissionSnapshot* snapshotPtr = imtauth::GetProductPermissionSnapshot(*m_snapshotCollectionCompPtr, productId, dataPtr);
-	const QString version = snapshotPtr != nullptr ? snapshotPtr->GetProductVersion() : QString();
 
-	QMutexLocker locker(&m_publishedVersionsMutex);
-	m_publishedVersions.insert(productId, {version, now + s_publishedVersionLifetimeMs});
-
-	return version;
+	return snapshotPtr != nullptr ? snapshotPtr->GetProductVersion() : QString();
 }
 
 

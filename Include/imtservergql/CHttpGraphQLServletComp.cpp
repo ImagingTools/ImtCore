@@ -114,7 +114,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 							QStringLiteral("HTTP GraphQL auth rejected (403 Forbidden) for Command-ID '%1', token %2: %3")
 									.arg(gqlCommand, maskedToken, contextError.message),
 							QStringLiteral("GraphQL - servlet"));
-				return CreateResponse(StatusCode::SC_FORBIDDEN, QByteArray(), request);
+				return CreateResponse(StatusCode::SC_FORBIDDEN, BuildGqlErrorJson(gqlCommand, contextError.message, QStringLiteral("Forbidden")), request, QByteArrayLiteral("application/json; charset=utf-8"));
 			}
 
 			SendCriticalMessage(
@@ -131,7 +131,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 		if (!m_gqlContextCreatorCompPtr->CheckRequestAccess(m_lastRequest, accessError)){
 			SendWarningMessage(0, QStringLiteral("HTTP GraphQL request refused (403 Forbidden): %1").arg(accessError), QStringLiteral("GraphQL - servlet"));
 
-			return CreateResponse(StatusCode::SC_FORBIDDEN, QByteArray(), request);
+			return CreateResponse(StatusCode::SC_FORBIDDEN, BuildGqlErrorJson(gqlCommand, accessError, QStringLiteral("Forbidden")), request, QByteArrayLiteral("application/json; charset=utf-8"));
 		}
 	}
 	else{

@@ -3,7 +3,6 @@
 
 
 // Qt includes
-#include <QtCore/QHash>
 #include <QtCore/QMutex>
 
 // ImtCore includes
@@ -83,14 +82,6 @@ private:
 
 	mutable QMutex m_ownProductMutex;
 	mutable bool m_isOwnProductEnsured = false;
-
-	struct PublishedVersion
-	{
-		QString version;
-		qint64 expiresAt = 0;
-	};
-	mutable QHash<QByteArray, PublishedVersion> m_publishedVersions;
-	mutable QMutex m_publishedVersionsMutex;
 
 	I_FACT(imtauth::IConnectedProduct, m_productFactCompPtr);
 	I_REF(imtauth::IPersonalAccessTokenManager, m_tokenManagerCompPtr);
