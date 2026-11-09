@@ -5737,9 +5737,14 @@ export class ListModel extends Item {
 		this.$touch();
 	}
 
+	// One row, or an array of rows that go in one after another, as for append().
 	insert(index, value) {
-		if (!isRecord(value)) return;
-		this.$rows.splice(Math.min(Math.max(Math.trunc(index), 0), this.$rows.length), 0, { ...value });
+		const rows = [];
+		for (const row of Array.isArray(value) ? value : [value]) {
+			if (isRecord(row)) rows.push({ ...row });
+		}
+		if (rows.length === 0) return;
+		this.$rows.splice(Math.min(Math.max(Math.trunc(index), 0), this.$rows.length), 0, ...rows);
 		this.$touch();
 	}
 
