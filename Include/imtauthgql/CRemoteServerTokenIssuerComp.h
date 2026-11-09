@@ -31,6 +31,7 @@ public:
 
 	// reimplemented (IServerTokenIssuer)
 	virtual QByteArray SignInSuperuser(const ServerInfo& server, const QString& password, QString& errorMessage) const override;
+	virtual bool SignOut(const ServerInfo& server, const QByteArray& sessionToken, QString& errorMessage) const override;
 	virtual bool AddClient(
 				const ServerInfo& server,
 				const QByteArray& sessionToken,

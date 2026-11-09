@@ -45,6 +45,32 @@ QByteArray CRemoteServerTokenIssuerComp::SignInSuperuser(const ServerInfo& serve
 }
 
 
+bool CRemoteServerTokenIssuerComp::SignOut(const ServerInfo& server, const QByteArray& sessionToken, QString& errorMessage) const
+{
+	sdl::V1_0::imtauth::LogoutRequestArguments arguments;
+	arguments.input.emplace();
+	arguments.input->accessToken = sessionToken;
+
+	imtgql::CGqlRequest gqlRequest;
+	if (!sdl::V1_0::imtauth::CLogoutGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
+		return false;
+	}
+
+	const sdl::V1_0::imtauth::CLogoutPayload payload = Send<sdl::V1_0::imtauth::CLogoutPayload>(server, sessionToken, gqlRequest, errorMessage);
+	if (!errorMessage.isEmpty()){
+		return false;
+	}
+
+	if (!payload.ok || !*payload.ok){
+		errorMessage = QStringLiteral("The server '%1' did not end the session").arg(QString::fromUtf8(server.productId));
+
+		return false;
+	}
+
+	return true;
+}
+
+
 bool CRemoteServerTokenIssuerComp::AddClient(
 			const ServerInfo& server,
 			const QByteArray& sessionToken,

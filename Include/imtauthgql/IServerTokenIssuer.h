@@ -46,6 +46,11 @@ public:
 	virtual QByteArray SignInSuperuser(const ServerInfo& server, const QString& password, QString& errorMessage) const = 0;
 
 	/**
+		End a session opened by SignInSuperuser().
+	*/
+	virtual bool SignOut(const ServerInfo& server, const QByteArray& sessionToken, QString& errorMessage) const = 0;
+
+	/**
 		Make the product a client of the server; nothing changes when it is one already.
 		\param isAdded	Set to true when the server has added the product now.
 	*/
