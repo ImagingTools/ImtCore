@@ -660,6 +660,7 @@ export class Engine {
 		hooks.initializeProperty = (item, name) => this.initializeProperty(item, name);
 		hooks.release = (item) => this.releaseSubtree(item);
 		hooks.breakBinding = (item, name) => this.dropBinding(item, name);
+		hooks.breakUnrun = (item, name) => this.dropUnrun(item, name);
 		hooks.depend = (item, name, trusted) => this.depend(item, name, trusted);
 		hooks.notify = (item, name) => this.notify(item, name);
 		hooks.dirty = (item, name) => this.markReaders(item, name);
@@ -1080,6 +1081,15 @@ export class Engine {
 		this.bindings.delete(binding);
 		this.volatile.delete(binding);
 		list.splice(at, 1);
+	}
+
+	// A script writes a property whose binding has not run yet (a handler that a use site's assignment runs while the component is
+	// built): in Qt the binding had run at construction, so the write replaces it. Without this the first run would undo the write.
+	dropUnrun(item, key) {
+		const list = item.$bindings;
+		if (list === undefined) return;
+		const binding = list.find((b) => b.key === key);
+		if (binding !== undefined && binding.runs === 0 && !binding.evaluating) this.dropBinding(item, key);
 	}
 
 	// A Binding item (or other engine write) may replace the property while the binding still believes

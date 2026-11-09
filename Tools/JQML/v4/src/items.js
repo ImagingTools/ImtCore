@@ -64,6 +64,7 @@ export const hooks = {
 	reloadLoader: null,
 	// (item, name) => void: a script assigned a value over a bound property, which removes the binding.
 	breakBinding: null,
+	breakUnrun: null,
 	// (text, html) => void / () => { text, html }: the clipboard of the page.
 	clipboardWrite() {},
 	clipboardRead() {
@@ -473,6 +474,7 @@ function defineProp(proto, name, get, set, trusted = false) {
 				return;
 			}
 			if (BREAKS_BINDING.has(name)) scriptWrite(this, name);
+			else if (hooks.engineWrite === 0 && this.$bindings !== null && hooks.breakUnrun !== null) hooks.breakUnrun(this, name);
 			set.call(this, value);
 			noteWrite(this, name);
 		},
