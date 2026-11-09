@@ -143,7 +143,8 @@ void CObjectCollectionSubscriberComp::UpdateSourceWatched()
 		return;
 	}
 
-	bool isWatched = true;
+	// Without a subscription nothing keeps the cache current
+	bool isWatched = !m_subscriptionIds.isEmpty();
 	for (const QByteArray& subscriptionId : m_subscriptionIds){
 		isWatched = isWatched && m_confirmedSubscriptionIds.contains(subscriptionId);
 	}
