@@ -621,10 +621,11 @@ export class Renderer {
 		const { ma, mb, mc, md, me, mf, dpr } = this;
 		if (Math.abs(mb) < 1e-9 && Math.abs(mc) < 1e-9) {
 			// An axis-aligned clip becomes a scissor rectangle of whole device pixels.
-			const x0 = Math.floor(me * dpr + 1e-6);
-			const y0 = Math.floor(mf * dpr + 1e-6);
-			const x1 = x0 + Math.ceil(w * ma * dpr - 1e-6);
-			const y1 = y0 + Math.ceil(h * md * dpr - 1e-6);
+			// A turn by 180 degrees (or a mirror) has a negative scale: the rectangle starts at its other corner.
+			const x0 = Math.floor(Math.min(me, me + w * ma) * dpr + 1e-6);
+			const y0 = Math.floor(Math.min(mf, mf + h * md) * dpr + 1e-6);
+			const x1 = x0 + Math.ceil(Math.abs(w * ma) * dpr - 1e-6);
+			const y1 = y0 + Math.ceil(Math.abs(h * md) * dpr - 1e-6);
 			const token = { stencil: false, x0: this.clipX0, y0: this.clipY0, x1: this.clipX1, y1: this.clipY1 };
 			const nx0 = Math.max(x0, this.clipX0);
 			const ny0 = Math.max(y0, this.clipY0);

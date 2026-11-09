@@ -1,7 +1,8 @@
 // How rectangles are painted: a border around a see-through fill must stay a ring.
 // `node test/paint.mjs`
 import { CanvasContext } from '../src/canvas.js';
-import { DropShadow, drawRectangle, Rectangle } from '../src/items.js';
+import { Canvas, DropShadow, drawRectangle, Rectangle } from '../src/items.js';
+import { Renderer } from '../src/renderer.js';
 import { parseColor } from '../src/util.js';
 
 const OPAQUE = 0xff0000ff;
@@ -94,6 +95,95 @@ const square = filledPolygon((ctx) => ctx.roundedRect(10, 10, 80, 30, 0, 0));
 check('roundedRect with a zero radius is a rectangle', inside(square[0], 10.5, 10.5), true);
 const ellipse = filledPolygon((ctx) => ctx.ellipse(10, 10, 80, 30));
 check('ellipse covers the middle but not the corner', inside(ellipse[0], 50, 25) && !inside(ellipse[0], 12, 12), true);
+
+// arc() goes clockwise unless `anticlockwise` is set. PaintedCorner of ImtCore fills the corner outside of a rounded corner:
+// `arc(w, 0, h, 0, Math.PI / 2, true)`, then two lines; the quarter of the circle must stay empty.
+function covered(draw, x, y) {
+	const commands = [];
+	const ctx = new CanvasContext(40, 40, commands);
+	ctx.beginPath();
+	draw(ctx);
+	ctx.fill();
+	return commands.some((c) => {
+		if (c.k !== 'poly') return false;
+		for (let i = 0; i + 2 < c.indices.length + 1; i += 3) {
+			const [a, b, d] = [c.indices[i], c.indices[i + 1], c.indices[i + 2]].map((n) => [c.points[2 * n], c.points[2 * n + 1]]);
+			const side = (p, q) => (q[0] - p[0]) * (y - p[1]) - (q[1] - p[1]) * (x - p[0]);
+			const s = [side(a, b), side(b, d), side(d, a)];
+			if (s.every((v) => v >= 0) || s.every((v) => v <= 0)) return true;
+		}
+		return false;
+	});
+}
+const corner = (ctx) => {
+	ctx.arc(40, 0, 40, 0, Math.PI / 2, true);
+	ctx.lineTo(0, 40);
+	ctx.lineTo(0, 0);
+};
+check('the corner outside of the rounded corner is filled', covered(corner, 2, 38) && covered(corner, 15, 38), true);
+check('the quarter of the circle stays empty', covered(corner, 20, 20) || covered(corner, 5, 5) || covered(corner, 38, 2), false);
+const clockwise = filledPolygon((ctx) => ctx.arc(20, 20, 10, 0, Math.PI / 2));
+check('a clockwise arc is a quarter of the circle', inside([...clockwise[0], 20, 20], 26, 26) && !inside([...clockwise[0], 20, 20], 12, 12), true);
+const backwards = filledPolygon((ctx) => ctx.arc(20, 20, 10, Math.PI / 2, 0));
+check('a clockwise arc from a larger angle to a smaller one goes round three quarters', Math.max(...backwards[0].filter((_, i) => i % 2 === 0)) > 29 && Math.min(...backwards[0].filter((_, i) => i % 2 === 0)) < 11, true);
+
+// What a canvas drew beyond its size is not shown (the corner above goes round half a disc above the canvas), and a canvas that drew
+// inside of its size is not clipped (a clip flushes the drawing).
+function canvasClips(draw) {
+	const canvas = new Canvas();
+	canvas.$aw = 24;
+	canvas.$ah = 24;
+	canvas.$painted = true;
+	canvas.$paintedWidth = 24;
+	canvas.$paintedHeight = 24;
+	const ctx = new CanvasContext(24, 24, canvas.$cmds);
+	ctx.beginPath();
+	draw(ctx);
+	ctx.fill();
+	let clips = 0;
+	let drawn = 0;
+	canvas.$paint(
+		{
+			ma: 1, mb: 0, mc: 0, md: 1, me: 0, mf: 0,
+			setMatrix() {},
+			translate() {},
+			pack: () => 0,
+			beginClip: () => ++clips,
+			endClip: () => {},
+			fillTriangles: () => drawn++,
+			fillQuad: () => drawn++,
+			fillQuadAA: () => drawn++,
+		},
+		1,
+	);
+	return `${clips},${drawn > 0}`;
+}
+check('a canvas that drew beyond its size is clipped', canvasClips((ctx) => {
+	ctx.arc(24, 0, 24, 0, Math.PI / 2, true);
+	ctx.lineTo(0, 24);
+	ctx.lineTo(0, 0);
+}), '1,true');
+check('a canvas that drew inside of its size is not clipped', canvasClips((ctx) => ctx.rect(2, 2, 10, 10)), '0,true');
+
+// A clip of an item turned by 180 degrees (PaintedCorner at the top right) is the same rectangle of the screen as without the turn.
+{
+	const r = new Renderer(null);
+	r.flush = () => {};
+	let scissor = null;
+	r.setScissor = (...rect) => (scissor = rect.join(','));
+	r.clipX0 = 0;
+	r.clipY0 = 0;
+	r.clipX1 = 1000;
+	r.clipY1 = 1000;
+	r.dpr = 1;
+	r.setMatrix(1, 0, 0, 1, 100, 50);
+	r.beginClip(24, 24);
+	const plain = scissor;
+	r.setMatrix(-1, 1.2e-16, -1.2e-16, -1, 124, 74);
+	const turned = r.beginClip(24, 24);
+	check('a clip of an item turned by 180 degrees is not empty', turned !== null, true);
+	check('and is the rectangle of the item on the screen', scissor, plain);
+}
 
 // Like Qt, a fillStyle/strokeStyle that is not a color leaves the style as it was.
 const styled = new CanvasContext(10, 10, []);

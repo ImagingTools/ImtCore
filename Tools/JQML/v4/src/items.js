@@ -5,7 +5,7 @@
 // Geometry follows the model of the C++ viewer: `$resolve()` applies anchors, `$arrange()` lets a
 // layout item position its children, `$render()` draws through the renderer with a matrix stack.
 
-import { CanvasContext, replayCommands } from './canvas.js';
+import { CanvasContext, commandsExceed, replayCommands } from './canvas.js';
 import { fonts } from './fonts.js';
 import { KEY, MODIFIERS } from './keys.js';
 import { QmlError } from './lexer.js';
@@ -2542,7 +2542,16 @@ export class Canvas extends Item {
 
 	$paint(r, opacity) {
 		this.$ensurePainted();
+		if (this.$cmds.length === 0) return;
+		if (this.$cmdsChecked !== this.$cmds) {
+			this.$cmdsChecked = this.$cmds;
+			this.$exceeds = commandsExceed(this.$cmds, this.$aw, this.$ah);
+		}
+		// What was drawn beyond the canvas is not shown.
+		const token = this.$exceeds ? r.beginClip(this.$aw, this.$ah) : undefined;
+		if (token === null) return;
 		replayCommands(r, this.$cmds, opacity, this.$aa);
+		if (token !== undefined) r.endClip(token);
 	}
 }
 
@@ -7774,6 +7783,7 @@ export class MapItem extends Item {
 		this.$live = null;
 		this.$ready = false;
 		this.$zoom = 8;
+		this.$bearing = 0;
 		this.$minZoom = 0;
 		this.$maxZoom = MAP_MAX_ZOOM;
 		this.$color = MAP_BACKGROUND;
@@ -7792,13 +7802,33 @@ export class MapItem extends Item {
 		return MAP_TILE * Math.pow(2, this.$zoom);
 	}
 
+	// The map is turned around its middle so that the compass direction `bearing` is at the top: counter-clockwise by
+	// `bearing`. $turn gives the offset in the map of an offset in the world, $unturn the offset in the world of an offset
+	// in the map.
+	$turn(dx, dy) {
+		if (this.$bearing === 0) return { x: dx, y: dy };
+		const a = geoRad(this.$bearing);
+		const c = Math.cos(a);
+		const s = Math.sin(a);
+		return { x: dx * c + dy * s, y: dy * c - dx * s };
+	}
+
+	$unturn(dx, dy) {
+		if (this.$bearing === 0) return { x: dx, y: dy };
+		const a = geoRad(this.$bearing);
+		const c = Math.cos(a);
+		const s = Math.sin(a);
+		return { x: dx * c - dy * s, y: dx * s + dy * c };
+	}
+
 	// The position in the map of a coordinate (the copy of the world nearest to the center).
 	$project(coordinate) {
 		const size = this.$world();
 		let dx = geoX(coordinate.longitude, size) - geoX(this.$center.longitude, size);
 		dx -= Math.round(dx / size) * size;
 		const dy = geoY(coordinate.latitude, size) - geoY(this.$center.latitude, size);
-		return { x: this.$aw / 2 + dx, y: this.$ah / 2 + dy };
+		const turned = this.$turn(dx, dy);
+		return { x: this.$aw / 2 + turned.x, y: this.$ah / 2 + turned.y };
 	}
 
 	$fromWorld(x, y) {
@@ -7808,13 +7838,15 @@ export class MapItem extends Item {
 
 	$coordinateAt(px, py) {
 		const size = this.$world();
-		return this.$fromWorld(geoX(this.$center.longitude, size) + (px - this.$aw / 2), geoY(this.$center.latitude, size) + (py - this.$ah / 2));
+		const d = this.$unturn(px - this.$aw / 2, py - this.$ah / 2);
+		return this.$fromWorld(geoX(this.$center.longitude, size) + d.x, geoY(this.$center.latitude, size) + d.y);
 	}
 
 	// Moves the center so that the coordinate is at (px, py).
 	$alignCoordinate(coordinate, px, py) {
 		const size = this.$world();
-		this.center = this.$fromWorld(geoX(coordinate.longitude, size) - (px - this.$aw / 2), geoY(coordinate.latitude, size) - (py - this.$ah / 2));
+		const d = this.$unturn(px - this.$aw / 2, py - this.$ah / 2);
+		this.center = this.$fromWorld(geoX(coordinate.longitude, size) - d.x, geoY(coordinate.latitude, size) - d.y);
 	}
 
 	// The smallest zoom level: the whole world has to fill the larger side of the map, like in Qt.
@@ -7928,9 +7960,11 @@ export class MapItem extends Item {
 		this.$alignCoordinate(c, Number(point.x), Number(point.y));
 	}
 
+	// Moves the map by (dx, dy) in its own (turned) frame.
 	pan(dx, dy) {
 		const size = this.$world();
-		this.center = this.$fromWorld(geoX(this.$center.longitude, size) + Number(dx), geoY(this.$center.latitude, size) + Number(dy));
+		const d = this.$unturn(Number(dx), Number(dy));
+		this.center = this.$fromWorld(geoX(this.$center.longitude, size) + d.x, geoY(this.$center.latitude, size) + d.y);
 	}
 
 	clearData() {
@@ -8050,16 +8084,38 @@ export class MapItem extends Item {
 		const world = this.$world();
 		const left = geoX(this.$center.longitude, world) - this.$aw / 2;
 		const top = geoY(this.$center.latitude, world) - this.$ah / 2;
-		const x0 = Math.floor(left / size);
-		const x1 = Math.floor((left + this.$aw) / size);
-		const y0 = Math.max(0, Math.floor(top / size));
-		const y1 = Math.min(count - 1, Math.floor((top + this.$ah) / size));
+		// The tiles that a turned map shows are those under the corners of the map, taken back to the world.
+		let minX = left;
+		let maxX = left + this.$aw;
+		let minY = top;
+		let maxY = top + this.$ah;
+		if (this.$bearing !== 0) {
+			minX = minY = Infinity;
+			maxX = maxY = -Infinity;
+			for (const [cornerX, cornerY] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) {
+				const d = this.$unturn((cornerX * this.$aw) / 2, (cornerY * this.$ah) / 2);
+				minX = Math.min(minX, left + this.$aw / 2 + d.x);
+				maxX = Math.max(maxX, left + this.$aw / 2 + d.x);
+				minY = Math.min(minY, top + this.$ah / 2 + d.y);
+				maxY = Math.max(maxY, top + this.$ah / 2 + d.y);
+			}
+		}
+		const x0 = Math.floor(minX / size);
+		const x1 = Math.floor(maxX / size);
+		const y0 = Math.max(0, Math.floor(minY / size));
+		const y1 = Math.min(count - 1, Math.floor(maxY / size));
 		if ((x1 - x0 + 1) * (y1 - y0 + 1) > 400) return;
+		const a = r.ma, b = r.mb, c = r.mc, d = r.md, e = r.me, f = r.mf;
+		if (this.$bearing !== 0) {
+			const angle = geoRad(this.$bearing);
+			r.rotateScaleAround(this.$aw / 2, this.$ah / 2, Math.cos(angle), -Math.sin(angle), 1);
+		}
 		for (let ty = y0; ty <= y1; ty++) {
 			for (let tx = x0; tx <= x1; tx++) {
 				this.$drawTile(r, z, ((tx % count) + count) % count, ty, tx * size - left, ty * size - top, size, opacity);
 			}
 		}
+		r.setMatrix(a, b, c, d, e, f);
 		if (this.$tiles.size > MAP_MAX_TILES) this.$evictTiles(r);
 	}
 
@@ -8181,6 +8237,23 @@ defineProp(
 		this.$zoom = next;
 		this.$update();
 		reportMapChange(this, 'zoomLevel');
+	},
+);
+// The compass direction at the top of the map, 0 (north) up to 360 (not included); a value outside is wrapped.
+defineProp(
+	MapItem.prototype,
+	'bearing',
+	function () {
+		return this.$bearing;
+	},
+	function (v) {
+		const value = toFloat(v);
+		if (!Number.isFinite(value)) return;
+		const next = ((value % 360) + 360) % 360;
+		if (next === this.$bearing) return;
+		this.$bearing = next;
+		this.$update();
+		reportMapChange(this, 'bearing');
 	},
 );
 defineProp(

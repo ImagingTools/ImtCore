@@ -326,6 +326,41 @@ function marker0() {
 	return live.$children.find((child) => child.$typeName === 'MapQuickItem');
 }
 
+// ----- bearing: the compass direction at the top of the map -----
+
+live.bearing = 0;
+const middle = live.center;
+const north = live.$coordinateAt(live.width / 2, 0);
+check('without a bearing the north is at the top', [near(north.longitude, middle.longitude), north.latitude > middle.latitude], [true, true]);
+check('the bearing starts at 0', live.bearing, 0);
+live.bearing = 90;
+check('the bearing is the direction at the top', live.bearing, 90);
+const east = live.$coordinateAt(live.width / 2, 0);
+check('with the bearing 90 the east is at the top', [east.longitude > middle.longitude, near(east.latitude, middle.latitude)], [true, true]);
+const eastPoint = live.fromCoordinate(east, false);
+check('and a coordinate goes back to where it was taken', [near(eastPoint.x, live.width / 2), near(eastPoint.y, 0)], [true, true]);
+live.bearing = 450;
+check('a bearing is wrapped to 0..360', live.bearing, 90);
+live.bearing = -90;
+check('a negative bearing is wrapped as well', live.bearing, 270);
+live.bearing = 180;
+const south = live.$coordinateAt(live.width / 2, 0);
+check('with the bearing 180 the south is at the top', south.latitude < middle.latitude, true);
+live.bearing = 90;
+const turnedStart = live.center;
+const turnedOrigin = live.fromCoordinate(turnedStart, false);
+live.pan(0, -30);
+const turnedMoved = live.fromCoordinate(turnedStart, false);
+check('a pan is made in the frame of the turned map', [near(turnedMoved.x, turnedOrigin.x), near(turnedMoved.y, turnedOrigin.y + 30)], [true, true]);
+const aligned = live.center;
+live.alignCoordinateToPoint(aligned, { x: 10, y: 20 });
+const alignedPoint = live.fromCoordinate(aligned, false);
+check('a coordinate is aligned to a point of the turned map', [near(alignedPoint.x, 10), near(alignedPoint.y, 20)], [true, true]);
+live.bearing = 0;
+live.center = middle;
+scene.drawFrame(1);
+check('a turned map is painted without errors', engine.errors, []);
+
 // ----- the tiles of the plugin -----
 
 check('osm.mapping.custom.host is the tile server', live.$tileTemplate(), 'https://tiles.example.com/maps/{z}/{x}/{y}.png');

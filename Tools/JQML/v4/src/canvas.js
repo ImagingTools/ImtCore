@@ -74,6 +74,112 @@ export function triangulate(p) {
 	return triangles;
 }
 
+// Do two segments share a point (they cross, touch or overlap)?
+function segmentsTouch(ax, ay, bx, by, cx, cy, dx, dy) {
+	const eps = 1e-7;
+	const side = (px, py, qx, qy, rx, ry) => {
+		const v = cross(px, py, qx, qy, rx, ry);
+		return Math.abs(v) <= eps ? 0 : v > 0 ? 1 : -1;
+	};
+	const onSegment = (px, py, qx, qy, rx, ry) => Math.min(px, qx) - eps <= rx && rx <= Math.max(px, qx) + eps && Math.min(py, qy) - eps <= ry && ry <= Math.max(py, qy) + eps;
+	const d1 = side(cx, cy, dx, dy, ax, ay);
+	const d2 = side(cx, cy, dx, dy, bx, by);
+	const d3 = side(ax, ay, bx, by, cx, cy);
+	const d4 = side(ax, ay, bx, by, dx, dy);
+	if (d1 !== d2 && d3 !== d4 && d1 * d2 <= 0 && d3 * d4 <= 0) return true;
+	return (d1 === 0 && onSegment(cx, cy, dx, dy, ax, ay)) || (d2 === 0 && onSegment(cx, cy, dx, dy, bx, by)) || (d3 === 0 && onSegment(ax, ay, bx, by, cx, cy)) || (d4 === 0 && onSegment(ax, ay, bx, by, dx, dy));
+}
+
+// A polygon whose outline crosses or touches itself (a figure eight, `arc(...)` followed by lines back through the start)
+// cannot be ear clipped. Long outlines are taken for simple: the test is quadratic.
+function isSimplePolygon(p) {
+	const n = p.length >> 1;
+	if (n > 600) return true;
+	for (let i = 0; i < n; i++) {
+		const b = (i + 1) % n;
+		for (let j = i + 1; j < n; j++) {
+			const d = (j + 1) % n;
+			if (b === j || d === i) continue;
+			if (segmentsTouch(p[2 * i], p[2 * i + 1], p[2 * b], p[2 * b + 1], p[2 * j], p[2 * j + 1], p[2 * d], p[2 * d + 1])) return false;
+		}
+	}
+	return true;
+}
+
+// The area covered by a self-crossing outline (non-zero winding, as for a canvas fill), as trapezoids between the
+// y values where an edge starts, ends or crosses another one.
+function windingMesh(p) {
+	const n = p.length >> 1;
+	const edges = [];
+	for (let i = 0; i < n; i++) {
+		const j = (i + 1) % n;
+		const x0 = p[2 * i], y0 = p[2 * i + 1], x1 = p[2 * j], y1 = p[2 * j + 1];
+		if (y0 === y1) continue;
+		edges.push(y0 < y1 ? { x0, y0, x1, y1, dir: 1 } : { x0: x1, y0: y1, x1: x0, y1: y0, dir: -1 });
+	}
+	const xAt = (e, y) => e.x0 + ((e.x1 - e.x0) * (y - e.y0)) / (e.y1 - e.y0);
+	const ys = new Set();
+	for (const e of edges) {
+		ys.add(e.y0);
+		ys.add(e.y1);
+	}
+	for (let i = 0; i < edges.length; i++) {
+		for (let j = i + 1; j < edges.length; j++) {
+			const a = edges[i];
+			const b = edges[j];
+			const ax = a.x1 - a.x0, ay = a.y1 - a.y0, bx = b.x1 - b.x0, by = b.y1 - b.y0;
+			const den = ax * by - ay * bx;
+			if (Math.abs(den) < 1e-12) continue;
+			const t = ((b.x0 - a.x0) * by - (b.y0 - a.y0) * bx) / den;
+			const u = ((b.x0 - a.x0) * ay - (b.y0 - a.y0) * ax) / den;
+			if (t > 0 && t < 1 && u > 0 && u < 1) ys.add(a.y0 + t * ay);
+		}
+	}
+	const levels = [...ys].sort((a, b) => a - b);
+	const points = [];
+	const indices = [];
+	for (let k = 0; k + 1 < levels.length; k++) {
+		const top = levels[k];
+		const bottom = levels[k + 1];
+		if (bottom - top < 1e-9) continue;
+		const mid = (top + bottom) / 2;
+		const active = edges.filter((e) => e.y0 <= mid && e.y1 > mid).sort((a, b) => xAt(a, mid) - xAt(b, mid));
+		let winding = 0;
+		let left = null;
+		for (const e of active) {
+			const before = winding;
+			winding += e.dir;
+			if (before === 0 && winding !== 0) left = e;
+			else if (before !== 0 && winding === 0) {
+				const first = points.length >> 1;
+				points.push(xAt(left, top), top, xAt(e, top), top, xAt(e, bottom), bottom, xAt(left, bottom), bottom);
+				indices.push(first, first + 1, first + 2, first, first + 2, first + 3);
+			}
+		}
+	}
+	return { points, indices };
+}
+
+// What a fill of one sub-path draws: its own points when the outline is simple, else the area it winds around.
+export function fillMesh(path) {
+	// The arcs of a rounded rectangle end where the next one starts: a point twice in a row is one point.
+	let p = path;
+	for (let i = 2; i < p.length; i += 2) {
+		if (Math.abs(p[i] - p[i - 2]) < 1e-9 && Math.abs(p[i + 1] - p[i - 1]) < 1e-9) {
+			if (p === path) p = Array.from(path);
+			p.splice(i, 2);
+			i -= 2;
+		}
+	}
+	const last = p.length - 2;
+	if (last >= 2 && Math.abs(p[last] - p[0]) < 1e-9 && Math.abs(p[last + 1] - p[1]) < 1e-9) {
+		if (p === path) p = Array.from(path);
+		p.length = last;
+	}
+	if (isSimplePolygon(p)) return { points: p, indices: triangulate(p) };
+	return windingMesh(p);
+}
+
 // A CSS font shorthand such as `italic bold 14px "Arial"` -> { family, size, bold, italic }.
 function parseFont(css) {
 	const m = /(?:^|\s)(\d*\.?\d+)(px|pt)\s+(.+)$/.exec(css);
@@ -405,9 +511,9 @@ export class CanvasContext {
 		if (this.$output === null) return;
 		const color = withAlpha(this.$fillColor, this.$alpha);
 		for (const subPath of this.$subPaths) {
-			const indices = triangulate(subPath);
+			const { points, indices } = fillMesh(subPath);
 			if (indices.length === 0) continue;
-			this.$emit({ k: 'poly', points: Float64Array.from(subPath), indices, color });
+			this.$emit({ k: 'poly', points: Float64Array.from(points), indices, color });
 		}
 	}
 
@@ -529,12 +635,20 @@ export class CanvasContext {
 		this.closePath();
 	}
 
-	arc(cx, cy, radius, start, end) {
+	// The arc goes clockwise from start to end, or counter-clockwise when `anticlockwise` is set (`arc(w, 0, r, 0, Math.PI / 2, true)`
+	// is three quarters of the circle); one full circle at most.
+	arc(cx, cy, radius, start, end, anticlockwise = false) {
 		cx = toFloat(cx);
 		cy = toFloat(cy);
 		radius = toFloat(radius);
 		start = toFloat(start);
 		end = toFloat(end);
+		const turn = 2 * Math.PI;
+		if (anticlockwise) {
+			if (start - end >= turn) end = start - turn;
+			else while (end > start) end -= turn;
+		} else if (end - start >= turn) end = start + turn;
+		else while (end < start) end += turn;
 		this.$ellipticArc(cx, cy, radius, radius, start, end);
 	}
 
@@ -668,6 +782,29 @@ export class CanvasContext {
 }
 
 // Draws recorded commands through the renderer `r`, relative to its current matrix.
+// Does anything that was drawn lie outside of the canvas (0, 0, w, h)? Such a canvas is clipped when it is painted, as in
+// Qt, where it is a texture of its size (PaintedCorner fills a path that goes round the corner above the canvas).
+export function commandsExceed(commands, w, h) {
+	const eps = 0.5;
+	for (const c of commands) {
+		if (c.k !== 'poly' && c.k !== 'rect') continue;
+		const m = c.m;
+		const outside = (x, y) => {
+			const tx = m[0] * x + m[2] * y + m[4];
+			const ty = m[1] * x + m[3] * y + m[5];
+			return tx < -eps || ty < -eps || tx > w + eps || ty > h + eps;
+		};
+		if (c.k === 'rect') {
+			if (outside(c.x, c.y) || outside(c.x + c.w, c.y) || outside(c.x + c.w, c.y + c.h) || outside(c.x, c.y + c.h)) return true;
+			continue;
+		}
+		for (let i = 0; i + 1 < c.points.length; i += 2) {
+			if (outside(c.points[i], c.points[i + 1])) return true;
+		}
+	}
+	return false;
+}
+
 export function replayCommands(r, commands, opacity, aa) {
 	const { ma, mb, mc, md, me, mf } = r;
 	const clips = []; // open clips: { skip } or { token, m, w, h }
