@@ -87,6 +87,18 @@ input ServerTokenReceiverInput {
 	clientProductId: ID!
 }
 
+# Makes the product a client of this server; nothing changes when it is one already.
+input AddServerTokenClientInput {
+	clientProductId: ID!
+	name: String
+}
+
+type AddServerTokenClientPayload {
+	# False when the product was a client already.
+	added: Boolean
+	success: Boolean!
+}
+
 input UpdateServerTokenScopesInput {
 	id: ID!
 	scopes: [ID]
@@ -103,4 +115,5 @@ type Mutation {
 	CreateServerToken (input: CreateServerTokenInput!): CreateServerTokenPayload!
 	RevokeServerToken (input: InputId!): RevokeServerTokenPayload!
 	UpdateServerTokenScopes (input: UpdateServerTokenScopesInput!): UpdateServerTokenScopesPayload!
+	AddServerTokenClient (input: AddServerTokenClientInput!): AddServerTokenClientPayload!
 }

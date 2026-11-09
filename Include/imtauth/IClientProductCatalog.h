@@ -4,6 +4,7 @@
 
 // Qt includes
 #include <QtCore/QByteArray>
+#include <QtCore/QString>
 
 // ACF includes
 #include <istd/IPolymorphic.h>
@@ -23,6 +24,12 @@ public:
 		\param isReadPtr set to false when the catalog could not be read; the product is then no client.
 	*/
 	virtual bool IsClientProduct(const QByteArray& productId, bool* isReadPtr = nullptr) const = 0;
+
+	/**
+		Make the product a client of this server; nothing changes when it is one already.
+		\param isAddedPtr set to true when the product has been added by this call.
+	*/
+	virtual bool AddClientProduct(const QByteArray& productId, const QString& name, QString& errorMessage, bool* isAddedPtr = nullptr) = 0;
 };
 
 

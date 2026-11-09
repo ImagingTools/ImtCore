@@ -181,6 +181,33 @@ sdl::V1_0::imtauth::CRevokeServerTokenPayload CServerTokenControllerComp::OnRevo
 }
 
 
+sdl::V1_0::imtauth::CAddServerTokenClientPayload CServerTokenControllerComp::OnAddServerTokenClient(
+			const sdl::V1_0::imtauth::CAddServerTokenClientGqlRequest& addServerTokenClientRequest,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	sdl::V1_0::imtauth::CAddServerTokenClientPayload response;
+	response.success = false;
+
+	if (!CheckSuperuserSession(gqlRequest, errorMessage)){
+		return response;
+	}
+
+	const auto arguments = addServerTokenClientRequest.GetRequestedArguments();
+	const QByteArray clientProductId = arguments.input.has_value() && arguments.input->clientProductId ? QByteArray(*arguments.input->clientProductId) : QByteArray();
+	const QString name = arguments.input.has_value() && arguments.input->name ? QString(*arguments.input->name) : QString();
+	if (!CheckAnotherProduct(clientProductId, errorMessage)){
+		return response;
+	}
+
+	bool isAdded = false;
+	response.success = m_clientProductCatalogCompPtr->AddClientProduct(clientProductId, name, errorMessage, &isAdded);
+	response.added = isAdded;
+
+	return response;
+}
+
+
 sdl::V1_0::imtauth::CUpdateServerTokenScopesPayload CServerTokenControllerComp::OnUpdateServerTokenScopes(
 			const sdl::V1_0::imtauth::CUpdateServerTokenScopesGqlRequest& updateServerTokenScopesRequest,
 			const ::imtgql::CGqlRequest& gqlRequest,
@@ -303,11 +330,21 @@ QByteArray CServerTokenControllerComp::GetOwnProductId() const
 }
 
 
-bool CServerTokenControllerComp::CheckClientProduct(const QByteArray& clientProductId, QString& errorMessage) const
+bool CServerTokenControllerComp::CheckAnotherProduct(const QByteArray& clientProductId, QString& errorMessage) const
 {
 	if (clientProductId.isEmpty() || clientProductId == GetOwnProductId()){
 		errorMessage = QStringLiteral("A server token is issued to the server of another product");
 
+		return false;
+	}
+
+	return true;
+}
+
+
+bool CServerTokenControllerComp::CheckClientProduct(const QByteArray& clientProductId, QString& errorMessage) const
+{
+	if (!CheckAnotherProduct(clientProductId, errorMessage)){
 		return false;
 	}
 

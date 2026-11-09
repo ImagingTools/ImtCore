@@ -60,6 +60,10 @@ protected:
 				const sdl::V1_0::imtauth::CUpdateServerTokenScopesGqlRequest& updateServerTokenScopesRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CAddServerTokenClientPayload OnAddServerTokenClient(
+				const sdl::V1_0::imtauth::CAddServerTokenClientGqlRequest& addServerTokenClientRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 	virtual sdl::V1_0::imtauth::CServerTokenReceiver OnGetServerTokenReceiver(
 				const sdl::V1_0::imtauth::CGetServerTokenReceiverGqlRequest& getServerTokenReceiverRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
@@ -72,6 +76,11 @@ protected:
 private:
 	bool CheckSuperuserSession(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	QByteArray GetOwnProductId() const;
+
+	/**
+		Check that the product is another product than this server.
+	*/
+	bool CheckAnotherProduct(const QByteArray& clientProductId, QString& errorMessage) const;
 
 	/**
 		Check that this server issues tokens to the product: one of its clients, not this server itself.

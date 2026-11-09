@@ -46,6 +46,18 @@ public:
 	virtual QByteArray SignInSuperuser(const ServerInfo& server, const QString& password, QString& errorMessage) const = 0;
 
 	/**
+		Make the product a client of the server; nothing changes when it is one already.
+		\param isAdded	Set to true when the server has added the product now.
+	*/
+	virtual bool AddClient(
+				const ServerInfo& server,
+				const QByteArray& sessionToken,
+				const QByteArray& clientProductId,
+				const QString& name,
+				bool& isAdded,
+				QString& errorMessage) const = 0;
+
+	/**
 		Get the permissions a token of the client product can hold at the server.
 	*/
 	virtual bool GetPermissions(

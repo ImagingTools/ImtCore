@@ -45,6 +45,43 @@ QByteArray CRemoteServerTokenIssuerComp::SignInSuperuser(const ServerInfo& serve
 }
 
 
+bool CRemoteServerTokenIssuerComp::AddClient(
+			const ServerInfo& server,
+			const QByteArray& sessionToken,
+			const QByteArray& clientProductId,
+			const QString& name,
+			bool& isAdded,
+			QString& errorMessage) const
+{
+	isAdded = false;
+
+	sdl::V1_0::imtauth::AddServerTokenClientRequestArguments arguments;
+	arguments.input.emplace();
+	arguments.input->clientProductId = clientProductId;
+	arguments.input->name = name;
+
+	imtgql::CGqlRequest gqlRequest;
+	if (!sdl::V1_0::imtauth::CAddServerTokenClientGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
+		return false;
+	}
+
+	const sdl::V1_0::imtauth::CAddServerTokenClientPayload payload = Send<sdl::V1_0::imtauth::CAddServerTokenClientPayload>(server, sessionToken, gqlRequest, errorMessage);
+	if (!errorMessage.isEmpty()){
+		return false;
+	}
+
+	if (!payload.success || !*payload.success){
+		errorMessage = QStringLiteral("The server '%1' did not add the product '%2'").arg(QString::fromUtf8(server.productId), QString::fromUtf8(clientProductId));
+
+		return false;
+	}
+
+	isAdded = payload.added && *payload.added;
+
+	return true;
+}
+
+
 bool CRemoteServerTokenIssuerComp::GetPermissions(
 			const ServerInfo& server,
 			const QByteArray& sessionToken,

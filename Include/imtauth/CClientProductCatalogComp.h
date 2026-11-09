@@ -30,6 +30,7 @@ public:
 
 	// reimplemented (IClientProductCatalog)
 	virtual bool IsClientProduct(const QByteArray& productId, bool* isReadPtr = nullptr) const override;
+	virtual bool AddClientProduct(const QByteArray& productId, const QString& name, QString& errorMessage, bool* isAddedPtr = nullptr) override;
 
 private:
 	I_MULTIATTR(QByteArray, m_productIdsAttrPtr);

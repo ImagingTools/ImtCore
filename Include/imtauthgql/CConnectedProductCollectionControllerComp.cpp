@@ -240,27 +240,14 @@ void CConnectedProductCollectionControllerComp::EnsureOwnProduct() const
 		return;
 	}
 
+	if (!m_clientProductCatalogCompPtr.IsValid()){
+		return;
+	}
+
+	// The catalog keeps this server as well; it is told apart by its product ID
 	const QString name = m_ownProductCompPtr->GetName().isEmpty() ? QString::fromUtf8(productId) : m_ownProductCompPtr->GetName();
-
-	bool isRead = false;
-	const bool hasProduct = imtauth::CConnectedProductDocumentValidatorComp::HasProduct(*m_objectCollectionCompPtr, productId, &isRead);
-	if (!isRead){
-		return;
-	}
-
-	if (hasProduct){
-		m_isOwnProductEnsured = true;
-
-		return;
-	}
-
-	const QByteArray objectId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
-	imtauth::IConnectedProductUniquePtr instancePtr = CreateProductEntry(objectId, productId, name, QString());
-	if (!instancePtr.IsValid()){
-		return;
-	}
-
-	m_isOwnProductEnsured = !m_objectCollectionCompPtr->InsertNewObject("ConnectedProduct", name, QString(), instancePtr.GetPtr(), objectId).isEmpty();
+	QString errorMessage;
+	m_isOwnProductEnsured = m_clientProductCatalogCompPtr->AddClientProduct(productId, name, errorMessage);
 }
 
 

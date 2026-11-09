@@ -16,6 +16,9 @@
                     <AttributeInfo Id="ProductCollection" Type="Reference" ExportId="ProductRepository">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ProductFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="ConnectedProduct"/>
+                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
@@ -186,6 +189,9 @@
         <Element Id="ProductCollectionController" PackageId="ImtAuthGqlPck" ComponentId="ConnectedProductCollectionController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ClientProductCatalog" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ClientProductCatalog"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="OwnProduct" Type="Reference" ExportId="PermissionTree">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

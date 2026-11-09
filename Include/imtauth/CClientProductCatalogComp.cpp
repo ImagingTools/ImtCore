@@ -30,6 +30,22 @@ bool CClientProductCatalogComp::IsClientProduct(const QByteArray& productId, boo
 }
 
 
+bool CClientProductCatalogComp::AddClientProduct(const QByteArray& productId, const QString& /*name*/, QString& errorMessage, bool* isAddedPtr)
+{
+	if (isAddedPtr != nullptr){
+		*isAddedPtr = false;
+	}
+
+	if (IsClientProduct(productId)){
+		return true;
+	}
+
+	errorMessage = QStringLiteral("The clients of this server are set in its configuration, '%1' is not one of them").arg(QString::fromUtf8(productId));
+
+	return false;
+}
+
+
 } // namespace imtauth
 
 

@@ -6,6 +6,7 @@
 #include <QtCore/QMutex>
 
 // ImtCore includes
+#include <imtauth/IClientProductCatalog.h>
 #include <imtauth/IConnectedProduct.h>
 #include <imtauth/IPersonalAccessTokenManager.h>
 #include <imtbase/IObjectCollection.h>
@@ -31,6 +32,7 @@ public:
 		I_ASSIGN(m_tokenManagerCompPtr, "PersonalAccessTokenManager", "Revokes the tokens of a removed product", true, "PersonalAccessTokenManager");
 		I_ASSIGN(m_snapshotCollectionCompPtr, "SnapshotCollection", "Published permission trees, they give the version of a product", false, "SnapshotCollection");
 		I_ASSIGN(m_ownProductCompPtr, "OwnProduct", "This server in its own catalog: the entry is created with the first request and cannot be removed", false, "OwnProduct");
+		I_ASSIGN(m_clientProductCatalogCompPtr, "ClientProductCatalog", "Adds this server to its own catalog", false, "ClientProductCatalog");
 	I_END_COMPONENT;
 
 protected:
@@ -79,6 +81,7 @@ private:
 private:
 	I_REF(imtbase::IObjectCollection, m_snapshotCollectionCompPtr);
 	I_REF(imtlic::IProductInfo, m_ownProductCompPtr);
+	I_REF(imtauth::IClientProductCatalog, m_clientProductCatalogCompPtr);
 
 	mutable QMutex m_ownProductMutex;
 	mutable bool m_isOwnProductEnsured = false;

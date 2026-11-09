@@ -7,6 +7,7 @@ The calling server sends the token in the header `x-server-token` with its produ
 ```
 Operator (Agentino or the Puma console)        Receiving server (Puma, Lisa, ...)           Calling server (ProLife, ...)
    | Authorization (superuser of the receiver) --> session
+   | AddServerTokenClient (clientProductId)    --> the product becomes a client (no change if it is one)
    | GetServerTokenReceiver (clientProductId)  --> permission tree the token can hold
    | CreateServerToken / UpdateServerTokenScopes / RevokeServerToken
    |                                             <-- token value (only at creation)
@@ -21,8 +22,8 @@ Operator (Agentino or the Puma console)        Receiving server (Puma, Lisa, ...
 
 | Part | Component | Role |
 |---|---|---|
-| Token commands | `imtauthgql::CServerTokenControllerComp` | Issues, lists, changes and revokes the tokens of this server. A superuser session only. |
-| Allowed clients | `imtauth::IClientProductCatalog` | `ClientProductCatalog` names them in the configuration; `ConnectedClientProductCatalog` takes the connected products (Puma). |
+| Token commands | `imtauthgql::CServerTokenControllerComp` | Adds client products, issues, lists, changes and revokes the tokens of this server. A superuser session only. |
+| Allowed clients | `imtauth::IClientProductCatalog` | `ClientProductCatalog` names them in the configuration and refuses to add one; `ConnectedClientProductCatalog` takes the connected products (Puma) and adds a product on `AddServerTokenClient`, so a configurator (Agentino) sets up the whole connection. |
 | Permissions of a token | `ProductServerPermissions` of the controller | A dedicated tree (Puma: `/ProductServer/...`). Without it, the permission tree of the server itself. |
 | Token storage | `ImtAuthVoce/PersonalAccessTokenStore` | The `PersonalAccessTokens` table of the server (created automatically). |
 | Check of a request | `imtservergql::CAuthenticationManagerComp` | `ServerProductId` refuses another product without a token; `ServerTokenManager` is where the tokens of this server are checked, for requests and for the periodic check of subscriptions: a subscription ends when its token is refused or holds other permissions than when it subscribed. A token is looked up there first in both `x-server-token` and the authentication header: a product sends its own server token in the authentication header for its subscriptions. Either way it stands for its client product and is bounded by the policy. A server token kept anywhere else is refused. |
