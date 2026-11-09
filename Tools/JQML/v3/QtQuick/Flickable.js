@@ -150,7 +150,7 @@ class Flickable extends Item {
                     parent = parent.parent
                 }
 
-                if(parent === this && mouse.target instanceof MouseArea && mouse.target.preventStealing === false) {
+                if(parent === this && mouse.target instanceof MouseArea && mouse.target.preventStealing === false && !mouse.target.__keepMouseGrab) {
                     mouse.target.__onMouseCanceled()
                     mouse.target = this
                 }
@@ -218,7 +218,7 @@ class Flickable extends Item {
         if(!this.interactive || !this.enabled || !this.visible) return
 
         if(!wheel.target){
-            let deltaX = wheel.angleDelta.x * 4
+            let deltaX = -wheel.angleDelta.x * 4
             let deltaY = -wheel.angleDelta.y * 4
 
             if(this.flickableDirection === Flickable.AutoFlickDirection || this.flickableDirection === Flickable.AutoFlickIfNeeded){

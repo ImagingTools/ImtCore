@@ -151,7 +151,7 @@ class QtObject extends QObject {
         if(this.__completed) return
 
         this.__completed = true
-        this['Component.completed']()
+        if(!this.__queueCompleted()) this['Component.completed']()
 
         for(let i = this.__children.length-1; i >= 0; i--){
             this.__children[i].__complete()

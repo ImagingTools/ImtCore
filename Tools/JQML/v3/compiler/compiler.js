@@ -689,7 +689,8 @@ function compile(options){
 
         }
         qmlprop(meta) {
-            let isSignalHandlerBody = meta[2][0] === "block" || meta[2][0] === "stat" || (meta[2][1] && meta[2][1][0] === "assign")
+            // Qt also takes "Keys.onTabPressed: function(event) { ... }"
+            let isSignalHandlerBody = meta[2][0] === "block" || meta[2][0] === "stat" || meta[2][0] === "function" || (meta[2][1] && meta[2][1][0] === "assign")
             let isSignalHandlerName = false
 
             if (meta[1][0] === "dot") {
@@ -1863,7 +1864,7 @@ function compile(options){
 
                         resultCode.add('\n')
 
-                        resultCode.add(`if(isRoot) {${assignProperty.value.name}.__updatePrimaryProperties();${assignProperty.value.name}.__updateProperties();${assignProperty.value.name}.__complete();${assignProperty.value.name}.__completeProperties()}`)
+                        resultCode.add(`if(isRoot) {${assignProperty.value.name}.__updatePrimaryProperties();${assignProperty.value.name}.__updateProperties();${assignProperty.value.name}.__completeRoot()}`)
 
                         resultCode.add('\n')
                         resultCode.add(`return ${assignProperty.value.name}`)
@@ -2009,8 +2010,9 @@ function compile(options){
             let typeInfo = this.getTypeInfo()
 
             for (let connectedSignal of this.connectedSignals) {
+                // Qt: onPressed runs on a press only, onPressedChanged on every change of the property
                 if (typeInfo.typeBase.isAssignableFrom(JQModules.QtQuick.MouseArea) && connectedSignal.slotName === 'onPressed') {
-                    connectedSignal.slotName = 'onPressedChanged'
+                    connectedSignal.slotName = 'onPressedEvent'
                 }
                 let names = connectedSignal.slotName.replaceAll("['", '').replaceAll("']", '').split('.')
                 let signalName = ''
@@ -2227,7 +2229,7 @@ function compile(options){
             code.add(`${this.children[0].name}.__${this.children[0].className}__${this.children[0].name}=true`)
 
             code.add('\n')
-            code.add(`if(isRoot) {${this.children[0].name}.__updatePrimaryProperties();${this.children[0].name}.__updateProperties();${this.children[0].name}.__complete();${this.children[0].name}.__completeProperties()}`)
+            code.add(`if(isRoot) {${this.children[0].name}.__updatePrimaryProperties();${this.children[0].name}.__updateProperties();${this.children[0].name}.__completeRoot()}`)
 
             code.add('\n')
             code.add(`return ${this.children[0].name}`)
@@ -2544,7 +2546,7 @@ function compile(options){
 
             code.add('\n')
 
-            code.add(`if(isRoot) {${this.instruction.name}.__updatePrimaryProperties();${this.instruction.name}.__updateProperties();${this.instruction.name}.__complete();${this.instruction.name}.__completeProperties()}`)
+            code.add(`if(isRoot) {${this.instruction.name}.__updatePrimaryProperties();${this.instruction.name}.__updateProperties();${this.instruction.name}.__completeRoot()}`)
 
             code.add('\n')
             code.add(`return ${this.instruction.name}`)
@@ -2611,12 +2613,8 @@ function compile(options){
         }
 
         toCode() {
-            if(this.meta.exports.length > 1){
-                return `function(){${this.meta.source}; return {${this.meta.exports.join(',')}}}()`
-            } else {
-                return `function(){${this.meta.source}; return ${this.meta.exports.join(',')}}()`
-            }
-            
+            // As in Qt, the qualifier of a library holds its top-level names, a single one too
+            return `function(){${this.meta.source}; return {${this.meta.exports.join(',')}}}()`
         }
     }
 
