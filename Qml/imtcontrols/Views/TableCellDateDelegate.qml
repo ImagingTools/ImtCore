@@ -8,7 +8,8 @@ TableCellDelegateBase {
 	property alias cellText: tableCellText
 
 	onReused: {
-		delegateContainer.cellText.text = new Date(delegateContainer.getValue()).toLocaleString()
+		let value = delegateContainer.getValue()
+		delegateContainer.cellText.text = value ? new Date(String(value)).toLocaleString() : ""
 	}
 
 	TableCellText {

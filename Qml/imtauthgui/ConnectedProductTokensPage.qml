@@ -84,7 +84,7 @@ Item {
 					addHeader("name", qsTr("Name"))
 					addHeader("createdAt", qsTr("Created"))
 					addHeader("lastUsedAt", qsTr("Last used"))
-					addHeader("revoked", qsTr("Revoked"))
+					addHeader("revoked", qsTr("Status"))
 					addHeader("permissions", "")
 					addHeader("revoke", "")
 					tokenTable.headers = this
@@ -92,8 +92,39 @@ Item {
 			}
 
 			onHeadersChanged: {
+				setColumnContentById("createdAt", dateColumnComp)
+				setColumnContentById("lastUsedAt", dateColumnComp)
+				setColumnContentById("revoked", statusColumnComp)
 				setColumnContentById("permissions", permissionsColumnComp)
 				setColumnContentById("revoke", revokeColumnComp)
+			}
+
+			Component {
+				id: dateColumnComp
+
+				TableCellDateDelegate {}
+			}
+
+			Component {
+				id: statusColumnComp
+
+				TableCellDelegateBase {
+					id: statusDelegate
+
+					TableCellText {
+						id: statusText
+						anchors.left: parent.left
+						anchors.leftMargin: statusDelegate.rowDelegate ? statusDelegate.rowDelegate.textLeftMargin : 0
+						anchors.right: parent.right
+						anchors.verticalCenter: parent.verticalCenter
+						rowDelegate: statusDelegate.rowDelegate
+						columnIndex: statusDelegate.columnIndex
+					}
+
+					onReused: {
+						statusText.text = tokenTable.elements.get(statusDelegate.rowIndex).item.m_revoked ? qsTr("Revoked") : qsTr("Active")
+					}
+				}
 			}
 
 			Component {
