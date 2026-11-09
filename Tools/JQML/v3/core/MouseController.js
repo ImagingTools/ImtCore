@@ -11,7 +11,6 @@ class QmlMouseEvent {
     modifiers = QtEnums.NoModifier
     wasHeld = false
     isClick = false
-    isClick = false
     originX = 0
     originY = 0
     x = 0
