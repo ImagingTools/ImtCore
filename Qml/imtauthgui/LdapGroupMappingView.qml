@@ -254,7 +254,6 @@ Item {
 				width: groupList.width
 				height: Style.controlHeightM
 				text: modelData.name
-				checkable: true
 				checked: root.selectedGroup === modelData.id
 				onClicked: root.selectGroup(modelData.id)
 			}
@@ -276,7 +275,10 @@ Item {
 				text: modelData.name
 				isActive: root.selectedGroup !== ""
 				checkState: root.selectedRoles.indexOf(modelData.id) >= 0 ? Qt.Checked : Qt.Unchecked
-				onCheckStateChanged: root.setRole(modelData.id, roleBox.checkState === Qt.Checked)
+
+				function nextCheckState(){
+					root.setRole(modelData.id, roleBox.checkState !== Qt.Checked)
+				}
 			}
 		}
 		Text {

@@ -747,6 +747,8 @@ void CLdapGroupMappingTest::testIdentityAndProviderFailuresDenyMappedGrants()
 	QVERIFY(stored.CopyFrom(fixture.user));
 	stored.SetProvider(nullptr);
 	QVERIFY(fixture.users->SetObjectData(MemberObjectId, stored));
+	// The fixture's user factory would otherwise attach a provider on load.
+	fixture.users->userRoleProvider = nullptr;
 	error.clear();
 	QVERIFY(!fixture.Refresh(error));
 	QVERIFY(!error.isEmpty());
