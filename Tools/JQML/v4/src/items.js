@@ -3765,6 +3765,12 @@ export class GridView extends ListView {
 		this.$currentIndex = 0;
 	}
 
+	// The scroll range counts the rows of the grid (the cells in a row share one), not one row of a list for each cell.
+	get $contentLength() {
+		const cols = this.$columns();
+		return cols > 0 ? Math.ceil(this.$rowCount / cols) * this.$cellHeight : 0;
+	}
+
 	$columns() {
 		const cell = this.$cellWidth > 0 ? this.$cellWidth : 1;
 		const width = this.$aw > 0 ? this.$aw : this.$w;
