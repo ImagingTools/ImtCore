@@ -10,10 +10,12 @@
 #include <itest/CStandardTestExecutor.h>
 #include <imtauth/CPersonalAccessTokenManagerComp.h>
 #include <imtauth/CRole.h>
+#include <imtauth/CTenantInfo.h>
 #include <imtauth/CTenantMembership.h>
 #include <imtauth/CUserInfo.h>
 #include <imtauth/IJwtSessionController.h>
 #include <imtauth/IRoleInfoProvider.h>
+#include <imtauth/ITenantManager.h>
 #include <imtauth/ITenantMembershipManager.h>
 #include <imtbase/CCollectionInfo.h>
 #include <imtbase/CObjectCollection.h>
@@ -81,7 +83,8 @@ private:
 };
 
 
-class CRoleUserInfo: public imtauth::CUserInfo
+// Identifiable, as the users of a user collection are
+class CRoleUserInfo: public imtauth::CIdentifiableUserInfo
 {
 public:
 	void SetRoleProvider(const imtauth::IRoleInfoProvider* providerPtr) { m_roleProviderPtr = providerPtr; }
@@ -169,17 +172,31 @@ public:
 	I_END_COMPONENT
 
 	QByteArrayList permissions{"/Organization/Read"};
+	bool isPresent = true;
+	bool isReadable = true;
 	mutable int reads = 0;
 	std::function<void()> duringRead;
 
 	MembershipIds GetMembershipsByTenant(const QByteArray&) const override { return MembershipIds(); }
-	MembershipIds GetMembershipsByUser(const QByteArray&) const override { return MembershipIds(); }
-	imtauth::ITenantMembershipUniquePtr GetMembership(const QByteArray&) const override { return imtauth::ITenantMembershipUniquePtr(); }
-	imtauth::ITenantMembershipUniquePtr FindMembership(const QByteArray& userId, const QByteArray& tenantId) const override
+	MembershipIds GetMembershipsByUser(const QByteArray&, bool* isReadPtr) const override
+	{
+		if (isReadPtr != nullptr){
+			*isReadPtr = isReadable;
+		}
+		return isReadable && isPresent ? MembershipIds{"membership"} : MembershipIds();
+	}
+	imtauth::ITenantMembershipUniquePtr GetMembership(const QByteArray&) const override { return FindMembership(s_userId, s_tenantId); }
+	imtauth::ITenantMembershipUniquePtr FindMembership(const QByteArray& userId, const QByteArray& tenantId, bool* isReadPtr = nullptr) const override
 	{
 		++reads;
 		if (duringRead){
 			duringRead();
+		}
+		if (isReadPtr != nullptr){
+			*isReadPtr = isReadable;
+		}
+		if (!isReadable || !isPresent){
+			return imtauth::ITenantMembershipUniquePtr();
 		}
 		auto* membershipPtr = new imtauth::CTenantMembership;
 		membershipPtr->SetUserId(userId);
@@ -192,6 +209,49 @@ public:
 	bool RemoveMembership(const QByteArray&) override { return false; }
 	bool UpdateMembershipOrganizationPermissions(const QByteArray&, const QByteArrayList&) override { return false; }
 	bool IsMember(const QByteArray&, const QByteArray&) const override { return true; }
+};
+
+
+// The organization as the authorization server answers it: present, absent or not read
+class CTenantManagerComp: public icomp::CComponentBase, virtual public imtauth::ITenantManager
+{
+public:
+	typedef icomp::CComponentBase BaseClass;
+	I_BEGIN_COMPONENT(CTenantManagerComp)
+		I_REGISTER_INTERFACE(imtauth::ITenantManager);
+	I_END_COMPONENT
+
+	QByteArrayList permissions{"/Read"};
+	bool isPresent = true;
+	bool isReadable = true;
+
+	imtauth::ITenantInfoUniquePtr GetTenant(const QByteArray& tenantId, bool* isReadPtr) const override
+	{
+		if (isReadPtr != nullptr){
+			*isReadPtr = isReadable;
+		}
+		if (!isReadable || !isPresent){
+			return imtauth::ITenantInfoUniquePtr();
+		}
+		imtauth::ITenantInfoUniquePtr tenantPtr(new imtauth::CIdentifiableTenantInfo);
+		tenantPtr->SetTenantId(tenantId);
+		tenantPtr->SetOwnerId("owner");
+		tenantPtr->SetTenantPermissions(permissions);
+		return tenantPtr;
+	}
+	QByteArrayList GetTenantIds() const override { return QByteArrayList(); }
+	QByteArrayList GetOwnedOrCreatedTenantIds(const QByteArray&, bool*) const override { return QByteArrayList(); }
+	QByteArrayList GetChildTenantIds(const QByteArray&, bool*) const override { return QByteArrayList(); }
+	QByteArrayList FindTenantIdsByName(const QString&) const override { return QByteArrayList(); }
+	QByteArrayList GetTenantPermissions(const QByteArray&) const override { return permissions; }
+	QByteArray CreateTenant(const QString&, const QString&, const QByteArray&, const QByteArray&, const QByteArray&) override { return QByteArray(); }
+	bool RemoveTenant(const QByteArray&) override { return false; }
+	bool UpdateTenant(const QByteArray&, const QString&, const QString&, const QByteArray&, bool) override { return false; }
+	bool SetTenantActive(const QByteArray&, bool) override { return false; }
+	bool SetTenantPermissions(const QByteArray&, const QByteArrayList&) override { return false; }
+	bool SetTenantHierarchy(const QByteArray&, const QByteArray&) override { return false; }
+	QByteArray GetSystemTenantId() const override { return QByteArray(); }
+	bool EnsureSystemTenant() override { return false; }
 };
 
 
@@ -258,6 +318,7 @@ struct CRenewalFixture
 	icomp::TSimSharedComponentPtr<CUserCollectionComp> users;
 	icomp::TSimSharedComponentPtr<CSessionControllerComp> sessions;
 	icomp::TSimSharedComponentPtr<CMembershipManagerComp> memberships;
+	icomp::TSimSharedComponentPtr<CTenantManagerComp> tenants;
 	icomp::TSimSharedComponentPtr<CTokenManagerStub> personalTokens;
 	icomp::TSimSharedComponentPtr<CTokenManagerStub> serverTokens;
 	icomp::TSimSharedComponentPtr<CReceiverComp> receiver;
@@ -272,6 +333,7 @@ struct CRenewalFixture
 		users->InitComponent();
 		sessions->InitComponent();
 		memberships->InitComponent();
+		tenants->InitComponent();
 		personalTokens->InitComponent();
 		serverTokens->productId = "Receiver";
 		serverTokens->clientProductId = "Client";
@@ -282,6 +344,7 @@ struct CRenewalFixture
 		authentication->SetRef("UserCollection", users);
 		authentication->SetRef("SlaveJwtSessionController", sessions);
 		authentication->SetRef("MembershipManager", memberships);
+		authentication->SetRef("TenantManager", tenants);
 		authentication->SetRef("PersonalAccessTokenManager", personalTokens);
 		if (withReceiver){
 			authentication->SetRef("ServerTokenReceiver", receiver);
@@ -290,11 +353,14 @@ struct CRenewalFixture
 		authentication->InitComponent();
 	}
 
-	static QByteArray Jwt(const QByteArray& tenantId = QByteArray())
+	static QByteArray Jwt(const QByteArray& tenantId = QByteArray(), const QByteArray& productId = QByteArray())
 	{
 		QJsonObject payload;
 		payload.insert("userId", QString::fromUtf8(s_userId));
 		payload.insert("tenantId", QString::fromUtf8(tenantId));
+		if (!productId.isEmpty()){
+			payload.insert("productId", QString::fromUtf8(productId));
+		}
 		payload.insert("sessionId", QString::fromUtf8(s_sessionId));
 		payload.insert("exp", double(QDateTime::currentSecsSinceEpoch() + 3600));
 		return "e30." + QJsonDocument(payload).toJson(QJsonDocument::Compact).toBase64(QByteArray::Base64UrlEncoding | QByteArray::OmitTrailingEquals) + ".signature";
@@ -355,9 +421,13 @@ void CAuthorizationRenewalTest::RoleChangeIsDetected()
 	QByteArray before;
 	QCOMPARE(fixture.Renew(headers, &before), Creator::AS_CONFIRMED);
 	QVERIFY(before.contains("/Read"));
+	QVERIFY(!before.contains("/Write"));
+	const istd::IChangeableUniquePtr userBeforePtr = fixture.users->user.CloneMe();
+	QVERIFY(userBeforePtr.IsValid());
 
 	// The role changes, the document of the user does not
 	fixture.roles.permissions = {"/Read", "/Write"};
+	QVERIFY(fixture.users->user.IsEqual(*userBeforePtr));
 	QByteArray after;
 	QCOMPARE(fixture.Renew(headers, &after), Creator::AS_CONFIRMED);
 	QVERIFY(after.contains("/Write"));
@@ -387,18 +457,34 @@ void CAuthorizationRenewalTest::OrganizationPermissionsAreCompared()
 
 void CAuthorizationRenewalTest::TokenBoundariesAreCompared_data()
 {
-	QTest::addColumn<bool>("server");
-	QTest::newRow("personal-token") << false;
-	QTest::newRow("server-token") << true;
+	QTest::addColumn<int>("kind");
+	QTest::newRow("personal-token") << 0;
+	QTest::newRow("server-on-its-own") << 1;
+	QTest::newRow("user-through-server") << 2;
 }
 
 
 void CAuthorizationRenewalTest::TokenBoundariesAreCompared()
 {
-	QFETCH(bool, server);
+	QFETCH(int, kind);
+	const bool server = kind != 0;
 	CRenewalFixture fixture(server);
 	fixture.roles.permissions = {"/Read", "/Write"};
-	const auto headers = server ? CRenewalFixture::Headers(QByteArray(), "imt_srv_client") : CRenewalFixture::Headers("imt_pat_user");
+	imtgql::IGqlContext::Headers headers;
+	if (kind == 0){
+		headers = CRenewalFixture::Headers("imt_pat_user");
+	}
+	else{
+		// The client product names itself; its user comes with a session opened through it
+		headers.insert(imtbase::s_productIdHeaderId, "Client");
+		if (kind == 1){
+			headers.insert(imtbase::s_authenticationTokenHeaderId, "imt_srv_client");
+		}
+		else{
+			headers.insert(imtbase::s_authenticationTokenHeaderId, CRenewalFixture::Jwt(QByteArray(), "Client"));
+			headers.insert(imtbase::s_serverTokenHeaderId, "imt_srv_client");
+		}
+	}
 	CTokenManagerStub& tokens = server ? *fixture.serverTokens : *fixture.personalTokens;
 	tokens.permissions = {"/Read", "/Write"};
 
@@ -489,6 +575,72 @@ void CAuthorizationRenewalTest::UnavailableIsNotDenied()
 	}
 
 	QCOMPARE(int(fixture.Renew(headers)), expected);
+}
+
+
+void CAuthorizationRenewalTest::OrganizationReadFailure_data()
+{
+	QTest::addColumn<int>("failure");
+	QTest::addColumn<bool>("isInOrganization");
+	QTest::addColumn<int>("expected");
+	QTest::newRow("tenant-not-readable") << 0 << true << int(Creator::AS_UNAVAILABLE);
+	QTest::newRow("tenant-removed") << 1 << true << int(Creator::AS_CONFIRMED);
+	QTest::newRow("membership-not-readable") << 2 << true << int(Creator::AS_UNAVAILABLE);
+	QTest::newRow("membership-removed") << 3 << true << int(Creator::AS_CONFIRMED);
+	QTest::newRow("memberships-not-readable") << 2 << false << int(Creator::AS_UNAVAILABLE);
+	QTest::newRow("memberships-removed") << 3 << false << int(Creator::AS_CONFIRMED);
+}
+
+
+void CAuthorizationRenewalTest::OrganizationReadFailure()
+{
+	QFETCH(int, failure);
+	QFETCH(bool, isInOrganization);
+	QFETCH(int, expected);
+	CRenewalFixture fixture;
+	const auto headers = CRenewalFixture::Headers(CRenewalFixture::Jwt(isInOrganization ? s_tenantId : QByteArray()));
+
+	QByteArray before;
+	QCOMPARE(fixture.Renew(headers, &before), Creator::AS_CONFIRMED);
+
+	switch (failure){
+	case 0:
+		fixture.tenants->isReadable = false;
+		break;
+	case 1:
+		fixture.tenants->isPresent = false;
+		break;
+	case 2:
+		fixture.memberships->isReadable = false;
+		break;
+	default:
+		fixture.memberships->isPresent = false;
+	}
+
+	// A failed read says nothing; what the store answered is a change of the access
+	QByteArray after;
+	QCOMPARE(int(fixture.Renew(headers, &after)), expected);
+	if (expected == Creator::AS_CONFIRMED){
+		QVERIFY(before != after);
+	}
+}
+
+
+void CAuthorizationRenewalTest::UnreadOrganizationIsNotCached()
+{
+	CRenewalFixture fixture;
+	const auto headers = CRenewalFixture::Headers(CRenewalFixture::Jwt(s_tenantId));
+
+	// A request goes on without the organization data it could not read, and does not keep that
+	fixture.memberships->isReadable = false;
+	QCOMPARE(fixture.Create(headers), Creator::CCS_OK);
+	const int readsAfterFailure = fixture.memberships->reads;
+
+	fixture.memberships->isReadable = true;
+	QCOMPARE(fixture.Create(headers), Creator::CCS_OK);
+	QCOMPARE(fixture.memberships->reads, readsAfterFailure + 1);
+	QCOMPARE(fixture.Create(headers), Creator::CCS_OK);
+	QCOMPARE(fixture.memberships->reads, readsAfterFailure + 1);
 }
 
 

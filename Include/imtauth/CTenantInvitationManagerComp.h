@@ -30,7 +30,7 @@ public:
 	I_END_COMPONENT;
 
 	virtual InvitationIds GetInvitationsByTenant(const QByteArray& tenantId, const Statuses& statuses = Statuses()) const override;
-	virtual InvitationIds GetInvitationsByUser(const QByteArray& userId, const Statuses& statuses = Statuses()) const override;
+	virtual InvitationIds GetInvitationsByUser(const QByteArray& userId, const Statuses& statuses = Statuses(), bool* isReadPtr = nullptr) const override;
 	virtual ITenantInvitationUniquePtr GetInvitation(const QByteArray& invitationId) const override;
 	virtual ITenantInvitationUniquePtr FindPendingInvitation(const QByteArray& userId, const QByteArray& tenantId) const override;
 	virtual QByteArray CreateInvitation(const QByteArray& invitedByUserId, const QByteArray& userId, const QByteArray& tenantId) override;

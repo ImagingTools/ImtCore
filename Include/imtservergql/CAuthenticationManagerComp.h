@@ -106,6 +106,8 @@ private:
 		// What the user holds inside the organization: its owner and its creator manage all of it, a member what the membership gives
 		QByteArrayList organizationPermissions;
 		bool hasOrganizationAccess = false;
+		// False when a part could not be read: the data above may miss what the user holds
+		bool isRead = true;
 	};
 
 	struct TokenCacheEntry
@@ -266,12 +268,10 @@ private:
 	bool IsPatToken(const QByteArray& token) const;
 
 	/**
-		Tell whether the memberships let the user see the organizations: inside an organization its owner,
-		creator and members, outside of any a member of one or a user with a pending invitation.
+		Tell whether a user outside of any organization sees the organizations: a member of one or a user with a pending invitation.
+		\param isRead Cleared when the memberships or the invitations could not be read: a refusal then says nothing.
 	*/
-	bool HasOrganizationAccess(const QByteArray& userId, const QByteArray& tenantId, bool isOwnerOrCreator) const;
-	/// The organization permissions of the user inside the organization; without the memberships (a product server) a member holds none.
-	QByteArrayList GetOrganizationPermissions(const QByteArray& userId, const QByteArray& tenantId, bool isOwnerOrCreator) const;
+	bool HasOrganizationAccess(const QByteArray& userId, bool& isRead) const;
 
 	/**
 		Extract the 'exp' claim (seconds since epoch) from a JWT without going

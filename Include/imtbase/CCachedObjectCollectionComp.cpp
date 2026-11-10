@@ -9,6 +9,7 @@
 #include <istd/TDelPtr.h>
 #include <istd/CChangeNotifier.h>
 #include <iser/CMemoryWriteArchive.h>
+#include <ilog/CMessage.h>
 
 
 namespace imtbase
@@ -368,6 +369,11 @@ ICollectionInfo::Ids CCachedObjectCollectionComp::GetElementIds(
 	FilteredCollectionPtr collectionCacheItemPtr = GetFilteredCollection(offset, count, selectionParamsPtr);
 	if (collectionCacheItemPtr != nullptr){
 		return collectionCacheItemPtr->cachePtr->GetElementIds(0, -1, nullptr, logPtr);
+	}
+
+	// The source was not read: the caller must not take the empty list for an empty selection
+	if (logPtr != nullptr && m_objectCollectionCompPtr.IsValid()){
+		logPtr->AddMessage(ilog::IMessageConsumer::MessagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0, QStringLiteral("The source collection could not be read."), QStringLiteral("CCachedObjectCollectionComp"))));
 	}
 
 	return ICollectionInfo::Ids();

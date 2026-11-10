@@ -18,6 +18,9 @@ private slots:
 	void ExpiredAccessToken();
 	void UnavailableIsNotDenied_data();
 	void UnavailableIsNotDenied();
+	void OrganizationReadFailure_data();
+	void OrganizationReadFailure();
+	void UnreadOrganizationIsNotCached();
 	void ChangeDuringCheckIsStale();
 	void StaleReadDoesNotFillCache();
 };

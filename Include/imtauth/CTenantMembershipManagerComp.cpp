@@ -50,23 +50,34 @@ ITenantMembershipManager::MembershipIds CTenantMembershipManagerComp::GetMembers
 }
 
 
-ITenantMembershipManager::MembershipIds CTenantMembershipManagerComp::GetMembershipsByUser(const QByteArray& userId) const
+ITenantMembershipManager::MembershipIds CTenantMembershipManagerComp::GetMembershipsByUser(const QByteArray& userId, bool* isReadPtr) const
 {
 	MembershipIds result;
+	if (isReadPtr != nullptr){
+		*isReadPtr = m_membershipCollectionCompPtr.IsValid();
+	}
 
 	if (!m_membershipCollectionCompPtr.IsValid()){
 		SendErrorMessage(0, "Membership collection not configured", "CTenantMembershipManagerComp");
 		return result;
 	}
 
-	for (const QByteArray& id : GetCandidateMembershipIds(userId, QByteArray())){
+	bool isRead = true;
+	for (const QByteArray& id : GetCandidateMembershipIds(userId, QByteArray(), &isRead)){
 		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (m_membershipCollectionCompPtr->GetObjectData(id, dataPtr)){
-			const ITenantMembership* membershipPtr = dynamic_cast<const ITenantMembership*>(dataPtr.GetPtr());
-			if (membershipPtr != nullptr && membershipPtr->GetUserId() == userId){
-				result.append(id);
-			}
+		if (!m_membershipCollectionCompPtr->GetObjectData(id, dataPtr)){
+			isRead = false;
+			continue;
 		}
+
+		const ITenantMembership* membershipPtr = dynamic_cast<const ITenantMembership*>(dataPtr.GetPtr());
+		if (membershipPtr != nullptr && membershipPtr->GetUserId() == userId){
+			result.append(id);
+		}
+	}
+
+	if (isReadPtr != nullptr){
+		*isReadPtr = isRead;
 	}
 
 	return result;
@@ -103,25 +114,40 @@ ITenantMembershipUniquePtr CTenantMembershipManagerComp::GetMembership(const QBy
 }
 
 
-ITenantMembershipUniquePtr CTenantMembershipManagerComp::FindMembership(const QByteArray& userId, const QByteArray& tenantId) const
+ITenantMembershipUniquePtr CTenantMembershipManagerComp::FindMembership(const QByteArray& userId, const QByteArray& tenantId, bool* isReadPtr) const
 {
+	if (isReadPtr != nullptr){
+		*isReadPtr = false;
+	}
+
 	if (!m_membershipCollectionCompPtr.IsValid() || !m_membershipFactoryCompPtr.IsValid()){
 		SendErrorMessage(0, "Membership collection or factory not configured", "CTenantMembershipManagerComp");
 		return nullptr;
 	}
 
-	for (const QByteArray& id : GetCandidateMembershipIds(userId, tenantId)){
+	bool isRead = true;
+	for (const QByteArray& id : GetCandidateMembershipIds(userId, tenantId, &isRead)){
 		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (m_membershipCollectionCompPtr->GetObjectData(id, dataPtr)){
-			const ITenantMembership* membershipPtr = dynamic_cast<const ITenantMembership*>(dataPtr.GetPtr());
-			if (membershipPtr != nullptr && membershipPtr->GetUserId() == userId && membershipPtr->GetTenantId() == tenantId){
-				ITenantMembershipUniquePtr clonedMembership = m_membershipFactoryCompPtr.CreateInstance();
-				if (clonedMembership.IsValid() && clonedMembership->CopyFrom(*membershipPtr)){
-					return clonedMembership;
-				}
-				return nullptr;
-			}
+		if (!m_membershipCollectionCompPtr->GetObjectData(id, dataPtr)){
+			isRead = false;
+			continue;
 		}
+
+		const ITenantMembership* membershipPtr = dynamic_cast<const ITenantMembership*>(dataPtr.GetPtr());
+		if (membershipPtr != nullptr && membershipPtr->GetUserId() == userId && membershipPtr->GetTenantId() == tenantId){
+			ITenantMembershipUniquePtr clonedMembership = m_membershipFactoryCompPtr.CreateInstance();
+			if (clonedMembership.IsValid() && clonedMembership->CopyFrom(*membershipPtr)){
+				if (isReadPtr != nullptr){
+					*isReadPtr = true;
+				}
+				return clonedMembership;
+			}
+			return nullptr;
+		}
+	}
+
+	if (isReadPtr != nullptr){
+		*isReadPtr = isRead;
 	}
 
 	return nullptr;
@@ -318,8 +344,12 @@ bool CTenantMembershipManagerComp::IsMember(const QByteArray& userId, const QByt
 
 // private methods
 
-QByteArrayList CTenantMembershipManagerComp::GetCandidateMembershipIds(const QByteArray& userId, const QByteArray& tenantId) const
+QByteArrayList CTenantMembershipManagerComp::GetCandidateMembershipIds(const QByteArray& userId, const QByteArray& tenantId, bool* isReadPtr) const
 {
+	if (isReadPtr != nullptr){
+		*isReadPtr = true;
+	}
+
 	if (userId.isEmpty() && tenantId.isEmpty()){
 		return QByteArrayList();
 	}
@@ -332,7 +362,7 @@ QByteArrayList CTenantMembershipManagerComp::GetCandidateMembershipIds(const QBy
 		filterExpr.fieldFilters << CollectionSelection::FieldFilter("TenantId", QString::fromUtf8(tenantId));
 	}
 
-	return CollectionSelection::SelectIds(*m_membershipCollectionCompPtr, filterExpr);
+	return CollectionSelection::SelectIds(*m_membershipCollectionCompPtr, filterExpr, QByteArrayList(), isReadPtr);
 }
 
 

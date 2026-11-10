@@ -17,7 +17,11 @@ class ITenantManager: virtual public istd::IChangeable
 {
 public:
 	virtual QByteArrayList GetTenantIds() const = 0;
-	virtual ITenantInfoUniquePtr GetTenant(const QByteArray& tenantId) const = 0;
+	/**
+		The organization, or an invalid pointer when there is none or it could not be read.
+		\param isReadPtr [optional] False when the storage could not be read: an invalid pointer then says nothing.
+	*/
+	virtual ITenantInfoUniquePtr GetTenant(const QByteArray& tenantId, bool* isReadPtr = nullptr) const = 0;
 	/**
 		Ids of the organizations the user owns or created.
 		\param isReadPtr [optional] False when the storage could not be read completely, so the list may miss some.

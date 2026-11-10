@@ -32,8 +32,9 @@ public:
 
 	/**
 		Get all membership IDs for a specific user (across all tenants).
+		\param isReadPtr [optional] False when the storage could not be read completely, so the list may miss some.
 	*/
-	virtual MembershipIds GetMembershipsByUser(const QByteArray& userId) const = 0;
+	virtual MembershipIds GetMembershipsByUser(const QByteArray& userId, bool* isReadPtr = nullptr) const = 0;
 
 	/**
 		Get a specific membership by ID.
@@ -44,8 +45,9 @@ public:
 	/**
 		Find membership for a specific user in a specific tenant.
 		\return UniquePtr to the membership, or invalid ptr if the user is not a member of the tenant.
+		\param isReadPtr [optional] False when the storage could not be read: an invalid pointer then says nothing.
 	*/
-	virtual ITenantMembershipUniquePtr FindMembership(const QByteArray& userId, const QByteArray& tenantId) const = 0;
+	virtual ITenantMembershipUniquePtr FindMembership(const QByteArray& userId, const QByteArray& tenantId, bool* isReadPtr = nullptr) const = 0;
 
 	/**
 		Add a user to a tenant.

@@ -85,8 +85,13 @@ Unlike a new request, an expired access token is accepted there while its sessio
 |---|---|
 | `AS_CONFIRMED` | Compare the fingerprint; a changed one closes the subscription |
 | `AS_DENIED` | Close the subscription |
-| `AS_UNAVAILABLE` | Keep the subscription; nothing is known (a failed read is not a removed account or session) |
+| `AS_UNAVAILABLE` | Keep the subscription; nothing is known (a failed read is not a removed account, session, organization or membership) |
 | `AS_STALE` | The access changed during the check; the result is not used and the check is repeated |
+
+The stores tell a failed read from an absent entry: `ITenantManager::GetTenant`, `ITenantMembershipManager::FindMembership`
+and `GetMembershipsByUser`, `ITenantInvitationManager::GetInvitationsByUser` report it through `isReadPtr`; a remote organization
+read is not answered when the request fails or the server answers with an error. A request goes on with what was read but does not
+cache incomplete organization data.
 
 Every change of the access this server is told about increments its authorization generation
 (`IGqlContextCreator::GetAuthorizationGeneration`). A registration during which the generation changed holds only

@@ -37,9 +37,9 @@ public:
 
 	// reimplemented (imtauth::ITenantMembershipManager)
 	virtual MembershipIds GetMembershipsByTenant(const QByteArray& tenantId) const override;
-	virtual MembershipIds GetMembershipsByUser(const QByteArray& userId) const override;
+	virtual MembershipIds GetMembershipsByUser(const QByteArray& userId, bool* isReadPtr = nullptr) const override;
 	virtual ITenantMembershipUniquePtr GetMembership(const QByteArray& membershipId) const override;
-	virtual ITenantMembershipUniquePtr FindMembership(const QByteArray& userId, const QByteArray& tenantId) const override;
+	virtual ITenantMembershipUniquePtr FindMembership(const QByteArray& userId, const QByteArray& tenantId, bool* isReadPtr = nullptr) const override;
 	virtual QByteArray AddMembership(const QByteArray& userId, const QByteArray& tenantId) override;
 	virtual bool RemoveMembership(const QByteArray& membershipId) override;
 	virtual bool UpdateMembershipOrganizationPermissions(const QByteArray& membershipId, const QByteArrayList& permissions) override;
@@ -50,7 +50,7 @@ private:
 		Ids of the memberships that may match the user and/or the tenant (an empty id matches any).
 		The caller verifies the loaded membership: a collection that does not know the filter returns every id.
 	*/
-	QByteArrayList GetCandidateMembershipIds(const QByteArray& userId, const QByteArray& tenantId) const;
+	QByteArrayList GetCandidateMembershipIds(const QByteArray& userId, const QByteArray& tenantId, bool* isReadPtr = nullptr) const;
 	bool CleanupTenantAssignedUserData(const QByteArray& userId, const QByteArray& tenantId);
 
 	I_REF(imtbase::IObjectCollection, m_membershipCollectionCompPtr);

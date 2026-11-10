@@ -249,12 +249,21 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateContext(
 	TokenTenantData tenantData;
 	if (!resolvedUserId.isEmpty()){
 		if (isRenewal){
+			// Organization data that could not be read says nothing about the access of a subscription
 			tenantData = ReadTenantData(resolvedUserId, tenantId);
+			if (!tenantData.isRead){
+				imtgql::CGqlRequestContextManager::Clear();
+				SetError(error, imtgql::IGqlContextCreator::CCS_INTERNAL_ERROR, QStringLiteral("The organization data could not be read."));
+				return nullptr;
+			}
 		}
 		else if (!TryGetCachedTenantData(token, tenantData)){
+			// A request goes on with what was read; only a complete read is kept
 			const qint64 resolutionGeneration = GetAuthorizationGeneration();
 			tenantData = ReadTenantData(resolvedUserId, tenantId);
-			StoreCachedTenantData(token, tenantData, resolutionGeneration);
+			if (tenantData.isRead){
+				StoreCachedTenantData(token, tenantData, resolutionGeneration);
+			}
 		}
 
 		if (tenantData.isTenantOwner){
@@ -280,8 +289,8 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateContext(
 			if (userInfoPtr == nullptr && isRenewal){
 				bool isRead = false;
 				const QByteArrayList userIds = imtauth::CollectionSelection::SelectIds(
-							*m_userCollectionCompPtr, imtauth::CollectionSelection::ColumnEquals("Id", resolvedUserId), QByteArrayList(), &isRead);
-				if (!isRead || !userIds.isEmpty()){
+							*m_userCollectionCompPtr, imtauth::CollectionSelection::ColumnEquals("DocumentId", resolvedUserId), QByteArrayList(), &isRead);
+				if (!isRead || userIds.contains(resolvedUserId)){
 					imtgql::CGqlRequestContextManager::Clear();
 					SetError(error, imtgql::IGqlContextCreator::CCS_INTERNAL_ERROR, QStringLiteral("The user account could not be read."));
 					return nullptr;
@@ -713,53 +722,39 @@ void CAuthenticationManagerComp::OnUpdate(imod::IModel* /*modelPtr*/, const istd
 
 // private methods
 
-bool CAuthenticationManagerComp::HasOrganizationAccess(const QByteArray& userId, const QByteArray& tenantId, bool isOwnerOrCreator) const
+bool CAuthenticationManagerComp::HasOrganizationAccess(const QByteArray& userId, bool& isRead) const
 {
-	if (!tenantId.isEmpty()){
-		// Without the memberships (a product server) the organization of the token is trusted
-		return isOwnerOrCreator || !m_membershipManagerCompPtr.IsValid() || m_membershipManagerCompPtr->IsMember(userId, tenantId);
-	}
-
+	// A listed entry that cannot be read is a failed read too
 	if (m_membershipManagerCompPtr.IsValid()){
-		for (const QByteArray& membershipId : m_membershipManagerCompPtr->GetMembershipsByUser(userId)){
+		bool isListRead = false;
+		for (const QByteArray& membershipId : m_membershipManagerCompPtr->GetMembershipsByUser(userId, &isListRead)){
 			imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
-			if (membershipPtr.IsValid() && membershipPtr->IsActive()){
+			if (!membershipPtr.IsValid()){
+				isListRead = false;
+			}
+			else if (membershipPtr->IsActive()){
 				return true;
 			}
 		}
+		isRead = isRead && isListRead;
 	}
 
 	if (m_invitationManagerCompPtr.IsValid()){
 		const imtauth::ITenantInvitationManager::Statuses statuses{imtauth::ITenantInvitation::TIS_PENDING};
-		for (const QByteArray& invitationId : m_invitationManagerCompPtr->GetInvitationsByUser(userId, statuses)){
+		bool isListRead = false;
+		for (const QByteArray& invitationId : m_invitationManagerCompPtr->GetInvitationsByUser(userId, statuses, &isListRead)){
 			imtauth::ITenantInvitationUniquePtr invitationPtr = m_invitationManagerCompPtr->GetInvitation(invitationId);
-			if (invitationPtr.IsValid() && m_invitationManagerCompPtr->GetEffectiveStatus(*invitationPtr) == imtauth::ITenantInvitation::TIS_PENDING){
+			if (!invitationPtr.IsValid()){
+				isListRead = false;
+			}
+			else if (m_invitationManagerCompPtr->GetEffectiveStatus(*invitationPtr) == imtauth::ITenantInvitation::TIS_PENDING){
 				return true;
 			}
 		}
+		isRead = isRead && isListRead;
 	}
 
 	return false;
-}
-
-
-QByteArrayList CAuthenticationManagerComp::GetOrganizationPermissions(const QByteArray& userId, const QByteArray& tenantId, bool isOwnerOrCreator) const
-{
-	if (tenantId.isEmpty()){
-		return QByteArrayList();
-	}
-
-	if (isOwnerOrCreator){
-		return {imtauth::s_organizationManagementPermission};
-	}
-
-	if (!m_membershipManagerCompPtr.IsValid()){
-		return QByteArrayList();
-	}
-
-	imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->FindMembership(userId, tenantId);
-
-	return membershipPtr.IsValid() && membershipPtr->IsActive() ? membershipPtr->GetOrganizationPermissions() : QByteArrayList();
 }
 
 
@@ -767,17 +762,40 @@ CAuthenticationManagerComp::TokenTenantData CAuthenticationManagerComp::ReadTena
 {
 	TokenTenantData tenantData;
 
+	if (tenantId.isEmpty()){
+		tenantData.hasOrganizationAccess = HasOrganizationAccess(userId, tenantData.isRead);
+
+		return tenantData;
+	}
+
 	bool isCreator = false;
-	if (m_tenantManagerCompPtr.IsValid() && !tenantId.isEmpty()){
-		imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
+	if (m_tenantManagerCompPtr.IsValid()){
+		imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId, &tenantData.isRead);
 		if (tenantPtr.IsValid()){
 			tenantData.isTenantOwner = tenantPtr->GetOwnerId() == userId;
 			isCreator = tenantPtr->GetCreatorId() == userId;
 			tenantData.tenantPermissions = tenantPtr->GetTenantPermissions();
 		}
 	}
-	tenantData.hasOrganizationAccess = HasOrganizationAccess(userId, tenantId, tenantData.isTenantOwner || isCreator);
-	tenantData.organizationPermissions = GetOrganizationPermissions(userId, tenantId, tenantData.isTenantOwner || isCreator);
+
+	// The owner and the creator manage all of the organization, a member what the membership gives
+	if (tenantData.isTenantOwner || isCreator){
+		tenantData.hasOrganizationAccess = true;
+		tenantData.organizationPermissions = {imtauth::s_organizationManagementPermission};
+	}
+	else if (!m_membershipManagerCompPtr.IsValid()){
+		// Without the memberships (a product server) the organization of the token is trusted, and a member holds no organization permissions
+		tenantData.hasOrganizationAccess = true;
+	}
+	else{
+		bool isMembershipRead = false;
+		imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->FindMembership(userId, tenantId, &isMembershipRead);
+		tenantData.isRead = tenantData.isRead && isMembershipRead;
+		if (membershipPtr.IsValid() && membershipPtr->IsActive()){
+			tenantData.hasOrganizationAccess = true;
+			tenantData.organizationPermissions = membershipPtr->GetOrganizationPermissions();
+		}
+	}
 
 	return tenantData;
 }

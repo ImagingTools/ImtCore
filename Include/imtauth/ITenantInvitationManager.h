@@ -20,7 +20,10 @@ public:
 	typedef QList<ITenantInvitation::TenantInvitationStatus> Statuses;
 
 	virtual InvitationIds GetInvitationsByTenant(const QByteArray& tenantId, const Statuses& statuses = Statuses()) const = 0;
-	virtual InvitationIds GetInvitationsByUser(const QByteArray& userId, const Statuses& statuses = Statuses()) const = 0;
+	/**
+		\param isReadPtr [optional] False when the storage could not be read completely, so the list may miss some.
+	*/
+	virtual InvitationIds GetInvitationsByUser(const QByteArray& userId, const Statuses& statuses = Statuses(), bool* isReadPtr = nullptr) const = 0;
 	virtual ITenantInvitationUniquePtr GetInvitation(const QByteArray& invitationId) const = 0;
 	virtual ITenantInvitationUniquePtr FindPendingInvitation(const QByteArray& userId, const QByteArray& tenantId) const = 0;
 	virtual QByteArray CreateInvitation(const QByteArray& invitedByUserId, const QByteArray& userId, const QByteArray& tenantId) = 0;
