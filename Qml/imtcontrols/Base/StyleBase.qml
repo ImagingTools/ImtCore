@@ -223,6 +223,8 @@ StyleComponents {
 	property int tableHeaderHeight: controlHeightM
 	// Faint stripe on every other table row.
 	property bool enableTableAlternating: true
+	// Whether the current row of a table is outlined with the focus ring.
+	property bool enableTableFocusOutline: true
 	property string tableAlternateRowColor: alternateBaseColor
 
 	//grid cell size

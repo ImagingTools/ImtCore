@@ -76,7 +76,7 @@ Rectangle {
 
 	property string selectedColor: Style.selectedColor;
 	// Off for rows that paint their own selection (e.g. rounded list items).
-	property bool focusOutlineVisible: true;
+	property bool focusOutlineVisible: Style.enableTableFocusOutline;
 	// Solid hover fill (replaces selectedColor * hoverOpacity).
 	property string hoverColor: Style.hover;
 
