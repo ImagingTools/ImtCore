@@ -26,6 +26,7 @@ private slots:
 	void ResetCollectionWithFixedObjectTest();
 	void GetOperationFlagsFixedObjectTest();
 	void CheckSerializeTest();
+	void CachedCollectionFallbackAndInvalidationTest();
 
 private:
 	QString m_imtCorePath;

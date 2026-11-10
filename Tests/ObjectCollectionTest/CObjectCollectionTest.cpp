@@ -4,6 +4,7 @@
 // ACF includes
 #include <ifile/CCompactXmlFileReadArchive.h>
 #include <ifile/CCompactXmlFileWriteArchive.h>
+#include <iprm/CParamsSet.h>
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
@@ -143,6 +144,62 @@ void CObjectCollectionTest::CheckSerializeTest()
 	else{
 		QFAIL("Component is not initialized");
 	}
+}
+
+
+void CObjectCollectionTest::CachedCollectionFallbackAndInvalidationTest()
+{
+	initTestCase();
+
+	istd::TDelPtr<ipackage::CComponentAccessor> compositePtr;
+	compositePtr.SetPtr(new ipackage::CComponentAccessor(m_registryFile, m_configFile));
+	QVERIFY2(compositePtr.IsValid(), "Component is not initialized");
+
+	imtbase::IObjectCollection* objectCollectionPtr = compositePtr->GetComponentInterface<imtbase::IObjectCollection>("ObjectCollection");
+	imtbase::IObjectCollection* cachedCollectionPtr = compositePtr->GetComponentInterface<imtbase::IObjectCollection>("CachedObjectCollection");
+	imtbase::IObjectCollection* zeroCacheCollectionPtr = compositePtr->GetComponentInterface<imtbase::IObjectCollection>("CachedObjectCollectionZeroCache");
+	QVERIFY2(objectCollectionPtr != nullptr, "Object collection is nullptr");
+	QVERIFY2(cachedCollectionPtr != nullptr, "Cached object collection is nullptr");
+	QVERIFY2(zeroCacheCollectionPtr != nullptr, "Zero-cache object collection is nullptr");
+
+	const imtbase::IObjectCollection::Ids objectIds = objectCollectionPtr->GetElementIds();
+	QVERIFY2(!objectIds.isEmpty(), "Object collection is empty");
+
+	const QByteArray objectId = objectIds.first();
+	QCOMPARE(cachedCollectionPtr->GetObjectTypeId(objectId), objectCollectionPtr->GetObjectTypeId(objectId));
+	QCOMPARE(
+				cachedCollectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME),
+				objectCollectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME));
+	QCOMPARE(cachedCollectionPtr->GetDataMetaInfo(objectId).IsValid(), objectCollectionPtr->GetDataMetaInfo(objectId).IsValid());
+	QCOMPARE(cachedCollectionPtr->GetElementMetaInfo(objectId).IsValid(), objectCollectionPtr->GetElementMetaInfo(objectId).IsValid());
+	QCOMPARE(cachedCollectionPtr->GetElementIds(), objectIds);
+	QCOMPARE(zeroCacheCollectionPtr->GetElementIds(), objectIds);
+
+	imtbase::IObjectCollection::DataPtr zeroCacheDataPtr;
+	QVERIFY(zeroCacheCollectionPtr->GetObjectData(objectId, zeroCacheDataPtr));
+	QVERIFY(zeroCacheDataPtr.IsValid());
+
+	iprm::CParamsSet dataConfiguration;
+	imtbase::IObjectCollection::DataPtr configuredDataPtr;
+	QVERIFY(cachedCollectionPtr->GetObjectData(objectId, configuredDataPtr, &dataConfiguration));
+	QVERIFY(configuredDataPtr.IsValid());
+
+	const QByteArray insertedObjectId = QByteArrayLiteral("CachedCollectionDelegationTestObject");
+	QCOMPARE(
+				objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, QStringLiteral("Cached test object"), QString(), nullptr, insertedObjectId),
+				insertedObjectId);
+	QVERIFY(cachedCollectionPtr->GetElementIds().contains(insertedObjectId));
+
+	imtbase::IObjectCollection::DataPtr insertedDataPtr;
+	QVERIFY(cachedCollectionPtr->GetObjectData(insertedObjectId, insertedDataPtr));
+	QVERIFY(insertedDataPtr.IsValid());
+
+	imtbase::IObjectCollection::Ids objectIdsToRemove;
+	objectIdsToRemove.push_back(insertedObjectId);
+	QVERIFY(cachedCollectionPtr->RemoveElements(objectIdsToRemove));
+	QVERIFY(!cachedCollectionPtr->GetElementIds().contains(insertedObjectId));
+	imtbase::IObjectCollection::DataPtr removedDataPtr;
+	QVERIFY(!cachedCollectionPtr->GetObjectData(insertedObjectId, removedDataPtr));
 }
 
 

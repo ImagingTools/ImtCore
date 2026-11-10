@@ -219,7 +219,10 @@ bool CCachedObjectCollectionComp::RestoreObjectSet(
 		return false;
 	}
 
-	istd::CChangeNotifier changeNotifier(this);
+	ICollectionInfo::MultiElementNotifierInfo notifierInfo;
+	istd::IChangeable::ChangeSet changeSet(CF_RESTORED);
+	changeSet.SetChangeInfo(CN_ALL_CHANGED, QVariant::fromValue(notifierInfo));
+	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 	bool retVal = m_objectCollectionCompPtr->RestoreObjectSet(selectionParamsPtr, operationContextPtr);
 	if (retVal){
@@ -243,7 +246,7 @@ const istd::IChangeable* CCachedObjectCollectionComp::GetObjectPtr(const Id& obj
 }
 
 
-bool CCachedObjectCollectionComp::GetObjectData(const Id& objectId, DataPtr& dataPtr, const iprm::IParamsSet* /*dataConfigurationPtr*/) const
+bool CCachedObjectCollectionComp::GetObjectData(const Id& objectId, DataPtr& dataPtr, const iprm::IParamsSet* dataConfigurationPtr) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		return false;
@@ -319,7 +322,10 @@ IObjectCollectionUniquePtr CCachedObjectCollectionComp::CreateSubCollection(int 
 {
 	FilteredCollectionPtr collectionCacheItemPtr = GetFilteredCollection(offset, count, selectionParamsPtr);
 	if (collectionCacheItemPtr != nullptr){
-		return collectionCacheItemPtr->cachePtr->CreateSubCollection(0, -1, nullptr);
+		IObjectCollectionUniquePtr subCollectionPtr = collectionCacheItemPtr->cachePtr->CreateSubCollection(0, -1, nullptr);
+		if (subCollectionPtr.IsValid()){
+			return subCollectionPtr;
+		}
 	}
 
 	if (m_objectCollectionCompPtr.IsValid()){
@@ -338,7 +344,10 @@ imtbase::IObjectCollectionIterator* CCachedObjectCollectionComp::CreateObjectCol
 {
 	FilteredCollectionPtr collectionCacheItemPtr = GetFilteredCollection(offset, count, selectionParamsPtr);
 	if (collectionCacheItemPtr != nullptr){
-		return collectionCacheItemPtr->cachePtr->CreateObjectCollectionIterator(objectId, 0, -1, nullptr);
+		imtbase::IObjectCollectionIterator* iteratorPtr = collectionCacheItemPtr->cachePtr->CreateObjectCollectionIterator(objectId, 0, -1, nullptr);
+		if (iteratorPtr != nullptr){
+			return iteratorPtr;
+		}
 	}
 	
 	if (!m_objectCollectionCompPtr.IsValid()){
@@ -379,7 +388,10 @@ idoc::MetaInfoPtr CCachedObjectCollectionComp::GetDataMetaInfo(const Id& objectI
 		for (int index = 0; index < m_cachedCollections.size(); index++){
 			const FilteredCollectionPtr& collectionCacheItemPtr = m_cachedCollections.at(index);
 			if (collectionCacheItemPtr->cachePtr->GetElementIds().contains(objectId)){
-				return collectionCacheItemPtr->cachePtr->GetDataMetaInfo(objectId);
+				idoc::MetaInfoPtr metaInfoPtr = collectionCacheItemPtr->cachePtr->GetDataMetaInfo(objectId);
+				if (metaInfoPtr.IsValid()){
+					return metaInfoPtr;
+				}
 			}
 		}
 	}
@@ -444,7 +456,10 @@ QVariant CCachedObjectCollectionComp::GetElementInfo(const Id& elementId, int in
 		for (int index = 0; index < m_cachedCollections.size(); index++){
 			const FilteredCollectionPtr& collectionCacheItemPtr = m_cachedCollections.at(index);
 			if (collectionCacheItemPtr->cachePtr->GetElementIds().contains(elementId)){
-				return collectionCacheItemPtr->cachePtr->GetElementInfo(elementId, infoType, logPtr);
+				QVariant info = collectionCacheItemPtr->cachePtr->GetElementInfo(elementId, infoType, logPtr);
+				if (info.isValid()){
+					return info;
+				}
 			}
 		}
 	}
@@ -465,7 +480,10 @@ idoc::MetaInfoPtr CCachedObjectCollectionComp::GetElementMetaInfo(const Id& elem
 		for (int index = 0; index < m_cachedCollections.size(); index++){
 			const FilteredCollectionPtr& collectionCacheItemPtr = m_cachedCollections.at(index);
 			if (collectionCacheItemPtr->cachePtr->GetElementIds().contains(elementId)){
-				return collectionCacheItemPtr->cachePtr->GetElementMetaInfo(elementId, logPtr);
+				idoc::MetaInfoPtr metaInfoPtr = collectionCacheItemPtr->cachePtr->GetElementMetaInfo(elementId, logPtr);
+				if (metaInfoPtr.IsValid()){
+					return metaInfoPtr;
+				}
 			}
 		}
 	}
@@ -652,4 +670,3 @@ void CCachedObjectCollectionComp::RemoveOldestObjectFromCache() const
 
 
 } // namespace imtbase
-
