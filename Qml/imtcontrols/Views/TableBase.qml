@@ -21,7 +21,7 @@ Rectangle {
 	property bool selectable: true;
 	property bool isMultiCheckable: true;
 	// The width of the checkbox column of a checkable table; the header and the rows both start their cells after it.
-	property int checkColumnWidth: tableContainer.checkable ? 3 * Style.marginM : 0;
+	readonly property int checkColumnWidth: tableContainer.checkable ? 3 * Style.marginM : 0;
 	property bool canSelectAll: true;
 	property bool scrollbarVisible: true;
 	property bool showHeaders: true;
