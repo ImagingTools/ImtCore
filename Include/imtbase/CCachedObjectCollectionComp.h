@@ -48,6 +48,7 @@ public:
 		I_ASSIGN_MULTI_0(m_invalidationModels, "InvalidationModels", "Additional models to observe; a change in any of them will trigger cache invalidation (the ObjectCollection's model is always observed too)", false);
 		I_ASSIGN(m_metaInfoCacheLimitAttrPtr, "MetaInfoCacheLimit", "Maximal count of filter combinations stored in the ring buffer (meta info cache)", true, 1000);
 		I_ASSIGN(m_objectCacheLimitAttrPtr, "ObjectCacheLimit", "Maximal count of the data objects in the ring buffer (cache)", true, 100);
+		I_ASSIGN(m_createFullCacheAttrPtr, "CreateFullCache", "Cache the complete underlying collection before creating filtered subsets", true, false);
 	I_END_COMPONENT;
 
 	CCachedObjectCollectionComp();
@@ -153,8 +154,10 @@ private:
 	I_MULTIREF(imod::IModel, m_invalidationModels);
 	I_ATTR(int, m_metaInfoCacheLimitAttrPtr);
 	I_ATTR(int, m_objectCacheLimitAttrPtr);
+	I_ATTR(bool, m_createFullCacheAttrPtr);
 
 	mutable QVector<FilteredCollectionPtr> m_cachedCollections;
+	mutable FilteredCollectionPtr m_fullCollectionCachePtr;
 
 	struct CacheItem
 	{
@@ -171,5 +174,4 @@ private:
 
 
 } // namespace imtbase
-
 

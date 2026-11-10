@@ -109,6 +109,7 @@ ICollectionInfo::Id CCachedObjectCollectionComp::InsertNewObject(
 
 	QWriteLocker locker(&m_lock);
 	m_cachedCollections.clear();
+	m_fullCollectionCachePtr.reset();
 	locker.unlock();
 
 	QByteArray retVal = m_objectCollectionCompPtr->InsertNewObject(
@@ -145,6 +146,7 @@ bool CCachedObjectCollectionComp::RemoveElements(const Ids& elementIds, const IO
 	if (retVal){
 		QWriteLocker locker(&m_lock);
 		m_cachedCollections.clear();
+		m_fullCollectionCachePtr.reset();
 		for (int i = 0; i < elementIds.size(); ++i){
 			m_cacheItems.remove(elementIds[i]);
 		}
@@ -306,6 +308,7 @@ bool CCachedObjectCollectionComp::SetObjectData(
 
 	QWriteLocker locker(&m_lock);
 	m_cachedCollections.clear();
+	m_fullCollectionCachePtr.reset();
 	m_cacheItems.remove(objectId);
 	locker.unlock();
 
@@ -504,6 +507,7 @@ bool CCachedObjectCollectionComp::SetElementName(const Id& elementId, const QStr
 
 	QWriteLocker locker(&m_lock);
 	m_cachedCollections.clear();
+	m_fullCollectionCachePtr.reset();
 	locker.unlock();
 
 	istd::IChangeable::ChangeSet changeSet(CF_ELEMENT_RENAMED);
@@ -527,6 +531,7 @@ bool CCachedObjectCollectionComp::SetElementDescription(const Id& elementId, con
 
 	QWriteLocker locker(&m_lock);
 	m_cachedCollections.clear();
+	m_fullCollectionCachePtr.reset();
 	locker.unlock();
 
 	istd::IChangeable::ChangeSet changeSet(CF_ELEMENT_DESCRIPTION_CHANGED);
@@ -550,6 +555,7 @@ bool CCachedObjectCollectionComp::SetElementEnabled(const Id& elementId, bool is
 
 	QWriteLocker locker(&m_lock);
 	m_cachedCollections.clear();
+	m_fullCollectionCachePtr.reset();
 	locker.unlock();
 
 	istd::IChangeable::ChangeSet changeSet(CF_ELEMENT_STATE);
@@ -598,7 +604,36 @@ CCachedObjectCollectionComp::FilteredCollectionPtr CCachedObjectCollectionComp::
 		}
 	}
 
-	IObjectCollectionUniquePtr subCollectionPtr = m_objectCollectionCompPtr->CreateSubCollection(offset, count, selectionParamsPtr);
+	IObjectCollectionUniquePtr subCollectionPtr;
+	if (*m_createFullCacheAttrPtr){
+		FilteredCollectionPtr fullCollectionCachePtr;
+		{
+			QReadLocker locker(&m_lock);
+			fullCollectionCachePtr = m_fullCollectionCachePtr;
+		}
+
+		if (fullCollectionCachePtr == nullptr){
+			IObjectCollectionUniquePtr fullCollectionPtr = m_objectCollectionCompPtr->CreateSubCollection(0, -1, nullptr);
+			if (fullCollectionPtr.IsValid()){
+				FilteredCollectionPtr newFullCollectionCachePtr = std::make_shared<FilteredCollection>(0, -1, QByteArray(), std::move(fullCollectionPtr));
+
+				QWriteLocker locker(&m_lock);
+				if (m_fullCollectionCachePtr == nullptr){
+					m_fullCollectionCachePtr = newFullCollectionCachePtr;
+				}
+				fullCollectionCachePtr = m_fullCollectionCachePtr;
+			}
+		}
+
+		if (fullCollectionCachePtr != nullptr){
+			subCollectionPtr = fullCollectionCachePtr->cachePtr->CreateSubCollection(offset, count, selectionParamsPtr);
+		}
+	}
+
+	if (!subCollectionPtr.IsValid()){
+		subCollectionPtr = m_objectCollectionCompPtr->CreateSubCollection(offset, count, selectionParamsPtr);
+	}
+
 	if (!subCollectionPtr.IsValid()){
 		return nullptr;
 	}
@@ -636,6 +671,7 @@ void CCachedObjectCollectionComp::ClearCache()
 	QWriteLocker locker(&m_lock);
 
 	m_cachedCollections.clear();
+	m_fullCollectionCachePtr.reset();
 
 	m_cacheItems.clear();
 }

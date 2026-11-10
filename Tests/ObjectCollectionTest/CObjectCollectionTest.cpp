@@ -158,9 +158,11 @@ void CObjectCollectionTest::CachedCollectionFallbackAndInvalidationTest()
 	imtbase::IObjectCollection* objectCollectionPtr = compositePtr->GetComponentInterface<imtbase::IObjectCollection>("ObjectCollection");
 	imtbase::IObjectCollection* cachedCollectionPtr = compositePtr->GetComponentInterface<imtbase::IObjectCollection>("CachedObjectCollection");
 	imtbase::IObjectCollection* zeroCacheCollectionPtr = compositePtr->GetComponentInterface<imtbase::IObjectCollection>("CachedObjectCollectionZeroCache");
+	imtbase::IObjectCollection* fullCacheCollectionPtr = compositePtr->GetComponentInterface<imtbase::IObjectCollection>("CachedObjectCollectionFullCache");
 	QVERIFY2(objectCollectionPtr != nullptr, "Object collection is nullptr");
 	QVERIFY2(cachedCollectionPtr != nullptr, "Cached object collection is nullptr");
 	QVERIFY2(zeroCacheCollectionPtr != nullptr, "Zero-cache object collection is nullptr");
+	QVERIFY2(fullCacheCollectionPtr != nullptr, "Full-cache object collection is nullptr");
 
 	const imtbase::IObjectCollection::Ids objectIds = objectCollectionPtr->GetElementIds();
 	QVERIFY2(!objectIds.isEmpty(), "Object collection is empty");
@@ -174,6 +176,7 @@ void CObjectCollectionTest::CachedCollectionFallbackAndInvalidationTest()
 	QCOMPARE(cachedCollectionPtr->GetElementMetaInfo(objectId).IsValid(), objectCollectionPtr->GetElementMetaInfo(objectId).IsValid());
 	QCOMPARE(cachedCollectionPtr->GetElementIds(), objectIds);
 	QCOMPARE(zeroCacheCollectionPtr->GetElementIds(), objectIds);
+	QCOMPARE(fullCacheCollectionPtr->GetElementIds(), objectIds);
 
 	imtbase::IObjectCollection::DataPtr zeroCacheDataPtr;
 	QVERIFY(zeroCacheCollectionPtr->GetObjectData(objectId, zeroCacheDataPtr));
@@ -189,6 +192,7 @@ void CObjectCollectionTest::CachedCollectionFallbackAndInvalidationTest()
 				objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, QStringLiteral("Cached test object"), QString(), nullptr, insertedObjectId),
 				insertedObjectId);
 	QVERIFY(cachedCollectionPtr->GetElementIds().contains(insertedObjectId));
+	QVERIFY(fullCacheCollectionPtr->GetElementIds().contains(insertedObjectId));
 
 	imtbase::IObjectCollection::DataPtr insertedDataPtr;
 	QVERIFY(cachedCollectionPtr->GetObjectData(insertedObjectId, insertedDataPtr));
@@ -198,6 +202,7 @@ void CObjectCollectionTest::CachedCollectionFallbackAndInvalidationTest()
 	objectIdsToRemove.push_back(insertedObjectId);
 	QVERIFY(cachedCollectionPtr->RemoveElements(objectIdsToRemove));
 	QVERIFY(!cachedCollectionPtr->GetElementIds().contains(insertedObjectId));
+	QVERIFY(!fullCacheCollectionPtr->GetElementIds().contains(insertedObjectId));
 	imtbase::IObjectCollection::DataPtr removedDataPtr;
 	QVERIFY(!cachedCollectionPtr->GetObjectData(insertedObjectId, removedDataPtr));
 }
