@@ -390,7 +390,8 @@ Rectangle {
 			objectName: "RowCheckBox";
 			z: 1000;
 
-			anchors.verticalCenter: parent.verticalCenter;
+			anchors.top: parent.top;
+			anchors.topMargin: (tableDelegateContainer.contentHeight - height) / 2;
 			anchors.left: parent.left;
 			anchors.leftMargin: Style.marginM;
 			
