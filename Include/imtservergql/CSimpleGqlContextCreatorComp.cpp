@@ -15,15 +15,26 @@ namespace imtservergql
 
 // reimplemented (imtgql::IGqlContextCreator)
 
-bool CSimpleGqlContextCreatorComp::IsRevocableToken(const QByteArray& /*token*/) const
+imtgql::IGqlContextUniquePtr CSimpleGqlContextCreatorComp::RenewGqlContext(
+			const imtgql::IGqlContext::Headers& headers,
+			AuthorizationState& state,
+			QString& errorMessage) const
 {
-	return false;
+	ContextCreationError error;
+	imtgql::IGqlContextUniquePtr gqlContextPtr = CreateGqlContext(headers, error);
+	imtgql::CGqlRequestContextManager::Clear();
+
+	state = gqlContextPtr.IsValid() ? AS_CONFIRMED : AS_UNAVAILABLE;
+	errorMessage = error.message;
+
+	return gqlContextPtr;
 }
 
 
-imtgql::IGqlContextCreator::ContextCreationStatus CSimpleGqlContextCreatorComp::CheckToken(const QByteArray& /*token*/, QByteArrayList& /*scopes*/, QString& /*errorMessage*/) const
+qint64 CSimpleGqlContextCreatorComp::GetAuthorizationGeneration() const
 {
-	return CCS_OK;
+	// Without authorization the access never changes
+	return 0;
 }
 
 

@@ -46,9 +46,13 @@ void AttachCurrentContext(imtgql::CGqlRequest& gqlRequest)
 
 // reimplemented (imtauth::IJwtSessionController)
 
-bool CRemoteJwtSessionControllerComp::ValidateSession(const QByteArray& sessionId) const
+bool CRemoteJwtSessionControllerComp::ValidateSession(const QByteArray& sessionId, bool* isCheckedPtr) const
 {
 	namespace sessionsdl = sdl::V1_0::imtauth;
+
+	if (isCheckedPtr != nullptr){
+		*isCheckedPtr = false;
+	}
 
 	sessionsdl::ValidateSessionRequestArguments arguments;
 	arguments.input.Emplace();
@@ -63,15 +67,15 @@ bool CRemoteJwtSessionControllerComp::ValidateSession(const QByteArray& sessionI
 
 	QString errorMessage;
 	Response response = SendModelRequest<Response>(gqlRequest, errorMessage);
-	if (!errorMessage.isEmpty()){
+	if (!errorMessage.isEmpty() || !response.isValid.has_value()){
 		return false;
 	}
 
-	if (response.isValid.has_value()){
-		return *response.isValid;
+	if (isCheckedPtr != nullptr){
+		*isCheckedPtr = true;
 	}
 
-	return false;
+	return *response.isValid;
 }
 
 

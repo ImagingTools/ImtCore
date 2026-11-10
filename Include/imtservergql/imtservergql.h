@@ -2,6 +2,9 @@
 #pragma once
 
 
+// STL includes
+#include <algorithm>
+
 // Qt includes
 #include <QtCore/QMap>
 #include <QtCore/QString>
@@ -59,6 +62,38 @@ inline imtauth::IUserInfo::FeatureIds GetUserPermissions(const imtgql::IGqlConte
 	const imtauth::IUserInfo::FeatureIds userPermissions = productId.isEmpty() ? userInfoPtr->GetPermissions() : userInfoPtr->GetPermissions(productId);
 
 	return imtgql::CollectTenantScopedPermissions(gqlContext, userPermissions) + gqlContext.GetImpliedPermissions();
+}
+
+
+/**
+	Get what decides the access of the context: the principal, its organization, every permission it holds and the bounds of its tokens.
+	Two contexts with the same fingerprint are allowed the same; a changed fingerprint is a changed access.
+*/
+inline QByteArray GetAuthorizationFingerprint(const imtgql::IGqlContext& gqlContext)
+{
+	auto sorted = [](QByteArrayList list){
+		std::sort(list.begin(), list.end());
+		list.erase(std::unique(list.begin(), list.end()), list.end());
+
+		return list.join(',');
+	};
+
+	const imtauth::IUserInfo* userInfoPtr = gqlContext.GetUserInfo();
+
+	QByteArrayList parts;
+	parts << QByteArray::number(gqlContext.GetPrincipalKind())
+		  << gqlContext.GetUserId()
+		  << gqlContext.GetTenantId()
+		  << gqlContext.GetProductId()
+		  << gqlContext.GetServerProductId()
+		  << QByteArray(userInfoPtr == nullptr ? "-" : (userInfoPtr->IsAdmin() ? "admin" : "user"))
+		  << QByteArray(gqlContext.IsTenantOwner() ? "owner" : "")
+		  << sorted(GetUserPermissions(gqlContext))
+		  << sorted(gqlContext.GetOrganizationPermissions())
+		  << sorted(gqlContext.GetTenantPermissions())
+		  << (gqlContext.HasPermissionBoundary() ? "bounded:" + sorted(gqlContext.GetPermissionBoundary()) : QByteArray());
+
+	return parts.join('\n');
 }
 
 

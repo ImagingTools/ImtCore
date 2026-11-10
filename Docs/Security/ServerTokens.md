@@ -74,16 +74,26 @@ they are not a distributed cache invalidation protocol.
 
 ## WebSocket credential lifetime
 
-A subscription tracks both the authentication credential and `x-server-token`, when present.
-The credentials are checked before registration and again after the controller registers the subscription.
-A failed second check or changed scopes rolls registration back and produces no success acknowledgement.
+A subscription keeps, on the server, the headers it was registered with and the fingerprint of its access
+(`imtservergql::GetAuthorizationFingerprint`): the principal, its organization, every permission it holds
+(roles, groups, organization permissions, implied permissions) and the bounds of its personal and server tokens.
 
-The periodic monitor validates credentials afresh, without the HTTP request-token cache.
-Revocation, expiration or changed scopes of either credential closes the subscription.
-JWT sessions are monitored as well as personal and server tokens. The default check interval is 30 seconds,
-so revocation is not an instantaneous interruption of an already running callback.
-An internal validation error rejects a new registration; an established subscription is retained for retry,
-matching the existing availability policy.
+A check builds the context afresh with `IGqlContextCreator::RenewGqlContext`, without any cache.
+Unlike a new request, an expired access token is accepted there while its session lives. A check ends as one of:
+
+| State | Action |
+|---|---|
+| `AS_CONFIRMED` | Compare the fingerprint; a changed one closes the subscription |
+| `AS_DENIED` | Close the subscription |
+| `AS_UNAVAILABLE` | Keep the subscription; nothing is known (a failed read is not a removed account or session) |
+| `AS_STALE` | The access changed during the check; the result is not used and the check is repeated |
+
+Every change of the access this server is told about increments its authorization generation
+(`IGqlContextCreator::GetAuthorizationGeneration`). A registration during which the generation changed holds only
+if a fresh check confirms the same fingerprint; otherwise it is rolled back without a success acknowledgement.
+A cache fill read before a change is not kept.
+
+The check interval is 30 seconds for now, so revocation is not an instantaneous interruption of an already running callback.
 
 ## Catalog uniqueness
 

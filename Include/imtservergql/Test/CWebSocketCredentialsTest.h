@@ -10,9 +10,11 @@ class CWebSocketCredentialsTest: public QObject
 	Q_OBJECT
 
 private slots:
+	void RegistrationWithoutChange();
 	void RegistrationRollback_data();
 	void RegistrationRollback();
-	void BothCredentialsAreMonitored_data();
-	void BothCredentialsAreMonitored();
+	void RegistrationKeptWithSameAccess();
+	void CheckOfSubscription_data();
+	void CheckOfSubscription();
 	void AnonymousSubscription();
 };

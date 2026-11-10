@@ -4,6 +4,7 @@
 
 // ACF includes
 #include <idoc/CStandardDocumentMetaInfo.h>
+#include <ilog/CMessage.h>
 #include <imod/TModelWrap.h>
 #include <iprm/IOptionsList.h>
 #include <istd/CChangeNotifier.h>
@@ -371,7 +372,7 @@ imtbase::ICollectionInfo::Ids CRemoteGqlCollectionController::GetElementIds(
 			int offset,
 			int count,
 			const iprm::IParamsSet* selectionParamsPtr,
-			ilog::IMessageConsumer* /*logPtr*/) const
+			ilog::IMessageConsumer* logPtr) const
 {
 	if (m_gqlClientPtr == nullptr || m_gqlObjectCollectionDelegatePtr == nullptr){
 		return Ids();
@@ -379,15 +380,21 @@ imtbase::ICollectionInfo::Ids CRemoteGqlCollectionController::GetElementIds(
 
 	Ids retVal;
 
+	// An empty list is a selection of nothing only when the server answered it
+	bool isRead = false;
 	GqlRequestPtr requestPtr(m_gqlObjectCollectionDelegatePtr->CreateGetElementListRequest(offset, count, selectionParamsPtr));
 	if (requestPtr.IsValid()){
 		GqlResponsePtr responsePtr = m_gqlClientPtr->SendRequest(requestPtr);
 		if (responsePtr.IsValid()){
 			IGqlObjectCollectionDelegate::Ids ids;
-			if (m_gqlObjectCollectionDelegatePtr->GetItemIds(*responsePtr, ids)){
-				std::copy(ids.begin(), ids.end(), std::back_inserter(retVal));
-			}
+			isRead = m_gqlObjectCollectionDelegatePtr->GetItemIds(*responsePtr, ids);
+			std::copy(ids.begin(), ids.end(), std::back_inserter(retVal));
 		}
+	}
+
+	if (!isRead && logPtr != nullptr){
+		logPtr->AddMessage(ilog::IMessageConsumer::MessagePtr(new ilog::CMessage(
+					istd::IInformationProvider::IC_ERROR, 0, QStringLiteral("The element list could not be read from the server"), "CRemoteGqlCollectionController")));
 	}
 
 	return retVal;

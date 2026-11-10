@@ -60,11 +60,14 @@ public:
 	virtual imtgql::IGqlContextUniquePtr CreateGqlContext(
 				const imtgql::IGqlContext::Headers& headers,
 				imtgql::IGqlContextCreator::ContextCreationError& error) const override;
-	virtual bool IsRevocableToken(const QByteArray& token) const override;
-	virtual ContextCreationStatus CheckToken(const QByteArray& token, QByteArrayList& scopes, QString& errorMessage) const override;
+	virtual imtgql::IGqlContextUniquePtr RenewGqlContext(
+				const imtgql::IGqlContext::Headers& headers,
+				AuthorizationState& state,
+				QString& errorMessage) const override;
+	virtual qint64 GetAuthorizationGeneration() const override;
 
 	// reimplemented (imtauth::IJwtSessionController)
-	virtual bool ValidateSession(const QByteArray& sessionId) const override;
+	virtual bool ValidateSession(const QByteArray& sessionId, bool* isCheckedPtr = nullptr) const override;
 	virtual JwtState ValidateJwt(const QByteArray& jwt) const override;
 	virtual bool RefreshToken(const QByteArray& refreshToken, UserSession& outputData) const override;
 	virtual bool CreateNewSession(const QByteArray& userId, const QByteArray& tenantId, UserSession& outputData) const override;
@@ -84,6 +87,17 @@ protected:
 	virtual void OnUpdate(imod::IModel* modelPtr, const istd::IChangeable::ChangeSet& changeSet) override;
 
 private:
+	// A token read afresh, without the cache
+	struct FreshToken
+	{
+		QByteArray userId;
+		QByteArray tenantId;
+		QByteArrayList scopes;
+		bool isPat = false;
+		QByteArray productId;
+		QByteArray clientProductId;
+	};
+
 	// Organization data of a token
 	struct TokenTenantData
 	{
@@ -112,6 +126,25 @@ private:
 		TokenTenantData tenantData;
 		qint64 tenantDataResolvedAt = 0;
 	};
+
+	/**
+		The context of a request, or with \c isRenewal of an established subscription: then nothing is taken from the cache
+		and an expired access token is accepted while its session lives.
+	*/
+	imtgql::IGqlContextUniquePtr CreateContext(
+				const imtgql::IGqlContext::Headers& headers,
+				bool isRenewal,
+				imtgql::IGqlContextCreator::ContextCreationError& error) const;
+
+	/**
+		Check a token at its store or session controller, without the cache.
+		\param managerPtr	The store of a personal access token or of a server token; not used for a session token.
+	*/
+	bool ResolveFreshToken(
+				const QByteArray& token,
+				const imtauth::IPersonalAccessTokenManager* managerPtr,
+				FreshToken& freshToken,
+				imtgql::IGqlContextCreator::ContextCreationError& error) const;
 
 	bool ResolveUserId(
 				const QByteArray& token,
@@ -148,6 +181,7 @@ private:
 	*/
 	bool ResolveServerToken(
 				const QByteArray& serverToken,
+				bool isRenewal,
 				QByteArray& clientProductId,
 				QByteArrayList& scopes,
 				imtgql::IGqlContextCreator::ContextCreationError& error) const;
@@ -219,9 +253,15 @@ private:
 	/**
 		Records the resolved organization data for 'token' on its existing cache entry (a no-op
 		if the token has no cache entry - callers only reach this after ResolveUserId() has
-		already cached the token).
+		already cached the token, or if the access changed since \c resolutionGeneration).
 	*/
-	void StoreCachedTenantData(const QByteArray& token, const TokenTenantData& tenantData) const;
+	void StoreCachedTenantData(const QByteArray& token, const TokenTenantData& tenantData, qint64 resolutionGeneration) const;
+
+	/// Organization data of the user of a token, read without the cache.
+	TokenTenantData ReadTenantData(const QByteArray& userId, const QByteArray& tenantId) const;
+
+	/// A change of the access: checks started before it are stale, and the organization data of every token is read again.
+	void InvalidateAuthorizationLocked() const;
 	imtgql::IGqlContextUniquePtr CreateContextInstance() const;
 	bool IsPatToken(const QByteArray& token) const;
 

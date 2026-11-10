@@ -78,8 +78,12 @@ private:
 	{
 		QByteArray subscriptionId;
 		imtgql::IGqlSubscriberController* controllerPtr = nullptr;
-		// Every credential is checked; narrowing either token ends the subscription.
-		QMap<QByteArray, QByteArrayList> credentials;
+
+		// The credentials it was registered with, kept here: a client cannot change what its subscription is checked with
+		imtgql::IGqlContext::Headers headers;
+
+		// What its access was decided on; a change ends the subscription
+		QByteArray authorization;
 		const imtrest::IRequest* requestPtr = nullptr;
 
 		// Only compared: the request is destroyed with it
@@ -87,7 +91,12 @@ private:
 	};
 
 	bool IsSubscriberAllowed(const imtgql::IGqlSubscriberController& controller, const imtgql::CGqlRequest& gqlRequest) const;
-	bool ReadCredentials(const imtgql::IGqlContext::Headers& headers, QMap<QByteArray, QByteArrayList>& credentials, QString& errorMessage) const;
+
+	/**
+		Tell whether the access of credentials is still the given one, read afresh.
+		A check the access changed during is repeated a few times.
+	*/
+	bool IsAuthorizationCurrent(const imtgql::IGqlContext::Headers& headers, const QByteArray& authorization, QString& errorMessage) const;
 	void AddTokenSubscription(const TokenSubscription& subscription) const;
 	void CheckTokenSubscriptions() const;
 	void DropTokenSubscription(const TokenSubscription& subscription, const QString& reason) const;

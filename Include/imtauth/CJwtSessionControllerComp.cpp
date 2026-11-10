@@ -15,6 +15,7 @@
 
 // ImtCore includes
 #include <imtbase/CComplexCollectionFilter.h>
+#include <imtauth/CollectionSelection.h>
 #include <imtauth/ISession.h>
 #include <imtauth/imtauth.h>
 
@@ -27,10 +28,21 @@ namespace imtauth
 
 // reimplemented (imtauth::IJwtSessionController)
 
-bool CJwtSessionControllerComp::ValidateSession(const QByteArray& sessionId) const
+bool CJwtSessionControllerComp::ValidateSession(const QByteArray& sessionId, bool* isCheckedPtr) const
 {
+	if (isCheckedPtr != nullptr){
+		*isCheckedPtr = true;
+	}
+
 	ISessionSharedPtr sessionInfoPtr = GetSession(sessionId);
 	if (!sessionInfoPtr.IsValid()){
+		// Only a session the collection reports as absent is gone
+		if (isCheckedPtr != nullptr && m_sessionCollectionCompPtr.IsValid()){
+			bool isRead = false;
+			const QByteArrayList ids = CollectionSelection::SelectIds(*m_sessionCollectionCompPtr, CollectionSelection::ColumnEquals("Id", sessionId), QByteArrayList(), &isRead);
+			*isCheckedPtr = isRead && ids.isEmpty();
+		}
+
 		return false;
 	}
 

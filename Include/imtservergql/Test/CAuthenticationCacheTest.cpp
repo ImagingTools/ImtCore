@@ -153,13 +153,19 @@ void CAuthenticationCacheTest::SubscriptionCheckBypassesCache()
 	CAuthenticationFixture fixture;
 	QVERIFY(fixture.Resolve("imt_pat_first"));
 	fixture.tokens->permissions = {"narrowed"};
-	QByteArrayList scopes;
+	const imtgql::IGqlContext::Headers headers{{imtbase::s_authenticationTokenHeaderId, "imt_pat_first"}};
+	imtgql::IGqlContextCreator::AuthorizationState state = imtgql::IGqlContextCreator::AS_UNAVAILABLE;
 	QString error;
-	QCOMPARE(fixture.authentication->CheckToken("imt_pat_first", scopes, error), imtgql::IGqlContextCreator::CCS_OK);
+	QVERIFY(fixture.authentication->RenewGqlContext(headers, state, error).IsValid());
+	QCOMPARE(state, imtgql::IGqlContextCreator::AS_CONFIRMED);
+	QCOMPARE(fixture.tokens->checks.value("imt_pat_first"), 2);
+
+	// The narrowed token replaces the cached one for the requests too
 	QVERIFY(fixture.Resolve("imt_pat_first"));
 	QCOMPARE(fixture.tokens->checks.value("imt_pat_first"), 3);
 	fixture.tokens->valid = false;
-	QCOMPARE(fixture.authentication->CheckToken("imt_pat_first", scopes, error), imtgql::IGqlContextCreator::CCS_FORBIDDEN);
+	QVERIFY(!fixture.authentication->RenewGqlContext(headers, state, error).IsValid());
+	QCOMPARE(state, imtgql::IGqlContextCreator::AS_DENIED);
 	QCOMPARE(fixture.tokens->checks.value("imt_pat_first"), 4);
 	QVERIFY(!error.isEmpty());
 	QVERIFY(fixture.authentication->GetUserFromJwt("imt_pat_first").isEmpty());
