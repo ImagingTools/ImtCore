@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthdb/CPersonalAccessTokenDatabaseDelegateComp.h>
+#include <imtauthdb/CPersonalAccessTokenSqlPersistence.h>
 
 // Qt includes
 #include <QtCore/QDateTime>
@@ -20,12 +21,82 @@ namespace imtauthdb
 {
 
 
-QString GetSqlResourcePath(const imtdb::IDatabaseEngine& databaseEngine, const QString& fileName)
+bool CPersonalAccessTokenDatabaseDelegateComp::CreateTableIfNeeded()
 {
-	const QByteArray databaseDriverId = databaseEngine.GetDatabaseDriverId();
-	const bool isSqlite = databaseDriverId.compare(QByteArrayLiteral("QSQLITE"), Qt::CaseInsensitive) == 0;
-	const QString prefix = isSqlite ? QStringLiteral(":/SQL/SQLite/") : QStringLiteral(":/SQL/Postgres/");
-	return prefix + fileName;
+	m_isSchemaReady = false;
+	if (!BaseClass::CreateTableIfNeeded() || !m_databaseEngineCompPtr.IsValid()){
+		return false;
+	}
+	CPersonalAccessTokenSqlPersistence persistence(*m_databaseEngineCompPtr);
+	m_isSchemaReady = persistence.EnsureSchema();
+	if (!m_isSchemaReady){
+		SendErrorMessage(0, persistence.GetErrorMessage(), "Token schema migration");
+	}
+
+	return m_isSchemaReady;
+}
+
+
+bool CPersonalAccessTokenDatabaseDelegateComp::CheckSchema() const
+{
+	if (!m_isSchemaReady){
+		SendErrorMessage(0, "The token schema is not ready", "PersonalAccessTokenDatabaseDelegate");
+		return false;
+	}
+	return true;
+}
+
+
+QByteArray CPersonalAccessTokenDatabaseDelegateComp::GetSelectionQuery(
+			const QByteArray& objectId, int offset, int count, const iprm::IParamsSet* paramsPtr) const
+{
+	if (!CheckSchema()){
+		return QByteArray();
+	}
+
+	return BaseClass::GetSelectionQuery(objectId, offset, count, paramsPtr);
+}
+
+
+bool CPersonalAccessTokenDatabaseDelegateComp::RevokeToken(const QByteArray& tokenId)
+{
+	if (!CheckSchema()){
+		return false;
+	}
+	CPersonalAccessTokenSqlPersistence persistence(*m_databaseEngineCompPtr);
+	const bool result = persistence.RevokeToken(tokenId);
+	if (!result){
+		SendErrorMessage(0, persistence.GetErrorMessage(), "RevokeToken");
+	}
+	return result;
+}
+
+
+bool CPersonalAccessTokenDatabaseDelegateComp::SetTokenScopes(const QByteArray& tokenId, const QByteArrayList& scopes)
+{
+	if (!CheckSchema()){
+		return false;
+	}
+	CPersonalAccessTokenSqlPersistence persistence(*m_databaseEngineCompPtr);
+	const bool result = persistence.SetTokenScopes(tokenId, scopes);
+	if (!result){
+		SendErrorMessage(0, persistence.GetErrorMessage(), "SetTokenScopes");
+	}
+	return result;
+}
+
+
+bool CPersonalAccessTokenDatabaseDelegateComp::UpdateLastUsedAt(const QByteArray& tokenId, const QDateTime& usedAt)
+{
+	if (!CheckSchema()){
+		return false;
+	}
+	CPersonalAccessTokenSqlPersistence persistence(*m_databaseEngineCompPtr);
+	const bool result = persistence.UpdateLastUsedAt(tokenId, usedAt);
+	if (!result){
+		SendErrorMessage(0, persistence.GetErrorMessage(), "UpdateLastUsedAt");
+	}
+	return result;
 }
 
 
@@ -33,7 +104,7 @@ istd::IChangeableUniquePtr CPersonalAccessTokenDatabaseDelegateComp::CreateObjec
 		const QSqlRecord& record,
 		const iprm::IParamsSet* /*dataConfigurationPtr*/) const
 {
-	if (!m_databaseEngineCompPtr.IsValid()){
+	if (!CheckSchema() || !m_databaseEngineCompPtr.IsValid()){
 		return nullptr;
 	}
 
@@ -136,7 +207,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CPersonalAccessTokenDatabaseDeleg
 			const istd::IChangeable* valuePtr,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
-	if (typeId.isEmpty() || (typeId != "PersonalAccessToken")){
+	if (!CheckSchema() || typeId.isEmpty() || (typeId != "PersonalAccessToken")){
 		return NewObjectQuery();
 	}
 
@@ -217,6 +288,9 @@ QByteArray CPersonalAccessTokenDatabaseDelegateComp::CreateUpdateObjectQuery(
 	const imtbase::IOperationContext* /*operationContextPtr*/,
 	bool /*useExternDelegate*/) const
 {
+	if (!CheckSchema()){
+		return QByteArray();
+	}
 	const imtauth::IPersonalAccessToken* tokenPtr = dynamic_cast<const imtauth::IPersonalAccessToken*>(&object);
 	if (tokenPtr == nullptr){
 		return QByteArray();
@@ -291,7 +365,7 @@ QByteArray CPersonalAccessTokenDatabaseDelegateComp::CreateDeleteObjectsQuery(
 			const QByteArrayList& objectIds,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
-	if (objectIds.isEmpty()){
+	if (!CheckSchema() || objectIds.isEmpty()){
 		return QByteArray();
 	}
 
@@ -326,7 +400,7 @@ QByteArray CPersonalAccessTokenDatabaseDelegateComp::CreateRenameObjectQuery(
 			const QString& newObjectName,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
-	if (objectId.isEmpty() || newObjectName.isEmpty()){
+	if (!CheckSchema() || objectId.isEmpty() || newObjectName.isEmpty()){
 		return QByteArray();
 	}
 
@@ -347,7 +421,7 @@ QByteArray CPersonalAccessTokenDatabaseDelegateComp::CreateDescriptionObjectQuer
 	const QString& description,
 	const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
-	if (objectId.isEmpty()){
+	if (!CheckSchema() || objectId.isEmpty()){
 		return QByteArray();
 	}
 

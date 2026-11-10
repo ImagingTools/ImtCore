@@ -101,6 +101,21 @@ sdl::V1_0::imtauth::CPublishProductPermissionsPayload CProductPermissionCatalogC
 		snapshotId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
 		snapshot.SetObjectUuid(snapshotId);
 		isStored = !m_snapshotCollectionCompPtr->InsertNewObject("ProductPermissionSnapshot", QString::fromUtf8(productId), QString(), &snapshot, snapshotId).isEmpty();
+		if (!isStored){
+			// A concurrent publisher may have inserted the product's first snapshot.
+			dataPtr.Reset();
+			storedPtr = imtauth::GetProductPermissionSnapshot(*m_snapshotCollectionCompPtr, productId, dataPtr, &isRead, &snapshotId);
+			if (isRead && storedPtr != nullptr){
+				if (storedPtr->GetTreeHash() == hash && storedPtr->GetProductVersion() == version){
+					response.success = true;
+					response.changed = false;
+
+					return response;
+				}
+				snapshot.SetObjectUuid(snapshotId);
+				isStored = m_snapshotCollectionCompPtr->SetObjectData(snapshotId, snapshot);
+			}
+		}
 	}
 	else{
 		snapshot.SetObjectUuid(snapshotId);

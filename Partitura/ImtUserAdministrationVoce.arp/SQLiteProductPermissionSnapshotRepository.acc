@@ -36,7 +36,7 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
-        <Element Id="SnapshotDatabaseDelegate" PackageId="ImtDatabasePck" ComponentId="SqlDatabaseDocumentDelegate">
+        <Element Id="SnapshotDatabaseDelegate" PackageId="ImtAuthDbPck" ComponentId="ProductCatalogDatabaseDelegate">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="AutoCreateTable" Type="Boolean" ExportId="">

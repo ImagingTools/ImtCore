@@ -74,6 +74,12 @@ bool CConnectedClientProductCatalogComp::AddClientProduct(const QByteArray& prod
 	entryPtr->SetProductName(productName);
 
 	if (m_productCollectionCompPtr->InsertNewObject("ConnectedProduct", productName, QString(), entryPtr, objectId).isEmpty()){
+		// Another process may have registered the same logical product after the initial read.
+		isRead = false;
+		if (IsClientProduct(productId, &isRead) && isRead){
+			return true;
+		}
+
 		errorMessage = QStringLiteral("The product '%1' could not be added").arg(QString::fromUtf8(productId));
 
 		return false;

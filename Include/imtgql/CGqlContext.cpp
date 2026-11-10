@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtgql/CGqlContext.h>
 
+#include <QtCore/QSet>
+
 
 // ACF includes
 #include <istd/CChangeNotifier.h>
@@ -186,7 +188,42 @@ void CGqlContext::SetUserInfo(const imtauth::IUserInfo* userInfoPtr)
 		else{
 			m_userInfoPtr.Reset();
 		}
+		m_principalKind = userInfoPtr == nullptr ? PK_ANONYMOUS : PK_USER;
 	}
+}
+
+
+IGqlContext::PrincipalKind CGqlContext::GetPrincipalKind() const
+{
+	return m_principalKind;
+}
+
+
+void CGqlContext::SetPrincipalKind(PrincipalKind kind)
+{
+	istd::CChangeNotifier notifier(this);
+	m_principalKind = kind;
+}
+
+
+bool CGqlContext::HasPermissionBoundary() const
+{
+	return m_hasPermissionBoundary;
+}
+
+
+QByteArrayList CGqlContext::GetPermissionBoundary() const
+{
+	return m_permissionBoundary;
+}
+
+
+void CGqlContext::SetPermissionBoundary(const QByteArrayList& permissions)
+{
+	istd::CChangeNotifier notifier(this);
+	m_permissionBoundary = permissions;
+	m_hasPermissionBoundary = true;
+	ResetImpliedPermissions();
 }
 
 
@@ -239,6 +276,12 @@ imtauth::IUserInfo::FeatureIds CGqlContext::GetImpliedPermissions() const
 						: m_userInfoPtr->GetPermissions(m_productId);
 
 			m_impliedPermissions = imtgql::CollectImpliedPermissions(*this, userPermissions);
+			if (m_hasPermissionBoundary){
+				const QSet<QByteArray> boundary(m_permissionBoundary.cbegin(), m_permissionBoundary.cend());
+				m_impliedPermissions.removeIf([&boundary](const QByteArray& permission){
+					return !boundary.contains(permission);
+				});
+			}
 		}
 	}
 
@@ -377,6 +420,9 @@ bool CGqlContext::CopyFrom(const IChangeable &object, CompatibilityMode /*mode*/
 		m_organizationPermissions = sourcePtr->m_organizationPermissions;
 
 		SetUserInfo(sourcePtr->m_userInfoPtr.GetPtr());
+		m_principalKind = sourcePtr->m_principalKind;
+		m_hasPermissionBoundary = sourcePtr->m_hasPermissionBoundary;
+		m_permissionBoundary = sourcePtr->m_permissionBoundary;
 
 		// Resolved anew for the copy instead of being taken over: the source may
 		// be answering GetImpliedPermissions() on another thread right now.
@@ -418,6 +464,9 @@ bool CGqlContext::ResetData(CompatibilityMode /*mode*/)
 	m_isTenantOwner = false;
 	m_organizationPermissions.clear();
 	m_userInfoPtr.Reset();
+	m_principalKind = PK_ANONYMOUS;
+	m_hasPermissionBoundary = false;
+	m_permissionBoundary.clear();
 
 	ResetImpliedPermissions();
 
@@ -437,4 +486,3 @@ void CGqlContext::ResetImpliedPermissions()
 
 
 } // namespace imtgql
-

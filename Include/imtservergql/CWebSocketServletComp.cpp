@@ -233,8 +233,20 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 		return CreateErrorResponse(QByteArrayLiteral("GraphQL context creator is not configured"), request);
 	}
 
+	QMap<QByteArray, QByteArrayList> credentials;
+	QString credentialError;
+	if (!ReadCredentials(gqlHeaders, credentials, credentialError)){
+		if (requestGuard.isNull()){
+			return imtrest::ConstResponsePtr();
+		}
+		return CreateErrorResponse(credentialError.toUtf8(), request);
+	}
+
 	imtgql::IGqlContextCreator::ContextCreationError contextError;
 	imtgql::IGqlContextUniquePtr gqlContextPtr = m_gqlContextCreatorCompPtr->CreateGqlContext(gqlHeaders, contextError);
+	if (requestGuard.isNull()){
+		return imtrest::ConstResponsePtr();
+	}
 	if (!gqlContextPtr.IsValid()){
 		const QByteArray authToken = gqlHeaders.value(imtbase::s_authenticationTokenHeaderId);
 		const QString maskedToken = authToken.isEmpty()
@@ -296,18 +308,22 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 
 		QString errorMessage;
 		if (subscriberControllerPtr->RegisterSubscription(subscriptionId, gqlRequest, request, errorMessage)){
-			// A token is revoked or narrowed long after the subscription is made, a session ends by itself.
-			// A subscription forwarded by the server of a product lives as long as the token of that server.
-			const QByteArray serverToken = gqlHeaders.value(imtbase::s_serverTokenHeaderId);
-			const QByteArray token = serverToken.isEmpty() ? gqlHeaders.value(imtbase::s_authenticationTokenHeaderId) : serverToken;
-			TokenSubscription subscription;
-			QString tokenError;
-			if (m_gqlContextCreatorCompPtr->IsRevocableToken(token)
-						&& m_gqlContextCreatorCompPtr->CheckToken(token, subscription.scopes, tokenError) == imtgql::IGqlContextCreator::CCS_OK){
+			QMap<QByteArray, QByteArrayList> currentCredentials;
+			const bool isCurrent = ReadCredentials(gqlHeaders, currentCredentials, credentialError) && currentCredentials == credentials;
+			if (requestGuard.isNull()){
+				return imtrest::ConstResponsePtr();
+			}
+			if (!isCurrent){
+				subscriberControllerPtr->UnregisterSubscription(subscriptionId);
+				return CreateErrorResponse(credentialError.isEmpty()
+							? QByteArrayLiteral("The credentials changed during subscription registration") : credentialError.toUtf8(), request);
+			}
+
+			if (!credentials.isEmpty()){
+				TokenSubscription subscription;
 				subscription.subscriptionId = subscriptionId;
 				subscription.controllerPtr = subscriberControllerPtr;
-				subscription.token = token;
-				std::sort(subscription.scopes.begin(), subscription.scopes.end());
+				subscription.credentials = credentials;
 				subscription.requestPtr = &request;
 				subscription.connectionPtr = webSocketRequest->parent();
 
@@ -472,6 +488,26 @@ void CWebSocketServletComp::OnComponentDestroyed()
 
 // private methods
 
+bool CWebSocketServletComp::ReadCredentials(
+			const imtgql::IGqlContext::Headers& headers,
+			QMap<QByteArray, QByteArrayList>& credentials,
+			QString& errorMessage) const
+{
+	for (const QByteArray& header : {imtbase::s_authenticationTokenHeaderId, imtbase::s_serverTokenHeaderId}){
+		const QByteArray token = headers.value(header);
+		if (token.isEmpty() || credentials.contains(token) || !m_gqlContextCreatorCompPtr->IsRevocableToken(token)){
+			continue;
+		}
+		QByteArrayList scopes;
+		if (m_gqlContextCreatorCompPtr->CheckToken(token, scopes, errorMessage) != imtgql::IGqlContextCreator::CCS_OK){
+			return false;
+		}
+		std::sort(scopes.begin(), scopes.end());
+		credentials.insert(token, scopes);
+	}
+	return true;
+}
+
 bool CWebSocketServletComp::IsSubscriberAllowed(
 			const imtgql::IGqlSubscriberController& controller,
 			const imtgql::CGqlRequest& gqlRequest) const
@@ -523,7 +559,9 @@ void CWebSocketServletComp::CheckTokenSubscriptions() const
 
 		QMultiHash<QByteArray, TokenSubscription> subscriptionsOfTokens;
 		for (const TokenSubscription& subscription : subscriptions){
-			subscriptionsOfTokens.insert(subscription.token, subscription);
+			for (auto iter = subscription.credentials.cbegin(); iter != subscription.credentials.cend(); ++iter){
+				subscriptionsOfTokens.insert(iter.key(), subscription);
+			}
 		}
 
 		const QList<QByteArray> tokens = subscriptionsOfTokens.uniqueKeys();
@@ -547,7 +585,7 @@ void CWebSocketServletComp::CheckTokenSubscriptions() const
 				if (isRefused){
 					DropTokenSubscription(subscription, errorMessage);
 				}
-				else if (subscription.scopes != scopes){
+				else if (subscription.credentials.value(token) != scopes){
 					DropTokenSubscription(subscription, QStringLiteral("The permissions of the token have changed"));
 				}
 			}

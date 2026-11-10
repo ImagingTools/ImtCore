@@ -31,6 +31,11 @@ private slots:
 	void testGetTokenIds();
 	void testUpdateLastUsedAt();
 	void testDeleteToken();
+	void testSqlSchemaMigration();
+	void testSqlMigrationRollback();
+	void testSqlAtomicMutations();
+	void testPostgresAtomicMigration();
+	void testDelegateMigratesOnInitialization();
 
 private:
 	QString m_imtCorePath;
@@ -39,5 +44,3 @@ private:
 	istd::TDelPtr<ipackage::CComponentAccessor> m_compositePtr;
 	imtauth::IPersonalAccessTokenManager* m_tokenManagerPtr;
 };
-
-

@@ -203,7 +203,7 @@ private:
 				qint64 jwtExpSecs = 0,
 				const QByteArray& patProductId = QByteArray(),
 				const QByteArray& patClientProductId = QByteArray(),
-				qint64 resolutionStartedAt = 0) const;
+				qint64 resolutionGeneration = 0) const;
 	void StoreExpiredToken(const QByteArray& token) const;
 	void InvalidateTokenCache(const QByteArray& token) const;
 	void InvalidateSessionTokenCache(const QByteArray& sessionId) const;
@@ -245,7 +245,7 @@ private:
 		The user of a forwarded request keeps only the permissions the token holds too, and is no superuser.
 		A server acting on its own is a user holding the permissions of its token.
 	*/
-	void BindToServerToken(imtgql::IGqlContext& gqlContext, const QByteArray& productId, const QByteArray& clientProductId, const QByteArrayList& serverScopes) const;
+	bool BindToServerToken(imtgql::IGqlContext& gqlContext, const QByteArray& productId, const QByteArray& clientProductId, const QByteArrayList& serverScopes) const;
 
 	/**
 		Decode standard claims from a JWT payload without remote calls or
@@ -294,7 +294,9 @@ private:
 	mutable QHash<QByteArray, qint64> m_revokedSessionIds;
 
 	// The same for personal access tokens: when the token managers last changed; a validation started before is not cached
-	mutable qint64 m_lastTokenChangeAt = 0;
+	mutable qint64 m_tokenChangeGeneration = 0;
+	mutable qint64 m_lastGlobalTokenChangeGeneration = 0;
+	mutable QHash<QByteArray, qint64> m_tokenChangeGenerations;
 
 	// Tokens currently being resolved by some thread via ResolveUserId(), so
 	// concurrent callers for the same token can wait for that result instead

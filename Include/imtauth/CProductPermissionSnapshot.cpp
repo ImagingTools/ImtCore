@@ -198,11 +198,24 @@ const CProductPermissionSnapshot* GetProductPermissionSnapshot(
 {
 	bool isRead = false;
 	const QByteArrayList ids = CollectionSelection::SelectIds(snapshotCollection, CollectionSelection::ColumnEquals("ProductId", productId), {"ProductId"}, &isRead);
+	if (!isRead || ids.size() > 1){
+		if (isReadPtr != nullptr){
+			*isReadPtr = false;
+		}
+		if (idPtr != nullptr){
+			idPtr->clear();
+		}
+
+		return nullptr;
+	}
 	const QByteArray snapshotId = ids.isEmpty() ? QByteArray() : ids.first();
 
 	const CProductPermissionSnapshot* snapshotPtr = nullptr;
 	if (!snapshotId.isEmpty() && snapshotCollection.GetObjectData(snapshotId, dataPtr)){
 		snapshotPtr = dynamic_cast<const CProductPermissionSnapshot*>(dataPtr.GetPtr());
+		if (snapshotPtr != nullptr && snapshotPtr->GetProductId() != productId){
+			snapshotPtr = nullptr;
+		}
 	}
 
 	if (isReadPtr != nullptr){

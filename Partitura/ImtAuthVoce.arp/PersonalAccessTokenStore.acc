@@ -27,6 +27,9 @@
                     <AttributeInfo Id="TokenFactory" Type="Factory" ExportId="">
                         <Data IsEnabled="true" Value="PersonalAccessToken"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="TokenPersistence" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PersonalAccessTokenSqlRepository"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

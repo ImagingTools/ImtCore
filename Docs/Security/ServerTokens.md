@@ -2,7 +2,7 @@
 
 A product server that calls another product server proves who it is with a server token.
 The receiving server issues the token for itself only and keeps it.
-The calling server sends the token in the header `x-server-token` with its product in `x-product-id`.
+The calling server sends the token in the header `x-server-token` with its product in `productid`.
 
 ```
 Operator (Agentino or the Puma console)        Receiving server (Puma, Lisa, ...)           Calling server (ProLife, ...)
@@ -13,7 +13,7 @@ Operator (Agentino or the Puma console)        Receiving server (Puma, Lisa, ...
    |                                             <-- token value (only at creation)
    | the value reaches the calling server (Agentino passes it in IMT_<RECEIVER>_SERVER_CREDENTIAL)
    |                                                                                            | request
-   |                                             <------------------ x-server-token, x-product-id
+   |                                             <------------------ x-server-token, productid
    |                                             AuthenticationManager: token issued here, for this client
    |                                             the handlers check the request with the permissions of the token
 ```
@@ -24,14 +24,72 @@ A token holds permissions of the permission tree of the receiver, the same permi
 (Puma: `PumaFeatures.h`, Lisa: `LisaFeatures.h`). There is no list of the commands a server may send:
 the handlers of the receiver check a request through a server as they check any request.
 
-- **A server acting on its own** (its token in the authentication header) is a user without a login whose permissions are
-  those of its token.
+- **A server acting on its own** (its token in the authentication header) has an explicit service principal
+  (`IGqlContext::PK_SERVICE`). Its user-info representation contains only the permissions of its token.
 - **A request a server forwards for its user** (the session of the user and `x-server-token`) holds the permissions of the user
   that the token holds too. A superuser forwarded by a server holds the permissions of the token and is no superuser there.
 - **What a connected product does for itself and its users needs no permission:** signing its users in, their sessions and
   profiles, their notifications and personal tokens, publishing its permission tree, sending notifications to its own users.
   The handlers limit these to the product of the server and to the user of the request.
 - The permissions of a member inside an organization are a mechanism of their own and are not bounded by the token.
+
+User permissions include feature requirements **before** they are intersected with token scopes.
+For example, a user holding `Edit` that requires `View` can use a `View`-only token.
+The resulting context retains an explicit permission boundary: resolving requirements later cannot restore
+permissions outside that boundary. Combining a personal and a server token intersects both boundaries;
+an explicitly empty boundary grants no product permissions. Copying a context preserves its principal and boundary.
+
+## Token storage and automatic migration
+
+`CPersonalAccessTokenDatabaseDelegateComp::CreateTableIfNeeded()` creates a missing table and automatically
+migrates an existing `PersonalAccessTokens` table during component initialization. No separate migration command is needed.
+The migration adds `ClientProductId`, makes `UserId` nullable for service tokens and ensures token-hash and
+client-product indexes exist. It is transactional and repeatable.
+
+SQLite requires a table rebuild to remove the owner constraint. Rows, table constraints, explicit indexes and
+triggers are preserved. An unsupported legacy table definition, duplicate token hashes, or incoming foreign keys
+causes an explicit error and rollback instead of silently discarding data. In particular, incoming foreign keys require
+an explicit migration designed for that schema, to avoid `ON DELETE CASCADE` during the rebuild.
+The delegate refuses token reads and mutations when schema initialization fails.
+
+The standard `PersonalAccessTokenStore` connects `TokenPersistence` to the SQL delegate.
+Revocation, scope changes and usage timestamps use field-specific SQL updates through
+`IPersonalAccessTokenPersistence`; they do not save an earlier copy of the complete token.
+Usage updates cannot broaden scopes or undo revocation, timestamps cannot move backwards,
+and scope changes on revoked tokens are rejected.
+Custom persistent registries must wire this interface too. `InMemoryUpdates=true` is an explicit opt-in
+only for a private in-memory collection; its read/modify/write operations are serialized by the manager.
+
+Rebuild dependent products and component packages together when deploying these changes.
+The C++ context/storage interfaces changed; old binaries must not be mixed with the rebuilt packages.
+Rebuild every ImtCore library imported by the products before relinking their executables, including
+indirect context consumers such as `imtdeskgql`. Product builds can link prebuilt imported libraries
+without rebuilding them; a successful executable link alone does not establish ABI consistency.
+Do not rebuild shared static libraries concurrently with product linkers that read them.
+
+Local token-change notifications carry the token ID. Authentication removes the matching cached entry rather than
+all PAT entries, and a generation check prevents an in-flight lookup from restoring an invalidated entry.
+Unidentified change notifications still invalidate the whole PAT cache. These notifications are process-local;
+they are not a distributed cache invalidation protocol.
+
+## WebSocket credential lifetime
+
+A subscription tracks both the authentication credential and `x-server-token`, when present.
+The credentials are checked before registration and again after the controller registers the subscription.
+A failed second check or changed scopes rolls registration back and produces no success acknowledgement.
+
+The periodic monitor validates credentials afresh, without the HTTP request-token cache.
+Revocation, expiration or changed scopes of either credential closes the subscription.
+JWT sessions are monitored as well as personal and server tokens. The default check interval is 30 seconds,
+so revocation is not an instantaneous interruption of an already running callback.
+An internal validation error rejects a new registration; an established subscription is retained for retry,
+matching the existing availability policy.
+
+## Catalog uniqueness
+
+Product repositories migrate `ProductId` into an indexed physical column and enforce uniqueness of the active
+record while retaining historical revisions. Existing conflicting active IDs abort migration without deleting rows.
+Repair such conflicts explicitly and restart the component. Concurrent initial registrations re-read the winning row.
 
 ## What a receiver is made of
 

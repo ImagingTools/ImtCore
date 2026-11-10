@@ -31,6 +31,21 @@ class IGqlContext: virtual public iser::IObject
 public:
 	typedef QMap<QByteArray,QByteArray> Headers;
 
+	enum PrincipalKind
+	{
+		PK_ANONYMOUS,
+		PK_USER,
+		PK_SERVICE
+	};
+
+	virtual PrincipalKind GetPrincipalKind() const = 0;
+	virtual void SetPrincipalKind(PrincipalKind kind) = 0;
+
+	// An explicit empty boundary grants nothing; an unset boundary does not restrict permissions.
+	virtual bool HasPermissionBoundary() const = 0;
+	virtual QByteArrayList GetPermissionBoundary() const = 0;
+	virtual void SetPermissionBoundary(const QByteArrayList& permissions) = 0;
+
 	virtual QByteArray GetProductId() const = 0;
 	virtual void SetProductId(const QByteArray& productId) = 0;
 

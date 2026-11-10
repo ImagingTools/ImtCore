@@ -20,6 +20,11 @@ public:
 	~CGqlContext();
 
 	// reimplemented (IGqlContext)
+	virtual PrincipalKind GetPrincipalKind() const override;
+	virtual void SetPrincipalKind(PrincipalKind kind) override;
+	virtual bool HasPermissionBoundary() const override;
+	virtual QByteArrayList GetPermissionBoundary() const override;
+	virtual void SetPermissionBoundary(const QByteArrayList& permissions) override;
 	virtual QByteArray GetProductId() const override;
 	virtual void SetProductId(const QByteArray& productId) override;
 	virtual QByteArray GetServerProductId() const override;
@@ -67,6 +72,9 @@ private:
 	void ResetImpliedPermissions();
 
 private:
+	PrincipalKind m_principalKind = PK_ANONYMOUS;
+	bool m_hasPermissionBoundary = false;
+	QByteArrayList m_permissionBoundary;
 	QByteArray m_userId;
 	QByteArray m_tenantId;
 	QByteArray m_productId;
@@ -97,4 +105,3 @@ private:
 
 
 } // namespace imtgql
-

@@ -78,9 +78,8 @@ private:
 	{
 		QByteArray subscriptionId;
 		imtgql::IGqlSubscriberController* controllerPtr = nullptr;
-		QByteArray token;
-		// Sorted; the subscription ends when the token holds other permissions
-		QByteArrayList scopes;
+		// Every credential is checked; narrowing either token ends the subscription.
+		QMap<QByteArray, QByteArrayList> credentials;
 		const imtrest::IRequest* requestPtr = nullptr;
 
 		// Only compared: the request is destroyed with it
@@ -88,6 +87,7 @@ private:
 	};
 
 	bool IsSubscriberAllowed(const imtgql::IGqlSubscriberController& controller, const imtgql::CGqlRequest& gqlRequest) const;
+	bool ReadCredentials(const imtgql::IGqlContext::Headers& headers, QMap<QByteArray, QByteArrayList>& credentials, QString& errorMessage) const;
 	void AddTokenSubscription(const TokenSubscription& subscription) const;
 	void CheckTokenSubscriptions() const;
 	void DropTokenSubscription(const TokenSubscription& subscription, const QString& reason) const;
@@ -114,4 +114,3 @@ private:
 
 
 } // namespace imtservergql
-

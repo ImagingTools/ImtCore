@@ -36,7 +36,7 @@ public:
 				ContextCreationError& error) const = 0;
 
 	/**
-		Tell whether the token lives until it is revoked, so what it holds must be checked again later.
+		Tell whether the credential needs periodic validation for revocation, expiration or permission changes.
 	*/
 	virtual bool IsRevocableToken(const QByteArray& token) const = 0;
 

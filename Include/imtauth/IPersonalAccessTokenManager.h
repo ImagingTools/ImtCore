@@ -28,6 +28,13 @@ namespace imtauth
 class IPersonalAccessTokenManager: virtual public iser::ISerializable
 {
 public:
+	enum ChangeFlags
+	{
+		CF_TOKEN_CHANGED = 0x638001
+	};
+
+	static constexpr const char* CN_TOKEN_ID = "TokenId";
+
 	/**
 		Result structure returned by CreateToken operation.
 	*/
@@ -151,5 +158,4 @@ public:
 
 
 } // namespace imtauth
-
 

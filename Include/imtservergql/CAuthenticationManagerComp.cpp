@@ -229,40 +229,11 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 		}
 
 		if (isPat){
-			// For PAT: restrict the user's permissions to the intersection with the
-			// token's scopes. GetPermissions() now returns role- and local-permission
-			// derived permissions combined, so writing the intersection into local
-			// permissions (after stripping roles/groups) is enough to make
-			// GetPermissions() - the method every permission check in this codebase
-			// actually reads - report exactly that intersection. An empty scope list
-			// yields zero permissions (fail closed), not the full unrestricted user.
-			imtauth::IUserInfo::FeatureIds fullPermissions = userInfoPtr->GetPermissions(productId);
-			imtauth::IUserInfo::FeatureIds effectivePermissions;
-			for (const QByteArray& perm : fullPermissions){
-				if (imtauth::HasPermission(scopes, perm, false)){
-					effectivePermissions.append(perm);
-				}
-			}
-
-			istd::IChangeableUniquePtr clonedPtr = userInfoPtr->CloneMe();
-			imtauth::IUserInfo* mutableUserPtr = dynamic_cast<imtauth::IUserInfo*>(clonedPtr.GetPtr());
-			if (mutableUserPtr != nullptr){
-				// Strip roles/groups so no other code path can expand them back into
-				// unrestricted permissions; only the explicit scoped list applies.
-				const QByteArrayList products = mutableUserPtr->GetProducts();
-				for (const QByteArray& prod : products){
-					mutableUserPtr->SetRoles(prod, imtauth::IUserBaseInfo::RoleIds());
-				}
-				const imtauth::IUserGroupInfo::GroupIds groupIds = mutableUserPtr->GetGroups();
-				for (const QByteArray& groupId : groupIds){
-					mutableUserPtr->RemoveFromGroup(groupId);
-				}
-				mutableUserPtr->SetLocalPermissions(productId, effectivePermissions);
-
-				gqlContextPtr->SetUserInfo(mutableUserPtr);
-			}
-			else{
-				gqlContextPtr->SetUserInfo(nullptr);
+			gqlContextPtr->SetUserInfo(userInfoPtr);
+			if (!imtgql::RestrictUserPermissions(*gqlContextPtr, scopes)){
+				imtgql::CGqlRequestContextManager::Clear();
+				SetError(error, imtgql::IGqlContextCreator::CCS_INTERNAL_ERROR, QStringLiteral("Unable to restrict personal token permissions."));
+				return nullptr;
 			}
 		}
 		else{
@@ -294,7 +265,11 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 
 	// A request through the server of a product holds no more than the token of that server: the handlers check it as usual
 	if (!serverProductId.isEmpty()){
-		BindToServerToken(*gqlContextPtr, productId, clientProductId, serverScopes);
+		if (!BindToServerToken(*gqlContextPtr, productId, clientProductId, serverScopes)){
+			imtgql::CGqlRequestContextManager::Clear();
+			SetError(error, imtgql::IGqlContextCreator::CCS_INTERNAL_ERROR, QStringLiteral("Unable to restrict server token permissions."));
+			return nullptr;
+		}
 	}
 
 	if (!foreignProductId.isEmpty()){
@@ -627,13 +602,22 @@ void CAuthenticationManagerComp::OnComponentDestroyed()
 
 // reimplemented (imod::CMultiModelObserverBase)
 
-void CAuthenticationManagerComp::OnUpdate(imod::IModel* /*modelPtr*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
+void CAuthenticationManagerComp::OnUpdate(imod::IModel* /*modelPtr*/, const istd::IChangeable::ChangeSet& changeSet)
 {
 	QMutexLocker cacheLocker(&m_tokenCacheMutex);
-	m_lastTokenChangeAt = QDateTime::currentMSecsSinceEpoch();
+	const QByteArray tokenId = changeSet.Contains(imtauth::IPersonalAccessTokenManager::CF_TOKEN_CHANGED)
+				? changeSet.GetChangeInfo(imtauth::IPersonalAccessTokenManager::CN_TOKEN_ID).toByteArray() : QByteArray();
+	++m_tokenChangeGeneration;
+	if (tokenId.isEmpty()){
+		m_lastGlobalTokenChangeGeneration = m_tokenChangeGeneration;
+	}
+	else if (!m_tokensBeingResolved.isEmpty()){
+		m_tokenChangeGenerations.insert(tokenId, m_tokenChangeGeneration);
+	}
 
 	for (auto iter = m_tokenCache.begin(); iter != m_tokenCache.end(); ){
-		iter = iter->isPat ? m_tokenCache.erase(iter) : std::next(iter);
+		iter = iter->isPat && (tokenId.isEmpty() || iter->tokenId.isEmpty() || iter->tokenId == tokenId)
+					? m_tokenCache.erase(iter) : std::next(iter);
 	}
 }
 
@@ -762,7 +746,11 @@ bool CAuthenticationManagerComp::ResolveToken(
 		QByteArray tokenProductId;
 		QByteArray tokenClientProductId;
 		bool isCheckFailed = false;
-		const qint64 resolutionStartedAt = QDateTime::currentMSecsSinceEpoch();
+		qint64 resolutionGeneration;
+		{
+			QMutexLocker locker(&m_tokenCacheMutex);
+			resolutionGeneration = m_tokenChangeGeneration;
+		}
 		if (!patManagerPtr->ValidateToken(token, userId, tokenId, scopes, &tokenProductId, &tokenClientProductId, &isCheckFailed)){
 			errorMessage = isCheckFailed ? QStringLiteral("The personal access token could not be checked.") : QStringLiteral("Invalid personal access token.");
 			status = isCheckFailed ? imtgql::IGqlContextCreator::CCS_INTERNAL_ERROR : imtgql::IGqlContextCreator::CCS_FORBIDDEN;
@@ -781,7 +769,7 @@ bool CAuthenticationManagerComp::ResolveToken(
 			return false;
 		}
 
-		StoreCachedToken(token, userId, tenantId, tokenId, scopes, true, 0, tokenProductId, tokenClientProductId, resolutionStartedAt);
+		StoreCachedToken(token, userId, tenantId, tokenId, scopes, true, 0, tokenProductId, tokenClientProductId, resolutionGeneration);
 		return true;
 	}
 
@@ -969,6 +957,9 @@ void CAuthenticationManagerComp::ReleaseTokenResolutionClaim(const QByteArray& t
 {
 	QMutexLocker cacheLocker(&m_tokenCacheMutex);
 	m_tokensBeingResolved.remove(token);
+	if (m_tokensBeingResolved.isEmpty()){
+		m_tokenChangeGenerations.clear();
+	}
 	m_tokenResolutionWaitCondition.wakeAll();
 }
 
@@ -983,7 +974,7 @@ void CAuthenticationManagerComp::StoreCachedToken(
 			qint64 jwtExpSecs,
 			const QByteArray& patProductId,
 			const QByteArray& patClientProductId,
-			qint64 resolutionStartedAt) const
+			qint64 resolutionGeneration) const
 {
 	TokenCacheEntry entry;
 	entry.patProductId = patProductId;
@@ -1026,7 +1017,8 @@ void CAuthenticationManagerComp::StoreCachedToken(
 	}
 
 	// The same for a validation that started before a token was revoked or changed
-	if (isPat && resolutionStartedAt <= m_lastTokenChangeAt){
+	if (isPat && (resolutionGeneration < m_lastGlobalTokenChangeGeneration
+				|| resolutionGeneration < m_tokenChangeGenerations.value(tokenId))){
 		return;
 	}
 
@@ -1088,12 +1080,64 @@ void CAuthenticationManagerComp::StoreExpiredToken(const QByteArray& token) cons
 
 imtgql::IGqlContextCreator::ContextCreationStatus CAuthenticationManagerComp::CheckToken(const QByteArray& token, QByteArrayList& scopes, QString& errorMessage) const
 {
-	QByteArray userId;
-	QByteArray tenantId;
-	bool isPat = false;
-	ContextCreationStatus status = CCS_OK;
+	scopes.clear();
+	if (!IsPatToken(token)){
+		const JwtState state = m_slaveJwtSessionControllerCompPtr.IsValid()
+					? m_slaveJwtSessionControllerCompPtr->ValidateJwt(token) : JwtState::JS_NONE;
+		if (state == JwtState::JS_OK){
+			return CCS_OK;
+		}
+		// An expired access token keeps an established subscription while its session lives
+		if (state == JwtState::JS_EXPIRED
+					&& m_slaveJwtSessionControllerCompPtr->ValidateSession(m_slaveJwtSessionControllerCompPtr->GetSessionFromJwt(token))){
+			return CCS_OK;
+		}
+		if (state != JwtState::JS_NONE){
+			InvalidateTokenCache(token);
+		}
+		errorMessage = state == JwtState::JS_NONE ? QStringLiteral("Session validation is unavailable") : QStringLiteral("The session is no longer valid");
+		return state == JwtState::JS_NONE ? CCS_INTERNAL_ERROR : CCS_UNAUTHORIZED;
+	}
 
-	return ResolveUserId(token, userId, tenantId, scopes, isPat, errorMessage, status) ? CCS_OK : status;
+	const bool isServer = imtauth::IsServerToken(token);
+	imtauth::IPersonalAccessTokenManager* managerPtr = isServer
+				? (m_serverTokenReceiverCompPtr.IsValid() ? m_serverTokenReceiverCompPtr->GetTokenManager() : nullptr)
+				: m_patManagerCompPtr.GetPtr();
+	if (managerPtr == nullptr){
+		errorMessage = QStringLiteral("The token store is not configured");
+		return CCS_INTERNAL_ERROR;
+	}
+	QByteArray userId;
+	QByteArray tokenId;
+	QByteArray productId;
+	QByteArray clientProductId;
+	bool failed = false;
+	// Subscription checks must observe expiration and revocation without the request cache.
+	if (!managerPtr->ValidateToken(token, userId, tokenId, scopes, &productId, &clientProductId, &failed)){
+		if (!failed){
+			InvalidateTokenCache(token);
+		}
+		errorMessage = failed ? QStringLiteral("The token could not be checked") : QStringLiteral("The token is revoked, expired or unknown");
+		return failed ? CCS_INTERNAL_ERROR : CCS_FORBIDDEN;
+	}
+	if (isServer != !clientProductId.isEmpty() || (isServer && productId != m_serverTokenReceiverCompPtr->GetServerProductId())){
+		InvalidateTokenCache(token);
+		errorMessage = QStringLiteral("The token is not valid for this server");
+		return CCS_FORBIDDEN;
+	}
+	{
+		QMutexLocker locker(&m_tokenCacheMutex);
+		if (m_tokensBeingResolved.contains(token)){
+			m_tokenChangeGenerations.insert(tokenId, ++m_tokenChangeGeneration);
+		}
+		auto cached = m_tokenCache.find(token);
+		// A remote store has no local change notification. Do not register with an older, broader context.
+		if (cached != m_tokenCache.end() && (cached->userId != userId || cached->tokenId != tokenId
+					|| cached->scopes != scopes || cached->patProductId != productId || cached->patClientProductId != clientProductId)){
+			m_tokenCache.erase(cached);
+		}
+	}
+	return CCS_OK;
 }
 
 
@@ -1127,13 +1171,17 @@ bool CAuthenticationManagerComp::ResolveServerToken(
 
 bool CAuthenticationManagerComp::IsRevocableToken(const QByteArray& token) const
 {
-	return IsPatToken(token);
+	return !token.isEmpty();
 }
 
 
 void CAuthenticationManagerComp::InvalidateTokenCache(const QByteArray& token) const
 {
 	QMutexLocker cacheLocker(&m_tokenCacheMutex);
+	if (IsPatToken(token) && m_tokensBeingResolved.contains(token)){
+		// An invalid remote token may not reveal its ID; reject outstanding PAT cache fills conservatively.
+		m_lastGlobalTokenChangeGeneration = ++m_tokenChangeGeneration;
+	}
 	m_tokenCache.remove(token);
 	m_expiredTokenCache.remove(token);
 }
@@ -1242,49 +1290,27 @@ qint64 CAuthenticationManagerComp::GetJwtExpirationSecs(const QByteArray& jwt) c
 }
 
 
-void CAuthenticationManagerComp::BindToServerToken(
+bool CAuthenticationManagerComp::BindToServerToken(
 			imtgql::IGqlContext& gqlContext,
 			const QByteArray& productId,
 			const QByteArray& clientProductId,
 			const QByteArrayList& serverScopes) const
 {
-	// A plain user info: whatever the source, it is no superuser
-	imtauth::CIdentifiableUserInfo boundUserInfo;
-
 	const imtauth::IUserInfo* userInfoPtr = gqlContext.GetUserInfo();
 	if (userInfoPtr != nullptr){
-		// The superuser may do anything: through a server, what its token holds
-		imtauth::IUserInfo::FeatureIds permissions = userInfoPtr->IsAdmin() ? serverScopes : imtauth::IUserInfo::FeatureIds();
-		if (!userInfoPtr->IsAdmin()){
-			for (const QByteArray& permission : userInfoPtr->GetPermissions(productId)){
-				if (imtauth::HasPermission(serverScopes, permission, false)){
-					permissions.append(permission);
-				}
-			}
-		}
-
-		boundUserInfo.CopyFrom(*userInfoPtr);
-
-		// Only the explicit list applies: roles and groups would expand it again
-		for (const QByteArray& userProductId : boundUserInfo.GetProducts()){
-			boundUserInfo.SetRoles(userProductId, imtauth::IUserBaseInfo::RoleIds());
-			boundUserInfo.SetLocalPermissions(userProductId, imtauth::IUserInfo::FeatureIds());
-		}
-		for (const QByteArray& groupId : boundUserInfo.GetGroups()){
-			boundUserInfo.RemoveFromGroup(groupId);
-		}
-		boundUserInfo.SetLocalPermissions(productId, permissions);
+		return imtgql::RestrictUserPermissions(gqlContext, serverScopes);
 	}
 	else if (!clientProductId.isEmpty()){
+		imtauth::CIdentifiableUserInfo boundUserInfo;
 		boundUserInfo.SetName(QString::fromUtf8(clientProductId));
 		boundUserInfo.SetEnabled(true);
 		boundUserInfo.SetLocalPermissions(productId, serverScopes);
-	}
-	else{
-		return;
+		gqlContext.SetUserInfo(&boundUserInfo);
+		gqlContext.SetPermissionBoundary(serverScopes);
+		gqlContext.SetPrincipalKind(imtgql::IGqlContext::PK_SERVICE);
 	}
 
-	gqlContext.SetUserInfo(&boundUserInfo);
+	return true;
 }
 
 

@@ -153,6 +153,7 @@ public:
 	virtual bool ClearDependentMetaInfo(const MetaFieldCleanupPlan& metaInfo) const override;
 
 protected:
+	virtual QVariantMap GetAdditionalInsertValues(const istd::IChangeable& object) const;
 	virtual QByteArray PrepareInsertNewObjectQuery(
 				const QByteArray& typeId,
 				const QByteArray& objectId,

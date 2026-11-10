@@ -9,6 +9,7 @@
 #include <imtauth/imtauth.h>
 #include <imtauth/CUserInfo.h>
 #include <imtgql/CGqlContext.h>
+#include <imtgql/imtgql.h>
 #include <imtlic/CFeatureInfo.h>
 #include <imtlic/CProductInfo.h>
 #include <imtlicgql/imtlicgql.h>
@@ -343,6 +344,71 @@ void CPermissionRequirementsTest::testBareIdIsNeverHeld()
 }
 
 
+void CPermissionRequirementsTest::testRequirementsBeforeTokenIntersection()
+{
+	imtlic::CProductInfo productInfo;
+	SetupProduct(productInfo, {{s_changeUser, {s_viewUsers}}, {s_viewUsers, {s_viewRevisions}}});
+	imtauth::CIdentifiableUserInfo user;
+	user.SetLocalPermissions("Lisa", {s_changeUser});
+	user.SetLocalPermissions("Other", {s_changeRole});
+	imtgql::CGqlContext context;
+	context.SetProductId("Lisa");
+	context.SetProductInfo(&productInfo);
+	context.SetUserInfo(&user);
+	QVERIFY(imtgql::RestrictUserPermissions(context, {s_viewUsers}));
+	QCOMPARE(context.GetUserInfo()->GetPermissions("Lisa"), QByteArrayList{s_viewUsers});
+	QVERIFY(context.GetUserInfo()->GetPermissions("Other").isEmpty());
+	QVERIFY(context.GetImpliedPermissions().isEmpty());
+	QCOMPARE(context.GetPrincipalKind(), imtgql::IGqlContext::PK_USER);
+}
+
+
+void CPermissionRequirementsTest::testTokenBoundaryCannotExpand()
+{
+	imtlic::CProductInfo productInfo;
+	SetupProduct(productInfo, {{s_changeUser, {s_viewUsers}}, {s_viewUsers, {s_viewRevisions}}});
+	imtauth::CIdentifiableUserInfo user;
+	user.SetLocalPermissions("Lisa", {s_changeUser});
+	imtgql::CGqlContext context;
+	context.SetProductId("Lisa");
+	context.SetProductInfo(&productInfo);
+	context.SetUserInfo(&user);
+	QVERIFY(imtgql::RestrictUserPermissions(context, {s_viewUsers, s_viewRevisions}));
+	QVERIFY(imtgql::RestrictUserPermissions(context, {s_changeUser, s_viewUsers}));
+	QCOMPARE(context.GetUserInfo()->GetPermissions("Lisa"), QByteArrayList{s_viewUsers});
+	QVERIFY(context.GetImpliedPermissions().isEmpty());
+	QCOMPARE(context.GetPermissionBoundary(), QByteArrayList{s_viewUsers});
+	QVERIFY(imtgql::RestrictUserPermissions(context, {}));
+	QVERIFY(context.HasPermissionBoundary());
+	QVERIFY(context.GetUserInfo()->GetPermissions("Lisa").isEmpty());
+	QVERIFY(context.GetImpliedPermissions().isEmpty());
+	QVERIFY(imtgql::RestrictUserPermissions(context, {s_changeUser}));
+	QVERIFY(context.GetUserInfo()->GetPermissions("Lisa").isEmpty());
+}
+
+
+void CPermissionRequirementsTest::testPrincipalAndBoundaryCopyReset()
+{
+	imtauth::CIdentifiableUserInfo service;
+	service.SetLocalPermissions("Lisa", {s_viewUsers});
+	imtgql::CGqlContext context;
+	context.SetUserInfo(&service);
+	context.SetPrincipalKind(imtgql::IGqlContext::PK_SERVICE);
+	context.SetServerProductId("Sender");
+	context.SetPermissionBoundary({});
+	imtgql::CGqlContext copy;
+	QVERIFY(copy.CopyFrom(context));
+	QCOMPARE(copy.GetPrincipalKind(), imtgql::IGqlContext::PK_SERVICE);
+	QCOMPARE(imtgql::GetSenderServerProductId(copy), QByteArray("Sender"));
+	QVERIFY(copy.HasPermissionBoundary());
+	QVERIFY(copy.GetPermissionBoundary().isEmpty());
+	QVERIFY(copy.ResetData());
+	QCOMPARE(copy.GetPrincipalKind(), imtgql::IGqlContext::PK_ANONYMOUS);
+	QVERIFY(!copy.HasPermissionBoundary());
+	QVERIFY(imtgql::GetSenderServerProductId(copy).isEmpty());
+}
+
+
 void CPermissionRequirementsTest::testBareIdIsNeverRequested()
 {
 	const QByteArrayList userPermissions{s_changeUser};
@@ -419,5 +485,4 @@ void CPermissionRequirementsTest::testIsPermissionSurvivesCopy()
 
 
 I_ADD_TEST(CPermissionRequirementsTest);
-
 
