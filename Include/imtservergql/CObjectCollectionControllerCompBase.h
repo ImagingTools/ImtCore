@@ -377,9 +377,6 @@ protected:
 	virtual bool OnBeforeRemoveElements(const QByteArrayList& elementIds, const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual void OnAfterRemoveElements(const QByteArrayList& elementIds, const imtgql::CGqlRequest& gqlRequest) const;
 
-	// Called with the object deserialized from a SetObjectData request before it replaces the stored one. By returning False, you can prevent the update.
-	virtual bool OnBeforeSetObjectData(const QByteArray& objectId, istd::IChangeable& object, const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-
 	virtual bool OnBeforeSetObjectName(const QByteArray& objectId, QString& newName, const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual void OnAfterSetObjectName(const QByteArray& objectId, const QString& oldName, const QString& newName, const imtgql::CGqlRequest& gqlRequest) const;
 

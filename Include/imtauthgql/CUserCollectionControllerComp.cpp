@@ -4,7 +4,6 @@
 
 // Qt includes
 #include <QSet>
-#include <QtCore/QMutexLocker>
 
 // ACF includes
 #include <iprm/CTextParam.h>
@@ -29,29 +28,6 @@
 
 namespace imtauthgql
 {
-
-
-sdl::V1_0::imtbase::CSetObjectDataPayload CUserCollectionControllerComp::OnSetObjectData(
-			const sdl::V1_0::imtbase::CSetObjectDataGqlRequest& setObjectDataRequest,
-			const imtgql::CGqlRequest& gqlRequest,
-			QString& errorMessage) const
-{
-	const imtgql::CGqlParamObject* input = gqlRequest.GetParamObject("input");
-	QByteArray objectId = input != nullptr ? input->GetParamArgumentValue("objectId").toByteArray() : QByteArray();
-	QMutexLocker locker(&imtauth::CUserBaseInfo::GetUserUpdateMutex(objectId));
-	return BaseClass::OnSetObjectData(setObjectDataRequest, gqlRequest, errorMessage);
-}
-
-
-QJsonObject CUserCollectionControllerComp::UpdateObject(
-			const imtgql::CGqlRequest& gqlRequest,
-			QString& errorMessage) const
-{
-	const imtgql::CGqlParamObject* input = gqlRequest.GetParamObject("input");
-	QByteArray objectId = input != nullptr ? input->GetParamArgumentValue("id").toByteArray() : QByteArray();
-	QMutexLocker locker(&imtauth::CUserBaseInfo::GetUserUpdateMutex(objectId));
-	return BaseClass::UpdateObject(gqlRequest, errorMessage);
-}
 
 
 // protected methods
@@ -188,9 +164,7 @@ bool CUserCollectionControllerComp::FillObjectFromRepresentation(
 		userInfoPtr->SetRoles(productId, roleIds);
 	}
 	else{
-		const QByteArrayList directoryRoles = userInfoPtr->GetDirectoryRoles(productId);
 		userInfoPtr->RemoveProduct(productId);
-		userInfoPtr->SetDirectoryRoles(productId, directoryRoles);
 	}
 
 	const QByteArrayList groupIds = CAssignmentCollector::GetDirectIds(representation.groups);
@@ -879,40 +853,6 @@ QJsonObject CUserCollectionControllerComp::InsertObject(
 
 
 // reimplemented (imtservergql::CObjectCollectionControllerCompBase)
-bool CUserCollectionControllerComp::OnBeforeSetObjectData(
-			const QByteArray& objectId,
-			istd::IChangeable& object,
-			const ::imtgql::CGqlRequest& gqlRequest,
-			QString& errorMessage) const
-{
-	if (!BaseClass::OnBeforeSetObjectData(objectId, object, gqlRequest, errorMessage)){
-		return false;
-	}
-
-	imtauth::CUserBaseInfo* userInfoPtr = dynamic_cast<imtauth::CUserBaseInfo*>(&object);
-	if (userInfoPtr == nullptr){
-		return true;
-	}
-
-	// Directory grants are owned by the credential sign-in, so the incoming ones are replaced by the stored ones.
-	// OnSetObjectData holds the update lock of the user while the object is read and written.
-	imtbase::IObjectCollection::DataPtr storedDataPtr;
-	const imtauth::CUserBaseInfo* storedUserPtr = nullptr;
-	if (m_objectCollectionCompPtr->GetObjectData(objectId, storedDataPtr)){
-		storedUserPtr = dynamic_cast<const imtauth::CUserBaseInfo*>(storedDataPtr.GetPtr());
-	}
-
-	if (storedUserPtr == nullptr){
-		errorMessage = QStringLiteral("Unable to set object data. Error: User '%1' could not be read").arg(QString::fromUtf8(objectId));
-		return false;
-	}
-
-	userInfoPtr->CopyDirectoryRolesFrom(*storedUserPtr);
-
-	return true;
-}
-
-
 bool CUserCollectionControllerComp::OnBeforeRemoveElements(const QByteArrayList& elementIds, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (m_tenantManagerCompPtr.IsValid()){

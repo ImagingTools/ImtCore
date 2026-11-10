@@ -62,10 +62,6 @@ protected:
 				const sdl::V1_0::imtbase::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::V1_0::imtbase::CSetObjectDataPayload OnSetObjectData(
-				const sdl::V1_0::imtbase::CSetObjectDataGqlRequest& setObjectDataRequest,
-				const ::imtgql::CGqlRequest& gqlRequest,
-				QString& errorMessage) const override;
 	virtual sdl::V1_0::imtbase::CGetElementMetaInfoPayload OnGetElementMetaInfo(
 				const sdl::V1_0::imtbase::CGetElementMetaInfoGqlRequest& getElementMetaInfoRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
@@ -120,12 +116,10 @@ protected:
 
 	// reimplemented (imtservergql::CPermissibleGqlRequestHandlerComp)
 	virtual bool CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
-	virtual QJsonObject UpdateObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 	// reimplemented (imtservergql::CObjectCollectionControllerCompBase) for tenant-dependent cleanup
 	virtual bool OnBeforeRemoveElements(const QByteArrayList& elementIds, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual void OnAfterRemoveElements(const QByteArrayList& elementIds, const ::imtgql::CGqlRequest& gqlRequest) const override;
-	virtual bool OnBeforeSetObjectData(const QByteArray& objectId, istd::IChangeable& object, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 protected:
 	I_REF(imtauth::IRoleInfoProvider, m_roleInfoProviderCompPtr);
@@ -145,4 +139,5 @@ protected:
 
 
 } // namespace imtauthgql
+
 

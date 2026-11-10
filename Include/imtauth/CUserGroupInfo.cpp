@@ -13,6 +13,7 @@
 #include <iser/CPrimitiveTypesSerializer.h>
 
 // ImtCore includes
+#include <imtcore/Version.h>
 #include <imtauth/IUserGroupInfoProvider.h>
 
 
@@ -123,6 +124,42 @@ const imtauth::IUserInfoProvider* CUserGroupInfo::GetUserProvider() const
 }
 
 
+IUserBaseInfo::SystemInfoList CUserGroupInfo::GetSystemInfos() const
+{
+	return m_systemInfos;
+}
+
+
+bool CUserGroupInfo::AddToSystem(SystemInfo systemInfo)
+{
+	if (m_systemInfos.contains(systemInfo)){
+		return false;
+	}
+
+	istd::CChangeNotifier changeNotifier(this);
+
+	m_systemInfos << systemInfo;
+
+	return true;
+}
+
+
+bool CUserGroupInfo::RemoveFromSystem(const QByteArray& systemId)
+{
+	for (qsizetype index = 0; index < m_systemInfos.size(); ++index){
+		if (m_systemInfos[index].systemId == systemId){
+			istd::CChangeNotifier changeNotifier(this);
+
+			m_systemInfos.removeAt(index);
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
 // reimplemented (IUserBaseInfo)
 
 IUserBaseInfo::FeatureIds CUserGroupInfo::GetPermissions(const QByteArray& productId) const
@@ -172,6 +209,63 @@ bool CUserGroupInfo::Serialize(iser::IArchive &archive)
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_userIds, "Users", "User");
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_parentGroupIds, "ParentGroups", "ParentGroup");
 
+	const iser::IVersionInfo& versionInfo = archive.GetVersionInfo();
+	quint32 imtCoreVersion;
+	if (!versionInfo.GetVersionNumber(imtcore::VI_IMTCORE, imtCoreVersion)){
+		imtCoreVersion = 0;
+	}
+
+	if (imtCoreVersion >= 23950){
+		int count = m_systemInfos.size();
+
+		if (!archive.IsStoring()){
+			m_systemInfos.clear();
+			count = 0;
+		}
+
+		iser::CArchiveTag infosTag("SystemInfos", "System infos", iser::CArchiveTag::TT_MULTIPLE);
+		iser::CArchiveTag infoTag("SystemInfo", "System info", iser::CArchiveTag::TT_GROUP, &infosTag);
+
+		retVal = retVal && archive.BeginMultiTag(infosTag, infoTag, count);
+		for (int index = 0; index < count; index++){
+			retVal = retVal && archive.BeginTag(infoTag);
+
+			SystemInfo systemInfo;
+
+			if (archive.IsStoring()){
+				systemInfo = m_systemInfos[index];
+			}
+
+			iser::CArchiveTag systemIdTag("SystemId", "System-ID", iser::CArchiveTag::TT_LEAF);
+			retVal = retVal && archive.BeginTag(systemIdTag);
+			retVal = retVal && archive.Process(systemInfo.systemId);
+			retVal = retVal && archive.EndTag(systemIdTag);
+
+			iser::CArchiveTag systemNameTag("SystemName", "System Name", iser::CArchiveTag::TT_LEAF);
+			retVal = retVal && archive.BeginTag(systemNameTag);
+			retVal = retVal && archive.Process(systemInfo.systemName);
+			retVal = retVal && archive.EndTag(systemNameTag);
+
+			iser::CArchiveTag systemEnabledTag("Enabled", "System enabled", iser::CArchiveTag::TT_LEAF);
+			retVal = retVal && archive.BeginTag(systemEnabledTag);
+			retVal = retVal && archive.Process(systemInfo.enabled);
+			retVal = retVal && archive.EndTag(systemEnabledTag);
+
+			retVal = retVal && archive.EndTag(infoTag);
+
+			if (retVal && !archive.IsStoring()){
+				m_systemInfos << systemInfo;
+			}
+		}
+
+		retVal = retVal && archive.EndTag(infosTag);
+	}
+	else if (!archive.IsStoring()){
+		// Groups stored before the system flag existed are internal groups.
+		m_systemInfos.clear();
+		m_systemInfos << SystemInfo();
+	}
+
 	return retVal;
 }
 
@@ -186,6 +280,7 @@ bool CUserGroupInfo::CopyFrom(const IChangeable &object, CompatibilityMode /*mod
 
 		m_userIds = sourcePtr->m_userIds;
 		m_parentGroupIds = sourcePtr->m_parentGroupIds;
+		m_systemInfos = sourcePtr->m_systemInfos;
 
 		return true;
 	}
@@ -213,6 +308,7 @@ bool CUserGroupInfo::ResetData(CompatibilityMode mode)
 
 	m_userIds.clear();
 	m_parentGroupIds.clear();
+	m_systemInfos.clear();
 	m_userGroupInfoProviderPtr = nullptr;
 	m_userInfoProviderPtr = nullptr;
 

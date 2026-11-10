@@ -1331,10 +1331,6 @@ sdl::V1_0::imtbase::CSetObjectDataPayload CObjectCollectionControllerCompBase::O
 		return sdl::V1_0::imtbase::CSetObjectDataPayload();
 	}
 
-	if (!OnBeforeSetObjectData(objectId, *objectPtr.GetPtr(), gqlRequest, errorMessage)){
-		return sdl::V1_0::imtbase::CSetObjectDataPayload();
-	}
-
 	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr = nullptr;
 	if (m_operationContextControllerCompPtr.IsValid()){
 		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext("Update", objectId, objectPtr.GetPtr());
@@ -3508,16 +3504,6 @@ void CObjectCollectionControllerCompBase::OnAfterRemoveElements(
 			const QByteArrayList& /*elementIds*/,
 			const imtgql::CGqlRequest& /*gqlRequest*/) const
 {
-}
-
-
-bool CObjectCollectionControllerCompBase::OnBeforeSetObjectData(
-			const QByteArray& /*objectId*/,
-			istd::IChangeable& /*object*/,
-			const imtgql::CGqlRequest& /*gqlRequest*/,
-			QString& /*errorMessage*/) const
-{
-	return true;
 }
 
 

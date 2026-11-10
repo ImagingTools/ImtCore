@@ -1,7 +1,6 @@
 module imtauthgui
 
 AdministrationView 1.0 AdministrationView.qml
-LdapGroupMappingView 1.0 LdapGroupMappingView.qml
 AuthorizationPage 1.0 AuthorizationPage.qml
 singleton AuthorizationController 1.0 AuthorizationController.qml
 
@@ -80,3 +79,4 @@ TenantCollectionListView 1.0 TenantCollectionListView.qml
 PermissionSourcesPage 1.0 PermissionSourcesPage.qml
 AssignmentsTable 1.0 AssignmentsTable.qml
 AssignmentsRefresher 1.0 AssignmentsRefresher.qml
+

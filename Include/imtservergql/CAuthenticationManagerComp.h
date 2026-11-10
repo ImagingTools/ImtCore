@@ -17,7 +17,6 @@
 #include <imtauth/IJwtSessionController.h>
 #include <imtauth/IPersonalAccessTokenManager.h>
 #include <imtauth/ITenantInvitationManager.h>
-#include <imtauth/ITenantEntityBindingManager.h>
 #include <imtauth/ITenantManager.h>
 #include <imtauth/ITenantMembershipManager.h>
 #include <imtlic/IProductInfo.h>
@@ -46,7 +45,6 @@ public:
 		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager for owner resolution", false, "TenantManager");
 		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Memberships that give a user outside of any organization access to the organizations", false, "MembershipManager");
 		I_ASSIGN(m_invitationManagerCompPtr, "InvitationManager", "Pending invitations that give a user outside of any organization access to the organizations", false, "InvitationManager");
-		I_ASSIGN(m_bindingManagerCompPtr, "BindingManager", "Tenant entity bindings the directory roles of a user are resolved with for the organization of a request", false, "TenantEntityBindingManager");
 		I_ASSIGN(m_productInfoCompPtr, "FeatureContainer", "Product the permissions of a request are checked against", false, "FeatureContainer");
 		I_ASSIGN(m_patPrefixAttrPtr, "PatPrefix", "Personal Access Token prefix", false, "imt_pat_");
 		I_ASSIGN(m_maxTokenCacheSizeAttrPtr, "MaxTokenCacheSize", "Maximum number of cached tokens", false, 10000);
@@ -226,7 +224,6 @@ private:
 	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
 	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);
 	I_REF(imtauth::ITenantInvitationManager, m_invitationManagerCompPtr);
-	I_REF(imtauth::ITenantEntityBindingManager, m_bindingManagerCompPtr);
 	I_REF(imtlic::IProductInfo, m_productInfoCompPtr);
 	I_ATTR(QByteArray, m_patPrefixAttrPtr);
 	I_ATTR(int, m_maxTokenCacheSizeAttrPtr);

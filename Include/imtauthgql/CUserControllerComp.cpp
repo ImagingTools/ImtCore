@@ -7,9 +7,6 @@
 // ACF includes
 #include <iprm/CParamsSet.h>
 
-// Qt includes
-#include <QtCore/QMutexLocker>
-
 // ImtCore includes
 #include <imtauth/CUserVerification.h>
 #include <imtauth/CollectionSelection.h>
@@ -89,7 +86,6 @@ sdl::V1_0::imtauth::CChangePasswordPayload CUserControllerComp::OnChangePassword
 	QByteArray userId = GetUserIdByLoginOrEmail(requestedLogin);
 
 	imtauth::IUserInfo* userInfoPtr = nullptr;
-	QMutexLocker userUpdateLocker(&imtauth::CUserBaseInfo::GetUserUpdateMutex(userId));
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_userCollectionCompPtr->GetObjectData(userId, dataPtr)){
 		userInfoPtr = dynamic_cast<imtauth::IUserInfo*>(dataPtr.GetPtr());

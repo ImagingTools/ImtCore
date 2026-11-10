@@ -5,7 +5,6 @@
 
 // ACF includes
 #include <iprm/CParamsSet.h>
-#include <ilog/CMessageContainer.h>
 
 // ImtCore includes
 #include <imtbase/CComplexCollectionFilter.h>
@@ -41,19 +40,8 @@ bool CAuthorizationControllerComp::ParseDataFromGqlRequest(
 }
 
 
-QByteArray CAuthorizationControllerComp::GetUserObjectId(const QByteArray& login, bool* isReadPtr) const
+QByteArray CAuthorizationControllerComp::GetUserObjectId(const QByteArray& login) const
 {
-	if (isReadPtr != nullptr){
-		*isReadPtr = true;
-	}
-
-	if (!m_userCollectionCompPtr.IsValid() || login.isEmpty()){
-		if (isReadPtr != nullptr){
-			*isReadPtr = false;
-		}
-
-		return QByteArray();
-	}
 	imtbase::IComplexCollectionFilter::FieldFilter fieldFilter;
 	fieldFilter.fieldId = "Id";
 	fieldFilter.filterValue = login;
@@ -67,46 +55,12 @@ QByteArray CAuthorizationControllerComp::GetUserObjectId(const QByteArray& login
 	iprm::CParamsSet filterParam;
 	filterParam.SetEditableParameter("ComplexFilter", &complexFilter);
 
-	ilog::CMessageContainer readErrors;
-	imtbase::IObjectCollection::Ids userIds = m_userCollectionCompPtr->GetElementIds(0, -1, &filterParam, &readErrors);
-	if (readErrors.GetWorstCategory() >= istd::IInformationProvider::IC_ERROR){
-		if (isReadPtr != nullptr){
-			*isReadPtr = false;
-		}
-
+	imtbase::IObjectCollection::Ids userIds = m_userCollectionCompPtr->GetElementIds(0, -1, &filterParam);
+	if (userIds.isEmpty()){
 		return QByteArray();
 	}
 
-	QByteArray result;
-	for (const QByteArray& userId : userIds){
-		imtbase::IObjectCollection::DataPtr data;
-		if (!m_userCollectionCompPtr->GetObjectData(userId, data)){
-			if (isReadPtr != nullptr){
-				*isReadPtr = false;
-			}
-
-			return QByteArray();
-		}
-		const imtauth::IUserInfo* user = dynamic_cast<const imtauth::IUserInfo*>(data.GetPtr());
-		if (user == nullptr){
-			if (isReadPtr != nullptr){
-				*isReadPtr = false;
-			}
-
-			return QByteArray();
-		}
-		if (user->GetId() == login){
-			if (!result.isEmpty()){
-				if (isReadPtr != nullptr){
-					*isReadPtr = false;
-				}
-
-				return QByteArray();
-			}
-			result = userId;
-		}
-	}
-	return result;
+	return userIds[0];
 }
 
 
@@ -132,11 +86,7 @@ QByteArrayList CAuthorizationControllerComp::CalculateGlobalPermissions(
 			const QByteArray& productId) const
 {
 	QSet<QByteArray> userPermissionsSet;
-	const imtauth::IUserBaseInfo::FeatureIds userPermissions = GetGlobalUserPermissions(
-				userInfo,
-				productId,
-				m_bindingManagerCompPtr.IsValid() ? m_bindingManagerCompPtr.GetPtr() : nullptr);
-	for (const QByteArray& permissionId : userPermissions){
+	for (const QByteArray& permissionId : userInfo.GetPermissions(productId)){
 		if (!permissionId.isEmpty()){
 			userPermissionsSet.insert(permissionId);
 		}
@@ -273,12 +223,6 @@ void CAuthorizationControllerComp::RegisterAccessAttempt(const QByteArray& login
 }
 
 
-bool CAuthorizationControllerComp::PrepareAuthorization(imtauth::CUserInfo&, const QByteArray&, QString&) const
-{
-	return true;
-}
-
-
 sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateAuthorizationSuccessfulResponse(
 			imtauth::CUserInfo& userInfo,
 			const QByteArray& systemId,
@@ -388,10 +332,6 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateAu
 		return payload;
 	}
 
-	if (!PrepareAuthorization(userInfo, productId, errorMessage)){
-		return sdl::V1_0::imtauth::CAuthorizationPayload();
-	}
-
 	sdl::V1_0::imtauth::CAuthorizationPayload payload = CreateAuthorizationSuccessfulResponse(userInfo, systemId, productId, errorMessage);
 
 	if (lifetimeStatus == imtauth::IPasswordPolicy::LS_EXPIRES_SOON){
@@ -400,60 +340,6 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateAu
 	}
 
 	return payload;
-}
-
-
-sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::AuthorizeStoredUser(
-			const QByteArray& login,
-			const QByteArray& password,
-			const QByteArray& productId,
-			const QByteArray& skippedSystemId,
-			QString& errorMessage) const
-{
-	qint64 remainingLockoutSecs = 0;
-	if (IsAccountLocked(login, &remainingLockoutSecs)){
-		return CreateAccountLockedResponse(login, remainingLockoutSecs, errorMessage);
-	}
-
-	QByteArray userObjectId = GetUserObjectId(login);
-	if (userObjectId.isEmpty()){
-		return CreateFailedAttemptResponse(login, errorMessage);
-	}
-
-	imtauth::CUserInfo* userInfoPtr = nullptr;
-	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (m_userCollectionCompPtr->GetObjectData(userObjectId, dataPtr)){
-		userInfoPtr = dynamic_cast<imtauth::CUserInfo*>(dataPtr.GetPtr());
-	}
-
-	if (userInfoPtr == nullptr){
-		return CreateFailedAttemptResponse(login, errorMessage);
-	}
-
-	QByteArray activeSystemId;
-	bool ok = false;
-	for (const imtauth::IUserInfo::SystemInfo& systemInfo : userInfoPtr->GetSystemInfos()){
-		if (systemInfo.enabled && (skippedSystemId.isEmpty() || systemInfo.systemId != skippedSystemId)){
-			if (CheckCredential(systemInfo.systemId, login, password)){
-				ok = true;
-				activeSystemId = systemInfo.systemId;
-				break;
-			}
-		}
-	}
-
-	if (!ok){
-		return CreateFailedAttemptResponse(login, errorMessage);
-	}
-
-	RegisterAccessAttempt(login, true);
-
-	// Checked after the credentials, so a wrong password cannot be used to probe account states.
-	if (!userInfoPtr->IsEnabled()){
-		return CreateAccountDisabledResponse(login);
-	}
-
-	return CreateAuthorizationResponseWithLifetimeCheck(*userInfoPtr, activeSystemId, productId, errorMessage);
 }
 
 
@@ -490,7 +376,50 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnAuthor
 		password = inputArgument->password->toUtf8();
 	}
 
-	return AuthorizeStoredUser(login, password, productId, QByteArray(), errorMessage);
+	qint64 remainingLockoutSecs = 0;
+	if (IsAccountLocked(login, &remainingLockoutSecs)){
+		return CreateAccountLockedResponse(login, remainingLockoutSecs, errorMessage);
+	}
+
+	QByteArray userObjectId = GetUserObjectId(login);
+	if (userObjectId.isEmpty()){
+		return CreateFailedAttemptResponse(login, errorMessage);
+	}
+
+	imtauth::CUserInfo* userInfoPtr = nullptr;
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	if (m_userCollectionCompPtr->GetObjectData(userObjectId, dataPtr)){
+		userInfoPtr = dynamic_cast<imtauth::CUserInfo*>(dataPtr.GetPtr());
+	}
+
+	if (userInfoPtr == nullptr){
+		return CreateFailedAttemptResponse(login, errorMessage);
+	}
+
+	QByteArray activeSystemId;
+	bool ok = false;
+	for (const imtauth::IUserInfo::SystemInfo& systemInfo : userInfoPtr->GetSystemInfos()){
+		if (systemInfo.enabled){
+			if (CheckCredential(systemInfo.systemId, login, password)){
+				ok = true;
+				activeSystemId = systemInfo.systemId;
+				break;
+			}
+		}
+	}
+
+	if (!ok){
+		return CreateFailedAttemptResponse(login, errorMessage);
+	}
+
+	RegisterAccessAttempt(login, true);
+
+	// Checked after the credentials, so a wrong password cannot be used to probe account states.
+	if (!userInfoPtr->IsEnabled()){
+		return CreateAccountDisabledResponse(login);
+	}
+
+	return CreateAuthorizationResponseWithLifetimeCheck(*userInfoPtr, activeSystemId, productId, errorMessage);
 }
 
 
@@ -514,18 +443,61 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnUserTo
 	if (inputArgument->login){
 		login = inputArgument->login->toUtf8();
 	}
-
+	
 	QByteArray productId;
 	if (inputArgument->productId){
 		productId = *inputArgument->productId;
 	}
-
+	
 	QByteArray password;
 	if (inputArgument->password){
 		password = inputArgument->password->toUtf8();
 	}
 
-	return AuthorizeStoredUser(login, password, productId, QByteArray(), errorMessage);
+	qint64 remainingLockoutSecs = 0;
+	if (IsAccountLocked(login, &remainingLockoutSecs)){
+		return CreateAccountLockedResponse(login, remainingLockoutSecs, errorMessage);
+	}
+
+	QByteArray userObjectId = GetUserObjectId(login);
+	if (userObjectId.isEmpty()){
+		return CreateFailedAttemptResponse(login, errorMessage);
+	}
+
+	imtauth::CUserInfo* userInfoPtr = nullptr;
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	if (m_userCollectionCompPtr->GetObjectData(userObjectId, dataPtr)){
+		userInfoPtr = dynamic_cast<imtauth::CUserInfo*>(dataPtr.GetPtr());
+	}
+
+	if (userInfoPtr == nullptr){
+		return CreateFailedAttemptResponse(login, errorMessage);
+	}
+
+	QByteArray activeSystemId;
+	bool ok = false;
+	for (const imtauth::IUserInfo::SystemInfo& systemInfo : userInfoPtr->GetSystemInfos()){
+		if (systemInfo.enabled){
+			if (CheckCredential(systemInfo.systemId, login, password)){
+				ok = true;
+				activeSystemId = systemInfo.systemId;
+				break;
+			}
+		}
+	}
+
+	if (!ok){
+		return CreateFailedAttemptResponse(login, errorMessage);
+	}
+
+	RegisterAccessAttempt(login, true);
+
+	// Checked after the credentials, so a wrong password cannot be used to probe account states.
+	if (!userInfoPtr->IsEnabled()){
+		return CreateAccountDisabledResponse(login);
+	}
+
+	return CreateAuthorizationResponseWithLifetimeCheck(*userInfoPtr, activeSystemId, productId, errorMessage);
 }
 
 

@@ -49,13 +49,8 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	/**
-		Prepares the user of a credential sign-in before its token is issued.
-		Called by CreateAuthorizationResponseWithLifetimeCheck only, so sign-ins with external identity providers skip it.
-	*/
-	virtual bool PrepareAuthorization(imtauth::CUserInfo& userInfo, const QByteArray& productId, QString& errorMessage) const;
 	bool ParseDataFromGqlRequest(const imtgql::CGqlRequest& gqlRequest, QByteArray& login, QByteArray& password, QByteArray& productId) const;
-	QByteArray GetUserObjectId(const QByteArray& login, bool* isReadPtr = nullptr) const;
+	QByteArray GetUserObjectId(const QByteArray& login) const;
 	bool CheckCredential(const QByteArray& systemId, const QByteArray& login, const QByteArray& password) const;
 	QByteArrayList CalculateGlobalPermissions(const imtauth::IUserInfo& userInfo, const QByteArray& userId, const QByteArray& productId) const;
 	sdl::V1_0::imtauth::CAuthorizationPayload CreateInvalidLoginOrPasswordResponse(const QByteArray& login, QString& errorMessage) const;
@@ -85,16 +80,6 @@ protected:
 				imtauth::CUserInfo& userInfo,
 				const QByteArray& systemId,
 				const QByteArray& productId,
-				QString& errorMessage) const;
-	/**
-		Signs in a stored user with the credential systems enabled for the account.
-		\param skippedSystemId	credential system already checked for this request; it is not checked again.
-	*/
-	sdl::V1_0::imtauth::CAuthorizationPayload AuthorizeStoredUser(
-				const QByteArray& login,
-				const QByteArray& password,
-				const QByteArray& productId,
-				const QByteArray& skippedSystemId,
 				QString& errorMessage) const;
 
 	// reimplemented (sdl::V1_0::imtauth::CAuthorizationGqlHandlerCompBase)
@@ -167,3 +152,4 @@ protected:
 
 
 } // namespace imtauthgql
+

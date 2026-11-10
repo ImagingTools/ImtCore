@@ -282,17 +282,6 @@ imtdoc::IDocumentInitDelegate* CDocumentServiceCompBase::GetDocumentInitDelegate
 }
 
 
-const imtdoc::IDocumentSaveDelegate* CDocumentServiceCompBase::GetDocumentSaveDelegate(const QByteArray& typeId) const
-{
-	int index = GetObjectFactoryIndex(typeId);
-	if ((index >= 0) && (index < m_documentSaveDelegateCompPtr.GetCount())){
-		return m_documentSaveDelegateCompPtr[index];
-	}
-
-	return nullptr;
-}
-
-
 bool CDocumentServiceCompBase::LoadFromFile(const QString& filePath)
 {
 	if (filePath.isEmpty()){

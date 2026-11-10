@@ -28,7 +28,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="AuthorizationController" PackageId="ImtAuthGqlPck" ComponentId="LdapAuthorizationController">
+        <Element Id="AuthorizationController" PackageId="ImtAuthGqlPck" ComponentId="AuthorizationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="AccountLockoutController" Type="Reference" ExportId="">
@@ -38,7 +38,6 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>UserToken</Value>
-                                <Value>Authorization</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -51,18 +50,6 @@
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="LdapEnableableParam" Type="Reference" ExportId="LdapEnableableParam">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="LdapGroupSettingsFile" Type="String" ExportId="LdapGroupSettingsFile">
-                        <Data IsEnabled="true" Value=""/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="LdapGroupChangeNotifications" Type="Boolean" ExportId="LdapGroupChangeNotifications">
-                        <Data IsEnabled="true" Value="true"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RoleCollection" Type="Reference" ExportId="RoleCollection">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PatPrefix" Type="Id" ExportId="PatPrefix">

@@ -31,25 +31,6 @@ public:
 		MIT_SID
 	};
 
-	struct SystemInfo
-	{
-		QByteArray systemId;
-		QString systemName;
-		bool enabled = true;
-
-		bool operator == (const SystemInfo& other) const
-		{
-			return (systemId == other.systemId) && (systemName == other.systemName) && (enabled == other.enabled);
-		}
-
-		bool operator != (const SystemInfo& other) const
-		{
-			return !(*this == other);
-		}
-	};
-
-	typedef QList<SystemInfo> SystemInfoList;
-
 	/**
 		Get password hash of the user.
 	*/

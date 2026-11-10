@@ -28,6 +28,9 @@ public:
 	virtual bool AddParentGroup(const QByteArray& parentGroupId) override;
 	virtual bool RemoveParentGroup(const QByteArray& parentGroupId) override;
 	virtual const imtauth::IUserInfoProvider* GetUserProvider() const override;
+	virtual SystemInfoList GetSystemInfos() const override;
+	virtual bool AddToSystem(SystemInfo systemInfo) override;
+	virtual bool RemoveFromSystem(const QByteArray& systemId) override;
 
 	// reimplemented (IUserBaseInfo)
 	virtual FeatureIds GetPermissions(const QByteArray& productId = QByteArray()) const override;
@@ -47,6 +50,7 @@ protected:
 protected:
 	IUserGroupInfo::UserIds m_userIds;
 	IUserGroupInfo::GroupIds m_parentGroupIds;
+	IUserGroupInfo::SystemInfoList m_systemInfos;
 	imtauth::IUserInfoProvider* m_userInfoProviderPtr;
 };
 

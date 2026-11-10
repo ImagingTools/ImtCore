@@ -4,7 +4,6 @@
 
 // Qt includes
 #include <QtCore/QDateTime>
-#include <QtCore/QMutexLocker>
 #include <QtCore/QUuid>
 
 // ACF includes
@@ -12,7 +11,6 @@
 
 // ImtCore includes
 #include <imtbase/imtbase.h>
-#include <imtauth/CUserBaseInfo.h>
 #include <imtauth/ITenantMembership.h>
 #include <imtauth/ITenantEntityBindingManager.h>
 #include <imtauth/ITenantManager.h>
@@ -344,7 +342,6 @@ bool CTenantMembershipManagerComp::CleanupTenantAssignedUserData(const QByteArra
 		return true;
 	}
 
-	QMutexLocker userUpdateLocker(&CUserBaseInfo::GetUserUpdateMutex(userId));
 	imtbase::IObjectCollection::DataPtr userDataPtr;
 	if (!m_userCollectionCompPtr->GetObjectData(userId, userDataPtr)) {
 		return false;

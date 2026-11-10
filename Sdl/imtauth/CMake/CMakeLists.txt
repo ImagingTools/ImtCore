@@ -10,7 +10,6 @@ add_custom_target(${PROJECT_NAME}-SDL-related-files SOURCES
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/Users.sdl
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/Groups.sdl
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/Authorization.sdl
-			${CMAKE_CURRENT_LIST_DIR}/../1.0/LdapGroups.sdl
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/Profile.sdl
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/Sessions.sdl
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/UserActions.sdl
@@ -49,10 +48,6 @@ ImtCoreCustomConfigureSdlCppQml(CXX QML
 
 ImtCoreCustomConfigureSdlCppQml(CXX QML
 			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/Authorization.sdl"
-			VERSION		"1.0")
-
-ImtCoreCustomConfigureSdlCppQml(CXX QML
-			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/LdapGroups.sdl"
 			VERSION		"1.0")
 
 ImtCoreCustomConfigureSdlCppQml(CXX QML
@@ -102,3 +97,4 @@ ImtCoreCustomConfigureSdlCppQml(CXX QML
 ImtCoreCustomConfigureSdlCppQml(CXX QML
 			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/CrossOrgGrantCollectionDocumentService.sdl"
 			VERSION		"1.0")
+

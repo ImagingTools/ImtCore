@@ -17,7 +17,6 @@
         <Element ComponentName="UserChangeGenerator" X="0" Y="0" Note=""/>
         <Element ComponentName="UserCollectionDocumentService" X="175" Y="250" Note=""/>
         <Element ComponentName="UserDocumentNameProvider" X="0" Y="0" Note=""/>
-        <Element ComponentName="UserDocumentSaveDelegate" X="957" Y="125" Note=""/>
         <Element ComponentName="UserDocumentValidator" X="957" Y="249" Note=""/>
         <Element ComponentName="UserGroupInfoProvider" X="950" Y="425" Note=""/>
         <Element ComponentName="UserInfo" X="575" Y="425" Note=""/>

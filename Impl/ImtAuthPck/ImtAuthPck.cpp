@@ -111,6 +111,11 @@ I_EXPORT_COMPONENT(
 			"Ldap User Collection Joiner");
 
 I_EXPORT_COMPONENT(
+			LdapUserGroupSynchronizer,
+			"Ldap user group synchronizer",
+			"Ldap User Group Hierarchy Synchronizer");
+
+I_EXPORT_COMPONENT(
 			UserChangeGenerator,
 			"User change generator",
 			"User Change Generator");
@@ -395,11 +400,6 @@ I_EXPORT_COMPONENT(
 			UserDocumentValidator,
 			"User document validator",
 			"User Document Validator");
-
-I_EXPORT_COMPONENT(
-			UserDocumentSaveDelegate,
-			"User document save delegate keeping the stored directory role grants",
-			"User Document Save Delegate");
 
 I_EXPORT_COMPONENT(
 			UserGroupDocumentValidator,

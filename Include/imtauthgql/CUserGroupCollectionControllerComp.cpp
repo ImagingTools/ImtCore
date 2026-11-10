@@ -59,6 +59,11 @@ bool CUserGroupCollectionControllerComp::FillObjectFromRepresentation(
 
 	userGroupInfoPtr->SetUsers(CAssignmentCollector::GetDirectIds(groupDataRepresentation.users));
 
+	// The system of a group is not editable: groups created here are internal, LDAP groups are created by the synchronization.
+	if (userGroupInfoPtr->GetSystemInfos().isEmpty()){
+		userGroupInfoPtr->AddToSystem(imtauth::IUserGroupInfo::SystemInfo());
+	}
+
 	const QByteArrayList roleIds = CAssignmentCollector::GetDirectIds(groupDataRepresentation.roles);
 
 	if (!roleIds.isEmpty()){
@@ -284,6 +289,29 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 		representationObject.description = QString(userGroupInfoPtr->GetDescription());
 	}
 
+	if (requestInfo.items.isSystemIdRequested){
+		QByteArrayList systemIdList;
+		for (const imtauth::IUserGroupInfo::SystemInfo& systemInfo : userGroupInfoPtr->GetSystemInfos()){
+			systemIdList << systemInfo.systemId;
+		}
+
+		representationObject.systemId = QByteArray(systemIdList.join(';'));
+	}
+
+	if (requestInfo.items.isSystemNameRequested){
+		QStringList systemNameList;
+		for (const imtauth::IUserGroupInfo::SystemInfo& systemInfo : userGroupInfoPtr->GetSystemInfos()){
+			if (systemInfo.systemName.isEmpty()){
+				systemNameList << QT_TR_NOOP("Internal");
+			}
+			else{
+				systemNameList << systemInfo.systemName;
+			}
+		}
+
+		representationObject.systemName = QString(systemNameList.join(';'));
+	}
+
 	if (requestInfo.items.isAddedRequested){
 		QDateTime addedTime = objectCollectionIterator.GetElementInfo("Added").toDateTime();
 		addedTime.setTimeZone(QTimeZone::utc());
@@ -377,6 +405,25 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 	CAssignmentCollector collector;
 	collector.CollectGroup(*userGroupInfoPtr, userGroupInfoPtr->GetObjectUuid(), productId);
 	collector.FillGroup(representationPayload);
+
+	imtsdl::TElementList<sdl::V1_0::imtauth::CGroupSystemInfo> systemInfoList;
+	for (const imtauth::IUserGroupInfo::SystemInfo& systemInfo : userGroupInfoPtr->GetSystemInfos()){
+		sdl::V1_0::imtauth::CGroupSystemInfo info;
+
+		info.id = QByteArray(systemInfo.systemId);
+
+		if (systemInfo.systemId.isEmpty()){
+			info.name = QStringLiteral("Internal");
+		}
+		else{
+			info.name = QString(systemInfo.systemName);
+		}
+
+		info.enabled = bool(systemInfo.enabled);
+
+		systemInfoList << info;
+	}
+	representationPayload.systemInfos = std::move(systemInfoList);
 
 	return true;
 }

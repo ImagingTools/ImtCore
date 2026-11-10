@@ -5,7 +5,6 @@
 
 
 // Qt includes
-#include <QtCore/QMutexLocker>
 #include <QtCore/QSet>
 
 // ACF includes
@@ -377,7 +376,6 @@ sdl::V1_0::imtauth::CSetProfileResponse CProfileControllerComp::OnSetProfile(
 	}
 
 	imtauth::IUserInfo* userInfoPtr = nullptr;
-	QMutexLocker userUpdateLocker(&imtauth::CUserBaseInfo::GetUserUpdateMutex(id));
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_userCollectionCompPtr->GetObjectData(id, dataPtr)){
 		userInfoPtr = dynamic_cast<imtauth::IUserInfo*>(dataPtr.GetPtr());

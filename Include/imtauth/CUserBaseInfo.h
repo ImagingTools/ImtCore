@@ -6,15 +6,9 @@
 #include <imtauth/CRole.h>
 #include <imtauth/IUserBaseInfo.h>
 
-// Qt includes
-#include <QtCore/QMutex>
-
 
 namespace imtauth
 {
-
-
-class ITenantEntityBindingManager;
 
 
 class CUserBaseInfo: virtual public IUserBaseInfo
@@ -22,34 +16,6 @@ class CUserBaseInfo: virtual public IUserBaseInfo
 
 public:
 	CUserBaseInfo();
-
-	/**
-		Directory grants are stored separately from manually assigned roles.
-		The reserved product key uses the existing Products archive representation,
-		so old user archives need no migration.
-	*/
-	RoleIds GetDirectoryRoles(const QByteArray& productId) const;
-	void SetDirectoryRoles(const QByteArray& productId, const RoleIds& roles);
-	/**
-		Check if the product is assigned manually, ignoring directory-owned grants.
-	*/
-	bool HasManualProduct(const QByteArray& productId) const;
-	bool ResolveDirectoryRoles(const QByteArray& productId, RoleIds& roles, FeatureIds& permissions) const;
-	bool HasDirectoryRoles() const;
-	/**
-		Replace the directory grants of all products with the ones of the source user.
-		Directory grants are owned by the credential sign-in, so saves of the user keep the stored ones.
-	*/
-	void CopyDirectoryRolesFrom(const CUserBaseInfo& source);
-	/**
-		Replace the directory grants with the permissions visible in the tenant.
-		Directory roles and their parent roles count only when they are visible in the tenant:
-		without a tenant only roles bound to no tenant, otherwise only roles bound to the tenant.
-		Without a binding manager no role is bound to any tenant.
-	*/
-	void ScopeDirectoryRoles(const QByteArray& tenantId, const ITenantEntityBindingManager* bindingManagerPtr);
-	static bool IsReservedProductId(const QByteArray& productId);
-	static QMutex& GetUserUpdateMutex(const QByteArray& userId);
 
 	// reimplemented (iser::IUserBaseInfo)
 	virtual const imtlic::IFeatureInfoProvider* GetPermissionProvider() const override;
@@ -100,3 +66,6 @@ protected:
 
 
 } // namespace imtauth
+
+
+
