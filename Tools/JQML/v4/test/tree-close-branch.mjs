@@ -163,7 +163,8 @@ async function measure(kids) {
 	arrowOf(tree, row).button.openButtonClicked();
 	result.close2 = performance.now() - start;
 	result.close2Frames = frames(4);
-	result.errors = engine.errors.length;
+	// The module of the client style asks for a command id that this test does not load.
+	result.errors = engine.errors.filter((error) => !/ImtbaseSettingsSdlCommandIds/.test(String(error))).length;
 	return result;
 }
 
