@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="6435" Description="ACF"/>
+            <Version Id="1" Number="2410" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description>The commands of the generic collection protocol a server of a product may send for one collection</Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="Policy" PackageId="ImtServerAppPck" ComponentId="CommandPermissionsProviderJoiner">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CommandPermissionsProvider" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>ObjectRead</Value>
+                                <Value>View</Value>
+                                <Value>Edit</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ObjectRead" PackageId="ImtServerAppPck" ComponentId="CommandGroupPermissionsProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CollectionId" Type="Id" ExportId="CollectionId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>GetObjectData</Value>
+                                <Value>GetElementInfo</Value>
+                                <Value>GetElementMetaInfo</Value>
+                                <Value>GetDataMetaInfo</Value>
+                                <Value>GetObjectTypeId</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="ObjectReadPermissions">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="View" PackageId="ImtServerAppPck" ComponentId="CommandGroupPermissionsProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CollectionId" Type="Id" ExportId="CollectionId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>GetElementsCount</Value>
+                                <Value>GetElementIds</Value>
+                                <Value>GetSelectableItems</Value>
+                                <Value>GetDocumentName</Value>
+                                <Value>GetUndoInfo</Value>
+                                <Value>GetOpenedDocumentList</Value>
+                                <Value>OnDocumentChanged</Value>
+                                <Value>OnDocumentManagerChanged</Value>
+                                <Value>OnUndoRedoChanged</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="ViewPermissions">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="Edit" PackageId="ImtServerAppPck" ComponentId="CommandGroupPermissionsProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CollectionId" Type="Id" ExportId="CollectionId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>CreateSubCollection</Value>
+                                <Value>InsertNewObject</Value>
+                                <Value>SetObjectData</Value>
+                                <Value>RemoveElements</Value>
+                                <Value>RemoveElementSet</Value>
+                                <Value>SetObjectName</Value>
+                                <Value>SetObjectDescription</Value>
+                                <Value>OpenDocument</Value>
+                                <Value>CloseDocument</Value>
+                                <Value>CreateNewDocument</Value>
+                                <Value>SaveDocument</Value>
+                                <Value>SetDocumentName</Value>
+                                <Value>DoUndo</Value>
+                                <Value>DoRedo</Value>
+                                <Value>ResetUndo</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="EditPermissions">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imtserverapp::ICommandPermissionsProvider" ComponentId="Policy"/>
+        <Interface InterfaceId="istd::IChangeable" ComponentId="Policy"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="Policy"/>
+    </ExportedInterfaces>
+    <ExportedComponents/>
+</Acf>

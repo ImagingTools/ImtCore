@@ -51,13 +51,7 @@
         <Element Id="Receiver" PackageId="ImtServerGqlPck" ComponentId="ServerTokenReceiver">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="CollectionPermissions" Type="Id[]" ExportId="CollectionPermissions">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="CommandPermissions">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                    <AttributeInfo Id="Policy" Type="Reference" ExportId="Policy">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PermissionTree" Type="Reference" ExportId="PermissionTree">
@@ -65,9 +59,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="TokenManager" Type="Reference" ExportId="TokenManager">
                         <Data IsEnabled="true" Value="TokenStore/PersonalAccessTokenManager"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

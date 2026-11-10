@@ -321,10 +321,7 @@
         <Element Id="Receiver" PackageId="ImtAuthVoce" ComponentId="ServerTokenReceiver">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="CollectionPermissions" Type="Id[]" ExportId="CollectionPermissions">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="CommandPermissions">
+                    <AttributeInfo Id="Policy" Type="Reference" ExportId="Policy">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DatabaseAccessSettings" Type="Reference" ExportId="DatabaseAccessSettings">

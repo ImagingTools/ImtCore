@@ -1101,18 +1101,20 @@ bool CAuthenticationManagerComp::CheckRequestAccess(const imtgql::CGqlRequest& g
 		return true;
 	}
 
-	QByteArray requiredPermission;
-	if (!m_serverTokenReceiverCompPtr.IsValid() || !m_serverTokenReceiverCompPtr->FindRequiredPermission(gqlRequest, requiredPermission)){
+	QByteArrayList requiredPermissions;
+	if (!m_serverTokenReceiverCompPtr.IsValid() || !m_serverTokenReceiverCompPtr->FindRequiredPermissions(gqlRequest, requiredPermissions)){
 		errorMessage = QStringLiteral("The request '%1' is closed to the servers of products").arg(QString::fromUtf8(gqlRequest.GetCommandId()));
 
 		return false;
 	}
 
-	if (!requiredPermission.isEmpty() && !imtauth::HasPermission(contextPtr->GetServerScopes(), requiredPermission)){
-		errorMessage = QStringLiteral("The server of '%1' may not send '%2': its token lacks '%3'")
-					.arg(QString::fromUtf8(serverProductId), QString::fromUtf8(gqlRequest.GetCommandId()), QString::fromUtf8(requiredPermission));
+	for (const QByteArray& requiredPermission : requiredPermissions){
+		if (!imtauth::HasPermission(contextPtr->GetServerScopes(), requiredPermission)){
+			errorMessage = QStringLiteral("The server of '%1' may not send '%2': its token lacks '%3'")
+						.arg(QString::fromUtf8(serverProductId), QString::fromUtf8(gqlRequest.GetCommandId()), QString::fromUtf8(requiredPermission));
 
-		return false;
+			return false;
+		}
 	}
 
 	return true;

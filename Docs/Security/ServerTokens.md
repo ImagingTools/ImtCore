@@ -26,14 +26,15 @@ Operator (Agentino or the Puma console)        Receiving server (Puma, Lisa, ...
 | Token commands | `imtauthgql::CServerTokenControllerComp` | Adds client products, issues, lists, changes and revokes the tokens of this server. A superuser session opened at this server only. |
 | Allowed clients | `imtauth::IClientProductCatalog` | The client products in the table `ConnectedProducts` of the database of the server. `AddServerTokenClient` adds a product, so a configurator (Agentino) sets up the whole connection. Puma shows the same table as its catalog of products (`ImtAuthVoce/ConnectedProductCatalog` embeds the receiver). |
 | Token storage | `ImtAuthVoce/PersonalAccessTokenStore` | The table `PersonalAccessTokens` of the server. A server token starts with `imt_srv_`, a personal token with `imt_pat_`: each is looked up only where its kind is kept. |
-| What a client may send | `imtservergql::CServerTokenReceiverComp` | `CommandPermissions`: `Command=Permission`, `Command=` opens it to any connected server. `CollectionPermissions`: `Collection=View[,Edit[,ObjectRead]]`. Only the commands of the generic collection protocol (`GetObjectData`, `GetElementIds`, `OpenDocument`, `SetObjectData`, ...) are resolved by the collection they name; any other command must be declared by name. Anything not declared is refused. |
+| What a client may send | `imtservergql::CServerTokenReceiverComp`, reference `Policy` | An `imtserverapp::ICommandPermissionsProvider`: the commands the clients may send with the permissions of a token each needs. A command of a collection is declared as `Collection/Command`; the request is looked up by the collection it names, so a `collectionId` cannot open another command. A command with an empty permission is open to any connected server. Anything not declared is refused. |
 | Check of a request | `imtservergql::CAuthenticationManagerComp` | Takes the receiver as its `ServerTokenReceiver` reference. Refuses another product without a token of its server, checks the token and the policy, and binds sessions to the server they came through (below). |
 
 ## Making a product a receiver
 
-Add one element to the server registry and give it to `AuthorizableServerFramework`:
+Add the receiver and its policy to the server registry and give the receiver to `AuthorizableServerFramework`:
 
 ```xml
+<Element Id="ProductServerPolicy" PackageId="LisaQmlVoce" ComponentId="ProductServerPolicy"/>
 <Element Id="ServerTokenReceiver" PackageId="ImtAuthVoce" ComponentId="ServerTokenReceiver">
     <Data IsEnabled="true" Flags="0">
         <AttributeInfoMap>
@@ -43,20 +44,8 @@ Add one element to the server registry and give it to `AuthorizableServerFramewo
             <AttributeInfo Id="PermissionTree" Type="Reference" ExportId="">
                 <Data IsEnabled="true" Value="AuthorizableServerFramework"/>
             </AttributeInfo>
-            <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
-                <Data IsEnabled="true">
-                    <Values>
-                        <Value>GetApplicationInfo=</Value>
-                        <Value>LicensesList=/LicenseDefinitionManagement/View</Value>
-                    </Values>
-                </Data>
-            </AttributeInfo>
-            <AttributeInfo Id="CollectionPermissions" Type="Id[]" ExportId="">
-                <Data IsEnabled="true">
-                    <Values>
-                        <Value>Products=/ProductManagement/View</Value>
-                    </Values>
-                </Data>
+            <AttributeInfo Id="Policy" Type="Reference" ExportId="">
+                <Data IsEnabled="true" Value="ProductServerPolicy"/>
             </AttributeInfo>
         </AttributeInfoMap>
     </Data>
@@ -65,7 +54,15 @@ Add one element to the server registry and give it to `AuthorizableServerFramewo
 
 `AuthorizableServerFramework`: `ServerTokenReceiver` = `ServerTokenReceiver`, and `ServerTokenReceiver` first in the GraphQL request handlers of the server.
 The product ID comes from the permission tree. The client products are kept in PostgreSQL; with SQLite set `ProductRepository`
-to an `ImtUserAdministrationVoce/SQLiteConnectedProductRepository` element. Optional attributes: `RequiredPermissions` (every token holds them) and `ProductServerPermissions` (a tree other than the tree of the product).
+to an `ImtUserAdministrationVoce/SQLiteConnectedProductRepository` element. Optional attributes: `RequiredPermissions` (every token holds them)
+and `ProductServerPermissions` (a tree other than the tree of the product).
+
+The policy is a composite of the product (`ProductServerPolicy.acc`, see Puma and Lisa), one block per permission and one per collection,
+joined by `CommandPermissionsProviderJoiner`:
+- `ImtServerAppPck/CommandGroupPermissionsProvider`: the commands that need the same permission (`CommandIds`, `CommandPermissions`).
+  A group with an empty permission opens its commands to any connected server.
+- `ImtAuthVoce/CollectionServerPolicy`: the commands of the generic collection protocol for one collection
+  (`CollectionId`, `ViewPermissions`, `EditPermissions`, `ObjectReadPermissions`). Without `EditPermissions` its changes are closed.
 
 In the settings plugin of the product, list the input connection in `ServerTokenConnectionIds` of its `ConnectionCollection`
 (`imtservice::IServerTokenReceiverInfo`). Agentino offers a token only for a connection to such an input.

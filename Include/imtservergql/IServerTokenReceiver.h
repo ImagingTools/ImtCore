@@ -32,11 +32,11 @@ public:
 	virtual imtauth::IPersonalAccessTokenManager* GetTokenManager() const = 0;
 
 	/**
-		Find the permission a server token needs for the request.
-		\param permission	Empty when any token of a connected server may send the request.
+		Find the permissions a server token needs for the request: all of them.
+		\param permissions	Empty when any token of a connected server may send the request.
 		\return				False when the request is closed to the servers of products.
 	*/
-	virtual bool FindRequiredPermission(const imtgql::CGqlRequest& gqlRequest, QByteArray& permission) const = 0;
+	virtual bool FindRequiredPermissions(const imtgql::CGqlRequest& gqlRequest, QByteArrayList& permissions) const = 0;
 };
 
 

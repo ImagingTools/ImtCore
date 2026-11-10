@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="6435" Description="ACF"/>
+            <Version Id="1" Number="2410" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="Policy" X="50" Y="150" Note=""/>
+        <Element ComponentName="ObjectRead" X="400" Y="50" Note=""/>
+        <Element ComponentName="View" X="400" Y="150" Note=""/>
+        <Element ComponentName="Edit" X="400" Y="250" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

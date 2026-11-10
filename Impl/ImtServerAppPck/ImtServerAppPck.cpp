@@ -116,6 +116,11 @@ I_EXPORT_COMPONENT(
 			"Single Command Permissions Provider");
 
 I_EXPORT_COMPONENT(
+			CommandGroupPermissionsProvider,
+			"Commands that need the same permissions, optionally of one collection",
+			"Command Group Permissions Provider Collection");
+
+I_EXPORT_COMPONENT(
 			CommandPermissionsProviderJoiner,
 			"CommandPermissionsProviderJoiner",
 			"Command Permissions Provider Joiner Comp");
