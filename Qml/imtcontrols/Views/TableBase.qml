@@ -22,6 +22,8 @@ Rectangle {
 	property bool isMultiCheckable: true;
 	// The width of the checkbox column of a checkable table; the header and the rows both start their cells after it.
 	readonly property int checkColumnWidth: tableContainer.checkable ? 3 * Style.marginM : 0;
+	// The first column that is shown; the checkbox column takes the look of its header cell.
+	property int firstVisibleColumnIndex: 0;
 	property bool canSelectAll: true;
 	property bool scrollbarVisible: true;
 	property bool showHeaders: true;
@@ -188,20 +190,6 @@ Rectangle {
 
 	signal widthRecalc();
 
-	// The first column that is shown; the checkbox column takes the look of its header cell.
-	property int firstVisibleColumnIndex: 0;
-
-	function updateFirstVisibleColumnIndex(){
-		for (let i = 0; i < tableContainer.widthDecoratorDynamic.getItemsCount(); i++){
-			if (tableContainer.widthDecoratorDynamic.getData("Width", i) > 0){
-				tableContainer.firstVisibleColumnIndex = i;
-
-				return;
-			}
-		}
-
-		tableContainer.firstVisibleColumnIndex = 0;
-	}
 	signal heightRecalc();
 
 	signal tableViewParamsAccepted();
@@ -498,6 +486,18 @@ Rectangle {
 
 	function setColumnContentById(headerId, comp){
 		tableContainer.columnContentComps[headerId] = comp;
+	}
+
+	function updateFirstVisibleColumnIndex(){
+		for (let i = 0; i < tableContainer.widthDecoratorDynamic.getItemsCount(); i++){
+			if (tableContainer.widthDecoratorDynamic.getData("Width", i) > 0){
+				tableContainer.firstVisibleColumnIndex = i;
+
+				return;
+			}
+		}
+
+		tableContainer.firstVisibleColumnIndex = 0;
 	}
 
 	// The look of a header cell, from the header decorator; the cell of the checkbox column uses the one of the first cell.
