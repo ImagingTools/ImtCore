@@ -81,11 +81,6 @@ I_EXPORT_COMPONENT(
 			"Organizations Permissions Provider");
 
 I_EXPORT_COMPONENT(
-			ProductServerPermissionsProvider,
-			"Permissions of the servers of products at this server",
-			"Product Server Permissions Provider");
-
-I_EXPORT_COMPONENT(
 			ConnectedClientProductCatalog,
 			"Products whose servers may be given a token of this server: the connected products",
 			"Connected Client Product Catalog");

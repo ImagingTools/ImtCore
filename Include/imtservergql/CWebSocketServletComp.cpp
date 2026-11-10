@@ -482,14 +482,6 @@ bool CWebSocketServletComp::IsSubscriberAllowed(
 		return false;
 	}
 
-	// The server of a product the subscription comes through
-	QString accessError;
-	if (!m_gqlContextCreatorCompPtr->CheckRequestAccess(gqlRequest, accessError)){
-		SendWarningMessage(0, accessError, QStringLiteral("CWebSocketServletComp"));
-
-		return false;
-	}
-
 	if (!contextPtr->GetClientProductId().isEmpty()){
 		return controller.IsOpenFor(imtgql::IGqlSubscriberController::SK_SERVER, gqlRequest);
 	}

@@ -273,7 +273,6 @@ sdl::V1_0::imtauth::CServerTokenReceiver CServerTokenControllerComp::OnGetServer
 
 	response.productId = GetOwnProductId();
 	response.groups = groups;
-	response.requiredPermissions.Emplace().FromList(GetRequiredPermissions());
 
 	return response;
 }
@@ -361,17 +360,6 @@ bool CServerTokenControllerComp::CheckClientProduct(const QByteArray& clientProd
 }
 
 
-QByteArrayList CServerTokenControllerComp::GetRequiredPermissions() const
-{
-	QByteArrayList requiredPermissions;
-	for (int i = 0; i < m_requiredPermissionsAttrPtr.GetCount(); i++){
-		requiredPermissions.append(m_requiredPermissionsAttrPtr[i]);
-	}
-
-	return requiredPermissions;
-}
-
-
 imtauth::IPersonalAccessTokenSharedPtr CServerTokenControllerComp::GetServerToken(const QByteArray& tokenId, QString& errorMessage) const
 {
 	// Personal tokens of users are not touched here
@@ -394,8 +382,7 @@ bool CServerTokenControllerComp::NormalizeScopes(QByteArrayList& scopes, QString
 	// Only the permissions of the tree are held, in its order
 	const QByteArrayList catalog = imtlic::CollectProductPermissions(tree);
 
-	QByteArrayList requested = scopes;
-	requested += GetRequiredPermissions();
+	const QByteArrayList requested = scopes;
 
 	// A group stands for the permissions in it
 	QByteArrayList held;
@@ -442,17 +429,6 @@ void CServerTokenControllerComp::BuildTokenTree(imtlic::CProductInfo& tree) cons
 			tree.AddFeature(featureId, featureInfo);
 		}
 	};
-
-	if (m_serverPermissionsCompPtr.IsValid()){
-		for (const imtbase::ICollectionInfo::Id& featureId : m_serverPermissionsCompPtr->GetFeatureList().GetElementIds()){
-			const imtlic::IFeatureInfoSharedPtr featureInfoPtr = m_serverPermissionsCompPtr->GetFeatureInfo(featureId);
-			if (featureInfoPtr.IsValid()){
-				addFeature(featureId, *featureInfoPtr);
-			}
-		}
-
-		return;
-	}
 
 	VisitTreeFeatures(addFeature);
 }

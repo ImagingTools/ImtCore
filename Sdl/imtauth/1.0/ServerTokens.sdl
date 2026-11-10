@@ -64,8 +64,6 @@ type ServerTokenReceiver
 {
 	productId: ID!
 	groups: [PermissionGroup]
-	# Held by every token for this server.
-	requiredPermissions: [ID]
 }
 
 # A permission of the receiving server with its sub-permissions.

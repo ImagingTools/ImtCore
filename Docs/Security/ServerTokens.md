@@ -15,26 +15,39 @@ Operator (Agentino or the Puma console)        Receiving server (Puma, Lisa, ...
    |                                                                                            | request
    |                                             <------------------ x-server-token, x-product-id
    |                                             AuthenticationManager: token issued here, for this client
-   |                                             ProductServerRequestPolicy: command -> required permission
+   |                                             the handlers check the request with the permissions of the token
 ```
+
+## What a token allows
+
+A token holds permissions of the permission tree of the receiver, the same permissions its roles are made of
+(Puma: `PumaFeatures.h`, Lisa: `LisaFeatures.h`). There is no list of the commands a server may send:
+the handlers of the receiver check a request through a server as they check any request.
+
+- **A server acting on its own** (its token in the authentication header) is a user without a login whose permissions are
+  those of its token.
+- **A request a server forwards for its user** (the session of the user and `x-server-token`) holds the permissions of the user
+  that the token holds too. A superuser forwarded by a server holds the permissions of the token and is no superuser there.
+- **What a connected product does for itself and its users needs no permission:** signing its users in, their sessions and
+  profiles, their notifications and personal tokens, publishing its permission tree, sending notifications to its own users.
+  The handlers limit these to the product of the server and to the user of the request.
+- The permissions of a member inside an organization are a mechanism of their own and are not bounded by the token.
 
 ## What a receiver is made of
 
 | Part | Component | Role |
 |---|---|---|
-| The receiver | `ImtAuthVoce/ServerTokenReceiver` | One element of the server registry. It holds everything below and exports `imtservergql::IServerTokenReceiver`: the product of the server, the token manager and what the clients may send. |
-| Token commands | `imtauthgql::CServerTokenControllerComp` | Adds client products, issues, lists, changes and revokes the tokens of this server. A superuser session opened at this server only. |
+| The receiver | `ImtAuthVoce/ServerTokenReceiver` | One element of the server registry. It holds everything below and exports `imtservergql::IServerTokenReceiver`: the product of the server and its token store. |
+| Token commands | `imtauthgql::CServerTokenControllerComp` | Adds client products, issues, lists, changes and revokes the tokens of this server, offering the permission tree of the server. A superuser session opened at this server only. |
 | Allowed clients | `imtauth::IClientProductCatalog` | The client products in the table `ConnectedProducts` of the database of the server. `AddServerTokenClient` adds a product, so a configurator (Agentino) sets up the whole connection. Puma shows the same table as its catalog of products (`ImtAuthVoce/ConnectedProductCatalog` embeds the receiver). |
 | Token storage | `ImtAuthVoce/PersonalAccessTokenStore` | The table `PersonalAccessTokens` of the server. A server token starts with `imt_srv_`, a personal token with `imt_pat_`: each is looked up only where its kind is kept. |
-| What a client may send | `imtservergql::CServerTokenReceiverComp`, reference `Policy` | An `imtserverapp::ICommandPermissionsProvider`: the commands the clients may send with the permissions of a token each needs. A command of a collection is declared as `Collection/Command`; the request is looked up by the collection it names, so a `collectionId` cannot open another command. A command with an empty permission is open to any connected server. Anything not declared is refused. |
-| Check of a request | `imtservergql::CAuthenticationManagerComp` | Takes the receiver as its `ServerTokenReceiver` reference. Refuses another product without a token of its server, checks the token and the policy, and binds sessions to the server they came through (below). |
+| Check of a request | `imtservergql::CAuthenticationManagerComp` | Takes the receiver as its `ServerTokenReceiver` reference. Refuses another product without a token of its server, checks the token, bounds the request by it (above) and checks where a session may be used (below). |
 
 ## Making a product a receiver
 
-Add the receiver and its policy to the server registry and give the receiver to `AuthorizableServerFramework`:
+Add the receiver to the server registry and give it to `AuthorizableServerFramework`:
 
 ```xml
-<Element Id="ProductServerPolicy" PackageId="LisaQmlVoce" ComponentId="ProductServerPolicy"/>
 <Element Id="ServerTokenReceiver" PackageId="ImtAuthVoce" ComponentId="ServerTokenReceiver">
     <Data IsEnabled="true" Flags="0">
         <AttributeInfoMap>
@@ -44,25 +57,14 @@ Add the receiver and its policy to the server registry and give the receiver to 
             <AttributeInfo Id="PermissionTree" Type="Reference" ExportId="">
                 <Data IsEnabled="true" Value="AuthorizableServerFramework"/>
             </AttributeInfo>
-            <AttributeInfo Id="Policy" Type="Reference" ExportId="">
-                <Data IsEnabled="true" Value="ProductServerPolicy"/>
-            </AttributeInfo>
         </AttributeInfoMap>
     </Data>
 </Element>
 ```
 
 `AuthorizableServerFramework`: `ServerTokenReceiver` = `ServerTokenReceiver`, and `ServerTokenReceiver` first in the GraphQL request handlers of the server.
-The product ID comes from the permission tree. The client products are kept in PostgreSQL; with SQLite set `ProductRepository`
-to an `ImtUserAdministrationVoce/SQLiteConnectedProductRepository` element. Optional attributes: `RequiredPermissions` (every token holds them)
-and `ProductServerPermissions` (a tree other than the tree of the product).
-
-The policy is a composite of the product (`ProductServerPolicy.acc`, see Puma and Lisa), one block per permission and one per collection,
-joined by `CommandPermissionsProviderJoiner`:
-- `ImtServerAppPck/CommandGroupPermissionsProvider`: the commands that need the same permission (`CommandIds`, `CommandPermissions`).
-  A group with an empty permission opens its commands to any connected server.
-- `ImtAuthVoce/CollectionServerPolicy`: the commands of the generic collection protocol for one collection
-  (`CollectionId`, `ViewPermissions`, `EditPermissions`, `ObjectReadPermissions`). Without `EditPermissions` its changes are closed.
+The product ID and the permissions a token may hold come from the permission tree. The client products are kept in PostgreSQL;
+with SQLite set `ProductRepository` to an `ImtUserAdministrationVoce/SQLiteConnectedProductRepository` element.
 
 In the settings plugin of the product, list the input connection in `ServerTokenConnectionIds` of its `ConnectionCollection`
 (`imtservice::IServerTokenReceiverInfo`). Agentino offers a token only for a connection to such an input.
@@ -71,14 +73,13 @@ The calling product reads the token from `IMT_<RECEIVER>_SERVER_CREDENTIAL`
 (`imtclientgql::GetServerCredentialVariableName`) once at the start, removes the variable so that the processes it starts
 do not inherit it, and sends the token with every request to the receiver.
 
-## Sessions are bound to the server they came through
+## Where a session may be used
 
 A session opened through the server of a product (the sign-in, a tenant session, a refresh) names that product in the claim
-`productId` of its token and in the table `UserSessions`. The authorization server accepts the session only through that server,
-with its server token; sent directly, it is refused. A session opened at the authorization server directly works only there.
-So a server cannot escape the permissions of its token by sending a session without its token,
-and a session of the console does not gain the rights of a server. A server that receives its own users' sessions (Lisa)
-accepts the sessions of its product directly.
+`productId` of its token and in the table `UserSessions`. It works only through a server, with that server's token, which bounds it:
+sent directly it would escape the token. It may pass several servers (ProLife forwards it to Lisa, Lisa to Puma): each is bounded
+by its own token. It is refreshed only through the server that opened it. A session opened at the authorization server directly
+works only there. A server that receives its own users' sessions (Lisa) accepts the sessions of its product directly.
 
 The commands of the server tokens and of the catalog of products need a superuser session opened at this server directly:
 a session that came through a server never manages server tokens.
@@ -92,10 +93,8 @@ The tokens are still issued and kept by the product.
 ## Known limitations
 
 - A token has no expiration: it would stop a working server. Replace it by issuing a new one.
-- Without `ProductServerPermissions` a token may be given any permission of the tree of the server, `Edit` ones included.
-  Only `ProductServerRequestPolicy` limits what a client really does, so declare there only what the clients need.
 - The password of the superuser of a product without users of its own (Lisa) passes through the server of that product at the sign-in.
   The binding of sessions keeps the server within its token, but a compromised server can read the password.
 - On systems other than Windows a stored token (Agentino) is protected by the file permissions only: there is no protection service of the system.
-- The receiver checks requests that carry a token or a foreign `x-product-id` with a user session.
-  A command the receiver serves without any authentication stays open; the policy does not close it.
+- A token bounds a request only where a handler checks a permission, a user or the product of the server.
+  A command the receiver serves without any authentication stays open to anybody, servers included.

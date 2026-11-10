@@ -27,12 +27,6 @@ imtgql::IGqlContextCreator::ContextCreationStatus CSimpleGqlContextCreatorComp::
 }
 
 
-bool CSimpleGqlContextCreatorComp::CheckRequestAccess(const imtgql::CGqlRequest& /*gqlRequest*/, QString& /*errorMessage*/) const
-{
-	return true;
-}
-
-
 imtgql::IGqlContextUniquePtr CSimpleGqlContextCreatorComp::CreateGqlContext(
 			const imtgql::IGqlContext::Headers& headers,
 			imtgql::IGqlContextCreator::ContextCreationError& error) const

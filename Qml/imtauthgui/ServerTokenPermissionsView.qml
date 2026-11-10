@@ -20,17 +20,11 @@ Rectangle {
 	property bool hasPermissions: false
 
 	// groups as PermissionsTableView.rebuildFromFlatArray takes them
-	function setPermissions(groups, requiredPermissions, scopes){
+	function setPermissions(groups, scopes){
 		tokenPermissionsView.hasPermissions = groups.length > 0
 
 		permissionsTable.rebuildFromFlatArray(groups)
 		permissionsTable.applySelection(scopes)
-
-		let locked = {}
-		for (let i = 0; i < requiredPermissions.length; ++i){
-			locked[requiredPermissions[i]] = qsTr("Every token for this server holds it")
-		}
-		permissionsTable.setLockedPermissions(locked)
 	}
 
 	function getCheckedIds(){

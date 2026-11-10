@@ -52,8 +52,7 @@ ServerTokenApiClient {
 			ServerTokenReceiver {
 				onFinished: {
 					root.productServer = {
-						"groups": PermissionGroups.toFlatArray(m_groups),
-						"requiredPermissions": Array.isArray(m_requiredPermissions) ? m_requiredPermissions : []
+						"groups": PermissionGroups.toFlatArray(m_groups)
 					}
 				}
 			}

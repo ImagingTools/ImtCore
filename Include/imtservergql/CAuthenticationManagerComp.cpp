@@ -17,6 +17,7 @@
 
 // ImtCore includes
 #include <imtbase/imtbase.h>
+#include <imtauth/CUserInfo.h>
 #include <imtauth/imtauth.h>
 #include <imtauth/IUserSettings.h>
 #include <imtgql/CGqlRequestContextManager.h>
@@ -127,12 +128,12 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 		}
 	}
 
-	// A session works only through the server it was opened through: sent directly or through another server it would
-	// escape the token of that server, and a session opened here would gain the rights of a server
+	// A session opened through the server of a product works only through a server, which bounds it by its token: sent directly
+	// it would escape that token. A session opened here works only here. A forwarded session may pass several servers
 	if (!ownProductId.isEmpty() && !token.isEmpty() && !isPat){
 		// Sent directly, a session of this server or of this product (its server opened it at the authorization server)
 		const QByteArray sessionProductId = imtauth::GetJwtProductId(token);
-		const bool isOwnSession = serverProductId.isEmpty() ? (sessionProductId.isEmpty() || sessionProductId == ownProductId) : sessionProductId == serverProductId;
+		const bool isOwnSession = serverProductId.isEmpty() ? (sessionProductId.isEmpty() || sessionProductId == ownProductId) : !sessionProductId.isEmpty();
 		if (!isOwnSession){
 			SetError(error, imtgql::IGqlContextCreator::CCS_FORBIDDEN, sessionProductId.isEmpty()
 						? QStringLiteral("The session was opened at this server and works only here, not through the server of '%1'.").arg(QString::fromUtf8(serverProductId))
@@ -291,6 +292,11 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 				gqlContextPtr->SetUserInfo(userInfoPtr);
 			}
 		}
+	}
+
+	// A request through the server of a product holds no more than the token of that server: the handlers check it as usual
+	if (!serverProductId.isEmpty()){
+		BindToServerToken(*gqlContextPtr, productId, clientProductId, serverScopes);
 	}
 
 	if (!foreignProductId.isEmpty()){
@@ -1093,34 +1099,6 @@ imtgql::IGqlContextCreator::ContextCreationStatus CAuthenticationManagerComp::Ch
 }
 
 
-bool CAuthenticationManagerComp::CheckRequestAccess(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
-{
-	const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
-	const QByteArray serverProductId = contextPtr != nullptr ? contextPtr->GetServerProductId() : QByteArray();
-	if (serverProductId.isEmpty()){
-		return true;
-	}
-
-	QByteArrayList requiredPermissions;
-	if (!m_serverTokenReceiverCompPtr.IsValid() || !m_serverTokenReceiverCompPtr->FindRequiredPermissions(gqlRequest, requiredPermissions)){
-		errorMessage = QStringLiteral("The request '%1' is closed to the servers of products").arg(QString::fromUtf8(gqlRequest.GetCommandId()));
-
-		return false;
-	}
-
-	for (const QByteArray& requiredPermission : requiredPermissions){
-		if (!imtauth::HasPermission(contextPtr->GetServerScopes(), requiredPermission)){
-			errorMessage = QStringLiteral("The server of '%1' may not send '%2': its token lacks '%3'")
-						.arg(QString::fromUtf8(serverProductId), QString::fromUtf8(gqlRequest.GetCommandId()), QString::fromUtf8(requiredPermission));
-
-			return false;
-		}
-	}
-
-	return true;
-}
-
-
 bool CAuthenticationManagerComp::ResolveServerToken(
 			const QByteArray& serverToken,
 			QByteArray& clientProductId,
@@ -1263,6 +1241,52 @@ qint64 CAuthenticationManagerComp::GetJwtExpirationSecs(const QByteArray& jwt) c
 	}
 
 	return expSecs;
+}
+
+
+void CAuthenticationManagerComp::BindToServerToken(
+			imtgql::IGqlContext& gqlContext,
+			const QByteArray& productId,
+			const QByteArray& clientProductId,
+			const QByteArrayList& serverScopes) const
+{
+	// A plain user info: whatever the source, it is no superuser
+	imtauth::CIdentifiableUserInfo boundUserInfo;
+
+	const imtauth::IUserInfo* userInfoPtr = gqlContext.GetUserInfo();
+	if (userInfoPtr != nullptr){
+		// The superuser may do anything: through a server, what its token holds
+		imtauth::IUserInfo::FeatureIds permissions = userInfoPtr->IsAdmin() ? serverScopes : imtauth::IUserInfo::FeatureIds();
+		if (!userInfoPtr->IsAdmin()){
+			for (const QByteArray& permission : userInfoPtr->GetPermissions(productId)){
+				if (imtauth::HasPermission(serverScopes, permission, false)){
+					permissions.append(permission);
+				}
+			}
+		}
+
+		boundUserInfo.CopyFrom(*userInfoPtr);
+
+		// Only the explicit list applies: roles and groups would expand it again
+		for (const QByteArray& userProductId : boundUserInfo.GetProducts()){
+			boundUserInfo.SetRoles(userProductId, imtauth::IUserBaseInfo::RoleIds());
+			boundUserInfo.SetLocalPermissions(userProductId, imtauth::IUserInfo::FeatureIds());
+		}
+		for (const QByteArray& groupId : boundUserInfo.GetGroups()){
+			boundUserInfo.RemoveFromGroup(groupId);
+		}
+		boundUserInfo.SetLocalPermissions(productId, permissions);
+	}
+	else if (!clientProductId.isEmpty()){
+		boundUserInfo.SetName(QString::fromUtf8(clientProductId));
+		boundUserInfo.SetEnabled(true);
+		boundUserInfo.SetLocalPermissions(productId, serverScopes);
+	}
+	else{
+		return;
+	}
+
+	gqlContext.SetUserInfo(&boundUserInfo);
 }
 
 

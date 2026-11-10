@@ -296,7 +296,6 @@ Item {
 				let server = tokensPage.apiClient ? tokensPage.apiClient.productServer : null
 				tokenDialog.permissionsView.setPermissions(
 							server ? server.groups : [],
-							server ? server.requiredPermissions : [],
 							tokenDialog.initialScopes ? tokenDialog.initialScopes : [])
 
 				tokenDialog.updateApplyButton()

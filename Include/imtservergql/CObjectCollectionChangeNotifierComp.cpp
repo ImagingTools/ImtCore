@@ -65,12 +65,9 @@ bool CObjectCollectionChangeNotifierComp::RegisterSubscription(
 		const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
 		const imtauth::IUserInfo* userInfoPtr = contextPtr != nullptr ? contextPtr->GetUserInfo() : nullptr;
 
+		// A server acting on its own is a user holding the permissions of its token
 		bool isAllowed = false;
-		if (contextPtr != nullptr && !contextPtr->GetClientProductId().isEmpty()){
-			// The servlet has checked the server
-			isAllowed = true;
-		}
-		else if (userInfoPtr != nullptr){
+		if (userInfoPtr != nullptr){
 			isAllowed = userInfoPtr->IsAdmin();
 
 			const QByteArrayList heldPermissions = imtservergql::GetUserPermissions(*contextPtr) + contextPtr->GetOrganizationPermissions();

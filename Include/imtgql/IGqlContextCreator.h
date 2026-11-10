@@ -46,12 +46,6 @@ public:
 		\return CCS_INTERNAL_ERROR when the token could not be checked: that says nothing about the token.
 	*/
 	virtual ContextCreationStatus CheckToken(const QByteArray& token, QByteArrayList& scopes, QString& errorMessage) const = 0;
-
-	/**
-		Check that the server of a product the request comes through may send it.
-		A request of a client of this server passes.
-	*/
-	virtual bool CheckRequestAccess(const CGqlRequest& gqlRequest, QString& errorMessage) const = 0;
 };
 
 

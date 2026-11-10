@@ -19,7 +19,6 @@
 #include <imtserverapp/CGuiElementRepresentationControllerComp.h>
 #include <imtserverapp/CPageBasedGuiRepresentationControllerComp.h>
 #include <imtserverapp/CSingleCommandPermissionsProviderComp.h>
-#include <imtserverapp/CCommandGroupPermissionsProviderComp.h>
 #include <imtserverapp/CCommandPermissionsProviderJoinerComp.h>
 #include <imtserverapp/CTableViewParamRepresentationControllerComp.h>
 #include <imtserverapp/CFileNameParamRepresentationControllerComp.h>
@@ -62,7 +61,6 @@ typedef imtserverapp::CDatabaseAccessSettingsRepresentationControllerComp Databa
 typedef imtserverapp::CPageBasedGuiRepresentationControllerComp PageBasedGuiRepresentationController;
 typedef imtserverapp::CGuiElementRepresentationControllerComp GuiElementRepresentationController;
 typedef imtserverapp::CSingleCommandPermissionsProviderComp SingleCommandPermissionsProvider;
-typedef imtserverapp::CCommandGroupPermissionsProviderComp CommandGroupPermissionsProvider;
 typedef imtserverapp::CCommandPermissionsProviderJoinerComp CommandPermissionsProviderJoiner;
 typedef imtserverapp::CTableViewParamRepresentationControllerComp TableViewParamRepresentationController;
 typedef imtserverapp::CGuiElementModelComp GuiElementModel;

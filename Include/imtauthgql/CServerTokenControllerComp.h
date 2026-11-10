@@ -10,7 +10,6 @@
 #include <imtauth/IPersonalAccessToken.h>
 #include <imtauth/IPersonalAccessTokenManager.h>
 #include <imtlic/CProductInfo.h>
-#include <imtlic/IFeatureInfoProvider.h>
 #include <imtlic/IProductInfo.h>
 #include <imtsdl/TElementList.h>
 
@@ -38,8 +37,6 @@ public:
 		I_ASSIGN(m_tokenManagerCompPtr, "PersonalAccessTokenManager", "Personal access token manager", true, "PersonalAccessTokenManager");
 		I_ASSIGN(m_clientProductCatalogCompPtr, "ClientProductCatalog", "Products whose servers may be given a token of this server", true, "ClientProductCatalog");
 		I_ASSIGN(m_permissionTreeCompPtr, "PermissionTree", "Permissions of this server, given to the roles of the products", true, "PermissionTree");
-		I_ASSIGN(m_serverPermissionsCompPtr, "ProductServerPermissions", "What a product server may do here: the permissions of its token; without it the permission tree of this server", false, "ProductServerPermissions");
-		I_ASSIGN_MULTI_0(m_requiredPermissionsAttrPtr, "RequiredPermissions", "Permissions every token for this server holds", false);
 	I_END_COMPONENT;
 
 protected:
@@ -90,7 +87,6 @@ private:
 	/**
 		The permissions every token for this server holds.
 	*/
-	QByteArrayList GetRequiredPermissions() const;
 
 	/**
 		The server token of the id. Personal tokens of users are not server tokens.
@@ -118,8 +114,6 @@ private:
 	I_REF(imtauth::IPersonalAccessTokenManager, m_tokenManagerCompPtr);
 	I_REF(imtauth::IClientProductCatalog, m_clientProductCatalogCompPtr);
 	I_REF(imtlic::IProductInfo, m_permissionTreeCompPtr);
-	I_REF(imtlic::IFeatureInfoProvider, m_serverPermissionsCompPtr);
-	I_MULTIATTR(QByteArray, m_requiredPermissionsAttrPtr);
 };
 
 

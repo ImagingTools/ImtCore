@@ -62,7 +62,6 @@ public:
 				imtgql::IGqlContextCreator::ContextCreationError& error) const override;
 	virtual bool IsRevocableToken(const QByteArray& token) const override;
 	virtual ContextCreationStatus CheckToken(const QByteArray& token, QByteArrayList& scopes, QString& errorMessage) const override;
-	virtual bool CheckRequestAccess(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 	// reimplemented (imtauth::IJwtSessionController)
 	virtual bool ValidateSession(const QByteArray& sessionId) const override;
@@ -240,6 +239,13 @@ private:
 		well-formed JWT or has no 'exp' claim.
 	*/
 	qint64 GetJwtExpirationSecs(const QByteArray& jwt) const;
+
+	/**
+		Bound a request through the server of a product by the token of that server.
+		The user of a forwarded request keeps only the permissions the token holds too, and is no superuser.
+		A server acting on its own is a user holding the permissions of its token.
+	*/
+	void BindToServerToken(imtgql::IGqlContext& gqlContext, const QByteArray& productId, const QByteArray& clientProductId, const QByteArrayList& serverScopes) const;
 
 	/**
 		Decode standard claims from a JWT payload without remote calls or
