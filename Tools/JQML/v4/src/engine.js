@@ -2706,7 +2706,11 @@ export class Engine {
 	// A property change handler: polled once per evaluation pass and, for custom properties, run at once when the
 	// property is assigned (so that a value changed and changed back within one pass is not lost).
 	addChangeHandler(handler) {
-		this.changeHandlers.push(handler);
+		// A property that was declared in QML runs its handlers when it is assigned and nothing polls it: its handler is held by its item
+		// only. In the list of the engine it would keep the item for good, as the SDL objects of the replies that a page asked for, and
+		// the loop over the list would pass it in every frame.
+		if (handler.hasLast && this.runsAtAssignment(handler)) handler.immediate = true;
+		else this.changeHandlers.push(handler);
 		const item = handler.item;
 		if (item.$chg === undefined) item.$chg = new Map();
 		const list = item.$chg.get(handler.property);

@@ -3513,7 +3513,8 @@ export class ListView extends Item {
 
 		const horizontal = this.$horizontal;
 		if (this.$rowHeight <= 0) {
-			const probe = this.createDelegate(0);
+			// The first row may have its delegate already (a model change keeps the delegates of the rows that stay and measures again).
+			const probe = this.$delegates.get(0) || this.createDelegate(0);
 			if (probe === null) {
 				this.createDelegate = null;
 				return;
@@ -3529,6 +3530,12 @@ export class ListView extends Item {
 					? probe.$h
 					: probe.$ah;
 			this.$rowHeight = extent > 0 ? extent : 40;
+			// Reading the size can lay the view out and build the delegate of the first row again: the one that is replaced is released.
+			const other = this.$delegates.get(0);
+			if (other !== undefined && other !== probe) {
+				if (this.releaseDelegate !== null) this.releaseDelegate(other);
+				this.$removeChild(other);
+			}
 			this.$delegates.set(0, probe);
 			this.$extentAt(0);
 		}
