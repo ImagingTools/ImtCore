@@ -3118,6 +3118,8 @@ defineField(GridLayout.prototype, 'rowSpacing', '$rowSpacing', toFloat);
 // ----- ListView -----
 
 const MAX_POOLED_DELEGATES = 20;
+// Delegates the pool holds beyond what the view and its cache buffer can build (rows of other sizes, a row that is half in).
+const POOL_SLACK = 4;
 const clamp = (v, lo, hi) => Math.min(Math.max(v, lo), hi);
 
 function listViewHorizontal(value) {
@@ -3175,6 +3177,17 @@ for (const [name, get] of [
 	);
 }
 
+// The size of an item that a binding or an anchor gives is not known before the binding has run once: a view that is
+// created with such a size is not an empty view yet.
+function sizeUnresolved(item) {
+	const list = item.$bindings;
+	if (list === null || list === undefined) return false;
+	for (const binding of list) {
+		if (binding.runs === 0 && (binding.key === 'width' || binding.key === 'height' || binding.key.startsWith('anchors'))) return true;
+	}
+	return false;
+}
+
 export class ListView extends Item {
 	// The delegates are the children of the view itself.
 	get contentItem() {
@@ -3227,6 +3240,26 @@ export class ListView extends Item {
 		if (this.$children.indexOf(item) < 0) this.$children.push(item);
 		this.$update();
 		return item;
+	}
+
+	// The most delegates the view can have built at a time: a jump moves all of them to the pool, so a pool that is larger would
+	// never be used up. Infinity while the size of the view is not known.
+	$poolLimit() {
+		const span = this.$horizontal ? this.$aw : this.$ah;
+		if (!(span > 0)) return Infinity;
+		const extent = this.$extentCount > 0 ? this.$extentSum / this.$extentCount : this.$rowHeight > 0 ? this.$rowHeight : 40;
+		const step = Math.max(1, extent + Math.max(0, this.$spacing));
+		return Math.ceil((span + 2 * Math.max(0, this.$cacheBuffer)) / step) + POOL_SLACK;
+	}
+
+	// Destroys the delegates of the pool that the view cannot use (the model got smaller, the view shrank), the oldest first.
+	$trimPool() {
+		const limit = this.$poolLimit();
+		while (this.$pool.length > limit) {
+			const item = this.$pool.shift();
+			if (this.releaseDelegate !== null) this.releaseDelegate(item);
+			item.$destroy();
+		}
 	}
 
 	// Destroys the pooled delegates.
@@ -3369,9 +3402,10 @@ export class ListView extends Item {
 	}
 
 	$releaseWhere(keep) {
-		// The pool holds as many delegates as the list had built: a jump to another place reuses all of them, instead of building
+		// The pool holds as many delegates as the view can build: a jump to another place reuses all of them, instead of building
 		// the rows of the cache buffer anew (a row that is made costs several times as much as one that is rebound).
-		const capacity = Math.max(MAX_POOLED_DELEGATES, this.$delegates.size);
+		const limit = this.$poolLimit();
+		const capacity = Number.isFinite(limit) ? limit : Math.max(MAX_POOLED_DELEGATES, this.$delegates.size);
 		for (const [index, item] of [...this.$delegates]) {
 			if (keep(index)) continue;
 			this.$delegates.delete(index);
@@ -3397,6 +3431,7 @@ export class ListView extends Item {
 		this.$arranging = true;
 		try {
 			this.$arrangeBody();
+			this.$trimPool();
 			this.$syncDelegateChildren();
 			// contentY/X can call $arrange outside a layout pass — keep screen coords in sync for hit-testing.
 			if (!layingOut) {
@@ -3479,6 +3514,11 @@ export class ListView extends Item {
 			this.$extentAt(0);
 		}
 
+		// A view that has no size holds no delegate (Qt makes one to learn the size of a row and drops it).
+		if (this.$aw <= 0 && this.$ah <= 0 && this.$w <= 0 && this.$h <= 0 && !sizeUnresolved(this)) {
+			this.$releaseWhere(() => false);
+			return;
+		}
 		const maxOffset = horizontal ? this.$maxContentX : this.$maxContentY;
 		const offset = clamp(horizontal ? this.$contentX : this.$contentY, 0, maxOffset);
 		if (horizontal) {
@@ -3782,6 +3822,13 @@ export class GridView extends ListView {
 		return cols > 0 ? Math.ceil(this.$rowCount / cols) * this.$cellHeight : 0;
 	}
 
+	$poolLimit() {
+		const span = this.$ah;
+		if (!(span > 0) || !(this.$cellHeight > 0)) return Infinity;
+		const rows = Math.ceil((span + 2 * Math.max(0, this.$cacheBuffer)) / this.$cellHeight) + 2;
+		return rows * this.$columns();
+	}
+
 	$columns() {
 		const cell = this.$cellWidth > 0 ? this.$cellWidth : 1;
 		const width = this.$aw > 0 ? this.$aw : this.$w;
@@ -3795,6 +3842,7 @@ export class GridView extends ListView {
 		this.$arranging = true;
 		try {
 			this.$arrangeGrid();
+			this.$trimPool();
 			this.$syncDelegateChildren();
 			if (!layingOut) {
 				const sx = this.$sx;
@@ -3826,6 +3874,16 @@ export class GridView extends ListView {
 			this.$builtCount = count;
 		}
 		if (this.createDelegate === null || count === 0) {
+			this.$releaseWhere(() => false);
+			return;
+		}
+		// A grid that has no size holds no delegate either; as in Qt one is made once and dropped.
+		if (this.$aw <= 0 && this.$ah <= 0 && this.$w <= 0 && this.$h <= 0 && !sizeUnresolved(this)) {
+			if (this.$probed !== true) {
+				this.$probed = true;
+				const probe = this.createDelegate(0);
+				if (probe !== null) this.$delegates.set(0, probe);
+			}
 			this.$releaseWhere(() => false);
 			return;
 		}
