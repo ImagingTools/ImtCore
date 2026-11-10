@@ -298,16 +298,15 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 		if (subscriberControllerPtr->RegisterSubscription(subscriptionId, gqlRequest, request, errorMessage)){
 			// A token is revoked or narrowed long after the subscription is made, a session ends by itself.
 			// A subscription forwarded by the server of a product lives as long as the token of that server.
-			const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
-			const bool isServerRequest = !contextPtr->GetServerProductId().isEmpty();
-			const bool isForwarded = isServerRequest && contextPtr->GetClientProductId().isEmpty();
-			const QByteArray token = gqlHeaders.value(isForwarded ? imtbase::s_serverTokenHeaderId : imtbase::s_authenticationTokenHeaderId);
-			if (m_gqlContextCreatorCompPtr->IsRevocableToken(token)){
-				TokenSubscription subscription;
+			const QByteArray serverToken = gqlHeaders.value(imtbase::s_serverTokenHeaderId);
+			const QByteArray token = serverToken.isEmpty() ? gqlHeaders.value(imtbase::s_authenticationTokenHeaderId) : serverToken;
+			TokenSubscription subscription;
+			QString tokenError;
+			if (m_gqlContextCreatorCompPtr->IsRevocableToken(token)
+						&& m_gqlContextCreatorCompPtr->CheckToken(token, subscription.scopes, tokenError) == imtgql::IGqlContextCreator::CCS_OK){
 				subscription.subscriptionId = subscriptionId;
 				subscription.controllerPtr = subscriberControllerPtr;
 				subscription.token = token;
-				subscription.scopes = isServerRequest ? contextPtr->GetServerScopes() : contextPtr->GetScopes();
 				std::sort(subscription.scopes.begin(), subscription.scopes.end());
 				subscription.requestPtr = &request;
 				subscription.connectionPtr = webSocketRequest->parent();
@@ -482,10 +481,7 @@ bool CWebSocketServletComp::IsSubscriberAllowed(
 		return false;
 	}
 
-	if (!contextPtr->GetClientProductId().isEmpty()){
-		return controller.IsOpenFor(imtgql::IGqlSubscriberController::SK_SERVER, gqlRequest);
-	}
-
+	// A server acting on its own is a user holding the permissions of its token
 	const imtauth::IUserInfo* userInfoPtr = contextPtr->GetUserInfo();
 	if (userInfoPtr == nullptr){
 		return !*m_isAnonymousDeniedAttrPtr || controller.IsOpenFor(imtgql::IGqlSubscriberController::SK_ANONYMOUS, gqlRequest);

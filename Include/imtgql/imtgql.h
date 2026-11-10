@@ -29,6 +29,12 @@ imtauth::IUserInfo::FeatureIds CollectImpliedPermissions(const IGqlContext& gqlC
 imtauth::IUserInfo::FeatureIds CollectTenantOwnerPermissions(const IGqlContext& gqlContext);
 
 /**
+	Get the product whose server sends the request on its own behalf: it is a user without a login there.
+	Empty for a request of a user, sent directly or forwarded by a server, and for an anonymous request a server forwards.
+*/
+QByteArray GetSenderServerProductId(const IGqlContext& gqlContext);
+
+/**
 	The given permissions limited to the permission scope of the organization of the context.
 	The organization access permissions (\see imtauth::GetOrganizationAccessPermissions) are kept: they open the organizations whatever the scope.
 	Outside of any organization the permissions are returned unchanged.

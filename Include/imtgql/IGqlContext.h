@@ -35,22 +35,11 @@ public:
 	virtual void SetProductId(const QByteArray& productId) = 0;
 
 	/**
-		Get the product whose server sends this request, empty for a request of a user.
-	*/
-	virtual QByteArray GetClientProductId() const = 0;
-	virtual void SetClientProductId(const QByteArray& clientProductId) = 0;
-
-	/**
-		Get the product whose server sent or forwarded this request, empty for a request of a client of this server.
+		Get the product whose server the request came through, empty for a request made here directly.
+		Without a user the server itself sends it; the user of the request holds only what the token of the server allows.
 	*/
 	virtual QByteArray GetServerProductId() const = 0;
 	virtual void SetServerProductId(const QByteArray& serverProductId) = 0;
-
-	/**
-		Get what the server of GetServerProductId() may do here: the permissions of its token.
-	*/
-	virtual QByteArrayList GetServerScopes() const = 0;
-	virtual void SetServerScopes(const QByteArrayList& scopes) = 0;
 
 	virtual QByteArray GetLanguageId() const = 0;
 	virtual void SetLanguageId(const QByteArray& languageId) = 0;

@@ -7,6 +7,7 @@
 
 // ImtCore includes
 #include <imtgql/CGqlRequest.h>
+#include <imtgql/imtgql.h>
 #include <imtnotifygql/imtnotifygql.h>
 
 
@@ -403,13 +404,14 @@ bool CNotificationsControllerComp::CanSend(const ::imtgql::CGqlRequest& gqlReque
 	}
 
 	const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
-	if (contextPtr == nullptr || contextPtr->GetClientProductId().isEmpty()){
+	const QByteArray senderProductId = contextPtr != nullptr ? imtgql::GetSenderServerProductId(*contextPtr) : QByteArray();
+	if (senderProductId.isEmpty()){
 		errorMessage = QStringLiteral("Notifications are sent only by the server of a product");
 
 		return false;
 	}
 
-	if (productId.isEmpty() || contextPtr->GetClientProductId() != productId){
+	if (productId.isEmpty() || senderProductId != productId){
 		errorMessage = QStringLiteral("Notifications are sent only to the product of the sender");
 
 		return false;

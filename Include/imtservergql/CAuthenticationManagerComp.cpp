@@ -156,9 +156,7 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 	gqlContextPtr->SetToken(token);
 	gqlContextPtr->SetHeaders(headers);
 	gqlContextPtr->SetProductId(productId);
-	gqlContextPtr->SetClientProductId(clientProductId);
 	gqlContextPtr->SetServerProductId(serverProductId);
-	gqlContextPtr->SetServerScopes(serverScopes);
 	gqlContextPtr->SetProductInfo(m_productInfoCompPtr.IsValid() ? m_productInfoCompPtr.GetPtr() : m_permissionTreeCompPtr.GetPtr());
 	if (isPat){
 		gqlContextPtr->SetScopes(scopes);

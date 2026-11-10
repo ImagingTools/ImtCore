@@ -47,8 +47,6 @@ bool CObjectCollectionChangeNotifierComp::IsOpenFor(SubscriberKind subscriberKin
 	switch (subscriberKind){
 	case SK_USER:
 		return *m_isOpenToUsersAttrPtr || m_readPermissionsAttrPtr.GetCount() > 0;
-	case SK_SERVER:
-		return *m_isOpenToServersAttrPtr;
 	default:
 		return false;
 	}

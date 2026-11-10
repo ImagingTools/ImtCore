@@ -37,6 +37,14 @@ imtauth::IUserInfo::FeatureIds CollectImpliedPermissions(const IGqlContext& gqlC
 }
 
 
+QByteArray GetSenderServerProductId(const IGqlContext& gqlContext)
+{
+	const bool isServerItself = gqlContext.GetUserInfo() != nullptr && gqlContext.GetUserId().isEmpty();
+
+	return isServerItself ? gqlContext.GetServerProductId() : QByteArray();
+}
+
+
 imtauth::IUserInfo::FeatureIds CollectTenantOwnerPermissions(const IGqlContext& gqlContext)
 {
 	if (!gqlContext.IsTenantOwner() || gqlContext.GetTenantId().isEmpty()){

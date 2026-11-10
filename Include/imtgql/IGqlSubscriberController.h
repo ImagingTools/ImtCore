@@ -20,8 +20,7 @@ public:
 	enum SubscriberKind
 	{
 		SK_ANONYMOUS,
-		SK_USER,
-		SK_SERVER
+		SK_USER
 	};
 
 	/**

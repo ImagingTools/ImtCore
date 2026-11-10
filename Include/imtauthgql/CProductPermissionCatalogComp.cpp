@@ -12,6 +12,7 @@
 // ImtCore includes
 #include <imtauth/CProductPermissionSnapshot.h>
 #include <imtauthgql/imtauthgql.h>
+#include <imtgql/imtgql.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/ProductPermissionCatalog.h>
 
 
@@ -44,7 +45,7 @@ sdl::V1_0::imtauth::CPublishProductPermissionsPayload CProductPermissionCatalogC
 
 	// Only the server of the product publishes its tree
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
-	if (gqlContextPtr == nullptr || productId.isEmpty() || gqlContextPtr->GetClientProductId() != productId){
+	if (gqlContextPtr == nullptr || productId.isEmpty() || imtgql::GetSenderServerProductId(*gqlContextPtr) != productId){
 		errorMessage = QStringLiteral("The permissions of the product '%1' are published by its server only").arg(QString::fromUtf8(productId));
 
 		return response;
