@@ -434,6 +434,7 @@ export class Engine {
 		this.primed = true; // false after a full sweep: the next incremental pass has to run every binding
 		this.bindingSeq = 0;
 		this.dirty = new Set();
+		this.dirtyGen = 0; // counts the times `dirty` was emptied (see markReaders)
 		this.retry = new Set(); // bound properties a Binding item wrote over: they apply their value on the next pass only
 		this.volatile = new Set();
 		this.passHeap = []; // bindings of the running pass that still wait, the lowest `seq` first
@@ -735,6 +736,7 @@ export class Engine {
 	reset() {
 		this.bindings.clear();
 		this.dirty.clear();
+		this.dirtyGen++;
 		this.retry.clear();
 		this.volatile.clear();
 		this.passHeap = [];
@@ -1165,6 +1167,7 @@ export class Engine {
 			let set = subs.get(names[i]);
 			if (set === undefined) subs.set(names[i], set = new Set());
 			set.add(binding);
+			set.markedGen = -1; // a reader that is not marked yet
 		}
 		binding.dItems = items;
 		binding.dNames = names;
@@ -1205,7 +1208,16 @@ export class Engine {
 		if (!this.incremental) return;
 		const set = item.$subs === undefined ? undefined : item.$subs.get(name);
 		if (set === undefined) return;
-		for (const binding of set) this.markDirty(binding);
+		// The readers that are marked are marked once until the next pass takes them: a script that changes a model a thousand times
+		// (a branch of the address tree that is closed row by row) marks its thousands of readers once, not a thousand times.
+		if (!this.inPass && set.markedGen === this.dirtyGen) return;
+		let all = true;
+		for (const binding of set) {
+			// a binding that failed is never marked (it is retried), one that is running or writing is marked when it ends
+			if (binding.evaluating || binding.writing) all = false;
+			this.markDirty(binding);
+		}
+		if (!this.inPass && all) set.markedGen = this.dirtyGen;
 	}
 
 	// The binding runs again: later in the running pass if its turn has not come, else in the next pass.
@@ -1659,6 +1671,7 @@ export class Engine {
 				// its stale value back onto the target and erase that size notification.
 				for (const binding of this.dirty) this.queueSubscriber(binding);
 				this.dirty.clear();
+				this.dirtyGen++;
 				this.drainSubscribers();
 				this.syncBindingItems();
 			}
@@ -1696,6 +1709,7 @@ export class Engine {
 		try {
 			for (const binding of this.dirty) if (!binding.inHeap) this.pushPending(binding);
 			this.dirty.clear();
+			this.dirtyGen++;
 			for (const binding of this.retry) if (!binding.inHeap && !binding.failed) this.pushPending(binding);
 			this.retry.clear();
 			const withData = this.dataSeen !== this.dataEpoch;

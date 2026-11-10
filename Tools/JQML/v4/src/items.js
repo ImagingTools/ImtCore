@@ -418,6 +418,8 @@ export function setFrameLoop(on) {
 
 // Bumped by every $update(): an item that found the layout current at this value still finds it so.
 let layoutEpoch = 0;
+// A layout that a script's read of a size asked for (see $ensureGeometry), not the one of a frame.
+let forcedLayout = false;
 
 // A view lays out from its model, which changes without calling $update on the view: the model reaches the
 // views that last arranged from it.
@@ -861,7 +863,13 @@ export class Item {
 		// A read in a script must not swallow the frame that still has to evaluate the bindings.
 		if (frameLoop) root.$updateRequested = false;
 		const epoch = layoutEpoch;
-		root.$layout();
+		const outer = forcedLayout;
+		forcedLayout = true;
+		try {
+			root.$layout();
+		} finally {
+			forcedLayout = outer;
+		}
 		if (layoutEpoch === epoch) this.$cleanEpoch = epoch;
 	}
 
@@ -3426,8 +3434,19 @@ export class ListView extends Item {
 	}
 
 	// Creates the delegates of the visible rows and removes the others.
+	// A script that changes the model over and over and reads a size in between (the address tree closes a branch row by row) asks
+	// for a layout with each read. As in Qt, where a list is laid out when the frame polishes, a list that has been built is
+	// arranged for a changed model in the next frame, not in each of these layouts.
+	$deferArrange() {
+		if (!forcedLayout || this.$builtModel === undefined || this.$delegates.size === 0) return false;
+		if (this.$builtModel === this.$model && this.$builtVersion === modelVersion(this.$model) && this.$builtCount === this.$rowCount) return false;
+		this.$update();
+		return true;
+	}
+
 	$arrange() {
 		if (this.$arranging) return;
+		if (this.$deferArrange()) return;
 		this.$arranging = true;
 		try {
 			this.$arrangeBody();
@@ -3839,6 +3858,7 @@ export class GridView extends ListView {
 	// destroyed, so a page of 500 cards builds as many as the view shows, not 500.
 	$arrange() {
 		if (this.$arranging) return;
+		if (this.$deferArrange()) return;
 		this.$arranging = true;
 		try {
 			this.$arrangeGrid();
