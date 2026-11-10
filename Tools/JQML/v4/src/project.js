@@ -480,7 +480,11 @@ export class Project {
 		const entry = pickVersion(versions === undefined ? undefined : versions.get(name), version);
 		if (entry !== undefined) return entry.path;
 		const types = this.modules.get(module);
-		return types ? types.get(name) : undefined;
+		const path = types ? types.get(name) : undefined;
+		if (path !== undefined || name.endsWith('__')) return path;
+		// A type that the application registers from C++ and that a module also has in QML under `Name__` (a qmldir keeps the QML type
+		// from taking the place of the C++ one on a desktop). The browser has no C++ type, so the QML one is the type here.
+		return this.moduleTypePath(module, `${name}__`, version);
 	}
 
 	// The path of a singleton of a module for an import of `version`.
