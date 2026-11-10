@@ -84,6 +84,23 @@ Rectangle {
 			&& tableDelegateContainer.tableItem.hoverEnabled
 			&& ma.containsMouse
 
+	readonly property bool hasCellColor: tableDelegateContainer.cellColor !== "transparent";
+	readonly property bool isAlternatingCell: tableDelegateContainer.tableItem.enableAlternating
+			&& tableDelegateContainer.tableItem.alternatingCellColor !== "transparent"
+			&& tableDelegateContainer.rowIndex % 2 == 1;
+
+	// The background of the cells of the row, shared by the cells and the cell of the checkbox column.
+	// Cells paint it only when hasCellColor is set; otherwise the row's own background shows through.
+	readonly property var cellBackgroundColor: tableDelegateContainer.selected ? tableDelegateContainer.selectedColor :
+			tableDelegateContainer.isAlternatingCell ? tableDelegateContainer.tableItem.alternatingCellColor : tableDelegateContainer.cellColor;
+
+	readonly property bool isFirstRow: tableDelegateContainer.rowIndex == 0;
+	readonly property bool isLastRow: tableDelegateContainer.rowIndex == tableDelegateContainer.tableItem.elementsCount - 1;
+
+	// The separators between the rows, shared by the cells and the cell of the checkbox column.
+	readonly property int topSeparatorHeight: tableDelegateContainer.rowIndex > 0 || (tableDelegateContainer.isFirstRow && tableDelegateContainer.visibleTopBorderFirst) ? tableDelegateContainer.horizontalBorderSize : 0;
+	readonly property int bottomSeparatorHeight: tableDelegateContainer.isLastRow && tableDelegateContainer.visibleBottomBorderLast ? tableDelegateContainer.horizontalBorderSize : 0;
+
 	// Priority: selected > hover > zebra stripe > transparent.
 	function rowBackgroundColor(){
 		if (tableDelegateContainer.selected)
