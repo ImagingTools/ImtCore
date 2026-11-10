@@ -11,11 +11,9 @@ namespace imtcom
 // reimplemented (imtcom/CServerConnectionInterfaceParam)
 int CServerConnectionInterfaceParamComp::GetConnectionFlags() const
 {
-	int flags = BaseClass2::GetConnectionFlags();
+	const int flags = BaseClass2::GetConnectionFlags();
 	if (m_sslEnabledCompPtr.IsValid()){
-		// The SSL setting decides only between CF_SECURE and CF_DEFAULT, other flags are kept
-		flags &= ~(CF_SECURE | CF_DEFAULT);
-		flags |= m_sslEnabledCompPtr->IsEnabled() ? CF_SECURE : CF_DEFAULT;
+		return WithSecureMode(flags, m_sslEnabledCompPtr->IsEnabled());
 	}
 	return flags;
 }
