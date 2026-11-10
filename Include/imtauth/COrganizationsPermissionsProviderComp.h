@@ -2,8 +2,12 @@
 #pragma once
 
 
+// ACF includes
+#include <icomp/CComponentBase.h>
+
 // ImtCore includes
-#include <imtauth/CStaticPermissionsProviderCompBase.h>
+#include <imtlic/IFeatureInfoProvider.h>
+#include <imtlic/CFeatureContainer.h>
 
 
 namespace imtauth
@@ -11,17 +15,29 @@ namespace imtauth
 
 
 class COrganizationsPermissionsProviderComp:
-			public CStaticPermissionsProviderCompBase
+			public icomp::CComponentBase,
+			virtual public imtlic::IFeatureInfoProvider
 {
 public:
-	typedef CStaticPermissionsProviderCompBase BaseClass;
+	typedef icomp::CComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(COrganizationsPermissionsProviderComp)
+		I_REGISTER_INTERFACE(imtlic::IFeatureInfoProvider);
 	I_END_COMPONENT
 
+	// reimplemented (IFeatureInfoProvider)
+	virtual imtlic::IFeatureInfoSharedPtr GetFeatureInfo(const QByteArray& featureId) const override;
+	virtual const imtbase::ICollectionInfo& GetFeatureList() const override;
+
 protected:
-	// reimplemented (CStaticPermissionsProviderCompBase)
-	virtual void CreateFeatures() override;
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
+
+private:
+	void CreateOrganizationFeatures();
+
+private:
+	imtlic::CFeatureContainer m_featureCollection;
 };
 
 
