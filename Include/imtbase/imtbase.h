@@ -50,7 +50,6 @@ static const inline QByteArray s_authenticationTokenHeaderId = QByteArrayLiteral
 static const inline QByteArray s_productIdHeaderId = QByteArrayLiteral("productid");
 // The token of the product server a request comes through; the user of the request has a token of its own
 static const inline QByteArray s_serverTokenHeaderId = QByteArrayLiteral("x-server-token");
-// The product the console of the authorization server administers, for a superuser only
 static const inline QByteArray s_permissionPathHeaderId = QByteArrayLiteral("permissionPath");
 static const inline QByteArray s_languageIdHeaderId = QByteArrayLiteral("languageid");
 // Unique ID of a client request; e.g. a DocumentChanged notification names the request that made the change
