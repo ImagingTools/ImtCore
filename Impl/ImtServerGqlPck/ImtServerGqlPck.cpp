@@ -26,9 +26,9 @@ I_EXPORT_COMPONENT(
 			"GraphQL WebSocket Receiver");
 
 I_EXPORT_COMPONENT(
-			ProductServerRequestPolicy,
-			"Requests the servers of products may send, with the permissions of their tokens",
-			"Product Server Token Permission Policy");
+			ServerTokenReceiver,
+			"How this server receives the servers of other products: its tokens and what they may send",
+			"Product Server Token Receiver Policy");
 
 I_EXPORT_COMPONENT(
 			GraphQLDemultiplexer,

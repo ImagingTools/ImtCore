@@ -56,7 +56,7 @@ public:
 	virtual bool Serialize(iser::IArchive& archive) override;
 
 private:
-	QByteArray GenerateRandomToken() const;
+	QByteArray GenerateRandomToken(const QByteArray& prefix) const;
 	QByteArray HashToken(const QByteArray& rawToken) const;
 	QByteArray ExtractTokenId(const QByteArray& rawToken) const;
 

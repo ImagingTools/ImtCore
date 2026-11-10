@@ -70,10 +70,11 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 		if (isPat){
 			QByteArray tokenProductId;
 			bool isTokenAccepted = GetCachedPatProducts(token, tokenProductId, clientProductId);
+			// A token is of the kind its prefix names
+			isTokenAccepted = isTokenAccepted && imtauth::IsServerToken(token) == !clientProductId.isEmpty();
 			if (isTokenAccepted && !clientProductId.isEmpty()){
 				// The token of a server names the server accepting it and the product using it
-				const QByteArray serverProductId = m_serverProductIdAttrPtr.IsValid() ? QByteArray(*m_serverProductIdAttrPtr) : productId;
-				isTokenAccepted = tokenProductId == serverProductId && (headerProductId.isEmpty() || headerProductId == clientProductId);
+				isTokenAccepted = tokenProductId == m_serverTokenReceiverCompPtr->GetServerProductId() && (headerProductId.isEmpty() || headerProductId == clientProductId);
 				productId = clientProductId;
 			}
 			else if (isTokenAccepted && !tokenProductId.isEmpty()){
@@ -94,7 +95,7 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 	QByteArray serverProductId = clientProductId;
 	QByteArrayList serverScopes = clientProductId.isEmpty() ? QByteArrayList() : scopes;
 	QByteArray foreignProductId;
-	const QByteArray ownProductId = m_serverProductIdAttrPtr.IsValid() ? QByteArray(*m_serverProductIdAttrPtr) : QByteArray();
+	const QByteArray ownProductId = m_serverTokenReceiverCompPtr.IsValid() ? m_serverTokenReceiverCompPtr->GetServerProductId() : QByteArray();
 	if (clientProductId.isEmpty() && !ownProductId.isEmpty()){
 		const QByteArray serverToken = headers.value(imtbase::s_serverTokenHeaderId);
 		if (!serverToken.isEmpty()){
@@ -123,6 +124,20 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 			if (!requestProductId.isEmpty() && requestProductId != ownProductId){
 				foreignProductId = requestProductId;
 			}
+		}
+	}
+
+	// A session works only through the server it was opened through: sent directly or through another server it would
+	// escape the token of that server, and a session opened here would gain the rights of a server
+	if (!ownProductId.isEmpty() && !token.isEmpty() && !isPat){
+		// Sent directly, a session of this server or of this product (its server opened it at the authorization server)
+		const QByteArray sessionProductId = imtauth::GetJwtProductId(token);
+		const bool isOwnSession = serverProductId.isEmpty() ? (sessionProductId.isEmpty() || sessionProductId == ownProductId) : sessionProductId == serverProductId;
+		if (!isOwnSession){
+			SetError(error, imtgql::IGqlContextCreator::CCS_FORBIDDEN, sessionProductId.isEmpty()
+						? QStringLiteral("The session was opened at this server and works only here, not through the server of '%1'.").arg(QString::fromUtf8(serverProductId))
+						: QStringLiteral("The session was opened through the server of '%1' and works only through it.").arg(QString::fromUtf8(sessionProductId)));
+			return nullptr;
 		}
 	}
 
@@ -588,7 +603,8 @@ void CAuthenticationManagerComp::OnComponentCreated()
 	BaseClass::OnComponentCreated();
 
 	// A revoked or changed token is validated again at its next request
-	for (imtauth::IPersonalAccessTokenManager* managerPtr : {m_patManagerCompPtr.GetPtr(), m_serverTokenManagerCompPtr.GetPtr()}){
+	imtauth::IPersonalAccessTokenManager* serverTokenManagerPtr = m_serverTokenReceiverCompPtr.IsValid() ? m_serverTokenReceiverCompPtr->GetTokenManager() : nullptr;
+	for (imtauth::IPersonalAccessTokenManager* managerPtr : {m_patManagerCompPtr.GetPtr(), serverTokenManagerPtr != m_patManagerCompPtr.GetPtr() ? serverTokenManagerPtr : nullptr}){
 		imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(managerPtr);
 		if (modelPtr != nullptr){
 			modelPtr->AttachObserver(this);
@@ -679,24 +695,19 @@ bool CAuthenticationManagerComp::ResolveUserId(
 			QString& errorMessage,
 			imtgql::IGqlContextCreator::ContextCreationStatus& status) const
 {
-	if (!m_serverTokenManagerCompPtr.IsValid() || !IsPatToken(token)){
+	if (!imtauth::IsServerToken(token)){
 		return ResolveToken(token, m_patManagerCompPtr.GetPtr(), userId, tenantId, scopes, isPat, errorMessage, status);
 	}
 
-	// A server sends the token this server issued for it also as its own token (its subscriptions, its service info)
-	if (ResolveToken(token, m_serverTokenManagerCompPtr.GetPtr(), userId, tenantId, scopes, isPat, errorMessage, status)){
-		return true;
-	}
+	// The token of a server is known only where it was issued
+	if (!m_serverTokenReceiverCompPtr.IsValid()){
+		errorMessage = QStringLiteral("This server accepts no tokens of servers.");
+		status = imtgql::IGqlContextCreator::CCS_FORBIDDEN;
 
-	if (status == imtgql::IGqlContextCreator::CCS_INTERNAL_ERROR){
 		return false;
 	}
 
-	// Otherwise a personal token of a user; a token of a server issued elsewhere names another receiver and is refused
-	errorMessage.clear();
-	status = imtgql::IGqlContextCreator::CCS_OK;
-
-	return ResolveToken(token, m_patManagerCompPtr.GetPtr(), userId, tenantId, scopes, isPat, errorMessage, status);
+	return ResolveToken(token, m_serverTokenReceiverCompPtr->GetTokenManager(), userId, tenantId, scopes, isPat, errorMessage, status);
 }
 
 
@@ -1091,7 +1102,7 @@ bool CAuthenticationManagerComp::CheckRequestAccess(const imtgql::CGqlRequest& g
 	}
 
 	QByteArray requiredPermission;
-	if (!m_requestPolicyCompPtr.IsValid() || !m_requestPolicyCompPtr->FindRequiredPermission(gqlRequest, requiredPermission)){
+	if (!m_serverTokenReceiverCompPtr.IsValid() || !m_serverTokenReceiverCompPtr->FindRequiredPermission(gqlRequest, requiredPermission)){
 		errorMessage = QStringLiteral("The request '%1' is closed to the servers of products").arg(QString::fromUtf8(gqlRequest.GetCommandId()));
 
 		return false;
@@ -1119,15 +1130,14 @@ bool CAuthenticationManagerComp::ResolveServerToken(
 	bool isPat = false;
 	QString errorMessage;
 	ContextCreationStatus status = CCS_OK;
-	imtauth::IPersonalAccessTokenManager* tokenManagerPtr = m_serverTokenManagerCompPtr.IsValid() ? m_serverTokenManagerCompPtr.GetPtr() : m_patManagerCompPtr.GetPtr();
-	if (!IsPatToken(serverToken) || !ResolveToken(serverToken, tokenManagerPtr, userId, tenantId, scopes, isPat, errorMessage, status)){
+	if (!imtauth::IsServerToken(serverToken) || !ResolveToken(serverToken, m_serverTokenReceiverCompPtr->GetTokenManager(), userId, tenantId, scopes, isPat, errorMessage, status)){
 		SetError(error, status == CCS_OK ? CCS_FORBIDDEN : status, errorMessage.isEmpty() ? QStringLiteral("The token of the server is not valid.") : errorMessage);
 
 		return false;
 	}
 
 	QByteArray tokenProductId;
-	if (!GetCachedPatProducts(serverToken, tokenProductId, clientProductId) || clientProductId.isEmpty() || tokenProductId != *m_serverProductIdAttrPtr){
+	if (!GetCachedPatProducts(serverToken, tokenProductId, clientProductId) || clientProductId.isEmpty() || tokenProductId != m_serverTokenReceiverCompPtr->GetServerProductId()){
 		SetError(error, CCS_FORBIDDEN, QStringLiteral("The token of the server is not issued for this server."));
 
 		return false;
@@ -1231,6 +1241,10 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateContextInstance()
 
 bool CAuthenticationManagerComp::IsPatToken(const QByteArray& token) const
 {
+	if (imtauth::IsServerToken(token)){
+		return true;
+	}
+
 	const QByteArray& patPrefix = m_patPrefixAttrPtr.IsValid() ? *m_patPrefixAttrPtr : QByteArrayLiteral("imt_pat_");
 	return !patPrefix.isEmpty() && token.size() > patPrefix.size() && token.startsWith(patPrefix);
 }

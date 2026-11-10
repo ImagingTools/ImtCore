@@ -13,10 +13,7 @@
         <Element Id="AuthenticationManager" PackageId="ImtAuthVoce" ComponentId="AuthenticationManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="ProductServerRequestPolicy" Type="Reference" ExportId="ProductServerRequestPolicy">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ServerProductId" Type="Id" ExportId="ServerProductId">
+                    <AttributeInfo Id="ServerTokenReceiver" Type="Reference" ExportId="ServerTokenReceiver">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="FeatureContainer" Type="Reference" ExportId="">
@@ -27,9 +24,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="PersonalAccessTokenManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaClientEngine/RemotePersonalAccessTokenController"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ServerTokenManager" Type="Reference" ExportId="ServerTokenManager">
-                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SlaveJwtSessionController" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaClientEngine"/>

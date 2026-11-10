@@ -38,33 +38,30 @@ void CUsersSessionsDatabaseDelegateComp::OnComponentCreated()
 		return;
 	}
 
-	QString driverId = m_databaseEngineCompPtr->GetDatabaseDriverId();
-	QString checkColumnQuery;
+	// Columns added after the table was first created
+	const QString driverId = m_databaseEngineCompPtr->GetDatabaseDriverId();
+	for (const QString& columnName : {QStringLiteral("TenantId"), QStringLiteral("ProductId")}){
+		QString checkColumnQuery;
+		if (driverId == "QPSQL"){
+			checkColumnQuery = QStringLiteral("SELECT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = '%1' AND column_name = '%2');").arg(tableName, columnName);
+		}
+		else if (driverId == "QSQLITE"){
+			checkColumnQuery = QStringLiteral("SELECT COUNT(*) > 0 FROM pragma_table_info('%1') WHERE name = '%2';").arg(tableName, columnName);
+		}
+		else{
+			return;
+		}
 
-	if (driverId == "QPSQL"){
-		checkColumnQuery = QString(
-			"SELECT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = '%1' AND column_name = 'TenantId');"
-		).arg(tableName);
-	}
-	else if (driverId == "QSQLITE"){
-		checkColumnQuery = QString(
-			"SELECT COUNT(*) > 0 FROM pragma_table_info('%1') WHERE name = 'TenantId';"
-		).arg(tableName);
-	}
-	else{
-		return;
-	}
+		QSqlError sqlError;
+		QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(checkColumnQuery.toUtf8(), &sqlError);
+		if (sqlError.type() != QSqlError::NoError){
+			return;
+		}
 
-	QSqlError sqlError;
-	QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(checkColumnQuery.toUtf8(), &sqlError);
-
-	if (sqlError.type() != QSqlError::NoError){
-		return;
-	}
-
-	if (sqlQuery.next() && !sqlQuery.value(0).toBool()){
-		QString alterQuery = QStringLiteral(R"(ALTER TABLE "%1" ADD COLUMN "TenantId" VARCHAR(1000);)").arg(tableName);
-		m_databaseEngineCompPtr->ExecSqlQuery(alterQuery.toUtf8(), &sqlError);
+		if (sqlQuery.next() && !sqlQuery.value(0).toBool()){
+			const QString alterQuery = QStringLiteral(R"(ALTER TABLE "%1" ADD COLUMN "%2" VARCHAR(1000);)").arg(tableName, columnName);
+			m_databaseEngineCompPtr->ExecSqlQuery(alterQuery.toUtf8(), &sqlError);
+		}
 	}
 }
 
@@ -123,6 +120,10 @@ istd::IChangeableUniquePtr CUsersSessionsDatabaseDelegateComp::CreateObjectFromR
 		sessionInfoPtr->SetTenantId(tenantId);
 	}
 
+	if (record.contains("ProductId")){
+		sessionInfoPtr->SetProductId(imtdb::VariantToByteArray(record.value("ProductId")));
+	}
+
 	if (record.contains("CreationDate")){
 		QDateTime creationDate = record.value("CreationDate").toDateTime();
 		sessionInfoPtr->SetCreationDate(creationDate);
@@ -166,8 +167,8 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUsersSessionsDatabaseDelegateCom
 		retVal.query += QStringLiteral("\nDELETE FROM \"UserSessions\" WHERE \"ExpirationDate\" < strftime('%Y-%m-%dT%H:%M:%S', 'now');").toUtf8();
 	}
 
-	retVal.query += QStringLiteral("\nINSERT INTO \"UserSessions\" (\"Id\", \"RefreshToken\", \"UserId\", \"TenantId\", \"CreationDate\", \"ExpirationDate\") VALUES ('%0', '%1', '%2', '%3', '%4', '%5');")
-				.arg(SqlEncode(QString::fromUtf8(proposedObjectId)), SqlEncode(QString::fromUtf8(token)), SqlEncode(QString::fromUtf8(userId)), SqlEncode(QString::fromUtf8(tenantId)), creationDate.toString(Qt::ISODate), expirationDate.toString(Qt::ISODate)).toUtf8();
+	retVal.query += QStringLiteral("\nINSERT INTO \"UserSessions\" (\"Id\", \"RefreshToken\", \"UserId\", \"TenantId\", \"ProductId\", \"CreationDate\", \"ExpirationDate\") VALUES ('%0', '%1', '%2', '%3', '%4', '%5', '%6');")
+				.arg(SqlEncode(QString::fromUtf8(proposedObjectId)), SqlEncode(QString::fromUtf8(token)), SqlEncode(QString::fromUtf8(userId)), SqlEncode(QString::fromUtf8(tenantId)), SqlEncode(QString::fromUtf8(sessionPtr->GetProductId())), creationDate.toString(Qt::ISODate), expirationDate.toString(Qt::ISODate)).toUtf8();
 
 	return retVal;
 }

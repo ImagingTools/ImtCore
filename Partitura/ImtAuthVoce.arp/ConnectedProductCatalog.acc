@@ -10,18 +10,6 @@
     <Description>Catalog of the connected products and the tokens of their servers</Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="ClientProductCatalog" PackageId="ImtAuthPck" ComponentId="ConnectedClientProductCatalog">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ProductCollection" Type="Reference" ExportId="ProductRepository">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ProductFactory" Type="Factory" ExportId="">
-                        <Data IsEnabled="true" Value="ConnectedProduct"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="CollectionHeadersProvider" PackageId="ImtColPck" ComponentId="CollectionHeadersProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -169,7 +157,7 @@
                                 <Value>ProductCollectionController</Value>
                                 <Value>ProductDocumentService</Value>
                                 <Value>CollectionDocumentService</Value>
-                                <Value>ServerTokenController</Value>
+                                <Value>Receiver</Value>
                                 <Value>DocumentCommands</Value>
                                 <Value>CollectionCommands</Value>
                                 <Value>ProductPermissionCatalog</Value>
@@ -190,7 +178,7 @@
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ClientProductCatalog" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ClientProductCatalog"/>
+                        <Data IsEnabled="true" Value="Receiver/ClientProductCatalog"/>
                     </AttributeInfo>
                     <AttributeInfo Id="OwnProduct" Type="Reference" ExportId="PermissionTree">
                         <Data IsEnabled="false"/>
@@ -330,6 +318,53 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="Receiver" PackageId="ImtAuthVoce" ComponentId="ServerTokenReceiver">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CollectionPermissions" Type="Id[]" ExportId="CollectionPermissions">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="CommandPermissions">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DatabaseAccessSettings" Type="Reference" ExportId="DatabaseAccessSettings">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PermissionTree" Type="Reference" ExportId="PermissionTree">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProductRepository" Type="Reference" ExportId="ProductRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProductServerPermissions" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ProductServerPermissions"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequiredPermissions" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>/ProductServer/SignIn</Value>
+                                <Value>/ProductServer/PublishPermissions</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TokenManager" Type="Reference" ExportId="PersonalAccessTokenManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="Subscribers" PackageId="ImtServerGqlPck" ComponentId="SlaveSubscriberController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -346,38 +381,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="ServerTokenController" PackageId="ImtAuthGqlPck" ComponentId="ServerTokenController">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="PersonalAccessTokenManager" Type="Reference" ExportId="PersonalAccessTokenManager">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ClientProductCatalog" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ClientProductCatalog"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="PermissionTree" Type="Reference" ExportId="PermissionTree">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ProductServerPermissions" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ProductServerPermissions"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RequiredPermissions" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>/ProductServer/SignIn</Value>
-                                <Value>/ProductServer/PublishPermissions</Value>
-                            </Values>
-                        </Data>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -582,6 +585,7 @@
     <ExportedInterfaces>
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="Demultiplexer"/>
         <Interface InterfaceId="imtgql::IGqlSubscriberController" ComponentId="Subscribers"/>
+        <Interface InterfaceId="imtservergql::IServerTokenReceiver" ComponentId="Receiver"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="Demultiplexer"/>
     </ExportedInterfaces>
     <ExportedComponents/>

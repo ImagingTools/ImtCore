@@ -13,7 +13,7 @@
         <Element Id="AuthenticationManager" PackageId="ImtServerGqlPck" ComponentId="AuthenticationManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="ProductServerRequestPolicy" Type="Reference" ExportId="ProductServerRequestPolicy">
+                    <AttributeInfo Id="ServerTokenReceiver" Type="Reference" ExportId="ServerTokenReceiver">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="FeatureContainer" Type="Reference" ExportId="FeatureContainer">
@@ -38,12 +38,6 @@
                         <Data IsEnabled="true" Value="imt_pat_"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PersonalAccessTokenManager" Type="Reference" ExportId="PersonalAccessTokenManager">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ServerProductId" Type="Id" ExportId="ServerProductId">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ServerTokenManager" Type="Reference" ExportId="ServerTokenManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SlaveJwtSessionController" Type="Reference" ExportId="SlaveJwtSessionController">

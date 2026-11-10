@@ -6,6 +6,7 @@
 #include <istd/IPolymorphic.h>
 
 // ImtCore includes
+#include <imtauth/IPersonalAccessTokenManager.h>
 #include <imtgql/CGqlRequest.h>
 
 
@@ -14,12 +15,22 @@ namespace imtservergql
 
 
 /**
-	What the servers of products may send to this server: the permission of a server token each request needs.
-	A request not declared here is closed to them.
+	How this server receives the servers of other products: its name in their tokens, where it keeps the tokens
+	it issued for them, and what they may send. A request not declared here is closed to them.
 */
-class IProductServerRequestPolicy: virtual public istd::IPolymorphic
+class IServerTokenReceiver: virtual public istd::IPolymorphic
 {
 public:
+	/**
+		Get the product of this server: the tokens it issues are for it.
+	*/
+	virtual QByteArray GetServerProductId() const = 0;
+
+	/**
+		Get the manager of the tokens this server issued for other servers.
+	*/
+	virtual imtauth::IPersonalAccessTokenManager* GetTokenManager() const = 0;
+
 	/**
 		Find the permission a server token needs for the request.
 		\param permission	Empty when any token of a connected server may send the request.

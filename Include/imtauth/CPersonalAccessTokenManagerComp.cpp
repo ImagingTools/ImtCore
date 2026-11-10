@@ -13,6 +13,7 @@
 // ImtCore includes
 #include <imtauth/CollectionSelection.h>
 #include <imtauth/IPersonalAccessToken.h>
+#include <imtauth/imtauth.h>
 
 
 namespace imtauth
@@ -50,7 +51,8 @@ IPersonalAccessTokenManager::TokenCreationResult CPersonalAccessTokenManagerComp
 	QByteArray tokenId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
 	// Generate random token value
-	QByteArray rawToken = GenerateRandomToken();
+	// The token of a server is told from a personal one by its prefix
+	QByteArray rawToken = GenerateRandomToken(clientProductId.isEmpty() ? QByteArrayLiteral("imt_pat_") : s_serverTokenPrefix);
 
 	// Compute token hash
 	QByteArray tokenHash = HashToken(rawToken);
@@ -381,7 +383,7 @@ bool CPersonalAccessTokenManagerComp::Serialize(iser::IArchive& /*archive*/)
 
 // private methods
 
-QByteArray CPersonalAccessTokenManagerComp::GenerateRandomToken() const
+QByteArray CPersonalAccessTokenManagerComp::GenerateRandomToken(const QByteArray& prefix) const
 {
 	// Generate a cryptographically secure random token
 	// Format: pat_<base64url_encoded_random_data>
@@ -400,7 +402,7 @@ QByteArray CPersonalAccessTokenManagerComp::GenerateRandomToken() const
 	}
 
 	// Convert to base64url for safe transmission
-	QByteArray token = "imt_pat_" + randomData.toBase64(QByteArray::Base64UrlEncoding | QByteArray::OmitTrailingEquals);
+	QByteArray token = prefix + randomData.toBase64(QByteArray::Base64UrlEncoding | QByteArray::OmitTrailingEquals);
 
 	return token;
 }

@@ -52,7 +52,7 @@ private:
 	QJsonObject JsonObjectFromBase64(const QByteArray& data) const;
 	QByteArray InsertNewSession(const istd::IChangeable& object) const;
 	QByteArray CreateSignature(const QByteArray& headerBase64, const QByteArray& payloadBase64) const;
-	QByteArray GenerateJwt(const QByteArray& sessionId, const QByteArray& userId, const QByteArray& tenantId) const;
+	QByteArray GenerateJwt(const QByteArray& sessionId, const QByteArray& userId, const QByteArray& tenantId, const QByteArray& productId) const;
 	QByteArray GetSessionIdByRefreshToken(const QByteArray& refreshToken) const;
 
 private:

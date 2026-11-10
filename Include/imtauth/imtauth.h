@@ -3,6 +3,8 @@
 
 
 // Qt includes
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
 #include <QtCore/QSet>
 #include <QtCore/QString>
 
@@ -198,6 +200,41 @@ static const inline QByteArray s_roleProductFilterId = QByteArrayLiteral("RolePr
 	Login of the superuser; it cannot be changed.
 */
 static const inline QByteArray s_superuserLogin = QByteArrayLiteral("su");
+
+
+/**
+	Prefix of a token a server issues for the server of another product. A personal token of a user never has it.
+*/
+static const inline QByteArray s_serverTokenPrefix = QByteArrayLiteral("imt_srv_");
+
+
+inline bool IsServerToken(const QByteArray& token)
+{
+	return token.startsWith(s_serverTokenPrefix);
+}
+
+
+/**
+	Claim of a session token naming the product whose server opened the session; absent for a session opened at the
+	authorization server directly.
+*/
+static const inline QString s_jwtProductIdClaim = QStringLiteral("productId");
+
+
+/**
+	Read the product whose server opened the session of a token. The token must have been validated before.
+*/
+inline QByteArray GetJwtProductId(const QByteArray& jwt)
+{
+	const QByteArrayList parts = jwt.split('.');
+	if (parts.size() != 3){
+		return QByteArray();
+	}
+
+	const QByteArray json = QByteArray::fromBase64(parts[1], QByteArray::Base64UrlEncoding | QByteArray::OmitTrailingEquals);
+
+	return QJsonDocument::fromJson(json).object().value(s_jwtProductIdClaim).toString().toUtf8();
+}
 
 
 /**

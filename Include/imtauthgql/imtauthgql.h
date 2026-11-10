@@ -1020,11 +1020,31 @@ inline bool IsSuperuserRequest(const imtgql::CGqlRequest& gqlRequest)
 
 
 /**
-	The superuser in a session of its own: a personal token of the superuser must not manage the identities of servers.
+	The superuser in a session of its own, sent to this server directly. Neither a personal token of the superuser
+	nor a session that came through the server of a product manages the identities of servers: that server would
+	manage its own token with it.
 */
 inline bool IsSuperuserSessionRequest(const imtgql::CGqlRequest& gqlRequest)
 {
-	return IsSuperuserRequest(gqlRequest) && !gqlRequest.GetRequestContext()->GetToken().startsWith(QByteArrayLiteral("imt_pat_"));
+	if (!IsSuperuserRequest(gqlRequest)){
+		return false;
+	}
+
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+
+	return gqlContextPtr->GetServerProductId().isEmpty() && !gqlContextPtr->GetToken().startsWith(QByteArrayLiteral("imt_pat_"));
+}
+
+
+/**
+	The product whose server sent the request, empty for a request made at this server directly.
+	A session opened or refreshed by the request belongs to it.
+*/
+inline QByteArray GetRequestServerProductId(const imtgql::CGqlRequest& gqlRequest)
+{
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+
+	return gqlContextPtr != nullptr ? gqlContextPtr->GetServerProductId() : QByteArray();
 }
 
 

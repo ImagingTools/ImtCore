@@ -7,7 +7,7 @@
 
 // ImtCore includes
 #include <imtauth/IPersonalAccessTokenManager.h>
-#include <imtservergql/IProductServerRequestPolicy.h>
+#include <imtservergql/IServerTokenReceiver.h>
 
 
 namespace imtservergql
@@ -24,15 +24,11 @@ public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_BASE_COMPONENT(CServerTokenAuthenticationCompBase);
-		I_ASSIGN(m_serverProductIdAttrPtr, "ServerProductId", "ID of this server in the tokens of other servers. Set, it refuses a request of another product without a token of its server", false, "");
-		I_ASSIGN(m_requestPolicyCompPtr, "ProductServerRequestPolicy", "What the servers of products may send; without it they may send nothing", false, "ProductServerRequestPolicy");
-		I_ASSIGN(m_serverTokenManagerCompPtr, "ServerTokenManager", "Where the tokens this server issued for other servers are kept; without it they are checked by the personal access token manager", false, "ServerTokenManager");
+		I_ASSIGN(m_serverTokenReceiverCompPtr, "ServerTokenReceiver", "How this server receives the servers of other products. Set, a request of another product needs a token of its server; without it this server accepts no server tokens", false, "ServerTokenReceiver");
 	I_END_COMPONENT;
 
 protected:
-	I_ATTR(QByteArray, m_serverProductIdAttrPtr);
-	I_REF(IProductServerRequestPolicy, m_requestPolicyCompPtr);
-	I_REF(imtauth::IPersonalAccessTokenManager, m_serverTokenManagerCompPtr);
+	I_REF(IServerTokenReceiver, m_serverTokenReceiverCompPtr);
 };
 
 

@@ -16,6 +16,7 @@
 // ImtCore includes
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtauth/ISession.h>
+#include <imtauth/imtauth.h>
 
 
 namespace imtauth
@@ -146,6 +147,14 @@ bool CJwtSessionControllerComp::RefreshToken(
 		return false;
 	}
 
+	// A session opened through the server of a product is refreshed only through it
+	if (sessionInfoPtr->GetProductId() != userSession.productId){
+		SendWarningMessage(0, QStringLiteral("Refresh rejected: session '%1' belongs to the server of '%2', the request came from '%3'")
+								.arg(QString::fromUtf8(sessionId), QString::fromUtf8(sessionInfoPtr->GetProductId()), QString::fromUtf8(userSession.productId)),
+								"CJwtSessionControllerComp");
+		return false;
+	}
+
 	QDateTime currentDate = QDateTime::currentDateTimeUtc();
 	if (currentDate >= sessionInfoPtr->GetExpirationDate()){
 		// The session itself has expired (the user has been away longer than
@@ -188,7 +197,7 @@ bool CJwtSessionControllerComp::RefreshToken(
 
 	QByteArray userId = sessionInfoPtr->GetUserId();
 
-	QByteArray jwt = GenerateJwt(sessionId, userId, sessionInfoPtr->GetTenantId());
+	QByteArray jwt = GenerateJwt(sessionId, userId, sessionInfoPtr->GetTenantId(), sessionInfoPtr->GetProductId());
 	if (jwt.isEmpty()){
 		SendErrorMessage(0, QStringLiteral("Unable to refresh session for user '%1'. Error: JWT is invalid").arg(userId), "CJwtSessionControllerComp");
 		return false;
@@ -223,6 +232,7 @@ bool CJwtSessionControllerComp::CreateNewSession(
 
 	sessionInfoPtr->SetUserId(userId);
 	sessionInfoPtr->SetTenantId(tenantId);
+	sessionInfoPtr->SetProductId(userSession.productId);
 
 	QByteArray refreshToken = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 	sessionInfoPtr->SetToken(refreshToken);
@@ -236,7 +246,7 @@ bool CJwtSessionControllerComp::CreateNewSession(
 	userSession.userId = userId;
 	userSession.tenantId = tenantId;
 
-	QByteArray jwt = GenerateJwt(sessionId, userId, tenantId);
+	QByteArray jwt = GenerateJwt(sessionId, userId, tenantId, userSession.productId);
 	if (jwt.isEmpty()){
 		SendErrorMessage(0, QStringLiteral("Unable to create a new session for user '%1'. Error: JWT is invalid").arg(userId), "CJwtSessionControllerComp");
 		return false;
@@ -390,7 +400,7 @@ QByteArray CJwtSessionControllerComp::CreateSignature(
 }
 
 
-QByteArray CJwtSessionControllerComp::GenerateJwt(const QByteArray& sessionId, const QByteArray& userId, const QByteArray& tenantId) const
+QByteArray CJwtSessionControllerComp::GenerateJwt(const QByteArray& sessionId, const QByteArray& userId, const QByteArray& tenantId, const QByteArray& productId) const
 {
 	qint64 expiresAt = QDateTime::currentSecsSinceEpoch() + *m_jwtLifetimeAttrPtr;
 	QJsonObject header;
@@ -402,6 +412,9 @@ QByteArray CJwtSessionControllerComp::GenerateJwt(const QByteArray& sessionId, c
 	payload["tenantId"] = QString(tenantId);
 	payload["sessionId"] = QString(sessionId);
 	payload["exp"] = expiresAt;
+	if (!productId.isEmpty()){
+		payload[imtauth::s_jwtProductIdClaim] = QString::fromUtf8(productId);
+	}
 
 	QByteArray headerBase64 = JsonObjectToBase64(header);
 	QByteArray payloadBase64 = JsonObjectToBase64(payload);

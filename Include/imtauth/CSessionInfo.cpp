@@ -67,6 +67,22 @@ void CSessionInfo::SetTenantId(const QByteArray &tenantId)
 }
 
 
+QByteArray CSessionInfo::GetProductId() const
+{
+	return m_productId;
+}
+
+
+void CSessionInfo::SetProductId(const QByteArray& productId)
+{
+	if (m_productId != productId){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_productId = productId;
+	}
+}
+
+
 QDateTime CSessionInfo::GetCreationDate() const
 {
 	return m_creationDate;
@@ -141,6 +157,13 @@ bool CSessionInfo::Serialize(iser::IArchive &archive)
 		retVal = retVal && archive.EndTag(tenantIdTag);
 	}
 
+	if (imtCoreVersion >= 23896){
+		iser::CArchiveTag productIdTag("ProductId", "Product whose server opened the session", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(productIdTag);
+		retVal = retVal && archive.Process(m_productId);
+		retVal = retVal && archive.EndTag(productIdTag);
+	}
+
 	return retVal;
 }
 
@@ -156,6 +179,7 @@ bool CSessionInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*
 		m_token = sourcePtr->m_token;
 		m_userId = sourcePtr->m_userId;
 		m_tenantId = sourcePtr->m_tenantId;
+		m_productId = sourcePtr->m_productId;
 		m_creationDate = sourcePtr->m_creationDate;
 		m_expirationDate = sourcePtr->m_expirationDate;
 
@@ -175,6 +199,7 @@ bool CSessionInfo::IsEqual(const IChangeable& object) const
 		retVal = retVal && m_token == sourcePtr->m_token;
 		retVal = retVal && m_userId == sourcePtr->m_userId;
 		retVal = retVal && m_tenantId == sourcePtr->m_tenantId;
+		retVal = retVal && m_productId == sourcePtr->m_productId;
 		retVal = retVal && m_creationDate == sourcePtr->m_creationDate;
 		retVal = retVal && m_expirationDate == sourcePtr->m_expirationDate;
 
@@ -203,6 +228,7 @@ bool CSessionInfo::ResetData(CompatibilityMode /*mode*/)
 	m_token.clear();
 	m_userId.clear();
 	m_tenantId.clear();
+	m_productId.clear();
 
 	return true;
 }

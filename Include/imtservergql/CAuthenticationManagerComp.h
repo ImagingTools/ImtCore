@@ -22,7 +22,6 @@
 #include <imtauth/ITenantMembershipManager.h>
 #include <imtlic/IProductInfo.h>
 #include <imtservergql/CServerTokenAuthenticationCompBase.h>
-#include <imtservergql/IProductServerRequestPolicy.h>
 
 
 namespace imtservergql

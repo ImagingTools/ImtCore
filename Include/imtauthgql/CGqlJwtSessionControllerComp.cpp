@@ -176,7 +176,7 @@ sdl::V1_0::imtauth::CGetSessionPayload CGqlJwtSessionControllerComp::OnGetSessio
 
 sdl::V1_0::imtauth::CRefreshTokenPayload CGqlJwtSessionControllerComp::OnRefreshToken(
 	const sdl::V1_0::imtauth::CRefreshTokenGqlRequest& refreshTokenRequest,
-	const ::imtgql::CGqlRequest& /*gqlRequest*/,
+	const ::imtgql::CGqlRequest& gqlRequest,
 	QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtauth::CRefreshTokenPayload response;
@@ -198,6 +198,7 @@ sdl::V1_0::imtauth::CRefreshTokenPayload CGqlJwtSessionControllerComp::OnRefresh
 	}
 
 	imtauth::IJwtSessionController::UserSession userSession;
+	userSession.productId = GetRequestServerProductId(gqlRequest);
 	response.ok = m_jwtSessionControllerCompPtr->RefreshToken(refreshToken, userSession);
 	if (!response.ok){
 		return response;
@@ -276,6 +277,7 @@ sdl::V1_0::imtauth::CCreateNewSessionPayload CGqlJwtSessionControllerComp::OnCre
 	}
 
 	imtauth::IJwtSessionController::UserSession userSession;
+	userSession.productId = GetRequestServerProductId(gqlRequest);
 	response.ok = m_jwtSessionControllerCompPtr->CreateNewSession(userId, tenantId, userSession);
 	if (response.ok){
 		response.userSession = CreateUserSessionData(userSession);
@@ -335,6 +337,7 @@ sdl::V1_0::imtauth::CSelectTenantPayload CGqlJwtSessionControllerComp::OnSelectT
 	}
 
 	imtauth::IJwtSessionController::UserSession userSession;
+	userSession.productId = GetRequestServerProductId(gqlRequest);
 	response.ok = m_jwtSessionControllerCompPtr->CreateNewSession(userId, tenantId, userSession);
 	if (!response.ok){
 		response.errorMessage = QStringLiteral("Failed to create tenant session");

@@ -22,6 +22,12 @@ public:
 		QByteArray tenantId;
 		QByteArray accessToken;
 		QByteArray refreshToken;
+
+		/**
+			Product whose server asks for the session, set by the caller; empty for a request made at this server directly.
+			A new session belongs to it, a refresh is refused for a session of another one.
+		*/
+		QByteArray productId;
 	};
 
 	enum JwtState
