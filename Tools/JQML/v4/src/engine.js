@@ -1882,7 +1882,14 @@ export class Engine {
 					}
 				} else {
 					// A loaded item with no onCompleted still has bindings (anchors.fill: parent) that must run before geometry is read.
-					this.evaluateFresh();
+					// The Loader sizes its item after the bindings of the item have run, as in Qt: a size that it wrote while they ran
+					// (its own `height` binding is one of them) would be written over by the binding of the item that comes after.
+					loader.$holdSize = true;
+					try {
+						this.evaluateFresh();
+					} finally {
+						loader.$holdSize = false;
+					}
 					this.layoutContaining(loader);
 					loader.$pushSize();
 					this.layoutContaining(loader);

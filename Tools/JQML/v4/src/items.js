@@ -6598,6 +6598,7 @@ export class Loader extends Item {
 	// The axes the Loader sizes itself are copied onto the item. The other axes follow the item.
 	// Only when the Loader's size changed or the item is new: a script may resize the item afterwards (Qt).
 	$pushSize() {
+		if (this.$holdSize === true) return;
 		const item = this.$children.length > 0 ? this.$children[0] : null;
 		if (item === null) {
 			this.$pushedItem = null;
@@ -6605,16 +6606,35 @@ export class Loader extends Item {
 		}
 		const fresh = this.$pushedItem !== item;
 		this.$pushedItem = item;
+		if (fresh) {
+			// The sizes of an item that was loaded before are not the sizes of this one.
+			this.$pushedW = undefined;
+			this.$pushedH = undefined;
+		}
+		// A size that the Loader binds (`height: !active ? 0 : 70`) is worked out first: in Qt the bindings have run when the Loader
+		// sizes its item, and a size that is not known yet would leave the item with the size that it asks for.
+		if (this.$bindings !== null && hooks.initializeProperty !== null) {
+			hooks.initializeProperty(this, 'width');
+			hooks.initializeProperty(this, 'height');
+		}
 		this.$sizing = true;
 		try {
 			if (this.$widthExplicit()) {
 				const width = this.width;
-				if (fresh || width !== this.$pushedW) item.width = width;
+				if (fresh || width !== this.$pushedW) {
+					// Qt 6 sets the size of the item with its setter, which removes a binding that the item has for it.
+					if (item.$bindings !== null && hooks.breakBinding !== null) hooks.breakBinding(item, 'width');
+					item.width = width;
+				}
 				this.$pushedW = width;
 			}
 			if (this.$heightExplicit()) {
 				const height = this.height;
-				if (fresh || height !== this.$pushedH) item.height = height;
+				if (fresh || height !== this.$pushedH) {
+					// Qt 6 sets the size of the item with its setter, which removes a binding that the item has for it.
+					if (item.$bindings !== null && hooks.breakBinding !== null) hooks.breakBinding(item, 'height');
+					item.height = height;
+				}
 				this.$pushedH = height;
 			}
 		} finally {
