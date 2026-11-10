@@ -3788,7 +3788,29 @@ export class GridView extends ListView {
 		return Math.max(1, Math.floor(width / cell));
 	}
 
+	// Only the rows of the grid that are in the view and in the cache buffer have delegates; the others are pooled (`reuseItems`) or
+	// destroyed, so a page of 500 cards builds as many as the view shows, not 500.
 	$arrange() {
+		if (this.$arranging) return;
+		this.$arranging = true;
+		try {
+			this.$arrangeGrid();
+			this.$syncDelegateChildren();
+			if (!layingOut) {
+				const sx = this.$sx;
+				const sy = this.$sy;
+				for (const child of this.$children) {
+					child.$sx = sx + child.$ax;
+					child.$sy = sy + child.$ay;
+				}
+			}
+		} finally {
+			this.$arranging = false;
+		}
+	}
+
+	$arrangeGrid() {
+		if (!this.$reuseItems && this.$pool.length > 0) this.$drainPool();
 		const dynamic = this.delegate;
 		if (dynamic instanceof ComponentItem && dynamic !== this.$dynamicDelegate) {
 			this.$dynamicDelegate = dynamic;
@@ -3807,24 +3829,74 @@ export class GridView extends ListView {
 			this.$releaseWhere(() => false);
 			return;
 		}
-		for (let i = 0; i < count; i++) {
-			if (this.$delegates.has(i)) continue;
-			const delegate = this.createDelegate(i);
-			if (delegate === null) {
-				this.createDelegate = null;
-				break;
-			}
-			this.$delegates.set(i, delegate);
-		}
 		const cols = this.$columns();
 		const cw = this.$cellWidth;
 		const ch = this.$cellHeight;
-		const y0 = this.$contentY;
+		const rows = Math.ceil(count / cols);
+		const offset = ch > 0 ? clamp(this.$contentY, 0, this.$maxContentY) : 0;
+		if (offset !== this.$contentY) this.contentY = offset;
+		const viewSpan = this.$ah;
+		const buffer = Math.max(0, this.$cacheBuffer);
+		// The rows of the grid that the view and the cache buffer reach, as the indexes of their first and last cell.
+		let first = 0;
+		let last = count - 1;
+		let viewFirst = 0;
+		let viewLast = count - 1;
+		if (ch > 0) {
+			// As in Qt a row that only touches the range with its edge is built too.
+			const rowFrom = (y) => clamp(Math.ceil(y / ch) - 1, 0, rows - 1);
+			const rowTo = (y) => clamp(Math.floor(y / ch), 0, rows - 1);
+			first = rowFrom(offset - buffer) * cols;
+			last = Math.min(count - 1, (rowTo(offset + viewSpan + buffer) + 1) * cols - 1);
+			viewFirst = rowFrom(offset) * cols;
+			viewLast = Math.min(count - 1, (rowTo(offset + viewSpan) + 1) * cols - 1);
+		}
+		this.$releaseWhere((index) => index >= first && index <= last);
+		const make = (i) => {
+			if (this.$delegates.has(i)) return true;
+			const delegate = this.createDelegate(i);
+			if (delegate === null) {
+				this.createDelegate = null;
+				return false;
+			}
+			this.$delegates.set(i, delegate);
+			return true;
+		};
+		// The cells of the view are built at once; those of the cache buffer from the view outwards, a few in a frame (as in a list).
+		if (this.$lazyFrame !== frameNumber) {
+			this.$lazyFrame = frameNumber;
+			this.$lazySpent = 0;
+		}
+		let ok = true;
+		for (let i = viewFirst; i <= viewLast && ok; i++) ok = make(i);
+		let before = viewFirst - 1;
+		let after = viewLast + 1;
+		while (ok && (before >= first || after <= last)) {
+			while (after <= last && this.$delegates.has(after)) after++;
+			while (before >= first && this.$delegates.has(before)) before--;
+			if (before < first && after > last) break;
+			if (this.$lazySpent >= LAZY_BUILD_ROWS) break;
+			if (after <= last) {
+				ok = make(after++);
+				this.$lazySpent++;
+			}
+			if (ok && before >= first) {
+				ok = make(before--);
+				this.$lazySpent++;
+			}
+		}
+		if (before >= first || after <= last) {
+			// What is left is built in the next frames; the cells that are built and joined to the view stay.
+			first = Math.max(first, before + 1);
+			last = Math.min(last, after - 1);
+			this.$releaseWhere((index) => index >= first && index <= last);
+			lazyViews.add(this);
+		}
 		for (const [index, item] of this.$delegates) {
 			const col = index % cols;
 			const row = Math.floor(index / cols);
 			const x = col * cw;
-			const y = row * ch - y0;
+			const y = row * ch - offset;
 			const an = item.$anchors;
 			// Delegates may pin themselves with anchors (GridExtendingBaseDelegate shifts rows
 			// below an open panel via topMargin). Anchors win over the grid slot, as in Qt; the
@@ -3839,7 +3911,7 @@ export class GridView extends ListView {
 					item.$ax = x;
 				}
 				if (an.$affectsY) {
-					item.$ay -= y0;
+					item.$ay -= offset;
 					item.$y = item.$ay;
 				} else {
 					item.$y = y;
@@ -3852,17 +3924,6 @@ export class GridView extends ListView {
 				item.$ay = y;
 			}
 		}
-	}
-
-	itemAtIndex(index) {
-		const i = Math.trunc(Number(index));
-		if (!Number.isFinite(i) || i < 0) return null;
-		if (!this.$delegates.has(i) && this.createDelegate !== null && i < this.$rowCount) {
-			const delegate = this.createDelegate(i);
-			if (delegate !== null) this.$delegates.set(i, delegate);
-		}
-		const item = this.$delegates.get(i);
-		return item === undefined ? null : item;
 	}
 
 	positionViewAtBeginning() {
