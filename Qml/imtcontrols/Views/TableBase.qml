@@ -187,6 +187,21 @@ Rectangle {
 	signal sortingChanged(string headerId, string sortOrder);
 
 	signal widthRecalc();
+
+	// The first column that is shown; the checkbox column takes the look of its header cell.
+	property int firstVisibleColumnIndex: 0;
+
+	function updateFirstVisibleColumnIndex(){
+		for (let i = 0; i < tableContainer.widthDecoratorDynamic.getItemsCount(); i++){
+			if (tableContainer.widthDecoratorDynamic.getData("Width", i) > 0){
+				tableContainer.firstVisibleColumnIndex = i;
+
+				return;
+			}
+		}
+
+		tableContainer.firstVisibleColumnIndex = 0;
+	}
 	signal heightRecalc();
 
 	signal tableViewParamsAccepted();
@@ -631,6 +646,7 @@ Rectangle {
 		if(tableContainer.isFlickable){
 			tableContainer.contentWidth = totalWidth;
 		}
+		tableContainer.updateFirstVisibleColumnIndex();
 		tableContainer.widthRecalc();
 	}
 
@@ -848,9 +864,9 @@ Rectangle {
 
 			visible: tableContainer.checkable;
 
-			color: tableContainer.headerCellColor(0);
-			opacity: tableContainer.headerCellOpacity(0);
-			radius: tableContainer.headerCellRadius(0);
+			color: tableContainer.headerCellColor(tableContainer.firstVisibleColumnIndex);
+			opacity: tableContainer.headerCellOpacity(tableContainer.firstVisibleColumnIndex);
+			radius: tableContainer.headerCellRadius(tableContainer.firstVisibleColumnIndex);
 
 			// The side next to the first header cell is never rounded.
 			Rectangle {
@@ -869,7 +885,7 @@ Rectangle {
 				width: parent.width / 2;
 				height: parent.height / 2;
 				color: parent.color;
-				visible: !tableContainer.isHeaderCornerRounded("LeftTopRound", 0);
+				visible: !tableContainer.isHeaderCornerRounded("LeftTopRound", tableContainer.firstVisibleColumnIndex);
 			}
 
 			Rectangle {
@@ -879,7 +895,7 @@ Rectangle {
 				width: parent.width / 2;
 				height: parent.height / 2;
 				color: parent.color;
-				visible: !tableContainer.isHeaderCornerRounded("LeftBottomRound", 0);
+				visible: !tableContainer.isHeaderCornerRounded("LeftBottomRound", tableContainer.firstVisibleColumnIndex);
 			}
 
 			Rectangle {
@@ -1220,6 +1236,7 @@ Rectangle {
 
 		tableContainer.contentWidth = tableWidth_;
 
+		tableContainer.updateFirstVisibleColumnIndex();
 		tableContainer.widthRecalc();
 
 	}
