@@ -158,26 +158,78 @@ bool CCachedObjectCollectionComp::RemoveElements(const Ids& elementIds, const IO
 
 
 bool CCachedObjectCollectionComp::RemoveElementSet(
-			const iprm::IParamsSet* /*selectionParamsPtr*/,
-			const IOperationContext* /*operationContextPtr*/)
+			const iprm::IParamsSet* selectionParamsPtr,
+			const IOperationContext* operationContextPtr)
 {
-	return false;
+	if (!m_objectCollectionCompPtr.IsValid()){
+		return false;
+	}
+
+	ICollectionInfo::MultiElementNotifierInfo notifierInfo;
+	notifierInfo.elementIds = m_objectCollectionCompPtr->GetElementIds(0, -1, selectionParamsPtr);
+
+	istd::IChangeable::ChangeSet changeSet(CF_REMOVED);
+	changeSet.SetChangeInfo(CN_ELEMENTS_REMOVED, QVariant::fromValue(notifierInfo));
+	istd::CChangeNotifier changeNotifier(this, &changeSet);
+
+	bool retVal = m_objectCollectionCompPtr->RemoveElementSet(selectionParamsPtr, operationContextPtr);
+	if (retVal){
+		ClearCache();
+	}
+	else{
+		changeNotifier.Abort();
+	}
+
+	return retVal;
 }
 
 
 bool CCachedObjectCollectionComp::RestoreObjects(
-			const Ids& /*objectIds*/,
-			const IOperationContext* /*operationContextPtr*/)
+			const Ids& objectIds,
+			const IOperationContext* operationContextPtr)
 {
-	return false;
+	if (!m_objectCollectionCompPtr.IsValid()){
+		return false;
+	}
+
+	ICollectionInfo::MultiElementNotifierInfo notifierInfo;
+	notifierInfo.elementIds = objectIds;
+
+	istd::IChangeable::ChangeSet changeSet(CF_RESTORED);
+	changeSet.SetChangeInfo(CN_ELEMENTS_RESTORED, QVariant::fromValue(notifierInfo));
+	istd::CChangeNotifier changeNotifier(this, &changeSet);
+
+	bool retVal = m_objectCollectionCompPtr->RestoreObjects(objectIds, operationContextPtr);
+	if (retVal){
+		ClearCache();
+	}
+	else{
+		changeNotifier.Abort();
+	}
+
+	return retVal;
 }
 
 
 bool CCachedObjectCollectionComp::RestoreObjectSet(
-			const iprm::IParamsSet* /*selectionParamsPtr*/,
-			const IOperationContext* /*operationContextPtr*/)
+			const iprm::IParamsSet* selectionParamsPtr,
+			const IOperationContext* operationContextPtr)
 {
-	return false;
+	if (!m_objectCollectionCompPtr.IsValid()){
+		return false;
+	}
+
+	istd::CChangeNotifier changeNotifier(this);
+
+	bool retVal = m_objectCollectionCompPtr->RestoreObjectSet(selectionParamsPtr, operationContextPtr);
+	if (retVal){
+		ClearCache();
+	}
+	else{
+		changeNotifier.Abort();
+	}
+
+	return retVal;
 }
 
 
@@ -195,6 +247,10 @@ bool CCachedObjectCollectionComp::GetObjectData(const Id& objectId, DataPtr& dat
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		return false;
+	}
+
+	if (dataConfigurationPtr != nullptr || *m_objectCacheLimitAttrPtr <= 0){
+		return m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr, dataConfigurationPtr);
 	}
 
 	{
@@ -266,6 +322,10 @@ IObjectCollectionUniquePtr CCachedObjectCollectionComp::CreateSubCollection(int 
 		return collectionCacheItemPtr->cachePtr->CreateSubCollection(0, -1, nullptr);
 	}
 
+	if (m_objectCollectionCompPtr.IsValid()){
+		return m_objectCollectionCompPtr->CreateSubCollection(offset, count, selectionParamsPtr);
+	}
+
 	return nullptr;
 }
 
@@ -313,13 +373,19 @@ QByteArray CCachedObjectCollectionComp::GetObjectTypeId(const Id& objectId) cons
 
 idoc::MetaInfoPtr CCachedObjectCollectionComp::GetDataMetaInfo(const Id& objectId) const
 {
-	QReadLocker locker(&m_lock);
+	{
+		QReadLocker locker(&m_lock);
 
-	for (int index = 0; index < m_cachedCollections.size(); index++){
-		const FilteredCollectionPtr& collectionCacheItemPtr = m_cachedCollections.at(index);
-		if (collectionCacheItemPtr->cachePtr->GetElementIds().contains(objectId)){
-			return collectionCacheItemPtr->cachePtr->GetDataMetaInfo(objectId);
+		for (int index = 0; index < m_cachedCollections.size(); index++){
+			const FilteredCollectionPtr& collectionCacheItemPtr = m_cachedCollections.at(index);
+			if (collectionCacheItemPtr->cachePtr->GetElementIds().contains(objectId)){
+				return collectionCacheItemPtr->cachePtr->GetDataMetaInfo(objectId);
+			}
 		}
+	}
+
+	if (m_objectCollectionCompPtr.IsValid()){
+		return m_objectCollectionCompPtr->GetDataMetaInfo(objectId);
 	}
 
 	return idoc::MetaInfoPtr();
@@ -347,30 +413,44 @@ ICollectionInfo::Ids CCachedObjectCollectionComp::GetElementIds(
 		return collectionCacheItemPtr->cachePtr->GetElementIds(0, -1, nullptr, logPtr);
 	}
 
+	if (m_objectCollectionCompPtr.IsValid()){
+		return m_objectCollectionCompPtr->GetElementIds(offset, count, selectionParamsPtr, logPtr);
+	}
+
 	return ICollectionInfo::Ids();
 }
 
 
 bool CCachedObjectCollectionComp::GetSubsetInfo(
-			ICollectionInfo& /*subsetInfo*/,
-			int /*offset*/,
-			int /*count*/,
-			const iprm::IParamsSet* /*selectionParamsPtr*/,
-			ilog::IMessageConsumer* /*logPtr*/) const
+			ICollectionInfo& subsetInfo,
+			int offset,
+			int count,
+			const iprm::IParamsSet* selectionParamsPtr,
+			ilog::IMessageConsumer* logPtr) const
 {
-	return false;
+	if (!m_objectCollectionCompPtr.IsValid()){
+		return false;
+	}
+
+	return m_objectCollectionCompPtr->GetSubsetInfo(subsetInfo, offset, count, selectionParamsPtr, logPtr);
 }
 
 
 QVariant CCachedObjectCollectionComp::GetElementInfo(const Id& elementId, int infoType, ilog::IMessageConsumer* logPtr) const
 {
-	QReadLocker locker(&m_lock);
+	{
+		QReadLocker locker(&m_lock);
 
-	for (int index = 0; index < m_cachedCollections.size(); index++){
-		const FilteredCollectionPtr& collectionCacheItemPtr = m_cachedCollections.at(index);
-		if (collectionCacheItemPtr->cachePtr->GetElementIds().contains(elementId)){
-			return collectionCacheItemPtr->cachePtr->GetElementInfo(elementId, infoType, logPtr);
+		for (int index = 0; index < m_cachedCollections.size(); index++){
+			const FilteredCollectionPtr& collectionCacheItemPtr = m_cachedCollections.at(index);
+			if (collectionCacheItemPtr->cachePtr->GetElementIds().contains(elementId)){
+				return collectionCacheItemPtr->cachePtr->GetElementInfo(elementId, infoType, logPtr);
+			}
 		}
+	}
+
+	if (m_objectCollectionCompPtr.IsValid()){
+		return m_objectCollectionCompPtr->GetElementInfo(elementId, infoType, logPtr);
 	}
 
 	return QVariant();
@@ -379,13 +459,19 @@ QVariant CCachedObjectCollectionComp::GetElementInfo(const Id& elementId, int in
 
 idoc::MetaInfoPtr CCachedObjectCollectionComp::GetElementMetaInfo(const Id& elementId, ilog::IMessageConsumer* logPtr) const
 {
-	QReadLocker locker(&m_lock);
+	{
+		QReadLocker locker(&m_lock);
 
-	for (int index = 0; index < m_cachedCollections.size(); index++){
-		const FilteredCollectionPtr& collectionCacheItemPtr = m_cachedCollections.at(index);
-		if (collectionCacheItemPtr->cachePtr->GetElementIds().contains(elementId)){
-			return collectionCacheItemPtr->cachePtr->GetElementMetaInfo(elementId, logPtr);
+		for (int index = 0; index < m_cachedCollections.size(); index++){
+			const FilteredCollectionPtr& collectionCacheItemPtr = m_cachedCollections.at(index);
+			if (collectionCacheItemPtr->cachePtr->GetElementIds().contains(elementId)){
+				return collectionCacheItemPtr->cachePtr->GetElementMetaInfo(elementId, logPtr);
+			}
 		}
+	}
+
+	if (m_objectCollectionCompPtr.IsValid()){
+		return m_objectCollectionCompPtr->GetElementMetaInfo(elementId, logPtr);
 	}
 
 	return idoc::MetaInfoPtr();
@@ -512,11 +598,16 @@ CCachedObjectCollectionComp::FilteredCollectionPtr CCachedObjectCollectionComp::
 		}
 	}
 
+	FilteredCollectionPtr filteredCollectionPtr = std::make_shared<FilteredCollection>(offset, count, data, std::move(subCollectionPtr));
+	if (*m_metaInfoCacheLimitAttrPtr <= 0){
+		return filteredCollectionPtr;
+	}
+
 	if (m_cachedCollections.size() >= *m_metaInfoCacheLimitAttrPtr){
 		m_cachedCollections.removeFirst();
 	}
 
-	m_cachedCollections.append(std::make_shared<FilteredCollection>(offset, count, data, std::move(subCollectionPtr)));
+	m_cachedCollections.append(filteredCollectionPtr);
 
 	return m_cachedCollections.last();
 }
@@ -561,5 +652,4 @@ void CCachedObjectCollectionComp::RemoveOldestObjectFromCache() const
 
 
 } // namespace imtbase
-
 
