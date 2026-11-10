@@ -180,7 +180,26 @@ Rectangle {
 			tableItem.properties.stateItemsChanged.connect(tableDelegateContainer.enabledItemsChanged);
 			ma.visible = tableItem.hoverEnabled
 			if (tableItem.checkable){
-				checkBox.createObject(tableDelegateContainer)
+				tableDelegateContainer.createCheckBox()
+			}
+		}
+	}
+
+	// The checkbox is made when the table becomes checkable, so a row built before that gets it too.
+	property Item checkBoxItem: null;
+
+	function createCheckBox(){
+		if (!tableDelegateContainer.checkBoxItem){
+			tableDelegateContainer.checkBoxItem = checkBox.createObject(tableDelegateContainer)
+		}
+	}
+
+	Connections {
+		target: tableDelegateContainer.tableItem;
+
+		function onCheckableChanged(){
+			if (tableDelegateContainer.tableItem.checkable){
+				tableDelegateContainer.createCheckBox()
 			}
 		}
 	}
