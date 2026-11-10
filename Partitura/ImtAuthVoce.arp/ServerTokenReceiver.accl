@@ -8,10 +8,12 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="ClientProductCatalog" X="250" Y="100" Note=""/>
-        <Element ComponentName="ConnectedProduct" X="50" Y="100" Note=""/>
-        <Element ComponentName="ServerTokenController" X="600" Y="100" Note=""/>
-        <Element ComponentName="TokenStore" X="950" Y="100" Note=""/>
+        <Element ComponentName="ServerTokenController" X="50" Y="150" Note=""/>
+        <Element ComponentName="Receiver" X="400" Y="50" Note=""/>
+        <Element ComponentName="ClientProductCatalog" X="400" Y="250" Note=""/>
+        <Element ComponentName="TokenStore" X="750" Y="50" Note=""/>
+        <Element ComponentName="ClientProducts" X="750" Y="250" Note=""/>
+        <Element ComponentName="ConnectedProduct" X="750" Y="350" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

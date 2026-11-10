@@ -112,7 +112,6 @@
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
         <Interface InterfaceId="imtserverapp::ICommandPermissionsProvider" ComponentId="Policy"/>
-        <Interface InterfaceId="istd::IChangeable" ComponentId="Policy"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="Policy"/>
     </ExportedInterfaces>
     <ExportedComponents/>

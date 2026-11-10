@@ -8,13 +8,22 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="CollectionDocumentService" X="100" Y="100" Note=""/>
-        <Element ComponentName="ConnectedProduct" X="350" Y="100" Note=""/>
-        <Element ComponentName="Demultiplexer" X="600" Y="100" Note=""/>
-        <Element ComponentName="ProductCollectionController" X="850" Y="100" Note=""/>
-        <Element ComponentName="ProductDocumentService" X="1100" Y="100" Note=""/>
-        <Element ComponentName="ProductDocumentValidator" X="1350" Y="100" Note=""/>
-        <Element ComponentName="ServerTokenController" X="1600" Y="100" Note=""/>
+        <Element ComponentName="Demultiplexer" X="50" Y="400" Note=""/>
+        <Element ComponentName="ProductCollectionController" X="400" Y="50" Note=""/>
+        <Element ComponentName="CollectionHeadersProvider" X="750" Y="50" Note=""/>
+        <Element ComponentName="ProductDocumentService" X="400" Y="150" Note=""/>
+        <Element ComponentName="CollectionDocumentService" X="400" Y="250" Note=""/>
+        <Element ComponentName="ProductDocumentNameProvider" X="750" Y="200" Note=""/>
+        <Element ComponentName="ProductDocumentValidator" X="750" Y="300" Note=""/>
+        <Element ComponentName="ConnectedProduct" X="1100" Y="150" Note=""/>
+        <Element ComponentName="DocumentCommands" X="400" Y="400" Note=""/>
+        <Element ComponentName="CollectionCommands" X="400" Y="500" Note=""/>
+        <Element ComponentName="ProductPermissionCatalog" X="400" Y="650" Note=""/>
+        <Element ComponentName="PublishedPermissionsProvider" X="400" Y="750" Note=""/>
+        <Element ComponentName="Receiver" X="400" Y="900" Note=""/>
+        <Element ComponentName="ProductServerPermissions" X="750" Y="900" Note=""/>
+        <Element ComponentName="Subscribers" X="50" Y="1050" Note=""/>
+        <Element ComponentName="ProductCollectionChangeNotifier" X="400" Y="1050" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>
