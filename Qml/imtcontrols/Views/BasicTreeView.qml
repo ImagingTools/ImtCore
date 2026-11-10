@@ -14,7 +14,7 @@ import imtcontrols 1.0
     is briefly summarised below; for anything else consult the markdown.
 
     Public properties (defaults in brackets):
-        model[[]], columns[[]], rowHeight[28], indentation[18], cacheBuffer[4000],
+        model[[]], columns[[]], rowHeight[28], indentation[18], cacheBuffer[500],
         headerHeight[30], showHeader[true], multiSelect[false], editable[false],
         editOnDoubleClick[true], allowDisabledEditing[false],
         allowDisabledSelection[false], skipDisabledOrNonCheckableOnCheck[true],
@@ -71,7 +71,7 @@ Item {
     // Pixels of off-screen rows the ListView keeps realized on each side.
     // Kept small so virtualization actually pays off; a few rows is enough
     // for smooth flicking. (Was 4000px ≈ 140 rows, which realized whole trees.)
-    property int    cacheBuffer: 4000//rowHeight * 4
+    property int    cacheBuffer: 500//rowHeight * 4
     property int    headerHeight: 30
     property int    minColumnWidth: 40
     property int    columnResizeHandleWidth: 8
