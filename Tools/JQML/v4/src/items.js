@@ -7405,6 +7405,86 @@ defineProp(
 	},
 );
 
+// `RemoteFileController` (imtqml::CRemoteFileController of com.imtcore.imtqml) for the browser: it sends, deletes and downloads
+// the files of the server, which the page reaches at `../../<prefix>/<name>`. The browser has no file system, so a download
+// opens its address in a new tab and the browser saves the file. `state`: Loading or Ready. The signals are the ones of the C++ type.
+export class RemoteFileController extends Item {
+	constructor() {
+		super();
+		this.$typeName = 'RemoteFileController';
+		this.$nonVisual = true;
+		this.$defineCustom('state', '');
+		this.$defineCustom('downloadedFileLocation', '');
+		this.$defineCustom('downloadedFilePath', '');
+		this.$defineCustom('json', '');
+		this.$defineCustom('prefix', '');
+		this.$declareSignal('progress', ['bytesLoaded', 'bytesTotal']);
+		this.$declareSignal('fileDeleted', ['url']);
+		this.$declareSignal('fileDownloaded', ['filePath']);
+		this.$declareSignal('fileUploaded', ['url']);
+		this.$declareSignal('fileExists', ['url']);
+		this.$declareSignal('fileDownloadFailed', []);
+		this.$declareSignal('fileUploadFailed', []);
+	}
+
+	// `../../<prefix>/<name>`; the prefix is `files` while it is empty.
+	$address(name) {
+		if (this.prefix === '') this.prefix = 'files';
+		return `../../${this.prefix}/${name}`.replace('//', '/');
+	}
+
+	// Posts a file that the page picked (a `File`) to the server.
+	sendFile(fileUrl) {
+		if (typeof XMLHttpRequest === 'undefined' || typeof FileReader === 'undefined') return false;
+		this.state = 'Loading';
+		const xhr = new XMLHttpRequest();
+		const reader = new FileReader();
+		reader.readAsArrayBuffer(fileUrl);
+		xhr.overrideMimeType('text/xml');
+		reader.onload = () => {
+			xhr.open('POST', this.$address(fileUrl.name));
+			xhr.send(reader.result);
+		};
+		xhr.onreadystatechange = () => {
+			if (this.$destroyed || xhr.readyState !== XMLHttpRequest.DONE) return;
+			if (xhr.status === 409) {
+				// The server already has the file: its hash is the third paragraph of the answer.
+				const paragraphs = xhr.responseXML === null ? [] : xhr.responseXML.getElementsByTagName('p');
+				this.json = paragraphs.length > 2 ? paragraphs[2].innerHTML : '';
+				this.$emit('fileExists', [fileUrl]);
+				return;
+			}
+			this.json = xhr.responseText;
+			this.state = 'Ready';
+			this.$emit('fileUploaded', [fileUrl]);
+		};
+		xhr.onprogress = (event) => this.$emit('progress', [event.loaded, event.total]);
+		return true;
+	}
+
+	// Downloads the file: its address opens in a new tab, and the server sends it with the id of the file in the query.
+	getFile(fileHash, fileName) {
+		if (typeof window === 'undefined' || typeof window.open !== 'function') return false;
+		window.open(`${this.$address(fileName)}?FileId=${fileHash}`, '_blank');
+		return true;
+	}
+
+	deleteFile(fileHash, fileUrl) {
+		if (typeof XMLHttpRequest === 'undefined') return false;
+		this.state = 'Loading';
+		const xhr = new XMLHttpRequest();
+		xhr.open('DELETE', this.$address(fileHash));
+		xhr.send(fileHash);
+		xhr.onreadystatechange = () => {
+			if (this.$destroyed || xhr.readyState !== XMLHttpRequest.DONE) return;
+			this.json = xhr.responseText;
+			this.state = 'Ready';
+			this.$emit('fileDeleted', [fileUrl]);
+		};
+		return true;
+	}
+}
+
 // ----- Map (QtLocation / QtPositioning) -----
 
 // `Map` draws Web Mercator tiles (the `osm` plugin: tile.openstreetmap.org, or `osm.mapping.custom.host`) and keeps the
@@ -8871,6 +8951,7 @@ export const BUILTIN_TYPES = new Map([
 	['Settings', Settings],
 	['WebSocket', WebSocketItem],
 	['GqlModel', GqlModel],
+	['RemoteFileController', RemoteFileController],
 	['FileDialog', FileDialog],
 	['Item', Item],
 	['Rectangle', Rectangle],
