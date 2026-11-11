@@ -4491,6 +4491,14 @@ defineContent('contentY', '$contentY');
 defineContent('contentWidth', '$contentW', '$w');
 defineContent('contentHeight', '$contentH', '$h');
 defineField(Flickable.prototype, 'interactive', '$interactive', toBool);
+// The origin of the content: 0 for a Flickable whose content starts at its top left corner. A scroll bar places its thumb with
+// `(contentY - originY) * ...`: without the property the thumb was NaN and did not follow the content.
+defineReadOnly(Flickable.prototype, 'originX', function () {
+	return 0;
+});
+defineReadOnly(Flickable.prototype, 'originY', function () {
+	return 0;
+});
 defineReadOnly(Flickable.prototype, 'atXBeginning', function () {
 	return this.$contentX <= 0;
 });
