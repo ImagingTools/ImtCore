@@ -466,6 +466,7 @@ export class Engine {
 		this.auditGeometry = typeof process !== "undefined" && process.env !== undefined && process.env.JQML_AUDIT_GEOMETRY === "1";
 		this.geometryMisses = [];
 		this.singletons = new Map(); // name -> { path, item }
+		this.typeEnums = new Map(); // name of a QML type -> the enums of its file
 		this.singletonEntries = new Map(); // path -> { path, item }: a singleton file is created once
 		this.fileLayers = new Map(); // file -> the names that only that file sees (see fileLayer), or null
 		this.ambiguousSingletons = new Set(); // names of singletons that several files declare
@@ -764,6 +765,7 @@ export class Engine {
 		for (const name of this.singletons.keys()) delete this.globals[name];
 		for (const name of this.jsGlobals) delete this.globals[name];
 		this.jsGlobals = [];
+		this.typeEnums.clear();
 		this.singletons.clear();
 		this.singletonEntries.clear();
 		this.fileLayers.clear();
@@ -810,9 +812,40 @@ export class Engine {
 
 	// ----- scopes and scripts -----
 
+	// The enums of a QML type are read through the name of the type, in the file of the type as well: `Type.Enum.Value` and `Type.Value`
+	// (`DocumentRepresentationController.ChangeSource.Own`). The name of a type that has enums is a global object that holds them; two
+	// files of the same name (in different modules) give one object with the enums of both.
+	setupTypeEnums() {
+		for (const [path, doc] of this.project.docs) {
+			// A document is parsed when the engine asks for its tree: only the ones that declare an enum are asked here.
+			if (typeof doc.source !== 'string' || !/^\s*enum\s+[A-Z]/m.test(doc.source)) continue;
+			if (doc.def === undefined || doc.def === null || !doc.def.enums || doc.def.enums.length === 0) continue;
+			const file = path.slice(path.lastIndexOf('/') + 1);
+			if (!file.endsWith('.qml')) continue;
+			const name = file.slice(0, -4);
+			if (!/^[A-Z]\w*$/.test(name)) continue;
+			let holder = this.typeEnums.get(name);
+			if (holder === undefined) {
+				// A global of this name that is not made here (a singleton, a built-in type, a script) stays as it is.
+				if (name in this.globals) continue;
+				holder = Object.create(null);
+				this.typeEnums.set(name, holder);
+				this.jsGlobals.push(name);
+				Object.defineProperty(this.globals, name, { value: holder, enumerable: true, configurable: true });
+			}
+			for (const e of doc.def.enums) {
+				if (!(e.name in holder)) holder[e.name] = Object.freeze({ ...e.values });
+				for (const [value, number] of Object.entries(e.values)) {
+					if (!(value in holder)) holder[value] = number;
+				}
+			}
+		}
+	}
+
 	// `pragma Singleton` types of the imported modules become global names, created on first use.
 	setupSingletons() {
 		this.ambiguousSingletons = this.findAmbiguousSingletons();
+		this.setupTypeEnums();
 		for (const [name, path] of this.project.singletons) {
 			const entry = this.singletonEntry(path);
 			this.singletons.set(name, entry);
