@@ -20,6 +20,10 @@ Rectangle {
 	property bool checkable: false;
 	property bool selectable: true;
 	property bool isMultiCheckable: true;
+	// The width of the checkbox column of a checkable table; the header and the rows both start their cells after it.
+	readonly property int checkColumnWidth: tableContainer.checkable ? 3 * Style.marginM : 0;
+	// The first column that is shown; the checkbox column takes the look of its header cell.
+	property int firstVisibleColumnIndex: 0;
 	property bool canSelectAll: true;
 	property bool scrollbarVisible: true;
 	property bool showHeaders: true;
@@ -185,6 +189,7 @@ Rectangle {
 	signal sortingChanged(string headerId, string sortOrder);
 
 	signal widthRecalc();
+
 	signal heightRecalc();
 
 	signal tableViewParamsAccepted();
@@ -483,6 +488,52 @@ Rectangle {
 		tableContainer.columnContentComps[headerId] = comp;
 	}
 
+	function updateFirstVisibleColumnIndex(){
+		for (let i = 0; i < tableContainer.widthDecoratorDynamic.getItemsCount(); i++){
+			if (tableContainer.widthDecoratorDynamic.getData("Width", i) > 0){
+				tableContainer.firstVisibleColumnIndex = i;
+
+				return;
+			}
+		}
+
+		tableContainer.firstVisibleColumnIndex = 0;
+	}
+
+	// The look of a header cell, from the header decorator; the cell of the checkbox column uses the one of the first cell.
+	function headerCellColor(index){
+		if (tableContainer.emptyDecorHeader || !tableContainer.headerDecorator.isValidData("Color", index)){
+			return "transparent";
+		}
+
+		return tableContainer.headerDecorator.getData("Color", index);
+	}
+
+	function headerCellOpacity(index){
+		if (tableContainer.emptyDecorHeader || !tableContainer.headerDecorator.isValidData("Opacity", index)){
+			return 1;
+		}
+
+		return tableContainer.headerDecorator.getData("Opacity", index);
+	}
+
+	function headerCellRadius(index){
+		if (tableContainer.emptyDecorHeader || !tableContainer.headerDecorator.isValidData("CellRadius", index)){
+			return 0;
+		}
+
+		return tableContainer.headerDecorator.getData("CellRadius", index);
+	}
+
+	// Whether the corner of a header cell is rounded; the corner is "LeftTopRound", "RightTopRound", "LeftBottomRound" or "RightBottomRound".
+	function isHeaderCornerRounded(corner, index){
+		if (tableContainer.emptyDecorHeader || !tableContainer.headerDecorator.isValidData(corner, index)){
+			return false;
+		}
+
+		return tableContainer.headerDecorator.getData(corner, index);
+	}
+
 	function setCellHeight(){
 		var maxVal = 0;
 		for(var i = 0; i < heightModel.count; i++){
@@ -595,6 +646,7 @@ Rectangle {
 		if(tableContainer.isFlickable){
 			tableContainer.contentWidth = totalWidth;
 		}
+		tableContainer.updateFirstVisibleColumnIndex();
 		tableContainer.widthRecalc();
 	}
 
@@ -800,6 +852,85 @@ Rectangle {
 
 		clip: true;
 
+		// The header cell of the checkbox column, built like the first header cell it sits next to:
+		// the borders outside, the decorated background between them.
+		Item {
+			id: checkBoxHeaderCell;
+
+			anchors.left: parent.left;
+			anchors.top: parent.top;
+			anchors.bottom: parent.bottom;
+
+			width: tableContainer.checkColumnWidth;
+
+			visible: tableContainer.checkable;
+
+			Rectangle {
+				id: checkBoxHeaderTopBorder;
+
+				anchors.left: parent.left;
+				anchors.right: parent.right;
+				anchors.top: parent.top;
+
+				height: tableContainer.visibleTopBorderFirst ? tableContainer.horizontalBorderSize : 0;
+				color: tableContainer.borderColorHorizontal;
+			}
+
+			Rectangle {
+				id: checkBoxHeaderBottomBorder;
+
+				anchors.left: parent.left;
+				anchors.right: parent.right;
+				anchors.bottom: parent.bottom;
+
+				height: tableContainer.visibleBottomBorderLast ? tableContainer.horizontalBorderSize : 0;
+				color: tableContainer.borderColorHorizontal;
+			}
+
+			Rectangle {
+				id: checkBoxHeaderBackground;
+
+				anchors.left: parent.left;
+				anchors.right: parent.right;
+				anchors.top: checkBoxHeaderTopBorder.bottom;
+				anchors.bottom: checkBoxHeaderBottomBorder.top;
+
+				color: tableContainer.headerCellColor(tableContainer.firstVisibleColumnIndex);
+				opacity: tableContainer.headerCellOpacity(tableContainer.firstVisibleColumnIndex);
+				radius: tableContainer.headerCellRadius(tableContainer.firstVisibleColumnIndex);
+
+				// The side next to the first header cell is never rounded.
+				Rectangle {
+					anchors.right: parent.right;
+					anchors.top: parent.top;
+					anchors.bottom: parent.bottom;
+
+					width: parent.width / 2;
+					color: parent.color;
+				}
+
+				Rectangle {
+					anchors.left: parent.left;
+					anchors.top: parent.top;
+
+					width: parent.width / 2;
+					height: parent.height / 2;
+					color: parent.color;
+					visible: !tableContainer.isHeaderCornerRounded("LeftTopRound", tableContainer.firstVisibleColumnIndex);
+				}
+
+				Rectangle {
+					anchors.left: parent.left;
+					anchors.bottom: parent.bottom;
+
+					width: parent.width / 2;
+					height: parent.height / 2;
+					color: parent.color;
+					visible: !tableContainer.isHeaderCornerRounded("LeftBottomRound", tableContainer.firstVisibleColumnIndex);
+				}
+			}
+		}
+
 		CheckBox {
 			id: checkBox;
 
@@ -837,7 +968,7 @@ Rectangle {
 		ListView {
 			id: headersList;
 
-			anchors.left: checkBox.visible ? checkBox.right : parent.left;
+			anchors.left: tableContainer.checkable ? checkBoxHeaderCell.right : parent.left;
 			anchors.right: parent.right;
 			anchors.top: parent.top;
 			anchors.bottom: parent.bottom;
@@ -1128,6 +1259,7 @@ Rectangle {
 
 		tableContainer.contentWidth = tableWidth_;
 
+		tableContainer.updateFirstVisibleColumnIndex();
 		tableContainer.widthRecalc();
 
 	}

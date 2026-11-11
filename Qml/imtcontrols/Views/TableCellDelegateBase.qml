@@ -184,7 +184,7 @@ Item {
 		Rectangle{
 			anchors.fill: parent;
 			z:-4;
-			color: !delegateContainer.rowDelegate ? "transparent" : delegateContainer.rowDelegate.selected ? delegateContainer.rowDelegate.selectedColor: !delegateContainer.rowDelegate.tableItem ? "transparent" : (delegateContainer.rowDelegate.tableItem.enableAlternating && delegateContainer.rowDelegate.tableItem.alternatingCellColor !== "transparent" && delegateContainer.rowIndex % 2) ? delegateContainer.rowDelegate.tableItem.alternatingCellColor : delegateContainer.rowDelegate.cellColor;
+			color: delegateContainer.rowDelegate ? delegateContainer.rowDelegate.cellBackgroundColor : "transparent";
 		}
 	}
 
@@ -195,9 +195,7 @@ Item {
 			anchors.top: parent.top;
 			anchors.left: parent.left;
 			anchors.right: parent.right;
-			height: !delegateContainer.rowDelegate ? 0 :
-													 (delegateContainer.rowIndex > 0 && delegateContainer.rowIndex < delegateContainer.rowCount) ? delegateContainer.rowDelegate.horizontalBorderSize :
-																																				   (delegateContainer.rowIndex == 0 && delegateContainer.rowDelegate.visibleTopBorderFirst) ? delegateContainer.rowDelegate.horizontalBorderSize : 0;
+			height: delegateContainer.rowDelegate ? delegateContainer.rowDelegate.topSeparatorHeight : 0;
 			color: delegateContainer.rowDelegate ? delegateContainer.rowDelegate.borderColorHorizontal : "transparent";
 		}
 	}
@@ -209,7 +207,7 @@ Item {
 			anchors.left: parent.left;
 			anchors.right: parent.right;
 
-			height: delegateContainer.rowDelegate ? delegateContainer.rowDelegate.visibleBottomBorderLast ? delegateContainer.rowDelegate.horizontalBorderSize : 0 : 0;
+			height: delegateContainer.rowDelegate ? delegateContainer.rowDelegate.bottomSeparatorHeight : 0;
 			color:  delegateContainer.rowDelegate ? delegateContainer.rowDelegate.borderColorHorizontal : "transparent";
 		}
 	}
