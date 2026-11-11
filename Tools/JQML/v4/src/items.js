@@ -6116,6 +6116,9 @@ export class ListModel extends Item {
 		}
 		row[key] = value;
 		markReaders(this, '$rows');
+		// A binding that reads the role (`active: model.loaded`) runs before the next line, as in Qt: the view that sets a role and
+		// asks for the item that the role switches on gets it.
+		noteWrite(this, '$rows');
 		hooks.touch();
 	}
 
