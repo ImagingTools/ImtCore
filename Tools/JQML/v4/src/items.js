@@ -1151,8 +1151,9 @@ export class Item {
 		this.$state = 1;
 
 		const an = this.$anchors;
-		let w = this.$w > 0 ? this.$w : this.$effW;
-		let h = this.$h > 0 ? this.$h : this.$effH;
+		let w = this.$w > 0 ? this.$w : this.$w === 0 && this.$wSet === true ? 0 : this.$effW;
+		// `height: 0` (and `width: 0`) that a script or a binding wrote is a size of 0 (a hidden header that is `visible ? implicitHeight : 0`), not "no size".
+		let h = this.$h > 0 ? this.$h : this.$h === 0 && this.$hSet === true ? 0 : this.$effH;
 		let x = this.$x;
 		let y = this.$y;
 
@@ -1566,6 +1567,7 @@ defineProp(
 		// readable as-is: ButtonDecorator cancels contentSpacing with `width: -Style.marginM`.
 		if (this.$anchors !== null && this.$anchors.$affectsWidth) return this.$aw;
 		if (this.$w < 0) return this.$w;
+		if (this.$w === 0 && this.$wSet === true) return 0;
 		return this.$w <= 0 ? this.$aw : this.$w;
 	},
 	function (v) {
@@ -1588,6 +1590,7 @@ defineProp(
 		this.$ensureGeometry();
 		if (this.$anchors !== null && this.$anchors.$affectsHeight) return this.$ah;
 		if (this.$h < 0) return this.$h;
+		if (this.$h === 0 && this.$hSet === true) return 0;
 		return this.$h <= 0 ? this.$ah : this.$h;
 	},
 	function (v) {
