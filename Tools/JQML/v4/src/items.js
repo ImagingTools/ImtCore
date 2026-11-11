@@ -3588,7 +3588,12 @@ export class ListView extends Item {
 			last++;
 		}
 
-		this.$releaseWhere((index) => index >= first && index <= last);
+		// A row of no size in front of the view keeps its delegate: it may get its size later (the header cell of a table is 0 wide until the
+		// table has measured its columns), and a delegate that was released has its size remembered as 0 and is never asked again.
+		const firstInView = first;
+		let keep = first;
+		while (keep > 0 && this.$delegates.has(keep - 1) && this.$extentAt(keep - 1) === 0) keep--;
+		this.$releaseWhere((index) => index >= keep && index <= last);
 		// The rows of the view are built at once. The rows of the cache buffer are built from the view outwards, as much as fits
 		// in the time of a frame (Qt builds them in the background): a jump of the scroll bar then costs the rows that are seen,
 		// not all the rows of the buffer.
@@ -3645,7 +3650,7 @@ export class ListView extends Item {
 				first = builtFirst;
 				last = Math.min(last, after - 1);
 				wanted = offset + viewSpan;
-				this.$releaseWhere((index) => index >= first && index <= last);
+				this.$releaseWhere((index) => (index >= first || (index >= keep && index < firstInView)) && index <= last);
 				lazyViews.add(this);
 			}
 		} else {
