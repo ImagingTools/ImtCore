@@ -222,9 +222,8 @@ function(jqml_compile_web2)
 
 endfunction(jqml_compile_web2)
 
-# Qml files declared by every qmldir that JQML3 compiles for CONFIG_PATH.
-# The list is suitable for add_custom_command DEPENDS. Paths use forward slashes.
-function(jqml3_qmldir_qml_files out_var config_path)
+# Resolve and validate the selected JQML compiler version.
+function(jqml_resolve_version out_version out_compiler)
 	if(NOT DEFINED JQML_VERSION OR "${JQML_VERSION}" STREQUAL "")
 		if(DEFINED ENV{JQML_VERSION} AND NOT "$ENV{JQML_VERSION}" STREQUAL "")
 			set(_jqml_version "$ENV{JQML_VERSION}")
@@ -243,6 +242,15 @@ function(jqml3_qmldir_qml_files out_var config_path)
 	if(NOT EXISTS "${_jqml_compiler}")
 		message(FATAL_ERROR "JQML compiler for ${_jqml_version} was not found: ${_jqml_compiler}")
 	endif()
+
+	set(${out_version} "${_jqml_version}" PARENT_SCOPE)
+	set(${out_compiler} "${_jqml_compiler}" PARENT_SCOPE)
+endfunction()
+
+# Qml files declared by every qmldir that JQML3 compiles for CONFIG_PATH.
+# The list is suitable for add_custom_command DEPENDS. Paths use forward slashes.
+function(jqml3_qmldir_qml_files out_var config_path)
+	jqml_resolve_version(_jqml_version _jqml_compiler)
 
 	if(NOT NODE_EXE)
 		if(${MSVC})
@@ -291,22 +299,7 @@ function(jq_compile_web)
 	set(QRC_WEB_FILE ${buildwebdir}/Resources/qmlJsWeb.qrc)
 	set(QRC_CPP_WEB_FILE ${buildwebdir}/Resources/qrc_${resname}Web.cpp)
 
-	if(NOT DEFINED JQML_VERSION OR JQML_VERSION STREQUAL "")
-		if(DEFINED ENV{JQML_VERSION} AND NOT "$ENV{JQML_VERSION}" STREQUAL "")
-			set(JQML_VERSION "$ENV{JQML_VERSION}")
-		else()
-			set(JQML_VERSION "v3")
-		endif()
-	endif()
-
-	if(NOT "${JQML_VERSION}" MATCHES "^v[345]$")
-		message(FATAL_ERROR "JQML_VERSION must be v3, v4 or v5 (got '${JQML_VERSION}')")
-	endif()
-
-	set(JQML_COMPILER "${IMTCOREDIR}/Tools/JQML/${JQML_VERSION}/compiler/compiler.js")
-	if(NOT EXISTS "${JQML_COMPILER}")
-		message(FATAL_ERROR "JQML compiler for ${JQML_VERSION} was not found: ${JQML_COMPILER}")
-	endif()
+	jqml_resolve_version(JQML_VERSION JQML_COMPILER)
 
 	if(NOT PYTHONEXE)
 		set(PYTHONEXE "$ENV{PYTHONEXE}")
@@ -374,7 +367,7 @@ function(jq_compile_web)
 
 	set(TRANSLATIONS_QRC_FILE ${buildwebdir}/Resources/qmlTranslationsWeb.qrc)
 
-	message("PREPARE RESOURCES ${PYTHONEXE} ${IMTCOREDIR}/Tools/JQML/v3/preparesources.py ${webdirs_n}")
+	message("PREPARE RESOURCES ${PYTHONEXE} ${IMTCOREDIR}/Tools/JQML/${JQML_VERSION}/preparesources.py ${webdirs_n}")
 
 	# HTML build
 	add_custom_command(
@@ -383,8 +376,8 @@ function(jq_compile_web)
 		${TRANSLATIONS_QRC_FILE}
 		POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E make_directory ${buildwebdir}
-		COMMAND ${PYTHONEXE} ${IMTCOREDIR}/Tools/JQML/v3/preparesources.py ${webdirs_n}
-		COMMAND ${PYTHONEXE} ${IMTCOREDIR}/Tools/JQML/v3/generate_translations_qrc.py ${TRANSLATIONS_QRC_FILE} ${TRANSLATION_SRC_DIRS}
+		COMMAND ${PYTHONEXE} ${IMTCOREDIR}/Tools/JQML/${JQML_VERSION}/preparesources.py ${webdirs_n}
+		COMMAND ${PYTHONEXE} ${IMTCOREDIR}/Tools/JQML/${JQML_VERSION}/generate_translations_qrc.py ${TRANSLATIONS_QRC_FILE} ${TRANSLATION_SRC_DIRS}
 		WORKING_DIRECTORY ${IMTCOREDIR}/Tools/JQML/${JQML_VERSION}
 		COMMAND ${CMAKE_COMMAND} -E env ${envvar}
 		TARGETNAME=${TARGETNAME}
