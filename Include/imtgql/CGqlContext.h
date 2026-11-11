@@ -25,6 +25,8 @@ public:
 	virtual bool HasPermissionBoundary() const override;
 	virtual QByteArrayList GetPermissionBoundary() const override;
 	virtual void SetPermissionBoundary(const QByteArrayList& permissions) override;
+	virtual bool GetGrantingAuthority(bool& isAdmin, QByteArrayList& permissions) const override;
+	virtual void SetGrantingAuthority(bool isAdmin, const QByteArrayList& permissions) override;
 	virtual QByteArray GetProductId() const override;
 	virtual void SetProductId(const QByteArray& productId) override;
 	virtual QByteArray GetServerProductId() const override;
@@ -75,6 +77,9 @@ private:
 	PrincipalKind m_principalKind = PK_ANONYMOUS;
 	bool m_hasPermissionBoundary = false;
 	QByteArrayList m_permissionBoundary;
+	bool m_hasGrantingAuthority = false;
+	bool m_isGrantingAdmin = false;
+	QByteArrayList m_grantingPermissions;
 	QByteArray m_userId;
 	QByteArray m_tenantId;
 	QByteArray m_productId;

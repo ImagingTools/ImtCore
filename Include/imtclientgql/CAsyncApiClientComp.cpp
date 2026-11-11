@@ -93,7 +93,7 @@ void CAsyncApiClientComp::SendRequestInternal(
 	promisePtr->start();
 
 	const auto uuid = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
-	SendVerboseMessage(QStringLiteral("Send async request with ID ") + uuid + "\n" + requestPtr->GetQuery());
+	SendVerboseMessage(QStringLiteral("Send async request with ID %1, command %2").arg(QString::fromUtf8(uuid), QString::fromUtf8(requestPtr->GetCommandId())));
 
 	auto replyPtr = m_networkManager->post(networkRequest, requestPtr->GetQuery());
 	if (replyPtr == nullptr){

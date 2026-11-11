@@ -35,10 +35,11 @@ QString CConnectionStatusSubscriberControllerComp::CreateBodySubscription() cons
 
 // reimplemented (imtservergql::CGqlPublisherCompBase)
 
-bool CConnectionStatusSubscriberControllerComp::IsOpenFor(SubscriberKind /*subscriberKind*/, const imtgql::CGqlRequest& /*gqlRequest*/) const
+bool CConnectionStatusSubscriberControllerComp::IsOpenFor(SubscriberKind subscriberKind, const imtgql::CGqlRequest& /*gqlRequest*/) const
 {
-	// The login page shows it, and it tells nothing but the state of a connection
-	return true;
+	// The login page shows it, and it tells nothing but the state of a connection; it is addressed to nobody
+	return subscriberKind == SK_USER ||
+				(subscriberKind == SK_ANONYMOUS && m_readPermissionsAttrPtr.GetCount() == 0);
 }
 
 
@@ -96,5 +97,4 @@ void CConnectionStatusSubscriberControllerComp::OnComponentDestroyed()
 
 
 } // namespace imtservergql
-
 

@@ -33,8 +33,9 @@ imtbase::IHierarchicalStructureInfo::Id CGqlHierarchicalStructureComp::InsertNew
 				operationContextPtr));
 
 	if (requestPtr.IsValid()){
-		IGqlClient::GqlResponsePtr responsePtr = m_clientCompPtr->SendRequest(requestPtr);
-		if (responsePtr.IsValid()){
+		const auto requestResult = m_clientCompPtr->SendRequest(requestPtr);
+		auto responsePtr = requestResult.responsePtr;
+		if (requestResult){
 			m_delegateCompPtr->GetNodeId(*responsePtr, retVal);
 		}
 	}
@@ -58,8 +59,9 @@ bool CGqlHierarchicalStructureComp::SetNodeName(
 				operationContextPtr));
 
 	if (requestPtr.IsValid()){
-		IGqlClient::GqlResponsePtr responsePtr = m_clientCompPtr->SendRequest(requestPtr);
-		if (responsePtr.IsValid()){
+		const auto requestResult = m_clientCompPtr->SendRequest(requestPtr);
+		auto responsePtr = requestResult.responsePtr;
+		if (requestResult){
 			bool retVal = false;
 			if (m_delegateCompPtr->GetOperationResult(*responsePtr, retVal)){
 				return retVal;
@@ -86,8 +88,9 @@ bool CGqlHierarchicalStructureComp::SetNodeDescription(
 				operationContextPtr));
 
 	if (requestPtr.IsValid()){
-		IGqlClient::GqlResponsePtr responsePtr = m_clientCompPtr->SendRequest(requestPtr);
-		if (responsePtr.IsValid()){
+		const auto requestResult = m_clientCompPtr->SendRequest(requestPtr);
+		auto responsePtr = requestResult.responsePtr;
+		if (requestResult){
 			bool retVal = false;
 			if (m_delegateCompPtr->GetOperationResult(*responsePtr, retVal)){
 				return retVal;
@@ -114,8 +117,9 @@ bool CGqlHierarchicalStructureComp::SetNodeMetaInfo(
 				operationContextPtr));
 
 	if (requestPtr.IsValid()){
-		IGqlClient::GqlResponsePtr responsePtr = m_clientCompPtr->SendRequest(requestPtr);
-		if (responsePtr.IsValid()){
+		const auto requestResult = m_clientCompPtr->SendRequest(requestPtr);
+		auto responsePtr = requestResult.responsePtr;
+		if (requestResult){
 			bool retVal = false;
 			if (m_delegateCompPtr->GetOperationResult(*responsePtr, retVal)){
 				return retVal;
@@ -142,8 +146,9 @@ bool CGqlHierarchicalStructureComp::MoveNode(
 				operationContextPtr));
 
 	if (requestPtr.IsValid()){
-		IGqlClient::GqlResponsePtr responsePtr = m_clientCompPtr->SendRequest(requestPtr);
-		if (responsePtr.IsValid()){
+		const auto requestResult = m_clientCompPtr->SendRequest(requestPtr);
+		auto responsePtr = requestResult.responsePtr;
+		if (requestResult){
 			bool retVal = false;
 			if (m_delegateCompPtr->GetOperationResult(*responsePtr, retVal)){
 				return retVal;
@@ -168,8 +173,9 @@ bool CGqlHierarchicalStructureComp::RemoveNode(
 				operationContextPtr));
 
 	if (requestPtr.IsValid()){
-		IGqlClient::GqlResponsePtr responsePtr = m_clientCompPtr->SendRequest(requestPtr);
-		if (responsePtr.IsValid()){
+		const auto requestResult = m_clientCompPtr->SendRequest(requestPtr);
+		auto responsePtr = requestResult.responsePtr;
+		if (requestResult){
 			bool retVal = false;
 			if (m_delegateCompPtr->GetOperationResult(*responsePtr, retVal)){
 				return retVal;
@@ -198,8 +204,9 @@ bool CGqlHierarchicalStructureComp::InsertLeaf(
 				operationContextPtr));
 
 	if (requestPtr.IsValid()){
-		IGqlClient::GqlResponsePtr responsePtr = m_clientCompPtr->SendRequest(requestPtr);
-		if (responsePtr.IsValid()){
+		const auto requestResult = m_clientCompPtr->SendRequest(requestPtr);
+		auto responsePtr = requestResult.responsePtr;
+		if (requestResult){
 			bool retVal = false;
 			if (m_delegateCompPtr->GetOperationResult(*responsePtr, retVal)){
 				return retVal;
@@ -228,8 +235,9 @@ bool CGqlHierarchicalStructureComp::MoveLeaf(
 				operationContextPtr));
 
 	if (requestPtr.IsValid()){
-		IGqlClient::GqlResponsePtr responsePtr = m_clientCompPtr->SendRequest(requestPtr);
-		if (responsePtr.IsValid()){
+		const auto requestResult = m_clientCompPtr->SendRequest(requestPtr);
+		auto responsePtr = requestResult.responsePtr;
+		if (requestResult){
 			bool retVal = false;
 			if (m_delegateCompPtr->GetOperationResult(*responsePtr, retVal)){
 				return retVal;
@@ -256,8 +264,9 @@ bool CGqlHierarchicalStructureComp::RemoveLeaf(
 					operationContextPtr));
 
 	if (requestPtr.IsValid()){
-		IGqlClient::GqlResponsePtr responsePtr = m_clientCompPtr->SendRequest(requestPtr);
-		if (responsePtr.IsValid()){
+		const auto requestResult = m_clientCompPtr->SendRequest(requestPtr);
+		auto responsePtr = requestResult.responsePtr;
+		if (requestResult){
 			bool retVal = false;
 			if (m_delegateCompPtr->GetOperationResult(*responsePtr, retVal)){
 				return retVal;
@@ -283,8 +292,9 @@ int CGqlHierarchicalStructureComp::GetItemCount(const iprm::IParamsSet* selectio
 					selectionParamsPtr));
 
 	if (requestPtr.IsValid()){
-		IGqlClient::GqlResponsePtr responsePtr = m_clientCompPtr->SendRequest(requestPtr);
-		if (responsePtr.IsValid()){
+		const auto requestResult = m_clientCompPtr->SendRequest(requestPtr);
+		auto responsePtr = requestResult.responsePtr;
+		if (requestResult){
 			int count = 0;
 			if (m_delegateCompPtr->GetItemCount(*responsePtr, count)){
 				retVal = count;
@@ -313,8 +323,9 @@ imtbase::IHierarchicalStructureInfo::Ids CGqlHierarchicalStructureComp::GetItemI
 					selectionParamsPtr));
 
 	if (requestPtr.IsValid()){
-		IGqlClient::GqlResponsePtr responsePtr = m_clientCompPtr->SendRequest(requestPtr);
-		if (responsePtr.IsValid()){
+		const auto requestResult = m_clientCompPtr->SendRequest(requestPtr);
+		auto responsePtr = requestResult.responsePtr;
+		if (requestResult){
 			m_delegateCompPtr->GetItemIds(*responsePtr, retVal);
 		}
 	}
@@ -334,8 +345,9 @@ imtbase::IHierarchicalStructureInfo::ItemInfoList CGqlHierarchicalStructureComp:
 	IGqlClient::GqlRequestPtr requestPtr(m_delegateCompPtr->CreateGetItemInfosRequest(itemIds));
 
 	if (requestPtr.IsValid()){
-		IGqlClient::GqlResponsePtr responsePtr = m_clientCompPtr->SendRequest(requestPtr);
-		if (responsePtr.IsValid()){
+		const auto requestResult = m_clientCompPtr->SendRequest(requestPtr);
+		auto responsePtr = requestResult.responsePtr;
+		if (requestResult){
 			m_delegateCompPtr->GetItemInfos(*responsePtr, retVal);
 		}
 	}
@@ -354,8 +366,9 @@ imtbase::IHierarchicalStructureInfo::Ids CGqlHierarchicalStructureComp::GetItemP
 
 	IGqlClient::GqlRequestPtr requestPtr(m_delegateCompPtr->CreateGetItemPathRequest(itemId));
 	if (requestPtr.IsValid()){
-		IGqlClient::GqlResponsePtr responsePtr = m_clientCompPtr->SendRequest(requestPtr);
-		if (responsePtr.IsValid()){
+		const auto requestResult = m_clientCompPtr->SendRequest(requestPtr);
+		auto responsePtr = requestResult.responsePtr;
+		if (requestResult){
 			m_delegateCompPtr->GetItemPath(*responsePtr, retVal);
 		}
 	}

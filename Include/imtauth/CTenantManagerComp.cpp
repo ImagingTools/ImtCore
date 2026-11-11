@@ -66,7 +66,7 @@ ITenantInfoUniquePtr CTenantManagerComp::GetTenant(const QByteArray& tenantId, b
 		// Only an organization the collection reports as absent is not there; a collection may ignore the filter
 		if (isReadPtr != nullptr){
 			bool isRead = false;
-			const QByteArrayList ids = CollectionSelection::SelectIds(*m_tenantCollectionCompPtr, CollectionSelection::ColumnEquals("DocumentId", tenantId), QByteArrayList(), &isRead);
+			const QByteArrayList ids = CollectionSelection::SelectIds(*m_tenantCollectionCompPtr, CollectionSelection::ColumnEquals("Id", tenantId), QByteArrayList(), &isRead);
 			*isReadPtr = isRead && !ids.contains(tenantId);
 		}
 		return nullptr;

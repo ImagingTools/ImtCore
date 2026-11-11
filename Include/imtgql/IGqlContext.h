@@ -46,6 +46,17 @@ public:
 	virtual QByteArrayList GetPermissionBoundary() const = 0;
 	virtual void SetPermissionBoundary(const QByteArrayList& permissions) = 0;
 
+	/**
+		Get what the request may give in the roles, groups and users of its product, when it differs from what it may do.
+		The token of a server bounds what a request through it may do at this server; what its user may give in its own product
+		is what this server holds for that user, within the personal token of the user.
+		\param isAdmin		Receives whether the user, as this server reads it, is the superuser: it may give any permission of the product.
+		\param permissions	Receives the permissions the user may give otherwise.
+		\return False when nothing was set: the request gives no more than it holds.
+	*/
+	virtual bool GetGrantingAuthority(bool& isAdmin, QByteArrayList& permissions) const = 0;
+	virtual void SetGrantingAuthority(bool isAdmin, const QByteArrayList& permissions) = 0;
+
 	virtual QByteArray GetProductId() const = 0;
 	virtual void SetProductId(const QByteArray& productId) = 0;
 

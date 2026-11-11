@@ -26,6 +26,19 @@ namespace imtservergql
 {
 
 
+/**
+	Machine codes of a refused or ended subscription, in the extensions of its error frame: a client decides by them, not by the message.
+*/
+/// The credentials expired or their session is closed: the client authenticates again.
+static const inline QByteArray s_subscriptionUnauthorizedCode = QByteArrayLiteral("Unauthorized");
+/// The access is refused: subscribing again does not help.
+static const inline QByteArray s_subscriptionForbiddenCode = QByteArrayLiteral("Forbidden");
+/// The permissions changed: a new registration decides on the current ones.
+static const inline QByteArray s_subscriptionPermissionsChangedCode = QByteArrayLiteral("PermissionsChanged");
+/// The access could not be confirmed for now: the client subscribes again later.
+static const inline QByteArray s_subscriptionAuthorizationUnavailableCode = QByteArrayLiteral("AuthorizationUnavailable");
+
+
 inline QByteArray GetPermissionPath(const imtgql::CGqlRequest& gqlRequest)
 {
 	QByteArray permissionPath = gqlRequest.GetHeader(imtbase::s_permissionPathHeaderId);
@@ -66,34 +79,109 @@ inline imtauth::IUserInfo::FeatureIds GetUserPermissions(const imtgql::IGqlConte
 
 
 /**
-	Get what decides the access of the context: the principal, its organization, every permission it holds and the bounds of its tokens.
-	Two contexts with the same fingerprint are allowed the same; a changed fingerprint is a changed access.
+	What decides the access of a context, as values: a snapshot that does not change with the objects it was read from.
+	The lists are sorted and hold every item once.
 */
-inline QByteArray GetAuthorizationFingerprint(const imtgql::IGqlContext& gqlContext)
+struct AuthorizationData
+{
+	int principalKind = 0;
+	QByteArray userId;
+	QByteArray tenantId;
+	QByteArray productId;
+	QByteArray serverProductId;
+	bool hasUser = false;
+	bool isAdmin = false;
+	bool isTenantOwner = false;
+	// The groups open objects shared with them, whatever permissions they give
+	QByteArrayList groups;
+	QByteArrayList permissions;
+	QByteArrayList organizationPermissions;
+	QByteArrayList tenantPermissions;
+	// No bound and a bound allowing nothing differ
+	bool hasBoundary = false;
+	QByteArrayList boundary;
+	// What the request may give in its product, apart from what it may do
+	bool hasGrantingAuthority = false;
+	bool isGrantingAdmin = false;
+	QByteArrayList grantingPermissions;
+};
+
+
+inline AuthorizationData GetAuthorizationData(const imtgql::IGqlContext& gqlContext)
 {
 	auto sorted = [](QByteArrayList list){
 		std::sort(list.begin(), list.end());
 		list.erase(std::unique(list.begin(), list.end()), list.end());
 
-		return list.join(',');
+		return list;
 	};
 
+	AuthorizationData retVal;
+	retVal.principalKind = gqlContext.GetPrincipalKind();
+	retVal.userId = gqlContext.GetUserId();
+	retVal.tenantId = gqlContext.GetTenantId();
+	retVal.productId = gqlContext.GetProductId();
+	retVal.serverProductId = gqlContext.GetServerProductId();
+
 	const imtauth::IUserInfo* userInfoPtr = gqlContext.GetUserInfo();
+	retVal.hasUser = userInfoPtr != nullptr;
+	retVal.isAdmin = userInfoPtr != nullptr && userInfoPtr->IsAdmin();
+	retVal.isTenantOwner = gqlContext.IsTenantOwner();
+	if (userInfoPtr != nullptr){
+		retVal.groups = sorted(userInfoPtr->GetGroups());
+	}
+	retVal.permissions = sorted(GetUserPermissions(gqlContext));
+	retVal.organizationPermissions = sorted(gqlContext.GetOrganizationPermissions());
+	retVal.tenantPermissions = sorted(gqlContext.GetTenantPermissions());
+	retVal.hasBoundary = gqlContext.HasPermissionBoundary();
+	if (retVal.hasBoundary){
+		retVal.boundary = sorted(gqlContext.GetPermissionBoundary());
+	}
+	retVal.hasGrantingAuthority = gqlContext.GetGrantingAuthority(retVal.isGrantingAdmin, retVal.grantingPermissions);
+	retVal.grantingPermissions = sorted(retVal.grantingPermissions);
 
-	QByteArrayList parts;
-	parts << QByteArray::number(gqlContext.GetPrincipalKind())
-		  << gqlContext.GetUserId()
-		  << gqlContext.GetTenantId()
-		  << gqlContext.GetProductId()
-		  << gqlContext.GetServerProductId()
-		  << QByteArray(userInfoPtr == nullptr ? "-" : (userInfoPtr->IsAdmin() ? "admin" : "user"))
-		  << QByteArray(gqlContext.IsTenantOwner() ? "owner" : "")
-		  << sorted(GetUserPermissions(gqlContext))
-		  << sorted(gqlContext.GetOrganizationPermissions())
-		  << sorted(gqlContext.GetTenantPermissions())
-		  << (gqlContext.HasPermissionBoundary() ? "bounded:" + sorted(gqlContext.GetPermissionBoundary()) : QByteArray());
+	return retVal;
+}
 
-	return parts.join('\n');
+
+/**
+	Tell whether two accesses have the same recipient: the principal, the user, its organization, its product and the server of the product.
+	The administrator and the owner of an organization stay the same recipient.
+*/
+inline bool IsSameRecipient(const AuthorizationData& registered, const AuthorizationData& current)
+{
+	return registered.principalKind == current.principalKind
+				&& registered.userId == current.userId
+				&& registered.tenantId == current.tenantId
+				&& registered.productId == current.productId
+				&& registered.serverProductId == current.serverProductId;
+}
+
+
+/**
+	Tell whether the current access holds all of the registered one: the same recipient with the same administrator and owner flags,
+	and no less of any permission, group, token bound or authority to grant. A bound or an authority to grant that appears or goes
+	is no such access: none and an empty one differ.
+*/
+inline bool IsAccessWithin(const AuthorizationData& registered, const AuthorizationData& current)
+{
+	auto isWithin = [](const QByteArrayList& sortedPart, const QByteArrayList& sortedWhole){
+		return std::includes(sortedWhole.cbegin(), sortedWhole.cend(), sortedPart.cbegin(), sortedPart.cend());
+	};
+
+	return IsSameRecipient(registered, current)
+				&& registered.hasUser == current.hasUser
+				&& registered.isAdmin == current.isAdmin
+				&& registered.isTenantOwner == current.isTenantOwner
+				&& isWithin(registered.groups, current.groups)
+				&& isWithin(registered.permissions, current.permissions)
+				&& isWithin(registered.organizationPermissions, current.organizationPermissions)
+				&& isWithin(registered.tenantPermissions, current.tenantPermissions)
+				&& registered.hasBoundary == current.hasBoundary
+				&& isWithin(registered.boundary, current.boundary)
+				&& registered.hasGrantingAuthority == current.hasGrantingAuthority
+				&& registered.isGrantingAdmin == current.isGrantingAdmin
+				&& isWithin(registered.grantingPermissions, current.grantingPermissions);
 }
 
 

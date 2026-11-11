@@ -14,6 +14,8 @@ TestCase {
 
 		property var connection: null
 		property var receivedTypes: []
+		// The codes the next starts are refused with, one each
+		property var refusalCodes: []
 
 		listen: true
 		port: 0
@@ -29,7 +31,18 @@ TestCase {
 				if (request.type === "connection_init"){
 					webSocket.sendTextMessage(JSON.stringify({"type": "connection_ack"}))
 				}
+				else if (request.type === "start" && server.refusalCodes.length > 0){
+					let codes = server.refusalCodes
+					let code = codes.shift()
+					server.refusalCodes = codes
+					server.sendError(request.id, code)
+				}
 			})
+		}
+
+		function sendError(subscriptionId, code){
+			server.connection.sendTextMessage(JSON.stringify({"type": "error", "id": subscriptionId,
+				"payload": [{"message": "Refused", "extensions": {"type": "Warning", "code": code}}]}))
 		}
 
 		function startCount(){
@@ -74,6 +87,7 @@ TestCase {
 	function init(){
 		server.connection = null
 		server.receivedTypes = []
+		server.refusalCodes = []
 	}
 
 	// A connected manager with one subscription the server has received.
@@ -190,6 +204,50 @@ TestCase {
 
 		tryVerify(function(){ return server.startCount() === 2 }, 5000)
 		compare(context.client.refreshCount, 0)
+	}
+
+	function test_unavailableAuthorizationIsAskedAgain(){
+		let context = connect()
+		context.manager.authorizationRetryInterval = 100
+		context.manager.authorizationRetryDelay = 100
+
+		// Unavailable again at the next registration: it goes on asking, it does not give up
+		server.refusalCodes = ["AuthorizationUnavailable", "AuthorizationUnavailable"]
+		server.sendError(context.client.subscriptionId, "AuthorizationUnavailable")
+		tryCompare(context.client, "state", "Error", 5000)
+
+		tryVerify(function(){ return server.startCount() === 4 }, 5000, "Asked again after each unavailable answer")
+		wait(500)
+		compare(server.startCount(), 4, "Not asked again once the server stays silent after a start")
+	}
+
+	function test_changedPermissionsSubscribeAgainAtOnce(){
+		let context = connect()
+
+		server.sendError(context.client.subscriptionId, "PermissionsChanged")
+
+		tryVerify(function(){ return server.startCount() === 2 }, 2000)
+		compare(context.client.refreshCount, 1, "What happened meanwhile is read again")
+	}
+
+	function test_refusalIsFinal_data(){
+		return [
+			{"tag": "forbidden", "code": "Forbidden"},
+			{"tag": "unauthorized", "code": "Unauthorized"},
+			{"tag": "no code", "code": ""}
+		]
+	}
+
+	function test_refusalIsFinal(data){
+		let context = connect()
+		context.manager.authorizationRetryInterval = 100
+		context.manager.authorizationRetryDelay = 100
+
+		server.sendError(context.client.subscriptionId, data.code)
+		tryCompare(context.client, "state", "Error", 5000)
+
+		wait(700)
+		compare(server.startCount(), 1, "A refused subscription waits for a new token or a reconnect")
 	}
 
 	function test_subscriptionRegisteredWhileDisconnectedIsNotAResume(){

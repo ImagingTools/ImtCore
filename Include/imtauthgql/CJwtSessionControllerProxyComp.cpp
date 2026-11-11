@@ -7,7 +7,29 @@ namespace imtauthgql
 {
 
 
+bool CJwtSessionControllerProxyComp::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
+{
+	// A product must not lend its server credentials to this server-to-server operation.
+	return gqlRequest.GetCommandId() != sdl::V1_0::imtauth::CGetSessionAuthorizationGqlRequest::GetCommandId()
+				&& BaseClass::IsRequestSupported(gqlRequest);
+}
+
+
 // reimplemented (sdl::V1_0::imtauth::CSessionsGqlHandlerCompBase)
+
+sdl::V1_0::imtauth::CGetSessionAuthorizationPayload CJwtSessionControllerProxyComp::OnGetSessionAuthorization(
+			const sdl::V1_0::imtauth::CGetSessionAuthorizationGqlRequest& /*getSessionAuthorizationRequest*/,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& errorMessage) const
+{
+	sdl::V1_0::imtauth::CGetSessionAuthorizationPayload response;
+	errorMessage = QStringLiteral("Session authorization is not available through the session proxy.");
+	response.state = sdl::V1_0::imtauth::SessionAuthorizationState::REFUSED;
+	response.refusalReason = sdl::V1_0::imtauth::SessionRefusalReason::FORBIDDEN;
+	response.message = errorMessage;
+	return response;
+}
+
 
 sdl::V1_0::imtauth::CValidateSessionPayload CJwtSessionControllerProxyComp::OnValidateSession(
 			const sdl::V1_0::imtauth::CValidateSessionGqlRequest& /*validateSessionRequest*/,

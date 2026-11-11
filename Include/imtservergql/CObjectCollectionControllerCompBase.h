@@ -422,11 +422,13 @@ protected:
 		as payload of the \c GetObjectData request.
 		The default implementation returns an invalid pointer, meaning the original
 		collection object is serialized unchanged.
+		\param errorMessage	Set when the object cannot be handed out; the result is invalid then.
 	*/
 	virtual istd::IChangeableUniquePtr CreateAdaptedObjectData(
 				const QByteArray& objectId,
 				const istd::IChangeable& object,
-				const imtgql::CGqlRequest& gqlRequest) const;
+				const imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const;
 
 	/**
 		Write a change history entry for a collection element attribute that is stored outside of

@@ -296,6 +296,9 @@
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="UserFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="UserInfo"/>
+                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
@@ -826,6 +829,7 @@
         <Component ExportedId="GroupRemoteRepository" ComponentId="RemoteRepositories/GroupRemoteRepository"/>
         <Component ExportedId="RemoteAuthorizationController" ComponentId="RemoteControllers/RemoteAuthorizationController"/>
         <Component ExportedId="ServerCredential" ComponentId="ServerCredential"/>
+        <Component ExportedId="SessionAuthorizationProvider" ComponentId="RemoteJwtSessionController"/>
         <Component ExportedId="ConnectionStatus" ComponentId="Subscription/ConnectionStatusProvider"/>
         <Component ExportedId="RemotePersonalAccessTokenController" ComponentId="RemotePersonalAccessTokenController"/>
         <Component ExportedId="RemoteTenantController" ComponentId="RemoteTenantController/RemoteTenantController"/>

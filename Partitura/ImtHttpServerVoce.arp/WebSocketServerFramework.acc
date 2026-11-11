@@ -100,7 +100,16 @@
                     <AttributeInfo Id="RequestManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="WebSocketServer"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="TokenCheckInterval" Type="Integer" ExportId="TokenCheckInterval">
+                    <AttributeInfo Id="AccessModels" Type="Reference[]" ExportId="AccessModels">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="GracePeriod" Type="Integer" ExportId="GracePeriod">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MaxCheckInterval" Type="Integer" ExportId="MaxCheckInterval">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ServerTokenReceiver" Type="Reference" ExportId="ServerTokenReceiver">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">

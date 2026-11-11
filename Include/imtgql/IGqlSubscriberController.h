@@ -20,7 +20,13 @@ public:
 	enum SubscriberKind
 	{
 		SK_ANONYMOUS,
-		SK_USER
+		SK_USER,
+		/**
+			A signed-in recipient whatever its permissions: the channel delivers to a subscriber only what is addressed to its own
+			identity (principal, user, organization, product), so a change of its permissions does not end its subscription.
+			Declared for the command of a request, never implied by SK_USER, by an administrator or by an undeclared open channel.
+		*/
+		SK_RECIPIENT
 	};
 
 	/**

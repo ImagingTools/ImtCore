@@ -40,13 +40,7 @@ void CWorker::ProcessRequest(const IRequest* request, const QByteArray& subComma
 		{
 			QMutexLocker lock(&m_processMutex);
 
-			QByteArray body = request->GetBody();
-			if (body.size() > 100){
-				body.resize(100);
-				body += "...";
-			}
-
-			qDebug() << "Start process " << request->GetCommandId() << body;
+			qDebug() << "Start process " << request->GetCommandId();
 
 			responsePtr = ExecuteServlet(m_requestServletPtr.GetPtr(), *request, subCommandId);
 		}
@@ -106,5 +100,4 @@ ConstResponsePtr CWorker::CreateInternalErrorResponse(const IRequest& request)
 
 
 } // namespace imtrest
-
 

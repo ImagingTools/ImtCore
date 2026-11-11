@@ -17,16 +17,34 @@
 
 // ImtCore includes
 #include <imtbase/imtbase.h>
+#include <imtbase/IIdentifiable.h>
 #include <imtauth/CollectionSelection.h>
 #include <imtauth/CUserInfo.h>
 #include <imtauth/imtauth.h>
 #include <imtauth/IUserSettings.h>
 #include <imtgql/CGqlRequestContextManager.h>
 #include <imtgql/imtgql.h>
+#include <imtservergql/CAuthorizationSnapshot.h>
+#include <imtservergql/imtservergql.h>
 
 
 namespace imtservergql
 {
+
+
+static imtgql::IGqlContextCreator::ContextCreationStatus ToContextCreationStatus(imtauth::SessionTokenCheck check)
+{
+	switch (check){
+	case imtauth::STC_VALID:
+		return imtgql::IGqlContextCreator::CCS_OK;
+	case imtauth::STC_REAUTHENTICATE:
+		return imtgql::IGqlContextCreator::CCS_UNAUTHORIZED;
+	case imtauth::STC_INVALID:
+		return imtgql::IGqlContextCreator::CCS_FORBIDDEN;
+	default:
+		return imtgql::IGqlContextCreator::CCS_INTERNAL_ERROR;
+	}
+}
 
 
 // public methods
@@ -37,27 +55,26 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 			const imtgql::IGqlContext::Headers& headers,
 			imtgql::IGqlContextCreator::ContextCreationError& error) const
 {
-	return CreateContext(headers, false, error);
+	return CreateContext(headers, CK_REQUEST, error);
 }
 
 
 imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::RenewGqlContext(
 			const imtgql::IGqlContext::Headers& headers,
+			bool isEstablished,
 			AuthorizationState& state,
-			QString& errorMessage) const
+			ContextCreationError& error,
+			QDateTime* sessionExpiresAtPtr) const
 {
 	const qint64 startGeneration = GetAuthorizationGeneration();
 
-	ContextCreationError error;
-	imtgql::IGqlContextUniquePtr gqlContextPtr = CreateContext(headers, true, error);
+	imtgql::IGqlContextUniquePtr gqlContextPtr = CreateContext(headers, isEstablished ? CK_ESTABLISHED_SUBSCRIPTION : CK_NEW_SUBSCRIPTION, error, sessionExpiresAtPtr);
 	imtgql::CGqlRequestContextManager::Clear();
-
-	errorMessage = error.message;
 
 	// Whatever was decided, it was decided on data that changed meanwhile
 	if (GetAuthorizationGeneration() != startGeneration){
 		state = AS_STALE;
-		errorMessage = QStringLiteral("The access changed during the check.");
+		SetError(error, CCS_INTERNAL_ERROR, QStringLiteral("The access changed during the check."));
 
 		return nullptr;
 	}
@@ -84,10 +101,18 @@ qint64 CAuthenticationManagerComp::GetAuthorizationGeneration() const
 
 imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateContext(
 			const imtgql::IGqlContext::Headers& headers,
-			bool isRenewal,
-			imtgql::IGqlContextCreator::ContextCreationError& error) const
+			ContextKind kind,
+			imtgql::IGqlContextCreator::ContextCreationError& error,
+			QDateTime* sessionExpiresAtPtr) const
 {
 	SetError(error, imtgql::IGqlContextCreator::CCS_OK);
+	if (sessionExpiresAtPtr != nullptr){
+		*sessionExpiresAtPtr = QDateTime();
+	}
+	QByteArray sessionId;
+
+	// A subscription is checked on the current state: no cache, every source read afresh
+	const bool isRenewal = kind != CK_REQUEST;
 
 	if (!m_gqlContextFactCompPtr.IsValid()){
 		SetError(
@@ -111,7 +136,38 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateContext(
 	QByteArray userTokenProductId;
 	QByteArrayList scopes;
 	bool isPat = false;
-	if (!token.isEmpty()){
+	const bool isSessionAuthorized = *m_isUserComputedBySourceAttrPtr && !token.isEmpty() && !IsPatToken(token) && m_sessionAuthorizationProviderCompPtr.IsValid();
+	imtauth::ISessionAuthorizationProvider::SessionAuthorization sessionAuthorization;
+	if (isSessionAuthorized){
+		sessionAuthorization = m_sessionAuthorizationProviderCompPtr->GetSessionAuthorization(token, productId, kind == CK_ESTABLISHED_SUBSCRIPTION);
+		if (sessionAuthorization.state != imtauth::ISessionAuthorizationProvider::SAS_COMPUTED){
+			if (sessionAuthorization.state == imtauth::ISessionAuthorizationProvider::SAS_REFUSED){
+				if (sessionAuthorization.refusalReason == imtauth::ISessionAuthorizationProvider::RR_REAUTHENTICATE){
+					InvalidateTokenCache(token);
+				}
+				SetError(error, sessionAuthorization.refusalReason == imtauth::ISessionAuthorizationProvider::RR_REAUTHENTICATE ? CCS_UNAUTHORIZED : CCS_FORBIDDEN, sessionAuthorization.message);
+			}
+			else{
+				SetError(error, CCS_INTERNAL_ERROR, sessionAuthorization.message);
+			}
+			return nullptr;
+		}
+
+		imtauth::SessionTokenClaims claims;
+		const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(sessionAuthorization.userPtr.GetPtr());
+		const imtbase::IIdentifiable* identifiablePtr = dynamic_cast<const imtbase::IIdentifiable*>(sessionAuthorization.userPtr.GetPtr());
+		if (!imtauth::ParseSessionTokenClaims(token, claims) || sessionAuthorization.userId.isEmpty()
+					|| sessionAuthorization.userId != claims.userId || sessionAuthorization.tenantId != claims.tenantId
+					|| userInfoPtr == nullptr || identifiablePtr == nullptr
+					|| identifiablePtr->GetObjectUuid() != sessionAuthorization.userId || !userInfoPtr->IsEnabled()){
+			SetError(error, CCS_INTERNAL_ERROR, QStringLiteral("The authorization server answered with an invalid user or session."));
+			return nullptr;
+		}
+		CAuthorizationSnapshot::DetachUser(*sessionAuthorization.userPtr.GetPtr());
+		resolvedUserId = sessionAuthorization.userId;
+		tenantId = sessionAuthorization.tenantId;
+	}
+	else if (!token.isEmpty()){
 		QByteArray tokenProductId;
 		bool isTokenAccepted = true;
 		if (isRenewal){
@@ -120,7 +176,7 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateContext(
 						? (m_serverTokenReceiverCompPtr.IsValid() ? m_serverTokenReceiverCompPtr->GetTokenManager() : nullptr)
 						: m_patManagerCompPtr.GetPtr();
 			FreshToken freshToken;
-			if (!ResolveFreshToken(token, managerPtr, freshToken, error)){
+			if (!ResolveFreshToken(token, managerPtr, kind == CK_ESTABLISHED_SUBSCRIPTION, freshToken, error)){
 				return nullptr;
 			}
 
@@ -128,6 +184,7 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateContext(
 			tenantId = freshToken.tenantId;
 			scopes = freshToken.scopes;
 			isPat = freshToken.isPat;
+			sessionId = freshToken.sessionId;
 			tokenProductId = freshToken.productId;
 			clientProductId = freshToken.clientProductId;
 		}
@@ -246,9 +303,34 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateContext(
 	// the dozens fired right after a tenant switch: subscriptions re-registering,
 	// per-open-document queries, page reload) each re-triggered their own
 	// uncached GetTenant() round-trip - the exact flood seen after SelectTenant.
+	// A session of a user whose source computes the user: the user and its organization come in one complete answer, for a request
+	// and a subscription alike; no cache, and no read with the token of the user, which may have expired
+	imtbase::IObjectCollection::DataPtr sessionUserPtr;
 	TokenTenantData tenantData;
+	if (isSessionAuthorized){
+		if (!tenantId.isEmpty()){
+			tenantData.isTenantOwner = sessionAuthorization.tenantOwnerId == resolvedUserId;
+			tenantData.hasOrganizationAccess = true;
+			tenantData.tenantPermissions = sessionAuthorization.tenantPermissions;
+			if (tenantData.isTenantOwner || sessionAuthorization.tenantCreatorId == resolvedUserId){
+				tenantData.organizationPermissions = {imtauth::s_organizationManagementPermission};
+			}
+		}
+		sessionUserPtr = sessionAuthorization.userPtr;
+		if (sessionExpiresAtPtr != nullptr){
+			*sessionExpiresAtPtr = sessionAuthorization.sessionExpiresAt;
+		}
+	}
+	else if (sessionExpiresAtPtr != nullptr && isRenewal && !isPat && !sessionId.isEmpty() && m_slaveJwtSessionControllerCompPtr.IsValid()){
+		// A session that could not be read has no known end: the control check comes all the same
+		const imtauth::ISessionSharedPtr sessionPtr = m_slaveJwtSessionControllerCompPtr->GetSession(sessionId);
+		if (sessionPtr.IsValid()){
+			*sessionExpiresAtPtr = sessionPtr->GetExpirationDate();
+		}
+	}
+
 	if (!resolvedUserId.isEmpty()){
-		if (isRenewal){
+		if (isRenewal && !isSessionAuthorized){
 			// Organization data that could not be read says nothing about the access of a subscription
 			tenantData = ReadTenantData(resolvedUserId, tenantId);
 			if (!tenantData.isRead){
@@ -257,7 +339,7 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateContext(
 				return nullptr;
 			}
 		}
-		else if (!TryGetCachedTenantData(token, tenantData)){
+		else if (!isSessionAuthorized && !TryGetCachedTenantData(token, tenantData)){
 			// A request goes on with what was read; only a complete read is kept
 			const qint64 resolutionGeneration = GetAuthorizationGeneration();
 			tenantData = ReadTenantData(resolvedUserId, tenantId);
@@ -274,37 +356,54 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateContext(
 		gqlContextPtr->SetOrganizationPermissions(tenantData.organizationPermissions);
 	}
 
-	if (m_userCollectionCompPtr.IsValid() && !resolvedUserId.isEmpty()){
+	if ((isSessionAuthorized || m_userCollectionCompPtr.IsValid()) && !resolvedUserId.isEmpty()){
 		imtbase::IObjectCollection::DataPtr userDataPtr;
 		const imtauth::IUserInfo* userInfoPtr = nullptr;
-		if (m_userCollectionCompPtr->GetObjectData(resolvedUserId, userDataPtr)){
-			userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(userDataPtr.GetPtr());
+		imtgql::IGqlContextCreator::ContextCreationError readError;
+		if (isSessionAuthorized){
+			userDataPtr = sessionUserPtr;
 		}
+		else if (isRenewal || *m_isUserComputedBySourceAttrPtr){
+			// A subscription holds what was read now, not the caches; a failed read says nothing about it.
+			// A user computed by the source holds permissions of one product and one organization: no shared cache may serve it.
+			if (!ReadCurrentUser(resolvedUserId, productId, userDataPtr, readError) && isRenewal){
+				imtgql::CGqlRequestContextManager::Clear();
+				SetError(error, readError.status, readError.message);
+				return nullptr;
+			}
+		}
+		else{
+			m_userCollectionCompPtr->GetObjectData(resolvedUserId, userDataPtr);
+		}
+		userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(userDataPtr.GetPtr());
 
 		// Deny access for disabled accounts (IEC 62443-3-3 SR 1.3): tokens and sessions
 		// of a disabled user become unusable immediately, without removing the account.
-		// A failed read is denied too: a remote user service refuses a disabled user's requests.
+		// A cached collection that fails is denied too: a remote user service refuses a disabled user's requests.
+		// A user read at its source tells a failed read, which is not a refusal.
 		if (userInfoPtr == nullptr || !userInfoPtr->IsEnabled()){
-			// An established subscription survives a read that failed; only an account the collection reports as absent is gone
-			if (userInfoPtr == nullptr && isRenewal){
-				bool isRead = false;
-				const QByteArrayList userIds = imtauth::CollectionSelection::SelectIds(
-							*m_userCollectionCompPtr, imtauth::CollectionSelection::ColumnEquals("DocumentId", resolvedUserId), QByteArrayList(), &isRead);
-				if (!isRead || userIds.contains(resolvedUserId)){
-					imtgql::CGqlRequestContextManager::Clear();
-					SetError(error, imtgql::IGqlContextCreator::CCS_INTERNAL_ERROR, QStringLiteral("The user account could not be read."));
-					return nullptr;
-				}
-			}
-
 			imtgql::CGqlRequestContextManager::Clear();
 
 			// A token resolved from the cache may belong to a session closed meanwhile (a tenant switch, a logout):
 			// the remote read is refused for that reason, and the client has to refresh rather than sign out.
-			if (userInfoPtr == nullptr && !isPat && !isRenewal && m_slaveJwtSessionControllerCompPtr.IsValid()
-						&& m_slaveJwtSessionControllerCompPtr->ValidateJwt(token) == imtauth::IJwtSessionController::JS_EXPIRED){
-				InvalidateTokenCache(token);
-				SetError(error, imtgql::IGqlContextCreator::CCS_UNAUTHORIZED, QStringLiteral("The session of the token is closed."));
+			if (userInfoPtr == nullptr && !isPat && !isRenewal && m_slaveJwtSessionControllerCompPtr.IsValid()){
+				bool isSessionChecked = false;
+				if (IsSessionClosed(token, isSessionChecked)){
+					InvalidateTokenCache(token);
+					SetError(error, imtgql::IGqlContextCreator::CCS_UNAUTHORIZED, QStringLiteral("The session of the token is closed."));
+					return nullptr;
+				}
+
+				// Neither the user nor the session could be read
+				if (!isSessionChecked){
+					SetError(error, imtgql::IGqlContextCreator::CCS_INTERNAL_ERROR, QStringLiteral("The session could not be checked."));
+					return nullptr;
+				}
+			}
+
+			// The access could not be checked: that is not a refusal
+			if (readError.status != imtgql::IGqlContextCreator::CCS_OK){
+				SetError(error, readError.status, readError.message);
 				return nullptr;
 			}
 
@@ -758,6 +857,86 @@ bool CAuthenticationManagerComp::HasOrganizationAccess(const QByteArray& userId,
 }
 
 
+bool CAuthenticationManagerComp::IsSessionClosed(const QByteArray& token, bool& isChecked) const
+{
+	isChecked = false;
+
+	const JwtState state = m_slaveJwtSessionControllerCompPtr->ValidateJwt(token);
+	if (state == JwtState::JS_NONE){
+		return false;
+	}
+
+	isChecked = true;
+	if (state != JwtState::JS_EXPIRED){
+		return false;
+	}
+
+	// The controller tells an expired token and a session it could not find alike; a session it could not read is not closed
+	QByteArray userId;
+	QByteArray tenantId;
+	QByteArray sessionId;
+	qint64 expSecs = 0;
+	if (!ParseJwtClaims(token, userId, tenantId, sessionId, expSecs)){
+		return false;
+	}
+	if (expSecs < QDateTime::currentSecsSinceEpoch()){
+		return true;
+	}
+
+	const bool isSessionValid = m_slaveJwtSessionControllerCompPtr->ValidateSession(sessionId, &isChecked);
+
+	return isChecked && !isSessionValid;
+}
+
+
+bool CAuthenticationManagerComp::ReadCurrentUser(
+			const QByteArray& userId,
+			const QByteArray& productId,
+			imtbase::IObjectCollection::DataPtr& userDataPtr,
+			imtgql::IGqlContextCreator::ContextCreationError& error) const
+{
+	const bool isComputedBySource = *m_isUserComputedBySourceAttrPtr;
+	CAuthorizationSnapshot snapshot(
+				m_userCollectionCompPtr.GetPtr(),
+				(!isComputedBySource && m_roleCollectionCompPtr.IsValid()) ? m_roleCollectionCompPtr.GetPtr() : nullptr,
+				(!isComputedBySource && m_userGroupCollectionCompPtr.IsValid()) ? m_userGroupCollectionCompPtr.GetPtr() : nullptr);
+
+	QString errorMessage;
+	istd::IChangeableUniquePtr userPtr;
+	const CAuthorizationSnapshot::ReadStatus status = snapshot.ReadUser(userId, userPtr, errorMessage);
+	if (status == CAuthorizationSnapshot::RS_ABSENT){
+		return true;
+	}
+	if (status == CAuthorizationSnapshot::RS_DENIED){
+		SetError(error, imtgql::IGqlContextCreator::CCS_FORBIDDEN, errorMessage);
+
+		return false;
+	}
+
+	bool isRead = (status == CAuthorizationSnapshot::RS_READ);
+	if (isRead){
+		imtauth::IUserInfo* userInfoPtr = dynamic_cast<imtauth::IUserInfo*>(userPtr.GetPtr());
+		if (isComputedBySource){
+			// The source resolved the permissions: its roles and groups are not expanded again here
+			CAuthorizationSnapshot::DetachUser(*userPtr);
+		}
+		else{
+			isRead = snapshot.KeepPermissions(*userInfoPtr, productId, errorMessage);
+		}
+	}
+
+	if (!isRead){
+		SetError(error, imtgql::IGqlContextCreator::CCS_INTERNAL_ERROR, errorMessage);
+
+		return false;
+	}
+
+	userDataPtr.FromUnique(std::move(userPtr));
+
+	return true;
+}
+
+
 CAuthenticationManagerComp::TokenTenantData CAuthenticationManagerComp::ReadTenantData(const QByteArray& userId, const QByteArray& tenantId) const
 {
 	TokenTenantData tenantData;
@@ -768,15 +947,35 @@ CAuthenticationManagerComp::TokenTenantData CAuthenticationManagerComp::ReadTena
 		return tenantData;
 	}
 
-	bool isCreator = false;
+	QByteArray ownerId;
+	QByteArray creatorId;
+	QByteArrayList tenantPermissions;
 	if (m_tenantManagerCompPtr.IsValid()){
 		imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId, &tenantData.isRead);
 		if (tenantPtr.IsValid()){
-			tenantData.isTenantOwner = tenantPtr->GetOwnerId() == userId;
-			isCreator = tenantPtr->GetCreatorId() == userId;
-			tenantData.tenantPermissions = tenantPtr->GetTenantPermissions();
+			ownerId = tenantPtr->GetOwnerId();
+			creatorId = tenantPtr->GetCreatorId();
+			tenantPermissions = tenantPtr->GetTenantPermissions();
 		}
 	}
+
+	CompleteTenantData(userId, tenantId, ownerId, creatorId, tenantPermissions, tenantData);
+
+	return tenantData;
+}
+
+
+void CAuthenticationManagerComp::CompleteTenantData(
+			const QByteArray& userId,
+			const QByteArray& tenantId,
+			const QByteArray& ownerId,
+			const QByteArray& creatorId,
+			const QByteArrayList& tenantPermissions,
+			TokenTenantData& tenantData) const
+{
+	tenantData.isTenantOwner = !ownerId.isEmpty() && ownerId == userId;
+	const bool isCreator = !creatorId.isEmpty() && creatorId == userId;
+	tenantData.tenantPermissions = tenantPermissions;
 
 	// The owner and the creator manage all of the organization, a member what the membership gives
 	if (tenantData.isTenantOwner || isCreator){
@@ -796,8 +995,6 @@ CAuthenticationManagerComp::TokenTenantData CAuthenticationManagerComp::ReadTena
 			tenantData.organizationPermissions = membershipPtr->GetOrganizationPermissions();
 		}
 	}
-
-	return tenantData;
 }
 
 
@@ -1218,6 +1415,7 @@ void CAuthenticationManagerComp::StoreExpiredToken(const QByteArray& token) cons
 bool CAuthenticationManagerComp::ResolveFreshToken(
 			const QByteArray& token,
 			const imtauth::IPersonalAccessTokenManager* managerPtr,
+			bool isExpiryAccepted,
 			FreshToken& freshToken,
 			imtgql::IGqlContextCreator::ContextCreationError& error) const
 {
@@ -1262,33 +1460,18 @@ bool CAuthenticationManagerComp::ResolveFreshToken(
 		return false;
 	}
 
-	const JwtState state = m_slaveJwtSessionControllerCompPtr->ValidateJwt(token);
-	if (state == JwtState::JS_NONE){
-		SetError(error, CCS_INTERNAL_ERROR, QStringLiteral("JWT validation temporarily unavailable."));
-		return false;
-	}
-	if (state != JwtState::JS_OK && state != JwtState::JS_EXPIRED){
-		SetError(error, CCS_FORBIDDEN, QStringLiteral("Invalid JWT token."));
-		return false;
-	}
-
-	// The claims are signed: the controller checks the signature before the expiration
-	QByteArray sessionId;
-	qint64 expSecs = 0;
-	if (!ParseJwtClaims(token, freshToken.userId, freshToken.tenantId, sessionId, expSecs) || freshToken.userId.isEmpty()){
-		SetError(error, CCS_FORBIDDEN, QStringLiteral("Invalid JWT token."));
+	// An expired access token holds while its session lives, for an established subscription only: a new one refreshes it first
+	imtauth::SessionTokenClaims claims;
+	QString message;
+	const imtauth::SessionTokenCheck check = imtauth::CheckSessionToken(*m_slaveJwtSessionControllerCompPtr, token, isExpiryAccepted, claims, message);
+	if (check != imtauth::STC_VALID){
+		SetError(error, ToContextCreationStatus(check), message);
 		return false;
 	}
 
-	// An expired access token holds while its session lives
-	if (state == JwtState::JS_EXPIRED){
-		bool isChecked = false;
-		if (!m_slaveJwtSessionControllerCompPtr->ValidateSession(sessionId, &isChecked)){
-			SetError(error, isChecked ? CCS_UNAUTHORIZED : CCS_INTERNAL_ERROR, isChecked
-						? QStringLiteral("The session of the token is closed.") : QStringLiteral("The session could not be checked."));
-			return false;
-		}
-	}
+	freshToken.userId = claims.userId;
+	freshToken.tenantId = claims.tenantId;
+	freshToken.sessionId = claims.sessionId;
 
 	return true;
 }
@@ -1310,7 +1493,7 @@ bool CAuthenticationManagerComp::ResolveServerToken(
 	QByteArray tokenProductId;
 	if (isRenewal){
 		FreshToken freshToken;
-		if (!ResolveFreshToken(serverToken, m_serverTokenReceiverCompPtr->GetTokenManager(), freshToken, error)){
+		if (!ResolveFreshToken(serverToken, m_serverTokenReceiverCompPtr->GetTokenManager(), false, freshToken, error)){
 			return false;
 		}
 
@@ -1478,6 +1661,9 @@ bool CAuthenticationManagerComp::BindToServerToken(
 {
 	const imtauth::IUserInfo* userInfoPtr = gqlContext.GetUserInfo();
 	if (userInfoPtr != nullptr){
+		// What the user may give in its product is what this server holds for it, within its personal token; the token of the server bounds what it may do
+		gqlContext.SetGrantingAuthority(userInfoPtr->IsAdmin(), imtservergql::GetUserPermissions(gqlContext));
+
 		return imtgql::RestrictUserPermissions(gqlContext, serverScopes);
 	}
 	else if (!clientProductId.isEmpty()){
@@ -1501,40 +1687,14 @@ bool CAuthenticationManagerComp::ParseJwtClaims(
 			QByteArray& sessionId,
 			qint64& expSecs) const
 {
-	userId.clear();
-	tenantId.clear();
-	sessionId.clear();
-	expSecs = 0;
+	imtauth::SessionTokenClaims claims;
+	const bool retVal = imtauth::ParseSessionTokenClaims(jwt, claims);
+	userId = claims.userId;
+	tenantId = claims.tenantId;
+	sessionId = claims.sessionId;
+	expSecs = claims.expSecs;
 
-	const QByteArrayList parts = jwt.split('.');
-	if (parts.size() != 3){
-		return false;
-	}
-
-	const QByteArray json = QByteArray::fromBase64(
-				parts[1],
-				QByteArray::Base64UrlEncoding | QByteArray::OmitTrailingEquals);
-	const QJsonObject payloadObj = QJsonDocument::fromJson(json).object();
-	if (payloadObj.isEmpty()){
-		return false;
-	}
-
-	if (payloadObj.contains(QStringLiteral("userId"))){
-		userId = payloadObj.value(QStringLiteral("userId")).toString().toUtf8();
-	}
-	if (payloadObj.contains(QStringLiteral("tenantId"))){
-		tenantId = payloadObj.value(QStringLiteral("tenantId")).toString().toUtf8();
-	}
-	if (payloadObj.contains(QStringLiteral("sessionId"))){
-		sessionId = payloadObj.value(QStringLiteral("sessionId")).toString().toUtf8();
-	}
-	if (payloadObj.contains(QStringLiteral("exp"))){
-		// Prefer double/long conversion over toInt() — toInt() truncates and
-		// returns 0 for values outside 32-bit range.
-		expSecs = static_cast<qint64>(payloadObj.value(QStringLiteral("exp")).toDouble());
-	}
-
-	return true;
+	return retVal;
 }
 
 

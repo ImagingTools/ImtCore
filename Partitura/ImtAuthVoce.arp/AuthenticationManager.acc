@@ -25,6 +25,9 @@
                     <AttributeInfo Id="GqlContextFactory" Type="Factory" ExportId="">
                         <Data IsEnabled="true" Value="GqlContext"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="IsUserComputedBySource" Type="Boolean" ExportId="IsUserComputedBySource">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="InvitationManager" Type="Reference" ExportId="InvitationManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -40,6 +43,12 @@
                     <AttributeInfo Id="PersonalAccessTokenManager" Type="Reference" ExportId="PersonalAccessTokenManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="RoleCollection" Type="Reference" ExportId="RoleCollection">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SessionAuthorizationProvider" Type="Reference" ExportId="SessionAuthorizationProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="SlaveJwtSessionController" Type="Reference" ExportId="SlaveJwtSessionController">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -50,6 +59,9 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserCollection" Type="Reference" ExportId="UserCollection">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserGroupCollection" Type="Reference" ExportId="UserGroupCollection">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserSettingsCollection" Type="Reference" ExportId="UserSettingsCollection">

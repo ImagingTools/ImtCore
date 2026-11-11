@@ -579,6 +579,12 @@ void CCachedObjectCollectionComp::InvalidateCache()
 }
 
 
+const IObjectCollection* CCachedObjectCollectionComp::GetSourceCollection() const
+{
+	return m_objectCollectionCompPtr.IsValid() ? m_objectCollectionCompPtr.GetPtr() : nullptr;
+}
+
+
 void CCachedObjectCollectionComp::RemoveOldestObjectFromCache() const
 {
 	if (m_cacheItems.isEmpty()){
@@ -598,5 +604,3 @@ void CCachedObjectCollectionComp::RemoveOldestObjectFromCache() const
 
 
 } // namespace imtbase
-
-

@@ -83,8 +83,9 @@ imtbase::ICollectionInfo::Id CRemoteGqlCollectionController::InsertNewObject(
 				operationContextPtr));
 
 	if (requestPtr.IsValid()){
-		GqlResponsePtr responsePtr = m_gqlClientPtr->SendRequest(requestPtr);
-		if (responsePtr.IsValid()){
+		const auto requestResult = m_gqlClientPtr->SendRequest(requestPtr);
+		auto responsePtr = requestResult.responsePtr;
+		if (requestResult){
 			if (m_gqlObjectCollectionDelegatePtr->GetObjectId(*responsePtr, retVal)){
 				imtbase::ICollectionInfo::ElementInsertInfo insertInfo;
 				insertInfo.elementId = retVal;
@@ -110,8 +111,9 @@ bool CRemoteGqlCollectionController::RemoveElements(const Ids& elementIds, const
 	GqlRequestPtr requestPtr(m_gqlObjectCollectionDelegatePtr->CreateRemoveObjectsRequest(elementIds, -1, operationContextPtr));
 
 	if (requestPtr.IsValid()){
-		GqlResponsePtr responsePtr = m_gqlClientPtr->SendRequest(requestPtr);
-		if (responsePtr.IsValid()){
+		const auto requestResult = m_gqlClientPtr->SendRequest(requestPtr);
+		auto responsePtr = requestResult.responsePtr;
+		if (requestResult){
 			m_gqlObjectCollectionDelegatePtr->GetOperationResult(*responsePtr, retVal);
 		}
 	}
@@ -133,8 +135,9 @@ bool CRemoteGqlCollectionController::RemoveElementSet(
 	GqlRequestPtr requestPtr(m_gqlObjectCollectionDelegatePtr->CreateRemoveObjectSetRequest(selectionParamsPtr, -1, operationContextPtr));
 
 	if (requestPtr.IsValid()){
-		GqlResponsePtr responsePtr = m_gqlClientPtr->SendRequest(requestPtr);
-		if (responsePtr.IsValid()){
+		const auto requestResult = m_gqlClientPtr->SendRequest(requestPtr);
+		auto responsePtr = requestResult.responsePtr;
+		if (requestResult){
 			m_gqlObjectCollectionDelegatePtr->GetOperationResult(*responsePtr, retVal);
 		}
 	}
@@ -167,19 +170,37 @@ const istd::IChangeable* CRemoteGqlCollectionController::GetObjectPtr(const Id& 
 
 bool CRemoteGqlCollectionController::GetObjectData(const Id& objectId, DataPtr& dataPtr, const iprm::IParamsSet* dataConfigurationPtr) const
 {
+	bool isAccessDenied = false;
+	return GetObjectDataWithStatus(objectId, dataPtr, isAccessDenied, dataConfigurationPtr);
+}
+
+
+bool CRemoteGqlCollectionController::GetObjectDataWithStatus(
+			const Id& objectId,
+			DataPtr& dataPtr,
+			bool& isAccessDenied,
+			const iprm::IParamsSet* dataConfigurationPtr) const
+{
+	isAccessDenied = false;
+
 	if (m_gqlClientPtr == nullptr || m_gqlObjectCollectionDelegatePtr == nullptr){
 		return false;
 	}
 
-	QByteArray typeId = GetObjectTypeId(objectId);
+	const auto typeResult = ReadObjectTypeId(objectId);
+	isAccessDenied = typeResult.errorCategory == IGqlClient::EC_ACCESS_DENIED;
+	if (!typeResult){
+		return false;
+	}
 
-	DataPtr retVal = CreateObjectInstance(typeId);
+	DataPtr retVal = CreateObjectInstance(typeResult.model);
 	if (retVal.IsValid()){
 		GqlRequestPtr requestPtr(m_gqlObjectCollectionDelegatePtr->CreateGetObjectRequest(objectId, dataConfigurationPtr));
 		if (requestPtr.IsValid()){
-			GqlResponsePtr responsePtr = m_gqlClientPtr->SendRequest(requestPtr);
-			if (responsePtr.IsValid()){
-				if (m_gqlObjectCollectionDelegatePtr->GetObjectData(*responsePtr, *retVal)){
+			const auto result = m_gqlClientPtr->SendRequest(requestPtr);
+			isAccessDenied = result.errorCategory == IGqlClient::EC_ACCESS_DENIED;
+			if (result){
+				if (m_gqlObjectCollectionDelegatePtr->GetObjectData(*result.responsePtr, *retVal)){
 					dataPtr = retVal;
 
 					return true;
@@ -219,8 +240,9 @@ bool CRemoteGqlCollectionController::SetObjectData(
 					operationContextPtr));
 
 		if (requestPtr.IsValid()){
-			GqlResponsePtr responsePtr = m_gqlClientPtr->SendRequest(requestPtr);
-			if (responsePtr.IsValid()){
+			const auto requestResult = m_gqlClientPtr->SendRequest(requestPtr);
+			auto responsePtr = requestResult.responsePtr;
+			if (requestResult){
 				if (m_gqlObjectCollectionDelegatePtr->GetOperationResult(*responsePtr, retVal)){
 					if (retVal){
 						istd::IChangeable::ChangeSet changeSet(istd::IChangeable::CF_ANY);
@@ -255,8 +277,9 @@ imtbase::IObjectCollectionUniquePtr CRemoteGqlCollectionController::CreateSubCol
 	if (collectionPtr != nullptr){
 		GqlRequestPtr requestPtr(m_gqlObjectCollectionDelegatePtr->CreateGetSubCollectionRequest(offset, count, selectionParamsPtr));
 		if (requestPtr.IsValid()){
-			GqlResponsePtr responsePtr = m_gqlClientPtr->SendRequest(requestPtr);
-			if (responsePtr.IsValid()){
+			const auto requestResult = m_gqlClientPtr->SendRequest(requestPtr);
+			auto responsePtr = requestResult.responsePtr;
+			if (requestResult){
 				retVal = m_gqlObjectCollectionDelegatePtr->GetSubCollection(*collectionPtr, *responsePtr, m_metaInfoCreatorMap.values());
 			}
 		}
@@ -286,26 +309,36 @@ const iprm::IOptionsList* CRemoteGqlCollectionController::GetObjectTypesInfo() c
 
 QByteArray CRemoteGqlCollectionController::GetObjectTypeId(const Id& objectId) const
 {
+	return ReadObjectTypeId(objectId).model;
+}
+
+
+IGqlClient::GqlModelResult<QByteArray> CRemoteGqlCollectionController::ReadObjectTypeId(const Id& objectId) const
+{
 	// A collection with a single object type needs no server round-trip to learn it.
 	const iprm::IOptionsList* typesInfoPtr = GetObjectTypesInfo();
 	if (typesInfoPtr != nullptr && typesInfoPtr->GetOptionsCount() == 1){
-		return typesInfoPtr->GetOptionId(0);
+		return {typesInfoPtr->GetOptionId(0), IGqlClient::EC_NONE, {}};
 	}
 
 	if (m_gqlClientPtr != nullptr && m_gqlObjectCollectionDelegatePtr != nullptr){
 		GqlRequestPtr requestPtr(m_gqlObjectCollectionDelegatePtr->CreateGetObjectTypeIdRequest(objectId));
 		if (requestPtr.IsValid()){
-			GqlResponsePtr responsePtr = m_gqlClientPtr->SendRequest(requestPtr);
-			if (responsePtr.IsValid()){
-				QByteArray typeId;
-				if (m_gqlObjectCollectionDelegatePtr->GetObjectTypeId(*responsePtr, typeId)){
-					return typeId;
-				}
+			const auto result = m_gqlClientPtr->SendRequest(requestPtr);
+			if (!result){
+				return {{}, result.errorCategory == IGqlClient::EC_NONE ? IGqlClient::EC_INVALID_RESPONSE : result.errorCategory,
+							result.errorMessage.isEmpty() ? QStringLiteral("Object type response is missing") : result.errorMessage};
 			}
+			QByteArray typeId;
+			if (m_gqlObjectCollectionDelegatePtr->GetObjectTypeId(*result.responsePtr, typeId)){
+				return {typeId, IGqlClient::EC_NONE, {}};
+			}
+			return {{}, IGqlClient::EC_INVALID_RESPONSE, QStringLiteral("Object type response is invalid")};
 		}
+		return {{}, IGqlClient::EC_INVALID_REQUEST, QStringLiteral("Object type request could not be created")};
 	}
 
-	return QByteArray();
+	return {{}, IGqlClient::EC_INTERNAL, QStringLiteral("Remote collection client or delegate is not configured")};
 }
 
 
@@ -333,8 +366,9 @@ idoc::MetaInfoPtr CRemoteGqlCollectionController::GetDataMetaInfo(const Id& obje
 
 	GqlRequestPtr requestPtr(m_gqlObjectCollectionDelegatePtr->CreateGetObjectDataMetaInfoRequest(objectId));
 	if (requestPtr.IsValid()){
-		GqlResponsePtr responsePtr = m_gqlClientPtr->SendRequest(requestPtr);
-		if (responsePtr.IsValid()){
+		const auto requestResult = m_gqlClientPtr->SendRequest(requestPtr);
+		auto responsePtr = requestResult.responsePtr;
+		if (requestResult){
 			retVal.SetPtr(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>());
 		}
 	}
@@ -355,8 +389,9 @@ int CRemoteGqlCollectionController::GetElementsCount(const iprm::IParamsSet* sel
 
 	GqlRequestPtr requestPtr(m_gqlObjectCollectionDelegatePtr->CreateGetElementCountRequest(selectionParamsPtr));
 	if (requestPtr.IsValid()){
-		GqlResponsePtr responsePtr = m_gqlClientPtr->SendRequest(requestPtr);
-		if (responsePtr.IsValid()){
+		const auto requestResult = m_gqlClientPtr->SendRequest(requestPtr);
+		auto responsePtr = requestResult.responsePtr;
+		if (requestResult){
 			int count;
 			if (m_gqlObjectCollectionDelegatePtr->GetItemCount(*responsePtr, count)){
 				retVal = count;
@@ -384,8 +419,9 @@ imtbase::ICollectionInfo::Ids CRemoteGqlCollectionController::GetElementIds(
 	bool isRead = false;
 	GqlRequestPtr requestPtr(m_gqlObjectCollectionDelegatePtr->CreateGetElementListRequest(offset, count, selectionParamsPtr));
 	if (requestPtr.IsValid()){
-		GqlResponsePtr responsePtr = m_gqlClientPtr->SendRequest(requestPtr);
-		if (responsePtr.IsValid()){
+		const auto requestResult = m_gqlClientPtr->SendRequest(requestPtr);
+		auto responsePtr = requestResult.responsePtr;
+		if (requestResult){
 			IGqlObjectCollectionDelegate::Ids ids;
 			isRead = m_gqlObjectCollectionDelegatePtr->GetItemIds(*responsePtr, ids);
 			std::copy(ids.begin(), ids.end(), std::back_inserter(retVal));
@@ -465,8 +501,9 @@ bool CRemoteGqlCollectionController::SetElementName(const Id& elementId, const Q
 	imtclientgql::IGqlObjectCollectionDelegate::ObjectInfo info;
 	if (GetObjectInfo(elementId, info)){
 		GqlRequestPtr requestPtr(m_gqlObjectCollectionDelegatePtr->CreateSetObjectNameRequest(elementId, name, info.version, nullptr));
-		GqlResponsePtr responsePtr = m_gqlClientPtr->SendRequest(requestPtr);
-		if (responsePtr.IsValid()){
+		const auto requestResult = m_gqlClientPtr->SendRequest(requestPtr);
+		auto responsePtr = requestResult.responsePtr;
+		if (requestResult){
 			m_gqlObjectCollectionDelegatePtr->GetOperationResult(*responsePtr, retVal);
 		}
 	}
@@ -486,8 +523,9 @@ bool CRemoteGqlCollectionController::SetElementDescription(const Id& elementId, 
 	imtclientgql::IGqlObjectCollectionDelegate::ObjectInfo info;
 	if (GetObjectInfo(elementId, info)){
 		GqlRequestPtr requestPtr(m_gqlObjectCollectionDelegatePtr->CreateSetObjectDescriptionRequest(elementId, description, info.version, nullptr));
-		GqlResponsePtr responsePtr = m_gqlClientPtr->SendRequest(requestPtr);
-		if (responsePtr.IsValid()){
+		const auto requestResult = m_gqlClientPtr->SendRequest(requestPtr);
+		auto responsePtr = requestResult.responsePtr;
+		if (requestResult){
 			m_gqlObjectCollectionDelegatePtr->GetOperationResult(*responsePtr, retVal);
 		}
 	}
@@ -524,8 +562,9 @@ bool CRemoteGqlCollectionController::GetObjectInfo(
 
 	GqlRequestPtr requestPtr(m_gqlObjectCollectionDelegatePtr->CreateGetObjectInfoRequest(objectId));
 	if (requestPtr.IsValid()){
-		GqlResponsePtr responsePtr = m_gqlClientPtr->SendRequest(requestPtr);
-		if (responsePtr.IsValid()){
+		const auto requestResult = m_gqlClientPtr->SendRequest(requestPtr);
+		auto responsePtr = requestResult.responsePtr;
+		if (requestResult){
 			retVal = m_gqlObjectCollectionDelegatePtr->GetObjectInfo(*responsePtr, valueOut);
 			if (retVal){
 				retVal = valueOut.id == objectId;
@@ -547,8 +586,9 @@ bool CRemoteGqlCollectionController::GetObjectMetaInfo(const QByteArray& objectI
 
 	GqlRequestPtr requestPtr(m_gqlObjectCollectionDelegatePtr->CreateGetObjectMetaInfoRequest(objectId));
 	if (requestPtr.IsValid()){
-		GqlResponsePtr responsePtr = m_gqlClientPtr->SendRequest(requestPtr);
-		if (responsePtr.IsValid()){
+		const auto requestResult = m_gqlClientPtr->SendRequest(requestPtr);
+		auto responsePtr = requestResult.responsePtr;
+		if (requestResult){
 			idoc::MetaInfoPtr metaInfoPtr(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>());
 			if (m_gqlObjectCollectionDelegatePtr->GetMetaInfo(*responsePtr, *metaInfoPtr)){
 				valueOut = metaInfoPtr;
@@ -563,5 +603,3 @@ bool CRemoteGqlCollectionController::GetObjectMetaInfo(const QByteArray& objectI
 
 
 } // namespace imtclientgql
-
-

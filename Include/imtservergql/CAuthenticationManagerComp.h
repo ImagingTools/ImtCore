@@ -17,6 +17,7 @@
 #include <imtgql/IGqlContextCreator.h>
 #include <imtauth/IJwtSessionController.h>
 #include <imtauth/IPersonalAccessTokenManager.h>
+#include <imtauth/ISessionAuthorizationProvider.h>
 #include <imtauth/ITenantInvitationManager.h>
 #include <imtauth/ITenantManager.h>
 #include <imtauth/ITenantMembershipManager.h>
@@ -28,14 +29,35 @@ namespace imtservergql
 {
 
 
+// Split attribute registration to stay below MSVC's constructor-object limit (C2603).
+class CAuthenticationManagerAttr: public CServerTokenAuthenticationCompBase
+{
+public:
+	typedef CServerTokenAuthenticationCompBase BaseClass;
+
+	I_BEGIN_BASE_COMPONENT(CAuthenticationManagerAttr);
+		I_ASSIGN(m_roleCollectionCompPtr, "RoleCollection", "Roles, read at their source for the check of a subscription", false, "RoleCollection");
+		I_ASSIGN(m_userGroupCollectionCompPtr, "UserGroupCollection", "User groups, read at their source for the check of a subscription", false, "UserGroupCollection");
+		I_ASSIGN(m_sessionAuthorizationProviderCompPtr, "SessionAuthorizationProvider", "The authorization of a user session as the source computes it: the user and its organization, for every session token while the source computes the user", false, "SessionAuthorizationProvider");
+		I_ASSIGN(m_isUserComputedBySourceAttrPtr, "IsUserComputedBySource", "The user collection hands out the user with its permissions resolved for the product and the organization of the request: the user is read at its source for every request, and only these permissions count", true, false);
+	I_END_COMPONENT;
+
+protected:
+	I_REF(imtbase::IObjectCollection, m_roleCollectionCompPtr);
+	I_REF(imtbase::IObjectCollection, m_userGroupCollectionCompPtr);
+	I_REF(imtauth::ISessionAuthorizationProvider, m_sessionAuthorizationProviderCompPtr);
+	I_ATTR(bool, m_isUserComputedBySourceAttrPtr);
+};
+
+
 class CAuthenticationManagerComp:
-			public CServerTokenAuthenticationCompBase,
+			public CAuthenticationManagerAttr,
 			virtual public imtgql::IGqlContextCreator,
 			virtual public imtauth::IJwtSessionController,
 			protected imod::CMultiModelObserverBase
 {
 public:
-	typedef CServerTokenAuthenticationCompBase BaseClass;
+	typedef CAuthenticationManagerAttr BaseClass;
 
 	I_BEGIN_COMPONENT(CAuthenticationManagerComp);
 		I_REGISTER_INTERFACE(imtgql::IGqlContextCreator);
@@ -62,8 +84,10 @@ public:
 				imtgql::IGqlContextCreator::ContextCreationError& error) const override;
 	virtual imtgql::IGqlContextUniquePtr RenewGqlContext(
 				const imtgql::IGqlContext::Headers& headers,
+				bool isEstablished,
 				AuthorizationState& state,
-				QString& errorMessage) const override;
+				ContextCreationError& error,
+				QDateTime* sessionExpiresAtPtr = nullptr) const override;
 	virtual qint64 GetAuthorizationGeneration() const override;
 
 	// reimplemented (imtauth::IJwtSessionController)
@@ -96,6 +120,8 @@ private:
 		bool isPat = false;
 		QByteArray productId;
 		QByteArray clientProductId;
+		/// Of a session token.
+		QByteArray sessionId;
 	};
 
 	// Organization data of a token
@@ -129,24 +155,53 @@ private:
 		qint64 tenantDataResolvedAt = 0;
 	};
 
+	enum ContextKind
+	{
+		/// A request: the caches are used
+		CK_REQUEST,
+		/// A subscription about to be registered: read afresh, an expired access token is refused
+		CK_NEW_SUBSCRIPTION,
+		/// An established subscription: read afresh, an expired access token is accepted while its session lives
+		CK_ESTABLISHED_SUBSCRIPTION
+	};
+
 	/**
-		The context of a request, or with \c isRenewal of an established subscription: then nothing is taken from the cache
-		and an expired access token is accepted while its session lives.
+		\param sessionExpiresAtPtr	[optional] For a subscription: when the session of the token ends, as it is known now.
 	*/
 	imtgql::IGqlContextUniquePtr CreateContext(
 				const imtgql::IGqlContext::Headers& headers,
-				bool isRenewal,
-				imtgql::IGqlContextCreator::ContextCreationError& error) const;
+				ContextKind kind,
+				imtgql::IGqlContextCreator::ContextCreationError& error,
+				QDateTime* sessionExpiresAtPtr = nullptr) const;
 
 	/**
 		Check a token at its store or session controller, without the cache.
-		\param managerPtr	The store of a personal access token or of a server token; not used for a session token.
+		\param managerPtr		The store of a personal access token or of a server token; not used for a session token.
+		\param isExpiryAccepted	An expired access token holds while its session lives.
 	*/
 	bool ResolveFreshToken(
 				const QByteArray& token,
 				const imtauth::IPersonalAccessTokenManager* managerPtr,
+				bool isExpiryAccepted,
 				FreshToken& freshToken,
 				imtgql::IGqlContextCreator::ContextCreationError& error) const;
+
+	/**
+		Read the user at its source. Its permissions are resolved on its roles and groups read at their sources too,
+		unless the source computes the user: then only the permissions it was handed out with count.
+		An absent user leaves userDataPtr invalid.
+	*/
+	bool ReadCurrentUser(
+				const QByteArray& userId,
+				const QByteArray& productId,
+				imtbase::IObjectCollection::DataPtr& userDataPtr,
+				imtgql::IGqlContextCreator::ContextCreationError& error) const;
+
+	/**
+		Whether the session of a token is known to be closed: its access token expired, or its session is gone.
+		\param isChecked	False when the session could not be read.
+	*/
+	bool IsSessionClosed(const QByteArray& token, bool& isChecked) const;
 
 	bool ResolveUserId(
 				const QByteArray& token,
@@ -261,6 +316,15 @@ private:
 
 	/// Organization data of the user of a token, read without the cache.
 	TokenTenantData ReadTenantData(const QByteArray& userId, const QByteArray& tenantId) const;
+
+	/// What the user holds in an organization read with its owner, its creator and its permissions.
+	void CompleteTenantData(
+				const QByteArray& userId,
+				const QByteArray& tenantId,
+				const QByteArray& ownerId,
+				const QByteArray& creatorId,
+				const QByteArrayList& tenantPermissions,
+				TokenTenantData& tenantData) const;
 
 	/// A change of the access: checks started before it are stale, and the organization data of every token is read again.
 	void InvalidateAuthorizationLocked() const;

@@ -7,6 +7,7 @@
 #include <imtgql/CGqlRequest.h>
 
 // Qt includes
+#include <QtCore/QDateTime>
 #include <QtCore/QString>
 
 
@@ -48,14 +49,21 @@ public:
 				ContextCreationError& error) const = 0;
 
 	/**
-		Create afresh the context of an established subscription from the headers it was registered with, without any cache.
-		Unlike a new request, an expired access token is accepted while its session lives.
+		Create the context of a subscription afresh: the credentials, the user, its roles and its groups are read at their sources.
+		\param isEstablished	A new subscription is refused with an expired access token, like a request; an established one
+								is accepted with it while its session lives.
+		\param error			Why there is no context; its status tells a refused token from a token to refresh.
+		\param sessionExpiresAtPtr	[optional] When the session of the credentials ends, as it is known now; invalid when it is not
+								known (a token without a session, an authorization server that does not tell it). A session may be
+								prolonged, so it is a reason to check again, not the end of the access.
 		\return The context when the state is AS_CONFIRMED, otherwise null.
 	*/
 	virtual IGqlContextUniquePtr RenewGqlContext(
 				const IGqlContext::Headers& headers,
+				bool isEstablished,
 				AuthorizationState& state,
-				QString& errorMessage) const = 0;
+				ContextCreationError& error,
+				QDateTime* sessionExpiresAtPtr = nullptr) const = 0;
 
 	/**
 		Get the generation of the access: it grows with every change of the access this server is told about.

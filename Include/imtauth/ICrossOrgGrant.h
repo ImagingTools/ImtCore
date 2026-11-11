@@ -6,6 +6,7 @@
 #include <QByteArray>
 #include <QString>
 #include <QList>
+#include <QDateTime>
 
 // ACF includes
 #include <istd/IChangeable.h>
@@ -48,6 +49,23 @@ struct CrossOrgGrantInfo
 	bool operator!=(const CrossOrgGrantInfo& other) const
 	{
 		return !(*this == other);
+	}
+
+	/// Active and not expired.
+	bool IsEffective() const
+	{
+		if (!isActive){
+			return false;
+		}
+
+		if (!expiresAt.isEmpty()){
+			const QDateTime expiryTime = QDateTime::fromString(expiresAt, Qt::ISODateWithMs);
+			if (expiryTime.isValid() && expiryTime < QDateTime::currentDateTimeUtc()){
+				return false;
+			}
+		}
+
+		return true;
 	}
 };
 
@@ -109,8 +127,9 @@ public:
 
 	/**
 		Get all grants where the specified tenant is the target (receiving access).
+		\param isReadPtr [optional] False when the storage could not be read completely, so the list may miss grants.
 	*/
-	virtual CrossOrgGrants GetGrantsByTargetTenant(const QByteArray& targetTenantId) const = 0;
+	virtual CrossOrgGrants GetGrantsByTargetTenant(const QByteArray& targetTenantId, bool* isReadPtr = nullptr) const = 0;
 
 	/**
 		Check if a target tenant has at least one of the specified roles

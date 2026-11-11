@@ -3,6 +3,7 @@
 
 
 // Qt includes
+#include <QtCore/QDateTime>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 #include <QtCore/QSet>
@@ -14,6 +15,7 @@
 #include <imtauth/IRoleInfoProvider.h>
 #include <imtauth/IUserGroupInfoProvider.h>
 #include <imtauth/ITenantConnectionRequestManager.h>
+#include <imtauth/IJwtSessionController.h>
 
 
 /**
@@ -219,6 +221,117 @@ inline bool IsServerToken(const QByteArray& token)
 	authorization server directly.
 */
 static const inline QString s_jwtProductIdClaim = QStringLiteral("productId");
+
+
+struct SessionTokenClaims
+{
+	QByteArray userId;
+	QByteArray tenantId;
+	QByteArray sessionId;
+	/// The product whose server opened the session; empty for a session opened at the authorization server directly.
+	QByteArray productId;
+	qint64 expSecs = 0;
+};
+
+
+/**
+	Read the claims of a session token. The signature is not checked: the token must be validated, see CheckSessionToken.
+*/
+inline bool ParseSessionTokenClaims(const QByteArray& jwt, SessionTokenClaims& claims)
+{
+	claims = SessionTokenClaims();
+
+	const QByteArrayList parts = jwt.split('.');
+	if (parts.size() != 3){
+		return false;
+	}
+
+	const QByteArray json = QByteArray::fromBase64(parts[1], QByteArray::Base64UrlEncoding | QByteArray::OmitTrailingEquals);
+	const QJsonObject payloadObj = QJsonDocument::fromJson(json).object();
+	if (payloadObj.isEmpty()){
+		return false;
+	}
+
+	claims.userId = payloadObj.value(QStringLiteral("userId")).toString().toUtf8();
+	claims.tenantId = payloadObj.value(QStringLiteral("tenantId")).toString().toUtf8();
+	claims.sessionId = payloadObj.value(QStringLiteral("sessionId")).toString().toUtf8();
+	claims.productId = payloadObj.value(s_jwtProductIdClaim).toString().toUtf8();
+	// toInt() truncates and gives 0 outside of 32 bits
+	claims.expSecs = static_cast<qint64>(payloadObj.value(QStringLiteral("exp")).toDouble());
+
+	return true;
+}
+
+
+enum SessionTokenCheck
+{
+	/// Signed, of a user, and its session lives.
+	STC_VALID,
+	/// Expired, or its session is closed: the client authenticates again.
+	STC_REAUTHENTICATE,
+	/// Not a valid session token of a user.
+	STC_INVALID,
+	/// The token or its session could not be checked.
+	STC_UNCHECKED
+};
+
+
+/**
+	Check a session token: its signature, its expiry and its session.
+	\param isExpiryAccepted	An expired token holds while its session lives (an established subscription only).
+*/
+inline SessionTokenCheck CheckSessionToken(
+			const IJwtSessionController& controller,
+			const QByteArray& token,
+			bool isExpiryAccepted,
+			SessionTokenClaims& claims,
+			QString& message)
+{
+	const IJwtSessionController::JwtState state = controller.ValidateJwt(token);
+	if (state == IJwtSessionController::JS_NONE){
+		message = QStringLiteral("JWT validation temporarily unavailable.");
+
+		return STC_UNCHECKED;
+	}
+	if (state != IJwtSessionController::JS_OK && state != IJwtSessionController::JS_EXPIRED){
+		message = QStringLiteral("Invalid JWT token.");
+
+		return STC_INVALID;
+	}
+
+	// The claims are signed: the controller checks the signature before the expiration
+	if (!ParseSessionTokenClaims(token, claims) || claims.userId.isEmpty() || claims.sessionId.isEmpty() || claims.expSecs <= 0){
+		message = QStringLiteral("Invalid JWT token.");
+
+		return STC_INVALID;
+	}
+
+	if (!isExpiryAccepted && claims.expSecs < QDateTime::currentSecsSinceEpoch()){
+		message = QStringLiteral("JWT token expired.");
+
+		return STC_REAUTHENTICATE;
+	}
+
+	bool isChecked = false;
+	const bool isSessionValid = controller.ValidateSession(claims.sessionId, &isChecked);
+	if (!isChecked){
+		message = QStringLiteral("The session could not be checked.");
+
+		return STC_UNCHECKED;
+	}
+	if (!isSessionValid){
+		message = QStringLiteral("The session of the token is closed.");
+
+		return STC_REAUTHENTICATE;
+	}
+	if (state == IJwtSessionController::JS_EXPIRED && !isExpiryAccepted){
+		message = QStringLiteral("JWT token expired.");
+
+		return STC_REAUTHENTICATE;
+	}
+
+	return STC_VALID;
+}
 
 
 /**

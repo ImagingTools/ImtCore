@@ -9,6 +9,7 @@
 #include<imtrest/IProtocolEngine.h>
 #include<imtrest/ITransport.h>
 #include<imtrest/CWebSocketRequest.h>
+#include <imtservergql/imtservergql.h>
 
 
 namespace imtservergql
@@ -52,6 +53,23 @@ bool CGqlPublisherCompBase::RegisterSubscription(
 		SendErrorMessage(0, errorMessage, "CGqlPublisherCompBase");
 
 		return false;
+	}
+
+	if (m_readPermissionsAttrPtr.GetCount() > 0){
+		const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
+		const imtauth::IUserInfo* userInfoPtr = contextPtr != nullptr ? contextPtr->GetUserInfo() : nullptr;
+		bool isAllowed = false;
+		if (userInfoPtr != nullptr){
+			isAllowed = userInfoPtr->IsAdmin();
+			const QByteArrayList heldPermissions = GetUserPermissions(*contextPtr) + contextPtr->GetOrganizationPermissions();
+			for (int index = 0; !isAllowed && index < m_readPermissionsAttrPtr.GetCount(); ++index){
+				isAllowed = imtauth::HasPermission(heldPermissions, m_readPermissionsAttrPtr[index]);
+			}
+		}
+		if (!isAllowed){
+			errorMessage = QStringLiteral("The subscription '%1' is not allowed").arg(QString::fromUtf8(gqlRequest.GetCommandId()));
+			return false;
+		}
 	}
 
 	const imtrest::CWebSocketRequest* constWebSocketRequest = dynamic_cast<const imtrest::CWebSocketRequest*>(&networkRequest);
@@ -214,5 +232,3 @@ bool CGqlPublisherCompBase::PublishDataFiltered(
 
 
 } // namespace imtservergql
-
-

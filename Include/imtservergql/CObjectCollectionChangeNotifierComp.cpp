@@ -2,18 +2,13 @@
 #include <imtservergql/CObjectCollectionChangeNotifierComp.h>
 
 
-// ImtCore includes
-#include <imtauth/imtauth.h>
-#include <imtservergql/imtservergql.h>
-
-
 // Qt includes
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 
-// ACF includes
-#include <iser/CJsonMemWriteArchive.h>
+// ImtCore includes
+#include <imtbase/IOperationContext.h>
 
 
 namespace imtservergql
@@ -50,38 +45,6 @@ bool CObjectCollectionChangeNotifierComp::IsOpenFor(SubscriberKind subscriberKin
 	default:
 		return false;
 	}
-}
-
-
-bool CObjectCollectionChangeNotifierComp::RegisterSubscription(
-			const QByteArray& subscriptionId,
-			const imtgql::CGqlRequest& gqlRequest,
-			const imtrest::IRequest& networkRequest,
-			QString& errorMessage)
-{
-	if (m_readPermissionsAttrPtr.GetCount() > 0){
-		const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
-		const imtauth::IUserInfo* userInfoPtr = contextPtr != nullptr ? contextPtr->GetUserInfo() : nullptr;
-
-		// A server acting on its own is a user holding the permissions of its token
-		bool isAllowed = false;
-		if (userInfoPtr != nullptr){
-			isAllowed = userInfoPtr->IsAdmin();
-
-			const QByteArrayList heldPermissions = imtservergql::GetUserPermissions(*contextPtr) + contextPtr->GetOrganizationPermissions();
-			for (int i = 0; !isAllowed && i < m_readPermissionsAttrPtr.GetCount(); i++){
-				isAllowed = imtauth::HasPermission(heldPermissions, m_readPermissionsAttrPtr[i]);
-			}
-		}
-
-		if (!isAllowed){
-			errorMessage = QStringLiteral("The subscription '%1' is not allowed").arg(QString::fromUtf8(gqlRequest.GetCommandId()));
-
-			return false;
-		}
-	}
-
-	return BaseClass::RegisterSubscription(subscriptionId, gqlRequest, networkRequest, errorMessage);
 }
 
 
@@ -181,32 +144,12 @@ void CObjectCollectionChangeNotifierComp::OnUpdate(const istd::IChangeable::Chan
 
 		imtbase::IOperationContext::OperationContextInfo info = operationContext.value<imtbase::IOperationContext::OperationContextInfo>();
 		operationContextObject.insert("ownerId", QString(info.id));
-		operationContextObject.insert("ownerName", info.name);
 
 		dataObject.insert("operationContext", operationContextObject);
 	}
 
 	if (!isRemoved){
 		dataObject.insert("itemId", QString(itemId));
-
-		// Send serialized item payload only when itemId is valid.
-		if (!itemId.isEmpty() && m_isSendItemSource.IsValid() && m_objectCollectionCompPtr.IsValid() && *m_isSendItemSource){
-			imtbase::IObjectCollection::DataPtr dataPtr;
-			m_objectCollectionCompPtr->GetObjectData(itemId, dataPtr);
-			QByteArray representationData;
-			iser::ISerializable* objectPtr = dynamic_cast<iser::ISerializable*>(dataPtr.GetPtr());
-			if (objectPtr != nullptr){
-				iser::CJsonMemWriteArchive archive;
-
-				if (objectPtr->Serialize(archive)){
-					representationData = archive.GetData();
-				}
-				else{
-					Q_ASSERT(false);
-				}
-			}
-			dataObject.insert("item", QString(representationData));
-		}
 	}
 
 	QJsonDocument jsonDocument;
@@ -227,4 +170,3 @@ void CObjectCollectionChangeNotifierComp::OnUpdate(const istd::IChangeable::Chan
 
 
 } // namespace imtservergql
-

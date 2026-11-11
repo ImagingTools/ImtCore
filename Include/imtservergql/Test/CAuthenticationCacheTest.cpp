@@ -155,8 +155,8 @@ void CAuthenticationCacheTest::SubscriptionCheckBypassesCache()
 	fixture.tokens->permissions = {"narrowed"};
 	const imtgql::IGqlContext::Headers headers{{imtbase::s_authenticationTokenHeaderId, "imt_pat_first"}};
 	imtgql::IGqlContextCreator::AuthorizationState state = imtgql::IGqlContextCreator::AS_UNAVAILABLE;
-	QString error;
-	QVERIFY(fixture.authentication->RenewGqlContext(headers, state, error).IsValid());
+	imtgql::IGqlContextCreator::ContextCreationError error;
+	QVERIFY(fixture.authentication->RenewGqlContext(headers, true, state, error).IsValid());
 	QCOMPARE(state, imtgql::IGqlContextCreator::AS_CONFIRMED);
 	QCOMPARE(fixture.tokens->checks.value("imt_pat_first"), 2);
 
@@ -164,10 +164,10 @@ void CAuthenticationCacheTest::SubscriptionCheckBypassesCache()
 	QVERIFY(fixture.Resolve("imt_pat_first"));
 	QCOMPARE(fixture.tokens->checks.value("imt_pat_first"), 3);
 	fixture.tokens->valid = false;
-	QVERIFY(!fixture.authentication->RenewGqlContext(headers, state, error).IsValid());
+	QVERIFY(!fixture.authentication->RenewGqlContext(headers, true, state, error).IsValid());
 	QCOMPARE(state, imtgql::IGqlContextCreator::AS_DENIED);
 	QCOMPARE(fixture.tokens->checks.value("imt_pat_first"), 4);
-	QVERIFY(!error.isEmpty());
+	QVERIFY(!error.message.isEmpty());
 	QVERIFY(fixture.authentication->GetUserFromJwt("imt_pat_first").isEmpty());
 }
 

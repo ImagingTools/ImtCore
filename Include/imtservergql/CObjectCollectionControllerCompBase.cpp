@@ -1394,7 +1394,13 @@ sdl::V1_0::imtbase::CGetObjectDataPayload CObjectCollectionControllerCompBase::O
 		return sdl::V1_0::imtbase::CGetObjectDataPayload();
 	}
 
-	istd::IChangeableUniquePtr adaptedObjectPtr = CreateAdaptedObjectData(objectId, *dataPtr.GetPtr(), gqlRequest);
+	QString adaptationError;
+	istd::IChangeableUniquePtr adaptedObjectPtr = CreateAdaptedObjectData(objectId, *dataPtr.GetPtr(), gqlRequest, adaptationError);
+	if (!adaptationError.isEmpty()){
+		errorMessage = adaptationError;
+		return sdl::V1_0::imtbase::CGetObjectDataPayload();
+	}
+
 	istd::IChangeable* objectToSerializePtr = adaptedObjectPtr.IsValid() ? adaptedObjectPtr.GetPtr() : dataPtr.GetPtr();
 
 	QByteArray objectData;
@@ -3574,7 +3580,8 @@ bool CObjectCollectionControllerCompBase::IsDescriptionStoredInDocument() const
 istd::IChangeableUniquePtr CObjectCollectionControllerCompBase::CreateAdaptedObjectData(
 			const QByteArray& /*objectId*/,
 			const istd::IChangeable& /*object*/,
-			const imtgql::CGqlRequest& /*gqlRequest*/) const
+			const imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& /*errorMessage*/) const
 {
 	return istd::IChangeableUniquePtr();
 }

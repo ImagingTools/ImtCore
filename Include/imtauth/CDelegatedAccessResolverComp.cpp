@@ -131,28 +131,27 @@ bool CDelegatedAccessResolverComp::HasDelegatedRole(
 
 QByteArrayList CDelegatedAccessResolverComp::GetDelegatedRoles(
 		const QByteArray& homeTenantId,
-		const QByteArray& targetTenantId) const
+		const QByteArray& targetTenantId,
+		bool* isReadPtr) const
 {
 	QByteArrayList result;
+	if (isReadPtr != nullptr){
+		*isReadPtr = m_crossOrgGrantCompPtr.IsValid();
+	}
 
 	if (!m_crossOrgGrantCompPtr.IsValid()){
 		return result;
 	}
 
-	const CrossOrgGrants grants = m_crossOrgGrantCompPtr->GetGrantsByTargetTenant(homeTenantId);
+	// The grants are read once: an effective grant of the target delegates its roles
+	const CrossOrgGrants grants = m_crossOrgGrantCompPtr->GetGrantsByTargetTenant(homeTenantId, isReadPtr);
 	for (const CrossOrgGrantInfo& grant : grants){
-		if (grant.sourceTenantId != targetTenantId){
-			continue;
-		}
-		if (!grant.isActive){
+		if (grant.sourceTenantId != targetTenantId || !grant.IsEffective()){
 			continue;
 		}
 		for (const QByteArray& roleId : grant.roleIds){
 			if (!roleId.isEmpty() && !result.contains(roleId)){
-				// Verify grant is effective (not expired)
-				if (m_crossOrgGrantCompPtr->HasAccess(targetTenantId, homeTenantId, roleId)){
-					result.append(roleId);
-				}
+				result.append(roleId);
 			}
 		}
 	}

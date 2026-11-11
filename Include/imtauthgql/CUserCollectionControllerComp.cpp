@@ -720,9 +720,10 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateObjectFromReques
 istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateAdaptedObjectData(
 			const QByteArray& objectId,
 			const istd::IChangeable& object,
-			const imtgql::CGqlRequest& gqlRequest) const
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
 {
-	istd::IChangeableUniquePtr baseAdaptedPtr = BaseClass::CreateAdaptedObjectData(objectId, object, gqlRequest);
+	istd::IChangeableUniquePtr baseAdaptedPtr = BaseClass::CreateAdaptedObjectData(objectId, object, gqlRequest, errorMessage);
 
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 	if (gqlContextPtr == nullptr){
@@ -738,44 +739,35 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateAdaptedObjectDat
 	imtauth::ITenantMembershipManager* membershipPtr = m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr;
 	imtauth::IRoleInfoProvider* roleProviderPtr = m_roleInfoProviderCompPtr.IsValid() ? m_roleInfoProviderCompPtr.GetPtr() : nullptr;
 
-	// Invalid result means the stored object needs no tenant filtering.
-	istd::IChangeableUniquePtr adaptedPtr = AdaptUserForTenant(
-				objectId,
-				object,
-				currentTenantId,
-				currentProductId,
-				bindingPtr,
-				delegatedPtr,
-				membershipPtr,
-				roleProviderPtr);
-
 	if (currentProductId.isEmpty()){
-		return adaptedPtr;
+		// Invalid result means the stored object needs no tenant filtering.
+		return AdaptUserForTenant(
+					objectId,
+					object,
+					currentTenantId,
+					currentProductId,
+					bindingPtr,
+					delegatedPtr,
+					membershipPtr,
+					roleProviderPtr);
 	}
 
-	// Remote consumers expand roles through the caller's token, which a PAT cannot do; send the resolved permissions with the object.
-	const imtauth::IUserInfo* sourceUserPtr = adaptedPtr.IsValid()
-				? dynamic_cast<const imtauth::IUserInfo*>(adaptedPtr.GetPtr())
-				: dynamic_cast<const imtauth::IUserInfo*>(&object);
-	if (sourceUserPtr == nullptr){
-		return adaptedPtr;
+	// A product server trusts the permissions handed out with the user: only a complete read gives them
+	const TenantUserSources sources{
+		m_objectCollectionCompPtr.GetPtr(),
+		m_roleCollectionCompPtr.GetPtr(),
+		m_userGroupCollectionCompPtr.GetPtr(),
+		bindingPtr,
+		delegatedPtr,
+		membershipPtr
+	};
+
+	istd::IChangeableUniquePtr userPtr;
+	if (ComputeTenantUser(sources, objectId, currentTenantId, currentProductId, userPtr, errorMessage) == imtservergql::CAuthorizationSnapshot::RS_ABSENT){
+		errorMessage = QStringLiteral("The user '%1' does not exist.").arg(QString::fromUtf8(objectId));
 	}
 
-	const imtauth::IUserInfo::FeatureIds resolvedPermissions = GetTenantUserPermissions(*sourceUserPtr, currentTenantId, currentProductId, bindingPtr, roleProviderPtr);
-	if (resolvedPermissions.isEmpty()){
-		return adaptedPtr;
-	}
-
-	if (!adaptedPtr.IsValid()){
-		adaptedPtr = object.CloneMe();
-	}
-
-	imtauth::IUserInfo* resultUserPtr = dynamic_cast<imtauth::IUserInfo*>(adaptedPtr.GetPtr());
-	if (resultUserPtr != nullptr){
-		resultUserPtr->SetLocalPermissions(currentProductId, resolvedPermissions);
-	}
-
-	return adaptedPtr;
+	return userPtr;
 }
 
 

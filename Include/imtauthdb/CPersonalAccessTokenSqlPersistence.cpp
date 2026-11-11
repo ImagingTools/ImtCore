@@ -62,8 +62,10 @@ bool CPersonalAccessTokenSqlPersistence::RevokeToken(const QByteArray& tokenId)
 
 bool CPersonalAccessTokenSqlPersistence::SetTokenScopes(const QByteArray& tokenId, const QByteArrayList& scopes)
 {
+	const QByteArray joinedScopes = scopes.join(',');
+	const QString scopeValue = joinedScopes.isEmpty() ? QStringLiteral("") : QString::fromUtf8(joinedScopes);
 	return Update("UPDATE \"PersonalAccessTokens\" SET \"Scopes\"=:scopes WHERE \"Id\"=:id AND NOT \"Revoked\" RETURNING \"Id\"",
-				{{":id", QString::fromUtf8(tokenId)}, {":scopes", QString::fromUtf8(scopes.join(','))}});
+				{{":id", QString::fromUtf8(tokenId)}, {":scopes", scopeValue}});
 }
 
 

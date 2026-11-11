@@ -39,7 +39,7 @@ bool CJwtSessionControllerComp::ValidateSession(const QByteArray& sessionId, boo
 		// Only a session the collection reports as absent is gone; a collection may ignore the filter
 		if (isCheckedPtr != nullptr && m_sessionCollectionCompPtr.IsValid()){
 			bool isRead = false;
-			const QByteArrayList ids = CollectionSelection::SelectIds(*m_sessionCollectionCompPtr, CollectionSelection::ColumnEquals("DocumentId", sessionId), QByteArrayList(), &isRead);
+			const QByteArrayList ids = CollectionSelection::SelectIds(*m_sessionCollectionCompPtr, CollectionSelection::ColumnEquals("DocumentId", sessionId), {QByteArrayLiteral("DocumentId")}, &isRead);
 			*isCheckedPtr = isRead && !ids.contains(sessionId);
 		}
 

@@ -11,6 +11,7 @@
 #include <QtSql/QSqlError>
 
 // ImtCore includes
+#include <imtbase/IComplexCollectionFilter.h>
 #include <imtlic/CFeatureInfo.h>
 #include <imtauth/CSessionInfo.h>
 #include <imtauth/CUserInfo.h>
@@ -252,6 +253,20 @@ bool CUsersSessionsDatabaseDelegateComp::CreateFilterQuery(const iprm::IParamsSe
 		filterQuery += QStringLiteral(R"( WHERE "RefreshToken" = '%1')").arg(SqlEncode(textParamPtr->GetText()));
 
 		return true;
+	}
+
+	// A selection by the id of a session reads that row only
+	iprm::TParamsPtr<imtbase::IComplexCollectionFilter> complexFilterPtr(&filterParams, "ComplexFilter", false);
+	if (complexFilterPtr.IsValid()){
+		const imtbase::IComplexCollectionFilter::FilterExpression& expression = complexFilterPtr->GetFilterExpression();
+		if (expression.filterExpressions.isEmpty() && expression.fieldFilters.size() == 1){
+			const imtbase::IComplexCollectionFilter::FieldFilter& fieldFilter = expression.fieldFilters.first();
+			if (fieldFilter.fieldId == "DocumentId" && fieldFilter.filterOperation == imtbase::IComplexCollectionFilter::FO_EQUAL){
+				filterQuery += QStringLiteral(R"( WHERE "%1" = '%2')").arg(QString::fromUtf8(*m_objectIdColumnAttrPtr), SqlEncode(fieldFilter.filterValue.toString()));
+
+				return true;
+			}
+		}
 	}
 
 	return false;

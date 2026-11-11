@@ -95,7 +95,7 @@ public:
 	// reimplemented (imtclientgql::IGqlClient)
 	// Not thread-safe: call only from the component thread.
 	// NOTE: SendRequest() runs a nested event loop while waiting.
-	virtual GqlResponsePtr SendRequest(GqlRequestPtr requestPtr, imtbase::IUrlParam* urlParamPtr = nullptr) const override;
+	virtual GqlResult SendRequest(GqlRequestPtr requestPtr, imtbase::IUrlParam* urlParamPtr = nullptr) const override;
 	virtual bool SendRequestNoWait(GqlRequestPtr requestPtr, imtbase::IUrlParam* urlParamPtr = nullptr) const override;
 
 	// reimplemented (imtrest::ITransport)
@@ -230,5 +230,4 @@ private:
 
 
 } // namespace imtclientgql
-
 

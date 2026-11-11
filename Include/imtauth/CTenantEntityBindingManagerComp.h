@@ -9,6 +9,7 @@
 #include <imtauth/ITenantEntityBindingManager.h>
 #include <imtauth/ITenantEntityBinding.h>
 #include <imtbase/IObjectCollection.h>
+#include <imtbase/IComplexCollectionFilter.h>
 
 
 namespace imtauth
@@ -33,12 +34,14 @@ public:
 	virtual bool RemoveBinding(const QByteArray& tenantId, const QByteArray& entityType, const QByteArray& entityId) override;
 	virtual bool RemoveAllBindingsForEntity(const QByteArray& entityType, const QByteArray& entityId) override;
 	virtual bool RemoveAllBindingsForTenant(const QByteArray& tenantId, const QByteArray& entityType) override;
-	virtual bool HasBinding(const QByteArray& tenantId, const QByteArray& entityType, const QByteArray& entityId) const override;
+	virtual bool HasBinding(const QByteArray& tenantId, const QByteArray& entityType, const QByteArray& entityId, bool* isReadPtr = nullptr) const override;
 	virtual QByteArrayList GetEntityIds(const QByteArray& tenantId, const QByteArray& entityType) const override;
-	virtual bool HasAnyTenantBinding(const QByteArray& entityType, const QByteArray& entityId) const override;
+	virtual bool HasAnyTenantBinding(const QByteArray& entityType, const QByteArray& entityId, bool* isReadPtr = nullptr) const override;
 
 private:
-	QByteArrayList FindBindingIds(const QByteArray& tenantId, const QByteArray& entityType, const QByteArray& entityId) const;
+	QByteArrayList FindBindingIds(const QByteArray& tenantId, const QByteArray& entityType, const QByteArray& entityId, bool* isReadPtr = nullptr) const;
+	/// Ids of the bindings the expression selects; isReadPtr is false when the collection reported an error.
+	QByteArrayList SelectBindingIds(const imtbase::IComplexCollectionFilter::FilterExpression& filterExpression, bool* isReadPtr) const;
 
 	I_REF(imtbase::IObjectCollection, m_bindingsCollectionCompPtr);
 	I_FACT(imtauth::ITenantEntityBinding, m_bindingFactoryCompPtr);

@@ -190,12 +190,21 @@ void CPersonalAccessTokenTest::testSqlMigrationRollback()
 void CPersonalAccessTokenTest::testSqlAtomicMutations()
 {
 	CTokenDatabaseEngine engine;
-	QVERIFY(engine.ExecSqlQuery(s_legacyTokenSchema).isActive());
+	QByteArray schema = s_legacyTokenSchema;
+	schema.replace("\"Scopes\" TEXT", "\"Scopes\" TEXT NOT NULL");
+	QVERIFY(engine.ExecSqlQuery(schema).isActive());
 	imtauthdb::CPersonalAccessTokenSqlPersistence persistence(engine);
 	QVERIFY2(persistence.EnsureSchema(), qPrintable(persistence.GetErrorMessage()));
 	QVERIFY(engine.ExecSqlQuery("INSERT INTO \"PersonalAccessTokens\" (\"Id\",\"UserId\",\"TokenHash\",\"Scopes\") "
 				"VALUES ('one','owner','hash','read,write')").isActive());
 	const QDateTime now = QDateTime::currentDateTimeUtc();
+	QVERIFY2(persistence.SetTokenScopes("one", {}), qPrintable(persistence.GetErrorMessage()));
+	QSqlQuery emptyScopes = engine.ExecSqlQuery("SELECT \"Scopes\" FROM \"PersonalAccessTokens\" WHERE \"Id\"='one'");
+	QVERIFY(emptyScopes.next());
+	QVERIFY(!emptyScopes.value(0).isNull());
+	QCOMPARE(emptyScopes.value(0).toString(), QStringLiteral(""));
+	emptyScopes.finish();
+	QVERIFY(persistence.SetTokenScopes("one", {}));
 	QVERIFY(persistence.SetTokenScopes("one", {"read"}));
 	QVERIFY(persistence.UpdateLastUsedAt("one", now));
 	QVERIFY(persistence.RevokeToken("one"));

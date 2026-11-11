@@ -97,6 +97,7 @@ public:
 
 	// reimplemented (IObjectCollectionCacheController)
 	virtual void InvalidateCache() override;
+	virtual const IObjectCollection* GetSourceCollection() const override;
 
 	// reimplemented (ICollectionInfo)
 	virtual int GetElementsCount(

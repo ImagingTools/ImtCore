@@ -155,4 +155,3 @@ typedef imtauthgql::CTenantRelationshipItemInfoProviderComp TenantRelationshipIt
 
 
 } // namespace ImtAuthGqlPck
-

@@ -74,9 +74,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 	qsizetype errorPosition = -1;
 	const QByteArray requestBody = request.GetBody();
 	if (!m_lastRequest.ParseQuery(requestBody, errorPosition)){
-		qCritical() << __FILE__ << __LINE__ << QStringLiteral("Error when parsing request: '%1'; Error position: '%2'")
-														.arg(request.GetBody(),
-															 QString::number(errorPosition));
+		qCritical() << __FILE__ << __LINE__ << QStringLiteral("Error when parsing request; Error position: '%1'").arg(errorPosition);
 
 		return GenerateError(StatusCode::SC_BAD_REQUEST, QStringLiteral("Request is incorrect"), request);
 	}

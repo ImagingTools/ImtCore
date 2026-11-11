@@ -182,9 +182,10 @@ bool CRemoteFileSystemStructureProviderComp::SendGetEntries(
 		urlParamPtr = m_urlParamCompPtr.GetPtr();
 	}
 
-	IGqlClient::GqlResponsePtr responsePtr = m_apiClientCompPtr->SendRequest(requestPtr, urlParamPtr);
-	if (!responsePtr.IsValid()){
-		error = QStringLiteral("Remote file service is not reachable");
+	const auto requestResult = m_apiClientCompPtr->SendRequest(requestPtr, urlParamPtr);
+	auto responsePtr = requestResult.responsePtr;
+	if (!requestResult){
+		error = requestResult.errorMessage;
 		SendErrorMessage(0, error, "CRemoteFileSystemStructureProviderComp");
 
 		return false;

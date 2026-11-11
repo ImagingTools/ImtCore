@@ -10,6 +10,9 @@ namespace imtbase
 {
 
 
+class IObjectCollection;
+
+
 /**
 	Interface for explicit control over cache invalidation in cached object collections.
 	Allows triggering cache clearing independently from updates on the underlying collection.
@@ -41,6 +44,12 @@ public:
 		did not emit change notifications, but cached data may be stale.
 	*/
 	virtual void InvalidateCache() = 0;
+
+	/**
+		The collection whose data is cached: a reader that must see the current state reads it there.
+		It may be a cache itself.
+	*/
+	virtual const IObjectCollection* GetSourceCollection() const = 0;
 };
 
 

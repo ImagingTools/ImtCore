@@ -17,15 +17,19 @@ namespace imtservergql
 
 imtgql::IGqlContextUniquePtr CSimpleGqlContextCreatorComp::RenewGqlContext(
 			const imtgql::IGqlContext::Headers& headers,
+			bool /*isEstablished*/,
 			AuthorizationState& state,
-			QString& errorMessage) const
+			ContextCreationError& error,
+			QDateTime* sessionExpiresAtPtr) const
 {
-	ContextCreationError error;
+	if (sessionExpiresAtPtr != nullptr){
+		*sessionExpiresAtPtr = QDateTime();
+	}
+
 	imtgql::IGqlContextUniquePtr gqlContextPtr = CreateGqlContext(headers, error);
 	imtgql::CGqlRequestContextManager::Clear();
 
 	state = gqlContextPtr.IsValid() ? AS_CONFIRMED : AS_UNAVAILABLE;
-	errorMessage = error.message;
 
 	return gqlContextPtr;
 }

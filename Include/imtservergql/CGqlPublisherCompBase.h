@@ -28,6 +28,7 @@ public:
 	I_BEGIN_BASE_COMPONENT(CGqlPublisherCompBase);
 		I_REGISTER_INTERFACE(imtgql::IGqlSubscriberController);
 		I_ASSIGN_MULTI_0(m_commandIdsAttrPtr, "CommandIds", "List of model-IDs for GraphQL-response", true);
+		I_ASSIGN_MULTI_0(m_readPermissionsAttrPtr, "ReadPermissions", "Permissions reading this channel: a user needs one of them", false);
 		I_ASSIGN(m_requestManagerCompPtr, "RequestManager", "Response dispatcher registered for the server", true, "RequestManager");
 	I_END_COMPONENT;
 
@@ -54,6 +55,7 @@ protected:
 
 protected:
 	I_MULTIATTR(QByteArray, m_commandIdsAttrPtr);
+	I_MULTIATTR(QByteArray, m_readPermissionsAttrPtr);
 	I_REF(imtrest::IResponseDispatcher, m_requestManagerCompPtr);
 
 	struct RequestNetworks
@@ -73,5 +75,4 @@ protected:
 
 
 } // namespace imtservergql
-
 

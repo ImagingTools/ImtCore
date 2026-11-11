@@ -227,6 +227,24 @@ void CGqlContext::SetPermissionBoundary(const QByteArrayList& permissions)
 }
 
 
+bool CGqlContext::GetGrantingAuthority(bool& isAdmin, QByteArrayList& permissions) const
+{
+	isAdmin = m_isGrantingAdmin;
+	permissions = m_grantingPermissions;
+
+	return m_hasGrantingAuthority;
+}
+
+
+void CGqlContext::SetGrantingAuthority(bool isAdmin, const QByteArrayList& permissions)
+{
+	istd::CChangeNotifier notifier(this);
+	m_hasGrantingAuthority = true;
+	m_isGrantingAdmin = isAdmin;
+	m_grantingPermissions = permissions;
+}
+
+
 imtlic::IProductInfo* CGqlContext::GetProductInfo() const
 {
 	return m_productInfoPtr;
@@ -423,6 +441,9 @@ bool CGqlContext::CopyFrom(const IChangeable &object, CompatibilityMode /*mode*/
 		m_principalKind = sourcePtr->m_principalKind;
 		m_hasPermissionBoundary = sourcePtr->m_hasPermissionBoundary;
 		m_permissionBoundary = sourcePtr->m_permissionBoundary;
+		m_hasGrantingAuthority = sourcePtr->m_hasGrantingAuthority;
+		m_isGrantingAdmin = sourcePtr->m_isGrantingAdmin;
+		m_grantingPermissions = sourcePtr->m_grantingPermissions;
 
 		// Resolved anew for the copy instead of being taken over: the source may
 		// be answering GetImpliedPermissions() on another thread right now.
@@ -467,6 +488,9 @@ bool CGqlContext::ResetData(CompatibilityMode /*mode*/)
 	m_principalKind = PK_ANONYMOUS;
 	m_hasPermissionBoundary = false;
 	m_permissionBoundary.clear();
+	m_hasGrantingAuthority = false;
+	m_isGrantingAdmin = false;
+	m_grantingPermissions.clear();
 
 	ResetImpliedPermissions();
 

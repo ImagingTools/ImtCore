@@ -53,6 +53,21 @@ bool CTenantNotificationPublisherComp::IsRequestSupported(const imtgql::CGqlRequ
 }
 
 
+bool CTenantNotificationPublisherComp::IsOpenFor(SubscriberKind subscriberKind, const imtgql::CGqlRequest& gqlRequest) const
+{
+	// Its notifications go to their recipient by its identity: its permissions do not decide them
+	if (subscriberKind == SK_RECIPIENT){
+		const QByteArray commandId = (m_commandIdsAttrPtr.IsValid() && m_commandIdsAttrPtr.GetCount() > 0)
+					? m_commandIdsAttrPtr[0]
+					: QByteArrayLiteral("OnMembershipNotification");
+
+		return m_readPermissionsAttrPtr.GetCount() == 0 && gqlRequest.GetCommandId() == commandId;
+	}
+
+	return BaseClass::IsOpenFor(subscriberKind, gqlRequest);
+}
+
+
 // reimplemented (icomp::CComponentBase)
 
 void CTenantNotificationPublisherComp::OnComponentCreated()
@@ -373,5 +388,4 @@ QString CTenantNotificationPublisherComp::FindTenantName(const QByteArray& tenan
 
 
 } // namespace imtauthgql
-
 

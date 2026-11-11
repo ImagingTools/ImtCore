@@ -196,9 +196,11 @@ CRemoteNotificationSenderComp::DeliveryResult CRemoteNotificationSenderComp::Del
 		return DR_REFUSED;
 	}
 
-	const imtclientgql::IGqlClient::GqlResponsePtr responsePtr = m_apiClientCompPtr->SendRequest(requestPtr);
-	if (!responsePtr.IsValid()){
-		return DR_NOT_ANSWERED;
+	const auto requestResult = m_apiClientCompPtr->SendRequest(requestPtr);
+	auto responsePtr = requestResult.responsePtr;
+	if (!requestResult){
+		SendErrorMessage(0, requestResult.errorMessage, "CRemoteNotificationSenderComp");
+		return requestResult.errorCategory == imtclientgql::IGqlClient::EC_ACCESS_DENIED ? DR_REFUSED : DR_NOT_ANSWERED;
 	}
 
 	QString errorMessage;
@@ -226,5 +228,4 @@ CRemoteNotificationSenderComp::DeliveryResult CRemoteNotificationSenderComp::Del
 
 
 } // namespace imtnotifygql
-
 

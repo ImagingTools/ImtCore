@@ -78,12 +78,17 @@ QByteArray CWebSocketClientComp::BuildRequestEnvelope(const GqlRequestPtr& reque
 }
 
 
-IGqlClient::GqlResponsePtr CWebSocketClientComp::SendRequest(GqlRequestPtr requestPtr, imtbase::IUrlParam* /*urlParamPtr*/) const
+IGqlClient::GqlResult CWebSocketClientComp::SendRequest(GqlRequestPtr requestPtr, imtbase::IUrlParam* /*urlParamPtr*/) const
 {
+	if (!requestPtr.IsValid()){
+		return {{}, EC_INVALID_REQUEST, QStringLiteral("Request is invalid")};
+	}
 	QString key;
 	QByteArray data = BuildRequestEnvelope(requestPtr, key);
 
-	m_webSocket.sendTextMessage(data);
+	if (m_webSocket.state() != QAbstractSocket::ConnectedState || m_webSocket.sendTextMessage(data) < 0){
+		return {{}, EC_NETWORK, QStringLiteral("WebSocket request could not be sent")};
+	}
 	NetworkOperation networkOperation(100, this);
 
 	GqlResponsePtr retVal;
@@ -105,11 +110,11 @@ IGqlClient::GqlResponsePtr CWebSocketClientComp::SendRequest(GqlRequestPtr reque
 
 			m_queryDataMap.remove(key);
 
-			return retVal;
+			return {retVal, EC_NONE, {}};
 		}
 	}
 
-	return retVal;
+	return {{}, EC_TIMEOUT, QStringLiteral("WebSocket request timed out")};
 }
 
 

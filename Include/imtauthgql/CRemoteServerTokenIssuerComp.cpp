@@ -253,9 +253,10 @@ Payload CRemoteServerTokenIssuerComp::Send(const ServerInfo& server, const QByte
 	imtbase::CUrlParam urlParam;
 	urlParam.SetUrl(server.url);
 
-	const imtclientgql::IGqlClient::GqlResponsePtr responsePtr = m_apiClientCompPtr->SendRequest(requestPtr, &urlParam);
-	if (!responsePtr.IsValid()){
-		errorMessage = QStringLiteral("The server '%1' at %2 did not answer").arg(QString::fromUtf8(server.productId), server.url.toString());
+	const auto requestResult = m_apiClientCompPtr->SendRequest(requestPtr, &urlParam);
+	auto responsePtr = requestResult.responsePtr;
+	if (!requestResult){
+		errorMessage = QStringLiteral("Request to server '%1' failed: %2").arg(QString::fromUtf8(server.productId), requestResult.errorMessage);
 
 		return Payload();
 	}
@@ -265,5 +266,4 @@ Payload CRemoteServerTokenIssuerComp::Send(const ServerInfo& server, const QByte
 
 
 } // namespace imtauthgql
-
 
