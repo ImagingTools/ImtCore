@@ -29,6 +29,7 @@ public:
 		I_REGISTER_INTERFACE(IStorageResolver);
 		I_ASSIGN(m_collectionCompPtr, "Collection", "Collection used as the storage of the linked objects", true, "Collection");
 		I_ASSIGN(m_typeIdAttrPtr, "TypeId", "Type-ID of the objects created in the collection", true, "");
+		I_ASSIGN(m_versionInfoCompPtr, "VersionInfo", "Version info of the application, used to detect the changes of the linked objects by serialization", false, "VersionInfo");
 	I_END_COMPONENT;
 
 protected:
@@ -38,6 +39,7 @@ protected:
 private:
 	I_REF(IObjectCollection, m_collectionCompPtr);
 	I_ATTR(QByteArray, m_typeIdAttrPtr);
+	I_REF(iser::IVersionInfo, m_versionInfoCompPtr);
 };
 
 

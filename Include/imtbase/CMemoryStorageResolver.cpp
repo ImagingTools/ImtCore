@@ -84,6 +84,13 @@ bool CMemoryStorageResolver::IsSnapshotStorage() const
 }
 
 
+const iser::IVersionInfo* CMemoryStorageResolver::GetVersionInfo() const
+{
+	// The objects are live instances: there is no stored state to compare with.
+	return nullptr;
+}
+
+
 } // namespace imtbase
 
 

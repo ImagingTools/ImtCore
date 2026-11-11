@@ -2,7 +2,7 @@
 #pragma once
 
 
-// std includes
+// STL includes
 #include <optional>
 #include <type_traits>
 #include <utility>
@@ -122,12 +122,14 @@ private:
 template <class T>
 StorageLink<T>::StorageLink()
 {
+	SetReadOnly(std::is_const_v<T>);
 }
 
 
 template <class T>
 StorageLink<T>::StorageLink(std::nullopt_t)
 {
+	SetReadOnly(std::is_const_v<T>);
 }
 
 
@@ -135,6 +137,7 @@ template <class T>
 StorageLink<T>::StorageLink(const Id& objectId, const QByteArray& storageId)
 	:BaseClass(objectId, storageId)
 {
+	SetReadOnly(std::is_const_v<T>);
 }
 
 

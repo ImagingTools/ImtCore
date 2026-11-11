@@ -22,10 +22,14 @@ class CCollectionStorageResolver: virtual public IStorageResolver
 {
 public:
 	/**
-		\param collection	The collection used as the storage. It must outlive the resolver.
-		\param typeId		Type-ID of the objects to be created in the collection by InsertObject.
+		\param collection		The collection used as the storage. It must outlive the resolver.
+		\param typeId			Type-ID of the objects to be created in the collection by InsertObject.
+		\param versionInfoPtr	Version info of the application for the change detection, see GetVersionInfo. It must outlive the resolver.
 	*/
-	CCollectionStorageResolver(IObjectCollection& collection, const QByteArray& typeId);
+	CCollectionStorageResolver(
+				IObjectCollection& collection,
+				const QByteArray& typeId,
+				const iser::IVersionInfo* versionInfoPtr = nullptr);
 
 	// reimplemented (imtbase::IStorageResolver)
 	virtual istd::IChangeableSharedPtr LoadObject(const Id& objectId) const override;
@@ -34,6 +38,7 @@ public:
 	virtual bool RemoveObject(const Id& objectId) override;
 	virtual QVariantMap GetStorageParams(const Id& objectId) const override;
 	virtual bool IsSnapshotStorage() const override;
+	virtual const iser::IVersionInfo* GetVersionInfo() const override;
 
 protected:
 	/**
@@ -42,14 +47,18 @@ protected:
 	CCollectionStorageResolver();
 
 	/**
-		Set the collection used as the storage and the type-ID of the new objects.
+		Set the collection used as the storage, the type-ID of the new objects and the version info of the application.
 		\param collectionPtr	The collection. It is not owned and must outlive the resolver.
 	*/
-	void SetCollection(IObjectCollection* collectionPtr, const QByteArray& typeId);
+	void SetCollection(
+				IObjectCollection* collectionPtr,
+				const QByteArray& typeId,
+				const iser::IVersionInfo* versionInfoPtr);
 
 private:
 	IObjectCollection* m_collectionPtr;
 	QByteArray m_typeId;
+	const iser::IVersionInfo* m_versionInfoPtr;
 };
 
 

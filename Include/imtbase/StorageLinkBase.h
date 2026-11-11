@@ -2,6 +2,9 @@
 #pragma once
 
 
+// STL includes
+#include <memory>
+
 // Qt includes
 #include <QtCore/QByteArray>
 #include <QtCore/QString>
@@ -107,7 +110,14 @@ public:
 
 	/**
 		Update the stored object with the loaded data.
-		\return \c false, if the link is empty, not bound, the object doesn't exist in the storage or the storage rejected the data. If the object is not loaded, there is nothing to save and the result is \c true.
+		The object of a snapshot storage is written only if it differs from its state at loading (or at the last saving),
+		so an unchanged object makes no storage access. The state is compared by serialization with the version info
+		of the resolver, otherwise by istd::IChangeable::IsEqual, if the object supports cloning and comparing.
+		An object whose changes can't be detected is not written at all: the result is \c false.
+		\return \c false, if the link is empty, not bound, the object doesn't exist in the storage, its changes can't be detected
+		or the storage rejected the data.
+		If the object is not loaded or not changed, or the link is read-only (StorageLink<const T>), there is nothing to save
+		and the result is \c true without access to the storage.
 	*/
 	bool Save() const;
 
@@ -133,12 +143,56 @@ protected:
 	*/
 	void SetData(const istd::IChangeableSharedPtr& dataPtr);
 
+	/**
+		Mark the link as read-only: it can't change the object, so the object is never saved and its state isn't kept at loading.
+	*/
+	void SetReadOnly(bool isReadOnly);
+
+private:
+	/**
+		State of an object for the change detection of Save: its serialization or its clone.
+	*/
+	struct SavedState;
+
+	enum ChangeState
+	{
+		CS_UNCHANGED,
+		CS_CHANGED,
+
+		/**
+			The object can't be compared with its saved state.
+		*/
+		CS_UNKNOWN
+	};
+
+	/**
+		Create the state of the object for the change detection. The state is empty, if the object can't be compared.
+	*/
+	static std::shared_ptr<SavedState> CreateSavedState(const istd::IChangeable& object, const IStorageResolver& resolver);
+	static ChangeState GetChangeState(const SavedState& savedState, const istd::IChangeable& object);
+
+	/**
+		Set the object loaded from the resolver and keep its state for the change detection of Save.
+	*/
+	void SetLoadedData(const istd::IChangeableSharedPtr& dataPtr, const IStorageResolver& resolver) const;
+
+	/**
+		Drop the loaded object and its saved state.
+	*/
+	void ResetData() const;
+
 private:
 	Id m_objectId;
 	QByteArray m_storageId;
 	IStorageResolver* m_resolverPtr;
 	const IStorageResolverProvider* m_providerPtr;
 	mutable istd::IChangeableSharedPtr m_dataPtr;
+	bool m_isReadOnly;
+
+	/**
+		State of the loaded object at loading or at the last saving. It is shared by the copies of the link like the object itself.
+	*/
+	mutable std::shared_ptr<SavedState> m_savedStatePtr;
 };
 
 

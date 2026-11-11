@@ -36,6 +36,7 @@ public:
 	virtual bool RemoveObject(const Id& objectId) override;
 	virtual QVariantMap GetStorageParams(const Id& objectId) const override;
 	virtual bool IsSnapshotStorage() const override;
+	virtual const iser::IVersionInfo* GetVersionInfo() const override;
 
 private:
 	mutable QReadWriteLock m_lock;

@@ -2,7 +2,7 @@
 #include "CStorageLinkTest.h"
 
 
-// std includes
+// STL includes
 #include <algorithm>
 #include <optional>
 
@@ -12,6 +12,10 @@
 
 // ACF includes
 #include <istd/TSingleFactory.h>
+#include <iser/IArchive.h>
+#include <iser/ISerializable.h>
+#include <iser/CArchiveTag.h>
+#include <iser/CMinimalVersionInfo.h>
 #include <iser/CMemoryReadArchive.h>
 #include <iser/CMemoryWriteArchive.h>
 #include <itest/CStandardTestExecutor.h>
@@ -69,6 +73,49 @@ class COtherTestData: public istd::IChangeable
 };
 
 
+/**
+	Serializable data without comparing: its changes can be detected only by serialization.
+*/
+class CSerializableTestData: virtual public iser::ISerializable
+{
+public:
+	CSerializableTestData(int value = 0): m_value(value) {}
+
+	int m_value;
+
+	// reimplemented (iser::ISerializable)
+	virtual bool Serialize(iser::IArchive& archive) override
+	{
+		iser::CArchiveTag valueTag("Value", "Test value", iser::CArchiveTag::TT_LEAF);
+		bool retVal = archive.BeginTag(valueTag);
+		retVal = retVal && archive.Process(m_value);
+		retVal = retVal && archive.EndTag(valueTag);
+
+		return retVal;
+	}
+
+	// reimplemented (istd::IChangeable)
+	virtual int GetSupportedOperations() const override { return SO_CLONE | SO_COPY; }
+
+	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/ = CM_WITHOUT_REFS) override
+	{
+		const CSerializableTestData* sourcePtr = dynamic_cast<const CSerializableTestData*>(&object);
+		if (sourcePtr != nullptr){
+			m_value = sourcePtr->m_value;
+
+			return true;
+		}
+
+		return false;
+	}
+
+	virtual istd::IChangeableUniquePtr CloneMe(CompatibilityMode /*mode*/ = CM_WITHOUT_REFS) const override
+	{
+		return istd::IChangeableUniquePtr(new CSerializableTestData(m_value));
+	}
+};
+
+
 typedef imtbase::StorageLink<CLinkTestData> DataLink;
 typedef istd::TSingleFactory<istd::IChangeable, CLinkTestData> DataFactory;
 
@@ -95,6 +142,34 @@ void SetupCollection(imtbase::CObjectCollection& collection)
 	collection.SetOperationFlags(imtbase::IObjectCollection::OF_ALL);
 	collection.RegisterFactory<DataFactory>(s_typeId);
 }
+
+
+/**
+	Collection resolver counting the writes.
+*/
+class CCountingCollectionResolver: public imtbase::CCollectionStorageResolver
+{
+public:
+	typedef imtbase::CCollectionStorageResolver BaseClass;
+
+	CCountingCollectionResolver(
+				imtbase::IObjectCollection& collection,
+				const QByteArray& typeId = s_typeId,
+				const iser::IVersionInfo* versionInfoPtr = nullptr)
+		:BaseClass(collection, typeId, versionInfoPtr),
+		m_saveCount(0)
+	{
+	}
+
+	virtual bool SaveObject(const Id& objectId, const istd::IChangeable& object) override
+	{
+		++m_saveCount;
+
+		return BaseClass::SaveObject(objectId, object);
+	}
+
+	int m_saveCount;
+};
 
 
 } // namespace
@@ -453,6 +528,160 @@ void CStorageLinkTest::testOptionalInterface()
 	QVERIFY(second.IsNull());
 	QVERIFY(!second);
 	QCOMPARE(storage.GetObjectsCount(), 1);
+}
+
+
+void CStorageLinkTest::testConstLink()
+{
+	imtbase::CObjectCollection collection;
+	SetupCollection(collection);
+
+	imtbase::CCollectionStorageResolver resolver(collection, s_typeId);
+
+	const QByteArray objectId = resolver.InsertObject(CreateData(3));
+
+	// Read-only links are used to follow the references of a data model
+	imtbase::StorageLink<const CLinkTestData> link(objectId);
+	link.SetResolver(&resolver);
+
+	QVERIFY(link);
+	QCOMPARE(link->m_value, 3);
+	QCOMPARE(link.value().m_value, 3);
+
+	istd::TSharedInterfacePtr<const CLinkTestData> objectPtr = link.GetObject();
+	QVERIFY(objectPtr.IsValid());
+	QCOMPARE(objectPtr->m_value, 3);
+
+	imtbase::StorageLink<const COtherTestData> otherLink(objectId);
+	otherLink.SetResolver(&resolver);
+	QVERIFY(!otherLink);
+}
+
+
+void CStorageLinkTest::testConstLinkNeverSaves()
+{
+	imtbase::CObjectCollection collection;
+	SetupCollection(collection);
+
+	CCountingCollectionResolver resolver(collection);
+
+	const QByteArray objectId = resolver.InsertObject(CreateData(4));
+
+	imtbase::StorageLink<const CLinkTestData> link(objectId);
+	link.SetResolver(&resolver);
+	QCOMPARE(link->m_value, 4);
+
+	// A read-only link can't change the object, so saving is a no-op
+	QVERIFY(link.Save());
+	QCOMPARE(resolver.m_saveCount, 0);
+}
+
+
+void CStorageLinkTest::testSaveRemovedObject()
+{
+	imtbase::CObjectCollection collection;
+	SetupCollection(collection);
+
+	imtbase::CCollectionStorageResolver resolver(collection, s_typeId);
+
+	DataLink link = CreateLink(resolver, 1);
+	link->m_value = 2;
+
+	QVERIFY(collection.RemoveElements(imtbase::IObjectCollection::Ids() << link.GetObjectId()));
+
+	// The loaded object of a removed one must not be written back, and must not create a new object
+	QVERIFY(!link.Save());
+	QCOMPARE(collection.GetElementsCount(), 0);
+
+	// Without a loaded object there is nothing to save
+	link.Unload();
+	QVERIFY(link.Save());
+}
+
+
+void CStorageLinkTest::testSaveUnchangedObject()
+{
+	imtbase::CObjectCollection collection;
+	SetupCollection(collection);
+
+	CCountingCollectionResolver resolver(collection);
+
+	DataLink link = CreateLink(resolver, 1);
+	link.Unload();
+
+	// Loaded and not changed: no write, no new revision in the storages with revisions
+	QCOMPARE(link->m_value, 1);
+	QVERIFY(link.Save());
+	QCOMPARE(resolver.m_saveCount, 0);
+
+	link->m_value = 2;
+	QVERIFY(link.Save());
+	QCOMPARE(resolver.m_saveCount, 1);
+
+	// The saved state follows the last saving, also for the copies of the link
+	DataLink copy = link;
+	QVERIFY(link.Save());
+	QVERIFY(copy.Save());
+	QCOMPARE(resolver.m_saveCount, 1);
+
+	// A changed and reverted object is not written either
+	link->m_value = 3;
+	link->m_value = 2;
+	QVERIFY(link.Save());
+	QCOMPARE(resolver.m_saveCount, 1);
+
+	// An object replaced by a different one is written
+	link = CreateData(5);
+	QVERIFY(link.Save());
+	QCOMPARE(resolver.m_saveCount, 2);
+
+	DataLink check(link.GetObjectId());
+	check.SetResolver(&resolver);
+	QCOMPARE(check->m_value, 5);
+}
+
+
+void CStorageLinkTest::testSerializedChangeDetection()
+{
+	using SerializableFactory = istd::TSingleFactory<istd::IChangeable, CSerializableTestData>;
+	using SerializableLink = imtbase::StorageLink<CSerializableTestData>;
+
+	const QByteArray typeId = QByteArrayLiteral("SerializableTestData");
+
+	imtbase::CObjectCollection collection;
+	collection.SetOperationFlags(imtbase::IObjectCollection::OF_ALL);
+	collection.RegisterFactory<SerializableFactory>(typeId);
+
+	CSerializableTestData versionSource;
+	iser::CMinimalVersionInfo versionInfo(&versionSource);
+
+	// With the version info the object is compared by serialization
+	CCountingCollectionResolver resolver(collection, typeId, &versionInfo);
+
+	SerializableLink link(resolver.InsertObject(istd::TSharedInterfacePtr<CSerializableTestData>(new CSerializableTestData(1))));
+	link.SetResolver(&resolver);
+
+	QCOMPARE(link->m_value, 1);
+	QVERIFY(link.Save());
+	QCOMPARE(resolver.m_saveCount, 0);
+
+	link->m_value = 2;
+	QVERIFY(link.Save());
+	QCOMPARE(resolver.m_saveCount, 1);
+
+	QVERIFY(link.Save());
+	QCOMPARE(resolver.m_saveCount, 1);
+
+	// Without the version info and without comparing the changes can't be detected: the object is not written at all
+	CCountingCollectionResolver blindResolver(collection, typeId);
+
+	SerializableLink blindLink(link.GetObjectId());
+	blindLink.SetResolver(&blindResolver);
+	QCOMPARE(blindLink->m_value, 2);
+
+	blindLink->m_value = 3;
+	QVERIFY(!blindLink.Save());
+	QCOMPARE(blindResolver.m_saveCount, 0);
 }
 
 

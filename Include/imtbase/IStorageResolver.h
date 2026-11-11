@@ -10,6 +10,7 @@
 // ACF includes
 #include <istd/IChangeable.h>
 #include <istd/IPolymorphic.h>
+#include <iser/IVersionInfo.h>
 
 
 namespace imtbase
@@ -36,7 +37,8 @@ public:
 	virtual istd::IChangeableSharedPtr LoadObject(const Id& objectId) const = 0;
 
 	/**
-		Save the object under the given ID. The object must already exist in the storage.
+		Save the object under the given ID. The object must already exist in the storage:
+		for a missing object the method fails and never creates one.
 	*/
 	virtual bool SaveObject(const Id& objectId, const istd::IChangeable& object) = 0;
 
@@ -65,6 +67,14 @@ public:
 		If \c false, LoadObject returns the live stored instance.
 	*/
 	virtual bool IsSnapshotStorage() const = 0;
+
+	/**
+		Get the version info used to serialize the objects of this storage.
+		StorageLink compares the serialized objects to detect their changes. Without the version info the data of newer versions
+		would be skipped, so serialization is not used and the change detection falls back to istd::IChangeable::IsEqual.
+		\return Version info or \c nullptr, if not available.
+	*/
+	virtual const iser::IVersionInfo* GetVersionInfo() const = 0;
 };
 
 

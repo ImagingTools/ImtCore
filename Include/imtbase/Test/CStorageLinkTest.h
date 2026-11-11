@@ -28,5 +28,10 @@ private slots:
 	void testSerialization();
 	void testLinksInContainer();
 	void testOptionalInterface();
+	void testConstLink();
+	void testConstLinkNeverSaves();
+	void testSaveRemovedObject();
+	void testSaveUnchangedObject();
+	void testSerializedChangeDetection();
 	void cleanupTestCase();
 };

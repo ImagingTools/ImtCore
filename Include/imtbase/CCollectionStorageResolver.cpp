@@ -6,9 +6,13 @@ namespace imtbase
 {
 
 
-CCollectionStorageResolver::CCollectionStorageResolver(IObjectCollection& collection, const QByteArray& typeId)
+CCollectionStorageResolver::CCollectionStorageResolver(
+			IObjectCollection& collection,
+			const QByteArray& typeId,
+			const iser::IVersionInfo* versionInfoPtr)
 	:m_collectionPtr(&collection),
-	m_typeId(typeId)
+	m_typeId(typeId),
+	m_versionInfoPtr(versionInfoPtr)
 {
 }
 
@@ -33,6 +37,16 @@ istd::IChangeableSharedPtr CCollectionStorageResolver::LoadObject(const Id& obje
 bool CCollectionStorageResolver::SaveObject(const Id& objectId, const istd::IChangeable& object)
 {
 	if (m_collectionPtr == nullptr){
+		return false;
+	}
+
+	/**
+		Collections differ for a missing object: the in-memory, file and remote ones fail, a database table delegate
+		reports success for an UPDATE of no rows, and the JSON document delegate may insert a new row.
+		The type-ID is the existence check available for all of them. In a database it still reads the row,
+		but this happens only for a changed object: StorageLink doesn't save an unchanged one.
+	*/
+	if (m_collectionPtr->GetObjectTypeId(objectId).isEmpty()){
 		return false;
 	}
 
@@ -81,18 +95,29 @@ bool CCollectionStorageResolver::IsSnapshotStorage() const
 }
 
 
+const iser::IVersionInfo* CCollectionStorageResolver::GetVersionInfo() const
+{
+	return m_versionInfoPtr;
+}
+
+
 // protected methods
 
 CCollectionStorageResolver::CCollectionStorageResolver()
-	:m_collectionPtr(nullptr)
+	:m_collectionPtr(nullptr),
+	m_versionInfoPtr(nullptr)
 {
 }
 
 
-void CCollectionStorageResolver::SetCollection(IObjectCollection* collectionPtr, const QByteArray& typeId)
+void CCollectionStorageResolver::SetCollection(
+			IObjectCollection* collectionPtr,
+			const QByteArray& typeId,
+			const iser::IVersionInfo* versionInfoPtr)
 {
 	m_collectionPtr = collectionPtr;
 	m_typeId = typeId;
+	m_versionInfoPtr = versionInfoPtr;
 }
 
 

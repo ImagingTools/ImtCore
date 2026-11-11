@@ -49,10 +49,39 @@ Applications assembled from compositions bind the links there instead of in code
 
 | Component | Attributes and references |
 |---|---|
-| `CollectionStorageResolver` (`CCollectionStorageResolverComp`) | `Collection`: the collection used as the storage. `TypeId`: the type-ID of the objects created by `InsertObject`. |
+| `CollectionStorageResolver` (`CCollectionStorageResolverComp`) | `Collection`: the collection used as the storage. `TypeId`: the type-ID of the objects created by `InsertObject`. `VersionInfo`: the version info of the application, for the change detection of `Save()` (see [Saving](#saving)). |
 | `StorageResolverRegistry` (`CStorageResolverRegistryComp`) | `StorageIds` and `StorageResolvers`: the resolver at a position of the list serves the storage ID at the same position; an empty ID is the default resolver. `IsDefaultProvider`: the registry becomes the provider of all links without own binding while the component exists. |
 
 Only one registry of a process should have `IsDefaultProvider` enabled. On destruction the registry clears the default provider only if it is still the registered one.
+
+## Links in data classes
+
+`StorageLinkBase::Serialize` writes its own `ObjectId` and `StorageId` tags. A data class that already stores the ID of a referenced object keeps the ID member and its archive tag, so the stored documents stay readable, and builds the link in its getter:
+
+```cpp
+imtbase::StorageLink<const imtgeo::IAddressElementInfo> CDevice::GetAddress() const
+{
+	return imtbase::StorageLink<const imtgeo::IAddressElementInfo>(m_addressId, "Address");
+}
+```
+
+Link the read-only interface (`const T`) when the caller follows a reference. The referenced object is loaded by each link separately, so keep the link in a local variable when it is used more than once.
+
+## Saving
+
+`Save()` never writes an unchanged object. Every write loads the storage, and a storage with revisions gets a new revision on every write. No collection skips unchanged data by itself.
+
+A link to a snapshot storage keeps the state of the object as it was loaded (or last saved) and compares the object with it:
+
+1. By serialization, if the object is `iser::ISerializable` and the resolver has version info (`IStorageResolver::GetVersionInfo`, the `VersionInfo` reference of the resolver component). This compares exactly the persisted data. Without the version info the data of newer versions would be skipped, so it is not used.
+2. Otherwise by `IsEqual` of a clone, if the class declares `SO_CLONE` and `SO_COMPARE`.
+3. Otherwise the change can't be detected: `Save()` doesn't write and returns `false`.
+
+An object set by `operator=` before any loading is compared with the stored object.
+
+A read-only link (`StorageLink<const T>`) can't change its object: it keeps no state at loading and its `Save()` never writes.
+
+`Save()` of a missing object fails and doesn't create it. Collections differ here: in-memory, file and remote collections fail, a SQL table delegate reports success for an `UPDATE` of no rows, and the JSON document delegate may insert a row. The collection resolver therefore checks the type-ID first. In a database that reads the row, but only a changed object gets that far.
 
 ## Related types
 

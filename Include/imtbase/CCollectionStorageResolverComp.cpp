@@ -14,7 +14,10 @@ void CCollectionStorageResolverComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	SetCollection(m_collectionCompPtr.GetPtr(), *m_typeIdAttrPtr);
+	SetCollection(
+				m_collectionCompPtr.GetPtr(),
+				*m_typeIdAttrPtr,
+				m_versionInfoCompPtr.GetPtr());
 }
 
 
