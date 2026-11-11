@@ -34,6 +34,25 @@ istd::IChangeableSharedPtr CCollectionStorageResolver::LoadObject(const Id& obje
 }
 
 
+IStorageResolver::Objects CCollectionStorageResolver::LoadObjects(const QSet<Id>& objectIds) const
+{
+	Objects retVal;
+
+	if ((m_collectionPtr == nullptr) || objectIds.isEmpty()){
+		return retVal;
+	}
+
+	for (const Id& objectId : objectIds){
+		const istd::IChangeableSharedPtr objectPtr = LoadObject(objectId);
+		if (objectPtr.IsValid()){
+			retVal.insert(objectId, objectPtr);
+		}
+	}
+
+	return retVal;
+}
+
+
 bool CCollectionStorageResolver::SaveObject(const Id& objectId, const istd::IChangeable& object)
 {
 	if (m_collectionPtr == nullptr){

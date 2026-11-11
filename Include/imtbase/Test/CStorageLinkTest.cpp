@@ -145,7 +145,7 @@ void SetupCollection(imtbase::CObjectCollection& collection)
 
 
 /**
-	Collection resolver counting the writes.
+	Collection resolver counting the storage accesses.
 */
 class CCountingCollectionResolver: public imtbase::CCollectionStorageResolver
 {
@@ -157,8 +157,24 @@ public:
 				const QByteArray& typeId = s_typeId,
 				const iser::IVersionInfo* versionInfoPtr = nullptr)
 		:BaseClass(collection, typeId, versionInfoPtr),
+		m_loadCount(0),
+		m_loadManyCount(0),
 		m_saveCount(0)
 	{
+	}
+
+	virtual istd::IChangeableSharedPtr LoadObject(const Id& objectId) const override
+	{
+		++m_loadCount;
+
+		return BaseClass::LoadObject(objectId);
+	}
+
+	virtual Objects LoadObjects(const QSet<Id>& objectIds) const override
+	{
+		++m_loadManyCount;
+
+		return BaseClass::LoadObjects(objectIds);
 	}
 
 	virtual bool SaveObject(const Id& objectId, const istd::IChangeable& object) override
@@ -168,6 +184,8 @@ public:
 		return BaseClass::SaveObject(objectId, object);
 	}
 
+	mutable int m_loadCount;
+	mutable int m_loadManyCount;
 	int m_saveCount;
 };
 
@@ -574,6 +592,15 @@ void CStorageLinkTest::testConstLinkNeverSaves()
 	// A read-only link can't change the object, so saving is a no-op
 	QVERIFY(link.Save());
 	QCOMPARE(resolver.m_saveCount, 0);
+
+	// Copies and batch loaded links stay read-only
+	QList<imtbase::StorageLink<const CLinkTestData>> links;
+	links.append(link);
+	links.last().Unload();
+	imtbase::StorageLinkBase::LoadAll(links);
+	QVERIFY(links.last().IsLoaded());
+	QVERIFY(links.last().Save());
+	QCOMPARE(resolver.m_saveCount, 0);
 }
 
 
@@ -638,6 +665,51 @@ void CStorageLinkTest::testSaveUnchangedObject()
 	DataLink check(link.GetObjectId());
 	check.SetResolver(&resolver);
 	QCOMPARE(check->m_value, 5);
+}
+
+
+void CStorageLinkTest::testLoadAll()
+{
+	imtbase::CObjectCollection collection;
+	SetupCollection(collection);
+
+	CCountingCollectionResolver resolver(collection);
+
+	QList<DataLink> links;
+	for (int i = 0; i < 3; ++i){
+		links.append(CreateLink(resolver, i));
+		links.last().Unload();
+	}
+
+	DataLink missing("missing-id");
+	missing.SetResolver(&resolver);
+	links.append(missing);
+	links.append(DataLink());
+
+	resolver.m_loadCount = 0;
+
+	imtbase::StorageLinkBase::LoadAll(links);
+
+	// One batch request for all links of the resolver, no loading of the single objects by the links
+	QCOMPARE(resolver.m_loadManyCount, 1);
+	for (int i = 0; i < 3; ++i){
+		QVERIFY(links[i].IsLoaded());
+		QCOMPARE(links[i]->m_value, i);
+	}
+	// The collection resolver loads the requested objects one by one inside LoadObjects, the missing one too
+	QCOMPARE(resolver.m_loadCount, 4);
+
+	QVERIFY(!links[3].IsLoaded());
+	QVERIFY(!links[4].IsLoaded());
+
+	// Loaded links are skipped: only the missing object is requested again
+	imtbase::StorageLinkBase::LoadAll(links);
+	QCOMPARE(resolver.m_loadManyCount, 2);
+	QCOMPARE(resolver.m_loadCount, 5);
+
+	// Batch loaded objects keep the change detection of Save
+	QVERIFY(links[0].Save());
+	QCOMPARE(resolver.m_saveCount, 0);
 }
 
 

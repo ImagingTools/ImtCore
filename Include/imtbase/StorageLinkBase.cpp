@@ -8,6 +8,8 @@
 
 // Qt includes
 #include <QtCore/QDebug>
+#include <QtCore/QHash>
+#include <QtCore/QSet>
 #include <QtCore/QtGlobal>
 
 // ACF includes
@@ -208,6 +210,41 @@ bool StorageLinkBase::Save() const
 	}
 
 	return true;
+}
+
+
+void StorageLinkBase::LoadLinks(const QList<const StorageLinkBase*>& links)
+{
+	using LinkResolver = std::pair<const StorageLinkBase*, IStorageResolver*>;
+
+	QList<LinkResolver> linksToLoad;
+	QHash<IStorageResolver*, QSet<Id>> objectIdsByResolver;
+
+	for (const StorageLinkBase* linkPtr : links){
+		if ((linkPtr == nullptr) || linkPtr->IsNull() || linkPtr->IsLoaded()){
+			continue;
+		}
+
+		IStorageResolver* resolverPtr = linkPtr->GetResolver();
+		if (resolverPtr == nullptr){
+			continue;
+		}
+
+		linksToLoad.append(LinkResolver(linkPtr, resolverPtr));
+		objectIdsByResolver[resolverPtr].insert(linkPtr->m_objectId);
+	}
+
+	QHash<IStorageResolver*, IStorageResolver::Objects> objectsByResolver;
+	for (auto iter = objectIdsByResolver.cbegin(); iter != objectIdsByResolver.cend(); ++iter){
+		objectsByResolver.insert(iter.key(), iter.key()->LoadObjects(iter.value()));
+	}
+
+	for (const LinkResolver& linkResolver : std::as_const(linksToLoad)){
+		const istd::IChangeableSharedPtr dataPtr = objectsByResolver.value(linkResolver.second).value(linkResolver.first->m_objectId);
+		if (dataPtr.IsValid()){
+			linkResolver.first->SetLoadedData(dataPtr, *linkResolver.second);
+		}
+	}
 }
 
 

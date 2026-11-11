@@ -8,7 +8,7 @@ The data model keeps only the link; the way of storing is chosen at run time by 
 | Type | Role |
 |---|---|
 | `StorageLink<T>` / `StorageLinkBase` | The link. Serializes only the object ID and the logical storage ID. `->` returns the object, loading it on demand. |
-| `IStorageResolver` | Loads, saves, inserts and removes objects by ID and reports storage parameters. |
+| `IStorageResolver` | Loads (also several at once), saves, inserts and removes objects by ID and reports storage parameters. |
 | `IStorageResolverProvider` | Returns a resolver by the logical storage ID. |
 | `CStorageResolverRegistry` | Provider implementation filled by the application. |
 | `CMemoryStorageResolver` | Objects in memory. Live instances: changes are visible to all links at once. |
@@ -83,6 +83,23 @@ A read-only link (`StorageLink<const T>`) can't change its object: it keeps no s
 
 `Save()` of a missing object fails and doesn't create it. Collections differ here: in-memory, file and remote collections fail, a SQL table delegate reports success for an `UPDATE` of no rows, and the JSON document delegate may insert a row. The collection resolver therefore checks the type-ID first. In a database that reads the row, but only a changed object gets that far.
 
+## Lists
+
+Each link loads its object with its own storage access: a list of N links makes N queries. Load the links of a list together before accessing them:
+
+```cpp
+QList<imtbase::StorageLink<const imtgeo::IAddressElementInfo>> addresses;
+for (const CDevice& device : devices){
+	addresses.append(device.GetAddress());
+}
+
+imtbase::StorageLinkBase::LoadAll(addresses);
+```
+
+`LoadAll` asks each resolver once for all its objects (`IStorageResolver::LoadObjects`). Links to the same object loaded together share the loaded instance, as copies of a link do.
+
+How many accesses that takes is up to the resolver: a resolver of a storage that can read several objects at once implements `LoadObjects` that way. The collection resolver works with any `IObjectCollection` (in-memory, database, file, remote), which has no access to several objects by their IDs, so it loads them one by one.
+
 ## Related types
 
 - `ICollectionObjectLink` / `CObjectLink` keep the object ID together with a pointer to the collection instance and resolve against that instance only. There is no late binding.
@@ -111,7 +128,7 @@ Differences to `std::optional`: copies of a link refer to the same stored object
 - Set the default provider once at the application start, before links are used from other threads. The provider and resolvers must outlive all links.
 - A single link instance is not thread-safe. Copies of a link share the loaded object.
 - Check `GetResolver()` or `GetObject().IsValid()` where the binding is not guaranteed; `operator->` asserts that the object exists.
-- Access through a link may be slow (database, network). Load explicitly with `GetObject()` in loops.
+- Access through a link may be slow (database, network). Load the links of a list with `StorageLinkBase::LoadAll()`.
 - Removing an object does not update other links to it: they stay dangling and resolve to nothing.
 
 ## Tests

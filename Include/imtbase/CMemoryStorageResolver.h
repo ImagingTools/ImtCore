@@ -31,6 +31,7 @@ public:
 
 	// reimplemented (imtbase::IStorageResolver)
 	virtual istd::IChangeableSharedPtr LoadObject(const Id& objectId) const override;
+	virtual Objects LoadObjects(const QSet<Id>& objectIds) const override;
 	virtual bool SaveObject(const Id& objectId, const istd::IChangeable& object) override;
 	virtual Id InsertObject(const istd::IChangeableSharedPtr& objectPtr, const QString& name = QString()) override;
 	virtual bool RemoveObject(const Id& objectId) override;

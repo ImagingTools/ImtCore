@@ -28,6 +28,23 @@ istd::IChangeableSharedPtr CMemoryStorageResolver::LoadObject(const Id& objectId
 }
 
 
+IStorageResolver::Objects CMemoryStorageResolver::LoadObjects(const QSet<Id>& objectIds) const
+{
+	Objects retVal;
+
+	QReadLocker locker(&m_lock);
+
+	for (const Id& objectId : objectIds){
+		const istd::IChangeableSharedPtr objectPtr = m_objects.value(objectId);
+		if (objectPtr.IsValid()){
+			retVal.insert(objectId, objectPtr);
+		}
+	}
+
+	return retVal;
+}
+
+
 bool CMemoryStorageResolver::SaveObject(const Id& objectId, const istd::IChangeable& object)
 {
 	istd::IChangeableSharedPtr storedPtr = LoadObject(objectId);

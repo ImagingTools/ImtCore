@@ -32,6 +32,7 @@ private slots:
 	void testConstLinkNeverSaves();
 	void testSaveRemovedObject();
 	void testSaveUnchangedObject();
+	void testLoadAll();
 	void testSerializedChangeDetection();
 	void cleanupTestCase();
 };

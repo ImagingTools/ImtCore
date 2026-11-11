@@ -4,6 +4,8 @@
 
 // Qt includes
 #include <QtCore/QByteArray>
+#include <QtCore/QHash>
+#include <QtCore/QSet>
 #include <QtCore/QString>
 #include <QtCore/QVariantMap>
 
@@ -28,6 +30,7 @@ class IStorageResolver: virtual public istd::IPolymorphic
 {
 public:
 	typedef QByteArray Id;
+	typedef QHash<Id, istd::IChangeableSharedPtr> Objects;
 
 	/**
 		Load the object with the given ID.
@@ -35,6 +38,13 @@ public:
 		\sa IsSnapshotStorage
 	*/
 	virtual istd::IChangeableSharedPtr LoadObject(const Id& objectId) const = 0;
+
+	/**
+		Load several objects at once, with as few storage accesses as the storage allows.
+		\return The loaded objects by their IDs. A missing object is not contained in the result.
+		\sa LoadObject
+	*/
+	virtual Objects LoadObjects(const QSet<Id>& objectIds) const = 0;
 
 	/**
 		Save the object under the given ID. The object must already exist in the storage:

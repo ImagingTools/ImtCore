@@ -16,6 +16,7 @@ namespace imtbase
 	The resolver doesn't own the data: all operations are delegated to the collection, which is responsible for the thread safety.
 	The collection returns the copy of the stored data, so the resolver has the snapshot semantic: use StorageLink::Save to write the changes back.
 	One resolver serves objects of a single collection type-ID.
+	IObjectCollection has no access to several objects by their IDs, so LoadObjects loads them one by one.
 	\ingroup Collection
 */
 class CCollectionStorageResolver: virtual public IStorageResolver
@@ -33,6 +34,7 @@ public:
 
 	// reimplemented (imtbase::IStorageResolver)
 	virtual istd::IChangeableSharedPtr LoadObject(const Id& objectId) const override;
+	virtual Objects LoadObjects(const QSet<Id>& objectIds) const override;
 	virtual bool SaveObject(const Id& objectId, const istd::IChangeable& object) override;
 	virtual Id InsertObject(const istd::IChangeableSharedPtr& objectPtr, const QString& name = QString()) override;
 	virtual bool RemoveObject(const Id& objectId) override;

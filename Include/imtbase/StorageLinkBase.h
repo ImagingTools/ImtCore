@@ -9,6 +9,7 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QString>
 #include <QtCore/QVariantMap>
+#include <QtCore/QList>
 
 // ACF includes
 #include <istd/IChangeable.h>
@@ -122,6 +123,15 @@ public:
 	bool Save() const;
 
 	/**
+		Load the objects of several links with one storage access per resolver (see IStorageResolver::LoadObjects).
+		Use it before accessing the links of a list, instead of loading each link separately.
+		Links that are null, already loaded or not bound are skipped; a link of a missing object stays unloaded.
+		\param links	Container of the links (e.g. QList<StorageLink<T>>).
+	*/
+	template <class Container>
+	static void LoadAll(const Container& links);
+
+	/**
 		Remove the linked object from the storage and reset the link.
 	*/
 	bool Remove();
@@ -165,6 +175,8 @@ private:
 		CS_UNKNOWN
 	};
 
+	static void LoadLinks(const QList<const StorageLinkBase*>& links);
+
 	/**
 		Create the state of the object for the change detection. The state is empty, if the object can't be compared.
 	*/
@@ -194,6 +206,21 @@ private:
 	*/
 	mutable std::shared_ptr<SavedState> m_savedStatePtr;
 };
+
+
+// public template methods
+
+template <class Container>
+void StorageLinkBase::LoadAll(const Container& links)
+{
+	QList<const StorageLinkBase*> linkPtrs;
+	linkPtrs.reserve(links.size());
+	for (const StorageLinkBase& link : links){
+		linkPtrs.append(&link);
+	}
+
+	LoadLinks(linkPtrs);
+}
 
 
 } // namespace imtbase
