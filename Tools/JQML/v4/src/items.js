@@ -2222,6 +2222,10 @@ function elidedWidth(info, text, limit) {
 	return used;
 }
 
+// Qt measures a line with the advances of the font rounded to whole pixels, the engine with the real ones: a bold figure in a box that
+// was measured with the regular font differs by a fraction of a pixel. A line that is no more than a pixel too wide is not cut.
+const ELIDE_SLACK = 1;
+
 // The text of a line that does not fit: the characters that stay and the ellipsis, as Qt's elidedText cuts them
 // (0 the start, 1 the end, 2 the middle). A cut text is strictly narrower than the limit.
 function elidedText(info, text, limit, mode) {
@@ -2423,7 +2427,7 @@ export class Text extends Item {
 		let width = 0;
 		for (let i = 0; i < lines.length; i++) {
 			widths[i] = textWidth(info, lines[i]);
-			if (elideLimit > 0 && lines.length === 1 && widths[i] > elideLimit) {
+			if (elideLimit > 0 && lines.length === 1 && widths[i] > elideLimit + ELIDE_SLACK) {
 				lines[i] = elidedText(info, lines[i], elideLimit, this.$elide);
 				widths[i] = textWidth(info, lines[i]);
 			}
@@ -2451,7 +2455,7 @@ export class Text extends Item {
 		const natural = blockMetrics(info, source, false, Infinity);
 		const laid = wrap ? blockMetrics(info, source, true, explicit) : natural;
 		let contentWidth = laid.max;
-		if (!rich && !wrap && this.$elide !== 3 && this.$elide !== 'ElideNone' && explicit > 0 && natural.max > explicit) contentWidth = textWidth(info, elidedText(info, source, explicit, this.$elide));
+		if (!rich && !wrap && this.$elide !== 3 && this.$elide !== 'ElideNone' && explicit > 0 && natural.max > explicit + ELIDE_SLACK) contentWidth = textWidth(info, elidedText(info, source, explicit, this.$elide));
 		if (rich && explicit > 0) contentWidth = Math.max(explicit, laid.max);
 		const factor = this.$lineHeight > 0 ? this.$lineHeight : 1;
 		const step = (rich ? info.lineSpacing : info.lineHeight) * factor;
@@ -6155,6 +6159,8 @@ export class Repeater extends Item {
 		this.$lastModel = undefined;
 		this.$lastVersion = -1;
 		this.$lastCount = -1;
+		this.$declareSignal('itemAdded', ['index', 'item']);
+		this.$declareSignal('itemRemoved', ['index', 'item']);
 	}
 
 	itemAt(index) {

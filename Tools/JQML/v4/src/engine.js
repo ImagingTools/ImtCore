@@ -1595,12 +1595,16 @@ export class Engine {
 			const delegate = this.repeaterDelegate(repeater);
 			const stay = delegate === null ? new Map() : this.repeaterDelegatesThatStay(repeater);
 			const kept = new Set(stay.values());
-			for (const old of repeater.$built) {
+			const removed = [];
+			for (let i = 0; i < repeater.$built.length; i++) {
+				const old = repeater.$built[i];
 				if (kept.has(old)) continue;
+				removed.push([i, old]);
 				this.releaseSubtree(old);
 				parent.$removeChild(old);
 			}
 			repeater.$built = [];
+			for (const [index, old] of removed) repeater.$emit('itemRemoved', [index, old]);
 
 			if (delegate === null) return;
 			if (count > MAX_REPEATER_COUNT) count = MAX_REPEATER_COUNT;
@@ -1622,6 +1626,7 @@ export class Engine {
 				this.placeRepeaterItems(repeater, parent, [item]);
 				repeater.$built.push(item);
 				this.runCompletedFrom(mark);
+				repeater.$emit('itemAdded', [i, item]);
 			}
 			this.indexTrack = outer;
 			parent.$update();
@@ -1653,6 +1658,7 @@ export class Engine {
 				repeater.$built.push(item);
 				parent.$update();
 				this.runCompletedFrom(mark);
+				repeater.$emit('itemAdded', [index, item]);
 				count = Math.min(modelCount(repeater.$model), MAX_REPEATER_COUNT);
 			}
 			repeater.$lastModel = repeater.$model;
