@@ -2222,6 +2222,30 @@ function elidedWidth(info, text, limit) {
 	return used;
 }
 
+// The text of a line that does not fit: the characters that stay and the ellipsis, as Qt's elidedText cuts them
+// (0 the start, 1 the end, 2 the middle). A cut text is strictly narrower than the limit.
+function elidedText(info, text, limit, mode) {
+	const ellipsis = info.advance('…');
+	const chars = Array.from(text);
+	if (!(ellipsis < limit)) return '';
+	const fits = (value) => textWidth(info, value) < limit;
+	let best = '…';
+	for (let cut = 1; cut <= chars.length; cut++) {
+		const keep = chars.length - cut;
+		let value;
+		if (mode === 0) value = '…' + chars.slice(cut).join('');
+		else if (mode === 2) {
+			const left = Math.floor(keep / 2);
+			value = chars.slice(0, left).join('') + '…' + chars.slice(left + cut).join('');
+		} else value = chars.slice(0, keep).join('') + '…';
+		if (fits(value)) {
+			best = value;
+			break;
+		}
+	}
+	return best;
+}
+
 function wraps(mode) {
 	if (typeof mode === 'number') return mode === 1 || mode === 3 || mode === 4;
 	return mode === 'WordWrap' || mode === 'Wrap' || mode === 'WrapAnywhere' || mode === 'WrapAtWordBoundaryOrAnywhere';
@@ -2381,13 +2405,15 @@ export class Text extends Item {
 		const explicit = this.$w > 0 ? this.$w : this.$aw > 0 ? this.$aw : 0;
 		const wrap = explicit > 0 && wraps(this.$wrap);
 		const limit = wrap ? explicit : Infinity;
+		const elideLimit = !rich && !wrap && (this.$elide === 0 || this.$elide === 1 || this.$elide === 2) ? explicit : 0;
 		if (
 			lay !== null &&
 			lay.version === fonts.version &&
 			lay.family === family &&
 			lay.source === source &&
 			lay.wrap === wrap &&
-			lay.limit === limit
+			lay.limit === limit &&
+			lay.elideLimit === elideLimit
 		) {
 			return lay;
 		}
@@ -2397,9 +2423,13 @@ export class Text extends Item {
 		let width = 0;
 		for (let i = 0; i < lines.length; i++) {
 			widths[i] = textWidth(info, lines[i]);
+			if (elideLimit > 0 && lines.length === 1 && widths[i] > elideLimit) {
+				lines[i] = elidedText(info, lines[i], elideLimit, this.$elide);
+				widths[i] = textWidth(info, lines[i]);
+			}
 			width = Math.max(width, widths[i]);
 		}
-		lay = { version: fonts.version, family, info, source, wrap, limit, lines, widths, width };
+		lay = { version: fonts.version, family, info, source, wrap, limit, elideLimit, lines, widths, width };
 		this.$lay = lay;
 		return lay;
 	}
@@ -2421,7 +2451,7 @@ export class Text extends Item {
 		const natural = blockMetrics(info, source, false, Infinity);
 		const laid = wrap ? blockMetrics(info, source, true, explicit) : natural;
 		let contentWidth = laid.max;
-		if (!rich && !wrap && this.$elide !== 3 && this.$elide !== 'ElideNone' && explicit > 0 && natural.max > explicit) contentWidth = elidedWidth(info, source, explicit);
+		if (!rich && !wrap && this.$elide !== 3 && this.$elide !== 'ElideNone' && explicit > 0 && natural.max > explicit) contentWidth = textWidth(info, elidedText(info, source, explicit, this.$elide));
 		if (rich && explicit > 0) contentWidth = Math.max(explicit, laid.max);
 		const factor = this.$lineHeight > 0 ? this.$lineHeight : 1;
 		const step = (rich ? info.lineSpacing : info.lineHeight) * factor;
@@ -2511,6 +2541,11 @@ defineField(Text.prototype, 'elide', '$elide', toElideMode);
 defineField(Text.prototype, 'horizontalAlignment', '$hAlign', toFloat);
 defineField(Text.prototype, 'textFormat', '$format', (value) => (value === undefined || value === null ? 'PlainText' : String(value)));
 defineField(Text.prototype, 'lineHeight', '$lineHeight', toFloat);
+// True when an elide mode cut the text (a text that does not fit and does not wrap).
+defineReadOnly(Text.prototype, 'truncated', function () {
+	const lay = this.$measure();
+	return lay.elideLimit > 0 && lay.lines.length === 1 && lay.lines[0] !== lay.source;
+});
 defineReadOnly(Text.prototype, 'contentWidth', function () {
 	return this.$metrics().contentWidth;
 });
