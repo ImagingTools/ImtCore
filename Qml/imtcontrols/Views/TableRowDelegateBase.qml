@@ -76,13 +76,30 @@ Rectangle {
 
 	property string selectedColor: Style.selectedColor;
 	// Off for rows that paint their own selection (e.g. rounded list items).
-	property bool focusOutlineVisible: true;
+	property bool focusOutlineVisible: Style.enableTableFocusOutline;
 	// Solid hover fill (replaces selectedColor * hoverOpacity).
 	property string hoverColor: Style.hover;
 
 	readonly property bool isHovered: tableDelegateContainer.tableItem
 			&& tableDelegateContainer.tableItem.hoverEnabled
 			&& ma.containsMouse
+
+	readonly property bool hasCellColor: tableDelegateContainer.cellColor !== "transparent";
+	readonly property bool isAlternatingCell: tableDelegateContainer.tableItem.enableAlternating
+			&& tableDelegateContainer.tableItem.alternatingCellColor !== "transparent"
+			&& tableDelegateContainer.rowIndex % 2 == 1;
+
+	// The background of the cells of the row, shared by the cells and the cell of the checkbox column.
+	// Cells paint it only when hasCellColor is set; otherwise the row's own background shows through.
+	readonly property var cellBackgroundColor: tableDelegateContainer.selected ? tableDelegateContainer.selectedColor :
+			tableDelegateContainer.isAlternatingCell ? tableDelegateContainer.tableItem.alternatingCellColor : tableDelegateContainer.cellColor;
+
+	readonly property bool isFirstRow: tableDelegateContainer.rowIndex == 0;
+	readonly property bool isLastRow: tableDelegateContainer.rowIndex == tableDelegateContainer.tableItem.elementsCount - 1;
+
+	// The separators between the rows, shared by the cells and the cell of the checkbox column.
+	readonly property int topSeparatorHeight: tableDelegateContainer.rowIndex > 0 || (tableDelegateContainer.isFirstRow && tableDelegateContainer.visibleTopBorderFirst) ? tableDelegateContainer.horizontalBorderSize : 0;
+	readonly property int bottomSeparatorHeight: tableDelegateContainer.isLastRow && tableDelegateContainer.visibleBottomBorderLast ? tableDelegateContainer.horizontalBorderSize : 0;
 
 	// Priority: selected > hover > zebra stripe > transparent.
 	function rowBackgroundColor(){
@@ -163,7 +180,26 @@ Rectangle {
 			tableItem.properties.stateItemsChanged.connect(tableDelegateContainer.enabledItemsChanged);
 			ma.visible = tableItem.hoverEnabled
 			if (tableItem.checkable){
-				checkBox.createObject(tableDelegateContainer)
+				tableDelegateContainer.createCheckBox()
+			}
+		}
+	}
+
+	// The checkbox is made when the table becomes checkable, so a row built before that gets it too.
+	property Item checkBoxItem: null;
+
+	function createCheckBox(){
+		if (!tableDelegateContainer.checkBoxItem){
+			tableDelegateContainer.checkBoxItem = checkBox.createObject(tableDelegateContainer)
+		}
+	}
+
+	Connections {
+		target: tableDelegateContainer.tableItem;
+
+		function onCheckableChanged(){
+			if (tableDelegateContainer.tableItem.checkable){
+				tableDelegateContainer.createCheckBox()
 			}
 		}
 	}
@@ -390,7 +426,8 @@ Rectangle {
 			objectName: "RowCheckBox";
 			z: 1000;
 
-			anchors.verticalCenter: parent.verticalCenter;
+			anchors.top: parent.top;
+			anchors.topMargin: (tableDelegateContainer.contentHeight - height) / 2;
 			anchors.left: parent.left;
 			anchors.leftMargin: Style.marginM;
 			
