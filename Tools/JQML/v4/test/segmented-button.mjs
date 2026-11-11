@@ -13,6 +13,7 @@ const core = fileURLToPath(new URL('../../../../', import.meta.url));
 const source = `
 	import QtQuick 2.12
 	import imtcontrols 1.0
+	Item {
 	Loader {
 		sourceComponent: Component {
 			SegmentedButton {
@@ -26,6 +27,7 @@ const source = `
 				Button { text: "Error"; iconSource: "error.svg" }
 			}
 		}
+	}
 	}
 `;
 const project = new Project({
@@ -47,7 +49,8 @@ await project.load('Main.qml');
 const engine = new Engine();
 engine.lenient = true;
 const host = new Item();
-const loader = engine.load(project, host);
+// The Loader has no size of its own (a Loader that fills a host gives its size to the item it loads, as in Qt).
+const loader = engine.load(project, host).$children[0];
 const settle = () => {
 	for (let n = 0; n < 8; n++) {
 		host.$layout();

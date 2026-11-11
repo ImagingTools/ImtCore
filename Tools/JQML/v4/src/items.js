@@ -3513,7 +3513,8 @@ export class ListView extends Item {
 
 		const horizontal = this.$horizontal;
 		if (this.$rowHeight <= 0) {
-			const probe = this.createDelegate(0);
+			// The first row may have its delegate already (a model change keeps the delegates of the rows that stay and measures again).
+			const probe = this.$delegates.get(0) || this.createDelegate(0);
 			if (probe === null) {
 				this.createDelegate = null;
 				return;
@@ -3529,6 +3530,12 @@ export class ListView extends Item {
 					? probe.$h
 					: probe.$ah;
 			this.$rowHeight = extent > 0 ? extent : 40;
+			// Reading the size can lay the view out and build the delegate of the first row again: the one that is replaced is released.
+			const other = this.$delegates.get(0);
+			if (other !== undefined && other !== probe) {
+				if (this.releaseDelegate !== null) this.releaseDelegate(other);
+				this.$removeChild(other);
+			}
 			this.$delegates.set(0, probe);
 			this.$extentAt(0);
 		}
@@ -6591,6 +6598,7 @@ export class Loader extends Item {
 	// The axes the Loader sizes itself are copied onto the item. The other axes follow the item.
 	// Only when the Loader's size changed or the item is new: a script may resize the item afterwards (Qt).
 	$pushSize() {
+		if (this.$holdSize === true) return;
 		const item = this.$children.length > 0 ? this.$children[0] : null;
 		if (item === null) {
 			this.$pushedItem = null;
@@ -6598,16 +6606,35 @@ export class Loader extends Item {
 		}
 		const fresh = this.$pushedItem !== item;
 		this.$pushedItem = item;
+		if (fresh) {
+			// The sizes of an item that was loaded before are not the sizes of this one.
+			this.$pushedW = undefined;
+			this.$pushedH = undefined;
+		}
+		// A size that the Loader binds (`height: !active ? 0 : 70`) is worked out first: in Qt the bindings have run when the Loader
+		// sizes its item, and a size that is not known yet would leave the item with the size that it asks for.
+		if (this.$bindings !== null && hooks.initializeProperty !== null) {
+			hooks.initializeProperty(this, 'width');
+			hooks.initializeProperty(this, 'height');
+		}
 		this.$sizing = true;
 		try {
 			if (this.$widthExplicit()) {
 				const width = this.width;
-				if (fresh || width !== this.$pushedW) item.width = width;
+				if (fresh || width !== this.$pushedW) {
+					// Qt 6 sets the size of the item with its setter, which removes a binding that the item has for it.
+					if (item.$bindings !== null && hooks.breakBinding !== null) hooks.breakBinding(item, 'width');
+					item.width = width;
+				}
 				this.$pushedW = width;
 			}
 			if (this.$heightExplicit()) {
 				const height = this.height;
-				if (fresh || height !== this.$pushedH) item.height = height;
+				if (fresh || height !== this.$pushedH) {
+					// Qt 6 sets the size of the item with its setter, which removes a binding that the item has for it.
+					if (item.$bindings !== null && hooks.breakBinding !== null) hooks.breakBinding(item, 'height');
+					item.height = height;
+				}
 				this.$pushedH = height;
 			}
 		} finally {
@@ -7377,6 +7404,86 @@ defineProp(
 		this.$sync();
 	},
 );
+
+// `RemoteFileController` (imtqml::CRemoteFileController of com.imtcore.imtqml) for the browser: it sends, deletes and downloads
+// the files of the server, which the page reaches at `../../<prefix>/<name>`. The browser has no file system, so a download
+// opens its address in a new tab and the browser saves the file. `state`: Loading or Ready. The signals are the ones of the C++ type.
+export class RemoteFileController extends Item {
+	constructor() {
+		super();
+		this.$typeName = 'RemoteFileController';
+		this.$nonVisual = true;
+		this.$defineCustom('state', '');
+		this.$defineCustom('downloadedFileLocation', '');
+		this.$defineCustom('downloadedFilePath', '');
+		this.$defineCustom('json', '');
+		this.$defineCustom('prefix', '');
+		this.$declareSignal('progress', ['bytesLoaded', 'bytesTotal']);
+		this.$declareSignal('fileDeleted', ['url']);
+		this.$declareSignal('fileDownloaded', ['filePath']);
+		this.$declareSignal('fileUploaded', ['url']);
+		this.$declareSignal('fileExists', ['url']);
+		this.$declareSignal('fileDownloadFailed', []);
+		this.$declareSignal('fileUploadFailed', []);
+	}
+
+	// `../../<prefix>/<name>`; the prefix is `files` while it is empty.
+	$address(name) {
+		if (this.prefix === '') this.prefix = 'files';
+		return `../../${this.prefix}/${name}`.replace('//', '/');
+	}
+
+	// Posts a file that the page picked (a `File`) to the server.
+	sendFile(fileUrl) {
+		if (typeof XMLHttpRequest === 'undefined' || typeof FileReader === 'undefined') return false;
+		this.state = 'Loading';
+		const xhr = new XMLHttpRequest();
+		const reader = new FileReader();
+		reader.readAsArrayBuffer(fileUrl);
+		xhr.overrideMimeType('text/xml');
+		reader.onload = () => {
+			xhr.open('POST', this.$address(fileUrl.name));
+			xhr.send(reader.result);
+		};
+		xhr.onreadystatechange = () => {
+			if (this.$destroyed || xhr.readyState !== XMLHttpRequest.DONE) return;
+			if (xhr.status === 409) {
+				// The server already has the file: its hash is the third paragraph of the answer.
+				const paragraphs = xhr.responseXML === null ? [] : xhr.responseXML.getElementsByTagName('p');
+				this.json = paragraphs.length > 2 ? paragraphs[2].innerHTML : '';
+				this.$emit('fileExists', [fileUrl]);
+				return;
+			}
+			this.json = xhr.responseText;
+			this.state = 'Ready';
+			this.$emit('fileUploaded', [fileUrl]);
+		};
+		xhr.onprogress = (event) => this.$emit('progress', [event.loaded, event.total]);
+		return true;
+	}
+
+	// Downloads the file: its address opens in a new tab, and the server sends it with the id of the file in the query.
+	getFile(fileHash, fileName) {
+		if (typeof window === 'undefined' || typeof window.open !== 'function') return false;
+		window.open(`${this.$address(fileName)}?FileId=${fileHash}`, '_blank');
+		return true;
+	}
+
+	deleteFile(fileHash, fileUrl) {
+		if (typeof XMLHttpRequest === 'undefined') return false;
+		this.state = 'Loading';
+		const xhr = new XMLHttpRequest();
+		xhr.open('DELETE', this.$address(fileHash));
+		xhr.send(fileHash);
+		xhr.onreadystatechange = () => {
+			if (this.$destroyed || xhr.readyState !== XMLHttpRequest.DONE) return;
+			this.json = xhr.responseText;
+			this.state = 'Ready';
+			this.$emit('fileDeleted', [fileUrl]);
+		};
+		return true;
+	}
+}
 
 // ----- Map (QtLocation / QtPositioning) -----
 
@@ -8844,6 +8951,7 @@ export const BUILTIN_TYPES = new Map([
 	['Settings', Settings],
 	['WebSocket', WebSocketItem],
 	['GqlModel', GqlModel],
+	['RemoteFileController', RemoteFileController],
 	['FileDialog', FileDialog],
 	['Item', Item],
 	['Rectangle', Rectangle],

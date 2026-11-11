@@ -1882,7 +1882,14 @@ export class Engine {
 					}
 				} else {
 					// A loaded item with no onCompleted still has bindings (anchors.fill: parent) that must run before geometry is read.
-					this.evaluateFresh();
+					// The Loader sizes its item after the bindings of the item have run, as in Qt: a size that it wrote while they ran
+					// (its own `height` binding is one of them) would be written over by the binding of the item that comes after.
+					loader.$holdSize = true;
+					try {
+						this.evaluateFresh();
+					} finally {
+						loader.$holdSize = false;
+					}
 					this.layoutContaining(loader);
 					loader.$pushSize();
 					this.layoutContaining(loader);
@@ -2706,7 +2713,11 @@ export class Engine {
 	// A property change handler: polled once per evaluation pass and, for custom properties, run at once when the
 	// property is assigned (so that a value changed and changed back within one pass is not lost).
 	addChangeHandler(handler) {
-		this.changeHandlers.push(handler);
+		// A property that was declared in QML runs its handlers when it is assigned and nothing polls it: its handler is held by its item
+		// only. In the list of the engine it would keep the item for good, as the SDL objects of the replies that a page asked for, and
+		// the loop over the list would pass it in every frame.
+		if (handler.hasLast && this.runsAtAssignment(handler)) handler.immediate = true;
+		else this.changeHandlers.push(handler);
 		const item = handler.item;
 		if (item.$chg === undefined) item.$chg = new Map();
 		const list = item.$chg.get(handler.property);
