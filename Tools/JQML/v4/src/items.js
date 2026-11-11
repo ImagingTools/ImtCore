@@ -7267,11 +7267,9 @@ export class BaseClass extends QtObject {
 						isNewModel = true;
 					}
 					if (component) {
-						// The elements go into the model in one step: a model with a thousand elements is not reported a thousand times.
-						const elements = [];
 						for (const sourceObjectInner of value) {
 							if (sourceObjectInner === null) {
-								elements.push(null);
+								model.append({ item: null });
 								continue;
 							}
 							let sourceTypename;
@@ -7280,15 +7278,13 @@ export class BaseClass extends QtObject {
 							if (!obj.fromObject(sourceObjectInner)) {
 								obj.destroy();
 								if (isNewModel) model.destroy();
-								else model.$appendElements(elements);
 								this.endChanges();
 								return false;
 							}
-							elements.push(obj);
+							model.append({ item: obj });
 							obj.owner = this;
 							obj.connectProperties();
 						}
-						model.$appendElements(elements);
 						if (isNewModel) {
 							this[_key] = model;
 							model.owner = this;
@@ -7364,13 +7360,6 @@ export class BaseModel extends ListModel {
 		this.$typeName = 'BaseModel';
 		this.$baseOwner = undefined;
 		this.$declareSignal('finished', []);
-	}
-
-	// The elements of a reply: one change of the model, not one for each element.
-	$appendElements(elements) {
-		if (elements.length === 0) return;
-		for (const item of elements) this.$rows.push({ item });
-		this.$touch();
 	}
 
 	getProperties(item) {

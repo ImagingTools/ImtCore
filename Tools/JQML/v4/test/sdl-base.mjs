@@ -209,6 +209,16 @@ async function scenario() {
 		return [view.m_measurements === null, view.m_table.m_type, view.toJson()];
 	});
 	step('a value of the wrong kind in an array', () => view.fromObject({ table: { rows: 5, conditions: [3] } }));
+	// A view that shows the model (a header of a table) gets one notification for each element, as from the QML file: the table measures
+	// the columns by them. Filling the array in one step made the header of IotPlatform draw only its last column.
+	step('count changes while an array is refilled', () => {
+		view.fromObject(reply(2));
+		const model = view.m_measurements.m_colorantList;
+		const counts = [];
+		model.countChanged.connect(() => counts.push(model.count));
+		view.fromObject(reply(4));
+		return counts;
+	});
 	step('finished is emitted', () => {
 		let count = 0;
 		root.other.finished.connect(() => count++);
