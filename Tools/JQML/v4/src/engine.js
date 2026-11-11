@@ -658,6 +658,8 @@ export class Engine {
 		};
 		hooks.changed = (item, name) => this.fireChanged(item, name);
 		hooks.changeSignal = (item, name) => this.defineChangeSignal(item, name);
+		hooks.instantiateType = (type, parent) => this.instantiateType(type, parent);
+		hooks.createComponent = (url, second, third) => this.createComponent(url, second, third);
 		hooks.initializeProperty = (item, name) => this.initializeProperty(item, name);
 		hooks.release = (item) => this.releaseSubtree(item);
 		hooks.breakBinding = (item, name) => this.dropBinding(item, name);
@@ -2264,6 +2266,8 @@ export class Engine {
 		}
 
 		const completedHandlers = [];
+		// A type of the engine that has to do something when it is completed (BaseClass connects its properties): before the handlers of QML.
+		if (typeof item.$onCompleted === 'function') completedHandlers.push({ fn: item.$onCompleted, item, line: 0, file: '' });
 		// What the use sites of a component assign to its properties: the base file's onXChanged handlers run for it (Qt).
 		const overlayWrites = [];
 		for (let l = 0; l < chain.length; l++) {
@@ -3071,6 +3075,21 @@ export class Engine {
 		}
 	}
 
+	// An object of a type that has no QML file of its own, or none that is used (BaseModel); the parent may be null.
+	instantiateType(type, parent) {
+		const mark = this.completed.length;
+		const item = this.createItem(emptyDef(type), this.documentScope === null ? this.newScope(null, '') : this.documentScope, parent, [], undefined, 0);
+		this.runCompletedFrom(mark);
+		return item;
+	}
+
+	// The types of Qml/imtcontrols/Base that the engine implements itself: `Qt.createComponent('BaseModel.qml')` makes the type of the
+	// engine, whatever the file says (the file stays the implementation of the desktop).
+	nativeQmlType(url, byType) {
+		const name = byType ? url : (/(?:^|\/)(BaseClass|BaseModel)\.qml$/.exec(url) || [])[1];
+		return name !== undefined && (name === 'BaseClass' || name === 'BaseModel') && BUILTIN_TYPES.has(name) ? name : null;
+	}
+
 	createObject(type, parent, props) {
 		if (typeof type !== 'string') throw new QmlError('Qt.createObject needs the name of a type');
 		if (!(parent instanceof Item)) throw new QmlError('Qt.createObject needs a parent item');
@@ -3102,6 +3121,13 @@ export class Engine {
 		};
 		if (this.project === null) {
 			fail(`Cannot load '${component.$url}': no project`);
+			return component;
+		}
+		const nativeType = this.nativeQmlType(byType ? second : url, byType);
+		if (nativeType !== null) {
+			component.$def = { ...emptyDef('Component'), children: [emptyDef(nativeType)] };
+			component.$defScope = this.newScope(null, '');
+			component.$setStatus(1);
 			return component;
 		}
 		const ready = (doc) => {

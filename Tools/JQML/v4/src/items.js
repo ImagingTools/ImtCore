@@ -42,6 +42,9 @@ export const hooks = {
 	completing: null,
 	// (item, name) => void: a custom property that has `onNameChanged` handlers got a new value.
 	changed: null,
+	// (type, parent) => item: an object of a type of the engine that has no QML file (BaseModel); (url) => Component: Qt.createComponent.
+	instantiateType: null,
+	createComponent: null,
 	// (item) => void: the x, y, width or height of an item that has change handlers got another value.
 	geometry: null,
 	changeSignal: null,
@@ -979,6 +982,8 @@ export class Item {
 					store[name] = value;
 					this.$update();
 					if (hooks.changed !== null && this.$chg !== undefined) hooks.changed(this, name);
+					// BaseClass: the properties of an SDL object report their changes to its owner.
+					if (this.$watch !== undefined) this.$watch(name);
 					noteWrite(this, name);
 				}
 				// A Binding or Connections item has to publish the new value before the statement that caused it returns.
@@ -6870,6 +6875,777 @@ export function createSdlObject(typeName) {
 	return new Proxy(object, SDL_HANDLER);
 }
 
+// ----- BaseClass and BaseModel (the base types of the generated SDL objects) -----
+//
+// `Qml/imtcontrols/Base/BaseClass.qml` and `BaseModel.qml` are QML files that the desktop runs. The browser runs these classes instead
+// (a reply of a table makes thousands of SDL objects, each of them is a `BaseClass`, and as QML objects they cost seconds): the same
+// members, the same results, written once for the whole class and not once for each object. Docs/JQML/CppAnalogs.md says how they are
+// kept equal; test/sdl-base.mjs runs both and compares them. A change of one of the QML files has to be made here too.
+
+const SDL_PROPERTY_IDS = new Map();
+
+// `colorPreview` -> `m_colorPreview`
+function sdlPropertyId(key) {
+	let id = SDL_PROPERTY_IDS.get(key);
+	if (id === undefined) {
+		id = `m_${key[0].toLowerCase()}${key.slice(1)}`;
+		SDL_PROPERTY_IDS.set(key, id);
+	}
+	return id;
+}
+
+// `BaseClass._internal`: the transaction of changes and the keys that the object has removed.
+class BaseInternal {
+	constructor(base) {
+		this.$base = base;
+		this.isTransaction = false; // true while a transaction is open
+		this.countChanges = 0; // the number of changes during the transaction
+		this.changeList = [];
+		this.removed = []; // the removed keys of the object
+	}
+
+	internalModelChanged(name, sender) {
+		if (this.isTransaction) {
+			this.changeList.push({ name, sender });
+			this.countChanges++;
+			return;
+		}
+		this.$base.$emit('modelChanged', [[{ name, sender }]]);
+	}
+
+	startTransaction() {
+		if (this.isTransaction) {
+			console.error('Unable to start transaction. Error: transaction already started.');
+			return;
+		}
+		this.changeList = [];
+		this.isTransaction = true;
+	}
+
+	stopTransaction() {
+		if (!this.isTransaction) {
+			console.error('Unable to stop transaction. Error: there is no active transaction.');
+			return;
+		}
+		if (this.countChanges > 0) {
+			this.$base.$emit('modelChanged', [this.changeList]);
+			this.countChanges = 0;
+		}
+		this.isTransaction = false;
+	}
+
+	removeAt(key) {
+		const index = this.removed.indexOf(key);
+		if (index > -1) this.removed.splice(index, 1);
+	}
+
+	containsInRemoved(key) {
+		return this.removed.indexOf(key) > -1;
+	}
+}
+
+export class BaseClass extends QtObject {
+	constructor() {
+		super();
+		this.$typeName = 'BaseClass';
+		this.$baseOwner = undefined;
+		this.$enableNotifications = true;
+		this.$internal = null;
+		this.$watched = null;
+		this.$propertiesConnected = false;
+		this.$declareSignal('modelChanged', ['changeSet']);
+		this.$declareSignal('finished', []);
+		// onModelChanged of BaseClass.qml: a change of the object is a change of its owner.
+		this.$connect('modelChanged', (changeSet) => this.$passToOwner(changeSet));
+	}
+
+	$passToOwner(changeSet) {
+		const owner = this.$baseOwner;
+		if (owner && owner.enableNotifications && owner.modelChanged) {
+			if (owner._internal.isTransaction) {
+				// concat() returns a new array rather than growing this one
+				owner._internal.changeList = owner._internal.changeList.concat(changeSet);
+				owner._internal.countChanges++;
+			} else {
+				owner.modelChanged(changeSet);
+			}
+		}
+	}
+
+	// A property of the object got a new value (see `$defineCustom`): this is what `connectProperties` connects.
+	$watchProperty(name) {
+		if (this.$watched.has(name) && this.$enableNotifications) this._internal.internalModelChanged(name, this);
+	}
+
+	$onCompleted() {
+		this.connectProperties();
+	}
+
+	beginChanges() {
+		this._internal.startTransaction();
+	}
+
+	endChanges() {
+		this._internal.stopTransaction();
+	}
+
+	removeKey(key) {
+		const selfKeys = this.getProperties();
+		if (selfKeys.includes(key)) {
+			const currentVal = this[key];
+			if (currentVal !== null && typeof currentVal === 'object') {
+				if (currentVal.destroy) currentVal.destroy();
+				this[key] = null;
+			}
+		}
+		this._internal.removed.push(key);
+	}
+
+	connectProperties() {
+		if (this.$propertiesConnected) return;
+		// The properties are watched where they are written, not with a connection of a function for each of them.
+		this.$watched = new Set(this.getProperties());
+		this.$watch = BaseClass.prototype.$watchProperty;
+		this.$propertiesConnected = true;
+	}
+
+	createMe() {
+		return hooks.instantiateType('BaseClass', null);
+	}
+
+	isEqualWithModel(model) {
+		if (typeof this !== typeof model) return false;
+		const selfKeys = this.getProperties();
+		const sourceKeys = model.getProperties();
+		if (selfKeys.length !== sourceKeys.length) return false;
+		for (let i = 0; i < selfKeys.length; i++) {
+			const key = selfKeys[i];
+			if (!sourceKeys.includes(key)) return false;
+			if (typeof this[key] !== typeof model[key]) return false;
+			if (typeof this[key] === 'object') {
+				if (this[key] && this[key].isEqualWithModel) {
+					if (!this[key].isEqualWithModel(model[key])) return false;
+				} else if (this[key] !== model[key]) {
+					return false;
+				}
+			} else if (this[key] !== model[key]) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	refresh() {}
+
+	copy(item) {
+		return this.copyFrom(item);
+	}
+
+	copyMe() {
+		const obj = this.createMe();
+		obj.fromJSON(this.toJson());
+		obj.connectProperties();
+		return obj;
+	}
+
+	copyFrom(item) {
+		this.fromJSON(item.toJson());
+		return true;
+	}
+
+	copyTo(item) {
+		item.fromJSON(this.toJson());
+		return true;
+	}
+
+	createComponent(propertyId, typename) {}
+
+	createElement(propertyId, typename) {}
+
+	isArrayRequired(propertyId) {
+		return false;
+	}
+
+	areArrayElementsRequired(propertyId) {
+		return false;
+	}
+
+	isArrayValueValid(propertyId, value) {
+		if (value === null || value === undefined) return !this.isArrayRequired(propertyId);
+		if (!this.areArrayElementsRequired(propertyId)) return true;
+		if (Array.isArray(value)) {
+			for (const element of value) {
+				if (element === null || element === undefined) return false;
+			}
+		} else if (value.hasNullElements && value.hasNullElements()) {
+			return false;
+		}
+		return true;
+	}
+
+	getJSONKeyForProperty(propertyId) {
+		return propertyId;
+	}
+
+	// The properties of the SDL type: the declared ones whose name has `m_` (and `__typename`), in the order of their declaration.
+	getProperties() {
+		const list = [];
+		const names = [];
+		if (this.$custom !== null) for (const name in this.$custom) names.push(name);
+		if (this.$aliases !== undefined) for (const name of this.$aliases) names.push(name);
+		for (const key of names) {
+			if ((key.indexOf('m_') >= 0 && key !== 'owner' && key !== 's_keys' && key !== 'objectName' && key !== 'enableNotifications' && typeof this[key] !== 'function') || key === '__typename') {
+				list.push(key);
+			}
+		}
+		return list;
+	}
+
+	createFromJson(json) {
+		return this.fromJSON(json);
+	}
+
+	toJson() {
+		const list = this.getProperties();
+		let json = '{';
+		let isFirst = true;
+		for (let i = 0; i < list.length; i++) {
+			const key = list[i];
+			if (!this.isArrayValueValid(key, this[key])) return '';
+			// eslint-disable-next-line eqeqeq
+			if (this[key] == null && this._internal.containsInRemoved(key)) continue;
+			if (!isFirst) json += ',';
+			isFirst = false;
+			if (typeof this[key] === 'object') {
+				if (Array.isArray(this[key])) {
+					json += `"${this.getJSONKeyForProperty(key)}":`;
+					json += '[';
+					for (let j = 0; j < this[key].length; j++) {
+						let value = this[key][j];
+						if (j !== 0) json += ', ';
+						if (typeof value === 'string') {
+							value = JSON.stringify(value);
+							json += value;
+						} else {
+							json += value;
+						}
+					}
+					json += ']';
+				} else if (this[key] !== null) {
+					const serializedValue = this[key].toJson();
+					if (serializedValue === '') return '';
+					json += `"${this.getJSONKeyForProperty(key)}":${serializedValue}`;
+				} else {
+					json += `"${this.getJSONKeyForProperty(key)}": null`;
+				}
+			} else {
+				let value = this[key];
+				if (value === undefined) value = null;
+				let safeValue = this[key];
+				if (typeof safeValue === 'string') {
+					safeValue = safeValue.replace(/\\/g, '\u005C\u005C');
+					safeValue = safeValue.replace(/"/g, '\u005C"');
+				}
+				json += `"${this.getJSONKeyForProperty(key)}":${typeof this[key] === 'string' ? `"${safeValue}"` : value}`;
+			}
+		}
+		json += '}';
+		return json;
+	}
+
+	toGraphQL() {
+		const list = this.getProperties();
+		let graphQL = '{';
+		let isFirst = true;
+		for (let i = 0; i < list.length; i++) {
+			const key = list[i];
+			if (!this.isArrayValueValid(key, this[key])) return '';
+			// eslint-disable-next-line eqeqeq
+			if (this[key] == null && this._internal.containsInRemoved(key)) continue;
+			if (!isFirst) graphQL += ',';
+			isFirst = false;
+			if (typeof this[key] === 'object') {
+				if (Array.isArray(this[key])) {
+					graphQL += `${this.getJSONKeyForProperty(key)}:`;
+					graphQL += '[';
+					for (let j = 0; j < this[key].length; j++) {
+						if (j !== 0) graphQL += ', ';
+						if (typeof this[key][j] === 'string') {
+							let data = this[key][j];
+							data = data.replace(/\\/g, '\\\\');
+							data = data.replace(/"/g, '\\"');
+							data = data.replace(/\r/g, '\\r');
+							data = data.replace(/\n/g, '\\n');
+							data = data.replace(/\t/g, '\\t');
+							graphQL += `"${data}"`;
+						} else if (typeof this[key][j] === 'object' && this[key][j] instanceof BaseClass) {
+							graphQL += this[key][j].toGraphQL();
+						} else {
+							graphQL += this[key][j];
+						}
+					}
+					graphQL += ']';
+				} else if (this[key] !== null) {
+					const serializedValue = this[key].toGraphQL();
+					if (serializedValue === '') return '';
+					graphQL += `${this.getJSONKeyForProperty(key)}:${serializedValue}`;
+				} else {
+					graphQL += `${this.getJSONKeyForProperty(key)}:null`;
+				}
+			} else {
+				let value = this[key];
+				if (value === undefined) value = null;
+				graphQL += `${this.getJSONKeyForProperty(key)}:`;
+				if (typeof this[key] === 'string') {
+					let data = this[key];
+					data = data.replace(/\\/g, '\\\\');
+					data = data.replace(/"/g, '\\"');
+					data = data.replace(/\r/g, '\\r');
+					data = data.replace(/\n/g, '\\n');
+					data = data.replace(/\t/g, '\\t');
+					graphQL += '"';
+					graphQL += data;
+					graphQL += '"';
+				} else {
+					graphQL += value;
+				}
+			}
+		}
+		graphQL += '}';
+		return graphQL;
+	}
+
+	fromJSON(json) {
+		let obj;
+		try {
+			obj = JSON.parse(this.escapeSpecialChars(json));
+		} catch (e) {
+			console.error(e);
+			return false;
+		}
+		return this.fromObject(obj);
+	}
+
+	escapeSpecialChars(jsonString) {
+		return jsonString.replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/\t/g, '\\t').replace(/\f/g, '\\f');
+	}
+
+	fromObject(sourceObject) {
+		for (const key in sourceObject) {
+			if (!this.isArrayValueValid(sdlPropertyId(key), sourceObject[key])) return false;
+		}
+
+		this.beginChanges();
+
+		for (const objKey of this.getProperties()) {
+			const jsonKey = this.getJSONKeyForProperty(objKey);
+			if (jsonKey in sourceObject) continue;
+			if (this.isArrayRequired(objKey)) continue;
+			const currentVal = this[objKey];
+			if (currentVal !== null && typeof currentVal === 'object') {
+				if (currentVal.clear) currentVal.clear();
+				if (currentVal.destroy) currentVal.destroy();
+				this[objKey] = null;
+			}
+		}
+
+		for (const key in sourceObject) {
+			const _key = sdlPropertyId(key);
+			const value = sourceObject[key];
+			if (value === null) {
+				this[_key] = null;
+			} else if (typeof value === 'object') {
+				if (Array.isArray(value)) {
+					const component = this.createComponent(_key);
+					let model = this[_key];
+					let isNewModel = false;
+					if (model) {
+						if (model.clear) model.clear();
+					} else if (component) {
+						// The owner is attached only after filling, so filling does not report a model change
+						model = hooks.instantiateType('BaseModel', this);
+						isNewModel = true;
+					}
+					if (component) {
+						// The elements go into the model in one step: a model with a thousand elements is not reported a thousand times.
+						const elements = [];
+						for (const sourceObjectInner of value) {
+							if (sourceObjectInner === null) {
+								elements.push(null);
+								continue;
+							}
+							let sourceTypename;
+							if (sourceObjectInner.__typename) sourceTypename = sourceObjectInner.__typename;
+							const obj = this.createElement(_key, sourceTypename).createObject(this);
+							if (!obj.fromObject(sourceObjectInner)) {
+								obj.destroy();
+								if (isNewModel) model.destroy();
+								else model.$appendElements(elements);
+								this.endChanges();
+								return false;
+							}
+							elements.push(obj);
+							obj.owner = this;
+							obj.connectProperties();
+						}
+						model.$appendElements(elements);
+						if (isNewModel) {
+							this[_key] = model;
+							model.owner = this;
+						}
+					} else {
+						this[_key] = value;
+					}
+				} else {
+					let obj;
+					if (!this[_key]) {
+						let sourceTypename;
+						if (value.__typename) sourceTypename = value.__typename;
+						const component = this.createComponent(_key, sourceTypename);
+						if (component) {
+							obj = component.createObject(this);
+						} else {
+							console.log('component error', _key, sourceTypename, JSON.stringify(sourceObject));
+						}
+					} else {
+						obj = this[_key];
+					}
+					if (obj) {
+						if (!obj.fromObject(value)) {
+							this.endChanges();
+							return false;
+						}
+						this[_key] = obj;
+						obj.owner = this;
+						obj.connectProperties();
+					}
+				}
+			} else if (key !== '__typename') {
+				this[_key] = value;
+			}
+			this._internal.removeAt(_key);
+		}
+
+		this.endChanges();
+		this.$emit('finished');
+		return true;
+	}
+}
+
+Object.defineProperty(BaseClass.prototype, '_internal', {
+	get() {
+		return this.$internal === null ? (this.$internal = new BaseInternal(this)) : this.$internal;
+	},
+	enumerable: false,
+	configurable: true,
+});
+
+defineProp(
+	BaseClass.prototype,
+	'owner',
+	function () {
+		return this.$baseOwner;
+	},
+	function (value) {
+		if (same(this.$baseOwner, value)) return;
+		this.$baseOwner = value;
+		this.$update();
+		if (hooks.changed !== null && this.$chg !== undefined) hooks.changed(this, 'owner');
+	},
+	true,
+);
+defineField(BaseClass.prototype, 'enableNotifications', '$enableNotifications', (value) => Boolean(value));
+defineField(BaseClass.prototype, 'propertiesIsConnected', '$propertiesConnected', (value) => Boolean(value));
+
+// `BaseModel`: the array of an SDL object. Its rows are `{ item }`, the item is an SDL object or null.
+export class BaseModel extends ListModel {
+	constructor() {
+		super();
+		this.$typeName = 'BaseModel';
+		this.$baseOwner = undefined;
+		this.$declareSignal('finished', []);
+	}
+
+	// The elements of a reply: one change of the model, not one for each element.
+	$appendElements(elements) {
+		if (elements.length === 0) return;
+		for (const item of elements) this.$rows.push({ item });
+		this.$touch();
+	}
+
+	getProperties(item) {
+		const list = [];
+		if (item === null || item === undefined) return list;
+		for (const key in item.$properties) {
+			if ((key.indexOf('m_') >= 0 && typeof item[key] !== 'function' && item[key] !== undefined && item[key] !== null) || key === '__typename') {
+				list.push(key);
+			}
+		}
+		return list;
+	}
+
+	hasNullElements() {
+		for (let i = 0; i < this.count; ++i) {
+			const item = this.get(i).item;
+			if (item === null || item === undefined) return true;
+		}
+		return false;
+	}
+
+	// The full list of an SDL item still contains null properties, they must be validated before skipping
+	getItemPropertyIds(item) {
+		return item.getProperties ? item.getProperties() : this.getProperties(item);
+	}
+
+	createGraphQlString(value) {
+		if (!/[\\"\r\n\t\b\f]/.test(value)) return `"${value}"`;
+		return `"${value.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\r/g, '\\r').replace(/\n/g, '\\n').replace(/\t/g, '\\t').replace(/[\b]/g, '\\b').replace(/\f/g, '\\f')}"`;
+	}
+
+	// Returns '' if a required array of an item is null or has null elements; scalars are not validated
+	toJson() {
+		let json = '[';
+		for (let i = 0; i < this.count; i++) {
+			if (i > 0) json += ',';
+			const item = this.get(i).item;
+			if (item === null || item === undefined) {
+				json += 'null';
+				continue;
+			}
+			const canValidate = typeof item.isArrayValueValid === 'function';
+			let separator = '{';
+			for (const key of this.getItemPropertyIds(item)) {
+				const value = item[key];
+				if (value === null || value === undefined) {
+					if (canValidate && !item.isArrayValueValid(key, value)) return '';
+					continue;
+				}
+				let serializedValue;
+				if (typeof value === 'object') {
+					if (canValidate && !item.isArrayValueValid(key, value)) return '';
+					if (Array.isArray(value)) {
+						serializedValue = '[';
+						for (let k = 0; k < value.length; k++) {
+							if (k !== 0) serializedValue += ', ';
+							serializedValue += typeof value[k] === 'string' ? JSON.stringify(value[k]) : value[k];
+						}
+						serializedValue += ']';
+					} else if (typeof value.toJson === 'function') {
+						serializedValue = value.toJson();
+						if (serializedValue === '') return '';
+					} else {
+						continue;
+					}
+				} else {
+					serializedValue = typeof value === 'string' ? JSON.stringify(value) : value;
+				}
+				json += `${separator}"${item.getJSONKeyForProperty(key)}":${serializedValue}`;
+				separator = ',';
+			}
+			json += separator === '{' ? '{}' : '}';
+		}
+		json += ']';
+		return json;
+	}
+
+	// Returns '' if a required array of an item is null or has null elements; scalars are not validated
+	toGraphQL() {
+		let graphQL = '[';
+		for (let i = 0; i < this.count; i++) {
+			if (i > 0) graphQL += ',';
+			const item = this.get(i).item;
+			if (item === null || item === undefined) {
+				graphQL += 'null';
+				continue;
+			}
+			const canValidate = typeof item.isArrayValueValid === 'function';
+			let separator = '{';
+			for (const key of this.getItemPropertyIds(item)) {
+				const value = item[key];
+				if (value === null || value === undefined) {
+					if (canValidate && !item.isArrayValueValid(key, value)) return '';
+					continue;
+				}
+				let serializedValue;
+				if (typeof value === 'object') {
+					if (canValidate && !item.isArrayValueValid(key, value)) return '';
+					if (Array.isArray(value)) {
+						serializedValue = '[';
+						for (let k = 0; k < value.length; k++) {
+							if (k !== 0) serializedValue += ', ';
+							serializedValue += typeof value[k] === 'string' ? this.createGraphQlString(value[k]) : value[k];
+						}
+						serializedValue += ']';
+					} else {
+						serializedValue = value.toGraphQL();
+						if (serializedValue === '') return '';
+					}
+				} else {
+					serializedValue = typeof value === 'string' ? this.createGraphQlString(value) : value;
+				}
+				graphQL += `${separator}${item.getJSONKeyForProperty(key)}:${serializedValue}`;
+				separator = ',';
+			}
+			graphQL += separator === '{' ? '{}' : '}';
+		}
+		graphQL += ']';
+		return graphQL;
+	}
+
+	isEqualWithModel(model) {
+		if (typeof this !== typeof model) return false;
+		if (this.count !== model.count) return false;
+		for (let i = 0; i < this.count; i++) {
+			const item1 = this.get(i).item;
+			const item2 = model.get(i).item;
+			const item1IsNull = item1 === null || item1 === undefined;
+			const item2IsNull = item2 === null || item2 === undefined;
+			if (item1IsNull !== item2IsNull) return false;
+			if (item1IsNull) continue;
+			const list1 = this.getProperties(item1);
+			const list2 = model.getProperties(item2);
+			for (let j = 0; j < list1.length; j++) {
+				const key = list1[j];
+				if (!list2.includes(key)) return false;
+				if (typeof item1[key] !== typeof item2[key]) return false;
+				if (typeof item1[key] === 'object') {
+					if (item1[key] && item1[key].isEqualWithModel) {
+						if (!item1[key].isEqualWithModel(item2[key])) return false;
+					} else if (item1[key] !== item2[key]) {
+						return false;
+					}
+				} else if (item1[key] !== item2[key]) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	copyMe() {
+		const retVal = hooks.instantiateType('BaseModel', null);
+		if (!retVal) {
+			console.debug('Unable to create copy for BaseModel. Error: Creating component is failed');
+			return null;
+		}
+		for (let i = 0; i < this.count; i++) {
+			const item = this.get(i).item;
+			retVal.addElement(item === null || item === undefined ? null : item.copyMe());
+		}
+		return retVal;
+	}
+
+	createFromJson(json) {
+		return this.fromJSON(json);
+	}
+
+	fromJSON(json) {
+		this.clear();
+		const arr = JSON.parse(json);
+		for (let i = 0; i < arr.length; i++) {
+			if (arr[i] === null) {
+				this.addElement(null);
+				continue;
+			}
+			let sourceTypename;
+			if (arr[i].__typename) sourceTypename = arr[i].__typename;
+			else continue;
+			const obj = hooks.createComponent(`${sourceTypename}.qml`).createObject(this);
+			obj.fromObject(arr[i]);
+			this.addElement(obj);
+		}
+		this.$emit('finished');
+	}
+
+	/// \deprecated! OBSOLETE function ONLY for support legacy code DO NOT USE IT! Use \c appendElement() instead.
+	addElement(element) {
+		this.insertElement(this.count, element);
+	}
+
+	appendElement(element) {
+		this.insertElement(this.count, element);
+	}
+
+	insertElement(index, element) {
+		if (element !== null && element !== undefined) {
+			element.owner = this.owner;
+			element.connectProperties();
+		}
+		this.insert(index, { item: element });
+		this.notifyOwner();
+	}
+
+	removeElement(index) {
+		if (index === undefined) index = 0;
+		this.remove(index);
+		this.notifyOwner();
+	}
+
+	// Inside the owner's beginChanges()/endChanges() the change is reported once, at the end - as in the web runtime.
+	notifyOwner() {
+		const owner = this.owner;
+		if (!owner) return;
+		if (owner._internal && owner._internal.isTransaction) owner._internal.countChanges++;
+		else owner.modelChanged([]);
+	}
+
+	getItemsCount() {
+		return this.count;
+	}
+
+	containsKey(key, index) {
+		if (index === undefined) index = 0;
+		const item = this.get(index).item;
+		return item !== null && item !== undefined && item[key] !== undefined;
+	}
+
+	getData(key, index) {
+		if (index === undefined) index = 0;
+		if (this.get(index) === undefined) return undefined;
+		const item = this.get(index).item;
+		return item === null || item === undefined ? item : item[key];
+	}
+
+	setProperty(index, propName, value) {
+		const item = this.get(index).item;
+		if (item === null || item === undefined) return;
+		if (item[propName] !== value) item[propName] = value;
+	}
+
+	swapItems(index1, index2) {
+		if (index1 < 0 || index1 >= this.count || index2 < 0 || index2 >= this.count) return false;
+		const sourceItem1 = this.get(index1).item;
+		const sourceItem2 = this.get(index2).item;
+		const item1 = sourceItem1 === null || sourceItem1 === undefined ? null : sourceItem1.copyMe();
+		const item2 = sourceItem2 === null || sourceItem2 === undefined ? null : sourceItem2.copyMe();
+		if (item1 !== null) item1.owner = this.owner;
+		if (item2 !== null) item2.owner = this.owner;
+		this.get(index1).item = item2;
+		this.get(index2).item = item1;
+		return true;
+	}
+}
+
+defineProp(
+	BaseModel.prototype,
+	'owner',
+	function () {
+		return this.$baseOwner;
+	},
+	function (value) {
+		if (same(this.$baseOwner, value)) return;
+		this.$baseOwner = value;
+		this.$update();
+		// onOwnerChanged of BaseModel.qml: the elements have the owner of the model.
+		for (let i = 0; i < this.count; ++i) {
+			const item = this.get(i).item;
+			if (item !== null && item !== undefined) item.owner = value;
+		}
+		if (hooks.changed !== null && this.$chg !== undefined) hooks.changed(this, 'owner');
+	},
+	true,
+);
+
 // ----- Settings -----
 
 // `Qt.labs.settings.Settings` backed by the browser's localStorage (a Map outside of a browser).
@@ -8952,6 +9728,8 @@ export const BUILTIN_TYPES = new Map([
 	['WebSocket', WebSocketItem],
 	['GqlModel', GqlModel],
 	['RemoteFileController', RemoteFileController],
+	['BaseClass', BaseClass],
+	['BaseModel', BaseModel],
 	['FileDialog', FileDialog],
 	['Item', Item],
 	['Rectangle', Rectangle],
