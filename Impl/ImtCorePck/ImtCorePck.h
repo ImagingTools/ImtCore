@@ -50,6 +50,8 @@
 #include <imtbase/CApplicationInfoControllerComp.h>
 #include <imtbase/CApplicationInfoDelegatorComp.h>
 #include <imtbase/COrderedObjectCollectionProxyComp.h>
+#include <imtbase/CCollectionStorageResolverComp.h>
+#include <imtbase/CStorageResolverRegistryComp.h>
 
 
 /**
@@ -117,6 +119,8 @@ typedef icomp::TModelCompWrap<imtbase::CDelegatedParamsSetComp> DelegatedParamsS
 typedef icomp::TModelCompWrap<imtbase::CApplicationInfoControllerComp> ApplicationInfoController;
 typedef imtbase::CApplicationInfoDelegatorComp ApplicationInfoDelegator;
 typedef icomp::TModelCompWrap<imtbase::COrderedObjectCollectionProxyComp> OrderedObjectCollectionProxy;
+typedef imtbase::CCollectionStorageResolverComp CollectionStorageResolver;
+typedef imtbase::CStorageResolverRegistryComp StorageResolverRegistry;
 
 
 } // namespace ImtCorePck

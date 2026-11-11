@@ -35,8 +35,20 @@ public:
 	virtual QVariantMap GetStorageParams(const Id& objectId) const override;
 	virtual bool IsSnapshotStorage() const override;
 
+protected:
+	/**
+		Create the resolver without a collection. All operations fail until SetCollection is called.
+	*/
+	CCollectionStorageResolver();
+
+	/**
+		Set the collection used as the storage and the type-ID of the new objects.
+		\param collectionPtr	The collection. It is not owned and must outlive the resolver.
+	*/
+	void SetCollection(IObjectCollection* collectionPtr, const QByteArray& typeId);
+
 private:
-	IObjectCollection& m_collection;
+	IObjectCollection* m_collectionPtr;
 	QByteArray m_typeId;
 };
 

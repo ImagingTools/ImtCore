@@ -13,6 +13,7 @@ The data model keeps only the link; the way of storing is chosen at run time by 
 | `CStorageResolverRegistry` | Provider implementation filled by the application. |
 | `CMemoryStorageResolver` | Objects in memory. Live instances: changes are visible to all links at once. |
 | `CCollectionStorageResolver` | Adapter over `IObjectCollection`. Snapshot semantic: call `Save()` to write changes back. |
+| `CCollectionStorageResolverComp`, `CStorageResolverRegistryComp` | Components of the collection resolver and of the registry, see [Components](#components). |
 
 ## Late binding
 
@@ -41,6 +42,25 @@ if (link){
 ```
 
 Different application profiles register different resolvers for the same storage IDs; the data model does not change.
+
+## Components
+
+Applications assembled from compositions bind the links there instead of in code. Both components are in `ImtCorePck`.
+
+| Component | Attributes and references |
+|---|---|
+| `CollectionStorageResolver` (`CCollectionStorageResolverComp`) | `Collection`: the collection used as the storage. `TypeId`: the type-ID of the objects created by `InsertObject`. |
+| `StorageResolverRegistry` (`CStorageResolverRegistryComp`) | `StorageIds` and `StorageResolvers`: the resolver at a position of the list serves the storage ID at the same position; an empty ID is the default resolver. `IsDefaultProvider`: the registry becomes the provider of all links without own binding while the component exists. |
+
+Only one registry of a process should have `IsDefaultProvider` enabled. On destruction the registry clears the default provider only if it is still the registered one.
+
+## Related types
+
+- `ICollectionObjectLink` / `CObjectLink` keep the object ID together with a pointer to the collection instance and resolve against that instance only. There is no late binding.
+- `IReferenceCollection` keeps references by object ID and repository ID. The repository ID has the role of the logical storage ID, but it is not resolved through `IStorageResolverProvider`.
+- `CObjectCollectionBase` follows its own external links to the storages configured in the collection component.
+
+`StorageLink<T>` is the type for new data models; the types above are not changed by it.
 
 ## Optional-like interface
 
