@@ -44,17 +44,8 @@ bool CServerConnectionParamRepresentationControllerComp::GetSdlRepresentationFro
 	const QString host = serverConnectionParamPtr->GetHost();
 	sdlRepresentation.host = host;
 
-	int flags = serverConnectionParamPtr->GetConnectionFlags();
-
-
-	switch (flags){
-	case imtcom::IServerConnectionInterface::CF_DEFAULT:
-		sdlRepresentation.isSecure = false;
-		break;
-	case imtcom::IServerConnectionInterface::CF_SECURE:
-		sdlRepresentation.isSecure = true;
-		break;
-	};
+	const int flags = serverConnectionParamPtr->GetConnectionFlags();
+	sdlRepresentation.isSecure = (flags & imtcom::IServerConnectionInterface::CF_SECURE) != 0;
 
 	int httpPort = serverConnectionParamPtr->GetPort(imtcom::IServerConnectionInterface::PT_HTTP);
 	sdlRepresentation.httpPort = httpPort;
@@ -94,13 +85,9 @@ bool CServerConnectionParamRepresentationControllerComp::GetDataModelFromSdlRepr
 	}
 
 	if (sdlRepresentation.isSecure){
-		bool isSecure = *sdlRepresentation.isSecure;
-		if (isSecure){
-			serverConnectionParamPtr->SetConnectionFlags(imtcom::IServerConnectionInterface::CF_SECURE);
-		}
-		else{
-			serverConnectionParamPtr->SetConnectionFlags(imtcom::IServerConnectionInterface::CF_DEFAULT);
-		}
+		serverConnectionParamPtr->SetConnectionFlags(imtcom::IServerConnectionInterface::WithSecureMode(
+					serverConnectionParamPtr->GetConnectionFlags(),
+					*sdlRepresentation.isSecure));
 	}
 
 	return true;

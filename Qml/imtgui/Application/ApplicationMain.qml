@@ -22,7 +22,9 @@ Item {
 	property bool serverReady: true; // [deprecated]
 	property bool authorizationServerConnected: false;
 	property bool useWebSocketSubscription: false;
-	property bool useWebSocketProxy: false;
+	// Connect the WebSocket on the page's origin (wss://<host>/<appId>/wssub) when the page is served over HTTPS.
+	// Comes from the server's connection settings, an application that is always behind a proxy may set it to true.
+	property bool useWebSocketProxy: ApplicationInfoProvider.webSocketSameOrigin;
 	
 	property bool firstModelsIsInit: false;
 	property bool serverConnected: subscriptionManager_.status == 1;
@@ -372,11 +374,13 @@ Item {
 
 			url.protocol = protocol
 
-			if (!shouldUseWebSocketProxy && application.webSocketPort >= 0){
-				url.port = application.webSocketPort;
-			}
-			else{
-				console.error("WebSocket port provider has invalid port!");
+			if (!shouldUseWebSocketProxy){
+				if (application.webSocketPort >= 0){
+					url.port = application.webSocketPort;
+				}
+				else{
+					console.error("WebSocket port provider has invalid port!");
+				}
 			}
 
 			if (context.appId && context.appId !== ""){
