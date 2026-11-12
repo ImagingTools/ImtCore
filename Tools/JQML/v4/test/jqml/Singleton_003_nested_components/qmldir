@@ -1,0 +1,2 @@
+module LocalSingleton3
+singleton SharedState 1.0 SharedState.qml

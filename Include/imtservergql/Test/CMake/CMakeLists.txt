@@ -9,6 +9,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 	imtservergql
 	imtfile
 	imtgql
+	imtdoc
+	imtrest
+	imtbase
 	imtbasesdl
 	Acf::itest
 	Acf::istd

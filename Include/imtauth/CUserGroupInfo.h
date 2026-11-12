@@ -8,16 +8,16 @@
 // ImtCore includes
 #include <imtbase/TIdentifiableWrap.h>
 #include <imtauth/IUserGroupInfo.h>
-#include <imtauth/CUserBaseInfo.h>
+#include <imtauth/CPrincipalBase.h>
 
 
 namespace imtauth
 {
 
 
-class CUserGroupInfo: virtual public IUserGroupInfo, public CUserBaseInfo
+class CUserGroupInfo: virtual public IUserGroupInfo, public CPrincipalBase
 {
-	typedef CUserBaseInfo BaseClass;
+	typedef CPrincipalBase BaseClass;
 
 public:
 	CUserGroupInfo();
@@ -46,7 +46,7 @@ public:
 	virtual bool AddToSystem(SystemInfo systemInfo) override;
 	virtual bool RemoveFromSystem(const QByteArray& systemId) override;
 
-	// reimplemented (IUserBaseInfo)
+	// reimplemented (IPrincipal)
 	virtual FeatureIds GetPermissions(const QByteArray& productId = QByteArray()) const override;
 
 	// reimplemented (iser::ISerializable)

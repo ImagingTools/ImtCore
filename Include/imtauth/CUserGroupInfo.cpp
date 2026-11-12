@@ -138,7 +138,7 @@ const imtauth::IUserInfoProvider* CUserGroupInfo::GetUserProvider() const
 }
 
 
-IUserBaseInfo::SystemInfoList CUserGroupInfo::GetSystemInfos() const
+IPrincipal::SystemInfoList CUserGroupInfo::GetSystemInfos() const
 {
 	return m_systemInfos;
 }
@@ -174,11 +174,11 @@ bool CUserGroupInfo::RemoveFromSystem(const QByteArray& systemId)
 }
 
 
-// reimplemented (IUserBaseInfo)
+// reimplemented (IPrincipal)
 
-IUserBaseInfo::FeatureIds CUserGroupInfo::GetPermissions(const QByteArray& productId) const
+IPrincipal::FeatureIds CUserGroupInfo::GetPermissions(const QByteArray& productId) const
 {
-	IUserBaseInfo::FeatureIds allPermissions = BaseClass::GetPermissions(productId);
+	IPrincipal::FeatureIds allPermissions = BaseClass::GetPermissions(productId);
 
 	if (m_userGroupInfoProviderPtr != nullptr){
 		// Walked iteratively with a visited set: a cycle in the parent groups must not recurse forever.
@@ -197,9 +197,9 @@ IUserBaseInfo::FeatureIds CUserGroupInfo::GetPermissions(const QByteArray& produ
 			}
 
 			// Only the group's own roles here, its parents are walked by this loop.
-			const CUserBaseInfo* parentBasePtr = dynamic_cast<const CUserBaseInfo*>(parentGroupPtr.GetPtr());
+			const CPrincipalBase* parentBasePtr = dynamic_cast<const CPrincipalBase*>(parentGroupPtr.GetPtr());
 			const FeatureIds parentPermissions = (parentBasePtr != nullptr)
-						? parentBasePtr->CUserBaseInfo::GetPermissions(productId)
+						? parentBasePtr->CPrincipalBase::GetPermissions(productId)
 						: parentGroupPtr->GetPermissions(productId);
 			for (const QByteArray& permissionId : parentPermissions){
 				if (!allPermissions.contains(permissionId)){
@@ -219,14 +219,24 @@ bool CUserGroupInfo::Serialize(iser::IArchive &archive)
 {
 	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this);
 
-	bool retVal = BaseClass::Serialize(archive);
-	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_userIds, "Users", "User");
-	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_parentGroupIds, "ParentGroups", "ParentGroup");
-
 	const iser::IVersionInfo& versionInfo = archive.GetVersionInfo();
 	quint32 imtCoreVersion;
 	if (!versionInfo.GetVersionNumber(imtcore::VI_IMTCORE, imtCoreVersion)){
 		imtCoreVersion = 0;
+	}
+
+	bool retVal = BaseClass::Serialize(archive);
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_userIds, "Users", "User");
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_parentGroupIds, "ParentGroups", "ParentGroup");
+
+	if (imtCoreVersion >= 23930){
+		iser::CArchiveTag sidTag("Sid", "Windows SID", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(sidTag);
+		retVal = retVal && archive.Process(m_sid);
+		retVal = retVal && archive.EndTag(sidTag);
+	}
+	else if (!archive.IsStoring()){
+		m_sid.clear();
 	}
 
 	if (imtCoreVersion >= 23950){
@@ -358,5 +368,3 @@ QByteArrayList CUserGroupInfo::GetAncestorGroups(const QByteArrayList& groupIds)
 
 
 } // namespace imtauth
-
-

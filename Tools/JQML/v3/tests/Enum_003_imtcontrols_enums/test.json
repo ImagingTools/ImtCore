@@ -1,0 +1,6 @@
+{
+    "includes": [
+        "${IMTCOREDIR}/Qml/web/imtcore.json"
+    ],
+    "dirs": []
+}

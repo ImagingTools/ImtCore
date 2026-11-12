@@ -1770,7 +1770,7 @@ QtObject {
 
 				updateCrossOrgGrantInputInput.m_documentId = documentId
 				updateCrossOrgGrantInputInput.m_grant = representationModel
-				updateCrossOrgGrantRequest.send(updateCrossOrgGrantInputInput)
+				return updateCrossOrgGrantRequest.send(updateCrossOrgGrantInputInput)
 			}
 
 			property DocumentId getCrossOrgGrantInput: DocumentId {}

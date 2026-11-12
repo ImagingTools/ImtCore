@@ -59,7 +59,7 @@ sdl::V1_0::imtauth::CGroupData CGroupCollectionDocumentServiceComp::OnGetGroupRe
 	response.name = groupPtr->GetName();
 	response.description = groupPtr->GetDescription();
 
-	// Roles are productId-scoped on IUserBaseInfo; without a tenant context
+	// Roles are productId-scoped on IPrincipal; without a tenant context
 	// here the roles of all products are collected.
 	CAssignmentCollector collector;
 	collector.CollectGroup(*groupPtr, groupPtr->GetObjectUuid(), QByteArray(), getGroupRepresentationRequest.GetRequestInfo().isUsersRequested);

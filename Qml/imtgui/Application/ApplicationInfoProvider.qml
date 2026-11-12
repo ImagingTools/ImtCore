@@ -20,6 +20,8 @@ QtObject {
 	property string permissionPath: ""
 	property ApplicationInfo serverApplicationInfo: null;
 	property int webSocketPort: -1;
+	// The server is behind a reverse proxy that serves the WebSocket on the page's origin
+	property bool webSocketSameOrigin: false;
 	property string userMode: "";
 	property string superuserStatus: "";
 	property string superuserMessage: "";
@@ -70,6 +72,8 @@ QtObject {
 			root.tenantsEnabled = sdlObject.m_tenantsEnabled === true;
 			root.externalLoginEnabled = sdlObject.m_externalLoginEnabled === true;
 			root.documentSharingEnabled = sdlObject.m_documentSharingEnabled === true;
+
+			root.webSocketSameOrigin = sdlObject.m_webSocketSameOrigin === true;
 
 			if (sdlObject.m_webSocketUrl){
 				root.webSocketPort = sdlObject.m_webSocketUrl.m_port;

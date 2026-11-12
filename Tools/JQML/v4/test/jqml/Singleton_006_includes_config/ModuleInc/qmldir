@@ -1,0 +1,2 @@
+module ModuleInc
+singleton IncState 1.0 IncState.qml

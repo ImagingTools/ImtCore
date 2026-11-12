@@ -4,7 +4,7 @@
 <context>
     <name>AddressEditor</name>
     <message>
-        <location filename="../../../Qml/imtgeogui/AddressEditor.qml" line="+13"/>
+        <location filename="../../../Qml/imtgeogui/AddressEditor.qml" line="+15"/>
         <source>Country</source>
         <translation>Страна</translation>
     </message>
@@ -69,7 +69,7 @@
         <translation>Другое</translation>
     </message>
     <message>
-        <location line="+31"/>
+        <location line="+23"/>
         <source>Select type</source>
         <translation>Выберите тип</translation>
     </message>
@@ -84,7 +84,7 @@
         <translation>Широта</translation>
     </message>
     <message>
-        <location line="+13"/>
+        <location line="+18"/>
         <source>Longitude</source>
         <translation>Долгота</translation>
     </message>
@@ -92,7 +92,7 @@
 <context>
     <name>AddressTreeView</name>
     <message>
-        <location filename="../../../Qml/imtgeogui/AddressTreeView.qml" line="+184"/>
+        <location filename="../../../Qml/imtgeogui/AddressTreeView.qml" line="+253"/>
         <source>Address</source>
         <translation>Адрес</translation>
     </message>
@@ -100,7 +100,7 @@
 <context>
     <name>AdministrationUi</name>
     <message>
-        <location filename="../../../Qml/imtauthgui/AdministrationUi.qml" line="+12"/>
+        <location filename="../../../Qml/imtauthgui/AdministrationUi.qml" line="+11"/>
         <source>Administration</source>
         <translation>Администрирование</translation>
     </message>
@@ -108,56 +108,89 @@
 <context>
     <name>AdministrationView</name>
     <message>
-        <location filename="../../../Qml/imtauthgui/AdministrationView.qml" line="+44"/>
-        <location line="+99"/>
-        <location line="+0"/>
+        <location filename="../../../Qml/imtauthgui/AdministrationView.qml" line="+60"/>
+        <location line="+26"/>
+        <location line="+161"/>
         <source>Roles</source>
         <translation>Роли</translation>
     </message>
     <message>
-        <location line="-94"/>
-        <location line="+102"/>
-        <location line="+0"/>
+        <location line="-186"/>
+        <location line="+50"/>
+        <location line="+137"/>
         <source>Users</source>
         <translation>Пользователи</translation>
     </message>
     <message>
-        <location line="-97"/>
-        <location line="+105"/>
-        <location line="+0"/>
+        <location line="-186"/>
+        <location line="+74"/>
+        <location line="+113"/>
         <source>Groups</source>
         <translation>Группы</translation>
     </message>
 </context>
 <context>
+    <name>ApplicationInfoProvider</name>
+    <message>
+        <location filename="../../../Qml/imtgui/Application/ApplicationInfoProvider.qml" line="+101"/>
+        <source>Unable to reach server</source>
+        <translation>Не удалось связаться с сервером</translation>
+    </message>
+</context>
+<context>
     <name>ApplicationMain</name>
     <message>
-        <location filename="../../../Qml/imtgui/Application/ApplicationMain.qml" line="+84"/>
         <source>Try connecting to authorization server ...</source>
-        <translation>Попытка подключения к серверу авторизации...</translation>
+        <translation type="vanished">Попытка подключения к серверу авторизации...</translation>
     </message>
     <message>
-        <location line="+8"/>
         <source>Try connecting to </source>
-        <translation>Попытка подключения к </translation>
+        <translation type="vanished">Попытка подключения к </translation>
     </message>
     <message>
-        <location line="+4"/>
         <source>Server connection error</source>
-        <translation>Ошибка соединения с сервером</translation>
+        <translation type="vanished">Ошибка соединения с сервером</translation>
     </message>
     <message>
-        <location line="+246"/>
         <source>Assigned to you</source>
-        <translation>Назначено вам</translation>
+        <translation type="vanished">Назначено вам</translation>
     </message>
     <message>
-        <location line="+22"/>
         <source>Click to open →</source>
-        <translation>Нажмите, чтобы открыть →</translation>
+        <translation type="vanished">Нажмите, чтобы открыть →</translation>
     </message>
     <message>
-        <location line="+153"/>
+        <location filename="../../../Qml/imtgui/Application/ApplicationMain.qml" line="+102"/>
+        <source>Connecting to the authorization server...</source>
+        <translation>Подключение к серверу авторизации...</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>The authorization server is unavailable</source>
+        <translation>Сервер авторизации недоступен</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Sign-in, users and permissions come from the authorization server, so the application is paused until it is back. The open pages stay as they are; the server reconnects on its own.</source>
+        <translation>Вход, пользователи и права предоставляются сервером авторизации, поэтому работа приложения приостановлена до его восстановления. Открытые страницы останутся без изменений; подключение к серверу восстановится автоматически.</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Connecting to </source>
+        <translation>Подключение к </translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>The connection to the server is lost</source>
+        <translation>Соединение с сервером потеряно</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>The application is paused until the connection is back. The open pages stay as they are.</source>
+        <translation>Работа приложения приостановлена до восстановления соединения. Открытые страницы останутся без изменений.</translation>
+    </message>
+    <message>
+        <location line="+294"/>
         <source>Network</source>
         <translation>Сеть</translation>
     </message>
@@ -172,197 +205,263 @@
         <translation>О продукте</translation>
     </message>
     <message>
-        <location line="+3"/>
         <source>PAT Tokens</source>
-        <translation>PAT-токены</translation>
+        <translation type="vanished">PAT-токены</translation>
     </message>
     <message>
-        <location line="-437"/>
         <source>Authorization server connection error</source>
-        <translation>Сервер авторизации недоступен</translation>
+        <translation type="vanished">Сервер авторизации недоступен</translation>
+    </message>
+</context>
+<context>
+    <name>AssignmentsTable</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/AssignmentsTable.qml" line="+34"/>
+        <source>Name</source>
+        <translation>Имя</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Nothing assigned</source>
+        <translation>Ничего не назначено</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Filter...</source>
+        <translation>Фильтр...</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Inherited, it cannot be removed here. Remove it from its source:</source>
+        <translation>Унаследовано, удалить здесь нельзя. Удалите в источнике:</translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Remove the selected items?</source>
+        <translation>Удалить выбранные элементы?</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>The selected items will be removed from the list.</source>
+        <translation>Выбранные элементы будут удалены из списка.</translation>
+    </message>
+    <message>
+        <location line="+36"/>
+        <source>Group</source>
+        <translation>Группа</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Parent group</source>
+        <translation>Родительская группа</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Role</source>
+        <translation>Роль</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Parent role</source>
+        <translation>Родительская роль</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Delegated role</source>
+        <translation>Делегированная роль</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Required by</source>
+        <translation>Требуется для</translation>
+    </message>
+    <message>
+        <location line="+297"/>
+        <source>Inherited from</source>
+        <translation>Унаследовано от</translation>
     </message>
 </context>
 <context>
     <name>Attribute</name>
     <message>
         <source>{actor} invited you to &quot;{subject}&quot;</source>
-        <translation>Приглашение в «{subject}» от {actor}</translation>
+        <translation type="vanished">Приглашение в «{subject}» от {actor}</translation>
     </message>
     <message>
         <source>{actor} accepted the invitation to &quot;{subject}&quot;</source>
-        <translation>Приглашение в «{subject}» принято: {actor}</translation>
+        <translation type="vanished">Приглашение в «{subject}» принято: {actor}</translation>
     </message>
     <message>
         <source>{actor} declined the invitation to &quot;{subject}&quot;</source>
-        <translation>Приглашение в «{subject}» отклонено: {actor}</translation>
+        <translation type="vanished">Приглашение в «{subject}» отклонено: {actor}</translation>
     </message>
     <message>
         <source>The invitation to &quot;{subject}&quot; was withdrawn</source>
-        <translation>Приглашение в «{subject}» отозвано</translation>
+        <translation type="vanished">Приглашение в «{subject}» отозвано</translation>
     </message>
     <message>
         <source>You are now the owner of &quot;{subject}&quot;</source>
-        <translation>Теперь вы владелец «{subject}»</translation>
+        <translation type="vanished">Теперь вы владелец «{subject}»</translation>
     </message>
     <message>
         <source>{member} is now the owner of &quot;{subject}&quot;</source>
-        <translation>Новый владелец «{subject}»: {member}</translation>
+        <translation type="vanished">Новый владелец «{subject}»: {member}</translation>
     </message>
     <message>
         <source>Your permissions in &quot;{subject}&quot; were changed</source>
-        <translation>Ваши права в «{subject}» изменены</translation>
+        <translation type="vanished">Ваши права в «{subject}» изменены</translation>
     </message>
     <message>
         <source>You are no longer a member of &quot;{subject}&quot;</source>
-        <translation>Вы больше не участник «{subject}»</translation>
+        <translation type="vanished">Вы больше не участник «{subject}»</translation>
     </message>
     <message>
         <source>{member} is no longer a member of &quot;{subject}&quot;</source>
-        <translation>{member} больше не участник «{subject}»</translation>
+        <translation type="vanished">{member} больше не участник «{subject}»</translation>
     </message>
     <message>
         <source>New message from &quot;{subject}&quot;</source>
-        <translation>Новое сообщение от «{subject}»</translation>
+        <translation type="vanished">Новое сообщение от «{subject}»</translation>
     </message>
     <message>
         <source>&quot;{partner}&quot; wants to connect to &quot;{subject}&quot;</source>
-        <translation>«{partner}» хочет подключиться к «{subject}»</translation>
+        <translation type="vanished">«{partner}» хочет подключиться к «{subject}»</translation>
     </message>
     <message>
         <source>&quot;{partner}&quot; accepted the connection request of &quot;{subject}&quot;</source>
-        <translation>Запрос «{subject}» на подключение к «{partner}» принят</translation>
+        <translation type="vanished">Запрос «{subject}» на подключение к «{partner}» принят</translation>
     </message>
     <message>
         <source>&quot;{partner}&quot; declined the connection request of &quot;{subject}&quot;</source>
-        <translation>Запрос «{subject}» на подключение к «{partner}» отклонён</translation>
+        <translation type="vanished">Запрос «{subject}» на подключение к «{partner}» отклонён</translation>
     </message>
     <message>
         <source>The connection of &quot;{subject}&quot; with &quot;{partner}&quot; was removed</source>
-        <translation>Подключение «{subject}» к «{partner}» удалено</translation>
+        <translation type="vanished">Подключение «{subject}» к «{partner}» удалено</translation>
     </message>
     <message>
         <source>&quot;{partner}&quot; proposes a relationship to &quot;{subject}&quot;</source>
-        <translation>«{partner}» предлагает связь с «{subject}»</translation>
+        <translation type="vanished">«{partner}» предлагает связь с «{subject}»</translation>
     </message>
     <message>
         <source>The relationship of &quot;{subject}&quot; with &quot;{partner}&quot; was accepted</source>
-        <translation>Связь «{subject}» с «{partner}» принята</translation>
+        <translation type="vanished">Связь «{subject}» с «{partner}» принята</translation>
     </message>
     <message>
         <source>The relationship proposal of &quot;{subject}&quot; with &quot;{partner}&quot; was declined</source>
-        <translation>Предложение о связи «{subject}» с «{partner}» отклонено</translation>
+        <translation type="vanished">Предложение о связи «{subject}» с «{partner}» отклонено</translation>
     </message>
     <message>
         <source>The relationship of &quot;{subject}&quot; with &quot;{partner}&quot; ended</source>
-        <translation>Связь «{subject}» с «{partner}» завершена</translation>
+        <translation type="vanished">Связь «{subject}» с «{partner}» завершена</translation>
     </message>
     <message>
         <source>{count, plural, =1 {New message in &quot;{subject}&quot;} other {# new messages in &quot;{subject}&quot;}}</source>
-        <translation>{count, plural, =1 {Новое сообщение в «{subject}»} one {# новое сообщение в «{subject}»} few {# новых сообщения в «{subject}»} many {# новых сообщений в «{subject}»} other {# нового сообщения в «{subject}»}}</translation>
+        <translation type="vanished">{count, plural, =1 {Новое сообщение в «{subject}»} one {# новое сообщение в «{subject}»} few {# новых сообщения в «{subject}»} many {# новых сообщений в «{subject}»} other {# нового сообщения в «{subject}»}}</translation>
     </message>
     <message>
         <source>{actor} assigned you to &quot;{subject}&quot;</source>
-        <translation>{actor} назначает вас на «{subject}»</translation>
+        <translation type="vanished">{actor} назначает вас на «{subject}»</translation>
     </message>
     <message>
         <source>Organization</source>
-        <translation>Организация</translation>
+        <translation type="vanished">Организация</translation>
     </message>
     <message>
         <source>Connection request</source>
-        <translation>Запрос на подключение</translation>
+        <translation type="vanished">Запрос на подключение</translation>
     </message>
     <message>
         <source>Connection</source>
-        <translation>Подключение</translation>
+        <translation type="vanished">Подключение</translation>
     </message>
     <message>
         <source>Relationship proposal</source>
-        <translation>Предложение о связи</translation>
+        <translation type="vanished">Предложение о связи</translation>
     </message>
     <message>
         <source>Relationship</source>
-        <translation>Связь</translation>
+        <translation type="vanished">Связь</translation>
     </message>
     <message>
         <source>Message from organization</source>
-        <translation>Сообщение от организации</translation>
+        <translation type="vanished">Сообщение от организации</translation>
     </message>
     <message>
         <source>Invitation received</source>
-        <translation>Получено приглашение</translation>
+        <translation type="vanished">Получено приглашение</translation>
     </message>
     <message>
         <source>Invitation accepted</source>
-        <translation>Приглашение принято</translation>
+        <translation type="vanished">Приглашение принято</translation>
     </message>
     <message>
         <source>Invitation declined</source>
-        <translation>Приглашение отклонено</translation>
+        <translation type="vanished">Приглашение отклонено</translation>
     </message>
     <message>
         <source>Invitation withdrawn</source>
-        <translation>Приглашение отозвано</translation>
+        <translation type="vanished">Приглашение отозвано</translation>
     </message>
     <message>
         <source>Ownership received</source>
-        <translation>Вы стали владельцем</translation>
+        <translation type="vanished">Вы стали владельцем</translation>
     </message>
     <message>
         <source>Ownership transferred</source>
-        <translation>Владение передано</translation>
+        <translation type="vanished">Владение передано</translation>
     </message>
     <message>
         <source>Permissions changed</source>
-        <translation>Права изменены</translation>
+        <translation type="vanished">Права изменены</translation>
     </message>
     <message>
         <source>Membership ended</source>
-        <translation>Участие завершено</translation>
+        <translation type="vanished">Участие завершено</translation>
     </message>
     <message>
         <source>Member left</source>
-        <translation>Участник вышел</translation>
+        <translation type="vanished">Участник вышел</translation>
     </message>
     <message>
         <source>Connection request received</source>
-        <translation>Получен запрос на подключение</translation>
+        <translation type="vanished">Получен запрос на подключение</translation>
     </message>
     <message>
         <source>Connection request approved</source>
-        <translation>Запрос на подключение одобрен</translation>
+        <translation type="vanished">Запрос на подключение одобрен</translation>
     </message>
     <message>
         <source>Connection request rejected</source>
-        <translation>Запрос на подключение отклонён</translation>
+        <translation type="vanished">Запрос на подключение отклонён</translation>
     </message>
     <message>
         <source>Connection removed</source>
-        <translation>Подключение удалено</translation>
+        <translation type="vanished">Подключение удалено</translation>
     </message>
     <message>
         <source>Relationship proposal received</source>
-        <translation>Получено предложение о связи</translation>
+        <translation type="vanished">Получено предложение о связи</translation>
     </message>
     <message>
         <source>Relationship proposal approved</source>
-        <translation>Предложение о связи одобрено</translation>
+        <translation type="vanished">Предложение о связи одобрено</translation>
     </message>
     <message>
         <source>Relationship proposal rejected</source>
-        <translation>Предложение о связи отклонено</translation>
+        <translation type="vanished">Предложение о связи отклонено</translation>
     </message>
     <message>
         <source>Relationship ended</source>
-        <translation>Связь прекращена</translation>
+        <translation type="vanished">Связь прекращена</translation>
     </message>
     <message>
         <source>New message</source>
-        <translation>Новое сообщение</translation>
+        <translation type="vanished">Новое сообщение</translation>
     </message>
     <message>
         <source>Ticket assigned</source>
-        <translation>Назначена заявка</translation>
+        <translation type="vanished">Назначена заявка</translation>
     </message>
     <message>
         <source>Notifications</source>
@@ -370,3203 +469,1233 @@
     </message>
     <message>
         <source>Notification</source>
-        <translation>Уведомление</translation>
+        <translation type="vanished">Уведомление</translation>
     </message>
     <message>
         <source>Severity</source>
-        <translation>Важность</translation>
+        <translation type="vanished">Важность</translation>
     </message>
     <message>
         <source>Mark as read</source>
-        <translation>Отметить как прочитанное</translation>
+        <translation type="vanished">Отметить как прочитанное</translation>
     </message>
     <message>
         <source>Mark all as read</source>
-        <translation>Отметить все как прочитанные</translation>
+        <translation type="vanished">Отметить все как прочитанные</translation>
     </message>
     <message>
         <source>Parent organization</source>
-        <translation>Родительская организация</translation>
+        <translation type="vanished">Родительская организация</translation>
     </message>
     <message>
         <source>Members</source>
-        <translation>Участники</translation>
+        <translation type="vanished">Участники</translation>
     </message>
     <message>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DdlCodeCreator/CDdlCodeCreator.cpp" line="+33"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+41"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+36"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+37"/>
         <source>Client (CommandLine)</source>
-        <translation>Клиент (командная строка)</translation>
+        <translation type="vanished">Клиент (командная строка)</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-6"/>
         <source>. ImagingTools</source>
-        <translation>. ImagingTools</translation>
+        <translation type="vanished">. ImagingTools</translation>
     </message>
     <message>
-        <location line="+4"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-4"/>
         <source>Design token generator</source>
-        <translation>Генератор дизайн-токенов</translation>
+        <translation type="vanished">Генератор дизайн-токенов</translation>
     </message>
     <message>
-        <location line="-4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-2"/>
         <source>ImagingTools</source>
-        <translation>ImagingTools</translation>
+        <translation type="vanished">ImagingTools</translation>
     </message>
     <message>
-        <location line="+826"/>
-        <location line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+592"/>
-        <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+229"/>
-        <location line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+732"/>
-        <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+548"/>
-        <location line="+10"/>
         <source>Client</source>
-        <translation>Клиент</translation>
+        <translation type="vanished">Клиент</translation>
     </message>
     <message>
-        <location line="-822"/>
-        <location line="+60"/>
-        <location line="+12"/>
-        <location line="+754"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-148"/>
-        <location line="+14"/>
-        <location line="+72"/>
-        <location line="+66"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+4"/>
-        <location line="+12"/>
-        <location line="+80"/>
-        <location line="+72"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-728"/>
-        <location line="+732"/>
-        <location line="+22"/>
-        <location line="+16"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-114"/>
-        <location line="+6"/>
-        <location line="+80"/>
-        <location line="+32"/>
         <source>Server</source>
-        <translation>Сервер</translation>
+        <translation type="vanished">Сервер</translation>
     </message>
     <message>
-        <location line="-504"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+220"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-214"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-510"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+158"/>
         <source>AddressElements</source>
-        <translation>Элементы адреса</translation>
+        <translation type="vanished">Элементы адреса</translation>
     </message>
     <message>
-        <location line="+494"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-234"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+40"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+464"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-168"/>
         <source>. xxxx &lt;my company&gt;</source>
-        <translation>. xxxx &lt;моя компания&gt;</translation>
+        <translation type="vanished">. xxxx &lt;моя компания&gt;</translation>
     </message>
     <message>
-        <location line="-800"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-36"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+116"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-696"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-8"/>
         <source>(C) 2018 ImagingTools GmbH. All rights reserved.</source>
-        <translation>(C) 2018 ImagingTools GmbH. Все права защищены.</translation>
+        <translation type="vanished">(C) 2018 ImagingTools GmbH. Все права защищены.</translation>
     </message>
     <message>
-        <location line="+32"/>
-        <location line="+374"/>
-        <location line="+398"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+30"/>
-        <location line="+12"/>
-        <location line="+248"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-134"/>
-        <location line="+22"/>
-        <location line="+158"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+254"/>
-        <location line="+444"/>
-        <location line="+16"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-114"/>
-        <location line="+124"/>
-        <location line="+278"/>
         <source>Settings</source>
-        <translation>Настройки</translation>
+        <translation type="vanished">Настройки</translation>
     </message>
     <message>
-        <location line="-798"/>
-        <location line="+32"/>
-        <location line="+12"/>
-        <location line="+442"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-412"/>
-        <location line="+12"/>
-        <location line="+10"/>
-        <location line="+104"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-146"/>
-        <location line="+120"/>
-        <location line="+32"/>
-        <location line="+458"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-708"/>
-        <location line="+674"/>
-        <location line="+40"/>
-        <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-750"/>
-        <location line="+322"/>
-        <location line="+32"/>
-        <location line="+12"/>
         <source>Preference File</source>
-        <translation>Файл настроек</translation>
+        <translation type="vanished">Файл настроек</translation>
     </message>
     <message>
-        <location line="-484"/>
-        <location line="+328"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location line="+288"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-488"/>
-        <location line="+78"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-720"/>
-        <location line="+246"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-40"/>
-        <location line="+420"/>
         <source>Light</source>
-        <translation>Светлая</translation>
+        <translation type="vanished">Светлая</translation>
     </message>
     <message>
-        <location line="-326"/>
-        <location line="+328"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-286"/>
-        <location line="+288"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-76"/>
-        <location line="+78"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-244"/>
-        <location line="+246"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-418"/>
-        <location line="+420"/>
         <source>Dark</source>
-        <translation>Темная</translation>
+        <translation type="vanished">Темная</translation>
     </message>
     <message>
-        <location line="-314"/>
-        <location line="+478"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-416"/>
-        <location line="+138"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-66"/>
-        <location line="+480"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-238"/>
-        <location line="+670"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-742"/>
-        <location line="+332"/>
         <source>General</source>
-        <translation>Основное</translation>
+        <translation type="vanished">Основное</translation>
     </message>
     <message>
-        <location line="-480"/>
-        <location line="+426"/>
-        <location line="+52"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-474"/>
-        <location line="+344"/>
-        <location line="+132"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-482"/>
-        <location line="+154"/>
-        <location line="+332"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-668"/>
-        <location line="+324"/>
-        <location line="+342"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-368"/>
-        <location line="+34"/>
-        <location line="+336"/>
         <source>Language</source>
-        <translation>Язык</translation>
+        <translation type="vanished">Язык</translation>
     </message>
     <message>
-        <location line="-96"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+272"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-656"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-436"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+412"/>
         <source>http://localhost:7778</source>
-        <translation>http://localhost:7778</translation>
+        <translation type="vanished">http://localhost:7778</translation>
     </message>
     <message>
-        <location line="-384"/>
-        <location line="+424"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-746"/>
-        <location line="+476"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+174"/>
-        <location line="+152"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-228"/>
-        <location line="+324"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-786"/>
-        <location line="+370"/>
         <source>Design Schema</source>
-        <translation>Дизайн схема</translation>
+        <translation type="vanished">Дизайн схема</translation>
     </message>
     <message>
-        <location line="-418"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-150"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+360"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+6"/>
         <source>DocumentInfo</source>
-        <translation>Информация о документе</translation>
+        <translation type="vanished">Информация о документе</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Network</source>
-        <translation>Сеть</translation>
+        <translation type="vanished">Сеть</translation>
     </message>
     <message>
-        <location line="+12"/>
-        <location line="+2"/>
-        <location line="+452"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-144"/>
-        <location line="+2"/>
-        <location line="+8"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+12"/>
-        <location line="+2"/>
-        <location line="+456"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-30"/>
-        <location line="+2"/>
-        <location line="+38"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-336"/>
-        <location line="+2"/>
-        <location line="+346"/>
-        <location line="+2"/>
         <source>Preferences</source>
-        <translation>Настройки</translation>
+        <translation type="vanished">Настройки</translation>
     </message>
     <message>
-        <location line="-448"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-616"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+6"/>
         <source>^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$</source>
-        <translation>^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$</translation>
+        <translation type="vanished">^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$</translation>
     </message>
     <message>
-        <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+12"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+12"/>
         <source>Instance Mask</source>
-        <translation>Маска экземпляра</translation>
+        <translation type="vanished">Маска экземпляра</translation>
     </message>
     <message>
-        <location line="-6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-4"/>
         <source>Database Settings</source>
-        <translation>Настройки базы данных</translation>
+        <translation type="vanished">Настройки базы данных</translation>
     </message>
     <message>
-        <location line="+66"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+64"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+64"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+60"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+62"/>
         <source>ImtCore</source>
-        <translation>ImtCore</translation>
+        <translation type="vanished">ImtCore</translation>
     </message>
     <message>
-        <location line="+346"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-120"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+514"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-148"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-462"/>
         <source>STL</source>
-        <translation>STL</translation>
+        <translation type="vanished">STL</translation>
     </message>
     <message>
-        <location line="-316"/>
-        <location line="+78"/>
-        <location line="+18"/>
-        <location line="+146"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+308"/>
-        <location line="+78"/>
-        <location line="+18"/>
-        <location line="+20"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-736"/>
-        <location line="+78"/>
-        <location line="+18"/>
-        <location line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-558"/>
-        <location line="+104"/>
-        <location line="+18"/>
-        <location line="+24"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+538"/>
-        <location line="+124"/>
-        <location line="+22"/>
-        <location line="+102"/>
         <source>Revision</source>
-        <translation>Ревизия</translation>
+        <translation type="vanished">Ревизия</translation>
     </message>
     <message>
-        <location line="+12"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+12"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+10"/>
         <source>qrc:/qml/imtcolgui/CollectionWorkspacePageView.qml</source>
-        <translation>qrc:/qml/imtcolgui/CollectionWorkspacePageView.qml</translation>
+        <translation type="vanished">qrc:/qml/imtcolgui/CollectionWorkspacePageView.qml</translation>
     </message>
     <message>
-        <location line="-252"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-128"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-118"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-154"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-256"/>
         <source>New Role</source>
-        <translation>Новая роль</translation>
+        <translation type="vanished">Новая роль</translation>
     </message>
     <message>
-        <location line="+78"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+78"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+78"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+104"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+124"/>
         <source>New Group</source>
-        <translation>Новая группа</translation>
+        <translation type="vanished">Новая группа</translation>
     </message>
     <message>
-        <location line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+12"/>
         <source>System Name</source>
-        <translation>Название системы</translation>
+        <translation type="vanished">Название системы</translation>
     </message>
     <message>
-        <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+10"/>
         <source>New User</source>
-        <translation>Новый пользователь</translation>
+        <translation type="vanished">Новый пользователь</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-182"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-154"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-182"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-98"/>
         <source>qrc:/qml/imtguigql/GqlCollectionDocManagerPageView.qml</source>
-        <translation>qrc:/qml/imtguigql/GqlCollectionDocManagerPageView.qml</translation>
+        <translation type="vanished">qrc:/qml/imtguigql/GqlCollectionDocManagerPageView.qml</translation>
     </message>
     <message>
-        <location line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+22"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+8"/>
         <source>qrc:/qml/imtgui/View/SearchPage.qml</source>
-        <translation>qrc:/qml/imtgui/View/SearchPage.qml</translation>
+        <translation type="vanished">qrc:/qml/imtgui/View/SearchPage.qml</translation>
     </message>
     <message>
-        <location line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+4"/>
         <source>Icons/Search</source>
-        <translation>Icons/Search</translation>
+        <translation type="vanished">Icons/Search</translation>
     </message>
     <message>
-        <location line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>qrc:/qml/imtdocgui/SearchPageSingleDocumentView.qml</source>
-        <translation>qrc:/qml/imtdocgui/SearchPageSingleDocumentView.qml</translation>
+        <translation type="vanished">qrc:/qml/imtdocgui/SearchPageSingleDocumentView.qml</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-4"/>
         <source>Search</source>
         <translation>Поиск</translation>
     </message>
     <message>
-        <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+6"/>
         <source>qrc:/qml/imtauthgui/AdministrationView.qml</source>
-        <translation>qrc:/qml/imtauthgui/AdministrationView.qml</translation>
+        <translation type="vanished">qrc:/qml/imtauthgui/AdministrationView.qml</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Admin</source>
-        <translation>Админ</translation>
+        <translation>Администрирование</translation>
     </message>
     <message>
-        <location line="-136"/>
-        <location line="+664"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-24"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-16"/>
-        <location line="+302"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-8"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-260"/>
-        <location line="+176"/>
         <source>Alias</source>
-        <translation>Псевдоним</translation>
+        <translation type="vanished">Псевдоним</translation>
     </message>
     <message>
-        <location line="-662"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-300"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>/// \file $(FilePath)</source>
-        <translation>/// \file $(FilePath)</translation>
+        <translation type="vanished">/// \file $(FilePath)</translation>
     </message>
     <message>
-        <location line="+190"/>
-        <location line="+58"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-570"/>
-        <location line="+636"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+392"/>
-        <location line="+74"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+98"/>
-        <location line="+174"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+192"/>
-        <location line="+50"/>
         <source>Algorithm</source>
-        <translation>Алгоритм</translation>
+        <translation type="vanished">Алгоритм</translation>
     </message>
     <message>
-        <location line="-56"/>
-        <location line="+48"/>
-        <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-646"/>
-        <location line="+4"/>
-        <location line="+644"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-72"/>
-        <location line="+60"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-172"/>
-        <location line="+160"/>
-        <location line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-48"/>
-        <location line="+42"/>
-        <location line="+2"/>
         <source>Encoding Format</source>
-        <translation>Формат кодирования</translation>
+        <translation type="vanished">Формат кодирования</translation>
     </message>
     <message>
-        <location line="-56"/>
-        <location line="+104"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-606"/>
-        <location line="+608"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-60"/>
-        <location line="+100"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-166"/>
-        <location line="+196"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-776"/>
-        <location line="+734"/>
         <source>Type</source>
-        <translation>Тип</translation>
+        <translation type="vanished">Тип</translation>
     </message>
     <message>
-        <location line="-102"/>
-        <location line="+12"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-682"/>
-        <location line="+684"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-98"/>
-        <location line="+30"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-194"/>
-        <location line="+128"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
-        <location line="+8"/>
+        <location filename="../../../Include/imtauth/CUserChangeGeneratorComp.cpp" line="+81"/>
+        <source>Security-ID</source>
+        <translation>Security-ID</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Administrator</source>
+        <translation>Администратор</translation>
+    </message>
+    <message>
+        <location line="+4"/>
         <source>Password</source>
         <translation>Пароль</translation>
     </message>
     <message>
-        <location line="-10"/>
-        <location line="+48"/>
-        <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-654"/>
-        <location line="+8"/>
-        <location line="+648"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-28"/>
-        <location line="+52"/>
-        <location line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-126"/>
-        <location line="+152"/>
-        <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-6"/>
-        <location line="+34"/>
-        <location line="+14"/>
+        <location line="+31"/>
+        <location filename="../../../Include/imtauth/CUserGroupChangeGeneratorComp.cpp" line="+139"/>
+        <source>Product</source>
+        <translation>Продукт</translation>
+    </message>
+    <message>
         <source>File Path</source>
-        <translation>Путь к файлу</translation>
+        <translation type="vanished">Путь к файлу</translation>
     </message>
     <message>
-        <location line="-52"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-58"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-156"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-58"/>
         <source>Key Files</source>
-        <translation>Файлы ключей</translation>
+        <translation type="vanished">Файлы ключей</translation>
     </message>
     <message>
-        <location line="-256"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-216"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-164"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+616"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-294"/>
         <source>Remove All</source>
-        <translation>Удалить все</translation>
+        <translation type="vanished">Удалить все</translation>
     </message>
     <message>
-        <location line="-6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-10"/>
         <source>Restore All</source>
-        <translation>Восстановить все</translation>
+        <translation type="vanished">Восстановить все</translation>
     </message>
     <message>
-        <location line="-8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+6"/>
         <source>Duplicate</source>
-        <translation>Дублировать</translation>
+        <translation type="vanished">Дублировать</translation>
     </message>
     <message>
-        <location line="+16"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Restore</source>
-        <translation>Восстановить</translation>
+        <translation type="vanished">Восстановить</translation>
     </message>
     <message>
-        <location line="+230"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+194"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+132"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-634"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+282"/>
         <source>Certificate Files</source>
-        <translation>Файлы сертификатов</translation>
+        <translation type="vanished">Файлы сертификатов</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-646"/>
-        <location line="+648"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location line="+66"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location line="+158"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
-        <location line="+54"/>
         <source>Enable SSL</source>
-        <translation>Включить SSL</translation>
+        <translation type="vanished">Включить SSL</translation>
     </message>
     <message>
-        <location line="-46"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-64"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-156"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-52"/>
         <source>Local Certificate</source>
-        <translation>Локальный сертификат</translation>
+        <translation type="vanished">Локальный сертификат</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>CA Certificate</source>
-        <translation>Сертификат ЦС</translation>
+        <translation type="vanished">Сертификат ЦС</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location line="+58"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-636"/>
-        <location line="+638"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location line="+72"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location line="+170"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
-        <location line="+60"/>
         <source>Private Key</source>
-        <translation>Закрытый ключ</translation>
+        <translation type="vanished">Закрытый ключ</translation>
     </message>
     <message>
-        <location line="-56"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-70"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-168"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-58"/>
         <source>Verification Mode</source>
-        <translation>Режим проверки</translation>
+        <translation type="vanished">Режим проверки</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Protocol</source>
-        <translation>Протокол</translation>
+        <translation type="vanished">Протокол</translation>
     </message>
     <message>
-        <location line="+92"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-624"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+84"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+184"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-748"/>
         <source>LDAP</source>
-        <translation>LDAP</translation>
+        <translation type="vanished">LDAP</translation>
     </message>
     <message>
-        <location line="-428"/>
-        <location line="+16"/>
-        <location line="+44"/>
-        <location line="+762"/>
-        <location line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+384"/>
-        <location line="+86"/>
-        <location line="+16"/>
-        <location line="+46"/>
-        <location line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-266"/>
-        <location line="+4"/>
-        <location line="+92"/>
-        <location line="+14"/>
-        <location line="+58"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-340"/>
-        <location line="+24"/>
-        <location line="+704"/>
-        <location line="+4"/>
-        <location line="+22"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+424"/>
-        <location line="+86"/>
-        <location line="+14"/>
-        <location line="+14"/>
-        <location line="+4"/>
-        <source>ImagingTools</source>
-        <translation>ImagingTools</translation>
-    </message>
-    <message>
-        <location line="-814"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-52"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-56"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-726"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-14"/>
         <source>Full Screen</source>
-        <translation>Полный экран</translation>
+        <translation type="vanished">Полный экран</translation>
     </message>
     <message>
-        <location line="+20"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+20"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+28"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-140"/>
         <source>PageViewParam</source>
-        <translation>Параметры просмотра страницы</translation>
+        <translation type="vanished">Параметры просмотра страницы</translation>
     </message>
     <message>
-        <location line="+16"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+16"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+16"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+708"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+26"/>
         <source>qrc:/qml/imtdocgui/MultiDocWorkspacePageView.qml</source>
-        <translation>qrc:/qml/imtdocgui/MultiDocWorkspacePageView.qml</translation>
+        <translation type="vanished">qrc:/qml/imtdocgui/MultiDocWorkspacePageView.qml</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>../../imtdocgui/MultiDocWorkspacePageView.qml</source>
-        <translation>../../imtdocgui/MultiDocWorkspacePageView.qml</translation>
+        <translation type="vanished">../../imtdocgui/MultiDocWorkspacePageView.qml</translation>
     </message>
     <message>
-        <location line="+26"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-120"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-138"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+26"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+26"/>
         <source>qrc:/qml/imtdocgui/SingleDocumentWorkspacePageView.qml</source>
-        <translation>qrc:/qml/imtdocgui/SingleDocumentWorkspacePageView.qml</translation>
+        <translation type="vanished">qrc:/qml/imtdocgui/SingleDocumentWorkspacePageView.qml</translation>
     </message>
     <message>
-        <location line="+24"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+32"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+24"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+30"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+30"/>
         <source>Icons/History</source>
-        <translation>Icons/History</translation>
+        <translation type="vanished">Icons/History</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-2"/>
         <source>History</source>
-        <translation>История</translation>
+        <translation type="vanished">История</translation>
     </message>
     <message>
-        <location line="+52"/>
-        <location line="+12"/>
-        <location line="+26"/>
-        <location line="+104"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+156"/>
-        <location line="+46"/>
-        <location line="+12"/>
-        <location line="+28"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-222"/>
-        <location line="+20"/>
-        <location line="+12"/>
-        <location line="+28"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-702"/>
-        <location line="+16"/>
-        <location line="+12"/>
-        <location line="+52"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+96"/>
-        <location line="+12"/>
-        <location line="+28"/>
-        <location line="+46"/>
+        <location line="+22"/>
+        <location filename="../../../Include/imtauth/CUserGroupChangeGeneratorComp.cpp" line="+22"/>
+        <location filename="../../../Include/imtauthdb/CRoleDatabaseDelegateComp.cpp" line="+60"/>
         <source>Role</source>
         <translation>Роль</translation>
     </message>
     <message>
-        <location line="-110"/>
-        <location line="+108"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-88"/>
-        <location line="+80"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-62"/>
-        <location line="+54"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-82"/>
-        <location line="+76"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-54"/>
-        <location line="+58"/>
         <source>Session</source>
-        <translation>Сессия</translation>
+        <translation type="vanished">Сессия</translation>
     </message>
     <message>
-        <location line="-114"/>
-        <location line="+52"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-6"/>
-        <location line="+52"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-6"/>
-        <location line="+52"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-32"/>
-        <location line="+78"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-64"/>
-        <location line="+98"/>
         <source>User Connection</source>
-        <translation>Подключение пользователя</translation>
+        <translation type="vanished">Подключение пользователя</translation>
     </message>
     <message>
-        <location line="-50"/>
-        <location line="+52"/>
-        <location line="+58"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-120"/>
-        <location line="+70"/>
-        <location line="+52"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-96"/>
-        <location line="+46"/>
-        <location line="+52"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-124"/>
-        <location line="+48"/>
-        <location line="+78"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-96"/>
-        <location line="+64"/>
-        <location line="+34"/>
+        <location line="-45"/>
+        <location filename="../../../Include/imtauthdb/CUserGroupDatabaseDelegateComp.cpp" line="+51"/>
+        <location line="+67"/>
+        <location line="+15"/>
+        <location line="+39"/>
         <source>Group</source>
         <translation>Группа</translation>
     </message>
     <message>
-        <location line="-108"/>
-        <location line="+60"/>
-        <location line="+46"/>
-        <location line="+154"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-698"/>
-        <location line="+574"/>
-        <location line="+74"/>
-        <location line="+60"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-96"/>
-        <location line="+46"/>
-        <location line="+60"/>
-        <location line="+352"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-128"/>
-        <location line="+52"/>
-        <location line="+86"/>
-        <location line="+128"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-672"/>
-        <location line="+576"/>
-        <location line="+58"/>
-        <location line="+52"/>
+        <location filename="../../../Include/imtauth/CUserGroupChangeGeneratorComp.cpp" line="-54"/>
+        <location filename="../../../Include/imtauthdb/CUserGroupDatabaseDelegateComp.cpp" line="+19"/>
+        <source>Parent Group</source>
+        <translation>Родительская группа</translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <location filename="../../../Include/imtauthdb/CUserDatabaseDelegateComp.cpp" line="+51"/>
+        <location line="+75"/>
+        <location line="+20"/>
         <source>User</source>
         <translation>Пользователь</translation>
     </message>
     <message>
-        <location line="-84"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-774"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-70"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-68"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+62"/>
         <source>SMTP</source>
-        <translation>SMTP</translation>
+        <translation type="vanished">SMTP</translation>
     </message>
     <message>
-        <location line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-4"/>
         <source>Server Address</source>
-        <translation>Адрес сервера</translation>
+        <translation type="vanished">Адрес сервера</translation>
     </message>
     <message>
-        <location line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+6"/>
         <source>Port</source>
-        <translation>Порт</translation>
+        <translation type="vanished">Порт</translation>
     </message>
     <message>
-        <location line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+16"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>465</source>
-        <translation>465</translation>
+        <translation type="vanished">465</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+4"/>
         <source>qqmbxszuzxnylorx</source>
-        <translation>qqmbxszuzxnylorx</translation>
+        <translation type="vanished">qqmbxszuzxnylorx</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-2"/>
         <source>kucherenkord@gmail.com</source>
-        <translation>kucherenkord@gmail.com</translation>
+        <translation type="vanished">kucherenkord@gmail.com</translation>
     </message>
     <message>
-        <location line="-6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+4"/>
         <source>smtp.gmail.com</source>
-        <translation>smtp.gmail.com</translation>
+        <translation type="vanished">smtp.gmail.com</translation>
     </message>
     <message>
-        <location line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+12"/>
         <source>Activate it if you want your server to work using SSL</source>
-        <translation>Активируйте, если хотите, чтобы сервер работал по SSL</translation>
+        <translation type="vanished">Активируйте, если хотите, чтобы сервер работал по SSL</translation>
     </message>
     <message>
-        <location line="+12"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-2"/>
         <source>Local Cert</source>
-        <translation>Локальный сертификат</translation>
+        <translation type="vanished">Локальный сертификат</translation>
     </message>
     <message>
-        <location line="-8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-4"/>
         <source>SSL Protocol</source>
-        <translation>SSL-протокол</translation>
+        <translation type="vanished">SSL-протокол</translation>
     </message>
     <message>
-        <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Verify Mode</source>
-        <translation>Режим проверки</translation>
+        <translation type="vanished">Режим проверки</translation>
     </message>
     <message>
-        <location line="-4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-6"/>
         <source>Ca Cert</source>
-        <translation>Сертификат ЦС</translation>
+        <translation type="vanished">Сертификат ЦС</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+12"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>SSL Configuration</source>
-        <translation>Настройки SSL</translation>
+        <translation type="vanished">Настройки SSL</translation>
     </message>
     <message>
-        <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+20"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+18"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+18"/>
         <source>Key Type</source>
-        <translation>Тип ключа</translation>
+        <translation type="vanished">Тип ключа</translation>
     </message>
     <message>
-        <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+6"/>
         <source>Select the file with your private key</source>
-        <translation>Выберите файл с вашим закрытым ключом</translation>
+        <translation type="vanished">Выберите файл с вашим закрытым ключом</translation>
     </message>
     <message>
-        <location line="-70"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+772"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-300"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-66"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-102"/>
         <source>Message Info</source>
-        <translation>Информация о сообщении</translation>
+        <translation type="vanished">Информация о сообщении</translation>
     </message>
     <message>
-        <location line="-304"/>
-        <location line="+442"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-730"/>
-        <location line="+460"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+172"/>
-        <location line="+174"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-230"/>
-        <location line="+340"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-672"/>
-        <location line="+352"/>
         <source>User Settings</source>
-        <translation>Настройки пользователя</translation>
+        <translation type="vanished">Настройки пользователя</translation>
     </message>
     <message>
-        <location line="-434"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-166"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-330"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+10"/>
         <source>English</source>
-        <translation>Английский</translation>
+        <translation type="vanished">Английский</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>German</source>
-        <translation>Немецкий</translation>
+        <translation type="vanished">Немецкий</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Russian</source>
-        <translation>Русский</translation>
+        <translation type="vanished">Русский</translation>
     </message>
     <message>
-        <location line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+692"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+12"/>
         <source>Server Connection Interface</source>
-        <translation>Интерфейс подключения к серверу</translation>
+        <translation type="vanished">Интерфейс подключения к серверу</translation>
     </message>
     <message>
-        <location line="+436"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-176"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+440"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-56"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-372"/>
         <source>OBJ</source>
-        <translation>OBJ</translation>
+        <translation type="vanished">OBJ</translation>
     </message>
     <message>
-        <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+4"/>
         <source>X</source>
-        <translation>X</translation>
+        <translation type="vanished">X</translation>
     </message>
     <message>
-        <location line="-4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Z</source>
-        <translation>Z</translation>
+        <translation type="vanished">Z</translation>
     </message>
     <message>
-        <location line="-478"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+132"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-496"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-678"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+472"/>
         <source>Last Message</source>
-        <translation>Последнее сообщение</translation>
+        <translation type="vanished">Последнее сообщение</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Unread</source>
-        <translation>Непрочитанные</translation>
+        <translation type="vanished">Непрочитанные</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Participants</source>
-        <translation>Участники</translation>
+        <translation type="vanished">Участники</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Last Updated</source>
-        <translation>Последнее обновление</translation>
+        <translation type="vanished">Последнее обновление</translation>
     </message>
     <message>
-        <location line="+70"/>
-        <location line="+232"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-72"/>
-        <location line="+196"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-274"/>
-        <location line="+192"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+94"/>
-        <location line="+684"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-62"/>
-        <location line="+206"/>
         <source>Import</source>
-        <translation>Импорт</translation>
+        <translation type="vanished">Импорт</translation>
     </message>
     <message>
-        <location line="-230"/>
-        <location line="+232"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-198"/>
-        <location line="+192"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-194"/>
-        <location line="+202"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-690"/>
-        <location line="+684"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-222"/>
-        <location line="+220"/>
         <source>Export</source>
-        <translation>Экспорт</translation>
+        <translation type="vanished">Экспорт</translation>
     </message>
     <message>
-        <location line="-194"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-154"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+32"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+32"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-178"/>
         <source>#</source>
-        <translation>#</translation>
+        <translation type="vanished">#</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Title</source>
-        <translation>Заголовок</translation>
+        <translation type="vanished">Заголовок</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Status</source>
-        <translation>Статус</translation>
+        <translation type="vanished">Статус</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Priority</source>
-        <translation>Приоритет</translation>
+        <translation type="vanished">Приоритет</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Assignees</source>
-        <translation>Исполнители</translation>
+        <translation type="vanished">Исполнители</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location line="+68"/>
-        <location line="+28"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location line="+228"/>
-        <location line="+26"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-182"/>
-        <location line="+26"/>
-        <location line="+158"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-640"/>
-        <location line="+28"/>
-        <location line="+614"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
-        <location line="+116"/>
-        <location line="+72"/>
         <source>Created</source>
-        <translation>Создано</translation>
+        <translation type="vanished">Создано</translation>
     </message>
     <message>
-        <location line="-92"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-162"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+40"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-810"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-136"/>
         <source>Icons/Conversation</source>
-        <translation>Icons/Conversation</translation>
+        <translation type="vanished">Icons/Conversation</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-2"/>
         <source>Conversations</source>
-        <translation>Беседы</translation>
+        <translation type="vanished">Беседы</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+6"/>
         <source>Icons/Ticket</source>
-        <translation>Icons/Ticket</translation>
+        <translation type="vanished">Icons/Ticket</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-2"/>
         <source>Tickets</source>
-        <translation>Заявки</translation>
+        <translation type="vanished">Заявки</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location line="+164"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+8"/>
-        <location line="+200"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+4"/>
-        <location line="+80"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+6"/>
-        <location line="+232"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+6"/>
-        <location line="+176"/>
-        <location line="+2"/>
         <source>Conversation</source>
-        <translation>Беседа</translation>
+        <translation type="vanished">Беседа</translation>
     </message>
     <message>
-        <location line="-164"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-204"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-84"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-236"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-180"/>
         <source>Ticket</source>
-        <translation>Заявка</translation>
+        <translation type="vanished">Заявка</translation>
     </message>
     <message>
-        <location line="+24"/>
-        <location line="+2"/>
-        <location line="+34"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+100"/>
-        <location line="+2"/>
-        <location line="+34"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-264"/>
-        <location line="+2"/>
-        <location line="+34"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+106"/>
-        <location line="+2"/>
-        <location line="+60"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+26"/>
-        <location line="+2"/>
-        <location line="+34"/>
-        <location line="+2"/>
         <source>TenantInvitation</source>
-        <translation>TenantInvitation</translation>
+        <translation type="vanished">TenantInvitation</translation>
     </message>
     <message>
-        <location line="-34"/>
-        <location line="+2"/>
-        <location line="+34"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-34"/>
-        <location line="+2"/>
-        <location line="+34"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-34"/>
-        <location line="+2"/>
-        <location line="+34"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-60"/>
-        <location line="+2"/>
-        <location line="+60"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-34"/>
-        <location line="+2"/>
-        <location line="+34"/>
-        <location line="+2"/>
         <source>TenantMembership</source>
-        <translation>TenantMembership</translation>
+        <translation type="vanished">TenantMembership</translation>
     </message>
     <message>
-        <location line="-34"/>
-        <location line="+2"/>
-        <location line="+34"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-34"/>
-        <location line="+2"/>
-        <location line="+34"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-34"/>
-        <location line="+2"/>
-        <location line="+34"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-60"/>
-        <location line="+2"/>
-        <location line="+60"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-34"/>
-        <location line="+2"/>
-        <location line="+80"/>
-        <location line="+2"/>
         <source>Tenant</source>
-        <translation>Тенант</translation>
+        <translation type="vanished">Тенант</translation>
     </message>
     <message>
-        <location line="-26"/>
-        <location line="+28"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-24"/>
-        <location line="+26"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-24"/>
-        <location line="+26"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-26"/>
-        <location line="+28"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-70"/>
-        <location line="+72"/>
         <source>Tenant Name</source>
-        <translation>Название тенанта</translation>
+        <translation type="vanished">Название тенанта</translation>
     </message>
     <message>
-        <location line="-22"/>
-        <location line="+28"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-20"/>
-        <location line="+26"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-20"/>
-        <location line="+26"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-22"/>
-        <location line="+28"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-66"/>
-        <location line="+72"/>
         <source>Members Count</source>
-        <translation>Количество участников</translation>
+        <translation type="vanished">Количество участников</translation>
     </message>
     <message>
-        <location line="-26"/>
-        <location line="+28"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-24"/>
-        <location line="+26"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-24"/>
-        <location line="+26"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-26"/>
-        <location line="+28"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-70"/>
-        <location line="+72"/>
         <source>Active</source>
-        <translation>Активный</translation>
+        <translation type="vanished">Активный</translation>
     </message>
     <message>
-        <location line="-24"/>
-        <location line="+28"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-22"/>
-        <location line="+26"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-22"/>
-        <location line="+26"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-24"/>
-        <location line="+28"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-68"/>
-        <location line="+72"/>
         <source>Updated</source>
-        <translation>Обновлено</translation>
+        <translation type="vanished">Обновлено</translation>
     </message>
     <message>
-        <location line="-26"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-40"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-40"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-26"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-86"/>
         <source>New Organization</source>
-        <translation>Новая организация</translation>
+        <translation type="vanished">Новая организация</translation>
     </message>
     <message>
-        <location line="+18"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+32"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+32"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+18"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+78"/>
         <source>Owner</source>
-        <translation>Владелец</translation>
+        <translation type="vanished">Владелец</translation>
     </message>
     <message>
-        <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+10"/>
         <source>New Tenant</source>
-        <translation>Новый тенант</translation>
+        <translation type="vanished">Новый тенант</translation>
     </message>
     <message>
-        <location line="+54"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-142"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-112"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-132"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-40"/>
         <source>Icons/SupportDesk</source>
-        <translation>Icons/SupportDesk</translation>
+        <translation type="vanished">Icons/SupportDesk</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>qrc:/qml/imtdeskgui/TicketCollectionView.qml</source>
-        <translation>qrc:/qml/imtdeskgui/TicketCollectionView.qml</translation>
+        <translation type="vanished">qrc:/qml/imtdeskgui/TicketCollectionView.qml</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-4"/>
         <source>Support</source>
         <translation>Поддержка</translation>
     </message>
     <message>
-        <location line="+10"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+172"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+384"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+168"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+78"/>
-        <location line="+2"/>
         <source>Attachment</source>
-        <translation>Вложение</translation>
+        <translation type="vanished">Вложение</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
-        <location line="+2"/>
         <source>ChatMessage</source>
-        <translation>ChatMessage</translation>
+        <translation type="vanished">ChatMessage</translation>
     </message>
     <message>
-        <location line="+180"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-406"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+392"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+432"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-690"/>
         <source>Y</source>
-        <translation>Y</translation>
+        <translation type="vanished">Y</translation>
     </message>
     <message>
-        <location line="+4"/>
-        <location line="+2"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location line="+2"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+6"/>
-        <location line="+2"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+4"/>
-        <location line="+2"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+6"/>
-        <location line="+2"/>
-        <location line="+2"/>
         <source>rad</source>
-        <translation>rad</translation>
+        <translation type="vanished">rad</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Search radius</source>
-        <translation>Радиус поиска</translation>
+        <translation type="vanished">Радиус поиска</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Mu</source>
-        <translation>Mu</translation>
+        <translation type="vanished">Mu</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Minimum angle</source>
-        <translation>Минимальный угол</translation>
+        <translation type="vanished">Минимальный угол</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Maximum angle</source>
-        <translation>Максимальный угол</translation>
+        <translation type="vanished">Максимальный угол</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Maximum surface angle</source>
-        <translation>Максимальный угол поверхности</translation>
+        <translation type="vanished">Максимальный угол поверхности</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Maximum nearest neighbors</source>
-        <translation>Максимальное количество соседних точек</translation>
+        <translation type="vanished">Максимальное количество соседних точек</translation>
     </message>
     <message>
-        <location line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+4"/>
         <source>Design</source>
-        <translation>Дизайн</translation>
+        <translation type="vanished">Дизайн</translation>
     </message>
     <message>
-        <location line="+34"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-214"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-228"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-212"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+24"/>
-        <location line="+62"/>
         <source>commodity</source>
-        <translation>товар</translation>
+        <translation type="vanished">товар</translation>
     </message>
     <message>
-        <location line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
-        <location line="+62"/>
         <source>excise</source>
-        <translation>акциз</translation>
+        <translation type="vanished">акциз</translation>
     </message>
     <message>
-        <location line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
-        <location line="+62"/>
         <source>job</source>
-        <translation>работа</translation>
+        <translation type="vanished">работа</translation>
     </message>
     <message>
-        <location line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
-        <location line="+62"/>
         <source>service</source>
-        <translation>услуга</translation>
+        <translation type="vanished">услуга</translation>
     </message>
     <message>
-        <location line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
-        <location line="+62"/>
         <source>gamblingBet</source>
-        <translation>ставка</translation>
+        <translation type="vanished">ставка</translation>
     </message>
     <message>
-        <location line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
-        <location line="+62"/>
         <source>gamblingPrize</source>
-        <translation>выигрыш</translation>
+        <translation type="vanished">выигрыш</translation>
     </message>
     <message>
-        <location line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
-        <location line="+62"/>
         <source>lottery</source>
-        <translation>лотерея</translation>
+        <translation type="vanished">лотерея</translation>
     </message>
     <message>
-        <location line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
-        <location line="+62"/>
         <source>lotteryPrize</source>
-        <translation>лотерейный выигрыш</translation>
+        <translation type="vanished">лотерейный выигрыш</translation>
     </message>
     <message>
-        <location line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
-        <location line="+62"/>
         <source>intellectualActivity</source>
-        <translation>интеллектуальная деятельность</translation>
+        <translation type="vanished">интеллектуальная деятельность</translation>
     </message>
     <message>
-        <location line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
-        <location line="+62"/>
         <source>payment</source>
-        <translation>оплата</translation>
+        <translation type="vanished">оплата</translation>
     </message>
     <message>
-        <location line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
-        <location line="+62"/>
         <source>agentCommission</source>
-        <translation>агентское вознаграждение</translation>
+        <translation type="vanished">агентское вознаграждение</translation>
     </message>
     <message>
-        <location line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
-        <location line="+62"/>
         <source>pay</source>
-        <translation>выплата</translation>
+        <translation type="vanished">выплата</translation>
     </message>
     <message>
-        <location line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
-        <location line="+62"/>
         <source>another</source>
-        <translation>прочее</translation>
+        <translation type="vanished">прочее</translation>
     </message>
     <message>
-        <location line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
-        <location line="+62"/>
         <source>proprietaryLaw</source>
-        <translation>имущественное право</translation>
+        <translation type="vanished">имущественное право</translation>
     </message>
     <message>
-        <location line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
-        <location line="+62"/>
         <source>nonOperatingIncome</source>
-        <translation>внереализационный доход</translation>
+        <translation type="vanished">внереализационный доход</translation>
     </message>
     <message>
-        <location line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
-        <location line="+62"/>
         <source>otherContributions</source>
-        <translation>прочие взносы</translation>
+        <translation type="vanished">прочие взносы</translation>
     </message>
     <message>
-        <location line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
-        <location line="+62"/>
         <source>merchantTax</source>
-        <translation>торговый сбор</translation>
+        <translation type="vanished">торговый сбор</translation>
     </message>
     <message>
-        <location line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
-        <location line="+62"/>
         <source>resortFee</source>
-        <translation>курортный сбор</translation>
+        <translation type="vanished">курортный сбор</translation>
     </message>
     <message>
-        <location line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
-        <location line="+62"/>
         <source>deposit</source>
-        <translation>залог</translation>
+        <translation type="vanished">залог</translation>
     </message>
     <message>
-        <location line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
-        <location line="+62"/>
         <source>consumption</source>
-        <translation>расход</translation>
+        <translation type="vanished">расход</translation>
     </message>
     <message>
-        <location line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
-        <location line="+62"/>
         <source>soleProprietorCPIContributions</source>
-        <translation>взносы ИП на ОПС</translation>
+        <translation type="vanished">взносы ИП на ОПС</translation>
     </message>
     <message>
-        <location line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
-        <location line="+62"/>
         <source>cpiContributions</source>
-        <translation>взносы на ОПС</translation>
+        <translation type="vanished">взносы на ОПС</translation>
     </message>
     <message>
-        <location line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
-        <location line="+62"/>
         <source>soleProprietorCMIContributions</source>
-        <translation>взносы ИП на ОМС</translation>
+        <translation type="vanished">взносы ИП на ОМС</translation>
     </message>
     <message>
-        <location line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
-        <location line="+62"/>
         <source>cmiContributions</source>
-        <translation>взносы на ОМС</translation>
+        <translation type="vanished">взносы на ОМС</translation>
     </message>
     <message>
-        <location line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
-        <location line="+62"/>
         <source>csiContributions</source>
-        <translation>взносы на ОСС</translation>
+        <translation type="vanished">взносы на ОСС</translation>
     </message>
     <message>
-        <location line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
-        <location line="+62"/>
         <source>casinoPayment</source>
-        <translation>оплата казино</translation>
+        <translation type="vanished">оплата казино</translation>
     </message>
     <message>
-        <location line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
-        <location line="+62"/>
         <source>fundsIssuance</source>
-        <translation>выдача средств</translation>
+        <translation type="vanished">выдача средств</translation>
     </message>
     <message>
-        <location line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
-        <location line="+62"/>
         <source>exciseWithoutMarking</source>
-        <translation>подакцизный товар без маркировки</translation>
+        <translation type="vanished">подакцизный товар без маркировки</translation>
     </message>
     <message>
-        <location line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
-        <location line="+62"/>
         <source>exciseWithMarking</source>
-        <translation>подакцизный товар с маркировкой</translation>
+        <translation type="vanished">подакцизный товар с маркировкой</translation>
     </message>
     <message>
-        <location line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
-        <location line="+62"/>
         <source>commodityWithoutMarking</source>
-        <translation>товар без маркировки</translation>
+        <translation type="vanished">товар без маркировки</translation>
     </message>
     <message>
-        <location line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-60"/>
-        <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
-        <location line="+62"/>
         <source>commodityWithMarking</source>
-        <translation>товар с маркировкой</translation>
+        <translation type="vanished">товар с маркировкой</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-246"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-218"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-246"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+30"/>
-        <location line="+48"/>
         <source>piece</source>
-        <translation>штука</translation>
+        <translation type="vanished">штука</translation>
     </message>
     <message>
-        <location line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
-        <location line="+48"/>
         <source>gram</source>
-        <translation>грамм</translation>
+        <translation type="vanished">грамм</translation>
     </message>
     <message>
-        <location line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
-        <location line="+48"/>
         <source>kilogram</source>
-        <translation>килограмм</translation>
+        <translation type="vanished">килограмм</translation>
     </message>
     <message>
-        <location line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
-        <location line="+48"/>
         <source>ton</source>
-        <translation>тонна</translation>
+        <translation type="vanished">тонна</translation>
     </message>
     <message>
-        <location line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
-        <location line="+48"/>
         <source>centimeter</source>
-        <translation>сантиметр</translation>
+        <translation type="vanished">сантиметр</translation>
     </message>
     <message>
-        <location line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
-        <location line="+48"/>
         <source>decimeter</source>
-        <translation>дециметр</translation>
+        <translation type="vanished">дециметр</translation>
     </message>
     <message>
-        <location line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
-        <location line="+48"/>
         <source>meter</source>
-        <translation>метр</translation>
+        <translation type="vanished">метр</translation>
     </message>
     <message>
-        <location line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
-        <location line="+48"/>
         <source>squareCentimeter</source>
-        <translation>кв. сантиметр</translation>
+        <translation type="vanished">кв. сантиметр</translation>
     </message>
     <message>
-        <location line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
-        <location line="+48"/>
         <source>squareDecimeter</source>
-        <translation>кв. дециметр</translation>
+        <translation type="vanished">кв. дециметр</translation>
     </message>
     <message>
-        <location line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
-        <location line="+48"/>
         <source>squareMeter</source>
-        <translation>кв. метр</translation>
+        <translation type="vanished">кв. метр</translation>
     </message>
     <message>
-        <location line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
-        <location line="+48"/>
         <source>milliliter</source>
-        <translation>миллилитр</translation>
+        <translation type="vanished">миллилитр</translation>
     </message>
     <message>
-        <location line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
-        <location line="+48"/>
         <source>liter</source>
-        <translation>литр</translation>
+        <translation type="vanished">литр</translation>
     </message>
     <message>
-        <location line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
-        <location line="+48"/>
         <source>cubicMeter</source>
-        <translation>куб. метр</translation>
+        <translation type="vanished">куб. метр</translation>
     </message>
     <message>
-        <location line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
-        <location line="+48"/>
         <source>kilowattHour</source>
-        <translation>киловатт·час</translation>
+        <translation type="vanished">киловатт·час</translation>
     </message>
     <message>
-        <location line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
-        <location line="+48"/>
         <source>gkal</source>
-        <translation>Гкал</translation>
+        <translation type="vanished">Гкал</translation>
     </message>
     <message>
-        <location line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
-        <location line="+48"/>
         <source>day</source>
-        <translation>день</translation>
+        <translation type="vanished">день</translation>
     </message>
     <message>
-        <location line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
-        <location line="+48"/>
         <source>hour</source>
-        <translation>час</translation>
+        <translation type="vanished">час</translation>
     </message>
     <message>
-        <location line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
-        <location line="+48"/>
         <source>minute</source>
-        <translation>минута</translation>
+        <translation type="vanished">минута</translation>
     </message>
     <message>
-        <location line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
-        <location line="+48"/>
         <source>second</source>
-        <translation>секунда</translation>
+        <translation type="vanished">секунда</translation>
     </message>
     <message>
-        <location line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
-        <location line="+48"/>
         <source>kilobyte</source>
-        <translation>килобайт</translation>
+        <translation type="vanished">килобайт</translation>
     </message>
     <message>
-        <location line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
-        <location line="+48"/>
         <source>megabyte</source>
-        <translation>мегабайт</translation>
+        <translation type="vanished">мегабайт</translation>
     </message>
     <message>
-        <location line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
-        <location line="+48"/>
         <source>gigabyte</source>
-        <translation>гигабайт</translation>
+        <translation type="vanished">гигабайт</translation>
     </message>
     <message>
-        <location line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
-        <location line="+48"/>
         <source>terabyte</source>
-        <translation>терабайт</translation>
+        <translation type="vanished">терабайт</translation>
     </message>
     <message>
-        <location line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-46"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
-        <location line="+48"/>
         <source>otherUnits</source>
-        <translation>другие единицы</translation>
+        <translation type="vanished">другие единицы</translation>
     </message>
     <message>
-        <location line="-486"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+448"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-594"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-402"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+308"/>
         <source>Icons/AdminPanel</source>
-        <translation>Icons/AdminPanel</translation>
+        <translation type="vanished">Icons/AdminPanel</translation>
     </message>
     <message>
-        <location line="-4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+18"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-18"/>
         <source>qrc:/qml/imtauthgui/UserActionCollectionView.qml</source>
-        <translation>qrc:/qml/imtauthgui/UserActionCollectionView.qml</translation>
+        <translation type="vanished">qrc:/qml/imtauthgui/UserActionCollectionView.qml</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Workspace</source>
         <translation>Рабочее пространство</translation>
     </message>
     <message>
-        <location line="-4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
+        <source>Organizations</source>
+        <translation>Организации</translation>
+    </message>
+    <message>
         <source>Icons/Dashboard</source>
-        <translation>Icons/Dashboard</translation>
+        <translation type="vanished">Icons/Dashboard</translation>
     </message>
     <message>
-        <location line="+246"/>
-        <location line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-452"/>
-        <location line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+726"/>
-        <location line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+384"/>
-        <location line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-416"/>
-        <location line="+14"/>
         <source>fullPrepayment</source>
-        <translation>полная предоплата</translation>
+        <translation type="vanished">полная предоплата</translation>
     </message>
     <message>
-        <location line="-12"/>
-        <location line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-12"/>
-        <location line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-12"/>
-        <location line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-12"/>
-        <location line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-12"/>
-        <location line="+14"/>
         <source>prepayment</source>
-        <translation>предоплата</translation>
+        <translation type="vanished">предоплата</translation>
     </message>
     <message>
-        <location line="-12"/>
-        <location line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-12"/>
-        <location line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-12"/>
-        <location line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-12"/>
-        <location line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-12"/>
-        <location line="+14"/>
         <source>advance</source>
-        <translation>аванс</translation>
+        <translation type="vanished">аванс</translation>
     </message>
     <message>
-        <location line="-12"/>
-        <location line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-12"/>
-        <location line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-12"/>
-        <location line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-12"/>
-        <location line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-12"/>
-        <location line="+14"/>
         <source>fullPayment</source>
-        <translation>полный расчёт</translation>
+        <translation type="vanished">полный расчёт</translation>
     </message>
     <message>
-        <location line="-12"/>
-        <location line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-12"/>
-        <location line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-12"/>
-        <location line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-12"/>
-        <location line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-12"/>
-        <location line="+14"/>
         <source>partialPayment</source>
-        <translation>частичный расчёт</translation>
+        <translation type="vanished">частичный расчёт</translation>
     </message>
     <message>
-        <location line="-12"/>
-        <location line="+14"/>
-        <location line="+230"/>
-        <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-12"/>
-        <location line="+14"/>
-        <location line="+134"/>
-        <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-12"/>
-        <location line="+14"/>
-        <location line="+10"/>
-        <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-12"/>
-        <location line="+14"/>
-        <location line="+134"/>
-        <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-12"/>
-        <location line="+14"/>
-        <location line="+106"/>
-        <location line="+10"/>
         <source>credit</source>
-        <translation>кредит</translation>
+        <translation type="vanished">кредит</translation>
     </message>
     <message>
-        <location line="-252"/>
-        <location line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-156"/>
-        <location line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-32"/>
-        <location line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-156"/>
-        <location line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-128"/>
-        <location line="+14"/>
         <source>creditPayment</source>
-        <translation>оплата кредита</translation>
+        <translation type="vanished">оплата кредита</translation>
     </message>
     <message>
-        <location line="+222"/>
-        <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+126"/>
-        <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+126"/>
-        <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+98"/>
-        <location line="+10"/>
         <source>cash</source>
-        <translation>наличные</translation>
+        <translation type="vanished">наличные</translation>
     </message>
     <message>
-        <location line="-8"/>
-        <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-8"/>
-        <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-8"/>
-        <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-8"/>
-        <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-8"/>
-        <location line="+10"/>
         <source>electronically</source>
-        <translation>электронно</translation>
+        <translation type="vanished">электронно</translation>
     </message>
     <message>
-        <location line="-8"/>
-        <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-8"/>
-        <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-8"/>
-        <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-8"/>
-        <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-8"/>
-        <location line="+10"/>
         <source>prepaid</source>
-        <translation>предоплачено</translation>
+        <translation type="vanished">предоплачено</translation>
     </message>
     <message>
-        <location line="-6"/>
-        <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-6"/>
-        <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-6"/>
-        <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-6"/>
-        <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-6"/>
-        <location line="+10"/>
         <source>other</source>
-        <translation>прочее</translation>
+        <translation type="vanished">прочее</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
-        <location line="+8"/>
         <source>Sell</source>
-        <translation>Продажа</translation>
+        <translation type="vanished">Продажа</translation>
     </message>
     <message>
-        <location line="-6"/>
-        <location line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-6"/>
-        <location line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-6"/>
-        <location line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-6"/>
-        <location line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-6"/>
-        <location line="+8"/>
         <source>Buy</source>
-        <translation>Покупка</translation>
+        <translation type="vanished">Покупка</translation>
     </message>
     <message>
-        <location line="-6"/>
-        <location line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-6"/>
-        <location line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-6"/>
-        <location line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-6"/>
-        <location line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-6"/>
-        <location line="+8"/>
         <source>SellReturn</source>
-        <translation>Возврат продажи</translation>
+        <translation type="vanished">Возврат продажи</translation>
     </message>
     <message>
-        <location line="-6"/>
-        <location line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-6"/>
-        <location line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-6"/>
-        <location line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-6"/>
-        <location line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-6"/>
-        <location line="+8"/>
         <source>BuyReturn</source>
-        <translation>Возврат покупки</translation>
+        <translation type="vanished">Возврат покупки</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
-        <location line="+2"/>
         <source>Receipt</source>
-        <translation>Чек</translation>
+        <translation type="vanished">Чек</translation>
     </message>
     <message>
-        <location line="-812"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+146"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-502"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-668"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+130"/>
         <source>New sensor</source>
-        <translation>Новый сенсор</translation>
+        <translation type="vanished">Новый сенсор</translation>
     </message>
     <message>
-        <location line="+438"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-466"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+182"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+348"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-504"/>
-        <location line="+2"/>
         <source>Personal Access Token</source>
-        <translation>Персональный токен доступа</translation>
+        <translation type="vanished">Персональный токен доступа</translation>
     </message>
     <message>
-        <location line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+12"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+12"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+12"/>
         <source>Action</source>
-        <translation>Действие</translation>
+        <translation type="vanished">Действие</translation>
     </message>
     <message>
-        <location line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+8"/>
         <source>Target</source>
-        <translation>Цель</translation>
+        <translation type="vanished">Цель</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Timestamp</source>
-        <translation>Отметка времени</translation>
+        <translation type="vanished">Отметка времени</translation>
     </message>
     <message>
-        <location line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-12"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-12"/>
         <source>Open</source>
-        <translation>Открыть</translation>
+        <translation type="vanished">Открыть</translation>
     </message>
     <message>
-        <location line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-2"/>
         <source>New Customer</source>
-        <translation>Новый заказчик</translation>
+        <translation type="vanished">Новый заказчик</translation>
     </message>
     <message>
-        <location line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+16"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+16"/>
         <source>User Action</source>
-        <translation>Действие пользователя</translation>
+        <translation type="vanished">Действие пользователя</translation>
     </message>
     <message>
-        <location line="-382"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+368"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-278"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+392"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+410"/>
         <source>:/qml/imtgui/Settings/SettingsTextInput.qml</source>
-        <translation>:/qml/imtgui/Settings/SettingsTextInput.qml</translation>
+        <translation type="vanished">:/qml/imtgui/Settings/SettingsTextInput.qml</translation>
     </message>
     <message>
-        <location line="-6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-4"/>
         <source>:/qml/imtgui/Settings/DatabaseInput.qml</source>
-        <translation>:/qml/imtgui/Settings/DatabaseInput.qml</translation>
+        <translation type="vanished">:/qml/imtgui/Settings/DatabaseInput.qml</translation>
     </message>
     <message>
-        <location line="+84"/>
-        <location line="+100"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+218"/>
-        <location line="+126"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-168"/>
-        <location line="+100"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-654"/>
-        <location line="+126"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+128"/>
-        <location line="+152"/>
         <source>Roles</source>
-        <translation>Роли</translation>
+        <translation type="vanished">Роли</translation>
     </message>
     <message>
-        <location line="-102"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-128"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-102"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-128"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-150"/>
         <source>Users</source>
-        <translation>Пользователи</translation>
+        <translation type="vanished">Пользователи</translation>
     </message>
     <message>
-        <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+32"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+4"/>
         <source>Role Name</source>
-        <translation>Название роли</translation>
+        <translation type="vanished">Название роли</translation>
     </message>
     <message>
-        <location line="-160"/>
-        <location line="+94"/>
-        <location line="+226"/>
-        <location line="+92"/>
-        <location line="+62"/>
-        <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-312"/>
-        <location line="+6"/>
-        <location line="+80"/>
-        <location line="+52"/>
-        <location line="+136"/>
-        <location line="+164"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-10"/>
-        <location line="+124"/>
-        <location line="+22"/>
-        <location line="+6"/>
-        <location line="+38"/>
-        <location line="+58"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-118"/>
-        <location line="+110"/>
-        <location line="+162"/>
-        <location line="+400"/>
-        <location line="+6"/>
-        <location line="+112"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-488"/>
-        <location line="+6"/>
-        <location line="+362"/>
-        <location line="+56"/>
-        <location line="+164"/>
-        <location line="+150"/>
         <source>Edit</source>
-        <translation>Редактировать</translation>
+        <translation type="vanished">Редактировать</translation>
     </message>
     <message>
-        <location line="-482"/>
-        <location line="+94"/>
-        <location line="+230"/>
-        <location line="+88"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-354"/>
-        <location line="+52"/>
-        <location line="+134"/>
-        <location line="+166"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-250"/>
-        <location line="+122"/>
-        <location line="+66"/>
-        <location line="+60"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-794"/>
-        <location line="+110"/>
-        <location line="+160"/>
-        <location line="+514"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-360"/>
-        <location line="+50"/>
-        <location line="+154"/>
-        <location line="+162"/>
         <source>Remove</source>
-        <translation>Удалить</translation>
+        <translation type="vanished">Удалить</translation>
     </message>
     <message>
-        <location line="-322"/>
-        <location line="+226"/>
-        <location line="+92"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-348"/>
-        <location line="+188"/>
-        <location line="+164"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-244"/>
-        <location line="+124"/>
-        <location line="+74"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-676"/>
-        <location line="+164"/>
-        <location line="+516"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-374"/>
-        <location line="+210"/>
-        <location line="+160"/>
         <source>New</source>
-        <translation>Новый</translation>
+        <translation type="vanished">Новый</translation>
     </message>
     <message>
-        <location line="-304"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-344"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+30"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-354"/>
         <source>Close</source>
-        <translation>Закрыть</translation>
+        <translation type="vanished">Закрыть</translation>
     </message>
     <message>
-        <location line="+16"/>
-        <location line="+300"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+16"/>
-        <location line="+332"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-76"/>
-        <location line="+92"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-538"/>
-        <location line="+522"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+16"/>
-        <location line="+348"/>
         <source>Undo</source>
-        <translation>Отменить</translation>
+        <translation type="vanished">Отменить</translation>
     </message>
     <message>
-        <location line="-304"/>
-        <location line="+8"/>
-        <location line="+294"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-344"/>
-        <location line="+4"/>
-        <location line="+338"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-94"/>
-        <location line="+86"/>
-        <location line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-524"/>
-        <location line="+520"/>
-        <location line="+16"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-356"/>
-        <location line="+4"/>
-        <location line="+350"/>
         <source>Save</source>
-        <translation>Сохранить</translation>
+        <translation type="vanished">Сохранить</translation>
     </message>
     <message>
-        <location line="+418"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-308"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+24"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+24"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-326"/>
         <source>(C) 2020 ImagingTools GmbH. All rights reserved.</source>
-        <translation>(C) 2020 ImagingTools GmbH. Все права защищены.</translation>
+        <translation type="vanished">(C) 2020 ImagingTools GmbH. Все права защищены.</translation>
     </message>
     <message>
-        <location line="-724"/>
-        <location line="+304"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-18"/>
-        <location line="+330"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-110"/>
-        <location line="+94"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-556"/>
-        <location line="+528"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-40"/>
-        <location line="+364"/>
         <source>Redo</source>
-        <translation>Восстановить</translation>
+        <translation type="vanished">Восстановить</translation>
     </message>
     <message>
-        <location line="-306"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-332"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-362"/>
         <source>Icons/Redo</source>
-        <translation>Icons/Redo</translation>
+        <translation type="vanished">Icons/Redo</translation>
     </message>
     <message>
-        <location line="+4"/>
-        <location line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-16"/>
-        <location line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-12"/>
-        <location line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-12"/>
-        <location line="+16"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+12"/>
-        <location line="+4"/>
         <source>Icons/Save</source>
-        <translation>Icons/Save</translation>
+        <translation type="vanished">Icons/Save</translation>
     </message>
     <message>
-        <location line="-20"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-12"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-12"/>
         <source>Icons/Close</source>
-        <translation>Icons/Close</translation>
+        <translation type="vanished">Icons/Close</translation>
     </message>
     <message>
-        <location filename="../../../Include/imtauth/CRoleChangeGeneratorComp.cpp" line="+59"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DdlCodeCreator/CDdlCodeCreator.cpp" line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+220"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-192"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-696"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+102"/>
+        <location filename="../../../Include/imtauth/CRoleChangeGeneratorComp.cpp" line="+55"/>
         <source>Role-ID</source>
         <translation>Идентификатор роли</translation>
     </message>
     <message>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DdlCodeCreator/CDdlCodeCreator.cpp" line="+98"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+98"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+98"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+124"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+148"/>
+        <location line="+3"/>
+        <source>Product-ID</source>
+        <translation>ID продукта</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Default Role</source>
+        <translation>Роль по умолчанию</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Guest Role</source>
+        <translation>Гостевая роль</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <location filename="../../../Include/imtauthdb/CRoleDatabaseDelegateComp.cpp" line="+31"/>
+        <source>Parent Role</source>
+        <translation>Родительская роль</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <location filename="../../../Include/imtauthdb/CPermissionPathMigrationComp.cpp" line="+86"/>
+        <location line="+17"/>
+        <source>Permission</source>
+        <translation>Право</translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <location filename="../../../Include/imtauth/CUserChangeGeneratorComp.cpp" line="+55"/>
+        <location filename="../../../Include/imtauth/CUserGroupChangeGeneratorComp.cpp" line="+55"/>
+        <location filename="../../../Include/imtauthdb/CPermissionPathMigrationComp.cpp" line="-11"/>
+        <location line="+17"/>
+        <source>Prohibition</source>
+        <translation>Запрет</translation>
+    </message>
+    <message>
         <source>Last Connection</source>
-        <translation>Последнее подключение</translation>
+        <translation type="vanished">Последнее подключение</translation>
     </message>
     <message>
-        <location line="-144"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-302"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+110"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+556"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-234"/>
         <source>Icons/Undo</source>
-        <translation>Icons/Undo</translation>
+        <translation type="vanished">Icons/Undo</translation>
     </message>
     <message>
-        <location line="+124"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+282"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-130"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-576"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+210"/>
         <source>Group Name</source>
-        <translation>Название группы</translation>
+        <translation type="vanished">Название группы</translation>
     </message>
     <message>
-        <location filename="../../../Include/imtauth/CRoleChangeGeneratorComp.cpp" line="+14"/>
-        <location filename="../../../Include/imtauth/CUserChangeGeneratorComp.cpp" line="+94"/>
-        <location filename="../../../Include/imtauth/CUserGroupChangeGeneratorComp.cpp" line="+115"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DdlCodeCreator/CDdlCodeCreator.cpp" line="-76"/>
-        <location line="+30"/>
-        <location line="+28"/>
-        <location line="+20"/>
-        <location line="+204"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-702"/>
-        <location line="+626"/>
-        <location line="+32"/>
-        <location line="+26"/>
-        <location line="+20"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-76"/>
-        <location line="+32"/>
-        <location line="+26"/>
-        <location line="+20"/>
-        <location line="+356"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-102"/>
-        <location line="+56"/>
-        <location line="+28"/>
-        <location line="+20"/>
-        <location line="+132"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-676"/>
-        <location line="+554"/>
-        <location line="+32"/>
-        <location line="+72"/>
-        <location line="+20"/>
+        <location line="-30"/>
+        <location filename="../../../Include/imtauth/CUserChangeGeneratorComp.cpp" line="-70"/>
+        <location filename="../../../Include/imtauth/CUserGroupChangeGeneratorComp.cpp" line="-71"/>
+        <location filename="../../../Include/imtservergql/CObjectCollectionControllerCompBase.cpp" line="+785"/>
+        <location line="+1508"/>
+        <location line="+107"/>
         <source>Description</source>
         <translation>Описание</translation>
     </message>
     <message>
-        <location line="-7"/>
-        <location filename="../../../Include/imtauth/CUserGroupChangeGeneratorComp.cpp" line="-7"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DdlCodeCreator/CDdlCodeCreator.cpp" line="-440"/>
-        <location line="+244"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-248"/>
-        <location line="+256"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-348"/>
-        <location line="+162"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-352"/>
-        <location line="+228"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-182"/>
-        <location line="+194"/>
+        <location line="-1"/>
+        <location filename="../../../Include/imtauth/CUserChangeGeneratorComp.cpp" line="-1"/>
+        <location filename="../../../Include/imtauth/CUserGroupChangeGeneratorComp.cpp" line="-1"/>
+        <location filename="../../../Include/imtservergql/CObjectCollectionControllerCompBase.cpp" line="-1668"/>
+        <location line="+1553"/>
+        <location line="+66"/>
         <source>Name</source>
         <translation>Название</translation>
     </message>
     <message>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DdlCodeCreator/CDdlCodeCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-160"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Email</source>
-        <translation>Почтовый адрес</translation>
+        <translation type="vanished">Почтовый адрес</translation>
     </message>
     <message>
-        <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+6"/>
         <source>Groups</source>
-        <translation>Группы</translation>
+        <translation type="vanished">Группы</translation>
     </message>
     <message>
-        <location line="+210"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-414"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+32"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+426"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-640"/>
         <source>Text file</source>
-        <translation>Текстовый файл</translation>
+        <translation type="vanished">Текстовый файл</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location line="+2"/>
-        <location line="+4"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location line="+4"/>
-        <location line="+2"/>
-        <location line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location line="+2"/>
-        <location line="+4"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location line="+4"/>
-        <location line="+2"/>
-        <location line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
-        <location line="+4"/>
-        <location line="+2"/>
-        <location line="+4"/>
         <source>Edit License</source>
-        <translation>Редактировать лицензию</translation>
+        <translation type="vanished">Редактировать лицензию</translation>
     </message>
     <message>
-        <location line="+332"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+204"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+104"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-624"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+292"/>
         <source>Report</source>
-        <translation>Отчет</translation>
+        <translation type="vanished">Отчет</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-2"/>
         <source>Report Files</source>
-        <translation>Файлы отчетов</translation>
+        <translation type="vanished">Файлы отчетов</translation>
     </message>
     <message>
-        <location line="-386"/>
-        <location line="+12"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-548"/>
-        <location line="+12"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+172"/>
-        <location line="+12"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+280"/>
-        <location line="+12"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-384"/>
-        <location line="+12"/>
         <source>NO_USER_MANAGEMENT</source>
-        <translation>NO_USER_MANAGEMENT</translation>
+        <translation type="vanished">NO_USER_MANAGEMENT</translation>
     </message>
     <message>
-        <location line="-10"/>
-        <location line="+12"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-10"/>
-        <location line="+12"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-10"/>
-        <location line="+12"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-10"/>
-        <location line="+12"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-10"/>
-        <location line="+12"/>
         <source>OPTIONAL_USER_MANAGEMENT</source>
-        <translation>OPTIONAL_USER_MANAGEMENT</translation>
+        <translation type="vanished">OPTIONAL_USER_MANAGEMENT</translation>
     </message>
     <message>
-        <location line="-10"/>
-        <location line="+12"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-10"/>
-        <location line="+12"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-10"/>
-        <location line="+12"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-10"/>
-        <location line="+12"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-10"/>
-        <location line="+12"/>
         <source>STRONG_USER_MANAGEMENT</source>
-        <translation>STRONG_USER_MANAGEMENT</translation>
+        <translation type="vanished">STRONG_USER_MANAGEMENT</translation>
     </message>
     <message>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-18"/>
         <source>SDL Generator version</source>
-        <translation>Версия генератора SDL</translation>
+        <translation type="vanished">Версия генератора SDL</translation>
     </message>
     <message>
-        <location line="-6"/>
         <source>SDL code generator</source>
-        <translation>Генератор кода SDL</translation>
+        <translation type="vanished">Генератор кода SDL</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>SDL Code generator</source>
-        <translation>Генератор кода SDL</translation>
+        <translation type="vanished">Генератор кода SDL</translation>
     </message>
     <message>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-360"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>? ImagingTools</source>
-        <translation>? ImagingTools</translation>
+        <translation type="vanished">? ImagingTools</translation>
     </message>
     <message>
-        <location line="-6"/>
         <source>OAS Code generator</source>
-        <translation>Генератор кода OAS</translation>
+        <translation type="vanished">Генератор кода OAS</translation>
     </message>
     <message>
-        <location filename="../../../Include/imtauth/CUserChangeGeneratorComp.cpp" line="-14"/>
+        <location filename="../../../Include/imtauth/CUserChangeGeneratorComp.cpp" line="-1"/>
         <source>User-ID</source>
         <translation>ID пользователя</translation>
     </message>
     <message>
-        <location line="+7"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DdlCodeCreator/CDdlCodeCreator.cpp" line="-84"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-58"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+310"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+772"/>
         <source>Username</source>
-        <translation>Логин</translation>
+        <translation type="vanished">Логин</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+3"/>
         <source>Mail</source>
         <translation>Почта</translation>
     </message>
     <message>
-        <location filename="../../../Include/imtauth/CUserGroupChangeGeneratorComp.cpp" line="-7"/>
+        <location filename="../../../Include/imtauth/CUserGroupChangeGeneratorComp.cpp" line="-1"/>
         <source>Group-ID</source>
         <translation>ID Группы</translation>
+    </message>
+    <message>
+        <location filename="../../../Include/imtbase/CDocumentChangeGeneratorCompBase.cpp" line="+18"/>
+        <source>Yes</source>
+        <translation>Да</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>No</source>
+        <translation>Нет</translation>
     </message>
 </context>
 <context>
     <name>AuthorizationController</name>
     <message>
-        <location filename="../../../Qml/imtauthgui/AuthorizationController.qml" line="+351"/>
+        <location filename="../../../Qml/imtauthgui/AuthorizationController.qml" line="+359"/>
+        <location line="+22"/>
+        <source>Access denied. Please sign in again.</source>
+        <translation>Доступ запрещён. Пожалуйста, войдите снова.</translation>
+    </message>
+    <message>
+        <location line="+51"/>
+        <source>Your session is no longer valid. Please sign in again.</source>
+        <translation>Ваша сессия больше недействительна. Пожалуйста, войдите снова.</translation>
+    </message>
+    <message>
+        <location line="+19"/>
+        <source>Your session has expired. Please sign in again.</source>
+        <translation>Срок действия сессии истёк. Пожалуйста, войдите снова.</translation>
+    </message>
+    <message>
+        <location line="+297"/>
+        <source>The current organization has been deleted. Switching to no organization.</source>
+        <translation>Текущая организация удалена. Выполняется переход без организации.</translation>
+    </message>
+    <message>
+        <location line="+43"/>
+        <source>Unable to switch the organization: %1</source>
+        <translation>Не удалось сменить организацию: %1</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Unable to switch the organization</source>
+        <translation>Не удалось сменить организацию</translation>
+    </message>
+    <message>
+        <location line="+73"/>
         <source>The user has been successfully registered</source>
         <translation>Пользователь успешно зарегистрирован</translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+27"/>
         <source>Password changed successfully</source>
         <translation>Пароль успешно изменен</translation>
     </message>
     <message>
+        <location line="+243"/>
+        <location line="+8"/>
+        <source>Unable to activate the organization</source>
+        <translation>Не удалось активировать организацию</translation>
+    </message>
+    <message>
+        <location line="+157"/>
+        <source>The sign-in could not be completed</source>
+        <translation>Не удалось выполнить вход</translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <source>The sign-in was not completed in time. Please try again.</source>
+        <translation>Вход не был выполнен вовремя. Пожалуйста, попробуйте снова.</translation>
+    </message>
+    <message>
+        <location line="+38"/>
+        <source>The account has been linked</source>
+        <translation>Учётная запись привязана</translation>
+    </message>
+    <message>
+        <location line="-814"/>
         <source>Your password expires in %1 day(s). Please change it in your profile.</source>
         <translation>Срок действия пароля истекает через %1 дн. Смените его в профиле.</translation>
     </message>
@@ -3574,150 +1703,210 @@
 <context>
     <name>AuthorizationPage</name>
     <message>
-        <location filename="../../../Qml/imtauthgui/AuthorizationPage.qml" line="+152"/>
+        <location filename="../../../Qml/imtauthgui/AuthorizationPage.qml" line="+226"/>
         <source>Welcome</source>
         <translation>Добро пожаловать</translation>
     </message>
     <message>
-        <location line="-105"/>
-        <location line="+147"/>
-        <location line="+260"/>
-        <location line="-260"/>
-        <location line="+260"/>
         <source>Login</source>
-        <translation>Логин</translation>
+        <translation type="vanished">Логин</translation>
     </message>
     <message>
-        <location line="-242"/>
         <source>Enter the login</source>
-        <translation>Введите логин</translation>
+        <translation type="vanished">Введите логин</translation>
     </message>
     <message>
-        <location line="+35"/>
+        <location line="+89"/>
         <source>Password</source>
         <translation>Пароль</translation>
     </message>
     <message>
-        <location line="+18"/>
         <source>Enter the password</source>
-        <translation>Введите пароль</translation>
+        <translation type="vanished">Введите пароль</translation>
     </message>
     <message>
-        <location line="+71"/>
         <source>Password recovery</source>
-        <translation>Восстановить пароль</translation>
+        <translation type="vanished">Восстановить пароль</translation>
     </message>
     <message>
-        <location line="+35"/>
+        <location line="+85"/>
         <source>Remember me</source>
         <translation>Запомнить меня</translation>
     </message>
     <message>
-        <location line="+20"/>
-        <location line="+93"/>
-        <location line="+0"/>
         <source>Register</source>
-        <translation>Зарегистрироваться</translation>
+        <translation type="vanished">Зарегистрироваться</translation>
     </message>
     <message>
-        <location line="-9"/>
         <source>User Registration</source>
-        <translation>Регистрация пользователя</translation>
+        <translation type="vanished">Регистрация пользователя</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+327"/>
         <source>Close</source>
         <translation>Закрыть</translation>
     </message>
     <message>
-        <location line="-333"/>
+        <location line="-501"/>
         <source>Welcome to</source>
         <translation>Добро пожаловать в</translation>
     </message>
     <message>
+        <location line="-158"/>
+        <location line="+199"/>
+        <source>Username</source>
+        <translation>Логин</translation>
+    </message>
+    <message>
+        <location line="-183"/>
+        <source>Username or password is incorrect</source>
+        <translation>Неверный логин или пароль</translation>
+    </message>
+    <message>
+        <location line="+36"/>
         <source>Unable to change the password.</source>
         <translation>Не удалось изменить пароль.</translation>
     </message>
     <message>
+        <location line="+166"/>
+        <source>Enter your username</source>
+        <translation>Введите логин</translation>
+    </message>
+    <message>
+        <location line="+48"/>
+        <source>Enter your password</source>
+        <translation>Введите пароль</translation>
+    </message>
+    <message>
+        <location line="+81"/>
+        <source>Forgot password?</source>
+        <translation>Забыли пароль?</translation>
+    </message>
+    <message>
+        <location line="+51"/>
+        <source>Sign in</source>
+        <translation>Войти</translation>
+    </message>
+    <message>
+        <location line="+64"/>
+        <source>or continue with</source>
+        <translation>или продолжить с помощью</translation>
+    </message>
+    <message>
+        <location line="+55"/>
+        <source>Complete the sign-in in the browser window that has opened.</source>
+        <translation>Завершите вход в открывшемся окне браузера.</translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <source>Cancel</source>
+        <translation>Отмена</translation>
+    </message>
+    <message>
+        <location line="+36"/>
+        <location line="+63"/>
+        <location line="+28"/>
+        <source>Sign up</source>
+        <translation>Зарегистрироваться</translation>
+    </message>
+    <message>
+        <location line="-58"/>
         <source>Your password has expired</source>
         <translation>Срок действия пароля истёк</translation>
     </message>
     <message>
+        <location line="+48"/>
         <source>Unable to register the user</source>
         <translation>Не удалось зарегистрировать пользователя</translation>
+    </message>
+</context>
+<context>
+    <name>BasicTreeView</name>
+    <message>
+        <location filename="../../../Qml/imtcontrols/Views/BasicTreeView.qml" line="+828"/>
+        <source>Checked</source>
+        <translation>Отмечено</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Partial</source>
+        <translation>Частично</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Unchecked</source>
+        <translation>Не отмечено</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>true</source>
+        <translation>true</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>false</source>
+        <translation>false</translation>
     </message>
 </context>
 <context>
     <name>CAccountInfoEditorComp</name>
     <message>
         <location filename="../../../Include/imtauthgui/CAccountInfoEditorComp.ui" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CAccountInfoEditorComp.h" line="+332"/>
         <source>Edit Account Information</source>
         <translation>Редактирование информации об аккаунте</translation>
     </message>
     <message>
         <location line="+112"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CAccountInfoEditorComp.h" line="+1"/>
         <source>Load...</source>
         <translation>Загрузить...</translation>
     </message>
     <message>
         <location line="+23"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CAccountInfoEditorComp.h" line="+1"/>
         <source>Remove</source>
         <translation>Удалить</translation>
     </message>
     <message>
         <location line="+108"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CAccountInfoEditorComp.h" line="+1"/>
         <source>Account Type</source>
         <translation>Тип аккаунта</translation>
     </message>
     <message>
         <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CAccountInfoEditorComp.h" line="+1"/>
         <source>Account Name</source>
         <translation>Название аккаунта</translation>
     </message>
     <message>
         <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CAccountInfoEditorComp.h" line="+1"/>
         <source>Account Description</source>
         <translation>Описание аккаунта</translation>
     </message>
     <message>
         <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CAccountInfoEditorComp.h" line="+1"/>
         <source>Company Address</source>
         <translation>Адрес компании</translation>
     </message>
     <message>
         <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CAccountInfoEditorComp.h" line="+1"/>
         <source>Country</source>
         <translation>Страна</translation>
     </message>
     <message>
         <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CAccountInfoEditorComp.h" line="+1"/>
         <source>City</source>
         <translation>Город</translation>
     </message>
     <message>
         <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CAccountInfoEditorComp.h" line="+1"/>
         <source>Postal Code</source>
         <translation>Почтовый индекс</translation>
     </message>
     <message>
         <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CAccountInfoEditorComp.h" line="+1"/>
         <source>Street</source>
         <translation>Улица</translation>
     </message>
     <message>
         <location line="+13"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CAccountInfoEditorComp.h" line="+1"/>
         <source>Account Owner</source>
         <translation>Владелец аккаунта</translation>
     </message>
@@ -3726,31 +1915,26 @@
     <name>CAddressEditorComp</name>
     <message>
         <location filename="../../../Include/imtauthgui/CAddressEditorComp.ui" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CAddressEditorComp.h" line="+113"/>
         <source>Edit Addresses</source>
         <translation>Редактировать адреса</translation>
     </message>
     <message>
         <location line="+27"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CAddressEditorComp.h" line="+1"/>
         <source>Country</source>
         <translation>Страна</translation>
     </message>
     <message>
         <location line="+18"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CAddressEditorComp.h" line="+1"/>
         <source>City</source>
         <translation>Город</translation>
     </message>
     <message>
         <location line="+18"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CAddressEditorComp.h" line="+1"/>
         <source>Postal code</source>
         <translation>Почтовый индекс</translation>
     </message>
     <message>
         <location line="+18"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CAddressEditorComp.h" line="+1"/>
         <source>Street</source>
         <translation>Улица</translation>
     </message>
@@ -3759,7 +1943,6 @@
     <name>CButtonBasedSelectionGuiComp</name>
     <message>
         <location filename="../../../Include/imtgui/CButtonBasedSelectionGuiComp.ui" line="+20"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CButtonBasedSelectionGuiComp.h" line="+55"/>
         <source>Form</source>
         <translation>Форма</translation>
     </message>
@@ -3778,17 +1961,17 @@
     </message>
     <message>
         <location line="+22"/>
-        <location line="+216"/>
+        <location line="+220"/>
         <source>Collection import cancelled</source>
         <translation>Импорт коллекции отменён</translation>
     </message>
     <message>
-        <location line="-212"/>
+        <location line="-216"/>
         <source>Collection import session not found</source>
         <translation>Сессия импорта коллекции не найдена</translation>
     </message>
     <message>
-        <location line="+92"/>
+        <location line="+96"/>
         <source>Import files to the collection</source>
         <translation>Импорт файлов в коллекцию</translation>
     </message>
@@ -3812,7 +1995,6 @@
     <name>CCompositeObjectViewComp</name>
     <message>
         <location filename="../../../Include/imtgui/CCompositeObjectViewComp.ui" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CCompositeObjectViewComp.h" line="+50"/>
         <source>Main Window</source>
         <translation>Главное окно</translation>
     </message>
@@ -3821,85 +2003,71 @@
     <name>CContactInfoEditorComp</name>
     <message>
         <location filename="../../../Include/imtauthgui/CContactInfoEditorComp.ui" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h" line="+204"/>
         <source>Edit Contact Information</source>
         <translation>Редактирование контактной информации</translation>
     </message>
     <message>
         <location line="+9"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h" line="+1"/>
         <source>E-Mail</source>
         <translation>Электронная почта</translation>
     </message>
     <message>
         <location line="+12"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h" line="+1"/>
         <source>Birthday</source>
         <translation>Дата рождения</translation>
     </message>
     <message>
         <location line="+12"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h" line="+1"/>
         <source>Gender</source>
         <translation>Пол</translation>
     </message>
     <message>
         <location line="+12"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h" line="+1"/>
         <source>First Name</source>
         <translation>Имя</translation>
     </message>
     <message>
         <location line="+12"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h" line="+1"/>
         <source>Last Name</source>
         <translation>Фамилия</translation>
     </message>
     <message>
         <location line="+12"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h" line="+1"/>
         <source>Nickname</source>
         <translation>Псевдоним</translation>
     </message>
     <message>
         <location line="+12"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h" line="+1"/>
         <source>Addresses</source>
         <translation>Адреса</translation>
     </message>
     <message>
         <location line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h" line="+1"/>
         <source>Add</source>
         <translation>Добавить</translation>
     </message>
     <message>
         <location line="+17"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h" line="+1"/>
         <source>Remove</source>
         <translation>Удалить</translation>
     </message>
     <message>
         <location line="+45"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h" line="+5"/>
         <source>Country</source>
         <translation>Страна</translation>
     </message>
     <message>
         <location line="+5"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h" line="-1"/>
         <source>City</source>
         <translation>Город</translation>
     </message>
     <message>
         <location line="+5"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h" line="-1"/>
         <source>Postal Code</source>
         <translation>Почтовый индекс</translation>
     </message>
     <message>
         <location line="+5"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h" line="-1"/>
         <source>Street</source>
         <translation>Улица</translation>
     </message>
@@ -3908,13 +2076,11 @@
     <name>CCustomLayoutSettings</name>
     <message>
         <location filename="../../../Include/imtgui/CCustomLayoutSettings.ui" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+380"/>
         <source>Dialog</source>
         <translation>Диалог</translation>
     </message>
     <message>
         <location line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+1"/>
         <source>Fixed Layouts</source>
         <translation>Фиксированные макеты</translation>
     </message>
@@ -3930,35 +2096,21 @@
         <location line="+44"/>
         <location line="+44"/>
         <location line="+44"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+1"/>
-        <location line="+2"/>
-        <location line="+3"/>
-        <location line="+3"/>
-        <location line="+3"/>
-        <location line="+3"/>
-        <location line="+3"/>
-        <location line="+3"/>
-        <location line="+3"/>
-        <location line="+3"/>
-        <location line="+3"/>
         <source>All Layouts</source>
         <translation>Все макеты</translation>
     </message>
     <message>
         <location line="-422"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="-28"/>
         <source>Border Enabled</source>
         <translation>Граница включена</translation>
     </message>
     <message>
         <location line="+34"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+2"/>
         <source>...</source>
         <translation>...</translation>
     </message>
     <message>
         <location line="+13"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+1"/>
         <source>Border Color</source>
         <translation>Цвет границы</translation>
     </message>
@@ -3969,68 +2121,52 @@
         <location line="+44"/>
         <location line="+44"/>
         <location line="+44"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+2"/>
-        <location line="+6"/>
-        <location line="+6"/>
-        <location line="+3"/>
-        <location line="+3"/>
-        <location line="+3"/>
         <source>0</source>
         <translation>0</translation>
     </message>
     <message>
         <location line="-301"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="-20"/>
         <source>Min Width</source>
         <translation>Мин. ширина</translation>
     </message>
     <message>
         <location line="+37"/>
         <location line="+88"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+2"/>
-        <location line="+6"/>
         <source>16777215</source>
         <translation>16777215</translation>
     </message>
     <message>
         <location line="-81"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="-5"/>
         <source>Max Width</source>
         <translation>Макс. ширина</translation>
     </message>
     <message>
         <location line="+44"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+3"/>
         <source>Min Height</source>
         <translation>Мин. высота</translation>
     </message>
     <message>
         <location line="+44"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+3"/>
         <source>Max Height</source>
         <translation>Макс. высота</translation>
     </message>
     <message>
         <location line="+44"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+3"/>
         <source>Left Margin</source>
         <translation>Левый отступ</translation>
     </message>
     <message>
         <location line="+44"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+3"/>
         <source>Right Margin</source>
         <translation>Правый отступ</translation>
     </message>
     <message>
         <location line="+44"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+3"/>
         <source>Top Margin</source>
         <translation>Верхний отступ</translation>
     </message>
     <message>
         <location line="+44"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+3"/>
         <source>Bottom Margin</source>
         <translation>Нижний отступ</translation>
     </message>
@@ -4039,7 +2175,6 @@
     <name>CCustomLayoutWidgetForm</name>
     <message>
         <location filename="../../../Include/imtgui/CCustomLayoutWidgetForm.ui" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CCustomLayoutWidgetForm.h" line="+280"/>
         <source>Form</source>
         <translation>Форма</translation>
     </message>
@@ -4053,29 +2188,17 @@
         <location line="+45"/>
         <location line="+23"/>
         <location line="+129"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CCustomLayoutWidgetForm.h" line="+1"/>
-        <location line="+1"/>
-        <location line="+1"/>
-        <location line="+1"/>
-        <location line="+1"/>
-        <location line="+1"/>
-        <location line="+1"/>
-        <location line="+1"/>
-        <location line="+3"/>
         <source>...</source>
         <translation>...</translation>
     </message>
     <message>
         <location line="-7"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CCustomLayoutWidgetForm.h" line="-1"/>
         <source>Set Icon</source>
         <translation>Установить иконку</translation>
     </message>
     <message>
         <location line="+29"/>
         <location line="+18"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CCustomLayoutWidgetForm.h" line="+2"/>
-        <location line="+1"/>
         <source>No Name</source>
         <translation>Без имени</translation>
     </message>
@@ -4084,49 +2207,41 @@
     <name>CDatabaseLoginSettingsEditorComp</name>
     <message>
         <location filename="../../../Include/imtdbgui/CDatabaseLoginSettingsEditorComp.ui" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtdbgui/ui_CDatabaseLoginSettingsEditorComp.h" line="+148"/>
         <source>Form</source>
         <translation>Форма</translation>
     </message>
     <message>
         <location line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtdbgui/ui_CDatabaseLoginSettingsEditorComp.h" line="+1"/>
         <source>Host</source>
         <translation>Хост</translation>
     </message>
     <message>
         <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtdbgui/ui_CDatabaseLoginSettingsEditorComp.h" line="+1"/>
         <source>Port</source>
         <translation>Порт</translation>
     </message>
     <message>
         <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtdbgui/ui_CDatabaseLoginSettingsEditorComp.h" line="+1"/>
         <source>Database Name</source>
         <translation>Название базы данных</translation>
     </message>
     <message>
         <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtdbgui/ui_CDatabaseLoginSettingsEditorComp.h" line="+1"/>
         <source>User</source>
         <translation>Пользователь</translation>
     </message>
     <message>
         <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtdbgui/ui_CDatabaseLoginSettingsEditorComp.h" line="+1"/>
         <source>Password</source>
         <translation>Пароль</translation>
     </message>
     <message>
         <location line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtdbgui/ui_CDatabaseLoginSettingsEditorComp.h" line="+1"/>
         <source>Use SSL</source>
         <translation>Использовать SSL</translation>
     </message>
     <message>
         <location line="+36"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtdbgui/ui_CDatabaseLoginSettingsEditorComp.h" line="+1"/>
         <source>Test Connection</source>
         <translation>Проверить соединение</translation>
     </message>
@@ -4176,7 +2291,6 @@
     <name>CDeviceSelectionGuiComp</name>
     <message>
         <location filename="../../../Include/imtdevgui/CDeviceSelectionGuiComp.ui" line="+26"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtdevgui/ui_CDeviceSelectionGuiComp.h" line="+73"/>
         <source>Form</source>
         <translation>Форма</translation>
     </message>
@@ -4185,7 +2299,6 @@
     <name>CEventStatisticsViewComp</name>
     <message>
         <location filename="../../../Include/imtloggui/CEventStatisticsViewComp.ui" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtloggui/ui_CEventStatisticsViewComp.h" line="+55"/>
         <source>ScrollArea</source>
         <translation>Область прокрутки</translation>
     </message>
@@ -4194,7 +2307,6 @@
     <name>CEventViewComp</name>
     <message>
         <location filename="../../../Include/imtloggui/CEventViewComp.ui" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtloggui/ui_CEventViewComp.h" line="+41"/>
         <source>Form</source>
         <translation>Форма</translation>
     </message>
@@ -4203,19 +2315,16 @@
     <name>CFeatureInfoEditorGuiComp</name>
     <message>
         <location filename="../../../Include/imtlicgui/CFeatureInfoEditorGuiComp.ui" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CFeatureInfoEditorGuiComp.h" line="+73"/>
         <source>Feature Information</source>
         <translation>Информация о функции</translation>
     </message>
     <message>
         <location line="+9"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CFeatureInfoEditorGuiComp.h" line="+1"/>
         <source>Feature Name</source>
         <translation>Название</translation>
     </message>
     <message>
         <location line="+12"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CFeatureInfoEditorGuiComp.h" line="+1"/>
         <source>Feature-ID</source>
         <translation>Идентификатор</translation>
     </message>
@@ -4242,18 +2351,18 @@
 <context>
     <name>CGqlCollectionImportControllerComp</name>
     <message>
-        <location filename="../../../Include/imtservergql/CGqlCollectionImportControllerComp.cpp" line="+22"/>
-        <location line="+28"/>
+        <location filename="../../../Include/imtservergql/CGqlCollectionImportControllerComp.cpp" line="+23"/>
+        <location line="+27"/>
         <source>Collection import controller unavailable</source>
         <translation>Контроллер импорта коллекции недоступен</translation>
     </message>
     <message>
-        <location filename="../../../Include/imtservergql/CGqlCollectionImportControllerComp.h" line="+82"/>
+        <location filename="../../../Include/imtservergql/CGqlCollectionImportControllerComp.h" line="+83"/>
         <source>Invalid file info in the request</source>
         <translation>Неверная информация о файле в запросе</translation>
     </message>
     <message>
-        <location filename="../../../Include/imtservergql/CGqlCollectionImportControllerComp.cpp" line="+15"/>
+        <location filename="../../../Include/imtservergql/CGqlCollectionImportControllerComp.cpp" line="+14"/>
         <location filename="../../../Include/imtservergql/CGqlCollectionImportControllerComp.h" line="+9"/>
         <location line="+4"/>
         <source>Invalid import request</source>
@@ -4264,19 +2373,16 @@
     <name>CLicenseInfoEditorGuiComp</name>
     <message>
         <location filename="../../../Include/imtlicgui/CLicenseInfoEditorGuiComp.ui" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CLicenseInfoEditorGuiComp.h" line="+73"/>
         <source>Edit License</source>
         <translation>Редактировать лицензию</translation>
     </message>
     <message>
         <location line="+18"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CLicenseInfoEditorGuiComp.h" line="+1"/>
         <source>License Name</source>
         <translation>Название лицензии</translation>
     </message>
     <message>
         <location line="+12"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CLicenseInfoEditorGuiComp.h" line="+1"/>
         <source>License-ID</source>
         <translation>Идентификатор лицензии</translation>
     </message>
@@ -4285,7 +2391,6 @@
     <name>CMenuPanel</name>
     <message>
         <location filename="../../../Include/imtwidgets/CMenuPanel.ui" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtwidgets/ui_CMenuPanel.h" line="+104"/>
         <source>Form</source>
         <translation>Форма</translation>
     </message>
@@ -4294,7 +2399,6 @@
     <name>CMultiParamsSetGuiComp</name>
     <message>
         <location filename="../../../Include/imtgui/CMultiParamsSetGuiComp.ui" line="+32"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CMultiParamsSetGuiComp.h" line="+62"/>
         <source>Form</source>
         <translation>Форма</translation>
     </message>
@@ -4303,31 +2407,26 @@
     <name>CMultiSelectionEditorComp</name>
     <message>
         <location filename="../../../Include/imtgui/CMultiSelectionEditorComp.ui" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CMultiSelectionEditorComp.h" line="+103"/>
         <source>Form</source>
         <translation>Форма</translation>
     </message>
     <message>
         <location line="+44"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CMultiSelectionEditorComp.h" line="+1"/>
         <source>Deselect All</source>
         <translation>Снять выделение со всех</translation>
     </message>
     <message>
         <location line="+7"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CMultiSelectionEditorComp.h" line="+1"/>
         <source>Select All</source>
         <translation>Выделить все</translation>
     </message>
     <message>
         <location line="+7"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CMultiSelectionEditorComp.h" line="+1"/>
         <source>Invert</source>
         <translation>Инвертировать</translation>
     </message>
     <message>
         <location line="+20"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CMultiSelectionEditorComp.h" line="+1"/>
         <source>Exclusive</source>
         <translation>Эксклюзивный</translation>
     </message>
@@ -4359,7 +2458,6 @@
     <name>CObjectCollectionMetaInfoViewComp</name>
     <message>
         <location filename="../../../Include/imtgui/CObjectCollectionMetaInfoViewComp.ui" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CObjectCollectionMetaInfoViewComp.h" line="+77"/>
         <source>Form</source>
         <translation>Форма</translation>
     </message>
@@ -4368,37 +2466,31 @@
     <name>CObjectCollectionRevisionDialog</name>
     <message>
         <location filename="../../../Include/imtgui/CObjectCollectionRevisionDialog.ui" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CObjectCollectionRevisionDialog.h" line="+78"/>
         <source>Select revision</source>
         <translation>Выбрать ревизию</translation>
     </message>
     <message>
         <location line="+25"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CObjectCollectionRevisionDialog.h" line="+2"/>
         <source>Revision</source>
         <translation>Ревизия</translation>
     </message>
     <message>
         <location line="+5"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CObjectCollectionRevisionDialog.h" line="+2"/>
         <source>Backup time</source>
         <translation>Время резервной копии</translation>
     </message>
     <message>
         <location line="+5"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CObjectCollectionRevisionDialog.h" line="+2"/>
         <source>User</source>
         <translation>Пользователь</translation>
     </message>
     <message>
         <location line="+5"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CObjectCollectionRevisionDialog.h" line="+2"/>
         <source>SW Version</source>
         <translation>Версия ПО</translation>
     </message>
     <message>
         <location line="+5"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CObjectCollectionRevisionDialog.h" line="+2"/>
         <source>Comment</source>
         <translation>Комментарий</translation>
     </message>
@@ -4407,37 +2499,31 @@
     <name>CObjectCollectionViewComp</name>
     <message>
         <location filename="../../../Include/imtgui/CObjectCollectionViewComp.ui" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CObjectCollectionViewComp.h" line="+264"/>
         <source>Form</source>
         <translation>Форма</translation>
     </message>
     <message>
         <location line="+37"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CObjectCollectionViewComp.h" line="+2"/>
         <source>1</source>
         <translation>1</translation>
     </message>
     <message>
         <location line="+105"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CObjectCollectionViewComp.h" line="+1"/>
         <source>Enter some text to filter the item list</source>
         <translation>Введите текст для фильтрации</translation>
     </message>
     <message>
         <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CObjectCollectionViewComp.h" line="+1"/>
         <source>Close</source>
         <translation>Закрыть</translation>
     </message>
     <message>
         <location line="+157"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CObjectCollectionViewComp.h" line="+1"/>
         <source>Info</source>
         <translation>Информация</translation>
     </message>
     <message>
         <location line="+43"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CObjectCollectionViewComp.h" line="+1"/>
         <source>TextLabel</source>
         <translation>Текстовая метка</translation>
     </message>
@@ -4446,7 +2532,6 @@
     <name>CPageDecoratorComp</name>
     <message>
         <location filename="../../../Include/imtgui/CPageDecoratorComp.ui" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPageDecoratorComp.h" line="+145"/>
         <source>Form</source>
         <translation>Форма</translation>
     </message>
@@ -4455,31 +2540,26 @@
     <name>CPaginationGuiComp</name>
     <message>
         <location filename="../../../Include/imtgui/CPaginationGuiComp.ui" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPaginationGuiComp.h" line="+123"/>
         <source>Form</source>
         <translation>Форма</translation>
     </message>
     <message>
         <location line="+85"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPaginationGuiComp.h" line="+1"/>
         <source>&lt;&lt;</source>
         <translation>&lt;&lt;</translation>
     </message>
     <message>
         <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPaginationGuiComp.h" line="+1"/>
         <source>&lt;</source>
         <translation>&lt;</translation>
     </message>
     <message>
         <location line="+40"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPaginationGuiComp.h" line="+1"/>
         <source>&gt;</source>
         <translation>&gt;</translation>
     </message>
     <message>
         <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPaginationGuiComp.h" line="+1"/>
         <source>&gt;&gt;</source>
         <translation>&gt;&gt;</translation>
     </message>
@@ -4488,49 +2568,41 @@
     <name>CPersonalAccessTokenManagerGuiComp</name>
     <message>
         <location filename="../../../Include/imtauthgui/CPersonalAccessTokenManagerGuiComp.ui" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CPersonalAccessTokenManagerGuiComp.h" line="+135"/>
         <source>Personal Access Token Manager</source>
         <translation>Менеджер персональных токенов доступа</translation>
     </message>
     <message>
         <location line="+21"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CPersonalAccessTokenManagerGuiComp.h" line="+1"/>
         <source>User: &lt;not set&gt;</source>
         <translation>Пользователь: &lt;не задан&gt;</translation>
     </message>
     <message>
         <location line="+29"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CPersonalAccessTokenManagerGuiComp.h" line="+1"/>
         <source>Personal Access Tokens</source>
         <translation>Персональные токены доступа</translation>
     </message>
     <message>
         <location line="+19"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CPersonalAccessTokenManagerGuiComp.h" line="+1"/>
         <source>Create</source>
         <translation>Создать</translation>
     </message>
     <message>
         <location line="+7"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CPersonalAccessTokenManagerGuiComp.h" line="+1"/>
         <source>Revoke</source>
         <translation>Отозвать</translation>
     </message>
     <message>
         <location line="+7"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CPersonalAccessTokenManagerGuiComp.h" line="+1"/>
         <source>Delete</source>
         <translation>Удалить</translation>
     </message>
     <message>
         <location line="+7"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CPersonalAccessTokenManagerGuiComp.h" line="+1"/>
         <source>Refresh</source>
         <translation>Обновить</translation>
     </message>
     <message>
         <location line="+25"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CPersonalAccessTokenManagerGuiComp.h" line="+1"/>
         <source>Token Details</source>
         <translation>Детали токена</translation>
     </message>
@@ -4539,37 +2611,31 @@
     <name>CPluginStatusViewerComp</name>
     <message>
         <location filename="../../../Include/imtgui/CPluginStatusViewerComp.ui" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPluginStatusViewerComp.h" line="+62"/>
         <source>Form</source>
         <translation>Форма</translation>
     </message>
     <message>
         <location line="+25"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPluginStatusViewerComp.h" line="+2"/>
         <source>TimeStamp</source>
         <translation>Отметка времени</translation>
     </message>
     <message>
         <location line="+5"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPluginStatusViewerComp.h" line="+2"/>
         <source>Status</source>
         <translation>Статус</translation>
     </message>
     <message>
         <location line="+5"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPluginStatusViewerComp.h" line="+2"/>
         <source>Name</source>
         <translation>Название</translation>
     </message>
     <message>
         <location line="+5"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPluginStatusViewerComp.h" line="+2"/>
         <source>Path</source>
         <translation>Путь</translation>
     </message>
     <message>
         <location line="+5"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPluginStatusViewerComp.h" line="+2"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
@@ -4578,7 +2644,6 @@
     <name>CPopupTestGuiComp</name>
     <message>
         <location filename="../../../Include/imtgui/CPopupTestGuiComp.ui" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+389"/>
         <source>Form</source>
         <translation>Форма</translation>
     </message>
@@ -4587,132 +2652,105 @@
         <location line="+20"/>
         <location line="+474"/>
         <location line="+20"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+1"/>
-        <location line="+1"/>
-        <location line="+24"/>
-        <location line="+1"/>
         <source>Anchor</source>
         <translation>Привязка</translation>
     </message>
     <message>
         <location line="-449"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="-24"/>
         <source>Standart popup</source>
         <translation>Стандартное всплывающее окно</translation>
     </message>
     <message>
         <location line="+15"/>
         <location line="+124"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+1"/>
-        <location line="+7"/>
         <source>Info</source>
         <translation>Информация</translation>
     </message>
     <message>
         <location line="-111"/>
         <location line="+121"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="-6"/>
-        <location line="+7"/>
         <source>Warning</source>
         <translation>Предупреждение</translation>
     </message>
     <message>
         <location line="-108"/>
         <location line="+115"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="-6"/>
-        <location line="+7"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
         <location line="-102"/>
         <location line="+109"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="-6"/>
-        <location line="+7"/>
         <source>Critical</source>
         <translation>Критическая ошибка</translation>
     </message>
     <message>
         <location line="-78"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="-6"/>
         <source>Extended popup</source>
         <translation>Расширенное всплывающее окно</translation>
     </message>
     <message>
         <location line="+38"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+1"/>
         <source>Category</source>
         <translation>Категория</translation>
     </message>
     <message>
         <location line="+9"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+1"/>
         <source>None</source>
         <translation>Нет</translation>
     </message>
     <message>
         <location line="+47"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+5"/>
         <source>Timeout</source>
         <translation>Тайм-аут</translation>
     </message>
     <message>
         <location line="+9"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+1"/>
         <source>Require user action</source>
         <translation>Требуется действие пользователя</translation>
     </message>
     <message>
         <location line="+7"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+1"/>
         <source>5s</source>
         <translation>5s</translation>
     </message>
     <message>
         <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+1"/>
         <source>10s</source>
         <translation>10s</translation>
     </message>
     <message>
         <location line="+7"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+1"/>
         <source>15s</source>
         <translation>15s</translation>
     </message>
     <message>
         <location line="+7"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+1"/>
         <source>20s</source>
         <translation>20s</translation>
     </message>
     <message>
         <location line="+53"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+1"/>
         <source>Message</source>
         <translation>Сообщение</translation>
     </message>
     <message>
         <location line="+13"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+1"/>
         <source>Widget without close control</source>
         <translation>Виджет без кнопки закрытия</translation>
     </message>
     <message>
         <location line="+13"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+1"/>
         <source>Widget with close control</source>
         <translation>Виджет с кнопкой закрытия</translation>
     </message>
     <message>
         <location line="+39"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+1"/>
         <source>Allow closing on mouse click</source>
         <translation>Разрешить закрытие по клику мыши</translation>
     </message>
     <message>
         <location line="+55"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+1"/>
         <source>Use area provider</source>
         <translation>Использовать провайдер области</translation>
     </message>
@@ -4721,43 +2759,36 @@
     <name>CProductInstanceInfoEditorComp</name>
     <message>
         <location filename="../../../Include/imtlicgui/CProductInstanceInfoEditorComp.ui" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CProductInstanceInfoEditorComp.h" line="+120"/>
         <source>Edit Product Instance</source>
         <translation>Редактировать экземпляр продукта</translation>
     </message>
     <message>
         <location line="+15"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CProductInstanceInfoEditorComp.h" line="+1"/>
         <source>Instance-ID</source>
         <translation>ID экземпляра</translation>
     </message>
     <message>
         <location line="+18"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CProductInstanceInfoEditorComp.h" line="+1"/>
         <source>Customer</source>
         <translation>Клиент</translation>
     </message>
     <message>
         <location line="+18"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CProductInstanceInfoEditorComp.h" line="+1"/>
         <source>Product</source>
         <translation>Продукт</translation>
     </message>
     <message>
         <location line="+24"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CProductInstanceInfoEditorComp.h" line="+1"/>
         <source>Licenses</source>
         <translation>Лицензии</translation>
     </message>
     <message>
         <location line="+16"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CProductInstanceInfoEditorComp.h" line="+3"/>
         <source>License</source>
         <translation>Лицензия</translation>
     </message>
     <message>
         <location line="+5"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CProductInstanceInfoEditorComp.h" line="-1"/>
         <source>Expiration</source>
         <translation>Срок действия</translation>
     </message>
@@ -4766,63 +2797,52 @@
     <name>CProductInstanceInfoViewComp</name>
     <message>
         <location filename="../../../Include/imtlicgui/CProductInstanceInfoViewComp.ui" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CProductInstanceInfoViewComp.h" line="+184"/>
         <source>Edit Product Instance</source>
         <translation>Редактировать экземпляр продукта</translation>
     </message>
     <message>
         <location line="+27"/>
         <location line="+178"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CProductInstanceInfoViewComp.h" line="+1"/>
-        <location line="+11"/>
         <source>License</source>
         <translation>Лицензия</translation>
     </message>
     <message>
         <location line="-164"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CProductInstanceInfoViewComp.h" line="-10"/>
         <source>Create Transaction Code...</source>
         <translation>Создать транзакционный код...</translation>
     </message>
     <message>
         <location line="+24"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CProductInstanceInfoViewComp.h" line="+2"/>
         <source>Load License...</source>
         <translation>Загрузить лицензию...</translation>
     </message>
     <message>
         <location line="+32"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CProductInstanceInfoViewComp.h" line="+2"/>
         <source>Instance-ID</source>
         <translation>ID экземпляра</translation>
     </message>
     <message>
         <location line="+22"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CProductInstanceInfoViewComp.h" line="+1"/>
         <source>Customer</source>
         <translation>Клиент</translation>
     </message>
     <message>
         <location line="+22"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CProductInstanceInfoViewComp.h" line="+1"/>
         <source>Product</source>
         <translation>Продукт</translation>
     </message>
     <message>
         <location line="+28"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CProductInstanceInfoViewComp.h" line="+1"/>
         <source>Features</source>
         <translation>Функции</translation>
     </message>
     <message>
         <location line="+31"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CProductInstanceInfoViewComp.h" line="+4"/>
         <source>Feature</source>
         <translation>Функция</translation>
     </message>
     <message>
         <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CProductInstanceInfoViewComp.h" line="-2"/>
         <source>Valid</source>
         <translation>Действителен</translation>
     </message>
@@ -4831,13 +2851,11 @@
     <name>CProgressDialog</name>
     <message>
         <location filename="../../../Include/imtgui/CProgressDialog.ui" line="+20"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CProgressDialog.h" line="+83"/>
         <source>Form</source>
         <translation>Форма</translation>
     </message>
     <message>
         <location line="+68"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CProgressDialog.h" line="+2"/>
         <source>Some work in progress...</source>
         <translation>Идёт обработка...</translation>
     </message>
@@ -4846,69 +2864,57 @@
     <name>CRemoteStandardLoginGuiComp</name>
     <message>
         <location filename="../../../Include/imtauthgui/CRemoteStandardLoginGuiComp.ui" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+390"/>
         <source>Form</source>
         <translation>Форма</translation>
     </message>
     <message>
         <location line="+89"/>
         <location line="+346"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+1"/>
-        <location line="+9"/>
         <source>Password</source>
         <translation>Пароль</translation>
     </message>
     <message>
         <location line="-339"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="-8"/>
         <source>User</source>
         <translation>Пользователь</translation>
     </message>
     <message>
         <location line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+1"/>
         <source>Remember me</source>
         <translation>Запомнить меня</translation>
     </message>
     <message>
         <location line="+29"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+2"/>
         <source>Login</source>
         <translation>Логин</translation>
     </message>
     <message>
         <location line="+29"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+1"/>
         <source>Please enter your credentials to log in.</source>
         <translation>Введите ваши учётные данные для входа.</translation>
     </message>
     <message>
         <location line="+163"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+2"/>
         <source>OK</source>
         <translation>ОК</translation>
     </message>
     <message>
         <location line="+74"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+1"/>
         <source>Please, enter the password for system administrator</source>
         <translation>Пожалуйста, введите пароль системного администратора</translation>
     </message>
     <message>
         <location line="+50"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+2"/>
         <source>Confirm Password</source>
         <translation>Подтвердите пароль</translation>
     </message>
     <message>
         <location line="+55"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+1"/>
         <source>No connection to the server</source>
         <translation>Нет соединения с сервером</translation>
     </message>
     <message>
         <location line="+38"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+1"/>
         <source>Refresh</source>
         <translation>Обновить</translation>
     </message>
@@ -4917,7 +2923,6 @@
     <name>CReportDocumentViewComp</name>
     <message>
         <location filename="../../../Include/imtreportgui/CReportDocumentViewComp.ui" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtreportgui/ui_CReportDocumentViewComp.h" line="+51"/>
         <source>Report</source>
         <translation>Отчёт</translation>
     </message>
@@ -4926,31 +2931,26 @@
     <name>CServerConnectionEditorComp</name>
     <message>
         <location filename="../../../Include/imtauthgui/CServerConnectionEditorComp.ui" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CServerConnectionEditorComp.h" line="+114"/>
         <source>Edit Addresses</source>
         <translation>Редактировать адреса</translation>
     </message>
     <message>
         <location line="+27"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CServerConnectionEditorComp.h" line="+1"/>
         <source>Host</source>
         <translation>Хост</translation>
     </message>
     <message>
         <location line="+18"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CServerConnectionEditorComp.h" line="+1"/>
         <source>HTTP Port</source>
         <translation>Порт HTTP</translation>
     </message>
     <message>
         <location line="+22"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CServerConnectionEditorComp.h" line="+1"/>
         <source>Websocket Port</source>
         <translation>Порт WebSocket</translation>
     </message>
     <message>
         <location line="+18"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CServerConnectionEditorComp.h" line="+1"/>
         <source>gRPC Port</source>
         <translation>Порт gRPC</translation>
     </message>
@@ -4959,7 +2959,6 @@
     <name>CSimpleAttributeManagerViewComp</name>
     <message>
         <location filename="../../../Include/imtgui/CSimpleAttributeManagerViewComp.ui" line="+20"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CSimpleAttributeManagerViewComp.h" line="+55"/>
         <source>Form</source>
         <translation>Форма</translation>
     </message>
@@ -4968,19 +2967,16 @@
     <name>CStandardAccountMenuComp</name>
     <message>
         <location filename="../../../Include/imtauthgui/CStandardAccountMenuComp.ui" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CStandardAccountMenuComp.h" line="+158"/>
         <source>Form</source>
         <translation>Форма</translation>
     </message>
     <message>
         <location line="+96"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CStandardAccountMenuComp.h" line="+3"/>
         <source>Preferences</source>
         <translation>Настройки</translation>
     </message>
     <message>
         <location line="+39"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CStandardAccountMenuComp.h" line="+2"/>
         <source>Logout</source>
         <translation>Выход из системы</translation>
     </message>
@@ -4989,39 +2985,32 @@
     <name>CStandardDocumentViewDecorator</name>
     <message>
         <location filename="../../../Include/imtgui/CStandardDocumentViewDecorator.ui" line="+120"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CStandardDocumentViewDecorator.h" line="+223"/>
         <source>New</source>
         <translation>Новый</translation>
     </message>
     <message>
         <location line="+17"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CStandardDocumentViewDecorator.h" line="+1"/>
         <source>Open</source>
         <translation>Открыть</translation>
     </message>
     <message>
         <location line="+17"/>
         <location line="+17"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CStandardDocumentViewDecorator.h" line="+1"/>
-        <location line="+1"/>
         <source>Save</source>
         <translation>Сохранить</translation>
     </message>
     <message>
         <location line="+36"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CStandardDocumentViewDecorator.h" line="+1"/>
         <source>Undo</source>
         <translation>Отменить</translation>
     </message>
     <message>
         <location line="+26"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CStandardDocumentViewDecorator.h" line="+1"/>
         <source>Redo</source>
         <translation>Восстановить</translation>
     </message>
     <message>
         <location line="+79"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CStandardDocumentViewDecorator.h" line="+1"/>
         <source>Close</source>
         <translation>Закрыть</translation>
     </message>
@@ -5030,63 +3019,52 @@
     <name>CStandardLoginGuiComp</name>
     <message>
         <location filename="../../../Include/imtauthgui/CStandardLoginGuiComp.ui" line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="+326"/>
         <source>Form</source>
         <translation>Форма</translation>
     </message>
     <message>
         <location line="+156"/>
         <location line="+234"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="+4"/>
-        <location line="+6"/>
         <source>Password</source>
         <translation>Пароль</translation>
     </message>
     <message>
         <location line="-294"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="-9"/>
         <source>User</source>
         <translation>Пользователь</translation>
     </message>
     <message>
         <location line="+7"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="+1"/>
         <source>Remember me</source>
         <translation>Запомнить меня</translation>
     </message>
     <message>
         <location line="+95"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="+4"/>
         <source>Login</source>
         <translation>Логин</translation>
     </message>
     <message>
         <location line="-65"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="-3"/>
         <source>Please enter your credentials to log in.</source>
         <translation>Введите ваши учётные данные для входа.</translation>
     </message>
     <message>
         <location line="+153"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="+5"/>
         <source>OK</source>
         <translation>ОК</translation>
     </message>
     <message>
         <location line="+74"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="+1"/>
         <source>Please, enter the password for system administrator</source>
         <translation>Пожалуйста, введите пароль системного администратора</translation>
     </message>
     <message>
         <location line="+50"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="+2"/>
         <source>Confirm Password</source>
         <translation>Подтвердите пароль</translation>
     </message>
     <message>
         <location line="+42"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="+1"/>
         <source>No connection to the server</source>
         <translation>Нет соединения с сервером</translation>
     </message>
@@ -5095,97 +3073,81 @@
     <name>CTaskManagerGuiComp</name>
     <message>
         <location filename="../../../Include/imthypegui/CTaskManagerGuiComp.ui" line="+100"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h" line="+251"/>
         <source>Add</source>
         <translation>Добавить</translation>
     </message>
     <message>
         <location line="+29"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h" line="+2"/>
         <source>Duplicate current inspection</source>
         <translation>Дублировать текущую инспекцию</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h" line="+2"/>
         <source>Duplicate</source>
         <translation>Дублировать</translation>
     </message>
     <message>
         <location line="+26"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h" line="+2"/>
         <source>Remove current inspection</source>
         <translation>Удалить текущую инспекцию</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h" line="+2"/>
         <source>Remove</source>
         <translation>Удалить</translation>
     </message>
     <message>
         <location line="+26"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h" line="+2"/>
         <source>Show acquisition manager</source>
         <translation>Показать менеджер захвата</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h" line="+2"/>
         <source>Inputs...</source>
         <translation>Входные данные...</translation>
     </message>
     <message>
         <location line="+22"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h" line="+2"/>
         <source>Show trigger table</source>
         <translation>Показать таблицу триггеров</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h" line="+2"/>
         <source>Triggers...</source>
         <translation>Триггеры...</translation>
     </message>
     <message>
         <location line="+22"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h" line="+2"/>
         <source>Hide inspections list</source>
         <translation>Скрыть список инспекций</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h" line="+2"/>
         <source>Hide</source>
         <translation>Скрыть</translation>
     </message>
     <message>
         <location line="+26"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h" line="+2"/>
         <source>Run all inspections</source>
         <translation>Запустить все инспекции</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h" line="+2"/>
         <source>Test Product</source>
         <translation>Тестовый продукт</translation>
     </message>
     <message>
         <location line="+45"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h" line="+1"/>
         <source>Total Inspections:</source>
         <translation>Всего инспекций:</translation>
     </message>
     <message>
         <location line="+61"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h" line="+2"/>
         <source>Show inspections list</source>
         <translation>Показать список инспекций</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h" line="+2"/>
         <source>Show</source>
         <translation>Показать</translation>
     </message>
@@ -5194,43 +3156,36 @@
     <name>CTaskSettingsDialog</name>
     <message>
         <location filename="../../../Include/imthypegui/CTaskSettingsDialog.ui" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskSettingsDialog.h" line="+159"/>
         <source>Task Settings</source>
         <translation>Настройки задачи</translation>
     </message>
     <message>
         <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskSettingsDialog.h" line="+1"/>
         <source>Active</source>
         <translation>Активный</translation>
     </message>
     <message>
         <location line="+7"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskSettingsDialog.h" line="+1"/>
         <source>Task Name</source>
         <translation>Название задачи</translation>
     </message>
     <message>
         <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskSettingsDialog.h" line="+1"/>
         <source>User-ID</source>
         <translation>ID пользователя</translation>
     </message>
     <message>
         <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskSettingsDialog.h" line="+1"/>
         <source>Input-ID</source>
         <translation>ID входных данных</translation>
     </message>
     <message>
         <location line="+29"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskSettingsDialog.h" line="+1"/>
         <source>Edit</source>
         <translation>Редактировать</translation>
     </message>
     <message>
         <location line="+34"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskSettingsDialog.h" line="+1"/>
         <source>Description</source>
         <translation>Описание</translation>
     </message>
@@ -5239,49 +3194,40 @@
     <name>CTaskSettingsGuiComp</name>
     <message>
         <location filename="../../../Include/imthypegui/CTaskSettingsGuiComp.ui" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskSettingsGuiComp.h" line="+166"/>
         <source>Task Settings</source>
         <translation>Настройки задачи</translation>
     </message>
     <message>
-        <location line="+117"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskSettingsGuiComp.h" line="+5"/>
+        <location line="+31"/>
         <source>Active</source>
         <translation>Активный</translation>
     </message>
     <message>
-        <location line="-13"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskSettingsGuiComp.h" line="-1"/>
+        <location line="+24"/>
         <source>Task Name</source>
         <translation>Название задачи</translation>
     </message>
     <message>
-        <location line="-86"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskSettingsGuiComp.h" line="-3"/>
+        <location line="-10"/>
         <source>User-ID</source>
         <translation>ID пользователя</translation>
     </message>
     <message>
-        <location line="+109"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskSettingsGuiComp.h" line="+8"/>
         <source>InputSub-ID</source>
-        <translation>Вх. суб-ID</translation>
+        <translation type="vanished">Вх. суб-ID</translation>
     </message>
     <message>
-        <location line="+7"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskSettingsGuiComp.h" line="+1"/>
+        <location line="-7"/>
         <source>Input-ID</source>
         <translation>ID входных данных</translation>
     </message>
     <message>
-        <location line="-77"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskSettingsGuiComp.h" line="-7"/>
+        <location line="+52"/>
         <source>Edit</source>
         <translation>Редактировать</translation>
     </message>
     <message>
-        <location line="-32"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskSettingsGuiComp.h" line="-1"/>
+        <location line="+34"/>
         <source>Description</source>
         <translation>Описание</translation>
     </message>
@@ -5290,53 +3236,43 @@
     <name>CThumbnailDecoratorGuiComp</name>
     <message>
         <location filename="../../../Include/imtgui/CThumbnailDecoratorGuiComp.ui" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+529"/>
         <source>Main Window</source>
         <translation>Главное окно</translation>
     </message>
     <message>
-        <location line="+104"/>
+        <location line="+114"/>
         <location line="+50"/>
         <location line="+20"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+2"/>
-        <location line="+1"/>
-        <location line="+1"/>
         <source>...</source>
         <translation>...</translation>
     </message>
     <message>
         <location line="+35"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+1"/>
         <source>Welcome</source>
         <translation>Добро пожаловать</translation>
     </message>
     <message>
         <location line="+93"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+1"/>
         <source>Commands</source>
         <translation>Команды</translation>
     </message>
     <message>
         <location line="+27"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+1"/>
         <source>Log out</source>
         <translation>Выйти из системы</translation>
     </message>
     <message>
         <location line="+19"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+4"/>
         <source>Dashboard</source>
         <translation>Панель управления</translation>
     </message>
     <message>
         <location line="+90"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+2"/>
         <source>Quit</source>
         <translation>Выйти</translation>
     </message>
     <message>
         <location line="+203"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+4"/>
         <source>Close</source>
         <translation>Закрыть</translation>
     </message>
@@ -5345,79 +3281,66 @@
     <name>CTimeFilterParamEditorComp</name>
     <message>
         <location filename="../../../Include/imtgui/CTimeFilterParamEditorComp.ui" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CTimeFilterParamEditorComp.h" line="+95"/>
         <source>Form</source>
         <translation>Форма</translation>
     </message>
     <message>
         <location line="+13"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CTimeFilterParamEditorComp.h" line="+1"/>
         <source>Total Period</source>
         <translation>Весь период</translation>
     </message>
     <message>
         <location line="+5"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CTimeFilterParamEditorComp.h" line="+1"/>
         <source>Last Hour</source>
         <translation>Последний час</translation>
     </message>
     <message>
         <location line="+5"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CTimeFilterParamEditorComp.h" line="+1"/>
         <source>Last 4 Hours</source>
         <translation>Последние 4 часа</translation>
     </message>
     <message>
         <location line="+5"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CTimeFilterParamEditorComp.h" line="+1"/>
         <source>Last 8 Hours</source>
         <translation>Последние 8 часов</translation>
     </message>
     <message>
         <location line="+5"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CTimeFilterParamEditorComp.h" line="+1"/>
         <source>Last Day</source>
         <translation>Последний день</translation>
     </message>
     <message>
         <location line="+5"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CTimeFilterParamEditorComp.h" line="+1"/>
         <source>Last Week</source>
         <translation>Последняя неделя</translation>
     </message>
     <message>
         <location line="+5"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CTimeFilterParamEditorComp.h" line="+1"/>
         <source>Last Month</source>
         <translation>Последний месяц</translation>
     </message>
     <message>
         <location line="+5"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CTimeFilterParamEditorComp.h" line="+1"/>
         <source>Last Quarter</source>
         <translation>Последний квартал</translation>
     </message>
     <message>
         <location line="+5"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CTimeFilterParamEditorComp.h" line="+1"/>
         <source>Last Year</source>
         <translation>Последний год</translation>
     </message>
     <message>
         <location line="+5"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CTimeFilterParamEditorComp.h" line="+1"/>
         <source>User-Defined</source>
         <translation>Пользовательский</translation>
     </message>
     <message>
         <location line="+41"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CTimeFilterParamEditorComp.h" line="+2"/>
         <source>From</source>
         <translation>От</translation>
     </message>
     <message>
         <location line="+16"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CTimeFilterParamEditorComp.h" line="+1"/>
         <source>To</source>
         <translation>До</translation>
     </message>
@@ -5615,7 +3538,7 @@
         <translation>Вс</translation>
     </message>
     <message>
-        <location line="+19"/>
+        <location line="+25"/>
         <source>Ok</source>
         <translation>ОК</translation>
     </message>
@@ -5628,6 +3551,16 @@
         <location line="+1"/>
         <source>Today</source>
         <translation>Сегодня</translation>
+    </message>
+    <message>
+        <location line="+640"/>
+        <source>Previous month</source>
+        <translation>Предыдущий месяц</translation>
+    </message>
+    <message>
+        <location line="+26"/>
+        <source>Next month</source>
+        <translation>Следующий месяц</translation>
     </message>
 </context>
 <context>
@@ -5696,7 +3629,7 @@
 <context>
     <name>CalendarView</name>
     <message>
-        <location filename="../../../Qml/imtcontrols/Inputs/CalendarView.qml" line="+40"/>
+        <location filename="../../../Qml/imtcontrols/Inputs/CalendarView.qml" line="+39"/>
         <source>Mo</source>
         <translation>Пн</translation>
     </message>
@@ -5734,7 +3667,7 @@
 <context>
     <name>ChangePasswordDialog</name>
     <message>
-        <location filename="../../../Qml/imtauthgui/ChangePasswordDialog.qml" line="+15"/>
+        <location filename="../../../Qml/imtauthgui/ChangePasswordDialog.qml" line="+16"/>
         <source>Save</source>
         <translation>Сохранить</translation>
     </message>
@@ -5747,7 +3680,7 @@
 <context>
     <name>ChatPanel</name>
     <message>
-        <location filename="../../../Qml/imtchatgui/ChatPanel.qml" line="+37"/>
+        <location filename="../../../Qml/imtchatgui/ChatPanel.qml" line="+35"/>
         <source>Chats</source>
         <translation>Чаты</translation>
     </message>
@@ -5760,7 +3693,7 @@
 <context>
     <name>ChatSearchBar</name>
     <message>
-        <location filename="../../../Qml/imtchatgui/ChatSearchBar.qml" line="+15"/>
+        <location filename="../../../Qml/imtchatgui/ChatSearchBar.qml" line="+13"/>
         <source>Search...</source>
         <translation>Поиск...</translation>
     </message>
@@ -5768,11 +3701,48 @@
 <context>
     <name>CheckBoxMenu</name>
     <message>
-        <location filename="../../../Qml/imtcontrols/Inputs/CheckBoxMenu.qml" line="+304"/>
-        <location line="+171"/>
-        <location line="+0"/>
+        <location filename="../../../Qml/imtcontrols/Inputs/CheckBoxMenu.qml" line="+306"/>
+        <location line="+174"/>
         <source>All</source>
         <translation>Все</translation>
+    </message>
+</context>
+<context>
+    <name>CheckableListPanel</name>
+    <message>
+        <location filename="../../../Qml/imtcontrols/Views/CheckableListPanel.qml" line="+23"/>
+        <source>Details</source>
+        <translation>Подробности</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Search</source>
+        <translation>Поиск</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Name</source>
+        <translation>Имя</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Nothing to show</source>
+        <translation>Нет данных для отображения</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>No matching items</source>
+        <translation>Нет подходящих элементов</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Nothing selected</source>
+        <translation>Ничего не выбрано</translation>
+    </message>
+    <message>
+        <location line="+494"/>
+        <source>Try a different search</source>
+        <translation>Попробуйте изменить запрос поиска</translation>
     </message>
 </context>
 <context>
@@ -5786,7 +3756,7 @@
 <context>
     <name>CollapsibleRectangle</name>
     <message>
-        <location filename="../../../Qml/imtcontrols/Views/CollapsibleRectangle.qml" line="+35"/>
+        <location filename="../../../Qml/imtcontrols/Views/CollapsibleRectangle.qml" line="+38"/>
         <source>Collapse</source>
         <translation>Свернуть</translation>
     </message>
@@ -5797,9 +3767,43 @@
     </message>
 </context>
 <context>
+    <name>CollectionFieldFilterDelegate</name>
+    <message>
+        <location filename="../../../Qml/imtcolgui/CollectionFieldFilterDelegate.qml" line="+50"/>
+        <source>Search</source>
+        <translation>Поиск</translation>
+    </message>
+</context>
+<context>
+    <name>CollectionRepresentation</name>
+    <message>
+        <location filename="../../../Qml/imtguigql/CollectionRepresentation.qml" line="+418"/>
+        <source>Unable to remove elements</source>
+        <translation>Не удалось удалить элементы</translation>
+    </message>
+</context>
+<context>
+    <name>CollectionSelectElementView</name>
+    <message>
+        <location filename="../../../Qml/imtcolgui/CollectionSelectElementView.qml" line="+64"/>
+        <source>Select an item</source>
+        <translation>Выберите объект</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Search</source>
+        <translation>Поиск</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Please select an item</source>
+        <translation>Пожалуйста, выберите объект</translation>
+    </message>
+</context>
+<context>
     <name>CollectionStructure</name>
     <message>
-        <location filename="../../../Qml/imtcolgui/CollectionStructure.qml" line="+190"/>
+        <location filename="../../../Qml/imtcolgui/CollectionStructure.qml" line="+184"/>
         <source>Edit</source>
         <translation>Редактировать</translation>
     </message>
@@ -5819,12 +3823,12 @@
         <translation>Установить описание</translation>
     </message>
     <message>
-        <location line="+333"/>
+        <location line="+319"/>
         <source>This table has been modified from another computer</source>
         <translation>Эта таблица была изменена на другом компьютере</translation>
     </message>
     <message>
-        <location line="+13"/>
+        <location line="+12"/>
         <source>Update</source>
         <translation>Обновить</translation>
     </message>
@@ -5862,7 +3866,7 @@
         <translation>Переименование документа</translation>
     </message>
     <message>
-        <location line="+13"/>
+        <location line="+11"/>
         <source>New node</source>
         <translation>Новый узел</translation>
     </message>
@@ -5875,7 +3879,7 @@
 <context>
     <name>CollectionStructureCommandsObserver</name>
     <message>
-        <location filename="../../../Qml/imtcolgui/CollectionStructureCommandsObserver.qml" line="+27"/>
+        <location filename="../../../Qml/imtcolgui/CollectionStructureCommandsObserver.qml" line="+26"/>
         <source>Open</source>
         <translation>Открыть</translation>
     </message>
@@ -5883,15 +3887,62 @@
 <context>
     <name>CollectionView</name>
     <message>
-        <location filename="../../../Qml/imtcolgui/CollectionView.qml" line="+529"/>
         <source>Please select an item for showing additional informations</source>
-        <translation>Выберите элемент чтобы увидеть дополнительную информацию</translation>
+        <translation type="vanished">Выберите элемент чтобы увидеть дополнительную информацию</translation>
+    </message>
+    <message>
+        <location filename="../../../Qml/imtcolgui/CollectionView.qml" line="+615"/>
+        <source>Select an item to view additional information</source>
+        <translation>Выберите объект для просмотра дополнительной информации</translation>
+    </message>
+</context>
+<context>
+    <name>CollectionViewBase</name>
+    <message>
+        <location filename="../../../Qml/imtcolgui/CollectionViewBase.qml" line="+422"/>
+        <source>Nothing matches the filters</source>
+        <translation>Нет элементов, соответствующих фильтрам</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Nothing here yet</source>
+        <translation>Здесь пока ничего нет</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>%1 filters are narrowing this list down.</source>
+        <translation>Список ограничен активными фильтрами: %1.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Items added to this collection will show up here.</source>
+        <translation>Элементы, добавленные в эту коллекцию, появятся здесь.</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Clear all filters</source>
+        <translation>Сбросить все фильтры</translation>
+    </message>
+    <message>
+        <location line="+145"/>
+        <source>Hide filters</source>
+        <translation>Скрыть фильтры</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Show filters - %1 active</source>
+        <translation>Показать фильтры - активно: %1</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Show filters</source>
+        <translation>Показать фильтры</translation>
     </message>
 </context>
 <context>
     <name>CollectionViewCommandsDelegateBase</name>
     <message>
-        <location filename="../../../Qml/imtcolgui/CollectionViewCommandsDelegateBase.qml" line="+19"/>
+        <location filename="../../../Qml/imtcolgui/CollectionViewCommandsDelegateBase.qml" line="+18"/>
         <source>Deleting a selected element</source>
         <translation>Удаление  выбранного  элемента</translation>
     </message>
@@ -5901,16 +3952,17 @@
         <translation>Удалить выбранный элемент из коллекции ?</translation>
     </message>
     <message>
-        <location line="+103"/>
+        <location line="+120"/>
         <source>The object has been successfully imported</source>
         <translation>Объект был успешно импортирован</translation>
     </message>
     <message>
+        <location line="+487"/>
         <source>No more than %1 documents can be opened at once</source>
         <translation>Одновременно можно открыть не более %1 документов</translation>
     </message>
     <message>
-        <location line="+107"/>
+        <location line="-386"/>
         <source>Duplicate</source>
         <translation>Дублировать</translation>
     </message>
@@ -5955,7 +4007,7 @@
         <translation>Введите описание документа:</translation>
     </message>
     <message>
-        <location line="+73"/>
+        <location line="+78"/>
         <source>Restoring an objects</source>
         <translation>Восстановление объектов</translation>
     </message>
@@ -6005,7 +4057,7 @@
         <translation>Установить описание</translation>
     </message>
     <message>
-        <location line="-444"/>
+        <location line="-449"/>
         <source>Edit</source>
         <translation>Редактировать</translation>
     </message>
@@ -6028,7 +4080,7 @@
 <context>
     <name>ComboBoxAddressElementView</name>
     <message>
-        <location filename="../../../Qml/imtgui/View/ComboBoxAddressElementView.qml" line="+13"/>
+        <location filename="../../../Qml/imtgui/View/ComboBoxAddressElementView.qml" line="+11"/>
         <source>Please select an item</source>
         <translation>Пожалуйста выберите объект</translation>
     </message>
@@ -6049,7 +4101,7 @@
 <context>
     <name>ComboBoxGqlElementView</name>
     <message>
-        <location filename="../../../Qml/imtgui/View/ComboBoxGqlElementView.qml" line="+13"/>
+        <location filename="../../../Qml/imtgui/View/ComboBoxGqlElementView.qml" line="+11"/>
         <source>Please select an item</source>
         <translation>Пожалуйста выберите объект</translation>
     </message>
@@ -6057,7 +4109,7 @@
 <context>
     <name>ComboBoxGqlLegacyElementView</name>
     <message>
-        <location filename="../../../Qml/imtgui/View/ComboBoxGqlLegacyElementView.qml" line="+13"/>
+        <location filename="../../../Qml/imtgui/View/ComboBoxGqlLegacyElementView.qml" line="+11"/>
         <source>Please select an item</source>
         <translation>Пожалуйста выберите объект</translation>
     </message>
@@ -6065,7 +4117,17 @@
 <context>
     <name>Configurator</name>
     <message>
-        <location filename="../../../Qml/imtgui/Application/Configurator.qml" line="+88"/>
+        <location filename="../../../Qml/imtgui/Application/Configurator.qml" line="+39"/>
+        <source>Settings have been saved successfully</source>
+        <translation>Настройки успешно сохранены</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Unable to save settings</source>
+        <translation>Не удалось сохранить настройки</translation>
+    </message>
+    <message>
+        <location line="+67"/>
         <source>Apply</source>
         <translation>Применить</translation>
     </message>
@@ -6086,17 +4148,103 @@
     </message>
 </context>
 <context>
+    <name>ContractView</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/ContractView.qml" line="+42"/>
+        <source>Relationship and counterparty tenant are required.</source>
+        <translation>Необходимо указать связь и организацию-контрагента.</translation>
+    </message>
+    <message>
+        <location line="+46"/>
+        <source>Cooperation Contract</source>
+        <translation>Договор о сотрудничестве</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Relationship</source>
+        <translation>Связь</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <location line="+102"/>
+        <source>Select relationship...</source>
+        <translation>Выберите связь...</translation>
+    </message>
+    <message>
+        <location line="-95"/>
+        <location line="+27"/>
+        <source>Select</source>
+        <translation>Выбрать</translation>
+    </message>
+    <message>
+        <location line="-17"/>
+        <source>Counterparty Tenant</source>
+        <translation>Организация-контрагент</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <location line="+55"/>
+        <source>Select tenant...</source>
+        <translation>Выберите организацию...</translation>
+    </message>
+    <message>
+        <location line="-37"/>
+        <source>Scope</source>
+        <translation>Область</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Optional — agreed scope of cooperation</source>
+        <translation>Необязательно — согласованная область сотрудничества</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Valid From</source>
+        <translation>Действует с</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Valid Until</source>
+        <translation>Действует до</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Description</source>
+        <translation>Описание</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Optional description</source>
+        <translation>Необязательное описание</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Terms</source>
+        <translation>Условия</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Optional free-form terms metadata</source>
+        <translation>Необязательные условия в свободной форме</translation>
+    </message>
+</context>
+<context>
     <name>ConversationCollectionView</name>
     <message>
-        <location filename="../../../Qml/imtchatgui/ConversationCollectionView.qml" line="+30"/>
+        <location filename="../../../Qml/imtchatgui/ConversationCollectionView.qml" line="+28"/>
         <source>Conversation</source>
         <translation>Беседа</translation>
+    </message>
+    <message>
+        <location line="+71"/>
+        <source>The changes could not be saved</source>
+        <translation>Не удалось сохранить изменения</translation>
     </message>
 </context>
 <context>
     <name>ConversationCreateDialog</name>
     <message>
-        <location filename="../../../Qml/imtchatgui/ConversationCreateDialog.qml" line="+50"/>
+        <location filename="../../../Qml/imtchatgui/ConversationCreateDialog.qml" line="+49"/>
         <source>New Conversation</source>
         <translation>Новая беседа</translation>
     </message>
@@ -6136,12 +4284,12 @@
         <translation>Поддержка</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+21"/>
         <source>Cancel</source>
         <translation>Отмена</translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+23"/>
         <source>Create</source>
         <translation>Создать</translation>
     </message>
@@ -6149,7 +4297,7 @@
 <context>
     <name>ConversationEditor</name>
     <message>
-        <location filename="../../../Qml/imtchatgui/ConversationEditor.qml" line="+95"/>
+        <location filename="../../../Qml/imtchatgui/ConversationEditor.qml" line="+92"/>
         <source>Name</source>
         <translation>Название</translation>
     </message>
@@ -6183,34 +4331,151 @@
     </message>
 </context>
 <context>
+    <name>CrossOrgGrantView</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/CrossOrgGrantView.qml" line="+135"/>
+        <source>This grant was created for your organization (read-only)</source>
+        <translation>Этот доступ предоставлен вашей организации (только чтение)</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Name</source>
+        <translation>Имя</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Generated from the organization and the roles if left empty</source>
+        <translation>Если не заполнено, формируется из организации и ролей</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Granting Organization</source>
+        <translation>Предоставляющая организация</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>Target Organization</source>
+        <translation>Целевая организация</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <location line="+133"/>
+        <source>Select organization...</source>
+        <translation>Выберите организацию...</translation>
+    </message>
+    <message>
+        <location line="-126"/>
+        <source>Select</source>
+        <translation>Выбрать</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Remove</source>
+        <translation>Удалить</translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <source>Roles</source>
+        <translation>Роли</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Add Role</source>
+        <translation>Добавить роль</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Description</source>
+        <translation>Описание</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Optional description</source>
+        <translation>Необязательное описание</translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Active</source>
+        <translation>Активный</translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <source>Expires At</source>
+        <translation>Истекает</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>The grant will expire on the selected date</source>
+        <translation>Срок действия доступа истечёт в выбранную дату</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>7 Days</source>
+        <translation>7 дней</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>30 Days</source>
+        <translation>30 дней</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>60 Days</source>
+        <translation>60 дней</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>90 Days</source>
+        <translation>90 дней</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>No Expiration</source>
+        <translation>Без срока действия</translation>
+    </message>
+    <message>
+        <location line="+38"/>
+        <source>No connected organizations. Connect one under Relationships first.</source>
+        <translation>Нет связанных организаций. Сначала добавьте связь в разделе «Связи».</translation>
+    </message>
+</context>
+<context>
+    <name>CustomTextField</name>
+    <message>
+        <location filename="../../../Qml/imtcontrols/Inputs/CustomTextField.qml" line="+283"/>
+        <source>Show password</source>
+        <translation>Показать пароль</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Hide password</source>
+        <translation>Скрыть пароль</translation>
+    </message>
+</context>
+<context>
     <name>DatabaseAccessSettingsEditor</name>
     <message>
-        <location filename="../../../Qml/imtgui/Params/DatabaseAccessSettingsEditor.qml" line="+22"/>
         <source>Database restore was successful</source>
-        <translation>База данных успешно восстановлена</translation>
+        <translation type="vanished">База данных успешно восстановлена</translation>
     </message>
     <message>
-        <location line="+4"/>
         <source>Error when trying to restore the database</source>
-        <translation>Ошибка при попытки восстановить базу данных</translation>
+        <translation type="vanished">Ошибка при попытки восстановить базу данных</translation>
     </message>
     <message>
-        <location line="+4"/>
         <source>Error when trying to create a database backup</source>
-        <translation>Ошибка при попытки создать резервную копию</translation>
+        <translation type="vanished">Ошибка при попытки создать резервную копию</translation>
     </message>
     <message>
-        <location line="+15"/>
         <source>Select backup file</source>
-        <translation>Выберите файл для восстановления</translation>
+        <translation type="vanished">Выберите файл для восстановления</translation>
     </message>
     <message>
-        <location line="+15"/>
         <source>Save file</source>
-        <translation>Сохранить файл</translation>
+        <translation type="vanished">Сохранить файл</translation>
     </message>
     <message>
-        <location line="+39"/>
+        <location filename="../../../Qml/imtgui/Params/DatabaseAccessSettingsEditor.qml" line="+41"/>
         <source>Database name</source>
         <translation>Название базы данных</translation>
     </message>
@@ -6255,40 +4520,34 @@
         <translation>Соединение успешно</translation>
     </message>
     <message>
-        <location line="+10"/>
         <source>Backup Information</source>
-        <translation>Информация о резервной копии</translation>
+        <translation type="vanished">Информация о резервной копии</translation>
     </message>
     <message>
-        <location line="+13"/>
         <source>Backup data</source>
-        <translation>Резервная копия</translation>
+        <translation type="vanished">Резервная копия</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>Before performing the operation, check the connection to the server</source>
-        <translation>Перед выполнением операции проверьте подключение к серверу</translation>
+        <translation type="vanished">Перед выполнением операции проверьте подключение к серверу</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>Backup</source>
-        <translation>Резервная копия</translation>
+        <translation type="vanished">Резервная копия</translation>
     </message>
     <message>
-        <location line="+8"/>
         <source>Restore data from backup</source>
-        <translation>Восстановление данных из резервной копии</translation>
+        <translation type="vanished">Восстановление данных из резервной копии</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>Restore</source>
-        <translation>Восстановить</translation>
+        <translation type="vanished">Восстановить</translation>
     </message>
 </context>
 <context>
     <name>DatabaseBackupController</name>
     <message>
-        <location filename="../../../Qml/imtgui/Application/DatabaseBackupController.qml" line="+22"/>
+        <location filename="../../../Qml/imtgui/Application/DatabaseBackupController.qml" line="+148"/>
         <source>Backup Information</source>
         <translation>Информация о резервной копии</translation>
     </message>
@@ -6298,19 +4557,23 @@
         <translation>Резервная копия</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>Before performing the operation, check the connection to the server</source>
-        <translation>Перед выполнением операции проверьте подключение к серверу</translation>
+        <translation type="vanished">Перед выполнением операции проверьте подключение к серверу</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+2"/>
         <source>Backup</source>
         <translation>Резервная копия</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+9"/>
         <source>Restore data from backup</source>
         <translation>Восстановление данных из резервной копии</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>The database is replaced on this computer with the PostgreSQL tools (pg_restore)</source>
+        <translation>База данных заменяется на этом компьютере с помощью инструментов PostgreSQL (pg_restore)</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -6318,34 +4581,69 @@
         <translation>Восстановить</translation>
     </message>
     <message>
-        <location line="+14"/>
         <source>Restore successful</source>
-        <translation>Восстановлени</translation>
+        <translation type="vanished">Восстановлени</translation>
     </message>
     <message>
-        <location line="+0"/>
+        <location line="-86"/>
         <source>Database restore was successful</source>
         <translation>База данных успешно восстановлена</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="-15"/>
         <source>Error when trying to restore the database</source>
         <translation>Ошибка при попытки восстановить базу данных</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+0"/>
         <source>Error when trying to create a database backup</source>
         <translation>Ошибка при попытки создать резервную копию</translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+5"/>
+        <source>Database backup was created</source>
+        <translation>Резервная копия базы данных создана</translation>
+    </message>
+    <message>
+        <location line="+32"/>
+        <source>Save backup file</source>
+        <translation>Сохранить файл резервной копии</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <location line="+11"/>
+        <source>Backup files (*.backup)</source>
+        <translation>Файлы резервных копий (*.backup)</translation>
+    </message>
+    <message>
+        <location line="-11"/>
+        <location line="+11"/>
+        <source>All files (*)</source>
+        <translation>Все файлы (*)</translation>
+    </message>
+    <message>
+        <location line="-2"/>
         <source>Select backup file</source>
         <translation>Выберите файл для восстановления</translation>
     </message>
     <message>
-        <location line="+15"/>
+        <location line="+5"/>
+        <source>Restore database</source>
+        <translation>Восстановить базу данных</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>The current database will be replaced with the content of the selected backup. Continue?</source>
+        <translation>Текущая база данных будет заменена содержимым выбранной резервной копии. Продолжить?</translation>
+    </message>
+    <message>
+        <location line="+35"/>
+        <source>The backup is created on this computer with the PostgreSQL tools (pg_dump)</source>
+        <translation>Резервная копия создаётся на этом компьютере с помощью инструментов PostgreSQL (pg_dump)</translation>
+    </message>
+    <message>
         <source>Save file</source>
-        <translation>Сохранить файл</translation>
+        <translation type="vanished">Сохранить файл</translation>
     </message>
 </context>
 <context>
@@ -6437,14 +4735,13 @@
 <context>
     <name>Decorators</name>
     <message>
-        <location filename="../../../Qml/imtcontrols/Base/Decorators.qml" line="+1309"/>
+        <location filename="../../../Qml/imtcontrols/Base/Decorators.qml" line="+1323"/>
         <source>Progress:</source>
         <translation>Прогресс:</translation>
     </message>
     <message>
         <location line="+80"/>
         <location line="+1"/>
-        <location line="+0"/>
         <source>Completed</source>
         <translation>Завершено</translation>
     </message>
@@ -6452,7 +4749,7 @@
 <context>
     <name>DocCollectionViewDelegate</name>
     <message>
-        <location filename="../../../Qml/imtdocgui/DocCollectionViewDelegate.qml" line="+201"/>
+        <location filename="../../../Qml/imtdocgui/DocCollectionViewDelegate.qml" line="+208"/>
         <source>Select Document Type</source>
         <translation>Выберите тип документа</translation>
     </message>
@@ -6467,7 +4764,7 @@
         <translation>Отмена</translation>
     </message>
     <message>
-        <location line="+53"/>
+        <location line="+52"/>
         <source>Please select a document type</source>
         <translation>Пожалуйста, выберите тип документа</translation>
     </message>
@@ -6475,7 +4772,7 @@
 <context>
     <name>DocumentHistoryDialog</name>
     <message>
-        <location filename="../../../Qml/imtdocgui/DocumentHistoryDialog.qml" line="+12"/>
+        <location filename="../../../Qml/imtdocgui/DocumentHistoryDialog.qml" line="+18"/>
         <source>OK</source>
         <translation>ОК</translation>
     </message>
@@ -6483,7 +4780,7 @@
 <context>
     <name>DocumentHistoryPanel</name>
     <message>
-        <location filename="../../../Qml/imtdocgui/DocumentHistoryPanel.qml" line="+79"/>
+        <location filename="../../../Qml/imtdocgui/DocumentHistoryPanel.qml" line="+50"/>
         <source>History</source>
         <translation>История</translation>
     </message>
@@ -6491,30 +4788,67 @@
 <context>
     <name>DocumentHistoryView</name>
     <message>
-        <location filename="../../../Qml/imtdocgui/DocumentHistoryView.qml" line="+123"/>
+        <location filename="../../../Qml/imtdocgui/DocumentHistoryView.qml" line="+125"/>
         <source>Revision</source>
         <translation>Ревизия</translation>
     </message>
     <message>
-        <location line="+6"/>
-        <source>Active</source>
-        <translation>Активный</translation>
+        <location line="+7"/>
+        <source>User</source>
+        <translation>Пользователь</translation>
     </message>
     <message>
-        <location line="+51"/>
+        <location line="+7"/>
+        <source>Date</source>
+        <translation>Дата</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Description</source>
+        <translation>Описание</translation>
+    </message>
+    <message>
+        <location line="+67"/>
+        <source>Current</source>
+        <translation>Текущая</translation>
+    </message>
+    <message>
+        <location line="+97"/>
+        <source>No document history yet</source>
+        <translation>История документа пока пуста</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Filter revisions...</source>
+        <translation>Фильтр ревизий...</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Error loading document history</source>
+        <translation>Ошибка загрузки истории документа</translation>
+    </message>
+    <message>
+        <source>Active</source>
+        <translation type="vanished">Активный</translation>
+    </message>
+    <message>
         <source>There is no history for this document</source>
-        <translation>Нет истории для этого документа</translation>
+        <translation type="vanished">Нет истории для этого документа</translation>
     </message>
 </context>
 <context>
     <name>DocumentRevisionDialog</name>
     <message>
-        <location filename="../../../Qml/imtdocgui/DocumentRevisionDialog.qml" line="+12"/>
         <source>Revision Manager</source>
-        <translation>Менеджер ревизий</translation>
+        <translation type="vanished">Менеджер ревизий</translation>
     </message>
     <message>
-        <location line="+13"/>
+        <location filename="../../../Qml/imtdocgui/DocumentRevisionDialog.qml" line="+13"/>
+        <source>Revisions (%1)</source>
+        <translation>Ревизии (%1)</translation>
+    </message>
+    <message>
+        <location line="+20"/>
         <source>Set this revision</source>
         <translation>Установить эту ревизию</translation>
     </message>
@@ -6529,17 +4863,31 @@
         <translation>Закрыть</translation>
     </message>
     <message>
-        <location line="+64"/>
         <source>The document revision has been successfully delete</source>
-        <translation>Ревизия документа успешно удалена</translation>
+        <translation type="vanished">Ревизия документа успешно удалена</translation>
     </message>
     <message>
-        <location line="+25"/>
+        <location line="+48"/>
         <source>The document revision has been successfully set</source>
         <translation>Ревизия документа успешно установлена</translation>
     </message>
     <message>
+        <location line="+25"/>
+        <source>The document revision has been successfully deleted</source>
+        <translation>Ревизия документа успешно удалена</translation>
+    </message>
+    <message>
         <location line="+14"/>
+        <source>Set revision</source>
+        <translation>Установить ревизию</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Restore the document to the selected revision ?</source>
+        <translation>Восстановить документ до выбранной ревизии ?</translation>
+    </message>
+    <message>
+        <location line="+13"/>
         <source>Remove revision</source>
         <translation>Удалить ревизию</translation>
     </message>
@@ -6549,29 +4897,37 @@
         <translation>Удалить выбранную ревизию?</translation>
     </message>
     <message>
-        <location line="+117"/>
         <source>User</source>
-        <translation>Пользователь</translation>
+        <translation type="vanished">Пользователь</translation>
     </message>
     <message>
-        <location line="+4"/>
         <source>Revision</source>
-        <translation>Ревизия</translation>
+        <translation type="vanished">Ревизия</translation>
     </message>
     <message>
-        <location line="+4"/>
         <source>Active</source>
-        <translation>Активный</translation>
+        <translation type="vanished">Активный</translation>
     </message>
     <message>
-        <location line="+4"/>
         <source>Time</source>
-        <translation>Время</translation>
+        <translation type="vanished">Время</translation>
     </message>
     <message>
-        <location line="+21"/>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation type="vanished">Описание</translation>
+    </message>
+</context>
+<context>
+    <name>DocumentRevisionsDataProvider</name>
+    <message>
+        <location filename="../../../Qml/imtdocgui/DocumentRevisionsDataProvider.qml" line="+79"/>
+        <source>Failed to load document history</source>
+        <translation>Не удалось загрузить историю документа</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>No document selected</source>
+        <translation>Документ не выбран</translation>
     </message>
 </context>
 <context>
@@ -6582,14 +4938,19 @@
         <translation>&lt;без имени&gt;</translation>
     </message>
     <message>
-        <location line="+286"/>
+        <location line="+58"/>
+        <source>This document was shared with your organization for viewing only. Changes cannot be saved.</source>
+        <translation>Этот документ предоставлен вашей организации только для просмотра. Изменения не могут быть сохранены.</translation>
+    </message>
+    <message>
+        <location line="+265"/>
         <source>Unable to get a model for document. Error: Document data controller is invalid</source>
         <translation>Не удалось получить модель для документа. Ошибка: контроллер данных документа недействителен</translation>
     </message>
     <message>
-        <location line="+363"/>
-        <location line="+54"/>
-        <location line="+0"/>
+        <location line="+427"/>
+        <location line="+72"/>
+        <location line="+4"/>
         <source>Internal error</source>
         <translation>Внутренняя ошибка</translation>
     </message>
@@ -6597,9 +4958,49 @@
 <context>
     <name>DocumentServiceBase</name>
     <message>
-        <location filename="../../../Qml/imtdocgui/DocumentServiceBase.qml" line="+117"/>
+        <location filename="../../../Qml/imtdocgui/DocumentServiceBase.qml" line="+170"/>
+        <source>This document was shared with your organization for viewing only. Changes cannot be saved.</source>
+        <translation>Этот документ предоставлен вашей организации только для просмотра. Изменения не могут быть сохранены.</translation>
+    </message>
+    <message>
+        <location line="+104"/>
         <source>&lt;no name&gt;</source>
         <translation>&lt;без имени&gt;</translation>
+    </message>
+    <message>
+        <location line="+537"/>
+        <location line="+13"/>
+        <location line="+14"/>
+        <source>Invalid user-ID</source>
+        <translation>Неверный ID пользователя</translation>
+    </message>
+    <message>
+        <location line="-26"/>
+        <location line="+13"/>
+        <location line="+14"/>
+        <source>Invalid document-ID</source>
+        <translation>Неверный ID документа</translation>
+    </message>
+    <message>
+        <location line="-26"/>
+        <source>Close document failed</source>
+        <translation>Не удалось закрыть документ</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>Undo failed</source>
+        <translation>Не удалось отменить действие</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <location line="+14"/>
+        <source>Invalid step count</source>
+        <translation>Неверное количество шагов</translation>
+    </message>
+    <message>
+        <location line="-1"/>
+        <source>Redo failed</source>
+        <translation>Не удалось повторить действие</translation>
     </message>
 </context>
 <context>
@@ -6634,26 +5035,135 @@
     </message>
 </context>
 <context>
+    <name>EntityContextTicketsDataProvider</name>
+    <message>
+        <location filename="../../../Qml/imtdeskgui/EntityContextTicketsDataProvider.qml" line="+75"/>
+        <source>Failed to load tickets</source>
+        <translation>Не удалось загрузить заявки</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>No entity selected</source>
+        <translation>Объект не выбран</translation>
+    </message>
+</context>
+<context>
     <name>EntityContextTicketsDialog</name>
     <message>
-        <location filename="../../../Qml/imtdeskgui/EntityContextTicketsDialog.qml" line="+16"/>
         <source>Entity Tickets</source>
-        <translation>Заявки сущности</translation>
+        <translation type="vanished">Заявки сущности</translation>
     </message>
     <message>
-        <location line="+27"/>
         <source>Close</source>
-        <translation>Закрыть</translation>
+        <translation type="vanished">Закрыть</translation>
     </message>
     <message>
-        <location line="+23"/>
         <source>Ticket successfully created</source>
-        <translation>Заявка успешно создана</translation>
+        <translation type="vanished">Заявка успешно создана</translation>
     </message>
     <message>
-        <location line="+33"/>
         <source>Create ticket for this entity</source>
-        <translation>Создать заявку для этой сущности</translation>
+        <translation type="vanished">Создать заявку для этой сущности</translation>
+    </message>
+    <message>
+        <source>Title</source>
+        <translation type="vanished">Заголовок</translation>
+    </message>
+    <message>
+        <source>Enter ticket title...</source>
+        <translation type="vanished">Введите заголовок заявки...</translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <translation type="vanished">Описание</translation>
+    </message>
+    <message>
+        <source>Describe the issue...</source>
+        <translation type="vanished">Опишите проблему...</translation>
+    </message>
+    <message>
+        <source>Create Ticket</source>
+        <translation type="vanished">Создать заявку</translation>
+    </message>
+    <message>
+        <source>Linked Tickets</source>
+        <translation type="vanished">Связанные заявки</translation>
+    </message>
+    <message>
+        <source>No tickets linked to this entity</source>
+        <translation type="vanished">Нет заявок, связанных с этой сущностью</translation>
+    </message>
+    <message>
+        <source>Loading tickets...</source>
+        <translation type="vanished">Загрузка заявок...</translation>
+    </message>
+</context>
+<context>
+    <name>EntityContextTicketsPanel</name>
+    <message>
+        <location filename="../../../Qml/imtdeskgui/EntityContextTicketsPanel.qml" line="+129"/>
+        <source>Tickets</source>
+        <translation>Заявки</translation>
+    </message>
+    <message>
+        <location line="+29"/>
+        <source>Reload tickets</source>
+        <translation>Обновить заявки</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>New Ticket</source>
+        <translation>Новая заявка</translation>
+    </message>
+    <message>
+        <location line="+39"/>
+        <source>Ticket</source>
+        <translation>Заявка</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Status</source>
+        <translation>Статус</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Priority</source>
+        <translation>Приоритет</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Assignee</source>
+        <translation>Исполнитель</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Created</source>
+        <translation>Создано</translation>
+    </message>
+    <message>
+        <location line="+151"/>
+        <source>No tickets yet</source>
+        <translation>Заявок пока нет</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Filter tickets...</source>
+        <translation>Фильтр заявок...</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Error loading tickets</source>
+        <translation>Ошибка загрузки заявок</translation>
+    </message>
+    <message>
+        <location line="+44"/>
+        <source>Create support ticket</source>
+        <translation>Создать заявку в поддержку</translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Describe the issue for %1. Support will receive the ticket with a link to this item.</source>
+        <translation>Опишите проблему для %1. Поддержка получит заявку со ссылкой на этот объект.</translation>
     </message>
     <message>
         <location line="+12"/>
@@ -6662,8 +5172,8 @@
     </message>
     <message>
         <location line="+10"/>
-        <source>Enter ticket title...</source>
-        <translation>Введите заголовок заявки...</translation>
+        <source>Short summary of the issue</source>
+        <translation>Краткое описание проблемы</translation>
     </message>
     <message>
         <location line="+12"/>
@@ -6671,35 +5181,40 @@
         <translation>Описание</translation>
     </message>
     <message>
-        <location line="+46"/>
-        <source>Describe the issue...</source>
-        <translation>Опишите проблему...</translation>
+        <location line="+44"/>
+        <source>Steps, expected result, and any useful context</source>
+        <translation>Шаги, ожидаемый результат и любая полезная информация</translation>
     </message>
     <message>
-        <location line="+26"/>
+        <location line="+27"/>
+        <source>Cancel</source>
+        <translation>Отмена</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Creating...</source>
+        <translation>Создание...</translation>
+    </message>
+    <message>
+        <location line="+0"/>
         <source>Create Ticket</source>
         <translation>Создать заявку</translation>
     </message>
     <message>
-        <location line="+59"/>
-        <source>Linked Tickets</source>
-        <translation>Связанные заявки</translation>
+        <location line="+31"/>
+        <source>Ticket successfully created</source>
+        <translation>Заявка успешно создана</translation>
     </message>
     <message>
-        <location line="+137"/>
-        <source>No tickets linked to this entity</source>
-        <translation>Нет заявок, связанных с этой сущностью</translation>
-    </message>
-    <message>
-        <location line="+8"/>
-        <source>Loading tickets...</source>
-        <translation>Загрузка заявок...</translation>
+        <location line="+9"/>
+        <source>Failed to create the ticket. Please try again.</source>
+        <translation>Не удалось создать заявку. Пожалуйста, попробуйте снова.</translation>
     </message>
 </context>
 <context>
     <name>EntitySearchPopup</name>
     <message>
-        <location filename="../../../Qml/imtchatgui/EntitySearchPopup.qml" line="+117"/>
+        <location filename="../../../Qml/imtchatgui/EntitySearchPopup.qml" line="+113"/>
         <source>No results for &quot;%1&quot;</source>
         <translation>Нет результатов для &quot;%1&quot;</translation>
     </message>
@@ -6714,79 +5229,670 @@
     <message>
         <location line="+8"/>
         <location line="+10"/>
-        <location line="+0"/>
         <source>OK</source>
         <translation>ОК</translation>
     </message>
 </context>
 <context>
+    <name>ExternalLoginButton</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/ExternalLoginButton.qml" line="+60"/>
+        <source>Continue with %1</source>
+        <translation>Продолжить с %1</translation>
+    </message>
+</context>
+<context>
+    <name>Feature</name>
+    <message>
+        <location filename="../../../Include/imtauth/COrganizationsPermissionsProviderComp.cpp" line="+93"/>
+        <source>Organization Management</source>
+        <translation>Управление организацией</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Provides access to the operations inside an organization.</source>
+        <translation>Предоставляет доступ к операциям внутри организации.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Edit Organization</source>
+        <translation>Редактирование организации</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Allows editing the organization.</source>
+        <translation>Позволяет редактировать организацию.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Change Name</source>
+        <translation>Изменение названия</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Allows changing the name of the organization.</source>
+        <translation>Позволяет изменять название организации.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Change Description</source>
+        <translation>Изменение описания</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Allows changing the description of the organization.</source>
+        <translation>Позволяет изменять описание организации.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Members</source>
+        <translation>Участники</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Provides access to the members of the organization.</source>
+        <translation>Предоставляет доступ к участникам организации.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>View Members</source>
+        <translation>Просмотр участников</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Allows viewing the members of the organization.</source>
+        <translation>Позволяет просматривать участников организации.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Edit Members</source>
+        <translation>Редактирование участников</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Allows editing the members of the organization.</source>
+        <translation>Позволяет редактировать участников организации.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Create Member</source>
+        <translation>Создание участника</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Allows creating a user who becomes a member of the organization.</source>
+        <translation>Позволяет создавать пользователя, который становится участником организации.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Change Member</source>
+        <translation>Изменить участника</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Allows changing the account data of a member.</source>
+        <translation>Позволяет изменять учётные данные участника.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Invite Member</source>
+        <translation>Пригласить участника</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Allows inviting a user to the organization.</source>
+        <translation>Позволяет приглашать пользователя в организацию.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Exclude Member</source>
+        <translation>Исключить участника</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Allows excluding a member from the organization.</source>
+        <translation>Позволяет исключать участника из организации.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Change Member Role</source>
+        <translation>Изменить роль участника</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Allows changing the role of a member.</source>
+        <translation>Позволяет изменять роль участника.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Roles</source>
+        <translation>Роли</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Provides access to the roles of the organization.</source>
+        <translation>Предоставляет доступ к ролям организации.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>View Roles</source>
+        <translation>Просмотр ролей</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Allows viewing the roles of the organization.</source>
+        <translation>Позволяет просматривать роли организации.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Edit Roles</source>
+        <translation>Редактирование ролей</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Allows editing the roles of the organization.</source>
+        <translation>Позволяет редактировать роли организации.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Add Role</source>
+        <translation>Добавить роль</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Allows adding a role.</source>
+        <translation>Позволяет добавлять роль.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Change Role</source>
+        <translation>Изменить роль</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Allows changing a role.</source>
+        <translation>Позволяет изменять роль.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Remove Role</source>
+        <translation>Удалить роль</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Allows removing a role.</source>
+        <translation>Позволяет удалять роль.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Groups</source>
+        <translation>Группы</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Provides access to the groups of the organization.</source>
+        <translation>Предоставляет доступ к группам организации.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>View Groups</source>
+        <translation>Просмотр групп</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Allows viewing the groups of the organization.</source>
+        <translation>Позволяет просматривать группы организации.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Edit Groups</source>
+        <translation>Редактирование групп</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Allows editing the groups of the organization.</source>
+        <translation>Позволяет редактировать группы организации.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Add Group</source>
+        <translation>Добавить группу</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Allows adding a group.</source>
+        <translation>Позволяет добавлять группу.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Change Group</source>
+        <translation>Изменить группу</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Allows changing a group.</source>
+        <translation>Позволяет изменять группу.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Remove Group</source>
+        <translation>Удалить группу</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Allows removing a group.</source>
+        <translation>Позволяет удалять группу.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Permissions</source>
+        <translation>Права</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Provides access to the permissions of the members.</source>
+        <translation>Предоставляет доступ к правам участников.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>View Permissions</source>
+        <translation>Просмотр прав</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Allows viewing the permissions of the members.</source>
+        <translation>Позволяет просматривать права участников.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Change Permissions</source>
+        <translation>Изменение прав</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Allows assigning and changing the permissions of the members.</source>
+        <translation>Позволяет назначать и изменять права участников.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Connections</source>
+        <translation>Связи</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Provides access to the connections to other organizations.</source>
+        <translation>Предоставляет доступ к связям с другими организациями.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>View Connections</source>
+        <translation>Просмотр связей</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Allows viewing the connections to other organizations.</source>
+        <translation>Позволяет просматривать связи с другими организациями.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>View Connection Code</source>
+        <translation>Просмотр кода подключения</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Allows viewing the code other organizations connect with.</source>
+        <translation>Позволяет просматривать код, с помощью которого подключаются другие организации.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Edit Connections</source>
+        <translation>Редактирование связей</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Allows editing the connections to other organizations.</source>
+        <translation>Позволяет редактировать связи с другими организациями.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Connect Organization</source>
+        <translation>Подключить организацию</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Allows connecting to another organization.</source>
+        <translation>Позволяет подключаться к другой организации.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Remove Connection</source>
+        <translation>Удалить связь</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Allows removing a connection to another organization.</source>
+        <translation>Позволяет удалять связь с другой организацией.</translation>
+    </message>
+</context>
+<context>
     <name>FeatureCollectionView</name>
     <message>
-        <location filename="../../../Qml/imtlicgui/FeatureCollectionView.qml" line="+77"/>
         <source>Feature Name</source>
-        <translation>Название</translation>
+        <translation type="vanished">Название</translation>
     </message>
 </context>
 <context>
     <name>FeatureEditor</name>
     <message>
-        <location filename="../../../Qml/imtlicgui/FeatureEditor.qml" line="+166"/>
-        <location line="+376"/>
-        <location line="+0"/>
+        <location filename="../../../Qml/imtlicgui/FeatureEditor.qml" line="+194"/>
+        <source>Untitled feature</source>
+        <translation>Функция без названия</translation>
+    </message>
+    <message>
+        <location line="+147"/>
+        <location line="+963"/>
         <source>Feature Name</source>
         <translation>Название</translation>
     </message>
     <message>
-        <location line="-368"/>
+        <location line="-531"/>
+        <source>Unnamed row - name and Feature ID are missing</source>
+        <translation>Строка без названия — отсутствуют название и идентификатор функции</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>%1 - name is missing</source>
+        <translation>%1 — отсутствует название</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>%1 - Feature ID is missing</source>
+        <translation>%1 — отсутствует идентификатор функции</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>%1 - Feature ID contains invalid characters</source>
+        <translation>%1 — идентификатор функции содержит недопустимые символы</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>%1 - Feature ID is duplicated</source>
+        <translation>%1 — идентификатор функции повторяется</translation>
+    </message>
+    <message>
+        <location line="+254"/>
+        <location line="+243"/>
+        <source>Root Feature</source>
+        <translation>Корневая функция</translation>
+    </message>
+    <message>
+        <location line="-242"/>
+        <location line="+1452"/>
+        <source>Sub-features</source>
+        <translation>Подфункции</translation>
+    </message>
+    <message>
+        <location line="-1429"/>
+        <location line="+1335"/>
+        <source>Feature</source>
+        <translation>Функция</translation>
+    </message>
+    <message>
+        <location line="-1334"/>
+        <location line="+312"/>
+        <source>Full path</source>
+        <translation>Полный путь</translation>
+    </message>
+    <message>
+        <location line="-311"/>
+        <source>Source</source>
+        <translation>Источник</translation>
+    </message>
+    <message>
+        <location line="+99"/>
+        <source>Direct</source>
+        <translation>Напрямую</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <location line="+1094"/>
+        <source>via %1</source>
+        <translation>через %1</translation>
+    </message>
+    <message>
+        <location line="-1065"/>
+        <location line="+1088"/>
+        <source>Remove requirement</source>
+        <translation>Удалить требование</translation>
+    </message>
+    <message>
+        <location line="-1043"/>
+        <location line="+1069"/>
+        <source>Required via %1 (cannot be removed directly)</source>
+        <translation>Требуется через %1 (нельзя удалить напрямую)</translation>
+    </message>
+    <message>
+        <location line="-1018"/>
+        <source>Required. Filled in from the name if you leave it empty.</source>
+        <translation>Обязательно. Если оставить пустым, заполняется из названия.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Invalid identifier. Use only Latin letters, digits and underscores.</source>
+        <translation>Недопустимый идентификатор. Используйте только латинские буквы, цифры и символы подчёркивания.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Identifier &apos;%1&apos; is already in use by another feature.</source>
+        <translation>Идентификатор &apos;%1&apos; уже используется другой функцией.</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Required. A feature needs a name before it can have sub-features.</source>
+        <translation>Обязательно. Чтобы добавить подфункции, функции нужно задать название.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
         <source>Enter the feature name</source>
         <translation>Введите название</translation>
     </message>
     <message>
-        <location line="+16"/>
-        <location line="+356"/>
-        <location line="+0"/>
-        <source>Feature-ID</source>
+        <location line="+18"/>
+        <location line="+321"/>
+        <source>Feature ID</source>
+        <translation>Идентификатор функции</translation>
+    </message>
+    <message>
+        <location line="-285"/>
+        <location line="+328"/>
+        <source>Permission</source>
+        <translation>Право</translation>
+    </message>
+    <message>
+        <location line="-316"/>
+        <source>How this feature is addressed by requirements and permissions</source>
+        <translation>Как на эту функцию ссылаются требования и права</translation>
+    </message>
+    <message>
+        <location line="+23"/>
+        <location line="+671"/>
+        <source>Copy the full path</source>
+        <translation>Скопировать полный путь</translation>
+    </message>
+    <message>
+        <location line="-661"/>
+        <location line="+697"/>
+        <source>Requirements</source>
+        <translation>Требования</translation>
+    </message>
+    <message>
+        <location line="-684"/>
+        <location line="+712"/>
+        <source>Clear all</source>
+        <translation>Очистить все</translation>
+    </message>
+    <message>
+        <location line="-704"/>
+        <location line="+723"/>
+        <source>Add requirement</source>
+        <translation>Добавить требование</translation>
+    </message>
+    <message>
+        <location line="-653"/>
+        <location line="+867"/>
+        <source>No requirements</source>
+        <translation>Нет требований</translation>
+    </message>
+    <message>
+        <location line="-733"/>
+        <source>Name</source>
+        <translation>Имя</translation>
+    </message>
+    <message>
+        <location line="+208"/>
+        <source>Feature name</source>
+        <translation>Название функции</translation>
+    </message>
+    <message>
+        <location line="+30"/>
+        <source>Identifier</source>
         <translation>Идентификатор</translation>
     </message>
     <message>
-        <location line="-348"/>
+        <location line="+24"/>
+        <source>No description</source>
+        <translation>Нет описания</translation>
+    </message>
+    <message>
+        <location line="+155"/>
+        <source>%1 sub-features (click to open)</source>
+        <translation>Подфункций: %1 (нажмите, чтобы открыть)</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Open sub-features</source>
+        <translation>Открыть подфункции</translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <source>Select a sub-feature to see its full name, path and description</source>
+        <translation>Выберите подфункцию, чтобы увидеть её полное название, путь и описание</translation>
+    </message>
+    <message>
+        <location line="+105"/>
+        <source>Required features (%1)</source>
+        <translation>Требуемые функции (%1)</translation>
+    </message>
+    <message>
+        <location line="+192"/>
+        <source>More than one row is ticked</source>
+        <translation>Отмечено более одной строки</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>No sub-feature selected</source>
+        <translation>Подфункция не выбрана</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Requirements belong to a single sub-feature - untick the rest to edit them</source>
+        <translation>Требования относятся к одной подфункции — снимите отметку с остальных, чтобы редактировать их</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Select a sub-feature to view and edit its requirements</source>
+        <translation>Выберите подфункцию, чтобы просмотреть и изменить её требования</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Click &apos;Add requirement&apos; to select features that this feature depends on</source>
+        <translation>Нажмите «Добавить требование», чтобы выбрать функции, от которых зависит эта функция</translation>
+    </message>
+    <message>
+        <location line="+18"/>
+        <source>New sub-feature</source>
+        <translation>Новая подфункция</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>No sub-features here</source>
+        <translation>Здесь нет подфункций</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Create a sub-feature to start this level</source>
+        <translation>Создайте подфункцию, чтобы начать этот уровень</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Give this feature a name and an ID before adding sub-features</source>
+        <translation>Перед добавлением подфункций задайте этой функции название и идентификатор</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>%1 incomplete</source>
+        <translation>Не заполнено: %1</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Select a sub-feature, or press New sub-feature to add one</source>
+        <translation>Выберите подфункцию или нажмите «Новая подфункция», чтобы добавить её</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Fill in Feature Name and Feature ID on the Root Feature page to add sub-features here</source>
+        <translation>Заполните название и идентификатор функции на странице «Корневая функция», чтобы добавить сюда подфункции</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Press Edit or F2 to change this row</source>
+        <translation>Нажмите «Изменить» или F2, чтобы изменить эту строку</translation>
+    </message>
+    <message>
+        <location line="+94"/>
+        <source>and %1 more</source>
+        <translation>и ещё %1</translation>
+    </message>
+    <message>
+        <source>Feature-ID</source>
+        <translation type="vanished">Идентификатор</translation>
+    </message>
+    <message>
+        <location line="-1179"/>
         <source>Enter the feature ID</source>
         <translation>Введите идентификатор</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+14"/>
+        <location line="+318"/>
+        <location line="+230"/>
         <source>Description</source>
         <translation>Описание</translation>
     </message>
     <message>
-        <location line="+18"/>
         <source>Is Optional</source>
-        <translation>Необязательный</translation>
+        <translation type="vanished">Необязательный</translation>
     </message>
     <message>
-        <location line="+323"/>
         <source>Feature Description</source>
-        <translation>Описание</translation>
+        <translation type="vanished">Описание</translation>
     </message>
     <message>
-        <location line="-308"/>
-        <location line="+316"/>
-        <location line="+0"/>
         <source>Is Permission</source>
-        <translation>Право</translation>
+        <translation type="vanished">Право</translation>
     </message>
     <message>
-        <location line="-341"/>
+        <location line="-547"/>
         <source>Enter the description</source>
         <translation>Введите описание</translation>
     </message>
     <message>
-        <location line="+203"/>
         <source>Dependencies</source>
-        <translation>Зависимости</translation>
+        <translation type="vanished">Зависимости</translation>
     </message>
     <message>
-        <location line="+134"/>
+        <location line="+9"/>
+        <location line="+322"/>
         <source>Optional</source>
         <translation>Опционально</translation>
     </message>
@@ -6794,12 +5900,12 @@
 <context>
     <name>FeaturesDialog</name>
     <message>
-        <location filename="../../../Qml/imtlicgui/FeaturesDialog.qml" line="+11"/>
+        <location filename="../../../Qml/imtlicgui/FeaturesDialog.qml" line="+17"/>
         <source>Select features</source>
         <translation>Выберите фичи</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+12"/>
         <source>Add</source>
         <translation>Добавить</translation>
     </message>
@@ -6809,15 +5915,54 @@
         <translation>Отмена</translation>
     </message>
     <message>
-        <location line="+53"/>
+        <location line="+91"/>
+        <source>Available features</source>
+        <translation>Доступные функции</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>%1 selected</source>
+        <translation>Выбрано: %1</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Feature</source>
+        <translation>Функция</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Search features</source>
+        <translation>Поиск функций</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Nothing left to add</source>
+        <translation>Больше нечего добавить</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Every feature of the collection is already part of this product</source>
+        <translation>Все функции коллекции уже входят в этот продукт</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Clear</source>
+        <translation>Очистить</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Select all</source>
+        <translation>Выделить все</translation>
+    </message>
+    <message>
         <source>Feature Name</source>
-        <translation>Название</translation>
+        <translation type="vanished">Название</translation>
     </message>
 </context>
 <context>
     <name>FileExportDialog</name>
     <message>
-        <location filename="../../../Qml/imtcontrols/Dialogs/FileExportDialog.qml" line="+11"/>
+        <location filename="../../../Qml/imtcontrols/Dialogs/FileExportDialog.qml" line="+10"/>
         <source>Save file</source>
         <translation>Сохранить файл</translation>
     </message>
@@ -6825,7 +5970,7 @@
 <context>
     <name>FileImportDialog</name>
     <message>
-        <location filename="../../../Qml/imtcontrols/Dialogs/FileImportDialog.qml" line="+10"/>
+        <location filename="../../../Qml/imtcontrols/Dialogs/FileImportDialog.qml" line="+9"/>
         <source>Import file</source>
         <translation>Импорт файла</translation>
     </message>
@@ -6849,9 +5994,218 @@
     </message>
 </context>
 <context>
+    <name>FileSystemBrowserDialog</name>
+    <message>
+        <location filename="../../../Qml/imtguigql/FileSystemBrowserDialog.qml" line="+232"/>
+        <location line="+866"/>
+        <source>This PC</source>
+        <translation>Этот компьютер</translation>
+    </message>
+    <message>
+        <location line="-274"/>
+        <source>A file is selected - choose a folder instead</source>
+        <translation>Выбран файл — выберите папку</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>A folder is selected - choose a file instead</source>
+        <translation>Выбрана папка — выберите файл</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Selection is not allowed here</source>
+        <translation>Здесь выбор недоступен</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>1 item</source>
+        <translation>1 элемент</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>%1 items</source>
+        <translation>Элементов: %1</translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>1 selected</source>
+        <translation>Выбран 1</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>%1 selected</source>
+        <translation>Выбрано: %1</translation>
+    </message>
+    <message>
+        <location line="+18"/>
+        <source>(no extension)</source>
+        <translation>(без расширения)</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Allowed file types: %1</source>
+        <translation>Допустимые типы файлов: %1</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Loading…</source>
+        <translation>Загрузка…</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>No items match &quot;%1&quot;</source>
+        <translation>Нет элементов, соответствующих «%1»</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>%1 items selected</source>
+        <translation>Выбрано элементов: %1</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Nothing selected</source>
+        <translation>Ничего не выбрано</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Select Folder</source>
+        <translation>Выбрать папку</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Select File</source>
+        <translation>Выбрать файл</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Select File or Folder</source>
+        <translation>Выбрать файл или папку</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <location line="+90"/>
+        <source>Select</source>
+        <translation>Выбрать</translation>
+    </message>
+    <message>
+        <location line="-89"/>
+        <location line="+90"/>
+        <source>Cancel</source>
+        <translation>Отмена</translation>
+    </message>
+    <message>
+        <location line="+111"/>
+        <source>Search %1</source>
+        <translation>Поиск в %1</translation>
+    </message>
+    <message>
+        <location line="+124"/>
+        <source>Name</source>
+        <translation>Имя</translation>
+    </message>
+    <message>
+        <location line="+31"/>
+        <source>Free space</source>
+        <translation>Свободно</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Date modified</source>
+        <translation>Дата изменения</translation>
+    </message>
+    <message>
+        <location line="+28"/>
+        <source>Total size</source>
+        <translation>Общий размер</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Size</source>
+        <translation>Размер</translation>
+    </message>
+    <message>
+        <location line="+201"/>
+        <source>Load more...</source>
+        <translation>Загрузить ещё...</translation>
+    </message>
+    <message>
+        <location line="+50"/>
+        <source>Can&apos;t load this location</source>
+        <translation>Не удалось загрузить это расположение</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>No matching items</source>
+        <translation>Нет подходящих элементов</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>No files of the allowed types</source>
+        <translation>Нет файлов допустимых типов</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>This folder is empty</source>
+        <translation>Эта папка пуста</translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <source>Try a different filter, or clear it to see all items</source>
+        <translation>Попробуйте другой фильтр или очистите его, чтобы увидеть все элементы</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Go up or pick another location</source>
+        <translation>Перейдите на уровень выше или выберите другое расположение</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Pick another location</source>
+        <translation>Выберите другое расположение</translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Retry</source>
+        <translation>Повторить</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Clear filter</source>
+        <translation>Очистить фильтр</translation>
+    </message>
+    <message>
+        <location line="+74"/>
+        <source>%1  •  %2</source>
+        <translation>%1  •  %2</translation>
+    </message>
+</context>
+<context>
+    <name>FilterDelegateBase</name>
+    <message>
+        <location filename="../../../Qml/imtgui/Panels/FilterDelegateBase.qml" line="+53"/>
+        <source>Narrowed by %1: %2</source>
+        <translation>Отфильтровано по %1: %2</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Choose %1 to narrow the list</source>
+        <translation>Выберите %1, чтобы сузить список</translation>
+    </message>
+</context>
+<context>
     <name>FilterPanelDecorator</name>
     <message>
-        <location filename="../../../Qml/imtgui/Panels/FilterPanelDecorator.qml" line="+217"/>
+        <location filename="../../../Qml/imtgui/Panels/FilterPanelDecorator.qml" line="+448"/>
+        <source>%1 more filters</source>
+        <translation>Ещё фильтров: %1</translation>
+    </message>
+    <message>
+        <location line="+142"/>
+        <source>Clear</source>
+        <translation>Очистить</translation>
+    </message>
+    <message>
+        <location line="+44"/>
         <source>Document State</source>
         <translation>Состояние документа</translation>
     </message>
@@ -6871,7 +6225,12 @@
         <translation>Дата создания</translation>
     </message>
     <message>
-        <location line="+48"/>
+        <location line="+148"/>
+        <source>Reset all filters - %1 active</source>
+        <translation>Сбросить все фильтры — активных: %1</translation>
+    </message>
+    <message>
+        <location line="+1"/>
         <source>Reset all filters</source>
         <translation>Сбросить все фильтры</translation>
     </message>
@@ -6885,9 +6244,17 @@
     </message>
 </context>
 <context>
+    <name>FilterableSelectCollectionDataProvider</name>
+    <message>
+        <location filename="../../../Qml/imtcolgui/FilterableSelectCollectionDataProvider.qml" line="+93"/>
+        <source>No collection selected</source>
+        <translation>Коллекция не выбрана</translation>
+    </message>
+</context>
+<context>
     <name>FilterableSelectGqlDataProvider</name>
     <message>
-        <location filename="../../../Qml/imtguigql/FilterableSelectGqlDataProvider.qml" line="+82"/>
+        <location filename="../../../Qml/imtguigql/FilterableSelectGqlDataProvider.qml" line="+138"/>
         <source>Failed to load items</source>
         <translation>Не удалось загрузить элементы</translation>
     </message>
@@ -6900,12 +6267,12 @@
 <context>
     <name>FilterableSelectPopup</name>
     <message>
-        <location filename="../../../Qml/imtcolgui/FilterableSelectPopup.qml" line="+70"/>
+        <location filename="../../../Qml/imtcolgui/FilterableSelectPopup.qml" line="+110"/>
         <source>Filter...</source>
         <translation>Фильтр...</translation>
     </message>
     <message>
-        <location line="+395"/>
+        <location line="+619"/>
         <source>Selected</source>
         <translation>Выбрано</translation>
     </message>
@@ -6915,19 +6282,23 @@
         <translation>Очистить все</translation>
     </message>
     <message>
-        <location line="+169"/>
+        <location line="+317"/>
+        <source>Loading failed. Click to retry</source>
+        <translation>Ошибка загрузки. Нажмите, чтобы повторить</translation>
+    </message>
+    <message>
+        <location line="-945"/>
         <source>No items found</source>
         <translation>Элементы не найдены</translation>
     </message>
     <message>
-        <location line="+19"/>
+        <location line="+836"/>
         <location line="+1"/>
-        <location line="+0"/>
         <source>Error loading items</source>
         <translation>Ошибка загрузки элементов</translation>
     </message>
     <message>
-        <location line="+98"/>
+        <location line="+108"/>
         <source>Loading more...</source>
         <translation>Загрузка...</translation>
     </message>
@@ -6936,19 +6307,16 @@
     <name>Form</name>
     <message>
         <location filename="../../../Include/imtwidgets/CToolButton.ui" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtwidgets/ui_CToolButton.h" line="+88"/>
         <source>Tool Button</source>
         <translation>Кнопка инструмента</translation>
     </message>
     <message>
         <location line="+33"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtwidgets/ui_CToolButton.h" line="+1"/>
         <source>...</source>
         <translation>...</translation>
     </message>
     <message>
         <location line="+35"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtwidgets/ui_CToolButton.h" line="+1"/>
         <source>Add New Wizard</source>
         <translation>Добавить новый мастер</translation>
     </message>
@@ -6956,7 +6324,7 @@
 <context>
     <name>Gallery</name>
     <message>
-        <location filename="../../../Qml/imtcontrols/Views/Gallery.qml" line="+86"/>
+        <location filename="../../../Qml/imtcontrols/Views/Gallery.qml" line="+85"/>
         <source>Gallery</source>
         <translation>Галерея</translation>
     </message>
@@ -6982,66 +6350,53 @@
     </message>
 </context>
 <context>
+    <name>GqlBasedCollectionDataController</name>
+    <message>
+        <location filename="../../../Qml/imtguigql/GqlBasedCollectionDataController.qml" line="+146"/>
+        <location line="+31"/>
+        <source>Unable to remove selected element(s)</source>
+        <translation>Не удалось удалить выбранные элементы</translation>
+    </message>
+</context>
+<context>
     <name>GqlBasedCollectionDocumentService</name>
     <message>
-        <location filename="../../../Qml/imtguigql/GqlBasedCollectionDocumentService.qml" line="+284"/>
-        <location line="+36"/>
-        <location line="+34"/>
-        <location line="+37"/>
-        <location line="-71"/>
-        <location line="+34"/>
-        <location line="+37"/>
         <source>Invalid user-ID</source>
-        <translation>Неверный ID пользователя</translation>
+        <translation type="vanished">Неверный ID пользователя</translation>
     </message>
     <message>
-        <location line="-104"/>
-        <location line="+36"/>
-        <location line="+34"/>
-        <location line="+37"/>
-        <location line="-71"/>
-        <location line="+34"/>
-        <location line="+37"/>
         <source>Invalid document-ID</source>
-        <translation>Неверный ID документа</translation>
+        <translation type="vanished">Неверный ID документа</translation>
     </message>
     <message>
-        <location line="-104"/>
         <source>Document data is invalid</source>
-        <translation>Данные документа недействительны</translation>
+        <translation type="vanished">Данные документа недействительны</translation>
     </message>
     <message>
-        <location line="+3"/>
         <source>Save document failed</source>
-        <translation>Не удалось сохранить документ</translation>
+        <translation type="vanished">Не удалось сохранить документ</translation>
     </message>
     <message>
-        <location line="+33"/>
         <source>Close document failed</source>
-        <translation>Не удалось закрыть документ</translation>
+        <translation type="vanished">Не удалось закрыть документ</translation>
     </message>
     <message>
-        <location line="+34"/>
         <source>Undo failed</source>
-        <translation>Не удалось отменить действие</translation>
+        <translation type="vanished">Не удалось отменить действие</translation>
     </message>
     <message>
-        <location line="+3"/>
-        <location line="+37"/>
-        <location line="+0"/>
         <source>Invalid step count</source>
-        <translation>Неверное количество шагов</translation>
+        <translation type="vanished">Неверное количество шагов</translation>
     </message>
     <message>
-        <location line="-3"/>
         <source>Redo failed</source>
-        <translation>Не удалось повторить действие</translation>
+        <translation type="vanished">Не удалось повторить действие</translation>
     </message>
 </context>
 <context>
     <name>GqlBasedDataModelController</name>
     <message>
-        <location filename="../../../Qml/imtguigql/GqlBasedDataModelController.qml" line="+104"/>
+        <location filename="../../../Qml/imtguigql/GqlBasedDataModelController.qml" line="+109"/>
         <source>Network error</source>
         <translation>Ошибка сети</translation>
     </message>
@@ -7049,23 +6404,78 @@
 <context>
     <name>GqlBasedDataModelProvider</name>
     <message>
-        <location filename="../../../Qml/imtguigql/GqlBasedDataModelProvider.qml" line="+105"/>
+        <location filename="../../../Qml/imtguigql/GqlBasedDataModelProvider.qml" line="+114"/>
         <source>Network error</source>
         <translation>Ошибка сети</translation>
+    </message>
+</context>
+<context>
+    <name>GqlBasedPermissionsProvider</name>
+    <message>
+        <location filename="../../../Qml/imtguigql/GqlBasedPermissionsProvider.qml" line="+35"/>
+        <source>Unable to load permissions</source>
+        <translation>Не удалось загрузить права</translation>
+    </message>
+</context>
+<context>
+    <name>GqlBasedProfileApiClient</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/GqlBasedProfileApiClient.qml" line="+166"/>
+        <source>(delegated)</source>
+        <translation>(делегировано)</translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <source>No organization</source>
+        <translation>Нет организации</translation>
+    </message>
+</context>
+<context>
+    <name>GqlBasedTenantManagementApiClient</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/GqlBasedTenantManagementApiClient.qml" line="+299"/>
+        <source>Invitation resent</source>
+        <translation>Приглашение отправлено повторно</translation>
+    </message>
+    <message>
+        <location line="+1510"/>
+        <source>The changes could not be saved</source>
+        <translation>Не удалось сохранить изменения</translation>
+    </message>
+</context>
+<context>
+    <name>GqlBasedUserAdministrationApiClient</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/GqlBasedUserAdministrationApiClient.qml" line="+378"/>
+        <location line="+145"/>
+        <location line="+168"/>
+        <source>The changes could not be saved</source>
+        <translation>Не удалось сохранить изменения</translation>
     </message>
 </context>
 <context>
     <name>GqlSdlRequestSender</name>
     <message>
-        <location filename="../../../Qml/imtguigql/GqlSdlRequestSender.qml" line="+156"/>
+        <location filename="../../../Qml/imtguigql/GqlSdlRequestSender.qml" line="+66"/>
+        <source>The server returned no data. Please try again.</source>
+        <translation>Сервер не вернул данных. Повторите попытку.</translation>
+    </message>
+    <message>
+        <location line="+141"/>
         <source>Network error</source>
         <translation>Ошибка сети</translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <location line="+6"/>
+        <source>Unable to read the server response</source>
+        <translation>Не удалось прочитать ответ сервера</translation>
     </message>
 </context>
 <context>
     <name>GraphicsView</name>
     <message>
-        <location filename="../../../Qml/imtcontrols/GraphicsView/GraphicsView.qml" line="+1336"/>
+        <location filename="../../../Qml/imtcontrols/GraphicsView/GraphicsView.qml" line="+1349"/>
         <source>Selection mode</source>
         <translation>Режим выделения</translation>
     </message>
@@ -7143,14 +6553,12 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Dialogs/InputDialog.qml" line="+20"/>
         <location line="+17"/>
-        <location line="+0"/>
         <source>OK</source>
         <translation>ОК</translation>
     </message>
     <message>
         <location line="-16"/>
         <location line="+17"/>
-        <location line="+0"/>
         <source>Cancel</source>
         <translation>Отмена</translation>
     </message>
@@ -7158,7 +6566,7 @@
 <context>
     <name>ItemSelectElementView</name>
     <message>
-        <location filename="../../../Qml/imtauthgui/ItemSelectElementView.qml" line="+18"/>
+        <location filename="../../../Qml/imtcolgui/ItemSelectElementView.qml" line="+32"/>
         <source>Items</source>
         <translation>Элементы</translation>
     </message>
@@ -7173,7 +6581,7 @@
         <translation>Введите или выберите элемент</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+6"/>
         <source>No items</source>
         <translation>Нет элементов</translation>
     </message>
@@ -7181,58 +6589,255 @@
 <context>
     <name>LicenseEditor</name>
     <message>
-        <location filename="../../../Qml/imtlicgui/LicenseEditor.qml" line="+237"/>
-        <location line="+226"/>
-        <location line="+0"/>
         <source>License Name</source>
-        <translation>Название лицензии</translation>
+        <translation type="vanished">Название лицензии</translation>
     </message>
     <message>
-        <location line="-217"/>
+        <location filename="../../../Qml/imtlicgui/LicenseEditor.qml" line="+572"/>
         <source>Enter the license name</source>
         <translation>Введите название лицензии</translation>
     </message>
     <message>
-        <location line="+21"/>
-        <location line="+201"/>
-        <location line="+0"/>
         <source>License-ID</source>
+        <translation type="vanished">Идентификатор лицензии</translation>
+    </message>
+    <message>
+        <location line="-254"/>
+        <location line="+528"/>
+        <location line="+17"/>
+        <source>Required by %1</source>
+        <translation>Требуется для %1</translation>
+    </message>
+    <message>
+        <location line="-541"/>
+        <source>Set inside</source>
+        <translation>Задаётся внутри</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Always included</source>
+        <translation>Всегда включено</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Grant the feature first</source>
+        <translation>Сначала предоставьте функцию</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Optional</source>
+        <translation>Опционально</translation>
+    </message>
+    <message>
+        <location line="+177"/>
+        <location line="+56"/>
+        <source>General</source>
+        <translation>Общие</translation>
+    </message>
+    <message>
+        <location line="-54"/>
+        <location line="+544"/>
+        <source>Inherited licenses</source>
+        <translation>Наследуемые лицензии</translation>
+    </message>
+    <message>
+        <location line="-479"/>
+        <source>License name</source>
+        <translation>Название лицензии</translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <source>License ID</source>
         <translation>Идентификатор лицензии</translation>
     </message>
     <message>
-        <location line="-192"/>
+        <location line="+1"/>
         <source>Enter the license ID</source>
         <translation>Введите идентификатор лицензии</translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+10"/>
+        <location line="+147"/>
         <source>Description</source>
         <translation>Описание</translation>
     </message>
     <message>
-        <location line="+9"/>
-        <source>Enter the license description</source>
-        <translation>Введите описание лицензии</translation>
+        <location line="-146"/>
+        <source>Enter the description</source>
+        <translation>Введите описание</translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+101"/>
+        <source>In license</source>
+        <translation>В лицензии</translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <location line="+257"/>
+        <source>Feature</source>
+        <translation>Функция</translation>
+    </message>
+    <message>
+        <location line="-242"/>
+        <source>Feature ID</source>
+        <translation>Идентификатор функции</translation>
+    </message>
+    <message>
+        <location line="+166"/>
+        <source>No description</source>
+        <translation>Нет описания</translation>
+    </message>
+    <message>
+        <location line="+55"/>
+        <source>%1 sub-features (click to open)</source>
+        <translation>Подфункций: %1 (нажмите, чтобы открыть)</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>%1 sub-features (grant feature to open)</source>
+        <translation>Подфункций: %1 (предоставьте функцию, чтобы открыть)</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Inherited features</source>
+        <translation>Наследуемые функции</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>from %1 licenses</source>
+        <translation>из лицензий: %1</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Nothing inherited</source>
+        <translation>Ничего не наследуется</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Licenses picked on the Inherited licenses page bring their features here, and this license grants them too</source>
+        <translation>Лицензии, выбранные на странице «Наследуемые лицензии», добавляют сюда свои функции, и эта лицензия также их предоставляет</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Search inherited features</source>
+        <translation>Поиск наследуемых функций</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>The inherited licenses grant nothing</source>
+        <translation>Наследуемые лицензии ничего не предоставляют</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>They carry no features of their own yet</source>
+        <translation>У них пока нет собственных функций</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Granted on top of the features ticked on the left</source>
+        <translation>Предоставляются в дополнение к функциям, отмеченным слева</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>from %1</source>
+        <translation>из %1</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Also ticked here</source>
+        <translation>Также отмечено здесь</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>No product</source>
+        <translation>Нет продукта</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <location line="+62"/>
+        <source>No product chosen</source>
+        <translation>Продукт не выбран</translation>
+    </message>
+    <message>
+        <location line="-61"/>
+        <source>This product has no features</source>
+        <translation>У этого продукта нет функций</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <location line="+60"/>
+        <source>Pick a product on the General page first</source>
+        <translation>Сначала выберите продукт на странице «Общие»</translation>
+    </message>
+    <message>
+        <location line="-59"/>
+        <source>Tick the features this license grants; open one to reach its optional parts</source>
+        <translation>Отметьте функции, которые предоставляет эта лицензия; откройте функцию, чтобы перейти к её опциональным частям</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Open a feature to grant its optional parts one by one</source>
+        <translation>Откройте функцию, чтобы предоставить её опциональные части по отдельности</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Also required, from outside this product: %1</source>
+        <translation>Также требуется (вне этого продукта): %1</translation>
+    </message>
+    <message>
+        <location line="+57"/>
+        <source>License</source>
+        <translation>Лицензия</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Search licenses</source>
+        <translation>Поиск лицензий</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Nothing to inherit from</source>
+        <translation>Не от чего наследовать</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Only other licenses of the same product can be inherited</source>
+        <translation>Наследовать можно только другие лицензии того же продукта</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Clear</source>
+        <translation>Очистить</translation>
+    </message>
+    <message>
+        <source>Enter the license description</source>
+        <translation type="vanished">Введите описание лицензии</translation>
+    </message>
+    <message>
+        <location line="-456"/>
         <source>Product</source>
         <translation>Продукт</translation>
     </message>
     <message>
-        <location line="+44"/>
+        <location line="-101"/>
         <source>Features</source>
         <translation>Свойства</translation>
     </message>
     <message>
-        <location line="+48"/>
         <source>Dependencies</source>
-        <translation>Зависимости</translation>
+        <translation type="vanished">Зависимости</translation>
     </message>
     <message>
-        <location line="+67"/>
         <source>Feature Name</source>
-        <translation>Название</translation>
+        <translation type="vanished">Название</translation>
+    </message>
+</context>
+<context>
+    <name>Loading</name>
+    <message>
+        <location filename="../../../Qml/imtcontrols/Views/Loading.qml" line="+20"/>
+        <source>Loading...</source>
+        <translation>Загрузка...</translation>
     </message>
 </context>
 <context>
@@ -7267,9 +6872,39 @@
     </message>
 </context>
 <context>
+    <name>MenuPanel</name>
+    <message>
+        <location filename="../../../Qml/imtgui/Panels/MenuPanel.qml" line="+541"/>
+        <location line="+468"/>
+        <source>Expand menu</source>
+        <translation>Развернуть меню</translation>
+    </message>
+    <message>
+        <location line="-369"/>
+        <source>Back</source>
+        <translation>Назад</translation>
+    </message>
+    <message>
+        <location line="+25"/>
+        <source>Forward</source>
+        <translation>Вперёд</translation>
+    </message>
+    <message>
+        <location line="+30"/>
+        <location line="+318"/>
+        <source>Collapse menu</source>
+        <translation>Свернуть меню</translation>
+    </message>
+    <message>
+        <location line="-221"/>
+        <source>Settings</source>
+        <translation>Настройки</translation>
+    </message>
+</context>
+<context>
     <name>MessageCollectionFilterDecorator</name>
     <message>
-        <location filename="../../../Qml/imtcolgui/MessageCollectionFilterDecorator.qml" line="+113"/>
+        <location filename="../../../Qml/imtcolgui/MessageCollectionFilterDecorator.qml" line="+121"/>
         <source>Info</source>
         <translation>Информация</translation>
     </message>
@@ -7293,11 +6928,26 @@
         <source>Verbose</source>
         <translation>Подробный</translation>
     </message>
+    <message>
+        <location line="+20"/>
+        <source>Clear log</source>
+        <translation>Очистить журнал</translation>
+    </message>
 </context>
 <context>
     <name>MessageCollectionView</name>
     <message>
-        <location filename="../../../Qml/imtcolgui/MessageCollectionView.qml" line="+121"/>
+        <location filename="../../../Qml/imtcolgui/MessageCollectionView.qml" line="+45"/>
+        <source>Clear log</source>
+        <translation>Очистить журнал</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Are you sure you want to clear the entire log? This action cannot be undone.</source>
+        <translation>Вы уверены, что хотите очистить весь журнал? Это действие нельзя отменить.</translation>
+    </message>
+    <message>
+        <location line="+120"/>
         <source>Cancel</source>
         <translation>Отмена</translation>
     </message>
@@ -7312,14 +6962,12 @@
     <message>
         <location line="+8"/>
         <location line="+11"/>
-        <location line="+0"/>
         <source>Yes</source>
         <translation>Да</translation>
     </message>
     <message>
         <location line="-10"/>
         <location line="+11"/>
-        <location line="+0"/>
         <source>No</source>
         <translation>Нет</translation>
     </message>
@@ -7327,7 +6975,7 @@
 <context>
     <name>MessageInput</name>
     <message>
-        <location filename="../../../Qml/imtchatgui/MessageInput.qml" line="+72"/>
+        <location filename="../../../Qml/imtchatgui/MessageInput.qml" line="+70"/>
         <source>Write a message... (@ to mention, # for reference)</source>
         <translation>Написать сообщение... (@ для упоминания, # для ссылки)</translation>
     </message>
@@ -7341,9 +6989,91 @@
     </message>
 </context>
 <context>
+    <name>MessageView</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/MessageView.qml" line="+66"/>
+        <source>Cross-Tenant Message</source>
+        <translation>Межорганизационное сообщение</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Direction</source>
+        <translation>Направление</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>▶ Outgoing</source>
+        <translation>▶ Исходящее</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>◀ Incoming</source>
+        <translation>◀ Входящее</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Peer</source>
+        <translation>Собеседник</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>To: %1</source>
+        <translation>Кому: %1</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>From: %1</source>
+        <translation>От: %1</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Message Type</source>
+        <translation>Тип сообщения</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Status</source>
+        <translation>Статус</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Payload</source>
+        <translation>Содержимое</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Sent At</source>
+        <translation>Отправлено</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <location line="+11"/>
+        <source>—</source>
+        <translation>—</translation>
+    </message>
+    <message>
+        <location line="-3"/>
+        <source>Processed At</source>
+        <translation>Обработано</translation>
+    </message>
+</context>
+<context>
+    <name>MetaInfoListDelegate</name>
+    <message>
+        <location filename="../../../Qml/imtcolgui/MetaInfoListDelegate.qml" line="+157"/>
+        <source>Show less</source>
+        <translation>Свернуть</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Show all (%1)</source>
+        <translation>Показать все (%1)</translation>
+    </message>
+</context>
+<context>
     <name>ModalDialogManager</name>
     <message>
-        <location filename="../../../Qml/imtcontrols/Dialogs/ModalDialogManager.qml" line="+165"/>
+        <location filename="../../../Qml/imtcontrols/Dialogs/ModalDialogManager.qml" line="+220"/>
         <source>Information</source>
         <translation>Информация</translation>
     </message>
@@ -7366,12 +7096,12 @@
 <context>
     <name>MultiDocWorkspaceView</name>
     <message>
-        <location filename="../../../Qml/imtdocgui/MultiDocWorkspaceView.qml" line="+173"/>
+        <location filename="../../../Qml/imtdocgui/MultiDocWorkspaceView.qml" line="+252"/>
         <source>Save all changes ?</source>
         <translation>Сохранить все изменения ?</translation>
     </message>
     <message>
-        <location line="+81"/>
+        <location line="+127"/>
         <source>Close document</source>
         <translation>Закрыть документ</translation>
     </message>
@@ -7381,7 +7111,7 @@
         <translation>Закрыть все документы</translation>
     </message>
     <message>
-        <location line="-83"/>
+        <location line="-129"/>
         <source>Save document</source>
         <translation>Сохранение документа</translation>
     </message>
@@ -7389,7 +7119,7 @@
 <context>
     <name>MultiDocumentCollectionView</name>
     <message>
-        <location filename="../../../Qml/imtdocgui/MultiDocumentCollectionView.qml" line="+112"/>
+        <location filename="../../../Qml/imtdocgui/MultiDocumentCollectionView.qml" line="+209"/>
         <source>Document Name</source>
         <translation>Название документа</translation>
     </message>
@@ -7409,7 +7139,12 @@
         <translation>Сохранить все изменения ?</translation>
     </message>
     <message>
-        <location line="+310"/>
+        <location line="+222"/>
+        <source>The document &quot;%1&quot; is no longer open on the server and was closed</source>
+        <translation>Документ &quot;%1&quot; больше не открыт на сервере и был закрыт</translation>
+    </message>
+    <message>
+        <location line="+154"/>
         <source>Close document</source>
         <translation>Закрыть документ</translation>
     </message>
@@ -7423,21 +7158,148 @@
     <name>MultiStatusProviderGui</name>
     <message>
         <location filename="../../../Include/imtgui/CMultiStatusProviderGuiComp.ui" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CMultiStatusProviderGuiComp.h" line="+92"/>
         <source>Form</source>
         <translation>Форма</translation>
     </message>
     <message>
         <location line="+25"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CMultiStatusProviderGuiComp.h" line="+1"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;StatusIcon&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Значок статуса&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
+    <name>NotificationBell</name>
+    <message>
+        <location filename="../../../Qml/imtnotifygui/NotificationBell.qml" line="+45"/>
+        <source>Notifications</source>
+        <translation>Уведомления</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Notifications: %1 unread</source>
+        <translation>Уведомления: непрочитанных %1</translation>
+    </message>
+</context>
+<context>
+    <name>NotificationCenter</name>
+    <message>
+        <location filename="../../../Qml/imtnotifygui/NotificationCenter.qml" line="+288"/>
+        <source>%1 new notifications while you were away</source>
+        <translation>Новых уведомлений, пока вас не было: %1</translation>
+    </message>
+</context>
+<context>
+    <name>NotificationDelegate</name>
+    <message>
+        <location filename="../../../Qml/imtnotifygui/NotificationDelegate.qml" line="+203"/>
+        <source>Mark as read</source>
+        <translation>Отметить как прочитанное</translation>
+    </message>
+    <message>
+        <location line="+22"/>
+        <source>Remove</source>
+        <translation>Удалить</translation>
+    </message>
+</context>
+<context>
+    <name>NotificationPanel</name>
+    <message>
+        <location filename="../../../Qml/imtnotifygui/NotificationPanel.qml" line="+153"/>
+        <source>All notifications</source>
+        <translation>Все уведомления</translation>
+    </message>
+    <message>
+        <location line="-80"/>
+        <source>Mark all as read</source>
+        <translation>Отметить все как прочитанные</translation>
+    </message>
+    <message>
+        <location line="+58"/>
+        <source>No notifications</source>
+        <translation>Нет уведомлений</translation>
+    </message>
+    <message>
+        <location line="-68"/>
+        <source>Notifications</source>
+        <translation>Уведомления</translation>
+    </message>
+</context>
+<context>
+    <name>NotificationTypeRegistry</name>
+    <message>
+        <location filename="../../../Qml/imtnotifygui/NotificationTypeRegistry.qml" line="+88"/>
+        <source>%1 &quot;%2&quot;</source>
+        <translation>%1 «%2»</translation>
+    </message>
+</context>
+<context>
+    <name>NotificationsPage</name>
+    <message>
+        <location filename="../../../Qml/imtnotifygui/NotificationsPage.qml" line="+121"/>
+        <location line="+218"/>
+        <source>Critical</source>
+        <translation>Критично</translation>
+    </message>
+    <message>
+        <location line="-210"/>
+        <location line="+209"/>
+        <source>Error</source>
+        <translation>Ошибка</translation>
+    </message>
+    <message>
+        <location line="-206"/>
+        <location line="+204"/>
+        <source>Information</source>
+        <translation>Информация</translation>
+    </message>
+    <message>
+        <source>Read</source>
+        <translation type="vanished">Прочитанные</translation>
+    </message>
+    <message>
+        <location line="-169"/>
+        <source>Remove the selected notifications?</source>
+        <translation>Удалить выбранные уведомления?</translation>
+    </message>
+    <message>
+        <location line="-1"/>
+        <source>Removing notifications</source>
+        <translation>Удаление уведомлений</translation>
+    </message>
+    <message>
+        <location line="+152"/>
+        <source>Unread only</source>
+        <translation>Только непрочитанные</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Severity</source>
+        <translation>Важность</translation>
+    </message>
+    <message>
+        <source>State</source>
+        <translation type="vanished">Состояние</translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <source>Type</source>
+        <translation>Тип</translation>
+    </message>
+    <message>
+        <source>Unread</source>
+        <translation type="vanished">Непрочитанные</translation>
+    </message>
+    <message>
+        <location line="-225"/>
+        <location line="+212"/>
+        <source>Warning</source>
+        <translation>Предупреждение</translation>
+    </message>
+</context>
+<context>
     <name>PackageCollectionViewCommandsDelegate</name>
     <message>
-        <location filename="../../../Qml/imtlicgui/PackageCollectionViewCommandsDelegate.qml" line="+10"/>
+        <location filename="../../../Qml/imtlicgui/PackageCollectionViewCommandsDelegate.qml" line="+9"/>
         <source>Deleting a feature</source>
         <translation>Удаление фичи</translation>
     </message>
@@ -7479,22 +7341,44 @@
     </message>
 </context>
 <context>
+    <name>PagesProvider</name>
+    <message>
+        <location filename="../../../Qml/imtgui/Application/PagesProvider.qml" line="+60"/>
+        <source>Failed to load application pages. Please try again.</source>
+        <translation>Не удалось загрузить страницы приложения. Попробуйте ещё раз.</translation>
+    </message>
+</context>
+<context>
     <name>Pagination</name>
     <message>
-        <location filename="../../../Qml/imtgui/View/Pagination.qml" line="+193"/>
         <source>Per page: </source>
-        <translation>На страницу: </translation>
+        <translation type="vanished">На страницу: </translation>
+    </message>
+    <message>
+        <location filename="../../../Qml/imtgui/View/Pagination.qml" line="+118"/>
+        <source>No items</source>
+        <translation>Нет элементов</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>of</source>
+        <translation>из</translation>
+    </message>
+    <message>
+        <location line="+102"/>
+        <source>Per page:</source>
+        <translation>На странице:</translation>
     </message>
 </context>
 <context>
     <name>PasswordInput</name>
     <message>
-        <location filename="../../../Qml/imtauthgui/PasswordInput.qml" line="+43"/>
+        <location filename="../../../Qml/imtauthgui/PasswordInput.qml" line="+38"/>
         <source>Passwords don&apos;t match</source>
         <translation>Пароли не совпадают</translation>
     </message>
     <message>
-        <location line="+17"/>
+        <location line="+56"/>
         <source>Current password</source>
         <translation>Текущий пароль</translation>
     </message>
@@ -7516,7 +7400,6 @@
     <message>
         <location line="+11"/>
         <location line="+2"/>
-        <location line="+0"/>
         <source>Confirm password</source>
         <translation>Подтвердите пароль</translation>
     </message>
@@ -7524,74 +7407,92 @@
 <context>
     <name>PasswordPolicyController</name>
     <message>
+        <location filename="../../../Qml/imtauthgui/PasswordPolicyController.qml" line="+122"/>
         <source>at least %1 characters</source>
         <translation>не менее %1 символов</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>at most %1 characters</source>
         <translation>не более %1 символов</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>a lowercase letter</source>
         <translation>строчная буква</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>an uppercase letter</source>
         <translation>заглавная буква</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>a digit</source>
         <translation>цифра</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>a special character</source>
         <translation>специальный символ</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>a password different from the login</source>
         <translation>пароль, отличный от логина</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>a password that is not commonly used</source>
         <translation>пароль, который не входит в число распространённых</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>a password different from the last %1 ones</source>
         <translation>пароль, отличный от %1 последних</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>a password that was not used before</source>
         <translation>пароль, который не использовался ранее</translation>
     </message>
     <message>
+        <location line="+13"/>
         <source>The current password is not correct.</source>
         <translation>Текущий пароль указан неверно.</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>The password was changed too recently and cannot be changed again yet.</source>
         <translation>Пароль был изменён слишком недавно, его пока нельзя сменить снова.</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>This account is managed by an external system, its password cannot be changed here.</source>
         <translation>Эта учётная запись управляется внешней системой, её пароль нельзя изменить здесь.</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>This account no longer exists.</source>
         <translation>Эта учётная запись больше не существует.</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>The password could not be changed. Please try again later.</source>
         <translation>Не удалось изменить пароль. Попробуйте позже.</translation>
     </message>
     <message>
+        <location line="+15"/>
         <source>The password does not meet the requirements: %1.</source>
         <translation>Пароль не соответствует требованиям: %1.</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>, </source>
         <translation>, </translation>
     </message>
     <message>
+        <location line="+52"/>
         <source>Password requirements:</source>
         <translation>Требования к паролю:</translation>
     </message>
@@ -7599,24 +7500,22 @@
 <context>
     <name>PasswordRecoveryDialog</name>
     <message>
-        <location filename="../../../Qml/imtauthgui/PasswordRecoveryDialog.qml" line="+15"/>
+        <location filename="../../../Qml/imtauthgui/PasswordRecoveryDialog.qml" line="+16"/>
         <source>Password Recovery</source>
         <translation>Восстановление пароля</translation>
     </message>
     <message>
-        <location line="+27"/>
-        <location line="+40"/>
-        <location line="+0"/>
+        <location line="+26"/>
+        <location line="+35"/>
         <source>Check the email</source>
         <translation>Проверить почту</translation>
     </message>
     <message>
-        <location line="-35"/>
         <source>Yes</source>
-        <translation>Да</translation>
+        <translation type="vanished">Да</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="-29"/>
         <source>Check the code</source>
         <translation>Проверить код</translation>
     </message>
@@ -7631,12 +7530,12 @@
         <translation>Отмена</translation>
     </message>
     <message>
-        <location line="+24"/>
+        <location line="+18"/>
         <source>Check the email you entered</source>
         <translation>Проверьте введённый адрес электронной почты</translation>
     </message>
     <message>
-        <location line="+41"/>
+        <location line="+42"/>
         <source>Enter the email</source>
         <translation>Введите электронную почту</translation>
     </message>
@@ -7686,21 +7585,20 @@
         <translation>Новый код можно получить через</translation>
     </message>
     <message>
-        <location line="+47"/>
         <source>Username</source>
-        <translation>Логин</translation>
+        <translation type="vanished">Логин</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>For this email this account has been found, is that you?</source>
-        <translation>Для этого адреса электронной почты найден аккаунт, это вы?</translation>
+        <translation type="vanished">Для этого адреса электронной почты найден аккаунт, это вы?</translation>
     </message>
     <message>
-        <location line="+142"/>
+        <location line="+169"/>
         <source>Password changed successfully</source>
         <translation>Пароль успешно изменен</translation>
     </message>
     <message>
+        <location line="+7"/>
         <source>Unable to change the password.</source>
         <translation>Не удалось изменить пароль.</translation>
     </message>
@@ -7708,127 +7606,276 @@
 <context>
     <name>PatTokenParamEditor</name>
     <message>
-        <location filename="../../../Qml/imtgui/Params/PatTokenParamEditor.qml" line="+138"/>
         <source>Token Created Successfully</source>
-        <translation>Токен успешно создан</translation>
+        <translation type="vanished">Токен успешно создан</translation>
     </message>
     <message>
-        <location line="+6"/>
         <source>OK</source>
-        <translation>ОК</translation>
+        <translation type="vanished">ОК</translation>
     </message>
     <message>
-        <location line="+17"/>
         <source>Please copy and save the token:</source>
-        <translation>Пожалуйста, скопируйте и сохраните токен:</translation>
+        <translation type="vanished">Пожалуйста, скопируйте и сохраните токен:</translation>
     </message>
     <message>
-        <location line="+23"/>
         <source>The token is copied</source>
-        <translation>Токен скопирован</translation>
+        <translation type="vanished">Токен скопирован</translation>
     </message>
     <message>
-        <location line="+0"/>
         <source>Copy the token</source>
-        <translation>Скопировать токен</translation>
+        <translation type="vanished">Скопировать токен</translation>
     </message>
     <message>
-        <location line="+28"/>
         <source>New Token</source>
-        <translation>Новый токен</translation>
+        <translation type="vanished">Новый токен</translation>
     </message>
     <message>
-        <location line="+62"/>
         <source>No Expiration</source>
-        <translation>Без срока действия</translation>
+        <translation type="vanished">Без срока действия</translation>
     </message>
     <message>
-        <location line="+16"/>
         <source>Delete Token</source>
-        <translation>Удалить токен</translation>
+        <translation type="vanished">Удалить токен</translation>
     </message>
     <message>
-        <location line="+22"/>
         <source>Revoke Token</source>
-        <translation>Отозвать токен</translation>
+        <translation type="vanished">Отозвать токен</translation>
     </message>
     <message>
-        <location line="+0"/>
         <source>Revoked</source>
-        <translation>Отозван</translation>
+        <translation type="vanished">Отозван</translation>
     </message>
     <message>
-        <location line="+16"/>
         <source>Are you sure you want to delete this token?</source>
-        <translation>Вы уверены, что хотите удалить этот токен?</translation>
+        <translation type="vanished">Вы уверены, что хотите удалить этот токен?</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>Any applications or scripts using this token will no longer be able to access the API. You cannot undo this action.</source>
-        <translation>Все приложения или скрипты, использующие этот токен, больше не смогут получить доступ к API. Это действие нельзя отменить.</translation>
+        <translation type="vanished">Все приложения или скрипты, использующие этот токен, больше не смогут получить доступ к API. Это действие нельзя отменить.</translation>
     </message>
     <message>
-        <location line="+22"/>
         <source>Add PAT Token</source>
-        <translation>Добавить PAT-токен</translation>
+        <translation type="vanished">Добавить PAT-токен</translation>
     </message>
     <message>
-        <location line="+9"/>
         <source>Add</source>
-        <translation>Добавить</translation>
+        <translation type="vanished">Добавить</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation type="vanished">Отмена</translation>
     </message>
     <message>
-        <location line="+28"/>
         <source>Token Name</source>
-        <translation>Название токена</translation>
+        <translation type="vanished">Название токена</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>A descriptive name for this token</source>
-        <translation>Описательное название для этого токена</translation>
+        <translation type="vanished">Описательное название для этого токена</translation>
     </message>
     <message>
-        <location line="+3"/>
         <source>Please enter the token name</source>
-        <translation>Пожалуйста, введите название токена</translation>
+        <translation type="vanished">Пожалуйста, введите название токена</translation>
     </message>
     <message>
-        <location line="+16"/>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation type="vanished">Описание</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>Optional description for this token</source>
-        <translation>Необязательное описание для этого токена</translation>
+        <translation type="vanished">Необязательное описание для этого токена</translation>
     </message>
     <message>
-        <location line="+12"/>
         <source>Expiration</source>
-        <translation>Срок действия</translation>
+        <translation type="vanished">Срок действия</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>The token will expire on the selected date</source>
-        <translation>Токен истечёт в выбранную дату</translation>
+        <translation type="vanished">Токен истечёт в выбранную дату</translation>
     </message>
 </context>
 <context>
     <name>PatTokenSettingsController</name>
     <message>
-        <location filename="../../../Qml/imtgui/Settings/PatTokenSettingsController.qml" line="+14"/>
         <source>PAT Tokens</source>
-        <translation>PAT-токены</translation>
+        <translation type="vanished">PAT-токены</translation>
+    </message>
+    <message>
+        <source>Personal Access Tokens for API authentication</source>
+        <translation type="vanished">Персональные токены доступа для аутентификации API</translation>
+    </message>
+</context>
+<context>
+    <name>PermissionDetailsPanel</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/PermissionDetailsPanel.qml" line="+24"/>
+        <source>Select a permission to see where it comes from</source>
+        <translation>Выберите право, чтобы увидеть его источник</translation>
+    </message>
+    <message>
+        <location line="+79"/>
+        <source>The path is copied</source>
+        <translation>Путь скопирован</translation>
     </message>
     <message>
         <location line="+0"/>
-        <source>Personal Access Tokens for API authentication</source>
-        <translation>Персональные токены доступа для аутентификации API</translation>
+        <source>Copy the full path</source>
+        <translation>Скопировать полный путь</translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <source>Description</source>
+        <translation>Описание</translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Source</source>
+        <translation>Источник</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Requires</source>
+        <translation>Требует</translation>
+    </message>
+</context>
+<context>
+    <name>PermissionDetailsRow</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/PermissionDetailsRow.qml" line="+99"/>
+        <source>Hide</source>
+        <translation>Скрыть</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Show all</source>
+        <translation>Показать все</translation>
+    </message>
+</context>
+<context>
+    <name>PermissionSourcesPage</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/PermissionSourcesPage.qml" line="+16"/>
+        <source>No permissions are granted.</source>
+        <translation>Права не предоставлены.</translation>
+    </message>
+    <message>
+        <location line="+49"/>
+        <source>Permissions</source>
+        <translation>Права</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Updating...</source>
+        <translation>Обновление...</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Permissions come from roles: assigned directly, through groups and through parent roles. To change them, edit the roles or the group membership.</source>
+        <translation>Права предоставляются через роли: назначенные напрямую, через группы и через родительские роли. Чтобы изменить их, отредактируйте роли или членство в группах.</translation>
+    </message>
+    <message>
+        <location line="+18"/>
+        <source>Permission</source>
+        <translation>Право</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Filter permissions...</source>
+        <translation>Фильтр прав...</translation>
+    </message>
+</context>
+<context>
+    <name>PermissionsTableView</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/PermissionsTableView.qml" line="+62"/>
+        <source>No permissions available.</source>
+        <translation>Нет доступных прав.</translation>
+    </message>
+    <message>
+        <location line="+356"/>
+        <source>Inherited</source>
+        <translation>Унаследовано</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Required</source>
+        <translation>Обязательно</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Inherited from:</source>
+        <translation>Унаследовано от:</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Required by:</source>
+        <translation>Требуется для:</translation>
+    </message>
+    <message>
+        <location line="+231"/>
+        <source>%1 of the permissions are selected</source>
+        <translation>Выбрано прав: %1</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Selected here</source>
+        <translation>Выбрано здесь</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Not selected</source>
+        <translation>Не выбрано</translation>
+    </message>
+    <message>
+        <location line="+141"/>
+        <source>Check All</source>
+        <translation>Выбрать все</translation>
+    </message>
+    <message>
+        <location line="+17"/>
+        <source>Uncheck All</source>
+        <translation>Снять все</translation>
+    </message>
+    <message>
+        <location line="+22"/>
+        <source>Expand All</source>
+        <translation>Развернуть все</translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>Collapse All</source>
+        <translation>Свернуть все</translation>
+    </message>
+    <message>
+        <location line="+19"/>
+        <source>Filter permissions...</source>
+        <translation>Фильтр прав...</translation>
+    </message>
+    <message>
+        <location line="+37"/>
+        <location line="+320"/>
+        <source>No permissions match the filter.</source>
+        <translation>Нет прав, соответствующих фильтру.</translation>
+    </message>
+    <message>
+        <location line="-320"/>
+        <source>No permissions are selected.</source>
+        <translation>Права не выбраны.</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Full path</source>
+        <translation>Полный путь</translation>
+    </message>
+    <message>
+        <location line="+70"/>
+        <source>Permission</source>
+        <translation>Право</translation>
+    </message>
+    <message>
+        <location line="+255"/>
+        <source>Select a permission to see its path, source and requirements</source>
+        <translation>Выберите право, чтобы увидеть его путь, источник и требования</translation>
     </message>
 </context>
 <context>
@@ -7854,7 +7901,6 @@
     <message>
         <location line="+1"/>
         <location line="+6"/>
-        <location line="+0"/>
         <source>Close</source>
         <translation>Закрыть</translation>
     </message>
@@ -7867,7 +7913,7 @@
 <context>
     <name>ProductCollectionViewCommandsDelegate</name>
     <message>
-        <location filename="../../../Qml/imtlicgui/ProductCollectionViewCommandsDelegate.qml" line="+15"/>
+        <location filename="../../../Qml/imtlicgui/ProductCollectionViewCommandsDelegate.qml" line="+16"/>
         <source>Deleting a product</source>
         <translation>Удаление продукта</translation>
     </message>
@@ -7878,21 +7924,46 @@
     </message>
     <message>
         <location line="+6"/>
-        <source>Select product</source>
-        <translation>Выберите продукт</translation>
-    </message>
-    <message>
-        <location line="+46"/>
-        <source>Feature overwriting</source>
-        <translation>Перезапись свойств</translation>
+        <source>Export the product to a file</source>
+        <translation>Экспортировать продукт в файл</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Overwrite features ?</source>
-        <translation>Перезаписать свойства ?</translation>
+        <source>Choose a product file to import</source>
+        <translation>Выберите файл продукта для импорта</translation>
     </message>
     <message>
-        <location line="+27"/>
+        <location line="+48"/>
+        <source>Import a product</source>
+        <translation>Импорт продукта</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Importing overwrites features.
+
+The product from the file (XML or the C++ header Lisa exports) is added to the collection; a product whose id already exists is not imported. Every feature it carries is written into the shared feature collection: features that are not there yet are created, and features that already exist are replaced by the version from the file. Other products and licenses that use those features get the replacement as well.
+
+Choose a file and import?</source>
+        <translation>Импорт перезаписывает функции.
+
+Продукт из файла (XML или заголовочный файл C++, экспортируемый Lisa) добавляется в коллекцию; продукт, идентификатор которого уже существует, не импортируется. Все содержащиеся в нём функции записываются в общую коллекцию функций: отсутствующие функции создаются, а уже существующие заменяются версией из файла. Другие продукты и лицензии, использующие эти функции, также получат замену.
+
+Выбрать файл и импортировать?</translation>
+    </message>
+    <message>
+        <source>Select product</source>
+        <translation type="vanished">Выберите продукт</translation>
+    </message>
+    <message>
+        <source>Feature overwriting</source>
+        <translation type="vanished">Перезапись свойств</translation>
+    </message>
+    <message>
+        <source>Overwrite features ?</source>
+        <translation type="vanished">Перезаписать свойства ?</translation>
+    </message>
+    <message>
+        <location line="+20"/>
         <source>Please enter the name of the document:</source>
         <translation>Введите название документа:</translation>
     </message>
@@ -7900,200 +7971,847 @@
 <context>
     <name>ProductView</name>
     <message>
-        <location filename="../../../Qml/imtlicgui/ProductView.qml" line="+50"/>
         <source>Feature Name</source>
-        <translation>Название</translation>
+        <translation type="vanished">Название</translation>
     </message>
     <message>
-        <location line="+4"/>
         <source>Feature-ID</source>
-        <translation>Идентификатор</translation>
+        <translation type="vanished">Идентификатор</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location filename="../../../Qml/imtlicgui/ProductView.qml" line="+1148"/>
         <source>Description</source>
         <translation>Описание</translation>
     </message>
     <message>
-        <location line="+147"/>
         <source>Product Name</source>
+        <translation type="vanished">Название продукта</translation>
+    </message>
+    <message>
+        <location line="-670"/>
+        <source>%1 needs %2; the rest of this feature comes with it, as its parts are not optional</source>
+        <translation>%1 требует %2; остальная часть этой функции добавляется вместе с ней, так как её части не являются опциональными</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>%1 needs this feature, so it stays in the product</source>
+        <translation>%1 требует эту функцию, поэтому она остаётся в продукте</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>This feature needs %1, which the product takes along</source>
+        <translation>Эта функция требует %1, которая добавляется в продукт</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Which optional parts a license actually unlocks is decided on the Features page of that license</source>
+        <translation>Какие опциональные части действительно открывает лицензия, определяется на странице «Функции» этой лицензии</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>%1 required missing</source>
+        <translation>Отсутствуют обязательные: %1</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>%1 requirements unknown</source>
+        <translation>Неизвестные требования: %1</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>%1 no longer required</source>
+        <translation>Больше не требуются: %1</translation>
+    </message>
+    <message>
+        <location line="+328"/>
+        <location line="+379"/>
+        <location line="+52"/>
+        <source>Required by %1</source>
+        <translation>Требуется для %1</translation>
+    </message>
+    <message>
+        <location line="-426"/>
+        <source>Came along</source>
+        <translation>Добавлено автоматически</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Optional</source>
+        <translation>Опционально</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Always included</source>
+        <translation>Всегда включено</translation>
+    </message>
+    <message>
+        <location line="+17"/>
+        <source>%1 and %2 more</source>
+        <translation>%1 и ещё %2</translation>
+    </message>
+    <message>
+        <location line="+104"/>
+        <location line="+55"/>
+        <source>General</source>
+        <translation>Общие</translation>
+    </message>
+    <message>
+        <location line="-54"/>
+        <source>Features</source>
+        <translation>Функции</translation>
+    </message>
+    <message>
+        <location line="+65"/>
+        <source>Product name</source>
         <translation>Название продукта</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+1"/>
         <source>Enter the product name</source>
         <translation>Введите название продукта</translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+9"/>
         <source>Category</source>
         <translation>Категория</translation>
+    </message>
+    <message>
+        <location line="+92"/>
+        <source>Feature</source>
+        <translation>Функция</translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <source>Feature ID</source>
+        <translation>Идентификатор функции</translation>
+    </message>
+    <message>
+        <location line="+29"/>
+        <source>Optional parts</source>
+        <translation>Опциональные части</translation>
+    </message>
+    <message>
+        <location line="+41"/>
+        <location line="+52"/>
+        <source>Requires %1</source>
+        <translation>Требует %1</translation>
+    </message>
+    <message>
+        <location line="-28"/>
+        <location line="+205"/>
+        <source>Untitled feature</source>
+        <translation>Функция без названия</translation>
+    </message>
+    <message>
+        <location line="-146"/>
+        <source>No description</source>
+        <translation>Нет описания</translation>
+    </message>
+    <message>
+        <location line="+66"/>
+        <source>%1 sub-features (click to view in panel)</source>
+        <translation>Подфункций: %1 (нажмите для просмотра на панели)</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Feature content</source>
+        <translation>Содержимое функции</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>No feature selected</source>
+        <translation>Функция не выбрана</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Pick a row on the left to choose which of its optional parts this product takes</source>
+        <translation>Выберите строку слева, чтобы указать, какие её опциональные части включает этот продукт</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Sub-feature</source>
+        <translation>Подфункция</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Search sub-features</source>
+        <translation>Поиск подфункций</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>No sub-features</source>
+        <translation>Нет подфункций</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>This feature is included as a whole</source>
+        <translation>Эта функция включена целиком</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Clear</source>
+        <translation>Очистить</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Take all</source>
+        <translation>Взять все</translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <source>Product</source>
+        <translation>Продукт</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Add feature</source>
+        <translation>Добавить функцию</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>No features added</source>
+        <translation>Функции не добавлены</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Use Add feature to build this product</source>
+        <translation>Используйте «Добавить функцию», чтобы сформировать этот продукт</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Select a feature to choose which of its parts this product includes</source>
+        <translation>Выберите функцию, чтобы указать, какие её части включает этот продукт</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>%1 needs this feature; remove it first to drop this one</source>
+        <translation>%1 требует эту функцию; сначала удалите её, чтобы исключить эту</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Tick the optional parts on the right; the rest always comes with the feature</source>
+        <translation>Отметьте опциональные части справа; остальное всегда входит в функцию</translation>
+    </message>
+</context>
+<context>
+    <name>ProfileAccessPage</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/ProfileAccessPage.qml" line="+81"/>
+        <source>Group</source>
+        <translation>Группа</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Parent group</source>
+        <translation>Родительская группа</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Role</source>
+        <translation>Роль</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Parent role</source>
+        <translation>Родительская роль</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Delegated role</source>
+        <translation>Делегированная роль</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Required by</source>
+        <translation>Требуется для</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Assigned to you</source>
+        <translation>Назначено вам</translation>
+    </message>
+    <message>
+        <location line="+25"/>
+        <source>Required</source>
+        <translation>Обязательно</translation>
+    </message>
+    <message>
+        <location line="+82"/>
+        <source>You have full access</source>
+        <translation>У вас полный доступ</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>As a superuser, every permission is already granted to you, so no roles, groups or individual permissions are listed here — there is nothing more to add.</source>
+        <translation>Как суперпользователю вам уже предоставлены все права, поэтому роли, группы и отдельные права здесь не перечислены — добавлять больше нечего.</translation>
+    </message>
+    <message>
+        <location line="+18"/>
+        <source>Roles</source>
+        <translation>Роли</translation>
+    </message>
+    <message>
+        <location line="+34"/>
+        <source>Groups</source>
+        <translation>Группы</translation>
+    </message>
+    <message>
+        <location line="+34"/>
+        <source>Permissions</source>
+        <translation>Права</translation>
+    </message>
+    <message>
+        <location line="+45"/>
+        <source>No roles, groups or permissions are assigned.</source>
+        <translation>Роли, группы и права не назначены.</translation>
+    </message>
+    <message>
+        <location line="+38"/>
+        <source>Name</source>
+        <translation>Имя</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Source</source>
+        <translation>Источник</translation>
+    </message>
+    <message>
+        <location line="+50"/>
+        <source>Full path</source>
+        <translation>Полный путь</translation>
     </message>
 </context>
 <context>
     <name>ProfileGeneralPage</name>
     <message>
+        <location filename="../../../Qml/imtauthgui/ProfileGeneralPage.qml" line="+56"/>
         <source>Profile saved</source>
         <translation>Профиль сохранён</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>Unable to save the profile.</source>
         <translation>Не удалось сохранить профиль.</translation>
     </message>
     <message>
+        <location line="+63"/>
         <source>Account</source>
         <translation>Учётная запись</translation>
     </message>
     <message>
+        <location line="+29"/>
         <source>Name</source>
         <translation>Имя</translation>
     </message>
     <message>
+        <location line="+17"/>
         <source>Enter the name</source>
         <translation>Введите имя</translation>
     </message>
     <message>
+        <location line="+20"/>
         <source>Email Address</source>
         <translation>Адрес электронной почты</translation>
     </message>
     <message>
+        <location line="+18"/>
         <source>Enter the email</source>
         <translation>Введите адрес электронной почты</translation>
     </message>
     <message>
+        <location line="+13"/>
         <source>Save</source>
         <translation>Сохранить</translation>
     </message>
     <message>
+        <location line="+101"/>
         <source>Password changed</source>
         <translation>Пароль изменён</translation>
     </message>
     <message>
+        <location line="+9"/>
         <source>Unable to change the password. Check your current password and try again.</source>
         <translation>Не удалось изменить пароль. Проверьте текущий пароль и попробуйте снова.</translation>
     </message>
     <message>
+        <location line="+14"/>
+        <location line="+25"/>
         <source>Password</source>
         <translation>Пароль</translation>
     </message>
     <message>
+        <location line="+20"/>
         <source>Change</source>
         <translation>Изменить</translation>
     </message>
     <message>
+        <location line="+23"/>
         <source>Current password</source>
         <translation>Текущий пароль</translation>
     </message>
     <message>
+        <location line="+17"/>
         <source>Enter your current password</source>
         <translation>Введите текущий пароль</translation>
     </message>
     <message>
+        <location line="+22"/>
         <source>New password</source>
         <translation>Новый пароль</translation>
     </message>
     <message>
+        <location line="+17"/>
         <source>Enter a new password</source>
         <translation>Введите новый пароль</translation>
     </message>
     <message>
+        <location line="+22"/>
         <source>Confirm new password</source>
         <translation>Подтверждение нового пароля</translation>
     </message>
     <message>
+        <location line="+17"/>
         <source>Re-enter the new password</source>
         <translation>Повторите новый пароль</translation>
     </message>
     <message>
+        <location line="+13"/>
         <source>Passwords don&apos;t match</source>
         <translation>Пароли не совпадают</translation>
     </message>
     <message>
+        <location line="+35"/>
         <source>Changing password…</source>
         <translation>Изменение пароля…</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>Update password</source>
         <translation>Обновить пароль</translation>
     </message>
     <message>
+        <location line="+14"/>
         <source>Cancel</source>
         <translation>Отмена</translation>
     </message>
 </context>
 <context>
+    <name>ProfileLinkedAccountsPage</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/ProfileLinkedAccountsPage.qml" line="+80"/>
+        <source>The account has been unlinked</source>
+        <translation>Учётная запись отвязана</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>The operation could not be completed</source>
+        <translation>Не удалось выполнить операцию</translation>
+    </message>
+    <message>
+        <location line="+47"/>
+        <source>Link an account of another service to sign in with it instead of your password.</source>
+        <translation>Привяжите учётную запись другого сервиса, чтобы входить с её помощью вместо пароля.</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Accounts</source>
+        <translation>Учётные записи</translation>
+    </message>
+    <message>
+        <location line="+62"/>
+        <source>Linked: %1</source>
+        <translation>Привязано: %1</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Linked</source>
+        <translation>Привязано</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Not linked</source>
+        <translation>Не привязано</translation>
+    </message>
+    <message>
+        <location line="+19"/>
+        <source>Unlink</source>
+        <translation>Отвязать</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Link</source>
+        <translation>Привязать</translation>
+    </message>
+    <message>
+        <location line="+17"/>
+        <source>No sign-in services are configured on the server.</source>
+        <translation>На сервере не настроены сервисы входа.</translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <source>Complete the sign-in in the browser window that has opened.</source>
+        <translation>Завершите вход в открывшемся окне браузера.</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Your account has no password, so the last linked account cannot be unlinked.</source>
+        <translation>У вашей учётной записи нет пароля, поэтому последнюю привязанную учётную запись нельзя отвязать.</translation>
+    </message>
+</context>
+<context>
+    <name>ProfileNoticeBanner</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/ProfileNoticeBanner.qml" line="+86"/>
+        <source>Dismiss</source>
+        <translation>Закрыть</translation>
+    </message>
+</context>
+<context>
+    <name>ProfileOrganizationsPage</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/ProfileOrganizationsPage.qml" line="+69"/>
+        <source>Invitation accepted</source>
+        <translation>Приглашение принято</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Invitation declined</source>
+        <translation>Приглашение отклонено</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>You have left the organization</source>
+        <translation>Вы покинули организацию</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Unable to complete the request.</source>
+        <translation>Не удалось выполнить запрос.</translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <source>Leave organization</source>
+        <translation>Покинуть организацию</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Are you sure you want to leave &quot;%1&quot;?</source>
+        <translation>Вы уверены, что хотите покинуть «%1»?</translation>
+    </message>
+    <message>
+        <location line="+51"/>
+        <source>Current organization</source>
+        <translation>Текущая организация</translation>
+    </message>
+    <message>
+        <location line="+48"/>
+        <source>No organization</source>
+        <translation>Нет организации</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>You are currently working in this organization. Everything you do applies here.</source>
+        <translation>Вы сейчас работаете в этой организации. Все ваши действия применяются здесь.</translation>
+    </message>
+    <message>
+        <location line="+19"/>
+        <source>Pending invitations</source>
+        <translation>Ожидающие приглашения</translation>
+    </message>
+    <message>
+        <location line="+57"/>
+        <source>Accept</source>
+        <translation>Принять</translation>
+    </message>
+    <message>
+        <location line="+27"/>
+        <source>Reject</source>
+        <translation>Отклонить</translation>
+    </message>
+    <message>
+        <location line="+34"/>
+        <source>Other organizations</source>
+        <translation>Другие организации</translation>
+    </message>
+    <message>
+        <location line="+74"/>
+        <source>Switch</source>
+        <translation>Переключиться</translation>
+    </message>
+    <message>
+        <location line="+31"/>
+        <source>Leave</source>
+        <translation>Покинуть</translation>
+    </message>
+    <message>
+        <location line="+25"/>
+        <source>You are not a member of any other organization yet.</source>
+        <translation>Вы пока не состоите ни в одной другой организации.</translation>
+    </message>
+</context>
+<context>
+    <name>ProfileTokensPage</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/ProfileTokensPage.qml" line="+66"/>
+        <source>Token deleted</source>
+        <translation>Токен удалён</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Token revoked</source>
+        <translation>Токен отозван</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Unable to complete the request.</source>
+        <translation>Не удалось выполнить запрос.</translation>
+    </message>
+    <message>
+        <location line="+48"/>
+        <source>Access tokens</source>
+        <translation>Токены доступа</translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <source>Tokens let scripts and integrations authenticate as you.</source>
+        <translation>Токены позволяют скриптам и интеграциям проходить аутентификацию от вашего имени.</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>New Token</source>
+        <translation>Новый токен</translation>
+    </message>
+    <message>
+        <location line="+78"/>
+        <location line="+316"/>
+        <source>No Expiration</source>
+        <translation>Без срока действия</translation>
+    </message>
+    <message>
+        <location line="-298"/>
+        <source>Delete Token</source>
+        <translation>Удалить токен</translation>
+    </message>
+    <message>
+        <location line="+22"/>
+        <source>Revoke Token</source>
+        <translation>Отозвать токен</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Revoked</source>
+        <translation>Отозван</translation>
+    </message>
+    <message>
+        <location line="+17"/>
+        <source>Are you sure you want to delete this token?</source>
+        <translation>Вы уверены, что хотите удалить этот токен?</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Any applications or scripts using this token will no longer be able to access the API. You cannot undo this action.</source>
+        <translation>Все приложения или скрипты, использующие этот токен, больше не смогут получить доступ к API. Это действие нельзя отменить.</translation>
+    </message>
+    <message>
+        <location line="+18"/>
+        <source>You don&apos;t have any access tokens yet. Create one to let a script or integration authenticate as you.</source>
+        <translation>У вас пока нет токенов доступа. Создайте токен, чтобы скрипт или интеграция могли проходить аутентификацию от вашего имени.</translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <source>Token Created Successfully</source>
+        <translation>Токен успешно создан</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>OK</source>
+        <translation>ОК</translation>
+    </message>
+    <message>
+        <location line="+17"/>
+        <source>Please copy and save the token:</source>
+        <translation>Пожалуйста, скопируйте и сохраните токен:</translation>
+    </message>
+    <message>
+        <location line="+25"/>
+        <source>The token is copied</source>
+        <translation>Токен скопирован</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Copy the token</source>
+        <translation>Скопировать токен</translation>
+    </message>
+    <message>
+        <location line="+22"/>
+        <source>New Personal Access Token</source>
+        <translation>Новый персональный токен доступа</translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <source>Generate Token</source>
+        <translation>Создать токен</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Cancel</source>
+        <translation>Отмена</translation>
+    </message>
+    <message>
+        <location line="+23"/>
+        <location line="+173"/>
+        <source>Enter a token name to continue</source>
+        <translation>Введите название токена, чтобы продолжить</translation>
+    </message>
+    <message>
+        <location line="-171"/>
+        <source>Select at least one permission</source>
+        <translation>Выберите хотя бы одно право</translation>
+    </message>
+    <message>
+        <location line="+52"/>
+        <source>Token Name</source>
+        <translation>Название токена</translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>e.g. CI/CD Pipeline, API Client...</source>
+        <translation>например, CI/CD Pipeline, API Client...</translation>
+    </message>
+    <message>
+        <location line="+18"/>
+        <source>Expiration</source>
+        <translation>Срок действия</translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <source>7 Days</source>
+        <translation>7 дней</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>30 Days</source>
+        <translation>30 дней</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>60 Days</source>
+        <translation>60 дней</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>90 Days</source>
+        <translation>90 дней</translation>
+    </message>
+    <message>
+        <location line="+39"/>
+        <source>Description (optional)</source>
+        <translation>Описание (необязательно)</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>What will this token be used for?</source>
+        <translation>Для чего будет использоваться этот токен?</translation>
+    </message>
+    <message>
+        <location line="+44"/>
+        <source>Select Permissions</source>
+        <translation>Выберите права</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>— grant only the access this token needs</source>
+        <translation>— предоставьте только тот доступ, который нужен этому токену</translation>
+    </message>
+    <message>
+        <location line="+52"/>
+        <source>No permissions available to assign to this token.</source>
+        <translation>Нет прав, которые можно назначить этому токену.</translation>
+    </message>
+</context>
+<context>
     <name>ProfileView</name>
     <message>
-        <location filename="../../../Qml/imtauthgui/ProfileView.qml" line="+124"/>
+        <location filename="../../../Qml/imtauthgui/ProfileView.qml" line="+202"/>
+        <source>My Account</source>
+        <translation>Моя учётная запись</translation>
+    </message>
+    <message>
+        <location line="+37"/>
         <source>General</source>
         <translation>Основное</translation>
     </message>
     <message>
-        <location line="+10"/>
-        <source>Username</source>
-        <translation>Логин</translation>
+        <location line="+2"/>
+        <source>Organizations</source>
+        <translation>Организации</translation>
     </message>
     <message>
-        <location line="+10"/>
-        <location line="+137"/>
-        <location line="+0"/>
-        <source>Name</source>
-        <translation>Название</translation>
+        <location line="+1"/>
+        <source>Access Tokens</source>
+        <translation>Токены доступа</translation>
     </message>
     <message>
-        <location line="-136"/>
-        <source>Enter the name</source>
-        <translation>Введите название</translation>
-    </message>
-    <message>
-        <location line="+20"/>
-        <source>Email Address</source>
-        <translation>Email</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Enter the email</source>
-        <translation>Введите email</translation>
-    </message>
-    <message>
-        <location line="+11"/>
-        <source>Save</source>
-        <translation>Сохранить</translation>
-    </message>
-    <message>
-        <location line="+10"/>
-        <source>Change password</source>
-        <translation>Сменить пароль</translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Change</source>
-        <translation>Изменить</translation>
-    </message>
-    <message>
-        <location line="+10"/>
-        <source>Change Password</source>
-        <translation>Сменить пароль</translation>
+        <location line="+1"/>
+        <source>Roles &amp; Permissions</source>
+        <translation>Роли и права</translation>
     </message>
     <message>
         <location line="+14"/>
+        <source>Linked Accounts</source>
+        <translation>Привязанные учётные записи</translation>
+    </message>
+    <message>
+        <source>Username</source>
+        <translation type="vanished">Логин</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation type="vanished">Название</translation>
+    </message>
+    <message>
+        <source>Enter the name</source>
+        <translation type="vanished">Введите название</translation>
+    </message>
+    <message>
+        <source>Email Address</source>
+        <translation type="vanished">Email</translation>
+    </message>
+    <message>
+        <source>Enter the email</source>
+        <translation type="vanished">Введите email</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation type="vanished">Сохранить</translation>
+    </message>
+    <message>
+        <source>Change password</source>
+        <translation type="vanished">Сменить пароль</translation>
+    </message>
+    <message>
+        <source>Change</source>
+        <translation type="vanished">Изменить</translation>
+    </message>
+    <message>
+        <source>Change Password</source>
+        <translation type="vanished">Сменить пароль</translation>
+    </message>
+    <message>
         <source>Roles</source>
-        <translation>Роли</translation>
+        <translation type="vanished">Роли</translation>
     </message>
     <message>
-        <location line="+18"/>
         <source>Groups</source>
-        <translation>Группы</translation>
+        <translation type="vanished">Группы</translation>
     </message>
     <message>
-        <location line="+17"/>
         <source>Permissions</source>
-        <translation>Права</translation>
+        <translation type="vanished">Права</translation>
     </message>
     <message>
-        <location line="+31"/>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation type="vanished">Описание</translation>
     </message>
 </context>
 <context>
@@ -8125,8 +8843,6 @@
         <location line="+32"/>
         <location line="+4"/>
         <location line="+116"/>
-        <location line="-116"/>
-        <location line="+116"/>
         <source>Cancel</source>
         <translation>Отмена</translation>
     </message>
@@ -8142,9 +8858,24 @@
     </message>
 </context>
 <context>
+    <name>QMessageBox</name>
+    <message>
+        <location filename="../../../Include/imtgui/TDocumentWorkspaceGuiCompBase.h" line="+318"/>
+        <source>Close document</source>
+        <translation>Закрыть документ</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Do you want to save your changes made in document
+%1</source>
+        <translation>Вы хотите сохранить изменения в документе
+%1</translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
-        <location filename="../../../Include/imtauth/CAccountInfoMetaInfo.cpp" line="+17"/>
+        <location filename="../../../Include/imtaccount/CAccountInfoMetaInfo.cpp" line="+17"/>
         <source>Account Type</source>
         <translation>Тип аккаунта</translation>
     </message>
@@ -8166,30 +8897,30 @@
     </message>
     <message>
         <location line="+2"/>
-        <location filename="../../../Include/imtauth/CContactInfoMetaInfoCreatorComp.cpp" line="+62"/>
+        <location filename="../../../Include/imtaccount/CContactInfoMetaInfoCreatorComp.cpp" line="+62"/>
         <source>Birthday</source>
         <translation>Дата рождения</translation>
     </message>
     <message>
         <location line="+2"/>
-        <location filename="../../../Include/imtauth/CContactInfoMetaInfoCreatorComp.cpp" line="+2"/>
+        <location filename="../../../Include/imtaccount/CContactInfoMetaInfoCreatorComp.cpp" line="+2"/>
         <source>First Name</source>
         <translation>Имя</translation>
     </message>
     <message>
         <location line="+2"/>
-        <location filename="../../../Include/imtauth/CContactInfoMetaInfoCreatorComp.cpp" line="+2"/>
+        <location filename="../../../Include/imtaccount/CContactInfoMetaInfoCreatorComp.cpp" line="+2"/>
         <source>Last Name</source>
         <translation>Фамилия</translation>
     </message>
     <message>
         <location line="+2"/>
-        <location filename="../../../Include/imtauth/CContactInfoMetaInfoCreatorComp.cpp" line="+2"/>
+        <location filename="../../../Include/imtaccount/CContactInfoMetaInfoCreatorComp.cpp" line="+2"/>
         <source>Nickname</source>
         <translation>Псевдоним</translation>
     </message>
     <message>
-        <location filename="../../../Include/imtauth/CAccountInfoMetaInfoCreatorComp.cpp" line="+43"/>
+        <location filename="../../../Include/imtaccount/CAccountInfoMetaInfoCreatorComp.cpp" line="+43"/>
         <source>Private</source>
         <translation>Личный</translation>
     </message>
@@ -8207,27 +8938,23 @@
         <translation>Неизвестный</translation>
     </message>
     <message>
-        <location filename="../../../Include/imtauth/CAddressMetaInfoCreatorComp.cpp" line="+55"/>
         <source>City</source>
-        <translation>Город</translation>
+        <translation type="vanished">Город</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>Country</source>
-        <translation>Страна</translation>
+        <translation type="vanished">Страна</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>Postal Code</source>
-        <translation>Почтовый индекс</translation>
+        <translation type="vanished">Почтовый индекс</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>Street</source>
-        <translation>Улица</translation>
+        <translation type="vanished">Улица</translation>
     </message>
     <message>
-        <location filename="../../../Include/imtauth/CContactInfoMetaInfoCreatorComp.cpp" line="-10"/>
+        <location filename="../../../Include/imtaccount/CContactInfoMetaInfoCreatorComp.cpp" line="-10"/>
         <source>EMail</source>
         <translation>Электронная почта</translation>
     </message>
@@ -8242,11 +8969,6 @@
         <translation>Электронная почта</translation>
     </message>
     <message>
-        <location filename="../../../Include/imtgeo/CAddressCollectionControllerComp.cpp" line="+59"/>
-        <location filename="../../../Include/imtgeo/CAddressControllerComp.cpp" line="+24"/>
-        <location line="+92"/>
-        <location line="+144"/>
-        <location filename="../../../Include/imtgeo/CAddressTreeCollectionControllerComp.cpp" line="+58"/>
         <location filename="../../../Include/imtlicgql/CLicenseControllerComp.cpp" line="+163"/>
         <location filename="../../../Include/imtservergql/CObjectMetaInfoCollectionControllerComp.cpp" line="+30"/>
         <source>Internal error</source>
@@ -8288,32 +9010,44 @@
         <translation>%1</translation>
     </message>
     <message>
-        <location filename="../../../Include/imtgeo/CAddressControllerComp.cpp" line="-129"/>
         <source>Can not insert object: %1</source>
-        <translation>Не удалось вставить объект: %1</translation>
+        <translation type="vanished">Не удалось вставить объект: %1</translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location filename="../../../Include/imtgeo/CAddressControllerComp.cpp" line="+30"/>
+        <source>Unable to get an address info</source>
+        <translation>Не удалось получить информацию об адресе</translation>
+    </message>
+    <message>
+        <location line="+66"/>
         <source>Can not create Address: %1</source>
         <translation>Не удалось создать адрес: %1</translation>
     </message>
     <message>
-        <location line="+71"/>
+        <location line="+20"/>
         <source>Can not create address: %1</source>
         <translation>Не удалось создать адрес: %1</translation>
     </message>
     <message>
-        <location line="+46"/>
+        <location line="+7"/>
+        <source>Unable to get an address info!</source>
+        <translation>Не удалось получить информацию об адресе!</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Invalid JSON input!</source>
+        <translation>Некорректные входные данные JSON!</translation>
+    </message>
+    <message>
         <source>Can not update object: %1</source>
-        <translation>Не удалось обновить объект: %1</translation>
+        <translation type="vanished">Не удалось обновить объект: %1</translation>
     </message>
     <message>
-        <location line="+12"/>
         <source>Can not create object for update: %1</source>
-        <translation>Не удалось создать объект для обновления: %1</translation>
+        <translation type="vanished">Не удалось создать объект для обновления: %1</translation>
     </message>
     <message>
-        <location filename="../../../Include/imtgui/TStandardDocumentViewDecorator.h" line="+366"/>
+        <location filename="../../../Include/imtgui/TStandardDocumentViewDecorator.h" line="+373"/>
         <source>&amp;New</source>
         <translation>&amp;Новый</translation>
     </message>
@@ -8404,7 +9138,6 @@
     </message>
     <message>
         <location line="+1"/>
-        <location line="+0"/>
         <source>Save As</source>
         <translation>Сохранить как</translation>
     </message>
@@ -8533,7 +9266,7 @@
         <translation>ID: %1</translation>
     </message>
     <message>
-        <location filename="../../../Include/imthypegui/TTaskCollectionEditorCompBase.h" line="+308"/>
+        <location filename="../../../Include/imthypegui/TTaskCollectionEditorCompBase.h" line="+305"/>
         <source>Task Manager</source>
         <translation>Менеджер задач</translation>
     </message>
@@ -8543,7 +9276,7 @@
         <translation>Не удалось создать задачу!</translation>
     </message>
     <message>
-        <location line="+87"/>
+        <location line="+93"/>
         <source>Task Error</source>
         <translation>Ошибка задачи</translation>
     </message>
@@ -8553,7 +9286,7 @@
         <translation>Не удалось дублировать задачу!</translation>
     </message>
     <message>
-        <location filename="../../../Include/imthypegui/CTaskManagerGuiComp.cpp" line="+423"/>
+        <location filename="../../../Include/imthypegui/CTaskManagerGuiComp.cpp" line="+425"/>
         <location filename="../../../Include/imthypegui/TTaskCollectionEditorCompBase.h" line="+130"/>
         <source>Enter new task name</source>
         <translation>Введите новое название задачи</translation>
@@ -8566,8 +9299,8 @@
     </message>
     <message>
         <location filename="../../../Include/imthypegui/TTaskCollectionEditorCompBase.h" line="+40"/>
-        <location filename="../../../Include/imtlicgui/CFeatureDependencyEditorBase.cpp" line="+157"/>
-        <location line="+27"/>
+        <location filename="../../../Include/imtlicgui/CFeatureDependencyEditorBase.cpp" line="+156"/>
+        <location line="+26"/>
         <source>Warning</source>
         <translation>Предупреждение</translation>
     </message>
@@ -8587,8 +9320,8 @@
         <translation>Название задачи не может быть пустым</translation>
     </message>
     <message>
-        <location filename="../../../Include/imtlicgui/CFeatureDependencyEditorBase.cpp" line="-26"/>
-        <location line="+27"/>
+        <location filename="../../../Include/imtlicgui/CFeatureDependencyEditorBase.cpp" line="-25"/>
+        <location line="+26"/>
         <source>Feature with ID &apos;%1&apos; depends on feature with ID &apos;%2&apos;</source>
         <translation>Функция с ID &apos;%1&apos; зависит от функции с ID &apos;%2&apos;</translation>
     </message>
@@ -8821,22 +9554,19 @@ Errors: 0</source>
         <translation>Не удалось подключиться к серверу %1 по адресу %2.</translation>
     </message>
     <message>
-        <location filename="../../../Include/imtauth/CSessionMetaInfoCreatorComp.cpp" line="+54"/>
         <source>Token</source>
-        <translation>Токен</translation>
+        <translation type="vanished">Токен</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>User-ID</source>
-        <translation>ID пользователя</translation>
+        <translation type="vanished">ID пользователя</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>Tenant-ID</source>
-        <translation>ID тенанта</translation>
+        <translation type="vanished">ID тенанта</translation>
     </message>
     <message>
-        <location filename="../../../Include/imtdb/CSqlDatabaseDocumentDelegateLegacyComp.cpp" line="+156"/>
+        <location filename="../../../Include/imtdb/CSqlDatabaseDocumentDelegateLegacyComp.cpp" line="+196"/>
         <source>Initial revision</source>
         <translation>Начальная ревизия</translation>
     </message>
@@ -8912,8 +9642,8 @@ Errors: 0</source>
         <translation>Отсутствует версия 1.0 аргументов запроса GQL</translation>
     </message>
     <message>
-        <location filename="../../../Include/imtdb/CDatabaseEngineComp.cpp" line="+276"/>
-        <location line="+254"/>
+        <location filename="../../../Include/imtdb/CDatabaseEngineComp.cpp" line="+297"/>
+        <location line="+295"/>
         <source>Maintenance database name was not set</source>
         <translation>Название служебной базы данных не задано</translation>
     </message>
@@ -8949,7 +9679,7 @@ Errors: 0</source>
 	| Запрос: %2</translation>
     </message>
     <message>
-        <location filename="../../../Include/imthypegui/CTaskSettingsGuiComp.cpp" line="+264"/>
+        <location filename="../../../Include/imthypegui/CTaskSettingsGuiComp.cpp" line="+231"/>
         <source>Reset...</source>
         <translation>Сброс...</translation>
     </message>
@@ -8981,11 +9711,120 @@ Errors: 0</source>
         <source>Palette file parsing error</source>
         <translation>Ошибка разбора файла палитры</translation>
     </message>
+    <message>
+        <location filename="../../../Include/imtdoc/CFileBasedUndoManagerComp.cpp" line="+95"/>
+        <source>Failed to load undo manager state from file: </source>
+        <translation>Не удалось загрузить состояние менеджера отмены из файла: </translation>
+    </message>
+    <message>
+        <location line="+57"/>
+        <source>Failed to remove undo data directory: </source>
+        <translation>Не удалось удалить каталог данных отмены: </translation>
+    </message>
+    <message>
+        <location filename="../../../Include/imtduckdb/CDuckDatabaseEngineComp.cpp" line="+438"/>
+        <source>Database file path was not set. Using an in-memory DuckDB database</source>
+        <translation>Путь к файлу базы данных не задан. Используется база данных DuckDB в памяти</translation>
+    </message>
+</context>
+<context>
+    <name>RelationshipView</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/RelationshipView.qml" line="+75"/>
+        <source>Select the partner organization.</source>
+        <translation>Выберите организацию-партнёра.</translation>
+    </message>
+    <message>
+        <location line="+68"/>
+        <source>Partner Organization</source>
+        <translation>Организация-партнёр</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <location line="+70"/>
+        <source>Select organization...</source>
+        <translation>Выберите организацию...</translation>
+    </message>
+    <message>
+        <location line="-64"/>
+        <source>Select</source>
+        <translation>Выбрать</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>My Role</source>
+        <translation>Моя роль</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Partner Role</source>
+        <translation>Роль партнёра</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Scope</source>
+        <translation>Область</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Optional — empty applies to all resources</source>
+        <translation>Необязательно — если пусто, применяется ко всем ресурсам</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Description</source>
+        <translation>Описание</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Optional description</source>
+        <translation>Необязательное описание</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>The changes take effect when the partner organization approves them.</source>
+        <translation>Изменения вступят в силу после их одобрения организацией-партнёром.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>The relationship comes into force when the partner organization approves it.</source>
+        <translation>Отношения вступят в силу после их одобрения организацией-партнёром.</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Sending...</source>
+        <translation>Отправка...</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Propose Changes</source>
+        <translation>Предложить изменения</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Send Proposal</source>
+        <translation>Отправить предложение</translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <source>No connected organizations. Connect one under Relationships first.</source>
+        <translation>Нет связанных организаций. Сначала добавьте связь в разделе «Связи».</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Choose another organization. Current and partner organizations must be different.</source>
+        <translation>Выберите другую организацию. Текущая организация и организация-партнёр должны различаться.</translation>
+    </message>
 </context>
 <context>
     <name>RemoteCollectionView</name>
     <message>
-        <location filename="../../../Qml/imtguigql/RemoteCollectionView.qml" line="+161"/>
+        <location filename="../../../Qml/imtguigql/RemoteCollectionView.qml" line="+142"/>
+        <source>The documents have been shared</source>
+        <translation>Документы предоставлены в общий доступ</translation>
+    </message>
+    <message>
+        <location line="+154"/>
         <source>This table has been modified from another computer</source>
         <translation>Эта таблица была изменена на другом компьютере</translation>
     </message>
@@ -8996,9 +9835,143 @@ Errors: 0</source>
     </message>
 </context>
 <context>
+    <name>RequirementsDialog</name>
+    <message>
+        <location filename="../../../Qml/imtlicgui/RequirementsDialog.qml" line="+14"/>
+        <source>Add requirements for %1</source>
+        <translation>Добавить требования для %1</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Add requirements</source>
+        <translation>Добавить требования</translation>
+    </message>
+    <message>
+        <location line="+36"/>
+        <source>Add</source>
+        <translation>Добавить</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Cancel</source>
+        <translation>Отмена</translation>
+    </message>
+    <message>
+        <location line="+136"/>
+        <source>Only features of root &apos;%1&apos;</source>
+        <translation>Только функции корня &apos;%1&apos;</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Only features of this Root feature</source>
+        <translation>Только функции этой корневой функции</translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <source>Available features</source>
+        <translation>Доступные функции</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>%1 selected</source>
+        <translation>Выбрано: %1</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Feature</source>
+        <translation>Функция</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Search features</source>
+        <translation>Поиск функций</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>No features to require</source>
+        <translation>Нет функций для добавления в требования</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>No other available features in this root package. Turn off the filter above to see features from other packages.</source>
+        <translation>В этом корневом пакете нет других доступных функций. Отключите фильтр выше, чтобы увидеть функции из других пакетов.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Every feature of the collection is already required or unavailable</source>
+        <translation>Все функции коллекции уже требуются или недоступны</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Clear</source>
+        <translation>Очистить</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Select all</source>
+        <translation>Выделить все</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Already required</source>
+        <translation>Уже требуется</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Sub-feature</source>
+        <translation>Подфункция</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Parent</source>
+        <translation>Родительская</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Cyclic</source>
+        <translation>Циклическая</translation>
+    </message>
+</context>
+<context>
+    <name>RevisionCard</name>
+    <message>
+        <location filename="../../../Qml/imtdocgui/RevisionCard.qml" line="+120"/>
+        <source>Current</source>
+        <translation>Текущая</translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Revision</source>
+        <translation>Ревизия</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>No description provided</source>
+        <translation>Описание отсутствует</translation>
+    </message>
+</context>
+<context>
+    <name>RoleCollectionView</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/RoleCollectionView.qml" line="+23"/>
+        <source>Deleting a role</source>
+        <translation>Удаление роли</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Delete the selected role ?</source>
+        <translation>Удалить выбранную роль ?</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Role</source>
+        <translation>Роль</translation>
+    </message>
+</context>
+<context>
     <name>RoleCollectionViewCommandsDelegate</name>
     <message>
-        <location filename="../../../Qml/imtauthgui/RoleCollectionViewCommandsDelegate.qml" line="+12"/>
+        <location filename="../../../Qml/imtauthgui/RoleCollectionViewCommandsDelegate.qml" line="+10"/>
         <source>Deleting a role</source>
         <translation>Удаление роли</translation>
     </message>
@@ -9011,12 +9984,19 @@ Errors: 0</source>
 <context>
     <name>RoleView</name>
     <message>
-        <location filename="../../../Qml/imtauthgui/RoleView.qml" line="+101"/>
+        <location filename="../../../Qml/imtauthgui/RoleView.qml" line="+292"/>
+        <location line="+63"/>
         <source>General</source>
         <translation>Общее</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="-59"/>
+        <location line="+417"/>
+        <source>History</source>
+        <translation>История</translation>
+    </message>
+    <message>
+        <location line="-341"/>
         <source>Role Name</source>
         <translation>Название роли</translation>
     </message>
@@ -9026,12 +10006,12 @@ Errors: 0</source>
         <translation>Введите название</translation>
     </message>
     <message>
-        <location line="+19"/>
+        <location line="+25"/>
         <source>Role-ID</source>
         <translation>Идентификатор роли</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+12"/>
         <source>Description</source>
         <translation>Описание</translation>
     </message>
@@ -9041,17 +10021,66 @@ Errors: 0</source>
         <translation>Введите описание</translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+85"/>
+        <location line="+143"/>
+        <source>Updating...</source>
+        <translation>Обновление...</translation>
+    </message>
+    <message>
+        <location line="-134"/>
+        <source>Remove</source>
+        <translation>Удалить</translation>
+    </message>
+    <message>
+        <location line="+21"/>
+        <location line="+29"/>
+        <source>Add Parent Role</source>
+        <translation>Добавить родительскую роль</translation>
+    </message>
+    <message>
+        <location line="+39"/>
+        <source>Role</source>
+        <translation>Роль</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>The role has no parent roles.</source>
+        <translation>У роли нет родительских ролей.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Filter roles...</source>
+        <translation>Фильтр ролей...</translation>
+    </message>
+    <message>
+        <location line="+48"/>
+        <source>Selected only</source>
+        <translation>Только выбранные</translation>
+    </message>
+    <message>
+        <location line="+33"/>
+        <source>No product features are enabled for this organization yet. Enable them on the Permissions page of the organization.</source>
+        <translation>Для этой организации ещё не включены функции продуктов. Включите их на странице «Права» организации.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>No permissions available.</source>
+        <translation>Нет доступных прав.</translation>
+    </message>
+    <message>
+        <location line="-385"/>
+        <location line="+203"/>
+        <location line="+58"/>
         <source>Parent Roles</source>
         <translation>Родительские роли</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>Adding Parent Role</source>
-        <translation>Добавить родительскую роль</translation>
+        <translation type="vanished">Добавить родительскую роль</translation>
     </message>
     <message>
-        <location line="+47"/>
+        <location line="-260"/>
+        <location line="+345"/>
         <source>Permissions</source>
         <translation>Права</translation>
     </message>
@@ -9087,7 +10116,7 @@ Errors: 0</source>
 <context>
     <name>SearchAddressComp</name>
     <message>
-        <location filename="../../../Qml/imtgui/View/SearchAddressComp.qml" line="+21"/>
+        <location filename="../../../Qml/imtgui/View/SearchAddressComp.qml" line="+19"/>
         <source>Address</source>
         <translation>Адрес</translation>
     </message>
@@ -9095,22 +10124,65 @@ Errors: 0</source>
 <context>
     <name>SearchCompLegacy</name>
     <message>
-        <location filename="../../../Qml/imtgui/View/SearchCompLegacy.qml" line="+731"/>
+        <location filename="../../../Qml/imtgui/View/SearchCompLegacy.qml" line="+730"/>
         <source>Search</source>
         <translation>Поиск</translation>
     </message>
 </context>
 <context>
+    <name>SearchPage</name>
+    <message>
+        <location filename="../../../Qml/imtgui/View/SearchPage.qml" line="+81"/>
+        <source>Search everything</source>
+        <translation>Поиск по всему</translation>
+    </message>
+    <message>
+        <location line="+19"/>
+        <source>Search across the whole application</source>
+        <translation>Поиск по всему приложению</translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <source>Documents, records and settings from every section are searched at once</source>
+        <translation>Поиск выполняется одновременно по документам, записям и настройкам всех разделов</translation>
+    </message>
+</context>
+<context>
     <name>SearchResultsView</name>
     <message>
-        <location filename="../../../Qml/imtgui/View/SearchResultsView.qml" line="+67"/>
+        <location filename="../../../Qml/imtgui/View/SearchResultsView.qml" line="+127"/>
         <source>No results</source>
         <translation>Нет результатов</translation>
     </message>
     <message>
-        <location line="+122"/>
+        <location line="+0"/>
+        <source>No results for &quot;</source>
+        <translation>Нет результатов по запросу &quot;</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Try adjusting your search query</source>
+        <translation>Попробуйте изменить поисковый запрос</translation>
+    </message>
+    <message>
+        <location line="+91"/>
+        <source>1 result</source>
+        <translation>1 результат</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>%1 results</source>
+        <translation>Результатов: %1</translation>
+    </message>
+    <message>
+        <location line="+84"/>
         <source>Go to the content</source>
         <translation>Перейти к содержимому</translation>
+    </message>
+    <message>
+        <location line="+55"/>
+        <source>Loading more...</source>
+        <translation>Загрузка...</translation>
     </message>
 </context>
 <context>
@@ -9124,14 +10196,13 @@ Errors: 0</source>
 <context>
     <name>SelectableCollectionEditor</name>
     <message>
-        <location filename="../../../Qml/imtguigql/SelectableCollectionEditor.qml" line="+71"/>
+        <location filename="../../../Qml/imtguigql/SelectableCollectionEditor.qml" line="+70"/>
         <source>New</source>
         <translation>Новый</translation>
     </message>
     <message>
         <location line="+15"/>
         <location line="+151"/>
-        <location line="+0"/>
         <source>Add</source>
         <translation>Добавить</translation>
     </message>
@@ -9159,30 +10230,50 @@ Errors: 0</source>
 <context>
     <name>ServerConnectionParamElementView</name>
     <message>
-        <location filename="../../../Qml/imtgui/View/ServerConnectionParamElementView.qml" line="+45"/>
+        <location filename="../../../Qml/imtgui/View/ServerConnectionParamElementView.qml" line="+46"/>
         <source>Server Host</source>
         <translation>Хост сервера</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+1"/>
+        <source>Host name or IP address used by clients to reach the service</source>
+        <translation>Имя хоста или IP-адрес, по которому клиенты подключаются к службе</translation>
+    </message>
+    <message>
+        <location line="+10"/>
         <source>Http Port</source>
         <translation>Порт HTTP</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+1"/>
+        <source>Port used for HTTP service requests</source>
+        <translation>Порт для HTTP-запросов к службе</translation>
+    </message>
+    <message>
+        <location line="+10"/>
         <source>Web Socket Port</source>
         <translation>Порт WebSocket</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+1"/>
+        <source>Port used for WebSocket connections and subscriptions</source>
+        <translation>Порт для WebSocket-соединений и подписок</translation>
+    </message>
+    <message>
+        <location line="+10"/>
         <source>Secure Connection</source>
         <translation>Защищённое соединение</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Uses encrypted HTTPS and secure WebSocket connections</source>
+        <translation>Использует зашифрованные соединения HTTPS и защищённый WebSocket</translation>
     </message>
 </context>
 <context>
     <name>ServerLogProvider</name>
     <message>
-        <location filename="../../../Qml/imtgui/Settings/ServerLogProvider.qml" line="+18"/>
+        <location filename="../../../Qml/imtgui/Settings/ServerLogProvider.qml" line="+17"/>
         <source>Server Log</source>
         <translation>Серверный лог</translation>
     </message>
@@ -9195,6 +10286,37 @@ Errors: 0</source>
         <location line="+13"/>
         <source>Save file</source>
         <translation>Сохранение файла</translation>
+    </message>
+</context>
+<context>
+    <name>ServerNoConnectionView</name>
+    <message>
+        <location filename="../../../Qml/imtgui/View/ServerNoConnectionView.qml" line="+135"/>
+        <source>Connecting...</source>
+        <translation>Подключение...</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Reconnecting...</source>
+        <translation>Повторное подключение...</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>s</source>
+        <translation>с</translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <source>Retry now</source>
+        <translation>Повторить сейчас</translation>
+    </message>
+</context>
+<context>
+    <name>ServerPathPicker</name>
+    <message>
+        <location filename="../../../Qml/imtguigql/ServerPathPicker.qml" line="+83"/>
+        <source>Browse...</source>
+        <translation>Обзор...</translation>
     </message>
 </context>
 <context>
@@ -9216,9 +10338,268 @@ Errors: 0</source>
     </message>
 </context>
 <context>
+    <name>ShareDocumentDialog</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/ShareDocumentDialog.qml" line="+25"/>
+        <source>Share &quot;%1&quot;</source>
+        <translation>Поделиться «%1»</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Share %1 documents</source>
+        <translation>Поделиться документами (%1)</translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <source>Share</source>
+        <translation>Поделиться</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Cancel</source>
+        <translation>Отмена</translation>
+    </message>
+    <message>
+        <location line="+82"/>
+        <location line="+232"/>
+        <source>Can edit</source>
+        <translation>Может редактировать</translation>
+    </message>
+    <message>
+        <location line="-232"/>
+        <location line="+225"/>
+        <source>Can view</source>
+        <translation>Может просматривать</translation>
+    </message>
+    <message>
+        <location line="-178"/>
+        <source>Share with</source>
+        <translation>Поделиться с</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Clear selection</source>
+        <translation>Снять выбор</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Select all</source>
+        <translation>Выделить все</translation>
+    </message>
+    <message>
+        <location line="+31"/>
+        <source>Loading organizations...</source>
+        <translation>Загрузка организаций...</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>There are no related organizations. Documents can be shared only with organizations that have an active relationship with yours.</source>
+        <translation>Нет связанных организаций. Делиться документами можно только с организациями, имеющими активную связь с вашей.</translation>
+    </message>
+    <message>
+        <location line="+81"/>
+        <source>Remove access</source>
+        <translation>Удалить доступ</translation>
+    </message>
+    <message>
+        <location line="+35"/>
+        <source>Access</source>
+        <translation>Доступ</translation>
+    </message>
+    <message>
+        <location line="+40"/>
+        <source>Members of the organizations can open and change the document. Only your organization can delete it.</source>
+        <translation>Участники организаций могут открывать и изменять документ. Удалить его может только ваша организация.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Members of the organizations can open the document, but cannot change it.</source>
+        <translation>Участники организаций могут открывать документ, но не могут его изменять.</translation>
+    </message>
+    <message>
+        <location line="+17"/>
+        <source>Expires</source>
+        <translation>Истекает</translation>
+    </message>
+    <message>
+        <location line="+31"/>
+        <source>Message</source>
+        <translation>Сообщение</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>Optional note for the organizations</source>
+        <translation>Необязательное примечание для организаций</translation>
+    </message>
+    <message>
+        <location line="+21"/>
+        <source>Never</source>
+        <translation>Никогда</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>In 7 days</source>
+        <translation>Через 7 дней</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>In 30 days</source>
+        <translation>Через 30 дней</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>In 90 days</source>
+        <translation>Через 90 дней</translation>
+    </message>
+</context>
+<context>
+    <name>SharingScopeFilterDelegate</name>
+    <message>
+        <location filename="../../../Qml/imtguigql/SharingScopeFilterDelegate.qml" line="+14"/>
+        <source>Sharing</source>
+        <translation>Общий доступ</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Our documents</source>
+        <translation>Наши документы</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Shared with us</source>
+        <translation>Доступные нам</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Shared by us</source>
+        <translation>Предоставленные нами</translation>
+    </message>
+</context>
+<context>
+    <name>SimpleCollectionItemDelegateBase</name>
+    <message>
+        <location filename="../../../Qml/imtgui/View/SimpleCollectionItemDelegateBase.qml" line="+157"/>
+        <source>Actions</source>
+        <translation>Действия</translation>
+    </message>
+    <message>
+        <location line="+21"/>
+        <source>Edit</source>
+        <translation>Редактировать</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Delete</source>
+        <translation>Удалить</translation>
+    </message>
+</context>
+<context>
+    <name>SimpleCollectionPage</name>
+    <message>
+        <location filename="../../../Qml/imtdocgui/SimpleCollectionPage.qml" line="+128"/>
+        <source>Are you sure you want to delete &quot;%1&quot;? This action cannot be undone.</source>
+        <translation>Вы уверены, что хотите удалить «%1»? Это действие нельзя отменить.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Are you sure you want to delete %1 selected item(s)? This action cannot be undone.</source>
+        <translation>Вы уверены, что хотите удалить выбранные элементы (%1)? Это действие нельзя отменить.</translation>
+    </message>
+    <message>
+        <location line="+149"/>
+        <source>Create %1</source>
+        <translation>Создать: %1</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>No %1 found.</source>
+        <translation>%1: ничего не найдено.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Filter %1...</source>
+        <translation>Фильтр: %1...</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <location line="+1"/>
+        <source>Delete %1</source>
+        <translation>Удалить: %1</translation>
+    </message>
+    <message>
+        <location line="+26"/>
+        <source>Create New %1</source>
+        <translation>Создать: %1</translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <source>Edit %1</source>
+        <translation>Редактировать: %1</translation>
+    </message>
+    <message>
+        <location line="+103"/>
+        <source>Remove</source>
+        <translation>Удалить</translation>
+    </message>
+    <message>
+        <location line="+25"/>
+        <source>Edit</source>
+        <translation>Редактировать</translation>
+    </message>
+    <message>
+        <location line="+101"/>
+        <source>Error loading items</source>
+        <translation>Ошибка загрузки элементов</translation>
+    </message>
+</context>
+<context>
+    <name>SimpleCollectionStateOverlay</name>
+    <message>
+        <location filename="../../../Qml/imtgui/View/SimpleCollectionStateOverlay.qml" line="+29"/>
+        <source>Loading...</source>
+        <translation>Загрузка...</translation>
+    </message>
+</context>
+<context>
+    <name>SimpleCollectionTable</name>
+    <message>
+        <location filename="../../../Qml/imtgui/View/SimpleCollectionTable.qml" line="+60"/>
+        <source>No items found.</source>
+        <translation>Ничего не найдено.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Filter items...</source>
+        <translation>Фильтр элементов...</translation>
+    </message>
+    <message>
+        <location line="+347"/>
+        <source>Loading more...</source>
+        <translation>Загрузка...</translation>
+    </message>
+</context>
+<context>
+    <name>SimpleCollectionTableHeader</name>
+    <message>
+        <location filename="../../../Qml/imtgui/View/SimpleCollectionTableHeader.qml" line="+51"/>
+        <source>%1 selected</source>
+        <translation>Выбрано: %1</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Select all</source>
+        <translation>Выделить все</translation>
+    </message>
+</context>
+<context>
     <name>SingleDocumentCollectionView</name>
     <message>
-        <location filename="../../../Qml/imtdocgui/SingleDocumentCollectionView.qml" line="+290"/>
+        <location filename="../../../Qml/imtdocgui/SingleDocumentCollectionView.qml" line="+255"/>
+        <source>The document &quot;%1&quot; is no longer open on the server and was closed</source>
+        <translation>Документ &quot;%1&quot; больше не открыт на сервере и был закрыт</translation>
+    </message>
+    <message>
+        <location line="+225"/>
         <source>Save document</source>
         <translation>Сохранение документа</translation>
     </message>
@@ -9226,6 +10607,11 @@ Errors: 0</source>
         <location line="+1"/>
         <source>Save all changes ?</source>
         <translation>Сохранить все изменения ?</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Save changes to &quot;%1&quot;?</source>
+        <translation>Сохранить изменения в «%1»?</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -9239,9 +10625,52 @@ Errors: 0</source>
     </message>
 </context>
 <context>
+    <name>SingleDocumentWorkspaceShellView</name>
+    <message>
+        <location filename="../../../Qml/imtdocgui/SingleDocumentWorkspaceShellView.qml" line="+375"/>
+        <source>Save document</source>
+        <translation>Сохранение документа</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Save changes to &quot;%1&quot;?</source>
+        <translation>Сохранить изменения в «%1»?</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Save all changes ?</source>
+        <translation>Сохранить все изменения ?</translation>
+    </message>
+    <message>
+        <location line="+32"/>
+        <source>Document Name</source>
+        <translation>Название документа</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Enter the document name</source>
+        <translation>Введите название документа</translation>
+    </message>
+    <message>
+        <location line="+114"/>
+        <source>No document selected</source>
+        <translation>Документ не выбран</translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>Failed to open document</source>
+        <translation>Не удалось открыть документ</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Retry</source>
+        <translation>Повторить</translation>
+    </message>
+</context>
+<context>
     <name>SingleDocumentWorkspaceView</name>
     <message>
-        <location filename="../../../Qml/imtdocgui/SingleDocumentWorkspaceView.qml" line="+134"/>
+        <location filename="../../../Qml/imtdocgui/SingleDocumentWorkspaceView.qml" line="+138"/>
         <source>Save document</source>
         <translation>Сохранение документа</translation>
     </message>
@@ -9255,7 +10684,6 @@ Errors: 0</source>
     <name>SingleStatusProviderGui</name>
     <message>
         <location filename="../../../Include/imtgui/CSingleStatusProviderGuiComp.ui" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CSingleStatusProviderGuiComp.h" line="+59"/>
         <source>Form</source>
         <translation>Форма</translation>
     </message>
@@ -9263,7 +10691,7 @@ Errors: 0</source>
 <context>
     <name>StructureAddressView</name>
     <message>
-        <location filename="../../../Qml/imtgeogui/StructureAddressView.qml" line="+23"/>
+        <location filename="../../../Qml/imtgeogui/StructureAddressView.qml" line="+22"/>
         <source>Country</source>
         <translation>Страна</translation>
     </message>
@@ -9324,13 +10752,12 @@ Errors: 0</source>
     </message>
     <message>
         <location line="+0"/>
-        <location line="+92"/>
-        <location line="+0"/>
+        <location line="+88"/>
         <source>Other</source>
         <translation>Другое</translation>
     </message>
     <message>
-        <location line="+34"/>
+        <location line="+41"/>
         <source>Save</source>
         <translation>Сохранить</translation>
     </message>
@@ -9340,7 +10767,7 @@ Errors: 0</source>
         <translation>Закрыть</translation>
     </message>
     <message>
-        <location line="+356"/>
+        <location line="+369"/>
         <source>Add</source>
         <translation>Добавить</translation>
     </message>
@@ -9360,7 +10787,7 @@ Errors: 0</source>
         <translation>Очистить</translation>
     </message>
     <message>
-        <location line="+62"/>
+        <location line="+64"/>
         <source>Remove address</source>
         <translation>Удалить адрес</translation>
     </message>
@@ -9370,7 +10797,7 @@ Errors: 0</source>
         <translation>Вы хотите удалить адрес?</translation>
     </message>
     <message>
-        <location line="+61"/>
+        <location line="+62"/>
         <source>Coordinates:</source>
         <translation>Координаты:</translation>
     </message>
@@ -9388,32 +10815,35 @@ Errors: 0</source>
 <context>
     <name>SuperuserPasswordPage</name>
     <message>
-        <location filename="../../../Qml/imtauthgui/SuperuserPasswordPage.qml" line="+67"/>
         <source>Please fill in the information for the system administrator</source>
-        <translation>Пожалуйста, заполните информацию для системного администратора</translation>
+        <translation type="vanished">Пожалуйста, заполните информацию для системного администратора</translation>
     </message>
     <message>
-        <location line="+30"/>
         <source>OK</source>
-        <translation>ОК</translation>
+        <translation type="vanished">ОК</translation>
     </message>
     <message>
+        <location filename="../../../Qml/imtauthgui/SuperuserPasswordPage.qml" line="+67"/>
         <source>Unable to create the administrator account</source>
         <translation>Не удалось создать учётную запись администратора</translation>
     </message>
     <message>
+        <location line="+12"/>
         <source>Unable to reach server</source>
         <translation>Не удалось связаться с сервером</translation>
     </message>
     <message>
+        <location line="+92"/>
         <source>Create the administrator account</source>
         <translation>Создайте учётную запись администратора</translation>
     </message>
     <message>
+        <location line="+13"/>
         <source>This server doesn&apos;t have one yet. Set a name and password below - you&apos;ll sign in with them right after.</source>
         <translation>На этом сервере её ещё нет. Задайте имя и пароль ниже — сразу после этого вы войдёте с ними.</translation>
     </message>
     <message>
+        <location line="+133"/>
         <source>Create account</source>
         <translation>Создать учётную запись</translation>
     </message>
@@ -9421,19 +10851,17 @@ Errors: 0</source>
 <context>
     <name>TDocumentWorkspaceGuiCompBase</name>
     <message>
-        <location filename="../../../Include/imtgui/TDocumentWorkspaceGuiCompBase.h" line="+318"/>
         <source>Close document</source>
-        <translation>Закрыть документ</translation>
+        <translation type="vanished">Закрыть документ</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>Do you want to save your changes made in document
 %1</source>
-        <translation>Вы хотите сохранить изменения в документе
+        <translation type="vanished">Вы хотите сохранить изменения в документе
 %1</translation>
     </message>
     <message>
-        <location line="+125"/>
+        <location filename="../../../Include/imtgui/TDocumentWorkspaceGuiCompBase.h" line="+125"/>
         <source>Document could not be opened</source>
         <translation>Не удалось открыть документ</translation>
     </message>
@@ -9441,7 +10869,12 @@ Errors: 0</source>
 <context>
     <name>TTaskCollectionEditorCompBase</name>
     <message>
-        <location filename="../../../Include/imthypegui/TTaskCollectionEditorCompBase.h" line="-33"/>
+        <location filename="../../../Include/imthypegui/TTaskCollectionEditorCompBase.h" line="-180"/>
+        <source>Copy of</source>
+        <translation>Копия</translation>
+    </message>
+    <message>
+        <location line="+147"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
@@ -9451,7 +10884,7 @@ Errors: 0</source>
         <translation>Название задачи содержит недопустимые символы</translation>
     </message>
     <message>
-        <location line="+346"/>
+        <location line="+344"/>
         <source>Task name: </source>
         <translation>Название задачи: </translation>
     </message>
@@ -9471,24 +10904,35 @@ ID входных данных: </translation>
     </message>
 </context>
 <context>
+    <name>TabPanel</name>
+    <message>
+        <location filename="../../../Qml/imtgui/Panels/TabPanel.qml" line="+164"/>
+        <source>Previous tab</source>
+        <translation>Предыдущая вкладка</translation>
+    </message>
+    <message>
+        <location line="+26"/>
+        <source>Next tab</source>
+        <translation>Следующая вкладка</translation>
+    </message>
+</context>
+<context>
     <name>TableHeaderParamComp</name>
     <message>
-        <location filename="../../../Qml/imtcontrols/Views/TableHeaderParamComp.qml" line="+12"/>
+        <location filename="../../../Qml/imtcontrols/Views/TableHeaderParamComp.qml" line="+26"/>
         <source>Table configuration</source>
         <translation>Конфигурация таблицы</translation>
     </message>
     <message>
-        <location line="+96"/>
         <source>Select at least one column</source>
-        <translation>Выберите хотя бы одну колонку</translation>
+        <translation type="vanished">Выберите хотя бы одну колонку</translation>
     </message>
     <message>
-        <location line="+120"/>
         <source>Available Columns</source>
-        <translation>Доступные колонки</translation>
+        <translation type="vanished">Доступные колонки</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+21"/>
         <source>Apply</source>
         <translation>Применить</translation>
     </message>
@@ -9498,7 +10942,67 @@ ID входных данных: </translation>
         <translation>Отмена</translation>
     </message>
     <message>
+        <location line="+237"/>
+        <source>Columns</source>
+        <translation>Столбцы</translation>
+    </message>
+    <message>
         <location line="+19"/>
+        <source>Clear</source>
+        <translation>Очистить</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Show all</source>
+        <translation>Показать все</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Reset</source>
+        <translation>Сбросить</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Reset to default columns</source>
+        <translation>Восстановить столбцы по умолчанию</translation>
+    </message>
+    <message>
+        <location line="+246"/>
+        <source>This table has no columns to configure</source>
+        <translation>В этой таблице нет настраиваемых столбцов</translation>
+    </message>
+    <message>
+        <location line="+32"/>
+        <source>Move up</source>
+        <translation>Переместить вверх</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>Move down</source>
+        <translation>Переместить вниз</translation>
+    </message>
+    <message>
+        <location line="+18"/>
+        <source>Select a column to move it</source>
+        <translation>Выберите столбец, чтобы переместить его</translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <source>Fit to width</source>
+        <translation>По ширине</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Fit columns to available width</source>
+        <translation>Подогнать столбцы под доступную ширину</translation>
+    </message>
+    <message>
+        <location line="+26"/>
+        <source>Show at least one column</source>
+        <translation>Оставьте хотя бы один столбец</translation>
+    </message>
+    <message>
+        <location line="+13"/>
         <source>Confirm reset headers</source>
         <translation>Подтверждение сброса</translation>
     </message>
@@ -9506,6 +11010,19 @@ ID входных данных: </translation>
         <location line="+1"/>
         <source>Reset header settings to default ?</source>
         <translation>Сбросить настройки заголовков на стандартные ?</translation>
+    </message>
+</context>
+<context>
+    <name>TableRowDetails</name>
+    <message>
+        <location filename="../../../Qml/imtcontrols/Views/TableRowDetails.qml" line="+15"/>
+        <source>Select a row to see it in full here</source>
+        <translation>Выберите строку, чтобы увидеть её здесь полностью</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Copy</source>
+        <translation>Скопировать</translation>
     </message>
 </context>
 <context>
@@ -9521,7 +11038,7 @@ ID входных данных: </translation>
         <translation>Ничего не найдено.</translation>
     </message>
     <message>
-        <location line="+145"/>
+        <location line="+192"/>
         <source>Edit</source>
         <translation>Редактировать</translation>
     </message>
@@ -9531,7 +11048,7 @@ ID входных данных: </translation>
         <translation>Удалить</translation>
     </message>
     <message>
-        <location line="+89"/>
+        <location line="-70"/>
         <source>Loading...</source>
         <translation>Загрузка...</translation>
     </message>
@@ -9539,7 +11056,42 @@ ID входных данных: </translation>
 <context>
     <name>TenantCollectionView</name>
     <message>
-        <location filename="../../../Qml/imtauthgui/TenantCollectionView.qml" line="+180"/>
+        <location filename="../../../Qml/imtauthgui/TenantCollectionView.qml" line="+70"/>
+        <source>Leave organization</source>
+        <translation>Покинуть организацию</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Are you sure you want to leave &quot;%1&quot;?</source>
+        <translation>Вы уверены, что хотите покинуть «%1»?</translation>
+    </message>
+    <message>
+        <location line="+145"/>
+        <source>Owner</source>
+        <translation>Владелец</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Creator</source>
+        <translation>Создатель</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Member</source>
+        <translation>Участник</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Invited</source>
+        <translation>Приглашён</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Delegated</source>
+        <translation>Делегирован</translation>
+    </message>
+    <message>
+        <location line="+59"/>
         <source>Invited by: %1</source>
         <translation>Приглашён: %1</translation>
     </message>
@@ -9559,16 +11111,19 @@ ID входных данных: </translation>
         <translation>Отклонить</translation>
     </message>
     <message>
-        <location line="+82"/>
-        <location line="+37"/>
-        <location line="+0"/>
+        <location line="+67"/>
+        <source>No parent</source>
+        <translation>Нет родителя</translation>
+    </message>
+    <message>
+        <location line="+70"/>
+        <location line="+14"/>
         <source>Active</source>
         <translation>Активный</translation>
     </message>
     <message>
-        <location line="-37"/>
-        <location line="+38"/>
-        <location line="+0"/>
+        <location line="-14"/>
+        <location line="+15"/>
         <source>Inactive</source>
         <translation>Неактивный</translation>
     </message>
@@ -9598,24 +11153,657 @@ ID входных данных: </translation>
         <translation>Я приглашён</translation>
     </message>
     <message>
-        <location line="+43"/>
+        <location line="+115"/>
+        <source>Activate organization</source>
+        <translation>Активация организации</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>&quot;%1&quot; is inactive. Activate it and switch to it?</source>
+        <translation>Организация «%1» неактивна. Активировать её и переключиться на неё?</translation>
+    </message>
+    <message>
+        <location line="+22"/>
+        <source>Switch organization</source>
+        <translation>Переключение организации</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>An organization can be edited only while you work in it. Switch to &quot;%1&quot; and open it?</source>
+        <translation>Организацию можно редактировать, только работая в ней. Переключиться на «%1» и открыть её?</translation>
+    </message>
+    <message>
+        <location line="+146"/>
+        <source>Remove organization</source>
+        <translation>Удаление организации</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Remove the organization &quot;%1&quot;?</source>
+        <translation>Удалить организацию «%1»?</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Remove organizations</source>
+        <translation>Удаление организаций</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Remove %1 organizations?</source>
+        <translation>Удалить организации (%1)?</translation>
+    </message>
+    <message>
+        <location line="+40"/>
+        <source>Only the members of &quot;%1&quot; can edit it.</source>
+        <translation>Редактировать организацию «%1» могут только её участники.</translation>
+    </message>
+    <message>
+        <location line="+60"/>
         <source>Organization</source>
         <translation>Организация</translation>
+    </message>
+    <message>
+        <location line="+36"/>
+        <source>The organization &quot;%1&quot; was created inactive. Activate it to work in it.</source>
+        <translation>Организация «%1» создана неактивной. Активируйте её, чтобы работать в ней.</translation>
+    </message>
+</context>
+<context>
+    <name>TenantConnectOrganizationPage</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/TenantConnectOrganizationPage.qml" line="+98"/>
+        <source>Connection request sent successfully</source>
+        <translation>Запрос на подключение успешно отправлен</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <location line="+15"/>
+        <source>Approve failed</source>
+        <translation>Не удалось одобрить</translation>
+    </message>
+    <message>
+        <location line="-13"/>
+        <location line="+15"/>
+        <source>Reject failed</source>
+        <translation>Не удалось отклонить</translation>
+    </message>
+    <message>
+        <location line="-13"/>
+        <location line="+15"/>
+        <source>Cancel failed</source>
+        <translation>Не удалось отменить</translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>Approved</source>
+        <translation>Одобрен</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Connection request approved</source>
+        <translation>Запрос на подключение одобрен</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Rejected</source>
+        <translation>Отклонён</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Connection request rejected</source>
+        <translation>Запрос на подключение отклонён</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Canceled</source>
+        <translation>Отменён</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Connection request canceled</source>
+        <translation>Запрос на подключение отменён</translation>
+    </message>
+    <message>
+        <location line="+18"/>
+        <source>Connection removed</source>
+        <translation>Подключение удалено</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <location line="+84"/>
+        <source>Unknown Organization</source>
+        <translation>Неизвестная организация</translation>
+    </message>
+    <message>
+        <location line="+27"/>
+        <source>Connect Organization</source>
+        <translation>Подключить организацию</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Enter the Connection Code of the organization you want to connect with.</source>
+        <translation>Введите код подключения организации, с которой хотите связаться.</translation>
+    </message>
+    <message>
+        <location line="+31"/>
+        <source>Connection Code</source>
+        <translation>Код подключения</translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <source>Enter code...</source>
+        <translation>Введите код...</translation>
+    </message>
+    <message>
+        <location line="+18"/>
+        <source>Message (optional)</source>
+        <translation>Сообщение (необязательно)</translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <source>Add a message...</source>
+        <translation>Добавьте сообщение...</translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>Sending...</source>
+        <translation>Отправка...</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Send Request</source>
+        <translation>Отправить запрос</translation>
+    </message>
+    <message>
+        <location line="+23"/>
+        <source>Incoming Requests</source>
+        <translation>Входящие запросы</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>No pending incoming requests.</source>
+        <translation>Нет ожидающих входящих запросов.</translation>
+    </message>
+    <message>
+        <location line="+21"/>
+        <source>Sent Requests</source>
+        <translation>Отправленные запросы</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>No pending sent requests.</source>
+        <translation>Нет ожидающих отправленных запросов.</translation>
+    </message>
+    <message>
+        <location line="+21"/>
+        <source>Established Connections</source>
+        <translation>Установленные подключения</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Organizations you are connected with.</source>
+        <translation>Организации, с которыми у вас есть подключение.</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>No established connections yet.</source>
+        <translation>Установленных подключений пока нет.</translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <location line="+15"/>
+        <location line="+15"/>
+        <source>Organization</source>
+        <translation>Организация</translation>
+    </message>
+    <message>
+        <location line="-29"/>
+        <location line="+15"/>
+        <source>Message</source>
+        <translation>Сообщение</translation>
+    </message>
+    <message>
+        <location line="-14"/>
+        <source>Received</source>
+        <translation>Получен</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <location line="+15"/>
+        <source>State</source>
+        <translation>Состояние</translation>
+    </message>
+    <message>
+        <location line="-1"/>
+        <source>Sent</source>
+        <translation>Отправлен</translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <source>Owner</source>
+        <translation>Владелец</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Connected since</source>
+        <translation>Подключено с</translation>
+    </message>
+    <message>
+        <location line="+19"/>
+        <source>Approving...</source>
+        <translation>Одобрение...</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Rejecting...</source>
+        <translation>Отклонение...</translation>
+    </message>
+    <message>
+        <location line="+24"/>
+        <source>Approve</source>
+        <translation>Одобрить</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>Reject</source>
+        <translation>Отклонить</translation>
+    </message>
+    <message>
+        <location line="+27"/>
+        <source>Canceling...</source>
+        <translation>Отмена...</translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <source>Cancel</source>
+        <translation>Отмена</translation>
+    </message>
+    <message>
+        <location line="+25"/>
+        <source>Remove</source>
+        <translation>Удалить</translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <source>Remove connection</source>
+        <translation>Удалить подключение</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Are you sure you want to remove the connection with &quot;%1&quot;?
+
+All relationships with this organization will also be removed.</source>
+        <translation>Вы уверены, что хотите удалить подключение к «%1»?
+
+Все связи с этой организацией также будут удалены.</translation>
+    </message>
+</context>
+<context>
+    <name>TenantConnectionCodePage</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/TenantConnectionCodePage.qml" line="+79"/>
+        <source>Connection Code</source>
+        <translation>Код подключения</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Share this code with other organizations so they can send you a connection request.</source>
+        <translation>Сообщите этот код другим организациям, чтобы они могли отправить вам запрос на подключение.</translation>
+    </message>
+    <message>
+        <location line="+25"/>
+        <source>Loading...</source>
+        <translation>Загрузка...</translation>
+    </message>
+    <message>
+        <location line="+57"/>
+        <source>Copied!</source>
+        <translation>Скопировано!</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Regenerate Code</source>
+        <translation>Сгенерировать код заново</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Regenerate Connection Code</source>
+        <translation>Повторная генерация кода подключения</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Are you sure you want to regenerate the connection code? The old code will stop working.</source>
+        <translation>Вы уверены, что хотите сгенерировать код подключения заново? Старый код перестанет работать.</translation>
+    </message>
+    <message>
+        <location line="+19"/>
+        <source>Access</source>
+        <translation>Доступ</translation>
+    </message>
+    <message>
+        <location line="+29"/>
+        <source>Allow other organizations to connect by code</source>
+        <translation>Разрешить другим организациям подключаться по коду</translation>
+    </message>
+    <message>
+        <location line="+28"/>
+        <source>When disabled, other organizations cannot send you connection requests using your code.</source>
+        <translation>Если отключено, другие организации не смогут отправлять вам запросы на подключение по вашему коду.</translation>
+    </message>
+</context>
+<context>
+    <name>TenantContractsPage</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/TenantContractsPage.qml" line="+23"/>
+        <source>Contract</source>
+        <translation>Договор</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Cooperation Contracts</source>
+        <translation>Договоры о сотрудничестве</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Manage bilateral cooperation agreements with partner tenants.</source>
+        <translation>Управление двусторонними соглашениями о сотрудничестве с организациями-партнёрами.</translation>
+    </message>
+    <message>
+        <location line="+34"/>
+        <source>Contract created successfully</source>
+        <translation>Договор успешно создан</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Contract status updated</source>
+        <translation>Статус договора обновлён</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Contract terminated</source>
+        <translation>Договор расторгнут</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>+ Create Contract</source>
+        <translation>+ Создать договор</translation>
+    </message>
+    <message>
+        <location line="+45"/>
+        <source>Target: %1</source>
+        <translation>Цель: %1</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Status: %1   Scope: %2</source>
+        <translation>Статус: %1   Область: %2</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Draft</source>
+        <translation>Черновик</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>All</source>
+        <translation>Все</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Valid: %1 – %2</source>
+        <translation>Действует: %1 – %2</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>now</source>
+        <translation>сейчас</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>open</source>
+        <translation>бессрочно</translation>
+    </message>
+    <message>
+        <location line="+21"/>
+        <source>Activate</source>
+        <translation>Активировать</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Terminate</source>
+        <translation>Расторгнуть</translation>
+    </message>
+</context>
+<context>
+    <name>TenantCrossOrgGrantsPage</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/TenantCrossOrgGrantsPage.qml" line="+21"/>
+        <source>Grant</source>
+        <translation>Предоставить</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Cross Organization Grants</source>
+        <translation>Межорганизационные права доступа</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Delegate scoped access from this organization to another organization.</source>
+        <translation>Делегирование ограниченного доступа от этой организации другой организации.</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>Organization</source>
+        <translation>Организация</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Roles</source>
+        <translation>Роли</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Direction</source>
+        <translation>Направление</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>State</source>
+        <translation>Состояние</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Expires</source>
+        <translation>Истекает</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Description</source>
+        <translation>Описание</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Received</source>
+        <translation>Получен</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Granted</source>
+        <translation>Предоставлен</translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Inactive</source>
+        <translation>Неактивный</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Active</source>
+        <translation>Активный</translation>
+    </message>
+</context>
+<context>
+    <name>TenantDocumentSharesPage</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/TenantDocumentSharesPage.qml" line="+63"/>
+        <source>Edit</source>
+        <translation>Редактировать</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>View</source>
+        <translation>Просмотр</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>%1, until %2</source>
+        <translation>%1, до %2</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Declined</source>
+        <translation>Отклонён</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Pending</source>
+        <translation>Ожидание</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Active</source>
+        <translation>Активный</translation>
+    </message>
+    <message>
+        <location line="+53"/>
+        <source>Revoke</source>
+        <translation>Отозвать</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Groups (%1)...</source>
+        <translation>Группы (%1)...</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Groups...</source>
+        <translation>Группы...</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Decline</source>
+        <translation>Отклонить</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Accept</source>
+        <translation>Принять</translation>
+    </message>
+    <message>
+        <location line="+77"/>
+        <source>Received</source>
+        <translation>Получен</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Documents shared with this organization are visible to its members within their own permissions. Restrict a received document to some groups to hide it from the others.</source>
+        <translation>Документы, предоставленные этой организации, видны её участникам в рамках их прав. Ограничьте полученный документ некоторыми группами, чтобы скрыть его от остальных.</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>No documents are shared with this organization</source>
+        <translation>Этой организации не предоставлено ни одного документа</translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <source>Shared by us</source>
+        <translation>Предоставленные нами</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>This organization shares no documents</source>
+        <translation>Эта организация не предоставляет доступ ни к одному документу</translation>
+    </message>
+    <message>
+        <location line="+19"/>
+        <location line="+16"/>
+        <source>Document</source>
+        <translation>Документ</translation>
+    </message>
+    <message>
+        <location line="-15"/>
+        <source>From</source>
+        <translation>От</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <location line="+16"/>
+        <source>Access</source>
+        <translation>Доступ</translation>
+    </message>
+    <message>
+        <location line="-15"/>
+        <location line="+16"/>
+        <source>State</source>
+        <translation>Состояние</translation>
+    </message>
+    <message>
+        <location line="-2"/>
+        <source>To</source>
+        <translation>Кому</translation>
+    </message>
+    <message>
+        <location line="+55"/>
+        <location line="+60"/>
+        <source>Actions</source>
+        <translation>Действия</translation>
+    </message>
+    <message>
+        <location line="+24"/>
+        <source>Groups seeing the document</source>
+        <translation>Группы, которым виден документ</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Save</source>
+        <translation>Сохранить</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Cancel</source>
+        <translation>Отмена</translation>
+    </message>
+    <message>
+        <location line="+31"/>
+        <source>Without groups every member of the organization sees the document.</source>
+        <translation>Если группы не указаны, документ видят все участники организации.</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Groups</source>
+        <translation>Группы</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Add Group</source>
+        <translation>Добавить группу</translation>
     </message>
 </context>
 <context>
     <name>TenantEditor</name>
     <message>
+        <location filename="../../../Qml/imtauthgui/TenantEditor.qml" line="+209"/>
+        <location line="+11"/>
         <source>Available permissions</source>
         <translation>Доступные права</translation>
     </message>
     <message>
-        <location filename="../../../Qml/imtauthgui/TenantEditor.qml" line="+104"/>
+        <location line="-14"/>
         <source>General</source>
         <translation>Общее</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+6"/>
         <source>Members</source>
         <translation>Участники</translation>
     </message>
@@ -9625,20 +11813,89 @@ ID входных данных: </translation>
         <translation>Роли</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+3"/>
         <source>Groups</source>
         <translation>Группы</translation>
     </message>
     <message>
+        <location line="+6"/>
+        <source>Grants</source>
+        <translation>Права доступа</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Relationships</source>
+        <translation>Отношения</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Connection Code</source>
+        <translation>Код подключения</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Connect Organization</source>
+        <translation>Подключить организацию</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>My Relationships</source>
+        <translation>Мои отношения</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Proposals</source>
+        <translation>Предложения</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Shared Documents</source>
+        <translation>Общие документы</translation>
+    </message>
+    <message>
+        <location line="+102"/>
+        <source>Invitation created successfully</source>
+        <translation>Приглашение успешно создано</translation>
+    </message>
+    <message>
         <location line="+3"/>
+        <source>Ownership transferred successfully</source>
+        <translation>Владение успешно передано</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Role created successfully</source>
+        <translation>Роль успешно создана</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Group created successfully</source>
+        <translation>Группа успешно создана</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>User created successfully</source>
+        <translation>Пользователь успешно создан</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>You have left this organization. Closing editor.</source>
+        <translation>Вы покинули эту организацию. Редактор закрывается.</translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <source>You have been removed from this organization. Closing editor.</source>
+        <translation>Вы были исключены из этой организации. Редактор закрывается.</translation>
+    </message>
+    <message>
         <source>Permissions</source>
-        <translation>Права</translation>
+        <translation type="vanished">Права</translation>
     </message>
 </context>
 <context>
     <name>TenantEditorStateManager</name>
     <message>
-        <location filename="../../../Qml/imtauthgui/TenantEditorStateManager.qml" line="+87"/>
+        <location filename="../../../Qml/imtauthgui/TenantEditorStateManager.qml" line="+163"/>
         <source>by %1</source>
         <translation>от %1</translation>
     </message>
@@ -9651,55 +11908,67 @@ ID входных данных: </translation>
 <context>
     <name>TenantGeneralPage</name>
     <message>
+        <location filename="../../../Qml/imtauthgui/TenantGeneralPage.qml" line="+53"/>
+        <source>No parent</source>
+        <translation>Нет родителя</translation>
+    </message>
+    <message>
+        <location line="+48"/>
         <source>Organization</source>
         <translation>Организация</translation>
     </message>
     <message>
+        <location line="+9"/>
         <source>Name</source>
         <translation>Название</translation>
     </message>
     <message>
+        <location line="+32"/>
+        <location line="+18"/>
+        <location line="+8"/>
         <source>Owner</source>
         <translation>Владелец</translation>
     </message>
     <message>
+        <location line="-25"/>
         <source>The owner holds every available permission of the organization</source>
         <translation>Владелец получает все доступные права организации</translation>
     </message>
     <message>
+        <location line="+6"/>
+        <location line="+12"/>
         <source>You (the creator)</source>
         <translation>Вы (создатель)</translation>
     </message>
     <message>
+        <location line="-11"/>
         <source>Search for a user</source>
         <translation>Поиск пользователя</translation>
     </message>
     <message>
+        <location line="-15"/>
         <source>Parent organization</source>
         <translation>Родительская организация</translation>
     </message>
     <message>
-        <location filename="../../../Qml/imtauthgui/TenantGeneralPage.qml" line="+80"/>
         <source>General</source>
-        <translation>Общее</translation>
+        <translation type="vanished">Общее</translation>
     </message>
     <message>
-        <location line="+7"/>
         <source>Basic settings of the organization.</source>
-        <translation>Основные настройки организации.</translation>
+        <translation type="vanished">Основные настройки организации.</translation>
     </message>
     <message>
-        <location line="+18"/>
         <source>Organization Name</source>
-        <translation>Название организации</translation>
+        <translation type="vanished">Название организации</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="-24"/>
         <source>Enter the organization name</source>
         <translation>Введите название организации</translation>
     </message>
     <message>
-        <location line="+15"/>
+        <location line="+12"/>
         <source>Description</source>
         <translation>Описание</translation>
     </message>
@@ -9709,7 +11978,12 @@ ID входных данных: </translation>
         <translation>Введите описание</translation>
     </message>
     <message>
-        <location line="+15"/>
+        <location line="+38"/>
+        <source>You become the owner. The ownership can be transferred to a member on the Members page later.</source>
+        <translation>Вы станете владельцем. Позже владение можно передать участнику на странице «Участники».</translation>
+    </message>
+    <message>
+        <location line="+12"/>
         <source>Active</source>
         <translation>Активный</translation>
     </message>
@@ -9717,90 +11991,277 @@ ID входных данных: </translation>
 <context>
     <name>TenantGroupsPage</name>
     <message>
+        <location filename="../../../Qml/imtauthgui/TenantGroupsPage.qml" line="+18"/>
+        <source>Group</source>
+        <translation>Группа</translation>
+    </message>
+    <message>
+        <location line="+8"/>
         <source>Name</source>
         <translation>Название</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>Description</source>
         <translation>Описание</translation>
     </message>
     <message>
-        <location filename="../../../Qml/imtauthgui/TenantGroupsPage.qml" line="+65"/>
+        <location line="-7"/>
         <source>Groups</source>
         <translation>Группы</translation>
     </message>
     <message>
-        <location line="+10"/>
         <source>Create Group</source>
-        <translation>Создать группу</translation>
+        <translation type="vanished">Создать группу</translation>
     </message>
     <message>
-        <location line="+12"/>
         <source>Create New Group</source>
-        <translation>Создать новую группу</translation>
+        <translation type="vanished">Создать новую группу</translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+1"/>
         <source>Organize members into groups for easier permission management.</source>
         <translation>Объединяйте участников в группы для удобного управления правами.</translation>
     </message>
     <message>
-        <location line="+28"/>
         <source>Filter groups...</source>
-        <translation>Фильтр групп...</translation>
+        <translation type="vanished">Фильтр групп...</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>No groups created yet.</source>
-        <translation>Группы ещё не созданы.</translation>
+        <translation type="vanished">Группы ещё не созданы.</translation>
     </message>
     <message>
-        <location line="+9"/>
         <source>Edit Group</source>
-        <translation>Редактировать группу</translation>
+        <translation type="vanished">Редактировать группу</translation>
     </message>
     <message>
-        <location line="+9"/>
         <source>Delete Group</source>
-        <translation>Удалить группу</translation>
+        <translation type="vanished">Удалить группу</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>Are you sure you want to delete the group &quot;%1&quot;? This action cannot be undone.</source>
-        <translation>Вы уверены, что хотите удалить группу &quot;%1&quot;? Это действие нельзя отменить.</translation>
+        <translation type="vanished">Вы уверены, что хотите удалить группу &quot;%1&quot;? Это действие нельзя отменить.</translation>
     </message>
     <message>
-        <location line="+34"/>
         <source>Create</source>
-        <translation>Создать</translation>
+        <translation type="vanished">Создать</translation>
     </message>
     <message>
-        <location line="+14"/>
-        <location line="+72"/>
-        <location line="+0"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation type="vanished">Отмена</translation>
     </message>
     <message>
-        <location line="-15"/>
         <source>Save</source>
-        <translation>Сохранить</translation>
+        <translation type="vanished">Сохранить</translation>
     </message>
 </context>
 <context>
     <name>TenantMemberDelegate</name>
     <message>
-        <location filename="../../../Qml/imtauthgui/TenantMemberDelegate.qml" line="+159"/>
         <source>You</source>
-        <translation>Вы</translation>
+        <translation type="vanished">Вы</translation>
     </message>
     <message>
-        <location line="+42"/>
+        <source>Active</source>
+        <translation type="vanished">Активный</translation>
+    </message>
+    <message>
+        <source>Expired</source>
+        <translation type="vanished">Истёк</translation>
+    </message>
+    <message>
+        <source>Revoked</source>
+        <translation type="vanished">Отозван</translation>
+    </message>
+    <message>
+        <source>Pending</source>
+        <translation type="vanished">Ожидание</translation>
+    </message>
+    <message>
+        <source>Actions</source>
+        <translation type="vanished">Действия</translation>
+    </message>
+    <message>
+        <source>Change Environment Role</source>
+        <translation type="vanished">Изменить роль в окружении</translation>
+    </message>
+    <message>
+        <source>Remove Member</source>
+        <translation type="vanished">Удалить участника</translation>
+    </message>
+    <message>
+        <source>Transfer Ownership</source>
+        <translation type="vanished">Передать владение</translation>
+    </message>
+    <message>
+        <source>Leave Organization</source>
+        <translation type="vanished">Покинуть организацию</translation>
+    </message>
+    <message>
+        <source>Resend Invitation</source>
+        <translation type="vanished">Повторно отправить приглашение</translation>
+    </message>
+    <message>
+        <source>Revoke Invitation</source>
+        <translation type="vanished">Отозвать приглашение</translation>
+    </message>
+</context>
+<context>
+    <name>TenantMembersPage</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/TenantMembersPage.qml" line="+48"/>
+        <source>Name</source>
+        <translation>Имя</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Role</source>
+        <translation>Роль</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Status</source>
+        <translation>Статус</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Details</source>
+        <translation>Подробности</translation>
+    </message>
+    <message>
+        <location line="+18"/>
+        <location line="+719"/>
+        <location line="+87"/>
+        <source>Transfer Ownership</source>
+        <translation>Передать владение</translation>
+    </message>
+    <message>
+        <location line="-805"/>
+        <source>Are you sure you want to transfer ownership to &quot;%1&quot;?</source>
+        <translation>Вы уверены, что хотите передать владение «%1»?</translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>Exclude Member</source>
+        <translation>Исключить участника</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Are you sure you want to exclude &quot;%1&quot; from this organization?</source>
+        <translation>Вы уверены, что хотите исключить «%1» из этой организации?</translation>
+    </message>
+    <message>
+        <location line="+23"/>
+        <location line="+680"/>
+        <location line="+94"/>
+        <source>Leave Organization</source>
+        <translation>Покинуть организацию</translation>
+    </message>
+    <message>
+        <location line="-773"/>
+        <source>Are you sure you want to leave this organization? You will lose access to it.</source>
+        <translation>Вы уверены, что хотите покинуть эту организацию? Вы потеряете к ней доступ.</translation>
+    </message>
+    <message>
+        <location line="+98"/>
+        <source>Organization Permissions</source>
+        <translation>Права в организации</translation>
+    </message>
+    <message>
+        <location line="+73"/>
+        <source>%1 permission(s) selected</source>
+        <translation>Выбрано прав: %1</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>No permissions selected</source>
+        <translation>Права не выбраны</translation>
+    </message>
+    <message>
+        <location line="+21"/>
+        <source>Apply</source>
+        <translation>Применить</translation>
+    </message>
+    <message>
+        <location line="+139"/>
+        <source>Exclude</source>
+        <translation>Исключить</translation>
+    </message>
+    <message>
+        <location line="+33"/>
+        <source>The owner, the creator of the organization and you cannot be excluded here.</source>
+        <translation>Владельца, создателя организации и вас самих здесь исключить нельзя.</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Exclude Members</source>
+        <translation>Исключить участников</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Are you sure you want to exclude %1 selected member(s) from this organization?</source>
+        <translation>Вы уверены, что хотите исключить выбранных участников (%1) из этой организации?</translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <source>Edit</source>
+        <translation>Редактировать</translation>
+    </message>
+    <message>
+        <location line="+139"/>
+        <source>Member</source>
+        <translation>Участник</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Owner</source>
+        <translation>Владелец</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Creator</source>
+        <translation>Создатель</translation>
+    </message>
+    <message>
+        <location line="+139"/>
+        <source>Manage Organization Permissions...</source>
+        <translation>Управление правами в организации...</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <location line="+80"/>
+        <source>Exclude from Organization</source>
+        <translation>Исключить из организации</translation>
+    </message>
+    <message>
+        <location line="+76"/>
+        <source>Invite (%1)</source>
+        <translation>Пригласить (%1)</translation>
+    </message>
+    <message>
+        <location line="-572"/>
+        <location line="+252"/>
+        <source>Invited</source>
+        <translation>Приглашён</translation>
+    </message>
+    <message>
+        <location line="+18"/>
         <source>Active</source>
         <translation>Активный</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="-17"/>
+        <source>Pending</source>
+        <translation>Ожидание</translation>
+    </message>
+    <message>
+        <location line="-600"/>
+        <source>User</source>
+        <translation>Пользователь</translation>
+    </message>
+    <message>
+        <location line="+602"/>
         <source>Expired</source>
         <translation>Истёк</translation>
     </message>
@@ -9810,384 +12271,503 @@ ID входных данных: </translation>
         <translation>Отозван</translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>Pending</source>
-        <translation>Ожидание</translation>
-    </message>
-    <message>
-        <location line="+23"/>
-        <source>Actions</source>
-        <translation>Действия</translation>
-    </message>
-    <message>
-        <location line="+14"/>
-        <source>Change Environment Role</source>
-        <translation>Изменить роль в окружении</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Remove Member</source>
-        <translation>Удалить участника</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Transfer Ownership</source>
-        <translation>Передать владение</translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <source>Leave Organization</source>
-        <translation>Покинуть организацию</translation>
-    </message>
-    <message>
-        <location line="+10"/>
-        <source>Resend Invitation</source>
-        <translation>Повторно отправить приглашение</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Revoke Invitation</source>
-        <translation>Отозвать приглашение</translation>
-    </message>
-</context>
-<context>
-    <name>TenantMembersPage</name>
-    <message>
-        <source>Name</source>
-        <translation>Имя</translation>
-    </message>
-    <message>
-        <source>Role</source>
-        <translation>Роль</translation>
-    </message>
-    <message>
-        <source>Status</source>
-        <translation>Статус</translation>
-    </message>
-    <message>
-        <source>Details</source>
-        <translation>Подробности</translation>
-    </message>
-    <message>
-        <source>Member</source>
-        <translation>Участник</translation>
-    </message>
-    <message>
-        <source>Owner</source>
-        <translation>Владелец</translation>
-    </message>
-    <message>
-        <source>Creator</source>
-        <translation>Создатель</translation>
-    </message>
-    <message>
-        <source>Invited</source>
-        <translation>Приглашён</translation>
-    </message>
-    <message>
-        <source>Active</source>
-        <translation>Активный</translation>
-    </message>
-    <message>
-        <source>Pending</source>
-        <translation>Ожидание</translation>
-    </message>
-    <message>
-        <source>Expired</source>
-        <translation>Истёк</translation>
-    </message>
-    <message>
-        <source>Revoked</source>
-        <translation>Отозван</translation>
-    </message>
-    <message>
+        <location line="+17"/>
         <source>You</source>
         <translation>Вы</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>%1 organization permission(s)</source>
         <translation>Прав в организации: %1</translation>
     </message>
     <message>
+        <location line="+108"/>
         <source>Actions</source>
         <translation>Действия</translation>
     </message>
     <message>
+        <location line="-66"/>
         <source>Resend Invitation</source>
         <translation>Повторно отправить приглашение</translation>
     </message>
     <message>
+        <location line="-589"/>
+        <location line="+590"/>
         <source>Revoke Invitation</source>
         <translation>Отзыв приглашения</translation>
     </message>
     <message>
+        <location line="-589"/>
         <source>Are you sure you want to revoke the invitation of &quot;%1&quot;?</source>
         <translation>Отозвать приглашение пользователя «%1»?</translation>
     </message>
     <message>
-        <location filename="../../../Qml/imtauthgui/TenantMembersPage.qml" line="+76"/>
+        <location line="-76"/>
         <source>Members</source>
         <translation>Участники</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+509"/>
         <source>Create User</source>
         <translation>Создать пользователя</translation>
     </message>
     <message>
-        <location line="+12"/>
         <source>Create New User</source>
-        <translation>Создать нового пользователя</translation>
+        <translation type="vanished">Создать нового пользователя</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+22"/>
         <source>Create Invitation</source>
         <translation>Создать приглашение</translation>
     </message>
     <message>
-        <location line="+34"/>
+        <location line="-530"/>
         <source>Manage the members of the organization. Users created here automatically become members.</source>
         <translation>Управление участниками организации. Созданные здесь пользователи автоматически становятся участниками.</translation>
     </message>
     <message>
-        <location line="+28"/>
         <source>Filter members...</source>
-        <translation>Фильтр участников...</translation>
+        <translation type="vanished">Фильтр участников...</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>No members found.</source>
-        <translation>Участники не найдены.</translation>
+        <translation type="vanished">Участники не найдены.</translation>
     </message>
     <message>
-        <location line="+9"/>
         <source>Edit User</source>
-        <translation>Редактировать пользователя</translation>
+        <translation type="vanished">Редактировать пользователя</translation>
     </message>
     <message>
-        <location line="+9"/>
         <source>Remove Member</source>
-        <translation>Удалить участника</translation>
+        <translation type="vanished">Удалить участника</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>Are you sure you want to remove &quot;%1&quot;? They will lose access to this workspace.</source>
-        <translation>Вы уверены, что хотите удалить &quot;%1&quot;? Пользователь потеряет доступ к этому рабочему пространству.</translation>
+        <translation type="vanished">Вы уверены, что хотите удалить &quot;%1&quot;? Пользователь потеряет доступ к этому рабочему пространству.</translation>
     </message>
     <message>
-        <location line="+34"/>
         <source>Create</source>
-        <translation>Создать</translation>
+        <translation type="vanished">Создать</translation>
     </message>
     <message>
-        <location line="+14"/>
-        <location line="+72"/>
-        <location line="+0"/>
+        <location line="+272"/>
         <source>Cancel</source>
         <translation>Отмена</translation>
     </message>
     <message>
-        <location line="-15"/>
         <source>Save</source>
-        <translation>Сохранить</translation>
+        <translation type="vanished">Сохранить</translation>
     </message>
     <message>
-        <location line="+38"/>
+        <location line="+630"/>
         <source>Type or choose a user to invite</source>
         <translation>Введите или выберите пользователя для приглашения</translation>
     </message>
 </context>
 <context>
+    <name>TenantMessagesPage</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/TenantMessagesPage.qml" line="+20"/>
+        <source>Message</source>
+        <translation>Сообщение</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Cross-Tenant Messages</source>
+        <translation>Межтенантные сообщения</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Incoming and outgoing cross-tenant protocol messages.</source>
+        <translation>Входящие и исходящие сообщения межтенантного протокола.</translation>
+    </message>
+    <message>
+        <location line="+87"/>
+        <source>▶ Outgoing</source>
+        <translation>▶ Исходящее</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>◀ Incoming</source>
+        <translation>◀ Входящее</translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <location line="+8"/>
+        <source>· %1</source>
+        <translation>· %1</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>To: %1</source>
+        <translation>Кому: %1</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>From: %1</source>
+        <translation>От: %1</translation>
+    </message>
+    <message>
+        <location line="+19"/>
+        <source>Sent: %1  Processed: %2</source>
+        <translation>Отправлено: %1  Обработано: %2</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <location line="+1"/>
+        <source>—</source>
+        <translation>—</translation>
+    </message>
+</context>
+<context>
+    <name>TenantMyConnectionsPage</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/TenantMyConnectionsPage.qml" line="+21"/>
+        <source>Relationship</source>
+        <translation>Связь</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Relationships</source>
+        <translation>Отношения</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>My Relationships</source>
+        <translation>Мои отношения</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Business relationships with other organizations. Creating or modifying a relationship requires approval from both parties.</source>
+        <translation>Деловые отношения с другими организациями. Создание или изменение отношений требует согласия обеих сторон.</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Partner</source>
+        <translation>Партнёр</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Partner role</source>
+        <translation>Роль партнёра</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Our role</source>
+        <translation>Наша роль</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Status</source>
+        <translation>Статус</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Description</source>
+        <translation>Описание</translation>
+    </message>
+    <message>
+        <location line="+49"/>
+        <source>The proposal was sent to the partner organization</source>
+        <translation>Предложение отправлено организации-партнёру</translation>
+    </message>
+</context>
+<context>
     <name>TenantPermissionsPage</name>
     <message>
+        <location filename="../../../Qml/imtauthgui/TenantPermissionsPage.qml" line="+92"/>
         <source>Other permissions</source>
         <translation>Другие права</translation>
     </message>
     <message>
+        <location line="+65"/>
         <source>Remove permissions</source>
         <translation>Снятие прав</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>%1 permission(s) will be taken from the owner, the roles and the sub-organizations of this organization. Continue?</source>
         <translation>Прав будет снято у владельца, ролей и подорганизаций этой организации: %1. Продолжить?</translation>
     </message>
     <message>
+        <location line="+17"/>
         <source>The permissions of this organization are chosen by its creator %1.</source>
         <translation>Права этой организации выбирает её создатель %1.</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>The permissions of this organization are chosen by its creator.</source>
         <translation>Права этой организации выбирает её создатель.</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>You are the owner: all of them are yours already.</source>
         <translation>Вы владелец: все эти права у вас уже есть.</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>The owner holds all of them.</source>
         <translation>У владельца есть все эти права.</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Roles and members can be given only these permissions.</source>
         <translation>Ролям и участникам можно выдать только эти права.</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>Choose the product features available to this organization. The owner holds every chosen permission; roles and members can be given only them.</source>
         <translation>Выберите возможности продукта, доступные этой организации. Владелец получает все выбранные права, ролям и участникам можно выдать только их.</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Only the permissions of the parent organization can be chosen.</source>
         <translation>Выбрать можно только права родительской организации.</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>A removed permission is taken from the owner, the roles and the sub-organizations.</source>
         <translation>Снятое право снимается у владельца, ролей и подорганизаций.</translation>
     </message>
     <message>
+        <location line="+28"/>
         <source>Available permissions (%1 of %2)</source>
         <translation>Доступные права (%1 из %2)</translation>
     </message>
     <message>
+        <location line="+1"/>
         <source>Available permissions (%1)</source>
         <translation>Доступные права (%1)</translation>
     </message>
     <message>
+        <location line="+5"/>
         <source>Selected only</source>
         <translation>Только выбранные</translation>
     </message>
     <message>
         <source>Available permissions</source>
-        <translation>Доступные права</translation>
+        <translation type="vanished">Доступные права</translation>
     </message>
     <message>
         <source>The roles and the owner of this organization hold nothing beyond these permissions. Only the creator of the organization changes them.</source>
-        <translation>Роли и владелец этой организации не получают ничего сверх этих прав. Изменять их может только создатель организации.</translation>
+        <translation type="vanished">Роли и владелец этой организации не получают ничего сверх этих прав. Изменять их может только создатель организации.</translation>
     </message>
     <message>
         <source>Select which product features are available for this organization. Only the features of the parent organization can be chosen.</source>
-        <translation>Выберите, какие возможности продукта доступны для этой организации. Доступны только возможности родительской организации.</translation>
+        <translation type="vanished">Выберите, какие возможности продукта доступны для этой организации. Доступны только возможности родительской организации.</translation>
     </message>
     <message>
         <source>Select which product features are available for this organization. Its roles and owner hold nothing beyond them.</source>
-        <translation>Выберите, какие возможности продукта доступны для этой организации. Её роли и владелец не получают ничего сверх них.</translation>
+        <translation type="vanished">Выберите, какие возможности продукта доступны для этой организации. Её роли и владелец не получают ничего сверх них.</translation>
     </message>
     <message>
-        <location filename="../../../Qml/imtauthgui/TenantPermissionsPage.qml" line="+117"/>
         <source>Permissions</source>
-        <translation>Права</translation>
+        <translation type="vanished">Права</translation>
+    </message>
+    <message>
+        <source>Select which product features are available for this organization.</source>
+        <translation type="vanished">Выберите, какие возможности продукта доступны для этой организации.</translation>
+    </message>
+    <message>
+        <source>Check All</source>
+        <translation type="vanished">Выбрать все</translation>
+    </message>
+    <message>
+        <source>Uncheck All</source>
+        <translation type="vanished">Снять все</translation>
+    </message>
+    <message>
+        <source>Expand All</source>
+        <translation type="vanished">Развернуть все</translation>
+    </message>
+    <message>
+        <source>Collapse All</source>
+        <translation type="vanished">Свернуть все</translation>
+    </message>
+    <message>
+        <source>Filter permissions...</source>
+        <translation type="vanished">Фильтр прав...</translation>
+    </message>
+    <message>
+        <source>Permission</source>
+        <translation type="vanished">Разрешение</translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <translation type="vanished">Описание</translation>
+    </message>
+</context>
+<context>
+    <name>TenantRelationshipProposalsPage</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/TenantRelationshipProposalsPage.qml" line="+82"/>
+        <source>Change of the relationship</source>
+        <translation>Изменение отношений</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>End of the relationship</source>
+        <translation>Прекращение отношений</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>New relationship</source>
+        <translation>Новые отношения</translation>
+    </message>
+    <message>
+        <location line="+69"/>
+        <source>Relationship proposal approved</source>
+        <translation>Предложение об отношениях одобрено</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Relationship proposal rejected</source>
+        <translation>Предложение об отношениях отклонено</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Relationship proposal withdrawn</source>
+        <translation>Предложение об отношениях отозвано</translation>
+    </message>
+    <message>
+        <location line="+35"/>
+        <source>Incoming Proposals</source>
+        <translation>Входящие предложения</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>A relationship comes into force or changes only when both organizations agree.</source>
+        <translation>Отношения вступают в силу или изменяются только с согласия обеих организаций.</translation>
     </message>
     <message>
         <location line="+7"/>
-        <source>Select which product features are available for this organization.</source>
-        <translation>Выберите, какие возможности продукта доступны для этой организации.</translation>
+        <source>No proposals are waiting for your answer.</source>
+        <translation>Нет предложений, ожидающих вашего ответа.</translation>
+    </message>
+    <message>
+        <location line="+21"/>
+        <source>Sent Proposals</source>
+        <translation>Отправленные предложения</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>No proposals are waiting for the partner&apos;s answer.</source>
+        <translation>Нет предложений, ожидающих ответа партнёра.</translation>
     </message>
     <message>
         <location line="+20"/>
-        <source>Check All</source>
-        <translation>Выбрать все</translation>
+        <location line="+14"/>
+        <source>Partner</source>
+        <translation>Партнёр</translation>
     </message>
     <message>
-        <location line="+15"/>
-        <source>Uncheck All</source>
-        <translation>Снять все</translation>
+        <location line="-13"/>
+        <location line="+14"/>
+        <source>Proposal</source>
+        <translation>Предложение</translation>
     </message>
     <message>
-        <location line="+15"/>
-        <source>Expand All</source>
-        <translation>Развернуть все</translation>
+        <location line="-13"/>
+        <location line="+14"/>
+        <source>Roles</source>
+        <translation>Роли</translation>
     </message>
     <message>
-        <location line="+15"/>
-        <source>Collapse All</source>
-        <translation>Свернуть все</translation>
-    </message>
-    <message>
-        <location line="+16"/>
-        <source>Filter permissions...</source>
-        <translation>Фильтр прав...</translation>
-    </message>
-    <message>
-        <location line="+27"/>
-        <source>Permission</source>
-        <translation>Разрешение</translation>
-    </message>
-    <message>
-        <location line="+1"/>
+        <location line="-13"/>
+        <location line="+14"/>
         <source>Description</source>
         <translation>Описание</translation>
+    </message>
+    <message>
+        <location line="+22"/>
+        <source>Approve</source>
+        <translation>Одобрить</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Reject</source>
+        <translation>Отклонить</translation>
+    </message>
+    <message>
+        <location line="+23"/>
+        <source>Withdraw</source>
+        <translation>Отозвать</translation>
+    </message>
+</context>
+<context>
+    <name>TenantRepresentationController</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/TenantRepresentationController.qml" line="+77"/>
+        <source>The organization could not be saved</source>
+        <translation>Не удалось сохранить организацию</translation>
     </message>
 </context>
 <context>
     <name>TenantRolesPage</name>
     <message>
+        <location filename="../../../Qml/imtauthgui/TenantRolesPage.qml" line="+18"/>
+        <source>Role</source>
+        <translation>Роль</translation>
+    </message>
+    <message>
+        <location line="+8"/>
         <source>Name</source>
         <translation>Название</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>Description</source>
         <translation>Описание</translation>
     </message>
     <message>
-        <location filename="../../../Qml/imtauthgui/TenantRolesPage.qml" line="+68"/>
+        <location line="-7"/>
         <source>Roles</source>
         <translation>Роли</translation>
     </message>
     <message>
-        <location line="+10"/>
         <source>Create Role</source>
-        <translation>Создать роль</translation>
+        <translation type="vanished">Создать роль</translation>
     </message>
     <message>
-        <location line="+12"/>
         <source>Create New Role</source>
-        <translation>Создать новую роль</translation>
+        <translation type="vanished">Создать новую роль</translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+1"/>
         <source>Manage the roles of the organization and assign permissions to its members.</source>
         <translation>Управление ролями организации и назначение прав участникам.</translation>
     </message>
     <message>
-        <location line="+28"/>
         <source>Filter roles...</source>
-        <translation>Фильтр ролей...</translation>
+        <translation type="vanished">Фильтр ролей...</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>No roles created yet.</source>
-        <translation>Роли ещё не созданы.</translation>
+        <translation type="vanished">Роли ещё не созданы.</translation>
     </message>
     <message>
-        <location line="+9"/>
         <source>Edit Role</source>
-        <translation>Редактировать роль</translation>
+        <translation type="vanished">Редактировать роль</translation>
     </message>
     <message>
-        <location line="+9"/>
         <source>Delete Role</source>
-        <translation>Удалить роль</translation>
+        <translation type="vanished">Удалить роль</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>Are you sure you want to delete the role &quot;%1&quot;? This action cannot be undone.</source>
-        <translation>Вы уверены, что хотите удалить роль &quot;%1&quot;? Это действие нельзя отменить.</translation>
+        <translation type="vanished">Вы уверены, что хотите удалить роль &quot;%1&quot;? Это действие нельзя отменить.</translation>
     </message>
     <message>
-        <location line="+34"/>
         <source>Create</source>
-        <translation>Создать</translation>
+        <translation type="vanished">Создать</translation>
     </message>
     <message>
-        <location line="+14"/>
-        <location line="+72"/>
-        <location line="+0"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation type="vanished">Отмена</translation>
     </message>
     <message>
-        <location line="-15"/>
         <source>Save</source>
-        <translation>Сохранить</translation>
+        <translation type="vanished">Сохранить</translation>
     </message>
 </context>
 <context>
@@ -10199,9 +12779,17 @@ ID входных данных: </translation>
     </message>
 </context>
 <context>
+    <name>ThumbnailDecorator</name>
+    <message>
+        <location filename="../../../Qml/imtgui/Application/ThumbnailDecorator.qml" line="+245"/>
+        <source>Settings</source>
+        <translation>Настройки</translation>
+    </message>
+</context>
+<context>
     <name>TicketBadge</name>
     <message>
-        <location filename="../../../Qml/imtdeskgui/TicketBadge.qml" line="+28"/>
+        <location filename="../../../Qml/imtdeskgui/TicketBadge.qml" line="+26"/>
         <source>Open</source>
         <translation>Открыть</translation>
     </message>
@@ -10249,7 +12837,7 @@ ID входных данных: </translation>
 <context>
     <name>TicketCollectionView</name>
     <message>
-        <location filename="../../../Qml/imtdeskgui/TicketCollectionView.qml" line="+117"/>
+        <location filename="../../../Qml/imtdeskgui/TicketCollectionView.qml" line="+143"/>
         <source>Status</source>
         <translation>Статус</translation>
     </message>
@@ -10312,7 +12900,7 @@ ID входных данных: </translation>
 <context>
     <name>TicketCreateDialog</name>
     <message>
-        <location filename="../../../Qml/imtdeskgui/TicketCreateDialog.qml" line="+56"/>
+        <location filename="../../../Qml/imtdeskgui/TicketCreateDialog.qml" line="+55"/>
         <source>New Issue</source>
         <translation>Новая задача</translation>
     </message>
@@ -10347,12 +12935,12 @@ ID входных данных: </translation>
         <translation>Приоритет</translation>
     </message>
     <message>
-        <location line="+27"/>
+        <location line="+28"/>
         <source>Cancel</source>
         <translation>Отмена</translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+23"/>
         <source>Submit new issue</source>
         <translation>Отправить новую задачу</translation>
     </message>
@@ -10360,7 +12948,7 @@ ID входных данных: </translation>
 <context>
     <name>TicketEditor</name>
     <message>
-        <location filename="../../../Qml/imtdeskgui/TicketEditor.qml" line="+154"/>
+        <location filename="../../../Qml/imtdeskgui/TicketEditor.qml" line="+165"/>
         <source>Copied to clipboard</source>
         <translation>Скопировано в буфер обмена</translation>
     </message>
@@ -10382,18 +12970,14 @@ ID входных данных: </translation>
     <message>
         <location line="+10"/>
         <location line="+14"/>
-        <location line="+1926"/>
-        <location line="+250"/>
-        <location line="-2176"/>
-        <location line="+1926"/>
-        <location line="+250"/>
+        <location line="+2163"/>
+        <location line="+266"/>
         <source>Unknown</source>
         <translation>Неизвестный</translation>
     </message>
     <message>
-        <location line="-2185"/>
+        <location line="-2438"/>
         <location line="+2"/>
-        <location line="+0"/>
         <source>Message</source>
         <translation>Сообщение</translation>
     </message>
@@ -10404,18 +12988,33 @@ ID входных данных: </translation>
     </message>
     <message>
         <location line="+0"/>
-        <location line="+2123"/>
-        <location line="+0"/>
+        <location line="+2369"/>
         <source>file</source>
         <translation>файл</translation>
     </message>
     <message>
-        <location line="-1825"/>
+        <location line="-2179"/>
+        <location line="+27"/>
+        <source>Failed to upload attachment: %1</source>
+        <translation>Не удалось загрузить вложение: %1</translation>
+    </message>
+    <message>
+        <location line="-18"/>
+        <source>Failed to read attachment: %1</source>
+        <translation>Не удалось прочитать вложение: %1</translation>
+    </message>
+    <message>
+        <location line="+160"/>
         <source>You have been removed from the assignees of this ticket. The view is now read-only.</source>
         <translation>Вы были удалены из исполнителей этой заявки. Просмотр теперь только для чтения.</translation>
     </message>
     <message>
-        <location line="+306"/>
+        <location line="+64"/>
+        <source>Saved</source>
+        <translation>Сохранено</translation>
+    </message>
+    <message>
+        <location line="+224"/>
         <source>New Ticket</source>
         <translation>Новая заявка</translation>
     </message>
@@ -10425,52 +13024,67 @@ ID входных данных: </translation>
         <translation>Заголовок</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+12"/>
         <source>Enter ticket title...</source>
         <translation>Введите заголовок заявки...</translation>
     </message>
     <message>
-        <location line="+93"/>
+        <location line="+96"/>
         <source>Description</source>
         <translation>Описание</translation>
     </message>
     <message>
-        <location line="+78"/>
+        <location line="+85"/>
         <source>Describe the issue...</source>
         <translation>Опишите проблему...</translation>
     </message>
     <message>
-        <location line="+58"/>
+        <location line="+62"/>
         <source>Properties</source>
         <translation>Свойства</translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+25"/>
         <source>Type</source>
         <translation>Тип</translation>
     </message>
     <message>
-        <location line="+23"/>
+        <location line="+24"/>
         <source>Priority</source>
         <translation>Приоритет</translation>
     </message>
     <message>
-        <location line="+24"/>
+        <location line="+25"/>
         <source>Status</source>
         <translation>Статус</translation>
     </message>
     <message>
-        <location line="+36"/>
+        <location line="+37"/>
         <source>Assignees</source>
         <translation>Исполнители</translation>
     </message>
     <message>
-        <location line="+31"/>
+        <location line="+32"/>
         <source>Add assignee</source>
         <translation>Добавить исполнителя</translation>
     </message>
     <message>
-        <location line="+87"/>
+        <location line="+80"/>
+        <source>Remove assignee</source>
+        <translation>Удалить исполнителя</translation>
+    </message>
+    <message>
+        <location line="+21"/>
+        <source>Remove assignee?</source>
+        <translation>Удалить исполнителя?</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>%1 will be unassigned from this ticket.</source>
+        <translation>%1 больше не будет исполнителем этой заявки.</translation>
+    </message>
+    <message>
+        <location line="+21"/>
         <source>No assignees</source>
         <translation>Нет исполнителей</translation>
     </message>
@@ -10485,37 +13099,82 @@ ID входных данных: </translation>
         <translation>Контекст</translation>
     </message>
     <message>
-        <location line="+31"/>
+        <location line="+32"/>
         <source>Add context</source>
         <translation>Добавить контекст</translation>
     </message>
     <message>
-        <location line="+92"/>
+        <location line="+85"/>
+        <source>Unlink</source>
+        <translation>Отвязать</translation>
+    </message>
+    <message>
+        <location line="+21"/>
+        <source>Remove linked entity?</source>
+        <translation>Удалить связанный объект?</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>%1 will be unlinked from this ticket.</source>
+        <translation>%1 будет отвязан от этой заявки.</translation>
+    </message>
+    <message>
+        <location line="+22"/>
         <source>No linked entities</source>
         <translation>Нет связанных сущностей</translation>
     </message>
     <message>
-        <location line="+115"/>
+        <location line="+108"/>
+        <source>Link context</source>
+        <translation>Связать контекст</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Close</source>
+        <translation>Закрыть</translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <source>Entity type</source>
+        <translation>Тип объекта</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>No entity types can be linked to tickets yet.</source>
+        <translation>Пока нет типов объектов, которые можно связать с заявками.</translation>
+    </message>
+    <message>
+        <location line="+47"/>
         <source>Search entities...</source>
         <translation>Поиск сущностей...</translation>
     </message>
     <message>
-        <location line="+92"/>
+        <location line="+93"/>
         <source>Lock issue</source>
         <translation>Заблокировать задачу</translation>
     </message>
     <message>
-        <location line="+13"/>
+        <location line="+22"/>
+        <source>Lock this ticket?</source>
+        <translation>Заблокировать эту заявку?</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Locked tickets can no longer receive new comments. You can unlock it again later.</source>
+        <translation>В заблокированные заявки нельзя добавлять новые комментарии. Позже заявку можно разблокировать.</translation>
+    </message>
+    <message>
+        <location line="+19"/>
         <source>Lock Reason</source>
         <translation>Причина блокировки</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+10"/>
         <source>Reason for locking</source>
         <translation>Причина блокировки</translation>
     </message>
     <message>
-        <location line="+68"/>
+        <location line="+57"/>
         <source>Comments</source>
         <translation>Комментарии</translation>
     </message>
@@ -10530,22 +13189,22 @@ ID входных данных: </translation>
         <translation>Вы</translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+17"/>
         <source>edited</source>
         <translation>изменено</translation>
     </message>
     <message>
-        <location line="+139"/>
+        <location line="+138"/>
         <source>Save</source>
         <translation>Сохранить</translation>
     </message>
     <message>
-        <location line="+17"/>
+        <location line="+22"/>
         <source>Cancel</source>
         <translation>Отмена</translation>
     </message>
     <message>
-        <location line="+67"/>
+        <location line="+78"/>
         <source>Reply</source>
         <translation>Ответить</translation>
     </message>
@@ -10565,12 +13224,22 @@ ID входных данных: </translation>
         <translation>Редактировать</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+17"/>
         <source>Delete</source>
         <translation>Удалить</translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="+21"/>
+        <source>Delete comment?</source>
+        <translation>Удалить комментарий?</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>This comment will be permanently deleted. You cannot undo this action.</source>
+        <translation>Этот комментарий будет удалён безвозвратно. Это действие нельзя отменить.</translation>
+    </message>
+    <message>
+        <location line="+23"/>
         <source>No comments yet</source>
         <translation>Комментариев пока нет</translation>
     </message>
@@ -10580,24 +13249,28 @@ ID входных данных: </translation>
         <translation>Будьте первым, кто оставит комментарий.</translation>
     </message>
     <message>
-        <location line="+142"/>
+        <location line="+152"/>
         <source>attachment</source>
         <translation>вложение</translation>
     </message>
     <message>
-        <location line="+56"/>
-        <location line="+100"/>
-        <location line="+0"/>
+        <location line="+34"/>
+        <source>Failed to remove attachment from server: %1</source>
+        <translation>Не удалось удалить вложение с сервера: %1</translation>
+    </message>
+    <message>
+        <location line="+23"/>
+        <location line="+114"/>
         <source>Uploading...</source>
         <translation>Загрузка...</translation>
     </message>
     <message>
-        <location line="-38"/>
+        <location line="-40"/>
         <source>Write a comment...</source>
         <translation>Написать комментарий...</translation>
     </message>
     <message>
-        <location line="+38"/>
+        <location line="+40"/>
         <source>Send</source>
         <translation>Отправить</translation>
     </message>
@@ -10625,7 +13298,7 @@ ID входных данных: </translation>
 <context>
     <name>TicketListPanel</name>
     <message>
-        <location filename="../../../Qml/imtdeskgui/TicketListPanel.qml" line="+38"/>
+        <location filename="../../../Qml/imtdeskgui/TicketListPanel.qml" line="+36"/>
         <source>Tickets</source>
         <translation>Заявки</translation>
     </message>
@@ -10648,7 +13321,7 @@ ID входных данных: </translation>
 <context>
     <name>TicketView</name>
     <message>
-        <location filename="../../../Qml/imtdeskgui/TicketView.qml" line="+108"/>
+        <location filename="../../../Qml/imtdeskgui/TicketView.qml" line="+106"/>
         <source>Locked: %1</source>
         <translation>Заблокировано: %1</translation>
     </message>
@@ -10693,22 +13366,22 @@ ID входных данных: </translation>
         <translation>Закрыто:</translation>
     </message>
     <message>
-        <location line="+50"/>
+        <location line="+51"/>
         <source>Close as completed</source>
         <translation>Закрыть как выполненное</translation>
     </message>
     <message>
-        <location line="+25"/>
+        <location line="+26"/>
         <source>Close as not planned</source>
         <translation>Закрыть как незапланированное</translation>
     </message>
     <message>
-        <location line="+23"/>
+        <location line="+24"/>
         <source>Reopen ticket</source>
         <translation>Переоткрыть заявку</translation>
     </message>
     <message>
-        <location line="+25"/>
+        <location line="+26"/>
         <source>Open Chat</source>
         <translation>Открыть чат</translation>
     </message>
@@ -10874,6 +13547,171 @@ ID входных данных: </translation>
     </message>
 </context>
 <context>
+    <name>TreeExplorerView</name>
+    <message>
+        <location filename="../../../Qml/imtcontrols/Views/TreeExplorerView.qml" line="+40"/>
+        <source>Root</source>
+        <translation>Корень</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Name</source>
+        <translation>Имя</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>New item</source>
+        <translation>Новый элемент</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Search in %1</source>
+        <translation>Поиск в %1</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>This folder is empty</source>
+        <translation>Эта папка пуста</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>No matching items</source>
+        <translation>Нет подходящих элементов</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Create an item to start this level</source>
+        <translation>Создайте элемент, чтобы начать этот уровень</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Select a row to work with it</source>
+        <translation>Выберите строку для работы с ней</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Press Edit or F2 to change this row</source>
+        <translation>Нажмите «Изменить» или F2, чтобы изменить эту строку</translation>
+    </message>
+    <message>
+        <location line="+99"/>
+        <source>Untitled item</source>
+        <translation>Элемент без названия</translation>
+    </message>
+    <message>
+        <location line="+526"/>
+        <source>Back to the parent level</source>
+        <translation>Назад на родительский уровень</translation>
+    </message>
+    <message>
+        <location line="+121"/>
+        <source>%1 items</source>
+        <translation>Элементов: %1</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>%1 of %2 items</source>
+        <translation>%1 из %2 элементов</translation>
+    </message>
+    <message>
+        <location line="+48"/>
+        <source>Fill in this feature before giving it children</source>
+        <translation>Заполните эту функцию, прежде чем добавлять дочерние</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>Done</source>
+        <translation>Готово</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <location line="+82"/>
+        <source>Cancel</source>
+        <translation>Отмена</translation>
+    </message>
+    <message>
+        <location line="-71"/>
+        <location line="+745"/>
+        <source>Open</source>
+        <translation>Открыть</translation>
+    </message>
+    <message>
+        <location line="-744"/>
+        <source>Show what is inside the selected row</source>
+        <translation>Показать содержимое выбранной строки</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <location line="+748"/>
+        <source>Edit</source>
+        <translation>Редактировать</translation>
+    </message>
+    <message>
+        <location line="-737"/>
+        <location line="+752"/>
+        <source>Rename</source>
+        <translation>Переименовать</translation>
+    </message>
+    <message>
+        <location line="-741"/>
+        <location line="+756"/>
+        <source>Move</source>
+        <translation>Переместить</translation>
+    </message>
+    <message>
+        <location line="-744"/>
+        <location line="+760"/>
+        <source>Remove %1</source>
+        <translation>Удалить %1</translation>
+    </message>
+    <message>
+        <location line="-760"/>
+        <location line="+760"/>
+        <source>Remove</source>
+        <translation>Удалить</translation>
+    </message>
+    <message>
+        <location line="-750"/>
+        <source>More commands</source>
+        <translation>Другие команды</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Move here</source>
+        <translation>Переместить сюда</translation>
+    </message>
+    <message>
+        <location line="+26"/>
+        <source>Editing - Tab moves on, Enter applies, Esc discards</source>
+        <translation>Редактирование — Tab: далее, Enter: применить, Esc: отменить</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Open the level you want it in, then press Move here</source>
+        <translation>Откройте нужный уровень и нажмите «Переместить сюда»</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>%1 rows ticked - Remove works on all of them</source>
+        <translation>Отмечено строк: %1 — «Удалить» применяется ко всем</translation>
+    </message>
+    <message>
+        <location line="+170"/>
+        <source>Drag to resize, double-click to reset the columns</source>
+        <translation>Перетащите для изменения размера, дважды щёлкните для сброса столбцов</translation>
+    </message>
+    <message>
+        <location line="+315"/>
+        <source>Try a different search</source>
+        <translation>Попробуйте изменить запрос поиска</translation>
+    </message>
+    <message>
+        <location line="+96"/>
+        <source>Open a row with Edit and fill in the missing values.</source>
+        <translation>Откройте строку через «Изменить» и заполните недостающие значения.</translation>
+    </message>
+</context>
+<context>
     <name>TreeViewElementView</name>
     <message>
         <location filename="../../../Qml/imtgui/View/TreeViewElementView.qml" line="+26"/>
@@ -10904,7 +13742,7 @@ ID входных данных: </translation>
 <context>
     <name>TypingIndicator</name>
     <message>
-        <location filename="../../../Qml/imtchatgui/TypingIndicator.qml" line="+34"/>
+        <location filename="../../../Qml/imtchatgui/TypingIndicator.qml" line="+32"/>
         <source>is typing</source>
         <translation>печатает</translation>
     </message>
@@ -10917,12 +13755,12 @@ ID входных данных: </translation>
 <context>
     <name>UserActionCollectionView</name>
     <message>
-        <location filename="../../../Qml/imtauthgui/UserActionCollectionView.qml" line="+37"/>
+        <location filename="../../../Qml/imtauthgui/UserActionCollectionView.qml" line="+38"/>
         <source>Action</source>
         <translation>Действие</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+4"/>
         <source>Create</source>
         <translation>Создать</translation>
     </message>
@@ -10937,28 +13775,39 @@ ID входных данных: </translation>
         <translation>Удалить</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+9"/>
         <source>Users</source>
         <translation>Пользователи</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Search by user name</source>
+        <translation>Поиск по имени пользователя</translation>
     </message>
 </context>
 <context>
     <name>UserCollectionView</name>
     <message>
+        <location filename="../../../Qml/imtauthgui/UserCollectionView.qml" line="+30"/>
+        <source>User</source>
+        <translation>Пользователь</translation>
+    </message>
+    <message>
+        <location line="+19"/>
         <source>Source</source>
         <translation>Источник</translation>
     </message>
     <message>
+        <location line="+57"/>
         <source>Never</source>
         <translation>Никогда</translation>
     </message>
     <message>
-        <location filename="../../../Qml/imtauthgui/UserCollectionView.qml" line="+60"/>
         <source>System Info</source>
-        <translation>Система</translation>
+        <translation type="vanished">Система</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="-54"/>
         <source>Internal</source>
         <translation>Внутренняя</translation>
     </message>
@@ -10968,50 +13817,42 @@ ID входных данных: </translation>
         <translation>LDAP</translation>
     </message>
     <message>
-        <location line="+67"/>
         <source>View roles</source>
-        <translation>Посмотреть роли</translation>
+        <translation type="vanished">Посмотреть роли</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>has been assigned</source>
-        <translation>были назначены</translation>
+        <translation type="vanished">были назначены</translation>
     </message>
     <message>
-        <location line="+0"/>
         <source>roles:</source>
-        <translation>ролей:</translation>
+        <translation type="vanished">ролей:</translation>
     </message>
     <message>
-        <location line="+8"/>
         <source>No roles</source>
-        <translation>Нет ролей</translation>
+        <translation type="vanished">Нет ролей</translation>
     </message>
     <message>
-        <location line="+54"/>
         <source>View groups</source>
-        <translation>Посмотреть группы</translation>
+        <translation type="vanished">Посмотреть группы</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>is included into</source>
-        <translation>состоит в</translation>
+        <translation type="vanished">состоит в</translation>
     </message>
     <message>
-        <location line="+0"/>
         <source>groups</source>
-        <translation>группах</translation>
+        <translation type="vanished">группах</translation>
     </message>
     <message>
-        <location line="+7"/>
         <source>No groups</source>
-        <translation>Нет групп</translation>
+        <translation type="vanished">Нет групп</translation>
     </message>
 </context>
 <context>
     <name>UserGeneralEditor</name>
     <message>
-        <location filename="../../../Qml/imtauthgui/UserGeneralEditor.qml" line="+50"/>
+        <location filename="../../../Qml/imtauthgui/UserGeneralEditor.qml" line="+113"/>
         <source>Username</source>
         <translation>Логин</translation>
     </message>
@@ -11021,12 +13862,12 @@ ID входных данных: </translation>
         <translation>Введите логин</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+4"/>
         <source>Please enter the username</source>
         <translation>Введите логин</translation>
     </message>
     <message>
-        <location line="+23"/>
+        <location line="+24"/>
         <source>Name</source>
         <translation>Имя пользователя</translation>
     </message>
@@ -11036,12 +13877,12 @@ ID входных данных: </translation>
         <translation>Введите имя пользователя</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+4"/>
         <source>Please enter the name</source>
         <translation>Пожалуйста, введите имя</translation>
     </message>
     <message>
-        <location line="+23"/>
+        <location line="+24"/>
         <source>Email Address</source>
         <translation>Email</translation>
     </message>
@@ -11051,19 +13892,28 @@ ID входных данных: </translation>
         <translation>Введите электронную почту</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+4"/>
         <source>Please enter the email</source>
         <translation>Пожалуйста, введите электронную почту</translation>
     </message>
     <message>
-        <location line="+18"/>
+        <location line="+13"/>
+        <source>Account enabled</source>
+        <translation>Учётная запись активна</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Disabled accounts cannot log in</source>
+        <translation>Отключённые учётные записи не могут входить в систему</translation>
+    </message>
+    <message>
+        <location line="+42"/>
         <location line="+11"/>
-        <location line="+0"/>
         <source>Passwords don&apos;t match</source>
         <translation>Пароли не совпадают</translation>
     </message>
     <message>
-        <location line="+36"/>
+        <location line="+53"/>
         <source>Password</source>
         <translation>Пароль</translation>
     </message>
@@ -11073,19 +13923,18 @@ ID входных данных: </translation>
         <translation>Введите пароль</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+15"/>
         <location line="+2"/>
-        <location line="+0"/>
         <source>Confirm password</source>
         <translation>Подтвердите пароль</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+5"/>
         <source>Please enter the password</source>
         <translation>Пожалуйста, введите пароль</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+9"/>
         <source>Change password</source>
         <translation>Изменить пароль</translation>
     </message>
@@ -11100,19 +13949,51 @@ ID входных данных: </translation>
         <translation>Изменить пароль</translation>
     </message>
     <message>
+        <location line="+21"/>
         <source>Unable to change the password.</source>
         <translation>Не удалось изменить пароль.</translation>
     </message>
 </context>
 <context>
+    <name>UserGroupCollectionView</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/UserGroupCollectionView.qml" line="+24"/>
+        <source>Group</source>
+        <translation>Группа</translation>
+    </message>
+</context>
+<context>
     <name>UserGroupView</name>
     <message>
-        <location filename="../../../Qml/imtauthgui/UserGroupView.qml" line="+106"/>
+        <location filename="../../../Qml/imtauthgui/UserGroupView.qml" line="+113"/>
+        <location line="+79"/>
         <source>General</source>
         <translation>Основное</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="-74"/>
+        <location line="+330"/>
+        <source>Members</source>
+        <translation>Участники</translation>
+    </message>
+    <message>
+        <location line="-329"/>
+        <source>Group Roles</source>
+        <translation>Роли группы</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Permissions</source>
+        <translation>Права</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <location line="+605"/>
+        <source>History</source>
+        <translation>История</translation>
+    </message>
+    <message>
+        <location line="-519"/>
         <source>Group Name</source>
         <translation>Название группы</translation>
     </message>
@@ -11122,7 +14003,7 @@ ID входных данных: </translation>
         <translation>Введите название</translation>
     </message>
     <message>
-        <location line="+13"/>
+        <location line="+15"/>
         <source>Description</source>
         <translation>Описание</translation>
     </message>
@@ -11132,32 +14013,113 @@ ID входных данных: </translation>
         <translation>Введите описание</translation>
     </message>
     <message>
-        <location line="+13"/>
+        <location line="+78"/>
+        <location line="+284"/>
+        <source>Updating...</source>
+        <translation>Обновление...</translation>
+    </message>
+    <message>
+        <location line="-275"/>
+        <location line="+145"/>
+        <location line="+139"/>
+        <source>Remove</source>
+        <translation>Удалить</translation>
+    </message>
+    <message>
+        <location line="-263"/>
+        <location line="+29"/>
+        <source>Add Parent Group</source>
+        <translation>Добавить родительскую группу</translation>
+    </message>
+    <message>
+        <location line="+25"/>
+        <source>Group</source>
+        <translation>Группа</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>The group has no parent groups.</source>
+        <translation>У группы нет родительских групп.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Filter groups...</source>
+        <translation>Фильтр групп...</translation>
+    </message>
+    <message>
+        <location line="+89"/>
+        <location line="+29"/>
+        <source>Add User</source>
+        <translation>Добавить пользователя</translation>
+    </message>
+    <message>
+        <location line="+21"/>
+        <source>User</source>
+        <translation>Пользователь</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>The group has no members.</source>
+        <translation>В группе нет участников.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Filter users...</source>
+        <translation>Фильтр пользователей...</translation>
+    </message>
+    <message>
+        <location line="+87"/>
+        <location line="+29"/>
+        <source>Add Role</source>
+        <translation>Добавить роль</translation>
+    </message>
+    <message>
+        <location line="+34"/>
+        <source>Role</source>
+        <translation>Роль</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>No roles are assigned.</source>
+        <translation>Роли не назначены.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Filter roles...</source>
+        <translation>Фильтр ролей...</translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <source>The group grants no permissions to its members.</source>
+        <translation>Группа не предоставляет прав своим участникам.</translation>
+    </message>
+    <message>
+        <location line="-585"/>
+        <location line="+186"/>
+        <location line="+58"/>
         <source>Parent Groups</source>
         <translation>Родительские группы</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>Adding Parent Group</source>
-        <translation>Добавление родительской группы</translation>
+        <translation type="vanished">Добавление родительской группы</translation>
     </message>
     <message>
-        <location line="+42"/>
+        <location line="+145"/>
         <source>Users</source>
         <translation>Пользователи</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>Adding Users</source>
-        <translation>Добавление пользователей</translation>
+        <translation type="vanished">Добавление пользователей</translation>
     </message>
     <message>
-        <location line="+25"/>
         <source>Adding Roles</source>
-        <translation>Добавление ролей</translation>
+        <translation type="vanished">Добавление ролей</translation>
     </message>
     <message>
-        <location line="-1"/>
+        <location line="+81"/>
+        <location line="+58"/>
         <source>Roles</source>
         <translation>Роли</translation>
     </message>
@@ -11165,37 +14127,82 @@ ID входных данных: </translation>
 <context>
     <name>UserPanel</name>
     <message>
-        <location filename="../../../Qml/imtauthgui/UserPanel.qml" line="+158"/>
-        <location line="+65"/>
-        <location line="+0"/>
+        <location filename="../../../Qml/imtauthgui/UserPanel.qml" line="+159"/>
+        <source>(delegated)</source>
+        <translation>(делегировано)</translation>
+    </message>
+    <message>
+        <location line="+138"/>
+        <source>Settings</source>
+        <translation>Настройки</translation>
+    </message>
+    <message>
+        <location line="+56"/>
+        <location line="+337"/>
         <source>Profile</source>
         <translation>Профиль</translation>
     </message>
     <message>
-        <location line="-56"/>
+        <location line="-333"/>
         <source>Organization</source>
         <translation>Организация</translation>
     </message>
     <message>
-        <location line="+27"/>
+        <location line="+13"/>
+        <location line="+146"/>
         <source>No organization</source>
         <translation>Нет организации</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="-141"/>
         <source>Logout</source>
         <translation>Выход из системы</translation>
     </message>
 </context>
 <context>
+    <name>UserTokenProvider</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/UserTokenProvider.qml" line="+63"/>
+        <source>This account has been deactivated. Please contact your administrator.</source>
+        <translation>Эта учётная запись деактивирована. Обратитесь к администратору.</translation>
+    </message>
+</context>
+<context>
     <name>UserView</name>
     <message>
-        <location filename="../../../Qml/imtauthgui/UserView.qml" line="+189"/>
+        <location filename="../../../Qml/imtauthgui/UserView.qml" line="+133"/>
+        <source>Correct the highlighted fields before saving</source>
+        <translation>Исправьте выделенные поля перед сохранением</translation>
+    </message>
+    <message>
+        <location line="+24"/>
+        <location line="+155"/>
         <source>General</source>
         <translation>Основное</translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="-151"/>
+        <source>User Roles</source>
+        <translation>Роли пользователя</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Group Membership</source>
+        <translation>Членство в группах</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Permissions</source>
+        <translation>Права</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <location line="+602"/>
+        <source>History</source>
+        <translation>История</translation>
+    </message>
+    <message>
+        <location line="-432"/>
         <source>System Information</source>
         <translation>Информация о системе</translation>
     </message>
@@ -11205,26 +14212,81 @@ ID входных данных: </translation>
         <translation>Название системы</translation>
     </message>
     <message>
-        <location line="+80"/>
-        <location line="+12"/>
-        <location line="+0"/>
+        <location line="+129"/>
+        <location line="+58"/>
         <source>Roles</source>
         <translation>Роли</translation>
     </message>
     <message>
+        <location line="-58"/>
+        <location line="+154"/>
+        <source>Updating...</source>
+        <translation>Обновление...</translation>
+    </message>
+    <message>
+        <location line="-145"/>
+        <location line="+154"/>
+        <source>Remove</source>
+        <translation>Удалить</translation>
+    </message>
+    <message>
+        <location line="-133"/>
+        <location line="+29"/>
+        <source>Add Role</source>
+        <translation>Добавить роль</translation>
+    </message>
+    <message>
+        <location line="+34"/>
+        <source>Role</source>
+        <translation>Роль</translation>
+    </message>
+    <message>
         <location line="+1"/>
+        <source>No roles are assigned.</source>
+        <translation>Роли не назначены.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Filter roles...</source>
+        <translation>Фильтр ролей...</translation>
+    </message>
+    <message>
+        <location line="+89"/>
+        <location line="+29"/>
+        <source>Add Group</source>
+        <translation>Добавить группу</translation>
+    </message>
+    <message>
+        <location line="+21"/>
+        <source>Group</source>
+        <translation>Группа</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>The user is not a member of any group.</source>
+        <translation>Пользователь не состоит ни в одной группе.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Filter groups...</source>
+        <translation>Фильтр групп...</translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <source>The user gets no permissions from roles or groups.</source>
+        <translation>Пользователь не получает прав от ролей или групп.</translation>
+    </message>
+    <message>
         <source>Adding Role</source>
-        <translation>Добавление роли</translation>
+        <translation type="vanished">Добавление роли</translation>
     </message>
     <message>
-        <location line="+31"/>
         <source>Adding Group</source>
-        <translation>Добавление группы</translation>
+        <translation type="vanished">Добавление группы</translation>
     </message>
     <message>
-        <location line="-13"/>
-        <location line="+12"/>
-        <location line="+0"/>
+        <location line="-102"/>
+        <location line="+58"/>
         <source>Groups</source>
         <translation>Группы</translation>
     </message>
@@ -11233,21 +14295,16 @@ ID входных данных: </translation>
     <name>imt3dgui::CView3dProviderComp</name>
     <message>
         <location filename="../../../Include/imt3dgui/CView3dProviderComp.cpp" line="+737"/>
-        <location line="+0"/>
-        <location line="+0"/>
         <source>Zoom in</source>
         <translation>Увеличить</translation>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+0"/>
-        <location line="+0"/>
         <source>Zoom out</source>
         <translation>Уменьшить</translation>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+0"/>
         <source>Show Grid</source>
         <translation>Показать сетку</translation>
     </message>
@@ -11258,7 +14315,6 @@ ID входных данных: </translation>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+0"/>
         <source>Show Axis</source>
         <translation>Показать оси</translation>
     </message>
@@ -11269,7 +14325,6 @@ ID входных данных: </translation>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+0"/>
         <source>Show Ruler</source>
         <translation>Показать линейку</translation>
     </message>
@@ -11280,7 +14335,6 @@ ID входных данных: </translation>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+0"/>
         <source>Reset View</source>
         <translation>Сбросить вид</translation>
     </message>
@@ -11291,7 +14345,6 @@ ID входных данных: </translation>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+0"/>
         <source>Right View</source>
         <translation>Вид справа</translation>
     </message>
@@ -11302,7 +14355,6 @@ ID входных данных: </translation>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+0"/>
         <source>Front View</source>
         <translation>Вид спереди</translation>
     </message>
@@ -11313,7 +14365,6 @@ ID входных данных: </translation>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+0"/>
         <source>Top View</source>
         <translation>Вид сверху</translation>
     </message>
@@ -11324,7 +14375,6 @@ ID входных данных: </translation>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+0"/>
         <source>Left View</source>
         <translation>Вид слева</translation>
     </message>
@@ -11335,7 +14385,6 @@ ID входных данных: </translation>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+0"/>
         <source>Bottom View</source>
         <translation>Вид снизу</translation>
     </message>
@@ -11346,7 +14395,6 @@ ID входных данных: </translation>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+0"/>
         <source>Back View</source>
         <translation>Вид сзади</translation>
     </message>
@@ -11357,7 +14405,6 @@ ID входных данных: </translation>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+0"/>
         <source>Select Point</source>
         <translation>Выбрать точку</translation>
     </message>
@@ -11368,7 +14415,6 @@ ID входных данных: </translation>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+0"/>
         <source>Select Box</source>
         <translation>Выбрать прямоугольник</translation>
     </message>
@@ -11379,7 +14425,6 @@ ID входных данных: </translation>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+0"/>
         <source>Select Circle</source>
         <translation>Выбрать круг</translation>
     </message>
@@ -11390,7 +14435,6 @@ ID входных данных: </translation>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+0"/>
         <source>Clear Selection</source>
         <translation>Снять выделение</translation>
     </message>
@@ -11401,14 +14445,11 @@ ID входных данных: </translation>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+0"/>
-        <location line="+0"/>
         <source>Select all</source>
         <translation>Выделить все</translation>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+0"/>
         <source>Invert Selection</source>
         <translation>Инвертировать выделение</translation>
     </message>
@@ -11419,7 +14460,6 @@ ID входных данных: </translation>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+0"/>
         <source>Delete Selection</source>
         <translation>Удалить выделенное</translation>
     </message>
@@ -11430,7 +14470,6 @@ ID входных данных: </translation>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+0"/>
         <source>Free Rotation</source>
         <translation>Свободное вращение</translation>
     </message>
@@ -11548,60 +14587,90 @@ ID входных данных: </translation>
 <context>
     <name>imtauth::CRoleChangeGeneratorComp</name>
     <message>
-        <location filename="../../../Include/imtauth/CRoleChangeGeneratorComp.cpp" line="+55"/>
+        <location filename="../../../Include/imtauth/CRoleChangeGeneratorComp.cpp" line="+48"/>
         <source>Added parent role &apos;%1&apos;</source>
         <translation>Добавлена родительская роль &apos;%1&apos;</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+4"/>
         <source>Removed parent role &apos;%1&apos;</source>
         <translation>Удалена родительская роль &apos;%1&apos;</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+4"/>
         <source>Added permission &apos;%1&apos;</source>
         <translation>Добавлено право &apos;%1&apos;</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+4"/>
         <source>Removed permission &apos;%1&apos;</source>
         <translation>Удалено право &apos;%1&apos;</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Added prohibition &apos;%1&apos;</source>
+        <translation>Добавлен запрет &apos;%1&apos;</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Removed prohibition &apos;%1&apos;</source>
+        <translation>Удалён запрет &apos;%1&apos;</translation>
     </message>
 </context>
 <context>
     <name>imtauth::CUserChangeGeneratorComp</name>
     <message>
-        <location filename="../../../Include/imtauth/CUserChangeGeneratorComp.cpp" line="+75"/>
+        <location filename="../../../Include/imtauth/CUserChangeGeneratorComp.cpp" line="+84"/>
         <source>Added to group &apos;%1&apos;</source>
         <translation>Добавлен в группу &apos;%1&apos;</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+4"/>
         <source>Removed from group &apos;%1&apos;</source>
         <translation>Удален из группы &apos;%1&apos;</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+4"/>
         <source>Added role &apos;%1&apos;</source>
         <translation>Добавлена роль &apos;%1&apos;</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+4"/>
         <source>Removed role &apos;%1&apos;</source>
         <translation>Удалена роль &apos;%1&apos;</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+4"/>
         <source>Added to product &apos;%1&apos;</source>
         <translation>Добавлен в продукт &apos;%1&apos;</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+4"/>
         <source>Removed from product &apos;%1&apos;</source>
         <translation>Удален из продукта &apos;%1&apos;</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+4"/>
+        <source>Added permission &apos;%1&apos;</source>
+        <translation>Добавлено право &apos;%1&apos;</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Removed permission &apos;%1&apos;</source>
+        <translation>Удалено право &apos;%1&apos;</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Added prohibition &apos;%1&apos;</source>
+        <translation>Добавлен запрет &apos;%1&apos;</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Removed prohibition &apos;%1&apos;</source>
+        <translation>Удалён запрет &apos;%1&apos;</translation>
+    </message>
+    <message>
+        <location line="+4"/>
         <source>Password changed</source>
         <translation>Пароль изменён</translation>
     </message>
@@ -11609,55 +14678,75 @@ ID входных данных: </translation>
 <context>
     <name>imtauth::CUserGroupChangeGeneratorComp</name>
     <message>
-        <location filename="../../../Include/imtauth/CUserGroupChangeGeneratorComp.cpp" line="+106"/>
+        <location filename="../../../Include/imtauth/CUserGroupChangeGeneratorComp.cpp" line="+90"/>
         <source>Added parent group &apos;%1&apos;</source>
         <translation>Добавлена родительская группа &apos;%1&apos;</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+4"/>
         <source>Removed parent group &apos;%1&apos;</source>
         <translation>Удалена родительская группа &apos;%1&apos;</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+8"/>
         <source>Removed user &apos;%1&apos;</source>
         <translation>Удален пользователь &apos;%1&apos;</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="-4"/>
         <source>Added user &apos;%1&apos;</source>
         <translation>Добавлен пользователь &apos;%1&apos;</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+8"/>
         <source>Added role &apos;%1&apos;</source>
         <translation>Добавлена роль &apos;%1&apos;</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+4"/>
         <source>Removed role &apos;%1&apos;</source>
         <translation>Удалена роль &apos;%1&apos;</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+4"/>
         <source>Added to product &apos;%1&apos;</source>
         <translation>Добавлен в продукт &apos;%1&apos;</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+4"/>
         <source>Removed from product &apos;%1&apos;</source>
         <translation>Удален из продукта &apos;%1&apos;</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Added permission &apos;%1&apos;</source>
+        <translation>Добавлено право &apos;%1&apos;</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Removed permission &apos;%1&apos;</source>
+        <translation>Удалено право &apos;%1&apos;</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Added prohibition &apos;%1&apos;</source>
+        <translation>Добавлен запрет &apos;%1&apos;</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Removed prohibition &apos;%1&apos;</source>
+        <translation>Удалён запрет &apos;%1&apos;</translation>
     </message>
 </context>
 <context>
     <name>imtauthgql::CRoleCollectionControllerComp</name>
     <message>
-        <location filename="../../../Include/imtauthgql/CRoleCollectionControllerComp.cpp" line="+168"/>
+        <location filename="../../../Include/imtauthgql/CRoleCollectionControllerComp.cpp" line="+142"/>
         <source>Roles</source>
         <translation>Роли</translation>
     </message>
     <message>
-        <location line="+36"/>
+        <location line="+29"/>
         <source>Unable to get a role info</source>
         <translation>Не удалось получить информацию о роли</translation>
     </message>
@@ -11665,12 +14754,12 @@ ID входных данных: </translation>
 <context>
     <name>imtauthgql::CUserCollectionControllerComp</name>
     <message>
-        <location filename="../../../Include/imtauthgql/CUserCollectionControllerComp.cpp" line="+402"/>
+        <location filename="../../../Include/imtauthgql/CUserCollectionControllerComp.cpp" line="+415"/>
         <source>Internal</source>
         <translation>Внутренняя</translation>
     </message>
     <message>
-        <location line="-356"/>
+        <location line="-354"/>
         <source>Username can&apos;t be empty!</source>
         <translation>Логин не может быть пустым!</translation>
     </message>
@@ -11680,7 +14769,7 @@ ID входных данных: </translation>
         <translation>Пользователь с таким логином уже существует</translation>
     </message>
     <message>
-        <location line="+136"/>
+        <location line="+118"/>
         <source>Users</source>
         <translation>Пользователи</translation>
     </message>
@@ -11688,7 +14777,7 @@ ID входных данных: </translation>
 <context>
     <name>imtauthgql::CUserGroupCollectionControllerComp</name>
     <message>
-        <location filename="../../../Include/imtauthgql/CUserGroupCollectionControllerComp.cpp" line="+136"/>
+        <location filename="../../../Include/imtauthgql/CUserGroupCollectionControllerComp.cpp" line="+117"/>
         <source>Groups</source>
         <translation>Группы</translation>
     </message>
@@ -11696,7 +14785,7 @@ ID входных данных: </translation>
 <context>
     <name>imtauthgql::CUserRepresentationController</name>
     <message>
-        <location filename="../../../Include/imtauthgql/CUserRepresentationController.cpp" line="+43"/>
+        <location filename="../../../Include/imtauthgql/CUserRepresentationController.cpp" line="+45"/>
         <source>Username can&apos;t be empty!</source>
         <translation>Логин не может быть пустым!</translation>
     </message>
@@ -11882,54 +14971,87 @@ ID входных данных: </translation>
 <context>
     <name>imtbase::CDocumentChangeGeneratorCompBase</name>
     <message>
-        <location filename="../../../Include/imtbase/CDocumentChangeGeneratorCompBase.cpp" line="+121"/>
+        <location filename="../../../Include/imtbase/CDocumentChangeGeneratorCompBase.cpp" line="+344"/>
         <source>Created the document</source>
         <translation>Создан документ</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+4"/>
+        <source>Deleted the document</source>
+        <translation>Документ удалён</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Restored the document</source>
+        <translation>Документ восстановлен</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Imported the document</source>
+        <translation>Документ импортирован</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Renamed from &apos;%1&apos; to &apos;%2&apos;</source>
+        <translation>Переименовано с &apos;%1&apos; на &apos;%2&apos;</translation>
+    </message>
+    <message>
+        <location line="+4"/>
         <source>&apos;%1&apos; changed from &apos;%2&apos; to &apos;%3&apos;</source>
         <translation>&apos;%1&apos; изменено с &apos;%2&apos; на &apos;%3&apos;</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+4"/>
         <source>&apos;%1&apos; was set to &apos;%2&apos;</source>
         <translation>&apos;%1&apos; установлено на &apos;%2&apos;</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+4"/>
         <source>&apos;%1&apos; was cleared</source>
         <translation>&apos;%1&apos; очищено</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Saved without changes</source>
+        <translation>Сохранено без изменений</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>The changes of this revision could not be determined</source>
+        <translation>Не удалось определить изменения в этой ревизии</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Operation &apos;%1&apos;</source>
+        <translation>Операция &apos;%1&apos;</translation>
     </message>
 </context>
 <context>
     <name>imtbase::CSystemStatusComp</name>
     <message>
-        <location filename="../../../Include/imtserverapp/CSystemStatusComp.cpp" line="-140"/>
-        <location line="+64"/>
         <source>Try connect to: &apos;%1&apos; ...</source>
-        <translation>Попытка подключения к: &apos;%1&apos; ...</translation>
+        <translation type="vanished">Попытка подключения к: &apos;%1&apos; ...</translation>
     </message>
 </context>
 <context>
     <name>imtdb::CSqlDatabaseObjectDelegateCompBase</name>
     <message>
-        <location filename="../../../Include/imtdb/CSqlDatabaseObjectDelegateCompBase.cpp" line="+668"/>
+        <location filename="../../../Include/imtdb/CSqlDatabaseObjectDelegateCompBase.cpp" line="+819"/>
         <source>Collection table auto-creation failed; see previous errors. Component initialization was stopped</source>
         <translation>Автосоздание таблицы коллекции не удалось; см. предыдущие ошибки. Инициализация компонента остановлена</translation>
     </message>
     <message>
-        <location line="+27"/>
+        <location line="+33"/>
         <source>Table creation script path is empty</source>
         <translation>Путь к скрипту создания таблицы не задан</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+17"/>
         <source>Collection table creation script &apos;%1&apos; could not be loaded</source>
         <translation>Не удалось загрузить скрипт создания таблицы коллекции &apos;%1&apos;</translation>
     </message>
     <message>
-        <location line="+27"/>
+        <location line="+46"/>
         <source>
 	| Table could not be created
 	| Error: %1
@@ -11966,7 +15088,7 @@ ID входных данных: </translation>
         <translation>Неверный путь к директории QML</translation>
     </message>
     <message>
-        <location line="+32"/>
+        <location line="+33"/>
         <source>The module name is invalid</source>
         <translation>Неверное название модуля</translation>
     </message>
@@ -11979,14 +15101,12 @@ ID входных данных: </translation>
 <context>
     <name>imtgeo::CAddressControllerComp</name>
     <message>
-        <location filename="../../../Include/imtgeo/CAddressControllerComp.cpp" line="-248"/>
         <source>Unable to get an address info</source>
-        <translation>Не удалось получить информацию об адресе</translation>
+        <translation type="vanished">Не удалось получить информацию об адресе</translation>
     </message>
     <message>
-        <location line="+141"/>
         <source>Unable to get an address info!</source>
-        <translation>Не удалось получить информацию об адресе!</translation>
+        <translation type="vanished">Не удалось получить информацию об адресе!</translation>
     </message>
 </context>
 <context>
@@ -12075,7 +15195,6 @@ ID входных данных: </translation>
     <name>imtgui::CLayoutManagerGuiComp</name>
     <message>
         <location filename="../../../Include/imtgui/CLayoutManagerGuiComp.cpp" line="+256"/>
-        <location line="+0"/>
         <source>Edit Mode</source>
         <translation>Режим редактирования</translation>
     </message>
@@ -12086,7 +15205,6 @@ ID входных данных: </translation>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+0"/>
         <source>Clear All</source>
         <translation>Очистить все</translation>
     </message>
@@ -12097,15 +15215,11 @@ ID входных данных: </translation>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+0"/>
-        <location line="+0"/>
         <source>Import</source>
         <translation>Импорт</translation>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+0"/>
-        <location line="+0"/>
         <source>Export</source>
         <translation>Экспорт</translation>
     </message>
@@ -12272,7 +15386,6 @@ ID входных данных: </translation>
     <message>
         <location line="+2"/>
         <location line="+715"/>
-        <location line="+0"/>
         <source>Duplicate</source>
         <translation>Дублировать</translation>
     </message>
@@ -12280,7 +15393,6 @@ ID входных данных: </translation>
         <location line="-714"/>
         <location line="+213"/>
         <location line="+502"/>
-        <location line="+0"/>
         <source>Remove</source>
         <translation>Удалить</translation>
     </message>
@@ -12294,7 +15406,6 @@ ID входных данных: </translation>
         <location line="-714"/>
         <location line="+715"/>
         <location line="+147"/>
-        <location line="+0"/>
         <source>Export</source>
         <translation>Экспорт</translation>
     </message>
@@ -12539,9 +15650,7 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtgui/CStandardCollectionViewDelegateComp.cpp" line="+26"/>
         <location line="+103"/>
-        <location line="+0"/>
         <location line="+10"/>
-        <location line="+0"/>
         <source>Edit</source>
         <translation>Редактировать</translation>
     </message>
@@ -12555,13 +15664,13 @@ ID входных данных: </translation>
 <context>
     <name>imtgui::CThumbnailDecoratorGuiComp</name>
     <message>
-        <location filename="../../../Include/imtgui/CThumbnailDecoratorGuiComp.cpp" line="+438"/>
-        <location line="+314"/>
+        <location filename="../../../Include/imtgui/CThumbnailDecoratorGuiComp.cpp" line="+440"/>
+        <location line="+311"/>
         <source>Login</source>
         <translation>Логин</translation>
     </message>
     <message>
-        <location line="-280"/>
+        <location line="-275"/>
         <source>Quit</source>
         <translation>Выйти</translation>
     </message>
@@ -12571,7 +15680,7 @@ ID входных данных: </translation>
         <translation>Вы действительно хотите выйти?</translation>
     </message>
     <message>
-        <location line="+416"/>
+        <location line="+411"/>
         <location line="+154"/>
         <source>&lt;unnamed&gt;</source>
         <translation>&lt;без имени&gt;</translation>
@@ -12613,7 +15722,7 @@ ID входных данных: </translation>
 <context>
     <name>imthypegui::CTaskManagerGuiComp</name>
     <message>
-        <location filename="../../../Include/imthypegui/CTaskManagerGuiComp.cpp" line="-300"/>
+        <location filename="../../../Include/imthypegui/CTaskManagerGuiComp.cpp" line="-302"/>
         <source>Disable</source>
         <translation>Отключить</translation>
     </message>
@@ -12629,12 +15738,12 @@ ID входных данных: </translation>
     </message>
     <message>
         <location line="+3"/>
-        <location line="+516"/>
+        <location line="+519"/>
         <source>Duplicate</source>
         <translation>Дублировать</translation>
     </message>
     <message>
-        <location line="-515"/>
+        <location line="-518"/>
         <source>Delete</source>
         <translation>Удалить</translation>
     </message>
@@ -12654,7 +15763,12 @@ ID входных данных: </translation>
         <translation>Настройки...</translation>
     </message>
     <message>
-        <location line="+137"/>
+        <location line="+133"/>
+        <source>Copy of</source>
+        <translation>Копия</translation>
+    </message>
+    <message>
+        <location line="+6"/>
         <source>Task Error</source>
         <translation>Ошибка задачи</translation>
     </message>
@@ -12665,12 +15779,12 @@ ID входных данных: </translation>
     </message>
     <message>
         <location line="+166"/>
-        <location line="+196"/>
+        <location line="+197"/>
         <source>Acquisition Manager</source>
         <translation>Менеджер захвата</translation>
     </message>
     <message>
-        <location line="-162"/>
+        <location line="-163"/>
         <source>Trigger-Inspection Mapping</source>
         <translation>Связь триггеров и инспекций</translation>
     </message>
@@ -12680,7 +15794,7 @@ ID входных данных: </translation>
         <translation>Всего инспекций: %1</translation>
     </message>
     <message>
-        <location line="+114"/>
+        <location line="+115"/>
         <source>&amp;Show Task List</source>
         <translation>&amp;Показать список задач</translation>
     </message>
@@ -12778,23 +15892,21 @@ ID входных данных: </translation>
 <context>
     <name>imthypegui::CTaskSettingsGuiComp</name>
     <message>
-        <location filename="../../../Include/imthypegui/CTaskSettingsGuiComp.cpp" line="-96"/>
-        <location line="+6"/>
+        <location filename="../../../Include/imthypegui/CTaskSettingsGuiComp.cpp" line="-85"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location line="-6"/>
+        <location line="+0"/>
         <source>The task name contains some not allowed characters</source>
         <translation>Название задачи содержит недопустимые символы</translation>
     </message>
     <message>
-        <location line="+6"/>
         <source>Acq-SubId must be a number</source>
-        <translation>Acq-SubId должен быть числом</translation>
+        <translation type="vanished">Acq-SubId должен быть числом</translation>
     </message>
     <message>
-        <location line="+114"/>
+        <location line="+109"/>
         <source>Acquisition Manager</source>
         <translation>Менеджер захвата</translation>
     </message>
@@ -12947,7 +16059,7 @@ ID входных данных: </translation>
 <context>
     <name>imtlicgql::CProductCollectionControllerComp</name>
     <message>
-        <location filename="../../../Include/imtlicgql/CProductCollectionControllerComp.cpp" line="+400"/>
+        <location filename="../../../Include/imtlicgql/CProductCollectionControllerComp.cpp" line="+515"/>
         <source>Product Name cannot be empty</source>
         <translation>Название продукта не может быть пустым</translation>
     </message>
@@ -13008,7 +16120,7 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtlicgui/CProductInstanceInfoEditorComp.cpp" line="+162"/>
         <source></source>
-        <translation type="obsolete"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+4"/>
@@ -13083,7 +16195,6 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtlicgui/CProductInstanceInfoViewDelegateComp.cpp" line="+21"/>
         <location line="+97"/>
-        <location line="+0"/>
         <source>Create License File</source>
         <translation>Создать файл лицензии</translation>
     </message>
@@ -13219,7 +16330,6 @@ ID входных данных: </translation>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+0"/>
         <source>Zoom in</source>
         <translation>Увеличить</translation>
     </message>
@@ -13230,7 +16340,6 @@ ID входных данных: </translation>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+0"/>
         <source>Zoom out</source>
         <translation>Уменьшить</translation>
     </message>
@@ -13241,7 +16350,6 @@ ID входных данных: </translation>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+0"/>
         <source>Zoom reset</source>
         <translation>Сбросить масштаб</translation>
     </message>
@@ -13254,12 +16362,12 @@ ID входных данных: </translation>
 <context>
     <name>imtqml::CDocumentServiceController</name>
     <message>
-        <location filename="../../../Include/imtqml/CDocumentServiceController.cpp" line="+370"/>
+        <location filename="../../../Include/imtqml/CDocumentServiceController.cpp" line="+380"/>
         <source>&lt;no name&gt;</source>
         <translation>&lt;без имени&gt;</translation>
     </message>
     <message>
-        <location line="+301"/>
+        <location line="+329"/>
         <source>Save document failed</source>
         <translation>Не удалось сохранить документ</translation>
     </message>
@@ -13267,7 +16375,7 @@ ID входных данных: </translation>
 <context>
     <name>imtrepo::CFileCollectionComp</name>
     <message>
-        <location filename="../../../Include/imtrepo/CFileCollectionComp.cpp" line="+704"/>
+        <location filename="../../../Include/imtrepo/CFileCollectionComp.cpp" line="+759"/>
         <source>File could not be inserted into the repository</source>
         <translation>Не удалось добавить файл в репозиторий</translation>
     </message>
@@ -13347,9 +16455,18 @@ ID входных данных: </translation>
     </message>
 </context>
 <context>
+    <name>imtserverapp::CSystemStatusComp</name>
+    <message>
+        <location filename="../../../Include/imtserverapp/CSystemStatusComp.cpp" line="-140"/>
+        <location line="+64"/>
+        <source>Try connect to: &apos;%1&apos; ...</source>
+        <translation>Попытка подключения к: &apos;%1&apos; ...</translation>
+    </message>
+</context>
+<context>
     <name>imtservergql::CGqlSearchControllerComp</name>
     <message>
-        <location filename="../../../Include/imtservergql/CGqlSearchControllerComp.cpp" line="+62"/>
+        <location filename="../../../Include/imtservergql/CGqlSearchControllerComp.cpp" line="+98"/>
         <source>Unnamed result</source>
         <translation>Безымянный результат</translation>
     </message>
@@ -13363,7 +16480,7 @@ ID входных данных: </translation>
     </message>
     <message>
         <location line="+670"/>
-        <location line="+120"/>
+        <location line="+121"/>
         <source>Unable to import the object. GQL input params is invalid.</source>
         <translation>Не удалось импортировать объект. Параметры GQL недействительны.</translation>
     </message>
@@ -13371,14 +16488,14 @@ ID входных данных: </translation>
 <context>
     <name>imtservergql::CObjectCollectionControllerCompBase</name>
     <message>
-        <location filename="../../../Include/imtservergql/CObjectCollectionControllerCompBase.cpp" line="+1818"/>
+        <location filename="../../../Include/imtservergql/CObjectCollectionControllerCompBase.cpp" line="-212"/>
         <source>Internal error</source>
         <translation>Внутренняя ошибка</translation>
     </message>
     <message>
-        <location line="+465"/>
+        <location line="+503"/>
         <location line="+25"/>
-        <location line="+123"/>
+        <location line="+129"/>
         <source>Unable to import the object. GQL input params is invalid.</source>
         <translation>Не удалось импортировать объект. Параметры GQL недействительны.</translation>
     </message>
@@ -13389,119 +16506,6 @@ ID входных данных: </translation>
         <location filename="../../../Include/imtservergql/CStructureControllerCompBase.cpp" line="+300"/>
         <source>Internal error</source>
         <translation>Внутренняя ошибка</translation>
-    </message>
-</context>
-<context>
-    <name>PermissionDetailsPanel</name>
-    <message>
-        <source>The path is copied</source>
-        <translation>Путь скопирован</translation>
-    </message>
-    <message>
-        <source>Copy the full path</source>
-        <translation>Скопировать полный путь</translation>
-    </message>
-</context>
-<context>
-    <name>NotificationBell</name>
-    <message>
-        <source>Notifications</source>
-        <translation>Уведомления</translation>
-    </message>
-    <message>
-        <source>Notifications: %1 unread</source>
-        <translation>Уведомления: непрочитанных %1</translation>
-    </message>
-</context>
-<context>
-    <name>NotificationDelegate</name>
-    <message>
-        <source>Mark as read</source>
-        <translation>Отметить как прочитанное</translation>
-    </message>
-    <message>
-        <source>Remove</source>
-        <translation>Удалить</translation>
-    </message>
-</context>
-<context>
-    <name>NotificationPanel</name>
-    <message>
-        <source>All notifications</source>
-        <translation>Все уведомления</translation>
-    </message>
-    <message>
-        <source>Mark all as read</source>
-        <translation>Отметить все как прочитанные</translation>
-    </message>
-    <message>
-        <source>No notifications</source>
-        <translation>Нет уведомлений</translation>
-    </message>
-    <message>
-        <source>Notifications</source>
-        <translation>Уведомления</translation>
-    </message>
-</context>
-<context>
-    <name>NotificationCenter</name>
-    <message>
-        <source>%1 new notifications while you were away</source>
-        <translation>Новых уведомлений, пока вас не было: %1</translation>
-    </message>
-</context>
-<context>
-    <name>NotificationsPage</name>
-    <message>
-        <source>Critical</source>
-        <translation>Критично</translation>
-    </message>
-    <message>
-        <source>Error</source>
-        <translation>Ошибка</translation>
-    </message>
-    <message>
-        <source>Information</source>
-        <translation>Информация</translation>
-    </message>
-    <message>
-        <source>Read</source>
-        <translation>Прочитанные</translation>
-    </message>
-    <message>
-        <source>Remove the selected notifications?</source>
-        <translation>Удалить выбранные уведомления?</translation>
-    </message>
-    <message>
-        <source>Removing notifications</source>
-        <translation>Удаление уведомлений</translation>
-    </message>
-    <message>
-        <source>Severity</source>
-        <translation>Важность</translation>
-    </message>
-    <message>
-        <source>State</source>
-        <translation>Состояние</translation>
-    </message>
-    <message>
-        <source>Type</source>
-        <translation>Тип</translation>
-    </message>
-    <message>
-        <source>Unread</source>
-        <translation>Непрочитанные</translation>
-    </message>
-    <message>
-        <source>Warning</source>
-        <translation>Предупреждение</translation>
-    </message>
-</context>
-<context>
-    <name>NotificationTypeRegistry</name>
-    <message>
-        <source>%1 &quot;%2&quot;</source>
-        <translation>%1 «%2»</translation>
     </message>
 </context>
 </TS>

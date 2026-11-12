@@ -108,6 +108,7 @@ private slots:
 	// Object revision tests
 	void RevisionSourceRefHelpersTest();
 	void OpenDocumentRevisionTest();
+	void HandleDocumentRevisionReadOnlyTest();
 	void OpenDocumentRevisionListNameSuffixTest();
 	void OpenDocumentNonExistentRevisionTest();
 	void OpenDocumentRevisionAndHeadSeparateTest();
@@ -157,5 +158,4 @@ private:
 	imtdoc::IDocumentService* m_singleCopyServicePtr = nullptr;
 	imtbase::IObjectCollection* m_collectionPtr = nullptr;
 };
-
 

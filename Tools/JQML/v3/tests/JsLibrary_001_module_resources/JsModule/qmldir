@@ -1,0 +1,4 @@
+module JsModule
+SingleFunction 1.0 SingleFunction.js
+SeveralFunctions 1.0 SeveralFunctions.js
+SingleObject 1.0 SingleObject.js

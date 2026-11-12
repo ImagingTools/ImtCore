@@ -14,6 +14,8 @@
 
 // ImtCore includes
 #include <imtauth/IUserInfo.h>
+#include <imtbase/imtbase.h>
+#include <imtgql/CGqlRequestContextManager.h>
 #include <imtgql/IGqlContext.h>
 #include <imtgql/CGqlParamObject.h>
 #include <imtdoc/CDocumentChangedEvent.h>
@@ -227,6 +229,15 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentChanged(imtdoc::CEventBa
 					concreteEventPtr->GetDocument());
 		sdlNotification.changeIds.Emplace();
 		sdlNotification.changeIds->FromList(changeIds);
+	}
+
+	// The change is published on the thread of the request that made it: the client of the request knows its ID
+	const imtgql::IGqlContext* requestContextPtr = imtgql::CGqlRequestContextManager::GetContext();
+	if (requestContextPtr != nullptr){
+		const QByteArray requestId = requestContextPtr->GetHeaders().value(imtbase::s_requestIdHeaderId.toLower());
+		if (imtbase::isValidUuid(requestId)){
+			sdlNotification.requestId = requestId;
+		}
 	}
 
 	PublishRepresentation(sdl::V1_0::imtbase::COnDocumentManagerChangedGqlRequest::GetCommandId(), notification.userId, sdlNotification);
