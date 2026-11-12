@@ -72,14 +72,6 @@ protected:
 	// reimplemented (imtservergql::CGqlRequestHandlerCompBase)
 	virtual QJsonObject CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
-	// reimplemented (imtservergql::CObjectCollectionControllerCompBase)
-	virtual bool OnBeforeStoreObject(
-				const QByteArray& objectId,
-				bool isNewObject,
-				istd::IChangeable& object,
-				const imtgql::CGqlRequest& gqlRequest,
-				QString& errorMessage) const override;
-
 	// reimplemented (imtservergql::CPermissibleGqlRequestHandlerComp)
 	virtual bool CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
