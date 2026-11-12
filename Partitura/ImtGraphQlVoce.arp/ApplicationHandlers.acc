@@ -34,6 +34,9 @@
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ApplicationPreferences" Type="Reference" ExportId="ApplicationPreferences">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="AuthOptionIndex" Type="Integer" ExportId="AuthOptionIndex">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
