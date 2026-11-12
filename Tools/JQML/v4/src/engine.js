@@ -3202,6 +3202,23 @@ export class Engine {
 
 	// The loaded document a URL names, or null.
 	findDocument(url) {
+		// A reply of the server builds one component per element through `Qt.createComponent('Type.qml')`; the search below walks
+		// every loaded document, so the answer is kept until a document or a module is added.
+		const project = this.project;
+		const version = project.docs.size + project.modules.size;
+		if (this.$documentCacheVersion !== version || this.$documentCacheProject !== project) {
+			this.$documentCache = new Map();
+			this.$documentCacheVersion = version;
+			this.$documentCacheProject = project;
+		}
+		const cached = this.$documentCache.get(url);
+		if (cached !== undefined) return cached;
+		const found = this.searchDocument(url);
+		this.$documentCache.set(url, found);
+		return found;
+	}
+
+	searchDocument(url) {
 		const docs = this.project.docs;
 		const exact = docs.get(this.documentPath(url));
 		if (exact !== undefined) return exact;
