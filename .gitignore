@@ -3,6 +3,9 @@ AuxInclude/
 Bin/
 Lib/
 node_modules/
+# the packages of the JQML v5 compiler are part of the repository
+!Tools/JQML/v5/node_modules/
+!Tools/JQML/v5/node_modules/**
 
 # CMake build artifacts
 CMakeCache.txt
