@@ -24,6 +24,7 @@ private slots:
 	void NoCheckWithoutChangeBeforeTheControl();
 	void PassedSessionDeadlineIsNotUnknown();
 	void ChangeOfTheAccessChecksAgain();
+	void ChangeOfAUserChecksItsSubscriptionsOnly();
 	void ChangesDuringACheckCoalesce();
 	void CheckDoesNotTriggerItself();
 	void GraceEndsAsTemporarilyUnavailable();
@@ -48,4 +49,5 @@ private slots:
 	void CollectionNotificationContainsOnlyIdentifiers_data();
 	void CollectionNotificationContainsOnlyIdentifiers();
 	void ReconnectInvalidatesCacheAndRechecksAccess();
+	void ForwardedRefusalKeepsItsCode();
 };

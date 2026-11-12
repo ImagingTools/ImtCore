@@ -3,6 +3,7 @@
 
 
 // Qt includes
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 
@@ -209,11 +210,21 @@ void CPublisherSubscriberBridgeComp::OnResponseReceived(
 void CPublisherSubscriberBridgeComp::OnSubscriptionStatusChanged(
 			const QByteArray& subscriptionId,
 			const SubscriptionStatus& status,
-			const QString& /*message*/)
+			const QString& message)
 {
 	if (status != SS_REFUSED || !m_requestManagerCompPtr.IsValid()){
 		return;
 	}
+
+	// The reason of the server behind goes on: the client tells a retry from a refusal by it
+	QJsonObject extensions;
+	extensions["type"] = QStringLiteral("Warning");
+	const QJsonArray errors = QJsonDocument::fromJson(message.toUtf8()).object().value("payload").toArray();
+	const QString code = errors.isEmpty() ? QString() : errors.first().toObject().value("extensions").toObject().value("code").toString();
+	if (!code.isEmpty()){
+		extensions["code"] = code;
+	}
+	const QByteArray extensionsJson = QJsonDocument(extensions).toJson(QJsonDocument::Compact);
 
 	QByteArrayList clientSubscriptionIds;
 	{
@@ -230,8 +241,8 @@ void CPublisherSubscriberBridgeComp::OnSubscriptionStatusChanged(
 				continue;
 			}
 
-			const QByteArray body = QStringLiteral(R"({"id": "%1","type": "error","payload": [{"message": "The server behind this one refused the subscription","extensions": {"type": "Warning"}}]})")
-						.arg(QString::fromUtf8(clientSubscriptionId)).toUtf8();
+			const QByteArray body = QStringLiteral(R"({"id": "%1","type": "error","payload": [{"message": "The server behind this one refused the subscription","extensions": %2}]})")
+						.arg(QString::fromUtf8(clientSubscriptionId), QString::fromUtf8(extensionsJson)).toUtf8();
 
 			imtrest::ConstResponsePtr responsePtr(networkRequestPtr->GetProtocolEngine().CreateResponse(
 						*networkRequestPtr,

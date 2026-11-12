@@ -48,8 +48,6 @@ private slots:
 	void ComputedUserFollowsOrganization_data();
 	void ComputedUserFollowsOrganization();
 	void InvisibleAssignmentsGrantNothing();
-	void ComputationReadFailure_data();
-	void ComputationReadFailure();
 	void SessionCheckAfterFailedRead_data();
 	void SessionCheckAfterFailedRead();
 	void SessionAuthorizationConfirmsExpiredToken();
@@ -62,6 +60,8 @@ private slots:
 	void SessionAuthorizationRejectsIncompleteReply_data();
 	void SessionAuthorizationRejectsIncompleteReply();
 	void SessionAuthorizationContextIsDetached();
+	void SessionAuthorizationIsKeptForRequests();
+	void SessionOfAnotherProductIsRefused();
 	void SessionAuthorizationSyncTransportFailure_data();
 	void SessionAuthorizationSyncTransportFailure();
 	void SessionAuthorizationHttpTransportFailure_data();

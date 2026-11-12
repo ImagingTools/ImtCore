@@ -373,9 +373,6 @@ bool CPersonalAccessTokenManagerComp::UpdateLastUsedAt(const QByteArray& tokenId
 	if (!CheckStorageConfiguration()){
 		return false;
 	}
-	if (m_tokenPersistenceCompPtr.IsValid()){
-		return m_tokenPersistenceCompPtr->UpdateLastUsedAt(tokenId, QDateTime::currentDateTimeUtc());
-	}
 
 	if (!m_tokenCollectionCompPtr.IsValid()){
 		SendErrorMessage(0, "Token collection not configured", "CPersonalAccessTokenManagerComp");
@@ -398,6 +395,10 @@ bool CPersonalAccessTokenManagerComp::UpdateLastUsedAt(const QByteArray& tokenId
 	const QDateTime now = QDateTime::currentDateTimeUtc();
 	if (tokenPtr->GetLastUsedAt().isValid() && tokenPtr->GetLastUsedAt().secsTo(now) < s_lastUsedPrecisionSeconds){
 		return true;
+	}
+
+	if (m_tokenPersistenceCompPtr.IsValid()){
+		return m_tokenPersistenceCompPtr->UpdateLastUsedAt(tokenId, now);
 	}
 
 	tokenPtr->SetLastUsedAt(now);

@@ -168,7 +168,7 @@ Transport status changes are injected in this test; it is not evidence of a live
 ### The user computed by its source
 
 A product server whose users live at an authorization server (`AuthorizableServerFramework`: Puma for ProLife and Lisa) sets
-`IsUserComputedBySource` of its authentication manager. The authorization server then hands out the user for the product `P` and
+`SessionAuthorizationProvider` of its authentication manager. The authorization server then hands out the user for the product `P` and
 the organization `T` of the request, with its final permission set in `permissions[P]`:
 
 1. Puma reads the user, its roles and groups at the sources of their collections (`imtservergql::CAuthorizationSnapshot`, see below),
@@ -247,6 +247,14 @@ updated and rebuilt together. It does not change the GraphQL wire format or asyn
 Notification delivery treats explicit transport access refusal as refused, rather than retrying it as
 an unanswered request. File-service and token-issuer diagnostics retain the actual transport failure message.
 
+The answer for a request is kept by the authentication manager of the product server for `TenantDataCacheLifetime`
+(10 s) and never past the end of its access token; the requests of a burst wait for one answer. A subscription check
+always asks the authorization server and its answer is not kept. The kept answers are dropped when the token is
+invalidated, its session is removed at this server, a token manager changes, or the cached users, roles or groups of
+`PumaClientEngine` change (the manager observes its `UserCollection`, `RoleCollection` and `UserGroupCollection`).
+A refusal or an incomplete answer is not kept. A change the product server is not told about (a session closed at the
+authorization server, a membership or an organization changed there) reaches the requests after at most that lifetime.
+
 The remote provider checks the response identity and serialization version and detaches the deserialized user from its
 role/group providers. A user-id-only cache cannot supply this result. The response is a complete computation, not a database
 transaction spanning all authorization stores.
@@ -266,7 +274,7 @@ User administration from the product continues through the normal user-authentic
 
 Other products and organizations are not answered: `permissions` of another product holds only the permissions stored with the user.
 
-Compatibility: `IsUserComputedBySource` is set in the composition only for an authorization server that hands out the computed user.
+Compatibility: `SessionAuthorizationProvider` is set in the composition only for an authorization server that hands out the computed user.
 An older Puma answers `permissions[P]` only when the set is not empty and otherwise leaves the roles to be expanded by the client; a
 product server with the mode set would then see no permissions there. A client wired to `GetSessionAuthorization` requires
 the new owner-side controller; a missing operation is an error, not a fallback to cached authorization.
@@ -277,7 +285,7 @@ repositories; product servers expose the existing remote JWT controller through 
 
 ### The snapshot
 
-Without `IsUserComputedBySource` (Puma itself, Agentino), the user, its roles and its groups are read by
+Without `SessionAuthorizationProvider` (Puma itself, Agentino), the user, its roles and its groups are read by
 `imtservergql::CAuthorizationSnapshot` at the sources of their collections (`UserCollection`, `RoleCollection`,
 `UserGroupCollection` of the authentication manager): a cached collection is passed through by
 `IObjectCollectionCacheController::GetSourceCollection`, through every layer. A role or a group is read when the resolution asks for
@@ -305,7 +313,7 @@ on a monotonic clock. The subscriptions with the same credentials (access token,
 
 | Reason | When |
 |---|---|
-| A change of one of its `AccessModels` | At once; the changes of a burst and those during a check give one more check |
+| A change of one of its `AccessModels` | At once; the changes of a burst and those during a check give one more check. Changed data of an object that is a subscribed user (`CN_OBJECT_DATA_CHANGED` with its id) check the subscriptions of that user only; any other change checks all |
 | The end of the session (`RenewGqlContext` tells it) | At that time; only an already reached deadline is retried after 10 s. A prolonged session is checked again, not closed |
 | Neither | `MaxCheckInterval` (300 s) after the last confirmation |
 
@@ -351,7 +359,10 @@ that read it:
 | `AuthorizationUnavailable` | The grace period is over, or the access could not be checked at the registration | Subscribes again after 5 s, doubled up to 60 s, as long as the answer is the same |
 | `PermissionsChanged` | Current access no longer serves the registration, or the recipient changed | Subscribes again at once and reads its state again |
 | `Unauthorized` | The token expired or its session is closed | Waits for a refreshed token or a reconnect |
-| `Forbidden` | The access is refused | Waits for a refreshed token or a reconnect |
+| `Forbidden` | The access is refused, or the channel is not open to the subscriber | Waits for a refreshed token or a reconnect |
+
+A product server forwarding a subscription to Puma (`CPublisherSubscriberBridgeComp`) passes the code of a refusal by Puma on to its
+client. A refusal for the read permissions of a publisher has no code yet (ImtCore#1110).
 
 A product server asking Puma by `GetSessionAuthorization` learns the end of the session from `sessionExpiresAt`. An older Puma does not
 send it: the end is then unknown, not passed, and the control check comes after `MaxCheckInterval` with every check of the session
@@ -411,6 +422,8 @@ A session opened through the server of a product (the sign-in, a tenant session,
 sent directly it would escape the token. It may pass several servers (ProLife forwards it to Lisa, Lisa to Puma): each is bounded
 by its own token. It is refreshed only through the server that opened it. A session opened at the authorization server directly
 works only there. A server that receives its own users' sessions (Lisa) accepts the sessions of its product directly.
+A product server that receives no servers (ProLife) accepts only the sessions opened through it: a session of another
+product or of the authorization server is refused there before the authorization server is asked.
 
 The commands of the server tokens and of the catalog of products need a superuser session opened at this server directly:
 a session that came through a server never manages server tokens.

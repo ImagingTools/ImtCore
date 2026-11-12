@@ -17,47 +17,25 @@
 #include <imtgql/IGqlContextCreator.h>
 #include <imtauth/IJwtSessionController.h>
 #include <imtauth/IPersonalAccessTokenManager.h>
-#include <imtauth/ISessionAuthorizationProvider.h>
 #include <imtauth/ITenantInvitationManager.h>
 #include <imtauth/ITenantManager.h>
 #include <imtauth/ITenantMembershipManager.h>
 #include <imtlic/IProductInfo.h>
-#include <imtservergql/CServerTokenAuthenticationCompBase.h>
+#include <imtservergql/CAuthenticationManagerCompBase.h>
 
 
 namespace imtservergql
 {
 
 
-// Split attribute registration to stay below MSVC's constructor-object limit (C2603).
-class CAuthenticationManagerAttr: public CServerTokenAuthenticationCompBase
-{
-public:
-	typedef CServerTokenAuthenticationCompBase BaseClass;
-
-	I_BEGIN_BASE_COMPONENT(CAuthenticationManagerAttr);
-		I_ASSIGN(m_roleCollectionCompPtr, "RoleCollection", "Roles, read at their source for the check of a subscription", false, "RoleCollection");
-		I_ASSIGN(m_userGroupCollectionCompPtr, "UserGroupCollection", "User groups, read at their source for the check of a subscription", false, "UserGroupCollection");
-		I_ASSIGN(m_sessionAuthorizationProviderCompPtr, "SessionAuthorizationProvider", "The authorization of a user session as the source computes it: the user and its organization, for every session token while the source computes the user", false, "SessionAuthorizationProvider");
-		I_ASSIGN(m_isUserComputedBySourceAttrPtr, "IsUserComputedBySource", "The user collection hands out the user with its permissions resolved for the product and the organization of the request: the user is read at its source for every request, and only these permissions count", true, false);
-	I_END_COMPONENT;
-
-protected:
-	I_REF(imtbase::IObjectCollection, m_roleCollectionCompPtr);
-	I_REF(imtbase::IObjectCollection, m_userGroupCollectionCompPtr);
-	I_REF(imtauth::ISessionAuthorizationProvider, m_sessionAuthorizationProviderCompPtr);
-	I_ATTR(bool, m_isUserComputedBySourceAttrPtr);
-};
-
-
 class CAuthenticationManagerComp:
-			public CAuthenticationManagerAttr,
+			public CAuthenticationManagerCompBase,
 			virtual public imtgql::IGqlContextCreator,
 			virtual public imtauth::IJwtSessionController,
 			protected imod::CMultiModelObserverBase
 {
 public:
-	typedef CAuthenticationManagerAttr BaseClass;
+	typedef CAuthenticationManagerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CAuthenticationManagerComp);
 		I_REGISTER_INTERFACE(imtgql::IGqlContextCreator);
@@ -326,6 +304,21 @@ private:
 				const QByteArrayList& tenantPermissions,
 				TokenTenantData& tenantData) const;
 
+	/**
+		The session authorization of a request cached for TenantDataCacheLifetime. Without one, the caller asks the
+		authorization server; with c isClaimed set it then calls ReleaseTokenResolutionClaim(), so that the requests
+		of a burst wait for one answer. A waiter that got none asks itself.
+	*/
+	bool TryAwaitOrClaimSessionAuthorization(
+				const QByteArray& token,
+				imtauth::ISessionAuthorizationProvider::SessionAuthorization& authorization,
+				bool& isClaimed) const;
+	void StoreCachedSessionAuthorization(
+				const QByteArray& token,
+				const imtauth::ISessionAuthorizationProvider::SessionAuthorization& authorization,
+				qint64 jwtExpSecs,
+				qint64 resolutionGeneration) const;
+
 	/// A change of the access: checks started before it are stale, and the organization data of every token is read again.
 	void InvalidateAuthorizationLocked() const;
 	imtgql::IGqlContextUniquePtr CreateContextInstance() const;
@@ -390,6 +383,16 @@ private:
 	mutable QMutex m_tokenCacheMutex;
 	mutable QHash<QByteArray, TokenCacheEntry> m_tokenCache;
 	mutable QHash<QByteArray, qint64> m_expiredTokenCache;
+
+	struct SessionAuthorizationCacheEntry
+	{
+		imtauth::ISessionAuthorizationProvider::SessionAuthorization authorization;
+		qint64 resolvedAt = 0;
+		qint64 jwtExpSecs = 0;
+	};
+
+	// The answers of the authorization server for the requests of a session; a subscription is never served from here
+	mutable QHash<QByteArray, SessionAuthorizationCacheEntry> m_sessionAuthorizationCache;
 
 	// Session-IDs removed via RemoveSession(), mapped to the time until which
 	// StoreCachedToken() refuses to cache JWTs of that session. Guarded by

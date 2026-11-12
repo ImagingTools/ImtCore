@@ -25,9 +25,6 @@
                     <AttributeInfo Id="GqlContextFactory" Type="Factory" ExportId="">
                         <Data IsEnabled="true" Value="GqlContext"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="IsUserComputedBySource" Type="Boolean" ExportId="IsUserComputedBySource">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="InvitationManager" Type="Reference" ExportId="InvitationManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

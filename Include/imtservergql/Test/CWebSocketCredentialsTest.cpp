@@ -33,6 +33,7 @@
 #include <imtservergql/CConnectionStatusSubscriberControllerComp.h>
 #include <imtservergql/CObjectCollectionChangeNotifierComp.h>
 #include <imtservergql/CGqlPublisherCompBase.h>
+#include <imtservergql/CPublisherSubscriberBridgeComp.h>
 
 
 namespace
@@ -62,6 +63,8 @@ public:
 	std::function<void(const imtgql::IGqlContext::Headers&)> duringCheck;
 	// The user the credentials stand for, as the source answers now
 	QByteArray userId = "user";
+	// Credentials of other users, by access token
+	QHash<QByteArray, QByteArray> userOfToken;
 	// Credentials an established check cannot confirm, as if its source did not answer
 	std::function<bool(const imtgql::IGqlContext::Headers&)> isUnavailable;
 	mutable std::atomic<int> runningChecks{0};
@@ -107,7 +110,7 @@ public:
 			error.message = QStringLiteral("Credential refused");
 			return nullptr;
 		}
-		return CreateAccessContext(accessAtStart, userId);
+		return CreateAccessContext(accessAtStart, userOfToken.value(headers.value(imtbase::s_authenticationTokenHeaderId), userId));
 	}
 
 	qint64 GetAuthorizationGeneration() const override
@@ -149,11 +152,13 @@ public:
 	std::function<void()> onRegister;
 	// The command of a channel to its recipient whatever its permissions
 	QByteArray recipientCommandId = "personal";
+	// A channel that declares no subscriber: closed where undeclared channels are denied
+	bool isDeclared = true;
 
 	bool IsRequestSupported(const imtgql::CGqlRequest&) const override { return true; }
 	bool IsOpenFor(SubscriberKind subscriberKind, const imtgql::CGqlRequest& gqlRequest) const override
 	{
-		return subscriberKind != SK_RECIPIENT || gqlRequest.GetCommandId() == recipientCommandId;
+		return isDeclared && (subscriberKind != SK_RECIPIENT || gqlRequest.GetCommandId() == recipientCommandId);
 	}
 	bool RegisterSubscription(const QByteArray& subscriptionId, const imtgql::CGqlRequest& gqlRequest, const imtrest::IRequest&, QString&) override
 	{
@@ -418,7 +423,8 @@ struct CSubscriptionFixture
 
 	explicit CSubscriptionFixture(int maxCheckInterval = 1, int gracePeriod = 60,
 				const icomp::TSimSharedComponentPtr<CCachePublisherComp>* publisherPtr = nullptr,
-				const icomp::TSimSharedComponentPtr<CObservableCacheComp>* cachePtr = nullptr)
+				const icomp::TSimSharedComponentPtr<CObservableCacheComp>* cachePtr = nullptr,
+				bool isUndeclaredChannelDenied = false)
 	{
 		creator->access = 1;
 		creator->InitComponent();
@@ -443,6 +449,8 @@ struct CSubscriptionFixture
 		}
 		servlet->SetIntAttr("MaxCheckInterval", maxCheckInterval);
 		servlet->SetIntAttr("GracePeriod", gracePeriod);
+		servlet->SetBoolAttr("DenyAnonymousSubscriptions", isUndeclaredChannelDenied);
+		servlet->SetBoolAttr("DenyUndeclaredUserSubscriptions", isUndeclaredChannelDenied);
 		servlet->InitComponent();
 		Prepare(request, "subscription", "user-credential");
 		Prepare(otherRequest, "other", "user-credential-2");
@@ -640,6 +648,14 @@ void CWebSocketCredentialsTest::AnonymousSubscription()
 	QCOMPARE(fixture.creator->requestContexts.load(), 1);
 	QTest::qWait(1200);
 	QCOMPARE(fixture.creator->Checks(), 0);
+
+	// A channel that declares no subscriber refuses for good, with the code that says so
+	CSubscriptionFixture closedFixture(1, 60, nullptr, nullptr, true);
+	closedFixture.controller->isDeclared = false;
+	closedFixture.servlet->RegisterSubscription(closedFixture.request);
+	QVERIFY(!closedFixture.servlet->error.isEmpty());
+	QCOMPARE(closedFixture.servlet->errorCode, imtservergql::s_subscriptionForbiddenCode);
+	QCOMPARE(closedFixture.controller->registrations.load(), 0);
 }
 
 
@@ -692,6 +708,43 @@ void CWebSocketCredentialsTest::ChangeOfTheAccessChecksAgain()
 	fixture.ChangeAccess();
 	QTRY_COMPARE_WITH_TIMEOUT(fixture.controller->removals.load(), 1, 2000);
 	QCOMPARE(fixture.DroppedCodes(), QByteArrayList{imtservergql::s_subscriptionPermissionsChangedCode});
+}
+
+
+void CWebSocketCredentialsTest::ChangeOfAUserChecksItsSubscriptionsOnly()
+{
+	CSubscriptionFixture fixture(300);
+	fixture.creator->userOfToken.insert("user-credential-2", "other-user");
+	fixture.servlet->RegisterSubscription(fixture.request);
+	QVERIFY(fixture.servlet->response.contains("start_ack"));
+	fixture.servlet->RegisterSubscription(fixture.otherRequest);
+	QVERIFY(fixture.servlet->response.contains("start_ack"));
+
+	QMutex mutex;
+	QByteArrayList checkedTokens;
+	fixture.creator->duringCheck = [&mutex, &checkedTokens](const imtgql::IGqlContext::Headers& headers){
+		QMutexLocker locker(&mutex);
+		checkedTokens << headers.value(imtbase::s_authenticationTokenHeaderId);
+	};
+	auto changeObject = [&fixture](const QByteArray& objectId){
+		istd::IChangeable::ChangeSet changeSet(imtbase::IObjectCollection::CF_OBJECT_DATA_CHANGED);
+		changeSet.SetChangeInfo(imtbase::IObjectCollection::CN_OBJECT_DATA_CHANGED, objectId);
+		istd::CChangeNotifier notifier(&fixture.users->collection, &changeSet);
+	};
+
+	// The data of a subscribed user: its subscriptions only
+	changeObject("other-user");
+	QTRY_COMPARE_WITH_TIMEOUT(fixture.creator->establishedChecks.load(), 1, 2000);
+	QTest::qWait(500);
+	{
+		QMutexLocker locker(&mutex);
+		QCOMPARE(checkedTokens, QByteArrayList{"user-credential-2"});
+	}
+
+	// An object that is no subscribed user, a role for example: everybody
+	changeObject("role");
+	QTRY_COMPARE_WITH_TIMEOUT(fixture.creator->establishedChecks.load(), 3, 2000);
+	QCOMPARE(fixture.controller->removals.load(), 0);
 }
 
 
@@ -1462,6 +1515,50 @@ void CWebSocketCredentialsTest::ReconnectInvalidatesCacheAndRechecksAccess()
 	const int resumedReads = remote->reads;
 	QVERIFY(cache->GetObjectData("original", data));
 	QCOMPARE(remote->reads, resumedReads);
+}
+
+
+void CWebSocketCredentialsTest::ForwardedRefusalKeepsItsCode()
+{
+	// A refusal of the server behind reaches the client with its reason: a retry or a new subscription is told from a refusal
+	icomp::TSimSharedComponentPtr<CCacheSubscriptionManagerComp> transport;
+	transport->InitComponent();
+	icomp::TSimSharedComponentPtr<CResponseDispatcherComp> dispatcher;
+	QByteArrayList sent;
+	dispatcher->onResponse = [&sent](const QByteArray& data){ sent << data; };
+	dispatcher->InitComponent();
+	icomp::TSimSharedComponentPtr<imtservergql::CPublisherSubscriberBridgeComp> bridge;
+	bridge->InsertMultiAttr("CommandIds", QByteArray("OnChanged"));
+	bridge->SetRef("SubscriptionManager", transport);
+	bridge->SetRef("RequestManager", dispatcher);
+	bridge->InitComponent();
+
+	imtrest::CWebSocketProtocolEngineComp engine;
+	imtrest::CWebSocketRequest request(engine);
+	request.SetBody(R"({"id":"client","type":"start"})");
+	imtgql::CGqlRequest gqlRequest(imtgql::IGqlRequest::RT_SUBSCRIPTION, "OnChanged");
+	imtgql::CGqlFieldObject field;
+	field.InsertField("id");
+	gqlRequest.AddField("data", field);
+	QString errorMessage;
+	QVERIFY2(bridge->RegisterSubscription("client", gqlRequest, request, errorMessage), qPrintable(errorMessage));
+	QVERIFY(transport->clientPtr != nullptr);
+
+	for (const QByteArray& code : {imtservergql::s_subscriptionPermissionsChangedCode, imtservergql::s_subscriptionAuthorizationUnavailableCode, QByteArray()}){
+		sent.clear();
+		QJsonObject extensions{{"type", "Warning"}};
+		if (!code.isEmpty()){
+			extensions.insert("code", QString::fromUtf8(code));
+		}
+		const QJsonObject frame{{"id", "subscription"}, {"type", "error"}, {"payload", QJsonArray{QJsonObject{{"message", "Refused"}, {"extensions", extensions}}}}};
+		transport->clientPtr->OnSubscriptionStatusChanged("subscription", imtclientgql::IGqlSubscriptionClient::SS_REFUSED, QString::fromUtf8(QJsonDocument(frame).toJson()));
+		QCOMPARE(sent.size(), 1);
+		const QByteArray& data = sent.first();
+		const QJsonObject forwarded = QJsonDocument::fromJson(data.mid(data.indexOf('{'))).object();
+		QCOMPARE(forwarded.value("id").toString(), QString("client"));
+		const QJsonObject forwardedExtensions = forwarded.value("payload").toArray().first().toObject().value("extensions").toObject();
+		QCOMPARE(forwardedExtensions.value("code").toString().toUtf8(), code);
+	}
 }
 
 

@@ -19,6 +19,7 @@
 #include <imtrest/IProtocolEngine.h>
 #include <imtrest/CWebSocketRequest.h>
 #include <imtbase/imtbase.h>
+#include <imtbase/IObjectCollection.h>
 #include <imtgql/CGqlRequestContextManager.h>
 #include <imtservergql/imtservergql.h>
 
@@ -308,7 +309,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 		}
 
 		if (!IsSubscriberAllowed(*subscriberControllerPtr, gqlRequest)){
-			return CreateErrorResponse(QStringLiteral("The subscription '%1' is not allowed").arg(QString::fromUtf8(commandId)).toUtf8(), request);
+			return CreateErrorResponse(QStringLiteral("The subscription '%1' is not allowed").arg(QString::fromUtf8(commandId)).toUtf8(), request, true, s_subscriptionForbiddenCode);
 		}
 
 		const bool isRecipientChannel = subscriberControllerPtr->IsOpenFor(imtgql::IGqlSubscriberController::SK_RECIPIENT, gqlRequest);
@@ -531,12 +532,28 @@ void CWebSocketServletComp::OnComponentDestroyed()
 
 // reimplemented (imod::CMultiModelObserverBase)
 
-void CWebSocketServletComp::OnUpdate(imod::IModel* /*modelPtr*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
+void CWebSocketServletComp::OnUpdate(imod::IModel* /*modelPtr*/, const istd::IChangeable::ChangeSet& changeSet)
 {
 	QMutexLocker locker(&m_tokenSubscriptionsMutex);
 
 	++m_accessChangeGeneration;
-	m_checkSchedule.OnAccessChanged(m_clock.elapsed());
+
+	// The changed data of a subscribed user concern its subscriptions only; any other change may concern everybody
+	const QByteArray objectId = changeSet.GetChangeInfo(imtbase::IObjectCollection::CN_OBJECT_DATA_CHANGED).toByteArray();
+	const qint64 nowMs = m_clock.elapsed();
+	bool isUserChange = false;
+	if (!objectId.isEmpty()){
+		for (auto it = m_tokenSubscriptions.cbegin(); it != m_tokenSubscriptions.cend(); ++it){
+			if (!it->isEmpty() && it->first().registeredAccess.userId == objectId){
+				m_checkSchedule.OnAccessChanged(nowMs, it.key());
+				isUserChange = true;
+			}
+		}
+	}
+	if (!isUserChange){
+		m_checkSchedule.OnAccessChanged(nowMs);
+	}
+
 	m_tokenCheckCondition.wakeAll();
 }
 

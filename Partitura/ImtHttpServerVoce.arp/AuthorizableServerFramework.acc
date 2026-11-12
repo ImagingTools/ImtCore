@@ -25,6 +25,9 @@
                     <AttributeInfo Id="PersonalAccessTokenManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaClientEngine/RemotePersonalAccessTokenController"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="RoleCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaClientEngine/CachedRoleCollection"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="SessionAuthorizationProvider" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaClientEngine/SessionAuthorizationProvider"/>
                     </AttributeInfo>
@@ -37,11 +40,11 @@
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="IsUserComputedBySource" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="true"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="UserCollection" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaClientEngine/CachedUserCollection"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserGroupCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaClientEngine/CachedGroupCollection"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserSettingsCollection" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="UserSettingsRepository"/>

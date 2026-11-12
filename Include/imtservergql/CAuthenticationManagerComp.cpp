@@ -136,11 +136,46 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateContext(
 	QByteArray userTokenProductId;
 	QByteArrayList scopes;
 	bool isPat = false;
-	const bool isSessionAuthorized = *m_isUserComputedBySourceAttrPtr && !token.isEmpty() && !IsPatToken(token) && m_sessionAuthorizationProviderCompPtr.IsValid();
+	const bool isSessionAuthorized = !token.isEmpty() && !IsPatToken(token) && m_sessionAuthorizationProviderCompPtr.IsValid();
 	imtauth::ISessionAuthorizationProvider::SessionAuthorization sessionAuthorization;
+	const QByteArray ownProductId = m_serverTokenReceiverCompPtr.IsValid() ? m_serverTokenReceiverCompPtr->GetServerProductId() : QByteArray();
 	if (isSessionAuthorized){
-		sessionAuthorization = m_sessionAuthorizationProviderCompPtr->GetSessionAuthorization(token, productId, kind == CK_ESTABLISHED_SUBSCRIPTION);
-		if (sessionAuthorization.state != imtauth::ISessionAuthorizationProvider::SAS_COMPUTED){
+		// A server that receives no servers of other products takes only the sessions opened through it
+		if (ownProductId.isEmpty() && m_productInfoCompPtr.IsValid() && imtauth::GetJwtProductId(token) != productId){
+			SetError(error, CCS_FORBIDDEN, QStringLiteral("The session was not opened through this server and does not work here."));
+			return nullptr;
+		}
+
+		// A request may use an answer a few seconds old; a subscription is checked on the current state
+		imtauth::SessionTokenClaims claims;
+		const bool hasClaims = imtauth::ParseSessionTokenClaims(token, claims);
+		const qint64 resolutionGeneration = GetAuthorizationGeneration();
+		bool isClaimed = false;
+		const bool isCached = !isRenewal && TryAwaitOrClaimSessionAuthorization(token, sessionAuthorization, isClaimed);
+		if (!isCached){
+			sessionAuthorization = m_sessionAuthorizationProviderCompPtr->GetSessionAuthorization(token, productId, kind == CK_ESTABLISHED_SUBSCRIPTION);
+		}
+
+		const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(sessionAuthorization.userPtr.GetPtr());
+		const imtbase::IIdentifiable* identifiablePtr = dynamic_cast<const imtbase::IIdentifiable*>(sessionAuthorization.userPtr.GetPtr());
+		const bool isComputed = sessionAuthorization.state == imtauth::ISessionAuthorizationProvider::SAS_COMPUTED;
+		const bool isAnswerValid = isComputed && hasClaims && !sessionAuthorization.userId.isEmpty()
+					&& sessionAuthorization.userId == claims.userId && sessionAuthorization.tenantId == claims.tenantId
+					&& userInfoPtr != nullptr && identifiablePtr != nullptr
+					&& identifiablePtr->GetObjectUuid() == sessionAuthorization.userId && userInfoPtr->IsEnabled();
+		if (!isCached){
+			if (isAnswerValid){
+				CAuthorizationSnapshot::DetachUser(*sessionAuthorization.userPtr.GetPtr());
+				if (!isRenewal){
+					StoreCachedSessionAuthorization(token, sessionAuthorization, claims.expSecs, resolutionGeneration);
+				}
+			}
+			if (isClaimed){
+				ReleaseTokenResolutionClaim(token);
+			}
+		}
+
+		if (!isComputed){
 			if (sessionAuthorization.state == imtauth::ISessionAuthorizationProvider::SAS_REFUSED){
 				if (sessionAuthorization.refusalReason == imtauth::ISessionAuthorizationProvider::RR_REAUTHENTICATE){
 					InvalidateTokenCache(token);
@@ -153,17 +188,10 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateContext(
 			return nullptr;
 		}
 
-		imtauth::SessionTokenClaims claims;
-		const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(sessionAuthorization.userPtr.GetPtr());
-		const imtbase::IIdentifiable* identifiablePtr = dynamic_cast<const imtbase::IIdentifiable*>(sessionAuthorization.userPtr.GetPtr());
-		if (!imtauth::ParseSessionTokenClaims(token, claims) || sessionAuthorization.userId.isEmpty()
-					|| sessionAuthorization.userId != claims.userId || sessionAuthorization.tenantId != claims.tenantId
-					|| userInfoPtr == nullptr || identifiablePtr == nullptr
-					|| identifiablePtr->GetObjectUuid() != sessionAuthorization.userId || !userInfoPtr->IsEnabled()){
+		if (!isAnswerValid){
 			SetError(error, CCS_INTERNAL_ERROR, QStringLiteral("The authorization server answered with an invalid user or session."));
 			return nullptr;
 		}
-		CAuthorizationSnapshot::DetachUser(*sessionAuthorization.userPtr.GetPtr());
 		resolvedUserId = sessionAuthorization.userId;
 		tenantId = sessionAuthorization.tenantId;
 	}
@@ -225,7 +253,6 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateContext(
 	QByteArray serverProductId = clientProductId;
 	QByteArrayList serverScopes = clientProductId.isEmpty() ? QByteArrayList() : scopes;
 	QByteArray foreignProductId;
-	const QByteArray ownProductId = m_serverTokenReceiverCompPtr.IsValid() ? m_serverTokenReceiverCompPtr->GetServerProductId() : QByteArray();
 	if (clientProductId.isEmpty() && !ownProductId.isEmpty()){
 		const QByteArray serverToken = headers.value(imtbase::s_serverTokenHeaderId);
 		if (!serverToken.isEmpty()){
@@ -363,7 +390,7 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateContext(
 		if (isSessionAuthorized){
 			userDataPtr = sessionUserPtr;
 		}
-		else if (isRenewal || *m_isUserComputedBySourceAttrPtr){
+		else if (isRenewal || m_sessionAuthorizationProviderCompPtr.IsValid()){
 			// A subscription holds what was read now, not the caches; a failed read says nothing about it.
 			// A user computed by the source holds permissions of one product and one organization: no shared cache may serve it.
 			if (!ReadCurrentUser(resolvedUserId, productId, userDataPtr, readError) && isRenewal){
@@ -784,6 +811,16 @@ void CAuthenticationManagerComp::OnComponentCreated()
 			modelPtr->AttachObserver(this);
 		}
 	}
+
+	// A change of the users, roles or groups the authorization server computes with: the kept answers are not used any more
+	if (m_sessionAuthorizationProviderCompPtr.IsValid()){
+		for (imtbase::IObjectCollection* collectionPtr : {m_userCollectionCompPtr.GetPtr(), m_roleCollectionCompPtr.GetPtr(), m_userGroupCollectionCompPtr.GetPtr()}){
+			imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(collectionPtr);
+			if (modelPtr != nullptr && !IsModelAttached(modelPtr)){
+				modelPtr->AttachObserver(this);
+			}
+		}
+	}
 }
 
 
@@ -895,7 +932,7 @@ bool CAuthenticationManagerComp::ReadCurrentUser(
 			imtbase::IObjectCollection::DataPtr& userDataPtr,
 			imtgql::IGqlContextCreator::ContextCreationError& error) const
 {
-	const bool isComputedBySource = *m_isUserComputedBySourceAttrPtr;
+	const bool isComputedBySource = m_sessionAuthorizationProviderCompPtr.IsValid();
 	CAuthorizationSnapshot snapshot(
 				m_userCollectionCompPtr.GetPtr(),
 				(!isComputedBySource && m_roleCollectionCompPtr.IsValid()) ? m_roleCollectionCompPtr.GetPtr() : nullptr,
@@ -1005,6 +1042,74 @@ void CAuthenticationManagerComp::InvalidateAuthorizationLocked() const
 	for (TokenCacheEntry& entry : m_tokenCache){
 		entry.tenantDataResolvedAt = 0;
 	}
+	m_sessionAuthorizationCache.clear();
+}
+
+
+bool CAuthenticationManagerComp::TryAwaitOrClaimSessionAuthorization(
+			const QByteArray& token,
+			imtauth::ISessionAuthorizationProvider::SessionAuthorization& authorization,
+			bool& isClaimed) const
+{
+	isClaimed = false;
+	const qint64 ttlMs = m_tenantDataCacheTtlAttrPtr.IsValid() ? (static_cast<qint64>(*m_tenantDataCacheTtlAttrPtr) * 1000) : (10 * 1000);
+	if (ttlMs <= 0){
+		return false;
+	}
+
+	QMutexLocker cacheLocker(&m_tokenCacheMutex);
+	bool hasWaited = false;
+	while (true){
+		const auto iter = m_sessionAuthorizationCache.constFind(token);
+		if (iter != m_sessionAuthorizationCache.cend()){
+			// An answer never outlives its access token
+			const qint64 now = QDateTime::currentMSecsSinceEpoch();
+			if (now - iter->resolvedAt <= ttlMs && iter->jwtExpSecs * 1000 > now){
+				authorization = iter->authorization;
+				return true;
+			}
+			m_sessionAuthorizationCache.erase(iter);
+		}
+
+		if (!m_tokensBeingResolved.contains(token)){
+			m_tokensBeingResolved.insert(token);
+			isClaimed = true;
+			return false;
+		}
+
+		// The answer waited for was not kept: a failing source is asked by everybody at once, not one after another
+		if (hasWaited){
+			return false;
+		}
+		hasWaited = true;
+		m_tokenResolutionWaitCondition.wait(&m_tokenCacheMutex);
+	}
+}
+
+
+void CAuthenticationManagerComp::StoreCachedSessionAuthorization(
+			const QByteArray& token,
+			const imtauth::ISessionAuthorizationProvider::SessionAuthorization& authorization,
+			qint64 jwtExpSecs,
+			qint64 resolutionGeneration) const
+{
+	QMutexLocker cacheLocker(&m_tokenCacheMutex);
+
+	// Asked before the access or a token changed
+	if (resolutionGeneration != m_tokenChangeGeneration){
+		return;
+	}
+
+	const int maxTokenCacheSize = m_maxTokenCacheSizeAttrPtr.IsValid() ? *m_maxTokenCacheSizeAttrPtr : 10000;
+	if (m_sessionAuthorizationCache.size() >= maxTokenCacheSize){
+		m_sessionAuthorizationCache.clear();
+	}
+
+	SessionAuthorizationCacheEntry entry;
+	entry.authorization = authorization;
+	entry.resolvedAt = QDateTime::currentMSecsSinceEpoch();
+	entry.jwtExpSecs = jwtExpSecs;
+	m_sessionAuthorizationCache.insert(token, entry);
 }
 
 
@@ -1537,6 +1642,7 @@ void CAuthenticationManagerComp::InvalidateTokenCache(const QByteArray& token) c
 	}
 	m_tokenCache.remove(token);
 	m_expiredTokenCache.remove(token);
+	m_sessionAuthorizationCache.remove(token);
 }
 
 
@@ -1580,6 +1686,12 @@ void CAuthenticationManagerComp::InvalidateSessionTokenCache(const QByteArray& s
 		else{
 			++iter;
 		}
+	}
+
+	for (auto iter = m_sessionAuthorizationCache.begin(); iter != m_sessionAuthorizationCache.end();){
+		imtauth::SessionTokenClaims claims;
+		iter = (imtauth::ParseSessionTokenClaims(iter.key(), claims) && claims.sessionId == sessionId)
+					? m_sessionAuthorizationCache.erase(iter) : std::next(iter);
 	}
 }
 

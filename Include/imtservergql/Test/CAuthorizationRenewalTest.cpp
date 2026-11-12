@@ -40,6 +40,7 @@
 #include <imtauthgql/CRemoteJwtSessionControllerComp.h>
 #include <imtauthgql/CUserCollectionControllerComp.h>
 #include <imtauth/CUserInfoComp.h>
+#include <imtlic/CProductInfoComp.h>
 #include <imtcore/Version.h>
 #include <imtbase/CCachedObjectCollectionComp.h>
 #include <imtbase/CCollectionInfo.h>
@@ -989,15 +990,17 @@ struct CRenewalFixture
 		O_REMOTE_SESSIONS = 4,
 		// The roles have no collection: a check must not take them for absent
 		O_NO_ROLE_COLLECTION = 8,
-		// A product server whose users are computed by the authorization server for the product and the organization of a request
+		// A product server whose users the authorization server computes; a session is authorized there, through its input
 		O_COMPUTED_BY_SOURCE = 16,
-		// With O_COMPUTED_BY_SOURCE: a session token is authorized by the authorization server, through its input
-		O_SESSION_AUTHORIZATION = 32,
 		// Product authentication does not own membership/invitation services; the authorization owner still does.
 		O_NO_PRODUCT_MEMBERSHIP = 64,
 		// Read users through the real remote collection, delegate and authorization owner input.
 		O_REMOTE_USERS = 128,
-		O_MULTI_USER_TYPES = 256
+		O_MULTI_USER_TYPES = 256,
+		// The requests of a session use an answer of the authorization server for some seconds
+		O_SESSION_CACHE = 512,
+		// The product server knows its product
+		O_PRODUCT_INFO = 1024
 	};
 
 	CContextFactory factory;
@@ -1039,6 +1042,7 @@ struct CRenewalFixture
 	// The organizations as the product server would read them itself
 	icomp::TSimSharedComponentPtr<CTenantManagerComp> serverTenants;
 	icomp::TSimSharedComponentPtr<CVersionInfoComp> versionInfo;
+	icomp::TSimSharedComponentPtr<imtlic::CProductInfoComp> productInfo;
 	TComponentFactory<imtauth::CUserInfoComp> userFactory;
 	TComponentFactory<CCollectionUserComp> collectionUserFactory;
 	Creator::ContextCreationStatus lastStatus = Creator::CCS_OK;
@@ -1137,55 +1141,55 @@ struct CRenewalFixture
 			authentication->SetRef("UserCollection", cachedUsers);
 			authentication->SetRef("RoleCollection", serverRoles);
 			authentication->SetRef("UserGroupCollection", serverGroups);
-			authentication->SetBoolAttr("IsUserComputedBySource", true);
 
-			if (options & O_SESSION_AUTHORIZATION){
-				ownerServerTokens->productId = "Receiver";
-				ownerServerTokens->clientProductId = s_productId;
-				ownerServerTokens->InitComponent();
-				ownerReceiver->managerPtr = &*ownerServerTokens;
-				ownerReceiver->InitComponent();
-				ownerAuthentication->SetRef("SlaveJwtSessionController", sessions);
-				ownerAuthentication->SetRef("ServerTokenReceiver", ownerReceiver);
-				if (options & O_REMOTE_USERS){
-					ownerAuthentication->SetRef("PersonalAccessTokenManager", personalTokens);
-					ownerAuthentication->SetRef("UserCollection", users);
-					ownerAuthentication->SetRef("RoleCollection", roles);
-					ownerAuthentication->SetRef("UserGroupCollection", groups);
-					ownerAuthentication->SetRef("MembershipManager", memberships);
-				}
-				ownerAuthentication->SetFactory("GqlContextFactory", &factory);
-				ownerAuthentication->InitComponent();
-				sessionHandler2->SetRef("JwtSessionController", sessions);
-				sessionHandler2->SetRef("AuthorizationSessionController", sessions);
-				sessionHandler2->SetRef("UserCollection", users);
-				sessionHandler2->SetRef("RoleCollection", roles);
-				sessionHandler2->SetRef("UserGroupCollection", groups);
-				sessionHandler2->SetRef("TenantManager", tenants);
-				sessionHandler2->SetRef("BindingManager", bindings);
-				sessionHandler2->SetRef("DelegatedAccess", delegations);
-				sessionHandler2->SetRef("MembershipManager", memberships);
-				sessionHandler2->SetRef("ServerTokenReceiver", ownerReceiver);
-				if (!(options & O_REMOTE_USERS)){
-					versionInfo->InitComponent();
-				}
-				sessionHandler2->SetRef("VersionInfo", versionInfo);
-				sessionHandler2->InitComponent();
-				ownerInput->authenticationPtr = &*ownerAuthentication;
-				ownerInput->handlerPtr = &*sessionHandler2;
-				ownerInput->serverToken = "imt_srv_product";
-				ownerInput->InitComponent();
-				remoteSessionProvider->SetRef("ApiClient", ownerInput);
-				userFactory.configure = [this](imtauth::CUserInfoComp& user){
-					user.SetRoleProvider(&roleSource);
-					user.SetUserGroupProvider(&groupSource);
-				};
-				remoteSessionProvider->SetFactory("UserFactory", &userFactory);
-				remoteSessionProvider->InitComponent();
-				// Read by the product server itself, it would fail
-				serverTenants->isReadable = false;
-				serverTenants->InitComponent();
-				authentication->SetRef("SessionAuthorizationProvider", remoteSessionProvider);
+			ownerServerTokens->productId = "Receiver";
+			ownerServerTokens->clientProductId = s_productId;
+			ownerServerTokens->InitComponent();
+			ownerReceiver->managerPtr = &*ownerServerTokens;
+			ownerReceiver->InitComponent();
+			ownerAuthentication->SetRef("SlaveJwtSessionController", sessions);
+			ownerAuthentication->SetRef("ServerTokenReceiver", ownerReceiver);
+			if (options & O_REMOTE_USERS){
+				ownerAuthentication->SetRef("PersonalAccessTokenManager", personalTokens);
+				ownerAuthentication->SetRef("UserCollection", users);
+				ownerAuthentication->SetRef("RoleCollection", roles);
+				ownerAuthentication->SetRef("UserGroupCollection", groups);
+				ownerAuthentication->SetRef("MembershipManager", memberships);
+			}
+			ownerAuthentication->SetFactory("GqlContextFactory", &factory);
+			ownerAuthentication->InitComponent();
+			sessionHandler2->SetRef("JwtSessionController", sessions);
+			sessionHandler2->SetRef("AuthorizationSessionController", sessions);
+			sessionHandler2->SetRef("UserCollection", users);
+			sessionHandler2->SetRef("RoleCollection", roles);
+			sessionHandler2->SetRef("UserGroupCollection", groups);
+			sessionHandler2->SetRef("TenantManager", tenants);
+			sessionHandler2->SetRef("BindingManager", bindings);
+			sessionHandler2->SetRef("DelegatedAccess", delegations);
+			sessionHandler2->SetRef("MembershipManager", memberships);
+			sessionHandler2->SetRef("ServerTokenReceiver", ownerReceiver);
+			if (!(options & O_REMOTE_USERS)){
+				versionInfo->InitComponent();
+			}
+			sessionHandler2->SetRef("VersionInfo", versionInfo);
+			sessionHandler2->InitComponent();
+			ownerInput->authenticationPtr = &*ownerAuthentication;
+			ownerInput->handlerPtr = &*sessionHandler2;
+			ownerInput->serverToken = "imt_srv_product";
+			ownerInput->InitComponent();
+			remoteSessionProvider->SetRef("ApiClient", ownerInput);
+			userFactory.configure = [this](imtauth::CUserInfoComp& user){
+				user.SetRoleProvider(&roleSource);
+				user.SetUserGroupProvider(&groupSource);
+			};
+			remoteSessionProvider->SetFactory("UserFactory", &userFactory);
+			remoteSessionProvider->InitComponent();
+			// Read by the product server itself, it would fail
+			serverTenants->isReadable = false;
+			serverTenants->InitComponent();
+			authentication->SetRef("SessionAuthorizationProvider", remoteSessionProvider);
+			if (!(options & O_SESSION_CACHE)){
+				authentication->SetIntAttr("TenantDataCacheLifetime", 0);
 			}
 		}
 		else if (options & O_CACHE){
@@ -1201,7 +1205,7 @@ struct CRenewalFixture
 		if (!(options & O_COMPUTED_BY_SOURCE)){
 			authentication->SetRef("UserGroupCollection", groups);
 		}
-		if (options & O_SESSION_AUTHORIZATION){
+		if (options & O_COMPUTED_BY_SOURCE){
 			// Any legacy preliminary token/session lookup would fail instead of hiding a second remote route.
 			productSessions->jwtState = imtauth::IJwtSessionController::JS_NONE;
 			productSessions->isSessionChecked = false;
@@ -1227,10 +1231,15 @@ struct CRenewalFixture
 		if (!(options & O_NO_PRODUCT_MEMBERSHIP)){
 			authentication->SetRef("MembershipManager", memberships);
 		}
-		authentication->SetRef("TenantManager", (options & O_SESSION_AUTHORIZATION) ? serverTenants : tenants);
+		authentication->SetRef("TenantManager", (options & O_COMPUTED_BY_SOURCE) ? serverTenants : tenants);
 		authentication->SetRef("PersonalAccessTokenManager", personalTokens);
 		if (options & O_RECEIVER){
 			authentication->SetRef("ServerTokenReceiver", receiver);
+		}
+		if (options & O_PRODUCT_INFO){
+			productInfo->InitComponent();
+			productInfo->SetProductId(s_productId);
+			authentication->SetRef("FeatureContainer", productInfo);
 		}
 		authentication->SetFactory("GqlContextFactory", &factory);
 		authentication->InitComponent();
@@ -1355,7 +1364,7 @@ struct CRenewalFixture
 	// The permissions of the user in the context of a request or of a subscription in the organization
 	bool ServerPermissions(const QByteArray& tenantId, bool isSubscription, QByteArrayList& permissions)
 	{
-		const auto headers = Headers(Jwt(tenantId));
+		const auto headers = Headers(Jwt(tenantId, s_productId));
 		Creator::ContextCreationError error;
 		imtgql::IGqlContextUniquePtr contextPtr;
 		if (isSubscription){
@@ -2274,13 +2283,14 @@ void CAuthorizationRenewalTest::ComputedUserFollowsOrganization()
 		QVERIFY2(fixture.Compute(tenantId, computed, errorMessage), qPrintable(errorMessage));
 		QCOMPARE(computed, expected);
 
-		// A request and a subscription read the user afresh, past the cache of the users
+		// A request and a subscription ask the authorization server afresh
+		fixture.sessions->sessionTenantId = tenantId;
 		for (const bool isSubscription : {false, true}){
-			const int readsBefore = fixture.computedUsers->reads;
+			const int requestsBefore = fixture.ownerInput->requests;
 			QByteArrayList held;
 			QVERIFY(fixture.ServerPermissions(tenantId, isSubscription, held));
 			QCOMPARE(held, expected);
-			QVERIFY(fixture.computedUsers->reads > readsBefore);
+			QVERIFY(fixture.ownerInput->requests > requestsBefore);
 		}
 	}
 
@@ -2315,6 +2325,7 @@ void CAuthorizationRenewalTest::InvisibleAssignmentsGrantNothing()
 	fixture.User().AddToGroup(groupId);
 	// The organization allows them: only the assignments decide
 	fixture.tenants->permissions = {"/Secret", "/Hidden"};
+	fixture.sessions->sessionTenantId = s_tenantId;
 
 	QByteArrayList computed;
 	QString errorMessage;
@@ -2329,109 +2340,34 @@ void CAuthorizationRenewalTest::InvisibleAssignmentsGrantNothing()
 }
 
 
-void CAuthorizationRenewalTest::ComputationReadFailure_data()
-{
-	QTest::addColumn<QByteArray>("failure");
-	QTest::addColumn<QByteArray>("tenantId");
-
-	QTest::newRow("role") << QByteArray("role") << s_tenantId;
-	QTest::newRow("group") << QByteArray("group") << s_tenantId;
-	QTest::newRow("binding") << QByteArray("binding") << s_tenantId;
-	QTest::newRow("membership") << QByteArray("membership") << s_tenantId;
-	// Not a member of the other organization: the grants of the own one are read
-	QTest::newRow("delegation") << QByteArray("delegation") << s_otherTenantId;
-}
-
-
-void CAuthorizationRenewalTest::ComputationReadFailure()
-{
-	QFETCH(QByteArray, failure);
-	QFETCH(QByteArray, tenantId);
-
-	CRenewalFixture fixture(CRenewalFixture::O_COMPUTED_BY_SOURCE);
-	const QByteArray groupId = "4c5d6e7f-8a9b-4c0d-9e1f-3a4b5c6d7e8f";
-	const QByteArray groupRoleId = "6e7f8a9b-0c1d-4e2f-9a3b-5c6d7e8f9a0b";
-	fixture.AddRole(groupRoleId, {"/Read"});
-	fixture.AddGroup(groupId, s_productId, {groupRoleId});
-	for (const QByteArray& bindingTenantId : {s_tenantId, s_otherTenantId}){
-		fixture.bindings->Bind(bindingTenantId, "UserGroups", groupId);
-		fixture.bindings->Bind(bindingTenantId, "Roles", groupRoleId);
-	}
-	fixture.User().SetRoles(s_productId, {});
-	fixture.User().AddToGroup(groupId);
-
-	QByteArrayList computed;
-	QString errorMessage;
-	QVERIFY2(fixture.Compute(tenantId, computed, errorMessage), qPrintable(errorMessage));
-	QCOMPARE(computed, QByteArrayList{"/Read"});
-
-	if (failure == "role"){
-		fixture.roles->unreadableIds.insert(groupRoleId);
-	}
-	else if (failure == "group"){
-		fixture.groups->unreadableIds.insert(groupId);
-	}
-	else if (failure == "binding"){
-		fixture.bindings->isReadable = false;
-	}
-	else if (failure == "membership"){
-		fixture.memberships->isReadable = false;
-	}
-	else{
-		fixture.delegations->isReadable = false;
-	}
-
-	// An incomplete read gives no user rather than fewer permissions
-	errorMessage.clear();
-	QVERIFY(!fixture.Compute(tenantId, computed, errorMessage));
-	QVERIFY(!errorMessage.isEmpty());
-
-	// The access could not be checked: neither a request nor a subscription is told it is refused
-	const auto headers = CRenewalFixture::Headers(CRenewalFixture::Jwt(tenantId));
-	QCOMPARE(fixture.Create(headers), Creator::CCS_INTERNAL_ERROR);
-	QCOMPARE(fixture.Renew(headers), Creator::AS_UNAVAILABLE);
-}
-
-
 void CAuthorizationRenewalTest::SessionCheckAfterFailedRead_data()
 {
-	QTest::addColumn<bool>("isComputed");
 	QTest::addColumn<bool>("isSessionChecked");
 	QTest::addColumn<bool>("isSessionAlive");
 	QTest::addColumn<int>("status");
 
-	QTest::newRow("computed, session not read") << true << false << true << int(Creator::CCS_INTERNAL_ERROR);
-	QTest::newRow("computed, session closed") << true << true << false << int(Creator::CCS_UNAUTHORIZED);
-	QTest::newRow("computed, session alive") << true << true << true << int(Creator::CCS_INTERNAL_ERROR);
 	// A cached collection tells no failure: an unread session is not a refusal, a session alive leaves the user unavailable
-	QTest::newRow("cached, session not read") << false << false << true << int(Creator::CCS_INTERNAL_ERROR);
-	QTest::newRow("cached, session closed") << false << true << false << int(Creator::CCS_UNAUTHORIZED);
-	QTest::newRow("cached, session alive") << false << true << true << int(Creator::CCS_FORBIDDEN);
+	QTest::newRow("session not read") << false << true << int(Creator::CCS_INTERNAL_ERROR);
+	QTest::newRow("session closed") << true << false << int(Creator::CCS_UNAUTHORIZED);
+	QTest::newRow("session alive") << true << true << int(Creator::CCS_FORBIDDEN);
 }
 
 
 void CAuthorizationRenewalTest::SessionCheckAfterFailedRead()
 {
-	QFETCH(bool, isComputed);
 	QFETCH(bool, isSessionChecked);
 	QFETCH(bool, isSessionAlive);
 	QFETCH(int, status);
 
 	// The user is not read; the session is looked at only then, once the token was accepted
-	CRenewalFixture fixture(isComputed ? CRenewalFixture::O_COMPUTED_BY_SOURCE : CRenewalFixture::O_CACHE);
+	CRenewalFixture fixture(CRenewalFixture::O_CACHE);
 	const std::function<void()> closeSession = [&fixture, isSessionChecked, isSessionAlive](){
 		fixture.sessions->jwtState = imtauth::IJwtSessionController::JS_EXPIRED;
 		fixture.sessions->isSessionChecked = isSessionChecked;
 		fixture.sessions->isSessionAlive = isSessionAlive;
 	};
-	if (isComputed){
-		fixture.computedUsers->isFailing = true;
-		fixture.computedUsers->duringRead = closeSession;
-	}
-	else{
-		fixture.users->unreadableIds.insert(s_userId);
-		fixture.users->duringRead = closeSession;
-	}
+	fixture.users->unreadableIds.insert(s_userId);
+	fixture.users->duringRead = closeSession;
 
 	// A session store that failed does not make a closed session
 	QCOMPARE(int(fixture.Create(CRenewalFixture::Headers(CRenewalFixture::Jwt(s_tenantId)))), status);
@@ -2440,7 +2376,7 @@ void CAuthorizationRenewalTest::SessionCheckAfterFailedRead()
 
 void CAuthorizationRenewalTest::SessionAuthorizationConfirmsExpiredToken()
 {
-	CRenewalFixture fixture(CRenewalFixture::O_COMPUTED_BY_SOURCE | CRenewalFixture::O_SESSION_AUTHORIZATION);
+	CRenewalFixture fixture(CRenewalFixture::O_COMPUTED_BY_SOURCE);
 	fixture.bindings->Bind(s_tenantId, "Roles", s_roleId);
 	fixture.tenants->permissions = {"/Read", "/Write"};
 	fixture.sessions->sessionTenantId = s_tenantId;
@@ -2520,7 +2456,7 @@ void CAuthorizationRenewalTest::SessionAuthorizationRefusals()
 {
 	QFETCH(QByteArray, refusal);
 
-	CRenewalFixture fixture(CRenewalFixture::O_COMPUTED_BY_SOURCE | CRenewalFixture::O_SESSION_AUTHORIZATION);
+	CRenewalFixture fixture(CRenewalFixture::O_COMPUTED_BY_SOURCE);
 	QByteArray accessToken = CRenewalFixture::Jwt(QByteArray(), s_productId);
 	auto ask = [&fixture, &accessToken](){
 		return fixture.remoteSessionProvider->GetSessionAuthorization(accessToken, s_productId, true);
@@ -2625,7 +2561,7 @@ void CAuthorizationRenewalTest::SessionAuthorizationOutcomes()
 	QFETCH(int, requestStatus);
 	QFETCH(int, subscriptionState);
 
-	CRenewalFixture fixture(CRenewalFixture::O_COMPUTED_BY_SOURCE | CRenewalFixture::O_SESSION_AUTHORIZATION);
+	CRenewalFixture fixture(CRenewalFixture::O_COMPUTED_BY_SOURCE);
 	const QByteArray tenantId = change == "delegation not read" ? s_otherTenantId : s_tenantId;
 	const QByteArray groupId = "4c5d6e7f-8a9b-4c0d-9e1f-3a4b5c6d7e8f";
 	fixture.bindings->Bind(tenantId, "Roles", s_roleId);
@@ -2723,53 +2659,46 @@ void CAuthorizationRenewalTest::SessionAuthorizationKeepsOrganizationRules()
 {
 	QFETCH(QByteArray, role);
 
-	// The product server as before, reading the organization itself, and with the answer of the authorization server
-	QByteArrayList fingerprints;
-	for (const int options : {int(CRenewalFixture::O_COMPUTED_BY_SOURCE), int(CRenewalFixture::O_COMPUTED_BY_SOURCE | CRenewalFixture::O_SESSION_AUTHORIZATION)}){
-		CRenewalFixture fixture(options | CRenewalFixture::O_NO_PRODUCT_MEMBERSHIP);
-		const QByteArray tenantId = (role == "no organization") ? QByteArray() : s_tenantId;
-		fixture.bindings->Bind(s_tenantId, "Roles", s_roleId);
-		fixture.sessions->sessionTenantId = tenantId;
-		if (role == "owner"){
-			fixture.tenants->ownerId = s_userId;
-		}
-		else if (role == "creator"){
-			fixture.tenants->creatorId = s_userId;
-		}
-
-		QByteArray fingerprint;
-		const auto headers = CRenewalFixture::Headers(CRenewalFixture::Jwt(tenantId, s_productId));
-		QCOMPARE(fixture.Create(headers, &fingerprint), Creator::CCS_OK);
-		fingerprints << fingerprint;
-		QByteArray renewed;
-		QCOMPARE(fixture.Renew(headers, &renewed), Creator::AS_CONFIRMED);
-		QCOMPARE(renewed, fingerprint);
-		if (options & CRenewalFixture::O_SESSION_AUTHORIZATION){
-			QCOMPARE(fixture.ownerInput->requests, 2);
-			QCOMPARE(fixture.ownerInput->handledRequests, 2);
-			QCOMPARE(fixture.computedUsers->reads, 0);
-			QCOMPARE(fixture.serverTenants->reads, 0);
-			QCOMPARE(fixture.productSessions->validationCalls, 0);
-			QCOMPARE(fixture.productSessions->sessionChecks, 0);
-			QCOMPARE(fixture.productSessions->sessionReads, 0);
-			if (tenantId.isEmpty()){
-				QCOMPARE(fixture.tenants->reads, 0);
-			}
-		}
-		if (role == "member" || role == "no organization"){
-			const imtgql::IGqlContextUniquePtr contextPtr = fixture.RenewContext(headers);
-			QVERIFY(contextPtr.IsValid());
-			QVERIFY(contextPtr->GetOrganizationPermissions().isEmpty());
-			const QByteArrayList permissions = contextPtr->GetUserInfo()->GetPermissions(s_productId);
-			QVERIFY(!permissions.contains("/Organization/Read"));
-			// Tenant navigation remains available to a member, without granting membership administration permissions.
-			for (const QByteArray& permission : imtauth::GetOrganizationAccessPermissions()){
-				QCOMPARE(permissions.contains(permission), role == "member");
-			}
-		}
+	// The organization is read only by the authorization server; the product server takes its answer
+	CRenewalFixture fixture(CRenewalFixture::O_COMPUTED_BY_SOURCE | CRenewalFixture::O_NO_PRODUCT_MEMBERSHIP);
+	const QByteArray tenantId = (role == "no organization") ? QByteArray() : s_tenantId;
+	fixture.bindings->Bind(s_tenantId, "Roles", s_roleId);
+	fixture.sessions->sessionTenantId = tenantId;
+	if (role == "owner"){
+		fixture.tenants->ownerId = s_userId;
+	}
+	else if (role == "creator"){
+		fixture.tenants->creatorId = s_userId;
 	}
 
-	QCOMPARE(fingerprints.value(1), fingerprints.value(0));
+	QByteArray fingerprint;
+	const auto headers = CRenewalFixture::Headers(CRenewalFixture::Jwt(tenantId, s_productId));
+	QCOMPARE(fixture.Create(headers, &fingerprint), Creator::CCS_OK);
+	QByteArray renewed;
+	QCOMPARE(fixture.Renew(headers, &renewed), Creator::AS_CONFIRMED);
+	QCOMPARE(renewed, fingerprint);
+	QCOMPARE(fixture.ownerInput->requests, 2);
+	QCOMPARE(fixture.ownerInput->handledRequests, 2);
+	QCOMPARE(fixture.computedUsers->reads, 0);
+	QCOMPARE(fixture.serverTenants->reads, 0);
+	QCOMPARE(fixture.productSessions->validationCalls, 0);
+	QCOMPARE(fixture.productSessions->sessionChecks, 0);
+	QCOMPARE(fixture.productSessions->sessionReads, 0);
+	if (tenantId.isEmpty()){
+		QCOMPARE(fixture.tenants->reads, 0);
+	}
+	const imtgql::IGqlContextUniquePtr contextPtr = fixture.RenewContext(headers);
+	QVERIFY(contextPtr.IsValid());
+	// The owner and the creator administer their organization
+	QCOMPARE(contextPtr->GetOrganizationPermissions().isEmpty(), role == "member" || role == "no organization");
+	if (role == "member" || role == "no organization"){
+		const QByteArrayList permissions = contextPtr->GetUserInfo()->GetPermissions(s_productId);
+		QVERIFY(!permissions.contains("/Organization/Read"));
+		// Tenant navigation remains available to a member, without granting membership administration permissions.
+		for (const QByteArray& permission : imtauth::GetOrganizationAccessPermissions()){
+			QCOMPARE(permissions.contains(permission), role == "member");
+		}
+	}
 }
 
 
@@ -2803,7 +2732,7 @@ void CAuthorizationRenewalTest::SessionAuthorizationRejectsIncompleteReply()
 {
 	QFETCH(QByteArray, change);
 
-	CRenewalFixture fixture(CRenewalFixture::O_COMPUTED_BY_SOURCE | CRenewalFixture::O_SESSION_AUTHORIZATION);
+	CRenewalFixture fixture(CRenewalFixture::O_COMPUTED_BY_SOURCE);
 	fixture.sessions->sessionTenantId = s_tenantId;
 	fixture.bindings->Bind(s_tenantId, "Roles", s_roleId);
 	const QByteArray token = CRenewalFixture::Jwt(s_tenantId, s_productId);
@@ -2915,7 +2844,7 @@ void CAuthorizationRenewalTest::SessionAuthorizationContextIsDetached()
 {
 	imtgql::IGqlContextUniquePtr contextPtr;
 	{
-		CRenewalFixture fixture(CRenewalFixture::O_COMPUTED_BY_SOURCE | CRenewalFixture::O_SESSION_AUTHORIZATION);
+		CRenewalFixture fixture(CRenewalFixture::O_COMPUTED_BY_SOURCE);
 		const QByteArray token = CRenewalFixture::Jwt(QByteArray(), s_productId);
 		const auto authorization = fixture.remoteSessionProvider->GetSessionAuthorization(token, s_productId, true);
 		QCOMPARE(authorization.state, imtauth::ISessionAuthorizationProvider::SAS_COMPUTED);
@@ -2949,6 +2878,78 @@ void CAuthorizationRenewalTest::SessionAuthorizationContextIsDetached()
 	QCOMPARE(contextPtr->GetUserInfo()->GetPermissions(s_productId), QByteArrayList{"/Read"});
 	QCOMPARE(contextPtr->GetUserInfo()->GetId(), s_userLogin);
 	QCOMPARE(imtbase::GetObjectUuid(contextPtr->GetUserInfo()), s_userId);
+}
+
+
+void CAuthorizationRenewalTest::SessionAuthorizationIsKeptForRequests()
+{
+	CRenewalFixture fixture(CRenewalFixture::O_COMPUTED_BY_SOURCE | CRenewalFixture::O_SESSION_CACHE);
+	fixture.bindings->Bind(s_tenantId, "Roles", s_roleId);
+	fixture.sessions->sessionTenantId = s_tenantId;
+	const QByteArray token = CRenewalFixture::Jwt(s_tenantId, s_productId);
+	const auto headers = CRenewalFixture::Headers(token);
+
+	// The requests of a session share one answer of the authorization server
+	QByteArray first;
+	QCOMPARE(fixture.Create(headers, &first), Creator::CCS_OK);
+	int asked = fixture.ownerInput->requests;
+	QVERIFY(asked > 0);
+	QByteArray second;
+	QCOMPARE(fixture.Create(headers, &second), Creator::CCS_OK);
+	QCOMPARE(fixture.ownerInput->requests, asked);
+	QCOMPARE(second, first);
+
+	// A subscription is checked there every time, and its answer is not kept for the requests
+	fixture.User().SetEnabled(false);
+	QCOMPARE(fixture.Renew(headers), Creator::AS_DENIED);
+	QVERIFY(fixture.ownerInput->requests > asked);
+	asked = fixture.ownerInput->requests;
+	QCOMPARE(fixture.Create(headers), Creator::CCS_OK);
+	QCOMPARE(fixture.ownerInput->requests, asked);
+
+	// A change this server is told about ends the answer; a refusal is not kept
+	fixture.authentication->AccessChanged();
+	QCOMPARE(fixture.Create(headers), Creator::CCS_FORBIDDEN);
+	QVERIFY(fixture.ownerInput->requests > asked);
+	fixture.User().SetEnabled(true);
+	QCOMPARE(fixture.Create(headers), Creator::CCS_OK);
+	asked = fixture.ownerInput->requests;
+	QCOMPARE(fixture.Create(headers), Creator::CCS_OK);
+	QCOMPARE(fixture.ownerInput->requests, asked);
+
+	// An invalidated token is asked again
+	fixture.authentication->InvalidateToken(token);
+	QCOMPARE(fixture.Create(headers), Creator::CCS_OK);
+	QVERIFY(fixture.ownerInput->requests > asked);
+
+	// An answer does not outlive its access token
+	const auto shortHeaders = CRenewalFixture::Headers(CRenewalFixture::Jwt(s_tenantId, s_productId, 1));
+	QCOMPARE(fixture.Create(shortHeaders), Creator::CCS_OK);
+	QTest::qWait(2100);
+	asked = fixture.ownerInput->requests;
+	QVERIFY(fixture.Create(shortHeaders) != Creator::CCS_OK);
+	QVERIFY(fixture.ownerInput->requests > asked);
+}
+
+
+void CAuthorizationRenewalTest::SessionOfAnotherProductIsRefused()
+{
+	// A product server that receives no servers takes only the sessions opened through it
+	CRenewalFixture fixture(CRenewalFixture::O_COMPUTED_BY_SOURCE | CRenewalFixture::O_PRODUCT_INFO);
+	fixture.bindings->Bind(s_tenantId, "Roles", s_roleId);
+	fixture.sessions->sessionTenantId = s_tenantId;
+
+	QCOMPARE(fixture.Create(CRenewalFixture::Headers(CRenewalFixture::Jwt(s_tenantId, s_productId))), Creator::CCS_OK);
+	const int asked = fixture.ownerInput->requests;
+
+	for (const QByteArray& sessionProductId : {QByteArray("OtherProduct"), QByteArray()}){
+		const auto headers = CRenewalFixture::Headers(CRenewalFixture::Jwt(s_tenantId, sessionProductId));
+		QCOMPARE(fixture.Create(headers), Creator::CCS_FORBIDDEN);
+		QCOMPARE(fixture.Renew(headers), Creator::AS_DENIED);
+	}
+
+	// Refused here: the authorization server is not asked about it
+	QCOMPARE(fixture.ownerInput->requests, asked);
 }
 
 
@@ -3083,7 +3084,7 @@ void CAuthorizationRenewalTest::SessionAuthorizationHttpTransportFailure()
 		}
 		collection->InitComponent();
 		imtbase::IObjectCollection::DataPtr userPtr;
-		isAccessDenied = !expectedDenied;
+		bool isAccessDenied = !expectedDenied;
 		QVERIFY(!collection->GetObjectDataWithStatus(s_userId, userPtr, isAccessDenied));
 		QCOMPARE(isAccessDenied, expectedDenied);
 		QVERIFY(!userPtr.IsValid());
@@ -3095,7 +3096,7 @@ void CAuthorizationRenewalTest::SessionAuthorizationHttpTransportFailure()
 void CAuthorizationRenewalTest::PersonalTokenKeepsItsRoute()
 {
 	// A personal access token keeps its own checks: the session authorization is not asked
-	CRenewalFixture fixture(CRenewalFixture::O_COMPUTED_BY_SOURCE | CRenewalFixture::O_SESSION_AUTHORIZATION);
+	CRenewalFixture fixture(CRenewalFixture::O_COMPUTED_BY_SOURCE);
 	fixture.personalTokens->permissions = {"/Read"};
 	fixture.Role(s_roleId).SetLocalPermissions({"/Read", "/Write"});
 	const auto headers = CRenewalFixture::Headers("imt_pat_personal");
@@ -3138,7 +3139,7 @@ void CAuthorizationRenewalTest::PersonalTokenRemoteUserRead()
 {
 	QFETCH(bool, multipleTypes);
 	QFETCH(QByteArray, failure);
-	CRenewalFixture fixture(CRenewalFixture::O_COMPUTED_BY_SOURCE | CRenewalFixture::O_SESSION_AUTHORIZATION
+	CRenewalFixture fixture(CRenewalFixture::O_COMPUTED_BY_SOURCE
 				| CRenewalFixture::O_REMOTE_USERS | (multipleTypes ? CRenewalFixture::O_MULTI_USER_TYPES : 0));
 	fixture.personalTokens->productId = s_productId;
 	const auto headers = CRenewalFixture::Headers("imt_pat_personal");
@@ -3213,7 +3214,7 @@ void CAuthorizationRenewalTest::RemoteCollectionReadStatus_data()
 void CAuthorizationRenewalTest::RemoteCollectionReadStatus()
 {
 	QFETCH(bool, multipleTypes);
-	CRenewalFixture fixture(CRenewalFixture::O_COMPUTED_BY_SOURCE | CRenewalFixture::O_SESSION_AUTHORIZATION
+	CRenewalFixture fixture(CRenewalFixture::O_COMPUTED_BY_SOURCE
 				| CRenewalFixture::O_REMOTE_USERS | (multipleTypes ? CRenewalFixture::O_MULTI_USER_TYPES : 0));
 	fixture.personalTokens->productId = s_productId;
 	fixture.userInput->authenticationToken = "imt_pat_personal";
@@ -3264,7 +3265,7 @@ void CAuthorizationRenewalTest::SnapshotAccessRefusal_data()
 void CAuthorizationRenewalTest::SnapshotAccessRefusal()
 {
 	QFETCH(QByteArray, kind);
-	CRenewalFixture fixture(CRenewalFixture::O_COMPUTED_BY_SOURCE | CRenewalFixture::O_SESSION_AUTHORIZATION);
+	CRenewalFixture fixture(CRenewalFixture::O_COMPUTED_BY_SOURCE);
 	const QByteArray groupId = "refused-group";
 	if (kind == "user"){
 		fixture.users->deniedIds.insert(s_userId);

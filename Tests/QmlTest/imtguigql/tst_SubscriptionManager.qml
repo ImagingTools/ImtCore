@@ -8,7 +8,7 @@ TestCase {
 
 	name: "SubscriptionManager"
 
-	// Plays the server side the way the ImtCore server does: connection_ack, and silence after a start.
+	// Plays the server side the way the ImtCore server does: connection_ack, and start_ack after a start it accepts.
 	WebSocketServer {
 		id: server
 
@@ -36,6 +36,9 @@ TestCase {
 					let code = codes.shift()
 					server.refusalCodes = codes
 					server.sendError(request.id, code)
+				}
+				else if (request.type === "start"){
+					webSocket.sendTextMessage(JSON.stringify({"type": "start_ack", "id": request.id}))
 				}
 			})
 		}
