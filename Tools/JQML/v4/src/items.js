@@ -7768,10 +7768,11 @@ export class FileDialog extends Item {
 
 	open() {
 		if (typeof document === 'undefined') return;
+		this.$shown = true;
 		if (this.fileMode === 2) {
 			const name = typeof window !== 'undefined' && window.prompt ? window.prompt(String(this.title || 'Save file'), String(this.currentFile || '')) : null;
 			if (name === null || name === '') {
-				this.$emit('rejected');
+				this.$reject();
 				return;
 			}
 			this.$accept([name]);
@@ -7787,16 +7788,24 @@ export class FileDialog extends Item {
 		if (extensions.length > 0) input.accept = extensions.join(',');
 		input.addEventListener('change', () => {
 			const files = [...input.files];
-			if (files.length === 0) this.$emit('rejected');
+			if (files.length === 0) this.$reject();
 			else this.$accept(files);
 		});
-		input.addEventListener('cancel', () => this.$emit('rejected'));
+		input.addEventListener('cancel', () => this.$reject());
 		input.click();
 	}
 
-	close() {}
+	close() {
+		this.$shown = false;
+	}
+
+	$reject() {
+		this.$shown = false;
+		this.$emit('rejected');
+	}
 
 	$accept(files) {
+		this.$shown = false;
 		const wrapped = files.map((file) => {
 			if (typeof file === 'string') return file;
 			file.toString = () => file;
@@ -7811,6 +7820,22 @@ export class FileDialog extends Item {
 		this.$emit('accepted');
 	}
 }
+
+defineProp(
+	FileDialog.prototype,
+	'visible',
+	function () {
+		return this.$shown === true;
+	},
+	function (value) {
+		// `visible = true` shows the dialog like `open()`; Qt hides it again when a file is chosen or the choice is cancelled.
+		const shown = toBool(value);
+		if (shown === (this.$shown === true)) return;
+		this.$shown = shown;
+		if (shown) this.open();
+	},
+	true,
+);
 
 // `StackLayout`: one visible child, resized to the stack. `currentIndex` applies before the next read.
 export class StackLayout extends Item {
