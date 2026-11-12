@@ -148,6 +148,18 @@ sdl::V1_0::imtbase::CGetElementMetaInfoPayload CUserGroupCollectionControllerCom
 		
 			imtsdl::TElementList<sdl::V1_0::imtbase::CParameter> infoParams;
 
+			QStringList sourceNames;
+			for (const imtauth::IUserGroupInfo::SystemInfo& systemInfo : userGroupInfoPtr->GetSystemInfos()){
+				sourceNames << (systemInfo.systemName.isEmpty() ? QStringLiteral("Internal") : systemInfo.systemName);
+			}
+
+			sdl::V1_0::imtbase::CParameter sourceParameter;
+			sourceParameter.id = QByteArrayLiteral("Source");
+			sourceParameter.typeId = QByteArrayLiteral("Text");
+			sourceParameter.name = QStringLiteral("Source");
+			sourceParameter.data = sourceNames.isEmpty() ? QStringLiteral("Internal") : sourceNames.join(QStringLiteral(", "));
+			infoParams << sourceParameter;
+
 			sdl::V1_0::imtbase::CParameter parentGroupsParameter;
 			parentGroupsParameter.id = QByteArrayLiteral("ParentGroups");
 			parentGroupsParameter.typeId = QByteArrayLiteral("TextList");
