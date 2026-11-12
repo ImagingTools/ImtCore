@@ -29,6 +29,11 @@ ServerTokenApiClient {
 		root.__revokeRequest.send(root.__revokeInput)
 	}
 
+	function deleteToken(tokenId){
+		root.__deleteInput.m_id = tokenId
+		root.__deleteRequest.send(root.__deleteInput)
+	}
+
 	function requestProductServer(){
 		root.__receiverInput.m_clientProductId = root.productId
 		root.__receiverRequest.send(root.__receiverInput)
@@ -43,6 +48,7 @@ ServerTokenApiClient {
 	property ServerTokenListInput __listInput: ServerTokenListInput {}
 	property CreateServerTokenInput __createInput: CreateServerTokenInput {}
 	property InputId __revokeInput: InputId {}
+	property InputId __deleteInput: InputId {}
 	property ServerTokenReceiverInput __receiverInput: ServerTokenReceiverInput {}
 	property UpdateServerTokenScopesInput __scopesInput: UpdateServerTokenScopesInput {}
 
@@ -116,6 +122,22 @@ ServerTokenApiClient {
 		requestType: 1
 		sdlObjectComp: Component {
 			RevokeServerTokenPayload {
+				onFinished: {
+					root.requestTokens()
+				}
+			}
+		}
+
+		function onError(message, type){
+			root.operationFailed(message)
+		}
+	}
+
+	property GqlSdlRequestSender __deleteRequest: GqlSdlRequestSender {
+		gqlCommandId: ImtauthServerTokensSdlCommandIds.s_deleteServerToken
+		requestType: 1
+		sdlObjectComp: Component {
+			DeleteServerTokenPayload {
 				onFinished: {
 					root.requestTokens()
 				}

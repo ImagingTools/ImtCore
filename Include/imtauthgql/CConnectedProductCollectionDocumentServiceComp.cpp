@@ -4,7 +4,6 @@
 
 // ImtCore includes
 #include <imtauth/CConnectedProduct.h>
-#include <imtauth/CProductPermissionSnapshot.h>
 #include <imtauthgql/imtauthgql.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/ConnectedProductCollectionDocumentService.h>
 
@@ -44,22 +43,6 @@ sdl::V1_0::imtauth::CConnectedProductData CConnectedProductCollectionDocumentSer
 	response.productId = productPtr->GetProductId();
 	response.name = productPtr->GetProductName();
 	response.description = productPtr->GetProductDescription();
-
-	if (m_snapshotCollectionCompPtr.IsValid()){
-		bool isRead = false;
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		const imtauth::CProductPermissionSnapshot* snapshotPtr = imtauth::GetProductPermissionSnapshot(*m_snapshotCollectionCompPtr, productPtr->GetProductId(), dataPtr, &isRead);
-		if (!isRead){
-			errorMessage = QStringLiteral("Unable to read the stored permission tree");
-
-			return sdl::V1_0::imtauth::CConnectedProductData();
-		}
-
-		if (snapshotPtr != nullptr){
-			response.productVersion = snapshotPtr->GetProductVersion();
-			response.publishedAt = snapshotPtr->GetPublishedAt().toString(Qt::ISODate);
-		}
-	}
 
 	return response;
 }
@@ -107,8 +90,8 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CConnectedProductCollectionDocument
 		productPtr->SetObjectUuid(*data.id);
 	}
 	if (data.productId){
-		// The tokens, the roles and the permission tree refer to the product by this ID
-		if (!productPtr->GetProductId().isEmpty() && productPtr->GetProductId() != *data.productId){
+		// The tokens, the roles and the permission tree refer to a stored product by this ID
+		if (productPtr->GetProductId() != *data.productId && IsDocumentStored(userLogin, documentId)){
 			errorMessage = QStringLiteral("The product ID cannot be changed");
 
 			return response;
@@ -131,6 +114,21 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CConnectedProductCollectionDocument
 	response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Success;
 
 	return response;
+}
+
+
+// private methods
+
+bool CConnectedProductCollectionDocumentServiceComp::IsDocumentStored(const QByteArray& userId, const QByteArray& documentId) const
+{
+	const imtdoc::IDocumentService::DocumentList documents = m_documentManagerCompPtr->GetOpenedDocumentList(userId);
+	for (const imtdoc::IDocumentService::DocumentListItem& document : documents){
+		if (document.documentId == documentId){
+			return !document.documentSourceRef.isEmpty();
+		}
+	}
+
+	return true;
 }
 
 

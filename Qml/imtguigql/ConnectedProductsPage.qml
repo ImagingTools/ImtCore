@@ -39,7 +39,6 @@ Item {
 
 		ConnectedProductView {
 			tokenApiClient: gqlTokenApiClient
-			permissionsProvider: gqlPermissionsProvider
 			commandsControllerComp: Component {
 				GqlBasedCommandsController {
 					typeId: "ConnectedProduct"
@@ -49,10 +48,6 @@ Item {
 			// Each opened product has its own services: their models and signals belong to one product
 			GqlBasedServerTokenApiClient {
 				id: gqlTokenApiClient
-			}
-
-			GqlBasedPermissionsProvider {
-				id: gqlPermissionsProvider
 			}
 		}
 	}

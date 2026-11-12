@@ -85,8 +85,7 @@ Item {
 					addHeader("createdAt", qsTr("Created"))
 					addHeader("lastUsedAt", qsTr("Last used"))
 					addHeader("revoked", qsTr("Status"))
-					addHeader("permissions", "")
-					addHeader("revoke", "")
+					addHeader("actions", "")
 					tokenTable.headers = this
 				}
 			}
@@ -95,8 +94,16 @@ Item {
 				setColumnContentById("createdAt", dateColumnComp)
 				setColumnContentById("lastUsedAt", dateColumnComp)
 				setColumnContentById("revoked", statusColumnComp)
-				setColumnContentById("permissions", permissionsColumnComp)
-				setColumnContentById("revoke", revokeColumnComp)
+				setColumnContentById("actions", actionsColumnComp)
+
+				// The buttons need their own width only, the rest goes to the text columns
+				tokenTable.setWidth()
+				let actionsIndex = tokenTable.getHeaderIndex("actions")
+				if (actionsIndex >= 0 && tokenTable.widthDecorator.getItemsCount() > actionsIndex){
+					tokenTable.widthDecorator.setData("Width", 2 * Style.buttonWidthM + 3 * Style.marginM, actionsIndex)
+					tokenTable.widthDecorator.setData("WidthPercent", -1, actionsIndex)
+					tokenTable.setWidth()
+				}
 			}
 
 			Component {
@@ -127,54 +134,61 @@ Item {
 				}
 			}
 
+			// An active token is edited or revoked, a revoked one can only be deleted
 			Component {
-				id: permissionsColumnComp
+				id: actionsColumnComp
 
 				TableCellDelegateBase {
-					id: permissionsDelegate
+					id: actionsDelegate
 
-					ToolButton {
-						id: permissionsButton
-						objectName: "ServerTokenPermissionsButton"
-						anchors.centerIn: parent
-						width: Style.buttonWidthM
-						height: width
-						iconSource: "qrc:/" + Style.getIconPath("Icons/Edit", Icon.State.On, Icon.Mode.Normal)
-						tooltipText: qsTr("Change the permissions of the token")
-						onClicked: {
-							let token = tokenTable.elements.get(permissionsDelegate.rowIndex).item
-							tokensPage.openTokenDialog(String(token.m_id), token.m_scopes ? token.m_scopes : [])
-						}
-					}
+					property bool isRevoked: false
 
 					onReused: {
-						permissionsButton.enabled = !tokenTable.elements.get(permissionsDelegate.rowIndex).item.m_revoked
+						actionsDelegate.isRevoked = tokenTable.elements.get(actionsDelegate.rowIndex).item.m_revoked ? true : false
 					}
-				}
-			}
 
-			Component {
-				id: revokeColumnComp
-
-				TableCellDelegateBase {
-					id: revokeDelegate
-
-					ToolButton {
-						id: revokeButton
-						objectName: "RevokeServerTokenButton"
+					Row {
 						anchors.centerIn: parent
-						width: Style.buttonWidthM
-						height: width
-						iconSource: "qrc:/" + Style.getIconPath("Icons/Delete", Icon.State.On, Icon.Mode.Normal)
-						tooltipText: qsTr("Revoke the token")
-						onClicked: {
-							let tokenId = tokenTable.elements.get(revokeDelegate.rowIndex).item.m_id
-							ModalDialogManager.openDialog(confirmRevokeDialogComp, {"tokenId": tokenId})
-						}
-					}
+						spacing: Style.marginM
 
-					onReused: {
-						revokeButton.enabled = !tokenTable.elements.get(revokeDelegate.rowIndex).item.m_revoked
+						ToolButton {
+							objectName: "ServerTokenPermissionsButton"
+							visible: !actionsDelegate.isRevoked
+							width: Style.buttonWidthM
+							height: width
+							iconSource: "qrc:/" + Style.getIconPath("Icons/Edit", Icon.State.On, Icon.Mode.Normal)
+							tooltipText: qsTr("Change the permissions of the token")
+							onClicked: {
+								let token = tokenTable.elements.get(actionsDelegate.rowIndex).item
+								tokensPage.openTokenDialog(String(token.m_id), token.m_scopes ? token.m_scopes : [])
+							}
+						}
+
+						ToolButton {
+							objectName: "RevokeServerTokenButton"
+							visible: !actionsDelegate.isRevoked
+							width: Style.buttonWidthM
+							height: width
+							iconSource: "qrc:/" + Style.getIconPath("Icons/Restore", Icon.State.On, Icon.Mode.Normal)
+							tooltipText: qsTr("Revoke the token")
+							onClicked: {
+								let tokenId = tokenTable.elements.get(actionsDelegate.rowIndex).item.m_id
+								ModalDialogManager.openDialog(confirmRevokeDialogComp, {"tokenId": tokenId})
+							}
+						}
+
+						ToolButton {
+							objectName: "DeleteServerTokenButton"
+							visible: actionsDelegate.isRevoked
+							width: Style.buttonWidthM
+							height: width
+							iconSource: "qrc:/" + Style.getIconPath("Icons/Delete", Icon.State.On, Icon.Mode.Normal)
+							tooltipText: qsTr("Delete the token")
+							onClicked: {
+								let tokenId = tokenTable.elements.get(actionsDelegate.rowIndex).item.m_id
+								ModalDialogManager.openDialog(confirmDeleteDialogComp, {"tokenId": tokenId})
+							}
+						}
 					}
 				}
 			}
@@ -201,6 +215,22 @@ Item {
 			onFinished: {
 				if (buttonId === Enums.yes)
 					tokensPage.apiClient.revokeToken(tokenId)
+			}
+		}
+	}
+
+	Component {
+		id: confirmDeleteDialogComp
+
+		MessageDialog {
+			title: qsTr("Delete the token?")
+			message: qsTr("The revoked token is removed from the list. You cannot undo this action.")
+
+			property string tokenId
+
+			onFinished: {
+				if (buttonId === Enums.yes)
+					tokensPage.apiClient.deleteToken(tokenId)
 			}
 		}
 	}
@@ -240,11 +270,37 @@ Item {
 						}
 
 						CustomTextField {
+							id: tokenInput
 							objectName: "ServerTokenValueField"
 							width: parent.width
 							height: Style.controlHeightM
 							readOnly: true
 							text: tokenCreatedDialog.token
+							focus: true
+
+							property bool copied: false
+
+							ToolButton {
+								objectName: "CopyServerTokenButton"
+								z: parent.z + 1
+								anchors.verticalCenter: parent.verticalCenter
+								anchors.right: parent.right
+								anchors.rightMargin: Style.marginL
+								width: Style.buttonWidthM
+								height: width
+								enabled: !tokenInput.copied
+								iconSource: tokenInput.copied ?
+												"qrc:/" + Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Normal) :
+												"qrc:/" + Style.getIconPath("Icons/Copy", Icon.State.On, Icon.Mode.Normal)
+								tooltipText: tokenInput.copied ? qsTr("The token is copied") : qsTr("Copy the token")
+								onClicked: {
+									if (!tokenInput.copied){
+										tokenInput.selectAll()
+										tokenInput.copy()
+										tokenInput.copied = true
+									}
+								}
+							}
 						}
 					}
 				}
@@ -258,8 +314,8 @@ Item {
 		Dialog {
 			id: tokenDialog
 			title: tokenDialog.tokenId === "" ? qsTr("New server token") : qsTr("Permissions of the token")
-			width: 680
-			height: 840
+			width: Math.max(Style.sizeHintXXL, Math.min(ModalDialogManager.activeView.width - 100, 900))
+			height: Math.max(Style.sizeHintL, Math.min(ModalDialogManager.activeView.height - 100, 900))
 			backgroundColor: Style.baseColor
 
 			// Set by openDialog after the dialog is created
@@ -345,34 +401,56 @@ Item {
 						width: parent.width - 2 * Style.marginXL
 						spacing: Style.marginM
 
-						BaseText {
-							visible: tokenDialog.tokenId === ""
-							text: qsTr("Name")
-						}
-
-						CustomTextField {
-							objectName: "ServerTokenNameInput"
+						// One line for the name and the description, as in the dialog of personal tokens: the dialog is about the permissions
+						Row {
+							id: metadataRow
 							visible: tokenDialog.tokenId === ""
 							width: parent.width
-							height: Style.controlHeightM
-							onTextChanged: {
-								tokenDialog.tokenName = text.trim()
-								tokenDialog.updateApplyButton()
+							spacing: Style.marginXL
+
+							Column {
+								width: Math.round((metadataRow.width - metadataRow.spacing) * 0.4)
+								spacing: Style.marginXS
+
+								Text {
+									text: qsTr("Name")
+									font.pixelSize: Style.fontSizeS
+									font.family: Style.fontFamily
+									color: Style.inactiveTextColor
+								}
+
+								CustomTextField {
+									objectName: "ServerTokenNameInput"
+									width: parent.width
+									height: Style.controlHeightM
+									placeHolderText: qsTr("e.g. ProLife production")
+									onTextChanged: {
+										tokenDialog.tokenName = text.trim()
+										tokenDialog.updateApplyButton()
+									}
+								}
 							}
-						}
 
-						BaseText {
-							visible: tokenDialog.tokenId === ""
-							text: qsTr("Description")
-						}
+							Column {
+								width: metadataRow.width - metadataRow.spacing - Math.round((metadataRow.width - metadataRow.spacing) * 0.4)
+								spacing: Style.marginXS
 
-						CustomTextField {
-							objectName: "ServerTokenDescriptionInput"
-							visible: tokenDialog.tokenId === ""
-							width: parent.width
-							height: Style.controlHeightM
-							onTextChanged: {
-								tokenDialog.tokenDescription = text
+								Text {
+									text: qsTr("Description")
+									font.pixelSize: Style.fontSizeS
+									font.family: Style.fontFamily
+									color: Style.inactiveTextColor
+								}
+
+								CustomTextField {
+									objectName: "ServerTokenDescriptionInput"
+									width: parent.width
+									height: Style.controlHeightM
+									placeHolderText: qsTr("Optional: where the server runs")
+									onTextChanged: {
+										tokenDialog.tokenDescription = text
+									}
+								}
 							}
 						}
 

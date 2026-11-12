@@ -59,6 +59,10 @@ type RevokeServerTokenPayload {
 	success: Boolean!
 }
 
+type DeleteServerTokenPayload {
+	success: Boolean!
+}
+
 # This server as the receiver of the tokens of a client product: the permissions a token can hold.
 type ServerTokenReceiver
 {
@@ -112,6 +116,8 @@ type Query {
 type Mutation {
 	CreateServerToken (input: CreateServerTokenInput!): CreateServerTokenPayload!
 	RevokeServerToken (input: InputId!): RevokeServerTokenPayload!
+	# Removes a revoked token from the list.
+	DeleteServerToken (input: InputId!): DeleteServerTokenPayload!
 	UpdateServerTokenScopes (input: UpdateServerTokenScopesInput!): UpdateServerTokenScopesPayload!
 	AddServerTokenClient (input: AddServerTokenClientInput!): AddServerTokenClientPayload!
 }

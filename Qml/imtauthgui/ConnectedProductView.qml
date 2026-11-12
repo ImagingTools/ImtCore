@@ -17,7 +17,6 @@ ViewBase {
 	contentColor: Style.baseColor
 
 	property var tokenApiClient: null
-	property var permissionsProvider: null
 
 	// The ID of the saved product. Tokens, roles and the tree refer to it, so it stays once stored.
 	property string storedProductId: ""
@@ -87,7 +86,6 @@ ViewBase {
 			multiPageView.addPageOnce("General", qsTr("General"), generalPageComp, "Icons/Settings")
 			if (container.storedProductId !== ""){
 				multiPageView.addPageOnce("Tokens", qsTr("Tokens"), tokensPageComp, "Icons/Key")
-				multiPageView.addPageOnce("Permissions", qsTr("Permissions"), permissionsPageComp, "Icons/Key")
 				multiPageView.addPageOnce("Administration", qsTr("Administration"), administrationPageComp, "Icons/Account")
 			}
 		}
@@ -104,17 +102,6 @@ ViewBase {
 		ConnectedProductTokensPage {
 			productId: container.storedProductId
 			apiClient: container.tokenApiClient
-		}
-	}
-
-	Component {
-		id: permissionsPageComp
-
-		ConnectedProductPermissionsPage {
-			productId: container.storedProductId
-			productVersion: container.model && container.model.m_productVersion ? String(container.model.m_productVersion) : ""
-			publishedAt: container.model && container.model.m_publishedAt ? String(container.model.m_publishedAt) : ""
-			permissionsProvider: container.permissionsProvider
 		}
 	}
 
@@ -179,6 +166,7 @@ ViewBase {
 						objectName: "ConnectedProductIdInput"
 						name: qsTr("Product-ID")
 						readOnly: container.storedProductId !== ""
+						description: container.storedProductId === "" ? qsTr("The ID cannot be changed after saving: tokens, roles and permissions refer to it") : qsTr("Tokens, roles and permissions refer to this ID, so it cannot be changed")
 						placeHolderText: qsTr("Enter the ID of the product")
 						onEditingFinished: {
 							container.doUpdateModel()

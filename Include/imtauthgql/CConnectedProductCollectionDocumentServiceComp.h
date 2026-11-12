@@ -23,7 +23,6 @@ public:
 
 	I_BEGIN_COMPONENT(CConnectedProductCollectionDocumentServiceComp)
 		I_ASSIGN(m_documentManagerCompPtr, "CollectionDocumentService", "Collection document manager", false, "CollectionDocumentService");
-		I_ASSIGN(m_snapshotCollectionCompPtr, "SnapshotCollection", "Published permission trees, they give the version and the time of the publication", false, "SnapshotCollection");
 	I_END_COMPONENT
 
 protected:
@@ -38,8 +37,10 @@ protected:
 				QString& errorMessage) const override;
 
 private:
+	// An unknown document counts as stored, so its product ID stays
+	bool IsDocumentStored(const QByteArray& userId, const QByteArray& documentId) const;
+
 	I_REF(imtdoc::IDocumentService, m_documentManagerCompPtr);
-	I_REF(imtbase::IObjectCollection, m_snapshotCollectionCompPtr);
 };
 
 

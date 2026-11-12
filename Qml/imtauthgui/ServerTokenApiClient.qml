@@ -26,4 +26,6 @@ QtObject {
 	function createToken(name, description, scopes) {}
 	function updateTokenScopes(tokenId, scopes) {}
 	function revokeToken(tokenId) {}
+	// A revoked token only
+	function deleteToken(tokenId) {}
 }

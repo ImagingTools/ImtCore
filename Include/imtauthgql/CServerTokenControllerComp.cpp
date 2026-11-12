@@ -181,6 +181,42 @@ sdl::V1_0::imtauth::CRevokeServerTokenPayload CServerTokenControllerComp::OnRevo
 }
 
 
+sdl::V1_0::imtauth::CDeleteServerTokenPayload CServerTokenControllerComp::OnDeleteServerToken(
+			const sdl::V1_0::imtauth::CDeleteServerTokenGqlRequest& deleteServerTokenRequest,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	sdl::V1_0::imtauth::CDeleteServerTokenPayload response;
+	response.success = false;
+
+	if (!CheckSuperuserSession(gqlRequest, errorMessage)){
+		return response;
+	}
+
+	const auto arguments = deleteServerTokenRequest.GetRequestedArguments();
+	const QByteArray tokenId = arguments.input.has_value() && arguments.input->id ? QByteArray(*arguments.input->id) : QByteArray();
+
+	const imtauth::IPersonalAccessTokenSharedPtr tokenPtr = GetServerToken(tokenId, errorMessage);
+	if (!tokenPtr.IsValid()){
+		return response;
+	}
+
+	// A working server is stopped by the revocation, which its subscriptions see
+	if (!tokenPtr->IsRevoked()){
+		errorMessage = QStringLiteral("Revoke the server token before deleting it");
+
+		return response;
+	}
+
+	response.success = m_tokenManagerCompPtr->DeleteToken(tokenId);
+	if (!*response.success){
+		errorMessage = QStringLiteral("Unable to delete the server token");
+	}
+
+	return response;
+}
+
+
 sdl::V1_0::imtauth::CAddServerTokenClientPayload CServerTokenControllerComp::OnAddServerTokenClient(
 			const sdl::V1_0::imtauth::CAddServerTokenClientGqlRequest& addServerTokenClientRequest,
 			const ::imtgql::CGqlRequest& gqlRequest,

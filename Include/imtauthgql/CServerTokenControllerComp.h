@@ -53,6 +53,10 @@ protected:
 				const sdl::V1_0::imtauth::CRevokeServerTokenGqlRequest& revokeServerTokenRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CDeleteServerTokenPayload OnDeleteServerToken(
+				const sdl::V1_0::imtauth::CDeleteServerTokenGqlRequest& deleteServerTokenRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 	virtual sdl::V1_0::imtauth::CUpdateServerTokenScopesPayload OnUpdateServerTokenScopes(
 				const sdl::V1_0::imtauth::CUpdateServerTokenScopesGqlRequest& updateServerTokenScopesRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,

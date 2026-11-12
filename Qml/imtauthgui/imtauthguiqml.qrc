@@ -17,7 +17,6 @@
         <file alias="imtauthgui/ServerTokenPermissionsView.qml">ServerTokenPermissionsView.qml</file>
         <file alias="imtauthgui/ConnectedProductView.qml">ConnectedProductView.qml</file>
         <file alias="imtauthgui/ConnectedProductTokensPage.qml">ConnectedProductTokensPage.qml</file>
-        <file alias="imtauthgui/ConnectedProductPermissionsPage.qml">ConnectedProductPermissionsPage.qml</file>
         <file alias="imtauthgui/RoleView.qml">RoleView.qml</file>
         <file alias="imtauthgui/UserGroupView.qml">UserGroupView.qml</file>
         <file alias="imtauthgui/PermissionsProvider.qml">PermissionsProvider.qml</file>

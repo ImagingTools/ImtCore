@@ -51,7 +51,7 @@ DocumentRepresentationController {
 
 		updateProductInput.m_documentId = documentId
 		updateProductInput.m_product = representationModel
-		updateProductRequest.send(updateProductInput)
+		return updateProductRequest.send(updateProductInput)
 	}
 
 	property DocumentId getProductInput: DocumentId {}

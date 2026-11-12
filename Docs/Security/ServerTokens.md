@@ -9,7 +9,7 @@ Operator (Agentino or the Puma console)        Receiving server (Puma, Lisa, ...
    | Authorization (superuser of the receiver) --> session
    | AddServerTokenClient (clientProductId)    --> the product becomes a client (no change if it is one)
    | GetServerTokenReceiver (clientProductId)  --> permission tree the token can hold
-   | CreateServerToken / UpdateServerTokenScopes / RevokeServerToken
+   | CreateServerToken / UpdateServerTokenScopes / RevokeServerToken / DeleteServerToken
    |                                             <-- token value (only at creation)
    | the value reaches the calling server (Agentino passes it in IMT_<RECEIVER>_SERVER_CREDENTIAL)
    |                                                                                            | request
@@ -57,6 +57,7 @@ Revocation, scope changes and usage timestamps use field-specific SQL updates th
 `IPersonalAccessTokenPersistence`; they do not save an earlier copy of the complete token.
 Usage updates cannot broaden scopes or undo revocation, timestamps cannot move backwards,
 and scope changes on revoked tokens are rejected.
+`DeleteServerToken` removes a revoked token only: a token in use is revoked first, so its subscriptions see the revocation.
 An empty scope list is valid and grants no product permissions. Scope updates store it as a non-null empty
 string, including repeated updates to an already empty list.
 Custom persistent registries must wire this interface too. `InMemoryUpdates=true` is an explicit opt-in
@@ -380,7 +381,7 @@ Repair such conflicts explicitly and restart the component. Concurrent initial r
 | Part | Component | Role |
 |---|---|---|
 | The receiver | `ImtAuthVoce/ServerTokenReceiver` | One element of the server registry. It holds everything below and exports `imtservergql::IServerTokenReceiver`: the product of the server and its token store. |
-| Token commands | `imtauthgql::CServerTokenControllerComp` | Adds client products, issues, lists, changes and revokes the tokens of this server, offering the permission tree of the server. A superuser session opened at this server only. |
+| Token commands | `imtauthgql::CServerTokenControllerComp` | Adds client products, issues, lists, changes, revokes and deletes the tokens of this server, offering the permission tree of the server. A superuser session opened at this server only. |
 | Allowed clients | `imtauth::IClientProductCatalog` | The client products in the table `ConnectedProducts` of the database of the server. `AddServerTokenClient` adds a product, so a configurator (Agentino) sets up the whole connection. Puma shows the same table as its catalog of products (`ImtAuthVoce/ConnectedProductCatalog` embeds the receiver). |
 | Token storage | `ImtAuthVoce/PersonalAccessTokenStore` | The table `PersonalAccessTokens` of the server. A server token starts with `imt_srv_`, a personal token with `imt_pat_`: each is looked up only where its kind is kept. |
 | Check of a request | `imtservergql::CAuthenticationManagerComp` | Takes the receiver as its `ServerTokenReceiver` reference. Refuses another product without a token of its server, checks the token, bounds the request by it (above) and checks where a session may be used (below). |

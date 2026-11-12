@@ -44,7 +44,6 @@ ServerTokenApiClient 1.0 ServerTokenApiClient.qml
 ServerTokenPermissionsView 1.0 ServerTokenPermissionsView.qml
 ConnectedProductView 1.0 ConnectedProductView.qml
 ConnectedProductTokensPage 1.0 ConnectedProductTokensPage.qml
-ConnectedProductPermissionsPage 1.0 ConnectedProductPermissionsPage.qml
 UserCollectionView 1.0 UserCollectionView.qml
 UserGroupCollectionView 1.0 UserGroupCollectionView.qml
 ChangePasswordDialog 1.0 ChangePasswordDialog.qml
