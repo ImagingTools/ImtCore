@@ -13,6 +13,7 @@
 #include <imtauth/IUserInfoProvider.h>
 #include <imtauth/imtauth.h>
 #include <imtauthgql/CAssignmentCollector.h>
+#include <imtauthgql/imtauthgql.h>
 #include <imtbase/IObjectCollectionIterator.h>
 
 
@@ -405,6 +406,8 @@ bool CUserGroupCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 
 	QByteArray objectId = userGroupInfoPtr->GetObjectUuid();
 
+	const istd::IChangeableUniquePtr previousPtr = userGroupInfoPtr->CloneMe();
+
 	QByteArrayList groupIds = userGroupInfoPtr->GetParentGroups();
 	for (const QByteArray& groupId : groupIds){
 		userGroupInfoPtr->RemoveParentGroup(groupId);
@@ -416,6 +419,10 @@ bool CUserGroupCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 	}
 
 	if (!FillObjectFromRepresentation(representation, object, objectId, errorMessage)){
+		return false;
+	}
+
+	if (!CheckGroupGrants(rawGqlRequest, dynamic_cast<const imtauth::IUserGroupInfo*>(previousPtr.GetPtr()), *userGroupInfoPtr, errorMessage)){
 		return false;
 	}
 
@@ -438,7 +445,31 @@ istd::IChangeableUniquePtr CUserGroupCollectionControllerComp::CreateObjectFromR
 		return nullptr;
 	}
 
+	if (!CheckGroupGrants(gqlRequest, nullptr, *userGroupInfoPtr, errorMessage)){
+		return nullptr;
+	}
+
 	return objectPtr;
+}
+
+
+bool CUserGroupCollectionControllerComp::CheckObjectData(const imtgql::CGqlRequest& gqlRequest, const QByteArray& objectId, const istd::IChangeable& object, QString& errorMessage) const
+{
+	const imtauth::IUserGroupInfo* groupPtr = dynamic_cast<const imtauth::IUserGroupInfo*>(&object);
+	if (groupPtr == nullptr){
+		errorMessage = QStringLiteral("Invalid group data");
+
+		return false;
+	}
+
+	imtbase::IObjectCollection::DataPtr storedDataPtr;
+	const imtauth::IUserGroupInfo* storedGroupPtr = nullptr;
+	if (!objectId.isEmpty() && m_objectCollectionCompPtr->GetObjectData(objectId, storedDataPtr)){
+		storedGroupPtr = dynamic_cast<const imtauth::IUserGroupInfo*>(storedDataPtr.GetPtr());
+	}
+
+	return CheckGroupGrants(gqlRequest, storedGroupPtr, *groupPtr, errorMessage)
+				&& ValidateGroupForTenant(gqlRequest, *groupPtr, objectId, errorMessage);
 }
 
 
@@ -446,6 +477,10 @@ istd::IChangeableUniquePtr CUserGroupCollectionControllerComp::CreateObjectFromR
 
 bool CUserGroupCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
+	if (!CheckAdministeredProducts(gqlRequest, errorMessage)){
+		return false;
+	}
+
 	QByteArrayList availableGroupIds;
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 	if (gqlContextPtr != nullptr){
@@ -490,6 +525,31 @@ bool CUserGroupCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequ
 
 
 // private methods
+
+bool CUserGroupCollectionControllerComp::CheckGroupGrants(
+			const imtgql::CGqlRequest& gqlRequest,
+			const imtauth::IUserGroupInfo* previousPtr,
+			const imtauth::IUserGroupInfo& group,
+			QString& errorMessage) const
+{
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (!CheckOtherProductsUnchanged(gqlContextPtr, previousPtr, group, errorMessage)){
+		return false;
+	}
+
+	const QByteArray productId = gqlContextPtr != nullptr ? gqlContextPtr->GetProductId() : QByteArray();
+	const QByteArrayList previousUsers = previousPtr != nullptr ? previousPtr->GetUsers() : QByteArrayList();
+	bool hasNewUsers = false;
+	for (const QByteArray& userId : group.GetUsers()){
+		hasNewUsers = hasNewUsers || !previousUsers.contains(userId);
+	}
+
+	// New members get all permissions of the group, the others only what the change adds
+	const QByteArrayList previousPermissions = (previousPtr != nullptr && !hasNewUsers) ? previousPtr->GetPermissions(productId) : QByteArrayList();
+
+	return CheckGrantedPermissions(gqlContextPtr, previousPermissions, group.GetPermissions(productId), errorMessage);
+}
+
 
 bool CUserGroupCollectionControllerComp::ValidateGroupForTenant(
 			const imtgql::CGqlRequest& gqlRequest,

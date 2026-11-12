@@ -9,7 +9,9 @@
 // ImtCore includes
 #include <imtauth/CRole.h>
 #include <imtauth/IUserBaseInfo.h>
+#include <imtauth/imtauth.h>
 #include <imtauthdb/imtauthdb.h>
+#include <imtdb/imtdb.h>
 
 
 namespace imtauthdb
@@ -127,6 +129,13 @@ QString CRoleDatabaseDelegateComp::CreateAdditionalFiltersQuery(const iprm::IPar
 	const QByteArrayList parentRoleIds = GetFilterIds(filterParams, s_parentFilterId);
 	if (!parentRoleIds.isEmpty()){
 		conditions << CreateArrayContainsAnyQuery(IsSQLite(), QStringLiteral("ParentsRoles"), parentRoleIds);
+	}
+
+	iprm::TParamsPtr<iprm::IIdParam> productParamPtr(&filterParams, imtauth::s_roleProductFilterId);
+	if (productParamPtr.IsValid()){
+		conditions << QStringLiteral("%1 = '%2'").arg(
+					CreateJsonExtractSql(QStringLiteral("Document"), QStringLiteral("ProductId"), QMetaType::QString, QStringLiteral("root")),
+					imtdb::EscapeSql(QString::fromUtf8(productParamPtr->GetId())));
 	}
 
 	iprm::TParamsPtr<iprm::IIdParam> idParamPtr(&filterParams, "ParentListFilter");

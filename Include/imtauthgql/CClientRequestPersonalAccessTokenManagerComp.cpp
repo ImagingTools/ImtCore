@@ -106,7 +106,7 @@ imtauth::IPersonalAccessTokenManager::TokenCreationResult CClientRequestPersonal
 }
 
 
-bool CClientRequestPersonalAccessTokenManagerComp::ValidateToken(const QByteArray& rawToken, QByteArray& userId, QByteArray& tokenId, QByteArrayList& scopes) const
+bool CClientRequestPersonalAccessTokenManagerComp::ValidateToken(const QByteArray& rawToken, QByteArray& userId, QByteArray& tokenId, QByteArrayList& scopes, QByteArray* productIdPtr) const
 {
 	namespace tokensdl = sdl::V1_0::imtauth;
 
@@ -134,6 +134,10 @@ bool CClientRequestPersonalAccessTokenManagerComp::ValidateToken(const QByteArra
 
 	if (payload.scopes.has_value()){
 		scopes = payload.scopes->ToList();
+	}
+
+	if (productIdPtr != nullptr && payload.productId.has_value()){
+		*productIdPtr = *payload.productId;
 	}
 
 	// The SDL schema's ValidateTokenPayload does not include a tokenId field

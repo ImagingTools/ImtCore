@@ -199,6 +199,9 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 		userData = *arguments.input->user;
 	}
 
+	const QByteArray contextProductId = gqlRequest.GetRequestContext() != nullptr ? gqlRequest.GetRequestContext()->GetProductId() : QByteArray();
+	const QByteArrayList previousPermissions = userPtr->GetPermissions(contextProductId);
+
 	// A stored user keeps its UUID: the editor sends the ID of its own representation.
 	if (userData.id && userPtr->GetObjectUuid().isEmpty()){
 		userPtr->SetObjectUuid(*userData.id);
@@ -323,6 +326,9 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 		if (userData.productId){
 			productId = *userData.productId;
 		}
+		if (!CheckAdministeredProduct(gqlRequest.GetRequestContext(), productId, errorMessage)){
+			return response;
+		}
 		imtauth::IUserBaseInfo::RoleIds incomingRoles;
 		for (const QByteArray& rid : CAssignmentCollector::GetDirectIds(userData.roles)){
 			if (shouldKeepForTenant(rolesEntity, rid)){
@@ -344,6 +350,10 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 			}
 		}
 		userPtr->SetRoles(productId, finalRoles);
+	}
+
+	if (!CheckGrantedPermissions(gqlRequest.GetRequestContext(), previousPermissions, userPtr->GetPermissions(contextProductId), errorMessage)){
+		return response;
 	}
 
 

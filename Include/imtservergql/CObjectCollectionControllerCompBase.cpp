@@ -910,7 +910,7 @@ sdl::V1_0::imtbase::CExportObjectPayload CObjectCollectionControllerCompBase::On
 
 sdl::V1_0::imtbase::CImportObjectPayload CObjectCollectionControllerCompBase::OnImportObject(
 			const sdl::V1_0::imtbase::CImportObjectGqlRequest& importObjectRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtbase::CImportObjectPayload response;
@@ -1035,6 +1035,11 @@ sdl::V1_0::imtbase::CImportObjectPayload CObjectCollectionControllerCompBase::On
 		}
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
+		return sdl::V1_0::imtbase::CImportObjectPayload();
+	}
+
+	if (!CheckObjectData(gqlRequest, QByteArray(), *collectionObjectInstancePtr.GetPtr(), errorMessage)){
+		QFile::remove(filePathTmp);
 		return sdl::V1_0::imtbase::CImportObjectPayload();
 	}
 
@@ -1266,6 +1271,10 @@ sdl::V1_0::imtbase::CInsertNewObjectPayload CObjectCollectionControllerCompBase:
 			errorMessage = QStringLiteral("Unable to insert new object to collection '%1'. Error: Object serialization failed").arg(*m_collectionIdAttrPtr);
 			return sdl::V1_0::imtbase::CInsertNewObjectPayload();
 		}
+
+		if (!CheckObjectData(gqlRequest, QByteArray(), *objectPtr.GetPtr(), errorMessage)){
+			return sdl::V1_0::imtbase::CInsertNewObjectPayload();
+		}
 	}
 
 	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr = nullptr;
@@ -1328,6 +1337,10 @@ sdl::V1_0::imtbase::CSetObjectDataPayload CObjectCollectionControllerCompBase::O
 
 	if (!DeSerializeObject(*objectPtr.GetPtr(), objectData)){
 		errorMessage = QStringLiteral("Unable to set object data to collection '%1'. Error: Object serialization failed").arg(*m_collectionIdAttrPtr);
+		return sdl::V1_0::imtbase::CSetObjectDataPayload();
+	}
+
+	if (!CheckObjectData(gqlRequest, objectId, *objectPtr.GetPtr(), errorMessage)){
 		return sdl::V1_0::imtbase::CSetObjectDataPayload();
 	}
 
@@ -1522,7 +1535,7 @@ sdl::V1_0::imtbase::CGetElementMetaInfoPayload CObjectCollectionControllerCompBa
 
 sdl::V1_0::imtbase::CCreateSubCollectionPayload CObjectCollectionControllerCompBase::OnCreateSubCollection(
 			const sdl::V1_0::imtbase::CCreateSubCollectionGqlRequest& createSubCollectionRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 
@@ -1554,6 +1567,8 @@ sdl::V1_0::imtbase::CCreateSubCollectionPayload CObjectCollectionControllerCompB
 			return {};
 		}
 	}
+
+	AddAccessFilters(gqlRequest, imtgql::CGqlParamObject(), filterParams);
 
 	if (!requestInfo.isItemsRequested){
 		return {};
@@ -3816,6 +3831,16 @@ QJsonObject CObjectCollectionControllerCompBase::CreateElementMetaInfoResponse(c
 	responseObj.insert(QStringLiteral("data"), dataObj);
 
 	return responseObj;
+}
+
+
+bool CObjectCollectionControllerCompBase::CheckObjectData(
+			const imtgql::CGqlRequest& /*gqlRequest*/,
+			const QByteArray& /*objectId*/,
+			const istd::IChangeable& /*object*/,
+			QString& /*errorMessage*/) const
+{
+	return true;
 }
 
 

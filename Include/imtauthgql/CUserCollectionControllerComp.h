@@ -108,6 +108,7 @@ protected:
 	/**
 		A user may view the own account in every organization of the session, also in one entered by delegated access.
 	*/
+	virtual bool CheckObjectData(const imtgql::CGqlRequest& gqlRequest, const QByteArray& objectId, const istd::IChangeable& object, QString& errorMessage) const override;
 	virtual bool CheckObjectAccess(
 				const imtgql::CGqlRequest& gqlRequest,
 				const QByteArrayList& objectIds,

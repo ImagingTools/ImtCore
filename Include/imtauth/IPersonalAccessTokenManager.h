@@ -74,7 +74,7 @@ public:
 		\param[out] scopes Permission scopes granted to the token (if valid)
 		\return True if token is valid, false if invalid, revoked, or expired
 	*/
-	virtual bool ValidateToken(const QByteArray& rawToken, QByteArray& userId, QByteArray& tokenId, QByteArrayList& scopes) const = 0;
+	virtual bool ValidateToken(const QByteArray& rawToken, QByteArray& userId, QByteArray& tokenId, QByteArrayList& scopes, QByteArray* productIdPtr = nullptr) const = 0;
 
 	/**
 		Get list of token IDs for a specific user.

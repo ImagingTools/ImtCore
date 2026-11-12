@@ -332,6 +332,15 @@ protected:
 		An object is accessible if it belongs to the organization or to no organization, or if it is shared with
 		the organization. DAL_OWNER excludes the shared objects. Always succeeds if tenant filtering is disabled.
 	*/
+	/**
+		Check an object received as raw data before it is stored.
+		\param objectId ID of the object to overwrite, empty for a new object.
+	*/
+	virtual bool CheckObjectData(
+				const imtgql::CGqlRequest& gqlRequest,
+				const QByteArray& objectId,
+				const istd::IChangeable& object,
+				QString& errorMessage) const;
 	virtual bool CheckObjectAccess(
 				const imtgql::CGqlRequest& gqlRequest,
 				const QByteArrayList& objectIds,

@@ -34,7 +34,7 @@ public:
 				const QString& description,
 				const QByteArrayList& scopes,
 				const QDateTime& expiresAt) override;
-	virtual bool ValidateToken(const QByteArray& rawToken, QByteArray& userId, QByteArray& tokenId, QByteArrayList& scopes) const override;
+	virtual bool ValidateToken(const QByteArray& rawToken, QByteArray& userId, QByteArray& tokenId, QByteArrayList& scopes, QByteArray* productIdPtr = nullptr) const override;
 	virtual QByteArrayList GetTokenIds(const QByteArray& userId) const override;
 	virtual imtauth::IPersonalAccessTokenSharedPtr GetToken(const QByteArray& tokenId) const override;
 	virtual bool RevokeToken(const QByteArray& tokenId) override;
