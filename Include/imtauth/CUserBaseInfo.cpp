@@ -59,6 +59,22 @@ void CUserBaseInfo::SetId(const QByteArray& id)
 }
 
 
+QByteArray CUserBaseInfo::GetSid() const
+{
+	return m_sid;
+}
+
+
+void CUserBaseInfo::SetSid(const QByteArray& sid)
+{
+	if (m_sid != sid){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_sid = sid;
+	}
+}
+
+
 QString CUserBaseInfo::GetName() const
 {
 	return m_name;
@@ -91,9 +107,9 @@ void CUserBaseInfo::SetDescription(const QString& description)
 }
 
 
-IUserBaseInfo::FeatureIds CUserBaseInfo::GetPermissions(const QByteArray& productId) const
+IPrincipal::FeatureIds CUserBaseInfo::GetPermissions(const QByteArray& productId) const
 {
-	IUserBaseInfo::FeatureIds allPermissions;
+	IPrincipal::FeatureIds allPermissions;
 
 	if (m_roleProviderPtr != nullptr){
 		RoleIds roleIds;
@@ -112,7 +128,7 @@ IUserBaseInfo::FeatureIds CUserBaseInfo::GetPermissions(const QByteArray& produc
 		for (const QByteArray& roleId : std::as_const(roleIds)){
 			imtauth::IRoleUniquePtr roleInfoPtr = m_roleProviderPtr->GetRole(roleId);
 			if (roleInfoPtr.IsValid()){
-				const IUserBaseInfo::FeatureIds rolePerms = roleInfoPtr->GetPermissions();
+				const IPrincipal::FeatureIds rolePerms = roleInfoPtr->GetPermissions();
 				for (const QByteArray& perm : std::as_const(rolePerms)){
 					if (!allPermissions.contains(perm)){
 						allPermissions << perm;
@@ -148,13 +164,13 @@ IUserBaseInfo::FeatureIds CUserBaseInfo::GetPermissions(const QByteArray& produc
 
 
 
-IUserBaseInfo::FeatureIds CUserBaseInfo::GetLocalPermissions(const QByteArray& productId) const
+IPrincipal::FeatureIds CUserBaseInfo::GetLocalPermissions(const QByteArray& productId) const
 {
 	if (m_permissionsMap.contains(productId)){
 		return m_permissionsMap[productId];
 	}
 
-	return IUserBaseInfo::FeatureIds();
+	return IPrincipal::FeatureIds();
 }
 
 
@@ -176,7 +192,7 @@ void CUserBaseInfo::SetLocalPermissions(const QByteArray& productId, const Featu
 }
 
 
-IUserBaseInfo::FeatureIds CUserBaseInfo::GetProhibitions() const
+IPrincipal::FeatureIds CUserBaseInfo::GetProhibitions() const
 {
 	return m_restrictions;
 }
@@ -221,13 +237,13 @@ bool CUserBaseInfo::RemoveProduct(const QByteArray& productId)
 }
 
 
-IUserBaseInfo::RoleIds CUserBaseInfo::GetRoles(const QByteArray& productId) const
+IPrincipal::RoleIds CUserBaseInfo::GetRoles(const QByteArray& productId) const
 {
 	if (m_rolesMap.contains(productId)){
 		return m_rolesMap.value(productId);
 	}
 
-	return IUserBaseInfo::RoleIds();
+	return IPrincipal::RoleIds();
 }
 
 
@@ -435,6 +451,7 @@ bool CUserBaseInfo::CopyFrom(const IChangeable &object, CompatibilityMode /*mode
 		istd::CChangeNotifier changeNotifier(this);
 
 		m_id = sourcePtr->m_id;
+		m_sid = sourcePtr->m_sid;
 		m_name = sourcePtr->m_name;
 		m_description = sourcePtr->m_description;
 		m_permissionsMap = sourcePtr->m_permissionsMap;
@@ -459,6 +476,7 @@ bool CUserBaseInfo::IsEqual(const IChangeable& object) const
 		retVal = retVal && m_rolesMap == sourcePtr->m_rolesMap;
 		retVal = retVal && m_name == sourcePtr->m_name;
 		retVal = retVal && m_id == sourcePtr->m_id;
+		retVal = retVal && m_sid == sourcePtr->m_sid;
 		retVal = retVal && m_description == sourcePtr->m_description;
 
 		return retVal;
@@ -484,6 +502,7 @@ bool CUserBaseInfo::ResetData(CompatibilityMode /*mode*/)
 	istd::CChangeNotifier changeNotifier(this);
 
 	m_id.clear();
+	m_sid.clear();
 	m_name.clear();
 	m_description.clear();
 	m_permissionsMap.clear();

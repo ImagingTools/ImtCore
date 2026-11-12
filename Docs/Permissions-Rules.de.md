@@ -323,7 +323,7 @@ Berechtigungen(product, tenant) = Rollen des Benutzers im Produkt
     = wirksame Berechtigungen
 ```
 
-- **R8.1. Berechtigungen sind produktspezifisch** (`IRole::GetProductId`, `IUserBaseInfo::GetRoles(productId)`, `GetPermissions(productId)`). Der Server bestimmt das Anfrageprodukt anhand seiner Konfiguration, nicht der Client (13.13). Rollen aus einem anderen Produkt öffnen keine Befehle dieses Produkts.
+- **R8.1. Berechtigungen sind produktspezifisch** (`IRole::GetProductId`, `IPrincipal::GetRoles(productId)`, `GetPermissions(productId)`). Der Server bestimmt das Anfrageprodukt anhand seiner Konfiguration, nicht der Client (13.13). Rollen aus einem anderen Produkt öffnen keine Befehle dieses Produkts.
 - **R8.2. Organisation (Tenant).** Für eine Organisation werden nur ihr **zugeordnete** Rollen, Gruppen und Berechtigungen berücksichtigt; bei „keine Organisation“ nur nicht zugeordnete (globale). Eine Elternrolle/-gruppe aus einer anderen Organisation gewährt nichts. Eine delegierte Rolle (Cross-Org-Delegation) zählt nur, wenn ihr Produkt übereinstimmt (`imtauthgql::AdaptUserForTenant`, `GetEffectiveUserPermissions`, `GetTenantUserPermissions`). Dies gilt auch bei Befehlsprüfungen, einschließlich in Puma selbst (13.14).
 - **R8.3. Zyklen in Rollen und Gruppen sind verboten:** Eine Elternrolle/-gruppe, die einen Zyklus schließt, wird mit Fehler abgelehnt (`CreatesRoleCycle`, `CreatesGroupCycle`).
 - **R8.4. Verbote (`prohibitions`)** werden gespeichert, aber bei der Berechnung von Berechtigungen **nicht angewendet** (13.8). Nicht verwenden.

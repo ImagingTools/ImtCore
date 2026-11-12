@@ -29,7 +29,7 @@ public:
 	virtual bool RemoveParentGroup(const QByteArray& parentGroupId) override;
 	virtual const imtauth::IUserInfoProvider* GetUserProvider() const override;
 
-	// reimplemented (IUserBaseInfo)
+	// reimplemented (IPrincipal)
 	virtual FeatureIds GetPermissions(const QByteArray& productId = QByteArray()) const override;
 
 	// reimplemented (iser::ISerializable)

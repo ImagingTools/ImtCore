@@ -4,24 +4,26 @@
 
 // ImtCore includes
 #include <imtauth/CRole.h>
-#include <imtauth/IUserBaseInfo.h>
+#include <imtauth/IPrincipal.h>
 
 
 namespace imtauth
 {
 
 
-class CUserBaseInfo: virtual public IUserBaseInfo
+class CUserBaseInfo: virtual public IPrincipal
 {
 
 public:
 	CUserBaseInfo();
 
-	// reimplemented (iser::IUserBaseInfo)
+	// reimplemented (IPrincipal)
 	virtual const imtlic::IFeatureInfoProvider* GetPermissionProvider() const override;
 	virtual const imtauth::IRoleInfoProvider* GetRoleProvider() const override;
 	virtual QByteArray GetId() const override;
 	virtual void SetId(const QByteArray& id) override;
+	virtual QByteArray GetSid() const override;
+	virtual void SetSid(const QByteArray& sid) override;
 	virtual QString GetName() const override;
 	virtual void SetName(const QString& name) override;
 	virtual QString GetDescription() const override;
@@ -55,12 +57,13 @@ protected:
 	const imtauth::IUserGroupInfoProvider* m_userGroupInfoProviderPtr;
 
 protected:
-	IUserBaseInfo::FeatureIds m_restrictions;
+	IPrincipal::FeatureIds m_restrictions;
 
 	QMap<QByteArray, QByteArrayList> m_permissionsMap;
 	QMap<QByteArray, QByteArrayList> m_rolesMap;
 	QString m_name;
 	QByteArray m_id;
+	QByteArray m_sid;
 	QString m_description;
 };
 

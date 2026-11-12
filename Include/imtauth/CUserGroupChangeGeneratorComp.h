@@ -4,7 +4,7 @@
 
 // ImtCore includes
 #include <imtbase/CDocumentChangeGeneratorCompBase.h>
-#include <imtauth/IUserBaseInfo.h>
+#include <imtauth/IPrincipal.h>
 
 
 namespace imtauth
@@ -30,8 +30,8 @@ protected:
 		Record the added and removed products together with the role assignments they carry.
 	*/
 	void CompareProductRoles(
-				const imtauth::IUserBaseInfo& oldGroupInfo,
-				const imtauth::IUserBaseInfo& newGroupInfo,
+				const imtauth::IPrincipal& oldGroupInfo,
+				const imtauth::IPrincipal& newGroupInfo,
 				imtbase::CObjectCollection& documentChangeCollection);
 
 	// reimplemented (imtbase::CDocumentChangeGeneratorCompBase)

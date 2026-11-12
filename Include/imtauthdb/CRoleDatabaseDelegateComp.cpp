@@ -8,7 +8,7 @@
 
 // ImtCore includes
 #include <imtauth/CRole.h>
-#include <imtauth/IUserBaseInfo.h>
+#include <imtauth/IPrincipal.h>
 #include <imtauthdb/imtauthdb.h>
 
 
@@ -52,7 +52,7 @@ QByteArray CRoleDatabaseDelegateComp::CreateDeleteObjectsQuery(
 	iprm::CParamsSet roleFilterParams;
 	SetFilterIds(roleFilterParams, s_roleFilterId, roleIds);
 
-	auto removeRoles = [&roleIds](imtauth::IUserBaseInfo& userBaseInfo){
+	auto removeRoles = [&roleIds](imtauth::IPrincipal& userBaseInfo){
 		RemovedReferences removedReferences;
 		for (const QByteArray& productId : userBaseInfo.GetProducts()){
 			for (const QByteArray& roleId : roleIds){
@@ -65,12 +65,12 @@ QByteArray CRoleDatabaseDelegateComp::CreateDeleteObjectsQuery(
 	};
 
 	if (m_userCollectionCompPtr.IsValid() && m_userDatabaseDelegateCompPtr.IsValid()){
-		retVal += CreateReferenceRemovalQuery<imtauth::IUserBaseInfo>(
+		retVal += CreateReferenceRemovalQuery<imtauth::IPrincipal>(
 					*m_userCollectionCompPtr, *m_userDatabaseDelegateCompPtr, roleFilterParams, imtbase::ICollectionInfo::Ids(), removeRoles, operationContextPtr);
 	}
 
 	if (m_userGroupCollectionCompPtr.IsValid() && m_userGroupDatabaseDelegateCompPtr.IsValid()){
-		retVal += CreateReferenceRemovalQuery<imtauth::IUserBaseInfo>(
+		retVal += CreateReferenceRemovalQuery<imtauth::IPrincipal>(
 					*m_userGroupCollectionCompPtr, *m_userGroupDatabaseDelegateCompPtr, roleFilterParams, imtbase::ICollectionInfo::Ids(), removeRoles, operationContextPtr);
 	}
 

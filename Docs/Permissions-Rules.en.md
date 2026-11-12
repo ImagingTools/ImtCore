@@ -323,7 +323,7 @@ permissions(product, tenant) = user's roles in the product
     = effective permissions
 ```
 
-- **R8.1. Permissions are product-specific** (`IRole::GetProductId`, `IUserBaseInfo::GetRoles(productId)`, `GetPermissions(productId)`). The server determines the request product from its configuration, not the client (13.13). Roles in another product do not grant access to this product's commands.
+- **R8.1. Permissions are product-specific** (`IRole::GetProductId`, `IPrincipal::GetRoles(productId)`, `GetPermissions(productId)`). The server determines the request product from its configuration, not the client (13.13). Roles in another product do not grant access to this product's commands.
 - **R8.2. Organization (tenant).** For an organization, only roles, groups, and permissions **assigned** to it are considered; for “no organization,” only unassigned (global) ones apply. A parent role/group from another organization grants nothing. A delegated role (cross-org delegation) counts only when its product matches (`imtauthgql::AdaptUserForTenant`, `GetEffectiveUserPermissions`, `GetTenantUserPermissions`). This also applies when checking commands, including in Puma itself (13.14).
 - **R8.3. Role and group cycles are forbidden:** a parent role/group that closes a cycle is rejected with an error (`CreatesRoleCycle`, `CreatesGroupCycle`).
 - **R8.4. Prohibitions** are stored but **not applied** when calculating permissions (13.8). Do not use them.

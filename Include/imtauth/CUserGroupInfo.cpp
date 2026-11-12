@@ -13,6 +13,7 @@
 #include <iser/CPrimitiveTypesSerializer.h>
 
 // ImtCore includes
+#include <imtcore/Version.h>
 #include <imtauth/IUserGroupInfoProvider.h>
 
 
@@ -123,11 +124,11 @@ const imtauth::IUserInfoProvider* CUserGroupInfo::GetUserProvider() const
 }
 
 
-// reimplemented (IUserBaseInfo)
+// reimplemented (IPrincipal)
 
-IUserBaseInfo::FeatureIds CUserGroupInfo::GetPermissions(const QByteArray& productId) const
+IPrincipal::FeatureIds CUserGroupInfo::GetPermissions(const QByteArray& productId) const
 {
-	IUserBaseInfo::FeatureIds allPermissions = BaseClass::GetPermissions(productId);
+	IPrincipal::FeatureIds allPermissions = BaseClass::GetPermissions(productId);
 
 	if (m_userGroupInfoProviderPtr != nullptr){
 		// Walked iteratively with a visited set: a cycle in the parent groups must not recurse forever.
@@ -168,9 +169,25 @@ bool CUserGroupInfo::Serialize(iser::IArchive &archive)
 {
 	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this);
 
+	const iser::IVersionInfo& versionInfo = archive.GetVersionInfo();
+	quint32 imtCoreVersion;
+	if (!versionInfo.GetVersionNumber(imtcore::VI_IMTCORE, imtCoreVersion)){
+		imtCoreVersion = 0;
+	}
+
 	bool retVal = BaseClass::Serialize(archive);
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_userIds, "Users", "User");
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_parentGroupIds, "ParentGroups", "ParentGroup");
+
+	if (imtCoreVersion >= 23930){
+		iser::CArchiveTag sidTag("Sid", "Windows SID", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(sidTag);
+		retVal = retVal && archive.Process(m_sid);
+		retVal = retVal && archive.EndTag(sidTag);
+	}
+	else if (!archive.IsStoring()){
+		m_sid.clear();
+	}
 
 	return retVal;
 }
