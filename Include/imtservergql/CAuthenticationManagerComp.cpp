@@ -173,7 +173,7 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 				// unrestricted permissions; only the explicit scoped list applies.
 				const QByteArrayList products = mutableUserPtr->GetProducts();
 				for (const QByteArray& prod : products){
-					mutableUserPtr->SetRoles(prod, imtauth::IUserBaseInfo::RoleIds());
+					mutableUserPtr->SetRoles(prod, imtauth::IPrincipal::RoleIds());
 				}
 				const imtauth::IUserGroupInfo::GroupIds groupIds = mutableUserPtr->GetGroups();
 				for (const QByteArray& groupId : groupIds){

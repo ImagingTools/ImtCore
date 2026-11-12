@@ -1071,13 +1071,13 @@ inline bool ShouldKeepEntityForTenant(
 	visible in the tenant; the user's own roles and groups are expected to be
 	filtered by AdaptUserForTenant already.
 */
-inline imtauth::IUserBaseInfo::RoleIds GetTenantUserRoles(
+inline imtauth::IPrincipal::RoleIds GetTenantUserRoles(
 				const imtauth::IUserInfo& userInfo,
 				const QByteArray& tenantId,
 				const QByteArray& productId,
 				imtauth::ITenantEntityBindingManager* bindingManager)
 {
-	imtauth::IUserBaseInfo::RoleIds retVal = userInfo.GetRoles(productId);
+	imtauth::IPrincipal::RoleIds retVal = userInfo.GetRoles(productId);
 
 	const imtauth::IUserGroupInfoProvider* groupProviderPtr = userInfo.GetUserGroupProvider();
 	if (groupProviderPtr == nullptr){
@@ -1268,9 +1268,9 @@ inline istd::IChangeableUniquePtr AdaptUserForTenant(
 	roles, its groups, their parent groups and the roles of those groups.
 	Parent roles, parent groups and group roles count only when they are
 	visible in the tenant, so an entity of another organization grants nothing.
-	Without a tenant this is IUserBaseInfo::GetPermissions().
+	Without a tenant this is IPrincipal::GetPermissions().
 */
-inline imtauth::IUserBaseInfo::FeatureIds GetTenantUserPermissions(
+inline imtauth::IPrincipal::FeatureIds GetTenantUserPermissions(
 				const imtauth::IUserInfo& userInfo,
 				const QByteArray& tenantId,
 				const QByteArray& productId,
@@ -1286,7 +1286,7 @@ inline imtauth::IUserBaseInfo::FeatureIds GetTenantUserPermissions(
 
 	QByteArrayList pendingRoleIds = GetTenantUserRoles(userInfo, tenantId, productId, bindingManager);
 
-	imtauth::IUserBaseInfo::FeatureIds permissions = userInfo.GetLocalPermissions(productId);
+	imtauth::IPrincipal::FeatureIds permissions = userInfo.GetLocalPermissions(productId);
 	QSet<QByteArray> visitedRoleIds;
 	while (!pendingRoleIds.isEmpty()){
 		const QByteArray roleId = pendingRoleIds.takeFirst();
@@ -1357,12 +1357,12 @@ inline const imtauth::IUserInfo& GetTenantAdaptedUser(
 	(AdaptUserForTenant): only roles/groups/permissions visible in the
 	current tenant - or true globals for "No Organization" - plus delegated
 	role enrichment are considered. Use this instead of a raw
-	IUserBaseInfo::GetPermissions() call whenever the result must reflect
+	IPrincipal::GetPermissions() call whenever the result must reflect
 	what the user actually possesses in the caller's current context (e.g.
 	for building the personal-access-token scope tree or for validating
 	requested token scopes).
 */
-inline imtauth::IUserBaseInfo::FeatureIds GetEffectiveUserPermissions(
+inline imtauth::IPrincipal::FeatureIds GetEffectiveUserPermissions(
 				const QByteArray& userId,
 				const imtauth::IUserInfo& userInfo,
 				const QByteArray& tenantId,
@@ -1384,7 +1384,7 @@ inline imtauth::IUserBaseInfo::FeatureIds GetEffectiveUserPermissions(
 	Get the effective roles of a user for the given tenant and product context,
 	adapted the same way as GetEffectiveUserPermissions(), delegated roles included.
 */
-inline imtauth::IUserBaseInfo::RoleIds GetEffectiveUserRoles(
+inline imtauth::IPrincipal::RoleIds GetEffectiveUserRoles(
 				const QByteArray& userId,
 				const imtauth::IUserInfo& userInfo,
 				const QByteArray& tenantId,
