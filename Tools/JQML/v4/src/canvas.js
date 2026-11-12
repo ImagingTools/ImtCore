@@ -209,6 +209,106 @@ function withAlpha(color, alpha) {
 	return alpha === 1 ? color : { ...color, a: color.a * alpha };
 }
 
+function mixColors(a, b, f) {
+	return { R: Math.round(a.R + (b.R - a.R) * f), G: Math.round(a.G + (b.G - a.G) * f), B: Math.round(a.B + (b.B - a.B) * f), a: a.a + (b.a - a.a) * f };
+}
+
+// The result of `ctx.createLinearGradient(x0, y0, x1, y1)`: colors along the line from (x0, y0) to (x1, y1), in the coordinates the
+// context has when the gradient is used; before the first stop and after the last one the color of that stop goes on.
+export class CanvasGradient {
+	constructor(x0, y0, x1, y1) {
+		this.$x0 = x0;
+		this.$y0 = y0;
+		this.$dx = x1 - x0;
+		this.$dy = y1 - y0;
+		this.$stops = [];
+	}
+
+	// A position outside of 0..1 or a value that is not a color is ignored.
+	addColorStop(position, color) {
+		const p = toFloat(position);
+		const c = styleColor(color);
+		if (c === null || !(p >= 0 && p <= 1)) return;
+		let at = this.$stops.length;
+		while (at > 0 && this.$stops[at - 1].p > p) at--;
+		this.$stops.splice(at, 0, { p, color: c });
+	}
+
+	// Without stops Qt paints black to white.
+	$list() {
+		return this.$stops.length > 0 ? this.$stops : [{ p: 0, color: toColor('#000000') }, { p: 1, color: toColor('#ffffff') }];
+	}
+
+	// The position of a point along the line, where the line is 0 at its start and 1 at its end. A line of no length is 0 everywhere.
+	$t(x, y) {
+		const len2 = this.$dx * this.$dx + this.$dy * this.$dy;
+		return len2 === 0 ? 0 : ((x - this.$x0) * this.$dx + (y - this.$y0) * this.$dy) / len2;
+	}
+
+	$colorAt(x, y) {
+		const stops = this.$list();
+		const t = this.$t(x, y);
+		if (t <= stops[0].p) return stops[0].color;
+		for (let i = 0; i + 1 < stops.length; i++) {
+			if (t <= stops[i + 1].p) {
+				const span = stops[i + 1].p - stops[i].p;
+				return span > 0 ? mixColors(stops[i].color, stops[i + 1].color, (t - stops[i].p) / span) : stops[i + 1].color;
+			}
+		}
+		return stops[stops.length - 1].color;
+	}
+
+	// A convex polygon (flat x, y list) as pieces that each lie between two stops, with a color for every corner: { points, colors }.
+	$pieces(points) {
+		const stops = this.$list();
+		const slices = [{ lo: -Infinity, hi: stops[0].p, a: stops[0].color, b: stops[0].color }];
+		for (let i = 0; i + 1 < stops.length; i++) {
+			if (stops[i + 1].p > stops[i].p) slices.push({ lo: stops[i].p, hi: stops[i + 1].p, a: stops[i].color, b: stops[i + 1].color });
+		}
+		const last = stops[stops.length - 1];
+		slices.push({ lo: last.p, hi: Infinity, a: last.color, b: last.color });
+		const pieces = [];
+		for (const slice of slices) {
+			let piece = points;
+			if (slice.lo > -Infinity) piece = this.$clip(piece, slice.lo, true);
+			if (slice.hi < Infinity) piece = this.$clip(piece, slice.hi, false);
+			const n = piece.length / 2;
+			if (n < 3) continue;
+			const span = slice.hi - slice.lo;
+			const colors = [];
+			for (let i = 0; i < n; i++) {
+				const f = span > 0 && span < Infinity ? Math.min(Math.max((this.$t(piece[2 * i], piece[2 * i + 1]) - slice.lo) / span, 0), 1) : 0;
+				colors.push(mixColors(slice.a, slice.b, f));
+			}
+			pieces.push({ points: piece, colors });
+		}
+		return pieces;
+	}
+
+	// The part of a convex polygon whose position is above (or below) `limit`.
+	$clip(points, limit, keepAbove) {
+		const out = [];
+		const n = points.length / 2;
+		for (let i = 0; i < n; i++) {
+			const j = (i + 1) % n;
+			const ax = points[2 * i];
+			const ay = points[2 * i + 1];
+			const bx = points[2 * j];
+			const by = points[2 * j + 1];
+			const ta = this.$t(ax, ay);
+			const tb = this.$t(bx, by);
+			const ina = keepAbove ? ta >= limit : ta <= limit;
+			const inb = keepAbove ? tb >= limit : tb <= limit;
+			if (ina) out.push(ax, ay);
+			if (ina !== inb) {
+				const k = (limit - ta) / (tb - ta);
+				out.push(ax + (bx - ax) * k, ay + (by - ay) * k);
+			}
+		}
+		return out;
+	}
+}
+
 // The 2D context passed to onPaint (`getContext("2d")`). A subset of the HTML canvas context:
 // fills, strokes (also dashed), text, transforms, rectangular clipping and the state stack. Every
 // drawing call is recorded into `output` as a command; `output === null` makes a detached
@@ -225,8 +325,10 @@ export class CanvasContext {
 		this.$m = [1, 0, 0, 1, 0, 0];
 		this.$fillColor = toColor('#000000');
 		this.$fillText = '#000000';
+		this.$fillGradient = null;
 		this.$strokeColor = toColor('#000000');
 		this.$strokeText = '#000000';
+		this.$strokeGradient = null;
 		this.$lineWidth = 1;
 		this.$alpha = 1;
 		this.$dash = [];
@@ -254,10 +356,16 @@ export class CanvasContext {
 	// Like Qt's Context2D and the HTML canvas, a value that is not a color (`undefined`, a misspelt
 	// property, "nonsense") leaves the style unchanged instead of failing the whole onPaint.
 	set fillStyle(value) {
+		if (value instanceof CanvasGradient) {
+			this.$fillGradient = value;
+			this.$fillText = value;
+			return;
+		}
 		const color = styleColor(value);
 		if (color === null) return;
 		this.$fillColor = color;
 		this.$fillText = value;
+		this.$fillGradient = null;
 	}
 
 	get strokeStyle() {
@@ -265,10 +373,20 @@ export class CanvasContext {
 	}
 
 	set strokeStyle(value) {
+		if (value instanceof CanvasGradient) {
+			this.$strokeGradient = value;
+			this.$strokeText = value;
+			return;
+		}
 		const color = styleColor(value);
 		if (color === null) return;
 		this.$strokeColor = color;
 		this.$strokeText = value;
+		this.$strokeGradient = null;
+	}
+
+	createLinearGradient(x0, y0, x1, y1) {
+		return new CanvasGradient(toFloat(x0), toFloat(y0), toFloat(x1), toFloat(y1));
 	}
 
 	get lineWidth() {
@@ -349,8 +467,10 @@ export class CanvasContext {
 			m: this.$m.slice(),
 			fillColor: this.$fillColor,
 			fillText: this.$fillText,
+			fillGradient: this.$fillGradient,
 			strokeColor: this.$strokeColor,
 			strokeText: this.$strokeText,
+			strokeGradient: this.$strokeGradient,
 			lineWidth: this.$lineWidth,
 			alpha: this.$alpha,
 			dash: this.$dash,
@@ -372,8 +492,10 @@ export class CanvasContext {
 		this.$m = s.m;
 		this.$fillColor = s.fillColor;
 		this.$fillText = s.fillText;
+		this.$fillGradient = s.fillGradient;
 		this.$strokeColor = s.strokeColor;
 		this.$strokeText = s.strokeText;
+		this.$strokeGradient = s.strokeGradient;
 		this.$lineWidth = s.lineWidth;
 		this.$alpha = s.alpha;
 		this.$dash = s.dash;
@@ -507,13 +629,25 @@ export class CanvasContext {
 		if (this.$subPaths.length > 0) this.$subPaths[this.$subPaths.length - 1].closed = true;
 	}
 
+	// Draws triangles (a flat point list and indices) with a gradient: one piece for each part between two stops.
+	$emitGradient(gradient, points, indices) {
+		for (let i = 0; i + 2 < indices.length; i += 3) {
+			const triangle = [];
+			for (let k = 0; k < 3; k++) triangle.push(points[2 * indices[i + k]], points[2 * indices[i + k] + 1]);
+			for (const piece of gradient.$pieces(triangle)) {
+				this.$emit({ k: 'gpoly', points: Float64Array.from(piece.points), colors: piece.colors.map((c) => withAlpha(c, this.$alpha)) });
+			}
+		}
+	}
+
 	fill() {
 		if (this.$output === null) return;
 		const color = withAlpha(this.$fillColor, this.$alpha);
 		for (const subPath of this.$subPaths) {
 			const { points, indices } = fillMesh(subPath);
 			if (indices.length === 0) continue;
-			this.$emit({ k: 'poly', points: Float64Array.from(points), indices, color });
+			if (this.$fillGradient !== null) this.$emitGradient(this.$fillGradient, points, indices);
+			else this.$emit({ k: 'poly', points: Float64Array.from(points), indices, color });
 		}
 	}
 
@@ -585,6 +719,10 @@ export class CanvasContext {
 		if (len === 0) return;
 		const nx = (-(y1 - y0) / len) * half;
 		const ny = ((x1 - x0) / len) * half;
+		if (this.$strokeGradient !== null) {
+			this.$emitGradient(this.$strokeGradient, [x0 + nx, y0 + ny, x1 + nx, y1 + ny, x1 - nx, y1 - ny, x0 - nx, y0 - ny], [0, 1, 2, 0, 2, 3]);
+			return;
+		}
 		this.$emit({
 			k: 'poly',
 			points: Float64Array.of(x0 + nx, y0 + ny, x1 + nx, y1 + ny, x1 - nx, y1 - ny, x0 - nx, y0 - ny),
@@ -751,7 +889,9 @@ export class CanvasContext {
 				baseline = y - descent;
 				break;
 		}
-		this.$emit({ k: 'text', info, text, x, y: baseline, color: withAlpha(this.$fillColor, this.$alpha) });
+		// Text is filled with the color of the gradient where it starts.
+		const textColor = this.$fillGradient !== null ? this.$fillGradient.$colorAt(x, baseline) : this.$fillColor;
+		this.$emit({ k: 'text', info, text, x, y: baseline, color: withAlpha(textColor, this.$alpha) });
 	}
 
 	// ----- images -----
@@ -777,6 +917,10 @@ export class CanvasContext {
 			h = -h;
 		}
 		if (w === 0 || h === 0) return;
+		if (this.$fillGradient !== null) {
+			this.$emitGradient(this.$fillGradient, [x, y, x + w, y, x + w, y + h, x, y + h], [0, 1, 2, 0, 2, 3]);
+			return;
+		}
 		this.$emit({ k: 'rect', x, y, w, h, color: withAlpha(this.$fillColor, this.$alpha) });
 	}
 }
@@ -787,7 +931,7 @@ export class CanvasContext {
 export function commandsExceed(commands, w, h) {
 	const eps = 0.5;
 	for (const c of commands) {
-		if (c.k !== 'poly' && c.k !== 'rect') continue;
+		if (c.k !== 'poly' && c.k !== 'gpoly' && c.k !== 'rect') continue;
 		const m = c.m;
 		const outside = (x, y) => {
 			const tx = m[0] * x + m[2] * y + m[4];
@@ -859,6 +1003,10 @@ export function replayCommands(r, commands, opacity, aa) {
 			case 'poly':
 				if (hidden > 0) break;
 				r.fillTriangles(c.points, c.indices, r.pack(c.color, opacity), c.aa ?? aa);
+				break;
+			case 'gpoly':
+				if (hidden > 0) break;
+				r.fillFan(c.points, c.colors.map((color) => r.pack(color, opacity)));
 				break;
 			case 'text': {
 				if (hidden > 0) break;
