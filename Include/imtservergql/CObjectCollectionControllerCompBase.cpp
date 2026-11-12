@@ -456,6 +456,10 @@ sdl::V1_0::imtbase::CDuplicateElementsPayload CObjectCollectionControllerCompBas
 		if (m_objectCollectionCompPtr->GetObjectData(elementId, dataPtr)){
 			istd::IChangeableUniquePtr clonedObjectPtr = dataPtr->CloneMe();
 			if (clonedObjectPtr.IsValid()){
+				if (!OnBeforeStoreObject(QByteArray(), true, *clonedObjectPtr, gqlRequest, errorMessage)){
+					return response;
+				}
+
 				QString duplicateName;
 				QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(elementId);
 
@@ -1038,6 +1042,12 @@ sdl::V1_0::imtbase::CImportObjectPayload CObjectCollectionControllerCompBase::On
 		return sdl::V1_0::imtbase::CImportObjectPayload();
 	}
 
+	if (!OnBeforeStoreObject(objectUuid, true, *collectionObjectInstancePtr.GetPtr(), gqlRequest, errorMessage)){
+		QFile::remove(filePathTmp);
+
+		return sdl::V1_0::imtbase::CImportObjectPayload();
+	}
+
 	QByteArray insertRetVal = m_objectCollectionCompPtr->InsertNewObject(typeId, name, description, collectionObjectInstancePtr.GetPtr(), objectUuid);
 	if (insertRetVal.isEmpty()){
 		errorMessage = QStringLiteral("Unable to import object with ID: '%1' to the collection. Error: The object could not be inserted into the collection").arg(objectUuid);
@@ -1266,6 +1276,10 @@ sdl::V1_0::imtbase::CInsertNewObjectPayload CObjectCollectionControllerCompBase:
 			errorMessage = QStringLiteral("Unable to insert new object to collection '%1'. Error: Object serialization failed").arg(*m_collectionIdAttrPtr);
 			return sdl::V1_0::imtbase::CInsertNewObjectPayload();
 		}
+
+		if (!OnBeforeStoreObject(objectId, true, *objectPtr.GetPtr(), gqlRequest, errorMessage)){
+			return sdl::V1_0::imtbase::CInsertNewObjectPayload();
+		}
 	}
 
 	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr = nullptr;
@@ -1328,6 +1342,10 @@ sdl::V1_0::imtbase::CSetObjectDataPayload CObjectCollectionControllerCompBase::O
 
 	if (!DeSerializeObject(*objectPtr.GetPtr(), objectData)){
 		errorMessage = QStringLiteral("Unable to set object data to collection '%1'. Error: Object serialization failed").arg(*m_collectionIdAttrPtr);
+		return sdl::V1_0::imtbase::CSetObjectDataPayload();
+	}
+
+	if (!OnBeforeStoreObject(objectId, false, *objectPtr.GetPtr(), gqlRequest, errorMessage)){
 		return sdl::V1_0::imtbase::CSetObjectDataPayload();
 	}
 
@@ -2766,6 +2784,12 @@ QJsonObject CObjectCollectionControllerCompBase::ImportObject(const imtgql::CGql
 		return QJsonObject();
 	}
 
+	if (!OnBeforeStoreObject(objectUuid, true, *collectionObjectInstancePtr.GetPtr(), gqlRequest, errorMessage)){
+		QFile::remove(filePathTmp);
+
+		return QJsonObject();
+	}
+
 	QByteArray retVal = m_objectCollectionCompPtr->InsertNewObject(typeId, name, description, collectionObjectInstancePtr.GetPtr(), objectUuid);
 	if (retVal.isEmpty()){
 		errorMessage = QStringLiteral("Unable to import object with ID: '%1' to the collection. Error: The object could not be inserted into the collection").arg(objectUuid);
@@ -3504,6 +3528,17 @@ void CObjectCollectionControllerCompBase::OnAfterRemoveElements(
 			const QByteArrayList& /*elementIds*/,
 			const imtgql::CGqlRequest& /*gqlRequest*/) const
 {
+}
+
+
+bool CObjectCollectionControllerCompBase::OnBeforeStoreObject(
+			const QByteArray& /*objectId*/,
+			bool /*isNewObject*/,
+			istd::IChangeable& /*object*/,
+			const imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& /*errorMessage*/) const
+{
+	return true;
 }
 
 

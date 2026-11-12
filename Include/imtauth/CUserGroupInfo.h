@@ -2,6 +2,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QRecursiveMutex>
+
 // ImtCore includes
 #include <imtbase/TIdentifiableWrap.h>
 #include <imtauth/IUserGroupInfo.h>
@@ -18,6 +21,17 @@ class CUserGroupInfo: virtual public IUserGroupInfo, public CUserBaseInfo
 
 public:
 	CUserGroupInfo();
+
+	/**
+		Get the users assigned to this group directly, without the users of the parent groups.
+	*/
+	UserIds GetOwnUsers() const;
+
+	/**
+		Lock serializing the read-modify-write updates of stored user groups,
+		e.g. between the LDAP group synchronization and the GraphQL group mutations.
+	*/
+	static QRecursiveMutex& GetUpdateMutex();
 
 	// reimplemented (IUserGroupInfo)
 	virtual UserIds GetUsers() const override;

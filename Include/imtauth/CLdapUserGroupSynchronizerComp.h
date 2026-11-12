@@ -6,10 +6,11 @@
 #include <QtCore/QThread>
 
 // ACF includes
-#include <icomp/CComponentBase.h>
+#include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
+#include <imtbase/ITransactionManager.h>
 
 
 namespace imtauth
@@ -21,11 +22,13 @@ namespace imtauth
 	Every LDAP group is mirrored as an internal group belonging to the LDAP system,
 	nested LDAP groups become parent groups. Internal groups and assignments made to
 	the mirrored groups (e.g. roles) are kept.
+	The name filter only selects the directory groups that are mirrored for the first time:
+	a mirrored group is kept and follows the directory until it is removed from the directory.
 */
-class CLdapUserGroupSynchronizerComp: public icomp::CComponentBase
+class CLdapUserGroupSynchronizerComp: public ilog::CLoggerComponentBase
 {
 public:
-	typedef icomp::CComponentBase BaseClass;
+	typedef ilog::CLoggerComponentBase BaseClass;
 
 	struct LdapGroup
 	{
@@ -33,6 +36,10 @@ public:
 		QString name;
 		QString description;
 		QByteArrayList parentSids;
+		/**
+			\c false for a directory group outside of the name filter: it is not mirrored, but an existing mirror is kept.
+		*/
+		bool isMatching = true;
 	};
 
 	typedef QList<LdapGroup> LdapGroups;
@@ -43,6 +50,7 @@ public:
 		I_ASSIGN(m_ldapSystemIdAttrPtr, "LdapSystemId", "LDAP System-ID", false, "Ldap");
 		I_ASSIGN(m_ldapSystemNameAttrPtr, "LdapSystemName", "LDAP System Name", false, "LDAP");
 		I_ASSIGN(m_groupNameFilterAttrPtr, "GroupNameFilter", "Name filter of the synchronized LDAP groups, '*' is a wildcard", false, "*");
+		I_ASSIGN(m_transactionManagerCompPtr, "TransactionManager", "Transaction manager of the user group collection, all changes of a synchronization are committed or rolled back together", false, "TransactionManager");
 	I_END_COMPONENT;
 
 	CLdapUserGroupSynchronizerComp();
@@ -53,12 +61,19 @@ public:
 	static QByteArray GetGroupObjectId(const QByteArray& sid);
 
 	/**
-		Read the LDAP groups matching the name filter. Returns \c false if the directory could not be read.
+		Check if the group name matches the name filter, '*' is a wildcard and the comparison is case-insensitive.
+	*/
+	static bool IsMatchingName(const QString& nameFilter, const QString& name);
+
+	/**
+		Read all LDAP groups, the groups outside of the name filter are marked as not matching.
+		Returns \c false if the directory or any of the groups could not be read completely.
 	*/
 	static bool ReadLdapGroups(const QString& nameFilter, LdapGroups& groups);
 
 	/**
-		Apply the given LDAP groups to the internal group collection.
+		Apply the given complete snapshot of the LDAP groups to the internal group collection.
+		Nothing is changed if the snapshot or the stored groups are inconsistent or could not be read.
 	*/
 	bool SynchronizeGroups(const LdapGroups& ldapGroups);
 
@@ -90,6 +105,7 @@ protected:
 	I_ATTR(QByteArray, m_ldapSystemIdAttrPtr);
 	I_TEXTATTR(m_ldapSystemNameAttrPtr);
 	I_TEXTATTR(m_groupNameFilterAttrPtr);
+	I_REF(imtbase::ITransactionManager, m_transactionManagerCompPtr);
 };
 
 

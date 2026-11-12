@@ -377,6 +377,19 @@ protected:
 	virtual bool OnBeforeRemoveElements(const QByteArrayList& elementIds, const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual void OnAfterRemoveElements(const QByteArrayList& elementIds, const imtgql::CGqlRequest& gqlRequest) const;
 
+	/**
+		Called with an object built from client data (an archive, an imported file or a duplicate) before it is stored.
+		\param objectId		ID of the stored object or the proposed ID of the new object.
+		\param isNewObject		True if the object is inserted as a new element.
+		By returning False, you can prevent the operation.
+	*/
+	virtual bool OnBeforeStoreObject(
+				const QByteArray& objectId,
+				bool isNewObject,
+				istd::IChangeable& object,
+				const imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const;
+
 	virtual bool OnBeforeSetObjectName(const QByteArray& objectId, QString& newName, const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual void OnAfterSetObjectName(const QByteArray& objectId, const QString& oldName, const QString& newName, const imtgql::CGqlRequest& gqlRequest) const;
 

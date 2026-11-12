@@ -3,6 +3,9 @@
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Groups.h>
 
 
+// Qt includes
+#include <QtCore/QMutexLocker>
+
 // ACF includes
 #include <iqt/iqt.h>
 #include <istd/TInterfacePtr.h>
@@ -498,6 +501,74 @@ istd::IChangeableUniquePtr CUserGroupCollectionControllerComp::CreateObjectFromR
 	}
 
 	return objectPtr;
+}
+
+
+// reimplemented (imtservergql::CGqlRequestHandlerCompBase)
+
+QJsonObject CUserGroupCollectionControllerComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+{
+	if (gqlRequest.GetRequestType() != imtgql::IGqlRequest::RT_MUTATION){
+		return BaseClass::CreateInternalResponse(gqlRequest, errorMessage);
+	}
+
+	// A group change must not interleave with the read-modify-write of the LDAP group synchronization.
+	QMutexLocker locker(&imtauth::CUserGroupInfo::GetUpdateMutex());
+
+	return BaseClass::CreateInternalResponse(gqlRequest, errorMessage);
+}
+
+
+// reimplemented (imtservergql::CObjectCollectionControllerCompBase)
+
+bool CUserGroupCollectionControllerComp::OnBeforeStoreObject(
+			const QByteArray& objectId,
+			bool isNewObject,
+			istd::IChangeable& object,
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	if (!BaseClass::OnBeforeStoreObject(objectId, isNewObject, object, gqlRequest, errorMessage)){
+		return false;
+	}
+
+	imtauth::IUserGroupInfo* userGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(&object);
+	if (userGroupInfoPtr == nullptr){
+		errorMessage = QStringLiteral("Invalid object type for a user group");
+
+		return false;
+	}
+
+	// The system of a group is not taken from the client: new groups are internal, a stored group keeps its system.
+	imtauth::IUserGroupInfo::SystemInfoList systemInfos;
+	if (isNewObject){
+		systemInfos << imtauth::IUserGroupInfo::SystemInfo();
+	}
+	else{
+		imtbase::IObjectCollection::DataPtr storedDataPtr;
+		const imtauth::IUserGroupInfo* storedGroupInfoPtr = nullptr;
+		if (m_objectCollectionCompPtr.IsValid() && m_objectCollectionCompPtr->GetObjectData(objectId, storedDataPtr)){
+			storedGroupInfoPtr = dynamic_cast<const imtauth::IUserGroupInfo*>(storedDataPtr.GetPtr());
+		}
+
+		if (storedGroupInfoPtr == nullptr){
+			errorMessage = QStringLiteral("Unable to read the stored group '%1'").arg(QString::fromUtf8(objectId));
+
+			return false;
+		}
+
+		systemInfos = storedGroupInfoPtr->GetSystemInfos();
+	}
+
+	for (const imtauth::IUserGroupInfo::SystemInfo& systemInfo : userGroupInfoPtr->GetSystemInfos()){
+		userGroupInfoPtr->RemoveFromSystem(systemInfo.systemId);
+	}
+
+	for (const imtauth::IUserGroupInfo::SystemInfo& systemInfo : systemInfos){
+		userGroupInfoPtr->AddToSystem(systemInfo);
+	}
+
+	return true;
 }
 
 

@@ -15,11 +15,14 @@
 
 // Qt includes
 #include <QtCore/QMap>
+#include <QtCore/QMutexLocker>
+#include <QtCore/QRegularExpression>
 #include <QtCore/QSet>
 #include <QtCore/QUuid>
 
 // ACF includes
 #include <istd/CChangeGroup.h>
+#include <ilog/CMessageContainer.h>
 
 // ImtCore includes
 #include <imtauth/CUserGroupInfo.h>
@@ -46,7 +49,73 @@ static QByteArray ConvertSidToString(void* sidDataPtr, DWORD sidSize)
 
 	return result;
 }
+
+
+static HRESULT ReadStringColumn(
+			IDirectorySearch& search,
+			ADS_SEARCH_HANDLE searchHandle,
+			LPWSTR attributeName,
+			ADSTYPE valueType,
+			QStringList& values)
+{
+	values.clear();
+
+	ADS_SEARCH_COLUMN column;
+	HRESULT retVal = search.GetColumn(searchHandle, attributeName, &column);
+	if (FAILED(retVal)){
+		return retVal;
+	}
+
+	retVal = E_UNEXPECTED;
+	if (column.dwADsType == valueType){
+		for (DWORD index = 0; index < column.dwNumValues; ++index){
+			const ADSVALUE& value = column.pADsValues[index];
+			values << QString::fromWCharArray((valueType == ADSTYPE_DN_STRING) ? value.DNString : value.CaseIgnoreString);
+		}
+
+		retVal = S_OK;
+	}
+
+	search.FreeColumn(&column);
+
+	return retVal;
+}
 #endif
+
+
+typedef QMap<QByteArray, QByteArrayList> ParentGroupsMap;
+
+
+static bool HasAncestorGroup(const ParentGroupsMap& parentGroupsMap, const QByteArray& groupId, const QByteArray& ancestorGroupId)
+{
+	QSet<QByteArray> visitedGroupIds;
+	QByteArrayList pendingGroupIds = parentGroupsMap.value(groupId);
+	while (!pendingGroupIds.isEmpty()){
+		const QByteArray currentGroupId = pendingGroupIds.takeLast();
+		if (currentGroupId == ancestorGroupId){
+			return true;
+		}
+
+		if (!visitedGroupIds.contains(currentGroupId)){
+			visitedGroupIds.insert(currentGroupId);
+			pendingGroupIds << parentGroupsMap.value(currentGroupId);
+		}
+	}
+
+	return false;
+}
+
+
+static bool IsSystemGroup(const IUserGroupInfo& groupInfo, const QByteArray& systemId)
+{
+	for (const IUserGroupInfo::SystemInfo& systemInfo : groupInfo.GetSystemInfos()){
+		if (systemInfo.systemId == systemId){
+			return true;
+		}
+	}
+
+	return false;
+}
 
 
 // public methods
@@ -65,18 +134,26 @@ QByteArray CLdapUserGroupSynchronizerComp::GetGroupObjectId(const QByteArray& si
 }
 
 
+bool CLdapUserGroupSynchronizerComp::IsMatchingName(const QString& nameFilter, const QString& name)
+{
+	QStringList filterParts = (nameFilter.isEmpty() ? QStringLiteral("*") : nameFilter).split(QLatin1Char('*'));
+	for (QString& filterPart : filterParts){
+		filterPart = QRegularExpression::escape(filterPart);
+	}
+
+	const QRegularExpression expression(
+				QRegularExpression::anchoredPattern(filterParts.join(QStringLiteral(".*"))),
+				QRegularExpression::CaseInsensitiveOption);
+
+	return expression.match(name).hasMatch();
+}
+
+
 bool CLdapUserGroupSynchronizerComp::ReadLdapGroups(const QString& nameFilter, LdapGroups& groups)
 {
 	groups.clear();
 
 #ifdef Q_OS_WIN
-	// Only '*' is used as wildcard, all other special LDAP filter characters are escaped.
-	QString escapedNameFilter = nameFilter.isEmpty() ? QStringLiteral("*") : nameFilter;
-	escapedNameFilter.replace(QLatin1String("\\"), QLatin1String("\\5c"));
-	escapedNameFilter.replace(QLatin1String("("), QLatin1String("\\28"));
-	escapedNameFilter.replace(QLatin1String(")"), QLatin1String("\\29"));
-	escapedNameFilter.replace(QLatin1Char('\0'), QLatin1String("\\00"));
-
 	HRESULT hrCom = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
 	bool shouldUninit = SUCCEEDED(hrCom);
 	if (!shouldUninit && hrCom != RPC_E_CHANGED_MODE){
@@ -125,10 +202,12 @@ bool CLdapUserGroupSynchronizerComp::ReadLdapGroups(const QString& nameFilter, L
 		searchPreferences[1].dwSearchPref = ADS_SEARCHPREF_PAGESIZE;
 		searchPreferences[1].vValue.dwType = ADSTYPE_INTEGER;
 		searchPreferences[1].vValue.Integer = 500;
-		searchPtr->SetSearchPreference(searchPreferences, 2);
 
-		QString filter = QStringLiteral("(&(objectCategory=group)(name=%1))").arg(escapedNameFilter);
-		std::wstring filterW = filter.toStdWString();
+		// Without paging the result is silently truncated, all preferences must be accepted.
+		hr = searchPtr->SetSearchPreference(searchPreferences, 2);
+
+		// All groups are read: parents outside of the name filter and mirrors that left the filter must be known.
+		WCHAR filter[] = L"(objectCategory=group)";
 
 		WCHAR nameAttrName[] = L"name";
 		WCHAR descriptionAttrName[] = L"description";
@@ -138,8 +217,13 @@ bool CLdapUserGroupSynchronizerComp::ReadLdapGroups(const QString& nameFilter, L
 		LPWSTR searchAttrs[] = {nameAttrName, descriptionAttrName, sidAttrName, dnAttrName, memberOfAttrName};
 
 		ADS_SEARCH_HANDLE searchHandle = nullptr;
-		hr = searchPtr->ExecuteSearch(filterW.data(), searchAttrs, 5, &searchHandle);
+		if (hr == S_OK){
+			hr = searchPtr->ExecuteSearch(filter, searchAttrs, 5, &searchHandle);
+		}
+
 		if (SUCCEEDED(hr)){
+			bool areRowsComplete = true;
+
 			HRESULT rowResult = S_OK;
 			while ((rowResult = searchPtr->GetNextRow(searchHandle)) == S_OK){
 				LdapGroup group;
@@ -154,49 +238,39 @@ bool CLdapUserGroupSynchronizerComp::ReadLdapGroups(const QString& nameFilter, L
 					searchPtr->FreeColumn(&column);
 				}
 
-				if (SUCCEEDED(searchPtr->GetColumn(searchHandle, nameAttrName, &column))){
-					if (column.dwADsType == ADSTYPE_CASE_IGNORE_STRING && column.dwNumValues > 0){
-						group.name = QString::fromWCharArray(column.pADsValues->CaseIgnoreString);
-					}
-					searchPtr->FreeColumn(&column);
+				QStringList values;
+				if (ReadStringColumn(*searchPtr, searchHandle, nameAttrName, ADSTYPE_CASE_IGNORE_STRING, values) == S_OK && !values.isEmpty()){
+					group.name = values.first();
 				}
 
-				if (SUCCEEDED(searchPtr->GetColumn(searchHandle, descriptionAttrName, &column))){
-					if (column.dwADsType == ADSTYPE_CASE_IGNORE_STRING && column.dwNumValues > 0){
-						group.description = QString::fromWCharArray(column.pADsValues->CaseIgnoreString);
-					}
-					searchPtr->FreeColumn(&column);
+				if (ReadStringColumn(*searchPtr, searchHandle, dnAttrName, ADSTYPE_DN_STRING, values) == S_OK && !values.isEmpty()){
+					dn = values.first();
 				}
 
-				if (SUCCEEDED(searchPtr->GetColumn(searchHandle, dnAttrName, &column))){
-					if (column.dwADsType == ADSTYPE_DN_STRING && column.dwNumValues > 0){
-						dn = QString::fromWCharArray(column.pADsValues->DNString);
-					}
-					searchPtr->FreeColumn(&column);
+				// A group without description or parent groups has no such column, any other error is an incomplete read.
+				HRESULT descriptionResult = ReadStringColumn(*searchPtr, searchHandle, descriptionAttrName, ADSTYPE_CASE_IGNORE_STRING, values);
+				if (descriptionResult == S_OK && !values.isEmpty()){
+					group.description = values.first();
 				}
 
-				if (SUCCEEDED(searchPtr->GetColumn(searchHandle, memberOfAttrName, &column))){
-					if (column.dwADsType == ADSTYPE_DN_STRING){
-						for (DWORD index = 0; index < column.dwNumValues; ++index){
-							parentDns << QString::fromWCharArray(column.pADsValues[index].DNString);
-						}
-					}
-					searchPtr->FreeColumn(&column);
+				HRESULT memberOfResult = ReadStringColumn(*searchPtr, searchHandle, memberOfAttrName, ADSTYPE_DN_STRING, parentDns);
+
+				const bool isDescriptionRead = (descriptionResult == S_OK) || (descriptionResult == E_ADS_COLUMN_NOT_SET);
+				const bool isMemberOfRead = (memberOfResult == S_OK) || (memberOfResult == E_ADS_COLUMN_NOT_SET);
+				if (group.sid.isEmpty() || group.name.isEmpty() || dn.isEmpty() || !isDescriptionRead || !isMemberOfRead){
+					areRowsComplete = false;
+
+					break;
 				}
 
-				if (group.sid.isEmpty() || group.name.isEmpty()){
-					continue;
-				}
+				group.isMatching = IsMatchingName(nameFilter, group.name);
 
-				if (!dn.isEmpty()){
-					sidsByDn.insert(dn.toLower(), group.sid);
-				}
-
+				sidsByDn.insert(dn.toLower(), group.sid);
 				parentDnsBySid.insert(group.sid, parentDns);
 				foundGroups << group;
 			}
 
-			retVal = (rowResult == S_ADS_NOMORE_ROWS);
+			retVal = areRowsComplete && (rowResult == S_ADS_NOMORE_ROWS);
 
 			searchPtr->CloseSearchHandle(searchHandle);
 		}
@@ -212,7 +286,7 @@ bool CLdapUserGroupSynchronizerComp::ReadLdapGroups(const QString& nameFilter, L
 		return false;
 	}
 
-	// Only groups covered by the filter can be parents.
+	// Parent groups outside of the directory search (e.g. of other domains) are ignored.
 	for (LdapGroup& group : foundGroups){
 		for (const QString& parentDn : parentDnsBySid.value(group.sid)){
 			const QByteArray parentSid = sidsByDn.value(parentDn.toLower());
@@ -235,107 +309,242 @@ bool CLdapUserGroupSynchronizerComp::ReadLdapGroups(const QString& nameFilter, L
 
 bool CLdapUserGroupSynchronizerComp::SynchronizeGroups(const LdapGroups& ldapGroups)
 {
+	static const QString s_messageSource = QStringLiteral("LDAP group synchronization");
+
 	if (!m_userGroupCollectionCompPtr.IsValid()){
+		SendErrorMessage(0, QStringLiteral("Invalid component configuration: user group collection missing"), s_messageSource);
+
 		return false;
 	}
 
-	imtbase::IObjectCollection& groupCollection = *m_userGroupCollectionCompPtr;
-
+	// An empty system ID is the internal system: the mirrored groups would become internal groups.
 	const QByteArray ldapSystemId = m_ldapSystemIdAttrPtr.IsValid() ? *m_ldapSystemIdAttrPtr : QByteArrayLiteral("Ldap");
+	if (ldapSystemId.isEmpty()){
+		SendErrorMessage(0, QStringLiteral("Invalid component configuration: LDAP system ID is empty"), s_messageSource);
+
+		return false;
+	}
 
 	IUserGroupInfo::SystemInfo ldapSystemInfo;
 	ldapSystemInfo.systemId = ldapSystemId;
 	ldapSystemInfo.systemName = m_ldapSystemNameAttrPtr.IsValid() ? *m_ldapSystemNameAttrPtr : QStringLiteral("LDAP");
 
-	QMap<QByteArray, QByteArray> objectIdsBySid;
-	QSet<QByteArray> ldapGroupIds;
+	QMap<QByteArray, QString> ldapGroupNamesBySid;
 	for (const LdapGroup& ldapGroup : ldapGroups){
-		const QByteArray groupId = GetGroupObjectId(ldapGroup.sid);
+		if (ldapGroup.sid.isEmpty() || ldapGroup.name.isEmpty() || ldapGroupNamesBySid.contains(ldapGroup.sid)){
+			SendErrorMessage(0, QStringLiteral("Incomplete LDAP group snapshot, the groups are not synchronized"), s_messageSource);
 
-		objectIdsBySid.insert(ldapGroup.sid, groupId);
-		ldapGroupIds.insert(groupId);
-	}
-
-	// Groups are only changed after all stored groups were read, an unread LDAP group would be duplicated or not removed.
-	QSet<QByteArray> storedLdapGroupIds;
-	const imtbase::ICollectionInfo::Ids storedGroupIds = groupCollection.GetElementIds();
-	for (const QByteArray& groupId : storedGroupIds){
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (!groupCollection.GetObjectData(groupId, dataPtr)){
 			return false;
 		}
 
-		const IUserGroupInfo* groupInfoPtr = dynamic_cast<const IUserGroupInfo*>(dataPtr.GetPtr());
+		ldapGroupNamesBySid.insert(ldapGroup.sid, ldapGroup.name);
+	}
+
+	imtbase::IObjectCollection& groupCollection = *m_userGroupCollectionCompPtr;
+
+	// Group changes of other clients are not overwritten between the read and the write of the groups.
+	QMutexLocker locker(&CUserGroupInfo::GetUpdateMutex());
+
+	// Groups are only changed after all stored groups were read, an unread LDAP group would be duplicated or not removed.
+	ilog::CMessageContainer readMessages;
+	const imtbase::ICollectionInfo::Ids storedGroupIds = groupCollection.GetElementIds(0, -1, nullptr, &readMessages);
+	if (readMessages.GetWorstCategory() >= istd::IInformationProvider::IC_ERROR){
+		SendErrorMessage(0, QStringLiteral("Unable to read the user groups, the groups are not synchronized"), s_messageSource);
+
+		return false;
+	}
+
+	QMap<QByteArray, imtbase::IObjectCollection::DataPtr> storedDataPtrs;
+	QSet<QByteArray> storedLdapGroupIds;
+	for (const QByteArray& groupId : storedGroupIds){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		const IUserGroupInfo* groupInfoPtr = nullptr;
+		if (groupCollection.GetObjectData(groupId, dataPtr)){
+			groupInfoPtr = dynamic_cast<const IUserGroupInfo*>(dataPtr.GetPtr());
+		}
+
 		if (groupInfoPtr == nullptr){
+			SendErrorMessage(0, QStringLiteral("Unable to read the user group '%1', the groups are not synchronized").arg(QString::fromUtf8(groupId)), s_messageSource);
+
+			return false;
+		}
+
+		storedDataPtrs.insert(groupId, dataPtr);
+
+		if (IsSystemGroup(*groupInfoPtr, ldapSystemId)){
+			storedLdapGroupIds.insert(groupId);
+		}
+	}
+
+	// The groups mirrored by this synchronization: groups of the filter and the existing mirrors of directory groups.
+	QMap<QByteArray, QByteArray> objectIdsBySid;
+	QSet<QByteArray> mirroredGroupIds;
+	QList<const LdapGroup*> mirroredLdapGroups;
+	for (const LdapGroup& ldapGroup : ldapGroups){
+		const QByteArray groupId = GetGroupObjectId(ldapGroup.sid);
+
+		// A mirror stored without the system flag (e.g. a repository without version information) must not become a duplicate.
+		if (storedDataPtrs.contains(groupId) && !storedLdapGroupIds.contains(groupId)){
+			SendErrorMessage(
+						0,
+						QStringLiteral("The user group '%1' mirrors the LDAP group '%2' but is not stored as an LDAP group. Check that the version information is connected to the user group repository").arg(QString::fromUtf8(groupId), ldapGroup.name),
+						s_messageSource);
+
+			return false;
+		}
+
+		if (ldapGroup.isMatching || storedLdapGroupIds.contains(groupId)){
+			objectIdsBySid.insert(ldapGroup.sid, groupId);
+			mirroredGroupIds.insert(groupId);
+			mirroredLdapGroups << &ldapGroup;
+		}
+	}
+
+	imtbase::ICollectionInfo::Ids removedGroupIds;
+	for (const QByteArray& groupId : storedGroupIds){
+		if (storedLdapGroupIds.contains(groupId) && !mirroredGroupIds.contains(groupId)){
+			removedGroupIds << groupId;
+		}
+	}
+
+	// The hierarchy after the synchronization without the parent groups managed by LDAP.
+	ParentGroupsMap parentGroupsMap;
+	QSet<QString> otherGroupNames;
+	for (const QByteArray& groupId : storedGroupIds){
+		if (removedGroupIds.contains(groupId)){
 			continue;
 		}
 
-		for (const IUserGroupInfo::SystemInfo& systemInfo : groupInfoPtr->GetSystemInfos()){
-			if (systemInfo.systemId == ldapSystemId){
-				storedLdapGroupIds.insert(groupId);
+		const IUserGroupInfo* groupInfoPtr = dynamic_cast<const IUserGroupInfo*>(storedDataPtrs.value(groupId).GetPtr());
+		Q_ASSERT(groupInfoPtr != nullptr);
 
-				break;
+		const bool isMirrored = mirroredGroupIds.contains(groupId);
+		if (!isMirrored){
+			otherGroupNames.insert(groupInfoPtr->GetName());
+		}
+
+		QByteArrayList& parentGroupIds = parentGroupsMap[groupId];
+		for (const QByteArray& parentGroupId : groupInfoPtr->GetParentGroups()){
+			if (!removedGroupIds.contains(parentGroupId) && (!isMirrored || !storedLdapGroupIds.contains(parentGroupId))){
+				parentGroupIds << parentGroupId;
 			}
 		}
 	}
 
-	bool retVal = true;
+	// LDAP parent groups closing a cycle are omitted, existing links are preferred to keep the result stable.
+	QMap<QByteArray, QByteArrayList> ldapParentGroupIdsMap;
+	for (int pass = 0; pass < 2; ++pass){
+		for (const LdapGroup* ldapGroupPtr : mirroredLdapGroups){
+			const QByteArray groupId = objectIdsBySid.value(ldapGroupPtr->sid);
 
-	istd::CChangeGroup changeGroup(&groupCollection);
+			const IUserGroupInfo* storedGroupInfoPtr = dynamic_cast<const IUserGroupInfo*>(storedDataPtrs.value(groupId).GetPtr());
+			const QByteArrayList storedParentGroupIds = (storedGroupInfoPtr != nullptr) ? storedGroupInfoPtr->GetParentGroups() : QByteArrayList();
 
-	for (const LdapGroup& ldapGroup : ldapGroups){
-		const QByteArray groupId = objectIdsBySid.value(ldapGroup.sid);
+			QByteArrayList& ldapParentGroupIds = ldapParentGroupIdsMap[groupId];
+			for (const QByteArray& parentSid : ldapGroupPtr->parentSids){
+				const QByteArray parentGroupId = objectIdsBySid.value(parentSid);
+				if (parentGroupId.isEmpty() || parentGroupId == groupId || ldapParentGroupIds.contains(parentGroupId)){
+					continue;
+				}
 
-		QByteArrayList ldapParentGroupIds;
-		for (const QByteArray& parentSid : ldapGroup.parentSids){
-			const QByteArray parentGroupId = objectIdsBySid.value(parentSid);
-			if (!parentGroupId.isEmpty() && parentGroupId != groupId && !ldapParentGroupIds.contains(parentGroupId)){
+				if (storedParentGroupIds.contains(parentGroupId) != (pass == 0)){
+					continue;
+				}
+
+				if (HasAncestorGroup(parentGroupsMap, parentGroupId, groupId)){
+					SendWarningMessage(
+								0,
+								QStringLiteral("The nesting of the LDAP group '%1' into the group '%2' is ignored, it would create a cycle").arg(ldapGroupPtr->name, ldapGroupNamesBySid.value(parentSid)),
+								s_messageSource);
+
+					continue;
+				}
+
 				ldapParentGroupIds << parentGroupId;
+				parentGroupsMap[groupId] << parentGroupId;
 			}
 		}
+	}
 
-		if (!storedLdapGroupIds.contains(groupId)){
-			CIdentifiableUserGroupInfo groupInfo;
-			groupInfo.SetObjectUuid(groupId);
-			groupInfo.SetId(groupId);
-			groupInfo.SetName(ldapGroup.name);
-			groupInfo.SetDescription(ldapGroup.description);
-			groupInfo.AddToSystem(ldapSystemInfo);
+	// Group names are unique: a name used by another group or by several LDAP groups gets the SID.
+	QMap<QString, int> ldapNameCounts;
+	for (const LdapGroup* ldapGroupPtr : mirroredLdapGroups){
+		++ldapNameCounts[ldapGroupPtr->name];
+	}
+
+	QMap<QByteArray, QString> groupNames;
+	QSet<QString> usedGroupNames = otherGroupNames;
+	for (const LdapGroup* ldapGroupPtr : mirroredLdapGroups){
+		QString groupName = ldapGroupPtr->name;
+		if (otherGroupNames.contains(groupName) || ldapNameCounts.value(groupName) > 1){
+			groupName = QStringLiteral("%1 (%2)").arg(ldapGroupPtr->name, QString::fromUtf8(ldapGroupPtr->sid));
+		}
+
+		if (usedGroupNames.contains(groupName)){
+			SendErrorMessage(0, QStringLiteral("The name of the LDAP group '%1' is already used, the groups are not synchronized").arg(groupName), s_messageSource);
+
+			return false;
+		}
+
+		usedGroupNames.insert(groupName);
+		groupNames.insert(ldapGroupPtr->sid, groupName);
+	}
+
+	// All changes are prepared before the first write.
+	struct GroupChange
+	{
+		QByteArray groupId;
+		QString name;
+		QString description;
+		bool isNew = false;
+		imtbase::IObjectCollection::DataPtr groupPtr;
+	};
+
+	QList<GroupChange> groupChanges;
+	for (const LdapGroup* ldapGroupPtr : mirroredLdapGroups){
+		GroupChange groupChange;
+		groupChange.groupId = objectIdsBySid.value(ldapGroupPtr->sid);
+		groupChange.name = groupNames.value(ldapGroupPtr->sid);
+		groupChange.description = ldapGroupPtr->description;
+
+		const QByteArrayList ldapParentGroupIds = ldapParentGroupIdsMap.value(groupChange.groupId);
+
+		if (!storedDataPtrs.contains(groupChange.groupId)){
+			CIdentifiableUserGroupInfo* groupInfoPtr = new CIdentifiableUserGroupInfo;
+			groupChange.groupPtr = imtbase::IObjectCollection::DataPtr::CreateFromUnique(istd::IChangeableUniquePtr(groupInfoPtr));
+			groupChange.isNew = true;
+
+			groupInfoPtr->SetObjectUuid(groupChange.groupId);
+			groupInfoPtr->SetId(groupChange.groupId);
+			groupInfoPtr->SetName(groupChange.name);
+			groupInfoPtr->SetDescription(groupChange.description);
+			groupInfoPtr->AddToSystem(ldapSystemInfo);
 			for (const QByteArray& parentGroupId : ldapParentGroupIds){
-				groupInfo.AddParentGroup(parentGroupId);
+				groupInfoPtr->AddParentGroup(parentGroupId);
 			}
 
-			if (groupCollection.InsertNewObject("Group", ldapGroup.name, ldapGroup.description, &groupInfo, groupId).isEmpty()){
-				retVal = false;
-			}
+			groupChanges << groupChange;
 
 			continue;
 		}
 
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (!groupCollection.GetObjectData(groupId, dataPtr) || !dataPtr.IsValid()){
-			retVal = false;
-
-			continue;
-		}
-
-		istd::IChangeableUniquePtr groupCopyPtr = dataPtr->CloneMe();
-		IUserGroupInfo* groupInfoPtr = dynamic_cast<IUserGroupInfo*>(groupCopyPtr.GetPtr());
+		groupChange.groupPtr = imtbase::IObjectCollection::DataPtr::CreateFromUnique(storedDataPtrs.value(groupChange.groupId)->CloneMe());
+		IUserGroupInfo* groupInfoPtr = dynamic_cast<IUserGroupInfo*>(groupChange.groupPtr.GetPtr());
 		if (groupInfoPtr == nullptr){
-			retVal = false;
+			SendErrorMessage(0, QStringLiteral("Unable to copy the user group '%1', the groups are not synchronized").arg(QString::fromUtf8(groupChange.groupId)), s_messageSource);
 
-			continue;
+			return false;
 		}
 
 		bool isChanged = false;
 
-		if (groupInfoPtr->GetName() != ldapGroup.name){
-			groupInfoPtr->SetName(ldapGroup.name);
+		if (groupInfoPtr->GetName() != groupChange.name){
+			groupInfoPtr->SetName(groupChange.name);
 			isChanged = true;
 		}
 
-		if (groupInfoPtr->GetDescription() != ldapGroup.description){
-			groupInfoPtr->SetDescription(ldapGroup.description);
+		if (groupInfoPtr->GetDescription() != groupChange.description){
+			groupInfoPtr->SetDescription(groupChange.description);
 			isChanged = true;
 		}
 
@@ -353,20 +562,57 @@ bool CLdapUserGroupSynchronizerComp::SynchronizeGroups(const LdapGroups& ldapGro
 			}
 		}
 
-		if (isChanged && !groupCollection.SetObjectData(groupId, *groupCopyPtr)){
+		if (isChanged){
+			groupChanges << groupChange;
+		}
+	}
+
+	if (groupChanges.isEmpty() && removedGroupIds.isEmpty()){
+		return true;
+	}
+
+	const bool isTransactionUsed = m_transactionManagerCompPtr.IsValid();
+	if (isTransactionUsed && !m_transactionManagerCompPtr->StartTransaction()){
+		SendErrorMessage(0, QStringLiteral("Unable to start the transaction, the groups are not synchronized"), s_messageSource);
+
+		return false;
+	}
+
+	bool retVal = true;
+
+	{
+		istd::CChangeGroup changeGroup(&groupCollection);
+
+		// The groups are only removed after all other changes were written.
+		for (const GroupChange& groupChange : groupChanges){
+			if (groupChange.isNew){
+				retVal = !groupCollection.InsertNewObject("Group", groupChange.name, groupChange.description, groupChange.groupPtr.GetPtr(), groupChange.groupId).isEmpty();
+			}
+			else{
+				retVal = groupCollection.SetObjectData(groupChange.groupId, *groupChange.groupPtr);
+			}
+
+			if (!retVal){
+				SendErrorMessage(0, QStringLiteral("Unable to write the user group '%1'").arg(groupChange.name), s_messageSource);
+
+				break;
+			}
+		}
+
+		if (retVal && !removedGroupIds.isEmpty() && !groupCollection.RemoveElements(removedGroupIds)){
+			SendErrorMessage(0, QStringLiteral("Unable to remove the user groups of the LDAP groups removed from the directory"), s_messageSource);
+
 			retVal = false;
 		}
 	}
 
-	imtbase::ICollectionInfo::Ids removedGroupIds;
-	for (const QByteArray& groupId : std::as_const(storedLdapGroupIds)){
-		if (!ldapGroupIds.contains(groupId)){
-			removedGroupIds << groupId;
+	if (isTransactionUsed){
+		if (retVal){
+			retVal = m_transactionManagerCompPtr->EndTransaction();
 		}
-	}
-
-	if (!removedGroupIds.isEmpty() && !groupCollection.RemoveElements(removedGroupIds)){
-		retVal = false;
+		else{
+			m_transactionManagerCompPtr->CancelTransaction();
+		}
 	}
 
 	return retVal;

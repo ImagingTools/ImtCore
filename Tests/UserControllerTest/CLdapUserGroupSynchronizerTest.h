@@ -26,6 +26,14 @@ private slots:
 	void testSynchronize_UpdateKeepsInternalAssignments();
 	void testSynchronize_RemovesOnlyVanishedLdapGroups();
 	void testSynchronize_FailedReadChangesNothing();
+	void testSynchronize_FailedListReadChangesNothing();
+	void testSynchronize_FailedWriteKeepsVanishedGroups();
+	void testSynchronize_RejectsInvalidSnapshotAndConfiguration();
+	void testSynchronize_RejectsMirrorWithoutSystemFlag();
+	void testSynchronize_KeepsMirrorsOutsideOfFilter();
+	void testSynchronize_OmitsNestingCycles();
+	void testSynchronize_DisambiguatesGroupNames();
+	void testIsMatchingName();
 };
 
 

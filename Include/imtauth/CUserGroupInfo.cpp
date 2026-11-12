@@ -31,6 +31,20 @@ CUserGroupInfo::CUserGroupInfo():
 }
 
 
+IUserGroupInfo::UserIds CUserGroupInfo::GetOwnUsers() const
+{
+	return m_userIds;
+}
+
+
+QRecursiveMutex& CUserGroupInfo::GetUpdateMutex()
+{
+	static QRecursiveMutex s_updateMutex;
+
+	return s_updateMutex;
+}
+
+
 // reimplemented (IUserGroupInfo)
 
 IUserGroupInfo::UserIds CUserGroupInfo::GetUsers() const

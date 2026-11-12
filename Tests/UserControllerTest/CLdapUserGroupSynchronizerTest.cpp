@@ -7,6 +7,7 @@
 #include <QtCore/QUuid>
 
 // ACF includes
+#include <ilog/CMessage.h>
 #include <icomp/TSimComponentWrap.h>
 #include <icomp/TSimComponentsFactory.h>
 #include <iser/CMemoryReadArchive.h>
@@ -83,8 +84,23 @@ public:
 	I_END_COMPONENT;
 
 	QSet<QByteArray> m_loadFailingIds;
+	QSet<QByteArray> m_writeFailingIds;
+	bool m_isListReadFailing = false;
 
 	// reimplemented (imtbase::IObjectCollection)
+	virtual bool SetObjectData(
+				const Id& objectId,
+				const istd::IChangeable& object,
+				CompatibilityMode mode = CM_WITHOUT_REFS,
+				const imtbase::IOperationContext* operationContextPtr = nullptr) override
+	{
+		if (m_writeFailingIds.contains(objectId)){
+			return false;
+		}
+
+		return imtbase::CObjectCollectionBase::SetObjectData(objectId, object, mode, operationContextPtr);
+	}
+
 	virtual bool GetObjectData(
 				const Id& objectId,
 				DataPtr& dataPtr,
@@ -95,6 +111,20 @@ public:
 		}
 
 		return imtbase::CObjectCollectionBase::GetObjectData(objectId, dataPtr, dataConfigurationPtr);
+	}
+
+	// reimplemented (imtbase::ICollectionInfo)
+	virtual Ids GetElementIds(
+				int offset = 0,
+				int count = -1,
+				const iprm::IParamsSet* selectionParamsPtr = nullptr,
+				ilog::IMessageConsumer* logPtr = nullptr) const override
+	{
+		if (m_isListReadFailing && logPtr != nullptr){
+			logPtr->AddMessage(ilog::IMessageConsumer::MessagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0, "Read failed", "Test")));
+		}
+
+		return imtbase::CObjectCollectionBase::GetElementIds(offset, count, selectionParamsPtr, logPtr);
 	}
 
 protected:
@@ -119,13 +149,15 @@ imtauth::IUserGroupInfo::SystemInfo LdapSystemInfo()
 imtauth::CLdapUserGroupSynchronizerComp::LdapGroup MakeLdapGroup(
 			const QByteArray& sid,
 			const QString& name,
-			const QByteArrayList& parentSids = QByteArrayList())
+			const QByteArrayList& parentSids = QByteArrayList(),
+			bool isMatching = true)
 {
 	imtauth::CLdapUserGroupSynchronizerComp::LdapGroup retVal;
 	retVal.sid = sid;
 	retVal.name = name;
 	retVal.description = name + QStringLiteral(" description");
 	retVal.parentSids = parentSids;
+	retVal.isMatching = isMatching;
 
 	return retVal;
 }
@@ -134,11 +166,12 @@ imtauth::CLdapUserGroupSynchronizerComp::LdapGroup MakeLdapGroup(
 class CFixture
 {
 public:
-	CFixture()
+	explicit CFixture(const QByteArray& ldapSystemId = "Ldap")
 	{
 		groups->InitComponent();
 
 		synchronizer->SetRef("UserGroupCollection", groups);
+		synchronizer->SetIdAttr("LdapSystemId", ldapSystemId);
 		// No background synchronization against a real directory.
 		synchronizer->SetIntAttr("CheckInterval", 0);
 		synchronizer->InitComponent();
@@ -157,9 +190,9 @@ public:
 		return dynamic_cast<const imtauth::IUserGroupInfo*>(dataPtr.GetPtr());
 	}
 
-	QByteArray AddInternalGroup(const QString& name)
+	QByteArray AddInternalGroup(const QString& name, const QByteArray& proposedGroupId = QByteArray())
 	{
-		const QByteArray groupId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+		const QByteArray groupId = proposedGroupId.isEmpty() ? QUuid::createUuid().toByteArray(QUuid::WithoutBraces) : proposedGroupId;
 
 		imtauth::CIdentifiableUserGroupInfo group;
 		group.SetObjectUuid(groupId);
@@ -380,6 +413,212 @@ void CLdapUserGroupSynchronizerTest::testSynchronize_FailedReadChangesNothing()
 	const imtauth::IUserGroupInfo* childPtr = fixture.GetGroup(childId);
 	QVERIFY(childPtr != nullptr);
 	QCOMPARE(childPtr->GetParentGroups(), QByteArrayList({rootId}));
+}
+
+
+void CLdapUserGroupSynchronizerTest::testSynchronize_FailedListReadChangesNothing()
+{
+	CFixture fixture;
+
+	imtauth::CLdapUserGroupSynchronizerComp::LdapGroups ldapGroups;
+	ldapGroups << MakeLdapGroup("S-1-5-21-1", "Root");
+	QVERIFY(fixture.synchronizer->SynchronizeGroups(ldapGroups));
+
+	// A list read reporting an error must not be taken as a complete list.
+	fixture.groups->m_isListReadFailing = true;
+	ldapGroups << MakeLdapGroup("S-1-5-21-2", "Child", {"S-1-5-21-1"});
+	QVERIFY(!fixture.synchronizer->SynchronizeGroups(ldapGroups));
+	fixture.groups->m_isListReadFailing = false;
+
+	QCOMPARE(fixture.groups->GetElementIds().size(), 1);
+}
+
+
+void CLdapUserGroupSynchronizerTest::testSynchronize_FailedWriteKeepsVanishedGroups()
+{
+	CFixture fixture;
+
+	imtauth::CLdapUserGroupSynchronizerComp::LdapGroups ldapGroups;
+	ldapGroups << MakeLdapGroup("S-1-5-21-1", "Root");
+	ldapGroups << MakeLdapGroup("S-1-5-21-2", "Child", {"S-1-5-21-1"});
+	QVERIFY(fixture.synchronizer->SynchronizeGroups(ldapGroups));
+
+	const QByteArray rootId = imtauth::CLdapUserGroupSynchronizerComp::GetGroupObjectId("S-1-5-21-1");
+	const QByteArray childId = imtauth::CLdapUserGroupSynchronizerComp::GetGroupObjectId("S-1-5-21-2");
+
+	// The child cannot be detached from the removed parent: the parent must not be removed.
+	fixture.groups->m_writeFailingIds.insert(childId);
+	ldapGroups.clear();
+	ldapGroups << MakeLdapGroup("S-1-5-21-2", "Child");
+	QVERIFY(!fixture.synchronizer->SynchronizeGroups(ldapGroups));
+	fixture.groups->m_writeFailingIds.clear();
+
+	QVERIFY(fixture.GetGroup(rootId) != nullptr);
+
+	const imtauth::IUserGroupInfo* childPtr = fixture.GetGroup(childId);
+	QVERIFY(childPtr != nullptr);
+	QCOMPARE(childPtr->GetParentGroups(), QByteArrayList({rootId}));
+
+	// The next run completes the synchronization.
+	QVERIFY(fixture.synchronizer->SynchronizeGroups(ldapGroups));
+	QVERIFY(fixture.GetGroup(rootId) == nullptr);
+}
+
+
+void CLdapUserGroupSynchronizerTest::testSynchronize_RejectsInvalidSnapshotAndConfiguration()
+{
+	imtauth::CLdapUserGroupSynchronizerComp::LdapGroups ldapGroups;
+	ldapGroups << MakeLdapGroup("S-1-5-21-1", "Root");
+
+	// An empty system ID would create internal groups.
+	CFixture internalSystemFixture("");
+	QVERIFY(!internalSystemFixture.synchronizer->SynchronizeGroups(ldapGroups));
+	QVERIFY(internalSystemFixture.groups->GetElementIds().isEmpty());
+
+	CFixture fixture;
+
+	imtauth::CLdapUserGroupSynchronizerComp::LdapGroups duplicatedGroups = ldapGroups;
+	duplicatedGroups << MakeLdapGroup("S-1-5-21-1", "Duplicate");
+	QVERIFY(!fixture.synchronizer->SynchronizeGroups(duplicatedGroups));
+
+	imtauth::CLdapUserGroupSynchronizerComp::LdapGroups incompleteGroups = ldapGroups;
+	incompleteGroups << MakeLdapGroup("S-1-5-21-2", QString());
+	QVERIFY(!fixture.synchronizer->SynchronizeGroups(incompleteGroups));
+
+	incompleteGroups = ldapGroups;
+	incompleteGroups << MakeLdapGroup(QByteArray(), "Unknown");
+	QVERIFY(!fixture.synchronizer->SynchronizeGroups(incompleteGroups));
+
+	QVERIFY(fixture.groups->GetElementIds().isEmpty());
+}
+
+
+void CLdapUserGroupSynchronizerTest::testSynchronize_RejectsMirrorWithoutSystemFlag()
+{
+	CFixture fixture;
+
+	// The mirror was stored without its system flag (e.g. by a repository without version information).
+	const QByteArray rootId = imtauth::CLdapUserGroupSynchronizerComp::GetGroupObjectId("S-1-5-21-1");
+	fixture.AddInternalGroup("Root", rootId);
+
+	imtauth::CLdapUserGroupSynchronizerComp::LdapGroups ldapGroups;
+	ldapGroups << MakeLdapGroup("S-1-5-21-1", "Root");
+	ldapGroups << MakeLdapGroup("S-1-5-21-2", "Child", {"S-1-5-21-1"});
+	QVERIFY(!fixture.synchronizer->SynchronizeGroups(ldapGroups));
+
+	QCOMPARE(fixture.groups->GetElementIds(), imtbase::ICollectionInfo::Ids({rootId}));
+
+	const imtauth::IUserGroupInfo* rootPtr = fixture.GetGroup(rootId);
+	QVERIFY(rootPtr != nullptr);
+	QCOMPARE(rootPtr->GetSystemInfos().size(), 1);
+	QVERIFY(rootPtr->GetSystemInfos().first().systemId.isEmpty());
+}
+
+
+void CLdapUserGroupSynchronizerTest::testSynchronize_KeepsMirrorsOutsideOfFilter()
+{
+	CFixture fixture;
+
+	imtauth::CLdapUserGroupSynchronizerComp::LdapGroups ldapGroups;
+	ldapGroups << MakeLdapGroup("S-1-5-21-1", "App Root");
+	ldapGroups << MakeLdapGroup("S-1-5-21-2", "App Child", {"S-1-5-21-1"});
+	QVERIFY(fixture.synchronizer->SynchronizeGroups(ldapGroups));
+
+	const QByteArray rootId = imtauth::CLdapUserGroupSynchronizerComp::GetGroupObjectId("S-1-5-21-1");
+	const QByteArray childId = imtauth::CLdapUserGroupSynchronizerComp::GetGroupObjectId("S-1-5-21-2");
+	const QByteArray otherId = imtauth::CLdapUserGroupSynchronizerComp::GetGroupObjectId("S-1-5-21-3");
+
+	// The parent group was renamed out of the filter, a new group outside of the filter appears.
+	ldapGroups.clear();
+	ldapGroups << MakeLdapGroup("S-1-5-21-1", "Root", {}, false);
+	ldapGroups << MakeLdapGroup("S-1-5-21-2", "App Child", {"S-1-5-21-1", "S-1-5-21-3"});
+	ldapGroups << MakeLdapGroup("S-1-5-21-3", "Other", {}, false);
+	QVERIFY(fixture.synchronizer->SynchronizeGroups(ldapGroups));
+
+	QCOMPARE(fixture.groups->GetElementIds().size(), 2);
+	QVERIFY(fixture.GetGroup(otherId) == nullptr);
+
+	const imtauth::IUserGroupInfo* rootPtr = fixture.GetGroup(rootId);
+	QVERIFY(rootPtr != nullptr);
+	QCOMPARE(rootPtr->GetName(), QString("Root"));
+
+	const imtauth::IUserGroupInfo* childPtr = fixture.GetGroup(childId);
+	QVERIFY(childPtr != nullptr);
+	QCOMPARE(childPtr->GetParentGroups(), QByteArrayList({rootId}));
+
+	// Only the removal from the directory removes the mirror.
+	ldapGroups.removeFirst();
+	QVERIFY(fixture.synchronizer->SynchronizeGroups(ldapGroups));
+	QVERIFY(fixture.GetGroup(rootId) == nullptr);
+	QCOMPARE(fixture.groups->GetElementIds(), imtbase::ICollectionInfo::Ids({childId}));
+}
+
+
+void CLdapUserGroupSynchronizerTest::testSynchronize_OmitsNestingCycles()
+{
+	CFixture fixture;
+
+	imtauth::CLdapUserGroupSynchronizerComp::LdapGroups ldapGroups;
+	ldapGroups << MakeLdapGroup("S-1-5-21-1", "First", {"S-1-5-21-3"});
+	ldapGroups << MakeLdapGroup("S-1-5-21-2", "Second", {"S-1-5-21-1"});
+	ldapGroups << MakeLdapGroup("S-1-5-21-3", "Third", {"S-1-5-21-2"});
+	QVERIFY(fixture.synchronizer->SynchronizeGroups(ldapGroups));
+
+	const QByteArray firstId = imtauth::CLdapUserGroupSynchronizerComp::GetGroupObjectId("S-1-5-21-1");
+	const QByteArray secondId = imtauth::CLdapUserGroupSynchronizerComp::GetGroupObjectId("S-1-5-21-2");
+	const QByteArray thirdId = imtauth::CLdapUserGroupSynchronizerComp::GetGroupObjectId("S-1-5-21-3");
+
+	// The link closing the cycle is omitted.
+	const imtauth::IUserGroupInfo* firstPtr = fixture.GetGroup(firstId);
+	const imtauth::IUserGroupInfo* secondPtr = fixture.GetGroup(secondId);
+	const imtauth::IUserGroupInfo* thirdPtr = fixture.GetGroup(thirdId);
+	QVERIFY(firstPtr != nullptr && secondPtr != nullptr && thirdPtr != nullptr);
+	QCOMPARE(firstPtr->GetParentGroups(), QByteArrayList({thirdId}));
+	QCOMPARE(secondPtr->GetParentGroups(), QByteArrayList({firstId}));
+	QVERIFY(thirdPtr->GetParentGroups().isEmpty());
+
+	// The result is stable.
+	QVERIFY(fixture.synchronizer->SynchronizeGroups(ldapGroups));
+	thirdPtr = fixture.GetGroup(thirdId);
+	QVERIFY(thirdPtr != nullptr);
+	QVERIFY(thirdPtr->GetParentGroups().isEmpty());
+}
+
+
+void CLdapUserGroupSynchronizerTest::testSynchronize_DisambiguatesGroupNames()
+{
+	CFixture fixture;
+
+	fixture.AddInternalGroup("Admins");
+
+	imtauth::CLdapUserGroupSynchronizerComp::LdapGroups ldapGroups;
+	ldapGroups << MakeLdapGroup("S-1-5-21-1", "Admins");
+	ldapGroups << MakeLdapGroup("S-1-5-21-2", "Users");
+	ldapGroups << MakeLdapGroup("S-1-5-21-3", "Users");
+	ldapGroups << MakeLdapGroup("S-1-5-21-4", "Guests");
+	QVERIFY(fixture.synchronizer->SynchronizeGroups(ldapGroups));
+
+	const imtauth::IUserGroupInfo* adminsPtr = fixture.GetGroup(imtauth::CLdapUserGroupSynchronizerComp::GetGroupObjectId("S-1-5-21-1"));
+	const imtauth::IUserGroupInfo* firstUsersPtr = fixture.GetGroup(imtauth::CLdapUserGroupSynchronizerComp::GetGroupObjectId("S-1-5-21-2"));
+	const imtauth::IUserGroupInfo* secondUsersPtr = fixture.GetGroup(imtauth::CLdapUserGroupSynchronizerComp::GetGroupObjectId("S-1-5-21-3"));
+	const imtauth::IUserGroupInfo* guestsPtr = fixture.GetGroup(imtauth::CLdapUserGroupSynchronizerComp::GetGroupObjectId("S-1-5-21-4"));
+	QVERIFY(adminsPtr != nullptr && firstUsersPtr != nullptr && secondUsersPtr != nullptr && guestsPtr != nullptr);
+	QCOMPARE(adminsPtr->GetName(), QString("Admins (S-1-5-21-1)"));
+	QCOMPARE(firstUsersPtr->GetName(), QString("Users (S-1-5-21-2)"));
+	QCOMPARE(secondUsersPtr->GetName(), QString("Users (S-1-5-21-3)"));
+	QCOMPARE(guestsPtr->GetName(), QString("Guests"));
+}
+
+
+void CLdapUserGroupSynchronizerTest::testIsMatchingName()
+{
+	QVERIFY(imtauth::CLdapUserGroupSynchronizerComp::IsMatchingName("*", "Any Group"));
+	QVERIFY(imtauth::CLdapUserGroupSynchronizerComp::IsMatchingName(QString(), "Any Group"));
+	QVERIFY(imtauth::CLdapUserGroupSynchronizerComp::IsMatchingName("App*", "application users"));
+	QVERIFY(imtauth::CLdapUserGroupSynchronizerComp::IsMatchingName("*Admins", "Domain Admins"));
+	QVERIFY(!imtauth::CLdapUserGroupSynchronizerComp::IsMatchingName("App*", "My App"));
+	QVERIFY(!imtauth::CLdapUserGroupSynchronizerComp::IsMatchingName("a.b", "axb"));
+	QVERIFY(imtauth::CLdapUserGroupSynchronizerComp::IsMatchingName("a.b(c)", "A.B(C)"));
 }
 
 
