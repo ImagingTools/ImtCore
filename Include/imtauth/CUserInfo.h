@@ -8,17 +8,17 @@
 // ImtCore includes
 #include <imtbase/TIdentifiableWrap.h>
 #include <imtauth/IUserInfo.h>
-#include <imtauth/CUserBaseInfo.h>
+#include <imtauth/CPrincipalBase.h>
 
 
 namespace imtauth
 {
 
 
-class CUserInfo: virtual public IUserInfo, public CUserBaseInfo
+class CUserInfo: virtual public IUserInfo, public CPrincipalBase
 {
 public:
-	typedef CUserBaseInfo BaseClass;
+	typedef CPrincipalBase BaseClass;
 
 	// reimplemented (iser::IUserInfo)
 	virtual QByteArray GetPasswordHash() const override;

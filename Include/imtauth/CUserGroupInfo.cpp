@@ -147,9 +147,9 @@ IPrincipal::FeatureIds CUserGroupInfo::GetPermissions(const QByteArray& productI
 			}
 
 			// Only the group's own roles here, its parents are walked by this loop.
-			const CUserBaseInfo* parentBasePtr = dynamic_cast<const CUserBaseInfo*>(parentGroupPtr.GetPtr());
+			const CPrincipalBase* parentBasePtr = dynamic_cast<const CPrincipalBase*>(parentGroupPtr.GetPtr());
 			const FeatureIds parentPermissions = (parentBasePtr != nullptr)
-						? parentBasePtr->CUserBaseInfo::GetPermissions(productId)
+						? parentBasePtr->CPrincipalBase::GetPermissions(productId)
 						: parentGroupPtr->GetPermissions(productId);
 			for (const QByteArray& permissionId : parentPermissions){
 				if (!allPermissions.contains(permissionId)){

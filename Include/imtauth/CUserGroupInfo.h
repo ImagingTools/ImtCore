@@ -5,16 +5,16 @@
 // ImtCore includes
 #include <imtbase/TIdentifiableWrap.h>
 #include <imtauth/IUserGroupInfo.h>
-#include <imtauth/CUserBaseInfo.h>
+#include <imtauth/CPrincipalBase.h>
 
 
 namespace imtauth
 {
 
 
-class CUserGroupInfo: virtual public IUserGroupInfo, public CUserBaseInfo
+class CUserGroupInfo: virtual public IUserGroupInfo, public CPrincipalBase
 {
-	typedef CUserBaseInfo BaseClass;
+	typedef CPrincipalBase BaseClass;
 
 public:
 	CUserGroupInfo();

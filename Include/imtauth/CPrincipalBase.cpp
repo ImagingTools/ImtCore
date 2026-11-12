@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include <imtauth/CUserBaseInfo.h>
+#include <imtauth/CPrincipalBase.h>
 
 
 // Qt includes
@@ -22,7 +22,7 @@ namespace imtauth
 
 // public methods
 
-CUserBaseInfo::CUserBaseInfo():
+CPrincipalBase::CPrincipalBase():
 	m_permissionProviderPtr(nullptr),
 	m_roleProviderPtr(nullptr),
 	m_userGroupInfoProviderPtr(nullptr)
@@ -31,25 +31,25 @@ CUserBaseInfo::CUserBaseInfo():
 }
 
 
-const imtlic::IFeatureInfoProvider *CUserBaseInfo::GetPermissionProvider() const
+const imtlic::IFeatureInfoProvider *CPrincipalBase::GetPermissionProvider() const
 {
 	return m_permissionProviderPtr;
 }
 
 
-const imtauth::IRoleInfoProvider* CUserBaseInfo::GetRoleProvider() const
+const imtauth::IRoleInfoProvider* CPrincipalBase::GetRoleProvider() const
 {
 	return m_roleProviderPtr;
 }
 
 
-QByteArray CUserBaseInfo::GetId() const
+QByteArray CPrincipalBase::GetId() const
 {
 	return m_id;
 }
 
 
-void CUserBaseInfo::SetId(const QByteArray& id)
+void CPrincipalBase::SetId(const QByteArray& id)
 {
 	if (m_id != id){
 		istd::CChangeNotifier changeNotifier(this);
@@ -59,13 +59,13 @@ void CUserBaseInfo::SetId(const QByteArray& id)
 }
 
 
-QByteArray CUserBaseInfo::GetSid() const
+QByteArray CPrincipalBase::GetSid() const
 {
 	return m_sid;
 }
 
 
-void CUserBaseInfo::SetSid(const QByteArray& sid)
+void CPrincipalBase::SetSid(const QByteArray& sid)
 {
 	if (m_sid != sid){
 		istd::CChangeNotifier changeNotifier(this);
@@ -75,13 +75,13 @@ void CUserBaseInfo::SetSid(const QByteArray& sid)
 }
 
 
-QString CUserBaseInfo::GetName() const
+QString CPrincipalBase::GetName() const
 {
 	return m_name;
 }
 
 
-void CUserBaseInfo::SetName(const QString& name)
+void CPrincipalBase::SetName(const QString& name)
 {
 	if (m_name != name){
 		istd::CChangeNotifier changeNotifier(this);
@@ -91,13 +91,13 @@ void CUserBaseInfo::SetName(const QString& name)
 }
 
 
-QString CUserBaseInfo::GetDescription() const
+QString CPrincipalBase::GetDescription() const
 {
 	return m_description;
 }
 
 
-void CUserBaseInfo::SetDescription(const QString& description)
+void CPrincipalBase::SetDescription(const QString& description)
 {
 	if (m_description != description){
 		istd::CChangeNotifier changeNotifier(this);
@@ -107,7 +107,7 @@ void CUserBaseInfo::SetDescription(const QString& description)
 }
 
 
-IPrincipal::FeatureIds CUserBaseInfo::GetPermissions(const QByteArray& productId) const
+IPrincipal::FeatureIds CPrincipalBase::GetPermissions(const QByteArray& productId) const
 {
 	IPrincipal::FeatureIds allPermissions;
 
@@ -164,7 +164,7 @@ IPrincipal::FeatureIds CUserBaseInfo::GetPermissions(const QByteArray& productId
 
 
 
-IPrincipal::FeatureIds CUserBaseInfo::GetLocalPermissions(const QByteArray& productId) const
+IPrincipal::FeatureIds CPrincipalBase::GetLocalPermissions(const QByteArray& productId) const
 {
 	if (m_permissionsMap.contains(productId)){
 		return m_permissionsMap[productId];
@@ -174,7 +174,7 @@ IPrincipal::FeatureIds CUserBaseInfo::GetLocalPermissions(const QByteArray& prod
 }
 
 
-void CUserBaseInfo::SetLocalPermissions(const QByteArray& productId, const FeatureIds& permissions)
+void CPrincipalBase::SetLocalPermissions(const QByteArray& productId, const FeatureIds& permissions)
 {
 	bool ok = true;
 	if (m_permissionsMap.contains(productId)){
@@ -192,13 +192,13 @@ void CUserBaseInfo::SetLocalPermissions(const QByteArray& productId, const Featu
 }
 
 
-IPrincipal::FeatureIds CUserBaseInfo::GetProhibitions() const
+IPrincipal::FeatureIds CPrincipalBase::GetProhibitions() const
 {
 	return m_restrictions;
 }
 
 
-void CUserBaseInfo::SetProhibitions(const FeatureIds &prohibitions)
+void CPrincipalBase::SetProhibitions(const FeatureIds &prohibitions)
 {
 	if (m_restrictions != prohibitions){
 		istd::CChangeNotifier changeNotifier(this);
@@ -208,13 +208,13 @@ void CUserBaseInfo::SetProhibitions(const FeatureIds &prohibitions)
 }
 
 
-QByteArrayList CUserBaseInfo::GetProducts() const
+QByteArrayList CPrincipalBase::GetProducts() const
 {
 	return m_rolesMap.keys();
 }
 
 
-bool CUserBaseInfo::RemoveProduct(const QByteArray& productId)
+bool CPrincipalBase::RemoveProduct(const QByteArray& productId)
 {
 	bool ok = false;
 	if (m_permissionsMap.contains(productId)){
@@ -237,7 +237,7 @@ bool CUserBaseInfo::RemoveProduct(const QByteArray& productId)
 }
 
 
-IPrincipal::RoleIds CUserBaseInfo::GetRoles(const QByteArray& productId) const
+IPrincipal::RoleIds CPrincipalBase::GetRoles(const QByteArray& productId) const
 {
 	if (m_rolesMap.contains(productId)){
 		return m_rolesMap.value(productId);
@@ -247,7 +247,7 @@ IPrincipal::RoleIds CUserBaseInfo::GetRoles(const QByteArray& productId) const
 }
 
 
-void CUserBaseInfo::SetRoles(const QByteArray& productId, const RoleIds &roles)
+void CPrincipalBase::SetRoles(const QByteArray& productId, const RoleIds &roles)
 {
 	bool ok = true;
 	if (m_rolesMap.contains(productId)){
@@ -265,7 +265,7 @@ void CUserBaseInfo::SetRoles(const QByteArray& productId, const RoleIds &roles)
 }
 
 
-void CUserBaseInfo::AddRole(const QByteArray& productId, const QByteArray& roleId)
+void CPrincipalBase::AddRole(const QByteArray& productId, const QByteArray& roleId)
 {
 	bool isChanged = false;
 	if (!m_rolesMap.contains(productId)){
@@ -289,7 +289,7 @@ void CUserBaseInfo::AddRole(const QByteArray& productId, const QByteArray& roleI
 }
 
 
-bool CUserBaseInfo::RemoveRole(const QByteArray& productId, const QByteArray& roleId)
+bool CPrincipalBase::RemoveRole(const QByteArray& productId, const QByteArray& roleId)
 {
 	if (m_rolesMap.contains(productId)){
 		RoleIds roleIds = m_rolesMap.value(productId);
@@ -313,13 +313,13 @@ bool CUserBaseInfo::RemoveRole(const QByteArray& productId, const QByteArray& ro
 }
 
 
-const imtauth::IUserGroupInfoProvider* CUserBaseInfo::GetUserGroupProvider() const
+const imtauth::IUserGroupInfoProvider* CPrincipalBase::GetUserGroupProvider() const
 {
 	return m_userGroupInfoProviderPtr;
 }
 
 
-bool CUserBaseInfo::Serialize(iser::IArchive &archive)
+bool CPrincipalBase::Serialize(iser::IArchive &archive)
 {
 	// Get ImtCore version
 	const iser::IVersionInfo& versionInfo = archive.GetVersionInfo();
@@ -438,15 +438,15 @@ bool CUserBaseInfo::Serialize(iser::IArchive &archive)
 }
 
 
-int CUserBaseInfo::GetSupportedOperations() const
+int CPrincipalBase::GetSupportedOperations() const
 {
 	return SO_COPY | SO_COMPARE | SO_RESET;
 }
 
 
-bool CUserBaseInfo::CopyFrom(const IChangeable &object, CompatibilityMode /*mode*/)
+bool CPrincipalBase::CopyFrom(const IChangeable &object, CompatibilityMode /*mode*/)
 {
-	const CUserBaseInfo* sourcePtr = dynamic_cast<const CUserBaseInfo*>(&object);
+	const CPrincipalBase* sourcePtr = dynamic_cast<const CPrincipalBase*>(&object);
 	if (sourcePtr != nullptr){
 		istd::CChangeNotifier changeNotifier(this);
 
@@ -467,9 +467,9 @@ bool CUserBaseInfo::CopyFrom(const IChangeable &object, CompatibilityMode /*mode
 }
 
 
-bool CUserBaseInfo::IsEqual(const IChangeable& object) const
+bool CPrincipalBase::IsEqual(const IChangeable& object) const
 {
-	const CUserBaseInfo* sourcePtr = dynamic_cast<const CUserBaseInfo*>(&object);
+	const CPrincipalBase* sourcePtr = dynamic_cast<const CPrincipalBase*>(&object);
 	if (sourcePtr != nullptr){
 		bool retVal = m_restrictions == sourcePtr->m_restrictions;
 		retVal = retVal && m_permissionsMap == sourcePtr->m_permissionsMap;
@@ -486,9 +486,9 @@ bool CUserBaseInfo::IsEqual(const IChangeable& object) const
 }
 
 
-istd::IChangeableUniquePtr CUserBaseInfo::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CPrincipalBase::CloneMe(CompatibilityMode mode) const
 {
-	istd::IChangeableUniquePtr clonePtr(new CUserBaseInfo);
+	istd::IChangeableUniquePtr clonePtr(new CPrincipalBase);
 	if (clonePtr->CopyFrom(*this, mode)){
 		return clonePtr;
 	}
@@ -497,7 +497,7 @@ istd::IChangeableUniquePtr CUserBaseInfo::CloneMe(CompatibilityMode mode) const
 }
 
 
-bool CUserBaseInfo::ResetData(CompatibilityMode /*mode*/)
+bool CPrincipalBase::ResetData(CompatibilityMode /*mode*/)
 {
 	istd::CChangeNotifier changeNotifier(this);
 

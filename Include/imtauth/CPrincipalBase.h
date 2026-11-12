@@ -11,11 +11,11 @@ namespace imtauth
 {
 
 
-class CUserBaseInfo: virtual public IPrincipal
+class CPrincipalBase: virtual public IPrincipal
 {
 
 public:
-	CUserBaseInfo();
+	CPrincipalBase();
 
 	// reimplemented (IPrincipal)
 	virtual const imtlic::IFeatureInfoProvider* GetPermissionProvider() const override;
