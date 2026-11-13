@@ -72,7 +72,7 @@ these from a JQMLNext commit, unchanged:
 Nothing is installed during the build; everything v5 needs is in the repository:
 
 - Node.js 12 or newer. On Windows it is `3rdParty/nodejs/node.exe` (a submodule, the executable is in Git LFS);
-  elsewhere `node` from the `PATH`, or `NODE_EXE`. The configure step stops with a message if Node.js does not
-  run or is too old.
+  elsewhere `node` from the `PATH`, or `NODE_EXE`. When v5 is built, the configure step stops with a message
+  if Node.js does not run or is too old; v3 and v4 builds configure as before.
 - Python 3.8 or newer for `preparesources.py`, as for v4.
 - `dist/core.js` is built in JQMLNext and committed; webpack is not needed.

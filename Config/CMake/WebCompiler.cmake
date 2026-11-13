@@ -222,10 +222,15 @@ function(jqml_compile_web2)
 
 endfunction(jqml_compile_web2)
 
-set(JQML_VERSION "" CACHE STRING "JQML version served at <ProductName>/Views/html/: v3, v4 or v5; empty takes the product's jqmlversion, then v3")
-set_property(CACHE JQML_VERSION PROPERTY STRINGS "" v3 v4 v5)
-set(JQML_WEB_ALL_VERSIONS "" CACHE STRING "Also build the other JQML versions, version N at <ProductName>/Views/htmlN/: ON or OFF; empty takes the product's jqmlallversions, then OFF")
-set_property(CACHE JQML_WEB_ALL_VERSIONS PROPERTY STRINGS "" ON OFF)
+# Declared only when not set yet, so a value given before keeps working as it did
+if(NOT DEFINED JQML_VERSION)
+	set(JQML_VERSION "" CACHE STRING "JQML version served at <ProductName>/Views/html/: v3, v4 or v5; empty takes the product's jqmlversion, then v3")
+	set_property(CACHE JQML_VERSION PROPERTY STRINGS "" v3 v4 v5)
+endif()
+if(NOT DEFINED JQML_WEB_ALL_VERSIONS)
+	set(JQML_WEB_ALL_VERSIONS "" CACHE STRING "Also build the other JQML versions, version N at <ProductName>/Views/htmlN/: ON or OFF; empty takes the product's jqmlallversions, then OFF")
+	set_property(CACHE JQML_WEB_ALL_VERSIONS PROPERTY STRINGS "" ON OFF)
+endif()
 
 # Resolve and validate the selected JQML compiler version:
 # JQML_VERSION (CMake), then the JQML_VERSION environment variable, then the product's jqmlversion, then v3.
@@ -342,15 +347,18 @@ function(jq_compile_web)
 
 	message("NODE_EXE_JQ ${NODE_EXE}")
 
-	# A missing submodule, an LFS pointer instead of node.exe or no node on the PATH fail here, not in the build
-	execute_process(COMMAND "${NODE_EXE}" --version OUTPUT_VARIABLE _jqml_node_version RESULT_VARIABLE _jqml_node_result
-		OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
-	if(NOT _jqml_node_result EQUAL 0 OR NOT _jqml_node_version MATCHES "^v([0-9]+)")
-		message(FATAL_ERROR "Node.js does not run: '${NODE_EXE}'. On Windows run 'git submodule update --init 3rdParty/nodejs' "
-			"and 'git lfs pull' in ImtCore; elsewhere install Node.js or set NODE_EXE.")
-	endif()
-	if(CMAKE_MATCH_1 LESS 12 AND (JQML_VERSION STREQUAL "v5" OR _jqml_all))
-		message(FATAL_ERROR "JQML v5 needs Node.js 12 or newer, '${NODE_EXE}' is ${_jqml_node_version}")
+	# v5 only, so v3 and v4 builds configure as before: a missing submodule, an LFS pointer instead of node.exe,
+	# no node on the PATH or a node older than 12 fail here, not in the build
+	if(JQML_VERSION STREQUAL "v5" OR _jqml_all)
+		execute_process(COMMAND "${NODE_EXE}" --version OUTPUT_VARIABLE _jqml_node_version RESULT_VARIABLE _jqml_node_result
+			OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
+		if(NOT _jqml_node_result EQUAL 0 OR NOT _jqml_node_version MATCHES "^v([0-9]+)")
+			message(FATAL_ERROR "Node.js does not run: '${NODE_EXE}'. On Windows run 'git submodule update --init 3rdParty/nodejs' "
+				"and 'git lfs pull' in ImtCore; elsewhere install Node.js or set NODE_EXE.")
+		endif()
+		if(CMAKE_MATCH_1 LESS 12)
+			message(FATAL_ERROR "JQML v5 needs Node.js 12 or newer, '${NODE_EXE}' is ${_jqml_node_version}")
+		endif()
 	endif()
 
 	list(LENGTH webdirs DIRS_COUNT)
