@@ -129,18 +129,32 @@ function unsubscribe(link){
     }
 }
 
-function connect(source, signal, fn, receiver = null, priority = PRIORITY_NORMAL){
-    return subscribe(new Link(source, signal, priority === PRIORITY_GEOMETRY ? GEOMETRY : 0, fn, receiver, null))
+// owner: the object whose destruction removes the connection (QObjectPrivate::connect with a receiver)
+function connect(source, signal, fn, receiver = null, priority = PRIORITY_NORMAL, owner = null){
+    let link = subscribe(new Link(source, signal, priority === PRIORITY_GEOMETRY ? GEOMETRY : 0, fn, receiver, null))
+    if(owner !== null && owner !== source) (owner.$inbound || (owner.$inbound = [])).push(link)
+    return link
 }
 
-function disconnect(source, signal, fn, receiver = null){
+function disconnect(source, signal, fn, receiver = null, owner = null){
     for(let link = headOf(source, signal); link; link = link.nextSub){
         if(!(link.flags & DEP) && link.fn === fn && link.receiver === receiver){
             unsubscribe(link)
+            let inbound = owner !== null ? owner.$inbound : null
+            let at = inbound ? inbound.indexOf(link) : -1
+            if(at >= 0) inbound.splice(at, 1)
             return true
         }
     }
     return false
+}
+
+// obj is destroyed: the connections it receives go (a destroyed receiver is disconnected)
+function dropConnections(obj){
+    let inbound = obj.$inbound
+    if(!inbound) return
+    obj.$inbound = null
+    for(let i = 0; i < inbound.length; i++) unsubscribe(inbound[i])
 }
 
 function connectHandler(source, signal, fn, scope){
@@ -731,7 +745,7 @@ module.exports = {
     DESTROYED, BLOCKED, COMPLETED, SETTER,
     clearScope, scopeCleared,
     Link, Binding, stats,
-    connect, disconnect, connectHandler, subscribe, unsubscribe, hasSubscribers, dropSubscribers,
+    connect, disconnect, connectHandler, subscribe, unsubscribe, hasSubscribers, dropSubscribers, dropConnections,
     emit, emitArgs, track, evaluate, runBinding, disposeBinding, isUpdating, flushPending,
     beginUpdate, endUpdate, batch, markDirty, queuePolish, queueCall, queueDelete, queueFrame, flushFrame, stop, isStopped,
     beginCreate, endCreate, creatingRoot, scheduleComponentComplete, scheduleBinding, scheduleCompleted,
