@@ -833,6 +833,12 @@ function qmlweb_tokenizer($TEXT, document_type) {
 
     function handle_dot() {
         next();
+        // `...`: spread and rest (ES2015)
+        if (peek() == "." && S.text.charAt(S.pos + 1) == ".") {
+            next();
+            next();
+            return token("punc", "...");
+        }
         return is_digit(peek())
             ? read_num(".")
             : token("punc", ".");
@@ -960,8 +966,9 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
     function expect(punc) { return expect_token("punc", punc); };
 
     function can_insert_semicolon() {
+        // an object binding (`prop: Item { }`) needs no separator before the next member, as in the QML grammar
         return !exigent_mode && (
-            S.token.nlb || is("eof") || is("punc", "}")
+            S.token.nlb || is("eof") || is("punc", "}") || S.token === S.qmlblock_end
         );
     };
 
@@ -1193,12 +1200,32 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
         return as_(info, in_statement ? "defun" : "function",
                   name,
                   // arguments
+                  // ES2015+: `name = default`, `...rest` and destructuring patterns `{a, b}`, `[a, b]`
                   (function(first, a){
                       while (!is("punc", ")")) {
                           if (first) first = false; else expect(",");
-                          if (!is("name")) unexpected();
-                          a.push(S.token.value);
-                          next();
+                          if (!exigent_mode && is("punc", ")")) break;
+                          var rest = is("punc", "...");
+                          if (rest) next();
+                          if (is("punc", "{") || is("punc", "[")) {
+                              // a destructuring pattern, defaults inside: its tokens up to the closing bracket
+                              var depth = 0;
+                              do {
+                                  if (is("punc", "{") || is("punc", "[") || is("punc", "(")) depth++;
+                                  else if (is("punc", "}") || is("punc", "]") || is("punc", ")")) depth--;
+                                  if (is("eof")) unexpected();
+                                  next();
+                              } while (depth > 0);
+                              a.push("$pattern");
+                          } else {
+                              if (!is("name")) unexpected();
+                              a.push((rest ? "..." : "") + S.token.value);
+                              next();
+                          }
+                          if (!rest && is("operator", "=")) {
+                              next();
+                              expression(false);
+                          }
                       }
                       next();
                       return a;
@@ -1331,6 +1358,11 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
             next();
             return new_();
         }
+        // spread in arrays, calls and objects, rest of arrow parameters: `...x` (the code generator checks where)
+        if (is("punc", "...")) {
+            next();
+            return as_(undefined, "spread", expression(false));
+        }
         if (is("punc")) {
             switch (S.token.value) {
               case "(":
@@ -1400,10 +1432,27 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
             if (!exigent_mode && is("punc", "}"))
                 // allow trailing comma
                 break;
+            // ES2015+: `[computed]: value`, shorthand `name`, method `name() {}`; no object spread, as in QV4 of Qt 6.8
+            if (is("punc", "[")) {
+                next();
+                var key = expression(false);
+                expect("]");
+                if (is("punc", "(")) {
+                    a.push([ "[]", function_(false) ]);
+                } else {
+                    expect(":");
+                    a.push([ "[]", expression(false), key ]);
+                }
+                continue;
+            }
             var type = S.token.type;
             var name = as_property_name();
-            if (type == "name" && (name == "get" || name == "set") && !is("punc", ":")) {
+            if (type == "name" && (name == "get" || name == "set") && !is("punc", ":") && !is("punc", ",") && !is("punc", "}") && !is("punc", "(")) {
                 a.push([ as_name(), function_(false), name ]);
+            } else if (is("punc", "(")) {
+                a.push([ name, function_(false) ]);
+            } else if (type == "name" && (is("punc", ",") || is("punc", "}"))) {
+                a.push([ name, as_(undefined, "name", name) ]);
             } else {
                 expect(":");
                 a.push([ name, expression(false) ]);
@@ -1569,17 +1618,17 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
         }
     };
 
+    // the parameters of `(params) => ...` parsed as an expression: names, `name = default`, `...rest` and patterns
     function extract_arrow_params(expr) {
-        if (expr[0] === "name") return [expr[1]];
-        if (expr[0] === "seq") {
-            function flattenSeq(node) {
-                if (node[0] === "name") return [node[1]];
-                if (node[0] === "seq") return flattenSeq(node[1]).concat(flattenSeq(node[2]));
-                return [];
-            }
-            return flattenSeq(expr);
+        function param(node) {
+            if (node[0] === "name") return [node[1]];
+            if (node[0] === "seq") return param(node[1]).concat(param(node[2]));
+            if (node[0] === "assign" && node[2] && node[2][0] === "name") return [node[2][1]];
+            if (node[0] === "spread") return param(node[1]).map(function(name) { return "..." + name; });
+            if (node[0] === "object" || node[0] === "array") return ["$pattern"];
+            return [];
         }
-        return [];
+        return param(expr);
     };
 
     function arrow_function_(params) {
@@ -1702,6 +1751,7 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
       a.push(qmlstatement());
     }
     expect("}");
+    S.qmlblock_end = S.token;
     LE_FLAG = false
     return a;
   }
@@ -1736,6 +1786,12 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
     var info = S.token
     var type = S.token.value;
     next();
+    // a qualified type: `property Module.Type x`, `property File.InlineComponent x`
+    while (is("punc", ".") && is_token(peek(), "name")) {
+      next();
+      type += "." + S.token.value;
+      next();
+    }
 
     var subtype;
     if (is("operator", "<")) {
@@ -1745,8 +1801,17 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
       expect_token("operator", ">");
     }
 
+    // `property int : 1` has no name (QQmlJS: "Expected token `identifier'")
+    if (!is("name"))
+      token_error(S.token, "Expected token `identifier'");
+    var nameToken = S.token;
     var name = S.token.value;
     next();
+    // the position of the name, for the errors the compiler reports on a declaration
+    function named(node) {
+      node.nameInfo = nameToken;
+      return node;
+    }
     if (type == "alias") {
       
       expect(":");
@@ -1764,24 +1829,28 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
         propName.push(S.token.value);
         next();
       }
-      return as_(info, "qmlaliasdef", name, objName, propName.join('.'));
+      return named(as_(info, "qmlaliasdef", name, objName, propName.join('.')));
     }
     if (is("punc", ":")) {
       next();
       statement.in_qmlprop = true;
-      return as_statement(info, "qmlpropdef", attrs, name, type);
+      return named(as_statement(info, "qmlpropdef", attrs, name, type));
     } else if (is("punc", ";"))
       next();
-    return as_(info, "qmlpropdef", attrs, name, type);
+    return named(as_(info, "qmlpropdef", attrs, name, type));
   }
 
   function qmldefaultprop() {
+    var info = S.token;
     next();
     expect_token("name", "property");
-    return as_(undefined, "qmldefaultprop", qmlpropdef());
+    var propdef = qmlpropdef();
+    propdef.declInfo = info;
+    return as_(undefined, "qmldefaultprop", propdef);
   }
 
   function qmlsignaldef() {
+    var info = S.token;
     var name = S.token.value;
     next();
     var args = [];
@@ -1817,7 +1886,7 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
     }
     if (is("punc", ";"))
       next();
-    return as_(undefined, "qmlsignaldef", name, args);
+    return as_(info, "qmlsignaldef", name, args);
   }
 
   function qmlstatement() {
@@ -1825,10 +1894,11 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
     if (is("keyword", "function")) {
       var from = S.token.pos;
       next();
+      var nameToken = S.token;
       var stat = function_(true);
       var to = S.token.pos;
       var name = stat[1];
-      return as_(undefined, "qmlmethod", name, stat, TEXT.substr(from, to - from));
+      return as_(nameToken, "qmlmethod", name, stat, TEXT.substr(from, to - from));
     } else if (is("name", "signal")) {
       next();
       if (is("punc", ":")) {
@@ -1841,6 +1911,15 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
       if(S.token.value == "enum"){
         next();
         return qmlenumdef();
+      }
+      // inline component: `component Name: Type { ... }`
+      if (S.token.value == "component" && is_token(peek(), "name")) {
+        next();
+        var componentName = S.token.value;
+        next();
+        expect(":");
+        var componentBody = qmlstatement();
+        return as_(info, "qmlinlinecomponent", componentName, componentBody);
       }
       var attrs = [false, false, false] // default, required, readonly
 
@@ -1855,7 +1934,10 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
 
       if (S.token.value == "property" && !is_token(peek(), "punc", ":")) {
         next();
-        return qmlpropdef(attrs);
+        var propdef = qmlpropdef(attrs);
+        // the declaration starts with its first modifier
+        propdef.declInfo = info;
+        return propdef;
       }
 
       var propname = subscripts(as_name(), false);

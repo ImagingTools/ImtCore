@@ -60,6 +60,8 @@ function parse(source, where){
     }
 }
 
+// resolve.callingContext(), when the resolver has it: the calling context of the code for a call x.createQmlObject(...)
+// (QV4 callingQmlContext), as JS sources { qt, scope, ids }
 function transformFree(ast, resolve, free){
     return ast.transform(new U.TreeTransformer(null, function(node){
         if(node instanceof U.AST_SymbolRef && node.thedef && node.thedef.undeclared){
@@ -67,6 +69,30 @@ function transformFree(ast, resolve, free){
             if(source === null || source === undefined) return undefined
             if(free) free.add(node.name)
             return replacementNode(source)
+        }
+        // `typeof name` of a name looked up at run time is "undefined" when it is not found, like JavaScript
+        if(node instanceof U.AST_UnaryPrefix && node.operator === 'typeof' && node.expression instanceof U.AST_Call
+            && node.expression.expression instanceof U.AST_Dot && node.expression.expression.property === 'ctx'
+            && node.expression.expression.expression instanceof U.AST_SymbolRef && node.expression.expression.expression.name === 'JQ'){
+            node.expression.expression.property = 'ctxValue'
+            return node
+        }
+        if(resolve.callingContext && node instanceof U.AST_Call && node.expression instanceof U.AST_Dot && node.expression.property === 'createComponent'){
+            return new U.AST_Call({
+                start: node.start,
+                end: node.end,
+                expression: replacementNode('JQ.callCreateComponent'),
+                args: [node.expression.expression, replacementNode(resolve.callingContext().scope)].concat(node.args),
+            })
+        }
+        if(resolve.callingContext && node instanceof U.AST_Call && node.expression instanceof U.AST_Dot && node.expression.property === 'createQmlObject'){
+            let context = resolve.callingContext()
+            return new U.AST_Call({
+                start: node.start,
+                end: node.end,
+                expression: replacementNode('JQ.callCreateQmlObject'),
+                args: [node.expression.expression, replacementNode(context.qt), replacementNode(context.scope), replacementNode(context.ids)].concat(node.args),
+            })
         }
         return undefined
     }))

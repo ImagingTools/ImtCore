@@ -1,5 +1,5 @@
 const engine = require('../Core/engine')
-const { defineType } = require('../Core/type')
+const { defineType, makeReadonly } = require('../Core/type')
 const { findFile } = require('../QtQml/files')
 const { Item } = require('./Item')
 
@@ -114,9 +114,9 @@ defineType(Loader, {
         source: { kind: 'string', effect: sourceChanged },
         sourceComponent: { kind: 'component', effect: sourceChanged },
         active: { kind: 'bool', initial: true, effect: reload },
-        item: { kind: 'var', initial: null },
-        status: 'int',
-        progress: { kind: 'real', initial: 1 },
+        item: { kind: 'var', initial: null, readonly: true },
+        status: { kind: 'int', readonly: true },
+        progress: { kind: 'real', initial: 1, readonly: true },
         asynchronous: 'bool',
     },
     signals: ['loaded'],
@@ -125,5 +125,9 @@ Loader.Null = 0
 Loader.Ready = 1
 Loader.Loading = 2
 Loader.Error = 3
+
+// read-only in Qt, writable in the base class
+makeReadonly(Loader, 'implicitWidth')
+makeReadonly(Loader, 'implicitHeight')
 
 module.exports = { Loader }
