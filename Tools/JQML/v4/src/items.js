@@ -2588,20 +2588,46 @@ export class Canvas extends Item {
 	}
 
 	// The first paint happens while the image is still loading, then imageLoaded is delivered. That is the order Qt logs.
+	// The picture is kept for `createPattern(url, ...)`; the engine finds it from the address like the one of an Image.
 	loadImage(src) {
 		const url = toStr(src);
-		if (this.$images === undefined) this.$images = new Map();
+		if (this.$images === undefined) {
+			this.$images = new Map();
+			this.$pictures = new Map();
+		}
 		const state = this.$images.get(url);
 		if (state === 'ready' || state === 'loading') return;
 		this.$images.set(url, 'loading');
 		this.$painted = false;
 		this.$ensurePainted();
-		this.$images.set(url, 'ready');
-		this.$emit('imageLoaded');
+		const canvas = this;
+		hooks.loadImage(
+			{
+				$source: url,
+				$directory: canvas.$directory,
+				get $destroyed() {
+					return canvas.$destroyed === true;
+				},
+				$setImage(picture, status) {
+					if (canvas.$images.get(url) !== 'loading') return;
+					if (status === 3) {
+						canvas.$images.set(url, 'error');
+						return;
+					}
+					if (picture !== null) canvas.$pictures.set(url, picture);
+					canvas.$images.set(url, 'ready');
+					canvas.$emit('imageLoaded');
+				},
+			},
+			url,
+		);
 	}
 
 	unloadImage(src) {
-		if (this.$images !== undefined) this.$images.delete(toStr(src));
+		if (this.$images !== undefined) {
+			this.$images.delete(toStr(src));
+			this.$pictures.delete(toStr(src));
+		}
 	}
 
 	isImageLoaded(src) {
@@ -2630,10 +2656,12 @@ export class Canvas extends Item {
 		this.$painted = true;
 		this.$paintedWidth = this.$aw;
 		this.$paintedHeight = this.$ah;
+		// The textures of the pictures that putImageData drew are not needed any more.
+		for (const old of this.$cmds) if (old.k === 'bitmap' && old.page !== null) (this.$stalePages ??= []).push(old.page);
 		this.$cmds = [];
 		const signal = this.$sigs.get('paint');
 		if (signal.handlers.length > 0) {
-			this.$context = new CanvasContext(this.$aw, this.$ah, this.$cmds);
+			this.$context = new CanvasContext(this.$aw, this.$ah, this.$cmds, this.$pictures === undefined ? null : this.$pictures);
 			try {
 				this.$emit('paint');
 			} finally {
@@ -2645,6 +2673,10 @@ export class Canvas extends Item {
 
 	$paint(r, opacity) {
 		this.$ensurePainted();
+		if (this.$stalePages !== undefined) {
+			for (const page of this.$stalePages) r.dropPage(page);
+			this.$stalePages = undefined;
+		}
 		if (this.$cmds.length === 0) return;
 		if (this.$cmdsChecked !== this.$cmds) {
 			this.$cmdsChecked = this.$cmds;
