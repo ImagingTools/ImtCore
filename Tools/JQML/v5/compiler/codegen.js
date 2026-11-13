@@ -224,13 +224,15 @@ class Codegen {
                 if(scope.ids.has(name)) return '$s' + '.$p'.repeat(depth) + '[' + scope.ids.get(name) + ']'
             }
             if(name === 'parent') return selfExpr + '.parent'
-            if(this.member(memberEl || el, name)) return selfExpr + '.' + name
+            // ListView in an expression is the type (ListView.Horizontal); its attached group only takes handlers
+            const valueMember = (target) => { let m = this.member(target, name); return m && !(m.group && m.group.$handlersOnly) }
+            if(valueMember(memberEl || el)) return selfExpr + '.' + name
             depth = 0
             for(let scope = el.scope; scope; scope = scope.parent, depth++){
                 if(scope.isDelegate && (name === 'index' || name === 'model' || name === 'modelData')){
                     return 'JQ.mctx($s' + '.$p'.repeat(depth) + ').' + name
                 }
-                if(scope.root && scope.root !== el && this.member(scope.root, name)){
+                if(scope.root && scope.root !== el && valueMember(scope.root)){
                     return '$s' + '.$p'.repeat(depth) + '[0].' + name
                 }
             }

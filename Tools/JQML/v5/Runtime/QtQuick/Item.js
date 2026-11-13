@@ -196,7 +196,7 @@ class Item extends QtObject {
             style.width = Math.max(0, v[Item.WIDTH]) + 'px'
             style.height = Math.max(0, v[Item.HEIGHT]) + 'px'
         }
-        if(bits & VISIBILITY) style.display = this.$ownVisible ? '' : 'none'
+        if(bits & VISIBILITY) style.display = this.$ownVisible && !this.$culled ? '' : 'none'
         if(bits & OPACITY) style.opacity = v[Item.OPACITY] === 1 ? '' : v[Item.OPACITY]
         if(bits & Z) style.zIndex = v[Item.Z] === 0 ? '' : v[Item.Z]
         if(bits & CLIP) style.overflow = v[Item.CLIP] ? 'hidden' : ''
@@ -268,9 +268,13 @@ defineType(Item, {
         Layout: { group: null },    // set by Layouts.js
         Keys: { group: null },      // set by KeyDelivery.js
         KeyNavigation: { group: null },
+        ListView: { group: null },  // set by ListView.js
     },
     signals: ['childrenChanged'],
 })
+
+// QQuickItemPrivate::culled: not painted, the visible property stays (a delegate in the reuse pool)
+Item.prototype.$culled = false
 
 Object.assign(Item, { TopLeft: 0, Top: 1, TopRight: 2, Left: 3, Center: 4, Right: 5, BottomLeft: 6, Bottom: 7, BottomRight: 8 })
 
