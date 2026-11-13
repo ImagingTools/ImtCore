@@ -280,6 +280,8 @@ async function compileJs(options, env, log, warn) {
 		root: options.root,
 		main: relativeTo(root, main),
 		lenient: true,
+		// every document was parsed above with the script checks on
+		trusted: true,
 		files: {},
 		binaries: {},
 		modules: {},

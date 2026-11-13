@@ -42,7 +42,7 @@ export function resourceRoot(root, location) {
 export function createProject(spec) {
 	const files = new Map(Object.entries(spec.files || {}));
 	for (const [path, base64] of Object.entries(spec.binaries || {})) files.set(path, decodeBase64(base64));
-	return new Project(new MapFS(files), { modules: spec.modules || {} });
+	return new Project(new MapFS(files), { modules: spec.modules || {}, trusted: spec.trusted === true });
 }
 
 function pickLanguage(spec) {

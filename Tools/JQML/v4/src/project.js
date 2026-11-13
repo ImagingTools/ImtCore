@@ -132,6 +132,8 @@ export class Project {
 	constructor(fs, options = {}) {
 		this.fs = fs;
 		this.importPaths = options.importPaths || [];
+		// The scripts of the documents were checked by the compiler: they are not checked again while parsing.
+		this.trusted = options.trusted === true;
 		this.moduleDirs = new Map();
 		for (const [name, dirs] of Object.entries(options.modules || {})) {
 			this.moduleDirs.set(name, Array.isArray(dirs) ? dirs : [dirs]);
@@ -209,7 +211,7 @@ export class Project {
 		const doc = { path, source, def: null, error: null };
 		this.docs.set(path, doc);
 		try {
-			doc.def = parseQmlDocument(source);
+			doc.def = parseQmlDocument(source, !this.trusted);
 		} catch (error) {
 			if (!(error instanceof QmlError)) throw error;
 			doc.error = error;
