@@ -107,7 +107,7 @@ class Image extends Item {
         let s = this.$dom.style
         let source = this.$v[Image.SOURCE]
         let url = source ? this.$url : ''
-        s.backgroundImage = url ? 'url("' + String(url).replace(/"/g, '\\"') + '")' : ''
+        s.backgroundImage = url ? 'url(' + JSON.stringify(String(url)) + ')' : ''
         let mode = this.$v[Image.FILLMODE]
         let size = { [Stretch]: '100% 100%', [PreserveAspectFit]: 'contain', [PreserveAspectCrop]: 'cover', [Pad]: 'auto' }[mode] || 'auto'
         s.backgroundSize = size
