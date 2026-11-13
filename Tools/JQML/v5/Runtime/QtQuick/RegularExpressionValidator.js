@@ -20,7 +20,7 @@ function partialSource(re){
                 else if(n === 'k') optional(source.indexOf('>', i) - i + 1)
                 else optional(2)
             } else if(c === '['){
-                let m = /\[(?:\\.|.)*?\]/g
+                let m = /\[(?:\\.|[^\\])*?\]/g
                 m.lastIndex = i
                 optional(m.exec(source)[0].length)
             } else if('|^$*+?'.indexOf(c) >= 0){
