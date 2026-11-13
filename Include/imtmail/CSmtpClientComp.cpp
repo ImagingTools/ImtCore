@@ -3,6 +3,7 @@
 
 
 // Qt includes
+#include <QtCore/QDeadlineTimer>
 #include <QtCore/QMimeDatabase>
 #include <QtCore/QUuid>
 
@@ -182,11 +183,15 @@ bool CSmtpClientComp::Exchange(
 		socket.write(command + QByteArrayLiteral("\r\n"));
 	}
 
-	// The lines of a reply have a dash after the code, except the last one.
+	/**
+		The lines of a reply have a dash after the code, except the last one. The whole reply has one deadline, so a
+		server that sends it slowly cannot hold the worker.
+	*/
+	const QDeadlineTimer deadline(*m_timeoutAttrPtr);
 	QByteArray line;
 	do{
 		while (!socket.canReadLine()){
-			if (!socket.waitForReadyRead(*m_timeoutAttrPtr)){
+			if (deadline.hasExpired() || !socket.waitForReadyRead(static_cast<int>(deadline.remainingTime()))){
 				error = QStringLiteral("The server did not answer: %1").arg(socket.errorString());
 
 				return false;
