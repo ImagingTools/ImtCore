@@ -194,6 +194,12 @@ function clearScope(scope, recursive){
     anyCleared = true
 }
 
+// contexts in the order they were made: QQmlContextData::emitDestruction goes from the newest child context
+let scopes = 0
+function nextScope(){
+    return ++scopes
+}
+
 function scopeCleared(scope){
     if(!anyCleared) return false
     if(scope.$cleared) return true
@@ -697,6 +703,37 @@ function completionOrder(current){
     return order
 }
 
+// The context a QML type is being built in: its document sees it while it is built (the parent of its QQmlContext)
+let buildContext = null
+
+function make(Class, s){
+    let previous = buildContext
+    buildContext = s
+    let obj
+    try {
+        obj = new Class(null)
+    } finally {
+        buildContext = previous
+    }
+    obj.$cctx = s
+    return obj
+}
+
+function inContext(root){
+    if(!root.$cctx && buildContext) root.$cctx = buildContext
+}
+
+// builds with fn() an object of a component made in the context s
+function buildIn(s, fn){
+    let previous = buildContext
+    buildContext = s
+    try {
+        return fn()
+    } finally {
+        buildContext = previous
+    }
+}
+
 function scheduleComponentComplete(obj){
     if(obj.$ccScheduled) return
     obj.$ccScheduled = true
@@ -744,7 +781,7 @@ module.exports = {
     PENDING,
     PRIORITY_GEOMETRY, PRIORITY_CROSS, PRIORITY_HANDLER, PRIORITY_NORMAL,
     DESTROYED, BLOCKED, COMPLETED, DELETING, SETTER,
-    clearScope, scopeCleared,
+    clearScope, scopeCleared, nextScope, parentScope, make, inContext, buildIn,
     Link, Binding, stats,
     connect, disconnect, connectHandler, subscribe, unsubscribe, hasSubscribers, dropSubscribers, dropConnections,
     emit, emitArgs, track, evaluate, runBinding, disposeBinding, isUpdating, flushPending,

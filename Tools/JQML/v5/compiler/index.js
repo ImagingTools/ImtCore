@@ -52,7 +52,13 @@ function addDir(files, dir, module, modules, entryDir, all = false){
     let entries = readQmldir(dir)
     let byFile = new Map(entries.map(e => [path.normalize(e.file), e]))
     for(let e of entries){
-        if(e.script && fs.existsSync(e.file)) files.$scripts.set(e.type, e.file)
+        if(!e.script || !fs.existsSync(e.file)) continue
+        files.$scripts.set(e.type, e.file)
+        // the scripts of a module, or of a directory with a qmldir: every document importing it gets them
+        for(let key of module ? [module.name, 'dir:' + pathKey(dir)] : ['dir:' + pathKey(dir)]){
+            if(!files.$moduleScripts.has(key)) files.$moduleScripts.set(key, [])
+            if(!files.$moduleScripts.get(key).includes(e.file)) files.$moduleScripts.get(key).push(e.file)
+        }
     }
     entries = entries.filter(e => !e.script)
     let names = !all && (module || fs.existsSync(path.resolve(dir, 'qmldir'))) ? entries.map(e => e.file) : fs.readdirSync(dir).filter(n => n.endsWith('.qml')).map(n => path.resolve(dir, n))
@@ -86,6 +92,7 @@ function addDir(files, dir, module, modules, entryDir, all = false){
 function collectFiles(entry, configPath){
     let files = new Map()
     files.$scripts = new Map()
+    files.$moduleScripts = new Map()
     files.$modules = new Map()
     files.$paths = new Set()
     let dirs = configPath && fs.existsSync(configPath) ? loadConfig(configPath).filter(dir => fs.existsSync(dir)) : []

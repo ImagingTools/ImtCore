@@ -238,9 +238,9 @@ class FileModel {
                 el.enums.push({ name: m[1], values: m[2] })
                 return
             case 'qmlinlinecomponent':
-                // not compiled yet (compiler/checks.js reports it)
+                // a type of its own: Codegen builds a FileModel of it (inlineModel)
                 if(!el.inlineComponents) el.inlineComponents = []
-                el.inlineComponents.push({ name: m[1], at: tokenAt(m.info) || { line, col } })
+                el.inlineComponents.push({ name: m[1], node: m[2], at: tokenAt(m.info) || { line, col } })
                 return
             case 'qmlelem': {
                 if(el.type === 'Component'){
@@ -257,4 +257,19 @@ class FileModel {
     }
 }
 
-module.exports = { FileModel, Element, Scope, cleanRaw, isHandlerName }
+// `component Name: Base { }` of file: a type with the imports, the directory and the url of the file, a document of its own
+function inlineModel(file, component){
+    let model = new FileModel(component.name, file.fileName)
+    model.imports = file.imports
+    model.dir = file.dir
+    model.module = ''
+    model.url = file.url
+    model.inlineOf = file
+    model.createsComponents = file.createsComponents
+    model.createsQmlObjects = file.createsQmlObjects
+    model.documentImports = file.documentImports
+    model.root = model.element(component.node, model.newScope(null, false), null)
+    return model
+}
+
+module.exports = { FileModel, Element, Scope, cleanRaw, isHandlerName, inlineModel }

@@ -17,7 +17,13 @@ class Component extends QtObject {
         let obj = null
         let previous = engine.beginCreate()
         try {
-            obj = this.$build(parent, context)
+            // a component of Qt.createComponent builds in the context it was made in
+            let made = this.$cctx || null
+            obj = made ? engine.buildIn(made, () => this.$build(parent, context)) : this.$build(parent, context)
+            if(made && obj && !obj.$cctx) obj.$cctx = made
+            // its context is a child of the component's one wherever the object goes: it ends with that context
+            let creator = obj && obj.$own && (obj.$own.$p || made)
+            if(creator) (creator.$made || (creator.$made = new Set())).add(obj)
             if(properties){
                 // QQmlComponent::setInitialProperties: a dotted name sets a sub-property ("border.width")
                 for(let key in properties){

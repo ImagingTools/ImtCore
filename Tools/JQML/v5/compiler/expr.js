@@ -77,6 +77,14 @@ function transformFree(ast, resolve, free){
             node.expression.expression.property = 'ctxValue'
             return node
         }
+        if(resolve.callingContext && node instanceof U.AST_Call && node.expression instanceof U.AST_Dot && node.expression.property === 'createComponent'){
+            return new U.AST_Call({
+                start: node.start,
+                end: node.end,
+                expression: replacementNode('JQ.callCreateComponent'),
+                args: [node.expression.expression, replacementNode(resolve.callingContext().scope)].concat(node.args),
+            })
+        }
         if(resolve.callingContext && node instanceof U.AST_Call && node.expression instanceof U.AST_Dot && node.expression.property === 'createQmlObject'){
             let context = resolve.callingContext()
             return new U.AST_Call({

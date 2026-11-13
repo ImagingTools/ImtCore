@@ -178,7 +178,10 @@ class QtObject {
     // the items first and unparents them after that)
     $releaseLater(hide = false, recursive = false){
         if(this.$f & engine.DESTROYED) return
-        engine.clearScope(this.$ownScope(), recursive)
+        // QQmlContextData::clearContext emits Component.onDestruction of the context first
+        let own = this.$ownScope()
+        if(own) emitContextDestruction(this, own)
+        engine.clearScope(own, recursive)
         if(recursive){
             for(let key in this){
                 if(key.startsWith('$s_')) engine.clearScope(this[key], true)
@@ -196,15 +199,17 @@ class QtObject {
 
     $destroyNow(){
         if(this.$f & engine.DESTROYED) return
-        // qdeclarativeelement_destructor: Component.onDestruction of the whole tree runs while its bindings still do
-        // (QQmlContextData::emitDestruction), then QQmlData::markAsDeleted stops them before any guard fires
+        // qdeclarativeelement_destructor: the context the object owns emits Component.onDestruction while its bindings
+        // still run, then QQmlData::markAsDeleted goes down the tree and stops them
         if(!(this.$f & engine.DELETING)){
-            visitTree(this, emitDestruction)
-            visitTree(this, markAsDeleted)
+            let own = this.$ownScope()
+            if(own) invalidateContext(this, own)
+            markAsDeleted(this)
         }
         // QQmlData::destroyed fires the guards before ~QObject deletes the children
         dropHolder(this)
         releaseGuards(this)
+        if(this.$idScope) releaseId(this, this.$idScope)
         if(this.$children){
             for(let i = this.$children.length - 1; i >= 0; i--) this.$children[i].$destroyNow()
         }
@@ -220,6 +225,8 @@ class QtObject {
         engine.dropConnections(this)
         if(this.$parent && !(this.$parent.$f & engine.DESTROYED)) this.$setParent(null)
         this.$f |= engine.DESTROYED
+        let creator = this.$own && (this.$own.$p || this.$cctx)
+        if(creator && creator.$made) creator.$made.delete(this)
         this.$disposeNative()
     }
 
@@ -248,23 +255,79 @@ function unguard(target, holder, slot){
     }
 }
 
-// an object, then its children from the last one, as $destroyNow goes
-function visitTree(object, fn){
+// QQmlData::markAsDeleted: the object, then its children from the last one; a context met on the way emits its
+// destruction first (setQueuedForDeletion -> deepClearContextObject)
+function markAsDeleted(object){
     let stack = [object]
     while(stack.length){
         let current = stack.pop()
-        fn(current)
+        let own = current.$ownScope()
+        if(own) invalidateContext(current, own)
+        current.$f |= engine.DELETING
         let children = current.$children
         if(children) for(let i = 0; i < children.length; i++) stack.push(children[i])
     }
 }
 
-function emitDestruction(object){
-    if(!(object.$f & engine.DELETING)) engine.emit(object, QtObject.SIGNAL_destruction)
+// QQmlContextData::emitDestruction, once per context: its objects in the reverse order of Component.onCompleted,
+// then the contexts made in it from the newest; an object belongs to the nearest context owner up its tree
+function emitContextDestruction(owner, scope){
+    if(scope.$destructed) return
+    scope.$destructed = true
+    let owners = []
+    emitOwnDestruction(owner, owners)
+    if(scope.$made) for(let made of scope.$made) owners.push(made)
+    if(owners.length > 1) owners.sort((a, b) => (b.$ownScope().$n || 0) - (a.$ownScope().$n || 0))
+    for(let i = 0; i < owners.length; i++) emitContextDestruction(owners[i], owners[i].$ownScope())
 }
 
-function markAsDeleted(object){
-    object.$f |= engine.DELETING
+// QQmlContextData::invalidate: the bindings of the context and of the contexts made in it stop, objects living elsewhere too
+function invalidateContext(owner, scope){
+    emitContextDestruction(owner, scope)
+    engine.clearScope(scope, true)
+}
+
+function emitOwnDestruction(object, owners){
+    let children = object.$children
+    if(children){
+        for(let i = 0; i < children.length; i++){
+            let child = children[i]
+            if(child.$ownScope()) owners.push(child)
+            else emitOwnDestruction(child, owners)
+        }
+    }
+    engine.emit(object, QtObject.SIGNAL_destruction)
+}
+
+// QQmlContextData id guard: the id of a destroyed object reads null; the bindings of a context living on, and of the
+// contexts below it, are evaluated again (those reading the id see the change, the others keep their values)
+function releaseId(object, scope){
+    for(let i = 1; i < scope.length; i++){
+        if(scope[i] === object) scope[i] = null
+    }
+    let root = scope[0]
+    if(!root || root.$f & (engine.DESTROYED | engine.DELETING)) return
+    let bindings = []
+    let stack = [root]
+    while(stack.length){
+        let current = stack.pop()
+        for(let binding = current.$bindings; binding; binding = binding.next){
+            for(let s = binding.scope, depth = 0; s && depth < 64; s = engine.parentScope(s), depth++){
+                if(s === scope){
+                    bindings.push(binding)
+                    break
+                }
+            }
+        }
+        let children = current.$children
+        if(children) for(let i = 0; i < children.length; i++) stack.push(children[i])
+    }
+    engine.beginUpdate()
+    try {
+        for(let binding of bindings) engine.runBinding(binding)
+    } finally {
+        engine.endUpdate()
+    }
 }
 
 // a destroyed holder lets go of the objects its var properties hold

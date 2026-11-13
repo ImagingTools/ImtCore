@@ -81,13 +81,21 @@ function checkFile(codegen, file, creation){
     // ---- phase 0: QQmlTypeLoader ---------------------------------------------------
     for(let el of file.elements){
         for(let component of el.inlineComponents || []){
-            // a document of Qt.createQmlObject has no url for the type of its inline component; the build has none yet
-            report(0, component.at, 'Type ' + component.name + ' unavailable', 'inline component ' + component.name + ' is not supported yet',
+            // a document of Qt.createQmlObject has no url for the type of its inline component
+            if(creation) report(0, component.at, 'Type ' + component.name + ' unavailable', 'inline component ' + component.name + ' is not supported in Qt.createQmlObject',
                 { line: -1, col: -1, message: 'No such file or directory' })
         }
     }
 
     // ---- phase 1: QmlIR::IRBuilder -------------------------------------------------
+    let inlineNames = new Set()
+    for(let el of file.elements){
+        for(let component of el.inlineComponents || []){
+            if(file.inlineOf) report(1, component.at, 'Nested inline components are not supported')
+            else if(inlineNames.has(component.name)) report(1, component.at, 'Inline component names must be unique per file')
+            inlineNames.add(component.name)
+        }
+    }
     for(let el of file.elements){
         if(el.id){
             let at = el.idValueAt || el.idAt

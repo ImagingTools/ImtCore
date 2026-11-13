@@ -966,8 +966,9 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
     function expect(punc) { return expect_token("punc", punc); };
 
     function can_insert_semicolon() {
+        // an object binding (`prop: Item { }`) needs no separator before the next member, as in the QML grammar
         return !exigent_mode && (
-            S.token.nlb || is("eof") || is("punc", "}")
+            S.token.nlb || is("eof") || is("punc", "}") || S.token === S.qmlblock_end
         );
     };
 
@@ -1750,6 +1751,7 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
       a.push(qmlstatement());
     }
     expect("}");
+    S.qmlblock_end = S.token;
     LE_FLAG = false
     return a;
   }
@@ -1784,6 +1786,12 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
     var info = S.token
     var type = S.token.value;
     next();
+    // a qualified type: `property Module.Type x`, `property File.InlineComponent x`
+    while (is("punc", ".") && is_token(peek(), "name")) {
+      next();
+      type += "." + S.token.value;
+      next();
+    }
 
     var subtype;
     if (is("operator", "<")) {

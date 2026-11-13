@@ -5,8 +5,9 @@ const JQ = require('../Runtime')
 const fs = require('fs')
 const path = require('path')
 const { rewriteValue, rewriteHandler, rewriteMethod, expressionText } = require('./expr')
-const { emitScript } = require('./scripts')
+const { emitScript, loadScript, isPure } = require('./scripts')
 const { checkFile } = require('./checks')
+const { inlineModel } = require('./model')
 
 const JS_GLOBALS = new Set([
     'Math', 'JSON', 'Date', 'Number', 'String', 'Boolean', 'Array', 'Object', 'RegExp', 'Error', 'TypeError', 'RangeError',
@@ -69,6 +70,23 @@ function isConstant(node){
     }
 }
 
+// the FileModels of the inline components of every file: files[url + '#' + name]; file.inlineTypes: name -> FileModel
+function expandInlineComponents(files){
+    for(let file of [...files.values()]){
+        for(let el of file.elements){
+            for(let component of el.inlineComponents || []){
+                if(!file.inlineTypes) file.inlineTypes = new Map()
+                // the first one of a name; compiler/checks.js reports the others
+                if(file.inlineTypes.has(component.name)) continue
+                let model = inlineModel(file, component)
+                model.inlineTypes = file.inlineTypes
+                file.inlineTypes.set(component.name, model)
+                files.set(file.url + '#' + component.name, model)
+            }
+        }
+    }
+}
+
 class Codegen {
     constructor(files, entry){
         this.files = files              // url -> FileModel
@@ -81,6 +99,8 @@ class Codegen {
         this.warnings = []
         this.out = []
         this.functionCount = 0
+        // inline components are types of their own; a document of Qt.createQmlObject has none (Qt cannot load them)
+        if(!files.$document) expandInlineComponents(files)
         for(let name of Object.keys(JQ.types)){
             this.types.set(name, new TypeRef(name, 'builtin', JQ.types[name], null, 'JQ.types.' + name))
         }
@@ -114,10 +134,12 @@ class Codegen {
         let refs = new Set()
         for(let file of entry ? [entry, ...files.values()] : files.values()){
             if(file.typeRef) continue
-            let ref = 'T_' + file.name
+            let ref = 'T_' + (file.inlineOf ? file.inlineOf.name + '$' : '') + file.name
             for(let n = 2; refs.has(ref); n++) ref = 'T' + n + '_' + file.name
             refs.add(ref)
             file.typeRef = new TypeRef(file.name, 'qml', null, file, ref)
+            // visible in their file only, elsewhere as File.Name
+            if(file.inlineOf) continue
             if(!this.byDir.has(file.dir)) this.byDir.set(file.dir, new Map())
             this.byDir.get(file.dir).set(file.name, file)
             if(!this.byName.has(file.name)) this.byName.set(file.name, [])
@@ -138,6 +160,18 @@ class Codegen {
             if(imp.as) file.namespaces.set(imp.as, source)
             else if(source) file.typeImports.unshift(source)
         }
+        // QQmlObjectCreator::init makes the scripts of a document with its context: its own, then those of its modules
+        let eager = [...new Set(file.scriptImports.values())]
+        let moduleScripts = this.files.$moduleScripts || new Map()
+        let keys = file.imports.map(imp => imp.isModule ? String(imp.path) : imp.dirKey ? 'dir:' + imp.dirKey : null).concat(file.dir ? ['dir:' + file.dir] : [])
+        for(let key of keys){
+            for(let fileName of key && moduleScripts.get(key) || []){
+                let ref = this.scriptRef(fileName)
+                if(!eager.includes(ref)) eager.push(ref)
+            }
+        }
+        // a pure script is made on its first use: nothing tells it from one made here
+        file.eagerScripts = eager.filter(ref => !this.pureScript(ref))
     }
 
     importedType(source, name){
@@ -156,6 +190,19 @@ class Codegen {
         return normalizeUrl(base + path.basename(key))
     }
 
+    pureScript(ref){
+        if(!this.pureRefs) this.pureRefs = new Map()
+        if(!this.pureRefs.has(ref)){
+            let fileName = [...this.scripts].find(([, r]) => r === ref)
+            let pure = false
+            try {
+                pure = !!fileName && fs.existsSync(fileName[0]) && isPure(loadScript(fileName[0]).ast, (name) => JS_GLOBALS.has(name) || name === 'Qt')
+            } catch(error) {}
+            this.pureRefs.set(ref, pure)
+        }
+        return this.pureRefs.get(ref)
+    }
+
     scriptRef(fileName){
         let key = path.normalize(fileName)
         if(!this.scripts.has(key)) this.scripts.set(key, '$js' + this.scripts.size)
@@ -170,6 +217,15 @@ class Codegen {
     // replacements win over module files of the same name), the file's imports, the last one first,
     // then its own dir, which ranks below every module import
     typeOf(name, file = null, qualifier = ''){
+        // File.Name: an inline component of a QML type
+        let dot = name.lastIndexOf('.')
+        if(dot > 0){
+            let owner = this.typeOf(name.slice(0, dot), file, qualifier)
+            let inline = owner && owner.file && !owner.file.inlineOf && owner.file.inlineTypes && owner.file.inlineTypes.get(name.slice(dot + 1))
+            if(inline) return inline.typeRef
+        }
+        // the inline components of the document come first
+        if(!qualifier && file && file.inlineTypes && file.inlineTypes.has(name)) return file.inlineTypes.get(name).typeRef
         if(qualifier){
             let source = file.namespaces.get(qualifier)
             return source && this.importedType(source, name) || this.types.get(name) || null
@@ -274,14 +330,14 @@ class Codegen {
                 }
             }
             if(name === 'Qt') return file.createsComponents || file.createsQmlObjects ? file.typeRef.ref + '$qt' : 'JQ.Qt'
-            if(file.scriptImports && file.scriptImports.has(name)) return file.scriptImports.get(name)
+            if(file.scriptImports && file.scriptImports.has(name)) return 'JQ.si(' + file.scriptImports.get(name) + ',' + this.documentScope(file, el) + ')'
             if(file.namespaces.has(name)){
                 let source = file.namespaces.get(name)
                 return 'JQ.ns(' + JSON.stringify(source && source.module || '') + ')'
             }
             let type = this.typeOf(name, file)
             if(type) return (type.kind === 'qml' ? type.file.singleton : type.Class.$singleton) ? 'JQ.singleton(' + this.use(type) + ')' : this.use(type)
-            if(this.moduleScripts.has(name)) return this.moduleScripts.get(name)
+            if(this.moduleScripts.has(name)) return 'JQ.si(' + this.moduleScripts.get(name) + ',' + this.documentScope(file, el) + ')'
             if(JS_GLOBALS.has(name)) return null
             // inside a delegate an unknown name is a model role: `text: name`
             depth = 0
@@ -292,10 +348,17 @@ class Codegen {
             return 'JQ.ctx($s,' + JSON.stringify(name) + ')'
         }
         // x.createQmlObject(...) creates in the context of the call: the file, the scope and the names of its ids
-        if(file.createsQmlObjects){
+        if(file.createsQmlObjects || file.createsComponents){
             resolve.callingContext = () => ({ qt: file.typeRef.ref + '$qt', scope: '$s', ids: this.scopeInfo(file, el.scope) })
         }
         return resolve
+    }
+
+    // the scope of the document instance from the code of el: its scripts are per document instance
+    documentScope(file, el){
+        let depth = 0
+        for(let scope = el.scope; scope && scope !== file.scopes[0]; scope = scope.parent) depth++
+        return '$s' + '.$p'.repeat(depth)
     }
 
     fn(file, el, raw, value, params, selfExpr, memberEl){
@@ -813,9 +876,10 @@ class Codegen {
     // added to its parent, so its onParentChanged sees the parent being set
     emitElement(file, el, parentVar, post){
         let v = 'e' + el.index
-        this.current.push('const ' + v + '=new ' + this.classRef(el) + '(null);')
-        if(this.isQmlType(el.typeRef)) this.current.push(v + '.$cctx=$s;')
-        if(el.slot >= 0) this.current.push('$s[' + el.slot + ']=' + v + ';')
+        // a QML type is built in this context: its document sees it from the start (its scripts are made then)
+        if(this.isQmlType(el.typeRef)) this.current.push('const ' + v + '=JQ.make(' + this.classRef(el) + ',$s);')
+        else this.current.push('const ' + v + '=new ' + this.classRef(el) + '(null);')
+        if(el.slot >= 0) this.current.push('$s[' + el.slot + ']=' + v + ';' + (el.slot > 0 ? v + '.$idScope=$s;' : ''))
         if(el.type === 'Component' && el.componentBody){
             this.current.push(v + '.$build=($parent,$ctx)=>' + this.bodyFunction(file, el.componentBody) + '($parent,$s,$ctx);')
         }
@@ -906,7 +970,7 @@ class Codegen {
         this.current = []
         let post = []
         let size = el.scope.slots
-        this.current.push('const $s=new Array(' + size + ');$s.$p=$ps;$s.$ctx=$ctx||null;' + this.scopeNames(file, el.scope))
+        this.current.push('const $s=new Array(' + size + ');$s.$p=$ps;$s.$ctx=$ctx||null;$s.$n=JQ.engine.nextScope();' + this.scopeNames(file, el.scope))
         this.emitElement(file, el, '$parent', post)
         this.current.push('e' + el.index + '.$own=$s;')
         let body = this.current.concat(post)
@@ -941,8 +1005,8 @@ class Codegen {
         } else {
             // most types of a bundle are never used: the registries hold the accessor, the class is made on the first use
             this.out.push('let ' + className + '=null;function ' + className + '$(){return ' + className + '||' + className + '$init()}' + className + '$.$lazy=true;')
-            this.out.push('JQ.files[' + url + ']=' + className + '$;')
-            if(file.module) this.out.push('JQ.qmlModule(' + JSON.stringify(file.module) + ')[' + JSON.stringify(file.name) + ']=' + className + '$;')
+            if(!file.inlineOf) this.out.push('JQ.files[' + url + ']=' + className + '$;')
+            if(file.module && !file.inlineOf) this.out.push('JQ.qmlModule(' + JSON.stringify(file.module) + ')[' + JSON.stringify(file.name) + ']=' + className + '$;')
         }
         let start = this.out.length
         this.emitClass(file, root, className, true)
@@ -952,7 +1016,8 @@ class Codegen {
 
         this.current = []
         let post = []
-        this.current.push('const $s=new Array(' + root.scope.slots + ');$s[0]=$root;' + (document ? '$s.$p=JQ.Qt.$qmlCaller;' : '') + this.scopeNames(file, root.scope))
+        this.current.push('const $s=new Array(' + root.scope.slots + ');$s[0]=$root;$root.$own=$s;$s.$n=JQ.engine.nextScope();' + (document ? '$s.$p=JQ.Qt.$qmlCaller;' : '') + this.scopeNames(file, root.scope))
+        if(file.eagerScripts && file.eagerScripts.length) this.current.push('JQ.inContext($root);JQ.sis($s,[' + file.eagerScripts.join(',') + ']);')
         this.applyMembers(file, root, '$root', post)
         this.emitChildren(file, root, '$root', post, this.use(root.typeRef))
         let body = this.current.concat(post)
@@ -967,9 +1032,25 @@ class Codegen {
         for(let file of this.files.values()) this.expandElementValues(file)
         for(let file of this.files.values()) this.prepareConnections(file)
         for(let file of this.files.values()) checkFile(this, file, false)
+        // a script may import scripts: the map grows while it is emitted
+        let scriptEnv = {
+            isGlobal: (name) => JS_GLOBALS.has(name) || name === 'Qt',
+            importRef: (imp, fileName) => {
+                if(imp.file){
+                    let target = path.resolve(path.dirname(fileName), imp.target)
+                    if(!this.scriptUrls.has(path.normalize(target))) this.scriptUrls.set(path.normalize(target), normalizeUrl(this.scriptUrl(fileName).replace(/[^/]*$/, '') + imp.target))
+                    return this.scriptRef(target)
+                }
+                return 'JQ.ns(' + JSON.stringify(this.modules.has(imp.target) ? imp.target : '') + ')'
+            },
+        }
         for(let [fileName, ref] of this.scripts){
-            if(fs.existsSync(fileName)) this.out.push(emitScript(ref, fileName, this.scriptUrl(fileName)))
-            else this.out.push('const ' + ref + '={};')
+            if(fs.existsSync(fileName)) this.out.push(emitScript(ref, fileName, this.scriptUrl(fileName), scriptEnv))
+            else this.out.push('const ' + ref + '=JQ.script("",true,()=>({}),()=>[]);')
+        }
+        // the scripts of the modules, for the documents of Qt.createQmlObject
+        for(let [key, fileNames] of this.files.$moduleScripts || []){
+            if(!key.startsWith('dir:')) this.out.push('JQ.moduleScripts[' + JSON.stringify(key) + ']=[' + fileNames.map(f => this.scriptRef(f)).join(',') + '];')
         }
         for(let file of this.files.values()) this.emitFile(file)
         return this.sharedFunctions(this.out.join('\n'))

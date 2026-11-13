@@ -31,6 +31,7 @@ class RuntimeCodegen extends Codegen {
     constructor(file, env){
         let files = new Map([[file.url, file]])
         files.$modules = new Map()
+        files.$document = true
         file.$env = env
         file.$errors = []
         super(files, file)
@@ -78,6 +79,12 @@ class RuntimeCodegen extends Codegen {
             }
             if(imp.as) file.namespaces.set(imp.as, source)
             else if(source) file.typeImports.unshift(source)
+        }
+        // the scripts of the document, then those of its modules (compiler/codegen.js resolveImports)
+        file.eagerScripts = [...new Set(file.scriptImports.values())]
+        for(let imp of file.imports){
+            let target = String(imp.path || '')
+            if(imp.isModule && Object.prototype.hasOwnProperty.call(env.modules, target)) file.eagerScripts.push('JQ.moduleScripts[' + JSON.stringify(target) + ']||[]')
         }
     }
 
