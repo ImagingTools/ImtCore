@@ -6,6 +6,7 @@
 #include <istd/CChangeNotifier.h>
 #include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
+#include <iser/CPrimitiveTypesSerializer.h>
 
 
 namespace imtmail
@@ -78,6 +79,20 @@ void CSmtpMessage::SetBody(const QString& body)
 }
 
 
+ISmtpMessage::Attachments CSmtpMessage::GetAttachments() const
+{
+	return m_attachments;
+}
+
+
+void CSmtpMessage::AddAttachment(const QString& fileName, const QByteArray& data)
+{
+	istd::CChangeNotifier changeNotifier(this);
+
+	m_attachments.append(Attachment{fileName, data});
+}
+
+
 // reimplemented (iser::ISerializable)
 
 bool CSmtpMessage::Serialize(iser::IArchive& archive)
@@ -104,6 +119,13 @@ bool CSmtpMessage::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_body);
 	retVal = retVal && archive.EndTag(bodyTag);
 
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeObjectContainer(
+				archive,
+				m_attachments,
+				QByteArrayLiteral("Attachments"),
+				QByteArrayLiteral("Attachment")
+	);
+
 	return retVal;
 }
 
@@ -120,6 +142,7 @@ bool CSmtpMessage::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*
 		m_from = sourcePtr->m_from;
 		m_subject = sourcePtr->m_subject;
 		m_body = sourcePtr->m_body;
+		m_attachments = sourcePtr->m_attachments;
 
 		return true;
 	}
@@ -137,6 +160,7 @@ bool CSmtpMessage::IsEqual(const IChangeable& object) const
 		retVal = retVal && m_from == sourcePtr->m_from;
 		retVal = retVal && m_subject == sourcePtr->m_subject;
 		retVal = retVal && m_body == sourcePtr->m_body;
+		retVal = retVal && m_attachments == sourcePtr->m_attachments;
 
 		return retVal;
 	}
@@ -162,9 +186,11 @@ bool CSmtpMessage::ResetData(CompatibilityMode /*mode*/)
 	m_from.clear();
 	m_subject.clear();
 	m_body.clear();
+	m_attachments.clear();
 
 	return true;
 }
 
 
 } // namespace imtmail
+

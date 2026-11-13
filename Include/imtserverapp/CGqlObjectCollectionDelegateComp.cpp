@@ -770,12 +770,29 @@ template<class Arguments,class SdlRequest>
 istd::TUniqueInterfacePtr<imtgql::IGqlRequest> CGqlObjectCollectionDelegateComp::CreateGqlRequest(Arguments arguments) const
 {
 	imtgql::CGqlRequest* requestPtr = new imtgql::CGqlRequest();
+
+	imtgql::IGqlContextUniquePtr contextPtr;
 	imtgql::IGqlContext* gqlContextPtr = imtgql::CGqlRequestContextManager::GetContext();
 	if (gqlContextPtr != nullptr){
 		istd::IChangeableUniquePtr clonedPtr = gqlContextPtr->CloneMe();
-		imtgql::IGqlContextUniquePtr castedPtr;
-		castedPtr.MoveCastedPtr(std::move(clonedPtr));
-		requestPtr->SetGqlContext(imtgql::IGqlContextSharedPtr::CreateFromUnique(std::move(castedPtr)));
+		contextPtr.MoveCastedPtr(std::move(clonedPtr));
+	}
+
+	/**
+		A request without the token of a caller, such as one of a background task or of an anonymous caller, is sent with
+		the token of the server. The token of a caller is kept, so the caller gets no rights of the server.
+	*/
+	const QByteArray accessToken = m_accessTokenParamCompPtr.IsValid() ? m_accessTokenParamCompPtr->GetId() : QByteArray();
+	if (!accessToken.isEmpty() && (!contextPtr.IsValid() || contextPtr->GetToken().isEmpty())){
+		if (!contextPtr.IsValid()){
+			contextPtr.SetPtr(new imtgql::CGqlContext());
+		}
+
+		contextPtr->SetToken(accessToken);
+	}
+
+	if (contextPtr.IsValid()){
+		requestPtr->SetGqlContext(imtgql::IGqlContextSharedPtr::CreateFromUnique(std::move(contextPtr)));
 	}
 
 	if (!SdlRequest::SetupGqlRequest(*requestPtr, arguments)){

@@ -24,6 +24,8 @@ public:
 		I_REGISTER_INTERFACE(IUserVerificationCodeSender);
 		I_ASSIGN(m_smtpClientCompPtr, "SmtpClient", "SMTP client", false, "SmtpClient");
 		I_ASSIGN(m_smtpMessageCreatorCompPtr, "SmtpMessageCreator", "SMTP message creator", false, "SmtpMessageCreator");
+		I_ASSIGN(m_subjectAttrPtr, "Subject", "Subject of the letter", true, "Imaging Tools: Password Recovery");
+		I_ASSIGN(m_bodyTemplateAttrPtr, "BodyTemplate", "Text of the letter, %1 is the account name and %2 is the code", true, "Your code to restore access to the '%1' account : %2");
 	I_END_COMPONENT;
 
 	// reimplemented (imtauth::IUserVerificationCodeSender)
@@ -32,6 +34,8 @@ public:
 protected:
 	I_REF(imtmail::ISmtpClient, m_smtpClientCompPtr);
 	I_REF(imtmail::ISmtpMessageCreator, m_smtpMessageCreatorCompPtr);
+	I_TEXTATTR(m_subjectAttrPtr);
+	I_TEXTATTR(m_bodyTemplateAttrPtr);
 };
 
 
