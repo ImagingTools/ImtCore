@@ -28,6 +28,12 @@ public:
 		Get the manager of the tokens this server issued for other servers.
 	*/
 	virtual imtauth::IPersonalAccessTokenManager* GetTokenManager() const = 0;
+
+	/**
+		Whether the servers of other products need their tokens now. Disabled, their requests are taken as before server tokens:
+		the product is the one the request names, and no token of a server is accepted.
+	*/
+	virtual bool IsEnabled() const = 0;
 };
 
 

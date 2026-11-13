@@ -193,10 +193,9 @@ void CAuthorizationServerProductInfoComp::OnComponentCreated()
 		// The product filled its tree before the event loop: a tree served earlier misses it
 		Invalidate();
 
-		// Without a token the authorization server gives nothing; the credential provider has reported that
-		if (m_serverCredentialCompPtr.IsValid() && m_serverCredentialCompPtr->GetServerToken().isEmpty()){
-			return;
-		}
+		// Without a token only an authorization server that takes products without tokens gives its permissions, and takes none
+		m_isPublishNeeded = m_serverCredentialCompPtr.IsValid() && !m_serverCredentialCompPtr->GetServerToken().isEmpty();
+		m_isPublishEnabled = m_isPublishNeeded;
 
 		m_threadPtr = QThread::create([this](){ Run(); });
 		m_threadPtr->setObjectName(QStringLiteral("AuthorizationServerPermissions"));
@@ -238,7 +237,7 @@ void CAuthorizationServerProductInfoComp::OnUpdate(const istd::IChangeable::Chan
 	}
 
 	QMutexLocker locker(&m_runMutex);
-	m_isPublishNeeded = true;
+	m_isPublishNeeded = m_isPublishEnabled;
 	m_isFetchNeeded = true;
 	m_isReconnected = true;
 	m_runCondition.wakeAll();

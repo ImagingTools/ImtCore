@@ -22,4 +22,10 @@ imtauth::IPersonalAccessTokenManager* CServerTokenReceiverComp::GetTokenManager(
 }
 
 
+bool CServerTokenReceiverComp::IsEnabled() const
+{
+	return !m_enabledParamCompPtr.IsValid() || m_enabledParamCompPtr->IsEnabled();
+}
+
+
 } // namespace imtservergql

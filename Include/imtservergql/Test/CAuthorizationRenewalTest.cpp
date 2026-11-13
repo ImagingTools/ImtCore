@@ -575,6 +575,7 @@ public:
 
 	QByteArray GetServerProductId() const override { return "Receiver"; }
 	imtauth::IPersonalAccessTokenManager* GetTokenManager() const override { return managerPtr; }
+	bool IsEnabled() const override { return true; }
 };
 
 

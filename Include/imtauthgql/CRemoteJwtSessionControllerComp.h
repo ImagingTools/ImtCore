@@ -9,6 +9,7 @@
 #include <imtauth/IJwtSessionController.h>
 #include <imtauth/ISessionAuthorizationProvider.h>
 #include <imtauth/IUserInfo.h>
+#include <imtclientgql/IServerCredentialProvider.h>
 #include <imtclientgql/TClientRequestManagerCompWrap.h>
 
 
@@ -29,9 +30,11 @@ public:
 		I_REGISTER_INTERFACE(imtauth::ISessionAuthorizationProvider);
 		I_ASSIGN(m_sessionFactCompPtr, "SessionFactory", "Factory used for creation of the new session", false, "SessionFactory");
 		I_ASSIGN(m_userFactCompPtr, "UserFactory", "Creates the computed user returned by session authorization", false, "UserFactory");
+		I_ASSIGN(m_serverCredentialCompPtr, "ServerCredentialProvider", "Token of this server at the authorization server: without one the sessions are not authorized there", false, "ServerCredentialProvider");
 	I_END_COMPONENT;
 
 	// reimplemented (imtauth::ISessionAuthorizationProvider)
+	virtual bool IsAvailable() const override;
 	virtual SessionAuthorization GetSessionAuthorization(
 				const QByteArray& accessToken,
 				const QByteArray& productId,
@@ -52,6 +55,7 @@ protected:
 protected:
 	I_FACT(imtauth::ISession, m_sessionFactCompPtr);
 	I_FACT(imtauth::IUserInfo, m_userFactCompPtr);
+	I_REF(imtclientgql::IServerCredentialProvider, m_serverCredentialCompPtr);
 };
 
 

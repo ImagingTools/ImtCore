@@ -651,6 +651,11 @@ bool CWebSocketServletComp::IsSubscriberAllowed(
 		return false;
 	}
 
+	// The servers of products without tokens subscribe as anonymous and as their users, as before server tokens
+	if (m_serverTokenReceiverCompPtr.IsValid() && !m_serverTokenReceiverCompPtr->IsEnabled()){
+		return true;
+	}
+
 	// A server acting on its own is a user holding the permissions of its token
 	const imtauth::IUserInfo* userInfoPtr = contextPtr->GetUserInfo();
 	if (userInfoPtr == nullptr){

@@ -8,6 +8,7 @@
 #include <QtNetwork/QNetworkReply>
 
 // ImtCore includes
+#include <imtclientgql/imtclientgql.h>
 #include <imtcom/CRequestSender.h>
 #include <imtgql/CGqlResponse.h>
 
@@ -68,7 +69,7 @@ IGqlClient::GqlResult CApiClientComp::SendRequest(GqlRequestPtr requestPtr, imtb
 									: isTimeout ? EC_TIMEOUT : EC_NETWORK;
 						category = istd::IInformationProvider::IC_ERROR;
 						message = "Response for request-ID " + uuid + "\n" + replyPtr->errorString();
-						retVal.errorMessage = message;
+						retVal.errorMessage = GetReplyErrorMessage(*replyPtr, replyPtr->readAll());
 					}
 				}
 				else{

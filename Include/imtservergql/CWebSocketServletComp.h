@@ -52,7 +52,7 @@ public:
 		I_ASSIGN(m_isAnonymousDeniedAttrPtr, "DenyAnonymousSubscriptions", "Only channels declared open take a subscriber who has not logged in. For a server with authorization", true, false);
 		I_ASSIGN(m_isUndeclaredUserChannelDeniedAttrPtr, "DenyUndeclaredUserSubscriptions", "A user subscribes only to channels that declare who reads them", true, false);
 		I_ASSIGN_MULTI_0(m_accessModelsCompPtr, "AccessModels", "Models whose changes may change the access of subscriptions: the subscriptions with credentials are checked again. Only models a check does not change", false);
-		I_ASSIGN(m_serverTokenReceiverCompPtr, "ServerTokenReceiver", "Server tokens issued by this server: a change of one checks the subscriptions again", false, "ServerTokenReceiver");
+		I_ASSIGN(m_serverTokenReceiverCompPtr, "ServerTokenReceiver", "Server tokens issued by this server: a change of one checks the subscriptions again. While they are disabled, no subscription is denied for its kind", false, "ServerTokenReceiver");
 		I_ASSIGN(m_maxCheckIntervalAttrPtr, "MaxCheckInterval", "Seconds after which the access of a subscription with credentials is checked again without a change; a change without an event is found this late", true, 300);
 		I_ASSIGN(m_gracePeriodAttrPtr, "GracePeriod", "Seconds a subscription waits for its access to be confirmed once a check could not confirm it; then it is closed as temporarily unavailable", true, 60);
 	I_END_COMPONENT

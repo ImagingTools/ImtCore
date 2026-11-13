@@ -76,6 +76,14 @@ QJsonObject CGqlRemoteRepresentationControllerComp::CreateInternalResponse(
 		if (requestResult){
 			return CreateJsonObjectFromResponse(gqlRequest.GetCommandId(), *responsePtr);
 		}
+
+		// The remote server tells why it failed the request
+		if (!requestResult.errorMessage.isEmpty()){
+			errorMessage = requestResult.errorMessage;
+			SendErrorMessage(0, errorMessage, "CGqlRemoteRepresentationControllerComp");
+
+			return QJsonObject();
+		}
 	}
 
 	errorMessage = QStringLiteral("Failed to create a network request to a remote server").toUtf8();

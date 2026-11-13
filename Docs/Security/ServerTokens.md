@@ -416,6 +416,29 @@ The calling product reads the token from `IMT_<RECEIVER>_SERVER_CREDENTIAL`
 (`imtclientgql::GetServerCredentialVariableName`) once at the start, removes the variable so that the processes it starts
 do not inherit it, and sends the token with every request to the receiver.
 
+## Working without server tokens
+
+A receiver can take the servers of products without tokens, as before server tokens. Its `EnabledParam` (`iprm::IEnableableParam`)
+decides; without the parameter tokens are always needed. Puma and Lisa keep it in their settings, `Server Tokens / Enable server tokens`,
+off by default; their test servers turn it on (`ServerTokensEnabled` of `PumaServerBase`, `DefaultServerTokensEnabled` of `LisaServerBase`).
+The setting is read on every request, so a change works at once.
+
+While it is off, the receiver:
+
+- takes the product a request names in `productid`, and accepts no token of a server: the header `x-server-token` is ignored, a server token in place of a user token is refused;
+- neither binds a session to the server it was opened through nor refuses another product;
+- denies no subscription for its kind (`DenyAnonymousSubscriptions`, `DenyUndeclaredUserSubscriptions`), and a channel with `ReadPermissions`
+  takes a subscriber who has not signed in when it is given the receiver (`ServerTokenReceiver` of `CGqlPublisherCompBase`): the cached
+  collections of a product server subscribe so;
+- gives its permission tree (`GetServerTokenFeatures`) to any caller, so the roles of a product still hold the `Administration` permissions;
+- keeps issuing and managing tokens, so they can be prepared before the setting is turned on.
+
+A product server without its token (`IMT_<RECEIVER>_SERVER_CREDENTIAL` not set) works the same way on its side:
+it reads its users, roles and groups at the authorization server with the tokens of the users instead of asking for the authorization
+of the session (`ISessionAuthorizationProvider::IsAvailable`), fetches the permission tree there but publishes none, and sends no notifications.
+A product without a token works only with a receiver that has the setting off. A product with a token and a receiver with the setting off
+fail to sign in: the receiver ignores the token and refuses to authorize a session for anybody but a server.
+
 ## Where a session may be used
 
 A session opened through the server of a product (the sign-in, a tenant session, a refresh) names that product in the claim

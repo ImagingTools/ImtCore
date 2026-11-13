@@ -323,8 +323,9 @@ sdl::V1_0::imtauth::CServerFeatureList CServerTokenControllerComp::OnGetServerTo
 
 	// The tree goes to the roles of a connected product; what reaches this server is bound by the token of the product
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
-	if (gqlContextPtr == nullptr || gqlContextPtr->GetServerProductId().isEmpty()){
-		errorMessage = QStringLiteral("The permissions of this server are given to the servers of products");
+	const bool isTokenless = m_receiverCompPtr.IsValid() && !m_receiverCompPtr->IsEnabled();
+	if (gqlContextPtr == nullptr || (gqlContextPtr->GetServerProductId().isEmpty() && !isTokenless)){
+		errorMessage = QStringLiteral("The permissions of %1 are given only to a product server with a valid server token").arg(QString::fromUtf8(GetOwnProductId()));
 
 		return response;
 	}

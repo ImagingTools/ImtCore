@@ -34,6 +34,7 @@ namespace imtauthgql
 	At the start and after each reconnection this server publishes its own tree there, untranslated, and fetches the
 	permissions of the authorization server; a failed step is repeated. A fetched tree replaces the served one when it
 	changes, and every tree is kept until the end: a request may still read the one it got.
+	A server without a token only fetches: an authorization server that takes products without tokens gives its permissions to it.
 */
 class CAuthorizationServerProductInfoComp:
 			public QObject,
@@ -49,7 +50,7 @@ public:
 		I_REGISTER_INTERFACE(iprm::INameParam);
 		I_REGISTER_INTERFACE(iser::ISerializable);
 		I_ASSIGN(m_productInfoCompPtr, "ProductInfo", "Permission tree of this product", true, "ProductInfo");
-		I_ASSIGN(m_serverCredentialCompPtr, "ServerCredentialProvider", "Token of this server: without it nothing is fetched", false, "ServerCredentialProvider");
+		I_ASSIGN(m_serverCredentialCompPtr, "ServerCredentialProvider", "Token of this server: without it the tree of the product is not published", false, "ServerCredentialProvider");
 		I_ASSIGN(m_connectionStatusModelCompPtr, "ConnectionStatus", "Connection to the authorization server: a reconnection publishes and fetches again", false, "ConnectionStatus");
 		I_ASSIGN(m_applicationInfoCompPtr, "ApplicationInfo", "Version of the product, published with its tree", false, "ApplicationInfo");
 	I_END_COMPONENT;
@@ -116,6 +117,8 @@ private:
 	QWaitCondition m_runCondition;
 	bool m_isStopping = false;
 	bool m_isPublishNeeded = true;
+	// Only with a token: an authorization server takes a tree from the servers of products only
+	bool m_isPublishEnabled = true;
 	bool m_isFetchNeeded = true;
 	bool m_isReconnected = false;
 };

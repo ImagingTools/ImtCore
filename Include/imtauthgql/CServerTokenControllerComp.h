@@ -12,6 +12,7 @@
 #include <imtlic/CProductInfo.h>
 #include <imtlic/IProductInfo.h>
 #include <imtsdl/TElementList.h>
+#include <imtservergql/IServerTokenReceiver.h>
 
 // Generated includes
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/ServerTokens_fwd.h>
@@ -37,6 +38,7 @@ public:
 		I_ASSIGN(m_tokenManagerCompPtr, "PersonalAccessTokenManager", "Personal access token manager", true, "PersonalAccessTokenManager");
 		I_ASSIGN(m_clientProductCatalogCompPtr, "ClientProductCatalog", "Products whose servers may be given a token of this server", true, "ClientProductCatalog");
 		I_ASSIGN(m_permissionTreeCompPtr, "PermissionTree", "Permissions of this server, given to the roles of the products", true, "PermissionTree");
+		I_ASSIGN(m_receiverCompPtr, "ServerTokenReceiver", "While it takes the servers of products without tokens, the permissions of this server are given without a token too", false, "ServerTokenReceiver");
 	I_END_COMPONENT;
 
 protected:
@@ -118,6 +120,7 @@ private:
 	I_REF(imtauth::IPersonalAccessTokenManager, m_tokenManagerCompPtr);
 	I_REF(imtauth::IClientProductCatalog, m_clientProductCatalogCompPtr);
 	I_REF(imtlic::IProductInfo, m_permissionTreeCompPtr);
+	I_REF(imtservergql::IServerTokenReceiver, m_receiverCompPtr);
 };
 
 

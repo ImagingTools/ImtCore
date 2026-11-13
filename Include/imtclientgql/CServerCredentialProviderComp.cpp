@@ -50,8 +50,8 @@ void CServerCredentialProviderComp::OnComponentCreated()
 		m_token = s_tokensOfVariables.value(variableName);
 	}
 	if (m_token.isEmpty()){
-		SendErrorMessage(0, QStringLiteral("The environment variable '%1' is not set: this server has no token, it publishes no permissions and sends no notifications")
-					.arg(QString::fromUtf8(variableName)),
+		SendErrorMessage(0, QStringLiteral("The environment variable '%1' is not set: this server has no token for %2. It works only while %2 takes servers without tokens, and publishes no permissions and sends no notifications there")
+					.arg(QString::fromUtf8(variableName), QString::fromUtf8(*m_serverProductIdAttrPtr)),
 					"CServerCredentialProviderComp");
 	}
 }

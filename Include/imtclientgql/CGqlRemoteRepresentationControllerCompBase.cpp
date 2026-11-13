@@ -56,7 +56,9 @@ QJsonObject CGqlRemoteRepresentationControllerCompBase::CreateInternalResponse(c
 			return CreateJsonObjectFromResponse(gqlRequest.GetCommandId(), *responsePtr);
 		}
 
-		errorMessage = QStringLiteral("Command could not be processed by the remote server: '%1'").arg(requestPtr->GetCommandId());
+		errorMessage = requestResult.errorMessage.isEmpty()
+					? QStringLiteral("Command could not be processed by the remote server: '%1'").arg(requestPtr->GetCommandId())
+					: requestResult.errorMessage;
 	}
 
 	return QJsonObject();

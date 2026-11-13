@@ -324,6 +324,12 @@ private:
 	imtgql::IGqlContextUniquePtr CreateContextInstance() const;
 	bool IsPatToken(const QByteArray& token) const;
 
+	/// The receiver of the servers of products while they need their tokens; null otherwise.
+	const IServerTokenReceiver* GetServerTokenReceiver() const;
+
+	/// Whether the authorization server computes the users of the sessions: a product server with its own token there.
+	bool IsComputedBySource() const;
+
 	/**
 		Tell whether a user outside of any organization sees the organizations: a member of one or a user with a pending invitation.
 		\param isRead Cleared when the memberships or the invitations could not be read: a refusal then says nothing.

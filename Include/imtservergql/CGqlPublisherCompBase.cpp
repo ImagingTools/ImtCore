@@ -58,7 +58,8 @@ bool CGqlPublisherCompBase::RegisterSubscription(
 	if (m_readPermissionsAttrPtr.GetCount() > 0){
 		const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
 		const imtauth::IUserInfo* userInfoPtr = contextPtr != nullptr ? contextPtr->GetUserInfo() : nullptr;
-		bool isAllowed = false;
+		// The servers of products without tokens subscribe without signing in
+		bool isAllowed = userInfoPtr == nullptr && m_serverTokenReceiverCompPtr.IsValid() && !m_serverTokenReceiverCompPtr->IsEnabled();
 		if (userInfoPtr != nullptr){
 			isAllowed = userInfoPtr->IsAdmin();
 			const QByteArrayList heldPermissions = GetUserPermissions(*contextPtr) + contextPtr->GetOrganizationPermissions();

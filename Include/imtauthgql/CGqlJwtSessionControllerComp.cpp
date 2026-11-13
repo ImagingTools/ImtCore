@@ -41,6 +41,12 @@ bool IsSessionOfRequest(const imtauth::ISession& session, const imtgql::CGqlRequ
 
 // reimplemented (imtauth::ISessionAuthorizationProvider)
 
+bool CGqlJwtSessionControllerComp::IsAvailable() const
+{
+	return true;
+}
+
+
 imtauth::ISessionAuthorizationProvider::SessionAuthorization CGqlJwtSessionControllerComp::GetSessionAuthorization(
 			const QByteArray& accessToken,
 			const QByteArray& productId,

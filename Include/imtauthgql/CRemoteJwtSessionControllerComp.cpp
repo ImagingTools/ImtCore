@@ -50,6 +50,12 @@ void AttachCurrentContext(imtgql::CGqlRequest& gqlRequest)
 
 // reimplemented (imtauth::ISessionAuthorizationProvider)
 
+bool CRemoteJwtSessionControllerComp::IsAvailable() const
+{
+	return !m_serverCredentialCompPtr.IsValid() || !m_serverCredentialCompPtr->GetServerToken().isEmpty();
+}
+
+
 imtauth::ISessionAuthorizationProvider::SessionAuthorization CRemoteJwtSessionControllerComp::GetSessionAuthorization(
 			const QByteArray& accessToken,
 			const QByteArray& productId,

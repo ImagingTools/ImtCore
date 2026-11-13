@@ -17,6 +17,7 @@
 #include <memory>
 
 // ImtCore includes
+#include <imtclientgql/imtclientgql.h>
 #include <imtgql/CGqlResponse.h>
 
 
@@ -176,7 +177,7 @@ void CAsyncApiClientComp::SendRequestInternal(
 			SendErrorMessage(0, message);
 			const int httpStatus = replyPtr->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
 			const ErrorCategory errorCategory = (httpStatus == 401 || httpStatus == 403) ? EC_ACCESS_DENIED : EC_NETWORK;
-			promisePtr->addResult(GqlResult{GqlResponsePtr(), errorCategory, replyPtr->errorString()});
+			promisePtr->addResult(GqlResult{GqlResponsePtr(), errorCategory, GetReplyErrorMessage(*replyPtr, replyPtr->readAll())});
 			promisePtr->finish();
 		}
 

@@ -61,6 +61,12 @@ public:
 	};
 
 	/**
+		Whether the sessions are authorized here. A product server without its token at the authorization server is not:
+		it reads its users there with the tokens of the users, as before server tokens.
+	*/
+	virtual bool IsAvailable() const = 0;
+
+	/**
 		Get the authorization of the session of an access token.
 		\param productId					The product of the server asking.
 		\param isEstablishedSubscription	An expired access token holds while its session lives; every other use refuses it.

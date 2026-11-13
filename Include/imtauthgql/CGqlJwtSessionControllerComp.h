@@ -46,6 +46,7 @@ public:
 	I_END_COMPONENT;
 
 	// reimplemented (imtauth::ISessionAuthorizationProvider)
+	virtual bool IsAvailable() const override;
 	virtual SessionAuthorization GetSessionAuthorization(
 				const QByteArray& accessToken,
 				const QByteArray& productId,
