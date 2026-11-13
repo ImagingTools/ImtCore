@@ -6618,6 +6618,11 @@ export class TreeItemModel extends Item {
 		return this.containsKey(key, index) && this.$rows[index][key] !== undefined && this.$rows[index][key] !== null;
 	}
 
+	// True if the value of the key is a nested model (a record or an array is one, getTreeItemModel wraps it), as in the C++ model.
+	isTreeModel(key, index = 0) {
+		return this.getTreeItemModel(key, index) !== null;
+	}
+
 	copyMe() {
 		const model = new TreeItemModel();
 		model.copy(this);
