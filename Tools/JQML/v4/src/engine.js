@@ -1846,7 +1846,7 @@ export class Engine {
 			handler.hasLast = true;
 			handler.last = value;
 			// An object (a Component, a model...) bound from the outside is a change from the null default.
-			if (typeof value === 'object' && value !== null) this.runNotified(handler);
+			if (typeof value === 'object' && value !== null && handler.property !== 'children') this.runNotified(handler);
 		} else if (value !== handler.last && (value === value || handler.last === handler.last)) {
 			handler.last = value;
 			this.runNotified(handler);
@@ -2970,7 +2970,8 @@ export class Engine {
 					initial = undefined;
 				}
 				const lateAlias = initial === undefined && item.$aliases !== undefined && item.$aliases.has(property);
-				this.addChangeHandler({ item, property, name, fn, line: prop.line, file: scope.file, last: initial, hasLast: !lateAlias, failed: false });
+				// The children that the item is made with are not a change: Qt tells of the ones that come or go afterwards.
+				this.addChangeHandler({ item, property, name, fn, line: prop.line, file: scope.file, last: initial, hasLast: !lateAlias && property !== 'children', failed: false });
 			} else {
 				this.noteIgnored(item, [name]);
 			}

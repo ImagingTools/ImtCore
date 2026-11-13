@@ -1747,7 +1747,14 @@ defineProp(
 	Item.prototype,
 	'children',
 	function () {
-		return this.$children.some((child) => child.$nonVisual) ? this.$children.filter((child) => !child.$nonVisual) : this.$children;
+		if (!this.$children.some((child) => child.$nonVisual)) return this.$children;
+		// The list without the non-visual children (a Timer) is the same list while the children are the same: `onChildrenChanged` is
+		// polled by comparing what `children` gives, and a new list on every read made it run on every pass.
+		const list = this.$children.filter((child) => !child.$nonVisual);
+		const last = this.$visibleChildren;
+		if (last !== undefined && last.length === list.length && last.every((child, i) => child === list[i])) return last;
+		this.$visibleChildren = list;
+		return list;
 	},
 	function (list) {
 		const items = Array.from(list || []).filter((item) => item instanceof Item && item !== this);
