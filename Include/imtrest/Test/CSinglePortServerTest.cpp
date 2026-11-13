@@ -421,8 +421,6 @@ void CSinglePortServerTest::SecureWebSocketOnSinglePortTest()
 
 void CSinglePortServerTest::TwoPortModeTest()
 {
-	QSKIP("CWebSocketServerComp crashes when it is destroyed, see https://github.com/ImagingTools/ImtCore/issues/1120");
-
 	CTestServers servers(false);
 
 	QByteArray response = SendHttpGet(servers.GetHttpPort());

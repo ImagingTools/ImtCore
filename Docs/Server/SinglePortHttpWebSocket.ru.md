@@ -77,6 +77,6 @@ HTTP-сервера, а `QWebSocketServer` получает уже готовы�
 
 - `CSinglePortServerTest`: HTTP на порту в режиме одного порта, подписка по WS на порту HTTP, обрыв соединения
   без закрывающего кадра, `ListenWebSocketPort=false`, WSS и HTTPS на одном порту (`SecureWebSocketOnSinglePortTest`,
-  сертификат `SinglePortTestCertificate.h`). `TwoPortModeTest` пропускается до исправления
-  [#1120](https://github.com/ImagingTools/ImtCore/issues/1120) (падение при разрушении `CWebSocketServerComp`).
+  сертификат `SinglePortTestCertificate.h`), режим двух портов (`TwoPortModeTest`, в нём `CWebSocketServerComp`
+  действительно разрушается, см. [#1120](https://github.com/ImagingTools/ImtCore/issues/1120)).
 - `CHttpRequestTest::WebSocketUpgradeRequestedTest`: распознавание upgrade-запроса.
