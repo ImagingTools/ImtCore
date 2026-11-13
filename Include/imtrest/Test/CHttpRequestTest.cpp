@@ -749,6 +749,36 @@ void CHttpRequestTest::ResponseBodyOmittedTest()
 }
 
 
+void CHttpRequestTest::WebSocketUpgradeRequestedTest_data()
+{
+	QTest::addColumn<QByteArray>("request");
+	QTest::addColumn<bool>("isUpgrade");
+
+	// RFC 6455, section 4.1: GET with Upgrade: websocket and Connection: upgrade
+	QTest::newRow("handshake") << QByteArray("GET /ws HTTP/1.1\r\nHost: a\r\nUpgrade: websocket\r\nConnection: Upgrade\r\n\r\n") << true;
+	QTest::newRow("case and lists") << QByteArray("GET /ws HTTP/1.1\r\nHost: a\r\nUpgrade: h2c, WebSocket\r\nConnection: keep-alive, upgrade\r\n\r\n") << true;
+	QTest::newRow("no Connection: upgrade") << QByteArray("GET /ws HTTP/1.1\r\nHost: a\r\nUpgrade: websocket\r\n\r\n") << false;
+	QTest::newRow("other protocol") << QByteArray("GET /ws HTTP/1.1\r\nHost: a\r\nUpgrade: h2c\r\nConnection: upgrade\r\n\r\n") << false;
+	QTest::newRow("POST") << QByteArray("POST /ws HTTP/1.1\r\nHost: a\r\nUpgrade: websocket\r\nConnection: upgrade\r\nContent-Length: 0\r\n\r\n") << false;
+	QTest::newRow("plain GET") << QByteArray("GET /ws HTTP/1.1\r\nHost: a\r\n\r\n") << false;
+}
+
+
+void CHttpRequestTest::WebSocketUpgradeRequestedTest()
+{
+	QFETCH(QByteArray, request);
+	QFETCH(bool, isUpgrade);
+
+	CRequestServletStub servlet;
+	CProtocolEngineStub engine;
+	imtrest::CHttpRequest httpRequest(servlet, engine);
+
+	QVERIFY(httpRequest.ExecuteHttpParser(request, nullptr));
+
+	QCOMPARE(httpRequest.IsWebSocketUpgradeRequested(), isUpgrade);
+}
+
+
 void CHttpRequestTest::TcpRequestIsPersistentTest()
 {
 	CRequestServletStub servlet;

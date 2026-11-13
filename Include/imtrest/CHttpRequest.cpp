@@ -214,6 +214,24 @@ void CHttpRequest::SetDefaultMaxBodySize(qint64 maxBodySize)
 }
 
 
+bool CHttpRequest::IsWebSocketUpgradeRequested() const
+{
+	// The parser sets the flag at the end of the head that has both Upgrade and Connection: upgrade
+	if ((m_httpParser.upgrade == 0) || (m_httpParser.method != HTTP_GET)){
+		return false;
+	}
+
+	const QList<QByteArray> protocols = GetHeaderValue("upgrade").split(',');
+	for (const QByteArray& protocol : protocols){
+		if (protocol.trimmed().compare("websocket", Qt::CaseInsensitive) == 0){
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
 // public static methods
 
 int CHttpRequest::OnStartMessage(http_parser* httpParser)

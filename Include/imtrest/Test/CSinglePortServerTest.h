@@ -10,9 +10,13 @@
 #include <icomp/CComponentBase.h>
 #include <icomp/TSimComponentWrap.h>
 #include <icomp/TSimComponentsFactory.h>
+#include <iprm/CComposedParamsSetComp.h>
+#include <iprm/CEnableableParamComp.h>
+#include <itest/CStandardTestExecutor.h>
 
 // ImtCore includes
 #include <imtcom/CServerConnectionInterfaceParamComp.h>
+#include <imtcom/ISslConfigurationManager.h>
 #include <imtrest/IRequestServlet.h>
 #include <imtrest/CHttpProtocolEngineComp.h>
 #include <imtrest/CTcpServerComp.h>
@@ -58,12 +62,32 @@ public:
 
 
 /**
+	SSL configuration of the test server: the self-signed certificate of 127.0.0.1.
+*/
+class CTestSslConfigurationManagerComp: public icomp::CComponentBase, virtual public imtcom::ISslConfigurationManager
+{
+public:
+	typedef icomp::CComponentBase BaseClass;
+
+	I_BEGIN_COMPONENT(CTestSslConfigurationManagerComp);
+		I_REGISTER_INTERFACE(imtcom::ISslConfigurationManager);
+	I_END_COMPONENT;
+
+	// reimplemented (imtcom::ISslConfigurationManager)
+	virtual bool CreateSslConfiguration(const iprm::IParamsSet& params, QSslConfiguration& output) const override;
+};
+
+
+/**
 	HTTP and WebSocket servers wired like in HttpServerFramework and WebSocketServerFramework.
 */
 class CTestServers
 {
 public:
-	CTestServers(bool isSinglePortMode, bool listenWebSocketPort = true);
+	/**
+		\param	isSecure	The HTTP server accepts only TLS connections (HTTPS and WSS on its port).
+	*/
+	CTestServers(bool isSinglePortMode, bool listenWebSocketPort = true, bool isSecure = false);
 	~CTestServers();
 
 	quint16 GetHttpPort() const;
@@ -83,6 +107,9 @@ private:
 	icomp::TSimSharedComponentPtr<imtrest::CWorkerManagerComp> m_workerManagerCompPtr;
 	icomp::TSimSharedComponentPtr<imtrest::CWebSocketServerComp> m_webSocketServerCompPtr;
 	icomp::TSimSharedComponentPtr<imtrest::CTcpServerComp> m_tcpServerCompPtr;
+	icomp::TSimSharedComponentPtr<iprm::CEnableableParamComp> m_sslEnableCompPtr;
+	icomp::TSimSharedComponentPtr<iprm::CComposedParamsSetComp> m_sslParamsCompPtr;
+	icomp::TSimSharedComponentPtr<CTestSslConfigurationManagerComp> m_sslManagerCompPtr;
 };
 
 
@@ -95,6 +122,7 @@ private slots:
 	void WebSocketSubscriptionOnSinglePortTest();
 	void WebSocketAbortOnSinglePortTest();
 	void SeparateWebSocketPortDisabledTest();
+	void SecureWebSocketOnSinglePortTest();
 	void TwoPortModeTest();
 };
 

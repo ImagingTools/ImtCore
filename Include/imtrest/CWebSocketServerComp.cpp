@@ -5,6 +5,7 @@
 // Qt includes
 #include <QtCore/QPointer>
 #include <QtNetwork/QTcpSocket>
+#include <QtNetwork/QSslSocket>
 
 // ACF includes
 #include <istd/TDelPtr.h>
@@ -248,6 +249,12 @@ IServer::ServerStatus CWebSocketServerComp::GetServerStatus() const
 bool CWebSocketServerComp::HandleWebSocketUpgrade(QTcpSocket* socketPtr)
 {
 	if (socketPtr == nullptr){
+		return false;
+	}
+
+	// The TLS backend of QSslSocket is not its child and stays in the old thread: it uses its thread only during the handshake
+	const QSslSocket* sslSocketPtr = qobject_cast<const QSslSocket*>(socketPtr);
+	if ((sslSocketPtr != nullptr) && !sslSocketPtr->isEncrypted()){
 		return false;
 	}
 

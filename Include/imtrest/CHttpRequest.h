@@ -87,6 +87,12 @@ public:
 	*/
 	void SetDefaultMaxBodySize(qint64 maxBodySize);
 
+	/**
+		Returns \c true if the request asks to switch the connection to WebSocket: a \c GET with \c Upgrade: \c websocket and
+		\c Connection: \c upgrade (RFC 6455, section 4.1). It is known after the headers are received.
+	*/
+	bool IsWebSocketUpgradeRequested() const;
+
 	static int OnStartMessage(http_parser* httpParser);
 	static int OnUrl(http_parser* httpParser, const char* at, size_t length);
 	static int OnStatus(http_parser* httpParser, const char *at, size_t length);

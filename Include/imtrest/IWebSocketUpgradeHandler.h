@@ -23,7 +23,7 @@ public:
 	/**
 		Take over the socket and complete the WebSocket handshake.
 		\param socketPtr	Connected socket without parent. The unread HTTP upgrade request must still be in its read buffer.
-							The method must be called from the thread owning the socket.
+							The method must be called from the thread owning the socket. A TLS socket must have finished its handshake.
 		\return	\c true if the ownership of the socket was taken, otherwise the caller stays responsible for the socket.
 	*/
 	virtual bool HandleWebSocketUpgrade(QTcpSocket* socketPtr) = 0;

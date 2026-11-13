@@ -2,7 +2,6 @@
 #include <imtrest/CMultiThreadServer.h>
 #include <imtrest/CServerSslTools.h>
 #include <imtrest/CSocketTimeoutWatcher.h>
-#include <imtrest/CHttpRequest.h>
 
 // Qt includes
 #include <QtNetwork/QSslSocket>
@@ -157,7 +156,8 @@ void CSocket::HandleReadyRead()
 	}
 
 	// The head of a request that can switch to WebSocket stays restorable: the WebSocket server reads the handshake itself
-	if ((m_rootSocket->GetWebSocketUpgradeHandler() != nullptr) && (m_requestPtr->GetState() == IRequest::RS_NON_STARTED) && !m_socket->isTransactionStarted()){
+	const bool canUpgrade = m_behavior.isWebSocketUpgradeRequest && (m_rootSocket->GetWebSocketUpgradeHandler() != nullptr);
+	if (canUpgrade && (m_requestPtr->GetState() == IRequest::RS_NON_STARTED) && !m_socket->isTransactionStarted()){
 		m_socket->startTransaction();
 	}
 
@@ -367,12 +367,7 @@ void CSocket::RejectRequest(const QByteArray& message)
 
 bool CSocket::StartWebSocketUpgrade()
 {
-	const CHttpRequest* httpRequestPtr = dynamic_cast<const CHttpRequest*>(m_requestPtr.GetPtr());
-	if ((httpRequestPtr == nullptr) || (httpRequestPtr->GetMethodType() != CHttpRequest::MT_GET)){
-		return false;
-	}
-
-	if (httpRequestPtr->GetHeaderValue(QByteArrayLiteral("upgrade")).trimmed().toLower() != QByteArrayLiteral("websocket")){
+	if (!m_behavior.isWebSocketUpgradeRequest(*m_requestPtr)){
 		return false;
 	}
 

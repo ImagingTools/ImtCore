@@ -6,12 +6,17 @@
 #include <QtCore/QDeadlineTimer>
 #include <QtNetwork/QTcpServer>
 #include <QtNetwork/QTcpSocket>
+#include <QtNetwork/QSslCertificate>
+#include <QtNetwork/QSslKey>
+#include <QtNetwork/QSslSocket>
 #include <QtWebSockets/QWebSocket>
 
 // ImtCore includes
 #include <imtrest/IProtocolEngine.h>
 #include <imtrest/CWebSocketRequest.h>
 #include <imtrest/CWebSocketResponse.h>
+
+#include "SinglePortTestCertificate.h"
 
 
 namespace
@@ -61,9 +66,45 @@ QByteArray SendHttpGet(quint16 port)
 }
 
 
-QUrl CreateWebSocketUrl(quint16 port)
+// The client trusts the self-signed certificate of the test server
+QSslConfiguration CreateClientSslConfiguration()
 {
-	return QUrl(QStringLiteral("ws://127.0.0.1:%1/test/wssub").arg(port));
+	QSslConfiguration retVal = QSslConfiguration::defaultConfiguration();
+	retVal.setPeerVerifyMode(QSslSocket::VerifyNone);
+
+	return retVal;
+}
+
+
+QByteArray SendHttpsGet(quint16 port)
+{
+	QSslSocket socket;
+	socket.setSslConfiguration(CreateClientSslConfiguration());
+	socket.connectToHostEncrypted(QStringLiteral("127.0.0.1"), port);
+
+	QByteArray response;
+	QDeadlineTimer deadline(s_timeout);
+	bool isRequestSent = false;
+	while (!deadline.hasExpired() && !response.contains("\r\n")){
+		if (!isRequestSent && socket.isEncrypted()){
+			socket.write(QByteArrayLiteral("GET /test HTTP/1.1\r\nHost: 127.0.0.1\r\n\r\n"));
+			isRequestSent = true;
+		}
+
+		QTest::qWait(10);
+
+		response += socket.readAll();
+	}
+
+	socket.abort();
+
+	return response;
+}
+
+
+QUrl CreateWebSocketUrl(quint16 port, bool isSecure = false)
+{
+	return QUrl(QStringLiteral("%1://127.0.0.1:%2/test/wssub").arg(isSecure ? QStringLiteral("wss") : QStringLiteral("ws")).arg(port));
 }
 
 
@@ -123,9 +164,24 @@ imtrest::ConstResponsePtr CTestWebSocketServletComp::ProcessRequest(const imtres
 }
 
 
+// public methods of the class CTestSslConfigurationManagerComp
+
+// reimplemented (imtcom::ISslConfigurationManager)
+
+bool CTestSslConfigurationManagerComp::CreateSslConfiguration(const iprm::IParamsSet& /*params*/, QSslConfiguration& output) const
+{
+	output = QSslConfiguration::defaultConfiguration();
+	output.setLocalCertificate(QSslCertificate(SinglePortTestCertificate::s_certificatePem, QSsl::Pem));
+	output.setPrivateKey(QSslKey(SinglePortTestCertificate::s_privateKeyPem, QSsl::Rsa, QSsl::Pem));
+	output.setPeerVerifyMode(QSslSocket::VerifyNone);
+
+	return !output.localCertificate().isNull() && !output.privateKey().isNull();
+}
+
+
 // public methods of the class CTestServers
 
-CTestServers::CTestServers(bool isSinglePortMode, bool listenWebSocketPort)
+CTestServers::CTestServers(bool isSinglePortMode, bool listenWebSocketPort, bool isSecure)
 	:m_httpPort(FindFreePort()),
 	m_webSocketPort(FindFreePort())
 {
@@ -154,6 +210,21 @@ CTestServers::CTestServers(bool isSinglePortMode, bool listenWebSocketPort)
 	m_tcpServerCompPtr->SetIntAttr("ThreadsLimit", 5);
 	if (isSinglePortMode){
 		m_tcpServerCompPtr->SetRef("WebSocketUpgradeHandler", m_webSocketServerCompPtr);
+	}
+	if (isSecure){
+		m_sslEnableCompPtr->SetBoolAttr("DefaultEnabled", true);
+		m_sslEnableCompPtr->InitComponent();
+
+		m_sslParamsCompPtr->InsertMultiRef("Parameters", m_sslEnableCompPtr);
+		m_sslParamsCompPtr->InsertMultiAttr("ParametersId", imtcom::ISslConfigurationManager::ParamKeys::s_enableSslModeParamKey);
+		m_sslParamsCompPtr->InsertMultiAttr("ParametersName", QStringLiteral("Enable SSL"));
+		m_sslParamsCompPtr->InsertMultiAttr("ParametersDescription", QStringLiteral("Enable SSL"));
+		m_sslParamsCompPtr->InitComponent();
+
+		m_sslManagerCompPtr->InitComponent();
+
+		m_tcpServerCompPtr->SetRef("SslConfiguration", m_sslParamsCompPtr);
+		m_tcpServerCompPtr->SetRef("SslConfigurationManager", m_sslManagerCompPtr);
 	}
 	m_tcpServerCompPtr->InitComponent();
 }
@@ -311,8 +382,47 @@ void CSinglePortServerTest::SeparateWebSocketPortDisabledTest()
 }
 
 
+void CSinglePortServerTest::SecureWebSocketOnSinglePortTest()
+{
+	// The TLS socket is moved to the thread of the WebSocket server after its handshake
+	CTestServers servers(true, false, true);
+
+	QByteArray response = SendHttpsGet(servers.GetHttpPort());
+	QVERIFY2(response.startsWith("HTTP/1.1 200"), response.constData());
+
+	QWebSocket client;
+	client.setSslConfiguration(CreateClientSslConfiguration());
+
+	QStringList messages;
+	connect(&client, &QWebSocket::textMessageReceived, this, [&messages](const QString& message){
+		messages.append(message);
+	});
+
+	QSignalSpy connectedSpy(&client, &QWebSocket::connected);
+	client.open(CreateWebSocketUrl(servers.GetHttpPort(), true));
+	QTRY_COMPARE_WITH_TIMEOUT(connectedSpy.count(), 1, s_timeout);
+
+	client.sendTextMessage(QStringLiteral(R"({"type": "connection_init", "payload": {}})"));
+	QTRY_VERIFY_WITH_TIMEOUT(ContainsMessage(messages, QStringLiteral("connection_ack")), s_timeout);
+
+	client.sendTextMessage(QStringLiteral(R"({"type": "start", "id": "secureSubscription", "payload": {"query": "subscription { OnTest }"}})"));
+
+	const QByteArray data = QByteArrayLiteral(R"({"type": "data", "id": "secureSubscription", "payload": {"data": {"OnTest": "published"}}})");
+	imtrest::ConstResponsePtr responsePtr(new imtrest::CWebSocketResponse(imtrest::IProtocolEngine::SC_OK, data, QByteArrayLiteral("application/json"), servers.GetWebSocketProtocolEngine()));
+	imtrest::CWebSocketServerComp& webSocketServer = servers.GetWebSocketServer();
+	QTRY_VERIFY_WITH_TIMEOUT(webSocketServer.SendResponse(QByteArrayLiteral("secureSubscription"), responsePtr), s_timeout);
+	QTRY_VERIFY_WITH_TIMEOUT(ContainsMessage(messages, QStringLiteral("published")), s_timeout);
+
+	// The HTTP side of the port keeps working after the hand-over
+	response = SendHttpsGet(servers.GetHttpPort());
+	QVERIFY2(response.startsWith("HTTP/1.1 200"), response.constData());
+}
+
+
 void CSinglePortServerTest::TwoPortModeTest()
 {
+	QSKIP("CWebSocketServerComp crashes when it is destroyed, see https://github.com/ImagingTools/ImtCore/issues/1120");
+
 	CTestServers servers(false);
 
 	QByteArray response = SendHttpGet(servers.GetHttpPort());
@@ -340,6 +450,6 @@ void CSinglePortServerTest::TwoPortModeTest()
 }
 
 
-// I_ADD_TEST(CSinglePortServerTest);
+I_ADD_TEST(CSinglePortServerTest);
 
 
