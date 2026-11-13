@@ -5314,8 +5314,8 @@ class TextEditor extends Item {
 			case KEY.Key_Enter:
 				return this.$enter();
 			case KEY.Key_Tab:
-				// a TextEdit takes a tab (the focus stays); a TextInput leaves it to the focus chain
-				return this.$multi && !ctrl && !alt && !shift && this.$type('	');
+				// a TextEdit types a tab, Shift+Tab as well, and the focus stays (Qt); a TextInput leaves it to the focus chain
+				return this.$multi && !ctrl && !alt && this.$type('	');
 			default:
 				break;
 		}
