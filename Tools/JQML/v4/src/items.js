@@ -1811,7 +1811,7 @@ defineProp(
 			old.$update();
 		}
 		this.$parent = null;
-		if (target !== null) target.$adopt(this);
+		if (target !== null) target.$adopt(this, true);
 		this.$update();
 	},
 	true,
@@ -3924,6 +3924,23 @@ ListView.prototype.forceLayout = function () {
 };
 
 // Cells in row-major order. `columns` is how many cell widths fit in the view.
+// As for a Flickable in Qt, the visual children of a view live in its contentItem, which is the only entry of `children`: the delegate of
+// row i is `view.children[0].children[i]` (InputView of ImtCore sets the parameters of a row that way). The engine keeps the delegates in
+// the view itself, ViewContent stands in for the contentItem.
+const itemChildren = Object.getOwnPropertyDescriptor(Item.prototype, 'children');
+defineProp(
+	ListView.prototype,
+	'children',
+	function () {
+		if (this.$childrenList === undefined) this.$childrenList = [this.contentItem];
+		return this.$childrenList;
+	},
+	function (list) {
+		itemChildren.set.call(this, list);
+	},
+	true,
+);
+
 export class GridView extends ListView {
 	constructor() {
 		super();
@@ -4438,6 +4455,20 @@ class FlickableContentItem extends Item {
 		this.$flickable = view;
 	}
 
+	// The content item moves against the scroll position (read-only here: the Flickable moves it).
+	get x() {
+		return -this.$flickable.contentX;
+	}
+
+	set x(value) {}
+
+	get y() {
+		return -this.$flickable.contentY;
+	}
+
+	set y(value) {}
+
+
 	get $implicitWidth() {
 		return this.$flickable.$aw;
 	}
@@ -4466,9 +4497,10 @@ export class Flickable extends Item {
 		return this.$content;
 	}
 
-	// A Repeater is a visual item in Qt: its delegates share its parent, the content item.
-	$adopt(child) {
-		if (child === this.$content || (child.$nonVisual && !(child instanceof Repeater))) super.$adopt(child);
+	// The items declared in a Flickable (and a Repeater, a visual item in Qt, whose delegates share its parent) go to the content item.
+	// An item that gets the Flickable as its parent from a script (`parent = flick`, `createObject(flick)`) stays a child of the Flickable.
+	$adopt(child, fromScript = false) {
+		if (fromScript || child === this.$content || (child.$nonVisual && !(child instanceof Repeater))) super.$adopt(child);
 		else this.$content.$adopt(child);
 	}
 

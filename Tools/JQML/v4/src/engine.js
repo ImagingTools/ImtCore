@@ -2081,7 +2081,7 @@ export class Engine {
 		if (def === null || def.children.length !== 1) throw new QmlError('A Component must have exactly one root item');
 		const scope = new Scope(component.$defScope, component.$defScope.file);
 		const mark = this.completed.length;
-		const item = this.createItem(def.children[0], scope, parent || null, [], undefined, 0);
+		const item = this.createItem(def.children[0], scope, parent || null, [], undefined, 0, true);
 		if (item !== null && props !== undefined && props !== null) {
 			for (const key of Object.keys(props)) this.guard(() => this.assign(item, key.split('.'), props[key]), `property '${key}'`, 0);
 		}
@@ -2342,7 +2342,8 @@ export class Engine {
 
 	// Creates the item of an object definition below `parent`. `overlays` are the definitions (use
 	// sites of a component) that are applied on top of `def`.
-	createItem(def, scope, parent, overlays, index, depth) {
+	// `fromScript`: the parent was given by a script (`createObject(parent)`), not by the nesting of the QML source.
+	createItem(def, scope, parent, overlays, index, depth, fromScript = false) {
 		const type = def.type;
 		if (this.lenient && IGNORED_TYPES.has(type)) return null;
 		let item;
@@ -2393,7 +2394,7 @@ export class Engine {
 					}
 				}
 				const componentScope = this.newScope(modelScope, doc.path);
-				return this.createItem(doc.def, componentScope, parent, [{ def, scope }, ...overlays], index, depth + 1);
+				return this.createItem(doc.def, componentScope, parent, [{ def, scope }, ...overlays], index, depth + 1, fromScript);
 			}
 			this.unknownTypes.set(type, (this.unknownTypes.get(type) || 0) + 1);
 			item = this.lenient ? createSdlObject(type) : new Placeholder(type);
@@ -2410,7 +2411,7 @@ export class Engine {
 			item.$constructing = false;
 			return item;
 		}
-		if (parent !== null) parent.$adopt(item);
+		if (parent !== null) parent.$adopt(item, fromScript);
 		if (parent === null || type === 'FocusScope' || type === 'Window') item.$isFocusScope = true;
 		if (index !== undefined) {
 			item.$defineCustom('index', index);
@@ -3261,7 +3262,7 @@ export class Engine {
 	// An object of a type that has no QML file of its own, or none that is used (BaseModel); the parent may be null.
 	instantiateType(type, parent) {
 		const mark = this.completed.length;
-		const item = this.createItem(emptyDef(type), this.documentScope === null ? this.newScope(null, '') : this.documentScope, parent, [], undefined, 0);
+		const item = this.createItem(emptyDef(type), this.documentScope === null ? this.newScope(null, '') : this.documentScope, parent, [], undefined, 0, true);
 		this.runCompletedFrom(mark);
 		return item;
 	}
@@ -3277,7 +3278,7 @@ export class Engine {
 		if (typeof type !== 'string') throw new QmlError('Qt.createObject needs the name of a type');
 		if (!(parent instanceof Item)) throw new QmlError('Qt.createObject needs a parent item');
 		const mark = this.completed.length;
-		const item = this.createItem(emptyDef(type), this.documentScope, parent, [], undefined, 0);
+		const item = this.createItem(emptyDef(type), this.documentScope, parent, [], undefined, 0, true);
 		if (props !== undefined && props !== null) {
 			for (const key of Object.keys(props)) this.assign(item, key.split('.'), props[key]);
 		}
