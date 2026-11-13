@@ -45,8 +45,8 @@ defineType(Window, {
         minimumHeight: 'real',
         maximumWidth: { kind: 'real', initial: 16777215 },
         maximumHeight: { kind: 'real', initial: 16777215 },
-        active: { kind: 'bool', initial: true },
-        contentItem: { kind: 'var', get(){ return this } },
+        active: { kind: 'bool', initial: true, readonly: true },
+        contentItem: { kind: 'var', readonly: true, get(){ return this } },
     },
     signals: ['closing(close)'],
 })

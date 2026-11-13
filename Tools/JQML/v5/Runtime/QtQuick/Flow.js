@@ -1,5 +1,5 @@
 const engine = require('../Core/engine')
-const { defineType } = require('../Core/type')
+const { defineType, makeReadonly } = require('../Core/type')
 const { Item } = require('./Item')
 const { Positioner, relayout } = require('./Positioner')
 
@@ -59,5 +59,9 @@ Flow.TopToBottom = 1
         if((id === Item.WIDTH || id === Item.HEIGHT) && this.$f & engine.COMPLETED) engine.queuePolish(this)
     }
 }
+
+// read-only in Qt, writable in the base class
+makeReadonly(Flow, 'implicitWidth')
+makeReadonly(Flow, 'implicitHeight')
 
 module.exports = { Flow }

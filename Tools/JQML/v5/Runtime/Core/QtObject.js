@@ -73,6 +73,10 @@ class QtObject {
         let old = this.$v[id]
         if(old === value || (old !== old && value !== value)) return
         this.$v[id] = value
+        if(prop.guarded){
+            if(old instanceof QtObject) unguard(old, this, id)
+            if(value instanceof QtObject) guard(value, this, id)
+        }
         if(prop.effect) prop.effect(this, value, old)
         engine.emit(this, prop.signal, old, value)
     }
@@ -162,8 +166,10 @@ class QtObject {
         engine.emit(this, QtObject.SIGNAL_completed)
     }
 
-    destroy(){
-        engine.queueDelete(this)
+    // QObject::destroy(int delay): deleted after delay milliseconds, or after the current event
+    destroy(delay){
+        if(typeof delay === 'number' && delay > 0) setTimeout(() => engine.queueDelete(this), delay)
+        else engine.queueDelete(this)
     }
 
     // A view lets go of a delegate (QQmlDelegateModelItem::destroyObject clears the delegate's context) or a Loader of
@@ -190,7 +196,15 @@ class QtObject {
 
     $destroyNow(){
         if(this.$f & engine.DESTROYED) return
-        engine.emit(this, QtObject.SIGNAL_destruction)
+        // qdeclarativeelement_destructor: Component.onDestruction of the whole tree runs while its bindings still do
+        // (QQmlContextData::emitDestruction), then QQmlData::markAsDeleted stops them before any guard fires
+        if(!(this.$f & engine.DELETING)){
+            visitTree(this, emitDestruction)
+            visitTree(this, markAsDeleted)
+        }
+        // QQmlData::destroyed fires the guards before ~QObject deletes the children
+        dropHolder(this)
+        releaseGuards(this)
         if(this.$children){
             for(let i = this.$children.length - 1; i >= 0; i--) this.$children[i].$destroyNow()
         }
@@ -210,6 +224,69 @@ class QtObject {
     }
 
     $disposeNative(){}
+}
+
+// QQmlVMEMetaObject guards the object a var (or object typed) property holds: its destruction sets the property to
+// null and notifies, so the bindings on it see the change. target.$guards: holder, slot pairs, one per property that
+// holds it ($write guards only a changed value); a guard goes when the property takes another value or the holder is destroyed.
+function guard(target, holder, slot){
+    let guards = target.$guards
+    if(guards) guards.push(holder, slot)
+    else target.$guards = [holder, slot]
+}
+
+function unguard(target, holder, slot){
+    let guards = target.$guards
+    if(!guards) return
+    for(let i = guards.length - 2; i >= 0; i -= 2){
+        if(guards[i] !== holder || guards[i + 1] !== slot) continue
+        let last = guards.length - 2
+        guards[i] = guards[last]
+        guards[i + 1] = guards[last + 1]
+        guards.length = last
+        return
+    }
+}
+
+// an object, then its children from the last one, as $destroyNow goes
+function visitTree(object, fn){
+    let stack = [object]
+    while(stack.length){
+        let current = stack.pop()
+        fn(current)
+        let children = current.$children
+        if(children) for(let i = 0; i < children.length; i++) stack.push(children[i])
+    }
+}
+
+function emitDestruction(object){
+    if(!(object.$f & engine.DELETING)) engine.emit(object, QtObject.SIGNAL_destruction)
+}
+
+function markAsDeleted(object){
+    object.$f |= engine.DELETING
+}
+
+// a destroyed holder lets go of the objects its var properties hold
+function dropHolder(holder){
+    let ids = holder.constructor.$type.varIds
+    for(let i = 0; i < ids.length; i++){
+        let value = holder.$v[ids[i]]
+        if(value instanceof QtObject) unguard(value, holder, ids[i])
+    }
+}
+
+function releaseGuards(target){
+    let guards = target.$guards
+    if(!guards) return
+    target.$guards = null
+    for(let i = 0; i < guards.length; i += 2){
+        let holder = guards[i], slot = guards[i + 1]
+        // QQmlVMEVariantQObjectPtr::objectDestroyedImpl: a holder that is being deleted is not told
+        if(holder.$f & engine.DELETING || holder.$v[slot] !== target) continue
+        holder.$v[slot] = null
+        engine.emit(holder, holder.constructor.$type.props[slot].signal, target, null)
+    }
 }
 
 defineType(QtObject, {

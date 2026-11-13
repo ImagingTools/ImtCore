@@ -50,4 +50,27 @@ function find(url, base){
     return files[matching[matching.length - 1]]
 }
 
-module.exports = { files, findFile, load }
+// Qt.createComponent: the url resolved like QQmlContext::resolvedUrl against base, the file that asks for it, and
+// looked up in the bundle only there. The bundle stands for the qrc:/qml/ resources: { url, key, type } with the
+// absolute url, the bundle path and the registered type (null when the bundle has no such file).
+function resolveExact(url, base = ''){
+    let text = String(url)
+    let suffix = (text.match(/[?#].*$/) || [''])[0]
+    let path = text.slice(0, text.length - suffix.length)
+    let key = null
+    let scheme = (path.match(/^([a-z][a-z0-9+.-]*):/i) || [])[1]
+    if(scheme){
+        if(scheme.toLowerCase() !== 'qrc') return { url: text, key: null, type: null }
+        let rest = path.slice(scheme.length + 1).replace(/^\/+/, '')
+        key = rest.startsWith('qml/') ? normalize(rest.slice(4)) : null
+    } else if(path.startsWith('/')){
+        let rest = path.replace(/^\/+/, '')
+        key = rest.startsWith('qml/') ? normalize(rest.slice(4)) : null
+    } else {
+        key = normalize(base.slice(0, base.lastIndexOf('/') + 1) + path)
+    }
+    if(key === null) return { url: 'qrc:' + (path.startsWith('/') ? path : '/' + path) + suffix, key: null, type: null }
+    return { url: 'qrc:/qml/' + key + suffix, key, type: files[key] || null }
+}
+
+module.exports = { files, findFile, load, resolveExact }

@@ -31,10 +31,13 @@ function loadScript(fileName){
     return { source, names: topLevelNames(source, fileName) }
 }
 
-function emitScript(ref, fileName){
+// url: the script's url in the bundle. Its Qt resolves relative urls against it (Qt.createComponent, createQmlObject),
+// and JQ.scripts holds it for the imports of documents compiled in the browser
+function emitScript(ref, fileName, url){
     let script = loadScript(fileName)
     let exports = script.names.map(name => JSON.stringify(name) + ':' + name).join(',')
-    return 'const ' + ref + '=(function(Qt){\n' + script.source + '\nreturn {' + exports + '}})(JQ.Qt);'
+    let key = JSON.stringify(url || '')
+    return 'const ' + ref + '=(function(Qt){\n' + script.source + '\nreturn {' + exports + '}})(JQ.Qt.$at(' + key + '));JQ.scripts[' + key + ']=' + ref + ';'
 }
 
 module.exports = { loadScript, emitScript }

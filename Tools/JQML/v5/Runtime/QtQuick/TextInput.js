@@ -1,4 +1,4 @@
-const { defineType } = require('../Core/type')
+const { defineType, makeReadonly } = require('../Core/type')
 const { TextField, common, text } = require('./TextField')
 const { ACCEPTABLE } = require('./Validator')
 
@@ -31,7 +31,7 @@ defineType(TextInput, {
         },
         inputMask: 'string',
         acceptableInput: { kind: 'bool', initial: true, readonly: true },
-        displayText: 'string',
+        displayText: { kind: 'string', readonly: true },
     }),
     signals: ['accepted', 'editingFinished', 'textEdited'],
 })
@@ -41,5 +41,9 @@ TextInput.Password = 2
 TextInput.PasswordEchoOnEdit = 3
 
 Object.assign(TextInput, { AlignLeft: 0x1, AlignRight: 0x2, AlignHCenter: 0x4, AlignJustify: 0x8, AlignTop: 0x20, AlignBottom: 0x40, AlignVCenter: 0x80 })
+
+// read-only in Qt, writable in the base class
+makeReadonly(TextInput, 'implicitWidth')
+makeReadonly(TextInput, 'implicitHeight')
 
 module.exports = { TextInput }

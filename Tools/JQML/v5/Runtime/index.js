@@ -98,6 +98,13 @@ function create(build){
 }
 
 // a handler written on a grouped attached property (Keys.onPressed) runs with the item as its object
+// x.createQmlObject(...) written in QML (compiler/expr.js): when x is Qt, the object is created in the context of the
+// call (QV4 callingQmlContext): the calling file, its scope and the names of the ids; any other x is called as is
+function callCreateQmlObject(target, fileQt, scope, ids, ...args){
+    if(target && target.$isQt === true) return Qt.$createQmlObject(fileQt.$base || '', scope, ids, ...args)
+    return target.createQmlObject(...args)
+}
+
 function handleGroup(group, signal, fn, scope, owner){
     return engine.subscribe(new engine.Link(group, signal, 0, fn, owner, scope))
 }
@@ -137,8 +144,23 @@ function defaultParent(Class, obj){
 const rootContext = { context: typeof window !== 'undefined' ? new (require('./ImtCore/WebContext').WebContext)() : null }
 
 // A name the compiler could not resolve: the context chain from the scope up through the scopes the
-// components were created in (QQmlContext parents): delegate roles, model / index / modelData, root properties
+// components were created in (QQmlContext parents). Each context: delegate roles, model / index / modelData, its ids
+// ($s.$i, codegen scopeNames), the properties of its object (the scope root); then the root context
 function ctx(s, name){
+    let found = lookup(s, name)
+    if(found === MISSING) throw new ReferenceError(name + ' is not defined')
+    return found
+}
+
+// `typeof name`: undefined for a name that is nowhere (compiler/expr.js)
+function ctxValue(s, name){
+    let found = lookup(s, name)
+    return found === MISSING ? undefined : found
+}
+
+const MISSING = {}
+
+function lookup(s, name){
     for(let scope = s; scope;){
         let c = scope.$ctx
         if(c){
@@ -147,11 +169,15 @@ function ctx(s, name){
             if(name === 'modelData') return c.modelData
             if(c.$row && typeof c.$row === 'object' && name in c.$row) return c.$role(name)
         }
+        let names = scope.$i
+        if(names && Object.prototype.hasOwnProperty.call(names.ids, name)) return scope[names.ids[name]]
+        let object = scope[0]
+        if(object && typeof object === 'object' && name[0] !== '$' && name in object) return object[name]
         if(scope.$p) scope = scope.$p
         else scope = scope[0] && scope[0].$cctx || null
     }
     if(name in rootContext) return rootContext[name]
-    throw new ReferenceError(name + ' is not defined')
+    return MISSING
 }
 
 // The nearest model context up the context chain: a component declared in a delegate and created by a Loader
@@ -166,6 +192,7 @@ function mctx(s){
 }
 
 const modules = {}      // module -> type name -> class
+const scripts = {}      // url of a JavaScript resource -> its exports (compiler/scripts.js)
 const namespaces = {}
 
 function qmlModule(name){
@@ -230,7 +257,7 @@ function singleton(Class){
 }
 
 const JQ = {
-    forward, bindAlias, handleGroup, files, singleton, defineMethod, defaultParent, ctx, mctx, ns, qmlModule, subAssign, rootContext,
+    forward, bindAlias, handleGroup, callCreateQmlObject, files, scripts, singleton, defineMethod, defaultParent, ctx, ctxValue, mctx, ns, qmlModule, subAssign, rootContext,
     engine, defineType, create,
     batch: engine.batch,
     stats: engine.stats,
@@ -282,6 +309,8 @@ if(!String.prototype.arg){
 }
 
 Qt.$types = JQ.types
+Qt.$qmlModules = modules
+Qt.$qmlScripts = scripts
 
 JQ.rootPath = ''
 

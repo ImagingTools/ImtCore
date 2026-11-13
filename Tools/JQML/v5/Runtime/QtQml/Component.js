@@ -19,7 +19,13 @@ class Component extends QtObject {
         try {
             obj = this.$build(parent, context)
             if(properties){
-                for(let key in properties) obj[key] = properties[key]
+                // QQmlComponent::setInitialProperties: a dotted name sets a sub-property ("border.width")
+                for(let key in properties){
+                    let path = key.split('.')
+                    let target = obj
+                    for(let i = 0; i < path.length - 1 && target; i++) target = target[path[i]]
+                    if(target) target[path[path.length - 1]] = properties[key]
+                }
             }
             engine.creatingRoot(obj)
         } finally {

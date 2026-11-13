@@ -17,6 +17,7 @@ const PRIORITY_NORMAL = 0
 const DESTROYED = 1
 const BLOCKED = 2
 const COMPLETED = 4
+const DELETING = 8         // in a tree being destroyed (QQmlData::isQueuedForDeletion): no bindings, no guard notifications
 
 // binding flags
 const EVALUATING = 1
@@ -585,7 +586,7 @@ function sweep(binding){
 
 // Like QQmlBinding::update: the flag covers evaluation, the write and the notification.
 function runBinding(binding){
-    if(binding.flags & DISPOSED || binding.target.$f & DESTROYED) return
+    if(binding.flags & DISPOSED || binding.target.$f & (DESTROYED | DELETING)) return
     if(binding.scope && scopeCleared(binding.scope)){
         binding.target.$takeBinding(binding.prop)
         disposeBinding(binding)
@@ -742,7 +743,7 @@ function scheduleCompleted(obj){
 module.exports = {
     PENDING,
     PRIORITY_GEOMETRY, PRIORITY_CROSS, PRIORITY_HANDLER, PRIORITY_NORMAL,
-    DESTROYED, BLOCKED, COMPLETED, SETTER,
+    DESTROYED, BLOCKED, COMPLETED, DELETING, SETTER,
     clearScope, scopeCleared,
     Link, Binding, stats,
     connect, disconnect, connectHandler, subscribe, unsubscribe, hasSubscribers, dropSubscribers, dropConnections,

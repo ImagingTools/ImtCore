@@ -1,5 +1,5 @@
 const engine = require('../Core/engine')
-const { defineType } = require('../Core/type')
+const { defineType, makeReadonly } = require('../Core/type')
 const { Item } = require('./Item')
 const { Positioner } = require('./Positioner')
 
@@ -23,5 +23,9 @@ class Row extends Positioner {
     }
 }
 defineType(Row)
+
+// read-only in Qt, writable in the base class
+makeReadonly(Row, 'implicitWidth')
+makeReadonly(Row, 'implicitHeight')
 
 module.exports = { Row }

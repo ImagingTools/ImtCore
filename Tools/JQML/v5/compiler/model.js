@@ -55,6 +55,22 @@ function lineOf(node, fallback){
     return node && node.info ? node.info.line + 1 : fallback
 }
 
+// 1-based column of a node, 0 when the parser gave none
+function colOf(node){
+    return node && node.info && typeof node.info.col === 'number' ? node.info.col + 1 : 0
+}
+
+// 1-based position of a parser token: { line, col }, or null
+function tokenAt(token){
+    return token && typeof token.line === 'number' ? { line: token.line + 1, col: token.col + 1 } : null
+}
+
+// the position of a value (a statement node or the expression in it)
+function valueAt(value){
+    if(!value) return null
+    return tokenAt(value.info) || (Array.isArray(value[1]) ? tokenAt(value[1].info) : null)
+}
+
 function isHandlerName(name){
     let last = name.slice(name.lastIndexOf('.') + 1)
     return /^on[A-Z]/.test(last)
@@ -101,7 +117,10 @@ class FileModel {
 
     build(ast){
         // ['toplevel', imports, ['qmlelem', ...], pragmas]
-        for(let imp of ast[1] || []) this.imports.push({ path: imp[1], version: imp[2], as: imp[3], isModule: imp[4] })
+        for(let imp of ast[1] || []){
+            let at = tokenAt(imp.info) || { line: 1, col: 1 }
+            this.imports.push({ path: imp[1], version: imp[2], as: imp[3], isModule: imp[4], line: at.line, col: at.col })
+        }
         for(let pragma of ast[3] || []) this.pragmas.push(pragma)
         this.singleton = this.pragmas.some(p => JSON.stringify(p).indexOf('Singleton') >= 0)
         let scope = this.newScope(null, false)
@@ -111,6 +130,7 @@ class FileModel {
 
     element(node, scope, parent){
         let el = new Element(pathName(node[1]), lineOf(node, parent ? parent.line : 1), scope, parent)
+        el.col = colOf(node)
         el.onProp = node[2] || null     // `Behavior on x`, `NumberAnimation on x`
         el.index = this.elements.length
         this.elements.push(el)
@@ -137,30 +157,37 @@ class FileModel {
 
     member(el, m, scope){
         let line = lineOf(m, el.line)
+        let col = colOf(m)
         switch(m[0]){
             case 'qmlprop': {
                 let name = pathName(m[1])
                 let value = m[2]
                 if(name === 'id'){
                     el.id = value[1][1]
+                    el.idAt = { line, col }
+                    el.idValueAt = valueAt(value)
+                    // a second object with the id of this scope: QQmlComponentAndAliasResolver reports it
+                    if(scope.ids.has(el.id) && !scope.duplicateId) scope.duplicateId = el
                     if(el.slot !== 0) el.slot = scope.slots++
                     scope.ids.set(el.id, el.slot)
                     return
                 }
                 if(isHandlerName(name)){
-                    el.handlers.push({ name, value, raw: cleanRaw(m[3]), line })
+                    el.handlers.push({ name, value, raw: cleanRaw(m[3]), line, col })
                     return
                 }
                 let inner = value && value[0] === 'stat' ? value[1] : null
                 if(inner && inner[0] === 'qmlelem'){
-                    el.assigns.push({ name, elementNode: inner, line })
+                    el.assigns.push({ name, elementNode: inner, line, col })
                     return
                 }
                 if(inner && inner[0] === 'array' && inner[1].length && inner[1].every(item => item[0] === 'qmlelem')){
-                    el.assigns.push({ name, elementNodes: inner[1], line })
+                    el.assigns.push({ name, elementNodes: inner[1], line, col })
                     return
                 }
-                el.assigns.push({ name, value, raw: cleanRaw(m[3]), line })
+                // `anchors.left`: the position of the last name; the value's own position
+                let nameAt = Array.isArray(m[1]) ? tokenAt(m[1].info) : null
+                el.assigns.push({ name, value, raw: cleanRaw(m[3]), line, col, nameAt: nameAt || { line, col }, valueAt: valueAt(value) })
                 return
             }
             case 'qmlobj': {
@@ -173,8 +200,11 @@ class FileModel {
             }
             case 'qmlpropdef': {
                 let mods = m[1] || []
-                let def = { name: m[2], type: m[3], defaultProp: !!mods[0], readonly: !!mods[2], line }
+                let def = { name: m[2], type: m[3], defaultProp: !!mods[0], required: !!mods[1], readonly: !!mods[2], line }
+                def.nameAt = tokenAt(m.nameInfo) || { line, col }
+                def.declAt = tokenAt(m.declInfo) || tokenAt(m.info) || { line, col }
                 let value = m[4]
+                def.valueAt = valueAt(value)
                 let inner = value && value[0] === 'stat' ? value[1] : null
                 if(inner && inner[0] === 'qmlelem') def.elementNode = inner
                 else if(value){
@@ -186,14 +216,16 @@ class FileModel {
             }
             case 'qmlaliasdef': {
                 let path = m.slice(2).filter(part => typeof part === 'string' && part)
-                el.aliases.push({ name: m[1], path, line })
+                // info: the tokens of the reference `id.property`
+                let refAt = Array.isArray(m.info) ? tokenAt(m.info[0]) : null
+                el.aliases.push({ name: m[1], path, line: refAt ? refAt.line : el.line, refAt, nameAt: tokenAt(m.nameInfo) })
                 return
             }
             case 'qmlsignaldef':
-                el.signals.push({ name: m[1], args: (m[2] || []).map(a => a.name) })
+                el.signals.push({ name: m[1], args: (m[2] || []).map(a => a.name), nameAt: tokenAt(m.info) })
                 return
             case 'qmlmethod':
-                el.methods.push({ name: m[1], raw: cleanRaw(m[3]), line })
+                el.methods.push({ name: m[1], raw: cleanRaw(m[3]), line, nameAt: tokenAt(m.info) })
                 return
             case 'qmldefaultprop': {
                 let inner = m[1]
@@ -204,6 +236,11 @@ class FileModel {
             }
             case 'qmlenumdef':
                 el.enums.push({ name: m[1], values: m[2] })
+                return
+            case 'qmlinlinecomponent':
+                // not compiled yet (compiler/checks.js reports it)
+                if(!el.inlineComponents) el.inlineComponents = []
+                el.inlineComponents.push({ name: m[1], at: tokenAt(m.info) || { line, col } })
                 return
             case 'qmlelem': {
                 if(el.type === 'Component'){

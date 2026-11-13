@@ -254,7 +254,7 @@ defineType(Item, {
         },
         enabled: { kind: 'bool', initial: true, effect(item){ item.$enabledChanged() } },
         focus: 'bool',
-        activeFocus: 'bool',
+        activeFocus: { kind: 'bool', readonly: true },
         activeFocusOnTab: 'bool',
         antialiasing: 'bool',
         smooth: { kind: 'bool', initial: true },
