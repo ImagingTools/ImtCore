@@ -100,6 +100,19 @@ Item {
         visible: container.userIsLoggedIn && !pagesProvider.pagesReceived && container.modelState !== "Error";
     }
 
+    // A user whose permissions open no page would otherwise see an empty window
+    BaseText {
+        anchors.centerIn: parent;
+        width: Math.min(parent.width - 2 * Style.marginXL, 480);
+
+        visible: container.userIsLoggedIn && pagesProvider.pagesReceived && pagesData.count === 0;
+        horizontalAlignment: Text.AlignHCenter;
+        wrapMode: Text.WordWrap;
+        color: Style.textColor;
+        font.pixelSize: Style.fontSizeL;
+        text: qsTr("No page of the application is available to you. Ask the administrator for access.");
+    }
+
     SkeletonTableView {
         id: pageSkeleton;
 

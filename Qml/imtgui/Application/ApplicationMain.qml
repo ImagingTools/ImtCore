@@ -113,7 +113,12 @@ Item {
 				internal.loadingVisible = false
 			}
 			else if (totalStatus == status.TRY_CONNECTING_TO_APP_SERVER){
-				internal.errorMessage = qsTr("Connecting to ") + application.getServerUrl() + " ..."
+				// The address of the server comes with the client settings, maybe after this state, maybe never (the address is given to the engine)
+				internal.errorMessage = Qt.binding(function(){
+					let serverUrl = application.getServerUrl();
+
+					return (serverUrl.indexOf("://:") >= 0) ? qsTr("Connecting to the server...") : qsTr("Connecting to ") + serverUrl + " ...";
+				})
 				internal.errorDescription = ""
 				internal.retryVisible = false
 				internal.loadingVisible = true
@@ -181,6 +186,9 @@ Item {
 	Component.onCompleted: {
 		setDecorators()
 		timer.onTriggeredFunc();
+
+		// The first state of the connection comes with no change signal: a server that does not answer from the start would leave the window empty
+		connectionState.checkState();
 	}
 	
 	// Dragging a window edge changes width and height on nearly every frame, and each

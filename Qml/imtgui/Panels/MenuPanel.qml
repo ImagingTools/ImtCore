@@ -92,8 +92,9 @@ Rectangle {
 	width: Style.enableMenuPanelCollapse ? menuPanel.collapsedWidth : menuPanel.rowWidth;
 
 	// Logged out the page list is cleared, and a rail with nothing in it is just a
-	// white stripe beside the sign-in page.
-	visible: !menuPanel.railMode || allPages.count > 0;
+	// white stripe beside the sign-in page. Signed in it stays even without pages:
+	// it holds the account, the only way to sign out.
+	visible: !menuPanel.railMode || allPages.count > 0 || menuPanel.loggedIn;
 
 	// Folded or open is the user's choice, so it outlives a page reload. Read and
 	// written by key like AuthorizationController does - declared properties on
