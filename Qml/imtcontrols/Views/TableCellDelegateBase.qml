@@ -59,6 +59,7 @@ Item {
 		if (rowDelegate && rowDelegate.tableItem){
 			rowDelegate.reused.disconnect(delegateContainer.reused)
 			rowDelegate.tableItem.widthRecalc.disconnect(delegateContainer.setCellWidth)
+			rowDelegate.tableItem.modelRefresh.disconnect(delegateContainer.refreshModelData)
 		}
 	}
 
