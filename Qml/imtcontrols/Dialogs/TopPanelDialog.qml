@@ -10,13 +10,13 @@ Rectangle {
 
 	width: Style.sizeHintXS;
 	height: Style.controlHeightL;
-	radius: Style.radiusL;
+	radius: Style.radiusM;
 
 	color: Style.baseColor;
 
 	property string title;
-	property int titleFontSize: Style.fontSizeXL;
-	property string titleFontFamily: Style.fontFamily;
+	property int titleFontSize: Style.fontSizeL;
+	property string titleFontFamily: Style.fontFamilyBold;
 	property color titleTextColor: Style.textColor;
 
 	property bool hasIcon: true;
@@ -59,6 +59,7 @@ Rectangle {
 		color: topPanelDialogContainer.titleTextColor;
 		font.family: topPanelDialogContainer.titleFontFamily;
 		font.pixelSize: topPanelDialogContainer.titleFontSize;
+		font.bold: true;
 
 		text: topPanelDialogContainer.title;
 
@@ -73,7 +74,7 @@ Rectangle {
 		anchors.verticalCenter: topPanelDialogContainer.verticalCenter;
 		anchors.rightMargin: Style.marginL;
 
-		width: Style.iconSizeM;
+		width: Style.buttonWidthL;
 		height: width;
 
 		visible: topPanelDialogContainer.canClose;
@@ -88,8 +89,11 @@ Rectangle {
 			id: buttonDecorator;
 
 			ButtonDecorator {
-				color: closeButton.hovered ? Style.buttonHoverColor : "transparent";
+				color: closeButton.hovered ? Style.toolButtonHoverColor : "transparent";
 				border.width: 0;
+				radius: Style.buttonRadius;
+				icon.width: Style.iconSizeS;
+				icon.height: Style.iconSizeS;
 			}
 		}
 	}

@@ -87,6 +87,12 @@ QNetworkRequest* CGqlClientEngineComp::CreateNetworkRequest(const imtgql::IGqlRe
 		if (!languageId.isEmpty()){
 			networkRequest->setRawHeader(imtbase::s_languageIdHeaderId, languageId);
 		}
+
+		// A forwarded request keeps its ID: the remote server names it in the DocumentChanged notification
+		QByteArray requestId = contextPtr->GetHeaders().value(imtbase::s_requestIdHeaderId.toLower());
+		if (!requestId.isEmpty()){
+			networkRequest->setRawHeader(imtbase::s_requestIdHeaderId, requestId);
+		}
 	}
 
 	const QByteArray protocolVersion = request.GetProtocolVersion();

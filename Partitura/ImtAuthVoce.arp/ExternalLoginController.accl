@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="6390" Description="ACF"/>
+            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="AppleProvider" X="900" Y="650" Note=""/>
+        <Element ComponentName="ExternalIdentity" X="275" Y="650" Note=""/>
+        <Element ComponentName="ExternalIdentityDatabaseDelegate" X="575" Y="475" Note=""/>
+        <Element ComponentName="ExternalIdentityManager" X="575" Y="150" Note=""/>
+        <Element ComponentName="ExternalLoginController" X="875" Y="150" Note=""/>
+        <Element ComponentName="FacebookProvider" X="900" Y="825" Note=""/>
+        <Element ComponentName="GoogleProvider" X="900" Y="425" Note=""/>
+        <Element ComponentName="JsonSerializer" X="275" Y="800" Note=""/>
+        <Element ComponentName="ObjectCollection" X="275" Y="475" Note=""/>
+        <Element ComponentName="OidcProvider" X="900" Y="1000" Note=""/>
+        <Element ComponentName="Repository" X="575" Y="300" Note=""/>
+        <Element ComponentName="Types" X="575" Y="650" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

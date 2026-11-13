@@ -15,6 +15,10 @@ namespace imtauth
 class IUserRecentAction : virtual public iser::IObject
 {
 public:
+	static const inline QByteArray s_createActionTypeId = QByteArrayLiteral("Create");
+	static const inline QByteArray s_updateActionTypeId = QByteArrayLiteral("Update");
+	static const inline QByteArray s_deleteActionTypeId = QByteArrayLiteral("Delete");
+
 	enum MetaInfoTypes
 	{
 		MIT_USER_ID = idoc::IDocumentMetaInfo::MIT_USER + 1,

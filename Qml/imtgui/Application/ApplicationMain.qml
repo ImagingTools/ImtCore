@@ -22,7 +22,9 @@ Item {
 	property bool serverReady: true; // [deprecated]
 	property bool authorizationServerConnected: false;
 	property bool useWebSocketSubscription: false;
-	property bool useWebSocketProxy: false;
+	// Connect the WebSocket on the page's origin (wss://<host>/<appId>/wssub) when the page is served over HTTPS.
+	// Comes from the server's connection settings, an application that is always behind a proxy may set it to true.
+	property bool useWebSocketProxy: ApplicationInfoProvider.webSocketSameOrigin;
 	
 	property bool firstModelsIsInit: false;
 	property bool serverConnected: subscriptionManager_.status == 1;
@@ -99,20 +101,29 @@ Item {
 		
 		onTotalStatusChanged: {
 			if (totalStatus == status.TRY_CONNECTING_TO_AUTH_SERVER){
-				internal.errorMessage = qsTr("Try connecting to authorization server ...")
+				internal.errorMessage = qsTr("Connecting to the authorization server...")
+				internal.errorDescription = ""
+				internal.retryVisible = false
 				internal.loadingVisible = true
 			}
 			else if (totalStatus == status.AUTH_SERVER_CONNECTION_ERROR){
-				internal.errorMessage = qsTr("Authorization server connection error")
+				internal.errorMessage = qsTr("The authorization server is unavailable")
+				internal.errorDescription = qsTr("Sign-in, users and permissions come from the authorization server, so the application is paused until it is back. The open pages stay as they are; the server reconnects on its own.")
+				internal.retryVisible = false
 				internal.loadingVisible = false
 			}
 			else if (totalStatus == status.TRY_CONNECTING_TO_APP_SERVER){
-				internal.errorMessage = qsTr("Try connecting to ") + application.getServerUrl() + " ..."
+				internal.errorMessage = qsTr("Connecting to ") + application.getServerUrl() + " ..."
+				internal.errorDescription = ""
+				internal.retryVisible = false
 				internal.loadingVisible = true
 			}
 			else if (totalStatus == status.APP_SERVER_CONNECTION_ERROR){
-				internal.errorMessage = qsTr("Server connection error")
+				internal.errorMessage = qsTr("The connection to the server is lost")
+				internal.errorDescription = qsTr("The application is paused until the connection is back. The open pages stay as they are.")
+				internal.retryVisible = true
 				internal.loadingVisible = false
+				ModalDialogManager.onServerConnectionError();
 				Events.sendEvent("ServerConnectionError");
 			}
 			else if (totalStatus == status.CONNECTION_SUCCESFUL){
@@ -147,6 +158,8 @@ Item {
 	QtObject {
 		id: internal
 		property string errorMessage: "";
+		property string errorDescription: "";
+		property bool retryVisible: false;
 		property bool loadingVisible: false;
 	}
 
@@ -271,14 +284,12 @@ Item {
 				context.appName = serverApplicationInfo.m_applicationName;
 				Style.logoIconName = serverApplicationInfo.m_logoIconName;
 
-				// make the application version kind (e.g. "Beta Version") visible in the UI
-				let serverVersion = serverApplicationInfo.m_version ? serverApplicationInfo.m_version : "";
-				let versionKind = serverApplicationInfo.m_versionKind ? serverApplicationInfo.m_versionKind : "";
-				if (versionKind !== ""){
-					serverVersion = serverVersion === "" ? versionKind : serverVersion + " - " + versionKind;
-				}
+				// make the application version kind (e.g. "Beta Version") and the build time visible in the UI
+				pageAboutProvider.serverVersion = pageAboutProvider.formatVersion(serverApplicationInfo.m_version, serverApplicationInfo.m_versionKind, serverApplicationInfo.m_buildTime)
 
-				pageAboutProvider.serverVersion = serverVersion
+				// services the server depends on (e.g. the authorization server) with their runtime status
+				pageAboutProvider.serverName = serverApplicationInfo.m_applicationName
+				pageAboutProvider.dependencies = serverApplicationInfo.m_dependencies ? serverApplicationInfo.m_dependencies : null
 
 				AuthorizationController.productId = serverApplicationInfo.m_applicationId
 			}
@@ -337,203 +348,19 @@ Item {
 		active: application.useWebSocketSubscription;
 	}
 
-	// Global ticket notification subscriptions — always active regardless of
-	// which page is currently selected in MenuPanel.  Previously these lived
-	// inside TicketCollectionView.qml which is lazy-loaded by PagesManager,
-	// so notifications were lost until the user navigated to the Tickets page.
-	//
-	// autoSubscribe is false so that registration only happens after login
-	// (see onLoggedIn / onLoggedOut below).
-
-	// Custom popup delegate for ticket notifications — clickable card
-	// that navigates to the ticket.
-	Component {
-		id: ticketNotificationDelegate
-
-		Rectangle {
-			id: ticketPopupRoot
-
-			property string messageId: ""
-			property string messageType: ""
-			property string messageText: ""
-			property bool closable: false
-			property var popupContainer: null
-
-			// Custom properties set via addCustomMessage properties bag
-			property string ticketId: ""
-			property string ticketNumber: ""
-			property string ticketTitle: ""
-			property string senderName: ""
-			property string preview: ""
-			property string notificationType: "message" // "message" or "assignee"
-
-			width: parent ? parent.width : Style.sizeHintXS
-			height: contentColumn.height + 2 * Style.marginL
-			radius: Style.radiusM
-			border.color: Style.borderColor
-			color: ticketPopupRoot.notificationType === "assignee" ? Style.successSubtleColor : Style.popupInfoBackgroundColor
-
-			MouseArea {
-				anchors.fill: parent
-				cursorShape: Qt.PointingHandCursor
-				hoverEnabled: true
-				onClicked: {
-					if (ticketPopupRoot.ticketId)
-						NavigationController.navigate("Tickets/Ticket/" + ticketPopupRoot.ticketId)
-					if (ticketPopupRoot.popupContainer)
-						ticketPopupRoot.popupContainer.removeMessageById(ticketPopupRoot.messageId)
-				}
-				onEntered: ticketPopupRoot.border.color = Style.highlightColor
-				onExited: ticketPopupRoot.border.color = Style.borderColor
-			}
-
-			Column {
-				id: contentColumn
-				anchors.left: parent.left
-				anchors.right: closeArea.left
-				anchors.top: parent.top
-				anchors.margins: Style.marginL
-				spacing: Style.marginM
-
-				// Title row: icon + "#Number Title — SenderName" (all key info)
-				Row {
-					width: parent.width
-					spacing: Style.marginS
-
-					Image {
-						anchors.verticalCenter: parent.verticalCenter
-						width: Style.iconSizeS
-						height: width
-						source: ticketPopupRoot.notificationType === "assignee"
-								? Style.getIconPath("Icons/Assignment", Icon.State.On, Icon.Mode.Normal)
-								: Style.getIconPath("Icons/Message", Icon.State.On, Icon.Mode.Normal)
-						sourceSize.width: width
-						sourceSize.height: height
-					}
-
-					BaseText {
-						width: parent.width - Style.iconSizeS - Style.marginS
-						text: ticketPopupRoot.notificationType === "assignee"
-							  ? (ticketPopupRoot.ticketNumber ? "#" + ticketPopupRoot.ticketNumber + " " : "")
-								+ ticketPopupRoot.ticketTitle + " — " + qsTr("Assigned to you")
-							  : (ticketPopupRoot.ticketNumber ? "#" + ticketPopupRoot.ticketNumber + " " : "")
-								+ ticketPopupRoot.ticketTitle
-								+ (ticketPopupRoot.senderName ? " — " + ticketPopupRoot.senderName : "")
-						font.bold: true
-						elide: Text.ElideRight
-						maximumLineCount: 1
-					}
-				}
-
-				// Message preview — single line, limited height, no raw \n
-				BaseText {
-					width: parent.width
-					text: ticketPopupRoot.preview.split("\n").join(" ")
-					color: Style.subtitleColor
-					elide: Text.ElideRight
-					maximumLineCount: 1
-					visible: ticketPopupRoot.preview !== ""
-				}
-
-				// Hint
-				BaseText {
-					text: qsTr("Click to open →")
-					color: Style.inactiveTextColor
-				}
-			}
-
-			ToolButton {
-				id: closeArea
-				width: Style.iconSizeS + Style.marginM
-				height: width
-				anchors.right: parent.right
-				anchors.top: parent.top
-				anchors.margins: Style.marginS
-				iconSource: "qrc:/" +Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
-				decorator: Component {
-					ToolButtonDecorator {
-						color: "transparent"
-						icon.width: Style.iconSizeXS
-					}
-				}
-				onClicked: {
-					if (ticketPopupRoot.popupContainer)
-						ticketPopupRoot.popupContainer.removeMessageById(ticketPopupRoot.messageId)
-				}
-			}
-		}
-	}
-
-	// Subscribes to server-side ticket message notifications and surfaces
-	// them via PopupManager. The server-side filter (CTicketMessageNotifierComp)
-	// already restricts delivery to users related to the ticket
-	// (reporter / assignees / admin), excluding the sender.
-	SubscriptionClient {
-		id: ticketMessageSubscription
-		gqlCommandId: "OnTicketMessageReceived"
-		autoSubscribe: false
-		onMessageReceived: {
-			if (!data){
-				return
-			}
-			var ticketId = data.containsKey("ticketId") ? data.getData("ticketId") : ""
-			var ticketNumber = data.containsKey("ticketNumber") ? data.getData("ticketNumber") : ""
-			var ticketTitle = data.containsKey("ticketTitle") ? data.getData("ticketTitle") : ""
-			var senderName = data.containsKey("senderUserName") ? data.getData("senderUserName") : ""
-			var content = data.containsKey("content") ? data.getData("content") : ""
-			var messageId = data.containsKey("messageId") ? data.getData("messageId") : ""
-
-			var preview = content ? String(content) : ""
-			if (preview.length > 80){
-				preview = preview.substring(0, 80) + "…"
-			}
-
-			PopupManager.addCustomMessage(messageId, ticketNotificationDelegate, {
-				autoClose: true,
-				ticketId: ticketId,
-				ticketNumber: ticketNumber,
-				ticketTitle: ticketTitle,
-				senderName: senderName,
-				preview: preview,
-				notificationType: "message"
-			})
-		}
-	}
-
-	// Subscribes to server-side assignee change notifications and surfaces
-	// them via PopupManager. The server-side filter (CTicketAssigneeNotifierComp)
-	// delivers only to newly added assignees.
-	SubscriptionClient {
-		id: ticketAssigneeSubscription
-		gqlCommandId: "OnTicketAssigneeChanged"
-		autoSubscribe: false
-		onMessageReceived: {
-			if (!data){
-				return
-			}
-
-			var ticketId = data.containsKey("ticketId") ? data.getData("ticketId") : ""
-			var ticketNumber = data.containsKey("ticketNumber") ? data.getData("ticketNumber") : ""
-			var ticketTitle = data.containsKey("ticketTitle") ? data.getData("ticketTitle") : ""
-
-			var popupId = "TicketAssignee_" + ticketNumber
-			PopupManager.addCustomMessage(popupId, ticketNotificationDelegate, {
-				autoClose: true,
-				ticketId: ticketId,
-				ticketNumber: ticketNumber,
-				ticketTitle: ticketTitle,
-				notificationType: "assignee"
-			})
-		}
-	}
-	
 	property Component messagePageComp: Component {
 		ServerNoConnectionView {
 			z: 5;
 			anchors.fill: parent;
-			anchors.topMargin: thumbnailDecorator.topPanel.height;
+			anchors.topMargin: thumbnailDecorator.topPanel ? thumbnailDecorator.topPanel.height : 0;
 			loadingVisible: internal.loadingVisible;
 			text: internal.errorMessage;
+			description: internal.errorDescription;
+			retryVisible: internal.retryVisible;
+
+			onRetryClicked: {
+				application.reconnect();
+			}
 		}
 	}
 	
@@ -547,12 +374,14 @@ Item {
 
 			url.protocol = protocol
 
-			// Port 0: WebSocket is served on the server's own port, the URL keeps it
-			if (!shouldUseWebSocketProxy && application.webSocketPort > 0){
-				url.port = application.webSocketPort;
-			}
-			else if (application.webSocketPort < 0){
-				console.error("WebSocket port provider has invalid port!");
+			if (!shouldUseWebSocketProxy){
+				// Port 0: WebSocket is served on the server's own port, the URL keeps it
+				if (application.webSocketPort > 0){
+					url.port = application.webSocketPort;
+				}
+				else if (application.webSocketPort < 0){
+					console.error("WebSocket port provider has invalid port!");
+				}
 			}
 
 			if (context.appId && context.appId !== ""){
@@ -572,12 +401,18 @@ Item {
 		ServerLogProvider {}
 	}
 	
+	Component {
+		id: serviceDependencyViewComp
+		ServiceDependencyView {}
+	}
+	
 	ThumbnailDecorator {
 		id: thumbnailDecorator;
 		
 		anchors.fill: parent;
 		Component.onCompleted: {
 			settingsController.registerParamEditor("ServerLog", serverLogProviderComp)
+			settingsController.registerParamEditor("ServiceDependency", serviceDependencyViewComp)
 		}
 		
 		function fillPreferenceParamsSet(){
@@ -736,11 +571,6 @@ Item {
 			thumbnailDecorator.showPage(undefined)
 			
 			application.updateAllModels();
-
-			// Register ticket notification subscriptions now that we have
-			// a valid auth token for the logged-in user.
-			ticketMessageSubscription.registerSubscription();
-			ticketAssigneeSubscription.registerSubscription();
 		}
 
 		function onTenantSelected(tenantId){
@@ -748,11 +578,6 @@ Item {
 		}
 		
 		function onLoggedOut(){
-			// Unregister subscriptions for the previous user before
-			// SubscriptionManager.clear() wipes the model.
-			ticketMessageSubscription.unRegisterSubscription();
-			ticketAssigneeSubscription.unRegisterSubscription();
-
 			thumbnailDecorator.stopLoading();
 			NavigationController.clear();
 			subscriptionManager_.clear();

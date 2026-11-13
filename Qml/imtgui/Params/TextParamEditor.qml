@@ -14,13 +14,14 @@ ParamEditorBase {
 	}
 	
 	property TextParam textParam: editorModel
+	property int controlWidth: Style.sizeHintXS
 
 	sourceComp: Component {
 		TextInputElementView {
 			width: textParamEditor.width
 			name: textParamEditor.name
 			description: textParamEditor.description
-			controlWidth: Style.sizeHintXS
+			controlWidth: textParamEditor.controlWidth
 			text: textParamEditor.textParam ? textParamEditor.textParam.m_text : ""
 			readOnly: textParamEditor.readOnly
 			onEditingFinished: {

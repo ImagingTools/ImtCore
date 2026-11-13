@@ -182,6 +182,12 @@
         <Element Id="TicketController" PackageId="ImtCoreVoce" ComponentId="TicketController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ProductId" Type="Id" ExportId="ProductId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="NotificationSender" Type="Reference" ExportId="NotificationSender">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -226,5 +232,6 @@
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="AttachmentStorage" ComponentId="TicketController/AttachmentStorage"/>
+        <Component ExportedId="TicketNotificationProducer" ComponentId="TicketController/TicketNotificationProducer"/>
     </ExportedComponents>
 </Acf>

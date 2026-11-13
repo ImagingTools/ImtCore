@@ -60,6 +60,12 @@ public:
 	*/
 	void NotifyFinished(const IRequest* requestPtr, const QByteArray& subCommandId);
 
+	/**
+		Answer a request that cannot be processed by this worker (it has no servlet) with \c 500 and finish it, so the
+		client does not wait and the request is freed (see CWorker::CreateInternalErrorResponse()).
+	*/
+	void RejectRequest(const IRequest* requestPtr, const QByteArray& subCommandId);
+
 	//reimplemented (QThread)
 	virtual void run() override;
 

@@ -42,6 +42,17 @@ Item {
 	// has no place on screen of its own to hang a popup from.
 	property Item popupAnchorItem: null
 
+	// The filter this one is narrowed by (FilterMenu.setFilterDependency, the first
+	// one registered). Its options follow that filter's value, so the chip carries a
+	// link mark and its hint and popup name the filter it follows. scopeText is only
+	// meaningful while scopeFilter is set.
+	property Item scopeFilter: null
+	readonly property bool isScoped: filterDelegateBase.scopeFilter !== null && filterDelegateBase.scopeFilter.isActive
+	readonly property string scopeFilterName: filterDelegateBase.scopeFilter !== null ? filterDelegateBase.scopeFilter.name : ""
+	readonly property string scopeText: filterDelegateBase.isScoped
+		? qsTr("Narrowed by %1: %2").arg(filterDelegateBase.scopeFilterName).arg(filterDelegateBase.scopeFilter.valueText)
+		: qsTr("Choose %1 to narrow the list").arg(filterDelegateBase.scopeFilterName)
+
 	property alias mainButton: chipArea
 	property alias clearButton: clearArea
 
@@ -80,10 +91,36 @@ Item {
 	function selectOption(index){
 	}
 
+	function updateScopeFilter(){
+		let dependsOn = filterDelegateBase.filterMenu ? filterDelegateBase.filterMenu.getDependsOn(filterDelegateBase.filterId) : []
+		let delegate = dependsOn.length > 0 ? filterDelegateBase.filterMenu.getFilterDelegate(dependsOn[0]) : null
+
+		// A filter that has not been loaded yet is listed without an item.
+		filterDelegateBase.scopeFilter = delegate ? delegate : null
+	}
+
+	onFilterMenuChanged: {
+		filterDelegateBase.updateScopeFilter()
+	}
+
+	onFilterIdChanged: {
+		filterDelegateBase.updateScopeFilter()
+	}
+
 	Connections {
 		target: filterDelegateBase.filterMenu ? filterDelegateBase.filterMenu: null
 		function onClearAllFilters(beQuiet){
 			filterDelegateBase.clearFilter(beQuiet)
+		}
+
+		function onFilterDependencyAdded(filterId, dependsOnFilterId){
+			if (filterId === filterDelegateBase.filterId){
+				filterDelegateBase.updateScopeFilter()
+			}
+		}
+
+		function onFilterDelegateLoaded(filterId){
+			filterDelegateBase.updateScopeFilter()
 		}
 	}
 
@@ -114,6 +151,22 @@ Item {
 			anchors.verticalCenter: parent.verticalCenter
 
 			spacing: Style.spacingXS
+
+			// Marks a filter whose options follow another one; full while that
+			// filter is set, faded while it is not.
+			Image {
+				id: scopeMark
+
+				anchors.verticalCenter: parent.verticalCenter
+
+				visible: filterDelegateBase.scopeFilter !== null
+				width: scopeMark.visible ? Style.iconSizeXS : 0
+				height: Style.iconSizeXS
+				opacity: filterDelegateBase.isScoped ? 1 : 0.5
+				sourceSize.width: width
+				sourceSize.height: height
+				source: "qrc:/" + Style.getIconPath("Icons/Link", Icon.State.On, Icon.Mode.Normal)
+			}
 
 			BaseText {
 				anchors.verticalCenter: parent.verticalCenter

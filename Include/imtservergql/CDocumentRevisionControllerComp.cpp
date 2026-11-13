@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtservergql/CDocumentRevisionControllerComp.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/DocumentRevision.h>
+#include <imtservergql/imtservergql.h>
 
 
 // ACF includes
@@ -383,6 +384,30 @@ bool CDocumentRevisionControllerComp::IsRequestSupported(const imtgql::CGqlReque
 	return IsCollectionSupported(collectionId);
 }
 
+
+// reimplemented (imtservergql::CPermissibleGqlRequestHandlerComp)
+
+bool CDocumentRevisionControllerComp::CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& /*errorMessage*/) const
+{
+	QByteArrayList collectionIds;
+	for (int i = 0; i < m_collectionIdsAttrPtr.GetCount(); ++i){
+		collectionIds.append(m_collectionIdsAttrPtr[i]);
+	}
+
+	QByteArrayList revisionPermissionPaths;
+	for (int i = 0; i < m_revisionPermissionPathsAttrPtr.GetCount(); ++i){
+		revisionPermissionPaths.append(m_revisionPermissionPathsAttrPtr[i]);
+	}
+
+	QString refusalReason;
+	if (imtservergql::CheckRevisionPermissions(gqlRequest, collectionIds, revisionPermissionPaths, refusalReason)){
+		return true;
+	}
+
+	SendWarningMessage(0, QStringLiteral("Command '%1' refused: %2").arg(QString::fromUtf8(gqlRequest.GetCommandId()), refusalReason));
+
+	return false;
+}
 
 } // namespace imtservergql
 

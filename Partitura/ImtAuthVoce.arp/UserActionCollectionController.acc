@@ -30,14 +30,14 @@
                     <AttributeInfo Id="NewPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>AddAccount</Value>
+                                <Value>/AccountManagement/Edit/Add</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="RemovePermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>RemoveAccount</Value>
+                                <Value>/AccountManagement/Edit/Remove</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

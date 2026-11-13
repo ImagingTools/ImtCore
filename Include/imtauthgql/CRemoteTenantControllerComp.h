@@ -4,6 +4,7 @@
 
 // ImtCore includes
 #include <imtauth/ITenantManager.h>
+#include <imtauth/ITenantRelationshipProvider.h>
 #include <imtclientgql/TClientRequestManagerCompWrap.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Tenants_fwd.h>
 
@@ -14,6 +15,7 @@ namespace imtauthgql
 
 class CRemoteTenantControllerComp:
 			virtual public imtauth::ITenantManager,
+			virtual public imtauth::ITenantRelationshipProvider,
 			public imtclientgql::TClientRequestManagerCompWrap<
 							sdl::V1_0::imtauth::CTenantsGqlHandlerCompBase>
 {
@@ -22,20 +24,33 @@ public:
 
 	I_BEGIN_COMPONENT(CRemoteTenantControllerComp);
 		I_REGISTER_INTERFACE(imtauth::ITenantManager);
+		I_REGISTER_INTERFACE(imtauth::ITenantRelationshipProvider);
 		I_ASSIGN(m_tenantFactoryCompPtr, "TenantFactory", "Factory for tenant info objects", true, "TenantFactory");
 	I_END_COMPONENT;
 
 	// reimplemented (imtauth::ITenantManager)
 	virtual QByteArrayList GetTenantIds() const override;
 	virtual imtauth::ITenantInfoUniquePtr GetTenant(const QByteArray& tenantId) const override;
+	virtual QByteArrayList GetOwnedOrCreatedTenantIds(const QByteArray& userId, bool* isReadPtr = nullptr) const override;
+	virtual QByteArrayList GetChildTenantIds(const QByteArray& tenantId, bool* isReadPtr = nullptr) const override;
+	virtual QByteArrayList FindTenantIdsByName(const QString& tenantName) const override;
 	virtual QByteArrayList GetTenantPermissions(const QByteArray& tenantId) const override;
-	virtual QByteArray CreateTenant(const QString& tenantName, const QString& description = QString(), const QByteArray& ownerId = QByteArray()) override;
+	virtual QByteArray CreateTenant(
+				const QString& tenantName,
+				const QString& description = QString(),
+				const QByteArray& ownerId = QByteArray(),
+				const QByteArray& creatorId = QByteArray(),
+				const QByteArray& parentTenantId = QByteArray()) override;
 	virtual bool RemoveTenant(const QByteArray& tenantId) override;
 	virtual bool UpdateTenant(const QByteArray& tenantId, const QString& tenantName, const QString& description, const QByteArray& ownerId = QByteArray(), bool updateOwner = false) override;
 	virtual bool SetTenantActive(const QByteArray& tenantId, bool isActive) override;
+	virtual bool SetTenantPermissions(const QByteArray& tenantId, const QByteArrayList& permissions) override;
 	virtual bool SetTenantHierarchy(const QByteArray& tenantId, const QByteArray& parentTenantId) override;
 	virtual QByteArray GetSystemTenantId() const override;
 	virtual bool EnsureSystemTenant() override;
+
+	// reimplemented (imtauth::ITenantRelationshipProvider)
+	virtual imtauth::RelatedTenantInfos GetRelatedTenants(const QByteArray& tenantId, QString* tenantNamePtr = nullptr, bool* isReadPtr = nullptr) const override;
 
 protected:
 	// reimplemented (sdl::V1_0::imtauth::CTenantsGqlHandlerCompBase)

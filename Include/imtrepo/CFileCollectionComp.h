@@ -46,6 +46,12 @@ public:
 	virtual int BackupRevision(const imtbase::IObjectCollection& collection, const Id& objectId, const QString& userComment = QString()) const override;
 	virtual bool RestoreRevision(imtbase::IObjectCollection& collection, const Id& objectId, int revision) const override;
 	virtual bool ExportRevision(const imtbase::IObjectCollection& collection, const Id& objectId, int revision, const QString& filePath) const override;
+	virtual bool GetRevisionData(
+				const imtbase::IObjectCollection& collection,
+				const Id& objectId,
+				int revision,
+				istd::IChangeableSharedPtr& dataPtr,
+				idoc::MetaInfoPtr& dataMetaInfoPtr) const override;
 	virtual bool DeleteRevision(IObjectCollection& collection, const ICollectionInfo::Id& objectId, int revision) const override;
 
 	// reimplemented (IFileCollectionInfo)
@@ -109,6 +115,12 @@ protected:
 	*/
 	virtual bool UpdateRepositoryFormat();
 	virtual bool TransformRepositoryItem(const RepositoryItemInfo& repositoryItemInfo, int fromRepositoryRevision, int toRepositoryRevision) const;
+	bool ExtractRevisionDataFile(
+			const imtbase::IObjectCollection& collection,
+			const Id& objectId,
+			int revision,
+			QString& workingDirectoryPath,
+			QString& objectDataFilePath) const;
 
 	// reimplemented (CFileCollectionCompBase)
 	virtual QString CalculateFolderPathInRepository(

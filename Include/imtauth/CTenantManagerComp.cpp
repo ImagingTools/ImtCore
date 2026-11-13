@@ -8,10 +8,17 @@
 
 // ACF includes
 #include <istd/CChangeNotifier.h>
+#include <iprm/CIdParam.h>
+#include <iprm/CParamsSet.h>
+#include <ilog/CMessageContainer.h>
 
 // ImtCore includes
 #include <imtauth/ITenantInfo.h>
+#include <imtauth/imtauth.h>
+#include <imtauth/TenantEvents.h>
 #include <imtbase/imtbase.h>
+#include <imtbase/CComplexCollectionFilter.h>
+#include <imtauth/CollectionSelection.h>
 
 
 namespace imtauth
@@ -70,6 +77,121 @@ ITenantInfoUniquePtr CTenantManagerComp::GetTenant(const QByteArray& tenantId) c
 }
 
 
+QByteArrayList CTenantManagerComp::GetOwnedOrCreatedTenantIds(const QByteArray& userId, bool* isReadPtr) const
+{
+	QByteArrayList retVal;
+	if (isReadPtr != nullptr){
+		*isReadPtr = m_tenantCollectionCompPtr.IsValid();
+	}
+
+	if (!m_tenantCollectionCompPtr.IsValid()){
+		return retVal;
+	}
+
+	// A collection that does not know the filter returns every organization
+	bool isRead = true;
+	for (const QByteArray& candidateId : CollectionSelection::SelectIds(*m_tenantCollectionCompPtr, CollectionSelection::AnyColumnEquals("OwnerId", "CreatorId", userId), QByteArrayList(), &isRead)){
+		ITenantInfoUniquePtr candidatePtr = GetTenant(candidateId);
+		if (!candidatePtr.IsValid()){
+			isRead = false;
+		}
+		else if (candidatePtr->GetOwnerId() == userId || candidatePtr->GetCreatorId() == userId){
+			retVal.append(candidateId);
+		}
+	}
+
+	if (isReadPtr != nullptr){
+		*isReadPtr = isRead;
+	}
+
+	return retVal;
+}
+
+
+QByteArrayList CTenantManagerComp::GetChildTenantIds(const QByteArray& tenantId, bool* isReadPtr) const
+{
+	QByteArrayList retVal;
+	if (isReadPtr != nullptr){
+		*isReadPtr = m_tenantCollectionCompPtr.IsValid();
+	}
+
+	if (!m_tenantCollectionCompPtr.IsValid() || tenantId.isEmpty()){
+		return retVal;
+	}
+
+	iprm::CIdParam parentTenantParam;
+	parentTenantParam.SetId(tenantId);
+
+	iprm::CParamsSet filterParams;
+	filterParams.SetEditableParameter("ParentTenantId", &parentTenantParam);
+
+	// A collection that does not know the filter returns every organization
+	ilog::CMessageContainer readErrors;
+	bool isRead = true;
+	for (const QByteArray& candidateId : m_tenantCollectionCompPtr->GetElementIds(0, -1, &filterParams, &readErrors)){
+		ITenantInfoUniquePtr candidatePtr = GetTenant(candidateId);
+		if (!candidatePtr.IsValid()){
+			isRead = false;
+		}
+		else if (candidatePtr->GetParentTenantId() == tenantId){
+			retVal.append(candidateId);
+		}
+	}
+
+	if (isReadPtr != nullptr){
+		*isReadPtr = isRead && readErrors.GetWorstCategory() < istd::IInformationProvider::IC_ERROR;
+	}
+
+	return retVal;
+}
+
+
+QByteArrayList CTenantManagerComp::FindTenantIdsByName(const QString& tenantName) const
+{
+	QByteArrayList retVal;
+	const QString name = tenantName.trimmed();
+	if (!m_tenantCollectionCompPtr.IsValid() || name.isEmpty()){
+		return retVal;
+	}
+
+	// The case-insensitive match of the database selects the candidates, the comparison below decides; SQLite ignores the case of ASCII letters only.
+	// A semicolon does not reach a selection query unchanged and a backslash escapes in LIKE, so the candidates match the longest part without them.
+	QString candidatePart;
+	QString part;
+	for (const QChar character : name + QChar(';')){
+		if (character == QChar(';') || character == QChar('\\')){
+			if (part.size() > candidatePart.size()){
+				candidatePart = part;
+			}
+			part.clear();
+		}
+		else{
+			part.append(character);
+		}
+	}
+
+	imtbase::IComplexCollectionFilter::FilterExpression filterExpr;
+	filterExpr.fieldFilters << imtbase::IComplexCollectionFilter::FieldFilter("Name", candidatePart, imtbase::IComplexCollectionFilter::FO_CONTAINS);
+
+	imtbase::CComplexCollectionFilter complexFilter;
+	complexFilter.SetFilterExpression(filterExpr);
+
+	iprm::CParamsSet filterParams;
+	if (!candidatePart.isEmpty()){
+		filterParams.SetEditableParameter("ComplexFilter", &complexFilter);
+	}
+
+	for (const QByteArray& candidateId : m_tenantCollectionCompPtr->GetElementIds(0, -1, &filterParams)){
+		ITenantInfoUniquePtr candidatePtr = GetTenant(candidateId);
+		if (candidatePtr.IsValid() && candidatePtr->GetTenantName().trimmed().compare(name, Qt::CaseInsensitive) == 0){
+			retVal.append(candidateId);
+		}
+	}
+
+	return retVal;
+}
+
+
 QByteArrayList CTenantManagerComp::GetTenantPermissions(const QByteArray& tenantId) const
 {
 	ITenantInfoUniquePtr tenantPtr = GetTenant(tenantId);
@@ -81,7 +203,12 @@ QByteArrayList CTenantManagerComp::GetTenantPermissions(const QByteArray& tenant
 }
 
 
-QByteArray CTenantManagerComp::CreateTenant(const QString& tenantName, const QString& description, const QByteArray& ownerId)
+QByteArray CTenantManagerComp::CreateTenant(
+			const QString& tenantName,
+			const QString& description,
+			const QByteArray& ownerId,
+			const QByteArray& creatorId,
+			const QByteArray& parentTenantId)
 {
 	if (!m_tenantCollectionCompPtr.IsValid() || !m_tenantFactoryCompPtr.IsValid()){
 		SendErrorMessage(0, "Tenant collection or factory not configured", "CTenantManagerComp");
@@ -104,7 +231,8 @@ QByteArray CTenantManagerComp::CreateTenant(const QString& tenantName, const QSt
 	tenantPtr->SetTenantName(tenantName);
 	tenantPtr->SetTenantDescription(description);
 	tenantPtr->SetOwnerId(ownerId);
-	tenantPtr->SetCreatorId(ownerId);
+	tenantPtr->SetCreatorId(creatorId.isEmpty() ? ownerId : creatorId);
+	tenantPtr->SetParentTenantId(parentTenantId);
 	tenantPtr->SetActive(true);
 	tenantPtr->SetCreatedAt(now);
 	tenantPtr->SetUpdatedAt(now);
@@ -114,11 +242,17 @@ QByteArray CTenantManagerComp::CreateTenant(const QString& tenantName, const QSt
 	// present in this set (see CRoleDocumentValidatorComp); without a default set
 	// a fresh tenant could not grant its roles any RBAC permission at all.
 	static const QByteArrayList defaultTenantPermissions = {
-		QByteArrayLiteral("ViewUsers"), QByteArrayLiteral("AddUser"), QByteArrayLiteral("UserUpdate"), QByteArrayLiteral("RemoveUser"), QByteArrayLiteral("UserItem"),
-		QByteArrayLiteral("ViewRoles"), QByteArrayLiteral("AddRole"), QByteArrayLiteral("RoleUpdate"), QByteArrayLiteral("RemoveRole"), QByteArrayLiteral("RoleItem"),
-		QByteArrayLiteral("ViewGroups"), QByteArrayLiteral("AddGroup"), QByteArrayLiteral("GroupUpdate"), QByteArrayLiteral("RemoveGroup"), QByteArrayLiteral("GroupItem")
+		QByteArrayLiteral("/Administration/Users/ViewPage"), QByteArrayLiteral("/Administration/Users/View"), QByteArrayLiteral("/Administration/Users/Edit/Add"),
+		QByteArrayLiteral("/Administration/Users/Edit/Change"), QByteArrayLiteral("/Administration/Users/Edit/Remove"),
+		QByteArrayLiteral("/Administration/Roles/ViewPage"), QByteArrayLiteral("/Administration/Roles/View"), QByteArrayLiteral("/Administration/Roles/Edit/Add"),
+		QByteArrayLiteral("/Administration/Roles/Edit/Change"), QByteArrayLiteral("/Administration/Roles/Edit/Remove"),
+		QByteArrayLiteral("/Administration/Groups/ViewPage"), QByteArrayLiteral("/Administration/Groups/View"), QByteArrayLiteral("/Administration/Groups/Edit/Add"),
+		QByteArrayLiteral("/Administration/Groups/Edit/Change"), QByteArrayLiteral("/Administration/Groups/Edit/Remove"),
+		QByteArrayLiteral("/Administration/Users/Revisions/View"), QByteArrayLiteral("/Administration/Roles/Revisions/View"), QByteArrayLiteral("/Administration/Groups/Revisions/View")
 	};
-	tenantPtr->SetTenantPermissions(defaultTenantPermissions);
+	tenantPtr->SetTenantPermissions(parentTenantId.isEmpty()
+				? defaultTenantPermissions
+				: RestrictPermissions(defaultTenantPermissions, GetTenantPermissions(parentTenantId)));
 
 	QByteArray retVal = m_tenantCollectionCompPtr->InsertNewObject("Tenant", tenantName, description, tenantPtr.GetPtr(), tenantId);
 	if (retVal.isEmpty()){
@@ -173,6 +307,8 @@ bool CTenantManagerComp::UpdateTenant(const QByteArray& tenantId, const QString&
 
 	istd::CChangeNotifier changeNotifier(this);
 
+	const QByteArray previousOwnerId = tenantPtr->GetOwnerId();
+
 	tenantPtr->SetTenantName(tenantName);
 	tenantPtr->SetTenantDescription(description);
 	if (updateOwner){
@@ -183,6 +319,14 @@ bool CTenantManagerComp::UpdateTenant(const QByteArray& tenantId, const QString&
 	if (!m_tenantCollectionCompPtr->SetObjectData(tenantId, *tenantPtr)){
 		SendErrorMessage(0, QStringLiteral("Failed to update tenant '%1'").arg(tenantId), "CTenantManagerComp");
 		return false;
+	}
+
+	if (updateOwner && previousOwnerId != ownerId){
+		TenantEvent::Publish(this, {
+					{TenantEvent::s_type, TenantEvent::s_ownershipTransferred},
+					{TenantEvent::s_tenantId, tenantId},
+					{TenantEvent::s_previousOwnerId, previousOwnerId},
+					{TenantEvent::s_ownerId, ownerId}});
 	}
 
 	SendInfoMessage(0, QStringLiteral("Updated tenant '%1'").arg(tenantId), "CTenantManagerComp");
@@ -223,6 +367,14 @@ bool CTenantManagerComp::SetTenantActive(const QByteArray& tenantId, bool isActi
 	SendInfoMessage(0, QStringLiteral("Set tenant '%1' active=%2").arg(tenantId, QString::number(isActive)), QStringLiteral("CTenantManagerComp"));
 
 	return true;
+}
+
+
+bool CTenantManagerComp::SetTenantPermissions(const QByteArray& tenantId, const QByteArrayList& permissions)
+{
+	QSet<QByteArray> visitedTenantIds;
+
+	return SetTenantPermissionsTree(tenantId, permissions, visitedTenantIds);
 }
 
 
@@ -312,6 +464,56 @@ bool CTenantManagerComp::EnsureSystemTenant()
 QByteArray CTenantManagerComp::GetSystemTenantId() const
 {
 	return imtauth::GetSystemTenantId();
+}
+
+
+// private methods
+
+bool CTenantManagerComp::SetTenantPermissionsTree(const QByteArray& tenantId, const QByteArrayList& permissions, QSet<QByteArray>& visitedTenantIds)
+{
+	visitedTenantIds.insert(tenantId);
+
+	if (!m_tenantCollectionCompPtr.IsValid()){
+		SendErrorMessage(0, "Tenant collection not configured", "CTenantManagerComp");
+		return false;
+	}
+
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	if (!m_tenantCollectionCompPtr->GetObjectData(tenantId, dataPtr)){
+		SendErrorMessage(0, QStringLiteral("Tenant '%1' not found").arg(QString::fromUtf8(tenantId)), "CTenantManagerComp");
+		return false;
+	}
+
+	ITenantInfo* tenantPtr = dynamic_cast<ITenantInfo*>(dataPtr.GetPtr());
+	if (tenantPtr == nullptr){
+		SendErrorMessage(0, "Invalid tenant object", "CTenantManagerComp");
+		return false;
+	}
+
+	istd::CChangeNotifier changeNotifier(this);
+
+	if (tenantPtr->GetTenantPermissions() != permissions){
+		tenantPtr->SetTenantPermissions(permissions);
+		tenantPtr->SetUpdatedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
+
+		if (!m_tenantCollectionCompPtr->SetObjectData(tenantId, *tenantPtr)){
+			SendErrorMessage(0, QStringLiteral("Failed to set the permissions of tenant '%1'").arg(QString::fromUtf8(tenantId)), "CTenantManagerComp");
+			return false;
+		}
+	}
+
+	// A sub-organization never holds more than its parent. Every subtree is visited, so a retry repairs descendants left over from a partially failed update
+	bool retVal = true;
+	for (const QByteArray& childTenantId : GetChildTenantIds(tenantId)){
+		if (visitedTenantIds.contains(childTenantId)){
+			continue;
+		}
+
+		const QByteArrayList restrictedPermissions = RestrictPermissions(GetTenantPermissions(childTenantId), permissions);
+		retVal = SetTenantPermissionsTree(childTenantId, restrictedPermissions, visitedTenantIds) && retVal;
+	}
+
+	return retVal;
 }
 
 

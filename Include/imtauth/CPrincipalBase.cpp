@@ -1,0 +1,521 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+#include <imtauth/CPrincipalBase.h>
+
+
+// Qt includes
+#include <QtCore/QByteArrayList>
+
+// ACF includes
+#include <istd/CChangeNotifier.h>
+#include <iser/IArchive.h>
+#include <iser/CArchiveTag.h>
+#include <iser/CPrimitiveTypesSerializer.h>
+
+// ImtCore includes
+#include <imtcore/Version.h>
+#include <imtbase/IObjectCollection.h>
+
+
+namespace imtauth
+{
+
+
+// public methods
+
+CPrincipalBase::CPrincipalBase():
+	m_permissionProviderPtr(nullptr),
+	m_roleProviderPtr(nullptr),
+	m_userGroupInfoProviderPtr(nullptr)
+{
+
+}
+
+
+const imtlic::IFeatureInfoProvider *CPrincipalBase::GetPermissionProvider() const
+{
+	return m_permissionProviderPtr;
+}
+
+
+const imtauth::IRoleInfoProvider* CPrincipalBase::GetRoleProvider() const
+{
+	return m_roleProviderPtr;
+}
+
+
+QByteArray CPrincipalBase::GetId() const
+{
+	return m_id;
+}
+
+
+void CPrincipalBase::SetId(const QByteArray& id)
+{
+	if (m_id != id){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_id = id;
+	}
+}
+
+
+QByteArray CPrincipalBase::GetSid() const
+{
+	return m_sid;
+}
+
+
+void CPrincipalBase::SetSid(const QByteArray& sid)
+{
+	if (m_sid != sid){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_sid = sid;
+	}
+}
+
+
+QString CPrincipalBase::GetName() const
+{
+	return m_name;
+}
+
+
+void CPrincipalBase::SetName(const QString& name)
+{
+	if (m_name != name){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_name = name;
+	}
+}
+
+
+QString CPrincipalBase::GetDescription() const
+{
+	return m_description;
+}
+
+
+void CPrincipalBase::SetDescription(const QString& description)
+{
+	if (m_description != description){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_description = description;
+	}
+}
+
+
+IPrincipal::FeatureIds CPrincipalBase::GetPermissions(const QByteArray& productId) const
+{
+	IPrincipal::FeatureIds allPermissions;
+
+	if (m_roleProviderPtr != nullptr){
+		RoleIds roleIds;
+		if (productId.isEmpty()){
+			for (auto it = m_rolesMap.cbegin(); it != m_rolesMap.cend(); ++it){
+				roleIds += it.value();
+			}
+		}
+		else{
+			auto it = m_rolesMap.constFind(productId);
+			if (it != m_rolesMap.cend()){
+				roleIds = it.value();
+			}
+		}
+
+		for (const QByteArray& roleId : std::as_const(roleIds)){
+			imtauth::IRoleUniquePtr roleInfoPtr = m_roleProviderPtr->GetRole(roleId);
+			if (roleInfoPtr.IsValid()){
+				const IPrincipal::FeatureIds rolePerms = roleInfoPtr->GetPermissions();
+				for (const QByteArray& perm : std::as_const(rolePerms)){
+					if (!allPermissions.contains(perm)){
+						allPermissions << perm;
+					}
+				}
+			}
+		}
+	}
+
+	// Local (directly assigned, not role-based) permissions are always part of the
+	// effective permission set - independent of whether a role provider is available.
+	FeatureIds localPermissions;
+	if (productId.isEmpty()){
+		for (auto it = m_permissionsMap.cbegin(); it != m_permissionsMap.cend(); ++it){
+			localPermissions += it.value();
+		}
+	}
+	else{
+		auto it = m_permissionsMap.constFind(productId);
+		if (it != m_permissionsMap.cend()){
+			localPermissions = it.value();
+		}
+	}
+
+	for (const QByteArray& perm : std::as_const(localPermissions)){
+		if (!allPermissions.contains(perm)){
+			allPermissions << perm;
+		}
+	}
+
+	return allPermissions;
+}
+
+
+
+IPrincipal::FeatureIds CPrincipalBase::GetLocalPermissions(const QByteArray& productId) const
+{
+	if (m_permissionsMap.contains(productId)){
+		return m_permissionsMap[productId];
+	}
+
+	return IPrincipal::FeatureIds();
+}
+
+
+void CPrincipalBase::SetLocalPermissions(const QByteArray& productId, const FeatureIds& permissions)
+{
+	bool ok = true;
+	if (m_permissionsMap.contains(productId)){
+		FeatureIds currentFeatureIds = m_permissionsMap.value(productId);
+		if (currentFeatureIds == permissions){
+			ok = false;
+		}
+	}
+
+	if (ok){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_permissionsMap.insert(productId, permissions);
+	}
+}
+
+
+IPrincipal::FeatureIds CPrincipalBase::GetProhibitions() const
+{
+	return m_restrictions;
+}
+
+
+void CPrincipalBase::SetProhibitions(const FeatureIds &prohibitions)
+{
+	if (m_restrictions != prohibitions){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_restrictions = prohibitions;
+	}
+}
+
+
+QByteArrayList CPrincipalBase::GetProducts() const
+{
+	return m_rolesMap.keys();
+}
+
+
+bool CPrincipalBase::RemoveProduct(const QByteArray& productId)
+{
+	bool ok = false;
+	if (m_permissionsMap.contains(productId)){
+		m_permissionsMap.remove(productId);
+
+		ok = true;
+	}
+
+	if (m_rolesMap.contains(productId)){
+		m_rolesMap.remove(productId);
+
+		ok = true;
+	}
+
+	if (ok){
+		istd::CChangeNotifier changeNotifier(this);
+	}
+
+	return false;
+}
+
+
+IPrincipal::RoleIds CPrincipalBase::GetRoles(const QByteArray& productId) const
+{
+	if (m_rolesMap.contains(productId)){
+		return m_rolesMap.value(productId);
+	}
+
+	return IPrincipal::RoleIds();
+}
+
+
+void CPrincipalBase::SetRoles(const QByteArray& productId, const RoleIds &roles)
+{
+	bool ok = true;
+	if (m_rolesMap.contains(productId)){
+		RoleIds currentRoleIds = m_rolesMap.value(productId);
+		if (currentRoleIds == roles){
+			ok = false;
+		}
+	}
+
+	if (ok){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_rolesMap.insert(productId, roles);
+	}
+}
+
+
+void CPrincipalBase::AddRole(const QByteArray& productId, const QByteArray& roleId)
+{
+	bool isChanged = false;
+	if (!m_rolesMap.contains(productId)){
+		m_rolesMap.insert(productId, RoleIds());
+
+		isChanged = true;
+	}
+
+	RoleIds roleIds = m_rolesMap.value(productId);
+	if (!roleIds.contains(roleId)){
+		roleIds << roleId;
+
+		isChanged = true;
+	}
+
+	if (isChanged){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_rolesMap.insert(productId, roleIds);
+	}
+}
+
+
+bool CPrincipalBase::RemoveRole(const QByteArray& productId, const QByteArray& roleId)
+{
+	if (m_rolesMap.contains(productId)){
+		RoleIds roleIds = m_rolesMap.value(productId);
+		if (roleIds.contains(roleId)){
+			istd::CChangeNotifier changeNotifier(this);
+
+			roleIds.removeOne(roleId);
+
+			if (roleIds.isEmpty()){
+				m_rolesMap.remove(productId);
+			}
+			else{
+				m_rolesMap.insert(productId, roleIds);
+			}
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+const imtauth::IUserGroupInfoProvider* CPrincipalBase::GetUserGroupProvider() const
+{
+	return m_userGroupInfoProviderPtr;
+}
+
+
+bool CPrincipalBase::Serialize(iser::IArchive &archive)
+{
+	// Get ImtCore version
+	const iser::IVersionInfo& versionInfo = archive.GetVersionInfo();
+	quint32 imtCoreVersion;
+	if (!versionInfo.GetVersionNumber(imtcore::VI_IMTCORE, imtCoreVersion)){
+		imtCoreVersion = 0;
+	}
+
+	bool retVal = true;
+
+	iser::CArchiveTag idTag("Id", "Id", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(idTag);
+	retVal = retVal && archive.Process(m_id);
+	retVal = retVal && archive.EndTag(idTag);
+
+	iser::CArchiveTag nameTag("Name", "Name", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(nameTag);
+	retVal = retVal && archive.Process(m_name);
+	retVal = retVal && archive.EndTag(nameTag);
+
+	iser::CArchiveTag descriptionTag("Description", "Description", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(descriptionTag);
+	retVal = retVal && archive.Process(m_description);
+	retVal = retVal && archive.EndTag(descriptionTag);
+
+	if (imtCoreVersion >= 6940){
+		QByteArrayList keys = m_permissionsMap.keys();
+		int count = keys.size();
+
+		if (!archive.IsStoring()){
+			m_permissionsMap.clear();
+			keys.clear();
+			count = 0;
+		}
+
+		iser::CArchiveTag permissionsTag("Permissions", "Permissions", iser::CArchiveTag::TT_MULTIPLE);
+		iser::CArchiveTag permissionTag("Permission", "Permission", iser::CArchiveTag::TT_GROUP, &permissionsTag);
+
+		retVal = retVal && archive.BeginMultiTag(permissionsTag, permissionTag, count);
+
+		for (int index = 0; index < count; index++){
+			retVal = retVal && archive.BeginTag(permissionTag);
+
+			QByteArray key;
+			QByteArrayList value;
+
+			if (archive.IsStoring()){
+				key = keys[index];
+				value = m_permissionsMap[key];
+			}
+
+			iser::CArchiveTag keyTag("ProductId", "ProductId", iser::CArchiveTag::TT_LEAF, &permissionTag);
+			retVal = retVal && archive.BeginTag(keyTag);
+			retVal = retVal && archive.Process(key);
+			retVal = retVal && archive.EndTag(keyTag);
+
+			retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, value, "Permissions", "PermissionId");
+
+			if (!archive.IsStoring()){
+				m_permissionsMap[key] = value;
+			}
+
+			retVal = retVal && archive.EndTag(permissionTag);
+		}
+
+		retVal = retVal && archive.EndTag(permissionsTag);
+	}
+	else{
+		retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_restrictions, "Permissions", "Permission");
+	}
+
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_restrictions, "Restrictions", "Restriction");
+
+	QByteArrayList keys = m_rolesMap.keys();
+	int count = keys.size();
+
+	if (!archive.IsStoring()){
+		m_rolesMap.clear();
+		keys.clear();
+		count = 0;
+	}
+
+	iser::CArchiveTag productsTag("Products", "Products", iser::CArchiveTag::TT_MULTIPLE);
+	iser::CArchiveTag roleTag("Role", "Role", iser::CArchiveTag::TT_GROUP, &productsTag);
+
+	retVal = retVal && archive.BeginMultiTag(productsTag, roleTag, count);
+
+	for (int index = 0; index < count; index++){
+		retVal = retVal && archive.BeginTag(roleTag);
+
+		QByteArray key;
+		QByteArrayList value;
+
+		if (archive.IsStoring()){
+			key = keys[index];
+			value = m_rolesMap[key];
+		}
+
+		iser::CArchiveTag keyTag("ProductId", "ProductId", iser::CArchiveTag::TT_LEAF, &roleTag);
+		retVal = retVal && archive.BeginTag(keyTag);
+		retVal = retVal && archive.Process(key);
+		retVal = retVal && archive.EndTag(keyTag);
+
+		retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, value, "Roles", "RoleId");
+
+		if (!archive.IsStoring()){
+			m_rolesMap[key] = value;
+		}
+
+		retVal = retVal && archive.EndTag(roleTag);
+	}
+
+	retVal = retVal && archive.EndTag(productsTag);
+
+	return retVal;
+}
+
+
+int CPrincipalBase::GetSupportedOperations() const
+{
+	return SO_COPY | SO_COMPARE | SO_RESET;
+}
+
+
+bool CPrincipalBase::CopyFrom(const IChangeable &object, CompatibilityMode /*mode*/)
+{
+	const CPrincipalBase* sourcePtr = dynamic_cast<const CPrincipalBase*>(&object);
+	if (sourcePtr != nullptr){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_id = sourcePtr->m_id;
+		m_sid = sourcePtr->m_sid;
+		m_name = sourcePtr->m_name;
+		m_description = sourcePtr->m_description;
+		m_permissionsMap = sourcePtr->m_permissionsMap;
+		m_restrictions = sourcePtr->m_restrictions;
+		m_rolesMap = sourcePtr->m_rolesMap;
+		m_roleProviderPtr = sourcePtr->m_roleProviderPtr;
+		m_userGroupInfoProviderPtr = sourcePtr->m_userGroupInfoProviderPtr;
+
+		return true;
+	}
+
+	return false;
+}
+
+
+bool CPrincipalBase::IsEqual(const IChangeable& object) const
+{
+	const CPrincipalBase* sourcePtr = dynamic_cast<const CPrincipalBase*>(&object);
+	if (sourcePtr != nullptr){
+		bool retVal = m_restrictions == sourcePtr->m_restrictions;
+		retVal = retVal && m_permissionsMap == sourcePtr->m_permissionsMap;
+		retVal = retVal && m_rolesMap == sourcePtr->m_rolesMap;
+		retVal = retVal && m_name == sourcePtr->m_name;
+		retVal = retVal && m_id == sourcePtr->m_id;
+		retVal = retVal && m_sid == sourcePtr->m_sid;
+		retVal = retVal && m_description == sourcePtr->m_description;
+
+		return retVal;
+	}
+
+	return false;
+}
+
+
+istd::IChangeableUniquePtr CPrincipalBase::CloneMe(CompatibilityMode mode) const
+{
+	istd::IChangeableUniquePtr clonePtr(new CPrincipalBase);
+	if (clonePtr->CopyFrom(*this, mode)){
+		return clonePtr;
+	}
+
+	return nullptr;
+}
+
+
+bool CPrincipalBase::ResetData(CompatibilityMode /*mode*/)
+{
+	istd::CChangeNotifier changeNotifier(this);
+
+	m_id.clear();
+	m_sid.clear();
+	m_name.clear();
+	m_description.clear();
+	m_permissionsMap.clear();
+	m_restrictions.clear();
+	m_rolesMap.clear();
+	m_roleProviderPtr = nullptr;
+	m_permissionProviderPtr = nullptr;
+	m_userGroupInfoProviderPtr = nullptr;
+
+	return true;
+}
+
+
+} // namespace imtauth
+
+

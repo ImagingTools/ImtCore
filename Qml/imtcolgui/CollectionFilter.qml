@@ -60,7 +60,8 @@ ComplexCollectionFilter{
 									   EQUAL: "Equal",
 									   LESS: "Less",
 									   GREATER: "Greater",
-									   CONTAINS: "Contains"
+									   CONTAINS: "Contains",
+									   STARTS_WITH: "StartsWith"
 								   })
 
 	/*!

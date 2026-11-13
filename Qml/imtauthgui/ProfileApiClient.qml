@@ -56,6 +56,13 @@ QtObject {
 	signal tokenDeleted(string message)
 	signal tokenRevoked(string message)
 
+	// --- Linked external accounts (Google, Apple, Facebook) ---
+	// accounts: plain JS array of { providerId, providerName, providerType, email, linkedAt, lastSignInAt }
+	// hasPassword: false if the linked accounts are the user's only way to sign in
+	signal linkedAccountsReceived(var accounts, bool hasPassword)
+	signal accountUnlinked(string providerId)
+	signal linkedAccountOperationFailed(string message)
+
 	// --- Errors, scoped by concern so each page can listen only to what's
 	// relevant to its own actions (a token-page error must never surface a
 	// banner on the Organizations page, and vice versa). ---
@@ -77,4 +84,8 @@ QtObject {
 	function createToken(name, description, scopes, expiresAt) {}
 	function deleteToken(tokenId) {}
 	function revokeToken(tokenId) {}
+
+	// Linking itself starts a sign-in with the provider: AuthorizationController.linkExternalAccount()
+	function getLinkedAccounts() {}
+	function unlinkAccount(providerId) {}
 }

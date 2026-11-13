@@ -18,7 +18,7 @@ import imtauthTenantMembershipsSdl 1.0
 RemoteCollectionView {
 	id: container
 
-	property string context: ""
+	property string permissionPath: ""
 	collectionId: "Tenants"
 	gqlGetListCommandId: ImtauthTenantsSdlCommandIds.s_getTenantList
 	documentCollectionFilter: null
@@ -32,7 +32,7 @@ RemoteCollectionView {
 
 	Component.onCompleted: {
 		table.setSortingInfo(TenantItemDataTypeMetaInfo.s_createdAt, "DESC")
-		table.nonSortableColumns = [TenantItemDataTypeMetaInfo.s_ownerId, TenantItemDataTypeMetaInfo.s_isActive, TenantItemDataTypeMetaInfo.s_membersCount, TenantItemDataTypeMetaInfo.s_tenantRelationScope, TenantItemDataTypeMetaInfo.s_invitationId, TenantItemDataTypeMetaInfo.s_invitedByName]
+		table.nonSortableColumns = [TenantItemDataTypeMetaInfo.s_parentTenantName, TenantItemDataTypeMetaInfo.s_ownerId,TenantItemDataTypeMetaInfo.s_isActive, TenantItemDataTypeMetaInfo.s_membersCount, TenantItemDataTypeMetaInfo.s_tenantRelationScope, TenantItemDataTypeMetaInfo.s_invitationId, TenantItemDataTypeMetaInfo.s_invitedByName]
 		registerFieldFilterDelegate("isActiveFilter", isActiveDelegateFilterComp)
 		registerFieldFilterDelegate("tenantRelationFilter", tenantRelationDelegateFilterComp)
 	}
@@ -44,6 +44,11 @@ RemoteCollectionView {
 				let scope = table.elements.getData(TenantItemDataTypeMetaInfo.s_tenantRelationScope, indexes[0])
 				if (scope === "Invited") return
 				let tenantId = table.elements.getData("id", indexes[0])
+				if (!container.tenantIsActive(indexes[0])) {
+					let tenantName = table.elements.getData("name", indexes[0])
+					ModalDialogManager.openDialog(activateDialogComp, {"tenantId": tenantId, "tenantName": tenantName || tenantId, "openEditor": false})
+					return
+				}
 				container.switchToTenant(tenantId)
 			}
 		} else if (commandId === "Leave") {
@@ -89,6 +94,9 @@ RemoteCollectionView {
 		function onSubscriptionOwnershipTransferred(tenantId) {
 			container.doUpdateGui()
 		}
+		function onSubscriptionsResumed() {
+			container.doUpdateGui()
+		}
 	}
 
 	onHeadersChanged: {
@@ -98,6 +106,7 @@ RemoteCollectionView {
 		table.setColumnContentById(TenantItemDataTypeMetaInfo.s_updatedAt, updatedAtCellDelegateComp)
 		table.setColumnContentById(TenantItemDataTypeMetaInfo.s_isActive, isActiveCellDelegateComp)
 		table.setColumnContentById(TenantItemDataTypeMetaInfo.s_tenantRelationScope, tenantRelationScopeCellDelegateComp)
+		table.setColumnContentById(TenantItemDataTypeMetaInfo.s_parentTenantName, parentTenantNameCellDelegateComp)
 	}
 
 	function acceptInvitation(invitationId) {
@@ -135,7 +144,7 @@ RemoteCollectionView {
 
 	property AcceptTenantInvitationInput acceptInvitationInput: AcceptTenantInvitationInput {}
 	property GqlSdlRequestSender acceptInvitationSender: GqlSdlRequestSender {
-		context: container.context
+		permissionPath: container.permissionPath
 		requestType: 1
 		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_acceptTenantInvitation
 		sdlObjectComp: Component {
@@ -159,7 +168,7 @@ RemoteCollectionView {
 
 	property RejectTenantInvitationInput rejectInvitationInput: RejectTenantInvitationInput {}
 	property GqlSdlRequestSender rejectInvitationSender: GqlSdlRequestSender {
-		context: container.context
+		permissionPath: container.permissionPath
 		requestType: 1
 		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_rejectTenantInvitation
 		sdlObjectComp: Component {
@@ -192,20 +201,34 @@ RemoteCollectionView {
 			onReused: {
 				if (rowIndex >= 0 && tenantRelationScopeDelegate && tenantRelationScopeDelegate.rowDelegate && tenantRelationScopeDelegate.rowDelegate.tableItem){
 					let scope = tenantRelationScopeDelegate.rowDelegate.tableItem.elements.getData(TenantItemDataTypeMetaInfo.s_tenantRelationScope, rowIndex);
-					if (scope){
-						scopeValue = scope
-					}
+					scopeValue = scope ? scope : ""
 
 					let invitationId = tenantRelationScopeDelegate.rowDelegate.tableItem.elements.getData(TenantItemDataTypeMetaInfo.s_invitationId, rowIndex);
-					if (invitationId){
-						invitationIdValue = invitationId
-					}
+					invitationIdValue = invitationId ? invitationId : ""
 
 					let invitedByName = tenantRelationScopeDelegate.rowDelegate.tableItem.elements.getData(TenantItemDataTypeMetaInfo.s_invitedByName, rowIndex);
-					if (invitedByName){
-						invitedByNameValue = invitedByName
-					}
+					invitedByNameValue = invitedByName ? invitedByName : ""
 				}
+			}
+
+			function scopeText(scope){
+				if (scope === "Owner"){
+					return qsTr("Owner")
+				}
+				if (scope === "Creator"){
+					return qsTr("Creator")
+				}
+				if (scope === "Member"){
+					return qsTr("Member")
+				}
+				if (scope === "Invited"){
+					return qsTr("Invited")
+				}
+				if (scope === "Delegated"){
+					return qsTr("Delegated")
+				}
+
+				return scope
 			}
 
 			Text {
@@ -215,7 +238,7 @@ RemoteCollectionView {
 				anchors.leftMargin: Style.marginM
 				font.pixelSize: Style.fontSizeM
 				color: tenantRelationScopeDelegate.scopeValue === "Invited" ? Style.imaginToolsAccentColor : Style.textColor
-				text: tenantRelationScopeDelegate.scopeValue
+				text: tenantRelationScopeDelegate.scopeText(tenantRelationScopeDelegate.scopeValue)
 				font.underline: tenantRelationScopeDelegate.scopeValue === "Invited"
 
 				MouseArea {
@@ -351,6 +374,34 @@ RemoteCollectionView {
 	}
 
 	Component {
+		id: parentTenantNameCellDelegateComp
+		TableCellDelegateBase {
+			id: parentTenantNameDelegate
+
+			// The colors stay bound to the style, so they follow a theme change
+			property string parentName: ""
+
+			onReused: {
+				var val = parentTenantNameDelegate.getValue()
+				parentTenantNameDelegate.parentName = val !== undefined && val !== null ? val.toString() : ""
+			}
+
+			Text {
+				id: parentTenantNameLabel
+				anchors.verticalCenter: parent.verticalCenter
+				anchors.left: parent.left
+				anchors.right: parent.right
+				anchors.leftMargin: Style.marginM
+				anchors.rightMargin: Style.marginM
+				elide: Text.ElideRight
+				font.pixelSize: Style.fontSizeM
+				text: parentTenantNameDelegate.parentName !== "" ? parentTenantNameDelegate.parentName : qsTr("No parent")
+				color: parentTenantNameDelegate.parentName !== "" ? Style.textColor : Style.inactiveTextColor
+			}
+		}
+	}
+
+	Component {
 		id: ownerIdCellDelegateComp
 		TableCellDelegateBase {
 			id: ownerIdDelegate
@@ -387,10 +438,11 @@ RemoteCollectionView {
 		id: isActiveCellDelegateComp
 		TableCellDelegateBase {
 			id: isActiveDelegate
+
+			property bool isActive: false
+
 			onReused: {
-				var val = isActiveDelegate.getValue()
-				isActiveLabel.text = val ? qsTr("Active") : qsTr("Inactive")
-				isActiveIndicator.color = val ? Style.successColor : Style.neutralEmphasisColor
+				isActiveDelegate.isActive = isActiveDelegate.getValue() ? true : false
 			}
 
 			Row {
@@ -405,7 +457,7 @@ RemoteCollectionView {
 					width: 10
 					height: 10
 					radius: width / 2
-					color: Style.neutralEmphasisColor
+					color: isActiveDelegate.isActive ? Style.successColor : Style.neutralEmphasisColor
 				}
 
 				Text {
@@ -413,6 +465,7 @@ RemoteCollectionView {
 					anchors.verticalCenter: parent.verticalCenter
 					font.pixelSize: Style.fontSizeM
 					color: Style.textColor
+					text: isActiveDelegate.isActive ? qsTr("Active") : qsTr("Inactive")
 				}
 			}
 		}
@@ -423,11 +476,11 @@ RemoteCollectionView {
 		FieldFilterDelegate {
 			name: qsTr("Status")
 			defaultFieldFilter.m_fieldId: "IsActive"
-			defaultFieldFilter.m_filterValueType: "Integer"
+			defaultFieldFilter.m_filterValueType: "Bool"
 
 			Component.onCompleted: {
-				createAndAddOption("1", qsTr("Active"), "", true)
-				createAndAddOption("0", qsTr("Inactive"), "", true)
+				createAndAddOption("true", qsTr("Active"), "", true)
+				createAndAddOption("false", qsTr("Inactive"), "", true)
 			}
 		}
 	}
@@ -435,7 +488,7 @@ RemoteCollectionView {
 	Component {
 		id: tenantRelationDelegateFilterComp
 		FieldFilterDelegate {
-			name: qsTr("My tenants")
+			name: qsTr("My organizations")
 
 			Component.onCompleted: {
 				createAndAddOption("owner", qsTr("I am owner"), "", true)
@@ -506,14 +559,85 @@ RemoteCollectionView {
 		tenantDocumentService.openDocument("Tenant", tenantId)
 	}
 
-	function requestOpenTenantDocument(tenantId, tenantName) {
+	function requestOpenTenantDocument(tenantId, tenantName, isActive) {
 		if (!tenantId) return
-		if (tenantId !== AuthorizationController.currentTenantId) {
-			PopupManager.addInfoMessage(
-				qsTr("To edit \"%1\", first switch to that organization using the Switch command.").arg(tenantName || tenantId),
-				true)
-		} else {
+		if (tenantId === AuthorizationController.currentTenantId) {
 			openTenantDocument(tenantId)
+			return
+		}
+
+		if (isActive === false) {
+			ModalDialogManager.openDialog(activateDialogComp, {"tenantId": tenantId, "tenantName": tenantName || tenantId, "openEditor": true})
+			return
+		}
+
+		ModalDialogManager.openDialog(switchToEditDialogComp, {"tenantId": tenantId, "tenantName": tenantName || tenantId})
+	}
+
+	function tenantIsActive(index) {
+		return table.elements.getData(TenantItemDataTypeMetaInfo.s_isActive, index) !== false
+	}
+
+	// The relation of the current user to the organization of a row; empty when there is none, e.g. for the superuser
+	function tenantRelationScope(elementsModel, index) {
+		let scope = elementsModel.getData(TenantItemDataTypeMetaInfo.s_tenantRelationScope, index)
+		return scope ? String(scope) : ""
+	}
+
+	function tenantIsEditable(elementsModel, index) {
+		return relationRules.isEditable(container.tenantRelationScope(elementsModel, index))
+	}
+
+	TenantRelationRules {
+		id: relationRules
+	}
+
+	// An inactive organization cannot be switched to, so it is activated first.
+	function activateTenant(tenantId, openEditor) {
+		if (openEditor) {
+			NavigationController.setPending(container.collectionId, ["Tenant", tenantId], {})
+		}
+
+		AuthorizationController.activateTenant(tenantId)
+	}
+
+	Component {
+		id: activateDialogComp
+		MessageDialog {
+			property string tenantId: ""
+			property string tenantName: ""
+			property bool openEditor: false
+			width: Style.sizeHintM
+			title: qsTr("Activate organization")
+			message: qsTr("\"%1\" is inactive. Activate it and switch to it?").arg(tenantName)
+			onFinished: {
+				if (buttonId == Enums.yes) {
+					container.activateTenant(tenantId, openEditor)
+				}
+			}
+		}
+	}
+
+	// An organization is edited from inside it.
+	// Switching rebuilds this view; the document navigation of the rebuilt one picks up the pending path when it registers.
+	function switchToTenantAndNavigate(tenantId, rest, params) {
+		NavigationController.setPending(container.collectionId, rest, params)
+		container.switchToTenant(tenantId)
+	}
+
+	Component {
+		id: switchToEditDialogComp
+		MessageDialog {
+			property string tenantId: ""
+			property string tenantName: ""
+			width: Style.sizeHintM
+			title: qsTr("Switch organization")
+			message: qsTr("An organization can be edited only while you work in it. Switch to \"%1\" and open it?").arg(tenantName)
+			onFinished: {
+				if (buttonId == Enums.yes) {
+					container.switchToTenantAndNavigate(tenantId, ["Tenant", tenantId], {})
+				}
+			}
 		}
 	}
 
@@ -546,11 +670,24 @@ RemoteCollectionView {
 		}
 	}
 
+	// A removed organization leaves the organization switcher
+	Connections {
+		target: container.dataController
+
+		function onElementsRemoved(elementIds){
+			AuthorizationController.notifyOrganizationsChanged()
+		}
+	}
+
 	Connections {
 		target: AuthorizationController
 
 		function onTenantSelected(tenantId){
 			container.closeTenantEditorsForSwitch(tenantId || "")
+		}
+
+		function onTenantSelectionFailed(message){
+			delete NavigationController.pending[container.collectionId]
 		}
 	}
 
@@ -567,7 +704,7 @@ RemoteCollectionView {
 
 	property FindMembershipInput __findMembershipForLeaveInput: FindMembershipInput {}
 	property GqlSdlRequestSender __findMembershipForLeaveSender: GqlSdlRequestSender {
-		context: container.context
+		permissionPath: container.permissionPath
 		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_findMembership
 
 		sdlObjectComp: Component {
@@ -590,7 +727,7 @@ RemoteCollectionView {
 
 	property RemoveMembershipInput __removeMembershipForLeaveInput: RemoveMembershipInput {}
 	property GqlSdlRequestSender __removeMembershipForLeaveSender: GqlSdlRequestSender {
-		context: container.context
+		permissionPath: container.permissionPath
 		requestType: 1
 		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_removeMembership
 
@@ -619,6 +756,7 @@ RemoteCollectionView {
 	commandsDelegateComp: Component {
 		DocCollectionViewDelegate {
 			id: tenantCommandsDelegate
+			revisionsPermissionPath: "/OrganizationManagement/Revisions"
 			collectionView: container
 
 			function createNewTenantDocument(){
@@ -630,15 +768,25 @@ RemoteCollectionView {
 				documentManager.createDocument("Tenant")
 			}
 
+			// Created inside an organization the new one becomes its sub-organization
 			function onNew(){
-				if (AuthorizationController.currentTenantId && AuthorizationController.currentTenantId !== "") {
-					PopupManager.addInfoMessage(
-						qsTr("To create a new organization, first switch to No Organization using the organization switcher."),
-						true)
-					return
+				createNewTenantDocument()
+			}
+
+			// The dialog names what is removed; the server refuses an organization with sub-organizations and says why
+			function onRemove(params){
+				let indexes = collectionView.table.getSelectedIndexes()
+				let elementsModel = collectionView.table.elements
+				if (indexes.length === 1 && elementsModel && elementsModel.containsKey("name", indexes[0])){
+					tenantCommandsDelegate.removeDialogTitle = qsTr("Remove organization")
+					tenantCommandsDelegate.removeMessage = qsTr("Remove the organization \"%1\"?").arg(elementsModel.getData("name", indexes[0]))
+				}
+				else{
+					tenantCommandsDelegate.removeDialogTitle = qsTr("Remove organizations")
+					tenantCommandsDelegate.removeMessage = qsTr("Remove %1 organizations?").arg(indexes.length)
 				}
 
-				createNewTenantDocument()
+				ModalDialogManager.openDialog(tenantCommandsDelegate.removeDialogComp, {})
 			}
 
 			function onEdit(){
@@ -665,17 +813,22 @@ RemoteCollectionView {
 						continue
 					}
 
-					let scope = elementsModel.getData(TenantItemDataTypeMetaInfo.s_tenantRelationScope, index)
+					let scope = container.tenantRelationScope(elementsModel, index)
 					if (scope === "Invited") {
 						continue
 					}
 
 					let tenantId = elementsModel.getData("id", index)
+					let tenantName = elementsModel.containsKey("name", index)
+							? elementsModel.getData("name", index)
+							: tenantId
+					if (!container.tenantIsEditable(elementsModel, index)) {
+						PopupManager.addInfoMessage(qsTr("Only the members of \"%1\" can edit it.").arg(tenantName), true)
+						return
+					}
+
 					if (tenantId && tenantId !== AuthorizationController.currentTenantId){
-						let tenantName = elementsModel.containsKey("name", index)
-								? elementsModel.getData("name", index)
-								: tenantId
-						container.requestOpenTenantDocument(tenantId, tenantName)
+						container.requestOpenTenantDocument(tenantId, tenantName, container.tenantIsActive(index))
 						return
 					}
 				}
@@ -712,17 +865,25 @@ RemoteCollectionView {
 					let row = selection[0]
 
 					let tenantId = elementsModel.getData("id", row)
-					let scope = elementsModel.getData(TenantItemDataTypeMetaInfo.s_tenantRelationScope, row)
+					let scope = container.tenantRelationScope(elementsModel, row)
 
-					switchEnabled = tenantId !== AuthorizationController.currentTenantId && scope !== "Invited"
-					leaveEnabled = scope === "Member"
+					switchEnabled = relationRules.canSwitch(scope, tenantId === AuthorizationController.currentTenantId)
+					leaveEnabled = relationRules.canLeave(scope)
 				}
 				commandsController.setCommandIsEnabled("Switch", switchEnabled)
 				commandsController.setCommandIsEnabled("Leave", leaveEnabled)
+
+				let editEnabled = selection && selection.length > 0
+				for (let i = 0; editEnabled && i < selection.length; i++) {
+					editEnabled = container.tenantIsEditable(elementsModel, selection[i])
+				}
+				if (!editEnabled) {
+					commandsController.setCommandIsEnabled("Edit", false)
+				}
 			}
 
 			Component.onCompleted: {
-				registerDocumentType("Tenant", qsTr("Tenant"))
+				registerDocumentType("Tenant", qsTr("Organization"))
 				addDocumentView("Tenant", "TenantEditor", tenantEditorComp, tenantDataControllerFactory)
 			}
 
@@ -738,12 +899,30 @@ RemoteCollectionView {
 						}
 					}
 					commandsPanelVisible: isNewTenant
+
+					// The save of a new organization is reported more than once.
+					property bool creationHandled: false
+
 					onDocumentSaved: {
-						if (isNewTenant){
-							if (tenantEditor.representationController){
-								tenantEditor.representationController.updateRepresentationFromDocument()
-							}
+						// A new or renamed organization shows in the organization switcher
+						AuthorizationController.notifyOrganizationsChanged()
+
+						if (!isNewTenant || tenantEditor.creationHandled){
+							return
 						}
+
+						tenantEditor.creationHandled = true
+						let tenantId = tenantCommandsDelegate.documentManager.getDocumentObjectId(tenantEditor.documentId)
+						let isInactive = tenantEditor.tenantData && tenantEditor.tenantData.m_isActive === false
+						let tenantName = tenantEditor.tenantData ? tenantEditor.tenantData.m_name : ""
+
+						// A stored organization is edited only from inside it, so the creation document is done
+						tenantCommandsDelegate.documentManager.closeDocument(tenantEditor.documentId)
+						if (isInactive){
+							PopupManager.addInfoMessage(qsTr("The organization \"%1\" was created inactive. Activate it to work in it.").arg(tenantName), true)
+							return
+						}
+						container.switchToTenantAndNavigate(tenantId, ["Tenant", tenantId], {})
 					}
 				}
 			}
@@ -751,68 +930,9 @@ RemoteCollectionView {
 			Component {
 				id: tenantDataControllerFactory
 
-				DocumentRepresentationController {
-					id: root
-
-					representationModel: TenantData {
-						m_isActive: true
-					}
-
-					function updateRepresentationFromDocument(){
-						startUpdateRepresentation(documentId, representationModel)
-
-						documentIdInput.m_id = documentId
-						documentIdInput.m_collectionId = container.collectionId
-
-						getTenantRequest.send(documentIdInput)
-					}
-
-					function updateDocumentFromRepresentation(){
-						startUpdateDocument(documentId)
-
-						updateTenantInput.m_documentId = documentId
-						updateTenantInput.m_tenant = representationModel
-
-						updateTenantRequest.send(updateTenantInput)
-					}
-
-					property DocumentId documentIdInput: DocumentId {}
-					property GqlSdlRequestSender getTenantRequest: GqlSdlRequestSender {
-						context: container.context
-						gqlCommandId: ImtauthTenantCollectionDocumentServiceSdlCommandIds.s_getTenantRepresentation
-						sdlObjectComp: Component {
-							TenantData {
-								onFinished: {
-									root.representationModel.copyFrom(this)
-									root.representationUpdated(root.documentId, root.representationModel)
-								}
-							}
-						}
-
-						function onError(message, type){
-							root.updateRepresentationFailed(root.documentId, message)
-						}
-					}
-
-					property UpdateTenantFromRepresentationInput updateTenantInput: UpdateTenantFromRepresentationInput {}
-					property GqlSdlRequestSender updateTenantRequest: GqlSdlRequestSender {
-						context: container.context
-						gqlCommandId: ImtauthTenantCollectionDocumentServiceSdlCommandIds.s_updateTenantFromRepresentation
-						requestType: 1
-						sdlObjectComp: Component {
-							DocumentOperationStatus {
-								onFinished: {
-									if (m_status === "Success"){
-										root.documentUpdated(root.documentId)
-									}
-								}
-							}
-						}
-
-						function onError(message, type){
-							root.updateDocumentFailed(root.documentId, message)
-						}
-					}
+				TenantRepresentationController {
+					collectionId: container.collectionId
+					permissionPath: container.permissionPath
 				}
 			}
 		}

@@ -35,7 +35,7 @@ public:
 				const QByteArray& documentId,
 				const QByteArray& documentTypeId,
 				const QString& documentName,
-				const QUrl& documentUrl,
+				const QByteArray& documentSourceRef,
 				bool isDirty,
 				const idoc::IUndoManager& undoManager);
 	const idoc::IUndoManager& GetUndoManager();

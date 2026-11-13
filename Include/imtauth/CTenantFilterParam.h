@@ -22,6 +22,18 @@ public:
 	virtual void SetOwnerId(const QByteArray& ownerId) override;
 	virtual TenantFilterMode GetFilterMode() const override;
 	virtual void SetFilterMode(TenantFilterMode mode) override;
+	virtual SharingScope GetSharingScope() const override;
+	virtual void SetSharingScope(SharingScope scope) override;
+	virtual IDocumentShareInfo::AccessLevel GetMinimumAccessLevel() const override;
+	virtual void SetMinimumAccessLevel(IDocumentShareInfo::AccessLevel accessLevel) override;
+	virtual QByteArrayList GetUserGroupIds() const override;
+	virtual bool IsGroupRestrictionEnabled() const override;
+	virtual void SetUserGroupIds(const QByteArrayList& groupIds, bool restrictionEnabled) override;
+	virtual QByteArrayList GetShareOwnerTenantIds() const override;
+	virtual bool IsShareOwnerRestrictionEnabled() const override;
+	virtual void SetShareOwnerTenantIds(const QByteArrayList& tenantIds, bool restrictionEnabled) override;
+	virtual int GetSharesRevision() const override;
+	virtual void SetSharesRevision(int revision) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
@@ -36,6 +48,13 @@ private:
 	QByteArray m_tenantId;
 	QByteArray m_ownerId;
 	TenantFilterMode m_filterMode;
+	SharingScope m_sharingScope;
+	IDocumentShareInfo::AccessLevel m_minimumAccessLevel;
+	QByteArrayList m_userGroupIds;
+	bool m_isGroupRestrictionEnabled;
+	QByteArrayList m_shareOwnerTenantIds;
+	bool m_isShareOwnerRestrictionEnabled;
+	int m_sharesRevision;
 };
 
 

@@ -7,6 +7,7 @@ FeatureCollectionView 1.0 FeatureCollectionView.qml
 FeatureEditor 1.0 FeatureEditor.qml
 FeatureEditorCommandsDelegate 1.0 FeatureEditorCommandsDelegate.qml
 FeaturesDialog 1.0 FeaturesDialog.qml
+RequirementsDialog 1.0 RequirementsDialog.qml
 
 
 LicenseCollectionView 1.0 LicenseCollectionView.qml

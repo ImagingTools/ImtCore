@@ -71,7 +71,7 @@ Item {
 	// Last error message (only meaningful in "error" state).
 	readonly property alias lastErrorMessage: _internal.lastErrorMessage
 
-	// Emitted when the document is fully ready (data loaded + view bound).
+	// Emitted when the document is fully ready (data loaded, view bound, representation received).
 	signal documentReady(string documentId)
 
 	// Emitted when the document is closed (either by the user or by a
@@ -112,8 +112,16 @@ Item {
 	}
 
 	// Re-issues the last open/create attempt with the current objectId/typeId.
+	// For an already opened document only the representation is requested again.
 	function retry(){
 		_internal.lastErrorMessage = ""
+
+		if (documentManager && _internal.documentId !== "" && documentManager.documentIsOpened(_internal.documentId)){
+			_internal.state = "loading"
+			documentManager.updateDocumentRepresentation(_internal.documentId)
+			return
+		}
+
 		_tryOpen()
 	}
 
@@ -124,6 +132,27 @@ Item {
 			return
 		}
 		documentManager.closeDocument(_internal.documentId)
+	}
+
+	// Closes the document as closeDocument() does: callback(true) once it is closed, callback(false) when the user keeps it
+	function requestClose(callback){
+		if (!documentManager || _internal.documentId === ""){
+			callback(true)
+			return
+		}
+		documentManager.tryCloseDocument(_internal.documentId, callback)
+	}
+
+	// The name the user knows the document by, for the question about its unsaved changes
+	function _dialogDocumentName(documentId){
+		let name = ""
+		if (typeof workspaceView.documentNameResolver === "function"){
+			name = workspaceView.documentNameResolver(documentId)
+		}
+		if (!name){
+			name = workspaceView.documentManager.getDocumentName(documentId)
+		}
+		return name ? name : ""
 	}
 
 	function _tryOpen(){
@@ -266,6 +295,14 @@ Item {
 			workspaceView.documentReady(documentId)
 		}
 
+		function onUpdateRepresentationFailed(documentId, message){
+			if (documentId !== _internal.documentId || _internal.state !== "loading"){
+				return
+			}
+			_internal.lastErrorMessage = message
+			_internal.state = "error"
+		}
+
 		function onDocumentSaved(documentId){
 			if (documentId !== _internal.documentId){
 				return
@@ -333,9 +370,10 @@ Item {
 				}
 			}
 
+			let name = workspaceView._dialogDocumentName(documentId)
 			ModalDialogManager.showConfirmationDialog(
 						qsTr("Save document"),
-						qsTr("Save all changes ?"),
+						name !== "" ? qsTr("Save changes to \"%1\"?").arg(name) : qsTr("Save all changes ?"),
 						dialogCallback)
 		}
 

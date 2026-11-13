@@ -10,6 +10,7 @@ class QmlMouseEvent {
     flags = 0
     modifiers = QtEnums.NoModifier
     wasHeld = false
+    isClick = false
     originX = 0
     originY = 0
     x = 0
@@ -117,45 +118,34 @@ module.exports = {
     dropAreas: new Set(),
     activePointerHandlers: new Set(),
 
-    buttons: {
-        0: {
-            timeStamp: 0,
-            target: null,
-        },
-        1: {
-            timeStamp: 0,
-            target: null,
-        },
-        2: {
-            timeStamp: 0,
-            target: null,
-        },
-        3: {
-            timeStamp: 0,
-            target: null,
-        },
-        4: {
-            timeStamp: 0,
-            target: null,
-        },
-    },
-    
     event: null,
 
+    // Qt defaults (QPlatformTheme): used when the browser gives no click count, as for touch
+    __doubleClickInterval: 400,
+    __doubleClickDistance: 5,
+    __lastPress: null,
+
     entered: [],
+    enteredSet: new Set(),
     hovered: [],
+
+    __hitTestDepth: 0,
 
     add: function(obj){
         this.objects.add(obj)
+        this.__markHitTarget(obj)
     },
     addDropArea: function(obj){
         this.dropAreas.add(obj)
+        this.__markHitTarget(obj)
     },
     removeDropArea: function(obj){
         this.dropAreas.delete(obj)
+        this.__unmarkHitTarget(obj)
     },
     remove: function(obj){
         this.objects.delete(obj)
+        this.__unmarkHitTarget(obj)
         if(this.event){
             let index = this.event.path.indexOf(obj)
             while(index >= 0){
@@ -165,51 +155,67 @@ module.exports = {
         }
     },
 
+    __markHitTarget: function(obj){
+        if(!obj) return
+        let dom = obj.__DOM
+        if(!dom && typeof obj.__getDOM === 'function') dom = obj.__getDOM()
+        if(dom) dom.classList.add('jq-mouse')
+    },
+
+    __unmarkHitTarget: function(obj){
+        if(!obj || !obj.__DOM) return
+        if(this.objects.has(obj) || this.dropAreas.has(obj)) return
+        obj.__DOM.classList.remove('jq-mouse')
+    },
+
+    __beginHitTest: function(){
+        if(this.__hitTestDepth++ === 0){
+            document.documentElement.classList.add('jq-hittest')
+        }
+    },
+
+    __endHitTest: function(){
+        if(this.__hitTestDepth === 0) return
+        this.__hitTestDepth--
+        if(this.__hitTestDepth === 0){
+            document.documentElement.classList.remove('jq-hittest')
+        }
+    },
+
+    __elementsFromPoint: function(x, y){
+        this.__beginHitTest()
+        try {
+            return document.elementsFromPoint(x, y)
+        } finally {
+            this.__endHitTest()
+        }
+    },
+
     getObjectsFromPoint: function(x, y){
+        let elements = this.__elementsFromPoint(x, y)
         let result = []
 
-        for(let obj of this.objects){
-            let dom = obj.__getDOM()
-            dom.classList.add("pointer")
-        }
-
-        for(let el of document.elementsFromPoint(x, y)){
-            if(this.objects.has(el.qml) && !el.qml.__destroyed){
-                result.push(el.qml)
+        for(let i = 0; i < elements.length; i++){
+            let qml = elements[i].qml
+            if(qml && this.objects.has(qml) && !qml.__destroyed){
+                result.push(qml)
             }
-            
-        }
-
-        for(let obj of this.objects){
-            let dom = obj.__getDOM()
-            dom.classList.remove("pointer")
         }
 
         return result
     },
 
     getDropAreaFromPoint: function(x, y){
-        for(let obj of this.dropAreas){
-            if(!obj || obj.__destroyed) continue
-            let dom = obj.__getDOM()
-            dom.classList.add("pointer")
-        }
+        let elements = this.__elementsFromPoint(x, y)
 
-        let result = null
-        for(let el of document.elementsFromPoint(x, y)){
-            if(this.dropAreas.has(el.qml) && !el.qml.__destroyed && el.qml.enabled && el.qml.visible){
-                result = el.qml
-                break
+        for(let i = 0; i < elements.length; i++){
+            let qml = elements[i].qml
+            if(qml && this.dropAreas.has(qml) && !qml.__destroyed && qml.enabled && qml.visible){
+                return qml
             }
         }
 
-        for(let obj of this.dropAreas){
-            if(!obj || obj.__destroyed) continue
-            let dom = obj.__getDOM()
-            dom.classList.remove("pointer")
-        }
-
-        return result
+        return null
     },
 
     __getMouseAreaDragTarget: function(mouseArea){
@@ -301,36 +307,100 @@ module.exports = {
         }
     },
 
+    __startMouseAreaDrag: function(mouseArea, mouse){
+        mouseArea.__dragMoved = false
+        mouseArea.__dragOverThreshold = false
+        mouseArea.__stealMouse = mouseArea.preventStealing
+        mouseArea.__keepMouseGrab = mouseArea.__stealMouse
+        mouseArea.__dragStartScene = { x: mouse.originX, y: mouse.originY }
+        this.__setMouseAreaDragActive(mouseArea, false)
+    },
+
+    // Qt: QQuickMouseArea::mouseMoveEvent, the drag part
     __updateMouseAreaDrag: function(mouseArea, mouse){
-        if(!mouseArea || !mouse || !mouse.pressed) return
+        if(!mouseArea || !mouse || !mouseArea.__dragStartScene) return
 
         let drag = mouseArea.drag
-        if(!drag || typeof drag !== 'object') return
-
         let dragTarget = this.__getMouseAreaDragTarget(mouseArea)
         if(!dragTarget) return
 
-        this.__setMouseAreaDragActive(mouseArea, true)
-
-        let axis = Number(drag.axis)
-        if(!Number.isFinite(axis)) axis = 2
-
-        let dragTargetActive = !(dragTarget.Drag && dragTarget.Drag.active !== undefined) || !!dragTarget.Drag.active
-        if(dragTargetActive){
-            if(axis === 2 || axis === 0){
-                dragTarget.x -= mouse.moveX
-                if(Number.isFinite(Number(drag.minimumX)) && dragTarget.x < Number(drag.minimumX)) dragTarget.x = Number(drag.minimumX)
-                if(Number.isFinite(Number(drag.maximumX)) && dragTarget.x > Number(drag.maximumX)) dragTarget.x = Number(drag.maximumX)
-            }
-
-            if(axis === 2 || axis === 1){
-                dragTarget.y -= mouse.moveY
-                if(Number.isFinite(Number(drag.minimumY)) && dragTarget.y < Number(drag.minimumY)) dragTarget.y = Number(drag.minimumY)
-                if(Number.isFinite(Number(drag.maximumY)) && dragTarget.y > Number(drag.maximumY)) dragTarget.y = Number(drag.maximumY)
-            }
+        if(!mouseArea.__dragMoved){
+            mouseArea.__dragTargetStart = { x: dragTarget.x, y: dragTarget.y }
         }
 
-        this.__updateDropAreasForDragTarget(dragTarget)
+        let axis = Number(drag.axis)
+        let dragX = (axis & 1) !== 0
+        let dragY = (axis & 2) !== 0
+        let start = mouseArea.__dragTargetStart
+        let deltaX = mouse.originX - mouseArea.__dragStartScene.x
+        let deltaY = mouse.originY - mouseArea.__dragStartScene.y
+
+        if(mouseArea.__keepMouseGrab && mouseArea.__stealMouse && mouseArea.__dragOverThreshold && !drag.active){
+            this.__setMouseAreaDragActive(mouseArea, true)
+        }
+
+        let targetX = dragTarget.x
+        let targetY = dragTarget.y
+        let dragPosX = targetX
+        let dragPosY = targetY
+        let boundedX = targetX
+        let boundedY = targetY
+        if(dragX){
+            dragPosX = start.x + deltaX
+            boundedX = Math.max(Number(drag.minimumX), Math.min(dragPosX, Number(drag.maximumX)))
+        }
+        if(dragY){
+            dragPosY = start.y + deltaY
+            boundedY = Math.max(Number(drag.minimumY), Math.min(dragPosY, Number(drag.maximumY)))
+        }
+
+        if(drag.active){
+            dragTarget.x = boundedX
+            dragTarget.y = boundedY
+        }
+
+        let threshold = Number(drag.threshold)
+        let overThresholdX = Math.abs(dragPosX - start.x) > threshold
+        let overThresholdY = Math.abs(dragPosY - start.y) > threshold
+        if(!mouseArea.__dragOverThreshold && ((targetX !== boundedX && overThresholdX) || (targetY !== boundedY && overThresholdY))){
+            mouseArea.__dragOverThreshold = true
+            if(drag.smoothed) mouseArea.__dragStartScene = { x: mouse.originX, y: mouse.originY }
+        }
+
+        if(!mouseArea.__keepMouseGrab && mouseArea.__dragOverThreshold){
+            mouseArea.__keepMouseGrab = true
+            mouseArea.__stealMouse = true
+        }
+
+        mouseArea.__dragMoved = true
+
+        if(drag.active) this.__updateDropAreasForDragTarget(dragTarget)
+    },
+
+    // As in Qt Quick, hover goes to the topmost hover-enabled MouseArea under
+    // the cursor (and its ancestors); hover-enabled MouseAreas beneath it, e.g.
+    // rows covered by a dialog overlay, must not react to the cursor.
+    __findHoverBlocker: function(event){
+        for(let obj of event.path){
+            if(!obj || obj.__destroyed || typeof obj.__acceptsHover !== 'function' || !obj.__acceptsHover()) continue
+
+            event.relative(obj)
+            if(event.x >= 0 && event.y >= 0 && event.x < obj.width && event.y < obj.height) return obj
+        }
+
+        return null
+    },
+
+    __isHoverBlocked: function(obj, blocker){
+        if(!blocker || obj === blocker || typeof obj.__acceptsHover !== 'function') return false
+
+        let parent = blocker.parent
+        while(parent){
+            if(parent === obj) return false
+            parent = parent.parent
+        }
+
+        return true
     },
 
     __finishMouseAreaDrag: function(mouseArea){
@@ -338,16 +408,376 @@ module.exports = {
 
         let dragTarget = this.__getMouseAreaDragTarget(mouseArea)
         this.__setMouseAreaDragActive(mouseArea, false)
+        mouseArea.__dragStartScene = null
+        mouseArea.__dragOverThreshold = false
+        mouseArea.__stealMouse = false
+        if(!mouseArea.preventStealing) mouseArea.__keepMouseGrab = false
 
         if(dragTarget){
             this.__finishDropAreasForDragTarget(dragTarget)
         }
     },
 
-    init: function(){   
-        window.addEventListener('mousemove', (e)=>{
-            let event = this.event ? this.event : new QmlMouseEvent({path: this.getObjectsFromPoint(e.pageX, e.pageY)})
+    __touchPointerId: null,
+    __lastTouchTime: -Infinity,
+    __touchSuppressInterval: 1000,
+
+    __isTouchPointer: function(e){
+        return e.pointerType === 'touch' || e.pointerType === 'pen'
+    },
+
+    // Browsers emulate mouse events (and a click) after a touch or pen
+    // interaction. They are already handled through pointer events.
+    __isEmulatedMouseEvent: function(){
+        if(this.__touchPointerId !== null) return true
+
+        return performance.now() - this.__lastTouchTime < this.__touchSuppressInterval
+    },
+
+    __isEditableElement: function(element){
+        if(!element || !element.tagName) return false
+        if(element.isContentEditable) return true
+
+        let tagName = element.tagName.toUpperCase()
+
+        return tagName === 'INPUT' || tagName === 'TEXTAREA' || tagName === 'SELECT'
+    },
+
+    __clearHover: function(skipObj){
+        let event = new QmlMouseEvent()
+        let entered = this.entered
+
+        this.entered = []
+        this.enteredSet.clear()
+
+        for(let obj of entered){
+            if(!obj || obj.__destroyed || obj === skipObj) continue
+            event.target = obj
+            if(typeof obj.__onMouseLeave === 'function') obj.__onMouseLeave(event)
+        }
+    },
+
+    __cancelPress: function(){
+        let event = this.event
+        if(!event || !(event instanceof QmlMouseEvent)){
+            this.event = null
+            return
+        }
+
+        for(let handler of this.activePointerHandlers){
+            if(!handler || handler.__destroyed) continue
+            if(typeof handler.__onMouseCanceled === 'function') handler.__onMouseCanceled(event)
+        }
+        this.activePointerHandlers.clear()
+
+        let target = event.target
+        if(target && !target.__destroyed){
+            if(typeof target.__onMouseCanceled === 'function') target.__onMouseCanceled(event)
+            this.__finishMouseAreaDrag(target)
+        }
+
+        this.event = null
+    },
+
+    __onMouseMove: function(e){
+        let lastPress = this.__lastPress
+        if(lastPress && (Math.abs(e.clientX - lastPress.x) > this.__doubleClickDistance || Math.abs(e.clientY - lastPress.y) > this.__doubleClickDistance)){
+            this.__lastPress = null
+        }
+
+        let event = this.event ? this.event : new QmlMouseEvent({path: this.getObjectsFromPoint(e.clientX, e.clientY)})
+        
+        let modifiers = QtEnums.NoModifier
+        if(e.shiftKey) {
+            modifiers |= QtEnums.ShiftModifier
+        }
+        if(e.altKey) {
+            modifiers |= QtEnums.AltModifier
+        }
+        if(e.ctrlKey) {
+            modifiers |= QtEnums.ControlModifier
+        }
+
+        event.modifiers = modifiers
+        event.moveX = event.originX - e.clientX
+        event.moveY = event.originY - e.clientY
+        event.originX = e.clientX
+        event.originY = e.clientY
+
+        JQApplication.resetCursor('unset')
+
+        if(event.pressed){
+            if(Math.abs(event.startX - event.originX) > 15) event.wasDragX = true
+            if(Math.abs(event.startY - event.originY) > 15) event.wasDragY = true
+        }
+
+        let hoverBlocker = event.target ? null : this.__findHoverBlocker(event)
+
+        const pointerInside = (obj) => {
+            event.relative(obj)
+            return event.x >= 0 && event.y >= 0 && event.x < obj.width && event.y < obj.height
+        }
+
+        // Physical exits must precede entries into unrelated areas.
+        let i = 0
+        while(i < this.entered.length){
+            let obj = this.entered[i]
+            if(obj.__destroyed) {
+                this.entered.splice(i, 1)
+                this.enteredSet.delete(obj)
+                continue
+            }
+
+            if(!pointerInside(obj)) {
+                if(typeof obj.__onMouseLeave === 'function') obj.__onMouseLeave(event)
+                this.entered.splice(i, 1)
+                this.enteredSet.delete(obj)
+            } else {
+                i++
+            }
+        }
+
+        // Enter the new topmost area before dispatching blocked exits.
+        // This keeps hover-dependent close buttons enabled during handoff.
+        i = 0
+        while(i < event.path.length){
+            let obj = event.path[i]
+            if(obj.__destroyed) {
+                event.path.splice(i, 1)
+                continue
+            }
+
+            if(!this.__isHoverBlocked(obj, hoverBlocker) && pointerInside(obj) && !this.enteredSet.has(obj)) {
+                this.entered.push(obj)
+                this.enteredSet.add(obj)
+                if(typeof obj.__onMouseEnter === 'function') obj.__onMouseEnter(event)
+            }
+
+            i++
+        }
+
+        i = 0
+        while(i < this.entered.length){
+            let obj = this.entered[i]
+            if(obj.__destroyed) {
+                this.entered.splice(i, 1)
+                this.enteredSet.delete(obj)
+                continue
+            }
+
+            if(!pointerInside(obj) || this.__isHoverBlocked(obj, hoverBlocker)) {
+                if(typeof obj.__onMouseLeave === 'function') obj.__onMouseLeave(event)
+                this.entered.splice(i, 1)
+                this.enteredSet.delete(obj)
+            } else {
+                i++
+            }
+        }
+
+        i = 0
+        while(i < event.path.length){
+            let obj = event.path[i]
+            if(obj.__destroyed) {
+                event.path.splice(i, 1)
+                continue
+            }
+
+            if(!this.__isHoverBlocked(obj, hoverBlocker) && typeof obj.__onMouseMove === 'function') {
+                event.relative(obj)
+                obj.__onMouseMove(event)
+            }
+
+            i++
+        }
+
+        let activeHandlers = []
+        for(let handler of this.activePointerHandlers){
+            if(!handler || handler.__destroyed || !handler.active){
+                this.activePointerHandlers.delete(handler)
+                continue
+            }
+            if(event.path.indexOf(handler) < 0){
+                activeHandlers.push(handler)
+            }
+        }
+
+        for(let handler of activeHandlers){
+            if(typeof handler.__onMouseMove === 'function') handler.__onMouseMove(event)
+        }
+    },
+
+    __onMouseDown: function(e){
+        this.event = new QmlMouseEvent({pressed: true})
+
+        let modifiers = QtEnums.NoModifier
+        if(e.shiftKey) {
+            modifiers |= QtEnums.ShiftModifier
+        }
+        if(e.altKey) {
+            modifiers |= QtEnums.AltModifier
+        }
+        if(e.ctrlKey) {
+            modifiers |= QtEnums.ControlModifier
+        }
+
+        this.event.modifiers = modifiers
+        this.event.fillButton(e)
+        this.event.originX = e.clientX
+        this.event.originY = e.clientY
+        this.event.startX = e.clientX
+        this.event.startY = e.clientY
+        this.event.path = this.getObjectsFromPoint(e.clientX, e.clientY)
+
+        let isDoubleClick = this.__isDoubleClick(e, this.event.button)
+
+        for(let obj of this.event.path){
+            this.event.accepted = true
+            this.event.relative(obj)
+            if(typeof obj.__onMouseDown === 'function') obj.__onMouseDown(this.event)
+            if(obj.active && this.activePointerHandlers.add){
+                this.activePointerHandlers.add(obj)
+            }
+        }
+
+        // Qt: the double click event follows the second press
+        let target = this.event.target
+        if(isDoubleClick && target && !target.__destroyed && typeof target.__onMouseDoubleClick === 'function'){
+            this.event.relative(target)
+            target.__onMouseDoubleClick(this.event)
+        }
+    },
+
+    // Qt (QGuiApplicationPrivate::processMouseEvent): a second press of the same button in time and place; the press after a double click starts again
+    __isDoubleClick: function(e, button){
+        if(e.detail > 0) return e.detail % 2 === 0
+
+        let now = performance.now()
+        let last = this.__lastPress
+        let isDoubleClick = !!last && last.button === button && now - last.time < this.__doubleClickInterval
+            && Math.abs(e.clientX - last.x) <= this.__doubleClickDistance && Math.abs(e.clientY - last.y) <= this.__doubleClickDistance
+
+        this.__lastPress = isDoubleClick ? null : { time: now, button: button, x: e.clientX, y: e.clientY }
+        return isDoubleClick
+    },
+
+    __onMouseUp: function(e){
+        if(this.event){
+            let modifiers = QtEnums.NoModifier
+            if(e.shiftKey) {
+                modifiers |= QtEnums.ShiftModifier
+            }
+            if(e.altKey) {
+                modifiers |= QtEnums.AltModifier
+            }
+            if(e.ctrlKey) {
+                modifiers |= QtEnums.ControlModifier
+            }
+
+            this.event.modifiers = modifiers
+
+            this.event.fillButton(e)
+            this.event.originX = e.clientX
+            this.event.originY = e.clientY
+
+            for(let handler of this.activePointerHandlers){
+                if(!handler || handler.__destroyed) continue
+                if(typeof handler.__onMouseUp === 'function') handler.__onMouseUp(this.event)
+            }
             
+            // Qt has no separate click event: the release emits released and clicked
+            let target = this.event.target
+            if(target && !target.__destroyed) {
+                JQApplication.beginUpdate()
+                this.event.relative(target)
+                if(typeof target.__onMouseUp === 'function') target.__onMouseUp(this.event)
+                this.__finishMouseAreaDrag(target)
+                JQApplication.endUpdate()
+            }
+
+            this.activePointerHandlers.clear()
+            this.event = null
+        }
+    },
+
+    __onPointerDown: function(e){
+        if(!this.__isTouchPointer(e) || !e.isPrimary || this.__touchPointerId !== null) return
+
+        this.__touchPointerId = e.pointerId
+        this.__lastTouchTime = performance.now()
+
+        // Keeps native focus and caret handling for text inputs.
+        if(!this.__isEditableElement(e.target)) e.preventDefault()
+
+        // No hover before the press for touch: enter happens with the press itself.
+        this.__onMouseDown(e)
+    },
+
+    __onPointerMove: function(e){
+        if(!this.__isTouchPointer(e) || e.pointerId !== this.__touchPointerId) return
+
+        this.__lastTouchTime = performance.now()
+
+        if(this.event) this.__onMouseMove(e)
+    },
+
+    __onPointerUp: function(e){
+        if(!this.__isTouchPointer(e) || e.pointerId !== this.__touchPointerId) return
+
+        this.__touchPointerId = null
+        this.__lastTouchTime = performance.now()
+
+        if(this.event) this.__onMouseMove(e)
+        this.__onMouseUp(e)
+
+        // No hover after a touch
+        this.__clearHover(null)
+    },
+
+    __onPointerCancel: function(e){
+        if(!this.__isTouchPointer(e) || e.pointerId !== this.__touchPointerId) return
+
+        this.__touchPointerId = null
+        this.__lastTouchTime = performance.now()
+
+        this.__cancelPress()
+        this.__clearHover(null)
+    },
+
+    init: function(){
+        window.addEventListener('pointerdown', (e)=>{
+            this.__onPointerDown(e)
+        })
+        window.addEventListener('pointermove', (e)=>{
+            this.__onPointerMove(e)
+        })
+        window.addEventListener('pointerup', (e)=>{
+            this.__onPointerUp(e)
+        })
+        window.addEventListener('pointercancel', (e)=>{
+            this.__onPointerCancel(e)
+        })
+        window.addEventListener('mousemove', (e)=>{
+            if(this.__isEmulatedMouseEvent()) return
+            this.__onMouseMove(e)
+        })
+        window.addEventListener('dblclick', (e)=>{
+            e.preventDefault()
+        })
+        window.addEventListener('mousedown', (e)=>{
+            if(this.__isEmulatedMouseEvent()) return
+            this.__onMouseDown(e)
+        })
+        window.addEventListener('mouseup', (e)=>{
+            if(this.__isEmulatedMouseEvent()) return
+            this.__onMouseUp(e)
+        })
+        window.addEventListener('contextmenu', (e)=>{
+            // The press and the release of the right button are handled as any other
+            e.preventDefault()
+        })
+        window.addEventListener('wheel', (e)=>{
+            let event = new QmlWheelEvent()
+
             let modifiers = QtEnums.NoModifier
             if(e.shiftKey) {
                 modifiers |= QtEnums.ShiftModifier
@@ -360,259 +790,45 @@ module.exports = {
             }
 
             event.modifiers = modifiers
-            event.moveX = event.originX - e.pageX
-            event.moveY = event.originY - e.pageY
-            event.originX = e.pageX
-            event.originY = e.pageY
+            event.originX = e.clientX
+            event.originY = e.clientY
+            event.angleDelta.x = -e.deltaX / 8
+            event.angleDelta.y = -e.deltaY / 8
+            event.path = this.getObjectsFromPoint(e.clientX, e.clientY)
 
-            JQApplication.resetCursor('unset')
-
-            if(event.pressed){
-                if(Math.abs(event.startX - event.originX) > 15) event.wasDragX = true
-                if(Math.abs(event.startY - event.originY) > 15) event.wasDragY = true
-            }
-
-            let i = 0
-            while(i < this.entered.length){
-                if(this.entered[i].__destroyed) {
-                    this.entered.splice(i, 1)
-                    continue
-                }
-
-                event.relative(this.entered[i])
-                if(event.x < 0 || event.y < 0 || event.x >= this.entered[i].width || event.y >= this.entered[i].height) {
-                    if(typeof this.entered[i].__onMouseLeave === 'function') this.entered[i].__onMouseLeave(event)
-                    this.entered.splice(i, 1)
-                } else {
-                    i++
+            for(let obj of event.path){
+                if(!event.accepted || !event.target){
+                    event.relative(obj)
+                    if(typeof obj.__onWheel === 'function') obj.__onWheel(event)
                 }
             }
 
-            i = 0
-            while(i < event.path.length){
-                if(event.path[i].__destroyed) {
-                    event.path.splice(i, 1)
-                    continue
-                }
-
-                event.relative(event.path[i])
-                if(event.x >= 0 && event.y >= 0 && event.x < event.path[i].width && event.y < event.path[i].height){
-                    if(this.entered.indexOf(event.path[i]) < 0) {
-                        this.entered.push(event.path[i])
-                        if(typeof event.path[i].__onMouseEnter === 'function') event.path[i].__onMouseEnter(event)
-                    }
-                } 
-                if(typeof event.path[i].__onMouseMove === 'function') event.path[i].__onMouseMove(event)
-
-                i++
-            }
-
-            let activeHandlers = []
-            for(let handler of this.activePointerHandlers){
-                if(!handler || handler.__destroyed || !handler.active){
-                    this.activePointerHandlers.delete(handler)
-                    continue
-                }
-                if(event.path.indexOf(handler) < 0){
-                    activeHandlers.push(handler)
-                }
-            }
-
-            for(let handler of activeHandlers){
-                if(typeof handler.__onMouseMove === 'function') handler.__onMouseMove(event)
-            }
-
-        })
-
-        window.addEventListener('click', (e)=>{
-            if(this.event) this.event.fillButton(e)
-            this.click(e)
-        })
-        window.addEventListener('dblclick', (e)=>{
-            e.preventDefault()
-        })
-        window.addEventListener('mousedown', (e)=>{
-            this.event = new QmlMouseEvent({pressed: true})
-
-            let modifiers = QtEnums.NoModifier
-            if(e.shiftKey) {
-                modifiers |= QtEnums.ShiftModifier
-            }
-            if(e.altKey) {
-                modifiers |= QtEnums.AltModifier
-            }
-            if(e.ctrlKey) {
-                modifiers |= QtEnums.ControlModifier
-            }
-
-            this.event.modifiers = modifiers
-            this.event.fillButton(e)
-            this.event.originX = e.pageX
-            this.event.originY = e.pageY
-            this.event.startX = e.pageX
-            this.event.startY = e.pageY
-            this.event.path = this.getObjectsFromPoint(e.pageX, e.pageY)
-
-            for(let obj of this.event.path){
-                this.event.accepted = true
-                this.event.relative(obj)
-                if(typeof obj.__onMouseDown === 'function') obj.__onMouseDown(this.event)
-                if(obj.active && this.activePointerHandlers.indexOf && false){}
-                if(obj.active && this.activePointerHandlers.add){
-                    this.activePointerHandlers.add(obj)
-                }
-            }
-        })
-        window.addEventListener('mouseup', (e)=>{
-            if(this.event){
-                let modifiers = QtEnums.NoModifier
-                if(e.shiftKey) {
-                    modifiers |= QtEnums.ShiftModifier
-                }
-                if(e.altKey) {
-                    modifiers |= QtEnums.AltModifier
-                }
-                if(e.ctrlKey) {
-                    modifiers |= QtEnums.ControlModifier
-                }
-
-                this.event.modifiers = modifiers
-
-                this.event.fillButton(e)
-                this.event.originX = e.pageX
-                this.event.originY = e.pageY
-
-                for(let handler of this.activePointerHandlers){
-                    if(!handler || handler.__destroyed) continue
-                    if(typeof handler.__onMouseUp === 'function') handler.__onMouseUp(this.event)
-                }
-                
-                if(this.event.target) {
-                    this.event.relative(this.event.target)
-                    if(typeof this.event.target.__onMouseUp === 'function') this.event.target.__onMouseUp(this.event)
-                    this.__finishMouseAreaDrag(this.event.target)
-                }
-
-                this.activePointerHandlers.clear()
-            }
-        })
-        window.addEventListener('contextmenu', (e)=>{
-            let modifiers = QtEnums.NoModifier
-            if(e.shiftKey) {
-                modifiers |= QtEnums.ShiftModifier
-            }
-            if(e.altKey) {
-                modifiers |= QtEnums.AltModifier
-            }
-            if(e.ctrlKey) {
-                modifiers |= QtEnums.ControlModifier
-            }
-
-            this.event.modifiers = modifiers
-            this.event.fillButton(e)
-            e.preventDefault()
-            this.click(e)
-        })
-        // window.addEventListener('touchstart', (e)=>{
-
-        // })
-        // window.addEventListener('touchend', (e)=>{
-
-        // })
-        // window.addEventListener('touchmove', (e)=>{
-
-        // })
-        window.addEventListener('wheel', (e)=>{
-            this.event = new QmlWheelEvent()
-
-            let modifiers = QtEnums.NoModifier
-            if(e.shiftKey) {
-                modifiers |= QtEnums.ShiftModifier
-            }
-            if(e.altKey) {
-                modifiers |= QtEnums.AltModifier
-            }
-            if(e.ctrlKey) {
-                modifiers |= QtEnums.ControlModifier
-            }
-
-            this.event.modifiers = modifiers
-            this.event.originX = e.pageX
-            this.event.originY = e.pageY
-            this.event.angleDelta.x = e.deltaX / 8
-            this.event.angleDelta.y = -e.deltaY / 8
-            this.event.path = this.getObjectsFromPoint(e.pageX, e.pageY)
-
-            for(let obj of this.event.path){
-                if(!this.event.accepted || !this.event.target){
-                    this.event.relative(obj)
-                    if(typeof obj.__onWheel === 'function') obj.__onWheel(this.event)
-                }
-            }
-
-            this.event = null
         })
     },
 
-    click: function(e){
-        if(this.event && this.event.target){
-            if(this.event.target.__destroyed) return
-            
-            let event = this.event
-            JQApplication.beginUpdate()
-
-            event.originX = e.pageX
-            event.originY = e.pageY
-            event.relative(event.target)
-
-            let _button = this.buttons[event.button]
-
-            if(e.timeStamp - _button.timeStamp > 300 || _button.target !== event.target){
-                _button.timeStamp = e.timeStamp
-                _button.target = event.target
-                event.target.__onMouseClick(event)
-                this.__propagateComposedEvent(event, event.target, 'click')
-            } else {
-                event.target.__onMouseDblClick(event)
-                this.__propagateComposedEvent(event, event.target, 'dblclick')
-            }
-            
-            event.target.__onMouseLeave(event)
-
-            JQApplication.endUpdate()
-        }
-
-        this.event = null
+    __composedSignals: {
+        click: 'clicked',
+        dblclick: 'doubleClicked',
+        pressAndHold: 'pressAndHold',
     },
 
+    // Qt: QQuickMouseAreaPrivate::propagate, every MouseArea at the point but the origin, topmost first
     __propagateComposedEvent: function(event, origin, kind){
         if(!event || !origin || origin.__destroyed) return
         if(!origin.propagateComposedEvents || event.accepted) return
 
-        let path = event.path && event.path.length ? event.path : this.getObjectsFromPoint(event.originX, event.originY)
-        let start = 0
-        for(let i = 0; i < path.length; i++){
-            if(path[i] === origin){
-                start = i + 1
-                break
-            }
-        }
+        let originRect = origin.__DOM.getBoundingClientRect()
+        let sceneX = originRect.left + event.x
+        let sceneY = originRect.top + event.y
+        let signalName = this.__composedSignals[kind]
 
-        for(let i = start; i < path.length; i++){
-            let obj = path[i]
-            if(!obj || obj === origin || obj.__destroyed) continue
+        for(let obj of this.getObjectsFromPoint(sceneX, sceneY)){
+            if(obj === origin || obj.__destroyed || typeof obj.__emitComposed !== 'function') continue
 
-            if(kind === 'click'){
-                if(typeof obj.__emitComposedClick !== 'function') continue
-                event.relative(obj)
-                obj.__emitComposedClick(event)
-            } else {
-                if(typeof obj.__emitComposedDoubleClick !== 'function') continue
-                event.relative(obj)
-                obj.__emitComposedDoubleClick(event)
-            }
-
-            if(event.accepted) return
+            let rect = obj.__DOM.getBoundingClientRect()
+            event.x = sceneX - rect.left
+            event.y = sceneY - rect.top
+            if(obj.__emitComposed(event, signalName) && event.accepted) return
         }
     },
 }

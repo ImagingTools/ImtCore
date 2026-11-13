@@ -9,6 +9,10 @@
 // ACF includes
 #include <istd/CChangeNotifier.h>
 
+// ImtCore includes
+#include <imtauth/TenantEvents.h>
+#include <imtauth/CollectionSelection.h>
+
 
 namespace imtauth
 {
@@ -190,6 +194,10 @@ QByteArray CCrossTenantMessageBrokerComp::SendMessage(
 	DispatchToHandlers(info);
 	StoreMessageInfo(messageId, info);
 
+	TenantEvent::Publish(this, {
+				{TenantEvent::s_type, TenantEvent::s_messageCreated},
+				{TenantEvent::s_messageId, messageId}});
+
 	return messageId;
 }
 
@@ -214,14 +222,15 @@ CrossTenantMessageInfo CCrossTenantMessageBrokerComp::GetMessage(const QByteArra
 }
 
 
-CrossTenantMessages CCrossTenantMessageBrokerComp::CollectMessages(const std::function<bool(const CrossTenantMessageInfo&)>& predicate) const
+CrossTenantMessages CCrossTenantMessageBrokerComp::CollectMessages(const QByteArray& columnId, const QByteArray& value, const std::function<bool(const CrossTenantMessageInfo&)>& predicate) const
 {
 	CrossTenantMessages result;
 	if (!m_messageCollectionCompPtr.IsValid()){
 		return result;
 	}
 
-	for (const QByteArray& id : m_messageCollectionCompPtr->GetElementIds()){
+	// A collection that does not know the filter returns every id, the predicate still decides
+	for (const QByteArray& id : CollectionSelection::SelectIds(*m_messageCollectionCompPtr, CollectionSelection::ColumnEquals(columnId, value))){
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (m_messageCollectionCompPtr->GetObjectData(id, dataPtr)){
 			const ICrossTenantMessageData* messagePtr = dynamic_cast<const ICrossTenantMessageData*>(dataPtr.GetPtr());
@@ -240,7 +249,7 @@ CrossTenantMessages CCrossTenantMessageBrokerComp::CollectMessages(const std::fu
 
 CrossTenantMessages CCrossTenantMessageBrokerComp::GetIncomingMessages(const QByteArray& targetTenantId) const
 {
-	return CollectMessages([&targetTenantId](const CrossTenantMessageInfo& info){
+	return CollectMessages("TargetTenantId", targetTenantId, [&targetTenantId](const CrossTenantMessageInfo& info){
 		return info.targetTenantId == targetTenantId;
 	});
 }
@@ -248,7 +257,7 @@ CrossTenantMessages CCrossTenantMessageBrokerComp::GetIncomingMessages(const QBy
 
 CrossTenantMessages CCrossTenantMessageBrokerComp::GetOutgoingMessages(const QByteArray& sourceTenantId) const
 {
-	return CollectMessages([&sourceTenantId](const CrossTenantMessageInfo& info){
+	return CollectMessages("SourceTenantId", sourceTenantId, [&sourceTenantId](const CrossTenantMessageInfo& info){
 		return info.sourceTenantId == sourceTenantId;
 	});
 }
@@ -256,7 +265,7 @@ CrossTenantMessages CCrossTenantMessageBrokerComp::GetOutgoingMessages(const QBy
 
 CrossTenantMessages CCrossTenantMessageBrokerComp::GetMessagesByRelationship(const QByteArray& relationshipId) const
 {
-	return CollectMessages([&relationshipId](const CrossTenantMessageInfo& info){
+	return CollectMessages("RelationshipId", relationshipId, [&relationshipId](const CrossTenantMessageInfo& info){
 		return info.relationshipId == relationshipId;
 	});
 }
@@ -274,11 +283,22 @@ bool CCrossTenantMessageBrokerComp::UpdateMessageStatus(
 
 	istd::CChangeNotifier changeNotifier(this);
 
+	const CrossTenantMessageStatus previousStatus = info.status;
 	info.status = status;
 	info.errorMessage = errorMessage;
 	info.updatedAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
 
-	return StoreMessageInfo(messageId, info);
+	if (!StoreMessageInfo(messageId, info)){
+		return false;
+	}
+
+	if (previousStatus != status){
+		TenantEvent::Publish(this, {
+					{TenantEvent::s_type, TenantEvent::s_messageStatusChanged},
+					{TenantEvent::s_messageId, messageId}});
+	}
+
+	return true;
 }
 
 

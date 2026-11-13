@@ -227,6 +227,12 @@ protected:
 	ObjectInfo* GetObjectInfo(const Id& id) const;
 	virtual void RemoveAllObjects();
 
+	/**
+		Create a copy of the stored object data, as returned by GetObjectData.
+		Called with the collection lock held. The default creates an instance of the object type and copies the data into it.
+	*/
+	virtual istd::IChangeableUniquePtr CreateDataCopy(const ObjectInfo& objectInfo) const;
+
 private:
 	istd::IChangeableUniquePtr CreateDataObject(const QByteArray& typeId) const;
 

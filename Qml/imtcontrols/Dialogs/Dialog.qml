@@ -21,6 +21,7 @@ ControlBase {
 
 	property bool centered: true;
 	property bool pinned: false;
+	// The app logo in the title bar.
 	property bool hasIcon: true;
 	property bool modal: false;
 
@@ -86,15 +87,28 @@ ControlBase {
 		enabled: false
 	}
 
-	function addButton(id, name, enabled, active){
+	// variant: "primary" | "danger" | "default"; empty lets DialogButtons pick it from the button id.
+	function addButton(id, name, enabled, active, variant){
 		if (enabled == undefined){
 			enabled = true
 		}
 		if(active == undefined){
 			active = false
 		}
+		if (variant == undefined){
+			variant = ""
+		}
 
-		buttonsModel.append({id: id, name:name, enabled: enabled, active: active})
+		buttonsModel.append({id: id, name:name, enabled: enabled, active: active, variant: variant})
+	}
+
+	function setButtonVariant(id, variant){
+		for(let i = 0; i < buttonsModel.count; i++){
+			if (buttonsModel.get(i).id === id){
+				buttonsModel.setProperty(i, "variant", variant);
+				break;
+			}
+		}
 	}
 
 	function setButtonActive(buttonIdArg){
@@ -104,7 +118,7 @@ ControlBase {
 	}
 
 	function insertButton(id, name, enabled, index){
-		buttonsModel.insert(index, {id: id, name:name, enabled: enabled})
+		buttonsModel.insert(index, {id: id, name:name, enabled: enabled, active: false, variant: ""})
 	}
 
 	function removeButton(id){

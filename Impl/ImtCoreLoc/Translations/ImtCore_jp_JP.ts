@@ -3626,6 +3626,10 @@
         <source>Password changed successfully</source>
         <translation>パスワードが正常に変更されました</translation>
     </message>
+    <message>
+        <source>Your password expires in %1 day(s). Please change it in your profile.</source>
+        <translation>パスワードの有効期限まであと %1 日です。プロフィールで変更してください。</translation>
+    </message>
 </context>
 <context>
     <name>AuthorizationPage</name>
@@ -3686,6 +3690,18 @@
         <location line="+10"/>
         <source>Close</source>
         <translation>閉じる</translation>
+    </message>
+    <message>
+        <source>Unable to change the password.</source>
+        <translation>パスワードを変更できませんでした。</translation>
+    </message>
+    <message>
+        <source>Your password has expired</source>
+        <translation>パスワードの有効期限が切れました</translation>
+    </message>
+    <message>
+        <source>Unable to register the user</source>
+        <translation>ユーザーを登録できませんでした</translation>
     </message>
 </context>
 <context>
@@ -7480,6 +7496,81 @@
     </message>
 </context>
 <context>
+    <name>PasswordPolicyController</name>
+    <message>
+        <source>at least %1 characters</source>
+        <translation>%1 文字以上</translation>
+    </message>
+    <message>
+        <source>at most %1 characters</source>
+        <translation>%1 文字以下</translation>
+    </message>
+    <message>
+        <source>a lowercase letter</source>
+        <translation>小文字</translation>
+    </message>
+    <message>
+        <source>an uppercase letter</source>
+        <translation>大文字</translation>
+    </message>
+    <message>
+        <source>a digit</source>
+        <translation>数字</translation>
+    </message>
+    <message>
+        <source>a special character</source>
+        <translation>記号</translation>
+    </message>
+    <message>
+        <source>a password different from the login</source>
+        <translation>ログイン名と異なるパスワード</translation>
+    </message>
+    <message>
+        <source>a password that is not commonly used</source>
+        <translation>一般的に使われていないパスワード</translation>
+    </message>
+    <message>
+        <source>a password different from the last %1 ones</source>
+        <translation>直近 %1 個と異なるパスワード</translation>
+    </message>
+    <message>
+        <source>a password that was not used before</source>
+        <translation>以前に使用していないパスワード</translation>
+    </message>
+    <message>
+        <source>The current password is not correct.</source>
+        <translation>現在のパスワードが正しくありません。</translation>
+    </message>
+    <message>
+        <source>The password was changed too recently and cannot be changed again yet.</source>
+        <translation>パスワードは最近変更されたため、まだ再度変更できません。</translation>
+    </message>
+    <message>
+        <source>This account is managed by an external system, its password cannot be changed here.</source>
+        <translation>このアカウントは外部システムで管理されているため、ここではパスワードを変更できません。</translation>
+    </message>
+    <message>
+        <source>This account no longer exists.</source>
+        <translation>このアカウントは存在しません。</translation>
+    </message>
+    <message>
+        <source>The password could not be changed. Please try again later.</source>
+        <translation>パスワードを変更できませんでした。後でもう一度お試しください。</translation>
+    </message>
+    <message>
+        <source>The password does not meet the requirements: %1.</source>
+        <translation>パスワードが要件を満たしていません: %1。</translation>
+    </message>
+    <message>
+        <source>, </source>
+        <translation>、</translation>
+    </message>
+    <message>
+        <source>Password requirements:</source>
+        <translation>パスワードの要件:</translation>
+    </message>
+</context>
+<context>
     <name>PasswordRecoveryDialog</name>
     <message>
         <location filename="../../../Qml/imtauthgui/PasswordRecoveryDialog.qml" line="+15"/>
@@ -7581,6 +7672,10 @@
         <location line="+142"/>
         <source>Password changed successfully</source>
         <translation>パスワードが正常に変更されました</translation>
+    </message>
+    <message>
+        <source>Unable to change the password.</source>
+        <translation>パスワードを変更できませんでした。</translation>
     </message>
 </context>
 <context>
@@ -7820,6 +7915,97 @@
         <location line="+21"/>
         <source>Category</source>
         <translation>カテゴリ</translation>
+    </message>
+</context>
+<context>
+    <name>ProfileGeneralPage</name>
+    <message>
+        <source>Profile saved</source>
+        <translation>プロフィールを保存しました</translation>
+    </message>
+    <message>
+        <source>Unable to save the profile.</source>
+        <translation>プロフィールを保存できませんでした。</translation>
+    </message>
+    <message>
+        <source>Account</source>
+        <translation>アカウント</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>名前</translation>
+    </message>
+    <message>
+        <source>Enter the name</source>
+        <translation>名前を入力</translation>
+    </message>
+    <message>
+        <source>Email Address</source>
+        <translation>メールアドレス</translation>
+    </message>
+    <message>
+        <source>Enter the email</source>
+        <translation>メールアドレスを入力</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation>保存</translation>
+    </message>
+    <message>
+        <source>Password changed</source>
+        <translation>パスワードを変更しました</translation>
+    </message>
+    <message>
+        <source>Unable to change the password. Check your current password and try again.</source>
+        <translation>パスワードを変更できませんでした。現在のパスワードを確認して、もう一度お試しください。</translation>
+    </message>
+    <message>
+        <source>Password</source>
+        <translation>パスワード</translation>
+    </message>
+    <message>
+        <source>Change</source>
+        <translation>変更</translation>
+    </message>
+    <message>
+        <source>Current password</source>
+        <translation>現在のパスワード</translation>
+    </message>
+    <message>
+        <source>Enter your current password</source>
+        <translation>現在のパスワードを入力</translation>
+    </message>
+    <message>
+        <source>New password</source>
+        <translation>新しいパスワード</translation>
+    </message>
+    <message>
+        <source>Enter a new password</source>
+        <translation>新しいパスワードを入力</translation>
+    </message>
+    <message>
+        <source>Confirm new password</source>
+        <translation>新しいパスワードの確認</translation>
+    </message>
+    <message>
+        <source>Re-enter the new password</source>
+        <translation>新しいパスワードを再入力</translation>
+    </message>
+    <message>
+        <source>Passwords don&apos;t match</source>
+        <translation>パスワードが一致しません</translation>
+    </message>
+    <message>
+        <source>Changing password…</source>
+        <translation>パスワードを変更しています…</translation>
+    </message>
+    <message>
+        <source>Update password</source>
+        <translation>パスワードを更新</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>キャンセル</translation>
     </message>
 </context>
 <context>
@@ -9110,6 +9296,26 @@ NOK: 0
         <source>OK</source>
         <translation>OK</translation>
     </message>
+    <message>
+        <source>Unable to create the administrator account</source>
+        <translation>管理者アカウントを作成できませんでした</translation>
+    </message>
+    <message>
+        <source>Unable to reach server</source>
+        <translation>サーバーに接続できません</translation>
+    </message>
+    <message>
+        <source>Create the administrator account</source>
+        <translation>管理者アカウントを作成</translation>
+    </message>
+    <message>
+        <source>This server doesn&apos;t have one yet. Set a name and password below - you&apos;ll sign in with them right after.</source>
+        <translation>このサーバーにはまだありません。下で名前とパスワードを設定してください。設定後すぐにそれでサインインします。</translation>
+    </message>
+    <message>
+        <source>Create account</source>
+        <translation>アカウントを作成</translation>
+    </message>
 </context>
 <context>
     <name>TDocumentWorkspaceGuiCompBase</name>
@@ -9547,6 +9753,10 @@ Input-ID: </source>
         <location line="+10"/>
         <source>Change Password</source>
         <translation>パスワードを変更</translation>
+    </message>
+    <message>
+        <source>Unable to change the password.</source>
+        <translation>パスワードを変更できませんでした。</translation>
     </message>
 </context>
 <context>

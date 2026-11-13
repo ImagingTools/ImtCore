@@ -211,7 +211,7 @@ Item {
 
 		let dayNumber = Number(day);
 
-		if(dayNumber > 31){
+		if(dayNumber < 1 || dayNumber > 31){
 			return false;
 		}
 		if(dayNumber <= 28){
@@ -291,6 +291,7 @@ Item {
 				textInputValidator : RegularExpressionValidator { regularExpression: dateInput.dateRegExp }
 
 				property bool isEmpty: false;
+				autoEditingFinished: false;
 
 				onVisibleChanged: {
 					if(text == ""){
@@ -298,13 +299,11 @@ Item {
 					}
 				}
 
-				onFocusChanged: {
-					if(!focus){
-						dateInput.setDateAsString(input.text);
-					}
+				onEditingFinished: {
+					dateInput.setDateAsString(input.text);
 				}
 				onAccepted: {
-					if(dateInput.setDateAsString(input.text)){
+					if(dateInput.setDateAsString(input.text) && dateInput.tabKeyItem){
 						dateInput.tabKeyItem.forceActiveFocus();
 					}
 				}
@@ -345,6 +344,7 @@ Item {
 					width: 50;
 					height: parent.height;
 					radius: input.radius;
+					color: input.color;
 					border.color: Style.borderColor;
 				}
 				Button{
@@ -388,7 +388,9 @@ Item {
 						if(y_ + dateInput.calendarHeight > ModalDialogManager.activeView.height){
 							y_ = point.y - (input.height + 2) - dateInput.calendarHeight - 4;
 						}
-						let parameters = {"x": point.x, "y":y_};
+						// Kept inside the window: a field near the right edge would push the popup off screen.
+						let x_ = Math.max(0, Math.min(point.x, ModalDialogManager.activeView.width - dateInput.calendarWidth - Style.marginS));
+						let parameters = {"x": x_, "y":y_};
 
 
 						ModalDialogManager.openDialog(calendarComp, parameters);

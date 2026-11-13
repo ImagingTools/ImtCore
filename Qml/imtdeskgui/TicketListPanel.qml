@@ -124,6 +124,7 @@ Rectangle {
 			delegate: Rectangle {
 				width: ticketListView.width
 				height: ticketItemContent.height + Style.paddingS * 2
+				color: Style.baseColor
 
 				Column {
 					id: ticketItemContent

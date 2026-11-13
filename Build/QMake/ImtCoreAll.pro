@@ -575,6 +575,14 @@ SUBDIRS += CollectionDocumentServiceTest
 CollectionDocumentServiceTest.file = ../../Tests/CollectionDocumentServiceTest/QMake/CollectionDocumentServiceTest.pro
 CollectionDocumentServiceTest.depends = imtbase imtdoc
 
+SUBDIRS += DocumentServiceIntegrationTestPck
+DocumentServiceIntegrationTestPck.file = ../../Tests/DocumentServiceIntegrationTest/DocumentServiceIntegrationTestPck/QMake/DocumentServiceIntegrationTestPck.pro
+DocumentServiceIntegrationTestPck.depends = imtdoc
+
+SUBDIRS += DocumentServiceIntegrationTest
+DocumentServiceIntegrationTest.file = ../../Tests/DocumentServiceIntegrationTest/QMake/DocumentServiceIntegrationTest.pro
+DocumentServiceIntegrationTest.depends = imtbase imtdoc ImtCorePck ImtDocPck DocumentServiceIntegrationTestPck
+
 SUBDIRS += ImtCoreFileCollectionTest
 ImtCoreFileCollectionTest.file = ../../Tests/FileCollectionTest/QMake/ImtCoreFileCollectionTest.pro
 ImtCoreFileCollectionTest.depends = imtbase imtaccount imtauth imtrepo

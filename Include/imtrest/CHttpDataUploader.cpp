@@ -10,10 +10,38 @@
 
 // ImtCCore includes
 #include<imtcom/CRequestSender.h>
+#include <imtrest/CHttpRangeTools.h>
 
 
 namespace imtrest
 {
+
+
+namespace
+{
+
+
+bool SendPart(const QNetworkRequest& request, const QByteArray& data)
+{
+	QNetworkReply* replyPtr = imtcom::CRequestSender::DoSyncPut(request, data, 30000);
+	if (replyPtr == nullptr){
+		return false;
+	}
+
+	// The reply belongs to the caller of DoSyncPut.
+	replyPtr->deleteLater();
+
+	if (replyPtr->error() != QNetworkReply::NoError){
+		qWarning() << "Unable to send data. error" << replyPtr->error() << replyPtr->errorString();
+
+		return false;
+	}
+
+	return true;
+}
+
+
+} // namespace
 
 
 CHttpDataUploader::CHttpDataUploader(QObject* parentPtr)
@@ -79,7 +107,14 @@ bool CHttpDataUploader::UploadFile(const QUrl& url)
 		return false;
 	}
 
-	qsizetype totalSize = m_devicePtr->size();
+	// The part size is a runtime property (QML), so it is a normal error and not a programming one.
+	if (m_partMaxSize <= 0){
+		qWarning() << __func__ << "Unable to upload data. Invalid part size" << m_partMaxSize;
+
+		return false;
+	}
+
+	qint64 totalSize = m_devicePtr->size();
 	while(!m_devicePtr->atEnd()){
 		QNetworkRequest uploadRequest(uploadUrl);
 		for(auto headersIter = m_additionalHeaders.cbegin(); headersIter != m_additionalHeaders.cend(); ++headersIter){
@@ -92,23 +127,26 @@ bool CHttpDataUploader::UploadFile(const QUrl& url)
 			}
 			uploadRequest.setRawHeader(headersIter.key().toUtf8(), headerValue.toByteArray());
 		}
-		QByteArray contentRangeHeaderValue = QByteArrayLiteral("bytes ");
-		contentRangeHeaderValue += QByteArray::number(m_devicePtr->pos());
-		contentRangeHeaderValue += '-';
 
+		qint64 partStart = m_devicePtr->pos();
 		QByteArray dataPart = m_devicePtr->read(m_partMaxSize);
-		contentRangeHeaderValue += QByteArray::number(dataPart.length());
-		contentRangeHeaderValue += '/';
-		contentRangeHeaderValue += QByteArray::number(totalSize);
+		if (dataPart.isEmpty()){
+			qWarning() << __func__ << "Unable to read data from the device at" << partStart;
 
-		uploadRequest.setRawHeader(QByteArrayLiteral("Content-Range"), contentRangeHeaderValue);
+			return false;
+		}
 
-		QNetworkReply* replyPtr = imtcom::CRequestSender::DoSyncPut(uploadRequest, dataPart, 30000);
-		Q_ASSERT(replyPtr != nullptr);
+		const QByteArray contentRange = CHttpRangeTools::CreateContentRange(partStart, dataPart.size(), totalSize);
+		if (contentRange.isEmpty()){
+			// The device has grown since the upload was started.
+			qWarning() << __func__ << "Unable to upload data. The device is changed during the upload";
 
-		if(replyPtr->error()){
-			qWarning() << "Unable to send data. error" << replyPtr->error() << replyPtr->errorString();
+			return false;
+		}
 
+		uploadRequest.setRawHeader(QByteArrayLiteral("Content-Range"), contentRange);
+
+		if (!SendPart(uploadRequest, dataPart)){
 			return false;
 		}
 	}

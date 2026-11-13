@@ -221,12 +221,13 @@ Item {
             }
         }
 
-        Loading {
+        SkeletonTableView {
             id: ldng;
 
             anchors.fill: treeViewInternal;
 
-            visible: false;
+            headerVisible: false;
+            columnCount: 1;
         }
     }
 

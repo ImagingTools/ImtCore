@@ -105,6 +105,22 @@ protected:
 				const sdl::V1_0::imtbase::CCreateSubCollectionGqlRequest& createSubCollectionRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtbase::CGetDocumentAccessPayload OnGetDocumentAccess(
+				const sdl::V1_0::imtbase::CGetDocumentAccessGqlRequest& getDocumentAccessRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtbase::CGetDocumentSharesPayload OnGetDocumentShares(
+				const sdl::V1_0::imtbase::CGetDocumentSharesGqlRequest& getDocumentSharesRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtbase::CShareDocumentsPayload OnShareDocuments(
+				const sdl::V1_0::imtbase::CShareDocumentsGqlRequest& shareDocumentsRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtbase::CRevokeDocumentSharesPayload OnRevokeDocumentShares(
+				const sdl::V1_0::imtbase::CRevokeDocumentSharesGqlRequest& revokeDocumentSharesRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 
 	// reimplemented (imtgql::IGqlRequestHandler)
 	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;

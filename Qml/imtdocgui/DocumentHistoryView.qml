@@ -28,6 +28,8 @@ Rectangle {
 
 	property string documentId: ""
 	property string collectionId: ""
+	// Part of the product this view works in; scopes its permission checks.
+	property string permissionPath: ""
 
 	// Opt-in row selection (used by DocumentRevisionDialog to pick a revision
 	// to restore/delete); plain history tabs leave this off.
@@ -41,7 +43,9 @@ Rectangle {
 	readonly property int activeRevision: revisionsProvider.activeRevision
 	readonly property alias contentHeight: historyTable.contentHeight
 
-	readonly property bool __canViewRevisions: PermissionsController.checkPermission("ViewRevisions")
+	// Permission area of the revisions of the collection, e.g. "/SensorManagement/Revisions".
+	property string revisionsPermissionPath: ""
+	readonly property bool __canViewRevisions: PermissionsController.checkPermission(container.revisionsPermissionPath + "/View")
 
 	property QtObject __selectionManager: QtObject {
 		function isSelected(id){
@@ -88,7 +92,9 @@ Rectangle {
 
 	SubscriptionClient {
 		id: subscriptionClient
+		deliveryEnabled: container.visible
 		onMessageReceived: container.sendRequest()
+		onRefreshRequired: container.sendRequest()
 	}
 
 	Component {
@@ -122,21 +128,21 @@ Rectangle {
 					color: Style.inactiveTextColor
 				}
 				BaseText {
-					width: headerRow.columnsWidth * 0.20
+					width: headerRow.columnsWidth * 0.18
 					text: qsTr("User")
 					font.bold: true
 					font.pixelSize: Style.fontSizeS
 					color: Style.inactiveTextColor
 				}
 				BaseText {
-					width: headerRow.columnsWidth * 0.22
+					width: headerRow.columnsWidth * 0.18
 					text: qsTr("Date")
 					font.bold: true
 					font.pixelSize: Style.fontSizeS
 					color: Style.inactiveTextColor
 				}
 				BaseText {
-					width: headerRow.columnsWidth * 0.40
+					width: headerRow.columnsWidth * 0.50
 					text: qsTr("Description")
 					font.bold: true
 					font.pixelSize: Style.fontSizeS
@@ -207,14 +213,14 @@ Rectangle {
 							text: qsTr("Current")
 							font.pixelSize: Style.fontSizeM
 							font.bold: true
-							color: "white"
+							color: Style.highlightedTextColor
 						}
 					}
 				}
 
 				Row {
 					anchors.verticalCenter: parent.verticalCenter
-					width: dataRow.columnsWidth * 0.20
+					width: dataRow.columnsWidth * 0.18
 					spacing: Style.spacingS
 
 					Rectangle {
@@ -232,7 +238,7 @@ Rectangle {
 								: ""
 							font.pixelSize: Style.fontSizeS
 							font.bold: true
-							color: "white"
+							color: Style.highlightedTextColor
 						}
 					}
 
@@ -248,20 +254,47 @@ Rectangle {
 
 				Text {
 					anchors.verticalCenter: parent.verticalCenter
-					width: dataRow.columnsWidth * 0.22
+					width: dataRow.columnsWidth * 0.18
 					text: revisionDelegate.revisionItem ? revisionDelegate.revisionItem.timestamp : ""
 					font.pixelSize: Style.fontSizeM
 					color: Style.inactiveTextColor
 					elide: Text.ElideRight
 				}
 
+				// A description lists every changed part, often on several lines: up to four are shown, the tooltip has all.
 				Text {
+					id: descriptionText
+					objectName: "RevisionDescription"
 					anchors.verticalCenter: parent.verticalCenter
-					width: dataRow.columnsWidth * 0.40
+					width: dataRow.columnsWidth * 0.50
 					text: revisionDelegate.revisionItem ? revisionDelegate.revisionItem.description : ""
 					font.pixelSize: Style.fontSizeM
 					color: Style.textColor
+					wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+					maximumLineCount: 4
 					elide: Text.ElideRight
+
+					MouseArea {
+						id: descriptionMouseArea
+						anchors.fill: parent
+						hoverEnabled: true
+						acceptedButtons: Qt.NoButton
+					}
+
+					// The whole text laid out without the line limit tells whether anything was cut.
+					Text {
+						id: descriptionMeasure
+						visible: false
+						width: descriptionText.width
+						text: descriptionText.text
+						font.pixelSize: descriptionText.font.pixelSize
+						wrapMode: descriptionText.wrapMode
+					}
+
+					TooltipArea {
+						text: descriptionMeasure.implicitHeight > descriptionText.height + 1 ? descriptionText.text : ""
+						mouseArea: descriptionMouseArea
+					}
 				}
 			}
 		}

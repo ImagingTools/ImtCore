@@ -9,6 +9,7 @@
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="ApiClient" X="550" Y="300" Note=""/>
+        <Element ComponentName="AsyncApiClient" X="850" Y="300" Note=""/>
         <Element ComponentName="GraphQLClientEngine" X="550" Y="450" Note=""/>
         <Element ComponentName="GraphQLRepresentationController" X="550" Y="150" Note=""/>
     </PositionMap>

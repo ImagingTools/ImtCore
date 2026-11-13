@@ -19,6 +19,9 @@ Rectangle {
 	property bool canRecoveryPassword: true;
 	property bool canRegisterUser: true;
 
+	// PasswordPolicyController instance for the sign-up form, injected by the owner.
+	property var passwordPolicy: null;
+
 	property string appName: context ? context.appName : ""
 	
 	property bool isAuthenticating: false;
@@ -37,6 +40,8 @@ Rectangle {
 
 	Component.onCompleted: {
 		decoratorPause.start();
+
+		AuthorizationController.loadExternalLoginProviders();
 
 		authPageContainer.state = "unauthorized";
 		authPageContainer.isAuthenticating = false;
@@ -84,6 +89,41 @@ Rectangle {
 		function onLoggedIn(){
 			authPageContainer.isAuthenticating = false;
 		}
+
+		function onPasswordChangeRequired(){
+			authPageContainer.isAuthenticating = false;
+			ModalDialogManager.openDialog(expiredPasswordDialogComp, {});
+		}
+	}
+
+	// The expired password is changed with the one just entered, then the login is repeated with the new one.
+	Connections {
+		id: expiredPasswordConnections;
+		target: AuthorizationController;
+		enabled: false;
+
+		property string newPassword: "";
+
+		function onChangePasswordSuccessfully(){
+			expiredPasswordConnections.enabled = false;
+			passwordTextInput.text = expiredPasswordConnections.newPassword;
+			expiredPasswordConnections.newPassword = "";
+			authPageContainer.isAuthenticating = true;
+			authPageContainer.login(loginTextInput.text, passwordTextInput.text);
+		}
+
+		function onChangePasswordFailed(message, violatedRules){
+			expiredPasswordConnections.enabled = false;
+			expiredPasswordConnections.newPassword = "";
+			authPageContainer.isAuthenticating = false;
+
+			let fallback = qsTr("Unable to change the password.");
+			PopupManager.addErrorMessage(
+						authPageContainer.passwordPolicy
+							? authPageContainer.passwordPolicy.describeFailure(violatedRules, fallback)
+							: fallback,
+						true);
+		}
 	}
 
 	function passwordRecovery(){
@@ -104,7 +144,7 @@ Rectangle {
 
 	Rectangle{
 		anchors.fill: parent;
-		color: "gray";
+		color: Style.overlayBackgroundColor;
 		opacity: 0.5;
 	}
 
@@ -161,8 +201,8 @@ Rectangle {
 				width: loginContainer.width;
 				height: Math.max(80, welcomeText.implicitHeight + 56);
 
-				color: loginContainer.color;
-				radius: loginContainer.radius;
+				// The card paints the background; an opaque header hid the card border along its sides.
+				color: "transparent";
 
 				Text {
 					id: welcomeText;
@@ -293,6 +333,8 @@ Rectangle {
 				readOnly: authPageContainer.isAuthenticating;
 				placeHolderText: qsTr("Enter your password");
 				echoMode: TextInput.Password;
+				// The page draws its own show-password button next to the field.
+				passwordRevealEnabled: false;
 
 				KeyNavigation.tab: loginTextInput;
 				KeyNavigation.backtab: loginTextInput;
@@ -414,8 +456,10 @@ Rectangle {
 						objectName: "LoginButton"
 						anchors.horizontalCenter: parent.horizontalCenter;
 
-						width: Style.buttonWidthXXL;
-						height: Style.controlHeightM;
+						// Full width and primary next to the full-width provider buttons.
+						width: externalLoginItem.visible ? parent.width : Style.buttonWidthXXL;
+						height: externalLoginItem.visible ? Style.controlHeightL : Style.controlHeightM;
+						variant: externalLoginItem.visible ? "primary" : "default";
 
 						enabled: !authPageContainer.isAuthenticating && loginTextInput.text != "" && passwordTextInput.text != "";
 
@@ -443,6 +487,131 @@ Rectangle {
 					}
 				}
 			}// buttonItem
+
+			// Sign-in with external accounts, shown only when the server offers providers.
+			Item {
+				id: externalLoginItem;
+
+				width: parent.width;
+				height: externalLoginColumn.height;
+				visible: AuthorizationController.externalLoginEnabled && AuthorizationController.externalLoginProviders.length > 0;
+
+				Column {
+					id: externalLoginColumn;
+
+					width: parent.width;
+					spacing: Style.marginM;
+
+					Item {
+						id: externalLoginSeparator;
+
+						width: parent.width;
+						height: externalLoginSeparatorText.height;
+
+						Rectangle {
+							anchors.left: parent.left;
+							anchors.right: externalLoginSeparatorText.left;
+							anchors.rightMargin: Style.marginM;
+							anchors.verticalCenter: parent.verticalCenter;
+
+							height: 1;
+							color: Style.borderColor;
+						}
+
+						Text {
+							id: externalLoginSeparatorText;
+
+							anchors.horizontalCenter: parent.horizontalCenter;
+
+							color: Style.inactiveTextColor;
+							font.family: Style.fontFamily;
+							font.pixelSize: Style.fontSizeS;
+
+							text: qsTr("or continue with");
+						}
+
+						Rectangle {
+							anchors.left: externalLoginSeparatorText.right;
+							anchors.leftMargin: Style.marginM;
+							anchors.right: parent.right;
+							anchors.verticalCenter: parent.verticalCenter;
+
+							height: 1;
+							color: Style.borderColor;
+						}
+					}
+
+					Column {
+						id: externalLoginButtonsColumn;
+
+						width: parent.width;
+						spacing: Style.marginM;
+
+						Repeater {
+							id: externalLoginProviderRepeater;
+
+							model: AuthorizationController.externalLoginProviders;
+
+							delegate: ExternalLoginButton {
+								objectName: "ExternalLoginButton_" + String(modelData.id);
+
+								width: externalLoginButtonsColumn.width;
+
+								providerName: String(modelData.name);
+								providerType: String(modelData.type);
+								loading: AuthorizationController.externalLoginInProgress && AuthorizationController.externalLoginProviderId === String(modelData.id);
+								enabled: !authPageContainer.isAuthenticating && !AuthorizationController.externalLoginInProgress;
+
+								onClicked: {
+									AuthorizationController.loginWithExternalProvider(String(modelData.id));
+								}
+							}
+						}
+					}
+
+					Text {
+						id: externalLoginWaitingText;
+						objectName: "ExternalLoginWaitingText"
+
+						width: parent.width;
+						visible: AuthorizationController.externalLoginInProgress;
+
+						color: Style.textColor;
+						font.family: Style.fontFamily;
+						font.pixelSize: Style.fontSizeM;
+						horizontalAlignment: Text.AlignHCenter;
+						wrapMode: Text.WordWrap;
+
+						text: qsTr("Complete the sign-in in the browser window that has opened.");
+					}
+
+					Text {
+						id: externalLoginCancelText;
+
+						anchors.horizontalCenter: parent.horizontalCenter;
+						visible: AuthorizationController.externalLoginInProgress;
+
+						color: Style.linkColor;
+						font.family: Style.fontFamilyBold;
+						font.pixelSize: Style.fontSizeM;
+						font.underline: true;
+
+						text: qsTr("Cancel");
+
+						MouseArea {
+							objectName: "ExternalLoginCancel"
+
+							anchors.fill: parent;
+							cursorShape: Qt.PointingHandCursor;
+							hoverEnabled: true;
+
+							onClicked: {
+								AuthorizationController.cancelExternalLogin();
+							}
+						}
+					}
+				}
+			}
 
 			// Register link placed below the main button - cleaner modern pattern
 			// (less clutter above the primary action).
@@ -493,6 +662,28 @@ Rectangle {
 		}//bodyColumn
 	}
 
+	Component {
+		id: expiredPasswordDialogComp;
+		ChangePasswordDialog {
+			title: qsTr("Your password has expired");
+			currentPasswordInputVisible: false;
+			login: loginTextInput.text;
+			policy: authPageContainer.passwordPolicy;
+			onFinished: {
+				if (buttonId == Enums.save){
+					authPageContainer.isAuthenticating = true;
+					expiredPasswordConnections.newPassword = contentItem.newPassword;
+					expiredPasswordConnections.enabled = true;
+					AuthorizationController.changePassword(loginTextInput.text, passwordTextInput.text, contentItem.newPassword);
+				}
+				else{
+					passwordTextInput.text = "";
+					passwordTextInput.forceActiveFocus();
+				}
+			}
+		}
+	}
+
 	Component{
 		id: passwordRecoveryDialogComp;
 		PasswordRecoveryDialog {}
@@ -502,14 +693,33 @@ Rectangle {
 		id: registerDialogComp;
 		Dialog {
 			id: registerDialog;
-			width: Math.max(Style.sizeHintL, Math.min(ModalDialogManager.activeView.width - 100, Style.sizeHintXXL));
-			height: ModalDialogManager.activeView.height - 100;
+			// Sized to the form: as wide as a compact dialog, as tall as its fields, scrolling only when the window is shorter.
+			width: Math.min(ModalDialogManager.activeView.width - 2 * Style.marginXL, Style.sizeHintXL);
 			title: qsTr("Sign up");
 			canMove: false;
+			notClosingButtons: Enums.save;
 
 			UserData {
 				id: userDataModel;
 				m_id: UuidGenerator.generateUUID();
+			}
+
+			Connections {
+				target: AuthorizationController;
+
+				function onRegisterSuccessfully(){
+					registerDialog.finished(Enums.close);
+				}
+
+				function onRegisterFailed(message, violatedRules){
+					registerDialog.buttons.setButtonState(Enums.save, true);
+					let fallback = message !== "" ? message : qsTr("Unable to register the user");
+					PopupManager.addErrorMessage(
+								authPageContainer.passwordPolicy
+									? authPageContainer.passwordPolicy.describeFailure(violatedRules, fallback)
+									: fallback,
+								true, "RegisterUserError");
+				}
 			}
 
 			Component.onCompleted: {
@@ -520,7 +730,9 @@ Rectangle {
 			contentComp: Component {
 				Item {
 					width: registerDialog.width;
-					height: registerDialog.height - 100;
+					height: Math.min(userGeneralEditor.height + Style.marginL, ModalDialogManager.activeView.height - 2 * Style.marginXL - 2 * Style.controlHeightL - Style.marginL * 2);
+
+					property alias editor: userGeneralEditor;
 
 					clip: true;
 
@@ -554,6 +766,8 @@ Rectangle {
 							id: userGeneralEditor;
 							width: flickable.width;
 							userData: userDataModel;
+							passwordPolicy: authPageContainer.passwordPolicy;
+							deferValidationErrors: true;
 
 							onEmitUpdateModel: {
 								userGeneralEditor.updateModel();
@@ -565,6 +779,16 @@ Rectangle {
 
 			onFinished: {
 				if (buttonId === Enums.save){
+					// Shows what is missing instead of sending a form the server would reject.
+					let editor = registerDialog.contentItem ? registerDialog.contentItem.editor : null;
+					if (editor){
+						editor.revealValidationErrors();
+						if (!editor.inputsAcceptable()){
+							return;
+						}
+					}
+
+					registerDialog.buttons.setButtonState(Enums.save, false);
 					authPageContainer.registerUser(userDataModel)
 				}
 			}

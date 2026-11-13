@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgql/CClientRequestGroupManagerComp.h>
+#include <imtauthgql/CAssignmentCollector.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Groups.h>
 
 
@@ -96,11 +97,11 @@ imtauth::IUserGroupInfoUniquePtr CClientRequestGroupManagerComp::GetGroup(const 
 	}
 
 	if (groupData.roles){
-		groupInfoPtr->SetRoles(productId, groupData.roles->ToList());
+		groupInfoPtr->SetRoles(productId, CAssignmentCollector::GetDirectIds(groupData.roles));
 	}
 
 	if (groupData.users){
-		groupInfoPtr->SetUsers(groupData.users->ToList());
+		groupInfoPtr->SetUsers(CAssignmentCollector::GetDirectIds(groupData.users));
 	}
 
 	return groupInfoPtr;
@@ -123,7 +124,7 @@ bool CClientRequestGroupManagerComp::AddUsersToGroup(const QByteArray& groupId, 
 		return false;
 	}
 
-	QByteArrayList currentUserIds = groupData.users->ToList();
+	QByteArrayList currentUserIds = CAssignmentCollector::GetDirectIds(groupData.users);
 
 	QByteArrayList result = currentUserIds;
 	for (const QByteArray& userId : userIds){
@@ -132,7 +133,7 @@ bool CClientRequestGroupManagerComp::AddUsersToGroup(const QByteArray& groupId, 
 		}
 	}
 
-	groupData.users->FromList(result);
+	groupData.users = CAssignmentCollector::CreateDirectAssignments(result);
 
 	return SetGroupDataSdl(groupId, groupData);
 }
@@ -154,7 +155,7 @@ bool CClientRequestGroupManagerComp::RemoveUsersFromGroup(const QByteArray& grou
 		return false;
 	}
 
-	QByteArrayList currentUserIds = groupData.users->ToList();
+	QByteArrayList currentUserIds = CAssignmentCollector::GetDirectIds(groupData.users);
 
 	QByteArrayList result = currentUserIds;
 	for (const QByteArray& userId : userIds){
@@ -163,7 +164,7 @@ bool CClientRequestGroupManagerComp::RemoveUsersFromGroup(const QByteArray& grou
 		}
 	}
 
-	groupData.users->FromList(result);
+	groupData.users = CAssignmentCollector::CreateDirectAssignments(result);
 
 	return SetGroupDataSdl(groupId, groupData);
 }
@@ -185,7 +186,7 @@ bool CClientRequestGroupManagerComp::AddRolesToGroup(const QByteArray& groupId, 
 		return false;
 	}
 
-	QByteArrayList currentRoleIds = groupData.roles->ToList();
+	QByteArrayList currentRoleIds = CAssignmentCollector::GetDirectIds(groupData.roles);
 
 	QByteArrayList result = currentRoleIds;
 	for (const QByteArray& roleId : roleIds){
@@ -194,7 +195,7 @@ bool CClientRequestGroupManagerComp::AddRolesToGroup(const QByteArray& groupId, 
 		}
 	}
 
-	groupData.roles->FromList(result);
+	groupData.roles = CAssignmentCollector::CreateDirectAssignments(result);
 
 	return SetGroupDataSdl(groupId, groupData);
 }
@@ -216,7 +217,7 @@ bool CClientRequestGroupManagerComp::RemoveRolesFromGroup(const QByteArray& grou
 		return false;
 	}
 
-	QByteArrayList currentRoleIds = groupData.roles->ToList();
+	QByteArrayList currentRoleIds = CAssignmentCollector::GetDirectIds(groupData.roles);
 
 	QByteArrayList result = currentRoleIds;
 	for (const QByteArray& roleId : roleIds){
@@ -225,7 +226,7 @@ bool CClientRequestGroupManagerComp::RemoveRolesFromGroup(const QByteArray& grou
 		}
 	}
 
-	groupData.roles->FromList(result);
+	groupData.roles = CAssignmentCollector::CreateDirectAssignments(result);
 
 	return SetGroupDataSdl(groupId, groupData);
 }

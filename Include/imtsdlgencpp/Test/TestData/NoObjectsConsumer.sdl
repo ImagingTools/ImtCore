@@ -1,0 +1,17 @@
+schema {
+	namespace: sdlgentestnoobjects
+	version: 1.0
+}
+
+
+import {
+	"NoObjects.sdl"
+}
+
+
+type TaskList
+{
+	title: String!
+	tasks: [Task!]!
+	defaultPriority: Priority
+}

@@ -2,12 +2,12 @@
 #include <imtcrypt/CRsaEncryption.h>
 
 
+// STL includes
+#include <memory>
+
 // OpenSSL includes
 #include <openssl/evp.h>
-#include <openssl/pem.h>
-#include <openssl/aes.h>
-#include <openssl/err.h>
-#include <openssl/rand.h>
+#include <openssl/rsa.h>
 
 // ImtCore includes
 #include <imtbase/imtbase.h>
@@ -17,141 +17,78 @@ namespace imtcrypt
 {
 
 
-
-CRsaEncryption::CRsaEncryption()
+namespace
 {
-	m_rsaPrivateKey = nullptr;
-	m_rsaPublicKey = nullptr;
+
+
+using KeyPtr = std::unique_ptr<EVP_PKEY, decltype(&EVP_PKEY_free)>;
+
+
+// Keys are PKCS#1 DER (RSAPrivateKey and RSAPublicKey), as written by CRsaKey
+template <typename DecodeFunction>
+KeyPtr DecodeKey(const QByteArray& key, DecodeFunction decode)
+{
+	const uchar* data = reinterpret_cast<const uchar*>(key.constData());
+
+	return KeyPtr(decode(EVP_PKEY_RSA, nullptr, &data, imtbase::narrow_cast<long>(key.length())), &EVP_PKEY_free);
 }
+
+
+template <typename InitFunction, typename CryptFunction>
+bool Crypt(EVP_PKEY* key, InitFunction init, CryptFunction crypt, const QByteArray& inputData, QByteArray& outputData)
+{
+	if (key == nullptr){
+		return false;
+	}
+
+	std::unique_ptr<EVP_PKEY_CTX, decltype(&EVP_PKEY_CTX_free)> context(EVP_PKEY_CTX_new(key, nullptr), &EVP_PKEY_CTX_free);
+	if (!context || init(context.get()) <= 0 || EVP_PKEY_CTX_set_rsa_padding(context.get(), RSA_PKCS1_PADDING) <= 0){
+		return false;
+	}
+
+	const uchar* input = reinterpret_cast<const uchar*>(inputData.constData());
+	const size_t inputLength = size_t(inputData.length());
+
+	size_t outputLength = 0;
+	if (crypt(context.get(), nullptr, &outputLength, input, inputLength) <= 0){
+		return false;
+	}
+
+	QByteArray result(imtbase::narrow_cast<qsizetype>(outputLength), '\0');
+	if (crypt(context.get(), reinterpret_cast<uchar*>(result.data()), &outputLength, input, inputLength) <= 0){
+		return false;
+	}
+
+	result.truncate(imtbase::narrow_cast<qsizetype>(outputLength));
+	outputData = result;
+
+	return true;
+}
+
+
+} // namespace
 
 
 bool CRsaEncryption::Encrypt(const QByteArray& inputData, const CRsaKey& key, QByteArray& outputData) const
 {
-	SetRsaPrivateKey(key.GetPrivateKey());
-	SetRsaPublicKey(key.GetPublicKey());
-
 	outputData.clear();
 
-	if (m_rsaPublicKey == nullptr){
-		return false;
-	}
+	KeyPtr publicKey = DecodeKey(key.GetPublicKey(), d2i_PublicKey);
 
-	QByteArray baRes;
-	baRes.resize(RSA_size(m_rsaPublicKey) + 1);
-	uchar *encryptedMessage = (uchar*)baRes.data();
-	int len = RSA_public_encrypt(imtbase::narrow_cast<int>(inputData.length()), (uchar*)inputData.data(), encryptedMessage, m_rsaPublicKey, RSA_PKCS1_PADDING);
-	if (len < 0){
-		return false;
-	}
-
-	outputData = QByteArray((char*)encryptedMessage, len);
-
-	return true;
-
+	return Crypt(publicKey.get(), EVP_PKEY_encrypt_init, EVP_PKEY_encrypt, inputData, outputData);
 }
+
 
 bool CRsaEncryption::Decrypt(const QByteArray& inputData, const CRsaKey& key, QByteArray& outputData) const
 {
-	SetRsaPrivateKey(key.GetPrivateKey());
-	SetRsaPublicKey(key.GetPublicKey());
-
 	outputData.clear();
 
-	if (m_rsaPrivateKey == nullptr){
-		return false;
-	}
+	KeyPtr privateKey = DecodeKey(key.GetPrivateKey(), d2i_PrivateKey);
 
-	QByteArray baRes;
-
-	baRes.resize(RSA_size(m_rsaPublicKey) + 1);
-	uchar *decryptedMessage = (uchar*)baRes.data();
-
-	int len = RSA_private_decrypt(imtbase::narrow_cast<int>(inputData.length()), (uchar*)inputData.data(), decryptedMessage, m_rsaPrivateKey, RSA_PKCS1_PADDING);
-	if (len < 0){
-		return false;
-	}
-
-	outputData = QByteArray((char*)decryptedMessage, len);
-
-	return true;
-
-}
-
-
-QByteArray CRsaEncryption::GetRsaPrivateKey() const
-{
-	BIO *bio = BIO_new(BIO_s_mem());
-	d2i_RSAPrivateKey_bio(bio, &m_rsaPrivateKey);
-
-	size_t bioLength = BIO_pending(bio);
-	QByteArray baRes;
-	baRes.resize(int(bioLength));
-	BIO_read(bio, baRes.data(), int(bioLength));
-	BIO_free_all(bio);
-
-	return  baRes;
-}
-
-
-QByteArray CRsaEncryption::GetRsaPublicKey() const
-{
-	BIO *bio = BIO_new(BIO_s_mem());
-	d2i_RSAPublicKey_bio(bio, &m_rsaPublicKey);
-
-	size_t bioLength = BIO_pending(bio);
-	QByteArray baRes;
-	baRes.resize(int(bioLength));
-
-	BIO_read(bio, baRes.data(), int(bioLength));
-
-	BIO_free_all(bio);
-
-	return  baRes;
-}
-
-
-bool CRsaEncryption::SetRsaPrivateKey(const QByteArray &key) const
-{
-	if (m_rsaPrivateKey != nullptr){
-		RSA_free(m_rsaPrivateKey);
-		m_rsaPrivateKey = nullptr;
-	}
-
-	BIO *bio = BIO_new(BIO_s_mem());
-	const int keyLength = imtbase::narrow_cast<int>(key.length());
-	if (BIO_write(bio, key.data(), keyLength) != keyLength){
-		return false;
-	}
-
-	m_rsaPrivateKey = d2i_RSAPrivateKey_bio(bio, &m_rsaPrivateKey);
-
-	BIO_free_all(bio);
-
-	return  true;
-}
-
-
-bool CRsaEncryption::SetRsaPublicKey(const QByteArray &key) const
-{
-	if (m_rsaPublicKey != nullptr){
-		RSA_free(m_rsaPublicKey);
-		m_rsaPublicKey = nullptr;
-	}
-
-	BIO *bio = BIO_new(BIO_s_mem());
-	int keyLength = imtbase::narrow_cast<int>(key.length());
-	if (BIO_write(bio, key.data(), keyLength) != keyLength){
-		return false;
-	}
-
-
-	m_rsaPublicKey = d2i_RSAPublicKey_bio(bio, &m_rsaPublicKey);
-
-	BIO_free_all(bio);
-
-	return m_rsaPublicKey != nullptr;
+	return Crypt(privateKey.get(), EVP_PKEY_decrypt_init, EVP_PKEY_decrypt, inputData, outputData);
 }
 
 
 } //namespace imtcrypt
+
 

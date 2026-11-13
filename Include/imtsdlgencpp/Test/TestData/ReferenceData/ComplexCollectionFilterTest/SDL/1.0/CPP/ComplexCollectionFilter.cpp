@@ -2475,6 +2475,15 @@ if (jsonObject.contains("distinctFields") && jsonObject["distinctFields"].isNull
 
 
 
+} // namespace sdl::V1_0::imtbase
+
+#include "ComplexCollectionFilterObjects.h"
+
+
+namespace sdl::V1_0::imtbase
+{
+
+
 CTimeFilterObject::CTimeFilterObject(QObject* parent): ::imtbase::CItemModelBase(parent){
 
 	QObject::connect(this, &CTimeFilterObject::timeRangeChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -3096,7 +3105,7 @@ void CFieldFilterObject::SetFilterOperations(const QVariant& v)
 		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::imtbase::FilterOperation>();
 		const int key = metaEnum.keyToValue(tempValue.toString().toUtf8());
 		if (key < 0){continue;}
-		istd::TNullableValue<FilterOperation> tempItem(static_cast<FilterOperation>(key));
+		istd::TNullableValue<sdl::V1_0::imtbase::FilterOperation> tempItem(static_cast<sdl::V1_0::imtbase::FilterOperation>(key));
 		CFieldFilter::filterOperations->append(tempItem);
 	}
 

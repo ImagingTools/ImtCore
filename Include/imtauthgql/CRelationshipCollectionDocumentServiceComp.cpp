@@ -3,7 +3,6 @@
 
 
 // ImtCore includes
-#include <imtauth/ITenantConnectionInfo.h>
 #include <imtauth/ITenantRelationshipInfo.h>
 #include <imtauthgql/imtauthgql.h>
 #include <imtbase/ICollectionInfo.h>
@@ -53,6 +52,14 @@ sdl::V1_0::imtauth::CTenantRelationship CRelationshipCollectionDocumentServiceCo
 			QByteArray sourceTenantId = relPtr->GetSourceTenantId();
 			QByteArray targetTenantId = relPtr->GetTargetTenantId();
 
+			// A relationship is visible from inside one of its two organizations only.
+			const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+			const QByteArray contextTenantId = (gqlContextPtr != nullptr) ? gqlContextPtr->GetTenantId() : QByteArray();
+			if (contextTenantId.isEmpty() || (contextTenantId != sourceTenantId && contextTenantId != targetTenantId)){
+				errorMessage = QStringLiteral("Access denied: the relationship does not belong to the current organization");
+				return sdl::V1_0::imtauth::CTenantRelationship();
+			}
+
 			sdl::V1_0::imtauth::CTenantRelationship response;
 
 			response.id = objectId;
@@ -94,205 +101,16 @@ sdl::V1_0::imtauth::CTenantRelationship CRelationshipCollectionDocumentServiceCo
 
 
 sdl::V1_0::imtbase::CDocumentOperationStatus CRelationshipCollectionDocumentServiceComp::OnUpdateRelationshipFromRepresentation(
-			const sdl::V1_0::imtauth::CUpdateRelationshipFromRepresentationGqlRequest& updateRelationshipFromRepresentationRequest,
-			const ::imtgql::CGqlRequest& gqlRequest,
+			const sdl::V1_0::imtauth::CUpdateRelationshipFromRepresentationGqlRequest& /*updateRelationshipFromRepresentationRequest*/,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
-	sdl::V1_0::imtauth::UpdateRelationshipFromRepresentationRequestArguments arguments = updateRelationshipFromRepresentationRequest.GetRequestedArguments();
 	sdl::V1_0::imtbase::CDocumentOperationStatus response;
 	response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Failed;
-
-	QByteArray documentId;
-	if (arguments.input->documentId){
-		documentId = *arguments.input->documentId;
-	}
-
-	if (documentId.isEmpty()){
-		errorMessage = QStringLiteral("Missing document ID");
-		return response;
-	}
-
-	if (!m_documentManagerCompPtr.IsValid()){
-		errorMessage = QStringLiteral("Document service not configured");
-		return response;
-	}
-
-	QByteArray userLogin = GetUserId(gqlRequest);
-
-	istd::IChangeableSharedPtr documentPtr;
-	m_documentManagerCompPtr->GetDocumentData(userLogin, documentId, documentPtr);
-	if (!documentPtr.IsValid()){
-		response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::InvalidDocumentId;
-		return response;
-	}
-
-	imtauth::ITenantRelationshipInfo* relationshipPtr = dynamic_cast<imtauth::ITenantRelationshipInfo*>(documentPtr.GetPtr());
-	if (relationshipPtr == nullptr){
-		response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::InvalidDocumentId;
-		return response;
-	}
-
-	sdl::V1_0::imtauth::CTenantRelationship relData;
-	if (arguments.input->relationship){
-		relData = *arguments.input->relationship;
-	} else {
-		errorMessage = QStringLiteral("Missing relationship representation");
-		return response;
-	}
-
-	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
-	QByteArray contextTenantId;
-	if (gqlContextPtr != nullptr){
-		contextTenantId = gqlContextPtr->GetTenantId();
-	}
-
-	QByteArray sourceTenantId = relationshipPtr->GetSourceTenantId();
-	QByteArray targetTenantId = relationshipPtr->GetTargetTenantId();
-	const bool hasPersistentPair = !sourceTenantId.isEmpty() && !targetTenantId.isEmpty();
-
-	if (hasPersistentPair){
-		if (!contextTenantId.isEmpty() && sourceTenantId != contextTenantId && targetTenantId != contextTenantId){
-			errorMessage = QStringLiteral("Tenant context is not a participant of the relationship");
-			return response;
-		}
-
-		if (relData.sourceTenantId && !relData.sourceTenantId->isEmpty() && *relData.sourceTenantId != sourceTenantId){
-			errorMessage = QStringLiteral("Relationship partner cannot be changed after creation");
-			return response;
-		}
-
-		if (relData.targetTenantId && !relData.targetTenantId->isEmpty() && *relData.targetTenantId != targetTenantId){
-			errorMessage = QStringLiteral("Relationship partner cannot be changed after creation");
-			return response;
-		}
-	} else {
-		if (relData.sourceTenantId && !relData.sourceTenantId->isEmpty()){
-			sourceTenantId = *relData.sourceTenantId;
-		}
-		if (relData.targetTenantId && !relData.targetTenantId->isEmpty()){
-			targetTenantId = *relData.targetTenantId;
-		}
-
-		if (!contextTenantId.isEmpty()){
-			if (sourceTenantId.isEmpty()){
-				sourceTenantId = contextTenantId;
-			}
-			if (sourceTenantId == contextTenantId && targetTenantId.isEmpty() && relData.sourceTenantId && *relData.sourceTenantId != contextTenantId){
-				targetTenantId = *relData.sourceTenantId;
-			}
-		}
-	}
-
-	if (!contextTenantId.isEmpty() && sourceTenantId != contextTenantId && targetTenantId != contextTenantId){
-		errorMessage = QStringLiteral("Tenant context is not a participant of the relationship");
-		return response;
-	}
-
-	relationshipPtr->SetSourceTenantId(sourceTenantId);
-	relationshipPtr->SetTargetTenantId(targetTenantId);
-
-	if (!m_connectionCollectionCompPtr.IsValid()){
-		errorMessage = QStringLiteral("Connection collection is not configured");
-		return response;
-	}
-
-	QByteArray requestedConnectionId;
-	if (relData.connectionId){
-		requestedConnectionId = *relData.connectionId;
-	}
-
-	QByteArray connectionId;
-	for (const QByteArray& objectId : m_connectionCollectionCompPtr->GetElementIds()){
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (!m_connectionCollectionCompPtr->GetObjectData(objectId, dataPtr)){
-			continue;
-		}
-
-		const imtauth::ITenantConnectionInfo* connectionPtr = dynamic_cast<const imtauth::ITenantConnectionInfo*>(dataPtr.GetPtr());
-		if (connectionPtr == nullptr){
-			continue;
-		}
-
-		if (connectionPtr->GetStatus() != imtauth::ITenantConnectionInfo::CS_ACTIVE){
-			continue;
-		}
-
-		const bool isDirectPair =
-						(connectionPtr->GetTenantAId() == sourceTenantId && connectionPtr->GetTenantBId() == targetTenantId) ||
-						(connectionPtr->GetTenantAId() == targetTenantId && connectionPtr->GetTenantBId() == sourceTenantId);
-		if (!isDirectPair){
-			continue;
-		}
-
-		QByteArray currentConnectionId = connectionPtr->GetConnectionId();
-		if (currentConnectionId.isEmpty()){
-			currentConnectionId = objectId;
-		}
-
-		if (!requestedConnectionId.isEmpty() && requestedConnectionId != currentConnectionId && requestedConnectionId != objectId){
-			continue;
-		}
-
-		connectionId = currentConnectionId;
-		break;
-	}
-
-	if (connectionId.isEmpty()){
-		if (requestedConnectionId.isEmpty()){
-			errorMessage = QStringLiteral("No active connection between tenants");
-		} else {
-			errorMessage = QStringLiteral("Invalid connectionId for the specified tenants");
-		}
-		return response;
-	}
-
-	if (relData.id){
-		relationshipPtr->SetRelationshipId(*relData.id);
-	}
-	relationshipPtr->SetConnectionId(connectionId);
-	if (relData.sourceRole){
-		relationshipPtr->SetSourceRole(imtauthgql::FromSdlRelationshipRole(*relData.sourceRole));
-	}
-	if (relData.targetRole){
-		relationshipPtr->SetTargetRole(imtauthgql::FromSdlRelationshipRole(*relData.targetRole));
-	}
-	if (relData.scope){
-		relationshipPtr->SetScope(*relData.scope);
-	}
-	if (relData.validFrom){
-		relationshipPtr->SetValidFrom(*relData.validFrom);
-	}
-	if (relData.validUntil){
-		relationshipPtr->SetValidUntil(*relData.validUntil);
-	}
-	if (relData.description){
-		relationshipPtr->SetDescription(*relData.description);
-	}
-	if (relData.createdAt){
-		relationshipPtr->SetCreatedAt(*relData.createdAt);
-	}
-	if (relData.updatedAt){
-		relationshipPtr->SetUpdatedAt(*relData.updatedAt);
-	}
-	if (relData.status){
-		switch (*relData.status){
-		case sdl::V1_0::imtauth::RelationshipStatus::Archived:
-			relationshipPtr->SetStatus(imtauth::ITenantRelationshipInfo::TRS_ARCHIVED);
-			break;
-		case sdl::V1_0::imtauth::RelationshipStatus::PendingApproval:
-			relationshipPtr->SetStatus(imtauth::ITenantRelationshipInfo::TRS_PENDING_APPROVED);
-			break;
-		default:
-			relationshipPtr->SetStatus(imtauth::ITenantRelationshipInfo::TRS_ACTIVE);
-			break;
-		}
-	}
-
-	m_documentManagerCompPtr->SetDocumentData(userLogin, documentId, *documentPtr);
-	response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Success;
+	errorMessage = QStringLiteral("A relationship comes into force or changes only by a proposal approved by both organizations");
+	response.message = errorMessage;
 
 	return response;
 }
-
 
 } // namespace imtauthgql

@@ -95,18 +95,6 @@ public:
 				int count = -1,
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
 
-	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated() override;
-	virtual void OnComponentDestroyed() override;
-
-private:
-	// imtbase::IObjectCollection::DataPtr GetObject(const QByteArray& objectId, const QByteArray& typeId) const;
-	// // bool GetElementType(const QByteArray& elementId, ElementType& valueOut) const;
-	// bool GetItemInfo(const QByteArray& nodeId, imtbase::IHierarchicalStructureInfo::ItemInfo& valueOut) const;
-	// bool GetObjectInfo(const QByteArray& objectId, imtgql::IGqlStructuredCollectionResponse::ObjectInfo& valueOut) const;
-	// bool GetObjectMetaInfo(const QByteArray& objectId, idoc::MetaInfoPtr& valueOut) const;
-	// bool GetObjectDataMetaInfo(const QByteArray& objectId, idoc::MetaInfoPtr& valueOut) const;
-
 protected:
 	I_REF(IGqlClient, m_clientCompPtr);
 	I_REF(imtclientgql::IGqlHierarchicalStructureDelegate, m_delegateCompPtr);

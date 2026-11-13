@@ -39,11 +39,13 @@
         <file alias="imtgui/Panels/FilterDelegateBase.qml">Panels/FilterDelegateBase.qml</file>
         <file alias="imtgui/Panels/OptionsFilterDelegate.qml">Panels/OptionsFilterDelegate.qml</file>
 	<file alias="imtgui/Panels/TimeFilterDelegate.qml">Panels/TimeFilterDelegate.qml</file>
+        <file alias="imtgui/Panels/DocumentViewVerticalCommandsPanel.qml">Panels/DocumentViewVerticalCommandsPanel.qml</file>
         <file alias="imtgui/Settings/PageAboutProvider.qml">Settings/PageAboutProvider.qml</file>
         <file alias="imtgui/Settings/Preference.qml">Settings/Preference.qml</file>
         <file alias="imtgui/Settings/PreferenceButton.qml">Settings/PreferenceButton.qml</file>
         <file alias="imtgui/Settings/PreferenceDialog.qml">Settings/PreferenceDialog.qml</file>
         <file alias="imtgui/Settings/ServerLogProvider.qml">Settings/ServerLogProvider.qml</file>
+        <file alias="imtgui/Settings/ServiceDependencyView.qml">Settings/ServiceDependencyView.qml</file>
         <file alias="imtgui/Settings/SettingsObserver.qml">Settings/SettingsObserver.qml</file>
         <file alias="imtgui/Settings/SettingsProvider.qml">Settings/SettingsProvider.qml</file>
         <file alias="imtgui/Settings/SettingsController.qml">Settings/SettingsController.qml</file>

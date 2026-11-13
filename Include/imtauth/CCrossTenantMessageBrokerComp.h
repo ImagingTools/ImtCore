@@ -75,7 +75,7 @@ public:
 	virtual bool SetTargetObjectId(const QByteArray& messageId, const QByteArray& targetObjectId) override;
 
 private:
-	CrossTenantMessages CollectMessages(const std::function<bool(const CrossTenantMessageInfo&)>& predicate) const;
+	CrossTenantMessages CollectMessages(const QByteArray& columnId, const QByteArray& value, const std::function<bool(const CrossTenantMessageInfo&)>& predicate) const;
 	bool StoreMessageInfo(const QByteArray& messageId, const CrossTenantMessageInfo& info);
 	bool ValidateRelationship(
 				const QByteArray& sourceTenantId,

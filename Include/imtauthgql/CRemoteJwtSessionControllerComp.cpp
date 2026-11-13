@@ -20,6 +20,28 @@ namespace imtauthgql
 {
 
 
+namespace
+{
+
+
+// Puma gives a session only to its own user, so the request goes as the user the server works for
+void AttachCurrentContext(imtgql::CGqlRequest& gqlRequest)
+{
+	imtgql::IGqlContext* gqlContextPtr = imtgql::CGqlRequestContextManager::GetContext();
+	if (gqlContextPtr == nullptr){
+		return;
+	}
+
+	istd::IChangeableUniquePtr clonedPtr = gqlContextPtr->CloneMe();
+	imtgql::IGqlContextUniquePtr castedPtr;
+	castedPtr.MoveCastedPtr(std::move(clonedPtr));
+	gqlRequest.SetGqlContext(imtgql::IGqlContextSharedPtr::CreateFromUnique(std::move(castedPtr)));
+}
+
+
+} // anonymous namespace
+
+
 // protected methods
 
 // reimplemented (imtauth::IJwtSessionController)
@@ -242,6 +264,7 @@ imtauth::ISessionSharedPtr CRemoteJwtSessionControllerComp::GetSession(const QBy
 	if (!sessionsdl::CGetSessionGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
 		return nullptr;
 	}
+	AttachCurrentContext(gqlRequest);
 
 	typedef sdl::V1_0::imtauth::CGetSessionPayload Response;
 
@@ -281,6 +304,7 @@ bool CRemoteJwtSessionControllerComp::RemoveSession(const QByteArray& sessionId)
 	if (!sessionsdl::CRemoveSessionGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
 		return false;
 	}
+	AttachCurrentContext(gqlRequest);
 
 	typedef sdl::V1_0::imtauth::CRemoveSessionPayload Response;
 

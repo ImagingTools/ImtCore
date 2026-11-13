@@ -7,11 +7,34 @@
 // ImtCore includes
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Sessions.h>
 #include <imtauth/ITenantInfo.h>
+#include <imtauth/IUserInfo.h>
 #include <imtgql/IGqlContext.h>
+#include <imtauthgql/imtauthgql.h>
 
 
 namespace imtauthgql
 {
+
+
+namespace
+{
+
+
+// A session is read and ended by its own user, or by the superuser
+bool IsSessionOfRequest(const imtauth::ISession& session, const imtgql::CGqlRequest& gqlRequest)
+{
+	if (IsSuperuserRequest(gqlRequest)){
+		return true;
+	}
+
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	const QByteArray requestUserId = gqlContextPtr != nullptr ? gqlContextPtr->GetUserId() : QByteArray();
+
+	return !requestUserId.isEmpty() && requestUserId == session.GetUserId();
+}
+
+
+} // anonymous namespace
 
 
 // protected methods
@@ -90,8 +113,8 @@ sdl::V1_0::imtauth::CValidateJwtPayload CGqlJwtSessionControllerComp::OnValidate
 
 sdl::V1_0::imtauth::CGetSessionPayload CGqlJwtSessionControllerComp::OnGetSession(
 	const sdl::V1_0::imtauth::CGetSessionGqlRequest& getSessionRequest,
-	const ::imtgql::CGqlRequest& /*gqlRequest*/,
-	QString& /*errorMessage*/) const
+	const ::imtgql::CGqlRequest& gqlRequest,
+	QString& errorMessage) const
 {
 	sdl::V1_0::imtauth::CGetSessionPayload response;
 
@@ -113,9 +136,18 @@ sdl::V1_0::imtauth::CGetSessionPayload CGqlJwtSessionControllerComp::OnGetSessio
 		sessionId = *arguments.input->sessionId;
 	}
 
+	// A session of another user is answered like a missing one
 	imtauth::ISessionSharedPtr sessionInfoPtr = m_jwtSessionControllerCompPtr->GetSession(sessionId);
 	if (!sessionInfoPtr.IsValid()){
 		SendErrorMessage(0, QStringLiteral("Unable to get session '%1'. Error: Session not found").arg(sessionId));
+		errorMessage = QStringLiteral("Unable to get session. Error: Session not found");
+
+		return response;
+	}
+
+	if (!IsSessionOfRequest(*sessionInfoPtr, gqlRequest)){
+		SendWarningMessage(0, QStringLiteral("Session '%1' was requested by another user").arg(sessionId));
+		errorMessage = QStringLiteral("Unable to get session. Error: Session not found");
 
 		return response;
 	}
@@ -167,9 +199,21 @@ sdl::V1_0::imtauth::CRefreshTokenPayload CGqlJwtSessionControllerComp::OnRefresh
 
 	imtauth::IJwtSessionController::UserSession userSession;
 	response.ok = m_jwtSessionControllerCompPtr->RefreshToken(refreshToken, userSession);
-	if (response.ok){
-		response.userSession = CreateUserSessionData(userSession);
+	if (!response.ok){
+		return response;
 	}
+
+	// A refresh is no new login, but the password lifetime ends the session like any other
+	if (IsPasswordChangeRequired(userSession.userId)){
+		SendWarningMessage(0, QStringLiteral("Token refresh refused: the password of user '%1' has expired or must be changed").arg(QString::fromUtf8(userSession.userId)));
+
+		m_jwtSessionControllerCompPtr->RemoveSession(m_jwtSessionControllerCompPtr->GetSessionFromJwt(userSession.accessToken));
+		response.ok = false;
+
+		return response;
+	}
+
+	response.userSession = CreateUserSessionData(userSession);
 
 	return response;
 }
@@ -202,14 +246,21 @@ sdl::V1_0::imtauth::CCreateNewSessionPayload CGqlJwtSessionControllerComp::OnCre
 		tenantId = *arguments.input->tenantId;
 	}
 
-	if (!tenantId.isEmpty()){
-		QByteArray authenticatedUserId = GetAuthenticatedUserId(gqlRequest);
-		if (authenticatedUserId.isEmpty()){
-			response.ok = false;
-			response.errorMessage = QStringLiteral("Authenticated user is required to select tenant");
-			return response;
-		}
+	// Only the authenticated user themselves or the superuser may open a session for a user.
+	const QByteArray authenticatedUserId = GetAuthenticatedUserId(gqlRequest);
+	if (authenticatedUserId.isEmpty()){
+		response.ok = false;
+		response.errorMessage = QStringLiteral("Authenticated user is required to create a session");
+		return response;
+	}
 
+	if (userId.isEmpty() || (authenticatedUserId != userId && !IsSuperuserRequest(gqlRequest))){
+		response.ok = false;
+		response.errorMessage = QStringLiteral("Cannot create a session for another user");
+		return response;
+	}
+
+	if (!tenantId.isEmpty()){
 		if (authenticatedUserId != userId){
 			response.ok = false;
 			response.errorMessage = QStringLiteral("Cannot create tenant session for another user");
@@ -309,7 +360,7 @@ sdl::V1_0::imtauth::CSelectTenantPayload CGqlJwtSessionControllerComp::OnSelectT
 
 sdl::V1_0::imtauth::CRemoveSessionPayload CGqlJwtSessionControllerComp::OnRemoveSession(
 	const sdl::V1_0::imtauth::CRemoveSessionGqlRequest& removeSessionRequest,
-	const ::imtgql::CGqlRequest& /*gqlRequest*/,
+	const ::imtgql::CGqlRequest& gqlRequest,
 	QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtauth::CRemoveSessionPayload response;
@@ -327,6 +378,13 @@ sdl::V1_0::imtauth::CRemoveSessionPayload CGqlJwtSessionControllerComp::OnRemove
 	}
 	if (arguments.input->sessionId){
 		sessionId = *arguments.input->sessionId;
+	}
+
+	imtauth::ISessionSharedPtr sessionInfoPtr = m_jwtSessionControllerCompPtr->GetSession(sessionId);
+	if (!sessionInfoPtr.IsValid() || !IsSessionOfRequest(*sessionInfoPtr, gqlRequest)){
+		response.ok = false;
+
+		return response;
 	}
 
 	response.ok = m_jwtSessionControllerCompPtr->RemoveSession(sessionId);
@@ -393,6 +451,49 @@ sdl::V1_0::imtauth::CGetTenantFromJwtPayload CGqlJwtSessionControllerComp::OnGet
 
 // private methods
 
+bool CGqlJwtSessionControllerComp::IsPasswordChangeRequired(const QByteArray& userId) const
+{
+	if (!m_passwordPolicyCompPtr.IsValid() || !m_userCollectionCompPtr.IsValid()){
+		return false;
+	}
+
+	// Fails closed: a user that cannot be read gets no new token
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	if (!m_userCollectionCompPtr->GetObjectData(userId, dataPtr)){
+		return true;
+	}
+
+	const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
+	if (userInfoPtr == nullptr){
+		return true;
+	}
+
+	// The session does not tell which system signed the user in, so a user with an external account
+	// (e.g. LDAP) is left to that system, as its login skips the lifetime check as well
+	bool hasInternalPassword = false;
+	for (const imtauth::IUserInfo::SystemInfo& systemInfo : userInfoPtr->GetSystemInfos()){
+		if (!systemInfo.enabled){
+			continue;
+		}
+
+		if (!systemInfo.systemId.isEmpty()){
+			return false;
+		}
+
+		hasInternalPassword = true;
+	}
+
+	if (!hasInternalPassword){
+		return false;
+	}
+
+	int daysUntilExpiration = -1;
+	const imtauth::IPasswordPolicy::LifetimeStatus lifetimeStatus = m_passwordPolicyCompPtr->GetPasswordLifetimeStatus(*userInfoPtr, daysUntilExpiration);
+
+	return lifetimeStatus == imtauth::IPasswordPolicy::LS_EXPIRED || lifetimeStatus == imtauth::IPasswordPolicy::LS_CHANGE_REQUIRED;
+}
+
+
 QByteArray CGqlJwtSessionControllerComp::GetAuthenticatedUserId(const ::imtgql::CGqlRequest& gqlRequest) const
 {
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
@@ -421,16 +522,17 @@ bool CGqlJwtSessionControllerComp::CanUseTenant(
 
 	imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
 	if (!tenantPtr.IsValid()){
-		errorMessage = QStringLiteral("Tenant not found");
+		errorMessage = QStringLiteral("Organization not found");
 		return false;
 	}
 
 	if (!tenantPtr->IsActive()){
-		errorMessage = QStringLiteral("Tenant is not active");
+		errorMessage = QStringLiteral("The organization is not active");
 		return false;
 	}
 
-	if (tenantPtr->GetOwnerId() == userId){
+	// The creator manages the permission scope of the organization, which is edited only from inside it
+	if (tenantPtr->GetOwnerId() == userId || tenantPtr->GetCreatorId() == userId){
 		return true;
 	}
 
@@ -463,7 +565,7 @@ bool CGqlJwtSessionControllerComp::CanUseTenant(
 		}
 	}
 
-	errorMessage = QStringLiteral("User is not an active member of tenant");
+	errorMessage = QStringLiteral("You are not an active member of this organization");
 	return false;
 }
 

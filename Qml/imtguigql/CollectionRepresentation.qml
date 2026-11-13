@@ -17,12 +17,13 @@ Item {
 	property string gqlExportCommandId: collectionId + "Export";
 
 	property TreeItemModel elementsModel: TreeItemModel {}
+	property var elementsSource: null
 	property var headersModel: null
 	property TreeItemModel notificationModel: TreeItemModel {}
 	
 	property var additionalFieldIds: []
 	property var requestedFields: []
-	property string context
+	property var permissionPaths: ({})
 
 	signal removed()
 	signal elementsRemoved(var elementIds)
@@ -163,6 +164,7 @@ Item {
 			elementsModel.clear()
 			elementsModel = null
 		}
+		elementsSource = null
 		
 		if (notificationModel){
 			notificationModel.clear()
@@ -174,6 +176,84 @@ Item {
 	
 	function getElementsRepresentation(){
 		return root.elementsModel;
+	}
+
+	function publishElements(items){
+		// TODO: remove bullshit
+		//if (!root.canUpdateElementsInPlace(items)){
+			root.elementsModel = items;
+			root.elementsSource = null;
+			root.elementsReceived(root.elementsModel);
+			return;
+		//}
+
+		/*root.elementsModel.setUpdateEnabled(false);
+		let count = items.getItemsCount();
+		for (let i = 0; i < count; i++){
+			root.copyElementRow(i, items);
+		}
+		root.elementsModel.setUpdateEnabled(true);
+		root.elementsSource = items;
+		root.elementsReceived(root.elementsModel);*/
+	}
+
+	function canUpdateElementsInPlace(items){
+		if (!items || !root.elementsModel || items === root.elementsModel){
+			return false;
+		}
+		if (!items.getItemsCount || !root.elementsModel.getItemsCount){
+			return false;
+		}
+		if (root.elementsModel.getItemsCount() === 0 || root.elementsModel.getItemsCount() !== items.getItemsCount()){
+			return false;
+		}
+		return true;
+	}
+
+	function copyElementRow(index, items){
+		let keys = items.getKeys(index);
+		for (let k = 0; k < keys.length; k++){
+			let key = keys[k];
+			if (key === "item"){
+				continue;
+			}
+			let value = items.getData(key, index);
+			if (value === null || value === undefined || typeof value !== "object"){
+				root.elementsModel.setData(key, value, index);
+			}
+		}
+
+		// Desktop CTreeItemModel has no get(): its rows hold no item objects.
+		if (typeof items.get !== "function" || typeof root.elementsModel.get !== "function"){
+			return;
+		}
+
+		let targetRow = root.elementsModel.get(index);
+		let sourceRow = items.get(index);
+		if (targetRow && sourceRow && targetRow.item && sourceRow.item){
+			root.copyItemFields(targetRow.item, sourceRow.item);
+		}
+	}
+
+	function copyItemFields(targetItem, sourceItem){
+		let ids = ["id", "name", "typeId"];
+		if (root.headersModel && root.headersModel.getItemsCount){
+			for (let i = 0; i < root.headersModel.getItemsCount(); i++){
+				let header = root.headersModel.get(i);
+				if (header && header.item && header.item.m_id){
+					ids.push(header.item.m_id);
+				}
+			}
+		}
+		for (let i = 0; i < root.additionalFieldIds.length; i++){
+			ids.push(root.additionalFieldIds[i]);
+		}
+		for (let i = 0; i < ids.length; i++){
+			let prop = "m_" + ids[i];
+			if (sourceItem[prop] !== undefined){
+				targetItem[prop] = sourceItem[prop];
+			}
+		}
 	}
 
 	function removeElements(elementIds){
@@ -248,7 +328,7 @@ Item {
 	GqlSdlRequestSender {
 		id: duplicateElementsRequest
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_duplicateElements
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 
 		sdlObjectComp: Component {
 			DuplicateElementsPayload {
@@ -271,13 +351,19 @@ Item {
 	GqlSdlRequestSender {
 		id: getElementMetaInfoRequest
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_getElementMetaInfo
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 
 		sdlObjectComp: Component {
 			GetElementMetaInfoPayload {
 				onFinished: {
 					root.objectMetaInfoReceived(m_elementMetaInfo)
 				}
+			}
+		}
+
+		onFinished: {
+			if (status < 0){
+				root.objectMetaInfoReceiveFailed("")
 			}
 		}
 
@@ -289,7 +375,7 @@ Item {
 	GqlSdlRequestSender {
 		id: restoreObjectsRequest
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_restoreObjects
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 
 		requestType: 1
 		sdlObjectComp: Component {
@@ -304,7 +390,7 @@ Item {
 	GqlSdlRequestSender {
 		id: restoreObjectSetRequest
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_restoreObjectSet
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 
 		requestType: 1
 		sdlObjectComp: Component {
@@ -319,7 +405,7 @@ Item {
 	GqlSdlRequestSender {
 		id: removeElementSetSender
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_removeElementSet
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 
 		requestType: 1
 		sdlObjectComp: Component {
@@ -344,7 +430,7 @@ Item {
 	GqlSdlRequestSender {
 		id: removeGqlSender
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_removeElements
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 
 		requestType: 1
 		sdlObjectComp: Component {
@@ -374,7 +460,7 @@ Item {
 	GqlSdlRequestSender {
 		id: setObjectNameRequest
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_setObjectName
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 
 		requestType: 1
 		sdlObjectComp: Component {
@@ -403,7 +489,7 @@ Item {
 	GqlSdlRequestSender {
 		id: getObjectVisualStatusRequest
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_getObjectVisualStatus
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 
 		sdlObjectComp: Component {
 			VisualStatus {
@@ -426,7 +512,7 @@ Item {
 	GqlSdlRequestSender {
 		id: setObjectDescriptionRequest
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_setObjectDescription
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 
 		requestType: 1
 		sdlObjectComp: Component {
@@ -449,7 +535,7 @@ Item {
 	GqlSdlRequestSender {
 		id: getCollectionHeadersRequest
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_getCollectionHeaders
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 
 		sdlObjectComp: Component {
 			GetCollectionHeadersPayload {
@@ -501,7 +587,7 @@ Item {
 	GqlRequestSender {
 		id: elementsGqlModel;
 		gqlCommandId: root.gqlGetListCommandId;
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 		
 		function createQueryParams(query, params){
 			var viewParams = Gql.GqlObject("viewParams");
@@ -528,8 +614,7 @@ Item {
 			}
 			
 			if (data.containsKey("items")){
-				root.elementsModel = data.getData("items");
-				root.elementsReceived(root.elementsModel)
+				root.publishElements(data.getData("items"))
 			}
 		}
 		
@@ -552,7 +637,7 @@ Item {
 	GqlSdlRequestSender {
 		id: importObjectRequest
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_importObject
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 
 		requestType: 1
 		sdlObjectComp: Component {
@@ -572,7 +657,7 @@ Item {
 	GqlSdlRequestSender {
 		id: exportObjectRequest
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_exportObject
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 		
 		sdlObjectComp: Component {
 			ExportObjectPayload {

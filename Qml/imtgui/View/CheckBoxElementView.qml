@@ -29,7 +29,7 @@ ElementView {
 
         CheckBox {
             id: cb;
-            width: checkBoxElementView.controlWidth;
+            width: checkBoxElementView.fittedControlWidth;
             height: checkBoxElementView.controlHeight;
             checkState: checkBoxElementView.checkState;
             text: checkBoxElementView.text;

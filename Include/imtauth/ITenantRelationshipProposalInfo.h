@@ -13,6 +13,8 @@
 // ImtCore includes
 #include <imtauth/ITenantRelationshipInfo.h>
 
+#undef GetMessage
+
 
 namespace imtauth
 {

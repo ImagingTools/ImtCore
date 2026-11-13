@@ -4,11 +4,16 @@
 
 // Qt includes
 #include <QtCore/QCoreApplication>
+#include <QtCore/QDebug>
 #include <QtCore/QMutableListIterator>
 
 // ImtCore includes
 #include <imtrest/IProtocolEngine.h>
 #include <imtrest/ITransport.h>
+#include <imtrest/CConnectionTimeoutBehavior.h>
+#include <imtrest/CHttpResponse.h>
+#include <imtrest/CHttpSender.h>
+#include <imtrest/IStreamingResponse.h>
 
 
 namespace imtrest
@@ -54,6 +59,18 @@ imtrest::IWebSocketUpgradeHandler* CMultiThreadServer::GetWebSocketUpgradeHandle
 }
 
 
+CConnectionTimeoutConfig CMultiThreadServer::GetConnectionTimeoutConfig() const
+{
+	return m_rootServer.GetConnectionTimeoutConfig();
+}
+
+
+qint64 CMultiThreadServer::GetWriteHighWatermark() const
+{
+	return m_rootServer.GetWriteHighWatermark();
+}
+
+
 bool CMultiThreadServer::IsSecureConnection() const
 {
 	return m_isSecureConnection;
@@ -90,11 +107,44 @@ void CMultiThreadServer::SetSslConfiguration(const QSslConfiguration& sslConfigu
 
 bool CMultiThreadServer::SendResponse(const QByteArray& requestId, ConstResponsePtr& response) const
 {
+	if (!response.IsValid()){
+		return false;
+	}
+
 	QReadLocker threadListLock(&m_threadSocketListGuard);
 
 	for (CSocketThread* socket : m_threadSocketList){
-		if (socket->GetRequestId() == requestId){
-			return socket->SendResponse(response);
+		if ((socket != nullptr) && (socket->GetRequestId() == requestId)){
+			// The body of a streaming response is read by parts in the thread of the connection, only its head is built here
+			if (dynamic_cast<const IStreamingResponse*>(response.GetPtr()) != nullptr){
+				return socket->SendStreamingResponse(
+							response,
+							socket->IsConnectionClosing(),
+							socket->IsResponseBodyOmitted(),
+							socket->IsChunkedResponseAllowed());
+			}
+
+			QByteArray data;
+
+			const auto* httpResponsePtr = dynamic_cast<const CHttpResponse*>(response.GetPtr());
+			if (httpResponsePtr != nullptr){
+				CHttpSender::ResponseOptions options;
+				options.isConnectionClosing = socket->IsConnectionClosing();
+				options.isBodyOmitted = socket->IsResponseBodyOmitted();
+
+				if (!CHttpSender::BuildResponseData(*response, data, options)){
+					// The response cannot be built, for example the engine does not know its status. The client still gets
+					// a response, otherwise it waits for it and the connection does not accept the next request.
+					qWarning() << "The response cannot be built, the status code is" << response->GetStatusCode();
+
+					data = CConnectionTimeoutBehavior::CreateHttpInternalServerErrorResponse(QDateTime::currentDateTimeUtc(), options.isConnectionClosing);
+				}
+			}
+			else{
+				data = response->GetData();
+			}
+
+			return socket->SendData(data);
 		}
 	}
 
@@ -104,14 +154,11 @@ bool CMultiThreadServer::SendResponse(const QByteArray& requestId, ConstResponse
 
 bool CMultiThreadServer::SendRequest(const QByteArray& requestId, ConstRequestPtr& request) const
 {
-	QReadLocker threadListLock(&m_threadSocketListGuard);
+	Q_UNUSED(requestId)
+	Q_UNUSED(request)
 
-	for (CSocketThread* socket : m_threadSocketList){
-		if (socket->GetRequestId() == requestId){
-			return socket->SendRequest(request);
-		}
-	}
-
+	// Sending outbound requests is not supported over this response-oriented socket transport
+	// (matches the previous behavior, where the underlying transport only ever accepted responses).
 	return false;
 }
 
@@ -142,9 +189,12 @@ void CMultiThreadServer::Disconnected(QByteArray requestId)
 	}
 
 	qintptr descriptor = PopSocketDescriptor();
-	CSocketThread* threadSocket = new CSocketThread(descriptor, m_isSecureConnection, m_sslConfiguration, this);
+	auto* threadSocket = new CSocketThread(descriptor, m_isSecureConnection, m_sslConfiguration, this);
 
 	m_threadSocketList.append(threadSocket);
+
+	// The signal comes from the thread of the connection. A direct call would run in that thread: it would wait for itself, delete its
+	// own running thread and create the next thread there, with this object as the parent that lives in another thread.
 	connect(threadSocket, &CSocketThread::SocketDisconnected, this, &CMultiThreadServer::Disconnected, Qt::QueuedConnection);
 
 	threadSocket->start();

@@ -31,23 +31,6 @@ CSqlDatabaseObjectCollectionIterator::CSqlDatabaseObjectCollectionIterator(
 	while (sqlQuery.next()){
 		m_records.append(sqlQuery.record());
 	}
-
-	if (m_elementsCount < 0){
-		// Try to extract TotalCount from the first record (set by COUNT(*) OVER() in the query).
-		// This gives the total count across all pages, not just the current page size.
-		if (!m_records.isEmpty()){
-			const int fieldIndex = m_records.first().indexOf("TotalCount");
-			if (fieldIndex >= 0){
-				m_elementsCount = m_records.first().value(fieldIndex).toInt();
-			}
-			else{
-				m_elementsCount = imtbase::narrow_cast<int>(m_records.size());
-			}
-		}
-		else{
-			m_elementsCount = 0;
-		}
-	}
 }
 
 

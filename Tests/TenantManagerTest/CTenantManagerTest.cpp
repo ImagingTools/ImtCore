@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include "CTenantManagerTest.h"
 
+#include <imtauth/CTenantDocumentValidatorComp.h>
+
 
 void CTenantManagerTest::init()
 {
@@ -301,4 +303,23 @@ void CTenantManagerTest::testHierarchy_MultiLevel()
 	QVERIFY(t1->parentTenantId.isEmpty());
 	QVERIFY(t2->parentTenantId == level1);
 	QVERIFY(t3->parentTenantId == level2);
+}
+
+
+void CTenantManagerTest::testOwnerCannotRestoreCreatorRevokedPermissions()
+{
+	const QByteArrayList persistedPermissions = {QByteArrayLiteral("/Orders/View")};
+	const QByteArrayList staleDocumentPermissions = {QByteArrayLiteral("/Orders/View"), QByteArrayLiteral("/Orders/Edit")};
+
+	QVERIFY(!imtauth::IsTenantPermissionScopeChangeAllowed("creator", persistedPermissions, staleDocumentPermissions, "owner"));
+}
+
+
+void CTenantManagerTest::testCreatorCanChangePermissions()
+{
+	const QByteArrayList persistedPermissions = {QByteArrayLiteral("/Orders/View"), QByteArrayLiteral("/Orders/Edit")};
+	const QByteArrayList narrowedPermissions = {QByteArrayLiteral("/Orders/View")};
+
+	QVERIFY(imtauth::IsTenantPermissionScopeChangeAllowed("creator", persistedPermissions, narrowedPermissions, "creator"));
+	QVERIFY(imtauth::IsTenantPermissionScopeChangeAllowed("creator", persistedPermissions, persistedPermissions, "owner"));
 }

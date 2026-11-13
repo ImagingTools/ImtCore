@@ -82,7 +82,6 @@ QList<imtsdl::IncludeDirective> CSdlClassCodeGeneratorComp::GetIncludeDirectives
 	}
 
 	/// \todo remove it, make a part of extenders
-	retVal += CreateImtDirective("<imtsdl/TListModelBase.h>");
 	retVal += CreateImtDirective("<imtsdl/TElementList.h>");
 	retVal += CreateQtDirective("<QtCore/QMetaEnum>");
 

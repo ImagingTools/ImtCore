@@ -21,7 +21,7 @@ FocusScope {
     //    property alias maximumLength: textEdit.maximumLength;
 
     property string placeHolderText;
-    property string focusColor: Style.textSelected;
+    property string focusColor: Style.textSelectedColor;
 
     property string fontColor: Style.textColor;
     property string placeHolderFontColor: Style.placeHolderTextColor;
@@ -76,11 +76,11 @@ FocusScope {
 
         anchors.fill: parent;
 
-        color: containerTextEdit.readOnly ? Style.alternateBaseColor : Style.baseColor;
+        color: containerTextEdit.readOnly ? Style.alternateBaseColor : Style.inputBackgroundColor;
 
         radius: containerTextEdit.radius;
 
-        border.color: containerTextEdit.borderColorConst !== "" ? containerTextEdit.borderColorConst: textEdit.activeFocus ? containerTextEdit.borderColor : Style.hover;
+        border.color: containerTextEdit.borderColorConst !== "" ? containerTextEdit.borderColorConst: textEdit.activeFocus ? containerTextEdit.borderColor : Style.inputBorderColor;
         border.width: 1;
     }
 
@@ -170,9 +170,19 @@ FocusScope {
 
 
             verticalAlignment: TextInput.AlignVCenter;
-            selectionColor: Style.textSelected;
+            selectionColor: Style.textSelectedColor;
             selectByMouse: true;
             wrapMode: TextEdit.WordWrap;
+            activeFocusOnTab: !textEdit.readOnly;
+
+            // In a form Tab moves to the next field instead of typing a tab character.
+            Keys.onTabPressed: {
+                let next = textEdit.nextItemInFocusChain(true);
+                if (next){
+                    event.accepted = true;
+                    next.forceActiveFocus();
+                }
+            }
             clip: true;
 
             //for web, do not remove!!!

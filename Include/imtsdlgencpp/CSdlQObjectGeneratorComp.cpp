@@ -770,7 +770,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 				FeedStream(stream, 1, false);
 
 				FeedStreamHorizontally(stream, 2);
-				stream << QStringLiteral("istd::TNullableValue<") << convertedType << QStringLiteral("> tempItem(static_cast<") << convertedType << QStringLiteral(">(key));");
+				stream << QStringLiteral("istd::TNullableValue<") << fieldNameSpace << QStringLiteral("::") << convertedType << QStringLiteral("> tempItem(static_cast<") << fieldNameSpace << QStringLiteral("::") << convertedType << QStringLiteral(">(key));");
 			}
 			else if (field.GetType() == "ID"){
 				FeedStreamHorizontally(stream, 2);

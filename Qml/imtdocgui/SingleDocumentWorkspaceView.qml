@@ -54,6 +54,7 @@ Rectangle {
 		}
 		
 		function onDocumentSavingFailed(documentId, message){
+			Events.sendEvent("StopLoading")
 			root.openErrorDialog(message)
 		}
 

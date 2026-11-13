@@ -188,6 +188,8 @@ CustomTextField {
             height: Style.marginM;
             iconSource: root.iconUpSource;
             enabled: !root.readOnly;
+            // The arrow keys of the field do the same, so the step buttons stay out of the Tab order
+            focusPolicy: Qt.NoFocus;
             decorator: Component { ButtonDecorator {
                     color: upButton.hovered ? Style.buttonHoverColor : "transparent";
                     border.width: 0;
@@ -227,6 +229,7 @@ CustomTextField {
             height: Style.marginM;
             iconSource: root.iconDownSource;
             enabled: !root.readOnly;
+            focusPolicy: Qt.NoFocus;
             decorator: Component { ButtonDecorator {
                     color: downButton.hovered ? Style.buttonHoverColor : "transparent";
                     border.width: 0;

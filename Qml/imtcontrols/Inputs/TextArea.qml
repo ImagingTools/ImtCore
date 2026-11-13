@@ -213,6 +213,16 @@ ControlBase {
             wrapMode: TextEdit.WordWrap;
             clip: true;
             visible: containerTextArea.decorator_.z < 0;
+            activeFocusOnTab: !textArea.readOnly;
+
+            // In a form Tab moves to the next field instead of typing a tab character.
+            Keys.onTabPressed: {
+                let next = textArea.nextItemInFocusChain(true);
+                if (next){
+                    event.accepted = true;
+                    next.forceActiveFocus();
+                }
+            }
 
 
             //for web, do not remove!!!

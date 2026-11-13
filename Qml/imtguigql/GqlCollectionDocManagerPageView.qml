@@ -16,6 +16,13 @@ PageContainer {
 		console.log("GqlCollectionDocManagerPageView.qml onCompleted", root.pageId)
 	}
 
+	Component.onDestruction: {
+		MainDocumentService.unregisterDocumentService(root.documentManager)
+		if (root.documentManager && typeof root.documentManager.release === "function"){
+			root.documentManager.release()
+		}
+	}
+
 	onPageIdChanged: {
 		if (pageId !== ""){
 			MainDocumentService.registerDocumentService(pageId, documentManager)
@@ -48,5 +55,6 @@ PageContainer {
 		id: documentManagerView_
 		anchors.fill: root
 		documentManager: root.documentManager
+		pageIcon: root.pageIcon
 	}
 }

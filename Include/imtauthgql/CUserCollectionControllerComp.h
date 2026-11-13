@@ -11,6 +11,7 @@
 #include <imtauth/ITenantManager.h>
 #include <imtauth/ITenantEntityBindingManager.h>
 #include <imtauth/IPersonalAccessTokenManager.h>
+#include <imtauth/IPasswordPolicy.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtauth/ITenantInvitation.h>
 #include <imtauth/ISession.h>
@@ -39,6 +40,7 @@ public:
 		I_ASSIGN(m_invitationCollectionCompPtr, "InvitationCollection", "Tenant invitation collection for purging references on user delete", false, "InvitationCollection");
 		I_ASSIGN(m_personalAccessTokenManagerCompPtr, "PersonalAccessTokenManager", "PAT manager to remove tokens of deleted user", false, "PersonalAccessTokenManager");
 		I_ASSIGN(m_sessionCollectionCompPtr, "SessionCollection", "Session collection for purging user sessions on delete", false, "SessionCollection");
+		I_ASSIGN(m_passwordPolicyCompPtr, "PasswordPolicy", "Password policy checked for the password of a new user", false, "PasswordPolicy");
 	I_END_COMPONENT;
 
 protected:
@@ -103,6 +105,15 @@ protected:
 				const imtgql::CGqlParamObject& viewParamsGql,
 				iprm::CParamsSet* filterParamsPtr) const override;
 
+	/**
+		A user may view the own account in every organization of the session, also in one entered by delegated access.
+	*/
+	virtual bool CheckObjectAccess(
+				const imtgql::CGqlRequest& gqlRequest,
+				const QByteArrayList& objectIds,
+				imtauth::IDocumentShareInfo::AccessLevel accessLevel,
+				QString& errorMessage) const override;
+
 	// reimplemented (imtservergql::CPermissibleGqlRequestHandlerComp)
 	virtual bool CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
@@ -123,6 +134,7 @@ protected:
 	I_REF(imtbase::IObjectCollection, m_invitationCollectionCompPtr);
 	I_REF(imtauth::IPersonalAccessTokenManager, m_personalAccessTokenManagerCompPtr);
 	I_REF(imtbase::IObjectCollection, m_sessionCollectionCompPtr);
+	I_REF(imtauth::IPasswordPolicy, m_passwordPolicyCompPtr);
 };
 
 

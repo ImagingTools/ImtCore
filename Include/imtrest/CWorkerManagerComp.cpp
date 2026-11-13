@@ -93,9 +93,15 @@ ConstResponsePtr CWorkerManagerComp::ProcessRequest(const IRequest& request, con
 		// Create servlet on THIS (manager/app) thread — not inside CWorkerThread::run().
 		IRequestServletPtr servletPtr = CreateServlet();
 		if (!servletPtr.IsValid()){
-			Q_ASSERT(false);
+			SendErrorMessage(0, QStringLiteral("Unable to create a servlet for the worker"));
+
 			m_workerList.removeOne(workerPtr);
 			delete workerPtr;
+
+			// The request is answered and freed: nobody else would do it
+			RespondWithInternalError(*requestPtr);
+			delete requestPtr;
+
 			return retVal;
 		}
 		workerPtr->SetServlet(std::move(servletPtr));
@@ -151,6 +157,17 @@ void CWorkerManagerComp::AboutToQuit()
 
 	qDeleteAll(m_requestList);
 	m_requestList.clear();
+}
+
+
+// private methods
+
+void CWorkerManagerComp::RespondWithInternalError(const IRequest& request) const
+{
+	ConstResponsePtr responsePtr = CWorker::CreateInternalErrorResponse(request);
+	if (responsePtr.IsValid() && m_requestManagerCompPtr.IsValid()){
+		m_requestManagerCompPtr->SendResponse(request.GetRequestId(), responsePtr);
+	}
 }
 
 

@@ -8,7 +8,7 @@ import imtauthAuthorizationSdl 1.0
 QtObject {
     id: container;
 
-    property string context: ""
+    property string permissionPath: ""
 	property string accessToken: "";
 	property string refreshToken: "";
     property string login: "";
@@ -18,8 +18,12 @@ QtObject {
     property var permissions: [];
     property bool isTokenGlobal: true
 
+    // Days until the password expires, reported by the last login (0 = no warning)
+    property int passwordExpiresInDays: 0;
+
     signal accepted();
     signal failed(string message);
+    signal passwordExpired();
 
     property string modelState: container.authorizationGqlModel.state;
 
@@ -47,7 +51,7 @@ QtObject {
 	}
 
     property GqlSdlRequestSender request : GqlSdlRequestSender {
-        context: container.context
+        permissionPath: container.permissionPath
         gqlCommandId: ImtauthAuthorizationSdlCommandIds.s_authorization;
         sdlObjectComp:
             Component {
@@ -61,6 +65,14 @@ QtObject {
                         return;
                     }
 
+                    // The password must be changed first: the payload carries no token either.
+                    if (m_passwordExpired === true){
+                        container.passwordExpired();
+
+                        return;
+                    }
+
+                    container.passwordExpiresInDays = m_passwordExpiresInDays;
                     container.setLoginData(m_refreshToken, m_token, m_userId, m_username, m_systemId, m_permissions.split(';'))
                 }
             }

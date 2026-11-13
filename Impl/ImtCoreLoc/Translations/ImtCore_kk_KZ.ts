@@ -3331,6 +3331,10 @@
         <source>Password changed successfully</source>
         <translation>Құпия сөз сәтті өзгертілді</translation>
     </message>
+    <message>
+        <source>Your password expires in %1 day(s). Please change it in your profile.</source>
+        <translation>Құпия сөздің мерзімі %1 күннен кейін аяқталады. Оны профильде өзгертіңіз.</translation>
+    </message>
 </context>
 <context>
     <name>AuthorizationPage</name>
@@ -3394,6 +3398,18 @@
         <location line="-333"/>
         <source>Welcome to</source>
         <translation>Қош келдіңіз</translation>
+    </message>
+    <message>
+        <source>Unable to change the password.</source>
+        <translation>Құпия сөзді өзгерту мүмкін болмады.</translation>
+    </message>
+    <message>
+        <source>Your password has expired</source>
+        <translation>Құпия сөздің мерзімі аяқталды</translation>
+    </message>
+    <message>
+        <source>Unable to register the user</source>
+        <translation>Пайдаланушыны тіркеу мүмкін болмады</translation>
     </message>
 </context>
 <context>
@@ -7262,6 +7278,81 @@
     </message>
 </context>
 <context>
+    <name>PasswordPolicyController</name>
+    <message>
+        <source>at least %1 characters</source>
+        <translation>кемінде %1 таңба</translation>
+    </message>
+    <message>
+        <source>at most %1 characters</source>
+        <translation>ең көбі %1 таңба</translation>
+    </message>
+    <message>
+        <source>a lowercase letter</source>
+        <translation>кіші әріп</translation>
+    </message>
+    <message>
+        <source>an uppercase letter</source>
+        <translation>бас әріп</translation>
+    </message>
+    <message>
+        <source>a digit</source>
+        <translation>цифр</translation>
+    </message>
+    <message>
+        <source>a special character</source>
+        <translation>арнайы таңба</translation>
+    </message>
+    <message>
+        <source>a password different from the login</source>
+        <translation>логиннен өзгеше құпия сөз</translation>
+    </message>
+    <message>
+        <source>a password that is not commonly used</source>
+        <translation>кең таралмаған құпия сөз</translation>
+    </message>
+    <message>
+        <source>a password different from the last %1 ones</source>
+        <translation>соңғы %1 құпия сөзден өзгеше құпия сөз</translation>
+    </message>
+    <message>
+        <source>a password that was not used before</source>
+        <translation>бұрын қолданылмаған құпия сөз</translation>
+    </message>
+    <message>
+        <source>The current password is not correct.</source>
+        <translation>Ағымдағы құпия сөз дұрыс емес.</translation>
+    </message>
+    <message>
+        <source>The password was changed too recently and cannot be changed again yet.</source>
+        <translation>Құпия сөз жақында ғана өзгертілді, оны әзірге қайта өзгертуге болмайды.</translation>
+    </message>
+    <message>
+        <source>This account is managed by an external system, its password cannot be changed here.</source>
+        <translation>Бұл тіркелгіні сыртқы жүйе басқарады, оның құпия сөзін мұнда өзгертуге болмайды.</translation>
+    </message>
+    <message>
+        <source>This account no longer exists.</source>
+        <translation>Бұл тіркелгі енді жоқ.</translation>
+    </message>
+    <message>
+        <source>The password could not be changed. Please try again later.</source>
+        <translation>Құпия сөзді өзгерту мүмкін болмады. Кейінірек қайталап көріңіз.</translation>
+    </message>
+    <message>
+        <source>The password does not meet the requirements: %1.</source>
+        <translation>Құпия сөз талаптарға сай емес: %1.</translation>
+    </message>
+    <message>
+        <source>, </source>
+        <translation>, </translation>
+    </message>
+    <message>
+        <source>Password requirements:</source>
+        <translation>Құпия сөзге қойылатын талаптар:</translation>
+    </message>
+</context>
+<context>
     <name>PasswordRecoveryDialog</name>
     <message>
         <location filename="../../../Qml/imtauthgui/PasswordRecoveryDialog.qml" line="+15"/>
@@ -7364,6 +7455,10 @@
         <location line="+142"/>
         <source>Password changed successfully</source>
         <translation>Құпия сөз сәтті өзгертілді</translation>
+    </message>
+    <message>
+        <source>Unable to change the password.</source>
+        <translation>Құпия сөзді өзгерту мүмкін болмады.</translation>
     </message>
 </context>
 <context>
@@ -7589,6 +7684,97 @@
         <location line="+21"/>
         <source>Category</source>
         <translation>Санат</translation>
+    </message>
+</context>
+<context>
+    <name>ProfileGeneralPage</name>
+    <message>
+        <source>Profile saved</source>
+        <translation>Профиль сақталды</translation>
+    </message>
+    <message>
+        <source>Unable to save the profile.</source>
+        <translation>Профильді сақтау мүмкін болмады.</translation>
+    </message>
+    <message>
+        <source>Account</source>
+        <translation>Тіркелгі</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Аты</translation>
+    </message>
+    <message>
+        <source>Enter the name</source>
+        <translation>Атын енгізіңіз</translation>
+    </message>
+    <message>
+        <source>Email Address</source>
+        <translation>Электрондық пошта мекенжайы</translation>
+    </message>
+    <message>
+        <source>Enter the email</source>
+        <translation>Электрондық поштаны енгізіңіз</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation>Сақтау</translation>
+    </message>
+    <message>
+        <source>Password changed</source>
+        <translation>Құпия сөз өзгертілді</translation>
+    </message>
+    <message>
+        <source>Unable to change the password. Check your current password and try again.</source>
+        <translation>Құпия сөзді өзгерту мүмкін болмады. Ағымдағы құпия сөзді тексеріп, қайталап көріңіз.</translation>
+    </message>
+    <message>
+        <source>Password</source>
+        <translation>Құпия сөз</translation>
+    </message>
+    <message>
+        <source>Change</source>
+        <translation>Өзгерту</translation>
+    </message>
+    <message>
+        <source>Current password</source>
+        <translation>Ағымдағы құпия сөз</translation>
+    </message>
+    <message>
+        <source>Enter your current password</source>
+        <translation>Ағымдағы құпия сөзді енгізіңіз</translation>
+    </message>
+    <message>
+        <source>New password</source>
+        <translation>Жаңа құпия сөз</translation>
+    </message>
+    <message>
+        <source>Enter a new password</source>
+        <translation>Жаңа құпия сөзді енгізіңіз</translation>
+    </message>
+    <message>
+        <source>Confirm new password</source>
+        <translation>Жаңа құпия сөзді растау</translation>
+    </message>
+    <message>
+        <source>Re-enter the new password</source>
+        <translation>Жаңа құпия сөзді қайта енгізіңіз</translation>
+    </message>
+    <message>
+        <source>Passwords don&apos;t match</source>
+        <translation>Құпия сөздер сәйкес келмейді</translation>
+    </message>
+    <message>
+        <source>Changing password…</source>
+        <translation>Құпия сөз өзгертілуде…</translation>
+    </message>
+    <message>
+        <source>Update password</source>
+        <translation>Құпия сөзді жаңарту</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Болдырмау</translation>
     </message>
 </context>
 <context>
@@ -8949,6 +9135,26 @@ Errors: 0</source>
         <source>OK</source>
         <translation>OK</translation>
     </message>
+    <message>
+        <source>Unable to create the administrator account</source>
+        <translation>Әкімші тіркелгісін құру мүмкін болмады</translation>
+    </message>
+    <message>
+        <source>Unable to reach server</source>
+        <translation>Серверге қосылу мүмкін болмады</translation>
+    </message>
+    <message>
+        <source>Create the administrator account</source>
+        <translation>Әкімші тіркелгісін құрыңыз</translation>
+    </message>
+    <message>
+        <source>This server doesn&apos;t have one yet. Set a name and password below - you&apos;ll sign in with them right after.</source>
+        <translation>Бұл серверде ол әлі жоқ. Төменде атау мен құпия сөзді орнатыңыз – бірден солармен кіресіз.</translation>
+    </message>
+    <message>
+        <source>Create account</source>
+        <translation>Тіркелгі құру</translation>
+    </message>
 </context>
 <context>
     <name>TDocumentWorkspaceGuiCompBase</name>
@@ -9111,8 +9317,8 @@ Input-ID: </source>
     </message>
     <message>
         <location line="+14"/>
-        <source>My tenants</source>
-        <translation>Менің тенанттарым</translation>
+        <source>My organizations</source>
+        <translation>Менің ұйымдарым</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -9131,8 +9337,8 @@ Input-ID: </source>
     </message>
     <message>
         <location line="+43"/>
-        <source>Tenant</source>
-        <translation>Тенант</translation>
+        <source>Organization</source>
+        <translation>Ұйым</translation>
     </message>
 </context>
 <context>
@@ -9185,18 +9391,18 @@ Input-ID: </source>
     </message>
     <message>
         <location line="+7"/>
-        <source>Basic workspace settings and configuration.</source>
-        <translation>Жұмыс кеңістігінің негізгі параметрлері мен конфигурациясы.</translation>
+        <source>Basic settings of the organization.</source>
+        <translation>Ұйымның негізгі параметрлері.</translation>
     </message>
     <message>
         <location line="+18"/>
-        <source>Tenant Name</source>
-        <translation>Тенант атауы</translation>
+        <source>Organization Name</source>
+        <translation>Ұйым атауы</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Enter the tenant name</source>
-        <translation>Тенант атауын енгізіңіз</translation>
+        <source>Enter the organization name</source>
+        <translation>Ұйым атауын енгізіңіз</translation>
     </message>
     <message>
         <location line="+15"/>
@@ -9328,8 +9534,8 @@ Input-ID: </source>
     </message>
     <message>
         <location line="+4"/>
-        <source>Leave Workspace</source>
-        <translation>Жұмыс кеңістігінен шығу</translation>
+        <source>Leave Organization</source>
+        <translation>Ұйымнан шығу</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -9366,8 +9572,8 @@ Input-ID: </source>
     </message>
     <message>
         <location line="+34"/>
-        <source>Manage tenant members. Users created here automatically become members.</source>
-        <translation>Тенант мүшелерін басқару. Мұнда жасалған пайдаланушылар автоматты түрде мүше болады.</translation>
+        <source>Manage the members of the organization. Users created here automatically become members.</source>
+        <translation>Ұйым мүшелерін басқару. Мұнда жасалған пайдаланушылар автоматты түрде мүше болады.</translation>
     </message>
     <message>
         <location line="+28"/>
@@ -9426,8 +9632,8 @@ Input-ID: </source>
     </message>
     <message>
         <location line="+7"/>
-        <source>Select which product features are available for this tenant.</source>
-        <translation>Осы тенант үшін қандай өнім мүмкіндіктері қолжетімді екенін таңдаңыз.</translation>
+        <source>Select which product features are available for this organization.</source>
+        <translation>Осы ұйым үшін қандай өнім мүмкіндіктері қолжетімді екенін таңдаңыз.</translation>
     </message>
     <message>
         <location line="+20"/>
@@ -9484,8 +9690,8 @@ Input-ID: </source>
     </message>
     <message>
         <location line="+16"/>
-        <source>Manage tenant roles and assign permissions to team members.</source>
-        <translation>Тенант рөлдерін басқару және мүшелерге рұқсаттар тағайындау.</translation>
+        <source>Manage the roles of the organization and assign permissions to its members.</source>
+        <translation>Ұйым рөлдерін басқару және мүшелерге рұқсаттар тағайындау.</translation>
     </message>
     <message>
         <location line="+28"/>
@@ -10430,6 +10636,10 @@ Input-ID: </source>
         <location line="+10"/>
         <source>Change Password</source>
         <translation>Құпия сөзді өзгерту</translation>
+    </message>
+    <message>
+        <source>Unable to change the password.</source>
+        <translation>Құпия сөзді өзгерту мүмкін болмады.</translation>
     </message>
 </context>
 <context>

@@ -363,7 +363,7 @@ bool CSqlStructureDelegateComp::CreatePaginationQuery(int offset, int count, QBy
 	paginationQuery.clear();
 
 	if (offset >= 0 && count > 0){
-		paginationQuery = QStringLiteral("OFFSET %1 ROWS FETCH NEXT %2 ROWS ONLY").arg(offset, count).toUtf8();
+		paginationQuery = QStringLiteral("OFFSET %1 ROWS FETCH NEXT %2 ROWS ONLY").arg(offset).arg(count).toUtf8();
 	}
 
 	return true;

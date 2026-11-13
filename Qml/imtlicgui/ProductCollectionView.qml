@@ -11,10 +11,9 @@ import imtlicProductsSdl 1.0
 
 RemoteCollectionView {
 	id: productCollectionViewContainer;
-	
-	property string context: ""
+
 	visibleMetaInfo: false;
-	
+
 	collectionId: "Products";
 	documentCollectionFilter: null
 	additionalFieldIds: [ProductItemTypeMetaInfo.s_productId]
@@ -54,14 +53,16 @@ RemoteCollectionView {
 		id: dataControllerComp;
 		
 		GqlRequestDocumentDataController {
-			context: productCollectionViewContainer.context
 			id: requestDocumentDataController
 			
 			property ProductData productData: documentModel
 			
 			gqlGetCommandId: ImtlicProductsSdlCommandIds.s_productItem;
+			getPermissionPath: "/ProductManagement/View";
 			gqlUpdateCommandId: ImtlicProductsSdlCommandIds.s_productUpdate;
+			updatePermissionPath: "/ProductManagement/Edit/Change";
 			gqlAddCommandId: ImtlicProductsSdlCommandIds.s_productAdd;
+			addPermissionPath: "/ProductManagement/Edit/Add";
 			
 			typeId: "Product";
 			documentName: productData ? productData.m_productName: "";

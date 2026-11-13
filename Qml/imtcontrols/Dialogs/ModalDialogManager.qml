@@ -19,12 +19,8 @@ Item {
 	property var dialogCallback: ({})
 	
 
-	Component.onCompleted: {
-		Events.subscribeEvent("ServerConnectionError", onServerConnectionError);
-	}
-
+	// Dialogs are closed on a lost connection by ApplicationMain: Events is not visible from this singleton.
 	Component.onDestruction: {
-		Events.unSubscribeEvent("ServerConnectionError", onServerConnectionError);
 		modalDialogModels.clear();
 	}
 	

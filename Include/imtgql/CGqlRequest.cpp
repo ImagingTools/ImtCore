@@ -19,6 +19,32 @@ namespace imtgql
 {
 
 
+namespace
+{
+
+
+// Unquoted token which is not a number (e.g. an enum value) is kept as text
+QVariant CreateNumberValue(const QByteArray& text)
+{
+	bool ok = false;
+	const qint64 intValue = text.toLongLong(&ok);
+	if (ok && QByteArray::number(intValue) == text){
+		return intValue;
+	}
+
+	const bool isFloat = text.contains('.') || text.contains('e') || text.contains('E');
+	const double doubleValue = text.toDouble(&ok);
+	if (ok && isFloat){
+		return doubleValue;
+	}
+
+	return text;
+}
+
+
+} // namespace
+
+
 const QHash<QByteArray, IGqlRequest::RequestType> CGqlRequest::s_requestNameMap = {
 	{ QByteArrayLiteral("query"), IGqlRequest::RT_QUERY },
 	{ QByteArrayLiteral("mutation"), IGqlRequest::RT_MUTATION },
@@ -999,25 +1025,7 @@ void CGqlRequest::SetParseText(const QByteArray& text)
 			variantList.append(QVariant());
 		}
 		else {
-			bool ok = false;
-			if (text.contains('.')){
-				double doubleValue = text.toDouble(&ok);
-				if (ok) {
-					variantList.append(doubleValue);
-				}
-				else {
-					variantList.append(text);
-				}
-			}
-			else{
-				qint64 intValue = text.toLongLong(&ok);
-				if (ok && QString::number(intValue).toUtf8() == text) {
-					variantList.append(intValue);
-				}
-				else {
-					variantList.append(text);
-				}
-			}
+			variantList.append(CreateNumberValue(text));
 		}
 		m_activeGqlObjectPtr->InsertParam(lastArrayId, variantList);
 
@@ -1091,20 +1099,7 @@ void CGqlRequest::SetParseText(const QByteArray& text)
 			value = QVariant();
 		}
 		else {
-			bool ok;
-			if (text.contains('.')){
-				double doubleValue = text.toDouble(&ok);
-				value = doubleValue;
-			}
-			else{
-				qint64 intValue = text.toLongLong(&ok);
-				if (ok && QString::number(intValue).toUtf8() == text) {
-					value = intValue;
-				}
-				else {
-					value = text;
-				}
-			}
+			value = CreateNumberValue(text);
 		}
 
 		if (!m_currentField.isEmpty() && m_activeGqlObjectPtr != nullptr) {

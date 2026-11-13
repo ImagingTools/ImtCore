@@ -10,6 +10,10 @@
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Roles.h>
 #include <imtbase/CComplexCollectionFilterHelper.h>
 #include <imtauth/CRole.h>
+#include <imtauth/CRoleDocumentValidatorComp.h>
+#include <imtauth/imtauth.h>
+#include <imtauthgql/imtauthgql.h>
+#include <imtauthgql/CAssignmentCollector.h>
 
 
 namespace imtauthgql
@@ -49,25 +53,6 @@ bool CRoleCollectionControllerComp::FillObjectFromRepresentation(
 		productId = *roleDataRepresentation.productId;
 	}
 
-	imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds();
-	for (const imtbase::ICollectionInfo::Id& collectionId : collectionIds){
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (m_objectCollectionCompPtr->GetObjectData(collectionId, dataPtr)){
-			imtauth::IRole* currentRoleInfoPtr = dynamic_cast<imtauth::IRole*>(dataPtr.GetPtr());
-			if (currentRoleInfoPtr != nullptr){
-				if (collectionId != objectId){
-					QByteArray currentRoleId = currentRoleInfoPtr->GetRoleId();
-					QByteArray currentProductId = currentRoleInfoPtr->GetProductId();
-
-					if (currentRoleId == roleId && currentProductId == productId){
-						errorMessage = QStringLiteral("Role with ID: '%1' already exists").arg(currentRoleId);
-						return false;
-					}
-				}
-			}
-		}
-	}
-
 	roleInfoPtr->SetProductId(productId);
 
 	QString roleName;
@@ -82,30 +67,23 @@ bool CRoleCollectionControllerComp::FillObjectFromRepresentation(
 	}
 	roleInfoPtr->SetRoleDescription(roleDescription);
 
-	QByteArrayList parentRoles;
-	if (roleDataRepresentation.parentRoles){
-		parentRoles = roleDataRepresentation.parentRoles->ToList();
-	}
-	if (!parentRoles.isEmpty()){
-		parentRoles.removeAll("");
-
-		for (const QByteArray& parentRoleId : parentRoles){
-			if (parentRoleId == objectId || !roleInfoPtr->IncludeRole(parentRoleId)){
-				errorMessage = QT_TR_NOOP(QStringLiteral("Unable include role '%1' to the role '%2'. Check the dependencies between them.")
-											.arg(parentRoleId, roleId));
-
-				return false;
+	const imtauth::IRoleInfoProvider* roleProviderPtr = roleInfoPtr->GetParentRolesProvider();
+	for (const QByteArray& parentRoleId : CAssignmentCollector::GetDirectIds(roleDataRepresentation.parentRoles)){
+		if (imtauth::CreatesRoleCycle(roleProviderPtr, objectId, parentRoleId)){
+			QString parentRoleName = QString::fromUtf8(parentRoleId);
+			imtauth::IRoleUniquePtr parentRolePtr = roleProviderPtr != nullptr ? roleProviderPtr->GetRole(parentRoleId) : imtauth::IRoleUniquePtr();
+			if (parentRolePtr.IsValid()){
+				parentRoleName = parentRolePtr->GetRoleName();
 			}
+			errorMessage = QStringLiteral("Role '%1' cannot be a parent role: it would create a cycle").arg(parentRoleName);
+
+			return false;
 		}
+
+		roleInfoPtr->IncludeRole(parentRoleId);
 	}
 
-	QByteArray permissions;
-	if (roleDataRepresentation.permissions){
-		permissions = *roleDataRepresentation.permissions;
-	}
-	QByteArrayList permissionIds = permissions.split(';');
-	permissionIds.removeAll("");
-	roleInfoPtr->SetLocalPermissions(permissionIds);
+	roleInfoPtr->SetLocalPermissions(CAssignmentCollector::GetDirectIds(roleDataRepresentation.permissions));
 
 	bool isGuest = bool(roleDataRepresentation.isGuest && *roleDataRepresentation.isGuest);
 	roleInfoPtr->SetGuest(isGuest);
@@ -196,7 +174,7 @@ sdl::V1_0::imtbase::CGetElementMetaInfoPayload CRoleCollectionControllerComp::On
 
 		sdl::V1_0::imtbase::CParameter parentRolesParameter;
 		parentRolesParameter.id = QByteArrayLiteral("ParentRoles");
-		parentRolesParameter.typeId = parentRolesParameter.id;
+		parentRolesParameter.typeId = QByteArrayLiteral("TextList");
 		parentRolesParameter.name = QStringLiteral("Parent Roles");
 
 		QByteArrayList parentRolesIds = roleInfoPtr->GetIncludedRoles();
@@ -223,7 +201,7 @@ sdl::V1_0::imtbase::CGetElementMetaInfoPayload CRoleCollectionControllerComp::On
 
 		sdl::V1_0::imtbase::CParameter permissionsParameter;
 		permissionsParameter.id = QByteArrayLiteral("Permissions");
-		permissionsParameter.typeId = parentRolesParameter.id;
+		permissionsParameter.typeId = QByteArrayLiteral("TextList");
 		permissionsParameter.name = QStringLiteral("Permissions");
 
 		imtauth::IRole::FeatureIds permissionsIds = roleInfoPtr->GetPermissions();
@@ -396,17 +374,12 @@ bool CRoleCollectionControllerComp::CreateRepresentationFromObject(
 	QString description = roleInfoPtr->GetRoleDescription();
 	representationPayload.description = QString(description);
 
-	QByteArrayList parentsRolesIds = roleInfoPtr->GetIncludedRoles();
-	std::sort(parentsRolesIds.begin(), parentsRolesIds.end());
-	representationPayload.parentRoles.Emplace().FromList(parentsRolesIds);
-
-	imtauth::IRole::FeatureIds permissions = roleInfoPtr->GetLocalPermissions();
-	permissions.removeAll("");
-	std::sort(permissions.begin(), permissions.end());
-	representationPayload.permissions = QByteArray(permissions.join(';'));
-
 	representationPayload.isDefault = bool(roleInfoPtr->IsDefault());
 	representationPayload.isGuest = bool(roleInfoPtr->IsGuest());
+
+	CAssignmentCollector collector;
+	collector.CollectRole(*roleInfoPtr, id, nullptr);
+	collector.FillRole(representationPayload);
 
 	return true;
 }
@@ -433,41 +406,22 @@ void CRoleCollectionControllerComp::SetAdditionalFilters(
 bool CRoleCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	QByteArray commandId = gqlRequest.GetCommandId();
+
+	// A role the user holds in the current tenant, delegated ones included, is always readable.
 	QByteArrayList availableRoleIds;
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 	if (gqlContextPtr != nullptr){
-		QByteArray productId = gqlContextPtr->GetProductId();
 		const imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
 		if (userInfoPtr != nullptr){
-			availableRoleIds = userInfoPtr->GetRoles(productId);
-		}
-	}
-
-	// Add delegated roles if the user is in a delegated tenant
-	if (gqlContextPtr != nullptr && m_delegatedAccessCompPtr.IsValid() && m_membershipManagerCompPtr.IsValid()){
-		QByteArray userId = gqlContextPtr->GetUserId();
-		QByteArray currentTenantId = gqlContextPtr->GetTenantId();
-		if (!userId.isEmpty() && !currentTenantId.isEmpty()){
-			const imtauth::ITenantMembershipManager::MembershipIds membershipIds =
-				m_membershipManagerCompPtr->GetMembershipsByUser(userId);
-			for (const QByteArray& membershipId : membershipIds){
-				imtauth::ITenantMembershipUniquePtr homeMembershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
-				if (!homeMembershipPtr.IsValid() || !homeMembershipPtr->IsActive()){
-					continue;
-				}
-				QByteArray homeTenantId = homeMembershipPtr->GetTenantId();
-				if (homeTenantId.isEmpty() || homeTenantId == currentTenantId){
-					continue;
-				}
-				if (m_delegatedAccessCompPtr->IsDelegatedAccess(userId, homeTenantId, currentTenantId)){
-					QByteArrayList delegatedRoles = m_delegatedAccessCompPtr->GetDelegatedRoles(homeTenantId, currentTenantId);
-					for (const QByteArray& roleId : delegatedRoles){
-						if (!availableRoleIds.contains(roleId)){
-							availableRoleIds.append(roleId);
-						}
-					}
-				}
-			}
+			availableRoleIds = GetEffectiveUserRoles(
+						gqlContextPtr->GetUserId(),
+						*userInfoPtr,
+						gqlContextPtr->GetTenantId(),
+						gqlContextPtr->GetProductId(),
+						m_bindingManagerCompPtr.GetPtr(),
+						m_delegatedAccessCompPtr.GetPtr(),
+						m_membershipManagerCompPtr.GetPtr(),
+						nullptr);
 		}
 	}
 
@@ -499,7 +453,7 @@ bool CRoleCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequest& 
 
 
 bool CRoleCollectionControllerComp::UpdateObjectFromRepresentationRequest(
-			const imtgql::CGqlRequest& /*rawGqlRequest*/,
+			const imtgql::CGqlRequest& rawGqlRequest,
 			const sdl::V1_0::imtauth::CRoleUpdateGqlRequest& roleUpdateRequest,
 			istd::IChangeable& object,
 			QString& errorMessage) const
@@ -525,7 +479,30 @@ bool CRoleCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 	}
 
 	QByteArray objectId = roleInfoPtr->GetObjectUuid();
-	return FillObjectFromRepresentation(roleDataRepresentation, object, objectId, errorMessage);
+	if (!FillObjectFromRepresentation(roleDataRepresentation, object, objectId, errorMessage)){
+		return false;
+	}
+
+	return ValidateRoleForTenant(rawGqlRequest, *roleInfoPtr, objectId, errorMessage);
+}
+
+
+istd::IChangeableUniquePtr CRoleCollectionControllerComp::CreateObjectFromRequest(
+			const imtgql::CGqlRequest& gqlRequest,
+			QByteArray& newObjectId,
+			QString& errorMessage) const
+{
+	istd::IChangeableUniquePtr objectPtr = BaseClass::CreateObjectFromRequest(gqlRequest, newObjectId, errorMessage);
+	if (!objectPtr.IsValid()){
+		return nullptr;
+	}
+
+	const imtauth::IRole* roleInfoPtr = dynamic_cast<const imtauth::IRole*>(objectPtr.GetPtr());
+	if (roleInfoPtr == nullptr || !ValidateRoleForTenant(gqlRequest, *roleInfoPtr, newObjectId, errorMessage)){
+		return nullptr;
+	}
+
+	return objectPtr;
 }
 
 
@@ -540,6 +517,30 @@ void CRoleCollectionControllerComp::OnComponentCreated()
 }
 
 
-} // namespace imtauth
+// private methods
 
+bool CRoleCollectionControllerComp::ValidateRoleForTenant(
+			const imtgql::CGqlRequest& gqlRequest,
+			const imtauth::IRole& role,
+			const QByteArray& objectId,
+			QString& errorMessage) const
+{
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	const QByteArray tenantId = gqlContextPtr != nullptr ? gqlContextPtr->GetTenantId() : QByteArray();
+
+	if (!imtauth::CRoleDocumentValidatorComp::CheckRoleIdUnique(
+				*m_objectCollectionCompPtr,
+				objectId,
+				role.GetRoleId(),
+				role.GetProductId(),
+				tenantId,
+				errorMessage)){
+		return false;
+	}
+
+	return imtauth::CRoleDocumentValidatorComp::CheckParentRolesInTenant(*m_objectCollectionCompPtr, role.GetIncludedRoles(), tenantId, errorMessage);
+}
+
+
+} // namespace imtauth
 

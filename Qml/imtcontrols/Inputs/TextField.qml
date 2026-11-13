@@ -43,6 +43,8 @@ ControlBase {
     signal editingFinished();
 
     onDecoratorChanged: {
+        if (!decorator_) return;
+
         bindText.target = decorator_
 
         if(decorator_.z < 0){
@@ -169,6 +171,7 @@ ControlBase {
         selectByMouse: true;
         clip: true;
         visible: containerTextField.decorator_.z < 0;
+        activeFocusOnTab: !textField.readOnly;
 
         onAccepted: {
             containerTextField.accepted();

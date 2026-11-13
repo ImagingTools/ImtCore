@@ -196,6 +196,9 @@
                     <AttributeInfo Id="AppLogoPath" Type="String" ExportId="AppLogoPath">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApplicationInfo"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="AutoLogoutMinutes" Type="Integer" ExportId="AutoLogoutMinutes">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

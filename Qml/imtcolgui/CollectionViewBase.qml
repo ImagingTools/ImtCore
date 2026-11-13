@@ -187,42 +187,51 @@ ViewBase {
 			
 			onComplComplChanged: {
 				if(tableDecoratorModel.complCompl){
+					tableDecoratorModel.apply();
+				}
+			}
+			
+			function apply(){
+				var tableDecorator = loaderTableDecorator.item;
+				if (!tableDecorator){
+					return;
+				}
+				var count = tableInternal.headers.getItemsCount();
+				
+				if(tableDecorator.getItemsCount()){
+					tableDecoratorModel.clear();
 					
-					var tableDecorator = loaderTableDecorator.item;
-					var count = tableInternal.headers.getItemsCount();
+					var headers = tableDecoratorModel.addTreeModel("Headers");
+					var cells = tableDecoratorModel.addTreeModel("Cells");
+					var cellWidth = tableDecoratorModel.addTreeModel("CellWidth");
 					
-					if(tableDecorator.getItemsCount()){
-						
-						var headers = tableDecoratorModel.addTreeModel("Headers");
-						var cells = tableDecoratorModel.addTreeModel("Cells");
-						var cellWidth = tableDecoratorModel.addTreeModel("CellWidth");
-						
-						var general;
-						if(tableDecorator.isValidData("General")){
-							general = tableDecorator.getTreeItemModel("General")
-							let keys = general.getKeys();
-							for(let i = 0; i < keys.length; i++){
-								if(tableInternal[keys[i]] !== undefined){
-									tableInternal[keys[i]] = general.getData(keys[i]);
-								}
+					var general;
+					if(tableDecorator.isValidData("General")){
+						general = tableDecorator.getTreeItemModel("General")
+						let keys = general.getKeys();
+						for(let i = 0; i < keys.length; i++){
+							if(tableInternal[keys[i]] !== undefined){
+								tableInternal[keys[i]] = general.getData(keys[i]);
 							}
 						}
-						
-						for(let i = 0; i < count; i++){
-							headers.insertNewItem();
-							cells.insertNewItem();
-							cellWidth.insertNewItem();
-							headers.copyItemDataFromModel(i,tableDecorator.getTreeItemModel("Headers"));
-							cells.copyItemDataFromModel(i,tableDecorator.getTreeItemModel("Cells"));
-							//cellWidth.copyItemDataFromModel(i,tableDecorator.getTreeItemModel("CellWidth"));
-							var widthVal = tableDecorator.getTreeItemModel("CellWidth").isValidData("Width",i) ?
-										tableDecorator.getTreeItemModel("CellWidth").getData("Width",i) : -1;
-							cellWidth.setData("Width", widthVal,i);
-							
-						}
-						
-						tableInternal.tableDecorator = tableDecoratorModel;
 					}
+					
+					for(let i = 0; i < count; i++){
+						headers.insertNewItem();
+						cells.insertNewItem();
+						cellWidth.insertNewItem();
+						headers.copyItemDataFromModel(i,tableDecorator.getTreeItemModel("Headers"));
+						cells.copyItemDataFromModel(i,tableDecorator.getTreeItemModel("Cells"));
+						//cellWidth.copyItemDataFromModel(i,tableDecorator.getTreeItemModel("CellWidth"));
+						var widthVal = tableDecorator.getTreeItemModel("CellWidth").isValidData("Width",i) ?
+									tableDecorator.getTreeItemModel("CellWidth").getData("Width",i) : -1;
+						cellWidth.setData("Width", widthVal,i);
+						
+					}
+					
+					// Reset first: the same model object would not trigger onTableDecoratorChanged
+					tableInternal.tableDecorator = null;
+					tableInternal.tableDecorator = tableDecoratorModel;
 				}
 			}
 		}
@@ -235,8 +244,25 @@ ViewBase {
 			
 			onLoaded: {
 				if(loaderTableDecorator.item){
-					loaderTableDecorator.compl = true;
+					if (loaderTableDecorator.compl){
+						// Reloaded after a theme change; complCompl does not change, so apply explicitly
+						if (tableDecoratorModel.complCompl){
+							tableDecoratorModel.apply();
+						}
+					}
+					else{
+						loaderTableDecorator.compl = true;
+					}
 				}
+			}
+		}
+		
+		// Decorator copies Style colors once on creation, so recreate it when the theme arrives
+		Connections {
+			target: Style
+			function onThemeApplied(){
+				loaderTableDecorator.active = false;
+				loaderTableDecorator.active = true;
 			}
 		}
 		
@@ -288,24 +314,40 @@ ViewBase {
 			}
 			
 			onElementsChanged: {
-				selectionBlock = true
-				resetSelection()
+				tableInternal.restoreSelection()
 
-				let elementsModel = collectionViewBaseContainer.dataController.elementsModel
-				let count = elementsModel.getItemsCount()
+				collectionViewBaseContainer.elementsChanged();
+			}
+
+			// Keeps only the selected ids still on this page: rows that went to another page (sorting, filtering)
+			// are not shown as selected, and commands like Edit or Remove must not act on them.
+			function restoreSelection(){
+				let count = !tableInternal.elements ? 0 : tableInternal.elements.getItemsCount()
 				let selectedIndexes = []
+				let selectedIds = []
 				for (let i = 0; i < count; i++){
-					let elementId = elementsModel.getData("id", i)
+					let elementId = tableInternal.elements.getData("id", i)
 					if (collectionViewBaseContainer.selectionManager.isSelected(elementId)){
 						selectedIndexes.push(i)
+						selectedIds.push(elementId)
 					}
 				}
 
-				selectionManager.selectMultiple(selectedIndexes)
-				
-				selectionBlock = false
+				let idsChanged = selectedIds.length !== collectionViewBaseContainer.selectionManager.selectedIds.length
+				if (idsChanged){
+					collectionViewBaseContainer.selectionManager.selectMultiple(selectedIds)
+				}
 
-				collectionViewBaseContainer.elementsChanged();
+				if (!tableInternal.selectionManager.arraysEqual(tableInternal.getSelectedIndexes(), selectedIndexes)){
+					tableInternal.selectionBlock = true
+					tableInternal.resetSelection()
+					tableInternal.selectionManager.selectMultiple(selectedIndexes)
+					tableInternal.selectionBlock = false
+				}
+
+				if (idsChanged){
+					collectionViewBaseContainer.selectionChanged(collectionViewBaseContainer.selectionManager.selectedIds, selectedIndexes)
+				}
 			}
 			
 			onHeadersChanged: {
@@ -589,7 +631,15 @@ ViewBase {
 		height: !visible ? 0 : Style.controlHeightM;
 		color: pagination_.color;
 		visible: collectionViewBaseContainer.hasPagination
-		
+
+		// Sets the paging footer apart from the rows, like a panel edge in VS Code.
+		Rectangle {
+			anchors.top: parent.top;
+			width: parent.width;
+			height: 1;
+			color: Style.borderColor;
+		}
+
 		Pagination {
 			id: pagination_;
 			anchors.horizontalCenter: parent.horizontalCenter;
@@ -608,14 +658,14 @@ ViewBase {
 		}
 	}
 
-	Loading {
+	// Covers the table only: the filters stay readable and usable while rows load.
+	SkeletonTableView {
 		id: loading_;
-		anchors.top: filterArea.top
+		anchors.top: backgroundTable.top
 		anchors.left: parent.left
 		anchors.right: parent.right
 		anchors.bottom: paginationObj.bottom
-		// baseColor is the Loading default and matches Agents/Services/Messages tables.
-		background.color: Style.baseColor
-		visible: false;
+		rowHeight: tableInternal.itemHeight
+		columnCount: tableInternal.columnCount > 0 ? Math.min(tableInternal.columnCount, 6) : 4
 	}
 }

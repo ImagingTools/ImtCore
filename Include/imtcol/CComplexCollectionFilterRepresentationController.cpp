@@ -26,7 +26,8 @@ const QMap<int, imtbase::IComplexCollectionFilter::FieldOperation> CComplexColle
 	{FOF_LESS | FOF_NOT, imtbase::IComplexCollectionFilter::FieldOperation::FO_NOT_LESS},
 	{FOF_LESS | FOF_EQUAL, imtbase::IComplexCollectionFilter::FieldOperation::FO_NOT_GREATER},
 
-	{FOF_CONTAINS, imtbase::IComplexCollectionFilter::FieldOperation::FO_CONTAINS}
+	{FOF_CONTAINS, imtbase::IComplexCollectionFilter::FieldOperation::FO_CONTAINS},
+	{FOF_STARTS_WITH, imtbase::IComplexCollectionFilter::FieldOperation::FO_STARTS_WITH}
 };
 
 

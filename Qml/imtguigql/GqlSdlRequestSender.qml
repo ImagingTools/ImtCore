@@ -2,6 +2,7 @@ import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtgui 1.0
+import imtcontrols 1.0
 import imtguigql 1.0
 
 
@@ -31,7 +32,7 @@ GqlRequest {
 	
 	property string gqlCommandId;
 	property int requestType: 0; // 0 - Query, 1 - Mutation, 2 - Subscription
-	property string context
+	property string permissionPath
 	
 	/**
 		SDL object created from sdlObjectComp
@@ -45,7 +46,10 @@ GqlRequest {
 	property Component inputObjectComp: null;
 	
 	property var inputParams: Gql.GqlObject("input");
-	
+
+	// Unique ID of the last sent request (X-Request-ID header), e.g. a DocumentChanged notification names the request that made the change
+	property string requestId: ""
+
 	signal finished(int status); // If status -1 - error, 1 - success response
 	
 	function addInputParam(id, value){
@@ -100,10 +104,12 @@ GqlRequest {
 		return {};
 	}
 	
+	// Returns the ID of the sent request, empty if the request was not sent
 	function send(sdlInputObject){
 		if (gqlCommandId == "" || gqlCommandId === undefined || gqlCommandId == null ){
 			console.error("Unable to send request. Error: GraphQL command-ID is invalid.");
-			return;
+			root.onError("GraphQL command-ID is invalid", "");
+			return "";
 		}
 		
 		let type = "";
@@ -118,45 +124,74 @@ GqlRequest {
 		}
 		else{
 			console.error("Unable to send request", root.gqlCommandId ,". Error: Request type is unsupported.");
-			return;
+			root.onError("Request type is unsupported", "");
+			return "";
 		}
 
 		var query = Gql.GqlRequest(type, root.gqlCommandId);
+		let gqlQuery = "";
+		try {
+			let gqlObject = Gql.GqlObject("input")
+			if (sdlInputObject){
+				gqlObject.fromObject(sdlInputObject)
+				query.AddParam(gqlObject);
+			}
+			else if (inputObjectComp != null){
+				let inputObject = inputObjectComp.createObject(root);
+				gqlObject.fromObject(inputObject)
+				query.AddParam(gqlObject);
 
-		let gqlObject = Gql.GqlObject("input")
-		if (sdlInputObject){
-			// console.log("sdlInputObject", sdlInputObject.toJson())
-			// gqlObject.fromJson(sdlInputObject.toJson())
-			gqlObject.fromObject(sdlInputObject)
-			query.AddParam(gqlObject);
+				inputObject.destroy()
+			}
+			else{
+				createQueryParams(query);
+			}
+
+			let requestedFields = getRequestedFields();
+			if (requestedFields !== null){
+				let fieldIds = requestedFields.GetFieldIds();
+				for (let i = 0; i < fieldIds.length; i++){
+					let fieldId = fieldIds[i];
+					if (requestedFields.IsObject(fieldId)){
+						query.AddField(requestedFields.GetFieldArgumentObjectPtr(fieldId));
+					}
+					else{
+						query.AddField(Gql.GqlObject(fieldId));
+					}
+				}
+			}
+
+			gqlQuery = query.GetQuery();
 		}
-		else if (inputObjectComp != null){
-			let inputObject = inputObjectComp.createObject(root);
-			gqlObject.fromObject(inputObject)
-			query.AddParam(gqlObject);
-			
-			inputObject.destroy()
-		}
-		else{
-			createQueryParams(query);
+		catch (error){
+			console.error("Unable to create request", root.gqlCommandId, ". Error:", error.message);
+			root.onError(error.message, "Error");
+			return "";
 		}
 
-		let requestedFields = getRequestedFields();
-		if(requestedFields !== null){
-			query.AddField(requestedFields);
+		// A copy: the object getHeaders() returns may be shared, the headers of this request must not stay in it
+		let headers = {}
+		let customHeaders = root.getHeaders()
+		for (let key in customHeaders){
+			headers[key] = customHeaders[key]
 		}
-		
-		let headers = root.getHeaders()
-		if (headers && root.context && root.context != "")
-			headers["context"] = root.context
 
-		root.setGqlQuery(query.GetQuery(), headers)
+		if (root.permissionPath && root.permissionPath != "")
+			headers["permissionPath"] = root.permissionPath
+
+		root.requestId = UuidGenerator.generateUUID()
+		headers["X-Request-ID"] = root.requestId
+
+		root.setGqlQuery(gqlQuery, headers)
+
+		return root.requestId
 	}
 	
 	function createQueryParams(query){
 		query.AddParam(inputParams);
 	}
 	
+	// Fields of the returned GqlObject are the selection set of the command result, the object itself is not selected
 	function getRequestedFields(){
 		return null;
 	}
@@ -185,13 +220,13 @@ GqlRequest {
 			catch(e){
 				console.error("Unable convert json ", json, " to object", "Warning");
 				console.error(e);
-				root.onError("Unable convert json ", json, " to object", "Warning");
+				root.onError(qsTr("Unable to read the server response"), "");
 				return;
 			}
 			
 			if (!responseObj){
 				console.log("Unable convert json ", json, " to object", "Warning");
-				root.onError("Unable convert json ", json, " to object", "Warning");
+				root.onError(qsTr("Unable to read the server response"), "");
 				return;
 			}
 

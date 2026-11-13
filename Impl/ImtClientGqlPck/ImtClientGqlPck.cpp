@@ -31,6 +31,11 @@ I_EXPORT_COMPONENT(
 			"GraphQL Client Sync Adapter");
 
 I_EXPORT_COMPONENT(
+			GqlHeartbeatChecker,
+			"Connection status of a GraphQL server, checked by periodic GetApplicationInfo requests",
+			"GraphQL Heartbeat Connection Status Checker");
+
+I_EXPORT_COMPONENT(
 			GraphQLClientEngine,
 			"GraphQLClientEngine",
 			"GraphQL Client Engine");
@@ -109,6 +114,11 @@ I_EXPORT_COMPONENT(
 			RemoteFilterableSelectController,
 			"Remote filterable select controller",
 			"Remote Filterable Select Controller");
+
+I_EXPORT_COMPONENT(
+			RemoteServiceInfo,
+			"Runtime status and version of a remote service the application depends on, requested by GetApplicationInfo on each connection",
+			"Remote Service Info Status Version Build Time Dependencies");
 
 
 } // namespace ImtClientGqlPck

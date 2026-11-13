@@ -5,16 +5,16 @@
 // ImtCore includes
 #include <imtbase/TIdentifiableWrap.h>
 #include <imtauth/IUserGroupInfo.h>
-#include <imtauth/CUserBaseInfo.h>
+#include <imtauth/CPrincipalBase.h>
 
 
 namespace imtauth
 {
 
 
-class CUserGroupInfo: virtual public IUserGroupInfo, public CUserBaseInfo
+class CUserGroupInfo: virtual public IUserGroupInfo, public CPrincipalBase
 {
-	typedef CUserBaseInfo BaseClass;
+	typedef CPrincipalBase BaseClass;
 
 public:
 	CUserGroupInfo();
@@ -29,8 +29,7 @@ public:
 	virtual bool RemoveParentGroup(const QByteArray& parentGroupId) override;
 	virtual const imtauth::IUserInfoProvider* GetUserProvider() const override;
 
-	// reimplemented (IUserBaseInfo)
-	virtual RoleIds GetRoles(const QByteArray& productId) const override;
+	// reimplemented (IPrincipal)
 	virtual FeatureIds GetPermissions(const QByteArray& productId = QByteArray()) const override;
 
 	// reimplemented (iser::ISerializable)
@@ -42,8 +41,8 @@ public:
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
-	QByteArrayList GetParentGroups(const QByteArray& groupId) const;
-	void GetParentGroupList(const IUserGroupInfo& userGroupInfo, QByteArrayList& groupList) const;
+	// The given groups and all their ancestors, each once.
+	QByteArrayList GetAncestorGroups(const QByteArrayList& groupIds) const;
 
 protected:
 	IUserGroupInfo::UserIds m_userIds;

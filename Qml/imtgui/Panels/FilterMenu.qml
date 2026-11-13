@@ -23,6 +23,8 @@ ControlBase {
     signal clear()
     signal filterChanged()
     signal clearAllFilters(bool beQuiet)
+    signal filterDependencyAdded(string filterId, string dependsOnFilterId)
+    signal filterDelegateLoaded(string filterId)
 
     property var registeredFilters: ({})
     property var filterDependencies: ({})
@@ -81,6 +83,11 @@ ControlBase {
         return null
     }
 
+    function setFilterDelegate(index, item){
+        filtersModel.setProperty(index, "item", item)
+        filterDelegateLoaded(filtersModel.get(index).id)
+    }
+
     function setFilterDependency(filterId, dependsOnFilterId){
         if (filterId in filterDependencies){
             filterDependencies[filterId].push(dependsOnFilterId)
@@ -88,6 +95,16 @@ ControlBase {
         else{
             filterDependencies[filterId] = [dependsOnFilterId]
         }
+
+        filterDependencyAdded(filterId, dependsOnFilterId)
+    }
+
+    function getDependsOn(filterId){
+        if (filterId in filterDependencies){
+            return filterDependencies[filterId]
+        }
+
+        return []
     }
 
     function hasDependsOn(filterId, dependsOnFilterId){

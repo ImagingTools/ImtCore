@@ -31,6 +31,7 @@ import imtgui 1.0
 	- Customizable filter placeholder text (\c filterPlaceholder)
 	- Optional selected items group at top with "Clear all" button (\c showSelectedGroup)
 	- Optional header component above filter (\c headerComponent) for custom controls like type selectors
+	- Optional footer component below the list (\c footerComponent), e.g. an apply button
 
 	\sa FilterableSelectDataProvider, FilterableSelectGqlDataProvider
 */
@@ -56,7 +57,8 @@ PopupView {
 
 	// --- Visual ---
 	property int itemWidth: Style.sizeHintXXS
-	property int itemHeight: Style.controlHeightL
+	// Compact rows, as VS Code pickers.
+	property int itemHeight: Style.controlHeightS + Style.spacingXS
 	property int maxVisibleItems: 8
 	property int textSize: Style.fontSizeM
 	property string fontColor: Style.textColor
@@ -106,9 +108,14 @@ PopupView {
 
 	// --- Filter field placeholder ---
 	property string filterPlaceholder: qsTr("Filter...")
+	property string emptyText: qsTr("No items found")
 
 	// --- Optional header component (rendered above filter field) ---
 	property Component headerComponent: null
+
+	// --- Optional footer component (rendered below the list, e.g. an apply button) ---
+	// A footer with a 'keyboardItem' (a Button) joins the Tab cycle after the list; Return and Space press it.
+	property Component footerComponent: null
 
 	// --- Selected items group at top ---
 	property bool showSelectedGroup: false
@@ -117,7 +124,29 @@ PopupView {
 	property int maxSelectedGroupItems: 4
 
 	// --- Private: max popup height (screen height minus margins) ---
-	property int __maxPopupHeight: 600
+	property int __maxPopupHeight: ModalDialogManager.activeView ? Math.min(600, ModalDialogManager.activeView.height - 2 * Style.marginL) : 600
+
+	onXChanged: root.__clampToHost()
+	onYChanged: root.__clampToHost()
+	onWidthChanged: root.__clampToHost()
+	onHeightChanged: root.__clampToHost()
+
+	// Callers place the popup at the anchor point; keep it inside the window.
+	function __clampToHost(){
+		if (root.embedded || !ModalDialogManager.activeView){
+			return
+		}
+
+		let maxX = ModalDialogManager.activeView.width - root.width - Style.marginL
+		if (root.x > maxX){
+			root.x = Math.max(Style.marginL, maxX)
+		}
+
+		let maxY = ModalDialogManager.activeView.height - root.height - Style.marginL
+		if (root.y > maxY){
+			root.y = Math.max(Style.marginL, maxY)
+		}
+	}
 
 	// --- Private: fixed height of the list stage ---
 	// Loading / empty / error / results all reserve this SAME height regardless of
@@ -128,9 +157,27 @@ PopupView {
 	// the resize entirely instead of smoothing it. When there are fewer results than
 	// maxVisibleItems the list simply leaves blank space below, the same tradeoff
 	// any fixed-height dropdown/autocomplete makes.
+	// The selected group takes its place from the list, so ticking rows does not resize the popup either.
 	readonly property int __listStageHeight: root.maxVisibleItems > 0
-		? root.maxVisibleItems * root.itemHeight
+		? (root.embedded ? root.maxVisibleItems * root.itemHeight
+			: Math.max(2 * root.itemHeight, root.__stageHeight - (selectedGroup.visible ? selectedGroup.height + contentColumn.spacing : 0)))
 		: 200
+
+	// --- Private: the list and the selected group together ---
+	readonly property int __stageHeight: Math.min(root.maxVisibleItems * root.itemHeight, root.__maxPopupHeight - root.__reservedHeight)
+
+	// --- Private: the selected group without its rows: caption, separator and spacings ---
+	readonly property int __selectedGroupChromeHeight: Style.controlHeightS + 2 * selectedGroup.spacing + 1 + contentColumn.spacing
+
+	// --- Private: selected rows shown before the group scrolls; the list keeps three rows under it ---
+	readonly property int __selectedGroupRows: root.embedded || root.maxVisibleItems <= 0 ? root.maxSelectedGroupItems
+		: Math.max(1, Math.min(root.maxSelectedGroupItems, Math.floor((root.__stageHeight - 3 * root.itemHeight - root.__selectedGroupChromeHeight) / root.itemHeight)))
+
+	// --- Private: everything but the stage; on a short window the list gives way, so the footer (e.g. an apply button) stays reachable ---
+	readonly property int __reservedHeight: 2 * Style.marginL
+		+ (headerLoader.visible ? headerLoader.height + contentColumn.spacing : 0)
+		+ filterField.height + contentColumn.spacing
+		+ (footerLoader.visible ? footerLoader.height + contentColumn.spacing : 0)
 
 	// --- Private: floor so loading/empty/error still show something in embedded
 	// "-1" mode when there are (as yet) zero rows to size against ---
@@ -303,6 +350,9 @@ PopupView {
 		\param index The index in the dataProvider.items array.
 	*/
 	function focusItem(index){
+		root.__leaveFooter()
+		root.__internal.selectedFocusedIndex = -1
+		root.__internal.clearAllFocused = false
 		root.focusedIndex = index
 	}
 
@@ -310,6 +360,7 @@ PopupView {
 	property QtObject __internal: QtObject {
 		property int selectedFocusedIndex: -1
 		property bool clearAllFocused: false
+		property bool footerFocused: false
 		property bool hoverBlocked: true
 		property var selectedItemsList: []
 		property int selectedItemsCount: 0
@@ -461,6 +512,7 @@ PopupView {
 	function __focusFilter(){
 		root.__internal.selectedFocusedIndex = -1
 		root.__internal.clearAllFocused = false
+		root.__internal.footerFocused = false
 		filterField.setFocus(true)
 		filterField.forceActiveFocus()
 	}
@@ -524,7 +576,7 @@ PopupView {
 			if (root.showSelectedGroup && root.dataProvider){
 				root.__internal.restoredContentY = popupListView.contentY
 				root.__internal.restoreAfterFetch = true
-				root.dataProvider.fetch(filterField.text)
+				root.dataProvider.reload()
 			}
 		}
 
@@ -556,9 +608,9 @@ PopupView {
 
 		anchors.fill: parent
 		color: Style.baseColor
-		radius: Style.radiusL
+		radius: Style.radiusM
 		border.width: 1
-		border.color: Style.alternateBaseColor
+		border.color: Style.inputBorderColor
 		visible: !root.embedded
 	}
 
@@ -610,7 +662,14 @@ PopupView {
 				textSize: root.textSize
 				fontColor: root.fontColor
 				placeHolderText: root.filterPlaceholder
-				radius: Style.radiusL
+				radius: Style.textFieldRadius
+
+				// A click into the filter moves the focus off the footer as well
+				onTextInputFocusChanged: {
+					if (filterField.textInputFocus){
+						root.__internal.footerFocused = false
+					}
+				}
 
 				onTextChanged: {
 					root.focusedIndex = -1
@@ -700,11 +759,7 @@ PopupView {
 					id: selectedListContainer
 
 					width: parent.width
-					height: {
-						var totalHeight = root.__internal.selectedItemsCount * root.itemHeight
-						var maxHeight = root.maxSelectedGroupItems * root.itemHeight
-						return Math.min(totalHeight, maxHeight)
-					}
+					height: Math.min(root.__internal.selectedItemsCount, root.__selectedGroupRows) * root.itemHeight
 
 					ListView {
 						id: selectedListView
@@ -826,7 +881,7 @@ PopupView {
 
 						secondSize: 8
 						targetItem: selectedListView
-						visible: root.__internal.selectedItemsCount > root.maxSelectedGroupItems
+						visible: root.__internal.selectedItemsCount > root.__selectedGroupRows
 					}
 				}
 
@@ -864,9 +919,12 @@ PopupView {
 
 					Text {
 						anchors.centerIn: parent
+						width: parent.width - 2 * Style.marginM
+						horizontalAlignment: Text.AlignHCenter
+						wrapMode: Text.WordWrap
 						font.pixelSize: root.textSize
 						color: root.fontColor
-						text: qsTr("No items found")
+						text: root.emptyText
 					}
 				}
 
@@ -879,6 +937,7 @@ PopupView {
 							&& root.dataProvider.error !== null
 							&& !root.dataProvider.isInitialLoading
 							&& !root.dataProvider.isPageLoading
+							&& root.dataProvider.items.length === 0
 
 					Text {
 						anchors.centerIn: parent
@@ -951,13 +1010,84 @@ PopupView {
 					}
 				}
 
+				// The next page loading, or failing, shown as a bar over the last row of a filled list
+				Rectangle {
+					id: pageStatusBar
+
+					objectName: "FilterableSelectPageStatus"
+
+					// Above the hover block, which would take the retry click
+					z: 1
+
+					anchors.left: parent.left
+					anchors.right: parent.right
+					anchors.bottom: parent.bottom
+
+					height: root.itemHeight
+					color: Style.baseColor
+					visible: root.dataProvider
+							&& root.dataProvider.items.length > 0
+							&& !root.dataProvider.isInitialLoading
+							&& (root.dataProvider.isPageLoading || root.dataProvider.error !== null)
+
+					Rectangle {
+						width: parent.width
+						height: 1
+						color: Style.borderColor
+					}
+
+					Row {
+						anchors.centerIn: parent
+						spacing: Style.marginS
+
+						Loading {
+							anchors.verticalCenter: parent.verticalCenter
+							width: Style.iconSizeXS
+							height: Style.iconSizeXS
+							indicatorSize: Style.iconSizeXS
+							background.color: "transparent"
+							visible: pageStatusBar.visible && root.dataProvider.isPageLoading
+						}
+
+						Text {
+							anchors.verticalCenter: parent.verticalCenter
+							font.pixelSize: Style.fontSizeS
+							color: root.dataProvider && root.dataProvider.isPageLoading ? Style.placeHolderTextColor : Style.errorColor
+							text: root.dataProvider && root.dataProvider.isPageLoading ? qsTr("Loading more...") : qsTr("Loading failed. Click to retry")
+						}
+					}
+
+					MouseArea {
+						anchors.fill: parent
+						hoverEnabled: true
+						enabled: root.dataProvider && !root.dataProvider.isPageLoading
+						cursorShape: Qt.PointingHandCursor
+						onClicked: {
+							root.dataProvider.retry()
+						}
+					}
+				}
+
+				// Only a real pointer move ends the block: the block appears under a still pointer, and the list moves under it
+				// when the selected group changes, so the position is compared in the window
 				MouseArea {
+					id: hoverBlockMouseArea
+
+					property point enteredPosition: Qt.point(-1, -1)
+
 					anchors.fill: parent
 					hoverEnabled: true
 					visible: root.__internal.hoverBlocked
 
+					onEntered: {
+						hoverBlockMouseArea.enteredPosition = hoverBlockMouseArea.mapToItem(null, hoverBlockMouseArea.mouseX, hoverBlockMouseArea.mouseY)
+					}
+
 					onPositionChanged: {
-						root.__internal.hoverBlocked = false
+						let position = hoverBlockMouseArea.mapToItem(null, hoverBlockMouseArea.mouseX, hoverBlockMouseArea.mouseY)
+						if (Math.abs(position.x - hoverBlockMouseArea.enteredPosition.x) >= 1 || Math.abs(position.y - hoverBlockMouseArea.enteredPosition.y) >= 1){
+							root.__internal.hoverBlocked = false
+						}
 					}
 				}
 			}
@@ -970,25 +1100,14 @@ PopupView {
 				height: 0
 				visible: false
 			}
+
+			Loader {
+				id: footerLoader
+				width: parent.width
+				sourceComponent: root.footerComponent
+				visible: root.footerComponent !== null
+			}
 		}
-	}
-
-	// --- "Loading more..." overlay at the bottom of the list area ---
-	Text {
-		id: loadingMoreOverlay
-
-		anchors.bottom: body.bottom
-		anchors.bottomMargin: Style.marginS
-		anchors.horizontalCenter: body.horizontalCenter
-
-		visible: root.dataProvider
-				&& root.dataProvider.isPageLoading
-				&& root.dataProvider.items.length > 0
-
-		color: Style.placeHolderTextColor
-		font.pixelSize: Style.fontSizeS
-		font.italic: true
-		text: qsTr("Loading more...")
 	}
 
 	// --- Shadow (covers entire background including filter field) ---
@@ -1001,7 +1120,7 @@ PopupView {
 
 		horizontalOffset: 3
 		verticalOffset: 3
-		radius: Style.radiusL
+		radius: Style.radiusM
 		color: Style.shadowColor
 		source: background
 	}
@@ -1011,6 +1130,58 @@ PopupView {
 		root.focusedIndex = -1
 		root.__internal.selectedFocusedIndex = -1
 		root.__internal.clearAllFocused = false
+		root.__internal.footerFocused = false
+	}
+
+	// --- Helper: the footer control the keyboard reaches, if the footer offers an enabled one ---
+	function __footerKeyboardItem(){
+		let footerItem = footerLoader.item
+		if (!footerItem || footerItem.keyboardItem === undefined || !footerItem.keyboardItem){
+			return null
+		}
+
+		return footerItem.keyboardItem.enabled ? footerItem.keyboardItem : null
+	}
+
+	// --- Helper: the footer control gives up the focus; true when it had it ---
+	function __leaveFooter(){
+		if (!root.__internal.footerFocused){
+			return false
+		}
+
+		root.__internal.footerFocused = false
+		root.forceActiveFocus()
+
+		return true
+	}
+
+	// --- Helper: the target before the footer: the last row, the last selected item or the filter ---
+	function __focusBeforeFooter(){
+		root.__internal.footerFocused = false
+		root.forceActiveFocus()
+		root.__internal.hoverBlocked = true
+		let itemCount = root.dataProvider ? root.dataProvider.items.length : 0
+		if (itemCount > 0){
+			root.focusedIndex = itemCount - 1
+			root.__scrollToRow(itemCount - 1)
+		} else if (root.showSelectedGroup && root.__internal.selectedItemsCount > 0){
+			root.__internal.selectedFocusedIndex = root.__internal.selectedItemsCount - 1
+			root.__selectedContentYCorrection(false)
+		} else {
+			root.__focusFilter()
+		}
+	}
+
+	function __focusFooter(){
+		let keyboardItem = root.__footerKeyboardItem()
+		root.__clearAllFocusIndicators()
+		if (!keyboardItem){
+			root.__focusFilter()
+			return
+		}
+
+		root.__internal.footerFocused = true
+		keyboardItem.forceActiveFocus()
 	}
 
 	// --- Helper: handle "Clear all" action from keyboard ---
@@ -1042,6 +1213,14 @@ PopupView {
 
 	// --- Helper: handle keyboard activation (Return/Enter/Space) ---
 	function __handleKeyboardActivation(){
+		// Footer control (e.g. an apply button) — press it
+		if (root.__internal.footerFocused){
+			let keyboardItem = root.__footerKeyboardItem()
+			if (keyboardItem){
+				keyboardItem.clicked()
+			}
+			return
+		}
 		// "Clear all" button action
 		if (root.__internal.clearAllFocused){
 			root.__handleClearAllAction()
@@ -1090,7 +1269,11 @@ PopupView {
 	Shortcut {
 		sequence: "Tab"
 		onActivated: {
-			if (filterField.textInputFocus){
+			if (root.__internal.footerFocused){
+				// Tab from the footer → back to filter
+				root.__focusFilter()
+				root.__clearAllFocusIndicators()
+			} else if (filterField.textInputFocus){
 				filterField.setFocus(false)
 				root.__internal.hoverBlocked = true
 				// If selected group visible, tab to "Clear all" first
@@ -1114,14 +1297,17 @@ PopupView {
 					root.focusedIndex = cnt > 0 ? 0 : -1
 				}
 			} else if (root.__internal.selectedFocusedIndex >= 0){
-				// Tab from selected group → main list
+				// Tab from selected group → main list, or the footer when the list is empty
 				root.__internal.selectedFocusedIndex = -1
 				var mainCount = root.dataProvider ? root.dataProvider.items.length : 0
-				root.focusedIndex = mainCount > 0 ? 0 : -1
+				if (mainCount > 0){
+					root.focusedIndex = 0
+				} else {
+					root.__focusFooter()
+				}
 			} else {
-				// Tab from main list → back to filter
-				root.__focusFilter()
-				root.__clearAllFocusIndicators()
+				// Tab from main list → the footer, if it offers a control, or back to filter
+				root.__focusFooter()
 			}
 		}
 	}
@@ -1129,8 +1315,14 @@ PopupView {
 	Shortcut {
 		sequence: "Shift+Tab"
 		onActivated: {
-			if (root.focusedIndex >= 0){
-				// Shift+Tab from main list → selected group (last item) or "Clear all" or filter
+			// Rows that move under a still pointer do not take the keyboard target
+			root.__internal.hoverBlocked = true
+			if (root.__internal.footerFocused){
+				root.__focusBeforeFooter()
+			} else if (root.focusedIndex >= 0){
+				// Shift+Tab from main list → selected group (last item) or "Clear all" or filter.
+				// A hovered row is reached with the text focus still in the filter, which would take Return.
+				filterField.setFocus(false)
 				root.focusedIndex = -1
 				if (root.showSelectedGroup && root.__internal.selectedItemsCount > 0){
 					root.__internal.selectedFocusedIndex = root.__internal.selectedItemsCount - 1
@@ -1155,6 +1347,10 @@ PopupView {
 	Shortcut {
 		sequence: "Up"
 		onActivated: {
+			if (root.__internal.footerFocused){
+				root.__focusBeforeFooter()
+				return
+			}
 			if (filterField.textInputFocus){
 				filterField.setFocus(false)
 			}
@@ -1199,6 +1395,10 @@ PopupView {
 	Shortcut {
 		sequence: "Down"
 		onActivated: {
+			if (root.__leaveFooter()){
+				root.__focusFilter()
+				return
+			}
 			if (filterField.textInputFocus){
 				filterField.setFocus(false)
 			}
@@ -1252,25 +1452,10 @@ PopupView {
 		}
 	}
 
+	// By the real height of the list: the selected group takes rows from it
 	function contentYCorrection(down_){
 		if (root.focusedIndex >= 0){
-			var contentY = popupListView.contentY
-			var itemH = root.itemHeight
-			var itemCount = root.dataProvider ? root.dataProvider.items.length : 0
-			var visibleCount = root.maxVisibleItems === -1 ? itemCount : Math.min(root.maxVisibleItems, itemCount)
-			if (visibleCount <= 0) return
-			var index = root.focusedIndex
-
-			if (down_){
-				if ((index + 1) * itemH > contentY + visibleCount * itemH){
-					popupListView.contentY = (index + 1) * itemH - visibleCount * itemH
-				}
-			}
-			else {
-				if (index * itemH < contentY){
-					popupListView.contentY = index * itemH
-				}
-			}
+			root.__scrollToRow(root.focusedIndex)
 		}
 	}
 
@@ -1278,7 +1463,7 @@ PopupView {
 		if (root.__internal.selectedFocusedIndex >= 0){
 			var contentY = selectedListView.contentY
 			var itemH = root.itemHeight
-			var visibleCount = root.maxSelectedGroupItems
+			var visibleCount = root.__selectedGroupRows
 			if (visibleCount <= 0) return
 			var index = root.__internal.selectedFocusedIndex
 

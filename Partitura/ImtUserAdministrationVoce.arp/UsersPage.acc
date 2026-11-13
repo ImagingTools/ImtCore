@@ -22,8 +22,8 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>name</Value>
+                                <Value>userId</Value>
                                 <Value>mail</Value>
-                                <Value>systemName</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -31,10 +31,8 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>name</Value>
+                                <Value>userId</Value>
                                 <Value>mail</Value>
-                                <Value>systemName</Value>
-                                <Value>roles</Value>
-                                <Value>groups</Value>
                                 <Value>lastConnection</Value>
                             </Values>
                         </Data>
@@ -43,10 +41,8 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>Name</Value>
+                                <Value>Username</Value>
                                 <Value>Email</Value>
-                                <Value>System Name</Value>
-                                <Value>Roles</Value>
-                                <Value>Groups</Value>
                                 <Value>Last Connection</Value>
                             </Values>
                         </Data>
@@ -55,8 +51,8 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>name</Value>
+                                <Value>userId</Value>
                                 <Value>mail</Value>
-                                <Value>systemName</Value>
                                 <Value>lastConnection</Value>
                             </Values>
                         </Data>
@@ -327,6 +323,9 @@
                     <AttributeInfo Id="HeadersProvider" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="CollectionHeadersProvider"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="PasswordPolicy" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PasswordPolicy"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -368,7 +367,7 @@
                                 <Value>Roles</Value>
                                 <Value>Groups</Value>
                                 <Value>LastConnection</Value>
-                                <Value>UserId</Value>
+                                <Value>Id</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -488,9 +487,11 @@
                                 <AttributeInfo Id="ClosePermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>RemoveUser</Value>
-                                            <Value>ChangeUser</Value>
-                                            <Value>ViewUsers</Value>
+                                            <Value>/Administration/Users/Edit/Remove</Value>
+                                            <Value>/Administration/Users/Edit/Change</Value>
+                                            <Value>/OrganizationManagement/Members/Edit/Change</Value>
+                                            <Value>/Administration/Users/View</Value>
+                                            <Value>/OrganizationManagement/Members/View</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -506,18 +507,22 @@
                                 <AttributeInfo Id="RedoPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>AddUser</Value>
-                                            <Value>RemoveUser</Value>
-                                            <Value>ChangeUser</Value>
+                                            <Value>/Administration/Users/Edit/Add</Value>
+                                            <Value>/OrganizationManagement/Members/Edit/Add</Value>
+                                            <Value>/Administration/Users/Edit/Remove</Value>
+                                            <Value>/Administration/Users/Edit/Change</Value>
+                                            <Value>/OrganizationManagement/Members/Edit/Change</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
                                 <AttributeInfo Id="SavePermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>AddUser</Value>
-                                            <Value>RemoveUser</Value>
-                                            <Value>ChangeUser</Value>
+                                            <Value>/Administration/Users/Edit/Add</Value>
+                                            <Value>/OrganizationManagement/Members/Edit/Add</Value>
+                                            <Value>/Administration/Users/Edit/Remove</Value>
+                                            <Value>/Administration/Users/Edit/Change</Value>
+                                            <Value>/OrganizationManagement/Members/Edit/Change</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -533,9 +538,11 @@
                                 <AttributeInfo Id="UndoPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>AddUser</Value>
-                                            <Value>RemoveUser</Value>
-                                            <Value>ChangeUser</Value>
+                                            <Value>/Administration/Users/Edit/Add</Value>
+                                            <Value>/OrganizationManagement/Members/Edit/Add</Value>
+                                            <Value>/Administration/Users/Edit/Remove</Value>
+                                            <Value>/Administration/Users/Edit/Change</Value>
+                                            <Value>/OrganizationManagement/Members/Edit/Change</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -561,8 +568,10 @@
                                 <AttributeInfo Id="EditPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>ViewUsers</Value>
-                                            <Value>ChangeUser</Value>
+                                            <Value>/Administration/Users/View</Value>
+                                            <Value>/OrganizationManagement/Members/View</Value>
+                                            <Value>/Administration/Users/Edit/Change</Value>
+                                            <Value>/OrganizationManagement/Members/Edit/Change</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -575,14 +584,15 @@
                                 <AttributeInfo Id="NewPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>AddUser</Value>
+                                            <Value>/Administration/Users/Edit/Add</Value>
+                                            <Value>/OrganizationManagement/Members/Edit/Add</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
                                 <AttributeInfo Id="RemovePermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>RemoveUser</Value>
+                                            <Value>/Administration/Users/Edit/Remove</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -644,7 +654,7 @@
                                 <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>ViewRevisions</Value>
+                                            <Value>/Administration/Users/Revisions/View</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -689,6 +699,7 @@
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="Demultiplexer"/>
     </ExportedInterfaces>
     <ExportedComponents>
+        <Component ExportedId="PasswordPolicy" ComponentId="PasswordPolicy"/>
         <Component ExportedId="SmtpMessageCreator" ComponentId="SmtpMessageCreator"/>
         <Component ExportedId="UserChangeGenerator" ComponentId="UserChangeGenerator"/>
     </ExportedComponents>

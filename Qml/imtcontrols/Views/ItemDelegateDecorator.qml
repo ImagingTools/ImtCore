@@ -6,14 +6,14 @@ import imtcontrols 1.0
 ButtonDecorator {
     id: root;
 
+    // A list row, not a button: transparent at rest, list hover and list selection colors otherwise.
     color: !root.baseElement ? "transparent" :
-                               root.baseElement.highlighted ? Style.highlightColor :
-                               root.baseElement.down || root.baseElement.checked ?
-                                   Style.buttonPressedColor : root.baseElement.hovered ?
-                                       Style.buttonHoverColor : Style.buttonColor
+                               root.baseElement.highlighted || root.baseElement.down || root.baseElement.checked ? Style.selectedColor :
+                               root.baseElement.hovered ? Style.hover : "transparent"
 
 	maxTextWidth: root.baseElement ? root.baseElement.width - Style.marginM : Style.sizeHintBXS;
-	backgroundItem.radius: 0
+	backgroundItem.radius: Style.buttonRadius
+	border.width: 0
 }
 
 

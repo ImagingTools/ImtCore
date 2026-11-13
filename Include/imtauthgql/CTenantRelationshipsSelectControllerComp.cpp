@@ -9,6 +9,7 @@
 #include <iprm/CParamsSet.h>
 
 // ImtCore includes
+#include <imtauth/CollectionSelection.h>
 #include <imtauth/ITenantRelationshipInfo.h>
 #include <imtbase/ICollectionInfo.h>
 #include "imtbasesdl/SDL/1.0/CPP/FilterableSelect.h"
@@ -52,7 +53,9 @@ sdl::V1_0::imtbase::CGetSelectableItemsPayload CTenantRelationshipsSelectControl
 
 	imtsdl::TElementList<sdl::V1_0::imtbase::CSelectableItemData> itemsList;
 
-	for (const QByteArray& objectId : m_tenantRelationshipCollectionCompPtr->GetElementIds()){
+	const imtauth::CollectionSelection::FilterExpression tenantExpression =
+				imtauth::CollectionSelection::AnyColumnEquals("SourceTenantId", "TargetTenantId", currentTenantId);
+	for (const QByteArray& objectId : imtauth::CollectionSelection::SelectIds(*m_tenantRelationshipCollectionCompPtr, tenantExpression)){
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (!m_tenantRelationshipCollectionCompPtr->GetObjectData(objectId, dataPtr)){
 			continue;

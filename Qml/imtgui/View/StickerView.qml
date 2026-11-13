@@ -13,7 +13,7 @@ Rectangle {
 	Text {
 		id: stickerText;
 		anchors.centerIn: parent;
-		color: Style.baseColor;
+		color: Style.highlightedTextColor;
 		font.family:Style.fontFamily;
 		font.pixelSize: Style.fontSizeM;
 	}

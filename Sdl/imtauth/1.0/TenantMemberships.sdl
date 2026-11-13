@@ -286,6 +286,11 @@ input MembershipSubscriptionInput {
 	userId: ID!
 }
 
+type OrganizationMembersNotification {
+	tenantId: ID!
+}
+
 type Subscription {
 	OnMembershipNotification(input: MembershipSubscriptionInput): MembershipNotification!
+	OnOrganizationMembersChanged: OrganizationMembersNotification!
 }

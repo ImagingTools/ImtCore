@@ -89,11 +89,21 @@ bool CParamSetRepresentationController::GetSdlRepresentationFromDataModel(
 				continue;
 			}
 
-			typeId = GetTypeId();
-
-			if (!GetRepresentationFromDataModel(*subParamsSetPtr, parameterRepresentation, paramsPtr)){
+			sdl::V1_0::imtbase::CParamsSet subRepresentation;
+			if (!GetSdlRepresentationFromDataModel(subRepresentation, *subParamsSetPtr, paramsPtr)){
 				return false;
 			}
+
+			// a nested set without any representable parameter has nothing to show or edit
+			if (subRepresentation.parameters->isEmpty()){
+				continue;
+			}
+
+			if (!subRepresentation.WriteToJsonObject(parameterRepresentation)){
+				return false;
+			}
+
+			typeId = GetTypeId();
 		}
 
 		sdl::V1_0::imtbase::CParameter parameter;

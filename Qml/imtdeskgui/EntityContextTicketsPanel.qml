@@ -25,7 +25,7 @@ import imtdeskImtDeskSdl 1.0
 Item {
 	id: root
 
-	property string context: ""
+	property string permissionPath: ""
 	property string entityType: ""
 	property string entityId: ""
 	property string entityDisplayName: ""
@@ -168,7 +168,7 @@ Item {
 				decorator: Component {
 					ButtonDecorator {
 						color: Style.imaginToolsAccentColor
-						textColor: "white"
+						textColor: Style.highlightedTextColor
 						opacity: newTicketButton.hovered ? 0.85 : 1
 					}
 				}
@@ -318,7 +318,7 @@ Item {
 							text: ticketDelegate.statusText ? qsTr(ticketDelegate.statusText) : ""
 							font.pixelSize: Style.fontSizeM
 							font.bold: true
-							color: "white"
+							color: Style.highlightedTextColor
 						}
 					}
 				}
@@ -345,7 +345,7 @@ Item {
 							text: ticketDelegate.priorityText ? qsTr(ticketDelegate.priorityText) : ""
 							font.pixelSize: Style.fontSizeM
 							font.bold: true
-							color: "white"
+							color: Style.highlightedTextColor
 						}
 					}
 				}
@@ -559,7 +559,7 @@ Item {
 					decorator: Component {
 						ButtonDecorator {
 							color: popupCreateButton.enabled ? Style.imaginToolsAccentColor : Style.baseColor
-							textColor: popupCreateButton.enabled ? "white" : Style.inactiveTextColor
+							textColor: popupCreateButton.enabled ? Style.highlightedTextColor : Style.inactiveTextColor
 							opacity: popupCreateButton.hovered ? 0.85 : 1
 						}
 					}
@@ -574,7 +574,7 @@ Item {
 	}
 
 	GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		id: createTicketRequest
 		gqlCommandId: ImtdeskImtDeskSdlCommandIds.s_createEntityContextTicket
 		requestType: 1

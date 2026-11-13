@@ -19,9 +19,15 @@ copyFile(path.join(engineRoot, 'compiler', 'language.js'), path.join(libDir, 'la
 const engine = loadEngine(engineRoot)
 fs.writeFileSync(path.join(libDir, 'engine-index.json'), JSON.stringify(serializeEngine(engine)))
 
+const stableVsix = path.join(extensionRoot, 'jqml.vsix')
+
+for (const name of fs.readdirSync(extensionRoot)) {
+    if (name.endsWith('.vsix')) fs.unlinkSync(path.join(extensionRoot, name))
+}
+
 const vsce = spawnSync(
     process.platform === 'win32' ? 'npx.cmd' : 'npx',
-    ['--yes', '@vscode/vsce', 'package', '--allow-missing-repository', '--skip-license'],
+    ['--yes', '@vscode/vsce', 'package', '--out', stableVsix, '--allow-missing-repository', '--skip-license'],
     { cwd: extensionRoot, stdio: 'inherit', shell: process.platform === 'win32' }
 )
 
@@ -29,7 +35,4 @@ if (vsce.status !== 0) {
     process.exit(vsce.status || 1)
 }
 
-const vsix = fs.readdirSync(extensionRoot).filter(name => name.endsWith('.vsix')).sort().pop()
-if (vsix) {
-    console.log('Packed ' + path.join(extensionRoot, vsix))
-}
+console.log('Packed ' + stableVsix)

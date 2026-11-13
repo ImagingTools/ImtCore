@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/SQL/Postgres">
+        <file alias="CreateUserNotificationsTable.sql">Resources/SQL/Postgres/CreateUserNotificationsTable.sql</file>
+    </qresource>
+    <qresource prefix="/SQL/SQLite">
+        <file alias="CreateUserNotificationsTable.sql">Resources/SQL/SQLite/CreateUserNotificationsTable.sql</file>
+    </qresource>
+</RCC>

@@ -1,6 +1,7 @@
 const vscode = require('vscode')
 const path = require('path')
 const fs = require('fs')
+const { JqmlDebugSession } = require('./debugAdapter')
 
 const KIND_MAP = {
     class: vscode.CompletionItemKind.Class,
@@ -144,6 +145,12 @@ function refreshDocument(document) {
 }
 
 function activate(context) {
+    context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory('jqml', {
+        createDebugAdapterDescriptor() {
+            return new vscode.DebugAdapterInlineImplementation(new JqmlDebugSession())
+        },
+    }))
+
     diagnostics = vscode.languages.createDiagnosticCollection('jqml')
     context.subscriptions.push(diagnostics, log())
     try {

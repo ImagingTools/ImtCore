@@ -112,7 +112,8 @@ bool CProductControllerComp::SetData(const QByteArray& data, QByteArray& dataId)
 
 	QByteArray objectUuid = productInfo.GetObjectUuid();
 
-	if (m_productCollectionCompPtr->GetElementIds().contains(objectUuid)){
+	imtbase::IObjectCollection::DataPtr existingDataPtr;
+	if (m_productCollectionCompPtr->GetObjectData(objectUuid, existingDataPtr)){
 		return false;
 	}
 

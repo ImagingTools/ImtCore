@@ -236,6 +236,10 @@ private Q_SLOTS:
 	void testCreateChildTenant_InvalidParent_Fails();
 	void testHierarchy_MultiLevel();
 
+	// Permission-scope authorization
+	void testOwnerCannotRestoreCreatorRevokedPermissions();
+	void testCreatorCanChangePermissions();
+
 private:
 	imtauth::CMockTenantManager* m_managerPtr = nullptr;
 };

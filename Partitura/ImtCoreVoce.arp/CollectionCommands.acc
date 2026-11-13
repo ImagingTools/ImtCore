@@ -85,15 +85,15 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ViewSensors</Value>
-                                <Value>ChangeProjectForSensor</Value>
-                                <Value>ChangeMacAddress</Value>
-                                <Value>ChangeSerialNumberForSensor</Value>
-                                <Value>ChangeDescriptionForSensor</Value>
-                                <Value>ChangeDeviceType</Value>
-                                <Value>ChangeHardwareConfiguration</Value>
-                                <Value>ChangeProductionStatus</Value>
-                                <Value>ChangeOrderForSensor</Value>
+                                <Value>/SensorManagement/View</Value>
+                                <Value>/SensorManagement/Edit/Change/Project</Value>
+                                <Value>/SensorManagement/Edit/Change/MacAddress</Value>
+                                <Value>/SensorManagement/Edit/Change/SerialNumber</Value>
+                                <Value>/SensorManagement/Edit/Change/Description</Value>
+                                <Value>/SensorManagement/Edit/Change/DeviceType</Value>
+                                <Value>/SensorManagement/Edit/Change/HardwareConfiguration</Value>
+                                <Value>/SensorManagement/Edit/Change/ProductionStatus</Value>
+                                <Value>/SensorManagement/Edit/Change/Order</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -149,7 +149,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>AddSensor</Value>
+                                <Value>/SensorManagement/Edit/Add</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -186,7 +186,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>RemoveSensor</Value>
+                                <Value>/SensorManagement/Edit/Remove</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

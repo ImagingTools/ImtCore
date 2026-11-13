@@ -98,6 +98,7 @@ bool CUserGroupChangeGeneratorComp::CompareDocuments(
 	InsertChange(documentChangeCollection, "GroupId", QT_TRANSLATE_NOOP("Attribute", "Group-ID"), oldUserGroupInfoPtr->GetId(), newUserGroupInfoPtr->GetId());
 	InsertTextChange(documentChangeCollection, "Name", QT_TRANSLATE_NOOP("Attribute", "Name"), oldUserGroupInfoPtr->GetName(), newUserGroupInfoPtr->GetName());
 	InsertTextChange(documentChangeCollection, "Description", QT_TRANSLATE_NOOP("Attribute", "Description"), oldUserGroupInfoPtr->GetDescription(), newUserGroupInfoPtr->GetDescription());
+	InsertChange(documentChangeCollection, "Sid", QT_TRANSLATE_NOOP("Attribute", "Security-ID"), oldUserGroupInfoPtr->GetSid(), newUserGroupInfoPtr->GetSid());
 
 	InsertListChanges(
 				documentChangeCollection,
@@ -124,8 +125,8 @@ bool CUserGroupChangeGeneratorComp::CompareDocuments(
 
 
 void CUserGroupChangeGeneratorComp::CompareProductRoles(
-			const imtauth::IUserBaseInfo& oldGroupInfo,
-			const imtauth::IUserBaseInfo& newGroupInfo,
+			const imtauth::IPrincipal& oldGroupInfo,
+			const imtauth::IPrincipal& newGroupInfo,
 			imtbase::CObjectCollection& documentChangeCollection)
 {
 	const QByteArrayList oldProducts = oldGroupInfo.GetProducts();
@@ -161,15 +162,6 @@ void CUserGroupChangeGeneratorComp::CompareProductRoles(
 					QT_TRANSLATE_NOOP("Attribute", "Role"),
 					inOld ? oldGroupInfo.GetRoles(productId) : QByteArrayList(),
 					inNew ? newGroupInfo.GetRoles(productId) : QByteArrayList());
-
-		InsertListChanges(
-					documentChangeCollection,
-					"AddPermission",
-					"RemovePermission",
-					"Permission",
-					QT_TRANSLATE_NOOP("Attribute", "Permission"),
-					inOld ? oldGroupInfo.GetLocalPermissions(productId) : QByteArrayList(),
-					inNew ? newGroupInfo.GetLocalPermissions(productId) : QByteArrayList());
 	}
 
 	InsertListChanges(

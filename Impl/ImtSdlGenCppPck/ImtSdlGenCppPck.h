@@ -6,6 +6,8 @@
 #include <icomp/TMakeComponentWrap.h>
 
 #include <imtsdlgencpp/CCxxProcessorsManagerComp.h>
+#include <imtsdlgencpp/CCxxSourceTailPostProcessorComp.h>
+#include <imtsdlgencpp/CCxxForwardDeclarationPostProcessorComp.h>
 #include <imtsdlgencpp/CSdlClassCodeGeneratorComp.h>
 #include <imtsdlgencpp/CSdlClassJsonModificatorComp.h>
 #include <imtsdlgencpp/CSdlClassTreeModelModificatorComp.h>
@@ -29,6 +31,8 @@ namespace ImtSdlGenCppPck
 
 
 typedef imtsdlgencpp::CCxxProcessorsManagerComp CxxProcessorsManager;
+typedef imtsdlgencpp::CCxxSourceTailPostProcessorComp CxxSourceTailPostProcessor;
+typedef imtsdlgencpp::CCxxForwardDeclarationPostProcessorComp CxxForwardDeclarationPostProcessor;
 typedef imtsdlgencpp::CSdlClassCodeGeneratorComp SdlClassCodeGenerator;
 typedef imtsdlgencpp::CSdlClassTreeModelModificatorComp SdlClassTreeModelModificator;
 typedef imtsdlgencpp::CSdlClassGqlModificatorComp SdlClassGqlModificator;

@@ -6,14 +6,11 @@
 #include <imod/CMultiModelDispatcherBase.h>
 #include <imod/IModel.h>
 
-// Qt includes
-#include <QRecursiveMutex>
-#include <QMap>
-
 // ImtCore includes
 #include <imtauth/ICrossTenantMessage.h>
 #include <imtauth/ITenantManager.h>
 #include <imtservergql/CGqlPublisherCompBase.h>
+#include <imtnotify/INotificationSender.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Tenants_fwd.h>
 
 
@@ -51,6 +48,7 @@ public:
 		I_ASSIGN(m_messageBrokerCompPtr, "MessageBroker", "Cross-tenant message broker to observe for changes", true, "CrossTenantMessageBroker");
 		I_ASSIGN_TO(m_messageBrokerModelCompPtr, m_messageBrokerCompPtr, true);
 		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager for resolving tenant owners", false, "TenantManager");
+		I_ASSIGN(m_notificationSenderCompPtr, "NotificationSender", "Notification center that keeps the notifications of the users", false, "NotificationSender");
 	I_END_COMPONENT;
 
 protected:
@@ -68,6 +66,7 @@ protected:
 	I_REF(imtauth::ICrossTenantMessage, m_messageBrokerCompPtr);
 	I_REF(imod::IModel, m_messageBrokerModelCompPtr);
 	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
+	I_REF(imtnotify::INotificationSender, m_notificationSenderCompPtr);
 
 private:
 	void PublishNotification(
@@ -78,11 +77,6 @@ private:
 
 	QByteArray FindTenantOwnerUserId(const QByteArray& tenantId) const;
 	QString FindTenantName(const QByteArray& tenantId) const;
-
-	// Cache of messageId → last known status for change detection.
-	mutable QMap<QByteArray, imtauth::CrossTenantMessageStatus> m_cachedMessageStatus;
-	// Protects the cache from concurrent access.
-	mutable QRecursiveMutex m_cacheMutex;
 };
 
 

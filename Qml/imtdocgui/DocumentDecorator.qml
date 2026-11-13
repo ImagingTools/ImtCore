@@ -13,6 +13,14 @@ QtObject {
 	property var registeredRepresentation: []
 
 	signal viewRegistered(var view, var representationController, bool updateRepresentation)
+	signal viewUnregistered(var view)
+	signal viewVisibilityChanged(var view, bool visible)
+
+	Component.onDestruction: {
+		while (registeredViews.length > 0){
+			unregisterView(registeredViews[registeredViews.length - 1])
+		}
+	}
 
 	onViewRegistered: {
 		if (view){
@@ -33,12 +41,29 @@ QtObject {
 
 			representationController.representationUpdated.connect(onRepresentationUpdated)
 			representationController.startUpdateRepresentation.connect(onStartUpdateRepresentation)
-			representationController.updateRepresentationFailed.connect(onUpdateRepresentationFailed)
 			representationController.updateDocumentFailed.connect(onUpdateDocumentFailed)
+
+			// The failure signal does not say which representation failed, so it is bound to its view.
+			let registeredView = view
+			let connection = {
+				"representationFailed": function(failedDocumentId, message){
+					root.onUpdateRepresentationFailed(registeredView, failedDocumentId, message)
+				},
+				"viewDestroyed": function(){
+					root.unregisterView(registeredView)
+				}
+			}
+			representationController.updateRepresentationFailed.connect(connection.representationFailed)
+			view.Component.destruction.connect(connection.viewDestroyed)
+			_internal.viewConnections.push(connection)
 
 			if (documentManager && view.commandsController){
 				let isDirty = documentManager.documentIsDirty(documentId)
-				view.commandsController.setCommandIsEnabled("Save", isDirty)
+				view.commandsController.setCommandIsEnabled("Save", isDirty && !isReadOnly())
+				if (isReadOnly()){
+					view.commandsController.setCommandIsEnabled("Undo", false)
+					view.commandsController.setCommandIsEnabled("Redo", false)
+				}
 			}
 
 			if (updateRepresentation){
@@ -87,11 +112,12 @@ QtObject {
 				return
 			}
 
+			let isReadOnly = root.isReadOnly()
 			for (let i = 0; i < root.registeredViews.length; ++i){
 				if (root.registeredViews[i].commandsController){
-					root.registeredViews[i].commandsController.setCommandIsEnabled("Undo", availableUndoSteps > 0)
-					root.registeredViews[i].commandsController.setCommandIsEnabled("Redo", availableRedoSteps > 0)
-					root.registeredViews[i].commandsController.setCommandIsEnabled("Save", isDirty)
+					root.registeredViews[i].commandsController.setCommandIsEnabled("Undo", availableUndoSteps > 0 && !isReadOnly)
+					root.registeredViews[i].commandsController.setCommandIsEnabled("Redo", availableRedoSteps > 0 && !isReadOnly)
+					root.registeredViews[i].commandsController.setCommandIsEnabled("Save", isDirty && !isReadOnly)
 				}
 			}
 		}
@@ -101,20 +127,36 @@ QtObject {
 				return
 			}
 
+			let isReadOnly = root.isReadOnly()
 			for (let i = 0; i < root.registeredViews.length; ++i){
 				if (root.registeredViews[i].commandsController){
-					root.registeredViews[i].commandsController.setCommandIsEnabled("Save", isDirty)
+					root.registeredViews[i].commandsController.setCommandIsEnabled("Save", isDirty && !isReadOnly)
 				}
 			}
 		}
 
-		function onDocumentManagerChanged(typeOperation, objectId, documentId, hasChanges){
+		function onDocumentIsReadOnlyChanged(documentId){
+			if (documentId !== root.documentId || !root.isReadOnly()){
+				return
+			}
+
+			for (let i = 0; i < root.registeredViews.length; ++i){
+				if (root.registeredViews[i].commandsController){
+					root.registeredViews[i].commandsController.setCommandIsEnabled("Undo", false)
+					root.registeredViews[i].commandsController.setCommandIsEnabled("Redo", false)
+					root.registeredViews[i].commandsController.setCommandIsEnabled("Save", false)
+				}
+			}
+		}
+
+		function onDocumentManagerChanged(typeOperation, objectId, documentId, documentName, sourceId, changeIds){
 			if (documentId !== root.documentId){
 				return
 			}
 
-			if (typeOperation === EDocumentOperationEnum.s_documentChanged){
-				root.updateRepresentationForAllViews()
+			// A document being closed is not read again
+			if (typeOperation === EDocumentOperationEnum.s_documentChanged && !root.documentManager.documentIsClosing(documentId)){
+				root.onDocumentChanged(sourceId, changeIds)
 			}
 
 			if (typeOperation === EDocumentOperationEnum.s_documentSaved){
@@ -149,6 +191,7 @@ QtObject {
 			if (registeredViews[i].model === representation){
 				registeredViews[i].setBlockingUpdateModel(true)
 				_internal.updateCounters[i] = _internal.updateCounters[i] + 1
+				_internal.failedViews[i] = false
 				break
 			}
 		}
@@ -177,14 +220,19 @@ QtObject {
 		documentManager.documentRepresentationUpdated(documentId, representation)
 	}
 
-	function onUpdateRepresentationFailed(documentId, message){
+	function onUpdateRepresentationFailed(view, documentId, message){
 		if (root.documentId !== documentId){
 			return
 		}
 
-		for (let i = 0; i < registeredViews.length; ++i){
-			_internal.updateCounters[i] = 0
-			registeredViews[i].setBlockingUpdateModel(false)
+		let index = registeredViews.indexOf(view)
+		if (index >= 0){
+			_internal.updateCounters[index] = 0
+			_internal.failedViews[index] = true
+			view.setBlockingUpdateModel(false)
+			if (typeof view.showContent === "function"){
+				view.showContent()
+			}
 		}
 
 		documentManager.updateRepresentationFailed(documentId, message)
@@ -196,6 +244,27 @@ QtObject {
 		}
 
 		documentManager.updateDocumentFailed(documentId, message)
+	}
+
+	// A visible view refuses the save while its input is not acceptable (acceptsSave() is optional).
+	function viewsAcceptSave(){
+		for (let i = 0; i < registeredViews.length; ++i){
+			let view = registeredViews[i]
+			if (view.visible && typeof view.acceptsSave === "function" && !view.acceptsSave()){
+				return false
+			}
+		}
+
+		return true
+	}
+
+	// Writes the GUI state of the visible views to the document.
+	function commitChanges(){
+		for (let i = 0; i < registeredViews.length; ++i){
+			if (registeredViews[i].visible){
+				registeredViews[i].doUpdateModel()
+			}
+		}
 	}
 
 	function onGuiUpdated(view, model){
@@ -216,6 +285,8 @@ QtObject {
 					_internal.requestUpdateViews.splice(viewIndex, 1)
 				}
 			}
+
+			viewVisibilityChanged(view, visible)
 		}
 	}
 
@@ -227,8 +298,57 @@ QtObject {
 				// must not trigger reverse updateDocumentFromRepresentation.
 				return
 			}
-			_internal.initiatingView = view
-			registeredRepresentation[index].updateDocumentFromRepresentation()
+			sendUpdate(index)
+		}
+	}
+
+	// Writes the representation of the view to the document; the source ID of the update tells its change notification
+	function sendUpdate(viewIndex){
+		let sourceId = registeredRepresentation[viewIndex].updateDocumentFromRepresentation()
+		if (!sourceId){
+			return
+		}
+
+		let sourceIds = _internal.ownSourceIds[viewIndex]
+		sourceIds.push(sourceId)
+		if (sourceIds.length > _internal.maxOwnSourceIds){
+			sourceIds.shift()
+		}
+		_internal.ownSourceIds[viewIndex] = sourceIds
+	}
+
+	// Index of the view whose update made the change, -1 for a change of another session, an undo or the server
+	function findSourceViewIndex(sourceId){
+		if (!sourceId){
+			return -1
+		}
+
+		for (let i = 0; i < _internal.ownSourceIds.length; ++i){
+			if (_internal.ownSourceIds[i].indexOf(sourceId) >= 0){
+				return i
+			}
+		}
+
+		return -1
+	}
+
+	// Each controller decides whether its representation is read again; a view whose last read failed is read anyway.
+	function onDocumentChanged(sourceId, changeIds){
+		let ids = changeIds ? changeIds : []
+		let sourceViewIndex = findSourceViewIndex(sourceId)
+
+		for (let i = 0; i < registeredViews.length; ++i){
+			let changeSource = DocumentRepresentationController.ChangeSource.External
+			if (i === sourceViewIndex){
+				changeSource = DocumentRepresentationController.ChangeSource.Own
+			}
+			else if (sourceViewIndex >= 0){
+				changeSource = DocumentRepresentationController.ChangeSource.DocumentView
+			}
+
+			if (_internal.failedViews[i] || registeredRepresentation[i].isUpdateRequired(ids, changeSource)){
+				updateRepresentation(i)
+			}
 		}
 	}
 
@@ -246,13 +366,62 @@ QtObject {
 		registeredViews.push(view)
 		registeredRepresentation.push(representationController)
 		_internal.updateCounters.push(0)
+		_internal.failedViews.push(false)
+		_internal.ownSourceIds.push([])
 		
 		viewRegistered(view, representationController, updateRepr)
+	}
+
+	function unregisterView(view){
+		let index = registeredViews.indexOf(view)
+		if (index < 0){
+			return
+		}
+
+		let representationController = registeredRepresentation[index]
+		let connection = _internal.viewConnections[index]
+
+		view.commandActivated.disconnect(onCommandActivated)
+		view.modelDataChanged.disconnect(onModelDataChanged)
+		view.guiUpdated.disconnect(onGuiUpdated)
+		view.guiVisibleChanged.disconnect(onGuiVisibleChanged)
+		view.Component.destruction.disconnect(connection.viewDestroyed)
+
+		representationController.representationUpdated.disconnect(onRepresentationUpdated)
+		representationController.startUpdateRepresentation.disconnect(onStartUpdateRepresentation)
+		representationController.updateRepresentationFailed.disconnect(connection.representationFailed)
+		representationController.updateDocumentFailed.disconnect(onUpdateDocumentFailed)
+
+		registeredViews.splice(index, 1)
+		registeredRepresentation.splice(index, 1)
+		_internal.updateCounters.splice(index, 1)
+		_internal.failedViews.splice(index, 1)
+		_internal.ownSourceIds.splice(index, 1)
+		_internal.viewConnections.splice(index, 1)
+
+		let requestIndex = _internal.requestUpdateViews.indexOf(view)
+		if (requestIndex >= 0){
+			_internal.requestUpdateViews.splice(requestIndex, 1)
+		}
+
+		viewUnregistered(view)
+	}
+
+	function isReadOnly(){
+		if (!documentManager || typeof documentManager.documentIsReadOnly !== "function"){
+			return false
+		}
+
+		return documentManager.documentIsReadOnly(documentId)
 	}
 
 	function onUndo(){
 		if (!documentManager){
 			console.error("Unable to handle Undo command. Error: Document manager is invalid")
+			return
+		}
+
+		if (isReadOnly()){
 			return
 		}
 
@@ -265,6 +434,10 @@ QtObject {
 			return
 		}
 
+		if (isReadOnly()){
+			return
+		}
+
 		documentManager.doRedo(documentId, 1)
 	}
 
@@ -274,6 +447,19 @@ QtObject {
 			return
 		}
 
+		if (isReadOnly()){
+			return
+		}
+
+		if (!viewsAcceptSave()){
+			return
+		}
+
+		commitChanges()
+		doSave()
+	}
+
+	function doSave(){
 		if (documentManager.hasDocumentNameProvider(documentTypeId)){
 			documentManager.saveDocument(documentId, "")
 		}
@@ -287,29 +473,77 @@ QtObject {
 	}
 
 	function updateRepresentationForAllViews(){
-		let skipView = _internal.initiatingView
-		_internal.initiatingView = null
-
 		for (let i = 0; i < registeredViews.length; ++i){
-			if (registeredViews[i] === skipView){
-				continue
-			}
+			updateRepresentation(i)
+		}
+	}
 
+	// Hidden views are updated when they become visible.
+	function updateRepresentation(viewIndex){
+		let view = registeredViews[viewIndex]
+		if (view.visible){
+			registeredRepresentation[viewIndex].updateRepresentationFromDocument()
+		}
+		else if (!_internal.requestUpdateViews.includes(view)){
+			_internal.requestUpdateViews.push(view)
+		}
+	}
+
+	function releaseView(viewIndex){
+		if (_internal.updateCounters[viewIndex] <= 0){
+			registeredViews[viewIndex].setBlockingUpdateModel(false)
+		}
+		registeredViews[viewIndex].doUpdateGui()
+	}
+
+	function representationRequired(viewIndex, isNewDocument){
+		return !isNewDocument || registeredRepresentation[viewIndex].requestRepresentationOnCreate
+	}
+
+	// Hidden views count only while no view is visible: their representation is requested once shown.
+	function isAwaitingRepresentation(isNewDocument){
+		let hasVisibleView = false
+		for (let i = 0; i < registeredViews.length; ++i){
 			if (registeredViews[i].visible){
-				registeredRepresentation[i].updateRepresentationFromDocument()
-			}
-			else{
-				if (!_internal.requestUpdateViews.includes(registeredViews[i])){
-					_internal.requestUpdateViews.push(registeredViews[i])
+				hasVisibleView = true
+				if (representationRequired(i, isNewDocument)){
+					return true
 				}
 			}
 		}
+
+		if (hasVisibleView){
+			return false
+		}
+
+		for (let i = 0; i < registeredViews.length; ++i){
+			if (representationRequired(i, isNewDocument)){
+				return true
+			}
+		}
+
+		return false
+	}
+
+	function isUpdatingRepresentation(){
+		for (let i = 0; i < _internal.updateCounters.length; ++i){
+			if (_internal.updateCounters[i] > 0){
+				return true
+			}
+		}
+
+		return false
+	}
+
+	// Cleared for a view when its representation is requested again.
+	function hasFailedRepresentation(){
+		return _internal.failedViews.includes(true)
 	}
 
 	function updateDocumentForAllViews(){
 		for (let i = 0; i < registeredViews.length; ++i){
 			registeredViews[i].setBlockingUpdateModel(true)
-			registeredRepresentation[i].updateDocumentFromRepresentation()
+			sendUpdate(i)
 		}
 	}
 
@@ -317,6 +551,10 @@ QtObject {
 		property var requestUpdateViews: []
 		property bool saveRequested: false
 		property var updateCounters: []
-		property var initiatingView: null
+		property var failedViews: []
+		property var viewConnections: []
+		// Source IDs of the last updates of each view; the oldest are dropped
+		property var ownSourceIds: []
+		property int maxOwnSourceIds: 16
 	}
 }

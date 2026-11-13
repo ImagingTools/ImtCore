@@ -56,9 +56,9 @@ QString CEventBase::GetDocumentName() const
 }
 
 
-QUrl CEventBase::GetDocumentUrl() const
+QByteArray CEventBase::GetDocumentSourceRef() const
 {
-	return m_documentUrl;
+	return m_documentSourceRef;
 }
 
 

@@ -262,7 +262,7 @@ bool CQmlEnumGeneratorComp::AddQrcEntry(const imtsdl::CSdlEnum& sdlEnum, iprm::C
 	qmlObjectParams.SetEditableParameter(QmldirModelParamIds::ObjectTypeName, &objectNameParam);
 	// b) version
 	iprm::CNameParam objectVerionNameParam;
-	objectVerionNameParam.SetName(QStringLiteral(" 1.0 "));
+	objectVerionNameParam.SetName(QStringLiteral("1.0"));
 	qmlObjectParams.SetEditableParameter(QmldirModelParamIds::ObjectVersionName, &objectVerionNameParam);
 	// c) file
 	iprm::CNameParam objectFileNameParam;

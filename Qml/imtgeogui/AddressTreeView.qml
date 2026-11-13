@@ -10,10 +10,10 @@ import imtcontrols 1.0
 Rectangle{
 	id: treeBody
 
-	property string context: ""
+	property string permissionPath: ""
 	clip: true
 	radius: 20;
-	color: Style.color_menu;
+	color: Style.baseColor;
 
 	property string addressListCommandId: "AddressList"
 	property string subscriptionCommandId: "OnAddressCollectionChanged"
@@ -46,7 +46,7 @@ Rectangle{
 	property Component additionalDelegateComp: Component{Item{}}
 
 	property GqlSdlRequestSender addressTreeRequest : GqlSdlRequestSender {
-		context: treeBody.context
+		permissionPath: treeBody.permissionPath
 		property string parentIds: "";
 		property string idsToOpen: "";
 		property int insertIndex: -1;
@@ -198,22 +198,30 @@ Rectangle{
 			return;
 		}
 
-		else{
-			treeBody.addressTreeRequest.reset()
-			let openedIdsString = treeView.getOpenedIds()
+		treeBody.reloadTree()
+	}
 
-			treeBody.addressTreeRequest.idsToOpen = openedIdsString
+	// Reloads the tree and keeps the opened branches open.
+	function reloadTree(){
+		treeBody.addressTreeRequest.reset()
+		let openedIdsString = treeView.getOpenedIds()
 
-			treeBody.addressTreeRequest.updateModel();
-		}
+		treeBody.addressTreeRequest.idsToOpen = openedIdsString
+
+		treeBody.addressTreeRequest.updateModel();
 	}
 
 	SubscriptionClient {
 		id: subscriptionClient;
 		gqlCommandId: treeBody.subscriptionCommandId
+		deliveryEnabled: treeBody.visible
 
 		onMessageReceived: {
 			treeBody.handleSubscription(data);
+		}
+
+		onRefreshRequired: {
+			treeBody.reloadTree();
 		}
 	}
 
@@ -286,7 +294,7 @@ Rectangle{
 		hasSelection: true;
 		scrollSize: 8;
 
-		color: Style.color_menu;
+		color: Style.baseColor;
 		selectionColor: Style.selectedColor
 		hoverColor: Style.selectedColor;
 		textColor: treeBody.textColor

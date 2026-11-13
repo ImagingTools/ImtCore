@@ -25,17 +25,17 @@ bool CSdlClassTreeModelModificatorComp::ProcessHeaderClassFile(const imtsdl::CSd
 	QTextStream ofStream(headerDevicePtr);
 
 	// add method definitions
-	ofStream << QStringLiteral("\t\t[[nodiscard]] bool WriteToModel(");
+	ofStream << QStringLiteral("\t[[nodiscard]] bool WriteToModel(");
 	ofStream << GetEscapedNamespace(QStringLiteral("imtbase"), QString());
 	ofStream << QStringLiteral("::CTreeItemModel& model, int modelIndex = 0) const;");
 	FeedStream(ofStream, 1, false);
 
-	ofStream << QStringLiteral("\t\t[[nodiscard]] bool ReadFromModel(const ");
+	ofStream << QStringLiteral("\t[[nodiscard]] bool ReadFromModel(const ");
 	ofStream << GetEscapedNamespace(QStringLiteral("imtbase"), QString());
 	ofStream << ("::CTreeItemModel& model, int modelIndex = 0);");
 	FeedStream(ofStream, 1);
 
-	ofStream << QStringLiteral("\t\t[[nodiscard]] bool OptReadFromModel(const ");
+	ofStream << QStringLiteral("\t[[nodiscard]] bool OptReadFromModel(const ");
 	ofStream << GetEscapedNamespace(QStringLiteral("imtbase"), QString());
 	ofStream << ("::CTreeItemModel& model, int modelIndex = 0);");
 	FeedStream(ofStream, 1);

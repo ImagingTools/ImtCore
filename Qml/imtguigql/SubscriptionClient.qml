@@ -22,6 +22,31 @@ GqlModel {
 
 	signal messageReceived(var data);
 
+	// Messages were missed (connection lost, or delivery disabled): re-read the state instead.
+	signal refreshRequired();
+
+	// Messages are delivered only while true, e.g. bound to the visibility of the GUI they update.
+	// Messages arriving meanwhile are dropped; refreshRequired() follows once delivery is enabled again.
+	property bool deliveryEnabled: true
+	property bool __missedMessages: false
+
+	onDeliveryEnabledChanged: {
+		if (deliveryEnabled && __missedMessages){
+			__missedMessages = false
+			refreshRequired()
+		}
+	}
+
+	// The data may be stale: a refresh now, or once delivery is enabled.
+	function markStale(){
+		if (deliveryEnabled){
+			refreshRequired()
+		}
+		else{
+			__missedMessages = true
+		}
+	}
+
 	onOkChanged: {
 		if (ok && autoSubscribe){
 			registerSubscription();
@@ -56,6 +81,11 @@ GqlModel {
 
 	// Fire messageReceived for the data currently held by this subscription.
 	function deliverReady(){
+		if (!container.deliveryEnabled){
+			container.__missedMessages = true
+			return
+		}
+
 		if (container.containsKey("data")){
 			let dataModelLocal = container.getData("data")
 

@@ -27,7 +27,8 @@ protected:
 				const sdl::V1_0::imtlic::CFeatureData& featureRepresentationData,
 				const QByteArray& rootFeatureId,
 				imtlic::CFeatureInfo& featureInfo,
-				QString& errorMessage) const;
+				QString& errorMessage,
+				bool isRootFeature = true) const;
 	bool CreateRepresentationModelFromFeatureInfo(
 				const imtlic::CFeatureInfo& featureInfo,
 				sdl::V1_0::imtlic::CFeatureData& featureRepresentationData,

@@ -90,7 +90,22 @@ public:
 
 protected:
 	virtual bool IsSqliteDriver() const;
+	virtual bool IsDuckDbDriver() const;
 	virtual QString GetBaseSelectionQuery() const;
+	/**
+		The select that GetSelectionQuery filters, sorts and pages: GetBaseSelectionQuery() by default. A delegate whose
+		selection depends on the parameters overrides it, for instance to ask for distinct rows with CreateDistinctSelectionQuery().
+		An empty select fails the selection, for parameters the select cannot be made from.
+	*/
+	virtual QString CreateBaseSelectionQuery(const iprm::IParamsSet& selectionParams) const;
+	/**
+		\a selectQuery with one row kept for each value of the fields that the complex filter in \a selectionParams marks
+		as distinct (DISTINCT ON). The sort of the selection belongs to the same select, so the row kept is the first by it.
+		The query is returned as it is when no field is distinct, and on SQLite, which has no DISTINCT ON.
+		Not applied by default, because the delegates that read documents have their own way of distinct: a delegate asks for it
+		by returning this from CreateBaseSelectionQuery().
+	*/
+	QString CreateDistinctSelectionQuery(const QString& selectQuery, const iprm::IParamsSet& selectionParams) const;
 	virtual idoc::IDocumentMetaInfo* CreateCollectionItemMetaInfo(const QByteArray& typeId) const;
 	virtual bool SetCollectionItemMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const;
 	virtual idoc::MetaInfoPtr CreateObjectMetaInfo(const QByteArray& typeId) const;
@@ -103,6 +118,12 @@ protected:
 	virtual bool CreateTextFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& textFilterQuery) const;
 	virtual bool CreateTimeFilterQuery(const imtbase::ITimeFilterParam& timeFilter, QString& timeFilterQuery, const QString& timeFieldId = QStringLiteral(R"(root1."TimeStamp")")) const;
 	virtual QString CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const;
+
+	/**
+		The column of the creation time the time filter of a collection selects by; empty: the collection has none and
+		the time filter selects every object.
+	*/
+	virtual QString GetCreationTimeColumn() const;
 	virtual bool CreateSortQuery(const imtbase::ICollectionFilter& collectionFilter, QString& sortQuery) const;
 	virtual bool CreateSortQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& sortQuery) const;
 	virtual QString EncodeTextArgument(const QString& argument) const;
@@ -125,3 +146,5 @@ protected:
 
 
 } // namespace imtdb
+
+

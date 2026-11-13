@@ -2,6 +2,9 @@
 #include "CFileSystemControllerTest.h"
 
 
+#include <itest/CStandardTestExecutor.h>
+
+
 namespace
 {
 
@@ -67,6 +70,7 @@ void CFileSystemControllerTest::HappyPathMapsPayloadTest()
 	CMockFileSystemProvider provider;
 	provider.nextListing.resolvedPath = QStringLiteral("/root/sub");
 	provider.nextListing.parentPath = QStringLiteral("/root");
+	provider.nextListing.hasParent = true;
 	provider.nextListing.totalCount = 1;
 	provider.nextListing.hasMore = false;
 
@@ -127,3 +131,6 @@ void CFileSystemControllerTest::PermissionDeniedCreateResponseTest()
 	QVERIFY(response.isEmpty());
 	QVERIFY(!error.isEmpty());
 }
+
+
+I_ADD_TEST(CFileSystemControllerTest);

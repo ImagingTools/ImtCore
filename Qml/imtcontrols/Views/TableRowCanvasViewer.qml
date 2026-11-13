@@ -67,6 +67,9 @@ Canvas {
 			if ("item" in rowDelegate.dataModel){
 				val = rowDelegate.dataModel.item[key]
 			}
+			else if (rowDelegate.dataModel.modelData && typeof rowDelegate.dataModel.modelData == 'object'){
+				val = rowDelegate.dataModel.modelData[key];
+			}
 			else {
 				val = rowDelegate.dataModel[key];
 			}
@@ -85,7 +88,7 @@ Canvas {
 		ctx.clearRect(0, 0, rowDelegate.width, rowDelegate.height);
 
 		let color = (rowDelegate.mouseArea.containsMouse || rowDelegate.selected) ? Style.selectedColor :
-				rowDelegate.tableItem.enableAlternating ? rowDelegate.tableItem.alternatingColor : 'white';
+				rowDelegate.tableItem.enableAlternating ? rowDelegate.tableItem.alternatingColor : Style.tableCellColor;
 		ctx.fillStyle = color
 		ctx.fillRect(x, y, rowDelegate.width, rowDelegate.height)
 

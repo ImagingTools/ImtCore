@@ -103,8 +103,9 @@ public:
 
 	/**
 		Get all grants where the specified tenant is the source (granting access).
+		\param isReadPtr [optional] False when the storage could not be read completely, so the list may miss grants.
 	*/
-	virtual CrossOrgGrants GetGrantsBySourceTenant(const QByteArray& sourceTenantId) const = 0;
+	virtual CrossOrgGrants GetGrantsBySourceTenant(const QByteArray& sourceTenantId, bool* isReadPtr = nullptr) const = 0;
 
 	/**
 		Get all grants where the specified tenant is the target (receiving access).
@@ -113,7 +114,7 @@ public:
 
 	/**
 		Check if a target tenant has at least one of the specified roles
-		granted by the source tenant.
+		granted by the source tenant. An empty role ID checks for any effective grant.
 	*/
 	virtual bool HasAccess(
 		const QByteArray& sourceTenantId,

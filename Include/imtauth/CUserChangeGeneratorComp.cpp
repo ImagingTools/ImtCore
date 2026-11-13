@@ -75,7 +75,7 @@ bool CUserChangeGeneratorComp::CompareDocuments(
 	}
 
 	InsertChange(documentChangeCollection, "UserId", QT_TRANSLATE_NOOP("Attribute", "User-ID"), oldUserInfoPtr->GetId(), newUserInfoPtr->GetId());
-	InsertTextChange(documentChangeCollection, "Username", QT_TRANSLATE_NOOP("Attribute", "Username"), oldUserInfoPtr->GetName(), newUserInfoPtr->GetName());
+	InsertTextChange(documentChangeCollection, "Name", QT_TRANSLATE_NOOP("Attribute", "Name"), oldUserInfoPtr->GetName(), newUserInfoPtr->GetName());
 	InsertTextChange(documentChangeCollection, "Description", QT_TRANSLATE_NOOP("Attribute", "Description"), oldUserInfoPtr->GetDescription(), newUserInfoPtr->GetDescription());
 	InsertTextChange(documentChangeCollection, "Mail", QT_TRANSLATE_NOOP("Attribute", "Mail"), oldUserInfoPtr->GetMail(), newUserInfoPtr->GetMail());
 	InsertChange(documentChangeCollection, "Sid", QT_TRANSLATE_NOOP("Attribute", "Security-ID"), oldUserInfoPtr->GetSid(), newUserInfoPtr->GetSid());
@@ -139,16 +139,6 @@ void CUserChangeGeneratorComp::CompareProductRoles(
 					QT_TRANSLATE_NOOP("Attribute", "Role"),
 					inOld ? oldUserInfo.GetRoles(productId) : QByteArrayList(),
 					inNew ? newUserInfo.GetRoles(productId) : QByteArrayList());
-
-		// Permissions granted directly to the user, independently of the roles.
-		InsertListChanges(
-					documentChangeCollection,
-					"AddPermission",
-					"RemovePermission",
-					"Permission",
-					QT_TRANSLATE_NOOP("Attribute", "Permission"),
-					inOld ? oldUserInfo.GetLocalPermissions(productId) : QByteArrayList(),
-					inNew ? newUserInfo.GetLocalPermissions(productId) : QByteArrayList());
 	}
 
 	InsertListChanges(

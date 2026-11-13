@@ -13,7 +13,7 @@ CDocumentUndoRedoChangedEvent::CDocumentUndoRedoChangedEvent(
 			const QByteArray& documentId,
 			const QByteArray& documentTypeId,
 			const QString& documentName,
-			const QUrl& documentUrl,
+			const QByteArray& documentSourceRef,
 			bool isDirty,
 			const idoc::IUndoManager& undoManager)
 	:m_undoManager(undoManager)
@@ -22,7 +22,7 @@ CDocumentUndoRedoChangedEvent::CDocumentUndoRedoChangedEvent(
 	m_documentId = documentId;
 	m_documentTypeId = documentTypeId;
 	m_documentName = documentName;
-	m_documentUrl = documentUrl;
+	m_documentSourceRef = documentSourceRef;
 	m_isDirty = isDirty;
 }
 

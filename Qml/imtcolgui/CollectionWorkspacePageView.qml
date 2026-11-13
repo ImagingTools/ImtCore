@@ -11,8 +11,12 @@ DocumentWorkspacePageView {
 
 	onStartItemSourceCompChanged: {
 		if (startItemSourceComp){
-			documentManagerView_.addFixedView(startItemSourceComp, pageName, pageId, true)
+			documentManagerView_.addFixedView(startItemSourceComp, pageName, pageId, true, true, pageIcon)
 		}
+	}
+
+	onPageIconChanged: {
+		documentManagerView_.setTabIcon(pageId, pageIcon)
 	}
 
 	function setDocumentName(documentId, name){
@@ -23,6 +27,7 @@ DocumentWorkspacePageView {
 		id: documentManagerView_
 		anchors.fill: parent
 		documentManager: multiDocPageView.documentManager
+		defaultDocumentIcon: multiDocPageView.pageIcon
 		visualStatusProvider: GqlBasedObjectVisualStatusProvider {
 			collectionId: multiDocPageView.pageId
 		}

@@ -234,6 +234,14 @@ Item {
 			contentView.startLoading(documentId)
 		}
 
+		// A representation update that follows starts the indicator again; waiting for it left it on when none came.
+		function onUndoDone(documentId){
+			if (documentId !== contentView.documentId){
+				return
+			}
+			contentView.stopLoading(documentId)
+		}
+
 		function onUndoFailed(documentId, message){
 			if (documentId !== contentView.documentId){
 				return
@@ -246,6 +254,13 @@ Item {
 				return
 			}
 			contentView.startLoading(documentId)
+		}
+
+		function onRedoDone(documentId){
+			if (documentId !== contentView.documentId){
+				return
+			}
+			contentView.stopLoading(documentId)
 		}
 
 		function onRedoFailed(documentId, message){

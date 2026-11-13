@@ -8,30 +8,27 @@
 // ImtCore includes
 #include <imtbase/TIdentifiableWrap.h>
 #include <imtauth/IUserInfo.h>
-#include <imtauth/CUserBaseInfo.h>
+#include <imtauth/CPrincipalBase.h>
 
 
 namespace imtauth
 {
 
 
-class CUserInfo: virtual public IUserInfo, public CUserBaseInfo
+class CUserInfo: virtual public IUserInfo, public CPrincipalBase
 {
 public:
-	typedef CUserBaseInfo BaseClass;
+	typedef CPrincipalBase BaseClass;
 
 	// reimplemented (iser::IUserInfo)
 	virtual QByteArray GetPasswordHash() const override;
 	virtual void SetPasswordHash(const QByteArray& passwordHash) override;
-	virtual QByteArray GetSid() const override;
-	virtual void SetSid(const QByteArray& sid) override;
 	virtual QString GetMail() const override;
 	virtual void SetMail(const QString& mail) override;
 	virtual bool IsAdmin() const override;
 	virtual IUserGroupInfo::GroupIds GetGroups() const override;
 	virtual void AddToGroup(const QByteArray& groupId) override;
 	virtual bool RemoveFromGroup(const QByteArray& groupId) override;
-	virtual RoleIds GetRoles(const QByteArray& productId) const override;
 	virtual FeatureIds GetPermissions(const QByteArray& productId = QByteArray()) const override;
 	virtual bool IsEnabled() const override;
 	virtual void SetEnabled(bool enabled) override;
@@ -56,7 +53,6 @@ public:
 
 private:
 	QByteArray m_passwordHash;
-	QByteArray m_sid;
 	QString m_mail;
 	IUserGroupInfo::GroupIds m_groupIds;
 	QDateTime m_lastConnection;

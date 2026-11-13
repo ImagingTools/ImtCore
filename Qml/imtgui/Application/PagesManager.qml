@@ -53,7 +53,7 @@ Item {
 
     function clearModels(){
         pagesData.model = 0;
-        pageModel.clear();
+        pagesProvider.clearModel();
     }
 
     property alias modelState: pagesProvider.modelState;
@@ -97,9 +97,14 @@ Item {
 
         anchors.fill: parent;
 
-        // Keyed on the repeater, not on getItemsCount(): that is a plain call and
-        // a binding on it would never hear the model fill up.
-        visible: container.userIsLoggedIn && pagesData.count === 0 && container.modelState !== "Error";
+        visible: container.userIsLoggedIn && !pagesProvider.pagesReceived && container.modelState !== "Error";
+    }
+
+    SkeletonTableView {
+        id: pageSkeleton;
+
+        anchors.fill: parent;
+        z: 1;
     }
 
     Repeater {
@@ -111,15 +116,38 @@ Item {
             anchors.fill: container;
             visible: container.activePageIndex === model.index;
 
+            // Created shown with the new page list: the skeleton may have been started by a page of the old list,
+            // destroyed together with the timer that was to stop it
             Component.onCompleted: {
                 if (visible){
                     load();
+                    pageSkeleton.stop();
                 }
             }
 
+            // A page opened by a click is built on the next tick, so the menu and a skeleton paint first.
             onVisibleChanged: {
-                if (visible){
-                    load();
+                if (!visible){
+                    return;
+                }
+
+                if (loader.item){
+                    pageSkeleton.stop();
+                }
+                else{
+                    pageSkeleton.start();
+                    deferredLoadTimer.restart();
+                }
+            }
+
+            Timer {
+                id: deferredLoadTimer;
+                interval: 0;
+                onTriggered: {
+                    pagesDeleg.load();
+                    if (pagesDeleg.visible){
+                        pageSkeleton.stop();
+                    }
                 }
             }
 
@@ -133,6 +161,10 @@ Item {
 
                     if (item.pageName !== undefined){
                         item.pageName = model.name;
+                    }
+
+                    if (item.pageIcon !== undefined){
+                        item.pageIcon = model.icon;
                     }
 
                     if (item.startItemSource !== undefined){

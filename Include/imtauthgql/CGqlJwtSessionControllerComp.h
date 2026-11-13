@@ -10,6 +10,8 @@
 #include <imtauth/ITenantManager.h>
 #include <imtauth/ITenantMembershipManager.h>
 #include <imtauth/IDelegatedAccess.h>
+#include <imtauth/IPasswordPolicy.h>
+#include <imtbase/IObjectCollection.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Sessions_fwd.h>
 
 
@@ -28,6 +30,8 @@ public:
 		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager", false, "TenantMembershipManager");
 		I_ASSIGN(m_delegatedAccessCompPtr, "DelegatedAccess", "Delegated access resolver for cross-org grants", false, "DelegatedAccessResolver");
 		I_ASSIGN(m_versionInfoCompPtr, "VersionInfo", "Version info", false, "VersionInfo");
+		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "User collection, read for the password lifetime check on a token refresh", false, "UserCollection");
+		I_ASSIGN(m_passwordPolicyCompPtr, "PasswordPolicy", "Password policy: a token refresh is refused once the password has expired", false, "PasswordPolicy");
 	I_END_COMPONENT;
 
 protected:
@@ -72,6 +76,7 @@ protected:
 private:
 	QByteArray GetAuthenticatedUserId(const ::imtgql::CGqlRequest& gqlRequest) const;
 	bool CanUseTenant(const QByteArray& userId, const QByteArray& tenantId, QString& errorMessage) const;
+	bool IsPasswordChangeRequired(const QByteArray& userId) const;
 	sdl::V1_0::imtauth::CUserSession CreateUserSessionData(
 			const imtauth::IJwtSessionController::UserSession& userSession) const;
 
@@ -81,6 +86,8 @@ protected:
 	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);
 	I_REF(imtauth::IDelegatedAccess, m_delegatedAccessCompPtr);
 	I_REF(iser::IVersionInfo, m_versionInfoCompPtr);
+	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
+	I_REF(imtauth::IPasswordPolicy, m_passwordPolicyCompPtr);
 };
 
 

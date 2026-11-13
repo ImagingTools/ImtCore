@@ -109,7 +109,7 @@ private:
 	struct ResponseData
 	{
 		QJsonObject data;
-		QJsonObject errors;
+		QJsonArray errors;
 		QByteArray commandId;
 	};
 

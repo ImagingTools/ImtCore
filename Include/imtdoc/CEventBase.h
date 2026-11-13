@@ -3,7 +3,8 @@
 
 
 // Qt includes
-#include <QtCore/QUrl>
+#include <QtCore/QByteArray>
+#include <QtCore/QString>
 
 // ACF includes
 #include <istd/IPolymorphic.h>
@@ -18,7 +19,7 @@ namespace imtdoc
 	\brief Base class for all document lifecycle event objects.
 
 	Every event produced by the document service carries a common set of
-	document-identifying fields (user-ID, document-ID, type-ID, name, URL,
+	document-identifying fields (user-ID, document-ID, type-ID, name, source reference,
 	dirty flag) together with an accept/reject flag that handlers can use to
 	signal whether the event was acted upon.
 
@@ -79,9 +80,12 @@ public:
 	QString GetDocumentName() const;
 
 	/**
-		\return The source URL of the document (e.g.\ \c collection://\<objectId\>).
+		\return The storage-specific reference to the document source
+		        (e.g.\ \c \<objectId\>[/\<revision\>] for collection documents),
+		        empty for documents not yet saved.
+		\sa CDocumentServiceBase::WorkingDocument::documentSourceRef
 	*/
-	QUrl GetDocumentUrl() const;
+	QByteArray GetDocumentSourceRef() const;
 
 	/**
 		\return \c true when the document had unsaved changes at the time of the event.
@@ -95,7 +99,7 @@ protected:
 	QByteArray m_documentId;      ///< Document instance ID.
 	QByteArray m_documentTypeId;  ///< Registered object type-ID.
 	QString m_documentName;       ///< Human-readable document name.
-	QUrl m_documentUrl;           ///< Source URL.
+	QByteArray m_documentSourceRef; ///< Document source reference.
 	bool m_isDirty = false;       ///< Unsaved-changes flag.
 };
 

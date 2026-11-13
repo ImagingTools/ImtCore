@@ -6,6 +6,7 @@
 #include <QSet>
 
 // ImtCore includes
+#include <imtauth/CollectionSelection.h>
 #include <imtauth/ITenantConnectionInfo.h>
 #include "imtbasesdl/SDL/1.0/CPP/FilterableSelect.h"
 
@@ -43,7 +44,9 @@ sdl::V1_0::imtbase::CGetSelectableItemsPayload CTenantConnectionsSelectControlle
 	}
 
 	QSet<QByteArray> connectedTenantIds;
-	for (const QByteArray& connectionId : m_tenantConnectionCollectionCompPtr->GetElementIds()){
+	const imtauth::CollectionSelection::FilterExpression tenantExpression =
+				imtauth::CollectionSelection::AnyColumnEquals("TenantAId", "TenantBId", currentTenantId);
+	for (const QByteArray& connectionId : imtauth::CollectionSelection::SelectIds(*m_tenantConnectionCollectionCompPtr, tenantExpression)){
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (!m_tenantConnectionCollectionCompPtr->GetObjectData(connectionId, dataPtr)){
 			continue;

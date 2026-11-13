@@ -142,8 +142,10 @@ ViewBase {
 
 				Text {
 					text: qsTr("Current organization")
-					font.pixelSize: Style.fontSizeS
-					color: Style.inactiveTextColor
+					font.family: Style.fontFamilyBold
+					font.pixelSize: Style.fontSizeXL
+					font.bold: true
+					color: Style.textColor
 				}
 
 				Rectangle {
@@ -197,8 +199,8 @@ ViewBase {
 							}
 
 							Text {
-								text: currentOrgRow.currentOrgData && currentOrgRow.currentOrgData.description !== ""
-									? currentOrgRow.currentOrgData.description
+								text: !currentOrgRow.currentOrgData || currentOrgRow.currentOrgData.id === "" ? ""
+									: currentOrgRow.currentOrgData.description !== "" ? currentOrgRow.currentOrgData.description
 									: qsTr("You are currently working in this organization. Everything you do applies here.")
 								font.pixelSize: Style.fontSizeS
 								font.family: Style.fontFamily
@@ -337,8 +339,10 @@ ViewBase {
 
 				Text {
 					text: qsTr("Other organizations")
-					font.pixelSize: Style.fontSizeS
-					color: Style.inactiveTextColor
+					font.family: Style.fontFamilyBold
+					font.pixelSize: Style.fontSizeXL
+					font.bold: true
+					color: Style.textColor
 				}
 
 				Rectangle {

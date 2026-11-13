@@ -35,6 +35,7 @@ ControlBase {
     property string borderColor: Style.borderColor;
 
     property bool openST: false;
+    property var _leaveHandle: null;
     property int waitingDuration: delay;
     property int delay: 500;
     property int timeout: -1;
@@ -49,6 +50,7 @@ ControlBase {
 
 
     Component.onDestruction: {
+        customTooltip._unwatchPointerLeave();
         customTooltip.closeTooltip();
     }
 
@@ -70,11 +72,39 @@ ControlBase {
         }
 
         customTooltip.openST = true;
+        customTooltip._watchPointerLeave();
+    }
+
+    // Close the tooltip when the pointer leaves the browser window (the web
+    // runtime sends no `exited` to the owner in that case).
+    // Started when the opening is scheduled (show) or performed directly (open), so a
+    // pending delay is cancelled as well. Already watching: keep the subscription.
+    function _watchPointerLeave(){
+        if (customTooltip._leaveHandle){
+            return;
+        }
+
+        customTooltip._leaveHandle = PointerLeaveWatcher.watch(function(){
+            pauseOpenTooltip.stop();
+
+            pauseCloseTooltip.stop();
+
+            if(customTooltip.decorator_ && customTooltip.decorator_.hide !== undefined){
+                customTooltip.decorator_.hide();
+            }
+            customTooltip.closeTooltip();
+        });
+    }
+
+    function _unwatchPointerLeave(){
+        PointerLeaveWatcher.unwatch(customTooltip._leaveHandle);
+        customTooltip._leaveHandle = null;
     }
 
     function openTooltip(xX, yY){
         if(!customTooltip.openST){
             if (!ModalDialogManager.activeView){
+                customTooltip._unwatchPointerLeave();
                 return;
             }
 
@@ -105,6 +135,12 @@ ControlBase {
     }
 
     function closeTooltip(){
+        // A new opening may already be pending (show() during the close animation): it still
+        // needs the pointer-leave listener to be cancelled.
+        if(!pauseOpenTooltip.running){
+            customTooltip._unwatchPointerLeave();
+        }
+
         if(customTooltip.openST){
             ModalDialogManager.closeByComp(customTooltip.tooltipContentComp);
 
@@ -257,11 +293,18 @@ ControlBase {
             pauseCloseTooltip.start();
         }
         pauseOpenTooltip.restart();
+        customTooltip._watchPointerLeave();
     }
 
     function hide(){
         pauseOpenTooltip.stop();
         pauseCloseTooltip.stop();
+
+        // Nothing is displayed yet, so the pending opening is cancelled. An open tooltip
+        // releases the subscription in closeTooltip().
+        if(!customTooltip.openST){
+            customTooltip._unwatchPointerLeave();
+        }
 
         if(customTooltip.decorator_ && customTooltip.decorator_.hide !== undefined){
             customTooltip.decorator_.hide();

@@ -1005,6 +1005,9 @@ QMap<QString, QString> CSdlTools::CalculateTargetCppFilesFromSchemaParams(const 
 
 	retVal.insert(ISdlProcessArgumentsParser::s_headerFileType, QDir::cleanPath(GetFileSystemAcceptableEntryPath(baseFilePath + QStringLiteral(".h"))));
 	retVal.insert(ISdlProcessArgumentsParser::s_sourceFileType, QDir::cleanPath(GetFileSystemAcceptableEntryPath(baseFilePath + QStringLiteral(".cpp"))));
+	retVal.insert(ISdlProcessArgumentsParser::s_fwdHeaderFileType, QDir::cleanPath(GetFileSystemAcceptableEntryPath(baseFilePath + QStringLiteral("_fwd.h"))));
+	retVal.insert(ISdlProcessArgumentsParser::s_objectHeaderFileType, QDir::cleanPath(GetFileSystemAcceptableEntryPath(baseFilePath + ISdlProcessArgumentsParser::s_objectsFileSuffix + QStringLiteral(".h"))));
+	retVal.insert(ISdlProcessArgumentsParser::s_objectSourceFileType, QDir::cleanPath(GetFileSystemAcceptableEntryPath(baseFilePath + ISdlProcessArgumentsParser::s_objectsFileSuffix + QStringLiteral(".cpp"))));
 
 	return retVal;
 }
@@ -1049,11 +1052,16 @@ bool CSdlTools::UpdateTypeInfo(CSdlEntryBase& sdlEntry, const iprm::IParamsSet* 
 
 	const QString defaultName = QFileInfo(argumentParserPtr->GetSchemaFilePath()).fileName();
 	QMap<QString, QString> joinRules = CalculateTargetCppFilesFromSchemaParams(*schemaParamsPtr, argumentParserPtr->GetOutputDirectoryPath(), defaultName);
-	
-	if(joinRules.contains(ISdlProcessArgumentsParser::s_headerFileType)){
+
+	if (joinRules.contains(ISdlProcessArgumentsParser::s_headerFileType)){
 		sdlEntry.SetTargetHeaderFilePath(QDir::cleanPath(joinRules[ISdlProcessArgumentsParser::s_headerFileType]));
 	}
-	
+
+	// the objects header exists only if the objects are generated
+	if (argumentParserPtr->IsObjectsGenerationEnabled() && joinRules.contains(ISdlProcessArgumentsParser::s_objectHeaderFileType)){
+		sdlEntry.SetObjectTargetHeaderFilePath(QDir::cleanPath(joinRules[ISdlProcessArgumentsParser::s_objectHeaderFileType]));
+	}
+
 	return true;
 }
 
@@ -1063,6 +1071,11 @@ QMap<QString, QString> CSdlTools::CalculateTargetCppFilesFromSchemaParams(const 
 	if (!argumentParser.IsTemplateEnabled()){
 		const QString defaultName = QFileInfo(argumentParser.GetSchemaFilePath()).fileName();
 		QMap<QString, QString> joinRules = CalculateTargetCppFilesFromSchemaParams(schemaParams, argumentParser.GetOutputDirectoryPath(), defaultName);
+		if (!argumentParser.IsObjectsGenerationEnabled()){
+			// the presence of these keys means that the objects files should be generated
+			joinRules.remove(ISdlProcessArgumentsParser::s_objectHeaderFileType);
+			joinRules.remove(ISdlProcessArgumentsParser::s_objectSourceFileType);
+		}
 
 		return joinRules;
 	}
@@ -1097,7 +1110,12 @@ QMap<QString, QString> CSdlTools::CalculateTargetCppFilesFromSchemaParams(const 
 	}
 
 	retVal.insert(ISdlProcessArgumentsParser::s_headerFileType, QDir::cleanPath(GetFileSystemAcceptableEntryPath(baseFilePath + QStringLiteral(".h"))));
+	retVal.insert(ISdlProcessArgumentsParser::s_fwdHeaderFileType, QDir::cleanPath(GetFileSystemAcceptableEntryPath(baseFilePath + QStringLiteral("_fwd.h"))));
 	retVal.insert(ISdlProcessArgumentsParser::s_sourceFileType, QDir::cleanPath(GetFileSystemAcceptableEntryPath(baseFilePath + QStringLiteral(".cpp"))));
+	if (argumentParser.IsObjectsGenerationEnabled()) {
+		retVal.insert(ISdlProcessArgumentsParser::s_objectHeaderFileType, QDir::cleanPath(GetFileSystemAcceptableEntryPath(baseFilePath + ISdlProcessArgumentsParser::s_objectsFileSuffix + QStringLiteral(".h"))));
+		retVal.insert(ISdlProcessArgumentsParser::s_objectSourceFileType, QDir::cleanPath(GetFileSystemAcceptableEntryPath(baseFilePath + ISdlProcessArgumentsParser::s_objectsFileSuffix + QStringLiteral(".cpp"))));
+	}
 
 	return retVal;
 }
@@ -1456,6 +1474,39 @@ IncludeDirective CSdlTools::CreateCustomDirective(const QString& path)
 	retVal.type = T_HEADER;
 
 	return retVal;
+}
+
+qint64 CSdlTools::CopyData(QIODevice& source, QIODevice& destination)
+{
+	Q_ASSERT_X(source.isOpen() && destination.isOpen(), __func__, "Source and destination MUST be open");
+
+	qint64 totalBytesCopied = 0;
+	std::array<char, 8192> buffer;
+
+	while (!source.atEnd()) {
+		qint64 bytesRead = source.read(buffer.data(), buffer.size());
+
+		if (bytesRead < 0) {
+			qWarning() << "CopyData read error:" << source.errorString();
+
+			return -1;
+		}
+
+		if (bytesRead == 0) {
+			break;
+		}
+
+		qint64 bytesWritten = destination.write(buffer.data(), bytesRead);
+		if (bytesWritten != bytesRead) {
+			qWarning() << "CopyData write error:" << destination.errorString();
+
+			return -1;
+		}
+
+		totalBytesCopied += bytesWritten;
+	}
+
+	return totalBytesCopied;
 }
 
 

@@ -111,7 +111,7 @@ RemoteCollectionView {
 						updateContactInfoInput.m_documentId = documentId
 						updateContactInfoInput.m_email = representationModel
 
-						updateContactInfoRequest.send(updateContactInfoInput)
+						return updateContactInfoRequest.send(updateContactInfoInput)
 					}
 
 					property DocumentId documentIdInput: DocumentId {}
@@ -173,7 +173,7 @@ RemoteCollectionView {
 						updateContactInfoInput.m_documentId = documentId
 						updateContactInfoInput.m_contactInfo = representationModel
 
-						updateContactInfoRequest.send(updateContactInfoInput)
+						return updateContactInfoRequest.send(updateContactInfoInput)
 					}
 
 					property DocumentId documentIdInput: DocumentId {}

@@ -18,6 +18,12 @@ class ISdlProcessArgumentsParser: virtual public istd::IPolymorphic
 public:
 	static inline const QString s_sourceFileType = QStringLiteral("CPP");
 	static inline const QString s_headerFileType = QStringLiteral("H");
+	static inline const QString s_objectHeaderFileType = QStringLiteral("O_H");
+	static inline const QString s_objectSourceFileType = QStringLiteral("O_CPP");
+	static inline const QString s_fwdHeaderFileType = QStringLiteral("FWD_H");
+
+	/// the suffix of the '<Schema>Objects' files. \note it is duplicated in the CMake config (see \c IMT_SDL_OBJECTS_SUFFIX in 'ImtCoreSdlCustomConfig.cmake')
+	static inline const QString s_objectsFileSuffix = QStringLiteral("Objects");
 
 public:
 	enum GeneratorType
@@ -66,6 +72,10 @@ public:
 	virtual QString GetDepFilePath() const = 0;
 	virtual CppGenerationMode GetCppGenerationMode() const = 0;
 	virtual TypenameWriteMode GetTypenameWriteMode() const = 0;
+	/// \returns false if the '<Schema>Objects' files with the QObject based classes (<Type>Object, <Type>ObjectList, union objects) and the QML types registration should not be generated
+	virtual bool IsObjectsGenerationEnabled() const = 0;
+	/// \returns true if the generated source file includes the moc output of the generated headers at its end
+	virtual bool IsMocIncludeEnabled() const = 0;
 
 	// template
 	virtual bool IsTemplateEnabled() const = 0;

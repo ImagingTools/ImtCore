@@ -17,7 +17,7 @@ import imtauthgui 1.0
 PasswordPolicyController {
     id: root
 
-    property string context: ""
+    property string permissionPath: ""
 
     property bool __requestSent: false
 
@@ -32,7 +32,7 @@ PasswordPolicyController {
     }
 
     property GqlSdlRequestSender __policyRequestSender: GqlSdlRequestSender {
-        context: root.context
+        permissionPath: root.permissionPath
         requestType: 1
         gqlCommandId: ImtauthUsersSdlCommandIds.s_getPasswordPolicy
 

@@ -7,6 +7,7 @@ const MemoryController = require('./MemoryController')
 module.exports = {
     rootPath: '',
     root: null,
+    embeddedTranslations: null,
 
     init: function(){ 
         global.queueFlag = []
@@ -51,20 +52,33 @@ module.exports = {
                 return obj
             }
 
+            __translationPrefixes(){
+                if(typeof this.application === 'string') return [this.application]
+                if(Array.isArray(this.application)) return this.application
+                return []
+            }
+
+            __applyEmbeddedTranslations(){
+                let embedded = module.exports.embeddedTranslations
+                if(!embedded || !this.language || this.__languages[this.language]) return
+                this.__languages[this.language] = embedded[this.language] || {}
+            }
+
             translate(sourceText){
+                this.__applyEmbeddedTranslations()
                 let translatedText = this.__languages[this.language]
                 let result = translatedText ? translatedText[sourceText] : sourceText
                 return result ? result : sourceText
             }
 
             SLOT_languageChanged(oldValue, newValue){
-                if(this.application && this.language && !this.__languages[this.language]){
-                    let langPrefixList = []
-                    if(typeof this.application === 'string'){
-                        langPrefixList.push(this.application)
-                    } else if(Array.isArray(this.application)){
-                        langPrefixList = this.application
+                if(this.language && !this.__languages[this.language]){
+                    if(module.exports.embeddedTranslations){
+                        this.__applyEmbeddedTranslations()
+                        return
                     }
+                    if(!this.application) return
+                    let langPrefixList = this.__translationPrefixes()
                     for(let langPrefix of langPrefixList){
                         let xhr = new XMLHttpRequest()
                         if(langPrefix){
@@ -98,12 +112,26 @@ module.exports = {
         
         global.JSContext = Context.create()
 
-        // Qt QString.arg() — replaces %1, %2, ... with arguments
+        // Qt QString.arg(): each value replaces every occurrence of the lowest numbered place marker (%1..%99),
+        // so chained calls ("%1 of %2".arg(a).arg(b)) fill the markers in order
         if (!String.prototype.arg) {
             String.prototype.arg = function(...args) {
                 let result = String(this)
                 for (let i = 0; i < args.length; i++) {
-                    result = result.replace('%' + (i + 1), args[i] !== undefined && args[i] !== null ? String(args[i]) : '')
+                    let lowest = 0
+                    const markerRe = /%(\d{1,2})/g
+                    let match
+                    while ((match = markerRe.exec(result)) !== null) {
+                        const number = parseInt(match[1], 10)
+                        if (number > 0 && (lowest === 0 || number < lowest)) {
+                            lowest = number
+                        }
+                    }
+                    if (lowest === 0) {
+                        break
+                    }
+                    const value = args[i] !== undefined && args[i] !== null ? String(args[i]) : ''
+                    result = result.replace(new RegExp('%' + lowest + '(?!\\d)', 'g'), () => value)
                 }
                 return result
             }
@@ -310,7 +338,7 @@ module.exports = {
             :focus,:active{outline:none;}
             a:focus,a:active{outline:none;}
             nav,footer,header,aside{display:block;}
-            html,body{height:100%;width:100%;font-size:100%;line-height:1;font-size:14px;-ms-text-size-adjust:100%;-moz-text-size-adjust:100%;-webkit-text-size-adjust:100%;}
+            html,body{height:100%;width:100%;font-size:100%;line-height:1;font-size:14px;-ms-text-size-adjust:100%;-moz-text-size-adjust:100%;-webkit-text-size-adjust:100%;pointer-events:all;touch-action:none;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;}
             input,button,textarea{font-family:inherit;}
             input::-ms-clear{display:none;}
             button{cursor:pointer;}
@@ -323,6 +351,10 @@ module.exports = {
             br {}
 
             .pointer {
+                pointer-events: all;
+            }
+
+            html.jq-hittest .jq-mouse {
                 pointer-events: all;
             }
 
@@ -415,7 +447,7 @@ module.exports = {
         </style>`)
 
         this.root = JQModules.QtQuick.Item.create()
-        this.root.__complete()
+        this.root.__completeRoot()
 
         window.addEventListener('resize', ()=>{
             this.beginUpdate()

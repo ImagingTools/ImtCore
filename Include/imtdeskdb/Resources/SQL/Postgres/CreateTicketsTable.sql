@@ -23,3 +23,4 @@ CREATE INDEX IF NOT EXISTS "IX_Tickets_Status" ON "${TableScheme}"."Tickets" ("S
 CREATE INDEX IF NOT EXISTS "IX_Tickets_Priority" ON "${TableScheme}"."Tickets" ("Priority");
 CREATE INDEX IF NOT EXISTS "IX_Tickets_CreatedAt" ON "${TableScheme}"."Tickets" ("CreatedAt");
 CREATE INDEX IF NOT EXISTS "IX_Tickets_Number" ON "${TableScheme}"."Tickets" ("Number");
+CREATE INDEX IF NOT EXISTS "IX_Tickets_ConversationId" ON "${TableScheme}"."Tickets" ("ConversationId");

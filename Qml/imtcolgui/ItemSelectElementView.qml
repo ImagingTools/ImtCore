@@ -115,6 +115,42 @@ ElementView {
 		}
 	}
 
+	// Opens the picker below anchorItem, e.g. an add button placed outside this view.
+	function openSelector(anchorItem) {
+		var known = []
+		var ids = []
+		for (var j = 0; j < itemSelectElementView.items.length; j++) {
+			var item = itemSelectElementView.items[j]
+			known.push({ id: item.id, title: item.name || item.id })
+			ids.push(item.id)
+		}
+		var point = anchorItem.mapToItem(null, 0, anchorItem.height)
+		ModalDialogManager.openDialog(selectComp, {
+			"x": point.x,
+			"y": point.y,
+			"knownItems": known,
+			"preselectedIds": ids
+		})
+	}
+
+	function removeItem(itemId) {
+		var arr = []
+		var removedIndex = -1
+		var removedData = null
+		for (var k = 0; k < itemSelectElementView.items.length; k++) {
+			var it = itemSelectElementView.items[k]
+			if (it && it.id === itemId) {
+				removedIndex = k
+				removedData = it
+			}
+			else {
+				arr.push(it)
+			}
+		}
+		if (removedIndex >= 0)
+			itemSelectElementView.__applyRemoval(arr, removedIndex, removedData)
+	}
+
 	function __applyRemoval(newItems, removedIndex, removedData) {
 		itemSelectElementView.items = newItems
 		itemSelectElementView.itemRemoved(removedIndex, removedData)
@@ -153,21 +189,7 @@ ElementView {
 				hoverEnabled: true
 				cursorShape: Qt.PointingHandCursor
 				onClicked: {
-					var known = []
-					for (var j = 0; j < itemSelectElementView.items.length; j++) {
-						var item = itemSelectElementView.items[j]
-						known.push({ id: item.id, title: item.name || item.id })
-					}
-					var ids = []
-					for (var i = 0; i < itemSelectElementView.items.length; i++)
-						ids.push(itemSelectElementView.items[i].id)
-					var point = addBtn.mapToItem(null, 0, addBtn.height)
-					ModalDialogManager.openDialog(selectComp, {
-						"x": point.x,
-						"y": point.y,
-						"knownItems": known,
-						"preselectedIds": ids
-					})
+					itemSelectElementView.openSelector(addBtn)
 				}
 			}
 		}

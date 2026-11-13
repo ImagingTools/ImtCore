@@ -141,17 +141,19 @@ Item {
 		}
 	}
 
-	TabPanel {
+	// Result categories as centered toggle buttons, the same as Dashboard / User Actions / Analytics on Workspace.
+	Item {
 		id: tabPanelContainer;
 		anchors.top: parent.top;
-		anchors.topMargin: Style.marginXL;
-		anchors.horizontalCenter: parent.horizontalCenter;
-		maxWidth: parent.width
-		height: Style.controlHeightM;
+		anchors.left: parent.left;
+		anchors.right: parent.right;
+		height: visible ? Style.controlHeightM + 2 * Style.marginM : 0;
 		visible: false;
-		spacing: Style.marginXS;
-		color: Style.baseColor;
-		selectedIndex: -1;
+		clip: true;
+
+		property int selectedIndex: -1;
+		property var model: null;
+
 		onSelectedIndexChanged: {
 			if (selectedIndex >= 0){
 				table.resetSelection();
@@ -172,74 +174,67 @@ Item {
 				}
 			}
 		}
-		onLeftClicked: {
-			if (selectedIndex > 0){
-				selectedIndex--;
-				tabPanelContainer.viewTabInListView(selectedIndex);
-			}
-		}
-		onRightClicked: {
-			let count = root.categories && root.categories.m_searchResults ? root.categories.m_searchResults.count : 0;
-			if (selectedIndex < count - 1){
-				selectedIndex++;
-				tabPanelContainer.viewTabInListView(selectedIndex);
-			}
-		}
-		tabDelegate:  Component { TabDelegate {
-				height: tabPanelContainer.height;
+		Row {
+			anchors.centerIn: parent;
+			spacing: Style.spacingS;
 
-				tabPanel: tabPanelContainer;
-				isCloseEnable: tabPanelContainer.isCloseEnable;
-				// listView: ;
-				decorator: tabPanelContainer.tabDelegateDecorator;
-				text: (model.item && model.item.m_name ? model.item.m_name : "") + (model.item && model.item.m_totalCount && model.item.m_totalCount > 0 ? (" (" + model.item.m_totalCount + ")") : "")
+			Repeater {
+				model: tabPanelContainer.model;
 
-				onCloseSignal: {
-					tabPanelContainer.closeItem(model.index);
-				}
-			} }
-		tabDelegateDecorator: Component {
-			DecoratorBase {
-				id: tabPanelDecorator;
-				
-				width: text.width + 2 * Style.marginXS;
-				height: baseElement ? baseElement.height : Style.headerHeight
-				
-				Row {
-					id: content;
-					anchors.centerIn: parent;
-					height: tabPanelDecorator.height;
-					spacing: Style.marginM;
-					
-					Text {
-						id: text;
-						anchors.verticalCenter: content.verticalCenter;
-						color: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.selected ? Style.textSelectedColor : Style.textColor;
-						font.family: Style.fontFamily;
-						font.pixelSize: Style.fontSizeM;
-						font.bold: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.selected;
-						text: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.text : "";
-						elide: Text.ElideRight;
+				delegate: Button {
+					id: categoryButton;
+					// Tests address the categories as Tab0, Tab1, ...
+					objectName: "Tab" + model.index;
+
+					height: Style.controlHeightM;
+					widthFromDecorator: true;
+					checked: tabPanelContainer.selectedIndex === model.index;
+					text: (model.item && model.item.m_name ? model.item.m_name : "") + (model.item && model.item.m_totalCount && model.item.m_totalCount > 0 ? (" (" + model.item.m_totalCount + ")") : "");
+
+					decorator: Component {
+						TopButtonDecorator {
+							color: !baseElement ? "transparent" : baseElement.checked ? Style.selectedColor : baseElement.mouseArea.containsMouse ? Style.toolButtonHoverColor : "transparent";
+							textColor: Style.textColor;
+							border.width: 0;
+							radius: Style.buttonRadius;
+						}
+					}
+
+					onClicked: {
+						tabPanelContainer.selectedIndex = model.index;
 					}
 				}
-				
-				// only blue strip for active tab, with radius like item cards
-				Rectangle {
-					anchors.bottom: parent.bottom;
-					anchors.horizontalCenter: parent.horizontalCenter;
-					width: text.width + Style.marginM;
-					height: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.selected ? 3 : 0;
-					color: Style.textSelectedColor;
-					radius: Style.radiusM;
-				}
 			}
+		}
+
+		Rectangle {
+			anchors.bottom: parent.bottom;
+			width: parent.width;
+			height: 1;
+			color: Style.borderColor;
 		}
 	}
 	
+	Text {
+		id: resultsSummary;
+		anchors.top: tabPanelContainer.bottom;
+		anchors.topMargin: Style.marginM;
+		anchors.left: table.left;
+		anchors.leftMargin: Style.marginM;
+		visible: tabPanelContainer.visible && root.activeTotal > 0;
+		height: visible ? implicitHeight : 0;
+		text: root.activeTotal === 1 ? qsTr("1 result") : qsTr("%1 results").arg(root.activeTotal);
+		font.family: Style.fontFamily;
+		font.pixelSize: Style.fontSizeS;
+		color: Style.subtitleColor;
+	}
+
+	// A plain list in the VS Code sense: rows without frames, hover and selection washes,
+	// the open action shown only on the row in use.
 	Table {
 		id: table;
-		anchors.top: tabPanelContainer.bottom;
-		anchors.topMargin: Style.marginXL;
+		anchors.top: resultsSummary.bottom;
+		anchors.topMargin: Style.spacingS;
 		anchors.bottom: parent.bottom;
 		anchors.bottomMargin: Style.marginM;
 		anchors.horizontalCenter: parent.horizontalCenter;
@@ -247,42 +242,81 @@ Item {
 		visible: tabPanelContainer.visible;
 		showHeaders: false;
 		backgroundElementsColor: Style.baseColor;
-		elementsSpacing: Style.marginM;
+		elementsSpacing: Style.spacingXXS;
 		enableAlternating: false;
-		itemHeight: 70;
+		itemHeight: Style.controlHeightL + Style.marginM;
 		rowDelegate: Component {
 			TableRowDelegateBase {
 				id: tableDelegate;
 				tableItem: table
 				width: table.elementsListWidth - Style.marginM;
-				height: elementView.height;
+				height: table.itemHeight;
 				selectedOpacity: 0;
 				hoverOpacity: 0;
-				
+				selectedColor: "transparent";
+				hoverColor: "transparent";
+				focusOutlineVisible: false;
+
 				Component.onCompleted: {
 					tableDelegate.mouseArea.cursorShape = Qt.PointingHandCursor;
 				}
-				
-				ElementView {
-					id: elementView;
+
+				Rectangle {
+					id: resultRow;
 					z: tableDelegate.z + 1;
-					width: tableDelegate.width;
-					name: model.item.m_resultName;
-					description: model.item.m_resultDescription;
-					color: tableDelegate.mouseArea.containsMouse || tableDelegate.selected ? Style.alternateBaseColor : Style.baseColor;
-					controlComp: button;
-					
-					Component {
-						id: button;
-						ToolButton {
-							width: Style.buttonWidthS;
-							height: width;
-							iconSource: "../../../" + Style.getIconPath("Icons/ExternalLink", Icon.State.On, Icon.Mode.Normal);
-							tooltipText: qsTr("Go to the content");
-							onClicked: {
-								table.select(model.index);
-								table.doubleClicked("", model.index)
+					anchors.fill: parent;
+					radius: Style.radiusM;
+					color: tableDelegate.selected ? Style.selectedColor : tableDelegate.mouseArea.containsMouse ? Style.hover : "transparent";
+					border.width: tableDelegate.selected ? 1 : 0;
+					border.color: Style.focusRingColor;
+
+					Column {
+						anchors.left: parent.left;
+						anchors.leftMargin: Style.marginM;
+						anchors.right: openButton.left;
+						anchors.rightMargin: Style.marginS;
+						anchors.verticalCenter: parent.verticalCenter;
+						spacing: Style.spacingXXS;
+
+						Text {
+							width: parent.width;
+							text: model.item.m_resultName;
+							font.family: Style.fontFamily;
+							font.pixelSize: Style.fontSizeM;
+							color: Style.textColor;
+							elide: Text.ElideRight;
+						}
+
+						Text {
+							width: parent.width;
+							visible: text !== "";
+							text: model.item.m_resultDescription ? model.item.m_resultDescription : "";
+							font.family: Style.fontFamily;
+							font.pixelSize: Style.fontSizeS;
+							color: Style.subtitleColor;
+							elide: Text.ElideRight;
+						}
+					}
+
+					ToolButton {
+						id: openButton;
+						anchors.right: parent.right;
+						anchors.rightMargin: Style.marginS;
+						anchors.verticalCenter: parent.verticalCenter;
+						width: Style.controlHeightS;
+						height: width;
+						visible: tableDelegate.selected || tableDelegate.mouseArea.containsMouse;
+						iconSource: "../../../" + Style.getIconPath("Icons/ExternalLink", Icon.State.On, Icon.Mode.Normal);
+						tooltipText: qsTr("Go to the content");
+						decorator: Component {
+							ToolButtonDecorator {
+								radius: Style.buttonRadius;
+								icon.width: Style.iconSizeS;
 							}
+						}
+						onClicked: {
+							table.select(model.index);
+							table.doubleClicked("", model.index)
 						}
 					}
 				}
@@ -334,11 +368,15 @@ Item {
 		}
 	}
 	
-	Loading {
+	SkeletonTableView {
 		id: loading;
 		anchors.fill: parent;
-		background.color: Style.baseColor
-		visible: false;
+		headerVisible: false;
+		cardRows: true;
+		rowHeight: table.itemHeight;
+		rowSpacing: table.elementsSpacing;
+		contentMaxWidth: table.width;
+		contentTopMargin: Style.controlHeightM + 2 * Style.marginM + Style.marginM;
 	}
 }
 

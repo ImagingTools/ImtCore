@@ -160,9 +160,11 @@ QtObject {
 	function fetchAllPermissions() {}
 
 	// Tenant-scoped permissions (filtered by tenant's tenantPermissions) — for RoleView
+	property string rolePermissionsTenantId: ""
 	property var tenantPermissions: []
 	signal tenantPermissionsReceived()
 	function fetchTenantPermissions(tenantId) {}
+	function invalidateTenantPermissions() {}
 
 	// --- Cross-org grants ---
 	property var crossOrgGrantDocumentManager: null
@@ -205,7 +207,7 @@ QtObject {
 	// --- Relationship Proposals ---
 	property var relationshipProposalsModel: null
 	function fetchRelationshipProposals(tenantId) {}
-	function createRelationshipProposal(connectionId, initiatorTenantId, proposalType, proposedSourceRole, proposedTargetRole, proposedScope, proposedDescription, message) {}
+	function createRelationshipProposal(initiatorTenantId, counterpartyTenantId, proposalType, existingRelationshipId, proposedSourceRole, proposedTargetRole, proposedScope, proposedDescription) {}
 	function approveRelationshipProposal(proposalId, tenantId) {}
 	function rejectRelationshipProposal(proposalId, tenantId) {}
 	function cancelRelationshipProposal(proposalId, tenantId) {}

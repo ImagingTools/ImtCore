@@ -31,6 +31,9 @@ public:
 	// reimplemented (IRequest)
 	virtual RequestState GetState() const override;
 	virtual MethodType GetMethodType() const override;
+	virtual bool IsConnectionPersistent() const override;
+	virtual bool IsResponseBodyOmitted() const override;
+	virtual bool IsChunkedResponseAllowed() const override;
 public:
 	virtual bool ParseDeviceData(QIODevice& device) override;
 	QUdpSocket *m_socket;

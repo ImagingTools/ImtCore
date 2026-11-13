@@ -4682,7 +4682,7 @@
 
 **Свойства**
 
-- `rowDelegate: TableRowDelegateBase`
+- `rowDelegate: var`
 - `table: var`
 - `columnCount: int`
 - `rowCount: int`
@@ -4781,7 +4781,7 @@
 
 **Свойства**
 
-- `rowDelegate: TableRowDelegateBase`
+- `rowDelegate: var`
 - `columnIndex: int`
 
 <a id="b-imtcontrols-TableCellTextDelegate"></a>
@@ -9110,6 +9110,8 @@
 - `clear()`
 - `filterChanged()`
 - `clearAllFilters(bool beQuiet)`
+- `filterDependencyAdded(string filterId, string dependsOnFilterId)`
+- `filterDelegateLoaded(string filterId)`
 
 **Функции**
 
@@ -9118,7 +9120,9 @@
 - `registerFieldFilterDelegate(filterId, filterDelegateComp)`
 - `removeFieldFilterDelegate(filterId)`
 - `getFilterDelegate(filterId)`
+- `setFilterDelegate(index, item)`
 - `setFilterDependency(filterId, dependsOnFilterId)`
+- `getDependsOn(filterId)`
 - `hasDependsOn(filterId, dependsOnFilterId)`
 
 <a id="b-imtgui-FilterPanelDecorator"></a>

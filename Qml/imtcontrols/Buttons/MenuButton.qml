@@ -14,7 +14,7 @@ Button{
 	property var popup: null;
 
 	property real popupMenuWidth: width
-	property int itemHeight: Style.controlHeightM;
+	property int itemHeight: Style.controlHeightS + Style.spacingXS;
 	property string displayId: "name"
 	property string elementIdName: "id"
 	property bool mainClickByModel: true

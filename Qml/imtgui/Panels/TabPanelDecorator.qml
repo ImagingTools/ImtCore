@@ -6,94 +6,149 @@ import imtcontrols 1.0
 DecoratorBase {
 	id: tabPanelDecorator;
 
-	width: content.width + 2 * Style.marginM;
+	width: content.width + 2 * Style.marginS;
 	height: baseElement ? baseElement.height : Style.headerHeight
 
 	property bool textIsCropped: textHelper.text != "" && textHelper.width > text.width;
 
 	property bool isSelected: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.selected : false;
 	property bool isHovered: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.mouseArea
-			? tabPanelDecorator.baseElement.mouseArea.containsMouse : false;
+			? tabPanelDecorator.baseElement.mouseArea.containsMouse || tabPanelDecorator.closeHovered : false;
+	// Set from a handler, not bound: the close button's enabled state follows this hover, a binding would loop.
+	property bool closeHovered: false;
+	property bool isPinned: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.pinned : false;
 	property bool canClose: tabPanelDecorator.baseElement
-			&& !tabPanelDecorator.baseElement.pinned
+			&& !tabPanelDecorator.isPinned
 			&& tabPanelDecorator.baseElement.isCloseEnable;
 	property bool showClose: tabPanelDecorator.canClose && (tabPanelDecorator.isSelected || tabPanelDecorator.isHovered);
-	property int closeSlotSize: Style.iconSizeS;
+	// VS Code: a modified tab always shows a dot where the close button sits; pointing at the dot turns it into the close button.
+	property bool isDirty: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.dirty !== undefined ? tabPanelDecorator.baseElement.dirty : false;
+	property bool showDirtyDot: tabPanelDecorator.canClose && tabPanelDecorator.isDirty && !closeButton.hovered;
+	property int closeSlotSize: Style.iconSizeM;
+
+	property bool showBackground: tabPanelDecorator.isSelected || tabPanelDecorator.isHovered;
+	property string backgroundColor: tabPanelDecorator.isSelected ? Style.baseColor : Style.toolButtonHoverColor;
+	property string stripColor: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.tabPanel
+			? tabPanelDecorator.baseElement.tabPanel.color : Style.tabPanelBackgroundColor;
+	property int cornerRadius: Style.radiusM;
+	property int flareRadius: Style.radiusS;
+
+	property bool signalLoading: false;
+	property bool isLoading: tabPanelDecorator.signalLoading || (tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.contentLoading : false);
 
 	Connections {
 		target: tabPanelDecorator.baseElement;
 
 		function onStartContentLoading(){
-			loading.start();
+			tabPanelDecorator.signalLoading = true;
 		}
 
 		function onStopContentLoading(){
-			loading.stop();
+			tabPanelDecorator.signalLoading = false;
 		}
 	}
 
+	Connections {
+		target: closeButton.mouseArea;
+
+		function onContainsMouseChanged(){
+			tabPanelDecorator.closeHovered = closeButton.mouseArea.containsMouse;
+		}
+	}
+
+	// Selected tab: the second rectangle squares off the bottom corners; not on hover, where the translucent overlap shows as a strip.
 	Rectangle {
+		id: background;
+
 		anchors.fill: tabPanelDecorator;
-		anchors.topMargin: Style.marginXS;
-		anchors.bottomMargin: Style.marginXS;
-		anchors.leftMargin: 2;
-		anchors.rightMargin: 2;
-		radius: Style.marginS;
-		color: Style.alternateBaseColor;
-		visible: tabPanelDecorator.isHovered && !tabPanelDecorator.isSelected;
+		anchors.topMargin: 1;
+		radius: tabPanelDecorator.cornerRadius;
+		color: tabPanelDecorator.backgroundColor;
+		visible: tabPanelDecorator.showBackground;
 	}
 
 	Rectangle {
-		anchors.right: tabPanelDecorator.right;
-		anchors.verticalCenter: tabPanelDecorator.verticalCenter;
-
-		width: 1;
-		height: tabPanelDecorator.height / 2;
-
-		visible: tabPanelDecorator.baseElement
-				 ? tabPanelDecorator.baseElement.index < tabPanelDecorator.baseElement.listView.count - 1 &&
-				   !tabPanelDecorator.baseElement.selected &&
-				   (tabPanelDecorator.baseElement.index + 1) !== tabPanelDecorator.baseElement.selectedIndex
-				 : false;
-
-		color: Style.borderColor;
-		opacity: 0.55;
-	}
-
-	Rectangle {
-		id: selection;
-
-		anchors.bottom: tabPanelDecorator.bottom;
 		anchors.left: tabPanelDecorator.left;
 		anchors.right: tabPanelDecorator.right;
+		anchors.bottom: tabPanelDecorator.bottom;
+		height: tabPanelDecorator.cornerRadius;
+		color: tabPanelDecorator.backgroundColor;
+		visible: tabPanelDecorator.isSelected;
+	}
 
-		height: tabPanelDecorator.isSelected ? 2 : 0;
+	// Concave corners that flow the selected tab into the page below.
+	Item {
+		id: leftFlare;
 
-		color: Style.textSelectedColor;
+		anchors.right: tabPanelDecorator.left;
+		anchors.bottom: tabPanelDecorator.bottom;
+		width: tabPanelDecorator.flareRadius;
+		height: tabPanelDecorator.flareRadius;
+		clip: true;
+		visible: tabPanelDecorator.isSelected;
+
+		Rectangle {
+			anchors.fill: parent;
+			color: tabPanelDecorator.backgroundColor;
+		}
+
+		Rectangle {
+			x: -tabPanelDecorator.flareRadius;
+			y: -tabPanelDecorator.flareRadius;
+			width: 2 * tabPanelDecorator.flareRadius;
+			height: width;
+			radius: tabPanelDecorator.flareRadius;
+			color: tabPanelDecorator.stripColor;
+		}
+	}
+
+	Item {
+		id: rightFlare;
+
+		anchors.left: tabPanelDecorator.right;
+		anchors.bottom: tabPanelDecorator.bottom;
+		width: tabPanelDecorator.flareRadius;
+		height: tabPanelDecorator.flareRadius;
+		clip: true;
+		visible: tabPanelDecorator.isSelected;
+
+		Rectangle {
+			anchors.fill: parent;
+			color: tabPanelDecorator.backgroundColor;
+		}
+
+		Rectangle {
+			x: 0;
+			y: -tabPanelDecorator.flareRadius;
+			width: 2 * tabPanelDecorator.flareRadius;
+			height: width;
+			radius: tabPanelDecorator.flareRadius;
+			color: tabPanelDecorator.stripColor;
+		}
 	}
 
 	Row {
 		id: content;
-		anchors.centerIn: tabPanelDecorator;
-		height: tabPanelDecorator.height;
-		spacing: Style.marginM;
-		visible: !loading.visible;
+
+		anchors.left: tabPanelDecorator.left;
+		anchors.leftMargin: Style.marginS;
+		anchors.top: background.top;
+		anchors.bottom: tabPanelDecorator.bottom;
+		spacing: Style.spacingS;
 
 		Item {
 			id: imagetabDelegate;
 			anchors.verticalCenter: parent.verticalCenter;
 			width: visible ? firsElementImage.width : 0;
-			height: tabPanelDecorator.height;
+			height: parent.height;
 			visible: firsElementImage.status === Image.Ready;
 
 			Image {
 				id: firsElementImage;
 				anchors.centerIn: imagetabDelegate;
-				width: Style.iconSizeM;
+				width: Style.iconSizeS;
 				height: width;
-				// The tab you are on, or the one under the pointer, takes the full
-				// strength foreground; the rest stay muted. Swapped, not faded.
-				source: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.icon !== "" ? "../../../" + Style.getIconPath(tabPanelDecorator.baseElement.icon, "On", tabPanelDecorator.isSelected || tabPanelDecorator.isHovered ? "Active" : "Normal"): "";
+				source: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.icon !== "" ? "../../../" + Style.getIconPath(tabPanelDecorator.baseElement.icon, "On", tabPanelDecorator.isSelected ? "Active" : "Normal"): "";
 				sourceSize.width: width;
 				sourceSize.height: height;
 				fillMode: Image.PreserveAspectFit;
@@ -106,9 +161,9 @@ DecoratorBase {
 			anchors.verticalCenter: parent.verticalCenter;
 
 			width: tabPanelDecorator.baseElement && textHelper.width < tabPanelDecorator.baseElement.minWidth ? tabPanelDecorator.baseElement.minWidth :
-																												tabPanelDecorator.baseElement && textHelper.width > tabPanelDecorator.baseElement.maxWidth ? tabPanelDecorator.baseElement.maxWidth : textHelper.width + 10;
+																												tabPanelDecorator.baseElement && textHelper.width > tabPanelDecorator.baseElement.maxWidth ? tabPanelDecorator.baseElement.maxWidth : textHelper.width + 2;
 
-			height: tabPanelDecorator.height;
+			height: parent.height;
 
 			clip: true;
 
@@ -118,8 +173,7 @@ DecoratorBase {
 				visible: false;
 
 				text: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.text : "";
-				font.family: tabPanelDecorator.isSelected || (tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.pinned) ? Style.fontFamilyBold : Style.fontFamily;
-				font.bold: tabPanelDecorator.isSelected || (tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.pinned);
+				font.family: Style.fontFamily;
 				font.pixelSize: Style.fontSizeM;
 			}
 
@@ -127,28 +181,61 @@ DecoratorBase {
 				id: text;
 
 				anchors.verticalCenter: parent.verticalCenter;
-				anchors.horizontalCenter: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.pinned ||
-										  tabPanelDecorator.baseElement && textHelper.width < tabPanelDecorator.baseElement.minWidth ? parent.horizontalCenter : undefined;
+				anchors.left: parent.left;
 
-				width: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.pinned ? textHelper.width : parent.width;
+				width: parent.width;
+				horizontalAlignment: tabPanelDecorator.isPinned ? Text.AlignHCenter : Text.AlignLeft;
+				visible: !tabPanelDecorator.isLoading;
 
-				color: tabPanelDecorator.isSelected ? Style.titleColor : (tabPanelDecorator.isHovered ? Style.textColor : Style.subtitleColor);
-				font.family: tabPanelDecorator.isSelected || (tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.pinned) ? Style.fontFamilyBold : Style.fontFamily;
-				font.bold: tabPanelDecorator.isSelected || (tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.pinned);
+				color: tabPanelDecorator.isSelected ? Style.textColor : Style.subtitleColor;
+				font.family: Style.fontFamily;
 				font.pixelSize: Style.fontSizeM;
 				text: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.text : "";
 
 				elide: Text.ElideRight;
 			}
+
+			SkeletonBlock {
+				anchors.verticalCenter: parent.verticalCenter;
+				anchors.left: parent.left;
+				width: parent.width;
+				height: Style.iconSizeXXS;
+				visible: tabPanelDecorator.isLoading;
+				animated: visible;
+			}
 		}
 
+		// The pin of a pinned tab takes the place of its close button.
 		Item {
 			id: closeSlot;
 
 			anchors.verticalCenter: parent.verticalCenter;
-			width: tabPanelDecorator.canClose ? tabPanelDecorator.closeSlotSize : 0;
+			width: tabPanelDecorator.canClose || tabPanelDecorator.isPinned ? tabPanelDecorator.closeSlotSize : 0;
 			height: tabPanelDecorator.closeSlotSize;
-			visible: tabPanelDecorator.canClose;
+			visible: tabPanelDecorator.canClose || tabPanelDecorator.isPinned;
+
+			Image {
+				id: pinImage;
+				anchors.centerIn: parent;
+				width: Style.iconSizeXS;
+				height: width;
+				visible: tabPanelDecorator.isPinned;
+				source: tabPanelDecorator.isPinned ? "../../../" + Style.getIconPath("Icons/Pin", "On", tabPanelDecorator.isSelected ? "Active" : "Normal") : "";
+				sourceSize.width: width;
+				sourceSize.height: height;
+				fillMode: Image.PreserveAspectFit;
+			}
+
+			Rectangle {
+				id: dirtyDot;
+				objectName: "DirtyIndicator"
+				anchors.centerIn: parent;
+				width: Style.spacingS;
+				height: width;
+				radius: width / 2;
+				color: tabPanelDecorator.isSelected ? Style.textColor : Style.subtitleColor;
+				visible: tabPanelDecorator.showDirtyDot;
+			}
 
 			ToolButton {
 				id: closeButton;
@@ -156,12 +243,13 @@ DecoratorBase {
 				anchors.centerIn: parent;
 				width: tabPanelDecorator.closeSlotSize;
 				height: tabPanelDecorator.closeSlotSize;
-				opacity: tabPanelDecorator.showClose ? 1 : 0;
-				enabled: tabPanelDecorator.showClose;
+				visible: tabPanelDecorator.canClose;
+				opacity: tabPanelDecorator.showDirtyDot ? 0 : tabPanelDecorator.showClose || closeButton.hovered ? 1 : 0;
+				enabled: tabPanelDecorator.showClose || tabPanelDecorator.isDirty;
 				iconSource: "qrc:/" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
 				decorator: Component {
 					ToolButtonDecorator {
-						color: "transparent";
+						radius: Style.radiusS;
 						icon.width: 10;
 					}
 				}
@@ -172,18 +260,4 @@ DecoratorBase {
 			}
 		}
 	}
-
-	Loading {
-		id: loading;
-		anchors.verticalCenter: tabPanelDecorator.verticalCenter;
-		x: content.x + texttabDelegate.x + (texttabDelegate.width - width) / 2;
-		width: Style.controlHeightS;
-		height: Style.controlHeightS;
-		indicatorSize: Style.iconSizeS;
-		background.color: "transparent";
-		visible: false;
-		z: 5;
-	}
 }
-
-

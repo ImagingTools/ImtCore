@@ -9,6 +9,7 @@ add_custom_target(${PROJECT_NAME}-SDL-related-files SOURCES
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/ImtBaseTypes.sdl
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/ComplexCollectionFilter.sdl
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/ImtCollection.sdl
+			${CMAKE_CURRENT_LIST_DIR}/../1.0/DocumentShares.sdl
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/DocumentRevision.sdl
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/MimeType.sdl
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/DocumentCollectionFilter.sdl
@@ -34,6 +35,10 @@ ImtCoreCustomConfigureSdlCppQml(CXX QML
 
 ImtCoreCustomConfigureSdlCppQml(CXX QML
 	SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/ImtCollection.sdl"
+	VERSION		"1.0")
+
+ImtCoreCustomConfigureSdlCppQml(CXX QML
+	SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/DocumentShares.sdl"
 	VERSION		"1.0")
 
 ImtCoreCustomConfigureSdlCppQml(CXX QML

@@ -14,6 +14,8 @@ CollectionViewCommandsDelegateBase {
 	/*deprecated*/property string viewTypeId;
 
 	property string documentManagerId: collectionId;
+	// Permission area of the revisions of the collection, e.g. "/SensorManagement/Revisions".
+	property string revisionsPermissionPath: "";
 
 	property var documentTypeIds: [];
 	/*deprecated*/property var documentViewTypeIds: [];
@@ -139,6 +141,11 @@ CollectionViewCommandsDelegateBase {
 				let itemId = elementsModel.getData("id", index);
 				let typeId = elementsModel.getData("typeId", index);
 				let documentName = ""
+				let accessLevel = elementsModel.containsKey("sharingAccess", index) ? String(elementsModel.getData("sharingAccess", index)) : ""
+				if (collectionViewCommandsDelegateBase.documentManager){
+					collectionViewCommandsDelegateBase.documentManager.setObjectReadOnly(itemId, accessLevel === "View")
+				}
+
 				if (elementsModel.containsKey("name", index))
 					documentName = elementsModel.getData("name", index)
 				else if (elementsModel.containsKey("mainText", index))
@@ -197,6 +204,7 @@ CollectionViewCommandsDelegateBase {
 
 		DocumentRevisionDialog {
 			collectionId: collectionViewCommandsDelegateBase.collectionId
+			revisionsPermissionPath: collectionViewCommandsDelegateBase.revisionsPermissionPath
 			function getHeaders(){
 				return collectionViewCommandsDelegateBase.getHeaders();
 			}

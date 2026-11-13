@@ -95,6 +95,7 @@ public:
 	// reimplemented (imtdoc::IPersistentUndoManager)
 	virtual void InitializeDocumentContext(const QByteArray& documentId, const QByteArray& documentTypeId) override;
 	virtual void ResetHistory() override;
+	virtual bool RemoveAllDocumentContexts() override;
 
 	// reimplemented (imod::IObserver)
 	virtual bool OnModelAttached(imod::IModel* modelPtr, istd::IChangeable::ChangeSet& changeMask) override;
@@ -130,6 +131,7 @@ protected:
 				UndoList& undoList,
 				const iser::CArchiveTag& listTag,
 				const iser::CArchiveTag& stepTag) const;
+	void RemoveStoredStepsFromDisk() const;
 	void SetStepFileAutoRemoveEnabled(bool value);
 	UndoStep* CreateStep(iser::ISerializable& object, const QString& stepFileName);
 	bool RestoreObject(const UndoStep& state, iser::ISerializable& object);

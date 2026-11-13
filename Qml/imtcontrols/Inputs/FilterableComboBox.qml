@@ -10,7 +10,7 @@ ComboBox {
 	property var filteringFields: [comboBoxContainer.nameId];
 	property string descriptionFieldId;
 	
-	itemHeight: 35;
+	itemHeight: Style.controlHeightS + Style.spacingXS;
 	
 	property var sourceModel;
 	

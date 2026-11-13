@@ -2771,7 +2771,7 @@
 - `tryCloseDirtyDocument(string documentId, var callback)`
 - `documentViewRegistered(string typeId, string viewTypeId)`
 - `documentAlreadyOpened(string documentId, string typeId)`
-- `documentReady(string documentId)`
+- `documentReady(string documentId, string typeId, bool isNew, var representationController)`
 
 **Функции**
 
@@ -2806,6 +2806,7 @@
 - `setDocumentName(documentId, name)`
 - `getDocumentName(documentId)`
 - `documentIsDirty(documentId)`
+- `documentIsReadOnly(documentId)`
 - `documentIsLoading(documentId)`
 - `setDocumentIsLoading(documentId, isLoading)`
 - `setDocumentIsDirty(documentId, isDirty)`
@@ -2816,7 +2817,7 @@
 - `setDocumentServiceActiveView(view)`
 - `setAutoNamedTypeId(typeId, hasProvider)`
 - `hasDocumentNameProvider(typeId)`
-- `handleDocumentOpened(documentId, objectId, objectTypeId, documentName, hasNameProvider, isDirty)`
+- `handleDocumentOpened(documentId, objectId, objectTypeId, documentName, hasNameProvider, isDirty, isDataLoaded, isReadOnly)`
 - `handleDocumentCreated(documentId, objectTypeId, documentName, hasNameProvider, proposedObjectId, isDirty)`
 - `handleSaveDocumentResult(documentId, status, message, documentName)`
 - `handleCloseDocumentResult(documentId, status)`

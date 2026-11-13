@@ -10,10 +10,10 @@ Build the package once:
 npm run package-extension
 ```
 
-This creates `vscode-extension/jqml-1.0.4.vsix`. Then install it into VS Code in any of these ways:
+This creates `vscode-extension/jqml.vsix`. The file name does not change between builds. Then install it into VS Code in any of these ways:
 
-- Command Palette: **Extensions: Install from VSIX...** and pick the `.vsix` file
-- CLI: `code --install-extension Tools/JQML/v3/vscode-extension/jqml-1.0.4.vsix`
+- Command Palette: **Extensions: Install from VSIX...** and pick `jqml.vsix`
+- CLI: `code --install-extension Tools/JQML/v3/vscode-extension/jqml.vsix`
 
 After that the extension is a normal installed extension. It starts itself when you open a `.qml` file. Restart VS Code if it does not appear immediately.
 
@@ -26,6 +26,8 @@ If another QML extension already claims `.qml`, set:
 ```
 
 Ctrl+click a property, method, or signal to jump to its declaration (QML or inherited engine file). Names starting with `__` are not offered in completions.
+
+Breakpoints can be set in `.qml` files only. The extension does not enable breakpoints for other languages.
 
 ## Settings
 

@@ -32,6 +32,9 @@ protected:
 	virtual QByteArrayList GetFeatureDependencies(const QByteArray& featureId) const override;
 	virtual const imtlic::IFeatureInfoProvider* GetDependencyContainer(const QByteArray& dependencyId) const override;
 
+private:
+	QByteArrayList GetDirectFeatureDependencies(const QByteArray& featureId) const;
+
 protected:
 	I_REF(imtbase::IObjectCollection, m_featureCollectionCompPtr);
 };

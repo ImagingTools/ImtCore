@@ -9,7 +9,7 @@ DecoratorBase {
 	id: root;
 
 	height: bottomContentLoader.y + bottomContentLoader.height;
-	property int radius: !baseElement ? Style.radiusL : baseElement.radius;
+	property int radius: !baseElement ? Style.radiusM : baseElement.radius;
 	
 	property int itemHeight: !baseElement ? 0 : baseElement.itemHeight;
 	property int itemWidth: !baseElement ? 0 : baseElement.itemWidth;
@@ -62,6 +62,8 @@ DecoratorBase {
 		visible: popupMenuListView.count > 0;
 
 		radius: root.radius;
+		border.width: 1;
+		border.color: Style.inputBorderColor;
 		clip: true;
 
 		CustomScrollbar {
@@ -122,12 +124,12 @@ DecoratorBase {
 		anchors.fill: itemBody;
 
 		z: itemBody.z-1
-		horizontalOffset: 3;
-		verticalOffset: root.isUpwards ? -3 : 3;
+		horizontalOffset: 0;
+		verticalOffset: root.isUpwards ? -2 : 2;
 
 		visible: !root.baseElement ? false: root.baseElement.hasShadow;
 
-		radius: Style.radiusL;
+		radius: 8;
 		spread: 0;
 		color: Style.shadowColor;
 		source: itemBody;

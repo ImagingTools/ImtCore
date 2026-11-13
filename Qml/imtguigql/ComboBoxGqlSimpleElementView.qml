@@ -23,7 +23,7 @@ ComboBoxElementView {
         ComboBoxGqlSimple {
             id: cb;
 
-            width: root.controlWidth;
+            width: root.fittedControlWidth;
             height: root.controlHeight;
 
             gqlCommandId: root.gqlCommandId;

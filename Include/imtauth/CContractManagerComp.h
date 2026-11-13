@@ -48,7 +48,7 @@ public:
 	virtual Contracts GetContractsByRelationship(const QByteArray& relationshipId) const override;
 
 private:
-	Contracts CollectContracts(const std::function<bool(const ContractInfo&)>& predicate) const;
+	Contracts CollectContracts(const QByteArray& columnId, const QByteArray& value, const std::function<bool(const ContractInfo&)>& predicate) const;
 	bool SetContractStatus(const QByteArray& contractId, ContractStatus status);
 
 private:

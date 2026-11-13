@@ -44,6 +44,10 @@ public:
 	virtual QByteArray CreateJoinTablesQuery() const override;
 	virtual QByteArray GetCustomColumnsQuery() const override;
 
+protected:
+	// reimplemented (imtdb::CSqlDatabaseDocumentDelegateCompBase)
+	virtual QString CreateTenantBindingFilterQuery(const QByteArray& tenantId, imtauth::TenantFilterMode filterMode = imtauth::TFM_INCLUDE) const override;
+
 private:
 	I_REF(imtdb::ISqlDatabaseObjectDelegate, m_userGroupDatabaseDelegateCompPtr);
 	I_REF(imtbase::IObjectCollection, m_userGroupCollectionCompPtr);

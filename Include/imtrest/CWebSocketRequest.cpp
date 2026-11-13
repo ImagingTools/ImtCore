@@ -205,6 +205,35 @@ void CWebSocketRequest::SetCommandId(const QByteArray& commandId)
 
 // reimplemented (IRequest)
 
+bool CWebSocketRequest::IsConnectionPersistent() const
+{
+	// The WebSocket connection is a persistent channel
+	return true;
+}
+
+
+bool CWebSocketRequest::IsResponseBodyOmitted() const
+{
+	return false;
+}
+
+
+bool CWebSocketRequest::IsChunkedResponseAllowed() const
+{
+	// The messages are not HTTP requests: there is no HTTP framing of the response
+	return false;
+}
+
+
+IRequest::HeadAction CWebSocketRequest::TakeHeadAction(QByteArray& message)
+{
+	// A WebSocket message has no head that should be answered before the message is received
+	message.clear();
+
+	return HA_NONE;
+}
+
+
 IRequest::RequestState CWebSocketRequest::GetState() const
 {
 	return m_state;

@@ -16,7 +16,7 @@ TableCellDelegateBase {
 		anchors.leftMargin: Style.marginM
 		width: visible ? 20 : 0
 		height: width
-		visible: source !== ""
+		visible: objectLinkDelegate.imageSource !== ""
 		sourceSize.width: width
 		sourceSize.height: height
 		source: objectLinkDelegate.imageSource
@@ -26,7 +26,9 @@ TableCellDelegateBase {
 		id: linkText
 		anchors.verticalCenter: parent.verticalCenter
 		anchors.left: image.visible ? image.right : parent.left
-		anchors.leftMargin: Style.marginM
+		anchors.leftMargin: objectLinkDelegate.rowDelegate ? objectLinkDelegate.rowDelegate.textLeftMargin : Style.marginS
+		anchors.right: parent.right
+		anchors.rightMargin: objectLinkDelegate.rowDelegate ? objectLinkDelegate.rowDelegate.textRightMargin : Style.marginS
 		font.pixelSize: Style.fontSizeM
 		font.family: Style.fontFamily
 		elide: Text.ElideRight
@@ -35,7 +37,10 @@ TableCellDelegateBase {
 	}
 	
 	MouseArea {
-		anchors.fill: linkText
+		anchors.left: linkText.left
+		anchors.verticalCenter: linkText.verticalCenter
+		width: Math.min(linkText.contentWidth, linkText.width)
+		height: linkText.height
 		hoverEnabled: true
 		cursorShape: Qt.PointingHandCursor
 		onClicked: {

@@ -5,22 +5,8 @@ schema {
 	version: 1.0
 }
 
-type RoleInfo {
-	id: ID
-	name: String
-	description: String
-}
-
-type GroupInfo {
-	id: ID
-	name: String
-	description: String
-}
-
-type PermissionInfo {
-	id: ID
-	name: String
-	description: String
+import {
+	"Assignments.sdl"
 }
 
 type ProfileTenantInfo {
@@ -42,9 +28,11 @@ type ProfileData {
 	name: String
 	email: String
 	currentTenantId: ID
-	roles: [RoleInfo]
-	groups: [GroupInfo]
-	permissions: [PermissionInfo]
+	# What the user holds in the current organization and product, with the paths it comes through.
+	roles: [Assignment]
+	groups: [Assignment]
+	permissions: [Assignment]
+	accessWarnings: [AccessWarning]
 }
 
 type GetUserOrganizationsPayload {

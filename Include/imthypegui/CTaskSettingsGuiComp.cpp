@@ -26,10 +26,8 @@ CTaskSettingsGuiComp::CTaskSettingsGuiComp()
 {
 #if QT_VERSION > 0x060000
 	m_taskNameValidator.setRegularExpression(QRegularExpression("^[^\\\\/:\\*\\?\"\\<\\>\\|\\+]+$"));
-	m_triggerIdValidator.setRegularExpression(QRegularExpression("^[0-9]{1,1}$"));
 #else
 	m_taskNameValidator.setRegExp(QRegExp("^[^\\\\/:\\*\\?\"\\<\\>\\|\\+]+$"));
-	m_triggerIdValidator.setRegExp(QRegExp("^[0-9]{0,1}$"));		// camera can have up to 10 images, i.e. trigger id 0-9
 #endif
 }
 
@@ -124,7 +122,6 @@ void CTaskSettingsGuiComp::OnGuiCreated()
 	BaseClass::OnGuiCreated();
 
 	TaskNameEdit->setValidator(&m_taskNameValidator);
-	TriggerSelector->setValidator(&m_triggerIdValidator);
 
 	ShowAcquisitionManagerButton->setVisible(m_taskInputManagerGuiCompPtr.IsValid() && m_taskInputManagerObserverCompPtr.IsValid());
 }
@@ -147,12 +144,6 @@ void CTaskSettingsGuiComp::OnTryClose(bool* ignoredPtr)
 		QString name = TaskNameEdit->text().trimmed();
 		if (m_taskNameValidator.validate(name, pos) != QValidator::Acceptable){
 			QMessageBox::critical(nullptr, tr("Error"), tr("The task name contains some not allowed characters"));
-
-			*ignoredPtr = true;
-		}
-		QString trigger = TriggerSelector->text().trimmed();
-		if (m_triggerIdValidator.validate(trigger, pos) != QValidator::Acceptable) {
-			QMessageBox::critical(nullptr, tr("Error"), tr("Acq-SubId must be a number"));
 
 			*ignoredPtr = true;
 		}
@@ -227,13 +218,8 @@ void CTaskSettingsGuiComp::OnInputsChanged(const istd::IChangeable::ChangeSet& /
 {
 	InputSelector->blockSignals(true);
 	InputSelector->clear();
-	TriggerSelector->clear();
-	TriggerSelector->setVisible(false);
 
 	imtbase::IObjectCollection::Ids inputIds = inputsCollectionPtr->GetElementIds();
-	if (!inputIds.isEmpty()){
-		TriggerSelector->setVisible(true);
-	}
 
 	for (int i = 0; i < inputIds.count(); ++i){
 		QByteArray inputId = inputsCollectionPtr->GetElementInfo(inputIds[i], imtbase::ICollectionInfo::EIT_NAME).toString().toUtf8();

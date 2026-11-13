@@ -11,26 +11,25 @@ import imtauthgui 1.0
  * TenantMembersPage
  *
  * Members tab — list / create / edit / exclude tenant members.
- * Extends SimpleCollectionPage with custom header buttons,
- * a custom delegate (TenantMemberDelegate), and member-specific
- * commands (invite, exclude, role management).
+ * Extends SimpleCollectionPage with custom header buttons, the standard table
+ * of members and invitations, and member-specific commands (invite, exclude, role management).
  */
 SimpleCollectionPage {
 	id: membersPage
 
 	entityName: qsTr("User")
 	entityNamePlural: qsTr("Members")
-	descriptionText: qsTr("Manage tenant members. Users created here automatically become members.")
+	descriptionText: qsTr("Manage the members of the organization. Users created here automatically become members.")
 
 	documentManager: apiClient ? apiClient.userDocumentManager : null
 	objectTypeId: apiClient ? apiClient.userObjectTypeId : ""
 
 	// Members use stateManager-driven model, not a data provider
 	listModel: __combinedModel
-	managePermissionIds: ["EditOrganizationMember", "InviteOrganizationMember", "ExcludeOrganizationMember", "ChangeOrganizationMemberRole"]
-	createPermissionIds: ["EditOrganizationMember"]
-	editPermissionIds: ["ChangeOrganizationMemberRole", "EditOrganizationMember"]
-	deletePermissionIds: ["ExcludeOrganizationMember", "EditOrganizationMember"]
+	managePermissionIds: ["/OrganizationManagement/Members/Edit/Add", "/OrganizationManagement/Members/Edit/Change", "/OrganizationManagement/Members/Edit/Invite", "/OrganizationManagement/Members/Edit/Exclude", "/OrganizationManagement/Members/Edit/ChangeRole"]
+	createPermissionIds: ["/OrganizationManagement/Members/Edit/Add"]
+	editPermissionIds: ["/OrganizationManagement/Members/Edit/Change", "/OrganizationManagement/Members/Edit/ChangeRole"]
+	deletePermissionIds: ["/OrganizationManagement/Members/Edit/Exclude"]
 
 	readonly property bool __canCreateMember: stateManager
 		? stateManager.hasAnyPermission(createPermissionIds)
@@ -45,7 +44,10 @@ SimpleCollectionPage {
 		? stateManager.canExcludeOrganizationMember
 		: false
 
-	delegateComponent: memberDelegateComp
+	columnIds: ["name", "role", "status", "details", "actions"]
+	columnNames: [qsTr("Name"), qsTr("Role"), qsTr("Status"), qsTr("Details"), ""]
+	columnDelegateIds: ["actions"]
+	columnDelegateComponents: [memberActionsCellComp]
 
 	headerButtonsComponent: memberHeaderButtonsComp
 
@@ -67,6 +69,47 @@ SimpleCollectionPage {
 				if (result === Enums.yes && membersPage.apiClient) {
 					var tid = membersPage.model ? membersPage.model.m_id : ""
 					membersPage.apiClient.transferOwnership(tid, memberActionMenu.targetUserId)
+				}
+			}
+		)
+	}
+
+	// Declared on the page: a callback declared inside the popup component loses the page on the web
+	function confirmExcludeMember(userId, userName) {
+		if (!membersPage.stateManager || !membersPage.stateManager.canExcludeOrganizationMember)
+			return
+
+		ModalDialogManager.showConfirmationDialog(
+			qsTr("Exclude Member"),
+			qsTr("Are you sure you want to exclude \"%1\" from this organization?").arg(userName),
+			function(result) {
+				if (result === Enums.yes && membersPage.apiClient) {
+					var tid = membersPage.model ? membersPage.model.m_id : ""
+					membersPage.apiClient.removeMember(tid, userId)
+				}
+			}
+		)
+	}
+
+	function confirmRevokeInvitation(invitationId, userName) {
+		ModalDialogManager.showConfirmationDialog(
+			qsTr("Revoke Invitation"),
+			qsTr("Are you sure you want to revoke the invitation of \"%1\"?").arg(userName),
+			function(result) {
+				if (result === Enums.yes && membersPage.apiClient)
+					membersPage.apiClient.revokeInvitation(invitationId)
+			}
+		)
+	}
+
+	function confirmLeave() {
+		ModalDialogManager.showConfirmationDialog(
+			qsTr("Leave Organization"),
+			qsTr("Are you sure you want to leave this organization? You will lose access to it."),
+			function(result) {
+				if (result === Enums.yes && membersPage.apiClient) {
+					var tid = membersPage.model ? membersPage.model.m_id : ""
+					membersPage.apiClient.removeMember(tid, memberActionMenu.targetUserId)
 				}
 			}
 		)
@@ -138,10 +181,10 @@ SimpleCollectionPage {
 					spacing: Style.marginM
 
 					Rectangle {
-						width: 36
-						height: 36
-						radius: 18
-						color: Style.selectedColor
+						width: Style.iconSizeL
+						height: Style.iconSizeL
+						radius: width / 2
+						color: Style.neutralSubtleColor
 						anchors.verticalCenter: parent.verticalCenter
 
 						BaseText {
@@ -215,7 +258,7 @@ SimpleCollectionPage {
 				anchors.bottom: parent.bottom
 				anchors.left: parent.left
 				anchors.right: parent.right
-				height: 54
+				height: Style.controlHeightM + 2 * Style.marginM
 				color: Style.alternateBaseColor
 				radius: Style.radiusM
 
@@ -245,62 +288,28 @@ SimpleCollectionPage {
 					anchors.verticalCenter: parent.verticalCenter
 					spacing: Style.marginL
 
-					Text {
+					Button {
 						id: cancelBtn
-						text: qsTr("Cancel")
-						font.pixelSize: Style.fontSizeM
-						color: Style.linkColor
-						opacity: cancelMouse.containsMouse ? 0.65 : 1.0
 						anchors.verticalCenter: parent.verticalCenter
-
-						Behavior on opacity { NumberAnimation { duration: 100 } }
-
-						MouseArea {
-							id: cancelMouse
-							anchors.fill: parent
-							anchors.margins: -4
-							hoverEnabled: true
-							cursorShape: Qt.PointingHandCursor
-							onClicked: orgPermsPopup.close()
-						}
+						text: qsTr("Cancel")
+						onClicked: orgPermsPopup.close()
 					}
 
-					Rectangle {
+					Button {
 						id: applyBtnRect
-						width: applyBtnLabel.implicitWidth + Style.marginXL
-						height: 32
-						radius: 4
-						color: Style.linkColor
 						anchors.verticalCenter: parent.verticalCenter
-						opacity: applyBtnMouse.containsMouse ? 0.75 : 1.0
-
-						Behavior on opacity { NumberAnimation { duration: 100 } }
-
-						BaseText {
-							id: applyBtnLabel
-							anchors.centerIn: parent
-							text: qsTr("Apply")
-							font.pixelSize: Style.fontSizeM
-							font.bold: true
-							color: Style.baseColor
-						}
-
-						MouseArea {
-							id: applyBtnMouse
-							anchors.fill: parent
-							hoverEnabled: true
-							cursorShape: Qt.PointingHandCursor
-							onClicked: {
-								var selected = orgPermsTable.getCheckedIds ? orgPermsTable.getCheckedIds() : []
-								var tid = membersPage.model ? membersPage.model.m_id : ""
-								var uid = orgPermsPopup.currentMember ? orgPermsPopup.currentMember.id : ""
-								if (uid && tid && membersPage.apiClient) {
-									membersPage.apiClient.setMemberOrganizationPermissionsByUser(tid, uid, selected)
-								}
-								orgPermsPopup.close()
-								if (membersPage.stateManager) {
-									membersPage.stateManager.loadMembersFromModel()
-								}
+						text: qsTr("Apply")
+						variant: "primary"
+						onClicked: {
+							var selected = orgPermsTable.getCheckedIds ? orgPermsTable.getCheckedIds() : []
+							var tid = membersPage.model ? membersPage.model.m_id : ""
+							var uid = orgPermsPopup.currentMember ? orgPermsPopup.currentMember.id : ""
+							if (uid && tid && membersPage.apiClient) {
+								membersPage.apiClient.setMemberOrganizationPermissionsByUser(tid, uid, selected)
+							}
+							orgPermsPopup.close()
+							if (membersPage.stateManager) {
+								membersPage.stateManager.loadMembersFromModel()
 							}
 						}
 					}
@@ -324,6 +333,10 @@ SimpleCollectionPage {
 				orgPermsPopup.__checkedCount = orgPermsTable.getCheckedIds().length
 				permsLoading.stop()
 			}
+		}
+
+		function onRequestFailed(message) {
+			permsLoading.stop()
 		}
 	}
 
@@ -414,8 +427,9 @@ SimpleCollectionPage {
 	Component {
 		id: memberHeaderButtonsComp
 
-		Row {
+		Flow {
 			id: headerButtonsRow
+			width: Math.min(membersPage.commandsLineWidth(headerButtonsRow), membersPage.contentWidth)
 			spacing: Style.marginL
 			visible: membersPage.__canCreateMember
 				|| membersPage.__canInviteMember
@@ -424,6 +438,8 @@ SimpleCollectionPage {
 
 			Text {
 				text: qsTr("Exclude")
+				width: Math.min(implicitWidth, membersPage.contentWidth)
+				elide: Text.ElideRight
 				font.pixelSize: Style.fontSizeM
 				font.bold: true
 				visible: membersPage.__canExcludeMember
@@ -443,13 +459,26 @@ SimpleCollectionPage {
 						if (!membersPage.__canExcludeMember)
 							return
 
-						var count = membersPage.selectionManager.selectedIds.length
+						// The owner, the creator and the current user are not excluded by others.
+						var tenant = membersPage.model
+						var ids = []
+						var selectedIds = membersPage.selectionManager.selectedIds
+						for (var k = 0; k < selectedIds.length; k++) {
+							var selectedId = selectedIds[k]
+							if (tenant && (selectedId === tenant.m_ownerId || selectedId === tenant.m_creatorId || selectedId === tenant.m_currentUserId))
+								continue
+							ids.push(selectedId)
+						}
+						if (ids.length === 0) {
+							PopupManager.addInfoMessage(qsTr("The owner, the creator of the organization and you cannot be excluded here."), true)
+							return
+						}
+
 						ModalDialogManager.showConfirmationDialog(
 									qsTr("Exclude Members"),
-									qsTr("Are you sure you want to exclude %1 selected member(s) from this tenant?").arg(count),
+									qsTr("Are you sure you want to exclude %1 selected member(s) from this organization?").arg(ids.length),
 									function(result) {
 										if (result === Enums.yes) {
-											var ids = membersPage.selectionManager.selectedIds.slice()
 											for (var i = 0; i < ids.length; i++)
 												membersPage.removeItem(ids[i])
 											membersPage.selectionManager.clear()
@@ -462,6 +491,8 @@ SimpleCollectionPage {
 
 			Text {
 				text: qsTr("Edit")
+				width: Math.min(implicitWidth, membersPage.contentWidth)
+				elide: Text.ElideRight
 				font.pixelSize: Style.fontSizeM
 				font.bold: true
 				visible: membersPage.__canEditMember
@@ -497,6 +528,8 @@ SimpleCollectionPage {
 
 			Text {
 				text: "+ " + qsTr("Create User")
+				width: Math.min(implicitWidth, membersPage.contentWidth)
+				elide: Text.ElideRight
 				font.pixelSize: Style.fontSizeM
 				font.bold: true
 				visible: membersPage.__canCreateMember
@@ -517,6 +550,8 @@ SimpleCollectionPage {
 			Text {
 				id: inviteMemberBtn
 				text: "+ " + qsTr("Create Invitation")
+				width: Math.min(implicitWidth, membersPage.contentWidth)
+				elide: Text.ElideRight
 				font.pixelSize: Style.fontSizeM
 				font.bold: true
 				visible: membersPage.__canInviteMember
@@ -554,57 +589,178 @@ SimpleCollectionPage {
 		}
 	}
 
-	// --- Custom delegate ---
+	// --- Rows of the members table ---
+	function __isOwnerOrCreator(userId) {
+		var tenant = membersPage.model
+		return tenant ? (userId === tenant.m_ownerId || (tenant.m_creatorId !== "" && userId === tenant.m_creatorId)) : false
+	}
+
+	function __isCurrentUser(userId) {
+		var tenant = membersPage.model
+		return tenant ? (tenant.m_currentUserId !== "" && userId === tenant.m_currentUserId) : false
+	}
+
+	function __invitationStatus(invitation) {
+		if (membersPage.stateManager && membersPage.stateManager.isInvitationExpired(invitation.expiresAt))
+			return "Expired"
+		if (invitation.status === "revoked" || invitation.status === "Revoked")
+			return "Revoked"
+		return "Pending"
+	}
+
+	function createRow(item) {
+		var data = item.sourceData || item
+		var tenant = membersPage.model
+		var row = {}
+		row.kind = item.kind || "member"
+		row.name = item.title || ""
+		if (row.kind === "invitation") {
+			var status = membersPage.__invitationStatus(data)
+			row.role = qsTr("Invited")
+			row.status = qsTr("Pending")
+			if (status === "Expired")
+				row.status = qsTr("Expired")
+			else if (status === "Revoked")
+				row.status = qsTr("Revoked")
+			row.details = membersPage.stateManager
+				? membersPage.stateManager.formatInvitationInfo(data.invitedByName || data.invitedByUserId || "", data.expiresAt || "")
+				: ""
+			return row
+		}
+
+		var userId = data.id || ""
+		row.role = qsTr("Member")
+		if (tenant && userId === tenant.m_ownerId)
+			row.role = qsTr("Owner")
+		else if (tenant && tenant.m_creatorId !== "" && userId === tenant.m_creatorId)
+			row.role = qsTr("Creator")
+		row.status = qsTr("Active")
+		var permissionCount = Array.isArray(data.organizationPermissions) ? data.organizationPermissions.length : 0
+		var details = []
+		if (membersPage.__isCurrentUser(userId))
+			details.push(qsTr("You"))
+		if (permissionCount > 0)
+			details.push(qsTr("%1 organization permission(s)").arg(permissionCount))
+		row.details = details.join(" · ")
+		return row
+	}
+
+	// A double-clicked member opens the user; an invitation is not a document
+	function openItem(itemId) {
+		if (itemId.indexOf("inv_") === 0)
+			return
+		if (!membersPage.stateManager || !membersPage.stateManager.canChangeOrganizationMember)
+			return
+		var item = membersPage.__findItemById(itemId)
+		if (item)
+			membersPage.openEdit(itemId, item.title || itemId, "")
+	}
+
+	function __memberMenuItems(userId) {
+		var items = []
+		var isOwnerOrCreator = membersPage.__isOwnerOrCreator(userId)
+		if (isOwnerOrCreator)
+			return items
+		var stateManager = membersPage.stateManager
+		if (membersPage.__isCurrentUser(userId)) {
+			items.push("leave")
+			return items
+		}
+		if (stateManager && (stateManager.canChangeOrganizationMemberRole || stateManager.canManageOrganizationMembers))
+			items.push("managePermissions")
+		if (stateManager && stateManager.canExcludeOrganizationMember)
+			items.push("remove")
+		if (stateManager && stateManager.isOwner)
+			items.push("transfer")
+		return items
+	}
+
+	function __invitationMenuItems(invitation) {
+		var items = []
+		if (membersPage.__invitationStatus(invitation) !== "Pending")
+			return items
+		var stateManager = membersPage.stateManager
+		// Who may invite may also take an invitation back
+		if (stateManager && stateManager.canInviteOrganizationMember) {
+			items.push({ text: qsTr("Resend Invitation"), action: "resend" })
+			items.push({ text: qsTr("Revoke Invitation"), action: "revoke" })
+		}
+		return items
+	}
+
+	function hasRowActions(itemId) {
+		var item = membersPage.__findItemById(itemId)
+		if (!item)
+			return false
+		var data = item.sourceData || item
+		if (item.kind === "invitation")
+			return membersPage.__invitationMenuItems(data).length > 0
+		return membersPage.__memberMenuItems(data.id || "").length > 0
+	}
+
+	function showRowActions(itemId, menuX, menuY) {
+		var item = membersPage.__findItemById(itemId)
+		if (!item)
+			return
+		var data = item.sourceData || item
+		if (item.kind === "invitation") {
+			var inviteItems = membersPage.__invitationMenuItems(data)
+			if (inviteItems.length === 0)
+				return
+			inviteActionMenu.menuItems = inviteItems
+			inviteActionMenu.targetInvitationId = data.id || ""
+			inviteActionMenu.targetUserName = data.userName || data.userId || ""
+			inviteActionContextModel.fillModel()
+			ModalDialogManager.openDialog(inviteActionPopupComp, {
+				"x": menuX,
+				"y": menuY,
+				"model": inviteActionContextModel
+			})
+			return
+		}
+
+		var actions = membersPage.__memberMenuItems(data.id || "")
+		if (actions.length === 0)
+			return
+		memberActionMenu.targetUserId = data.id || ""
+		memberActionMenu.targetUserName = data.name || data.id || ""
+		memberActionMenu.showManagePermissions = actions.indexOf("managePermissions") >= 0
+		memberActionMenu.showExclude = actions.indexOf("remove") >= 0
+		memberActionMenu.showTransfer = actions.indexOf("transfer") >= 0
+		memberActionMenu.showLeave = actions.indexOf("leave") >= 0
+		memberActionContextModel.fillModel()
+		ModalDialogManager.openDialog(memberActionPopupComp, {
+			"x": menuX,
+			"y": menuY,
+			"model": memberActionContextModel
+		})
+	}
+
 	Component {
-		id: memberDelegateComp
+		id: memberActionsCellComp
 
-		TenantMemberDelegate {
-			width: parent.width
-			kind: modelData.kind || "member"
-			memberData: modelData.sourceData || modelData
-			tenantData: membersPage.model
-			stateManager: membersPage.stateManager
-			actionHandler: membersPage
-			isOwner: membersPage.stateManager ? membersPage.stateManager.isOwner : false
-			selectionManager: membersPage.selectionManager
-			showCheckBox: true
+		TableCellDelegateBase {
+			id: actionsCell
 
-			onMemberActionsRequested: {
-				memberActionMenu.targetUserId = userId
-				memberActionMenu.targetUserName = userName
-				memberActionMenu.showManagePermissions = false
-				memberActionMenu.showExclude = false
-				memberActionMenu.showTransfer = false
-				memberActionMenu.showLeave = false
-				for (var i = 0; i < menuItems.length; i++) {
-					if (menuItems[i].action === "managePermissions") memberActionMenu.showManagePermissions = true
-					else if (menuItems[i].action === "remove") memberActionMenu.showExclude = true
-					else if (menuItems[i].action === "transfer") memberActionMenu.showTransfer = true
-					else if (menuItems[i].action === "leave") memberActionMenu.showLeave = true
+			readonly property string itemId: actionsCell.getRowData() ? (actionsCell.getRowData().id || "") : ""
+
+			ToolButton {
+				id: actionsButton
+				visible: actionsCell.itemId !== "" && membersPage.hasRowActions(actionsCell.itemId)
+				anchors.centerIn: parent
+				tooltipText: qsTr("Actions")
+				iconSource: "qrc:/" + Style.getIconPath("Icons/More", Icon.State.On, Icon.Mode.Normal)
+				decorator: Component {
+					ToolButtonDecorator {
+						color: "transparent"
+						icon.width: Style.iconSizeXS
+					}
 				}
-				memberActionContextModel.fillModel()
-				ModalDialogManager.openDialog(memberActionPopupComp, {
-					"x": menuX,
-					"y": menuY,
-					"model": memberActionContextModel
-				})
-			}
 
-			onMemberEditRequested: {
-				if (membersPage.stateManager && membersPage.stateManager.canChangeOrganizationMember)
-					membersPage.openEdit(userId, userName, "")
-			}
-
-			onInviteActionsRequested: {
-				inviteActionMenu.menuItems = menuItems
-				inviteActionMenu.targetInvitationId = invitationId
-				inviteActionMenu.targetUserName = userName
-				inviteActionContextModel.fillModel()
-				ModalDialogManager.openDialog(inviteActionPopupComp, {
-					"x": menuX,
-					"y": menuY,
-					"model": inviteActionContextModel
-				})
+				onClicked: {
+					var point = actionsButton.mapToItem(null, 0, actionsButton.height)
+					membersPage.showRowActions(actionsCell.itemId, point.x, point.y)
+				}
 			}
 		}
 	}
@@ -624,11 +780,11 @@ SimpleCollectionPage {
 					memberActionContextModel.append({"id": "", "name": "", "icon": ""})
 
 				if (memberActionMenu.showExclude)
-					memberActionContextModel.append({"id": "Exclude", "name": qsTr("Exclude from Tenant"), "icon": "", "isEnabled": true})
+					memberActionContextModel.append({"id": "Exclude", "name": qsTr("Exclude from Organization"), "icon": "", "isEnabled": true})
 				if (memberActionMenu.showTransfer)
 					memberActionContextModel.append({"id": "Transfer", "name": qsTr("Transfer Ownership"), "icon": "", "isEnabled": true})
 				if (memberActionMenu.showLeave)
-					memberActionContextModel.append({"id": "Leave", "name": qsTr("Leave Workspace"), "icon": "", "isEnabled": true})
+					memberActionContextModel.append({"id": "Leave", "name": qsTr("Leave Organization"), "icon": "", "isEnabled": true})
 			}
 		}
 	}
@@ -650,29 +806,14 @@ SimpleCollectionPage {
 					}
 				}
 				else if (commandId === "Exclude") {
-					if (!membersPage.stateManager || !membersPage.stateManager.canExcludeOrganizationMember)
-						return
-
-					ModalDialogManager.showConfirmationDialog(
-						qsTr("Exclude Member"),
-						qsTr("Are you sure you want to exclude \"%1\" from this tenant?").arg(memberActionMenu.targetUserName),
-						function(result) {
-							if (result === Enums.yes && membersPage.apiClient) {
-								var tenantIdExclude = membersPage.model ? membersPage.model.m_id : ""
-								membersPage.apiClient.removeMember(tenantIdExclude, memberActionMenu.targetUserId)
-							}
-						}
-					)
+					membersPage.confirmExcludeMember(memberActionMenu.targetUserId, memberActionMenu.targetUserName)
 				}
 				else if (commandId === "Transfer") {
 					if (membersPage.stateManager && membersPage.stateManager.isOwner)
 						membersPage.confirmTransferOwnership()
 				}
 				else if (commandId === "Leave") {
-					if (membersPage.apiClient) {
-						var ltid = membersPage.model ? membersPage.model.m_id : ""
-						membersPage.apiClient.removeMember(ltid, memberActionMenu.targetUserId)
-					}
+					membersPage.confirmLeave()
 				}
 			}
 		}
@@ -700,8 +841,8 @@ SimpleCollectionPage {
 			onFinished: {
 				if (commandId === "resend" && membersPage.apiClient && membersPage.stateManager && membersPage.stateManager.canInviteOrganizationMember)
 					membersPage.apiClient.resendInvitation(inviteActionMenu.targetInvitationId)
-				else if (commandId === "revoke" && membersPage.apiClient && membersPage.stateManager && membersPage.stateManager.canExcludeOrganizationMember)
-					membersPage.apiClient.revokeInvitation(inviteActionMenu.targetInvitationId)
+				else if (commandId === "revoke" && membersPage.apiClient && membersPage.stateManager && membersPage.stateManager.canInviteOrganizationMember)
+					membersPage.confirmRevokeInvitation(inviteActionMenu.targetInvitationId, inviteActionMenu.targetUserName)
 			}
 		}
 	}
@@ -719,20 +860,11 @@ SimpleCollectionPage {
 		closePolicy: Enums.popupCloseOnEscape | Enums.popupCloseOnPressOutside
 
 		MenuItem {
-			text: qsTr("Exclude from Tenant")
+			text: qsTr("Exclude from Organization")
 			visible: memberActionMenu.showExclude
 			height: visible ? implicitHeight : 0
 			onTriggered: {
-				ModalDialogManager.showConfirmationDialog(
-					qsTr("Exclude Member"),
-					qsTr("Are you sure you want to exclude \"%1\" from this tenant?").arg(memberActionMenu.targetUserName),
-					function(result) {
-						if (result === Enums.yes && membersPage.apiClient) {
-							var tenantId = membersPage.model ? membersPage.model.m_id : ""
-							membersPage.apiClient.removeMember(tenantId, memberActionMenu.targetUserId)
-						}
-					}
-				)
+				membersPage.confirmExcludeMember(memberActionMenu.targetUserId, memberActionMenu.targetUserName)
 			}
 		}
 
@@ -746,14 +878,11 @@ SimpleCollectionPage {
 		}
 
 		MenuItem {
-			text: qsTr("Leave Workspace")
+			text: qsTr("Leave Organization")
 			visible: memberActionMenu.showLeave
 			height: visible ? implicitHeight : 0
 			onTriggered: {
-				if (membersPage.apiClient) {
-					var ltid = membersPage.model ? membersPage.model.m_id : ""
-					membersPage.apiClient.removeMember(ltid, memberActionMenu.targetUserId)
-				}
+				membersPage.confirmLeave()
 			}
 		}
 	}
@@ -773,7 +902,7 @@ SimpleCollectionPage {
 					if (action === "resend" && membersPage.apiClient)
 						membersPage.apiClient.resendInvitation(inviteActionMenu.targetInvitationId)
 					else if (action === "revoke" && membersPage.apiClient)
-						membersPage.apiClient.revokeInvitation(inviteActionMenu.targetInvitationId)
+						membersPage.confirmRevokeInvitation(inviteActionMenu.targetInvitationId, inviteActionMenu.targetUserName)
 				}
 			}
 			onObjectAdded: inviteActionMenu.insertItem(index, object)
@@ -794,17 +923,43 @@ SimpleCollectionPage {
 			showSelectedGroup: true
 			filterPlaceholder: qsTr("Type or choose a user to invite")
 
+			// Users ticked in the popup; the invitations go only on the Invite button
+			property var newSelection: []
+
+			footerComponent: Component {
+				Item {
+					height: inviteButton.height
+
+					// The popup's keyboard reaches the Invite button after the list
+					property Item keyboardItem: inviteButton
+
+					Button {
+						id: inviteButton
+						anchors.right: parent.right
+						text: qsTr("Invite (%1)").arg(invitePopup.newSelection.length)
+						variant: "primary"
+						enabled: invitePopup.newSelection.length > 0
+						onClicked: {
+							if (membersPage.stateManager)
+								membersPage.stateManager.inviteSelectedUsers(invitePopup.newSelection)
+							invitePopup.closePopup()
+						}
+					}
+				}
+			}
+
 			onSelectionChanged: {
 				var arr = []
 				for (var i = 0; i < selectedIds.length; i++) {
 					var selId = selectedIds[i]
+					if (preselectedIds.indexOf(selId) >= 0)
+						continue
 					var selName = dataProvider ? dataProvider.getSelectedItemText(selId) : ""
 					if (!selName)
 						selName = selId
 					arr.push({id: selId, name: selName})
 				}
-				if (membersPage.stateManager)
-					membersPage.stateManager.inviteSelectedUsers(arr)
+				invitePopup.newSelection = arr
 			}
 
 			Component.onDestruction: {

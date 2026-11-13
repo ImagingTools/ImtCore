@@ -52,6 +52,11 @@ ViewBase {
 	property string objectTypeId: ""
 	property var listModel: null
 	property Component delegateComponent: null
+	// Standard table instead of `delegateComponent` (see SimpleCollectionTable)
+	property var columnIds: []
+	property var columnNames: []
+	property var columnDelegateIds: []
+	property var columnDelegateComponents: []
 	property Component headerButtonsComponent: null
 	property Component customEditorComponent: null
 	property bool showCreateButton: true
@@ -60,9 +65,57 @@ ViewBase {
 	property var editPermissionIds: []
 	property var deletePermissionIds: []
 
+	// The editor that shows this page's headers in its own header (TenantEditor); null shows them here.
+	// It is told by updateSubHeaders() when editorOpen or editorTitle change.
+	property var headerHost: null
+	readonly property bool editorOpen: !root.__onListPage
+	// Title of the open create/edit editor, empty on the list
+	property string editorTitle: ""
+
+	onEditorOpenChanged: {
+		if (!root.editorOpen)
+			root.editorTitle = ""
+		if (root.headerHost)
+			root.headerHost.updateSubHeaders()
+	}
+	onEditorTitleChanged: {
+		if (root.headerHost)
+			root.headerHost.updateSubHeaders()
+	}
+
+	// Closes the open editor asking about its unsaved changes: callback(true) once the list is shown,
+	// callback(false) when the user keeps the editor
+	function requestCloseEditor(callback) {
+		if (!root.editorOpen) {
+			callback(true)
+			return
+		}
+		if (root.__activeShellView && root.__activeShellView.state === "content") {
+			root.__activeShellView.requestClose(callback)
+			return
+		}
+		root.__resetStackToList()
+		callback(true)
+	}
+
 	// Width of the centered content column; the table matches it.
 	readonly property int contentWidth: Math.min(root.width - Style.marginXL * 2, Style.contentWidthMax)
 	readonly property int contentLeftMargin: Math.max((root.width - root.contentWidth) / 2, Style.marginXL)
+
+	// Width of a commands Flow laid out in one line, for its width: Math.min(commandsLineWidth(flow), contentWidth)
+	function commandsLineWidth(flow) {
+		var width = 0
+		var count = 0
+		for (var i = 0; i < flow.children.length; i++) {
+			var child = flow.children[i]
+			if (child.visible && child.width > 0) {
+				width += child.width
+				count++
+			}
+		}
+
+		return count > 0 ? width + (count - 1) * flow.spacing : 0
+	}
 
 	function removeItems(ids) {
 		console.warn("SimpleCollectionPage.removeItems() is not implemented; override it in the consumer.")
@@ -81,6 +134,28 @@ ViewBase {
 					root.selectionManager.clear()
 			}
 		})
+	}
+
+	// Row of the standard table for a list item; null takes the item's own fields of the columns
+	function createRow(item) {
+		return null
+	}
+
+	// Text of a TextParam carried in the parameters of a list item
+	function parameterText(item, parameterId) {
+		var parameters = item && item.parameters ? item.parameters : []
+		var count = parameters.count !== undefined ? parameters.count : parameters.length
+		for (var i = 0; i < count; i++) {
+			var parameter = parameters.get ? parameters.get(i) : parameters[i]
+			if (parameter && parameter.id === parameterId) {
+				var raw = parameter.data || ""
+				if (raw === "")
+					return ""
+				var parsed = JSON.parse(raw)
+				return parsed && parsed.text !== undefined ? String(parsed.text) : ""
+			}
+		}
+		return ""
 	}
 
 	function updateGui() {}
@@ -223,15 +298,23 @@ ViewBase {
 		if (root.documentManager)
 			collectionStackView.addPage(editorViewComponent)
 		else if (root.customEditorComponent)
-			collectionStackView.addPage(root.customEditorComponent)
+			collectionStackView.addPage(customEditorWrapperComponent)
 		collectionStackView.next()
 	}
 
 	function openCreate() {
 		__clearExtraPages()
 		root.__isCreating = true
-		stackViewHeader.addHeader("create", qsTr("Create New %1").arg(root.entityName))
+		root.editorTitle = qsTr("Create New %1").arg(root.entityName)
+		stackViewHeader.addHeader("create", root.editorTitle)
 		__pushEditorPage()
+	}
+
+	// A double-clicked row of the table; pages with rows that are not documents override it
+	function openItem(itemId) {
+		var item = root.__findItemById(itemId)
+		if (item && root.canEdit && (root.documentManager || root.customEditorComponent))
+			root.__openEdit(itemId, item.title || item.id || "", item.description || "")
 	}
 
 	function openEdit(itemId, itemName, itemDescription) {
@@ -242,18 +325,25 @@ ViewBase {
 		root.__editItemId = itemId
 		root.__isCreating = false
 		__clearExtraPages()
-		stackViewHeader.addHeader("edit", itemName || qsTr("Edit %1").arg(root.entityName))
+		root.editorTitle = itemName || qsTr("Edit %1").arg(root.entityName)
+		stackViewHeader.addHeader("edit", root.editorTitle)
 		__pushEditorPage()
 	}
 
 	Connections {
 		target: root.documentManager
 		function onDocumentSaved(documentId) {
-			root.refresh()
+			if (!root.dataProvider || !root.dataProvider.followsCollectionChanges)
+				root.refresh()
 		}
 		function onDocumentNameChanged(documentId, oldName, newName) {
+			// A new document has no name yet; keep the "Create New ..." title
+			if (!newName || newName === "")
+				return
 			stackViewHeader.setHeaderName("edit", newName)
 			stackViewHeader.setHeaderName("create", newName)
+			if (root.editorOpen)
+				root.editorTitle = newName
 		}
 	}
 
@@ -264,7 +354,8 @@ ViewBase {
 		anchors.left: parent.left
 		anchors.leftMargin: root.contentLeftMargin
 		width: root.contentWidth
-		height: Style.controlHeightL
+		height: visible ? Style.controlHeightL : 0
+		visible: !root.headerHost
 		initialItemTitleVisible: true
 
 		onCloseClicked: {
@@ -296,78 +387,115 @@ ViewBase {
 		}
 	}
 
-	Text {
-		id: createBtn
-		visible: root.showCreateButton && root.canCreate && root.__onListPage && root.__useDefaultButtons
+	// The commands share the line of the header while both fit, and go under it otherwise
+	readonly property real __commandsWidth: !root.__onListPage ? 0
+		: root.__useDefaultButtons ? defaultCommands.width : customHeaderButtonsLoader.width
+	readonly property real __commandsHeight: root.__useDefaultButtons ? defaultCommands.height : customHeaderButtonsLoader.height
+	// With the headers shown by headerHost the commands share the line of the search box instead
+	readonly property bool __commandsInFilterRow: !!root.headerHost && root.__commandsWidth > 0
+		&& root.__commandsWidth + Style.marginL + Style.sizeHintXXS <= root.contentWidth
+	readonly property bool __commandsBelow: root.__commandsWidth > 0
+		&& (root.headerHost ? !root.__commandsInFilterRow : stackViewHeader.implicitContentWidth + Style.marginL + root.__commandsWidth > root.contentWidth)
+
+	// The line the commands are centered on: the header, or the search box of the table when headerHost shows the headers
+	Item {
+		id: commandsRow
+		anchors.top: root.headerHost ? collectionStackView.top : stackViewHeader.top
+		anchors.topMargin: root.headerHost ? Style.marginM : 0
+		anchors.left: stackViewHeader.left
 		anchors.right: stackViewHeader.right
-		anchors.verticalCenter: stackViewHeader.verticalCenter
-		text: root.__createBtnText
-		font.pixelSize: Style.fontSizeM
-		font.bold: true
-		color: Style.linkColor
-
-		MouseArea {
-			anchors.fill: parent
-			hoverEnabled: true
-			cursorShape: Qt.PointingHandCursor
-			onClicked: {
-				if (root.canCreate)
-					root.openCreate()
-			}
-		}
+		height: root.headerHost ? Style.controlHeightM : Style.controlHeightL
 	}
 
-	Text {
-		id: editBtn
-		visible: root.canEdit && root.__onListPage && root.__useDefaultButtons
-		anchors.right: createBtn.left
-		anchors.rightMargin: Style.marginL
-		anchors.verticalCenter: stackViewHeader.verticalCenter
-		text: qsTr("Edit")
-		font.pixelSize: Style.fontSizeM
-		font.bold: true
-		color: root.__selectedCount === 1 ? Style.linkColor : Style.inactiveTextColor
-		opacity: root.__selectedCount === 1 ? 1.0 : 0.5
-
-		MouseArea {
-			anchors.fill: parent
-			hoverEnabled: true
-			cursorShape: root.__selectedCount === 1 && root.canEdit ? Qt.PointingHandCursor : Qt.ArrowCursor
-			enabled: root.__selectedCount === 1 && root.canEdit
-			onClicked: {
-				if (!root.canEdit)
-					return
-
-				var selId = root.selectionManager.selectedIds[0]
-				var item = root.__findItemById(selId)
-				if (item)
-					root.__openEdit(selId, item.title || item.id || "", item.description || "")
-			}
-		}
+	Item {
+		id: commandsLine
+		anchors.top: stackViewHeader.bottom
+		anchors.left: stackViewHeader.left
+		anchors.right: stackViewHeader.right
+		height: root.__commandsBelow ? root.__commandsHeight + Style.marginS : 0
 	}
 
-	Text {
-		id: removeBtn
-		visible: root.canDelete && root.__onListPage && root.__useDefaultButtons
-		anchors.right: editBtn.left
-		anchors.rightMargin: Style.marginL
-		anchors.verticalCenter: stackViewHeader.verticalCenter
-		text: qsTr("Remove")
-		font.pixelSize: Style.fontSizeM
-		font.bold: true
-		color: root.__selectedCount > 0 ? Style.errorColor : Style.inactiveTextColor
-		opacity: root.__selectedCount > 0 ? 1.0 : 0.5
+	Flow {
+		id: defaultCommands
+		anchors.right: stackViewHeader.right
+		width: Math.min(root.commandsLineWidth(defaultCommands), root.contentWidth)
+		// One top anchor: switching between top and verticalCenter set both for a moment and stretched the height
+		anchors.top: root.__commandsBelow ? commandsLine.top : commandsRow.top
+		anchors.topMargin: root.__commandsBelow ? 0 : (commandsRow.height - defaultCommands.height) / 2
+		spacing: Style.marginL
+		visible: root.__onListPage && root.__useDefaultButtons
 
-		MouseArea {
-			anchors.fill: parent
-			hoverEnabled: true
-			cursorShape: root.__selectedCount > 0 && root.canDelete ? Qt.PointingHandCursor : Qt.ArrowCursor
-			enabled: root.__selectedCount > 0 && root.canDelete
-			onClicked: {
-				if (!root.canDelete)
-					return
+		Text {
+			id: removeBtn
+			visible: root.canDelete
+			text: qsTr("Remove")
+			width: Math.min(implicitWidth, root.contentWidth)
+			elide: Text.ElideRight
+			font.pixelSize: Style.fontSizeM
+			font.bold: true
+			color: root.__selectedCount > 0 ? Style.errorColor : Style.inactiveTextColor
+			opacity: root.__selectedCount > 0 ? 1.0 : 0.5
 
-				root.confirmRemoveItems(root.selectionManager.selectedIds.slice(), "")
+			MouseArea {
+				anchors.fill: parent
+				hoverEnabled: true
+				cursorShape: root.__selectedCount > 0 && root.canDelete ? Qt.PointingHandCursor : Qt.ArrowCursor
+				enabled: root.__selectedCount > 0 && root.canDelete
+				onClicked: {
+					if (!root.canDelete)
+						return
+
+					root.confirmRemoveItems(root.selectionManager.selectedIds.slice(), "")
+				}
+			}
+		}
+
+		Text {
+			id: editBtn
+			visible: root.canEdit
+			text: qsTr("Edit")
+			width: Math.min(implicitWidth, root.contentWidth)
+			elide: Text.ElideRight
+			font.pixelSize: Style.fontSizeM
+			font.bold: true
+			color: root.__selectedCount === 1 ? Style.linkColor : Style.inactiveTextColor
+			opacity: root.__selectedCount === 1 ? 1.0 : 0.5
+
+			MouseArea {
+				anchors.fill: parent
+				hoverEnabled: true
+				cursorShape: root.__selectedCount === 1 && root.canEdit ? Qt.PointingHandCursor : Qt.ArrowCursor
+				enabled: root.__selectedCount === 1 && root.canEdit
+				onClicked: {
+					if (!root.canEdit)
+						return
+
+					var selId = root.selectionManager.selectedIds[0]
+					var item = root.__findItemById(selId)
+					if (item)
+						root.__openEdit(selId, item.title || item.id || "", item.description || "")
+				}
+			}
+		}
+
+		Text {
+			id: createBtn
+			visible: root.showCreateButton && root.canCreate
+			text: root.__createBtnText
+			width: Math.min(implicitWidth, root.contentWidth)
+			elide: Text.ElideRight
+			font.pixelSize: Style.fontSizeM
+			font.bold: true
+			color: Style.linkColor
+
+			MouseArea {
+				anchors.fill: parent
+				hoverEnabled: true
+				cursorShape: Qt.PointingHandCursor
+				onClicked: {
+					if (root.canCreate)
+						root.openCreate()
+				}
 			}
 		}
 	}
@@ -376,14 +504,15 @@ ViewBase {
 		id: customHeaderButtonsLoader
 		visible: !!root.headerButtonsComponent && root.__onListPage
 		anchors.right: stackViewHeader.right
-		anchors.verticalCenter: stackViewHeader.verticalCenter
+		anchors.top: root.__commandsBelow ? commandsLine.top : commandsRow.top
+		anchors.topMargin: root.__commandsBelow ? 0 : (commandsRow.height - customHeaderButtonsLoader.height) / 2
 		sourceComponent: root.headerButtonsComponent
 		property var page: root
 	}
 
 	BaseText {
 		id: descriptionLabel
-		anchors.top: stackViewHeader.bottom
+		anchors.top: commandsLine.bottom
 		anchors.topMargin: Style.marginS
 		anchors.horizontalCenter: parent.horizontalCenter
 		width: root.contentWidth
@@ -395,7 +524,7 @@ ViewBase {
 
 	StackView {
 		id: collectionStackView
-		anchors.top: descriptionLabel.visible ? descriptionLabel.bottom : stackViewHeader.bottom
+		anchors.top: descriptionLabel.visible ? descriptionLabel.bottom : commandsLine.bottom
 		anchors.topMargin: Style.marginS
 		anchors.left: parent.left
 		anchors.right: parent.right
@@ -411,11 +540,17 @@ ViewBase {
 
 		SimpleCollectionTable {
 			id: collectionTable
+			canMoveColumns: true
 			model: root.effectiveModel
 			delegateComponent: root.delegateComponent
+			columnIds: root.columnIds
+			columnNames: root.columnNames
+			columnDelegateIds: root.columnDelegateIds
+			columnDelegateComponents: root.columnDelegateComponents
 			actionHandler: root
 			emptyText: root.__emptyText
 			filterPlaceholder: root.__filterPlaceholder
+			filterRightInset: root.__commandsInFilterRow ? root.__commandsWidth + Style.marginL : 0
 			initialLoading: root.dataProvider ? root.dataProvider.isInitialLoading : false
 			loadingMore: root.dataProvider ? root.dataProvider.isPageLoading : false
 			errorMessage: root.dataProvider && root.dataProvider.error
@@ -423,6 +558,7 @@ ViewBase {
 				: ""
 
 			onFilterChanged: root.__lastFilterText = text
+			onItemDoubleClicked: root.openItem(id)
 			onFilterRequested: {
 				if (root.dataProvider)
 					root.dataProvider.fetch(text)
@@ -442,6 +578,23 @@ ViewBase {
 			Component.onDestruction: {
 				if (root)
 					root.selectionManager = null
+			}
+		}
+	}
+
+	// Same centered column as the document editors (SimpleDocumentEditorShell)
+	Component {
+		id: customEditorWrapperComponent
+
+		Item {
+			Loader {
+				anchors.top: parent.top
+				anchors.bottom: parent.bottom
+				anchors.left: parent.left
+				anchors.leftMargin: root.contentLeftMargin
+				width: root.contentWidth
+
+				sourceComponent: root.customEditorComponent
 			}
 		}
 	}

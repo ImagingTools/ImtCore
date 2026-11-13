@@ -3,12 +3,19 @@
 
 
 // STL includes
+#include <functional>
 #include <memory>
+#include <optional>
+#include <type_traits>
+#include <utility>
+#include <variant>
 
 // Qt includes
-#include <QtCore/QUrl>
+#include <QtCore/QByteArray>
+#include <QtCore/QString>
 
 // ACF includes
+#include <istd/IPolymorphic.h>
 #include <idoc/IUndoManager.h>
 #include <iser/ISerializable.h>
 #include <imod/IObserver.h>
@@ -90,7 +97,7 @@ public:
 	enum TaskType
 	{
 		TT_NEW,   ///< Create a new blank document
-		TT_OPEN,  ///< Open an existing document from a URL
+		TT_OPEN,  ///< Open an existing document by its source reference
 		TT_SAVE,  ///< Save a document
 		TT_CLOSE  ///< Close a document
 	};
@@ -107,7 +114,7 @@ public:
 		| documentTypeId             |   X    |         |         |          |
 		| proposedSourceDocumentId   |  (opt) |         |         |          |
 		| initParamsPtr              |  (opt) |         |         |          |
-		| url                        |        |    X    |         |          |
+		| documentSourceRef          |        |    X    |         |          |
 		| documentId                 |        |         |    X    |    X     |
 		| documentName               |        |         |  (opt)  |          |
 		| singleDocumentInstance     |  (opt) |  (opt)  |         |          |
@@ -117,13 +124,13 @@ public:
 		QByteArray userId;
 		QByteArray documentTypeId;
 		QByteArray proposedSourceDocumentId;
-		QUrl url;
+		QByteArray documentSourceRef; ///< Implementation-specific reference to the document source to open (TT_OPEN only).
 		QByteArray documentId;
 		QString documentName;
 		const imtbase::IOperationContext* operationContextPtr = nullptr; ///< Optional operation context for tenant/owner propagation during save.
 		const istd::IChangeable* defaultDataPtr = nullptr;
 		const iprm::IParamsSet* initParamsPtr = nullptr; ///< Optional initialization parameters passed to the init delegate (TT_NEW only).
-		bool singleDocumentInstance = false; ///< Optional. For \c TT_OPEN, when \c true the document is opened in single-instance mode: opening a second instance of an already-open document URL is forbidden. For \c TT_NEW, when \c true the newly created document is marked as single-instance so that it cannot be opened again elsewhere. Defaults to \c false.
+		bool singleDocumentInstance = false; ///< Optional. For \c TT_OPEN, when \c true the document is opened in single-instance mode: opening a second instance of an already-open document is forbidden. For \c TT_NEW, when \c true the newly created document is marked as single-instance so that it cannot be opened again elsewhere. Defaults to \c false.
 	};
 
 	/**
@@ -139,9 +146,9 @@ public:
 	/**
 		\brief Immediate-error output for \c BeginDocumentTask.
 
-		Populated only when \c BeginDocumentTask cannot even create
-		the task (e.g.\ missing required parameters).  In that case
-		the method returns an empty task ID.
+		Populated when the task fails already during its setup (e.g.\ missing
+		required parameters).  The returned task ID stays valid and
+		\c WaitForTaskFinished gives the same failure.
 	*/
 	struct Error
 	{
@@ -153,12 +160,13 @@ public:
 	struct DocumentInfo
 	{
 		QByteArray typeId;        ///< Registered object type-ID of the document.
-		QUrl url;                 ///< Source URL (e.g.\ \c collection://\<objectId\>).
+		QByteArray documentSourceRef; ///< Implementation-specific reference to the document source, empty for unsaved documents.
 		QString name;             ///< Human-readable document name.
 		bool isDirty = false;     ///< \c true when the document has unsaved changes.
 		bool hasNameProvider = false; ///< \c true when a name provider is registered for this type.
 		bool isLoading = false;   ///< \c true while the document data is still being loaded asynchronously.
 		bool singleDocumentInstance = false; ///< \c true when opened with \c TaskParams::singleDocumentInstance.
+		bool isReadOnly = false;  ///< \c true when the document can only be closed (e.g.\ a document opened from an object revision).
 	};
 
 	/**
@@ -189,11 +197,10 @@ public:
 		\param params    Input parameters (see \c TaskParams for which
 		                 fields are required per task type).
 		\param errorPtr  Optional.  Receives an immediate error description
-		                 when the task cannot be created at all.  In that
-		                 case the method returns an empty \c QByteArray.
+		                 when the task fails already during its setup.
 		\return          A unique task ID that can be passed to
-		                 \c WaitForTaskFinished, or empty on immediate
-		                 failure.
+		                 \c WaitForTaskFinished; a failure of the task is
+		                 reported by its result.
 	*/
 	virtual QByteArray BeginDocumentTask(
 				TaskType taskType,
@@ -242,6 +249,7 @@ public:
 		\param documentId    Instance ID of the document.
 		\param documentName  New name to assign.
 		\return              \c OS_OK on success, or an appropriate error code.
+		                     \c OS_FAILED for a read-only document.
 	*/
 	virtual OperationStatus SetDocumentName(const QByteArray& userId, const QByteArray& documentId, const QString& documentName) = 0;
 
@@ -271,6 +279,7 @@ public:
 		automatically updated.
 
 		\return  \c OS_OK on success, or an appropriate error code.
+		         \c OS_FAILED for a loading or read-only document.
 	*/
 	virtual OperationStatus SetDocumentData(const QByteArray& userId, const QByteArray& documentId, const istd::IChangeable& document) = 0;
 
@@ -282,7 +291,7 @@ public:
 
 		\return  \c OS_OK on success, or an appropriate error code. \c OS_FAILED also covers the case
 		         where the open document is not of the type \a method was bound to, in which case
-		         \a method was not called.
+		         \a method was not called, and a loading or read-only document.
 	*/
 	virtual OperationStatus ExecuteDocumentMethod(
 				const QByteArray& userId,
@@ -290,10 +299,104 @@ public:
 				const CDocumentMethod& method) = 0;
 
 	/**
+		\brief Result of \c HandleDocument for a method returning \a Ret.
+
+		\c value is set if and only if the method was called (\c status is \c OS_OK). A returned reference
+		is copied while the document is locked; for a \c void method \c value holds \c std::monostate.
+	*/
+	template <typename Ret>
+	struct MethodResult
+	{
+		typedef std::conditional_t<std::is_void_v<Ret>, std::monostate, std::decay_t<Ret>> Value;
+
+		OperationStatus status = OS_FAILED;
+		std::optional<Value> value;
+	};
+
+	/**
+		\brief Call \a method with \a args on the live document object, under the service's internal lock.
+
+		\a method may be any member function of any type the document object can be cast to with
+		\c dynamic_cast: \c const or not, \c noexcept or not, with any parameters and any return type.
+		\a args are forwarded to \a method as they are passed here, so lvalue references (output parameters),
+		rvalue references and non-copyable types are supported. The call is synchronous, \a args are not stored.
+
+		A \c const method can be called on a read-only document. Changes made by a non-\c const method are
+		grouped by \c istd::CChangeGroup. An overloaded method has to be selected by \c static_cast, and
+		default arguments of \a method are not available.
+
+		\par Example
+		\code
+			IDocumentService::MethodResult<QString> textResult =
+						documentService.HandleDocument(userId, documentId, &iprm::ITextParam::GetText);
+
+			std::unique_ptr<MyItem> itemPtr = std::make_unique<MyItem>();
+			int itemIndex = -1;
+			documentService.HandleDocument(userId, documentId, &MyDocument::InsertItem, std::move(itemPtr), itemIndex);
+		\endcode
+
+		\return  \c status is \c OS_OK if \a method was called, \c OS_INVALID_USER_ID or \c OS_INVALID_DOCUMENT_ID
+		         for an unknown user or document, or \c OS_FAILED if the document is loading, is read-only
+		         for a non-\c const method, or is not of the type \a method belongs to.
+	*/
+	template <typename Method, typename... Args>
+	auto HandleDocument(const QByteArray& userId, const QByteArray& documentId, Method method, Args&&... args)
+	{
+		static_assert(std::is_member_function_pointer_v<Method>, "Method must be a pointer to a member function");
+
+		typedef typename MemberFunctionClass<Method>::Type Document;
+		typedef std::bool_constant<std::is_invocable_v<Method, const Document&, Args&&...>> IsConstMethod;
+
+		static_assert(
+					std::is_invocable_v<Method, Document&, Args&&...>,
+					"Method cannot be called with the given arguments");
+
+		typedef std::invoke_result_t<Method, Document&, Args&&...> Ret;
+		typedef MethodResult<Ret> Result;
+
+		static_assert(
+					std::is_void_v<Ret> || std::is_constructible_v<
+								typename Result::Value,
+								std::conditional_t<
+											std::is_reference_v<Ret>,
+											std::add_lvalue_reference_t<std::remove_reference_t<Ret>>,
+											Ret>>,
+					"Method result cannot be stored in MethodResult::value, return it by value or by copyable reference");
+
+		Result result;
+
+		auto access = [&](istd::IChangeable& document){
+			Document* documentPtr = dynamic_cast<Document*>(&document);
+			if (documentPtr == nullptr){
+				return false;
+			}
+
+			if constexpr (IsConstMethod::value){
+				InvokeMethod<Ret>(result.value, method, std::as_const(*documentPtr), std::forward<Args>(args)...);
+			}
+			else{
+				InvokeMethod<Ret>(result.value, method, *documentPtr, std::forward<Args>(args)...);
+			}
+
+			return true;
+		};
+
+		TDocumentAccessor<decltype(access)> accessor(access, IsConstMethod::value);
+
+		result.status = AccessDocument(userId, documentId, accessor);
+		if (result.status == OS_OK && !result.value.has_value()){
+			result.status = OS_FAILED;
+		}
+
+		return result;
+	}
+
+	/**
 		\brief Retrieve the undo manager associated with an open document.
 
 		\param undoManagerPtr  Receives a raw (non-owning) pointer to the undo
-		                       manager on success.
+		                       manager on success. For read-only documents,
+		                       mutating undo-manager operations are disabled.
 		\return                \c OS_OK on success, or an appropriate error code.
 	*/
 	virtual OperationStatus GetDocumentUndoManager(
@@ -335,6 +438,96 @@ public:
 		                is not currently registered.
 	*/
 	virtual void UnregisterEventHandler(IDocumentServiceEventHandler& handler) = 0;
+
+protected:
+	/**
+		\brief Accessor of the live data object of a document, see \c AccessDocument.
+	*/
+	class IDocumentAccessor: virtual public istd::IPolymorphic
+	{
+	public:
+		/**
+			\brief \c true if \c Access doesn't change the document, so a read-only document can be accessed too.
+		*/
+		virtual bool IsReadOnlyAccess() const = 0;
+
+		/**
+			\brief Access the live data object of a document.
+
+			\return  \c false if \a document is not of the type supported by this accessor.
+		*/
+		virtual bool Access(istd::IChangeable& document) = 0;
+	};
+
+	/**
+		\brief Let \a accessor access the live document object, under the service's internal lock.
+
+		Implementation part of \c HandleDocument, not available to the users of the service.
+		Changes made by \a accessor are grouped by \c istd::CChangeGroup if it is not a read-only access.
+
+		\return  \c OS_OK if \a accessor accessed the document, \c OS_INVALID_USER_ID or
+		         \c OS_INVALID_DOCUMENT_ID for an unknown user or document, or \c OS_FAILED if the document is
+		         loading, is read-only for a non-read-only access, or \a accessor rejected its type.
+	*/
+	virtual OperationStatus AccessDocument(
+				const QByteArray& userId,
+				const QByteArray& documentId,
+				IDocumentAccessor& accessor) = 0;
+
+private:
+	template <typename Method>
+	struct MemberFunctionClass;
+
+	template <typename Function, typename Class>
+	struct MemberFunctionClass<Function Class::*>
+	{
+		typedef Class Type;
+	};
+
+	template <typename Function>
+	class TDocumentAccessor: public IDocumentAccessor
+	{
+	public:
+		TDocumentAccessor(Function& function, bool isReadOnlyAccess)
+			:m_function(function),
+			m_isReadOnlyAccess(isReadOnlyAccess)
+		{
+		}
+
+		// reimplemented (IDocumentAccessor)
+		virtual bool IsReadOnlyAccess() const override
+		{
+			return m_isReadOnlyAccess;
+		}
+
+		virtual bool Access(istd::IChangeable& document) override
+		{
+			return m_function(document);
+		}
+
+	private:
+		Function& m_function;
+		bool m_isReadOnlyAccess;
+	};
+
+	template <typename Ret, typename Value, typename Method, typename Document, typename... Args>
+	static void InvokeMethod(std::optional<Value>& value, Method method, Document& document, Args&&... args)
+	{
+		if constexpr (std::is_void_v<Ret>){
+			std::invoke(method, document, std::forward<Args>(args)...);
+
+			value.emplace();
+		}
+		else{
+			if constexpr (std::is_reference_v<Ret>){
+				auto&& methodResult = std::invoke(method, document, std::forward<Args>(args)...);
+				value.emplace(methodResult);
+			}
+			else{
+				value.emplace(std::invoke(method, document, std::forward<Args>(args)...));
+			}
+		}
+	}
 };
 
 
@@ -342,4 +535,3 @@ public:
 
 
 Q_DECLARE_METATYPE(imtdoc::IDocumentService::DocumentNotification);
-

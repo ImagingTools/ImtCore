@@ -7,13 +7,13 @@
     <x>0</x>
     <y>0</y>
     <width>409</width>
-    <height>234</height>
+    <height>217</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Task Settings</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout" rowstretch="1,0,0,0,0,0,0,0">
+  <layout class="QGridLayout" name="gridLayout" rowstretch="1,0,0,0,0,0,0">
    <property name="leftMargin">
     <number>0</number>
    </property>
@@ -26,6 +26,33 @@
    <property name="bottomMargin">
     <number>0</number>
    </property>
+   <item row="6" column="1">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="0" column="0">
+    <widget class="QCheckBox" name="ActiveCheck">
+     <property name="text">
+      <string>Active</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="inputIDLabel">
+     <property name="text">
+      <string>Input-ID</string>
+     </property>
+    </widget>
+   </item>
    <item row="2" column="0">
     <widget class="QLabel" name="label_3">
      <property name="text">
@@ -33,18 +60,24 @@
      </property>
     </widget>
    </item>
-   <item row="5" column="0">
-    <widget class="QLabel" name="label_2">
+   <item row="1" column="1">
+    <widget class="QLineEdit" name="TaskNameEdit"/>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label">
      <property name="text">
-      <string>Description</string>
+      <string>Task Name</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="1">
-    <widget class="QLineEdit" name="TaskDescriptionEdit"/>
-   </item>
    <item row="3" column="1">
     <widget class="QStackedWidget" name="InputPageStack">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="currentIndex">
       <number>1</number>
      </property>
@@ -99,58 +132,18 @@
      </widget>
     </widget>
    </item>
-   <item row="7" column="1">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="label">
+   <item row="5" column="0">
+    <widget class="QLabel" name="label_2">
      <property name="text">
-      <string>Task Name</string>
+      <string>Description</string>
      </property>
     </widget>
-   </item>
-   <item row="1" column="1">
-    <widget class="QLineEdit" name="TaskNameEdit"/>
    </item>
    <item row="2" column="1">
     <widget class="QLineEdit" name="TaskUserIdEdit"/>
    </item>
-   <item row="0" column="0">
-    <widget class="QCheckBox" name="ActiveCheck">
-     <property name="text">
-      <string>Active</string>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="0">
-    <widget class="QLabel" name="TriggerLabel">
-     <property name="toolTip">
-      <string extracomment="Id of frame in multiframe acquisition"/>
-     </property>
-     <property name="text">
-      <string>InputSub-ID</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="inputIDLabel">
-     <property name="text">
-      <string>Input-ID</string>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="1">
-    <widget class="QLineEdit" name="TriggerSelector"/>
+   <item row="5" column="1">
+    <widget class="QLineEdit" name="TaskDescriptionEdit"/>
    </item>
   </layout>
  </widget>

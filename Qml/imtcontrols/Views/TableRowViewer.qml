@@ -11,6 +11,102 @@ Row {
 	property alias model: repeater.model
 	property bool loadDefaultCellDelegate: true;
 
+	function cellComponent(columnIndex){
+		if (!dataList.rowDelegate || !dataList.rowDelegate.tableItem){
+			return null;
+		}
+
+		let tableItem = dataList.rowDelegate.tableItem;
+		let headerId = tableItem.getHeaderId(columnIndex);
+		let contentComp = null;
+
+		if (dataList.loadDefaultCellDelegate){
+			contentComp = tableItem.cellDelegate;
+		}
+
+		if (headerId && headerId.toLowerCase().endsWith("link")){
+			contentComp = objectLinkDelegateComp;
+		}
+
+		let contents = tableItem.columnContentComps;
+		if (contents && Object.keys(contents).includes(headerId) && contents[headerId]){
+			contentComp = contents[headerId];
+		}
+
+		return contentComp;
+	}
+
+	Component.onDestruction: {
+		if (dataList.rowDelegate && dataList.rowDelegate.tableItem && typeof dataList.rowDelegate.tableItem.cancelRowFill === 'function'){
+			dataList.rowDelegate.tableItem.cancelRowFill(dataList);
+		}
+	}
+
+	// A table that has spent its time slice queues the row and fills it on a later tick, which lets the first rows paint.
+	function fillCells(){
+		if (!dataList.rowDelegate || !dataList.rowDelegate.tableItem){
+			return true;
+		}
+
+		let tableItem = dataList.rowDelegate.tableItem;
+		if (typeof tableItem.takeRowFillSlice === 'function' && !tableItem.takeRowFillSlice(dataList)){
+			return false;
+		}
+
+		dataList.fillRowCells();
+
+		return true;
+	}
+
+	// Fills every cell of the row in one pass, so the row is laid out once rather than once per cell.
+	function fillRowCells(){
+		if (!dataList.rowDelegate || !dataList.rowDelegate.tableItem){
+			return;
+		}
+
+		// Inline rather than a function per cell, and contentItem set last: every QML function call is
+		// its own update in the web runtime, so a cell resized inside one re-lays the row and the list out.
+		for (let i = 0; i < repeater.count; i++){
+			let cell = repeater.itemAt(i);
+			if (!cell || !cell.complCompl || cell.contentItem){
+				continue;
+			}
+
+			let contentComp = dataList.cellComponent(i);
+			if (!contentComp){
+				continue;
+			}
+
+			// Not as createObject initial properties: the web runtime takes an object passed there for a new child,
+			// re-completes it and leaves the cell's rowDelegate null.
+			let obj = contentComp.createObject(cell);
+			obj.columnIndex = i;
+			obj.rowDelegate = dataList.rowDelegate;
+			if (typeof obj.setCellWidth === 'function'){
+				obj.setCellWidth();
+			}
+
+			cell.contentItem = obj;
+		}
+	}
+
+	// For a cell the Repeater does not list yet: added after the row was built, when the columns arrive late.
+	function fillCell(cell, index){
+		let contentComp = dataList.cellComponent(index);
+		if (!contentComp){
+			return;
+		}
+
+		let obj = contentComp.createObject(cell);
+		obj.columnIndex = index;
+		obj.rowDelegate = dataList.rowDelegate;
+		if (typeof obj.setCellWidth === 'function'){
+			obj.setCellWidth();
+		}
+
+		cell.contentItem = obj;
+	}
+
 	Component {
 		id: objectLinkDelegateComp
 		TextLinkCellDelegate {
@@ -46,7 +142,8 @@ Row {
 			id: cell
 			property bool compl: false;
 			property bool complCompl: dataList.compl && dataList && dataList.rowDelegate && dataList.rowDelegate.tableItem && dataList.rowDelegate.tableItem.columnCount;
-			width: loader.item ? loader.item.width :20
+			property Item contentItem: null;
+			width: cell.contentItem ? cell.contentItem.width : 20
 			height: dataList.height;
 
 			clip: true;
@@ -56,43 +153,13 @@ Row {
 			}
 
 			onComplComplChanged: {
-				if(cell.complCompl && dataList && dataList.rowDelegate && dataList.rowDelegate.tableItem && dataList.rowDelegate.tableItem.headers){
-					let headerId = dataList.rowDelegate.tableItem.getHeaderId(model.index)
-					let contents = dataList.rowDelegate.tableItem.columnContentComps;
-					let contentComp = undefined;
-
-					if (dataList.loadDefaultCellDelegate){
-						contentComp = dataList.rowDelegate.tableItem.cellDelegate;
-					}
-
-					if (headerId.toLowerCase().endsWith("link")){
-						contentComp = objectLinkDelegateComp;
-					}
-
-					if (Object.keys(contents).includes(headerId)){
-						if (contents[headerId]){
-							contentComp = contents[headerId];
-						}
-					}
-
-					loader.sourceComponent = contentComp;
-				}
-			}
-
-			Loader {
-				id: loader;
-				anchors.fill: parent
-				property bool ready: item && dataList.rowDelegate;
-				onReadyChanged: {
-					if(ready){
-						item.columnIndex = model.index
-						item.rowDelegate = dataList.rowDelegate
-						if(typeof item.setCellWidth === 'function'){
-							item.setCellWidth()
-						}
-					}
+				if (!cell.complCompl || cell.contentItem){
+					return;
 				}
 
+				if (dataList.fillCells() && !cell.contentItem){
+					dataList.fillCell(cell, model.index);
+				}
 			}
 		}
 	}

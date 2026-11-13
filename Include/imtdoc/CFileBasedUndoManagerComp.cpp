@@ -127,6 +127,38 @@ void CFileBasedUndoManagerComp::ResetHistory()
 }
 
 
+bool CFileBasedUndoManagerComp::RemoveAllDocumentContexts()
+{
+	if (!m_rootFolderCompPtr.IsValid()){
+		return true;
+	}
+
+	const QString rootFolderPath = m_rootFolderCompPtr->GetPath();
+	if (rootFolderPath.isEmpty()){
+		return true;
+	}
+
+	QDir rootDirectory(rootFolderPath);
+	if (!rootDirectory.exists()){
+		return true;
+	}
+
+	// Document data is stored in subdirectories only, files in the root folder are kept
+	bool retVal = true;
+	const QStringList directoryNames = rootDirectory.entryList(QDir::Dirs | QDir::NoDotAndDotDot | QDir::Hidden);
+	for (const QString& directoryName : directoryNames){
+		QDir documentDirectory(rootDirectory.filePath(directoryName));
+		if (!documentDirectory.removeRecursively()){
+			SendWarningMessage(0, QObject::tr("Failed to remove undo data directory: ") + documentDirectory.absolutePath());
+
+			retVal = false;
+		}
+	}
+
+	return retVal;
+}
+
+
 void CFileBasedUndoManagerComp::ResetUndo()
 {
 	istd::CChangeNotifier notifier(this);
@@ -219,6 +251,16 @@ bool CFileBasedUndoManagerComp::Serialize(iser::IArchive& archive)
 		RestoreObservedObject(*m_currentStatePtr);
 	}
 
+	if (!archive.IsStoring() && !retVal){
+		SetStepFileAutoRemoveEnabled(false);
+		RemoveStoredStepsFromDisk();
+
+		m_undoList.clear();
+		m_redoList.clear();
+		m_beginStatePtr.reset();
+		m_currentStatePtr.reset();
+	}
+
 	return retVal;
 }
 
@@ -250,6 +292,27 @@ bool CFileBasedUndoManagerComp::SerializeUndoList(
 	retVal = retVal && archive.EndTag(listTag);
 
 	return retVal;
+}
+
+
+void CFileBasedUndoManagerComp::RemoveStoredStepsFromDisk() const
+{
+	const QString storageDirectoryPath = GetStorageDirectoryPath();
+	if (storageDirectoryPath.isEmpty()){
+		return;
+	}
+
+	QDir directory(storageDirectoryPath);
+	if (!directory.exists()){
+		return;
+	}
+
+	const QStringList fileNames = directory.entryList(QDir::Files | QDir::NoDotAndDotDot);
+	for (const QString& fileName : fileNames){
+		if (fileName.startsWith(QStringLiteral("Undo_")) || fileName.startsWith(QStringLiteral("Redo_")) || fileName.startsWith(QStringLiteral("CurrentState"))){
+			QFile::remove(directory.filePath(fileName));
+		}
+	}
 }
 
 

@@ -406,6 +406,14 @@ documentOpened(documentId, objectTypeId)
 if (isDirty) setDocumentIsDirty(documentId, true)
 ```
 
+`DocumentInfo.isReadOnly == true` у документа, открытого из ревизии объекта: такой
+документ можно только закрыть. Сервер отклоняет сохранение, переименование,
+изменение данных и undo/redo/resetUndo, а имя документа содержит суффикс
+` (Rev #N)`. `DocumentDecorator` выключает команды `Undo`/`Redo`/`Save` для
+таких документов (`documentIsReadOnly(documentId)`). Флаг задаёт только сервер:
+он запоминается из ответа `OpenDocument` и из списка открытых документов,
+клиент изменить его не может.
+
 `documentOpened` дополнительно обрабатывается в самом `DocumentServiceBase`
 (`onDocumentOpened → createDocumentData`) — повторный вызов безопасен, так как
 `createDocumentData` выходит, если документ уже есть.
@@ -435,10 +443,20 @@ documentManager.createDocument(typeId, proposedSourceDocumentId)
 setAutoNamedTypeId, setDocumentName
 createDocumentData(documentId, objectTypeId, isNew = true)
 if (proposedObjectId) setDocumentObjectId(...)
+setDocumentIsLoading(documentId, true)
 documentCreated(documentId, objectTypeId)
 if (isDirty) setDocumentIsDirty(...)
-setDocumentIsLoading(documentId, false)   // новый документ грузить нечего
+if (isDataLoaded !== false) setDocumentIsLoading(documentId, false)
 ```
+
+Ответ `CreateNewDocument` приходит только после создания объекта на сервере, поэтому
+передаёт `isDataLoaded = true`. `reflectRemoteDocumentCreated` передаёт `false`:
+уведомление `NewDocumentCreated` сервер шлёт до создания объекта, и загрузка
+завершается уведомлением `DocumentDataLoaded`.
+
+По умолчанию view нового документа показывает значения из `representationModel`
+контроллера. Чтобы получить representation нового документа с сервера, в контроллере
+выставляется `requestRepresentationOnCreate: true`.
 
 `openOrCreateByObjectId(typeId, objectId, proposedId)` — единая точка входа:
 пустой `objectId` → `createDocument`, иначе → `openDocument`.
@@ -463,8 +481,10 @@ documentData.addView(viewTypeId, view)
         → representationController = factory.createObject(documentData)
           representationController.documentId = id
           representationController.view       = view
+        → required = !isNew || representationController.requestRepresentationOnCreate
         → documentDecorator.registerView(view, representationController,
-                                         updateRepr = !isNew && !isLoading)
+                                         updateRepr = required && !isLoading)
+        → если !required && !isLoading: documentDecorator.releaseView(index)
 → __internal.maybeEmitDocumentReady(documentId)
 ```
 
@@ -495,7 +515,7 @@ documentData.addView(viewTypeId, view)
 index < 0 :  если isLoading == false -> запомнить в pendingDataLoaded[documentId]
              (уведомление DataLoaded пришло раньше ответа OpenDocument)
 
-docData.isClosing -> выход (документ уже закрывается)
+docData.isClosing или isLoading не изменился -> выход
 
 docData.isLoading = isLoading
 
@@ -503,17 +523,34 @@ isLoading == true и есть pendingDataLoaded[documentId]
    -> удалить запись, немедленно считать isLoading = false
 
 isLoading == false:
-   !isNew : documentDecorator.updateRepresentationForAllViews()
-   isNew  : для каждого зарегистрированного view —
-            если updateCounters[i] <= 0  -> view.setBlockingUpdateModel(false)
-            view.doUpdateGui()
+   для каждого зарегистрированного view —
+      representation нужна (!isNew || requestRepresentationOnCreate)
+         -> documentDecorator.updateRepresentation(i)
+      иначе
+         -> documentDecorator.releaseView(i)   // снять блокировку, doUpdateGui()
    -> signal documentDataLoaded(documentId)
    -> maybeEmitDocumentReady(documentId)
 ```
 
-`maybeEmitDocumentReady` эмитит `documentReady(documentId)` **ровно один раз**, когда
-одновременно выполнено: документ не в состоянии загрузки **и** зарегистрирован хотя бы
-один view. Порядок событий значения не имеет.
+`maybeEmitDocumentReady` эмитит `documentReady(documentId, typeId, isNew, representationController)`
+**ровно один раз**, когда документ полностью готов к работе:
+
+- документ не в состоянии загрузки;
+- зарегистрирован хотя бы один view;
+- нет незавершённых запросов representation;
+- representation получена с сервера хотя бы раз (`documentRepresentationUpdated`),
+  если она нужна хотя бы одному видимому view. Если видимых view нет, учитываются все.
+
+Порядок событий значения не имеет. Если view невидим, его representation
+запрашивается при показе; готовность перепроверяется при каждом изменении
+видимости view. При ошибке `updateRepresentationFailed` сигнал `documentReady` не эмитится;
+повторить запрос можно через `updateDocumentRepresentation(documentId)` (так делает
+`SingleDocumentWorkspaceShellView.retry()` для уже открытого документа).
+Ошибка относится только к своему view: декоратор снимает блокировку и счётчик загрузки
+только у него, остальные view продолжают загрузку. Признак ошибки снимается следующим
+запросом representation этого view.
+Уничтоженный view автоматически снимается с регистрации (`DocumentDecorator.unregisterView`).
+`representationController` — контроллер первого зарегистрированного view (`null`, если его нет).
 
 ### 4.8. Закрытие документа
 
@@ -526,7 +563,8 @@ isLoading == false:
     closeFunc(false)
 
 closeFunc(undefined) -> отмена
-closeFunc(true)      -> подписаться на documentSaved/saveDocumentFailed,
+closeFunc(true)      -> commitDocumentChanges(documentId)   // GUI -> документ (Update<X>FromRepresentation), без ожидания ответа
+                        подписаться на documentSaved/saveDocumentFailed,
                         вызвать saveDocument(documentId);
                         по documentSaved -> closeFunc(false)
 closeFunc(false)     -> startCloseDocument(documentId)
@@ -537,7 +575,9 @@ closeFunc(false)     -> startCloseDocument(documentId)
 
 `DocumentServiceBase.onDocumentClosed → __internal.removeDocumentData(documentId)`:
 удаляются `pendingDataLoaded`, `readyEmitted`, `cachedDocumentObjectIds`,
-`documentSaveNameResolvers` и сама запись из `openedDocuments`.
+`documentSaveNameResolvers` и сама запись из `openedDocuments`; объект документа вместе с
+декоратором и контроллерами уничтожается. `closeDocumentFailed` снимает признак `isClosing`,
+чтобы документ продолжал обрабатывать уведомления о загрузке.
 
 Хост по `documentClosed` убирает вкладку. `MultiDocumentCollectionView` дополнительно
 обрабатывает `closeDocumentFailed`, вызывая свой же `onDocumentClosed`, чтобы вкладка не
@@ -556,7 +596,7 @@ closeFunc(false)     -> startCloseDocument(documentId)
 
 | Подписка | `gqlCommandId` | Обработка |
 |---|---|---|
-| Документы | `On<CollectionId>DocumentChanged` | `DocumentOpened` → `reflectRemoteDocumentOpened(...)`; `NewDocumentCreated` → `reflectRemoteDocumentCreated(...)`; `DocumentDataLoaded` → `setDocumentIsLoading(id, false)`; `DocumentClosed` → `documentClosed(id)`; `DocumentRenamed` → `setDocumentName(id, name)`; **в любом случае** эмитится `documentManagerChanged(operation, objectId, documentId, documentName)`. |
+| Документы | `On<CollectionId>DocumentChanged` | `DocumentOpened` → `reflectRemoteDocumentOpened(...)`; `NewDocumentCreated` → `reflectRemoteDocumentCreated(...)`; `DocumentDataLoaded` → `setDocumentIsLoading(id, false)`; `DocumentClosed` → `documentClosed(id)`; `DocumentRenamed` → `setDocumentName(id, name)`; **в любом случае** эмитится `documentManagerChanged(operation, objectId, documentId, documentName, sourceId, changeIds)`; для `DocumentChanged` `sourceId` — поле уведомления `requestId`, `changeIds` — поле `changeIds` (см. 5.4). |
 | Undo | `On<CollectionId>UndoChanged` | `undoInfoReceived(documentId, undoSteps, redoSteps, isDirty)`. |
 
 Нотификации рассылаются всем подпискам того же пользователя, поэтому **вторая сессия
@@ -575,7 +615,7 @@ closeFunc(false)     -> startCloseDocument(documentId)
 
 `documentManagerChanged` — это широковещательный сигнал, на который реагируют:
 
-- `DocumentDecorator`: `DocumentChanged` → `updateRepresentationForAllViews()`;
+- `DocumentDecorator`: `DocumentChanged` → `onDocumentChanged(sourceId, changeIds)` (см. 5.4);
   `DocumentSaved` → вызвать `view.documentSaved()` у всех view, где такая функция есть;
 - `MultiDocumentCollectionView`: `DocumentClosed` → убрать вкладку;
   `NewDocumentCreated` / `DocumentOpened` → `setDocumentName(...)`.
@@ -620,7 +660,12 @@ DocumentRepresentationController {
     signal updateDocumentFailed(documentId, message)
 
     function updateRepresentationFromDocument() { /* сервер -> representation */ }
-    function updateDocumentFromRepresentation() { /* representation -> сервер */ }
+    function updateDocumentFromRepresentation() { /* representation -> сервер, возвращает sourceId */ }
+
+    // перечитывать ли representation после изменения документа на сервере, см. 5.4
+    property var observedChangeIds: []      // части документа, которые показывает representation
+    property bool updateOnDocumentViewChange: true  // false: правки других view этого документа не читать
+    function isUpdateRequired(changeIds, changeSource)
 }
 ```
 
@@ -642,7 +687,7 @@ function updateDocumentFromRepresentation(){
     startUpdateDocument(documentId)
     updateRoleInput.m_documentId = documentId
     updateRoleInput.m_role = representationModel
-    updateRoleRequest.send(updateRoleInput)    // Mutation UpdateRoleFromRepresentation
+    return updateRoleRequest.send(updateRoleInput)    // Mutation UpdateRoleFromRepresentation; sourceId = ID запроса
 }
 ```
 
@@ -696,12 +741,12 @@ sequenceDiagram
     alt updateCounters[index] > 0
         Note over D: изменение вызвано загрузкой representation — игнорируем
     else
-        D->>D: _internal.initiatingView = view
-        D->>RC: updateDocumentFromRepresentation()
-        RC->>S: Update<X>FromRepresentation
+        D->>RC: sendUpdate(index): sourceId = updateDocumentFromRepresentation()
+        RC->>S: Update<X>FromRepresentation, заголовок X-Request-ID = sourceId
+        D->>D: запомнить sourceId для view
         S-->>S: применить к рабочей копии, обновить undo/isDirty
-        S--)D: subscription DocumentChanged
-        D->>D: updateRepresentationForAllViews()  (кроме initiatingView)
+        S--)D: subscription DocumentChanged {requestId → sourceId, changeIds}
+        D->>RC: isUpdateRequired(changeIds, changeSource) для каждого view
     end
 ```
 
@@ -709,11 +754,70 @@ sequenceDiagram
 меняет representation, что снова поднимает `modelChanged`; без этой проверки данные ушли
 бы обратно на сервер бесконечным циклом.
 
-`_internal.initiatingView` — защита от лишней перерисовки: view, который инициировал
-изменение, при последующем `DocumentChanged` пропускается (его GUI и так актуален).
-Флаг одноразовый — сбрасывается в начале `updateRepresentationForAllViews()`.
+### 5.4. Перечитывание после изменения: `sourceId` и `changeIds`
 
-### 5.4. Ошибки
+Сигнал `documentManagerChanged` для `DocumentChanged` несёт два независимых значения:
+
+| Значение | Откуда | Смысл |
+|---|---|---|
+| `sourceId` | Метка, которую вернул `updateDocumentFromRepresentation()` | Что вызвало изменение. Пусто, если неизвестно |
+| `changeIds` | Сервер: `IDocumentChangeNotificationConverter` типа документа | Какие части документа изменились. Пусто, если неизвестно |
+
+`imtdocgui` не знает, что такое `sourceId`: это непрозрачная строка, которую декоратор только сравнивает.
+Транспорт сам решает, чем её заполнить:
+
+- GQL-контроллер возвращает из `updateDocumentFromRepresentation()` результат `GqlSdlRequestSender.send()` —
+  ID запроса, который ушёл в заголовке `X-Request-ID`;
+- сервер публикует `DocumentChanged` в потоке запроса, изменившего документ, и пишет этот ID в поле
+  `requestId` уведомления (берёт его из `CGqlRequestContextManager`);
+- `GqlBasedCollectionDocumentService` передаёт поле `requestId` в сигнал как `sourceId`.
+
+Как это работает:
+
+1. `DocumentDecorator.sendUpdate()` запоминает `sourceId` для своего view: у каждого view хранятся 16 последних.
+   Контроллер, который ничего не вернул, своих изменений не имеет: у него перечитывается всё.
+2. При `DocumentChanged` декоратор находит view по `sourceId` и спрашивает **каждый** контроллер
+   `isUpdateRequired(changeIds, changeSource)`. Источник изменения для контроллера:
+
+   | `changeSource` | Когда |
+   |---|---|
+   | `DocumentRepresentationController.ChangeSource.Own` | Изменение вызвало обновление этого view |
+   | `DocumentRepresentationController.ChangeSource.DocumentView` | Изменение вызвало обновление другого view этого документа в этом клиенте |
+   | `DocumentRepresentationController.ChangeSource.External` | Другая вкладка или сессия, undo, сервер: метка не найдена ни у одного view |
+3. Если контроллер ответил `true`, видимый view читается сразу, скрытый — при показе. View, чьё
+   последнее чтение не удалось, читается при любом изменении.
+
+Контроллер объявляет, какие части документа он показывает, а решение принимает базовый `isUpdateRequired`:
+
+```qml
+observedChangeIds: ["licenses", "permissions"]
+```
+
+| Ситуация | Решение |
+|---|---|
+| Своё изменение | Не читать |
+| Изменение другого view этого документа при `updateOnDocumentViewChange: false` | Не читать |
+| `changeIds` пустой (неизвестно, что изменилось: undo, нет конвертера) | Читать |
+| `observedChangeIds` пустой (контроллер не фильтрует) | Читать |
+| Есть пересечение `changeIds` и `observedChangeIds` | Читать |
+| Пересечения нет | Не читать |
+
+`updateOnDocumentViewChange: false` подходит view, данные которого другие view документа не меняют, включая
+то, что сервер пересчитывает из их правок. Иначе view покажет старые значения до следующего внешнего
+изменения. Когда сервер начнёт присылать `changeIds`, точнее объявить `observedChangeIds`: они отсекают
+нерелевантные изменения из любого источника.
+
+Для особых случаев контроллер переопределяет `isUpdateRequired`. Например, если сервер сам дописывает
+документ во время правки (номер заявки), своё изменение тоже нужно читать: «своё» — это всё, что сервер
+изменил во время запроса, а не только отправленные данные.
+
+Объявляя `observedChangeIds`, контроллер обещает, что другие изменения его данных не затрагивают, включая
+значения, которые сервер вычисляет при чтении.
+
+`updateRepresentationForAllViews()` (повторная синхронизация после переподключения) правило не
+спрашивает и читает все view.
+
+### 5.5. Ошибки
 
 - `updateRepresentationFailed` → **все** `updateCounters` обнуляются и **все** view
   разблокируются; наверх идёт `documentManager.updateRepresentationFailed(...)`
@@ -778,8 +882,8 @@ onPageAdded(item, index):
   `representationModel`. Общего representation нет.
 - Все контроллеры зарегистрированы в **одном** `DocumentDecorator` документа.
 - При `DocumentChanged` (правка в любом view или изменение другим клиентом)
-  `updateRepresentationForAllViews()`:
-  - пропускает `initiatingView`;
+  `onDocumentChanged(sourceId, changeIds)`:
+  - спрашивает каждый контроллер `isUpdateRequired(changeIds, changeSource)` (см. 5.4);
   - для **видимых** view сразу запускает `updateRepresentationFromDocument()`;
   - для **невидимых** — откладывает, добавляя в `_internal.requestUpdateViews`.
 - Когда невидимый view становится видимым (`guiVisibleChanged(view, true)`),
@@ -875,10 +979,10 @@ DocumentDecorator.onCommandActivated("Undo") -> onUndo()
 
 1. по undo-подписке — `undoInfoReceived(documentId, availableUndoSteps, availableRedoSteps, isDirty)`;
    `DocumentServiceBase.onUndoInfoReceived → setDocumentIsDirty(documentId, isDirty)`;
-   `DocumentDecorator` включает/выключает команды `Undo`/`Redo`/`Save` во всех view;
-2. по document-подписке — `DocumentChanged`, что приводит к
-   `updateRepresentationForAllViews()`, то есть перезагрузке representation
-   (`initiatingView` здесь `null`, поэтому обновятся **все** видимые view).
+   `DocumentDecorator` включает/выключает команды `Undo`/`Redo`/`Save` во всех view
+   (у read-only документов они всегда выключены);
+2. по document-подписке — `DocumentChanged` с ID запроса `DoUndo`. Его отправил сервис,
+   а не контроллер, поэтому изменение ни для одного view не своё и по умолчанию перечитываются **все** view (см. 5.4).
 
 `getUndoInfo(documentId)` — явный запрос состояния (используется, например, при
 восстановлении списка открытых документов).

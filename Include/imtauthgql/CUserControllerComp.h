@@ -92,6 +92,8 @@ private:
 	imtauth::IUserInfoSharedPtr GetUserInfoByLogin(const QByteArray& login) const;
 	QByteArray GetUserIdByLogin(const QByteArray& login) const;
 	QByteArray GetUserIdByEmail(const QString& email) const;
+	// The password recovery names the account by its e-mail; the login is accepted as well
+	QByteArray GetUserIdByLoginOrEmail(const QByteArray& loginOrEmail) const;
 
 private:
 	I_REF(imtauth::IUserVerificationController, m_userVerificationControllerCompPtr);

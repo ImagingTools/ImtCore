@@ -2,6 +2,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QMutex>
+
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
 
@@ -56,7 +59,8 @@ public:
 	virtual QByteArray CreateConnectionRequest(
 				const QByteArray& sourceTenantId,
 				const QString& connectionCode,
-				const QString& message = QString()) override;
+				const QString& message = QString(),
+				QString* errorMessagePtr = nullptr) override;
 	virtual QByteArray ApproveConnectionRequest(const QByteArray& requestId, const QByteArray& approvingTenantId) override;
 	virtual bool RejectConnectionRequest(const QByteArray& requestId, const QByteArray& tenantId) override;
 	virtual bool CancelConnectionRequest(const QByteArray& requestId, const QByteArray& tenantId) override;
@@ -74,20 +78,34 @@ public:
 	virtual bool RejectRelationshipProposal(const QByteArray& proposalId, const QByteArray& tenantId) override;
 	virtual bool CancelRelationshipProposal(const QByteArray& proposalId, const QByteArray& tenantId) override;
 	virtual QByteArrayList GetRelationshipProposalIds(const QByteArray& tenantId) const override;
+	virtual ITenantRelationshipProposalInfoUniquePtr GetRelationshipProposal(const QByteArray& proposalId) const override;
 
 	// ITenantConnectionRequestManager - Relationships
-	virtual QByteArrayList GetTenantRelationshipIds(const QByteArray& tenantId) const override;
+	virtual QByteArrayList GetTenantRelationshipIds(const QByteArray& tenantId, bool* isReadPtr = nullptr) const override;
 	virtual ITenantRelationshipInfoUniquePtr GetTenantRelationship(const QByteArray& relationshipId) const override;
 	virtual bool RemoveTenantRelationship(const QByteArray& tenantId, const QByteArray& relationshipId) override;
+	virtual QDateTime GetRelatedSince(const QByteArray& tenantId, const QByteArray& otherTenantId, bool* isReadPtr = nullptr) const override;
 
 private:
 	QString GenerateConnectionCode() const;
 	QByteArray FindTenantByConnectionCode(const QString& connectionCode) const;
+	void PublishProposalEvent(
+				const QString& eventType,
+				const ITenantRelationshipProposalInfo& proposal,
+				ITenantRelationshipProposalInfo::RelationshipProposalStatus previousStatus);
 	bool ConnectionExists(const QByteArray& tenantAId, const QByteArray& tenantBId) const;
 	bool PendingRequestExists(const QByteArray& tenantAId, const QByteArray& tenantBId) const;
 	QByteArray CreateConnection(const QByteArray& tenantAId, const QByteArray& tenantBId);
 	QByteArray ApplyRelationshipProposal(const ITenantRelationshipProposalInfo* proposalPtr);
-	void ArchiveRelationshipsForConnection(const QByteArray& connectionId);
+	/// False when a relationship of the connection could not be read or archived.
+	bool ArchiveRelationshipsForConnection(const QByteArray& connectionId);
+	/// False when an open proposal of the connection could not be read or canceled.
+	bool CancelProposalsForConnection(const QByteArray& connectionId);
+
+	// Proposal changes and connection removals one at a time: two approvals of a proposal, or a proposal during the removal of its connection,
+	// would each leave a relationship, and a cancellation during an approval would mark an applied proposal canceled
+	QMutex m_relationshipChangeMutex;
+	bool ArchiveRelationship(const QByteArray& relationshipId, const ITenantRelationshipInfo& relationship, bool isRemovalPublished);
 
 	// DB helper methods
 	bool StoreConnectionCode(const QByteArray& tenantId, const ITenantConnectionCodeInfo& codeInfo);

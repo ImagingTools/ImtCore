@@ -25,6 +25,37 @@ namespace imtclientgql
 {
 
 
+namespace
+{
+
+
+/**
+	The product and the language the request was resolved for, as the HTTP client sends them: a web client served by a
+	product server sends no product, the server knows it.
+*/
+void InsertContextHeaders(const imtgql::IGqlContext& context, QJsonObject& headersObject)
+{
+	const QByteArray productId = context.GetProductId();
+	if (!productId.isEmpty()){
+		for (const QString& headerId : headersObject.keys()){
+			if (headerId.compare(QString(imtbase::s_productIdHeaderId), Qt::CaseInsensitive) == 0){
+				headersObject.remove(headerId);
+			}
+		}
+
+		headersObject[QString(imtbase::s_productIdHeaderId)] = QString(productId);
+	}
+
+	const QByteArray languageId = context.GetLanguageId();
+	if (!languageId.isEmpty()){
+		headersObject[QString(imtbase::s_languageIdHeaderId)] = QString(languageId);
+	}
+}
+
+
+} // namespace
+
+
 // public methods
 
 CSubscriptionManagerComp::CSubscriptionManagerComp()
@@ -392,10 +423,7 @@ QFuture<CSubscriptionManagerComp::GqlResult> CSubscriptionManagerComp::SendReque
 			}
 		}
 
-		const QByteArray languageId = contextPtr->GetLanguageId();
-		if (!languageId.isEmpty()){
-			headersObject[QString(imtbase::s_languageIdHeaderId)] = QString(languageId);
-		}
+		InsertContextHeaders(*contextPtr, headersObject);
 	}
 	dataObject["headers"] = headersObject;
 
@@ -511,10 +539,7 @@ bool CSubscriptionManagerComp::SubscriptionRegister(const imtgql::CGqlRequest& s
 			}
 		}
 
-		const QByteArray languageId = contextPtr->GetLanguageId();
-		if (!languageId.isEmpty()){
-			headersObject[QString(imtbase::s_languageIdHeaderId)] = QString(languageId);
-		}
+		InsertContextHeaders(*contextPtr, headersObject);
 	}
 
 	// The request context is a clone taken when the subscription was created, so
@@ -587,7 +612,8 @@ bool CSubscriptionManagerComp::SendRequestInternal(const imtgql::IGqlRequest& re
 	}
 
 	if (m_subscriptionSenderCompPtr.IsValid()){
-		retVal = m_subscriptionSenderCompPtr->SendRequest(requestPtr);
+		QByteArray data = requestPtr->GetBody();
+		retVal = m_subscriptionSenderCompPtr->SendData(data);
 	}
 	else if (m_requestManagerCompPtr.IsValid()){
 		if (clientId.isEmpty()){

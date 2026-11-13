@@ -123,7 +123,9 @@ bool CWebSocketServerComp::SendResponse(const QByteArray& requestId, ConstRespon
 
 	CWebSocketSender* sender = m_senders.value(requestId).data();
 	if (sender != nullptr){
-		return sender->SendResponse(response);
+		QByteArray data = response->GetData();
+
+		return sender->SendData(data);
 	}
 
 	return false;
@@ -136,7 +138,9 @@ bool CWebSocketServerComp::SendRequest(const QByteArray& requestId, ConstRequest
 
 	CWebSocketSender* sender = m_senders.value(requestId).data();
 	if (sender != nullptr){
-		return sender->SendRequest(request);
+		QByteArray data = request->GetBody();
+
+		return sender->SendData(data);
 	}
 
 	return false;
@@ -373,7 +377,7 @@ void CWebSocketServerComp::HandleNewConnections()
 	while (QWebSocket* webSocketPtr = webSocketServerPtr->nextPendingConnection()){
 #if QT_VERSION >= QT_VERSION_CHECK(6,4,0)
 		QString subprotocol = webSocketPtr->subprotocol();
-		QString message = QStringLiteral("Handle new web socket connection, (Subprotocol: '%1', Threads: %2)").arg(subprotocol, m_webSocketThreadList.count()) ;
+		QString message = QStringLiteral("Handle new web socket connection, (Subprotocol: '%1', Threads: %2)").arg(subprotocol).arg(m_webSocketThreadList.count()) ;
 		SendVerboseMessage(message, "CWebSocketServerComp");
 
 		if (!subprotocol.isEmpty() && !supportedSubprotocols.contains(subprotocol)) {

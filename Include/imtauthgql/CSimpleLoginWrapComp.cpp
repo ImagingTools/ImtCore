@@ -72,6 +72,11 @@ bool CSimpleLoginWrapComp::Login(const QString& userName, const QString& passwor
 			return false;
 		}
 
+		// An expired password or a deactivated account is answered without a token
+		if (!response.token || response.token->isEmpty()){
+			return false;
+		}
+
 		m_loggedUserPassword = password.toUtf8();
 
 		if (response.userId){
@@ -86,14 +91,10 @@ bool CSimpleLoginWrapComp::Login(const QString& userName, const QString& passwor
 		if (response.username){
 			m_userInfoPtr->SetId(*response.username);
 		}
-		if (response.permissions){
-			QByteArray permissions = *response.permissions;
-			if (!permissions.isEmpty()){
-				m_userInfoPtr->SetLocalPermissions(productId, response.permissions->split(';'));
-			}
+		m_userPermissionIds.clear();
+		if (response.permissions && !response.permissions->isEmpty()){
+			m_userPermissionIds = response.permissions->split(';');
 		}
-
-		m_userPermissionIds = m_userInfoPtr->GetLocalPermissions(productId);
 
 		if (response.token){
 			m_loggedUserToken = *response.token;

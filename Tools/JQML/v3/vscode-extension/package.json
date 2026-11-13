@@ -2,7 +2,7 @@
     "name": "jqml",
     "displayName": "JQML",
     "description": "Syntax highlighting, completions and diagnostics for the JQML engine",
-    "version": "1.0.17",
+    "version": "1.0.21",
     "publisher": "imtcore",
     "engines": {
         "vscode": "^1.74.0"
@@ -12,7 +12,8 @@
         "Linters"
     ],
     "activationEvents": [
-        "onLanguage:jqml"
+        "onLanguage:jqml",
+        "onDebug:jqml"
     ],
     "main": "./src/extension.js",
     "contributes": {
@@ -34,6 +35,43 @@
                 "language": "jqml",
                 "scopeName": "source.jqml",
                 "path": "./syntaxes/qml.tmLanguage.json"
+            }
+        ],
+        "breakpoints": [
+            { "language": "jqml" },
+            { "language": "qml" }
+        ],
+        "debuggers": [
+            {
+                "type": "jqml",
+                "label": "JQML",
+                "languages": ["jqml", "qml"],
+                "program": "./src/debugAdapter.js",
+                "runtime": "node",
+                "configurationAttributes": {
+                    "launch": {
+                        "required": [],
+                        "properties": {
+                            "program": {
+                                "type": "string",
+                                "description": "QML file to open with breakpoints.",
+                                "default": "${file}"
+                            }
+                        }
+                    }
+                },
+                "configurationSnippets": [
+                    {
+                        "label": "JQML: breakpoints",
+                        "description": "Set breakpoints in a QML file.",
+                        "body": {
+                            "type": "jqml",
+                            "request": "launch",
+                            "name": "JQML",
+                            "program": "^\"\\${file}\""
+                        }
+                    }
+                ]
             }
         ],
         "configuration": {

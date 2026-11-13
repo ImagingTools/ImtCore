@@ -58,6 +58,50 @@ void imtsdl::CSdlEntryBase::SetSchemaFilePath(const QString& schemaFilePath)
 }
 
 
+QString imtsdl::CSdlEntryBase::GetObjectTargetHeaderFilePath() const
+{
+	return m_objectTargetHeaderFilePath;
+}
+
+
+void imtsdl::CSdlEntryBase::SetObjectTargetHeaderFilePath(const QString& objectHeaderFile)
+{
+	if (m_objectTargetHeaderFilePath != objectHeaderFile){
+		istd::CChangeNotifier notifier(this);
+		m_objectTargetHeaderFilePath = objectHeaderFile;
+	}
+}
+
+
+QString imtsdl::CSdlEntryBase::GetObjectTargetSourceFilePath() const
+{
+	return m_objectTargetSourceFilePath;
+}
+
+
+void imtsdl::CSdlEntryBase::SetObjectTargetSourceFilePath(const QString& objectSourceFile)
+{
+	if (m_objectTargetSourceFilePath != objectSourceFile){
+		istd::CChangeNotifier notifier(this);
+		m_objectTargetSourceFilePath = objectSourceFile;
+	}
+}
+
+QString imtsdl::CSdlEntryBase::GetFwdHeaderTargetFilePath() const
+{
+	return m_fwdHeaderTargetFilePath;
+}
+
+
+void imtsdl::CSdlEntryBase::SetFwdHeaderTargetFilePath(const QString& fwdHeaderFile)
+{
+	if (m_fwdHeaderTargetFilePath != fwdHeaderFile){
+		istd::CChangeNotifier notifier(this);
+		m_fwdHeaderTargetFilePath = fwdHeaderFile;
+	}
+}
+
+
 bool imtsdl::CSdlEntryBase::IsExternal() const
 {
 	return m_isExternal;

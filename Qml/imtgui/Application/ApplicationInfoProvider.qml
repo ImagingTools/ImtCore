@@ -17,13 +17,18 @@ import imtappApplicationSdl 1.0
 QtObject {
 	id: root;
 
-	property string context: ""
+	property string permissionPath: ""
 	property ApplicationInfo serverApplicationInfo: null;
 	// -1 - not known yet, 0 - the server's own port, otherwise a separate WebSocket port
 	property int webSocketPort: -1;
+	// The server is behind a reverse proxy that serves the WebSocket on the page's origin
+	property bool webSocketSameOrigin: false;
 	property string userMode: "";
 	property string superuserStatus: "";
 	property string superuserMessage: "";
+	property bool tenantsEnabled: false;
+	property bool externalLoginEnabled: false;
+	property bool documentSharingEnabled: false;
 
 	signal updated();
 
@@ -54,7 +59,7 @@ QtObject {
 	}
 
 	property GqlSdlRequestSender request : GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		gqlCommandId: ImtappApplicationSdlCommandIds.s_getApplicationInfo;
 		sdlObjectComp: Component { ApplicationInfo {
 			} }
@@ -65,6 +70,11 @@ QtObject {
 			}
 
 			root.serverApplicationInfo = sdlObject;
+			root.tenantsEnabled = sdlObject.m_tenantsEnabled === true;
+			root.externalLoginEnabled = sdlObject.m_externalLoginEnabled === true;
+			root.documentSharingEnabled = sdlObject.m_documentSharingEnabled === true;
+
+			root.webSocketSameOrigin = sdlObject.m_webSocketSameOrigin === true;
 
 			// No webSocketUrl: WebSocket is served on the server's own (HTTP) port
 			if (sdlObject.m_webSocketUrl){

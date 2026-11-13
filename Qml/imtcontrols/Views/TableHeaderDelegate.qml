@@ -60,6 +60,13 @@ Item{
 		}
 	}
 
+	// widthRecalc can arrive before this binding follows the table's column count
+	onColumnCountChanged: {
+		if(headerDelegate.complCompl){
+			headerDelegate.setCellWidth();
+		}
+	}
+
 	function createRightMA(){
 		if(headerDelegate.columnIndex == getLastHeaderIndex()){
 			if(headerDelegate.rightMA == null){
@@ -158,19 +165,9 @@ Item{
 		anchors.left: leftBorder.right;
 		anchors.right: rightBorder.left;
 		anchors.bottom: bottomBorder.top;
-		color: headerDelegate.tableItem.emptyDecorHeader ? "transparent" :
-														   headerDelegate.tableItem.headerDecorator.isValidData("Color", headerDelegate.columnIndex) ?
-															   headerDelegate.tableItem.headerDecorator.getData("Color", headerDelegate.columnIndex) :
-															   "transparent";
-
-		opacity:  headerDelegate.tableItem.emptyDecorHeader ? 1 :
-															  headerDelegate.tableItem.headerDecorator.isValidData("Opacity", headerDelegate.columnIndex) ?
-																  headerDelegate.tableItem.headerDecorator.getData("Opacity", headerDelegate.columnIndex) :
-																  1;
-
-		radius: headerDelegate.tableItem.emptyDecorHeader ? 0 :
-															headerDelegate.tableItem.headerDecorator.isValidData("CellRadius", headerDelegate.columnIndex) ?
-																headerDelegate.tableItem.headerDecorator.getData("CellRadius", headerDelegate.columnIndex) :0;
+		color: headerDelegate.tableItem.headerCellColor(headerDelegate.columnIndex);
+		opacity: headerDelegate.tableItem.headerCellOpacity(headerDelegate.columnIndex);
+		radius: headerDelegate.tableItem.headerCellRadius(headerDelegate.columnIndex);
 
 		// Tells the reader the title is a control before they click it, in the
 		// tab strip's manner: a light wash inset from the cell's edges, and not
@@ -179,16 +176,12 @@ Item{
 		//
 		// Under the corner patches, so a decorated header keeps the corners it
 		// asked for.
+		// VS Code header cells light up whole, without an inset pill.
 		Rectangle {
 			anchors.fill: parent;
-			anchors.topMargin: Style.marginXS;
-			anchors.bottomMargin: Style.marginXS;
-			anchors.leftMargin: 2;
-			anchors.rightMargin: 2;
 
-			visible: headerDelegate.sortable && headerMa.containsMouse && !headerDelegate.activeSort;
-			color: Style.alternateBaseColor;
-			radius: Style.radiusM;
+			visible: headerDelegate.sortable && headerMa.containsMouse;
+			color: Style.hover;
 		}
 
 		// The press itself. A wash that deepens under the finger and drains away
@@ -200,14 +193,9 @@ Item{
 			// Same shape as the hover wash above, so pressing deepens what the
 			// pointer already lit rather than painting a second, wider patch.
 			anchors.fill: parent;
-			anchors.topMargin: Style.marginXS;
-			anchors.bottomMargin: Style.marginXS;
-			anchors.leftMargin: 2;
-			anchors.rightMargin: 2;
 
 			color: Style.selectedColor;
 			opacity: 0;
-			radius: Style.radiusM;
 
 			// Quick to arrive, slower to leave: snapping straight back reads as a
 			// glitch, while a short drain reads as a release.
@@ -240,9 +228,8 @@ Item{
 			width: parent.width/2;
 			height: parent.height/2;
 			color: parent.color;
-			visible: headerDelegate.tableItem.emptyDecorHeader ? true :
-																 headerDelegate.tableItem.headerDecorator.isValidData("LeftTopRound", headerDelegate.columnIndex) ?
-																	 !headerDelegate.tableItem.headerDecorator.getData("LeftTopRound", headerDelegate.columnIndex) :true;
+			// In a table with a checkbox column the cell of that column owns the left corners.
+			visible: headerDelegate.tableItem.checkable && headerDelegate.firstVisibleColumn ? true : !headerDelegate.tableItem.isHeaderCornerRounded("LeftTopRound", headerDelegate.columnIndex);
 		}
 
 		Rectangle{
@@ -252,9 +239,7 @@ Item{
 			width: parent.width/2;
 			height: parent.height/2;
 			color: parent.color;
-			visible: headerDelegate.tableItem.emptyDecorHeader ? true :
-																 headerDelegate.tableItem.headerDecorator.isValidData("RightTopRound", headerDelegate.columnIndex) ?
-																	 !headerDelegate.tableItem.headerDecorator.getData("RightTopRound", headerDelegate.columnIndex) :true;
+			visible: !headerDelegate.tableItem.isHeaderCornerRounded("RightTopRound", headerDelegate.columnIndex);
 		}
 
 		Rectangle{
@@ -264,9 +249,8 @@ Item{
 			width: parent.width/2;
 			height: parent.height/2;
 			color: parent.color;
-			visible: headerDelegate.tableItem.emptyDecorHeader ? true :
-																 headerDelegate.tableItem.headerDecorator.isValidData("LeftBottomRound", headerDelegate.columnIndex) ?
-																	 !headerDelegate.tableItem.headerDecorator.getData("LeftBottomRound", headerDelegate.columnIndex) :true;
+			// In a table with a checkbox column the cell of that column owns the left corners.
+			visible: headerDelegate.tableItem.checkable && headerDelegate.firstVisibleColumn ? true : !headerDelegate.tableItem.isHeaderCornerRounded("LeftBottomRound", headerDelegate.columnIndex);
 		}
 
 		Rectangle{
@@ -276,9 +260,7 @@ Item{
 			width: parent.width/2;
 			height: parent.height/2;
 			color: parent.color;
-			visible: headerDelegate.tableItem.emptyDecorHeader ? true :
-																 headerDelegate.tableItem.headerDecorator.isValidData("RightBottomRound", headerDelegate.columnIndex) ?
-																	 !headerDelegate.tableItem.headerDecorator.getData("RightBottomRound", headerDelegate.columnIndex) :true;
+			visible: !headerDelegate.tableItem.isHeaderCornerRounded("RightBottomRound", headerDelegate.columnIndex);
 		}
 		//cornerPatches
 
@@ -292,8 +274,10 @@ Item{
 			anchors.right: parent.right;
 			anchors.bottom: parent.bottom;
 
+			// The sort arrow alone marks the ordered column, as in VS Code tables.
 			height: 2;
 			opacity: 0;
+			visible: false;
 			color: Style.titleColor;
 
 			NumberAnimation {
@@ -354,10 +338,10 @@ Item{
 																   true;
 
 
-		color: headerDelegate.tableItem.emptyDecorHeader ? (headerDelegate.activeSort ? Style.titleColor : Style.subtitleColor) :
+		color: headerDelegate.tableItem.emptyDecorHeader ? Style.titleColor :
 														   headerDelegate.tableItem.headerDecorator.isValidData("FontColor", headerDelegate.columnIndex) ?
 															   headerDelegate.tableItem.headerDecorator.getData("FontColor", headerDelegate.columnIndex) :
-															   headerDelegate.activeSort ? Style.titleColor : Style.subtitleColor;
+															   Style.titleColor;
 		elide: headerDelegate.tableItem.elideMode;
 
 		wrapMode: headerDelegate.tableItem.wrapMode;

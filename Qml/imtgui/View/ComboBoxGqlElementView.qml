@@ -76,7 +76,7 @@ ElementView {
 		SearchComp{
 			id: cb;
 
-			width: comboBoxGqlElementView.controlWidth;
+			width: comboBoxGqlElementView.fittedControlWidth;
 			height: comboBoxGqlElementView.controlHeight;
 
 			Component.onCompleted: {

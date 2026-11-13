@@ -169,8 +169,8 @@ bool CUserSettingsControllerComp::UpdateModelFromRepresentation(
 
 	bool retVal = m_userSettingsRepresentationControllerCompPtr->GetDataModelFromRepresentation(representation, *paramSetPtr);
 	if (retVal){
-		imtbase::ICollectionInfo::Ids collectionIds = m_userSettingsCollectionCompPtr->GetElementIds();
-		if (collectionIds.contains(userId)){
+		imtbase::IObjectCollection::DataPtr existingDataPtr;
+		if (m_userSettingsCollectionCompPtr->GetObjectData(userId, existingDataPtr)){
 			m_userSettingsCollectionCompPtr->SetObjectData(userId, *userSettingsPtr);
 		}
 		else{

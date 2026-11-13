@@ -13,6 +13,9 @@
         <Element Id="ConnectionCodesNotificationPublisher" PackageId="ImtAuthGqlPck" ComponentId="ConnectionCodesNotificationPublisher">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="NotificationSender" Type="Reference" ExportId="NotificationSender">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
@@ -20,16 +23,10 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
-                    <AttributeInfo Id="ConnectionCollection" Type="Reference" ExportId="TenantConnectionRepository">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="ConnectionRequestManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="TenantConnectionRequestManager"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RequestCollection" Type="Reference" ExportId="TenantConnectionRequestRepository">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
@@ -39,6 +36,9 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserCollection" Type="Reference" ExportId="UserCollection">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -515,5 +515,6 @@
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="TenantConnectionRequestManager" ComponentId="TenantConnectionRequestManager"/>
+        <Component ExportedId="ConnectionCodesNotificationPublisher" ComponentId="ConnectionCodesNotificationPublisher"/>
     </ExportedComponents>
 </Acf>

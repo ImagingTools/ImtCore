@@ -18,6 +18,9 @@ QtObject {
 	// --- Wired by the orchestrator ---
 	property var tenantData: null
 	property var apiClient: null
+	// Part of the organization permission tree the editor works in; scopes the
+	// checks below the same way the GQL senders scope the requests they send.
+	property string permissionPath: ""
 
 	// --- Local UI state ---
 	property var pendingMembers: []
@@ -56,35 +59,43 @@ QtObject {
 		? stateManager.tenantData.m_currentUserId === stateManager.tenantData.m_ownerId
 		: false
 
+	// The server decides who edits the permission scope: only the creator, the owner reads it
+	readonly property bool canEditTenantPermissions: stateManager.isNewTenant
+		|| (stateManager.tenantData ? stateManager.tenantData.m_canEditTenantPermissions === true : false)
+
+	readonly property bool isSubOrganization: stateManager.tenantData
+		? (stateManager.tenantData.m_parentTenantId !== undefined && stateManager.tenantData.m_parentTenantId !== "")
+		: false
+
 	// Full-access users are owner or creator; members with specific org permissions
 	// are controlled granularly via __currentUserOrgPerms, not through isAdmin.
 	readonly property bool isAdmin: stateManager.isOwner || stateManager.isCreator
 
-	readonly property bool canChangeOrganizationName: stateManager.hasPermission("ChangeOrganizationName")
-	readonly property bool canChangeOrganizationDescription: stateManager.hasPermission("ChangeOrganizationDescription")
-	readonly property bool canEditOrganization: stateManager.hasAnyPermission(["EditOrganization", "ChangeOrganizationName", "ChangeOrganizationDescription"])
+	readonly property bool canChangeOrganizationName: stateManager.hasPermission("/OrganizationManagement/Edit/ChangeName")
+	readonly property bool canChangeOrganizationDescription: stateManager.hasPermission("/OrganizationManagement/Edit/ChangeDescription")
+	readonly property bool canEditOrganization: stateManager.hasAnyPermission(["/OrganizationManagement/Edit/ChangeName", "/OrganizationManagement/Edit/ChangeDescription"])
 
-	readonly property bool canViewOrganizationMembers: stateManager.hasPermission("ViewOrganizationMembers")
-	readonly property bool canInviteOrganizationMember: stateManager.hasPermission("InviteOrganizationMember")
-	readonly property bool canExcludeOrganizationMember: stateManager.hasPermission("ExcludeOrganizationMember")
-	readonly property bool canChangeOrganizationMember: stateManager.hasPermission("ChangeOrganizationMember")
-	readonly property bool canChangeOrganizationMemberRole: stateManager.hasPermission("ChangeOrganizationMemberRole")
-	readonly property bool canManageOrganizationMembers: stateManager.hasAnyPermission(["EditOrganizationMember", "InviteOrganizationMember", "ExcludeOrganizationMember", "ChangeOrganizationMemberRole"])
+	readonly property bool canViewOrganizationMembers: stateManager.hasPermission("/OrganizationManagement/Members/View")
+	readonly property bool canInviteOrganizationMember: stateManager.hasPermission("/OrganizationManagement/Members/Edit/Invite")
+	readonly property bool canExcludeOrganizationMember: stateManager.hasPermission("/OrganizationManagement/Members/Edit/Exclude")
+	readonly property bool canChangeOrganizationMember: stateManager.hasPermission("/OrganizationManagement/Members/Edit/ChangeRole")
+	readonly property bool canChangeOrganizationMemberRole: stateManager.hasPermission("/OrganizationManagement/Members/Edit/ChangeRole")
+	readonly property bool canManageOrganizationMembers: stateManager.hasAnyPermission(["/OrganizationManagement/Members/Edit/Invite", "/OrganizationManagement/Members/Edit/Exclude", "/OrganizationManagement/Members/Edit/ChangeRole"])
 
-	readonly property bool canViewOrganizationRoles: stateManager.hasPermission("ViewOrganizationRoles")
-	readonly property bool canManageOrganizationRoles: stateManager.hasAnyPermission(["EditOrganizationRole", "ChangeOrganizationRole", "RemoveOrganizationRole", "AddOrganizationRole"])
+	readonly property bool canViewOrganizationRoles: stateManager.hasPermission("/OrganizationManagement/Roles/View")
+	readonly property bool canManageOrganizationRoles: stateManager.hasAnyPermission(["/OrganizationManagement/Roles/Edit/Change", "/OrganizationManagement/Roles/Edit/Remove", "/OrganizationManagement/Roles/Edit/Add"])
 
-	readonly property bool canViewOrganizationGroups: stateManager.hasPermission("ViewOrganizationGroups")
-	readonly property bool canManageOrganizationGroups: stateManager.hasAnyPermission(["EditOrganizationGroup", "ChangeOrganizationGroup", "RemoveOrganizationGroup", "AddOrganizationGroup"])
+	readonly property bool canViewOrganizationGroups: stateManager.hasPermission("/OrganizationManagement/Groups/View")
+	readonly property bool canManageOrganizationGroups: stateManager.hasAnyPermission(["/OrganizationManagement/Groups/Edit/Change", "/OrganizationManagement/Groups/Edit/Remove", "/OrganizationManagement/Groups/Edit/Add"])
 
-	readonly property bool canViewOrganizationPermissions: stateManager.hasPermission("ViewOrganizationPermissions")
-	readonly property bool canEditOrganizationMemberPermissions: stateManager.hasPermission("EditOrganizationMemberPermissions")
+	readonly property bool canViewOrganizationPermissions: stateManager.hasPermission("/OrganizationManagement/Permissions/View")
+	readonly property bool canEditOrganizationMemberPermissions: stateManager.hasPermission("/OrganizationManagement/Permissions/Change")
 
-	readonly property bool canViewOrganizationConnections: stateManager.hasPermission("ViewOrganizationConnections")
-	readonly property bool canViewOrganizationConnectionCode: stateManager.hasPermission("ViewOrganizationConnectionCode")
-	readonly property bool canConnectOrganization: stateManager.hasPermission("ConnectOrganization")
-	readonly property bool canRemoveOrganizationConnection: stateManager.hasPermission("RemoveOrganizationConnection")
-	readonly property bool canManageOrganizationConnections: stateManager.hasAnyPermission(["EditOrganizationConnection", "ConnectOrganization", "RemoveOrganizationConnection"])
+	readonly property bool canViewOrganizationConnections: stateManager.hasPermission("/OrganizationManagement/Connections/View")
+	readonly property bool canViewOrganizationConnectionCode: stateManager.hasPermission("/OrganizationManagement/Connections/ViewCode")
+	readonly property bool canConnectOrganization: stateManager.hasPermission("/OrganizationManagement/Connections/Edit/Connect")
+	readonly property bool canRemoveOrganizationConnection: stateManager.hasPermission("/OrganizationManagement/Connections/Edit/Remove")
+	readonly property bool canManageOrganizationConnections: stateManager.hasAnyPermission(["/OrganizationManagement/Connections/Edit/Connect", "/OrganizationManagement/Connections/Edit/Remove"])
 
 	// Computed key for page-list change detection.
 	// Changes whenever any page-controlling permission flips (add or remove).
@@ -111,15 +122,18 @@ QtObject {
 	// --- Pure logic helpers ---
 
 	// Client-side checks are UX hints only; server must enforce permissions on every operation.
-	// Org-level permissions (ViewOrganizationMembers, EditOrganizationMember, etc.) are
+	// Org-level permissions (the tree of COrganizationsPermissionsProviderComp) are
 	// distinct from product-level role permissions and are served via
 	// TenantData.currentUserOrganizationPermissions, NOT via PermissionsController.
+	// They are held as full paths, e.g. "/OrganizationManagement/Members/View";
+	// their ids repeat across the tree (View, Edit), so they are asked for by full path only.
 	function hasPermission(permissionId) {
 		if (!permissionId || permissionId === "")
 			return false
 		if (stateManager.isNewTenant || stateManager.isCreator || stateManager.isOwner || stateManager.isAdmin)
 			return true
-		return stateManager.__currentUserOrgPerms.indexOf(permissionId) !== -1
+
+		return PermissionsController.hasPermission(stateManager.__currentUserOrgPerms, permissionId)
 	}
 
 	function hasAnyPermission(permissionIds) {
@@ -138,7 +152,7 @@ QtObject {
 		var date = new Date(value)
 		if (isNaN(date.getTime()))
 			return value
-		return Qt.formatDateTime(date, Qt.DefaultLocaleShortDate)
+		return date.toLocaleDateString()
 	}
 
 	function displayNameOrId(name, id) {

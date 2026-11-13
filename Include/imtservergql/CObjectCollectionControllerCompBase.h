@@ -29,6 +29,7 @@
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtauth/IUserActionManager.h>
 #include <imtauth/CTenantFilterParam.h>
+#include <imtauth/IDocumentShareManager.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection_fwd.h>
 
 
@@ -52,11 +53,13 @@ public:
 		I_REGISTER_INTERFACE(imtbase::ISearchController)
 		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "Collection-ID", true, "");
 		I_ASSIGN(m_collectionNameAttrPtr, "CollectionName", "Collection Name", true, "");
+		I_ASSIGN(m_documentShareManagerCompPtr, "DocumentShareManager", "Manager of the document shares; if set, documents of the collection can be shared with related organizations", false, "DocumentShareManager");
 	I_END_COMPONENT
 
 protected:
 	I_ATTR(QByteArray, m_collectionIdAttrPtr);
 	I_ATTR(QString, m_collectionNameAttrPtr);
+	I_REF(imtauth::IDocumentShareManager, m_documentShareManagerCompPtr);
 };
 
 
@@ -184,6 +187,22 @@ public:
 				const sdl::V1_0::imtbase::CCreateSubCollectionGqlRequest& createSubCollectionRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtbase::CGetDocumentAccessPayload OnGetDocumentAccess(
+				const sdl::V1_0::imtbase::CGetDocumentAccessGqlRequest& getDocumentAccessRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtbase::CGetDocumentSharesPayload OnGetDocumentShares(
+				const sdl::V1_0::imtbase::CGetDocumentSharesGqlRequest& getDocumentSharesRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtbase::CShareDocumentsPayload OnShareDocuments(
+				const sdl::V1_0::imtbase::CShareDocumentsGqlRequest& shareDocumentsRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtbase::CRevokeDocumentSharesPayload OnRevokeDocumentShares(
+				const sdl::V1_0::imtbase::CRevokeDocumentSharesGqlRequest& revokeDocumentSharesRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 
 	// reimplemented (imtservergql::CGqlRequestHandlerCompBase)
 	virtual QJsonObject CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
@@ -289,6 +308,12 @@ protected:
 	virtual void PrepareFilters(const imtgql::CGqlRequest& gqlRequest, const imtgql::CGqlParamObject& viewParamsGql, iprm::CParamsSet& filterParams) const;
 
 	/**
+		Add the filters that limit a selection to what the requester may see: the additional filters and the tenant filter.
+		Every selection made for a request applies them, whatever the command.
+	*/
+	void AddAccessFilters(const imtgql::CGqlRequest& gqlRequest, const imtgql::CGqlParamObject& viewParamsGql, iprm::CParamsSet& filterParams) const;
+
+	/**
 		Set multiple optional additional filters to initially get a more refined collection.
 	*/
 	virtual void SetAdditionalFilters(const imtgql::CGqlRequest& gqlRequest,const imtgql::CGqlParamObject& viewParamsGql, iprm::CParamsSet* filterParams) const;
@@ -301,6 +326,29 @@ protected:
 		The returned pointer is owned by the caller (ParamsSet takes ownership).
 	*/
 	virtual imtauth::CTenantFilterParam* CreateTenantFilterParam(const imtgql::CGqlRequest& gqlRequest) const;
+
+	/**
+		Check that the requesting organization may access the objects with at least the given level.
+		An object is accessible if it belongs to the organization or to no organization, or if it is shared with
+		the organization. DAL_OWNER excludes the shared objects. Always succeeds if tenant filtering is disabled.
+	*/
+	virtual bool CheckObjectAccess(
+				const imtgql::CGqlRequest& gqlRequest,
+				const QByteArrayList& objectIds,
+				imtauth::IDocumentShareInfo::AccessLevel accessLevel,
+				QString& errorMessage) const;
+
+	/**
+		Get the objects of the given list which belong to the requesting organization itself.
+	*/
+	QByteArrayList GetOwnObjectIds(const imtgql::CGqlRequest& gqlRequest, const QByteArrayList& objectIds) const;
+
+	/**
+		Add the sharing fields to a list item: the related organizations and the access level of the requesting one.
+	*/
+	void SetupSharingInfo(const imtgql::CGqlRequest& gqlRequest, const QByteArray& objectId, QJsonObject& itemObj) const;
+	void AppendSharingMetaInfo(const imtgql::CGqlRequest& gqlRequest, const QByteArray& objectId, QList<sdl::V1_0::imtbase::CParameter>& parameters) const;
+	QJsonObject CreateElementMetaInfoResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 
 	virtual istd::IChangeableUniquePtr CreateObject(const QByteArray& typeId) const;
 	virtual QString GetObjectNameFromRequest(const imtgql::CGqlRequest& gqlRequest) const;
@@ -383,6 +431,12 @@ protected:
 	virtual void OnComponentCreated() override;
 
 private:
+	bool CheckObjectAccessInScope(
+				const imtgql::CGqlRequest& gqlRequest,
+				const QByteArrayList& objectIds,
+				imtauth::SharingScope sharingScope,
+				imtauth::IDocumentShareInfo::AccessLevel accessLevel) const;
+
 	virtual bool DoUpdateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, istd::IChangeable& object, QByteArray& newObjectId, QString& errorMessage) const;
 	bool SerializeObject(istd::IChangeable& object, QByteArray& objectData) const;
 	bool DeSerializeObject(istd::IChangeable& object, const QByteArray& objectData) const;

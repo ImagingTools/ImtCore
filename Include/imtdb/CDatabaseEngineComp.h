@@ -13,6 +13,7 @@
 // ImtCore includes
 #include <imtbase/TModelUpdateBinder.h>
 #include <imtdb/IDatabaseEngine.h>
+#include <imtdb/IDatabaseConnectionConfigurator.h>
 #include <imtdb/IDatabaseServerConnectionChecker.h>
 #include <imtdb/CDatabaseAccessSettings.h>
 #include <imtdb/IMigrationController.h>
@@ -26,12 +27,21 @@ namespace imtdb
 {
 
 
+/**
+	Attributes of the engine that are declared apart from CDatabaseEngineComp: the static information of a component is built in one
+	function, and the compiler of Windows (MSVC) limits the number of the objects with a constructor that a function may have (error C2603).
+	CDatabaseEngineComp is close to this limit, so a new attribute is declared here.
+*/
 class CDatabaseEngineAttr: public ilog::CLoggerComponentBase
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 	I_BEGIN_COMPONENT(CDatabaseEngineAttr);
+		I_ASSIGN(m_connectionConfiguratorCompPtr, "ConnectionConfigurator", "Sets up every connection that the engine opens (the engine has a connection for every thread), for example the settings of a concrete database. Without it the connections keep the defaults of the driver", false, "ConnectionConfigurator");
 	I_END_COMPONENT;
+
+protected:
+	I_REF(imtdb::IDatabaseConnectionConfigurator, m_connectionConfiguratorCompPtr);
 };
 
 
@@ -114,6 +124,13 @@ private:
 		\return \c true if the database could not be connected successfully or \c false otherwise.
 	 */
 	bool EnsureDatabaseConnected(QSqlError* sqlError = nullptr) const;
+
+	/**
+		Set up the connection that is just opened by the configurator (if the engine has it). If the connection cannot be set up, the reason
+		is written to the log and the connection is closed: the engine does not work with a connection that is not what it was asked for.
+		\return	\c true if the connection is set up or there is no configurator.
+	*/
+	bool ConfigureConnection(QSqlDatabase& databaseConnection) const;
 
 	/**
 		Ensure that the database is created and ready to use.

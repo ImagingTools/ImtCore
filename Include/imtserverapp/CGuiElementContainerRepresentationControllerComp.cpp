@@ -14,6 +14,7 @@
 #include <QtCore/QJsonObject>
 
 // ImtCore includes
+#include <imtserverapp/imtserverapp.h>
 #include <imtserverapp/IGuiElementContainer.h>
 #include <imtserverapp/IGuiElementModel.h>
 
@@ -95,21 +96,20 @@ bool CGuiElementContainerRepresentationControllerComp::GetRepresentationFromData
 
 	QJsonArray itemsArray;
 
+	const QByteArray permissionPath = GetPermissionPath(paramsPtr);
+
 	QByteArrayList elementIds = guiElementContainerPtr->GetElementIds();
 	for (const QByteArray& elementId : elementIds){
 		const imtserverapp::IGuiElementModel* guiElementModelPtr = guiElementContainerPtr->GetGuiElementModel(elementId);
 		if (guiElementModelPtr != nullptr){
-			if (!isAdmin){
-				if (m_commandPermissionsProviderCompPtr.IsValid() && !elementId.isEmpty()){
-					QByteArrayList elementPermissions = m_commandPermissionsProviderCompPtr->GetCommandPermissions(elementId);
-
-					if (m_checkPermissionCompPtr.IsValid()){
-						bool result = m_checkPermissionCompPtr->CheckPermission(userPermissions, elementPermissions);
-						if (!result){
-							continue;
-						}
-					}
-				}
+			if (!IsElementAccessible(
+						m_commandPermissionsProviderCompPtr.GetPtr(),
+						m_checkPermissionCompPtr.GetPtr(),
+						elementId,
+						userPermissions,
+						isAdmin,
+						permissionPath)){
+				continue;
 			}
 
 			const imtserverapp::IRepresentationController* representationControllerPtr = FindRepresentationController(elementId);

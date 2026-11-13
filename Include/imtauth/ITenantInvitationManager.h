@@ -28,6 +28,11 @@ public:
 	virtual bool RejectInvitation(const QByteArray& invitationId, const QByteArray& userId) = 0;
 	virtual bool RevokeInvitation(const QByteArray& invitationId, const QByteArray& revokedByUserId) = 0;
 	virtual bool ResendInvitation(const QByteArray& invitationId) = 0;
+	/**
+		Revoke the pending invitations to the organization the user sent; called before the user stops being its member.
+		\return False when an invitation could not be read or revoked, so one may still be accepted.
+	*/
+	virtual bool RevokeInvitationsSentBy(const QByteArray& tenantId, const QByteArray& invitedByUserId, const QByteArray& revokedByUserId) = 0;
 	virtual ITenantInvitation::TenantInvitationStatus GetEffectiveStatus(const ITenantInvitation& invitation) const = 0;
 };
 

@@ -26,6 +26,7 @@
                             <Values>
                                 <Value>name</Value>
                                 <Value>description</Value>
+                                <Value>parentTenantName</Value>
                                 <Value>tenantRelationScope</Value>
                                 <Value>isActive</Value>
                                 <Value>createdAt</Value>
@@ -38,6 +39,7 @@
                             <Values>
                                 <Value>Name</Value>
                                 <Value>Description</Value>
+                                <Value>Parent</Value>
                                 <Value>Role</Value>
                                 <Value>Active</Value>
                                 <Value>Created</Value>
@@ -92,18 +94,18 @@
                     <AttributeInfo Id="RedoPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>AddTenant</Value>
-                                <Value>RemoveTenant</Value>
-                                <Value>ChangeTenant</Value>
+                                <Value>/OrganizationManagement/Add</Value>
+                                <Value>/OrganizationManagement/Remove</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="SavePermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>AddTenant</Value>
-                                <Value>RemoveTenant</Value>
-                                <Value>ChangeTenant</Value>
+                                <Value>/OrganizationManagement/Add</Value>
+                                <Value>/OrganizationManagement/Remove</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -119,9 +121,9 @@
                     <AttributeInfo Id="UndoPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>AddTenant</Value>
-                                <Value>RemoveTenant</Value>
-                                <Value>ChangeTenant</Value>
+                                <Value>/OrganizationManagement/Add</Value>
+                                <Value>/OrganizationManagement/Remove</Value>
+                                <Value>/OrganizationManagement/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -230,6 +232,7 @@
                                 <Value>updatedAt</Value>
                                 <Value>isActive</Value>
                                 <Value>ownerId</Value>
+                                <Value>tenantRelationScope</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -242,6 +245,7 @@
                                 <Value>UpdatedAt</Value>
                                 <Value>IsActive</Value>
                                 <Value>OwnerId</Value>
+                                <Value>TenantRelationScope</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

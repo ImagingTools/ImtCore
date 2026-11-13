@@ -78,6 +78,8 @@ bool CSdlProcessArgumentsParserComp::SetArguments(const QStringList& arguments)
 	QCommandLineOption configFilePathOption("config", "Defines a path to a file with initial configuration. NOTE: The parameters from the configuration file may be overridden by command line arguments. WARNING: path MUST be a valid path to existing file!", "config");
 	QCommandLineOption cppModeOption("cpp-mode", "Defines the type of generated files. Headers, sources(implementation) or both(default). Expected values: ALL | HEADER | IMPL", "CPP_MODE");
 	QCommandLineOption typenameWriteModeOption("typename-mode", "Defines when to write __typename field in Json/GraphQL/Model conversions. Expected values: ALWAYS | IF_REQUIRED | NEVER. Default: IF_REQUIRED", "TYPENAME_MODE");
+	QCommandLineOption noObjectsOption("no-objects", "Do not generate the '<Schema>Objects' files with the QObject based classes (<Type>Object, <Type>ObjectList, union objects) and the QML types registration. They are only needed to use the SDL types from QML through C++ models.");
+	QCommandLineOption includeMocOption("include-moc", "Include the moc output of the generated headers (moc_<Schema>.cpp, moc_<Schema>Objects.cpp) at the end of the generated source file. The build system must create it next to the source file and must not compile it separately.");
 
 	// special modes
 	QCommandLineOption cppOption("CPP", "C++ Modificator to generate code. (enabled default)");
@@ -109,7 +111,9 @@ bool CSdlProcessArgumentsParserComp::SetArguments(const QStringList& arguments)
 				depFileParhOption,
 				configFilePathOption,
 				cppModeOption,
-				typenameWriteModeOption
+				typenameWriteModeOption,
+				noObjectsOption,
+				includeMocOption
 	});
 
 	bool isOptionsAcceptable = true;
@@ -290,6 +294,14 @@ bool CSdlProcessArgumentsParserComp::SetArguments(const QStringList& arguments)
 
 			return false;
 		}
+	}
+
+	if (commandLineParser.isSet(noObjectsOption)){
+		m_isObjectsGenerationEnabled = false;
+	}
+
+	if (commandLineParser.isSet(includeMocOption)){
+		m_isMocIncludeEnabled = true;
 	}
 
 	// special modes
@@ -511,6 +523,18 @@ CSdlProcessArgumentsParserComp::TypenameWriteMode CSdlProcessArgumentsParserComp
 }
 
 
+bool CSdlProcessArgumentsParserComp::IsObjectsGenerationEnabled() const
+{
+	return m_isObjectsGenerationEnabled;
+}
+
+
+bool CSdlProcessArgumentsParserComp::IsMocIncludeEnabled() const
+{
+	return m_isMocIncludeEnabled;
+}
+
+
 bool CSdlProcessArgumentsParserComp::ReadFromSettings(const QString& settingsFilePath)
 {
 
@@ -671,6 +695,24 @@ void CSdlProcessArgumentsParserComp::SetTemplateOutputPath(const QString& templa
 void CSdlProcessArgumentsParserComp::SetTypenameWriteMode(TypenameWriteMode mode)
 {
 	m_typenameWriteMode = mode;
+}
+
+
+void CSdlProcessArgumentsParserComp::SetObjectsGenerationEnabled(bool enabled)
+{
+	m_isObjectsGenerationEnabled = enabled;
+}
+
+
+void CSdlProcessArgumentsParserComp::SetCppGenerationMode(CppGenerationMode mode)
+{
+	m_cppGenerationMode = mode;
+}
+
+
+void CSdlProcessArgumentsParserComp::SetMocIncludeEnabled(bool enabled)
+{
+	m_isMocIncludeEnabled = enabled;
 }
 
 

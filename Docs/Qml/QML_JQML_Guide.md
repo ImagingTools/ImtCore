@@ -172,7 +172,7 @@ Tools/JQML/v3/
 ├── core/               ← Runtime-Engine
 │   ├── JQApplication   ← Globaler Lifecycle
 │   ├── JQContext        ← Ausführungs-Scope, Bindings
-│   ├── MouseController  ← Maus-Event-Dispatch
+│   ├── MouseController  ← Maus-/Touch-Event-Dispatch (Touch und Stift über Pointer Events)
 │   ├── KeyboardController ← Tastatur-Event-Dispatch
 │   ├── ImageController  ← Bild-Laden und -Caching
 │   ├── TextController   ← Text-Messung

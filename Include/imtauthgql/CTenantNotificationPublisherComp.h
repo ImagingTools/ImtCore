@@ -7,13 +7,21 @@
 #include <imod/TSingleModelObserverBase.h>
 
 // Qt includes
-#include <QRecursiveMutex>
+#include <QList>
+#include <QMutex>
+#include <QPair>
+#include <QSet>
+#include <QTimer>
+#include <QVariantMap>
 
 // ImtCore includes
 #include <imtauth/ITenantInvitationManager.h>
 #include <imtauth/ITenantMembershipManager.h>
 #include <imtauth/ITenantManager.h>
+#include <imtbase/IObjectCollection.h>
 #include <imtservergql/CGqlPublisherCompBase.h>
+#include <imtnotify/INotificationInboxController.h>
+#include <imtnotify/INotificationSender.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/TenantMemberships_fwd.h>
 
 
@@ -22,20 +30,22 @@ namespace imtauthgql
 
 
 /**
-	Server-side publisher that broadcasts notifications when tenant-related
-	state changes: membership lifecycle, invitation lifecycle, or ownership
-	transfer.
+	Server-side publisher of the membership notifications of a user.
 
-	The component observes:
-	- imtauth::ITenantMembershipManager — membership state changes
-	  (inactive→active = InvitationAccepted, removal of inactive = InvitationRejected)
-	- imtauth::ITenantInvitationManager — invitation lifecycle
-	  (new pending invitation = InvitationReceived, status transitions)
-	- imtauth::ITenantManager — ownership transfers
-	  (owner changed = OwnershipTransferred)
+	The observed managers name each change they make (imtauth::TenantEvent),
+	and each one is announced to the users it concerns:
+	- InvitationReceived: the invited user (also when the invitation is resent)
+	- InvitationAccepted, InvitationRejected: the user who sent the invitation
+	- InvitationRevoked: the invited user
+	- MembershipRoleChanged: the member whose organization permissions changed
+	- MembershipRemoved: the removed member and the owner of the organization
+	- OwnershipTransferred: the previous and the new owner
 
 	Notifications are delivered only to subscribers whose authenticated user
 	matches the target userId.
+
+	Any of the changes above and a new membership are also announced by OnOrganizationMembersChanged
+	to every subscriber whose session is in the organization.
 
 	The subscription endpoint name is configurable via the \c CommandId
 	attribute and defaults to "OnMembershipNotification".
@@ -55,6 +65,9 @@ public:
 		I_ASSIGN_TO(m_tenantManagerModelCompPtr, m_tenantManagerCompPtr, false);
 		I_ASSIGN(m_invitationManagerCompPtr, "InvitationManager", "Tenant invitation manager to observe for invitation lifecycle changes", false, "TenantInvitationManager");
 		I_ASSIGN_TO(m_invitationManagerModelCompPtr, m_invitationManagerCompPtr, false);
+		I_ASSIGN(m_notificationSenderCompPtr, "NotificationSender", "Notification center that keeps the notifications of the users", false, "NotificationSender");
+		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "Users: the names of the users the notifications are about", false, "UserCollection");
+		I_ASSIGN(m_inboxControllerCompPtr, "InboxController", "Inboxes of the users: a removed member loses the notifications of the organization", false, "InboxController");
 	I_END_COMPONENT;
 
 protected:
@@ -75,47 +88,52 @@ protected:
 	I_REF(imod::IModel, m_tenantManagerModelCompPtr);
 	I_REF(imtauth::ITenantInvitationManager, m_invitationManagerCompPtr);
 	I_REF(imod::IModel, m_invitationManagerModelCompPtr);
+	I_REF(imtnotify::INotificationSender, m_notificationSenderCompPtr);
+	I_REF(imtnotify::INotificationInboxController, m_inboxControllerCompPtr);
+	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
 
 private:
-	struct CachedMembership
+	struct Notification
 	{
+		QByteArray targetUserId;
+		sdl::V1_0::imtauth::EMembershipNotificationType notificationType;
+		QByteArray membershipId;
 		QByteArray userId;
 		QByteArray tenantId;
-		bool isActive;
+
+		// Who sent an invitation
+		QByteArray inviterId = QByteArray();
 	};
 
-	struct CachedTenantOwner
-	{
-		QByteArray ownerId;
-	};
+	/**
+		A removed member loses the notifications of the organization; a failed removal is retried.
+	*/
+	void RemoveMemberNotifications(const QByteArray& tenantId, const QByteArray& userId);
+	void RetryMemberCleanups();
 
-	struct CachedInvitation
-	{
-		QByteArray userId;
-		QByteArray tenantId;
-		QByteArray invitedByUserId;
-		imtauth::ITenantInvitation::TenantInvitationStatus status;
-	};
+	QList<Notification> CreateNotifications(const QVariantMap& event) const;
+	void PublishNotification(const Notification& notification) const;
 
-	void PublishNotification(
-		const QByteArray& targetUserId,
-		sdl::V1_0::imtauth::EMembershipNotificationType notificationType,
-		const QByteArray& membershipId,
-		const QByteArray& userId,
-		const QByteArray& tenantId,
-		const QString& tenantName,
-		const QByteArray& roleId) const;
+	/**
+		Keep the notification in the inbox of its user; an invitation that is answered or revoked is withdrawn.
+	*/
+	void SendToNotificationCenter(const Notification& notification) const;
+	void PublishMembersChanged(const QByteArray& tenantId) const;
 
-	QByteArray FindTenantOwnerUserId(const QByteArray& tenantId) const;
+	QString FindTenantName(const QByteArray& tenantId) const;
+	imtnotify::ObjectLinkInfo GetUserLink(const QByteArray& userId) const;
 
-	// Cache of membershipId → state for change detection.
-	mutable QMap<QByteArray, CachedMembership> m_cachedMemberships;
-	// Cache of tenantId → ownerId for ownership change detection.
-	mutable QMap<QByteArray, CachedTenantOwner> m_cachedTenantOwners;
-	// Cache of invitationId → state for invitation lifecycle detection.
-	mutable QMap<QByteArray, CachedInvitation> m_cachedInvitations;
-	// Protects all caches from concurrent access.
-	mutable QRecursiveMutex m_cacheMutex;
+	/**
+		The user whose request made the change, named from the users when the request has no name.
+	*/
+	imtnotify::ObjectLinkInfo GetRequestUserLink() const;
+	QByteArray FindTenantOwnerId(const QByteArray& tenantId) const;
+
+private:
+	// Tenant and user of the removed memberships whose notifications could not be removed yet
+	QSet<QPair<QByteArray, QByteArray>> m_pendingMemberCleanups;
+	QMutex m_pendingMemberCleanupsMutex;
+	QTimer m_retryTimer;
 };
 
 

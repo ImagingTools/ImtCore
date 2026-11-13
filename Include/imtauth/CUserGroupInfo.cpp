@@ -2,6 +2,9 @@
 #include <imtauth/CUserGroupInfo.h>
 
 
+// Qt includes
+#include <QtCore/QSet>
+
 // ACF includes
 #include <istd/TDelPtr.h>
 #include <istd/CChangeNotifier.h>
@@ -10,6 +13,7 @@
 #include <iser/CPrimitiveTypesSerializer.h>
 
 // ImtCore includes
+#include <imtcore/Version.h>
 #include <imtauth/IUserGroupInfoProvider.h>
 
 
@@ -34,10 +38,12 @@ IUserGroupInfo::UserIds CUserGroupInfo::GetUsers() const
 	QByteArrayList retVal = m_userIds;
 
 	if (m_userGroupInfoProviderPtr != nullptr){
-		for (const QByteArray& parentGroupId : m_parentGroupIds){
+		// Only the own users of each ancestor: GetUsers() of a parent would recurse forever on a cycle.
+		for (const QByteArray& parentGroupId : GetAncestorGroups(m_parentGroupIds)){
 			imtauth::IUserGroupInfoSharedPtr parentGroupPtr = m_userGroupInfoProviderPtr->GetUserGroup(parentGroupId);
-			if (parentGroupPtr.IsValid()){
-				for (const QByteArray& userId : parentGroupPtr->GetUsers()){
+			const CUserGroupInfo* parentInfoPtr = dynamic_cast<const CUserGroupInfo*>(parentGroupPtr.GetPtr());
+			if (parentInfoPtr != nullptr){
+				for (const QByteArray& userId : parentInfoPtr->m_userIds){
 					if (!retVal.contains(userId)){
 						retVal << userId;
 					}
@@ -89,13 +95,7 @@ imtauth::IUserGroupInfo::GroupIds CUserGroupInfo::GetParentGroups() const
 
 bool CUserGroupInfo::AddParentGroup(const QByteArray& parentGroupId)
 {
-	if (m_id == parentGroupId){
-		return false;
-	}
-
-	QByteArrayList parentGroups = GetParentGroups(parentGroupId);
-
-	if (parentGroups.contains(m_id)){
+	if (m_parentGroupIds.contains(parentGroupId)){
 		return false;
 	}
 
@@ -124,38 +124,40 @@ const imtauth::IUserInfoProvider* CUserGroupInfo::GetUserProvider() const
 }
 
 
-// reimplemented (IUserBaseInfo)
+// reimplemented (IPrincipal)
 
-imtauth::IUserBaseInfo::RoleIds CUserGroupInfo::GetRoles(const QByteArray& productId) const
+IPrincipal::FeatureIds CUserGroupInfo::GetPermissions(const QByteArray& productId) const
 {
-	IUserBaseInfo::RoleIds retVal = BaseClass::GetRoles(productId);
+	IPrincipal::FeatureIds allPermissions = BaseClass::GetPermissions(productId);
+
 	if (m_userGroupInfoProviderPtr != nullptr){
-		for (const QByteArray& parentGroupId : m_parentGroupIds){
-			IUserGroupInfoSharedPtr parentGroupPtr = m_userGroupInfoProviderPtr->GetUserGroup(parentGroupId);
-			if (parentGroupPtr.IsValid()){
-				for (const QByteArray& roleId : parentGroupPtr->GetRoles(productId)){
-					if (!retVal.contains(roleId)){
-						retVal << roleId;
-					}
+		// Walked iteratively with a visited set: a cycle in the parent groups must not recurse forever.
+		QByteArrayList pendingGroupIds = m_parentGroupIds;
+		QSet<QByteArray> visitedGroupIds;
+		while (!pendingGroupIds.isEmpty()){
+			const QByteArray groupId = pendingGroupIds.takeFirst();
+			if (visitedGroupIds.contains(groupId)){
+				continue;
+			}
+			visitedGroupIds.insert(groupId);
+
+			IUserGroupInfoSharedPtr parentGroupPtr = m_userGroupInfoProviderPtr->GetUserGroup(groupId);
+			if (!parentGroupPtr.IsValid()){
+				continue;
+			}
+
+			// Only the group's own roles here, its parents are walked by this loop.
+			const CPrincipalBase* parentBasePtr = dynamic_cast<const CPrincipalBase*>(parentGroupPtr.GetPtr());
+			const FeatureIds parentPermissions = (parentBasePtr != nullptr)
+						? parentBasePtr->CPrincipalBase::GetPermissions(productId)
+						: parentGroupPtr->GetPermissions(productId);
+			for (const QByteArray& permissionId : parentPermissions){
+				if (!allPermissions.contains(permissionId)){
+					allPermissions << permissionId;
 				}
 			}
-		}
-	}
 
-	return retVal;
-}
-
-
-IUserBaseInfo::FeatureIds CUserGroupInfo::GetPermissions(const QByteArray& productId) const
-{
-	IUserBaseInfo::FeatureIds allPermissions = BaseClass::GetPermissions(productId);
-
-	if (m_userGroupInfoProviderPtr != nullptr){
-		for (const QByteArray& parentGroupId : m_parentGroupIds){
-			IUserGroupInfoSharedPtr parentGroupPtr = m_userGroupInfoProviderPtr->GetUserGroup(parentGroupId);
-			if (parentGroupPtr.IsValid()){
-				allPermissions += parentGroupPtr->GetPermissions(productId);
-			}
+			pendingGroupIds += parentGroupPtr->GetParentGroups();
 		}
 	}
 
@@ -167,9 +169,25 @@ bool CUserGroupInfo::Serialize(iser::IArchive &archive)
 {
 	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this);
 
+	const iser::IVersionInfo& versionInfo = archive.GetVersionInfo();
+	quint32 imtCoreVersion;
+	if (!versionInfo.GetVersionNumber(imtcore::VI_IMTCORE, imtCoreVersion)){
+		imtCoreVersion = 0;
+	}
+
 	bool retVal = BaseClass::Serialize(archive);
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_userIds, "Users", "User");
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_parentGroupIds, "ParentGroups", "ParentGroup");
+
+	if (imtCoreVersion >= 23930){
+		iser::CArchiveTag sidTag("Sid", "Windows SID", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(sidTag);
+		retVal = retVal && archive.Process(m_sid);
+		retVal = retVal && archive.EndTag(sidTag);
+	}
+	else if (!archive.IsStoring()){
+		m_sid.clear();
+	}
 
 	return retVal;
 }
@@ -221,33 +239,28 @@ bool CUserGroupInfo::ResetData(CompatibilityMode mode)
 
 // protected methods
 
-QByteArrayList CUserGroupInfo::GetParentGroups(const QByteArray& groupId) const
+QByteArrayList CUserGroupInfo::GetAncestorGroups(const QByteArrayList& groupIds) const
 {
 	QByteArrayList retVal;
-	if (m_userGroupInfoProviderPtr != nullptr){
-		IUserGroupInfoSharedPtr groupPtr(m_userGroupInfoProviderPtr->GetUserGroup(groupId));
-		if (groupPtr.IsValid()){
-			GetParentGroupList(*groupPtr, retVal);
+
+	// Walked iteratively with a visited set: a cycle in the parent groups must not recurse forever.
+	QByteArrayList pendingGroupIds = groupIds;
+	while (!pendingGroupIds.isEmpty()){
+		const QByteArray currentGroupId = pendingGroupIds.takeFirst();
+		if (retVal.contains(currentGroupId)){
+			continue;
+		}
+		retVal << currentGroupId;
+
+		if (m_userGroupInfoProviderPtr != nullptr){
+			IUserGroupInfoSharedPtr groupPtr(m_userGroupInfoProviderPtr->GetUserGroup(currentGroupId));
+			if (groupPtr.IsValid()){
+				pendingGroupIds += groupPtr->GetParentGroups();
+			}
 		}
 	}
 
 	return retVal;
-}
-
-
-void CUserGroupInfo::GetParentGroupList(const IUserGroupInfo& userGroupInfo, QByteArrayList& groupList) const
-{
-	QByteArrayList parentGroups = userGroupInfo.GetParentGroups();
-
-	groupList += parentGroups;
-	if (m_userGroupInfoProviderPtr != nullptr){
-		for (const QByteArray& groupId : parentGroups){
-			IUserGroupInfoSharedPtr groupPtr(m_userGroupInfoProviderPtr->GetUserGroup(groupId));
-			if (groupPtr.IsValid()){
-				GetParentGroupList(*groupPtr, groupList);
-			}
-		}
-	}
 }
 
 

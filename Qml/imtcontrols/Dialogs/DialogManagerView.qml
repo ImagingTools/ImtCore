@@ -42,7 +42,7 @@ Item {
 
 				anchors.fill: parent;
 				
-				color: "gray";
+				color: Style.overlayBackgroundColor;
 				visible: modalDialogs.visible;
 				opacity: 0.4;
 				

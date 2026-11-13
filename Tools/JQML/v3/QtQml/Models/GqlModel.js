@@ -1,6 +1,8 @@
 const TreeItemModel = require("./TreeItemModel")
 
 class GqlModel extends TreeItemModel {
+	static requestTimeout = 120000
+
 	GetGlobalAccessToken(){
 		return XMLHttpRequest.QMLAuthToken || ""
 	}
@@ -37,22 +39,28 @@ class GqlModel extends TreeItemModel {
             }
         }
 
+        // A request that never answers ends as a transport error instead of loading forever.
+        xhr.timeout = GqlModel.requestTimeout
+
         xhr.onreadystatechange = ()=>{
             if (!this.__destroyed && xhr.readyState === XMLHttpRequest.DONE){
 				if (xhr.status === 401){
 					this.state = "Unauthorized"
 				}
-				
-				if (xhr.status === 403){
+				else if (xhr.status === 403){
 					this.state = "Forbidden"
 				}
-				
-				if (xhr.status === 200){
+				else if (xhr.status === 200){
 					this.json = xhr.responseText
 					this.state = "Processing"
 					this.updateJSONModel()
 					this.updateTreeItemJSONModel()
 					this.state = "Ready"
+				}
+				else{
+					// 5xx, a dropped connection (status 0) or a timeout: without this the model stayed in
+					// "Loading" and every view waiting for it kept its loading indicator.
+					this.state = "Error"
 				}
 			}
         }

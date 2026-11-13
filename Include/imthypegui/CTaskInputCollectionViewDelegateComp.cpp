@@ -105,10 +105,10 @@ void CTaskInputCollectionViewDelegateComp::SetupSummaryInformation()
 	m_summaryInformationHeaders.clear();
 
 	m_summaryInformationTypes.InsertItem("Name", tr("Acquisition-ID"), "");
-	m_summaryInformationHeaders["Name"] = HeaderInfo(true);
+	m_summaryInformationHeaders["Name"] = HeaderInfo(true, HeaderInfo::IF_FILTERABLE | HeaderInfo::IF_SORTABLE);
 
 	m_summaryInformationTypes.InsertItem("Preview", *m_previewColumnNameAttrPtr, "");
-	m_summaryInformationHeaders["Preview"] = HeaderInfo(false);
+	m_summaryInformationHeaders["Preview"] = HeaderInfo(false, HeaderInfo::IF_SORTABLE);
 
 	m_summaryInformationTypes.InsertItem("Description", tr("Description"), "");
 	m_summaryInformationHeaders["Description"] = HeaderInfo(false, HeaderInfo::IF_FILTERABLE | HeaderInfo::IF_SORTABLE);

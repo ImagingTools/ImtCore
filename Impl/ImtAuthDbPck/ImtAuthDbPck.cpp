@@ -81,6 +81,11 @@ I_EXPORT_COMPONENT(
 			"Personal Access Token Database Delegate");
 
 I_EXPORT_COMPONENT(
+			ExternalIdentityDatabaseDelegate,
+			"External identity link database delegate",
+			"External Identity Database Delegate OIDC");
+
+I_EXPORT_COMPONENT(
 			TenantDatabaseDelegate,
 			"Tenant database delegate",
 			"Tenant Database Delegate");
@@ -105,6 +110,11 @@ I_EXPORT_COMPONENT(
 			CrossOrgGrantDatabaseDelegate,
 			"SQL delegate for cross-org grants (hydration, INSERT/UPDATE/DELETE)",
 			"Cross Org Grant Database Delegate");
+
+I_EXPORT_COMPONENT(
+			DocumentShareDatabaseDelegate,
+			"SQL delegate for document shares between tenants",
+			"Document Share Database Delegate");
 
 I_EXPORT_COMPONENT(
 			ContractDatabaseDelegate,
@@ -145,6 +155,11 @@ I_EXPORT_COMPONENT(
 			OrderRequestDatabaseDelegate,
 			"SQL delegate for order requests (hydration, INSERT/UPDATE/DELETE)",
 			"Order Request Database Delegate");
+
+I_EXPORT_COMPONENT(
+			PermissionPathMigration,
+			"Database migration step that rewrites permissions stored by feature id as full feature paths",
+			"Permission Path Migration");
 
 } // namespace ImtAuthDbPck
 

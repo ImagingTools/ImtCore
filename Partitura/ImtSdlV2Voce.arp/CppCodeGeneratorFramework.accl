@@ -2,20 +2,22 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5422" Description="ACF"/>
-            <Version Id="1" Number="2252" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+            <Version Id="0" Number="5715" Description="ACF"/>
+            <Version Id="1" Number="2459" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395267" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="CxxProcessorsManager" X="701.414213562" Y="373.585786438" Note=""/>
-        <Element ComponentName="QmlRegisterGenerator" X="1000" Y="250" Note=""/>
-        <Element ComponentName="SdlClassCodeGenerator" X="650" Y="175" Note=""/>
+        <Element ComponentName="CxxForwardDeclarationPostProcessor" X="175" Y="50" Note=""/>
+        <Element ComponentName="CxxProcessorsManager" X="600" Y="375" Note=""/>
+        <Element ComponentName="CxxSourceTailPostProcessor" X="725" Y="200" Note=""/>
+        <Element ComponentName="QmlRegisterGenerator" X="1050" Y="200" Note=""/>
+        <Element ComponentName="SdlClassCodeGenerator" X="625" Y="750" Note=""/>
         <Element ComponentName="SdlEnumGenerator" X="200" Y="475" Note=""/>
-        <Element ComponentName="SdlGqlCodeGeneratorFramework" X="275" Y="300" Note=""/>
-        <Element ComponentName="SdlQObjectGenerator" X="875" Y="575" Note=""/>
+        <Element ComponentName="SdlGqlCodeGeneratorFramework" X="500" Y="50" Note=""/>
+        <Element ComponentName="SdlQObjectGenerator" X="775" Y="575" Note=""/>
         <Element ComponentName="SdlUnionGenerator" X="1025" Y="450" Note=""/>
-        <Element ComponentName="SdlUnionObjectGenerator" X="500" Y="575" Note=""/>
+        <Element ComponentName="SdlUnionObjectGenerator" X="450" Y="600" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

@@ -38,22 +38,6 @@ void CUserInfo::SetPasswordHash(const QByteArray& passwordHash)
 }
 
 
-QByteArray CUserInfo::GetSid() const
-{
-	return m_sid;
-}
-
-
-void CUserInfo::SetSid(const QByteArray& sid)
-{
-	if (m_sid != sid){
-		istd::CChangeNotifier changeNotifier(this);
-
-		m_sid = sid;
-	}
-}
-
-
 QString CUserInfo::GetMail() const
 {
 	return m_mail;
@@ -103,31 +87,9 @@ bool CUserInfo::RemoveFromGroup(const QByteArray& groupId)
 }
 
 
-IUserBaseInfo::RoleIds CUserInfo::GetRoles(const QByteArray& productId) const
+IPrincipal::FeatureIds CUserInfo::GetPermissions(const QByteArray& productId) const
 {
-	IUserBaseInfo::RoleIds retVal = BaseClass::GetRoles(productId);
-
-	if (m_userGroupInfoProviderPtr != nullptr){
-		for (const QByteArray& parentGroupId : m_groupIds){
-			IUserGroupInfoSharedPtr parentGroupPtr = m_userGroupInfoProviderPtr->GetUserGroup(parentGroupId);
-			if (parentGroupPtr.IsValid()){
-				QByteArrayList groupRoleIds = parentGroupPtr->GetRoles(productId);
-				for (const QByteArray& roleId : groupRoleIds){
-					if (!retVal.contains(roleId)){
-						retVal << roleId;
-					}
-				}
-			}
-		}
-	}
-
-	return retVal;
-}
-
-
-IUserBaseInfo::FeatureIds CUserInfo::GetPermissions(const QByteArray& productId) const
-{
-	IUserBaseInfo::FeatureIds allPermissions = BaseClass::GetPermissions(productId);
+	IPrincipal::FeatureIds allPermissions = BaseClass::GetPermissions(productId);
 
 	if (m_userGroupInfoProviderPtr != nullptr){
 		for (const QByteArray& parentGroupId : m_groupIds){
@@ -386,7 +348,6 @@ bool CUserInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 		BaseClass::CopyFrom(object);
 
 		m_passwordHash = sourcePtr->m_passwordHash;
-		m_sid = sourcePtr->m_sid;
 		m_mail = sourcePtr->m_mail;
 		m_groupIds = sourcePtr->m_groupIds;
 		m_systemInfos = sourcePtr->m_systemInfos;
@@ -409,7 +370,6 @@ bool CUserInfo::IsEqual(const IChangeable& object) const
 	const CUserInfo* sourcePtr = dynamic_cast<const CUserInfo*>(&object);
 	if (retVal && sourcePtr != nullptr){
 		retVal = retVal && m_passwordHash == sourcePtr->m_passwordHash;
-		retVal = retVal && m_sid == sourcePtr->m_sid;
 		retVal = retVal && m_mail == sourcePtr->m_mail;
 		retVal = retVal && m_groupIds == sourcePtr->m_groupIds;
 		retVal = retVal && m_lastConnection == sourcePtr->m_lastConnection;
@@ -445,7 +405,6 @@ bool CUserInfo::ResetData(CompatibilityMode mode)
 
 	m_mail.clear();
 	m_passwordHash.clear();
-	m_sid.clear();
 	m_groupIds.clear();
 	m_enabled = true;
 	m_passwordHistory.clear();

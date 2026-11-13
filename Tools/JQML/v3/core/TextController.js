@@ -1,3 +1,5 @@
+const RichTextSanitizer = require('./RichTextSanitizer')
+
 const NoWrap = 0
 const WordWrap = 1
 const WrapAnywhere = 2
@@ -107,7 +109,7 @@ module.exports = {
         }
  
         if(isHTML){
-            this.content.innerHTML = text
+            this.content.innerHTML = RichTextSanitizer.sanitize(text)
         } else {
             this.content.textContent = text
         }

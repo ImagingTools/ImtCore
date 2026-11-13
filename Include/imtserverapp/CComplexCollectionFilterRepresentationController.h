@@ -27,7 +27,8 @@ public:
 		FOF_ARRAY_IS_EMPTY = 32,
 		FOF_ARRAY_HAS_ANY = 64,
 		FOF_ARRAY_HAS_ALL = 128,
-		FOF_ARRAY_ILIKE_ANY = 256
+		FOF_ARRAY_ILIKE_ANY = 256,
+		FOF_STARTS_WITH = 512
 	};
 
 	CComplexCollectionFilterRepresentationController();

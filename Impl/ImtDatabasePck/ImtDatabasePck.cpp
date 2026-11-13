@@ -22,6 +22,11 @@ I_EXPORT_COMPONENT(
 			"SQL Database");
 
 I_EXPORT_COMPONENT(
+			SqliteConnectionConfigurator,
+			"Settings of the connections to a SQLite database (WAL, synchronization, foreign keys, busy timeout)",
+			"SQL SQLite Database Connection Configurator");
+
+I_EXPORT_COMPONENT(
 			SqlDatabaseCollection,
 			"SQL-based object collection",
 			"SQL Database");
@@ -65,11 +70,6 @@ I_EXPORT_COMPONENT(
 			FileDocumentGarbageCollector,
 			"Garbage collector and integrity auditor for the document file store",
 			"Database Document File Store Garbage Collector GC Audit");
-
-I_EXPORT_COMPONENT(
-			RestoringDatabaseController,
-			"Restoring database controller",
-			"Restoring Restore Database Controller PostreSQL psql");
 
 I_EXPORT_COMPONENT(
 			SqlStructureDelegate,

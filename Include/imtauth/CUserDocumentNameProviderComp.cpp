@@ -3,7 +3,7 @@
 
 
 // ImtCore includes
-#include <imtauth/IUserBaseInfo.h>
+#include <imtauth/IPrincipal.h>
 
 
 namespace imtauth
@@ -12,9 +12,9 @@ namespace imtauth
 
 // reimplemented (imtdoc::IDocumentNameProvider)
 
-QString CUserDocumentNameProviderComp::GetDefaultDocumentName(const QByteArray& /*objectId*/, const istd::IChangeable& document) const
+QString CUserDocumentNameProviderComp::GetDefaultDocumentName(const istd::IChangeable& document, const iprm::IParamsSet* /*nameGenerationParams*/) const
 {
-	const IUserBaseInfo* userBaseInfoPtr = dynamic_cast<const IUserBaseInfo*>(&document);
+	const IPrincipal* userBaseInfoPtr = dynamic_cast<const IPrincipal*>(&document);
 	if (userBaseInfoPtr != nullptr){
 		return userBaseInfoPtr->GetName();
 	}

@@ -49,6 +49,43 @@ QtObject {
 	signal tryCloseDirtyDocument(string documentId, var callback)
 
 	signal documentTypeIdRegistered(string documentTypeId)
+
+	// ObjectId -> true for documents another organization shared for viewing only
+	property var readOnlyObjectIds: ({})
+
+	property Component readOnlyAlertComp: Component {
+		Rectangle {
+			color: Style.popupWarningBackgroundColor
+
+			BaseText {
+				anchors.verticalCenter: parent.verticalCenter
+				anchors.left: parent.left
+				anchors.leftMargin: Style.marginL
+				anchors.right: parent.right
+				anchors.rightMargin: Style.marginL
+
+				text: qsTr("This document was shared with your organization for viewing only. Changes cannot be saved.")
+				elide: Text.ElideRight
+			}
+		}
+	}
+
+	function setObjectReadOnly(objectId, readOnly){
+		if (!objectId){
+			return
+		}
+
+		if (readOnly){
+			documentManager.readOnlyObjectIds[objectId] = true
+		}
+		else{
+			delete documentManager.readOnlyObjectIds[objectId]
+		}
+	}
+
+	function isObjectReadOnly(objectId){
+		return objectId !== "" && documentManager.readOnlyObjectIds[objectId] === true
+	}
 	
 	function getActiveView()
 	{
@@ -339,6 +376,7 @@ QtObject {
 				}
 
 				if (document.documentDataController){
+					document.isSaving = true;
 					if (isNew){
 						document.documentDataController.insertDocument();
 					}
@@ -588,6 +626,16 @@ QtObject {
 
 			documentData.view = view;
 
+			if (documentManager.isObjectReadOnly(documentId)){
+				view.readOnly = true;
+				if (view.commandsPanelVisible !== undefined){
+					view.commandsPanelVisible = false;
+				}
+				if (typeof view.setAlertPanel === "function"){
+					view.setAlertPanel(documentManager.readOnlyAlertComp);
+				}
+			}
+
 			if (view.viewRegistered !== undefined){
 				view.viewRegistered();
 			}
@@ -659,6 +707,8 @@ QtObject {
 			property bool modelReceived: false;
 			property bool modelInitialized: false;
 			property bool viewRegistered: false;
+			// The data controller reports load and save errors alike; this tells which one failed.
+			property bool isSaving: false;
 
 			Component.onDestruction: {
 				if (documentDataController){
@@ -755,6 +805,7 @@ QtObject {
 				target: singleDocumentData.documentDataController;
 
 				function onSaved(documentId){
+					singleDocumentData.isSaving = false;
 					singleDocumentData.isDirty = false;
 
 					let documentModel = singleDocumentData.documentDataController.documentModel;
@@ -773,7 +824,14 @@ QtObject {
 					}
 				}
 
-				function onError(){
+				// A failed save reported as a failed opening left the save overlay on.
+				function onError(message, type){
+					if (singleDocumentData.isSaving){
+						singleDocumentData.isSaving = false
+						documentManager.documentSavingFailed(singleDocumentData.documentId, message ? message : qsTr("Internal error"))
+						return
+					}
+
 					documentManager.documentOpeningFailed(singleDocumentData.documentId, qsTr("Internal error"))
 				}
 			}

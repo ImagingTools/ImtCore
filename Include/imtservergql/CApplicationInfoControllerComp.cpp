@@ -4,6 +4,8 @@
 
 
 // Qt includes
+#include <QtCore/QCoreApplication>
+#include <QtCore/QFileInfo>
 #include <QtCore/QUrl>
 
 // ACF includes
@@ -13,6 +15,10 @@
 
 namespace imtservergql
 {
+
+
+// Bounds the dependency tree, e.g. when two services depend on each other
+static const int s_maxDependencyDepth = 8;
 
 
 // protected methods
@@ -46,6 +52,10 @@ CApplicationInfoControllerComp::ApplicationInfo CApplicationInfoControllerComp::
 	QString versionKindText = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_VERSION_KIND);
 	if (!versionKindText.isEmpty()){
 		applicationInfo.versionKind = versionKindText;
+	}
+
+	if (!m_buildTime.isEmpty()){
+		applicationInfo.buildTime = m_buildTime;
 	}
 
 	using AppAttribute = ibase::IApplicationInfo::ApplicationAttribute;
@@ -91,8 +101,27 @@ CApplicationInfoControllerComp::ApplicationInfo CApplicationInfoControllerComp::
 	FillWebSocketUrl(applicationInfo);
 	FillUserMode(applicationInfo);
 	FillSuperuserStatus(applicationInfo);
+	FillServiceDependencies(applicationInfo);
+
+	applicationInfo.tenantsEnabled = m_tenantsEnabledAttrPtr.IsValid() ? *m_tenantsEnabledAttrPtr : false;
+	applicationInfo.externalLoginEnabled = m_externalLoginEnabledAttrPtr.IsValid() ? *m_externalLoginEnabledAttrPtr : false;
+	applicationInfo.documentSharingEnabled = m_documentSharingEnabledAttrPtr.IsValid() ? *m_documentSharingEnabledAttrPtr : false;
 
 	return applicationInfo;
+}
+
+
+// reimplemented (icomp::CComponentBase)
+
+void CApplicationInfoControllerComp::OnComponentCreated()
+{
+	BaseClass::OnComponentCreated();
+
+	// Read once: a replaced executable is not the one that is running
+	QFileInfo executableInfo(QCoreApplication::applicationFilePath());
+	if (executableInfo.exists()){
+		m_buildTime = executableInfo.lastModified().toUTC().toString(Qt::ISODate);
+	}
 }
 
 
@@ -120,6 +149,8 @@ void CApplicationInfoControllerComp::FillWebSocketUrl(ApplicationInfo& applicati
 	webSocketUrl.scheme = url.scheme();
 
 	applicationInfo.webSocketUrl = std::move(webSocketUrl);
+	applicationInfo.webSocketSameOrigin =
+				(m_webSocketUrlProviderCompPtr->GetConnectionFlags() & imtcom::IServerConnectionInterface::CF_WEBSOCKET_SAME_ORIGIN) != 0;
 }
 
 
@@ -205,6 +236,77 @@ void CApplicationInfoControllerComp::FillSuperuserStatus(ApplicationInfo& applic
 	}
 
 	applicationInfo.superuser = std::move(superuser);
+}
+
+
+void CApplicationInfoControllerComp::FillServiceDependencies(ApplicationInfo& applicationInfo) const
+{
+	if (!m_serviceDependenciesCompPtr.IsValid()){
+		return;
+	}
+
+	QList<imtcom::IServiceInfoProvider::ServiceInfo> dependencies;
+	const int count = m_serviceDependenciesCompPtr.GetCount();
+	for (int i = 0; i < count; ++i){
+		const imtcom::IServiceInfoProvider* serviceInfoProviderPtr = m_serviceDependenciesCompPtr[i];
+		if (serviceInfoProviderPtr != nullptr){
+			dependencies << serviceInfoProviderPtr->GetServiceInfo();
+		}
+	}
+
+	if (dependencies.isEmpty()){
+		return;
+	}
+
+	applicationInfo.dependencies = CreateDependencyList(dependencies, 1);
+}
+
+
+imtsdl::TElementList<sdl::V1_0::imtapp::CServiceInfo> CApplicationInfoControllerComp::CreateDependencyList(
+			const QList<imtcom::IServiceInfoProvider::ServiceInfo>& dependencies,
+			int depth)
+{
+	imtsdl::TElementList<sdl::V1_0::imtapp::CServiceInfo> dependencyList;
+	if (depth > s_maxDependencyDepth){
+		return dependencyList;
+	}
+
+	for (const imtcom::IServiceInfoProvider::ServiceInfo& dependency : dependencies){
+		sdl::V1_0::imtapp::CServiceInfo dependencyData;
+		dependencyData.serviceId = dependency.serviceId;
+
+		switch (dependency.status){
+		case imtcom::IConnectionStatusProvider::CS_CONNECTED:
+			dependencyData.status = sdl::V1_0::imtapp::ServiceStatus::CONNECTED;
+			break;
+		case imtcom::IConnectionStatusProvider::CS_DISCONNECTED:
+			dependencyData.status = sdl::V1_0::imtapp::ServiceStatus::DISCONNECTED;
+			break;
+		default:
+			dependencyData.status = sdl::V1_0::imtapp::ServiceStatus::UNKNOWN;
+			break;
+		}
+
+		if (!dependency.applicationName.isEmpty()){
+			dependencyData.applicationName = dependency.applicationName;
+		}
+		if (!dependency.version.isEmpty()){
+			dependencyData.version = dependency.version;
+		}
+		if (!dependency.versionKind.isEmpty()){
+			dependencyData.versionKind = dependency.versionKind;
+		}
+		if (dependency.buildTime.isValid()){
+			dependencyData.buildTime = dependency.buildTime.toUTC().toString(Qt::ISODate);
+		}
+		if (!dependency.dependencies.isEmpty()){
+			dependencyData.dependencies = CreateDependencyList(dependency.dependencies, depth + 1);
+		}
+
+		dependencyList << dependencyData;
+	}
+
+	return dependencyList;
 }
 
 

@@ -10,6 +10,9 @@
 // ImtCore includes
 #include <imtbase/COperationContext.h>
 #include <imtauth/CUserInfo.h>
+#include <imtauthgql/imtauthgql.h>
+#include <imtdoc/imtdoc.h>
+#include <imtservergql/DocumentSharing.h>
 
 
 namespace imtservergql
@@ -35,16 +38,14 @@ CDM::CDocumentList CCollectionDocumentServiceControllerComp::OnGetOpenedDocument
 		for (const imtdoc::IDocumentService::DocumentListItem& info : list){
 			CDM::CDocumentInfo sdlInfo;
 
-			QString path = info.url.path();
-			QStringList parts = path.split('/', Qt::SkipEmptyParts);
-			QByteArray objectId = parts.count() > 0 ? parts.last().toUtf8() : QByteArray();
-
 			sdlInfo.documentId = info.documentId;
 			sdlInfo.documentName = info.name;
-			sdlInfo.objectId = objectId;
+			sdlInfo.objectId = imtdoc::SourceRefToObjectId(info.documentSourceRef);
 			sdlInfo.objectTypeId = info.typeId;
 			sdlInfo.isDirty = info.isDirty;
 			sdlInfo.hasNameProvider = info.hasNameProvider;
+			sdlInfo.isLoading = info.isLoading;
+			sdlInfo.isReadOnly = info.isReadOnly;
 
 			retVal.documentList->append(sdlInfo);
 		}
@@ -103,6 +104,7 @@ CDM::CDocumentInfo CCollectionDocumentServiceControllerComp::OnCreateNewDocument
 		retVal.isDirty = true;
 		retVal.hasNameProvider = false;
 		retVal.isLoading = false;
+		retVal.isReadOnly = false;
 
 		imtdoc::IDocumentService::DocumentList list = m_documentManagerCompPtr->GetOpenedDocumentList(userId);
 		for (const imtdoc::IDocumentService::DocumentListItem& info : list){
@@ -142,12 +144,14 @@ CDM::CDocumentInfo CCollectionDocumentServiceControllerComp::OnOpenDocument(
 		SendWarningMessage(0, "Unable to get user-ID from context");
 	}
 
-	QUrl url(QStringLiteral("collection:///%1").arg(*objectId->id));
+	if (!CheckObjectAccess(gqlRequest, *objectId->id, imtauth::IDocumentShareInfo::DAL_VIEW, errorMessage)){
+		return retVal;
+	}
 
 	if (m_documentManagerCompPtr.IsValid()) {
 		imtdoc::IDocumentService::TaskParams taskParams;
 		taskParams.userId = userId;
-		taskParams.url = url;
+		taskParams.documentSourceRef = imtdoc::ObjectIdToSourceRef(*objectId->id);
 		taskParams.singleDocumentInstance = objectId->singleInstanceMode.value_or(false);
 		QByteArray taskId = m_documentManagerCompPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, taskParams);
 		imtdoc::IDocumentService::TaskResult taskResult = m_documentManagerCompPtr->WaitForTaskFinished(taskId);
@@ -165,6 +169,7 @@ CDM::CDocumentInfo CCollectionDocumentServiceControllerComp::OnOpenDocument(
 		retVal.isDirty = false;
 		retVal.hasNameProvider = false;
 		retVal.isLoading = true;
+		retVal.isReadOnly = false;
 
 		imtdoc::IDocumentService::DocumentList list = m_documentManagerCompPtr->GetOpenedDocumentList(userId);
 		for (const imtdoc::IDocumentService::DocumentListItem& info : list){
@@ -173,6 +178,7 @@ CDM::CDocumentInfo CCollectionDocumentServiceControllerComp::OnOpenDocument(
 				retVal.objectTypeId = info.typeId;
 				retVal.hasNameProvider = info.hasNameProvider;
 				retVal.isLoading = info.isLoading;
+				retVal.isReadOnly = info.isReadOnly;
 				break;
 			}
 		}
@@ -260,6 +266,13 @@ CDM::CDocumentOperationStatus CCollectionDocumentServiceControllerComp::OnSetDoc
 	}
 
 	if (m_documentManagerCompPtr.IsValid()) {
+		if (IsDocumentReadOnly(userId, *documentId->documentId)){
+			errorMessage = QStringLiteral("Document is read-only");
+			retVal.status = CDM::EDocumentOperationStatus::Failed;
+
+			return retVal;
+		}
+
 		imtdoc::IDocumentService::OperationStatus status = m_documentManagerCompPtr->SetDocumentName(userId, *documentId->documentId, *documentId->documentName);
 		switch (status){
 		case imtdoc::IDocumentService::OS_OK:
@@ -312,6 +325,24 @@ CDM::CDocumentOperationStatus CCollectionDocumentServiceControllerComp::OnSaveDo
 	}
 
 	if (m_documentManagerCompPtr.IsValid()) {
+		if (IsDocumentReadOnly(userId, *saveDocumentInput->documentId)){
+			errorMessage = QStringLiteral("Document is read-only");
+			retVal.status = CDM::EDocumentOperationStatus::Failed;
+			retVal.message = errorMessage;
+
+			return retVal;
+		}
+
+		const QByteArray collectionObjectId = GetCollectionObjectId(userId, *saveDocumentInput->documentId);
+		const bool isNewObject = collectionObjectId.isEmpty();
+
+		if (!isNewObject && !CheckObjectAccess(gqlRequest, collectionObjectId, imtauth::IDocumentShareInfo::DAL_EDIT, errorMessage)){
+			retVal.status = CDM::EDocumentOperationStatus::Failed;
+			retVal.message = errorMessage;
+
+			return retVal;
+		}
+
 		istd::TDelPtr<imtbase::IOperationContext> operationContextPtr;
 		operationContextPtr.SetPtr(CreateOperationContextFromGqlRequest(gqlRequest));
 
@@ -337,6 +368,8 @@ CDM::CDocumentOperationStatus CCollectionDocumentServiceControllerComp::OnSaveDo
 				if (m_documentManagerCompPtr->GetDocumentName(userId, *saveDocumentInput->documentId, resolvedName) == imtdoc::IDocumentService::OS_OK){
 					retVal.documentName = resolvedName;
 				}
+
+				CreateUserActionLog(userId, *saveDocumentInput->documentId, isNewObject ? imtauth::IUserRecentAction::s_createActionTypeId : imtauth::IUserRecentAction::s_updateActionTypeId, resolvedName, gqlRequest);
 			}
 			break;
 		case imtdoc::IDocumentService::OS_INVALID_USER_ID:
@@ -464,7 +497,18 @@ sdl::V1_0::imtbase::CUndoInfo CCollectionDocumentServiceControllerComp::OnGetUnd
 
 	if (m_documentManagerCompPtr.IsValid()) {
 		idoc::IUndoManager* undoManagerPtr = nullptr;
-		if (m_documentManagerCompPtr-> GetDocumentUndoManager(userId, *documentId->id, undoManagerPtr) != imtdoc::IDocumentService::OS_OK){
+		const imtdoc::IDocumentService::OperationStatus status = m_documentManagerCompPtr->GetDocumentUndoManager(userId, *documentId->id, undoManagerPtr);
+
+		// Data, not an error: a resyncing client closes the document. After a restart the user has no entry at all.
+		const bool isDocumentUnknown = !userId.isEmpty()
+					&& (status == imtdoc::IDocumentService::OS_INVALID_DOCUMENT_ID || status == imtdoc::IDocumentService::OS_INVALID_USER_ID);
+		if (isDocumentUnknown){
+			retVal.status->status = sdl::V1_0::imtbase::EUndoStatus::InvalidDocumentId;
+
+			return retVal;
+		}
+
+		if (status != imtdoc::IDocumentService::OS_OK || undoManagerPtr == nullptr){
 			errorMessage = "Undo manager not available";
 
 			retVal.status->status = sdl::V1_0::imtbase::EUndoStatus::Failed;
@@ -545,8 +589,16 @@ sdl::V1_0::imtbase::CUndoStatus CCollectionDocumentServiceControllerComp::OnDoUn
 	}
 
 	if (m_documentManagerCompPtr.IsValid()) {
+		if (IsDocumentReadOnly(userId, documentId)){
+			errorMessage = QStringLiteral("Document is read-only");
+
+			retVal.status = sdl::V1_0::imtbase::EUndoStatus::Failed;
+
+			return retVal;
+		}
+
 		idoc::IUndoManager* undoManagerPtr = nullptr;
-		if (m_documentManagerCompPtr->GetDocumentUndoManager(userId, documentId, undoManagerPtr) != imtdoc::IDocumentService::OS_OK) {
+		if (m_documentManagerCompPtr->GetDocumentUndoManager(userId, documentId, undoManagerPtr) != imtdoc::IDocumentService::OS_OK || undoManagerPtr == nullptr) {
 			errorMessage = "Undo manager not available";
 
 			retVal.status = sdl::V1_0::imtbase::EUndoStatus::Failed;
@@ -613,8 +665,16 @@ sdl::V1_0::imtbase::CUndoStatus CCollectionDocumentServiceControllerComp::OnDoRe
 	}
 
 	if (m_documentManagerCompPtr.IsValid()) {
+		if (IsDocumentReadOnly(userId, documentId)){
+			errorMessage = QStringLiteral("Document is read-only");
+
+			retVal.status = sdl::V1_0::imtbase::EUndoStatus::Failed;
+
+			return retVal;
+		}
+
 		idoc::IUndoManager* undoManagerPtr = nullptr;
-		if (m_documentManagerCompPtr->GetDocumentUndoManager(userId, documentId, undoManagerPtr) != imtdoc::IDocumentService::OS_OK) {
+		if (m_documentManagerCompPtr->GetDocumentUndoManager(userId, documentId, undoManagerPtr) != imtdoc::IDocumentService::OS_OK || undoManagerPtr == nullptr) {
 			errorMessage = "Undo manager not available";
 
 			retVal.status = sdl::V1_0::imtbase::EUndoStatus::Failed;
@@ -674,8 +734,16 @@ sdl::V1_0::imtbase::CUndoStatus CCollectionDocumentServiceControllerComp::OnRese
 	}
 
 	if (m_documentManagerCompPtr.IsValid()) {
+		if (IsDocumentReadOnly(userId, *documentId->id)){
+			errorMessage = QStringLiteral("Document is read-only");
+
+			retVal.status = sdl::V1_0::imtbase::EUndoStatus::Failed;
+
+			return retVal;
+		}
+
 		idoc::IUndoManager* undoManagerPtr = nullptr;
-		if (m_documentManagerCompPtr->GetDocumentUndoManager(userId, *documentId->id, undoManagerPtr) != imtdoc::IDocumentService::OS_OK) {
+		if (m_documentManagerCompPtr->GetDocumentUndoManager(userId, *documentId->id, undoManagerPtr) != imtdoc::IDocumentService::OS_OK || undoManagerPtr == nullptr) {
 			errorMessage = "Undo manager not available";
 
 			retVal.status = sdl::V1_0::imtbase::EUndoStatus::Failed;
@@ -743,6 +811,45 @@ imtbase::IOperationContext* CCollectionDocumentServiceControllerComp::CreateOper
 }
 
 
+bool CCollectionDocumentServiceControllerComp::CheckObjectAccess(
+			const ::imtgql::CGqlRequest& gqlRequest,
+			const QByteArray& objectId,
+			imtauth::IDocumentShareInfo::AccessLevel accessLevel,
+			QString& errorMessage) const
+{
+	if (!m_objectCollectionCompPtr.IsValid() || gqlRequest.GetRequestContext() == nullptr){
+		return true;
+	}
+
+	if (HasObjectAccess(*m_objectCollectionCompPtr, m_documentShareManagerCompPtr.GetPtr(), gqlRequest, {objectId}, accessLevel)){
+		return true;
+	}
+
+	errorMessage = accessLevel == imtauth::IDocumentShareInfo::DAL_VIEW
+				? QStringLiteral("Document does not exist")
+				: QStringLiteral("The organization may not change the document");
+
+	return false;
+}
+
+
+bool CCollectionDocumentServiceControllerComp::IsDocumentReadOnly(const QByteArray& userId, const QByteArray& documentId) const
+{
+	if (!m_documentManagerCompPtr.IsValid()){
+		return false;
+	}
+
+	const imtdoc::IDocumentService::DocumentList documentList = m_documentManagerCompPtr->GetOpenedDocumentList(userId);
+	for (const imtdoc::IDocumentService::DocumentListItem& documentItem : documentList){
+		if (documentItem.documentId == documentId){
+			return documentItem.isReadOnly;
+		}
+	}
+
+	return false;
+}
+
+
 QByteArray CCollectionDocumentServiceControllerComp::GetCollectionObjectId(const QByteArray& userId, const QByteArray& documentId) const
 {
 	if (!m_documentManagerCompPtr.IsValid()){
@@ -752,8 +859,7 @@ QByteArray CCollectionDocumentServiceControllerComp::GetCollectionObjectId(const
 	const imtdoc::IDocumentService::DocumentList documentList = m_documentManagerCompPtr->GetOpenedDocumentList(userId);
 	for (const imtdoc::IDocumentService::DocumentListItem& documentItem : documentList){
 		if (documentItem.documentId == documentId){
-			// Documents bound to a collection element carry a 'collection:///<objectId>' source URL.
-			return documentItem.url.path().mid(1).toUtf8();
+			return imtdoc::SourceRefToObjectId(documentItem.documentSourceRef);
 		}
 	}
 
@@ -789,6 +895,58 @@ void CCollectionDocumentServiceControllerComp::GenerateDocumentChanges(
 				operationTypeId, objectId, documentDataPtr, *changesCollectionPtr, errorMessage, nullptr)){
 		SendWarningMessage(0, QStringLiteral("Unable to generate document changes for '%1'. Error: %2")
 					.arg(QString::fromUtf8(objectId), errorMessage));
+	}
+}
+
+
+void CCollectionDocumentServiceControllerComp::CreateUserActionLog(
+			const QByteArray& userId,
+			const QByteArray& documentId,
+			const QByteArray& actionTypeId,
+			const QString& documentName,
+			const ::imtgql::CGqlRequest& gqlRequest) const
+{
+	if (!m_userActionManagerCompPtr.IsValid()){
+		return;
+	}
+
+	imtauth::IUserRecentAction::TargetInfo targetInfo;
+	targetInfo.id = GetCollectionObjectId(userId, documentId);
+	targetInfo.name = documentName.isEmpty() ? QString::fromUtf8(targetInfo.id) : documentName;
+	targetInfo.source = *m_collectionIdAttrPtr;
+
+	const imtdoc::IDocumentService::DocumentList documentList = m_documentManagerCompPtr->GetOpenedDocumentList(userId);
+	for (const imtdoc::IDocumentService::DocumentListItem& documentItem : documentList){
+		if (documentItem.documentId == documentId){
+			targetInfo.typeId = documentItem.typeId;
+			targetInfo.typeName = QString::fromUtf8(documentItem.typeId);
+			break;
+		}
+	}
+
+	imtauth::IUserRecentAction::ActionTypeInfo actionTypeInfo;
+	actionTypeInfo.id = actionTypeId;
+	if (actionTypeId == imtauth::IUserRecentAction::s_createActionTypeId){
+		actionTypeInfo.name = QStringLiteral("Create");
+		actionTypeInfo.description = QStringLiteral("Object created");
+	}
+	else{
+		actionTypeInfo.name = QStringLiteral("Update");
+		actionTypeInfo.description = QStringLiteral("Object changed");
+	}
+
+	imtauth::IUserRecentAction::UserInfo userInfo;
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr != nullptr){
+		const imtauth::CIdentifiableUserInfo* userInfoPtr = dynamic_cast<const imtauth::CIdentifiableUserInfo*>(gqlContextPtr->GetUserInfo());
+		if (userInfoPtr != nullptr){
+			userInfo.id = userInfoPtr->GetObjectUuid();
+			userInfo.name = userInfoPtr->GetName();
+		}
+	}
+
+	if (!m_userActionManagerCompPtr->CreateUserAction(userInfo, actionTypeInfo, targetInfo)){
+		SendWarningMessage(0, QStringLiteral("Unable to record user action '%1' for document '%2'").arg(QString::fromUtf8(actionTypeId), QString::fromUtf8(targetInfo.id)));
 	}
 }
 

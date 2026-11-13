@@ -2,6 +2,12 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QtDebug>
+
+// ACF includes
+#include <istd/istd.h>
+
 // ImtCore includes
 #include <imtsdl/imtsdl.h>
 #include <imtsdl/ISdlTypeListProvider.h>
@@ -141,6 +147,14 @@ public:
 			from the type name.
 	 */
 	[[nodiscard]] static QString GetValueVariableName(const QString& sdlTypeName);
+
+	/**
+		\brief Adds the include directives of the external (imported from other schemas) entries of \c entryList to \c output
+		\param addObjectInclude - if true, the header of the QObject based classes is used instead of the main one
+		\returns false, if the include path of some external entry is unknown
+	 */
+	template<class SdlEntryClass>
+	static bool CreateDirectivesFromEntryList(const QList<SdlEntryClass>& entryList, QList<imtsdl::IncludeDirective>& output, bool addObjectInclude = false);
 };
 
 
@@ -170,6 +184,33 @@ inline QString CSdlGenTools::GetCollectionReferenceName(
 	}
 
 	return {};
+}
+
+template<class SdlEntryClass>
+inline bool CSdlGenTools::CreateDirectivesFromEntryList(const QList<SdlEntryClass>& entryList, QList<imtsdl::IncludeDirective>& output, bool addObjectInclude)
+{
+	for (const SdlEntryClass& entry: entryList){
+		if (entry.IsExternal()){
+			QString typeIncludePath = entry.GetTargetHeaderFilePath();
+			if (addObjectInclude){
+				typeIncludePath = entry.GetObjectTargetHeaderFilePath();
+			}
+
+			if (typeIncludePath.trimmed().isEmpty()){
+				qCritical() << QStringLiteral("%1Header path is empty for type %2 of schema %3").arg((addObjectInclude ? "Object " : ""), entry.GetName(), entry.GetSchemaFilePath());
+				I_CRITICAL();
+
+				return false;
+			}
+
+			imtsdl::IncludeDirective directive = imtsdl::CSdlTools::CreateCustomDirective(QStringLiteral("<%1>").arg(typeIncludePath));
+			if (!output.contains(directive)){
+				output << directive;
+			}
+		}
+	}
+
+	return true;
 }
 
 

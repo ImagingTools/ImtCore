@@ -21,6 +21,16 @@ I_EXPORT_COMPONENT(
 			"Schema Definition Language SDL Parser Argument General Manager")
 
 I_EXPORT_COMPONENT(
+			CxxSourceTailPostProcessor,
+			"The C++ post processor, that joins the objects source file with the main one and adds the moc includes",
+			"Schema Definition Language SDL Post Processor Source moc")
+
+I_EXPORT_COMPONENT(
+			CxxForwardDeclarationPostProcessor,
+			"The C++ post processor, that generates the forward declaration file (_fwd.h)",
+			"Schema Definition Language SDL Post Processor Forward Declaration")
+
+I_EXPORT_COMPONENT(
 			SdlClassCodeGenerator,
 			"The C++ class generator of SDL types",
 			"Schema Definition Language SDL Class Generator")

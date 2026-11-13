@@ -1,0 +1,180 @@
+schema {
+	namespace: sdlgentest
+	version: 1.0
+	query: Query
+	mutation: Mutation
+}
+
+
+enum ItemStatus
+{
+	ACTIVE
+	ARCHIVED
+}
+
+
+type Address
+{
+	city: String
+	street: String
+	zip: String
+}
+
+
+type Contact
+{
+	email: String
+	phone: String
+	address: Address
+}
+
+
+type Owner
+{
+	login: ID!
+	name: String
+	contact: Contact
+}
+
+
+type Tag
+{
+	name: String
+	color: String
+}
+
+
+type ItemInfo
+{
+	description: String
+	owner: Owner
+	tags: [Tag]
+}
+
+
+type Leaf
+{
+	value: String
+	note: String
+}
+
+
+# "data" is used on two neighbouring levels and is followed by a sibling object field,
+# "dataField" gets the nested struct name that the inner "data" falls back to
+type Wrapper
+{
+	data: Leaf
+	dataField: Leaf
+	info: Leaf
+	label: String
+}
+
+
+type TextContent
+{
+	text: String
+}
+
+
+type ImageContent
+{
+	url: String
+}
+
+
+union Content = TextContent | ImageContent
+
+
+type TreeNode
+{
+	name: String
+	parentNode: TreeNode
+	childNodes: [TreeNode]
+}
+
+
+# CycleA -> CycleB -> CycleA
+type CycleA
+{
+	name: String
+	b: CycleB
+}
+
+
+type CycleB
+{
+	title: String
+	a: CycleA
+}
+
+
+type Item
+{
+	id: ID!
+	name: String
+	status: ItemStatus
+	keywords: [String]
+	info: ItemInfo
+	data: Wrapper
+	content: Content
+	node: TreeNode
+	cycle: CycleA
+}
+
+
+type Notification
+{
+	text: String
+	level: Int
+}
+
+
+type ItemsPayload
+{
+	items: [Item]
+	totalCount: Int
+	notification: Notification
+}
+
+
+input ItemsFilter
+{
+	text: String
+	statuses: [String]
+}
+
+
+input ItemsInput
+{
+	offset: Int
+	count: Int
+	filter: ItemsFilter
+}
+
+
+type ReportBody
+{
+	title: String
+	pages: Int
+}
+
+
+# the only object field of the payload has the same name as the command
+type ReportPayload
+{
+	Report: ReportBody
+	summary: String
+}
+
+
+type Query
+{
+	ItemsList(input: ItemsInput): ItemsPayload!
+	Report(input: ItemsInput): ReportPayload!
+}
+
+
+type Mutation
+{
+	SaveItem(input: ItemsInput): Item!
+}

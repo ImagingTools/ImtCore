@@ -44,6 +44,121 @@ DocumentViewBase {
 	 */
 	readonly property bool isNewTenant: stateManager_.isNewTenant
 
+	// The view hosting the editor when it continues its header (SingleDocumentCollectionView): the section shown and
+	// the editor open in it are added after the organization, and the pages show no header of their own
+	property var __headerHost: null
+	// A close of an editor of a page is in progress: the header does not start another one
+	property bool __navigating: false
+
+	onDocumentManagerViewChanged: {
+		if (container.documentManagerView && typeof container.documentManagerView.addDocumentSubHeader === "function"){
+			container.__headerHost = container.documentManagerView
+			container.__headerHost.subHeaderNavigator = container
+			container.updateSubHeaders()
+		}
+	}
+
+	Component.onDestruction: {
+		if (container.__headerHost && container.__headerHost.subHeaderNavigator === container)
+			container.__headerHost.subHeaderNavigator = null
+	}
+
+	// The headers past the organization: the section shown, then the editor open in it
+	function updateSubHeaders(){
+		if (!container.__headerHost)
+			return
+		container.__headerHost.removeDocumentSubHeader("section")
+		var index = multiPageView.currentIndex
+		if (index < 0 || index >= multiPageView.pagesModel.count)
+			return
+		container.__headerHost.addDocumentSubHeader("section", multiPageView.pagesModel.get(index).name)
+		var page = multiPageView.getPageByIndex(index)
+		if (page && page.editorOpen === true)
+			container.__headerHost.addDocumentSubHeader("editor", page.editorTitle)
+	}
+
+	function __currentPage(){
+		return multiPageView.getPageByIndex(multiPageView.currentIndex)
+	}
+
+	function __hasOpenEditor(){
+		for (var i = 0; i < multiPageView.pagesModel.count; i++){
+			var page = multiPageView.getPageByIndex(i)
+			if (page && page.editorOpen === true)
+				return true
+		}
+		return false
+	}
+
+	// Closes the editor open in the section shown, asking about its unsaved changes
+	function __closeCurrentEditor(callback){
+		var page = container.__currentPage()
+		if (!page || page.editorOpen !== true){
+			callback(true)
+			return
+		}
+		container.__navigating = true
+		page.requestCloseEditor(function(closed){
+			container.__navigating = false
+			callback(closed)
+		})
+	}
+
+	// Closes the editors open in the sections from `index` on, each shown while it is asked about
+	function __closeEditorsFrom(index, callback){
+		for (var i = index; i < multiPageView.pagesModel.count; i++){
+			var page = multiPageView.getPageByIndex(i)
+			if (page && page.editorOpen === true){
+				var next = i + 1
+				multiPageView.activatePage(i)
+				container.__closeCurrentEditor(function(closed){
+					if (closed)
+						container.__closeEditorsFrom(next, callback)
+					else
+						callback(false)
+				})
+				return
+			}
+		}
+		callback(true)
+	}
+
+	// The navigator of the host header (see SingleDocumentCollectionView.subHeaderNavigator)
+	function canNavigateBack(){
+		var page = container.__currentPage()
+		return !!page && page.editorOpen === true
+	}
+
+	function navigateBack(){
+		if (container.__navigating)
+			return
+		container.__closeCurrentEditor(function(closed){})
+	}
+
+	// The section header closes the editor open in it, the organization header also goes to the first section
+	function navigateToHeader(headerId){
+		if (container.__navigating)
+			return
+		container.__closeCurrentEditor(function(closed){
+			if (closed && headerId !== "section")
+				multiPageView.activatePage(0)
+		})
+	}
+
+	// The editors of all sections are closed before the organization: the shown one first, then the hidden ones
+	function requestLeave(callback){
+		if (container.__navigating){
+			callback(false)
+			return
+		}
+		container.__closeCurrentEditor(function(closed){
+			if (closed)
+				container.__closeEditorsFrom(0, callback)
+			else
+				callback(false)
+		})
+	}
+
 	// --- Composition root ---
 	TenantEditorStateManager {
 		id: stateManager_
@@ -52,6 +167,9 @@ DocumentViewBase {
 	}
 
 	function updateGui() {
+		// The role, group and user editors of the organization offer only its permission scope
+		if (container.apiClient && container.tenantData && container.tenantData.m_id !== "")
+			container.apiClient.rolePermissionsTenantId = container.tenantData.m_id
 		stateManager_.loadMembersFromModel()
 		stateManager_.loadInvitationsFromModel()
 		var generalPage = multiPageView.getPageByIndex(0)
@@ -62,16 +180,15 @@ DocumentViewBase {
 			permissionsPage.doUpdateGui()
 	}
 
+	// Runs inside this editor's change transaction on the shared model, so the pages must not open their own.
 	function updateModel() {
 		var generalPage = multiPageView.getPageByIndex(0)
 		if (generalPage)
-			generalPage.doUpdateModel()
-		if (container.tenantData) {
+			generalPage.updateModel()
+		// The permissions page writes its selection itself when it changes; rewriting it here made every commit,
+		// the one of Save included, a change of the model
+		if (container.tenantData)
 			stateManager_.syncMembersToModel()
-			var permissionsPage = multiPageView.getPageById("Permissions")
-			if (permissionsPage)
-				permissionsPage.doUpdateModel()
-		}
 	}
 
 	// --- Multi-page navigation ---
@@ -80,9 +197,16 @@ DocumentViewBase {
 		anchors.fill: parent
 		panelWidth: Style.sizeHintXXS
 
+		onCurrentIndexChanged: {
+			container.updateSubHeaders()
+		}
+
 		function updatePages() {
 			multiPageView.clear()
 			multiPageView.addPage("General", qsTr("General"), generalPageComp, "Icons/Settings")
+			// The creator picks the permission scope while creating the organization
+			if (stateManager_.isNewTenant)
+				multiPageView.addPage("Permissions", qsTr("Available permissions"), permissionsPageComp, "Icons/Key")
 			if (!stateManager_.isNewTenant) {
 				if (stateManager_.canViewOrganizationMembers)
 					multiPageView.addPage("Members", qsTr("Members"), membersPageComp, "Icons/MultipleUser")
@@ -93,7 +217,7 @@ DocumentViewBase {
 					multiPageView.addPage("Groups", qsTr("Groups"), groupsPageComp, "Icons/Organization")
 				}
 				if (stateManager_.canViewOrganizationPermissions) {
-					multiPageView.addPage("Permissions", qsTr("Permissions"), permissionsPageComp, "Icons/Key")
+					multiPageView.addPage("Permissions", qsTr("Available permissions"), permissionsPageComp, "Icons/Key")
 				}
 				if (stateManager_.isCreator) {
 					multiPageView.addPage("CrossOrgGrants", qsTr("Grants"), crossOrgGrantsPageComp, "Icons/Crown")
@@ -107,29 +231,102 @@ DocumentViewBase {
 						multiPageView.addSubPage("Relationships", "ConnectOrganization", qsTr("Connect Organization"), connectOrganizationPageComp)
 					if (stateManager_.canViewOrganizationConnections)
 						multiPageView.addSubPage("Relationships", "MyRelationships", qsTr("My Relationships"), myConnectionsPageComp)
+					if (stateManager_.canViewOrganizationConnections)
+						multiPageView.addSubPage("Relationships", "RelationshipProposals", qsTr("Proposals"), relationshipProposalsPageComp)
 					// multiPageView.addPage("Messages", qsTr("Messages"), messagesPageComp, "Icons/Message")
+				}
+				// The shares belong to the organization of the session, so only its own editor shows them
+				if (ApplicationInfoProvider.documentSharingEnabled
+							&& (stateManager_.isAdmin || stateManager_.canViewOrganizationConnections)
+							&& container.tenantData && String(container.tenantData.m_id) === AuthorizationController.getTenantId()) {
+					multiPageView.addPage("DocumentShares", qsTr("Shared Documents"), documentSharesPageComp, "Icons/Share")
 				}
 			}
 			multiPageView.currentIndex = 0
 		}
 
 		Component.onCompleted: {
+			container.__builtPagesKey = container.__pagesKey()
 			multiPageView.updatePages()
 		}
 	}
 
-	// Re-build pages whenever anything controlling page visibility changes.
+	// The page list follows what the pages depend on, including the organization of the session for the shares
+	function __pagesKey() {
+		var sessionTenant = container.tenantData && String(container.tenantData.m_id) === AuthorizationController.getTenantId()
+		return stateManager_.pagesConfigKey + (sessionTenant ? "S" : "")
+	}
+
+	property string __builtPagesKey: ""
+
+	// A representation fills the model field by field and every field flips some of the flags: the pages are rebuilt
+	// once, after the model is filled, and only when the list really changes (a rebuild recreates the shown page).
+	Timer {
+		id: pagesUpdateTimer
+		interval: 0
+		onTriggered: {
+			var key = container.__pagesKey()
+			if (key === container.__builtPagesKey)
+				return
+			// A rebuild destroys the pages with their editors: it waits until the user closes them
+			if (container.__hasOpenEditor()){
+				pagesUpdateRetryTimer.restart()
+				return
+			}
+			container.__builtPagesKey = key
+			multiPageView.updatePages()
+			// The rebuilt pages are new: the representation they missed is shown again
+			container.doUpdateGui()
+		}
+	}
+
+	Timer {
+		id: pagesUpdateRetryTimer
+		interval: 500
+		onTriggered: {
+			pagesUpdateTimer.restart()
+		}
+	}
+
 	Connections {
 		target: stateManager_
 		function onIsNewTenantChanged() {
-			multiPageView.updatePages()
+			pagesUpdateTimer.restart()
 			if (!stateManager_.isNewTenant) {
 				stateManager_.loadMembersFromModel()
 				stateManager_.loadInvitationsFromModel()
 			}
 		}
 		function onPagesConfigKeyChanged() {
-			if (!stateManager_.isNewTenant) multiPageView.updatePages()
+			pagesUpdateTimer.restart()
+		}
+	}
+
+	Connections {
+		target: container.tenantData
+		function onM_idChanged() {
+			pagesUpdateTimer.restart()
+		}
+		// The editors of roles, groups and users offer the permission scope of the organization
+		function onM_tenantPermissionsChanged() {
+			if (container.apiClient)
+				container.apiClient.invalidateTenantPermissions()
+		}
+	}
+
+	// The reasons to read the organization again come in bursts: an own change and its notification,
+	// a notification relayed by the API client and by AuthorizationController. One reading serves them all.
+	function __refreshRepresentation() {
+		if (!stateManager_.isNewTenant && container.representationController)
+			representationRefreshTimer.restart()
+	}
+
+	Timer {
+		id: representationRefreshTimer
+		interval: 100
+		onTriggered: {
+			if (!stateManager_.isNewTenant && container.representationController)
+				container.representationController.updateRepresentationFromDocument()
 		}
 	}
 
@@ -137,8 +334,7 @@ DocumentViewBase {
 	Connections {
 		target: container.apiClient ? container.apiClient.userDocumentManager : null
 		function onDocumentSaved(documentId) {
-			if (!stateManager_.isNewTenant && container.representationController)
-				container.representationController.updateRepresentationFromDocument()
+			container.__refreshRepresentation()
 		}
 	}
 
@@ -146,13 +342,9 @@ DocumentViewBase {
 		target: container.apiClient
 		function onInvitationCreated() {
 			PopupManager.addSuccessMessage(qsTr("Invitation created successfully"), true)
-			if (container.representationController)
-				container.representationController.updateRepresentationFromDocument()
 		}
 		function onOwnershipTransferred() {
 			PopupManager.addSuccessMessage(qsTr("Ownership transferred successfully"), true)
-			if (container.representationController)
-				container.representationController.updateRepresentationFromDocument()
 		}
 		function onRoleCreated() {
 			PopupManager.addSuccessMessage(qsTr("Role created successfully"), true)
@@ -162,11 +354,6 @@ DocumentViewBase {
 		}
 		function onUserCreated() {
 			PopupManager.addSuccessMessage(qsTr("User created successfully"), true)
-			// Refresh the tenant document so the newly added user (auto-joined
-			// as Member via AddMembership in the api client) appears in the
-			// TenantMembersPage list.
-			if (!stateManager_.isNewTenant && container.representationController)
-				container.representationController.updateRepresentationFromDocument()
 		}
 		function onMemberRemoved(userId) {
 			if (!container.tenantData || stateManager_.isNewTenant)
@@ -179,42 +366,6 @@ DocumentViewBase {
 					AuthorizationController.selectTenant("")
 				if (container.documentManager && container.documentId)
 					container.documentManager.closeDocument(container.documentId)
-			}
-		}
-		function onSubscriptionInvitationAccepted(tenantId) {
-			if (!container.tenantData || stateManager_.isNewTenant)
-				return
-			if (tenantId === container.tenantData.m_id) {
-				PopupManager.addSuccessMessage(qsTr("Invitation accepted"), true)
-				if (container.representationController)
-					container.representationController.updateRepresentationFromDocument()
-			}
-		}
-		function onSubscriptionInvitationRejected(tenantId, membershipId) {
-			if (!container.tenantData || stateManager_.isNewTenant)
-				return
-			if (tenantId === container.tenantData.m_id) {
-				PopupManager.addInfoMessage(qsTr("Invitation rejected"), true)
-				stateManager_.removePendingInvitation(membershipId)
-				if (container.representationController)
-					container.representationController.updateRepresentationFromDocument()
-			}
-		}
-		function onSubscriptionOwnershipTransferred(tenantId) {
-			if (!container.tenantData || stateManager_.isNewTenant)
-				return
-			if (tenantId === container.tenantData.m_id) {
-				PopupManager.addInfoMessage(qsTr("Ownership transferred"), true)
-				if (container.representationController)
-					container.representationController.updateRepresentationFromDocument()
-			}
-		}
-		function onSubscriptionMembershipRoleChanged(tenantId, userId, role) {
-			if (!container.tenantData || stateManager_.isNewTenant)
-				return
-			if (tenantId === container.tenantData.m_id) {
-				if (container.representationController)
-					container.representationController.updateRepresentationFromDocument()
 			}
 		}
 		function onSubscriptionMembershipRemoved(tenantId, userId) {
@@ -231,43 +382,19 @@ DocumentViewBase {
 						container.documentManager.closeDocument(container.documentId)
 					return
 				}
-				if (container.representationController)
-					container.representationController.updateRepresentationFromDocument()
 			}
 		}
 	}
 
-	// --- Listen to globally-broadcast tenant membership events so the editor
-	// reloads even when the change was performed by the local user via another
-	// view (e.g. accepting an invitation in TenantCollectionView) — the server
-	// does not re-deliver a subscription notification to the actor itself.
+	// Members and invitations are read again only when the server reports a change of them, whoever made it
 	Connections {
 		target: AuthorizationController
 
-		function onTenantInvitationAccepted(tenantId) {
+		function onTenantMembersChanged(tenantId) {
 			if (!container.tenantData || stateManager_.isNewTenant)
 				return
 			if (tenantId === container.tenantData.m_id) {
-				if (container.representationController)
-					container.representationController.updateRepresentationFromDocument()
-			}
-		}
-		function onTenantInvitationRejected(tenantId, membershipId) {
-			if (!container.tenantData || stateManager_.isNewTenant)
-				return
-			if (tenantId === container.tenantData.m_id) {
-				if (membershipId)
-					stateManager_.removePendingInvitation(membershipId)
-				if (container.representationController)
-					container.representationController.updateRepresentationFromDocument()
-			}
-		}
-		function onTenantOwnershipTransferred(tenantId) {
-			if (!container.tenantData || stateManager_.isNewTenant)
-				return
-			if (tenantId === container.tenantData.m_id) {
-				if (container.representationController)
-					container.representationController.updateRepresentationFromDocument()
+				container.__refreshRepresentation()
 			}
 		}
 	}
@@ -291,6 +418,7 @@ DocumentViewBase {
 			model: container.tenantData
 			stateManager: stateManager_
 			apiClient: container.apiClient
+			headerHost: container.__headerHost ? container : null
 		}
 	}
 
@@ -301,6 +429,7 @@ DocumentViewBase {
 			model: container.tenantData
 			stateManager: stateManager_
 			apiClient: container.apiClient
+			headerHost: container.__headerHost ? container : null
 		}
 	}
 
@@ -311,6 +440,7 @@ DocumentViewBase {
 			model: container.tenantData
 			stateManager: stateManager_
 			apiClient: container.apiClient
+			headerHost: container.__headerHost ? container : null
 		}
 	}
 
@@ -331,6 +461,14 @@ DocumentViewBase {
 			model: container.tenantData
 			stateManager: stateManager_
 			apiClient: container.apiClient
+			headerHost: container.__headerHost ? container : null
+		}
+	}
+
+	Component {
+		id: documentSharesPageComp
+
+		TenantDocumentSharesPage {
 		}
 	}
 
@@ -341,6 +479,7 @@ DocumentViewBase {
 			model: container.tenantData
 			stateManager: stateManager_
 			apiClient: container.apiClient
+			headerHost: container.__headerHost ? container : null
 		}
 	}
 
@@ -371,6 +510,17 @@ DocumentViewBase {
 			model: container.tenantData
 			stateManager: stateManager_
 			apiClient: container.apiClient
+			headerHost: container.__headerHost ? container : null
+		}
+	}
+
+	Component {
+		id: relationshipProposalsPageComp
+
+		TenantRelationshipProposalsPage {
+			model: container.tenantData
+			stateManager: stateManager_
+			apiClient: container.apiClient
 		}
 	}
 
@@ -381,6 +531,7 @@ DocumentViewBase {
 			model: container.tenantData
 			stateManager: stateManager_
 			apiClient: container.apiClient
+			headerHost: container.__headerHost ? container : null
 		}
 	}
 }

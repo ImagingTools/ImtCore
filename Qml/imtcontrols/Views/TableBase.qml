@@ -20,12 +20,17 @@ Rectangle {
 	property bool checkable: false;
 	property bool selectable: true;
 	property bool isMultiCheckable: true;
+	// The width of the checkbox column of a checkable table; the header and the rows both start their cells after it.
+	readonly property int checkColumnWidth: tableContainer.checkable ? 3 * Style.marginM : 0;
+	// The first column that is shown; the checkbox column takes the look of its header cell.
+	property int firstVisibleColumnIndex: 0;
 	property bool canSelectAll: true;
 	property bool scrollbarVisible: true;
 	property bool showHeaders: true;
 
-	property bool enableAlternating: (Style.enableAlternating !== undefined && Style.enableAlternating !== null) ? Style.enableAlternating : false;
-	property color alternatingColor: Style.backgroundColor2;
+	// Tables stripe their rows faintly (VS Code keybindings table); Style.enableTableAlternating turns it off.
+	property bool enableAlternating: (Style.enableAlternating === true) || (Style.enableTableAlternating !== undefined ? Style.enableTableAlternating : false);
+	property color alternatingColor: Style.tableAlternateRowColor !== undefined ? Style.tableAlternateRowColor : Style.backgroundColor2;
 	property color alternatingCellColor: 'transparent';
 	property real alternatingOpacity: Style.alternatingOpacity ? Style.alternatingOpacity : 0.05;
 	property bool hoverEnabled: (Style.enableHoverEffect !== undefined && Style.enableHoverEffect !== null) ? Style.enableHoverEffect : true;
@@ -184,6 +189,7 @@ Rectangle {
 	signal sortingChanged(string headerId, string sortOrder);
 
 	signal widthRecalc();
+
 	signal heightRecalc();
 
 	signal tableViewParamsAccepted();
@@ -256,10 +262,8 @@ Rectangle {
 	}
 
 	onSelectionChanged: {
-		if (selection.length > 0){
-			let maxIndex = selection.sort()[selection.length - 1]
-
-			elementsListObj.positionViewAtIndex(maxIndex, ListView.Contain)
+		if (selection.length > 0 && selectionManager.focusedIndex >= 0){
+			elementsListObj.positionViewAtIndex(selectionManager.focusedIndex, ListView.Contain)
 		}
 	}
 
@@ -414,6 +418,30 @@ Rectangle {
 		tableContainer.properties.clearInvisibleItems();
 	}
 
+	function refreshVisibleRows(){
+		let y = elementsListObj.contentY;
+		let bottom = y + elementsListObj.height;
+		let guard = 0;
+
+		while (y < bottom && guard < elementsListObj.count){
+			guard = guard + 1;
+			let row = elementsListObj.itemAt(0, y + 1);
+			if (!row || row.height <= 0){
+				return;
+			}
+
+			if (row.reused){
+				row.reused();
+			}
+
+			let nextY = row.y + row.height;
+			if (nextY <= y){
+				return;
+			}
+			y = nextY;
+		}
+	}
+
 	function getHeaderIndex(headerId){
 		if (!tableContainer.headers){
 			return -1;
@@ -460,6 +488,52 @@ Rectangle {
 		tableContainer.columnContentComps[headerId] = comp;
 	}
 
+	function updateFirstVisibleColumnIndex(){
+		for (let i = 0; i < tableContainer.widthDecoratorDynamic.getItemsCount(); i++){
+			if (tableContainer.widthDecoratorDynamic.getData("Width", i) > 0){
+				tableContainer.firstVisibleColumnIndex = i;
+
+				return;
+			}
+		}
+
+		tableContainer.firstVisibleColumnIndex = 0;
+	}
+
+	// The look of a header cell, from the header decorator; the cell of the checkbox column uses the one of the first cell.
+	function headerCellColor(index){
+		if (tableContainer.emptyDecorHeader || !tableContainer.headerDecorator.isValidData("Color", index)){
+			return "transparent";
+		}
+
+		return tableContainer.headerDecorator.getData("Color", index);
+	}
+
+	function headerCellOpacity(index){
+		if (tableContainer.emptyDecorHeader || !tableContainer.headerDecorator.isValidData("Opacity", index)){
+			return 1;
+		}
+
+		return tableContainer.headerDecorator.getData("Opacity", index);
+	}
+
+	function headerCellRadius(index){
+		if (tableContainer.emptyDecorHeader || !tableContainer.headerDecorator.isValidData("CellRadius", index)){
+			return 0;
+		}
+
+		return tableContainer.headerDecorator.getData("CellRadius", index);
+	}
+
+	// Whether the corner of a header cell is rounded; the corner is "LeftTopRound", "RightTopRound", "LeftBottomRound" or "RightBottomRound".
+	function isHeaderCornerRounded(corner, index){
+		if (tableContainer.emptyDecorHeader || !tableContainer.headerDecorator.isValidData(corner, index)){
+			return false;
+		}
+
+		return tableContainer.headerDecorator.getData(corner, index);
+	}
+
 	function setCellHeight(){
 		var maxVal = 0;
 		for(var i = 0; i < heightModel.count; i++){
@@ -488,6 +562,19 @@ Rectangle {
 				tableContainer.widthDecorator.setData("WidthPercent",-1,index);
 			}
 		}
+
+		// Called on every width, header, element and visibility change; widths that come out the same
+		// are not recomputed, or every cell and header would be resized again for nothing.
+		let widthSignature = tableWidth_ + "|" + tableContainer.isFlickable + "|" + tableContainer.minCellWidth + "|" + tableContainer.defaultColumnWidth + "|" + headersCount;
+		for (let k = 0; k < tableContainer.widthDecorator.getItemsCount(); k++){
+			widthSignature += "|" + getHeaderId(k) + ":" + tableContainer.widthDecorator.getData("Width", k) + ":" + tableContainer.widthDecorator.getData("WidthPercent", k);
+		}
+
+		if (widthSignature === tableContainer.lastWidthSignature && tableContainer.widthDecoratorDynamic.getItemsCount() > 0){
+			return;
+		}
+
+		tableContainer.lastWidthSignature = widthSignature;
 
 		tableContainer.widthDecoratorDynamic.clear();
 		tableContainer.widthDecoratorDynamic.copy(tableContainer.widthDecorator);
@@ -559,6 +646,7 @@ Rectangle {
 		if(tableContainer.isFlickable){
 			tableContainer.contentWidth = totalWidth;
 		}
+		tableContainer.updateFirstVisibleColumnIndex();
 		tableContainer.widthRecalc();
 	}
 
@@ -613,6 +701,121 @@ Rectangle {
 	}
 
 
+	// Rows in the viewport fill their cells at once. The others fill within a time slice per tick and the rest
+	// wait in one queue, top row first, so a page of rows paints progressively instead of freezing.
+	property string lastWidthSignature: "";
+	property real rowFillSliceStart: 0;
+	property int rowFillSliceMs: 40;
+	property var pendingFillRows: [];
+
+	function rowFillIndex(rowViewer){
+		return rowViewer.rowDelegate && rowViewer.rowDelegate.rowIndex !== undefined ? rowViewer.rowDelegate.rowIndex : -1;
+	}
+
+	// From the row index rather than the row's position: a row being built is not positioned yet.
+	function rowIsInViewport(rowViewer){
+		let rowIndex = tableContainer.rowFillIndex(rowViewer);
+		if (rowIndex < 0 || tableContainer.itemHeight <= 0){
+			return false;
+		}
+
+		let rowTop = rowIndex * tableContainer.itemHeight;
+		let viewTop = elementsListObj.contentY - elementsListObj.originY;
+
+		return rowTop + tableContainer.itemHeight > viewTop && rowTop < viewTop + elementsListObj.height;
+	}
+
+	function rowFillSliceLeft(){
+		let now = Date.now();
+		if (tableContainer.rowFillSliceStart === 0){
+			tableContainer.rowFillSliceStart = now;
+			rowFillSliceTimer.restart();
+
+			return true;
+		}
+
+		return now - tableContainer.rowFillSliceStart < tableContainer.rowFillSliceMs;
+	}
+
+	// False queues the row: the table fills it later through fillRowCells().
+	function takeRowFillSlice(rowViewer){
+		if (tableContainer.rowIsInViewport(rowViewer) || tableContainer.rowFillSliceLeft()){
+			return true;
+		}
+
+		let queue = tableContainer.pendingFillRows;
+		if (queue.indexOf(rowViewer) < 0){
+			let rowIndex = tableContainer.rowFillIndex(rowViewer);
+			let position = queue.length;
+			while (position > 0 && tableContainer.rowFillIndex(queue[position - 1]) > rowIndex){
+				position--;
+			}
+
+			queue.splice(position, 0, rowViewer);
+		}
+
+		if (!rowFillQueueTimer.running){
+			rowFillQueueTimer.start();
+		}
+
+		return false;
+	}
+
+	function cancelRowFill(rowViewer){
+		let index = tableContainer.pendingFillRows.indexOf(rowViewer);
+		if (index >= 0){
+			tableContainer.pendingFillRows.splice(index, 1);
+		}
+	}
+
+	// Always fills the first row, so a slice too short for any row still makes progress.
+	function fillPendingRows(){
+		let queue = tableContainer.pendingFillRows;
+		tableContainer.pendingFillRows = [];
+
+		let start = Date.now();
+		for (let i = 0; i < queue.length; i++){
+			if (i > 0 && Date.now() - start >= tableContainer.rowFillSliceMs && !tableContainer.rowIsInViewport(queue[i])){
+				tableContainer.pendingFillRows.push(queue[i]);
+				continue;
+			}
+
+			queue[i].fillRowCells();
+		}
+
+		if (tableContainer.pendingFillRows.length === 0){
+			rowFillQueueTimer.stop();
+		}
+	}
+
+	Timer {
+		id: rowFillSliceTimer;
+		interval: 0;
+		onTriggered: {
+			tableContainer.rowFillSliceStart = 0;
+		}
+	}
+
+	// One timer for the table instead of one per waiting row. Not 0: Qt never fires a repeating Timer with a zero interval.
+	Timer {
+		id: rowFillQueueTimer;
+		interval: 1;
+		repeat: true;
+		onTriggered: {
+			tableContainer.fillPendingRows();
+		}
+	}
+
+	Timer {
+		id: listWidthTimer;
+		interval: 0;
+		onTriggered: {
+			if (tableContainer.visible){
+				tableContainer.setWidth();
+			}
+		}
+	}
+
 	PauseAnimation {
 		id: pauseWidth;
 		duration: 100;
@@ -648,6 +851,85 @@ Rectangle {
 		color: Style.baseColor;
 
 		clip: true;
+
+		// The header cell of the checkbox column, built like the first header cell it sits next to:
+		// the borders outside, the decorated background between them.
+		Item {
+			id: checkBoxHeaderCell;
+
+			anchors.left: parent.left;
+			anchors.top: parent.top;
+			anchors.bottom: parent.bottom;
+
+			width: tableContainer.checkColumnWidth;
+
+			visible: tableContainer.checkable;
+
+			Rectangle {
+				id: checkBoxHeaderTopBorder;
+
+				anchors.left: parent.left;
+				anchors.right: parent.right;
+				anchors.top: parent.top;
+
+				height: tableContainer.visibleTopBorderFirst ? tableContainer.horizontalBorderSize : 0;
+				color: tableContainer.borderColorHorizontal;
+			}
+
+			Rectangle {
+				id: checkBoxHeaderBottomBorder;
+
+				anchors.left: parent.left;
+				anchors.right: parent.right;
+				anchors.bottom: parent.bottom;
+
+				height: tableContainer.visibleBottomBorderLast ? tableContainer.horizontalBorderSize : 0;
+				color: tableContainer.borderColorHorizontal;
+			}
+
+			Rectangle {
+				id: checkBoxHeaderBackground;
+
+				anchors.left: parent.left;
+				anchors.right: parent.right;
+				anchors.top: checkBoxHeaderTopBorder.bottom;
+				anchors.bottom: checkBoxHeaderBottomBorder.top;
+
+				color: tableContainer.headerCellColor(tableContainer.firstVisibleColumnIndex);
+				opacity: tableContainer.headerCellOpacity(tableContainer.firstVisibleColumnIndex);
+				radius: tableContainer.headerCellRadius(tableContainer.firstVisibleColumnIndex);
+
+				// The side next to the first header cell is never rounded.
+				Rectangle {
+					anchors.right: parent.right;
+					anchors.top: parent.top;
+					anchors.bottom: parent.bottom;
+
+					width: parent.width / 2;
+					color: parent.color;
+				}
+
+				Rectangle {
+					anchors.left: parent.left;
+					anchors.top: parent.top;
+
+					width: parent.width / 2;
+					height: parent.height / 2;
+					color: parent.color;
+					visible: !tableContainer.isHeaderCornerRounded("LeftTopRound", tableContainer.firstVisibleColumnIndex);
+				}
+
+				Rectangle {
+					anchors.left: parent.left;
+					anchors.bottom: parent.bottom;
+
+					width: parent.width / 2;
+					height: parent.height / 2;
+					color: parent.color;
+					visible: !tableContainer.isHeaderCornerRounded("LeftBottomRound", tableContainer.firstVisibleColumnIndex);
+				}
+			}
+		}
 
 		CheckBox {
 			id: checkBox;
@@ -686,7 +968,7 @@ Rectangle {
 		ListView {
 			id: headersList;
 
-			anchors.left: checkBox.visible ? checkBox.right : parent.left;
+			anchors.left: tableContainer.checkable ? checkBoxHeaderCell.right : parent.left;
 			anchors.right: parent.right;
 			anchors.top: parent.top;
 			anchors.bottom: parent.bottom;
@@ -733,10 +1015,11 @@ Rectangle {
 			anchors.bottom: parent.bottom;
 
 			height: 1;
+			z: 2;
 
+			// Separates the column titles from the rows, as the header of a VS Code table does.
 			color: Style.borderColor;
-			opacity: 0.5;
-			visible: false;
+			visible: true;
 		}
 	}//headers
 
@@ -825,6 +1108,14 @@ Rectangle {
 			if(tableContainer.isFlickable){
 				tableContainer.contentWidth = contentWidth;
 			}
+		}
+
+		// Columns are sized from this list's width, which also changes without the table's (the vertical
+		// scrollbar showing or hiding, anchors settling after the table resized). Rows sized to a stale width
+		// left a horizontal scrollbar that never went away. On the next tick: resizing the columns inside this
+		// change shows or hides the scrollbars, which change this width again - a binding loop.
+		onWidthChanged: {
+			listWidthTimer.restart();
 		}
 
 		onContentYChanged: {
@@ -968,6 +1259,7 @@ Rectangle {
 
 		tableContainer.contentWidth = tableWidth_;
 
+		tableContainer.updateFirstVisibleColumnIndex();
 		tableContainer.widthRecalc();
 
 	}

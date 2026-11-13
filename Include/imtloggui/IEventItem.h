@@ -6,6 +6,8 @@
 #include <idoc/IDocumentMetaInfo.h>
 #include <ilog/IMessageConsumer.h>
 
+#undef GetMessage
+
 
 namespace imtloggui
 {

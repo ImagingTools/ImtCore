@@ -20,7 +20,6 @@
 #include <imtauthgql/CSessionModelObserverComp.h>
 #include <imtauthgql/CSessionModelSubscriberControllerComp.h>
 #include <imtauthgql/CLdapAuthorizationControllerComp.h>
-#include <imtauthgql/CUserSerializableCollectionControllerComp.h>
 #include <imtauthgql/CUserSettingsControllerComp.h>
 #include <imtauthgql/CProfileControllerComp.h>
 #include <imtauthgql/CRoleRemoteCollectionControllerComp.h>
@@ -44,6 +43,7 @@
 #include <imtauthgql/CPermissionsProviderComp.h>
 #include <imtauthgql/CPersonalAccessTokenControllerComp.h>
 #include <imtauthgql/CClientRequestPersonalAccessTokenManagerComp.h>
+#include <imtauthgql/CExternalLoginCallbackServletComp.h>
 #include <imtauthgql/CTenantCollectionControllerComp.h>
 #include <imtauthgql/CTenantMetaInfoDelegateComp.h>
 #include <imtauthgql/CTenantCollectionDocumentServiceComp.h>
@@ -90,7 +90,6 @@ typedef imtauthgql::CRemotePermissionCheckerComp RemotePermissionChecker;
 typedef imtauthgql::CSessionModelObserverComp SessionModelObserver;
 typedef imtauthgql::CSessionModelSubscriberControllerComp SessionModelSubscriberController;
 typedef imtauthgql::CLdapAuthorizationControllerComp LdapAuthorizationController;
-typedef imtauthgql::CUserSerializableCollectionControllerComp UserSerializableCollectionController;
 typedef imtauthgql::CUserSettingsControllerComp UserSettingsController;
 typedef imtauthgql::CProfileControllerComp ProfileController;
 typedef imtauthgql::CRoleRemoteCollectionControllerComp RoleRemoteCollectionController;
@@ -114,6 +113,7 @@ typedef imtauthgql::CTokenBasedPermissionsProviderComp ClientRequestTokenBasedPe
 typedef imtauthgql::CPermissionsProviderComp PermissionsProvider;
 typedef imtauthgql::CPersonalAccessTokenControllerComp PersonalAccessTokenController;
 typedef icomp::TModelCompWrap<imtauthgql::CClientRequestPersonalAccessTokenManagerComp> ClientRequestPersonalAccessTokenManager;
+typedef imtauthgql::CExternalLoginCallbackServletComp ExternalLoginCallbackServlet;
 typedef imtauthgql::CTenantCollectionControllerComp TenantCollectionController;
 typedef imtauthgql::CTenantMetaInfoDelegateComp TenantMetaInfoDelegate;
 typedef imtauthgql::CTenantCollectionDocumentServiceComp TenantCollectionDocumentService;

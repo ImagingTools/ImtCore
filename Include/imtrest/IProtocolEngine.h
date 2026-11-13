@@ -129,7 +129,8 @@ public:
 	};
 
 	/**
-		Get type-ID of the used protocol.
+		Get type-ID of the used protocol as a text. The well-known IDs are in \c ProtocolTypeIds, other protocols
+		can use their own IDs.
 	*/
 	virtual QByteArray GetProtocolTypeId() const = 0;
 

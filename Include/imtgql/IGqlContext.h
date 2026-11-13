@@ -12,6 +12,12 @@
 #include <imtauth/IUserInfo.h>
 
 
+namespace imtlic
+{
+	class IProductInfo;
+}
+
+
 namespace imtgql
 {
 
@@ -49,8 +55,41 @@ public:
 	virtual const imtauth::IUserInfo* GetUserInfo() const = 0;
 	virtual void SetUserInfo(const imtauth::IUserInfo* userInfoPtr) = 0;
 
+	/**
+		Get information about the product this request runs against, if available.
+		It carries the feature tree the permissions of the product are declared in,
+		which is what a permission check needs to resolve requirements between them.
+	*/
+	virtual imtlic::IProductInfo* GetProductInfo() const = 0;
+	virtual void SetProductInfo(imtlic::IProductInfo* productInfoPtr) = 0;
+
+	/**
+		Get the permissions available to the organization of this request.
+		An empty list sets no limit.
+	*/
+	virtual QByteArrayList GetTenantPermissions() const = 0;
+	virtual void SetTenantPermissions(const QByteArrayList& permissions) = 0;
+
+	/**
+		Get the permissions the user of this request holds through the requirements
+		of the permissions given to them in the product of the request, transitively:
+		holding 'A' whose requirements name 'B' is holding 'B' as well.
+
+		The permissions held directly are not part of the returned list, and the
+		list is empty while the context carries no user or no product info to
+		resolve the requirements in. \see imtgql::CollectImpliedPermissions
+	*/
+	virtual imtauth::IUserInfo::FeatureIds GetImpliedPermissions() const = 0;
+
 	virtual bool IsTenantOwner() const = 0;
 	virtual void SetIsTenantOwner(bool isTenantOwner) = 0;
+
+	/**
+		Get the permissions the user of this request holds inside its organization (\see imtauth::IsOrganizationInternalPermission).
+		They come from the ownership or the membership, not from the roles of the user; empty outside of an organization.
+	*/
+	virtual QByteArrayList GetOrganizationPermissions() const = 0;
+	virtual void SetOrganizationPermissions(const QByteArrayList& permissions) = 0;
 
 	virtual Headers GetHeaders() const = 0;
 	virtual void SetHeaders(const Headers& headers) = 0;

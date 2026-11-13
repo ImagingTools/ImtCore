@@ -27,6 +27,7 @@ type TenantItemData {
 	invitationId: ID
 	invitedByName: String
 	parentTenantId: ID
+	parentTenantName: String
 	isSystemTenant: Boolean
 }
 
@@ -66,7 +67,12 @@ type TenantData {
 	pendingInvitations: [TenantInvitationEntry]
 	tenantPermissions: [ID]
 	parentTenantId: ID
+	parentTenantName: String
 	isSystemTenant: Boolean
+	canEditTenantPermissions: Boolean
+	parentTenantPermissions: [ID]
+	ownerName: String
+	creatorName: String
 }
 
 input GetTenantListInput {
@@ -331,6 +337,7 @@ type TenantRelationship {
 	description: String
 	createdAt: String
 	updatedAt: String
+	relatedSince: String
 }
 
 input GetTenantRelationshipsInput {
@@ -443,10 +450,12 @@ type GetRelationshipProposalsPayload {
 type CrossOrgGrant {
 	id: ID!
 	sourceTenantId: ID!
+	sourceTenantName: String
 	targetTenantId: ID!
 	targetTenantName: String
 	name: String
 	roleIds: [ID]
+	roleNames: [String]
 	description: String
 	createdAt: String
 	expiresAt: String
@@ -778,6 +787,7 @@ enum EConnectionNotificationType {
 	RelationshipProposalReceived
 	RelationshipProposalApproved
 	RelationshipProposalRejected
+	RelationshipRemoved
 }
 
 type ConnectionNotification {
@@ -786,6 +796,7 @@ type ConnectionNotification {
 	connectionId: ID
 	requestId: ID
 	proposalId: ID
+	relationshipId: ID
 }
 
 input ConnectionNotificationSubscriptionInput {

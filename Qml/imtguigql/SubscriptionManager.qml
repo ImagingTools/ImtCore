@@ -53,8 +53,9 @@ WebSocket {
 		}
 		else if (status == WebSocket.Closed){
 			timer.restart()
-			
+
 			for (let index = 0; index < subscriptionModel.length; index++){
+				container.markInterrupted(index)
 				subscriptionModel[index]["status"] = "unregistered"
 			}
 		}
@@ -63,6 +64,14 @@ WebSocket {
 	function reconnect(){
 		active = false;
 		active = true;
+	}
+
+	// The server answers a start with silence, so a sent one is live; its notifications are lost until it is sent again.
+	function markInterrupted(index){
+		let status = subscriptionModel[index]["status"]
+		if (status === "waiting" || status === "registered"){
+			subscriptionModel[index]["interrupted"] = true
+		}
 	}
 
 	property Timer timer: Timer{
@@ -122,11 +131,12 @@ WebSocket {
 	function handleSubscriptionError(subscriptionId, rawMessage) {
 		console.warn("SubscriptionManager: error for id", subscriptionId, rawMessage)
 
-		// Mark matching subscription unregistered so a later AccessTokenRefreshed
-		// (or reconnect) can re-submit it with a fresh token.
+		// Not "unregistered": that one is re-sent with every new registration. A refused
+		// subscription is re-submitted only by AccessTokenRefreshed or a reconnect.
 		for (let index = 0; index < subscriptionModel.length; index++){
 			if (subscriptionModel[index]["subscriptionId"] == subscriptionId){
-				subscriptionModel[index]["status"] = "unregistered"
+				container.markInterrupted(index)
+				subscriptionModel[index]["status"] = "rejected"
 				let subscription = subscriptionModel[index]["subscription"]
 				if (subscription)
 					subscription.state = "Error"
@@ -222,6 +232,15 @@ WebSocket {
 				subscriptionModel[index]["status"] = "waiting";
 
 				container.sendTextMessage(JSON.stringify(request))
+
+				// Sent before the resync request, so the server is listening again when the client re-reads its state.
+				if (subscriptionModel[index]["interrupted"]){
+					subscriptionModel[index]["interrupted"] = false
+					let subscription = subscriptionModel[index]["subscription"]
+					if (subscription && subscription.markStale !== undefined){
+						subscription.markStale()
+					}
+				}
 			}
 		}
 	}

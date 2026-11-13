@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgql/CClientRequestRoleInfoProviderComp.h>
+#include <imtauthgql/CAssignmentCollector.h>
 
 
 // ImtCore includes
@@ -88,14 +89,11 @@ imtauth::IRoleUniquePtr CClientRequestRoleInfoProviderComp::GetRole(const QByteA
 	}
 
 	if (payload.permissions){
-		QByteArray permissions = *payload.permissions;
-		if (!permissions.isEmpty()){
-			roleInfoPtr->SetLocalPermissions(permissions.split(';'));
-		}
+		roleInfoPtr->SetLocalPermissions(CAssignmentCollector::GetDirectIds(payload.permissions));
 	}
 
 	if (payload.parentRoles){
-		for (const QByteArray& roleId : payload.parentRoles->ToList()){
+		for (const QByteArray& roleId : CAssignmentCollector::GetDirectIds(payload.parentRoles)){
 			roleInfoPtr->IncludeRole(roleId);
 		}
 	}

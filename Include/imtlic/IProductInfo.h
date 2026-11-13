@@ -2,6 +2,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QHash>
+
 // ACF includes
 #include <iprm/INameParam.h>
 
@@ -259,6 +262,50 @@ public:
 	*/
 	virtual void SetOptionalFeatures(const OptionalFeatureInfos& optionalFeatures) = 0;
 };
+
+
+/**
+	Leaf permissions every feature of a product requires directly, keyed by the full feature path.
+*/
+typedef QHash<QByteArray, QByteArrayList> PermissionRequirements;
+
+/**
+	Get the leaf permissions each feature of the product requires directly, by the rules of
+	CollectImpliedPermissions(): requirements of a group apply to its features, a required group
+	stands for its leaves and requirements naming the own branch are dropped.
+	Groups are listed too, so a held group resolves like its leaves.
+*/
+PermissionRequirements CollectPermissionRequirements(IProductInfo& productInfo);
+
+/**
+	Collect the permissions implied by the given ones through feature requirements.
+
+	Holding a permission means holding what it requires: a permission "A" whose
+	requirements name "B" and "C" grants those too, and whatever they require in
+	turn. Requirements are stored as full feature paths (\see CalculateFeaturePath);
+	a required group grants all of its leaves, and the requirements declared on a
+	group apply to every feature in it. A requirement naming the feature itself,
+	one of its ancestors or descendants is ignored.
+
+	Held permissions and requirements are full paths; anything else names no feature
+	and implies nothing (\see imtauth::HasPermission).
+
+	\param productInfo Product whose feature tree declares the requirements.
+	\param permissionIds The permissions held.
+	\return The implied leaf permissions, without the ones passed in. Requirement cycles terminate.
+*/
+QByteArrayList CollectImpliedPermissions(IProductInfo& productInfo, const QByteArrayList& permissionIds);
+
+/**
+	Collect the permissions implied by the given ones through already collected requirements.
+	\see CollectImpliedPermissions(IProductInfo&, const QByteArrayList&)
+*/
+QByteArrayList CollectImpliedPermissions(const PermissionRequirements& requirements, const QByteArrayList& permissionIds);
+
+/**
+	Get every permission of a product: the full paths of the leaf features marked as permissions.
+*/
+QByteArrayList CollectProductPermissions(IProductInfo& productInfo);
 
 
 typedef istd::TUniqueInterfacePtr<IProductInfo> IProductInfoUniquePtr;

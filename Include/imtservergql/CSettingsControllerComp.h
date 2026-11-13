@@ -47,6 +47,11 @@ protected:
 				QString& errorMessage) const override;
 	
 private:
+	/**
+		An authenticated caller may only use their own settings, unless they are an admin. A request without a caller
+		is left to the server's authentication, because some applications run without users.
+	*/
+	bool IsCallerAllowed(const ::imtgql::CGqlRequest& gqlRequest, const QByteArray& userId) const;
 	imtauth::IUserSettingsSharedPtr GetOrCreateUserSettings(const QByteArray& userId) const;
 	bool SetUserSettings(const QByteArray& userId, const imtauth::IUserSettings& userSettings) const;
 	

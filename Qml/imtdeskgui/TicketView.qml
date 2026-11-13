@@ -121,7 +121,7 @@ Rectangle {
 					model: ticketViewRoot.labels
 
 					Rectangle {
-						height: Style.sizeHintL
+						height: labelText.height + Style.paddingS
 						width: labelText.width + Style.paddingM * 2
 						radius: height / 2
 						color: modelData.color || Style.backgroundColor
@@ -131,7 +131,7 @@ Rectangle {
 							anchors.centerIn: parent
 							text: modelData.name || ""
 							font.pixelSize: Style.fontSizeXS
-							color: "white"
+							color: Style.highlightedTextColor
 							font.bold: true
 						}
 					}
@@ -143,6 +143,7 @@ Rectangle {
 				width: parent.width - Style.paddingL * 2
 				height: descText.height + Style.paddingM * 2
 				radius: Style.radiusS
+				color: Style.backgroundColor
 
 				Text {
 					id: descText
@@ -229,6 +230,7 @@ Rectangle {
 
 					Rectangle {
 						width: tagText.width + Style.paddingM * 2
+						height: tagText.height + Style.paddingS
 						radius: height / 2
 						color: Style.backgroundColor
 
@@ -251,16 +253,17 @@ Rectangle {
 				// Close ticket (with state reason)
 				Rectangle {
 					visible: ticketViewRoot.status === 0
-					width: Style.buttonWidthM
+					width: closeCompletedText.width + Style.paddingL * 2
 					height: Style.buttonHeightM
 					radius: Style.radiusS
 					color: Style.doneColor
 
 					Text {
+						id: closeCompletedText
 						anchors.centerIn: parent
 						text: qsTr("Close as completed")
 						font.pixelSize: Style.fontSizeXS
-						color: "white"
+						color: Style.highlightedTextColor
 						font.bold: true
 					}
 
@@ -275,13 +278,14 @@ Rectangle {
 				// Close as not planned
 				Rectangle {
 					visible: ticketViewRoot.status === 0
-					width: Style.buttonWidthM
+					width: closeNotPlannedText.width + Style.paddingL * 2
 					height: Style.buttonHeightM
 					radius: Style.radiusS
 					color: "transparent"
 					border.color: Style.buttonInactiveTextColor
 
 					Text {
+						id: closeNotPlannedText
 						anchors.centerIn: parent
 						text: qsTr("Close as not planned")
 						font.pixelSize: Style.fontSizeXS
@@ -299,16 +303,17 @@ Rectangle {
 				// Reopen ticket
 				Rectangle {
 					visible: ticketViewRoot.status === 1
-					width: Style.buttonWidthM
+					width: reopenText.width + Style.paddingL * 2
 					height: Style.buttonHeightM
 					radius: Style.radiusS
 					color: Style.successColor
 
 					Text {
+						id: reopenText
 						anchors.centerIn: parent
 						text: qsTr("Reopen ticket")
 						font.pixelSize: Style.fontSizeXS
-						color: "white"
+						color: Style.highlightedTextColor
 						font.bold: true
 					}
 
@@ -323,13 +328,14 @@ Rectangle {
 				// Open linked conversation
 				Rectangle {
 					visible: ticketViewRoot.conversationId.length > 0
-					width: Style.buttonWidthM
+					width: openChatText.width + Style.paddingL * 2
 					height: Style.buttonHeightM
 					radius: Style.radiusS
 					color: "transparent"
 					border.color: Style.imaginToolsAccentColor
 
 					Text {
+						id: openChatText
 						anchors.centerIn: parent
 						text: qsTr("Open Chat")
 						font.pixelSize: Style.fontSizeXS

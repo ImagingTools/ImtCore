@@ -44,12 +44,17 @@ Item {
 
 	SubscriptionClient {
 		id: subscriptionClient
+		deliveryEnabled: root.visible
 
 		function getHeaders(){
 			return {}
 		}
 
 		onMessageReceived: {
+			dataProvider.fetch(filterInput.text)
+		}
+
+		onRefreshRequired: {
 			dataProvider.fetch(filterInput.text)
 		}
 	}

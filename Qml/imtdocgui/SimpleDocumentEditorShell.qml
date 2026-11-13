@@ -47,6 +47,9 @@ Item {
 
 	readonly property alias shellView: shell
 
+	// Kept for the destruction, when the shell may be gone already
+	readonly property string __documentId: shell.documentId
+
 	// Same centered content column as SimpleCollectionPage, so the editor
 	// lines up with the list it was opened from.
 	readonly property int contentWidth: Math.min(root.width - Style.marginXL * 2, Style.contentWidthMax)
@@ -81,5 +84,8 @@ Item {
 	Component.onDestruction: {
 		if (root.activeShellTarget && root.activeShellTarget.__activeShellView === shell)
 			root.activeShellTarget.__activeShellView = null
+		// Taken down without being closed (its page or editor was destroyed): the document is not left open on the server
+		if (root.documentManager && root.__documentId !== "" && root.documentManager.documentIsOpened(root.__documentId))
+			root.documentManager.closeDocument(root.__documentId, true)
 	}
 }

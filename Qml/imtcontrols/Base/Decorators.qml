@@ -260,14 +260,14 @@ StyleComponents {
 
 				anchors.fill: textFieldItem;
 
-				color: !textFieldItem.baseElement ? "transparent" : textFieldItem.baseElement.readOnly ? Style.alternateBaseColor : Style.baseColor;
+				color: !textFieldItem.baseElement ? "transparent" : textFieldItem.baseElement.readOnly ? Style.alternateBaseColor : Style.inputBackgroundColor;
 
 				radius: !textFieldItem.baseElement ? 0 : textFieldItem.baseElement.radius;
 
 				border.color: !textFieldItem.baseElement ?
 								  "transparent" : textFieldItem.baseElement.borderColorConst !== "" ?
 									  textFieldItem.baseElement.borderColorConst: textFieldItem.baseElement.activeFocus ?
-										  textFieldItem.baseElement.borderColor : Style.hover;
+										  textFieldItem.baseElement.borderColor : Style.inputBorderColor;
 
 				border.width: 1;
 			}
@@ -334,11 +334,11 @@ StyleComponents {
 
 				anchors.fill: textAreaItem;
 
-				color: !textAreaItem.baseElement ? "transparent" : textAreaItem.baseElement.readOnly ? Style.alternateBaseColor : Style.baseColor;
+				color: !textAreaItem.baseElement ? "transparent" : textAreaItem.baseElement.readOnly ? Style.alternateBaseColor : Style.inputBackgroundColor;
 
 				radius: !textAreaItem.baseElement ? 0 : textAreaItem.baseElement.radius;
 
-				border.color: !textAreaItem.baseElement ? "transparent" : textAreaItem.baseElement.borderColorConst !== "" ? textAreaItem.baseElement.borderColorConst: textAreaItem.baseElement.activeFocus ? textAreaItem.baseElement.borderColor : Style.hover;
+				border.color: !textAreaItem.baseElement ? "transparent" : textAreaItem.baseElement.borderColorConst !== "" ? textAreaItem.baseElement.borderColorConst: textAreaItem.baseElement.activeFocus ? textAreaItem.baseElement.borderColor : Style.inputBorderColor;
 
 				border.width: 1;
 			}
@@ -502,12 +502,12 @@ StyleComponents {
 				width: height;
 				height: checkBoxItem ? checkBoxItem.height : 0;
 
-				color: Style.baseColor;
+				color: Style.inputBackgroundColor;
 
 				radius: !checkBoxItem.baseElement ? 0 : checkBoxItem.baseElement.radius;
 
 				border.width: 1;
-				border.color: !checkBoxItem.baseElement ? "transparent" : checkBoxItem.borderColor !=="" ? checkBoxItem.borderColor  : checkBoxItem.baseElement.isActive ? Style.borderColor : Style.inactiveTextColor;
+				border.color: !checkBoxItem.baseElement ? "transparent" : checkBoxItem.borderColor !=="" ? checkBoxItem.borderColor : checkBoxItem.baseElement.activeFocus ? Style.focusRingColor : checkBoxItem.baseElement.isActive ? Style.inputBorderColor : Style.inactiveTextColor;
 
 				Image {
 					id: image;
@@ -594,6 +594,8 @@ StyleComponents {
 				color: !switchItem.baseElement ? "transparent" : switchItem.checked ? switchItem.baseElement.backgroundColorChecked :
 																					  switchItem.baseElement.backgroundColor;
 				radius: height;
+				border.width: switchItem.baseElement && switchItem.baseElement.activeFocus ? Style.focusRingWidth : 0;
+				border.color: Style.focusRingColor;
 
 				opacity: !switchItem.baseElement ? 0 : switchItem.baseElement.backgroundOpacity;
 
@@ -1244,11 +1246,11 @@ StyleComponents {
 
 				anchors.fill: textAreaItem;
 
-				color: !textAreaItem.baseElement ? "transparent" : textAreaItem.baseElement.readOnly ? Style.alternateBaseColor : Style.baseColor;
+				color: !textAreaItem.baseElement ? "transparent" : textAreaItem.baseElement.readOnly ? Style.alternateBaseColor : Style.inputBackgroundColor;
 
 				radius: !textAreaItem.baseElement ? 0 : textAreaItem.baseElement.radius;
 
-				border.color: !textAreaItem.baseElement ? "transparent" : textAreaItem.baseElement.borderColorConst !== "" ? textAreaItem.baseElement.borderColorConst: textAreaItem.baseElement.activeFocus ? textAreaItem.baseElement.borderColor : Style.hover;
+				border.color: !textAreaItem.baseElement ? "transparent" : textAreaItem.baseElement.borderColorConst !== "" ? textAreaItem.baseElement.borderColorConst: textAreaItem.baseElement.activeFocus ? textAreaItem.baseElement.borderColor : Style.inputBorderColor;
 
 				border.width: 1;
 			}

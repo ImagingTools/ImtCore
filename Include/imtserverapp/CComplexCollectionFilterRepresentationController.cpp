@@ -28,6 +28,7 @@ const QMap<int, imtbase::IComplexCollectionFilter::FieldOperation> CComplexColle
 	{FOF_LESS | FOF_EQUAL, imtbase::IComplexCollectionFilter::FieldOperation::FO_NOT_GREATER},
 
 	{FOF_CONTAINS, imtbase::IComplexCollectionFilter::FieldOperation::FO_CONTAINS},
+	{FOF_STARTS_WITH, imtbase::IComplexCollectionFilter::FieldOperation::FO_STARTS_WITH},
 
 	// Array operations
 	{FOF_ARRAY_IS_EMPTY, imtbase::IComplexCollectionFilter::FieldOperation::FO_ARRAY_IS_EMPTY},
@@ -255,6 +256,10 @@ QString CComplexCollectionFilterRepresentationController::GetFlagsAsString(int f
 
 	if (flags & FOF_CONTAINS){
 		retVal += retVal.isEmpty() ? "CONTAINS" : ", CONTAINS";
+	}
+
+	if (flags & FOF_STARTS_WITH){
+		retVal += retVal.isEmpty() ? "STARTS_WITH" : ", STARTS_WITH";
 	}
 
 	return retVal;
@@ -610,6 +615,9 @@ int CComplexCollectionFilterRepresentationController::ComputeFlagsFromSdlOperati
 	if (filterOperations.contains(Filter::FilterOperation::Contains)){
 		flags |= FOF_CONTAINS;
 	}
+	if (filterOperations.contains(Filter::FilterOperation::StartsWith)){
+		flags |= FOF_STARTS_WITH;
+	}
 	if (filterOperations.contains(Filter::FilterOperation::ArrayIsEmpty)){
 		flags |= FOF_ARRAY_IS_EMPTY;
 	}
@@ -654,6 +662,9 @@ void CComplexCollectionFilterRepresentationController::MapFieldOperationToSdlOpe
 		break;
 	case imtbase::IComplexCollectionFilter::FO_CONTAINS:
 		outOperations = imtsdl::TElementList<Filter::FilterOperation> {Filter::FilterOperation::Contains};
+		break;
+	case imtbase::IComplexCollectionFilter::FO_STARTS_WITH:
+		outOperations = imtsdl::TElementList<Filter::FilterOperation> {Filter::FilterOperation::StartsWith};
 		break;
 	case imtbase::IComplexCollectionFilter::FO_ARRAY_HAS_ANY:
 		outOperations = imtsdl::TElementList<Filter::FilterOperation> ({Filter::FilterOperation::ArrayHasAny});

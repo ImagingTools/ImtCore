@@ -52,7 +52,7 @@ public:
 	// reimplemented (imtservergql::IFileUploadHandler)
 	virtual FilelUploadStatus ReceiveFileChunk(
 		const QByteArray& fileId,
-		const istd::CIntRange& range,
+		const ByteRange& range,
 		const QByteArray& data) override;
 
 protected:
@@ -85,7 +85,7 @@ private:
 	{
 		QByteArray tempFileId;
 		ProgressLoggerPtr uploadProgressLoggerPtr;
-		QList<istd::CIntRange> uploadedChunks;
+		QList<ByteRange> uploadedChunks;
 	};
 
 	struct WorkingSessionInfo: public SessionInfo
@@ -111,7 +111,7 @@ private:
 
 	QByteArray FindSession(const QByteArray& fileId) const;
 	WorkingFileInfo* FindFileInfo(const QByteArray& fileId);
-	FilelUploadStatus AddFileChunk(const QByteArray& fileId, const istd::CIntRange& range);
+	FilelUploadStatus AddFileChunk(const QByteArray& fileId, const ByteRange& range);
 	double GetFileProgress(const QByteArray& fileId);
 	void UpdateUploadProgress(const QByteArray& fileId);
 
