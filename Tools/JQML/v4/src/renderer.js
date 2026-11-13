@@ -421,6 +421,33 @@ export class Renderer {
 		this.bindPage(previous);
 	}
 
+	// A picture (a texture page of its own) on a convex polygon of the local space: `uvs` are the positions in the picture of the points.
+	imageFan(page, points, uvs, opacity) {
+		const n = points.length >> 1;
+		if (n < 3) return;
+		const previous = this.page;
+		this.bindPage(page);
+		if (this.reserve(n, (n - 2) * 3)) {
+			const { ma, mb, mc, md, me, mf } = this;
+			const color = this.packRgba(255, 255, 255, opacity);
+			const base = this.nv;
+			for (let i = 0; i < n; i++) {
+				const x = points[2 * i];
+				const y = points[2 * i + 1];
+				this.vertex(ma * x + mc * y + me, mb * x + md * y + mf, uvs[2 * i], uvs[2 * i + 1], color);
+			}
+			const idx = this.indices;
+			let k = this.ni;
+			for (let i = 1; i < n - 1; i++) {
+				idx[k++] = base;
+				idx[k++] = base + i;
+				idx[k++] = base + i + 1;
+			}
+			this.ni = k;
+		}
+		this.bindPage(previous);
+	}
+
 	dropPage(page) {
 		if (this.gl !== null && page.texture !== null) this.gl.deleteTexture(page.texture);
 		page.texture = null;

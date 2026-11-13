@@ -24,8 +24,12 @@ function isUpper(text) {
 	return text.length > 0 && text[0] >= 'A' && text[0] <= 'Z';
 }
 
+// Whether the script fragments are checked while a document is parsed (see parseQmlDocument).
+let checking = true;
+
 // Syntax check of a script fragment. `kind`: 'expr' (an expression), 'body' (statements).
 function checkSyntax(kind, text, line, col, params = '') {
+	if (!checking) return;
 	try {
 		const js = escapeSourceBreaks(text);
 		if (kind === 'expr') {
@@ -464,7 +468,15 @@ class Parser {
 	}
 }
 
-// Parses a QML document and returns its root object. Throws QmlError with a line and column.
-export function parseQmlDocument(source) {
-	return new Parser(source).parseDocument();
+// Parses a QML document and returns its root object. Throws QmlError with a line and column. `check: false` leaves the script
+// fragments unchecked: each check is a `new Function`, which a compiled application does not need to repeat, as the compiler
+// has already parsed every document with the checks on.
+export function parseQmlDocument(source, check = true) {
+	const previous = checking;
+	checking = check;
+	try {
+		return new Parser(source).parseDocument();
+	} finally {
+		checking = previous;
+	}
 }

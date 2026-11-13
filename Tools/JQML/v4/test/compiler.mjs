@@ -8,6 +8,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
 import { commonDirectory, compile, htmlPage, listQmldirQmlFiles, parseArgs } from '../compiler/compiler.js';
+import { createApplication as createCompiledApplication } from '../src/runtime.js';
 import { parseTsCatalog } from '../compiler/translations.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -21,7 +22,7 @@ function walk(item, visit) {
 }
 
 // Evaluates a compiled bundle the way a page would, but without a DOM: bootstrap() only publishes
-// window.qmlWebApplication then.
+// window.qmlWebApplication then, and only in a debug build.
 function evaluateBundle(code) {
 	const context = vm.createContext({ console, TextEncoder, TextDecoder, setTimeout, clearTimeout, Buffer, performance });
 	context.window = context;
@@ -72,7 +73,7 @@ const checks = {
 	async 'js mode'() {
 		const out = mkdtempSync(join(tmpdir(), 'qmlweb-js-'));
 		try {
-			const result = await compile({ mode: 'js', config: join(fixture, 'app.json'), entry: 'app/Main.qml', output: out, name: 'index', root: '/data/' }, quiet);
+			const result = await compile({ mode: 'js', config: join(fixture, 'app.json'), entry: 'app/Main.qml', output: out, name: 'index', root: '/data/', debug: true }, quiet);
 			assert.ok(existsSync(join(out, 'index.js')));
 			assert.ok(existsSync(join(out, 'index.js.map')));
 			const map = JSON.parse(readFileSync(join(out, 'index.js.map'), 'utf8'));
@@ -120,6 +121,38 @@ const checks = {
 		} finally {
 			rmSync(out, { recursive: true, force: true });
 		}
+	},
+
+	// The default build carries the documents as packed trees: no QML text, no comments, nothing to reach the engine through.
+	async 'compiled mode'() {
+		const result = await compile({ mode: 'js', config: join(fixture, 'app.json'), entry: 'app/Main.qml', name: 'index', root: '/data/' }, quiet);
+		const spec = JSON.parse(JSON.stringify(result.spec));
+		assert.equal(spec.debug, undefined);
+		assert.deepEqual(Object.keys(spec.files).sort(), ['modules/Widgets/qmldir', 'modules/Widgets/util.js']);
+		assert.deepEqual(Object.keys(spec.docs).sort(), ['app/Main.qml', 'app/Sibling.qml', 'app/Unused.qml', 'modules/Widgets/Base/Theme.qml', 'modules/Widgets/Widget.qml']);
+		for (const text of [result.code, JSON.stringify(spec.docs)]) {
+			assert.ok(!text.includes('import QtQuick'), 'the text of a document is in the bundle');
+			assert.ok(!text.includes('The entry of the compiler test'), 'a comment of a document is in the bundle');
+			assert.ok(!text.includes('property string greeting'), 'a declaration is in the bundle as text');
+		}
+		// A page does not reach the engine, the project or the documents through its window.
+		assert.equal(evaluateBundle(result.code), undefined);
+
+		const app = createCompiledApplication({ ...spec, language: 'de-DE' }, null);
+		app.scene.resize(800, 600, 1);
+		const root = await app.start();
+		for (let i = 0; i < 3; i++) app.scene.drawFrame(i * 0.016);
+		assert.equal(root.greeting, 'Hallo');
+		assert.equal(root.sum, 5);
+		assert.equal(root.color, '#FF101010');
+		const names = [];
+		walk(root, (item) => names.push(item.objectName));
+		assert.ok(names.includes('widget') && names.includes('sibling') && names.includes('widgetText'));
+		assert.equal(app.engine.errors.length, 0, app.engine.errors.join('\n'));
+		const unused = app.project.docs.get('app/Unused.qml');
+		assert.equal(unused.parsed, false);
+		assert.ok(unused.def !== null && unused.error === null);
+		assert.equal(unused.parsed, true);
 	},
 
 	async 'syntax error'() {

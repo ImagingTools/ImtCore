@@ -6,7 +6,7 @@
 //   node test/desktop/run.mjs [Name]
 //   QT_QML_RUNNER=C:\Qt\...\bin\qml.exe node test/desktop/run.mjs
 //
-// test.json in a case folder may list "dirs": extra QML import paths, relative to the case.
+// test.json in a case folder may list "dirs": extra QML import paths, relative to the case; "timers": true lets the timers of a case that imports QtTest run.
 
 import { spawn } from 'node:child_process';
 import { existsSync } from 'node:fs';
@@ -194,8 +194,16 @@ async function runWeb(testDir, importDirs) {
 	settle(engine, root);
 	engine.runCompletedFrom(0);
 	// qml.exe with `import QtTest` returns as soon as the first completion batch ends, so a timer
-	// started there never runs. The log is whatever onCompleted already printed.
-	if (!quit && (doc.def.modules || []).some((mod) => mod.name === 'QtTest')) quit = true;
+	// started there never runs. The log is whatever onCompleted already printed. A case whose
+	// test.json says "timers": true runs its timers under qml.exe as well (a Timer that calls the
+	// functions of a TestCase), and is let run here.
+	let keepTimers = false;
+	try {
+		keepTimers = JSON.parse((await new DirFS(testDir).readText('test.json')) || '{}').timers === true;
+	} catch {
+		keepTimers = false;
+	}
+	if (!quit && !keepTimers && (doc.def.modules || []).some((mod) => mod.name === 'QtTest')) quit = true;
 	// A script in onCompleted may have written a property. Bindings and change handlers
 	// catch up on the next pass; a log that already ran stays as it was.
 	if (!quit) settle(engine, root);

@@ -309,15 +309,169 @@ export class CanvasGradient {
 	}
 }
 
+// The rows of the 8 x 8 bitmaps of the brush patterns of `createPattern(color, Qt.XPattern)`, read from desktop Qt ('#' is painted).
+const BRUSH_BITMAPS = {
+	2: ['########', '##.###.#', '########', '########', '########', '##.###.#', '########', '########'],
+	3: ['###.###.', '########', '#.###.##', '########', '###.###.', '########', '#.###.##', '########'],
+	4: ['#.#.#.#.', '##.###.#', '#.#.#.#.', '.###.###', '#.#.#.#.', '##.###.#', '#.#.#.#.', '.###.###'],
+	5: ['.#.#.#.#', '#.#.#.#.', '.#.#.#.#', '#.#.#.#.', '.#.#.#.#', '#.#.#.#.', '.#.#.#.#', '#.#.#.#.'],
+	6: ['.#.#.#.#', '..#...#.', '.#.#.#.#', '#...#...', '.#.#.#.#', '..#...#.', '.#.#.#.#', '#...#...'],
+	7: ['...#...#', '........', '.#...#..', '........', '...#...#', '........', '.#...#..', '........'],
+	8: ['........', '..#...#.', '........', '........', '........', '..#...#.', '........', '........'],
+	9: ['........', '........', '........', '########', '........', '........', '........', '........'],
+	10: ['....#...', '....#...', '....#...', '....#...', '....#...', '....#...', '....#...', '....#...'],
+	11: ['....#...', '....#...', '....#...', '########', '....#...', '....#...', '....#...', '....#...'],
+	12: ['.......#', '......#.', '.....#..', '....#...', '...#....', '..#.....', '.#......', '#.......'],
+	13: ['#.......', '.#......', '..#.....', '...#....', '....#...', '.....#..', '......#.', '.......#'],
+	14: ['#......#', '.#....#.', '..#..#..', '...##...', '...##...', '..#..#..', '.#....#.', '#......#'],
+};
+
+// The pixels (and the size) a pattern repeats are made at least this big: a small tile would be one piece for every few pixels.
+const TILE_MIN = 64;
+// The pieces one fill is made of at most (a tile of 1 x 1 over a big canvas).
+const MAX_TILES = 40000;
+
+// What `createImageData()` gives: `data` holds the pixels as red, green, blue, alpha. Desktop Qt ignores a value that is out of 0..255
+// that is written to it, here it is clamped.
+export class CanvasImageData {
+	constructor(width, height, data) {
+		this.width = width;
+		this.height = height;
+		this.data = data ?? new Uint8ClampedArray(width * height * 4);
+	}
+}
+
+// A repeated picture, made by `createPattern()`: `$tile` is { w, h, pixels | picture, key } (null: nothing is drawn), `$solid` a color
+// for the brush that fills with one color. Reading fillStyle after a pattern was set gives `$text`, the color of the brush (Qt).
+export class CanvasPattern {
+	constructor(tile, solid = null, text = '#000000') {
+		this.$tile = tile;
+		this.$solid = solid;
+		this.$text = text;
+	}
+}
+
+// The pixels of a tile repeated until it is TILE_MIN wide and high: [w, h, pixels].
+function repeatPixels(w, h, pixels) {
+	const fx = Math.max(1, Math.ceil(TILE_MIN / w));
+	const fy = Math.max(1, Math.ceil(TILE_MIN / h));
+	if (fx === 1 && fy === 1) return { w, h, fx, fy, pixels };
+	const out = new Uint8ClampedArray(w * fx * h * fy * 4);
+	for (let y = 0; y < h * fy; y++) {
+		for (let x = 0; x < w * fx; x++) {
+			const from = ((y % h) * w + (x % w)) * 4;
+			out.set(pixels.subarray(from, from + 4), (y * w * fx + x) * 4);
+		}
+	}
+	return { w: w * fx, h: h * fy, fx, fy, pixels: out };
+}
+
+const brushTiles = new Map();
+const pictureTiles = new WeakMap();
+
+// The tile of a brush pattern in a color; the tiles are kept, a canvas that paints again and again asks for them every time.
+function brushTile(mode, color) {
+	const key = `${mode}:${color.R},${color.G},${color.B},${color.a}`;
+	let tile = brushTiles.get(key);
+	if (tile !== undefined) return tile;
+	const rows = BRUSH_BITMAPS[mode];
+	const pixels = new Uint8ClampedArray(8 * 8 * 4);
+	for (let y = 0; y < 8; y++) {
+		for (let x = 0; x < 8; x++) {
+			if (rows[y][x] !== '#') continue;
+			pixels.set([color.R, color.G, color.B, Math.round(color.a * 255)], (y * 8 + x) * 4);
+		}
+	}
+	tile = { ...repeatPixels(8, 8, pixels), key, page: null };
+	brushTiles.set(key, tile);
+	return tile;
+}
+
+// The tile of a loaded picture. A picture that has `data` (RGBA pixels) is used as it is, which is what the tests do; a picture of the
+// browser is drawn when the tile is painted.
+function pictureTile(picture) {
+	if (picture === null || picture === undefined) return null;
+	let tile = pictureTiles.get(picture);
+	if (tile !== undefined) return tile;
+	const w = picture.naturalWidth || picture.width || 0;
+	const h = picture.naturalHeight || picture.height || 0;
+	if (w <= 0 || h <= 0) return null;
+	if (picture.data instanceof Uint8ClampedArray) {
+		tile = { ...repeatPixels(w, h, picture.data), key: null, page: null };
+	} else {
+		tile = { w: w * Math.max(1, Math.ceil(TILE_MIN / w)), h: h * Math.max(1, Math.ceil(TILE_MIN / h)), fx: Math.max(1, Math.ceil(TILE_MIN / w)), fy: Math.max(1, Math.ceil(TILE_MIN / h)), picture, pw: w, ph: h, key: null, page: null };
+	}
+	pictureTiles.set(picture, tile);
+	return tile;
+}
+
+// A texture page of the renderer made from pixels or from a picture of the browser; null where there is no browser.
+function pagePixels(w, h, pixels) {
+	if (typeof document === 'undefined' || typeof ImageData === 'undefined') return null;
+	const canvas = document.createElement('canvas');
+	canvas.width = w;
+	canvas.height = h;
+	canvas.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(pixels), w, h), 0, 0);
+	return { canvas, context: null, texture: null, dirty: true, size: Math.max(w, h), nearest: true };
+}
+
+function tilePage(tile) {
+	if (tile.page !== null) return tile.page;
+	if (tile.pixels !== undefined) {
+		tile.page = pagePixels(tile.w, tile.h, tile.pixels);
+		return tile.page;
+	}
+	if (typeof document === 'undefined') return null;
+	const canvas = document.createElement('canvas');
+	canvas.width = tile.w;
+	canvas.height = tile.h;
+	const context = canvas.getContext('2d');
+	for (let y = 0; y < tile.fy; y++) for (let x = 0; x < tile.fx; x++) context.drawImage(tile.picture, x * tile.pw, y * tile.ph);
+	try {
+		context.getImageData(0, 0, 1, 1);
+	} catch {
+		return null; // a picture of another site: the canvas is tainted and cannot be a texture
+	}
+	tile.page = { canvas, context: null, texture: null, dirty: true, size: Math.max(tile.w, tile.h), nearest: true };
+	return tile.page;
+}
+
+// The part of a convex polygon (flat x, y list) inside a rectangle.
+function clipToRect(points, x0, y0, x1, y1) {
+	let poly = points;
+	for (let edge = 0; edge < 4 && poly.length >= 6; edge++) {
+		const out = [];
+		const n = poly.length / 2;
+		for (let i = 0; i < n; i++) {
+			const j = (i + 1) % n;
+			const ax = poly[2 * i];
+			const ay = poly[2 * i + 1];
+			const bx = poly[2 * j];
+			const by = poly[2 * j + 1];
+			const da = edge === 0 ? ax - x0 : edge === 1 ? x1 - ax : edge === 2 ? ay - y0 : y1 - ay;
+			const db = edge === 0 ? bx - x0 : edge === 1 ? x1 - bx : edge === 2 ? by - y0 : y1 - by;
+			if (da >= 0) out.push(ax, ay);
+			if (da >= 0 !== db >= 0) {
+				const k = da / (da - db);
+				out.push(ax + (bx - ax) * k, ay + (by - ay) * k);
+			}
+		}
+		poly = out;
+	}
+	return poly;
+}
+
 // The 2D context passed to onPaint (`getContext("2d")`). A subset of the HTML canvas context:
 // fills, strokes (also dashed), text, transforms, rectangular clipping and the state stack. Every
 // drawing call is recorded into `output` as a command; `output === null` makes a detached
 // context that only measures text (getContext() outside of onPaint).
 export class CanvasContext {
-	constructor(width, height, output) {
+	// `pictures`: the pictures `Canvas.loadImage()` has loaded, by their address (for createPattern).
+	constructor(width, height, output, pictures = null) {
 		this.$output = output;
 		this.$width = width;
 		this.$height = height;
+		this.$pictures = pictures;
 		this.$init();
 	}
 
@@ -326,9 +480,11 @@ export class CanvasContext {
 		this.$fillColor = toColor('#000000');
 		this.$fillText = '#000000';
 		this.$fillGradient = null;
+		this.$fillPattern = null;
 		this.$strokeColor = toColor('#000000');
 		this.$strokeText = '#000000';
 		this.$strokeGradient = null;
+		this.$strokePattern = null;
 		this.$lineWidth = 1;
 		this.$alpha = 1;
 		this.$dash = [];
@@ -358,7 +514,21 @@ export class CanvasContext {
 	set fillStyle(value) {
 		if (value instanceof CanvasGradient) {
 			this.$fillGradient = value;
+			this.$fillPattern = null;
 			this.$fillText = value;
+			return;
+		}
+		if (value instanceof CanvasPattern) {
+			this.$fillText = value.$text;
+			this.$fillGradient = null;
+			// A pattern of one color (Qt.SolidPattern, Qt.NoBrush) is an ordinary fill.
+			if (value.$solid !== null) {
+				this.$fillColor = value.$solid;
+				this.$fillPattern = null;
+			} else {
+				this.$fillPattern = value.$tile === null ? null : value;
+				if (value.$tile === null) this.$fillColor = toColor('rgba(0, 0, 0, 0)');
+			}
 			return;
 		}
 		const color = styleColor(value);
@@ -366,6 +536,7 @@ export class CanvasContext {
 		this.$fillColor = color;
 		this.$fillText = value;
 		this.$fillGradient = null;
+		this.$fillPattern = null;
 	}
 
 	get strokeStyle() {
@@ -375,7 +546,20 @@ export class CanvasContext {
 	set strokeStyle(value) {
 		if (value instanceof CanvasGradient) {
 			this.$strokeGradient = value;
+			this.$strokePattern = null;
 			this.$strokeText = value;
+			return;
+		}
+		if (value instanceof CanvasPattern) {
+			this.$strokeText = value.$text;
+			this.$strokeGradient = null;
+			if (value.$solid !== null) {
+				this.$strokeColor = value.$solid;
+				this.$strokePattern = null;
+			} else {
+				this.$strokePattern = value.$tile === null ? null : value;
+				if (value.$tile === null) this.$strokeColor = toColor('rgba(0, 0, 0, 0)');
+			}
 			return;
 		}
 		const color = styleColor(value);
@@ -383,6 +567,62 @@ export class CanvasContext {
 		this.$strokeColor = color;
 		this.$strokeText = value;
 		this.$strokeGradient = null;
+		this.$strokePattern = null;
+	}
+
+	// `createPattern(color, Qt.HorPattern)`: a brush of Qt, 8 x 8 pixels; `createPattern(url, repetition)`: a picture that was loaded with
+	// `Canvas.loadImage(url)`, repeated in both directions whatever the repetition says (as in Qt). Both start at the origin of the
+	// coordinates the context has when it is used. A picture that is not loaded makes a pattern that draws nothing.
+	createPattern(source, mode) {
+		if (typeof mode === 'number') {
+			const color = styleColor(source) ?? toColor('#000000');
+			const text = styleColor(source) === null ? '#000000' : source;
+			if (mode === 1) return new CanvasPattern(null, color, text);
+			if (!(mode in BRUSH_BITMAPS)) return new CanvasPattern(null, toColor('rgba(0, 0, 0, 0)'), text);
+			return new CanvasPattern(brushTile(mode, color), null, text);
+		}
+		const picture = this.$pictures === null ? undefined : this.$pictures.get(String(source));
+		return new CanvasPattern(pictureTile(picture));
+	}
+
+	// An image of `width` x `height` pixels (rounded), all transparent black; or one as big as `imageData`. Anything else gives undefined.
+	createImageData(width, height) {
+		if (arguments.length === 1 && width instanceof CanvasImageData) return new CanvasImageData(width.width, width.height);
+		if (arguments.length < 2) return undefined;
+		const w = Math.round(Number(width));
+		const h = Math.round(Number(height));
+		if (!(w > 0 && h > 0) || width === undefined || height === undefined) throw new Error('createImageData(): invalid arguments');
+		return new CanvasImageData(w, h);
+	}
+
+	// Draws the pixels of `imageData` like a picture: with the transform and globalAlpha of the context, over what is there, and gives the
+	// context (Qt). Without the rectangle of the pixels to take (dirtyX, dirtyY, dirtyWidth, dirtyHeight) nothing is drawn, which is what Qt
+	// does. Qt copies that rectangle out of the image and then draws the same rectangle out of the copy (so the offset counts twice): the
+	// columns dirtyX * 2 .. dirtyX + dirtyWidth of the image are drawn at dx, the rows likewise at dy. Qt gives the same, read from it:
+	// (1, 0, 2, 1) draws the third pixel of the first row at (dx, dy), (0, 1, 4, 1) and (80, 80, 80, 80) of 160 x 160 draw nothing.
+	putImageData(imageData, dx, dy, dirtyX, dirtyY, dirtyWidth, dirtyHeight) {
+		if (this.$output === null || !(imageData instanceof CanvasImageData)) return;
+		if (dirtyX === undefined || dirtyY === undefined || dirtyWidth === undefined || dirtyHeight === undefined) return;
+		dx = toFloat(dx);
+		dy = toFloat(dy);
+		const left = Math.trunc(toFloat(dirtyX)) * 2;
+		const top = Math.trunc(toFloat(dirtyY)) * 2;
+		const right = Math.trunc(toFloat(dirtyX)) + Math.trunc(toFloat(dirtyWidth));
+		const bottom = Math.trunc(toFloat(dirtyY)) + Math.trunc(toFloat(dirtyHeight));
+		const x0 = Math.max(0, left);
+		const y0 = Math.max(0, top);
+		const x1 = Math.min(imageData.width, right);
+		const y1 = Math.min(imageData.height, bottom);
+		if (x1 <= x0 || y1 <= y0) return this;
+		const w = x1 - x0;
+		const h = y1 - y0;
+		const data = new Uint8ClampedArray(w * h * 4);
+		for (let y = 0; y < h; y++) {
+			const from = ((y0 + y) * imageData.width + x0) * 4;
+			data.set(imageData.data.subarray(from, from + w * 4), y * w * 4);
+		}
+		this.$emit({ k: 'bitmap', w, h, data, x: dx + (x0 - left), y: dy + (y0 - top), alpha: this.$alpha, page: null });
+		return this;
 	}
 
 	createLinearGradient(x0, y0, x1, y1) {
@@ -468,9 +708,11 @@ export class CanvasContext {
 			fillColor: this.$fillColor,
 			fillText: this.$fillText,
 			fillGradient: this.$fillGradient,
+			fillPattern: this.$fillPattern,
 			strokeColor: this.$strokeColor,
 			strokeText: this.$strokeText,
 			strokeGradient: this.$strokeGradient,
+			strokePattern: this.$strokePattern,
 			lineWidth: this.$lineWidth,
 			alpha: this.$alpha,
 			dash: this.$dash,
@@ -493,9 +735,11 @@ export class CanvasContext {
 		this.$fillColor = s.fillColor;
 		this.$fillText = s.fillText;
 		this.$fillGradient = s.fillGradient;
+		this.$fillPattern = s.fillPattern;
 		this.$strokeColor = s.strokeColor;
 		this.$strokeText = s.strokeText;
 		this.$strokeGradient = s.strokeGradient;
+		this.$strokePattern = s.strokePattern;
 		this.$lineWidth = s.lineWidth;
 		this.$alpha = s.alpha;
 		this.$dash = s.dash;
@@ -640,6 +884,49 @@ export class CanvasContext {
 		}
 	}
 
+	// Draws a convex polygon (flat point list) with a pattern: one piece for every tile it touches, with the position in the tile.
+	$emitPattern(pattern, points) {
+		const tile = pattern.$tile;
+		let minX = Infinity;
+		let minY = Infinity;
+		let maxX = -Infinity;
+		let maxY = -Infinity;
+		for (let i = 0; i + 1 < points.length; i += 2) {
+			minX = Math.min(minX, points[i]);
+			maxX = Math.max(maxX, points[i]);
+			minY = Math.min(minY, points[i + 1]);
+			maxY = Math.max(maxY, points[i + 1]);
+		}
+		const i0 = Math.floor(minX / tile.w);
+		const i1 = Math.floor(maxX / tile.w);
+		const j0 = Math.floor(minY / tile.h);
+		const j1 = Math.floor(maxY / tile.h);
+		if ((i1 - i0 + 1) * (j1 - j0 + 1) > MAX_TILES) return;
+		for (let j = j0; j <= j1; j++) {
+			for (let i = i0; i <= i1; i++) {
+				const left = i * tile.w;
+				const top = j * tile.h;
+				const piece = clipToRect(points, left, top, left + tile.w, top + tile.h);
+				if (piece.length < 6) continue;
+				const uvs = new Float64Array(piece.length);
+				for (let k = 0; k < piece.length; k += 2) {
+					uvs[k] = (piece[k] - left) / tile.w;
+					uvs[k + 1] = (piece[k + 1] - top) / tile.h;
+				}
+				this.$emit({ k: 'tpoly', points: Float64Array.from(piece), uvs, tile, alpha: this.$alpha });
+			}
+		}
+	}
+
+	// The triangles of a mesh (flat point list and indices) with a pattern.
+	$emitPatternMesh(pattern, points, indices) {
+		for (let i = 0; i + 2 < indices.length; i += 3) {
+			const triangle = [];
+			for (let k = 0; k < 3; k++) triangle.push(points[2 * indices[i + k]], points[2 * indices[i + k] + 1]);
+			this.$emitPattern(pattern, triangle);
+		}
+	}
+
 	fill() {
 		if (this.$output === null) return;
 		const color = withAlpha(this.$fillColor, this.$alpha);
@@ -647,6 +934,7 @@ export class CanvasContext {
 			const { points, indices } = fillMesh(subPath);
 			if (indices.length === 0) continue;
 			if (this.$fillGradient !== null) this.$emitGradient(this.$fillGradient, points, indices);
+			else if (this.$fillPattern !== null) this.$emitPatternMesh(this.$fillPattern, points, indices);
 			else this.$emit({ k: 'poly', points: Float64Array.from(points), indices, color });
 		}
 	}
@@ -723,6 +1011,10 @@ export class CanvasContext {
 			this.$emitGradient(this.$strokeGradient, [x0 + nx, y0 + ny, x1 + nx, y1 + ny, x1 - nx, y1 - ny, x0 - nx, y0 - ny], [0, 1, 2, 0, 2, 3]);
 			return;
 		}
+		if (this.$strokePattern !== null) {
+			this.$emitPattern(this.$strokePattern, [x0 + nx, y0 + ny, x1 + nx, y1 + ny, x1 - nx, y1 - ny, x0 - nx, y0 - ny]);
+			return;
+		}
 		this.$emit({
 			k: 'poly',
 			points: Float64Array.of(x0 + nx, y0 + ny, x1 + nx, y1 + ny, x1 - nx, y1 - ny, x0 - nx, y0 - ny),
@@ -774,7 +1066,10 @@ export class CanvasContext {
 	}
 
 	// The arc goes clockwise from start to end, or counter-clockwise when `anticlockwise` is set (`arc(w, 0, r, 0, Math.PI / 2, true)`
-	// is three quarters of the circle); one full circle at most.
+	// is three quarters of the circle); one full circle at most. The sweep is worked out the way desktop Qt does it (read from Qt): an end
+	// that is a turn from the start is a whole circle in either direction (`arc(x, y, r, 0, 2 * Math.PI, true)`, which the nodes of a
+	// graph are drawn with, is a circle, not an arc of no length as in the HTML canvas); otherwise a counter-clockwise sweep that is
+	// positive loses a turn, a clockwise one that is negative gets one.
 	arc(cx, cy, radius, start, end, anticlockwise = false) {
 		cx = toFloat(cx);
 		cy = toFloat(cy);
@@ -782,12 +1077,12 @@ export class CanvasContext {
 		start = toFloat(start);
 		end = toFloat(end);
 		const turn = 2 * Math.PI;
-		if (anticlockwise) {
-			if (start - end >= turn) end = start - turn;
-			else while (end > start) end -= turn;
-		} else if (end - start >= turn) end = start + turn;
-		else while (end < start) end += turn;
-		this.$ellipticArc(cx, cy, radius, radius, start, end);
+		let sweep = end - start;
+		if (Math.abs(Math.abs(sweep) - turn) < 1e-9) sweep = anticlockwise ? -turn : turn;
+		else if (anticlockwise && sweep > 0) sweep -= turn;
+		else if (!anticlockwise) while (sweep < 0) sweep += turn;
+		if (Math.abs(sweep) > turn) sweep = sweep > 0 ? turn : -turn;
+		this.$ellipticArc(cx, cy, radius, radius, start, start + sweep);
 	}
 
 	$ellipticArc(cx, cy, rx, ry, start, end) {
@@ -921,6 +1216,10 @@ export class CanvasContext {
 			this.$emitGradient(this.$fillGradient, [x, y, x + w, y, x + w, y + h, x, y + h], [0, 1, 2, 0, 2, 3]);
 			return;
 		}
+		if (this.$fillPattern !== null) {
+			this.$emitPattern(this.$fillPattern, [x, y, x + w, y, x + w, y + h, x, y + h]);
+			return;
+		}
 		this.$emit({ k: 'rect', x, y, w, h, color: withAlpha(this.$fillColor, this.$alpha) });
 	}
 }
@@ -931,13 +1230,17 @@ export class CanvasContext {
 export function commandsExceed(commands, w, h) {
 	const eps = 0.5;
 	for (const c of commands) {
-		if (c.k !== 'poly' && c.k !== 'gpoly' && c.k !== 'rect') continue;
+		if (c.k !== 'poly' && c.k !== 'gpoly' && c.k !== 'tpoly' && c.k !== 'bitmap' && c.k !== 'rect') continue;
 		const m = c.m;
 		const outside = (x, y) => {
 			const tx = m[0] * x + m[2] * y + m[4];
 			const ty = m[1] * x + m[3] * y + m[5];
 			return tx < -eps || ty < -eps || tx > w + eps || ty > h + eps;
 		};
+		if (c.k === 'bitmap') {
+			if (outside(c.x, c.y) || outside(c.x + c.w, c.y) || outside(c.x + c.w, c.y + c.h) || outside(c.x, c.y + c.h)) return true;
+			continue;
+		}
 		if (c.k === 'rect') {
 			if (outside(c.x, c.y) || outside(c.x + c.w, c.y) || outside(c.x + c.w, c.y + c.h) || outside(c.x, c.y + c.h)) return true;
 			continue;
@@ -1008,6 +1311,18 @@ export function replayCommands(r, commands, opacity, aa) {
 				if (hidden > 0) break;
 				r.fillFan(c.points, c.colors.map((color) => r.pack(color, opacity)));
 				break;
+			case 'tpoly': {
+				if (hidden > 0) break;
+				const page = tilePage(c.tile);
+				if (page !== null) r.imageFan(page, c.points, c.uvs, opacity * c.alpha);
+				break;
+			}
+			case 'bitmap': {
+				if (hidden > 0) break;
+				if (c.page === null) c.page = pagePixels(c.w, c.h, c.data);
+				if (c.page !== null) r.image(c.page, c.x, c.y, c.w, c.h, 0, 0, 1, 1, opacity * c.alpha);
+				break;
+			}
 			case 'text': {
 				if (hidden > 0) break;
 				const color = r.pack(c.color, opacity);

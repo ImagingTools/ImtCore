@@ -7,7 +7,7 @@
 
 import { CanvasContext, commandsExceed, replayCommands } from './canvas.js';
 import { fonts } from './fonts.js';
-import { KEY, MODIFIERS } from './keys.js';
+import { KEY, MODIFIERS, parseKeySequence, qtKeyToDom, STANDARD_KEYS } from './keys.js';
 import { QmlError } from './lexer.js';
 import { colorToString, parseColor, toColor, toFloat } from './util.js';
 
@@ -1747,7 +1747,14 @@ defineProp(
 	Item.prototype,
 	'children',
 	function () {
-		return this.$children.some((child) => child.$nonVisual) ? this.$children.filter((child) => !child.$nonVisual) : this.$children;
+		if (!this.$children.some((child) => child.$nonVisual)) return this.$children;
+		// The list without the non-visual children (a Timer) is the same list while the children are the same: `onChildrenChanged` is
+		// polled by comparing what `children` gives, and a new list on every read made it run on every pass.
+		const list = this.$children.filter((child) => !child.$nonVisual);
+		const last = this.$visibleChildren;
+		if (last !== undefined && last.length === list.length && last.every((child, i) => child === list[i])) return last;
+		this.$visibleChildren = list;
+		return list;
 	},
 	function (list) {
 		const items = Array.from(list || []).filter((item) => item instanceof Item && item !== this);
@@ -1804,7 +1811,7 @@ defineProp(
 			old.$update();
 		}
 		this.$parent = null;
-		if (target !== null) target.$adopt(this);
+		if (target !== null) target.$adopt(this, true);
 		this.$update();
 	},
 	true,
@@ -2581,20 +2588,46 @@ export class Canvas extends Item {
 	}
 
 	// The first paint happens while the image is still loading, then imageLoaded is delivered. That is the order Qt logs.
+	// The picture is kept for `createPattern(url, ...)`; the engine finds it from the address like the one of an Image.
 	loadImage(src) {
 		const url = toStr(src);
-		if (this.$images === undefined) this.$images = new Map();
+		if (this.$images === undefined) {
+			this.$images = new Map();
+			this.$pictures = new Map();
+		}
 		const state = this.$images.get(url);
 		if (state === 'ready' || state === 'loading') return;
 		this.$images.set(url, 'loading');
 		this.$painted = false;
 		this.$ensurePainted();
-		this.$images.set(url, 'ready');
-		this.$emit('imageLoaded');
+		const canvas = this;
+		hooks.loadImage(
+			{
+				$source: url,
+				$directory: canvas.$directory,
+				get $destroyed() {
+					return canvas.$destroyed === true;
+				},
+				$setImage(picture, status) {
+					if (canvas.$images.get(url) !== 'loading') return;
+					if (status === 3) {
+						canvas.$images.set(url, 'error');
+						return;
+					}
+					if (picture !== null) canvas.$pictures.set(url, picture);
+					canvas.$images.set(url, 'ready');
+					canvas.$emit('imageLoaded');
+				},
+			},
+			url,
+		);
 	}
 
 	unloadImage(src) {
-		if (this.$images !== undefined) this.$images.delete(toStr(src));
+		if (this.$images !== undefined) {
+			this.$images.delete(toStr(src));
+			this.$pictures.delete(toStr(src));
+		}
 	}
 
 	isImageLoaded(src) {
@@ -2623,10 +2656,12 @@ export class Canvas extends Item {
 		this.$painted = true;
 		this.$paintedWidth = this.$aw;
 		this.$paintedHeight = this.$ah;
+		// The textures of the pictures that putImageData drew are not needed any more.
+		for (const old of this.$cmds) if (old.k === 'bitmap' && old.page !== null) (this.$stalePages ??= []).push(old.page);
 		this.$cmds = [];
 		const signal = this.$sigs.get('paint');
 		if (signal.handlers.length > 0) {
-			this.$context = new CanvasContext(this.$aw, this.$ah, this.$cmds);
+			this.$context = new CanvasContext(this.$aw, this.$ah, this.$cmds, this.$pictures === undefined ? null : this.$pictures);
 			try {
 				this.$emit('paint');
 			} finally {
@@ -2638,6 +2673,10 @@ export class Canvas extends Item {
 
 	$paint(r, opacity) {
 		this.$ensurePainted();
+		if (this.$stalePages !== undefined) {
+			for (const page of this.$stalePages) r.dropPage(page);
+			this.$stalePages = undefined;
+		}
 		if (this.$cmds.length === 0) return;
 		if (this.$cmdsChecked !== this.$cmds) {
 			this.$cmdsChecked = this.$cmds;
@@ -3885,6 +3924,23 @@ ListView.prototype.forceLayout = function () {
 };
 
 // Cells in row-major order. `columns` is how many cell widths fit in the view.
+// As for a Flickable in Qt, the visual children of a view live in its contentItem, which is the only entry of `children`: the delegate of
+// row i is `view.children[0].children[i]` (InputView of ImtCore sets the parameters of a row that way). The engine keeps the delegates in
+// the view itself, ViewContent stands in for the contentItem.
+const itemChildren = Object.getOwnPropertyDescriptor(Item.prototype, 'children');
+defineProp(
+	ListView.prototype,
+	'children',
+	function () {
+		if (this.$childrenList === undefined) this.$childrenList = [this.contentItem];
+		return this.$childrenList;
+	},
+	function (list) {
+		itemChildren.set.call(this, list);
+	},
+	true,
+);
+
 export class GridView extends ListView {
 	constructor() {
 		super();
@@ -4399,6 +4455,20 @@ class FlickableContentItem extends Item {
 		this.$flickable = view;
 	}
 
+	// The content item moves against the scroll position (read-only here: the Flickable moves it).
+	get x() {
+		return -this.$flickable.contentX;
+	}
+
+	set x(value) {}
+
+	get y() {
+		return -this.$flickable.contentY;
+	}
+
+	set y(value) {}
+
+
 	get $implicitWidth() {
 		return this.$flickable.$aw;
 	}
@@ -4427,9 +4497,10 @@ export class Flickable extends Item {
 		return this.$content;
 	}
 
-	// A Repeater is a visual item in Qt: its delegates share its parent, the content item.
-	$adopt(child) {
-		if (child === this.$content || (child.$nonVisual && !(child instanceof Repeater))) super.$adopt(child);
+	// The items declared in a Flickable (and a Repeater, a visual item in Qt, whose delegates share its parent) go to the content item.
+	// An item that gets the Flickable as its parent from a script (`parent = flick`, `createObject(flick)`) stays a child of the Flickable.
+	$adopt(child, fromScript = false) {
+		if (fromScript || child === this.$content || (child.$nonVisual && !(child instanceof Repeater))) super.$adopt(child);
 		else this.$content.$adopt(child);
 	}
 
@@ -5159,6 +5230,61 @@ class TextEditor extends Item {
 
 	// ----- keys -----
 
+	// Whether the editor keeps a key for itself, so that a Shortcut does not get it (QQuickTextInput and QQuickTextEdit accept the
+	// ShortcutOverride of Qt): the keys that edit or move in the text, and what the standard keys of editing are. A read-only editor
+	// keeps none; a TextEdit keeps Return, Up, Down and Tab as well. What an editor does not keep goes to a Shortcut first
+	// (Escape, F2, Ctrl+S).
+	$shortcutOverride(event) {
+		if (this.$readOnly) return false;
+		const key = event.key;
+		const modifiers = event.modifiers & (MODIFIERS.ShiftModifier | MODIFIERS.ControlModifier | MODIFIERS.AltModifier | MODIFIERS.MetaModifier);
+		if (modifiers === 0 || modifiers === MODIFIERS.ShiftModifier) {
+			// a character (the key codes of Qt below Key_Escape are characters)
+			if (key < KEY.Key_Escape) return true;
+			switch (key) {
+				case KEY.Key_Delete:
+				case KEY.Key_Home:
+				case KEY.Key_End:
+				case KEY.Key_Backspace:
+				case KEY.Key_Left:
+				case KEY.Key_Right:
+					return true;
+				case KEY.Key_Return:
+				case KEY.Key_Enter:
+				case KEY.Key_Up:
+				case KEY.Key_Down:
+				case KEY.Key_Tab:
+					return this.$multi;
+				default:
+					break;
+			}
+		}
+		const ctrl = modifiers === MODIFIERS.ControlModifier;
+		const ctrlShift = modifiers === (MODIFIERS.ControlModifier | MODIFIERS.ShiftModifier);
+		switch (key) {
+			// copy, paste, cut, undo, redo, select all
+			case KEY.Key_C:
+			case KEY.Key_V:
+			case KEY.Key_X:
+			case KEY.Key_Z:
+			case KEY.Key_Y:
+			case KEY.Key_A:
+				return ctrl || (key === KEY.Key_Z && ctrlShift);
+			case KEY.Key_Insert:
+				return ctrl || modifiers === MODIFIERS.ShiftModifier;
+			case KEY.Key_Left:
+			case KEY.Key_Right:
+			case KEY.Key_Home:
+			case KEY.Key_End:
+			case KEY.Key_Delete:
+			case KEY.Key_Backspace:
+				// by words and to the ends, with the selection, deleting by words
+				return ctrl || ctrlShift || modifiers === MODIFIERS.ShiftModifier;
+			default:
+				return key === KEY.Key_Backspace && modifiers === MODIFIERS.AltModifier;
+		}
+	}
+
 	$keyPressed(event) {
 		const mods = event.modifiers;
 		const handled = this.$handleKey(event.key, (mods & MODIFIERS.ControlModifier) !== 0, (mods & MODIFIERS.ShiftModifier) !== 0, (mods & MODIFIERS.AltModifier) !== 0, event.text);
@@ -5219,6 +5345,9 @@ class TextEditor extends Item {
 			case KEY.Key_Return:
 			case KEY.Key_Enter:
 				return this.$enter();
+			case KEY.Key_Tab:
+				// a TextEdit types a tab, Shift+Tab as well, and the focus stays (Qt); a TextInput leaves it to the focus chain
+				return this.$multi && !ctrl && !alt && this.$type('	');
 			default:
 				break;
 		}
@@ -5608,14 +5737,152 @@ readOnlyProp('canPaste', function () {
 	return !this.$readOnly && hooks.clipboardRead().text !== '';
 });
 
+// `Shortcut`: a key sequence that works wherever the focus is (the engine looks for it in dispatchKey, before the item that has the
+// focus gets the key; a text editor keeps the keys of editing for itself). `sequence` is a text ("Ctrl+Z", "Esc") or a StandardKey,
+// `sequences` a list of them; a sequence that is not valid never activates. Two enabled shortcuts of the same sequence activate none
+// of them: the one that was made last gets `activatedAmbiguously`. The visibility of the parent does not matter, and `context` is
+// not looked at (there is one window).
 export class Shortcut extends Item {
 	constructor() {
 		super();
 		this.$typeName = 'Shortcut';
 		this.$nonVisual = true;
+		this.$sequence = '';
+		this.$sequences = [];
+		this.$sequencesSet = false;
+		this.$enabled = true;
+		this.$context = 1; // Qt.WindowShortcut
+		this.$autoRepeat = true;
+		this.$parsed = null;
 		this.$declareSignal('activated', []);
+		this.$declareSignal('activatedAmbiguously', []);
+	}
+
+	// The valid sequences it listens to: [{ key, modifiers }, ...] of the first step of each, and the text of the first one.
+	$sequenceList() {
+		if (this.$parsed !== null) return this.$parsed;
+		const values = this.$sequencesSet ? this.$sequences.concat(this.$sequence === '' ? [] : [this.$sequence]) : [this.$sequence];
+		const combos = [];
+		let text = '';
+		for (const value of values) {
+			const parsed = parseKeySequence(typeof value === 'number' ? (STANDARD_KEYS.find((entry) => entry[1] === value) || [])[2] : value);
+			if (parsed === null) continue;
+			// a sequence of several steps waits for all of them; only its first step is known here, and it never activates
+			if (parsed.steps.length === 1) combos.push(parsed.steps[0]);
+			if (text === '') text = parsed.text;
+		}
+		this.$parsed = { combos, text };
+		return this.$parsed;
+	}
+
+	$matches(key, modifiers) {
+		for (const combo of this.$sequenceList().combos) if (combo.key === key && combo.modifiers === modifiers) return true;
+		return false;
 	}
 }
+
+defineProp(
+	Shortcut.prototype,
+	'sequence',
+	function () {
+		// with `sequences` set, Qt has no `sequence`
+		return this.$sequencesSet && this.$sequence === '' ? undefined : this.$sequence;
+	},
+	function (value) {
+		this.$sequence = typeof value === 'number' ? value : toStr(value);
+		this.$parsed = null;
+	},
+	true,
+);
+defineProp(
+	Shortcut.prototype,
+	'sequences',
+	function () {
+		return this.$sequences;
+	},
+	function (value) {
+		this.$sequences = Array.from(value || []);
+		this.$sequencesSet = true;
+		this.$parsed = null;
+	},
+	true,
+);
+defineField(Shortcut.prototype, 'enabled', '$enabled', toBool);
+defineField(Shortcut.prototype, 'autoRepeat', '$autoRepeat', toBool);
+defineField(Shortcut.prototype, 'context', '$context', toFloat);
+defineReadOnly(Shortcut.prototype, 'nativeText', function () {
+	return this.$sequenceList().text;
+});
+defineReadOnly(Shortcut.prototype, 'portableText', function () {
+	return this.$sequenceList().text;
+});
+
+// `TestCase` of QtTest, as far as the tests of the keyboard need it: keyPress, keyRelease and keyClick send the keys to the item that
+// has the focus the way the keyboard of a window does (a modifier is a key of its own, pressed before the key and released after it).
+export class TestCase extends Item {
+	constructor(engine) {
+		super();
+		this.$typeName = 'TestCase';
+		this.$nonVisual = true;
+		this.$engine = engine;
+		this.$name = '';
+		this.$when = true;
+	}
+
+	$send(key, modifiers, down) {
+		const modifierKeys = [
+			[MODIFIERS.ShiftModifier, KEY.Key_Shift],
+			[MODIFIERS.ControlModifier, KEY.Key_Control],
+			[MODIFIERS.AltModifier, KEY.Key_Alt],
+			[MODIFIERS.MetaModifier, KEY.Key_Meta],
+		].filter(([bit]) => (modifiers & bit) !== 0);
+		const withModifiers = (extra) => qtKeyToDom(extra, modifiers);
+		if (down) {
+			for (const [, modifierKey] of modifierKeys) this.$engine.dispatchKey(withModifiers(modifierKey), true);
+			this.$engine.dispatchKey(withModifiers(key), true);
+		} else {
+			this.$engine.dispatchKey(withModifiers(key), false);
+			for (const [, modifierKey] of modifierKeys.reverse()) this.$engine.dispatchKey(withModifiers(modifierKey), false);
+		}
+	}
+
+	keyPress(key, modifiers = 0) {
+		this.$send(toFloat(key), toFloat(modifiers), true);
+	}
+
+	keyRelease(key, modifiers = 0) {
+		this.$send(toFloat(key), toFloat(modifiers), false);
+	}
+
+	keyClick(key, modifiers = 0) {
+		this.$send(toFloat(key), toFloat(modifiers), true);
+		this.$send(toFloat(key), toFloat(modifiers), false);
+	}
+}
+defineProp(
+	TestCase.prototype,
+	'name',
+	function () {
+		return this.$name;
+	},
+	function (value) {
+		this.$name = toStr(value);
+	},
+	true,
+);
+defineProp(
+	TestCase.prototype,
+	'when',
+	function () {
+		return this.$when;
+	},
+	function (value) {
+		this.$when = toBool(value);
+	},
+	true,
+);
+defineReadOnly(TestCase.prototype, 'windowShown', () => true, undefined, true);
+defineReadOnly(TestCase.prototype, 'running', () => true, undefined, true);
 
 // ----- Timer -----
 
@@ -6381,6 +6648,11 @@ export class TreeItemModel extends Item {
 
 	isValidData(key, index = 0) {
 		return this.containsKey(key, index) && this.$rows[index][key] !== undefined && this.$rows[index][key] !== null;
+	}
+
+	// True if the value of the key is a nested model (a record or an array is one, getTreeItemModel wraps it), as in the C++ model.
+	isTreeModel(key, index = 0) {
+		return this.getTreeItemModel(key, index) !== null;
 	}
 
 	copyMe() {
@@ -9837,6 +10109,7 @@ export const BUILTIN_TYPES = new Map([
 	['Timer', Timer],
 	['QtObject', QtObject],
 	['Shortcut', Shortcut],
+	['TestCase', TestCase],
 	['Gradient', Gradient],
 	['GradientStop', GradientStop],
 ]);

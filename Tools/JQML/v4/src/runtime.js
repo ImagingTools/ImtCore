@@ -4,7 +4,10 @@
 //
 // spec: {
 //   name, root, main, lenient, maxErrors, language, incremental,
-//   files: { path: text },        QML documents, JavaScript files, qmldir files
+//   files: { path: text },        JavaScript files, qmldir files, and the QML documents of a debug build
+//   docs: { path: text },         the QML documents of a compiled application, as packed trees (src/packed.js)
+//   scans: { path: { f, t, q, e } }  what the text of a packed document names (see createProject)
+//   debug: true                   the text of the documents is there, and window.qmlWeb gives the engine
 //   binaries: { path: base64 },   fonts
 //   modules: { name: [dir] },     module name -> directories with a qmldir
 //   translations: { language: { source: translation } },
@@ -42,7 +45,15 @@ export function resourceRoot(root, location) {
 export function createProject(spec) {
 	const files = new Map(Object.entries(spec.files || {}));
 	for (const [path, base64] of Object.entries(spec.binaries || {})) files.set(path, decodeBase64(base64));
-	return new Project(new MapFS(files), { modules: spec.modules || {} });
+	const project = new Project(new MapFS(files), { modules: spec.modules || {}, trusted: spec.trusted === true });
+	// The documents of a compiled application are packed trees, without their text (compiler/compiler.js); a scan lists the font
+	// files `f`, the types made by createObject `t` and the QML files `q` a document names, and `e` when it declares an enum.
+	const scans = spec.scans || {};
+	for (const [path, record] of Object.entries(spec.docs || {})) {
+		const scan = scans[path] || {};
+		project.addCompiled(path, record, { fonts: scan.f || [], types: scan.t || [], files: scan.q || [], enums: scan.e === 1 });
+	}
+	return project;
 }
 
 function pickLanguage(spec) {
@@ -58,6 +69,11 @@ export function createApplication(spec, canvas, location = null) {
 	const engine = new Engine();
 	engine.lenient = spec.lenient !== false;
 	engine.incremental = spec.incremental !== false;
+	// A debug build: `?noresolve=1` runs the expressions through `with` as before, `?verify=1` runs both forms and compares them.
+	if (spec.debug === true && location && typeof location.search === 'string') {
+		if (/[?&]noresolve=1/.test(location.search)) engine.resolveNames = false;
+		if (/[?&]verify=1/.test(location.search)) engine.verifyResolution = true;
+	}
 	if (spec.maxErrors) engine.maxErrors = spec.maxErrors;
 	engine.translations = spec.translations || {};
 	engine.language = pickLanguage(spec);
@@ -89,7 +105,8 @@ function showFatal(error) {
 // Creates a canvas filling the page and starts the application once the page is loaded.
 // `window.qmlWebApplication` exposes the specification and the factories before that (devtools, tests).
 export function bootstrap(spec) {
-	if (typeof window !== 'undefined') window.qmlWebApplication = { spec, createApplication, createProject };
+	// The engine, the project and the documents are reached through these only in a debug build.
+	if (typeof window !== 'undefined' && spec.debug === true) window.qmlWebApplication = { spec, createApplication, createProject };
 	if (typeof document === 'undefined') return;
 	const run = () => {
 		const style = document.createElement('style');
@@ -100,7 +117,7 @@ export function bootstrap(spec) {
 		document.body.append(canvas);
 		const application = createApplication(spec, canvas, window.location);
 		attachCanvas(canvas, application.scene, application.engine);
-		window.qmlWeb = application;
+		if (spec.debug === true) window.qmlWeb = application;
 		application.start().catch(showFatal);
 	};
 	if (document.readyState === 'complete') run();

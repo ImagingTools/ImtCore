@@ -1,0 +1,5 @@
+module mymod
+
+Base 1.0 Base.qml
+Card 1.0 Card.qml
+singleton Theme 1.0 Theme.qml

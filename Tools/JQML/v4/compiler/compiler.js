@@ -15,7 +15,11 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { Project } from '../src/project.js';
+import { packDocument } from '../src/packed.js';
+import { parseQmlDocument } from '../src/parser.js';
+import { Project, scanSource } from '../src/project.js';
+import { QmlError } from '../src/lexer.js';
+import { minifyScript } from './minify.js';
 import { bundleRuntime } from './bundle.js';
 import { entryDirectory, listQmldirQmlFiles, loadCompilerConfig, readQmldir, toPosix } from './config.js';
 import { loadTranslationCatalogs } from './translations.js';
@@ -33,6 +37,7 @@ export const USAGE = `Usage: node compiler/compiler.js [options]
   -n, --name <string>   application name (default: "")
   -r, --root <string>   root path of the pictures (default: "/")
   -m, --mode <string>   compile mode: "js" | "html"
+      --debug           keep the text of the QML documents in the bundle and publish window.qmlWeb
       --list-qml        print qml files declared by config qmldirs, one path per line
   -h, --help            show this help
 `;
@@ -67,6 +72,10 @@ export function parseArgs(argv) {
 		}
 		if (arg === '--list-qml') {
 			options.listQml = true;
+			continue;
+		}
+		if (arg === '--debug') {
+			options.debug = true;
 			continue;
 		}
 		if (arg === '-h' || arg === '--help') {
@@ -280,12 +289,29 @@ async function compileJs(options, env, log, warn) {
 		root: options.root,
 		main: relativeTo(root, main),
 		lenient: true,
+		// every document was parsed above with the script checks on
+		trusted: true,
 		files: {},
 		binaries: {},
 		modules: {},
 		translations,
 	};
-	for (const [file, text] of [...fs.texts].sort((a, b) => a[0].localeCompare(b[0]))) spec.files[relativeTo(root, file)] = text;
+	if (options.debug) spec.debug = true;
+	else {
+		spec.docs = {};
+		spec.scans = {};
+	}
+	for (const [file, text] of [...fs.texts].sort((a, b) => a[0].localeCompare(b[0]))) {
+		if (!file.endsWith('.qml') || options.debug) {
+			spec.files[relativeTo(root, file)] = text;
+			continue;
+		}
+		// A document is carried as its packed tree, not as its text.
+		const name = relativeTo(root, file);
+		spec.docs[name] = packedRecord(project.docs.get(file), text);
+		const scan = packedScan(scanSource(text));
+		if (scan !== null) spec.scans[name] = scan;
+	}
 	for (const [file, data] of [...fs.bytes].sort((a, b) => a[0].localeCompare(b[0]))) spec.binaries[relativeTo(root, file)] = data.toString('base64');
 	for (const [name, dirs] of Object.entries(modules)) spec.modules[name] = dirs.map((dir) => relativeTo(root, dir));
 
@@ -309,6 +335,31 @@ async function compileJs(options, env, log, warn) {
 }
 
 // options: see parseArgs. Returns what was produced; throws on errors.
+// The record of a document of a compiled application (see CompiledDocument): its tree packed with smaller scripts, as JSON text. A
+// document that does not parse is carried as its error: the application only fails when it uses that document.
+function packedRecord(doc, text) {
+	let def = doc !== undefined && !doc.error ? doc.def : null;
+	if (def === null) {
+		try {
+			def = parseQmlDocument(text);
+		} catch (error) {
+			if (!(error instanceof QmlError)) throw error;
+			return JSON.stringify({ error: [error.message, error.line || 0, error.column || 0] });
+		}
+	}
+	return JSON.stringify(packDocument(def, minifyScript));
+}
+
+// The scan of a document in the short form of the spec, or null when it has nothing in it.
+function packedScan(scan) {
+	const packed = {};
+	if (scan.fonts.length > 0) packed.f = scan.fonts;
+	if (scan.types.length > 0) packed.t = scan.types;
+	if (scan.files.length > 0) packed.q = scan.files;
+	if (scan.enums) packed.e = 1;
+	return Object.keys(packed).length > 0 ? packed : null;
+}
+
 export async function compile(options, { env = process.env, log = console.log, warn = console.warn } = {}) {
 	if (options.mode === 'html') return compileHtml(options, log);
 	if (options.mode === 'js') return compileJs(options, env, log, warn);
