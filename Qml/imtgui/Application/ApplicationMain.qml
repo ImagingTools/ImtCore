@@ -10,13 +10,13 @@ import imtauthUsersSdl 1.0
 
 Item {
 	id: application;
-	
+
 	anchors.fill: parent;
-	
+
 	property Decorators decorators: decorators_
-	
+
 	property alias localSettings: clientSettingsController.json
-	
+
 	property alias thumbDecMenuPanelRadius: thumbnailDecorator.menuPanelRadius;
 
 	property bool serverReady: true; // [deprecated]
@@ -28,21 +28,21 @@ Item {
 	
 	property bool firstModelsIsInit: false;
 	property bool serverConnected: subscriptionManager_.status == 1;
-	
+
 	property alias subscriptionManager: subscriptionManager_;
-	
+
 	property alias loadPageByClick: thumbnailDecorator.loadPageByClick;
 	property alias canRecoveryPassword: thumbnailDecorator.canRecoveryPassword;
 
 	property alias authConnectionState: connectionState.authConnectionState
 	property alias pageAboutProvider: pageAboutProvider
-	
+
 	// TODO: ConnectionStateMachine.qml
 	QtObject {
 		id: connectionState
 
 		property int totalStatus: -1
-		
+
 		property var status : ({
 			TRY_CONNECTING_TO_AUTH_SERVER: 0,
 			AUTH_SERVER_CONNECTION_ERROR: 1,
@@ -50,7 +50,7 @@ Item {
 			APP_SERVER_CONNECTION_ERROR: 3,
 			CONNECTION_SUCCESFUL: 4
 		})
-		
+
 		// 0 - WebSocket.Connecting, 1 - WebSocket.Open, 2 - WebSocket.Closing, 3 - WebSocket.Closed, 4 - WebSocket.Error
 		//
 		// Until the WebSocket has been given a URL it still reports its initial
@@ -76,11 +76,11 @@ Item {
 		onAppConnectionStateChanged: {
 			checkState()
 		}
-		
+
 		onAuthConnectionStateChanged: {
 			checkState()
 		}
-		
+
 		function checkState(){
 			if (authConnectionState == 1 && appConnectionState == 1){
 				totalStatus = status.CONNECTION_SUCCESFUL
@@ -98,7 +98,7 @@ Item {
 				totalStatus = status.AUTH_SERVER_CONNECTION_ERROR
 			}
 		}
-		
+
 		onTotalStatusChanged: {
 			if (totalStatus == status.TRY_CONNECTING_TO_AUTH_SERVER){
 				internal.errorMessage = qsTr("Connecting to the authorization server...")
@@ -136,30 +136,31 @@ Item {
 				statusTimer.stop()
 				Events.sendEvent("SearchVisible", true);
 				Events.sendEvent("SetUserPanelEnabled", true);
-				
+
 				application.firstModelsInit()
-				
+
 				return
 			}
 
 			statusTimer.restart()
 		}
 	}
-	
+
 	Timer {
 		id: statusTimer
 		interval: 1000
 		repeat: false
 		onTriggered: {
 			thumbnailDecorator.stackView.clear();
-			
+
 			Events.sendEvent("SearchVisible", false);
 			Events.sendEvent("SetUserPanelEnabled", false);
-			
-			application.showMessagePage(internal.errorMessage, internal.loadingVisible)
+
+			// showMessagePage() would assign internal.errorMessage and drop its Qt.binding (the server address may arrive later)
+			thumbnailDecorator.stackView.addPage(application.messagePageComp);
 		}
 	}
-	
+
 	QtObject {
 		id: internal
 		property string errorMessage: "";
@@ -175,14 +176,14 @@ Item {
 
 		internal.errorMessage = message;
 		internal.loadingVisible = loadingVisible;
-		
+
 		thumbnailDecorator.stackView.addPage(messagePageComp);
 	}
-	
+
 	signal saveSettings(string json);
 	signal settingsSaved();
 	signal settingsSaveFailed();
-	
+
 	Component.onCompleted: {
 		setDecorators()
 		timer.onTriggeredFunc();
@@ -190,7 +191,7 @@ Item {
 		// The first state of the connection comes with no change signal: a server that does not answer from the start would leave the window empty
 		connectionState.checkState();
 	}
-	
+
 	// Dragging a window edge changes width and height on nearly every frame, and each
 	// change used to dispatch two global Events immediately - so a resize walked every
 	// subscriber list of three event keys, allocating a fresh parameters object each
@@ -237,7 +238,7 @@ Item {
 			}
 		}
 	}
-	
+
 	// WebSocket port, resolved from the merged GetApplicationInfo response (see
 	// ApplicationInfoProvider / CApplicationInfoControllerComp). -1 means "not known
 	// yet"; the retry Timer below re-fetches until it is.
@@ -311,34 +312,34 @@ Item {
 	property DesignSchemaProvider designProvider : DesignSchemaProvider
 	{
 	}
-	
+
 	property LanguageProvider languageProvider : LanguageProvider
 	{
 	}
-	
+
 	ClientSettingsController {
 		id: clientSettingsController
-		
+
 		onSaveSettings: {
 			application.saveSettings(paramsSet.toJson())
 		}
-		
+
 		onUrlChanged: {
 			// AuthorizationController.logout();
 			application.reconnect();
 		}
 	}
-	
+
 	UserSettingsController {
 		id: userSettingsController
-		
+
 		onParamModelCreated: {
 			let languageSelectionParam = application.languageProvider.selectionParam;
 			let languageParamter = getParameterById(application.languageProvider.typeId);
 			if (languageParamter.m_data !== languageSelectionParam.toJson()){
 				application.languageProvider.selectionParam.createFromJson(languageParamter.m_data)
 			}
-			
+
 			let designSelectionParam = application.designProvider.selectionParam;
 			let designParamter = getParameterById(application.designProvider.typeId)
 			if (designParamter.m_data !== designSelectionParam.toJson()){
@@ -346,11 +347,11 @@ Item {
 			}
 		}
 	}
-	
+
 	PageAboutProvider {
 		id: pageAboutProvider
 	}
-	
+
 	SubscriptionManager {
 		id: subscriptionManager_;
 		active: application.useWebSocketSubscription;
@@ -371,7 +372,7 @@ Item {
 			}
 		}
 	}
-	
+
 	function getWebSocketUrl(serverUrl){
 		try {
 			let url = new URL(serverUrl);
@@ -402,26 +403,26 @@ Item {
 			return "";
 		}
 	}
-	
+
 	Component {
 		id: serverLogProviderComp
 		ServerLogProvider {}
 	}
-	
+
 	Component {
 		id: serviceDependencyViewComp
 		ServiceDependencyView {}
 	}
-	
+
 	ThumbnailDecorator {
 		id: thumbnailDecorator;
-		
+
 		anchors.fill: parent;
 		Component.onCompleted: {
 			settingsController.registerParamEditor("ServerLog", serverLogProviderComp)
 			settingsController.registerParamEditor("ServiceDependency", serviceDependencyViewComp)
 		}
-		
+
 		function fillPreferenceParamsSet(){
 			if (Qt.platform.os !== "web"){
 				settingsController.registerParamsSetController("Network", qsTr("Network"), clientSettingsController)
@@ -433,16 +434,16 @@ Item {
 			}
 		}
 	}
-	
+
 	function updateAllModels(){
 		userSettingsController.getSettings()
 		thumbnailDecorator.updateModels();
 	}
-	
+
 	function onSimpleUserManagement(){
 		application.updateAllModels();
 	}
-	
+
 	// After forced logout (session/refresh expired) open the login UI immediately
 	// instead of leaving the user on a connection-status overlay.
 	function enterLoggedOutUi(){
@@ -466,7 +467,7 @@ Item {
 		thumbnailDecorator.showPage(thumbnailDecorator.authorizationPageComp);
 		AuthorizationController.updateUserManagementModel();
 	}
-	
+
 	function firstModelsInit(force){
 		if (!force){
 			force = false
@@ -489,19 +490,19 @@ Item {
 
 		firstModelsIsInit = true;
 	}
-	
+
 	function connectToWebSocketServer(){
 		if (!application.useWebSocketSubscription){
 			return;
 		}
-		
+
 		subscriptionManager_.active = false;
 		let serverUrl = getServerUrl();
 		let webSocketServerUrl = getWebSocketUrl(serverUrl);
 		subscriptionManager_.url = webSocketServerUrl;
 		subscriptionManager_.active = true;
 	}
-	
+
 	// Applies the login / superuser-setup / simple-dashboard routing decision from
 	// the latest known userMode + superuser status (both arrive together in the
 	// merged ApplicationInfoProvider response - see CApplicationInfoControllerComp).
@@ -576,14 +577,14 @@ Item {
 		function onLoggedIn(){
 			thumbnailDecorator.drawingContainer.content = Style.drawingContainerDecorator;
 			thumbnailDecorator.showPage(undefined)
-			
+
 			application.updateAllModels();
 		}
 
 		function onTenantSelected(tenantId){
 			application.updateAllModels();
 		}
-		
+
 		function onLoggedOut(){
 			thumbnailDecorator.stopLoading();
 			NavigationController.clear();
@@ -593,7 +594,7 @@ Item {
 			application.firstModelsIsInit = false;
 		}
 	}
-	
+
 	// Retries the bootstrap fetch until a WebSocket port is known. The first retry is
 	// deliberately quick (a cold start that just lost a race with the server should
 	// not cost three seconds), then backs off so an unreachable server is not polled
