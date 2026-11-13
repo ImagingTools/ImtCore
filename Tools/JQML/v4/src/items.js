@@ -42,6 +42,9 @@ export const hooks = {
 	completing: null,
 	// (item, name) => void: a custom property that has `onNameChanged` handlers got a new value.
 	changed: null,
+	// (type, parent) => item: an object of a type of the engine that has no QML file (BaseModel); (url) => Component: Qt.createComponent.
+	instantiateType: null,
+	createComponent: null,
 	// (item) => void: the x, y, width or height of an item that has change handlers got another value.
 	geometry: null,
 	changeSignal: null,
@@ -979,6 +982,8 @@ export class Item {
 					store[name] = value;
 					this.$update();
 					if (hooks.changed !== null && this.$chg !== undefined) hooks.changed(this, name);
+					// BaseClass: the properties of an SDL object report their changes to its owner.
+					if (this.$watch !== undefined) this.$watch(name);
 					noteWrite(this, name);
 				}
 				// A Binding or Connections item has to publish the new value before the statement that caused it returns.
@@ -1146,8 +1151,9 @@ export class Item {
 		this.$state = 1;
 
 		const an = this.$anchors;
-		let w = this.$w > 0 ? this.$w : this.$effW;
-		let h = this.$h > 0 ? this.$h : this.$effH;
+		let w = this.$w > 0 ? this.$w : this.$w === 0 && this.$wSet === true ? 0 : this.$effW;
+		// `height: 0` (and `width: 0`) that a script or a binding wrote is a size of 0 (a hidden header that is `visible ? implicitHeight : 0`), not "no size".
+		let h = this.$h > 0 ? this.$h : this.$h === 0 && this.$hSet === true ? 0 : this.$effH;
 		let x = this.$x;
 		let y = this.$y;
 
@@ -1561,6 +1567,7 @@ defineProp(
 		// readable as-is: ButtonDecorator cancels contentSpacing with `width: -Style.marginM`.
 		if (this.$anchors !== null && this.$anchors.$affectsWidth) return this.$aw;
 		if (this.$w < 0) return this.$w;
+		if (this.$w === 0 && this.$wSet === true) return 0;
 		return this.$w <= 0 ? this.$aw : this.$w;
 	},
 	function (v) {
@@ -1583,6 +1590,7 @@ defineProp(
 		this.$ensureGeometry();
 		if (this.$anchors !== null && this.$anchors.$affectsHeight) return this.$ah;
 		if (this.$h < 0) return this.$h;
+		if (this.$h === 0 && this.$hSet === true) return 0;
 		return this.$h <= 0 ? this.$ah : this.$h;
 	},
 	function (v) {
@@ -2214,6 +2222,34 @@ function elidedWidth(info, text, limit) {
 	return used;
 }
 
+// Qt measures a line with the advances of the font rounded to whole pixels, the engine with the real ones: a bold figure in a box that
+// was measured with the regular font differs by a fraction of a pixel. A line that is no more than a pixel too wide is not cut.
+const ELIDE_SLACK = 1;
+
+// The text of a line that does not fit: the characters that stay and the ellipsis, as Qt's elidedText cuts them
+// (0 the start, 1 the end, 2 the middle). A cut text is strictly narrower than the limit.
+function elidedText(info, text, limit, mode) {
+	const ellipsis = info.advance('…');
+	const chars = Array.from(text);
+	if (!(ellipsis < limit)) return '';
+	const fits = (value) => textWidth(info, value) < limit;
+	let best = '…';
+	for (let cut = 1; cut <= chars.length; cut++) {
+		const keep = chars.length - cut;
+		let value;
+		if (mode === 0) value = '…' + chars.slice(cut).join('');
+		else if (mode === 2) {
+			const left = Math.floor(keep / 2);
+			value = chars.slice(0, left).join('') + '…' + chars.slice(left + cut).join('');
+		} else value = chars.slice(0, keep).join('') + '…';
+		if (fits(value)) {
+			best = value;
+			break;
+		}
+	}
+	return best;
+}
+
 function wraps(mode) {
 	if (typeof mode === 'number') return mode === 1 || mode === 3 || mode === 4;
 	return mode === 'WordWrap' || mode === 'Wrap' || mode === 'WrapAnywhere' || mode === 'WrapAtWordBoundaryOrAnywhere';
@@ -2373,13 +2409,15 @@ export class Text extends Item {
 		const explicit = this.$w > 0 ? this.$w : this.$aw > 0 ? this.$aw : 0;
 		const wrap = explicit > 0 && wraps(this.$wrap);
 		const limit = wrap ? explicit : Infinity;
+		const elideLimit = !rich && !wrap && (this.$elide === 0 || this.$elide === 1 || this.$elide === 2) ? explicit : 0;
 		if (
 			lay !== null &&
 			lay.version === fonts.version &&
 			lay.family === family &&
 			lay.source === source &&
 			lay.wrap === wrap &&
-			lay.limit === limit
+			lay.limit === limit &&
+			lay.elideLimit === elideLimit
 		) {
 			return lay;
 		}
@@ -2389,9 +2427,13 @@ export class Text extends Item {
 		let width = 0;
 		for (let i = 0; i < lines.length; i++) {
 			widths[i] = textWidth(info, lines[i]);
+			if (elideLimit > 0 && lines.length === 1 && widths[i] > elideLimit + ELIDE_SLACK) {
+				lines[i] = elidedText(info, lines[i], elideLimit, this.$elide);
+				widths[i] = textWidth(info, lines[i]);
+			}
 			width = Math.max(width, widths[i]);
 		}
-		lay = { version: fonts.version, family, info, source, wrap, limit, lines, widths, width };
+		lay = { version: fonts.version, family, info, source, wrap, limit, elideLimit, lines, widths, width };
 		this.$lay = lay;
 		return lay;
 	}
@@ -2413,7 +2455,7 @@ export class Text extends Item {
 		const natural = blockMetrics(info, source, false, Infinity);
 		const laid = wrap ? blockMetrics(info, source, true, explicit) : natural;
 		let contentWidth = laid.max;
-		if (!rich && !wrap && this.$elide !== 3 && this.$elide !== 'ElideNone' && explicit > 0 && natural.max > explicit) contentWidth = elidedWidth(info, source, explicit);
+		if (!rich && !wrap && this.$elide !== 3 && this.$elide !== 'ElideNone' && explicit > 0 && natural.max > explicit + ELIDE_SLACK) contentWidth = textWidth(info, elidedText(info, source, explicit, this.$elide));
 		if (rich && explicit > 0) contentWidth = Math.max(explicit, laid.max);
 		const factor = this.$lineHeight > 0 ? this.$lineHeight : 1;
 		const step = (rich ? info.lineSpacing : info.lineHeight) * factor;
@@ -2503,6 +2545,11 @@ defineField(Text.prototype, 'elide', '$elide', toElideMode);
 defineField(Text.prototype, 'horizontalAlignment', '$hAlign', toFloat);
 defineField(Text.prototype, 'textFormat', '$format', (value) => (value === undefined || value === null ? 'PlainText' : String(value)));
 defineField(Text.prototype, 'lineHeight', '$lineHeight', toFloat);
+// True when an elide mode cut the text (a text that does not fit and does not wrap).
+defineReadOnly(Text.prototype, 'truncated', function () {
+	const lay = this.$measure();
+	return lay.elideLimit > 0 && lay.lines.length === 1 && lay.lines[0] !== lay.source;
+});
 defineReadOnly(Text.prototype, 'contentWidth', function () {
 	return this.$metrics().contentWidth;
 });
@@ -3583,7 +3630,12 @@ export class ListView extends Item {
 			last++;
 		}
 
-		this.$releaseWhere((index) => index >= first && index <= last);
+		// A row of no size in front of the view keeps its delegate: it may get its size later (the header cell of a table is 0 wide until the
+		// table has measured its columns), and a delegate that was released has its size remembered as 0 and is never asked again.
+		const firstInView = first;
+		let keep = first;
+		while (keep > 0 && this.$delegates.has(keep - 1) && this.$extentAt(keep - 1) === 0) keep--;
+		this.$releaseWhere((index) => index >= keep && index <= last);
 		// The rows of the view are built at once. The rows of the cache buffer are built from the view outwards, as much as fits
 		// in the time of a frame (Qt builds them in the background): a jump of the scroll bar then costs the rows that are seen,
 		// not all the rows of the buffer.
@@ -3640,7 +3692,7 @@ export class ListView extends Item {
 				first = builtFirst;
 				last = Math.min(last, after - 1);
 				wanted = offset + viewSpan;
-				this.$releaseWhere((index) => index >= first && index <= last);
+				this.$releaseWhere((index) => (index >= first || (index >= keep && index < firstInView)) && index <= last);
 				lazyViews.add(this);
 			}
 		} else {
@@ -4478,6 +4530,14 @@ defineContent('contentY', '$contentY');
 defineContent('contentWidth', '$contentW', '$w');
 defineContent('contentHeight', '$contentH', '$h');
 defineField(Flickable.prototype, 'interactive', '$interactive', toBool);
+// The origin of the content: 0 for a Flickable whose content starts at its top left corner. A scroll bar places its thumb with
+// `(contentY - originY) * ...`: without the property the thumb was NaN and did not follow the content.
+defineReadOnly(Flickable.prototype, 'originX', function () {
+	return 0;
+});
+defineReadOnly(Flickable.prototype, 'originY', function () {
+	return 0;
+});
 defineReadOnly(Flickable.prototype, 'atXBeginning', function () {
 	return this.$contentX <= 0;
 });
@@ -6060,6 +6120,9 @@ export class ListModel extends Item {
 		}
 		row[key] = value;
 		markReaders(this, '$rows');
+		// A binding that reads the role (`active: model.loaded`) runs before the next line, as in Qt: the view that sets a role and
+		// asks for the item that the role switches on gets it.
+		noteWrite(this, '$rows');
 		hooks.touch();
 	}
 
@@ -6096,6 +6159,8 @@ export class Repeater extends Item {
 		this.$lastModel = undefined;
 		this.$lastVersion = -1;
 		this.$lastCount = -1;
+		this.$declareSignal('itemAdded', ['index', 'item']);
+		this.$declareSignal('itemRemoved', ['index', 'item']);
 	}
 
 	itemAt(index) {
@@ -6870,6 +6935,766 @@ export function createSdlObject(typeName) {
 	return new Proxy(object, SDL_HANDLER);
 }
 
+// ----- BaseClass and BaseModel (the base types of the generated SDL objects) -----
+//
+// `Qml/imtcontrols/Base/BaseClass.qml` and `BaseModel.qml` are QML files that the desktop runs. The browser runs these classes instead
+// (a reply of a table makes thousands of SDL objects, each of them is a `BaseClass`, and as QML objects they cost seconds): the same
+// members, the same results, written once for the whole class and not once for each object. Docs/JQML/CppAnalogs.md says how they are
+// kept equal; test/sdl-base.mjs runs both and compares them. A change of one of the QML files has to be made here too.
+
+const SDL_PROPERTY_IDS = new Map();
+
+// `colorPreview` -> `m_colorPreview`
+function sdlPropertyId(key) {
+	let id = SDL_PROPERTY_IDS.get(key);
+	if (id === undefined) {
+		id = `m_${key[0].toLowerCase()}${key.slice(1)}`;
+		SDL_PROPERTY_IDS.set(key, id);
+	}
+	return id;
+}
+
+// `BaseClass._internal`: the transaction of changes and the keys that the object has removed.
+class BaseInternal {
+	constructor(base) {
+		this.$base = base;
+		this.isTransaction = false; // true while a transaction is open
+		this.countChanges = 0; // the number of changes during the transaction
+		this.changeList = [];
+		this.removed = []; // the removed keys of the object
+	}
+
+	internalModelChanged(name, sender) {
+		if (this.isTransaction) {
+			this.changeList.push({ name, sender });
+			this.countChanges++;
+			return;
+		}
+		this.$base.$emit('modelChanged', [[{ name, sender }]]);
+	}
+
+	startTransaction() {
+		if (this.isTransaction) {
+			console.error('Unable to start transaction. Error: transaction already started.');
+			return;
+		}
+		this.changeList = [];
+		this.isTransaction = true;
+	}
+
+	stopTransaction() {
+		if (!this.isTransaction) {
+			console.error('Unable to stop transaction. Error: there is no active transaction.');
+			return;
+		}
+		if (this.countChanges > 0) {
+			this.$base.$emit('modelChanged', [this.changeList]);
+			this.countChanges = 0;
+		}
+		this.isTransaction = false;
+	}
+
+	removeAt(key) {
+		const index = this.removed.indexOf(key);
+		if (index > -1) this.removed.splice(index, 1);
+	}
+
+	containsInRemoved(key) {
+		return this.removed.indexOf(key) > -1;
+	}
+}
+
+export class BaseClass extends QtObject {
+	constructor() {
+		super();
+		this.$typeName = 'BaseClass';
+		this.$baseOwner = undefined;
+		this.$enableNotifications = true;
+		this.$internal = null;
+		this.$watched = null;
+		this.$propertiesConnected = false;
+		this.$declareSignal('modelChanged', ['changeSet']);
+		this.$declareSignal('finished', []);
+		// onModelChanged of BaseClass.qml: a change of the object is a change of its owner.
+		this.$connect('modelChanged', (changeSet) => this.$passToOwner(changeSet));
+	}
+
+	$passToOwner(changeSet) {
+		const owner = this.$baseOwner;
+		if (owner && owner.enableNotifications && owner.modelChanged) {
+			if (owner._internal.isTransaction) {
+				// concat() returns a new array rather than growing this one
+				owner._internal.changeList = owner._internal.changeList.concat(changeSet);
+				owner._internal.countChanges++;
+			} else {
+				owner.modelChanged(changeSet);
+			}
+		}
+	}
+
+	// A property of the object got a new value (see `$defineCustom`): this is what `connectProperties` connects.
+	$watchProperty(name) {
+		if (this.$watched.has(name) && this.$enableNotifications) this._internal.internalModelChanged(name, this);
+	}
+
+	$onCompleted() {
+		this.connectProperties();
+	}
+
+	beginChanges() {
+		this._internal.startTransaction();
+	}
+
+	endChanges() {
+		this._internal.stopTransaction();
+	}
+
+	removeKey(key) {
+		const selfKeys = this.getProperties();
+		if (selfKeys.includes(key)) {
+			const currentVal = this[key];
+			if (currentVal !== null && typeof currentVal === 'object') {
+				if (currentVal.destroy) currentVal.destroy();
+				this[key] = null;
+			}
+		}
+		this._internal.removed.push(key);
+	}
+
+	connectProperties() {
+		if (this.$propertiesConnected) return;
+		// The properties are watched where they are written, not with a connection of a function for each of them.
+		this.$watched = new Set(this.getProperties());
+		this.$watch = BaseClass.prototype.$watchProperty;
+		this.$propertiesConnected = true;
+	}
+
+	createMe() {
+		return hooks.instantiateType('BaseClass', null);
+	}
+
+	isEqualWithModel(model) {
+		if (typeof this !== typeof model) return false;
+		const selfKeys = this.getProperties();
+		const sourceKeys = model.getProperties();
+		if (selfKeys.length !== sourceKeys.length) return false;
+		for (let i = 0; i < selfKeys.length; i++) {
+			const key = selfKeys[i];
+			if (!sourceKeys.includes(key)) return false;
+			if (typeof this[key] !== typeof model[key]) return false;
+			if (typeof this[key] === 'object') {
+				if (this[key] && this[key].isEqualWithModel) {
+					if (!this[key].isEqualWithModel(model[key])) return false;
+				} else if (this[key] !== model[key]) {
+					return false;
+				}
+			} else if (this[key] !== model[key]) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	refresh() {}
+
+	copy(item) {
+		return this.copyFrom(item);
+	}
+
+	copyMe() {
+		const obj = this.createMe();
+		obj.fromJSON(this.toJson());
+		obj.connectProperties();
+		return obj;
+	}
+
+	copyFrom(item) {
+		this.fromJSON(item.toJson());
+		return true;
+	}
+
+	copyTo(item) {
+		item.fromJSON(this.toJson());
+		return true;
+	}
+
+	createComponent(propertyId, typename) {}
+
+	createElement(propertyId, typename) {}
+
+	isArrayRequired(propertyId) {
+		return false;
+	}
+
+	areArrayElementsRequired(propertyId) {
+		return false;
+	}
+
+	isArrayValueValid(propertyId, value) {
+		if (value === null || value === undefined) return !this.isArrayRequired(propertyId);
+		if (!this.areArrayElementsRequired(propertyId)) return true;
+		if (Array.isArray(value)) {
+			for (const element of value) {
+				if (element === null || element === undefined) return false;
+			}
+		} else if (value.hasNullElements && value.hasNullElements()) {
+			return false;
+		}
+		return true;
+	}
+
+	getJSONKeyForProperty(propertyId) {
+		return propertyId;
+	}
+
+	// The properties of the SDL type: the declared ones whose name has `m_` (and `__typename`), in the order of their declaration.
+	getProperties() {
+		const list = [];
+		const names = [];
+		if (this.$custom !== null) for (const name in this.$custom) names.push(name);
+		if (this.$aliases !== undefined) for (const name of this.$aliases) names.push(name);
+		for (const key of names) {
+			if ((key.indexOf('m_') >= 0 && key !== 'owner' && key !== 's_keys' && key !== 'objectName' && key !== 'enableNotifications' && typeof this[key] !== 'function') || key === '__typename') {
+				list.push(key);
+			}
+		}
+		return list;
+	}
+
+	createFromJson(json) {
+		return this.fromJSON(json);
+	}
+
+	toJson() {
+		const list = this.getProperties();
+		let json = '{';
+		let isFirst = true;
+		for (let i = 0; i < list.length; i++) {
+			const key = list[i];
+			if (!this.isArrayValueValid(key, this[key])) return '';
+			// eslint-disable-next-line eqeqeq
+			if (this[key] == null && this._internal.containsInRemoved(key)) continue;
+			if (!isFirst) json += ',';
+			isFirst = false;
+			if (typeof this[key] === 'object') {
+				if (Array.isArray(this[key])) {
+					json += `"${this.getJSONKeyForProperty(key)}":`;
+					json += '[';
+					for (let j = 0; j < this[key].length; j++) {
+						let value = this[key][j];
+						if (j !== 0) json += ', ';
+						if (typeof value === 'string') {
+							value = JSON.stringify(value);
+							json += value;
+						} else {
+							json += value;
+						}
+					}
+					json += ']';
+				} else if (this[key] !== null) {
+					const serializedValue = this[key].toJson();
+					if (serializedValue === '') return '';
+					json += `"${this.getJSONKeyForProperty(key)}":${serializedValue}`;
+				} else {
+					json += `"${this.getJSONKeyForProperty(key)}": null`;
+				}
+			} else {
+				let value = this[key];
+				if (value === undefined) value = null;
+				let safeValue = this[key];
+				if (typeof safeValue === 'string') {
+					safeValue = safeValue.replace(/\\/g, '\u005C\u005C');
+					safeValue = safeValue.replace(/"/g, '\u005C"');
+				}
+				json += `"${this.getJSONKeyForProperty(key)}":${typeof this[key] === 'string' ? `"${safeValue}"` : value}`;
+			}
+		}
+		json += '}';
+		return json;
+	}
+
+	toGraphQL() {
+		const list = this.getProperties();
+		let graphQL = '{';
+		let isFirst = true;
+		for (let i = 0; i < list.length; i++) {
+			const key = list[i];
+			if (!this.isArrayValueValid(key, this[key])) return '';
+			// eslint-disable-next-line eqeqeq
+			if (this[key] == null && this._internal.containsInRemoved(key)) continue;
+			if (!isFirst) graphQL += ',';
+			isFirst = false;
+			if (typeof this[key] === 'object') {
+				if (Array.isArray(this[key])) {
+					graphQL += `${this.getJSONKeyForProperty(key)}:`;
+					graphQL += '[';
+					for (let j = 0; j < this[key].length; j++) {
+						if (j !== 0) graphQL += ', ';
+						if (typeof this[key][j] === 'string') {
+							let data = this[key][j];
+							data = data.replace(/\\/g, '\\\\');
+							data = data.replace(/"/g, '\\"');
+							data = data.replace(/\r/g, '\\r');
+							data = data.replace(/\n/g, '\\n');
+							data = data.replace(/\t/g, '\\t');
+							graphQL += `"${data}"`;
+						} else if (typeof this[key][j] === 'object' && this[key][j] instanceof BaseClass) {
+							graphQL += this[key][j].toGraphQL();
+						} else {
+							graphQL += this[key][j];
+						}
+					}
+					graphQL += ']';
+				} else if (this[key] !== null) {
+					const serializedValue = this[key].toGraphQL();
+					if (serializedValue === '') return '';
+					graphQL += `${this.getJSONKeyForProperty(key)}:${serializedValue}`;
+				} else {
+					graphQL += `${this.getJSONKeyForProperty(key)}:null`;
+				}
+			} else {
+				let value = this[key];
+				if (value === undefined) value = null;
+				graphQL += `${this.getJSONKeyForProperty(key)}:`;
+				if (typeof this[key] === 'string') {
+					let data = this[key];
+					data = data.replace(/\\/g, '\\\\');
+					data = data.replace(/"/g, '\\"');
+					data = data.replace(/\r/g, '\\r');
+					data = data.replace(/\n/g, '\\n');
+					data = data.replace(/\t/g, '\\t');
+					graphQL += '"';
+					graphQL += data;
+					graphQL += '"';
+				} else {
+					graphQL += value;
+				}
+			}
+		}
+		graphQL += '}';
+		return graphQL;
+	}
+
+	fromJSON(json) {
+		let obj;
+		try {
+			obj = JSON.parse(this.escapeSpecialChars(json));
+		} catch (e) {
+			console.error(e);
+			return false;
+		}
+		return this.fromObject(obj);
+	}
+
+	escapeSpecialChars(jsonString) {
+		return jsonString.replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/\t/g, '\\t').replace(/\f/g, '\\f');
+	}
+
+	fromObject(sourceObject) {
+		for (const key in sourceObject) {
+			if (!this.isArrayValueValid(sdlPropertyId(key), sourceObject[key])) return false;
+		}
+
+		this.beginChanges();
+
+		for (const objKey of this.getProperties()) {
+			const jsonKey = this.getJSONKeyForProperty(objKey);
+			if (jsonKey in sourceObject) continue;
+			if (this.isArrayRequired(objKey)) continue;
+			const currentVal = this[objKey];
+			if (currentVal !== null && typeof currentVal === 'object') {
+				if (currentVal.clear) currentVal.clear();
+				if (currentVal.destroy) currentVal.destroy();
+				this[objKey] = null;
+			}
+		}
+
+		for (const key in sourceObject) {
+			const _key = sdlPropertyId(key);
+			const value = sourceObject[key];
+			if (value === null) {
+				this[_key] = null;
+			} else if (typeof value === 'object') {
+				if (Array.isArray(value)) {
+					const component = this.createComponent(_key);
+					let model = this[_key];
+					let isNewModel = false;
+					if (model) {
+						if (model.clear) model.clear();
+					} else if (component) {
+						// The owner is attached only after filling, so filling does not report a model change
+						model = hooks.instantiateType('BaseModel', this);
+						isNewModel = true;
+					}
+					if (component) {
+						for (const sourceObjectInner of value) {
+							if (sourceObjectInner === null) {
+								model.append({ item: null });
+								continue;
+							}
+							let sourceTypename;
+							if (sourceObjectInner.__typename) sourceTypename = sourceObjectInner.__typename;
+							const obj = this.createElement(_key, sourceTypename).createObject(this);
+							if (!obj.fromObject(sourceObjectInner)) {
+								obj.destroy();
+								if (isNewModel) model.destroy();
+								this.endChanges();
+								return false;
+							}
+							model.append({ item: obj });
+							obj.owner = this;
+							obj.connectProperties();
+						}
+						if (isNewModel) {
+							this[_key] = model;
+							model.owner = this;
+						}
+					} else {
+						this[_key] = value;
+					}
+				} else {
+					let obj;
+					if (!this[_key]) {
+						let sourceTypename;
+						if (value.__typename) sourceTypename = value.__typename;
+						const component = this.createComponent(_key, sourceTypename);
+						if (component) {
+							obj = component.createObject(this);
+						} else {
+							console.log('component error', _key, sourceTypename, JSON.stringify(sourceObject));
+						}
+					} else {
+						obj = this[_key];
+					}
+					if (obj) {
+						if (!obj.fromObject(value)) {
+							this.endChanges();
+							return false;
+						}
+						this[_key] = obj;
+						obj.owner = this;
+						obj.connectProperties();
+					}
+				}
+			} else if (key !== '__typename') {
+				this[_key] = value;
+			}
+			this._internal.removeAt(_key);
+		}
+
+		this.endChanges();
+		this.$emit('finished');
+		return true;
+	}
+}
+
+Object.defineProperty(BaseClass.prototype, '_internal', {
+	get() {
+		return this.$internal === null ? (this.$internal = new BaseInternal(this)) : this.$internal;
+	},
+	enumerable: false,
+	configurable: true,
+});
+
+defineProp(
+	BaseClass.prototype,
+	'owner',
+	function () {
+		return this.$baseOwner;
+	},
+	function (value) {
+		if (same(this.$baseOwner, value)) return;
+		this.$baseOwner = value;
+		this.$update();
+		if (hooks.changed !== null && this.$chg !== undefined) hooks.changed(this, 'owner');
+	},
+	true,
+);
+defineField(BaseClass.prototype, 'enableNotifications', '$enableNotifications', (value) => Boolean(value));
+defineField(BaseClass.prototype, 'propertiesIsConnected', '$propertiesConnected', (value) => Boolean(value));
+
+// `BaseModel`: the array of an SDL object. Its rows are `{ item }`, the item is an SDL object or null.
+export class BaseModel extends ListModel {
+	constructor() {
+		super();
+		this.$typeName = 'BaseModel';
+		this.$baseOwner = undefined;
+		this.$declareSignal('finished', []);
+	}
+
+	getProperties(item) {
+		const list = [];
+		if (item === null || item === undefined) return list;
+		for (const key in item.$properties) {
+			if ((key.indexOf('m_') >= 0 && typeof item[key] !== 'function' && item[key] !== undefined && item[key] !== null) || key === '__typename') {
+				list.push(key);
+			}
+		}
+		return list;
+	}
+
+	hasNullElements() {
+		for (let i = 0; i < this.count; ++i) {
+			const item = this.get(i).item;
+			if (item === null || item === undefined) return true;
+		}
+		return false;
+	}
+
+	// The full list of an SDL item still contains null properties, they must be validated before skipping
+	getItemPropertyIds(item) {
+		return item.getProperties ? item.getProperties() : this.getProperties(item);
+	}
+
+	createGraphQlString(value) {
+		if (!/[\\"\r\n\t\b\f]/.test(value)) return `"${value}"`;
+		return `"${value.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\r/g, '\\r').replace(/\n/g, '\\n').replace(/\t/g, '\\t').replace(/[\b]/g, '\\b').replace(/\f/g, '\\f')}"`;
+	}
+
+	// Returns '' if a required array of an item is null or has null elements; scalars are not validated
+	toJson() {
+		let json = '[';
+		for (let i = 0; i < this.count; i++) {
+			if (i > 0) json += ',';
+			const item = this.get(i).item;
+			if (item === null || item === undefined) {
+				json += 'null';
+				continue;
+			}
+			const canValidate = typeof item.isArrayValueValid === 'function';
+			let separator = '{';
+			for (const key of this.getItemPropertyIds(item)) {
+				const value = item[key];
+				if (value === null || value === undefined) {
+					if (canValidate && !item.isArrayValueValid(key, value)) return '';
+					continue;
+				}
+				let serializedValue;
+				if (typeof value === 'object') {
+					if (canValidate && !item.isArrayValueValid(key, value)) return '';
+					if (Array.isArray(value)) {
+						serializedValue = '[';
+						for (let k = 0; k < value.length; k++) {
+							if (k !== 0) serializedValue += ', ';
+							serializedValue += typeof value[k] === 'string' ? JSON.stringify(value[k]) : value[k];
+						}
+						serializedValue += ']';
+					} else if (typeof value.toJson === 'function') {
+						serializedValue = value.toJson();
+						if (serializedValue === '') return '';
+					} else {
+						continue;
+					}
+				} else {
+					serializedValue = typeof value === 'string' ? JSON.stringify(value) : value;
+				}
+				json += `${separator}"${item.getJSONKeyForProperty(key)}":${serializedValue}`;
+				separator = ',';
+			}
+			json += separator === '{' ? '{}' : '}';
+		}
+		json += ']';
+		return json;
+	}
+
+	// Returns '' if a required array of an item is null or has null elements; scalars are not validated
+	toGraphQL() {
+		let graphQL = '[';
+		for (let i = 0; i < this.count; i++) {
+			if (i > 0) graphQL += ',';
+			const item = this.get(i).item;
+			if (item === null || item === undefined) {
+				graphQL += 'null';
+				continue;
+			}
+			const canValidate = typeof item.isArrayValueValid === 'function';
+			let separator = '{';
+			for (const key of this.getItemPropertyIds(item)) {
+				const value = item[key];
+				if (value === null || value === undefined) {
+					if (canValidate && !item.isArrayValueValid(key, value)) return '';
+					continue;
+				}
+				let serializedValue;
+				if (typeof value === 'object') {
+					if (canValidate && !item.isArrayValueValid(key, value)) return '';
+					if (Array.isArray(value)) {
+						serializedValue = '[';
+						for (let k = 0; k < value.length; k++) {
+							if (k !== 0) serializedValue += ', ';
+							serializedValue += typeof value[k] === 'string' ? this.createGraphQlString(value[k]) : value[k];
+						}
+						serializedValue += ']';
+					} else {
+						serializedValue = value.toGraphQL();
+						if (serializedValue === '') return '';
+					}
+				} else {
+					serializedValue = typeof value === 'string' ? this.createGraphQlString(value) : value;
+				}
+				graphQL += `${separator}${item.getJSONKeyForProperty(key)}:${serializedValue}`;
+				separator = ',';
+			}
+			graphQL += separator === '{' ? '{}' : '}';
+		}
+		graphQL += ']';
+		return graphQL;
+	}
+
+	isEqualWithModel(model) {
+		if (typeof this !== typeof model) return false;
+		if (this.count !== model.count) return false;
+		for (let i = 0; i < this.count; i++) {
+			const item1 = this.get(i).item;
+			const item2 = model.get(i).item;
+			const item1IsNull = item1 === null || item1 === undefined;
+			const item2IsNull = item2 === null || item2 === undefined;
+			if (item1IsNull !== item2IsNull) return false;
+			if (item1IsNull) continue;
+			const list1 = this.getProperties(item1);
+			const list2 = model.getProperties(item2);
+			for (let j = 0; j < list1.length; j++) {
+				const key = list1[j];
+				if (!list2.includes(key)) return false;
+				if (typeof item1[key] !== typeof item2[key]) return false;
+				if (typeof item1[key] === 'object') {
+					if (item1[key] && item1[key].isEqualWithModel) {
+						if (!item1[key].isEqualWithModel(item2[key])) return false;
+					} else if (item1[key] !== item2[key]) {
+						return false;
+					}
+				} else if (item1[key] !== item2[key]) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	copyMe() {
+		const retVal = hooks.instantiateType('BaseModel', null);
+		if (!retVal) {
+			console.debug('Unable to create copy for BaseModel. Error: Creating component is failed');
+			return null;
+		}
+		for (let i = 0; i < this.count; i++) {
+			const item = this.get(i).item;
+			retVal.addElement(item === null || item === undefined ? null : item.copyMe());
+		}
+		return retVal;
+	}
+
+	createFromJson(json) {
+		return this.fromJSON(json);
+	}
+
+	fromJSON(json) {
+		this.clear();
+		const arr = JSON.parse(json);
+		for (let i = 0; i < arr.length; i++) {
+			if (arr[i] === null) {
+				this.addElement(null);
+				continue;
+			}
+			let sourceTypename;
+			if (arr[i].__typename) sourceTypename = arr[i].__typename;
+			else continue;
+			const obj = hooks.createComponent(`${sourceTypename}.qml`).createObject(this);
+			obj.fromObject(arr[i]);
+			this.addElement(obj);
+		}
+		this.$emit('finished');
+	}
+
+	/// \deprecated! OBSOLETE function ONLY for support legacy code DO NOT USE IT! Use \c appendElement() instead.
+	addElement(element) {
+		this.insertElement(this.count, element);
+	}
+
+	appendElement(element) {
+		this.insertElement(this.count, element);
+	}
+
+	insertElement(index, element) {
+		if (element !== null && element !== undefined) {
+			element.owner = this.owner;
+			element.connectProperties();
+		}
+		this.insert(index, { item: element });
+		this.notifyOwner();
+	}
+
+	removeElement(index) {
+		if (index === undefined) index = 0;
+		this.remove(index);
+		this.notifyOwner();
+	}
+
+	// Inside the owner's beginChanges()/endChanges() the change is reported once, at the end - as in the web runtime.
+	notifyOwner() {
+		const owner = this.owner;
+		if (!owner) return;
+		if (owner._internal && owner._internal.isTransaction) owner._internal.countChanges++;
+		else owner.modelChanged([]);
+	}
+
+	getItemsCount() {
+		return this.count;
+	}
+
+	containsKey(key, index) {
+		if (index === undefined) index = 0;
+		const item = this.get(index).item;
+		return item !== null && item !== undefined && item[key] !== undefined;
+	}
+
+	getData(key, index) {
+		if (index === undefined) index = 0;
+		if (this.get(index) === undefined) return undefined;
+		const item = this.get(index).item;
+		return item === null || item === undefined ? item : item[key];
+	}
+
+	setProperty(index, propName, value) {
+		const item = this.get(index).item;
+		if (item === null || item === undefined) return;
+		if (item[propName] !== value) item[propName] = value;
+	}
+
+	swapItems(index1, index2) {
+		if (index1 < 0 || index1 >= this.count || index2 < 0 || index2 >= this.count) return false;
+		const sourceItem1 = this.get(index1).item;
+		const sourceItem2 = this.get(index2).item;
+		const item1 = sourceItem1 === null || sourceItem1 === undefined ? null : sourceItem1.copyMe();
+		const item2 = sourceItem2 === null || sourceItem2 === undefined ? null : sourceItem2.copyMe();
+		if (item1 !== null) item1.owner = this.owner;
+		if (item2 !== null) item2.owner = this.owner;
+		this.get(index1).item = item2;
+		this.get(index2).item = item1;
+		return true;
+	}
+}
+
+defineProp(
+	BaseModel.prototype,
+	'owner',
+	function () {
+		return this.$baseOwner;
+	},
+	function (value) {
+		if (same(this.$baseOwner, value)) return;
+		this.$baseOwner = value;
+		this.$update();
+		// onOwnerChanged of BaseModel.qml: the elements have the owner of the model.
+		for (let i = 0; i < this.count; ++i) {
+			const item = this.get(i).item;
+			if (item !== null && item !== undefined) item.owner = value;
+		}
+		if (hooks.changed !== null && this.$chg !== undefined) hooks.changed(this, 'owner');
+	},
+	true,
+);
+
 // ----- Settings -----
 
 // `Qt.labs.settings.Settings` backed by the browser's localStorage (a Map outside of a browser).
@@ -6943,10 +7768,11 @@ export class FileDialog extends Item {
 
 	open() {
 		if (typeof document === 'undefined') return;
+		this.$shown = true;
 		if (this.fileMode === 2) {
 			const name = typeof window !== 'undefined' && window.prompt ? window.prompt(String(this.title || 'Save file'), String(this.currentFile || '')) : null;
 			if (name === null || name === '') {
-				this.$emit('rejected');
+				this.$reject();
 				return;
 			}
 			this.$accept([name]);
@@ -6962,16 +7788,24 @@ export class FileDialog extends Item {
 		if (extensions.length > 0) input.accept = extensions.join(',');
 		input.addEventListener('change', () => {
 			const files = [...input.files];
-			if (files.length === 0) this.$emit('rejected');
+			if (files.length === 0) this.$reject();
 			else this.$accept(files);
 		});
-		input.addEventListener('cancel', () => this.$emit('rejected'));
+		input.addEventListener('cancel', () => this.$reject());
 		input.click();
 	}
 
-	close() {}
+	close() {
+		this.$shown = false;
+	}
+
+	$reject() {
+		this.$shown = false;
+		this.$emit('rejected');
+	}
 
 	$accept(files) {
+		this.$shown = false;
 		const wrapped = files.map((file) => {
 			if (typeof file === 'string') return file;
 			file.toString = () => file;
@@ -6986,6 +7820,22 @@ export class FileDialog extends Item {
 		this.$emit('accepted');
 	}
 }
+
+defineProp(
+	FileDialog.prototype,
+	'visible',
+	function () {
+		return this.$shown === true;
+	},
+	function (value) {
+		// `visible = true` shows the dialog like `open()`; Qt hides it again when a file is chosen or the choice is cancelled.
+		const shown = toBool(value);
+		if (shown === (this.$shown === true)) return;
+		this.$shown = shown;
+		if (shown) this.open();
+	},
+	true,
+);
 
 // `StackLayout`: one visible child, resized to the stack. `currentIndex` applies before the next read.
 export class StackLayout extends Item {
@@ -8952,6 +9802,8 @@ export const BUILTIN_TYPES = new Map([
 	['WebSocket', WebSocketItem],
 	['GqlModel', GqlModel],
 	['RemoteFileController', RemoteFileController],
+	['BaseClass', BaseClass],
+	['BaseModel', BaseModel],
 	['FileDialog', FileDialog],
 	['Item', Item],
 	['Rectangle', Rectangle],

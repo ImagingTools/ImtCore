@@ -466,6 +466,7 @@ export class Engine {
 		this.auditGeometry = typeof process !== "undefined" && process.env !== undefined && process.env.JQML_AUDIT_GEOMETRY === "1";
 		this.geometryMisses = [];
 		this.singletons = new Map(); // name -> { path, item }
+		this.typeEnums = new Map(); // name of a QML type -> the enums of its file
 		this.singletonEntries = new Map(); // path -> { path, item }: a singleton file is created once
 		this.fileLayers = new Map(); // file -> the names that only that file sees (see fileLayer), or null
 		this.ambiguousSingletons = new Set(); // names of singletons that several files declare
@@ -658,6 +659,8 @@ export class Engine {
 		};
 		hooks.changed = (item, name) => this.fireChanged(item, name);
 		hooks.changeSignal = (item, name) => this.defineChangeSignal(item, name);
+		hooks.instantiateType = (type, parent) => this.instantiateType(type, parent);
+		hooks.createComponent = (url, second, third) => this.createComponent(url, second, third);
 		hooks.initializeProperty = (item, name) => this.initializeProperty(item, name);
 		hooks.release = (item) => this.releaseSubtree(item);
 		hooks.breakBinding = (item, name) => this.dropBinding(item, name);
@@ -762,6 +765,7 @@ export class Engine {
 		for (const name of this.singletons.keys()) delete this.globals[name];
 		for (const name of this.jsGlobals) delete this.globals[name];
 		this.jsGlobals = [];
+		this.typeEnums.clear();
 		this.singletons.clear();
 		this.singletonEntries.clear();
 		this.fileLayers.clear();
@@ -808,9 +812,40 @@ export class Engine {
 
 	// ----- scopes and scripts -----
 
+	// The enums of a QML type are read through the name of the type, in the file of the type as well: `Type.Enum.Value` and `Type.Value`
+	// (`DocumentRepresentationController.ChangeSource.Own`). The name of a type that has enums is a global object that holds them; two
+	// files of the same name (in different modules) give one object with the enums of both.
+	setupTypeEnums() {
+		for (const [path, doc] of this.project.docs) {
+			// A document is parsed when the engine asks for its tree: only the ones that declare an enum are asked here.
+			if (typeof doc.source !== 'string' || !/^\s*enum\s+[A-Z]/m.test(doc.source)) continue;
+			if (doc.def === undefined || doc.def === null || !doc.def.enums || doc.def.enums.length === 0) continue;
+			const file = path.slice(path.lastIndexOf('/') + 1);
+			if (!file.endsWith('.qml')) continue;
+			const name = file.slice(0, -4);
+			if (!/^[A-Z]\w*$/.test(name)) continue;
+			let holder = this.typeEnums.get(name);
+			if (holder === undefined) {
+				// A global of this name that is not made here (a singleton, a built-in type, a script) stays as it is.
+				if (name in this.globals) continue;
+				holder = Object.create(null);
+				this.typeEnums.set(name, holder);
+				this.jsGlobals.push(name);
+				Object.defineProperty(this.globals, name, { value: holder, enumerable: true, configurable: true });
+			}
+			for (const e of doc.def.enums) {
+				if (!(e.name in holder)) holder[e.name] = Object.freeze({ ...e.values });
+				for (const [value, number] of Object.entries(e.values)) {
+					if (!(value in holder)) holder[value] = number;
+				}
+			}
+		}
+	}
+
 	// `pragma Singleton` types of the imported modules become global names, created on first use.
 	setupSingletons() {
 		this.ambiguousSingletons = this.findAmbiguousSingletons();
+		this.setupTypeEnums();
 		for (const [name, path] of this.project.singletons) {
 			const entry = this.singletonEntry(path);
 			this.singletons.set(name, entry);
@@ -1560,12 +1595,16 @@ export class Engine {
 			const delegate = this.repeaterDelegate(repeater);
 			const stay = delegate === null ? new Map() : this.repeaterDelegatesThatStay(repeater);
 			const kept = new Set(stay.values());
-			for (const old of repeater.$built) {
+			const removed = [];
+			for (let i = 0; i < repeater.$built.length; i++) {
+				const old = repeater.$built[i];
 				if (kept.has(old)) continue;
+				removed.push([i, old]);
 				this.releaseSubtree(old);
 				parent.$removeChild(old);
 			}
 			repeater.$built = [];
+			for (const [index, old] of removed) repeater.$emit('itemRemoved', [index, old]);
 
 			if (delegate === null) return;
 			if (count > MAX_REPEATER_COUNT) count = MAX_REPEATER_COUNT;
@@ -1587,6 +1626,7 @@ export class Engine {
 				this.placeRepeaterItems(repeater, parent, [item]);
 				repeater.$built.push(item);
 				this.runCompletedFrom(mark);
+				repeater.$emit('itemAdded', [i, item]);
 			}
 			this.indexTrack = outer;
 			parent.$update();
@@ -1618,6 +1658,7 @@ export class Engine {
 				repeater.$built.push(item);
 				parent.$update();
 				this.runCompletedFrom(mark);
+				repeater.$emit('itemAdded', [index, item]);
 				count = Math.min(modelCount(repeater.$model), MAX_REPEATER_COUNT);
 			}
 			repeater.$lastModel = repeater.$model;
@@ -2264,6 +2305,8 @@ export class Engine {
 		}
 
 		const completedHandlers = [];
+		// A type of the engine that has to do something when it is completed (BaseClass connects its properties): before the handlers of QML.
+		if (typeof item.$onCompleted === 'function') completedHandlers.push({ fn: item.$onCompleted, item, line: 0, file: '' });
 		// What the use sites of a component assign to its properties: the base file's onXChanged handlers run for it (Qt).
 		const overlayWrites = [];
 		for (let l = 0; l < chain.length; l++) {
@@ -3071,6 +3114,21 @@ export class Engine {
 		}
 	}
 
+	// An object of a type that has no QML file of its own, or none that is used (BaseModel); the parent may be null.
+	instantiateType(type, parent) {
+		const mark = this.completed.length;
+		const item = this.createItem(emptyDef(type), this.documentScope === null ? this.newScope(null, '') : this.documentScope, parent, [], undefined, 0);
+		this.runCompletedFrom(mark);
+		return item;
+	}
+
+	// The types of Qml/imtcontrols/Base that the engine implements itself: `Qt.createComponent('BaseModel.qml')` makes the type of the
+	// engine, whatever the file says (the file stays the implementation of the desktop).
+	nativeQmlType(url, byType) {
+		const name = byType ? url : (/(?:^|\/)(BaseClass|BaseModel)\.qml$/.exec(url) || [])[1];
+		return name !== undefined && (name === 'BaseClass' || name === 'BaseModel') && BUILTIN_TYPES.has(name) ? name : null;
+	}
+
 	createObject(type, parent, props) {
 		if (typeof type !== 'string') throw new QmlError('Qt.createObject needs the name of a type');
 		if (!(parent instanceof Item)) throw new QmlError('Qt.createObject needs a parent item');
@@ -3102,6 +3160,13 @@ export class Engine {
 		};
 		if (this.project === null) {
 			fail(`Cannot load '${component.$url}': no project`);
+			return component;
+		}
+		const nativeType = this.nativeQmlType(byType ? second : url, byType);
+		if (nativeType !== null) {
+			component.$def = { ...emptyDef('Component'), children: [emptyDef(nativeType)] };
+			component.$defScope = this.newScope(null, '');
+			component.$setStatus(1);
 			return component;
 		}
 		const ready = (doc) => {
@@ -3137,6 +3202,23 @@ export class Engine {
 
 	// The loaded document a URL names, or null.
 	findDocument(url) {
+		// A reply of the server builds one component per element through `Qt.createComponent('Type.qml')`; the search below walks
+		// every loaded document, so the answer is kept until a document or a module is added.
+		const project = this.project;
+		const version = project.docs.size + project.modules.size;
+		if (this.$documentCacheVersion !== version || this.$documentCacheProject !== project) {
+			this.$documentCache = new Map();
+			this.$documentCacheVersion = version;
+			this.$documentCacheProject = project;
+		}
+		const cached = this.$documentCache.get(url);
+		if (cached !== undefined) return cached;
+		const found = this.searchDocument(url);
+		this.$documentCache.set(url, found);
+		return found;
+	}
+
+	searchDocument(url) {
 		const docs = this.project.docs;
 		const exact = docs.get(this.documentPath(url));
 		if (exact !== undefined) return exact;

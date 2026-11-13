@@ -17,10 +17,10 @@ namespace imtauth
 class IUserGroupInfoProvider;
 
 /**
-	Interface for describing.
+	Common interface for security principals (users and user groups).
 	\ingroup UserBase
 */
-class IUserBaseInfo: virtual public iser::IObject
+class IPrincipal: virtual public iser::IObject
 {
 public:
 	typedef QList<QByteArray> FeatureIds;
@@ -84,6 +84,16 @@ public:
 		Set id of the user.
 	*/
 	virtual void SetId(const QByteArray& id) = 0;
+
+	/**
+		Get Windows SID of the principal.
+	*/
+	virtual QByteArray GetSid() const = 0;
+
+	/**
+		Set Windows SID of the principal.
+	*/
+	virtual void SetSid(const QByteArray& sid) = 0;
 
 	/**
 		Get name.

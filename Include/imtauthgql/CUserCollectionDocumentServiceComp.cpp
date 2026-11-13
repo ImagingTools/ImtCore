@@ -109,7 +109,7 @@ sdl::V1_0::imtauth::CUserData CUserCollectionDocumentServiceComp::OnGetUserRepre
 	response.productId = currentProductId;
 
 	// Delegated roles added by the tenant adaptation are not direct, so they do not round-trip.
-	const imtauth::IUserBaseInfo::RoleIds directRoles = userPtr->GetRoles(currentProductId);
+	const imtauth::IPrincipal::RoleIds directRoles = userPtr->GetRoles(currentProductId);
 	CAssignmentCollector collector;
 	collector.CollectUser(*effectiveUserPtr, effectiveUserPtr->GetRoles(currentProductId), directRoles, currentProductId);
 	collector.FillUser(response);
@@ -323,7 +323,7 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 		if (userData.productId){
 			productId = *userData.productId;
 		}
-		imtauth::IUserBaseInfo::RoleIds incomingRoles;
+		imtauth::IPrincipal::RoleIds incomingRoles;
 		for (const QByteArray& rid : CAssignmentCollector::GetDirectIds(userData.roles)){
 			if (shouldKeepForTenant(rolesEntity, rid)){
 				incomingRoles.append(rid);
@@ -331,8 +331,8 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 		}
 		// Delta update only for tenant-visible roles to avoid overwriting
 		// role assignments that belong to other tenants for the same product.
-		imtauth::IUserBaseInfo::RoleIds currentRoles = userPtr->GetRoles(productId);
-		imtauth::IUserBaseInfo::RoleIds finalRoles;
+		imtauth::IPrincipal::RoleIds currentRoles = userPtr->GetRoles(productId);
+		imtauth::IPrincipal::RoleIds finalRoles;
 		for (const QByteArray& cr : currentRoles){
 			if (!shouldKeepForTenant(rolesEntity, cr) || incomingRoles.contains(cr)){
 				finalRoles.append(cr);
