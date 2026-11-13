@@ -79,6 +79,14 @@ private:
 	*/
 	void RejectRequest(const QByteArray& message);
 
+	/**
+		The parsed head is a WebSocket upgrade and the server has a handler for it: the handshake is put back into the socket
+		and the socket is passed to the handler (see IWebSocketUpgradeHandler).
+		\return \c true if the connection is passed, this object does not use the socket anymore.
+	*/
+	bool StartWebSocketUpgrade();
+	void HandOverWebSocket();
+
 private:
 	CSocketThread* m_rootSocket;
 	QPointer<QTcpSocket> m_socket;

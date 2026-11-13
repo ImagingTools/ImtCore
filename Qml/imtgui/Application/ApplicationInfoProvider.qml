@@ -19,6 +19,7 @@ QtObject {
 
 	property string permissionPath: ""
 	property ApplicationInfo serverApplicationInfo: null;
+	// -1 - not known yet, 0 - the server's own port, otherwise a separate WebSocket port
 	property int webSocketPort: -1;
 	// The server is behind a reverse proxy that serves the WebSocket on the page's origin
 	property bool webSocketSameOrigin: false;
@@ -75,8 +76,12 @@ QtObject {
 
 			root.webSocketSameOrigin = sdlObject.m_webSocketSameOrigin === true;
 
+			// No webSocketUrl: WebSocket is served on the server's own (HTTP) port
 			if (sdlObject.m_webSocketUrl){
 				root.webSocketPort = sdlObject.m_webSocketUrl.m_port;
+			}
+			else{
+				root.webSocketPort = 0;
 			}
 
 			root.updated();

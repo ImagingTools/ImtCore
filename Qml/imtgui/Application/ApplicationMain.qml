@@ -232,7 +232,7 @@ Item {
 	
 	// WebSocket port, resolved from the merged GetApplicationInfo response (see
 	// ApplicationInfoProvider / CApplicationInfoControllerComp). -1 means "not known
-	// yet"; the retry Timer below re-fetches until it is.
+	// yet"; the retry Timer below re-fetches until it is. 0 means the server's own port.
 	property int webSocketPort: -1;
 
 	onWebSocketPortChanged: {
@@ -375,10 +375,11 @@ Item {
 			url.protocol = protocol
 
 			if (!shouldUseWebSocketProxy){
-				if (application.webSocketPort >= 0){
+				// Port 0: WebSocket is served on the server's own port, the URL keeps it
+				if (application.webSocketPort > 0){
 					url.port = application.webSocketPort;
 				}
-				else{
+				else if (application.webSocketPort < 0){
 					console.error("WebSocket port provider has invalid port!");
 				}
 			}

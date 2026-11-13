@@ -61,6 +61,16 @@ int CTcpServerComp::GetThreadsLimit()
 }
 
 
+imtrest::IWebSocketUpgradeHandler* CTcpServerComp::GetWebSocketUpgradeHandler()
+{
+	if (!m_webSocketUpgradeHandlerCompPtr.IsValid()){
+		return nullptr;
+	}
+
+	return m_webSocketUpgradeHandlerCompPtr.GetPtr();
+}
+
+
 CConnectionTimeoutConfig CTcpServerComp::GetConnectionTimeoutConfig() const
 {
 	CConnectionTimeoutConfig retVal;

@@ -108,6 +108,11 @@ void CSocket::OnHandleSslErrors(QList<QSslError> errorList)
 
 void CSocket::HandleReadyRead()
 {
+	// The connection is passed to the WebSocket server, see StartWebSocketUpgrade()
+	if (m_timeoutWatcherPtr == nullptr){
+		return;
+	}
+
 	if (m_timeoutWatcherPtr->IsClosing() || m_timeoutWatcherPtr->IsCloseRequested()){
 		// The client should only close the connection after the response of the timeout or of the rejection (RFC 9112,
 		// section 9.6) and should not send requests after a request that asked to close it (RFC 9112, section 9.6).
@@ -150,12 +155,35 @@ void CSocket::HandleReadyRead()
 		return;
 	}
 
+	// The head of a request that can switch to WebSocket stays restorable: the WebSocket server reads the handshake itself
+	const bool canUpgrade = m_behavior.isWebSocketUpgradeRequest && (m_rootSocket->GetWebSocketUpgradeHandler() != nullptr);
+	if (canUpgrade && (m_requestPtr->GetState() == IRequest::RS_NON_STARTED) && !m_socket->isTransactionStarted()){
+		m_socket->startTransaction();
+	}
+
 	// The request takes only its own data from the socket, so they are not kept twice and the data of the next
 	// request are not mixed with it.
 	if (!m_requestPtr->ParseDeviceData(*m_socket)){
+		if (m_socket->isTransactionStarted()){
+			m_socket->commitTransaction();
+		}
+
 		RejectRequest();
 
 		return;
+	}
+
+	if (m_socket->isTransactionStarted()){
+		// The states after the head follow RS_HEADERS_COMPLETE
+		if (m_requestPtr->GetState() < IRequest::RS_HEADERS_COMPLETE){
+			return;
+		}
+
+		if (StartWebSocketUpgrade()){
+			return;
+		}
+
+		m_socket->commitTransaction();
 	}
 
 	// The client can wait for the reaction to the head of the request before it sends the body
@@ -222,7 +250,7 @@ void CSocket::Disconnected()
 
 void CSocket::OnSendResponse(QByteArray data)
 {
-	if (!m_socket.isNull() && m_socket->isOpen()){
+	if (!m_socket.isNull() && m_socket->isOpen() && (m_timeoutWatcherPtr != nullptr)){
 		m_timeoutWatcherPtr->WriteResponse(data);
 	}
 
@@ -334,6 +362,50 @@ void CSocket::RejectRequest(const QByteArray& message)
 	m_requestPtr.Reset();
 
 	m_timeoutWatcherPtr->RejectRequest(message);
+}
+
+
+bool CSocket::StartWebSocketUpgrade()
+{
+	if (!m_behavior.isWebSocketUpgradeRequest(*m_requestPtr)){
+		return false;
+	}
+
+	// Put the handshake back into the read buffer, QWebSocketServer parses it itself
+	m_socket->rollbackTransaction();
+	m_requestPtr.Reset();
+
+	// The connection belongs to the WebSocket server from now on: nothing here watches it or writes to it
+	disconnect(m_socket.data(), nullptr, this, nullptr);
+
+	m_streamingSenderPtr.reset();
+
+	delete m_timeoutWatcherPtr;
+	m_timeoutWatcherPtr = nullptr;
+
+	// The socket may not change its thread while it is emitting readyRead()
+	QMetaObject::invokeMethod(this, &CSocket::HandOverWebSocket, Qt::QueuedConnection);
+
+	return true;
+}
+
+
+void CSocket::HandOverWebSocket()
+{
+	QTcpSocket* socketPtr = m_socket.data();
+	m_socket.clear();
+
+	if (socketPtr != nullptr){
+		// Called in the thread owning the socket, the handler moves it to its own thread
+		IWebSocketUpgradeHandler* upgradeHandlerPtr = m_rootSocket->GetWebSocketUpgradeHandler();
+		if (!upgradeHandlerPtr->HandleWebSocketUpgrade(socketPtr)){
+			socketPtr->abort();
+			socketPtr->deleteLater();
+		}
+	}
+
+	// The connection thread is not needed anymore
+	Disconnected();
 }
 
 

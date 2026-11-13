@@ -2,6 +2,11 @@
 #include <imtrest/CWebSocketServerComp.h>
 
 
+// Qt includes
+#include <QtCore/QPointer>
+#include <QtNetwork/QTcpSocket>
+#include <QtNetwork/QSslSocket>
+
 // ACF includes
 #include <istd/TDelPtr.h>
 #include <iprm/IEnableableParam.h>
@@ -195,7 +200,8 @@ void CWebSocketServerComp::OnComponentCreated()
 
 void CWebSocketServerComp::OnComponentDestroyed()
 {
-	StopServer();
+	// Not virtual: during the destruction of the wrapper the virtual call gets a wrong this (#1120)
+	CWebSocketServerComp::StopServer();
 
 	m_timer.stop();
 
@@ -236,6 +242,42 @@ IServer::ServerStatus CWebSocketServerComp::GetServerStatus() const
 	}
 
 	return SS_NOT_STARTED;
+}
+
+
+// reimplemented (imtrest::IWebSocketUpgradeHandler)
+
+bool CWebSocketServerComp::HandleWebSocketUpgrade(QTcpSocket* socketPtr)
+{
+	if (socketPtr == nullptr){
+		return false;
+	}
+
+	// The TLS backend of QSslSocket is not its child and stays in the old thread: it uses its thread only during the handshake
+	const QSslSocket* sslSocketPtr = qobject_cast<const QSslSocket*>(socketPtr);
+	if ((sslSocketPtr != nullptr) && !sslSocketPtr->isEncrypted()){
+		return false;
+	}
+
+	// Runs in the thread owning the socket: only this thread may push it to the server thread.
+	socketPtr->moveToThread(thread());
+
+	QPointer<CWebSocketServerComp> serverPtr(this);
+	QMetaObject::invokeMethod(
+				socketPtr,
+				[serverPtr, socketPtr](){
+					if (serverPtr.isNull() || !serverPtr->m_webSocketServerPtr.IsValid() || (socketPtr->state() != QAbstractSocket::ConnectedState)){
+						socketPtr->abort();
+						socketPtr->deleteLater();
+
+						return;
+					}
+
+					serverPtr->m_webSocketServerPtr->handleConnection(socketPtr);
+				},
+				Qt::QueuedConnection);
+
+	return true;
 }
 
 
@@ -305,12 +347,19 @@ bool CWebSocketServerComp::StartListening(const QHostAddress& address, quint16 p
 	}
 #endif
 
+	// Connections passed by the HTTP server (HandleWebSocketUpgrade) are served also without listening.
+	connect(m_webSocketServerPtr.GetPtr(), &QWebSocketServer::newConnection, this, &CWebSocketServerComp::HandleNewConnections);
+	connect(m_webSocketServerPtr.GetPtr(), &QWebSocketServer::acceptError, this, &CWebSocketServerComp::OnAcceptError);
+	connect(m_webSocketServerPtr.GetPtr(), &QWebSocketServer::sslErrors, this, &CWebSocketServerComp::OnSslErrors);
+
+	if (!*m_listenWebSocketPortAttrPtr){
+		SendInfoMessage(0, QStringLiteral("Web socket server does not listen on its own port"));
+
+		return true;
+	}
+
 	if (m_webSocketServerPtr->listen(address, port)){
 		SendInfoMessage(0, QStringLiteral("Web socket server successfully started on port %1").arg(port));
-
-		connect(m_webSocketServerPtr.GetPtr(), &QWebSocketServer::newConnection, this, &CWebSocketServerComp::HandleNewConnections);
-		connect(m_webSocketServerPtr.GetPtr(), &QWebSocketServer::acceptError, this, &CWebSocketServerComp::OnAcceptError);
-		connect(m_webSocketServerPtr.GetPtr(), &QWebSocketServer::sslErrors, this, &CWebSocketServerComp::OnSslErrors);
 
 		return true;
 	}

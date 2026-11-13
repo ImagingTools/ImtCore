@@ -40,6 +40,9 @@
                     <AttributeInfo Id="HttpProtocolEngine" Type="Reference" ExportId="HttpProtocolEngine">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ListenWebSocketPort" Type="Boolean" ExportId="ListenWebSocketPort">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -130,6 +133,7 @@
         <Interface InterfaceId="imtrest::IRequestServlet" ComponentId="WebSocketServlet"/>
         <Interface InterfaceId="imtrest::IResponseDispatcher" ComponentId="WebSocketServer"/>
         <Interface InterfaceId="imtrest::IServer" ComponentId="WebSocketServer"/>
+        <Interface InterfaceId="imtrest::IWebSocketUpgradeHandler" ComponentId="WebSocketServer"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="WebSocketServer"/>
     </ExportedInterfaces>
     <ExportedComponents/>
