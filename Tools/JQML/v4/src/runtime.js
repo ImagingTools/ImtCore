@@ -69,6 +69,11 @@ export function createApplication(spec, canvas, location = null) {
 	const engine = new Engine();
 	engine.lenient = spec.lenient !== false;
 	engine.incremental = spec.incremental !== false;
+	// A debug build: `?noresolve=1` runs the expressions through `with` as before, `?verify=1` runs both forms and compares them.
+	if (spec.debug === true && location && typeof location.search === 'string') {
+		if (/[?&]noresolve=1/.test(location.search)) engine.resolveNames = false;
+		if (/[?&]verify=1/.test(location.search)) engine.verifyResolution = true;
+	}
 	if (spec.maxErrors) engine.maxErrors = spec.maxErrors;
 	engine.translations = spec.translations || {};
 	engine.language = pickLanguage(spec);
