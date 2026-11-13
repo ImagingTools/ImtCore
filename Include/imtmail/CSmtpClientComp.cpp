@@ -2,6 +2,11 @@
 #include <imtmail/CSmtpClientComp.h>
 
 
+// Qt includes
+#include <QtCore/QMimeDatabase>
+#include <QtCore/QUuid>
+
+
 namespace imtmail
 {
 
@@ -9,56 +14,199 @@ namespace imtmail
 // public methods
 
 CSmtpClientComp::CSmtpClientComp()
-	:m_socketPtr(nullptr),
-	m_currentMailSendState(MS_CLOSE)
 {
+	m_threadPool.setMaxThreadCount(1);
 }
 
 
 // protected methods
 
-CSmtpClientComp::ResponseCode CSmtpClientComp::ExtractResponseCode(const QByteArray& response)
+QByteArray CSmtpClientComp::BuildMimeMessage(const ISmtpMessage& message) const
 {
-	int code = response.left(3).toInt();
-	switch (code){
-	case 220:
-		return RC_SERVICE_READY;
-	case 250:
-		return RC_OK;
-	case 334:
-		return RC_AUTHENTIFICATION_REQUEST;
-	case 235:
-		return RC_AUTHENTIFICATION_SUCCESSFUL;
-	case 354:
-		return RC_START_MAIL_INPUT;
-	case 221:
-		return RC_SERVICE_CLOSING;
-	default:
-		return RC_UNKNOWN;
+	const QByteArray lineBreak = QByteArrayLiteral("\r\n");
+	const QByteArray boundary = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+
+	QByteArray retVal;
+	retVal.append(QByteArrayLiteral("From: ") + message.GetFrom().toUtf8() + lineBreak);
+	retVal.append(QByteArrayLiteral("To: ") + message.GetTo().toUtf8() + lineBreak);
+	retVal.append(QByteArrayLiteral("Subject: ") + message.GetSubject().toUtf8() + lineBreak);
+	retVal.append(QByteArrayLiteral("MIME-Version: 1.0") + lineBreak);
+	retVal.append(QByteArrayLiteral(R"(Content-Type: multipart/mixed; boundary=")") + boundary + QByteArrayLiteral(R"(")") + lineBreak);
+	retVal.append(lineBreak);
+
+	retVal.append(QByteArrayLiteral("--") + boundary + lineBreak);
+	retVal.append(QByteArrayLiteral("Content-Type: text/plain; charset=UTF-8") + lineBreak);
+	retVal.append(QByteArrayLiteral("Content-Transfer-Encoding: base64") + lineBreak + lineBreak);
+	retVal.append(ToBase64Lines(message.GetBody().toUtf8()));
+
+	const QMimeDatabase mimeDatabase;
+	const ISmtpMessage::Attachments attachments = message.GetAttachments();
+	for (const ISmtpMessage::Attachment& attachment : attachments){
+		const QByteArray mimeType = mimeDatabase.mimeTypeForFileNameAndData(attachment.fileName, attachment.data).name().toLatin1();
+
+		QString fileName = attachment.fileName;
+		fileName.remove('"').remove('\r').remove('\n');
+
+		const QByteArray quotedName = QByteArrayLiteral(R"(")") + fileName.toUtf8() + QByteArrayLiteral(R"(")");
+
+		retVal.append(QByteArrayLiteral("--") + boundary + lineBreak);
+		retVal.append(QByteArrayLiteral("Content-Type: ") + mimeType + QByteArrayLiteral("; name=") + quotedName + lineBreak);
+		retVal.append(QByteArrayLiteral("Content-Disposition: attachment; filename=") + quotedName + lineBreak);
+		retVal.append(QByteArrayLiteral("Content-Transfer-Encoding: base64") + lineBreak + lineBreak);
+		retVal.append(ToBase64Lines(attachment.data));
 	}
+
+	retVal.append(QByteArrayLiteral("--") + boundary + QByteArrayLiteral("--") + lineBreak);
+
+	return retVal;
 }
 
 
-void CSmtpClientComp::SendCommand(const QString& command)
+QByteArray CSmtpClientComp::ToBase64Lines(const QByteArray& data) const
 {
-	if (m_textStreamPtr != nullptr){
-		*m_textStreamPtr << command << "\r\n";
-		m_textStreamPtr->flush();
+	const QByteArray encoded = data.toBase64();
+
+	QByteArray retVal;
+	for (int position = 0; position < encoded.size(); position += 76){
+		retVal.append(encoded.mid(position, 76));
+		retVal.append(QByteArrayLiteral("\r\n"));
 	}
+
+	return retVal;
 }
 
 
-void CSmtpClientComp::ClearData()
+QString CSmtpClientComp::ExtractAddress(const QString& address) const
 {
-	if (m_socketPtr){
-		m_socketPtr->disconnect();
+	const int begin = address.indexOf('<');
+	const int end = address.indexOf('>', begin);
+	if (begin < 0 || end <= begin){
+		return address.trimmed();
 	}
 
-	m_socketPtr.reset();
-	m_textStreamPtr.reset();
-	m_smtpMessagePtr.Reset();
+	return address.mid(begin + 1, end - begin - 1);
+}
 
-	m_message.clear();
+
+void CSmtpClientComp::DeliverMessage(const QString& from, const QString& to, const QByteArray& data) const
+{
+	QString error;
+	for (int attempt = 1; attempt <= *m_maxAttemptsAttrPtr; ++attempt){
+		if (m_isStopped.loadRelaxed() != 0){
+			SendWarningMessage(0, QStringLiteral("The message to '%1' was not sent, the client is stopped").arg(to), "CSmtpClientComp");
+
+			return;
+		}
+
+		if (RunSession(from, to, data, error)){
+			SendInfoMessage(0, QStringLiteral("The message to '%1' is sent").arg(to), "CSmtpClientComp");
+
+			return;
+		}
+
+		SendWarningMessage(0, QStringLiteral("Attempt %1 to send a message to '%2' failed. %3").arg(attempt).arg(to, error), "CSmtpClientComp");
+	}
+
+	SendErrorMessage(0, QStringLiteral("Failed to send a message to '%1'").arg(to), "CSmtpClientComp");
+}
+
+
+bool CSmtpClientComp::RunSession(
+			const QString& from,
+			const QString& to,
+			const QByteArray& data,
+			QString& error) const
+{
+	QByteArray user;
+	if (m_userParamCompPtr.IsValid()){
+		user = m_userParamCompPtr->GetText().toUtf8();
+	}
+	else if (m_userAttrPtr.IsValid()){
+		user = *m_userAttrPtr;
+	}
+
+	QByteArray password;
+	if (m_passwordParamCompPtr.IsValid()){
+		password = m_passwordParamCompPtr->GetText().toUtf8();
+	}
+	else if (m_passwordAttrPtr.IsValid()){
+		password = *m_passwordAttrPtr;
+	}
+
+	QSslSocket socket;
+
+	// The certificate of the server is not checked, as before.
+	socket.setPeerVerifyMode(QSslSocket::VerifyNone);
+	socket.connectToHostEncrypted(GetHost(), static_cast<quint16>(GetPort()));
+	if (!socket.waitForEncrypted(*m_timeoutAttrPtr)){
+		error = socket.errorString();
+
+		return false;
+	}
+
+	bool retVal = Exchange(socket, QByteArray(), '2', error);
+	retVal = retVal && Exchange(socket, QByteArrayLiteral("EHLO localhost"), '2', error);
+	if (!user.isEmpty()){
+		retVal = retVal && Exchange(socket, QByteArrayLiteral("AUTH LOGIN"), '3', error);
+		retVal = retVal && Exchange(socket, user.toBase64(), '3', error);
+		retVal = retVal && Exchange(socket, password.toBase64(), '2', error);
+	}
+
+	retVal = retVal && Exchange(socket, QByteArrayLiteral("MAIL FROM:<") + from.toUtf8() + '>', '2', error);
+	retVal = retVal && Exchange(socket, QByteArrayLiteral("RCPT TO:<") + to.toUtf8() + '>', '2', error);
+	retVal = retVal && Exchange(socket, QByteArrayLiteral("DATA"), '3', error);
+	retVal = retVal && Exchange(socket, data + '.', '2', error);
+	if (retVal){
+		Exchange(socket, QByteArrayLiteral("QUIT"), '2', error);
+	}
+
+	return retVal;
+}
+
+
+bool CSmtpClientComp::Exchange(
+			QSslSocket& socket,
+			const QByteArray& command,
+			char expectedReplyClass,
+			QString& error) const
+{
+	if (!command.isEmpty()){
+		socket.write(command + QByteArrayLiteral("\r\n"));
+	}
+
+	// The lines of a reply have a dash after the code, except the last one.
+	QByteArray line;
+	do{
+		while (!socket.canReadLine()){
+			if (!socket.waitForReadyRead(*m_timeoutAttrPtr)){
+				error = QStringLiteral("The server did not answer: %1").arg(socket.errorString());
+
+				return false;
+			}
+		}
+
+		line = socket.readLine();
+	} while (line.size() > 3 && line.at(3) == '-');
+
+	if (!line.startsWith(expectedReplyClass)){
+		error = QStringLiteral("Unexpected reply of the server: %1").arg(line.trimmed());
+
+		return false;
+	}
+
+	return true;
+}
+
+
+// reimplemented (icomp::CComponentBase)
+
+void CSmtpClientComp::OnComponentDestroyed()
+{
+	m_isStopped.storeRelaxed(1);
+	m_threadPool.clear();
+	m_threadPool.waitForDone();
+
+	BaseClass::OnComponentDestroyed();
 }
 
 
@@ -69,7 +217,7 @@ QString CSmtpClientComp::GetHost() const
 	if (m_hostParamCompPtr.IsValid()){
 		return m_hostParamCompPtr->GetText();
 	}
-	
+
 	if (m_hostNameAttrPtr.IsValid()){
 		return *m_hostNameAttrPtr;
 	}
@@ -82,14 +230,14 @@ int CSmtpClientComp::GetPort() const
 {
 	if (m_portParamCompPtr.IsValid()){
 		QString portStr = m_portParamCompPtr->GetText();
-		
+
 		bool ok = false;
 		int port = portStr.toInt(&ok);
 		if (ok){
 			return port;
 		}
 	}
-	
+
 	if (m_portAttrPtr.IsValid()){
 		return *m_portAttrPtr;
 	}
@@ -98,208 +246,32 @@ int CSmtpClientComp::GetPort() const
 }
 
 
-bool CSmtpClientComp::SendEmail(const ISmtpMessage& smtpMessage) const
+bool CSmtpClientComp::SendEmail(const ISmtpMessage& message) const
 {
-	if (m_currentMailSendState != MS_CLOSE){
+	const QString from = ExtractAddress(message.GetFrom());
+	const QString to = ExtractAddress(message.GetTo());
+	const QString headers = message.GetFrom() + message.GetTo() + message.GetSubject();
+	if (from.isEmpty() || to.isEmpty() || headers.contains('\r') || headers.contains('\n')){
+		SendErrorMessage(0, QStringLiteral("The message to '%1' has no sender or recipient, or has a line break in a header").arg(message.GetTo()), "CSmtpClientComp");
+
 		return false;
 	}
 
-	m_message = "To: " + smtpMessage.GetTo() + "\n";
-	m_message.append("From: " + smtpMessage.GetFrom() + "\n");
-	m_message.append("Subject: " + smtpMessage.GetSubject() + "\n");
+	if (GetHost().isEmpty() || GetPort() <= 0){
+		SendErrorMessage(0, QStringLiteral("The server of the message to '%1' is not set").arg(to), "CSmtpClientComp");
 
-	//Let's intitiate multipart MIME with cutting boundary "frontier"
-	m_message.append("MIME-Version: 1.0\n");
-	m_message.append("Content-Type: multipart/mixed; boundary=frontier\n\n");
-
-	m_message.append( "--frontier\n" );
-	m_message.append( "Content-Type: text/plain\n\n" );
-	m_message.append(smtpMessage.GetBody());
-	m_message.append("\n\n");
-	m_message.append( "--frontier--\n" );
-
-	m_message.replace( QString::fromLatin1( "\n" ), QString::fromLatin1( "\r\n" ) );
-	m_message.replace( QString::fromLatin1( "\r\n.\r\n" ),QString::fromLatin1( "\r\n..\r\n" ) );
-
-	m_currentMailSendState = MS_INIT;
-
-	m_smtpMessagePtr.MoveCastedPtr(smtpMessage.CloneMe());
-
-	QString host = GetHost();
-	int port = GetPort();
-
-	if (m_socketPtr){
-		m_socketPtr->disconnect();
+		return false;
 	}
-	m_socketPtr.reset(new QSslSocket());
 
-	connect(m_socketPtr.get(), &QSslSocket::readyRead, this, &CSmtpClientComp::OnReadyRead, Qt::DirectConnection);
-	connect(m_socketPtr.get(), &QSslSocket::connected, this, &CSmtpClientComp::OnConnected, Qt::DirectConnection);
-	connect(m_socketPtr.get(), &QSslSocket::encrypted, this, &CSmtpClientComp::OnEcrypted, Qt::DirectConnection);
-	connect(m_socketPtr.get(), &QSslSocket::stateChanged, this, &CSmtpClientComp::OnStateChanged, Qt::DirectConnection);
-	connect(m_socketPtr.get(), &QSslSocket::disconnected, this,&CSmtpClientComp::OnDisconnected, Qt::DirectConnection);
+	const QByteArray data = BuildMimeMessage(message);
 
-	m_socketPtr->connectToHostEncrypted(host, port);
-
-	if (!m_socketPtr->waitForConnected(*m_timeoutAttrPtr)){
-		qDebug() << QStringLiteral("Error during the connection establishing: %1").arg(m_socketPtr->errorString());
-	}
+	m_threadPool.start([this, from, to, data](){
+		DeliverMessage(from, to, data);
+	});
 
 	return true;
 }
 
 
-void CSmtpClientComp::OnStateChanged(QAbstractSocket::SocketState socketState)
-{
-	qDebug() << "OnStateChanged" << socketState;
-}
-
-
-void CSmtpClientComp::OnErrorReceived(QAbstractSocket::SocketError socketError)
-{
-	qDebug() << "OnErrorReceived" << socketError;
-}
-
-
-void CSmtpClientComp::OnSslErrors(const QList<QSslError>& sslErrors)
-{
-	qDebug() << "OnSslErrors" << sslErrors;
-
-	QString sslErrorsString;
-	for(const QSslError& sslError: sslErrors){
-		sslErrorsString += sslError.errorString() + "; ";
-	}
-
-	m_socketPtr->ignoreSslErrors(sslErrors);
-}
-
-
-void CSmtpClientComp::OnDisconnected()
-{
-	qDebug() << "OnDisconnected";
-}
-
-
-void CSmtpClientComp::OnConnected()
-{
-	qDebug() << "OnConnected";
-}
-
-
-void CSmtpClientComp::OnReadyRead()
-{
-	if (m_socketPtr == nullptr){
-		qDebug() << "Unable to handle 'OnReadyRead' socket is invalid";
-		return;
-	}
-
-	QByteArray response = m_socketPtr->readAll();
-	qDebug() << "Server response:" << response;
-
-	ResponseCode code = ExtractResponseCode(response);
-
-	if (m_currentMailSendState == MS_INIT && code == RC_SERVICE_READY)
-	{
-		m_textStreamPtr.reset(new QTextStream(m_socketPtr.get()));
-
-		SendCommand("EHLO localhost");
-
-		m_currentMailSendState = MS_HANDSHAKE;
-	}
-	else if (m_currentMailSendState == MS_HANDSHAKE && code == RC_OK)
-	{
-		m_socketPtr->startClientEncryption();
-		if(!m_socketPtr->waitForEncrypted(*m_timeoutAttrPtr)){
-			m_currentMailSendState = MS_CLOSE;
-		}
-
-		SendCommand("EHLO localhost");
-
-		m_currentMailSendState = MS_AUTH;
-	}
-	else if (m_currentMailSendState == MS_AUTH && code == RC_OK)
-	{
-		SendCommand("AUTH LOGIN");
-		m_currentMailSendState = MS_USER;
-	}
-	else if (m_currentMailSendState == MS_USER && code == RC_AUTHENTIFICATION_REQUEST)
-	{
-		QString user;
-		
-		if (m_userAttrPtr.IsValid()){
-			user = *m_userAttrPtr;
-		}
-		
-		if (m_userParamCompPtr.IsValid()){
-			user = m_userParamCompPtr->GetText();
-		}
-		
-		SendCommand(QByteArray().append(user.toUtf8()).toBase64());
-		m_currentMailSendState = MS_PASS;
-	}
-	else if (m_currentMailSendState == MS_PASS && code == RC_AUTHENTIFICATION_REQUEST)
-	{
-		QString password;
-		if (m_passwordAttrPtr.IsValid()){
-			password = *m_passwordAttrPtr;
-		}
-		
-		if (m_passwordParamCompPtr.IsValid()){
-			password = m_passwordParamCompPtr->GetText();
-		}
-
-		SendCommand(QByteArray().append(password.toUtf8()).toBase64());
-		m_currentMailSendState = MS_MAIL;
-	}
-	else if (m_currentMailSendState == MS_MAIL && code == RC_AUTHENTIFICATION_SUCCESSFUL)
-	{
-		if (m_smtpMessagePtr.IsValid()){
-			SendCommand(QStringLiteral("MAIL FROM:<%1>").arg(m_smtpMessagePtr->GetFrom()));
-			m_currentMailSendState = MS_RCPT;
-		}
-	}
-	else if (m_currentMailSendState == MS_RCPT && code == RC_OK)
-	{
-		if (m_smtpMessagePtr.IsValid()){
-			SendCommand(QStringLiteral("RCPT TO:<%1>").arg(m_smtpMessagePtr->GetTo()));
-			m_currentMailSendState = MS_DATA;
-		}
-	}
-	else if (m_currentMailSendState == MS_DATA && code == RC_OK)
-	{
-		SendCommand("DATA");
-		m_currentMailSendState = MS_BODY;
-	}
-	else if (m_currentMailSendState == MS_BODY && code == RC_START_MAIL_INPUT)
-	{
-		SendCommand(QStringLiteral("%1%2").arg(m_message, QStringLiteral("\r\n.")));
-
-		m_currentMailSendState = MS_QUIT;
-	}
-	else if (m_currentMailSendState == MS_QUIT && code == RC_OK)
-	{
-		SendCommand("QUIT");
-		m_currentMailSendState = MS_CLOSE;
-		SendInfoMessage(0, QStringLiteral("Message  succesfully sended"), "CSmtpClientComp");
-		m_message.clear();
-	}
-	else if (m_currentMailSendState == MS_CLOSE)
-	{
-		m_message.clear();
-	}
-	else
-	{
-		SendErrorMessage(0, QStringLiteral("Failed to send message"), "CSmtpClientComp");
-		m_currentMailSendState = MS_CLOSE;
-		m_message.clear();
-	}
-}
-
-
-void CSmtpClientComp::OnEcrypted()
-{
-	qDebug() << "OnEcrypted";
-}
-
-
 } // namespace imtmail
+
