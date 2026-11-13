@@ -6,9 +6,9 @@
 // and root of the enclosing components (delegates have a parent scope), and finally the globals
 // (Math, JSON, Date, console, Qt, Item, time).
 
-import { Animation, ANIMATION_TYPES, AnchorLine, BindingValue, BUILTIN_TYPES, COMPONENT_ENUM_VALUE, ComponentItem, Coordinate, createSdlObject, duringChange, FILE_DIALOG_MODES, flushDeclarativeFocus, getFocusItem, hooks, Item, ListModel, ListView, linkToOwner, Loader, MapItemView, modelCount, modelScopeData, modelVersion, Placeholder, POINTER_DEVICE, queueDeclarativeFocus, readRows, readUntracked, Repeater, resetFocus, setSceneActive, Stack, Timer, TRANSFORM_ORIGIN, TreeItemModel } from './items.js';
+import { Animation, ANIMATION_TYPES, AnchorLine, BindingValue, BUILTIN_TYPES, COMPONENT_ENUM_VALUE, ComponentItem, Coordinate, createSdlObject, duringChange, FILE_DIALOG_MODES, flushDeclarativeFocus, getFocusItem, hooks, Item, ListModel, ListView, linkToOwner, Loader, MapItemView, modelCount, modelScopeData, modelVersion, Placeholder, POINTER_DEVICE, queueDeclarativeFocus, readRows, readUntracked, Repeater, resetFocus, setSceneActive, Stack, TestCase, Timer, TRANSFORM_ORIGIN, TreeItemModel } from './items.js';
 import { fonts } from './fonts.js';
-import { KEY, MODIFIERS, NAMED_KEY_HANDLERS, qtKeyEvent } from './keys.js';
+import { KEY, MODIFIERS, NAMED_KEY_HANDLERS, qtKeyEvent, STANDARD_KEYS } from './keys.js';
 import { QmlError, escapeSourceBreaks, tokenize, topLevelNames } from './lexer.js';
 import { callableHandler } from './parser.js';
 import { resolveExpression } from './resolve.js';
@@ -510,6 +510,7 @@ export class Engine {
 		this.auditMode = false;
 		this.auditMisses = new Map(); // 'Type.property file:line' -> { count, reads }
 		this.timers = new Set();
+		this.shortcuts = new Set(); // the Shortcut items, in the order they were made
 		this.completed = [];
 		this.documentScope = null;
 		this.factories = new Map();
@@ -587,6 +588,11 @@ export class Engine {
 			...enumObject(QT_ENUMS),
 			...CURSOR,
 			...BRUSH_PATTERN,
+			// Qt::ShortcutContext.
+			WidgetShortcut: 0,
+			WindowShortcut: 1,
+			ApplicationShortcut: 2,
+			WidgetWithChildrenShortcut: 3,
 			...ALIGN,
 			// Qt::Edge.
 			TopEdge: 0x1,
@@ -662,6 +668,8 @@ export class Engine {
 				Null: 0, Ready: 1, Loading: 2, Error: 3,
 				AlignLeft: 1, AlignRight: 2, AlignHCenter: 4, AlignJustify: 8, AlignTop: 32, AlignBottom: 64, AlignVCenter: 128, AlignCenter: 132,
 			}),
+			// `Shortcut { sequence: StandardKey.Save }`: the numbers of QKeySequence::StandardKey.
+			StandardKey: Object.freeze(Object.fromEntries(STANDARD_KEYS.map(([name, value]) => [name, value]))),
 			Flickable: enumObject(FLICKABLE_ENUMS),
 			ListView: Object.freeze({
 				Horizontal: 1, Vertical: 2,
@@ -2139,9 +2147,32 @@ export class Engine {
 	// Delivers a key event (a DOM KeyboardEvent or alike) to the item with the active focus and up its parents. Each item
 	// offers it to its `Keys` handlers, then to its own key handling (an editor), then to its `KeyNavigation`.
 	// Returns true if the event was accepted.
+	// The Shortcut a key press activates, before the item that has the focus gets the key: the focused text editor that keeps the key for
+	// editing (see $shortcutOverride) comes first. One enabled shortcut of the sequence activates; several give `activatedAmbiguously` to
+	// the one that was made last. Returns true when a shortcut took the key.
+	activateShortcut(event) {
+		if (this.shortcuts.size === 0) return false;
+		const modifiers = event.modifiers & (MODIFIERS.ShiftModifier | MODIFIERS.ControlModifier | MODIFIERS.AltModifier | MODIFIERS.MetaModifier);
+		const focus = getFocusItem();
+		if (focus !== null && focus !== undefined && typeof focus.$shortcutOverride === 'function' && focus.$shortcutOverride(event)) return false;
+		const hits = [];
+		for (const shortcut of this.shortcuts) {
+			if (shortcut.$enabled && !shortcut.$destroyed && shortcut.$matches(event.key, modifiers)) hits.push(shortcut);
+		}
+		if (hits.length === 0) return false;
+		if (hits.length > 1) {
+			const last = hits[hits.length - 1];
+			this.guard(() => last.$emit('activatedAmbiguously'), 'Shortcut.onActivatedAmbiguously', 0);
+		} else if (!event.isAutoRepeat || hits[0].$autoRepeat) {
+			this.guard(() => hits[0].$emit('activated'), 'Shortcut.onActivated', 0);
+		}
+		return true;
+	}
+
 	dispatchKey(domEvent, pressed) {
 		const event = qtKeyEvent(domEvent);
 		const shift = (event.modifiers & MODIFIERS.ShiftModifier) !== 0;
+		if (pressed && this.activateShortcut(event)) return true;
 		for (let item = getFocusItem(); item !== null && item !== undefined; item = item.$parent) {
 			const keys = item.$keys;
 			if (keys !== undefined) {
@@ -2338,7 +2369,7 @@ export class Engine {
 		} else if (this.lenient && SILENT_TYPES.has(type)) {
 			item = new Placeholder(type);
 		} else if (builtin !== undefined) {
-			item = type === 'Timer' ? new Timer(this) : new builtin();
+			item = type === 'Timer' ? new Timer(this) : type === 'TestCase' ? new TestCase(this) : new builtin();
 		} else if (type === 'Component' && this.lenient) {
 			item = new ComponentItem();
 			item.$def = def;
@@ -2386,6 +2417,7 @@ export class Engine {
 			if (this.indexTrack !== null) this.indexTrack.push(item);
 		}
 		if (type === 'Timer') this.timers.add(item);
+		if (type === 'Shortcut') this.shortcuts.add(item);
 		if (this.lenient && type === 'Connections') {
 			item.$conn = { handlers: [], target: undefined, links: [] };
 			this.connections.add(item);
@@ -3041,7 +3073,14 @@ export class Engine {
 			return;
 		}
 		if (name === 'Keys.onPressed' || name === 'Keys.onReleased' || NAMED_KEY_HANDLERS.has(name)) {
-			const fn = this.compile('body', body, 'event', scope, item);
+			let fn;
+			if (callableHandler(body)) {
+				// `Keys.onPressed: function(event) { ... }` (Qt 6): the function expression is the handler.
+				const produce = this.compile('expr', body, '', scope, item);
+				fn = (...args) => produce.call(item).apply(item, args);
+			} else {
+				fn = this.compile('body', body, 'event', scope, item);
+			}
 			if (item.$keys === undefined) item.$keys = { pressed: [], released: [], byKey: new Map() };
 			if (name === 'Keys.onPressed') item.$keys.pressed.push(fn);
 			else if (name === 'Keys.onReleased') item.$keys.released.push(fn);
@@ -3439,6 +3478,7 @@ export class Engine {
 		}
 		item.$subs = undefined;
 		if (item.$typeName === 'Timer') this.timers.delete(item);
+		if (item.$typeName === 'Shortcut') this.shortcuts.delete(item);
 		if (item instanceof Repeater) {
 			if (item.$model instanceof ListModel) item.$model.$syncWatchers = Math.max(0, item.$model.$syncWatchers - 1);
 			this.repeaters.delete(item);
