@@ -1066,7 +1066,10 @@ export class CanvasContext {
 	}
 
 	// The arc goes clockwise from start to end, or counter-clockwise when `anticlockwise` is set (`arc(w, 0, r, 0, Math.PI / 2, true)`
-	// is three quarters of the circle); one full circle at most.
+	// is three quarters of the circle); one full circle at most. The sweep is worked out the way desktop Qt does it (read from Qt): an end
+	// that is a turn from the start is a whole circle in either direction (`arc(x, y, r, 0, 2 * Math.PI, true)`, which the nodes of a
+	// graph are drawn with, is a circle, not an arc of no length as in the HTML canvas); otherwise a counter-clockwise sweep that is
+	// positive loses a turn, a clockwise one that is negative gets one.
 	arc(cx, cy, radius, start, end, anticlockwise = false) {
 		cx = toFloat(cx);
 		cy = toFloat(cy);
@@ -1074,12 +1077,12 @@ export class CanvasContext {
 		start = toFloat(start);
 		end = toFloat(end);
 		const turn = 2 * Math.PI;
-		if (anticlockwise) {
-			if (start - end >= turn) end = start - turn;
-			else while (end > start) end -= turn;
-		} else if (end - start >= turn) end = start + turn;
-		else while (end < start) end += turn;
-		this.$ellipticArc(cx, cy, radius, radius, start, end);
+		let sweep = end - start;
+		if (Math.abs(Math.abs(sweep) - turn) < 1e-9) sweep = anticlockwise ? -turn : turn;
+		else if (anticlockwise && sweep > 0) sweep -= turn;
+		else if (!anticlockwise) while (sweep < 0) sweep += turn;
+		if (Math.abs(sweep) > turn) sweep = sweep > 0 ? turn : -turn;
+		this.$ellipticArc(cx, cy, radius, radius, start, start + sweep);
 	}
 
 	$ellipticArc(cx, cy, rx, ry, start, end) {
