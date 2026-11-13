@@ -6,6 +6,7 @@
 import { fonts } from './fonts.js';
 import { QmlError } from './lexer.js';
 import { parseQmlDocument } from './parser.js';
+import { unpackDocument } from './packed.js';
 import { BUILTIN_TYPES } from './items.js';
 import { basename, dirname, joinPath, normalizePath, resolvePath, SCRIPT_IMPORT_RE } from './util.js';
 
@@ -97,6 +98,58 @@ class LazyDocument {
 const DYNAMIC_TYPE_RE = /createObject\s*\(\s*(["'])([A-Za-z_][\w.]*)\1/g;
 const FONT_FILE_RE = /(["'])([^"'\n]+\.(?:ttf|otf|woff2?))\1/gi;
 const QML_FILE_RE = /(["'])([\w./-]+\.qml)\1/g;
+const ENUM_RE = /^\s*enum\s+[A-Z]/m;
+
+// What the project looks for in the text of a document besides its tree: the font files and the QML files it names, the types that
+// `createObject("Type")` makes, and whether it declares an enum. The compiler works it out once (see compiler/compiler.js).
+export function scanSource(source) {
+	return {
+		fonts: [...source.matchAll(FONT_FILE_RE)].map((match) => match[2]),
+		types: [...source.matchAll(DYNAMIC_TYPE_RE)].map((match) => match[2]),
+		files: [...source.matchAll(QML_FILE_RE)].map((match) => match[2]),
+		enums: ENUM_RE.test(source),
+	};
+}
+
+// The scan of a document: the one the compiler carried, or the one of its text.
+export function scanOf(doc) {
+	if (doc.scan === undefined) doc.scan = scanSource(doc.source);
+	return doc.scan;
+}
+
+// A document of a compiled application: its tree comes packed (src/packed.js) and is unpacked when the engine first asks for it,
+// there is no text. `record` is the JSON text of the packed tree, or of { error: [message, line, col] } for a document that does
+// not parse; `scan` is what scanSource found in the text.
+class CompiledDocument {
+	constructor(path, record, scan) {
+		this.path = path;
+		this.record = record;
+		this.scan = scan;
+		this.source = undefined;
+		this.parsed = false;
+		this.tree = null;
+		this.failure = null;
+	}
+
+	parse() {
+		if (this.parsed) return;
+		this.parsed = true;
+		const value = JSON.parse(this.record);
+		if (value.error !== undefined) this.failure = new QmlError(value.error[0], value.error[1], value.error[2]);
+		else this.tree = unpackDocument(value);
+		this.record = null;
+	}
+
+	get def() {
+		this.parse();
+		return this.tree;
+	}
+
+	get error() {
+		this.parse();
+		return this.failure;
+	}
+}
 
 // `Type 1.0 path/File.qml` lines of a qmldir file; singletons, internal types and other directives are ignored.
 const QMLDIR_TYPE_RE = /^(singleton\s+)?([A-Z]\w*)\s+(\d+)(?:\.(\d+))?\s+(\S+\.(?:qml|js))\s*$/;
@@ -134,6 +187,8 @@ export class Project {
 		this.importPaths = options.importPaths || [];
 		// The scripts of the documents were checked by the compiler: they are not checked again while parsing.
 		this.trusted = options.trusted === true;
+		// path -> CompiledDocument: the documents of a compiled application come without their text
+		this.compiled = new Map();
 		this.moduleDirs = new Map();
 		for (const [name, dirs] of Object.entries(options.modules || {})) {
 			this.moduleDirs.set(name, Array.isArray(dirs) ? dirs : [dirs]);
@@ -155,6 +210,11 @@ export class Project {
 		this.directoryGlobal = new Set(); // directories whose singletons are global names
 	}
 
+	// A document of a compiled application (see CompiledDocument).
+	addCompiled(path, record, scan) {
+		this.compiled.set(path, new CompiledDocument(path, record, scan));
+	}
+
 	// Loads the main document and everything it refers to. Throws a QmlError if the main file is
 	// missing or has a syntax error.
 	async load(mainPath) {
@@ -172,6 +232,7 @@ export class Project {
 	// imports would have discovered is read here from the file system instead: every module and directory qmldir,
 	// every JavaScript file and the fonts named in the sources.
 	async loadEmbedded() {
+		for (const [path, doc] of this.compiled) if (!this.docs.has(path)) this.docs.set(path, doc);
 		const files = this.fs.files;
 		if (!(files instanceof Map)) return;
 		const paths = [...files.keys()];
@@ -194,8 +255,8 @@ export class Project {
 			if (basename(path) === 'qmldir' && !moduleDirs.has(dirname(path))) await this.addDirectorySingletons(dirname(path));
 			else if (path.endsWith('.js')) await this.addScript(path);
 		}
-		for (const doc of lazy) {
-			for (const match of doc.source.matchAll(FONT_FILE_RE)) await this.addFont(resolvePath(match[2], dirname(doc.path)));
+		for (const doc of [...lazy, ...this.compiled.values()]) {
+			for (const font of scanOf(doc).fonts) await this.addFont(resolvePath(font, dirname(doc.path)));
 		}
 		while (this.pending.length > 0) await Promise.all(this.pending.splice(0));
 	}
@@ -203,6 +264,11 @@ export class Project {
 	async addDoc(path, required) {
 		const existing = this.docs.get(path);
 		if (existing) return existing;
+		const compiled = this.compiled.get(path);
+		if (compiled !== undefined) {
+			this.docs.set(path, compiled);
+			return compiled;
+		}
 		const source = await this.fs.readText(path);
 		if (source === null) {
 			if (required) throw new QmlError(`Cannot read '${path}'${this.fs.failure ? ` (${this.fs.failure})` : ''}`);
@@ -362,9 +428,9 @@ export class Project {
 				for (const child of def.children) walk(child);
 			};
 			walk(doc.def);
-			for (const match of doc.source.matchAll(DYNAMIC_TYPE_RE)) {
-				pairs.push([match[2], doc.path]);
-				if (doc.path !== this.mainPath) pairs.push([match[2], this.mainPath]);
+			for (const type of scanOf(doc).types) {
+				pairs.push([type, doc.path]);
+				if (doc.path !== this.mainPath) pairs.push([type, this.mainPath]);
 			}
 			const seen = new Set();
 			for (const [type, from] of pairs) {
@@ -375,11 +441,10 @@ export class Project {
 			}
 		}
 
-		for (const match of doc.source.matchAll(FONT_FILE_RE)) {
-			tasks.push(this.addFont(resolvePath(match[2], dir)));
-		}
+		const scan = scanOf(doc);
+		for (const font of scan.fonts) tasks.push(this.addFont(resolvePath(font, dir)));
 		// Loader.source and setSource: QML files named by a string literal.
-		for (const match of doc.source.matchAll(QML_FILE_RE)) tasks.push(this.addSingleton(resolvePath(match[2], dir)));
+		for (const file of scan.files) tasks.push(this.addSingleton(resolvePath(file, dir)));
 		await Promise.all(tasks);
 	}
 

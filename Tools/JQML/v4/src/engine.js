@@ -11,6 +11,7 @@ import { fonts } from './fonts.js';
 import { KEY, MODIFIERS, NAMED_KEY_HANDLERS, qtKeyEvent } from './keys.js';
 import { QmlError, escapeSourceBreaks, tokenize, topLevelNames } from './lexer.js';
 import { callableHandler } from './parser.js';
+import { scanOf } from './project.js';
 import { basename, dirname, hslaString, joinPath, normalizePath, parseColor, resolvePath, rgbaString, SCRIPT_IMPORT_RE } from './util.js';
 
 const MAX_COMPONENT_DEPTH = 50;
@@ -818,7 +819,7 @@ export class Engine {
 	setupTypeEnums() {
 		for (const [path, doc] of this.project.docs) {
 			// A document is parsed when the engine asks for its tree: only the ones that declare an enum are asked here.
-			if (typeof doc.source !== 'string' || !/^\s*enum\s+[A-Z]/m.test(doc.source)) continue;
+			if (!scanOf(doc).enums) continue;
 			if (doc.def === undefined || doc.def === null || !doc.def.enums || doc.def.enums.length === 0) continue;
 			const file = path.slice(path.lastIndexOf('/') + 1);
 			if (!file.endsWith('.qml')) continue;
