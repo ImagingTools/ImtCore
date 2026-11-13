@@ -196,7 +196,14 @@ class QtObject {
         }
         for(let binding = this.$bindings; binding; binding = binding.next) engine.disposeBinding(binding)
         this.$bindings = null
+        // grouped properties (anchors, font, border) are not children: their bindings would stay subscribed and keep the object
+        let groups = this.constructor.$type.groups
+        for(let i = 0; i < groups.length; i++){
+            let group = this.$v[groups[i]]
+            if(group) group.$destroyNow()
+        }
         engine.dropSubscribers(this)
+        engine.dropConnections(this)
         if(this.$parent && !(this.$parent.$f & engine.DESTROYED)) this.$setParent(null)
         this.$f |= engine.DESTROYED
         this.$disposeNative()

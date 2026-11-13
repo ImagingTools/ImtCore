@@ -4,8 +4,17 @@ const { Item } = require('./Item')
 const { ListModel } = require('../QtQml/Models/ListModel')
 const { ModelContext, modelRows, sameModel } = require('../QtQml/Models/ModelContext')
 
+const { GroupObject } = require('../Core/QtObject')
+
 const HORIZONTAL = 1
 const VERTICAL = 2
+const VISIBILITY = require('./Item').bits.VISIBILITY
+
+// ListView attached object of a delegate (QQuickItemViewAttached): the reuse signals
+class ListViewAttached extends GroupObject {}
+
+defineType(ListViewAttached, { signals: ['pooled', 'reused'] })
+ListViewAttached.$handlersOnly = true
 
 // Delegates exist only for [contentY - cacheBuffer, contentY + height + cacheBuffer], like Qt.
 class ListView extends Item {
@@ -17,6 +26,7 @@ class ListView extends Item {
         this.$sizes = []
         this.$model = null
         this.$filling = false
+        this.$pool = []               // released { item, ctx } kept for reuseItems
         engine.scheduleComponentComplete(this)
     }
 
@@ -140,7 +150,9 @@ class ListView extends Item {
             this.$model = model
             if(model instanceof ListModel) model.$addView(this)
         }
-        for(let index of Array.from(this.$entries.keys())) this.$release(index)
+        // QQuickItemViewPrivate::clear releases NotReusable
+        for(let index of Array.from(this.$entries.keys())) this.$release(index, false)
+        this.$drainPool()
         this.$sizes = []
         let count = modelRows(this.$model).count
         this.$write(ListView.COUNT, count)
@@ -170,6 +182,21 @@ class ListView extends Item {
     }
 
     $create(index, rows){
+        // QQmlDelegateModelPrivate::object: the oldest pooled item, its index and every role updated, then reused()
+        if(this.$pool.length){
+            let entry = this.$pool.shift()
+            let ctx = entry.ctx
+            ctx.$row = rows.row(index)
+            ctx.$write(ModelContext.INDEX, index)
+            ctx.$write(ModelContext.MODELDATA, rows.data(index))
+            ctx.$rowChanged(null)
+            this.$entries.set(index, entry)
+            entry.item.$culled = false
+            engine.markDirty(entry.item, VISIBILITY)
+            let attached = entry.item.$v[Item.LISTVIEW]
+            if(attached) engine.emitArgs(attached, ListViewAttached.SIGNAL_reused, [])
+            return entry.item
+        }
         let delegate = this.$v[ListView.DELEGATE]
         let ctx = new ModelContext(rows.row(index), index, rows.data(index))
         ctx.$view = this
@@ -179,11 +206,28 @@ class ListView extends Item {
         return item
     }
 
-    $release(index){
+    // QQuickItemViewPrivate::releaseItem: with reuseItems the item goes to the pool, culled, then pooled()
+    $release(index, reusable = true){
         let entry = this.$entries.get(index)
         if(!entry) return
         this.$entries.delete(index)
+        if(reusable && this.$v[ListView.REUSEITEMS]){
+            this.$pool.push(entry)
+            entry.item.$culled = true
+            engine.markDirty(entry.item, VISIBILITY)
+            let attached = entry.item.$v[Item.LISTVIEW]
+            if(attached) engine.emitArgs(attached, ListViewAttached.SIGNAL_pooled, [])
+            return
+        }
         entry.item.$releaseLater()
+    }
+
+    // QQmlDelegateModel::drainReusableItemsPool(0)
+    $drainPool(){
+        let pool = this.$pool
+        if(!pool.length) return
+        this.$pool = []
+        for(let entry of pool) entry.item.$releaseLater()
     }
 
     // QQuickItemViewPrivate::refill: the visible range first; the cacheBuffer range only on a later pass
@@ -209,12 +253,18 @@ class ListView extends Item {
             let start = withBuffer ? keepStart : position
             let end = withBuffer ? keepEnd : position + Math.max(0, this.$viewSize())
             let current = this.$v[ListView.CURRENTINDEX]
+            this.$releaseOnJump(keepStart, keepEnd, spacing, current)
+            // QQuickItemViewPrivate::refill: addVisibleItems, then removeNonVisibleItems
+            let released = []
+            // QQuickListViewPrivate::addVisibleItems: rows not built yet are estimated with averageSize
+            let average = this.$averageSize()
             let pos = 0
             let i = 0
             for(; i < count; i++){
                 let entry = this.$entries.get(i)
                 let size = this.$sizes[i]
-                let needed = pos <= end && (size === undefined || pos + size >= start)
+                let reach = size === undefined ? average : size
+                let needed = pos <= end && (size === undefined && average === 0 || pos + reach >= start)
                 let kept = pos <= keepEnd && (size === undefined || pos + size >= keepStart)
                 if(needed && !entry){
                     let item = this.$create(i, rows)
@@ -222,7 +272,7 @@ class ListView extends Item {
                     entry = this.$entries.get(i)
                     added = true
                 } else if(!kept && entry && i !== current){
-                    this.$release(i)
+                    released.push(i)
                     entry = null
                 }
                 if(entry){
@@ -230,9 +280,14 @@ class ListView extends Item {
                     size = this.$sizes[i] = vertical ? item.$v[Item.HEIGHT] : item.$v[Item.WIDTH]
                     item.$place(vertical ? Item.Y : Item.X, pos)
                 }
-                if(size === undefined) break
+                if(size === undefined){
+                    if(average === 0 || pos > keepEnd) break
+                    pos += average + spacing
+                    continue
+                }
                 pos += size + spacing
             }
+            for(let index of released) this.$release(index)
             for(let index of Array.from(this.$entries.keys())){
                 if(index >= count) this.$release(index)
             }
@@ -248,6 +303,28 @@ class ListView extends Item {
         if(!withBuffer && this.$v[ListView.CACHEBUFFER] > 0){
             if(added) this.$scheduleBuffer()
             else this.$fill(true)
+        }
+    }
+
+    // QQuickListViewPrivate::addVisibleItems: a jump of more than an item past the built ones releases them before the fill,
+    // so the fill reuses them
+    $releaseOnJump(keepStart, keepEnd, spacing, current){
+        let first = Infinity, last = -1
+        for(let index of this.$entries.keys()){
+            if(index === current) continue
+            if(index < first) first = index
+            if(index > last) last = index
+        }
+        if(last < 0) return
+        let average = this.$averageSize()
+        let pos = 0, visiblePos = 0
+        for(let k = 0; k <= last; k++){
+            if(k === first) visiblePos = pos
+            pos += (this.$sizes[k] === undefined ? average : this.$sizes[k]) + spacing
+        }
+        if(keepStart <= pos + average + spacing && keepEnd >= visiblePos - average - spacing) return
+        for(let index of Array.from(this.$entries.keys())){
+            if(index !== current) this.$release(index)
         }
     }
 
@@ -282,6 +359,10 @@ class ListView extends Item {
         let old = this.$v[id]
         super.$write(id, value)
         if(id === ListView.CURRENTINDEX && this.$v[id] !== old) this.$updateCurrentItem()
+        // QQuickListView::geometryChange drains the pool, setReuseItems(false) as well
+        else if((id === Item.WIDTH || id === Item.HEIGHT || id === ListView.REUSEITEMS) && this.$v[id] !== old && this.$pool.length){
+            if(id !== ListView.REUSEITEMS || !this.$v[id]) this.$drainPool()
+        }
     }
 
     $modelChanged(kind, index, count, roles = null){
@@ -410,4 +491,15 @@ ListView.Vertical = VERTICAL
     }
 }
 
-module.exports = { ListView }
+// The ListView attached group property of every Item, wired here because it needs ListViewAttached
+{
+    let prop = Item.$type.propByName.get('ListView')
+    prop.group = ListViewAttached
+    let id = prop.id
+    Object.defineProperty(Item.prototype, 'ListView', {
+        get(){ return this.$v[id] || (this.$v[id] = new ListViewAttached(this)) },
+        configurable: true,
+    })
+}
+
+module.exports = { ListView, ListViewAttached }

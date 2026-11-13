@@ -12,6 +12,7 @@ class TypeInfo {
         this.handlers = base ? base.handlers.slice() : []
         this.signalArgs = base ? base.signalArgs.slice() : []
         this.initial = base ? base.initial.slice() : []
+        this.groups = base ? base.groups.slice() : []   // ids of the grouped properties
     }
 
     addSignal(name, args = []){
@@ -22,6 +23,13 @@ class TypeInfo {
         this.signalArgs.push(args)
         return id
     }
+}
+
+// QObjectWrapper::method_connect: the receiver of a connection is the object of a signal, else the given this object. A
+// function, a function declared in a QML object too, has none and stays connected while the sender lives (checked in Qt 6.8)
+function ownerOf(fn, thisObject){
+    if(fn && fn.$receiver) return fn.$receiver
+    return thisObject && thisObject.$f !== undefined ? thisObject : null
 }
 
 // spec.props: { name: kindName | { kind, initial, effect, get, set, group } }
@@ -36,13 +44,16 @@ function defineSignalAccessor(Class, name, id){
             if(!facade){
                 let obj = this
                 facade = function(...args){ engine.emitArgs(obj, id, args) }
+                facade.$receiver = obj
                 facade.connect = (receiver, fn) => {
-                    if(typeof receiver === 'function') return engine.connect(obj, id, receiver, null)
-                    return engine.connect(obj, id, typeof fn === 'string' ? receiver[fn] : fn, receiver)
+                    if(typeof receiver === 'function') return engine.connect(obj, id, receiver, null, undefined, ownerOf(receiver, null))
+                    fn = typeof fn === 'string' ? receiver[fn] : fn
+                    return engine.connect(obj, id, fn, receiver, undefined, ownerOf(fn, receiver))
                 }
                 facade.disconnect = (receiver, fn) => {
-                    if(typeof receiver === 'function') return engine.disconnect(obj, id, receiver, null)
-                    return engine.disconnect(obj, id, typeof fn === 'string' ? receiver[fn] : fn, receiver)
+                    if(typeof receiver === 'function') return engine.disconnect(obj, id, receiver, null, ownerOf(receiver, null))
+                    fn = typeof fn === 'string' ? receiver[fn] : fn
+                    return engine.disconnect(obj, id, fn, receiver, ownerOf(fn, receiver))
                 }
                 facades.set(id, facade)
             }
@@ -79,6 +90,7 @@ function defineType(Class, spec = {}){
         type.props.push(prop)
         type.propByName.set(name, prop)
         type.initial.push(isGroup ? null : ('initial' in def ? def.initial : kind.initial))
+        if(isGroup) type.groups.push(id)
 
         if(isGroup){
             let Group = def.group
