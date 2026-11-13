@@ -78,12 +78,17 @@ QByteArray CWebSocketClientComp::BuildRequestEnvelope(const GqlRequestPtr& reque
 }
 
 
-IGqlClient::GqlResponsePtr CWebSocketClientComp::SendRequest(GqlRequestPtr requestPtr, imtbase::IUrlParam* /*urlParamPtr*/) const
+IGqlClient::GqlResult CWebSocketClientComp::SendRequest(GqlRequestPtr requestPtr, imtbase::IUrlParam* /*urlParamPtr*/) const
 {
+	if (!requestPtr.IsValid()){
+		return {{}, EC_INVALID_REQUEST, QStringLiteral("Request is invalid")};
+	}
 	QString key;
 	QByteArray data = BuildRequestEnvelope(requestPtr, key);
 
-	m_webSocket.sendTextMessage(data);
+	if (m_webSocket.state() != QAbstractSocket::ConnectedState || m_webSocket.sendTextMessage(data) < 0){
+		return {{}, EC_NETWORK, QStringLiteral("WebSocket request could not be sent")};
+	}
 	NetworkOperation networkOperation(100, this);
 
 	GqlResponsePtr retVal;
@@ -105,11 +110,11 @@ IGqlClient::GqlResponsePtr CWebSocketClientComp::SendRequest(GqlRequestPtr reque
 
 			m_queryDataMap.remove(key);
 
-			return retVal;
+			return {retVal, EC_NONE, {}};
 		}
 	}
 
-	return retVal;
+	return {{}, EC_TIMEOUT, QStringLiteral("WebSocket request timed out")};
 }
 
 
@@ -289,6 +294,7 @@ void CWebSocketClientComp::OnWebSocketConnected()
 	}
 
 	SetState(ST_CONNECTED);
+	m_isRetrying = false;
 
 	SendInfoMessage(0, "WebSocket connected", "CWebSocketClientComp");
 
@@ -316,7 +322,13 @@ void CWebSocketClientComp::OnWebSocketConnected()
 
 void CWebSocketClientComp::OnWebSocketDisconnected()
 {
-	SendInfoMessage(0, "WebSocket disconnected", "CWebSocketClientComp");
+	if (m_state != ST_CONNECTING){
+		SendInfoMessage(0, "WebSocket disconnected", "CWebSocketClientComp");
+	}
+	else if (!m_isRetrying){
+		SendInfoMessage(0, QStringLiteral("WebSocket server is unavailable, retrying every %1 s").arg(m_refreshTimer.interval() / 1000), "CWebSocketClientComp");
+		m_isRetrying = true;
+	}
 
 	m_connectionStatusProvider.SetConnectionStatus(imtcom::IConnectionStatusProvider::CS_DISCONNECTED);
 	m_startQueries.Reset();
@@ -358,8 +370,11 @@ void CWebSocketClientComp::OnWebSocketError(QAbstractSocket::SocketError error)
 
 void CWebSocketClientComp::OnSslErrors(const QList<QSslError>& sslErrors)
 {
-	for (const QSslError& error : sslErrors){
-		SendErrorMessage(0, QStringLiteral("SSL client error: %1").arg(error.errorString()));
+	// A retry meets the same errors again
+	if (!m_isRetrying){
+		for (const QSslError& error : sslErrors){
+			SendErrorMessage(0, QStringLiteral("SSL client error: %1").arg(error.errorString()));
+		}
 	}
 
 	m_webSocket.ignoreSslErrors(sslErrors);
@@ -537,7 +552,9 @@ void CWebSocketClientComp::EnsureWebSocketConnection()
 		}
 	}
 
-	SendInfoMessage(0, QStringLiteral("Try connect to the WebSocket-server: Host: %1; Port: %2, Protocol: %3").arg(url.host(), QString::number(url.port()), url.scheme()));
+	if (!m_isRetrying){
+		SendInfoMessage(0, QStringLiteral("Try connect to the WebSocket-server: Host: %1; Port: %2, Protocol: %3").arg(url.host(), QString::number(url.port()), url.scheme()));
+	}
 
 #if QT_VERSION >= QT_VERSION_CHECK(6,4,0)
 	QWebSocketHandshakeOptions handshakeOptions;
@@ -574,6 +591,10 @@ void CWebSocketClientComp::OpenConnection()
 
 	// open() rejects an invalid URL synchronously and emits no disconnected()
 	if (m_webSocket.state() == QAbstractSocket::UnconnectedState){
+		if (!m_isRetrying){
+			SendErrorMessage(0, QStringLiteral("The address of the WebSocket server is not valid, retrying every %1 s").arg(m_refreshTimer.interval() / 1000), "CWebSocketClientComp");
+		}
+		m_isRetrying = true;
 		SetState(ST_WAITING_RETRY);
 		m_refreshTimer.start();
 	}
@@ -608,6 +629,9 @@ void CWebSocketClientComp::ProcessConnectRequest()
 
 void CWebSocketClientComp::ProcessDisconnectRequest()
 {
+	// The next connection reports its first attempt again
+	m_isRetrying = false;
+
 	switch (m_state){
 	case ST_CONNECTING:
 		SetState(ST_DISCONNECTING);
@@ -640,6 +664,9 @@ void CWebSocketClientComp::ProcessDisconnectRequest()
 void CWebSocketClientComp::ProcessSettingsChanged()
 {
 	Q_ASSERT(QThread::currentThread() == thread());
+
+	// A new server deserves its own first attempt in the log
+	m_isRetrying = false;
 
 	switch (m_state){
 	case ST_CONNECTING:

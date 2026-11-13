@@ -329,8 +329,11 @@ public:
 
 	// reimplemented (imtauth::ITenantManager)
 	virtual QByteArrayList GetTenantIds() const override { return {m_tenantId}; }
-	virtual imtauth::ITenantInfoUniquePtr GetTenant(const QByteArray& tenantId) const override
+	virtual imtauth::ITenantInfoUniquePtr GetTenant(const QByteArray& tenantId, bool* isReadPtr = nullptr) const override
 	{
+		if (isReadPtr != nullptr){
+			*isReadPtr = !m_isLoadFailing;
+		}
 		if (m_isLoadFailing || tenantId != m_tenantId){
 			return imtauth::ITenantInfoUniquePtr();
 		}
@@ -390,8 +393,10 @@ class CRemovalFixture
 public:
 	CRemovalFixture()
 	{
+		users->InitComponent();
 		invitations->InitComponent();
 		tenants->InitComponent();
+		controller->SetRef("ObjectCollection", users);
 		controller->SetRef("InvitationCollection", invitations);
 		controller->SetRef("TenantManager", tenants);
 		controller->InitComponent();
@@ -411,11 +416,19 @@ public:
 		return invitationId;
 	}
 
+	// The removed users are stored: the removal reads each of them first
 	bool RemoveUsers(const QByteArrayList& userIds, QString& errorMessage)
 	{
+		for (const QByteArray& userId : userIds){
+			imtauth::CIdentifiableUserInfo user;
+			user.SetObjectUuid(userId);
+			users->InsertNewObject("User", QString(), QString(), &user, userId);
+		}
+
 		return controller->OnBeforeRemoveElements(userIds, imtgql::CGqlRequest(), errorMessage);
 	}
 
+	icomp::TSimSharedComponentPtr<CTestUserCollectionComp> users;
 	icomp::TSimSharedComponentPtr<CTestInvitationCollectionComp> invitations;
 	icomp::TSimSharedComponentPtr<CTestTenantManagerComp> tenants;
 	icomp::TSimSharedComponentPtr<CTestUserCollectionControllerComp> controller;

@@ -244,7 +244,7 @@ sdl::V1_0::imtauth::CGetTenantRelationshipsPayload CTenantManagerControllerComp:
 sdl::V1_0::imtauth::CGetTenantPayload CTenantManagerControllerComp::OnGetTenant(
 			const sdl::V1_0::imtauth::CGetTenantGqlRequest& getTenantRequest,
 			const ::imtgql::CGqlRequest& gqlRequest,
-			QString& /*errorMessage*/) const
+			QString& errorMessage) const
 {
 	sdl::V1_0::imtauth::CGetTenantPayload response;
 
@@ -279,9 +279,15 @@ sdl::V1_0::imtauth::CGetTenantPayload CTenantManagerControllerComp::OnGetTenant(
 		return response;
 	}
 
-	imtauth::ITenantInfoUniquePtr tenantInfoPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
+	bool isRead = false;
+	imtauth::ITenantInfoUniquePtr tenantInfoPtr = m_tenantManagerCompPtr->GetTenant(tenantId, &isRead);
 
 	if (!tenantInfoPtr.IsValid()){
+		// A failed read is an error of the request, so a caller does not take it for an absent organization
+		if (!isRead){
+			errorMessage = QStringLiteral("The organization could not be read.");
+			return response;
+		}
 		response.errorMessage = QStringLiteral("Organization not found");
 		return response;
 	}
@@ -503,13 +509,8 @@ sdl::V1_0::imtauth::CRemoveTenantPayload CTenantManagerControllerComp::OnRemoveT
 	}
 
 	QString accessError;
-	if (!HasTenantManageAccess(
-				*m_tenantManagerCompPtr.GetPtr(),
-				m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr,
-				gqlRequest,
-				tenantId,
-				QByteArrayList(),
-				accessError)){
+	const imtauth::ITenantInfoUniquePtr removedTenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
+	if (!CheckTenantRemovalAccess(gqlRequest.GetRequestContext(), removedTenantPtr.GetPtr(), accessError)){
 		response.errorMessage = accessError;
 		response.success = false;
 		return response;

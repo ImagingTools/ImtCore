@@ -23,6 +23,8 @@ public:
 	virtual void SetUserId(const QByteArray& userId) override;
 	virtual QByteArray GetProductId() const override;
 	virtual void SetProductId(const QByteArray& productId) override;
+	virtual QByteArray GetClientProductId() const override;
+	virtual void SetClientProductId(const QByteArray& clientProductId) override;
 	virtual QString GetName() const override;
 	virtual void SetName(const QString& name) override;
 	virtual QString GetDescription() const override;
@@ -55,6 +57,7 @@ private:
 	QByteArray m_id;
 	QByteArray m_userId;
 	QByteArray m_productId;
+	QByteArray m_clientProductId;
 	QString m_name;
 	QString m_description;
 	QByteArray m_tokenHash;

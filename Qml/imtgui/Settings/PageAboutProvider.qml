@@ -70,6 +70,7 @@ ParamsSetController {
 			let child = node.createDependenciesArrayElement()
 			child.m_serviceId = dependency.m_serviceId ? String(dependency.m_serviceId) : ""
 			child.m_status = dependency.m_status ? String(dependency.m_status) : "UNKNOWN"
+			child.m_credentialStatus = dependency.m_credentialStatus ? String(dependency.m_credentialStatus) : "NOT_USED"
 			child.m_applicationName = dependency.m_applicationName ? String(dependency.m_applicationName) : ""
 			child.m_version = formatVersion(dependency.m_version, dependency.m_versionKind, dependency.m_buildTime)
 

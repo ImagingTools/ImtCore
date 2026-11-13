@@ -353,10 +353,6 @@ function compile(options){
 
     }
 
-    const Enums = {
-
-    }
-
     // Filled after every module is registered. Until then type lookup must see
     // each qmldir update, so results are not memoized.
     let moduleLookupReady = false
@@ -439,6 +435,7 @@ function compile(options){
         defineProperties = []
         defineSignals = []
         defineMethods = []
+        defineEnums = {}
         connectedSignals = []
         assignProperties = []
         objectProperties = []
@@ -692,7 +689,8 @@ function compile(options){
 
         }
         qmlprop(meta) {
-            let isSignalHandlerBody = meta[2][0] === "block" || meta[2][0] === "stat" || (meta[2][1] && meta[2][1][0] === "assign")
+            // Qt also takes "Keys.onTabPressed: function(event) { ... }"
+            let isSignalHandlerBody = meta[2][0] === "block" || meta[2][0] === "stat" || meta[2][0] === "function" || (meta[2][1] && meta[2][1][0] === "assign")
             let isSignalHandlerName = false
 
             if (meta[1][0] === "dot") {
@@ -772,7 +770,58 @@ function compile(options){
             }
         }
         qmlenumdef(meta) {
-            Enums[meta[1]] = meta[2]
+            this.defineEnums[meta[1]] = meta[2]
+        }
+
+        // Enumerations of this type and its base types: enumeration name -> {value name: value}
+        getEnums() {
+            let enums = {}
+            let typeInfo = null
+            try {
+                typeInfo = this.getTypeInfo(this.extends)
+            } catch { }
+
+            if (typeInfo && typeInfo.type instanceof QmlFile) {
+                Object.assign(enums, typeInfo.type.instruction.getEnums())
+            }
+
+            return Object.assign(enums, this.defineEnums)
+        }
+
+        // What <Type>.<name> is: the values of an enumeration, the value of an enumeration or undefined
+        findEnumAttribute(name) {
+            let enums = this.getEnums()
+            if (name in enums) return enums[name]
+
+            for (let enumName in enums) {
+                if (name in enums[enumName]) return enums[enumName][name]
+            }
+
+            return undefined
+        }
+
+        // Enumerations are static fields of the class, like those of the built-in types.
+        // A singleton is reached as an instance, so it also gets getters, the inherited enumerations too.
+        getEnumsCode(isSingleton) {
+            let code = []
+            for (let enumName in this.defineEnums) {
+                code.push(`static ${enumName} = ${JSON.stringify(this.defineEnums[enumName])}`)
+                for (let valueName in this.defineEnums[enumName]) {
+                    code.push(`static ${valueName} = ${this.defineEnums[enumName][valueName]}`)
+                }
+            }
+
+            if (isSingleton) {
+                let enums = this.getEnums()
+                for (let enumName in enums) {
+                    code.push(`get ${enumName}(){return this.constructor.${enumName}}`)
+                    for (let valueName in enums[enumName]) {
+                        code.push(`get ${valueName}(){return this.constructor.${valueName}}`)
+                    }
+                }
+            }
+
+            return code.join('\n')
         }
 
         resolveImportedName(name) {
@@ -981,6 +1030,10 @@ function compile(options){
                             stat.value.add(new SourceNode(tree.info.line+1,tree.info.col,this.qmlFile.fileName,path.source))
                         } else if (tree[1] === 'context') {
                             stat.value.add(new SourceNode(tree.info.line+1,tree.info.col,this.qmlFile.fileName,'JSContext'))
+                        } else if (stat.wasDot && SingleFiles[tree[1]]) {
+                            // A type of a file without a module, <Type>.<Enumeration>: its class is global
+                            stat.value.add(new SourceNode(tree.info.line+1,tree.info.col,this.qmlFile.fileName,tree[1]))
+                            stat.dotObj = SingleFiles[tree[1]]
                         } else {
                             try {
                                 let obj = lookupGlobalName(tree[1])
@@ -1013,8 +1066,14 @@ function compile(options){
                                 }
                                 stat.dotObj = null
                             } else if (stat.dotObj instanceof QmlFile) {
-                                path = stat.dotObj.instruction.resolve(tree[2])
-                                if (path) stat.dotObj = (typeof path.obj === 'object' || typeof path.obj === 'function') ? path.obj : null
+                                let enumAttribute = stat.dotObj.instruction.findEnumAttribute(tree[2])
+                                if (enumAttribute !== undefined) {
+                                    path = enumAttribute
+                                    stat.dotObj = typeof enumAttribute === 'object' ? enumAttribute : null
+                                } else {
+                                    path = stat.dotObj.instruction.resolve(tree[2])
+                                    if (path) stat.dotObj = (typeof path.obj === 'object' || typeof path.obj === 'function') ? path.obj : null
+                                }
                             } else if (stat.dotObj instanceof Instruction) {
                                 path = stat.dotObj.resolve(tree[2])
                                 if (path) stat.dotObj = (typeof path.obj === 'object' || typeof path.obj === 'function') ? path.obj : null
@@ -1805,7 +1864,7 @@ function compile(options){
 
                         resultCode.add('\n')
 
-                        resultCode.add(`if(isRoot) {${assignProperty.value.name}.__updatePrimaryProperties();${assignProperty.value.name}.__updateProperties();${assignProperty.value.name}.__complete();${assignProperty.value.name}.__completeProperties()}`)
+                        resultCode.add(`if(isRoot) {${assignProperty.value.name}.__updatePrimaryProperties();${assignProperty.value.name}.__updateProperties();${assignProperty.value.name}.__completeRoot()}`)
 
                         resultCode.add('\n')
                         resultCode.add(`return ${assignProperty.value.name}`)
@@ -1951,8 +2010,9 @@ function compile(options){
             let typeInfo = this.getTypeInfo()
 
             for (let connectedSignal of this.connectedSignals) {
+                // Qt: onPressed runs on a press only, onPressedChanged on every change of the property
                 if (typeInfo.typeBase.isAssignableFrom(JQModules.QtQuick.MouseArea) && connectedSignal.slotName === 'onPressed') {
-                    connectedSignal.slotName = 'onPressedChanged'
+                    connectedSignal.slotName = 'onPressedEvent'
                 }
                 let names = connectedSignal.slotName.replaceAll("['", '').replaceAll("']", '').split('.')
                 let signalName = ''
@@ -2169,7 +2229,7 @@ function compile(options){
             code.add(`${this.children[0].name}.__${this.children[0].className}__${this.children[0].name}=true`)
 
             code.add('\n')
-            code.add(`if(isRoot) {${this.children[0].name}.__updatePrimaryProperties();${this.children[0].name}.__updateProperties();${this.children[0].name}.__complete();${this.children[0].name}.__completeProperties()}`)
+            code.add(`if(isRoot) {${this.children[0].name}.__updatePrimaryProperties();${this.children[0].name}.__updateProperties();${this.children[0].name}.__completeRoot()}`)
 
             code.add('\n')
             code.add(`return ${this.children[0].name}`)
@@ -2440,6 +2500,7 @@ function compile(options){
             code.add(`static cachedComponents = {}
                 static meta = Object.assign({}, ${typeInfo.path}.meta, ${meta})
                 ${baseClassMeta}
+                ${this.instruction.getEnumsCode(this.singleton)}
 
                 __removeObjectName(){removeObjectName('${this.instruction.className}')}
                 __addObjectName(){addObjectName('${this.instruction.className}')}
@@ -2485,7 +2546,7 @@ function compile(options){
 
             code.add('\n')
 
-            code.add(`if(isRoot) {${this.instruction.name}.__updatePrimaryProperties();${this.instruction.name}.__updateProperties();${this.instruction.name}.__complete();${this.instruction.name}.__completeProperties()}`)
+            code.add(`if(isRoot) {${this.instruction.name}.__updatePrimaryProperties();${this.instruction.name}.__updateProperties();${this.instruction.name}.__completeRoot()}`)
 
             code.add('\n')
             code.add(`return ${this.instruction.name}`)
@@ -2552,12 +2613,8 @@ function compile(options){
         }
 
         toCode() {
-            if(this.meta.exports.length > 1){
-                return `function(){${this.meta.source}; return {${this.meta.exports.join(',')}}}()`
-            } else {
-                return `function(){${this.meta.source}; return ${this.meta.exports.join(',')}}()`
-            }
-            
+            // As in Qt, the qualifier of a library holds its top-level names, a single one too
+            return `function(){${this.meta.source}; return {${this.meta.exports.join(',')}}}()`
         }
     }
 

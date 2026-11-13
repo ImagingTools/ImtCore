@@ -15,6 +15,33 @@ namespace imtservergql
 
 // reimplemented (imtgql::IGqlContextCreator)
 
+imtgql::IGqlContextUniquePtr CSimpleGqlContextCreatorComp::RenewGqlContext(
+			const imtgql::IGqlContext::Headers& headers,
+			bool /*isEstablished*/,
+			AuthorizationState& state,
+			ContextCreationError& error,
+			QDateTime* sessionExpiresAtPtr) const
+{
+	if (sessionExpiresAtPtr != nullptr){
+		*sessionExpiresAtPtr = QDateTime();
+	}
+
+	imtgql::IGqlContextUniquePtr gqlContextPtr = CreateGqlContext(headers, error);
+	imtgql::CGqlRequestContextManager::Clear();
+
+	state = gqlContextPtr.IsValid() ? AS_CONFIRMED : AS_UNAVAILABLE;
+
+	return gqlContextPtr;
+}
+
+
+qint64 CSimpleGqlContextCreatorComp::GetAuthorizationGeneration() const
+{
+	// Without authorization the access never changes
+	return 0;
+}
+
+
 imtgql::IGqlContextUniquePtr CSimpleGqlContextCreatorComp::CreateGqlContext(
 			const imtgql::IGqlContext::Headers& headers,
 			imtgql::IGqlContextCreator::ContextCreationError& error) const

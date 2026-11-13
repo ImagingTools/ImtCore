@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthdb/CPersonalAccessTokenDatabaseDelegateComp.h>
+#include <imtauthdb/CPersonalAccessTokenSqlPersistence.h>
 
 // Qt includes
 #include <QtCore/QDateTime>
@@ -20,12 +21,82 @@ namespace imtauthdb
 {
 
 
-QString GetSqlResourcePath(const imtdb::IDatabaseEngine& databaseEngine, const QString& fileName)
+bool CPersonalAccessTokenDatabaseDelegateComp::CreateTableIfNeeded()
 {
-	const QByteArray databaseDriverId = databaseEngine.GetDatabaseDriverId();
-	const bool isSqlite = databaseDriverId.compare(QByteArrayLiteral("QSQLITE"), Qt::CaseInsensitive) == 0;
-	const QString prefix = isSqlite ? QStringLiteral(":/SQL/SQLite/") : QStringLiteral(":/SQL/Postgres/");
-	return prefix + fileName;
+	m_isSchemaReady = false;
+	if (!BaseClass::CreateTableIfNeeded() || !m_databaseEngineCompPtr.IsValid()){
+		return false;
+	}
+	CPersonalAccessTokenSqlPersistence persistence(*m_databaseEngineCompPtr);
+	m_isSchemaReady = persistence.EnsureSchema();
+	if (!m_isSchemaReady){
+		SendErrorMessage(0, persistence.GetErrorMessage(), "Token schema migration");
+	}
+
+	return m_isSchemaReady;
+}
+
+
+bool CPersonalAccessTokenDatabaseDelegateComp::CheckSchema() const
+{
+	if (!m_isSchemaReady){
+		SendErrorMessage(0, "The token schema is not ready", "PersonalAccessTokenDatabaseDelegate");
+		return false;
+	}
+	return true;
+}
+
+
+QByteArray CPersonalAccessTokenDatabaseDelegateComp::GetSelectionQuery(
+			const QByteArray& objectId, int offset, int count, const iprm::IParamsSet* paramsPtr) const
+{
+	if (!CheckSchema()){
+		return QByteArray();
+	}
+
+	return BaseClass::GetSelectionQuery(objectId, offset, count, paramsPtr);
+}
+
+
+bool CPersonalAccessTokenDatabaseDelegateComp::RevokeToken(const QByteArray& tokenId)
+{
+	if (!CheckSchema()){
+		return false;
+	}
+	CPersonalAccessTokenSqlPersistence persistence(*m_databaseEngineCompPtr);
+	const bool result = persistence.RevokeToken(tokenId);
+	if (!result){
+		SendErrorMessage(0, persistence.GetErrorMessage(), "RevokeToken");
+	}
+	return result;
+}
+
+
+bool CPersonalAccessTokenDatabaseDelegateComp::SetTokenScopes(const QByteArray& tokenId, const QByteArrayList& scopes)
+{
+	if (!CheckSchema()){
+		return false;
+	}
+	CPersonalAccessTokenSqlPersistence persistence(*m_databaseEngineCompPtr);
+	const bool result = persistence.SetTokenScopes(tokenId, scopes);
+	if (!result){
+		SendErrorMessage(0, persistence.GetErrorMessage(), "SetTokenScopes");
+	}
+	return result;
+}
+
+
+bool CPersonalAccessTokenDatabaseDelegateComp::UpdateLastUsedAt(const QByteArray& tokenId, const QDateTime& usedAt)
+{
+	if (!CheckSchema()){
+		return false;
+	}
+	CPersonalAccessTokenSqlPersistence persistence(*m_databaseEngineCompPtr);
+	const bool result = persistence.UpdateLastUsedAt(tokenId, usedAt);
+	if (!result){
+		SendErrorMessage(0, persistence.GetErrorMessage(), "UpdateLastUsedAt");
+	}
+	return result;
 }
 
 
@@ -33,7 +104,7 @@ istd::IChangeableUniquePtr CPersonalAccessTokenDatabaseDelegateComp::CreateObjec
 		const QSqlRecord& record,
 		const iprm::IParamsSet* /*dataConfigurationPtr*/) const
 {
-	if (!m_databaseEngineCompPtr.IsValid()){
+	if (!CheckSchema() || !m_databaseEngineCompPtr.IsValid()){
 		return nullptr;
 	}
 
@@ -54,6 +125,10 @@ istd::IChangeableUniquePtr CPersonalAccessTokenDatabaseDelegateComp::CreateObjec
 	if (record.contains("UserId")){
 		const QByteArray userId = imtdb::VariantToByteArray(record.value("UserId"));
 		tokenPtr->SetUserId(userId);
+	}
+
+	if (record.contains("ClientProductId")){
+		tokenPtr->SetClientProductId(imtdb::VariantToByteArray(record.value("ClientProductId")));
 	}
 
 	if (record.contains("ProductId")){
@@ -132,7 +207,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CPersonalAccessTokenDatabaseDeleg
 			const istd::IChangeable* valuePtr,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
-	if (typeId.isEmpty() || (typeId != "PersonalAccessToken")){
+	if (!CheckSchema() || typeId.isEmpty() || (typeId != "PersonalAccessToken")){
 		return NewObjectQuery();
 	}
 
@@ -177,18 +252,21 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CPersonalAccessTokenDatabaseDeleg
 	const QString lastUsedAtSql = lastUsedAt.isEmpty() ? "NULL" : QStringLiteral("'%1'").arg(lastUsedAt);
 	const QString expiresAtSql = expiresAt.isEmpty() ? "NULL" : QStringLiteral("'%1'").arg(expiresAt);
 	const QString productIdSql = productId.isEmpty() ? "NULL" : QStringLiteral("'%1'").arg(SqlEncode(productId));
+	const QString clientProductId = QString::fromUtf8(tokenPtr->GetClientProductId());
+	const QString clientProductIdSql = clientProductId.isEmpty() ? "NULL" : QStringLiteral("'%1'").arg(SqlEncode(clientProductId));
+	const QString userIdSql = userId.isEmpty() ? "NULL" : QStringLiteral("'%1'").arg(SqlEncode(userId));
 	const QString revokedSql = revoked ? "TRUE" : "FALSE";
 
 	NewObjectQuery retVal;
 
 	retVal.query = QString(
 			"INSERT INTO \"PersonalAccessTokens\""
-			"(\"Id\", \"Name\", \"Description\", \"UserId\", \"ProductId\", \"TokenHash\", \"Scopes\", \"CreatedAt\", \"LastUsedAt\", \"ExpiresAt\", \"Revoked\") "
-			"VALUES('%1', '%2', '%3', '%4', %5, '%6', '%7', %8, %9, %10, %11);")
+			"(\"Id\", \"Name\", \"Description\", \"UserId\", \"ProductId\", \"TokenHash\", \"Scopes\", \"CreatedAt\", \"LastUsedAt\", \"ExpiresAt\", \"Revoked\", \"ClientProductId\") "
+			"VALUES('%1', '%2', '%3', %4, %5, '%6', '%7', %8, %9, %10, %11, %12);")
 		.arg(SqlEncode(QString::fromUtf8(tokenId)))
 		.arg(SqlEncode(name))
 		.arg(SqlEncode(description))
-		.arg(SqlEncode(userId))
+		.arg(userIdSql)
 		.arg(productIdSql)
 		.arg(SqlEncode(tokenHash))
 		.arg(SqlEncode(scopesStr))
@@ -196,6 +274,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CPersonalAccessTokenDatabaseDeleg
 		.arg(lastUsedAtSql)
 		.arg(expiresAtSql)
 		.arg(revokedSql)
+		.arg(clientProductIdSql)
 		.toUtf8();
 
 	return retVal;
@@ -209,6 +288,9 @@ QByteArray CPersonalAccessTokenDatabaseDelegateComp::CreateUpdateObjectQuery(
 	const imtbase::IOperationContext* /*operationContextPtr*/,
 	bool /*useExternDelegate*/) const
 {
+	if (!CheckSchema()){
+		return QByteArray();
+	}
 	const imtauth::IPersonalAccessToken* tokenPtr = dynamic_cast<const imtauth::IPersonalAccessToken*>(&object);
 	if (tokenPtr == nullptr){
 		return QByteArray();
@@ -242,29 +324,35 @@ QByteArray CPersonalAccessTokenDatabaseDelegateComp::CreateUpdateObjectQuery(
 	const QString lastUsedAtSql = lastUsedAt.isEmpty() ? "NULL" : QStringLiteral("'%1'").arg(lastUsedAt);
 	const QString expiresAtSql = expiresAt.isEmpty() ? "NULL" : QStringLiteral("'%1'").arg(expiresAt);
 	const QString productIdSql = productId.isEmpty() ? "NULL" : QStringLiteral("'%1'").arg(SqlEncode(productId));
+	const QString clientProductId = QString::fromUtf8(tokenPtr->GetClientProductId());
+	const QString clientProductIdSql = clientProductId.isEmpty() ? "NULL" : QStringLiteral("'%1'").arg(SqlEncode(clientProductId));
+	const QString userIdSql = userId.isEmpty() ? "NULL" : QStringLiteral("'%1'").arg(SqlEncode(userId));
 	const QString revokedSql = revoked ? "TRUE" : "FALSE";
 
+	// A revocation stays: a writer that read the token before it must not undo it
 	const QByteArray retVal = QString(
 		"UPDATE \"PersonalAccessTokens\" SET "
 		"\"Name\"='%1', "
 		"\"Description\"='%2', "
-		"\"UserId\"='%3', "
+		"\"UserId\"=%3, "
 		"\"ProductId\"=%4, "
 		"\"TokenHash\"='%5', "
 		"\"Scopes\"='%6', "
 		"\"LastUsedAt\"=%7, "
 		"\"ExpiresAt\"=%8, "
-		"\"Revoked\"=%9 "
-		"WHERE \"Id\"='%10';")
+		"\"Revoked\"=(\"Revoked\" OR %9), "
+		"\"ClientProductId\"=%10 "
+		"WHERE \"Id\"='%11';")
 		.arg(SqlEncode(name))
 		.arg(SqlEncode(description))
-		.arg(SqlEncode(userId))
+		.arg(userIdSql)
 		.arg(productIdSql)
 		.arg(SqlEncode(tokenHash))
 		.arg(SqlEncode(scopesStr))
 		.arg(lastUsedAtSql)
 		.arg(expiresAtSql)
 		.arg(revokedSql)
+		.arg(clientProductIdSql)
 		.arg(SqlEncode(QString::fromUtf8(objectId)))
 		.toUtf8();
 
@@ -277,7 +365,7 @@ QByteArray CPersonalAccessTokenDatabaseDelegateComp::CreateDeleteObjectsQuery(
 			const QByteArrayList& objectIds,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
-	if (objectIds.isEmpty()){
+	if (!CheckSchema() || objectIds.isEmpty()){
 		return QByteArray();
 	}
 
@@ -312,7 +400,7 @@ QByteArray CPersonalAccessTokenDatabaseDelegateComp::CreateRenameObjectQuery(
 			const QString& newObjectName,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
-	if (objectId.isEmpty() || newObjectName.isEmpty()){
+	if (!CheckSchema() || objectId.isEmpty() || newObjectName.isEmpty()){
 		return QByteArray();
 	}
 
@@ -333,7 +421,7 @@ QByteArray CPersonalAccessTokenDatabaseDelegateComp::CreateDescriptionObjectQuer
 	const QString& description,
 	const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
-	if (objectId.isEmpty()){
+	if (!CheckSchema() || objectId.isEmpty()){
 		return QByteArray();
 	}
 

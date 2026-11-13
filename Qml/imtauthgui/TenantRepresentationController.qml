@@ -35,7 +35,7 @@ DocumentRepresentationController {
 		updateTenantInput.m_documentId = documentId
 		updateTenantInput.m_tenant = representationModel
 
-		updateTenantRequest.send(updateTenantInput)
+		return updateTenantRequest.send(updateTenantInput)
 	}
 
 	// The refused change was not applied: the reason is shown and the editor returns to what the document holds

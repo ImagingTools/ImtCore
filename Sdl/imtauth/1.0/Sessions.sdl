@@ -98,12 +98,49 @@ type GetTenantFromJwtPayload {
 	tenantId: ID!
 }
 
+# Asked by the server of a product with its server token only; the access token is the proof of the session.
+input GetSessionAuthorizationInput {
+	accessToken: ID!
+	# An expired access token holds while its session lives; every other use refuses it.
+	isEstablishedSubscription: Boolean
+}
+
+enum SessionAuthorizationState {
+	COMPUTED
+	REFUSED
+	UNCHECKED
+}
+
+enum SessionRefusalReason {
+	NONE
+	# The access token expired or its session is closed: the client authenticates again.
+	REAUTHENTICATE
+	# The user is absent or disabled, or the token is no session token of it.
+	FORBIDDEN
+}
+
+type GetSessionAuthorizationPayload {
+	state: SessionAuthorizationState!
+	refusalReason: SessionRefusalReason
+	message: String
+	userId: ID
+	tenantId: ID
+	# The user computed for the product and the organization of the session, serialized as GetObjectData does.
+	userData: String
+	tenantOwnerId: ID
+	tenantCreatorId: ID
+	tenantPermissions: [ID]
+	# When the session ends, as it is known now (ISO 8601, UTC); a reason to check again, the session may be prolonged.
+	sessionExpiresAt: String
+}
+
 type Query {
 	ValidateSession (input: ValidateSessionInput): ValidateSessionPayload!
 	ValidateJwt (input: ValidateJwtInput): ValidateJwtPayload!
 	GetSession (input: GetSessionInput): GetSessionPayload!
 	GetUserFromJwt (input: GetUserFromJwtInput): GetUserFromJwtPayload!
 	GetTenantFromJwt (input: GetTenantFromJwtInput): GetTenantFromJwtPayload!
+	GetSessionAuthorization (input: GetSessionAuthorizationInput!): GetSessionAuthorizationPayload!
 }
 
 type Mutation {
@@ -112,4 +149,3 @@ type Mutation {
 	SelectTenant (input: SelectTenantInput): SelectTenantPayload!
 	RemoveSession (input: RemoveSessionInput): RemoveSessionPayload!
 }
-

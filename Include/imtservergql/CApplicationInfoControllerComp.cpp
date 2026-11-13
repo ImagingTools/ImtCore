@@ -280,6 +280,24 @@ imtsdl::TElementList<sdl::V1_0::imtapp::CServiceInfo> CApplicationInfoController
 			break;
 		}
 
+		switch (dependency.credentialStatus){
+		case imtcom::IServiceInfoProvider::CRS_VALID:
+			dependencyData.credentialStatus = sdl::V1_0::imtapp::ServerCredentialStatus::VALID;
+			break;
+		case imtcom::IServiceInfoProvider::CRS_MISSING:
+			dependencyData.credentialStatus = sdl::V1_0::imtapp::ServerCredentialStatus::MISSING;
+			break;
+		case imtcom::IServiceInfoProvider::CRS_REJECTED:
+			dependencyData.credentialStatus = sdl::V1_0::imtapp::ServerCredentialStatus::REJECTED;
+			break;
+		case imtcom::IServiceInfoProvider::CRS_UNAVAILABLE:
+			dependencyData.credentialStatus = sdl::V1_0::imtapp::ServerCredentialStatus::UNAVAILABLE;
+			break;
+		default:
+			dependencyData.credentialStatus = sdl::V1_0::imtapp::ServerCredentialStatus::NOT_USED;
+			break;
+		}
+
 		if (!dependency.applicationName.isEmpty()){
 			dependencyData.applicationName = dependency.applicationName;
 		}

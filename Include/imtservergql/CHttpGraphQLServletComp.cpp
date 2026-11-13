@@ -74,9 +74,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 	qsizetype errorPosition = -1;
 	const QByteArray requestBody = request.GetBody();
 	if (!m_lastRequest.ParseQuery(requestBody, errorPosition)){
-		qCritical() << __FILE__ << __LINE__ << QStringLiteral("Error when parsing request: '%1'; Error position: '%2'")
-														.arg(request.GetBody(),
-															 QString::number(errorPosition));
+		qCritical() << __FILE__ << __LINE__ << QStringLiteral("Error when parsing request; Error position: '%1'").arg(errorPosition);
 
 		return GenerateError(StatusCode::SC_BAD_REQUEST, QStringLiteral("Request is incorrect"), request);
 	}
@@ -114,7 +112,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 							QStringLiteral("HTTP GraphQL auth rejected (403 Forbidden) for Command-ID '%1', token %2: %3")
 									.arg(gqlCommand, maskedToken, contextError.message),
 							QStringLiteral("GraphQL - servlet"));
-				return CreateResponse(StatusCode::SC_FORBIDDEN, QByteArray(), request);
+				return CreateResponse(StatusCode::SC_FORBIDDEN, BuildGqlErrorJson(gqlCommand, contextError.message, QStringLiteral("Forbidden")), request, QByteArrayLiteral("application/json; charset=utf-8"));
 			}
 
 			SendCriticalMessage(

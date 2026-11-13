@@ -37,6 +37,18 @@ const imtlic::IFeatureInfoProvider *CUserBaseInfo::GetPermissionProvider() const
 }
 
 
+void CUserBaseInfo::SetRoleProvider(const imtauth::IRoleInfoProvider* roleProviderPtr)
+{
+	m_roleProviderPtr = roleProviderPtr;
+}
+
+
+void CUserBaseInfo::SetUserGroupProvider(const imtauth::IUserGroupInfoProvider* userGroupProviderPtr)
+{
+	m_userGroupInfoProviderPtr = userGroupProviderPtr;
+}
+
+
 const imtauth::IRoleInfoProvider* CUserBaseInfo::GetRoleProvider() const
 {
 	return m_roleProviderPtr;
@@ -146,6 +158,12 @@ IUserBaseInfo::FeatureIds CUserBaseInfo::GetPermissions(const QByteArray& produc
 	return allPermissions;
 }
 
+
+
+bool CUserBaseInfo::HasLocalPermissions(const QByteArray& productId) const
+{
+	return m_permissionsMap.contains(productId);
+}
 
 
 IUserBaseInfo::FeatureIds CUserBaseInfo::GetLocalPermissions(const QByteArray& productId) const
@@ -505,5 +523,4 @@ bool CUserBaseInfo::ResetData(CompatibilityMode /*mode*/)
 
 
 } // namespace imtauth
-
 

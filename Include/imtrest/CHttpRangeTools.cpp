@@ -178,16 +178,17 @@ qint64 CHttpRangeTools::ByteRange::GetLength() const
 
 // public static methods
 
+static const QByteArray s_contentRangeUnit("bytes ");
+
+
 bool CHttpRangeTools::ParseContentRange(const QByteArray& value, ContentRange& result)
 {
-	static const QByteArray unit("bytes ");
-
 	const QByteArray text = value.trimmed();
-	if ((text.size() <= unit.size()) || (text.left(unit.size()).toLower() != unit)){
+	if ((text.size() <= s_contentRangeUnit.size()) || (text.left(s_contentRangeUnit.size()).toLower() != s_contentRangeUnit)){
 		return false;
 	}
 
-	const QByteArray spec = text.mid(unit.size());
+	const QByteArray spec = text.mid(s_contentRangeUnit.size());
 
 	const int slashIndex = int(spec.indexOf('/'));
 	if (slashIndex < 0){

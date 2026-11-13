@@ -2,8 +2,13 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QMutex>
+#include <QtCore/QSet>
+
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
+#include <imtbase/IObjectCollectionCacheController.h>
 #include <imtclientgql/CSubscriberCompBase.h>
 
 
@@ -23,9 +28,22 @@ public:
 protected:
 	// reimplemented (imtgql::IGqlSubscriptionClient)
 	virtual void OnResponseReceived(const QByteArray& subscriptionId, const QByteArray& subscriptionData) override;
+	virtual void OnSubscriptionStatusChanged(const QByteArray& subscriptionId, const SubscriptionStatus& status, const QString& message) override;
+
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
+
+private:
+	void UpdateSourceWatched();
 
 private:
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
+
+	QSet<QByteArray> m_confirmedSubscriptionIds;
+	bool m_areSubscriptionsRegistered = false;
+	// -1 until the cache is told the first time
+	int m_watchedState = -1;
+	QMutex m_confirmedSubscriptionIdsMutex;
 };
 
 

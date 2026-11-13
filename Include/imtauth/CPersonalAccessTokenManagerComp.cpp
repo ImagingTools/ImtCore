@@ -6,6 +6,7 @@
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QRandomGenerator>
 #include <QtCore/QUuid>
+#include <QtCore/QMutexLocker>
 
 // ACF includes
 #include <istd/CChangeNotifier.h>
@@ -13,10 +14,14 @@
 // ImtCore includes
 #include <imtauth/CollectionSelection.h>
 #include <imtauth/IPersonalAccessToken.h>
+#include <imtauth/imtauth.h>
 
 
 namespace imtauth
 {
+
+
+static const qint64 s_lastUsedPrecisionSeconds = 60;
 
 
 // public methods
@@ -29,24 +34,27 @@ IPersonalAccessTokenManager::TokenCreationResult CPersonalAccessTokenManagerComp
 			const QString& name,
 			const QString& description,
 			const QByteArrayList& scopes,
-			const QDateTime& expiresAt)
+			const QDateTime& expiresAt,
+			const QByteArray& clientProductId)
 {
+	QMutexLocker locker(&m_tokensMutex);
 	TokenCreationResult result;
 	result.success = false;
 
-	if (!m_tokenCollectionCompPtr.IsValid() || !m_tokenFactoryCompPtr.IsValid()){
+	if (!CheckStorageConfiguration() || !m_tokenFactoryCompPtr.IsValid()){
 		SendErrorMessage(0, "Token collection or factory not configured", "CPersonalAccessTokenManagerComp");
 		return result;
 	}
 
-	// Notify observers that the manager state will change
-	istd::CChangeNotifier changeNotifier(this);
-
 	// Generate unique token ID
 	QByteArray tokenId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+	istd::IChangeable::ChangeSet changeSet(CF_TOKEN_CHANGED);
+	changeSet.SetChangeInfo(CN_TOKEN_ID, tokenId);
+	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 	// Generate random token value
-	QByteArray rawToken = GenerateRandomToken();
+	// The token of a server is told from a personal one by its prefix
+	QByteArray rawToken = GenerateRandomToken(clientProductId.isEmpty() ? QByteArrayLiteral("imt_pat_") : s_serverTokenPrefix);
 
 	// Compute token hash
 	QByteArray tokenHash = HashToken(rawToken);
@@ -55,12 +63,14 @@ IPersonalAccessTokenManager::TokenCreationResult CPersonalAccessTokenManagerComp
 	IPersonalAccessTokenUniquePtr tokenPtr = m_tokenFactoryCompPtr.CreateInstance();
 	if (!tokenPtr.IsValid()){
 		SendErrorMessage(0, "Failed to create token object", "CPersonalAccessTokenManagerComp");
+		changeNotifier.Abort();
 		return result;
 	}
 
 	tokenPtr->SetId(tokenId);
 	tokenPtr->SetUserId(userId);
 	tokenPtr->SetProductId(productId);
+	tokenPtr->SetClientProductId(clientProductId);
 	tokenPtr->SetName(name);
 	tokenPtr->SetDescription(description);
 	tokenPtr->SetTokenHash(tokenHash);
@@ -73,6 +83,7 @@ IPersonalAccessTokenManager::TokenCreationResult CPersonalAccessTokenManagerComp
 	QByteArray retVal = m_tokenCollectionCompPtr->InsertNewObject("PersonalAccessToken", name, description, tokenPtr.GetPtr(), tokenId);
 	if (retVal.isEmpty()){
 		SendErrorMessage(0, "Failed to store token in collection", "CPersonalAccessTokenManagerComp");
+		changeNotifier.Abort();
 		return result;
 	}
 
@@ -92,10 +103,20 @@ bool CPersonalAccessTokenManagerComp::ValidateToken(
 			QByteArray& userId,
 			QByteArray& tokenId,
 			QByteArrayList& scopes,
-			QByteArray* productIdPtr) const
+			QByteArray* productIdPtr,
+			QByteArray* clientProductIdPtr,
+			bool* isCheckFailedPtr) const
 {
+	QMutexLocker locker(m_tokenPersistenceCompPtr.IsValid() ? nullptr : &m_tokensMutex);
+	if (isCheckFailedPtr != nullptr){
+		*isCheckFailedPtr = false;
+	}
+
 	if (!m_tokenCollectionCompPtr.IsValid()){
 		SendErrorMessage(0, "Token collection not configured", "CPersonalAccessTokenManagerComp");
+		if (isCheckFailedPtr != nullptr){
+			*isCheckFailedPtr = true;
+		}
 		return false;
 	}
 
@@ -103,12 +124,23 @@ bool CPersonalAccessTokenManagerComp::ValidateToken(
 	QByteArray tokenHash = HashToken(rawToken);
 
 	// Find token by hash: the database selects the candidates, the comparison below decides
+	bool isRead = false;
 	const imtbase::ICollectionInfo::Ids tokenIds = CollectionSelection::SelectIds(
-				*m_tokenCollectionCompPtr, CollectionSelection::ColumnEquals("TokenHash", tokenHash), {"TokenHash"});
+				*m_tokenCollectionCompPtr, CollectionSelection::ColumnEquals("TokenHash", tokenHash), {"TokenHash"}, &isRead);
+	if (!isRead){
+		if (isCheckFailedPtr != nullptr){
+			*isCheckFailedPtr = true;
+		}
+		return false;
+	}
+
 	for (const QByteArray& currentTokenId : std::as_const(tokenIds)){
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (!m_tokenCollectionCompPtr->GetObjectData(currentTokenId, dataPtr)){
-			continue;
+			if (isCheckFailedPtr != nullptr){
+				*isCheckFailedPtr = true;
+			}
+			return false;
 		}
 
 		IPersonalAccessToken* tokenPtr = dynamic_cast<IPersonalAccessToken*>(dataPtr.GetPtr());
@@ -145,6 +177,9 @@ bool CPersonalAccessTokenManagerComp::ValidateToken(
 		if (productIdPtr != nullptr){
 			*productIdPtr = tokenPtr->GetProductId();
 		}
+		if (clientProductIdPtr != nullptr){
+			*clientProductIdPtr = tokenPtr->GetClientProductId();
+		}
 
 		return true;
 	}
@@ -155,8 +190,27 @@ bool CPersonalAccessTokenManagerComp::ValidateToken(
 }
 
 
+QByteArrayList CPersonalAccessTokenManagerComp::GetServerTokenIds(const QByteArray& clientProductId, bool* isReadPtr) const
+{
+	QMutexLocker locker(m_tokenPersistenceCompPtr.IsValid() ? nullptr : &m_tokensMutex);
+	if (isReadPtr != nullptr){
+		*isReadPtr = m_tokenCollectionCompPtr.IsValid();
+	}
+
+	if (!m_tokenCollectionCompPtr.IsValid() || clientProductId.isEmpty()){
+		return QByteArrayList();
+	}
+
+	const imtbase::ICollectionInfo::Ids tokenIds = CollectionSelection::SelectIds(
+				*m_tokenCollectionCompPtr, CollectionSelection::ColumnEquals("ClientProductId", clientProductId), {"ClientProductId"}, isReadPtr);
+
+	return QByteArrayList(tokenIds.cbegin(), tokenIds.cend());
+}
+
+
 QByteArrayList CPersonalAccessTokenManagerComp::GetTokenIds(const QByteArray& userId) const
 {
+	QMutexLocker locker(m_tokenPersistenceCompPtr.IsValid() ? nullptr : &m_tokensMutex);
 	QByteArrayList result;
 
 	if (!m_tokenCollectionCompPtr.IsValid()){
@@ -183,6 +237,7 @@ QByteArrayList CPersonalAccessTokenManagerComp::GetTokenIds(const QByteArray& us
 
 IPersonalAccessTokenSharedPtr CPersonalAccessTokenManagerComp::GetToken(const QByteArray& tokenId) const
 {
+	QMutexLocker locker(m_tokenPersistenceCompPtr.IsValid() ? nullptr : &m_tokensMutex);
 	if (!m_tokenCollectionCompPtr.IsValid()){
 		SendErrorMessage(0, "Token collection not configured", "CPersonalAccessTokenManagerComp");
 		return nullptr;
@@ -214,6 +269,21 @@ IPersonalAccessTokenSharedPtr CPersonalAccessTokenManagerComp::GetToken(const QB
 
 bool CPersonalAccessTokenManagerComp::RevokeToken(const QByteArray& tokenId)
 {
+	QMutexLocker locker(&m_tokensMutex);
+	if (!CheckStorageConfiguration()){
+		return false;
+	}
+	istd::IChangeable::ChangeSet changeSet(CF_TOKEN_CHANGED);
+	changeSet.SetChangeInfo(CN_TOKEN_ID, tokenId);
+	istd::CChangeNotifier changeNotifier(this, &changeSet);
+	if (m_tokenPersistenceCompPtr.IsValid()){
+		const bool result = m_tokenPersistenceCompPtr->RevokeToken(tokenId);
+		if (!result){
+			changeNotifier.Abort();
+		}
+		return result;
+	}
+
 	if (!m_tokenCollectionCompPtr.IsValid()){
 		SendErrorMessage(0, "Token collection not configured", "CPersonalAccessTokenManagerComp");
 		return false;
@@ -222,22 +292,22 @@ bool CPersonalAccessTokenManagerComp::RevokeToken(const QByteArray& tokenId)
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!m_tokenCollectionCompPtr->GetObjectData(tokenId, dataPtr)){
 		SendErrorMessage(0, QStringLiteral("Token '%1' not found").arg(tokenId), "CPersonalAccessTokenManagerComp");
+		changeNotifier.Abort();
 		return false;
 	}
 
 	IPersonalAccessToken* tokenPtr = dynamic_cast<IPersonalAccessToken*>(dataPtr.GetPtr());
 	if (!tokenPtr){
 		SendErrorMessage(0, "Invalid token object", "CPersonalAccessTokenManagerComp");
+		changeNotifier.Abort();
 		return false;
 	}
-
-	// Notify observers that the manager state will change
-	istd::CChangeNotifier changeNotifier(this);
 
 	tokenPtr->SetRevoked(true);
 
 	if (!m_tokenCollectionCompPtr->SetObjectData(tokenId, *tokenPtr)){
 		SendErrorMessage(0, QStringLiteral("Failed to update token '%1'").arg(tokenId), "CPersonalAccessTokenManagerComp");
+		changeNotifier.Abort();
 		return false;
 	}
 
@@ -247,8 +317,63 @@ bool CPersonalAccessTokenManagerComp::RevokeToken(const QByteArray& tokenId)
 }
 
 
+bool CPersonalAccessTokenManagerComp::SetTokenScopes(const QByteArray& tokenId, const QByteArrayList& scopes)
+{
+	QMutexLocker locker(&m_tokensMutex);
+	if (!CheckStorageConfiguration()){
+		return false;
+	}
+	istd::IChangeable::ChangeSet changeSet(CF_TOKEN_CHANGED);
+	changeSet.SetChangeInfo(CN_TOKEN_ID, tokenId);
+	istd::CChangeNotifier changeNotifier(this, &changeSet);
+	if (m_tokenPersistenceCompPtr.IsValid()){
+		const bool result = m_tokenPersistenceCompPtr->SetTokenScopes(tokenId, scopes);
+		if (!result){
+			changeNotifier.Abort();
+		}
+		return result;
+	}
+
+	if (!m_tokenCollectionCompPtr.IsValid()){
+		SendErrorMessage(0, "Token collection not configured", "CPersonalAccessTokenManagerComp");
+		return false;
+	}
+
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	IPersonalAccessToken* tokenPtr = m_tokenCollectionCompPtr->GetObjectData(tokenId, dataPtr) ? dynamic_cast<IPersonalAccessToken*>(dataPtr.GetPtr()) : nullptr;
+	if (tokenPtr == nullptr){
+		SendErrorMessage(0, QStringLiteral("Token '%1' not found").arg(QString::fromUtf8(tokenId)), "CPersonalAccessTokenManagerComp");
+		changeNotifier.Abort();
+		return false;
+	}
+
+	if (tokenPtr->IsRevoked()){
+		SendErrorMessage(0, "A revoked token cannot change permissions", "SetTokenScopes");
+		changeNotifier.Abort();
+		return false;
+	}
+
+	tokenPtr->SetScopes(scopes);
+
+	if (!m_tokenCollectionCompPtr->SetObjectData(tokenId, *tokenPtr)){
+		SendErrorMessage(0, QStringLiteral("Failed to update token '%1'").arg(QString::fromUtf8(tokenId)), "CPersonalAccessTokenManagerComp");
+		changeNotifier.Abort();
+		return false;
+	}
+
+	SendInfoMessage(0, QStringLiteral("Changed the permissions of token '%1'").arg(QString::fromUtf8(tokenId)), "CPersonalAccessTokenManagerComp");
+
+	return true;
+}
+
+
 bool CPersonalAccessTokenManagerComp::UpdateLastUsedAt(const QByteArray& tokenId)
 {
+	QMutexLocker locker(&m_tokensMutex);
+	if (!CheckStorageConfiguration()){
+		return false;
+	}
+
 	if (!m_tokenCollectionCompPtr.IsValid()){
 		SendErrorMessage(0, "Token collection not configured", "CPersonalAccessTokenManagerComp");
 		return false;
@@ -256,38 +381,80 @@ bool CPersonalAccessTokenManagerComp::UpdateLastUsedAt(const QByteArray& tokenId
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!m_tokenCollectionCompPtr->GetObjectData(tokenId, dataPtr)){
+		SendErrorMessage(0, "Token could not be read", "UpdateLastUsedAt");
 		return false;
 	}
 
 	IPersonalAccessToken* tokenPtr = dynamic_cast<IPersonalAccessToken*>(dataPtr.GetPtr());
 	if (!tokenPtr){
+		SendErrorMessage(0, "Invalid token object", "UpdateLastUsedAt");
 		return false;
 	}
 
-	tokenPtr->SetLastUsedAt(QDateTime::currentDateTimeUtc());
+	// Every check of a working server comes here: a minute is exact enough and saves the writes
+	const QDateTime now = QDateTime::currentDateTimeUtc();
+	if (tokenPtr->GetLastUsedAt().isValid() && tokenPtr->GetLastUsedAt().secsTo(now) < s_lastUsedPrecisionSeconds){
+		return true;
+	}
 
-	return m_tokenCollectionCompPtr->SetObjectData(tokenId, *tokenPtr);
+	if (m_tokenPersistenceCompPtr.IsValid()){
+		return m_tokenPersistenceCompPtr->UpdateLastUsedAt(tokenId, now);
+	}
+
+	tokenPtr->SetLastUsedAt(now);
+
+	if (!m_tokenCollectionCompPtr->SetObjectData(tokenId, *tokenPtr)){
+		SendErrorMessage(0, "Token usage could not be updated", "UpdateLastUsedAt");
+		return false;
+	}
+	return true;
+}
+
+
+bool CPersonalAccessTokenManagerComp::CheckStorageConfiguration() const
+{
+	if (!m_tokenCollectionCompPtr.IsValid()){
+		SendErrorMessage(0, "Token collection not configured", "CPersonalAccessTokenManagerComp");
+		return false;
+	}
+	if (!m_tokenPersistenceCompPtr.IsValid() && (!m_inMemoryUpdatesAttrPtr.IsValid() || !*m_inMemoryUpdatesAttrPtr)){
+		SendErrorMessage(0, "Atomic token persistence is required for a persistent collection", "CPersonalAccessTokenManagerComp");
+		return false;
+	}
+	return true;
 }
 
 
 bool CPersonalAccessTokenManagerComp::DeleteToken(const QByteArray& tokenId)
 {
+	QMutexLocker locker(&m_tokensMutex);
 	if (!m_tokenCollectionCompPtr.IsValid()){
 		SendErrorMessage(0, "Token collection not configured", "CPersonalAccessTokenManagerComp");
 		return false;
 	}
 
 	// Notify observers that the manager state will change
-	istd::CChangeNotifier changeNotifier(this);
+	istd::IChangeable::ChangeSet changeSet(CF_TOKEN_CHANGED);
+	changeSet.SetChangeInfo(CN_TOKEN_ID, tokenId);
+	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 	if (!m_tokenCollectionCompPtr->RemoveElements({tokenId})){
 		SendErrorMessage(0, QStringLiteral("Failed to delete token '%1'").arg(tokenId), "CPersonalAccessTokenManagerComp");
+		changeNotifier.Abort();
 		return false;
 	}
 
 	SendInfoMessage(0, QStringLiteral("Deleted token '%1'").arg(tokenId), "CPersonalAccessTokenManagerComp");
 
 	return true;
+}
+
+
+// reimplemented (imtbase::IObjectCollectionProvider)
+
+const imtbase::IObjectCollection* CPersonalAccessTokenManagerComp::GetObjectCollection() const
+{
+	return m_tokenCollectionCompPtr.GetPtr();
 }
 
 
@@ -301,7 +468,7 @@ bool CPersonalAccessTokenManagerComp::Serialize(iser::IArchive& /*archive*/)
 
 // private methods
 
-QByteArray CPersonalAccessTokenManagerComp::GenerateRandomToken() const
+QByteArray CPersonalAccessTokenManagerComp::GenerateRandomToken(const QByteArray& prefix) const
 {
 	// Generate a cryptographically secure random token
 	// Format: pat_<base64url_encoded_random_data>
@@ -320,7 +487,7 @@ QByteArray CPersonalAccessTokenManagerComp::GenerateRandomToken() const
 	}
 
 	// Convert to base64url for safe transmission
-	QByteArray token = "imt_pat_" + randomData.toBase64(QByteArray::Base64UrlEncoding | QByteArray::OmitTrailingEquals);
+	QByteArray token = prefix + randomData.toBase64(QByteArray::Base64UrlEncoding | QByteArray::OmitTrailingEquals);
 
 	return token;
 }
@@ -330,14 +497,6 @@ QByteArray CPersonalAccessTokenManagerComp::HashToken(const QByteArray& rawToken
 {
 	// Use SHA-256 to hash the token
 	return QCryptographicHash::hash(rawToken, QCryptographicHash::Sha256).toHex();
-}
-
-
-QByteArray CPersonalAccessTokenManagerComp::ExtractTokenId(const QByteArray& /*rawToken*/) const
-{
-	// For now, we don't embed the ID in the token
-	// We search by hash instead
-	return QByteArray();
 }
 
 

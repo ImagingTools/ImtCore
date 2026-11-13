@@ -41,6 +41,8 @@ public:
 		I_ASSIGN(m_personalAccessTokenManagerCompPtr, "PersonalAccessTokenManager", "PAT manager to remove tokens of deleted user", false, "PersonalAccessTokenManager");
 		I_ASSIGN(m_sessionCollectionCompPtr, "SessionCollection", "Session collection for purging user sessions on delete", false, "SessionCollection");
 		I_ASSIGN(m_passwordPolicyCompPtr, "PasswordPolicy", "Password policy checked for the password of a new user", false, "PasswordPolicy");
+		I_ASSIGN(m_roleCollectionCompPtr, "RoleCollection", "Roles, read at their source for the user handed out with its permissions", false, "RoleCollection");
+		I_ASSIGN(m_userGroupCollectionCompPtr, "UserGroupCollection", "User groups, read at their source for the user handed out with its permissions", false, "UserGroupCollection");
 	I_END_COMPONENT;
 
 protected:
@@ -98,7 +100,8 @@ protected:
 	virtual istd::IChangeableUniquePtr CreateAdaptedObjectData(
 				const QByteArray& objectId,
 				const istd::IChangeable& object,
-				const imtgql::CGqlRequest& gqlRequest) const override;
+				const imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 	virtual QJsonObject InsertObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual void SetAdditionalFilters(
 				const imtgql::CGqlRequest& gqlRequest,
@@ -122,6 +125,18 @@ protected:
 	virtual bool OnBeforeRemoveElements(const QByteArrayList& elementIds, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual void OnAfterRemoveElements(const QByteArrayList& elementIds, const ::imtgql::CGqlRequest& gqlRequest) const override;
 
+private:
+	/**
+		Check the changes of a user a request is allowed to make: the account, the groups, the other products and the granted permissions.
+		\param previousPtr The stored user; null for a new one.
+	*/
+	bool CheckUserGrants(
+				const imtgql::CGqlRequest& gqlRequest,
+				const QByteArray& objectId,
+				const imtauth::IUserInfo* previousPtr,
+				const imtauth::IUserInfo& user,
+				QString& errorMessage) const;
+
 protected:
 	I_REF(imtauth::IRoleInfoProvider, m_roleInfoProviderCompPtr);
 	I_REF(imtauth::IUserGroupInfoProvider, m_userGroupInfoProviderCompPtr);
@@ -136,6 +151,8 @@ protected:
 	I_REF(imtauth::IPersonalAccessTokenManager, m_personalAccessTokenManagerCompPtr);
 	I_REF(imtbase::IObjectCollection, m_sessionCollectionCompPtr);
 	I_REF(imtauth::IPasswordPolicy, m_passwordPolicyCompPtr);
+	I_REF(imtbase::IObjectCollection, m_roleCollectionCompPtr);
+	I_REF(imtbase::IObjectCollection, m_userGroupCollectionCompPtr);
 };
 
 

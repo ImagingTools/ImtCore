@@ -6,6 +6,7 @@
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
+#include <imtclientgql/IServerCredentialProvider.h>
 #include <imtclientgql/IGqlSubscriptionManager.h>
 
 
@@ -24,6 +25,7 @@ public:
 		I_REGISTER_INTERFACE(imtclientgql::IGqlSubscriptionClient);
 		I_ASSIGN(m_subscriptionManagerCompPtr, "SubscriptionManager", "Subscription manager", true, "SubscriptionManager");
 		I_ASSIGN_MULTI_0(m_commandAttrPtr, "Command", "Command for subscription", true);
+		I_ASSIGN(m_serverCredentialCompPtr, "ServerCredentialProvider", "Token of this server, for a subscription the server makes itself", false, "ServerCredentialProvider");
 	I_END_COMPONENT;
 
 protected:
@@ -42,6 +44,8 @@ protected:
 	virtual void OnComponentCreated() override;
 
 protected:
+	I_REF(imtclientgql::IServerCredentialProvider, m_serverCredentialCompPtr);
+
 	QByteArrayList m_subscriptionIds;
 
 protected:

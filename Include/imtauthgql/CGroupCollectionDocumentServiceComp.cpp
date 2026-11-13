@@ -162,9 +162,9 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CGroupCollectionDocumentServiceComp
 	}
 
 	// New members get all permissions of the group, the others only what the change adds
-	bool hasNewUsers = false;
-	for (const QByteArray& userId : groupPtr->GetUsers()){
-		hasNewUsers = hasNewUsers || !previousUsers.contains(userId);
+	const bool hasNewUsers = HasNewGroupMembers(previousUsers, groupPtr->GetUsers());
+	if (hasNewUsers &&!CheckGroupGrantsInOtherProducts(gqlRequest.GetRequestContext(), *groupPtr, errorMessage)){
+		return response;
 	}
 	if (!CheckGrantedPermissions(gqlRequest.GetRequestContext(), hasNewUsers ? QByteArrayList() : previousPermissions, groupPtr->GetPermissions(contextProductId), errorMessage)){
 		return response;

@@ -1,0 +1,5 @@
+module EnumModule
+ModuleType 1.0 ModuleType.qml
+DerivedType 1.0 DerivedType.qml
+ModuleUser 1.0 ModuleUser.qml
+singleton ModuleSingleton 1.0 ModuleSingleton.qml

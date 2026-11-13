@@ -34,6 +34,7 @@ public:
 	I_BEGIN_COMPONENT(CGqlObjectCollectionComp);
 		I_REGISTER_INTERFACE(IGqlSubscriptionClient);
 		I_REGISTER_INTERFACE(IObjectCollection);
+		I_REGISTER_INTERFACE(imtbase::IObjectCollectionReadStatus);
 		I_REGISTER_INTERFACE(IObjectCollectionInfo);
 		I_REGISTER_INTERFACE(ICollectionInfo);
 		I_REGISTER_INTERFACE(istd::IChangeable);
@@ -71,5 +72,4 @@ protected:
 
 
 } //namespace imtclientgql
-
 

@@ -51,8 +51,9 @@ public:
 
 	/**
 		Check if a binding exists.
+		\param isReadPtr [optional] False when the bindings could not be read, so false says nothing.
 	*/
-	virtual bool HasBinding(const QByteArray& tenantId, const QByteArray& entityType, const QByteArray& entityId) const = 0;
+	virtual bool HasBinding(const QByteArray& tenantId, const QByteArray& entityType, const QByteArray& entityId, bool* isReadPtr = nullptr) const = 0;
 
 	/**
 		Get all entity IDs of a given type bound to a tenant.
@@ -62,8 +63,9 @@ public:
 	/**
 		Returns true if the entity has at least one binding to any tenant
 		(i.e., the entity is tenant-scoped and not global/unbound).
+		\param isReadPtr [optional] False when the bindings could not be read, so false says nothing.
 	*/
-	virtual bool HasAnyTenantBinding(const QByteArray& entityType, const QByteArray& entityId) const = 0;
+	virtual bool HasAnyTenantBinding(const QByteArray& entityType, const QByteArray& entityId, bool* isReadPtr = nullptr) const = 0;
 };
 
 

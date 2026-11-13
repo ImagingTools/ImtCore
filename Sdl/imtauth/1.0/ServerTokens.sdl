@@ -1,0 +1,123 @@
+schema {
+	query: Query
+	mutation: Mutation
+	namespace: imtauth
+	version: 1.0
+}
+
+import {
+	"../../imtbase/1.0/ImtCollection.sdl"
+	"Permissions.sdl"
+}
+
+# A personal access token without an owner: it identifies a server of a product.
+type ServerToken
+{
+	id: ID!
+	clientProductId: ID!
+	productId: ID!
+	name: String!
+	description: String
+	scopes: [ID]
+	createdAt: String
+	lastUsedAt: String
+	revoked: Bool
+}
+
+type ServerTokenList
+{
+	tokens: [ServerToken]
+}
+
+input ServerTokenListInput {
+	clientProductId: ID!
+}
+
+# The token is issued by this server for itself.
+input CreateServerTokenInput {
+	clientProductId: ID!
+	name: String!
+	description: String
+	scopes: [ID]
+}
+
+type CreateServerTokenPayload {
+	id: ID
+	token: ID
+	# The permissions the token holds: the requested ones with the ones they require.
+	scopes: [ID]
+	success: Boolean!
+}
+
+type UpdateServerTokenScopesPayload {
+	# The permissions the token holds: the requested ones with the ones they require.
+	scopes: [ID]
+	success: Boolean!
+}
+
+type RevokeServerTokenPayload {
+	success: Boolean!
+}
+
+type DeleteServerTokenPayload {
+	success: Boolean!
+}
+
+# This server as the receiver of the tokens of a client product: the permissions a token can hold.
+type ServerTokenReceiver
+{
+	productId: ID!
+	groups: [PermissionGroup]
+}
+
+# A permission of the receiving server with its sub-permissions.
+type ServerFeature
+{
+	featureId: ID!
+	name: String
+	description: String
+	requirements: [ID]
+	subFeatures: [ServerFeature]
+}
+
+type ServerFeatureList
+{
+	features: [ServerFeature]
+}
+
+input ServerTokenReceiverInput {
+	clientProductId: ID!
+}
+
+# Makes the product a client of this server; nothing changes when it is one already.
+input AddServerTokenClientInput {
+	clientProductId: ID!
+	name: String
+}
+
+type AddServerTokenClientPayload {
+	# False when the product was a client already.
+	added: Boolean
+	success: Boolean!
+}
+
+input UpdateServerTokenScopesInput {
+	id: ID!
+	scopes: [ID]
+}
+
+type Query {
+	GetServerTokenList (input: ServerTokenListInput!): ServerTokenList!
+	GetServerTokenReceiver (input: ServerTokenReceiverInput!): ServerTokenReceiver!
+	# The permissions of this server the token of the calling product server allows, for the roles of that product.
+	GetServerTokenFeatures: ServerFeatureList!
+}
+
+type Mutation {
+	CreateServerToken (input: CreateServerTokenInput!): CreateServerTokenPayload!
+	RevokeServerToken (input: InputId!): RevokeServerTokenPayload!
+	# Removes a revoked token from the list.
+	DeleteServerToken (input: InputId!): DeleteServerTokenPayload!
+	UpdateServerTokenScopes (input: UpdateServerTokenScopesInput!): UpdateServerTokenScopesPayload!
+	AddServerTokenClient (input: AddServerTokenClientInput!): AddServerTokenClientPayload!
+}

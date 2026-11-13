@@ -8,9 +8,15 @@
 
 // ACF includes
 #include <iser/CMemoryReadArchive.h>
+#include <iser/CJsonMemReadArchive.h>
 
 // ImtCore includes
 #include <imtauth/ISession.h>
+#include <imtauth/CUserBaseInfo.h>
+#include <imtauth/imtauth.h>
+#include <imtbase/IIdentifiable.h>
+#include <imtcore/Version.h>
+#include <imtservergql/CAuthorizationSnapshot.h>
 #include <imtgql/CGqlContext.h>
 #include <imtgql/CGqlRequestContextManager.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Sessions.h>
@@ -42,13 +48,123 @@ void AttachCurrentContext(imtgql::CGqlRequest& gqlRequest)
 } // anonymous namespace
 
 
+// reimplemented (imtauth::ISessionAuthorizationProvider)
+
+bool CRemoteJwtSessionControllerComp::IsAvailable() const
+{
+	return !m_serverCredentialCompPtr.IsValid() || !m_serverCredentialCompPtr->GetServerToken().isEmpty();
+}
+
+
+imtauth::ISessionAuthorizationProvider::SessionAuthorization CRemoteJwtSessionControllerComp::GetSessionAuthorization(
+			const QByteArray& accessToken,
+			const QByteArray& productId,
+			bool isEstablishedSubscription) const
+{
+	namespace sessionsdl = sdl::V1_0::imtauth;
+	SessionAuthorization retVal;
+	sessionsdl::GetSessionAuthorizationRequestArguments arguments;
+	arguments.input.Emplace();
+	arguments.input->accessToken = accessToken;
+	arguments.input->isEstablishedSubscription = isEstablishedSubscription;
+
+	imtgql::CGqlRequest gqlRequest;
+	if (!sessionsdl::CGetSessionAuthorizationGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
+		retVal.message = QStringLiteral("The request of the session authorization could not be built.");
+		return retVal;
+	}
+
+	// Do not attach the current user context: the server authenticates with its own token only.
+	imtgql::IGqlContextUniquePtr contextPtr(new imtgql::CGqlContext);
+	contextPtr->SetProductId(productId);
+	gqlRequest.SetGqlContext(imtgql::IGqlContextSharedPtr::CreateFromUnique(std::move(contextPtr)));
+
+	const auto result = SendModelRequest<sessionsdl::CGetSessionAuthorizationPayload>(gqlRequest);
+	if (result.errorCategory == imtclientgql::IGqlClient::EC_ACCESS_DENIED){
+		retVal.state = SAS_REFUSED;
+		retVal.refusalReason = RR_FORBIDDEN;
+		retVal.message = QStringLiteral("The authorization server refused the server credentials.");
+		return retVal;
+	}
+	const auto& response = result.model;
+	if (!result || !response.state.HasValue()){
+		retVal.message = result.errorMessage.isEmpty() ? QStringLiteral("The authorization server gave no answer.") : result.errorMessage;
+		return retVal;
+	}
+
+	retVal.message = response.message.HasValue() ? *response.message : QString();
+	if (*response.state == sessionsdl::SessionAuthorizationState::REFUSED){
+		const bool hasReason = response.refusalReason.HasValue()
+					&& (*response.refusalReason == sessionsdl::SessionRefusalReason::REAUTHENTICATE || *response.refusalReason == sessionsdl::SessionRefusalReason::FORBIDDEN);
+		if (hasReason){
+			retVal.state = SAS_REFUSED;
+			retVal.refusalReason = (*response.refusalReason == sessionsdl::SessionRefusalReason::REAUTHENTICATE) ? RR_REAUTHENTICATE : RR_FORBIDDEN;
+		}
+		else{
+			retVal.message = QStringLiteral("The authorization server gave no valid refusal reason.");
+		}
+		return retVal;
+	}
+	if (*response.state != sessionsdl::SessionAuthorizationState::COMPUTED){
+		if (retVal.message.isEmpty()){
+			retVal.message = QStringLiteral("The session authorization could not be checked.");
+		}
+		return retVal;
+	}
+	if (!response.refusalReason.HasValue() || *response.refusalReason != sessionsdl::SessionRefusalReason::NONE
+				|| !response.tenantId.HasValue() || !response.tenantOwnerId.HasValue() || !response.tenantCreatorId.HasValue()
+				|| !response.tenantPermissions.HasValue()){
+		retVal.message = QStringLiteral("The authorization server gave an incomplete answer.");
+		return retVal;
+	}
+
+	const QByteArray userId = response.userId.HasValue() ? *response.userId : QByteArray();
+	const QByteArray userData = response.userData.HasValue() ? response.userData->toUtf8() : QByteArray();
+	istd::IChangeableUniquePtr userPtr(m_userFactCompPtr.CreateInstance());
+	imtauth::IUserInfo* userInfoPtr = dynamic_cast<imtauth::IUserInfo*>(userPtr.GetPtr());
+	const imtbase::IIdentifiable* identifiablePtr = dynamic_cast<const imtbase::IIdentifiable*>(userPtr.GetPtr());
+	const imtauth::CUserBaseInfo* userBasePtr = dynamic_cast<const imtauth::CUserBaseInfo*>(userPtr.GetPtr());
+	iser::ISerializable* serializablePtr = dynamic_cast<iser::ISerializable*>(userPtr.GetPtr());
+	iser::CJsonMemReadArchive archive(userData);
+	quint32 version = 0;
+	imtauth::SessionTokenClaims claims;
+	if (userId.isEmpty() || userData.isEmpty() || userInfoPtr == nullptr || serializablePtr == nullptr
+				|| userBasePtr == nullptr || identifiablePtr == nullptr
+				|| !archive.GetVersionInfo().GetVersionNumber(imtcore::VI_IMTCORE, version) || version < 6940
+				|| !serializablePtr->Serialize(archive) || identifiablePtr->GetObjectUuid() != userId || !userInfoPtr->IsEnabled()
+				|| !userBasePtr->HasLocalPermissions(productId)
+				|| !imtauth::ParseSessionTokenClaims(accessToken, claims) || claims.userId != userId || claims.tenantId != *response.tenantId){
+		retVal.message = QStringLiteral("The answer of the authorization server holds no valid user.");
+		return retVal;
+	}
+
+	retVal.state = SAS_COMPUTED;
+	retVal.userId = userId;
+	retVal.tenantId = *response.tenantId;
+	retVal.tenantOwnerId = *response.tenantOwnerId;
+	retVal.tenantCreatorId = *response.tenantCreatorId;
+	retVal.tenantPermissions = response.tenantPermissions->ToList();
+	// An older authorization server does not tell it: unknown, not ended.
+	if (response.sessionExpiresAt.HasValue()){
+		retVal.sessionExpiresAt = QDateTime::fromString(*response.sessionExpiresAt, Qt::ISODateWithMs);
+	}
+	imtservergql::CAuthorizationSnapshot::DetachUser(*userPtr);
+	retVal.userPtr.FromUnique(std::move(userPtr));
+	return retVal;
+}
+
+
 // protected methods
 
 // reimplemented (imtauth::IJwtSessionController)
 
-bool CRemoteJwtSessionControllerComp::ValidateSession(const QByteArray& sessionId) const
+bool CRemoteJwtSessionControllerComp::ValidateSession(const QByteArray& sessionId, bool* isCheckedPtr) const
 {
 	namespace sessionsdl = sdl::V1_0::imtauth;
+
+	if (isCheckedPtr != nullptr){
+		*isCheckedPtr = false;
+	}
 
 	sessionsdl::ValidateSessionRequestArguments arguments;
 	arguments.input.Emplace();
@@ -63,15 +179,15 @@ bool CRemoteJwtSessionControllerComp::ValidateSession(const QByteArray& sessionI
 
 	QString errorMessage;
 	Response response = SendModelRequest<Response>(gqlRequest, errorMessage);
-	if (!errorMessage.isEmpty()){
+	if (!errorMessage.isEmpty() || !response.isValid.has_value()){
 		return false;
 	}
 
-	if (response.isValid.has_value()){
-		return *response.isValid;
+	if (isCheckedPtr != nullptr){
+		*isCheckedPtr = true;
 	}
 
-	return false;
+	return *response.isValid;
 }
 
 

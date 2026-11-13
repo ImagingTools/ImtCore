@@ -19,6 +19,8 @@ QtObject {
 	
 	property string permissionPath: ""
 	property string productId: "";
+	// The product whose data a console administers now; requests go in its context while it is set.
+	property string administeredProductId: "";
 	
 	signal userModeChanged(string userMode);
 	signal superuserExistResult(string status, string error);

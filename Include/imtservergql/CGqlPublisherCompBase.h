@@ -11,6 +11,7 @@
 #include <imtrest/IResponseDispatcher.h>
 #include <imtgql/IGqlRequestHandler.h>
 #include <imtgql/IGqlSubscriberController.h>
+#include <imtservergql/IServerTokenReceiver.h>
 
 
 namespace imtservergql
@@ -28,11 +29,14 @@ public:
 	I_BEGIN_BASE_COMPONENT(CGqlPublisherCompBase);
 		I_REGISTER_INTERFACE(imtgql::IGqlSubscriberController);
 		I_ASSIGN_MULTI_0(m_commandIdsAttrPtr, "CommandIds", "List of model-IDs for GraphQL-response", true);
+		I_ASSIGN_MULTI_0(m_readPermissionsAttrPtr, "ReadPermissions", "Permissions reading this channel: a user needs one of them", false);
 		I_ASSIGN(m_requestManagerCompPtr, "RequestManager", "Response dispatcher registered for the server", true, "RequestManager");
+		I_ASSIGN(m_serverTokenReceiverCompPtr, "ServerTokenReceiver", "While it takes the servers of products without tokens, a subscriber who has not signed in reads this channel too, as before server tokens", false, "ServerTokenReceiver");
 	I_END_COMPONENT;
 
 	// reimplemented (imtgql::IGqlSubscriberController)
 	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
+	virtual bool IsOpenFor(SubscriberKind subscriberKind, const imtgql::CGqlRequest& gqlRequest) const override;
 	virtual bool RegisterSubscription(
 				const QByteArray& subscriptionId,
 				const imtgql::CGqlRequest& gqlRequest,
@@ -53,7 +57,9 @@ protected:
 
 protected:
 	I_MULTIATTR(QByteArray, m_commandIdsAttrPtr);
+	I_MULTIATTR(QByteArray, m_readPermissionsAttrPtr);
 	I_REF(imtrest::IResponseDispatcher, m_requestManagerCompPtr);
+	I_REF(IServerTokenReceiver, m_serverTokenReceiverCompPtr);
 
 	struct RequestNetworks
 	{
@@ -72,5 +78,4 @@ protected:
 
 
 } // namespace imtservergql
-
 

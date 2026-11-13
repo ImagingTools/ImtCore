@@ -80,15 +80,15 @@ CGqlClientSyncAdapterComp::CGqlClientSyncAdapterComp():
 
 // reimplemented (IGqlClient)
 
-IGqlClient::GqlResponsePtr CGqlClientSyncAdapterComp::SendRequest(GqlRequestPtr requestPtr, imtbase::IUrlParam* urlParamPtr) const
+IGqlClient::GqlResult CGqlClientSyncAdapterComp::SendRequest(GqlRequestPtr requestPtr, imtbase::IUrlParam* urlParamPtr) const
 {
 	if (!requestPtr.IsValid()){
-		return GqlResponsePtr(nullptr);
+		return {{}, EC_INVALID_REQUEST, QStringLiteral("Request is invalid")};
 	}
 
 	if (!m_asyncClientCompPtr.IsValid()){
 		SendErrorMessage(0, "Async client is not available", "Sync Adapter");
-		return GqlResponsePtr(nullptr);
+		return {{}, EC_INTERNAL, QStringLiteral("Async client is not available")};
 	}
 
 	CCompletionState completionState;
@@ -105,25 +105,27 @@ IGqlClient::GqlResponsePtr CGqlClientSyncAdapterComp::SendRequest(GqlRequestPtr 
 		future.waitForFinished();
 		completionFuture.waitForFinished();
 		SendErrorMessage(0, "Request timed out", "Sync Adapter");
-		return GqlResponsePtr(nullptr);
+		return {{}, EC_TIMEOUT, QStringLiteral("Request timed out")};
 	}
 
 	completionFuture.waitForFinished();
-	const IAsyncGqlClient::GqlResult result = completionState.Result();
+	GqlResult result = completionState.Result();
 
-	if (result.errorCategory != IAsyncGqlClient::EC_NONE){
+	if (result.errorCategory == EC_NONE && !result.responsePtr.IsValid()){
+		result.errorCategory = EC_INVALID_RESPONSE;
+		result.errorMessage = QStringLiteral("Response is missing");
+	}
+	if (!result){
 		SendErrorMessage(0, result.errorMessage, "Sync Adapter");
-		return GqlResponsePtr(nullptr);
 	}
 
-	return result.responsePtr;
+	return result;
 }
 
 
 bool CGqlClientSyncAdapterComp::SendRequestNoWait(GqlRequestPtr requestPtr, imtbase::IUrlParam* urlParamPtr) const
 {
-	IGqlClient::GqlResponsePtr responsePtr = SendRequest(requestPtr, urlParamPtr);
-	return responsePtr.IsValid();
+	return bool(SendRequest(requestPtr, urlParamPtr));
 }
 
 

@@ -94,6 +94,33 @@ imtbase::IDocumentChangeGenerator* CDocumentRevisionControllerComp::FindDocument
 }
 
 
+bool CDocumentRevisionControllerComp::CheckRevisionChange(
+			const ::imtgql::CGqlRequest& gqlRequest,
+			const QByteArray& collectionId,
+			const imtbase::IObjectCollection& collection,
+			const QByteArray& objectId,
+			int revision,
+			QString& errorMessage) const
+{
+	const int index = m_collectionIdsAttrPtr.FindValue(collectionId);
+	if (index < 0 || index >= m_objectChangeCheckersCompPtr.GetCount() || m_objectChangeCheckersCompPtr[index] == nullptr){
+		return true;
+	}
+
+	const imtbase::IRevisionController* revisionControllerPtr = collection.GetRevisionController();
+
+	istd::IChangeableSharedPtr dataPtr;
+	idoc::MetaInfoPtr dataMetaInfoPtr;
+	if (revisionControllerPtr == nullptr || !revisionControllerPtr->GetRevisionData(collection, objectId, revision, dataPtr, dataMetaInfoPtr) || !dataPtr.IsValid()){
+		errorMessage = QStringLiteral("Unable to read revision '%1' of '%2'").arg(QString::number(revision), QString::fromUtf8(objectId));
+
+		return false;
+	}
+
+	return m_objectChangeCheckersCompPtr[index]->CheckObjectChange(gqlRequest, objectId, dataPtr.GetPtr(), errorMessage);
+}
+
+
 // reimplemented (sdl::V1_0::imtbase::CDocumentRevisionGqlHandlerCompBase)
 
 sdl::V1_0::imtbase::CRevisionInfoList CDocumentRevisionControllerComp::OnGetRevisionInfoList(
@@ -231,7 +258,7 @@ sdl::V1_0::imtbase::CBackupRevisionResponse CDocumentRevisionControllerComp::OnB
 
 sdl::V1_0::imtbase::CRestoreRevisionResponse CDocumentRevisionControllerComp::OnRestoreRevision(
 	const sdl::V1_0::imtbase::CRestoreRevisionGqlRequest& restoreRevisionRequest,
-	const ::imtgql::CGqlRequest& /*gqlRequest*/,
+	const ::imtgql::CGqlRequest& gqlRequest,
 	QString& errorMessage) const
 {
 	sdl::V1_0::imtbase::CRestoreRevisionResponse response;
@@ -271,6 +298,10 @@ sdl::V1_0::imtbase::CRestoreRevisionResponse CDocumentRevisionControllerComp::On
 	const imtbase::IRevisionController* revisionControllerPtr = objectCollectionPtr->GetRevisionController();
 	if (revisionControllerPtr == nullptr){
 		errorMessage = QStringLiteral("Unable to set revision '%1' for document '%2'. Error: revision controller is invalid").arg(QString::number(revisionNumber), documentId);
+		return {};
+	}
+
+	if (!CheckRevisionChange(gqlRequest, collectionId, *objectCollectionPtr, documentId, revisionNumber, errorMessage)){
 		return {};
 	}
 

@@ -9,7 +9,6 @@
 
 // ImtCore includes
 #include <imtgql/CGqlContext.h>
-#include <imtgql/CGqlRequestContextManager.h>
 #include <imtnotifygql/imtnotifygql.h>
 
 
@@ -40,7 +39,7 @@ bool CRemoteNotificationSenderComp::Send(const Audience& audience, const Message
 		request.message.dedupKey = QByteArrayLiteral("request:") + QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 	}
 
-	return TakeCallerSession(request) && Enqueue(request);
+	return Enqueue(request);
 }
 
 
@@ -51,7 +50,7 @@ bool CRemoteNotificationSenderComp::Withdraw(const Audience& audience, const QBy
 	request.audience = audience;
 	request.message.groupKey = groupKey;
 
-	return TakeCallerSession(request) && Enqueue(request);
+	return Enqueue(request);
 }
 
 
@@ -151,12 +150,17 @@ void CRemoteNotificationSenderComp::RunQueue()
 
 CRemoteNotificationSenderComp::DeliveryResult CRemoteNotificationSenderComp::Deliver(const Request& request) const
 {
-	if (!HasApiClient()){
+	const QByteArray serverToken = m_serverCredentialCompPtr->GetServerToken();
+	if (!HasApiClient() || serverToken.isEmpty()){
+		SendWarningMessage(0, QStringLiteral("This server has no token, notification '%1' is not sent")
+					.arg(QString::fromUtf8(request.isWithdraw ? request.message.groupKey : request.message.typeId)),
+					"CRemoteNotificationSenderComp");
+
 		return DR_REFUSED;
 	}
 
 	imtgql::IGqlContextUniquePtr contextPtr(new imtgql::CGqlContext);
-	contextPtr->SetToken(request.accessToken);
+	contextPtr->SetToken(serverToken);
 	contextPtr->SetProductId(request.audience.productId);
 
 	imtgql::CGqlRequest gqlRequest;
@@ -192,9 +196,11 @@ CRemoteNotificationSenderComp::DeliveryResult CRemoteNotificationSenderComp::Del
 		return DR_REFUSED;
 	}
 
-	const imtclientgql::IGqlClient::GqlResponsePtr responsePtr = m_apiClientCompPtr->SendRequest(requestPtr);
-	if (!responsePtr.IsValid()){
-		return DR_NOT_ANSWERED;
+	const auto requestResult = m_apiClientCompPtr->SendRequest(requestPtr);
+	auto responsePtr = requestResult.responsePtr;
+	if (!requestResult){
+		SendErrorMessage(0, requestResult.errorMessage, "CRemoteNotificationSenderComp");
+		return requestResult.errorCategory == imtclientgql::IGqlClient::EC_ACCESS_DENIED ? DR_REFUSED : DR_NOT_ANSWERED;
 	}
 
 	QString errorMessage;
@@ -221,23 +227,5 @@ CRemoteNotificationSenderComp::DeliveryResult CRemoteNotificationSenderComp::Del
 }
 
 
-bool CRemoteNotificationSenderComp::TakeCallerSession(Request& request) const
-{
-	const imtgql::IGqlContext* contextPtr = imtgql::CGqlRequestContextManager::GetContext();
-	if (contextPtr == nullptr || contextPtr->GetToken().isEmpty()){
-		SendWarningMessage(0, QStringLiteral("Notification '%1' was made outside of a user request and is not sent")
-					.arg(QString::fromUtf8(request.isWithdraw ? request.message.groupKey : request.message.typeId)),
-					"CRemoteNotificationSenderComp");
-
-		return false;
-	}
-
-	request.accessToken = contextPtr->GetToken();
-
-	return true;
-}
-
-
 } // namespace imtnotifygql
-
 

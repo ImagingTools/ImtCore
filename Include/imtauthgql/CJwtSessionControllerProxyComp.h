@@ -22,7 +22,14 @@ public:
 	I_END_COMPONENT;
 
 protected:
+	// reimplemented (imtgql::IGqlRequestHandler)
+	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
+
 	// reimplemented (sdl::V1_0::imtauth::CSessionsGqlHandlerCompBase)
+	virtual sdl::V1_0::imtauth::CGetSessionAuthorizationPayload OnGetSessionAuthorization(
+				const sdl::V1_0::imtauth::CGetSessionAuthorizationGqlRequest& getSessionAuthorizationRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 	virtual sdl::V1_0::imtauth::CValidateSessionPayload OnValidateSession(
 				const sdl::V1_0::imtauth::CValidateSessionGqlRequest& validateSessionRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,

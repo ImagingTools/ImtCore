@@ -495,5 +495,6 @@
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="UserGroupChangeGenerator" ComponentId="UserGroupChangeGenerator"/>
+        <Component ExportedId="GroupsListController" ComponentId="GroupsListController"/>
     </ExportedComponents>
 </Acf>

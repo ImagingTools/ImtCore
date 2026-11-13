@@ -10,6 +10,7 @@
 // ImtCore includes
 #include <imtbase/TAggergatedObjectCollectionWrap.h>
 #include <imtservice/IConnectionCollection.h>
+#include <imtservice/IServerTokenReceiverInfo.h>
 #include <imtcom/IServerConnectionInterface.h>
 
 
@@ -19,13 +20,15 @@ namespace imtservice
 
 class CConnectionCollectionComp:
 			public ilog::CLoggerComponentBase,
-			virtual public IConnectionCollection
+			virtual public IConnectionCollection,
+			virtual public IServerTokenReceiverInfo
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CConnectionCollectionComp);
 		I_REGISTER_INTERFACE(imtservice::IConnectionCollection);
+		I_REGISTER_INTERFACE(imtservice::IServerTokenReceiverInfo);
 		I_ASSIGN(m_applicationInfoCompPtr, "ApplicationInfo", "Application info of the service", true, "ApplicationInfo");
 		I_ASSIGN(m_serviceTypeId, "ServiceTypeId", "Service type ID for service", true, "");
 		I_ASSIGN_MULTI_0(m_connectionNames, "ConnectionNames", "Connection names", true);
@@ -33,6 +36,7 @@ public:
 		I_ASSIGN_MULTI_0(m_connectionDescriptions, "ConnectionDescriptions", "Service connection descriptions", true);
 		I_ASSIGN_MULTI_0(m_connectionTypes, "ConnectionTypes", "Service connection types: 0 - input, 1 - output", true);
 		I_ASSIGN_MULTI_0(m_serverInterfaceListCompPtr, "ServerInterfaces", "List of server connection interfaces", true);
+		I_ASSIGN_MULTI_0(m_serverTokenConnectionIds, "ServerTokenConnectionIds", "Input connections through which the service receives the servers of other products: it registers them as clients and issues their server tokens", false);
 		I_ASSIGN(m_tracingConfigurationCompPtr, "TracingConfiguration", "Tracing configuration of verbose messages", true, "TracingConfiguration");
 	I_END_COMPONENT;
 
@@ -51,6 +55,9 @@ public:
 				const QString& name = QString(),
 				const QString& description = QString() ) override;
 
+	// reimplemented (imtservice::IServerTokenReceiverInfo)
+	virtual bool IsServerTokenReceiver(const QByteArray& connectionId) const override;
+
 	// reimplemented (ilog::ITracingConfiguration)
 	virtual int GetTracingLevel() const override;
 	virtual void SetTracingLevel(int tracingLevel) override;
@@ -67,6 +74,7 @@ private:
 	I_MULTIATTR(QByteArray, m_connectionDescriptions);
 	I_MULTIATTR(int, m_connectionTypes);
 	I_MULTIREF(imtcom::IServerConnectionInterface, m_serverInterfaceListCompPtr);
+	I_MULTIATTR(QByteArray, m_serverTokenConnectionIds);
 	I_REF(ilog::ITracingConfiguration, m_tracingConfigurationCompPtr);
 
 	imtbase::CObjectCollection m_collection;
