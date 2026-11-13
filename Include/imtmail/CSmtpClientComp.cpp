@@ -59,8 +59,10 @@ QByteArray CSmtpClientComp::BuildMimeMessage(const ISmtpMessage& message, const 
 	for (const ISmtpMessage::Attachment& attachment : attachments){
 		const QByteArray mimeType = mimeDatabase.mimeTypeForFileNameAndData(attachment.fileName, attachment.data).name().toLatin1();
 
+		// In a quoted parameter a backslash and a quote are escaped with a backslash.
 		QString fileName = attachment.fileName;
-		fileName.remove('"').remove('\r').remove('\n');
+		fileName.remove('\r').remove('\n');
+		fileName.replace('\\', QStringLiteral(R"(\\)")).replace('"', QStringLiteral(R"(\")"));
 
 		const QByteArray quotedName = QByteArrayLiteral(R"(")") + fileName.toUtf8() + QByteArrayLiteral(R"(")");
 
