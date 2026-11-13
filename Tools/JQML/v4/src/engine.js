@@ -11,6 +11,7 @@ import { fonts } from './fonts.js';
 import { KEY, MODIFIERS, NAMED_KEY_HANDLERS, qtKeyEvent } from './keys.js';
 import { QmlError, escapeSourceBreaks, tokenize, topLevelNames } from './lexer.js';
 import { callableHandler } from './parser.js';
+import { resolveExpression } from './resolve.js';
 import { scanOf } from './project.js';
 import { basename, dirname, hslaString, joinPath, normalizePath, parseColor, resolvePath, rgbaString, SCRIPT_IMPORT_RE } from './util.js';
 
@@ -378,6 +379,32 @@ const REAL_TYPES = new Set(['real', 'double', 'qreal', 'float']);
 const SILENT_TYPES = new Set(['Connections', 'Binding', 'AnimatedImage', 'BorderImage', 'ScrollView', 'SystemPalette']);
 
 // Ids and the root item of one component instance (or one delegate of a Repeater/ListView).
+// Do two runs of an expression give the same value? An object that the expression makes anew each time is the same when it is of
+// the same kind and has the same keys with the same primitive values (nested ones compare as the same kind).
+function sameResult(a, b) {
+	if (Object.is(a, b) || (a !== a && b !== b)) return true;
+	if (typeof a !== typeof b || a === null || b === null || (typeof a !== 'object' && typeof a !== 'function')) return false;
+	if (typeof a === 'function') return String(a) === String(b);
+	if (Object.getPrototypeOf(a) !== Object.getPrototypeOf(b)) return false;
+	const keys = Object.keys(a);
+	if (keys.length !== Object.keys(b).length) return false;
+	for (const key of keys) {
+		let x;
+		let y;
+		try {
+			x = a[key];
+			y = b[key];
+		} catch {
+			continue;
+		}
+		if (Object.is(x, y) || (x !== x && y !== y)) continue;
+		if (typeof x !== typeof y) return false;
+		if (typeof x !== 'object' && typeof x !== 'function') return false;
+		if (x === null || y === null || Object.getPrototypeOf(x) !== Object.getPrototypeOf(y)) return false;
+	}
+	return true;
+}
+
 class Scope {
 	constructor(parent, file) {
 		this.parent = parent;
@@ -432,6 +459,25 @@ export class Engine {
 		// what they read, they were just created) and the `volatile` ones, which read something that is not announced.
 		// `incremental = false` runs every binding on every pass, as before; `audit` then checks the shortcut.
 		this.incremental = true;
+		// An expression is run through names that were looked up before (src/resolve.js) instead of through a `with` chain.
+		// `verifyResolution` runs both and compares what they give (side effects of the expression happen twice): a debugging aid.
+		this.resolveNames = true;
+		this.verifyResolution = false;
+		this.resolveStats = { resolved: 0, withChain: 0 };
+		this.resolveMismatches = [];
+		// In Node (the tests): JQML_VERIFY=1 compares the two forms and tells what differed when the process ends, JQML_NORESOLVE=1 keeps `with`.
+		if (typeof process !== 'undefined' && process.env) {
+			if (process.env.JQML_NORESOLVE === '1') this.resolveNames = false;
+			if (process.env.JQML_VERIFY === '1') {
+				this.verifyResolution = true;
+				process.on('exit', () => {
+					const kinds = new Map();
+					for (const m of this.resolveMismatches) kinds.set(m.code.slice(0, 100), (kinds.get(m.code.slice(0, 100)) || 0) + 1);
+					console.error(`[verify] expressions ${this.resolveStats.resolved} resolved, ${this.resolveStats.withChain} left to with, ${this.resolveMismatches.length} different results`);
+					for (const [code, count] of kinds) console.error(`[verify]   x${count} ${JSON.stringify(code)}`);
+				});
+			}
+		}
 		this.primed = true; // false after a full sweep: the next incremental pass has to run every binding
 		this.bindingSeq = 0;
 		this.dirty = new Set();
@@ -1038,8 +1084,15 @@ export class Engine {
 		// The levels that are delegates have a context (roles) that is looked up after the objects of the level.
 		let contexts = '';
 		for (const level of levels) contexts += level.data !== null ? '1' : '0';
-		const key = `${depth}\n${contexts}\n${kind}\n${params}\n${code}`;
-		let factory = this.factories.get(key);
+		// The factories of a script: by the code first (the same string each time a binding is made, which keeps its hash; a key
+		// made of the whole text had to be hashed again at every call), then by the shape of the scope, the kind and the parameters.
+		const shape = `${depth}\n${contexts}\n${kind}\n${params}`;
+		let shapes = this.factories.get(code);
+		if (shapes === undefined) {
+			shapes = new Map();
+			this.factories.set(code, shapes);
+		}
+		let factory = shapes.get(shape);
 		if (factory === undefined) {
 			const names = ['__g'];
 			let open = 'with (__g) {';
@@ -1065,8 +1118,11 @@ export class Engine {
 			const js = escapeSourceBreaks(code);
 			const body = kind === 'expr' ? `return (${js}\n);` : js;
 			const source = `${open} return function (${params}) {\n${body}\n}; ${'}'.repeat(closing)}`;
-			factory = new Function(...names, source);
-			this.factories.set(key, factory);
+			const resolved = kind === 'expr' && this.resolveNames ? resolveExpression(code, params, depth, contexts) : null;
+			if (kind === 'expr') this.resolveStats[resolved !== null ? 'resolved' : 'withChain']++;
+			factory = new Function(...names, resolved !== null ? resolved : source);
+			if (resolved !== null && this.verifyResolution) factory.plain = new Function(...names, source);
+			shapes.set(shape, factory);
 		}
 		const args = [this.globals];
 		for (const scopeLevel of levels) {
@@ -1074,7 +1130,34 @@ export class Engine {
 			args.push(scopeLevel.root === null ? EMPTY : scopeLevel.root, scopeLevel.ids);
 		}
 		args.push(self);
+		if (factory.plain !== undefined) return this.verified(factory(...args), factory.plain(...args), code);
 		return factory(...args);
+	}
+
+	// Both forms of an expression, run one after the other: what they give must be the same (see `verifyResolution`).
+	verified(resolved, plain, code) {
+		return (...a) => {
+			let expected;
+			let failure = null;
+			try {
+				expected = plain.apply(this, a);
+			} catch (error) {
+				failure = error;
+			}
+			let value;
+			let thrown = null;
+			try {
+				value = resolved.apply(this, a);
+			} catch (error) {
+				thrown = error;
+			}
+			const same = failure !== null || thrown !== null ? failure !== null && thrown !== null && String(failure.constructor) === String(thrown.constructor) : sameResult(value, expected);
+			if (!same && this.resolveMismatches.length < 100) {
+				this.resolveMismatches.push({ code, resolved: thrown !== null ? `threw ${thrown}` : String(value), plain: failure !== null ? `threw ${failure}` : String(expected) });
+			}
+			if (failure !== null) throw failure;
+			return expected;
+		};
 	}
 
 	// ----- bindings -----
