@@ -21,13 +21,27 @@ CSmtpClientComp::CSmtpClientComp()
 
 // protected methods
 
-QByteArray CSmtpClientComp::BuildMimeMessage(const ISmtpMessage& message) const
+QString CSmtpClientComp::GetUser() const
+{
+	if (m_userParamCompPtr.IsValid()){
+		return m_userParamCompPtr->GetText();
+	}
+
+	if (m_userAttrPtr.IsValid()){
+		return *m_userAttrPtr;
+	}
+
+	return QString();
+}
+
+
+QByteArray CSmtpClientComp::BuildMimeMessage(const ISmtpMessage& message, const QString& sender) const
 {
 	const QByteArray lineBreak = QByteArrayLiteral("\r\n");
 	const QByteArray boundary = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
 	QByteArray retVal;
-	retVal.append(QByteArrayLiteral("From: ") + message.GetFrom().toUtf8() + lineBreak);
+	retVal.append(QByteArrayLiteral("From: ") + sender.toUtf8() + lineBreak);
 	retVal.append(QByteArrayLiteral("To: ") + message.GetTo().toUtf8() + lineBreak);
 	retVal.append(QByteArrayLiteral("Subject: ") + message.GetSubject().toUtf8() + lineBreak);
 	retVal.append(QByteArrayLiteral("MIME-Version: 1.0") + lineBreak);
@@ -117,13 +131,7 @@ bool CSmtpClientComp::RunSession(
 			const QByteArray& data,
 			QString& error) const
 {
-	QByteArray user;
-	if (m_userParamCompPtr.IsValid()){
-		user = m_userParamCompPtr->GetText().toUtf8();
-	}
-	else if (m_userAttrPtr.IsValid()){
-		user = *m_userAttrPtr;
-	}
+	const QByteArray user = GetUser().toUtf8();
 
 	QByteArray password;
 	if (m_passwordParamCompPtr.IsValid()){
@@ -248,9 +256,11 @@ int CSmtpClientComp::GetPort() const
 
 bool CSmtpClientComp::SendEmail(const ISmtpMessage& message) const
 {
-	const QString from = ExtractAddress(message.GetFrom());
+	// The user of the server is the sender of a message that has none.
+	const QString sender = message.GetFrom().isEmpty() ? GetUser() : message.GetFrom();
+	const QString from = ExtractAddress(sender);
 	const QString to = ExtractAddress(message.GetTo());
-	const QString headers = message.GetFrom() + message.GetTo() + message.GetSubject();
+	const QString headers = sender + message.GetTo() + message.GetSubject();
 	if (from.isEmpty() || to.isEmpty() || headers.contains('\r') || headers.contains('\n')){
 		SendErrorMessage(0, QStringLiteral("The message to '%1' has no sender or recipient, or has a line break in a header").arg(message.GetTo()), "CSmtpClientComp");
 
@@ -263,7 +273,7 @@ bool CSmtpClientComp::SendEmail(const ISmtpMessage& message) const
 		return false;
 	}
 
-	const QByteArray data = BuildMimeMessage(message);
+	const QByteArray data = BuildMimeMessage(message, sender);
 
 	m_threadPool.start([this, from, to, data](){
 		DeliverMessage(from, to, data);

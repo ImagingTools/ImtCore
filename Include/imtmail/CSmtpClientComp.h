@@ -48,7 +48,8 @@ public:
 	CSmtpClientComp();
 
 protected:
-	QByteArray BuildMimeMessage(const ISmtpMessage& message) const;
+	QString GetUser() const;
+	QByteArray BuildMimeMessage(const ISmtpMessage& message, const QString& sender) const;
 	QByteArray ToBase64Lines(const QByteArray& data) const;
 	QString ExtractAddress(const QString& address) const;
 	void DeliverMessage(const QString& from, const QString& to, const QByteArray& data) const;
