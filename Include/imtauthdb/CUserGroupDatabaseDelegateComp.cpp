@@ -9,12 +9,25 @@
 // ImtCore includes
 #include <imtauth/IUserInfo.h>
 #include <imtauth/IUserGroupInfo.h>
+#include <imtauth/CUserGroupInfo.h>
 #include <imtauth/CUserGroupFilter.h>
 #include <imtauthdb/imtauthdb.h>
 
 
 namespace imtauthdb
 {
+
+
+// Only the direct members are stored: GetUsers() also returns the users of the parent groups.
+static imtauth::IUserGroupInfo::UserIds GetOwnUserIds(const imtauth::IUserGroupInfo& groupInfo)
+{
+	const imtauth::CUserGroupInfo* groupImplPtr = dynamic_cast<const imtauth::CUserGroupInfo*>(&groupInfo);
+	if (groupImplPtr != nullptr){
+		return groupImplPtr->GetOwnUsers();
+	}
+
+	return groupInfo.GetUsers();
+}
 
 
 // public methods
@@ -38,7 +51,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserGroupDatabaseDelegateComp::C
 	const QString groupName = groupInfoPtr->GetName().isEmpty() ? objectName : groupInfoPtr->GetName();
 	NewObjectQuery retVal = BaseClass::CreateNewObjectQuery(typeId, proposedObjectId, groupName, objectDescription, valuePtr, operationContextPtr);
 	
-	imtauth::IUserGroupInfo::UserIds userIds = groupInfoPtr->GetUsers();
+	imtauth::IUserGroupInfo::UserIds userIds = GetOwnUserIds(*groupInfoPtr);
 	for (const QByteArray& userId : userIds){
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (m_userCollectionCompPtr->GetObjectData(userId, dataPtr)){
@@ -88,8 +101,8 @@ QByteArray CUserGroupDatabaseDelegateComp::CreateUpdateObjectQuery(
 	}
 	
 	if (useExternDelegate){
-		imtauth::IUserGroupInfo::UserIds oldUserIds = oldGroupInfoPtr->GetUsers();
-		imtauth::IUserGroupInfo::UserIds newUserIds = newGroupInfoPtr->GetUsers();
+		imtauth::IUserGroupInfo::UserIds oldUserIds = GetOwnUserIds(*oldGroupInfoPtr);
+		imtauth::IUserGroupInfo::UserIds newUserIds = GetOwnUserIds(*newGroupInfoPtr);
 		
 		imtauth::IUserGroupInfo::UserIds addedUsers;
 		imtauth::IUserGroupInfo::UserIds removedUsers;

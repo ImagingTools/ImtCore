@@ -64,6 +64,21 @@ public:
 		Get list of all availiable users.
 	*/
 	virtual const imtauth::IUserInfoProvider* GetUserProvider() const = 0;
+
+	/**
+		Get information about the system in which this group is located.
+	*/
+	virtual SystemInfoList GetSystemInfos() const = 0;
+
+	/**
+		Add group to the system.
+	*/
+	virtual bool AddToSystem(SystemInfo systemInfo) = 0;
+
+	/**
+		Remove a group from the system.
+	*/
+	virtual bool RemoveFromSystem(const QByteArray& systemId) = 0;
 };
 
 

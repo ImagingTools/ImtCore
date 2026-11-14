@@ -25,6 +25,8 @@ type GroupItemData {
 	roles: ID
 	users: ID
 	parentGroups: ID
+	systemId: ID
+	systemName: String
 	added: String
 	lastModified: String
 	usersCount: Int
@@ -35,6 +37,13 @@ type GroupsListPayload {
 	notification: NotificationItem
 }
 
+# System (e.g. internal or LDAP) a group belongs to, like SystemInfo of users.
+type GroupSystemInfo {
+	id: ID
+	name: String
+	enabled: Bool
+}
+
 type GroupData {
 	id: ID
 	productId: ID
@@ -43,6 +52,8 @@ type GroupData {
 	roles: [Assignment]
 	users: [Assignment]
 	parentGroups: [Assignment]
+	# Read-only: internal groups are created by users, LDAP groups by the synchronization.
+	systemInfos: [GroupSystemInfo]
 	# Read-only.
 	permissions: [Assignment]
 	accessWarnings: [AccessWarning]

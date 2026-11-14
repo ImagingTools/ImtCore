@@ -64,6 +64,28 @@ public:
 		MIT_ROLES
 	};
 
+	/**
+		Information about the system (e.g. internal or LDAP) an user or a group belongs to.
+	*/
+	struct SystemInfo
+	{
+		QByteArray systemId;
+		QString systemName;
+		bool enabled = true;
+
+		bool operator == (const SystemInfo& other) const
+		{
+			return (systemId == other.systemId) && (systemName == other.systemName) && (enabled == other.enabled);
+		}
+
+		bool operator != (const SystemInfo& other) const
+		{
+			return !(*this == other);
+		}
+	};
+
+	typedef QList<SystemInfo> SystemInfoList;
+
 
 	/**
 		Get list of all availiable permissions.
