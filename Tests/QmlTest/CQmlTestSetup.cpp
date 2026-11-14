@@ -6,6 +6,7 @@
 #include <QtQml/qqml.h>
 
 // ImtCore includes
+#include <GeneratedFiles/sdlgentestunionsdl/SDL/1.0/CPP/ScalarUnionObjects.h>
 #include <imtbase/CTreeItemModel.h>
 #include <imtbase/Init.h>
 #include <imtqml/CDataModelController.h>
@@ -23,6 +24,7 @@
 static void InitQmlResources()
 {
 	Q_INIT_RESOURCE(imtstylecontrolsqml);
+	Q_INIT_RESOURCE(sdlgentestunionScalarUnionSdl);
 	DefaultImtCoreQmlInitializer::InitImtCoreSdl();
 	DefaultImtCoreQmlInitializer::InitQml();
 }
@@ -74,6 +76,8 @@ void CQmlTestSetup::applicationAvailable()
 	qmlRegisterType<imtqml::CQmlProcess>("com.imtcore.imtqml", 1, 0, "Process");
 	qmlRegisterType<imtqml::CDocumentServiceController>("com.imtcore.imtqml", 1, 0, "DocumentServiceController");
 	qmlRegisterType<imtqml::CDataModelController>("com.imtcore.imtqml", 1, 0, "DataModelController");
+	// The C++ side of the SDL tests: the generated QObject classes, that are used by QML through the C++ models
+	qmlRegisterType<sdl::V1_0::sdlgentestunion::CScalarUnionPayloadObject>("sdlgentestunioncpp", 1, 0, "CppScalarUnionPayload");
 	RegisterSingleton("com.imtcore.imtqml", "NetworkEventInterceptor", imtqml::CNetworkEventInterceptor::Instance());
 
 	qmlRegisterModule("QtGraphicalEffects", 1, 12);
