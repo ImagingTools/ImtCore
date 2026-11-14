@@ -89,7 +89,7 @@
                     <AttributeInfo Id="DbName" Type="Id" ExportId="DbName">
                         <Data IsEnabled="true" Value="postgres"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="Pasword" Type="Id" ExportId="Password">
+                    <AttributeInfo Id="Password" Type="Id" ExportId="Password">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
