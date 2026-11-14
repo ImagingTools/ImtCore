@@ -14,7 +14,7 @@ namespace imtaccount
 
 
 /**
-	Meta-info creator for the person information object.
+	Meta-info creator for the contact information object.
 */
 class CContactInfoMetaInfoCreatorComp: public imtbase::CObjectMetaInfoCreatorCompBase
 {

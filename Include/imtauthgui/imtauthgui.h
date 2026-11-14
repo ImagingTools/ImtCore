@@ -88,17 +88,6 @@
 	    └─ CStandardAccountMenuComp - Account menu widget
 	\endcode
 	
-	<b>Contact Information:</b>
-	\code
-	CContactInfoEditorComp (iqtgui::TDesignerGuiCompBase)
-	├─ Edit contact details
-	├─ Phone, email, social media
-	├─ Multiple contact methods
-	└─ Validation and formatting
-	    │
-	    └─ CContactInfoViewDelegateComp - View delegate for contacts
-	\endcode
-	
 	<b>Address Management:</b>
 	\code
 	CAddressEditorComp (iqtgui::TDesignerGuiCompBase)
@@ -199,30 +188,6 @@
 	    // User clicked OK - save changes
 	    userCollection->UpdateObject(userInfo.get());
 	    qDebug() << "Account updated successfully";
-	}
-	\endcode
-	
-	\subsection imtauthgui_contact_editor Contact Editor
-	
-	**Edit Contact Information:**
-	\code{.cpp}
-	// Create contact editor
-	auto contactEditor = CContactInfoEditorComp::CreateInstance();
-	
-	// Load contact info
-	auto contactInfo = userInfo->GetContactInfo();
-	contactEditor->SetContactInfo(contactInfo.get());
-	
-	// Configure supported contact methods
-	contactEditor->EnableEmailEditing(true);
-	contactEditor->EnablePhoneEditing(true);
-	contactEditor->EnableSocialMediaEditing(true);
-	
-	// Show editor
-	if (contactEditor->ShowDialog() == QDialog::Accepted) {
-	    // Save contact changes
-	    userInfo->SetContactInfo(contactInfo.get());
-	    SaveUserInfo(userInfo.get());
 	}
 	\endcode
 	
