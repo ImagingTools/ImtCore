@@ -11,15 +11,11 @@ namespace imtcom
 // reimplemented (imtcom/CServerConnectionInterfaceParam)
 int CServerConnectionInterfaceParamComp::GetConnectionFlags() const
 {
+	const int flags = BaseClass2::GetConnectionFlags();
 	if (m_sslEnabledCompPtr.IsValid()){
-		if (m_sslEnabledCompPtr->IsEnabled()){
-			return CF_SECURE;
-		}
-		else{
-			return CF_DEFAULT;
-		}
+		return WithSecureMode(flags, m_sslEnabledCompPtr->IsEnabled());
 	}
-	return BaseClass2::GetConnectionFlags();
+	return flags;
 }
 
 // reimplemented (icomp::CComponentBase)

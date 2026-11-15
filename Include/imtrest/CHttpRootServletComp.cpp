@@ -51,6 +51,13 @@ namespace imtrest
 
 // public methods
 
+CHttpRootServletComp::CHttpRootServletComp()
+	// the web clients of all JQML versions in both encodings fit
+	:m_compressedDataCache(64 * 1024 * 1024)
+{
+}
+
+
 // reimplemented (IRequestHandler)
 
 bool CHttpRootServletComp::IsCommandSupported(const QByteArray& commandId) const
@@ -93,38 +100,10 @@ imtrest::ConstResponsePtr CHttpRootServletComp::ProcessRequest(const IRequest& r
 					}
 				}
 			}
-			if (encodingType == ET_DEFLATE){
-				QByteArray data = responsePtr->GetData();
-				QByteArray qData = qCompress(data, 8);
-				qData.remove(0, 4);
-				httpResponsePtr->SetData(qData);
+			if (encodingType != ET_NONE){
+				httpResponsePtr->SetData(GetCompressedData(commandId, *responsePtr, encodingType));
 				IResponse::Headers headers = responsePtr->GetHeaders();
-				headers.insert("content-encoding", "deflate");
-				httpResponsePtr->SetHeaders(headers);
-			}
-			if (encodingType == ET_GZIP){
-				QByteArray data = responsePtr->GetData();
-				QByteArray qData = qCompress(data, 8);
-				qData.remove(0, 6);
-				qData.remove(qData.length() - 4, 4);
-				int crc = (int)crc32(0, (unsigned char *)qData.data(), qData.length());
-				const char gzipheader[] = {
-						 0x1f, static_cast<char>(0x8b)      // gzip magic number
-						 , 8             // compress method "defalte"
-						 , 1             // text data
-						 , 0, 0, 0, 0    // timestamp is not set
-						 , 2             // maximum compression flag
-						 , static_cast<char>(255)           // unknown OS
-					 };
-				QByteArray outData;
-				QDataStream datastream(&outData, QIODevice::WriteOnly);
-				datastream.device()->write(gzipheader,10);
-				datastream.device()->write(qData);
-				datastream << crc;
-				datastream << qData.length();
-				httpResponsePtr->SetData(outData);
-				IResponse::Headers headers = responsePtr->GetHeaders();
-				headers.insert("content-encoding", "gzip");
+				headers.insert("content-encoding", encodingType == ET_DEFLATE ? "deflate" : "gzip");
 				httpResponsePtr->SetHeaders(headers);
 			}
 		}
@@ -170,6 +149,73 @@ IRequestServlet* CHttpRootServletComp::FindRequestHandler(const QByteArray& comm
 	}
 
 	return nullptr;
+}
+
+
+QByteArray CHttpRootServletComp::GetCompressedData(const QByteArray& commandId, const IResponse& response, EncodingType encodingType) const
+{
+	QByteArray eTag;
+	const IResponse::Headers headers = response.GetHeaders();
+	for (IResponse::Headers::ConstIterator headerIter = headers.constBegin(); headerIter != headers.constEnd(); ++headerIter){
+		if (headerIter.key().toLower() == "etag"){
+			eTag = headerIter.value();
+			break;
+		}
+	}
+
+	if (eTag.isEmpty()){
+		return Compress(response.GetData(), encodingType);
+	}
+
+	const QByteArray cacheKey = commandId + '\n' + eTag + '\n' + QByteArray::number(encodingType);
+	{
+		QMutexLocker cacheLock(&m_compressedDataCacheMutex);
+		const QByteArray* cachedDataPtr = m_compressedDataCache.object(cacheKey);
+		if (cachedDataPtr != nullptr){
+			return *cachedDataPtr;
+		}
+	}
+
+	// two requests of a new body may both compress it, the later one replaces the earlier in the cache
+	const QByteArray compressedData = Compress(response.GetData(), encodingType);
+	{
+		QMutexLocker cacheLock(&m_compressedDataCacheMutex);
+		m_compressedDataCache.insert(cacheKey, new QByteArray(compressedData), compressedData.size());
+	}
+
+	return compressedData;
+}
+
+
+QByteArray CHttpRootServletComp::Compress(const QByteArray& data, EncodingType encodingType)
+{
+	if (encodingType == ET_DEFLATE){
+		QByteArray qData = qCompress(data, 8);
+		qData.remove(0, 4);
+
+		return qData;
+	}
+
+	QByteArray qData = qCompress(data, 8);
+	qData.remove(0, 6);
+	qData.remove(qData.length() - 4, 4);
+	int crc = (int)crc32(0, (unsigned char *)qData.data(), qData.length());
+	const char gzipheader[] = {
+			 0x1f, static_cast<char>(0x8b)      // gzip magic number
+			 , 8             // compress method "defalte"
+			 , 1             // text data
+			 , 0, 0, 0, 0    // timestamp is not set
+			 , 2             // maximum compression flag
+			 , static_cast<char>(255)           // unknown OS
+		 };
+	QByteArray outData;
+	QDataStream datastream(&outData, QIODevice::WriteOnly);
+	datastream.device()->write(gzipheader,10);
+	datastream.device()->write(qData);
+	datastream << crc;
+	datastream << qData.length();
+
+	return outData;
 }
 
 

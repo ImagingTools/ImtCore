@@ -60,7 +60,7 @@ sdl::V1_0::imtauth::CGroupData CGroupCollectionDocumentServiceComp::OnGetGroupRe
 	response.name = groupPtr->GetName();
 	response.description = groupPtr->GetDescription();
 
-	// Roles are productId-scoped on IUserBaseInfo; only a superuser sees the roles of all products.
+	// Roles are productId-scoped on IPrincipal; only a superuser sees the roles of all products.
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 	const imtauth::IUserInfo* contextUserPtr = gqlContextPtr != nullptr ? gqlContextPtr->GetUserInfo() : nullptr;
 	const QByteArray productId = (contextUserPtr != nullptr && !contextUserPtr->IsAdmin()) ? gqlContextPtr->GetProductId() : QByteArray();

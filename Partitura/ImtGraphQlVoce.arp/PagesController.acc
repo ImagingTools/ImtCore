@@ -19,7 +19,7 @@
                     <AttributeInfo Id="FixedItemQmlPath" Type="Text" ExportId="AdministrationPageQmlPath">
                         <Data IsEnabled="true" Value="qrc:/qml/imtauthgui/AdministrationView.qml"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="IconPath" Type="Text" ExportId="">
+                    <AttributeInfo Id="IconPath" Type="Text" ExportId="AdministrationPageIconPath">
                         <Data IsEnabled="true" Value="Icons/AdminPanel"/>
                     </AttributeInfo>
                     <AttributeInfo Id="IsVisible" Type="Boolean" ExportId="AdminPageVisible">
@@ -28,7 +28,7 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="Name" Type="Text" ExportId="">
+                    <AttributeInfo Id="Name" Type="Text" ExportId="AdministrationPageName">
                         <Data IsEnabled="true" Value="Admin"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PageId" Type="Id" ExportId="">

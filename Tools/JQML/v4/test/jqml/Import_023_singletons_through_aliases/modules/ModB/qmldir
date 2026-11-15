@@ -1,0 +1,4 @@
+module ModB
+Thing 1.0 Thing.qml
+singleton Style 1.0 Style.qml
+OnlyB 1.0 OnlyB.qml

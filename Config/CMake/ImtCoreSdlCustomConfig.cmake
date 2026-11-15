@@ -261,10 +261,9 @@ macro (ImtCoreCustomConfigureSdlCpp)
 	# so it is created next to it and is not compiled separately
 	set(SDL_MOC_SOURCES)
 	foreach(SDL_HEADER ${FOUND_DEPS})
-		string(FIND "${SDL_HEADER}" ".h" matchres)
-		string(FIND "${SDL_HEADER}" "_fwd.h" matchres_fwd)
-
-		if (${matchres} GREATER -1 AND ${matchres_fwd} EQUAL -1)
+		# match the extension only: a '.h' elsewhere in the path (e.g. home directory 'first.last') also selects the .cpp,
+		# whose empty moc output then overwrites the header's
+		if ("${SDL_HEADER}" MATCHES "\\.h$" AND NOT "${SDL_HEADER}" MATCHES "_fwd\\.h$")
 			get_filename_component(SDL_HEADER_NAME "${SDL_HEADER}" NAME_WE)
 			set(SDL_MOC_SOURCE "${SDL_CPP_OUTPUT_DIRECTORY}/moc_${SDL_HEADER_NAME}.cpp")
 			qt6_generate_moc("${SDL_HEADER}" "${SDL_MOC_SOURCE}")

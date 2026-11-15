@@ -15,8 +15,8 @@ namespace imtauthgql
 
 void CAssignmentCollector::CollectUser(
 			const imtauth::IUserInfo& userInfo,
-			const imtauth::IUserBaseInfo::RoleIds& roleIds,
-			const imtauth::IUserBaseInfo::RoleIds& directRoleIds,
+			const imtauth::IPrincipal::RoleIds& roleIds,
+			const imtauth::IPrincipal::RoleIds& directRoleIds,
 			const QByteArray& productId)
 {
 	for (const QByteArray& roleId : roleIds){

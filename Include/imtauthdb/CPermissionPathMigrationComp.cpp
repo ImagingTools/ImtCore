@@ -10,7 +10,7 @@
 
 // ImtCore includes
 #include <imtauth/IRole.h>
-#include <imtauth/IUserBaseInfo.h>
+#include <imtauth/IPrincipal.h>
 #include <imtbase/COperationDescription.h>
 #include <imtbase/IObjectCollectionIterator.h>
 #include <imtlic/IFeatureInfo.h>
@@ -98,7 +98,7 @@ bool CPermissionPathMigrationComp::Migrate() const
 		});
 	}
 
-	auto convertUserBase = [this, &pathMap, &productId](imtauth::IUserBaseInfo& userBaseInfo, imtbase::COperationContext& operationContext){
+	auto convertUserBase = [this, &pathMap, &productId](imtauth::IPrincipal& userBaseInfo, imtbase::COperationContext& operationContext){
 		QByteArrayList permissions = userBaseInfo.GetLocalPermissions(productId);
 		const bool permissionsChanged = ConvertIds(permissions, pathMap, "AddPermission", "RemovePermission", "Permission", QT_TRANSLATE_NOOP("Attribute", "Permission"), operationContext);
 		if (permissionsChanged){
@@ -115,11 +115,11 @@ bool CPermissionPathMigrationComp::Migrate() const
 	};
 
 	if (m_userCollectionCompPtr.IsValid()){
-		retVal = MigrateCollection<imtauth::IUserBaseInfo>(*m_userCollectionCompPtr, QStringLiteral("user"), convertUserBase) && retVal;
+		retVal = MigrateCollection<imtauth::IPrincipal>(*m_userCollectionCompPtr, QStringLiteral("user"), convertUserBase) && retVal;
 	}
 
 	if (m_userGroupCollectionCompPtr.IsValid()){
-		retVal = MigrateCollection<imtauth::IUserBaseInfo>(*m_userGroupCollectionCompPtr, QStringLiteral("group"), convertUserBase) && retVal;
+		retVal = MigrateCollection<imtauth::IPrincipal>(*m_userGroupCollectionCompPtr, QStringLiteral("group"), convertUserBase) && retVal;
 	}
 
 	return retVal;

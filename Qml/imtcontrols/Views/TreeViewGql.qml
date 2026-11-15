@@ -105,6 +105,7 @@ Rectangle{
 			property int delegateWidthFull: list.maxLevel * treeViewGql.shift + list.delegateWidth;
 			property int maxLevel: 1;
 			reuseItems: true
+			cacheBuffer: 500
 
 			onContentYChanged: {
 				listFrame.contentY = contentY;

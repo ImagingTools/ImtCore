@@ -1,0 +1,10 @@
+{
+  "name": "jqml",
+  "version": "5.0.0",
+  "description": "QML compiler and runtime for the web (snapshot of JQMLNext)",
+  "main": "compiler/index.js",
+  "license": "ISC",
+  "dependencies": {
+    "uglify-js": "^3.19.3"
+  }
+}

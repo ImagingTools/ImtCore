@@ -10,6 +10,7 @@ Willkommen zur QML- und JQML-Dokumentation des ImtCore SDK. Diese Dokumentation 
 | **[Modul-Referenz](QML_Module_Reference.md)** | Detaillierte Referenz aller QML-Module und Komponenten | Nachschlagewerk |
 | **[JQML Guide](QML_JQML_Guide.md)** | JQML-Versionen, Web-Kompilierung, Cross-Platform-Entwicklung | Web-Deployment |
 | **[JQML v3 Fixes (RU)](JQML_V3_Fixes.ru.md)** | Begründung der Compiler- und Runtime-Korrekturen in JQML v3 | Wartung |
+| **[C++-Typen und ihre Web-Analoga (RU)](../JQML/CppAnalogs.md)** | Welche C++-Typen (TreeItemModel, RemoteFileController usw.) JQML v4 im Web nachbildet und welche nicht | Web-Entwicklung |
 | **[Komponenten-Tutorials](QML_Component_Tutorials.md)** | Praktische Tutorials für häufige UI-Muster | Praxis-Beispiele |
 | **[Document Service Client (RU)](DocumentService_Client_Architecture.ru.md)** | Клиентские Document Service: локальный и клиент серверного сервиса | Dokumenten-Workflows |
 

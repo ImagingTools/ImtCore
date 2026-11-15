@@ -1,0 +1,18 @@
+module sdlTable
+
+MeasurementViewData 1.0 MeasurementViewData.qml
+MeasurementContainer 1.0 MeasurementContainer.qml
+SpectralColorMeasurementSpecification 1.0 SpectralColorMeasurementSpecification.qml
+DeviceInfo 1.0 DeviceInfo.qml
+SpectrumInfo 1.0 SpectrumInfo.qml
+ColorantItem 1.0 ColorantItem.qml
+ColorantProperties 1.0 ColorantProperties.qml
+Lab 1.0 Lab.qml
+RgbColorHex 1.0 RgbColorHex.qml
+Condition 1.0 Condition.qml
+MeasurementItem 1.0 MeasurementItem.qml
+MeasurementValue 1.0 MeasurementValue.qml
+MeasurementValueView 1.0 MeasurementValueView.qml
+MeasurementTableViewData 1.0 MeasurementTableViewData.qml
+TableViewCondition 1.0 TableViewCondition.qml
+TableViewRow 1.0 TableViewRow.qml

@@ -165,19 +165,9 @@ Item{
 		anchors.left: leftBorder.right;
 		anchors.right: rightBorder.left;
 		anchors.bottom: bottomBorder.top;
-		color: headerDelegate.tableItem.emptyDecorHeader ? "transparent" :
-														   headerDelegate.tableItem.headerDecorator.isValidData("Color", headerDelegate.columnIndex) ?
-															   headerDelegate.tableItem.headerDecorator.getData("Color", headerDelegate.columnIndex) :
-															   "transparent";
-
-		opacity:  headerDelegate.tableItem.emptyDecorHeader ? 1 :
-															  headerDelegate.tableItem.headerDecorator.isValidData("Opacity", headerDelegate.columnIndex) ?
-																  headerDelegate.tableItem.headerDecorator.getData("Opacity", headerDelegate.columnIndex) :
-																  1;
-
-		radius: headerDelegate.tableItem.emptyDecorHeader ? 0 :
-															headerDelegate.tableItem.headerDecorator.isValidData("CellRadius", headerDelegate.columnIndex) ?
-																headerDelegate.tableItem.headerDecorator.getData("CellRadius", headerDelegate.columnIndex) :0;
+		color: headerDelegate.tableItem.headerCellColor(headerDelegate.columnIndex);
+		opacity: headerDelegate.tableItem.headerCellOpacity(headerDelegate.columnIndex);
+		radius: headerDelegate.tableItem.headerCellRadius(headerDelegate.columnIndex);
 
 		// Tells the reader the title is a control before they click it, in the
 		// tab strip's manner: a light wash inset from the cell's edges, and not
@@ -238,9 +228,8 @@ Item{
 			width: parent.width/2;
 			height: parent.height/2;
 			color: parent.color;
-			visible: headerDelegate.tableItem.emptyDecorHeader ? true :
-																 headerDelegate.tableItem.headerDecorator.isValidData("LeftTopRound", headerDelegate.columnIndex) ?
-																	 !headerDelegate.tableItem.headerDecorator.getData("LeftTopRound", headerDelegate.columnIndex) :true;
+			// In a table with a checkbox column the cell of that column owns the left corners.
+			visible: headerDelegate.tableItem.checkable && headerDelegate.firstVisibleColumn ? true : !headerDelegate.tableItem.isHeaderCornerRounded("LeftTopRound", headerDelegate.columnIndex);
 		}
 
 		Rectangle{
@@ -250,9 +239,7 @@ Item{
 			width: parent.width/2;
 			height: parent.height/2;
 			color: parent.color;
-			visible: headerDelegate.tableItem.emptyDecorHeader ? true :
-																 headerDelegate.tableItem.headerDecorator.isValidData("RightTopRound", headerDelegate.columnIndex) ?
-																	 !headerDelegate.tableItem.headerDecorator.getData("RightTopRound", headerDelegate.columnIndex) :true;
+			visible: !headerDelegate.tableItem.isHeaderCornerRounded("RightTopRound", headerDelegate.columnIndex);
 		}
 
 		Rectangle{
@@ -262,9 +249,8 @@ Item{
 			width: parent.width/2;
 			height: parent.height/2;
 			color: parent.color;
-			visible: headerDelegate.tableItem.emptyDecorHeader ? true :
-																 headerDelegate.tableItem.headerDecorator.isValidData("LeftBottomRound", headerDelegate.columnIndex) ?
-																	 !headerDelegate.tableItem.headerDecorator.getData("LeftBottomRound", headerDelegate.columnIndex) :true;
+			// In a table with a checkbox column the cell of that column owns the left corners.
+			visible: headerDelegate.tableItem.checkable && headerDelegate.firstVisibleColumn ? true : !headerDelegate.tableItem.isHeaderCornerRounded("LeftBottomRound", headerDelegate.columnIndex);
 		}
 
 		Rectangle{
@@ -274,9 +260,7 @@ Item{
 			width: parent.width/2;
 			height: parent.height/2;
 			color: parent.color;
-			visible: headerDelegate.tableItem.emptyDecorHeader ? true :
-																 headerDelegate.tableItem.headerDecorator.isValidData("RightBottomRound", headerDelegate.columnIndex) ?
-																	 !headerDelegate.tableItem.headerDecorator.getData("RightBottomRound", headerDelegate.columnIndex) :true;
+			visible: !headerDelegate.tableItem.isHeaderCornerRounded("RightBottomRound", headerDelegate.columnIndex);
 		}
 		//cornerPatches
 

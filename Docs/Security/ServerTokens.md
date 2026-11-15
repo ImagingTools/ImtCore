@@ -295,7 +295,7 @@ kept in the user, which then points to no provider: nothing is read again from a
 role or group grants nothing; a role or a group that cannot be read, a missing collection or an object of an unexpected type make the
 check unavailable.
 
-This local resolution is not tenant-aware: it is `IUserBaseInfo::GetPermissions`, as for the requests of Puma itself, and it is not
+This local resolution is not tenant-aware: it is `IPrincipal::GetPermissions`, as for the requests of Puma itself, and it is not
 the computation Puma makes for a product server. A role of another organization still grants its permissions there, bounded by the
 organization permissions of the context. Making it tenant-aware is a separate change.
 

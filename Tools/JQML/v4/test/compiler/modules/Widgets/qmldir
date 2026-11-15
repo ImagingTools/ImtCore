@@ -1,0 +1,5 @@
+module Widgets
+
+Widget 1.0 Widget.qml
+singleton Theme 1.0 Base/Theme.qml
+Util 1.0 util.js

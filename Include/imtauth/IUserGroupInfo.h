@@ -3,7 +3,7 @@
 
 
 // ImtCore includes
-#include <imtauth/IUserBaseInfo.h>
+#include <imtauth/IPrincipal.h>
 
 
 
@@ -19,7 +19,7 @@ class IUserInfoProvider;
 	Interface for describing an user group.
 	\ingroup User
 */
-class IUserGroupInfo: virtual public IUserBaseInfo
+class IUserGroupInfo: virtual public IPrincipal
 {
 public:
 	typedef QByteArrayList UserIds;

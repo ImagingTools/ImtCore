@@ -48,7 +48,7 @@
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ApplicationPreferences" Type="Reference" ExportId="">
+                    <AttributeInfo Id="ApplicationPreferences" Type="Reference" ExportId="ApplicationPreferences">
                         <Data IsEnabled="true" Value="AppPreferences"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ServiceDependencies" Type="Reference[]" ExportId="ServiceDependencies">
@@ -122,6 +122,12 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="AdministationPageAlignment" Type="Integer" ExportId="AdministationPageAlignment">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="AdministrationPageIconPath" Type="Text" ExportId="AdministrationPageIconPath">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="AdministrationPageName" Type="Text" ExportId="AdministrationPageName">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="AdministrationPagePermissions" Type="Id[]" ExportId="AdministrationPagePermissions">

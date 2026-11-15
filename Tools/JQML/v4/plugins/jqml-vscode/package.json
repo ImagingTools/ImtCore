@@ -1,0 +1,96 @@
+{
+    "name": "jqml4",
+    "displayName": "JQML 4",
+    "description": "Syntax highlighting, completions, navigation and live diagnostics for JQML 4",
+    "version": "1.0.0",
+    "publisher": "imtcore",
+    "engines": {
+        "vscode": "^1.74.0"
+    },
+    "categories": [
+        "Programming Languages",
+        "Linters"
+    ],
+    "activationEvents": [
+        "onLanguage:jqml4"
+    ],
+    "main": "./src/extension.js",
+    "scripts": {
+        "build": "node scripts/build.mjs",
+        "test": "node scripts/build.mjs && node --test test/service.test.mjs",
+        "package": "node scripts/package.mjs"
+    },
+    "contributes": {
+        "languages": [
+            {
+                "id": "jqml4",
+                "aliases": [
+                    "JQML 4"
+                ],
+                "extensions": [
+                    ".qml"
+                ],
+                "configuration": "./language-configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "jqml4",
+                "scopeName": "source.jqml4",
+                "path": "./syntaxes/qml.tmLanguage.json"
+            }
+        ],
+        "configuration": {
+            "title": "JQML 4",
+            "properties": {
+                "jqml4.configPath": {
+                    "type": "string",
+                    "default": "",
+                    "description": "Path to a JQML compiler JSON config with dirs/includes. Absolute path, ${workspaceFolder} and ${env:NAME} are supported."
+                },
+                "jqml4.env": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "default": {},
+                    "description": "Variables used for ${NAME} placeholders in the compiler config. They override the process environment."
+                },
+                "jqml4.importPaths": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "default": [],
+                    "description": "Folders searched for <Module>/qmldir to resolve `import Module 1.0`. ${workspaceFolder} and ${env:NAME} are supported."
+                },
+                "jqml4.enginePath": {
+                    "type": "string",
+                    "default": "",
+                    "description": "Optional root of the JQML v4 sources (the folder with src/items.js). Used to open the source of built-in types on Go to Definition. Empty: the folder this extension was built from."
+                },
+                "jqml4.hideInternalMembers": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Hide names that start with an underscore from completions."
+                },
+                "jqml4.diagnostics.unknownTypes": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Warn about types that are neither built in nor found through imports."
+                },
+                "jqml4.diagnostics.unknownMembers": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Warn about properties and signal handlers that the type does not declare."
+                }
+            }
+        },
+        "commands": [
+            {
+                "command": "jqml4.reload",
+                "title": "JQML 4: Reload project"
+            }
+        ]
+    }
+}

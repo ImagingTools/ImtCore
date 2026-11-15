@@ -1,0 +1,6 @@
+{
+    "includes": [
+        "./level2.json"
+    ],
+    "dirs": []
+}

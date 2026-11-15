@@ -62,6 +62,7 @@ type ApplicationInfo {
 	applicationType: String
 	logoIconName: String
 	webSocketUrl: UrlParam
+	webSocketSameOrigin: Bool
 	userMode: UserManagementMode
 	superuser: SuperuserCheckResult
 	tenantsEnabled: Bool

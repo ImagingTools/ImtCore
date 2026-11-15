@@ -343,7 +343,7 @@ public:
 		if (collectionPtr == nullptr || !collectionPtr->GetObjectData(groupId, dataPtr)){
 			return imtauth::IUserGroupInfoSharedPtr();
 		}
-		imtauth::CUserBaseInfo* groupPtr = dynamic_cast<imtauth::CUserBaseInfo*>(dataPtr.GetPtr());
+		imtauth::CPrincipalBase* groupPtr = dynamic_cast<imtauth::CPrincipalBase*>(dataPtr.GetPtr());
 		if (groupPtr != nullptr){
 			groupPtr->SetRoleProvider(roleSourcePtr);
 			groupPtr->SetUserGroupProvider(this);
@@ -1512,7 +1512,7 @@ void CAuthorizationRenewalTest::ProductOfGroupIsKept()
 	QVERIFY(!userInfoPtr->GetPermissions(s_productId).contains("/Reports/Read"));
 
 	// Without a product too
-	const imtauth::IUserBaseInfo::FeatureIds all = userInfoPtr->GetPermissions();
+	const imtauth::IPrincipal::FeatureIds all = userInfoPtr->GetPermissions();
 	QVERIFY(all.contains("/Reports/Read"));
 	QVERIFY(all.contains("/Read"));
 
@@ -2745,7 +2745,7 @@ void CAuthorizationRenewalTest::SessionAuthorizationRejectsIncompleteReply()
 		fixture.Role(s_roleId).SetLocalPermissions({});
 		const auto emptyAuthorization = fixture.remoteSessionProvider->GetSessionAuthorization(token, s_productId, true);
 		QCOMPARE(emptyAuthorization.state, imtauth::ISessionAuthorizationProvider::SAS_COMPUTED);
-		const auto* userPtr = dynamic_cast<const imtauth::CUserBaseInfo*>(emptyAuthorization.userPtr.GetPtr());
+		const auto* userPtr = dynamic_cast<const imtauth::CPrincipalBase*>(emptyAuthorization.userPtr.GetPtr());
 		QVERIFY(userPtr != nullptr);
 		QVERIFY(userPtr->HasLocalPermissions(s_productId));
 		QVERIFY(userPtr->GetLocalPermissions(s_productId).isEmpty());

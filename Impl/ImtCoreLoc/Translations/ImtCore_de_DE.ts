@@ -256,6 +256,30 @@
 <context>
     <name>Attribute</name>
     <message>
+        <source>Admin</source>
+        <translation>Verwaltung</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Suche</translation>
+    </message>
+    <message>
+        <source>Support</source>
+        <translation>Support</translation>
+    </message>
+    <message>
+        <source>Notifications</source>
+        <translation>Benachrichtigungen</translation>
+    </message>
+    <message>
+        <source>Organizations</source>
+        <translation>Organisationen</translation>
+    </message>
+    <message>
+        <source>Workspace</source>
+        <translation>Arbeitsbereich</translation>
+    </message>
+    <message>
         <location filename="../../../Include/imtauth/CUserChangeGeneratorComp.cpp" line="+81"/>
         <source>Security-ID</source>
         <translation>Sicherheits-ID</translation>

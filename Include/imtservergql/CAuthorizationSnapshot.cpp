@@ -10,7 +10,7 @@
 #include <imtbase/IObjectCollectionReadStatus.h>
 #include <imtauth/CollectionSelection.h>
 #include <imtauth/CRole.h>
-#include <imtauth/CUserBaseInfo.h>
+#include <imtauth/CPrincipalBase.h>
 #include <imtauth/IUserGroupInfo.h>
 
 
@@ -57,7 +57,7 @@ CAuthorizationSnapshot::ReadStatus CAuthorizationSnapshot::ReadUser(
 		return status;
 	}
 
-	imtauth::CUserBaseInfo* userBasePtr = dynamic_cast<imtauth::CUserBaseInfo*>(userPtr.GetPtr());
+	imtauth::CPrincipalBase* userBasePtr = dynamic_cast<imtauth::CPrincipalBase*>(userPtr.GetPtr());
 	if (dynamic_cast<imtauth::IUserInfo*>(userPtr.GetPtr()) == nullptr || userBasePtr == nullptr){
 		userPtr.Reset();
 		errorMessage = QStringLiteral("The user account has an unexpected type.");
@@ -93,7 +93,7 @@ bool CAuthorizationSnapshot::KeepPermissions(imtauth::IUserInfo& userInfo, const
 	}
 	productIds << productId;
 
-	QHash<QByteArray, imtauth::IUserBaseInfo::FeatureIds> permissions;
+	QHash<QByteArray, imtauth::IPrincipal::FeatureIds> permissions;
 	for (const QByteArray& permissionProductId : std::as_const(productIds)){
 		if (!permissionProductId.isEmpty() && !permissions.contains(permissionProductId)){
 			permissions.insert(permissionProductId, userInfo.GetPermissions(permissionProductId));
@@ -126,7 +126,7 @@ bool CAuthorizationSnapshot::IsComplete(QString& errorMessage) const
 
 void CAuthorizationSnapshot::DetachUser(istd::IChangeable& user)
 {
-	imtauth::CUserBaseInfo* userBasePtr = dynamic_cast<imtauth::CUserBaseInfo*>(&user);
+	imtauth::CPrincipalBase* userBasePtr = dynamic_cast<imtauth::CPrincipalBase*>(&user);
 	if (userBasePtr != nullptr){
 		userBasePtr->SetRoleProvider(nullptr);
 		userBasePtr->SetUserGroupProvider(nullptr);
@@ -261,7 +261,7 @@ imtbase::IObjectCollection::DataPtr CAuthorizationSnapshot::ReadOnce(ObjectKind 
 	else{
 		// What it refers to is read here too
 		imtauth::CRole* rolePtr = dynamic_cast<imtauth::CRole*>(objectPtr.GetPtr());
-		imtauth::CUserBaseInfo* groupPtr = dynamic_cast<imtauth::CUserBaseInfo*>(objectPtr.GetPtr());
+		imtauth::CPrincipalBase* groupPtr = dynamic_cast<imtauth::CPrincipalBase*>(objectPtr.GetPtr());
 		const bool isExpectedType = isRole
 					? (rolePtr != nullptr)
 					: (groupPtr != nullptr && dynamic_cast<imtauth::IUserGroupInfo*>(objectPtr.GetPtr()) != nullptr);

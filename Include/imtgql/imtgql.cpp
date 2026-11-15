@@ -72,7 +72,7 @@ bool RestrictUserPermissions(IGqlContext& gqlContext, const QByteArrayList& perm
 		return false;
 	}
 	for (const QByteArray& product : user.GetProducts()){
-		user.SetRoles(product, imtauth::IUserBaseInfo::RoleIds());
+		user.SetRoles(product, imtauth::IPrincipal::RoleIds());
 		user.SetLocalPermissions(product, QByteArrayList());
 	}
 	for (const QByteArray& group : user.GetGroups()){

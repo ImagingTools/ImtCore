@@ -128,9 +128,26 @@ public:
 	enum ConnectionFlags
 	{
 		CF_DEFAULT = 0x1,	///< Default insecure connection (HTTP, WS)
-		CF_SECURE = 0x2		///< Secure connection with SSL/TLS encryption (HTTPS, WSS)
+		CF_SECURE = 0x2,	///< Secure connection with SSL/TLS encryption (HTTPS, WSS)
+		/**
+			Web clients reach the WebSocket on the origin of the HTTP page (same scheme, host and port),
+			at the path /<application id>/wssub, instead of on the WebSocket port.
+			Set when a reverse proxy in front of the server forwards that path to the WebSocket port.
+		*/
+		CF_WEBSOCKET_SAME_ORIGIN = 0x4
 	};
-	I_DECLARE_FLAGS(ConnectionFlags, CF_DEFAULT, CF_SECURE);
+	I_DECLARE_FLAGS(ConnectionFlags, CF_DEFAULT, CF_SECURE, CF_WEBSOCKET_SAME_ORIGIN);
+
+	/**
+		\brief Return \a connectionFlags switched to secure or insecure mode.
+
+		Replaces CF_SECURE / CF_DEFAULT according to \a isSecure and keeps all other flags.
+	*/
+	static int WithSecureMode(int connectionFlags, bool isSecure)
+	{
+		connectionFlags &= ~(CF_SECURE | CF_DEFAULT);
+		return connectionFlags | (isSecure ? CF_SECURE : CF_DEFAULT);
+	}
 
 	/**
 		\typedef ProtocolTypes
@@ -145,7 +162,7 @@ public:
 		Returns the current connection flags, which control whether connections
 		use secure (HTTPS/WSS) or insecure (HTTP/WS) protocols.
 		
-		\return Current connection flags (CF_DEFAULT or CF_SECURE).
+		\return Current combination of ConnectionFlags.
 		\sa SetConnectionFlags(), ConnectionFlags
 	*/
 	virtual int GetConnectionFlags() const = 0;
@@ -156,7 +173,7 @@ public:
 		Configures whether the connection should use secure (encrypted) or
 		insecure protocols. This flag affects URL generation via GetUrl().
 		
-		\param connectionFlags Connection flags to set (CF_DEFAULT or CF_SECURE).
+		\param connectionFlags Combination of ConnectionFlags to set.
 		\sa GetConnectionFlags(), ConnectionFlags, GetUrl()
 		
 		\par Example:

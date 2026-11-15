@@ -144,6 +144,8 @@ void CApplicationInfoControllerComp::FillWebSocketUrl(ApplicationInfo& applicati
 	webSocketUrl.scheme = url.scheme();
 
 	applicationInfo.webSocketUrl = std::move(webSocketUrl);
+	applicationInfo.webSocketSameOrigin =
+				(m_webSocketUrlProviderCompPtr->GetConnectionFlags() & imtcom::IServerConnectionInterface::CF_WEBSOCKET_SAME_ORIGIN) != 0;
 }
 
 

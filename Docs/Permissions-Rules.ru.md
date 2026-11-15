@@ -323,7 +323,7 @@ Lisa FeatureEditor ──generate──► <Product>Features.h ──FillProduct
    = действующие права
 ```
 
-- **R8.1. Права привязаны к продукту** (`IRole::GetProductId`, `IUserBaseInfo::GetRoles(productId)`, `GetPermissions(productId)`). Продукт запроса определяет сервер по своей конфигурации, а не клиент (13.13). Роли другого продукта не открывают команды этого продукта.
+- **R8.1. Права привязаны к продукту** (`IRole::GetProductId`, `IPrincipal::GetRoles(productId)`, `GetPermissions(productId)`). Продукт запроса определяет сервер по своей конфигурации, а не клиент (13.13). Роли другого продукта не открывают команды этого продукта.
 - **R8.2. Организация (tenant).** Для организации учитываются только роли, группы и права, **привязанные** к ней; для «Без организации» — только непривязанные (глобальные). Родительская роль/группа другой организации ничего не даёт. Делегированная роль (cross-org delegation) учитывается только при совпадении её продукта (`imtauthgql::AdaptUserForTenant`, `GetEffectiveUserPermissions`, `GetTenantUserPermissions`). Это правило действует и при проверке команд, в том числе в самой Puma (13.14).
 - **R8.3. Циклы ролей и групп запрещены:** родительская роль/группа, замыкающая цикл, отклоняется с ошибкой (`CreatesRoleCycle`, `CreatesGroupCycle`).
 - **R8.4. Запреты (`prohibitions`)** хранятся, но при вычислении прав **не применяются** (13.8). Использовать нельзя.
@@ -397,7 +397,7 @@ Lisa FeatureEditor ──generate──► <Product>Features.h ──FillProduct
 | 13.5 | Голые id больше не поддерживаются (R4.3), а хранимые права ролей, пользователей, участников организаций, scopes PAT и права организаций в БД частично записаны голыми id или **старыми путями** (`/SensorManagement/EditSensor/AddSensor`). После развёртывания такие права перестают действовать. `imtauthdb::CPermissionPathMigrationComp` (шаг миграции БД, `imtdb::IMigrationController`, пакет `ImtAuthDbPck`; пока ни в одной композиции не подключён) переводит голый id в путь только по текущему дереву: старые id (`AddSensor`) в новом дереве не встречаются, короткие (`Add`) неоднозначны — оба остаются как есть. Каталог фич в БД Lisa — тоже старое дерево. | БД Puma и Lisa, `imtauthdb/CPermissionPathMigrationComp` | **Открыто, до развёртывания:** миграция БД по таблице «старый id / старый путь → новый путь» (есть для Lisa и ProLife) и обновление каталога Lisa. |
 | 13.6 | Непоследовательное сопоставление: `PackagesSetDescription` → `AddFeature` (по R6.4 — `ChangeFeature`, как у `ProductsSetDescription`). | `Lisa/Partitura/LisaVoce.arp/FeaturesPermissions.acc` | Уточнить. |
 | 13.7 | `CUserGroupCollectionControllerComp` пропускает `GroupItem`, `GetObjectData`, `GetObjectTypeId` **для любой группы**, а пользователю с делегированным доступом из другой организации разрешает **любую** групповую команду, включая изменение и удаление. | `imtauthgql/CUserGroupCollectionControllerComp.cpp` | Пропускать только чтение собственных групп (R8.6). |
-| 13.8 | `prohibitions` хранятся и сериализуются, но в расчёте прав не участвуют (`CRole::GetProhibitions` возвращает пустой список). | `imtauth/CRole.cpp`, `CUserBaseInfo.cpp` | Реализовать или удалить. |
+| 13.8 | `prohibitions` хранятся и сериализуются, но в расчёте прав не участвуют (`CRole::GetProhibitions` возвращает пустой список). | `imtauth/CRole.cpp`, `CPrincipalBase.cpp` | Реализовать или удалить. |
 | 13.9 | При совпадении `CommandId` в joiner молча побеждает первый провайдер. | `imtserverapp/CCommandPermissionsProviderJoinerComp.cpp` | Добавить диагностику. |
 | 13.10 | Fail-open: неподключённые `CommandPermissions`/`PermissionChecker` открывают команду всем. | `imtservergql::CheckRequestPermissions` | Проверять конфигурацию при старте. |
 | 13.11 | Тест `testContainerCannotBeRequirementTarget` назван неверно: его цель `/Products/EditProducts` — лист, а не группа. Прогон собранного `PermissionRequirementsTest.exe` (2026-10-16): 12 прошли, 7 упали — во всех тестах вывода прав `CollectImpliedPermissions` вернул пустой список. Бинарник мог быть собран со старой `imtlic.lib` (параллельная сборка). | `ImtCore/Tests/PermissionRequirementsTest` | Исправлено: тест переписан (25 кейсов), добавлен `PermissionCheckTest` (38), все проходят (раздел 11). |
@@ -442,7 +442,7 @@ Lisa FeatureEditor ──generate──► <Product>Features.h ──FillProduct
 | Элементы GUI | `ImtCore/Include/imtserverapp/imtserverapp.h` (`IsElementAccessible`), `imtservergql/CCommandsControllerComp.cpp` |
 | Контекст, requirements | `ImtCore/Include/imtgql/CGqlContext.*`, `imtlic/CProductInfo.cpp`, `imtlic/IFeatureInfo.h` |
 | Контекст запроса, PAT, организация | `ImtCore/Include/imtservergql/CAuthenticationManagerComp.cpp` |
-| Права пользователя | `imtauth/CUserBaseInfo.cpp`, `CUserInfo.cpp`, `CRole.cpp`, `imtauthgql/imtauthgql.h` |
+| Права пользователя | `imtauth/CPrincipalBase.cpp`, `CUserInfo.cpp`, `CRole.cpp`, `imtauthgql/imtauthgql.h` |
 | Дерево прав GraphQL | `ImtCore/Sdl/imtauth/1.0/Permissions.sdl`, `imtauthgql/CPermissionsProviderComp.cpp` |
 | Права команд (Partitura) | `ImtCore/Partitura/ImtCoreVoce.arp/*Permissions.acc`, `ImtAuthVoce.arp/ObjectCollectionPermissions.acc`, `Lisa/Partitura/LisaVoce.arp/*Permissions.acc` |
 | Клиент | `ImtCore/Qml/imtauthgui/PermissionsController.qml`, `PermissionsProvider.qml`, `Qml/imtlicgui/FeatureEditor.qml` |

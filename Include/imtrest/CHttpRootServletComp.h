@@ -3,6 +3,7 @@
 
 
 // Qt includes
+#include <QtCore/QCache>
 #include <QtCore/QMutex>
 
 // ACF includes
@@ -30,6 +31,8 @@ public:
 		I_ASSIGN(m_compressionLevelAttrPtr, "CompressionLevel", "Compression level for automatic compression", true, 8);
 	I_END_COMPONENT
 
+	CHttpRootServletComp();
+
 	// reimplemented (IRequestServlet)
 	virtual bool IsCommandSupported(const QByteArray& commandId) const override;
 	virtual imtrest::ConstResponsePtr ProcessRequest(const IRequest& request, const QByteArray& subCommandId = QByteArray()) const override;
@@ -44,6 +47,13 @@ protected:
 
 	virtual IRequestServlet* FindRequestHandler(const QByteArray& commandId) const;
 
+	/**
+		Compressed body of a response. A response with an entity tag is compressed once per command and tag: the tag
+		changes with the content of the command, so the cached body cannot be stale.
+	*/
+	QByteArray GetCompressedData(const QByteArray& commandId, const IResponse& response, EncodingType encodingType) const;
+	static QByteArray Compress(const QByteArray& data, EncodingType encodingType);
+
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 
@@ -57,6 +67,10 @@ private:
 
 	HandlersMap m_handlersMap;
 	mutable QMutex m_handlersMapMutex;
+
+	// key: command, entity tag and encoding; cost: size in bytes
+	mutable QCache<QByteArray, QByteArray> m_compressedDataCache;
+	mutable QMutex m_compressedDataCacheMutex;
 };
 
 

@@ -12,7 +12,7 @@
 
 // ImtCore includes
 #include <imtauth/ISession.h>
-#include <imtauth/CUserBaseInfo.h>
+#include <imtauth/CPrincipalBase.h>
 #include <imtauth/imtauth.h>
 #include <imtbase/IIdentifiable.h>
 #include <imtcore/Version.h>
@@ -123,7 +123,7 @@ imtauth::ISessionAuthorizationProvider::SessionAuthorization CRemoteJwtSessionCo
 	istd::IChangeableUniquePtr userPtr(m_userFactCompPtr.CreateInstance());
 	imtauth::IUserInfo* userInfoPtr = dynamic_cast<imtauth::IUserInfo*>(userPtr.GetPtr());
 	const imtbase::IIdentifiable* identifiablePtr = dynamic_cast<const imtbase::IIdentifiable*>(userPtr.GetPtr());
-	const imtauth::CUserBaseInfo* userBasePtr = dynamic_cast<const imtauth::CUserBaseInfo*>(userPtr.GetPtr());
+	const imtauth::CPrincipalBase* userBasePtr = dynamic_cast<const imtauth::CPrincipalBase*>(userPtr.GetPtr());
 	iser::ISerializable* serializablePtr = dynamic_cast<iser::ISerializable*>(userPtr.GetPtr());
 	iser::CJsonMemReadArchive archive(userData);
 	quint32 version = 0;

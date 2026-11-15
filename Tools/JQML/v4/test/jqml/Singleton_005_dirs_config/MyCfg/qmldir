@@ -1,0 +1,2 @@
+module MyCfg
+singleton ConfState 1.0 ConfState.qml

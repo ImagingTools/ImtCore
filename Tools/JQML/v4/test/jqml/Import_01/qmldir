@@ -1,0 +1,5 @@
+module testmodule
+Container 1.0 ./Container.qml
+TestComponent 1.0 ./Decorators/TestComponent.qml
+MyButton 1.0 ./Buttons/Button.qml
+Main 1.0 Main.qml
