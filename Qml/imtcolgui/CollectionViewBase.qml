@@ -187,42 +187,51 @@ ViewBase {
 			
 			onComplComplChanged: {
 				if(tableDecoratorModel.complCompl){
+					tableDecoratorModel.apply();
+				}
+			}
+			
+			function apply(){
+				var tableDecorator = loaderTableDecorator.item;
+				if (!tableDecorator){
+					return;
+				}
+				var count = tableInternal.headers.getItemsCount();
+				
+				if(tableDecorator.getItemsCount()){
+					tableDecoratorModel.clear();
 					
-					var tableDecorator = loaderTableDecorator.item;
-					var count = tableInternal.headers.getItemsCount();
+					var headers = tableDecoratorModel.addTreeModel("Headers");
+					var cells = tableDecoratorModel.addTreeModel("Cells");
+					var cellWidth = tableDecoratorModel.addTreeModel("CellWidth");
 					
-					if(tableDecorator.getItemsCount()){
-						
-						var headers = tableDecoratorModel.addTreeModel("Headers");
-						var cells = tableDecoratorModel.addTreeModel("Cells");
-						var cellWidth = tableDecoratorModel.addTreeModel("CellWidth");
-						
-						var general;
-						if(tableDecorator.isValidData("General")){
-							general = tableDecorator.getTreeItemModel("General")
-							let keys = general.getKeys();
-							for(let i = 0; i < keys.length; i++){
-								if(tableInternal[keys[i]] !== undefined){
-									tableInternal[keys[i]] = general.getData(keys[i]);
-								}
+					var general;
+					if(tableDecorator.isValidData("General")){
+						general = tableDecorator.getTreeItemModel("General")
+						let keys = general.getKeys();
+						for(let i = 0; i < keys.length; i++){
+							if(tableInternal[keys[i]] !== undefined){
+								tableInternal[keys[i]] = general.getData(keys[i]);
 							}
 						}
-						
-						for(let i = 0; i < count; i++){
-							headers.insertNewItem();
-							cells.insertNewItem();
-							cellWidth.insertNewItem();
-							headers.copyItemDataFromModel(i,tableDecorator.getTreeItemModel("Headers"));
-							cells.copyItemDataFromModel(i,tableDecorator.getTreeItemModel("Cells"));
-							//cellWidth.copyItemDataFromModel(i,tableDecorator.getTreeItemModel("CellWidth"));
-							var widthVal = tableDecorator.getTreeItemModel("CellWidth").isValidData("Width",i) ?
-										tableDecorator.getTreeItemModel("CellWidth").getData("Width",i) : -1;
-							cellWidth.setData("Width", widthVal,i);
-							
-						}
-						
-						tableInternal.tableDecorator = tableDecoratorModel;
 					}
+					
+					for(let i = 0; i < count; i++){
+						headers.insertNewItem();
+						cells.insertNewItem();
+						cellWidth.insertNewItem();
+						headers.copyItemDataFromModel(i,tableDecorator.getTreeItemModel("Headers"));
+						cells.copyItemDataFromModel(i,tableDecorator.getTreeItemModel("Cells"));
+						//cellWidth.copyItemDataFromModel(i,tableDecorator.getTreeItemModel("CellWidth"));
+						var widthVal = tableDecorator.getTreeItemModel("CellWidth").isValidData("Width",i) ?
+									tableDecorator.getTreeItemModel("CellWidth").getData("Width",i) : -1;
+						cellWidth.setData("Width", widthVal,i);
+						
+					}
+					
+					// Reset first: the same model object would not trigger onTableDecoratorChanged
+					tableInternal.tableDecorator = null;
+					tableInternal.tableDecorator = tableDecoratorModel;
 				}
 			}
 		}
@@ -235,8 +244,25 @@ ViewBase {
 			
 			onLoaded: {
 				if(loaderTableDecorator.item){
-					loaderTableDecorator.compl = true;
+					if (loaderTableDecorator.compl){
+						// Reloaded after a theme change; complCompl does not change, so apply explicitly
+						if (tableDecoratorModel.complCompl){
+							tableDecoratorModel.apply();
+						}
+					}
+					else{
+						loaderTableDecorator.compl = true;
+					}
 				}
+			}
+		}
+		
+		// Decorator copies Style colors once on creation, so recreate it when the theme arrives
+		Connections {
+			target: Style
+			function onThemeApplied(){
+				loaderTableDecorator.active = false;
+				loaderTableDecorator.active = true;
 			}
 		}
 		

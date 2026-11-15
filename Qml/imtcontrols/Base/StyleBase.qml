@@ -29,6 +29,9 @@ StyleComponents {
 
 	property string theme: "Light";
 	property string logoIconName;
+
+	// Emitted after parseStyleTheme() so snapshot-based consumers (e.g. table decorators) can rebuild
+	signal themeApplied();
 	property string language;//deprecated?
 
 	//Font properties
@@ -813,6 +816,7 @@ StyleComponents {
 
 			styleContainer.imaginToolsAccentColor = dataSource.getData("ColorPalette").getData("ImaginTools Accent");
 
+			styleContainer.themeApplied();
 		}
 
 	}

@@ -576,7 +576,7 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 		add_subdirectory("${INCLUDE_DIR}/imtfile/Test/CMake" "${AUX_INCLUDE_DIR}/imtfile/Test")
 		imt_chain_windeploy_target(imtfileTest)
 		add_subdirectory("${INCLUDE_DIR}/imtservergql/Test/CMake" "${AUX_INCLUDE_DIR}/imtservergql/Test")
-		add_dependencies(imtservergqlTest imtservergql imtfile imtbasesdl)
+		add_dependencies(imtservergqlTest imtservergql imtfile imtdoc imtrest imtbase imtbasesdl)
 		imt_chain_windeploy_target(imtservergqlTest)
 		add_subdirectory("${INCLUDE_DIR}/imttest/CMake" "${AUX_INCLUDE_DIR}/imttest")
 

@@ -109,10 +109,10 @@ SearchComp{
 		if(textChange){
 			searchContainer.textChangeFunc(currentText);
 		}
-		else{
-			searchContainer.setTextFilter("")
-			searchContainer.updateModel(0)
-		}
+
+		// Reload the children of the selected element. The popup search field no longer does it on a programmatic text change.
+		searchContainer.setTextFilter("")
+		searchContainer.updateModel(0)
 	}
 
 	/**

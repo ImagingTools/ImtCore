@@ -36,6 +36,13 @@ public:
 	virtual imtgql::IGqlContextUniquePtr CreateGqlContext(
 				const imtgql::IGqlContext::Headers& headers,
 				imtgql::IGqlContextCreator::ContextCreationError& error) const override;
+	virtual imtgql::IGqlContextUniquePtr RenewGqlContext(
+				const imtgql::IGqlContext::Headers& headers,
+				bool isEstablished,
+				AuthorizationState& state,
+				ContextCreationError& error,
+				QDateTime* sessionExpiresAtPtr = nullptr) const override;
+	virtual qint64 GetAuthorizationGeneration() const override;
 
 private:
 	I_FACT(imtgql::IGqlContext, m_gqlContextFactCompPtr);

@@ -338,7 +338,7 @@ QtObject {
 				root.__applyDocumentObjectId(root.__roleDocumentService, documentId, representationModel)
 				updateRoleInput.m_documentId = documentId
 				updateRoleInput.m_role = representationModel
-				updateRoleRequest.send(updateRoleInput)
+				return updateRoleRequest.send(updateRoleInput)
 			}
 
 			property DocumentId getRoleInput: DocumentId {}
@@ -483,7 +483,7 @@ QtObject {
 				root.__applyDocumentObjectId(root.__groupDocumentService, documentId, representationModel)
 				updateGroupInput.m_documentId = documentId
 				updateGroupInput.m_group = representationModel
-				updateGroupRequest.send(updateGroupInput)
+				return updateGroupRequest.send(updateGroupInput)
 			}
 
 			property DocumentId getGroupInput: DocumentId {}
@@ -651,7 +651,7 @@ QtObject {
 				updateUserInput.m_documentId = documentId
 				updateUserInput.m_user = representationModel
 				updateUserInput.m_tenantId = root.tenantId
-				updateUserRequest.send(updateUserInput)
+				return updateUserRequest.send(updateUserInput)
 			}
 
 			property DocumentId getUserInput: DocumentId {}

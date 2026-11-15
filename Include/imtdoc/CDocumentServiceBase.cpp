@@ -13,6 +13,7 @@
 // ACF includes
 #include <imod/IModel.h>
 #include <imod/IObserver.h>
+#include <istd/CChangeGroup.h>
 #include <istd/CChangeNotifier.h>
 
 // ImtCore includes
@@ -208,6 +209,42 @@ IDocumentService::DocumentList CDocumentServiceBase::GetOpenedDocumentList(const
 	}
 
 	return list;
+}
+
+
+// protected methods — reimplemented (imtdoc::IDocumentService)
+
+IDocumentService::OperationStatus CDocumentServiceBase::AccessDocument(
+			const QByteArray& userId,
+			const QByteArray& documentId,
+			IDocumentAccessor& accessor)
+{
+	QMutexLocker locker(&m_mutex);
+
+	OperationStatus validationStatus;
+	if (!ValidateInputParams(userId, documentId, validationStatus)){
+		return validationStatus;
+	}
+
+	WorkingDocument& workingDocument = m_documents[documentId];
+
+	if (workingDocument.isLoading || !workingDocument.objectPtr.IsValid()){
+		return OS_FAILED;
+	}
+
+	istd::IChangeable& document = *workingDocument.objectPtr;
+
+	if (accessor.IsReadOnlyAccess()){
+		return accessor.Access(document) ? OS_OK : OS_FAILED;
+	}
+
+	if (workingDocument.isReadOnly){
+		return OS_FAILED;
+	}
+
+	istd::CChangeGroup changeGroup(&document);
+
+	return accessor.Access(document) ? OS_OK : OS_FAILED;
 }
 
 

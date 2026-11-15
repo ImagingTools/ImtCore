@@ -83,6 +83,7 @@ type DocumentServiceNotification {
 	isLoading: Bool
 	hasNameProvider: Bool
 	changeIds: [ID]								# Populated only for DocumentChanged notifications; IDs are defined in the schema of the document controller for this document type
+	requestId: ID								# DocumentChanged only: ID of the client request that made the change (X-Request-ID header)
 }
 
 type SetDocumentNameInput {

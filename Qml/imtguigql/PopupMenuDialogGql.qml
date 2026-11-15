@@ -103,6 +103,11 @@ PopupMenuDialog {
 			}
 
 			onTextChanged: {
+				// The field is recreated when the popup flips, and its initial text is not a user edit.
+				if (popup.filterText === text){
+					return;
+				}
+
 				popup.filterText = text
 
 				popup.editSignal();
@@ -134,6 +139,7 @@ PopupMenuDialog {
 
 				onClicked: {
 					popup.filterText = "";
+					popup.editSignal();
 					popup.clearSignal();
 				}
 			}

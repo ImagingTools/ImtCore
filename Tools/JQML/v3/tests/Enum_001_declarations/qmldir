@@ -1,0 +1,4 @@
+module LocalEnums
+singleton SingletonHolder 1.0 SingletonHolder.qml
+Holder 1.0 Holder.qml
+Derived 1.0 Derived.qml

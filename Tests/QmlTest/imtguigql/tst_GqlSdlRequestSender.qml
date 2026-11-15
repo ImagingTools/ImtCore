@@ -197,6 +197,19 @@ TestCase {
 	}
 
 	GqlSdlRequestSender {
+		id: sharedHeadersSender
+
+		gqlCommandId: "WithSharedHeaders"
+		permissionPath: "path-1"
+
+		property var sharedHeaders: null
+
+		function getHeaders(){
+			return sharedHeaders
+		}
+	}
+
+	GqlSdlRequestSender {
 		id: pingSender
 
 		gqlCommandId: "Ping"
@@ -479,6 +492,43 @@ TestCase {
 
 		compareSentQuery('query Ping {Ping(input: {}) {}}')
 		verify(!("permissionpath" in GqlTestTransport.lastRequestHeaders))
+		waitFinished(-1)
+	}
+
+	function test_sharedHeadersAreNotChanged(){
+		let headers = {}
+		headers["X-Custom"] = "custom value"
+		sharedHeadersSender.sharedHeaders = headers
+
+		startSending(sharedHeadersSender)
+		sharedHeadersSender.send()
+
+		compare(GqlTestTransport.lastRequestHeaders["x-custom"], "custom value")
+		compare(GqlTestTransport.lastRequestHeaders["permissionpath"], "path-1")
+		verify(GqlTestTransport.lastRequestHeaders["x-request-id"] !== undefined)
+		compare(Object.keys(headers), ["X-Custom"], "The headers of the request do not stay in the object getHeaders() returns")
+		waitFinished(-1)
+	}
+
+	function test_requestId(){
+		startSending(pingSender)
+		let firstRequestId = pingSender.send()
+
+		verify(firstRequestId !== "", "A sent request has an ID")
+		compare(pingSender.requestId, firstRequestId)
+		compare(GqlTestTransport.lastRequestHeaders["x-request-id"], firstRequestId)
+		waitFinished(-1)
+
+		GqlTestTransport.reset()
+		startSending(pingSender)
+		let secondRequestId = pingSender.send()
+
+		verify(secondRequestId !== firstRequestId, "Each request has its own ID")
+		compare(GqlTestTransport.lastRequestHeaders["x-request-id"], secondRequestId)
+		waitFinished(-1)
+
+		startSending(invalidCommandSender)
+		compare(invalidCommandSender.send(), "", "A request that is not sent has no ID")
 		waitFinished(-1)
 	}
 

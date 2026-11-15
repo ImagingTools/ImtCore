@@ -61,6 +61,9 @@
         <Element Id="PersonalAccessTokenManager" PackageId="ImtAuthPck" ComponentId="PersonalAccessTokenManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="InMemoryUpdates" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="TokenCollection" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="TokenCollection"/>
                     </AttributeInfo>

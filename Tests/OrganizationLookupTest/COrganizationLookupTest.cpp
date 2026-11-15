@@ -467,6 +467,8 @@ public:
 
 		manager->SetRef("TokenCollection", collection);
 		manager->SetFactory("TokenFactory", &tokenFactory);
+		// A private in-memory collection: the manager serializes the updates itself
+		manager->SetBoolAttr("InMemoryUpdates", true);
 		manager->InitComponent();
 	}
 

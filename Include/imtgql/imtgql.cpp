@@ -5,6 +5,10 @@
 // ImtCore includes
 #include <iqt/iqt.h>
 #include <imtauth/imtauth.h>
+#include <imtauth/CUserInfo.h>
+#include <QtCore/QSet>
+#include <imtbase/imtbase.h>
+#include <imtgql/CGqlContext.h>
 #include <imtlic/IProductInfo.h>
 
 
@@ -32,6 +36,54 @@ imtauth::IUserInfo::FeatureIds CollectImpliedPermissions(const IGqlContext& gqlC
 	}
 
 	return retVal;
+}
+
+
+QByteArray GetSenderServerProductId(const IGqlContext& gqlContext)
+{
+	const bool isServerItself = gqlContext.GetPrincipalKind() == IGqlContext::PK_SERVICE;
+
+	return isServerItself ? gqlContext.GetServerProductId() : QByteArray();
+}
+
+
+bool RestrictUserPermissions(IGqlContext& gqlContext, const QByteArrayList& permissions)
+{
+	const imtauth::IUserInfo* sourcePtr = gqlContext.GetUserInfo();
+	if (sourcePtr == nullptr){
+		return false;
+	}
+
+	const auto principalKind = gqlContext.GetPrincipalKind();
+	QByteArrayList boundary = permissions;
+	if (gqlContext.HasPermissionBoundary()){
+		const QByteArrayList previous = gqlContext.GetPermissionBoundary();
+		const QSet<QByteArray> previousSet(previous.cbegin(), previous.cend());
+		boundary.removeIf([&previousSet](const QByteArray& permission){ return !previousSet.contains(permission); });
+	}
+	const QSet<QByteArray> allowed(boundary.cbegin(), boundary.cend());
+	const QByteArray productId = gqlContext.GetProductId();
+	QByteArrayList effective = sourcePtr->IsAdmin() ? boundary
+				: sourcePtr->GetPermissions(productId) + gqlContext.GetImpliedPermissions();
+	effective.removeIf([&allowed](const QByteArray& permission){ return !allowed.contains(permission); });
+
+	imtauth::CIdentifiableUserInfo user;
+	if (!user.CopyFrom(*sourcePtr)){
+		return false;
+	}
+	for (const QByteArray& product : user.GetProducts()){
+		user.SetRoles(product, imtauth::IUserBaseInfo::RoleIds());
+		user.SetLocalPermissions(product, QByteArrayList());
+	}
+	for (const QByteArray& group : user.GetGroups()){
+		user.RemoveFromGroup(group);
+	}
+	user.SetLocalPermissions(productId, effective);
+	gqlContext.SetUserInfo(&user);
+	gqlContext.SetPrincipalKind(principalKind);
+	gqlContext.SetPermissionBoundary(boundary);
+
+	return true;
 }
 
 
@@ -133,6 +185,19 @@ QByteArray GetTranslation(const iqt::ITranslationManager* translationManagerPtr,
 }
 
 
+void SetServerRequestContext(CGqlRequest& gqlRequest, const QByteArray& serverToken)
+{
+	IGqlContextUniquePtr contextPtr(new CGqlContext);
+	if (!serverToken.isEmpty()){
+		IGqlContext::Headers headers;
+		headers.insert(imtbase::s_authenticationTokenHeaderId, serverToken);
+
+		contextPtr->SetToken(serverToken);
+		contextPtr->SetHeaders(headers);
+	}
+
+	gqlRequest.SetGqlContext(IGqlContextSharedPtr::CreateFromUnique(std::move(contextPtr)));
+}
+
+
 } // namespace imtqml
-
-

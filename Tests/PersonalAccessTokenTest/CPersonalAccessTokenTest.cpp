@@ -4,9 +4,283 @@
 // Qt includes
 #include <QtCore/QDebug>
 #include <QtCore/QThread>
+#include <QtCore/QFile>
+#include <QtCore/QUuid>
 
 // ACF includes
 #include <itest/CStandardTestExecutor.h>
+#include <icomp/TSimComponentWrap.h>
+
+#include <imtauthdb/CPersonalAccessTokenSqlPersistence.h>
+#include <imtauthdb/CPersonalAccessTokenDatabaseDelegateComp.h>
+
+
+namespace
+{
+
+
+class CTokenDatabaseEngine: public imtdb::IDatabaseEngine
+{
+public:
+	explicit CTokenDatabaseEngine(const QString& driver = QStringLiteral("QSQLITE"))
+		:m_database(QSqlDatabase::addDatabase(driver, QUuid::createUuid().toString()))
+	{
+		if (driver == "QPSQL"){
+			m_database.setHostName("127.0.0.1");
+			m_database.setPort(qEnvironmentVariableIntValue("IMT_TEST_POSTGRES_PORT"));
+			m_database.setUserName("postgres");
+			m_database.setDatabaseName("postgres");
+		}
+		else{
+			m_database.setDatabaseName(":memory:");
+		}
+		m_database.open();
+		if (driver == "QPSQL" && m_database.isOpen()){
+			m_schema = "token_test_" + QUuid::createUuid().toString(QUuid::Id128).toUtf8();
+			ExecSqlQuery("CREATE SCHEMA " + m_schema);
+			ExecSqlQuery("SET search_path TO " + m_schema);
+		}
+	}
+
+	~CTokenDatabaseEngine()
+	{
+		if (!m_schema.isEmpty()){
+			ExecSqlQuery("DROP SCHEMA " + m_schema + " CASCADE");
+		}
+		const QString name = m_database.connectionName();
+		m_database.close();
+		m_database = QSqlDatabase();
+		QSqlDatabase::removeDatabase(name);
+	}
+
+	bool BeginTransaction() const override { return m_database.transaction(); }
+	bool FinishTransaction() const override { return m_database.commit(); }
+	bool CancelTransaction() const override { return m_database.rollback(); }
+	QByteArray GetDatabaseDriverId() const override { return m_database.driverName().toUtf8(); }
+
+	QSqlQuery ExecSqlQuery(const QByteArray& sql, QSqlError* error = nullptr, bool forward = false) const override
+	{
+		QSqlQuery query(m_database);
+		query.setForwardOnly(forward);
+		query.exec(QString::fromUtf8(sql));
+		if (error != nullptr){
+			*error = query.lastError();
+		}
+		return query;
+	}
+
+	QSqlQuery ExecSqlQuery(const QByteArray& sql, const QVariantMap& values, QSqlError* error = nullptr, bool forward = false) const override
+	{
+		QSqlQuery query(m_database);
+		query.setForwardOnly(forward);
+		if (query.prepare(QString::fromUtf8(sql))){
+			for (auto it = values.cbegin(); it != values.cend(); ++it){
+				query.bindValue(it.key(), it.value());
+			}
+			query.exec();
+		}
+		if (error != nullptr){
+			*error = query.lastError();
+		}
+		return query;
+	}
+
+	QSqlQuery ExecSqlQueryFromFile(const QString& path, QSqlError* error = nullptr, bool forward = false) const override
+	{
+		return ExecSqlQueryFromFile(path, QVariantMap(), error, forward);
+	}
+
+	QSqlQuery ExecSqlQueryFromFile(const QString& path, const QVariantMap& values, QSqlError* error = nullptr, bool forward = false) const override
+	{
+		QFile file(path);
+		if (!file.open(QIODevice::ReadOnly)){
+			if (error != nullptr){
+				*error = QSqlError(file.errorString(), QString(), QSqlError::StatementError);
+			}
+			return QSqlQuery(m_database);
+		}
+		return ExecSqlQuery(file.readAll(), values, error, forward);
+	}
+
+private:
+	mutable QSqlDatabase m_database;
+	QByteArray m_schema;
+};
+
+
+const QByteArray s_legacyTokenSchema =
+		"CREATE TABLE \"PersonalAccessTokens\" (\"Id\" TEXT PRIMARY KEY, \"UserId\" TEXT NOT NULL, "
+		"\"TokenHash\" TEXT, \"Scopes\" TEXT, \"LastUsedAt\" TEXT, \"Revoked\" BOOLEAN DEFAULT FALSE)";
+
+
+class CTokenDatabaseEngineComp: public icomp::CComponentBase, public CTokenDatabaseEngine
+{
+public:
+	typedef icomp::CComponentBase BaseClass;
+	I_BEGIN_COMPONENT(CTokenDatabaseEngineComp)
+		I_REGISTER_INTERFACE(imtdb::IDatabaseEngine);
+	I_END_COMPONENT
+};
+
+
+} // namespace
+
+
+void CPersonalAccessTokenTest::testSqlSchemaMigration()
+{
+	CTokenDatabaseEngine engine;
+	QVERIFY(engine.ExecSqlQuery(s_legacyTokenSchema).isActive());
+	QVERIFY(engine.ExecSqlQuery("INSERT INTO \"PersonalAccessTokens\" VALUES ('one','owner','hash','read',NULL,FALSE)").isActive());
+	QVERIFY(engine.ExecSqlQuery("CREATE INDEX \"CustomOwnerIndex\" ON \"PersonalAccessTokens\" (\"UserId\")").isActive());
+	QVERIFY(engine.ExecSqlQuery("CREATE TABLE \"Audit\" (\"Id\" TEXT)").isActive());
+	QVERIFY(engine.ExecSqlQuery("CREATE TRIGGER \"TokenAudit\" AFTER UPDATE ON \"PersonalAccessTokens\" "
+				"BEGIN INSERT INTO \"Audit\" VALUES (new.\"Id\"); END").isActive());
+	imtauthdb::CPersonalAccessTokenSqlPersistence persistence(engine);
+	QVERIFY2(persistence.EnsureSchema(), qPrintable(persistence.GetErrorMessage()));
+	QVERIFY2(persistence.EnsureSchema(), qPrintable(persistence.GetErrorMessage()));
+	QVERIFY(engine.ExecSqlQuery("INSERT INTO \"PersonalAccessTokens\" (\"Id\",\"TokenHash\",\"ClientProductId\") "
+				"VALUES ('server','server-hash','client')").isActive());
+	QSqlQuery row = engine.ExecSqlQuery("SELECT \"UserId\",\"Scopes\",\"TokenHash\" FROM \"PersonalAccessTokens\" WHERE \"Id\"='one'");
+	QVERIFY(row.next());
+	QCOMPARE(row.value(0).toString(), QString("owner"));
+	QCOMPARE(row.value(1).toString(), QString("read"));
+	QCOMPARE(row.value(2).toString(), QString("hash"));
+	row.finish();
+	QVERIFY(!engine.ExecSqlQuery("INSERT INTO \"PersonalAccessTokens\" (\"Id\",\"TokenHash\") VALUES ('duplicate','hash')").isActive());
+	QVERIFY(persistence.RevokeToken("one"));
+	row = engine.ExecSqlQuery("SELECT count(*) FROM \"Audit\"");
+	QVERIFY(row.next());
+	QCOMPARE(row.value(0).toInt(), 1);
+	row.finish();
+	row = engine.ExecSqlQuery("SELECT count(*) FROM sqlite_master WHERE name='CustomOwnerIndex'");
+	QVERIFY(row.next());
+	QCOMPARE(row.value(0).toInt(), 1);
+}
+
+
+void CPersonalAccessTokenTest::testSqlMigrationRollback()
+{
+	CTokenDatabaseEngine engine;
+	QVERIFY(engine.ExecSqlQuery(s_legacyTokenSchema).isActive());
+	QVERIFY(engine.ExecSqlQuery("INSERT INTO \"PersonalAccessTokens\" VALUES ('one','owner','same','read',NULL,FALSE)").isActive());
+	QVERIFY(engine.ExecSqlQuery("INSERT INTO \"PersonalAccessTokens\" VALUES ('two','owner','same','write',NULL,FALSE)").isActive());
+	imtauthdb::CPersonalAccessTokenSqlPersistence persistence(engine);
+	QVERIFY(!persistence.EnsureSchema());
+	QVERIFY(!persistence.GetErrorMessage().isEmpty());
+	QSqlQuery row = engine.ExecSqlQuery("SELECT count(*) FROM \"PersonalAccessTokens\"");
+	QVERIFY(row.next());
+	QCOMPARE(row.value(0).toInt(), 2);
+	row.finish();
+	row = engine.ExecSqlQuery("SELECT count(*) FROM pragma_table_info('PersonalAccessTokens') WHERE name='ClientProductId'");
+	QVERIFY(row.next());
+	QCOMPARE(row.value(0).toInt(), 0);
+	row.finish();
+	QVERIFY(engine.ExecSqlQuery("DELETE FROM \"PersonalAccessTokens\" WHERE \"Id\"='two'").isActive());
+	QVERIFY(engine.ExecSqlQuery("PRAGMA foreign_keys=ON").isActive());
+	QVERIFY(engine.ExecSqlQuery("CREATE TABLE \"Child\" (\"TokenId\" TEXT REFERENCES \"PersonalAccessTokens\" (\"Id\") ON DELETE CASCADE)").isActive());
+	QVERIFY(engine.ExecSqlQuery("INSERT INTO \"Child\" VALUES ('one')").isActive());
+	QVERIFY(!persistence.EnsureSchema());
+	QVERIFY(persistence.GetErrorMessage().contains("foreign keys"));
+	row = engine.ExecSqlQuery("SELECT count(*) FROM \"Child\"");
+	QVERIFY(row.next());
+	QCOMPARE(row.value(0).toInt(), 1);
+}
+
+
+void CPersonalAccessTokenTest::testSqlAtomicMutations()
+{
+	CTokenDatabaseEngine engine;
+	QByteArray schema = s_legacyTokenSchema;
+	schema.replace("\"Scopes\" TEXT", "\"Scopes\" TEXT NOT NULL");
+	QVERIFY(engine.ExecSqlQuery(schema).isActive());
+	imtauthdb::CPersonalAccessTokenSqlPersistence persistence(engine);
+	QVERIFY2(persistence.EnsureSchema(), qPrintable(persistence.GetErrorMessage()));
+	QVERIFY(engine.ExecSqlQuery("INSERT INTO \"PersonalAccessTokens\" (\"Id\",\"UserId\",\"TokenHash\",\"Scopes\") "
+				"VALUES ('one','owner','hash','read,write')").isActive());
+	const QDateTime now = QDateTime::currentDateTimeUtc();
+	QVERIFY2(persistence.SetTokenScopes("one", {}), qPrintable(persistence.GetErrorMessage()));
+	QSqlQuery emptyScopes = engine.ExecSqlQuery("SELECT \"Scopes\" FROM \"PersonalAccessTokens\" WHERE \"Id\"='one'");
+	QVERIFY(emptyScopes.next());
+	QVERIFY(!emptyScopes.value(0).isNull());
+	QCOMPARE(emptyScopes.value(0).toString(), QStringLiteral(""));
+	emptyScopes.finish();
+	QVERIFY(persistence.SetTokenScopes("one", {}));
+	QVERIFY(persistence.SetTokenScopes("one", {"read"}));
+	QVERIFY(persistence.UpdateLastUsedAt("one", now));
+	QVERIFY(persistence.RevokeToken("one"));
+	QVERIFY(persistence.UpdateLastUsedAt("one", now.addSecs(-60)));
+	QVERIFY(!persistence.SetTokenScopes("one", {"write"}));
+	QVERIFY(!persistence.RevokeToken("missing"));
+	QVERIFY(!persistence.UpdateLastUsedAt("one", QDateTime()));
+	QSqlQuery row = engine.ExecSqlQuery("SELECT \"Scopes\",\"Revoked\",\"LastUsedAt\" FROM \"PersonalAccessTokens\" WHERE \"Id\"='one'");
+	QVERIFY(row.next());
+	QCOMPARE(row.value(0).toString(), QString("read"));
+	QVERIFY(row.value(1).toBool());
+	QCOMPARE(row.value(2).toString(), now.toString(Qt::ISODate));
+}
+
+
+void CPersonalAccessTokenTest::testPostgresAtomicMigration()
+{
+	if (qEnvironmentVariableIntValue("IMT_TEST_POSTGRES_PORT") <= 0){
+		QSKIP("Set IMT_TEST_POSTGRES_PORT to an isolated local test cluster");
+	}
+	CTokenDatabaseEngine engine(QStringLiteral("QPSQL"));
+	QSqlQuery query = engine.ExecSqlQuery("CREATE TABLE \"PersonalAccessTokens\" (\"Id\" UUID PRIMARY KEY, \"UserId\" UUID NOT NULL, "
+				"\"TokenHash\" TEXT, \"Scopes\" TEXT, \"LastUsedAt\" TIMESTAMP WITH TIME ZONE, \"Revoked\" BOOLEAN DEFAULT FALSE)");
+	QVERIFY2(query.isActive(), qPrintable(query.lastError().text()));
+	query.finish();
+	imtauthdb::CPersonalAccessTokenSqlPersistence persistence(engine);
+	QVERIFY2(persistence.EnsureSchema(), qPrintable(persistence.GetErrorMessage()));
+	QVERIFY2(persistence.EnsureSchema(), qPrintable(persistence.GetErrorMessage()));
+	const QByteArray id = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+	query = engine.ExecSqlQuery("INSERT INTO \"PersonalAccessTokens\" (\"Id\",\"TokenHash\",\"Scopes\",\"ClientProductId\") "
+				"VALUES (:id,'hash','read,write','client')", {{":id", QString::fromUtf8(id)}});
+	QVERIFY2(query.isActive(), qPrintable(query.lastError().text()));
+	query.finish();
+	const QDateTime now = QDateTime::fromSecsSinceEpoch(QDateTime::currentSecsSinceEpoch(), Qt::UTC);
+	QVERIFY2(persistence.SetTokenScopes(id, {"read"}), qPrintable(persistence.GetErrorMessage()));
+	QVERIFY2(persistence.UpdateLastUsedAt(id, now), qPrintable(persistence.GetErrorMessage()));
+	QVERIFY2(persistence.RevokeToken(id), qPrintable(persistence.GetErrorMessage()));
+	QVERIFY2(persistence.UpdateLastUsedAt(id, now.addSecs(-60)), qPrintable(persistence.GetErrorMessage()));
+	QVERIFY(!persistence.SetTokenScopes(id, {"write"}));
+	query = engine.ExecSqlQuery("SELECT \"Scopes\",\"Revoked\",EXTRACT(EPOCH FROM \"LastUsedAt\"),\"UserId\","
+				"\"LastUsedAt\"::text FROM \"PersonalAccessTokens\"");
+	QVERIFY(query.next());
+	QCOMPARE(query.value(0).toString(), QString("read"));
+	QVERIFY(query.value(1).toBool());
+	QVERIFY2(!query.value(2).isNull(), qPrintable(QStringLiteral("Timestamp: %1").arg(query.value(4).toString())));
+	QCOMPARE(query.value(2).toLongLong(), now.toSecsSinceEpoch());
+	QVERIFY(query.value(3).isNull());
+}
+
+
+void CPersonalAccessTokenTest::testDelegateMigratesOnInitialization()
+{
+	for (const bool duplicate : {false, true}){
+		icomp::TSimSharedComponentPtr<CTokenDatabaseEngineComp> engine;
+		engine->InitComponent();
+		QVERIFY(engine->ExecSqlQuery(s_legacyTokenSchema).isActive());
+		QVERIFY(engine->ExecSqlQuery("INSERT INTO \"PersonalAccessTokens\" VALUES ('one','owner','hash','read',NULL,FALSE)").isActive());
+		if (duplicate){
+			QVERIFY(engine->ExecSqlQuery("INSERT INTO \"PersonalAccessTokens\" VALUES ('two','owner','hash','read',NULL,FALSE)").isActive());
+		}
+		icomp::TSimSharedComponentPtr<imtauthdb::CPersonalAccessTokenDatabaseDelegateComp> delegate;
+		delegate->SetRef("DatabaseEngine", engine);
+		delegate->SetIdAttr("TableName", "PersonalAccessTokens");
+		delegate->SetBoolAttr("AutoCreateTable", true);
+		delegate->InitComponent();
+		if (duplicate){
+			QVERIFY(!delegate->RevokeToken("one"));
+			QVERIFY(delegate->GetSelectionQuery().isEmpty());
+		}
+		else{
+			QVERIFY(delegate->RevokeToken("one"));
+			QVERIFY(engine->ExecSqlQuery("INSERT INTO \"PersonalAccessTokens\" (\"Id\",\"TokenHash\",\"ClientProductId\") "
+						"VALUES ('server','server-hash','client')").isActive());
+		}
+	}
+}
 
 
 void CPersonalAccessTokenTest::initTestCase()
@@ -301,5 +575,3 @@ void CPersonalAccessTokenTest::testDeleteToken()
 
 
 I_ADD_TEST(CPersonalAccessTokenTest);
-
-

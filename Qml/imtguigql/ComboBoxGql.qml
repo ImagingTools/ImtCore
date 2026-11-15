@@ -100,6 +100,12 @@ ComboBox {
 					return
 				}
 
+				// The search field does not report its initial text, so the filter of a reopened popup is applied here.
+				if(popup.filterText !== ""){
+					let str = popup.filterText.replace(comboBoxContainerGql.excludeFilterPart, "");
+					comboBoxContainerGql.setTextFilter(str)
+				}
+
 				comboBoxContainerGql.updateModel(0)
 			}
 
@@ -226,7 +232,12 @@ ComboBox {
 			if (dataProvider.offset == 0){
 				comboBoxContainerGql.model = dataProvider.collectionModel
 				comboBoxContainerGql.endListStatus = false;
+				// A reload drops the index, which clears the text. A search-style combo shows its text, so it keeps it.
+				let keptText = comboBoxContainerGql.currentText;
 				comboBoxContainerGql.currentIndex = -1;
+				if(comboBoxContainerGql.keepFilterText){
+					comboBoxContainerGql.currentText = keptText;
+				}
 
 				if(comboBoxContainerGql.popup && comboBoxContainerGql.popup.decorator_){
 					comboBoxContainerGql.popup.decorator_.contentY = 0;

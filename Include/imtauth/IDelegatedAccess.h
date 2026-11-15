@@ -87,11 +87,13 @@ public:
 		Returns only roles obtained through cross-org grants (not membership roles).
 		\param homeTenantId The user's home tenant.
 		\param targetTenantId The tenant the user is accessing.
+		\param isReadPtr [optional] False when the grants could not be read, so the list may miss roles.
 		\return List of role IDs delegated through active grants.
 	*/
 	virtual QByteArrayList GetDelegatedRoles(
 		const QByteArray& homeTenantId,
-		const QByteArray& targetTenantId) const = 0;
+		const QByteArray& targetTenantId,
+		bool* isReadPtr = nullptr) const = 0;
 
 	/**
 		Check if access to a target tenant is obtained via delegation (cross-org grant)

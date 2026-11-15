@@ -22,11 +22,23 @@ namespace imtgql
 imtauth::IUserInfo::FeatureIds CollectImpliedPermissions(const IGqlContext& gqlContext, const imtauth::IUserInfo::FeatureIds& permissions);
 
 /**
+	Restrict the effective user permissions, including requirements, to a token boundary.
+	A restricted superuser is an ordinary principal. Repeated restrictions intersect.
+*/
+bool RestrictUserPermissions(IGqlContext& gqlContext, const QByteArrayList& permissions);
+
+/**
 	Every permission of the product of the context if the caller owns the organization of the context, otherwise none.
 	The owner of an organization holds its whole permission scope, whatever the roles.
 	\see imtlic::CollectProductPermissions
 */
 imtauth::IUserInfo::FeatureIds CollectTenantOwnerPermissions(const IGqlContext& gqlContext);
+
+/**
+	Get the product whose server sends the request on its own behalf: it is a user without a login there.
+	Empty for a request of a user, sent directly or forwarded by a server, and for an anonymous request a server forwards.
+*/
+QByteArray GetSenderServerProductId(const IGqlContext& gqlContext);
 
 /**
 	The given permissions limited to the permission scope of the organization of the context.
@@ -44,7 +56,13 @@ QByteArray GetLanguageIdFromRequest(const QList<CGqlParamObject>& inputParams);
 QByteArray GetDesignSchemeIdFromRequest(const QList<CGqlParamObject>& inputParams);
 QByteArray GetTranslation(const iqt::ITranslationManager* translationManagerPtr, const CGqlRequest& gqlRequest, const QByteArray& phrase, const QByteArray& context);
 
+/**
+	Make a request this server sends on its own behalf: it gets a context of its own, so the credentials of a request
+	being served do not travel along.
+	\param serverToken	[optional] The token of this server, sent as the authentication of the request.
+*/
+void SetServerRequestContext(CGqlRequest& gqlRequest, const QByteArray& serverToken = QByteArray());
+
 
 } // namespace imtqml
-
 

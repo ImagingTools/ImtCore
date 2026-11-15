@@ -29,6 +29,34 @@ namespace
 {
 
 
+// A refused subscription is sent again in a minute
+const int s_refusedRetryInterval = 60 * 1000;
+
+
+void RemoveHeader(QJsonObject& headersObject, const QByteArray& headerKey)
+{
+	for (const QString& headerId : headersObject.keys()){
+		if (headerId.compare(QString(headerKey), Qt::CaseInsensitive) == 0){
+			headersObject.remove(headerId);
+		}
+	}
+}
+
+
+/**
+	The token of this server names the product only: the rights of a request come from the token of its user.
+	The same headers a client sent here are dropped: they are not this server's to forward.
+*/
+void InsertServerToken(const QByteArray& serverToken, QJsonObject& headersObject)
+{
+	RemoveHeader(headersObject, imtbase::s_serverTokenHeaderId);
+
+	if (!serverToken.isEmpty()){
+		headersObject[QString(imtbase::s_serverTokenHeaderId)] = QString(serverToken);
+	}
+}
+
+
 /**
 	The product and the language the request was resolved for, as the HTTP client sends them: a web client served by a
 	product server sends no product, the server knows it.
@@ -37,11 +65,7 @@ void InsertContextHeaders(const imtgql::IGqlContext& context, QJsonObject& heade
 {
 	const QByteArray productId = context.GetProductId();
 	if (!productId.isEmpty()){
-		for (const QString& headerId : headersObject.keys()){
-			if (headerId.compare(QString(imtbase::s_productIdHeaderId), Qt::CaseInsensitive) == 0){
-				headersObject.remove(headerId);
-			}
-		}
+		RemoveHeader(headersObject, imtbase::s_productIdHeaderId);
 
 		headersObject[QString(imtbase::s_productIdHeaderId)] = QString(productId);
 	}
@@ -94,7 +118,15 @@ QByteArray CSubscriptionManagerComp::RegisterSubscription(
 
 	for (QByteArray subscriptionId : m_registeredClients.keys()){
 		if (m_registeredClients[subscriptionId].m_request.IsEqual(subscriptionRequest) && m_registeredClients[subscriptionId].m_clientId == clientId){
-			m_registeredClients[subscriptionId].m_clients.append(createRegistration());
+			const std::shared_ptr<ClientRegistration> registrationPtr = createRegistration();
+			m_registeredClients[subscriptionId].m_clients.append(registrationPtr);
+			const IGqlSubscriptionClient::SubscriptionStatus status = m_registeredClients[subscriptionId].m_status;
+
+			locker.unlock();
+
+			// The subscription is shared and under way: the new client learns where it stands
+			QMutexLocker dispatchLocker(&registrationPtr->dispatchMutex);
+			subscriptionClient.OnSubscriptionStatusChanged(subscriptionId, status, QString());
 
 			return subscriptionId;
 		}
@@ -122,7 +154,7 @@ QByteArray CSubscriptionManagerComp::RegisterSubscription(
 		{
 			QMutexLocker registeredLocker(&m_registeredClientsMutex);
 			if (m_registeredClients.contains(subscriptionId)){
-				m_registeredClients[subscriptionId].m_status = IGqlSubscriptionClient::SS_REGISTERED;
+				m_registeredClients[subscriptionId].m_isRegistrationSent = true;
 			}
 		}
 
@@ -191,15 +223,14 @@ void CSubscriptionManagerComp::OnUpdate(const istd::IChangeable::ChangeSet& chan
 	for (const QByteArray& subscriptionId : subscriptionIds){
 		if (changeSet.Contains(imtcom::IConnectionStatusProvider::CF_CONNECTED)){
 			if (m_registeredClients[subscriptionId].m_clientId == clientId){
-				const bool isRegistered = SubscriptionRegister(m_registeredClients[subscriptionId].m_request, subscriptionId);
-				m_registeredClients[subscriptionId].m_status = isRegistered
-						? IGqlSubscriptionClient::SS_REGISTERED
-						: IGqlSubscriptionClient::SS_IN_REGISTRATION;
+				m_registeredClients[subscriptionId].m_isRegistrationSent = SubscriptionRegister(m_registeredClients[subscriptionId].m_request, subscriptionId);
+				m_registeredClients[subscriptionId].m_status = IGqlSubscriptionClient::SS_IN_REGISTRATION;
 			}
 		}
 		else{
 			if (m_registeredClients[subscriptionId].m_clientId == clientId){
 				m_registeredClients[subscriptionId].m_status = IGqlSubscriptionClient::SS_IN_REGISTRATION;
+				m_registeredClients[subscriptionId].m_isRegistrationSent = false;
 			}
 		}
 	}
@@ -248,12 +279,13 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 			// keys() is a copy, so it stays valid while the lock is released below;
 			// the map itself must be re-checked on every iteration for the same reason.
 			for (const QByteArray& subscriptionId : m_registeredClients.keys()){
-				const auto foundIt = m_registeredClients.constFind(subscriptionId);
-				if (foundIt == m_registeredClients.constEnd()){
+				const auto foundIt = m_registeredClients.find(subscriptionId);
+				if (foundIt == m_registeredClients.end()){
 					continue;
 				}
 
-				if (foundIt->m_status == IGqlSubscriptionClient::SS_IN_REGISTRATION){
+				if (foundIt->m_status == IGqlSubscriptionClient::SS_IN_REGISTRATION && !foundIt->m_isRegistrationSent){
+					foundIt->m_isRegistrationSent = true;
 					istd::IChangeableUniquePtr objectPtr(foundIt->m_request.CloneMe());
 					locker.unlock();
 					auto requestPtr = dynamic_cast<imtgql::CGqlRequest*>(objectPtr.GetPtr());
@@ -270,6 +302,7 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 			const auto foundIt = m_registeredClients.find(subscriptionId);
 			if (foundIt != m_registeredClients.end()){
 				foundIt->m_status = IGqlSubscriptionClient::SS_REGISTERED;
+				foundIt->m_isRefusalReported = false;
 
 				// Dispatched outside the lock, like MT_DATA below.
 				locker.unlock();
@@ -340,6 +373,23 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 		{
 			const QString key = QString::fromUtf8(webSocketRequest->GetQueryId());
 			QByteArray body = webSocketRequest->GetBody();
+			const QByteArray subscriptionId = rootObject.value("id").toString().toUtf8();
+			const auto foundIt = m_registeredClients.find(subscriptionId);
+			if (foundIt != m_registeredClients.end()){
+				foundIt->m_status = IGqlSubscriptionClient::SS_REFUSED;
+				const QByteArray commandId = foundIt->m_request.GetCommandId();
+				const bool isReported = foundIt->m_isRefusalReported;
+				foundIt->m_isRefusalReported = true;
+
+				locker.unlock();
+				if (!isReported){
+					SendErrorMessage(0, QStringLiteral("The server refused the subscription '%1': %2").arg(QString::fromUtf8(commandId), QString::fromUtf8(body)), QStringLiteral("CSubscriptionManagerComp"));
+				}
+				UpdateCustomerSubscriptionStatuses(subscriptionId, QString::fromUtf8(body));
+				ScheduleRefusedRetry();
+
+				return imtrest::ConstResponsePtr();
+			}
 			{
 				const QJsonDocument envelope = QJsonDocument::fromJson(body);
 				if (envelope.isObject()){
@@ -425,6 +475,7 @@ QFuture<CSubscriptionManagerComp::GqlResult> CSubscriptionManagerComp::SendReque
 
 		InsertContextHeaders(*contextPtr, headersObject);
 	}
+	InsertServerToken(GetServerToken(), headersObject);
 	dataObject["headers"] = headersObject;
 
 	const QByteArray queryData = QJsonDocument(dataObject).toJson(QJsonDocument::Compact);
@@ -541,6 +592,7 @@ bool CSubscriptionManagerComp::SubscriptionRegister(const imtgql::CGqlRequest& s
 
 		InsertContextHeaders(*contextPtr, headersObject);
 	}
+	InsertServerToken(GetServerToken(), headersObject);
 
 	// The request context is a clone taken when the subscription was created, so
 	// its token is the one that was current back then. The server authenticates
@@ -653,6 +705,56 @@ void CSubscriptionManagerComp::OnComponentCreated()
 
 	if (m_accessTokenProviderModelCompPtr.IsValid()){
 		m_accessTokenProviderModelCompPtr->AttachObserver(&m_accessTokenObserver);
+	}
+}
+
+
+QByteArray CSubscriptionManagerComp::GetServerToken() const
+{
+	return m_serverCredentialCompPtr.IsValid() ? m_serverCredentialCompPtr->GetServerToken() : QByteArray();
+}
+
+
+void CSubscriptionManagerComp::ScheduleRefusedRetry() const
+{
+	if (m_isRefusedRetryScheduled.exchange(true)){
+		return;
+	}
+
+	QMetaObject::invokeMethod(const_cast<CSubscriptionManagerComp*>(this), [this](){
+		QTimer::singleShot(s_refusedRetryInterval, const_cast<CSubscriptionManagerComp*>(this), [this](){
+			m_isRefusedRetryScheduled = false;
+
+			RetryRefusedSubscriptions();
+		});
+	}, Qt::QueuedConnection);
+}
+
+
+void CSubscriptionManagerComp::RetryRefusedSubscriptions() const
+{
+	QByteArrayList subscriptionIds;
+	{
+		QMutexLocker locker(&m_registeredClientsMutex);
+		subscriptionIds = m_registeredClients.keys();
+	}
+
+	for (const QByteArray& subscriptionId : subscriptionIds){
+		imtgql::CGqlRequest request;
+		{
+			QMutexLocker locker(&m_registeredClientsMutex);
+			const auto foundIt = m_registeredClients.find(subscriptionId);
+			if (foundIt == m_registeredClients.end() || foundIt->m_status != IGqlSubscriptionClient::SS_REFUSED){
+				continue;
+			}
+
+			foundIt->m_status = IGqlSubscriptionClient::SS_IN_REGISTRATION;
+			foundIt->m_isRegistrationSent = true;
+			request = foundIt->m_request;
+		}
+
+		// Sent outside the lock, see ReregisterSubscriptions()
+		SubscriptionRegister(request, subscriptionId);
 	}
 }
 

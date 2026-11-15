@@ -4,10 +4,13 @@
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
+#include <QtCore/QRecursiveMutex>
 
 // ImtCore includes
 #include <imtauth/IPersonalAccessTokenManager.h>
+#include <imtauth/IPersonalAccessTokenPersistence.h>
 #include <imtbase/IObjectCollection.h>
+#include <imtbase/IObjectCollectionProvider.h>
 
 
 namespace imtauth
@@ -16,15 +19,19 @@ namespace imtauth
 
 class CPersonalAccessTokenManagerComp:
 			public ilog::CLoggerComponentBase,
-			virtual public imtauth::IPersonalAccessTokenManager
+			virtual public imtauth::IPersonalAccessTokenManager,
+			virtual public imtbase::IObjectCollectionProvider
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CPersonalAccessTokenManagerComp);
 		I_REGISTER_INTERFACE(imtauth::IPersonalAccessTokenManager);
+		I_REGISTER_INTERFACE(imtbase::IObjectCollectionProvider);
 		I_ASSIGN(m_tokenCollectionCompPtr, "TokenCollection", "Personal access token collection", true, "PersonalAccessTokenCollection");
 		I_ASSIGN(m_tokenFactoryCompPtr, "TokenFactory", "Personal access token factory", true, "PersonalAccessTokenFactory");
+		I_ASSIGN(m_tokenPersistenceCompPtr, "TokenPersistence", "Atomic token updates; required for a persistent collection", false, "");
+		I_ASSIGN(m_inMemoryUpdatesAttrPtr, "InMemoryUpdates", "Allow serialized object updates only for a private in-memory collection", true, false);
 	I_END_COMPONENT;
 
 	// reimplemented (imtauth::IPersonalAccessTokenManager)
@@ -34,28 +41,42 @@ public:
 		const QString& name,
 		const QString& description,
 		const QByteArrayList& scopes,
-		const QDateTime& expiresAt) override;
-	virtual bool ValidateToken(const QByteArray& rawToken, QByteArray& userId, QByteArray& tokenId, QByteArrayList& scopes, QByteArray* productIdPtr = nullptr) const override;
+		const QDateTime& expiresAt,
+			const QByteArray& clientProductId = QByteArray()) override;
+	virtual bool ValidateToken(
+				const QByteArray& rawToken,
+				QByteArray& userId,
+				QByteArray& tokenId,
+				QByteArrayList& scopes,
+				QByteArray* productIdPtr = nullptr,
+				QByteArray* clientProductIdPtr = nullptr,
+				bool* isCheckFailedPtr = nullptr) const override;
+	virtual QByteArrayList GetServerTokenIds(const QByteArray& clientProductId, bool* isReadPtr = nullptr) const override;
 	virtual QByteArrayList GetTokenIds(const QByteArray& userId) const override;
 	virtual IPersonalAccessTokenSharedPtr GetToken(const QByteArray& tokenId) const override;
 	virtual bool RevokeToken(const QByteArray& tokenId) override;
+	virtual bool SetTokenScopes(const QByteArray& tokenId, const QByteArrayList& scopes) override;
 	virtual bool UpdateLastUsedAt(const QByteArray& tokenId) override;
 	virtual bool DeleteToken(const QByteArray& tokenId) override;
+
+	// reimplemented (imtbase::IObjectCollectionProvider)
+	virtual const imtbase::IObjectCollection* GetObjectCollection() const override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
 
 private:
-	QByteArray GenerateRandomToken() const;
+	QByteArray GenerateRandomToken(const QByteArray& prefix) const;
 	QByteArray HashToken(const QByteArray& rawToken) const;
-	QByteArray ExtractTokenId(const QByteArray& rawToken) const;
+	bool CheckStorageConfiguration() const;
 
 private:
 	I_REF(imtbase::IObjectCollection, m_tokenCollectionCompPtr);
 	I_FACT(imtauth::IPersonalAccessToken, m_tokenFactoryCompPtr);
+	I_REF(imtauth::IPersonalAccessTokenPersistence, m_tokenPersistenceCompPtr);
+	I_ATTR(bool, m_inMemoryUpdatesAttrPtr);
+	mutable QRecursiveMutex m_tokensMutex;
 };
 
 
 } // namespace imtauth
-
-

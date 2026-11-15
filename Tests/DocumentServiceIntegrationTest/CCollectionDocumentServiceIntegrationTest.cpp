@@ -1209,6 +1209,32 @@ void CCollectionDocumentServiceIntegrationTest::OpenDocumentRevisionTest()
 }
 
 
+void CCollectionDocumentServiceIntegrationTest::HandleDocumentRevisionReadOnlyTest()
+{
+	AddCollectionObject(TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME);
+	const int revision = CreateObjectRevision(TEST_OBJECT_ID, QStringLiteral("revisionData"), QStringLiteral("currentData"));
+	QVERIFY(revision > 0);
+
+	const QByteArray docId = OpenDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_OBJECT_ID, revision);
+	QVERIFY(!docId.isEmpty());
+	QVERIFY(FindDocumentInfo(*m_servicePtr, TEST_USER_ID, docId).isReadOnly);
+
+	auto getResult = m_servicePtr->HandleDocument(TEST_USER_ID, docId, &iprm::ITextParam::GetText);
+	QCOMPARE(getResult.status, imtdoc::IDocumentService::OS_OK);
+	QVERIFY(getResult.value.has_value());
+	QCOMPARE(*getResult.value, QStringLiteral("revisionData"));
+
+	auto setResult = m_servicePtr->HandleDocument(TEST_USER_ID, docId, &iprm::ITextParam::SetText, QStringLiteral("modified"));
+	QCOMPARE(setResult.status, imtdoc::IDocumentService::OS_FAILED);
+	QVERIFY(!setResult.value.has_value());
+
+	getResult = m_servicePtr->HandleDocument(TEST_USER_ID, docId, &iprm::ITextParam::GetText);
+	QCOMPARE(getResult.status, imtdoc::IDocumentService::OS_OK);
+	QVERIFY(getResult.value.has_value());
+	QCOMPARE(*getResult.value, QStringLiteral("revisionData"));
+}
+
+
 void CCollectionDocumentServiceIntegrationTest::OpenDocumentRevisionListNameSuffixTest()
 {
 	AddCollectionObject(TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME);
@@ -1497,5 +1523,4 @@ void CCollectionDocumentServiceIntegrationTest::NameProviderSourceParamsRevision
 				m_servicePtr->GetDocumentName(TEST_USER_ID, docId, name) == imtdoc::IDocumentService::OS_OK && name == expectedName,
 				WAIT_TIMEOUT);
 }
-
 

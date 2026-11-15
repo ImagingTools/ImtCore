@@ -49,6 +49,53 @@ module.exports = {
         }
     },
 
+    __acceptKey(e){
+        if (e.key === 'Tab') {
+            e.preventDefault()
+        }
+    },
+
+    // Qt: the Keys signal of a specific key (keyToSignal in qquickitem.cpp)
+    __keySignalName(e){
+        switch (e.key) {
+            case 'ArrowLeft': return 'Keys.leftPressed'
+            case 'ArrowRight': return 'Keys.rightPressed'
+            case 'ArrowUp': return 'Keys.upPressed'
+            case 'ArrowDown': return 'Keys.downPressed'
+            case 'Tab': return e.shiftKey ? 'Keys.backtabPressed' : 'Keys.tabPressed'
+            case 'Escape': return 'Keys.escapePressed'
+            case 'Enter': return e.code === 'NumpadEnter' ? 'Keys.enterPressed' : 'Keys.returnPressed'
+            case 'Delete': return 'Keys.deletePressed'
+            case '*': return 'Keys.asteriskPressed'
+            case '#': return 'Keys.numberSignPressed'
+            case 'ContextMenu': return 'Keys.menuPressed'
+        }
+        if (e.code === 'Space') return 'Keys.spacePressed'
+        if (typeof e.key === 'number' && e.key >= 0x30 && e.key <= 0x39) return 'Keys.digit' + (e.key - 0x30) + 'Pressed'
+
+        return ''
+    },
+
+    __isKeySignalHandled(obj, signalName){
+        let self = obj.__self || obj
+        if (typeof self['SLOT_' + signalName] === 'function') return true
+        let connections = self.__connections ? self.__connections[signalName] : null
+        return !!(connections && connections.length)
+    },
+
+    // Qt: a handler of the specific key runs first with the event accepted by default, Keys.pressed only if it is not accepted
+    __sendKeysPressed(obj, e){
+        let signalName = this.__keySignalName(e)
+        e.accepted = false
+        if (signalName && typeof obj[signalName] === 'function' && this.__isKeySignalHandled(obj, signalName)) {
+            e.accepted = true
+            obj[signalName](e)
+        }
+        if (!e.accepted) obj['Keys.pressed'](e)
+
+        return e.accepted
+    },
+
     add: function (obj) {
         this.shortcuts.push(obj)
     },
@@ -106,60 +153,8 @@ module.exports = {
                     }
                 }
 
-                e.accepted = false
-                obj['Keys.pressed'](e)
-                if (e.accepted) return
-
-                if (e.key === 'Tab' && e.shiftKey) {
-                    e.accepted = false
-                    obj['Keys.backtabPressed'](e)
-                    if (e.accepted) return
-                } else if (e.key === 'Tab') {
-                    e.accepted = false
-                    obj['Keys.tabPressed'](e)
-                    if (e.accepted) return
-                }
-
-                if (e.key === 'ArrowLeft') {
-                    e.accepted = false
-                    obj['Keys.leftPressed'](e)
-                    if (e.accepted) return
-                }
-                if (e.key === 'ArrowRight') {
-                    e.accepted = false
-                    obj['Keys.rightPressed'](e)
-                    if (e.accepted) return
-                }
-                if (e.key === 'ArrowUp') {
-                    e.accepted = false
-                    obj['Keys.upPressed'](e)
-                    if (e.accepted) return
-                }
-                if (e.key === 'ArrowDown') {
-                    e.accepted = false
-                    obj['Keys.downPressed'](e)
-                    if (e.accepted) return
-                }
-                if (e.key === 'Return') {
-                    e.accepted = false
-                    obj['Keys.returnPressed'](e)
-                    if (e.accepted) return
-                }
-                if (e.key === 'Enter') {
-                    e.accepted = false
-                    obj['Keys.enterPressed'](e)
-                    if (e.accepted) return
-                }
-                if (e.code === 'Space') {
-                    e.accepted = false
-                    obj['Keys.spacePressed'](e)
-                    if (e.accepted) return
-                }
-                if (e.key === 'Escape') {
-                    e.accepted = false
-                    obj['Keys.escapePressed'](e)
-                    if (e.accepted) return
-                }
+                // Qt: an accepted key goes no further, so the browser must not act on it either (Tab would move the DOM focus)
+                if (this.__sendKeysPressed(obj, e)) return this.__acceptKey(e)
             }
 
             if (e.key === 'Tab') {

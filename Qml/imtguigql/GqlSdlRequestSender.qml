@@ -2,6 +2,7 @@ import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtgui 1.0
+import imtcontrols 1.0
 import imtguigql 1.0
 
 
@@ -45,7 +46,10 @@ GqlRequest {
 	property Component inputObjectComp: null;
 	
 	property var inputParams: Gql.GqlObject("input");
-	
+
+	// Unique ID of the last sent request (X-Request-ID header), e.g. a DocumentChanged notification names the request that made the change
+	property string requestId: ""
+
 	signal finished(int status); // If status -1 - error, 1 - success response
 	
 	function addInputParam(id, value){
@@ -100,11 +104,12 @@ GqlRequest {
 		return {};
 	}
 	
+	// Returns the ID of the sent request, empty if the request was not sent
 	function send(sdlInputObject){
 		if (gqlCommandId == "" || gqlCommandId === undefined || gqlCommandId == null ){
 			console.error("Unable to send request. Error: GraphQL command-ID is invalid.");
 			root.onError("GraphQL command-ID is invalid", "");
-			return;
+			return "";
 		}
 		
 		let type = "";
@@ -120,7 +125,7 @@ GqlRequest {
 		else{
 			console.error("Unable to send request", root.gqlCommandId ,". Error: Request type is unsupported.");
 			root.onError("Request type is unsupported", "");
-			return;
+			return "";
 		}
 
 		var query = Gql.GqlRequest(type, root.gqlCommandId);
@@ -161,14 +166,25 @@ GqlRequest {
 		catch (error){
 			console.error("Unable to create request", root.gqlCommandId, ". Error:", error.message);
 			root.onError(error.message, "Error");
-			return;
+			return "";
 		}
 
-		let headers = root.getHeaders()
-		if (headers && root.permissionPath && root.permissionPath != "")
+		// A copy: the object getHeaders() returns may be shared, the headers of this request must not stay in it
+		let headers = {}
+		let customHeaders = root.getHeaders()
+		for (let key in customHeaders){
+			headers[key] = customHeaders[key]
+		}
+
+		if (root.permissionPath && root.permissionPath != "")
 			headers["permissionPath"] = root.permissionPath
 
+		root.requestId = UuidGenerator.generateUUID()
+		headers["X-Request-ID"] = root.requestId
+
 		root.setGqlQuery(gqlQuery, headers)
+
+		return root.requestId
 	}
 	
 	function createQueryParams(query){

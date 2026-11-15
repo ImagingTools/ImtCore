@@ -194,15 +194,17 @@ Item {
             area.enabled = false
             dispatchPointer(window, "pointercancel", 1003, point.x, point.y)
             area.enabled = true
+            // Qt: MouseArea.enabled does not end a press, so the cancel still reaches it
             if(!verify(!area.pressed && !area.__pressed, "disabled MouseArea remained pressed after pointercancel")) return false
-            if(!verify(root.canceledCount === 1, "disabled MouseArea emitted canceled")) return false
+            if(!verify(root.canceledCount === 2, "MouseArea disabled during the press did not emit canceled")) return false
 
             dispatchPointer(dom, "pointerdown", 1004, point.x, point.y)
             area.visible = false
             dispatchPointer(window, "pointercancel", 1004, point.x, point.y)
             area.visible = true
+            // Qt: hiding ends the press at once (ungrabMouse), the later cancel finds nothing
             if(!verify(!area.pressed && !area.__pressed, "hidden MouseArea remained pressed after pointercancel")) return false
-            return verify(root.canceledCount === 1, "hidden MouseArea emitted canceled")
+            return verify(root.canceledCount === 3, "hidden MouseArea did not emit canceled once")
         }
 
         function checkDisabledBeforeRelease() {
@@ -214,8 +216,9 @@ Item {
             area.enabled = false
             dispatchPointer(window, "pointerup", 1005, point.x, point.y)
             area.enabled = true
+            // Qt: MouseArea.enabled does not end a press, the release is still a click
             if(!verify(!area.pressed && !area.__pressed, "area disabled before the release remained pressed")) return false
-            if(!verify(root.clickedCount === 0, "area disabled before the release emitted clicked")) return false
+            if(!verify(root.clickedCount === 1, "area disabled before the release did not emit clicked")) return false
 
             startFirstClick()
             tap(area)
@@ -223,8 +226,9 @@ Item {
             area.enabled = false
             dispatchPointer(window, "pointerup", 1006, point.x, point.y)
             area.enabled = true
+            // Qt: doubleClicked comes with the second press, before the area is disabled
             if(!verify(!area.pressed && !area.__pressed, "area disabled before a double-click release remained pressed")) return false
-            if(!verify(root.doubleClickedCount === 0, "area disabled before a double-click release emitted doubleClicked")) return false
+            if(!verify(root.doubleClickedCount === 1, "second press did not emit doubleClicked")) return false
 
             startFirstClick()
             tap(area)
@@ -263,13 +267,14 @@ Item {
             dispatchPointer(window, "pointerup", 1009, point.x, point.y)
             if(!verify(root.clickedCount === 1, "release back inside the area did not emit clicked")) return false
 
-            // A release outside ends the click sequence, even right after a real click.
+            // Qt: the second press is the double click, wherever it is released; the press after it starts again
             startFirstClick()
             tap(area)
             dispatchPointer(dom, "pointerdown", 1010, point.x, point.y)
+            if(!verify(root.doubleClickedCount === 1, "second press did not emit doubleClicked")) return false
             dispatchPointer(window, "pointerup", 1010, outsideX, outsideY)
             tap(area)
-            return verify(root.doubleClickedCount === 0, "tap after a release outside was classified as a double click")
+            return verify(root.doubleClickedCount === 1 && root.clickedCount === 2, "press after a double click was not a first click")
         }
 
         // The press enters the area through the first move, so it holds containsMouse.

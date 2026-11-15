@@ -25,6 +25,9 @@
         <Element Id="SubscriptionManager" PackageId="ImtClientGqlPck" ComponentId="SubscriptionManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ServerCredentialProvider" Type="Reference" ExportId="ServerCredentialProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="AccessTokenProvider" Type="Reference" ExportId="AccessTokenProvider">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

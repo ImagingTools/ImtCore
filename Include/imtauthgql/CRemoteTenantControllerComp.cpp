@@ -67,9 +67,13 @@ QByteArrayList CRemoteTenantControllerComp::GetTenantIds() const
 }
 
 
-imtauth::ITenantInfoUniquePtr CRemoteTenantControllerComp::GetTenant(const QByteArray& tenantId) const
+imtauth::ITenantInfoUniquePtr CRemoteTenantControllerComp::GetTenant(const QByteArray& tenantId, bool* isReadPtr) const
 {
 	namespace tenantsdl = sdl::V1_0::imtauth;
+
+	if (isReadPtr != nullptr){
+		*isReadPtr = false;
+	}
 
 	if (!m_tenantFactoryCompPtr.IsValid()){
 		return nullptr;
@@ -89,6 +93,12 @@ imtauth::ITenantInfoUniquePtr CRemoteTenantControllerComp::GetTenant(const QByte
 
 	QString errorMessage;
 	tenantsdl::CGetTenantPayload payload = OnGetTenant(getTenantRequest, gqlRequest, errorMessage);
+
+	// The server answered when it sent the organization or why there is none; no answer and an error of the request say nothing
+	if (isReadPtr != nullptr){
+		*isReadPtr = errorMessage.isEmpty() && (payload.tenant.has_value() || payload.errorMessage.has_value());
+	}
+
 	if (!payload.tenant.has_value()){
 		return nullptr;
 	}

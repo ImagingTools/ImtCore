@@ -371,6 +371,9 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
+                    <AttributeInfo Id="RoleCollection" Type="Reference" ExportId="RoleRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="RoleInfoProvider" Type="Reference" ExportId="RoleInfoProvider">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -388,6 +391,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="UserFactory" Type="Factory" ExportId="">
                         <Data IsEnabled="true" Value="UserInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserGroupCollection" Type="Reference" ExportId="UserGroupRepository">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserGroupInfoProvider" Type="Reference" ExportId="UserGroupInfoProvider">
                         <Data IsEnabled="false"/>
@@ -702,5 +708,6 @@
         <Component ExportedId="PasswordPolicy" ComponentId="PasswordPolicy"/>
         <Component ExportedId="SmtpMessageCreator" ComponentId="SmtpMessageCreator"/>
         <Component ExportedId="UserChangeGenerator" ComponentId="UserChangeGenerator"/>
+        <Component ExportedId="UserListController" ComponentId="UserListController"/>
     </ExportedComponents>
 </Acf>

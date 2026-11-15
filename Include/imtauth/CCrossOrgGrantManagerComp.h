@@ -41,7 +41,7 @@ public:
 	virtual bool RemoveGrants(const QByteArrayList& grantIds) override;
 	virtual CrossOrgGrantInfo GetGrant(const QByteArray& grantId) const override;
 	virtual CrossOrgGrants GetGrantsBySourceTenant(const QByteArray& sourceTenantId, bool* isReadPtr = nullptr) const override;
-	virtual CrossOrgGrants GetGrantsByTargetTenant(const QByteArray& targetTenantId) const override;
+	virtual CrossOrgGrants GetGrantsByTargetTenant(const QByteArray& targetTenantId, bool* isReadPtr = nullptr) const override;
 	virtual bool HasAccess(
 				const QByteArray& sourceTenantId,
 				const QByteArray& targetTenantId,
@@ -49,7 +49,6 @@ public:
 
 private:
 	CrossOrgGrants CollectGrants(const QByteArray& columnId, const QByteArray& value, const std::function<bool(const CrossOrgGrantInfo&)>& predicate, bool* isReadPtr = nullptr) const;
-	bool IsGrantEffective(const CrossOrgGrantInfo& grantInfo) const;
 
 private:
 	I_REF(imtbase::IObjectCollection, m_grantCollectionCompPtr);

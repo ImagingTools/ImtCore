@@ -8,6 +8,7 @@
 // ACF includes
 #include <istd/CChangeNotifier.h>
 #include <iprm/CParamsSet.h>
+#include <ilog/CMessageContainer.h>
 
 // ImtCore includes
 #include <imtbase/CComplexCollectionFilter.h>
@@ -131,9 +132,9 @@ bool CTenantEntityBindingManagerComp::RemoveAllBindingsForTenant(const QByteArra
 }
 
 
-bool CTenantEntityBindingManagerComp::HasBinding(const QByteArray& tenantId, const QByteArray& entityType, const QByteArray& entityId) const
+bool CTenantEntityBindingManagerComp::HasBinding(const QByteArray& tenantId, const QByteArray& entityType, const QByteArray& entityId, bool* isReadPtr) const
 {
-	return !FindBindingIds(tenantId, entityType, entityId).isEmpty();
+	return !FindBindingIds(tenantId, entityType, entityId, isReadPtr).isEmpty();
 }
 
 
@@ -170,9 +171,13 @@ QByteArrayList CTenantEntityBindingManagerComp::GetEntityIds(const QByteArray& t
 }
 
 
-bool CTenantEntityBindingManagerComp::HasAnyTenantBinding(const QByteArray& entityType, const QByteArray& entityId) const
+bool CTenantEntityBindingManagerComp::HasAnyTenantBinding(const QByteArray& entityType, const QByteArray& entityId, bool* isReadPtr) const
 {
-	if (!m_bindingsCollectionCompPtr.IsValid() || entityType.isEmpty() || entityId.isEmpty()){
+	if (entityType.isEmpty() || entityId.isEmpty()){
+		if (isReadPtr != nullptr){
+			*isReadPtr = true;
+		}
+
 		return false;
 	}
 
@@ -181,37 +186,46 @@ bool CTenantEntityBindingManagerComp::HasAnyTenantBinding(const QByteArray& enti
 	filterExpr.fieldFilters << imtbase::IComplexCollectionFilter::FieldFilter("EntityId", QString::fromUtf8(entityId));
 	// Do not restrict by TenantId: any tenant binding means it is tenant-scoped.
 
-	imtbase::CComplexCollectionFilter complexFilter;
-	complexFilter.SetFilterExpression(filterExpr);
-
-	iprm::CParamsSet filterParams;
-	filterParams.SetEditableParameter("ComplexFilter", &complexFilter);
-
-	QByteArrayList bindingIds = m_bindingsCollectionCompPtr->GetElementIds(0, -1, &filterParams);
-	return !bindingIds.isEmpty();
+	return !SelectBindingIds(filterExpr, isReadPtr).isEmpty();
 }
 
 
 // private methods
 
-QByteArrayList CTenantEntityBindingManagerComp::FindBindingIds(const QByteArray& tenantId, const QByteArray& entityType, const QByteArray& entityId) const
+QByteArrayList CTenantEntityBindingManagerComp::FindBindingIds(const QByteArray& tenantId, const QByteArray& entityType, const QByteArray& entityId, bool* isReadPtr) const
 {
-	if (!m_bindingsCollectionCompPtr.IsValid()){
-		return QByteArrayList();
-	}
-
 	imtbase::IComplexCollectionFilter::FilterExpression filterExpr;
 	filterExpr.fieldFilters << imtbase::IComplexCollectionFilter::FieldFilter("TenantId", QString::fromUtf8(tenantId));
 	filterExpr.fieldFilters << imtbase::IComplexCollectionFilter::FieldFilter("EntityType", QString::fromUtf8(entityType));
 	filterExpr.fieldFilters << imtbase::IComplexCollectionFilter::FieldFilter("EntityId", QString::fromUtf8(entityId));
 
+	return SelectBindingIds(filterExpr, isReadPtr);
+}
+
+
+QByteArrayList CTenantEntityBindingManagerComp::SelectBindingIds(const imtbase::IComplexCollectionFilter::FilterExpression& filterExpression, bool* isReadPtr) const
+{
+	if (isReadPtr != nullptr){
+		*isReadPtr = m_bindingsCollectionCompPtr.IsValid();
+	}
+
+	if (!m_bindingsCollectionCompPtr.IsValid()){
+		return QByteArrayList();
+	}
+
 	imtbase::CComplexCollectionFilter complexFilter;
-	complexFilter.SetFilterExpression(filterExpr);
+	complexFilter.SetFilterExpression(filterExpression);
 
 	iprm::CParamsSet filterParams;
 	filterParams.SetEditableParameter("ComplexFilter", &complexFilter);
 
-	return m_bindingsCollectionCompPtr->GetElementIds(0, -1, &filterParams);
+	ilog::CMessageContainer readErrors;
+	const QByteArrayList retVal = m_bindingsCollectionCompPtr->GetElementIds(0, -1, &filterParams, &readErrors);
+	if (isReadPtr != nullptr && readErrors.GetWorstCategory() >= istd::IInformationProvider::IC_ERROR){
+		*isReadPtr = false;
+	}
+
+	return retVal;
 }
 
 

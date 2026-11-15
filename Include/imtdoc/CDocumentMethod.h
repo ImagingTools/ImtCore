@@ -20,7 +20,7 @@ namespace imtdoc
 
 /**
 	\ingroup imtdoc
-	\brief Type-erased call to a mutating method of a document's concrete type.
+	\brief Type-erased call to a method of a document's concrete type.
 
 	Binds a pointer-to-member-function together with its arguments at construction time, so that
 	\c IDocumentService::ExecuteDocumentMethod can invoke it against the live document object it holds
@@ -30,8 +30,9 @@ namespace imtdoc
 	declaring the method needn't derive from \c istd::IChangeable, it only has to be a base of the
 	same concrete document object. \c static_cast cannot express this.
 
-	Only \c void -returning, non-\c const methods can be bound, and their parameters must be taken by
-	value or by \c const reference - see the constructor.
+	Both \c const and non-\c const methods can be bound, and their parameters must be taken by value
+	or by \c const reference - see the constructors. The result of a non-\c void method is written to
+	a variable passed to the constructor.
 
 	\par Example
 	\code
@@ -39,6 +40,12 @@ namespace imtdoc
 					userId,
 					documentId,
 					imtdoc::CDocumentMethod(&MyDocument::AddItems, items));
+
+		bool isRemoved = false;
+		documentServicePtr->ExecuteDocumentMethod(
+					userId,
+					documentId,
+					imtdoc::CDocumentMethod(&MyDocument::RemoveItem, isRemoved, itemId));
 	\endcode
 */
 class CDocumentMethod
@@ -56,23 +63,39 @@ public:
 	*/
 	template <typename Document, typename... Args>
 	explicit CDocumentMethod(void (Document::*method)(Args...), std::decay_t<Args>... args) :
-				m_invoke([method,
-#if __cplusplus >= 202002L // C++20 or newer
-							...args = std::move(args)
-#else
-							args...
-#endif
-							](istd::IChangeable& document) {
-					auto* documentPtr = dynamic_cast<Document*>(&document);
-					Q_ASSERT(documentPtr != nullptr);
-					if (documentPtr == nullptr){
-						return false;
-					}
+				m_invoke(CreateInvoker<Document, void>(method, nullptr, std::move(args)...))
+	{
+	}
 
-					(documentPtr->*method)(args...);
+	/**
+		\brief \c const overload of the constructor above.
+	*/
+	template <typename Document, typename... Args>
+	explicit CDocumentMethod(void (Document::*method)(Args...) const, std::decay_t<Args>... args) :
+				m_invoke(CreateInvoker<Document, void>(method, nullptr, std::move(args)...))
+	{
+	}
 
-					return true;
-				})
+	/**
+		\brief Bind \a method and \a args, to be invoked later against a document of type \a Document;
+		the result of \a method is written to \a ret.
+
+		\a Ret is deduced from \a method alone, \a ret only has to hold its decayed type.
+		\a ret is referenced, not copied, so it must outlive every invocation of this object.
+		\a ret is left unchanged if the method was not called.
+	*/
+	template <typename Ret, typename Document, typename... Args>
+	explicit CDocumentMethod(Ret (Document::*method)(Args...), std::decay_t<Ret>& ret, std::decay_t<Args>... args) :
+				m_invoke(CreateInvoker<Document, Ret>(method, &ret, std::move(args)...))
+	{
+	}
+
+	/**
+		\brief \c const overload of the constructor above.
+	*/
+	template <typename Ret, typename Document, typename... Args>
+	explicit CDocumentMethod(Ret (Document::*method)(Args...) const, std::decay_t<Ret>& ret, std::decay_t<Args>... args) :
+				m_invoke(CreateInvoker<Document, Ret>(method, &ret, std::move(args)...))
 	{
 	}
 
@@ -88,7 +111,43 @@ public:
 	}
 
 private:
-	std::function<bool(istd::IChangeable&)> m_invoke;
+	typedef std::function<bool(istd::IChangeable&)> Invoker;
+
+	/**
+		Creates the invoker of \a method; for a non-\c void \a Ret the result is written to \a retPtr.
+	*/
+	template <typename Document, typename Ret, typename Method, typename... BoundArgs>
+	static Invoker CreateInvoker(Method method, std::decay_t<Ret>* retPtr, BoundArgs... args)
+	{
+		return [method,
+					retPtr,
+#if __cplusplus >= 202002L // C++20 or newer
+					...args = std::move(args)
+#else
+					args...
+#endif
+					](istd::IChangeable& document) {
+			auto* documentPtr = dynamic_cast<Document*>(&document);
+			Q_ASSERT(documentPtr != nullptr);
+			if (documentPtr == nullptr){
+				return false;
+			}
+
+			if constexpr (std::is_void_v<Ret>){
+				Q_UNUSED(retPtr);
+
+				(documentPtr->*method)(args...);
+			}
+			else{
+				*retPtr = (documentPtr->*method)(args...);
+			}
+
+			return true;
+		};
+	}
+
+private:
+	Invoker m_invoke;
 };
 
 

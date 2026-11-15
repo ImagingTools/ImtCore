@@ -641,8 +641,8 @@ sdl::V1_0::imtbase::CRemoveElementSetPayload CObjectCollectionControllerCompBase
 
 sdl::V1_0::imtbase::CRestoreObjectsPayload CObjectCollectionControllerCompBase::OnRestoreObjects(
 			const sdl::V1_0::imtbase::CRestoreObjectsGqlRequest& restoreObjectsRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
-			QString& /*errorMessage*/) const
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
 {
 	sdl::V1_0::imtbase::CRestoreObjectsPayload response;
 
@@ -650,6 +650,10 @@ sdl::V1_0::imtbase::CRestoreObjectsPayload CObjectCollectionControllerCompBase::
 	QByteArrayList objectIds;
 	if (arguments.input->objectIds){
 		objectIds = arguments.input->objectIds->ToList();
+	}
+
+	if (!CheckObjectAccess(gqlRequest, objectIds, imtauth::IDocumentShareInfo::DAL_EDIT, errorMessage)){
+		return response;
 	}
 
 	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr = nullptr;
@@ -665,7 +669,7 @@ sdl::V1_0::imtbase::CRestoreObjectsPayload CObjectCollectionControllerCompBase::
 
 sdl::V1_0::imtbase::CRestoreObjectSetPayload CObjectCollectionControllerCompBase::OnRestoreObjectSet(
 			const sdl::V1_0::imtbase::CRestoreObjectSetGqlRequest& restoreObjectSetRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtbase::CRestoreObjectSetPayload response;
@@ -681,6 +685,8 @@ sdl::V1_0::imtbase::CRestoreObjectSetPayload CObjectCollectionControllerCompBase
 			}
 		}
 	}
+
+	AddAccessFilters(gqlRequest, imtgql::CGqlParamObject(), filterParams);
 
 	imtbase::ICollectionInfo::Ids elementIds = m_objectCollectionCompPtr->GetElementIds(0, -1, &filterParams);
 
@@ -1388,7 +1394,13 @@ sdl::V1_0::imtbase::CGetObjectDataPayload CObjectCollectionControllerCompBase::O
 		return sdl::V1_0::imtbase::CGetObjectDataPayload();
 	}
 
-	istd::IChangeableUniquePtr adaptedObjectPtr = CreateAdaptedObjectData(objectId, *dataPtr.GetPtr(), gqlRequest);
+	QString adaptationError;
+	istd::IChangeableUniquePtr adaptedObjectPtr = CreateAdaptedObjectData(objectId, *dataPtr.GetPtr(), gqlRequest, adaptationError);
+	if (!adaptationError.isEmpty()){
+		errorMessage = adaptationError;
+		return sdl::V1_0::imtbase::CGetObjectDataPayload();
+	}
+
 	istd::IChangeable* objectToSerializePtr = adaptedObjectPtr.IsValid() ? adaptedObjectPtr.GetPtr() : dataPtr.GetPtr();
 
 	QByteArray objectData;
@@ -3568,7 +3580,8 @@ bool CObjectCollectionControllerCompBase::IsDescriptionStoredInDocument() const
 istd::IChangeableUniquePtr CObjectCollectionControllerCompBase::CreateAdaptedObjectData(
 			const QByteArray& /*objectId*/,
 			const istd::IChangeable& /*object*/,
-			const imtgql::CGqlRequest& /*gqlRequest*/) const
+			const imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& /*errorMessage*/) const
 {
 	return istd::IChangeableUniquePtr();
 }
@@ -3831,6 +3844,20 @@ QJsonObject CObjectCollectionControllerCompBase::CreateElementMetaInfoResponse(c
 	responseObj.insert(QStringLiteral("data"), dataObj);
 
 	return responseObj;
+}
+
+
+bool CObjectCollectionControllerCompBase::CheckObjectChange(
+			const imtgql::CGqlRequest& gqlRequest,
+			const QByteArray& objectId,
+			const istd::IChangeable* dataPtr,
+			QString& errorMessage) const
+{
+	if (!CheckObjectAccess(gqlRequest, {objectId}, imtauth::IDocumentShareInfo::DAL_EDIT, errorMessage)){
+		return false;
+	}
+
+	return dataPtr == nullptr || CheckObjectData(gqlRequest, objectId, *dataPtr, errorMessage);
 }
 
 

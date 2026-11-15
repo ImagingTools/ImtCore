@@ -48,7 +48,8 @@ imtauth::IPersonalAccessTokenManager::TokenCreationResult CClientRequestPersonal
 			const QString& name,
 			const QString& description,
 			const QByteArrayList& scopes,
-			const QDateTime& expiresAt)
+			const QDateTime& expiresAt,
+			const QByteArray& /*clientProductId*/)
 {
 	namespace tokensdl = sdl::V1_0::imtauth;
 
@@ -106,9 +107,21 @@ imtauth::IPersonalAccessTokenManager::TokenCreationResult CClientRequestPersonal
 }
 
 
-bool CClientRequestPersonalAccessTokenManagerComp::ValidateToken(const QByteArray& rawToken, QByteArray& userId, QByteArray& tokenId, QByteArrayList& scopes, QByteArray* productIdPtr) const
+bool CClientRequestPersonalAccessTokenManagerComp::ValidateToken(
+			const QByteArray& rawToken,
+			QByteArray& userId,
+			QByteArray& tokenId,
+			QByteArrayList& scopes,
+			QByteArray* productIdPtr,
+			QByteArray* clientProductIdPtr,
+			bool* isCheckFailedPtr) const
 {
 	namespace tokensdl = sdl::V1_0::imtauth;
+
+	// Stays set until the authorization server gave an answer about the token
+	if (isCheckFailedPtr != nullptr){
+		*isCheckFailedPtr = true;
+	}
 
 	tokensdl::ValidateTokenRequestArguments arguments;
 	arguments.input.emplace();
@@ -124,7 +137,15 @@ bool CClientRequestPersonalAccessTokenManagerComp::ValidateToken(const QByteArra
 
 	QString errorMessage;
 	tokensdl::CValidateTokenPayload payload = OnValidateToken(validateTokenRequest, gqlRequest, errorMessage);
-	if (!payload.valid.has_value() || !*payload.valid){
+	if (!payload.valid.has_value()){
+		return false;
+	}
+
+	if (isCheckFailedPtr != nullptr){
+		*isCheckFailedPtr = false;
+	}
+
+	if (!*payload.valid){
 		return false;
 	}
 
@@ -140,10 +161,32 @@ bool CClientRequestPersonalAccessTokenManagerComp::ValidateToken(const QByteArra
 		*productIdPtr = *payload.productId;
 	}
 
+	if (clientProductIdPtr != nullptr && payload.clientProductId.has_value()){
+		*clientProductIdPtr = *payload.clientProductId;
+	}
+
 	// The SDL schema's ValidateTokenPayload does not include a tokenId field
 	tokenId = QByteArray();
 
 	return true;
+}
+
+
+bool CClientRequestPersonalAccessTokenManagerComp::SetTokenScopes(const QByteArray& /*tokenId*/, const QByteArrayList& /*scopes*/)
+{
+	// The tokens of servers are managed on the authorization server only
+	return false;
+}
+
+
+QByteArrayList CClientRequestPersonalAccessTokenManagerComp::GetServerTokenIds(const QByteArray& /*clientProductId*/, bool* isReadPtr) const
+{
+	if (isReadPtr != nullptr){
+		*isReadPtr = false;
+	}
+
+	// The tokens of servers are managed on the authorization server only
+	return QByteArrayList();
 }
 
 

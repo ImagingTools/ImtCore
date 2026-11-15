@@ -325,7 +325,8 @@ class TestCase extends Item {
         }
     }
 
-    __dispatchMouseEvent(type, point, button = QtEnums.LeftButton, buttons = QtEnums.NoButton, modifiers = QtEnums.NoModifier){
+    // detail is the click count of the browser: QTest never makes a double click of two separate clicks
+    __dispatchMouseEvent(type, point, button = QtEnums.LeftButton, buttons = QtEnums.NoButton, modifiers = QtEnums.NoModifier, detail = 1){
         if(typeof window === 'undefined' || typeof window.dispatchEvent !== 'function') return false
 
         let shiftKey = !!(modifiers & QtEnums.ShiftModifier)
@@ -342,6 +343,7 @@ class TestCase extends Item {
             screenY: point.pageY,
             button: this.__mouseDomButton(button),
             buttons: this.__mouseDomButtons(buttons),
+            detail: type === 'mousemove' ? 0 : detail,
             shiftKey,
             ctrlKey,
             altKey,
@@ -363,6 +365,7 @@ class TestCase extends Item {
         return this.__dispatchMouseEvent('mousemove', point, QtEnums.NoButton, QtEnums.NoButton, modifiers)
     }
 
+    // Qt: QTest sends the button events alone, without a move to the point
     mousePress(item, x, y, button = QtEnums.LeftButton, modifiers = QtEnums.NoModifier, delay = 0){
         let point = this.__mousePoint(item, x, y)
         if(!point) return false
@@ -371,7 +374,6 @@ class TestCase extends Item {
             console.warn('[TestCase] mousePress delay is ignored in web runtime')
         }
 
-        this.__dispatchMouseEvent('mousemove', point, button, button, modifiers)
         return this.__dispatchMouseEvent('mousedown', point, button, button, modifiers)
     }
 
@@ -383,8 +385,8 @@ class TestCase extends Item {
             console.warn('[TestCase] mouseRelease delay is ignored in web runtime')
         }
 
-        this.__dispatchMouseEvent('mousemove', point, button, button, modifiers)
-        return this.__dispatchMouseEvent('mouseup', point, button, QtEnums.NoButton, modifiers)
+        this.__dispatchMouseEvent('mouseup', point, button, QtEnums.NoButton, modifiers)
+        return this.__dispatchMouseEvent('click', point, button, QtEnums.NoButton, modifiers)
     }
 
     mouseClick(item, x, y, button = QtEnums.LeftButton, modifiers = QtEnums.NoModifier, delay = 0){
@@ -395,7 +397,6 @@ class TestCase extends Item {
             console.warn('[TestCase] mouseClick delay is ignored in web runtime')
         }
 
-        this.__dispatchMouseEvent('mousemove', point, button, button, modifiers)
         this.__dispatchMouseEvent('mousedown', point, button, button, modifiers)
         this.__dispatchMouseEvent('mouseup', point, button, QtEnums.NoButton, modifiers)
         return this.__dispatchMouseEvent('click', point, button, QtEnums.NoButton, modifiers)
@@ -419,8 +420,8 @@ class TestCase extends Item {
             clientY: point.pageY - (window.scrollY || 0),
             screenX: point.pageX,
             screenY: point.pageY,
-            deltaX: (dx || 0) * 8,
-            deltaY: (dy || 0) * 8,
+            deltaX: -(dx || 0) * 8,
+            deltaY: -(dy || 0) * 8,
             deltaMode: 0,
             shiftKey,
             ctrlKey,
@@ -432,25 +433,26 @@ class TestCase extends Item {
         return true
     }
 
-    mouseDoubleClick(item, x, y, button = QtEnums.LeftButton, modifiers = QtEnums.NoModifier, delay = 0){
+    // Qt: press, release, press, double click, release
+    mouseDoubleClickSequence(item, x, y, button = QtEnums.LeftButton, modifiers = QtEnums.NoModifier, delay = 0){
         let point = this.__mousePoint(item, x, y)
         if(!point) return false
 
         if(delay > 0) {
-            console.warn('[TestCase] mouseDoubleClick delay is ignored in web runtime')
+            console.warn('[TestCase] mouseDoubleClickSequence delay is ignored in web runtime')
         }
 
-        this.__dispatchMouseEvent('mousemove', point, button, button, modifiers)
+        this.__dispatchMouseEvent('mousedown', point, button, button, modifiers, 1)
+        this.__dispatchMouseEvent('mouseup', point, button, QtEnums.NoButton, modifiers, 1)
+        this.__dispatchMouseEvent('click', point, button, QtEnums.NoButton, modifiers, 1)
+        this.__dispatchMouseEvent('mousedown', point, button, button, modifiers, 2)
+        this.__dispatchMouseEvent('mouseup', point, button, QtEnums.NoButton, modifiers, 2)
+        this.__dispatchMouseEvent('click', point, button, QtEnums.NoButton, modifiers, 2)
+        return this.__dispatchMouseEvent('dblclick', point, button, QtEnums.NoButton, modifiers, 2)
+    }
 
-        this.__dispatchMouseEvent('mousedown', point, button, button, modifiers)
-        this.__dispatchMouseEvent('mouseup', point, button, QtEnums.NoButton, modifiers)
-        this.__dispatchMouseEvent('click', point, button, QtEnums.NoButton, modifiers)
-
-        this.__dispatchMouseEvent('mousedown', point, button, button, modifiers)
-        this.__dispatchMouseEvent('mouseup', point, button, QtEnums.NoButton, modifiers)
-        this.__dispatchMouseEvent('click', point, button, QtEnums.NoButton, modifiers)
-
-        return this.__dispatchMouseEvent('dblclick', point, button, QtEnums.NoButton, modifiers)
+    mouseDoubleClick(item, x, y, button = QtEnums.LeftButton, modifiers = QtEnums.NoModifier, delay = 0){
+        return this.mouseDoubleClickSequence(item, x, y, button, modifiers, delay)
     }
 
     __dispatchKeyEvent(type, key, modifiers = QtEnums.NoModifier){

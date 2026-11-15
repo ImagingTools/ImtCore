@@ -4,6 +4,9 @@ const String = require("./String")
 const Signal = require("./Signal")
 const Alias = require("./Alias")
 
+// Objects whose Component.onCompleted waits until the whole tree being created is complete
+let completedQueue = null
+
 class QObject extends QBaseObject {
     static meta = {
         parent: {type:Var, },
@@ -81,9 +84,37 @@ class QObject extends QBaseObject {
             delete this.__dynamic
             this.__updatePrimaryProperties()
             this.__updateProperties()
+            this.__completeRoot()
+        }
+    }
+
+    // Qt: every object of a created tree is complete before the first Component.onCompleted runs
+    __completeRoot(){
+        let outerQueue = completedQueue
+        let queue = []
+        completedQueue = queue
+        try {
             this.__complete()
             this.__completeProperties()
+        } finally {
+            completedQueue = outerQueue
         }
+
+        for(let obj of queue){
+            if(obj.__destroyed) continue
+            try {
+                obj['Component.completed']()
+            } catch(error){
+                console.error(error)
+            }
+        }
+    }
+
+    __queueCompleted(){
+        if(!completedQueue) return false
+
+        completedQueue.push(this)
+        return true
     }
 
     __addLink(){

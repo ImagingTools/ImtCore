@@ -13,9 +13,10 @@ class Drag extends GroupProperty {
     static Automatic = 1
     static Internal = 2
 
-    static XAxis = 0
-    static YAxis = 1
-    static XAndYAxis = 2
+    // Qt: QQuickDrag::Axis flags
+    static XAxis = 1
+    static YAxis = 2
+    static XAndYAxis = 3
 
     static meta = {
         active: { type: Bool, value: false },
@@ -36,8 +37,9 @@ class Drag extends GroupProperty {
         maximumY: { type: Real, value: Number.POSITIVE_INFINITY },
         minimumX: { type: Real, value: Number.NEGATIVE_INFINITY },
         minimumY: { type: Real, value: Number.NEGATIVE_INFINITY },
-        smoothed: { type: Bool, value: false },
-        threshold: { type: Real, value: 0 },
+        smoothed: { type: Bool, value: true },
+        // Qt: QStyleHints::startDragDistance
+        threshold: { type: Real, value: 10 },
 
         activeChanged: { type: Signal, args: [] },
         dragTypeChanged: { type: Signal, args: [] },

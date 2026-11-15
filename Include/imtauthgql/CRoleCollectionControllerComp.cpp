@@ -398,7 +398,10 @@ void CRoleCollectionControllerComp::SetAdditionalFilters(
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 	const imtauth::IUserInfo* userInfoPtr = gqlContextPtr != nullptr ? gqlContextPtr->GetUserInfo() : nullptr;
 	const bool isBound = userInfoPtr != nullptr && !userInfoPtr->IsAdmin();
-	const QByteArray productId = isBound ? gqlContextPtr->GetProductId() : GetInputArgumentFromRequest(gqlRequest, "productId").toByteArray();
+	QByteArray productId = isBound ? gqlContextPtr->GetProductId() : GetInputArgumentFromRequest(gqlRequest, "productId").toByteArray();
+	if (productId.isEmpty() && gqlContextPtr != nullptr){
+		productId = gqlContextPtr->GetProductId();
+	}
 	if (productId.isEmpty() && !isBound){
 		return;
 	}
