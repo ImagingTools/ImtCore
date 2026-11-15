@@ -10,6 +10,7 @@
 #include <imtauth/imtauth.h>
 #include <imtauthgql/CAssignmentCollector.h>
 #include <imtauthgql/imtauthgql.h>
+#include <imtdoc/imtdoc.h>
 
 // Generated includes
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/RoleCollectionDocumentService.h>
@@ -110,7 +111,9 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CRoleCollectionDocumentServiceComp:
 		return response;
 	}
 
-	if (!rolePtr->GetProductId().isEmpty() && !CheckAdministeredProduct(gqlRequest.GetRequestContext(), rolePtr->GetProductId(), errorMessage)){
+	// A new role gets its product from the editor; a stored one keeps the product it has, an empty one too
+	const bool isStored = imtdoc::IsDocumentStored(*m_documentManagerCompPtr, userLogin, documentId);
+	if (isStored && !CheckAdministeredProduct(gqlRequest.GetRequestContext(), rolePtr->GetProductId(), errorMessage)){
 		return response;
 	}
 
@@ -135,7 +138,7 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CRoleCollectionDocumentServiceComp:
 		rolePtr->SetRoleId(*roleData.roleId);
 	}
 	if (roleData.productId){
-		if (!rolePtr->GetProductId().isEmpty() && rolePtr->GetProductId() != *roleData.productId){
+		if (isStored && rolePtr->GetProductId() != *roleData.productId){
 			errorMessage = QStringLiteral("The product of a role cannot be changed");
 			return response;
 		}

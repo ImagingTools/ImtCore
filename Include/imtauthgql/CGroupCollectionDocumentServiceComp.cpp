@@ -63,7 +63,13 @@ sdl::V1_0::imtauth::CGroupData CGroupCollectionDocumentServiceComp::OnGetGroupRe
 	// Roles are productId-scoped on IPrincipal; only a superuser sees the roles of all products.
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 	const imtauth::IUserInfo* contextUserPtr = gqlContextPtr != nullptr ? gqlContextPtr->GetUserInfo() : nullptr;
-	const QByteArray productId = (contextUserPtr != nullptr && !contextUserPtr->IsAdmin()) ? gqlContextPtr->GetProductId() : QByteArray();
+	const bool isProductBound = contextUserPtr != nullptr && !contextUserPtr->IsAdmin();
+	const QByteArray productId = isProductBound ? gqlContextPtr->GetProductId() : QByteArray();
+	// An empty product would collect the roles of all products
+	if (isProductBound && productId.isEmpty()){
+		errorMessage = QStringLiteral("The product of the request is not known");
+		return sdl::V1_0::imtauth::CGroupData();
+	}
 
 	CAssignmentCollector collector;
 	collector.CollectGroup(*groupPtr, groupPtr->GetObjectUuid(), productId, getGroupRepresentationRequest.GetRequestInfo().isUsersRequested);
@@ -155,10 +161,12 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CGroupCollectionDocumentServiceComp
 
 	if (groupData.roles && groupData.productId){
 		QByteArray productId = *groupData.productId;
-		if (!CheckAdministeredProduct(gqlRequest.GetRequestContext(), productId, errorMessage)){
+		const QByteArrayList roleIds = CAssignmentCollector::GetDirectIds(groupData.roles);
+		if (!CheckAdministeredProduct(gqlRequest.GetRequestContext(), productId, errorMessage)
+					|| !CheckRolesOfProduct(groupPtr->GetRoleProvider(), roleIds, productId, errorMessage)){
 			return response;
 		}
-		groupPtr->SetRoles(productId, CAssignmentCollector::GetDirectIds(groupData.roles));
+		groupPtr->SetRoles(productId, roleIds);
 	}
 
 	// New members get all permissions of the group, the others only what the change adds

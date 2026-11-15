@@ -358,6 +358,10 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 		userPtr->SetRoles(productId, finalRoles);
 	}
 
+	if (!CheckAddedRolesOfProducts(userPtr->GetRoleProvider(), previousUserPtr, *userPtr, errorMessage)){
+		return response;
+	}
+
 	if (!CheckGrantedPermissions(gqlRequest.GetRequestContext(), previousPermissions, userPtr->GetPermissions(contextProductId), errorMessage)){
 		return response;
 	}

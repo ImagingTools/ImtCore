@@ -37,9 +37,6 @@ protected:
 				QString& errorMessage) const override;
 
 private:
-	// An unknown document counts as stored, so its product ID stays
-	bool IsDocumentStored(const QByteArray& userId, const QByteArray& documentId) const;
-
 	I_REF(imtdoc::IDocumentService, m_documentManagerCompPtr);
 };
 

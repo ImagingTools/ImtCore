@@ -5,6 +5,7 @@
 // ImtCore includes
 #include <imtauth/CConnectedProduct.h>
 #include <imtauthgql/imtauthgql.h>
+#include <imtdoc/imtdoc.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/ConnectedProductCollectionDocumentService.h>
 
 
@@ -91,7 +92,7 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CConnectedProductCollectionDocument
 	}
 	if (data.productId){
 		// The tokens, the roles and the permission tree refer to a stored product by this ID
-		if (productPtr->GetProductId() != *data.productId && IsDocumentStored(userLogin, documentId)){
+		if (productPtr->GetProductId() != *data.productId && imtdoc::IsDocumentStored(*m_documentManagerCompPtr, userLogin, documentId)){
 			errorMessage = QStringLiteral("The product ID cannot be changed");
 
 			return response;
@@ -114,21 +115,6 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CConnectedProductCollectionDocument
 	response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Success;
 
 	return response;
-}
-
-
-// private methods
-
-bool CConnectedProductCollectionDocumentServiceComp::IsDocumentStored(const QByteArray& userId, const QByteArray& documentId) const
-{
-	const imtdoc::IDocumentService::DocumentList documents = m_documentManagerCompPtr->GetOpenedDocumentList(userId);
-	for (const imtdoc::IDocumentService::DocumentListItem& document : documents){
-		if (document.documentId == documentId){
-			return !document.documentSourceRef.isEmpty();
-		}
-	}
-
-	return true;
 }
 
 

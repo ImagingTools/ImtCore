@@ -448,6 +448,14 @@ sdl::V1_0::imtbase::CDuplicateElementsPayload CObjectCollectionControllerCompBas
 
 	response.success = false;
 
+	// A copy is a new object: every copy is checked as an insertion before anything is copied
+	for (const QByteArray& elementId : elementIds){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (m_objectCollectionCompPtr->GetObjectData(elementId, dataPtr) && dataPtr.IsValid() && !CheckObjectData(gqlRequest, QByteArray(), *dataPtr.GetPtr(), errorMessage)){
+			return response;
+		}
+	}
+
 	istd::CChangeGroup changeGroup(m_objectCollectionCompPtr.GetPtr());
 
 	int count = imtbase::narrow_cast<int>(elementIds.size());
@@ -2789,6 +2797,13 @@ QJsonObject CObjectCollectionControllerCompBase::ImportObject(const imtgql::CGql
 			errorMessage = QStringLiteral("Unable to import object to the collection. Error: Object conversion failed");
 		}
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+
+		return QJsonObject();
+	}
+
+	// An import is an insertion: it is checked as one
+	if (!CheckObjectData(gqlRequest, QByteArray(), *collectionObjectInstancePtr.GetPtr(), errorMessage)){
+		QFile::remove(filePathTmp);
 
 		return QJsonObject();
 	}

@@ -370,6 +370,18 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 		productId = *arguments.input->productId;
 	}
 
+	// An empty product collects the roles of all products: only a superuser sees them, anybody else the product of the request
+	const imtgql::IGqlContext* gqlContextPtr = groupItemRequest.GetRequestContext();
+	const imtauth::IUserInfo* contextUserPtr = gqlContextPtr != nullptr ? gqlContextPtr->GetUserInfo() : nullptr;
+	if (productId.isEmpty() && (contextUserPtr == nullptr || !contextUserPtr->IsAdmin())){
+		productId = gqlContextPtr != nullptr ? gqlContextPtr->GetProductId() : QByteArray();
+		if (productId.isEmpty()){
+			errorMessage = QStringLiteral("The product of the request is not known");
+
+			return false;
+		}
+	}
+
 	representationPayload.id = QByteArray(userGroupInfoPtr->GetObjectUuid());
 	representationPayload.name = QString(userGroupInfoPtr->GetName());
 	representationPayload.description = QString(userGroupInfoPtr->GetDescription());
@@ -533,7 +545,9 @@ bool CUserGroupCollectionControllerComp::CheckGroupGrants(
 			QString& errorMessage) const
 {
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
-	if (!CheckOtherProductsUnchanged(gqlContextPtr, previousPtr, group, errorMessage)){
+	const imtauth::IRoleInfoProvider* roleProviderPtr = m_roleInfoProviderCompPtr.IsValid() ? m_roleInfoProviderCompPtr.GetPtr() : group.GetRoleProvider();
+	if (!CheckOtherProductsUnchanged(gqlContextPtr, previousPtr, group, errorMessage)
+				|| !CheckAddedRolesOfProducts(roleProviderPtr, previousPtr, group, errorMessage)){
 		return false;
 	}
 

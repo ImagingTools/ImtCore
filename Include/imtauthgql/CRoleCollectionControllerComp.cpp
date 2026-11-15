@@ -443,6 +443,15 @@ bool CRoleCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequest& 
 		return false;
 	}
 
+	// The roles a user other than a superuser sees are the roles of the product of the request: without one there are none
+	const imtgql::IGqlContext* requestContextPtr = gqlRequest.GetRequestContext();
+	const imtauth::IUserInfo* requestUserPtr = requestContextPtr != nullptr ? requestContextPtr->GetUserInfo() : nullptr;
+	if (requestUserPtr != nullptr && !requestUserPtr->IsAdmin() && requestContextPtr->GetProductId().isEmpty()){
+		errorMessage = QStringLiteral("The product of the request is not known");
+
+		return false;
+	}
+
 	QByteArray commandId = gqlRequest.GetCommandId();
 
 	// A role the user holds in the current tenant, delegated ones included, is always readable.

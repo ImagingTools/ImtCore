@@ -706,6 +706,7 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateObjectFromReques
 	if (userInfoPtr != nullptr){
 		const QByteArray contextProductId = gqlRequest.GetRequestContext() != nullptr ? gqlRequest.GetRequestContext()->GetProductId() : QByteArray();
 		if (!CheckOtherProductsUnchanged(gqlRequest.GetRequestContext(), nullptr, *userInfoPtr, errorMessage)
+					|| !CheckAddedRolesOfProducts(m_roleInfoProviderCompPtr.GetPtr(), nullptr, *userInfoPtr, errorMessage)
 					|| !CheckGrantedPermissions(gqlRequest.GetRequestContext(), QByteArrayList(), userInfoPtr->GetPermissions(contextProductId), errorMessage)){
 			return nullptr;
 		}
@@ -1150,7 +1151,8 @@ bool CUserCollectionControllerComp::CheckUserGrants(
 		return false;
 	}
 
-	if (!CheckOtherProductsUnchanged(gqlContextPtr, previousPtr, user, errorMessage)){
+	if (!CheckOtherProductsUnchanged(gqlContextPtr, previousPtr, user, errorMessage)
+				|| !CheckAddedRolesOfProducts(m_roleInfoProviderCompPtr.GetPtr(), previousPtr, user, errorMessage)){
 		return false;
 	}
 

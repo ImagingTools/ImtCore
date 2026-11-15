@@ -1855,6 +1855,63 @@ inline bool CheckAdministeredProduct(const imtgql::IGqlContext* gqlContextPtr, c
 
 
 /**
+	Check that the roles are roles of the product they are given in: a role of another product would act in this one.
+	A role that cannot be read is refused.
+*/
+inline bool CheckRolesOfProduct(
+			const imtauth::IRoleInfoProvider* roleProviderPtr,
+			const QByteArrayList& roleIds,
+			const QByteArray& productId,
+			QString& errorMessage)
+{
+	for (const QByteArray& roleId : roleIds){
+		const imtauth::IRoleUniquePtr rolePtr = roleProviderPtr != nullptr ? roleProviderPtr->GetRole(roleId) : imtauth::IRoleUniquePtr();
+		if (!rolePtr.IsValid()){
+			errorMessage = QStringLiteral("The role '%1' is not available").arg(QString::fromUtf8(roleId));
+
+			return false;
+		}
+
+		if (rolePtr->GetProductId() != productId){
+			errorMessage = QStringLiteral("The role '%1' is a role of another product").arg(rolePtr->GetRoleName());
+
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+/**
+	Check that each role a change gives a user or a group in a product is a role of that product.
+	\param previousPtr	[optional] The stored state: the roles it held are not checked again.
+*/
+inline bool CheckAddedRolesOfProducts(
+			const imtauth::IRoleInfoProvider* roleProviderPtr,
+			const imtauth::IPrincipal* previousPtr,
+			const imtauth::IPrincipal& principal,
+			QString& errorMessage)
+{
+	for (const QByteArray& productId : principal.GetProducts()){
+		const imtauth::IPrincipal::RoleIds previousRoles = previousPtr != nullptr ? previousPtr->GetRoles(productId) : imtauth::IPrincipal::RoleIds();
+		imtauth::IPrincipal::RoleIds addedRoles;
+		for (const QByteArray& roleId : principal.GetRoles(productId)){
+			if (!previousRoles.contains(roleId)){
+				addedRoles.append(roleId);
+			}
+		}
+
+		if (!CheckRolesOfProduct(roleProviderPtr, addedRoles, productId, errorMessage)){
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+/**
 	Check the products named in the input of an administration command: input.productId and input.item.productId.
 */
 inline bool CheckAdministeredProducts(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage)
