@@ -409,6 +409,14 @@ PopupView {
 		}
 	}
 
+	// A new filter replaces the rows: they are shown from the top, a shorter list must not
+	// stay scrolled past its end (e.g. after the selected row was revealed further down).
+	function __showFromTop(){
+		root.__internal.restoreAfterFetch = false
+		__restoreScrollTimer.stop()
+		popupListView.contentY = 0
+	}
+
 	function __scrollToRow(index){
 		var maxContentY = Math.max(0, popupListView.contentHeight - popupListView.height)
 		var rowTop = index * root.itemHeight
@@ -597,6 +605,7 @@ PopupView {
 		onFinished: {
 			if (root.dataProvider){
 				root.focusedIndex = -1
+				root.__showFromTop()
 				root.dataProvider.fetch(filterField.text)
 			}
 		}
@@ -681,6 +690,7 @@ PopupView {
 					debounce.stop()
 					if (root.dataProvider){
 						root.focusedIndex = -1
+						root.__showFromTop()
 						root.dataProvider.fetch(filterField.text)
 					}
 				}
