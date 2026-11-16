@@ -3,6 +3,9 @@
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Groups.h>
 
 
+// Qt includes
+#include <QtCore/QMutexLocker>
+
 // ACF includes
 #include <iqt/iqt.h>
 #include <istd/TInterfacePtr.h>
@@ -58,6 +61,11 @@ bool CUserGroupCollectionControllerComp::FillObjectFromRepresentation(
 	}
 
 	userGroupInfoPtr->SetUsers(CAssignmentCollector::GetDirectIds(groupDataRepresentation.users));
+
+	// The system of a group is not editable: groups created here are internal, LDAP groups are created by the synchronization.
+	if (userGroupInfoPtr->GetSystemInfos().isEmpty()){
+		userGroupInfoPtr->AddToSystem(imtauth::IUserGroupInfo::SystemInfo());
+	}
 
 	const QByteArrayList roleIds = CAssignmentCollector::GetDirectIds(groupDataRepresentation.roles);
 
@@ -142,6 +150,18 @@ sdl::V1_0::imtbase::CGetElementMetaInfoPayload CUserGroupCollectionControllerCom
 			sdl::V1_0::imtbase::CElementMetaInfo elementMetaInfo;
 		
 			imtsdl::TElementList<sdl::V1_0::imtbase::CParameter> infoParams;
+
+			QStringList sourceNames;
+			for (const imtauth::IUserGroupInfo::SystemInfo& systemInfo : userGroupInfoPtr->GetSystemInfos()){
+				sourceNames << (systemInfo.systemName.isEmpty() ? QStringLiteral("Internal") : systemInfo.systemName);
+			}
+
+			sdl::V1_0::imtbase::CParameter sourceParameter;
+			sourceParameter.id = QByteArrayLiteral("Source");
+			sourceParameter.typeId = QByteArrayLiteral("Text");
+			sourceParameter.name = QStringLiteral("Source");
+			sourceParameter.data = sourceNames.isEmpty() ? QStringLiteral("Internal") : sourceNames.join(QStringLiteral(", "));
+			infoParams << sourceParameter;
 
 			sdl::V1_0::imtbase::CParameter parentGroupsParameter;
 			parentGroupsParameter.id = QByteArrayLiteral("ParentGroups");
@@ -284,6 +304,29 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 		representationObject.description = QString(userGroupInfoPtr->GetDescription());
 	}
 
+	if (requestInfo.items.isSystemIdRequested){
+		QByteArrayList systemIdList;
+		for (const imtauth::IUserGroupInfo::SystemInfo& systemInfo : userGroupInfoPtr->GetSystemInfos()){
+			systemIdList << systemInfo.systemId;
+		}
+
+		representationObject.systemId = QByteArray(systemIdList.join(';'));
+	}
+
+	if (requestInfo.items.isSystemNameRequested){
+		QStringList systemNameList;
+		for (const imtauth::IUserGroupInfo::SystemInfo& systemInfo : userGroupInfoPtr->GetSystemInfos()){
+			if (systemInfo.systemName.isEmpty()){
+				systemNameList << QT_TR_NOOP("Internal");
+			}
+			else{
+				systemNameList << systemInfo.systemName;
+			}
+		}
+
+		representationObject.systemName = QString(systemNameList.join(';'));
+	}
+
 	if (requestInfo.items.isAddedRequested){
 		QDateTime addedTime = objectCollectionIterator.GetElementInfo("Added").toDateTime();
 		addedTime.setTimeZone(QTimeZone::utc());
@@ -378,6 +421,25 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 	collector.CollectGroup(*userGroupInfoPtr, userGroupInfoPtr->GetObjectUuid(), productId);
 	collector.FillGroup(representationPayload);
 
+	imtsdl::TElementList<sdl::V1_0::imtauth::CGroupSystemInfo> systemInfoList;
+	for (const imtauth::IUserGroupInfo::SystemInfo& systemInfo : userGroupInfoPtr->GetSystemInfos()){
+		sdl::V1_0::imtauth::CGroupSystemInfo info;
+
+		info.id = QByteArray(systemInfo.systemId);
+
+		if (systemInfo.systemId.isEmpty()){
+			info.name = QStringLiteral("Internal");
+		}
+		else{
+			info.name = QString(systemInfo.systemName);
+		}
+
+		info.enabled = bool(systemInfo.enabled);
+
+		systemInfoList << info;
+	}
+	representationPayload.systemInfos = std::move(systemInfoList);
+
 	return true;
 }
 
@@ -439,6 +501,21 @@ istd::IChangeableUniquePtr CUserGroupCollectionControllerComp::CreateObjectFromR
 	}
 
 	return objectPtr;
+}
+
+
+// reimplemented (imtservergql::CGqlRequestHandlerCompBase)
+
+QJsonObject CUserGroupCollectionControllerComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+{
+	if (gqlRequest.GetRequestType() != imtgql::IGqlRequest::RT_MUTATION){
+		return BaseClass::CreateInternalResponse(gqlRequest, errorMessage);
+	}
+
+	// A group change must not interleave with the read-modify-write of the LDAP group synchronization.
+	QMutexLocker locker(&imtauth::CUserGroupInfo::GetUpdateMutex());
+
+	return BaseClass::CreateInternalResponse(gqlRequest, errorMessage);
 }
 
 

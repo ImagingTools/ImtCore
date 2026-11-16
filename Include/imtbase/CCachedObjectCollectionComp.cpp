@@ -9,6 +9,7 @@
 #include <istd/TDelPtr.h>
 #include <istd/CChangeNotifier.h>
 #include <iser/CMemoryWriteArchive.h>
+#include <ilog/CMessage.h>
 
 
 namespace imtbase
@@ -345,6 +346,10 @@ ICollectionInfo::Ids CCachedObjectCollectionComp::GetElementIds(
 	FilteredCollectionPtr collectionCacheItemPtr = GetFilteredCollection(offset, count, selectionParamsPtr);
 	if (collectionCacheItemPtr != nullptr){
 		return collectionCacheItemPtr->cachePtr->GetElementIds(0, -1, nullptr, logPtr);
+	}
+
+	if (logPtr != nullptr){
+		logPtr->AddMessage(ilog::IMessageConsumer::MessagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0, QStringLiteral("Unable to read the collection elements"), "CCachedObjectCollectionComp")));
 	}
 
 	return ICollectionInfo::Ids();

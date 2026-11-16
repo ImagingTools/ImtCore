@@ -2,6 +2,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QRecursiveMutex>
+
 // ImtCore includes
 #include <imtbase/TIdentifiableWrap.h>
 #include <imtauth/IUserGroupInfo.h>
@@ -19,6 +22,17 @@ class CUserGroupInfo: virtual public IUserGroupInfo, public CPrincipalBase
 public:
 	CUserGroupInfo();
 
+	/**
+		Get the users assigned to this group directly, without the users of the parent groups.
+	*/
+	UserIds GetOwnUsers() const;
+
+	/**
+		Lock serializing the read-modify-write updates of stored user groups,
+		e.g. between the LDAP group synchronization and the GraphQL group mutations.
+	*/
+	static QRecursiveMutex& GetUpdateMutex();
+
 	// reimplemented (IUserGroupInfo)
 	virtual UserIds GetUsers() const override;
 	virtual void SetUsers(const UserIds& users) override;
@@ -28,6 +42,9 @@ public:
 	virtual bool AddParentGroup(const QByteArray& parentGroupId) override;
 	virtual bool RemoveParentGroup(const QByteArray& parentGroupId) override;
 	virtual const imtauth::IUserInfoProvider* GetUserProvider() const override;
+	virtual SystemInfoList GetSystemInfos() const override;
+	virtual bool AddToSystem(SystemInfo systemInfo) override;
+	virtual bool RemoveFromSystem(const QByteArray& systemId) override;
 
 	// reimplemented (IPrincipal)
 	virtual FeatureIds GetPermissions(const QByteArray& productId = QByteArray()) const override;
@@ -47,6 +64,7 @@ protected:
 protected:
 	IUserGroupInfo::UserIds m_userIds;
 	IUserGroupInfo::GroupIds m_parentGroupIds;
+	IUserGroupInfo::SystemInfoList m_systemInfos;
 	imtauth::IUserInfoProvider* m_userInfoProviderPtr;
 };
 

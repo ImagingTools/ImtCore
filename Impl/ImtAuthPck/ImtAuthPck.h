@@ -25,6 +25,7 @@
 #include <imtauth/CAccountLockoutControllerComp.h>
 #include <imtauth/CPasswordPolicyControllerComp.h>
 #include <imtauth/CLdapUserCollectionJoinerComp.h>
+#include <imtauth/CLdapUserGroupSynchronizerComp.h>
 #include <imtauth/CUserChangeGeneratorComp.h>
 #include <imtauth/CRoleChangeGeneratorComp.h>
 #include <imtauth/CUserGroupChangeGeneratorComp.h>
@@ -122,6 +123,7 @@ typedef imtauth::CPasswordPolicyControllerComp PasswordPolicy;
 typedef imtauth::CLdapCredentialControllerComp LdapCredentialController;
 typedef imtauth::CAccountLockoutControllerComp AccountLockoutController;
 typedef imtauth::CLdapUserCollectionJoinerComp LdapUserCollectionJoiner;
+typedef imtauth::CLdapUserGroupSynchronizerComp LdapUserGroupSynchronizer;
 typedef imtauth::CUserChangeGeneratorComp UserChangeGenerator;
 typedef imtauth::CRoleChangeGeneratorComp RoleChangeGenerator;
 typedef imtauth::CUserGroupChangeGeneratorComp UserGroupChangeGenerator;
