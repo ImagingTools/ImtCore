@@ -231,14 +231,6 @@ if(NOT DEFINED JQML_WEB_ALL_VERSIONS)
 	set(JQML_WEB_ALL_VERSIONS "" CACHE STRING "Also build the other JQML versions, version N at <ProductName>/Views/htmlN/: ON or OFF; empty takes the product's jqmlallversions, then OFF")
 	set_property(CACHE JQML_WEB_ALL_VERSIONS PROPERTY STRINGS "" ON OFF)
 endif()
-# JQML v4 only (its compiler does not know these options for v3 or v5): makes a compiled bundle harder to read, not faster or
-# smaller to run. OFF by default; a product turns one on with -DJQML_COMPRESS_DOCS=ON / -DJQML_OBFUSCATE_LIGHT=ON.
-if(NOT DEFINED JQML_COMPRESS_DOCS)
-	set(JQML_COMPRESS_DOCS OFF CACHE BOOL "JQML v4: deflate the packed QML documents of a compiled build into one block, inflated by the browser at startup")
-endif()
-if(NOT DEFINED JQML_OBFUSCATE_LIGHT)
-	set(JQML_OBFUSCATE_LIGHT OFF CACHE BOOL "JQML v4: strip the comments and the layout of the engine's own code from a compiled bundle (no renaming, no control flow change)")
-endif()
 
 # Resolve and validate the selected JQML compiler version:
 # JQML_VERSION (CMake), then the JQML_VERSION environment variable, then the product's jqmlversion, then v3.
@@ -320,17 +312,6 @@ function(jq_compile_web)
 
 	jqml_resolve_version(JQML_VERSION JQML_COMPILER)
 	message(STATUS "JQML ${JQML_VERSION} for ${PROJECT_NAME}")
-
-	# --compress-docs and --obfuscate-light are only understood by the v4 compiler.
-	set(_jqml_v4_extra_args)
-	if(JQML_VERSION STREQUAL "v4")
-		if(JQML_COMPRESS_DOCS)
-			list(APPEND _jqml_v4_extra_args --compress-docs)
-		endif()
-		if(JQML_OBFUSCATE_LIGHT)
-			list(APPEND _jqml_v4_extra_args --obfuscate-light)
-		endif()
-	endif()
 
 	# JQML_WEB_ALL_VERSIONS (CMake), then the environment variable, then the product's jqmlallversions
 	if(NOT "${JQML_WEB_ALL_VERSIONS}" STREQUAL "")
@@ -463,7 +444,6 @@ function(jq_compile_web)
 		-r ${dataroot}
 		-e ${startqml}
 		-m js
-		${_jqml_v4_extra_args}
 		DEPENDS ${DEPEND_LIST} ${sdldependency}
 		COMMENT "WEB COMPILER for ${PROJECT_NAME}"
 		VERBATIM
@@ -479,10 +459,6 @@ function(jq_compile_web)
 			endif()
 
 			string(SUBSTRING ${_jqml_extra} 1 1 _jqml_number)
-			set(_jqml_extra_v4_args)
-			if(_jqml_extra STREQUAL "v4")
-				set(_jqml_extra_v4_args ${_jqml_v4_extra_args})
-			endif()
 			set(_jqml_extra_dir ${IMTCOREDIR}/Tools/JQML/${_jqml_extra})
 			set(_jqml_extra_out ${buildwebdir}/Resources/${_jqml_extra})
 			set(_jqml_extra_qrc ${_jqml_extra_out}/qmlJsWeb${_jqml_number}.qrc)
@@ -525,7 +501,6 @@ function(jq_compile_web)
 				-r ${dataroot}
 				-e ${startqml}
 				-m js
-				${_jqml_extra_v4_args}
 				DEPENDS ${DEPEND_LIST} ${sdldependency} ${_jqml_extra_out}/index.html
 				COMMENT "WEB COMPILER ${_jqml_extra} for ${PROJECT_NAME}"
 				VERBATIM

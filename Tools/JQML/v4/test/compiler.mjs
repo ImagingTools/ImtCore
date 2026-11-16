@@ -123,18 +123,22 @@ const checks = {
 		}
 	},
 
-	// The default build carries the documents as packed trees: no QML text, no comments, nothing to reach the engine through.
+	// The default build carries the documents as packed trees, deflated into one block, and strips the comments and the layout
+	// of the engine's own code: no QML text, no comments, nothing to reach the engine through.
 	async 'compiled mode'() {
 		const result = await compile({ mode: 'js', config: join(fixture, 'app.json'), entry: 'app/Main.qml', name: 'index', root: '/data/' }, quiet);
 		const spec = JSON.parse(JSON.stringify(result.spec));
 		assert.equal(spec.debug, undefined);
 		assert.deepEqual(Object.keys(spec.files).sort(), ['modules/Widgets/qmldir', 'modules/Widgets/util.js']);
-		assert.deepEqual(Object.keys(spec.docs).sort(), ['app/Main.qml', 'app/Sibling.qml', 'app/Unused.qml', 'modules/Widgets/Base/Theme.qml', 'modules/Widgets/Widget.qml']);
-		for (const text of [result.code, JSON.stringify(spec.docs)]) {
+		assert.equal(spec.docs, undefined);
+		assert.equal(spec.scans, undefined);
+		assert.equal(typeof spec.docsDeflate, 'string');
+		for (const text of [result.code, spec.docsDeflate]) {
 			assert.ok(!text.includes('import QtQuick'), 'the text of a document is in the bundle');
 			assert.ok(!text.includes('The entry of the compiler test'), 'a comment of a document is in the bundle');
 			assert.ok(!text.includes('property string greeting'), 'a declaration is in the bundle as text');
 		}
+		assert.ok(!result.code.includes('an error of a binding while it runs is only logged'), 'a comment of the engine is in the bundle');
 		// A page does not reach the engine, the project or the documents through its window.
 		assert.equal(evaluateBundle(result.code), undefined);
 
@@ -153,20 +157,17 @@ const checks = {
 		assert.equal(unused.parsed, false);
 		assert.ok(unused.def !== null && unused.error === null);
 		assert.equal(unused.parsed, true);
+		// The documents are there once the application has started: a page that never starts never inflates them.
+		assert.ok(app.project.docs.has('app/Main.qml'));
 	},
 
-	// --compress-docs: the packed trees and their scans move into one deflated block; the browser (or here, Node) inflates it
-	// before the project loads its main document, so the application still runs the same.
-	async '--compress-docs'() {
-		const result = await compile({ mode: 'js', config: join(fixture, 'app.json'), entry: 'app/Main.qml', name: 'index', root: '/data/', compressDocs: true }, quiet);
+	// --no-compress-docs: the packed trees and their scans stay as the plain spec.docs/spec.scans of a build before this feature,
+	// for one that cannot rely on DecompressionStream.
+	async '--no-compress-docs'() {
+		const result = await compile({ mode: 'js', config: join(fixture, 'app.json'), entry: 'app/Main.qml', name: 'index', root: '/data/', compressDocs: false }, quiet);
 		const spec = JSON.parse(JSON.stringify(result.spec));
-		assert.equal(spec.docs, undefined);
-		assert.equal(spec.scans, undefined);
-		assert.equal(typeof spec.docsDeflate, 'string');
-		for (const text of [result.code, spec.docsDeflate]) {
-			assert.ok(!text.includes('import QtQuick'), 'the text of a document is in the bundle');
-			assert.ok(!text.includes('property string greeting'), 'a declaration is in the bundle as text');
-		}
+		assert.equal(spec.docsDeflate, undefined);
+		assert.deepEqual(Object.keys(spec.docs).sort(), ['app/Main.qml', 'app/Sibling.qml', 'app/Unused.qml', 'modules/Widgets/Base/Theme.qml', 'modules/Widgets/Widget.qml']);
 
 		const app = createCompiledApplication({ ...spec, language: 'de-DE' }, null);
 		app.scene.resize(800, 600, 1);
@@ -178,12 +179,12 @@ const checks = {
 		walk(root, (item) => names.push(item.objectName));
 		assert.ok(names.includes('widget') && names.includes('sibling') && names.includes('widgetText'));
 		assert.equal(app.engine.errors.length, 0, app.engine.errors.join('\n'));
-		// The documents are there once the application has started: a page that never starts never inflates them.
-		assert.ok(app.project.docs.has('app/Main.qml'));
 	},
 
-	async '--compress-docs needs DecompressionStream'() {
-		const result = await compile({ mode: 'js', config: join(fixture, 'app.json'), entry: 'app/Main.qml', name: 'index', compressDocs: true }, quiet);
+	// By default the documents are there only once the application has started (they are still deflated before that);
+	// a browser with no DecompressionStream fails there with a message that says so, not with some other error.
+	async 'compressed docs need DecompressionStream'() {
+		const result = await compile({ mode: 'js', config: join(fixture, 'app.json'), entry: 'app/Main.qml', name: 'index' }, quiet);
 		const spec = JSON.parse(JSON.stringify(result.spec));
 		const app = createCompiledApplication(spec, null);
 		const real = globalThis.DecompressionStream;
@@ -195,15 +196,14 @@ const checks = {
 		}
 	},
 
-	// --obfuscate-light: the comments and the layout of the engine's own code (not of the QML documents, already stripped by the
-	// packed format) go, without renaming anything; the application still runs.
-	async '--obfuscate-light'() {
-		const plain = await compile({ mode: 'js', config: join(fixture, 'app.json'), entry: 'app/Main.qml', name: 'index' }, quiet);
-		assert.ok(plain.code.includes('an error of a binding while it runs is only logged'), 'a comment of the engine is missing even without the flag');
+	// --no-obfuscate-light: the engine's own code keeps its comments and its layout, for a build whose own bundle must stay
+	// readable (without going as far as --debug, which also keeps the QML documents as text).
+	async '--no-obfuscate-light'() {
+		const plain = await compile({ mode: 'js', config: join(fixture, 'app.json'), entry: 'app/Main.qml', name: 'index', obfuscateLight: false }, quiet);
+		assert.ok(plain.code.includes('an error of a binding while it runs is only logged'), 'a comment of the engine is missing with the flag off');
 
-		const result = await compile({ mode: 'js', config: join(fixture, 'app.json'), entry: 'app/Main.qml', name: 'index', root: '/data/', obfuscateLight: true }, quiet);
-		assert.ok(!result.code.includes('an error of a binding while it runs is only logged'), 'a comment of the engine is still in the obfuscated bundle');
-		assert.ok(result.code.length < plain.code.length, 'the obfuscated bundle is not smaller');
+		const result = await compile({ mode: 'js', config: join(fixture, 'app.json'), entry: 'app/Main.qml', name: 'index', root: '/data/' }, quiet);
+		assert.ok(result.code.length < plain.code.length, 'the default (obfuscated) bundle is not smaller');
 
 		const spec = JSON.parse(JSON.stringify(result.spec));
 		const app = createCompiledApplication({ ...spec, language: 'de-DE' }, null);
