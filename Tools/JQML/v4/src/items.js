@@ -1505,6 +1505,9 @@ export class Item {
 // Types whose own size follows their children: a change below them changes how their parent places them.
 Item.prototype.$contentSized = false;
 
+// The type name of an item where it is used, when it is a component (see Engine.createItem); the tests look items up by it.
+Item.prototype.$qmlType = '';
+
 Object.defineProperty(Item.prototype, Symbol.unscopables, {
 	value: Object.fromEntries(OBJECT_NAMES_UNSCOPABLE.map((name) => [name, true])),
 });

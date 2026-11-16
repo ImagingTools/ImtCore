@@ -16,8 +16,10 @@
 import { Engine } from './engine.js';
 import { attachCanvas } from './host.js';
 import { MapFS, Project } from './project.js';
+import { Flickable, ListView } from './items.js';
 import { Renderer } from './renderer.js';
 import { Scene } from './scene.js';
+import { createTestApi, trackNetwork } from './testapi.js';
 
 export function decodeBase64(text) {
 	if (typeof atob === 'function') {
@@ -118,7 +120,10 @@ export function bootstrap(spec) {
 		const application = createApplication(spec, canvas, window.location);
 		attachCanvas(canvas, application.scene, application.engine);
 		if (spec.debug === true) window.qmlWeb = application;
-		application.start().catch(showFatal);
+		// Every build has it, release ones too: the tests find and drive the items through it (see testapi.js).
+		const testApi = createTestApi({ engine: application.engine, scene: application.scene, canvas, network: trackNetwork(window), classes: { Flickable, ListView } });
+		window.qmlTest = testApi;
+		application.start().then(() => testApi.markStarted(), showFatal);
 	};
 	if (document.readyState === 'complete') run();
 	else window.addEventListener('load', run);

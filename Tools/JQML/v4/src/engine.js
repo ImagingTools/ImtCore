@@ -2402,6 +2402,8 @@ export class Engine {
 		if (this.lenient) item.$open = true;
 		item.$scope = scope;
 		const chain = [{ def, scope }, ...overlays];
+		// The name the type has where the item is used (`ImtButton` of a component whose root is a Rectangle): the tests look items up by it.
+		if (chain.length > 1) item.$qmlType = chain[chain.length - 1].def.type;
 		item.$constructing = true;
 		for (const link of chain) {
 			if (link.scope.root === null) link.scope.root = item;
