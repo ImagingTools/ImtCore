@@ -42,6 +42,8 @@ Rectangle {
 	signal revertSignal();
 	signal modelDataChanged();
 	signal objectMoveFinished();
+	// Right click on an object (it is selected first); menuX/menuY are window coordinates.
+	signal contextMenuRequested(int index, real menuX, real menuY);
 	
 	ApplicationEvents {
 		onDesignSchemeChanged: {
@@ -75,6 +77,14 @@ Rectangle {
 		}
 	}
 	
+	onSelectedIndexChanged: {
+		// Selection set from outside (e.g. after the model was replaced) must reach the canvas too.
+		if (canvas.selectedIndex !== selectedIndex){
+			canvas.selectedIndex = selectedIndex
+		}
+		console.log("SchemeView.qml onSelectedIndexChanged", selectedIndex)
+	}
+
 	function designSchemeChanged(scheme){
 		canvas.requestPaint();
 	}
@@ -223,6 +233,17 @@ Rectangle {
 			
 			anchors.fill: parent;
 			cursorShape: Qt.OpenHandCursor;
+			acceptedButtons: Qt.LeftButton | Qt.RightButton;
+			
+			// The right button only selects an object, it neither moves objects nor pans the scheme.
+			property bool rightButtonPressed: false;
+			
+			onRightClicked: {
+				if (canvas.selectedIndex >= 0){
+					let point = controlArea.mapToItem(null, mouseX, mouseY);
+					canvasPage.contextMenuRequested(canvas.selectedIndex, point.x, point.y);
+				}
+			}
 			
 			onClicked: {
 				if(!wasMoving){
@@ -243,6 +264,8 @@ Rectangle {
 			}
 			
 			onPressed: {
+				console.log("onPressed", canvas.selectedIndex)
+				controlArea.rightButtonPressed = mouse.button == Qt.RightButton;
 				canvas.selectedIndex = -1;
 				for(let i = 0; i < canvasPage.objectsModel.count; i++){
 					let item = canvasPage.objectsModel.get(i).item;
@@ -262,7 +285,7 @@ Rectangle {
 						canvas.selectedIndex = i;
 					}
 				}
-				if(canvas.selectedIndex == -1){
+				if(canvas.selectedIndex == -1 && !controlArea.rightButtonPressed){
 					controlArea.cursorShape = Qt.ClosedHandCursor;
 				}
 			}
@@ -274,7 +297,7 @@ Rectangle {
 				else {
 					controlArea.cursorShape = Qt.OpenHandCursor
 				}
-				if (canvas.selectedIndex >= 0 && wasMoving){
+				if (canvas.selectedIndex >= 0 && wasMoving && !controlArea.rightButtonPressed){
 					canvasPage.objectMoveFinished()
 				}
 			}
@@ -283,12 +306,16 @@ Rectangle {
 				wasMoving = false;
 				isPressed = false;
 				
-				if(canvas.selectedIndex >= 0){
+				if(canvas.selectedIndex >= 0 && mouse.button != Qt.RightButton){
 					canvasPage.goInside();
 				}
 			}
 			
 			onDeltaSignal: {
+				if (controlArea.rightButtonPressed){
+					return;
+				}
+				
 				if(canvas.selectedIndex < 0){
 					canvasPage.autoFit = false;
 					
@@ -471,7 +498,9 @@ Rectangle {
 			property int fontSizeS: canvasPage.objectSecondaryFontSize
 			property int radius_: Style.radiusXS
 			property int borderShift: 4
-			property int shadowSize: 3
+			property int shadowSize: 6
+			// Offset of the back card that marks composite objects (groups)
+			property int compositeStackOffset: 3
 			
 			property int backgroundStep: 30
 			property int backgroundWidth: 1024
@@ -488,8 +517,9 @@ Rectangle {
 			property string selectedColor: Style.selectedColor
 			property string mainColor: Style.borderColor2
 			property string errorColor: Style.errorColor
-			property string compositeColor: Style.firstColorHighlight;
-			property string compositeSelectedColor: Style.imaginToolsAccentColor;
+			property string compositeColor: Style.alternateBaseColor;
+			property string compositeSelectedColor: Style.selectedColor;
+			property string compositeBorderColor: Style.imaginToolsAccentColor;
 			property string selectedLinkFromColor: Style.selectedLinkFromColor
 			property string selectedLinkToColor: Style.selectedLinkToColor
 			property string linkColor: Style.borderColor2
@@ -730,9 +760,7 @@ Rectangle {
 				let selected = index === canvas.selectedIndex
 				
 				let hasError = item.m_hasError
-				let isComposite = item.m_isComposite
-				
-				isComposite = false
+				let isComposite = item.m_isComposite === true
 				
 				ctx.lineCap = "round"
 				ctx.lineJoin = "round"
@@ -749,12 +777,13 @@ Rectangle {
 				ctx.roundedRect(x_ + shadowSize, y_ + shadowSize, mainRecWidth, canvas.mainRec_height , canvas.radius_, canvas.radius_);
 				ctx.fill();
 				
+
+				
 				//main rectangle
 				ctx.lineWidth = 2 ;
-				ctx.strokeStyle = hasError ? canvas.errorColor : canvas.mainColor;
-				ctx.fillStyle = (!selected && !isComposite) ? backgroundColor :
-															  (!selected && isComposite) ? canvas.compositeColor:
-																						   (selected && isComposite) ? canvas.compositeSelectedColor: (selected && !isComposite) ? canvas.selectedColor : backgroundColor;
+				ctx.strokeStyle = hasError ? canvas.errorColor : isComposite ? canvas.compositeBorderColor : canvas.mainColor;
+				ctx.fillStyle = isComposite ? (selected ? canvas.compositeSelectedColor : canvas.compositeColor) :
+											  (selected ? canvas.selectedColor : backgroundColor);
 				ctx.beginPath()
 				ctx.roundedRect(x_, y_, mainRecWidth, canvas.mainRec_height , canvas.radius_, canvas.radius_);
 				ctx.fill();
@@ -767,6 +796,19 @@ Rectangle {
 				ctx.roundedRect(x_ + canvas.borderShift, y_ + canvas.borderShift, mainRecWidth - 2 * canvas.borderShift, canvas.mainRec_height  - 2 * canvas.borderShift, canvas.radius_, canvas.radius_);
 				ctx.stroke();
 				
+				//frame of the composite object (stack of objects)
+				if (isComposite){
+					let stackOffset = canvas.compositeStackOffset
+					ctx.lineWidth = 1
+					ctx.strokeStyle = hasError ? canvas.errorColor : canvas.compositeBorderColor
+					ctx.fillStyle = canvas.compositeColor
+					ctx.beginPath()
+					ctx.roundedRect(x_ + stackOffset, y_ + stackOffset, mainRecWidth - 2 * stackOffset, canvas.mainRec_height - 2 * stackOffset, canvas.radius_, canvas.radius_);
+
+					//ctx.fill();
+					ctx.stroke();
+				}
+
 				//Main text
 				ctx.strokeStyle = canvas.mainTextColor;
 				ctx.fillStyle = canvas.mainTextColor;
@@ -1126,7 +1168,7 @@ Rectangle {
 	
 	Shortcut {
 		sequence: "Ctrl+C";
-		enabled: true;
+		enabled: canvasPage.visible;
 		onActivated: {
 			canvasPage.copySignal(canvas.selectedIndex);
 		}
@@ -1136,7 +1178,7 @@ Rectangle {
 		id: pasteShortcut;
 		
 		sequence: "Ctrl+V";
-		enabled: true;
+		enabled: canvasPage.visible;
 		onActivated: {
 			canvasPage.pasteSignal(canvas.selectedIndex);
 		}
@@ -1145,7 +1187,7 @@ Rectangle {
 	
 	Shortcut {
 		sequence: "Delete";
-		enabled: true;
+		enabled: canvasPage.visible;
 		onActivated: {
 			canvasPage.deleteSignal(canvas.selectedIndex);
 		}
@@ -1153,7 +1195,7 @@ Rectangle {
 	
 	Shortcut {
 		sequence: "Ctrl+Z";
-		enabled: true;
+		enabled: canvasPage.visible;
 		onActivated: {
 			canvasPage.revertSignal();
 		}
@@ -1161,7 +1203,7 @@ Rectangle {
 	
 	Shortcut {
 		sequence: "F2";
-		enabled: true;
+		enabled: canvasPage.visible;
 		onActivated: {
 			canvasPage.renameSignal(canvas.selectedIndex);
 		}
