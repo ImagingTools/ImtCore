@@ -9,6 +9,9 @@ DocumentWorkspacePageView {
 
 	documentManagerView: documentManagerView_
 
+	// Collection shown by the page; a view may keep its own collection under a page with another ID.
+	property string collectionId: multiDocPageView.pageId
+
 	onStartItemSourceCompChanged: {
 		if (startItemSourceComp){
 			documentManagerView_.addFixedView(startItemSourceComp, pageName, pageId, true, true, pageIcon)
@@ -29,12 +32,13 @@ DocumentWorkspacePageView {
 		documentManager: multiDocPageView.documentManager
 		defaultDocumentIcon: multiDocPageView.pageIcon
 		visualStatusProvider: GqlBasedObjectVisualStatusProvider {
-			collectionId: multiDocPageView.pageId
+			collectionId: multiDocPageView.collectionId
 		}
 
 		onViewLoaded: {
 			if (view && viewId === multiDocPageView.pageId){
 				view.collectionId = multiDocPageView.pageId
+				multiDocPageView.collectionId = view.collectionId
 			}
 		}
 	}
