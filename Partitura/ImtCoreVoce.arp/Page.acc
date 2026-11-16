@@ -24,6 +24,9 @@
                     <AttributeInfo Id="Description" Type="Text" ExportId="Description">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="GroupId" Type="Id" ExportId="GroupId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="IconPath" Type="Text" ExportId="IconPath">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

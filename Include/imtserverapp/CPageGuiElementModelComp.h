@@ -23,15 +23,18 @@ public:
 		I_REGISTER_INTERFACE(imtserverapp::IPageGuiElementModel);
 		I_ASSIGN(m_pageSourceItemAttrPtr, "PageQmlItem", "Path to the QML file item describing this page", false, "PageQmlItem");
 		I_ASSIGN(m_startSourceItemAttrPtr, "StartQmlItem", "Path to the QML file start on this page", false, "StartQmlItem");
+		I_ASSIGN(m_groupIdAttrPtr, "GroupId", "ID of the menu group this page belongs to", false, "");
 	I_END_COMPONENT;
 
 	// reimplemented (imtserverapp::IPageGuiElementModel)
 	virtual QString GetStartSourceItem() const override;
 	virtual QString GetPageQmlItemFilePath() const override;
+	virtual QByteArray GetGroupId() const override;
 
 protected:
 	I_TEXTATTR(m_pageSourceItemAttrPtr);
 	I_TEXTATTR(m_startSourceItemAttrPtr);
+	I_ATTR(QByteArray, m_groupIdAttrPtr);
 };
 
 

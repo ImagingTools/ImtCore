@@ -22,6 +22,12 @@ public:
 		Get path to the document manager on this page.
 	*/
 	virtual QString GetStartSourceItem() const = 0;
+
+	/**
+		Get ID of the menu group this page belongs to.
+		\return Empty ID if the page is not part of any group.
+	*/
+	virtual QByteArray GetGroupId() const = 0;
 };
 
 

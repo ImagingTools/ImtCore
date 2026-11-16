@@ -30,6 +30,16 @@ QString CPageGuiElementModelComp::GetPageQmlItemFilePath() const
 }
 
 
+QByteArray CPageGuiElementModelComp::GetGroupId() const
+{
+	if (!m_groupIdAttrPtr.IsValid()){
+		return QByteArray();
+	}
+
+	return *m_groupIdAttrPtr;
+}
+
+
 } // namespace imtserverapp
 
 

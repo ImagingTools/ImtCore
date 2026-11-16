@@ -36,6 +36,7 @@ bool CPageBasedGuiRepresentationControllerComp::SetupItemModel(
 
 	representation.insert(QStringLiteral("source"), pageQmlItemFilePath);
 	representation.insert(QStringLiteral("startItem"), startSourceItem);
+	representation.insert(QStringLiteral("groupId"), QString::fromUtf8(pageGuiElementPtr->GetGroupId()));
 
 	return true;
 }

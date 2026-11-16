@@ -112,6 +112,7 @@ Rectangle {
 		anchors.bottomMargin: thumbnailDecoratorContainer.mainMargin;
 		
 		model: pagesManager.pageModel;
+		groupsModel: pagesManager.pageGroupsModel;
 		
 		// The rail keeps its own colour even before the page list arrives. Left
 		// transparent while empty it showed the window's darker backdrop through

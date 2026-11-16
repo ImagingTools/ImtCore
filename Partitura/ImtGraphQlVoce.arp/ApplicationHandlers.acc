@@ -64,6 +64,9 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="PageGroups" Type="Reference[]" ExportId="PageGroups">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Pages" Type="Reference[]" ExportId="Pages">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

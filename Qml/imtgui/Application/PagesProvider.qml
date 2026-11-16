@@ -10,15 +10,20 @@ QtObject {
 
     property TreeItemModel pagesModel: TreeItemModel {};
 
+    // Menu groups the pages refer to by "groupId". Stays empty when the server has no groups.
+    property TreeItemModel pageGroupsModel: TreeItemModel {};
+
     // Set on any answer, an empty page list included - the page count alone cannot tell "still loading" from "no pages".
     property bool pagesReceived: false;
 
     function updateModel(){
+        pagesProvider.pageGroupsGqlModel.updateModel();
         pagesProvider.pagesGqlModel.updateModel();
     }
 
     function clearModel(){
         pagesModel.clear();
+        pageGroupsModel.clear();
         pagesProvider.pagesReceived = false;
     }
 
@@ -34,6 +39,7 @@ QtObject {
             queryFields.InsertField("icon");
             queryFields.InsertField("source");
             queryFields.InsertField("startItem");
+            queryFields.InsertField("groupId");
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();
@@ -58,6 +64,38 @@ QtObject {
             }
             else if (this.state === "Error"){
                 PopupManager.addWarningMessage(qsTr("Failed to load application pages. Please try again."), true)
+            }
+        }
+    }
+
+    // A server without menu groups answers with an error: the menu then simply stays flat.
+    property GqlModel pageGroupsGqlModel : GqlModel {
+        function updateModel(){
+            var query = Gql.GqlRequest("query", "PageGroupsData");
+
+            var queryFields = Gql.GqlObject("items");
+            queryFields.InsertField("id");
+            queryFields.InsertField("name");
+            queryFields.InsertField("icon");
+            query.AddField(queryFields);
+
+            var gqlData = query.GetQuery();
+
+            this.setGqlQuery(gqlData)
+        }
+
+        onStateChanged: {
+            if (this.state === "Ready"){
+                if (this.containsKey("data")){
+                    var dataModelLocal = this.getData("data");
+
+                    if (dataModelLocal.containsKey("PageGroupsData")){
+                        dataModelLocal = dataModelLocal.getData("PageGroupsData");
+                        if (dataModelLocal.containsKey("items")){
+                            pagesProvider.pageGroupsModel = dataModelLocal.getData("items");
+                        }
+                    }
+                }
             }
         }
     }

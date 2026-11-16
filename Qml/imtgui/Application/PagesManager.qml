@@ -8,6 +8,7 @@ Item {
     id: container;
 
     property TreeItemModel pageModel: TreeItemModel {};
+    property TreeItemModel pageGroupsModel: pagesProvider.pageGroupsModel;
     property Item activeItem: null;
     property int activePageIndex: -1;
 
