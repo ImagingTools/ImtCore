@@ -26,6 +26,8 @@
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Tenants.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Permissions.h>
 #include <imtauthgql/CAssignmentCollector.h>
+#include <imtservergql/imtservergql.h>
+#include <imtservergql/CAuthorizationSnapshot.h>
 
 
 // Qt includes
@@ -1017,6 +1019,29 @@ inline bool IsSuperuserRequest(const imtgql::CGqlRequest& gqlRequest)
 	return (contextUserInfoPtr != nullptr) && contextUserInfoPtr->IsAdmin();
 }
 
+
+/**
+	The superuser in a session of its own: a personal token of the superuser must not manage the identities of servers.
+	A superuser coming through the server of a product is no superuser here.
+*/
+inline bool IsSuperuserSessionRequest(const imtgql::CGqlRequest& gqlRequest)
+{
+	return IsSuperuserRequest(gqlRequest) && !gqlRequest.GetRequestContext()->GetToken().startsWith(QByteArrayLiteral("imt_pat_"));
+}
+
+
+/**
+	The product whose server sent the request, empty for a request made at this server directly.
+	A session opened or refreshed by the request belongs to it.
+*/
+inline QByteArray GetRequestServerProductId(const imtgql::CGqlRequest& gqlRequest)
+{
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+
+	return gqlContextPtr != nullptr ? gqlContextPtr->GetServerProductId() : QByteArray();
+}
+
+
 /**
 	Adapts (filters) the roles, groups and permissions of a user according to the
 	current tenant context, and enriches with delegated roles when appropriate.
@@ -1046,21 +1071,28 @@ inline bool IsSuperuserRequest(const imtgql::CGqlRequest& gqlRequest)
  *   absolutely no tenant bindings are kept (i.e. true global items).
  * - If tenantId is non-empty: only entities that have an explicit
  *   binding to that tenant are kept.
+ * \param isCompletePtr [optional] Cleared when the bindings could not be read, so the answer says nothing; never set.
  */
 inline bool ShouldKeepEntityForTenant(
 				imtauth::ITenantEntityBindingManager* bindingManager,
 				const QByteArray& tenantId,
 				const QByteArray& entityType,
-				const QByteArray& entityId)
+				const QByteArray& entityId,
+				bool* isCompletePtr = nullptr)
 {
 	if (bindingManager == nullptr || entityId.isEmpty()){
 		return true;
 	}
-	const bool boundToAny = bindingManager->HasAnyTenantBinding(entityType, entityId);
-	if (tenantId.isEmpty()){
-		return !boundToAny;
+
+	bool isRead = true;
+	const bool retVal = tenantId.isEmpty()
+				? !bindingManager->HasAnyTenantBinding(entityType, entityId, &isRead)
+				: bindingManager->HasBinding(tenantId, entityType, entityId, &isRead);
+	if (!isRead && isCompletePtr != nullptr){
+		*isCompletePtr = false;
 	}
-	return bindingManager->HasBinding(tenantId, entityType, entityId);
+
+	return retVal;
 }
 
 
@@ -1070,12 +1102,14 @@ inline bool ShouldKeepEntityForTenant(
 	With a tenant, roles and parent groups of the groups count only when they are
 	visible in the tenant; the user's own roles and groups are expected to be
 	filtered by AdaptUserForTenant already.
+	\param isCompletePtr [optional] Cleared when a binding could not be read; never set.
 */
 inline imtauth::IPrincipal::RoleIds GetTenantUserRoles(
 				const imtauth::IUserInfo& userInfo,
 				const QByteArray& tenantId,
 				const QByteArray& productId,
-				imtauth::ITenantEntityBindingManager* bindingManager)
+				imtauth::ITenantEntityBindingManager* bindingManager,
+				bool* isCompletePtr = nullptr)
 {
 	imtauth::IPrincipal::RoleIds retVal = userInfo.GetRoles(productId);
 
@@ -1103,13 +1137,13 @@ inline imtauth::IPrincipal::RoleIds GetTenantUserRoles(
 		}
 
 		for (const QByteArray& roleId : groupPtr->GetRoles(productId)){
-			if (!retVal.contains(roleId) && (!isTenantScoped || ShouldKeepEntityForTenant(bindingManager, tenantId, rolesEntity, roleId))){
+			if (!retVal.contains(roleId) && (!isTenantScoped || ShouldKeepEntityForTenant(bindingManager, tenantId, rolesEntity, roleId, isCompletePtr))){
 				retVal << roleId;
 			}
 		}
 
 		for (const QByteArray& parentGroupId : groupPtr->GetParentGroups()){
-			if (!isTenantScoped || ShouldKeepEntityForTenant(bindingManager, tenantId, groupsEntity, parentGroupId)){
+			if (!isTenantScoped || ShouldKeepEntityForTenant(bindingManager, tenantId, groupsEntity, parentGroupId, isCompletePtr)){
 				pendingGroupIds << parentGroupId;
 			}
 		}
@@ -1119,6 +1153,11 @@ inline imtauth::IPrincipal::RoleIds GetTenantUserRoles(
 }
 
 
+/**
+	The user as it is seen in the tenant: only its roles and groups visible there, with the roles delegated to it.
+	An invalid result means the user needs no adaptation.
+	\param isCompletePtr [optional] Cleared when a binding, a membership or a grant could not be read; never set.
+*/
 inline istd::IChangeableUniquePtr AdaptUserForTenant(
 				const QByteArray& objectId,
 				const istd::IChangeable& object,
@@ -1127,7 +1166,8 @@ inline istd::IChangeableUniquePtr AdaptUserForTenant(
 				imtauth::ITenantEntityBindingManager* bindingManager,
 				imtauth::IDelegatedAccess* delegatedAccess,
 				imtauth::ITenantMembershipManager* membershipManager,
-				imtauth::IRoleInfoProvider* roleInfoProvider)
+				imtauth::IRoleInfoProvider* roleInfoProvider,
+				bool* isCompletePtr = nullptr)
 {
 	// Operate on the original object for reading current assignments.
 	// Explicit cast, no auto.
@@ -1153,7 +1193,7 @@ inline istd::IChangeableUniquePtr AdaptUserForTenant(
 		for (int i = 0; i < userRoles.size(); ++i){
 			const QByteArray rid = userRoles.at(i);
 			if (rid.isEmpty()) continue;
-			if (ShouldKeepEntityForTenant(bindingManager, tenantId, rolesEntity, rid)){
+			if (ShouldKeepEntityForTenant(bindingManager, tenantId, rolesEntity, rid, isCompletePtr)){
 				filteredRoles.append(rid);
 			} else {
 				anyFilterChange = true;
@@ -1166,7 +1206,7 @@ inline istd::IChangeableUniquePtr AdaptUserForTenant(
 	for (int i = 0; i < userGroups.size(); ++i){
 		const QByteArray gid = userGroups.at(i);
 		if (gid.isEmpty()) continue;
-		if (ShouldKeepEntityForTenant(bindingManager, tenantId, groupsEntity, gid)){
+		if (ShouldKeepEntityForTenant(bindingManager, tenantId, groupsEntity, gid, isCompletePtr)){
 			filteredGroups.append(gid);
 		} else {
 			anyFilterChange = true;
@@ -1178,12 +1218,18 @@ inline istd::IChangeableUniquePtr AdaptUserForTenant(
 	if (!tenantId.isEmpty() && !productId.isEmpty() && delegatedAccess != nullptr && membershipManager != nullptr){
 		bool hasDirectMembership = false;
 		QByteArrayList homeTenantIds;
+		bool isRead = true;
 		const imtauth::ITenantMembershipManager::MembershipIds membershipIds =
-			membershipManager->GetMembershipsByUser(objectId);
+			membershipManager->GetMembershipsByUser(objectId, &isRead);
 		for (int i = 0; i < membershipIds.size(); ++i){
 			const QByteArray membershipId = membershipIds.at(i);
 			imtauth::ITenantMembershipUniquePtr membershipPtr = membershipManager->GetMembership(membershipId);
-			if (!membershipPtr.IsValid() || !membershipPtr->IsActive()){
+			if (!membershipPtr.IsValid()){
+				// Listed, so it is there: it could not be read
+				isRead = false;
+				continue;
+			}
+			if (!membershipPtr->IsActive()){
 				continue;
 			}
 			QByteArray tId = membershipPtr->GetTenantId();
@@ -1199,7 +1245,9 @@ inline istd::IChangeableUniquePtr AdaptUserForTenant(
 		if (!hasDirectMembership){
 			for (int i = 0; i < homeTenantIds.size(); ++i){
 				const QByteArray homeTenantId = homeTenantIds.at(i);
-				QByteArrayList roleIds = delegatedAccess->GetDelegatedRoles(homeTenantId, tenantId);
+				bool isGrantRead = true;
+				QByteArrayList roleIds = delegatedAccess->GetDelegatedRoles(homeTenantId, tenantId, &isGrantRead);
+				isRead = isRead && isGrantRead;
 				for (int j = 0; j < roleIds.size(); ++j){
 					const QByteArray roleId = roleIds.at(j);
 					if (!roleId.isEmpty()){
@@ -1214,6 +1262,10 @@ inline istd::IChangeableUniquePtr AdaptUserForTenant(
 					}
 				}
 			}
+		}
+
+		if (!isRead && isCompletePtr != nullptr){
+			*isCompletePtr = false;
 		}
 	}
 
@@ -1269,13 +1321,16 @@ inline istd::IChangeableUniquePtr AdaptUserForTenant(
 	Parent roles, parent groups and group roles count only when they are
 	visible in the tenant, so an entity of another organization grants nothing.
 	Without a tenant this is IPrincipal::GetPermissions().
+	\param isCompletePtr [optional] Cleared when a binding could not be read; never set.
+		A role or a group that could not be read is known to its provider only.
 */
 inline imtauth::IPrincipal::FeatureIds GetTenantUserPermissions(
 				const imtauth::IUserInfo& userInfo,
 				const QByteArray& tenantId,
 				const QByteArray& productId,
 				imtauth::ITenantEntityBindingManager* bindingManager,
-				imtauth::IRoleInfoProvider* roleInfoProvider)
+				imtauth::IRoleInfoProvider* roleInfoProvider,
+				bool* isCompletePtr = nullptr)
 {
 	const imtauth::IRoleInfoProvider* roleProviderPtr = (roleInfoProvider != nullptr) ? roleInfoProvider : userInfo.GetRoleProvider();
 	if (tenantId.isEmpty() || bindingManager == nullptr || roleProviderPtr == nullptr){
@@ -1284,7 +1339,7 @@ inline imtauth::IPrincipal::FeatureIds GetTenantUserPermissions(
 
 	const QByteArray rolesEntity = QByteArrayLiteral("Roles");
 
-	QByteArrayList pendingRoleIds = GetTenantUserRoles(userInfo, tenantId, productId, bindingManager);
+	QByteArrayList pendingRoleIds = GetTenantUserRoles(userInfo, tenantId, productId, bindingManager, isCompletePtr);
 
 	imtauth::IPrincipal::FeatureIds permissions = userInfo.GetLocalPermissions(productId);
 	QSet<QByteArray> visitedRoleIds;
@@ -1307,13 +1362,84 @@ inline imtauth::IPrincipal::FeatureIds GetTenantUserPermissions(
 		}
 
 		for (const QByteArray& parentRoleId : rolePtr->GetIncludedRoles()){
-			if (ShouldKeepEntityForTenant(bindingManager, tenantId, rolesEntity, parentRoleId)){
+			if (ShouldKeepEntityForTenant(bindingManager, tenantId, rolesEntity, parentRoleId, isCompletePtr)){
 				pendingRoleIds << parentRoleId;
 			}
 		}
 	}
 
 	return permissions;
+}
+
+
+/**
+	Where the user and everything its permissions come from are read.
+*/
+struct TenantUserSources
+{
+	const imtbase::IObjectCollection* userCollectionPtr = nullptr;
+	const imtbase::IObjectCollection* roleCollectionPtr = nullptr;
+	const imtbase::IObjectCollection* groupCollectionPtr = nullptr;
+	imtauth::ITenantEntityBindingManager* bindingManagerPtr = nullptr;
+	imtauth::IDelegatedAccess* delegatedAccessPtr = nullptr;
+	imtauth::ITenantMembershipManager* membershipManagerPtr = nullptr;
+};
+
+
+/**
+	Compute the user for a product and an organization on what is read now.
+	\param userPtr	On RS_READ the user with permissions[productId] final, an empty set too, pointing to no provider.
+	\return RS_FAILED when anything could not be read: no part of an incomplete computation is given.
+*/
+inline imtservergql::CAuthorizationSnapshot::ReadStatus ComputeTenantUser(
+			const TenantUserSources& sources,
+			const QByteArray& userId,
+			const QByteArray& tenantId,
+			const QByteArray& productId,
+			istd::IChangeableUniquePtr& userPtr,
+			QString& errorMessage)
+{
+	userPtr.Reset();
+
+	imtservergql::CAuthorizationSnapshot snapshot(sources.userCollectionPtr, sources.roleCollectionPtr, sources.groupCollectionPtr);
+	istd::IChangeableUniquePtr readUserPtr;
+	const imtservergql::CAuthorizationSnapshot::ReadStatus status = snapshot.ReadUser(userId, readUserPtr, errorMessage);
+	if (status != imtservergql::CAuthorizationSnapshot::RS_READ){
+		return status;
+	}
+
+	bool isComplete = true;
+	istd::IChangeableUniquePtr adaptedPtr = AdaptUserForTenant(
+				userId,
+				*readUserPtr,
+				tenantId,
+				productId,
+				sources.bindingManagerPtr,
+				sources.delegatedAccessPtr,
+				sources.membershipManagerPtr,
+				&snapshot,
+				&isComplete);
+	if (!adaptedPtr.IsValid()){
+		adaptedPtr = std::move(readUserPtr);
+	}
+
+	imtauth::IUserInfo* resultUserPtr = dynamic_cast<imtauth::IUserInfo*>(adaptedPtr.GetPtr());
+	const imtauth::IUserInfo::FeatureIds permissions = GetTenantUserPermissions(*resultUserPtr, tenantId, productId, sources.bindingManagerPtr, &snapshot, &isComplete);
+	if (!snapshot.IsComplete(errorMessage)){
+		return imtservergql::CAuthorizationSnapshot::RS_FAILED;
+	}
+	if (!isComplete){
+		errorMessage = QStringLiteral("The organization data of the user '%1' could not be read.").arg(QString::fromUtf8(userId));
+
+		return imtservergql::CAuthorizationSnapshot::RS_FAILED;
+	}
+
+	// The final set, an empty one too; the copy outlives the snapshot
+	imtservergql::CAuthorizationSnapshot::DetachUser(*adaptedPtr);
+	resultUserPtr->SetLocalPermissions(productId, permissions);
+	userPtr = std::move(adaptedPtr);
+
+	return imtservergql::CAuthorizationSnapshot::RS_READ;
 }
 
 
@@ -1703,6 +1829,308 @@ inline imtauth::OrderRequestStatus FromSdlOrderStatus(sdl::V1_0::imtauth::OrderR
 	default:
 		return imtauth::ORS_RECEIVED;
 	}
+}
+
+
+/**
+	Check that the request may work with the data of the given product.
+	A permission held in a role acts only on the objects of the product of this role; a superuser is not bound.
+*/
+inline bool CheckAdministeredProduct(const imtgql::IGqlContext* gqlContextPtr, const QByteArray& productId, QString& errorMessage)
+{
+	// Without a user the permission check of the command decides
+	const imtauth::IUserInfo* userInfoPtr = gqlContextPtr != nullptr ? gqlContextPtr->GetUserInfo() : nullptr;
+	if (userInfoPtr == nullptr || userInfoPtr->IsAdmin()){
+		return true;
+	}
+
+	if (productId.isEmpty() || productId != gqlContextPtr->GetProductId()){
+		errorMessage = QStringLiteral("The data of the product '%1' is not available in this context").arg(QString::fromUtf8(productId));
+
+		return false;
+	}
+
+	return true;
+}
+
+
+/**
+	Check that the roles are roles of the product they are given in: a role of another product would act in this one.
+	A role that cannot be read is refused.
+*/
+inline bool CheckRolesOfProduct(
+			const imtauth::IRoleInfoProvider* roleProviderPtr,
+			const QByteArrayList& roleIds,
+			const QByteArray& productId,
+			QString& errorMessage)
+{
+	for (const QByteArray& roleId : roleIds){
+		const imtauth::IRoleUniquePtr rolePtr = roleProviderPtr != nullptr ? roleProviderPtr->GetRole(roleId) : imtauth::IRoleUniquePtr();
+		if (!rolePtr.IsValid()){
+			errorMessage = QStringLiteral("The role '%1' is not available").arg(QString::fromUtf8(roleId));
+
+			return false;
+		}
+
+		if (rolePtr->GetProductId() != productId){
+			errorMessage = QStringLiteral("The role '%1' is a role of another product").arg(rolePtr->GetRoleName());
+
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+/**
+	Check that each role a change gives a user or a group in a product is a role of that product.
+	\param previousPtr	[optional] The stored state: the roles it held are not checked again.
+*/
+inline bool CheckAddedRolesOfProducts(
+			const imtauth::IRoleInfoProvider* roleProviderPtr,
+			const imtauth::IPrincipal* previousPtr,
+			const imtauth::IPrincipal& principal,
+			QString& errorMessage)
+{
+	for (const QByteArray& productId : principal.GetProducts()){
+		const imtauth::IPrincipal::RoleIds previousRoles = previousPtr != nullptr ? previousPtr->GetRoles(productId) : imtauth::IPrincipal::RoleIds();
+		imtauth::IPrincipal::RoleIds addedRoles;
+		for (const QByteArray& roleId : principal.GetRoles(productId)){
+			if (!previousRoles.contains(roleId)){
+				addedRoles.append(roleId);
+			}
+		}
+
+		if (!CheckRolesOfProduct(roleProviderPtr, addedRoles, productId, errorMessage)){
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+/**
+	Check the products named in the input of an administration command: input.productId and input.item.productId.
+*/
+inline bool CheckAdministeredProducts(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage)
+{
+	const imtgql::CGqlParamObject* inputPtr = gqlRequest.GetParamObject("input");
+	if (inputPtr == nullptr){
+		return true;
+	}
+
+	const QByteArray productId = inputPtr->GetParamArgumentValue("productId").toByteArray();
+	if (!productId.isEmpty() && !CheckAdministeredProduct(gqlRequest.GetRequestContext(), productId, errorMessage)){
+		return false;
+	}
+
+	const imtgql::CGqlParamObject* itemPtr = inputPtr->GetParamArgumentObjectPtr("item");
+	const QByteArray itemProductId = itemPtr != nullptr ? itemPtr->GetParamArgumentValue("productId").toByteArray() : QByteArray();
+
+	return itemProductId.isEmpty() || CheckAdministeredProduct(gqlRequest.GetRequestContext(), itemProductId, errorMessage);
+}
+
+
+/**
+	Check that the caller holds every permission a change adds: nobody can give what he does not have himself.
+	Inside an organization the permission scope of the organization limits what its roles hold.
+	A request through the server of a product gives in that product what its user holds here, not only what the token of the server holds:
+	the token bounds what the request may do (\see imtgql::IGqlContext::GetGrantingAuthority). The callers check the product of the data first.
+*/
+inline bool CheckGrantedPermissions(
+			const imtgql::IGqlContext* gqlContextPtr,
+			const QByteArrayList& previousPermissions,
+			const QByteArrayList& permissions,
+			QString& errorMessage)
+{
+	bool isGrantingAdmin = false;
+	QByteArrayList grantingPermissions;
+	const bool hasGrantingAuthority = gqlContextPtr != nullptr && gqlContextPtr->GetGrantingAuthority(isGrantingAdmin, grantingPermissions);
+
+	const imtauth::IUserInfo* userInfoPtr = gqlContextPtr != nullptr ? gqlContextPtr->GetUserInfo() : nullptr;
+	if (hasGrantingAuthority ? isGrantingAdmin : (userInfoPtr != nullptr && userInfoPtr->IsAdmin())){
+		return true;
+	}
+
+	if (gqlContextPtr != nullptr && !gqlContextPtr->GetTenantId().isEmpty()){
+		return true;
+	}
+
+	const QByteArrayList heldPermissions = hasGrantingAuthority
+				? grantingPermissions
+				: (gqlContextPtr != nullptr ? imtservergql::GetUserPermissions(*gqlContextPtr) : QByteArrayList());
+	for (const QByteArray& permission : permissions){
+		if (!previousPermissions.contains(permission) && !imtauth::HasPermission(heldPermissions, permission)){
+			errorMessage = QStringLiteral("The permission '%1' cannot be granted: you do not hold it").arg(QString::fromUtf8(permission));
+
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+/**
+	Check a change of the account of a user, which acts in all products: the caller needs the permission
+	in every product where the user has a role. One's own account and the inside of an organization are not bound.
+*/
+inline bool CheckSharedUserChange(
+			const imtgql::IGqlContext* gqlContextPtr,
+			const QByteArray& userId,
+			const imtauth::IPrincipal& user,
+			const QByteArray& permission,
+			QString& errorMessage)
+{
+	const imtauth::IUserInfo* callerPtr = gqlContextPtr != nullptr ? gqlContextPtr->GetUserInfo() : nullptr;
+	if (callerPtr == nullptr || callerPtr->IsAdmin() || gqlContextPtr->GetUserId() == userId || !gqlContextPtr->GetTenantId().isEmpty()){
+		return true;
+	}
+
+	for (const QByteArray& productId : user.GetProducts()){
+		if (!imtauth::HasPermission(callerPtr->GetPermissions(productId), permission)){
+			errorMessage = QStringLiteral("The user also works in the product '%1', where you may not change it").arg(QString::fromUtf8(productId));
+
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+/**
+	Check what joining a group gives in the other products: the caller has to hold it there.
+*/
+inline bool CheckGroupGrantsInOtherProducts(
+			const imtgql::IGqlContext* gqlContextPtr,
+			const imtauth::IUserGroupInfo& group,
+			QString& errorMessage)
+{
+	const imtauth::IUserInfo* callerPtr = gqlContextPtr != nullptr ? gqlContextPtr->GetUserInfo() : nullptr;
+	if (callerPtr == nullptr || callerPtr->IsAdmin() || !gqlContextPtr->GetTenantId().isEmpty()){
+		return true;
+	}
+
+	for (const QByteArray& productId : group.GetProducts()){
+		if (productId == gqlContextPtr->GetProductId()){
+			continue;
+		}
+
+		const QByteArrayList heldPermissions = callerPtr->GetPermissions(productId);
+		for (const QByteArray& permission : group.GetPermissions(productId)){
+			if (!imtauth::HasPermission(heldPermissions, permission)){
+				errorMessage = QStringLiteral("The group gives permissions in the product '%1' that you do not hold").arg(QString::fromUtf8(productId));
+
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
+
+static const inline QByteArray s_changeUserPermission = QByteArrayLiteral("/Administration/Users/Edit/Change");
+
+
+/**
+	Check a change of the account of a stored user, the same for each way of storing a user.
+*/
+inline bool CheckUserAccountChange(
+			const imtgql::IGqlContext* gqlContextPtr,
+			const QByteArray& userId,
+			const imtauth::IUserInfo& previous,
+			const imtauth::IUserInfo& current,
+			QString& errorMessage)
+{
+	const bool isChanged = previous.GetId() != current.GetId() || previous.GetName() != current.GetName() || previous.GetMail() != current.GetMail()
+				|| previous.IsEnabled() != current.IsEnabled() || previous.GetPasswordHash() != current.GetPasswordHash();
+
+	return !isChanged || CheckSharedUserChange(gqlContextPtr, userId, previous, s_changeUserPermission, errorMessage);
+}
+
+
+/**
+	Check what the groups a user joins give in the other products.
+	\param groupProviderPtr Reads the joined groups.
+*/
+inline bool CheckJoinedUserGroups(
+			const imtgql::IGqlContext* gqlContextPtr,
+			const imtauth::IUserGroupInfoProvider* groupProviderPtr,
+			const QByteArrayList& previousGroups,
+			const QByteArrayList& groups,
+			QString& errorMessage)
+{
+	const QSet<QByteArray> previousSet(previousGroups.cbegin(), previousGroups.cend());
+	for (const QByteArray& groupId : groups){
+		if (previousSet.contains(groupId)){
+			continue;
+		}
+
+		const imtauth::IUserGroupInfoSharedPtr groupPtr = groupProviderPtr != nullptr ? groupProviderPtr->GetUserGroup(groupId) : imtauth::IUserGroupInfoSharedPtr();
+		if (!groupPtr.IsValid()){
+			errorMessage = QStringLiteral("Unable to read the group '%1'").arg(QString::fromUtf8(groupId));
+
+			return false;
+		}
+
+		if (!CheckGroupGrantsInOtherProducts(gqlContextPtr, *groupPtr, errorMessage)){
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+/**
+	Tell whether the group gets members it did not have: they receive all its permissions.
+*/
+inline bool HasNewGroupMembers(const QByteArrayList& previousUsers, const QByteArrayList& users)
+{
+	const QSet<QByteArray> previousSet(previousUsers.cbegin(), previousUsers.cend());
+	for (const QByteArray& userId : users){
+		if (!previousSet.contains(userId)){
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+/**
+	Check that a change of a user or a group leaves the assignments of the other products as they are.
+	\param previousPtr The stored object, null for a new one.
+*/
+inline bool CheckOtherProductsUnchanged(
+			const imtgql::IGqlContext* gqlContextPtr,
+			const imtauth::IPrincipal* previousPtr,
+			const imtauth::IPrincipal& current,
+			QString& errorMessage)
+{
+	const imtauth::IUserInfo* userInfoPtr = gqlContextPtr != nullptr ? gqlContextPtr->GetUserInfo() : nullptr;
+	if (userInfoPtr != nullptr && userInfoPtr->IsAdmin()){
+		return true;
+	}
+
+	const QByteArray ownProductId = gqlContextPtr != nullptr ? gqlContextPtr->GetProductId() : QByteArray();
+	const QByteArrayList previousProducts = previousPtr != nullptr ? previousPtr->GetProducts() : QByteArrayList();
+	for (const QByteArray& productId : previousProducts + current.GetProducts()){
+		const QByteArrayList previousRoles = previousPtr != nullptr ? previousPtr->GetRoles(productId) : QByteArrayList();
+		const QByteArrayList previousPermissions = previousPtr != nullptr ? previousPtr->GetLocalPermissions(productId) : QByteArrayList();
+		if (productId != ownProductId
+					&& (previousRoles != current.GetRoles(productId) || previousPermissions != current.GetLocalPermissions(productId))){
+			errorMessage = QStringLiteral("The data of the product '%1' is not available in this context").arg(QString::fromUtf8(productId));
+
+			return false;
+		}
+	}
+
+	return true;
 }
 
 

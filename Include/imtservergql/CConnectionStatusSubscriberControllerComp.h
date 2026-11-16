@@ -31,6 +31,7 @@ protected:
 	QString CreateBodySubscription() const;
 
 	// reimplemented (imtservergql::CGqlPublisherCompBase)
+	virtual bool IsOpenFor(SubscriberKind subscriberKind, const imtgql::CGqlRequest& gqlRequest) const override;
 	virtual bool RegisterSubscription(
 				const QByteArray& subscriptionId,
 				const imtgql::CGqlRequest& gqlRequest,

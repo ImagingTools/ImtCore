@@ -6,6 +6,7 @@
 #include <imtbase/IObjectCollection.h>
 #include <imtbase/IDocumentChangeGenerator.h>
 #include <imtservergql/CGqlRequestHandlerCompBase.h>
+#include <imtservergql/IObjectChangeChecker.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/DocumentRevision_fwd.h>
 
 
@@ -23,12 +24,20 @@ public:
 		I_ASSIGN_MULTI_0(m_revisionPermissionPathsAttrPtr, "RevisionPermissionPaths", "Permission area of the revisions of each collection, in the order of CollectionIds", false);
 		I_ASSIGN_MULTI_0(m_objectCollectionsCompPtr, "ObjectCollections", "Object collections", false);
 		I_ASSIGN_MULTI_0(m_documentChangeGeneratorsCompPtr, "DocumentChangeGenerators", "Document change generators", false);
+		I_ASSIGN_MULTI_0(m_objectChangeCheckersCompPtr, "ObjectChangeCheckers", "Rules of changing the objects of each collection, in the order of CollectionIds", false);
 	I_END_COMPONENT;
 
 protected:
 	virtual bool IsCollectionSupported(const QByteArray& typeId) const;
 	virtual imtbase::IObjectCollection* FindObjectCollection(const QByteArray& typeId) const;
 	virtual imtbase::IDocumentChangeGenerator* FindDocumentChangeGenerator(const QByteArray& typeId) const;
+	bool CheckRevisionChange(
+				const ::imtgql::CGqlRequest& gqlRequest,
+				const QByteArray& collectionId,
+				const imtbase::IObjectCollection& collection,
+				const QByteArray& objectId,
+				int revision,
+				QString& errorMessage) const;
 
 	// reimplemented (sdl::V1_0::imtbase::CDocumentRevisionGqlHandlerCompBase)
 	virtual sdl::V1_0::imtbase::CRevisionInfoList OnGetRevisionInfoList(const sdl::V1_0::imtbase::CGetRevisionInfoListGqlRequest& getRevisionInfoListRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
@@ -48,6 +57,7 @@ protected:
 	I_MULTIATTR(QByteArray, m_revisionPermissionPathsAttrPtr);
 	I_MULTIREF(imtbase::IObjectCollection, m_objectCollectionsCompPtr);
 	I_MULTIREF(imtbase::IDocumentChangeGenerator, m_documentChangeGeneratorsCompPtr);
+	I_MULTIREF(IObjectChangeChecker, m_objectChangeCheckersCompPtr);
 };
 
 

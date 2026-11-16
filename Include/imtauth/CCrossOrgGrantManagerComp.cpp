@@ -200,28 +200,11 @@ CrossOrgGrants CCrossOrgGrantManagerComp::GetGrantsBySourceTenant(const QByteArr
 }
 
 
-CrossOrgGrants CCrossOrgGrantManagerComp::GetGrantsByTargetTenant(const QByteArray& targetTenantId) const
+CrossOrgGrants CCrossOrgGrantManagerComp::GetGrantsByTargetTenant(const QByteArray& targetTenantId, bool* isReadPtr) const
 {
 	return CollectGrants("TargetTenantId", targetTenantId, [&targetTenantId](const CrossOrgGrantInfo& info){
 		return info.targetTenantId == targetTenantId;
-	});
-}
-
-
-bool CCrossOrgGrantManagerComp::IsGrantEffective(const CrossOrgGrantInfo& grantInfo) const
-{
-	if (!grantInfo.isActive){
-		return false;
-	}
-
-	if (!grantInfo.expiresAt.isEmpty()){
-		QDateTime expiresAt = QDateTime::fromString(grantInfo.expiresAt, Qt::ISODateWithMs);
-		if (expiresAt.isValid() && expiresAt < QDateTime::currentDateTimeUtc()){
-			return false;
-		}
-	}
-
-	return true;
+	}, isReadPtr);
 }
 
 
@@ -235,7 +218,7 @@ bool CCrossOrgGrantManagerComp::HasAccess(
 		if (info.sourceTenantId != sourceTenantId){
 			continue;
 		}
-		if (!IsGrantEffective(info)){
+		if (!info.IsEffective()){
 			continue;
 		}
 		if (roleId.isEmpty() || info.roleIds.contains(roleId)){

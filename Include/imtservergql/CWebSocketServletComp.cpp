@@ -2,11 +2,16 @@
 #include <imtservergql/CWebSocketServletComp.h>
 
 
+// STL includes
+#include <algorithm>
+
 // Qt includes
+#include <QtCore/QMultiHash>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 #include <QtCore/QPointer>
+#include <QtCore/QDeadlineTimer>
 #include <QtCore/QScopeGuard>
 
 // ImtCore includes
@@ -14,11 +19,16 @@
 #include <imtrest/IProtocolEngine.h>
 #include <imtrest/CWebSocketRequest.h>
 #include <imtbase/imtbase.h>
+#include <imtbase/IObjectCollection.h>
 #include <imtgql/CGqlRequestContextManager.h>
+#include <imtservergql/imtservergql.h>
 
 
 namespace imtservergql
 {
+
+
+static const int s_maxParallelChecks = 4;
 
 
 // public methods
@@ -92,6 +102,14 @@ bool CWebSocketServletComp::SendResponse(const QByteArray& /*requestId*/, imtres
 bool CWebSocketServletComp::SendRequest(const QByteArray& /*requestId*/, imtrest::ConstRequestPtr& /*request*/) const
 {
 	return false;
+}
+
+
+// reimplemented (imtrest::IRequestEventHandler)
+
+void CWebSocketServletComp::OnRequestDestroyed(imtrest::IRequest* request)
+{
+	RemoveTokenSubscriptions([request](const TokenSubscription& subscription){ return subscription.requestPtr == request; });
 }
 
 
@@ -217,8 +235,22 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 		return CreateErrorResponse(QByteArrayLiteral("GraphQL context creator is not configured"), request);
 	}
 
+	// A subscription with credentials is registered with the access read now: revoked credentials never become a subscription
+	const bool hasCredentials = !gqlHeaders.value(imtbase::s_authenticationTokenHeaderId).isEmpty() || !gqlHeaders.value(imtbase::s_serverTokenHeaderId).isEmpty();
+	quint64 accessGeneration;
+	{
+		QMutexLocker locker(&m_tokenSubscriptionsMutex);
+		accessGeneration = m_accessChangeGeneration;
+	}
+	const qint64 authorizationGeneration = m_gqlContextCreatorCompPtr->GetAuthorizationGeneration();
 	imtgql::IGqlContextCreator::ContextCreationError contextError;
-	imtgql::IGqlContextUniquePtr gqlContextPtr = m_gqlContextCreatorCompPtr->CreateGqlContext(gqlHeaders, contextError);
+	QDateTime sessionExpiresAt;
+	imtgql::IGqlContextUniquePtr gqlContextPtr = hasCredentials
+				? CreateCurrentContext(gqlHeaders, false, contextError, &sessionExpiresAt)
+				: m_gqlContextCreatorCompPtr->CreateGqlContext(gqlHeaders, contextError);
+	if (requestGuard.isNull()){
+		return imtrest::ConstResponsePtr();
+	}
 	if (!gqlContextPtr.IsValid()){
 		const QByteArray authToken = gqlHeaders.value(imtbase::s_authenticationTokenHeaderId);
 		const QString maskedToken = authToken.isEmpty()
@@ -244,9 +276,11 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 			wireMessage = detail;
 		}
 
-		return CreateErrorResponse(wireMessage.toUtf8(), request, /*logMessage*/ false);
+		// The client tells a refusal from an access it may confirm later by the code
+		return CreateErrorResponse(wireMessage.toUtf8(), request, /*logMessage*/ false, GetRefusalCode(contextError));
 	}
 
+	const AuthorizationData registeredAccess = GetAuthorizationData(*gqlContextPtr);
 	gqlRequest.SetGqlContext(std::move(gqlContextPtr));
 
 	QByteArray commandId = gqlRequest.GetCommandId();
@@ -274,8 +308,52 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 			return imtrest::ConstResponsePtr();
 		}
 
+		if (!IsSubscriberAllowed(*subscriberControllerPtr, gqlRequest)){
+			return CreateErrorResponse(QStringLiteral("The subscription '%1' is not allowed").arg(QString::fromUtf8(commandId)).toUtf8(), request, true, s_subscriptionForbiddenCode);
+		}
+
+		const bool isRecipientChannel = subscriberControllerPtr->IsOpenFor(imtgql::IGqlSubscriberController::SK_RECIPIENT, gqlRequest);
+
 		QString errorMessage;
 		if (subscriberControllerPtr->RegisterSubscription(subscriptionId, gqlRequest, request, errorMessage)){
+			bool accessChanged;
+			{
+				QMutexLocker locker(&m_tokenSubscriptionsMutex);
+				accessChanged = accessGeneration != m_accessChangeGeneration;
+				accessGeneration = m_accessChangeGeneration;
+			}
+
+			QString authorizationError;
+			QByteArray reasonCode;
+			const bool isCurrent = !hasCredentials
+						|| (!accessChanged && m_gqlContextCreatorCompPtr->GetAuthorizationGeneration() == authorizationGeneration)
+						|| IsAuthorizationCurrent(gqlHeaders, registeredAccess, isRecipientChannel, authorizationError, reasonCode);
+			if (requestGuard.isNull()){
+				return imtrest::ConstResponsePtr();
+			}
+			if (!isCurrent){
+				subscriberControllerPtr->UnregisterSubscription(subscriptionId);
+				return CreateErrorResponse(authorizationError.toUtf8(), request, true, reasonCode);
+			}
+
+			if (hasCredentials){
+				TokenSubscription subscription;
+				subscription.subscriptionId = subscriptionId;
+				subscription.controllerPtr = subscriberControllerPtr;
+				subscription.headers = gqlHeaders;
+				subscription.registeredAccess = registeredAccess;
+				subscription.isRecipientChannel = isRecipientChannel;
+				subscription.requestPtr = &request;
+				subscription.connectionPtr = webSocketRequest->parent();
+
+				AddTokenSubscription(subscription, sessionExpiresAt, accessGeneration);
+				webSocketRequestPtr->RegisterRequestEventHandler(const_cast<CWebSocketServletComp*>(this));
+			}
+
+			if (webSocketRequest->GetMethodType() == imtrest::CWebSocketRequest::MT_START){
+				return CreateDataResponse(QStringLiteral(R"({"type": "start_ack","id": "%1"})").arg(QString::fromUtf8(subscriptionId)).toUtf8(), request);
+			}
+
 			return imtrest::ConstResponsePtr();
 		}
 
@@ -303,6 +381,11 @@ imtrest::ConstResponsePtr CWebSocketServletComp::UnregisterSubscription(const im
 	}
 
 	const QByteArray subscriptionId = webSocketRequest->GetRequestId();
+
+	// The stop comes in a request of its own over the same connection
+	RemoveTokenSubscriptions([&subscriptionId, webSocketRequest](const TokenSubscription& subscription){
+		return subscription.subscriptionId == subscriptionId && subscription.connectionPtr == webSocketRequest->parent();
+	});
 
 	for (int index = 0; index < m_gqlSubscriberControllersCompPtr.GetCount(); index++){
 		imtgql::IGqlSubscriberController* controllerPtr = m_gqlSubscriberControllersCompPtr[index];
@@ -348,7 +431,8 @@ imtrest::ConstResponsePtr CWebSocketServletComp::CreateDataResponse(const QByteA
 imtrest::ConstResponsePtr CWebSocketServletComp::CreateErrorResponse(
 			const QByteArray& errorMessage,
 			const imtrest::IRequest& request,
-			bool logMessage) const
+			bool logMessage,
+			const QByteArray& reasonCode) const
 {
 	QByteArray requestBody = request.GetBody();
 	QJsonDocument document = QJsonDocument::fromJson(requestBody);
@@ -369,6 +453,9 @@ imtrest::ConstResponsePtr CWebSocketServletComp::CreateErrorResponse(
 	errorObj.insert(QStringLiteral("message"), QString::fromUtf8(errorMessage));
 	QJsonObject extensionsObj;
 	extensionsObj.insert(QStringLiteral("type"), QStringLiteral("Warning"));
+	if (!reasonCode.isEmpty()){
+		extensionsObj.insert(QStringLiteral("code"), QString::fromUtf8(reasonCode));
+	}
 	errorObj.insert(QStringLiteral("extensions"), extensionsObj);
 
 	QJsonArray payloadArr;
@@ -394,6 +481,366 @@ imtrest::ConstResponsePtr CWebSocketServletComp::CreateErrorResponse(
 	}
 
 	return responsePtr;
+}
+
+
+// reimplemented (icomp::CComponentBase)
+
+void CWebSocketServletComp::OnComponentCreated()
+{
+	BaseClass::OnComponentCreated();
+
+	m_checkSchedule = CSubscriptionCheckSchedule(qint64(*m_maxCheckIntervalAttrPtr) * 1000, qint64(*m_gracePeriodAttrPtr) * 1000);
+	m_clock.start();
+	m_checkPool.setMaxThreadCount(s_maxParallelChecks);
+
+	for (int index = 0; index < m_accessModelsCompPtr.GetCount(); index++){
+		ObserveAccessModel(m_accessModelsCompPtr[index]);
+	}
+
+	// The manager of the server tokens of this server tells a revoked or changed token
+	if (m_serverTokenReceiverCompPtr.IsValid()){
+		ObserveAccessModel(dynamic_cast<imod::IModel*>(m_serverTokenReceiverCompPtr->GetTokenManager()));
+	}
+}
+
+
+void CWebSocketServletComp::OnComponentDestroyed()
+{
+	EnsureModelsDetached();
+
+	QThread* threadPtr = nullptr;
+	{
+		QMutexLocker locker(&m_tokenSubscriptionsMutex);
+		m_isTokenCheckStopped = true;
+		m_tokenCheckCondition.wakeAll();
+		threadPtr = m_tokenCheckThreadPtr;
+		m_tokenCheckThreadPtr = nullptr;
+	}
+
+	if (threadPtr != nullptr){
+		threadPtr->wait();
+		delete threadPtr;
+	}
+
+	// A running check ends with its request: its result is not used
+	m_checkPool.waitForDone();
+
+	BaseClass::OnComponentDestroyed();
+}
+
+
+// reimplemented (imod::CMultiModelObserverBase)
+
+void CWebSocketServletComp::OnUpdate(imod::IModel* /*modelPtr*/, const istd::IChangeable::ChangeSet& changeSet)
+{
+	QMutexLocker locker(&m_tokenSubscriptionsMutex);
+
+	++m_accessChangeGeneration;
+
+	// The changed data of a subscribed user concern its subscriptions only; any other change may concern everybody
+	const QByteArray objectId = changeSet.GetChangeInfo(imtbase::IObjectCollection::CN_OBJECT_DATA_CHANGED).toByteArray();
+	const qint64 nowMs = m_clock.elapsed();
+	bool isUserChange = false;
+	if (!objectId.isEmpty()){
+		for (auto it = m_tokenSubscriptions.cbegin(); it != m_tokenSubscriptions.cend(); ++it){
+			if (!it->isEmpty() && it->first().registeredAccess.userId == objectId){
+				m_checkSchedule.OnAccessChanged(nowMs, it.key());
+				isUserChange = true;
+			}
+		}
+	}
+	if (!isUserChange){
+		m_checkSchedule.OnAccessChanged(nowMs);
+	}
+
+	m_tokenCheckCondition.wakeAll();
+}
+
+
+// private methods
+
+imtgql::IGqlContextUniquePtr CWebSocketServletComp::CreateCurrentContext(
+			const imtgql::IGqlContext::Headers& headers,
+			bool isEstablished,
+			imtgql::IGqlContextCreator::ContextCreationError& error,
+			QDateTime* sessionExpiresAtPtr) const
+{
+	// A check that met a change of the access is repeated; a refusal or a failed read is not
+	for (int attempt = 0; attempt < 3; attempt++){
+		imtgql::IGqlContextCreator::AuthorizationState state = imtgql::IGqlContextCreator::AS_UNAVAILABLE;
+		imtgql::IGqlContextUniquePtr gqlContextPtr = m_gqlContextCreatorCompPtr->RenewGqlContext(headers, isEstablished, state, error, sessionExpiresAtPtr);
+		if (state != imtgql::IGqlContextCreator::AS_STALE){
+			return state == imtgql::IGqlContextCreator::AS_CONFIRMED ? std::move(gqlContextPtr) : imtgql::IGqlContextUniquePtr();
+		}
+	}
+
+	error.status = imtgql::IGqlContextCreator::CCS_INTERNAL_ERROR;
+	error.message = QStringLiteral("The access kept changing during the check");
+
+	return imtgql::IGqlContextUniquePtr();
+}
+
+
+bool CWebSocketServletComp::IsAuthorizationCurrent(
+			const imtgql::IGqlContext::Headers& headers,
+			const AuthorizationData& registeredAccess,
+			bool isRecipientChannel,
+			QString& errorMessage,
+			QByteArray& reasonCode) const
+{
+	imtgql::IGqlContextCreator::ContextCreationError error;
+	const imtgql::IGqlContextUniquePtr gqlContextPtr = CreateCurrentContext(headers, false, error);
+	if (!gqlContextPtr.IsValid()){
+		errorMessage = error.message;
+		reasonCode = GetRefusalCode(error);
+
+		return false;
+	}
+
+	if (!IsServedBy(registeredAccess, isRecipientChannel, GetAuthorizationData(*gqlContextPtr))){
+		errorMessage = QStringLiteral("The permissions changed during subscription registration");
+		reasonCode = s_subscriptionPermissionsChangedCode;
+
+		return false;
+	}
+
+	return true;
+}
+
+
+bool CWebSocketServletComp::IsServedBy(const AuthorizationData& registeredAccess, bool isRecipientChannel, const AuthorizationData& currentAccess)
+{
+	// Compared with the access of the registration, not with the last check: more access serves it, the same recipient serves its own channel
+	return IsAccessWithin(registeredAccess, currentAccess) || (isRecipientChannel && IsSameRecipient(registeredAccess, currentAccess));
+}
+
+
+QByteArray CWebSocketServletComp::GetRefusalCode(const imtgql::IGqlContextCreator::ContextCreationError& error)
+{
+	switch (error.status){
+	case imtgql::IGqlContextCreator::CCS_UNAUTHORIZED:
+		return s_subscriptionUnauthorizedCode;
+	case imtgql::IGqlContextCreator::CCS_FORBIDDEN:
+		return s_subscriptionForbiddenCode;
+	default:
+		return s_subscriptionAuthorizationUnavailableCode;
+	}
+}
+
+
+QByteArray CWebSocketServletComp::GetCredentialKey(const imtgql::IGqlContext::Headers& headers)
+{
+	return headers.value(imtbase::s_authenticationTokenHeaderId) + '\n'
+				+ headers.value(imtbase::s_serverTokenHeaderId) + '\n'
+				+ headers.value(imtbase::s_productIdHeaderId);
+}
+
+
+qint64 CWebSocketServletComp::ToScheduleTime(const QDateTime& time, qint64 nowMs) const
+{
+	return time.isValid() ? std::max(qint64(0), nowMs + QDateTime::currentDateTimeUtc().msecsTo(time)) : -1;
+}
+
+bool CWebSocketServletComp::IsSubscriberAllowed(
+			const imtgql::IGqlSubscriberController& controller,
+			const imtgql::CGqlRequest& gqlRequest) const
+{
+	const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
+	if (contextPtr == nullptr){
+		return false;
+	}
+
+	// The servers of products without tokens subscribe as anonymous and as their users, as before server tokens
+	if (m_serverTokenReceiverCompPtr.IsValid() && !m_serverTokenReceiverCompPtr->IsEnabled()){
+		return true;
+	}
+
+	// A server acting on its own is a user holding the permissions of its token
+	const imtauth::IUserInfo* userInfoPtr = contextPtr->GetUserInfo();
+	if (userInfoPtr == nullptr){
+		return !*m_isAnonymousDeniedAttrPtr || controller.IsOpenFor(imtgql::IGqlSubscriberController::SK_ANONYMOUS, gqlRequest);
+	}
+
+	return !*m_isUndeclaredUserChannelDeniedAttrPtr || userInfoPtr->IsAdmin() || controller.IsOpenFor(imtgql::IGqlSubscriberController::SK_USER, gqlRequest);
+}
+
+
+void CWebSocketServletComp::AddTokenSubscription(const TokenSubscription& subscription, const QDateTime& sessionExpiresAt, quint64 accessGeneration) const
+{
+	QMutexLocker locker(&m_tokenSubscriptionsMutex);
+
+	const QByteArray credentialKey = GetCredentialKey(subscription.headers);
+	m_tokenSubscriptions[credentialKey].append(subscription);
+
+	// Just checked: next at the end of its session or at the control check
+	const qint64 nowMs = m_clock.elapsed();
+	m_checkSchedule.Add(credentialKey, nowMs, ToScheduleTime(sessionExpiresAt, nowMs));
+	// Include events after the last registration check, even when this key did not exist yet.
+	if (accessGeneration != m_accessChangeGeneration){
+		m_checkSchedule.OnAccessChanged(nowMs, credentialKey);
+	}
+
+	if (m_tokenCheckThreadPtr == nullptr && !m_isTokenCheckStopped){
+		m_tokenCheckThreadPtr = QThread::create([this](){ RunTokenChecks(); });
+		m_tokenCheckThreadPtr->setObjectName(QStringLiteral("WebSocketTokenCheck"));
+		m_tokenCheckThreadPtr->start();
+	}
+
+	m_tokenCheckCondition.wakeAll();
+}
+
+
+void CWebSocketServletComp::RunTokenChecks() const
+{
+	QMutexLocker locker(&m_tokenSubscriptionsMutex);
+
+	while (!m_isTokenCheckStopped){
+		const qint64 nowMs = m_clock.elapsed();
+
+		// Not confirmed within the grace period: ended as temporarily unavailable, not as refused
+		for (const QByteArray& credentialKey : m_checkSchedule.TakeExpired(nowMs)){
+			DropCredentialsLocked(
+						credentialKey,
+						s_subscriptionAuthorizationUnavailableCode,
+						QStringLiteral("The access could not be confirmed: the authorization is temporarily unavailable"));
+		}
+
+		// A check may wait for the network: it holds back neither the other checks nor the end of a grace period
+		for (const QByteArray& credentialKey : m_checkSchedule.TakeDue(nowMs)){
+			const auto found = m_tokenSubscriptions.constFind(credentialKey);
+			if (found == m_tokenSubscriptions.cend() || found->isEmpty()){
+				m_checkSchedule.Remove(credentialKey);
+				continue;
+			}
+
+			const imtgql::IGqlContext::Headers headers = found->first().headers;
+			const qint64 attemptId = m_checkSchedule.GetAttemptId(credentialKey);
+			m_checkPool.start([this, credentialKey, attemptId, headers](){ CheckCredentials(credentialKey, attemptId, headers); });
+		}
+
+		const qint64 wakeMs = m_checkSchedule.GetNextWakeTime();
+		const qint64 waitMs = wakeMs - m_clock.elapsed();
+		if (wakeMs < 0){
+			m_tokenCheckCondition.wait(&m_tokenSubscriptionsMutex);
+		}
+		else if (waitMs > 0){
+			m_tokenCheckCondition.wait(&m_tokenSubscriptionsMutex, QDeadlineTimer(waitMs));
+		}
+	}
+}
+
+
+void CWebSocketServletComp::RemoveTokenSubscriptions(const std::function<bool(const TokenSubscription&)>& predicate) const
+{
+	QMutexLocker locker(&m_tokenSubscriptionsMutex);
+	for (auto it = m_tokenSubscriptions.begin(); it != m_tokenSubscriptions.end(); ){
+		it->removeIf(predicate);
+		if (it->isEmpty()){
+			m_checkSchedule.Remove(it.key());
+			it = m_tokenSubscriptions.erase(it);
+		}
+		else{
+			++it;
+		}
+	}
+}
+
+
+void CWebSocketServletComp::CheckCredentials(const QByteArray& credentialKey, qint64 attemptId, const imtgql::IGqlContext::Headers& headers) const
+{
+	{
+		QMutexLocker locker(&m_tokenSubscriptionsMutex);
+		if (m_isTokenCheckStopped || !m_checkSchedule.IsCurrentAttempt(credentialKey, attemptId)){
+			return;
+		}
+	}
+
+	// An established subscription is checked as one: an expired access token may hold there while its session lives
+	imtgql::IGqlContextCreator::ContextCreationError error;
+	imtgql::IGqlContextCreator::AuthorizationState state = imtgql::IGqlContextCreator::AS_UNAVAILABLE;
+	QDateTime sessionExpiresAt;
+	const imtgql::IGqlContextUniquePtr gqlContextPtr = m_gqlContextCreatorCompPtr->RenewGqlContext(headers, true, state, error, &sessionExpiresAt);
+	const bool isConfirmed = state == imtgql::IGqlContextCreator::AS_CONFIRMED && gqlContextPtr.IsValid();
+	const AuthorizationData currentAccess = isConfirmed ? GetAuthorizationData(*gqlContextPtr) : AuthorizationData();
+
+	QMutexLocker locker(&m_tokenSubscriptionsMutex);
+
+	// Ended meanwhile, by its client or by its grace period, perhaps subscribed again: the result is not used
+	if (m_isTokenCheckStopped || !m_checkSchedule.IsCurrentAttempt(credentialKey, attemptId)){
+		return;
+	}
+
+	const qint64 nowMs = m_clock.elapsed();
+	if (state == imtgql::IGqlContextCreator::AS_DENIED){
+		DropCredentialsLocked(credentialKey, GetRefusalCode(error), error.message);
+	}
+	else if (isConfirmed){
+		auto found = m_tokenSubscriptions.find(credentialKey);
+		if (found == m_tokenSubscriptions.end()){
+			m_checkSchedule.Remove(credentialKey);
+			return;
+		}
+		QList<TokenSubscription>& subscriptions = *found;
+		for (int index = subscriptions.size() - 1; index >= 0; --index){
+			const TokenSubscription& subscription = subscriptions[index];
+			if (!IsServedBy(subscription.registeredAccess, subscription.isRecipientChannel, currentAccess)){
+				DropTokenSubscriptionLocked(subscriptions.takeAt(index), s_subscriptionPermissionsChangedCode, QStringLiteral("The permissions have changed"));
+			}
+		}
+
+		if (!subscriptions.isEmpty()){
+			m_checkSchedule.OnChecked(credentialKey, CSubscriptionCheckSchedule::CR_CONFIRMED, nowMs, ToScheduleTime(sessionExpiresAt, nowMs));
+		}
+		else{
+			m_tokenSubscriptions.erase(found);
+			m_checkSchedule.Remove(credentialKey);
+		}
+	}
+	else{
+		// Nothing is known: the subscriptions are kept within the grace period, a stale check is repeated
+		const CSubscriptionCheckSchedule::CheckResult result = (state == imtgql::IGqlContextCreator::AS_STALE)
+					? CSubscriptionCheckSchedule::CR_STALE
+					: CSubscriptionCheckSchedule::CR_UNAVAILABLE;
+		m_checkSchedule.OnChecked(credentialKey, result, nowMs);
+	}
+
+	m_tokenCheckCondition.wakeAll();
+}
+
+
+void CWebSocketServletComp::DropTokenSubscriptionLocked(const TokenSubscription& subscription, const QByteArray& reasonCode, const QString& reason) const
+{
+	// Under the lock the request is alive: its destructor waits for it in OnRequestDestroyed
+	subscription.controllerPtr->UnregisterSubscription(subscription.subscriptionId);
+
+	SendWarningMessage(0, QStringLiteral("Subscription '%1' dropped: %2").arg(QString::fromUtf8(subscription.requestPtr->GetCommandId()), reason), QStringLiteral("CWebSocketServletComp"));
+
+	if (m_requestManagerCompPtr.IsValid()){
+		imtrest::ConstResponsePtr responsePtr = CreateErrorResponse(QStringLiteral("Forbidden: %1").arg(reason).toUtf8(), *subscription.requestPtr, false, reasonCode);
+		if (responsePtr.IsValid()){
+			m_requestManagerCompPtr->SendResponse(subscription.requestPtr->GetRequestId(), responsePtr);
+		}
+	}
+}
+
+
+void CWebSocketServletComp::DropCredentialsLocked(const QByteArray& credentialKey, const QByteArray& reasonCode, const QString& reason) const
+{
+	const QList<TokenSubscription> subscriptions = m_tokenSubscriptions.take(credentialKey);
+	for (auto it = subscriptions.crbegin(); it != subscriptions.crend(); ++it){
+		DropTokenSubscriptionLocked(*it, reasonCode, reason);
+	}
+
+	m_checkSchedule.Remove(credentialKey);
+}
+
+
+void CWebSocketServletComp::ObserveAccessModel(imod::IModel* modelPtr)
+{
+	if (modelPtr != nullptr && !modelPtr->IsAttached(this)){
+		modelPtr->AttachObserver(this);
+	}
 }
 
 

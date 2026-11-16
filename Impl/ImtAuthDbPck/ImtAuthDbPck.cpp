@@ -76,6 +76,11 @@ I_EXPORT_COMPONENT(
 			"User Action Database Delegate");
 
 I_EXPORT_COMPONENT(
+			ProductCatalogDatabaseDelegate,
+			"Product catalog and permission snapshot database delegate",
+			"SQL Product Catalog Snapshot Delegate");
+
+I_EXPORT_COMPONENT(
 			PersonalAccessTokenDatabaseDelegate,
 			"Personal access token database delegate",
 			"Personal Access Token Database Delegate");

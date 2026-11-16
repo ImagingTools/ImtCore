@@ -50,12 +50,15 @@ QJsonObject CGqlRemoteRepresentationControllerCompBase::CreateInternalResponse(c
 			}
 		}
 
-		imtclientgql::IGqlClient::GqlResponsePtr responsePtr = m_apiClientCompPtr->SendRequest(requestPtr);
-		if (responsePtr.IsValid()){
+		const auto requestResult = m_apiClientCompPtr->SendRequest(requestPtr);
+		auto responsePtr = requestResult.responsePtr;
+		if (requestResult){
 			return CreateJsonObjectFromResponse(gqlRequest.GetCommandId(), *responsePtr);
 		}
 
-		errorMessage = QStringLiteral("Command could not be processed by the remote server: '%1'").arg(requestPtr->GetCommandId());
+		errorMessage = requestResult.errorMessage.isEmpty()
+					? QStringLiteral("Command could not be processed by the remote server: '%1'").arg(requestPtr->GetCommandId())
+					: requestResult.errorMessage;
 	}
 
 	return QJsonObject();

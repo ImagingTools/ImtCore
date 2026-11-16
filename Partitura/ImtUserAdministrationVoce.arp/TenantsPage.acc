@@ -289,7 +289,7 @@
                                 <AttributeInfo Id="ClosePermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>/OrganizationManagement/Remove</Value>
+                                            <Value>/OrganizationManagement/View</Value>
                                             <Value>/OrganizationManagement/View</Value>
                                         </Values>
                                     </Data>
@@ -301,7 +301,7 @@
                                     <Data IsEnabled="true">
                                         <Values>
                                             <Value>/OrganizationManagement/Add</Value>
-                                            <Value>/OrganizationManagement/Remove</Value>
+                                            <Value>/OrganizationManagement/View</Value>
                                             <Value>/OrganizationManagement/View</Value>
                                         </Values>
                                     </Data>
@@ -310,7 +310,7 @@
                                     <Data IsEnabled="true">
                                         <Values>
                                             <Value>/OrganizationManagement/Add</Value>
-                                            <Value>/OrganizationManagement/Remove</Value>
+                                            <Value>/OrganizationManagement/View</Value>
                                             <Value>/OrganizationManagement/View</Value>
                                         </Values>
                                     </Data>
@@ -328,7 +328,7 @@
                                     <Data IsEnabled="true">
                                         <Values>
                                             <Value>/OrganizationManagement/Add</Value>
-                                            <Value>/OrganizationManagement/Remove</Value>
+                                            <Value>/OrganizationManagement/View</Value>
                                             <Value>/OrganizationManagement/View</Value>
                                         </Values>
                                     </Data>
@@ -375,7 +375,7 @@
                                 <AttributeInfo Id="RemovePermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>/OrganizationManagement/Remove</Value>
+                                            <Value>/OrganizationManagement/View</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>

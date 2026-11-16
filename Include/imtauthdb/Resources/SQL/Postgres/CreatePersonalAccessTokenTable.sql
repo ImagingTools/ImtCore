@@ -3,8 +3,9 @@ CREATE TABLE IF NOT EXISTS "PersonalAccessTokens"
     "Id"         uuid PRIMARY KEY,
     "Name"       text        NOT NULL,
     "Description" text       NOT NULL DEFAULT '',
-    "UserId"     uuid        NOT NULL,
+    "UserId"     uuid,
     "ProductId"  text,
+    "ClientProductId" text,
     "TokenHash"  bytea       NOT NULL,
     -- Code stores scopes as comma-separated string, kept as text for compatibility
     "Scopes"     text        NOT NULL DEFAULT '',
@@ -13,6 +14,12 @@ CREATE TABLE IF NOT EXISTS "PersonalAccessTokens"
     "ExpiresAt"  timestamp without time zone,
     "Revoked"    boolean     NOT NULL DEFAULT false
 );
+
+CREATE UNIQUE INDEX IF NOT EXISTS "IX_PersonalAccessTokens_TokenHash"
+    ON "PersonalAccessTokens" ("TokenHash");
+
+CREATE INDEX IF NOT EXISTS "IX_PersonalAccessTokens_ClientProductId"
+    ON "PersonalAccessTokens" ("ClientProductId") WHERE "ClientProductId" IS NOT NULL;
 
 -- Helpful indexes (optional)
 CREATE INDEX IF NOT EXISTS "IX_PersonalAccessTokens_UserId"

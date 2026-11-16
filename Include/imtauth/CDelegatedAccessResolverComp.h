@@ -39,7 +39,8 @@ public:
 				const QByteArray& roleId) const override;
 	virtual QByteArrayList GetDelegatedRoles(
 				const QByteArray& homeTenantId,
-				const QByteArray& targetTenantId) const override;
+				const QByteArray& targetTenantId,
+				bool* isReadPtr = nullptr) const override;
 	virtual bool IsDelegatedAccess(
 				const QByteArray& userId,
 				const QByteArray& homeTenantId,

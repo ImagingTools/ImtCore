@@ -6,7 +6,15 @@ include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 include(${ACFDIR}/Config/CMake/DeployQt.cmake)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
+	imtauthgql
+	imtauthsdl
+	imtclientgql
+	imtserverapp
 	imtservergql
+	imtauth
+	imtsdl
+	imtcrypt
+	imtaccount
 	imtfile
 	imtgql
 	imtdoc
@@ -21,4 +29,3 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 )
 
 deploy_qt(TARGET ${PROJECT_NAME})
-

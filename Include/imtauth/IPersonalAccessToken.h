@@ -60,6 +60,18 @@ public:
 		\param productId Product ID to set, or empty to not bind the token to a product
 	*/
 	virtual void SetProductId(const QByteArray& productId) = 0;
+
+	/**
+		Get the product whose server uses this token. A token with a client product has no owner:
+		it identifies a server, and GetProductId() names the server accepting it.
+		\return Product ID, empty for the token of a user.
+	*/
+	virtual QByteArray GetClientProductId() const = 0;
+
+	/**
+		Set the product whose server uses this token.
+	*/
+	virtual void SetClientProductId(const QByteArray& clientProductId) = 0;
 	
 	/**
 		Get human-readable token name.

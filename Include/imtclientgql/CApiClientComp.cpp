@@ -3,10 +3,12 @@
 
 
 // Qt includes
+#include <QtCore/QElapsedTimer>
 #include <QtCore/QUuid>
 #include <QtNetwork/QNetworkReply>
 
 // ImtCore includes
+#include <imtclientgql/imtclientgql.h>
 #include <imtcom/CRequestSender.h>
 #include <imtgql/CGqlResponse.h>
 
@@ -25,13 +27,13 @@ CApiClientComp::CApiClientComp()
 
 // reimplemented (IGqlClient)
 
-IGqlClient::GqlResponsePtr CApiClientComp::SendRequest(GqlRequestPtr requestPtr, imtbase::IUrlParam* urlParam) const
+IGqlClient::GqlResult CApiClientComp::SendRequest(GqlRequestPtr requestPtr, imtbase::IUrlParam* urlParam) const
 {
 	if (!requestPtr.IsValid()){
-		return GqlResponsePtr(nullptr);
+		return {{}, EC_INVALID_REQUEST, QStringLiteral("Request is invalid")};
 	}
 
-	GqlResponsePtr retVal;
+	GqlResult retVal;
 
 	if (m_protocolEngineCompPtr.IsValid()){
 		imtgql::IGqlRequest::RequestType requestType = requestPtr->GetRequestType();
@@ -41,9 +43,11 @@ IGqlClient::GqlResponsePtr CApiClientComp::SendRequest(GqlRequestPtr requestPtr,
 				QByteArray uuid = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
 				istd::IInformationProvider::InformationCategory category = istd::IInformationProvider::IC_INFO;
-				QString message = "Send request with ID " + uuid + "\n" + requestPtr->GetQuery();
+				QString message = QStringLiteral("Send request with ID %1, command %2").arg(QString::fromUtf8(uuid), QString::fromUtf8(requestPtr->GetCommandId()));
 				SendVerboseMessage(message, "API client");
 
+				QElapsedTimer requestTimer;
+				requestTimer.start();
 				QNetworkReply* replyPtr = imtcom::CRequestSender::DoSyncPost(*networkRequestPtr, requestPtr->GetQuery(), m_timeout);
 				if (replyPtr != nullptr){
 					QNetworkReply::NetworkError error = replyPtr->error();
@@ -52,18 +56,27 @@ IGqlClient::GqlResponsePtr CApiClientComp::SendRequest(GqlRequestPtr requestPtr,
 
 						imtgql::CGqlResponse* responsePtr(new imtgql::CGqlResponse(requestPtr));
 						responsePtr->SetResponseData(payload);
-						retVal.SetPtr(responsePtr);
+						retVal.responsePtr.SetPtr(responsePtr);
 
 						category = istd::IInformationProvider::IC_INFO;
 					}
 					else{
+						const int status = replyPtr->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+						// DoSyncPost aborts a running reply when its wait expires.
+						const bool isTimeout = error == QNetworkReply::TimeoutError
+									|| (error == QNetworkReply::OperationCanceledError && m_timeout > 0 && requestTimer.elapsed() >= m_timeout);
+						retVal.errorCategory = status == 401 || status == 403 ? EC_ACCESS_DENIED
+									: isTimeout ? EC_TIMEOUT : EC_NETWORK;
 						category = istd::IInformationProvider::IC_ERROR;
 						message = "Response for request-ID " + uuid + "\n" + replyPtr->errorString();
+						retVal.errorMessage = GetReplyErrorMessage(*replyPtr, replyPtr->readAll());
 					}
 				}
 				else{
 					category = istd::IInformationProvider::IC_ERROR;
 					message = "Null response for request-ID " + uuid;
+					retVal.errorCategory = EC_NETWORK;
+					retVal.errorMessage = message;
 				}
 
 				if (replyPtr != nullptr){
@@ -76,13 +89,22 @@ IGqlClient::GqlResponsePtr CApiClientComp::SendRequest(GqlRequestPtr requestPtr,
 			}
 			else{
 				SendErrorMessage(0, "Failed to create network request", "API Client");
+				retVal.errorCategory = EC_INTERNAL;
+				retVal.errorMessage = QStringLiteral("Failed to create network request");
 			}
 
 			delete(networkRequestPtr);
 		}
 		else{
 			SendErrorMessage(0, "Invalid request type", "API Client");
+			retVal.errorCategory = EC_INVALID_REQUEST;
+			retVal.errorMessage = QStringLiteral("Invalid request type");
 		}
+	}
+	else{
+		retVal.errorCategory = EC_INTERNAL;
+		retVal.errorMessage = QStringLiteral("Protocol engine is not configured");
+		SendErrorMessage(0, retVal.errorMessage, "API Client");
 	}
 
 	return retVal;
@@ -108,5 +130,3 @@ void CApiClientComp::OnComponentCreated()
 
 
 } // namespace imtclientgql
-
-

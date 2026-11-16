@@ -37,7 +37,7 @@ public:
 
 protected:
 	// reimplemented (imtauth::IJwtSessionController)
-	virtual bool ValidateSession(const QByteArray& sessionId) const override;
+	virtual bool ValidateSession(const QByteArray& sessionId, bool* isCheckedPtr = nullptr) const override;
 	virtual JwtState ValidateJwt(const QByteArray& token) const override;
 	virtual bool RefreshToken(const QByteArray& refreshToken, UserSession& userSession) const override;
 	virtual bool CreateNewSession(const QByteArray& userId, const QByteArray& tenantId, UserSession& userSession) const override;
@@ -52,7 +52,7 @@ private:
 	QJsonObject JsonObjectFromBase64(const QByteArray& data) const;
 	QByteArray InsertNewSession(const istd::IChangeable& object) const;
 	QByteArray CreateSignature(const QByteArray& headerBase64, const QByteArray& payloadBase64) const;
-	QByteArray GenerateJwt(const QByteArray& sessionId, const QByteArray& userId, const QByteArray& tenantId) const;
+	QByteArray GenerateJwt(const QByteArray& sessionId, const QByteArray& userId, const QByteArray& tenantId, const QByteArray& productId) const;
 	QByteArray GetSessionIdByRefreshToken(const QByteArray& refreshToken) const;
 
 private:

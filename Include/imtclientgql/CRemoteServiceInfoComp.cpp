@@ -3,6 +3,7 @@
 
 
 // ImtCore includes
+#include <imtgql/imtgql.h>
 #include <imtgql/CGqlRequest.h>
 #include <GeneratedFiles/imtappsdl/SDL/1.0/CPP/Application.h>
 
@@ -10,6 +11,9 @@
 namespace imtclientgql
 {
 
+
+// A token is checked every five minutes
+static const int s_credentialCheckInterval = 5 * 60 * 1000;
 
 // Bounds the tree, e.g. when two services depend on each other
 static const int s_maxDependencyDepth = 8;
@@ -54,6 +58,11 @@ void CRemoteServiceInfoComp::OnComponentCreated()
 	QMetaObject::invokeMethod(this, [this](){
 		BaseClass2::RegisterModel(m_connectionStatusModelCompPtr.GetPtr());
 
+		if (m_serverCredentialCompPtr.IsValid() && !m_serverCredentialCompPtr->GetServerToken().isEmpty()){
+			connect(&m_credentialCheckTimer, &QTimer::timeout, this, [this](){ UpdateServiceInfo(); });
+			m_credentialCheckTimer.start(s_credentialCheckInterval);
+		}
+
 		UpdateServiceInfo();
 	}, Qt::QueuedConnection);
 }
@@ -61,6 +70,8 @@ void CRemoteServiceInfoComp::OnComponentCreated()
 
 void CRemoteServiceInfoComp::OnComponentDestroyed()
 {
+	m_credentialCheckTimer.stop();
+
 	BaseClass2::UnregisterAllModels();
 
 	BaseClass::OnComponentDestroyed();
@@ -71,18 +82,37 @@ void CRemoteServiceInfoComp::OnComponentDestroyed()
 
 void CRemoteServiceInfoComp::UpdateServiceInfo()
 {
-	// Also drops the answer of a request still in flight when the connection is lost
-	const int requestId = ++m_lastRequestId;
+	const QByteArray serverToken = m_serverCredentialCompPtr.IsValid() ? m_serverCredentialCompPtr->GetServerToken() : QByteArray();
+	if (m_serverCredentialCompPtr.IsValid() && serverToken.isEmpty()){
+		SetCredentialStatus(CRS_MISSING);
+	}
 
 	const imtcom::IConnectionStatusProvider::ConnectionStatus connectionStatus = m_connectionStatusCompPtr->GetConnectionStatus();
 	if (connectionStatus != imtcom::IConnectionStatusProvider::CS_CONNECTED){
+		// Also drops the answer of a request still in flight when the connection is lost
+		++m_lastRequestId;
+
+		if (!serverToken.isEmpty()){
+			SetCredentialStatus(CRS_UNAVAILABLE);
+		}
 		SetServiceStatus(connectionStatus);
 
 		return;
 	}
 
-	// Unknown until the service answers
-	SetServiceStatus(imtcom::IConnectionStatusProvider::CS_UNKNOWN);
+	// Unknown until the service answers, a periodic check of the token keeps what is known
+	if (GetServiceInfo().status != imtcom::IConnectionStatusProvider::CS_CONNECTED){
+		SetServiceStatus(imtcom::IConnectionStatusProvider::CS_UNKNOWN);
+	}
+
+	SendInfoRequest(serverToken);
+}
+
+
+void CRemoteServiceInfoComp::SendInfoRequest(const QByteArray& serverToken)
+{
+	const bool useToken = !serverToken.isEmpty();
+	const int requestId = ++m_lastRequestId;
 
 	imtgql::CGqlRequest request;
 	sdl::V1_0::imtapp::GetApplicationInfoRequestArguments arguments;
@@ -91,28 +121,48 @@ void CRemoteServiceInfoComp::UpdateServiceInfo()
 		return;
 	}
 
-	m_asyncClientCompPtr->SendModelRequest<sdl::V1_0::imtapp::CApplicationInfo>(request).then(this, [this, requestId](const GqlModelResult<sdl::V1_0::imtapp::CApplicationInfo>& result) {
-		OnRequestFinished(requestId, result);
+	if (useToken){
+		imtgql::SetServerRequestContext(request, serverToken);
+	}
+
+	m_asyncClientCompPtr->SendModelRequest<sdl::V1_0::imtapp::CApplicationInfo>(request).then(this, [this, requestId, useToken](const GqlModelResult<sdl::V1_0::imtapp::CApplicationInfo>& result) {
+		OnRequestFinished(requestId, useToken, result);
 	});
 }
 
 
-void CRemoteServiceInfoComp::OnRequestFinished(int requestId, const GqlModelResult<sdl::V1_0::imtapp::CApplicationInfo>& result)
+void CRemoteServiceInfoComp::OnRequestFinished(int requestId, bool isTokenUsed, const GqlModelResult<sdl::V1_0::imtapp::CApplicationInfo>& result)
 {
 	if (requestId != m_lastRequestId){
 		return;
 	}
 
+	// The service answered and refused the token
+	if (isTokenUsed && result.errorCategory == IAsyncGqlClient::EC_ACCESS_DENIED){
+		SetCredentialStatus(CRS_REJECTED);
+		SetServiceStatus(imtcom::IConnectionStatusProvider::CS_CONNECTED);
+
+		return;
+	}
+
 	// The connection is up but the communication with the service does not work
 	if (result.errorCategory != IAsyncGqlClient::EC_NONE){
+		if (isTokenUsed){
+			SetCredentialStatus(CRS_UNAVAILABLE);
+		}
 		SetServiceStatus(imtcom::IConnectionStatusProvider::CS_DISCONNECTED);
 
 		return;
 	}
 
+	if (isTokenUsed){
+		SetCredentialStatus(CRS_VALID);
+	}
+
 	ServiceInfo serviceInfo;
 	serviceInfo.serviceId = *m_serviceIdAttrPtr;
 	serviceInfo.status = imtcom::IConnectionStatusProvider::CS_CONNECTED;
+	serviceInfo.credentialStatus = GetServiceInfo().credentialStatus;
 	if (result.model.applicationName.HasValue()){
 		serviceInfo.applicationName = *result.model.applicationName;
 	}
@@ -141,6 +191,7 @@ void CRemoteServiceInfoComp::SetServiceStatus(imtcom::IConnectionStatusProvider:
 	ServiceInfo serviceInfo;
 	serviceInfo.serviceId = m_serviceInfo.serviceId;
 	serviceInfo.applicationName = m_serviceInfo.applicationName;
+	serviceInfo.credentialStatus = m_serviceInfo.credentialStatus;
 	serviceInfo.status = status;
 
 	m_serviceInfo = serviceInfo;
@@ -152,6 +203,21 @@ void CRemoteServiceInfoComp::SetServiceInfo(const ServiceInfo& serviceInfo)
 	QMutexLocker locker(&m_serviceInfoMutex);
 
 	m_serviceInfo = serviceInfo;
+}
+
+
+void CRemoteServiceInfoComp::SetCredentialStatus(CredentialStatus status)
+{
+	QMutexLocker locker(&m_serviceInfoMutex);
+
+	const bool isChanged = m_serviceInfo.credentialStatus != status;
+	m_serviceInfo.credentialStatus = status;
+
+	locker.unlock();
+
+	if (isChanged && status == CRS_REJECTED){
+		qCritical().noquote() << QStringLiteral("The service '%1' refuses the token of this server: it is wrong, revoked or issued for another product").arg(QString::fromUtf8(*m_serviceIdAttrPtr));
+	}
 }
 
 
@@ -183,6 +249,24 @@ void CRemoteServiceInfoComp::ReadDependencies(
 				break;
 			default:
 				dependency.status = imtcom::IConnectionStatusProvider::CS_UNKNOWN;
+				break;
+			}
+		}
+		if (dependencyData->credentialStatus.HasValue()){
+			switch (*dependencyData->credentialStatus){
+			case sdl::V1_0::imtapp::ServerCredentialStatus::VALID:
+				dependency.credentialStatus = CRS_VALID;
+				break;
+			case sdl::V1_0::imtapp::ServerCredentialStatus::MISSING:
+				dependency.credentialStatus = CRS_MISSING;
+				break;
+			case sdl::V1_0::imtapp::ServerCredentialStatus::REJECTED:
+				dependency.credentialStatus = CRS_REJECTED;
+				break;
+			case sdl::V1_0::imtapp::ServerCredentialStatus::UNAVAILABLE:
+				dependency.credentialStatus = CRS_UNAVAILABLE;
+				break;
+			default:
 				break;
 			}
 		}
