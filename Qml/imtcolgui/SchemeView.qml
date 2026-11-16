@@ -81,6 +81,7 @@ Rectangle {
 		// Selection set from outside (e.g. after the model was replaced) must reach the canvas too.
 		if (canvas.selectedIndex !== selectedIndex){
 			canvas.selectedIndex = selectedIndex
+			canvas.requestPaint()
 		}
 		console.log("SchemeView.qml onSelectedIndexChanged", selectedIndex)
 	}
