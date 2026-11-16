@@ -22,12 +22,6 @@ namespace imtgql
 imtauth::IUserInfo::FeatureIds CollectImpliedPermissions(const IGqlContext& gqlContext, const imtauth::IUserInfo::FeatureIds& permissions);
 
 /**
-	Restrict the effective user permissions, including requirements, to a token boundary.
-	A restricted superuser is an ordinary principal. Repeated restrictions intersect.
-*/
-bool RestrictUserPermissions(IGqlContext& gqlContext, const QByteArrayList& permissions);
-
-/**
 	Every permission of the product of the context if the caller owns the organization of the context, otherwise none.
 	The owner of an organization holds its whole permission scope, whatever the roles.
 	\see imtlic::CollectProductPermissions

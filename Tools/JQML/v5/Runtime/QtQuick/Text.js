@@ -1,6 +1,6 @@
 const engine = require('../Core/engine')
 const { toCss } = require('../Core/color')
-const { defineType } = require('../Core/type')
+const { defineType, makeReadonly } = require('../Core/type')
 const { Font } = require('./Font')
 const { Item, bits } = require('./Item')
 const { NOWRAP, measure, style, wrapParagraph } = require('./TextLayout')
@@ -404,5 +404,9 @@ Object.assign(Text, { AlignLeft: 0x1, AlignRight: 0x2, AlignHCenter: 0x4, AlignJ
     FixedSize: 0, HorizontalFit: 1, VerticalFit: 2, Fit: 3,
     QtRendering: 0, NativeRendering: 1, CurveRendering: 2,
 })
+
+// read-only in Qt, writable in the base class
+makeReadonly(Text, 'implicitWidth')
+makeReadonly(Text, 'implicitHeight')
 
 module.exports = { Text }

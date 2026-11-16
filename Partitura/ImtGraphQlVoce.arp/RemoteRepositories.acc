@@ -49,6 +49,9 @@
         <Element Id="GroupRemoteRepository" PackageId="ImtGraphQlVoce" ComponentId="RemoteRepository">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="AccessTokenParam" Type="Reference" ExportId="AccessTokenParam">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ReadPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
@@ -133,6 +136,9 @@
         <Element Id="RoleRemoteRepository" PackageId="ImtGraphQlVoce" ComponentId="RemoteRepository">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="AccessTokenParam" Type="Reference" ExportId="AccessTokenParam">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ReadPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
@@ -262,6 +268,9 @@
         <Element Id="UserRemoteRepository" PackageId="ImtGraphQlVoce" ComponentId="RemoteRepository">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="AccessTokenParam" Type="Reference" ExportId="AccessTokenParam">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ReadPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>

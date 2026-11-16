@@ -55,6 +55,50 @@ static QString GetNotConnectedMessage(const QByteArray& productId, const QByteAr
 }
 
 
+/**
+	Restrict the effective user permissions, including requirements, to a token boundary.
+	A restricted superuser is an ordinary principal. Repeated restrictions intersect.
+*/
+static bool RestrictUserPermissions(imtgql::IGqlContext& gqlContext, const QByteArrayList& permissions)
+{
+	const imtauth::IUserInfo* sourcePtr = gqlContext.GetUserInfo();
+	if (sourcePtr == nullptr){
+		return false;
+	}
+
+	const auto principalKind = gqlContext.GetPrincipalKind();
+	QByteArrayList boundary = permissions;
+	if (gqlContext.HasPermissionBoundary()){
+		const QByteArrayList previous = gqlContext.GetPermissionBoundary();
+		const QSet<QByteArray> previousSet(previous.cbegin(), previous.cend());
+		boundary.removeIf([&previousSet](const QByteArray& permission){ return !previousSet.contains(permission); });
+	}
+	const QSet<QByteArray> allowed(boundary.cbegin(), boundary.cend());
+	const QByteArray productId = gqlContext.GetProductId();
+	QByteArrayList effective = sourcePtr->IsAdmin() ? boundary
+				: sourcePtr->GetPermissions(productId) + gqlContext.GetImpliedPermissions();
+	effective.removeIf([&allowed](const QByteArray& permission){ return !allowed.contains(permission); });
+
+	imtauth::CIdentifiableUserInfo user;
+	if (!user.CopyFrom(*sourcePtr)){
+		return false;
+	}
+	for (const QByteArray& product : user.GetProducts()){
+		user.SetRoles(product, imtauth::IPrincipal::RoleIds());
+		user.SetLocalPermissions(product, QByteArrayList());
+	}
+	for (const QByteArray& group : user.GetGroups()){
+		user.RemoveFromGroup(group);
+	}
+	user.SetLocalPermissions(productId, effective);
+	gqlContext.SetUserInfo(&user);
+	gqlContext.SetPrincipalKind(principalKind);
+	gqlContext.SetPermissionBoundary(boundary);
+
+	return true;
+}
+
+
 // public methods
 
 // reimplemented (imtgql::IGqlContextCreator)
@@ -457,7 +501,7 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateContext(
 
 		if (isPat){
 			gqlContextPtr->SetUserInfo(userInfoPtr);
-			if (!imtgql::RestrictUserPermissions(*gqlContextPtr, scopes)){
+			if (!RestrictUserPermissions(*gqlContextPtr, scopes)){
 				imtgql::CGqlRequestContextManager::Clear();
 				SetError(error, imtgql::IGqlContextCreator::CCS_INTERNAL_ERROR, QStringLiteral("Unable to restrict personal token permissions."));
 				return nullptr;
@@ -1803,7 +1847,7 @@ bool CAuthenticationManagerComp::BindToServerToken(
 		// What the user may give in its product is what this server holds for it, within its personal token; the token of the server bounds what it may do
 		gqlContext.SetGrantingAuthority(userInfoPtr->IsAdmin(), imtservergql::GetUserPermissions(gqlContext));
 
-		return imtgql::RestrictUserPermissions(gqlContext, serverScopes);
+		return RestrictUserPermissions(gqlContext, serverScopes);
 	}
 	else if (!clientProductId.isEmpty()){
 		imtauth::CIdentifiableUserInfo boundUserInfo;
