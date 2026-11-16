@@ -323,9 +323,13 @@ Item {
 
 		if (workspaceView.documentManager && workspaceView.documentManager.getDocumentDataById(id)){
 			return false
+
+		}
 		if (index === 0 && tabView.currentIndex > 0){
 			tabView.currentIndex--
 		}
+
+
 		}
 
 		tabView.removeTab(id)
