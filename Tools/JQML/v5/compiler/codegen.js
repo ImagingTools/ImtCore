@@ -184,6 +184,8 @@ class Codegen {
     scriptUrl(fileName){
         let key = path.normalize(fileName)
         if(this.scriptUrls.has(key)) return this.scriptUrls.get(key)
+        let declared = this.files.$qrcUrl ? this.files.$qrcUrl(fileName) : null
+        if(declared) return declared
         let dir = path.dirname(key)
         let neighbour = [...this.files.values()].find(file => file.url && path.dirname(path.normalize(file.fileName)) === dir)
         let base = neighbour ? neighbour.url.slice(0, neighbour.url.lastIndexOf('/') + 1) : ''
