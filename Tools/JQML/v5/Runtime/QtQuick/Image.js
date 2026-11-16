@@ -1,6 +1,6 @@
 const engine = require('../Core/engine')
 const { GroupObject } = require('../Core/QtObject')
-const { defineType } = require('../Core/type')
+const { defineType, makeReadonly } = require('../Core/type')
 const { Item, bits } = require('./Item')
 
 const STYLE = bits.STYLE
@@ -133,10 +133,10 @@ defineType(Image, {
         source: { kind: 'string', effect: reload },
         fillMode: { kind: 'int', effect: repaint },
         sourceSize: { group: SourceSize },
-        paintedWidth: 'real',
-        paintedHeight: 'real',
-        status: 'int',
-        progress: 'real',
+        paintedWidth: { kind: 'real', readonly: true },
+        paintedHeight: { kind: 'real', readonly: true },
+        status: { kind: 'int', readonly: true },
+        progress: { kind: 'real', readonly: true },
         asynchronous: 'bool',
         cache: { kind: 'bool', initial: true },
         smooth: { kind: 'bool', initial: true },
@@ -158,5 +158,9 @@ Object.assign(Image, { Stretch, PreserveAspectFit, PreserveAspectCrop, Tile, Til
         if((id === Item.WIDTH || id === Item.HEIGHT) && this.$natural !== undefined) this.$updatePainted()
     }
 }
+
+// read-only in Qt, writable in the base class
+makeReadonly(Image, 'implicitWidth')
+makeReadonly(Image, 'implicitHeight')
 
 module.exports = { SourceSize, Image }

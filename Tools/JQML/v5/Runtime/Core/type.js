@@ -13,6 +13,7 @@ class TypeInfo {
         this.signalArgs = base ? base.signalArgs.slice() : []
         this.initial = base ? base.initial.slice() : []
         this.groups = base ? base.groups.slice() : []   // ids of the grouped properties
+        this.varIds = base ? base.varIds.slice() : []   // ids of the guarded properties (QtObject guards)
     }
 
     addSignal(name, args = []){
@@ -63,7 +64,15 @@ function defineSignalAccessor(Class, name, id){
     })
 }
 
+// names of the classes defined so far: a QML type of the bundle is loaded once its class is (Qt.createComponent)
+const definedNames = new Set()
+
+function isDefined(name){
+    return definedNames.has(name)
+}
+
 function defineType(Class, spec = {}){
+    definedNames.add(Class.name)
     let base = Object.getPrototypeOf(Class).$type || null
     let type = new TypeInfo(base)
 
@@ -86,11 +95,15 @@ function defineType(Class, spec = {}){
             coerce: kind ? kind.coerce : null,
             effect: def.effect || null,
             group: def.group || null,
+            readonly: !!def.readonly,
+            // QQmlVMEMetaObject guards the objects held by the properties a QML document declares, not by C++ ones (anchors.fill)
+            guarded: !!spec.qml && def.kind === 'var',
         }
         type.props.push(prop)
         type.propByName.set(name, prop)
         type.initial.push(isGroup ? null : ('initial' in def ? def.initial : kind.initial))
         if(isGroup) type.groups.push(id)
+        if(prop.guarded) type.varIds.push(id)
 
         if(isGroup){
             let Group = def.group
@@ -141,4 +154,18 @@ function defineType(Class, spec = {}){
     return Class
 }
 
-module.exports = { defineType, TypeInfo }
+// A property the base class lets write and the class makes read-only, like Qt (Text.implicitWidth): a JavaScript write
+// throws; Class.$readonlyNames tells the compiler
+function makeReadonly(Class, name){
+    let descriptor = null
+    for(let proto = Class.prototype; proto && !descriptor; proto = Object.getPrototypeOf(proto)) descriptor = Object.getOwnPropertyDescriptor(proto, name)
+    Object.defineProperty(Class.prototype, name, {
+        get: descriptor.get,
+        set(){ throw new TypeError('Cannot assign to read-only property "' + name + '"') },
+        configurable: true,
+    })
+    if(!Object.prototype.hasOwnProperty.call(Class, '$readonlyNames')) Class.$readonlyNames = new Set(Class.$readonlyNames || [])
+    Class.$readonlyNames.add(name)
+}
+
+module.exports = { defineType, TypeInfo, isDefined, makeReadonly }

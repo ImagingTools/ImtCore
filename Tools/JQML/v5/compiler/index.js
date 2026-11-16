@@ -13,6 +13,12 @@ function readFileModel(fileName){
     let name = path.basename(fileName, '.qml')
     let model = new FileModel(name, fileName).build(ast)
     model.createsComponents = source.includes('createComponent')
+    model.createsQmlObjects = source.includes('createQmlObject')
+    // `import "dir"` and `import "x.js"` in the strings of a file that builds documents with Qt.createQmlObject: the bundle
+    // takes them, as Qt would read them from the disk
+    model.documentImports = model.createsQmlObjects
+        ? [...source.matchAll(/import\s+\\?["']([^"'\\\n]+)\\?["']/g)].map(m => m[1])
+        : []
     return model
 }
 
@@ -46,7 +52,13 @@ function addDir(files, dir, module, modules, entryDir, all = false){
     let entries = readQmldir(dir)
     let byFile = new Map(entries.map(e => [path.normalize(e.file), e]))
     for(let e of entries){
-        if(e.script && fs.existsSync(e.file)) files.$scripts.set(e.type, e.file)
+        if(!e.script || !fs.existsSync(e.file)) continue
+        files.$scripts.set(e.type, e.file)
+        // the scripts of a module, or of a directory with a qmldir: every document importing it gets them
+        for(let key of module ? [module.name, 'dir:' + pathKey(dir)] : ['dir:' + pathKey(dir)]){
+            if(!files.$moduleScripts.has(key)) files.$moduleScripts.set(key, [])
+            if(!files.$moduleScripts.get(key).includes(e.file)) files.$moduleScripts.get(key).push(e.file)
+        }
     }
     entries = entries.filter(e => !e.script)
     let names = !all && (module || fs.existsSync(path.resolve(dir, 'qmldir'))) ? entries.map(e => e.file) : fs.readdirSync(dir).filter(n => n.endsWith('.qml')).map(n => path.resolve(dir, n))
@@ -80,6 +92,7 @@ function addDir(files, dir, module, modules, entryDir, all = false){
 function collectFiles(entry, configPath){
     let files = new Map()
     files.$scripts = new Map()
+    files.$moduleScripts = new Map()
     files.$modules = new Map()
     files.$paths = new Set()
     let dirs = configPath && fs.existsSync(configPath) ? loadConfig(configPath).filter(dir => fs.existsSync(dir)) : []
@@ -104,6 +117,28 @@ function collectFiles(entry, configPath){
             if(added.has(imp.dirKey) || !fs.existsSync(dir)) continue
             added.add(imp.dirKey)
             addDir(files, dir, null, modules, entryDir)
+        }
+        let addDocumentDir = (dir) => {
+            if(added.has(pathKey(dir)) || !fs.existsSync(dir) || !fs.statSync(dir).isDirectory()) return
+            added.add(pathKey(dir))
+            addDir(files, dir, null, modules, entryDir)
+        }
+        for(let target of file.documentImports || []){
+            if(target.endsWith('.js') || /^[a-z]+:/i.test(target)) continue
+            addDocumentDir(path.resolve(path.dirname(file.fileName), target))
+        }
+        // a script that calls Qt.createQmlObject resolves the types of its documents against its own directory
+        for(let imp of file.imports){
+            let target = String(imp.path || '').replace(/^["']|["']$/g, '')
+            if(!target.endsWith('.js') || /^[a-z]+:/i.test(target)) continue
+            let script = path.resolve(path.dirname(file.fileName), target)
+            if(!fs.existsSync(script)) continue
+            let source = fs.readFileSync(script, 'utf8')
+            if(!source.includes('createQmlObject')) continue
+            addDocumentDir(path.dirname(script))
+            for(let m of source.matchAll(/import\s+\\?["']([^"'\\\n]+)\\?["']/g)){
+                if(!m[1].endsWith('.js') && !/^[a-z]+:/i.test(m[1])) addDocumentDir(path.resolve(path.dirname(script), m[1]))
+            }
         }
     }
     return files
@@ -189,7 +224,11 @@ window.addEventListener('load', () => {
     const root = JQ.create(() => new (${entryFile.typeRef.ref}$())(content))
     window.__root = root
 })`
-    let output = runtime + '\n;(function(){\n' + code + '\n' + bootstrap + '\n})();\n'
+    // Qt.createQmlObject compiles QML in the browser: the compiler joins the bundle only when an application uses it
+    let usesQmlCompiler = [...files.values()].some(file => file.createsQmlObjects)
+        || [...codegen.scripts.keys()].some(fileName => fs.existsSync(fileName) && fs.readFileSync(fileName, 'utf8').includes('createQmlObject'))
+    let qmlCompiler = usesQmlCompiler ? fs.readFileSync(path.resolve(__dirname, '../dist/qmlcompiler.js'), 'utf8') + '\n' : ''
+    let output = runtime + '\n' + qmlCompiler + ';(function(){\n' + code + '\n' + bootstrap + '\n})();\n'
     fs.writeFileSync(path.resolve(options.output, options.name + '.js'), escapeNonLatin1(output))
     return { warnings: codegen.warnings }
 }

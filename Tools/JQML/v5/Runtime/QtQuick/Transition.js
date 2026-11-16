@@ -1,4 +1,4 @@
-const { defineType } = require('../Core/type')
+const { defineType, makeReadonly } = require('../Core/type')
 const { STOPPED } = require('./Animation')
 const { ParallelAnimation } = require('./ParallelAnimation')
 
@@ -31,5 +31,8 @@ defineType(Transition, {
         enabled: { kind: 'bool', initial: true },
     },
 })
+
+// read-only in Qt, writable in the base class
+makeReadonly(Transition, 'running')
 
 module.exports = { Transition }
