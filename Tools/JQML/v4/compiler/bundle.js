@@ -82,11 +82,14 @@ function collectModules(srcDir, entry) {
 	return order;
 }
 
-// options: { srcDir, entry, banner, tail, file, sourceRoot }
+// options: { srcDir, entry, banner, tail, file, sourceRoot, transformModule }
 // Returns { code, map, modules }: the script, its source map (version 3) and the bundled module names.
 // `tail` runs inside the bundle after the modules and reaches them through `__modules`.
+// `transformModule(file, code)`: rewrites a module's code before it is emitted (the light obfuscation of the compiler), or returns
+// it unchanged. A transform that changes the number of lines keeps the source map valid (every line is still mapped to a real line
+// of the source) but loses its per-line precision for that module: every one of its generated lines maps to the module's first line.
 export function bundleRuntime(options) {
-	const { srcDir, entry = 'runtime.js', banner = '', tail = '', file = 'bundle.js' } = options;
+	const { srcDir, entry = 'runtime.js', banner = '', tail = '', file = 'bundle.js', transformModule } = options;
 	const modules = collectModules(srcDir, entry);
 
 	const generated = [];
@@ -110,10 +113,13 @@ export function bundleRuntime(options) {
 		sources.push(options.sourceRoot ? toPosix(path.join(options.sourceRoot, module.file)) : module.file);
 		sourcesContent.push(module.source);
 		emit(`__modules[${JSON.stringify(module.file)}] = (function () {`);
-		const lines = module.code.replace(/\n$/, '').split('\n');
+		const originalLines = module.code.replace(/\n$/, '').split('\n');
+		const code = transformModule ? transformModule(module.file, module.code) ?? module.code : module.code;
+		const lines = code.replace(/\n$/, '').split('\n');
+		const reshaped = lines.length !== originalLines.length;
 		for (let i = 0; i < lines.length; i++) {
 			generated.push(lines[i]);
-			mappings.push([sourceIndex, i]);
+			mappings.push([sourceIndex, reshaped ? 0 : i]);
 		}
 		emit(`return { ${module.exports.join(', ')} };`);
 		emit('})();');

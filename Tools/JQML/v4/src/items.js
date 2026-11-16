@@ -108,6 +108,20 @@ export function setDestroyObserver(callback) {
 	destroyObserver = callback;
 }
 
+// The destroyed items wait for the end of the running script, then let go of what they hold (Item.$sever).
+let severQueue = null;
+function severLater(item) {
+	if (severQueue === null) {
+		severQueue = [];
+		queueMicrotask(() => {
+			const list = severQueue;
+			severQueue = null;
+			for (const dead of list) dead.$sever();
+		});
+	}
+	severQueue.push(item);
+}
+
 // ----- Keyboard focus -----
 
 // One focused child per focus scope. The root (and every FocusScope) is a scope.
@@ -441,12 +455,19 @@ function notifyViews(model) {
 	}
 }
 
-// A function of a QML object connected to a signal of another object is disconnected when its object is destroyed.
+// A function of a QML object connected to a signal of another object is disconnected when its object is destroyed, and when the
+// object with the signal is destroyed (Qt drops the connection with either end). Both objects know the link: the owner to undo it,
+// the source to let the owner forget it. Without the second, an object that stays holds the undo function of a connection to an item of
+// a closed page, and the undo function holds that item.
 export function linkToOwner(source, fn, undo) {
 	const owner = fn.$owner;
 	if (owner === undefined || owner === source) return;
+	undo.$owner = owner;
+	undo.$source = source;
 	if (owner.$links === undefined) owner.$links = [];
 	owner.$links.push(undo);
+	if (source.$linksIn === undefined) source.$linksIn = new Set();
+	source.$linksIn.add(undo);
 }
 
 // Script assignment replaces a binding on these Item properties (Qt). `visible` must be
@@ -816,6 +837,31 @@ export class Item {
 		if (this.$owned !== undefined) for (const owned of this.$owned) owned.$destroy();
 		this.$destroyed = true;
 		if (destroyObserver !== null) destroyObserver(this);
+		severLater(this);
+	}
+
+	// What is left of a destroyed item holds nothing of the tree around it. In Qt a reference to a deleted object reads as null and the
+	// object is freed; here a script variable (a `property var` or `property Item` of an item that stays) can keep the husk alive, and
+	// through its parent, its scope and its properties the whole page it was in. It runs after the script that called destroy() has
+	// returned (QObject::deleteLater), so that script can still read the item.
+	$sever() {
+		const parent = this.$parent;
+		if (parent !== null) {
+			if (this.$queued && parent.$dirtyKids !== null) {
+				const index = parent.$dirtyKids.indexOf(this);
+				if (index >= 0) parent.$dirtyKids.splice(index, 1);
+			}
+			this.$parent = null;
+		}
+		this.$children = [];
+		this.$dirtyKids = null;
+		this.$scope = null;
+		this.$anchors = null;
+		if (this.$fnNames !== undefined) for (const name of this.$fnNames) this[name] = null; // the functions of the item hold its scope
+		if (this.$sigs !== null) for (const signal of this.$sigs.values()) signal.handlers = [];
+		this.$owned = undefined;
+		if (this.$defScope !== undefined) this.$defScope = null; // a Component: the scope it was written in
+		if (this.$custom !== null) for (const name in this.$custom) this.$custom[name] = null;
 	}
 
 	// Requests a new layout and repaint. This item needs a pass over its children, and so does its parent (it has to
@@ -1504,6 +1550,9 @@ export class Item {
 
 // Types whose own size follows their children: a change below them changes how their parent places them.
 Item.prototype.$contentSized = false;
+
+// The type name of an item where it is used, when it is a component (see Engine.createItem); the tests look items up by it.
+Item.prototype.$qmlType = '';
 
 Object.defineProperty(Item.prototype, Symbol.unscopables, {
 	value: Object.fromEntries(OBJECT_NAMES_UNSCOPABLE.map((name) => [name, true])),
@@ -4733,12 +4782,17 @@ function wrapRanges(info, text, start, stop, limit, anywhere, out) {
 	out.push({ start: lineStart, end: stop });
 }
 
+// The text editors of the scene (src/textproxy.js keeps an input element of the page for some of them).
+export const textEditors = new Set();
+
 // The editing core of TextInput (one line) and TextEdit (many lines). The cursor and the other end of the selection
 // (`$anchor`) are indexes into `$text`; undo steps are snapshots taken before a change.
 class TextEditor extends Item {
 	constructor(multiline) {
 		super();
+		textEditors.add(this);
 		this.$multi = multiline;
+		this.$hints = 0; // Qt.InputMethodHints
 		this.$text = '';
 		this.$color = BLACK;
 		this.$pixelSize = 12;
@@ -5099,6 +5153,42 @@ class TextEditor extends Item {
 		this.$touched();
 	}
 
+	// What the input element of the page mirrors: the text and the selection.
+	$domState() {
+		return { text: this.$text, start: this.$lo, end: this.$hi, backward: this.$cursor < this.$anchor };
+	}
+
+	// The input element of the page changed (typing, a virtual keyboard, a composition, a paste, the autofill of the browser): the model
+	// follows. `start` and `end` are the selection of the element. The change is found as what is between the common head and tail of the
+	// old and the new text, so the undo history, the cursor and `textEdited` work as for a typed key. Returns whether the text changed.
+	$fromDom(value, start, end, backward) {
+		if (!this.$editable) return false;
+		const next = this.$multi ? String(value) : String(value).replace(/[\r\n]/g, ' ');
+		const old = this.$text;
+		let changed = false;
+		if (next !== old) {
+			const shortest = Math.min(old.length, next.length);
+			let head = 0;
+			while (head < shortest && old.charCodeAt(head) === next.charCodeAt(head)) head++;
+			if (head > 0 && head < shortest && isHighSurrogate(old.charCodeAt(head - 1))) head--;
+			let tail = 0;
+			while (tail < shortest - head && old.charCodeAt(old.length - 1 - tail) === next.charCodeAt(next.length - 1 - tail)) tail++;
+			if (tail > 0 && isLowSurrogate(old.charCodeAt(old.length - tail))) tail--;
+			const inserted = next.slice(head, next.length - tail);
+			changed = this.$splice(head, old.length - tail, inserted, inserted === '' ? 'delete' : 'type', false);
+			this.$emit('textEdited', []);
+		}
+		if (this.$text === next) {
+			const n = next.length;
+			const lo = clampIndex(start, n);
+			const hi = clampIndex(end, n);
+			this.$cursor = backward ? lo : hi;
+			this.$anchor = backward ? hi : lo;
+			this.$touched();
+		}
+		return changed;
+	}
+
 	// ----- the API of the QML types -----
 
 	select(start, end) {
@@ -5425,6 +5515,11 @@ class TextEditor extends Item {
 
 	// ----- focus and the text cursor -----
 
+	$destroy() {
+		textEditors.delete(this);
+		super.$destroy();
+	}
+
 	$focusEdge() {
 		const now = this.$active;
 		if (now === this.$focused) return;
@@ -5647,6 +5742,7 @@ for (const [name, field, coerce] of [
 	['bottomPadding', '$padB', toFloat],
 	['wrapMode', '$wrap', toWrapMode],
 	['echoMode', '$echo', toEcho],
+	['inputMethodHints', '$hints', toFloat],
 	['textFormat', '$format', (value) => (value === undefined || value === null ? 'PlainText' : String(value))],
 ]) {
 	defineProp(
@@ -6676,6 +6772,19 @@ export class TreeItemModel extends Item {
 		this.$touch();
 		return true;
 	}
+
+	// The keys of the row `index` are set in the row `externalIndex` of `other` (the C++ CopyItemDataToModel): the values are not
+	// copied deeply, a nested model is shared. false when the row has no keys, as in C++.
+	copyItemDataToModel(index, other, externalIndex = 0) {
+		const row = this.$rows[index];
+		if (row === undefined || !(other instanceof TreeItemModel)) return false;
+		let result = false;
+		for (const key of Object.keys(row)) {
+			result = other.setData(key, row[key], externalIndex);
+			if (!result) break;
+		}
+		return result;
+	}
 }
 
 defineReadOnly(
@@ -6909,6 +7018,11 @@ export class Loader extends Item {
 		this.$declareSignal('loaded', []);
 		this.$declareSignal('itemChanged', []);
 		this.$declareSignal('statusChanged', []);
+	}
+
+	$sever() {
+		this.$sourceComponent = null;
+		super.$sever();
 	}
 
 	// An explicit width (or anchors that set it) wins; otherwise the loaded item's width.

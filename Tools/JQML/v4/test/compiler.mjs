@@ -123,18 +123,22 @@ const checks = {
 		}
 	},
 
-	// The default build carries the documents as packed trees: no QML text, no comments, nothing to reach the engine through.
+	// The default build carries the documents as packed trees, deflated into one block, and strips the comments and the layout
+	// of the engine's own code: no QML text, no comments, nothing to reach the engine through.
 	async 'compiled mode'() {
 		const result = await compile({ mode: 'js', config: join(fixture, 'app.json'), entry: 'app/Main.qml', name: 'index', root: '/data/' }, quiet);
 		const spec = JSON.parse(JSON.stringify(result.spec));
 		assert.equal(spec.debug, undefined);
 		assert.deepEqual(Object.keys(spec.files).sort(), ['modules/Widgets/qmldir', 'modules/Widgets/util.js']);
-		assert.deepEqual(Object.keys(spec.docs).sort(), ['app/Main.qml', 'app/Sibling.qml', 'app/Unused.qml', 'modules/Widgets/Base/Theme.qml', 'modules/Widgets/Widget.qml']);
-		for (const text of [result.code, JSON.stringify(spec.docs)]) {
+		assert.equal(spec.docs, undefined);
+		assert.equal(spec.scans, undefined);
+		assert.equal(typeof spec.docsDeflate, 'string');
+		for (const text of [result.code, spec.docsDeflate]) {
 			assert.ok(!text.includes('import QtQuick'), 'the text of a document is in the bundle');
 			assert.ok(!text.includes('The entry of the compiler test'), 'a comment of a document is in the bundle');
 			assert.ok(!text.includes('property string greeting'), 'a declaration is in the bundle as text');
 		}
+		assert.ok(!result.code.includes('an error of a binding while it runs is only logged'), 'a comment of the engine is in the bundle');
 		// A page does not reach the engine, the project or the documents through its window.
 		assert.equal(evaluateBundle(result.code), undefined);
 
@@ -153,6 +157,84 @@ const checks = {
 		assert.equal(unused.parsed, false);
 		assert.ok(unused.def !== null && unused.error === null);
 		assert.equal(unused.parsed, true);
+		// The documents are there once the application has started: a page that never starts never inflates them.
+		assert.ok(app.project.docs.has('app/Main.qml'));
+	},
+
+	// --no-compress-docs: the packed trees and their scans stay as the plain spec.docs/spec.scans of a build before this feature,
+	// for one that cannot rely on DecompressionStream.
+	async '--no-compress-docs'() {
+		const result = await compile({ mode: 'js', config: join(fixture, 'app.json'), entry: 'app/Main.qml', name: 'index', root: '/data/', compressDocs: false }, quiet);
+		const spec = JSON.parse(JSON.stringify(result.spec));
+		assert.equal(spec.docsDeflate, undefined);
+		assert.deepEqual(Object.keys(spec.docs).sort(), ['app/Main.qml', 'app/Sibling.qml', 'app/Unused.qml', 'modules/Widgets/Base/Theme.qml', 'modules/Widgets/Widget.qml']);
+
+		const app = createCompiledApplication({ ...spec, language: 'de-DE' }, null);
+		app.scene.resize(800, 600, 1);
+		const root = await app.start();
+		for (let i = 0; i < 3; i++) app.scene.drawFrame(i * 0.016);
+		assert.equal(root.greeting, 'Hallo');
+		assert.equal(root.sum, 5);
+		const names = [];
+		walk(root, (item) => names.push(item.objectName));
+		assert.ok(names.includes('widget') && names.includes('sibling') && names.includes('widgetText'));
+		assert.equal(app.engine.errors.length, 0, app.engine.errors.join('\n'));
+	},
+
+	// By default the documents are there only once the application has started (they are still deflated before that);
+	// a browser with no DecompressionStream fails there with a message that says so, not with some other error.
+	async 'compressed docs need DecompressionStream'() {
+		const result = await compile({ mode: 'js', config: join(fixture, 'app.json'), entry: 'app/Main.qml', name: 'index' }, quiet);
+		const spec = JSON.parse(JSON.stringify(result.spec));
+		const app = createCompiledApplication(spec, null);
+		const real = globalThis.DecompressionStream;
+		globalThis.DecompressionStream = undefined;
+		try {
+			await assert.rejects(app.start(), /DecompressionStream/);
+		} finally {
+			globalThis.DecompressionStream = real;
+		}
+	},
+
+	// --no-obfuscate-light: the engine's own code keeps its comments and its layout, for a build whose own bundle must stay
+	// readable (without going as far as --debug, which also keeps the QML documents as text).
+	async '--no-obfuscate-light'() {
+		const plain = await compile({ mode: 'js', config: join(fixture, 'app.json'), entry: 'app/Main.qml', name: 'index', obfuscateLight: false }, quiet);
+		assert.ok(plain.code.includes('an error of a binding while it runs is only logged'), 'a comment of the engine is missing with the flag off');
+
+		const result = await compile({ mode: 'js', config: join(fixture, 'app.json'), entry: 'app/Main.qml', name: 'index', root: '/data/' }, quiet);
+		assert.ok(result.code.length < plain.code.length, 'the default (obfuscated) bundle is not smaller');
+
+		const spec = JSON.parse(JSON.stringify(result.spec));
+		const app = createCompiledApplication({ ...spec, language: 'de-DE' }, null);
+		app.scene.resize(800, 600, 1);
+		const root = await app.start();
+		for (let i = 0; i < 3; i++) app.scene.drawFrame(i * 0.016);
+		assert.equal(root.greeting, 'Hallo');
+		assert.equal(root.sum, 5);
+		assert.equal(app.engine.errors.length, 0, app.engine.errors.join('\n'));
+	},
+
+	// The default build also renames a QML script's own locals (compiler/mangleLocals): never an id, and the application still
+	// computes the same thing. --no-obfuscate-light keeps the original names, for a build that must stay readable end to end.
+	async 'obfuscate-light renames a QML script\'s own locals'() {
+		const local = join(fixture, 'standalone', 'Local.qml');
+		const obfuscated = await compile({ mode: 'js', entry: local, name: 'index', compressDocs: false }, quiet);
+		const readable = await compile({ mode: 'js', entry: local, name: 'index', obfuscateLight: false, compressDocs: false }, quiet);
+		const obfuscatedDocs = JSON.stringify(JSON.parse(JSON.stringify(obfuscated.spec)).docs);
+		const readableDocs = JSON.stringify(JSON.parse(JSON.stringify(readable.spec)).docs);
+		assert.ok(!obfuscatedDocs.includes('"upTo"') && !obfuscatedDocs.includes('"acc"'), 'a local name is still in the obfuscated bundle');
+		assert.ok(readableDocs.includes('upTo') && readableDocs.includes('acc'), 'a local name is missing even with the flag off');
+		assert.ok(obfuscatedDocs.includes('root') && readableDocs.includes('root'), 'the id was renamed along with the locals');
+
+		for (const spec of [obfuscated.spec, readable.spec]) {
+			const app = createCompiledApplication(JSON.parse(JSON.stringify(spec)), null);
+			app.scene.resize(300, 200, 1);
+			const root = await app.start();
+			for (let i = 0; i < 3; i++) app.scene.drawFrame(i * 0.016);
+			assert.equal(root.total, 6 + 300);
+			assert.equal(app.engine.errors.length, 0, app.engine.errors.join('\n'));
+		}
 	},
 
 	async 'syntax error'() {

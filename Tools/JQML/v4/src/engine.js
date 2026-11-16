@@ -10,7 +10,7 @@ import { Animation, ANIMATION_TYPES, AnchorLine, BindingValue, BUILTIN_TYPES, CO
 import { fonts } from './fonts.js';
 import { KEY, MODIFIERS, NAMED_KEY_HANDLERS, qtKeyEvent, STANDARD_KEYS } from './keys.js';
 import { QmlError, escapeSourceBreaks, tokenize, topLevelNames } from './lexer.js';
-import { callableHandler } from './parser.js';
+import { callableHandler, parseQmlDocument } from './parser.js';
 import { resolveExpression } from './resolve.js';
 import { scanOf } from './project.js';
 import { basename, dirname, hslaString, joinPath, normalizePath, parseColor, resolvePath, rgbaString, SCRIPT_IMPORT_RE } from './util.js';
@@ -473,6 +473,8 @@ export class Engine {
 		this.usesTime = false;
 		this.errors = [];
 		this.errorSet = new Set();
+		this.creationErrors = null;
+		this.inlineDocs = new Map();
 		this.bindings = new Set();
 		// Incremental evaluation: a pass runs the bindings in `dirty` (a read property was written, the layout moved
 		// what they read, they were just created) and the `volatile` ones, which read something that is not announced.
@@ -588,6 +590,26 @@ export class Engine {
 			...enumObject(QT_ENUMS),
 			...CURSOR,
 			...BRUSH_PATTERN,
+			// Qt::InputMethodHint: what the page's input element of an editor is made for (keyboard layout, autocapitalization).
+			ImhNone: 0,
+			ImhHiddenText: 0x1,
+			ImhSensitiveData: 0x2,
+			ImhNoAutoUppercase: 0x4,
+			ImhPreferNumbers: 0x8,
+			ImhPreferUppercase: 0x10,
+			ImhPreferLowercase: 0x20,
+			ImhNoPredictiveText: 0x40,
+			ImhDate: 0x80,
+			ImhTime: 0x100,
+			ImhMultiLine: 0x200,
+			ImhDigitsOnly: 0x10000,
+			ImhFormattedNumbersOnly: 0x20000,
+			ImhUppercaseOnly: 0x40000,
+			ImhLowercaseOnly: 0x80000,
+			ImhDialableCharactersOnly: 0x100000,
+			ImhEmailCharactersOnly: 0x200000,
+			ImhUrlCharactersOnly: 0x400000,
+			ImhLatinOnly: 0x800000,
 			// Qt::ShortcutContext.
 			WidgetShortcut: 0,
 			WindowShortcut: 1,
@@ -621,6 +643,7 @@ export class Engine {
 			application: Object.freeze({ arguments: [], name: '', version: '' }),
 			createObject: (type, parent, props) => engine.createObject(type, parent, props),
 			createComponent: (url, second, third) => engine.createComponent(url, second, third),
+			createQmlObject: (...args) => engine.createQmlObject(...args),
 			resolvedUrl: (url) => url,
 			quit: () => {
 				if (engine.onQuit !== null) engine.onQuit();
@@ -847,6 +870,7 @@ export class Engine {
 		this.ambiguousSingletons.clear();
 		this.errors = [];
 		this.errorSet.clear();
+		this.inlineDocs.clear();
 		this.completed = [];
 		this.modules.clear();
 		this.usesTime = false;
@@ -859,6 +883,7 @@ export class Engine {
 
 	// Reports a script or evaluation problem; the same message is only stored once.
 	report(where, error, line) {
+		if (this.creationErrors !== null && /^(Cannot assign to non-existent property|Unknown type)/.test(describe(error))) this.creationErrors.push({ error, line });
 		const lineText = line ? `: line ${line}` : '';
 		const text = `${where}${lineText}: ${describe(error)}`;
 		if (this.errorSet.has(text) || this.errors.length >= this.maxErrors) return;
@@ -2169,8 +2194,11 @@ export class Engine {
 		return true;
 	}
 
-	dispatchKey(domEvent, pressed) {
+	// `native`: the key is edited by an input element of the page (src/textproxy.js), the focused editor does not edit with it; its Keys
+	// handlers and the items around it get the key as usual.
+	dispatchKey(domEvent, pressed, native = false) {
 		const event = qtKeyEvent(domEvent);
+		const editor = native ? getFocusItem() : null;
 		const shift = (event.modifiers & MODIFIERS.ShiftModifier) !== 0;
 		if (pressed && this.activateShortcut(event)) return true;
 		for (let item = getFocusItem(); item !== null && item !== undefined; item = item.$parent) {
@@ -2186,7 +2214,7 @@ export class Engine {
 				}
 			}
 			if (!pressed) continue;
-			if (item.$keyPressed !== undefined && this.guard(() => item.$keyPressed(event), `key ${item.$typeName}`, 0) === true) return true;
+			if (item !== editor && item.$keyPressed !== undefined && this.guard(() => item.$keyPressed(event), `key ${item.$typeName}`, 0) === true) return true;
 			const target = keyNavigationTarget(item, event.key, shift);
 			if (target !== null) {
 				target.forceActiveFocus();
@@ -2402,6 +2430,8 @@ export class Engine {
 		if (this.lenient) item.$open = true;
 		item.$scope = scope;
 		const chain = [{ def, scope }, ...overlays];
+		// The name the type has where the item is used (`ImtButton` of a component whose root is a Rectangle): the tests look items up by it.
+		if (chain.length > 1) item.$qmlType = chain[chain.length - 1].def.type;
 		item.$constructing = true;
 		for (const link of chain) {
 			if (link.scope.root === null) link.scope.root = item;
@@ -2755,6 +2785,8 @@ export class Engine {
 		const bound = compiled.bind(item);
 		bound.$owner = item;
 		Object.defineProperty(item, fn.name, { value: bound, enumerable: true, configurable: true, writable: true });
+		if (item.$fnNames === undefined) item.$fnNames = [];
+		item.$fnNames.push(fn.name);
 	}
 
 	// ----- properties -----
@@ -3340,6 +3372,68 @@ export class Engine {
 		return component;
 	}
 
+	// `Qt.createQmlObject(qml, parent[, url])`: the object of the QML text, a child of `parent` whose context it sees (the ids of the
+	// document of `parent` are names in its bindings). The text is a document of its own: it has its imports and one root. `url` is
+	// what the errors name and where the relative types and imports are looked up; it is `inline` in the directory of the document of
+	// `parent` by default. Like in Qt an empty text gives null, a text that does not parse, a type or a property that does not exist
+	// throws an Error and no object stays, and an error of a binding while it runs is only logged. The types come from the modules and
+	// directories the project has loaded.
+	createQmlObject(code, parent, url) {
+		const header = 'Qt.createQmlObject(): ';
+		if (arguments.length < 2) throw new Error(`${header}Insufficient arguments`);
+		if (parent === null || typeof parent !== 'object' || parent.$typeName === undefined) throw new Error(`${header}Missing parent object`);
+		if (this.project === null) throw new Error(`${header}no project`);
+		const text = String(code);
+		if (text.trim() === '') return null;
+		const file = parent.$scope === null || parent.$scope === undefined ? this.project.mainPath : parent.$scope.file;
+		const where = url === undefined ? joinPath(dirname(file), 'inline') : String(url);
+		const failure = (error, line, column) => new Error(`${header}failed to create object: 
+    ${where}:${line}:${column}: ${describe(error)}`);
+		const path = url === undefined ? where : this.documentPath(where);
+		let byText = this.inlineDocs.get(path);
+				if (byText === undefined) {
+					byText = new Map();
+					this.inlineDocs.set(path, byText);
+				}
+				let kept = byText.get(text);
+		if (kept === undefined) {
+			kept = { path: `${path}#${byText.size}`, source: text, def: null, error: null };
+			try {
+				kept.def = parseQmlDocument(text, !this.project.trusted);
+			} catch (error) {
+				if (!(error instanceof QmlError)) throw error;
+				throw failure(error, error.line, error.column);
+			}
+			this.project.docs.set(kept.path, kept);
+			byText.set(text, kept);
+		}
+		const scope = this.newScope(parent.$scope === undefined ? null : parent.$scope, kept.path);
+		const mark = this.completed.length;
+		const outer = this.creationErrors;
+		const errors = [];
+		this.creationErrors = errors;
+		let item = null;
+		const known = parent instanceof Item ? new Set(parent.$children) : null;
+		try {
+			item = this.createItem(kept.def, scope, parent instanceof Item ? parent : null, [], undefined, 0, true);
+		} catch (error) {
+			errors.push({ error, line: error instanceof QmlError ? error.line : 0 });
+		} finally {
+			this.creationErrors = outer;
+		}
+		if (errors.length > 0) {
+			// What was made before the error: the object, or the one that a failure inside of it left as a child of the parent.
+			if (item !== null && item !== undefined && typeof item.destroy === 'function') item.destroy();
+			if (known !== null) for (const child of [...parent.$children]) if (!known.has(child)) child.destroy();
+			const first = errors[0];
+			throw failure(first.error, first.line || kept.def.line, first.error instanceof QmlError && first.error.column ? first.error.column : kept.def.col);
+		}
+		// The values of the bindings are there when the call returns, also for an object without a Component.onCompleted.
+		this.evaluateFresh();
+		this.runCompletedFrom(mark);
+		return item;
+	}
+
 	// The path of `url` relative to the main document; `qrc:` and `file:` prefixes are dropped.
 	documentPath(url) {
 		return resolvePath(url.replace(/^qrc:\/*/, '/'), dirname(this.project.mainPath));
@@ -3450,7 +3544,23 @@ export class Engine {
 		if (item.$links !== undefined) {
 			const links = item.$links;
 			item.$links = undefined;
-			for (const undo of links) undo();
+			for (const undo of links) {
+				undo();
+				if (undo.$source !== undefined && undo.$source.$linksIn !== undefined) undo.$source.$linksIn.delete(undo);
+			}
+		}
+		if (item.$linksIn !== undefined) {
+			// The connections to a signal of this item: the objects that made them let go of them.
+			const incoming = item.$linksIn;
+			item.$linksIn = undefined;
+			for (const undo of incoming) {
+				undo();
+				const links = undo.$owner.$links;
+				if (links !== undefined) {
+					const at = links.indexOf(undo);
+					if (at >= 0) links.splice(at, 1);
+				}
+			}
 		}
 		if (item.$chg !== undefined) {
 			for (const list of item.$chg.values()) {
