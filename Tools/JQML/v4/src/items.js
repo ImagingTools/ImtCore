@@ -6772,6 +6772,19 @@ export class TreeItemModel extends Item {
 		this.$touch();
 		return true;
 	}
+
+	// The keys of the row `index` are set in the row `externalIndex` of `other` (the C++ CopyItemDataToModel): the values are not
+	// copied deeply, a nested model is shared. false when the row has no keys, as in C++.
+	copyItemDataToModel(index, other, externalIndex = 0) {
+		const row = this.$rows[index];
+		if (row === undefined || !(other instanceof TreeItemModel)) return false;
+		let result = false;
+		for (const key of Object.keys(row)) {
+			result = other.setData(key, row[key], externalIndex);
+			if (!result) break;
+		}
+		return result;
+	}
 }
 
 defineReadOnly(
