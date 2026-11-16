@@ -12,6 +12,7 @@
 #include <imtauth/CUserConnectionInfo.h>
 #include <imtauth/ITenantInfo.h>
 #include <imtauthgql/imtauthgql.h>
+#include <imtgql/CGqlRequestContextManager.h>
 #include <imtgql/imtgql.h>
 
 
@@ -258,6 +259,9 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateAu
 
 	if (m_jwtSessionControllerCompPtr.IsValid()){
 		imtauth::IJwtSessionController::UserSession userSession;
+		// Every sign-in ends here: the session belongs to the server the request came through
+		const imtgql::IGqlContext* requestContextPtr = imtgql::CGqlRequestContextManager::GetContext();
+		userSession.productId = requestContextPtr != nullptr ? requestContextPtr->GetServerProductId() : QByteArray();
 		if (m_jwtSessionControllerCompPtr->CreateNewSession(objectId, QByteArray(), userSession)){
 			payload.refreshToken = userSession.refreshToken;
 			payload.token = userSession.accessToken;

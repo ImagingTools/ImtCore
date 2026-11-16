@@ -10,6 +10,9 @@
 #include <iprm/CParamsSet.h>
 #include <imeas/CSimpleNumericValue.h>
 
+// ImtCore includes
+#include <imtdoc/IDocumentService.h>
+
 
 namespace imtdoc
 {
@@ -138,6 +141,19 @@ int GetRevisionFromParams(const iprm::IParamsSet* paramsPtr)
 	}
 
 	return qRound(values[0]);
+}
+
+
+bool IsDocumentStored(const IDocumentService& documentService, const QByteArray& userId, const QByteArray& documentId)
+{
+	const IDocumentService::DocumentList documents = documentService.GetOpenedDocumentList(userId);
+	for (const IDocumentService::DocumentListItem& document : documents){
+		if (document.documentId == documentId){
+			return !document.documentSourceRef.isEmpty();
+		}
+	}
+
+	return true;
 }
 
 

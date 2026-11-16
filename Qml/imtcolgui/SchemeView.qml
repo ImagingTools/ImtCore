@@ -42,6 +42,8 @@ Rectangle {
 	signal revertSignal();
 	signal modelDataChanged();
 	signal objectMoveFinished();
+	// Right click on an object (it is selected first); menuX/menuY are window coordinates.
+	signal contextMenuRequested(int index, real menuX, real menuY);
 	
 	ApplicationEvents {
 		onDesignSchemeChanged: {
@@ -76,6 +78,11 @@ Rectangle {
 	}
 	
 	onSelectedIndexChanged: {
+		// Selection set from outside (e.g. after the model was replaced) must reach the canvas too.
+		if (canvas.selectedIndex !== selectedIndex){
+			canvas.selectedIndex = selectedIndex
+			canvas.requestPaint()
+		}
 		console.log("SchemeView.qml onSelectedIndexChanged", selectedIndex)
 	}
 
@@ -118,20 +125,46 @@ Rectangle {
 		requestPaint()
 	}
 	
+	// Fits the objects of the scheme, or the whole sheet when there are none
 	function zoomToFit(){
-		if (canvas.backgroundWidth == 0 | canvas.backgroundHeight == 0){
+		let bounds = canvasPage.getContentBounds()
+		if (bounds.width <= 0 || bounds.height <= 0 || canvas.width <= 0 || canvas.height <= 0){
 			return
 		}
-		
-		let scaleCoeff_ = (canvas.width - Style.marginM * 2) / canvas.backgroundWidth;
-		let scaleCoeff_h = (canvas.height - Style.marginM * 2) / canvas.backgroundHeight;
-		if (scaleCoeff_ > scaleCoeff_h){
-			scaleCoeff_ = scaleCoeff_h
+
+		let margin = Style.marginXL * 2
+		let scaleCoeff_ = Math.min((canvas.width - margin * 2) / bounds.width, (canvas.height - margin * 2) / bounds.height)
+		// A few objects are not blown up
+		scaleCoeff_ = Math.min(scaleCoeff_, 1.2)
+		if (scaleCoeff_ <= 0){
+			return
 		}
-		canvas.setScale(scaleCoeff_, canvas.width / 2, canvas.height / 2)
-		
-		canvas.deltaX = canvasPage.width / 2 - backgroundRec.width / 2
-		canvas.deltaY = canvasPage.height / 2 - backgroundRec.height / 2
+
+		canvas.scaleCoeff = scaleCoeff_
+		canvas.scaleCoeffPrev = scaleCoeff_
+		canvas.deltaX = canvas.width / 2 - (bounds.x + bounds.width / 2) * scaleCoeff_
+		canvas.deltaY = canvas.height / 2 - (bounds.y + bounds.height / 2) * scaleCoeff_
+	}
+
+	function getContentBounds(){
+		if (canvasPage.objectsModel.count === 0){
+			return {"x": 0, "y": 0, "width": canvas.backgroundWidth, "height": canvas.backgroundHeight}
+		}
+
+		let left = Number.MAX_VALUE
+		let top = Number.MAX_VALUE
+		let right = -Number.MAX_VALUE
+		let bottom = -Number.MAX_VALUE
+		for (let i = 0; i < canvasPage.objectsModel.count; i++){
+			let item = canvasPage.objectsModel.get(i).item
+			let width_ = item.m_width ? item.m_width : canvas.mainRec_width
+			left = Math.min(left, item.m_x)
+			top = Math.min(top, item.m_y)
+			right = Math.max(right, item.m_x + width_ + canvas.shadowSize)
+			bottom = Math.max(bottom, item.m_y + canvas.mainRec_height + canvas.shadowSize)
+		}
+
+		return {"x": left, "y": top, "width": right - left, "height": bottom - top}
 	}
 	
 	function requestPaint(){
@@ -157,7 +190,6 @@ Rectangle {
 			//     return;
 			// }
 			// let id = objectsModel.getData("id", canvas.selectedIndex);
-			console.log("Go inside");
 		}
 	}
 	
@@ -202,6 +234,17 @@ Rectangle {
 			
 			anchors.fill: parent;
 			cursorShape: Qt.OpenHandCursor;
+			acceptedButtons: Qt.LeftButton | Qt.RightButton;
+			
+			// The right button only selects an object, it neither moves objects nor pans the scheme.
+			property bool rightButtonPressed: false;
+			
+			onRightClicked: {
+				if (canvas.selectedIndex >= 0){
+					let point = controlArea.mapToItem(null, mouseX, mouseY);
+					canvasPage.contextMenuRequested(canvas.selectedIndex, point.x, point.y);
+				}
+			}
 			
 			onClicked: {
 				if(!wasMoving){
@@ -223,8 +266,8 @@ Rectangle {
 			
 			onPressed: {
 				console.log("onPressed", canvas.selectedIndex)
+				controlArea.rightButtonPressed = mouse.button == Qt.RightButton;
 				canvas.selectedIndex = -1;
-				console.log("canvasPage.objectsModel", canvasPage.objectsModel.toJson())
 				for(let i = 0; i < canvasPage.objectsModel.count; i++){
 					let item = canvasPage.objectsModel.get(i).item;
 					let x_ = item.m_x;
@@ -239,12 +282,11 @@ Rectangle {
 					height_ = height_  * canvas.scaleCoeff;
 					
 					let ok = checkInsideMovingItem(x_, y_, width_, height_);
-					console.log("ok", ok, i)
 					if(ok){
 						canvas.selectedIndex = i;
 					}
 				}
-				if(canvas.selectedIndex == -1){
+				if(canvas.selectedIndex == -1 && !controlArea.rightButtonPressed){
 					controlArea.cursorShape = Qt.ClosedHandCursor;
 				}
 			}
@@ -256,7 +298,7 @@ Rectangle {
 				else {
 					controlArea.cursorShape = Qt.OpenHandCursor
 				}
-				if (canvas.selectedIndex >= 0 && wasMoving){
+				if (canvas.selectedIndex >= 0 && wasMoving && !controlArea.rightButtonPressed){
 					canvasPage.objectMoveFinished()
 				}
 			}
@@ -265,12 +307,16 @@ Rectangle {
 				wasMoving = false;
 				isPressed = false;
 				
-				if(canvas.selectedIndex >= 0){
+				if(canvas.selectedIndex >= 0 && mouse.button != Qt.RightButton){
 					canvasPage.goInside();
 				}
 			}
 			
 			onDeltaSignal: {
+				if (controlArea.rightButtonPressed){
+					return;
+				}
+				
 				if(canvas.selectedIndex < 0){
 					canvasPage.autoFit = false;
 					
@@ -454,6 +500,8 @@ Rectangle {
 			property int radius_: Style.radiusXS
 			property int borderShift: 4
 			property int shadowSize: 6
+			// Offset of the back card that marks composite objects (groups)
+			property int compositeStackOffset: 3
 			
 			property int backgroundStep: 30
 			property int backgroundWidth: 1024
@@ -470,23 +518,38 @@ Rectangle {
 			property string selectedColor: Style.selectedColor
 			property string mainColor: Style.borderColor2
 			property string errorColor: Style.errorColor
-			property string compositeColor: Style.firstColorHighlight;
-			property string compositeSelectedColor: Style.imaginToolsAccentColor;
+			property string compositeColor: Style.alternateBaseColor;
+			property string compositeSelectedColor: Style.selectedColor;
+			property string compositeBorderColor: Style.imaginToolsAccentColor;
 			property string selectedLinkFromColor: Style.selectedLinkFromColor
 			property string selectedLinkToColor: Style.selectedLinkToColor
 			property string linkColor: Style.borderColor2
 			property string mainTextColor: Style.textColor
 			property string secondTextColor: Style.inactiveTextColor
-			property string gridColor: Style.imagingToolsGradient1;
+			// The grid is drawn faint with the border color, which suits every theme
+			property string gridColor: Style.borderColor;
+			property real gridOpacity: 0.35;
 			property string backgroundBorderColor: Style.borderColor; // Style.alternateBaseColor;
 			property string backgroundColor: Style.baseColor;
 			property string innerFrameColor: "transparent";
 			
 			onSelectedIndexChanged: {
 				canvasPage.selectedIndex = selectedIndex
-				console.log("Canvas.qml onSelectedIndexChanged", selectedIndex)
 			}
 			
+			// A theme sets the colors of Style after its change event, so the canvas follows the colors themselves
+			onBackgroundColorChanged: {
+				requestPaint()
+			}
+
+			onMainTextColorChanged: {
+				requestPaint()
+			}
+
+			onGridColorChanged: {
+				requestPaint()
+			}
+
 			onWidthChanged: {
 				requestPaint()
 			}
@@ -587,8 +650,8 @@ Rectangle {
 				
 				ctx.fillStyle = canvas.gridColor;
 				ctx.strokeStyle = canvas.gridColor;
-				
-				
+				ctx.globalAlpha = canvas.gridOpacity;
+
 				for(let i = 0; i * step < canvas.backgroundWidth; i++){//vertical lines
 					let x1 = i * step;
 					let y1 =  0 ;
@@ -613,6 +676,7 @@ Rectangle {
 					ctx.stroke();
 				}
 				
+				ctx.globalAlpha = 1;
 				ctx.strokeStyle = canvas.backgroundBorderColor;
 				ctx.lineWidth = 2;
 				ctx.beginPath()
@@ -697,9 +761,7 @@ Rectangle {
 				let selected = index === canvas.selectedIndex
 				
 				let hasError = item.m_hasError
-				let isComposite = item.m_isComposite
-				
-				isComposite = false
+				let isComposite = item.m_isComposite === true
 				
 				ctx.lineCap = "round"
 				ctx.lineJoin = "round"
@@ -711,17 +773,18 @@ Rectangle {
 				let shadowSize = canvas.shadowSize;
 				ctx.lineWidth = 2 ;
 				// ctx.fillStyle = selected ? Qt.rgba(0.2, 0.8, 0, 0.3) : Qt.rgba(0, 0, 0, 0.2);
-				ctx.fillStyle = Qt.rgba(0, 0, 0, 0.2);
+				ctx.fillStyle = Qt.rgba(0, 0, 0, 0.1);
 				ctx.beginPath()
 				ctx.roundedRect(x_ + shadowSize, y_ + shadowSize, mainRecWidth, canvas.mainRec_height , canvas.radius_, canvas.radius_);
 				ctx.fill();
 				
+
+				
 				//main rectangle
 				ctx.lineWidth = 2 ;
-				ctx.strokeStyle = hasError ? canvas.errorColor : canvas.mainColor;
-				ctx.fillStyle = (!selected && !isComposite) ? backgroundColor :
-															  (!selected && isComposite) ? canvas.compositeColor:
-																						   (selected && isComposite) ? canvas.compositeSelectedColor: (selected && !isComposite) ? canvas.selectedColor : backgroundColor;
+				ctx.strokeStyle = hasError ? canvas.errorColor : isComposite ? canvas.compositeBorderColor : canvas.mainColor;
+				ctx.fillStyle = isComposite ? (selected ? canvas.compositeSelectedColor : canvas.compositeColor) :
+											  (selected ? canvas.selectedColor : backgroundColor);
 				ctx.beginPath()
 				ctx.roundedRect(x_, y_, mainRecWidth, canvas.mainRec_height , canvas.radius_, canvas.radius_);
 				ctx.fill();
@@ -734,6 +797,19 @@ Rectangle {
 				ctx.roundedRect(x_ + canvas.borderShift, y_ + canvas.borderShift, mainRecWidth - 2 * canvas.borderShift, canvas.mainRec_height  - 2 * canvas.borderShift, canvas.radius_, canvas.radius_);
 				ctx.stroke();
 				
+				//frame of the composite object (stack of objects)
+				if (isComposite){
+					let stackOffset = canvas.compositeStackOffset
+					ctx.lineWidth = 1
+					ctx.strokeStyle = hasError ? canvas.errorColor : canvas.compositeBorderColor
+					ctx.fillStyle = canvas.compositeColor
+					ctx.beginPath()
+					ctx.roundedRect(x_ + stackOffset, y_ + stackOffset, mainRecWidth - 2 * stackOffset, canvas.mainRec_height - 2 * stackOffset, canvas.radius_, canvas.radius_);
+
+					//ctx.fill();
+					ctx.stroke();
+				}
+
 				//Main text
 				ctx.strokeStyle = canvas.mainTextColor;
 				ctx.fillStyle = canvas.mainTextColor;
@@ -942,7 +1018,6 @@ Rectangle {
 				let complexIntersection = true;
 				if(hasMargin){
 					angle = findAngle(x1_link, y1_link,intersection.x, intersection.y)
-					//console.log("angle: ", angle)
 					
 					let quarter =  Math.trunc(angle/(Math.PI/2))
 					let add = 0;
@@ -1094,9 +1169,8 @@ Rectangle {
 	
 	Shortcut {
 		sequence: "Ctrl+C";
-		enabled: true;
+		enabled: canvasPage.visible;
 		onActivated: {
-			console.log("Ctrl+C");
 			canvasPage.copySignal(canvas.selectedIndex);
 		}
 	}
@@ -1105,9 +1179,8 @@ Rectangle {
 		id: pasteShortcut;
 		
 		sequence: "Ctrl+V";
-		enabled: true;
+		enabled: canvasPage.visible;
 		onActivated: {
-			console.log("Ctrl+V");
 			canvasPage.pasteSignal(canvas.selectedIndex);
 		}
 	}
@@ -1115,27 +1188,24 @@ Rectangle {
 	
 	Shortcut {
 		sequence: "Delete";
-		enabled: true;
+		enabled: canvasPage.visible;
 		onActivated: {
-			console.log("Delete");
 			canvasPage.deleteSignal(canvas.selectedIndex);
 		}
 	}
 	
 	Shortcut {
 		sequence: "Ctrl+Z";
-		enabled: true;
+		enabled: canvasPage.visible;
 		onActivated: {
-			console.log("Ctrl+Z");
 			canvasPage.revertSignal();
 		}
 	}
 	
 	Shortcut {
 		sequence: "F2";
-		enabled: true;
+		enabled: canvasPage.visible;
 		onActivated: {
-			console.log("F2");
 			canvasPage.renameSignal(canvas.selectedIndex);
 		}
 	}
@@ -1176,7 +1246,6 @@ Rectangle {
 	}
 	
 	function deleteObjectFunc(index){
-		console.log("DELETE OBJECT: ", index);
 		let id = canvasPage.objectsModel.get(index).item.m_id;
 		
 		//remove links

@@ -7,6 +7,7 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
+#include <imtbase/IObjectCollectionReadStatus.h>
 #include <imtbase/IMetaInfoCreator.h>
 #include <imtclientgql/IGqlObjectCollectionDelegate.h>
 #include <imtclientgql/IGqlClient.h>
@@ -24,12 +25,20 @@ namespace imtclientgql
 
 class CRemoteGqlCollectionController:
 			virtual public imtbase::IObjectCollection,
+			virtual public imtbase::IObjectCollectionReadStatus,
 			public istd::TComposedFactory<istd::IChangeable>
 {
 public:
 	typedef istd::TComposedFactory<istd::IChangeable> BaseClass;
 
 	CRemoteGqlCollectionController();
+
+	// reimplemented (IObjectCollectionReadStatus)
+	virtual bool GetObjectDataWithStatus(
+				const Id& objectId,
+				DataPtr& dataPtr,
+				bool& isAccessDenied,
+				const iprm::IParamsSet* dataConfigurationPtr = nullptr) const override;
 
 	// reimplemented (IObjectCollection)
 	virtual const imtbase::IRevisionController* GetRevisionController() const override;
@@ -97,6 +106,7 @@ protected:
 	virtual DataPtr CreateObjectInstance(const QByteArray& typeId) const;
 
 private:
+	IGqlClient::GqlModelResult<QByteArray> ReadObjectTypeId(const Id& objectId) const;
 	bool GetObjectInfo(const QByteArray& objectId, imtclientgql::IGqlObjectCollectionDelegate::ObjectInfo& valueOut) const;
 	bool GetObjectMetaInfo(const QByteArray& objectId, idoc::MetaInfoPtr& valueOut) const;
 
@@ -110,5 +120,3 @@ protected:
 
 
 } //namespace imtclientgql
-
-

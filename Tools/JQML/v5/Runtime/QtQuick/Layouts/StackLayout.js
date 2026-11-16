@@ -62,7 +62,7 @@ defineType(StackLayout, {
             if(layout.$f & engine.COMPLETED) layout.$updateVisibility()
             layout.$invalidate()
         } },
-        count: 'int',
+        count: { kind: 'int', readonly: true },
     },
 })
 

@@ -9,6 +9,7 @@
 #include<imtrest/IProtocolEngine.h>
 #include<imtrest/ITransport.h>
 #include<imtrest/CWebSocketRequest.h>
+#include <imtservergql/imtservergql.h>
 
 
 namespace imtservergql
@@ -32,6 +33,13 @@ bool CGqlPublisherCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlReq
 }
 
 
+bool CGqlPublisherCompBase::IsOpenFor(SubscriberKind subscriberKind, const imtgql::CGqlRequest& /*gqlRequest*/) const
+{
+	// What a publisher sends a user is its own business: it filters the events by the subscriber
+	return subscriberKind == SK_USER;
+}
+
+
 bool CGqlPublisherCompBase::RegisterSubscription(
 			const QByteArray& subscriptionId,
 			const imtgql::CGqlRequest& gqlRequest,
@@ -45,6 +53,24 @@ bool CGqlPublisherCompBase::RegisterSubscription(
 		SendErrorMessage(0, errorMessage, "CGqlPublisherCompBase");
 
 		return false;
+	}
+
+	if (m_readPermissionsAttrPtr.GetCount() > 0){
+		const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
+		const imtauth::IUserInfo* userInfoPtr = contextPtr != nullptr ? contextPtr->GetUserInfo() : nullptr;
+		// The servers of products without tokens subscribe without signing in
+		bool isAllowed = userInfoPtr == nullptr && m_serverTokenReceiverCompPtr.IsValid() && !m_serverTokenReceiverCompPtr->IsEnabled();
+		if (userInfoPtr != nullptr){
+			isAllowed = userInfoPtr->IsAdmin();
+			const QByteArrayList heldPermissions = GetUserPermissions(*contextPtr) + contextPtr->GetOrganizationPermissions();
+			for (int index = 0; !isAllowed && index < m_readPermissionsAttrPtr.GetCount(); ++index){
+				isAllowed = imtauth::HasPermission(heldPermissions, m_readPermissionsAttrPtr[index]);
+			}
+		}
+		if (!isAllowed){
+			errorMessage = QStringLiteral("The subscription '%1' is not allowed").arg(QString::fromUtf8(gqlRequest.GetCommandId()));
+			return false;
+		}
 	}
 
 	const imtrest::CWebSocketRequest* constWebSocketRequest = dynamic_cast<const imtrest::CWebSocketRequest*>(&networkRequest);
@@ -207,5 +233,3 @@ bool CGqlPublisherCompBase::PublishDataFiltered(
 
 
 } // namespace imtservergql
-
-

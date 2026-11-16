@@ -103,6 +103,11 @@ FocusScope {
 	function setFocus(value){
 		textField.focus = value;
 	}
+
+	// Gives the keyboard to the input itself, as a click does
+	function forceInputFocus(){
+		textField.forceActiveFocus();
+	}
 	
 	function ensureVisible(pos){
 		textField.ensureVisible(pos);

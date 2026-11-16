@@ -65,6 +65,7 @@ public:
 protected:
 	// reimplemented (imtgql::IGqlSubscriberController)
 	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
+	virtual bool IsOpenFor(SubscriberKind subscriberKind, const imtgql::CGqlRequest& gqlRequest) const override;
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;

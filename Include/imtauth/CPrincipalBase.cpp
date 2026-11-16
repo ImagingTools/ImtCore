@@ -37,6 +37,18 @@ const imtlic::IFeatureInfoProvider *CPrincipalBase::GetPermissionProvider() cons
 }
 
 
+void CPrincipalBase::SetRoleProvider(const imtauth::IRoleInfoProvider* roleProviderPtr)
+{
+	m_roleProviderPtr = roleProviderPtr;
+}
+
+
+void CPrincipalBase::SetUserGroupProvider(const imtauth::IUserGroupInfoProvider* userGroupProviderPtr)
+{
+	m_userGroupInfoProviderPtr = userGroupProviderPtr;
+}
+
+
 const imtauth::IRoleInfoProvider* CPrincipalBase::GetRoleProvider() const
 {
 	return m_roleProviderPtr;
@@ -164,6 +176,12 @@ IPrincipal::FeatureIds CPrincipalBase::GetPermissions(const QByteArray& productI
 
 
 
+bool CPrincipalBase::HasLocalPermissions(const QByteArray& productId) const
+{
+	return m_permissionsMap.contains(productId);
+}
+
+
 IPrincipal::FeatureIds CPrincipalBase::GetLocalPermissions(const QByteArray& productId) const
 {
 	if (m_permissionsMap.contains(productId)){
@@ -210,7 +228,14 @@ void CPrincipalBase::SetProhibitions(const FeatureIds &prohibitions)
 
 QByteArrayList CPrincipalBase::GetProducts() const
 {
-	return m_rolesMap.keys();
+	QByteArrayList retVal = m_rolesMap.keys();
+	for (auto it = m_permissionsMap.cbegin(); it != m_permissionsMap.cend(); ++it){
+		if (!retVal.contains(it.key())){
+			retVal.append(it.key());
+		}
+	}
+
+	return retVal;
 }
 
 
@@ -517,5 +542,4 @@ bool CPrincipalBase::ResetData(CompatibilityMode /*mode*/)
 
 
 } // namespace imtauth
-
 

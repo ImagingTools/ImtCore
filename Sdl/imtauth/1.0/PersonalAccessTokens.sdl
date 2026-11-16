@@ -68,6 +68,9 @@ type ValidateTokenPayload
 {
 	valid: Boolean!
 	userId: ID
+	productId: ID
+	# Set for the token of a server, whose userId is empty.
+	clientProductId: ID
 	scopes: [ID]
 	message: String
 }

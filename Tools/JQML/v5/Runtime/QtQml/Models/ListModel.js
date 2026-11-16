@@ -150,7 +150,7 @@ class ListModel extends QtObject {
 }
 
 defineType(ListModel, {
-    props: { count: 'int', dynamicRoles: 'bool' },
+    props: { count: { kind: 'int', readonly: true }, dynamicRoles: 'bool' },
 })
 
 const elements = new WeakMap()      // row -> the live object get() returns

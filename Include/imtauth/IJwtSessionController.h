@@ -22,6 +22,12 @@ public:
 		QByteArray tenantId;
 		QByteArray accessToken;
 		QByteArray refreshToken;
+
+		/**
+			Product whose server asks for the session, set by the caller; empty for a request made at this server directly.
+			A new session belongs to it, a refresh is refused for a session of another one.
+		*/
+		QByteArray productId;
 	};
 
 	enum JwtState
@@ -32,7 +38,10 @@ public:
 		JS_INVALID
 	};
 
-	virtual bool ValidateSession(const QByteArray& sessionId) const = 0;
+	/**
+		\param isCheckedPtr	[optional] False when the session could not be checked, so a false result says nothing about it.
+	*/
+	virtual bool ValidateSession(const QByteArray& sessionId, bool* isCheckedPtr = nullptr) const = 0;
 	virtual JwtState ValidateJwt(const QByteArray& jwt) const = 0;
 	virtual bool RefreshToken(const QByteArray& refreshToken, UserSession& outputData) const = 0;
 	virtual bool CreateNewSession(const QByteArray& userId, const QByteArray& tenantId, UserSession& outputData) const = 0;

@@ -3,11 +3,13 @@
 
 // ACF includes
 #include <iser/CMemoryWriteArchive.h>
+#include <iser/CJsonMemWriteArchive.h>
 
 // ImtCore includes
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Sessions.h>
 #include <imtauth/ITenantInfo.h>
 #include <imtauth/IUserInfo.h>
+#include <imtbase/imtbase.h>
 #include <imtgql/IGqlContext.h>
 #include <imtauthgql/imtauthgql.h>
 
@@ -37,14 +39,173 @@ bool IsSessionOfRequest(const imtauth::ISession& session, const imtgql::CGqlRequ
 } // anonymous namespace
 
 
+// reimplemented (imtauth::ISessionAuthorizationProvider)
+
+bool CGqlJwtSessionControllerComp::IsAvailable() const
+{
+	return true;
+}
+
+
+imtauth::ISessionAuthorizationProvider::SessionAuthorization CGqlJwtSessionControllerComp::GetSessionAuthorization(
+			const QByteArray& accessToken,
+			const QByteArray& productId,
+			bool isEstablishedSubscription) const
+{
+	if (productId.isEmpty()){
+		return {SAS_REFUSED, RR_FORBIDDEN, QStringLiteral("The product of the session is not known.")};
+	}
+	if (!m_authorizationSessionControllerCompPtr.IsValid()){
+		return {SAS_UNCHECKED, RR_NONE, QStringLiteral("The session authorization source is not configured.")};
+	}
+
+	imtauth::SessionTokenClaims claims;
+	QString message;
+	switch (imtauth::CheckSessionToken(*m_authorizationSessionControllerCompPtr, accessToken, isEstablishedSubscription, claims, message)){
+	case imtauth::STC_VALID:
+		break;
+	case imtauth::STC_REAUTHENTICATE:
+		return {SAS_REFUSED, RR_REAUTHENTICATE, message};
+	case imtauth::STC_INVALID:
+		return {SAS_REFUSED, RR_FORBIDDEN, message};
+	default:
+		return {SAS_UNCHECKED, RR_NONE, message};
+	}
+
+	const imtauth::ISessionSharedPtr sessionPtr = m_authorizationSessionControllerCompPtr->GetSession(claims.sessionId);
+	if (!sessionPtr.IsValid()){
+		return {SAS_UNCHECKED, RR_NONE, QStringLiteral("The session could not be read.")};
+	}
+	if (sessionPtr->GetUserId() != claims.userId || sessionPtr->GetTenantId() != claims.tenantId || sessionPtr->GetProductId() != claims.productId){
+		return {SAS_REFUSED, RR_FORBIDDEN, QStringLiteral("The token does not match its session.")};
+	}
+	if (claims.productId.isEmpty()){
+		return {SAS_REFUSED, RR_FORBIDDEN, QStringLiteral("The session was opened at the authorization server and works only there.")};
+	}
+
+	SessionAuthorization retVal;
+	retVal.userId = claims.userId;
+	retVal.tenantId = claims.tenantId;
+	retVal.sessionExpiresAt = sessionPtr->GetExpirationDate();
+	if (!claims.tenantId.isEmpty()){
+		if (!m_tenantManagerCompPtr.IsValid()){
+			return {SAS_UNCHECKED, RR_NONE, QStringLiteral("The organization manager is not configured.")};
+		}
+		bool isRead = false;
+		const imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(claims.tenantId, &isRead);
+		if (!isRead){
+			return {SAS_UNCHECKED, RR_NONE, QStringLiteral("The organization of the session could not be read.")};
+		}
+		if (!tenantPtr.IsValid()){
+			return {SAS_REFUSED, RR_FORBIDDEN, QStringLiteral("The organization of the session does not exist.")};
+		}
+
+		retVal.tenantOwnerId = tenantPtr->GetOwnerId();
+		retVal.tenantCreatorId = tenantPtr->GetCreatorId();
+		retVal.tenantPermissions = tenantPtr->GetTenantPermissions();
+	}
+
+	const TenantUserSources sources{
+		m_userCollectionCompPtr.GetPtr(),
+		m_roleCollectionCompPtr.GetPtr(),
+		m_userGroupCollectionCompPtr.GetPtr(),
+		m_bindingManagerCompPtr.GetPtr(),
+		m_delegatedAccessCompPtr.GetPtr(),
+		m_membershipManagerCompPtr.GetPtr()
+	};
+	istd::IChangeableUniquePtr userPtr;
+	switch (ComputeTenantUser(sources, claims.userId, claims.tenantId, productId, userPtr, message)){
+	case imtservergql::CAuthorizationSnapshot::RS_READ:
+		break;
+	case imtservergql::CAuthorizationSnapshot::RS_ABSENT:
+		return {SAS_REFUSED, RR_FORBIDDEN, QStringLiteral("User account is not available.")};
+	case imtservergql::CAuthorizationSnapshot::RS_DENIED:
+		return {SAS_REFUSED, RR_FORBIDDEN, message};
+	default:
+		return {SAS_UNCHECKED, RR_NONE, message};
+	}
+
+	const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(userPtr.GetPtr());
+	if (userInfoPtr == nullptr || !userInfoPtr->IsEnabled()){
+		return {SAS_REFUSED, RR_FORBIDDEN, QStringLiteral("User account is disabled.")};
+	}
+
+	retVal.state = SAS_COMPUTED;
+	retVal.userPtr.FromUnique(std::move(userPtr));
+	return retVal;
+}
+
+
 // protected methods
 
 // reimplemented (sdl::V1_0::imtauth::CSessionsGqlHandlerCompBase)
 
+sdl::V1_0::imtauth::CGetSessionAuthorizationPayload CGqlJwtSessionControllerComp::OnGetSessionAuthorization(
+			const sdl::V1_0::imtauth::CGetSessionAuthorizationGqlRequest& getSessionAuthorizationRequest,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& /*errorMessage*/) const
+{
+	namespace sessionsdl = sdl::V1_0::imtauth;
+	sessionsdl::CGetSessionAuthorizationPayload response;
+	QByteArray productId;
+	QString message;
+	SessionAuthorization authorization;
+	authorization.state = CheckAuthorizationServer(gqlRequest, productId, message);
+	authorization.refusalReason = RR_FORBIDDEN;
+	authorization.message = message;
+	if (authorization.state == SAS_COMPUTED){
+		const sessionsdl::GetSessionAuthorizationRequestArguments arguments = getSessionAuthorizationRequest.GetRequestedArguments();
+		const QByteArray accessToken = (arguments.input.HasValue() && arguments.input->accessToken.HasValue()) ? *arguments.input->accessToken : QByteArray();
+		const bool isEstablished = arguments.input.HasValue() && arguments.input->isEstablishedSubscription.HasValue() && *arguments.input->isEstablishedSubscription;
+		authorization = GetSessionAuthorization(accessToken, productId, isEstablished);
+	}
+
+	switch (authorization.state){
+	case SAS_COMPUTED:
+		response.state = sessionsdl::SessionAuthorizationState::COMPUTED;
+		break;
+	case SAS_REFUSED:
+		response.state = sessionsdl::SessionAuthorizationState::REFUSED;
+		response.refusalReason = (authorization.refusalReason == RR_REAUTHENTICATE)
+					? sessionsdl::SessionRefusalReason::REAUTHENTICATE
+					: sessionsdl::SessionRefusalReason::FORBIDDEN;
+		break;
+	default:
+		response.state = sessionsdl::SessionAuthorizationState::UNCHECKED;
+		break;
+	}
+	response.message = authorization.message;
+	if (authorization.state != SAS_COMPUTED){
+		return response;
+	}
+
+	iser::ISerializable* serializablePtr = dynamic_cast<iser::ISerializable*>(authorization.userPtr.GetPtr());
+	iser::CJsonMemWriteArchive archive(m_versionInfoCompPtr.GetPtr());
+	if (serializablePtr == nullptr || !serializablePtr->Serialize(archive)){
+		response.state = sessionsdl::SessionAuthorizationState::UNCHECKED;
+		response.message = QStringLiteral("The user could not be serialized.");
+		return response;
+	}
+
+	response.refusalReason = sessionsdl::SessionRefusalReason::NONE;
+	response.userId = authorization.userId;
+	response.tenantId = authorization.tenantId;
+	response.userData = QString::fromUtf8(archive.GetData());
+	response.tenantOwnerId = authorization.tenantOwnerId;
+	response.tenantCreatorId = authorization.tenantCreatorId;
+	if (authorization.sessionExpiresAt.isValid()){
+		response.sessionExpiresAt = authorization.sessionExpiresAt.toUTC().toString(Qt::ISODateWithMs);
+	}
+	response.tenantPermissions.Emplace();
+	response.tenantPermissions->FromList(authorization.tenantPermissions);
+	return response;
+}
+
+
 sdl::V1_0::imtauth::CValidateSessionPayload CGqlJwtSessionControllerComp::OnValidateSession(
 	const sdl::V1_0::imtauth::CValidateSessionGqlRequest& validateSessionRequest,
 	const ::imtgql::CGqlRequest& /*gqlRequest*/,
-	QString& /*errorMessage*/) const
+	QString& errorMessage) const
 {
 	sdl::V1_0::imtauth::CValidateSessionPayload response;
 
@@ -64,7 +225,16 @@ sdl::V1_0::imtauth::CValidateSessionPayload CGqlJwtSessionControllerComp::OnVali
 		sessionId = *arguments.input->sessionId;
 	}
 
-	response.isValid = m_jwtSessionControllerCompPtr->ValidateSession(sessionId);
+	// A session that could not be checked is an error of the request: a caller would take "not valid" for a closed session
+	bool isChecked = false;
+	const bool isValid = m_jwtSessionControllerCompPtr->ValidateSession(sessionId, &isChecked);
+	if (!isChecked){
+		errorMessage = QStringLiteral("The session could not be checked.");
+
+		return response;
+	}
+
+	response.isValid = isValid;
 
 	return response;
 }
@@ -176,7 +346,7 @@ sdl::V1_0::imtauth::CGetSessionPayload CGqlJwtSessionControllerComp::OnGetSessio
 
 sdl::V1_0::imtauth::CRefreshTokenPayload CGqlJwtSessionControllerComp::OnRefreshToken(
 	const sdl::V1_0::imtauth::CRefreshTokenGqlRequest& refreshTokenRequest,
-	const ::imtgql::CGqlRequest& /*gqlRequest*/,
+	const ::imtgql::CGqlRequest& gqlRequest,
 	QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtauth::CRefreshTokenPayload response;
@@ -198,6 +368,7 @@ sdl::V1_0::imtauth::CRefreshTokenPayload CGqlJwtSessionControllerComp::OnRefresh
 	}
 
 	imtauth::IJwtSessionController::UserSession userSession;
+	userSession.productId = GetRequestServerProductId(gqlRequest);
 	response.ok = m_jwtSessionControllerCompPtr->RefreshToken(refreshToken, userSession);
 	if (!response.ok){
 		return response;
@@ -276,6 +447,7 @@ sdl::V1_0::imtauth::CCreateNewSessionPayload CGqlJwtSessionControllerComp::OnCre
 	}
 
 	imtauth::IJwtSessionController::UserSession userSession;
+	userSession.productId = GetRequestServerProductId(gqlRequest);
 	response.ok = m_jwtSessionControllerCompPtr->CreateNewSession(userId, tenantId, userSession);
 	if (response.ok){
 		response.userSession = CreateUserSessionData(userSession);
@@ -335,6 +507,7 @@ sdl::V1_0::imtauth::CSelectTenantPayload CGqlJwtSessionControllerComp::OnSelectT
 	}
 
 	imtauth::IJwtSessionController::UserSession userSession;
+	userSession.productId = GetRequestServerProductId(gqlRequest);
 	response.ok = m_jwtSessionControllerCompPtr->CreateNewSession(userId, tenantId, userSession);
 	if (!response.ok){
 		response.errorMessage = QStringLiteral("Failed to create tenant session");
@@ -588,6 +761,47 @@ sdl::V1_0::imtauth::CUserSession CGqlJwtSessionControllerComp::CreateUserSession
 	}
 
 	return userData;
+}
+
+
+imtauth::ISessionAuthorizationProvider::AuthorizationState CGqlJwtSessionControllerComp::CheckAuthorizationServer(
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QByteArray& productId,
+			QString& message) const
+{
+	// The session token is proof in the body; only the product's own server token authenticates this operation.
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	const QByteArray senderProductId = (gqlContextPtr != nullptr) ? gqlContextPtr->GetServerProductId() : QByteArray();
+	const QByteArray serverToken = (gqlContextPtr != nullptr) ? gqlContextPtr->GetHeaders().value(imtbase::s_serverTokenHeaderId) : QByteArray();
+	if (senderProductId.isEmpty() || !imtauth::IsServerToken(serverToken) || !gqlContextPtr->GetUserId().isEmpty()
+				|| !gqlContextPtr->GetToken().isEmpty() || gqlContextPtr->GetProductId() != senderProductId){
+		message = QStringLiteral("The authorization of a session is given to the server of a product only.");
+		return SAS_REFUSED;
+	}
+
+	imtauth::IPersonalAccessTokenManager* tokenManagerPtr = m_serverTokenReceiverCompPtr.IsValid() ? m_serverTokenReceiverCompPtr->GetTokenManager() : nullptr;
+	if (tokenManagerPtr == nullptr){
+		message = QStringLiteral("The server tokens are not configured.");
+		return SAS_UNCHECKED;
+	}
+
+	QByteArray tokenUserId;
+	QByteArray tokenId;
+	QByteArrayList scopes;
+	QByteArray tokenProductId;
+	QByteArray clientProductId;
+	bool isCheckFailed = false;
+	if (!tokenManagerPtr->ValidateToken(serverToken, tokenUserId, tokenId, scopes, &tokenProductId, &clientProductId, &isCheckFailed)){
+		message = isCheckFailed ? QStringLiteral("The token of the server could not be checked.") : QStringLiteral("The token of the server is revoked, expired or unknown.");
+		return isCheckFailed ? SAS_UNCHECKED : SAS_REFUSED;
+	}
+	if (tokenProductId != m_serverTokenReceiverCompPtr->GetServerProductId() || clientProductId.isEmpty() || clientProductId != senderProductId){
+		message = QStringLiteral("The token of the server is not issued for this server and the product of the request.");
+		return SAS_REFUSED;
+	}
+
+	productId = clientProductId;
+	return SAS_COMPUTED;
 }
 
 

@@ -3,6 +3,8 @@
 
 
 // Qt includes
+#include <QtCore/QAtomicInt>
+#include <QtCore/QThreadPool>
 #include <QtNetwork/QSslSocket>
 
 // ACF includes
@@ -17,9 +19,15 @@ namespace imtmail
 {
 
 
-class CSmtpClientComp: public QObject, public ilog::CLoggerComponentBase, virtual public ISmtpClient
+/**
+	SMTP client over an implicit TLS connection.
+
+	SendEmail() puts the message into a queue and returns at once. The messages are sent one after another on a
+	thread of the component. A message that could not be sent is tried again, up to the number of attempts of the
+	component. The result is logged.
+*/
+class CSmtpClientComp: public ilog::CLoggerComponentBase, virtual public ISmtpClient
 {
-	Q_OBJECT
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
@@ -29,60 +37,40 @@ public:
 		I_ASSIGN(m_hostParamCompPtr, "HostParam", "The property holds connection's host name parameter", false, "");
 		I_ASSIGN(m_portAttrPtr, "Port", "The property holds connection's port number", false, 465);
 		I_ASSIGN(m_portParamCompPtr, "PortParam", "The property holds connection's port number parameter", false, "");
-		I_ASSIGN(m_timeoutAttrPtr, "Timeout", "Timeout (in msecs)", false, 5000);
+		I_ASSIGN(m_timeoutAttrPtr, "Timeout", "Timeout of one step of the conversation with the server (in msecs)", true, 5000);
 		I_ASSIGN(m_userAttrPtr, "User", "User", false, "");
 		I_ASSIGN(m_userParamCompPtr, "UserParam", "User parameter", false, "");
 		I_ASSIGN(m_passwordAttrPtr, "Password", "Password", false, "");
 		I_ASSIGN(m_passwordParamCompPtr, "PasswordParam", "Password parameter", false, "");
+		I_ASSIGN(m_maxAttemptsAttrPtr, "MaxAttempts", "Number of attempts to send a message", true, 3);
 	I_END_COMPONENT;
 
 	CSmtpClientComp();
 
 protected:
-	enum ResponseCode
-	{
-		RC_UNKNOWN = -1,
-		RC_SERVICE_READY = 220,
-		RC_OK = 250,
-		RC_AUTHENTIFICATION_REQUEST = 334,
-		RC_AUTHENTIFICATION_SUCCESSFUL = 235,
-		RC_START_MAIL_INPUT = 354,
-		RC_SERVICE_CLOSING = 221
-	};
+	QString GetUser() const;
+	QByteArray BuildMimeMessage(const ISmtpMessage& message, const QString& sender) const;
+	QByteArray ToBase64Lines(const QByteArray& data) const;
+	QString ExtractAddress(const QString& address) const;
+	void DeliverMessage(const QString& from, const QString& to, const QByteArray& data) const;
+	bool RunSession(
+				const QString& from,
+				const QString& to,
+				const QByteArray& data,
+				QString& error) const;
+	bool Exchange(
+				QSslSocket& socket,
+				const QByteArray& command,
+				char expectedReplyClass,
+				QString& error) const;
 
-	enum MailStatus
-	{
-		MS_TLS,
-		MS_HANDSHAKE,
-		MS_AUTH,
-		MS_USER,
-		MS_PASS,
-		MS_RCPT,
-		MS_MAIL,
-		MS_DATA,
-		MS_INIT,
-		MS_BODY,
-		MS_QUIT,
-		MS_CLOSE
-	};
-
-	ResponseCode ExtractResponseCode(const QByteArray& response);
-	void SendCommand(const QString& command);
-	void ClearData();
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentDestroyed() override;
 
 	// reimplemented (imtmail::ISmtpClient)
 	virtual QString GetHost() const override;
 	virtual int GetPort() const override;
 	virtual bool SendEmail(const ISmtpMessage& message) const override;
-
-private slots:
-	void OnStateChanged(QAbstractSocket::SocketState socketState);
-	void OnErrorReceived(QAbstractSocket::SocketError socketError);
-	void OnSslErrors(const QList<QSslError>& sslErrors);
-	void OnDisconnected();
-	void OnConnected();
-	void OnReadyRead();
-	void OnEcrypted();
 
 private:
 	I_ATTR(QByteArray, m_userAttrPtr);
@@ -94,17 +82,13 @@ private:
 	I_ATTR(int, m_portAttrPtr);
 	I_REF(iprm::ITextParam, m_portParamCompPtr);
 	I_ATTR(int, m_timeoutAttrPtr);
+	I_ATTR(int, m_maxAttemptsAttrPtr);
 
 private:
-	mutable std::unique_ptr<QSslSocket> m_socketPtr;
-	mutable istd::TUniqueInterfacePtr<ISmtpMessage> m_smtpMessagePtr;
-	std::unique_ptr<QTextStream> m_textStreamPtr;
-	mutable int m_currentMailSendState;
-	mutable QString m_message;
+	QAtomicInt m_isStopped;
+	mutable QThreadPool m_threadPool;
 };
 
 
 } // namespace imtmail
-
-
 

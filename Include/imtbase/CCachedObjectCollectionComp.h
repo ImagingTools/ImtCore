@@ -7,6 +7,7 @@
 #include <QtCore/QVector>
 
 // std includes
+#include <atomic>
 #include <memory>
 
 // ACF includes
@@ -96,6 +97,7 @@ public:
 
 	// reimplemented (IObjectCollectionCacheController)
 	virtual void InvalidateCache() override;
+	virtual const IObjectCollection* GetSourceCollection() const override;
 
 	// reimplemented (ICollectionInfo)
 	virtual int GetElementsCount(
@@ -167,6 +169,7 @@ private:
 
 	int m_operationFlags;
 	mutable QReadWriteLock m_lock;
+	std::atomic<bool> m_isSourceUnwatched = false;
 };
 
 
