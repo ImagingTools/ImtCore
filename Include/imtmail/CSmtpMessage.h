@@ -21,6 +21,8 @@ public:
 	virtual void SetSubject(const QString& subject) override;
 	virtual QString GetBody() const override;
 	virtual void SetBody(const QString& body) override;
+	virtual Attachments GetAttachments() const override;
+	virtual void AddAttachment(const QString& fileName, const QByteArray& data) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
@@ -36,7 +38,9 @@ private:
 	QString m_to;
 	QString m_subject;
 	QString m_body;
+	Attachments m_attachments;
 };
 
 
 } // namespace imtmail
+
