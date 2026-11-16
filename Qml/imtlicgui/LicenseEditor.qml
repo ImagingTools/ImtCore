@@ -28,6 +28,8 @@ ViewBase {
 	property var parentLicenseIds: []
 	property string productId: ""
 	property bool canEdit: false
+	// Products a license can be defined for (all of them unless the page narrows it down).
+	property TreeItemModel productsModel: CachedProductCollection.collectionModel
 	// Part of the product this editor works in; scopes its permission checks.
 	property string permissionPath: ""
 
@@ -604,7 +606,7 @@ ViewBase {
 							id: productComboBox
 							objectName: "ProductCombo"
 							name: qsTr("Product")
-							model: CachedProductCollection.collectionModel
+							model: licenseEditor.productsModel
 							nameId: "productName"
 							changeable: licenseEditor.canEdit
 							onCurrentIndexChanged: {
@@ -618,7 +620,7 @@ ViewBase {
 						function currentProductId() {
 							if (productComboBox.currentIndex < 0)
 								return ""
-							return CachedProductCollection.collectionModel.getData(
+							return licenseEditor.productsModel.getData(
 								ProductItemTypeMetaInfo.s_id, productComboBox.currentIndex)
 						}
 
@@ -629,8 +631,8 @@ ViewBase {
 							licenseIdInput.text = licenseEditor.licenseData.m_licenseId || ""
 							descriptionInput.text = licenseEditor.licenseData.m_description || ""
 							productComboBox.currentIndex = -1
-							for (let i = 0; i < CachedProductCollection.collectionModel.getItemsCount(); ++i) {
-								let id = CachedProductCollection.collectionModel.getData(ProductItemTypeMetaInfo.s_id, i)
+							for (let i = 0; i < licenseEditor.productsModel.getItemsCount(); ++i) {
+								let id = licenseEditor.productsModel.getData(ProductItemTypeMetaInfo.s_id, i)
 								if (id === licenseEditor.licenseData.m_productId) {
 									productComboBox.currentIndex = i
 									break

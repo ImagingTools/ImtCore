@@ -16,6 +16,12 @@ RemoteCollectionView {
 
 	collectionId: "Products";
 	documentCollectionFilter: null
+
+	// Set when the page holds products of one category only (new products get it, the editor does not offer it).
+	property string fixedCategoryId: ""
+
+	// Editor of a product; a page can replace it with its own.
+	property Component productEditorComp: productDocumentComp
 	additionalFieldIds: [ProductItemTypeMetaInfo.s_productId]
 	
 	commandsDelegateComp: Component {ProductCollectionViewCommandsDelegate {
@@ -23,7 +29,7 @@ RemoteCollectionView {
 			
 			documentTypeIds: ["Product"]
 			documentViewTypeIds: ["ProductEditor"]
-			documentViewsComp: [productDocumentComp]
+			documentViewsComp: [productCollectionViewContainer.productEditorComp]
 			documentDataControllersComp: [dataControllerComp]
 		}
 	}
@@ -36,6 +42,8 @@ RemoteCollectionView {
 		
 		ProductView {
 			id: productEditor;
+
+			fixedCategoryId: productCollectionViewContainer.fixedCategoryId
 			
 			commandsControllerComp: Component {GqlBasedCommandsController {
 					typeId: "Product";
@@ -69,7 +77,9 @@ RemoteCollectionView {
 			documentDescription: productData ? productData.m_description: "";
 			
 			documentModelComp: Component {
-				ProductData {}
+				ProductData {
+					m_categoryId: productCollectionViewContainer.fixedCategoryId
+				}
 			}
 		}
 	}

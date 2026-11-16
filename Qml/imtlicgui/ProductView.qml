@@ -27,6 +27,8 @@ ViewBase {
 	// it travels next to that feature instead of being glued onto it.
 	property var optionalFeatures: []
 	property bool canEdit: false
+	// Set when the page holds products of one category only: the category is not offered for editing.
+	property string fixedCategoryId: ""
 	// Part of the product this view works in; scopes its permission checks.
 	property string permissionPath: ""
 
@@ -1026,6 +1028,7 @@ ViewBase {
 							name: qsTr("Category")
 							model: categoryModel
 							nameId: "name"
+							visible: productViewContainer.fixedCategoryId === ""
 							changeable: productViewContainer.canEdit
 							onCurrentIndexChanged: productViewContainer.doUpdateModel()
 						}
@@ -1052,6 +1055,8 @@ ViewBase {
 								productViewContainer.productData.m_categoryId = "Hardware"
 							else
 								productViewContainer.productData.m_categoryId = ""
+							if (productViewContainer.fixedCategoryId !== "")
+								productViewContainer.productData.m_categoryId = productViewContainer.fixedCategoryId
 						}
 					}
 				}
