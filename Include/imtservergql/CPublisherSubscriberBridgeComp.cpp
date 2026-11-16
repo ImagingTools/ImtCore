@@ -63,10 +63,34 @@ bool CPublisherSubscriberBridgeComp::RegisterSubscription(
 		return false;
 	}
 
-	// Store the mapping between client and upstream subscriptions
-	QMutexLocker locker(&m_bridgeMutex);
-	m_clientToUpstreamMap.insert(subscriptionId, upstreamSubscriptionId);
-	m_upstreamToClientsMap[upstreamSubscriptionId].append(subscriptionId);
+	// Store the mapping between client and upstream subscriptions.
+	// A client re-registering an id that is still mapped (e.g. after a reconnect) replaces
+	// the previous upstream subscription, which must be released instead of leaked.
+	QByteArray staleUpstreamSubscriptionId;
+	{
+		QMutexLocker locker(&m_bridgeMutex);
+
+		if (m_clientToUpstreamMap.contains(subscriptionId)){
+			const QByteArray previousUpstreamSubscriptionId = m_clientToUpstreamMap.take(subscriptionId);
+			if (previousUpstreamSubscriptionId != upstreamSubscriptionId && m_upstreamToClientsMap.contains(previousUpstreamSubscriptionId)){
+				QByteArrayList& clientIds = m_upstreamToClientsMap[previousUpstreamSubscriptionId];
+				clientIds.removeAll(subscriptionId);
+				if (clientIds.isEmpty()){
+					m_upstreamToClientsMap.remove(previousUpstreamSubscriptionId);
+					staleUpstreamSubscriptionId = previousUpstreamSubscriptionId;
+				}
+			}
+		}
+
+		m_clientToUpstreamMap.insert(subscriptionId, upstreamSubscriptionId);
+		if (!m_upstreamToClientsMap[upstreamSubscriptionId].contains(subscriptionId)){
+			m_upstreamToClientsMap[upstreamSubscriptionId].append(subscriptionId);
+		}
+	}
+
+	if (!staleUpstreamSubscriptionId.isEmpty()){
+		m_subscriptionManagerCompPtr->UnregisterSubscription(staleUpstreamSubscriptionId, *this);
+	}
 
 	return true;
 }

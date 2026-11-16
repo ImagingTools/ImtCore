@@ -98,9 +98,48 @@ bool CGqlPublisherCompBase::UnregisterSubscription(const QByteArray& subscriptio
 void CGqlPublisherCompBase::OnRequestDestroyed(imtrest::IRequest* request)
 {
 	imtrest::CWebSocketRequest* webSocketRequestPtr = dynamic_cast<imtrest::CWebSocketRequest*>(request);
-	if (webSocketRequestPtr != nullptr){
-		UnregisterSubscription(webSocketRequestPtr->GetQueryId());
+	if (webSocketRequestPtr == nullptr){
+		return;
 	}
+
+	const QByteArray subscriptionId = webSocketRequestPtr->GetQueryId();
+
+	// A "start" request lives until its socket is closed, while a client keeps its
+	// subscription id across a reconnect or a token refresh. The server may notice the
+	// old socket closing only after the subscription has already been registered again
+	// on the new socket, so unregistering by id alone would silently drop the live
+	// subscription. Only the registration bound to the destroyed request is removed.
+	{
+		QMutexLocker locker(&m_mutex);
+
+		int staleIndex = -1;
+		bool hasOtherRegistration = false;
+		for (int i = 0; i < m_registeredSubscribers.size(); ++i){
+			const auto foundIter = m_registeredSubscribers[i].networkRequests.constFind(subscriptionId);
+			if (foundIter == m_registeredSubscribers[i].networkRequests.constEnd()){
+				continue;
+			}
+
+			if (foundIter.value() == request){
+				staleIndex = i;
+			}
+			else{
+				hasOtherRegistration = true;
+			}
+		}
+
+		if (staleIndex < 0){
+			return;
+		}
+
+		if (hasOtherRegistration){
+			m_registeredSubscribers.removeAt(staleIndex);
+
+			return;
+		}
+	}
+
+	UnregisterSubscription(subscriptionId);
 }
 
 
