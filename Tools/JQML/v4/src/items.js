@@ -108,6 +108,20 @@ export function setDestroyObserver(callback) {
 	destroyObserver = callback;
 }
 
+// The destroyed items wait for the end of the running script, then let go of what they hold (Item.$sever).
+let severQueue = null;
+function severLater(item) {
+	if (severQueue === null) {
+		severQueue = [];
+		queueMicrotask(() => {
+			const list = severQueue;
+			severQueue = null;
+			for (const dead of list) dead.$sever();
+		});
+	}
+	severQueue.push(item);
+}
+
 // ----- Keyboard focus -----
 
 // One focused child per focus scope. The root (and every FocusScope) is a scope.
@@ -816,6 +830,28 @@ export class Item {
 		if (this.$owned !== undefined) for (const owned of this.$owned) owned.$destroy();
 		this.$destroyed = true;
 		if (destroyObserver !== null) destroyObserver(this);
+		severLater(this);
+	}
+
+	// What is left of a destroyed item holds nothing of the tree around it. In Qt a reference to a deleted object reads as null and the
+	// object is freed; here a script variable (a `property var` or `property Item` of an item that stays) can keep the husk alive, and
+	// through its parent, its scope and its properties the whole page it was in. It runs after the script that called destroy() has
+	// returned (QObject::deleteLater), so that script can still read the item.
+	$sever() {
+		const parent = this.$parent;
+		if (parent !== null) {
+			if (this.$queued && parent.$dirtyKids !== null) {
+				const index = parent.$dirtyKids.indexOf(this);
+				if (index >= 0) parent.$dirtyKids.splice(index, 1);
+			}
+			this.$parent = null;
+		}
+		this.$children = [];
+		this.$dirtyKids = null;
+		this.$scope = null;
+		this.$owned = undefined;
+		if (this.$defScope !== undefined) this.$defScope = null; // a Component: the scope it was written in
+		if (this.$custom !== null) for (const name in this.$custom) this.$custom[name] = null;
 	}
 
 	// Requests a new layout and repaint. This item needs a pass over its children, and so does its parent (it has to
@@ -6959,6 +6995,11 @@ export class Loader extends Item {
 		this.$declareSignal('loaded', []);
 		this.$declareSignal('itemChanged', []);
 		this.$declareSignal('statusChanged', []);
+	}
+
+	$sever() {
+		this.$sourceComponent = null;
+		super.$sever();
 	}
 
 	// An explicit width (or anchors that set it) wins; otherwise the loaded item's width.
