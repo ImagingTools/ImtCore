@@ -427,7 +427,7 @@ Lisa FeatureEditor ──generate──► <Product>Features.h ──FillProduct
 |---|---|---|---|---|---|
 | Lisa | 74 | 28 | путь, дерево R3.4 | `Edit` → `View`, ревизии → `View` — верное | `Lisa/Impl/LisaServer/LisaFeatures.h` |
 | ProLife | 139 | 43 | путь, дерево R3.4 | `Edit` → `View`, `ViewAll`/`ViewHistory` → `View`, ревизии → `View` — верное | `ProLife/Impl/ProLifeServer/ProLifeFeatures.h` |
-| IotPlatform | 127 | 21 | путь; Users, Roles, Groups по R3.4 | `Edit` → `View`, ревизии → `View` — верное | `IotPlatform/Impl/IotPlatformServerExe/IotPlatformFeatures.h` |
+| IotPlatform | 155 | 24 | путь, дерево R3.4 | `Edit` → `View`, ревизии → `View` — верное | `IotPlatform/Impl/IotPlatformServerExe/IotPlatformFeatures.h` |
 | NeoPro | 35 | 4 | путь | `View*` → `Edit*` | `NeoPro/Impl/NeoProServer/NeoProFeatures.h` |
 | Acula | 21 | 4 | путь | `View*` → `Edit*` | `Acula/Impl/AculaServer/AculaFeatures.h` |
 | Agentino | 18 | 0 | — | — | `Agentino/Impl/AgentinoServer/AgentinoFeatures.h` |
