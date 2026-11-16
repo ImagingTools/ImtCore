@@ -48,6 +48,28 @@ Item {
 		}
 	}
 	Item { id: sibling }
+
+	// A connection from an object that stays to a signal of an item of a page that closes.
+	property alias loader2: loader2
+	QtObject {
+		id: observer
+		function handler() {}
+	}
+	Loader {
+		id: loader2
+		active: true
+		sourceComponent: Component {
+			Item {
+				id: page2
+				property int value: 0
+				Rectangle { id: inner2; width: 5; height: 5 }
+				Item { id: tail4 }
+				Item { id: tail5 }
+				Item { id: tail6 }
+				Component.onCompleted: page2.valueChanged.connect(observer.handler)
+			}
+		}
+	}
 	Component.onCompleted: seen = "completed"
 }
 `,
@@ -104,6 +126,11 @@ const track = (root) => {
 	return refs;
 };
 const weak = track(page);
+function track2(item) {
+	const refs = [new WeakRef(item)];
+	for (const child of item.$children.slice(0, -3)) refs.push(new WeakRef(child));
+	return refs;
+}
 check('items below the page', weak.length >= 4, true);
 
 // The script that destroys the page can still read it: the husk is emptied after it returns.
@@ -123,6 +150,16 @@ for (let i = 0; i < 12; i++) {
 check('children and values of a destroyed page are freed', weak.map((ref, i) => (ref.deref() === undefined ? null : i + ':' + (ref.deref().$typeName || 'object'))).filter((x) => x !== null), []);
 check('the husk has no parent, children or scope', [page.$parent, page.$children.length, page.$scope], [null, 0, null]);
 check('a property of the husk reads null', page.title, null);
+
+// The page whose signal the observer was connected to is freed, and the observer does not hold it.
+const second = track2(root.loader2.$children[0]);
+root.loader2.active = false;
+frames(4);
+for (let i = 0; i < 12; i++) {
+	collect();
+	await new Promise((resolve) => setTimeout(resolve, 20));
+}
+check('an item that an object connected to is freed with its page', second.filter((ref) => ref.deref() !== undefined).length, 0);
 check('nothing failed', engine.errors.length, 0);
 console.log(failures === 0 ? 'All good' : `${failures} failed`);
 process.exit(failures === 0 ? 0 : 1);

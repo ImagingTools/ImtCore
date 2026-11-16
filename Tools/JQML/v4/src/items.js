@@ -455,12 +455,19 @@ function notifyViews(model) {
 	}
 }
 
-// A function of a QML object connected to a signal of another object is disconnected when its object is destroyed.
+// A function of a QML object connected to a signal of another object is disconnected when its object is destroyed, and when the
+// object with the signal is destroyed (Qt drops the connection with either end). Both objects know the link: the owner to undo it,
+// the source to let the owner forget it. Without the second, an object that stays holds the undo function of a connection to an item of
+// a closed page, and the undo function holds that item.
 export function linkToOwner(source, fn, undo) {
 	const owner = fn.$owner;
 	if (owner === undefined || owner === source) return;
+	undo.$owner = owner;
+	undo.$source = source;
 	if (owner.$links === undefined) owner.$links = [];
 	owner.$links.push(undo);
+	if (source.$linksIn === undefined) source.$linksIn = new Set();
+	source.$linksIn.add(undo);
 }
 
 // Script assignment replaces a binding on these Item properties (Qt). `visible` must be
@@ -849,6 +856,9 @@ export class Item {
 		this.$children = [];
 		this.$dirtyKids = null;
 		this.$scope = null;
+		this.$anchors = null;
+		if (this.$fnNames !== undefined) for (const name of this.$fnNames) this[name] = null; // the functions of the item hold its scope
+		if (this.$sigs !== null) for (const signal of this.$sigs.values()) signal.handlers = [];
 		this.$owned = undefined;
 		if (this.$defScope !== undefined) this.$defScope = null; // a Component: the scope it was written in
 		if (this.$custom !== null) for (const name in this.$custom) this.$custom[name] = null;

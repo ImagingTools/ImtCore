@@ -2785,6 +2785,8 @@ export class Engine {
 		const bound = compiled.bind(item);
 		bound.$owner = item;
 		Object.defineProperty(item, fn.name, { value: bound, enumerable: true, configurable: true, writable: true });
+		if (item.$fnNames === undefined) item.$fnNames = [];
+		item.$fnNames.push(fn.name);
 	}
 
 	// ----- properties -----
@@ -3542,7 +3544,23 @@ export class Engine {
 		if (item.$links !== undefined) {
 			const links = item.$links;
 			item.$links = undefined;
-			for (const undo of links) undo();
+			for (const undo of links) {
+				undo();
+				if (undo.$source !== undefined && undo.$source.$linksIn !== undefined) undo.$source.$linksIn.delete(undo);
+			}
+		}
+		if (item.$linksIn !== undefined) {
+			// The connections to a signal of this item: the objects that made them let go of them.
+			const incoming = item.$linksIn;
+			item.$linksIn = undefined;
+			for (const undo of incoming) {
+				undo();
+				const links = undo.$owner.$links;
+				if (links !== undefined) {
+					const at = links.indexOf(undo);
+					if (at >= 0) links.splice(at, 1);
+				}
+			}
 		}
 		if (item.$chg !== undefined) {
 			for (const list of item.$chg.values()) {
