@@ -325,10 +325,13 @@ Item {
 			return false
 
 		}
-		if (index === 0 && tabView.currentIndex > 0){
-			tabView.currentIndex--
-		}
-
+		if (index === 0 && tabView.currentIndex > 0){
+
+			tabView.currentIndex--
+
+		}
+
+
 
 		}
 
