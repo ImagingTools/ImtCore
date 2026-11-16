@@ -71,6 +71,8 @@ public:
 	I_BEGIN_COMPONENT(CObjectCollectionControllerCompBase);
 		I_ASSIGN_MULTI_0(m_replaceableFieldsAttrPtr, "ReplaceableFilterFields", "List of filter fields to be replaced", false);
 		I_ASSIGN_MULTI_0(m_replacementFieldsAttrPtr, "ReplacementFilterFields", "List of filter fields to replace with", false);
+		I_ASSIGN_MULTI_0(m_headerFilterHeaderIdsAttrPtr, "HeaderFilterHeaderIds", "Request headers that restrict a list to one value of a field (e.g. a page showing one product category)", false);
+		I_ASSIGN_MULTI_0(m_headerFilterFieldIdsAttrPtr, "HeaderFilterFieldIds", "Fields restricted by the headers of HeaderFilterHeaderIds, in the same order", false);
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
 		I_ASSIGN(m_userActionManagerCompPtr, "UserActionManager", "User action manager", false, "UserActionManager");
 		I_ASSIGN(m_headersProviderCompPtr, "HeadersProvider", "Collection headers provider", false, "HeadersProvider");
@@ -213,6 +215,12 @@ public:
 
 protected:
 	void ReplaceComplexFilterFields(imtbase::IComplexCollectionFilter& filter) const;
+
+	/**
+		Restricts the request to the objects whose HeaderFilterFieldIds fields equal the values of the
+		HeaderFilterHeaderIds headers sent with it. The restriction is AND-ed with the client's own filter.
+	*/
+	void ApplyHeaderFilters(const imtgql::CGqlRequest& gqlRequest, iprm::CParamsSet& filterParams) const;
 	void UpdateFieldsInfoFromHeaders(imtbase::IComplexCollectionFilter& filter) const;
 
 	virtual bool GetOperationFromRequest(const imtgql::CGqlRequest& gqlRequest, imtgql::CGqlParamObject& gqlObject, QString& errorMessage, int& operationType) const;
@@ -462,6 +470,8 @@ private:
 protected:
 	I_MULTIATTR(QByteArray, m_replaceableFieldsAttrPtr);
 	I_MULTIATTR(QByteArray, m_replacementFieldsAttrPtr);
+	I_MULTIATTR(QByteArray, m_headerFilterHeaderIdsAttrPtr);
+	I_MULTIATTR(QByteArray, m_headerFilterFieldIdsAttrPtr);
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
 	I_REF(imtcol::ICollectionHeadersProvider, m_headersProviderCompPtr);
 	I_REF(imtbase::IOperationContextController, m_operationContextControllerCompPtr);

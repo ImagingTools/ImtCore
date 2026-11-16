@@ -3286,6 +3286,45 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 			}
 		}
 	}
+
+	ApplyHeaderFilters(gqlRequest, filterParams);
+}
+
+
+void CObjectCollectionControllerCompBase::ApplyHeaderFilters(const imtgql::CGqlRequest& gqlRequest, iprm::CParamsSet& filterParams) const
+{
+	imtbase::IComplexCollectionFilter::FilterExpression fixedExpression;
+	fixedExpression.logicalOperation = imtbase::IComplexCollectionFilter::LO_AND;
+
+	const int count = qMin(m_headerFilterHeaderIdsAttrPtr.GetCount(), m_headerFilterFieldIdsAttrPtr.GetCount());
+	for (int i = 0; i < count; ++i){
+		const QByteArray headerValue = gqlRequest.GetHeader(m_headerFilterHeaderIdsAttrPtr[i]);
+		if (!headerValue.isEmpty()){
+			fixedExpression.fieldFilters << imtbase::IComplexCollectionFilter::FieldFilter(m_headerFilterFieldIdsAttrPtr[i], QString::fromUtf8(headerValue));
+		}
+	}
+
+	if (fixedExpression.fieldFilters.isEmpty()){
+		return;
+	}
+
+	imtbase::CComplexCollectionFilter* complexFilterPtr = dynamic_cast<imtbase::CComplexCollectionFilter*>(filterParams.GetEditableParameter(QByteArrayLiteral("ComplexFilter")));
+	if (complexFilterPtr == nullptr){
+		istd::TDelPtr<imtbase::CComplexCollectionFilter> newFilterPtr = new imtbase::CComplexCollectionFilter();
+		newFilterPtr->SetFilterExpression(fixedExpression);
+
+		filterParams.SetEditableParameter(QByteArrayLiteral("ComplexFilter"), newFilterPtr.PopPtr(), true);
+
+		return;
+	}
+
+	// The client's own filter becomes a nested expression, so its OR-logic cannot widen the fixed restriction.
+	const imtbase::IComplexCollectionFilter::FilterExpression& clientExpression = complexFilterPtr->GetFilterExpression();
+	if (!clientExpression.fieldFilters.isEmpty() || !clientExpression.filterExpressions.isEmpty()){
+		fixedExpression.filterExpressions << clientExpression;
+	}
+
+	complexFilterPtr->SetFilterExpression(fixedExpression);
 }
 
 
