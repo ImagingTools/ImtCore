@@ -512,6 +512,8 @@ class Codegen {
 
         for(let e of el.enums){
             for(let key of Object.keys(e.values || {})) this.out.push(className + '.' + key + '=' + JSON.stringify(e.values[key]) + ';')
+            // Type.Enum.Value as well as Type.Value
+            this.out.push(className + '.' + e.name + '=' + JSON.stringify(e.values || {}) + ';')
         }
 
         let aliasTargets = []
