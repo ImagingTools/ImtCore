@@ -588,6 +588,26 @@ export class Engine {
 			...enumObject(QT_ENUMS),
 			...CURSOR,
 			...BRUSH_PATTERN,
+			// Qt::InputMethodHint: what the page's input element of an editor is made for (keyboard layout, autocapitalization).
+			ImhNone: 0,
+			ImhHiddenText: 0x1,
+			ImhSensitiveData: 0x2,
+			ImhNoAutoUppercase: 0x4,
+			ImhPreferNumbers: 0x8,
+			ImhPreferUppercase: 0x10,
+			ImhPreferLowercase: 0x20,
+			ImhNoPredictiveText: 0x40,
+			ImhDate: 0x80,
+			ImhTime: 0x100,
+			ImhMultiLine: 0x200,
+			ImhDigitsOnly: 0x10000,
+			ImhFormattedNumbersOnly: 0x20000,
+			ImhUppercaseOnly: 0x40000,
+			ImhLowercaseOnly: 0x80000,
+			ImhDialableCharactersOnly: 0x100000,
+			ImhEmailCharactersOnly: 0x200000,
+			ImhUrlCharactersOnly: 0x400000,
+			ImhLatinOnly: 0x800000,
 			// Qt::ShortcutContext.
 			WidgetShortcut: 0,
 			WindowShortcut: 1,
@@ -2169,8 +2189,11 @@ export class Engine {
 		return true;
 	}
 
-	dispatchKey(domEvent, pressed) {
+	// `native`: the key is edited by an input element of the page (src/textproxy.js), the focused editor does not edit with it; its Keys
+	// handlers and the items around it get the key as usual.
+	dispatchKey(domEvent, pressed, native = false) {
 		const event = qtKeyEvent(domEvent);
+		const editor = native ? getFocusItem() : null;
 		const shift = (event.modifiers & MODIFIERS.ShiftModifier) !== 0;
 		if (pressed && this.activateShortcut(event)) return true;
 		for (let item = getFocusItem(); item !== null && item !== undefined; item = item.$parent) {
@@ -2186,7 +2209,7 @@ export class Engine {
 				}
 			}
 			if (!pressed) continue;
-			if (item.$keyPressed !== undefined && this.guard(() => item.$keyPressed(event), `key ${item.$typeName}`, 0) === true) return true;
+			if (item !== editor && item.$keyPressed !== undefined && this.guard(() => item.$keyPressed(event), `key ${item.$typeName}`, 0) === true) return true;
 			const target = keyNavigationTarget(item, event.key, shift);
 			if (target !== null) {
 				target.forceActiveFocus();

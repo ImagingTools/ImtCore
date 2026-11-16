@@ -4733,12 +4733,17 @@ function wrapRanges(info, text, start, stop, limit, anywhere, out) {
 	out.push({ start: lineStart, end: stop });
 }
 
+// The text editors of the scene (src/textproxy.js keeps an input element of the page for some of them).
+export const textEditors = new Set();
+
 // The editing core of TextInput (one line) and TextEdit (many lines). The cursor and the other end of the selection
 // (`$anchor`) are indexes into `$text`; undo steps are snapshots taken before a change.
 class TextEditor extends Item {
 	constructor(multiline) {
 		super();
+		textEditors.add(this);
 		this.$multi = multiline;
+		this.$hints = 0; // Qt.InputMethodHints
 		this.$text = '';
 		this.$color = BLACK;
 		this.$pixelSize = 12;
@@ -5099,6 +5104,42 @@ class TextEditor extends Item {
 		this.$touched();
 	}
 
+	// What the input element of the page mirrors: the text and the selection.
+	$domState() {
+		return { text: this.$text, start: this.$lo, end: this.$hi, backward: this.$cursor < this.$anchor };
+	}
+
+	// The input element of the page changed (typing, a virtual keyboard, a composition, a paste, the autofill of the browser): the model
+	// follows. `start` and `end` are the selection of the element. The change is found as what is between the common head and tail of the
+	// old and the new text, so the undo history, the cursor and `textEdited` work as for a typed key. Returns whether the text changed.
+	$fromDom(value, start, end, backward) {
+		if (!this.$editable) return false;
+		const next = this.$multi ? String(value) : String(value).replace(/[\r\n]/g, ' ');
+		const old = this.$text;
+		let changed = false;
+		if (next !== old) {
+			const shortest = Math.min(old.length, next.length);
+			let head = 0;
+			while (head < shortest && old.charCodeAt(head) === next.charCodeAt(head)) head++;
+			if (head > 0 && head < shortest && isHighSurrogate(old.charCodeAt(head - 1))) head--;
+			let tail = 0;
+			while (tail < shortest - head && old.charCodeAt(old.length - 1 - tail) === next.charCodeAt(next.length - 1 - tail)) tail++;
+			if (tail > 0 && isLowSurrogate(old.charCodeAt(old.length - tail))) tail--;
+			const inserted = next.slice(head, next.length - tail);
+			changed = this.$splice(head, old.length - tail, inserted, inserted === '' ? 'delete' : 'type', false);
+			this.$emit('textEdited', []);
+		}
+		if (this.$text === next) {
+			const n = next.length;
+			const lo = clampIndex(start, n);
+			const hi = clampIndex(end, n);
+			this.$cursor = backward ? lo : hi;
+			this.$anchor = backward ? hi : lo;
+			this.$touched();
+		}
+		return changed;
+	}
+
 	// ----- the API of the QML types -----
 
 	select(start, end) {
@@ -5425,6 +5466,11 @@ class TextEditor extends Item {
 
 	// ----- focus and the text cursor -----
 
+	$destroy() {
+		textEditors.delete(this);
+		super.$destroy();
+	}
+
 	$focusEdge() {
 		const now = this.$active;
 		if (now === this.$focused) return;
@@ -5647,6 +5693,7 @@ for (const [name, field, coerce] of [
 	['bottomPadding', '$padB', toFloat],
 	['wrapMode', '$wrap', toWrapMode],
 	['echoMode', '$echo', toEcho],
+	['inputMethodHints', '$hints', toFloat],
 	['textFormat', '$format', (value) => (value === undefined || value === null ? 'PlainText' : String(value))],
 ]) {
 	defineProp(
