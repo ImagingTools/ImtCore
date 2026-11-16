@@ -315,6 +315,9 @@ Item {
 		if (index < 0 || tabView.tabModel.get(index).pinned){
 			return false
 		}
+		if (workspaceView.openingDocumentIds[id]){
+			return false
+		}
 		if (workspaceView.documentManager && workspaceView.documentManager.getDocumentDataById(id)){
 			return false
 		}
