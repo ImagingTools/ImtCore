@@ -155,6 +155,66 @@ const checks = {
 		assert.equal(unused.parsed, true);
 	},
 
+	// --compress-docs: the packed trees and their scans move into one deflated block; the browser (or here, Node) inflates it
+	// before the project loads its main document, so the application still runs the same.
+	async '--compress-docs'() {
+		const result = await compile({ mode: 'js', config: join(fixture, 'app.json'), entry: 'app/Main.qml', name: 'index', root: '/data/', compressDocs: true }, quiet);
+		const spec = JSON.parse(JSON.stringify(result.spec));
+		assert.equal(spec.docs, undefined);
+		assert.equal(spec.scans, undefined);
+		assert.equal(typeof spec.docsDeflate, 'string');
+		for (const text of [result.code, spec.docsDeflate]) {
+			assert.ok(!text.includes('import QtQuick'), 'the text of a document is in the bundle');
+			assert.ok(!text.includes('property string greeting'), 'a declaration is in the bundle as text');
+		}
+
+		const app = createCompiledApplication({ ...spec, language: 'de-DE' }, null);
+		app.scene.resize(800, 600, 1);
+		const root = await app.start();
+		for (let i = 0; i < 3; i++) app.scene.drawFrame(i * 0.016);
+		assert.equal(root.greeting, 'Hallo');
+		assert.equal(root.sum, 5);
+		const names = [];
+		walk(root, (item) => names.push(item.objectName));
+		assert.ok(names.includes('widget') && names.includes('sibling') && names.includes('widgetText'));
+		assert.equal(app.engine.errors.length, 0, app.engine.errors.join('\n'));
+		// The documents are there once the application has started: a page that never starts never inflates them.
+		assert.ok(app.project.docs.has('app/Main.qml'));
+	},
+
+	async '--compress-docs needs DecompressionStream'() {
+		const result = await compile({ mode: 'js', config: join(fixture, 'app.json'), entry: 'app/Main.qml', name: 'index', compressDocs: true }, quiet);
+		const spec = JSON.parse(JSON.stringify(result.spec));
+		const app = createCompiledApplication(spec, null);
+		const real = globalThis.DecompressionStream;
+		globalThis.DecompressionStream = undefined;
+		try {
+			await assert.rejects(app.start(), /DecompressionStream/);
+		} finally {
+			globalThis.DecompressionStream = real;
+		}
+	},
+
+	// --obfuscate-light: the comments and the layout of the engine's own code (not of the QML documents, already stripped by the
+	// packed format) go, without renaming anything; the application still runs.
+	async '--obfuscate-light'() {
+		const plain = await compile({ mode: 'js', config: join(fixture, 'app.json'), entry: 'app/Main.qml', name: 'index' }, quiet);
+		assert.ok(plain.code.includes('an error of a binding while it runs is only logged'), 'a comment of the engine is missing even without the flag');
+
+		const result = await compile({ mode: 'js', config: join(fixture, 'app.json'), entry: 'app/Main.qml', name: 'index', root: '/data/', obfuscateLight: true }, quiet);
+		assert.ok(!result.code.includes('an error of a binding while it runs is only logged'), 'a comment of the engine is still in the obfuscated bundle');
+		assert.ok(result.code.length < plain.code.length, 'the obfuscated bundle is not smaller');
+
+		const spec = JSON.parse(JSON.stringify(result.spec));
+		const app = createCompiledApplication({ ...spec, language: 'de-DE' }, null);
+		app.scene.resize(800, 600, 1);
+		const root = await app.start();
+		for (let i = 0; i < 3; i++) app.scene.drawFrame(i * 0.016);
+		assert.equal(root.greeting, 'Hallo');
+		assert.equal(root.sum, 5);
+		assert.equal(app.engine.errors.length, 0, app.engine.errors.join('\n'));
+	},
+
 	async 'syntax error'() {
 		await assert.rejects(compile({ mode: 'js', entry: join(fixture, 'broken', 'Main.qml'), name: 'broken' }, quiet), (error) => {
 			assert.match(error.message, /broken\/Main.qml:5:13: error: /);

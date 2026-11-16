@@ -101,8 +101,13 @@ check('the ids of the context of the parent', [item.width, item.height, item.$pa
 root.base = 5;
 frames(2);
 check('a binding follows them', item.width, 10);
-const documents = engine.inlineDocs.size;
-check('the same text again is another object, and not another document', [make('import QtQuick\nItem { objectName: "z" }') !== make('import QtQuick\nItem { objectName: "z" }'), engine.inlineDocs.size - documents], [true, 1]);
+const countDocuments = () => {
+	let n = 0;
+	for (const byText of engine.inlineDocs.values()) n += byText.size;
+	return n;
+};
+const documents = countDocuments();
+check('the same text again is another object, and not another document', [make('import QtQuick\nItem { objectName: "z" }') !== make('import QtQuick\nItem { objectName: "z" }'), countDocuments() - documents], [true, 1]);
 check('a runtime error of a binding is only logged', attempt(() => make('import QtQuick\nItem { property int a: nothere.x }')).name, undefined);
 
 // a type of the directory of the url, and what the text imports itself

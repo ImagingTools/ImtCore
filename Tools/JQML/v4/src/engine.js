@@ -3388,9 +3388,14 @@ export class Engine {
 		const failure = (error, line, column) => new Error(`${header}failed to create object: 
     ${where}:${line}:${column}: ${describe(error)}`);
 		const path = url === undefined ? where : this.documentPath(where);
-		let kept = this.inlineDocs.get(`${path} ${text}`);
+		let byText = this.inlineDocs.get(path);
+				if (byText === undefined) {
+					byText = new Map();
+					this.inlineDocs.set(path, byText);
+				}
+				let kept = byText.get(text);
 		if (kept === undefined) {
-			kept = { path: `${path}#${this.inlineDocs.size}`, source: text, def: null, error: null };
+			kept = { path: `${path}#${byText.size}`, source: text, def: null, error: null };
 			try {
 				kept.def = parseQmlDocument(text, !this.project.trusted);
 			} catch (error) {
@@ -3398,7 +3403,7 @@ export class Engine {
 				throw failure(error, error.line, error.column);
 			}
 			this.project.docs.set(kept.path, kept);
-			this.inlineDocs.set(`${path} ${text}`, kept);
+			byText.set(text, kept);
 		}
 		const scope = this.newScope(parent.$scope === undefined ? null : parent.$scope, kept.path);
 		const mark = this.completed.length;
