@@ -125,6 +125,23 @@ Rectangle {
 		requestPaint()
 	}
 	
+	function fitToCanvas(){
+		if (canvas.backgroundWidth == 0 | canvas.backgroundHeight == 0){
+			return
+		}
+
+		let scaleCoeff_ = (canvas.width - Style.marginM * 2) / canvas.backgroundWidth;
+		let scaleCoeff_h = (canvas.height - Style.marginM * 2) / canvas.backgroundHeight;
+		if (scaleCoeff_ > scaleCoeff_h){
+			scaleCoeff_ = scaleCoeff_h
+		}
+		canvas.setScale(scaleCoeff_, canvas.width / 2, canvas.height / 2)
+
+		canvas.deltaX = canvasPage.width / 2 - backgroundRec.width / 2
+		canvas.deltaY = canvasPage.height / 2 - backgroundRec.height / 2
+	}
+
+
 	// Fits the objects of the scheme, or the whole sheet when there are none
 	function zoomToFit(){
 		let bounds = canvasPage.getContentBounds()
