@@ -8,6 +8,10 @@
 // ACF includes
 #include <iqt/iqt.h>
 
+// ImtCore includes
+#include <imtauth/imtauth.h>
+#include <imtservergql/imtservergql.h>
+
 
 namespace imtservergql
 {
@@ -120,14 +124,13 @@ bool CHeadersDataProviderComp::CheckHeaderPermission(const QByteArray& headerId,
 		return false;
 	}
 
-	QByteArrayList userPermissions = userInfoPtr->GetPermissions();
-	QByteArray headerPermission = m_headerPermissionsAttrPtr[index];
-
+	const QByteArray headerPermission = m_headerPermissionsAttrPtr[index];
 	if (headerPermission.isEmpty()){
 		return true;
 	}
 
-	return userPermissions.contains(headerPermission);
+	// As for the commands: the permissions of the product of the request, with what they imply, compared by path.
+	return imtauth::HasPermission(GetUserPermissions(gqlContext), headerPermission);
 }
 
 
