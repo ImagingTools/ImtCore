@@ -215,6 +215,28 @@ const checks = {
 		assert.equal(app.engine.errors.length, 0, app.engine.errors.join('\n'));
 	},
 
+	// The default build also renames a QML script's own locals (compiler/mangleLocals): never an id, and the application still
+	// computes the same thing. --no-obfuscate-light keeps the original names, for a build that must stay readable end to end.
+	async 'obfuscate-light renames a QML script\'s own locals'() {
+		const local = join(fixture, 'standalone', 'Local.qml');
+		const obfuscated = await compile({ mode: 'js', entry: local, name: 'index', compressDocs: false }, quiet);
+		const readable = await compile({ mode: 'js', entry: local, name: 'index', obfuscateLight: false, compressDocs: false }, quiet);
+		const obfuscatedDocs = JSON.stringify(JSON.parse(JSON.stringify(obfuscated.spec)).docs);
+		const readableDocs = JSON.stringify(JSON.parse(JSON.stringify(readable.spec)).docs);
+		assert.ok(!obfuscatedDocs.includes('"upTo"') && !obfuscatedDocs.includes('"acc"'), 'a local name is still in the obfuscated bundle');
+		assert.ok(readableDocs.includes('upTo') && readableDocs.includes('acc'), 'a local name is missing even with the flag off');
+		assert.ok(obfuscatedDocs.includes('root') && readableDocs.includes('root'), 'the id was renamed along with the locals');
+
+		for (const spec of [obfuscated.spec, readable.spec]) {
+			const app = createCompiledApplication(JSON.parse(JSON.stringify(spec)), null);
+			app.scene.resize(300, 200, 1);
+			const root = await app.start();
+			for (let i = 0; i < 3; i++) app.scene.drawFrame(i * 0.016);
+			assert.equal(root.total, 6 + 300);
+			assert.equal(app.engine.errors.length, 0, app.engine.errors.join('\n'));
+		}
+	},
+
 	async 'syntax error'() {
 		await assert.rejects(compile({ mode: 'js', entry: join(fixture, 'broken', 'Main.qml'), name: 'broken' }, quiet), (error) => {
 			assert.match(error.message, /broken\/Main.qml:5:13: error: /);
