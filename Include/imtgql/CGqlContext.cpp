@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtgql/CGqlContext.h>
 
+#include <QtCore/QSet>
+
 
 // ACF includes
 #include <istd/CChangeNotifier.h>
@@ -28,6 +30,22 @@ CGqlContext::CGqlContext()
 
 CGqlContext::~CGqlContext()
 {
+}
+
+
+QByteArray CGqlContext::GetServerProductId() const
+{
+	return m_serverProductId;
+}
+
+
+void CGqlContext::SetServerProductId(const QByteArray& serverProductId)
+{
+	if (m_serverProductId != serverProductId){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_serverProductId = serverProductId;
+	}
 }
 
 
@@ -170,7 +188,60 @@ void CGqlContext::SetUserInfo(const imtauth::IUserInfo* userInfoPtr)
 		else{
 			m_userInfoPtr.Reset();
 		}
+		m_principalKind = userInfoPtr == nullptr ? PK_ANONYMOUS : PK_USER;
 	}
+}
+
+
+IGqlContext::PrincipalKind CGqlContext::GetPrincipalKind() const
+{
+	return m_principalKind;
+}
+
+
+void CGqlContext::SetPrincipalKind(PrincipalKind kind)
+{
+	istd::CChangeNotifier notifier(this);
+	m_principalKind = kind;
+}
+
+
+bool CGqlContext::HasPermissionBoundary() const
+{
+	return m_hasPermissionBoundary;
+}
+
+
+QByteArrayList CGqlContext::GetPermissionBoundary() const
+{
+	return m_permissionBoundary;
+}
+
+
+void CGqlContext::SetPermissionBoundary(const QByteArrayList& permissions)
+{
+	istd::CChangeNotifier notifier(this);
+	m_permissionBoundary = permissions;
+	m_hasPermissionBoundary = true;
+	ResetImpliedPermissions();
+}
+
+
+bool CGqlContext::GetGrantingAuthority(bool& isAdmin, QByteArrayList& permissions) const
+{
+	isAdmin = m_isGrantingAdmin;
+	permissions = m_grantingPermissions;
+
+	return m_hasGrantingAuthority;
+}
+
+
+void CGqlContext::SetGrantingAuthority(bool isAdmin, const QByteArrayList& permissions)
+{
+	istd::CChangeNotifier notifier(this);
+	m_hasGrantingAuthority = true;
+	m_isGrantingAdmin = isAdmin;
+	m_grantingPermissions = permissions;
 }
 
 
@@ -223,6 +294,12 @@ imtauth::IUserInfo::FeatureIds CGqlContext::GetImpliedPermissions() const
 						: m_userInfoPtr->GetPermissions(m_productId);
 
 			m_impliedPermissions = imtgql::CollectImpliedPermissions(*this, userPermissions);
+			if (m_hasPermissionBoundary){
+				const QSet<QByteArray> boundary(m_permissionBoundary.cbegin(), m_permissionBoundary.cend());
+				m_impliedPermissions.removeIf([&boundary](const QByteArray& permission){
+					return !boundary.contains(permission);
+				});
+			}
 		}
 	}
 
@@ -296,6 +373,11 @@ bool CGqlContext::Serialize(iser::IArchive &archive)
 	retVal = retVal && archive.Process(m_productId);
 	retVal = retVal && archive.EndTag(productTag);
 
+	iser::CArchiveTag serverProductTag("ServerProductId", "Product whose server the request came through", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(serverProductTag);
+	retVal = retVal && archive.Process(m_serverProductId);
+	retVal = retVal && archive.EndTag(serverProductTag);
+
 	iser::CArchiveTag designSchemeTag("DesignScheme", "Design scheme", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(designSchemeTag);
 	retVal = retVal && archive.Process(m_designScheme);
@@ -348,6 +430,7 @@ bool CGqlContext::CopyFrom(const IChangeable &object, CompatibilityMode /*mode*/
 		m_userId = sourcePtr->m_userId;
 		m_tenantId = sourcePtr->m_tenantId;
 		m_productId = sourcePtr->m_productId;
+		m_serverProductId = sourcePtr->m_serverProductId;
 		m_headers = sourcePtr->m_headers;
 		m_productInfoPtr = sourcePtr->m_productInfoPtr;
 		m_tenantPermissions = sourcePtr->m_tenantPermissions;
@@ -355,6 +438,12 @@ bool CGqlContext::CopyFrom(const IChangeable &object, CompatibilityMode /*mode*/
 		m_organizationPermissions = sourcePtr->m_organizationPermissions;
 
 		SetUserInfo(sourcePtr->m_userInfoPtr.GetPtr());
+		m_principalKind = sourcePtr->m_principalKind;
+		m_hasPermissionBoundary = sourcePtr->m_hasPermissionBoundary;
+		m_permissionBoundary = sourcePtr->m_permissionBoundary;
+		m_hasGrantingAuthority = sourcePtr->m_hasGrantingAuthority;
+		m_isGrantingAdmin = sourcePtr->m_isGrantingAdmin;
+		m_grantingPermissions = sourcePtr->m_grantingPermissions;
 
 		// Resolved anew for the copy instead of being taken over: the source may
 		// be answering GetImpliedPermissions() on another thread right now.
@@ -384,6 +473,7 @@ bool CGqlContext::ResetData(CompatibilityMode /*mode*/)
 
 	m_languageId.clear();
 	m_productId.clear();
+	m_serverProductId.clear();
 	m_designScheme.clear();
 	m_token.clear();
 	m_scopes.clear();
@@ -395,6 +485,12 @@ bool CGqlContext::ResetData(CompatibilityMode /*mode*/)
 	m_isTenantOwner = false;
 	m_organizationPermissions.clear();
 	m_userInfoPtr.Reset();
+	m_principalKind = PK_ANONYMOUS;
+	m_hasPermissionBoundary = false;
+	m_permissionBoundary.clear();
+	m_hasGrantingAuthority = false;
+	m_isGrantingAdmin = false;
+	m_grantingPermissions.clear();
 
 	ResetImpliedPermissions();
 
@@ -414,4 +510,3 @@ void CGqlContext::ResetImpliedPermissions()
 
 
 } // namespace imtgql
-

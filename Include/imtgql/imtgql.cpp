@@ -5,6 +5,8 @@
 // ImtCore includes
 #include <iqt/iqt.h>
 #include <imtauth/imtauth.h>
+#include <imtbase/imtbase.h>
+#include <imtgql/CGqlContext.h>
 #include <imtlic/IProductInfo.h>
 
 
@@ -32,6 +34,14 @@ imtauth::IUserInfo::FeatureIds CollectImpliedPermissions(const IGqlContext& gqlC
 	}
 
 	return retVal;
+}
+
+
+QByteArray GetSenderServerProductId(const IGqlContext& gqlContext)
+{
+	const bool isServerItself = gqlContext.GetPrincipalKind() == IGqlContext::PK_SERVICE;
+
+	return isServerItself ? gqlContext.GetServerProductId() : QByteArray();
 }
 
 
@@ -133,6 +143,19 @@ QByteArray GetTranslation(const iqt::ITranslationManager* translationManagerPtr,
 }
 
 
+void SetServerRequestContext(CGqlRequest& gqlRequest, const QByteArray& serverToken)
+{
+	IGqlContextUniquePtr contextPtr(new CGqlContext);
+	if (!serverToken.isEmpty()){
+		IGqlContext::Headers headers;
+		headers.insert(imtbase::s_authenticationTokenHeaderId, serverToken);
+
+		contextPtr->SetToken(serverToken);
+		contextPtr->SetHeaders(headers);
+	}
+
+	gqlRequest.SetGqlContext(IGqlContextSharedPtr::CreateFromUnique(std::move(contextPtr)));
+}
+
+
 } // namespace imtqml
-
-

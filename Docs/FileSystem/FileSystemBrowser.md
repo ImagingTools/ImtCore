@@ -141,6 +141,8 @@ when the filter or sort changes.
 Implements the same domain interface by forwarding `GetFileSystemEntries` through
 `IGqlClient` (`ApiClient`). Optional `UrlParam` is passed to `SendRequest`.
 Response parsing uses generated SDL types.
+The synchronous request returns `IGqlClient::GqlResult`; failures propagate its error
+message instead of reporting every transport refusal as an unreachable service.
 
 ## Server controller (`imtservergql`)
 

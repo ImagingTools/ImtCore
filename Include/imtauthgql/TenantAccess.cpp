@@ -259,6 +259,24 @@ bool NarrowSubOrganizationPermissions(imtauth::ITenantManager& tenantManager, co
 }
 
 
+bool CheckTenantRemovalAccess(const imtgql::IGqlContext* gqlContextPtr, const imtauth::ITenantInfo* tenantPtr, QString& errorMessage)
+{
+	const imtauth::IUserInfo* userInfoPtr = gqlContextPtr != nullptr ? gqlContextPtr->GetUserInfo() : nullptr;
+	if (userInfoPtr != nullptr && userInfoPtr->IsAdmin()){
+		return true;
+	}
+
+	if (userInfoPtr != nullptr && tenantPtr != nullptr
+				&& (tenantPtr->GetCreatorId() == gqlContextPtr->GetUserId() || tenantPtr->GetOwnerId() == gqlContextPtr->GetUserId())){
+		return true;
+	}
+
+	errorMessage = QStringLiteral("An organization is removed only by its creator or its owner");
+
+	return false;
+}
+
+
 bool CheckTenantRemoval(const imtauth::ITenantManager& tenantManager, const QByteArrayList& tenantIds, QString& errorMessage)
 {
 	return CheckTenantRemovalWith(

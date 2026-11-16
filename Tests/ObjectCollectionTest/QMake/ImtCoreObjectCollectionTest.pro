@@ -6,7 +6,7 @@ include($$PWD/../../../Config/QMake/ImtCore.pri)
 LIBS += -L../../../Lib/$$COMPILER_DIR
 LIBS += -limtbase -limtauth -limtaccount -limtdb -limttest -litest
 
-QT += core testlib widgets
+QT += core testlib widgets sql
 
 CONFIG += console
 

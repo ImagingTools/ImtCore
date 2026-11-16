@@ -140,6 +140,22 @@ QByteArray CConnectionCollectionComp::InsertNewConnection(
 }
 
 
+// reimplemented (imtservice::IServerTokenReceiverInfo)
+
+bool CConnectionCollectionComp::IsServerTokenReceiver(const QByteArray& connectionId) const
+{
+	for (int i = 0; i < m_serverTokenConnectionIds.GetCount(); i++){
+		if (m_serverTokenConnectionIds[i] == connectionId){
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+// reimplemented (ilog::ITracingConfiguration)
+
 int CConnectionCollectionComp::GetTracingLevel() const
 {
 	if (!m_tracingConfigurationCompPtr.IsValid()){

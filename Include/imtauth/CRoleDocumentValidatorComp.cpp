@@ -60,6 +60,10 @@ bool CRoleDocumentValidatorComp::ValidateDocumentData(
 		return false;
 	}
 
+	if (!CheckParentRolesInProduct(*m_roleCollectionCompPtr, roleInfoPtr->GetIncludedRoles(), productId, errorMessage)){
+		return false;
+	}
+
 	if (!tenantId.isEmpty()){
 		if (!m_tenantManagerCompPtr.IsValid()){
 			errorMessage = QStringLiteral("Tenant manager is not configured for tenant-scoped role permissions validation");
@@ -160,6 +164,25 @@ bool CRoleDocumentValidatorComp::CheckParentRolesInTenant(
 	for (const QByteArray& parentRoleId : parentRoleIds){
 		if (!tenantRoleIds.contains(parentRoleId)){
 			errorMessage = QStringLiteral("The parent role '%1' belongs to another organization").arg(QString::fromUtf8(parentRoleId));
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+bool CRoleDocumentValidatorComp::CheckParentRolesInProduct(
+			const imtbase::IObjectCollection& roleCollection,
+			const QByteArrayList& parentRoleIds,
+			const QByteArray& productId,
+			QString& errorMessage)
+{
+	for (const QByteArray& parentRoleId : parentRoleIds){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		const imtauth::IRole* parentRolePtr = roleCollection.GetObjectData(parentRoleId, dataPtr) ? dynamic_cast<const imtauth::IRole*>(dataPtr.GetPtr()) : nullptr;
+		if (parentRolePtr == nullptr || parentRolePtr->GetProductId() != productId){
+			errorMessage = QStringLiteral("The parent role '%1' belongs to another product").arg(QString::fromUtf8(parentRoleId));
 			return false;
 		}
 	}

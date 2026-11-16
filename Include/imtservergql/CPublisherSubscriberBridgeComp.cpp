@@ -3,12 +3,14 @@
 
 
 // Qt includes
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 
 // ImtCore includes
 #include <imtgql/CGqlRequest.h>
 #include <imtgql/IGqlContext.h>
+#include <imtrest/IProtocolEngine.h>
 
 
 namespace imtservergql
@@ -206,10 +208,54 @@ void CPublisherSubscriberBridgeComp::OnResponseReceived(
 
 
 void CPublisherSubscriberBridgeComp::OnSubscriptionStatusChanged(
-			const QByteArray& /*subscriptionId*/,
-			const SubscriptionStatus& /*status*/,
-			const QString& /*message*/)
+			const QByteArray& subscriptionId,
+			const SubscriptionStatus& status,
+			const QString& message)
 {
+	if (status != SS_REFUSED || !m_requestManagerCompPtr.IsValid()){
+		return;
+	}
+
+	// The reason of the server behind goes on: the client tells a retry from a refusal by it
+	QJsonObject extensions;
+	extensions["type"] = QStringLiteral("Warning");
+	const QJsonArray errors = QJsonDocument::fromJson(message.toUtf8()).object().value("payload").toArray();
+	const QString code = errors.isEmpty() ? QString() : errors.first().toObject().value("extensions").toObject().value("code").toString();
+	if (!code.isEmpty()){
+		extensions["code"] = code;
+	}
+	const QByteArray extensionsJson = QJsonDocument(extensions).toJson(QJsonDocument::Compact);
+
+	QByteArrayList clientSubscriptionIds;
+	{
+		QMutexLocker bridgeLocker(&m_bridgeMutex);
+		clientSubscriptionIds = m_upstreamToClientsMap.value(subscriptionId);
+	}
+
+	// The clients were told the subscription is made: without this they wait for events that never come
+	QMutexLocker locker(&m_mutex);
+	for (const QByteArray& clientSubscriptionId : clientSubscriptionIds){
+		for (const RequestNetworks& entry : m_registeredSubscribers){
+			const imtrest::IRequest* networkRequestPtr = entry.networkRequests.value(clientSubscriptionId);
+			if (networkRequestPtr == nullptr){
+				continue;
+			}
+
+			const QByteArray body = QStringLiteral(R"({"id": "%1","type": "error","payload": [{"message": "The server behind this one refused the subscription","extensions": %2}]})")
+						.arg(QString::fromUtf8(clientSubscriptionId), QString::fromUtf8(extensionsJson)).toUtf8();
+
+			imtrest::ConstResponsePtr responsePtr(networkRequestPtr->GetProtocolEngine().CreateResponse(
+						*networkRequestPtr,
+						imtrest::IProtocolEngine::SC_OPERATION_NOT_AVAILABLE,
+						body,
+						QByteArrayLiteral("text/html; charset=utf-8")).PopInterfacePtr());
+			if (responsePtr.IsValid()){
+				m_requestManagerCompPtr->SendResponse(networkRequestPtr->GetRequestId(), responsePtr);
+			}
+
+			break;
+		}
+	}
 }
 
 

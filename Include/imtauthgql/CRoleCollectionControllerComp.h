@@ -72,7 +72,18 @@ protected:
 				istd::IChangeable& object,
 				QString& errorMessage) const override;
 	virtual void SetAdditionalFilters(const imtgql::CGqlRequest& gqlRequest, imtbase::CComplexCollectionFilter& complexFilter) const override;
+	virtual void SetAdditionalFilters(
+				const imtgql::CGqlRequest& gqlRequest,
+				const imtgql::CGqlParamObject& viewParamsGql,
+				iprm::CParamsSet* filterParamsPtr) const override;
+	virtual bool OnBeforeRemoveElements(const QByteArrayList& elementIds, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual istd::IChangeableUniquePtr CreateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& errorMessage) const override;
+	virtual bool CheckObjectData(const imtgql::CGqlRequest& gqlRequest, const QByteArray& objectId, const istd::IChangeable& object, QString& errorMessage) const override;
+	virtual bool CheckObjectAccess(
+				const imtgql::CGqlRequest& gqlRequest,
+				const QByteArrayList& objectIds,
+				imtauth::IDocumentShareInfo::AccessLevel accessLevel,
+				QString& errorMessage) const override;
 
 	// reimplemented (imtservergql::CPermissibleGqlRequestHandlerComp)
 	virtual bool CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;

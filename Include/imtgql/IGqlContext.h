@@ -31,8 +31,41 @@ class IGqlContext: virtual public iser::IObject
 public:
 	typedef QMap<QByteArray,QByteArray> Headers;
 
+	enum PrincipalKind
+	{
+		PK_ANONYMOUS,
+		PK_USER,
+		PK_SERVICE
+	};
+
+	virtual PrincipalKind GetPrincipalKind() const = 0;
+	virtual void SetPrincipalKind(PrincipalKind kind) = 0;
+
+	// An explicit empty boundary grants nothing; an unset boundary does not restrict permissions.
+	virtual bool HasPermissionBoundary() const = 0;
+	virtual QByteArrayList GetPermissionBoundary() const = 0;
+	virtual void SetPermissionBoundary(const QByteArrayList& permissions) = 0;
+
+	/**
+		Get what the request may give in the roles, groups and users of its product, when it differs from what it may do.
+		The token of a server bounds what a request through it may do at this server; what its user may give in its own product
+		is what this server holds for that user, within the personal token of the user.
+		\param isAdmin		Receives whether the user, as this server reads it, is the superuser: it may give any permission of the product.
+		\param permissions	Receives the permissions the user may give otherwise.
+		\return False when nothing was set: the request gives no more than it holds.
+	*/
+	virtual bool GetGrantingAuthority(bool& isAdmin, QByteArrayList& permissions) const = 0;
+	virtual void SetGrantingAuthority(bool isAdmin, const QByteArrayList& permissions) = 0;
+
 	virtual QByteArray GetProductId() const = 0;
 	virtual void SetProductId(const QByteArray& productId) = 0;
+
+	/**
+		Get the product whose server the request came through, empty for a request made here directly.
+		Without a user the server itself sends it; the user of the request holds only what the token of the server allows.
+	*/
+	virtual QByteArray GetServerProductId() const = 0;
+	virtual void SetServerProductId(const QByteArray& serverProductId) = 0;
 
 	virtual QByteArray GetLanguageId() const = 0;
 	virtual void SetLanguageId(const QByteArray& languageId) = 0;

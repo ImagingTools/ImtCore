@@ -987,6 +987,12 @@ bool CSqlDatabaseDocumentDelegateCompBase::ClearDependentMetaInfo(const MetaFiel
 
 // protected methods
 
+QVariantMap CSqlDatabaseDocumentDelegateCompBase::GetAdditionalInsertValues(const istd::IChangeable& /*object*/) const
+{
+	return QVariantMap();
+}
+
+
 QByteArray CSqlDatabaseDocumentDelegateCompBase::PrepareInsertNewObjectQuery(
 			const QByteArray& typeId,
 			const QByteArray& objectId,
@@ -1066,6 +1072,12 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::PrepareInsertNewObjectQuery(
 						/*9*/ QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs),
 						/*10*/ QStringLiteral("Active")
 					);
+
+	const QVariantMap additionalValues = GetAdditionalInsertValues(object);
+	for (auto it = additionalValues.cbegin(); it != additionalValues.cend(); ++it){
+		columnsClause += ", " + imtdb::QuoteIdentifier(it.key());
+		valuesClause += it.value().isNull() ? QStringLiteral(", NULL") : QStringLiteral(", '%1'").arg(SqlEncode(it.value().toString()));
+	}
 
 	query += QStringLiteral(R"(INSERT INTO %1 "%2"(%3) VALUES(%4);)")
 				.arg(

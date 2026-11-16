@@ -31,6 +31,13 @@ CSqlDatabaseObjectCollectionIterator::CSqlDatabaseObjectCollectionIterator(
 	while (sqlQuery.next()){
 		m_records.append(sqlQuery.record());
 	}
+	if (sqlQuery.lastError().isValid()){
+		m_records.clear();
+		m_elementsCount = -1;
+	}
+	else if (m_elementsCount < 0){
+		m_elementsCount = imtbase::narrow_cast<int>(m_records.size());
+	}
 }
 
 

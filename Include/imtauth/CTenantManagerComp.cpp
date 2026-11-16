@@ -42,8 +42,12 @@ QByteArrayList CTenantManagerComp::GetTenantIds() const
 }
 
 
-ITenantInfoUniquePtr CTenantManagerComp::GetTenant(const QByteArray& tenantId) const
+ITenantInfoUniquePtr CTenantManagerComp::GetTenant(const QByteArray& tenantId, bool* isReadPtr) const
 {
+	if (isReadPtr != nullptr){
+		*isReadPtr = false;
+	}
+
 	if (!m_tenantCollectionCompPtr.IsValid() || !m_tenantFactoryCompPtr.IsValid()){
 		SendErrorMessage(0, "Tenant collection or factory not configured", "CTenantManagerComp");
 		return nullptr;
@@ -51,11 +55,20 @@ ITenantInfoUniquePtr CTenantManagerComp::GetTenant(const QByteArray& tenantId) c
 
 	if (!imtbase::isValidUuid(tenantId)){
 		SendErrorMessage(0, QStringLiteral("Invalid tenant id '%1'").arg(tenantId), QStringLiteral("CTenantManagerComp"));
+		if (isReadPtr != nullptr){
+			*isReadPtr = true;
+		}
 		return nullptr;
 	}
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!m_tenantCollectionCompPtr->GetObjectData(tenantId, dataPtr)){
+		// Only an organization the collection reports as absent is not there; a collection may ignore the filter
+		if (isReadPtr != nullptr){
+			bool isRead = false;
+			const QByteArrayList ids = CollectionSelection::SelectIds(*m_tenantCollectionCompPtr, CollectionSelection::ColumnEquals("Id", tenantId), QByteArrayList(), &isRead);
+			*isReadPtr = isRead && !ids.contains(tenantId);
+		}
 		return nullptr;
 	}
 
@@ -71,6 +84,10 @@ ITenantInfoUniquePtr CTenantManagerComp::GetTenant(const QByteArray& tenantId) c
 
 	if (!clonedTenant->CopyFrom(*tenantPtr)){
 		return nullptr;
+	}
+
+	if (isReadPtr != nullptr){
+		*isReadPtr = true;
 	}
 
 	return clonedTenant;

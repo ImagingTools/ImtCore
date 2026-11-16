@@ -567,6 +567,11 @@ imtbase::ICollectionInfo::Ids CSqlDatabaseObjectCollectionComp::GetElementIds(
 	if (m_objectDelegateCompPtr.IsValid() && m_dbEngineCompPtr.IsValid()){
 		QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(QByteArray(), offset, count, selectionParamsPtr);
 		if (objectSelectionQuery.isEmpty()){
+			// No rows asked for, or a delegate that lists nothing unfiltered, is an empty selection; a filter it cannot express is a failed read
+			if (logPtr != nullptr && count != 0 && selectionParamsPtr != nullptr){
+				logPtr->AddMessage(ilog::IMessageConsumer::MessagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0, QStringLiteral("The selection query could not be created."), "CSqlDatabaseObjectCollectionComp")));
+			}
+
 			return Ids();
 		}
 

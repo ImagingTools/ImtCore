@@ -56,6 +56,15 @@ public:
 				const QByteArray& tenantId,
 				QString& errorMessage);
 
+	/**
+		Check that the parent roles belong to the product of the role.
+	*/
+	static bool CheckParentRolesInProduct(
+				const imtbase::IObjectCollection& roleCollection,
+				const QByteArrayList& parentRoleIds,
+				const QByteArray& productId,
+				QString& errorMessage);
+
 private:
 	I_REF(imtbase::IObjectCollection, m_roleCollectionCompPtr);
 	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
