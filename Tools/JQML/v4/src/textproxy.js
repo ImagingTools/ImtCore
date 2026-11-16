@@ -23,7 +23,7 @@ const IMH = { hidden: 0x1, sensitive: 0x2, noUppercase: 0x4, noPredictive: 0x40,
 const STYLE = `
 .jqml-proxy { position: absolute; box-sizing: border-box; margin: 0; padding: 0; border: 0; outline: 0; resize: none; overflow: hidden;
 	background: transparent !important; color: transparent !important; -webkit-text-fill-color: transparent; caret-color: transparent;
-	font: 16px sans-serif; opacity: 0.01; pointer-events: none; box-shadow: none; }
+	font: 16px sans-serif; opacity: 0.01; pointer-events: none; touch-action: none; box-shadow: none; }
 .jqml-proxy::selection { background: transparent; }
 .jqml-proxy:-webkit-autofill { transition: background-color 600000s 0s, color 600000s 0s; }
 `;
@@ -74,6 +74,9 @@ export function attachTextProxy(canvas, scene, engine) {
 		if (hints & IMH.noPredictive || hints & IMH.sensitive) el.setAttribute('autocomplete', role ? el.autocomplete : 'off');
 		if (item.$maxLength < 32767) el.maxLength = item.$maxLength;
 		el.readOnly = !item.$editable;
+		// The fields of a login form take the clicks themselves: the list of the saved logins of the browser opens only on a click in the
+		// element (not on a focus from a script). Their caret and selection come to the model through `selectionchange`.
+		if (role !== '') el.style.pointerEvents = 'auto';
 		byElement.set(el, item);
 		listen(el);
 		return el;
@@ -219,6 +222,8 @@ export function attachTextProxy(canvas, scene, engine) {
 				free = { item: editor, el };
 			}
 			place(free.el, editor);
+			// the second click in the focused field is native too (the list of the browser, the caret, a selection with the mouse)
+			free.el.style.pointerEvents = 'auto';
 			push(free.el, editor);
 		}
 	}
