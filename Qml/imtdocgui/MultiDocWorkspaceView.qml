@@ -316,9 +316,7 @@ Item {
 			return false
 		}
 		if (workspaceView.openingDocumentIds[id]){
-
 			return false
-
 		}
 
 		if (workspaceView.documentManager && workspaceView.documentManager.getDocumentDataById(id)){
@@ -326,13 +324,7 @@ Item {
 
 		}
 		if (index === 0 && tabView.currentIndex > 0){
-
 			tabView.currentIndex--
-
-		}
-
-
-
 		}
 
 		tabView.removeTab(id)
