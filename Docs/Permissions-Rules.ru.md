@@ -186,7 +186,7 @@ Lisa FeatureEditor ──generate──► <Product>Features.h ──FillProduct
 
 Без `IProductInfo` в контексте requirements не раскрываются, и пользователь получает только выданные листья. Наличие `FeatureContainer` в `AuthenticationManager` проверяется при старте сервера.
 
-**R5.3. Направление записи: «более сильное право → что оно включает»**: `Edit*` → `View*`, никогда наоборот. Удобнее всего одна запись на группе: группа `EditUser` → `ViewUsers` действует для `ChangeUser`, `RemoveUser`, `AddUser`. Так записаны деревья Lisa, ProLife и организации; NeoPro, IotPlatform, Acula — ещё в обратную сторону (13.1).
+**R5.3. Направление записи: «более сильное право → что оно включает»**: `Edit*` → `View*`, никогда наоборот. Удобнее всего одна запись на группе: группа `EditUser` → `ViewUsers` действует для `ChangeUser`, `RemoveUser`, `AddUser`. Так записаны деревья Lisa, ProLife, IotPlatform и организации; NeoPro, Acula — ещё в обратную сторону (13.1).
 
 **R5.4. Ограничения** (проверяют `FeatureEditor` и генератор `Features.h`):
 - цель — существующий узел того же продукта, записанный полным путём; внешнее требование в `LicenseEditor` помечается «from outside this product»;
@@ -390,7 +390,7 @@ Lisa FeatureEditor ──generate──► <Product>Features.h ──FillProduct
 
 | № | Что обнаружено | Где | Что делать |
 |---|---|---|---|
-| 13.1 | **Механизм верный, данные и группы — нет.** Код: «держишь A ⇒ держишь requirements A» (`imtlic::CollectImpliedPermissions`, вызывается из `IGqlContext::GetImpliedPermissions()`; итог `GetPermissions(productId) ∪ GetImpliedPermissions()` в `imtservergql::GetUserPermissions`). Данные во всех продуктах записаны в обратную сторону: `View*` → группа `Edit*` (Lisa, ProLife, NeoPro, IotPlatform, Acula, `COrganizationsPermissionsProviderComp`). Если вывод работает, роль с одним `View*` получает `Edit*` на сервере. Кроме того: requirement на группу даёт сам путь группы, а не её листья; итог не ограничивается правами организации; для PAT раскрытие идёт от всех прав пользователя, а не от scopes; ограничения R5.4 не проверяются. | `imtlic/CProductInfo.cpp`, `imtgql/CGqlContext.cpp`, `imtservergql/imtservergql.h`, `*Features.h` | Исправлено в коде (раскрытие группы-цели в листья, requirements групп, граница организации, PAT от scopes, запрет зависимостей своей ветки) и в данных Lisa, ProLife и дерева организации: новые деревья (R3.4, R3.6) записаны `Edit → View`. **Открыто:** NeoPro, IotPlatform, Acula, Agentino; аудит существующих ролей. |
+| 13.1 | **Механизм верный, данные и группы — нет.** Код: «держишь A ⇒ держишь requirements A» (`imtlic::CollectImpliedPermissions`, вызывается из `IGqlContext::GetImpliedPermissions()`; итог `GetPermissions(productId) ∪ GetImpliedPermissions()` в `imtservergql::GetUserPermissions`). Данные во всех продуктах записаны в обратную сторону: `View*` → группа `Edit*` (Lisa, ProLife, NeoPro, IotPlatform, Acula, `COrganizationsPermissionsProviderComp`). Если вывод работает, роль с одним `View*` получает `Edit*` на сервере. Кроме того: requirement на группу даёт сам путь группы, а не её листья; итог не ограничивается правами организации; для PAT раскрытие идёт от всех прав пользователя, а не от scopes; ограничения R5.4 не проверяются. | `imtlic/CProductInfo.cpp`, `imtgql/CGqlContext.cpp`, `imtservergql/imtservergql.h`, `*Features.h` | Исправлено в коде (раскрытие группы-цели в листья, requirements групп, граница организации, PAT от scopes, запрет зависимостей своей ветки) и в данных Lisa, ProLife, IotPlatform и дерева организации: новые деревья (R3.4, R3.6) записаны `Edit → View`. **Открыто:** NeoPro, Acula, Agentino; аудит существующих ролей. |
 | 13.2 | Исправлено: `GetUserPermissions` берёт права продукта запроса (`GetPermissions(productId)`). | `imtservergql/imtservergql.h` | — |
 | 13.3 | Клиентский `PermissionsController.hasPermission` **не реализует проверку группы** (лист `.../EditUser/ChangeUser` есть, проверка группы `.../EditUser` → на клиенте `false`, на сервере `true`). | `ImtCore/Qml/imtauthgui/PermissionsController.qml` | Исправлено: только пути, проверка группы — «есть лист внутри». |
 | 13.4 | Ограничение PAT по scopes — **точное совпадение** (`scopeSet.contains`), а выдача scopes — через `HasPermission`. Расходятся для голых id. | `imtservergql/CAuthenticationManagerComp.cpp` | Исправлено: через `HasPermission`; голый scope ничего не покрывает. |
@@ -427,7 +427,7 @@ Lisa FeatureEditor ──generate──► <Product>Features.h ──FillProduct
 |---|---|---|---|---|---|
 | Lisa | 74 | 28 | путь, дерево R3.4 | `Edit` → `View`, ревизии → `View` — верное | `Lisa/Impl/LisaServer/LisaFeatures.h` |
 | ProLife | 139 | 43 | путь, дерево R3.4 | `Edit` → `View`, `ViewAll`/`ViewHistory` → `View`, ревизии → `View` — верное | `ProLife/Impl/ProLifeServer/ProLifeFeatures.h` |
-| IotPlatform | 89 | 7 | путь | `View*` → `Edit*` | `IotPlatform/Impl/IotPlatformServerExe/IotPlatformFeatures.h` |
+| IotPlatform | 127 | 21 | путь; Users, Roles, Groups по R3.4 | `Edit` → `View`, ревизии → `View` — верное | `IotPlatform/Impl/IotPlatformServerExe/IotPlatformFeatures.h` |
 | NeoPro | 35 | 4 | путь | `View*` → `Edit*` | `NeoPro/Impl/NeoProServer/NeoProFeatures.h` |
 | Acula | 21 | 4 | путь | `View*` → `Edit*` | `Acula/Impl/AculaServer/AculaFeatures.h` |
 | Agentino | 18 | 0 | — | — | `Agentino/Impl/AgentinoServer/AgentinoFeatures.h` |
