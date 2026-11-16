@@ -2,7 +2,7 @@ const engine = require('../Core/engine')
 const { GroupObject } = require('../Core/QtObject')
 const { defineType } = require('../Core/type')
 const { Item } = require('./Item')
-const { LeftButton, NoButton, contains, scenePos, targetsAt, ungrab } = require('./PointerDelivery')
+const { LeftButton, NoButton, contains, scenePos, targetsAt, ungrab, pointerOver, deliverHover, isHovered } = require('./PointerDelivery')
 
 const XAxis = 1, YAxis = 2, XAndYAxis = 3
 const START_DRAG_DISTANCE = 10        // QStyleHints::startDragDistance
@@ -97,9 +97,17 @@ class MouseArea extends Item {
         return new MouseEvent(this.$lastX, this.$lastY, this.$lastButton, this.$lastButtons, this.$lastModifiers, isClick, this.$longPress)
     }
 
-    $save(x, y, button, buttons, modifiers){
+    // QQuickMouseAreaPrivate::lastPos: mouseX / mouseY return it (QQuickMouseArea::mouseX), so they read the new
+    // position as soon as an event stores it, in onEntered and onPressed too; they notify where Qt emits mouseXChanged
+    $setLastPos(x, y){
         this.$lastX = x
         this.$lastY = y
+        this.$v[MouseArea.MOUSEX] = x
+        this.$v[MouseArea.MOUSEY] = y
+    }
+
+    $save(x, y, button, buttons, modifiers){
+        this.$setLastPos(x, y)
         this.$lastButton = button
         this.$lastButtons = buttons
         this.$lastModifiers = modifiers
@@ -278,8 +286,7 @@ class MouseArea extends Item {
             target.x = boundedX
             target.y = boundedY
             let now = scenePos(this)
-            this.$lastX = sceneX - now.x
-            this.$lastY = sceneY - now.y
+            this.$setLastPos(sceneX - now.x, sceneY - now.y)
         }
         let threshold = drag.$v[MouseDrag.THRESHOLD]
         let overX = Math.abs(dragX - startX) > threshold
@@ -328,10 +335,10 @@ class MouseArea extends Item {
         if(this.$pressed) this.$doubleClick = isConnected || me.accepted
     }
 
+    // QQuickMouseArea::hoverEnterEvent: lastPos, then entered, then mouseXChanged, mouseYChanged and positionChanged
     $hoverEnter(x, y, modifiers){
         if(!this.$v[MouseArea.ENABLED] && !this.$pressed) return
-        this.$lastX = x
-        this.$lastY = y
+        this.$setLastPos(x, y)
         this.$lastModifiers = modifiers
         this.$setHovered(true)
         let me = new MouseEvent(x, y, NoButton, NoButton, modifiers, false, false)
@@ -342,8 +349,7 @@ class MouseArea extends Item {
     $hoverMove(x, y, modifiers){
         if(!this.$v[MouseArea.ENABLED] && !this.$pressed) return
         if(x === this.$lastX && y === this.$lastY) return
-        this.$lastX = x
-        this.$lastY = y
+        this.$setLastPos(x, y)
         this.$lastModifiers = modifiers
         let me = new MouseEvent(x, y, NoButton, NoButton, modifiers, false, false)
         this.$emitPosition(me)
@@ -416,14 +422,28 @@ defineType(MouseArea, {
         'positionChanged(mouse)', 'wheel(wheel)', 'entered', 'exited', 'canceled'],
 })
 
-// an area that hides itself (in its press handler, say) or is disabled through a parent drops the press
+// an area that hides itself (in its press handler, say) or is disabled through a parent drops the press and the
+// hover. QQuickMouseArea::itemChange(ItemVisibleHasChanged): an area shown under the pointer gets the hover delivered
+// at the pointer (deliverHoverEvent), and is hovered with the pointer position as lastPos when it is among the
+// hovered items then - not when an item above it takes the hover
 {
     let base = MouseArea.prototype.$write
     MouseArea.prototype.$write = function(id, value){
+        let old = this.$v[id]
         base.call(this, id, value)
         if((id === Item.VISIBLE && !this.$v[Item.VISIBLE]) || (id === Item.ENABLED && !this.$v[Item.ENABLED])){
             if(this.$pressed) this.$ungrabMouse()
             else if(this.$hovered) this.$setHovered(false)
+        } else if(id === Item.VISIBLE && !old && this.$v[Item.VISIBLE] && !this.$hovered
+                && this.$v[Item.ENABLED] && this.$v[MouseArea.ENABLED] && this.$v[MouseArea.HOVERENABLED]){
+            let p = pointerOver(this)
+            if(p){
+                deliverHover()
+                if(!this.$hovered && isHovered(this)){
+                    this.$setLastPos(p.x, p.y)
+                    this.$setHovered(true)
+                }
+            }
         }
     }
 }

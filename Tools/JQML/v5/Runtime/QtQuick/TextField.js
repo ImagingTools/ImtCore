@@ -93,6 +93,12 @@ function takesKey(event, multiline, readOnly){
 }
 
 class TextField extends Item {
+    // QQuickTextInputPrivate::init, QQuickTextEditPrivate::init: setAcceptedMouseButtons(Qt::LeftButton). The field
+    // takes the press in the scene (PointerDelivery), so an item below it does not get it; its native control edits
+    get $acceptsMouse(){
+        return true
+    }
+
     constructor(parent = null, multiline = false){
         super(parent)
         this.$input = null
