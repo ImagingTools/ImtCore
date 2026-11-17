@@ -2,9 +2,13 @@
 #include <imtgql/imtgql.h>
 
 
+// Qt includes
+#include <QtCore/QSet>
+
 // ImtCore includes
 #include <iqt/iqt.h>
 #include <imtauth/imtauth.h>
+#include <imtauth/CUserInfo.h>
 #include <imtbase/imtbase.h>
 #include <imtgql/CGqlContext.h>
 #include <imtlic/IProductInfo.h>
@@ -104,6 +108,46 @@ imtauth::IUserInfo::FeatureIds CollectOrganizationAccessPermissions(const IGqlCo
 	}
 
 	return retVal;
+}
+
+
+bool RestrictUserPermissions(IGqlContext& gqlContext, const QByteArrayList& permissions)
+{
+	const imtauth::IUserInfo* sourcePtr = gqlContext.GetUserInfo();
+	if (sourcePtr == nullptr){
+		return false;
+	}
+
+	const auto principalKind = gqlContext.GetPrincipalKind();
+	QByteArrayList boundary = permissions;
+	if (gqlContext.HasPermissionBoundary()){
+		const QByteArrayList previous = gqlContext.GetPermissionBoundary();
+		const QSet<QByteArray> previousSet(previous.cbegin(), previous.cend());
+		boundary.removeIf([&previousSet](const QByteArray& permission){ return !previousSet.contains(permission); });
+	}
+	const QSet<QByteArray> allowed(boundary.cbegin(), boundary.cend());
+	const QByteArray productId = gqlContext.GetProductId();
+	QByteArrayList effective = sourcePtr->IsAdmin() ? boundary
+				: sourcePtr->GetPermissions(productId) + gqlContext.GetImpliedPermissions();
+	effective.removeIf([&allowed](const QByteArray& permission){ return !allowed.contains(permission); });
+
+	imtauth::CIdentifiableUserInfo user;
+	if (!user.CopyFrom(*sourcePtr)){
+		return false;
+	}
+	for (const QByteArray& product : user.GetProducts()){
+		user.SetRoles(product, imtauth::IPrincipal::RoleIds());
+		user.SetLocalPermissions(product, QByteArrayList());
+	}
+	for (const QByteArray& group : user.GetGroups()){
+		user.RemoveFromGroup(group);
+	}
+	user.SetLocalPermissions(productId, effective);
+	gqlContext.SetUserInfo(&user);
+	gqlContext.SetPrincipalKind(principalKind);
+	gqlContext.SetPermissionBoundary(boundary);
+
+	return true;
 }
 
 
