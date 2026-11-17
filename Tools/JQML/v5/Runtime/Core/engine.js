@@ -286,6 +286,7 @@ function endUpdate(){
                 item.$dirty = 0
                 if(!(item.$f & DESTROYED)) item.$flush(bits)
             }
+            if(sceneChanged) sceneChanged()
         }
         if(deleteLater.length){
             let objects = deleteLater
@@ -304,6 +305,14 @@ function batch(fn){
     } finally {
         endUpdate()
     }
+}
+
+// Called once the changed items are written to the DOM (QQuickWindowPrivate::dirtyItemList is not empty): the
+// pointer delivery gives a still pointer its hover again in the next frame (flushFrameSynchronousEvents)
+let sceneChanged = null
+
+function onSceneChanged(fn){
+    sceneChanged = fn
 }
 
 function markDirty(item, bits){
@@ -785,7 +794,7 @@ module.exports = {
     Link, Binding, stats,
     connect, disconnect, connectHandler, subscribe, unsubscribe, hasSubscribers, dropSubscribers, dropConnections,
     emit, emitArgs, track, evaluate, runBinding, disposeBinding, isUpdating, flushPending,
-    beginUpdate, endUpdate, batch, markDirty, queuePolish, queueCall, queueDelete, queueFrame, flushFrame, stop, isStopped,
+    beginUpdate, endUpdate, batch, markDirty, onSceneChanged, queuePolish, queueCall, queueDelete, queueFrame, flushFrame, stop, isStopped,
     beginCreate, endCreate, creatingRoot, scheduleComponentComplete, scheduleBinding, scheduleCompleted,
     reportError,
     writeError, bindingError

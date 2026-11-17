@@ -1761,20 +1761,21 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
     next();
     if (is("punc", "{")){
       next();
+      // Name [= integer], ...: a value without one follows the one before (QML enums count from 0)
       var res = {}
+      var value = 0
       while(!is("punc", "}")){
         var key = S.token.value
-        var val = undefined
         next();
         if(is("operator", "=")){
           next();
-          if(!is("punc", "}")){
-            val = S.token.value
-            res[key] = val
-            next();
-            if(is("punc", ",")) next();
-          }
+          var negative = is("operator", "-")
+          if(negative) next();
+          value = negative ? -S.token.value : S.token.value
+          next();
         }
+        res[key] = value++
+        if(is("punc", ",")) next();
       }
       next();
       return as_(undefined, "qmlenumdef", name, res);
