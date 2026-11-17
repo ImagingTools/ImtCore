@@ -15,6 +15,10 @@ Dialog {
 	property string placeHolderText;
 
 	property bool selectTextOnStart: false;
+
+	// Return in the text field finishes the dialog through InputDialogBody (onAccepted) and the
+	// key then reaches Keys.onPressed below as well; the dialog must be finished only once.
+	property bool isFinished: false;
 	
 	Component.onCompleted: {
 		addButton(Enums.ok, qsTr("OK"), true)
@@ -23,11 +27,15 @@ Dialog {
 	
 	Keys.onPressed: {
 		if (event.key === Qt.Key_Return){
-			inputDialogContainer.finished(Enums.ok);
+			event.accepted = true;
+			if (!inputDialogContainer.isFinished){
+				inputDialogContainer.finished(Enums.ok);
+			}
 		}
 	}
 	
 	onFinished: {
+		inputDialogContainer.isFinished = true;
 		if (buttonId == Enums.ok){
 			inputDialogContainer.inputValue = inputDialogContainer.bodyItem.inputValue;
 		}
