@@ -81,7 +81,6 @@ class MouseArea extends Item {
         this.$startY = 0
         this.$targetStart = null
         this.$holdTimer = 0
-        this.$cursorSet = false
         if(parent) this.$setParent(parent)
     }
 
@@ -89,8 +88,11 @@ class MouseArea extends Item {
         return this.$v[MouseArea.HOVERENABLED] && this.$v[MouseArea.ENABLED]
     }
 
+    // QQuickMouseArea::QQuickMouseArea: setCursor(Qt::ArrowCursor), so an area has a cursor and the items below it do
+    // not show theirs; cursorShape undefined unsets it (QQuickItem::unsetCursor) and leaves the cursor of the items below
     $cursor(){
-        return this.$cursorSet ? this.$v[MouseArea.CURSORSHAPE] : null
+        let shape = this.$v[MouseArea.CURSORSHAPE]
+        return shape === undefined || shape === null ? null : shape
     }
 
     $event(isClick){
@@ -415,7 +417,7 @@ defineType(MouseArea, {
         preventStealing: 'bool',
         scrollGestureEnabled: { kind: 'bool', initial: true },
         pressAndHoldInterval: { kind: 'int', initial: PRESS_AND_HOLD_INTERVAL },
-        cursorShape: { kind: 'var', initial: 'default', effect(area){ area.$cursorSet = true } },
+        cursorShape: { kind: 'var', initial: 'default' },
         drag: { group: MouseDrag },
     },
     signals: ['pressed(mouse)', 'released(mouse)', 'clicked(mouse)', 'doubleClicked(mouse)', 'pressAndHold(mouse)',

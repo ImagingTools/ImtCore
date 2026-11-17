@@ -185,13 +185,29 @@ function cases(name, runtime){
         assert.equal(cursorAt(50, 260), 'default')
     })
 
-    test(name + ': a MouseArea without a cursor shape above a TextEdit leaves the I-beam', () => {
-        let { window } = scene()
+    // QQuickMouseArea::QQuickMouseArea: setCursor(Qt::ArrowCursor), "The default value is Qt.ArrowCursor"; a modal
+    // background or a dialog header above a field shows the arrow, not the I-beam of the field below
+    test(name + ': a MouseArea above a field shows its default arrow, not the I-beam of the field below', () => {
+        let { window, overlay } = scene()
         let edit
         engine.batch(() => { edit = geometry(new TextEdit(window), 10, 250, 200, 40) })
-        engine.batch(() => geometry(new MouseArea(window), 0, 200, 400, 100))
+        let below = mouseArea(overlay, (it) => { it.cursorShape = 'text' })
+        engine.batch(() => {
+            overlay.height = 300
+            overlay.z = 1
+        })
+        engine.batch(() => geometry(new MouseArea(window), 0, 200, 400, 100).z = 2)
+        assert.equal(cursorAt(50, 260), 'default')
+        assert.equal(cursorAt(50, 110), 'text')
+        assert.ok(edit && below)
+    })
+
+    // "If the cursorShape property is set to undefined, the MouseArea will not change the existing shape"
+    test(name + ': a MouseArea with the cursor shape undefined leaves the cursor of the item below', () => {
+        let { window } = scene()
+        engine.batch(() => geometry(new TextEdit(window), 10, 250, 200, 40))
+        engine.batch(() => { geometry(new MouseArea(window), 0, 200, 400, 100).cursorShape = undefined })
         assert.equal(cursorAt(50, 260), 'text')
-        assert.ok(edit)
     })
 
     test(name + ': a press while another button holds the grab goes to the grabber, not to the field', () => {
