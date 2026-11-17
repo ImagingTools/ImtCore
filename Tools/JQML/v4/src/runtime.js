@@ -94,6 +94,11 @@ export function createApplication(spec, canvas, location = null) {
 	const renderer = new Renderer(canvas);
 	const engine = new Engine();
 	engine.lenient = spec.lenient !== false;
+	// The scripts of the QML files get a name and a source map, so the debugger stops in the .qml file. A debug build does it always, any
+	// other one with `?qmlsource=1` in the address: it costs time at the start (every script is compiled on its own, and the expressions
+	// run as written, without src/resolve.js).
+	const wantsSources = spec.debug === true || (location && typeof location.search === 'string' && /[?&]qmlsource=1/.test(location.search));
+	if (typeof spec.sourceBase === 'string' && wantsSources) engine.sourceBase = spec.sourceBase;
 	engine.incremental = spec.incremental !== false;
 	// A debug build: `?noresolve=1` runs the expressions through `with` as before, `?verify=1` runs both forms and compares them.
 	if (spec.debug === true && location && typeof location.search === 'string') {

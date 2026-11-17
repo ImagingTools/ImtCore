@@ -11,6 +11,7 @@ import { fonts } from './fonts.js';
 import { KEY, MODIFIERS, NAMED_KEY_HANDLERS, qtKeyEvent, STANDARD_KEYS } from './keys.js';
 import { QmlError, escapeSourceBreaks, tokenize, topLevelNames } from './lexer.js';
 import { callableHandler, parseQmlDocument } from './parser.js';
+import { scriptTail } from './debugmap.js';
 import { resolveExpression } from './resolve.js';
 import { scanOf } from './project.js';
 import { basename, dirname, hslaString, joinPath, normalizePath, parseColor, resolvePath, rgbaString, SCRIPT_IMPORT_RE } from './util.js';
@@ -483,6 +484,8 @@ export class Engine {
 		// An expression is run through names that were looked up before (src/resolve.js) instead of through a `with` chain.
 		// `verifyResolution` runs both and compares what they give (side effects of the expression happen twice): a debugging aid.
 		this.resolveNames = true;
+		// The URL of the folder that the QML files of a debug build lie in (file:///...), or null: the scripts get a name and a source map.
+		this.sourceBase = null;
 		this.verifyResolution = false;
 		this.resolveStats = { resolved: 0, withChain: 0 };
 		this.resolveMismatches = [];
@@ -1130,7 +1133,8 @@ export class Engine {
 
 	// Compiles script text into a function. kind: 'expr' (the function returns the expression) or
 	// 'body' (the function runs statements). The function is called with the item as `this`.
-	compile(kind, code, params, scope, self) {
+	// `line`: the line of the QML file on which `code` starts; with it a debug build (`sourceBase`) tags the script for the debugger.
+	compile(kind, code, params, scope, self, line = 0) {
 		const levels = [];
 		for (let s = scope; s !== null; s = s.parent) levels.push(s);
 		const depth = levels.length;
@@ -1139,7 +1143,8 @@ export class Engine {
 		for (const level of levels) contexts += level.data !== null ? '1' : '0';
 		// The factories of a script: by the code first (the same string each time a binding is made, which keeps its hash; a key
 		// made of the whole text had to be hashed again at every call), then by the shape of the scope, the kind and the parameters.
-		const shape = `${depth}\n${contexts}\n${kind}\n${params}`;
+		const debugging = this.sourceBase !== null && line > 0 && typeof scope.file === 'string' && scope.file !== '';
+		const shape = `${depth}\n${contexts}\n${kind}\n${params}${debugging ? `\n${scope.file}:${line}` : ''}`;
 		let shapes = this.factories.get(code);
 		if (shapes === undefined) {
 			shapes = new Map();
@@ -1170,8 +1175,10 @@ export class Engine {
 			names.push('__self');
 			const js = escapeSourceBreaks(code);
 			const body = kind === 'expr' ? `return (${js}\n);` : js;
-			const source = `${open} return function (${params}) {\n${body}\n}; ${'}'.repeat(closing)}`;
-			const resolved = kind === 'expr' && this.resolveNames ? resolveExpression(code, params, depth, contexts) : null;
+			let source = `${open} return function (${params}) {\n${body}\n}; ${'}'.repeat(closing)}`;
+			// A debug build runs the text of the script as it is (the resolved form is another text), tagged with the QML file.
+			const resolved = !debugging && kind === 'expr' && this.resolveNames ? resolveExpression(code, params, depth, contexts) : null;
+			if (debugging) source += scriptTail(`${this.sourceBase}/${encodeURI(scope.file)}`, scope.file, line, source.split('\n').length);
 			if (kind === 'expr') this.resolveStats[resolved !== null ? 'resolved' : 'withChain']++;
 			factory = new Function(...names, resolved !== null ? resolved : source);
 			if (resolved !== null && this.verifyResolution) factory.plain = new Function(...names, source);
@@ -2579,7 +2586,7 @@ export class Engine {
 				if (prop.isHandler || prop.isDeclaration || prop.text === null) continue;
 				let value = this.constantValue(prop.text);
 				if (value === NOT_CONSTANT) {
-					value = this.guard(() => this.compile('expr', prop.text, '', link.scope, element).call(element), `ListElement '${prop.name}' (${link.scope.file})`, prop.line);
+					value = this.guard(() => this.compile('expr', prop.text, '', link.scope, element, prop.line).call(element), `ListElement '${prop.name}' (${link.scope.file})`, prop.line);
 				}
 				element.$row[prop.name] = value;
 			}
@@ -2750,7 +2757,7 @@ export class Engine {
 		if (modelProp === undefined) throw new QmlError("Repeater needs a numeric 'model'", def.line, def.col);
 		let count;
 		try {
-			count = this.compile('expr', modelProp.text, '', scope, parent).call(parent);
+			count = this.compile('expr', modelProp.text, '', scope, parent, modelProp.line).call(parent);
 		} catch (error) {
 			throw new QmlError(describe(error), modelProp.line, modelProp.col);
 		}
@@ -2778,7 +2785,7 @@ export class Engine {
 	defineFunction(item, fn, scope) {
 		let compiled;
 		try {
-			compiled = this.compile('body', fn.body, fn.params, scope, item);
+			compiled = this.compile('body', fn.body, fn.params, scope, item, fn.line);
 		} catch (error) {
 			throw new QmlError(describe(error), fn.line, fn.col);
 		}
@@ -2870,7 +2877,7 @@ export class Engine {
 
 	setValue(item, path, text, scope, prop, capture = null) {
 		if (prop.isReturnBlock) {
-			const block = this.compile('body', text, '', scope, item);
+			const block = this.compile('body', text, '', scope, item, prop.line);
 			this.dropGroupBinding(item, path);
 			this.addBinding(item, path, () => block.call(item), prop.line, scope.file);
 			return;
@@ -2889,7 +2896,7 @@ export class Engine {
 			this.assign(item, path, text.includes('[') ? [] : {});
 			return;
 		}
-		const fn = this.compile('expr', text, '', scope, item);
+		const fn = this.compile('expr', text, '', scope, item, prop.line);
 		this.dropGroupBinding(item, path);
 		this.addBinding(item, path, () => fn.call(item), prop.line, scope.file);
 	}
@@ -3034,7 +3041,7 @@ export class Engine {
 		if (match === null) throw new QmlError(`Invalid alias target '${prop.text}'`, prop.line, prop.col);
 		const parts = match[1].split('.').map((s) => s.trim());
 		const last = parts[parts.length - 1];
-		const targetFn = this.compile('expr', parts.length > 1 ? parts.slice(0, -1).join('.') : last, '', scope, item);
+		const targetFn = this.compile('expr', parts.length > 1 ? parts.slice(0, -1).join('.') : last, '', scope, item, prop.line);
 		const whole = parts.length === 1;
 		const name = prop.name;
 		const first = parts[0];
@@ -3091,28 +3098,28 @@ export class Engine {
 			return;
 		}
 		if (name === 'Component.onCompleted') {
-			completedOut.push({ fn: this.compile('body', body, '', scope, item), item, line: prop.line, file: scope.file });
+			completedOut.push({ fn: this.compile('body', body, '', scope, item, prop.line), item, line: prop.line, file: scope.file });
 			return;
 		}
 		if (name === 'ListView.onPooled' || name === 'ListView.onReused') {
 			const key = name === 'ListView.onPooled' ? '$pooledFns' : '$reusedFns';
 			if (item[key] === undefined) item[key] = [];
-			item[key].push({ fn: this.compile('body', body, '', scope, item), file: scope.file, line: prop.line });
+			item[key].push({ fn: this.compile('body', body, '', scope, item, prop.line), file: scope.file, line: prop.line });
 			return;
 		}
 		if (name === 'Component.onDestruction') {
 			if (item.$destruction === undefined) item.$destruction = [];
-			item.$destruction.push({ fn: this.compile('body', body, '', scope, item), file: scope.file, line: prop.line });
+			item.$destruction.push({ fn: this.compile('body', body, '', scope, item, prop.line), file: scope.file, line: prop.line });
 			return;
 		}
 		if (name === 'Keys.onPressed' || name === 'Keys.onReleased' || NAMED_KEY_HANDLERS.has(name)) {
 			let fn;
 			if (callableHandler(body)) {
 				// `Keys.onPressed: function(event) { ... }` (Qt 6): the function expression is the handler.
-				const produce = this.compile('expr', body, '', scope, item);
+				const produce = this.compile('expr', body, '', scope, item, prop.line);
 				fn = (...args) => produce.call(item).apply(item, args);
 			} else {
-				fn = this.compile('body', body, 'event', scope, item);
+				fn = this.compile('body', body, 'event', scope, item, prop.line);
 			}
 			if (item.$keys === undefined) item.$keys = { pressed: [], released: [], byKey: new Map() };
 			if (name === 'Keys.onPressed') item.$keys.pressed.push(fn);
@@ -3136,7 +3143,7 @@ export class Engine {
 			if (name.length > 9 && name.endsWith('Changed')) {
 				// A property change handler: the property is polled once per evaluation pass.
 				const property = decapitalize(name.slice(2, -7));
-				const fn = this.compile('body', body, '', scope, item);
+				const fn = this.compile('body', body, '', scope, item, prop.line);
 				// The handler starts from the value the property has now, so the first assigned or bound value is a change (as in Qt).
 				// An alias whose target does not exist yet has no value to start from: its first value is the initial one.
 				let initial;
@@ -3156,10 +3163,10 @@ export class Engine {
 		let fn;
 		if (callableHandler(body)) {
 			// The arrow or function expression is the handler, not a statement that builds and drops it.
-			const produce = this.compile('expr', body, '', scope, item);
+			const produce = this.compile('expr', body, '', scope, item, prop.line);
 			fn = (...args) => produce.call(item).apply(item, args);
 		} else {
-			fn = this.compile('body', body, signal.params.join(', '), scope, item);
+			fn = this.compile('body', body, signal.params.join(', '), scope, item, prop.line);
 		}
 		item.$connect(signalName, (...args) => this.guard(() => fn.apply(item, args), `handler '${name}' (${scope.file})`, prop.line));
 	}
@@ -3264,7 +3271,7 @@ export class Engine {
 		if (handler.fn !== null) {
 			call = handler.fn;
 		} else {
-			const fn = this.compile('body', handler.body, signal === undefined ? '' : signal.params.join(', '), handler.scope, conn);
+			const fn = this.compile('body', handler.body, signal === undefined ? '' : signal.params.join(', '), handler.scope, conn, handler.line);
 			call = (...args) => fn.apply(conn, args);
 		}
 		const run = (...args) => {

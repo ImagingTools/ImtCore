@@ -10,6 +10,15 @@ Rectangle {
 
     property string greeting: qsTr("Hello")
     property int sum: Util.add(2, 3)
+    property int touched: 0
+
+    // The handler has a comment and a blank line: the lines of the packed script must stay the lines of this file.
+    Component.onCompleted: {
+        /* a comment
+           of two lines */
+
+        page.touched = Util.add(1, 1) // the statement the source map test looks for
+    }
 
     Widget {
         id: widget
