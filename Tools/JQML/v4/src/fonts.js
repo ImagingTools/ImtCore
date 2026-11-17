@@ -234,8 +234,9 @@ export class FontInfo {
 		if (style === null) {
 			this.ascent = 0;
 			this.lineHeight = size;
-			// Qt's built-in box font (used when no fonts are installed): line spacing is 7/6 of the pixel size.
-			this.lineSpacing = Math.round((size * 7) / 6);
+			// Qt's built-in box font (used when no fonts are installed): the line spacing, measured for every size from 8 to 60, is 8/7 of the
+			// pixel size rounded up.
+			this.lineSpacing = Math.ceil((size * 8) / 7);
 			this.underlineY = size - Math.max(1, size * 0.08);
 			this.strikeY = size * 0.5;
 			this.lineWidth = Math.max(1, size * 0.08);

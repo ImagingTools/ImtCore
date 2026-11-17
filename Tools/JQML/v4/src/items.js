@@ -7,6 +7,7 @@
 
 import { CanvasContext, commandsExceed, replayCommands } from './canvas.js';
 import { fonts } from './fonts.js';
+import { layoutRichText, linkAtPoint, mightBeRichText, paintRichText, parseRichText } from './richtext.js';
 import { KEY, MODIFIERS, parseKeySequence, qtKeyToDom, STANDARD_KEYS } from './keys.js';
 import { QmlError } from './lexer.js';
 import { colorToString, parseColor, toColor, toFloat } from './util.js';
@@ -2450,6 +2451,12 @@ export class Text extends Item {
 		this.$lineHeight = 1;
 		this.$font = null;
 		this.$lay = null;
+		this.$linkColor = colorToString(toColor('#0000ff'));
+		this.$hoveredLink = '';
+		this.$pressedLink = '';
+		this.$richState = { docKey: null, doc: null, key: null, layout: null };
+		this.$declareSignal('linkActivated', ['link']);
+		this.$declareSignal('linkHovered', ['link']);
 	}
 
 	get font() {
@@ -2460,8 +2467,8 @@ export class Text extends Item {
 	$measure() {
 		let lay = this.$lay;
 		const family = this.$family !== '' ? this.$family : fonts.defaultFamily();
-		const rich = this.$format === 'RichText' || this.$format === 'StyledText';
-		const source = rich ? richPlain(this.$text) : this.$text;
+		const rich = false;
+		const source = this.$text;
 		const explicit = this.$w > 0 ? this.$w : this.$aw > 0 ? this.$aw : 0;
 		const wrap = explicit > 0 && wraps(this.$wrap);
 		const limit = wrap ? explicit : Infinity;
@@ -2494,6 +2501,114 @@ export class Text extends Item {
 		return lay;
 	}
 
+	// How the text is read: 'plain', 'rich' (RichText: the HTML of QTextDocument) or 'styled' (StyledText, and AutoText that found markup).
+	$kind() {
+		let format = this.$format;
+		if (typeof format === 'number' || /^\d+$/.test(String(format))) format = ['PlainText', 'RichText', 'AutoText', 'MarkdownText', 'StyledText'][Number(format)] ?? 'PlainText';
+		if (format === 'RichText') return 'rich';
+		if (format === 'StyledText') return 'styled';
+		if (format === 'AutoText') return mightBeRichText(this.$text) ? 'styled' : 'plain';
+		return 'plain';
+	}
+
+	$richWidth() {
+		return this.$w > 0 ? this.$w : this.$aw > 0 ? this.$aw : 0;
+	}
+
+	// The layout of the marked up text for a width (0: none), kept while nothing it depends on changes.
+	$richLayout(width) {
+		const kind = this.$kind();
+		const family = this.$family !== '' ? this.$family : fonts.defaultFamily();
+		const size = this.$pixelSize > 0 ? this.$pixelSize : 12;
+		const wrap = !wraps(this.$wrap) ? 'none' : this.$wrap === 1 || this.$wrap === 'WordWrap' ? 'word' : 'anywhere';
+		const key = [kind, family, size, this.$bold, this.$italic, width, wrap, this.$lineHeight, this.$hAlign, fonts.version].join('|');
+		const state = this.$richState;
+		const docKey = `${kind}\n${this.$text}`;
+		if (state.key === key && state.docKey === docKey) return state.layout;
+		if (state.docKey !== docKey) {
+			state.doc = parseRichText(this.$text, kind === 'styled');
+			state.docKey = docKey;
+		}
+		const layout = layoutRichText(state.doc, { fonts, family, size, bold: this.$bold, italic: this.$italic, width, wrap, styled: kind === 'styled', lineHeightFactor: this.$lineHeight, align: this.$hAlign });
+		state.key = key;
+		state.layout = layout;
+		return layout;
+	}
+
+	$richMetrics() {
+		const kind = this.$kind();
+		const explicit = this.$richWidth();
+		const lay = this.$richLayout(explicit);
+		const factor = this.$lineHeight > 0 ? this.$lineHeight : 1;
+		const contentWidth = kind === 'rich' && explicit > 0 ? Math.max(explicit, lay.contentWidth) : lay.contentWidth;
+		const implicitHeight = kind === 'rich' && explicit > 0 && factor !== 1 ? lay.implicitHeight - Math.floor(this.$pixelSize * (factor - 1)) : lay.implicitHeight;
+		return { implicitWidth: lay.naturalWidth, implicitHeight, contentWidth, contentHeight: lay.contentHeight };
+	}
+
+	$paintRich(r, opacity) {
+		const layout = this.$richLayout(this.$richWidth());
+		const family = this.$family !== '' ? this.$family : fonts.defaultFamily();
+		paintRichText(r, layout, {
+			fonts,
+			family,
+			size: this.$pixelSize > 0 ? this.$pixelSize : 12,
+			bold: this.$bold,
+			italic: this.$italic,
+			width: this.$richWidth(),
+			pack: (color) => r.pack(toColor(color), opacity),
+			baseColor: layout.baseColor !== null ? r.pack(toColor(layout.baseColor), opacity) : r.pack(this.$color, opacity),
+			linkColor: r.pack(toColor(this.$linkColor), opacity),
+		});
+	}
+
+	// The link at a point of the text, or ''.
+	linkAt(x, y) {
+		if (this.$text === '' || this.$kind() === 'plain') return '';
+		return linkAtPoint(this.$richLayout(this.$richWidth()), toFloat(x), toFloat(y));
+	}
+
+	// A text with links takes the pointer over a link only: the hand, the hovered link, and `linkActivated` for a click on it.
+	$itemAt(px, py, wheel = false, button = -1) {
+		if (wheel || !this.$visible || this.$text === '' || this.$kind() === 'plain' || !this.$text.includes('href')) return super.$itemAt(px, py, wheel, button);
+		if (button > 0 || this.$rotation !== 0 || this.$scale !== 1) return null;
+		const layout = this.$richLayout(this.$richWidth());
+		if (layout.links.length === 0) return null;
+		return linkAtPoint(layout, px - this.$sx, py - this.$sy) !== '' ? this : null;
+	}
+
+	$linkAtScene(x, y) {
+		return linkAtPoint(this.$richLayout(this.$richWidth()), x - this.$sx, y - this.$sy);
+	}
+
+	$setHoveredLink(link) {
+		if (this.$hoveredLink === link) return;
+		this.$hoveredLink = link;
+		markReaders(this, 'hoveredLink');
+		this.$emit('linkHovered', [link]);
+	}
+
+	$mouseMoveAt(sceneX, sceneY) {
+		this.$setHoveredLink(this.$linkAtScene(sceneX, sceneY));
+	}
+
+	$hoverChanged(hovered) {
+		if (!hovered) this.$setHoveredLink('');
+	}
+
+	$mousePressAt(sceneX, sceneY) {
+		this.$pressedLink = this.$linkAtScene(sceneX, sceneY);
+	}
+
+	$mouseClicked() {
+		const link = this.$pressedLink;
+		this.$pressedLink = '';
+		if (link !== '') this.$emit('linkActivated', [link]);
+	}
+
+	get $cursorShape() {
+		return this.$hoveredLink !== '' ? 13 : 0; // Qt.PointingHandCursor
+	}
+
 	$fontInfo() {
 		const family = this.$family !== '' ? this.$family : fonts.defaultFamily();
 		return fonts.get(family, this.$pixelSize > 0 ? this.$pixelSize : 12, this.$bold, this.$italic);
@@ -2502,9 +2617,10 @@ export class Text extends Item {
 	// Laid-out size. Plain text uses the font height; rich text uses the wider line spacing.
 	// An explicit width makes rich text report that width, and a lineHeight other than 1 shortens the implicit height by the extra leading.
 	$metrics() {
+		if (this.$text !== '' && this.$kind() !== 'plain') return this.$richMetrics();
 		const info = this.$fontInfo();
-		const rich = this.$format === 'RichText' || this.$format === 'StyledText';
-		const source = rich ? richPlain(this.$text) : this.$text;
+		const rich = false;
+		const source = this.$text;
 		// The width that the anchors give (`anchors.left` and `anchors.right`) wraps the text like a `width` does.
 		const explicit = this.$w > 0 ? this.$w : this.$aw > 0 ? this.$aw : 0;
 		const wrap = explicit > 0 && wraps(this.$wrap);
@@ -2530,6 +2646,10 @@ export class Text extends Item {
 
 	$paint(r, opacity) {
 		if (this.$text.length === 0 || this.$pixelSize <= 0) return;
+		if (this.$kind() !== 'plain') {
+			this.$paintRich(r, opacity);
+			return;
+		}
 		const lay = this.$measure();
 		const info = lay.info;
 		const color = r.pack(this.$color, opacity);
@@ -2603,6 +2723,7 @@ defineField(Text.prototype, 'textFormat', '$format', (value) => (value === undef
 defineField(Text.prototype, 'lineHeight', '$lineHeight', toFloat);
 // True when an elide mode cut the text (a text that does not fit and does not wrap).
 defineReadOnly(Text.prototype, 'truncated', function () {
+	if (this.$text !== '' && this.$kind() !== 'plain') return false;
 	const lay = this.$measure();
 	return lay.elideLimit > 0 && lay.lines.length === 1 && lay.lines[0] !== lay.source;
 });
@@ -2613,8 +2734,18 @@ defineReadOnly(Text.prototype, 'contentHeight', function () {
 	return this.$metrics().contentHeight;
 });
 defineReadOnly(Text.prototype, 'lineCount', function () {
+	const kind = this.$text === '' ? 'plain' : this.$kind();
+	if (kind === 'rich') return 1; // Qt does not count the lines of a document
+	if (kind === 'styled') {
+		const lines = this.$richLayout(this.$richWidth()).lines;
+		return Math.max(1, lines.filter((line) => !line.trailingSynthetic && !line.spacer).length);
+	}
 	return this.$measure().lines.length;
 });
+defineField(Text.prototype, 'linkColor', '$linkColor', (value) => colorToString(toColor(value === undefined || value === null ? '#0000ff' : value)));
+defineReadOnly(Text.prototype, 'hoveredLink', function () {
+	return this.$hoveredLink;
+}, undefined, true);
 
 // ----- Canvas -----
 
