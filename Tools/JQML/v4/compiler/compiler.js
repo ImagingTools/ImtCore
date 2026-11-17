@@ -198,6 +198,12 @@ export function commonDirectory(paths) {
 	return dir === '' ? '/' : dir;
 }
 
+// The URL of a folder of the compiler's virtual file system (/D:/dir or /dir): file:///D:/dir, file:///dir.
+function sourceBaseOf(root) {
+	const disk = toDisk(root).replace(/\/+$/, '');
+	return encodeURI(/^[A-Za-z]:/.test(disk) ? `file:///${disk}` : `file://${disk}`);
+}
+
 function relativeTo(root, virtualPath) {
 	if (root === '/') return virtualPath.replace(/^\/+/, '');
 	if (virtualPath === root) return '';
@@ -308,6 +314,9 @@ async function compileJs(options, env, log, warn) {
 		modules: {},
 		translations,
 	};
+	// The folder of the QML files as a URL: the source map of the bundle lists the QML files under it, and the engine names the scripts
+	// of a QML file `<sourceBase>/<file>` for the debugger (a debug build always, any other one with `?qmlsource=1` in the address).
+	spec.sourceBase = sourceBaseOf(root);
 	if (options.debug) spec.debug = true;
 	else {
 		spec.docs = {};
@@ -350,6 +359,15 @@ async function compileJs(options, env, log, warn) {
 	const transformModule = obfuscateLight ? (_file, code) => minifyScript(code) : undefined;
 	const bundle = bundleRuntime({ srcDir: SRC_DIR, entry: 'runtime.js', banner, tail, file: fileName, sourceRoot: toPosix(path.relative(options.output || '.', SRC_DIR)), transformModule });
 
+	// The QML files go in the source map of the bundle with their text (a source nothing in the bundle itself maps to: the scripts of a
+	// QML file are compiled at run time and carry a small source map of their own, see src/debugmap.js). The map is a file of its own,
+	// the bundle itself still carries the packed trees only.
+	for (const [file, text] of [...fs.texts].sort((a, b) => a[0].localeCompare(b[0]))) {
+		if (!file.endsWith('.qml')) continue;
+		bundle.map.sources.push(`${spec.sourceBase}/${encodeURI(relativeTo(root, file))}`);
+		bundle.map.sourcesContent.push(text);
+	}
+
 	let written = null;
 	if (options.output) {
 		mkdirSync(options.output, { recursive: true });
@@ -378,7 +396,8 @@ function packedRecord(doc, text, obfuscateLight) {
 		}
 	}
 	if (obfuscateLight) def = mangleDocument(def);
-	return JSON.stringify(packDocument(def, minifyScript));
+	// The line breaks of a script stay: line N of the packed script is line N of the QML text (source maps, see src/debugmap.js).
+	return JSON.stringify(packDocument(def, (script) => minifyScript(script, true)));
 }
 
 // A copy of `def` whose script fragments had their safely renameable names renamed (mangleLocals): the plain parameters and the
@@ -388,8 +407,8 @@ function packedRecord(doc, text, obfuscateLight) {
 function mangleDocument(def) {
 	return {
 		...def,
-		properties: def.properties.map((prop) => (prop.text === null ? prop : { ...prop, text: mangleLocals(prop.text, '').body })),
-		functions: def.functions.map((fn) => ({ ...fn, ...mangleLocals(fn.body, fn.params) })),
+		properties: def.properties.map((prop) => (prop.text === null ? prop : { ...prop, text: mangleLocals(prop.text, '', true).body })),
+		functions: def.functions.map((fn) => ({ ...fn, ...mangleLocals(fn.body, fn.params, true) })),
 		children: def.children.map(mangleDocument),
 	};
 }

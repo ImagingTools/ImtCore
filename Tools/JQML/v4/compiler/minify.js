@@ -95,16 +95,20 @@ function regexAllowed(prev) {
 	return last !== ')' && last !== ']';
 }
 
-// The tokens of the text with what lay between them: { text, gap } where gap is '' (nothing), ' ' (white space) or '\n' (a line break).
+// The tokens of the text with what lay between them: { text, gap, lines } where gap is '' (nothing), ' ' (white space) or '\n' (a line
+// break) and lines is the number of line breaks between the previous token (or the start) and this one, in the white space and in
+// the comments there: what keeps the lines of a script where they are in the file (the debugger of a QML file needs them).
 function scan(text) {
 	const tokens = [];
 	let gap = '';
+	let lines = 0;
 	let prev = '';
 	let i = 0;
 	const push = (end) => {
 		const token = text.slice(i, end);
-		tokens.push({ text: token, gap });
+		tokens.push({ text: token, gap, lines });
 		gap = '';
+		lines = 0;
 		prev = token;
 		i = end;
 	};
@@ -112,6 +116,7 @@ function scan(text) {
 		const c = text[i];
 		if (c === '\n' || c === '\r' || c === ' ' || c === ' ') {
 			gap = '\n';
+			if (c !== '\r' || text[i + 1] !== '\n') lines++;
 			i++;
 		} else if (c === ' ' || c === '\t' || c === '\f' || c === '\v' || c === ' ' || c === '﻿') {
 			if (gap === '') gap = ' ';
@@ -122,8 +127,13 @@ function scan(text) {
 		} else if (c === '/' && text[i + 1] === '*') {
 			const close = text.indexOf('*/', i + 2);
 			const end = close < 0 ? text.length : close + 2;
-			if (text.slice(i, end).includes('\n')) gap = '\n';
-			else if (gap === '') gap = ' ';
+			const breaks = text.slice(i, end).split('\n').length - 1;
+			if (breaks > 0) {
+				gap = '\n';
+				lines += breaks;
+			} else if (gap === '') {
+				gap = ' ';
+			}
 			i = end;
 		} else if (c === '"' || c === "'") {
 			push(skipString(text, i));
@@ -158,12 +168,17 @@ function mustSeparate(a, b) {
 	return false;
 }
 
-export function minifyScript(text) {
+// `keepLines`: every line break of the text stays (also the ones before the first token and the ones that comments or blank lines
+// had), so line N of the result is line N of the text: the scripts of a QML file are packed so, and the source maps of the debugger
+// point at the lines of the file. Without it a run of line breaks is one.
+export function minifyScript(text, keepLines = false) {
 	const tokens = scan(text);
 	let out = '';
 	for (let i = 0; i < tokens.length; i++) {
 		const token = tokens[i];
-		if (i > 0) {
+		if (keepLines && token.lines > 0) {
+			out += '\n'.repeat(token.lines);
+		} else if (i > 0) {
 			if (token.gap === '\n') out += '\n';
 			// tokens that touched in the text still do: only what was apart needs to stay apart
 			else if (token.gap === ' ' && mustSeparate(tokens[i - 1].text, token.text)) out += ' ';
@@ -248,8 +263,9 @@ function isLiteralKey(tokens, at, frames) {
 // signal handler or a function body) that stay inside it: never an id, a property, a signal or anything else a binding
 // outside this one fragment could still be reading or writing by that name. `params` is the function's own parameter list as
 // written (its text, not run through this); `body` is the statements (property bindings, see src/parser.js). Returns
-// { body, params }, unchanged when nothing here was safe to rename (see localNames).
-export function mangleLocals(body, params) {
+// { body, params }, unchanged when nothing here was safe to rename (see localNames). `keepLines`: the line breaks stay as they
+// are (see minifyScript).
+export function mangleLocals(body, params, keepLines = false) {
 	const trimmedParams = params.trim();
 	// a default value or a destructuring pattern in the parameter list: only a plain, comma-separated list of names is renamed
 	if (trimmedParams !== '' && !/^[A-Za-z_$][\w$]*(\s*,\s*[A-Za-z_$][\w$]*)*$/.test(trimmedParams)) return { body, params };
@@ -275,7 +291,8 @@ export function mangleLocals(body, params) {
 	let out = '';
 	for (let i = 0; i < tokens.length; i++) {
 		const token = tokens[i];
-		if (i > 0) out += token.gap;
+		if (keepLines && token.lines > 0) out += '\n'.repeat(token.lines);
+		else if (i > 0) out += token.gap;
 		const t = token.text;
 		const replacement = rename.get(t);
 		const isMember = i > 0 && tokens[i - 1].text === '.';
