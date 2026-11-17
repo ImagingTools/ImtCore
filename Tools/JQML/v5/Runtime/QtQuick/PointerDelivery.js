@@ -37,8 +37,9 @@ function paintOrder(item){
     return items
 }
 
-// an item that takes mouse events: presses, hover or the wheel
-const handlesMouse = (item) => item.$mousePress !== undefined || item.$acceptsHover !== undefined || item.$wheel !== undefined
+// an item that takes mouse events: presses, hover or the wheel. $acceptsMouse: an item that takes the press without
+// handling it here (TextInput, TextEdit: setAcceptedMouseButtons(Qt::LeftButton), their native control does the rest)
+const handlesMouse = (item) => item.$mousePress !== undefined || item.$acceptsMouse !== undefined || item.$acceptsHover !== undefined || item.$wheel !== undefined
 
 // Items under a scene point that take mouse events (all items with `all`), topmost first, each with the point in its
 // own coordinates. Invisible or disabled items hide their subtree; a clipping item hides children outside it.
@@ -66,6 +67,7 @@ const scene = {
     hovered: [],
     x: -1,
     y: -1,
+    modifiers: 0,
     contextMenuGrabbed: false,
 }
 
@@ -84,11 +86,15 @@ function local(item, x, y){
     return { x: x - pos.x, y: y - pos.y }
 }
 
-function press(x, y, button, buttons, modifiers, doubleClick){
+// native: the TextInput or TextEdit whose native control is under the point. True when the press reaches it before
+// an item above takes it (QQuickDeliveryAgent, topmost first): the native control handles the press then
+function press(x, y, button, buttons, modifiers, doubleClick, native = null){
+    let reached = false
     engine.batch(() => {
         scene.x = x
         scene.y = y
         scene.pressedButtons = buttons
+        scene.modifiers = modifiers
         let grabber = scene.grabber
         if(grabber && !(grabber.$f & engine.DESTROYED)){
             // another button while grabbed goes to the grabber
@@ -99,6 +105,10 @@ function press(x, y, button, buttons, modifiers, doubleClick){
         scene.grabber = null
         for(let target of targetsAt(x, y)){
             let item = target.item
+            if(native && item === native){
+                reached = true
+                break
+            }
             if(item.$mousePress){
                 if(item.$mousePress(target.x, target.y, button, buttons, modifiers)){
                     scene.grabber = item
@@ -115,12 +125,14 @@ function press(x, y, button, buttons, modifiers, doubleClick){
         }
         scene.contextMenuGrabbed = !!(scene.grabber && button === RightButton && scene.grabber.$mousePress)
     })
+    return reached
 }
 
 function move(x, y, buttons, modifiers){
     engine.batch(() => {
         scene.x = x
         scene.y = y
+        scene.modifiers = modifiers
         let grabber = scene.grabber
         if(grabber && !(grabber.$f & engine.DESTROYED)){
             let p = local(grabber, x, y)
@@ -137,6 +149,7 @@ function release(x, y, button, buttons, modifiers){
         scene.x = x
         scene.y = y
         scene.pressedButtons = buttons
+        scene.modifiers = modifiers
         let grabber = scene.grabber
         if(grabber && !(grabber.$f & engine.DESTROYED)){
             let p = local(grabber, x, y)
@@ -150,30 +163,69 @@ function release(x, y, button, buttons, modifiers){
 }
 
 // QQuickDeliveryAgent: the topmost hover-accepting item under the cursor and those of its ancestors; what lies below it is not hovered
+// QQuickDeliveryAgentPrivate::deliverHoverEventToItem: an item under the point that takes hover is entered or moved
+// over, one that was hovered and is not is left now. A MouseArea does not block hover events (it ignores them).
+function hoverItem(item, x, y, pass){
+    let index = scene.hovered.indexOf(item)
+    if(item.$acceptsHover && item.$acceptsHover() && contains(item, x, y)){
+        pass.hovered.add(item)
+        pass.leafFound = true
+        if(index < 0){
+            scene.hovered.push(item)
+            item.$hoverEnter(x, y, pass.modifiers)
+        } else item.$hoverMove(x, y, pass.modifiers)
+    } else if(index >= 0){
+        scene.hovered.splice(index, 1)
+        if(!(item.$f & engine.DESTROYED) && item.$hoverLeave) item.$hoverLeave()
+    }
+    return false
+}
+
+// QQuickDeliveryAgentPrivate::deliverHoverEventRecursive: children topmost first, then the item. Once the hovered
+// leaf is found the pass goes on to its ancestors only, not to the siblings below it.
+function hoverRecursive(item, x, y, pass){
+    let lx = x - item.$v[Item.X], ly = y - item.$v[Item.Y]
+    let children = paintOrder(item)
+    for(let i = children.length - 1; i >= 0; i--){
+        let child = children[i]
+        if(!child.$v[Item.VISIBLE] || !child.$v[Item.ENABLED]) continue
+        if(child.$v[Item.CLIP] && !contains(child, lx - child.$v[Item.X], ly - child.$v[Item.Y])) continue
+        if(hoverRecursive(child, lx, ly, pass)) return true
+        if(pass.leafFound) break
+    }
+    return hoverItem(item, lx, ly, pass)
+}
+
+// QQuickDeliveryAgentPrivate::deliverHoverEvent: enter and move go out during the pass, so the item the pointer
+// enters gets it before an item below that the pass does not visit is left (after the pass)
+let hoverPass = null
+
 function hover(x, y, modifiers){
-    let now = []
+    // an item shown from a hover handler: the next frame delivers the hover again
+    if(hoverPass){
+        engine.queueFrame(frameHover)
+        return
+    }
     let cursor = null
-    let leaf = null
     for(let target of targetsAt(x, y)){
         let item = target.item
         if(cursor === null && item.$cursor) cursor = item.$cursor()
-        if(!item.$acceptsHover || !item.$acceptsHover()) continue
-        if(!leaf) leaf = item
-        else {
-            let ancestor = leaf.$parent
-            while(ancestor && ancestor !== item) ancestor = ancestor.$parent
-            if(!ancestor) continue
+    }
+    let pass = hoverPass = { hovered: new Set(), leafFound: false, modifiers }
+    try {
+        for(let i = scene.roots.length - 1; i >= 0 && !pass.leafFound; i--){
+            let root = scene.roots[i]
+            if(root.$f & engine.DESTROYED || !root.$v[Item.VISIBLE] || !root.$v[Item.ENABLED]) continue
+            if(root.$v[Item.CLIP] && !contains(root, x - root.$v[Item.X], y - root.$v[Item.Y])) continue
+            if(hoverRecursive(root, x, y, pass)) break
         }
-        now.push(target)
-    }
-    for(let item of scene.hovered){
-        if(!now.some(target => target.item === item) && !(item.$f & engine.DESTROYED)) item.$hoverLeave()
-    }
-    let previous = scene.hovered
-    scene.hovered = now.map(target => target.item)
-    for(let target of now){
-        if(previous.indexOf(target.item) < 0) target.item.$hoverEnter(target.x, target.y, modifiers)
-        else target.item.$hoverMove(target.x, target.y, modifiers)
+        for(let item of scene.hovered.slice()){
+            if(pass.hovered.has(item)) continue
+            scene.hovered.splice(scene.hovered.indexOf(item), 1)
+            if(!(item.$f & engine.DESTROYED)) item.$hoverLeave()
+        }
+    } finally {
+        hoverPass = null
     }
     setCursor(cursor)
 }
@@ -202,12 +254,46 @@ function wheel(x, y, angleDelta, pixelDelta, buttons, modifiers){
     return accepted
 }
 
-// the grab ends, like QQuickWindow::ungrabMouse when the grabber hides or gets disabled
+// the grab ends, like QQuickWindow::ungrabMouse when the grabber hides or gets disabled; the item is no longer hovered
 function ungrab(item){
     if(scene.grabber === item) scene.grabber = null
     let index = scene.hovered.indexOf(item)
     if(index >= 0) scene.hovered.splice(index, 1)
 }
+
+// QQuickItem::isUnderMouse: the last pointer position inside the item (its shape, not what covers it), in its
+// coordinates, or null
+function pointerOver(item){
+    if(scene.x < 0 || scene.y < 0) return false
+    let p = local(item, scene.x, scene.y)
+    return contains(item, p.x, p.y) ? p : null
+}
+
+// QQuickDeliveryAgentPrivate::deliverHoverEvent at the last pointer position (QQuickMouseArea::itemChange)
+function deliverHover(){
+    if(scene.x < 0 || scene.y < 0) return
+    hover(scene.x, scene.y, scene.modifiers)
+}
+
+// the item is among the hovered items (QQuickDeliveryAgentPrivate::hoverItems)
+function isHovered(item){
+    return scene.hovered.indexOf(item) >= 0
+}
+
+// QQuickDeliveryAgentPrivate::flushFrameSynchronousEvents: when the scene changed, a still pointer gets a hover
+// event at its last position with the next frame (items appear, hide or move under it), unless an item grabs it
+const frameHover = {
+    $f: 0,
+    $frameQueued: false,
+    $frame(){
+        if(scene.grabber || scene.x < 0 || scene.y < 0) return
+        hover(scene.x, scene.y, scene.modifiers)
+    },
+}
+
+engine.onSceneChanged(() => {
+    if(!scene.grabber && scene.x >= 0 && scene.y >= 0 && scene.roots.length) engine.queueFrame(frameHover)
+})
 
 function setCursor(cursor){
     if(scene.element) scene.element.style.cursor = cursor || ''
@@ -238,13 +324,16 @@ function listen(element){
     if(listening || typeof window === 'undefined') return
     listening = true
     window.addEventListener('mousedown', (e) => {
-        if(isNative(e)) return
+        let p = pointOf(e)
+        // a native control (input, textarea) not made by a TextInput or TextEdit handles its own pointer events
+        if(isNative(e) && !e.target.$item) return
+        // the second press of a double click also delivers MouseButtonDblClick to the grabber. The press goes down
+        // the scene as in Qt: when it reaches the TextInput of the native control under it, that control takes it
+        let native = isNative(e) ? e.target.$item : null
+        if(press(p.x, p.y, DOM_BUTTON[e.button] || LeftButton, e.buttons, modifiersOf(e), e.detail === 2, native)) return
         // the browser would blur the focused input and start a text selection; in Qt a press moves focus only
         // when QML asks for it (forceActiveFocus, activeFocusOnPress)
         e.preventDefault()
-        let p = pointOf(e)
-        // the second press of a double click also delivers MouseButtonDblClick to the grabber
-        press(p.x, p.y, DOM_BUTTON[e.button] || LeftButton, e.buttons, modifiersOf(e), e.detail === 2)
     })
     window.addEventListener('mousemove', (e) => {
         let p = pointOf(e)
@@ -346,4 +435,4 @@ Object.assign(Item.prototype, {
     }
 }
 
-module.exports = { NoButton, LeftButton, scenePos, contains, scene, targetsAt, press, move, release, leaveWindow, wheel, ungrab }
+module.exports = { NoButton, LeftButton, scenePos, contains, scene, targetsAt, press, move, release, leaveWindow, wheel, ungrab, pointerOver, deliverHover, isHovered }
