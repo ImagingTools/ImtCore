@@ -2041,7 +2041,6 @@ export class Engine {
 			loader.$loaded = null;
 			loader.$failed = false;
 			const before = new Set(loader.$children);
-			loader.$declared = before;
 			if (key !== '' && key !== null) {
 				const mark = this.completed.length;
 				this.guard(() => {
@@ -2090,10 +2089,12 @@ export class Engine {
 			}
 		} finally {
 			loader.$inLoad = false;
-			loader.$declared = null;
 		}
 		loader.$emit('itemChanged');
 		this.emitLoaderStatus(loader);
+		// The bindings that read the item, the size or the status of the Loader (those of the item among them, which read 0 and null while
+		// it was made) are told by the signals above: they read again before `loaded` and before a layout reads what they set, as in Qt.
+		if (ok) this.runBindingPass();
 		if (ok) loader.$emit('loaded');
 		if (this.loaderKey(loader) !== loader.$wanted) this.updateLoader(loader);
 	}
