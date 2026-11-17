@@ -7,6 +7,7 @@
 //   files: { path: text },        JavaScript files, qmldir files, and the QML documents of a debug build
 //   docs: { path: text },         the QML documents of a compiled application, as packed trees (src/packed.js)
 //   scans: { path: { f, t, q, e } }  what the text of a packed document names (see createProject)
+//   docsDeflate: base64,           --compress-docs of the compiler: docs and scans deflated (raw) together, in their place
 //   debug: true                   the text of the documents is there, and window.qmlWeb gives the engine
 //   binaries: { path: base64 },   fonts
 //   modules: { name: [dir] },     module name -> directories with a qmldir
@@ -16,8 +17,10 @@
 import { Engine } from './engine.js';
 import { attachCanvas } from './host.js';
 import { MapFS, Project } from './project.js';
+import { Flickable, ListView } from './items.js';
 import { Renderer } from './renderer.js';
 import { Scene } from './scene.js';
+import { createTestApi, trackNetwork } from './testapi.js';
 
 export function decodeBase64(text) {
 	if (typeof atob === 'function') {
@@ -41,19 +44,42 @@ export function resourceRoot(root, location) {
 	return result.endsWith('/') ? result : `${result}/`;
 }
 
-// A project over the embedded files; load() parses them again in the browser.
+// The documents of a compiled application are packed trees, without their text (compiler/compiler.js); a scan lists the font
+// files `f`, the types made by createObject `t` and the QML files `q` a document names, and `e` when it declares an enum.
+function addCompiledDocuments(project, docs, scans) {
+	for (const [path, record] of Object.entries(docs || {})) {
+		const scan = (scans || {})[path] || {};
+		project.addCompiled(path, record, { fonts: scan.f || [], types: scan.t || [], files: scan.q || [], enums: scan.e === 1 });
+	}
+}
+
+// `spec.docsDeflate` (--compress-docs of the compiler): `{ docs, scans }` deflated (raw) and base64-encoded, one block instead of
+// the usual plain JSON of `spec.docs`/`spec.scans`. DecompressionStream is a browser/Node API (not in every very old browser); a
+// build made with the flag needs it, and says so rather than silently doing nothing.
+async function inflateDocs(base64) {
+	if (typeof DecompressionStream !== 'function') {
+		throw new Error('This browser has no DecompressionStream; it cannot start a build made with --compress-docs.');
+	}
+	const stream = new Blob([decodeBase64(base64)]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+	return JSON.parse(await new Response(stream).text());
+}
+
+// A project over the embedded files; load() parses them again in the browser. The documents of a build made with
+// --compress-docs are not there yet (they are still deflated): addDeflatedDocs adds them, and createApplication's
+// start() calls it before the project loads its main document.
 export function createProject(spec) {
 	const files = new Map(Object.entries(spec.files || {}));
 	for (const [path, base64] of Object.entries(spec.binaries || {})) files.set(path, decodeBase64(base64));
 	const project = new Project(new MapFS(files), { modules: spec.modules || {}, trusted: spec.trusted === true });
-	// The documents of a compiled application are packed trees, without their text (compiler/compiler.js); a scan lists the font
-	// files `f`, the types made by createObject `t` and the QML files `q` a document names, and `e` when it declares an enum.
-	const scans = spec.scans || {};
-	for (const [path, record] of Object.entries(spec.docs || {})) {
-		const scan = scans[path] || {};
-		project.addCompiled(path, record, { fonts: scan.f || [], types: scan.t || [], files: scan.q || [], enums: scan.e === 1 });
-	}
+	addCompiledDocuments(project, spec.docs, spec.scans);
 	return project;
+}
+
+// Inflates spec.docsDeflate (if there is one) and adds its documents to `project`; a no-op otherwise.
+export async function addDeflatedDocs(project, spec) {
+	if (!spec.docsDeflate) return;
+	const { docs, scans } = await inflateDocs(spec.docsDeflate);
+	addCompiledDocuments(project, docs, scans);
 }
 
 function pickLanguage(spec) {
@@ -85,6 +111,7 @@ export function createApplication(spec, canvas, location = null) {
 	};
 	const project = createProject(spec);
 	const start = async () => {
+		await addDeflatedDocs(project, spec);
 		await project.load(spec.main);
 		await project.loadEmbedded();
 		return engine.load(project, scene.root);
@@ -118,7 +145,10 @@ export function bootstrap(spec) {
 		const application = createApplication(spec, canvas, window.location);
 		attachCanvas(canvas, application.scene, application.engine);
 		if (spec.debug === true) window.qmlWeb = application;
-		application.start().catch(showFatal);
+		// Every build has it, release ones too: the tests find and drive the items through it (see testapi.js).
+		const testApi = createTestApi({ engine: application.engine, scene: application.scene, canvas, network: trackNetwork(window), classes: { Flickable, ListView } });
+		window.qmlTest = testApi;
+		application.start().then(() => testApi.markStarted(), showFatal);
 	};
 	if (document.readyState === 'complete') run();
 	else window.addEventListener('load', run);
