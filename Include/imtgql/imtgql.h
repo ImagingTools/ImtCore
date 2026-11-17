@@ -46,6 +46,13 @@ imtauth::IUserInfo::FeatureIds CollectTenantScopedPermissions(const IGqlContext&
 */
 imtauth::IUserInfo::FeatureIds CollectOrganizationAccessPermissions(const IGqlContext& gqlContext, const QByteArray& userId);
 
+/**
+	Restrict the effective user permissions of the context, including requirements, to a token boundary.
+	A restricted superuser is an ordinary principal. Repeated restrictions intersect.
+	\return false if the context has no user or the user could not be copied.
+*/
+bool RestrictUserPermissions(IGqlContext& gqlContext, const QByteArrayList& permissions);
+
 QByteArray GetLanguageIdFromRequest(const QList<CGqlParamObject>& inputParams);
 QByteArray GetDesignSchemeIdFromRequest(const QList<CGqlParamObject>& inputParams);
 QByteArray GetTranslation(const iqt::ITranslationManager* translationManagerPtr, const CGqlRequest& gqlRequest, const QByteArray& phrase, const QByteArray& context);
