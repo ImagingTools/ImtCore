@@ -98,6 +98,8 @@ export class Renderer {
 		if (atlas !== null) {
 			this.page = atlas.pages[0];
 			this.whiteUv = 2 / this.page.size;
+			// The draws that are queued only refer to the pages: they are sent before a page is emptied for new glyphs.
+			atlas.beforeReset.add(() => this.submit());
 		}
 
 		if (canvas !== null) this.initGl();

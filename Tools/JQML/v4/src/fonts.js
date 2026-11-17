@@ -100,6 +100,8 @@ export class GlyphAtlas {
 	constructor() {
 		this.pages = [];
 		this.generation = 0;
+		// Functions that are called before the pages are emptied: a renderer that has queued draws of these pages submits them.
+		this.beforeReset = new Set();
 		this.newPage();
 	}
 
@@ -167,6 +169,7 @@ export class GlyphAtlas {
 
 	// Empties every page; all glyph entries become invalid (see `generation`).
 	reset() {
+		for (const submit of this.beforeReset) submit();
 		this.generation++;
 		for (const page of this.pages) this.clearPage(page);
 		this.pages.length = 1;
