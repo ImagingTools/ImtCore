@@ -130,7 +130,7 @@ GqlModel {
                 else if (dataModelLocal.containsKey("extensions")){
                     // The server sends the type of an error in the extensions of the GraphQL error.
                     let extensionsModel = dataModelLocal.getTreeItemModel("extensions");
-                    if (extensionsModel.containsKey("type")){
+                    if (extensionsModel && extensionsModel.containsKey("type")){
                         type = extensionsModel.getData("type");
                     }
                 }
