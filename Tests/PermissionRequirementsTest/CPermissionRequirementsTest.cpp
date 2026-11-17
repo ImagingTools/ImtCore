@@ -8,6 +8,7 @@
 // ImtCore includes
 #include <imtauth/imtauth.h>
 #include <imtauth/CUserInfo.h>
+#include <imtauthgql/imtauthgql.h>
 #include <imtgql/CGqlContext.h>
 #include <imtgql/imtgql.h>
 #include <imtlic/CFeatureInfo.h>
@@ -355,7 +356,7 @@ void CPermissionRequirementsTest::testRequirementsBeforeTokenIntersection()
 	context.SetProductId("Lisa");
 	context.SetProductInfo(&productInfo);
 	context.SetUserInfo(&user);
-	QVERIFY(imtgql::RestrictUserPermissions(context, {s_viewUsers}));
+	QVERIFY(imtauthgql::RestrictUserPermissions(context, {s_viewUsers}));
 	QCOMPARE(context.GetUserInfo()->GetPermissions("Lisa"), QByteArrayList{s_viewUsers});
 	QVERIFY(context.GetUserInfo()->GetPermissions("Other").isEmpty());
 	QVERIFY(context.GetImpliedPermissions().isEmpty());
@@ -373,16 +374,16 @@ void CPermissionRequirementsTest::testTokenBoundaryCannotExpand()
 	context.SetProductId("Lisa");
 	context.SetProductInfo(&productInfo);
 	context.SetUserInfo(&user);
-	QVERIFY(imtgql::RestrictUserPermissions(context, {s_viewUsers, s_viewRevisions}));
-	QVERIFY(imtgql::RestrictUserPermissions(context, {s_changeUser, s_viewUsers}));
+	QVERIFY(imtauthgql::RestrictUserPermissions(context, {s_viewUsers, s_viewRevisions}));
+	QVERIFY(imtauthgql::RestrictUserPermissions(context, {s_changeUser, s_viewUsers}));
 	QCOMPARE(context.GetUserInfo()->GetPermissions("Lisa"), QByteArrayList{s_viewUsers});
 	QVERIFY(context.GetImpliedPermissions().isEmpty());
 	QCOMPARE(context.GetPermissionBoundary(), QByteArrayList{s_viewUsers});
-	QVERIFY(imtgql::RestrictUserPermissions(context, {}));
+	QVERIFY(imtauthgql::RestrictUserPermissions(context, {}));
 	QVERIFY(context.HasPermissionBoundary());
 	QVERIFY(context.GetUserInfo()->GetPermissions("Lisa").isEmpty());
 	QVERIFY(context.GetImpliedPermissions().isEmpty());
-	QVERIFY(imtgql::RestrictUserPermissions(context, {s_changeUser}));
+	QVERIFY(imtauthgql::RestrictUserPermissions(context, {s_changeUser}));
 	QVERIFY(context.GetUserInfo()->GetPermissions("Lisa").isEmpty());
 }
 
