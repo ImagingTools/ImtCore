@@ -7147,20 +7147,24 @@ export class Loader extends Item {
 		this.$failed = false;
 		this.$statusSent = 0;
 		this.$loaded = null; // the item that was loaded: the other children are declared in the Loader (a Connections, a Timer) and stay
+		this.$declared = null; // the children the Loader had when a load began, while it runs
 		this.$declareSignal('loaded', []);
 		this.$declareSignal('itemChanged', []);
 		this.$declareSignal('statusChanged', []);
 	}
 
 	// The item the Loader loaded, or null. Not `$children[0]`: what is declared inside the Loader comes first.
+	// While a load runs, the item is the child that came after it began: the bindings and handlers of the item itself see it as soon as it is attached.
 	$loadedItem() {
-		const item = this.$loaded;
+		let item = this.$loaded;
+		if (item === null && this.$declared !== null) item = this.$children.find((child) => !this.$declared.has(child)) ?? null;
 		return item !== null && item.$parent === this && item.$destroyed !== true ? item : null;
 	}
 
 	$sever() {
 		this.$sourceComponent = null;
 		this.$loaded = null;
+		this.$declared = null;
 		super.$sever();
 	}
 
