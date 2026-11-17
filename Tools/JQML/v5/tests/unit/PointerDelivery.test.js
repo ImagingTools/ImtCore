@@ -148,6 +148,52 @@ function cases(name, runtime){
         assert.equal(click(50, 260, edit), false)
     })
 
+    // QQuickWindowPrivate::findCursorItemAndHandler: the cursor of the topmost item under the pointer that has one; an
+    // item without a cursor does not stop the search. A TextInput has none, a TextEdit the I-beam
+    // (QQuickTextEditPrivate::updateMouseCursorShape: the arrow when read-only and not selecting by mouse).
+    function cursorAt(x, y){
+        let element = { style: { cursor: 'unset' } }
+        delivery.scene.element = element
+        try {
+            delivery.move(x, y, 0, 0)
+        } finally {
+            delivery.leaveWindow()
+            delivery.scene.element = null
+        }
+        return element.style.cursor
+    }
+
+    test(name + ': the cursor over a field covered by a MouseArea with a cursor shape is that of the MouseArea', () => {
+        let { overlay } = scene()
+        mouseArea(overlay, (it) => { it.cursorShape = 'pointer' })
+        assert.equal(cursorAt(50, 110), 'pointer')
+    })
+
+    test(name + ': a TextInput has no cursor of its own', () => {
+        scene()
+        assert.equal(cursorAt(50, 110), '')
+    })
+
+    test(name + ': a TextEdit shows the I-beam, the arrow when read-only and not selecting by mouse', () => {
+        let { window } = scene()
+        let edit
+        engine.batch(() => { edit = geometry(new TextEdit(window), 10, 250, 200, 40) })
+        assert.equal(cursorAt(50, 260), 'text')
+        engine.batch(() => { edit.readOnly = true })
+        assert.equal(cursorAt(50, 260), 'text')
+        engine.batch(() => { edit.selectByMouse = false })
+        assert.equal(cursorAt(50, 260), 'default')
+    })
+
+    test(name + ': a MouseArea without a cursor shape above a TextEdit leaves the I-beam', () => {
+        let { window } = scene()
+        let edit
+        engine.batch(() => { edit = geometry(new TextEdit(window), 10, 250, 200, 40) })
+        engine.batch(() => geometry(new MouseArea(window), 0, 200, 400, 100))
+        assert.equal(cursorAt(50, 260), 'text')
+        assert.ok(edit)
+    })
+
     test(name + ': a press while another button holds the grab goes to the grabber, not to the field', () => {
         let { field, overlay } = scene()
         let area = mouseArea(overlay)

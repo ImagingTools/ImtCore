@@ -110,7 +110,9 @@ class TextField extends Item {
         if(this.$dom){
             let input = document.createElement(multiline ? 'textarea' : 'input')
             input.className = 'jq2-input'
-            input.style.cssText = 'position:absolute;left:0;top:0;width:100%;height:100%;margin:0;padding:0;border:0;outline:none;background:transparent;resize:none;pointer-events:auto;font:inherit;color:inherit;'
+            // the cursor is the scene's (the topmost item with a cursor, QQuickWindowPrivate::findCursorItemAndHandler):
+            // the control takes the DOM events even where an item covers it, its own text cursor would show through
+            input.style.cssText = 'position:absolute;left:0;top:0;width:100%;height:100%;margin:0;padding:0;border:0;outline:none;background:transparent;resize:none;pointer-events:auto;font:inherit;color:inherit;cursor:inherit;'
             this.$dom.appendChild(input)
             this.$input = input
             input.$item = this

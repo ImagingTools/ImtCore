@@ -12,6 +12,11 @@ class TextEdit extends TextField {
         super.$write(id, value)
         if(id === Item.WIDTH && old !== this.$v[id] && this.$v[TextEdit.WRAPMODE]) this.$updateImplicitSize()
     }
+
+    // QQuickTextEditPrivate::updateMouseCursorShape (a TextInput sets no cursor)
+    $cursor(){
+        return this.$v[TextEdit.READONLY] && !this.$v[TextEdit.SELECTBYMOUSE] ? 'default' : 'text'
+    }
 }
 
 defineType(TextEdit, {
