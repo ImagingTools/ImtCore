@@ -22,6 +22,7 @@
 #include <imtauth/CUserInfo.h>
 #include <imtauth/imtauth.h>
 #include <imtauth/IUserSettings.h>
+#include <imtauthgql/imtauthgql.h>
 #include <imtgql/CGqlRequestContextManager.h>
 #include <imtgql/imtgql.h>
 #include <imtservergql/CAuthorizationSnapshot.h>
@@ -457,7 +458,7 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateContext(
 
 		if (isPat){
 			gqlContextPtr->SetUserInfo(userInfoPtr);
-			if (!imtgql::RestrictUserPermissions(*gqlContextPtr, scopes)){
+			if (!imtauthgql::RestrictUserPermissions(*gqlContextPtr, scopes)){
 				imtgql::CGqlRequestContextManager::Clear();
 				SetError(error, imtgql::IGqlContextCreator::CCS_INTERNAL_ERROR, QStringLiteral("Unable to restrict personal token permissions."));
 				return nullptr;
@@ -1803,7 +1804,7 @@ bool CAuthenticationManagerComp::BindToServerToken(
 		// What the user may give in its product is what this server holds for it, within its personal token; the token of the server bounds what it may do
 		gqlContext.SetGrantingAuthority(userInfoPtr->IsAdmin(), imtservergql::GetUserPermissions(gqlContext));
 
-		return imtgql::RestrictUserPermissions(gqlContext, serverScopes);
+		return imtauthgql::RestrictUserPermissions(gqlContext, serverScopes);
 	}
 	else if (!clientProductId.isEmpty()){
 		imtauth::CIdentifiableUserInfo boundUserInfo;

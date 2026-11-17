@@ -4,6 +4,7 @@
 
 // ImtCore includes
 #include <imtauth/CTenantFilterParam.h>
+#include <imtauth/CUserInfo.h>
 #include <imtauth/ITenantRelationshipInfo.h>
 #include <imtauth/ITenantRelationshipProposalInfo.h>
 #include <imtauth/ITenantConnectionRequestInfo.h>
@@ -1525,6 +1526,51 @@ inline imtauth::IPrincipal::RoleIds GetEffectiveUserRoles(
 				userId, userInfo, tenantId, productId, bindingManager, delegatedAccess, membershipManager, roleInfoProvider, adaptedPtr);
 
 	return GetTenantUserRoles(effectiveUser, tenantId, productId, bindingManager);
+}
+
+
+/**
+	Restrict the effective user permissions of the context, including requirements, to a token boundary.
+	A restricted superuser is an ordinary principal. Repeated restrictions intersect.
+	\return false if the context has no user or the user could not be copied.
+*/
+inline bool RestrictUserPermissions(imtgql::IGqlContext& gqlContext, const QByteArrayList& permissions)
+{
+	const imtauth::IUserInfo* sourcePtr = gqlContext.GetUserInfo();
+	if (sourcePtr == nullptr){
+		return false;
+	}
+
+	const auto principalKind = gqlContext.GetPrincipalKind();
+	QByteArrayList boundary = permissions;
+	if (gqlContext.HasPermissionBoundary()){
+		const QByteArrayList previous = gqlContext.GetPermissionBoundary();
+		const QSet<QByteArray> previousSet(previous.cbegin(), previous.cend());
+		boundary.removeIf([&previousSet](const QByteArray& permission){ return !previousSet.contains(permission); });
+	}
+	const QSet<QByteArray> allowed(boundary.cbegin(), boundary.cend());
+	const QByteArray productId = gqlContext.GetProductId();
+	QByteArrayList effective = sourcePtr->IsAdmin() ? boundary
+				: sourcePtr->GetPermissions(productId) + gqlContext.GetImpliedPermissions();
+	effective.removeIf([&allowed](const QByteArray& permission){ return !allowed.contains(permission); });
+
+	imtauth::CIdentifiableUserInfo user;
+	if (!user.CopyFrom(*sourcePtr)){
+		return false;
+	}
+	for (const QByteArray& product : user.GetProducts()){
+		user.SetRoles(product, imtauth::IPrincipal::RoleIds());
+		user.SetLocalPermissions(product, QByteArrayList());
+	}
+	for (const QByteArray& group : user.GetGroups()){
+		user.RemoveFromGroup(group);
+	}
+	user.SetLocalPermissions(productId, effective);
+	gqlContext.SetUserInfo(&user);
+	gqlContext.SetPrincipalKind(principalKind);
+	gqlContext.SetPermissionBoundary(boundary);
+
+	return true;
 }
 
 
