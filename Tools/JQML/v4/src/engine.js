@@ -2032,11 +2032,15 @@ export class Engine {
 		loader.$wanted = key;
 		let ok = false;
 		try {
-			for (const child of [...loader.$children]) {
-				this.releaseSubtree(child);
-				loader.$removeChild(child);
+			// What was loaded goes; what is declared in the Loader (a Connections, a Timer) stays, as in Qt.
+			const previous = loader.$loadedItem();
+			if (previous !== null) {
+				this.releaseSubtree(previous);
+				loader.$removeChild(previous);
 			}
+			loader.$loaded = null;
 			loader.$failed = false;
+			const before = new Set(loader.$children);
 			if (key !== '' && key !== null) {
 				const mark = this.completed.length;
 				this.guard(() => {
@@ -2058,10 +2062,13 @@ export class Engine {
 						throw new QmlError('Cannot load sourceComponent');
 					}
 					ok = created !== null && created !== undefined;
+					if (ok) loader.$loaded = created;
 				}, `Loader '${typeof key === 'string' ? key : 'sourceComponent'}'`, 0);
 				if (!ok) {
 					loader.$failed = true;
+					// A failed load can have left the item it made in the middle: what the Loader got after the load began goes.
 					for (const child of [...loader.$children]) {
+						if (before.has(child)) continue;
 						this.releaseSubtree(child);
 						loader.$removeChild(child);
 					}
@@ -2126,10 +2133,10 @@ export class Engine {
 		for (let i = 0; i < path.length - 1; i++) {
 			const next = target[path[i]];
 			if (next === undefined || next === null || typeof next !== 'object' || !('$owner' in next || '$typeName' in next)) {
-				// `icon.width: 18` where `icon` is bound by a base type (`icon: buttonIcon`): written once the object exists.
-				const bound = item.$bindings !== null && item.$bindings.some((b) => b.key === path[0]);
-				const aliased = item.$aliases !== undefined && item.$aliases.has(path[0]);
-				if (this.lenient && i === 0 && item.$constructing && (next === undefined || next === null) && (bound || aliased)) {
+				// `icon.width: 18` where `icon` is bound by a base type (`icon: buttonIcon`): written once the object exists. So is
+				// `defaultFieldFilter.m_fieldId: "Status"` where the base type declares `property FieldFilter defaultFieldFilter: FieldFilter {}`:
+				// the use site's properties are applied before the base type has made the object of its default.
+				if (this.lenient && i === 0 && item.$constructing && (next === undefined || next === null)) {
 					if (item.$pendingGroupWrites === undefined) item.$pendingGroupWrites = [];
 					item.$pendingGroupWrites.push([path, value]);
 					return;

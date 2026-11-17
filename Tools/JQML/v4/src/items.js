@@ -7146,13 +7146,21 @@ export class Loader extends Item {
 		this.$sizing = false;
 		this.$failed = false;
 		this.$statusSent = 0;
+		this.$loaded = null; // the item that was loaded: the other children are declared in the Loader (a Connections, a Timer) and stay
 		this.$declareSignal('loaded', []);
 		this.$declareSignal('itemChanged', []);
 		this.$declareSignal('statusChanged', []);
 	}
 
+	// The item the Loader loaded, or null. Not `$children[0]`: what is declared inside the Loader comes first.
+	$loadedItem() {
+		const item = this.$loaded;
+		return item !== null && item.$parent === this && item.$destroyed !== true ? item : null;
+	}
+
 	$sever() {
 		this.$sourceComponent = null;
+		this.$loaded = null;
 		super.$sever();
 	}
 
@@ -7166,13 +7174,13 @@ export class Loader extends Item {
 	}
 
 	get $implicitWidth() {
-		const item = this.$children.length > 0 ? this.$children[0] : null;
+		const item = this.$loadedItem();
 		if (item === null) return 0;
 		return this.$widthExplicit() ? item.$implicitWidth : item.width;
 	}
 
 	get $implicitHeight() {
-		const item = this.$children.length > 0 ? this.$children[0] : null;
+		const item = this.$loadedItem();
 		if (item === null) return 0;
 		return this.$heightExplicit() ? item.$implicitHeight : item.height;
 	}
@@ -7181,7 +7189,7 @@ export class Loader extends Item {
 	// Only when the Loader's size changed or the item is new: a script may resize the item afterwards (Qt).
 	$pushSize() {
 		if (this.$holdSize === true) return;
-		const item = this.$children.length > 0 ? this.$children[0] : null;
+		const item = this.$loadedItem();
 		if (item === null) {
 			this.$pushedItem = null;
 			return;
@@ -7306,7 +7314,7 @@ defineProp(
 	function () {
 		if (this.$anchors !== null && this.$anchors.$affectsWidth) return this.$aw;
 		if (this.$w > 0) return this.$w;
-		const item = this.$children.length > 0 ? this.$children[0] : null;
+		const item = this.$loadedItem();
 		return item !== null ? item.width : 0;
 	},
 	function (v) {
@@ -7324,7 +7332,7 @@ defineProp(
 	function () {
 		if (this.$anchors !== null && this.$anchors.$affectsHeight) return this.$ah;
 		if (this.$h > 0) return this.$h;
-		const item = this.$children.length > 0 ? this.$children[0] : null;
+		const item = this.$loadedItem();
 		return item !== null ? item.height : 0;
 	},
 	function (v) {
@@ -7337,12 +7345,12 @@ defineProp(
 	},
 );
 defineReadOnly(Loader.prototype, 'item', function () {
-	return this.$children.length > 0 ? this.$children[0] : null;
+	return this.$loadedItem();
 });
 defineReadOnly(Loader.prototype, 'status', function () {
 	if (!this.$active) return 0;
 	if (this.$failed) return 3;
-	return this.$children.length > 0 ? 1 : 0;
+	return this.$loadedItem() !== null ? 1 : 0;
 });
 Loader.prototype.$contentSized = true;
 
