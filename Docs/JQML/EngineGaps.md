@@ -41,7 +41,7 @@
 | `Image.sourceSize.width/height` | 4656 / 2918 / 3526 | размер декодирования не учитывается: резкость SVG-иконок, память больших картинок (проверить) |
 | `MouseArea.onCanceled` | 1383 / 894 / 1053 | нет сигнала потери нажатия (скролл забирает мышь у кнопки): кнопка может остаться «нажатой» |
 | `NumberAnimation.easing.type` | 459 / 367 / 410 | кривые не применяются, всё идёт линейно (`items.js`, комментарий у `Animation`) |
-| `Text.onLinkActivated` | 89 / 74 / 81 | ссылки в RichText не нажимаются |
+| ~~`Text.onLinkActivated`~~ (сделано: RichText, StyledText и ссылки, см. `RichText.md`) | 89 / 74 / 81 | ссылки в RichText теперь нажимаются |
 | `MouseArea.onPressAndHold` | 50 / 40 / 41 | долгое нажатие не распознаётся |
 | `ListView/Flickable.onMovementStarted/Ended`, `onFlickStarted` | ≈7 | |
 | `Drag.*`, `MouseArea.drag.target`, `DropArea` | 1–3 | перетаскивание между элементами |
@@ -86,6 +86,6 @@
 2. Методы `TreeItemModel` из таблицы (`setUpdateEnabled`, `swapItems`, `isEqualWithModel`, `beginChanges`/`endChanges`, `getParent`,
    `insertNewItemWithParameters`).
 3. `MouseArea.onCanceled`, `Image.sourceSize`, `easing.type` — самые частые «молчаливые» расхождения.
-4. `Text.onLinkActivated`, `onPressAndHold`, `Canvas.arcTo`, `createConicGradient`, `getImageData`, `Qt.md5`.
+4. `onPressAndHold`, `Canvas.arcTo`, `createConicGradient`, `getImageData`, `Qt.md5`.
 5. Корневой `Window`, `Drag`/`DropArea`, `defaultFieldFilter` (сначала проверить).
 6. Скорость обработчиков и функций, остаток памяти закрытых вкладок.
