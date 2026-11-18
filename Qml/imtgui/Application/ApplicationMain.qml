@@ -113,9 +113,10 @@ Item {
 				internal.loadingVisible = false
 			}
 			else if (totalStatus == status.TRY_CONNECTING_TO_APP_SERVER){
-				// The address of the server comes with the client settings, maybe after this state, maybe never (the address is given to the engine)
+				// The address of the server comes with the client settings, maybe after this state, maybe never (the address is given to the engine).
+				// A web client gives the location of the page (an object): its text is the address
 				internal.errorMessage = Qt.binding(function(){
-					let serverUrl = application.getServerUrl();
+					let serverUrl = String(application.getServerUrl());
 
 					return (serverUrl.indexOf("://:") >= 0) ? qsTr("Connecting to the server...") : qsTr("Connecting to ") + serverUrl + " ...";
 				})
