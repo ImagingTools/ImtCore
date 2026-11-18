@@ -599,6 +599,8 @@ sdl::V1_0::imtbase::CRemoveElementSetPayload CObjectCollectionControllerCompBase
 		}
 	}
 
+	ApplyHeaderFilters(gqlRequest, filterParams);
+
 	// The storage removes a set without regard to the tenant, so the selected objects are removed by their IDs
 	istd::TDelPtr<imtauth::CTenantFilterParam> tenantFilterPtr(CreateTenantFilterParam(gqlRequest));
 	const bool isTenantRestricted = tenantFilterPtr.IsValid() && !IsAccessCheckBypassed(gqlRequest);
@@ -665,7 +667,7 @@ sdl::V1_0::imtbase::CRestoreObjectsPayload CObjectCollectionControllerCompBase::
 
 sdl::V1_0::imtbase::CRestoreObjectSetPayload CObjectCollectionControllerCompBase::OnRestoreObjectSet(
 			const sdl::V1_0::imtbase::CRestoreObjectSetGqlRequest& restoreObjectSetRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtbase::CRestoreObjectSetPayload response;
@@ -681,6 +683,8 @@ sdl::V1_0::imtbase::CRestoreObjectSetPayload CObjectCollectionControllerCompBase
 			}
 		}
 	}
+
+	ApplyHeaderFilters(gqlRequest, filterParams);
 
 	imtbase::ICollectionInfo::Ids elementIds = m_objectCollectionCompPtr->GetElementIds(0, -1, &filterParams);
 
@@ -1165,6 +1169,7 @@ sdl::V1_0::imtbase::CGetElementsCountPayload CObjectCollectionControllerCompBase
 	}
 
 	AddAccessFilters(gqlRequest, imtgql::CGqlParamObject(), filterParams);
+	ApplyHeaderFilters(gqlRequest, filterParams);
 
 	response.count = m_objectCollectionCompPtr->GetElementsCount(&filterParams);
 
@@ -1207,6 +1212,7 @@ sdl::V1_0::imtbase::CGetElementIdsPayload CObjectCollectionControllerCompBase::O
 	}
 
 	AddAccessFilters(gqlRequest, imtgql::CGqlParamObject(), filterParams);
+	ApplyHeaderFilters(gqlRequest, filterParams);
 
 	imtbase::IObjectCollection::Ids ids = m_objectCollectionCompPtr->GetElementIds(offset, count, &filterParams);
 	response.elementIds.Emplace();
@@ -1522,7 +1528,7 @@ sdl::V1_0::imtbase::CGetElementMetaInfoPayload CObjectCollectionControllerCompBa
 
 sdl::V1_0::imtbase::CCreateSubCollectionPayload CObjectCollectionControllerCompBase::OnCreateSubCollection(
 			const sdl::V1_0::imtbase::CCreateSubCollectionGqlRequest& createSubCollectionRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 
@@ -1554,6 +1560,8 @@ sdl::V1_0::imtbase::CCreateSubCollectionPayload CObjectCollectionControllerCompB
 			return {};
 		}
 	}
+
+	ApplyHeaderFilters(gqlRequest, filterParams);
 
 	if (!requestInfo.isItemsRequested){
 		return {};
@@ -3304,7 +3312,9 @@ void CObjectCollectionControllerCompBase::ApplyHeaderFilters(const imtgql::CGqlR
 		}
 	}
 
-	if (fixedExpression.fieldFilters.isEmpty()){
+	AddFixedFilters(gqlRequest, fixedExpression);
+
+	if (fixedExpression.fieldFilters.isEmpty() && fixedExpression.filterExpressions.isEmpty()){
 		return;
 	}
 
@@ -3325,6 +3335,13 @@ void CObjectCollectionControllerCompBase::ApplyHeaderFilters(const imtgql::CGqlR
 	}
 
 	complexFilterPtr->SetFilterExpression(fixedExpression);
+}
+
+
+void CObjectCollectionControllerCompBase::AddFixedFilters(
+			const imtgql::CGqlRequest& /*gqlRequest*/,
+			imtbase::IComplexCollectionFilter::FilterExpression& /*fixedExpression*/) const
+{
 }
 
 

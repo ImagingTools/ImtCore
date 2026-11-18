@@ -40,6 +40,7 @@ ViewBase {
 		CachedLicenseCollection.updateModel()
 		CachedFeatureCollection.modelUpdated.connect(licenseEditor.onCollectionsChanged)
 		CachedLicenseCollection.modelUpdated.connect(licenseEditor.onCollectionsChanged)
+		CachedProductCollection.modelUpdated.connect(licenseEditor.onProductsChanged)
 		multiPageView.updatePages()
 		multiPageView.ensurePageLoaded(0)
 		multiPageView.ensurePageLoaded(1)
@@ -49,6 +50,7 @@ ViewBase {
 	Component.onDestruction: {
 		CachedFeatureCollection.modelUpdated.disconnect(licenseEditor.onCollectionsChanged)
 		CachedLicenseCollection.modelUpdated.disconnect(licenseEditor.onCollectionsChanged)
+		CachedProductCollection.modelUpdated.disconnect(licenseEditor.onProductsChanged)
 	}
 
 	LocalizationEvent {
@@ -57,6 +59,25 @@ ViewBase {
 
 	function onCollectionsChanged() {
 		rebuildEntries()
+	}
+
+	// The products may come after the license: the combo box is filled in place, so its pick is set again
+	function onProductsChanged() {
+		productsTimer.restart()
+	}
+
+	Timer {
+		id: productsTimer
+		interval: 0
+		onTriggered: {
+			var generalPageInstance = multiPageView.getPageByIndex(0)
+			if (generalPageInstance) {
+				licenseEditor.setBlockingUpdateGui(true)
+				generalPageInstance.selectProduct()
+				licenseEditor.setBlockingUpdateGui(false)
+			}
+			licenseEditor.rebuildEntries()
+		}
 	}
 
 	function updateGui() {
@@ -525,6 +546,10 @@ ViewBase {
 				generalGroup.updateModel()
 			}
 
+			function selectProduct() {
+				generalGroup.selectProduct()
+			}
+
 			CustomScrollbar {
 				id: scrollbar
 				z: parent.z + 1
@@ -610,7 +635,8 @@ ViewBase {
 							nameId: "productName"
 							changeable: licenseEditor.canEdit
 							onCurrentIndexChanged: {
-								if (licenseEditor.guiIsBlocked())
+								// -1 comes from refilling the product list, not from the user
+								if (licenseEditor.guiIsBlocked() || currentIndex < 0)
 									return
 								licenseEditor.setProductId(generalGroup.currentProductId())
 								licenseEditor.doUpdateModel()
@@ -630,14 +656,20 @@ ViewBase {
 							licenseNameInput.text = licenseEditor.licenseData.m_licenseName || ""
 							licenseIdInput.text = licenseEditor.licenseData.m_licenseId || ""
 							descriptionInput.text = licenseEditor.licenseData.m_description || ""
-							productComboBox.currentIndex = -1
+							selectProduct()
+						}
+
+						function selectProduct() {
+							if (!licenseEditor.licenseData)
+								return
+							let index = -1
 							for (let i = 0; i < licenseEditor.productsModel.getItemsCount(); ++i) {
-								let id = licenseEditor.productsModel.getData(ProductItemTypeMetaInfo.s_id, i)
-								if (id === licenseEditor.licenseData.m_productId) {
-									productComboBox.currentIndex = i
+								if (licenseEditor.productsModel.getData(ProductItemTypeMetaInfo.s_id, i) === licenseEditor.licenseData.m_productId) {
+									index = i
 									break
 								}
 							}
+							productComboBox.currentIndex = index
 						}
 
 						function updateModel() {

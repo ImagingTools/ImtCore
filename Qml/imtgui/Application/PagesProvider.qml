@@ -17,7 +17,6 @@ QtObject {
     property bool pagesReceived: false;
 
     function updateModel(){
-        pagesProvider.pageGroupsGqlModel.updateModel();
         pagesProvider.pagesGqlModel.updateModel();
     }
 
@@ -42,6 +41,14 @@ QtObject {
             queryFields.InsertField("groupId");
             query.AddField(queryFields);
 
+            var groupItemsFields = Gql.GqlObject("items");
+            groupItemsFields.InsertField("id");
+            groupItemsFields.InsertField("name");
+            groupItemsFields.InsertField("icon");
+            var groupsFields = Gql.GqlObject("groups");
+            groupsFields.InsertFieldObject(groupItemsFields);
+            query.AddField(groupsFields);
+
             var gqlData = query.GetQuery();
 
             this.setGqlQuery(gqlData)
@@ -54,9 +61,17 @@ QtObject {
 
                     if(dataModelLocal.containsKey("PagesData")){
                         dataModelLocal = dataModelLocal.getData("PagesData");
-                        dataModelLocal = dataModelLocal.getData("items");
 
-                        pagesProvider.pagesModel = dataModelLocal;
+                        // Servers with their own page list send no groups; the groups go first so the menu is built once
+                        var groupsModel = dataModelLocal.containsKey("groups") ? dataModelLocal.getData("groups") : null;
+                        if (groupsModel && groupsModel.containsKey("items")){
+                            pagesProvider.pageGroupsModel = groupsModel.getData("items");
+                        }
+                        else{
+                            pagesProvider.pageGroupsModel.clear();
+                        }
+
+                        pagesProvider.pagesModel = dataModelLocal.getData("items");
                     }
                 }
 
@@ -64,38 +79,6 @@ QtObject {
             }
             else if (this.state === "Error"){
                 PopupManager.addWarningMessage(qsTr("Failed to load application pages. Please try again."), true)
-            }
-        }
-    }
-
-    // A server without menu groups answers with an error: the menu then simply stays flat.
-    property GqlModel pageGroupsGqlModel : GqlModel {
-        function updateModel(){
-            var query = Gql.GqlRequest("query", "PageGroupsData");
-
-            var queryFields = Gql.GqlObject("items");
-            queryFields.InsertField("id");
-            queryFields.InsertField("name");
-            queryFields.InsertField("icon");
-            query.AddField(queryFields);
-
-            var gqlData = query.GetQuery();
-
-            this.setGqlQuery(gqlData)
-        }
-
-        onStateChanged: {
-            if (this.state === "Ready"){
-                if (this.containsKey("data")){
-                    var dataModelLocal = this.getData("data");
-
-                    if (dataModelLocal.containsKey("PageGroupsData")){
-                        dataModelLocal = dataModelLocal.getData("PageGroupsData");
-                        if (dataModelLocal.containsKey("items")){
-                            pagesProvider.pageGroupsModel = dataModelLocal.getData("items");
-                        }
-                    }
-                }
             }
         }
     }

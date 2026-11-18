@@ -14,6 +14,8 @@ QtObject {
 	property string documentName;
 	property string documentDescription;
 	property string typeId;
+	// Sent with the requests when given: tells the server which of the collections sharing the commands is meant
+	property string collectionId;
 	property Component documentModelComp;
 	property var documentModel: null;
 	
@@ -102,6 +104,9 @@ QtObject {
 	function setupGetRequestInputData(){
 		getRequestInputParam.InsertField ("id", getDocumentId());
 		getRequestInputParam.InsertField("typeId", getDocumentTypeId());
+		if (collectionId !== ""){
+			getRequestInputParam.InsertField("collectionId", collectionId);
+		}
 	}
 	
 	function setupAddRequestInputData(){
@@ -110,6 +115,9 @@ QtObject {
 		addRequestInputParam.InsertField("typeId", getDocumentTypeId());
 		addRequestInputParam.InsertField("name", getDocumentName());
 		addRequestInputParam.InsertField("description", getDocumentDescription());
+		if (collectionId !== ""){
+			addRequestInputParam.InsertField("collectionId", collectionId);
+		}
 	}
 	
 	function setupUpdateRequestInputData(){
@@ -118,6 +126,9 @@ QtObject {
 		updateRequestInputParam.InsertField("typeId", getDocumentTypeId());
 		updateRequestInputParam.InsertField("name", getDocumentName());
 		updateRequestInputParam.InsertField("description", getDocumentDescription());
+		if (collectionId !== ""){
+			updateRequestInputParam.InsertField("collectionId", collectionId);
+		}
 	}
 	
 	function updateDocumentModel(){

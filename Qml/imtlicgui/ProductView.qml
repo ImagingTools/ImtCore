@@ -4,6 +4,7 @@ import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtauthgui 1.0
 import imtcontrols 1.0
+import imtdocgui 1.0
 import imtlicProductsSdl 1.0
 import imtlicFeaturesSdl 1.0
 
@@ -29,6 +30,10 @@ ViewBase {
 	property bool canEdit: false
 	// Set when the page holds products of one category only: the category is not offered for editing.
 	property string fixedCategoryId: ""
+	// Page of the feature catalog: new features are created there.
+	property string featuresPageId: "Features"
+	property bool featureCatalogEmpty: false
+	property bool canCreateFeature: false
 	// Part of the product this view works in; scopes its permission checks.
 	property string permissionPath: ""
 
@@ -60,6 +65,7 @@ ViewBase {
 
 	Component.onCompleted: {
 		canEdit = PermissionsController.checkPermission("/ProductManagement/Edit/Change")
+		canCreateFeature = PermissionsController.checkPermission("/FeatureManagement/Edit/Add")
 		CachedFeatureCollection.updateModel()
 		CachedFeatureCollection.modelUpdated.connect(productViewContainer.onFeaturesChanged)
 		multiPageView.updatePages()
@@ -75,7 +81,13 @@ ViewBase {
 		onLocalizationChanged: productViewContainer.updateFeaturesGui()
 	}
 
+	// The product ID is the name without white space; it is never typed in.
+	function productIdFromName(name) {
+		return name ? name.replace(/\s+/g, '') : ""
+	}
+
 	function onFeaturesChanged() {
+		featureCatalogEmpty = !allFeaturesModel || allFeaturesModel.getItemsCount() === 0
 		updateFeaturesGui()
 	}
 
@@ -1017,9 +1029,28 @@ ViewBase {
 							objectName: "ProductNameInput"
 							name: qsTr("Product name")
 							placeHolderText: qsTr("Enter the product name")
+							isRequired: true
+							showErrorWhenInvalid: true
+							deferErrorUntilEdited: true
+							errorText: qsTr("Please enter the product name")
+							textInputValidator: productNameValidator
 							readOnly: !productViewContainer.canEdit
+							onTextEdited: productIdInput.text = productViewContainer.productIdFromName(productNameInput.text)
 							onEditingFinished: productViewContainer.doUpdateModel()
 							KeyNavigation.tab: categoryComboBox
+						}
+
+						RegularExpressionValidator {
+							id: productNameValidator
+							regularExpression: /^(?!\s*$).+/
+						}
+
+						TextInputElementView {
+							id: productIdInput
+							objectName: "ProductIdInput"
+							name: qsTr("Product ID")
+							description: qsTr("Generated from the product name")
+							readOnly: true
 						}
 
 						ComboBoxElementView {
@@ -1037,6 +1068,7 @@ ViewBase {
 							if (!productViewContainer.productData)
 								return
 							productNameInput.text = productViewContainer.productData.m_productName
+							productIdInput.text = productViewContainer.productData.m_productId
 							categoryComboBox.currentIndex = -1
 							if (productViewContainer.productData.m_categoryId === "Software")
 								categoryComboBox.currentIndex = 0
@@ -1048,15 +1080,16 @@ ViewBase {
 							if (!productViewContainer.productData)
 								return
 							productViewContainer.productData.m_productName = productNameInput.text
-							productViewContainer.productData.m_productId = productNameInput.text.replace(/\s+/g, '')
-							if (categoryComboBox.currentIndex === 0)
-								productViewContainer.productData.m_categoryId = "Software"
-							else if (categoryComboBox.currentIndex === 1)
-								productViewContainer.productData.m_categoryId = "Hardware"
-							else
-								productViewContainer.productData.m_categoryId = ""
+							productViewContainer.productData.m_productId = productViewContainer.productIdFromName(productNameInput.text)
+							// Assigned once: an intermediate value would change the document and send an update.
+							let categoryId = ""
 							if (productViewContainer.fixedCategoryId !== "")
-								productViewContainer.productData.m_categoryId = productViewContainer.fixedCategoryId
+								categoryId = productViewContainer.fixedCategoryId
+							else if (categoryComboBox.currentIndex === 0)
+								categoryId = "Software"
+							else if (categoryComboBox.currentIndex === 1)
+								categoryId = "Hardware"
+							productViewContainer.productData.m_categoryId = categoryId
 						}
 					}
 				}
@@ -1403,7 +1436,10 @@ ViewBase {
 					? productViewContainer.productData.m_productName : qsTr("Product")
 				createButtonText: qsTr("Add feature")
 				emptyText: qsTr("No features added")
-				emptyDescription: qsTr("Use Add feature to build this product")
+				emptyDescription: productViewContainer.featureCatalogEmpty
+					? qsTr("The feature catalog is empty: create a feature, then add it to the product")
+					: qsTr("Use Add feature to build this product")
+				emptyActionText: productViewContainer.canCreateFeature ? qsTr("Create feature") : ""
 				idleHintText: qsTr("Select a feature to choose which of its parts this product includes")
 				selectedHintText: productViewContainer.featureIsRequired(productViewContainer.selectedRootFeatureId())
 					? qsTr("%1 needs this feature; remove it first to drop this one")
@@ -1439,6 +1475,7 @@ ViewBase {
 				secondaryTextProvider: function(node) { return node && node.data ? node.data.featureId || "" : "" }
 				onSelectedNodeChanged: productViewContainer.selectRootFeature(selectedNode)
 				onCreateRequested: productViewContainer.openFeaturesDialog()
+				onEmptyActionRequested: MainDocumentService.insertNewDocument(productViewContainer.featuresPageId, "Feature")
 				onRemoveNodesRequested: productViewContainer.removeRootFeatures(nodes)
 			}
 		}

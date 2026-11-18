@@ -8,6 +8,9 @@
 // ACF includes
 #include <iprm/IParamsSet.h>
 
+// ImtCore includes
+#include <imtdoc/IDocumentService.h>
+
 
 namespace imtdoc
 {
@@ -62,6 +65,12 @@ QByteArray GetObjectIdFromParams(const iprm::IParamsSet* paramsPtr);
 	Returns -1 if \a paramsPtr is null or does not reference an object revision.
 */
 int GetRevisionFromParams(const iprm::IParamsSet* paramsPtr);
+
+/**
+	Returns the collection object ID of the document  documentId the user  userId has opened in  documentService.
+	Returns an empty ID for a document never saved or not opened.
+*/
+QByteArray GetDocumentObjectId(const IDocumentService& documentService, const QByteArray& userId, const QByteArray& documentId);
 
 
 } // namespace imtdoc

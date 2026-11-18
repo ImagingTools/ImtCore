@@ -1404,7 +1404,7 @@ DocumentViewBase {
 										model: ticketEditor.pendingAssignees
 										delegate: Rectangle {
 											objectName: "AssigneeChip_" + index
-											width: Math.min(assigneeChipText.contentWidth + assigneeChipRemove.width + Style.paddingS * 3, assigneesFlow.chipMaxWidth)
+											width: Math.min(assigneeChipText.implicitWidth + assigneeChipRemove.width + Style.paddingS * 3, assigneesFlow.chipMaxWidth)
 											height: assigneesFlow.chipHeight
 											radius: Style.radiusM
 											color: editView.accentBgLight
@@ -1626,7 +1626,7 @@ DocumentViewBase {
 										model: ticketEditor.pendingEntityRefs
 										delegate: Rectangle {
 											objectName: "ContextChip_" + index
-											width: Math.min(refLabelText.contentWidth + refRemoveBtn.width + Style.paddingS * 3, contextFlow.chipMaxWidth)
+											width: Math.min(refLabelText.implicitWidth + refRemoveBtn.width + Style.paddingS * 3, contextFlow.chipMaxWidth)
 											height: contextFlow.chipHeight
 											radius: Style.radiusM
 											color: editView.accentBgLight
