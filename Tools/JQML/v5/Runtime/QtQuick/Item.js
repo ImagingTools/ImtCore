@@ -40,7 +40,8 @@ function injectStyle(){
         html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; }
         .jq2 { position: absolute; left: 0; top: 0; z-index: 0; box-sizing: border-box; overflow: visible; pointer-events: none; user-select: none; }
         .jq2-input { user-select: text; }
-        .jq2-text { display: flex; font-family: 'Segoe UI'; font-size: 12px; }
+        .jq2-input::selection { background: var(--jq2-selection); color: var(--jq2-selected-text); }
+        .jq2-text { display: flex; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 12px; }
         .jq2-text-inner { white-space: pre; line-height: normal; }
         .jq2-text-inner p { margin: 0; }
     `
@@ -268,6 +269,7 @@ defineType(Item, {
         Layout: { group: null },    // set by Layouts.js
         Keys: { group: null },      // set by KeyDelivery.js
         KeyNavigation: { group: null },
+        Drag: { group: null },      // set by Drag.js
         ListView: { group: null },  // set by ListView.js
     },
     signals: ['childrenChanged'],

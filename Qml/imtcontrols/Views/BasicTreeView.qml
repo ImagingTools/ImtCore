@@ -2180,9 +2180,9 @@ Item {
         if (node && column)
             cellEditCanceled(createIndex(node), column)
 
-        treeView.forceActiveFocus()
+        listView.forceActiveFocus()
         Qt.callLater(function() {
-            treeView.forceActiveFocus()
+            listView.forceActiveFocus()
         })
     }
 

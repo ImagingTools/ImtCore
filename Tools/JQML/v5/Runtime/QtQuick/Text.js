@@ -3,7 +3,7 @@ const { toCss } = require('../Core/color')
 const { defineType, makeReadonly } = require('../Core/type')
 const { Font } = require('./Font')
 const { Item, bits } = require('./Item')
-const { NOWRAP, measure, style, wrapParagraph } = require('./TextLayout')
+const { NOWRAP, familyCss, measure, style, wrapParagraph } = require('./TextLayout')
 
 const STYLE = bits.STYLE
 
@@ -293,7 +293,7 @@ class Text extends Item {
 
     $styleFont(s, font, lh){
         s.fontSize = font.pixelSize + 'px'
-        s.fontFamily = font.family
+        s.fontFamily = familyCss(font.family)
         s.fontWeight = font.weight
         s.fontStyle = font.italic ? 'italic' : ''
         s.textDecoration = [font.underline ? 'underline' : '', font.strikeout ? 'line-through' : ''].join(' ').trim()
