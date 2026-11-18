@@ -2297,6 +2297,10 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::GetObjectSelectionQuery(const Q
 		schemaPrefix = QStringLiteral("%1.").arg(*m_tableSchemaAttrPtr);
 	}
 
+	// The id comes from the client. An id that is no UUID is compared as text: a uuid column finds nothing instead of failing
+	const QString escapedObjectId = imtdb::EscapeSql(QString::fromUtf8(objectId));
+	const bool isUuid = !QUuid::fromString(QString::fromUtf8(objectId)).isNull();
+
 	if (IsSQLite()){
 		return QStringLiteral(R"(
 		SELECT
@@ -2315,7 +2319,7 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::GetObjectSelectionQuery(const Q
 					/*2*/ *m_tableNameAttrPtr,
 					/*3*/ documentFilterQuery,
 					/*4*/ s_documentIdColumn,
-					/*5*/ objectId,
+					/*5*/ escapedObjectId,
 					/*6*/ CreateJsonExtractSql(
 						s_revisionInfoColumn,
 						s_revisionNumberKey,
@@ -2338,16 +2342,17 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::GetObjectSelectionQuery(const Q
 				FROM %1 "%2"
 				WHERE %7 = 1
 			) AS root1 ON root1."%4" = root."%4"
-			WHERE (%3) AND root."%4" = '%6' ORDER BY %8 DESC)")
+			WHERE (%3) AND root."%4"%9 = '%6' ORDER BY %8 DESC)")
 			.arg(
 				/*1*/ schemaPrefix,
 				/*2*/ *m_tableNameAttrPtr,
 				/*3*/ documentFilterQuery,
 				/*4*/ s_documentIdColumn,
 				/*5*/ s_lastModifiedColumn,
-				/*6*/ objectId,
+				/*6*/ escapedObjectId,
 				/*7*/ CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int),
-				/*8*/ CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int, QStringLiteral("root"))
+				/*8*/ CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int, QStringLiteral("root")),
+				/*9*/ isUuid ? QString() : QStringLiteral("::text")
 			).toUtf8();
 }
 
