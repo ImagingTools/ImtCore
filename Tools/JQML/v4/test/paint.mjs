@@ -233,6 +233,24 @@ check('a valid fillStyle still applies', styled.fillStyle, 'blue');
 	check('and beyond the bottom edge', Math.round(bottom), 48);
 	check('and not further to the left than blur - offset', Math.round(left), -4);
 	check('and is the more opaque the nearer to the middle', shapes[shapes.length - 1].w < shapes[0].w, true);
+	// What the source holds (the button of a panel) is shown over the shadow too, after the source.
+	const button = new Rectangle();
+	button.$ax = 20;
+	button.$ay = 6;
+	button.$aw = 30;
+	button.$ah = 10;
+	source.$adopt(button);
+	const withChild = [];
+	const order = {
+		...r,
+		fillQuad: (x, y, w, h, alpha) => withChild.push([x, y, w, h].join(',')),
+		fillQuadAA: (x, y, w, h, alpha) => withChild.push([x, y, w, h].join(',')),
+		fillPolygon: (points) => withChild.push(points.join(',')),
+		translate: () => {},
+		setMatrix: () => {},
+	};
+	shadow.$paint(order, 1);
+	check('the content of the source is painted over the shadow', withChild[withChild.length - 1], '0,0,30,10');
 	shadow.$color = parseColor('#00000000');
 	const none = [];
 	shadow.$paint({ pack: () => 0, fillQuad: () => none.push(1), fillPolygon: () => none.push(1) }, 1);
