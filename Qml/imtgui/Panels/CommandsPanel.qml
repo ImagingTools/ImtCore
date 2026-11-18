@@ -159,7 +159,7 @@ Item {
 
 	Timer {
 		id: skeletonDelay;
-		interval: 300;
+		interval: Style.skeletonDelay;
 		running: !commandsItem.commandsLoaded;
 		onTriggered: {
 			commandsItem.skeletonDelayElapsed = true;
