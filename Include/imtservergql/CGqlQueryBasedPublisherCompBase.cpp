@@ -54,9 +54,11 @@ bool CGqlQueryBasedPublisherCompBase::Publish(bool useAwsStyle)
 		QByteArray data = doc.toJson(QJsonDocument::Compact);
 
 		for (const QByteArray& id: requestNetworks.networkRequests.keys()){
-			const imtrest::IRequest* networkRequestPtr = requestNetworks.networkRequests[id];
-			if (networkRequestPtr != nullptr){
-				PushDataToSubscriber(id, "", data, *networkRequestPtr, useAwsStyle);
+			for (const imtrest::IRequest* networkRequestPtr : requestNetworks.networkRequests[id]){
+				Q_ASSERT(networkRequestPtr != nullptr);
+				if (networkRequestPtr != nullptr){
+					PushDataToSubscriber(id, "", data, *networkRequestPtr, useAwsStyle);
+				}
 			}
 		}
 	}

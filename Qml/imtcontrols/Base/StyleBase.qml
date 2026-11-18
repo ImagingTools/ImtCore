@@ -145,6 +145,9 @@ StyleComponents {
 	property int controlHeightM: 32
 	property int controlHeightS: 24
 
+	//Loading skeletons appear only after this delay (ms): a faster answer is perceived as instant and would just flicker
+	property int skeletonDelay: 250
+
 	//radius - Primer keeps a three step scale: small, medium (the default) and
 	//large. Anything outside it reads as a different design language, so the
 	//wider names are kept as aliases only, for screens and product styles that

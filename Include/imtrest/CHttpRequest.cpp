@@ -186,6 +186,18 @@ void CHttpRequest::SetBody(const QByteArray& body)
 }
 
 
+QByteArray CHttpRequest::GetConnectionId() const
+{
+	return m_connectionId;
+}
+
+
+void CHttpRequest::SetConnectionId(const QByteArray& connectionId)
+{
+	m_connectionId = connectionId;
+}
+
+
 void CHttpRequest::SetCommandId(const QByteArray& commandId)
 {
 	m_url.setPath(commandId);
