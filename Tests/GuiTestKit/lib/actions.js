@@ -246,10 +246,16 @@ async function textInputOf(page, container) {
   return container.locator(TEXT_INPUT_SELECTOR).first();
 }
 
+// An empty field renders a zero-width space (or a byte order mark) rather than nothing; strip it so "" compares equal.
+const INVISIBLE_CHARACTERS = /[\u200B\uFEFF]/g;
+
+function withoutInvisible(value) {
+  return value === null ? null : value.replace(INVISIBLE_CHARACTERS, '');
+}
+
 // On JQML v4 the editor's `text` property is its value (a read-only field is a TextInput too).
 async function readQmlValue(input) {
-  const value = await input.run('value').catch(() => null);
-  return value === null ? null : value.replace(/[​﻿]/g, '');
+  return withoutInvisible(await input.run('value').catch(() => null));
 }
 
 /**
@@ -276,10 +282,9 @@ async function readTextValue(input) {
         const implValue = valueOf(impl);
         return implValue !== null ? implValue : impl.textContent.trim();
       };
-      const value = read();
-      // An empty field renders a zero-width space rather than nothing; strip it so "" compares equal.
-      return value === null ? null : value.replace(/[\u200B\uFEFF]/g, '');
+      return read();
     }, undefined, { timeout: READ_TIMEOUT })
+    .then(withoutInvisible)
     .catch(() => null);
 }
 

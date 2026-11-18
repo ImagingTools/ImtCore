@@ -4,7 +4,7 @@
 // `quietMs`, or bails out after `timeout`. Network tracking below turns "is a request still in flight"
 // from a guess into a fact, so quietMs only has to cover the render flush after mutations stop.
 
-const { knownBackend, detectBackend, locate, callQmlTest } = require('./qml');
+const { knownBackend, detectBackend, locate, callQmlTest, NOT_READY_MESSAGE } = require('./qml');
 
 const DEFAULTS = { quietMs: 150, timeout: 6000 };
 const NETWORK_IDLE_TIMEOUT = 5000;
@@ -131,17 +131,25 @@ async function waitForNetworkIdle(page, options = {}) {
  */
 async function qmlQuietOnce(page, quietMs, timeout) {
   const deadline = Date.now() + timeout;
-  const idle = () => callQmlTest(page, 'whenIdle', { timeout: Math.max(0, deadline - Date.now()) });
-  // Right after a navigation the new document may not have published qmlTest or built its first document yet.
-  await page
+  const left = () => Math.max(0, deadline - Date.now());
+  // Right after a navigation the new document may not have published qmlTest or built its first document yet. One
+  // that does not get there in time is as quiet as it gets, as the DOM pass is after its timeout.
+  const started = await page
     .waitForFunction(() => window.qmlTest !== undefined && window.qmlTest.started === true, undefined, {
-      timeout: Math.max(1, deadline - Date.now()),
+      timeout: Math.max(1, left()),
       polling: 100,
     })
-    .catch(() => {});
-  await idle();
-  await page.waitForTimeout(Math.min(quietMs, Math.max(0, deadline - Date.now())));
-  await idle();
+    .then(() => true, () => false);
+  if (!started) return;
+  try {
+    await callQmlTest(page, 'whenIdle', { timeout: left() });
+    await page.waitForTimeout(Math.min(quietMs, left()));
+    await callQmlTest(page, 'whenIdle', { timeout: left() });
+  } catch (err) {
+    // qmlTest gone without the context: a navigation began between the steps. One that destroys the context throws
+    // its own error, which waitForStable handles as on v3.
+    if (!String(err && err.message).includes(NOT_READY_MESSAGE)) throw err;
+  }
 }
 
 /** One DOM-quiet pass: resolves after `quietMs` with no mutations, or after `timeout` regardless. */

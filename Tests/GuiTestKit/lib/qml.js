@@ -9,13 +9,16 @@
 // `[objectName*="X"]`, `[visible]`, the tags `input`/`textarea`, the descendant combinator and a list of selectors
 // separated by commas. qmlSelectors() turns that into the selectors of qmlTest. Two rules of those selectors matter:
 // a name is always quoted (`"X":visible`; unquoted, `X:visible` is read as one name, and a name that is not ASCII
-// is refused), and an item without an objectName has an empty name on v4, where v3 named it after its type, so the
-// type names the kit uses (`MouseArea`, `TextInput`, `TextEdit`) become a type test (`@MouseArea`).
+// is refused), and an item without an objectName has an empty name on v4, where v3 named it after its type. So the
+// type names the kit uses (`MouseArea`, `TextInput`, `TextEdit`) stand for an item of that type that is unnamed or
+// named so (`""@MouseArea`, `"MouseArea"@MouseArea`), as on v3, where a MouseArea with a name of its own is skipped.
 //
 // Clicks stay real mouse clicks at the middle of the item, as on v3, so the item on top at that point takes them
 // just as it does for a user. Text goes in through qmlTest.fill, which focuses the editor, selects its text and types.
 
 const backendByPage = new WeakMap();
+// The address of a page where the application was not found in time, so the next look at it does not wait again.
+const fallbackUrlByPage = new WeakMap();
 
 const TYPE_NAMES = new Set(['MouseArea', 'TextInput', 'TextEdit']);
 const TAG_TYPES = { input: '@TextInput', textarea: '@TextEdit' };
@@ -23,6 +26,10 @@ const TAG_TYPES = { input: '@TextInput', textarea: '@TextEdit' };
 // What a Playwright locator waits by default.
 const DEFAULT_WAIT_TIMEOUT = 30000;
 const POLL_MS = 100;
+
+// The message of a page that has no window.qmlTest at the moment, and the errors of a navigation under way.
+const NOT_READY_MESSAGE = 'window.qmlTest is not ready';
+const NOT_READY = /window\.qmlTest is not ready|Execution context was destroyed|Cannot find context with specified id/;
 
 /** The backend of the page when it is already known: 'qml', 'dom' or undefined. */
 function knownBackend(page) {
@@ -43,13 +50,23 @@ async function detectBackend(page) {
   return kind;
 }
 
-/** The backend of the page, waiting until the application has loaded far enough to tell; 'dom' when it never does. */
+/**
+ * The backend of the page, waiting until the application has loaded far enough to tell; 'dom' when it never does.
+ * That answer is kept for the address of the page, so a page without the application costs the wait once.
+ */
 async function backendOf(page, timeout = DEFAULT_WAIT_TIMEOUT) {
+  if (fallbackUrlByPage.get(page) === page.url()) {
+    const kind = await detectBackend(page);
+    return kind || 'dom';
+  }
   const deadline = Date.now() + timeout;
   for (;;) {
     const kind = await detectBackend(page);
     if (kind) return kind;
-    if (Date.now() >= deadline) return 'dom';
+    if (Date.now() >= deadline) {
+      fallbackUrlByPage.set(page, page.url());
+      return 'dom';
+    }
     await page.waitForTimeout(POLL_MS);
   }
 }
@@ -62,7 +79,11 @@ function unsupported(selector, part) {
   return new Error(`GUI selector is not supported on JQML v4: ${selector} (at ${part})`);
 }
 
-// One compound of the CSS subset (no spaces) -> one compound of a qmlTest selector.
+/**
+ * One compound of the CSS subset (no spaces) -> the compounds of qmlTest that together find the same items; more than
+ * one only for a type name, which stands for the unnamed items of the type and those named after it.
+ * @returns {string[]}
+ */
 function compoundToQml(selector, text) {
   const match = /^([A-Za-z]*)((?:\[[^\]]*\])*)$/.exec(text);
   if (!match) throw unsupported(selector, text);
@@ -71,7 +92,7 @@ function compoundToQml(selector, text) {
     type = TAG_TYPES[match[1].toLowerCase()];
     if (!type) throw unsupported(selector, text);
   }
-  let name = '';
+  let names = [''];
   let visible = false;
   for (const attribute of match[2].match(/\[[^\]]*\]/g) || []) {
     const parts = /^\[\s*(\w+)\s*(?:([\^$*]?=)\s*"((?:[^"\\]|\\.)*)")?\s*\]$/.exec(attribute);
@@ -85,58 +106,43 @@ function compoundToQml(selector, text) {
     const value = raw.replace(/\\(.)/g, '$1');
     if (op === '=' && TYPE_NAMES.has(value)) {
       type = `@${value}`;
+      names = ['""', JSON.stringify(value)];
       continue;
     }
-    if (op === '=') name = value;
-    else if (op === '^=') name = `${value}*`;
-    else if (op === '$=') name = `*${value}`;
-    else name = `*${value}*`;
+    if (op === '=') names = [JSON.stringify(value)];
+    else if (op === '^=') names = [JSON.stringify(`${value}*`)];
+    else if (op === '$=') names = [JSON.stringify(`*${value}`)];
+    else names = [JSON.stringify(`*${value}*`)];
   }
-  const out = `${name ? JSON.stringify(name) : ''}${type}${visible ? ':visible' : ''}`;
-  return out || '*';
+  return names.map((name) => `${name}${type}${visible ? ':visible' : ''}` || '*');
 }
 
 /**
- * The qmlTest selectors for a selector of the kit's CSS subset: one per alternative of a comma list, tried in turn.
+ * The qmlTest selectors for a selector of the kit's CSS subset. Their items together are the items of the CSS
+ * selector: one or more per alternative of a comma list (a type name gives two, see compoundToQml).
  * @param {string} css
  * @returns {string[]}
  */
 function qmlSelectors(css) {
-  return css.split(',').map((alternative) =>
+  return css.split(',').flatMap((alternative) =>
     alternative
       .trim()
       .split(/\s+(?![^[]*\])/)
       .map((compound) => compoundToQml(css, compound))
-      .join(' ')
+      .reduce((heads, variants) => heads.flatMap((head) => variants.map((variant) => (head ? `${head} ${variant}` : variant))), [''])
   );
-}
-
-/**
- * The qmlTest selector of an objectName path, for a spec that calls window.qmlTest itself: every name quoted, joined
- * by the descendant combinator, `:visible` after the last one when `visible` is set. The type names the kit uses for
- * items without an objectName (`MouseArea`, `TextInput`, `TextEdit`) become a type test, as in qmlSelectors().
- * @param {string[]} path
- * @param {{visible?: boolean}} [options]
- * @returns {string}
- */
-function qmlSelector(path, options = {}) {
-  if (!Array.isArray(path) || path.length === 0) {
-    throw new Error('qml.qmlSelector: path must be a non-empty array of objectNames');
-  }
-  const compounds = path.map((name) => (TYPE_NAMES.has(name) ? `@${name}` : JSON.stringify(String(name))));
-  if (options.visible) compounds[compounds.length - 1] += ':visible';
-  return compounds.join(' ');
 }
 
 // ----- in the page -------------------------------------------------------------------------------------------------
 
 /**
  * Runs in the page: resolves the steps of a KitLocator with window.qmlTest and does one operation on what they find.
- * A step is { sel: [qmlTest selectors, the first that finds anything wins], pick: null | index (-1 is the last) };
- * each step searches below every item the previous one found.
+ * A step is { sel: qmlTest selectors whose items together are the step's items, pick: null | index (-1 is the last) };
+ * each step searches below every item the previous one found. The items of a step come in the order of the tree.
  */
-async function inPage({ op, steps, args }) {
+async function inPage({ op, steps, args, notReady }) {
   const t = window.qmlTest;
+  if (t === undefined || t.started !== true) throw new Error(notReady);
   const property = (id, name) => {
     try {
       return t.get(id, name);
@@ -159,6 +165,12 @@ async function inPage({ op, steps, args }) {
     const info = t.info(id);
     return property(id, 'visible') === true && info.width > 0 && info.height > 0;
   };
+  // The items below `scope` that one of the selectors finds, in the order of the tree, like a CSS selector list.
+  const findAll = (scope, selectors) => {
+    if (selectors.length === 1) return t.find(scope, selectors[0]);
+    const ids = new Set(selectors.flatMap((selector) => t.find(scope, selector).map((handle) => handle.id)));
+    return ids.size === 0 ? [] : t.find(scope, '*').filter((handle) => ids.has(handle.id));
+  };
 
   let list = [];
   let scopes = [null];
@@ -166,16 +178,11 @@ async function inPage({ op, steps, args }) {
     list = [];
     const seen = new Set();
     for (const scope of scopes) {
-      for (const selector of step.sel) {
-        const found = t.find(scope, selector);
-        if (found.length === 0) continue;
-        for (const handle of found) {
-          if (!seen.has(handle.id)) {
-            seen.add(handle.id);
-            list.push(handle);
-          }
+      for (const handle of findAll(scope, step.sel)) {
+        if (!seen.has(handle.id)) {
+          seen.add(handle.id);
+          list.push(handle);
         }
-        break;
       }
     }
     if (step.pick !== null && step.pick !== undefined) {
@@ -193,7 +200,8 @@ async function inPage({ op, steps, args }) {
     case 'state':
       return first ? { attached: true, visible: shown(first.id) } : { attached: false, visible: false };
     case 'box':
-      return first ? t.info(first.id).box : null;
+      // As Playwright's boundingBox(): null for an item that is not shown.
+      return first && shown(first.id) ? t.info(first.id).box : null;
     case 'boxes':
       return list
         .map((handle) => t.info(handle.id).box)
@@ -223,8 +231,6 @@ async function inPage({ op, steps, args }) {
         .map((row) => t.find(row.id, args.cell)[0])
         .filter(Boolean)
         .map((cell) => textOf(cell.id, false).trim());
-    case 'describe':
-      return first ? t.dump(first.id, { depth: 3 }) : '';
     default:
       throw new Error(`unknown operation ${op}`);
   }
@@ -238,7 +244,8 @@ function timeoutError(what, timeout) {
 
 /**
  * A locator of the kit's CSS subset that works on both backends: on v3 every method goes to the Playwright locator
- * of the same selectors, on v4 to window.qmlTest. It has the part of the Playwright Locator API the kit uses.
+ * of the same selectors, on v4 to window.qmlTest. It has the part of the Playwright Locator API the kit and the specs
+ * use; a locator made before the backend of the page is known is one of these on v3 too.
  * A step is { css: string | { qml: string[] }, pick }; `{ qml }` gives qmlTest selectors directly (v4 only).
  */
 class KitLocator {
@@ -287,16 +294,27 @@ class KitLocator {
     return isQml(this.page);
   }
 
+  /** Runs one in-page operation; fails with a "not ready" error while the page has no window.qmlTest. */
   run(op, args = {}) {
     const steps = this.steps.map((step) => ({
       sel: typeof step.css === 'string' ? qmlSelectors(step.css) : step.css.qml,
       pick: step.pick,
     }));
-    return this.page.evaluate(inPage, { op, steps, args });
+    return this.page.evaluate(inPage, { op, steps, args, notReady: NOT_READY_MESSAGE });
+  }
+
+  /** run(), where a page without window.qmlTest (a navigation under way) finds nothing: that gives `nothing`. */
+  async runOrNothing(nothing, op, args) {
+    try {
+      return await this.run(op, args);
+    } catch (err) {
+      if (NOT_READY.test(String(err && err.message))) return nothing;
+      throw err;
+    }
   }
 
   async count() {
-    return (await this.isQml()) ? this.run('count') : this.playwright().count();
+    return (await this.isQml()) ? this.runOrNothing(0, 'count') : this.playwright().count();
   }
 
   async waitFor(options = {}) {
@@ -305,7 +323,7 @@ class KitLocator {
     const timeout = options.timeout === undefined ? DEFAULT_WAIT_TIMEOUT : options.timeout;
     const deadline = Date.now() + timeout;
     for (;;) {
-      const now = await this.run('state');
+      const now = await this.runOrNothing({ attached: false, visible: false }, 'state');
       const reached =
         state === 'attached' ? now.attached : state === 'detached' ? !now.attached : state === 'hidden' ? !now.visible : now.visible;
       if (reached) return;
@@ -315,7 +333,9 @@ class KitLocator {
   }
 
   async isVisible() {
-    return (await this.isQml()) ? (await this.run('state')).visible : this.playwright().isVisible();
+    if (!(await this.isQml())) return this.playwright().isVisible();
+
+    return (await this.runOrNothing({ visible: false }, 'state')).visible;
   }
 
   async boundingBox(options = {}) {
@@ -348,6 +368,7 @@ class KitLocator {
     await this.waitFor({ state: 'visible', timeout: options.timeout });
     await this.run('scroll');
     const box = await this.run('box');
+    if (!box) throw new Error(`locator.click ${this}: the item is not shown`);
     await this.page.mouse.click(box.x + box.width / 2, box.y + box.height / 2, options);
   }
 
@@ -374,25 +395,23 @@ function locate(page, css) {
   return knownBackend(page) === 'dom' ? page.locator(css) : new KitLocator(page, [{ css, pick: null }]);
 }
 
-/** Runs one in-page operation for the items a CSS selector of the kit finds (v4 only). */
-function query(page, css, op, args) {
-  return new KitLocator(page, [{ css, pick: null }]).run(op, args);
-}
-
-/** Calls a method of window.qmlTest in the page (v4 only). */
+/** Calls a method of window.qmlTest in the page (v4 only); fails with a "not ready" error while there is none. */
 function callQmlTest(page, method, ...args) {
-  return page.evaluate(([name, list]) => window.qmlTest[name](...list), [method, args]);
+  return page.evaluate(([name, list, notReady]) => {
+    if (window.qmlTest === undefined) throw new Error(notReady);
+    return window.qmlTest[name](...list);
+  }, [method, args, NOT_READY_MESSAGE]);
 }
 
 module.exports = {
   KitLocator,
+  NOT_READY_MESSAGE,
   knownBackend,
   detectBackend,
   backendOf,
   isQml,
+  compoundToQml,
   qmlSelectors,
-  qmlSelector,
   locate,
-  query,
   callQmlTest,
 };
