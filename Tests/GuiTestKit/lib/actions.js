@@ -2,6 +2,7 @@
 // or ambiguous - it never silently no-ops.
 
 const dom = require('./dom');
+const { KitLocator, isQml } = require('./qml');
 const { waitForStable } = require('./stability');
 
 // Ceiling (time-to-fail) sized for 10-worker contention; raising it never slows a passing test.
@@ -235,12 +236,30 @@ async function clickButton(page, pathOrName) {
 const TEXT_INPUT_SELECTOR = '[objectName="TextInput"] input, input[objectName="TextInput"], [objectName="TextInput"]';
 
 /**
+ * The text editor inside the control `container` (a locator from dom.byPath). On JQML v4 it is the first
+ * TextInput (or multi-line TextEdit) item below the control, by type.
+ */
+async function textInputOf(page, container) {
+  if (container instanceof KitLocator && (await isQml(page))) {
+    return container.locator({ qml: ['@TextInput', '@TextEdit'] }).first();
+  }
+  return container.locator(TEXT_INPUT_SELECTOR).first();
+}
+
+// On JQML v4 the editor's `text` property is its value (a read-only field is a TextInput too).
+async function readQmlValue(input) {
+  const value = await input.run('value').catch(() => null);
+  return value === null ? null : value.replace(/[​﻿]/g, '');
+}
+
+/**
  * Current value of a text control, or null if this element exposes none.
  *
  * Reads an <input>/<textarea> value, then the wrapper's `text` attribute, then a read-only field's
  * inner `<div class="impl">` textContent.
  */
-function readTextValue(input) {
+async function readTextValue(input) {
+  if (input instanceof KitLocator && (await input.isQml())) return readQmlValue(input);
   return input
     .evaluate((el) => {
       // Single-line TextInput renders an <input>, multi-line TextEdit a <textarea>; both carry text in .value.
@@ -274,7 +293,8 @@ function isMasked(value, typed) {
  * mirrors none. Deliberately does NOT fall back to rendered `.impl` text (a multi-line editor mirrors
  * nothing there while still holding the typed text).
  */
-function readMirroredValue(input) {
+async function readMirroredValue(input) {
+  if (input instanceof KitLocator && (await input.isQml())) return readQmlValue(input);
   return input
     .evaluate((el) => {
       // textarea as well as input: a multi-line TextEdit mirrors its text there.
@@ -294,7 +314,7 @@ async function fill(page, path, text, opts = {}) {
   const verify = opts.verify !== false;
 
   const container = await requireVisible(page, path, { what: 'text input' });
-  const input = container.locator(TEXT_INPUT_SELECTOR).first();
+  const input = await textInputOf(page, container);
   try {
     await input.waitFor({ state: 'visible', timeout: opts.timeout || DEFAULT_TIMEOUT });
   } catch (_) {
@@ -311,11 +331,16 @@ async function fill(page, path, text, opts = {}) {
   if (!box) throw new Error(`GUI fill target TextInput has no bounding box: [${fmtPath(path)}]`);
   await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
 
-  if (clear) {
-    await page.keyboard.press('Control+A');
-    await page.keyboard.press('Delete');
+  if (input instanceof KitLocator && (await input.isQml())) {
+    // JQML v4: qmlTest selects the text and types through the scene, so the handlers of the editor run as for keys.
+    await input.run('fill', { text, clear });
+  } else {
+    if (clear) {
+      await page.keyboard.press('Control+A');
+      await page.keyboard.press('Delete');
+    }
+    await page.keyboard.type(text);
   }
-  await page.keyboard.type(text);
   await waitForStable(page);
 
   if (verify && text.length > 0) {
@@ -341,7 +366,7 @@ async function fill(page, path, text, opts = {}) {
  */
 async function textInputValue(page, path) {
   const container = dom.byPath(page, path);
-  return readTextValue(container.locator(TEXT_INPUT_SELECTOR).first());
+  return readTextValue(await textInputOf(page, container));
 }
 
 /**
@@ -357,7 +382,7 @@ async function textInputValue(page, path) {
  */
 async function waitForTextInputValue(page, path, predicate = (v) => v === '', timeout = DEFAULT_TIMEOUT) {
   const container = dom.byPath(page, path);
-  const input = container.locator(TEXT_INPUT_SELECTOR).first();
+  const input = await textInputOf(page, container);
 
   const deadline = Date.now() + timeout;
   let consecutiveMatches = 0;
@@ -404,8 +429,8 @@ async function openComboPopup(page, comboPath) {
     await click(page, comboPath, { what: 'combo box' });
     // Wait for the popup rather than sampling once: under load it can open a beat after the click settles.
     try {
-      await page
-        .locator('[objectName="PopupMenuDialog"][visible]')
+      await dom
+        .locate(page, '[objectName="PopupMenuDialog"][visible]')
         .first()
         .waitFor({ state: 'visible', timeout: 2500 });
       return;
@@ -525,7 +550,7 @@ async function scroll(page, deltaY, at) {
 async function closeAllDocumentTabs(page) {
   for (let i = 0; i < 12; i++) {
     // CloseButton is only visible for closeable document tabs; click its inner MouseArea.
-    const closeBtn = page.locator('[objectName="CloseButton"][visible]').first();
+    const closeBtn = dom.locate(page, '[objectName="CloseButton"][visible]').first();
     if ((await closeBtn.count()) === 0) {
       return;
     }
@@ -538,7 +563,7 @@ async function closeAllDocumentTabs(page) {
 
     // Dirty document -> "Save all changes?" confirm; click No to discard. Waited for rather than
     // sampled once, since it can paint just after the click settles.
-    const noBtn = page.locator('[objectName="NoButton"][visible]').first();
+    const noBtn = dom.locate(page, '[objectName="NoButton"][visible]').first();
     const confirmShown = await noBtn
       .waitFor({ state: 'visible', timeout: 1500 })
       .then(() => true)
