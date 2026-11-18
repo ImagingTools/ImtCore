@@ -15,6 +15,8 @@ Rectangle {
 	property int rowCount: 5
 	property int contentMaxWidth: 900
 	property int phase: 0
+	// The plain background hides the unfilled form at once; the shapes only after Style.skeletonDelay
+	property bool shapesVisible: false
 
 	color: Style.baseColor
 
@@ -25,9 +27,19 @@ Rectangle {
 	}
 
 	Timer {
+		interval: Style.skeletonDelay
+		repeat: false
+		running: skeletonForm.visible && !skeletonForm.shapesVisible
+
+		onTriggered: {
+			skeletonForm.shapesVisible = true
+		}
+	}
+
+	Timer {
 		interval: 80
 		repeat: true
-		running: skeletonForm.visible
+		running: skeletonForm.visible && skeletonForm.shapesVisible
 
 		onTriggered: {
 			skeletonForm.phase = (skeletonForm.phase + 1) % 16
@@ -38,6 +50,7 @@ Rectangle {
 		id: content
 
 		anchors.fill: parent
+		visible: skeletonForm.shapesVisible
 		opacity: 0.45 + 0.55 * (skeletonForm.phase < 8 ? skeletonForm.phase / 8 : (16 - skeletonForm.phase) / 8)
 
 		Column {
