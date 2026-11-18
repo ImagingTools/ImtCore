@@ -142,10 +142,10 @@ sdl::V1_0::imtauth::CProfileData CProfileControllerComp::OnGetProfile(
 	// plus delegated role enrichment.
 	// =========================================================================
 
-	// Roles of the adapted user; the delegated ones it was given are not its own.
-	const QByteArrayList roles = GetTenantUserRoles(*effectiveUserPtr, currentTenantId, currentProductId, bindingPtr);
+	// Roles of the adapted user; the delegated ones it was given are not its own. Group roles come through its groups.
 	CAssignmentCollector collector;
-	collector.CollectUser(*effectiveUserPtr, roles, userInfoPtr->GetRoles(currentProductId), currentProductId);
+	collector.SetTenantScope(bindingPtr, currentTenantId);
+	collector.CollectUser(*effectiveUserPtr, effectiveUserPtr->GetRoles(currentProductId), userInfoPtr->GetRoles(currentProductId), currentProductId);
 	collector.FillUser(profileData);
 
 	// The collector walks parent roles without the tenant bindings, so only what is held in the tenant stays.

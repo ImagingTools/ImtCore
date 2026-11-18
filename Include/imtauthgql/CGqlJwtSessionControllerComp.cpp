@@ -179,7 +179,14 @@ sdl::V1_0::imtauth::CGetSessionAuthorizationPayload CGqlJwtSessionControllerComp
 		return response;
 	}
 
-	iser::ISerializable* serializablePtr = dynamic_cast<iser::ISerializable*>(authorization.userPtr.GetPtr());
+	// The product signs in through this server: the password data of the user never leaves it
+	istd::IChangeableUniquePtr userCopyPtr = (authorization.userPtr.GetPtr() != nullptr) ? authorization.userPtr->CloneMe() : istd::IChangeableUniquePtr();
+	imtauth::IUserInfo* userCopyInfoPtr = dynamic_cast<imtauth::IUserInfo*>(userCopyPtr.GetPtr());
+	if (userCopyInfoPtr != nullptr){
+		imtauthgql::RemovePasswordData(*userCopyInfoPtr);
+	}
+
+	iser::ISerializable* serializablePtr = dynamic_cast<iser::ISerializable*>(userCopyInfoPtr);
 	iser::CJsonMemWriteArchive archive(m_versionInfoCompPtr.GetPtr());
 	if (serializablePtr == nullptr || !serializablePtr->Serialize(archive)){
 		response.state = sessionsdl::SessionAuthorizationState::UNCHECKED;
