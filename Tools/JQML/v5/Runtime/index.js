@@ -98,6 +98,20 @@ function create(build){
 }
 
 // a handler written on a grouped attached property (Keys.onPressed) runs with the item as its object
+// x.createQmlObject(...) written in QML (compiler/expr.js): when x is Qt, the object is created in the context of the
+// call (QV4 callingQmlContext): the calling file, its scope and the names of the ids; any other x is called as is
+function callCreateQmlObject(target, fileQt, scope, ids, ...args){
+    if(target && target.$isQt === true) return Qt.$createQmlObject(fileQt.$base || '', scope, ids, ...args)
+    return target.createQmlObject(...args)
+}
+
+// x.createComponent(...) written in QML: a component of Qt is made in the context of the call (its creation context)
+function callCreateComponent(target, scope, ...args){
+    let component = target.createComponent(...args)
+    if(target && target.$isQt === true && component && component.$build !== undefined) component.$cctx = scope
+    return component
+}
+
 function handleGroup(group, signal, fn, scope, owner){
     return engine.subscribe(new engine.Link(group, signal, 0, fn, owner, scope))
 }
@@ -137,8 +151,23 @@ function defaultParent(Class, obj){
 const rootContext = { context: typeof window !== 'undefined' ? new (require('./ImtCore/WebContext').WebContext)() : null }
 
 // A name the compiler could not resolve: the context chain from the scope up through the scopes the
-// components were created in (QQmlContext parents): delegate roles, model / index / modelData, root properties
+// components were created in (QQmlContext parents). Each context: delegate roles, model / index / modelData, its ids
+// ($s.$i, codegen scopeNames), the properties of its object (the scope root); then the root context
 function ctx(s, name){
+    let found = lookup(s, name)
+    if(found === MISSING) throw new ReferenceError(name + ' is not defined')
+    return found
+}
+
+// `typeof name`: undefined for a name that is nowhere (compiler/expr.js)
+function ctxValue(s, name){
+    let found = lookup(s, name)
+    return found === MISSING ? undefined : found
+}
+
+const MISSING = {}
+
+function lookup(s, name){
     for(let scope = s; scope;){
         let c = scope.$ctx
         if(c){
@@ -147,11 +176,15 @@ function ctx(s, name){
             if(name === 'modelData') return c.modelData
             if(c.$row && typeof c.$row === 'object' && name in c.$row) return c.$role(name)
         }
+        let names = scope.$i
+        if(names && Object.prototype.hasOwnProperty.call(names.ids, name)) return scope[names.ids[name]]
+        let object = scope[0]
+        if(object && typeof object === 'object' && name[0] !== '$' && name in object) return object[name]
         if(scope.$p) scope = scope.$p
         else scope = scope[0] && scope[0].$cctx || null
     }
     if(name in rootContext) return rootContext[name]
-    throw new ReferenceError(name + ' is not defined')
+    return MISSING
 }
 
 // The nearest model context up the context chain: a component declared in a delegate and created by a Loader
@@ -166,6 +199,71 @@ function mctx(s){
 }
 
 const modules = {}      // module -> type name -> class
+const scripts = {}      // url of a JavaScript resource -> its script (compiler/scripts.js)
+
+// A JavaScript resource: factory(Qt, the context scope, ...its imports) makes an instance and returns its qualifier
+// pure: made on its first use (compiler/scripts.js isPure), any other script with each document instance
+function script(url, library, factory, imports, pure = false){
+    return { url, library, factory, imports, pure, shared: null }
+}
+
+// QQmlScriptData::scriptValueForContext: a .pragma library script has one instance, any other one per document
+// instance (s: the scope of the document), made on its first use
+function si(ref, s){
+    if(ref.library || !s) return ref.shared || (ref.shared = instantiate(ref, null))
+    let made = s.$js || (s.$js = new Map())
+    let instance = made.get(ref)
+    if(!instance){
+        instance = instantiate(ref, s)
+        made.set(ref, instance)
+    }
+    return instance
+}
+
+// the scripts of a document instance, made with its context (QQmlObjectCreator::init): refs or lists of them
+function sis(s, refs){
+    for(let ref of refs){
+        if(Array.isArray(ref)) sis(s, ref)
+        else if(!ref.pure) si(ref, s)
+    }
+}
+
+const moduleScripts = {}    // module -> its qmldir scripts
+
+// a script imported by a script: a library is shared, another script gets an instance of its own in the same context
+function instantiate(ref, s){
+    let imports = ref.imports().map(i => i && i.factory ? (i.library ? si(i, null) : instantiate(i, s)) : i)
+    return ref.factory(Qt.$at(ref.url), s, ...imports)
+}
+
+// a free name of a script: the importing context, then the global object
+function sctx(s, name){
+    let found = s ? lookup(s, name) : MISSING
+    if(found !== MISSING) return found
+    if(name in globalThis) return globalThis[name]
+    throw new ReferenceError(name + ' is not defined')
+}
+
+function sctxValue(s, name){
+    let found = s ? lookup(s, name) : MISSING
+    if(found !== MISSING) return found
+    return globalThis[name]
+}
+
+// `name = value` of a script: a property of an object of the importing context, else a global
+function sset(s, name, value){
+    for(let scope = s; scope;){
+        let object = scope[0]
+        if(object && typeof object === 'object' && name[0] !== '$' && name in object){
+            object[name] = value
+            return value
+        }
+        if(scope.$p) scope = scope.$p
+        else scope = scope[0] && scope[0].$cctx || null
+    }
+    globalThis[name] = value
+    return value
+}
 const namespaces = {}
 
 function qmlModule(name){
@@ -230,7 +328,7 @@ function singleton(Class){
 }
 
 const JQ = {
-    forward, bindAlias, handleGroup, files, singleton, defineMethod, defaultParent, ctx, mctx, ns, qmlModule, subAssign, rootContext,
+    forward, bindAlias, handleGroup, callCreateQmlObject, files, scripts, script, si, sis, moduleScripts, make: engine.make, inContext: engine.inContext, callCreateComponent, sctx, sctxValue, sset, singleton, defineMethod, defaultParent, ctx, ctxValue, mctx, ns, qmlModule, subAssign, rootContext,
     engine, defineType, create,
     batch: engine.batch,
     stats: engine.stats,
@@ -282,6 +380,8 @@ if(!String.prototype.arg){
 }
 
 Qt.$types = JQ.types
+Qt.$qmlModules = modules
+Qt.$qmlScripts = scripts
 
 JQ.rootPath = ''
 

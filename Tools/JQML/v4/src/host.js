@@ -1,3 +1,5 @@
+import { attachTextProxy } from './textproxy.js';
+
 // Connects a scene to a canvas of the page: size, pointer and keyboard input, the system clipboard and
 // the animation loop. Shared by the viewer page (app.js) and by compiled applications (runtime.js).
 
@@ -115,6 +117,9 @@ export function attachCanvas(canvas, scene, engine, options = {}) {
 		e.preventDefault();
 		deliverPaste(e.clipboardData.getData('text/plain'), e.clipboardData.getData('text/html'));
 	});
+
+	// The input elements of the text editors: the keyboard of a phone, the autofill and the memory of passwords of the browser.
+	if (options.textProxy !== false) attachTextProxy(canvas, scene, engine);
 
 	// ----- loop -----
 

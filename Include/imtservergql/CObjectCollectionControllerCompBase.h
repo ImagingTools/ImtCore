@@ -16,6 +16,7 @@
 #include <imtbase/IOperationContextController.h>
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtservergql/CPermissibleGqlRequestHandlerComp.h>
+#include <imtservergql/IObjectChangeChecker.h>
 #include <imtgql/IGqlRequestExtractor.h>
 #include <imtbase/IComplexCollectionFilter.h>
 #include <imtbase/CMimeType.h>
@@ -40,7 +41,7 @@ namespace imtservergql
 {
 
 
-class CObjectCollectionControllerAttrCompBase: 
+class CObjectCollectionControllerAttrCompBase:
 			virtual public imtgql::IGqlRequestExtractor,
 			virtual public imtbase::ISearchController,
 			public sdl::V1_0::imtbase::CImtCollectionGqlHandlerCompBase
@@ -67,12 +68,15 @@ protected:
 };
 
 
-class CObjectCollectionControllerCompBase: public CObjectCollectionControllerAttrCompBase
+class CObjectCollectionControllerCompBase:
+			public CObjectCollectionControllerAttrCompBase,
+			virtual public IObjectChangeChecker
 {
 public:
 	typedef CObjectCollectionControllerAttrCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CObjectCollectionControllerCompBase);
+		I_REGISTER_INTERFACE(IObjectChangeChecker);
 		I_ASSIGN_MULTI_0(m_replaceableFieldsAttrPtr, "ReplaceableFilterFields", "List of filter fields to be replaced", false);
 		I_ASSIGN_MULTI_0(m_replacementFieldsAttrPtr, "ReplacementFilterFields", "List of filter fields to replace with", false);
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
@@ -212,6 +216,13 @@ public:
 	virtual QJsonObject CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
 
+	// reimplemented (IObjectChangeChecker)
+	virtual bool CheckObjectChange(
+				const imtgql::CGqlRequest& gqlRequest,
+				const QByteArray& objectId,
+				const istd::IChangeable* dataPtr,
+				QString& errorMessage) const override;
+
 	// reimplemented (imtgql::IGqlRequestExtractor)
 	virtual istd::IChangeableUniquePtr ExtractObject(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& errorMessage) const override;
 
@@ -350,6 +361,15 @@ protected:
 		An object is accessible if it belongs to the organization or to no organization, or if it is shared with
 		the organization. DAL_OWNER excludes the shared objects. Always succeeds if tenant filtering is disabled.
 	*/
+	/**
+		Check an object received as raw data before it is stored.
+		\param objectId ID of the object to overwrite, empty for a new object.
+	*/
+	virtual bool CheckObjectData(
+				const imtgql::CGqlRequest& gqlRequest,
+				const QByteArray& objectId,
+				const istd::IChangeable& object,
+				QString& errorMessage) const;
 	virtual bool CheckObjectAccess(
 				const imtgql::CGqlRequest& gqlRequest,
 				const QByteArrayList& objectIds,
@@ -420,11 +440,13 @@ protected:
 		as payload of the \c GetObjectData request.
 		The default implementation returns an invalid pointer, meaning the original
 		collection object is serialized unchanged.
+		\param errorMessage	Set when the object cannot be handed out; the result is invalid then.
 	*/
 	virtual istd::IChangeableUniquePtr CreateAdaptedObjectData(
 				const QByteArray& objectId,
 				const istd::IChangeable& object,
-				const imtgql::CGqlRequest& gqlRequest) const;
+				const imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const;
 
 	/**
 		Write a change history entry for a collection element attribute that is stored outside of

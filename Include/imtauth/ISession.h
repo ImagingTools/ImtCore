@@ -59,6 +59,16 @@ public:
 	virtual void SetTenantId(const QByteArray& tenantId) = 0;
 
 	/**
+		Get the product whose server opened the session; empty for a session opened at this server directly.
+	*/
+	virtual QByteArray GetProductId() const = 0;
+
+	/**
+		Set the product whose server opened the session.
+	*/
+	virtual void SetProductId(const QByteArray& productId) = 0;
+
+	/**
 		Get session creation date.
 	*/
 	virtual QDateTime GetCreationDate() const = 0;

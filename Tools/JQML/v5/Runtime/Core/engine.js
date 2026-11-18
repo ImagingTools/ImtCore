@@ -17,6 +17,7 @@ const PRIORITY_NORMAL = 0
 const DESTROYED = 1
 const BLOCKED = 2
 const COMPLETED = 4
+const DELETING = 8         // in a tree being destroyed (QQmlData::isQueuedForDeletion): no bindings, no guard notifications
 
 // binding flags
 const EVALUATING = 1
@@ -193,6 +194,12 @@ function clearScope(scope, recursive){
     anyCleared = true
 }
 
+// contexts in the order they were made: QQmlContextData::emitDestruction goes from the newest child context
+let scopes = 0
+function nextScope(){
+    return ++scopes
+}
+
 function scopeCleared(scope){
     if(!anyCleared) return false
     if(scope.$cleared) return true
@@ -279,6 +286,7 @@ function endUpdate(){
                 item.$dirty = 0
                 if(!(item.$f & DESTROYED)) item.$flush(bits)
             }
+            if(sceneChanged) sceneChanged()
         }
         if(deleteLater.length){
             let objects = deleteLater
@@ -297,6 +305,14 @@ function batch(fn){
     } finally {
         endUpdate()
     }
+}
+
+// Called once the changed items are written to the DOM (QQuickWindowPrivate::dirtyItemList is not empty): the
+// pointer delivery gives a still pointer its hover again in the next frame (flushFrameSynchronousEvents)
+let sceneChanged = null
+
+function onSceneChanged(fn){
+    sceneChanged = fn
 }
 
 function markDirty(item, bits){
@@ -585,7 +601,7 @@ function sweep(binding){
 
 // Like QQmlBinding::update: the flag covers evaluation, the write and the notification.
 function runBinding(binding){
-    if(binding.flags & DISPOSED || binding.target.$f & DESTROYED) return
+    if(binding.flags & DISPOSED || binding.target.$f & (DESTROYED | DELETING)) return
     if(binding.scope && scopeCleared(binding.scope)){
         binding.target.$takeBinding(binding.prop)
         disposeBinding(binding)
@@ -696,6 +712,37 @@ function completionOrder(current){
     return order
 }
 
+// The context a QML type is being built in: its document sees it while it is built (the parent of its QQmlContext)
+let buildContext = null
+
+function make(Class, s){
+    let previous = buildContext
+    buildContext = s
+    let obj
+    try {
+        obj = new Class(null)
+    } finally {
+        buildContext = previous
+    }
+    obj.$cctx = s
+    return obj
+}
+
+function inContext(root){
+    if(!root.$cctx && buildContext) root.$cctx = buildContext
+}
+
+// builds with fn() an object of a component made in the context s
+function buildIn(s, fn){
+    let previous = buildContext
+    buildContext = s
+    try {
+        return fn()
+    } finally {
+        buildContext = previous
+    }
+}
+
 function scheduleComponentComplete(obj){
     if(obj.$ccScheduled) return
     obj.$ccScheduled = true
@@ -742,12 +789,12 @@ function scheduleCompleted(obj){
 module.exports = {
     PENDING,
     PRIORITY_GEOMETRY, PRIORITY_CROSS, PRIORITY_HANDLER, PRIORITY_NORMAL,
-    DESTROYED, BLOCKED, COMPLETED, SETTER,
-    clearScope, scopeCleared,
+    DESTROYED, BLOCKED, COMPLETED, DELETING, SETTER,
+    clearScope, scopeCleared, nextScope, parentScope, make, inContext, buildIn,
     Link, Binding, stats,
     connect, disconnect, connectHandler, subscribe, unsubscribe, hasSubscribers, dropSubscribers, dropConnections,
     emit, emitArgs, track, evaluate, runBinding, disposeBinding, isUpdating, flushPending,
-    beginUpdate, endUpdate, batch, markDirty, queuePolish, queueCall, queueDelete, queueFrame, flushFrame, stop, isStopped,
+    beginUpdate, endUpdate, batch, markDirty, onSceneChanged, queuePolish, queueCall, queueDelete, queueFrame, flushFrame, stop, isStopped,
     beginCreate, endCreate, creatingRoot, scheduleComponentComplete, scheduleBinding, scheduleCompleted,
     reportError,
     writeError, bindingError

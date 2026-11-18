@@ -69,6 +69,7 @@ public:
 	Q_INVOKABLE inline void clearQueryParams(const QByteArray& key){ ClearQueryParams(key); }
 	Q_INVOKABLE inline void setUpdateEnabled(bool updateEnabled){ SetUpdateEnabled(updateEnabled); }
 	Q_INVOKABLE inline void refresh(){ Refresh(); }
+	Q_INVOKABLE inline bool blockSignals(bool block){ return QAbstractListModel::blockSignals(block); }
 	Q_INVOKABLE inline QString toJson(){ return ToJson(); }
 
 	explicit CTreeItemModel(QObject* parent = nullptr);

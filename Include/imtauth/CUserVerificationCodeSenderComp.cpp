@@ -25,9 +25,9 @@ bool CUserVerificationCodeSenderComp::SendCode(const IUserInfo& userInfo, const 
 		return false;
 	}
 
-	smtpMessagePtr->SetSubject("Imaging Tools: Password Recovery");
+	smtpMessagePtr->SetSubject(*m_subjectAttrPtr);
 
-	QString message = QStringLiteral("Your code to restore access to the '%1' account : %2").arg(userInfo.GetName(), verificationCode);
+	QString message = (*m_bodyTemplateAttrPtr).arg(userInfo.GetName(), verificationCode);
 	smtpMessagePtr->SetBody(message);
 
 	QString email = userInfo.GetMail();

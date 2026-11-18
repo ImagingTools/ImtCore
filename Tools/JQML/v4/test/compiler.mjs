@@ -31,6 +31,27 @@ function evaluateBundle(code) {
 	return context.window.qmlWebApplication;
 }
 
+
+// The numbers of a segment of a source map (base64 VLQ).
+function decodeVlq(segment) {
+	const digits = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+	const values = [];
+	let value = 0;
+	let shift = 0;
+	for (const char of segment) {
+		const digit = digits.indexOf(char);
+		value += (digit & 31) << shift;
+		if (digit & 32) {
+			shift += 5;
+		} else {
+			values.push(value & 1 ? -(value >> 1) : value >> 1);
+			value = 0;
+			shift = 0;
+		}
+	}
+	return values;
+}
+
 const checks = {
 	'command line'() {
 		const options = parseArgs(['-c', 'a.json', '--output=out', '-e', 'Main.qml', '-n', 'app', '-m', 'js', '--list-qml']);
@@ -123,18 +144,22 @@ const checks = {
 		}
 	},
 
-	// The default build carries the documents as packed trees: no QML text, no comments, nothing to reach the engine through.
+	// The default build carries the documents as packed trees, deflated into one block, and strips the comments and the layout
+	// of the engine's own code: no QML text, no comments, nothing to reach the engine through.
 	async 'compiled mode'() {
 		const result = await compile({ mode: 'js', config: join(fixture, 'app.json'), entry: 'app/Main.qml', name: 'index', root: '/data/' }, quiet);
 		const spec = JSON.parse(JSON.stringify(result.spec));
 		assert.equal(spec.debug, undefined);
 		assert.deepEqual(Object.keys(spec.files).sort(), ['modules/Widgets/qmldir', 'modules/Widgets/util.js']);
-		assert.deepEqual(Object.keys(spec.docs).sort(), ['app/Main.qml', 'app/Sibling.qml', 'app/Unused.qml', 'modules/Widgets/Base/Theme.qml', 'modules/Widgets/Widget.qml']);
-		for (const text of [result.code, JSON.stringify(spec.docs)]) {
+		assert.equal(spec.docs, undefined);
+		assert.equal(spec.scans, undefined);
+		assert.equal(typeof spec.docsDeflate, 'string');
+		for (const text of [result.code, spec.docsDeflate]) {
 			assert.ok(!text.includes('import QtQuick'), 'the text of a document is in the bundle');
 			assert.ok(!text.includes('The entry of the compiler test'), 'a comment of a document is in the bundle');
 			assert.ok(!text.includes('property string greeting'), 'a declaration is in the bundle as text');
 		}
+		assert.ok(!result.code.includes('an error of a binding while it runs is only logged'), 'a comment of the engine is in the bundle');
 		// A page does not reach the engine, the project or the documents through its window.
 		assert.equal(evaluateBundle(result.code), undefined);
 
@@ -153,6 +178,180 @@ const checks = {
 		assert.equal(unused.parsed, false);
 		assert.ok(unused.def !== null && unused.error === null);
 		assert.equal(unused.parsed, true);
+		// The documents are there once the application has started: a page that never starts never inflates them.
+		assert.ok(app.project.docs.has('app/Main.qml'));
+	},
+
+	// --no-compress-docs: the packed trees and their scans stay as the plain spec.docs/spec.scans of a build before this feature,
+	// for one that cannot rely on DecompressionStream.
+	async '--no-compress-docs'() {
+		const result = await compile({ mode: 'js', config: join(fixture, 'app.json'), entry: 'app/Main.qml', name: 'index', root: '/data/', compressDocs: false }, quiet);
+		const spec = JSON.parse(JSON.stringify(result.spec));
+		assert.equal(spec.docsDeflate, undefined);
+		assert.deepEqual(Object.keys(spec.docs).sort(), ['app/Main.qml', 'app/Sibling.qml', 'app/Unused.qml', 'modules/Widgets/Base/Theme.qml', 'modules/Widgets/Widget.qml']);
+
+		const app = createCompiledApplication({ ...spec, language: 'de-DE' }, null);
+		app.scene.resize(800, 600, 1);
+		const root = await app.start();
+		for (let i = 0; i < 3; i++) app.scene.drawFrame(i * 0.016);
+		assert.equal(root.greeting, 'Hallo');
+		assert.equal(root.sum, 5);
+		const names = [];
+		walk(root, (item) => names.push(item.objectName));
+		assert.ok(names.includes('widget') && names.includes('sibling') && names.includes('widgetText'));
+		assert.equal(app.engine.errors.length, 0, app.engine.errors.join('\n'));
+	},
+
+	// By default the documents are there only once the application has started (they are still deflated before that);
+	// a browser with no DecompressionStream fails there with a message that says so, not with some other error.
+	async 'compressed docs need DecompressionStream'() {
+		const result = await compile({ mode: 'js', config: join(fixture, 'app.json'), entry: 'app/Main.qml', name: 'index' }, quiet);
+		const spec = JSON.parse(JSON.stringify(result.spec));
+		const app = createCompiledApplication(spec, null);
+		const real = globalThis.DecompressionStream;
+		globalThis.DecompressionStream = undefined;
+		try {
+			await assert.rejects(app.start(), /DecompressionStream/);
+		} finally {
+			globalThis.DecompressionStream = real;
+		}
+	},
+
+	// --no-obfuscate-light: the engine's own code keeps its comments and its layout, for a build whose own bundle must stay
+	// readable (without going as far as --debug, which also keeps the QML documents as text).
+	async '--no-obfuscate-light'() {
+		const plain = await compile({ mode: 'js', config: join(fixture, 'app.json'), entry: 'app/Main.qml', name: 'index', obfuscateLight: false }, quiet);
+		assert.ok(plain.code.includes('an error of a binding while it runs is only logged'), 'a comment of the engine is missing with the flag off');
+
+		const result = await compile({ mode: 'js', config: join(fixture, 'app.json'), entry: 'app/Main.qml', name: 'index', root: '/data/' }, quiet);
+		assert.ok(result.code.length < plain.code.length, 'the default (obfuscated) bundle is not smaller');
+
+		const spec = JSON.parse(JSON.stringify(result.spec));
+		const app = createCompiledApplication({ ...spec, language: 'de-DE' }, null);
+		app.scene.resize(800, 600, 1);
+		const root = await app.start();
+		for (let i = 0; i < 3; i++) app.scene.drawFrame(i * 0.016);
+		assert.equal(root.greeting, 'Hallo');
+		assert.equal(root.sum, 5);
+		assert.equal(app.engine.errors.length, 0, app.engine.errors.join('\n'));
+	},
+
+	// The default build also renames a QML script's own locals (compiler/mangleLocals): never an id, and the application still
+	// computes the same thing. --no-obfuscate-light keeps the original names, for a build that must stay readable end to end.
+	async 'obfuscate-light renames a QML script\'s own locals'() {
+		const local = join(fixture, 'standalone', 'Local.qml');
+		const obfuscated = await compile({ mode: 'js', entry: local, name: 'index', compressDocs: false }, quiet);
+		const readable = await compile({ mode: 'js', entry: local, name: 'index', obfuscateLight: false, compressDocs: false }, quiet);
+		const obfuscatedDocs = JSON.stringify(JSON.parse(JSON.stringify(obfuscated.spec)).docs);
+		const readableDocs = JSON.stringify(JSON.parse(JSON.stringify(readable.spec)).docs);
+		assert.ok(!obfuscatedDocs.includes('"upTo"') && !obfuscatedDocs.includes('"acc"'), 'a local name is still in the obfuscated bundle');
+		assert.ok(readableDocs.includes('upTo') && readableDocs.includes('acc'), 'a local name is missing even with the flag off');
+		assert.ok(obfuscatedDocs.includes('root') && readableDocs.includes('root'), 'the id was renamed along with the locals');
+
+		for (const spec of [obfuscated.spec, readable.spec]) {
+			const app = createCompiledApplication(JSON.parse(JSON.stringify(spec)), null);
+			app.scene.resize(300, 200, 1);
+			const root = await app.start();
+			for (let i = 0; i < 3; i++) app.scene.drawFrame(i * 0.016);
+			assert.equal(root.total, 6 + 300);
+			assert.equal(app.engine.errors.length, 0, app.engine.errors.join('\n'));
+		}
+	},
+
+	async 'source map: the QML files are in it, in a release bundle too'() {
+		const mainText = readFileSync(join(fixture, 'app', 'Main.qml'), 'utf8');
+		for (const debug of [false, true]) {
+			const out = mkdtempSync(join(tmpdir(), 'qmlweb-map-'));
+			try {
+				const result = await compile({ mode: 'js', config: join(fixture, 'app.json'), entry: 'app/Main.qml', output: out, name: 'index', debug }, quiet);
+				const map = JSON.parse(readFileSync(join(out, 'index.js.map'), 'utf8'));
+				assert.match(result.spec.sourceBase, /^file:\/\/\//);
+				// The QML files are sources of the map, with their text, under the URL the engine gives their scripts.
+				const mainUrl = `${result.spec.sourceBase}/app/Main.qml`;
+				const at = map.sources.indexOf(mainUrl);
+				assert.ok(at >= 0, `the map lists ${mainUrl}`);
+				assert.equal(map.sourcesContent[at], mainText);
+				assert.equal(map.sources.length, map.sourcesContent.length);
+				assert.ok(map.sources.some((source) => source.endsWith('engine.js')));
+				assert.equal(map.sources.filter((source) => source.endsWith('.qml')).length, 5);
+				// The bundle itself is what it was: a release one has the packed trees, not the text.
+				assert.equal(result.spec.files['app/Main.qml'] !== undefined, debug);
+			} finally {
+				rmSync(out, { recursive: true, force: true });
+			}
+		}
+	},
+
+	async 'the scripts of a QML file have names and source maps that point at its lines'() {
+		const mainText = readFileSync(join(fixture, 'app', 'Main.qml'), 'utf8');
+		const lineOf = (text) => mainText.split('\n').findIndex((line) => line.includes(text)) + 1;
+		const nativeFunction = globalThis.Function;
+		const run = async (spec, location) => {
+			const captured = [];
+			globalThis.Function = new Proxy(nativeFunction, {
+				construct(target, args) {
+					captured.push(String(args[args.length - 1]));
+					return new target(...args);
+				},
+			});
+			try {
+				const app = createCompiledApplication(spec, null, location);
+				app.scene.resize(800, 600, 1);
+				const root = await app.start();
+				assert.equal(app.engine.errors.length, 0, app.engine.errors.join('\n'));
+				assert.equal(root.touched, 2);
+			} finally {
+				globalThis.Function = nativeFunction;
+			}
+			return captured;
+		};
+		// The line of the QML file that each line of a script points at (null: none), from the tail of the script.
+		const decode = (script) => {
+			const encoded = /sourceMappingURL=data:application\/json;charset=utf-8,(\S+)/.exec(script)[1];
+			const map = JSON.parse(decodeURIComponent(encoded));
+			const lines = [];
+			let line = 0;
+			for (const segment of map.mappings.split(';')) {
+				if (segment === '') {
+					lines.push(null);
+					continue;
+				}
+				line += decodeVlq(segment)[2];
+				lines.push(line + 1);
+			}
+			return { map, lines };
+		};
+		const check = (captured, spec) => {
+			const mainUrl = `${spec.sourceBase}/app/Main.qml`;
+			const squeezed = (source) => source.replace(/\s+/g, '');
+			const sum = captured.find((source) => squeezed(source).includes('Util.add(2,3)') && source.includes('sourceMappingURL'));
+			assert.ok(sum, 'the script of `sum` has a source map');
+			assert.match(sum, /\/\/# sourceURL=jqml-script:\/\/\/app\/Main\.qml#\d+/);
+			const { map, lines } = decode(sum);
+			assert.deepEqual(map.sources, [mainUrl]);
+			// V8 puts two lines before the body; the head of the function and the first line of the script share the next line.
+			assert.equal(lines[0] + lines[1], 0);
+			assert.equal(lines[2], lineOf('property int sum'));
+			assert.equal(lines[3], lineOf('property int sum'));
+			// A handler with a comment and a blank line: the statement is on its own line of the file in the script too.
+			const handler = captured.find((source) => squeezed(source).includes('Util.add(1,1)') && source.includes('sourceMappingURL'));
+			assert.ok(handler, 'the handler has a source map');
+			const { lines: handlerLines } = decode(handler);
+			const at = handler.split('\n').findIndex((line) => squeezed(line).includes('Util.add(1,1)'));
+			assert.equal(handlerLines[2 + at], lineOf('Util.add(1, 1)'), 'the statement of the handler');
+		};
+
+		// A debug build tags its scripts always.
+		const debug = await compile({ mode: 'js', config: join(fixture, 'app.json'), entry: 'app/Main.qml', name: 'index', debug: true }, quiet);
+		check(await run(JSON.parse(JSON.stringify(debug.spec)), null), debug.spec);
+
+		// A release build does not (it would make the start slower), unless the address asks for it; the packed scripts keep their lines.
+		const release = await compile({ mode: 'js', config: join(fixture, 'app.json'), entry: 'app/Main.qml', name: 'index' }, quiet);
+		const releaseSpec = () => JSON.parse(JSON.stringify(release.spec));
+		const plain = await run(releaseSpec(), { search: '' });
+		assert.ok(!plain.some((source) => source.includes('sourceMappingURL')), 'a release build does not tag its scripts');
+		const tagged = await run(releaseSpec(), { search: '?qmlsource=1' });
+		check(tagged, release.spec);
 	},
 
 	async 'syntax error'() {

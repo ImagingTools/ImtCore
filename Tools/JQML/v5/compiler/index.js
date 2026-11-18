@@ -13,6 +13,12 @@ function readFileModel(fileName){
     let name = path.basename(fileName, '.qml')
     let model = new FileModel(name, fileName).build(ast)
     model.createsComponents = source.includes('createComponent')
+    model.createsQmlObjects = source.includes('createQmlObject')
+    // `import "dir"` and `import "x.js"` in the strings of a file that builds documents with Qt.createQmlObject: the bundle
+    // takes them, as Qt would read them from the disk
+    model.documentImports = model.createsQmlObjects
+        ? [...source.matchAll(/import\s+\\?["']([^"'\\\n]+)\\?["']/g)].map(m => m[1])
+        : []
     return model
 }
 
@@ -39,14 +45,76 @@ const pathKey = (fileName) => {
     return process.platform === 'win32' ? key.toLowerCase() : key
 }
 
+function normalizeResource(resource){
+    let parts = []
+    for(let part of resource.split('/')){
+        if(part === '..') parts.pop()
+        else if(part && part !== '.') parts.push(part)
+    }
+    return parts.join('/')
+}
+
+// The .qrc files of a dir: file -> its resource path under qml/, as Qt serves it (the prefix of its qresource and
+// its alias, or its path). Resources outside /qml/ are not urls of the bundle.
+const qrcDirs = new Map()
+function readQrcDir(dir){
+    let dirKey = pathKey(dir)
+    if(qrcDirs.has(dirKey)) return qrcDirs.get(dirKey)
+    let urls = new Map()
+    qrcDirs.set(dirKey, urls)
+    let names = []
+    try {
+        names = fs.readdirSync(dir).filter(name => name.endsWith('.qrc'))
+    } catch(e) {
+        return urls
+    }
+    for(let name of names){
+        let prefix = ''
+        let text = fs.readFileSync(path.resolve(dir, name), 'utf8')
+        for(let m of text.matchAll(/<qresource\b([^>]*?)\/?>|<file\b([^>]*)>([^<]*)<\/file>/g)){
+            if(m[0].startsWith('<qresource')){
+                prefix = normalizeResource((m[1].match(/\bprefix\s*=\s*"([^"]*)"/) || [])[1] || '')
+                continue
+            }
+            let file = m[3].trim()
+            let alias = (m[2].match(/\balias\s*=\s*"([^"]*)"/) || [])[1]
+            let resource = normalizeResource((prefix ? prefix + '/' : '') + (alias || file))
+            if(!resource.startsWith('qml/')) continue
+            let fileKey = pathKey(path.resolve(dir, file))
+            if(!urls.has(fileKey)) urls.set(fileKey, resource.slice(4))
+        }
+    }
+    return urls
+}
+
+// The url of a file under qml/ as a .qrc of its dir or of a dir above declares it, or null
+function qrcUrl(fileName){
+    let key = pathKey(fileName)
+    let dir = path.dirname(path.resolve(fileName))
+    while(true){
+        let url = readQrcDir(dir).get(key)
+        if(url) return url
+        let parent = path.dirname(dir)
+        if(parent === dir) return null
+        dir = parent
+    }
+}
+
 // module: { name, root } of a module dir, or null for a plain dir (the entry's, an imported one). The files
 // are the qmldir ones, or every .qml with all or when the dir has no qmldir. A file's url is its qrc path
-// under qml/: relative to the root of the module that holds it, or to the entry's dir.
+// under qml/: the one a .qrc declares for it (Qt serves the file there), else relative to the root of the module
+// that holds it, or to the entry's dir.
 function addDir(files, dir, module, modules, entryDir, all = false){
     let entries = readQmldir(dir)
     let byFile = new Map(entries.map(e => [path.normalize(e.file), e]))
     for(let e of entries){
-        if(e.script && fs.existsSync(e.file)) files.$scripts.set(e.type, e.file)
+        if(!e.script || !fs.existsSync(e.file)) continue
+        files.$scripts.set(e.type, e.file)
+        // the scripts of a module, or of a directory with a qmldir: every document importing it gets them
+        for(let key of module ? [module.name, 'dir:' + pathKey(dir)] : ['dir:' + pathKey(dir)]){
+            if(!files.$moduleScripts.has(key)) files.$moduleScripts.set(key, [])
+            if(!files.$moduleScripts.get(key).includes(e.file)) files.$moduleScripts.get(key).push(e.file)
+        }
     }
     entries = entries.filter(e => !e.script)
     let names = !all && (module || fs.existsSync(path.resolve(dir, 'qmldir'))) ? entries.map(e => e.file) : fs.readdirSync(dir).filter(n => n.endsWith('.qml')).map(n => path.resolve(dir, n))
@@ -64,7 +132,7 @@ function addDir(files, dir, module, modules, entryDir, all = false){
         model.dir = pathKey(dir)
         model.module = module ? module.name : ''
         let relative = path.relative(holder ? holder.root : entryDir, fileName).split(path.sep).join('/')
-        model.url = holder ? holder.name + '/' + relative : relative
+        model.url = qrcUrl(fileName) || (holder ? holder.name + '/' + relative : relative)
         model.fromModule = !!module
         files.set(model.url, model)
         if(module){
@@ -80,8 +148,10 @@ function addDir(files, dir, module, modules, entryDir, all = false){
 function collectFiles(entry, configPath){
     let files = new Map()
     files.$scripts = new Map()
+    files.$moduleScripts = new Map()
     files.$modules = new Map()
     files.$paths = new Set()
+    files.$qrcUrl = qrcUrl
     let dirs = configPath && fs.existsSync(configPath) ? loadConfig(configPath).filter(dir => fs.existsSync(dir)) : []
     // a module may span several dirs with their own qmldir; urls are relative to the topmost one
     let modules = dirs.map(dir => ({ name: readQmldir(dir).module || path.basename(dir), root: path.resolve(dir) }))
@@ -104,6 +174,28 @@ function collectFiles(entry, configPath){
             if(added.has(imp.dirKey) || !fs.existsSync(dir)) continue
             added.add(imp.dirKey)
             addDir(files, dir, null, modules, entryDir)
+        }
+        let addDocumentDir = (dir) => {
+            if(added.has(pathKey(dir)) || !fs.existsSync(dir) || !fs.statSync(dir).isDirectory()) return
+            added.add(pathKey(dir))
+            addDir(files, dir, null, modules, entryDir)
+        }
+        for(let target of file.documentImports || []){
+            if(target.endsWith('.js') || /^[a-z]+:/i.test(target)) continue
+            addDocumentDir(path.resolve(path.dirname(file.fileName), target))
+        }
+        // a script that calls Qt.createQmlObject resolves the types of its documents against its own directory
+        for(let imp of file.imports){
+            let target = String(imp.path || '').replace(/^["']|["']$/g, '')
+            if(!target.endsWith('.js') || /^[a-z]+:/i.test(target)) continue
+            let script = path.resolve(path.dirname(file.fileName), target)
+            if(!fs.existsSync(script)) continue
+            let source = fs.readFileSync(script, 'utf8')
+            if(!source.includes('createQmlObject')) continue
+            addDocumentDir(path.dirname(script))
+            for(let m of source.matchAll(/import\s+\\?["']([^"'\\\n]+)\\?["']/g)){
+                if(!m[1].endsWith('.js') && !/^[a-z]+:/i.test(m[1])) addDocumentDir(path.resolve(path.dirname(script), m[1]))
+            }
         }
     }
     return files
@@ -206,7 +298,11 @@ window.addEventListener('load', () => {
     const root = JQ.create(() => new (${entryFile.typeRef.ref}$())(content))
     window.__root = root
 })`
-    let output = runtime + '\n;(function(){\n' + code + '\n' + bootstrap + '\n})();\n'
+    // Qt.createQmlObject compiles QML in the browser: the compiler joins the bundle only when an application uses it
+    let usesQmlCompiler = [...files.values()].some(file => file.createsQmlObjects)
+        || [...codegen.scripts.keys()].some(fileName => fs.existsSync(fileName) && fs.readFileSync(fileName, 'utf8').includes('createQmlObject'))
+    let qmlCompiler = usesQmlCompiler ? fs.readFileSync(path.resolve(__dirname, '../dist/qmlcompiler.js'), 'utf8') + '\n' : ''
+    let output = runtime + '\n' + qmlCompiler + ';(function(){\n' + code + '\n' + bootstrap + '\n})();\n'
     fs.writeFileSync(path.resolve(options.output, options.name + '.js'), escapeNonLatin1(output))
     return { warnings: codegen.warnings }
 }

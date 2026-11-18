@@ -16,6 +16,9 @@ namespace imtdoc
 {
 
 
+class IDocumentService;
+
+
 /**
 	ID of the \c iprm::IIdParam with the collection object ID in the document source parameters.
 */
@@ -67,10 +70,16 @@ QByteArray GetObjectIdFromParams(const iprm::IParamsSet* paramsPtr);
 int GetRevisionFromParams(const iprm::IParamsSet* paramsPtr);
 
 /**
-	Returns the collection object ID of the document  documentId the user  userId has opened in  documentService.
+	Returns the collection object ID of the document \a documentId the user \a userId has opened in \a documentService.
 	Returns an empty ID for a document never saved or not opened.
 */
 QByteArray GetDocumentObjectId(const IDocumentService& documentService, const QByteArray& userId, const QByteArray& documentId);
+
+/**
+	Whether the opened document of the user has a stored object behind it: a new document has none until it is saved.
+	A document that is not opened counts as stored.
+*/
+bool IsDocumentStored(const IDocumentService& documentService, const QByteArray& userId, const QByteArray& documentId);
 
 
 } // namespace imtdoc

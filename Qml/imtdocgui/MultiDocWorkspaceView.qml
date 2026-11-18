@@ -309,6 +309,29 @@ Item {
 		}
 	}
 
+	// Closes a closable tab added by addFixedView(); pinned tabs and document tabs are not affected.
+	function removeFixedView(id){
+		let index = tabView.getIndexById(id)
+		if (index < 0 || tabView.tabModel.get(index).pinned){
+			return false
+		}
+		if (workspaceView.openingDocumentIds[id]){
+			return false
+		}
+
+		if (workspaceView.documentManager && workspaceView.documentManager.getDocumentDataById(id)){
+			return false
+
+		}
+		if (index === 0 && tabView.currentIndex > 0){
+			tabView.currentIndex--
+		}
+
+		tabView.removeTab(id)
+
+		return true
+	}
+
 	// Documents requested but not loaded yet, shown as placeholder tabs.
 	property var openingDocumentIds: ({})
 	// Placeholders closed before the data arrived; the document is closed when it does.

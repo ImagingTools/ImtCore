@@ -139,7 +139,7 @@ defineType(Repeater, {
     props: {
         model: { kind: 'var', effect: modelSet },
         delegate: { kind: 'component', effect: resync },
-        count: 'int',
+        count: { kind: 'int', readonly: true },
     },
     signals: ['itemAdded(index,item)', 'itemRemoved(index,item)'],
 })

@@ -16,6 +16,7 @@
 #include <imtclientgql/CGqlRemoteRepresentationControllerCompBase.h>
 #include <imtclientgql/CGqlRemoteRepresentationControllerComp.h>
 #include <imtclientgql/CSubscriptionManagerComp.h>
+#include <imtclientgql/CServerCredentialProviderComp.h>
 #include <imtclientgql/CWebSocketClientComp.h>
 #include <imtclientgql/CModelSubscriberComp.h>
 #include <imtclientgql/CGqlHierarchicalStructureDelegateComp.h>
@@ -38,6 +39,7 @@ namespace ImtClientGqlPck
 
 
 typedef imtclientgql::CApiClientComp ApiClient;
+typedef imtclientgql::CServerCredentialProviderComp ServerCredentialProvider;
 typedef imtclientgql::CAsyncApiClientComp AsyncApiClient;
 typedef imtclientgql::CGqlClientSyncAdapterComp GqlClientSyncAdapter;
 typedef icomp::TModelCompWrap<imtclientgql::CGqlHeartbeatCheckerComp> GqlHeartbeatChecker;

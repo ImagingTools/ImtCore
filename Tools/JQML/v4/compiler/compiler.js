@@ -15,11 +15,12 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import zlib from 'node:zlib';
 import { packDocument } from '../src/packed.js';
 import { parseQmlDocument } from '../src/parser.js';
 import { Project, scanSource } from '../src/project.js';
 import { QmlError } from '../src/lexer.js';
-import { minifyScript } from './minify.js';
+import { mangleLocals, minifyScript } from './minify.js';
 import { bundleRuntime } from './bundle.js';
 import { entryDirectory, listQmldirQmlFiles, loadCompilerConfig, readQmldir, toPosix } from './config.js';
 import { loadTranslationCatalogs } from './translations.js';
@@ -38,6 +39,9 @@ export const USAGE = `Usage: node compiler/compiler.js [options]
   -r, --root <string>   root path of the pictures (default: "/")
   -m, --mode <string>   compile mode: "js" | "html"
       --debug           keep the text of the QML documents in the bundle and publish window.qmlWeb
+      --no-compress-docs   do not deflate the packed QML documents into one block (mode js, not --debug; on by default)
+      --no-obfuscate-light do not strip the comments and the layout of the engine's own code, nor rename a QML script's own
+                        locals (mode js; on by default)
       --list-qml        print qml files declared by config qmldirs, one path per line
   -h, --help            show this help
 `;
@@ -76,6 +80,14 @@ export function parseArgs(argv) {
 		}
 		if (arg === '--debug') {
 			options.debug = true;
+			continue;
+		}
+		if (arg === '--no-compress-docs') {
+			options.compressDocs = false;
+			continue;
+		}
+		if (arg === '--no-obfuscate-light') {
+			options.obfuscateLight = false;
 			continue;
 		}
 		if (arg === '-h' || arg === '--help') {
@@ -184,6 +196,12 @@ export function commonDirectory(paths) {
 	}
 	const dir = parts.join('/');
 	return dir === '' ? '/' : dir;
+}
+
+// The URL of a folder of the compiler's virtual file system (/D:/dir or /dir): file:///D:/dir, file:///dir.
+function sourceBaseOf(root) {
+	const disk = toDisk(root).replace(/\/+$/, '');
+	return encodeURI(/^[A-Za-z]:/.test(disk) ? `file:///${disk}` : `file://${disk}`);
 }
 
 function relativeTo(root, virtualPath) {
@@ -296,11 +314,19 @@ async function compileJs(options, env, log, warn) {
 		modules: {},
 		translations,
 	};
+	// The folder of the QML files as a URL: the source map of the bundle lists the QML files under it, and the engine names the scripts
+	// of a QML file `<sourceBase>/<file>` for the debugger (a debug build always, any other one with `?qmlsource=1` in the address).
+	spec.sourceBase = sourceBaseOf(root);
 	if (options.debug) spec.debug = true;
 	else {
 		spec.docs = {};
 		spec.scans = {};
 	}
+	// Every module of the engine loses its comments and its layout by default (compiler/minify.js, already used for the scripts of
+	// a QML document, see below); no name is changed and no control flow moves, so there is nothing here for the JIT to run slower.
+	// A debug build keeps its text readable on purpose. --no-obfuscate-light turns it off, for a build whose own bundle must stay
+	// readable.
+	const obfuscateLight = options.obfuscateLight !== false && !options.debug;
 	for (const [file, text] of [...fs.texts].sort((a, b) => a[0].localeCompare(b[0]))) {
 		if (!file.endsWith('.qml') || options.debug) {
 			spec.files[relativeTo(root, file)] = text;
@@ -308,17 +334,39 @@ async function compileJs(options, env, log, warn) {
 		}
 		// A document is carried as its packed tree, not as its text.
 		const name = relativeTo(root, file);
-		spec.docs[name] = packedRecord(project.docs.get(file), text);
+		spec.docs[name] = packedRecord(project.docs.get(file), text, obfuscateLight);
 		const scan = packedScan(scanSource(text));
 		if (scan !== null) spec.scans[name] = scan;
 	}
 	for (const [file, data] of [...fs.bytes].sort((a, b) => a[0].localeCompare(b[0]))) spec.binaries[relativeTo(root, file)] = data.toString('base64');
 	for (const [name, dirs] of Object.entries(modules)) spec.modules[name] = dirs.map((dir) => relativeTo(root, dir));
 
+	// The packed trees and their scans, which are plain JSON and the biggest part of a release bundle, go in one deflated block
+	// instead of sitting in it as text by default; runtime.js inflates it (DecompressionStream) before the project reads a document.
+	// A debug build keeps the documents as text on purpose (that is what --debug is for), so this never applies to it.
+	// --no-compress-docs turns it off, for a build that cannot rely on DecompressionStream.
+	const compressDocs = options.compressDocs !== false && !options.debug;
+	if (compressDocs) {
+		const payload = JSON.stringify({ docs: spec.docs, scans: spec.scans });
+		spec.docsDeflate = zlib.deflateRawSync(Buffer.from(payload, 'utf8'), { level: 9 }).toString('base64');
+		delete spec.docs;
+		delete spec.scans;
+	}
+
 	const fileName = `${options.name}.js`;
 	const banner = `// ${options.name || 'QmlWeb application'} — generated by QmlWeb compiler/compiler.js from ${toDisk(main)}`;
 	const tail = `__modules["runtime.js"].bootstrap(${JSON.stringify(spec)});`;
-	const bundle = bundleRuntime({ srcDir: SRC_DIR, entry: 'runtime.js', banner, tail, file: fileName, sourceRoot: toPosix(path.relative(options.output || '.', SRC_DIR)) });
+	const transformModule = obfuscateLight ? (_file, code) => minifyScript(code) : undefined;
+	const bundle = bundleRuntime({ srcDir: SRC_DIR, entry: 'runtime.js', banner, tail, file: fileName, sourceRoot: toPosix(path.relative(options.output || '.', SRC_DIR)), transformModule });
+
+	// The QML files go in the source map of the bundle with their text (a source nothing in the bundle itself maps to: the scripts of a
+	// QML file are compiled at run time and carry a small source map of their own, see src/debugmap.js). The map is a file of its own,
+	// the bundle itself still carries the packed trees only.
+	for (const [file, text] of [...fs.texts].sort((a, b) => a[0].localeCompare(b[0]))) {
+		if (!file.endsWith('.qml')) continue;
+		bundle.map.sources.push(`${spec.sourceBase}/${encodeURI(relativeTo(root, file))}`);
+		bundle.map.sourcesContent.push(text);
+	}
 
 	let written = null;
 	if (options.output) {
@@ -337,7 +385,7 @@ async function compileJs(options, env, log, warn) {
 // options: see parseArgs. Returns what was produced; throws on errors.
 // The record of a document of a compiled application (see CompiledDocument): its tree packed with smaller scripts, as JSON text. A
 // document that does not parse is carried as its error: the application only fails when it uses that document.
-function packedRecord(doc, text) {
+function packedRecord(doc, text, obfuscateLight) {
 	let def = doc !== undefined && !doc.error ? doc.def : null;
 	if (def === null) {
 		try {
@@ -347,7 +395,22 @@ function packedRecord(doc, text) {
 			return JSON.stringify({ error: [error.message, error.line || 0, error.column || 0] });
 		}
 	}
-	return JSON.stringify(packDocument(def, minifyScript));
+	if (obfuscateLight) def = mangleDocument(def);
+	// The line breaks of a script stay: line N of the packed script is line N of the QML text (source maps, see src/debugmap.js).
+	return JSON.stringify(packDocument(def, (script) => minifyScript(script, true)));
+}
+
+// A copy of `def` whose script fragments had their safely renameable names renamed (mangleLocals): the plain parameters and the
+// top-level var/let/const of each property binding, signal handler and function - never an id, a property or a signal, which a
+// binding outside this one fragment, perhaps outside this one document, could still be reading or writing by that name. `def`
+// itself (the project's own parsed tree, possibly shared and reused elsewhere) is never changed; this returns new objects.
+function mangleDocument(def) {
+	return {
+		...def,
+		properties: def.properties.map((prop) => (prop.text === null ? prop : { ...prop, text: mangleLocals(prop.text, '', true).body })),
+		functions: def.functions.map((fn) => ({ ...fn, ...mangleLocals(fn.body, fn.params, true) })),
+		children: def.children.map(mangleDocument),
+	};
 }
 
 // The scan of a document in the short form of the spec, or null when it has nothing in it.

@@ -135,6 +135,7 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
+        <Interface InterfaceId="imtauth::IPersonalAccessTokenPersistence" ComponentId="PersonalAccessTokenDatabaseDelegate"/>
         <Interface InterfaceId="imtbase::IObjectCollection" ComponentId="Repository"/>
         <Interface InterfaceId="imtdb::ISqlDatabaseObjectDelegate" ComponentId="PersonalAccessTokenDatabaseDelegate"/>
     </ExportedInterfaces>

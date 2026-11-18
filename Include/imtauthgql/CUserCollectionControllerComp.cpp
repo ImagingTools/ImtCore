@@ -30,6 +30,9 @@ namespace imtauthgql
 {
 
 
+static const QByteArray s_removeUserPermission = QByteArrayLiteral("/Administration/Users/Edit/Remove");
+
+
 // protected methods
 
 bool CUserCollectionControllerComp::FillObjectFromRepresentation(
@@ -659,6 +662,14 @@ bool CUserCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 
 	QByteArray objectId = userInfoPtr->GetObjectUuid();
 
+	const istd::IChangeableUniquePtr previousPtr = userInfoPtr->CloneMe();
+	const imtauth::IUserInfo* previousUserPtr = dynamic_cast<const imtauth::IUserInfo*>(previousPtr.GetPtr());
+	if (previousUserPtr == nullptr){
+		errorMessage = QStringLiteral("Unable to copy the user");
+
+		return false;
+	}
+
 	QByteArrayList groupIds = userInfoPtr->GetGroups();
 	for (const QByteArray& groupId : groupIds){
 		if (!groupId.isEmpty()){
@@ -671,7 +682,11 @@ bool CUserCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 		userInfoPtr->RemoveFromSystem(systemInfo.systemId);
 	}
 
-	return FillObjectFromRepresentation(userData, object, objectId, IsSuperuserRequest(rawGqlRequest), errorMessage);
+	if (!FillObjectFromRepresentation(userData, object, objectId, IsSuperuserRequest(rawGqlRequest), errorMessage)){
+		return false;
+	}
+
+	return CheckUserGrants(rawGqlRequest, objectId, previousUserPtr, *userInfoPtr, errorMessage);
 }
 
 
@@ -688,6 +703,15 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateObjectFromReques
 		userInfoPtr->SetEnabled(true);
 	}
 
+	if (userInfoPtr != nullptr){
+		const QByteArray contextProductId = gqlRequest.GetRequestContext() != nullptr ? gqlRequest.GetRequestContext()->GetProductId() : QByteArray();
+		if (!CheckOtherProductsUnchanged(gqlRequest.GetRequestContext(), nullptr, *userInfoPtr, errorMessage)
+					|| !CheckAddedRolesOfProducts(m_roleInfoProviderCompPtr.GetPtr(), nullptr, *userInfoPtr, errorMessage)
+					|| !CheckGrantedPermissions(gqlRequest.GetRequestContext(), QByteArrayList(), userInfoPtr->GetPermissions(contextProductId), errorMessage)){
+			return nullptr;
+		}
+	}
+
 	return objectPtr;
 }
 
@@ -697,9 +721,10 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateObjectFromReques
 istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateAdaptedObjectData(
 			const QByteArray& objectId,
 			const istd::IChangeable& object,
-			const imtgql::CGqlRequest& gqlRequest) const
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
 {
-	istd::IChangeableUniquePtr baseAdaptedPtr = BaseClass::CreateAdaptedObjectData(objectId, object, gqlRequest);
+	istd::IChangeableUniquePtr baseAdaptedPtr = BaseClass::CreateAdaptedObjectData(objectId, object, gqlRequest, errorMessage);
 
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 	if (gqlContextPtr == nullptr){
@@ -715,44 +740,35 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateAdaptedObjectDat
 	imtauth::ITenantMembershipManager* membershipPtr = m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr;
 	imtauth::IRoleInfoProvider* roleProviderPtr = m_roleInfoProviderCompPtr.IsValid() ? m_roleInfoProviderCompPtr.GetPtr() : nullptr;
 
-	// Invalid result means the stored object needs no tenant filtering.
-	istd::IChangeableUniquePtr adaptedPtr = AdaptUserForTenant(
-				objectId,
-				object,
-				currentTenantId,
-				currentProductId,
-				bindingPtr,
-				delegatedPtr,
-				membershipPtr,
-				roleProviderPtr);
-
 	if (currentProductId.isEmpty()){
-		return adaptedPtr;
+		// Invalid result means the stored object needs no tenant filtering.
+		return AdaptUserForTenant(
+					objectId,
+					object,
+					currentTenantId,
+					currentProductId,
+					bindingPtr,
+					delegatedPtr,
+					membershipPtr,
+					roleProviderPtr);
 	}
 
-	// Remote consumers expand roles through the caller's token, which a PAT cannot do; send the resolved permissions with the object.
-	const imtauth::IUserInfo* sourceUserPtr = adaptedPtr.IsValid()
-				? dynamic_cast<const imtauth::IUserInfo*>(adaptedPtr.GetPtr())
-				: dynamic_cast<const imtauth::IUserInfo*>(&object);
-	if (sourceUserPtr == nullptr){
-		return adaptedPtr;
+	// A product server trusts the permissions handed out with the user: only a complete read gives them
+	const TenantUserSources sources{
+		m_objectCollectionCompPtr.GetPtr(),
+		m_roleCollectionCompPtr.GetPtr(),
+		m_userGroupCollectionCompPtr.GetPtr(),
+		bindingPtr,
+		delegatedPtr,
+		membershipPtr
+	};
+
+	istd::IChangeableUniquePtr userPtr;
+	if (ComputeTenantUser(sources, objectId, currentTenantId, currentProductId, userPtr, errorMessage) == imtservergql::CAuthorizationSnapshot::RS_ABSENT){
+		errorMessage = QStringLiteral("The user '%1' does not exist.").arg(QString::fromUtf8(objectId));
 	}
 
-	const imtauth::IUserInfo::FeatureIds resolvedPermissions = GetTenantUserPermissions(*sourceUserPtr, currentTenantId, currentProductId, bindingPtr, roleProviderPtr);
-	if (resolvedPermissions.isEmpty()){
-		return adaptedPtr;
-	}
-
-	if (!adaptedPtr.IsValid()){
-		adaptedPtr = object.CloneMe();
-	}
-
-	imtauth::IUserInfo* resultUserPtr = dynamic_cast<imtauth::IUserInfo*>(adaptedPtr.GetPtr());
-	if (resultUserPtr != nullptr){
-		resultUserPtr->SetLocalPermissions(currentProductId, resolvedPermissions);
-	}
-
-	return adaptedPtr;
+	return userPtr;
 }
 
 
@@ -775,6 +791,30 @@ bool CUserCollectionControllerComp::CheckObjectAccess(
 	}
 
 	return BaseClass::CheckObjectAccess(gqlRequest, objectIds, accessLevel, errorMessage);
+}
+
+
+bool CUserCollectionControllerComp::CheckObjectData(const imtgql::CGqlRequest& gqlRequest, const QByteArray& objectId, const istd::IChangeable& object, QString& errorMessage) const
+{
+	const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(&object);
+	if (userInfoPtr == nullptr){
+		errorMessage = QStringLiteral("Invalid user data");
+
+		return false;
+	}
+
+	imtbase::IObjectCollection::DataPtr storedDataPtr;
+	const imtauth::IUserInfo* storedUserPtr = nullptr;
+	if (!objectId.isEmpty()){
+		storedUserPtr = m_objectCollectionCompPtr->GetObjectData(objectId, storedDataPtr) ? dynamic_cast<const imtauth::IUserInfo*>(storedDataPtr.GetPtr()) : nullptr;
+		if (storedUserPtr == nullptr){
+			errorMessage = QStringLiteral("Unable to read the user '%1'").arg(QString::fromUtf8(objectId));
+
+			return false;
+		}
+	}
+
+	return CheckUserGrants(gqlRequest, objectId, storedUserPtr, *userInfoPtr, errorMessage);
 }
 
 
@@ -808,6 +848,10 @@ bool CUserCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequest& 
 
 	if (!requestOwnerId.isEmpty() && requestOwnerId == requestedUserId){
 		return true;
+	}
+
+	if (!CheckAdministeredProducts(gqlRequest, errorMessage)){
+		return false;
 	}
 
 	return BaseClass::CheckPermissions(gqlRequest, errorMessage);
@@ -855,6 +899,20 @@ QJsonObject CUserCollectionControllerComp::InsertObject(
 // reimplemented (imtservergql::CObjectCollectionControllerCompBase)
 bool CUserCollectionControllerComp::OnBeforeRemoveElements(const QByteArrayList& elementIds, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
+	for (const QByteArray& userId : elementIds){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		const imtauth::IUserInfo* userPtr = m_objectCollectionCompPtr->GetObjectData(userId, dataPtr) ? dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr()) : nullptr;
+		if (userPtr == nullptr){
+			errorMessage = QStringLiteral("Unable to read the user '%1'").arg(QString::fromUtf8(userId));
+
+			return false;
+		}
+
+		if (!CheckSharedUserChange(gqlRequest.GetRequestContext(), userId, *userPtr, s_removeUserPermission, errorMessage)){
+			return false;
+		}
+	}
+
 	if (m_tenantManagerCompPtr.IsValid()){
 		for (const QByteArray& userId : elementIds){
 			// An organization that cannot be read may be owned by the user: it would be left with a removed owner
@@ -1070,6 +1128,35 @@ void CUserCollectionControllerComp::SetAdditionalFilters(
 	imtbase::CComplexCollectionFilter* complexFilterPtr = new imtbase::CComplexCollectionFilter();
 	complexFilterPtr->SetFilterExpression(filterExpr);
 	filterParamsPtr->SetEditableParameter("ComplexFilter", complexFilterPtr, true);
+}
+
+
+// private methods
+
+bool CUserCollectionControllerComp::CheckUserGrants(
+			const imtgql::CGqlRequest& gqlRequest,
+			const QByteArray& objectId,
+			const imtauth::IUserInfo* previousPtr,
+			const imtauth::IUserInfo& user,
+			QString& errorMessage) const
+{
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	const QByteArray productId = gqlContextPtr != nullptr ? gqlContextPtr->GetProductId() : QByteArray();
+
+	if (previousPtr != nullptr && !CheckUserAccountChange(gqlContextPtr, objectId, *previousPtr, user, errorMessage)){
+		return false;
+	}
+
+	if (!CheckJoinedUserGroups(gqlContextPtr, m_userGroupInfoProviderCompPtr.GetPtr(), previousPtr != nullptr ? previousPtr->GetGroups() : QByteArrayList(), user.GetGroups(), errorMessage)){
+		return false;
+	}
+
+	if (!CheckOtherProductsUnchanged(gqlContextPtr, previousPtr, user, errorMessage)
+				|| !CheckAddedRolesOfProducts(m_roleInfoProviderCompPtr.GetPtr(), previousPtr, user, errorMessage)){
+		return false;
+	}
+
+	return CheckGrantedPermissions(gqlContextPtr, previousPtr != nullptr ? previousPtr->GetPermissions(productId) : QByteArrayList(), user.GetPermissions(productId), errorMessage);
 }
 
 

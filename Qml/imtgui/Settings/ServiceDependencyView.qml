@@ -39,7 +39,7 @@ ParamEditorBase {
 		let hasChildren = serviceInfo.m_dependencies && serviceInfo.m_dependencies.getItemsCount() > 0
 		let name = serviceInfo.m_applicationName !== "" ? serviceInfo.m_applicationName : serviceInfo.m_serviceId
 
-		rowsModel.append({"name": name, "level": level, "isLast": isLast, "hasChildren": hasChildren, "status": serviceInfo.m_status, "version": serviceInfo.m_version})
+		rowsModel.append({"name": name, "level": level, "isLast": isLast, "hasChildren": hasChildren, "status": serviceInfo.m_status, "version": serviceInfo.m_version, "credentialStatus": String(serviceInfo.m_credentialStatus)})
 
 		if (hasChildren){
 			let count = serviceInfo.m_dependencies.getItemsCount()
@@ -71,6 +71,18 @@ ParamEditorBase {
 		}
 
 		return qsTr("Unknown")
+	}
+
+	function getCredentialText(credentialStatus){
+		if (credentialStatus === "MISSING"){
+			return qsTr("no server token")
+		}
+
+		if (credentialStatus === "REJECTED"){
+			return qsTr("server token is refused")
+		}
+
+		return ""
 	}
 
 	sourceComp: Component {
@@ -147,8 +159,8 @@ ParamEditorBase {
 								x: serviceDependencyView.versionX
 								width: rowItem.width - x
 								elide: Text.ElideRight
-								color: model.status === "DISCONNECTED" ? Style.dangerColor : Style.textColor
-								text: serviceDependencyView.getStatusText(model.status, model.version)
+								color: model.status === "DISCONNECTED" || serviceDependencyView.getCredentialText(model.credentialStatus) !== "" ? Style.dangerColor : Style.textColor
+								text: serviceDependencyView.getStatusText(model.status, model.version) + (serviceDependencyView.getCredentialText(model.credentialStatus) !== "" ? " - " + serviceDependencyView.getCredentialText(model.credentialStatus) : "")
 							}
 						}
 					}

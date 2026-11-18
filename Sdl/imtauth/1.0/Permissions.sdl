@@ -32,6 +32,10 @@ type PermissionGroup {
 	entries: [PermissionEntry]
 }
 
+type PermissionTree {
+	groups: [PermissionGroup]
+}
+
 type GetProductPermissionsPayload {
 	groups: [PermissionGroup]
 	errorMessage: String

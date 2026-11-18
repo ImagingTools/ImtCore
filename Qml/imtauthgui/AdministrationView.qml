@@ -171,7 +171,7 @@ Item {
 
 				adminNavigation.requestedPageId = ""
 				multiPageView.block = true
-				multiPageView.currentIndex = 0
+				multiPageView.activatePage(0)
 				multiPageView.block = false
 			}
 			onActivated: {
@@ -180,7 +180,7 @@ Item {
 				let index = multiPageView.getIndexById(matchedPath)
 				multiPageView.block = true
 				if (index >= 0){
-					multiPageView.currentIndex = index
+					multiPageView.activatePage(index)
 				}
 
 				// A sub-page path lands on its list; open editors stay open (they used to be closed, losing unsaved edits).
@@ -248,11 +248,24 @@ Item {
 			addSubPage("Users", qsTr("Users"), userCollectionComp, "Icons/Account")
 			addSubPage("Groups", qsTr("Groups"), userGroupCollectionComp, "Icons/MultipleUser")
 
-			// The initial sub-page is part of opening the page, not a navigation of its own.
-			let requestedIndex = adminNavigation.requestedPageId !== "" ? multiPageView.getIndexById(adminNavigation.requestedPageId) : -1;
-			multiPageView.currentIndex = requestedIndex >= 0 ? requestedIndex : 0;
-			multiPageView.block = false;
+			// Products add their own sub-pages here, so the initial sub-page is chosen among all of them.
 			administrationContainer.multiPageUpdated();
+
+			/**
+				The initial sub-page is part of opening the page, not a navigation of its own.
+				Activated, not only selected: when it already was the current index, nothing else loads it.
+			*/
+			let requestedIndex = adminNavigation.requestedPageId !== "" ? multiPageView.getIndexById(adminNavigation.requestedPageId) : -1;
+			multiPageView.activatePage(requestedIndex >= 0 ? requestedIndex : 0);
+			multiPageView.block = false;
+
+			// Every sub-page can be navigated to, the ones of the product too. A path waiting for one is delivered now.
+			let pageIds = [];
+			for (let i = 0; i < multiPageView.pagesModel.count; ++i){
+				pageIds.push(multiPageView.pagesModel.get(i).id);
+			}
+
+			adminNavigation.paths = pageIds;
 		}
 	}
 }

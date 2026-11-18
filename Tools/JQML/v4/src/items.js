@@ -7,6 +7,7 @@
 
 import { CanvasContext, commandsExceed, replayCommands } from './canvas.js';
 import { fonts } from './fonts.js';
+import { layoutRichText, linkAtPoint, mightBeRichText, paintRichText, parseRichText } from './richtext.js';
 import { KEY, MODIFIERS, parseKeySequence, qtKeyToDom, STANDARD_KEYS } from './keys.js';
 import { QmlError } from './lexer.js';
 import { colorToString, parseColor, toColor, toFloat } from './util.js';
@@ -106,6 +107,20 @@ let hitY = 0;
 let destroyObserver = null;
 export function setDestroyObserver(callback) {
 	destroyObserver = callback;
+}
+
+// The destroyed items wait for the end of the running script, then let go of what they hold (Item.$sever).
+let severQueue = null;
+function severLater(item) {
+	if (severQueue === null) {
+		severQueue = [];
+		queueMicrotask(() => {
+			const list = severQueue;
+			severQueue = null;
+			for (const dead of list) dead.$sever();
+		});
+	}
+	severQueue.push(item);
 }
 
 // ----- Keyboard focus -----
@@ -441,12 +456,19 @@ function notifyViews(model) {
 	}
 }
 
-// A function of a QML object connected to a signal of another object is disconnected when its object is destroyed.
+// A function of a QML object connected to a signal of another object is disconnected when its object is destroyed, and when the
+// object with the signal is destroyed (Qt drops the connection with either end). Both objects know the link: the owner to undo it,
+// the source to let the owner forget it. Without the second, an object that stays holds the undo function of a connection to an item of
+// a closed page, and the undo function holds that item.
 export function linkToOwner(source, fn, undo) {
 	const owner = fn.$owner;
 	if (owner === undefined || owner === source) return;
+	undo.$owner = owner;
+	undo.$source = source;
 	if (owner.$links === undefined) owner.$links = [];
 	owner.$links.push(undo);
+	if (source.$linksIn === undefined) source.$linksIn = new Set();
+	source.$linksIn.add(undo);
 }
 
 // Script assignment replaces a binding on these Item properties (Qt). `visible` must be
@@ -816,6 +838,31 @@ export class Item {
 		if (this.$owned !== undefined) for (const owned of this.$owned) owned.$destroy();
 		this.$destroyed = true;
 		if (destroyObserver !== null) destroyObserver(this);
+		severLater(this);
+	}
+
+	// What is left of a destroyed item holds nothing of the tree around it. In Qt a reference to a deleted object reads as null and the
+	// object is freed; here a script variable (a `property var` or `property Item` of an item that stays) can keep the husk alive, and
+	// through its parent, its scope and its properties the whole page it was in. It runs after the script that called destroy() has
+	// returned (QObject::deleteLater), so that script can still read the item.
+	$sever() {
+		const parent = this.$parent;
+		if (parent !== null) {
+			if (this.$queued && parent.$dirtyKids !== null) {
+				const index = parent.$dirtyKids.indexOf(this);
+				if (index >= 0) parent.$dirtyKids.splice(index, 1);
+			}
+			this.$parent = null;
+		}
+		this.$children = [];
+		this.$dirtyKids = null;
+		this.$scope = null;
+		this.$anchors = null;
+		if (this.$fnNames !== undefined) for (const name of this.$fnNames) this[name] = null; // the functions of the item hold its scope
+		if (this.$sigs !== null) for (const signal of this.$sigs.values()) signal.handlers = [];
+		this.$owned = undefined;
+		if (this.$defScope !== undefined) this.$defScope = null; // a Component: the scope it was written in
+		if (this.$custom !== null) for (const name in this.$custom) this.$custom[name] = null;
 	}
 
 	// Requests a new layout and repaint. This item needs a pass over its children, and so does its parent (it has to
@@ -1504,6 +1551,9 @@ export class Item {
 
 // Types whose own size follows their children: a change below them changes how their parent places them.
 Item.prototype.$contentSized = false;
+
+// The type name of an item where it is used, when it is a component (see Engine.createItem); the tests look items up by it.
+Item.prototype.$qmlType = '';
 
 Object.defineProperty(Item.prototype, Symbol.unscopables, {
 	value: Object.fromEntries(OBJECT_NAMES_UNSCOPABLE.map((name) => [name, true])),
@@ -2401,6 +2451,12 @@ export class Text extends Item {
 		this.$lineHeight = 1;
 		this.$font = null;
 		this.$lay = null;
+		this.$linkColor = colorToString(toColor('#0000ff'));
+		this.$hoveredLink = '';
+		this.$pressedLink = '';
+		this.$richState = { docKey: null, doc: null, key: null, layout: null };
+		this.$declareSignal('linkActivated', ['link']);
+		this.$declareSignal('linkHovered', ['link']);
 	}
 
 	get font() {
@@ -2411,8 +2467,8 @@ export class Text extends Item {
 	$measure() {
 		let lay = this.$lay;
 		const family = this.$family !== '' ? this.$family : fonts.defaultFamily();
-		const rich = this.$format === 'RichText' || this.$format === 'StyledText';
-		const source = rich ? richPlain(this.$text) : this.$text;
+		const rich = false;
+		const source = this.$text;
 		const explicit = this.$w > 0 ? this.$w : this.$aw > 0 ? this.$aw : 0;
 		const wrap = explicit > 0 && wraps(this.$wrap);
 		const limit = wrap ? explicit : Infinity;
@@ -2445,6 +2501,114 @@ export class Text extends Item {
 		return lay;
 	}
 
+	// How the text is read: 'plain', 'rich' (RichText: the HTML of QTextDocument) or 'styled' (StyledText, and AutoText that found markup).
+	$kind() {
+		let format = this.$format;
+		if (typeof format === 'number' || /^\d+$/.test(String(format))) format = ['PlainText', 'RichText', 'AutoText', 'MarkdownText', 'StyledText'][Number(format)] ?? 'PlainText';
+		if (format === 'RichText') return 'rich';
+		if (format === 'StyledText') return 'styled';
+		if (format === 'AutoText') return mightBeRichText(this.$text) ? 'styled' : 'plain';
+		return 'plain';
+	}
+
+	$richWidth() {
+		return this.$w > 0 ? this.$w : this.$aw > 0 ? this.$aw : 0;
+	}
+
+	// The layout of the marked up text for a width (0: none), kept while nothing it depends on changes.
+	$richLayout(width) {
+		const kind = this.$kind();
+		const family = this.$family !== '' ? this.$family : fonts.defaultFamily();
+		const size = this.$pixelSize > 0 ? this.$pixelSize : 12;
+		const wrap = !wraps(this.$wrap) ? 'none' : this.$wrap === 1 || this.$wrap === 'WordWrap' ? 'word' : 'anywhere';
+		const key = [kind, family, size, this.$bold, this.$italic, width, wrap, this.$lineHeight, this.$hAlign, fonts.version].join('|');
+		const state = this.$richState;
+		const docKey = `${kind}\n${this.$text}`;
+		if (state.key === key && state.docKey === docKey) return state.layout;
+		if (state.docKey !== docKey) {
+			state.doc = parseRichText(this.$text, kind === 'styled');
+			state.docKey = docKey;
+		}
+		const layout = layoutRichText(state.doc, { fonts, family, size, bold: this.$bold, italic: this.$italic, width, wrap, styled: kind === 'styled', lineHeightFactor: this.$lineHeight, align: this.$hAlign });
+		state.key = key;
+		state.layout = layout;
+		return layout;
+	}
+
+	$richMetrics() {
+		const kind = this.$kind();
+		const explicit = this.$richWidth();
+		const lay = this.$richLayout(explicit);
+		const factor = this.$lineHeight > 0 ? this.$lineHeight : 1;
+		const contentWidth = kind === 'rich' && explicit > 0 ? Math.max(explicit, lay.contentWidth) : lay.contentWidth;
+		const implicitHeight = kind === 'rich' && explicit > 0 && factor !== 1 ? lay.implicitHeight - Math.floor(this.$pixelSize * (factor - 1)) : lay.implicitHeight;
+		return { implicitWidth: lay.naturalWidth, implicitHeight, contentWidth, contentHeight: lay.contentHeight };
+	}
+
+	$paintRich(r, opacity) {
+		const layout = this.$richLayout(this.$richWidth());
+		const family = this.$family !== '' ? this.$family : fonts.defaultFamily();
+		paintRichText(r, layout, {
+			fonts,
+			family,
+			size: this.$pixelSize > 0 ? this.$pixelSize : 12,
+			bold: this.$bold,
+			italic: this.$italic,
+			width: this.$richWidth(),
+			pack: (color) => r.pack(toColor(color), opacity),
+			baseColor: layout.baseColor !== null ? r.pack(toColor(layout.baseColor), opacity) : r.pack(this.$color, opacity),
+			linkColor: r.pack(toColor(this.$linkColor), opacity),
+		});
+	}
+
+	// The link at a point of the text, or ''.
+	linkAt(x, y) {
+		if (this.$text === '' || this.$kind() === 'plain') return '';
+		return linkAtPoint(this.$richLayout(this.$richWidth()), toFloat(x), toFloat(y));
+	}
+
+	// A text with links takes the pointer over a link only: the hand, the hovered link, and `linkActivated` for a click on it.
+	$itemAt(px, py, wheel = false, button = -1) {
+		if (wheel || !this.$visible || this.$text === '' || this.$kind() === 'plain' || !this.$text.includes('href')) return super.$itemAt(px, py, wheel, button);
+		if (button > 0 || this.$rotation !== 0 || this.$scale !== 1) return null;
+		const layout = this.$richLayout(this.$richWidth());
+		if (layout.links.length === 0) return null;
+		return linkAtPoint(layout, px - this.$sx, py - this.$sy) !== '' ? this : null;
+	}
+
+	$linkAtScene(x, y) {
+		return linkAtPoint(this.$richLayout(this.$richWidth()), x - this.$sx, y - this.$sy);
+	}
+
+	$setHoveredLink(link) {
+		if (this.$hoveredLink === link) return;
+		this.$hoveredLink = link;
+		markReaders(this, 'hoveredLink');
+		this.$emit('linkHovered', [link]);
+	}
+
+	$mouseMoveAt(sceneX, sceneY) {
+		this.$setHoveredLink(this.$linkAtScene(sceneX, sceneY));
+	}
+
+	$hoverChanged(hovered) {
+		if (!hovered) this.$setHoveredLink('');
+	}
+
+	$mousePressAt(sceneX, sceneY) {
+		this.$pressedLink = this.$linkAtScene(sceneX, sceneY);
+	}
+
+	$mouseClicked() {
+		const link = this.$pressedLink;
+		this.$pressedLink = '';
+		if (link !== '') this.$emit('linkActivated', [link]);
+	}
+
+	get $cursorShape() {
+		return this.$hoveredLink !== '' ? 13 : 0; // Qt.PointingHandCursor
+	}
+
 	$fontInfo() {
 		const family = this.$family !== '' ? this.$family : fonts.defaultFamily();
 		return fonts.get(family, this.$pixelSize > 0 ? this.$pixelSize : 12, this.$bold, this.$italic);
@@ -2453,9 +2617,10 @@ export class Text extends Item {
 	// Laid-out size. Plain text uses the font height; rich text uses the wider line spacing.
 	// An explicit width makes rich text report that width, and a lineHeight other than 1 shortens the implicit height by the extra leading.
 	$metrics() {
+		if (this.$text !== '' && this.$kind() !== 'plain') return this.$richMetrics();
 		const info = this.$fontInfo();
-		const rich = this.$format === 'RichText' || this.$format === 'StyledText';
-		const source = rich ? richPlain(this.$text) : this.$text;
+		const rich = false;
+		const source = this.$text;
 		// The width that the anchors give (`anchors.left` and `anchors.right`) wraps the text like a `width` does.
 		const explicit = this.$w > 0 ? this.$w : this.$aw > 0 ? this.$aw : 0;
 		const wrap = explicit > 0 && wraps(this.$wrap);
@@ -2481,6 +2646,10 @@ export class Text extends Item {
 
 	$paint(r, opacity) {
 		if (this.$text.length === 0 || this.$pixelSize <= 0) return;
+		if (this.$kind() !== 'plain') {
+			this.$paintRich(r, opacity);
+			return;
+		}
 		const lay = this.$measure();
 		const info = lay.info;
 		const color = r.pack(this.$color, opacity);
@@ -2554,6 +2723,7 @@ defineField(Text.prototype, 'textFormat', '$format', (value) => (value === undef
 defineField(Text.prototype, 'lineHeight', '$lineHeight', toFloat);
 // True when an elide mode cut the text (a text that does not fit and does not wrap).
 defineReadOnly(Text.prototype, 'truncated', function () {
+	if (this.$text !== '' && this.$kind() !== 'plain') return false;
 	const lay = this.$measure();
 	return lay.elideLimit > 0 && lay.lines.length === 1 && lay.lines[0] !== lay.source;
 });
@@ -2564,8 +2734,18 @@ defineReadOnly(Text.prototype, 'contentHeight', function () {
 	return this.$metrics().contentHeight;
 });
 defineReadOnly(Text.prototype, 'lineCount', function () {
+	const kind = this.$text === '' ? 'plain' : this.$kind();
+	if (kind === 'rich') return 1; // Qt does not count the lines of a document
+	if (kind === 'styled') {
+		const lines = this.$richLayout(this.$richWidth()).lines;
+		return Math.max(1, lines.filter((line) => !line.trailingSynthetic && !line.spacer).length);
+	}
 	return this.$measure().lines.length;
 });
+defineField(Text.prototype, 'linkColor', '$linkColor', (value) => colorToString(toColor(value === undefined || value === null ? '#0000ff' : value)));
+defineReadOnly(Text.prototype, 'hoveredLink', function () {
+	return this.$hoveredLink;
+}, undefined, true);
 
 // ----- Canvas -----
 
@@ -4733,12 +4913,17 @@ function wrapRanges(info, text, start, stop, limit, anywhere, out) {
 	out.push({ start: lineStart, end: stop });
 }
 
+// The text editors of the scene (src/textproxy.js keeps an input element of the page for some of them).
+export const textEditors = new Set();
+
 // The editing core of TextInput (one line) and TextEdit (many lines). The cursor and the other end of the selection
 // (`$anchor`) are indexes into `$text`; undo steps are snapshots taken before a change.
 class TextEditor extends Item {
 	constructor(multiline) {
 		super();
+		textEditors.add(this);
 		this.$multi = multiline;
+		this.$hints = 0; // Qt.InputMethodHints
 		this.$text = '';
 		this.$color = BLACK;
 		this.$pixelSize = 12;
@@ -5099,6 +5284,42 @@ class TextEditor extends Item {
 		this.$touched();
 	}
 
+	// What the input element of the page mirrors: the text and the selection.
+	$domState() {
+		return { text: this.$text, start: this.$lo, end: this.$hi, backward: this.$cursor < this.$anchor };
+	}
+
+	// The input element of the page changed (typing, a virtual keyboard, a composition, a paste, the autofill of the browser): the model
+	// follows. `start` and `end` are the selection of the element. The change is found as what is between the common head and tail of the
+	// old and the new text, so the undo history, the cursor and `textEdited` work as for a typed key. Returns whether the text changed.
+	$fromDom(value, start, end, backward) {
+		if (!this.$editable) return false;
+		const next = this.$multi ? String(value) : String(value).replace(/[\r\n]/g, ' ');
+		const old = this.$text;
+		let changed = false;
+		if (next !== old) {
+			const shortest = Math.min(old.length, next.length);
+			let head = 0;
+			while (head < shortest && old.charCodeAt(head) === next.charCodeAt(head)) head++;
+			if (head > 0 && head < shortest && isHighSurrogate(old.charCodeAt(head - 1))) head--;
+			let tail = 0;
+			while (tail < shortest - head && old.charCodeAt(old.length - 1 - tail) === next.charCodeAt(next.length - 1 - tail)) tail++;
+			if (tail > 0 && isLowSurrogate(old.charCodeAt(old.length - tail))) tail--;
+			const inserted = next.slice(head, next.length - tail);
+			changed = this.$splice(head, old.length - tail, inserted, inserted === '' ? 'delete' : 'type', false);
+			this.$emit('textEdited', []);
+		}
+		if (this.$text === next) {
+			const n = next.length;
+			const lo = clampIndex(start, n);
+			const hi = clampIndex(end, n);
+			this.$cursor = backward ? lo : hi;
+			this.$anchor = backward ? hi : lo;
+			this.$touched();
+		}
+		return changed;
+	}
+
 	// ----- the API of the QML types -----
 
 	select(start, end) {
@@ -5425,6 +5646,11 @@ class TextEditor extends Item {
 
 	// ----- focus and the text cursor -----
 
+	$destroy() {
+		textEditors.delete(this);
+		super.$destroy();
+	}
+
 	$focusEdge() {
 		const now = this.$active;
 		if (now === this.$focused) return;
@@ -5647,6 +5873,7 @@ for (const [name, field, coerce] of [
 	['bottomPadding', '$padB', toFloat],
 	['wrapMode', '$wrap', toWrapMode],
 	['echoMode', '$echo', toEcho],
+	['inputMethodHints', '$hints', toFloat],
 	['textFormat', '$format', (value) => (value === undefined || value === null ? 'PlainText' : String(value))],
 ]) {
 	defineProp(
@@ -6676,6 +6903,19 @@ export class TreeItemModel extends Item {
 		this.$touch();
 		return true;
 	}
+
+	// The keys of the row `index` are set in the row `externalIndex` of `other` (the C++ CopyItemDataToModel): the values are not
+	// copied deeply, a nested model is shared. false when the row has no keys, as in C++.
+	copyItemDataToModel(index, other, externalIndex = 0) {
+		const row = this.$rows[index];
+		if (row === undefined || !(other instanceof TreeItemModel)) return false;
+		let result = false;
+		for (const key of Object.keys(row)) {
+			result = other.setData(key, row[key], externalIndex);
+			if (!result) break;
+		}
+		return result;
+	}
 }
 
 defineReadOnly(
@@ -6906,9 +7146,22 @@ export class Loader extends Item {
 		this.$sizing = false;
 		this.$failed = false;
 		this.$statusSent = 0;
+		this.$loaded = null; // the item that was loaded: the other children are declared in the Loader (a Connections, a Timer) and stay
 		this.$declareSignal('loaded', []);
 		this.$declareSignal('itemChanged', []);
 		this.$declareSignal('statusChanged', []);
+	}
+
+	// The item the Loader loaded, or null. Not `$children[0]`: what is declared inside the Loader comes first.
+	$loadedItem() {
+		const item = this.$loaded;
+		return item !== null && item.$parent === this && item.$destroyed !== true ? item : null;
+	}
+
+	$sever() {
+		this.$sourceComponent = null;
+		this.$loaded = null;
+		super.$sever();
 	}
 
 	// An explicit width (or anchors that set it) wins; otherwise the loaded item's width.
@@ -6921,13 +7174,13 @@ export class Loader extends Item {
 	}
 
 	get $implicitWidth() {
-		const item = this.$children.length > 0 ? this.$children[0] : null;
+		const item = this.$loadedItem();
 		if (item === null) return 0;
 		return this.$widthExplicit() ? item.$implicitWidth : item.width;
 	}
 
 	get $implicitHeight() {
-		const item = this.$children.length > 0 ? this.$children[0] : null;
+		const item = this.$loadedItem();
 		if (item === null) return 0;
 		return this.$heightExplicit() ? item.$implicitHeight : item.height;
 	}
@@ -6936,7 +7189,7 @@ export class Loader extends Item {
 	// Only when the Loader's size changed or the item is new: a script may resize the item afterwards (Qt).
 	$pushSize() {
 		if (this.$holdSize === true) return;
-		const item = this.$children.length > 0 ? this.$children[0] : null;
+		const item = this.$loadedItem();
 		if (item === null) {
 			this.$pushedItem = null;
 			return;
@@ -7061,7 +7314,7 @@ defineProp(
 	function () {
 		if (this.$anchors !== null && this.$anchors.$affectsWidth) return this.$aw;
 		if (this.$w > 0) return this.$w;
-		const item = this.$children.length > 0 ? this.$children[0] : null;
+		const item = this.$loadedItem();
 		return item !== null ? item.width : 0;
 	},
 	function (v) {
@@ -7079,7 +7332,7 @@ defineProp(
 	function () {
 		if (this.$anchors !== null && this.$anchors.$affectsHeight) return this.$ah;
 		if (this.$h > 0) return this.$h;
-		const item = this.$children.length > 0 ? this.$children[0] : null;
+		const item = this.$loadedItem();
 		return item !== null ? item.height : 0;
 	},
 	function (v) {
@@ -7092,12 +7345,12 @@ defineProp(
 	},
 );
 defineReadOnly(Loader.prototype, 'item', function () {
-	return this.$children.length > 0 ? this.$children[0] : null;
+	return this.$loadedItem();
 });
 defineReadOnly(Loader.prototype, 'status', function () {
 	if (!this.$active) return 0;
 	if (this.$failed) return 3;
-	return this.$children.length > 0 ? 1 : 0;
+	return this.$loadedItem() !== null ? 1 : 0;
 });
 Loader.prototype.$contentSized = true;
 

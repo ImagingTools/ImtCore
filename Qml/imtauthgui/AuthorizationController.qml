@@ -19,6 +19,8 @@ QtObject {
 	
 	property string permissionPath: ""
 	property string productId: "";
+	// The product whose data a console administers now; requests go in its context while it is set.
+	property string administeredProductId: "";
 	
 	signal userModeChanged(string userMode);
 	signal superuserExistResult(string status, string error);
@@ -62,6 +64,7 @@ QtObject {
 	property bool rememberMe: false
 	property string lastUser: ""
 	property string storedRefreshToken: ""
+	property bool __loginSettingsLoading: false
 	property string currentTenantId: ""
 	property string currentTenantName: ""
 	property var __permissionsRefreshCallbacks: []
@@ -278,10 +281,14 @@ QtObject {
 	}
 	
 	function loadLoginSettings() {
+		// The change handlers save the login settings: while they are read, nothing is saved, otherwise the values that are not read yet are
+		// written over the stored ones
+		root.__loginSettingsLoading = true;
 		let rememberMeStr = storage.value("Login_rememberMe", "");
 		root.rememberMe = (rememberMeStr === "true");
 		root.lastUser = storage.value("Login_lastUser", "");
 		root.storedRefreshToken = storage.value("Login_storedRefreshToken", "");
+		root.__loginSettingsLoading = false;
 	}
 
 	function normalizePermissions(rawPermissions) {
@@ -336,6 +343,10 @@ QtObject {
 	}
 	
 	function saveLoginSettings() {
+		if (root.__loginSettingsLoading){
+			return;
+		}
+
 		storage.setValue("Login_rememberMe", root.rememberMe ? "true" : "false");
 		storage.setValue("Login_lastUser", root.lastUser);
 		storage.setValue("Login_storedRefreshToken", root.storedRefreshToken);

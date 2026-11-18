@@ -123,6 +123,7 @@ void CGqlHeartbeatCheckerComp::OnHeartbeatFinished(int heartbeatId, const GqlMod
 	// The server answered, only the answer is not usable
 	case IAsyncGqlClient::EC_SERVER_ERROR:
 	case IAsyncGqlClient::EC_INVALID_RESPONSE:
+	case IAsyncGqlClient::EC_ACCESS_DENIED:
 		SetStatus(CS_CONNECTED, QString());
 		break;
 	case IAsyncGqlClient::EC_NETWORK:

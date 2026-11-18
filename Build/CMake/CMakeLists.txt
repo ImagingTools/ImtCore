@@ -643,7 +643,7 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 		add_dependencies(UserAccountStateTest imtbase imtauth)
 
 		add_subdirectory("${TESTS_DIR}/PermissionRequirementsTest/CMake" "${AUX_INCLUDE_DIR}/PermissionRequirementsTest")
-		add_dependencies(PermissionRequirementsTest imtbase imtauth imtgql imtlic)
+		add_dependencies(PermissionRequirementsTest imtbase imtauth imtgql imtlic imtservergql imtauthsdl imtauthgql)
 
 		add_subdirectory("${TESTS_DIR}/PermissionCheckTest/CMake" "${AUX_INCLUDE_DIR}/PermissionCheckTest")
 		add_dependencies(PermissionCheckTest imtbase imtauth imtgql imtlic)

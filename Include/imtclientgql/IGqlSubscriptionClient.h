@@ -24,7 +24,12 @@ public:
 		SS_UNKNOWN = 0,
 		SS_UNREGISTERED,
 		SS_IN_REGISTRATION,
-		SS_REGISTERED
+		SS_REGISTERED,
+
+		/**
+			The server refused the subscription or dropped it: no change will be reported.
+		*/
+		SS_REFUSED
 	};
 
 	/**

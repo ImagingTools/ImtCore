@@ -133,6 +133,34 @@ public:
 		castedContextPtr.MoveCastedPtr(std::move(clonedContextPtr));
 		concreteRequestPtr->SetGqlContext(imtgql::IGqlContextSharedPtr::CreateFromUnique(std::move(castedContextPtr)));
 	}
+
+	template<class SdlClass>
+	static IGqlClient::GqlModelResult<SdlClass> ParseModelResult(const IGqlClient::GqlResult& result, const QByteArray& commandId)
+	{
+		if (result.errorCategory != IGqlClient::EC_NONE){
+			return {{}, result.errorCategory,
+						result.errorMessage.isEmpty() ? QStringLiteral("GraphQL request failed") : result.errorMessage};
+		}
+		if (!result.responsePtr.IsValid()){
+			return {{}, IGqlClient::EC_INVALID_RESPONSE, QStringLiteral("Response is missing")};
+		}
+
+		IGqlClient::GqlModelResult<SdlClass> retVal;
+		ParseError parseError = PE_NONE;
+		retVal.model = ParseModelResponse<SdlClass>(result.responsePtr->GetResponseData(), commandId, retVal.errorMessage, &parseError);
+		switch (parseError){
+		case PE_NONE:
+			retVal.errorCategory = IGqlClient::EC_NONE;
+			break;
+		case PE_SERVER_ERROR:
+			retVal.errorCategory = IGqlClient::EC_SERVER_ERROR;
+			break;
+		case PE_INVALID_RESPONSE:
+			retVal.errorCategory = IGqlClient::EC_INVALID_RESPONSE;
+			break;
+		}
+		return retVal;
+	}
 };
 
 
@@ -151,34 +179,30 @@ public:
 
 protected:
 	template<class SdlClass>
-	SdlClass SendModelRequest(const imtgql::IGqlRequest& request, QString& errorMessage) const
+	IGqlClient::GqlModelResult<SdlClass> SendModelRequest(const imtgql::IGqlRequest& request) const
 	{
-		errorMessage.clear();
-
 		if (!m_apiClientCompPtr.IsValid()){
-			Q_ASSERT(false);
-			return SdlClass();
+			return {{}, IGqlClient::EC_INTERNAL, QStringLiteral("API client is not configured")};
 		}
 
 		IGqlClient::GqlRequestPtr requestPtr;
 		requestPtr.MoveCastedPtr(request.CloneMe());
 		if (!requestPtr.IsValid()){
-			errorMessage = QStringLiteral("Request is invalid");
-			return SdlClass();
+			return {{}, IGqlClient::EC_INVALID_REQUEST, QStringLiteral("Request is invalid")};
 		}
 
 		CClientRequestModelHelpers::AttachMissingContext(requestPtr);
 
-		IGqlClient::GqlResponsePtr responsePtr = m_apiClientCompPtr->SendRequest(requestPtr);
-		if (!responsePtr.IsValid()){
-			errorMessage = QStringLiteral("Response is invalid");
-			return SdlClass();
-		}
+		return CClientRequestModelHelpers::ParseModelResult<SdlClass>(
+					m_apiClientCompPtr->SendRequest(requestPtr), request.GetCommandId());
+	}
 
-		return CClientRequestModelHelpers::ParseModelResponse<SdlClass>(
-					responsePtr->GetResponseData(),
-					request.GetCommandId(),
-					errorMessage);
+	template<class SdlClass>
+	SdlClass SendModelRequest(const imtgql::IGqlRequest& request, QString& errorMessage) const
+	{
+		const auto result = SendModelRequest<SdlClass>(request);
+		errorMessage = result.errorMessage;
+		return result.model;
 	}
 
 	bool HasApiClient() const

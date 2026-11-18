@@ -252,12 +252,12 @@ export class Scene {
 	}
 
 	// Key events go to the item with the active focus; true if a handler accepted the event.
-	keyDown(event) {
-		return this.engine.dispatchKey(event, true);
+	keyDown(event, native = false) {
+		return this.engine.dispatchKey(event, true, native);
 	}
 
-	keyUp(event) {
-		return this.engine.dispatchKey(event, false);
+	keyUp(event, native = false) {
+		return this.engine.dispatchKey(event, false, native);
 	}
 
 	setHovered(target) {

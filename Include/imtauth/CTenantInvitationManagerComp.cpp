@@ -81,21 +81,33 @@ ITenantInvitationManager::InvitationIds CTenantInvitationManagerComp::GetInvitat
 }
 
 
-ITenantInvitationManager::InvitationIds CTenantInvitationManagerComp::GetInvitationsByUser(const QByteArray& userId, const Statuses& statuses) const
+ITenantInvitationManager::InvitationIds CTenantInvitationManagerComp::GetInvitationsByUser(const QByteArray& userId, const Statuses& statuses, bool* isReadPtr) const
 {
 	InvitationIds result;
+	if (isReadPtr != nullptr){
+		*isReadPtr = m_invitationCollectionCompPtr.IsValid();
+	}
+
 	if (!m_invitationCollectionCompPtr.IsValid()){
 		return result;
 	}
 
-	for (const QByteArray& id : GetCandidateInvitationIds("UserId", userId)){
+	bool isRead = true;
+	for (const QByteArray& id : GetCandidateInvitationIds("UserId", userId, &isRead)){
 		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (m_invitationCollectionCompPtr->GetObjectData(id, dataPtr)){
-			const ITenantInvitation* invitationPtr = dynamic_cast<const ITenantInvitation*>(dataPtr.GetPtr());
-			if (invitationPtr != nullptr && invitationPtr->GetUserId() == userId && StatusMatches(*invitationPtr, statuses)){
-				result.append(id);
-			}
+		if (!m_invitationCollectionCompPtr->GetObjectData(id, dataPtr)){
+			isRead = false;
+			continue;
 		}
+
+		const ITenantInvitation* invitationPtr = dynamic_cast<const ITenantInvitation*>(dataPtr.GetPtr());
+		if (invitationPtr != nullptr && invitationPtr->GetUserId() == userId && StatusMatches(*invitationPtr, statuses)){
+			result.append(id);
+		}
+	}
+
+	if (isReadPtr != nullptr){
+		*isReadPtr = isRead;
 	}
 
 	return result;

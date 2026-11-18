@@ -23,6 +23,8 @@ public:
 	virtual void SetUserId(const QByteArray &userId) override;
 	virtual QByteArray GetTenantId() const override;
 	virtual void SetTenantId(const QByteArray &tenantId) override;
+	virtual QByteArray GetProductId() const override;
+	virtual void SetProductId(const QByteArray& productId) override;
 	virtual QDateTime GetCreationDate() const override;
 	virtual void SetCreationDate(const QDateTime& creationDate) override;
 	virtual QDateTime GetExpirationDate() const override;
@@ -41,6 +43,7 @@ private:
 	QByteArray m_token;
 	QByteArray m_userId;
 	QByteArray m_tenantId;
+	QByteArray m_productId;
 
 	QDateTime m_creationDate;
 	QDateTime m_expirationDate;

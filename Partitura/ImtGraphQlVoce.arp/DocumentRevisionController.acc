@@ -36,6 +36,9 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ObjectChangeCheckers" Type="Reference[]" ExportId="ObjectChangeCheckers">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ObjectCollections" Type="Reference[]" ExportId="ObjectCollections">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

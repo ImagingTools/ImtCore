@@ -9,6 +9,7 @@
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
+#include <iprm/IIdParam.h>
 
 // ImtCore includes
 #include <imtserverapp/IJsonRepresentationController.h>
@@ -36,6 +37,7 @@ public:
 		I_ASSIGN(m_paramSetRepresentationControllerCompPtr, "ParamSetRepresentationController", "Representation controller used to convert parameter sets, e.g. selection filters", true, "ParamSetRepresentationController");
 		I_ASSIGN_MULTI_0(m_typeIdsAttrPtr, "TypeIds", "List of type-ID corresponding to the registered factories", false);
 		I_ASSIGN_MULTI_0(m_objectFactoriesCompPtr, "ObjectFactories", "Factory list for creating object instances by type-ID", false);
+		I_ASSIGN(m_accessTokenParamCompPtr, "AccessTokenParam", "Access token of the server, sent with a request that has no token of a caller", false, "AccessTokenParam");
 	I_END_COMPONENT;
 
 	virtual imtgql::IGqlRequest* CreateGetObjectTypeIdRequest(const QByteArray& objectId) const override;
@@ -129,6 +131,7 @@ private:
 	I_REF(IJsonRepresentationController, m_paramSetRepresentationControllerCompPtr);
 	I_MULTIATTR(QByteArray, m_typeIdsAttrPtr);
 	I_MULTIFACT(istd::IChangeable, m_objectFactoriesCompPtr);
+	I_REF(iprm::IIdParam, m_accessTokenParamCompPtr);
 };
 
 
