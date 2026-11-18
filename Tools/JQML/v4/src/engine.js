@@ -563,6 +563,8 @@ export class Engine {
 		this.animations = new Set();
 		this.carets = new Set(); // editors with the focus: their text cursor blinks
 		this.fresh = []; // bindings created since they were last evaluated
+		this.freshLoading = false; // the first values of the bindings are being worked out (evaluateFresh)
+		this.freshLoaders = new Set(); // the Loaders that changed meanwhile: they load when the pass is over
 		this.subQueue = []; // bindings to re-run because a property they read was written
 		this.draining = false;
 		this.trackingPass = 0; // > 0 while every binding is already being swept; writes do not fan out
@@ -770,7 +772,12 @@ export class Engine {
 		hooks.notify = (item, name) => this.notify(item, name);
 		hooks.dirty = (item, name) => this.markReaders(item, name);
 		hooks.geometry = (item) => this.geoDirty.add(item);
-		hooks.reloadLoader = (loader) => this.updateLoader(loader);
+		// While the first values of bindings are worked out, a Loader waits: as in Qt, it loads when the object is complete, after every
+		// property of it has its first value (the handler of a property that comes after `sourceComponent` must see no item).
+		hooks.reloadLoader = (loader) => {
+			if (this.freshLoading) this.freshLoaders.add(loader);
+			else this.updateLoader(loader);
+		};
 		hooks.clipboardWrite = (text, html) => {
 			this.clipboard = { text, html };
 			if (this.onClipboardWrite !== null) this.onClipboardWrite(text, html);
@@ -1561,14 +1568,32 @@ export class Engine {
 		const list = this.fresh;
 		this.fresh = [];
 		this.trackingPass++;
+		const outer = this.freshLoading;
+		this.freshLoading = true;
 		try {
 			for (let pass = 0; pass < 2; pass++) {
 				for (const binding of list) this.evaluateOne(binding, true);
+				this.loadFreshLoaders();
 			}
 		} finally {
+			this.freshLoading = outer;
 			this.trackingPass--;
 		}
 		if (this.connections.size > 0) this.syncConnections();
+	}
+
+	// The Loaders that changed while the first values were worked out load now, one after the other, outside of that work.
+	loadFreshLoaders() {
+		if (this.freshLoaders.size === 0) return;
+		const loaders = [...this.freshLoaders];
+		this.freshLoaders.clear();
+		const outer = this.freshLoading;
+		this.freshLoading = false;
+		try {
+			for (const loader of loaders) this.updateLoader(loader);
+		} finally {
+			this.freshLoading = outer;
+		}
 	}
 
 	// (Re)creates the delegates of every Repeater whose model changed.
@@ -2046,6 +2071,9 @@ export class Engine {
 			loader.$failed = false;
 			const before = new Set(loader.$children);
 			if (key !== '' && key !== null) {
+				// The properties of the Loader take their first values before it loads, as in Qt: the handlers of their change see
+				// no item yet (a dialog moves its Loader by the size of the window only when it has an item).
+				this.evaluateFresh();
 				const mark = this.completed.length;
 				this.guard(() => {
 					let created = null;
@@ -2077,6 +2105,9 @@ export class Engine {
 						loader.$removeChild(child);
 					}
 				} else {
+					// The size of the Loader is the size of its item, which it did not have while the item was made: the layouts that its
+					// onCompleted handlers asked for ran with a Loader of size 0 and left nothing queued, so the Loader asks for one more.
+					loader.$update();
 					// A loaded item with no onCompleted still has bindings (anchors.fill: parent) that must run before geometry is read.
 					// The Loader sizes its item after the bindings of the item have run, as in Qt: a size that it wrote while they ran
 					// (its own `height` binding is one of them) would be written over by the binding of the item that comes after.
