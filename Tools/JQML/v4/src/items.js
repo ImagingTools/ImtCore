@@ -2455,6 +2455,12 @@ export class Text extends Item {
 		this.$hoveredLink = '';
 		this.$pressedLink = '';
 		this.$richState = { docKey: null, doc: null, key: null, layout: null };
+		// `padding` and the padding of each side; a side without its own (null) has `padding`
+		this.$pad = 0;
+		this.$padL = null;
+		this.$padR = null;
+		this.$padT = null;
+		this.$padB = null;
 		this.$declareSignal('linkActivated', ['link']);
 		this.$declareSignal('linkHovered', ['link']);
 	}
@@ -2463,13 +2469,24 @@ export class Text extends Item {
 		return this.$font !== null ? this.$font : (this.$font = new FontGroup(this));
 	}
 
+	$padding(field) {
+		const own = this[field];
+		return own === null ? this.$pad : own;
+	}
+
+	// The width the text is laid out in: the width of the item without its left and right padding (0: none).
+	$layoutWidth() {
+		const width = this.$w > 0 ? this.$w : this.$aw > 0 ? this.$aw : 0;
+		return width > 0 ? Math.max(0, width - this.$padding('$padL') - this.$padding('$padR')) : 0;
+	}
+
 	// Measured text: the font, the lines and their widths. Honours wrapMode once a width is known.
 	$measure() {
 		let lay = this.$lay;
 		const family = this.$family !== '' ? this.$family : fonts.defaultFamily();
 		const rich = false;
 		const source = this.$text;
-		const explicit = this.$w > 0 ? this.$w : this.$aw > 0 ? this.$aw : 0;
+		const explicit = this.$layoutWidth();
 		const wrap = explicit > 0 && wraps(this.$wrap);
 		const limit = wrap ? explicit : Infinity;
 		const elideLimit = !rich && !wrap && (this.$elide === 0 || this.$elide === 1 || this.$elide === 2) ? explicit : 0;
@@ -2511,10 +2528,6 @@ export class Text extends Item {
 		return 'plain';
 	}
 
-	$richWidth() {
-		return this.$w > 0 ? this.$w : this.$aw > 0 ? this.$aw : 0;
-	}
-
 	// The layout of the marked up text for a width (0: none), kept while nothing it depends on changes.
 	$richLayout(width) {
 		const kind = this.$kind();
@@ -2537,7 +2550,7 @@ export class Text extends Item {
 
 	$richMetrics() {
 		const kind = this.$kind();
-		const explicit = this.$richWidth();
+		const explicit = this.$layoutWidth();
 		const lay = this.$richLayout(explicit);
 		const factor = this.$lineHeight > 0 ? this.$lineHeight : 1;
 		const contentWidth = kind === 'rich' && explicit > 0 ? Math.max(explicit, lay.contentWidth) : lay.contentWidth;
@@ -2546,7 +2559,7 @@ export class Text extends Item {
 	}
 
 	$paintRich(r, opacity) {
-		const layout = this.$richLayout(this.$richWidth());
+		const layout = this.$richLayout(this.$layoutWidth());
 		const family = this.$family !== '' ? this.$family : fonts.defaultFamily();
 		paintRichText(r, layout, {
 			fonts,
@@ -2554,7 +2567,7 @@ export class Text extends Item {
 			size: this.$pixelSize > 0 ? this.$pixelSize : 12,
 			bold: this.$bold,
 			italic: this.$italic,
-			width: this.$richWidth(),
+			width: this.$layoutWidth(),
 			pack: (color) => r.pack(toColor(color), opacity),
 			baseColor: layout.baseColor !== null ? r.pack(toColor(layout.baseColor), opacity) : r.pack(this.$color, opacity),
 			linkColor: r.pack(toColor(this.$linkColor), opacity),
@@ -2564,20 +2577,20 @@ export class Text extends Item {
 	// The link at a point of the text, or ''.
 	linkAt(x, y) {
 		if (this.$text === '' || this.$kind() === 'plain') return '';
-		return linkAtPoint(this.$richLayout(this.$richWidth()), toFloat(x), toFloat(y));
+		return linkAtPoint(this.$richLayout(this.$layoutWidth()), toFloat(x) - this.$padding('$padL'), toFloat(y) - this.$padding('$padT'));
 	}
 
 	// A text with links takes the pointer over a link only: the hand, the hovered link, and `linkActivated` for a click on it.
 	$itemAt(px, py, wheel = false, button = -1) {
 		if (wheel || !this.$visible || this.$text === '' || this.$kind() === 'plain' || !this.$text.includes('href')) return super.$itemAt(px, py, wheel, button);
 		if (button > 0 || this.$rotation !== 0 || this.$scale !== 1) return null;
-		const layout = this.$richLayout(this.$richWidth());
+		const layout = this.$richLayout(this.$layoutWidth());
 		if (layout.links.length === 0) return null;
-		return linkAtPoint(layout, px - this.$sx, py - this.$sy) !== '' ? this : null;
+		return this.$linkAtScene(px, py) !== '' ? this : null;
 	}
 
 	$linkAtScene(x, y) {
-		return linkAtPoint(this.$richLayout(this.$richWidth()), x - this.$sx, y - this.$sy);
+		return linkAtPoint(this.$richLayout(this.$layoutWidth()), x - this.$sx - this.$padding('$padL'), y - this.$sy - this.$padding('$padT'));
 	}
 
 	$setHoveredLink(link) {
@@ -2614,15 +2627,22 @@ export class Text extends Item {
 		return fonts.get(family, this.$pixelSize > 0 ? this.$pixelSize : 12, this.$bold, this.$italic);
 	}
 
-	// Laid-out size. Plain text uses the font height; rich text uses the wider line spacing.
-	// An explicit width makes rich text report that width, and a lineHeight other than 1 shortens the implicit height by the extra leading.
+	// Laid-out size: the implicit size has the padding, the content size does not. Plain text uses the font height; rich text uses the
+	// wider line spacing.
 	$metrics() {
-		if (this.$text !== '' && this.$kind() !== 'plain') return this.$richMetrics();
+		const metrics = this.$text !== '' && this.$kind() !== 'plain' ? this.$richMetrics() : this.$plainMetrics();
+		metrics.implicitWidth += this.$padding('$padL') + this.$padding('$padR');
+		metrics.implicitHeight += this.$padding('$padT') + this.$padding('$padB');
+		return metrics;
+	}
+
+	// An explicit width makes rich text report that width, and a lineHeight other than 1 shortens the implicit height by the extra leading.
+	$plainMetrics() {
 		const info = this.$fontInfo();
 		const rich = false;
 		const source = this.$text;
 		// The width that the anchors give (`anchors.left` and `anchors.right`) wraps the text like a `width` does.
-		const explicit = this.$w > 0 ? this.$w : this.$aw > 0 ? this.$aw : 0;
+		const explicit = this.$layoutWidth();
 		const wrap = explicit > 0 && wraps(this.$wrap);
 		const natural = blockMetrics(info, source, false, Infinity);
 		const laid = wrap ? blockMetrics(info, source, true, explicit) : natural;
@@ -2644,16 +2664,22 @@ export class Text extends Item {
 		return this.$metrics().implicitHeight;
 	}
 
+	// The text is painted inside the padding.
 	$paint(r, opacity) {
 		if (this.$text.length === 0 || this.$pixelSize <= 0) return;
-		if (this.$kind() !== 'plain') {
-			this.$paintRich(r, opacity);
-			return;
-		}
+		const left = this.$padding('$padL');
+		const top = this.$padding('$padT');
+		r.translate(left, top);
+		if (this.$kind() !== 'plain') this.$paintRich(r, opacity);
+		else this.$paintPlain(r, opacity);
+		r.translate(-left, -top);
+	}
+
+	$paintPlain(r, opacity) {
 		const lay = this.$measure();
 		const info = lay.info;
 		const color = r.pack(this.$color, opacity);
-		const box = this.$aw > 0 ? this.$aw : lay.width;
+		const box = this.$aw > 0 ? Math.max(0, this.$aw - this.$padding('$padL') - this.$padding('$padR')) : lay.width;
 		const align = this.$hAlign;
 		for (let li = 0; li < lay.lines.length; li++) {
 			const baseline = li * info.lineHeight + info.ascent;
@@ -2721,6 +2747,42 @@ defineField(Text.prototype, 'elide', '$elide', toElideMode);
 defineField(Text.prototype, 'horizontalAlignment', '$hAlign', toFloat);
 defineField(Text.prototype, 'textFormat', '$format', (value) => (value === undefined || value === null ? 'PlainText' : String(value)));
 defineField(Text.prototype, 'lineHeight', '$lineHeight', toFloat);
+const TEXT_PADDING = [['leftPadding', '$padL'], ['rightPadding', '$padR'], ['topPadding', '$padT'], ['bottomPadding', '$padB']];
+// `padding` is the padding of every side that has none of its own
+defineProp(
+	Text.prototype,
+	'padding',
+	function () {
+		return this.$pad;
+	},
+	function (value) {
+		const v = toFloat(value);
+		if (same(this.$pad, v)) return;
+		this.$pad = v;
+		for (const [name, field] of TEXT_PADDING) {
+			if (this[field] === null) markReaders(this, name);
+		}
+		this.$update();
+	},
+	true,
+);
+// The padding of a side; undefined gives it `padding` again (Qt's reset)
+for (const [name, field] of TEXT_PADDING) {
+	defineProp(
+		Text.prototype,
+		name,
+		function () {
+			return this.$padding(field);
+		},
+		function (value) {
+			const v = value === undefined || value === null ? null : toFloat(value);
+			if (same(this[field], v)) return;
+			this[field] = v;
+			this.$update();
+		},
+		true,
+	);
+}
 // True when an elide mode cut the text (a text that does not fit and does not wrap).
 defineReadOnly(Text.prototype, 'truncated', function () {
 	if (this.$text !== '' && this.$kind() !== 'plain') return false;
@@ -2737,7 +2799,7 @@ defineReadOnly(Text.prototype, 'lineCount', function () {
 	const kind = this.$text === '' ? 'plain' : this.$kind();
 	if (kind === 'rich') return 1; // Qt does not count the lines of a document
 	if (kind === 'styled') {
-		const lines = this.$richLayout(this.$richWidth()).lines;
+		const lines = this.$richLayout(this.$layoutWidth()).lines;
 		return Math.max(1, lines.filter((line) => !line.trailingSynthetic && !line.spacer).length);
 	}
 	return this.$measure().lines.length;
