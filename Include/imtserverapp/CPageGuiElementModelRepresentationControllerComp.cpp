@@ -3,7 +3,9 @@
 
 
 // ImtCore includes
+#include <imtserverapp/CCommandRepresentationController.h>
 #include <imtserverapp/IPageGuiElementModel.h>
+#include <imtserverapp/imtserverapp.h>
 
 
 namespace imtserverapp
@@ -44,7 +46,9 @@ bool CPageGuiElementModelRepresentationControllerComp::GetRepresentationFromData
 
 	representation.insert(QStringLiteral("source"), pageQmlItemFilePath);
 	representation.insert(QStringLiteral("startItem"), startSourceItem);
-	representation.insert(QStringLiteral("groupId"), QString::fromUtf8(guiElementPtr->GetGroupId()));
+	// The group is shown by name and icon only: it carries no permissions of its own
+	const CCommandRepresentationController groupRepresentationController(m_translationManagerCompPtr.GetPtr());
+	SetupPageGroupRepresentation(*guiElementPtr, groupRepresentationController, representation, paramsPtr);
 
 	return true;
 }

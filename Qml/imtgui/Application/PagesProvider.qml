@@ -10,9 +10,6 @@ QtObject {
 
     property TreeItemModel pagesModel: TreeItemModel {};
 
-    // Menu groups the pages refer to by "groupId". Stays empty when the server has no groups.
-    property TreeItemModel pageGroupsModel: TreeItemModel {};
-
     // Set on any answer, an empty page list included - the page count alone cannot tell "still loading" from "no pages".
     property bool pagesReceived: false;
 
@@ -22,7 +19,6 @@ QtObject {
 
     function clearModel(){
         pagesModel.clear();
-        pageGroupsModel.clear();
         pagesProvider.pagesReceived = false;
     }
 
@@ -39,15 +35,9 @@ QtObject {
             queryFields.InsertField("source");
             queryFields.InsertField("startItem");
             queryFields.InsertField("groupId");
+            queryFields.InsertField("groupName");
+            queryFields.InsertField("groupIcon");
             query.AddField(queryFields);
-
-            var groupItemsFields = Gql.GqlObject("items");
-            groupItemsFields.InsertField("id");
-            groupItemsFields.InsertField("name");
-            groupItemsFields.InsertField("icon");
-            var groupsFields = Gql.GqlObject("groups");
-            groupsFields.InsertFieldObject(groupItemsFields);
-            query.AddField(groupsFields);
 
             var gqlData = query.GetQuery();
 
@@ -61,17 +51,9 @@ QtObject {
 
                     if(dataModelLocal.containsKey("PagesData")){
                         dataModelLocal = dataModelLocal.getData("PagesData");
+                        dataModelLocal = dataModelLocal.getData("items");
 
-                        // Servers with their own page list send no groups; the groups go first so the menu is built once
-                        var groupsModel = dataModelLocal.containsKey("groups") ? dataModelLocal.getData("groups") : null;
-                        if (groupsModel && groupsModel.containsKey("items")){
-                            pagesProvider.pageGroupsModel = groupsModel.getData("items");
-                        }
-                        else{
-                            pagesProvider.pageGroupsModel.clear();
-                        }
-
-                        pagesProvider.pagesModel = dataModelLocal.getData("items");
+                        pagesProvider.pagesModel = dataModelLocal;
                     }
                 }
 

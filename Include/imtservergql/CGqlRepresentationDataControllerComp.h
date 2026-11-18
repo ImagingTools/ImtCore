@@ -24,8 +24,6 @@ public:
 		I_REGISTER_INTERFACE(imtgql::IGqlRepresentationController);
 		I_ASSIGN(m_dataModelCompPtr, "DataModel", "Data model used for representation", true, "DataModel");
 		I_ASSIGN(m_representationControllerCompPtr, "RepresentationController", "Controller for data model representation", true, "RepresentationController");
-		I_ASSIGN_MULTI_0(m_subRepresentationIdsAttrPtr, "SubRepresentationIds", "Field names under which the representations of 'SubRepresentations' are added to the query answer", false);
-		I_ASSIGN_MULTI_0(m_subRepresentationsCompPtr, "SubRepresentations", "Representations added to the query answer, one for each field name of 'SubRepresentationIds'", false);
 	I_END_COMPONENT;
 
 protected:
@@ -40,8 +38,6 @@ protected:
 protected:
 	I_REF(istd::IChangeable, m_dataModelCompPtr);
 	I_REF(imtserverapp::IRepresentationController, m_representationControllerCompPtr);
-	I_MULTIATTR(QByteArray, m_subRepresentationIdsAttrPtr);
-	I_MULTIREF(imtgql::IGqlRepresentationController, m_subRepresentationsCompPtr);
 };
 
 

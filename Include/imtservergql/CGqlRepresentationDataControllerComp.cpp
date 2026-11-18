@@ -41,21 +41,6 @@ QJsonObject CGqlRepresentationDataControllerComp::CreateRepresentationFromReques
 
 	bool result = m_representationControllerCompPtr->GetRepresentationFromDataModel(*m_dataModelCompPtr, representationModel, representationParamsPtr.GetPtr());
 	if (result){
-		const int subRepresentationsCount = qMin(m_subRepresentationIdsAttrPtr.GetCount(), m_subRepresentationsCompPtr.GetCount());
-		for (int i = 0; i < subRepresentationsCount; ++i){
-			const imtgql::IGqlRepresentationController* subRepresentationPtr = m_subRepresentationsCompPtr[i];
-			if (subRepresentationPtr == nullptr){
-				continue;
-			}
-
-			const QJsonObject subRepresentation = subRepresentationPtr->CreateRepresentationFromRequest(gqlRequest, errorMessage);
-			if (!subRepresentation.contains(QStringLiteral("data"))){
-				return QJsonObject();
-			}
-
-			representationModel.insert(QString::fromUtf8(m_subRepresentationIdsAttrPtr[i]), subRepresentation.value(QStringLiteral("data")));
-		}
-
 		QJsonObject rootObj;
 		rootObj.insert(QStringLiteral("data"), representationModel);
 		return rootObj;

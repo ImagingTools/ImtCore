@@ -41,10 +41,6 @@ Rectangle {
 	// Model for pages with bottom alignment
 	property TreeItemModel bottomPagesModel: TreeItemModel {};
 
-	// Menu groups (id, name, icon). A page joins a group by its "groupId";
-	// pages of one group are expected to follow each other in the page model.
-	property TreeItemModel groupsModel: TreeItemModel {};
-
 	// IDs of the folded groups, in the form ",groupA,groupB,".
 	property string collapsedGroups: ",";
 
@@ -408,18 +404,15 @@ Rectangle {
 		bottomAlignmentPages.model = bottomPagesModel;
 	}
 
-	function getGroupName(groupId){
-		if (!menuPanel.groupsModel){
-			return groupId;
+	// The page carries the name of its group
+	function getPageGroupName(pagesModel, index){
+		if (!pagesModel || index < 0 || index >= pagesModel.getItemsCount() || !pagesModel.containsKey("groupName", index)){
+			return "";
 		}
 
-		for (let i = 0; i < menuPanel.groupsModel.getItemsCount(); i++){
-			if (menuPanel.groupsModel.getData("id", i) === groupId){
-				return menuPanel.groupsModel.getData("name", i);
-			}
-		}
+		let groupName = pagesModel.getData("groupName", index);
 
-		return groupId;
+		return groupName ? groupName : "";
 	}
 
 	function getPageGroupId(pagesModel, index){
@@ -514,7 +507,7 @@ Rectangle {
 
 				visible: menuPanel.isGroupStart(allPages.model, model.index);
 				groupId: pageItem.groupId;
-				title: menuPanel.groupsModel ? menuPanel.getGroupName(pageItem.groupId) : pageItem.groupId;
+				title: menuPanel.getPageGroupName(allPages.model, model.index);
 				groupCollapsed: pageItem.groupCollapsed;
 				panelCollapsed: menuPanel.collapsed;
 				collapsedPanelWidth: menuPanel.collapsedWidth;
@@ -1015,7 +1008,7 @@ anchors.topMargin: menuPanel.railMode ? Style.marginXS
 
 							visible: menuPanel.isGroupStart(topAlignmentPages.model, model.index);
 							groupId: topPageItem.groupId;
-							title: menuPanel.groupsModel ? menuPanel.getGroupName(topPageItem.groupId) : topPageItem.groupId;
+							title: menuPanel.getPageGroupName(topAlignmentPages.model, model.index);
 							groupCollapsed: topPageItem.groupCollapsed;
 							panelCollapsed: menuPanel.collapsed;
 							collapsedPanelWidth: menuPanel.collapsedWidth;

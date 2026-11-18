@@ -24,10 +24,10 @@ public:
 	virtual QString GetStartSourceItem() const = 0;
 
 	/**
-		Get ID of the menu group this page belongs to.
-		\return Empty ID if the page is not part of any group.
+		Get the menu group this page belongs to: its ID, name and icon.
+		\return nullptr if the page is not part of any group.
 	*/
-	virtual QByteArray GetGroupId() const = 0;
+	virtual const IGuiElementModel* GetGroup() const = 0;
 };
 
 
