@@ -150,8 +150,56 @@ bool CGqlFieldObject::Serialize(iser::IArchive& /*archive*/)
 
 // reimplemented (istd::IChangeable)
 
-bool CGqlFieldObject::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
+bool CGqlFieldObject::IsEqual(const IChangeable& object) const
 {
+	const CGqlFieldObject* sourcePtr = dynamic_cast<const CGqlFieldObject*>(&object);
+	if (sourcePtr == nullptr){
+		return false;
+	}
+
+	if (sourcePtr == this){
+		return true;
+	}
+
+	if (m_emptyFields != sourcePtr->m_emptyFields){
+		return false;
+	}
+
+	if (m_objectFields.keys() != sourcePtr->m_objectFields.keys()){
+		return false;
+	}
+
+	for (auto it = m_objectFields.constBegin(); it != m_objectFields.constEnd(); ++it){
+		const std::shared_ptr<CGqlFieldObject>& otherPtr = sourcePtr->m_objectFields.value(it.key());
+		if ((it.value() == nullptr) != (otherPtr == nullptr)){
+			return false;
+		}
+
+		if (it.value() != nullptr && !it.value()->IsEqual(*otherPtr)){
+			return false;
+		}
+	}
+
+	if (m_fragmentFields.keys() != sourcePtr->m_fragmentFields.keys()){
+		return false;
+	}
+
+	for (auto it = m_fragmentFields.constBegin(); it != m_fragmentFields.constEnd(); ++it){
+		const std::shared_ptr<CGqlFieldFragment>& otherPtr = sourcePtr->m_fragmentFields.value(it.key());
+		if ((it.value() == nullptr) != (otherPtr == nullptr)){
+			return false;
+		}
+
+		if (it.value() != nullptr && !it.value()->IsEqual(*otherPtr)){
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+bool CGqlFieldObject::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/){
 	const CGqlFieldObject* sourcePtr = dynamic_cast<const CGqlFieldObject*>(&object);
 	if (sourcePtr != nullptr){
 		istd::CChangeNotifier changeNotifier(this);

@@ -19,6 +19,8 @@ public:
 
 	QByteArray GetValue();
 	operator QVariant() const;
+	bool operator==(const CGqlEnum& other) const;
+	bool operator!=(const CGqlEnum& other) const;
 
 protected:
 	QByteArray m_value;
