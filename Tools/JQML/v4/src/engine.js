@@ -132,8 +132,7 @@ const IGNORED_TYPES = new Set([
 	'AnchorChanges', 'StateChangeScript', 'ParentChange', 'StateGroup', 'Glow', 'RectangularGlow',
 	'InnerShadow', 'FastBlur', 'GaussianBlur', 'ColorOverlay', 'OpacityMask', 'LinearGradient', 'RadialGradient', 'Blend',
 	'BrightnessContrast', 'Colorize', 'Desaturate', 'DisplacementMap', 'HueSaturation', 'ShaderEffect', 'ShaderEffectSource',
-	'Translate', 'Rotation', 'Scale', 'Matrix4x4', 'DoubleValidator', 'IntValidator',
-	'RegExpValidator',
+	'Translate', 'Rotation', 'Scale', 'Matrix4x4', 'RegExpValidator',
 ]);
 
 // Enumerations whose values are not interpreted by the engine: each name stands for itself.
@@ -254,6 +253,56 @@ function formatDateTime(value, format, defaultOptions) {
 	}
 	return result;
 }
+
+// The `Locale` of Qt.locale(): the locale of the browser or the one named ("de_DE"), with its number separators. The QML methods
+// of Date take it (installLocaleDates).
+class QmlLocale {
+	constructor(name) {
+		this.name = name;
+		this.$tag = name.replace('_', '-');
+		let parts = [];
+		try {
+			parts = new Intl.NumberFormat(this.$tag).formatToParts(12345.6);
+		} catch {
+			this.$tag = undefined;
+			parts = new Intl.NumberFormat().formatToParts(12345.6);
+		}
+		const part = (type, fallback) => (parts.find((p) => p.type === type) || { value: fallback }).value;
+		this.decimalPoint = part('decimal', '.');
+		this.groupSeparator = part('group', ',');
+	}
+}
+
+function qmlLocale(name) {
+	if (name) return new QmlLocale(String(name));
+	const tag = typeof navigator !== 'undefined' && navigator.language ? navigator.language : 'en-US';
+	return new QmlLocale(tag.replace('-', '_'));
+}
+
+// Locale.FormatType, and the styles of Intl for it: the date and the time.
+const LOCALE_FORMAT = Object.freeze({ LongFormat: 0, ShortFormat: 1, NarrowFormat: 2 });
+const LOCALE_STYLES = [{ date: 'full', time: 'long' }, { date: 'short', time: 'short' }, { date: 'short', time: 'short' }];
+
+// Date.toLocaleString(locale, format), toLocaleDateString and toLocaleTimeString of QML: with a Locale the format is a
+// Locale.FormatType (LongFormat when there is none) or a text of Qt ("dd.MM.yyyy"). Other calls are the methods of JavaScript.
+function installLocaleDates() {
+	for (const [method, parts] of [['toLocaleString', ['date', 'time']], ['toLocaleDateString', ['date']], ['toLocaleTimeString', ['time']]]) {
+		const native = Date.prototype[method];
+		if (native.$qml === true) continue;
+		const qml = function (locale, format) {
+			if (!(locale instanceof QmlLocale)) return native.apply(this, arguments);
+			if (typeof format === 'string') return formatDateTime(this, format, {});
+			const style = LOCALE_STYLES[format === undefined ? 0 : format] || LOCALE_STYLES[0];
+			const options = {};
+			if (parts.includes('date')) options.dateStyle = style.date;
+			if (parts.includes('time')) options.timeStyle = style.time;
+			return native.call(this, locale.$tag, options);
+		};
+		qml.$qml = true;
+		Object.defineProperty(Date.prototype, method, { value: qml, writable: true, configurable: true });
+	}
+}
+installLocaleDates();
 
 // Qt::BrushStyle, the second argument of `ctx.createPattern(color, mode)`.
 const BRUSH_PATTERN = Object.freeze({
@@ -654,7 +703,7 @@ export class Engine {
 			formatDateTime: (d, f) => { const z = (n) => String(n).padStart(2, '0'); return String(f).replace('dd', z(d.getDate())).replace('MM', z(d.getMonth() + 1)).replace('yyyy', d.getFullYear()).replace('hh', z(d.getHours())).replace('mm', z(d.getMinutes())); },
 			isQtObject: (v) => v !== null && typeof v === 'object' && v.$typeName !== undefined,
 			atob: (s) => atob(s), btoa: (s) => btoa(s),
-			locale: () => ({ decimalPoint: (1.5).toLocaleString().charAt(1), name: typeof navigator === 'undefined' ? '' : navigator.language }),
+			locale: (name) => qmlLocale(name),
 			openUrlExternally: (url) => { window.open(String(url), '_blank'); return true; },
 			point: (x, y) => ({ x, y }),
 			size: (width, height) => ({ width, height }),
@@ -710,6 +759,7 @@ export class Engine {
 			Canvas: CANVAS,
 			Gradient: enumObject(['Vertical', 'Horizontal']),
 			FileDialog: Object.freeze(Object.fromEntries(FILE_DIALOG_MODES.map((name, index) => [name, index]))),
+			Locale: LOCALE_FORMAT,
 			XMLHttpRequest: typeof XMLHttpRequest === 'undefined' ? class XMLHttpRequest { open() {} send() {} setRequestHeader() {} } : XMLHttpRequest,
 			Animation: Object.freeze({ Infinite: -1, Forward: 'Forward', Backward: 'Backward' }),
 			Easing: enumObject(['Linear', 'InQuad', 'OutQuad', 'InOutQuad', 'OutInQuad', 'InCubic', 'OutCubic', 'InOutCubic', 'OutInCubic', 'InQuart', 'OutQuart', 'InOutQuart', 'InQuint', 'OutQuint', 'InOutQuint', 'InSine', 'OutSine', 'InOutSine', 'InExpo', 'OutExpo', 'InOutExpo', 'InCirc', 'OutCirc', 'InOutCirc', 'InElastic', 'OutElastic', 'InOutElastic', 'InBack', 'OutBack', 'InOutBack', 'InBounce', 'OutBounce', 'InOutBounce', 'BezierSpline']),
@@ -1059,10 +1109,12 @@ export class Engine {
 						for (const name of declared.keys()) singletons.set(name, this.project.moduleSingletonPath(imp.name, name, imp.version));
 					}
 				}
-				if (singletons.size === 0) continue;
+				// The alias of a module also gives the enumerations of the engine: `Platform.FileDialog.OpenFiles`.
+				const moduleAlias = imp.kind === 'module' && imp.alias !== '';
+				if (singletons.size === 0 && !moduleAlias) continue;
 				if (layer === null) layer = Object.create(null);
 				if (imp.alias) {
-					if (!Object.prototype.hasOwnProperty.call(layer, imp.alias)) layer[imp.alias] = Object.create(null);
+					if (!Object.prototype.hasOwnProperty.call(layer, imp.alias)) layer[imp.alias] = Object.create(moduleAlias ? this.globals : null);
 					for (const [name, path] of singletons) define(layer[imp.alias], name, path);
 				} else {
 					for (const [name, path] of singletons) if (this.ambiguousSingletons.has(name)) define(layer, name, path);
@@ -2382,11 +2434,22 @@ export class Engine {
 		}
 	}
 
+	// `Platform.FileDialog` of `import Qt.labs.platform 1.1 as Platform`: a type under the alias of a module that has no file for
+	// it is a type of the engine, as without the alias.
+	moduleTypeName(type, file) {
+		const dot = type.indexOf('.');
+		if (dot < 0 || this.project === null) return type;
+		const doc = this.project.docs.get(file);
+		const alias = type.slice(0, dot);
+		if (doc === undefined || !this.project.fileImports(doc).some((imp) => imp.kind === 'module' && imp.alias === alias)) return type;
+		return this.project.resolveType(type, file) === null ? type.slice(dot + 1) : type;
+	}
+
 	// Creates the item of an object definition below `parent`. `overlays` are the definitions (use
 	// sites of a component) that are applied on top of `def`.
 	// `fromScript`: the parent was given by a script (`createObject(parent)`), not by the nesting of the QML source.
 	createItem(def, scope, parent, overlays, index, depth, fromScript = false) {
-		const type = def.type;
+		const type = this.moduleTypeName(def.type, scope.file);
 		if (this.lenient && IGNORED_TYPES.has(type)) return null;
 		let item;
 		const builtin = BUILTIN_TYPES.get(type);
@@ -3029,6 +3092,7 @@ export class Engine {
 			this.defineAlias(item, prop, scope);
 			return;
 		}
+		if (prop.isRequired && prop.text === null && this.defineRequired(item, prop.name, scope)) return;
 		// `property string` always holds a string.
 		if (prop.typeName === 'string') item.$defineCustom(prop.name, '', toQmlString, prop.isReadonly === true);
 		else if (INT_TYPES.has(prop.typeName)) item.$defineCustom(prop.name, 0, toQmlInt, prop.isReadonly === true);
@@ -3040,6 +3104,29 @@ export class Engine {
 		else if (prop.typeName === 'rect') item.$defineCustom(prop.name, { x: 0, y: 0, width: 0, height: 0 }, null, prop.isReadonly === true);
 		else item.$defineCustom(prop.name, undefined, null, prop.isReadonly === true);
 		if (prop.text !== null) this.setValue(item, [prop.name], prop.text, scope, prop);
+	}
+
+	// `required property var modelData` of a delegate: Qt sets it from the row, as `index`, `model` and the roles. The property
+	// reads the variable of the row (it follows the row when the delegate is reused); `index` is the one the delegate has. False
+	// for an item that is not made for a row (it has no `index`): the property is an ordinary one, set by createObject() or the
+	// use site.
+	defineRequired(item, name, scope) {
+		if (item.$custom === null || !('index' in item.$custom)) return false;
+		if (name === 'index') return true;
+		let delegateScope = scope;
+		while (delegateScope !== null && delegateScope.data === null) delegateScope = delegateScope.parent;
+		if (delegateScope === null) return false;
+		const context = delegateScope.context;
+		Object.defineProperty(item, name, {
+			get: () => context[name],
+			set: (value) => {
+				const variable = Object.getOwnPropertyDescriptor(context, name);
+				if (variable !== undefined && variable.set !== undefined) context[name] = value;
+			},
+			enumerable: true,
+			configurable: true,
+		});
+		return true;
 	}
 
 	// `property alias name: target.property`: reads and writes are forwarded to the target.
@@ -3097,6 +3184,16 @@ export class Engine {
 		});
 	}
 
+	// The function of a handler: its statements, or the arrow or function expression that is the whole handler
+	// (`Keys.onPressed: function(event) {...}`), not a statement that builds and drops it. Called with the item as `this`.
+	compileHandler(body, params, scope, item, line) {
+		if (!callableHandler(body)) return this.compile('body', body, params, scope, item, line);
+		const produce = this.compile('expr', body, '', scope, item, line);
+		return function (...args) {
+			return produce.call(this).apply(this, args);
+		};
+	}
+
 	connectHandler(item, prop, scope, completedOut) {
 		const name = prop.name;
 		const body = prop.text === null ? '' : prop.text;
@@ -3105,29 +3202,22 @@ export class Engine {
 			return;
 		}
 		if (name === 'Component.onCompleted') {
-			completedOut.push({ fn: this.compile('body', body, '', scope, item, prop.line), item, line: prop.line, file: scope.file });
+			completedOut.push({ fn: this.compileHandler(body, '', scope, item, prop.line), item, line: prop.line, file: scope.file });
 			return;
 		}
 		if (name === 'ListView.onPooled' || name === 'ListView.onReused') {
 			const key = name === 'ListView.onPooled' ? '$pooledFns' : '$reusedFns';
 			if (item[key] === undefined) item[key] = [];
-			item[key].push({ fn: this.compile('body', body, '', scope, item, prop.line), file: scope.file, line: prop.line });
+			item[key].push({ fn: this.compileHandler(body, '', scope, item, prop.line), file: scope.file, line: prop.line });
 			return;
 		}
 		if (name === 'Component.onDestruction') {
 			if (item.$destruction === undefined) item.$destruction = [];
-			item.$destruction.push({ fn: this.compile('body', body, '', scope, item, prop.line), file: scope.file, line: prop.line });
+			item.$destruction.push({ fn: this.compileHandler(body, '', scope, item, prop.line), file: scope.file, line: prop.line });
 			return;
 		}
 		if (name === 'Keys.onPressed' || name === 'Keys.onReleased' || NAMED_KEY_HANDLERS.has(name)) {
-			let fn;
-			if (callableHandler(body)) {
-				// `Keys.onPressed: function(event) { ... }` (Qt 6): the function expression is the handler.
-				const produce = this.compile('expr', body, '', scope, item, prop.line);
-				fn = (...args) => produce.call(item).apply(item, args);
-			} else {
-				fn = this.compile('body', body, 'event', scope, item, prop.line);
-			}
+			const fn = this.compileHandler(body, 'event', scope, item, prop.line);
 			if (item.$keys === undefined) item.$keys = { pressed: [], released: [], byKey: new Map() };
 			if (name === 'Keys.onPressed') item.$keys.pressed.push(fn);
 			else if (name === 'Keys.onReleased') item.$keys.released.push(fn);
@@ -3150,7 +3240,7 @@ export class Engine {
 			if (name.length > 9 && name.endsWith('Changed')) {
 				// A property change handler: the property is polled once per evaluation pass.
 				const property = decapitalize(name.slice(2, -7));
-				const fn = this.compile('body', body, '', scope, item, prop.line);
+				const fn = this.compileHandler(body, '', scope, item, prop.line);
 				// The handler starts from the value the property has now, so the first assigned or bound value is a change (as in Qt).
 				// An alias whose target does not exist yet has no value to start from: its first value is the initial one.
 				let initial;
@@ -3167,14 +3257,7 @@ export class Engine {
 			}
 			return;
 		}
-		let fn;
-		if (callableHandler(body)) {
-			// The arrow or function expression is the handler, not a statement that builds and drops it.
-			const produce = this.compile('expr', body, '', scope, item, prop.line);
-			fn = (...args) => produce.call(item).apply(item, args);
-		} else {
-			fn = this.compile('body', body, signal.params.join(', '), scope, item, prop.line);
-		}
+		const fn = this.compileHandler(body, signal.params.join(', '), scope, item, prop.line);
 		item.$connect(signalName, (...args) => this.guard(() => fn.apply(item, args), `handler '${name}' (${scope.file})`, prop.line));
 	}
 
@@ -3278,7 +3361,7 @@ export class Engine {
 		if (handler.fn !== null) {
 			call = handler.fn;
 		} else {
-			const fn = this.compile('body', handler.body, signal === undefined ? '' : signal.params.join(', '), handler.scope, conn, handler.line);
+			const fn = this.compileHandler(handler.body, signal === undefined ? '' : signal.params.join(', '), handler.scope, conn, handler.line);
 			call = (...args) => fn.apply(conn, args);
 		}
 		const run = (...args) => {

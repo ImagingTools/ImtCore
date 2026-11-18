@@ -6755,6 +6755,45 @@ defineField(RegularExpressionValidator.prototype, 'regularExpression', '$express
 	return value;
 });
 
+// `IntValidator`: an integer from `bottom` to `top`.
+export class IntValidator extends QtObject {
+	constructor() {
+		super();
+		this.$typeName = 'IntValidator';
+		for (const [name, initial] of [['bottom', -2147483648], ['top', 2147483647], ['locale', '']]) this.$defineCustom(name, initial);
+	}
+
+	accepts(text) {
+		const value = String(text).trim();
+		if (!/^[+-]?\d+$/.test(value)) return false;
+		const number = Number(value);
+		return number >= this.bottom && number <= this.top;
+	}
+}
+
+// `DoubleValidator`: a number from `bottom` to `top` with at most `decimals` digits after the decimal point of the locale
+// (the one of the browser, as Qt.locale(); '.' for the locale "C"). `notation`: 0 standard, 1 scientific (the default).
+export class DoubleValidator extends QtObject {
+	constructor() {
+		super();
+		this.$typeName = 'DoubleValidator';
+		for (const [name, initial] of [['bottom', -Infinity], ['top', Infinity], ['decimals', 1000], ['notation', 1], ['locale', '']]) {
+			this.$defineCustom(name, initial);
+		}
+	}
+
+	accepts(text) {
+		const point = this.locale === 'C' ? '.' : (1.5).toLocaleString().charAt(1);
+		const value = String(text).trim().replace(point, '.');
+		const pattern = this.notation === 0 ? /^[+-]?(\d*)(?:\.(\d*))?$/ : /^[+-]?(\d*)(?:\.(\d*))?(?:[eE][+-]?\d+)?$/;
+		const match = pattern.exec(value);
+		if (match === null || (match[1] === '' && !match[2])) return false;
+		if (match[2] !== undefined && match[2].length > this.decimals) return false;
+		const number = Number(value);
+		return Number.isFinite(number) && number >= this.bottom && number <= this.top;
+	}
+}
+
 // The data model of ImtCore (`TreeItemModel`): a list of rows, each row is a map key -> value, where a value
 // is a plain value or a nested model. Only the commonly used part of its interface is implemented.
 /* probe-xhr */ if (typeof XMLHttpRequest !== 'undefined') { const open = XMLHttpRequest.prototype.open; XMLHttpRequest.prototype.open = function () { const r = open.apply(this, arguments); if (XMLHttpRequest.QMLAuthToken) this.setRequestHeader('X-authentication-token', XMLHttpRequest.QMLAuthToken); return r; }; }
@@ -10323,6 +10362,8 @@ readsUntracked(SdlList, ['get']);
 
 export const BUILTIN_TYPES = new Map([
 	['RegularExpressionValidator', RegularExpressionValidator],
+	['IntValidator', IntValidator],
+	['DoubleValidator', DoubleValidator],
 	['Settings', Settings],
 	['WebSocket', WebSocketItem],
 	['GqlModel', GqlModel],
