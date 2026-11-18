@@ -4,6 +4,8 @@
 // `quietMs`, or bails out after `timeout`. Network tracking below turns "is a request still in flight"
 // from a guess into a fact, so quietMs only has to cover the render flush after mutations stop.
 
+const { knownBackend, detectBackend, locate, callQmlTest } = require('./qml');
+
 const DEFAULTS = { quietMs: 150, timeout: 6000 };
 const NETWORK_IDLE_TIMEOUT = 5000;
 // A settled action is: DOM mutates -> quiet while a request is in flight -> response -> DOM mutates ->
@@ -24,6 +26,13 @@ const BUSY_INDICATOR_TIMEOUT = 5000;
  */
 async function waitForBusyIndicatorGone(page, options = {}) {
   const { timeout = BUSY_INDICATOR_TIMEOUT } = options;
+  if (knownBackend(page) === 'qml') {
+    const deadline = Date.now() + timeout;
+    while ((await locate(page, BUSY_SELECTOR).count().catch(() => 0)) > 0 && Date.now() < deadline) {
+      await page.waitForTimeout(100);
+    }
+    return;
+  }
   try {
     await page.waitForFunction((selector) => !document.querySelector(selector), BUSY_SELECTOR, {
       timeout,
@@ -115,8 +124,29 @@ async function waitForNetworkIdle(page, options = {}) {
   });
 }
 
+/**
+ * One quiet pass on JQML v4, where nothing mutates a DOM: the application says itself when it is idle (no frame
+ * wanted, no animation, picture or request in progress). It is asked again after `quietMs`, so a view that arrives
+ * in chunks is not caught in the gap between two of them. Resolves after `timeout` regardless.
+ */
+async function qmlQuietOnce(page, quietMs, timeout) {
+  const deadline = Date.now() + timeout;
+  const idle = () => callQmlTest(page, 'whenIdle', { timeout: Math.max(0, deadline - Date.now()) });
+  // Right after a navigation the new document may not have published qmlTest or built its first document yet.
+  await page
+    .waitForFunction(() => window.qmlTest !== undefined && window.qmlTest.started === true, undefined, {
+      timeout: Math.max(1, deadline - Date.now()),
+      polling: 100,
+    })
+    .catch(() => {});
+  await idle();
+  await page.waitForTimeout(Math.min(quietMs, Math.max(0, deadline - Date.now())));
+  await idle();
+}
+
 /** One DOM-quiet pass: resolves after `quietMs` with no mutations, or after `timeout` regardless. */
 function domQuietOnce(page, quietMs, timeout) {
+  if (knownBackend(page) === 'qml') return qmlQuietOnce(page, quietMs, timeout);
   return page.evaluate(
     ({ quietMs, timeout }) =>
       new Promise((resolve) => {
@@ -165,6 +195,8 @@ async function waitForStable(page, options = {}) {
   trackNetwork(page);
 
   try {
+    // The backend decides what "quiet" means (DOM mutations or the idle state of JQML v4); one look, no waiting.
+    await detectBackend(page);
     for (let round = 0; round < MAX_SETTLE_ROUNDS; round++) {
       await domQuietOnce(page, quietMs, Math.max(0, deadline - Date.now()));
 
