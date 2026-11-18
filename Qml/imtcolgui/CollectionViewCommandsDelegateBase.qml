@@ -455,11 +455,11 @@ ViewCommandsDelegateBase {
 			else {
 				let fileName = filePath
 				let fileNameWithExt = fileName;
+				let ext = "";
 				let parts = filePath.split('/')
 				if (parts.length > 0){
 					fileNameWithExt = parts[parts.length - 1];
 					let data = parts[parts.length - 1].split('.')
-					let ext = "";
 					if (data.length > 0){
 						ext = data[data.length - 1]
 						fileName = data[0]

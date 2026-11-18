@@ -8,7 +8,13 @@ const STYLE = bits.STYLE
 const Stretch = 0, PreserveAspectFit = 1, PreserveAspectCrop = 2, Tile = 3, TileVertically = 4, TileHorizontally = 5, Pad = 6
 const Null = 0, Ready = 1, Loading = 2, Error = 3
 
-// In the browser every image loads asynchronously; Qt loads local files synchronously unless `asynchronous`
+// Qt loads local files (and qrc) synchronously unless `asynchronous`, remote ones asynchronously; the page loads every
+// image asynchronously. As Qt's QQuickPixmapCache an image the page has loaded is Ready at once; a new local source keeps
+// the image it replaces (status, size, picture) until it is loaded, so no Loading state shows in between; a remote
+// source goes through Loading as in Qt
+const loadedImages = new Map()      // url -> { width, height }
+const isRemote = (source) => /^(https?|ftp):/i.test(String(source))
+const nativeImage = () => typeof globalThis !== 'undefined' && globalThis.Image ? globalThis.Image : null
 // sourceSize: a size value type with width / height; unset parts are -1
 class SourceSize extends GroupObject {}
 defineType(SourceSize, {
@@ -31,33 +37,57 @@ class Image extends Item {
             this.$loader.onload = this.$loader.onerror = null
             this.$loader = null
         }
-        this.$natural = null
         if(!source){
+            this.$natural = null
+            this.$url = ''
             this.$write(Image.PROGRESS, 0)
             this.$write(Image.STATUS, Null)
             this.$updateSize()
             return
         }
-        if(typeof document === 'undefined') return
-        let loader = new window.Image()
+        let Native = nativeImage()
+        if(!Native) return
+        let url = require('../Core/Resources').resolveUrl(source)
+        let cached = loadedImages.get(url)
+        if(cached){
+            this.$ready(url, cached)
+            return
+        }
+        let keep = !isRemote(source) && this.$v[Image.STATUS] === Ready && !this.$v[Image.ASYNCHRONOUS]
+        if(!keep){
+            this.$natural = null
+            this.$url = url
+            this.$updateSize()
+            this.$write(Image.PROGRESS, 0)
+            this.$write(Image.STATUS, Loading)
+        }
+        let loader = new Native()
         this.$loader = loader
-        this.$write(Image.PROGRESS, 0)
-        this.$write(Image.STATUS, Loading)
         loader.onload = () => engine.batch(() => {
             if(this.$loader !== loader) return
-            this.$natural = { width: loader.naturalWidth, height: loader.naturalHeight }
-            this.$updateSize()
-            this.$write(Image.PROGRESS, 1)
-            this.$write(Image.STATUS, Ready)
+            this.$loader = null
+            let size = { width: loader.naturalWidth, height: loader.naturalHeight }
+            loadedImages.set(url, size)
+            this.$ready(url, size)
         })
         loader.onerror = () => engine.batch(() => {
             if(this.$loader !== loader) return
+            this.$loader = null
             engine.reportError('Cannot open: ' + source, 'Image')
+            this.$natural = null
+            this.$url = url
+            this.$updateSize()
             this.$write(Image.STATUS, Error)
         })
-        let url = require('../Core/Resources').resolveUrl(source)
-        this.$url = url
         loader.src = url
+    }
+
+    $ready(url, size){
+        this.$natural = { width: size.width, height: size.height }
+        this.$url = url
+        this.$updateSize()
+        this.$write(Image.PROGRESS, 1)
+        this.$write(Image.STATUS, Ready)
     }
 
     // implicit size: the loaded size scaled to sourceSize (one dimension keeps the aspect ratio)
@@ -105,8 +135,7 @@ class Image extends Item {
         super.$paint(dirty)
         if(!(dirty & STYLE) || !this.$dom) return
         let s = this.$dom.style
-        let source = this.$v[Image.SOURCE]
-        let url = source ? this.$url : ''
+        let url = this.$url || ''
         s.backgroundImage = url ? 'url(' + JSON.stringify(String(url)) + ')' : ''
         let mode = this.$v[Image.FILLMODE]
         let size = { [Stretch]: '100% 100%', [PreserveAspectFit]: 'contain', [PreserveAspectCrop]: 'cover', [Pad]: 'auto' }[mode] || 'auto'

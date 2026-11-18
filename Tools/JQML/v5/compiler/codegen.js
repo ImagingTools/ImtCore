@@ -19,6 +19,13 @@ const JS_GLOBALS = new Set([
     'globalThis', 'BigInt', 'Intl', 'Reflect', 'Proxy', 'alert', 'print', 'gc',
 ])
 
+// QML types that only the C++ of the desktop host registers in a module (qmlRegisterType, qmlRegisterSingletonInstance
+// of com.imtcore.imtqml, Impl/JQMLHost/Main.cpp): a file importing the module may name them in code the page does not
+// run (an else of Qt.platform.os === "web"); the page has none of them
+const NATIVE_TYPES = new Map([
+    ['com.imtcore.imtqml', new Set(['NetworkEventInterceptor', 'DocumentServiceController', 'DataModelController'])],
+])
+
 const QML_KIND = {
     int: 'int', real: 'real', double: 'real', bool: 'bool', string: 'string', url: 'string',
     color: 'color', var: 'var', variant: 'var', Component: 'component',
@@ -153,9 +160,11 @@ class Codegen {
     resolveImports(file){
         file.typeImports = []
         file.namespaces = new Map()
+        file.nativeNames = new Set()
         for(let imp of file.imports){
             let target = String(imp.path || '').replace(/^["']|["']$/g, '')
             if(target.endsWith('.js')) continue
+            if(imp.isModule && !imp.as && NATIVE_TYPES.has(target)) for(let name of NATIVE_TYPES.get(target)) file.nativeNames.add(name)
             let source = imp.isModule ? (this.modules.has(target) ? { module: target } : null) : imp.dirKey ? { dir: imp.dirKey } : null
             if(imp.as) file.namespaces.set(imp.as, source)
             else if(source) file.typeImports.unshift(source)
@@ -314,6 +323,8 @@ class Codegen {
     resolver(el, selfExpr, file, memberEl){
         const resolve = (name) => {
             if(name === '$self' || name === '$s' || name === 'JQ') return null
+            // qsTr of a QML document translates in the context of its file (lupdate: the file's base name)
+            if(name === 'qsTr' && !this.declaresName(el, name)) return 'JQ.qsTrIn(' + JSON.stringify(this.translationContext(file)) + ')'
             let depth = 0
             for(let scope = el.scope; scope; scope = scope.parent, depth++){
                 if(scope.ids.has(name)) return '$s' + '.$p'.repeat(depth) + '[' + scope.ids.get(name) + ']'
@@ -346,7 +357,7 @@ class Codegen {
             for(let scope = el.scope; scope; scope = scope.parent, depth++){
                 if(scope.isDelegate) return 'JQ.mctx($s' + '.$p'.repeat(depth) + ').$role(' + JSON.stringify(name) + ')'
             }
-            if(name !== 'model' && name !== 'index' && name !== 'modelData' && name !== 'context') this.warn(file, el.line, name + ' is not found')
+            if(name !== 'model' && name !== 'index' && name !== 'modelData' && name !== 'context' && !(file.nativeNames && file.nativeNames.has(name))) this.warn(file, el.line, name + ' is not found')
             return 'JQ.ctx($s,' + JSON.stringify(name) + ')'
         }
         // x.createQmlObject(...) creates in the context of the call: the file, the scope and the names of its ids
@@ -354,6 +365,17 @@ class Codegen {
             resolve.callingContext = () => ({ qt: file.typeRef.ref + '$qt', scope: '$s', ids: this.scopeInfo(file, el.scope) })
         }
         return resolve
+    }
+
+    translationContext(file){
+        let owner = file.inlineOf || file
+        return path.basename(String(owner.fileName || owner.name || ''), '.qml')
+    }
+
+    // an id or a member of the scope named name (it would hide the global)
+    declaresName(el, name){
+        for(let scope = el.scope; scope; scope = scope.parent) if(scope.ids.has(name)) return true
+        return !!this.member(el, name)
     }
 
     // the scope of the document instance from the code of el: its scripts are per document instance
@@ -660,6 +682,21 @@ class Codegen {
                 return
             }
         }
+        // a group in a group: Drag.hotSpot.x
+        if(parts.length === 3){
+            let m = this.member(el, parts[0])
+            let outer = m && m.kind === 'prop' && m.group
+            let inner = outer && outer.$type.propByName.get(parts[1])
+            if(inner && inner.group){
+                if(!inner.group.$type.propByName.get(parts[2])){
+                    this.report(file, 2, assign.nameAt || assign, 'Cannot assign to non-existent property "' + parts[2] + '"', el.type + '.' + assign.name + ' is not found')
+                    return
+                }
+                let groupRef = this.classRef(el) + '.$type.propByName.get(' + JSON.stringify(parts[0]) + ').group.$type.propByName.get(' + JSON.stringify(parts[1]) + ').group'
+                this.assignValue(file, el, v + '.' + parts[0] + '.' + parts[1], parts[2], assign.value, assign.raw, groupRef + '.' + parts[2].toUpperCase(), v)
+                return
+            }
+        }
         // an attached object of no known type, or a group that is no member: errors of Qt; a known one is a gap of the runtime
         let first = parts[0]
         let legacy = el.type + '.' + assign.name + ' is not supported yet'
@@ -847,13 +884,15 @@ class Codegen {
         return null
     }
 
-    // `function onFoo(args) {...}` in Connections is a handler; any `onFoo:` handler makes them ignored (Qt docs)
+    // `function onFoo(args) {...}` in Connections is a handler; any `onFoo:` handler makes them ignored (Qt docs).
+    // It stays a method of the Connections too: the other functions call it by its name (QQmlConnections is the
+    // scope object of its functions)
     prepareConnections(file){
         for(let el of file.elements){
             if(!this.isConnections(el)) continue
             let functions = el.methods.filter(m => /^on[A-Z]/.test(m.name))
-            el.methods = el.methods.filter(m => !/^on[A-Z]/.test(m.name))
-            if(el.handlers.length) continue
+            // attached handlers (Component.onCompleted) are no handlers of the Connections
+            if(el.handlers.some(h => !h.name.includes('.'))) continue
             for(let m of functions) el.handlers.push({ name: m.name, value: ['function'], raw: m.raw.replace(/^function\s+[\w$]+\s*\(/, 'function('), line: m.line, declaredFunction: true })
         }
     }

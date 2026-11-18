@@ -10,8 +10,18 @@ const style = (item) => engine.markDirty(item, STYLE)
 let canvasContext = null
 const measureCache = new Map()
 
+// A family the system does not have: Qt takes the default font of the system (QFontDatabase falls back to the
+// application font), the browser its own default font (a serif one); the system's UI font follows the family
+const GENERIC_FAMILY = /^(serif|sans-serif|monospace|cursive|fantasy|system-ui|ui-[a-z-]+|math|emoji)$/i
+function familyCss(family){
+    let list = String(family || '').split(',').map((f) => f.trim()).filter(Boolean)
+    let css = list.map((f) => GENERIC_FAMILY.test(f) || /^(["']).*\1$/.test(f) ? f : '"' + f.replace(/["\\]/g, '') + '"')
+    if(!list.some((f) => GENERIC_FAMILY.test(f))) css.push('system-ui', 'sans-serif')
+    return css.join(', ')
+}
+
 function fontCss(f){
-    return (f.italic ? 'italic ' : '') + (f.weight !== 400 ? f.weight + ' ' : '') + f.pixelSize + 'px ' + f.family
+    return (f.italic ? 'italic ' : '') + (f.weight !== 400 ? f.weight + ' ' : '') + f.pixelSize + 'px ' + familyCss(f.family)
 }
 
 // Same metrics as core/TextController.measureTextFast of the current runtime
@@ -87,4 +97,4 @@ function wrapParagraph(paragraph, mode, width, font, out){
     out.push(line.replace(/\s+$/, ''))
 }
 
-module.exports = { style, fontCss, measure, NOWRAP, wrapParagraph }
+module.exports = { style, familyCss, fontCss, measure, NOWRAP, wrapParagraph }

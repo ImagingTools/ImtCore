@@ -450,4 +450,6 @@ defineType(MouseArea, {
     }
 }
 
+MouseArea.prototype.$isMouseArea = true
+
 module.exports = { MouseEvent, WheelEvent, MouseDrag, MouseArea }

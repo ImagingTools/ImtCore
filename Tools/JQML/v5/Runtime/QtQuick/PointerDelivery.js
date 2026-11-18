@@ -59,6 +59,40 @@ function itemsAt(item, x, y, out, all){
 
 // ---- delivery -------------------------------------------------------------------------------
 
+// QQuickDeliveryAgentPrivate::sendFilteredPointerEvent: the ancestors of the receiver that filter the events of their
+// children (Flickable: childMouseEventFilter) see the event first, the outermost one first. The result: the item
+// that takes the mouse instead of the receiver, or null; filtered: the receiver does not get the event
+function filterChildEvent(kind, receiver, x, y, buttons, seen){
+    let filters = []
+    for(let it = receiver && receiver.$parent; it instanceof Item; it = it.$parent){
+        if(it.$filterPointer) filters.unshift(it)
+    }
+    let result = { grabber: null, filtered: false }
+    for(let filter of filters){
+        if(seen){
+            if(seen.has(filter)) continue
+            seen.add(filter)
+        }
+        let p = local(filter, x, y)
+        let r = filter.$filterPointer(kind, receiver, p.x, p.y, buttons)
+        if(r.grab && !result.grabber) result.grabber = filter
+        if(r.filter){
+            result.filtered = true
+            if(!result.grabber) result.grabber = filter
+            break
+        }
+    }
+    return result
+}
+
+// the grab goes to another item: the one that had it is told (QQuickWindow::mouseUngrabEvent, MouseArea.canceled)
+function transferGrab(item){
+    let old = scene.grabber
+    scene.grabber = item
+    if(old && old !== item && !(old.$f & engine.DESTROYED) && old.$ungrabMouse) old.$ungrabMouse()
+    if(scene.grabber !== item) scene.grabber = item
+}
+
 const scene = {
     roots: [],
     element: null,
@@ -103,8 +137,14 @@ function press(x, y, button, buttons, modifiers, doubleClick, native = null){
             return
         }
         scene.grabber = null
+        let filtered = new Set()
         for(let target of targetsAt(x, y)){
             let item = target.item
+            let filter = filterChildEvent('press', item, x, y, buttons, filtered)
+            if(filter.filtered){
+                scene.grabber = filter.grabber
+                break
+            }
             if(native && item === native){
                 reached = true
                 break
@@ -135,6 +175,12 @@ function move(x, y, buttons, modifiers){
         scene.modifiers = modifiers
         let grabber = scene.grabber
         if(grabber && !(grabber.$f & engine.DESTROYED)){
+            let filter = filterChildEvent('move', grabber, x, y, buttons, null)
+            if(filter.grabber && filter.grabber !== grabber){
+                transferGrab(filter.grabber)
+                return
+            }
+            if(filter.filtered) return
             let p = local(grabber, x, y)
             if(grabber.$mouseMove) grabber.$mouseMove(p.x, p.y, buttons, modifiers)
         } else {
@@ -152,8 +198,10 @@ function release(x, y, button, buttons, modifiers){
         scene.modifiers = modifiers
         let grabber = scene.grabber
         if(grabber && !(grabber.$f & engine.DESTROYED)){
+            let filter = filterChildEvent('release', grabber, x, y, buttons, null)
             let p = local(grabber, x, y)
-            if(grabber.$mouseRelease) grabber.$mouseRelease(p.x, p.y, button, buttons, modifiers)
+            if(!filter.filtered && grabber.$mouseRelease) grabber.$mouseRelease(p.x, p.y, button, buttons, modifiers)
+            else if(filter.filtered && grabber.$ungrabMouse) grabber.$ungrabMouse()
         }
         if(!buttons){
             scene.grabber = null
@@ -303,8 +351,13 @@ function setCursor(cursor){
 
 const DOM_BUTTON = [LeftButton, MiddleButton, RightButton, 8, 16]
 
+// Qt on macOS (Qt::AA_MacDontSwapCtrlAndMeta off): the Command key is Qt::ControlModifier, the Control key Qt::MetaModifier
+const isMac = () => typeof navigator !== 'undefined' && !!navigator && /Mac|iPhone|iPad|iPod/.test(String(navigator.platform || ''))
+
 function modifiersOf(e){
-    return (e.shiftKey ? 0x02000000 : 0) | (e.ctrlKey ? 0x04000000 : 0) | (e.altKey ? 0x08000000 : 0) | (e.metaKey ? 0x10000000 : 0)
+    let mac = isMac()
+    return (e.shiftKey ? 0x02000000 : 0) | (e.altKey ? 0x08000000 : 0)
+        | (e.ctrlKey ? (mac ? 0x10000000 : 0x04000000) : 0) | (e.metaKey ? (mac ? 0x04000000 : 0x10000000) : 0)
 }
 
 function pointOf(e){
@@ -355,6 +408,40 @@ function listen(element){
         if(wheel(p.x, p.y, angleDelta, pixelDelta, e.buttons, modifiersOf(e))) e.preventDefault()
     }, { passive: false })
     document.documentElement.addEventListener('mouseleave', leaveWindow)
+    // QQuickDeliveryAgent: a single touch point is delivered as the left button (mouse synthesized from touch); the
+    // browser does not pan or zoom the page, the views flick
+    if(element && element.style) element.style.touchAction = 'none'
+    let touchId = null
+    const touchPoint = (e) => {
+        for(let touch of e.changedTouches) if(touch.identifier === touchId) return touch
+        return null
+    }
+    window.addEventListener('touchstart', (e) => {
+        if(touchId !== null || e.touches.length !== 1) return
+        let touch = e.changedTouches[0]
+        if(isNative(e) && !e.target.$item) return
+        touchId = touch.identifier
+        let p = pointOf(touch)
+        let native = isNative(e) ? e.target.$item : null
+        if(press(p.x, p.y, LeftButton, LeftButton, modifiersOf(e), false, native)) return
+        if(e.cancelable) e.preventDefault()
+    }, { passive: false })
+    window.addEventListener('touchmove', (e) => {
+        let touch = touchPoint(e)
+        if(!touch) return
+        let p = pointOf(touch)
+        move(p.x, p.y, LeftButton, modifiersOf(e))
+        if(scene.grabber && e.cancelable) e.preventDefault()
+    }, { passive: false })
+    const touchEnd = (e) => {
+        let touch = touchPoint(e)
+        if(!touch) return
+        touchId = null
+        let p = pointOf(touch)
+        release(p.x, p.y, LeftButton, NoButton, modifiersOf(e))
+    }
+    window.addEventListener('touchend', touchEnd)
+    window.addEventListener('touchcancel', touchEnd)
 }
 
 function addRoot(item, element){
@@ -435,4 +522,4 @@ Object.assign(Item.prototype, {
     }
 }
 
-module.exports = { NoButton, LeftButton, scenePos, contains, scene, targetsAt, press, move, release, leaveWindow, wheel, ungrab, pointerOver, deliverHover, isHovered }
+module.exports = { modifiersOf, NoButton, LeftButton, scenePos, contains, scene, targetsAt, press, move, release, leaveWindow, wheel, ungrab, pointerOver, deliverHover, isHovered }

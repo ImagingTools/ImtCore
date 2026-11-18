@@ -6,6 +6,7 @@ const { Item } = require('./Item')
 const { Keys } = require('./Keys')
 const { KeyNavigation } = require('./KeyNavigation')
 const { KeyEvent } = require('./KeyEvent')
+const QtEnums = require('../Qt/enums')
 
 const agent = { root: null, activeFocusItem: null, windowFocused: false }
 
@@ -197,7 +198,103 @@ function deliverTo(item, event, kind){
         if(result) return result
     }
     if(filterKey(item, event, kind, true)) return ACCEPTED
+    // QQuickItemPrivate::deliverKeyEvent: a Tab nobody took moves the focus along the chain, from the contentItem or an
+    // item that takes the focus by Tab; not with Ctrl or Alt
+    if(kind === 'pressed' && (item === agent.root || item.$v[Item.ACTIVEFOCUSONTAB]) && !(event.modifiers & (QtEnums.ControlModifier | QtEnums.AltModifier))){
+        let backward = event.key === QtEnums.Key_Backtab || (event.key === QtEnums.Key_Tab && (event.modifiers & QtEnums.ShiftModifier))
+        if((backward || event.key === QtEnums.Key_Tab) && focusNextPrev(item, !backward)) return ACCEPTED
+    }
     return 0
+}
+
+// ---- the tab focus chain (QQuickItemPrivate::nextPrevItemInTabFocusChain) ----
+
+const childItems = (item) => (item.$children || []).filter((child) => child instanceof Item)
+const parentItem = (item) => item.$parent instanceof Item ? item.$parent : null
+
+// depth-first through the items of the window, children in their order; the first visible, enabled item with
+// activeFocusOnTab (Qt::TabFocusAllControls: QQuickItemPrivate::canAcceptTabFocus takes any item of the window).
+// With wrap the chain goes on from the start; it gives the item itself when no other one takes the focus
+function nextPrevItemInTabFocusChain(item, forward, wrap = true){
+    if(!inWindow(item)) return item
+    let from = null
+    if(forward) from = parentItem(item)
+    else {
+        let children = childItems(item)
+        from = children.length ? children[0] : parentItem(item)
+    }
+    let startItem = item
+    let originalStartItem = startItem
+    while(startItem && !startItem.$v[Item.VISIBLE]) startItem = parentItem(startItem)
+    if(!startItem) return item
+    let firstFromItem = from
+    let current = item
+    let seen = new Set()
+    let skip
+    do {
+        skip = false
+        let last = current
+        let children = childItems(current)
+        let hasChildren = children.length > 0 && isEnabled(current) && current.$v[Item.VISIBLE]
+        let firstChild = hasChildren ? children[0] : null
+        let lastChild = hasChildren ? children[children.length - 1] : null
+        let parent = parentItem(current)
+        if(hasChildren && from === parent){
+            if(forward) current = firstChild
+            else {
+                current = lastChild
+                if(childItems(current).length) skip = true
+            }
+        } else if(hasChildren && forward && from !== lastChild){
+            current = children[children.indexOf(from) + 1]
+        } else if(hasChildren && !forward && from !== firstChild){
+            current = children[children.indexOf(from) - 1]
+            if(!current) return item
+            if(childItems(current).length) skip = true
+        } else if(parent){
+            // the parent would be visited twice
+            if(forward) skip = true
+            else {
+                let firstSibling = childItems(parent)[0]
+                if(firstSibling && (last !== firstSibling || (parent.$isFocusScope && parent.$v[Item.ACTIVEFOCUSONTAB] && parent.$v[Item.ACTIVEFOCUS]))) skip = true
+            }
+            current = parent
+        } else if(hasChildren){
+            if(!wrap) return null
+            if(forward) current = firstChild
+            else {
+                current = lastChild
+                if(childItems(current).length) skip = true
+            }
+        }
+        from = last
+        let cycle = false
+        if(!skip){
+            cycle = seen.has(current)
+            seen.add(current)
+        }
+        if(((current === startItem || current === originalStartItem) && from === firstFromItem) || cycle){
+            return item === agent.root ? item : startItem
+        }
+        if(!firstFromItem){
+            startItem = current
+            firstFromItem = from
+        }
+    } while(skip || !current.$v[Item.ACTIVEFOCUSONTAB] || !isEnabled(current) || !current.$v[Item.VISIBLE])
+    return current
+}
+
+// QQuickItemPrivate::focusNextPrev
+function focusNextPrev(item, forward){
+    let next = nextPrevItemInTabFocusChain(item, forward, true)
+    if(!next || next === item) return false
+    next.forceActiveFocus()
+    return true
+}
+
+// Item.nextItemInFocusChain(forward = true)
+Item.prototype.nextItemInFocusChain = function(forward = true){
+    return nextPrevItemInTabFocusChain(this, forward !== false, true)
 }
 
 // QQuickItemKeyFilter chain: the attached object made last comes first
@@ -373,4 +470,4 @@ for(let [name, Group] of [['Keys', Keys], ['KeyNavigation', KeyNavigation]]){
     }
 }
 
-module.exports = { agent, deliverTo, isEnabled, setWindowFocused, activateWindow, windowCreated, isSyncingDom: () => syncingDom, ACCEPTED, CONSUMED }
+module.exports = { agent, deliverTo, nextPrevItemInTabFocusChain, focusNextPrev, isEnabled, setWindowFocused, activateWindow, windowCreated, isSyncingDom: () => syncingDom, ACCEPTED, CONSUMED }

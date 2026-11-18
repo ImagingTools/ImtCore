@@ -26,6 +26,7 @@ const { Image } = require('./QtQuick/Image')
 const { Canvas } = require('./QtQuick/Canvas')
 const { MouseArea, MouseDrag } = require('./QtQuick/MouseArea')
 const { DropArea } = require('./QtQuick/DropArea')
+const { Drag } = require('./QtQuick/Drag')
 const { Flickable } = require('./QtQuick/Flickable')
 const { Column } = require('./QtQuick/Column')
 const { Row } = require('./QtQuick/Row')
@@ -327,8 +328,23 @@ function singleton(Class){
     return Class.$instance
 }
 
+const Translations = require('./Core/Translations')
+
+function translateIn(context, text, disambiguation, n){
+    let c = rootContext.context
+    return c && c.translateIn ? c.translateIn(context, text, disambiguation, n) : Translations.translate(null, context, text, disambiguation, n)
+}
+
+// qsTr of a QML document: in the context of its file (compiler/codegen.js)
+const trFunctions = new Map()
+function qsTrIn(context){
+    let fn = trFunctions.get(context)
+    if(!fn) trFunctions.set(context, fn = (text, disambiguation, n) => translateIn(context, text, disambiguation, n))
+    return fn
+}
+
 const JQ = {
-    forward, bindAlias, handleGroup, callCreateQmlObject, files, scripts, script, si, sis, moduleScripts, make: engine.make, inContext: engine.inContext, callCreateComponent, sctx, sctxValue, sset, singleton, defineMethod, defaultParent, ctx, ctxValue, mctx, ns, qmlModule, subAssign, rootContext,
+    qsTrIn, forward, bindAlias, handleGroup, callCreateQmlObject, files, scripts, script, si, sis, moduleScripts, make: engine.make, inContext: engine.inContext, callCreateComponent, sctx, sctxValue, sset, singleton, defineMethod, defaultParent, ctx, ctxValue, mctx, ns, qmlModule, subAssign, rootContext,
     engine, defineType, create,
     batch: engine.batch,
     stats: engine.stats,
@@ -337,7 +353,7 @@ const JQ = {
     types: {
         QtObject, Component, Timer, Connections, Binding, ListModel, Instantiator,
         Item, Anchors, FocusScope, Keys, KeyNavigation, Rectangle, Border, Gradient, GradientStop, Text, Font, TextInput, TextEdit, Image, Canvas,
-        MouseArea, MouseDrag, DropArea, Flickable, Column, Row, Flow, Repeater, Loader, ListView, GridView, Shortcut, StandardKey,
+        MouseArea, MouseDrag, DropArea, Drag, Flickable, Column, Row, Flow, Repeater, Loader, ListView, GridView, Shortcut, StandardKey,
         IntValidator, DoubleValidator, RegularExpressionValidator, RegExpValidator, FontLoader,
         State, PropertyChanges, StateChangeScript, Transition, StateGroup,
         Animation, PauseAnimation, PropertyAnimation, NumberAnimation, ColorAnimation, RotationAnimation, SmoothedAnimation,
@@ -346,16 +362,26 @@ const JQ = {
         LayoutAttached, RowLayout, ColumnLayout, GridLayout, StackLayout, LayoutItemProxy,
         Window, FileDialog, FolderDialog, Settings, WebSocket: QmlWebSocket, DropShadow, TestCase, SignalSpy,
         BaseClass, BaseModel, TreeItemModel, GqlModel, GqlRequest, FileIO, Process, RemoteFileController, NavigationHistory,
+        // the Locale of QML: Locale.ShortFormat, the type of Qt.locale()
+        Locale: require('./Qt/Locale').Locale,
     },
     mouse: require('./QtQuick/PointerDelivery'),
+    keys: require('./QtQuick/KeyDelivery'),
+    keyEvent: require('./QtQuick/KeyEvent'),
+    shortcut: require('./QtQuick/Shortcut'),
+    flickable: require('./QtQuick/Flickable'),
+    translations: require('./Core/Translations'),
+    textLayout: require('./QtQuick/TextLayout'),
     QtObject, GroupObject, Item, Anchors, Rectangle, Text, MouseArea, Column, Row, Component, Timer, FocusScope,
 }
 
 if(typeof globalThis !== 'undefined'){
     // the web context translates (and makes qsTr bindings follow the language)
-    globalThis.qsTr = (text) => rootContext.context ? rootContext.context.translate(String(text)) : String(text)
-    globalThis.qsTranslate = (context, text) => globalThis.qsTr(text)
-    if(!globalThis.qsTrId) globalThis.qsTrId = (id) => String(id)
+    // qsTr(sourceText, disambiguation, n), qsTranslate(context, sourceText, disambiguation, n), qsTrId(id, n): the
+    // message of the context (a qsTr of a JavaScript file has none: any context), with n its numerus form and %n
+    globalThis.qsTr = (text, disambiguation, n) => translateIn(null, text, disambiguation, n)
+    globalThis.qsTranslate = (context, text, disambiguation, n) => translateIn(context, text, disambiguation, n)
+    globalThis.qsTrId = (id, n) => rootContext.context && rootContext.context.translateId ? rootContext.context.translateId(id, n) : Translations.translateId(null, id, n)
     if(!globalThis.QT_TR_NOOP) globalThis.QT_TR_NOOP = (text) => text
 }
 
