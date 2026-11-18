@@ -1999,7 +1999,8 @@ export class Engine {
 
 	// (Re)creates the content of every Loader whose source changed.
 	updateLoaders() {
-		for (const loader of [...this.loaders]) this.updateLoader(loader);
+		// a full pass of the bindings follows (evaluateBindings), so the Loaders do not settle them one by one
+		for (const loader of [...this.loaders]) this.updateLoader(loader, false);
 	}
 
 	// What the loader should show now. An inactive loader shows nothing; the last assigned source wins.
@@ -2010,7 +2011,10 @@ export class Engine {
 	}
 
 	// One Loader. The loaded item's onCompleted runs before itemChanged, statusChanged and loaded.
-	updateLoader(loader) {
+	// `settle`: read again the bindings that the Loader told (see below). A Loader that is made with the document does not:
+	// the objects after it do not exist yet, so a pass now would count the failures of the bindings that read them (a binding
+	// that fails 30 times is dropped), and the pass of the whole document follows anyway.
+	updateLoader(loader, settle = true) {
 		if (loader.$destroyed) {
 			this.loaders.delete(loader);
 			return;
@@ -2092,8 +2096,11 @@ export class Engine {
 		}
 		loader.$emit('itemChanged');
 		this.emitLoaderStatus(loader);
+		// The bindings that read the item, the size or the status of the Loader (those of the item among them, which read 0 and null while
+		// it was made) are told by the signals above: they read again before `loaded` and before a layout reads what they set, as in Qt.
+		if (ok && settle) this.runBindingPass();
 		if (ok) loader.$emit('loaded');
-		if (this.loaderKey(loader) !== loader.$wanted) this.updateLoader(loader);
+		if (this.loaderKey(loader) !== loader.$wanted) this.updateLoader(loader, settle);
 	}
 
 	applyInitialProps(item, props) {
@@ -2579,7 +2586,7 @@ export class Engine {
 			}
 		}
 		for (const handler of completedHandlers) this.completed.push(handler);
-		if (item instanceof Loader) this.updateLoader(item);
+		if (item instanceof Loader) this.updateLoader(item, false);
 		return item;
 	}
 
