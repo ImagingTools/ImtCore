@@ -185,6 +185,42 @@ check('a canvas that drew inside of its size is not clipped', canvasClips((ctx) 
 	check('and is the rectangle of the item on the screen', scissor, plain);
 }
 
+// A line thinner than a pixel (a border of height 0.5) is one whole pixel wherever it is: at some positions it covered no pixel centre and vanished.
+{
+	const r = new Renderer(null);
+	r.setMatrix(1, 0, 0, 1, 0, 0);
+	const rows = (dpr, y, h) => {
+		r.dpr = dpr;
+		r.nv = 0;
+		r.ni = 0;
+		r.fillQuad(0, y, 100, h, 0xff000000);
+		const ys = [0, 1, 2, 3].map((i) => r.f32[i * 5 + 1] * dpr);
+		return [Math.min(...ys), Math.max(...ys)].join('-');
+	};
+	let always = true;
+	for (let y = 100; y < 101; y += 0.125) {
+		const [top, bottom] = rows(1, y, 0.5).split('-').map(Number);
+		if (bottom - top !== 1 || !Number.isInteger(top)) always = false;
+	}
+	check('a line of height 0.5 is one whole pixel at every position', always, true);
+	check('and so is one of 0.5 at a device ratio of 2 (a pixel is 0.5)', rows(2, 100.3, 0.25), '200-201');
+	check('a quad that is not thinner than a pixel is left as it is', rows(1, 10.25, 3), '10.25-13.25');
+	// The same for a line of width 0.5 (a vertical one), and for a quad that is thin on both sides.
+	const columns = (x, w, h) => {
+		r.dpr = 1;
+		r.nv = 0;
+		r.ni = 0;
+		r.fillQuad(x, 0, w, h, 0xff000000);
+		const xs = [0, 1, 2, 3].map((i) => r.f32[i * 5]);
+		const ys = [0, 1, 2, 3].map((i) => r.f32[i * 5 + 1]);
+		return [Math.max(...xs) - Math.min(...xs), Number.isInteger(Math.min(...xs)), Math.max(...ys) - Math.min(...ys)].join(',');
+	};
+	let vertical = true;
+	for (let x = 50; x < 51; x += 0.125) if (columns(x, 0.5, 40) !== '1,true,40') vertical = false;
+	check('a line of width 0.5 is one whole pixel at every position', vertical, true);
+	check('a dot thinner than a pixel on both sides is one pixel', columns(7.3, 0.4, 0.4), '1,true,1');
+}
+
 // Like Qt, a fillStyle/strokeStyle that is not a color leaves the style as it was.
 const styled = new CanvasContext(10, 10, []);
 styled.fillStyle = '#ff0000';
@@ -233,6 +269,24 @@ check('a valid fillStyle still applies', styled.fillStyle, 'blue');
 	check('and beyond the bottom edge', Math.round(bottom), 48);
 	check('and not further to the left than blur - offset', Math.round(left), -4);
 	check('and is the more opaque the nearer to the middle', shapes[shapes.length - 1].w < shapes[0].w, true);
+	// What the source holds (the button of a panel) is shown over the shadow too, after the source.
+	const button = new Rectangle();
+	button.$ax = 20;
+	button.$ay = 6;
+	button.$aw = 30;
+	button.$ah = 10;
+	source.$adopt(button);
+	const withChild = [];
+	const order = {
+		...r,
+		fillQuad: (x, y, w, h, alpha) => withChild.push([x, y, w, h].join(',')),
+		fillQuadAA: (x, y, w, h, alpha) => withChild.push([x, y, w, h].join(',')),
+		fillPolygon: (points) => withChild.push(points.join(',')),
+		translate: () => {},
+		setMatrix: () => {},
+	};
+	shadow.$paint(order, 1);
+	check('the content of the source is painted over the shadow', withChild[withChild.length - 1], '0,0,30,10');
 	shadow.$color = parseColor('#00000000');
 	const none = [];
 	shadow.$paint({ pack: () => 0, fillQuad: () => none.push(1), fillPolygon: () => none.push(1) }, 1);
