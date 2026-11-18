@@ -122,10 +122,16 @@ const advance = (size) => size * 0.55;
 }
 
 {
+	const rasterize = fonts.rasterize;
+	const boldGlyphs = [];
+	fonts.rasterize = (info, ch) => {
+		boldGlyphs.push(info.style !== null && info.style.bold);
+		return rasterize(info, ch);
+	};
 	const r = draw((ctx) => ctx.scale(2, 2), 'AbC', 'bold 12px sans-serif');
+	fonts.rasterize = rasterize;
 	check('a bold font stays bold: the font of the scaled size is of the same style', r.glyphs.map((g) => g.size), [24, 24, 24]);
-	const font = fonts.get('sans-serif', 24, true, false);
-	check('the scaled font is the bold one of the scaled size', font.style.bold, true);
+	check('the scaled glyphs are bold', boldGlyphs, [true, true, true]);
 }
 
 {
