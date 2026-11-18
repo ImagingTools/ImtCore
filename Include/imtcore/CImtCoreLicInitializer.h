@@ -18,5 +18,6 @@ Q_ALWAYS_INLINE static void ImtCoreInitLicQmlResources()
 	Q_INIT_RESOURCE(imtlicguiqml);
 	Q_INIT_RESOURCE(imtlicFeaturesSdl);
 	Q_INIT_RESOURCE(imtlicProductsSdl);
+	Q_INIT_RESOURCE(imtlicProductCollectionDocumentServiceSdl);
 	Q_INIT_RESOURCE(imtlicLicensesSdl);
 }

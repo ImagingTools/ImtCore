@@ -16,7 +16,7 @@ Item {
     property int panelWidth: Style.sizeHintXXXS;
 
     // A narrow view keeps only the page icons, so the page itself is not squeezed.
-    readonly property bool compact: root.width > 0 && root.width - root.panelWidth < Style.sizeHintS;
+    readonly property bool compact: root.width > 0 && root.width - root.panelWidth < Style.sizeHintM;
 
     function showNavTooltip(item, text){
         // The decorator places the tooltip next to the tooltip item, so put the item over the page button.

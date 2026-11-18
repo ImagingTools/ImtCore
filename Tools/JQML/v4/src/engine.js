@@ -2041,6 +2041,7 @@ export class Engine {
 			loader.$loaded = null;
 			loader.$failed = false;
 			const before = new Set(loader.$children);
+			loader.$declared = before;
 			if (key !== '' && key !== null) {
 				const mark = this.completed.length;
 				this.guard(() => {
@@ -2089,6 +2090,7 @@ export class Engine {
 			}
 		} finally {
 			loader.$inLoad = false;
+			loader.$declared = null;
 		}
 		loader.$emit('itemChanged');
 		this.emitLoaderStatus(loader);
