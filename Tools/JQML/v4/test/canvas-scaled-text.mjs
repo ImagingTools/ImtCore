@@ -141,10 +141,10 @@ const advance = (size) => size * 0.55;
 	ctx.scale(2, 2);
 	ctx.fillStyle = '#000000';
 	ctx.fillText('A', 10, 20);
+	commands[0].info = fonts.get('', 10, false, false);
 	const r = new Recorder();
 	replayCommands(r, commands, 1, false);
-	const style = commands[0].info.style;
-	check('the glyphs of a font without a family are not changed', style === null ? r.glyphs.map((g) => g.size) : 'has a family', style === null ? [commands[0].info.size] : 'has a family');
+	check('the glyphs of a font without a family are not changed', r.glyphs.map((g) => [g.size, g.scale]), [[10, 2]]);
 }
 
 {
