@@ -8,7 +8,8 @@ include(${IMTCOREDIR}/Config/CMake/ImtCoreSdlCustomConfig.cmake)
 add_custom_target(${PROJECT_NAME}-SDL-related-files SOURCES
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/Features.sdl
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/Licenses.sdl
-			${CMAKE_CURRENT_LIST_DIR}/../1.0/Products.sdl)
+			${CMAKE_CURRENT_LIST_DIR}/../1.0/Products.sdl
+			${CMAKE_CURRENT_LIST_DIR}/../1.0/ProductCollectionDocumentService.sdl)
 
 ImtCoreCustomConfigureSdlCppQml(CXX QML
 			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/Features.sdl"
@@ -21,4 +22,8 @@ ImtCoreCustomConfigureSdlCppQml(CXX QML
 			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/Products.sdl"
 			VERSION		"1.0"
 			SOURCE_NAME	"Products")
+ImtCoreCustomConfigureSdlCppQml(CXX QML
+			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/ProductCollectionDocumentService.sdl"
+			VERSION		"1.0"
+			SOURCE_NAME	"ProductCollectionDocumentService")
 

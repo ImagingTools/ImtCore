@@ -76,6 +76,7 @@ ElementView {
 	signal itemSelected(string itemId, var item)
 
 	bottomComp: collectionSelectView.isSelectionRequired && collectionSelectView.selectedId === "" ? errorComp : undefined
+	isRequired: collectionSelectView.isSelectionRequired
 
 	//! Override to add request headers.
 	function getHeaders(){

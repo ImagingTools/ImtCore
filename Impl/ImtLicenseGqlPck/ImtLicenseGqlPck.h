@@ -21,6 +21,9 @@
 #include <imtlicgql/CProductMetaInfoDelegateComp.h>
 #include <imtlicgql/CLicenseMetaInfoDelegateComp.h>
 #include <imtlicgql/CProductInfoFileGeneratorComp.h>
+#include <imtlicgql/CProductCollectionDocumentServiceComp.h>
+#include <imtlicgql/CProductDocumentValidatorComp.h>
+#include <imtlicgql/CProductDocumentNameProviderComp.h>
 
 
 /**
@@ -31,6 +34,9 @@ namespace ImtLicenseGqlPck
 
 
 typedef imtlicgql::CProductCollectionControllerComp ProductCollectionController;
+typedef imtlicgql::CProductCollectionDocumentServiceComp ProductCollectionDocumentService;
+typedef imtlicgql::CProductDocumentValidatorComp ProductDocumentValidator;
+typedef imtlicgql::CProductDocumentNameProviderComp ProductDocumentNameProvider;
 typedef imtlicgql::CProductControllerComp ProductController;
 typedef imtlicgql::CLicenseControllerComp LicenseController;
 typedef imtlicgql::CLicenseCollectionControllerComp LicenseCollectionController;

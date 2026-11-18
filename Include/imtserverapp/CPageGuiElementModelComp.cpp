@@ -30,6 +30,12 @@ QString CPageGuiElementModelComp::GetPageQmlItemFilePath() const
 }
 
 
+const IGuiElementModel* CPageGuiElementModelComp::GetGroup() const
+{
+	return m_groupCompPtr.GetPtr();
+}
+
+
 } // namespace imtserverapp
 
 

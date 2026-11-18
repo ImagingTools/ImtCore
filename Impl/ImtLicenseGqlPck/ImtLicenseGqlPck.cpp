@@ -85,6 +85,21 @@ I_EXPORT_COMPONENT(
 			"Product info file generator",
 			"Product Info File Generator");
 
+I_EXPORT_COMPONENT(
+			ProductCollectionDocumentService,
+			"Product collection document service",
+			"Product Collection Document Service");
+
+I_EXPORT_COMPONENT(
+			ProductDocumentValidator,
+			"Validator of product documents",
+			"Product Document Validator");
+
+I_EXPORT_COMPONENT(
+			ProductDocumentNameProvider,
+			"Name of product documents",
+			"Product Document Name Provider");
+
 
 } // namespace ImtLicenseGqlPck
 

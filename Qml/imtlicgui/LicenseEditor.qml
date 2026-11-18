@@ -28,6 +28,8 @@ ViewBase {
 	property var parentLicenseIds: []
 	property string productId: ""
 	property bool canEdit: false
+	// Products a license can be defined for (all of them unless the page narrows it down).
+	property TreeItemModel productsModel: CachedProductCollection.collectionModel
 	// Part of the product this editor works in; scopes its permission checks.
 	property string permissionPath: ""
 
@@ -38,6 +40,7 @@ ViewBase {
 		CachedLicenseCollection.updateModel()
 		CachedFeatureCollection.modelUpdated.connect(licenseEditor.onCollectionsChanged)
 		CachedLicenseCollection.modelUpdated.connect(licenseEditor.onCollectionsChanged)
+		CachedProductCollection.modelUpdated.connect(licenseEditor.onProductsChanged)
 		multiPageView.updatePages()
 		multiPageView.ensurePageLoaded(0)
 		multiPageView.ensurePageLoaded(1)
@@ -47,6 +50,7 @@ ViewBase {
 	Component.onDestruction: {
 		CachedFeatureCollection.modelUpdated.disconnect(licenseEditor.onCollectionsChanged)
 		CachedLicenseCollection.modelUpdated.disconnect(licenseEditor.onCollectionsChanged)
+		CachedProductCollection.modelUpdated.disconnect(licenseEditor.onProductsChanged)
 	}
 
 	LocalizationEvent {
@@ -55,6 +59,25 @@ ViewBase {
 
 	function onCollectionsChanged() {
 		rebuildEntries()
+	}
+
+	// The products may come after the license: the combo box is filled in place, so its pick is set again
+	function onProductsChanged() {
+		productsTimer.restart()
+	}
+
+	Timer {
+		id: productsTimer
+		interval: 0
+		onTriggered: {
+			var generalPageInstance = multiPageView.getPageByIndex(0)
+			if (generalPageInstance) {
+				licenseEditor.setBlockingUpdateGui(true)
+				generalPageInstance.selectProduct()
+				licenseEditor.setBlockingUpdateGui(false)
+			}
+			licenseEditor.rebuildEntries()
+		}
 	}
 
 	function updateGui() {
@@ -523,6 +546,10 @@ ViewBase {
 				generalGroup.updateModel()
 			}
 
+			function selectProduct() {
+				generalGroup.selectProduct()
+			}
+
 			CustomScrollbar {
 				id: scrollbar
 				z: parent.z + 1
@@ -604,11 +631,12 @@ ViewBase {
 							id: productComboBox
 							objectName: "ProductCombo"
 							name: qsTr("Product")
-							model: CachedProductCollection.collectionModel
+							model: licenseEditor.productsModel
 							nameId: "productName"
 							changeable: licenseEditor.canEdit
 							onCurrentIndexChanged: {
-								if (licenseEditor.guiIsBlocked())
+								// -1 comes from refilling the product list, not from the user
+								if (licenseEditor.guiIsBlocked() || currentIndex < 0)
 									return
 								licenseEditor.setProductId(generalGroup.currentProductId())
 								licenseEditor.doUpdateModel()
@@ -618,7 +646,7 @@ ViewBase {
 						function currentProductId() {
 							if (productComboBox.currentIndex < 0)
 								return ""
-							return CachedProductCollection.collectionModel.getData(
+							return licenseEditor.productsModel.getData(
 								ProductItemTypeMetaInfo.s_id, productComboBox.currentIndex)
 						}
 
@@ -628,14 +656,20 @@ ViewBase {
 							licenseNameInput.text = licenseEditor.licenseData.m_licenseName || ""
 							licenseIdInput.text = licenseEditor.licenseData.m_licenseId || ""
 							descriptionInput.text = licenseEditor.licenseData.m_description || ""
-							productComboBox.currentIndex = -1
-							for (let i = 0; i < CachedProductCollection.collectionModel.getItemsCount(); ++i) {
-								let id = CachedProductCollection.collectionModel.getData(ProductItemTypeMetaInfo.s_id, i)
-								if (id === licenseEditor.licenseData.m_productId) {
-									productComboBox.currentIndex = i
+							selectProduct()
+						}
+
+						function selectProduct() {
+							if (!licenseEditor.licenseData)
+								return
+							let index = -1
+							for (let i = 0; i < licenseEditor.productsModel.getItemsCount(); ++i) {
+								if (licenseEditor.productsModel.getData(ProductItemTypeMetaInfo.s_id, i) === licenseEditor.licenseData.m_productId) {
+									index = i
 									break
 								}
 							}
+							productComboBox.currentIndex = index
 						}
 
 						function updateModel() {

@@ -25,6 +25,7 @@
 #include <imtdb/CMigrationControllerComp.h>
 #include <imtdb/CCompositeMigrationControllerComp.h>
 #include <imtdb/CObjectCollectionMigrationControllerComp.h>
+#include <imtdb/CObjectCollectionImportMigrationControllerComp.h>
 #include <imtdb/CDatabaseConnectorComp.h>
 #include <imtdb/CDependentTableMetaInfoControllerComp.h>
 #include <imtdb/CPostgresXPathExtractorComp.h>
@@ -57,6 +58,7 @@ typedef imtdb::TMessageDatabaseDelegateComp<imtdb::CSqlDatabaseDocumentDelegateC
 typedef imtdb::CMigrationControllerComp MigrationController;
 typedef imtdb::CCompositeMigrationControllerComp CompositeMigrationController;
 typedef imtdb::CObjectCollectionMigrationControllerComp ObjectCollectionMigrationController;
+typedef imtdb::CObjectCollectionImportMigrationControllerComp ObjectCollectionImportMigrationController;
 typedef imtdb::CDatabaseConnectorComp DatabaseConnector;
 typedef imtdb::CDependentTableMetaInfoControllerComp DependentTableMetaInfoController;
 typedef imtdb::CSqlDatabaseDocumentDelegateComp SQLiteDatabaseDocumentDelegate;

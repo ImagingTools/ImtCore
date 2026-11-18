@@ -144,6 +144,19 @@ int GetRevisionFromParams(const iprm::IParamsSet* paramsPtr)
 }
 
 
+QByteArray GetDocumentObjectId(const IDocumentService& documentService, const QByteArray& userId, const QByteArray& documentId)
+{
+	const IDocumentService::DocumentList documentList = documentService.GetOpenedDocumentList(userId);
+	for (const IDocumentService::DocumentListItem& documentItem : documentList){
+		if (documentItem.documentId == documentId){
+			return SourceRefToObjectId(documentItem.documentSourceRef);
+		}
+	}
+
+	return QByteArray();
+}
+
+
 bool IsDocumentStored(const IDocumentService& documentService, const QByteArray& userId, const QByteArray& documentId)
 {
 	const IDocumentService::DocumentList documents = documentService.GetOpenedDocumentList(userId);
