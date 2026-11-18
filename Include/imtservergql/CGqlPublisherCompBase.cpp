@@ -85,8 +85,17 @@ bool CGqlPublisherCompBase::RegisterSubscription(
 	QMutexLocker locker(&m_mutex);
 
 	// Duplicate check
+	const QByteArray connectionId = GetConnectionId(networkRequest);
+	Q_ASSERT(!connectionId.isEmpty());
 	for (const RequestNetworks& entry : m_registeredSubscribers) {
-		if (entry.networkRequests.contains(subscriptionId) && entry.networkRequests.value(subscriptionId) == &networkRequest) {
+		const auto found = entry.networkRequests.constFind(subscriptionId);
+		if (found == entry.networkRequests.constEnd() || found.value() == nullptr) {
+			continue;
+		}
+
+		const QByteArray entryConnectionId = GetConnectionId(*found.value());
+		Q_ASSERT(!entryConnectionId.isEmpty());
+		if (entryConnectionId == connectionId) {
 			errorMessage = QStringLiteral("Subscription ID already in use.");
 			return false;
 		}
@@ -105,12 +114,21 @@ bool CGqlPublisherCompBase::RegisterSubscription(
 }
 
 
-bool CGqlPublisherCompBase::UnregisterSubscription(const QByteArray& subscriptionId)
+bool CGqlPublisherCompBase::UnregisterSubscription(const QByteArray& connectionId, const QByteArray& subscriptionId)
 {
+	Q_ASSERT(!connectionId.isEmpty());
+
 	QMutexLocker locker(&m_mutex);
 
 	for (int i = 0; i < m_registeredSubscribers.size(); ++i) {
-		if (m_registeredSubscribers[i].networkRequests.contains(subscriptionId)) {
+		const auto found = m_registeredSubscribers[i].networkRequests.constFind(subscriptionId);
+		if (found == m_registeredSubscribers[i].networkRequests.constEnd() || found.value() == nullptr) {
+			continue;
+		}
+
+		const QByteArray entryConnectionId = GetConnectionId(*found.value());
+		Q_ASSERT(!entryConnectionId.isEmpty());
+		if (entryConnectionId == connectionId) {
 			m_registeredSubscribers.removeAt(i);
 			return true;
 		}
@@ -125,12 +143,25 @@ void CGqlPublisherCompBase::OnRequestDestroyed(imtrest::IRequest* request)
 {
 	imtrest::CWebSocketRequest* webSocketRequestPtr = dynamic_cast<imtrest::CWebSocketRequest*>(request);
 	if (webSocketRequestPtr != nullptr){
-		UnregisterSubscription(webSocketRequestPtr->GetQueryId());
+		const QByteArray connectionId = webSocketRequestPtr->GetConnectionId();
+		Q_ASSERT(!connectionId.isEmpty());
+
+		UnregisterSubscription(connectionId, webSocketRequestPtr->GetQueryId());
 	}
 }
 
 
 // protected methods
+
+QByteArray CGqlPublisherCompBase::GetConnectionId(const imtrest::IRequest& networkRequest)
+{
+	const imtrest::CWebSocketRequest* webSocketRequestPtr = dynamic_cast<const imtrest::CWebSocketRequest*>(&networkRequest);
+	const QByteArray connectionId = webSocketRequestPtr != nullptr ? webSocketRequestPtr->GetConnectionId() : QByteArray();
+	Q_ASSERT(!connectionId.isEmpty());
+
+	return connectionId;
+}
+
 
 bool CGqlPublisherCompBase::PushDataToSubscriber(
 			const QByteArray& subscriptionId,

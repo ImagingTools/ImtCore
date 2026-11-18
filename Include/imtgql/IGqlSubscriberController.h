@@ -48,7 +48,10 @@ public:
 				const CGqlRequest& gqlRequest,
 				const imtrest::IRequest& networkRequest,
 				QString& errorMessage) = 0;
-	virtual bool UnregisterSubscription(const QByteArray& subscriptionId) = 0;
+	/**
+		Unregister the subscription of a connection. A subscription is identified by the pair of connection-ID and subscription-ID.
+	*/
+	virtual bool UnregisterSubscription(const QByteArray& connectionId, const QByteArray& subscriptionId) = 0;
 };
 
 

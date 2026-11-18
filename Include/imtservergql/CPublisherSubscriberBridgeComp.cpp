@@ -60,7 +60,9 @@ bool CPublisherSubscriberBridgeComp::RegisterSubscription(
 	// Register with the upstream subscription manager (forwards to remote server with user context)
 	QByteArray upstreamSubscriptionId = m_subscriptionManagerCompPtr->RegisterSubscription(upstreamRequest, *this);
 	if (upstreamSubscriptionId.isEmpty()){
-		BaseClass::UnregisterSubscription(subscriptionId);
+		const QByteArray connectionId = GetConnectionId(networkRequest);
+		Q_ASSERT(!connectionId.isEmpty());
+		BaseClass::UnregisterSubscription(connectionId, subscriptionId);
 		errorMessage = QStringLiteral("Failed to register upstream subscription");
 		return false;
 	}
@@ -74,7 +76,7 @@ bool CPublisherSubscriberBridgeComp::RegisterSubscription(
 }
 
 
-bool CPublisherSubscriberBridgeComp::UnregisterSubscription(const QByteArray& subscriptionId)
+bool CPublisherSubscriberBridgeComp::UnregisterSubscription(const QByteArray& connectionId, const QByteArray& subscriptionId)
 {
 	QByteArray upstreamSubscriptionId;
 
@@ -82,7 +84,7 @@ bool CPublisherSubscriberBridgeComp::UnregisterSubscription(const QByteArray& su
 		QMutexLocker locker(&m_bridgeMutex);
 
 		if (!m_clientToUpstreamMap.contains(subscriptionId)){
-			return BaseClass::UnregisterSubscription(subscriptionId);
+			return BaseClass::UnregisterSubscription(connectionId, subscriptionId);
 		}
 
 		upstreamSubscriptionId = m_clientToUpstreamMap.take(subscriptionId);
@@ -96,7 +98,7 @@ bool CPublisherSubscriberBridgeComp::UnregisterSubscription(const QByteArray& su
 			}
 			else{
 				// Other clients still use this upstream subscription, just remove local
-				return BaseClass::UnregisterSubscription(subscriptionId);
+				return BaseClass::UnregisterSubscription(connectionId, subscriptionId);
 			}
 		}
 	}
@@ -106,7 +108,7 @@ bool CPublisherSubscriberBridgeComp::UnregisterSubscription(const QByteArray& su
 		m_subscriptionManagerCompPtr->UnregisterSubscription(upstreamSubscriptionId, *this);
 	}
 
-	return BaseClass::UnregisterSubscription(subscriptionId);
+	return BaseClass::UnregisterSubscription(connectionId, subscriptionId);
 }
 
 
