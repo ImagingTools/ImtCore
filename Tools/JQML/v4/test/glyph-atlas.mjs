@@ -135,6 +135,13 @@ const TEXT = Array.from({ length: 256 }, (_, i) => String.fromCharCode(0x400 + i
 	check('the text of the frame has emptied the atlas', atlas.generation > generation, true);
 	renderer.submit();
 	check('a draw that is queued does not lose its glyphs when the atlas is emptied before the frame is submitted', violations.slice(0, 3), []);
+	check('a renderer with nothing queued is not kept by the atlas', atlas.beforeReset.size, 0);
+
+	// renderers that are made and dropped: the atlas keeps only those with queued geometry, and lets them go after the reset
+	for (let i = 0; i < 10; i++) new Renderer(null).fillQuad(0, 0, 10, 10, 0xff000000);
+	check('a renderer with queued geometry is submitted at the reset of the atlas', atlas.beforeReset.size, 10);
+	atlas.reset();
+	check('after the reset the atlas keeps no renderer', atlas.beforeReset.size, 0);
 }
 
 console.log(failures === 0 ? 'All good' : `${failures} failed`);
