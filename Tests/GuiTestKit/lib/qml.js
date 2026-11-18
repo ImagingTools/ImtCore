@@ -111,6 +111,23 @@ function qmlSelectors(css) {
   );
 }
 
+/**
+ * The qmlTest selector of an objectName path, for a spec that calls window.qmlTest itself: every name quoted, joined
+ * by the descendant combinator, `:visible` after the last one when `visible` is set. The type names the kit uses for
+ * items without an objectName (`MouseArea`, `TextInput`, `TextEdit`) become a type test, as in qmlSelectors().
+ * @param {string[]} path
+ * @param {{visible?: boolean}} [options]
+ * @returns {string}
+ */
+function qmlSelector(path, options = {}) {
+  if (!Array.isArray(path) || path.length === 0) {
+    throw new Error('qml.qmlSelector: path must be a non-empty array of objectNames');
+  }
+  const compounds = path.map((name) => (TYPE_NAMES.has(name) ? `@${name}` : JSON.stringify(String(name))));
+  if (options.visible) compounds[compounds.length - 1] += ':visible';
+  return compounds.join(' ');
+}
+
 // ----- in the page -------------------------------------------------------------------------------------------------
 
 /**
@@ -374,6 +391,7 @@ module.exports = {
   backendOf,
   isQml,
   qmlSelectors,
+  qmlSelector,
   locate,
   query,
   callQmlTest,

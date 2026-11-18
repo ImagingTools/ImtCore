@@ -10,7 +10,7 @@
 // On JQML v4 there is no DOM: locate() hands out a locator that runs the same selectors through window.qmlTest
 // (see qml.js), so the functions below work on both.
 
-const { locate, isQml, callQmlTest } = require('./qml');
+const { locate, isQml, callQmlTest, qmlSelector } = require('./qml');
 
 const OBJ = (name) => `[objectName="${cssEscape(name)}"]`;
 
@@ -386,4 +386,5 @@ module.exports = {
   locate,
   isQml,
   callQmlTest,
+  qmlSelector,
 };
