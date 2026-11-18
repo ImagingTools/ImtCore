@@ -366,6 +366,43 @@ export class Renderer {
 		const x1 = x + w;
 		const y1 = y + h;
 		const base = this.nv;
+		// A line thinner than a pixel (a border of 0.5) covers the centre of a pixel at one position and none at the next: it
+		// flickers and vanishes while the content scrolls. Upright, such a side takes one whole pixel.
+		if (mb === 0 && mc === 0) {
+			const dpr = this.dpr;
+			let dx0 = (ma * x + me) * dpr;
+			let dx1 = (ma * x1 + me) * dpr;
+			let dy0 = (md * y + mf) * dpr;
+			let dy1 = (md * y1 + mf) * dpr;
+			if (dx1 < dx0) [dx0, dx1] = [dx1, dx0];
+			if (dy1 < dy0) [dy0, dy1] = [dy1, dy0];
+			const thinX = dx1 - dx0 < 1;
+			const thinY = dy1 - dy0 < 1;
+			if (thinX || thinY) {
+				if (thinX) {
+					dx0 = Math.floor((dx0 + dx1) / 2);
+					dx1 = dx0 + 1;
+				}
+				if (thinY) {
+					dy0 = Math.floor((dy0 + dy1) / 2);
+					dy1 = dy0 + 1;
+				}
+				this.vertex(dx0 / dpr, dy0 / dpr, u, u, color);
+				this.vertex(dx1 / dpr, dy0 / dpr, u, u, color);
+				this.vertex(dx1 / dpr, dy1 / dpr, u, u, color);
+				this.vertex(dx0 / dpr, dy1 / dpr, u, u, color);
+				const hair = this.indices;
+				let j = this.ni;
+				hair[j++] = base;
+				hair[j++] = base + 1;
+				hair[j++] = base + 2;
+				hair[j++] = base;
+				hair[j++] = base + 2;
+				hair[j++] = base + 3;
+				this.ni = j;
+				return;
+			}
+		}
 		this.vertex(ma * x + mc * y + me, mb * x + md * y + mf, u, u, color);
 		this.vertex(ma * x1 + mc * y + me, mb * x1 + md * y + mf, u, u, color);
 		this.vertex(ma * x1 + mc * y1 + me, mb * x1 + md * y1 + mf, u, u, color);

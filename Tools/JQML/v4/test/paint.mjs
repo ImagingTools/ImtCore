@@ -185,6 +185,28 @@ check('a canvas that drew inside of its size is not clipped', canvasClips((ctx) 
 	check('and is the rectangle of the item on the screen', scissor, plain);
 }
 
+// A line thinner than a pixel (a border of height 0.5) is one whole pixel wherever it is: at some positions it covered no pixel centre and vanished.
+{
+	const r = new Renderer(null);
+	r.setMatrix(1, 0, 0, 1, 0, 0);
+	const rows = (dpr, y, h) => {
+		r.dpr = dpr;
+		r.nv = 0;
+		r.ni = 0;
+		r.fillQuad(0, y, 100, h, 0xff000000);
+		const ys = [0, 1, 2, 3].map((i) => r.f32[i * 5 + 1] * dpr);
+		return [Math.min(...ys), Math.max(...ys)].join('-');
+	};
+	let always = true;
+	for (let y = 100; y < 101; y += 0.125) {
+		const [top, bottom] = rows(1, y, 0.5).split('-').map(Number);
+		if (bottom - top !== 1 || !Number.isInteger(top)) always = false;
+	}
+	check('a line of height 0.5 is one whole pixel at every position', always, true);
+	check('and so is one of 0.5 at a device ratio of 2 (a pixel is 0.5)', rows(2, 100.3, 0.25), '200-201');
+	check('a quad that is not thinner than a pixel is left as it is', rows(1, 10.25, 3), '10.25-13.25');
+}
+
 // Like Qt, a fillStyle/strokeStyle that is not a color leaves the style as it was.
 const styled = new CanvasContext(10, 10, []);
 styled.fillStyle = '#ff0000';
