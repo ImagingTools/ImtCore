@@ -273,10 +273,38 @@ class QmlLocale {
 	}
 }
 
+// The language tag of the system (of the browser), the default locale of Qt.
+function systemLanguageTag() {
+	return typeof navigator !== 'undefined' && navigator.language ? navigator.language : 'en-US';
+}
+
 function qmlLocale(name) {
 	if (name) return new QmlLocale(String(name));
-	const tag = typeof navigator !== 'undefined' && navigator.language ? navigator.language : 'en-US';
-	return new QmlLocale(tag.replace('-', '_'));
+	return new QmlLocale(systemLanguageTag().replace('-', '_'));
+}
+
+// The plural categories of CLDR in their order: the forms of a plural message of a Qt catalog come in this order in its language.
+const PLURAL_CATEGORIES = ['zero', 'one', 'two', 'few', 'many', 'other'];
+
+// The form of a plural message for the count `n` in `language`; a category without a form of its own takes the last form.
+function pluralForm(forms, n, language) {
+	let index = 0;
+	if (n >= 0) {
+		try {
+			const rules = new Intl.PluralRules(language.replace('_', '-'));
+			const categories = PLURAL_CATEGORIES.filter((category) => rules.resolvedOptions().pluralCategories.includes(category));
+			index = Math.max(0, categories.indexOf(rules.select(n)));
+		} catch {
+			index = n === 1 ? 0 : 1;
+		}
+	}
+	return forms[Math.min(index, forms.length - 1)];
+}
+
+// As in Qt: with a count (qsTr(text, disambiguation, n)) `%n` of the text is the count, `%Ln` the count written in the system locale.
+function replacePercentN(text, n) {
+	if (typeof text !== 'string' || typeof n !== 'number' || n < 0) return text;
+	return text.replace(/%(L?)n/g, (_, localized) => (localized ? n.toLocaleString(systemLanguageTag()) : String(n)));
 }
 
 // Locale.FormatType, and the styles of Intl for it: the date and the time.
@@ -767,9 +795,9 @@ export class Engine {
 			mouseMove() {
 				throw new Error('QtQuickTest::fail');
 			},
-			qsTr: (text) => engine.translate(text),
-			qsTrId: (text) => engine.translate(text),
-			qsTranslate: (context, text) => engine.translate(text),
+			qsTr: (text, disambiguation, n) => engine.translate(text, n),
+			qsTrId: (text, n) => engine.translate(text, n),
+			qsTranslate: (context, text, disambiguation, n) => engine.translate(text, n),
 			QT_TR_NOOP: (text) => text,
 			console: {
 				log: (...args) => {
@@ -864,15 +892,18 @@ export class Engine {
 		this.context.language = value;
 	}
 
-	// The translation of `text` in the current language: `de_DE` falls back to `de`, a missing entry to the text.
-	translate(text) {
-		if (typeof text !== 'string' || !this.language) return text;
+	// The translation of `text` in the current language: `de_DE` falls back to `de`, a missing entry to the text. A plural message
+	// (a list of forms in the catalog) takes the form of the count `n`; `%n` of the result is the count.
+	translate(text, n = -1) {
+		if (typeof text !== 'string' || !this.language) return replacePercentN(text, n);
 		const languages = [this.language, this.language.replace('-', '_'), this.language.split(/[-_]/)[0]];
 		for (const language of languages) {
 			const catalog = this.translations[language];
-			if (catalog && typeof catalog[text] === 'string' && catalog[text] !== '') return catalog[text];
+			const entry = catalog ? catalog[text] : undefined;
+			const translation = Array.isArray(entry) ? pluralForm(entry, n, language) : entry;
+			if (typeof translation === 'string' && translation !== '') return replacePercentN(translation, n);
 		}
-		return text;
+		return replacePercentN(text, n);
 	}
 
 	get isAnimated() {
