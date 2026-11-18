@@ -6,6 +6,11 @@
 //
 // A "path" is an array of objectNames from an outer container to the target; the descendant combinator
 // means intermediate nesting is allowed, so you only list the meaningful anchors.
+//
+// On JQML v4 there is no DOM: locate() hands out a locator that runs the same selectors through window.qmlTest
+// (see qml.js), so the functions below work on both.
+
+const { locate, isQml, callQmlTest } = require('./qml');
 
 const OBJ = (name) => `[objectName="${cssEscape(name)}"]`;
 
@@ -34,7 +39,7 @@ function selectorForPath(path) {
  * @returns {import('@playwright/test').Locator}
  */
 function byPath(page, path) {
-  return page.locator(`${selectorForPath(path)}[visible]`).first();
+  return locate(page, `${selectorForPath(path)}[visible]`).first();
 }
 
 /**
@@ -43,7 +48,7 @@ function byPath(page, path) {
  * @param {string[]} path
  */
 function byPathAnyVisibility(page, path) {
-  return page.locator(selectorForPath(path)).first();
+  return locate(page, selectorForPath(path)).first();
 }
 
 /**
@@ -53,7 +58,7 @@ function byPathAnyVisibility(page, path) {
  * @param {string[]} path
  */
 function mouseAreaOf(page, path) {
-  return page.locator(`${selectorForPath(path)} [objectName="MouseArea"][visible]`).first();
+  return locate(page, `${selectorForPath(path)} [objectName="MouseArea"][visible]`).first();
 }
 
 /**
@@ -73,7 +78,7 @@ function popupItem(page, text) {
  * @param {number} index  zero-based position among the popup's selectable (non-separator) rows
  */
 function popupItemByIndex(page, index) {
-  return page.locator('[objectName="PopupMenuDialog"] [objectName="MouseArea"][visible]').nth(index);
+  return locate(page, '[objectName="PopupMenuDialog"] [objectName="MouseArea"][visible]').nth(index);
 }
 
 /**
@@ -82,7 +87,7 @@ function popupItemByIndex(page, index) {
  * @param {import('@playwright/test').Page} page
  */
 function popupItemLast(page) {
-  return page.locator('[objectName="PopupMenuDialog"] [objectName="MouseArea"][visible]').last();
+  return locate(page, '[objectName="PopupMenuDialog"] [objectName="MouseArea"][visible]').last();
 }
 
 /**
@@ -92,7 +97,7 @@ function popupItemLast(page) {
  * @param {string[]} path
  */
 async function countVisible(page, path) {
-  return page.locator(`${selectorForPath(path)}[visible]`).count();
+  return locate(page, `${selectorForPath(path)}[visible]`).count();
 }
 
 /**
@@ -102,7 +107,7 @@ async function countVisible(page, path) {
  * @param {string[]} path
  */
 async function countAny(page, path) {
-  return page.locator(selectorForPath(path)).count();
+  return locate(page, selectorForPath(path)).count();
 }
 
 /**
@@ -160,7 +165,7 @@ const OFFER_FALLBACK_TIMEOUT = 10000;
 /** How many VISIBLE elements match a raw attribute selector, optionally inside an objectName path. */
 async function countVisibleMatching(page, selector, scope = []) {
   const prefix = scope.length ? `${selectorForPath(scope)} ` : '';
-  return page.locator(`${prefix}${selector}[visible]`).count();
+  return locate(page, `${prefix}${selector}[visible]`).count();
 }
 
 /**
@@ -208,6 +213,7 @@ async function isOffered(page, path, options) {
  * @returns {Promise<{x:number,y:number,width:number,height:number}[]>}
  */
 async function columnRects(page, headerIds) {
+  if (await isQml(page)) return columnRectsQml(page, headerIds);
   return page.evaluate((ids) => {
     const rows = Array.from(document.querySelectorAll('[objectName^="TableRow_"][visible]'));
     if (!rows.length) return [];
@@ -281,6 +287,82 @@ async function columnRects(page, headerIds) {
   }, headerIds);
 }
 
+/**
+ * columnRects() on JQML v4: the same grouping, clamping and subtraction, with the boxes read through window.qmlTest.
+ * @param {import('@playwright/test').Page} page
+ * @param {string[]} headerIds
+ */
+async function columnRectsQml(page, headerIds) {
+  return page.evaluate((ids) => {
+    const t = window.qmlTest;
+    const rows = t.find(null, '"TableRow_*":visible');
+    if (!rows.length) return [];
+    const rectOf = (handle) => {
+      const box = t.info(handle.id).box;
+      return { x: box.x, y: box.y, width: box.width, height: box.height, top: box.y, bottom: box.y + box.height };
+    };
+    const viewport = { top: 0, bottom: window.innerHeight };
+
+    const groups = new Map();
+    for (const row of rows) {
+      const dialog = t.closest(row.id, '"Dialog"');
+      const key = dialog ? dialog.id : '';
+      if (!groups.has(key)) groups.set(key, { dialog, rows: [] });
+      groups.get(key).rows.push(row);
+    }
+    const dialogs = t.find(null, '"Dialog":visible');
+
+    function subtractOccluder(rect, occluder) {
+      const overlapsX = rect.x < occluder.x + occluder.width && rect.x + rect.width > occluder.x;
+      if (!overlapsX) return [rect];
+      const pieces = [];
+      if (rect.y < occluder.top) {
+        pieces.push({ ...rect, height: Math.min(rect.y + rect.height, occluder.top) - rect.y });
+      }
+      const bottom = rect.y + rect.height;
+      if (bottom > occluder.bottom) {
+        const y = Math.max(rect.y, occluder.bottom);
+        pieces.push({ ...rect, y, height: bottom - y });
+      }
+      return pieces.filter((p) => p.height > 0);
+    }
+
+    const rects = [];
+    for (const [key, group] of groups.entries()) {
+      const scopeRect = group.dialog ? rectOf(group.dialog) : viewport;
+      const table = t.closest(group.rows[0].id, '"Table"');
+      const containerRect = table ? rectOf(table) : scopeRect;
+      const rowRects = group.rows.map(rectOf);
+      const groupTop = Math.max(Math.min(...rowRects.map((r) => r.top)), scopeRect.top, containerRect.top, 0);
+      const groupBottom = Math.min(Math.max(...rowRects.map((r) => r.bottom)), scopeRect.bottom, containerRect.bottom, window.innerHeight);
+      if (groupBottom <= groupTop) continue;
+
+      const occluders = dialogs.filter((d) => d.id !== key).map(rectOf);
+
+      for (const id of ids) {
+        let left = null;
+        let right = null;
+        for (const row of group.rows) {
+          const cell = t.find(row.id, `${JSON.stringify(id)}:visible`)[0];
+          if (!cell) continue;
+          const r = rectOf(cell);
+          if (r.width <= 0) continue;
+          left = left === null ? r.x : Math.min(left, r.x);
+          right = right === null ? r.x + r.width : Math.max(right, r.x + r.width);
+        }
+        if (left === null || right - left <= 0) continue;
+
+        let pieces = [{ x: left, y: groupTop, width: right - left, height: groupBottom - groupTop }];
+        for (const occluder of occluders) {
+          pieces = pieces.flatMap((p) => subtractOccluder(p, occluder));
+        }
+        rects.push(...pieces);
+      }
+    }
+    return rects;
+  }, headerIds);
+}
+
 module.exports = {
   OBJ,
   OFFER_ANCHOR_TIMEOUT,
@@ -301,4 +383,7 @@ module.exports = {
   countAny,
   isVisible,
   columnRects,
+  locate,
+  isQml,
+  callQmlTest,
 };

@@ -16,6 +16,8 @@ const { captureConsoleErrors } = require('../lib/consoleErrors');
 const { attachStabilityTracking } = require('../lib/stability');
 
 const PERMISSIONS_STORAGE_KEY = 'AuthorizationController/permissions';
+// JQML v4 keeps the same Settings under a "qml/" prefix.
+const PERMISSIONS_STORAGE_KEYS = [PERMISSIONS_STORAGE_KEY, `qml/${PERMISSIONS_STORAGE_KEY}`];
 
 /**
  * The permission codes the server granted this user, from the storageState saved after login. Returns
@@ -32,7 +34,7 @@ function readGrantedPermissions(authFilePath) {
   }
   for (const origin of state.origins || []) {
     for (const entry of origin.localStorage || []) {
-      if (entry.name !== PERMISSIONS_STORAGE_KEY) continue;
+      if (!PERMISSIONS_STORAGE_KEYS.includes(entry.name)) continue;
       // Stored as a JSON string holding a ';'-separated list (an empty one for a user with none).
       let raw = entry.value;
       try {
