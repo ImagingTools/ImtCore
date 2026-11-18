@@ -5,6 +5,7 @@
 // ImtCore includes
 #include <imtauth/imtauth.h>
 #include <imtauth/IUserInfoProvider.h>
+#include <imtauthgql/imtauthgql.h>
 
 
 namespace imtauthgql
@@ -12,6 +13,13 @@ namespace imtauthgql
 
 
 // public methods
+
+void CAssignmentCollector::SetTenantScope(imtauth::ITenantEntityBindingManager* bindingManagerPtr, const QByteArray& tenantId)
+{
+	m_bindingManagerPtr = bindingManagerPtr;
+	m_tenantId = tenantId;
+}
+
 
 void CAssignmentCollector::CollectUser(
 			const imtauth::IUserInfo& userInfo,
@@ -406,7 +414,9 @@ void CAssignmentCollector::AddRole(
 
 	chain << roleId;
 	for (const QByteArray& parentRoleId : rolePtr->GetIncludedRoles()){
-		AddRole(parentProviderPtr, parentRoleId, SK_PARENT_ROLE, rolePath, chain);
+		if (IsInTenantScope(QByteArrayLiteral("Roles"), parentRoleId)){
+			AddRole(parentProviderPtr, parentRoleId, SK_PARENT_ROLE, rolePath, chain);
+		}
 	}
 }
 
@@ -462,7 +472,9 @@ void CAssignmentCollector::AddGroupContents(
 
 	for (const QByteArray& product : std::as_const(products)){
 		for (const QByteArray& roleId : group.GetRoles(product)){
-			AddRole(group.GetRoleProvider(), roleId, SK_ROLE, groupPath, QByteArrayList());
+			if (IsInTenantScope(QByteArrayLiteral("Roles"), roleId)){
+				AddRole(group.GetRoleProvider(), roleId, SK_ROLE, groupPath, QByteArrayList());
+			}
 		}
 	}
 
@@ -472,8 +484,16 @@ void CAssignmentCollector::AddGroupContents(
 	}
 
 	for (const QByteArray& parentGroupId : group.GetParentGroups()){
-		AddGroup(parentProviderPtr, parentGroupId, SK_PARENT_GROUP, productId, groupPath, chain);
+		if (IsInTenantScope(QByteArrayLiteral("UserGroups"), parentGroupId)){
+			AddGroup(parentProviderPtr, parentGroupId, SK_PARENT_GROUP, productId, groupPath, chain);
+		}
 	}
+}
+
+
+bool CAssignmentCollector::IsInTenantScope(const QByteArray& entityType, const QByteArray& entityId) const
+{
+	return m_tenantId.isEmpty() || ShouldKeepEntityForTenant(m_bindingManagerPtr, m_tenantId, entityType, entityId);
 }
 
 

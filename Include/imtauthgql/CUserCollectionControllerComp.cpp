@@ -611,6 +611,10 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 	std::sort(roleList.begin(), roleList.end());
 
 	CAssignmentCollector collector;
+	const imtgql::IGqlContext* gqlContextPtr = userItemRequest.GetRequestContext();
+	if (gqlContextPtr != nullptr && m_bindingManagerCompPtr.IsValid()){
+		collector.SetTenantScope(m_bindingManagerCompPtr.GetPtr(), gqlContextPtr->GetTenantId());
+	}
 	collector.CollectUser(*userInfoPtr, roleList, roleList, productId);
 	collector.FillUser(representationPayload);
 
