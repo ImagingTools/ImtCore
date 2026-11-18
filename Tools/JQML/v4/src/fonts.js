@@ -97,15 +97,26 @@ export function parseFontWeight(buffer) {
 
 // Texture pages the glyphs are packed into (shelf packing).
 export class GlyphAtlas {
-	constructor() {
+	// onReset: called after the pages are emptied (the font manager drops the glyph entries of every font).
+	constructor(onReset = null) {
 		this.pages = [];
+		// The pages a reset took out of `pages`; newPage() takes them again, so there are never more than MAX_PAGES canvases
+		// (and textures), whatever still refers to an old page.
+		this.spare = [];
 		this.generation = 0;
 		// Functions that are called before the pages are emptied: a renderer that has queued draws of these pages submits them.
 		this.beforeReset = new Set();
+		this.onReset = onReset;
 		this.newPage();
 	}
 
 	newPage() {
+		const spare = this.spare.pop();
+		if (spare !== undefined) {
+			this.clearPage(spare);
+			this.pages.push(spare);
+			return spare;
+		}
 		const canvas = makeCanvas(PAGE_SIZE, PAGE_SIZE);
 		const context = canvas ? canvas.getContext('2d') : null;
 		// `coverage`: renderer applies luminance-aware stem gamma (dark text thins, light text keeps fringes).
@@ -171,8 +182,11 @@ export class GlyphAtlas {
 	reset() {
 		for (const submit of this.beforeReset) submit();
 		this.generation++;
-		for (const page of this.pages) this.clearPage(page);
+		// the first page is emptied now, the others when newPage() takes them again
+		this.clearPage(this.pages[0]);
+		for (let i = this.pages.length - 1; i > 0; i--) this.spare.push(this.pages[i]);
 		this.pages.length = 1;
+		if (this.onReset !== null) this.onReset();
 	}
 }
 
@@ -292,8 +306,9 @@ export class FontManager {
 	setDevicePixelRatio(dpr) {
 		if (dpr !== this.dpr) {
 			this.dpr = dpr;
-			this.infos.clear();
+			// the reset first: the fonts that are dropped from `infos` also drop their glyphs, if something still holds them
 			if (this.atlas) this.atlas.reset();
+			this.infos.clear();
 		}
 	}
 
@@ -307,7 +322,15 @@ export class FontManager {
 
 	ensureAtlas() {
 		if (this.atlas === null && this.measureContext() !== null) {
-			this.atlas = new GlyphAtlas();
+			// The glyphs of an emptied atlas are no use: every cached font drops them now, not only when it is used again
+			// (a zoom makes a font for each size it passes, most of them are not used again).
+			this.atlas = new GlyphAtlas(() => {
+				const generation = this.atlas.generation;
+				for (const info of this.infos.values()) {
+					info.glyphs.clear();
+					info.generation = generation;
+				}
+			});
 		}
 		return this.atlas;
 	}

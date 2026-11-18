@@ -90,12 +90,6 @@ const TEXT = Array.from({ length: 256 }, (_, i) => String.fromCharCode(0x400 + i
 		page.clears = (page.clears ?? 0) + 1;
 		clear(page);
 	};
-	const newPage = atlas.newPage.bind(atlas);
-	atlas.newPage = () => {
-		const page = newPage();
-		page.clears = 0;
-		return page;
-	};
 
 	const renderer = new Renderer(null);
 	const violations = [];
@@ -142,6 +136,26 @@ const TEXT = Array.from({ length: 256 }, (_, i) => String.fromCharCode(0x400 + i
 	check('a renderer with queued geometry is submitted at the reset of the atlas', atlas.beforeReset.size, 10);
 	atlas.reset();
 	check('after the reset the atlas keeps no renderer', atlas.beforeReset.size, 0);
+}
+
+// A zoom in small steps: a font for every size it passes stays in `fonts.infos`. After the atlas is emptied the fonts that are not used
+// again must not keep their glyphs (and through them the pages of the old generations): the canvases stay at most four.
+{
+	const canvases = new Set(atlas.pages.map((page) => page.canvas));
+	const before = atlas.generation;
+	const zoomFonts = [];
+	for (let size = 140; atlas.generation < before + 3 && size < 400; size += 0.25) {
+		const info = fonts.get('sans-serif', size, false, false);
+		zoomFonts.push(info);
+		for (const ch of TEXT) {
+			const glyph = info.glyph(ch);
+			if (glyph !== null) canvases.add(glyph.page.canvas);
+		}
+	}
+	check('the zoom has emptied the atlas three times', atlas.generation, before + 3);
+	check('the pages of all the generations are at most four canvases', canvases.size <= 4, true);
+	const stale = zoomFonts.filter((info) => info.generation !== atlas.generation || [...info.glyphs.values()].some((g) => g !== null && !atlas.pages.includes(g.page)));
+	check('no font keeps the glyphs of an emptied atlas', stale.length, 0);
 }
 
 console.log(failures === 0 ? 'All good' : `${failures} failed`);
