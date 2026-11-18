@@ -417,6 +417,51 @@ int CGqlContext::GetSupportedOperations() const
 }
 
 
+bool CGqlContext::IsEqual(const IChangeable& object) const
+{
+	const CGqlContext* sourcePtr = dynamic_cast<const CGqlContext*>(&object);
+	if (sourcePtr == nullptr){
+		return false;
+	}
+
+	if (sourcePtr == this){
+		return true;
+	}
+
+	if (m_principalKind != sourcePtr->m_principalKind ||
+		m_hasPermissionBoundary != sourcePtr->m_hasPermissionBoundary ||
+		m_permissionBoundary != sourcePtr->m_permissionBoundary ||
+		m_hasGrantingAuthority != sourcePtr->m_hasGrantingAuthority ||
+		m_isGrantingAdmin != sourcePtr->m_isGrantingAdmin ||
+		m_grantingPermissions != sourcePtr->m_grantingPermissions ||
+		m_userId != sourcePtr->m_userId ||
+		m_tenantId != sourcePtr->m_tenantId ||
+		m_productId != sourcePtr->m_productId ||
+		m_serverProductId != sourcePtr->m_serverProductId ||
+		m_languageId != sourcePtr->m_languageId ||
+		m_designScheme != sourcePtr->m_designScheme ||
+		m_token != sourcePtr->m_token ||
+		m_scopes != sourcePtr->m_scopes ||
+		m_productInfoPtr != sourcePtr->m_productInfoPtr ||
+		m_tenantPermissions != sourcePtr->m_tenantPermissions ||
+		m_isTenantOwner != sourcePtr->m_isTenantOwner ||
+		m_organizationPermissions != sourcePtr->m_organizationPermissions ||
+		m_headers != sourcePtr->m_headers){
+		return false;
+	}
+
+	if (m_userInfoPtr.IsValid() != sourcePtr->m_userInfoPtr.IsValid()){
+		return false;
+	}
+
+	if (m_userInfoPtr.IsValid() && !m_userInfoPtr->IsEqual(*sourcePtr->m_userInfoPtr.GetPtr())){
+		return false;
+	}
+
+	return true;
+}
+
+
 bool CGqlContext::CopyFrom(const IChangeable &object, CompatibilityMode /*mode*/)
 {
 	auto sourcePtr = dynamic_cast<const CGqlContext*>(&object);
