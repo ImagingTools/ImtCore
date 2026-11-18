@@ -12,7 +12,8 @@ Item {
 	property var backgroundItem: null;
 	property Item activeView: null; // Active view for this Dialog Manager
 	property Item topItem: null;
-	property ListModel modalDialogModels: ListModel {}
+	// The roles are dynamic: a static model fixes the type of `Parameters` by the first dialog opened, and a dialog opened without parameters made the later ones (the popup of a combo box) lose theirs.
+	property ListModel modalDialogModels: ListModel {dynamicRoles: true}
 	property alias count: container.modalDialogModels.count;
 	property var itemUuidList: []
 	
