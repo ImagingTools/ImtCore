@@ -611,6 +611,10 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 	std::sort(roleList.begin(), roleList.end());
 
 	CAssignmentCollector collector;
+	const imtgql::IGqlContext* gqlContextPtr = userItemRequest.GetRequestContext();
+	if (gqlContextPtr != nullptr && m_bindingManagerCompPtr.IsValid()){
+		collector.SetTenantScope(m_bindingManagerCompPtr.GetPtr(), gqlContextPtr->GetTenantId());
+	}
 	collector.CollectUser(*userInfoPtr, roleList, roleList, productId);
 	collector.FillUser(representationPayload);
 
@@ -740,9 +744,10 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateAdaptedObjectDat
 	imtauth::ITenantMembershipManager* membershipPtr = m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr;
 	imtauth::IRoleInfoProvider* roleProviderPtr = m_roleInfoProviderCompPtr.IsValid() ? m_roleInfoProviderCompPtr.GetPtr() : nullptr;
 
+	istd::IChangeableUniquePtr userPtr;
 	if (currentProductId.isEmpty()){
 		// Invalid result means the stored object needs no tenant filtering.
-		return AdaptUserForTenant(
+		userPtr = AdaptUserForTenant(
 					objectId,
 					object,
 					currentTenantId,
@@ -752,20 +757,36 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateAdaptedObjectDat
 					membershipPtr,
 					roleProviderPtr);
 	}
+	else{
+		// A product server trusts the permissions handed out with the user: only a complete read gives them
+		const TenantUserSources sources{
+			m_objectCollectionCompPtr.GetPtr(),
+			m_roleCollectionCompPtr.GetPtr(),
+			m_userGroupCollectionCompPtr.GetPtr(),
+			bindingPtr,
+			delegatedPtr,
+			membershipPtr
+		};
 
-	// A product server trusts the permissions handed out with the user: only a complete read gives them
-	const TenantUserSources sources{
-		m_objectCollectionCompPtr.GetPtr(),
-		m_roleCollectionCompPtr.GetPtr(),
-		m_userGroupCollectionCompPtr.GetPtr(),
-		bindingPtr,
-		delegatedPtr,
-		membershipPtr
-	};
+		if (ComputeTenantUser(sources, objectId, currentTenantId, currentProductId, userPtr, errorMessage) == imtservergql::CAuthorizationSnapshot::RS_ABSENT){
+			errorMessage = QStringLiteral("The user '%1' does not exist.").arg(QString::fromUtf8(objectId));
+		}
+		if (!userPtr.IsValid()){
+			return userPtr;
+		}
+	}
 
-	istd::IChangeableUniquePtr userPtr;
-	if (ComputeTenantUser(sources, objectId, currentTenantId, currentProductId, userPtr, errorMessage) == imtservergql::CAuthorizationSnapshot::RS_ABSENT){
-		errorMessage = QStringLiteral("The user '%1' does not exist.").arg(QString::fromUtf8(objectId));
+	// Only the server of a product writes the user back, so only it gets the password data
+	if (GetRequestServerProductId(gqlRequest).isEmpty()){
+		if (!userPtr.IsValid()){
+			userPtr = object.CloneMe();
+		}
+		imtauth::IUserInfo* userInfoPtr = dynamic_cast<imtauth::IUserInfo*>(userPtr.GetPtr());
+		if (userInfoPtr == nullptr){
+			errorMessage = QStringLiteral("The user '%1' could not be copied.").arg(QString::fromUtf8(objectId));
+			return istd::IChangeableUniquePtr();
+		}
+		RemovePasswordData(*userInfoPtr);
 	}
 
 	return userPtr;

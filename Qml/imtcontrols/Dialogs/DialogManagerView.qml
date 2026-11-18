@@ -21,7 +21,7 @@ Item {
 		completed = true
 	}
 
-	ListModel{id: localViewModel}
+	ListModel{id: localViewModel; dynamicRoles: true}
 	
 	Repeater {
 		id: modalDialogs;

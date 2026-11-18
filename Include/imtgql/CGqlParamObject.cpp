@@ -261,8 +261,92 @@ bool CGqlParamObject::Serialize(iser::IArchive& /*archive*/)
 
 // reimplemented (istd::IChangeable)
 
-bool CGqlParamObject::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
+bool CGqlParamObject::IsEqual(const IChangeable& object) const
 {
+	const CGqlParamObject* sourcePtr = dynamic_cast<const CGqlParamObject*>(&object);
+	if (sourcePtr == nullptr){
+		return false;
+	}
+
+	if (sourcePtr == this){
+		return true;
+	}
+
+	if (m_isNull != sourcePtr->m_isNull || m_objectId != sourcePtr->m_objectId){
+		return false;
+	}
+
+	if (m_simpleParams.keys() != sourcePtr->m_simpleParams.keys()){
+		return false;
+	}
+
+	for (auto it = m_simpleParams.constBegin(); it != m_simpleParams.constEnd(); ++it){
+		const QVariant& otherValue = sourcePtr->m_simpleParams.value(it.key());
+		const QVariant& value = it.value();
+
+		if (value.canConvert<const CGqlParamObject*>() && value.metaType() == QMetaType::fromType<const CGqlParamObject*>()){
+			if (otherValue.metaType() != value.metaType()){
+				return false;
+			}
+
+			const CGqlParamObject* ptr = value.value<const CGqlParamObject*>();
+			const CGqlParamObject* otherPtr = otherValue.value<const CGqlParamObject*>();
+			if ((ptr == nullptr) != (otherPtr == nullptr)){
+				return false;
+			}
+
+			if (ptr != nullptr && !ptr->IsEqual(*otherPtr)){
+				return false;
+			}
+		}
+		else if (value != otherValue){
+			return false;
+		}
+	}
+
+	if (m_objectParams.keys() != sourcePtr->m_objectParams.keys()){
+		return false;
+	}
+
+	for (auto it = m_objectParams.constBegin(); it != m_objectParams.constEnd(); ++it){
+		const istd::TSharedInterfacePtr<CGqlParamObject>& otherPtr = sourcePtr->m_objectParams.value(it.key());
+		if (it.value().IsValid() != otherPtr.IsValid()){
+			return false;
+		}
+
+		if (it.value().IsValid() && !it.value()->IsEqual(*otherPtr)){
+			return false;
+		}
+	}
+
+	if (m_objectParamsArray.keys() != sourcePtr->m_objectParamsArray.keys()){
+		return false;
+	}
+
+	for (auto it = m_objectParamsArray.constBegin(); it != m_objectParamsArray.constEnd(); ++it){
+		const QList<istd::TSharedInterfacePtr<CGqlParamObject>>& otherList = sourcePtr->m_objectParamsArray.value(it.key());
+		if (it.value().size() != otherList.size()){
+			return false;
+		}
+
+		for (qsizetype i = 0; i < otherList.size(); ++i){
+			const istd::TSharedInterfacePtr<CGqlParamObject>& ptr = it.value().at(i);
+			const istd::TSharedInterfacePtr<CGqlParamObject>& otherPtr = otherList.at(i);
+			if (ptr.IsValid() != otherPtr.IsValid()){
+				return false;
+			}
+
+			if (ptr.IsValid() && !ptr->IsEqual(*otherPtr)){
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
+
+bool CGqlParamObject::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/){
 	const CGqlParamObject* sourcePtr = dynamic_cast<const CGqlParamObject*>(&object);
 	if (sourcePtr != nullptr){
 		istd::CChangeNotifier changeNotifier(this);

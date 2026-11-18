@@ -228,6 +228,20 @@ function listQmlFiles(configPath, entry = ''){
     return files
 }
 
+// The QML styles and the runtime name Windows fonts ("Segoe UI", "Consolas"). Without these faces a browser
+// on another system falls back to its serif default; here each name resolves to the closest local font.
+const FONT_FACES = [
+    ['Segoe UI', 400, ['Segoe UI', 'SegoeUI', 'Helvetica Neue', 'HelveticaNeue', 'Noto Sans', 'NotoSans-Regular', 'DejaVu Sans', 'Liberation Sans', 'Arial', 'ArialMT']],
+    ['Segoe UI', 700, ['Segoe UI Bold', 'SegoeUI-Bold', 'Helvetica Neue Bold', 'HelveticaNeue-Bold', 'Noto Sans Bold', 'NotoSans-Bold', 'DejaVu Sans Bold', 'Liberation Sans Bold', 'Arial Bold', 'Arial-BoldMT']],
+    ['Consolas', 400, ['Consolas', 'Menlo', 'Menlo-Regular', 'Monaco', 'DejaVu Sans Mono', 'Liberation Mono', 'Courier New', 'CourierNewPSMT']],
+    ['Consolas', 700, ['Consolas Bold', 'Consolas-Bold', 'Menlo Bold', 'Menlo-Bold', 'DejaVu Sans Mono Bold', 'Liberation Mono Bold', 'Courier New Bold', 'CourierNewPS-BoldMT']]
+]
+
+function fontFaces(){
+    return FONT_FACES.map(([family, weight, locals]) =>
+        `@font-face { font-family: '${family}'; font-weight: ${weight}; src: ${locals.map(name => `local('${name}')`).join(', ')}; }`).join('\n')
+}
+
 function html(options){
     let icon = options.icon ? `<link rel="icon" href="${options.icon}">` : ''
     return `<!DOCTYPE html>
@@ -237,6 +251,9 @@ function html(options){
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${options.name}</title>
 ${icon}
+<style>
+${fontFaces()}
+</style>
 <script src="${options.name}.js"></script>
 </head>
 <body></body>

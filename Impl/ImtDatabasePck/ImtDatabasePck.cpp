@@ -102,6 +102,11 @@ I_EXPORT_COMPONENT(
 			"ObjectCollection Migration Controller");
 
 I_EXPORT_COMPONENT(
+			ObjectCollectionImportMigrationController,
+			"Migration step importing the objects of another collection, keeping their IDs",
+			"ObjectCollection Import Migration Controller");
+
+I_EXPORT_COMPONENT(
 			DatabaseConnector,
 			"Database connector",
 			"Database Connector");

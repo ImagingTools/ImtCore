@@ -14,6 +14,7 @@
 // ImtCore includes
 #include <imtauth/IRole.h>
 #include <imtauth/IRoleInfoProvider.h>
+#include <imtauth/ITenantEntityBindingManager.h>
 #include <imtauth/IUserGroupInfo.h>
 #include <imtauth/IUserGroupInfoProvider.h>
 #include <imtauth/IUserInfo.h>
@@ -74,6 +75,12 @@ public:
 		QByteArrayList ids;
 		QString message;
 	};
+
+	/**
+		Walk only the group roles, parent groups and parent roles bound to the tenant, as GetTenantUserRoles does.
+		An empty tenant or no binding manager keeps everything.
+	*/
+	void SetTenantScope(imtauth::ITenantEntityBindingManager* bindingManagerPtr, const QByteArray& tenantId);
 
 	/**
 		Collect a user: the given roles (those not in \c directRoleIds are delegated) and the user's groups.
@@ -164,8 +171,12 @@ private:
 				const Path& groupPath,
 				const QByteArrayList& chain,
 				const imtauth::IUserGroupInfoProvider* fallbackGroupProviderPtr);
+	bool IsInTenantScope(const QByteArray& entityType, const QByteArray& entityId) const;
 
 private:
+	imtauth::ITenantEntityBindingManager* m_bindingManagerPtr = nullptr;
+	QByteArray m_tenantId;
+
 	QList<Item> m_roles;
 	QList<Item> m_groups;
 	QList<Item> m_users;

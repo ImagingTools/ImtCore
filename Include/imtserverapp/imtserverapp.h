@@ -2,6 +2,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QJsonObject>
+
 // ACF includes
 #include <iprm/IIdParam.h>
 #include <iprm/TParamsPtr.h>
@@ -10,6 +13,8 @@
 #include <imtauth/imtauth.h>
 #include <imtauth/IPermissionChecker.h>
 #include <imtserverapp/ICommandPermissionsProvider.h>
+#include <imtserverapp/IPageGuiElementModel.h>
+#include <imtserverapp/IRepresentationController.h>
 
 
 /**
@@ -77,6 +82,18 @@ inline bool IsElementAccessible(
 
 	return permissionCheckerPtr->CheckPermission(heldPermissions, elementPermissions);
 }
+
+
+/**
+	Adds the menu group of the page \a page to its representation: \c groupId, \c groupName and \c groupIcon,
+	taken from the representation of the group made by \a groupRepresentationController.
+	A page outside any group gets an empty \c groupId.
+*/
+void SetupPageGroupRepresentation(
+			const IPageGuiElementModel& page,
+			const IRepresentationController& groupRepresentationController,
+			QJsonObject& representation,
+			const iprm::IParamsSet* paramsPtr);
 
 
 } // namespace imtserverapp

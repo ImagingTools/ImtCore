@@ -35,6 +35,22 @@ DecoratorBase {
 
 	property bool signalLoading: false;
 	property bool isLoading: tabPanelDecorator.signalLoading || (tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.contentLoading : false);
+	property bool skeletonDelayElapsed: false;
+
+	onIsLoadingChanged: {
+		if (!tabPanelDecorator.isLoading){
+			tabPanelDecorator.skeletonDelayElapsed = false;
+		}
+	}
+
+	// The title skeleton is shown only when the load lasts longer than Style.skeletonDelay
+	Timer {
+		interval: Style.skeletonDelay;
+		running: tabPanelDecorator.isLoading;
+		onTriggered: {
+			tabPanelDecorator.skeletonDelayElapsed = true;
+		}
+	}
 
 	Connections {
 		target: tabPanelDecorator.baseElement;
@@ -200,7 +216,7 @@ DecoratorBase {
 				anchors.left: parent.left;
 				width: parent.width;
 				height: Style.iconSizeXXS;
-				visible: tabPanelDecorator.isLoading;
+				visible: tabPanelDecorator.isLoading && tabPanelDecorator.skeletonDelayElapsed;
 				animated: visible;
 			}
 		}

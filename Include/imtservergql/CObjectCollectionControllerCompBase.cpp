@@ -607,6 +607,8 @@ sdl::V1_0::imtbase::CRemoveElementSetPayload CObjectCollectionControllerCompBase
 		}
 	}
 
+	ApplyHeaderFilters(gqlRequest, filterParams);
+
 	// The storage removes a set without regard to the tenant, so the selected objects are removed by their IDs
 	istd::TDelPtr<imtauth::CTenantFilterParam> tenantFilterPtr(CreateTenantFilterParam(gqlRequest));
 	const bool isTenantRestricted = tenantFilterPtr.IsValid() && !IsAccessCheckBypassed(gqlRequest);
@@ -695,6 +697,7 @@ sdl::V1_0::imtbase::CRestoreObjectSetPayload CObjectCollectionControllerCompBase
 	}
 
 	AddAccessFilters(gqlRequest, imtgql::CGqlParamObject(), filterParams);
+	ApplyHeaderFilters(gqlRequest, filterParams);
 
 	imtbase::ICollectionInfo::Ids elementIds = m_objectCollectionCompPtr->GetElementIds(0, -1, &filterParams);
 
@@ -1184,6 +1187,7 @@ sdl::V1_0::imtbase::CGetElementsCountPayload CObjectCollectionControllerCompBase
 	}
 
 	AddAccessFilters(gqlRequest, imtgql::CGqlParamObject(), filterParams);
+	ApplyHeaderFilters(gqlRequest, filterParams);
 
 	response.count = m_objectCollectionCompPtr->GetElementsCount(&filterParams);
 
@@ -1226,6 +1230,7 @@ sdl::V1_0::imtbase::CGetElementIdsPayload CObjectCollectionControllerCompBase::O
 	}
 
 	AddAccessFilters(gqlRequest, imtgql::CGqlParamObject(), filterParams);
+	ApplyHeaderFilters(gqlRequest, filterParams);
 
 	imtbase::IObjectCollection::Ids ids = m_objectCollectionCompPtr->GetElementIds(offset, count, &filterParams);
 	response.elementIds.Emplace();
@@ -1589,6 +1594,7 @@ sdl::V1_0::imtbase::CCreateSubCollectionPayload CObjectCollectionControllerCompB
 	}
 
 	AddAccessFilters(gqlRequest, imtgql::CGqlParamObject(), filterParams);
+	ApplyHeaderFilters(gqlRequest, filterParams);
 
 	if (!requestInfo.isItemsRequested){
 		return {};
@@ -2190,7 +2196,9 @@ QJsonObject CObjectCollectionControllerCompBase::InsertObject(
 	QString description = gqlInputParamPtr->GetParamArgumentValue("description").toString();
 
 	if (typeId.isEmpty()){
-		typeId = "DocumentInfo";
+		// A collection of one type stores the object as that type: a "DocumentInfo" row of a typed collection cannot be read back
+		const iprm::IOptionsList* typesPtr = m_objectCollectionCompPtr->GetObjectTypesInfo();
+		typeId = (typesPtr != nullptr && typesPtr->GetOptionsCount() == 1) ? typesPtr->GetOptionId(0) : QByteArrayLiteral("DocumentInfo");
 	}
 
 	QByteArray objectId;
@@ -3328,6 +3336,54 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 			}
 		}
 	}
+
+	ApplyHeaderFilters(gqlRequest, filterParams);
+}
+
+
+void CObjectCollectionControllerCompBase::ApplyHeaderFilters(const imtgql::CGqlRequest& gqlRequest, iprm::CParamsSet& filterParams) const
+{
+	imtbase::IComplexCollectionFilter::FilterExpression fixedExpression;
+	fixedExpression.logicalOperation = imtbase::IComplexCollectionFilter::LO_AND;
+
+	const int count = qMin(m_headerFilterHeaderIdsAttrPtr.GetCount(), m_headerFilterFieldIdsAttrPtr.GetCount());
+	for (int i = 0; i < count; ++i){
+		const QByteArray headerValue = gqlRequest.GetHeader(m_headerFilterHeaderIdsAttrPtr[i]);
+		if (!headerValue.isEmpty()){
+			fixedExpression.fieldFilters << imtbase::IComplexCollectionFilter::FieldFilter(m_headerFilterFieldIdsAttrPtr[i], QString::fromUtf8(headerValue));
+		}
+	}
+
+	AddFixedFilters(gqlRequest, fixedExpression);
+
+	if (fixedExpression.fieldFilters.isEmpty() && fixedExpression.filterExpressions.isEmpty()){
+		return;
+	}
+
+	imtbase::CComplexCollectionFilter* complexFilterPtr = dynamic_cast<imtbase::CComplexCollectionFilter*>(filterParams.GetEditableParameter(QByteArrayLiteral("ComplexFilter")));
+	if (complexFilterPtr == nullptr){
+		istd::TDelPtr<imtbase::CComplexCollectionFilter> newFilterPtr = new imtbase::CComplexCollectionFilter();
+		newFilterPtr->SetFilterExpression(fixedExpression);
+
+		filterParams.SetEditableParameter(QByteArrayLiteral("ComplexFilter"), newFilterPtr.PopPtr(), true);
+
+		return;
+	}
+
+	// The client's own filter becomes a nested expression, so its OR-logic cannot widen the fixed restriction.
+	const imtbase::IComplexCollectionFilter::FilterExpression& clientExpression = complexFilterPtr->GetFilterExpression();
+	if (!clientExpression.fieldFilters.isEmpty() || !clientExpression.filterExpressions.isEmpty()){
+		fixedExpression.filterExpressions << clientExpression;
+	}
+
+	complexFilterPtr->SetFilterExpression(fixedExpression);
+}
+
+
+void CObjectCollectionControllerCompBase::AddFixedFilters(
+			const imtgql::CGqlRequest& /*gqlRequest*/,
+			imtbase::IComplexCollectionFilter::FilterExpression& /*fixedExpression*/) const
+{
 }
 
 

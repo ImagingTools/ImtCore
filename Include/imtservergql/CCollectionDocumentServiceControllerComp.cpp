@@ -856,14 +856,7 @@ QByteArray CCollectionDocumentServiceControllerComp::GetCollectionObjectId(const
 		return QByteArray();
 	}
 
-	const imtdoc::IDocumentService::DocumentList documentList = m_documentManagerCompPtr->GetOpenedDocumentList(userId);
-	for (const imtdoc::IDocumentService::DocumentListItem& documentItem : documentList){
-		if (documentItem.documentId == documentId){
-			return imtdoc::SourceRefToObjectId(documentItem.documentSourceRef);
-		}
-	}
-
-	return QByteArray();
+	return imtdoc::GetDocumentObjectId(*m_documentManagerCompPtr, userId, documentId);
 }
 
 

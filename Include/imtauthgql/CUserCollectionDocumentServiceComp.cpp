@@ -111,6 +111,7 @@ sdl::V1_0::imtauth::CUserData CUserCollectionDocumentServiceComp::OnGetUserRepre
 	// Delegated roles added by the tenant adaptation are not direct, so they do not round-trip.
 	const imtauth::IPrincipal::RoleIds directRoles = userPtr->GetRoles(currentProductId);
 	CAssignmentCollector collector;
+	collector.SetTenantScope(bindingPtr, currentTenantId);
 	collector.CollectUser(*effectiveUserPtr, effectiveUserPtr->GetRoles(currentProductId), directRoles, currentProductId);
 	collector.FillUser(response);
 

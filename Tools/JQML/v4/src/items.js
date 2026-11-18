@@ -2384,7 +2384,7 @@ export class DropShadow extends Item {
 			fillRounded(r, r.pack(color, opacity * alpha), x, y, this.$aw + 2 * grow, this.$ah + 2 * grow, Math.max(corner + grow, 0), aa);
 		}
 		// The effect shows its source over the shadow: the inside of the outline is the source, not the shadow. A source that
-		// covers the same box (`anchors.fill: source`) is painted again here.
+		// covers the same box (`anchors.fill: source`) is painted again here, with what is inside of it (a button of a panel).
 		if (
 			source instanceof Rectangle &&
 			source.$parent === this.$parent &&
@@ -2393,7 +2393,7 @@ export class DropShadow extends Item {
 			Math.abs(source.$aw - this.$aw) < 0.5 &&
 			Math.abs(source.$ah - this.$ah) < 0.5
 		) {
-			source.$paint(r, opacity * source.$opacity);
+			source.$renderContent(r, opacity * source.$opacity);
 		}
 	}
 }

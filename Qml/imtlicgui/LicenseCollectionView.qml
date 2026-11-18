@@ -16,6 +16,9 @@ RemoteCollectionView {
 
 	collectionId: "Licenses";
 	documentCollectionFilter: null
+
+	// "Software" or "Hardware" when licenses are only defined for products of that category.
+	property string productCategoryId: ""
 	
 	commandsDelegateComp: Component {DocumentCollectionViewDelegate {
 			revisionsPermissionPath: "/LicenseDefinitionManagement/Revisions";
@@ -36,6 +39,10 @@ RemoteCollectionView {
 		
 		LicenseEditor {
 			id: licenceEditor;
+
+			productsModel: root.productCategoryId === "Software" ? CachedProductCollection.softwareProductsModel
+						 : root.productCategoryId === "Hardware" ? CachedProductCollection.hardwareProductsModel
+						 : CachedProductCollection.collectionModel
 			
 			commandsDelegateComp: Component {ViewCommandsDelegateBase {
 					view: licenceEditor;

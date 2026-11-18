@@ -17,13 +17,25 @@ Rectangle {
 	color: Style.baseColor
 	visible: false
 
+	// Shown only when the load lasts longer than Style.skeletonDelay
 	function start(){
 		skeletonPanel.phase = 0
-		skeletonPanel.visible = true
+		showDelayTimer.restart()
 	}
 
 	function stop(){
+		showDelayTimer.stop()
 		skeletonPanel.visible = false
+	}
+
+	Timer {
+		id: showDelayTimer
+		interval: Style.skeletonDelay
+		repeat: false
+
+		onTriggered: {
+			skeletonPanel.visible = true
+		}
 	}
 
 	MouseArea {

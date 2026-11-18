@@ -56,5 +56,12 @@ PageContainer {
 		anchors.fill: root
 		documentManager: root.documentManager
 		pageIcon: root.pageIcon
+
+		// The collection of the page is its page ID.
+		onCollectionViewChanged: {
+			if (documentManagerView_.collectionView){
+				documentManagerView_.collectionView.collectionId = root.pageId
+			}
+		}
 	}
 }

@@ -105,6 +105,10 @@ QtObject {
 	}
 
 	onUndoInfoReceived: {
+		let index = getDocumentIndexByDocumentId(documentId)
+		if (index >= 0){
+			__internal.openedDocuments[index].undoStepCount = availableUndoSteps
+		}
 		setDocumentIsDirty(documentId, isDirty)
 	}
 
@@ -518,6 +522,17 @@ QtObject {
 		return __internal.openedDocuments[index].isDirty
 	}
 
+	// A new document nobody has edited yet: the server keeps it dirty, yet closing it loses nothing
+	function documentIsUntouchedNew(documentId){
+		let index = getDocumentIndexByDocumentId(documentId)
+		if (index < 0){
+			return false
+		}
+
+		let docData = __internal.openedDocuments[index]
+		return docData.isNew && docData.undoStepCount === 0
+	}
+
 	// A read-only document (e.g. opened from an object revision) can only be closed.
 	// The flag comes from the server only (DocumentInfo.isReadOnly).
 	function documentIsReadOnly(documentId){
@@ -861,6 +876,7 @@ QtObject {
 				property string objectId: ""
 				property bool isDirty: false
 				property bool isNew: true
+				property int undoStepCount: 0
 				property bool isLoading: false
 				property bool isClosing: false
 				property bool representationReceived: false

@@ -1044,6 +1044,16 @@ inline QByteArray GetRequestServerProductId(const imtgql::CGqlRequest& gqlReques
 
 
 /**
+	Remove the password hash and the hashes of the earlier passwords from a user copy that leaves the server.
+*/
+inline void RemovePasswordData(imtauth::IUserInfo& userInfo)
+{
+	userInfo.SetPasswordHash(QByteArray());
+	userInfo.SetPasswordHistory(QByteArrayList());
+}
+
+
+/**
 	Adapts (filters) the roles, groups and permissions of a user according to the
 	current tenant context, and enriches with delegated roles when appropriate.
 
