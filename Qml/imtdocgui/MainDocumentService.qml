@@ -85,6 +85,58 @@ QtObject {
         documentManager.openDocument(documentId, documentTypeId);
     }
 
+    // Creates a new document on the page typeId, loading the page first if it is not open yet.
+    // createdCallback(documentId) is optional; it is called once the server document service has created the document.
+    function insertNewDocument(typeId, documentTypeId, createdCallback){
+        if (!typeId || typeId === "" || !documentTypeId || documentTypeId === ""){
+            console.error("Unable to create a document, please check input parameters");
+            return;
+        }
+
+        let documentManager = root.documentManagers[typeId];
+        if (!documentManager){
+            root.tryRegisterDocumentService(typeId, function(result){
+                if (result && root.documentManagers[typeId]){
+                    root.insertNewDocument(typeId, documentTypeId, createdCallback);
+                }
+                else{
+                    console.error("Unable to create a document. Document manager with type-ID: '" , typeId, "' is invalid!");
+                }
+            })
+            return;
+        }
+
+        documentOpened(typeId, "", documentTypeId);
+
+        // A page on the server document service creates the document there.
+        if (documentManager.createDocument){
+            if (createdCallback){
+                let createFailedFunc = null;
+                let createdFunc = function(documentId, createdTypeId){
+                    if (createdTypeId !== documentTypeId){
+                        return;
+                    }
+
+                    documentManager.documentCreated.disconnect(createdFunc);
+                    documentManager.createDocumentFailed.disconnect(createFailedFunc);
+                    createdCallback(documentId);
+                }
+                createFailedFunc = function(failedTypeId, message){
+                    documentManager.documentCreated.disconnect(createdFunc);
+                    documentManager.createDocumentFailed.disconnect(createFailedFunc);
+                }
+
+                documentManager.documentCreated.connect(createdFunc);
+                documentManager.createDocumentFailed.connect(createFailedFunc);
+            }
+
+            documentManager.createDocument(documentTypeId);
+        }
+        else{
+            documentManager.insertNewDocument(documentTypeId);
+        }
+    }
+
     function saveDirtyDocuments(){
         let typeIds = Object.keys(root.documentManagers);
         for (let i = 0; i < typeIds.length; i++){

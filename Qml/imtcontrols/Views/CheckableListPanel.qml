@@ -430,7 +430,8 @@ FocusScope {
 								objectName: "PanelRowBadge"
 								anchors.right: parent.right
 								anchors.verticalCenter: parent.verticalCenter
-								width: badgeText.text === "" ? 0 : Math.min(parent.width * 0.4, badgeText.contentWidth + 2 * Style.marginS)
+								// implicitWidth: contentWidth is that of the elided text, which depends on this width
+								width: badgeText.text === "" ? 0 : Math.min(parent.width * 0.4, badgeText.implicitWidth + 2 * Style.marginS)
 								height: Style.fontSizeM + 4
 								radius: height / 2
 								visible: badgeText.text !== ""

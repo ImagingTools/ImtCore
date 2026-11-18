@@ -19,6 +19,7 @@
 #include <imtlic/CProductInfo.h>
 #include <imtlic/IFeatureInfo.h>
 #include <imtlicgql/imtlicgql.h>
+#include <imtlicgql/ProductRepresentation.h>
 
 
 namespace imtlicgql
@@ -394,21 +395,7 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 	}
 	representationPayload.id = QByteArray(id);
 
-	QByteArray productId = productInfoPtr->GetProductId();
-	representationPayload.productId = QByteArray((productId));
-
-	QString productName = productInfoPtr->GetName();
-	representationPayload.name = QString((productName));
-	representationPayload.productName = QString((productName));
-
-	QString description = productInfoPtr->GetProductDescription();
-	representationPayload.description = QString((description));
-
-	QByteArray categoryId = productInfoPtr->GetCategoryId();
-	representationPayload.categoryId = QByteArray((categoryId));
-
-	representationPayload.features = QByteArray((productInfoPtr->GetFeatures()->GetElementIds().toList().join(';')));
-	representationPayload.optionalFeatures = CreateOptionalFeaturesRepresentation(*productInfoPtr);
+	FillRepresentationFromProduct(*productInfoPtr, representationPayload);
 
 	return true;
 }
@@ -506,186 +493,18 @@ bool CProductCollectionControllerComp::FillObjectFromRepresentation(
 	}
 	productInfoPtr->SetObjectUuid(objectId);
 
-	QByteArray productId;
-	if (productDataRepresentation.productId){
-		productId = *productDataRepresentation.productId;
-	}
+	QByteArrayList unresolvedRequirements;
+	FillProductFromRepresentation(productDataRepresentation, *m_featureCollectionCompPtr, *productInfoPtr, &unresolvedRequirements);
 
-	if (productId.isEmpty()){
-		errorMessage = QT_TR_NOOP("Product Name cannot be empty");
-		SendErrorMessage(0, errorMessage, "Product controller");
-
-		return false;
-	}
-
-	imtbase::IComplexCollectionFilter::FieldFilter fieldFilter;
-	fieldFilter.fieldId = "ProductId";
-	fieldFilter.filterValue = productId;
-
-	imtbase::IComplexCollectionFilter::FilterExpression groupFilter;
-	groupFilter.fieldFilters << fieldFilter;
-
-	imtbase::CComplexCollectionFilter complexFilter;
-	complexFilter.SetFilterExpression(groupFilter);
-
-	iprm::CParamsSet filterParam;
-	filterParam.SetEditableParameter("ComplexFilter", &complexFilter);
-
-	imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds(0, -1, &filterParam);
-	if (!collectionIds.isEmpty()){
-		QByteArray id = collectionIds[0];
-		if (objectId != id){
-			errorMessage = QT_TR_NOOP(QStringLiteral("Product '%1' already exists")).arg(productId);
-
-			return false;
-		}
-	}
-
-	productInfoPtr->SetProductId(productId);
-
-	QString name;
-	QString description;
-
-	if (productDataRepresentation.productName){
-		name = *productDataRepresentation.productName;
-	}
-	if (name.isEmpty()){
-		errorMessage = QT_TR_NOOP("Product Name is empty");
-		SendErrorMessage(0, errorMessage, "Product controller");
-
-		return false;
-	}
-
-	imtbase::IComplexCollectionFilter::FieldFilter nameFieldFilter;
-	nameFieldFilter.fieldId = "ProductName";
-	nameFieldFilter.filterValue = name;
-
-	imtbase::IComplexCollectionFilter::FilterExpression nameGroupFilter;
-	nameGroupFilter.fieldFilters << nameFieldFilter;
-
-	imtbase::CComplexCollectionFilter nameComplexFilter;
-	nameComplexFilter.SetFilterExpression(nameGroupFilter);
-
-	iprm::CParamsSet nameFilterParam;
-	nameFilterParam.SetEditableParameter("ComplexFilter", &nameComplexFilter);
-
-	imtbase::ICollectionInfo::Ids collectionIds2 = m_objectCollectionCompPtr->GetElementIds(0, -1, &nameFilterParam);
-	if (!collectionIds2.isEmpty()){
-		QByteArray id = collectionIds2[0];
-		if (objectId != id){
-			errorMessage = QT_TR_NOOP(QStringLiteral("Product name '%1' already exists, please rename")).arg(name);
-
-			return false;
-		}
-	}
-
-	productInfoPtr->SetName(name);
-
-	if (productDataRepresentation.description){
-		description = *productDataRepresentation.description;
-	}
-	productInfoPtr->SetProductDescription(description);
-
-	QByteArray categoryId;
-	if (productDataRepresentation.categoryId){
-		categoryId = *productDataRepresentation.categoryId;
-	}
-	productInfoPtr->SetCategoryId(categoryId);
-
-	QByteArray features;
-	if (productDataRepresentation.features){
-		features = *productDataRepresentation.features;
-	}
-
-	QByteArrayList featureIds;
-	if (!features.isEmpty()){
-		featureIds = features.split(';');
-		featureIds.removeAll(QByteArray());
-	}
-
-	// Every id in "features" is a feature document id and is looked up as one;
-	// the ids below are nodes inside such a document and are never resolved
-	// against the collection. featureId is only matched against what the product
-	// actually has, to drop stale entries.
-	imtlic::IProductInfo::OptionalFeatureInfos optionalFeatures;
-	if (productDataRepresentation.optionalFeatures){
-		for (const sdl::V1_0::imtlic::CProductOptionalFeature& optionalFeature : productDataRepresentation.optionalFeatures->ToList()){
-			if (!optionalFeature.featureId){
-				continue;
-			}
-
-			const QByteArray featureId = *optionalFeature.featureId;
-			if (featureId.isEmpty() || !featureIds.contains(featureId)){
-				continue;
-			}
-
-			imtlic::IProductInfo::OptionalFeatureInfo optionalFeatureInfo;
-			optionalFeatureInfo.featureId = featureId;
-
-			if (optionalFeature.subFeatureIds){
-				optionalFeatureInfo.subFeatureIds = optionalFeature.subFeatureIds->ToList();
-				optionalFeatureInfo.subFeatureIds.removeAll(QByteArray());
-			}
-
-			if (!optionalFeatureInfo.subFeatureIds.isEmpty()){
-				optionalFeatures << optionalFeatureInfo;
-			}
-		}
-	}
-
-	// A feature is worth nothing without what it requires, so the product is
-	// completed here rather than trusted to arrive complete: the editor resolves
-	// the same requirements while the user works, but a product also arrives from
-	// an older client, from another one, or from a direct request - and a product
-	// missing a required feature is one whose generated product info silently
-	// drops that requirement (\see CProductInfoFileGeneratorComp).
-	const ProductFeatureClosure featureClosure = CompleteProductFeatures(
-			*m_featureCollectionCompPtr,
-			featureIds,
-			optionalFeatures);
-
-	for (const QByteArray& unresolvedRequirement : featureClosure.unresolvedRequirements){
+	for (const QByteArray& unresolvedRequirement : unresolvedRequirements){
 		SendWarningMessage(
 				0,
 				QStringLiteral("Product '%1' requires '%2', which no feature of the catalog carries")
-						.arg(name, QString::fromUtf8(unresolvedRequirement)),
+						.arg(productInfoPtr->GetName(), QString::fromUtf8(unresolvedRequirement)),
 				"CProductCollectionControllerComp");
 	}
 
-	for (const QByteArray& featureId : featureClosure.featureIds){
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (m_featureCollectionCompPtr->GetObjectData(featureId, dataPtr)){
-			const imtlic::IFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::IFeatureInfo*>(dataPtr.GetPtr());
-			if (featureInfoPtr != nullptr){
-				productInfoPtr->AddFeature(featureId, *featureInfoPtr);
-			}
-		}
-	}
-
-	productInfoPtr->SetOptionalFeatures(featureClosure.optionalFeatures);
-
-	return true;
-}
-
-
-// private methods
-
-imtsdl::TElementList<sdl::V1_0::imtlic::CProductOptionalFeature> CProductCollectionControllerComp::CreateOptionalFeaturesRepresentation(
-			const imtlic::IProductInfo& productInfo)
-{
-	imtsdl::TElementList<sdl::V1_0::imtlic::CProductOptionalFeature> retVal;
-
-	const imtlic::IProductInfo::OptionalFeatureInfos optionalFeatures = productInfo.GetOptionalFeatures();
-	for (const imtlic::IProductInfo::OptionalFeatureInfo& optionalFeature : optionalFeatures){
-		sdl::V1_0::imtlic::CProductOptionalFeature representation;
-		representation.featureId = optionalFeature.featureId;
-		representation.subFeatureIds.Emplace();
-		representation.subFeatureIds->FromList(optionalFeature.subFeatureIds);
-
-		retVal << representation;
-	}
-
-	return retVal;
+	return CheckProductIdentity(*productInfoPtr, objectId, *m_objectCollectionCompPtr, errorMessage);
 }
 
 

@@ -20,6 +20,7 @@
         <file alias="imtgui/Panels/MenuPanel.qml">Panels/MenuPanel.qml</file>
         <file alias="imtgui/Panels/MenuPanelButton.qml">Panels/MenuPanelButton.qml</file>
         <file alias="imtgui/Panels/MenuPanelButtonDecorator.qml">Panels/MenuPanelButtonDecorator.qml</file>
+        <file alias="imtgui/Panels/MenuPanelGroupHeader.qml">Panels/MenuPanelGroupHeader.qml</file>
         <file alias="imtgui/Panels/SubMenuPanelButtonDecorator.qml">Panels/SubMenuPanelButtonDecorator.qml</file>
         <file alias="imtgui/Panels/TabDelegate.qml">Panels/TabDelegate.qml</file>
         <file alias="imtgui/Panels/TabPanel.qml">Panels/TabPanel.qml</file>
