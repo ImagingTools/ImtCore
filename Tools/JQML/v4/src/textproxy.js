@@ -48,6 +48,7 @@ export function attachTextProxy(canvas, scene, engine) {
 	const forms = new Map(); // password editor -> { form, user, password, userItem }
 	let free = null; // { item, el } the element of the focused editor that is not in a login form
 	const byElement = new Map(); // element -> editor
+	const lastState = new WeakMap(); // element -> { text, start, end }: where the element and the model last agreed
 	let composing = false;
 
 	// ----- elements -----
@@ -95,6 +96,18 @@ export function attachTextProxy(canvas, scene, engine) {
 	function push(el, item) {
 		if (composing && document.activeElement === el) return;
 		const state = item.$domState();
+		const last = lastState.get(el);
+		// Two writers: the element (a key moved its caret) and the model (a click or a script). What changed since the last time the
+		// two agreed is the newer one. A frame must not write the old model over a caret that a key has just moved, before `selectionchange`
+		// has told the model: the caret then never moved.
+		if (last !== undefined && document.activeElement === el) {
+			const nativeMoved = el.value !== last.text || el.selectionStart !== last.start || el.selectionEnd !== last.end;
+			const modelMoved = state.text !== last.text || state.start !== last.start || state.end !== last.end;
+			if (nativeMoved && !modelMoved) {
+				pull(el);
+				return;
+			}
+		}
 		if (el.value !== state.text) el.value = state.text;
 		if (document.activeElement === el && (el.selectionStart !== state.start || el.selectionEnd !== state.end)) {
 			try {
@@ -103,6 +116,12 @@ export function attachTextProxy(canvas, scene, engine) {
 				// a type that has no selection
 			}
 		}
+		remember(el);
+	}
+
+	// The state on which the element and the model agree.
+	function remember(el) {
+		lastState.set(el, { text: el.value, start: el.selectionStart, end: el.selectionEnd });
 	}
 
 	// ----- from the element to the model -----
@@ -113,6 +132,7 @@ export function attachTextProxy(canvas, scene, engine) {
 		item.$fromDom(el.value, el.selectionStart ?? el.value.length, el.selectionEnd ?? el.value.length, el.selectionDirection === 'backward');
 		// the model may have taken less (maxLength): the element follows it
 		if (item.$text !== el.value) push(el, item);
+		else remember(el);
 		scene.root.$updateRequested = true;
 	}
 
@@ -222,8 +242,8 @@ export function attachTextProxy(canvas, scene, engine) {
 				free = { item: editor, el };
 			}
 			place(free.el, editor);
-			// the second click in the focused field is native too (the list of the browser, the caret, a selection with the mouse)
-			free.el.style.pointerEvents = 'auto';
+			// The pointer is not for this element: the caret, the selection with the mouse and the context menu are the scene's (the text
+			// of the element has other metrics than the one that is drawn, and the menu of the browser is not the menu of the editor).
 			push(free.el, editor);
 		}
 	}
