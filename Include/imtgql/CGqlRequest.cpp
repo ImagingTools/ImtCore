@@ -641,6 +641,16 @@ bool CGqlRequest::IsEqual(const IChangeable& object) const
 		return false;
 	}
 
+	if (m_gqlContextPtr.IsValid() != sourcePtr->m_gqlContextPtr.IsValid()){
+		return false;
+	}
+
+	if (m_gqlContextPtr.IsValid() && m_gqlContextPtr.GetPtr() != sourcePtr->m_gqlContextPtr.GetPtr()){
+		if (!m_gqlContextPtr->IsEqual(*sourcePtr->m_gqlContextPtr.GetPtr())){
+			return false;
+		}
+	}
+
 	return true;
 }
 
