@@ -2077,6 +2077,9 @@ export class Engine {
 						loader.$removeChild(child);
 					}
 				} else {
+					// The size of the Loader is the size of its item, which it did not have while the item was made: the layouts that its
+					// onCompleted handlers asked for ran with a Loader of size 0 and left nothing queued, so the Loader asks for one more.
+					loader.$update();
 					// A loaded item with no onCompleted still has bindings (anchors.fill: parent) that must run before geometry is read.
 					// The Loader sizes its item after the bindings of the item have run, as in Qt: a size that it wrote while they ran
 					// (its own `height` binding is one of them) would be written over by the binding of the item that comes after.
