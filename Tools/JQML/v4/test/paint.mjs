@@ -205,6 +205,20 @@ check('a canvas that drew inside of its size is not clipped', canvasClips((ctx) 
 	check('a line of height 0.5 is one whole pixel at every position', always, true);
 	check('and so is one of 0.5 at a device ratio of 2 (a pixel is 0.5)', rows(2, 100.3, 0.25), '200-201');
 	check('a quad that is not thinner than a pixel is left as it is', rows(1, 10.25, 3), '10.25-13.25');
+	// The same for a line of width 0.5 (a vertical one), and for a quad that is thin on both sides.
+	const columns = (x, w, h) => {
+		r.dpr = 1;
+		r.nv = 0;
+		r.ni = 0;
+		r.fillQuad(x, 0, w, h, 0xff000000);
+		const xs = [0, 1, 2, 3].map((i) => r.f32[i * 5]);
+		const ys = [0, 1, 2, 3].map((i) => r.f32[i * 5 + 1]);
+		return [Math.max(...xs) - Math.min(...xs), Number.isInteger(Math.min(...xs)), Math.max(...ys) - Math.min(...ys)].join(',');
+	};
+	let vertical = true;
+	for (let x = 50; x < 51; x += 0.125) if (columns(x, 0.5, 40) !== '1,true,40') vertical = false;
+	check('a line of width 0.5 is one whole pixel at every position', vertical, true);
+	check('a dot thinner than a pixel on both sides is one pixel', columns(7.3, 0.4, 0.4), '1,true,1');
 }
 
 // Like Qt, a fillStyle/strokeStyle that is not a color leaves the style as it was.
