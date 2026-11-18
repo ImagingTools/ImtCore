@@ -130,7 +130,7 @@ void CTestableCollectionDocumentServicePublisher::AddSubscriber(
 {
 	RequestNetworks subscriber;
 	subscriber.gqlRequest.CopyFrom(imtgql::CGqlRequest(imtgql::IGqlRequest::RT_SUBSCRIPTION, commandId));
-	subscriber.networkRequests.insert(subscriptionId, &networkRequest);
+	subscriber.networkRequests[subscriptionId].append(&networkRequest);
 
 	m_registeredSubscribers.append(subscriber);
 }

@@ -179,9 +179,11 @@ void CPublisherSubscriberBridgeComp::OnResponseReceived(
 				for (const QByteArray& clientSubscriptionId : clientSubscriptionIds){
 					for (const RequestNetworks& entry : m_registeredSubscribers){
 						if (entry.networkRequests.contains(clientSubscriptionId)){
-							const imtrest::IRequest* networkRequestPtr = entry.networkRequests.value(clientSubscriptionId);
-							if (networkRequestPtr != nullptr){
-								PushDataToSubscriber(clientSubscriptionId, commandId, payload, *networkRequestPtr);
+							for (const imtrest::IRequest* networkRequestPtr : entry.networkRequests.value(clientSubscriptionId)){
+								Q_ASSERT(networkRequestPtr != nullptr);
+								if (networkRequestPtr != nullptr){
+									PushDataToSubscriber(clientSubscriptionId, commandId, payload, *networkRequestPtr);
+								}
 							}
 							break;
 						}
@@ -198,9 +200,11 @@ void CPublisherSubscriberBridgeComp::OnResponseReceived(
 		for (const RequestNetworks& entry : m_registeredSubscribers){
 			if (entry.networkRequests.contains(clientSubscriptionId)){
 				QByteArray commandId = entry.gqlRequest.GetCommandId();
-				const imtrest::IRequest* networkRequestPtr = entry.networkRequests.value(clientSubscriptionId);
-				if (networkRequestPtr != nullptr){
-					PushDataToSubscriber(clientSubscriptionId, commandId, payload, *networkRequestPtr);
+				for (const imtrest::IRequest* networkRequestPtr : entry.networkRequests.value(clientSubscriptionId)){
+					Q_ASSERT(networkRequestPtr != nullptr);
+					if (networkRequestPtr != nullptr){
+						PushDataToSubscriber(clientSubscriptionId, commandId, payload, *networkRequestPtr);
+					}
 				}
 				break;
 			}
@@ -238,21 +242,28 @@ void CPublisherSubscriberBridgeComp::OnSubscriptionStatusChanged(
 	QMutexLocker locker(&m_mutex);
 	for (const QByteArray& clientSubscriptionId : clientSubscriptionIds){
 		for (const RequestNetworks& entry : m_registeredSubscribers){
-			const imtrest::IRequest* networkRequestPtr = entry.networkRequests.value(clientSubscriptionId);
-			if (networkRequestPtr == nullptr){
+			const QList<const imtrest::IRequest*> requests = entry.networkRequests.value(clientSubscriptionId);
+			if (requests.isEmpty()){
 				continue;
 			}
 
-			const QByteArray body = QStringLiteral(R"({"id": "%1","type": "error","payload": [{"message": "The server behind this one refused the subscription","extensions": %2}]})")
-						.arg(QString::fromUtf8(clientSubscriptionId), QString::fromUtf8(extensionsJson)).toUtf8();
+			for (const imtrest::IRequest* networkRequestPtr : requests){
+				Q_ASSERT(networkRequestPtr != nullptr);
+				if (networkRequestPtr == nullptr){
+					continue;
+				}
 
-			imtrest::ConstResponsePtr responsePtr(networkRequestPtr->GetProtocolEngine().CreateResponse(
-						*networkRequestPtr,
-						imtrest::IProtocolEngine::SC_OPERATION_NOT_AVAILABLE,
-						body,
-						QByteArrayLiteral("text/html; charset=utf-8")).PopInterfacePtr());
-			if (responsePtr.IsValid()){
-				m_requestManagerCompPtr->SendResponse(networkRequestPtr->GetRequestId(), responsePtr);
+				const QByteArray body = QStringLiteral(R"({"id": "%1","type": "error","payload": [{"message": "The server behind this one refused the subscription","extensions": %2}]})")
+							.arg(QString::fromUtf8(clientSubscriptionId), QString::fromUtf8(extensionsJson)).toUtf8();
+
+				imtrest::ConstResponsePtr responsePtr(networkRequestPtr->GetProtocolEngine().CreateResponse(
+							*networkRequestPtr,
+							imtrest::IProtocolEngine::SC_OPERATION_NOT_AVAILABLE,
+							body,
+							QByteArrayLiteral("text/html; charset=utf-8")).PopInterfacePtr());
+				if (responsePtr.IsValid()){
+					m_requestManagerCompPtr->SendResponse(networkRequestPtr->GetRequestId(), responsePtr);
+				}
 			}
 
 			break;

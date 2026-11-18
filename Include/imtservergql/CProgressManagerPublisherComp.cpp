@@ -84,7 +84,8 @@ bool CProgressManagerPublisherComp::PublishSession(const QByteArray& sessionId)
 	for (const RequestNetworks& networkRequest : m_registeredSubscribers){
 		if (networkRequest.networkRequests.contains(sessionId)){
 			commandId = networkRequest.gqlRequest.GetCommandId();
-			requestPtr = networkRequest.networkRequests[sessionId];
+			const QList<const imtrest::IRequest*>& requests = networkRequest.networkRequests[sessionId];
+			requestPtr = requests.isEmpty() ? nullptr : requests.first();
 		}
 	}
 

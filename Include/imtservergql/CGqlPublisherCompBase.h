@@ -66,7 +66,7 @@ protected:
 	struct RequestNetworks
 	{
 		imtgql::CGqlRequest gqlRequest;
-		QMap<QByteArray, const imtrest::IRequest*> networkRequests; // Subscription-ID -> NetworkRequest
+		QMap<QByteArray, QList<const imtrest::IRequest*>> networkRequests; // Subscription-ID -> NetworkRequests (one per connection)
 
 		RequestNetworks()
 			:gqlRequest(imtgql::IGqlRequest::RT_SUBSCRIPTION)
