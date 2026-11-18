@@ -41,7 +41,6 @@ public:
 	const QWebSocket* GetWebSocket() const;
 	void SetSocketStatus(Status socketStatus);
 	Status GetSocketStatus();
-	QByteArray GetRequestId();
 	QByteArray GetConnectionId() const;
 	// imtrest::IRequestServlet* GetRequestServlet();
 
@@ -90,7 +89,6 @@ private:
 	imtrest::IRequestServlet* m_requestClientHandlerPtr;
 	QByteArray m_productId;
 
-	QByteArray m_requestId;
 	QByteArray m_connectionId;
 	QObject m_receiver;
 

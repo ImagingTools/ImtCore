@@ -89,12 +89,6 @@ CWebSocketThread::Status CWebSocketThread::GetSocketStatus()
 }
 
 
-QByteArray CWebSocketThread::GetRequestId()
-{
-	return m_requestId;
-}
-
-
 QByteArray CWebSocketThread::GetConnectionId() const
 {
 	return m_connectionId;
