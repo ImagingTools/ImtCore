@@ -88,17 +88,24 @@ instead (`Docs/JQML/TestApi.md`). The kit works on both, with the same objectNam
   v3, `dom.locate()` hands out a `KitLocator`, which sends every call to Playwright on v3 and to `window.qmlTest` on
   v4. Once a page is known to be v3, `dom.locate()` returns Playwright's own locator, so v3 runs the code it ran before.
 - The CSS the kit uses (`[objectName="X"]`, `^=`, `$=`, `*=`, `[visible]`, `input`, the descendant combinator and
-  comma lists) is translated to qmlTest selectors. `KitLocator` has the part of the Locator API the kit uses:
-  `locator`, `first`, `last`, `nth`, `count`, `waitFor`, `isVisible`, `boundingBox`, `scrollIntoViewIfNeeded`,
-  `textContent`, `innerText`, `click`, `fill`.
+  comma lists) is translated to qmlTest selectors (`lib/qml.test.js` shows how). A comma list finds the items of all
+  its alternatives, in the order of the tree, as CSS does. A type name (`[objectName="MouseArea"]`) finds the items of
+  that type that have no objectName or that one, as v3 did, where a MouseArea with a name of its own is skipped.
+- `KitLocator` has the part of the Locator API the kit and the specs use: `locator`, `first`, `last`, `nth`, `count`,
+  `waitFor`, `isVisible`, `boundingBox` (null for an item that is not shown), `scrollIntoViewIfNeeded`,
+  `textContent`, `innerText`, `click`, `fill`. While a navigation is under way and the page has no
+  `window.qmlTest`, it finds nothing: `count()` is 0 and `waitFor()` goes on waiting.
 - Clicks stay real mouse clicks at the middle of the item, so the item on top at that point takes them, as for a user.
   `fill()` types through `qmlTest.fill` (focus, select all, the keys), since a select-all shortcut sent from
   Playwright is not reliable on the canvas. `waitForStable()` asks `qmlTest.whenIdle` instead of watching DOM
-  mutations. `checkElementScreenshot()` clips the page to the item's box.
+  mutations. `checkElementScreenshot()` clips the page to the item's box, and `columnRects()` reads the same boxes
+  through qmlTest and masks them with the same geometry as on v3.
+- A page where the application never shows up is taken for v3 after the wait, once per address of the page.
 - The session is kept under `qml/AuthorizationController/...` on v4 (v3: `AuthorizationController/...`); global
   setup and the permission check read both.
 
-Things to know about the selectors of qmlTest, if a spec uses them directly (`dom.callQmlTest`):
+Things to know about the selectors of qmlTest, if a spec uses them directly (`dom.isQml(page)` tells the backend,
+`dom.callQmlTest(page, method, ...args)` calls `window.qmlTest`):
 
 - Quote names: `"Save":visible`. Unquoted, `Save:visible` is read as ONE name (`:` is a character of a name), and a
   name that is not ASCII (`"ПользовательElementView"`) is refused unless it is quoted.
