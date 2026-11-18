@@ -617,6 +617,34 @@ int CGqlRequest::GetSupportedOperations() const
 }
 
 
+bool CGqlRequest::IsEqual(const IChangeable& object) const
+{
+	const CGqlRequest* sourcePtr = dynamic_cast<const CGqlRequest*>(&object);
+	if (sourcePtr == nullptr){
+		return false;
+	}
+
+	if (sourcePtr == this){
+		return true;
+	}
+
+	if (m_requestType != sourcePtr->m_requestType ||
+		m_commandId != sourcePtr->m_commandId ||
+		m_protocolVersion != sourcePtr->m_protocolVersion ||
+		m_operationName != sourcePtr->m_operationName){
+		return false;
+	}
+
+	if (!m_params.IsEqual(sourcePtr->m_params) ||
+		!m_fields.IsEqual(sourcePtr->m_fields) ||
+		!m_variables.IsEqual(sourcePtr->m_variables)){
+		return false;
+	}
+
+	return true;
+}
+
+
 bool CGqlRequest::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
 	const CGqlRequest* sourcePtr = dynamic_cast<const CGqlRequest*>(&object);

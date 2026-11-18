@@ -197,6 +197,18 @@ void CWebSocketRequest::RegisterRequestEventHandler(IRequestEventHandler* reques
 }
 
 
+QByteArray CWebSocketRequest::GetConnectionId() const
+{
+	return m_connectionId;
+}
+
+
+void CWebSocketRequest::SetConnectionId(const QByteArray& connectionId)
+{
+	m_connectionId = connectionId;
+}
+
+
 void CWebSocketRequest::SetCommandId(const QByteArray& commandId)
 {
 	m_commandId = commandId;

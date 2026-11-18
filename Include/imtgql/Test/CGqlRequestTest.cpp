@@ -4,6 +4,7 @@
 
 // ImtCore includes
 #include <imtgql/CGqlParamObject.h>
+#include <imtgql/CGqlFieldObject.h>
 #include <imtgql/CGqlRequest.h>
 #include <imtgql/CGqlFieldFragment.h>
 
@@ -1026,6 +1027,224 @@ void CGqlRequestTest::BenchmarkIsNullArrayElementMillionValues()
 		}
 	}
 	QCOMPARE(nullElementCount, 0);
+}
+
+
+void CGqlRequestTest::IsEqualSameAndEmpty()
+{
+	imtgql::CGqlRequest first(imtgql::IGqlRequest::RT_QUERY, "Cmd");
+	imtgql::CGqlRequest second(imtgql::IGqlRequest::RT_QUERY, "Cmd");
+
+	QVERIFY(first.IsEqual(first));
+	QVERIFY(first.IsEqual(second));
+	QVERIFY(second.IsEqual(first));
+}
+
+
+void CGqlRequestTest::IsEqualDifferentHeader()
+{
+	imtgql::CGqlRequest base(imtgql::IGqlRequest::RT_QUERY, "Cmd");
+
+	imtgql::CGqlRequest otherType(imtgql::IGqlRequest::RT_MUTATION, "Cmd");
+	QVERIFY(!base.IsEqual(otherType));
+
+	imtgql::CGqlRequest otherCommand(imtgql::IGqlRequest::RT_QUERY, "Other");
+	QVERIFY(!base.IsEqual(otherCommand));
+
+	imtgql::CGqlRequest otherVersion(imtgql::IGqlRequest::RT_QUERY, "Cmd");
+	otherVersion.SetProtocolVersion("2.0");
+	QVERIFY(!base.IsEqual(otherVersion));
+}
+
+
+void CGqlRequestTest::IsEqualParamsAndFields()
+{
+	imtgql::CGqlRequest first(imtgql::IGqlRequest::RT_QUERY, "Cmd");
+	imtgql::CGqlRequest second(imtgql::IGqlRequest::RT_QUERY, "Cmd");
+
+	imtgql::CGqlParamObject params;
+	params.InsertParam("id", QVariant(QByteArrayLiteral("1")));
+	first.AddParam("input", params);
+	QVERIFY(!first.IsEqual(second));
+	QVERIFY(!second.IsEqual(first));
+
+	second.AddParam("input", params);
+	QVERIFY(first.IsEqual(second));
+
+	imtgql::CGqlParamObject otherParams;
+	otherParams.InsertParam("id", QVariant(QByteArrayLiteral("2")));
+	imtgql::CGqlRequest third(imtgql::IGqlRequest::RT_QUERY, "Cmd");
+	third.AddParam("input", otherParams);
+	QVERIFY(!first.IsEqual(third));
+
+	first.AddSimpleField("Name");
+	QVERIFY(!first.IsEqual(second));
+
+	second.AddSimpleField("Name");
+	QVERIFY(first.IsEqual(second));
+
+	second.AddSimpleField("Extra");
+	QVERIFY(!first.IsEqual(second));
+}
+
+
+void CGqlRequestTest::IsEqualParsedQueries()
+{
+	imtgql::CGqlRequest first;
+	imtgql::CGqlRequest second;
+	imtgql::CGqlRequest third;
+	qsizetype errorPosition = -1;
+
+	QVERIFY(first.ParseQuery(fieldsQueryResult, errorPosition));
+	QVERIFY(second.ParseQuery(fieldsQueryResult, errorPosition));
+	QVERIFY(first.IsEqual(second));
+
+	QVERIFY(third.ParseQuery(simpleQueryResult, errorPosition));
+	QVERIFY(!first.IsEqual(third));
+}
+
+
+void CGqlRequestTest::IsEqualNonRequestObject()
+{
+	imtgql::CGqlRequest request(imtgql::IGqlRequest::RT_QUERY, "Cmd");
+	imtgql::CGqlParamObject paramObject;
+
+	QVERIFY(!request.IsEqual(paramObject));
+}
+
+
+void CGqlRequestTest::ParamObjectIsEqualSimple()
+{
+	imtgql::CGqlParamObject first;
+	imtgql::CGqlParamObject second;
+	QVERIFY(first.IsEqual(first));
+	QVERIFY(first.IsEqual(second));
+
+	first.InsertParam("a", QVariant(1));
+	QVERIFY(!first.IsEqual(second));
+	QVERIFY(!second.IsEqual(first));
+
+	second.InsertParam("a", QVariant(1));
+	QVERIFY(first.IsEqual(second));
+
+	second.InsertParam("a", QVariant(2));
+	QVERIFY(!first.IsEqual(second));
+
+	imtgql::CGqlParamObject third;
+	third.InsertParam("b", QVariant(1));
+	QVERIFY(!first.IsEqual(third));
+}
+
+
+void CGqlRequestTest::ParamObjectIsEqualNested()
+{
+	imtgql::CGqlParamObject child1;
+	child1.InsertParam("x", QVariant(1));
+	imtgql::CGqlParamObject child2;
+	child2.InsertParam("x", QVariant(2));
+
+	imtgql::CGqlParamObject first;
+	imtgql::CGqlParamObject second;
+	imtgql::CGqlParamObject third;
+	first.InsertParam("obj", child1);
+	second.InsertParam("obj", child1);
+	third.InsertParam("obj", child2);
+
+	QVERIFY(first.IsEqual(second));
+	QVERIFY(!first.IsEqual(third));
+
+	imtgql::CGqlParamObject empty;
+	QVERIFY(!first.IsEqual(empty));
+}
+
+
+void CGqlRequestTest::ParamObjectIsEqualObjectList()
+{
+	imtgql::CGqlParamObject item1;
+	item1.InsertParam("x", QVariant(1));
+	imtgql::CGqlParamObject item2;
+	item2.InsertParam("x", QVariant(2));
+
+	imtgql::CGqlParamObject first;
+	imtgql::CGqlParamObject second;
+	imtgql::CGqlParamObject third;
+	imtgql::CGqlParamObject fourth;
+	first.InsertParam("list", QList<imtgql::CGqlParamObject>({item1, item2}));
+	second.InsertParam("list", QList<imtgql::CGqlParamObject>({item1, item2}));
+	third.InsertParam("list", QList<imtgql::CGqlParamObject>({item1}));
+	fourth.InsertParam("list", QList<imtgql::CGqlParamObject>({item2, item1}));
+
+	QVERIFY(first.IsEqual(second));
+	QVERIFY(!first.IsEqual(third));
+	QVERIFY(!first.IsEqual(fourth));
+}
+
+
+void CGqlRequestTest::ParamObjectIsEqualNullAndType()
+{
+	imtgql::CGqlParamObject nullObject = imtgql::CGqlParamObject::CreateNull();
+	imtgql::CGqlParamObject normal;
+
+	QVERIFY(nullObject.IsEqual(imtgql::CGqlParamObject::CreateNull()));
+	QVERIFY(!nullObject.IsEqual(normal));
+	QVERIFY(!normal.IsEqual(nullObject));
+
+	imtgql::CGqlFieldObject fieldObject;
+	QVERIFY(!normal.IsEqual(fieldObject));
+}
+
+
+void CGqlRequestTest::FieldObjectIsEqualSimple()
+{
+	imtgql::CGqlFieldObject first;
+	imtgql::CGqlFieldObject second;
+	QVERIFY(first.IsEqual(first));
+	QVERIFY(first.IsEqual(second));
+
+	first.InsertField("a");
+	QVERIFY(!first.IsEqual(second));
+	QVERIFY(!second.IsEqual(first));
+
+	second.InsertField("a");
+	QVERIFY(first.IsEqual(second));
+
+	second.InsertField("b");
+	QVERIFY(!first.IsEqual(second));
+
+	imtgql::CGqlFieldObject third;
+	third.InsertField("c");
+	QVERIFY(!first.IsEqual(third));
+}
+
+
+void CGqlRequestTest::FieldObjectIsEqualNested()
+{
+	imtgql::CGqlFieldObject child1;
+	child1.InsertField("x");
+	imtgql::CGqlFieldObject child2;
+	child2.InsertField("y");
+
+	imtgql::CGqlFieldObject first;
+	imtgql::CGqlFieldObject second;
+	imtgql::CGqlFieldObject third;
+	first.InsertField("obj", child1);
+	second.InsertField("obj", child1);
+	third.InsertField("obj", child2);
+
+	QVERIFY(first.IsEqual(second));
+	QVERIFY(!first.IsEqual(third));
+
+	imtgql::CGqlFieldObject empty;
+	QVERIFY(!first.IsEqual(empty));
+}
+
+
+void CGqlRequestTest::FieldObjectIsEqualType()
+{
+	imtgql::CGqlFieldObject fieldObject;
+	imtgql::CGqlParamObject paramObject;
+
+	QVERIFY(!fieldObject.IsEqual(paramObject));
 }
 
 

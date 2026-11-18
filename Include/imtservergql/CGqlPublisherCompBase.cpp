@@ -85,36 +85,87 @@ bool CGqlPublisherCompBase::RegisterSubscription(
 	QMutexLocker locker(&m_mutex);
 
 	// Duplicate check
-	for (const RequestNetworks& entry : m_registeredSubscribers) {
-		if (entry.networkRequests.contains(subscriptionId) && entry.networkRequests.value(subscriptionId) == &networkRequest) {
-			errorMessage = QStringLiteral("Subscription ID already in use.");
-			return false;
+	const QByteArray connectionId = GetConnectionId(networkRequest);
+	Q_ASSERT(!connectionId.isEmpty());
+	bool isAdded = false;
+	for (RequestNetworks& entry : m_registeredSubscribers) {
+		if (!entry.gqlRequest.IsEqual(gqlRequest)) {
+			continue;
 		}
+
+		QList<const imtrest::IRequest*>& requests = entry.networkRequests[subscriptionId];
+		for (const imtrest::IRequest* requestPtr : requests) {
+			Q_ASSERT(requestPtr != nullptr);
+			if (requestPtr == nullptr) {
+				continue;
+			}
+
+			const QByteArray entryConnectionId = GetConnectionId(*requestPtr);
+			Q_ASSERT(!entryConnectionId.isEmpty());
+			if (entryConnectionId == connectionId) {
+				errorMessage = QStringLiteral("Subscription ID already in use.");
+				return false;
+			}
+		}
+
+		requests.append(&networkRequest);
+		isAdded = true;
+
+		break;
 	}
 
+	if (!isAdded) {
+		RequestNetworks newEntry;
+		newEntry.gqlRequest.CopyFrom(gqlRequest);
+		newEntry.networkRequests.insert(subscriptionId, QList<const imtrest::IRequest*>() << &networkRequest);
 
-	// To support unique variables per user, every subscription MUST have its own RequestNetworks entry.
-	RequestNetworks newEntry;
-	newEntry.gqlRequest.CopyFrom(gqlRequest);
-	newEntry.networkRequests.insert(subscriptionId, &networkRequest);
-
-	m_registeredSubscribers.append(newEntry);
+		m_registeredSubscribers.append(newEntry);
+	}
 
 	webSocketRequest->RegisterRequestEventHandler(this);
+
 	return true;
 }
 
 
-bool CGqlPublisherCompBase::UnregisterSubscription(const QByteArray& subscriptionId)
+bool CGqlPublisherCompBase::UnregisterSubscription(const QByteArray& connectionId, const QByteArray& subscriptionId)
 {
+	Q_ASSERT(!connectionId.isEmpty());
+
 	QMutexLocker locker(&m_mutex);
 
 	for (int i = 0; i < m_registeredSubscribers.size(); ++i) {
-		if (m_registeredSubscribers[i].networkRequests.contains(subscriptionId)) {
-			m_registeredSubscribers.removeAt(i);
+		RequestNetworks& entry = m_registeredSubscribers[i];
+		const auto found = entry.networkRequests.find(subscriptionId);
+		if (found == entry.networkRequests.end()) {
+			continue;
+		}
+
+		QList<const imtrest::IRequest*>& requests = found.value();
+		for (int j = 0; j < requests.size(); ++j) {
+			Q_ASSERT(requests[j] != nullptr);
+			if (requests[j] == nullptr) {
+				continue;
+			}
+
+			const QByteArray entryConnectionId = GetConnectionId(*requests[j]);
+			Q_ASSERT(!entryConnectionId.isEmpty());
+			if (entryConnectionId != connectionId) {
+				continue;
+			}
+
+			requests.removeAt(j);
+			if (requests.isEmpty()) {
+				entry.networkRequests.erase(found);
+			}
+			if (entry.networkRequests.isEmpty()) {
+				m_registeredSubscribers.removeAt(i);
+			}
+
 			return true;
 		}
 	}
+
 	return false;
 }
 
@@ -125,12 +176,25 @@ void CGqlPublisherCompBase::OnRequestDestroyed(imtrest::IRequest* request)
 {
 	imtrest::CWebSocketRequest* webSocketRequestPtr = dynamic_cast<imtrest::CWebSocketRequest*>(request);
 	if (webSocketRequestPtr != nullptr){
-		UnregisterSubscription(webSocketRequestPtr->GetQueryId());
+		const QByteArray connectionId = webSocketRequestPtr->GetConnectionId();
+		Q_ASSERT(!connectionId.isEmpty());
+
+		UnregisterSubscription(connectionId, webSocketRequestPtr->GetQueryId());
 	}
 }
 
 
 // protected methods
+
+QByteArray CGqlPublisherCompBase::GetConnectionId(const imtrest::IRequest& networkRequest)
+{
+	const imtrest::CWebSocketRequest* webSocketRequestPtr = dynamic_cast<const imtrest::CWebSocketRequest*>(&networkRequest);
+	const QByteArray connectionId = webSocketRequestPtr != nullptr ? webSocketRequestPtr->GetConnectionId() : QByteArray();
+	Q_ASSERT(!connectionId.isEmpty());
+
+	return connectionId;
+}
+
 
 bool CGqlPublisherCompBase::PushDataToSubscriber(
 			const QByteArray& subscriptionId,
@@ -215,15 +279,17 @@ bool CGqlPublisherCompBase::PublishDataFiltered(
 		}
 
 		for (auto it = entry.networkRequests.constBegin(); it != entry.networkRequests.constEnd(); ++it) {
-			const imtrest::IRequest* networkRequestPtr = it.value();
-			if (networkRequestPtr == nullptr) {
-				continue;
-			}
+			for (const imtrest::IRequest* networkRequestPtr : it.value()) {
+				Q_ASSERT(networkRequestPtr != nullptr);
+				if (networkRequestPtr == nullptr){
+						continue;
+				}
 
-			bool retVal = PushDataToSubscriber(it.key(), commandId, data, *networkRequestPtr);
-			if (!retVal){
-				QString message = QStringLiteral("Unable to notify subscriber about the changes. Subscription-ID: '%1', '%2'").arg(commandId, data);
-				SendErrorMessage(0, message, "CGqlPublisherCompBase");
+				bool retVal = PushDataToSubscriber(it.key(), commandId, data, *networkRequestPtr);
+				if (!retVal){
+					QString message = QStringLiteral("Unable to notify subscriber about the changes. Subscription-ID: '%1', '%2'").arg(commandId, data);
+					SendErrorMessage(0, message, "CGqlPublisherCompBase");
+				}
 			}
 		}
 	}

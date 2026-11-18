@@ -51,19 +51,20 @@ void CSessionModelSubscriberControllerComp::OnSessionModelChanged(const istd::IC
 
 	QJsonDocument changeSetDocument;
 	changeSetDocument.setObject(rootObject);
-
+	const QByteArray changeSetData = changeSetDocument.toJson(QJsonDocument::Compact);
 	for (RequestNetworks& requestNetworks: m_registeredSubscribers){
 		for (const QByteArray& id: requestNetworks.networkRequests.keys()){
-			const imtrest::IRequest* networkRequest = requestNetworks.networkRequests[id];
-			QByteArray body = QStringLiteral(R"({"type": "data", "id": "%1","payload":{"data": {"token": "%2", "changeSet": %3}}})")
-								.arg(id, sessionId, changeSetDocument.toJson(QJsonDocument::Compact)).toUtf8();
+			for (const imtrest::IRequest* networkRequest : requestNetworks.networkRequests[id]){
+				QByteArray body = QStringLiteral(R"({"type": "data", "id": "%1","payload":{"data": {"token": "%2", "changeSet": %3}}})")
+									.arg(id, sessionId, changeSetData).toUtf8();
 
-			QByteArray responseTypeId(QByteArrayLiteral("application/json; charset=utf-8"));
-			const imtrest::IProtocolEngine& engine = networkRequest->GetProtocolEngine();
+				QByteArray responseTypeId(QByteArrayLiteral("application/json; charset=utf-8"));
+				const imtrest::IProtocolEngine& engine = networkRequest->GetProtocolEngine();
 
-			imtrest::ConstResponsePtr responsePtr(engine.CreateResponse(*networkRequest, imtrest::IProtocolEngine::SC_OK, body, responseTypeId).PopInterfacePtr());
-			if (responsePtr.IsValid()){
-				m_requestManagerCompPtr->SendResponse(networkRequest->GetRequestId(), responsePtr);
+				imtrest::ConstResponsePtr responsePtr(engine.CreateResponse(*networkRequest, imtrest::IProtocolEngine::SC_OK, body, responseTypeId).PopInterfacePtr());
+				if (responsePtr.IsValid()){
+					m_requestManagerCompPtr->SendResponse(networkRequest->GetRequestId(), responsePtr);
+				}
 			}
 		}
 	}

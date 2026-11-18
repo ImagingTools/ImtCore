@@ -332,7 +332,9 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 				return imtrest::ConstResponsePtr();
 			}
 			if (!isCurrent){
-				subscriberControllerPtr->UnregisterSubscription(subscriptionId);
+				const QByteArray connectionId = webSocketRequest->GetConnectionId();
+				Q_ASSERT(!connectionId.isEmpty());
+				subscriberControllerPtr->UnregisterSubscription(connectionId, subscriptionId);
 				return CreateErrorResponse(authorizationError.toUtf8(), request, true, reasonCode);
 			}
 
@@ -381,6 +383,8 @@ imtrest::ConstResponsePtr CWebSocketServletComp::UnregisterSubscription(const im
 	}
 
 	const QByteArray subscriptionId = webSocketRequest->GetRequestId();
+	const QByteArray connectionId = webSocketRequest->GetConnectionId();
+	Q_ASSERT(!connectionId.isEmpty());
 
 	// The stop comes in a request of its own over the same connection
 	RemoveTokenSubscriptions([&subscriptionId, webSocketRequest](const TokenSubscription& subscription){
@@ -390,7 +394,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::UnregisterSubscription(const im
 	for (int index = 0; index < m_gqlSubscriberControllersCompPtr.GetCount(); index++){
 		imtgql::IGqlSubscriberController* controllerPtr = m_gqlSubscriberControllersCompPtr[index];
 		if (controllerPtr != nullptr){
-			if (controllerPtr->UnregisterSubscription(subscriptionId)){
+			if (controllerPtr->UnregisterSubscription(connectionId, subscriptionId)){
 				QByteArray data = QStringLiteral(R"({"type": "complete","id": "%1"})").arg(subscriptionId).toUtf8();
 				return CreateDataResponse(data, request);
 			}
@@ -812,7 +816,11 @@ void CWebSocketServletComp::CheckCredentials(const QByteArray& credentialKey, qi
 void CWebSocketServletComp::DropTokenSubscriptionLocked(const TokenSubscription& subscription, const QByteArray& reasonCode, const QString& reason) const
 {
 	// Under the lock the request is alive: its destructor waits for it in OnRequestDestroyed
-	subscription.controllerPtr->UnregisterSubscription(subscription.subscriptionId);
+	const imtrest::CWebSocketRequest* subscriptionRequestPtr = dynamic_cast<const imtrest::CWebSocketRequest*>(subscription.requestPtr);
+	Q_ASSERT(subscriptionRequestPtr != nullptr);
+	const QByteArray connectionId = subscriptionRequestPtr != nullptr ? subscriptionRequestPtr->GetConnectionId() : QByteArray();
+	Q_ASSERT(!connectionId.isEmpty());
+	subscription.controllerPtr->UnregisterSubscription(connectionId, subscription.subscriptionId);
 
 	SendWarningMessage(0, QStringLiteral("Subscription '%1' dropped: %2").arg(QString::fromUtf8(subscription.requestPtr->GetCommandId()), reason), QStringLiteral("CWebSocketServletComp"));
 
