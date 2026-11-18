@@ -79,17 +79,16 @@ bool CProgressManagerPublisherComp::PublishSession(const QByteArray& sessionId)
 	sdl::V1_0::imtbase::CTaskProgress mainTask;
 
 	QByteArray commandId;
-	const imtrest::IRequest* requestPtr = nullptr;
+	QList<const imtrest::IRequest*> requests;
 
 	for (const RequestNetworks& networkRequest : m_registeredSubscribers){
 		if (networkRequest.networkRequests.contains(sessionId)){
 			commandId = networkRequest.gqlRequest.GetCommandId();
-			const QList<const imtrest::IRequest*>& requests = networkRequest.networkRequests[sessionId];
-			requestPtr = requests.isEmpty() ? nullptr : requests.first();
+			requests.append(networkRequest.networkRequests[sessionId]);
 		}
 	}
 
-	if (commandId.isEmpty() || requestPtr == nullptr){
+	if (commandId.isEmpty() || requests.isEmpty()){
 		return false;
 	}
 
@@ -122,7 +121,17 @@ bool CProgressManagerPublisherComp::PublishSession(const QByteArray& sessionId)
 
 	QByteArray data = jsonDoc.toJson(QJsonDocument::Compact);
 
-	return PushDataToSubscriber(sessionId, commandId, data, *requestPtr);
+	bool retVal = true;
+	for (const imtrest::IRequest* requestPtr : requests){
+		Q_ASSERT(requestPtr != nullptr);
+		if (requestPtr == nullptr){
+			continue;
+		}
+
+		retVal = PushDataToSubscriber(sessionId, commandId, data, *requestPtr) && retVal;
+	}
+
+	return retVal;
 }
 
 
