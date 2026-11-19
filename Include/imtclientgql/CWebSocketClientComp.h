@@ -88,6 +88,7 @@ public:
 		I_ASSIGN(m_clientIdAttrPtr, "ClientId", "ID of the client that needs to be identified on the server", false, "");
 		I_ASSIGN(m_clientIdCompPtr, "ClientIdParam", "Parameter providing the client-ID that needs to be identified on the server", false, "ClientIdParam");
 		I_ASSIGN(m_productId, "ProductId", "Product-ID used with corresponded GraphQl requests", false, "");
+		I_ASSIGN(m_silenceTimeoutAttrPtr, "SilenceTimeout", "Seconds without any message from the server after which the connection is taken as lost and opened again (the server sends a keep-alive every 5 s), 0 turns the check off", true, 15);
 	I_END_COMPONENT;
 
 	CWebSocketClientComp();
@@ -134,6 +135,8 @@ Q_SIGNALS:
 
 private:
 	void OnTimeout();
+	void OnSilenceTimeout();
+	void RestartSilenceTimer();
 	void OnWebSocketConnected();
 	void OnWebSocketDisconnected();
 	void OnWebSocketError(QAbstractSocket::SocketError error);
@@ -213,9 +216,12 @@ private:
 	I_ATTR(QByteArray, m_serverPasswordAttrPtr);
 	I_ATTR(QByteArray, m_clientIdAttrPtr);
 	I_ATTR(QByteArray, m_productId);
+	I_ATTR(int, m_silenceTimeoutAttrPtr);
 
 	mutable QWebSocket m_webSocket;
 	QTimer m_refreshTimer;
+	// TCP does not notice a peer that went away silently, a server keep-alive restarts it
+	QTimer m_silenceTimer;
 	State m_state = ST_IDLE;
 	// A connection attempt failed: the retries are not logged until the client connects or the settings change
 	bool m_isRetrying = false;
