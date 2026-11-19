@@ -5027,15 +5027,63 @@ export class ImageItem extends Item {
 		this.$status = status;
 		this.$page = null;
 		this.$pageKey = '';
+		// what a picture of the size it has makes of `sourceSize` and of the implicit size
+		markReaders(this, 'sourceSize.width');
+		markReaders(this, 'sourceSize.height');
 		this.$update();
 	}
 
-	get $naturalWidth() {
+	// The size of the picture as it was loaded.
+	get $rawWidth() {
 		return this.$img === null ? 0 : this.$img.naturalWidth || this.$img.width || 0;
 	}
 
-	get $naturalHeight() {
+	get $rawHeight() {
 		return this.$img === null ? 0 : this.$img.naturalHeight || this.$img.height || 0;
+	}
+
+	// The size Qt loads the picture at for `sourceSize` (measured in Qt 6.11, test/qt-measure/image). Both sides of the request unset: the size of the picture.
+	// A picture made of pixels is only made smaller: one side asked for keeps the proportions, both sides fit the picture into the box, with
+	// PreserveAspectFit or PreserveAspectCrop the picture covers the box (and may be made larger). A vector picture (.svg) is made to the size asked for:
+	// both sides are exactly the box, one side keeps the proportions.
+	$loadedSize() {
+		const nw = this.$rawWidth;
+		const nh = this.$rawHeight;
+		const rw = this.$sourceSize.$w;
+		const rh = this.$sourceSize.$h;
+		if (nw <= 0 || nh <= 0 || (rw <= 0 && rh <= 0)) return { w: nw, h: nh };
+		const vector = /\.svgz?(?:[?#]|$)/i.test(this.$source);
+		const cover = this.$fillMode === 1 || this.$fillMode === 2;
+		let w;
+		let h;
+		if (rw > 0 && rh > 0) {
+			if (cover) {
+				const scale = Math.max(rw / nw, rh / nh);
+				w = nw * scale;
+				h = nh * scale;
+			} else if (vector) {
+				w = rw;
+				h = rh;
+			} else {
+				const scale = Math.min(rw / nw, rh / nh, 1);
+				w = nw * scale;
+				h = nh * scale;
+			}
+		} else {
+			let scale = rw > 0 ? rw / nw : rh / nh;
+			if (!vector) scale = Math.min(scale, 1);
+			w = nw * scale;
+			h = nh * scale;
+		}
+		return { w: Math.max(1, Math.round(w)), h: Math.max(1, Math.round(h)) };
+	}
+
+	get $naturalWidth() {
+		return this.$loadedSize().w;
+	}
+
+	get $naturalHeight() {
+		return this.$loadedSize().h;
 	}
 
 	get $implicitWidth() {
@@ -5093,8 +5141,8 @@ export class ImageItem extends Item {
 		const full = { w: fit.w / (fit.u1 - fit.u0), h: fit.h / (fit.v1 - fit.v0) };
 		const pw = Math.min(2048, Math.max(1, Math.round(full.w * k)));
 		const ph = Math.min(2048, Math.max(1, Math.round(full.h * k)));
-		const nw = this.$naturalWidth;
-		const nh = this.$naturalHeight;
+		const nw = this.$rawWidth;
+		const nh = this.$rawHeight;
 		// Integer (or near-1:1) scales keep bitmap icons crisp; fractional scales need smoothing.
 		const sx = nw > 0 ? pw / nw : 0;
 		const sy = nh > 0 ? ph / nh : 0;
@@ -5161,14 +5209,14 @@ defineProp(
 		}
 	},
 );
-// `sourceSize` of an Image: the size the picture is read at (`sourceSize.width: 20`, `sourceSize: Qt.size(16, 8)`). The browser decodes the picture at
-// its own size, so the values are kept and told to the QML (the width and height read back as written, 0 when they are not set) and
-// nothing is rescaled.
+// `sourceSize` of an Image: the size the picture is read at (`sourceSize.width: 20`, `sourceSize: Qt.size(16, 8)`). The width and height read back as
+// written; when neither is set they are the size of the loaded picture (Qt). The implicit size of the image follows them (see $loadedSize).
 class SourceSize {
 	constructor(owner) {
 		this.$owner = owner;
 		this.$w = 0;
 		this.$h = 0;
+		this.$asked = false; // written at least once: what it holds is read back as it is, even 0 and 0 (Qt)
 	}
 
 	// A size is a value in Qt: after a change the item holds a new one, which is what the handlers of sourceSizeChanged compare.
@@ -5176,12 +5224,16 @@ class SourceSize {
 		const next = new SourceSize(this.$owner);
 		next.$w = this.$w;
 		next.$h = this.$h;
+		next.$asked = true;
 		this.$owner.$sourceSize = next;
+		markReaders(this.$owner, 'sourceSize.width');
+		markReaders(this.$owner, 'sourceSize.height');
 		reportHandlerChange(this.$owner, 'sourceSize');
+		this.$owner.$update(); // the implicit size follows
 	}
 
 	$set(width, height) {
-		if (this.$w === width && this.$h === height) return;
+		if (this.$w === width && this.$h === height && this.$asked) return;
 		this.$w = width;
 		this.$h = height;
 		this.$changed();
@@ -5194,11 +5246,13 @@ for (const [name, field] of [['width', '$w'], ['height', '$h']]) {
 		'sourceSize',
 		name,
 		function () {
+			// neither side asked for: the size of the picture that is loaded
+			if (!this.$asked) return name === 'width' ? this.$owner.$rawWidth : this.$owner.$rawHeight;
 			return this[field];
 		},
 		function (value) {
 			const size = Math.max(0, toFloat(value));
-			if (this[field] === size) return;
+			if (this[field] === size && this.$asked) return;
 			this[field] = size;
 			this.$changed();
 		},
