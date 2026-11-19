@@ -711,12 +711,18 @@ function runBinding(binding){
     runningFailed = false
     try {
         let value = evaluate(binding)
-        // an error further down the notification does not stop the other subscribers of the signal
+        // an error further down the notification does not stop the other subscribers of the signal. The write reads
+        // with no binding active: a binding enabled by a read of another one's evaluation (flushPending) gives that one
+        // no dependency on what its setter reads (QQmlBinding::update captures the expression only)
         if(value !== NO_VALUE){
+            let previousActive = active
+            active = null
             try {
                 binding.target.$write(binding.prop, value)
             } catch(error) {
                 reportError(error, binding.target.constructor.name + '.' + binding.target.constructor.$type.props[binding.prop].name)
+            } finally {
+                active = previousActive
             }
         }
         if(!runningFailed && erroredBindings.size) erroredBindings.delete(binding)

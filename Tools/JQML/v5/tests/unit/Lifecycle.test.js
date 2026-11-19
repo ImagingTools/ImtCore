@@ -106,6 +106,33 @@ function cases(name, runtime){
         assert.equal(polishes, 20000)
     })
 
+    // QQmlBinding::update captures the properties the expression reads, not those its write reads: a binding whose
+    // evaluation reads a property with a pending binding (QQmlData::flushPendingBinding) does not take the reads of
+    // that property's setter (the runtime's own code, C++ in Qt) as its dependencies
+    test(name + ': a binding takes no dependency from the write of a binding it enables', () => {
+        class Probe extends Item {}
+        let watched
+        runtime.jq.defineType(Probe, { props: { v: { kind: 'real', effect: (probe) => { probe.$peek = watched.height } } } })
+        let outer, probe, evaluations = 0
+        engine.batch(() => { watched = new Item(null) })
+        runtime.jq.create(() => {
+            let root = new Item(null)
+            probe = new Probe(root)
+            probe.$bind(Probe.V, () => 7, null)
+            outer = new Item(root)
+            // not a bindable property (x, y, width, height bind after the others): enabled while probe's is pending
+            outer.$bind(Item.OPACITY, () => {
+                evaluations++
+                return probe.v / 10
+            }, null)
+            return root
+        })
+        assert.equal(outer.opacity, 0.7)
+        assert.equal(evaluations, 1)
+        engine.batch(() => { watched.height = 50 })
+        assert.equal(evaluations, 1)
+    })
+
     test(name + ': the subscriptions of a destroyed object are counted out', () => {
         let before = engine.stats.links
         let obj
