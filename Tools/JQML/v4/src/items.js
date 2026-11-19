@@ -2977,12 +2977,11 @@ export class MouseArea extends Item {
 		this.$mouseDrag = new MouseDrag(this);
 		this.$dragFrom = null; // where the button went down, while it is down
 		this.$dragStart = null; // where the target was when the drag began
+		this.$dragRef = null; // where the pointer was when it went farther than the threshold
 		this.$dragged = false;
 		this.$holdInterval = 800;
 		this.$holdDeadline = 0; // seconds of the engine time at which pressAndHold is sent; 0 when it is not awaited
 		this.$held = false;
-		this.$pressX = 0;
-		this.$pressY = 0;
 		this.$declareSignal('clicked', ['mouse']);
 		this.$declareSignal('pressed', ['mouse']);
 		this.$declareSignal('released', ['mouse']);
@@ -3012,6 +3011,7 @@ export class MouseArea extends Item {
 		this.$trackMouse(sceneX, sceneY, false);
 		this.$dragFrom = { x: sceneX, y: sceneY };
 		this.$dragStart = null;
+		this.$dragRef = null;
 		this.$dragged = false;
 		this.$held = false;
 		this.$holdDeadline = 0;
@@ -3019,31 +3019,32 @@ export class MouseArea extends Item {
 		// As in Qt the wait for a hold starts only when something listens to pressAndHold (and then a hold is no click).
 		const hold = this.$sigs === null ? undefined : this.$sigs.get('pressAndHold');
 		if (hold !== undefined && hold.handlers.length > 0 && this.$pressed && hooks.watchHold !== null) {
-			this.$pressX = sceneX;
-			this.$pressY = sceneY;
 			this.$holdDeadline = hooks.now() + this.$holdInterval / 1000;
 			hooks.watchHold(this);
 		}
 	}
 
 	// The engine calls it when the button has been held for pressAndHoldInterval.
+	// Qt (measured): the time runs while the button is down wherever the pointer goes; the hold is sent only if the pointer is in the area then.
 	$fireHold() {
 		if (!this.$pressed || this.$holdDeadline === 0) return;
 		this.$holdDeadline = 0;
+		if (this.$mouseX < 0 || this.$mouseY < 0 || this.$mouseX >= this.$aw || this.$mouseY >= this.$ah) return;
 		this.$held = true;
 		this.$emit('pressAndHold', [this.$mouseEvent()]);
 	}
 
-	// True when the press can no longer go on: the area or one of its parents was hidden or disabled while the button is down.
+	// True when the press can no longer go on: the area or one of its parents was hidden while the button is down. A disabled area keeps the
+	// press and gets its release and click (measured in Qt with QtTest).
 	$pressLost() {
 		if (!this.$pressed) return false;
 		for (let item = this; item !== null; item = item.$parent) {
-			if (!item.$visible || item.$enabled === false) return true;
+			if (!item.$visible) return true;
 		}
 		return false;
 	}
 
-	// The press is taken away (the area was disabled or hidden, another item took the drag): `canceled`, and no `released` or `clicked` follow.
+	// The press is taken away (the area was hidden, another item took the drag): `canceled`, and no `released` or `clicked` follow.
 	$cancelPress() {
 		if (!this.$pressed) return;
 		this.$pressed = false;
@@ -3072,24 +3073,35 @@ export class MouseArea extends Item {
 		const drag = this.$mouseDrag;
 		const target = drag.$target;
 		if (this.$dragFrom === null || target === null) return;
-		const dx = sceneX - this.$dragFrom.x;
-		const dy = sceneY - this.$dragFrom.y;
 		if (!drag.$active) {
-			const over = ((drag.$axis & 1) !== 0 && Math.abs(dx) > drag.$threshold) || ((drag.$axis & 2) !== 0 && Math.abs(dy) > drag.$threshold);
-			if (!over) return;
+			// Qt (measured): the move that goes farther than the threshold from the press only takes the pointer as the reference; the drag
+			// starts with the next move, and the target follows the pointer from the reference.
+			if (this.$dragRef === null) {
+				const dx = sceneX - this.$dragFrom.x;
+				const dy = sceneY - this.$dragFrom.y;
+				const over = ((drag.$axis & 1) !== 0 && Math.abs(dx) > drag.$threshold) || ((drag.$axis & 2) !== 0 && Math.abs(dy) > drag.$threshold);
+				if (over) {
+					this.$dragRef = { x: sceneX, y: sceneY };
+					this.$dragged = true; // the grab is taken: a release now is no click, though the drag has not started
+				}
+				return;
+			}
 			this.$dragStart = { x: target.$x, y: target.$y };
 			this.$dragged = true;
 			drag.$active = true;
 			markReaders(this, 'drag.active');
 			noteWrite(this, 'drag.active');
 		}
-		if (this.$dragStart === null) return;
+		if (this.$dragStart === null || this.$dragRef === null) return;
+		const dx = sceneX - this.$dragRef.x;
+		const dy = sceneY - this.$dragRef.y;
 		if ((drag.$axis & 1) !== 0) target.x = Math.min(Math.max(this.$dragStart.x + dx, drag.$minX), drag.$maxX);
 		if ((drag.$axis & 2) !== 0) target.y = Math.min(Math.max(this.$dragStart.y + dy, drag.$minY), drag.$maxY);
 	}
 
 	$dragEnd() {
 		this.$dragFrom = null;
+		this.$dragRef = null;
 		this.$dragStart = null;
 		if (!this.$mouseDrag.$active) return;
 		this.$mouseDrag.$active = false;
@@ -3106,8 +3118,6 @@ export class MouseArea extends Item {
 		const moved = sceneX !== this.$sceneX || sceneY !== this.$sceneY;
 		this.$sceneX = sceneX;
 		this.$sceneY = sceneY;
-		// A move of more than the drag distance of Qt (10 pixels) ends the wait for a hold.
-		if (this.$holdDeadline !== 0 && Math.hypot(sceneX - this.$pressX, sceneY - this.$pressY) > 10) this.$holdDeadline = 0;
 		if (x !== this.$mouseX || y !== this.$mouseY) {
 			this.$mouseX = x;
 			this.$mouseY = y;
@@ -3340,8 +3350,8 @@ export class DragAttached {
 		this.$source = null;
 		this.$target = null;
 		this.$last = { x: NaN, y: NaN };
-		this.$supportedActions = 15;
-		this.$proposedAction = 1;
+		this.$supportedActions = 7; // Qt::CopyAction | MoveAction | LinkAction
+		this.$proposedAction = 2; // Qt::MoveAction
 		this.$mimeData = {};
 	}
 
@@ -3529,10 +3539,10 @@ class MouseDrag {
 		this.$axis = 3;
 		this.$active = false;
 		this.$threshold = 10;
-		this.$minX = -Number.MAX_VALUE;
-		this.$maxX = Number.MAX_VALUE;
-		this.$minY = -Number.MAX_VALUE;
-		this.$maxY = Number.MAX_VALUE;
+		this.$minX = -3.4028234663852886e38; // FLT_MAX, as Qt answers
+		this.$maxX = 3.4028234663852886e38;
+		this.$minY = -3.4028234663852886e38;
+		this.$maxY = 3.4028234663852886e38;
 		this.$filterChildren = false;
 		this.$smoothed = true;
 	}
@@ -6929,6 +6939,8 @@ export function easingValue(type, t, amplitude = 1, overshoot = 1.70158, period 
 		}
 		return t < 0.5 ? 0.5 * easingIn(family, 2 * t, amplitude, overshoot, period) : 0.5 + 0.5 * easingOut(family, 2 * t - 1, amplitude, overshoot, period);
 	}
+	// OutInElastic follows the samples of Qt (6.11) with the amplitude doubled
+	if (family === 'Elastic') amplitude *= 2;
 	return t < 0.5 ? 0.5 * easingOut(family, 2 * t, amplitude, overshoot, period) : 0.5 + 0.5 * easingIn(family, 2 * t - 1, amplitude, overshoot, period);
 }
 

@@ -1,5 +1,7 @@
 // The easing curves of animations (`easing.type`, 14 uses in our QML) as QEasingCurve gives them: the numbers of Easing.*, the ends of every
 // curve, the known middle values, the curves that overshoot (Back, Elastic) and the ones that do not, and an animation that runs along a curve.
+// The values of the middle of every curve below were measured in Qt 6.11 (test/qt-measure/easing/Main.qml runs a NumberAnimation of 2 s with each
+// type and writes the value at every frame); they are at [progress of the time, value] with an error of the timing of about 0.002.
 // `node test/easing.mjs`
 import { Engine } from '../src/engine.js';
 import { easingValue } from '../src/items.js';
@@ -49,6 +51,46 @@ let ends = true;
 for (let type = 0; type <= 45; type++) if (easingValue(type, 0) !== 0 || easingValue(type, 1) !== 1) ends = false;
 check('every curve starts at 0 and ends at 1', ends, true);
 check('the curve below 0 and above 1 is clamped', [easingValue(1, -1), easingValue(1, 2)], [0, 1]);
+
+// the curves against what Qt gave: [type, [[progress, value] ...]]
+const MEASURED = [
+	[1, [[0.1515,0.0231],[0.3515,0.1239],[0.5515,0.3042],[0.7515,0.5648],[0.896,0.8028]]],
+	[2, [[0.1515,0.2809],[0.3515,0.5794],[0.5515,0.7993],[0.7515,0.9385],[0.8955,0.9892]]],
+	[3, [[0.1515,0.0462],[0.3515,0.2478],[0.5515,0.5986],[0.752,0.877],[0.8955,0.9782]]],
+	[4, [[0.1515,0.2578],[0.3515,0.4559],[0.5515,0.5053],[0.7515,0.6265],[0.8955,0.8136]]],
+	[6, [[0.152,0.3902],[0.352,0.7279],[0.5515,0.9101],[0.752,0.9847],[0.896,0.9989]]],
+	[11, [[0.1515,0.0042],[0.352,0.1228],[0.552,0.6777],[0.7515,0.9695],[0.896,0.9991]]],
+	[14, [[0.152,0.5615],[0.3515,0.8857],[0.5515,0.982],[0.7515,0.9991],[0.8955,1]]],
+	[17, [[0.152,0.0284],[0.352,0.149],[0.552,0.3529],[0.7515,0.6202],[0.896,0.8374]]],
+	[19, [[0.152,0.0559],[0.3515,0.2751],[0.552,0.5813],[0.7515,0.8552],[0.896,0.9735]]],
+	[21, [[0.1515,0.0018],[0.3515,0.0102],[0.5515,0.0437],[0.752,0.1782],[0.8955,0.4836]]],
+	[22, [[0.1515,0.652],[0.3515,0.9137],[0.5515,0.9792],[0.752,0.9955],[0.896,0.999]]],
+	[23, [[0.1515,0.0035],[0.3515,0.0638],[0.552,0.7572],[0.752,0.9853],[0.8955,0.9984]]],
+	[26, [[0.152,0.53],[0.3515,0.7616],[0.5515,0.8938],[0.752,0.9688],[0.896,0.9946]]],
+	[27, [[0.152,0.0237],[0.352,0.1449],[0.552,0.722],[0.752,0.9339],[0.896,0.9891]]],
+	[29, [[0.1515,0.0013],[0.3515,0.006],[0.5515,-0.0448],[0.7515,0.083],[0.8955,-0.2807]]],
+	[30, [[0.1515,1.3484],[0.352,0.9596],[0.552,0.9883],[0.752,1.0054],[0.8955,0.998]]],
+	[31, [[0.1515,-0.0017],[0.352,0.064],[0.5515,1.1355],[0.752,1.0065],[0.8955,1.0013]]],
+	[33, [[0.1515,-0.0297],[0.352,-0.0929],[0.5515,-0.0641],[0.752,0.1866],[0.8955,0.5755]]],
+	[34, [[0.152,0.5762],[0.352,0.9794],[0.552,1.0986],[0.752,1.0634],[0.896,1.0154]]],
+	[35, [[0.152,-0.0694],[0.352,-0.0159],[0.552,0.7487],[0.7515,1.0998],[0.896,1.04]]],
+	[38, [[0.152,0.1747],[0.352,0.937],[0.552,0.7503],[0.752,0.9706],[0.8955,0.9827]]],
+	[37, [[0.1515,0.0558],[0.3515,0.1705],[0.5515,0.1782],[0.752,0.5349],[0.8955,0.9182]]],
+	[39, [[0.152,0.0393],[0.352,0.1687],[0.552,0.5409],[0.752,0.8815],[0.896,0.9713]]],
+	[32, [[0.152,0.4482],[0.352,0.5076],[0.552,0.5009],[0.752,0.468],[0.896,0.2693]]],
+];
+let worst = 0;
+let worstAt = '';
+for (const [type, points] of MEASURED) {
+	for (const [progress, value] of points) {
+		const error = Math.abs(easingValue(type, progress) - value);
+		if (error > worst) {
+			worst = error;
+			worstAt = `type ${type} at ${progress}`;
+		}
+	}
+}
+check(`${MEASURED.length} curves follow Qt within 0.02 (the worst: ${worstAt}, ${worst.toFixed(4)})`, worst < 0.02, true);
 
 // the numbers of the middle value of the formulas of Qt
 check('Linear', easingValue(0, 0.5), 0.5);

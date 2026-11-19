@@ -1,9 +1,11 @@
-// MouseArea.onCanceled (7 uses, Button.qml among them: it resets `down`) and onPressAndHold (6 uses), as desktop Qt gives them:
-//   canceled        the press is taken away: the area is disabled or hidden while pressed, or a DragHandler takes the drag over (a Flickable does not take it from an area under it
-//                   in this engine: it scrolls by a part with no area); `pressed` is false and
-//                   neither released nor clicked follow
-//   pressAndHold    the button stays down for pressAndHoldInterval (800 ms) without leaving the area; clicked is not sent on the release after it;
-//                   a move beyond the drag threshold or an earlier release cancels the wait
+// MouseArea.onCanceled (7 uses, Button.qml among them: it resets `down`) and onPressAndHold (6 uses), as desktop Qt 6.11 gives them. The values
+// were measured with QtTest (test/qt-measure/mouse/Main.qml sends the events to a window):
+//   canceled        the area (or a parent) is hidden while pressed, or a DragHandler takes the drag over: `pressed` is false and neither released nor
+//                   clicked follow. A DISABLED area keeps the press: it gets its release and its click. (A Flickable does not take the drag from an area
+//                   under it in this engine: it scrolls by a part with no area.)
+//   pressAndHold    the button stays down for pressAndHoldInterval (800 ms); clicked is not sent on the release after it. The time runs wherever the
+//                   pointer goes, and the signal is sent if the pointer is inside the area when it is over: a move of 15 pixels inside, or out and back,
+//                   still gives it; staying outside does not
 // `node test/mouse-area-canceled-hold.mjs`
 import { Engine } from '../src/engine.js';
 import { Project } from '../src/project.js';
@@ -102,15 +104,14 @@ scene.pointerDown(...at(root.plain));
 scene.pointerUp(...at(root.plain));
 check('a click', take(), 'P1 R1 C1');
 
-// canceled: disabled while pressed
+// disabled while pressed: no cancel (Qt: [P], pressed, then [R C])
 scene.pointerDown(...at(root.plain));
 check('pressed', root.plain.pressed, true);
 root.plain.enabled = false;
 advance(0.05);
-check('canceled when disabled while pressed', take(), 'P1 X1');
-check('and it is not pressed any more', root.plain.pressed, false);
+check('a disabled area keeps the press', [take(), root.plain.pressed], ['P1', true]);
 scene.pointerUp(...at(root.plain));
-check('the release after it sends nothing', take(), '');
+check('and gets the release and the click', take(), 'R1 C1');
 root.plain.enabled = true;
 
 // canceled: hidden while pressed
@@ -119,7 +120,7 @@ root.plain.visible = false;
 advance(0.05);
 check('canceled when hidden while pressed', take(), 'P1 X1');
 scene.pointerUp(...at(root.plain));
-take();
+check('the release after it sends nothing', take(), '');
 root.plain.visible = true;
 
 // canceled: a DragHandler takes the drag
@@ -150,13 +151,29 @@ scene.pointerUp(...at(root.held));
 advance(1);
 check('an early release is a click and no hold', take(), 'P2 R2 C2');
 
-// moved out and far: no hold
+// moved inside: the hold is still sent (Qt: [P H] for 4 and for 15 pixels)
+scene.pointerDown(...at(root.held, 20, 50));
+scene.pointerMove(...at(root.held, 35, 50));
+advance(0.9);
+check('a move of 15 pixels inside the area keeps the hold', take(), 'P2 H2');
+scene.pointerUp(...at(root.held, 35, 50));
+check('and the release is no click', take(), 'R2');
+
+// moved out and left there: no hold (Qt: [P], then [R])
 scene.pointerDown(...at(root.held));
-scene.pointerMove(...at(root.held, 50, 90));
-scene.pointerMove(...at(root.held, 50, 140));
-advance(1);
-check('leaving the area stops the hold', take().includes('H2'), false);
-scene.pointerUp(...at(root.held, 50, 140));
+scene.pointerMove(...at(root.held, 50, 130));
+advance(0.9);
+check('staying outside the area when the time is over gives no hold', take(), 'P2');
+scene.pointerUp(...at(root.held, 50, 130));
+check('released outside: no click', take(), 'R2');
+
+// out and back before the time is over: the hold (Qt: [P H])
+scene.pointerDown(...at(root.held));
+scene.pointerMove(...at(root.held, 50, 130));
+scene.pointerMove(...at(root.held, 50, 60));
+advance(0.9);
+check('out and back gives the hold', take(), 'P2 H2');
+scene.pointerUp(...at(root.held, 50, 60));
 take();
 
 // the interval is a property
