@@ -589,34 +589,68 @@ class Codegen {
         // Loader that is the root of its own file
         if(file.url && el !== file.root && this.inherits(el, JQ.types.Loader)) this.current.push(v + '.$base=' + JSON.stringify(file.url) + ';')
 
+        // The order of QQmlObjectCreator::setupBindings, which pushes the bindings onto allCreatedBindings; finalize
+        // enables them from the last pushed (a stack), and a binding subscribes to what it reads when it is enabled,
+        // which orders the notifications later. QmlIR::Object::appendBinding prepends a named binding (a property
+        // declaration with its value as well) and inserts a child of the default property by its position, and
+        // QmlUnitGenerator writes the value bindings, the signal handlers, the attached properties, the group
+        // properties and the bindings to aliases in that order. So: the named values from the last written to the
+        // first, the children (emitChildren), then the attached, group and alias bindings (lateMembers), each from the
+        // last written to the first.
+        let named = [], late = []
+        let unit = (list, at, kind, group, emit) => {
+            let start = this.current.length
+            emit()
+            list.push({ at, kind, group, code: this.current.splice(start) })
+        }
+        let atOf = (x) => x ? x.line * 100000 + (x.col || 0) : 0
+
         for(let def of el.propdefs){
             let constName = cls + '.' + def.name.toUpperCase()
+            let at = atOf(def.declAt || def.nameAt)
             if(def.element){
-                // in declaration order, like QQmlObjectCreator populating the object
-                this.current.push(v + '.$write(' + constName + ',' + this.elementExpr(file, def.element, def.asComponent, post) + ');')
+                unit(named, at, 'named', null, () => {
+                    this.current.push(v + '.$write(' + constName + ',' + this.elementExpr(file, def.element, def.asComponent, post) + ');')
+                })
                 continue
             }
             if(!def.value) continue
-            this.assignValue(file, el, v, def.name, def.value, def.raw, constName, null, def.readonly)
+            unit(named, at, 'named', null, () => this.assignValue(file, el, v, def.name, def.value, def.raw, constName, null, def.readonly))
         }
 
         for(let assign of el.assigns){
+            let at = atOf(assign)
             if(assign.element){
                 // through an alias the target may be a later element of this body
                 let viaAlias = (this.member(el, assign.name.split('.')[0]) || {}).kind === 'alias'
                 let line = this.assignTarget(file, el, v, assign.name) + '=' + this.elementExpr(file, assign.element, assign.asComponent, post) + ';'
                 if(viaAlias) post.push(line)
-                else this.current.push(line)
+                else unit(named, at, 'named', null, () => this.current.push(line))
                 continue
             }
             if(assign.elements){
-                let vars = assign.elements.map(child => this.emitElement(file, child, v, post))
-                let m = this.member(el, assign.name)
-                if(m && m.kind === 'prop' && LIST_VALUE.has(assign.name)) this.current.push(v + '.' + assign.name + '=[' + vars.join(',') + '];')
+                unit(named, at, 'named', null, () => {
+                    let vars = assign.elements.map(child => this.emitElement(file, child, v, post))
+                    let m = this.member(el, assign.name)
+                    if(m && m.kind === 'prop' && LIST_VALUE.has(assign.name)) this.current.push(v + '.' + assign.name + '=[' + vars.join(',') + '];')
+                })
                 continue
             }
-            this.assignProperty(file, el, v, assign)
+            let parts = assign.name.split('.')
+            let first = this.member(el, parts[0])
+            let kind = 'named', group = null
+            if(parts.length === 1 && first && first.kind === 'alias') kind = 'alias'
+            else if(parts.length > 1 && first && first.kind === 'prop' && first.group && !this.inherits(el, JQ.types.PropertyChanges)){
+                kind = /^[A-Z]/.test(parts[0]) ? 'attached' : 'group'
+                group = parts[0]
+            }
+            unit(kind === 'named' ? named : late, at, kind, group, () => this.assignProperty(file, el, v, assign))
         }
+
+        // the named values: prepended, so written from the last to the first
+        named.sort((a, b) => b.at - a.at)
+        for(let u of named) this.current.push(...u.code)
+        el.$lateMembers = late
 
         if(el.$subAssigns){
             for(let [name, entries] of el.$subAssigns) post.push('JQ.subAssign(' + v + ',' + JSON.stringify(name) + ',[' + entries.join(',') + '],$s);')
@@ -633,6 +667,29 @@ class Codegen {
             let last = a.path[a.path.length - 1]
             post.push('JQ.forward(' + owner + ',' + owner + '.constructor.$type.signalByName.get(' + JSON.stringify(last + 'Changed') + '),' + v + ',' + cls + '.SIGNAL_' + a.name + 'Changed);')
         }
+    }
+
+    // after the children: the attached properties, the group properties, the bindings to aliases (QmlUnitGenerator::
+    // writeBindings). A group (anchors, Layout) is prepended where it is first written, and its own bindings are
+    // prepended in its object: the groups from the last first written, each from its last binding; the aliases from
+    // the last written
+    lateMembers(el){
+        let late = el.$lateMembers
+        el.$lateMembers = null
+        if(!late || !late.length) return
+        let groups = (kind) => {
+            let byGroup = new Map()
+            for(let u of late){
+                if(u.kind !== kind) continue
+                if(!byGroup.has(u.group)) byGroup.set(u.group, [])
+                byGroup.get(u.group).push(u)
+            }
+            let list = Array.from(byGroup.values())
+            list.sort((a, b) => Math.min(...b.map(u => u.at)) - Math.min(...a.map(u => u.at)))
+            return list.flatMap(units => units.sort((a, b) => b.at - a.at))
+        }
+        let aliases = late.filter(u => u.kind === 'alias').sort((a, b) => b.at - a.at)
+        for(let u of [...groups('attached'), ...groups('group'), ...aliases]) this.current.push(...u.code)
     }
 
     assignTarget(file, el, v, name){
@@ -928,6 +985,7 @@ class Codegen {
         }
         this.applyMembers(file, el, v, post)
         this.emitChildren(file, el, v, post, this.classRef(el))
+        this.lateMembers(el)
         if(parentVar !== 'null') this.current.push(v + '.$setParent(' + parentVar + ');')
         return v
     }
@@ -1063,6 +1121,7 @@ class Codegen {
         if(file.eagerScripts && file.eagerScripts.length) this.current.push('JQ.inContext($root);JQ.sis($s,[' + file.eagerScripts.join(',') + ']);')
         this.applyMembers(file, root, '$root', post)
         this.emitChildren(file, root, '$root', post, this.use(root.typeRef))
+        this.lateMembers(root)
         let body = this.current.concat(post)
         this.out.push('function ' + className + '$build($root){' + body.join('') + '}')
         let definition = this.out.splice(start)

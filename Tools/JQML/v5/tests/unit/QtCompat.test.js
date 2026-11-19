@@ -133,6 +133,71 @@ function cases(name, runtime){
         assert.equal(second.index, 2)
     })
 
+    // ---- Text lays out at componentComplete (QQuickTextPrivate::updateLayout) ----
+
+    // ElementView in a page a Loader builds while its editor is still being built: a Column anchored to the sides of
+    // its row, its rows as wide as the Column. QQuickAnchorsPrivate::updateOnComplete gives the Column its width in
+    // QQuickItem::componentComplete, before QQuickBasePositioner::componentComplete positions the rows, so it is as
+    // high as its rows at once, not after a polish in the frame
+    test(name + ': anchors give a Column its width before it positions its rows, inside an enclosing creation', () => {
+        const { Column } = types
+        let row, column
+        let page = new Component(null, (parent) => {
+            row = new Item(parent)
+            row.width = 700
+            column = new Column(row)
+            column.anchors.left = row.left
+            column.anchors.right = row.right
+            let mainPart = new Item(column)
+            mainPart.$bind(Item.WIDTH, () => column.width, null)
+            mainPart.height = 32
+            return row
+        })
+        let editor = new Component(null, (parent) => {
+            let root = new Item(parent)
+            page.createObject(root)
+            assert.equal(column.width, 700)
+            assert.equal(column.height, 32)
+            return root
+        })
+        editor.createObject(null)
+        assert.equal(column.height, 32)
+    })
+
+    test(name + ': a Text made by a component lays out once, at componentComplete; outside a creation at once', () => {
+        const { Text } = types
+        let updates = 0
+        let base = Text.prototype.$updateImplicitSize
+        Text.prototype.$updateImplicitSize = function(){
+            if(this.$f & engine.COMPLETED) updates++
+            return base.apply(this, arguments)
+        }
+        try {
+            let component = new Component(null, () => {
+                let text = new Text(null)
+                text.font.pixelSize = 20
+                text.font.bold = true
+                text.font.family = 'Ubuntu'
+                text.text = 'hello'
+                return text
+            })
+            let text
+            engine.batch(() => { text = component.createObject(null) })
+            assert.equal(updates, 1)
+            assert.ok(text.implicitWidth > 0)
+            updates = 0
+            let loose
+            engine.batch(() => {
+                loose = new Text(null)
+                loose.text = 'abc'
+            })
+            assert.ok(updates >= 1)
+            assert.ok(loose.implicitWidth > 0)
+        } finally {
+            Text.prototype.$updateImplicitSize = base
+        }
+    })
+
     // ---- translations ----
 
     test(name + ': translations: the message of the context, with its disambiguation, then without it', () => {
