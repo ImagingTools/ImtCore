@@ -34,6 +34,38 @@ function cases(name, runtime){
         assert.equal(engine.hasSubscribers(loader, Item.SIGNAL_widthChanged), true)
     })
 
+    // QAbstractItemModel::beginInsertRows of any count: the rows are not passed to a function as its arguments, which
+    // overflows the call stack past about 100000 of them
+    test(name + ': 150000 rows inserted, appended and moved at once in a ListModel shown by a ListView', () => {
+        const { ListModel, ListView } = types
+        let root, model, view
+        engine.batch(() => {
+            root = new Item(null)
+            model = new ListModel(root)
+            view = new ListView(root)
+            view.width = 100
+            view.height = 100
+            view.delegate = new Component(null, (parent) => {
+                let item = new Item(parent)
+                item.height = 10
+                return item
+            })
+            view.model = model
+        })
+        engine.batch(() => engine.scheduleComponentComplete(view))
+        let rows = Array.from({ length: 150000 }, (_, i) => ({ n: i }))
+        engine.batch(() => model.append(rows))
+        engine.batch(() => model.insert(1, rows))
+        assert.equal(model.count, 300000)
+        assert.equal(view.count, 300000)
+        // [r0, s0 .. s149999, r1 .. r149999]: the first 150000 rows go after the next one
+        engine.batch(() => model.move(0, 1, 150000))
+        assert.equal(model.get(0).n, 149999)
+        assert.equal(model.get(1).n, 0)
+        assert.equal(model.get(2).n, 0)
+        engine.batch(() => view.forceLayout())
+        assert.equal(view.itemAtIndex(0).y, 0)
+    })
 
 }
 

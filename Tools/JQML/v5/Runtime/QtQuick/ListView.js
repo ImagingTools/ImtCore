@@ -973,8 +973,16 @@ class ListView extends Item {
                 shifted.set(to, entry)
             }
             this.$entries = shifted
-            if(kind === 'insert') this.$sizes.splice(index, 0, ...new Array(count))
-            else this.$sizes.splice(index, count)
+            // the sizes after index move by count (rows not laid out stay unknown); not splice(index, 0, ...new
+            // Array(count)), whose arguments overflow the call stack past about 100000 rows
+            let sizes = this.$sizes
+            if(kind === 'insert'){
+                if(index < sizes.length){
+                    let tail = sizes.splice(index)
+                    sizes.length = index + count
+                    for(let i = 0; i < tail.length; i++) sizes.push(tail[i])
+                }
+            } else sizes.splice(index, count)
             let total = modelRows(this.$model).count
             this.$write(ListView.COUNT, total)
             let current = this.$v[ListView.CURRENTINDEX]
