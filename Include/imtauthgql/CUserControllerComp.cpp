@@ -468,8 +468,7 @@ sdl::V1_0::imtauth::CCheckSuperuserPayload CUserControllerComp::OnCheckSuperuser
 
 	if (m_databaseConnectionCheckerCompPtr.IsValid()){
 		QString connectionMessage;
-		bool ok = m_databaseConnectionCheckerCompPtr->CheckDatabaseConnection(connectionMessage);
-		if (!ok){
+		if (m_databaseConnectionCheckerCompPtr->CheckDatabaseConnection(connectionMessage) == imtdb::IDatabaseServerConnectionChecker::DS_NOT_CONNECTED){
 			response.status = sdl::V1_0::imtauth::ExistsStatus::UNKNOWN;
 			response.message = connectionMessage;
 

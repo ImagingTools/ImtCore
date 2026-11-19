@@ -198,7 +198,7 @@ void CApplicationInfoControllerComp::FillSuperuserStatus(ApplicationInfo& applic
 
 	if (m_databaseConnectionCheckerCompPtr.IsValid()){
 		QString connectionMessage;
-		if (!m_databaseConnectionCheckerCompPtr->CheckDatabaseConnection(connectionMessage)){
+		if (m_databaseConnectionCheckerCompPtr->CheckDatabaseConnection(connectionMessage) == imtdb::IDatabaseServerConnectionChecker::DS_NOT_CONNECTED){
 			superuser.status = sdl::V1_0::imtapp::SuperuserExistsStatus::UNKNOWN;
 			superuser.message = connectionMessage;
 

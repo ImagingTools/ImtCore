@@ -192,7 +192,7 @@ void CSystemStatusComp::CheckStatus()
 	if (m_checkDbStatusAttrPtr.IsValid() && *m_checkDbStatusAttrPtr){
 		if (m_dbServerConnectionCheckerCompPtr.IsValid()){
 			QString error;
-			bool isConnected = m_dbServerConnectionCheckerCompPtr->CheckDatabaseConnection(error);
+			const bool isConnected = m_dbServerConnectionCheckerCompPtr->CheckDatabaseConnection(error) != imtdb::IDatabaseServerConnectionChecker::DS_NOT_CONNECTED;
 			if (!isConnected){
 				error = QStringLiteral("%1 %2").arg(*m_serverNameAttrPtr, error);
 

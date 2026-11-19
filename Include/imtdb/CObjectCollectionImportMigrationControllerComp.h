@@ -2,12 +2,10 @@
 #pragma once
 
 
-// ACF includes
-#include <iprm/IEnableableParam.h>
-
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <imtdb/CMigrationControllerCompBase.h>
+#include <imtdb/IDatabaseServerConnectionChecker.h>
 #include <imtdb/ISqlDatabaseObjectDelegate.h>
 #include <imtdb/IObjectImportConverter.h>
 
@@ -24,8 +22,9 @@ namespace imtdb
 	no organization owns them. An object already in the target table is left as it is, so a repeated step changes nothing.
 	Without a converter every object is imported unchanged.
 
-	The step fails if the source cannot be read or an object cannot be written. With the optional SourceEnabler switched off it
-	imports nothing and passes: an installation without the source keeps it off.
+	The step fails if the source cannot be read or an object cannot be written. With the optional SourceDatabase, the database the
+	source collection lives in, a missing source database means there is nothing to import: the step passes, as on an installation
+	that never had the source. Any other failure fails the step, so the revision is not recorded and the import is repeated.
 */
 class CObjectCollectionImportMigrationControllerComp: public imtdb::CMigrationControllerCompBase
 {
@@ -36,7 +35,7 @@ public:
 		I_ASSIGN(m_sourceCollectionCompPtr, "SourceCollection", "Collection the objects are imported from", true, "SourceCollection");
 		I_ASSIGN(m_targetDelegateCompPtr, "TargetDelegate", "Delegate of the table the objects are imported into", true, "TargetDelegate");
 		I_ASSIGN(m_converterCompPtr, "ObjectConverter", "Selects and converts the imported objects; without it every object is imported unchanged", false, "ObjectConverter");
-		I_ASSIGN(m_sourceEnablerCompPtr, "SourceEnabler", "If given and switched off, the step imports nothing", false, "SourceEnabler");
+		I_ASSIGN(m_sourceDatabaseCompPtr, "SourceDatabase", "Database of the source collection: if it does not exist, there is nothing to import", false, "SourceDatabase");
 	I_END_COMPONENT;
 
 protected:
@@ -51,7 +50,7 @@ private:
 	I_REF(imtbase::IObjectCollection, m_sourceCollectionCompPtr);
 	I_REF(imtdb::ISqlDatabaseObjectDelegate, m_targetDelegateCompPtr);
 	I_REF(imtdb::IObjectImportConverter, m_converterCompPtr);
-	I_REF(iprm::IEnableableParam, m_sourceEnablerCompPtr);
+	I_REF(imtdb::IDatabaseServerConnectionChecker, m_sourceDatabaseCompPtr);
 };
 
 

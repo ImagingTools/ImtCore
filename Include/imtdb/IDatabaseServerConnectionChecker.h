@@ -13,10 +13,27 @@ namespace imtdb
 class IDatabaseServerConnectionChecker: virtual public istd::IPolymorphic
 {
 public:
+	enum DatabaseState
+	{
+		/**
+			The server is connected and the database exists.
+		*/
+		DS_EXISTS,
+		/**
+			The server is connected, the database does not exist.
+		*/
+		DS_MISSING,
+		/**
+			The server cannot be connected or asked about the database.
+		*/
+		DS_NOT_CONNECTED
+	};
+
 	/**
-		Check if the database server is connected.
+		Check the connection to the database server and whether the database exists there.
+		\param errorMessage	The reason of \c DS_NOT_CONNECTED.
 	*/
-	virtual bool CheckDatabaseConnection(QString& errorMessage) const = 0;
+	virtual DatabaseState CheckDatabaseConnection(QString& errorMessage) const = 0;
 };
 
 
