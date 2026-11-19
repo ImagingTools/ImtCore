@@ -5,10 +5,11 @@ It is meant for moving data between applications, for example a catalog that ano
 
 ## What the step does
 
-1. Reads the IDs of the source collection. A read that reports an error fails the step, so the revision is not recorded with nothing imported.
-2. Skips an object whose ID is already in the target table. A repeated step changes nothing.
-3. Passes each object to the optional converter. The converter keeps the object, replaces it with an object of another type, or leaves it out.
-4. Writes the object through the delegate of the target table, with the ID of the source object. The delegate creates the meta info; no organization owns the object.
+1. Checks the source database (see `SourceDatabase` below): without it there is nothing to import.
+2. Reads the IDs of the source collection. A read that reports an error fails the step, so the revision is not recorded with nothing imported.
+3. Skips an object whose ID is already in the target table. A repeated step changes nothing.
+4. Passes each object to the optional converter. The converter keeps the object, replaces it with an object of another type, or leaves it out.
+5. Writes the object through the delegate of the target table, with the ID of the source object. The delegate creates the meta info; no organization owns the object.
 
 The objects keep their IDs, so references to them in the migrated database stay valid without being rewritten.
 
@@ -21,13 +22,19 @@ The objects keep their IDs, so references to them in the migrated database stay 
 | `SourceCollection` | yes | `imtbase::IObjectCollection` the objects come from, usually an SQL collection on a second database engine. |
 | `TargetDelegate` | yes | `imtdb::ISqlDatabaseObjectDelegate` of the target table. |
 | `ObjectConverter` | no | `imtdb::IObjectImportConverter`. Without it every object is imported unchanged. |
-| `SourceEnabler` | no | `iprm::IEnableableParam`. Switched off, the step imports nothing and passes. |
+| `SourceDatabase` | no | `imtdb::IDatabaseServerConnectionChecker` of the database the source collection lives in, usually its engine. If that database does not exist, the step imports nothing and passes. |
 
 ## Configuring the source
 
 The source database is only read. Give its engine `AutoCreateDatabase = 0`, `AutoCreateTables = 0` and no `MigrationController`, so nothing is created or migrated there.
 
-Keep the step behind a `SourceEnabler` that is off by default. An installation without the source database, such as a new installation or a test system, then still starts. Switch it on before the update of an installation that has the source.
+Give the step the engine of the source as `SourceDatabase`. The step then decides by the source database itself:
+
+- the database does not exist (a new installation, a test system): there is nothing to import, the step passes;
+- the database exists: the objects are imported;
+- the database cannot be checked (the server is not reachable, the login fails) or the source cannot be read: the step fails. The revision is not recorded, so the import runs again at the next start once the cause is fixed.
+
+Do not put the step behind a switch that is off by default: a step that imports nothing still records its revision, and an installation started once with the switch off can never import its data.
 
 ## Converters
 

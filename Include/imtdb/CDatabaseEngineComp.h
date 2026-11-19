@@ -90,7 +90,7 @@ public:
 	virtual QSqlQuery ExecSqlQueryFromFile(const QString& filePath, const QVariantMap& bindValues, QSqlError* sqlError = nullptr, bool isForwardOnly = false) const override;
 
 	// reimplemented (IDatabaseServerConnectionChecker)
-	virtual bool CheckDatabaseConnection(QString& errorMessage) const override;
+	virtual DatabaseState CheckDatabaseConnection(QString& errorMessage) const override;
 
 	static void DrectBindValue(QByteArray* string, const QByteArray& what, const QByteArray& expr);
 	static void DrectBindValueInsertDefault(QByteArray* string, const QByteArray& what);
@@ -118,6 +118,13 @@ protected:
 	virtual void OnComponentDestroyed() override;
 
 private:
+	/**
+		Opens a connection of its own to the maintenance database of the server and runs \a query there.
+		\param hasRow	Set to whether the query returned a row.
+		\return	\c false if the server cannot be connected or the query fails; the reason is in \a errorMessage.
+	*/
+	bool QueryMaintenanceDatabase(const QString& query, const QVariantMap& bindValues, bool& hasRow, QString& errorMessage) const;
+
 	/**
 		Internal method for reconnection database on disconnect or not connected.
 		\value sqlError[optional] - use it to track sql errors during the connection check

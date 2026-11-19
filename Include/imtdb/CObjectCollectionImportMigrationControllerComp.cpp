@@ -32,12 +32,22 @@ bool CObjectCollectionImportMigrationControllerComp::DoMigration(int& resultRevi
 
 	const QString tableName = QString::fromUtf8(m_targetDelegateCompPtr->GetTableName());
 
-	if (m_sourceEnablerCompPtr.IsValid() && !m_sourceEnablerCompPtr->IsEnabled()){
-		SendInfoMessage(0, QStringLiteral("The import into '%1' is switched off, nothing is imported").arg(tableName));
+	if (m_sourceDatabaseCompPtr.IsValid()){
+		QString errorMessage;
+		const IDatabaseServerConnectionChecker::DatabaseState sourceState = m_sourceDatabaseCompPtr->CheckDatabaseConnection(errorMessage);
+		if (sourceState == IDatabaseServerConnectionChecker::DS_NOT_CONNECTED){
+			SendErrorMessage(0, QStringLiteral("The source database of the import into '%1' cannot be checked: %2").arg(tableName, errorMessage));
 
-		resultRevision = subRange.GetMaxValue();
+			return false;
+		}
 
-		return true;
+		if (sourceState == IDatabaseServerConnectionChecker::DS_MISSING){
+			SendInfoMessage(0, QStringLiteral("The source database of the import into '%1' does not exist, nothing is imported").arg(tableName));
+
+			resultRevision = subRange.GetMaxValue();
+
+			return true;
+		}
 	}
 
 	// An incomplete read must not pass for "nothing to import": the revision would be recorded and the objects never come
