@@ -8,7 +8,7 @@ const { KeyNavigation } = require('./KeyNavigation')
 const { KeyEvent } = require('./KeyEvent')
 const QtEnums = require('../Qt/enums')
 
-const agent = { root: null, activeFocusItem: null, windowFocused: false }
+const agent = { root: null, activeFocusItem: null, windowFocused: false, windowFocusReason: false }
 
 // setFocusInScope / clearFocusInScope options
 const DONT_CHANGE_FOCUS_PROPERTY = 1
@@ -174,7 +174,13 @@ function setWindowFocused(focused){
     if(!agent.root || agent.windowFocused === focused) return
     if(focused && noWindow()) return
     agent.windowFocused = focused
-    engine.batch(() => agent.root.$setFocus(focused))
+    // the focus events of this change have Qt::ActiveWindowFocusReason
+    agent.windowFocusReason = true
+    try {
+        engine.batch(() => agent.root.$setFocus(focused))
+    } finally {
+        agent.windowFocusReason = false
+    }
 }
 
 function windowCreated(){

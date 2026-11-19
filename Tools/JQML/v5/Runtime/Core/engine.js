@@ -364,6 +364,47 @@ function isStopped(){
     return stopped
 }
 
+// Timers whose time has come before the frame. Qt renders a frame on the window's UpdateRequest, which
+// QWindow::requestUpdate delivers with the next vsync; until then the event loop runs the timers that expire,
+// a zero timer (QTimer with interval 0, a Timer of interval 0) on every pass - one that starts another, or
+// itself again, runs again on the next pass. requestAnimationFrame runs right before the browser paints, and a
+// setTimeout started in the same turn often comes after it, so the frame first runs the timers that are due,
+// for at most TIMER_BUDGET ms (the time left to the vsync), then polishes. A timer started by the polish fires
+// after the frame, as in Qt (QQuickWindow::polishItems runs in the frame, after the event loop pass).
+const now = typeof performance === 'object' && performance && typeof performance.now === 'function'
+    ? () => performance.now() : () => Date.now()
+const TIMER_BUDGET = 8
+let dueTimers = new Set()
+
+function timerScheduled(timer, interval){
+    timer.$due = now() + interval
+    dueTimers.delete(timer)
+    dueTimers.add(timer)
+}
+
+function timerDone(timer){
+    dueTimers.delete(timer)
+}
+
+function runDueTimers(){
+    let start = now()
+    while(dueTimers.size){
+        let time = now()
+        let due = []
+        for(let timer of dueTimers){
+            if(timer.$due <= time) due.push(timer)
+        }
+        if(!due.length) return
+        // one pass of the event loop: the timers in the order they expire, the same expiry in the order they
+        // started (stable sort)
+        due.sort((a, b) => a.$due - b.$due)
+        for(let timer of due){
+            if(dueTimers.has(timer) && timer.$due <= time) timer.$fireNow()
+        }
+        if(now() - start >= TIMER_BUDGET) return
+    }
+}
+
 function runFrame(){
     if(!frameRequested) return
     frameRequested = false
@@ -371,9 +412,10 @@ function runFrame(){
     clearTimeout(frameTimer)
     frameHandle = frameTimer = 0
     if(stopped) return
-    let items = frameItems
-    frameItems = []
     batch(() => {
+        runDueTimers()
+        let items = frameItems
+        frameItems = []
         for(let item of items){
             item.$frameQueued = false
             if(!(item.$f & DESTROYED)) item.$frame()
@@ -679,7 +721,12 @@ function endCreate(previous){
         // (allParserStatusCallbacks.back()/pop_back()), then the Component.onCompleted handlers
         for(let i = current.bindings.length - 1; i >= 0; i--){
             let binding = current.bindings[i]
-            if(!(binding.flags & DISPOSED)) enablePending(binding)
+            if(!(binding.flags & DISPOSED) && !isQPropertyBinding(binding)) enablePending(binding)
+        }
+        // a binding of a bindable property (QQuickItem x, y, width, height: Q_OBJECT_COMPAT_PROPERTY) is a
+        // QQmlPropertyBinding, stashed in allQPropertyBindings and set after the others, in the order made (pop_front)
+        for(let binding of current.bindings){
+            if(!(binding.flags & DISPOSED) && isQPropertyBinding(binding)) enablePending(binding)
         }
         for(let i = current.componentComplete.length - 1; i >= 0; i--){
             let obj = current.componentComplete[i]
@@ -690,6 +737,14 @@ function endCreate(previous){
         endUpdate()
         if(--inProgressCreations === 0 && erroredBindings.size) flushErroredBindings()
     }
+}
+
+// QQmlObjectCreator::setPropertyBinding: bindingProperty->acceptsQBinding() - a QML binding written on a bindable
+// property of the object itself (not a binding through an alias, not one the anchors set)
+function isQPropertyBinding(binding){
+    let target = binding.target
+    return binding.self === target && !(binding.flags & SETTER) && target.$bindableSignals !== undefined
+        && target.$bindableSignals.has(selfSignal(binding))
 }
 
 // Component.onCompleted order of the current runtime (confirmed against Qt by the tests):
@@ -795,6 +850,7 @@ module.exports = {
     connect, disconnect, connectHandler, subscribe, unsubscribe, hasSubscribers, dropSubscribers, dropConnections,
     emit, emitArgs, track, evaluate, runBinding, disposeBinding, isUpdating, flushPending,
     beginUpdate, endUpdate, batch, markDirty, onSceneChanged, queuePolish, queueCall, queueDelete, queueFrame, flushFrame, stop, isStopped,
+    timerScheduled, timerDone,
     beginCreate, endCreate, creatingRoot, scheduleComponentComplete, scheduleBinding, scheduleCompleted,
     reportError,
     writeError, bindingError

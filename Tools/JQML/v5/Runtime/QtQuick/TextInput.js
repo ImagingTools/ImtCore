@@ -60,7 +60,7 @@ class TextInput extends TextField {
         else if(widthUsed - hscroll < width) hscroll = widthUsed - width
         else if(width - hscroll > widthUsed) hscroll = width - widthUsed
         this.$hs = hscroll
-        if(this.$input) this.$input.scrollLeft = hscroll
+        if(this.$input && this.$input.scrollLeft !== hscroll) this.$input.scrollLeft = hscroll
         this.$updateCursorRectangle()
     }
 

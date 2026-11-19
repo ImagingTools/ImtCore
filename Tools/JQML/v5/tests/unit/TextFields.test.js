@@ -426,6 +426,19 @@ function cases(name, runtime){
         assert.equal(input.positionToRectangle(0).x, 0)
     })
 
+    test(name + ': the layout kept for the cursor follows a new text and a new width', () => {
+        let input = make(TextInput, (it) => {
+            it.width = 100
+            it.text = 'abc'
+        })
+        assert.equal(input.cursorRectangle.x, 3 * CHAR)
+        engine.batch(() => { input.text = 'abcdef' })
+        assert.equal(input.cursorRectangle.x, 6 * CHAR)
+        engine.batch(() => { input.horizontalAlignment = TextInput.AlignRight })
+        engine.batch(() => { input.width = 200 })
+        assert.equal(input.cursorRectangle.x, 200)
+    })
+
     // ---- TextEdit ----
 
     test(name + ': append adds a paragraph, the text itself when empty', () => {
@@ -435,6 +448,94 @@ function cases(name, runtime){
         engine.batch(() => edit.append('second'))
         assert.equal(edit.text, 'first\nsecond')
         assert.equal(edit.lineCount, 2)
+    })
+
+    // ---- focus out, cursor delegate ----
+
+    // a window with two fields: the second takes the focus from the first
+    function focusScene(setup){
+        const { Item, keys } = runtime
+        let root, first, second
+        engine.batch(() => {
+            root = new Item(null)
+            first = new TextInput(root)
+            first.text = 'hello world'
+            second = new TextInput(root)
+            if(setup) setup(first)
+        })
+        root.$isFocusScope = true
+        keys.agent.root = root
+        keys.agent.windowFocused = true
+        engine.batch(() => root.$setFocus(true))
+        engine.batch(() => first.forceActiveFocus())
+        return { root, first, second, keys }
+    }
+
+    // QQuickTextInputPrivate::handleFocusEvent / QQuickTextEditPrivate::handleFocusEvent
+    test(name + ': losing the focus deselects, unless persistentSelection or the window lost it', () => {
+        let { first, second } = focusScene()
+        engine.batch(() => first.select(0, 5))
+        engine.batch(() => second.forceActiveFocus())
+        assert.equal(first.selectedText, '')
+        assert.equal(first.cursorPosition, 5)
+
+        let kept = focusScene((it) => { it.persistentSelection = true })
+        engine.batch(() => kept.first.select(0, 5))
+        engine.batch(() => kept.second.forceActiveFocus())
+        assert.equal(kept.first.selectedText, 'hello')
+
+        let window = focusScene()
+        engine.batch(() => window.first.select(0, 5))
+        window.keys.setWindowFocused(false)
+        assert.equal(window.first.activeFocus, false)
+        assert.equal(window.first.selectedText, 'hello')
+        window.keys.setWindowFocused(true)
+    })
+
+    test(name + ': the cursor shows with the focus, not in a read-only field', () => {
+        let { first, second } = focusScene()
+        assert.equal(first.cursorVisible, true)
+        engine.batch(() => second.forceActiveFocus())
+        assert.equal(first.cursorVisible, false)
+        let readOnly = focusScene((it) => { it.readOnly = true })
+        assert.equal(readOnly.first.activeFocus, true)
+        assert.equal(readOnly.first.cursorVisible, false)
+    })
+
+    // QQuickTextUtil::setCursorDelegate / createCursor, QQuickTextInput::updateCursorRectangle
+    test(name + ': a cursor delegate is made when the cursor first shows, at the cursor rectangle, and follows it', () => {
+        const { Item, types } = runtime
+        let made = 0
+        let delegate = new types.Component(null, (parent) => {
+            made++
+            let item
+            engine.batch(() => {
+                item = new Item(parent)
+                item.width = 2
+            })
+            return item
+        })
+        let input = make(TextInput, (it) => {
+            it.text = 'abcdef'
+            it.cursorDelegate = delegate
+        })
+        assert.equal(made, 0)
+        engine.batch(() => { input.cursorVisible = true })
+        assert.equal(made, 1)
+        let cursor = input.children.find((child) => child.width === 2)
+        assert.ok(cursor)
+        assert.equal(cursor.parent, input)
+        assert.equal(cursor.x, input.cursorRectangle.x)
+        assert.equal(cursor.y, input.cursorRectangle.y)
+        assert.equal(cursor.height, input.cursorRectangle.height)
+        engine.batch(() => { input.cursorPosition = 3 })
+        assert.equal(cursor.x, 3 * CHAR)
+        // it stays when the cursor hides; a new delegate replaces it
+        engine.batch(() => { input.cursorVisible = false })
+        engine.batch(() => { input.cursorVisible = true })
+        assert.equal(made, 1)
+        engine.batch(() => { input.cursorDelegate = delegate.constructor === undefined ? null : new types.Component(null, delegate.$build) })
+        assert.equal(made, 2)
     })
 }
 

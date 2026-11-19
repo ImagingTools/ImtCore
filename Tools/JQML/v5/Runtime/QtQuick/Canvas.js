@@ -1,21 +1,30 @@
-// Canvas on a native <canvas>, after qquickcanvasitem.cpp: available once the item is in a window
-// (queued), paint(region) is emitted at polish for the dirty rect, painted after it.
+// Canvas on a native <canvas>, after qquickcanvasitem.cpp (Qt 6.8): available once the item is in a window (queued,
+// QQuickCanvasItem::itemChange ItemSceneChange -> sceneGraphInitialized); paint(region) is emitted at polish for the
+// dirty rect, painted() once the commands are on the canvas. The context is the DOM one with Qt's behaviour
+// (Context2D.js).
 const engine = require('../Core/engine')
 const { defineType } = require('../Core/type')
 const { Item } = require('./Item')
-const { toCss } = require('../Core/color')
+const { QtObject } = require('../Core/QtObject')
 const { QSizeF, QRectF } = require('../Core/ValueTypes')
+const { extendContext } = require('./Context2D')
+const { resolveUrl } = require('../Core/Resources')
 
-const PROTO = typeof CanvasRenderingContext2D !== 'undefined' ? CanvasRenderingContext2D.prototype : null
+// QQuickPixmap cache: a url loaded once is ready for every canvas (loadImage of a ready url emits nothing)
+const pixmaps = new Map()       // resolved url -> { image, status, waiting: Set<Canvas> }
+const READY = 1, LOADING = 2, ERROR = 3
 
-// Qt colors are #AARRGGBB; CSS wants rgba() for them
-function styleSetter(name){
-    let native = PROTO && Object.getOwnPropertyDescriptor(PROTO, name)
-    return {
-        get(){ return native.get.call(this) },
-        set(value){ native.set.call(this, typeof value === 'string' && value[0] === '#' ? toCss(value) : value) },
-        configurable: true,
-    }
+// QQuickCanvasItem::requestAnimationFrame: one counter for every canvas (static int id)
+let nextCallbackId = 0
+
+// the methods of a context that put something on the canvas (QQuickContext2DCommandBuffer not empty)
+const DRAWING = ['fill', 'stroke', 'fillRect', 'strokeRect', 'clearRect', 'fillText', 'strokeText', 'drawImage', 'putImageData', 'reset']
+
+function inWindow(item){
+    let top = item
+    while(top.$parent) top = top.$parent
+    let scene = require('./PointerDelivery').scene
+    return scene.roots.includes(top)
 }
 
 class Canvas extends Item {
@@ -25,10 +34,15 @@ class Canvas extends Item {
         this.$context = null
         this.$dirtyRect = null
         this.$hasCanvasSize = false
-        this.$images = new Map()        // url -> { image, status }
+        this.$hasCanvasWindow = false
+        this.$hasTileSize = false
+        this.$images = new Map()        // resolved url -> pixmap entry of this canvas (loadImage / unloadImage)
         this.$callbacks = new Map()
-        this.$nextCallback = 1
+        this.$drawn = false
+        this.$sceneWatch = null
         this.$v[Canvas.CANVASSIZE] = new QSizeF(0, 0)
+        this.$v[Canvas.TILESIZE] = new QSizeF(0, 0)
+        this.$v[Canvas.CANVASWINDOW] = new QRectF(0, 0, 0, 0)
         if(this.$dom){
             let canvas = document.createElement('canvas')
             canvas.style.cssText = 'position:absolute;left:0;top:0;'
@@ -36,18 +50,42 @@ class Canvas extends Item {
             this.$canvas = canvas
         }
         if(parent) this.$setParent(parent)
-        // "sceneGraphInitialized" comes queued after the item enters a window
-        setTimeout(() => this.$sceneGraphInitialized(), 0)
+        // ItemSceneChange: "sceneGraphInitialized" is invoked queued once the item is in a window
+        setTimeout(() => this.$checkWindow(), 0)
     }
 
+    $checkWindow(){
+        if(this.$f & engine.DESTROYED || engine.isStopped() || this.$v[Canvas.AVAILABLE]) return
+        if(inWindow(this)){
+            this.$sceneGraphInitialized()
+            return
+        }
+        // not in a window yet: the topmost ancestor going into one brings the scene change
+        let top = this
+        while(top.$parent) top = top.$parent
+        if(this.$sceneWatch && this.$sceneWatch.item === top) return
+        if(this.$sceneWatch) engine.unsubscribe(this.$sceneWatch.link)
+        let link = engine.connect(top, QtObject.SIGNAL_parentChanged, () => setTimeout(() => this.$checkWindow(), 0))
+        this.$sceneWatch = { item: top, link }
+    }
+
+    // QQuickCanvasItem::sceneGraphInitialized: available; the context of contextType is made (delayedCreate) and
+    // painted, or a canvas with a paint handler is painted
     $sceneGraphInitialized(){
-        if(this.$f & engine.DESTROYED || engine.isStopped()) return
+        if(this.$sceneWatch){
+            engine.unsubscribe(this.$sceneWatch.link)
+            this.$sceneWatch = null
+        }
         engine.batch(() => {
             this.$write(Canvas.AVAILABLE, true)
             this.$resizeCanvas()
             let type = this.$v[Canvas.CONTEXTTYPE]
-            if(type) this.getContext(type)
-            if(type || this.$isPaintConnected()) this.requestPaint()
+            if(type){
+                if(!this.$context) this.$createContext(type)
+                this.requestPaint()
+            } else if(this.$isPaintConnected()){
+                this.requestPaint()
+            }
         })
     }
 
@@ -56,103 +94,147 @@ class Canvas extends Item {
     }
 
     $write(id, value){
-        if(id === Canvas.CANVASSIZE) this.$hasCanvasSize = true
+        if(id === Canvas.CANVASSIZE && !this.$syncing){
+            let old = this.$v[id]
+            if(old && value && old.width === value.width && old.height === value.height) return
+            this.$hasCanvasSize = true
+        }
+        if(id === Canvas.CANVASWINDOW && !this.$syncing) this.$hasCanvasWindow = true
+        if(id === Canvas.TILESIZE && !this.$syncing) this.$hasTileSize = true
+        let old = this.$v[id]
         super.$write(id, value)
-        if(id === Item.WIDTH || id === Item.HEIGHT) this.$geometryChanged()
-        if(id === Canvas.CANVASSIZE) this.$resizeCanvas()
+        if((id === Item.WIDTH || id === Item.HEIGHT) && old !== this.$v[id]) this.$geometryChanged()
+        if(id === Canvas.CANVASSIZE || id === Canvas.CANVASWINDOW || id === Canvas.TILESIZE){
+            this.$resizeCanvas()
+            if(this.$context) engine.queuePolish(this)
+        }
+        if(id === Item.VISIBLE && this.$v[id] && this.$callbacks.size) engine.queuePolish(this)
     }
 
+    // QQuickCanvasItem::geometryChange: canvasSize, tileSize and canvasWindow follow the item unless set; a visible
+    // available canvas of a new size is painted again
     $geometryChanged(){
-        let size = this.$v[Canvas.CANVASSIZE]
         let w = this.$v[Item.WIDTH], h = this.$v[Item.HEIGHT]
-        if(!this.$hasCanvasSize && (!size || size.width !== w || size.height !== h)){
-            this.$v[Canvas.CANVASSIZE] = new QSizeF(w, h)
-            engine.emit(this, Canvas.SIGNAL_canvasSizeChanged)
-            this.$resizeCanvas()
+        this.$syncing = true
+        try {
+            let size = this.$v[Canvas.CANVASSIZE]
+            if(!this.$hasCanvasSize && (size.width !== w || size.height !== h)) this.$write(Canvas.CANVASSIZE, new QSizeF(w, h))
+            let tile = this.$v[Canvas.TILESIZE]
+            if(!this.$hasTileSize && (tile.width !== Math.trunc(w) || tile.height !== Math.trunc(h))) this.$write(Canvas.TILESIZE, new QSizeF(Math.trunc(w), Math.trunc(h)))
+            let win = this.$v[Canvas.CANVASWINDOW]
+            if(!this.$hasCanvasWindow && (win.x !== 0 || win.y !== 0 || win.width !== w || win.height !== h)) this.$write(Canvas.CANVASWINDOW, new QRectF(0, 0, w, h))
+        } finally {
+            this.$syncing = false
         }
         if(this.$v[Canvas.AVAILABLE] && this.$v[Item.VISIBLE]) this.requestPaint()
     }
 
+    $canvasSizeValue(){ return this.$v[Canvas.CANVASSIZE] }
+
+    $ratio(){ return (typeof window !== 'undefined' && window.devicePixelRatio) || 1 }
+
+    // a new backing store (QQuickContext2DTexture::canvasChanged: a new image); the state of the context stays
     $resizeCanvas(){
         let canvas = this.$canvas
         if(!canvas) return
         let size = this.$v[Canvas.CANVASSIZE]
-        let ratio = (typeof window !== 'undefined' && window.devicePixelRatio) || 1
+        let ratio = this.$ratio()
         let w = Math.max(0, Math.round(size.width * ratio)), h = Math.max(0, Math.round(size.height * ratio))
         if(canvas.width === w && canvas.height === h) return
+        let ctx = this.$context
+        let current = ctx ? ctx.$snapshot() : null
         canvas.width = w
         canvas.height = h
         canvas.style.width = size.width + 'px'
         canvas.style.height = size.height + 'px'
-        if(this.$context) this.$context.setTransform(ratio, 0, 0, ratio, 0, 0)
+        if(!ctx) return
+        // the DOM state went with the old backing store: the saved states, then the current one
+        let save = Object.getPrototypeOf(ctx).save
+        for(let state of ctx.$stack){
+            ctx.$apply(state)
+            save.call(ctx)
+        }
+        ctx.$apply(current)
     }
 
+    // QQuickCanvasItem::getContext: the context of the type, made if there is none; another type: a warning
     getContext(type){
-        if(!this.$v[Canvas.AVAILABLE]){
-            console.warn('Unable to use getContext() at this time, please wait for available: true')
+        if(typeof type !== 'string'){
+            console.warn('JQML: Canvas: getContext should be called with a string naming the required context type')
             return null
         }
-        if(String(type).toLowerCase() !== '2d') return null
-        if(!this.$context && this.$canvas){
-            let ctx = this.$canvas.getContext('2d')
-            let ratio = (typeof window !== 'undefined' && window.devicePixelRatio) || 1
-            ctx.setTransform(ratio, 0, 0, ratio, 0, 0)
-            this.$extend(ctx)
-            this.$context = ctx
-            this.$write(Canvas.CONTEXT, ctx)
+        if(!this.$v[Canvas.AVAILABLE]){
+            console.warn('JQML: Canvas: Unable to use getContext() at this time, please wait for available: true')
+            return null
         }
-        return this.$context
+        if(this.$context){
+            if(type.toLowerCase() === '2d') return this.$context
+            console.warn('JQML: Canvas: Canvas already initialized with a different context type')
+            return null
+        }
+        return this.$createContext(type) ? this.$context : null
     }
 
-    // Context2D differences from the DOM context
-    $extend(ctx){
-        let item = this
-        for(let name of ['fillStyle', 'strokeStyle', 'shadowColor']) Object.defineProperty(ctx, name, styleSetter(name))
-        Object.defineProperty(ctx, 'canvas', { get(){ return item }, configurable: true })
-        let ellipse = ctx.ellipse, drawImage = ctx.drawImage, createPattern = ctx.createPattern
-        // ellipse(x, y, w, h): "an ellipse within the bounding rectangle", a closed subpath
-        ctx.ellipse = function(...args){
-            if(args.length === 4){
-                let [x, y, w, h] = args
-                this.moveTo(x + w, y + h / 2)
-                ellipse.call(this, x + w / 2, y + h / 2, Math.abs(w / 2), Math.abs(h / 2), 0, 0, Math.PI * 2)
-                this.closePath()
-                return
+    // QQuickCanvasItem::createContext: "2d" only (case-sensitive), in a window
+    $createContext(type){
+        if(type !== '2d' || !this.$canvas) return false
+        if(String(this.$v[Canvas.CONTEXTTYPE]).toLowerCase() !== '2d'){
+            this.$settingType = true
+            this.$write(Canvas.CONTEXTTYPE, '2d')
+            this.$settingType = false
+        }
+        let ctx = this.$canvas.getContext('2d')
+        let ratio = this.$ratio()
+        ctx.setTransform(ratio, 0, 0, ratio, 0, 0)
+        extendContext(ctx, this, () => this.$ratio())
+        // the commands put on the canvas: painted() after the polish (textureChanged)
+        for(let name of DRAWING){
+            let fn = ctx[name]
+            if(typeof fn !== 'function') continue
+            let item = this
+            ctx[name] = function(...args){
+                item.$drawn = true
+                return fn.apply(this, args)
             }
-            ellipse.apply(this, args)
         }
-        ctx.roundedRect = function(x, y, w, h, xr, yr){
-            this.roundRect(x, y, w, h, [{ x: xr, y: yr === undefined ? xr : yr }])
-        }
-        // a url draws once loadImage() has it; an unloaded url is loaded
-        let resolve = (source) => {
-            if(typeof source === 'string'){
-                let entry = item.$images.get(source)
-                if(!entry){
-                    item.loadImage(source)
-                    return null
-                }
-                return entry.status === 1 ? entry.image : null
-            }
-            if(source instanceof Canvas) return source.$canvas
-            if(source && source.$dom && source.$dom.querySelector){
-                let img = source.$dom.querySelector('img')
-                return img || null
-            }
-            return source
-        }
-        ctx.drawImage = function(source, ...args){
-            let image = resolve(source)
-            if(image) drawImage.call(this, image, ...args)
-        }
-        ctx.createPattern = function(source, repetition){
-            let image = resolve(source)
-            return image ? createPattern.call(this, image, repetition || 'repeat') : null
-        }
+        this.$context = ctx
+        this.$write(Canvas.CONTEXT, ctx)
+        return true
     }
 
+    // an image of drawImage / createPattern: a url (loaded by loadImage, an unloaded one starts loading), an Image item,
+    // another Canvas, a CanvasImageData
+    $imageSource(source){
+        if(source == null) return null
+        if(typeof source === 'string' || (typeof source === 'object' && source.constructor && source.constructor.name === 'URL')){
+            let url = resolveUrl(String(source))
+            let entry = this.$images.get(url)
+            if(!entry){
+                this.loadImage(String(source))
+                entry = this.$images.get(url)
+            }
+            return entry && entry.status === READY ? entry.image : null
+        }
+        if(source instanceof Canvas) return source.$canvas
+        if(source instanceof Item){
+            // QQuickImage: its pixmap, by its url
+            let url = source.$url
+            return url ? this.$imageSource(url) : null
+        }
+        if(typeof ImageData !== 'undefined' && source instanceof ImageData && typeof document !== 'undefined'){
+            let scratch = document.createElement('canvas')
+            scratch.width = source.width
+            scratch.height = source.height
+            scratch.getContext('2d').putImageData(source, 0, 0)
+            return scratch
+        }
+        return source
+    }
+
+    // QQuickCanvasItem::requestPaint: the canvas window is dirty
     requestPaint(){
-        this.markDirty(new QRectF(0, 0, this.$v[Canvas.CANVASSIZE].width, this.$v[Canvas.CANVASSIZE].height))
+        let w = this.$v[Canvas.CANVASWINDOW]
+        this.markDirty(new QRectF(w.x, w.y, w.width, w.height))
     }
 
     markDirty(rect){
@@ -166,6 +248,8 @@ class Canvas extends Item {
         engine.queuePolish(this)
     }
 
+    // QQuickCanvasItem::updatePolish: the animation callbacks of a visible canvas, or else paint(dirty rect); then the
+    // context flushes, and painted() follows when there were commands
     $polish(){
         if(this.$callbacks.size && this.$v[Item.VISIBLE]){
             let callbacks = this.$callbacks
@@ -174,49 +258,93 @@ class Canvas extends Item {
         } else if(this.$dirtyRect){
             let region = this.$dirtyRect
             this.$dirtyRect = null
-            engine.emitArgs(this, Canvas.SIGNAL_paint, [region])
+            let r = new QRectF(Math.trunc(region.x), Math.trunc(region.y), Math.trunc(region.width), Math.trunc(region.height))
+            engine.emitArgs(this, Canvas.SIGNAL_paint, [r])
+        }
+        if(this.$context && this.$drawn){
+            this.$drawn = false
             engine.emit(this, Canvas.SIGNAL_painted)
         }
     }
 
     requestAnimationFrame(callback){
-        let id = this.$nextCallback++
+        if(typeof callback !== 'function'){
+            console.warn('JQML: Canvas: requestAnimationFrame should be called with an animation callback function')
+            return null
+        }
+        let id = ++nextCallbackId
         this.$callbacks.set(id, callback)
-        engine.queuePolish(this)
+        // QTBUG-55778: posted, not a polish from here; a hidden canvas waits for visibleChanged
+        if(this.$v[Item.VISIBLE]) setTimeout(() => { if(!(this.$f & engine.DESTROYED)) engine.batch(() => engine.queuePolish(this)) }, 0)
         return id
     }
 
     cancelRequestAnimationFrame(id){
+        if(!Number.isInteger(id)){
+            console.warn('JQML: Canvas: cancelRequestAnimationFrame should be called with an animation callback id')
+            return null
+        }
         this.$callbacks.delete(id)
     }
 
+    // QQuickCanvasItem::loadImage: asynchronous, through the pixmap cache; imageLoaded() when one was loading
     loadImage(url){
-        url = String(url)
-        if(this.$images.has(url) || typeof Image === 'undefined') return
-        let image = new Image()
-        let entry = { image, status: 2 }
-        this.$images.set(url, entry)
-        image.onload = () => {
-            entry.status = 1
-            if(!(this.$f & engine.DESTROYED) && !engine.isStopped()) engine.batch(() => engine.emit(this, Canvas.SIGNAL_imageLoaded))
+        let resolved = resolveUrl(String(url))
+        if(this.$images.has(resolved)) return
+        let entry = pixmaps.get(resolved)
+        if(!entry){
+            entry = { image: null, status: LOADING, waiting: new Set() }
+            pixmaps.set(resolved, entry)
+            if(typeof Image !== 'undefined'){
+                let image = new Image()
+                entry.image = image
+                let done = (status) => {
+                    entry.status = status
+                    let waiting = Array.from(entry.waiting)
+                    entry.waiting.clear()
+                    if(engine.isStopped()) return
+                    engine.batch(() => {
+                        for(let canvas of waiting){
+                            if(!(canvas.$f & engine.DESTROYED) && canvas.$images.get(resolved) === entry) engine.emit(canvas, Canvas.SIGNAL_imageLoaded)
+                        }
+                    })
+                }
+                image.onload = () => done(READY)
+                image.onerror = () => done(ERROR)
+                image.src = resolved
+            } else {
+                entry.status = ERROR
+            }
         }
-        image.onerror = () => {
-            entry.status = 3
-            if(!(this.$f & engine.DESTROYED) && !engine.isStopped()) engine.batch(() => engine.emit(this, Canvas.SIGNAL_imageLoaded))
-        }
-        image.src = url
+        this.$images.set(resolved, entry)
+        if(entry.status === LOADING) entry.waiting.add(this)
     }
 
-    unloadImage(url){ this.$images.delete(String(url)) }
-    isImageLoaded(url){ let e = this.$images.get(String(url)); return !!e && e.status === 1 }
-    isImageLoading(url){ let e = this.$images.get(String(url)); return !!e && e.status === 2 }
-    isImageError(url){ let e = this.$images.get(String(url)); return !!e && e.status === 3 }
+    unloadImage(url){ this.$images.delete(resolveUrl(String(url))) }
+    isImageLoaded(url){ let e = this.$images.get(resolveUrl(String(url))); return !!e && e.status === READY }
+    isImageLoading(url){ let e = this.$images.get(resolveUrl(String(url))); return !!e && e.status === LOADING }
+    isImageError(url){ let e = this.$images.get(resolveUrl(String(url))); return !!e && e.status === ERROR }
 
-    toDataURL(type){
-        return this.$canvas && this.$v[Canvas.AVAILABLE] ? this.$canvas.toDataURL(type || 'image/png') : 'data:,'
+    // QQuickCanvasItem::toDataURL: image/png by default; another image/ type the browser cannot write, or no context: "data:,"
+    toDataURL(mimeType){
+        let mime = String(mimeType === undefined ? 'image/png' : mimeType).toLowerCase()
+        if(!this.$context || !this.$canvas || !mime.startsWith('image/')) return 'data:,'
+        let ext = mime.slice(6)
+        if(ext !== 'png' && ext !== 'jpeg') return 'data:,'
+        return this.$canvas.toDataURL(mime)
     }
 
+    // QQuickCanvasItem::save writes a file: a page has no file system
     save(){ return false }
+
+    $disposeNative(){
+        if(this.$sceneWatch){
+            engine.unsubscribe(this.$sceneWatch.link)
+            this.$sceneWatch = null
+        }
+        for(let entry of this.$images.values()) entry.waiting && entry.waiting.delete(this)
+        super.$disposeNative()
+    }
 }
 
 defineType(Canvas, {
@@ -226,7 +354,19 @@ defineType(Canvas, {
         canvasWindow: 'var',
         tileSize: 'var',
         context: { kind: 'var', readonly: true },
-        contextType: 'string',
+        contextType: {
+            kind: 'string',
+            // QQuickCanvasItem::setContextType: made at once when available; a canvas with another context keeps it
+            effect(canvas, value, old){
+                if(canvas.$settingType) return
+                if(canvas.$context){
+                    console.warn('JQML: Canvas: Canvas already initialized with a different context type')
+                    canvas.$v[Canvas.CONTEXTTYPE] = old
+                    return
+                }
+                if(canvas.$v[Canvas.AVAILABLE] && value) canvas.$createContext(value)
+            },
+        },
         renderStrategy: 'int',
         renderTarget: 'int',
     },
@@ -234,4 +374,4 @@ defineType(Canvas, {
 })
 Object.assign(Canvas, { Immediate: 0, Threaded: 1, Cooperative: 2, Image: 0, FramebufferObject: 1 })
 
-module.exports = { Canvas }
+module.exports = { Canvas, pixmaps }
