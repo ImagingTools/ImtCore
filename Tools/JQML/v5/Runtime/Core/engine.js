@@ -175,7 +175,11 @@ function dropSubscribers(obj){
     let subs = obj.$subs
     if(!subs) return
     for(let i = 1; i < subs.length; i += 2){
-        for(let link = subs[i]; link; link = link.nextSub) link.flags |= DEAD
+        for(let link = subs[i]; link; link = link.nextSub){
+            if(link.flags & DEAD) continue
+            link.flags |= DEAD
+            stats.links--
+        }
     }
     obj.$subs = null
 }

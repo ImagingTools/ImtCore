@@ -67,6 +67,16 @@ function cases(name, runtime){
         assert.equal(view.itemAtIndex(0).y, 0)
     })
 
+    test(name + ': the subscriptions of a destroyed object are counted out', () => {
+        let before = engine.stats.links
+        let obj
+        engine.batch(() => { obj = new QtObject(null) })
+        engine.connect(obj, QtObject.SIGNAL_objectNameChanged, () => {})
+        obj.$on(QtObject.SIGNAL_completed, () => {}, null)
+        assert.equal(engine.stats.links, before + 2)
+        engine.batch(() => obj.destroy())
+        assert.equal(engine.stats.links, before)
+    })
 }
 
 for(let [name, load] of runtimes) cases(name, load())
