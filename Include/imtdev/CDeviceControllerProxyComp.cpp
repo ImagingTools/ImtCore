@@ -209,7 +209,8 @@ void CDeviceControllerProxyComp::OnComponentDestroyed()
 {
 	m_overriddenDeviceInfoObserver.UnregisterAllObjects();
 
-	CancelEnumeration();
+	// Not virtual: in the destructor of the wrapper a virtual call gets a wrong this
+	CDeviceControllerProxyComp::CancelEnumeration();
 
 	m_intervalTimer.stop();
 
