@@ -537,7 +537,7 @@ Rectangle {
 			property string errorColor: Style.errorColor
 			property string compositeColor: Style.alternateBaseColor;
 			property string compositeSelectedColor: Style.selectedColor;
-			property string compositeBorderColor: Style.imaginToolsAccentColor;
+			property string compositeBorderColor: Style.imagingToolsAccentColor;
 			property string selectedLinkFromColor: Style.selectedLinkFromColor
 			property string selectedLinkToColor: Style.selectedLinkToColor
 			property string linkColor: Style.borderColor2

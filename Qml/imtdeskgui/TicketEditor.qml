@@ -782,7 +782,7 @@ DocumentViewBase {
 		// as "#aarrggbb" - a yellow border.
 		readonly property string cardBorderColorFaded: Style.inputBorderColor
 		readonly property string pageBgColor: Style.backgroundColor2
-		readonly property string accentColor: Style.imaginToolsAccentColor
+		readonly property string accentColor: Style.imagingToolsAccentColor
 		readonly property string labelColor: Style.textColor
 		readonly property real avatarSize: 36
 		readonly property real accentDividerHeight: 2

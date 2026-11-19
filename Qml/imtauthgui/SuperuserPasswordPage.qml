@@ -144,7 +144,7 @@ Rectangle {
 						width: Style.iconSizeXXL;
 						height: Style.iconSizeXXL;
 						radius: width / 2;
-						color: Style.imaginToolsAccentColor;
+						color: Style.imagingToolsAccentColor;
 						opacity: Style.popupIconChipOpacity;
 					}
 

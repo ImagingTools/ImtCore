@@ -274,7 +274,7 @@ Item {
                         anchors.right: parent.right
                         width: root.columnResizeHandleWidth
                         color: (root.__resizingBoundaryIndex === index || parent.resizeHovered)
-                            ? Style.imaginToolsAccentColor : "transparent"
+                            ? Style.imagingToolsAccentColor : "transparent"
                         opacity: (root.__resizingBoundaryIndex === index || parent.resizeHovered) ? 0.45 : 0
                         visible: root.allowColumnResize && index < root.columnCount() - 1
 
@@ -491,7 +491,7 @@ Item {
                             anchors.fill: parent
                             color: "transparent"
                             border.width: cellRoot.isEditingHere ? 2 : 0
-                            border.color: Style.imaginToolsAccentColor
+                            border.color: Style.imagingToolsAccentColor
                             radius: Style.radiusS
                             z: 10
                         }
@@ -753,7 +753,7 @@ Item {
                 color: root.normalTextColor
                 selectByMouse: true
                 selectedTextColor: Style.selectedColor
-                selectionColor: Style.imaginToolsAccentColor
+                selectionColor: Style.imagingToolsAccentColor
                 clip: true
                 text: textEditorRoot.value !== undefined && textEditorRoot.value !== null ? String(textEditorRoot.value) : ""
                 validator: textEditorRoot.editorType === "number" ? doubleValidator
