@@ -272,27 +272,31 @@ function endUpdate(){
     depth++
     try {
         // Order: deferred calls, DOM writes, deferred deletes. Polish runs with the next frame, and while one is
-        // pending the DOM waits for it: a frame is rendered after its items are polished (QQuickWindow::polishItems)
-        while(callLater.length){
-            let calls = callLater
-            callLater = []
-            for(let fn of calls) fn()
-        }
-        if(dirty.length && !polish.length){
-            let items = dirty
-            dirty = []
-            for(let item of items){
-                let bits = item.$dirty
-                item.$dirty = 0
-                if(!(item.$f & DESTROYED)) item.$flush(bits)
+        // pending the DOM waits for it: a frame is rendered after its items are polished (QQuickWindow::polishItems).
+        // What a pass queues (a call or a delete from Component.onDestruction, an item changed by a delete) runs in
+        // another pass: the event loop would take it at once, nothing else may come to run it
+        do {
+            while(callLater.length){
+                let calls = callLater
+                callLater = []
+                for(let fn of calls) fn()
             }
-            if(sceneChanged) sceneChanged()
-        }
-        if(deleteLater.length){
-            let objects = deleteLater
-            deleteLater = []
-            for(let obj of objects) obj.$destroyNow()
-        }
+            if(dirty.length && !polish.length){
+                let items = dirty
+                dirty = []
+                for(let item of items){
+                    let bits = item.$dirty
+                    item.$dirty = 0
+                    if(!(item.$f & DESTROYED)) item.$flush(bits)
+                }
+                if(sceneChanged) sceneChanged()
+            }
+            if(deleteLater.length){
+                let objects = deleteLater
+                deleteLater = []
+                for(let obj of objects) obj.$destroyNow()
+            }
+        } while(callLater.length || deleteLater.length || (dirty.length && !polish.length))
     } finally {
         depth--
     }
