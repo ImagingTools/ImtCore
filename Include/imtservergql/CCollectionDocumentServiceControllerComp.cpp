@@ -128,7 +128,7 @@ CDM::CDocumentInfo CCollectionDocumentServiceControllerComp::OnOpenDocument(
 
 	const auto& arguments = openDocumentRequest.GetRequestedArguments();
 	if (!arguments.input.has_value()){
-		Q_ASSERT(false);
+		errorMessage = QStringLiteral("The input is required");
 		return retVal;
 	}
 
@@ -197,7 +197,7 @@ CDM::CDocumentInfo CCollectionDocumentServiceControllerComp::OnGetDocumentName(
 
 	const auto& arguments = getDocumentNameRequest.GetRequestedArguments();
 	if (!arguments.input.has_value()){
-		Q_ASSERT(false);
+		errorMessage = QStringLiteral("The input is required");
 		return retVal;
 	}
 
@@ -250,7 +250,7 @@ CDM::CDocumentOperationStatus CCollectionDocumentServiceControllerComp::OnSetDoc
 
 	const auto& arguments = setDocumentNameRequest.GetRequestedArguments();
 	if (!arguments.input.has_value()){
-		Q_ASSERT(false);
+		errorMessage = QStringLiteral("The input is required");
 		return retVal;
 	}
 	auto documentId = arguments.input;
@@ -309,7 +309,7 @@ CDM::CDocumentOperationStatus CCollectionDocumentServiceControllerComp::OnSaveDo
 
 	const auto& arguments = saveDocumentRequest.GetRequestedArguments();
 	if (!arguments.input.has_value()){
-		Q_ASSERT(false);
+		errorMessage = QStringLiteral("The input is required");
 		return retVal;
 	}
 	auto saveDocumentInput = arguments.input;
@@ -410,7 +410,7 @@ CDM::CDocumentOperationStatus CCollectionDocumentServiceControllerComp::OnCloseD
 
 	const auto& arguments = closeDocumentRequest.GetRequestedArguments();
 	if (!arguments.input.has_value()){
-		Q_ASSERT(false);
+		errorMessage = QStringLiteral("The input is required");
 		return retVal;
 	}
 	auto documentId = arguments.input;
@@ -476,7 +476,7 @@ sdl::V1_0::imtbase::CUndoInfo CCollectionDocumentServiceControllerComp::OnGetUnd
 
 	const auto& arguments = getUndoInfoRequest.GetRequestedArguments();
 	if (!arguments.input.has_value()){
-		Q_ASSERT(false);
+		errorMessage = QStringLiteral("The input is required");
 		return retVal;
 	}
 	auto documentId = arguments.input;
@@ -715,7 +715,7 @@ sdl::V1_0::imtbase::CUndoStatus CCollectionDocumentServiceControllerComp::OnRese
 
 	const auto& arguments = resetUndoRequest.GetRequestedArguments();
 	if (!arguments.input.has_value()){
-		Q_ASSERT(false);
+		errorMessage = QStringLiteral("The input is required");
 		return retVal;
 	}
 	auto documentId = arguments.input;

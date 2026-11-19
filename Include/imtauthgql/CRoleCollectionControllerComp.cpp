@@ -506,8 +506,8 @@ bool CRoleCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtauth::RoleUpdateRequestArguments arguments = roleUpdateRequest.GetRequestedArguments();
-	if (!arguments.input->item.has_value()){
-		Q_ASSERT(false);
+	if (!arguments.input || !arguments.input->item.has_value()){
+		errorMessage = QStringLiteral("The input with an item is required");
 		return false;
 	}
 

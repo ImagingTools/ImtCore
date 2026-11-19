@@ -18,13 +18,13 @@ namespace imtservergql
 sdl::V1_0::imtbase::CSearchResults CGqlSearchControllerComp::OnSearch(
 			const sdl::V1_0::imtbase::CSearchGqlRequest& searchRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
-			QString& /*errorMessage*/) const
+			QString& errorMessage) const
 {
 	sdl::V1_0::imtbase::CSearchResults response;
 
 	sdl::V1_0::imtbase::SearchRequestArguments arguments = searchRequest.GetRequestedArguments();
 	if (!arguments.input.has_value()){
-		Q_ASSERT(false);
+		errorMessage = QStringLiteral("The input is required");
 		return response;
 	}
 
