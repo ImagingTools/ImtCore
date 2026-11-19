@@ -109,18 +109,24 @@ iprm::IParamsSetUniquePtr CreateObjectSourceParams(const QByteArray& objectId, i
 }
 
 
-QByteArray GetObjectIdFromParams(const iprm::IParamsSet* paramsPtr)
+static QByteArray GetIdFromParams(const iprm::IParamsSet* paramsPtr, const QByteArray& paramId)
 {
 	if (paramsPtr == nullptr){
 		return QByteArray();
 	}
 
-	const iprm::IIdParam* objectIdParamPtr = dynamic_cast<const iprm::IIdParam*>(paramsPtr->GetParameter(s_objectIdParamId));
-	if (objectIdParamPtr == nullptr){
+	const iprm::IIdParam* idParamPtr = dynamic_cast<const iprm::IIdParam*>(paramsPtr->GetParameter(paramId));
+	if (idParamPtr == nullptr){
 		return QByteArray();
 	}
 
-	return objectIdParamPtr->GetId();
+	return idParamPtr->GetId();
+}
+
+
+QByteArray GetObjectIdFromParams(const iprm::IParamsSet* paramsPtr)
+{
+	return GetIdFromParams(paramsPtr, s_objectIdParamId);
 }
 
 
@@ -146,16 +152,7 @@ int GetRevisionFromParams(const iprm::IParamsSet* paramsPtr)
 
 QByteArray GetLanguageIdFromParams(const iprm::IParamsSet* paramsPtr)
 {
-	if (paramsPtr == nullptr){
-		return QByteArray();
-	}
-
-	const iprm::IIdParam* languageIdParamPtr = dynamic_cast<const iprm::IIdParam*>(paramsPtr->GetParameter(s_languageIdParamId));
-	if (languageIdParamPtr == nullptr){
-		return QByteArray();
-	}
-
-	return languageIdParamPtr->GetId();
+	return GetIdFromParams(paramsPtr, s_languageIdParamId);
 }
 
 

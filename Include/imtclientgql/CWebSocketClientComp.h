@@ -88,7 +88,7 @@ public:
 		I_ASSIGN(m_clientIdAttrPtr, "ClientId", "ID of the client that needs to be identified on the server", false, "");
 		I_ASSIGN(m_clientIdCompPtr, "ClientIdParam", "Parameter providing the client-ID that needs to be identified on the server", false, "ClientIdParam");
 		I_ASSIGN(m_productId, "ProductId", "Product-ID used with corresponded GraphQl requests", false, "");
-		I_ASSIGN(m_silenceTimeoutAttrPtr, "SilenceTimeout", "Seconds without any message from the server after which the connection is taken as lost and opened again (the server sends a keep-alive every 5 s), 0 turns the check off", true, 15);
+		I_ASSIGN(m_silenceTimeoutAttrPtr, "SilenceTimeout", "Seconds without any message from the server after which the connection is taken as lost and opened again (the server sends a keep-alive every 5 s; not shorter than a request may wait), 0 turns the check off", true, 30);
 	I_END_COMPONENT;
 
 	CWebSocketClientComp();

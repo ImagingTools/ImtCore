@@ -21,6 +21,12 @@ namespace imtauth
 {
 
 
+static QString Translate(const iqt::ITranslationManager* translationManagerPtr, const char* text, const QByteArray& languageId)
+{
+	return QString::fromUtf8(iqt::GetTranslation(translationManagerPtr, text, languageId, "CRoleDocumentValidatorComp"));
+}
+
+
 bool CRoleDocumentValidatorComp::ValidateDocumentData(
 			const istd::IChangeable& document,
 			QString& errorMessage,
@@ -197,16 +203,6 @@ bool CRoleDocumentValidatorComp::CheckParentRolesInProduct(
 	}
 
 	return true;
-}
-
-
-QString CRoleDocumentValidatorComp::Translate(const iqt::ITranslationManager* translationManagerPtr, const char* text, const QByteArray& languageId)
-{
-	if (translationManagerPtr == nullptr){
-		return QString::fromUtf8(text);
-	}
-
-	return QString::fromUtf8(iqt::GetTranslation(translationManagerPtr, text, languageId, "CRoleDocumentValidatorComp"));
 }
 
 

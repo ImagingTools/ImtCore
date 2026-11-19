@@ -302,6 +302,12 @@ bool CGqlRequest::ParseQuery(const QByteArray& query, qsizetype& errorPosition)
 		}
 	}
 
+	// An anonymous operation may put its variables right after the type: "mutation($input: X!)"
+	const qsizetype variablesIndex = type.indexOf('(');
+	if (variablesIndex >= 0){
+		type = type.left(variablesIndex);
+	}
+
 	if (!s_requestNameMap.contains(type)){
 		return false;
 	}

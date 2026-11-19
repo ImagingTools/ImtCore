@@ -34,7 +34,7 @@ static const QByteArray s_viewUsersPermissionId = QByteArrayLiteral("/Administra
 sdl::V1_0::imtauth::CChangePasswordPayload CUserControllerComp::OnChangePassword(
 			const sdl::V1_0::imtauth::CChangePasswordGqlRequest& changePasswordRequest,
 			const imtgql::CGqlRequest& gqlRequest,
-			QString& errorMessage) const
+			QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtauth::CChangePasswordPayload payload;
 	payload.success = false;
@@ -55,7 +55,6 @@ sdl::V1_0::imtauth::CChangePasswordPayload CUserControllerComp::OnChangePassword
 
 	sdl::V1_0::imtauth::ChangePasswordRequestArguments arguments = changePasswordRequest.GetRequestedArguments();
 	if (!arguments.input.has_value()){
-		errorMessage = QStringLiteral("The input is required");
 		return CreateChangePasswordFailure(
 					QStringLiteral("Unable to change password. Error: Input argument is invalid"),
 					QStringList() << QStringLiteral("InvalidRequest"));

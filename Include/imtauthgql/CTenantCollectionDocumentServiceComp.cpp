@@ -669,6 +669,7 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceCom
 		saveParams.userId = userLogin;
 		saveParams.documentId = documentId;
 		saveParams.operationContextPtr = gqlContextPtr != nullptr ? &operationContext : nullptr;
+		saveParams.languageId = gqlContextPtr != nullptr ? gqlContextPtr->GetLanguageId() : QByteArray();
 		QByteArray saveTaskId = m_documentManagerCompPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_SAVE, saveParams);
 		const imtdoc::IDocumentService::TaskResult saveResult = m_documentManagerCompPtr->WaitForTaskFinished(saveTaskId);
 		if (saveResult.status != imtdoc::IDocumentService::OS_OK){

@@ -333,7 +333,8 @@ ViewBase {
 			}
 
 			function inputsAcceptable(){
-				return roleNameInput.acceptableInput && roleIdInput.text !== "";
+				// The Role-ID is made from the name, also from a name not committed yet
+				return roleNameInput.acceptableInput;
 			}
 
 			function revealValidationErrors(){
@@ -465,6 +466,11 @@ ViewBase {
 						function updateModel(){
 							if (!container.roleData){
 								return
+							}
+
+							// A save right after typing the name comes before its editingFinished
+							if (roleNameInput.text !== container.roleData.m_name){
+								roleIdInput.text = roleNameInput.text.replace(/\s+/g, '');
 							}
 
 							container.roleData.m_roleId = roleIdInput.text;

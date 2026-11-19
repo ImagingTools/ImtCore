@@ -75,11 +75,6 @@ public:
 				const iqt::ITranslationManager* translationManagerPtr = nullptr,
 				const QByteArray& languageId = QByteArray());
 
-	/**
-		Translates a message of the validator (context \c CRoleDocumentValidatorComp), the text itself without a manager.
-	*/
-	static QString Translate(const iqt::ITranslationManager* translationManagerPtr, const char* text, const QByteArray& languageId);
-
 private:
 	I_REF(imtbase::IObjectCollection, m_roleCollectionCompPtr);
 	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);

@@ -359,7 +359,7 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnAuthor
 		return sdl::V1_0::imtauth::CAuthorizationPayload();
 	}
 
-	istd::TNullableValue<sdl::V1_0::imtauth::CAuthorizationInput> inputArgument = *authorizationRequest.GetRequestedArguments().input;
+	istd::TNullableValue<sdl::V1_0::imtauth::CAuthorizationInput> inputArgument = authorizationRequest.GetRequestedArguments().input;
 	if (!inputArgument.has_value()){
 		errorMessage = QStringLiteral("The input is required");
 		return sdl::V1_0::imtauth::CAuthorizationPayload();

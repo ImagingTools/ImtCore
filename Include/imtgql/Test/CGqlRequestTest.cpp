@@ -711,15 +711,23 @@ void CGqlRequestTest::ParseQueryWithOperationName()
 
 void CGqlRequestTest::ParseQueryWithLeadingWhitespace()
 {
-	const QList<QByteArray> prefixes = {"\\n", " ", "\\t", "\\r\\n  \\t"};
-	for (const QByteArray& prefix : prefixes){
+	// Whitespace before the operation and an anonymous operation with variables right after its type
+	const QList<QByteArray> headers = {
+		"\\nmutation Authorization($input: AuthorizationInput!)",
+		" mutation Authorization($input: AuthorizationInput!)",
+		"\\tmutation Authorization($input: AuthorizationInput!)",
+		"\\r\\n  \\tmutation Authorization($input: AuthorizationInput!)",
+		"mutation($input: AuthorizationInput!)",
+		"\\n  mutation ($input: AuthorizationInput!)"
+	};
+	for (const QByteArray& header : headers){
 		const QByteArray query =
-					"{\"query\": \"" + prefix + "mutation Authorization($input: AuthorizationInput!) { Authorization(input: $input) { token } }\\n\","
+					"{\"query\": \"" + header + " { Authorization(input: $input) { token } }\\n\","
 					"\"variables\": {\"input\": {\"login\": \"su\"}}}";
 
 		qsizetype errorPosition = -1;
 		imtgql::CGqlRequest request;
-		QVERIFY2(request.ParseQuery(query, errorPosition), prefix.constData());
+		QVERIFY2(request.ParseQuery(query, errorPosition), header.constData());
 		QVERIFY(errorPosition < 0);
 		QCOMPARE(request.GetRequestType(), imtgql::IGqlRequest::RT_MUTATION);
 		QCOMPARE(request.GetCommandId(), QByteArray("Authorization"));
