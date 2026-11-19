@@ -12987,4 +12987,51 @@ Input-ID: </source>
         <translation>&apos;%1&apos; ата-аналық рөлі басқа өнімге тиесілі</translation>
     </message>
 </context>
+<context>
+    <name>CAuthorizationControllerComp</name>
+    <message>
+        <source>Invalid login or password. Login: &apos;%1&apos;</source>
+        <translation>Логин немесе құпия сөз қате. Логин: &apos;%1&apos;</translation>
+    </message>
+    <message>
+        <source>Attempts left before the account is locked for %1: %2.</source>
+        <translation>Тіркелгі %1 бұғатталғанға дейін қалған әрекеттер: %2.</translation>
+    </message>
+    <message>
+        <source>Attempts left before the account is locked until an administrator unlocks it: %1.</source>
+        <translation>Тіркелгі әкімші ашқанға дейін бұғатталғанға дейін қалған әрекеттер: %1.</translation>
+    </message>
+    <message>
+        <source>It stays locked until an administrator unlocks it.</source>
+        <translation>Ол әкімші ашқанша бұғатталған күйде қалады.</translation>
+    </message>
+    <message>
+        <source>Try again in %1.</source>
+        <translation>%1 кейін қайталап көріңіз.</translation>
+    </message>
+    <message>
+        <source>Too many invalid sign-in attempts. The account is locked. %1</source>
+        <translation>Сәтсіз кіру әрекеттері тым көп. Тіркелгі бұғатталды. %1</translation>
+    </message>
+    <message>
+        <source>1 second</source>
+        <translation>1 сек.</translation>
+    </message>
+    <message>
+        <source>%1 seconds</source>
+        <translation>%1 сек.</translation>
+    </message>
+    <message>
+        <source>1 minute</source>
+        <translation>1 мин.</translation>
+    </message>
+    <message>
+        <source>%1 minutes</source>
+        <translation>%1 мин.</translation>
+    </message>
+    <message>
+        <source>%1 hours</source>
+        <translation>%1 сағ.</translation>
+    </message>
+</context>
 </TS>

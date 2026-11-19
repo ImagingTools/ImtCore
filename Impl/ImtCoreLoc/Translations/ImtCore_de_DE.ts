@@ -14506,4 +14506,51 @@ Alle Beziehungen zu dieser Organisation werden ebenfalls entfernt.</translation>
         <translation>Die übergeordnete Rolle &apos;%1&apos; gehört zu einem anderen Produkt</translation>
     </message>
 </context>
+<context>
+    <name>CAuthorizationControllerComp</name>
+    <message>
+        <source>Invalid login or password. Login: &apos;%1&apos;</source>
+        <translation>Ungültiger Login oder ungültiges Passwort. Login: &apos;%1&apos;</translation>
+    </message>
+    <message>
+        <source>Attempts left before the account is locked for %1: %2.</source>
+        <translation>Verbleibende Versuche, bevor das Konto für %1 gesperrt wird: %2.</translation>
+    </message>
+    <message>
+        <source>Attempts left before the account is locked until an administrator unlocks it: %1.</source>
+        <translation>Verbleibende Versuche, bevor das Konto bis zur Entsperrung durch einen Administrator gesperrt wird: %1.</translation>
+    </message>
+    <message>
+        <source>It stays locked until an administrator unlocks it.</source>
+        <translation>Es bleibt gesperrt, bis ein Administrator es entsperrt.</translation>
+    </message>
+    <message>
+        <source>Try again in %1.</source>
+        <translation>Versuchen Sie es in %1 erneut.</translation>
+    </message>
+    <message>
+        <source>Too many invalid sign-in attempts. The account is locked. %1</source>
+        <translation>Zu viele ungültige Anmeldeversuche. Das Konto ist gesperrt. %1</translation>
+    </message>
+    <message>
+        <source>1 second</source>
+        <translation>1 Sekunde</translation>
+    </message>
+    <message>
+        <source>%1 seconds</source>
+        <translation>%1 Sekunden</translation>
+    </message>
+    <message>
+        <source>1 minute</source>
+        <translation>1 Minute</translation>
+    </message>
+    <message>
+        <source>%1 minutes</source>
+        <translation>%1 Minuten</translation>
+    </message>
+    <message>
+        <source>%1 hours</source>
+        <translation>%1 Stunden</translation>
+    </message>
+</context>
 </TS>

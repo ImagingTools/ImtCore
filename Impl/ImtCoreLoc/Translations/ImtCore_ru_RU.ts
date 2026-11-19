@@ -16566,4 +16566,51 @@ All relationships with this organization will also be removed.</source>
         <translation>Родительская роль &apos;%1&apos; принадлежит другому продукту</translation>
     </message>
 </context>
+<context>
+    <name>CAuthorizationControllerComp</name>
+    <message>
+        <source>Invalid login or password. Login: &apos;%1&apos;</source>
+        <translation>Неверный логин или пароль. Логин: &apos;%1&apos;</translation>
+    </message>
+    <message>
+        <source>Attempts left before the account is locked for %1: %2.</source>
+        <translation>Осталось попыток до блокировки учётной записи на %1: %2.</translation>
+    </message>
+    <message>
+        <source>Attempts left before the account is locked until an administrator unlocks it: %1.</source>
+        <translation>Осталось попыток до блокировки учётной записи, снять которую сможет только администратор: %1.</translation>
+    </message>
+    <message>
+        <source>It stays locked until an administrator unlocks it.</source>
+        <translation>Она останется заблокированной, пока её не разблокирует администратор.</translation>
+    </message>
+    <message>
+        <source>Try again in %1.</source>
+        <translation>Повторите попытку через %1.</translation>
+    </message>
+    <message>
+        <source>Too many invalid sign-in attempts. The account is locked. %1</source>
+        <translation>Слишком много неудачных попыток входа. Учётная запись заблокирована. %1</translation>
+    </message>
+    <message>
+        <source>1 second</source>
+        <translation>1 сек.</translation>
+    </message>
+    <message>
+        <source>%1 seconds</source>
+        <translation>%1 сек.</translation>
+    </message>
+    <message>
+        <source>1 minute</source>
+        <translation>1 мин.</translation>
+    </message>
+    <message>
+        <source>%1 minutes</source>
+        <translation>%1 мин.</translation>
+    </message>
+    <message>
+        <source>%1 hours</source>
+        <translation>%1 ч.</translation>
+    </message>
+</context>
 </TS>
