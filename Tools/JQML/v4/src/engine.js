@@ -8,6 +8,7 @@
 
 import { Animation, ANIMATION_TYPES, AnchorLine, BindingValue, BUILTIN_TYPES, COMPONENT_ENUM_VALUE, ComponentItem, Coordinate, createSdlObject, duringChange, FILE_DIALOG_MODES, flushDeclarativeFocus, getFocusItem, hooks, Item, ListModel, ListView, linkToOwner, Loader, MapItemView, modelCount, modelScopeData, modelVersion, Placeholder, POINTER_DEVICE, queueDeclarativeFocus, readRows, readUntracked, Repeater, resetFocus, setSceneActive, Stack, TestCase, Timer, TRANSFORM_ORIGIN, TreeItemModel } from './items.js';
 import { fonts } from './fonts.js';
+import { md5 } from './md5.js';
 import { KEY, MODIFIERS, NAMED_KEY_HANDLERS, qtKeyEvent, STANDARD_KEYS } from './keys.js';
 import { QmlError, escapeSourceBreaks, tokenize, topLevelNames } from './lexer.js';
 import { callableHandler, parseQmlDocument } from './parser.js';
@@ -737,6 +738,7 @@ export class Engine {
 			openUrlExternally: (url) => { window.open(String(url), '_blank'); return true; },
 			point: (x, y) => ({ x, y }),
 			size: (width, height) => ({ width, height }),
+			md5: (text) => md5(text),
 			rect: (x, y, width, height) => ({ x, y, width, height }),
 			callLater: (fn, ...args) => setTimeout(() => engine.guard(() => fn(...args), 'Qt.callLater', 0), 0),
 			binding: (fn) => {

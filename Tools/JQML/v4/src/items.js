@@ -8463,6 +8463,79 @@ defineProp(
 	true,
 );
 
+// `FolderDialog` (Qt.labs.platform) backed by the browser chooser of a folder, which is an `<input type=file webkitdirectory>`. The browser gives
+// the files of the folder, not its path: `folder` is `file:///<name of the folder>`, which the QML of ImtCore cuts down to the name
+// (`folder.toString().replace('file:///', '')`). `currentFolder` follows it, like `currentFile` follows the file of FileDialog.
+export class FolderDialog extends FileDialog {
+	constructor() {
+		super();
+		this.$typeName = 'FolderDialog';
+	}
+
+	open() {
+		if (typeof document === 'undefined') return;
+		this.$shown = true;
+		const input = document.createElement('input');
+		input.type = 'file';
+		input.webkitdirectory = true;
+		input.addEventListener('change', () => {
+			const files = [...input.files];
+			if (files.length === 0) this.$reject();
+			else this.$acceptFolder(files);
+		});
+		input.addEventListener('cancel', () => this.$reject());
+		input.click();
+	}
+
+	$acceptFolder(files) {
+		this.$shown = false;
+		const path = String(files[0].webkitRelativePath || '');
+		const name = path.includes('/') ? path.slice(0, path.indexOf('/')) : '';
+		this.folder = `file:///${name}`;
+		this.currentFolder = this.folder;
+		this.$emit('accepted');
+	}
+}
+
+// `FileIO` (imtqml::CFileIO: `source`, `read()`, `write(data)`). The browser has no file system: `write` saves the data as a download named after
+// the last part of `source` and answers true, `read` has no file to read and answers an empty string.
+export class FileIO extends Item {
+	constructor() {
+		super();
+		this.$typeName = 'FileIO';
+		this.$nonVisual = true;
+		this.$defineCustom('source', '');
+	}
+
+	read() {
+		return '';
+	}
+
+	write(data) {
+		if (typeof document === 'undefined' || typeof Blob === 'undefined' || typeof URL === 'undefined' || !URL.createObjectURL) return false;
+		const text = String(data === undefined || data === null ? '' : data);
+		// A string that holds bytes (the result of Qt.atob) is saved as they are; any other text as UTF-8.
+		let bytes = new Uint8Array(text.length);
+		for (let i = 0; i < text.length; i++) {
+			const code = text.charCodeAt(i);
+			if (code > 0xff) {
+				bytes = new TextEncoder().encode(text);
+				break;
+			}
+			bytes[i] = code;
+		}
+		const parts = String(this.source || '').split(/[\\/]/);
+		const link = document.createElement('a');
+		link.href = URL.createObjectURL(new Blob([bytes]));
+		link.download = parts[parts.length - 1] || 'file';
+		if (document.body) document.body.appendChild(link);
+		link.click();
+		if (document.body) document.body.removeChild(link);
+		if (URL.revokeObjectURL) URL.revokeObjectURL(link.href);
+		return true;
+	}
+}
+
 // `StackLayout`: one visible child, resized to the stack. `currentIndex` applies before the next read.
 export class StackLayout extends Item {
 	constructor() {
@@ -10433,6 +10506,8 @@ export const BUILTIN_TYPES = new Map([
 	['BaseClass', BaseClass],
 	['BaseModel', BaseModel],
 	['FileDialog', FileDialog],
+	['FolderDialog', FolderDialog],
+	['FileIO', FileIO],
 	['Item', Item],
 	['Rectangle', Rectangle],
 	['DropShadow', DropShadow],

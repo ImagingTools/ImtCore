@@ -116,7 +116,7 @@ check('write returns true', safe(() => root.io.write('hello')), true);
 check('and makes a download', links.length, 1);
 check('named after the last part of the source', links[0] && links[0].download, 'report.xlsx');
 check('with the data in it', blobs[0] && blobs[0].size, 5);
-root.io.source = 'C:\data\other.json';
+root.io.source = 'C:\\data\\other.json';
 safe(() => root.io.write('{}'));
 check('a path of Windows is cut the same way', links[1] && links[1].download, 'other.json');
 root.io.source = '';
