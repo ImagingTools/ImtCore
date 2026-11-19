@@ -205,7 +205,7 @@ Rectangle {
 						width: currentLabel.width + Style.marginL
 						height: Style.buttonHeightS
 						radius: height / 2
-						color: Style.imaginToolsAccentColor
+						color: Style.imagingToolsAccentColor
 
 						Text {
 							id: currentLabel
@@ -229,7 +229,7 @@ Rectangle {
 						width: Style.iconSizeS
 						height: width
 						radius: width / 2
-						color: Style.imaginToolsAccentColor
+						color: Style.imagingToolsAccentColor
 
 						BaseText {
 							anchors.centerIn: parent

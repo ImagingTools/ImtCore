@@ -1132,7 +1132,7 @@ Item {
 					color: checkMouse.containsMouse ? Style.buttonHoverColor : Style.inputBackgroundColor
 					border.width: 1
 					border.color: !rowItem.checkActive ? Style.inactiveTextColor
-						: checkMouse.containsMouse ? Style.imaginToolsAccentColor
+						: checkMouse.containsMouse ? Style.imagingToolsAccentColor
 						: Style.inputBorderColor
 
 					Image {

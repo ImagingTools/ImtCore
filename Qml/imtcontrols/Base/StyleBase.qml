@@ -302,7 +302,9 @@ StyleComponents {
 	property string errorTextColor: "#d1242f";
 
 		//accent
-	property string imaginToolsAccentColor: "#005fb8"
+	property string imagingToolsAccentColor: "#005fb8"
+	// Legacy misspelled name, kept so that consumer projects keep working
+	property alias imaginToolsAccentColor: styleContainer.imagingToolsAccentColor
 	property string positiveAccentColor: styleContainer.successColor;
 	property string negativeAccentColor: styleContainer.dangerColor;
 	property string middleAccentColor: styleContainer.attentionColor;
@@ -386,9 +388,9 @@ StyleComponents {
 	property string buttonPressedColor: "#c4c4c4";
 	// Hover behind icon-only buttons on toolbars and tab strips (VS Code toolbar.hoverBackground).
 	property string toolButtonHoverColor: "#50b8b8b8";
-	property string buttonAccentColor: imaginToolsAccentColor;
+	property string buttonAccentColor: imagingToolsAccentColor;
 	property string buttonInactiveColor: "#ebebeb";
-	property string buttonBorderFocusColor: imaginToolsAccentColor;
+	property string buttonBorderFocusColor: imagingToolsAccentColor;
 	property string buttonBorderInactiveColor: "#1a000000";
 	property string buttonTextColor: "#3b3b3b";
 	property string buttonInactiveTextColor: "#9e9e9e";
@@ -410,7 +412,7 @@ StyleComponents {
 	property string buttonDangerTextColor: "#ffffff";
 
 		//focus ring drawn outside the control border
-	property string focusRingColor: imaginToolsAccentColor;
+	property string focusRingColor: imagingToolsAccentColor;
 	property int focusRingWidth: 1;
 
 		//text inputs, combo boxes, check boxes
@@ -833,7 +835,14 @@ StyleComponents {
 				styleContainer.focusRingColor = focusRingThemeColor;
 			}
 
-			styleContainer.imaginToolsAccentColor = dataSource.getData("ColorPalette").getData("ImaginTools Accent");
+			// "ImaginTools Accent" is the legacy misspelled palette key, still used by themes of consumer projects
+			let colorPalette = dataSource.getData("ColorPalette");
+			if (colorPalette.containsKey("ImagingTools Accent")){
+				styleContainer.imagingToolsAccentColor = colorPalette.getData("ImagingTools Accent");
+			}
+			else if (colorPalette.containsKey("ImaginTools Accent")){
+				styleContainer.imagingToolsAccentColor = colorPalette.getData("ImaginTools Accent");
+			}
 
 			styleContainer.themeApplied();
 		}

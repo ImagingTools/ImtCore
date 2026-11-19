@@ -181,7 +181,7 @@ ViewBase {
 				width: 44
 				height: 44
 				radius: width / 2
-				color: Style.imaginToolsAccentColor
+				color: Style.imagingToolsAccentColor
 				anchors.verticalCenter: parent.verticalCenter
 
 				Text {

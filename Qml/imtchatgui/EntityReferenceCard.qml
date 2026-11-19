@@ -17,7 +17,7 @@ Rectangle {
 
 	radius: Style.radiusS
 	color: Style.baseColor
-	border.color: Style.imaginToolsAccentColor
+	border.color: Style.imagingToolsAccentColor
 	border.width: 1
 
 	// Compact chip mode (used inside MessageInput)
@@ -30,14 +30,14 @@ Rectangle {
 		Text {
 			text: entityRefCardRoot.entityTypeIcon(entityRefCardRoot.entityType)
 			font.pixelSize: Style.fontSizeXS
-			color: Style.imaginToolsAccentColor
+			color: Style.imagingToolsAccentColor
 			anchors.verticalCenter: parent.verticalCenter
 		}
 
 		Text {
 			text: entityRefCardRoot.displayName || entityRefCardRoot.entityId
 			font.pixelSize: Style.fontSizeXS
-			color: Style.imaginToolsAccentColor
+			color: Style.imagingToolsAccentColor
 			anchors.verticalCenter: parent.verticalCenter
 			elide: Text.ElideRight
 			maximumLineCount: 1
@@ -73,7 +73,7 @@ Rectangle {
 			Text {
 				text: entityRefCardRoot.entityTypeIcon(entityRefCardRoot.entityType)
 				font.pixelSize: Style.fontSizeM
-				color: Style.imaginToolsAccentColor
+				color: Style.imagingToolsAccentColor
 			}
 
 			Text {
@@ -88,7 +88,7 @@ Rectangle {
 			text: entityRefCardRoot.displayName || entityRefCardRoot.entityId
 			font.pixelSize: Style.fontSizeS
 			font.bold: true
-			color: Style.imaginToolsAccentColor
+			color: Style.imagingToolsAccentColor
 			elide: Text.ElideRight
 			width: parent.width
 		}
