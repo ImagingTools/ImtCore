@@ -14,7 +14,7 @@ DocCollectionViewDelegate {
 	revisionsPermissionPath: "/ProductManagement/Revisions";
 	
 	removeDialogTitle: qsTr("Deleting a product");
-	removeMessage: qsTr("Delete the selected product ?");
+	removeNameFieldId: "productName";
 	
 	exportFileDialog.nameFilters: ["Xml files (*.xml)", "C++ Header Files (*.h)"];
 	importFileDialog.nameFilters: ["Xml files (*.xml)", "C++ Header Files (*.h)"];

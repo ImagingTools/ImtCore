@@ -238,7 +238,8 @@ protected:
 				const WorkingDocument& document,
 				OperationStatus& status,
 				QString* errorMessage = nullptr,
-				const imtbase::IOperationContext* operationContextPtr = nullptr) const;
+				const imtbase::IOperationContext* operationContextPtr = nullptr,
+				const QByteArray& languageId = QByteArray()) const;
 	virtual QList<imtdoc::IDocumentServiceEventHandler*> GetDocumentServiceEventHandlers() const;
 
 	virtual istd::IChangeableUniquePtr CreateObject(const QByteArray& typeId) const = 0;

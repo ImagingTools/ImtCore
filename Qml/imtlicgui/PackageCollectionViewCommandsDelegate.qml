@@ -7,6 +7,6 @@ CollectionViewCommandsDelegateBase {
     id: container;
 
     removeDialogTitle: qsTr("Deleting a feature");
-    removeMessage: qsTr("Delete the selected feature ?");
+    removeNameFieldId: "featureName";
 }
 

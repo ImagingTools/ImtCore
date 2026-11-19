@@ -2635,6 +2635,14 @@
         <source>Set description</source>
         <translation>Beschreibung setzen</translation>
     </message>
+    <message>
+        <source>Delete the selected item?</source>
+        <translation>Ausgewähltes Element löschen?</translation>
+    </message>
+    <message>
+        <source>Delete &quot;%1&quot;?</source>
+        <translation>„%1“ löschen?</translation>
+    </message>
 </context>
 <context>
     <name>CollectionStructureCommandsObserver</name>
@@ -2759,12 +2767,12 @@
     </message>
     <message>
         <location line="+65"/>
-        <source>Delete all items with the current filter ?</source>
+        <source>Delete all items with the current filter?</source>
         <translation>Alle Elemente mit dem aktuellen Filter löschen?</translation>
     </message>
     <message>
         <location line="+3"/>
-        <source>Delete all data from this collection ?</source>
+        <source>Delete all data from this collection?</source>
         <translation>Alle Daten dieser Sammlung löschen?</translation>
     </message>
     <message>
@@ -2831,6 +2839,18 @@
         <location line="-114"/>
         <source>Set description</source>
         <translation>Beschreibung setzen</translation>
+    </message>
+    <message>
+        <source>Delete the selected item?</source>
+        <translation>Ausgewähltes Element löschen?</translation>
+    </message>
+    <message>
+        <source>Delete the selected items (%1)?</source>
+        <translation>Ausgewählte Elemente (%1) löschen?</translation>
+    </message>
+    <message>
+        <source>Delete &quot;%1&quot;?</source>
+        <translation>„%1“ löschen?</translation>
     </message>
 </context>
 <context>
@@ -3577,7 +3597,7 @@
     </message>
     <message>
         <location line="+1"/>
-        <source>Delete the selected revision ?</source>
+        <source>Delete the selected revision?</source>
         <translation>Ausgewählte Revision löschen?</translation>
     </message>
 </context>
@@ -8360,6 +8380,14 @@ Fehler: 0</translation>
         <location line="+345"/>
         <source>Permissions</source>
         <translation>Berechtigungen</translation>
+    </message>
+    <message>
+        <source>Please enter the role name, the Role-ID is made from it</source>
+        <translation>Bitte geben Sie den Rollennamen ein, die Role-ID wird daraus gebildet</translation>
+    </message>
+    <message>
+        <source>Correct the highlighted fields before saving</source>
+        <translation>Korrigieren Sie vor dem Speichern die markierten Felder</translation>
     </message>
 </context>
 <context>
@@ -14446,6 +14474,83 @@ Alle Beziehungen zu dieser Organisation werden ebenfalls entfernt.</translation>
         <location filename="../../../Include/imtservergql/CStructureControllerCompBase.cpp" line="+300"/>
         <source>Internal error</source>
         <translation>Interner Fehler</translation>
+    </message>
+</context>
+<context>
+    <name>ConnectedProductCollectionView</name>
+    <message>
+        <source>All tokens of its servers are revoked. Its roles stay.</source>
+        <translation>Alle Token seiner Server werden widerrufen. Seine Rollen bleiben erhalten.</translation>
+    </message>
+</context>
+<context>
+    <name>CRoleDocumentValidatorComp</name>
+    <message>
+        <source>Role-ID can&apos;t be empty!</source>
+        <translation>Die Role-ID darf nicht leer sein!</translation>
+    </message>
+    <message>
+        <source>Role with ID: &apos;%1&apos; already exists</source>
+        <translation>Eine Rolle mit der ID &apos;%1&apos; existiert bereits</translation>
+    </message>
+    <message>
+        <source>Permission &apos;%1&apos; is not allowed for tenant &apos;%2&apos;</source>
+        <translation>Die Berechtigung &apos;%1&apos; ist für die Organisation &apos;%2&apos; nicht erlaubt</translation>
+    </message>
+    <message>
+        <source>The parent role &apos;%1&apos; belongs to another organization</source>
+        <translation>Die übergeordnete Rolle &apos;%1&apos; gehört zu einer anderen Organisation</translation>
+    </message>
+    <message>
+        <source>The parent role &apos;%1&apos; belongs to another product</source>
+        <translation>Die übergeordnete Rolle &apos;%1&apos; gehört zu einem anderen Produkt</translation>
+    </message>
+</context>
+<context>
+    <name>CAuthorizationControllerComp</name>
+    <message>
+        <source>Invalid login or password. Login: &apos;%1&apos;</source>
+        <translation>Ungültiger Login oder ungültiges Passwort. Login: &apos;%1&apos;</translation>
+    </message>
+    <message>
+        <source>Attempts left before the account is locked for %1: %2.</source>
+        <translation>Verbleibende Versuche, bevor das Konto für %1 gesperrt wird: %2.</translation>
+    </message>
+    <message>
+        <source>Attempts left before the account is locked until an administrator unlocks it: %1.</source>
+        <translation>Verbleibende Versuche, bevor das Konto bis zur Entsperrung durch einen Administrator gesperrt wird: %1.</translation>
+    </message>
+    <message>
+        <source>It stays locked until an administrator unlocks it.</source>
+        <translation>Es bleibt gesperrt, bis ein Administrator es entsperrt.</translation>
+    </message>
+    <message>
+        <source>Try again in %1.</source>
+        <translation>Versuchen Sie es in %1 erneut.</translation>
+    </message>
+    <message>
+        <source>Too many invalid sign-in attempts. The account is locked. %1</source>
+        <translation>Zu viele ungültige Anmeldeversuche. Das Konto ist gesperrt. %1</translation>
+    </message>
+    <message>
+        <source>1 second</source>
+        <translation>1 Sekunde</translation>
+    </message>
+    <message>
+        <source>%1 seconds</source>
+        <translation>%1 Sekunden</translation>
+    </message>
+    <message>
+        <source>1 minute</source>
+        <translation>1 Minute</translation>
+    </message>
+    <message>
+        <source>%1 minutes</source>
+        <translation>%1 Minuten</translation>
+    </message>
+    <message>
+        <source>%1 hours</source>
+        <translation>%1 Stunden</translation>
     </message>
 </context>
 </TS>

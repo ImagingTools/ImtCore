@@ -770,7 +770,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 	workingDocumentSnapshot.objectPtr = documentSnapshotPtr;
 
 	QString validationMessage;
-	if (!this->ValidateDocumentData(workingDocumentSnapshot, validationStatus, &validationMessage, params.operationContextPtr)){
+	if (!this->ValidateDocumentData(workingDocumentSnapshot, validationStatus, &validationMessage, params.operationContextPtr, params.languageId)){
 		QString msg = validationMessage.isEmpty() ? this->GetInvalidDocumentMessage() : validationMessage;
 		this->CompleteTask(taskId, TaskResult{validationStatus, documentId, msg});
 		return;

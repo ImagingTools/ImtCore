@@ -506,8 +506,8 @@ bool CRoleCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtauth::RoleUpdateRequestArguments arguments = roleUpdateRequest.GetRequestedArguments();
-	if (!arguments.input->item.has_value()){
-		Q_ASSERT(false);
+	if (!arguments.input || !arguments.input->item.has_value()){
+		errorMessage = QStringLiteral("The input with an item is required");
 		return false;
 	}
 
@@ -670,6 +670,8 @@ bool CRoleCollectionControllerComp::ValidateRoleForTenant(
 {
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 	const QByteArray tenantId = gqlContextPtr != nullptr ? gqlContextPtr->GetTenantId() : QByteArray();
+	const QByteArray languageId = gqlContextPtr != nullptr ? gqlContextPtr->GetLanguageId() : QByteArray();
+	const iqt::ITranslationManager* translationManagerPtr = m_translationManagerCompPtr.GetPtr();
 
 	if (!imtauth::CRoleDocumentValidatorComp::CheckRoleIdUnique(
 				*m_objectCollectionCompPtr,
@@ -677,15 +679,17 @@ bool CRoleCollectionControllerComp::ValidateRoleForTenant(
 				role.GetRoleId(),
 				role.GetProductId(),
 				tenantId,
-				errorMessage)){
+				errorMessage,
+				translationManagerPtr,
+				languageId)){
 		return false;
 	}
 
-	if (!imtauth::CRoleDocumentValidatorComp::CheckParentRolesInTenant(*m_objectCollectionCompPtr, role.GetIncludedRoles(), tenantId, errorMessage)){
+	if (!imtauth::CRoleDocumentValidatorComp::CheckParentRolesInTenant(*m_objectCollectionCompPtr, role.GetIncludedRoles(), tenantId, errorMessage, translationManagerPtr, languageId)){
 		return false;
 	}
 
-	return imtauth::CRoleDocumentValidatorComp::CheckParentRolesInProduct(*m_objectCollectionCompPtr, role.GetIncludedRoles(), role.GetProductId(), errorMessage);
+	return imtauth::CRoleDocumentValidatorComp::CheckParentRolesInProduct(*m_objectCollectionCompPtr, role.GetIncludedRoles(), role.GetProductId(), errorMessage, translationManagerPtr, languageId);
 }
 
 

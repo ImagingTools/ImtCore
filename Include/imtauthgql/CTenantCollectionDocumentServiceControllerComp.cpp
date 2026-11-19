@@ -81,7 +81,7 @@ CDM::CDocumentInfo CTenantCollectionDocumentServiceControllerComp::OnOpenDocumen
 		// Extract the objectId (tenantId) being opened from the request arguments
 		const auto& arguments = openDocumentRequest.GetRequestedArguments();
 		if (!arguments.input.has_value()){
-			Q_ASSERT(false);
+			errorMessage = QStringLiteral("The input is required");
 			return CDM::CDocumentInfo();
 		}
 

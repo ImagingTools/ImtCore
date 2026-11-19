@@ -27,7 +27,7 @@ sdl::V1_0::imtauth::CGetProductPermissionsPayload CPermissionsProviderComp::OnGe
 
 	auto arguments = getProductPermissionsRequest.GetRequestedArguments();
 	if (!arguments.input.has_value()){
-		Q_ASSERT(false);
+		errorMessage = QStringLiteral("The input is required");
 		return response;
 	}
 
@@ -97,7 +97,7 @@ sdl::V1_0::imtauth::CGetProductPermissionsPayload CPermissionsProviderComp::OnGe
 
 	auto arguments = getUserPermissionsRequest.GetRequestedArguments();
 	if (!arguments.input.has_value()){
-		Q_ASSERT(false);
+		errorMessage = QStringLiteral("The input is required");
 		return response;
 	}
 

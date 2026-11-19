@@ -290,7 +290,8 @@ bool CGqlRequest::ParseQuery(const QByteArray& query, qsizetype& errorPosition)
 	}
 
 	const QByteArray header = body.left(index);
-	const QList<QByteArray> headersData = header.split(' ');
+	// GraphQL ignores whitespace and line breaks around the operation type
+	const QList<QByteArray> headersData = header.simplified().split(' ');
 
 	QByteArray type;
 	for (const QByteArray& headerItem : headersData){
@@ -299,6 +300,12 @@ bool CGqlRequest::ParseQuery(const QByteArray& query, qsizetype& errorPosition)
 
 			break;
 		}
+	}
+
+	// An anonymous operation may put its variables right after the type: "mutation($input: X!)"
+	const qsizetype variablesIndex = type.indexOf('(');
+	if (variablesIndex >= 0){
+		type = type.left(variablesIndex);
 	}
 
 	if (!s_requestNameMap.contains(type)){

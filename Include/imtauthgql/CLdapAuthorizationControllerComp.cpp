@@ -219,7 +219,7 @@ sdl::V1_0::imtauth::CAuthorizationPayload CLdapAuthorizationControllerComp::OnAu
 
 			sdl::V1_0::imtauth::AuthorizationRequestArguments arguments = authorizationRequest.GetRequestedArguments();
 			if (!arguments.input.has_value()){
-				Q_ASSERT(false);
+				errorMessage = QStringLiteral("The input is required");
 				return sdl::V1_0::imtauth::CAuthorizationPayload();
 			}
 

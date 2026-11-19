@@ -29,6 +29,11 @@ static const QByteArray s_objectIdParamId = QByteArrayLiteral("ObjectId");
 */
 static const QByteArray s_revisionParamId = QByteArrayLiteral("Revision");
 
+/**
+	ID of the \c iprm::IIdParam with the language of the caller in the validation parameters.
+*/
+static const QByteArray s_languageIdParamId = QByteArrayLiteral("LanguageId");
+
 
 /**
 	Returns the document source reference of the collection object \a objectId: \c <objectId>.
@@ -68,6 +73,12 @@ QByteArray GetObjectIdFromParams(const iprm::IParamsSet* paramsPtr);
 	Returns -1 if \a paramsPtr is null or does not reference an object revision.
 */
 int GetRevisionFromParams(const iprm::IParamsSet* paramsPtr);
+
+/**
+	Extracts the language of the caller from the validation parameters, a validator answers in it.
+	Returns an empty ID if \a paramsPtr is null or carries no language.
+*/
+QByteArray GetLanguageIdFromParams(const iprm::IParamsSet* paramsPtr);
 
 /**
 	Returns the collection object ID of the document \a documentId the user \a userId has opened in \a documentService.

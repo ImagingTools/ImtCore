@@ -605,7 +605,8 @@ protected:
 		const WorkingDocument& /*document*/,
 		OperationStatus& status,
 		QString* errorMessage = nullptr,
-		const imtbase::IOperationContext* /*operationContextPtr*/ = nullptr) const override
+		const imtbase::IOperationContext* /*operationContextPtr*/ = nullptr,
+		const QByteArray& /*languageId*/ = QByteArray()) const override
 	{
 		if (m_validateShouldFail) {
 			status = OS_INVALID_DOCUMENT_DATA;

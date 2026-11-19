@@ -910,6 +910,8 @@ void CWebSocketCredentialsTest::ExhaustedPoolHoldsBackNothing()
 	std::vector<std::unique_ptr<imtrest::CWebSocketRequest>> requests;
 	const auto subscribe = [&fixture, &requests](int index){
 		requests.push_back(std::make_unique<imtrest::CWebSocketRequest>(fixture.engine));
+		// Every subscription on its own socket: the server gives each request the ID of its connection
+		requests.back()->SetConnectionId("connection-" + QByteArray::number(index));
 		CSubscriptionFixture::Prepare(*requests.back(), QStringLiteral("subscription-%1").arg(index), QStringLiteral("user-credential-%1").arg(index));
 		fixture.servlet->RegisterSubscription(*requests.back());
 	};
@@ -988,6 +990,8 @@ void CWebSocketCredentialsTest::ExpiredQueuedCheckDoesNotReadTheSource()
 	std::vector<std::unique_ptr<imtrest::CWebSocketRequest>> requests;
 	for (int index = 0; index < 5; ++index){
 		requests.push_back(std::make_unique<imtrest::CWebSocketRequest>(fixture.engine));
+		// Every subscription on its own socket: the server gives each request the ID of its connection
+		requests.back()->SetConnectionId("connection-" + QByteArray::number(index));
 		CSubscriptionFixture::Prepare(*requests.back(), QStringLiteral("queued-%1").arg(index), QStringLiteral("user-credential-%1").arg(index));
 		fixture.servlet->RegisterSubscription(*requests.back());
 	}
