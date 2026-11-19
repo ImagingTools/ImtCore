@@ -383,10 +383,6 @@ void CWebSocketClientComp::OnSslErrors(const QList<QSslError>& sslErrors)
 
 void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message)
 {
-	if (!message.contains("keep_alive")){
-		SendVerboseMessage(message, "OnWebSocketTextMessageReceived");
-	}
-
 	QWebSocket* webSocketPtr = dynamic_cast<QWebSocket*>(sender());
 	if (webSocketPtr == nullptr){
 		return;
@@ -401,6 +397,10 @@ void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message
 
 	imtrest::ConstResponsePtr responsePtr;
 	imtrest::CWebSocketRequest::MethodType methodType = webSocketRequest->GetMethodType();
+
+	if (methodType != imtrest::CWebSocketRequest::MT_KEEP_ALIVE && methodType != imtrest::CWebSocketRequest::MT_KEEP_ALIVE_ACK){
+		SendVerboseMessage(message, "OnWebSocketTextMessageReceived");
+	}
 	if (
 			methodType == imtrest::CWebSocketRequest::MT_CONNECTION_ACK ||
 			methodType == imtrest::CWebSocketRequest::MT_KEEP_ALIVE ||
