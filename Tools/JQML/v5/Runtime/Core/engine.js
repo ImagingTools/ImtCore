@@ -338,13 +338,44 @@ function queuePolish(item){
     requestFrame()
 }
 
+// QQuickWindowPrivate::polishItems with its PolishLoopDetector: an item whose polish queues a polish again, 1000 times
+// in a row, gets the warning "possible QQuickItem::polish() loop"; at 10000 the loop gives up, so the frame is rendered
+// ("not a fix, just a remedy so that the application can be somewhat responsive") and the items left wait for the
+// next frame
+const POLISH_LOOP_WARN = 1000, POLISH_LOOP_GIVE_UP = 10000
+let polishNextFrame = []
+
 function runPolish(){
+    let loops = 0
     while(polish.length){
         let items = polish
         polish = []
-        for(let item of items){
+        for(let i = 0; i < items.length; i++){
+            let item = items[i]
             item.$polishQueued = false
-            if(!(item.$f & DESTROYED)) item.$polish()
+            if(item.$f & DESTROYED) continue
+            let queued = polish.length
+            item.$polish()
+            if(polish.length <= queued){
+                loops = 0
+                continue
+            }
+            loops++
+            if(loops >= POLISH_LOOP_WARN && loops < POLISH_LOOP_WARN + 5){
+                let guilty = polish[polish.length - 1]
+                console.warn('JQML: ' + item.constructor.name + ': possible QQuickItem::polish() loop')
+                console.warn('JQML: ' + guilty.constructor.name + ': ' + guilty.constructor.name + ' called polish() inside updatePolish() of ' + item.constructor.name)
+            }
+            if(loops === POLISH_LOOP_GIVE_UP){
+                for(let k = i + 1; k < items.length; k++){
+                    items[k].$polishQueued = true
+                    polishNextFrame.push(items[k])
+                }
+                for(let queuedItem of polish) polishNextFrame.push(queuedItem)
+                polish = []
+                requestFrame()
+                return
+            }
         }
     }
 }
@@ -420,6 +451,10 @@ function runFrame(){
     clearTimeout(frameTimer)
     frameHandle = frameTimer = 0
     if(stopped) return
+    if(polishNextFrame.length){
+        polish = polishNextFrame.concat(polish)
+        polishNextFrame = []
+    }
     batch(() => {
         runDueTimers()
         let items = frameItems

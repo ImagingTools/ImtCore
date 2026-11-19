@@ -67,6 +67,45 @@ function cases(name, runtime){
         assert.equal(view.itemAtIndex(0).y, 0)
     })
 
+    // QQuickWindowPrivate::polishItems, PolishLoopDetector: a polish that always polishes again gets a warning after 1000
+    // loops and is given up at 10000, the frame is rendered, the item polishes again in the next frame
+    test(name + ': a polish loop is given up after 10000 polishes, the frame is rendered, the next frame goes on', () => {
+        let looping, other
+        engine.batch(() => {
+            looping = new Item(null)
+            other = new Item(null)
+        })
+        let polishes = 0
+        looping.$polish = function(){
+            polishes++
+            // the old runtime looped for ever: stop at 20000 so the test ends either way
+            if(polishes < 20000) engine.queuePolish(this)
+        }
+        let warnings = []
+        let warn = console.warn
+        console.warn = (message) => warnings.push(String(message))
+        try {
+            engine.batch(() => {
+                engine.queuePolish(looping)
+                other.x = 5
+            })
+            engine.flushFrame()
+        } finally {
+            console.warn = warn
+        }
+        assert.equal(polishes, 10000)
+        assert.equal(warnings.filter(w => /possible QQuickItem::polish\(\) loop/.test(w)).length, 5)
+        // the DOM writes of the frame were not held back by the loop
+        assert.equal(other.$dirty, 0)
+        console.warn = () => {}
+        try {
+            engine.flushFrame()
+        } finally {
+            console.warn = warn
+        }
+        assert.equal(polishes, 20000)
+    })
+
     test(name + ': the subscriptions of a destroyed object are counted out', () => {
         let before = engine.stats.links
         let obj
