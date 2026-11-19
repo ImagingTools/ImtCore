@@ -29,6 +29,10 @@ Item {
         inst.model = 2
         console.log("count number", inst.count, inst.objectAt(1).position)
         console.log("active", inst.active)
+        inst.active = false
+        console.log("inactive", inst.active, inst.count)
+        inst.active = true
+        console.log("active again", inst.count)
         Qt.quit()
     }
 }

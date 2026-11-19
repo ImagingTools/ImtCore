@@ -6764,6 +6764,68 @@ defineReadOnly(Repeater.prototype, 'count', function () {
 	return this.$built.length;
 });
 
+// `Instantiator` (QtQml): makes an object of the delegate for every row of the model, like a Repeater does for items. The objects are
+// not drawn (a QtObject, a MenuItem); `objectAdded(index, object)` / `objectRemoved(index, object)` are the signals of itemAdded / itemRemoved,
+// `objectAt(index)` is itemAt. While `active` is false there are no objects.
+export class Instantiator extends Repeater {
+	constructor() {
+		super();
+		this.$typeName = 'Instantiator';
+		this.$active = true;
+		this.$declareSignal('objectAdded', ['index', 'object']);
+		this.$declareSignal('objectRemoved', ['index', 'object']);
+		this.$rawModel = 0;
+		Object.defineProperty(this, '$model', {
+			get: () => (this.$active ? this.$rawModel : 0),
+			set: (value) => {
+				this.$rawModel = value;
+			},
+		});
+	}
+
+	$emit(name, args = []) {
+		if (name === 'itemAdded') name = 'objectAdded';
+		else if (name === 'itemRemoved') name = 'objectRemoved';
+		super.$emit(name, args);
+	}
+
+	objectAt(index) {
+		return this.itemAt(index);
+	}
+}
+// A change of the model or of `active` makes the objects before the next line of the script, as in Qt.
+defineProp(
+	Instantiator.prototype,
+	'model',
+	function () {
+		return this.$rawModel;
+	},
+	function (value) {
+		if (value === this.$rawModel) return;
+		noteListModelWatcher(this.$rawModel, -1);
+		this.$model = value;
+		noteListModelWatcher(value, 1);
+		this.$update();
+		if (!this.$constructing && hooks.syncRepeater !== null) hooks.syncRepeater(this);
+	},
+	true,
+);
+defineProp(
+	Instantiator.prototype,
+	'active',
+	function () {
+		return this.$active;
+	},
+	function (value) {
+		const active = toBool(value);
+		if (active === this.$active) return;
+		this.$active = active;
+		this.$update();
+		if (!this.$constructing && hooks.syncRepeater !== null) hooks.syncRepeater(this);
+	},
+	true,
+);
+
 // A type the engine does not implement (Connections, an unknown component ...): an
 // item that only keeps its properties and children, draws nothing and ignores unknown handlers.
 export class Placeholder extends Item {
@@ -6875,8 +6937,24 @@ export class TreeItemModel extends Item {
 		hooks.touch();
 		markReaders(this, '$rows');
 		markReaders(this, 'count');
+		if (this.$updatesOff === true) return;
 		notifyViews(this);
 		if (this.$sigs.get('modelChanged').handlers.length > 0) this.$emit('modelChanged', []);
+	}
+
+	// The model that holds this one as the value of a key (CTreeItemModel::GetParent), null for the top one.
+	getParent() {
+		return this.$ownerModel || null;
+	}
+
+	// While it is false the model does not tell its views and handlers about changes (m_isUpdateEnabled); the data is written all the same.
+	setUpdateEnabled(enabled) {
+		this.$updatesOff = !toBool(enabled);
+	}
+
+	$adopt(value) {
+		if (value instanceof TreeItemModel && value !== this && !value.$wrapped) value.$ownerModel = this;
+		return value;
 	}
 
 	static $wrap(value) {
@@ -6931,14 +7009,14 @@ export class TreeItemModel extends Item {
 	}
 
 	setData(key, value, index = 0) {
-		this.$ensureRow(index)[key] = value;
+		this.$ensureRow(index)[key] = this.$adopt(value);
 		this.$touch();
 		return true;
 	}
 
 	addTreeModel(key, index = 0) {
 		const model = new TreeItemModel();
-		this.$ensureRow(index)[key] = model;
+		this.$ensureRow(index)[key] = this.$adopt(model);
 		this.$touch();
 		return model;
 	}
@@ -6953,6 +7031,15 @@ export class TreeItemModel extends Item {
 		this.$rows.splice(at, 0, {});
 		this.$touch();
 		return at;
+	}
+
+	// A row at `index` with the keys of the object; an index out of range is ignored (CTreeItemModel::InsertNewItemWithParameters).
+	insertNewItemWithParameters(index, parameters) {
+		if (!(index >= 0 && index <= this.$rows.length)) return;
+		const row = {};
+		for (const key of Object.keys(parameters || {})) row[key] = this.$adopt(parameters[key]);
+		this.$rows.splice(index, 0, row);
+		this.$touch();
 	}
 
 	removeItem(index) {
@@ -10506,6 +10593,7 @@ export const BUILTIN_TYPES = new Map([
 	['BaseClass', BaseClass],
 	['BaseModel', BaseModel],
 	['FileDialog', FileDialog],
+	['Instantiator', Instantiator],
 	['FolderDialog', FolderDialog],
 	['FileIO', FileIO],
 	['Item', Item],
