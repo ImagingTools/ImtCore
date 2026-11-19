@@ -11,7 +11,7 @@
 //   debug: true                   the text of the documents is there, and window.qmlWeb gives the engine
 //   binaries: { path: base64 },   fonts
 //   modules: { name: [dir] },     module name -> directories with a qmldir
-//   translations: { language: { source: translation } },
+//   translations: { language: { source: translation or [plural forms] } },
 // }
 
 import { Engine } from './engine.js';

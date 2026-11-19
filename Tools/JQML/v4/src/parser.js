@@ -186,6 +186,7 @@ class Parser {
 
 		let isDefault = false;
 		let isReadonly = false;
+		let isRequired = false;
 		while (
 			(this.isId('readonly') || this.isId('default') || this.isId('required')) &&
 			this.peek(1).t === 'id' &&
@@ -193,6 +194,7 @@ class Parser {
 		) {
 			if (this.isId('default')) isDefault = true;
 			if (this.isId('readonly')) isReadonly = true;
+			if (this.isId('required')) isRequired = true;
 			this.next();
 		}
 
@@ -264,6 +266,7 @@ class Parser {
 				isAlias: typeName === 'alias',
 				isReadonly,
 				isDefault,
+				isRequired,
 				isHandler: false,
 				isBlock: false,
 				text: null,

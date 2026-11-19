@@ -24,7 +24,7 @@ function decodeXmlText(text) {
 	return value.replace(/\u0000CDATA(\d+)\u0000/g, (_, index) => cdata[Number(index)]);
 }
 
-// { source text -> translation } of one .ts file; of a plural message the first form is used.
+// { source text -> translation } of one .ts file; a plural message has the list of its forms, in the order of the catalog.
 export function parseTsCatalog(xml) {
 	const dict = {};
 	const source = String(xml).replace(/<!--[\s\S]*?-->/g, '');
@@ -35,13 +35,12 @@ export function parseTsCatalog(xml) {
 		const sourceMatch = body.match(/<source\b[^>]*>([\s\S]*?)<\/source>/);
 		const translationMatch = body.match(/<translation\b[^>]*>([\s\S]*?)<\/translation>/);
 		if (!sourceMatch || !translationMatch) continue;
-		let translation = translationMatch[1];
+		const translation = translationMatch[1];
 		const forms = [];
 		const formRe = /<numerusform\b[^>]*>([\s\S]*?)<\/numerusform>/g;
 		let formMatch;
 		while ((formMatch = formRe.exec(translation))) forms.push(decodeXmlText(formMatch[1]));
-		translation = forms.length ? forms[0] : decodeXmlText(translation);
-		dict[decodeXmlText(sourceMatch[1])] = translation;
+		dict[decodeXmlText(sourceMatch[1])] = forms.length ? forms : decodeXmlText(translation);
 	}
 	return dict;
 }
