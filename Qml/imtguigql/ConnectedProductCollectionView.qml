@@ -24,7 +24,8 @@ RemoteCollectionView {
 			documentManager: productCollectionView.documentManager
 
 			removeDialogTitle: qsTr("Removing a product")
-			removeMessage: qsTr("Remove the selected product? All tokens of its servers are revoked. Its roles stay.")
+			removeNameFieldId: "productName"
+			removeConsequenceText: qsTr("All tokens of its servers are revoked. Its roles stay.")
 
 			Component.onCompleted: {
 				registerDocumentType("ConnectedProduct", qsTr("Product"))

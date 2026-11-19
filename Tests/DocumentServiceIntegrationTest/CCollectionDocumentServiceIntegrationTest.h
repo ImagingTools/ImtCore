@@ -77,6 +77,8 @@ private slots:
 	void SaveDocumentCollectionSetDataFailTest();
 	void SaveDocumentValidationFailTest();
 	void SaveDocumentValidationFailWithMessageTest();
+	void SaveDocumentValidatorGetsLanguageTest();
+	void SaveNewDocumentValidatorGetsLanguageTest();
 	void SaveDocumentWithNameProviderTest();
 	void SaveDocumentEventFiredTest();
 	void SaveDocumentSaveAsEventFiredTest();

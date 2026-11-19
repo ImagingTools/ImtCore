@@ -8,7 +8,7 @@ DocumentCollectionViewDelegate {
 	revisionsPermissionPath: "/Administration/Roles/Revisions";
 	
 	removeDialogTitle: qsTr("Deleting a role");
-	removeMessage: qsTr("Delete the selected role ?");
+	removeNameFieldId: "roleName";
 	
 	documentTypeIds: ["Role"];
 	documentViewTypeIds: ["RoleEditor"];

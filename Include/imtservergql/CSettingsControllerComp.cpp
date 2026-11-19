@@ -31,7 +31,7 @@ sdl::V1_0::imtbase::CSetSettingsPayload CSettingsControllerComp::OnSetSettings(
 	
 	sdl::V1_0::imtbase::SetSettingsRequestArguments arguments = setSettingsRequest.GetRequestedArguments();
 	if (!arguments.input || !arguments.input->userId.has_value()){
-		Q_ASSERT(false);
+		errorMessage = QStringLiteral("The input with a user-ID is required");
 		
 		return response;
 	}
@@ -52,7 +52,7 @@ sdl::V1_0::imtbase::CSetSettingsPayload CSettingsControllerComp::OnSetSettings(
 	}
 
 	if (!arguments.input->settings.has_value()){
-		Q_ASSERT(false);
+		errorMessage = QStringLiteral("The settings are required");
 		return response;
 	}
 	
@@ -130,7 +130,7 @@ sdl::V1_0::imtbase::CParamsSet CSettingsControllerComp::OnGetSettings(
 	
 	sdl::V1_0::imtbase::GetSettingsRequestArguments arguments = getSettingsRequest.GetRequestedArguments();
 	if (!arguments.input.has_value()){
-		Q_ASSERT(false);
+		errorMessage = QStringLiteral("The input is required");
 		return response;
 	}
 
@@ -209,7 +209,7 @@ sdl::V1_0::imtbase::CStyleData CSettingsControllerComp::OnGetStyleData(
 	
 	sdl::V1_0::imtbase::GetStyleDataRequestArguments arguments = getStyleRequest.GetRequestedArguments();
 	if (!arguments.input.has_value()){
-		Q_ASSERT(false);
+		errorMessage = QStringLiteral("The input is required");
 		return response;
 	}
 

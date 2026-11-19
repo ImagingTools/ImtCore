@@ -100,9 +100,27 @@ TestCase {
 		client.registerSubscription()
 
 		tryCompare(manager, "status", WebSocket.Open, 5000)
-		tryVerify(function(){ return server.startCount() === 1 }, 5000, "The subscription is started")
 
-		return {"manager": manager, "client": client}
+		let context = {"manager": manager, "client": client}
+		waitStarted(context, 1)
+
+		return context
+	}
+
+	// The server got the start number `count` and the client has handled its start_ack:
+	// a refresh it causes has happened, so the count of refreshes can be compared right after.
+	function waitStarted(context, count){
+		tryVerify(function(){ return server.startCount() === count }, 10000, "Start " + count + " reaches the server")
+		tryVerify(function(){
+			let model = context.manager.subscriptionModel
+			for (let i = 0; i < model.length; ++i){
+				if (model[i]["subscription"] === context.client){
+					return model[i]["status"] === "registered"
+				}
+			}
+
+			return false
+		}, 5000, "Start " + count + " is acknowledged on the client")
 	}
 
 	function dropConnection(context){
@@ -149,7 +167,7 @@ TestCase {
 		context.client.deliveryEnabled = false
 
 		dropConnection(context)
-		tryVerify(function(){ return server.startCount() === 2 }, 10000)
+		waitStarted(context, 2)
 		compare(context.client.refreshCount, 0, "Not while hidden")
 
 		context.client.deliveryEnabled = true
@@ -171,7 +189,7 @@ TestCase {
 
 		// the manager reconnects on its own after its retry interval
 		tryCompare(context.manager, "status", WebSocket.Open, 10000)
-		tryVerify(function(){ return server.startCount() === 2 }, 5000, "Started again on the new connection")
+		waitStarted(context, 2)
 		compare(context.client.refreshCount, 1)
 	}
 
@@ -179,9 +197,9 @@ TestCase {
 		let context = connect()
 
 		dropConnection(context)
-		tryVerify(function(){ return server.startCount() === 2 }, 10000)
+		waitStarted(context, 2)
 		dropConnection(context)
-		tryVerify(function(){ return server.startCount() === 3 }, 10000)
+		waitStarted(context, 3)
 
 		compare(context.client.refreshCount, 2)
 	}
@@ -195,7 +213,7 @@ TestCase {
 		// a refreshed token starts the failed subscription again
 		context.manager.onAccessTokenRefreshed({})
 
-		tryVerify(function(){ return server.startCount() === 2 }, 5000)
+		waitStarted(context, 2)
 		compare(context.client.refreshCount, 1)
 	}
 
@@ -205,7 +223,7 @@ TestCase {
 		// stop + start on a live connection: nothing is missed in between
 		context.manager.onAccessTokenRefreshed({})
 
-		tryVerify(function(){ return server.startCount() === 2 }, 5000)
+		waitStarted(context, 2)
 		compare(context.client.refreshCount, 0)
 	}
 
@@ -229,7 +247,7 @@ TestCase {
 
 		server.sendError(context.client.subscriptionId, "PermissionsChanged")
 
-		tryVerify(function(){ return server.startCount() === 2 }, 2000)
+		waitStarted(context, 2)
 		compare(context.client.refreshCount, 1, "What happened meanwhile is read again")
 	}
 
@@ -260,7 +278,7 @@ TestCase {
 
 		manager.active = true
 
-		tryVerify(function(){ return server.startCount() === 1 }, 5000)
+		waitStarted({"manager": manager, "client": client}, 1)
 		compare(client.refreshCount, 0, "It was never live before, so nothing was missed")
 	}
 }

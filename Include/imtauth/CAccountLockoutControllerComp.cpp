@@ -39,6 +39,43 @@ bool CAccountLockoutControllerComp::IsAccountLocked(const QByteArray& login, qin
 }
 
 
+int CAccountLockoutControllerComp::GetRemainingAttempts(const QByteArray& login, qint64* lockoutDurationSecsPtr) const
+{
+	const int maxFailedAttempts = *m_maxFailedAttemptsAttrPtr;
+	if (maxFailedAttempts <= 0){
+		return -1;
+	}
+
+	if (lockoutDurationSecsPtr != nullptr){
+		const int lockoutDurationSecs = *m_lockoutDurationAttrPtr;
+		*lockoutDurationSecsPtr = (lockoutDurationSecs > 0) ? lockoutDurationSecs : -1;
+	}
+
+	QMutexLocker locker(&m_mutex);
+
+	auto iter = m_accountStates.find(login);
+	if (iter == m_accountStates.end()){
+		return maxFailedAttempts;
+	}
+
+	const qint64 nowSecs = QDateTime::currentSecsSinceEpoch();
+	if (IsLockedInternal(*iter, nowSecs)){
+		return 0;
+	}
+
+	// The same window as RegisterFailedAttempt(): older attempts no longer count
+	const qint64 periodStartSecs = nowSecs - *m_failedAttemptsPeriodAttrPtr;
+	int countedAttempts = 0;
+	for (const qint64 attemptTime : std::as_const(iter->failedAttemptTimes)){
+		if (attemptTime >= periodStartSecs){
+			++countedAttempts;
+		}
+	}
+
+	return qMax(0, maxFailedAttempts - countedAttempts);
+}
+
+
 bool CAccountLockoutControllerComp::RegisterFailedAttempt(const QByteArray& login)
 {
 	int maxFailedAttempts = *m_maxFailedAttemptsAttrPtr;

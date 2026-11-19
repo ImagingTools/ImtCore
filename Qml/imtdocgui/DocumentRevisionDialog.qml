@@ -138,8 +138,9 @@ Dialog {
 		id: removeRevisionConfirmDialog;
 		MessageDialog {
 			width: Style.sizeHintM;
+			destructive: true;
 			title: qsTr("Remove revision");
-			message: qsTr("Delete the selected revision ?");
+			message: qsTr("Delete the selected revision?");
 			onFinished: {
 				if (buttonId == Enums.yes){
 					deleteRevisionRequest.send()

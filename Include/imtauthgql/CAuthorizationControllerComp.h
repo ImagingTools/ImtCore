@@ -53,7 +53,16 @@ protected:
 	QByteArray GetUserObjectId(const QByteArray& login) const;
 	bool CheckCredential(const QByteArray& systemId, const QByteArray& login, const QByteArray& password) const;
 	QByteArrayList CalculateGlobalPermissions(const imtauth::IUserInfo& userInfo, const QByteArray& userId, const QByteArray& productId) const;
-	sdl::V1_0::imtauth::CAuthorizationPayload CreateInvalidLoginOrPasswordResponse(const QByteArray& login, QString& errorMessage) const;
+	/**
+		Response for invalid credentials, in the language \a languageId.
+		With a positive \a remainingAttempts the message warns how many attempts are left before the lock of \a lockoutDurationSecs.
+	*/
+	sdl::V1_0::imtauth::CAuthorizationPayload CreateInvalidLoginOrPasswordResponse(
+				const QByteArray& login,
+				QString& errorMessage,
+				const QByteArray& languageId = QByteArray(),
+				int remainingAttempts = -1,
+				qint64 lockoutDurationSecs = -1) const;
 	/**
 		Response for an account that is disabled. Only for callers whose credentials were
 		already verified - otherwise it would turn a login attempt into an account-state probe.
@@ -63,12 +72,20 @@ protected:
 		Response for a locked account; the message tells how long the lock lasts.
 		param remainingLockoutSecs negative if the account stays locked until an administrator unlocks it.
 	*/
-	sdl::V1_0::imtauth::CAuthorizationPayload CreateAccountLockedResponse(const QByteArray& login, qint64 remainingLockoutSecs, QString& errorMessage) const;
+	sdl::V1_0::imtauth::CAuthorizationPayload CreateAccountLockedResponse(const QByteArray& login, qint64 remainingLockoutSecs, QString& errorMessage, const QByteArray& languageId = QByteArray()) const;
 	/**
 		Registers a failed attempt and answers it: the lock message when this attempt locked the account,
-		otherwise the invalid login or password message.
+		otherwise the invalid login or password message with the number of attempts left.
 	*/
-	sdl::V1_0::imtauth::CAuthorizationPayload CreateFailedAttemptResponse(const QByteArray& login, QString& errorMessage) const;
+	sdl::V1_0::imtauth::CAuthorizationPayload CreateFailedAttemptResponse(const QByteArray& login, QString& errorMessage, const QByteArray& languageId = QByteArray()) const;
+	/**
+		Translates a message of the controller into \a languageId (context \c CAuthorizationControllerComp).
+	*/
+	QString Translate(const char* text, const QByteArray& languageId) const;
+	/**
+		Duration text "N seconds/minutes/hours" in \a languageId.
+	*/
+	QString FormatDuration(qint64 secs, const QByteArray& languageId) const;
 	bool IsAccountLocked(const QByteArray& login, qint64* remainingLockoutSecsPtr = nullptr) const;
 	void RegisterAccessAttempt(const QByteArray& login, bool successful) const;
 	sdl::V1_0::imtauth::CAuthorizationPayload CreateAuthorizationSuccessfulResponse(

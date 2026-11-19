@@ -152,6 +152,9 @@ void CWebSocketRequest::SetBody(const QByteArray &body)
 	if (object.value("type") == "keep_alive"){
 		m_type = MT_KEEP_ALIVE;
 	}
+	if (object.value("type") == "ka"){
+		m_type = MT_KEEP_ALIVE;
+	}
 	if (object.value("type") == "ping"){
 		m_type = MT_KEEP_ALIVE;
 	}

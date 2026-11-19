@@ -36,6 +36,14 @@ public:
 	virtual bool IsAccountLocked(const QByteArray& login, qint64* remainingLockoutSecsPtr = nullptr) const = 0;
 
 	/**
+		Number of invalid access attempts the account identified by \c login may still make before it is locked.
+		\param lockoutDurationSecsPtr optional output for how long the coming lock lasts in seconds;
+			negative if it lasts until an administrator unlocks the account.
+		\return 0 for a locked account, a negative value if the lockout is disabled.
+	*/
+	virtual int GetRemainingAttempts(const QByteArray& login, qint64* lockoutDurationSecsPtr = nullptr) const = 0;
+
+	/**
 		Register an invalid access attempt for the account identified by \c login.
 		\return \c true if the account became (or already was) locked.
 	*/
