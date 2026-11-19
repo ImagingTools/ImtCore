@@ -696,7 +696,13 @@ void CSdlClassGqlModificatorComp::AddUnionFieldValueReadFromObject(QTextStream& 
 		FeedStream(stream, 1, false);
 
 		FeedStreamHorizontally(stream, hIndents);
-		stream << QStringLiteral("if (!");
+		if (hasScalarTypes){
+			// scalar alternatives are stored directly, only objects require typename
+			stream << QStringLiteral("if (") << tempDataPtrVarName << QStringLiteral(" != nullptr && !");
+		}
+		else{
+			stream << QStringLiteral("if (") << tempDataPtrVarName << QStringLiteral(" == nullptr || !");
+		}
 		stream << tempDataPtrVarName;
 		stream << QStringLiteral("->ContainsParam(\"__typename\")){");
 		FeedStream(stream, 1, false);
@@ -715,8 +721,15 @@ void CSdlClassGqlModificatorComp::AddUnionFieldValueReadFromObject(QTextStream& 
 		stream << QStringLiteral("QString ");
 		stream << GetDecapitalizedValue(field.GetId());
 		stream << QStringLiteral("Typename = ");
+		if (hasScalarTypes){
+			stream << tempDataPtrVarName << QStringLiteral(" != nullptr ? ");
+		}
 		stream << tempDataPtrVarName;
-		stream << QStringLiteral("->GetParamArgumentValue(\"__typename\").toString();");
+		stream << QStringLiteral("->GetParamArgumentValue(\"__typename\").toString()");
+		if (hasScalarTypes){
+			stream << QStringLiteral(" : QString()");
+		}
+		stream << ';';
 		FeedStream(stream, 1, false);
 	}
 
