@@ -67,8 +67,8 @@
                     <AttributeInfo Id="HostName" Type="Id" ExportId="DefaultDatabaseHost">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="Pasword" Type="Id" ExportId="DefaultDatabasePassword">
-                        <Data IsEnabled="true" Value="root"/>
+                    <AttributeInfo Id="Password" Type="Id" ExportId="DefaultDatabasePassword">
+                        <Data IsEnabled="true" Value=""/>
                     </AttributeInfo>
                     <AttributeInfo Id="Port" Type="Integer" ExportId="DefaultDatabasePort">
                         <Data IsEnabled="false"/>

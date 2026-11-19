@@ -160,7 +160,7 @@ QString CMongoDatabaseEngineComp::GetPassword() const
 		return m_databaseAccessSettingsCompPtr->GetPassword();
 	}
 
-	return *m_paswordAttrPtr;
+	return *m_passwordAttrPtr;
 }
 
 
