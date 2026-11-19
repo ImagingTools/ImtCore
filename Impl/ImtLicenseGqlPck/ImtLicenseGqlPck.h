@@ -11,7 +11,6 @@
 #include <imtlicgql/CProductControllerComp.h>
 #include <imtlicgql/CLicenseControllerComp.h>
 #include <imtlicgql/CLicenseCollectionControllerComp.h>
-#include <imtlicgql/CAccountControllerComp.h>
 #include <imtlicgql/CProductPermissionsControllerComp.h>
 #include <imtlicgql/CFeatureControllerComp.h>
 #include <imtlicgql/CFeatureCollectionControllerComp.h>
@@ -40,7 +39,6 @@ typedef imtlicgql::CProductDocumentNameProviderComp ProductDocumentNameProvider;
 typedef imtlicgql::CProductControllerComp ProductController;
 typedef imtlicgql::CLicenseControllerComp LicenseController;
 typedef imtlicgql::CLicenseCollectionControllerComp LicenseCollectionController;
-typedef imtlicgql::CAccountControllerComp AccountController;
 typedef imtlicgql::CProductPermissionsControllerComp ProductPermissionController;
 typedef imtlicgql::CFeatureControllerComp FeatureController;
 typedef imtlicgql::CFeatureCollectionControllerComp FeatureCollectionController;
@@ -53,5 +51,4 @@ typedef imtlicgql::CProductInfoFileGeneratorComp ProductInfoFileGenerator;
 
 
 } // namespace ImtLicenseGqlPck
-
 

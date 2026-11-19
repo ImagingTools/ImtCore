@@ -2,15 +2,10 @@
 #include <imtaccount/CContactInfo.h>
 
 
-// Qt includes
-#include <QtCore/QDebug>
-
 // ACF includes
-#include <istd/TDelPtr.h>
 #include <istd/CChangeNotifier.h>
 #include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
-#include <iser/CPrimitiveTypesSerializer.h>
 
 
 namespace imtaccount
@@ -21,18 +16,14 @@ namespace imtaccount
 
 QByteArray CContactInfo::GetTypeId()
 {
-	return "ContactInfo";
+	return QByteArrayLiteral("ContactInfo");
 }
 
 
 // public methods
 
 CContactInfo::CContactInfo()
-	:m_genderType(GT_DIVERSE), // :)
-	m_firstName(""),
-	m_lastName(""),
-	m_nickName(""),
-	m_modelUpdateBridge(this, imod::CModelUpdateBridge::UF_SOURCE)
+	:m_modelUpdateBridge(this, imod::CModelUpdateBridge::UF_SOURCE)
 {
 	m_addresses.AttachObserver(&m_modelUpdateBridge);
 }
@@ -48,7 +39,7 @@ QString CContactInfo::GetEmail() const
 
 void CContactInfo::SetEmail(const QString& email)
 {
-	if (m_email!= email){
+	if (m_email != email){
 		istd::CChangeNotifier changeNotifier(this);
 
 		m_email = email;
@@ -56,87 +47,41 @@ void CContactInfo::SetEmail(const QString& email)
 }
 
 
-IContactInfo::GenderType CContactInfo::GetGenderType() const
+QString CContactInfo::GetPhone() const
 {
-	return m_genderType;
+	return m_phone;
 }
 
 
-void CContactInfo::SetGenderType(GenderType genderType)
+void CContactInfo::SetPhone(const QString& phone)
 {
-	if (m_genderType != genderType){
+	if (m_phone != phone){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_genderType = genderType;
+		m_phone = phone;
 	}
 }
 
 
-QDate CContactInfo::GetBirthday() const
+QString CContactInfo::GetWebPage() const
 {
-	return m_birthday;
+	return m_webPage;
 }
 
 
-void CContactInfo::SetBirthday(const QDate& birthday)
+void CContactInfo::SetWebPage(const QString& webPage)
 {
-	if (m_birthday != birthday){
+	if (m_webPage != webPage){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_birthday = birthday;
+		m_webPage = webPage;
 	}
 }
 
 
-QString CContactInfo::GetNameField(NameFieldType fieldType) const
+IAddressProvider* CContactInfo::GetAddresses() const
 {
-	switch(fieldType){
-	case NFT_FIRST_NAME:
-		return m_firstName;
-	case NFT_LAST_NAME:
-		return m_lastName;
-	case NFT_NICKNAME:
-		return m_nickName;
-	default:
-		return QString();
-	};
-}
-
-
-void CContactInfo::SetNameField(NameFieldType fieldType, const QString& value)
-{
-	switch (fieldType){
-	case NFT_FIRST_NAME:
-		if (m_firstName != value){
-			istd::CChangeNotifier changeNotifier(this);
-
-			m_firstName = value;
-		}
-		break;
-	case NFT_LAST_NAME:
-		if (m_lastName != value){
-			istd::CChangeNotifier changeNotifier(this);
-
-			m_lastName = value;
-		}
-		break;
-	case NFT_NICKNAME:
-		if (m_nickName != value){
-			istd::CChangeNotifier changeNotifier(this);
-
-			m_nickName = value;
-		}
-		break;
-	default:
-		qWarning() << "Unexpected field type" << ToString(fieldType);
-		break;
-	};
-}
-
-
-const IAddressProvider* CContactInfo::GetAddresses() const
-{
-	return &m_addresses;
+	return const_cast<imod::TModelWrap<CAddressCollection>*>(&m_addresses);
 }
 
 
@@ -148,37 +93,22 @@ bool CContactInfo::Serialize(iser::IArchive& archive)
 
 	bool retVal = true;
 
-	iser::CArchiveTag emailTag("Email", "Email", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag emailTag(QByteArrayLiteral("Email"), QByteArrayLiteral("Email"), iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(emailTag);
 	retVal = retVal && archive.Process(m_email);
 	retVal = retVal && archive.EndTag(emailTag);
 
-	iser::CArchiveTag genderTypeTag("GenderType", "Gender type", iser::CArchiveTag::TT_LEAF);
-	retVal= retVal && archive.BeginTag(genderTypeTag);
-	retVal = retVal && I_SERIALIZE_ENUM(GenderType, archive, m_genderType);
-	retVal = retVal && archive.EndTag(genderTypeTag);
+	iser::CArchiveTag phoneTag(QByteArrayLiteral("Phone"), QByteArrayLiteral("Phone"), iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(phoneTag);
+	retVal = retVal && archive.Process(m_phone);
+	retVal = retVal && archive.EndTag(phoneTag);
 
-	iser::CArchiveTag birthdayTag("Birthday", "Birthday", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(birthdayTag);
-	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeDate(archive, m_birthday);
-	retVal = retVal && archive.EndTag(birthdayTag);
+	iser::CArchiveTag webPageTag(QByteArrayLiteral("WebPage"), QByteArrayLiteral("Web page"), iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(webPageTag);
+	retVal = retVal && archive.Process(m_webPage);
+	retVal = retVal && archive.EndTag(webPageTag);
 
-	iser::CArchiveTag firstNameTag("FirstName", "First name", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(firstNameTag);
-	retVal = retVal && archive.Process(m_firstName);
-	retVal = retVal && archive.EndTag(firstNameTag);
-
-	iser::CArchiveTag lastNameTag("LastName", "Last name", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(lastNameTag);
-	retVal = retVal && archive.Process(m_lastName);
-	retVal = retVal && archive.EndTag(lastNameTag);
-
-	iser::CArchiveTag nickNameTag("NickName", "Nick name", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(nickNameTag);
-	retVal = retVal && archive.Process(m_nickName);
-	retVal = retVal && archive.EndTag(nickNameTag);
-
-	// iser::CArchiveTag addressesTag("Addresses", "Addresses", iser::CArchiveTag::TT_GROUP);
+	// iser::CArchiveTag addressesTag(QByteArrayLiteral("Addresses"), QByteArrayLiteral("Addresses"), iser::CArchiveTag::TT_GROUP);
 	// retVal = retVal && archive.BeginTag(addressesTag);
 	// retVal = retVal && m_addresses.Serialize(archive);
 	// retVal = retVal && archive.EndTag(addressesTag);
@@ -191,56 +121,64 @@ bool CContactInfo::Serialize(iser::IArchive& archive)
 
 int CContactInfo::GetSupportedOperations() const
 {
-	return SO_COPY | SO_CLONE | SO_RESET;
+	return SO_COPY | SO_COMPARE | SO_CLONE | SO_RESET;
 }
 
 
 bool CContactInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
 	const CContactInfo* sourcePtr = dynamic_cast<const CContactInfo*>(&object);
-	if (sourcePtr != nullptr){
-		istd::CChangeNotifier changeNotifier(this);
-
-		m_email = sourcePtr->m_email;
-		m_genderType = sourcePtr->m_genderType;
-		m_birthday = sourcePtr->m_birthday;
-		m_firstName = sourcePtr->m_firstName;
-		m_lastName = sourcePtr->m_lastName;
-		m_nickName = sourcePtr->m_nickName;
-
-		return true;
+	if (sourcePtr == nullptr){
+		return false;
 	}
 
-	return false;
+	istd::CChangeNotifier changeNotifier(this);
+
+	m_email = sourcePtr->m_email;
+	m_phone = sourcePtr->m_phone;
+	m_webPage = sourcePtr->m_webPage;
+
+	return m_addresses.CopyFrom(sourcePtr->m_addresses);
 }
 
 
-istd::IChangeableUniquePtr CContactInfo::CloneMe(CompatibilityMode /*mode*/) const
+bool CContactInfo::IsEqual(const IChangeable& object) const
 {
-//	istd::TDelPtr<CContactInfo> clonePtr(new CContactInfo);
-//	if (clonePtr->CopyFrom(*this, mode)){
-//		return clonePtr;
-//	}
+	const CContactInfo* sourcePtr = dynamic_cast<const CContactInfo*>(&object);
+	if (sourcePtr == nullptr){
+		return false;
+	}
 
-	return nullptr;
+	bool retVal = m_email == sourcePtr->m_email;
+	retVal = retVal && m_phone == sourcePtr->m_phone;
+	retVal = retVal && m_webPage == sourcePtr->m_webPage;
+
+	return retVal;
 }
 
 
-bool CContactInfo::ResetData(CompatibilityMode /*mode*/)
+istd::IChangeableUniquePtr CContactInfo::CloneMe(CompatibilityMode mode) const
+{
+	istd::IChangeableUniquePtr clonePtr(new CContactInfo);
+	if (!clonePtr->CopyFrom(*this, mode)){
+		return nullptr;
+	}
+
+	return clonePtr;
+}
+
+
+bool CContactInfo::ResetData(CompatibilityMode mode)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
 	m_email.clear();
-	m_genderType = GT_DIVERSE;
-	m_birthday = QDate();
-	m_firstName.clear();
-	m_lastName.clear();
-	m_nickName.clear();
+	m_phone.clear();
+	m_webPage.clear();
 
-	return true;
+	return m_addresses.ResetData(mode);
 }
 
 
 } // namespace imtaccount
-
 
