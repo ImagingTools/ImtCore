@@ -31,6 +31,7 @@ function emptyCatalog(){
 
 // The messages of a .ts file into the catalog; untranslated and obsolete / vanished messages are left out (lrelease)
 function parseTs(text, catalog = emptyCatalog()){
+    catalog.cache = null
     let ts = element(text, 'TS')
     if(!ts) return catalog
     let language = attribute(ts.attributes, 'language')
@@ -77,6 +78,16 @@ function parseTs(text, catalog = emptyCatalog()){
 // context (a qsTr of a JavaScript file) the first context that has the message
 function lookup(catalog, context, source, disambiguation){
     if(!catalog) return undefined
+    // the bindings ask for the same messages again and again: the answers are kept per catalog
+    let cacheKey = (context === null || context === undefined ? '\u0002' : String(context)) + '\u0001' + source + '\u0001' + (disambiguation || '')
+    let cache = catalog.cache || (catalog.cache = new Map())
+    if(cache.has(cacheKey)) return cache.get(cacheKey)
+    let found = findMessage(catalog, context, source, disambiguation)
+    cache.set(cacheKey, found)
+    return found
+}
+
+function findMessage(catalog, context, source, disambiguation){
     let find = (messages) => {
         if(!messages) return undefined
         let found = messages.get(key(source, disambiguation))

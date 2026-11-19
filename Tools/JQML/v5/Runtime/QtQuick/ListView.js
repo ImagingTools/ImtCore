@@ -79,8 +79,10 @@ class ListView extends Item {
         this.$header = null
         this.$footer = null
         this.$highlight = null
-        this.$highlightAnimation = null
+        this.$highlightAnimations = null
         this.$itemsSize = 0
+        // QQuickListViewPrivate::averageSize: 100 until items are laid out, then the rounded mean of the built ones
+        this.$average = 100
         this.$flickDirectionSet = false
         this.$keyNavigationSet = false
         engine.scheduleComponentComplete(this)
@@ -307,9 +309,16 @@ class ListView extends Item {
 
     // QQuickItemViewPrivate::positionViewAtIndex: the mode decides the new position, bounded by the extents
     positionViewAtIndex(index, mode = ListView.Beginning){
+        if(this.$v[ListView.COUNT] <= 0) return
+        this.$fill()
+        this.$moveToIndex(index, mode)
+    }
+
+    // the position for the mode, from the items built and the average size of the others; no refill (the view
+    // refills when its position changes, as QQuickItemView::viewportMoved)
+    $moveToIndex(index, mode){
         let count = this.$v[ListView.COUNT]
         if(count <= 0) return
-        this.$fill()
         let idx = Math.max(Math.min(index, count - 1), 0)
         let itemPos = this.$itemPositionAt(idx)
         let entry = this.$entries.get(idx)
@@ -401,12 +410,16 @@ class ListView extends Item {
         }
     }
 
-    $averageSize(){
-        let total = 0, count = 0
-        for(let size of this.$sizes){
-            if(size !== undefined){ total += size; count++ }
+    $averageSize(){ return this.$average }
+
+    // QQuickListViewPrivate::updateAverage: the rounded mean size of the items built; none built, it stays
+    $updateAverage(){
+        let sum = 0, count = 0
+        for(let index of this.$entries.keys()){
+            let size = this.$sizes[index]
+            if(size !== undefined){ sum += size; count++ }
         }
-        return count ? total / count : 0
+        if(count) this.$average = Math.round(sum / count)
     }
 
     $componentComplete(){
@@ -495,45 +508,70 @@ class ListView extends Item {
         let component = this.$v[ListView.HIGHLIGHT]
         let current = this.$v[ListView.CURRENTITEM]
         if(this.$highlight && (this.$highlight.$component !== component || !current)){
-            if(this.$highlightAnimation) this.$highlightAnimation.stop()
+            this.$stopHighlightAnimations()
             this.$highlight.$releaseLater()
             this.$highlight = null
             this.$write(ListView.HIGHLIGHTITEM, null)
         }
         if(!component || !current) return
-        let created = false
-        if(!this.$highlight){
-            this.$highlight = this.$componentItem(component, 0)
-            if(!this.$highlight) return
-            this.$highlight.$component = component
-            created = true
-            this.$write(ListView.HIGHLIGHTITEM, this.$highlight)
-        }
-        if(!this.$v[ListView.HIGHLIGHTFOLLOWSCURRENTITEM]) return
-        let highlight = this.$highlight
         let vertical = this.$vertical()
+        let follows = this.$v[ListView.HIGHLIGHTFOLLOWSCURRENTITEM]
+        if(!this.$highlight){
+            let highlight = this.$componentItem(component, 0)
+            if(!highlight) return
+            highlight.$component = component
+            this.$highlight = highlight
+            // QQuickListViewPrivate::createHighlight: following the current item, it takes its size along the flow
+            // and its position at once
+            if(follows){
+                if(vertical){
+                    highlight.height = current.$v[Item.HEIGHT]
+                    highlight.y = current.$v[Item.Y]
+                } else {
+                    highlight.width = current.$v[Item.WIDTH]
+                    highlight.x = current.$v[Item.X]
+                }
+            }
+            this.$write(ListView.HIGHLIGHTITEM, highlight)
+        }
+        if(!follows) return
+        // QQuickListViewPrivate::updateHighlight: not while a StrictlyEnforceRange view is pressed
+        let s = this.$fs
+        if(this.$v[ListView.HIGHLIGHTRANGEMODE] === STRICTLY_ENFORCE_RANGE && s && s.pressed) return
+        let highlight = this.$highlight
+        // across the flow an empty highlight takes the current item's size at once
         if(vertical && !highlight.$v[Item.WIDTH]) highlight.width = current.$v[Item.WIDTH]
         if(!vertical && !highlight.$v[Item.HEIGHT]) highlight.height = current.$v[Item.HEIGHT]
-        if(vertical) highlight.height = current.$v[Item.HEIGHT]
-        else highlight.width = current.$v[Item.WIDTH]
-        let to = current.$v[vertical ? Item.Y : Item.X]
-        let property = vertical ? 'y' : 'x'
-        if(created || highlight[property] === to){
-            highlight[property] = to
+        // the position by highlightMove*, the width and the height by highlightResize* (three QSmoothedAnimations)
+        let move = [this.$v[ListView.HIGHLIGHTMOVEVELOCITY], this.$v[ListView.HIGHLIGHTMOVEDURATION]]
+        let resize = [this.$v[ListView.HIGHLIGHTRESIZEVELOCITY], this.$v[ListView.HIGHLIGHTRESIZEDURATION]]
+        this.$animateHighlight('pos', vertical ? 'y' : 'x', current.$v[vertical ? Item.Y : Item.X], move)
+        this.$animateHighlight('width', 'width', current.$v[Item.WIDTH], resize)
+        this.$animateHighlight('height', 'height', current.$v[Item.HEIGHT], resize)
+    }
+
+    $animateHighlight(key, property, to, [velocity, duration]){
+        let animations = this.$highlightAnimations || (this.$highlightAnimations = {})
+        let animation = animations[key]
+        let highlight = this.$highlight
+        if(animation && animation.running && animation.to === to && animation.target === highlight) return
+        if(highlight[property] === to){
+            if(animation && animation.running) animation.stop()
             return
         }
-        if(this.$highlightAnimation && this.$highlightAnimation.running && this.$highlightAnimation.to === to) return
-        let animation = this.$highlightAnimation
-        if(!animation){
-            animation = this.$highlightAnimation = new SmoothedAnimation(null)
-            animation.target = highlight
-        }
+        if(!animation) animation = animations[key] = new SmoothedAnimation(null)
         if(animation.target !== highlight) animation.target = highlight
         animation.property = property
-        animation.velocity = this.$v[ListView.HIGHLIGHTMOVEVELOCITY]
-        animation.duration = this.$v[ListView.HIGHLIGHTMOVEDURATION]
+        animation.velocity = velocity
+        animation.duration = duration
         animation.to = to
         animation.restart()
+    }
+
+    $stopHighlightAnimations(){
+        let animations = this.$highlightAnimations
+        if(!animations) return
+        for(let key in animations) animations[key].stop()
     }
 
     // ---- sections (QQuickListViewPrivate::sectionAt, updateInlineSection, updateSections) ----
@@ -614,6 +652,14 @@ class ListView extends Item {
         if(this.$v[ListView.CURRENTINDEX] >= count) this.$write(ListView.CURRENTINDEX, count - 1)
         this.$ensureCurrentItem()
         this.$trackCurrent()
+        // QQuickItemView::setModel / componentComplete end with updateViewport, also when refill laid nothing out
+        // (a view of no size): lastPosition estimates the rows with averageSize - the size of the current item when
+        // it is the only one (initializeCurrentItem)
+        if(this.$v[Item.WIDTH] === 0 && this.$v[Item.HEIGHT] === 0 && this.$v[ListView.DELEGATE]){
+            let spacing = this.$v[ListView.SPACING]
+            this.$itemsSize = count ? count * this.$average + (count - 1) * spacing : 0
+            this.$write(this.$vertical() ? ListView.CONTENTHEIGHT : ListView.CONTENTWIDTH, this.$itemsSize + this.$headerSize() + this.$footerSize())
+        }
     }
 
     // updateCurrent() creates the current item even when it is outside the filled range
@@ -622,11 +668,14 @@ class ListView extends Item {
         if(index < 0 || this.$entries.has(index) || !this.$v[ListView.DELEGATE]) return this.$updateCurrentItem()
         let rows = modelRows(this.$model)
         if(index >= rows.count) return this.$updateCurrentItem()
+        let alone = this.$entries.size === 0
         let item = this.$create(index, rows)
         if(item){
             let entry = this.$entries.get(index)
             this.$updateEntrySection(index, entry, rows)
-            this.$layoutEntry(index, entry, this.$positionAt(index))
+            // QQuickListViewPrivate::initializeCurrentItem: with no visible items the average is the current item's size
+            let size = this.$layoutEntry(index, entry, this.$positionAt(index))
+            if(alone) this.$average = size
         }
         this.$updateCurrentItem()
     }
@@ -655,6 +704,8 @@ class ListView extends Item {
             this.$entries.set(index, entry)
             entry.item.$culled = false
             engine.markDirty(entry.item, VISIBILITY)
+            attachedOf(entry.item).$write(ListViewAttached.ISCURRENTITEM, index === this.$v[ListView.CURRENTINDEX])
+            if(this.$currentAttached === entry.item && index !== this.$v[ListView.CURRENTINDEX]) this.$currentAttached = null
             let attached = entry.item.$v[Item.LISTVIEW]
             if(attached) engine.emitArgs(attached, ListViewAttached.SIGNAL_reused, [])
             return entry.item
@@ -763,6 +814,8 @@ class ListView extends Item {
                 if(index >= count) this.$release(index)
             }
             let known = i
+            // QQuickItemViewPrivate::refill: visibleItemsChanged (updateAverage), then updateViewport
+            this.$updateAverage()
             let estimated = pos + (count - known) * (this.$averageSize() + spacing)
             this.$itemsSize = Math.max(0, count ? estimated - spacing : 0)
             // QQuickItemViewPrivate::updateViewport: the items, the header and the footer
@@ -858,25 +911,33 @@ class ListView extends Item {
         this.$focusCurrentItem()
         let index = this.$v[ListView.CURRENTINDEX]
         let entry = this.$entries.get(index)
-        for(let [i, other] of this.$entries) attachedOf(other.item).$write(ListViewAttached.ISCURRENTITEM, i === index)
-        this.$write(ListView.CURRENTITEM, entry ? entry.item : null)
+        let item = entry ? entry.item : null
+        // ListView.isCurrentItem: the item that was current and the one that is
+        let previous = this.$currentAttached
+        if(previous !== item){
+            if(previous && !(previous.$f & engine.DESTROYED)) attachedOf(previous).$write(ListViewAttached.ISCURRENTITEM, false)
+            if(item) attachedOf(item).$write(ListViewAttached.ISCURRENTITEM, true)
+            this.$currentAttached = item
+        }
+        this.$write(ListView.CURRENTITEM, item)
         this.$updateHighlight()
     }
 
     // QQuickItemView::trackedPositionChanged: a new current index brings its item into the view (into the highlight
-    // range when one is applied); not while the user moves the view
+    // range when one is applied); not while the user moves the view. It only moves the view, it does not refill:
+    // a contentHeight handler sees the new items after the bindings of the change settle (the PopupDecorator
+    // of the filters sizes itself in onContentHeightChanged)
     $trackCurrent(){
         let index = this.$v[ListView.CURRENTINDEX]
         if(index < 0 || !(this.$f & engine.COMPLETED)) return
         let s = this.$fs
         if(s && (s.pressed || s.moving)) return
-        this.$fill()
         let range = this.$highlightRange()
         if(range.mode !== NO_HIGHLIGHT_RANGE){
             this.$setFlowPositionBounded(this.$itemPositionAt(index) - range.start)
             return
         }
-        this.positionViewAtIndex(index, ListView.Contain)
+        this.$moveToIndex(index, ListView.Contain)
     }
 
     $write(id, value){
@@ -945,7 +1006,7 @@ class ListView extends Item {
     $disposeNative(){
         if(this.$model instanceof ListModel) this.$model.$removeView(this)
         if(this.$bufferTimer) clearTimeout(this.$bufferTimer)
-        if(this.$highlightAnimation) this.$highlightAnimation.stop()
+        this.$stopHighlightAnimations()
         super.$disposeNative()
     }
 }

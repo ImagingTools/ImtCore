@@ -14,6 +14,7 @@ const OPTIONS = [
     ['r', 'root', '<string>', 'root path (default: "/")'],
     ['m', 'mode', '<string>', 'compile mode (choices: "js", "html")'],
     ['', 'list-qml', '', 'print qml files declared by config qmldirs, one path per line'],
+    ['', 'minify', '', 'minify the compiled QML (names of functions and classes are kept)'],
 ]
 
 const usage = () => 'Usage: compiler [options]\n\nOptions:\n' + OPTIONS.map(([s, l, arg, text]) =>

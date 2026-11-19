@@ -428,6 +428,18 @@ function(jq_compile_web)
 		VERBATIM
 	)
 
+	# v5: the compiled QML of a Release build is minified; JQML_MINIFY ON / OFF decides for any build
+	set(_jqml_minify_args)
+	if(JQML_VERSION STREQUAL "v5")
+		if(DEFINED JQML_MINIFY)
+			if(JQML_MINIFY)
+				set(_jqml_minify_args --minify)
+			endif()
+		elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+			set(_jqml_minify_args --minify)
+		endif()
+	endif()
+
 	# JS build
 	add_custom_command(
 		OUTPUT
@@ -444,6 +456,7 @@ function(jq_compile_web)
 		-r ${dataroot}
 		-e ${startqml}
 		-m js
+		${_jqml_minify_args}
 		DEPENDS ${DEPEND_LIST} ${sdldependency}
 		COMMENT "WEB COMPILER for ${PROJECT_NAME}"
 		VERBATIM
