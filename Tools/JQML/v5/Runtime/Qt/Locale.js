@@ -1,9 +1,20 @@
 // Qt.locale() and the QML Date extensions toLocaleDateString/TimeString/String(locale, format)
 
+// a name the browser does not know is the C locale, as QLocale's (its formats are those of en-US)
+function knownTag(name){
+    let tag = String(name).replace('_', '-')
+    try {
+        return Intl.getCanonicalLocales(tag).length ? tag : null
+    } catch(error) {
+        return null
+    }
+}
+
 class Locale {
     constructor(name){
-        this.name = name
-        this.$tag = name.replace('_', '-')
+        let tag = name === 'C' ? null : knownTag(name)
+        this.name = tag ? name : 'C'
+        this.$tag = tag || 'en-US'
         let parts = new Intl.NumberFormat(this.$tag).formatToParts(12345.6)
         let part = (type, fallback) => (parts.find(p => p.type === type) || { value: fallback }).value
         this.decimalPoint = part('decimal', '.')
@@ -18,6 +29,7 @@ Object.assign(Locale, { LongFormat: 0, ShortFormat: 1, NarrowFormat: 2 })
 
 function defaultName(){
     let tag = typeof navigator !== 'undefined' && navigator.language ? navigator.language : 'en-US'
+    if(!knownTag(tag)) tag = 'en-US'
     return tag.replace('-', '_')
 }
 

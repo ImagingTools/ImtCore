@@ -280,6 +280,22 @@ function cases(name, runtime){
             else delete globalThis.Image
         }
     })
+
+    test(name + ': a locale name the browser does not know is the C locale, as QLocale', () => {
+        let c = Qt.locale('undefined')
+        assert.equal(c.name, 'C')
+        assert.equal(c.decimalPoint, '.')
+        // a browser language it does not know (Firefox under automation gives "undefined"): the default locale is en_US
+        let saved = Object.getOwnPropertyDescriptor(globalThis, 'navigator')
+        Object.defineProperty(globalThis, 'navigator', { value: { language: 'undefined' }, configurable: true, writable: true })
+        try {
+            assert.equal(Qt.locale().name, 'en_US')
+            assert.equal(Qt.formatDateTime(new Date(2024, 0, 2, 3, 4), 'dd.MM.yyyy hh:mm'), '02.01.2024 03:04')
+        } finally {
+            if(saved) Object.defineProperty(globalThis, 'navigator', saved)
+            else delete globalThis.navigator
+        }
+    })
 }
 
 for(let [name, load] of runtimes) cases(name, load())
