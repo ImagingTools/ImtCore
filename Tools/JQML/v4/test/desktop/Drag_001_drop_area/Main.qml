@@ -28,8 +28,8 @@ Item {
     }
 
     Component.onCompleted: {
-        console.log("drag", box.Drag.active, box.Drag.hotSpot.x, box.Drag.hotSpot.y, box.Drag.keys, box.Drag.dragType === Drag.Internal)
-        console.log("area", area.containsDrag, area.keys, typeof area.drag, area.enabled)
+        console.log("drag", box.Drag.active, box.Drag.hotSpot.x, box.Drag.hotSpot.y, box.Drag.keys.length, box.Drag.keys[0], box.Drag.dragType === Drag.Internal)
+        console.log("area", area.containsDrag, area.keys.length, area.keys[0], typeof area.drag, area.enabled)
         console.log("enums", Drag.None, Drag.Automatic, Drag.Internal)
         Qt.quit()
     }

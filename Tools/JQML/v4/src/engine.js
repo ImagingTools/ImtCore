@@ -6,7 +6,7 @@
 // and root of the enclosing components (delegates have a parent scope), and finally the globals
 // (Math, JSON, Date, console, Qt, Item, time).
 
-import { Animation, ANIMATION_TYPES, AnchorLine, BindingValue, BUILTIN_TYPES, COMPONENT_ENUM_VALUE, ComponentItem, Coordinate, createSdlObject, duringChange, FILE_DIALOG_MODES, flushDeclarativeFocus, getFocusItem, hooks, Item, ListModel, ListView, linkToOwner, Loader, MapItemView, modelCount, modelScopeData, modelVersion, Placeholder, POINTER_DEVICE, queueDeclarativeFocus, readRows, readUntracked, Repeater, Instantiator, resetFocus, setSceneActive, Stack, TestCase, Timer, TRANSFORM_ORIGIN, TreeItemModel } from './items.js';
+import { Animation, ANIMATION_TYPES, AnchorLine, BindingValue, BUILTIN_TYPES, COMPONENT_ENUM_VALUE, ComponentItem, Coordinate, createSdlObject, duringChange, FILE_DIALOG_MODES, flushDeclarativeFocus, getFocusItem, hooks, Item, ListModel, ListView, linkToOwner, Loader, MapItemView, modelCount, modelScopeData, modelVersion, Placeholder, POINTER_DEVICE, queueDeclarativeFocus, readRows, readUntracked, Repeater, Instantiator, resetDrags, resetFocus, updateDrags, setSceneActive, Stack, TestCase, Timer, TRANSFORM_ORIGIN, TreeItemModel } from './items.js';
 import { fonts } from './fonts.js';
 import { md5 } from './md5.js';
 import { KEY, MODIFIERS, NAMED_KEY_HANDLERS, qtKeyEvent, STANDARD_KEYS } from './keys.js';
@@ -795,7 +795,7 @@ export class Engine {
 			Locale: LOCALE_FORMAT,
 			XMLHttpRequest: typeof XMLHttpRequest === 'undefined' ? class XMLHttpRequest { open() {} send() {} setRequestHeader() {} } : XMLHttpRequest,
 			Animation: Object.freeze({ Infinite: -1, Forward: 'Forward', Backward: 'Backward' }),
-			Easing: enumObject(['Linear', 'InQuad', 'OutQuad', 'InOutQuad', 'OutInQuad', 'InCubic', 'OutCubic', 'InOutCubic', 'OutInCubic', 'InQuart', 'OutQuart', 'InOutQuart', 'InQuint', 'OutQuint', 'InOutQuint', 'InSine', 'OutSine', 'InOutSine', 'InExpo', 'OutExpo', 'InOutExpo', 'InCirc', 'OutCirc', 'InOutCirc', 'InElastic', 'OutElastic', 'InOutElastic', 'InBack', 'OutBack', 'InOutBack', 'InBounce', 'OutBounce', 'InOutBounce', 'BezierSpline']),
+			Easing: Object.freeze(Object.fromEntries(['Linear', 'InQuad', 'OutQuad', 'InOutQuad', 'OutInQuad', 'InCubic', 'OutCubic', 'InOutCubic', 'OutInCubic', 'InQuart', 'OutQuart', 'InOutQuart', 'OutInQuart', 'InQuint', 'OutQuint', 'InOutQuint', 'OutInQuint', 'InSine', 'OutSine', 'InOutSine', 'OutInSine', 'InExpo', 'OutExpo', 'InOutExpo', 'OutInExpo', 'InCirc', 'OutCirc', 'InOutCirc', 'OutInCirc', 'InElastic', 'OutElastic', 'InOutElastic', 'OutInElastic', 'InBack', 'OutBack', 'InOutBack', 'OutInBack', 'InBounce', 'OutBounce', 'InOutBounce', 'OutInBounce', 'InCurve', 'OutCurve', 'SineCurve', 'CosineCurve', 'BezierSpline'].map((name, number) => [name, number]))), // the numbers of QEasingCurve::Type
 			// Qt Quick Test's mouseMove fails the same way under offscreen qml: the call throws and the test catches it.
 			mouseMove() {
 				throw new Error('QtQuickTest::fail');
@@ -941,6 +941,7 @@ export class Engine {
 		this.cursor = 0;
 		this.timers.clear();
 		this.holds.clear();
+		resetDrags();
 		this.changeHandlers = [];
 		this.loaders.clear();
 		this.repeaters.clear();
@@ -2377,6 +2378,8 @@ export class Engine {
 
 	setTime(seconds) {
 		this.time = seconds;
+		// the areas under a dragged item hear of its moves once, not for every write of x and y (Qt: after the script)
+		updateDrags();
 		this.flushQuiet(seconds);
 		if (this.animations.size > 0) {
 			for (const animation of [...this.animations]) {
@@ -2959,7 +2962,7 @@ export class Engine {
 			} else if (this.lenient && /^[A-Z]/.test(prop.name)) {
 				// `Layout.preferredWidth` and the rest of the attached layout spec. Other attached
 				// properties (Keys.enabled, ...) stay unsupported.
-				if (prop.name.startsWith('Layout.') || prop.name.startsWith('KeyNavigation.')) this.setValue(item, prop.name.split('.'), prop.text, scope, prop);
+				if (prop.name.startsWith('Layout.') || prop.name.startsWith('KeyNavigation.') || prop.name.startsWith('Drag.')) this.setValue(item, prop.name.split('.'), prop.text, scope, prop);
 				else this.noteIgnored(item, prop.name.split('.'));
 			} else {
 				this.setValue(item, prop.name.split('.'), prop.text, scope, prop, capture);

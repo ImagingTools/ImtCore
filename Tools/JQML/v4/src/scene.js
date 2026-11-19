@@ -1,6 +1,6 @@
 // The scene: the root item, the frame (layout, bindings, painting) and the mouse input.
 
-import { DragHandler, flushLazyViews, getFocusItem, Item, setDestroyObserver, setFocusItem, setFrameLoop, WheelHandler } from './items.js';
+import { DragHandler, flushLazyViews, updateDrags, getFocusItem, Item, setDestroyObserver, setFocusItem, setFrameLoop, WheelHandler } from './items.js';
 
 const MAX_PASSES = 10;
 
@@ -133,6 +133,8 @@ export class Scene {
 				root.$updateRequested = true;
 			}
 			if (engine.auditMode && engine.auditSweep() > 0) root.$updateRequested = true;
+			// What the items that are dragged are over (DropArea) is known after the layout.
+			updateDrags();
 		} finally {
 			setFrameLoop(false);
 		}

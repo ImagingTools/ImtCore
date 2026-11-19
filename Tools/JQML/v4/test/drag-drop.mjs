@@ -1,7 +1,8 @@
 // Drag and DropArea (ReorderableListDelegate moves the rows of a list with them), as desktop Qt gives them for an item pulled by a MouseArea:
 //   Drag.active: mouse.drag.active   the item sends its position to the areas under it
 //   DropArea                         onEntered when the item comes over the area, containsDrag while it is over, onExited when it leaves,
-//                                    onDropped when the item is released over it (drop.source is the item, Drag.drop() is done by the release)
+//                                    onDropped when Drag.drop() is called (the documented `onReleased: Drag.drop()`); ending the drag with
+//                                    Drag.active = false, which is what the release does to a bound Drag.active, is a cancel: onExited, no drop
 //   Drag.keys / DropArea.keys        an area takes the items that share a key (an area with no keys takes all)
 // `node test/drag-drop.mjs`
 import { Engine } from '../src/engine.js';
@@ -19,6 +20,7 @@ Item {
 	width: 300
 	height: 200
 	property string log: ""
+	property bool dropOnRelease: true
 	property alias box: box
 	property alias grab: grab
 	property alias target: target
@@ -36,6 +38,9 @@ Item {
 			id: grab
 			anchors.fill: parent
 			drag.target: box
+			onReleased: {
+				if (root.dropOnRelease) box.Drag.drop()
+			}
 		}
 	}
 	DropArea {
@@ -134,6 +139,22 @@ frame();
 check('dropped on the release, with the source', take(), 'drop(true)');
 check('the drag ends', [safe(() => root.grab.drag.active), safe(() => root.box.Drag.active)], [false, false]);
 check('the item stays where it was dropped', root.box.x > 100, true);
+
+// the same without Drag.drop(): the end of the drag is a cancel
+root.dropOnRelease = false;
+root.box.x = 10;
+root.box.y = 10;
+frame();
+const third = at(root.box, 20, 20);
+scene.pointerDown(...third);
+scene.pointerMove(third[0] + 20, third[1]);
+scene.pointerMove(third[0] + 160, third[1] + 10);
+frame();
+check('entered again', take(), 'enter(true)');
+scene.pointerUp(third[0] + 160, third[1] + 10);
+frame();
+check('released without Drag.drop(): exited and not dropped', take(), 'exit');
+root.dropOnRelease = true;
 
 // over the area that has another key: nothing
 root.box.x = 10;
