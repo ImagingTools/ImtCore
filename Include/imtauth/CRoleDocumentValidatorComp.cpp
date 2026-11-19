@@ -23,6 +23,11 @@ namespace imtauth
 
 static QString Translate(const iqt::ITranslationManager* translationManagerPtr, const char* text, const QByteArray& languageId)
 {
+	// Without a language of the caller the text stays English, not the language of the server
+	if (languageId.isEmpty()){
+		return QString::fromUtf8(text);
+	}
+
 	return QString::fromUtf8(iqt::GetTranslation(translationManagerPtr, text, languageId, "CRoleDocumentValidatorComp"));
 }
 

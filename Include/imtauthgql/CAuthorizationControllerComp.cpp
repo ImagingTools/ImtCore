@@ -137,12 +137,12 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateIn
 	// The lock must not come as a surprise: every failed attempt tells how many are left
 	if (remainingAttempts > 0){
 		if (lockoutDurationSecs > 0){
-			errorMessage += QStringLiteral(" ") + Translate(QT_TRANSLATE_NOOP("CAuthorizationControllerComp", "Attempts left before the account is locked for %1: %2."), languageId)
+			errorMessage += QStringLiteral(". ") + Translate(QT_TRANSLATE_NOOP("CAuthorizationControllerComp", "Attempts left before the account is locked for %1: %2."), languageId)
 						.arg(FormatDuration(lockoutDurationSecs, languageId))
 						.arg(remainingAttempts);
 		}
 		else{
-			errorMessage += QStringLiteral(" ") + Translate(QT_TRANSLATE_NOOP("CAuthorizationControllerComp", "Attempts left before the account is locked until an administrator unlocks it: %1."), languageId)
+			errorMessage += QStringLiteral(". ") + Translate(QT_TRANSLATE_NOOP("CAuthorizationControllerComp", "Attempts left before the account is locked until an administrator unlocks it: %1."), languageId)
 						.arg(remainingAttempts);
 		}
 	}
@@ -217,6 +217,11 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateFa
 
 QString CAuthorizationControllerComp::Translate(const char* text, const QByteArray& languageId) const
 {
+	// Without a language of the caller the text stays English, not the language of the server
+	if (languageId.isEmpty()){
+		return QString::fromUtf8(text);
+	}
+
 	return QString::fromUtf8(iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), text, languageId, "CAuthorizationControllerComp"));
 }
 
