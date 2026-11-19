@@ -144,6 +144,21 @@ int GetRevisionFromParams(const iprm::IParamsSet* paramsPtr)
 }
 
 
+QByteArray GetLanguageIdFromParams(const iprm::IParamsSet* paramsPtr)
+{
+	if (paramsPtr == nullptr){
+		return QByteArray();
+	}
+
+	const iprm::IIdParam* languageIdParamPtr = dynamic_cast<const iprm::IIdParam*>(paramsPtr->GetParameter(s_languageIdParamId));
+	if (languageIdParamPtr == nullptr){
+		return QByteArray();
+	}
+
+	return languageIdParamPtr->GetId();
+}
+
+
 QByteArray GetDocumentObjectId(const IDocumentService& documentService, const QByteArray& userId, const QByteArray& documentId)
 {
 	const IDocumentService::DocumentList documentList = documentService.GetOpenedDocumentList(userId);

@@ -355,6 +355,9 @@ CDM::CDocumentOperationStatus CCollectionDocumentServiceControllerComp::OnSaveDo
 		taskParams.documentId = *saveDocumentInput->documentId;
 		taskParams.documentName = *saveDocumentInput->documentName;
 		taskParams.operationContextPtr = operationContextPtr.GetPtr();
+		if (gqlRequest.GetRequestContext() != nullptr){
+			taskParams.languageId = gqlRequest.GetRequestContext()->GetLanguageId();
+		}
 		QByteArray taskId = m_documentManagerCompPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_SAVE, taskParams);
 		imtdoc::IDocumentService::TaskResult taskResult = m_documentManagerCompPtr->WaitForTaskFinished(taskId);
 		QString saveErrorMessage = taskResult.errorMessage;

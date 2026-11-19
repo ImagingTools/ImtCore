@@ -7,6 +7,7 @@
 
 // ACF includes
 #include <iprm/CParamsSet.h>
+#include <iqt/iqt.h>
 
 // ImtCore includes
 #include <imtauth/CTenantFilterParam.h>
@@ -27,6 +28,8 @@ bool CRoleDocumentValidatorComp::ValidateDocumentData(
 			const imtbase::IOperationContext* operationContextPtr) const
 {
 	const QByteArray objectId = imtdoc::GetObjectIdFromParams(validationParams);
+	const QByteArray languageId = imtdoc::GetLanguageIdFromParams(validationParams);
+	const iqt::ITranslationManager* translationManagerPtr = m_translationManagerCompPtr.GetPtr();
 
 	const imtauth::IRole* roleInfoPtr = dynamic_cast<const imtauth::IRole*>(&document);
 	if (roleInfoPtr == nullptr){
@@ -36,7 +39,7 @@ bool CRoleDocumentValidatorComp::ValidateDocumentData(
 
 	const QByteArray roleId = roleInfoPtr->GetRoleId();
 	if (roleId.isEmpty()){
-		errorMessage = QStringLiteral("Role-ID can't be empty!");
+		errorMessage = Translate(translationManagerPtr, QT_TRANSLATE_NOOP("CRoleDocumentValidatorComp", "Role-ID can't be empty!"), languageId);
 		return false;
 	}
 
@@ -52,15 +55,15 @@ bool CRoleDocumentValidatorComp::ValidateDocumentData(
 		tenantId = operationContextPtr->GetTenantId().trimmed();
 	}
 
-	if (!CheckRoleIdUnique(*m_roleCollectionCompPtr, objectId, roleId, productId, tenantId, errorMessage)){
+	if (!CheckRoleIdUnique(*m_roleCollectionCompPtr, objectId, roleId, productId, tenantId, errorMessage, translationManagerPtr, languageId)){
 		return false;
 	}
 
-	if (!CheckParentRolesInTenant(*m_roleCollectionCompPtr, roleInfoPtr->GetIncludedRoles(), tenantId, errorMessage)){
+	if (!CheckParentRolesInTenant(*m_roleCollectionCompPtr, roleInfoPtr->GetIncludedRoles(), tenantId, errorMessage, translationManagerPtr, languageId)){
 		return false;
 	}
 
-	if (!CheckParentRolesInProduct(*m_roleCollectionCompPtr, roleInfoPtr->GetIncludedRoles(), productId, errorMessage)){
+	if (!CheckParentRolesInProduct(*m_roleCollectionCompPtr, roleInfoPtr->GetIncludedRoles(), productId, errorMessage, translationManagerPtr, languageId)){
 		return false;
 	}
 
@@ -87,7 +90,7 @@ bool CRoleDocumentValidatorComp::ValidateDocumentData(
 			}
 
 			if (!tenantPermissionsSet.contains(normalizedPermissionId)){
-				errorMessage = QStringLiteral("Permission '%1' is not allowed for tenant '%2'")
+				errorMessage = Translate(translationManagerPtr, QT_TRANSLATE_NOOP("CRoleDocumentValidatorComp", "Permission '%1' is not allowed for tenant '%2'"), languageId)
 						.arg(QString::fromUtf8(normalizedPermissionId), QString::fromUtf8(tenantId));
 				return false;
 			}
@@ -104,7 +107,9 @@ bool CRoleDocumentValidatorComp::CheckRoleIdUnique(
 			const QByteArray& roleId,
 			const QByteArray& productId,
 			const QByteArray& tenantId,
-			QString& errorMessage)
+			QString& errorMessage,
+			const iqt::ITranslationManager* translationManagerPtr,
+			const QByteArray& languageId)
 {
 	imtauth::CTenantFilterParam tenantFilter;
 	tenantFilter.SetTenantId(tenantId);
@@ -126,7 +131,7 @@ bool CRoleDocumentValidatorComp::CheckRoleIdUnique(
 	filterParams.SetEditableParameter("ComplexFilter", &complexFilter);
 
 	if (!roleCollection.GetElementIds(0, 1, &filterParams).isEmpty()){
-		errorMessage = QStringLiteral("Role with ID: '%1' already exists").arg(roleId);
+		errorMessage = Translate(translationManagerPtr, QT_TRANSLATE_NOOP("CRoleDocumentValidatorComp", "Role with ID: '%1' already exists"), languageId).arg(QString::fromUtf8(roleId));
 		return false;
 	}
 
@@ -138,7 +143,9 @@ bool CRoleDocumentValidatorComp::CheckParentRolesInTenant(
 			const imtbase::IObjectCollection& roleCollection,
 			const QByteArrayList& parentRoleIds,
 			const QByteArray& tenantId,
-			QString& errorMessage)
+			QString& errorMessage,
+			const iqt::ITranslationManager* translationManagerPtr,
+			const QByteArray& languageId)
 {
 	if (parentRoleIds.isEmpty()){
 		return true;
@@ -163,7 +170,7 @@ bool CRoleDocumentValidatorComp::CheckParentRolesInTenant(
 	const imtbase::ICollectionInfo::Ids tenantRoleIds = roleCollection.GetElementIds(0, -1, &filterParams);
 	for (const QByteArray& parentRoleId : parentRoleIds){
 		if (!tenantRoleIds.contains(parentRoleId)){
-			errorMessage = QStringLiteral("The parent role '%1' belongs to another organization").arg(QString::fromUtf8(parentRoleId));
+			errorMessage = Translate(translationManagerPtr, QT_TRANSLATE_NOOP("CRoleDocumentValidatorComp", "The parent role '%1' belongs to another organization"), languageId).arg(QString::fromUtf8(parentRoleId));
 			return false;
 		}
 	}
@@ -176,18 +183,30 @@ bool CRoleDocumentValidatorComp::CheckParentRolesInProduct(
 			const imtbase::IObjectCollection& roleCollection,
 			const QByteArrayList& parentRoleIds,
 			const QByteArray& productId,
-			QString& errorMessage)
+			QString& errorMessage,
+			const iqt::ITranslationManager* translationManagerPtr,
+			const QByteArray& languageId)
 {
 	for (const QByteArray& parentRoleId : parentRoleIds){
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		const imtauth::IRole* parentRolePtr = roleCollection.GetObjectData(parentRoleId, dataPtr) ? dynamic_cast<const imtauth::IRole*>(dataPtr.GetPtr()) : nullptr;
 		if (parentRolePtr == nullptr || parentRolePtr->GetProductId() != productId){
-			errorMessage = QStringLiteral("The parent role '%1' belongs to another product").arg(QString::fromUtf8(parentRoleId));
+			errorMessage = Translate(translationManagerPtr, QT_TRANSLATE_NOOP("CRoleDocumentValidatorComp", "The parent role '%1' belongs to another product"), languageId).arg(QString::fromUtf8(parentRoleId));
 			return false;
 		}
 	}
 
 	return true;
+}
+
+
+QString CRoleDocumentValidatorComp::Translate(const iqt::ITranslationManager* translationManagerPtr, const char* text, const QByteArray& languageId)
+{
+	if (translationManagerPtr == nullptr){
+		return QString::fromUtf8(text);
+	}
+
+	return QString::fromUtf8(iqt::GetTranslation(translationManagerPtr, text, languageId, "CRoleDocumentValidatorComp"));
 }
 
 

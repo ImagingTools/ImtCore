@@ -670,6 +670,8 @@ bool CRoleCollectionControllerComp::ValidateRoleForTenant(
 {
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 	const QByteArray tenantId = gqlContextPtr != nullptr ? gqlContextPtr->GetTenantId() : QByteArray();
+	const QByteArray languageId = gqlContextPtr != nullptr ? gqlContextPtr->GetLanguageId() : QByteArray();
+	const iqt::ITranslationManager* translationManagerPtr = m_translationManagerCompPtr.GetPtr();
 
 	if (!imtauth::CRoleDocumentValidatorComp::CheckRoleIdUnique(
 				*m_objectCollectionCompPtr,
@@ -677,15 +679,17 @@ bool CRoleCollectionControllerComp::ValidateRoleForTenant(
 				role.GetRoleId(),
 				role.GetProductId(),
 				tenantId,
-				errorMessage)){
+				errorMessage,
+				translationManagerPtr,
+				languageId)){
 		return false;
 	}
 
-	if (!imtauth::CRoleDocumentValidatorComp::CheckParentRolesInTenant(*m_objectCollectionCompPtr, role.GetIncludedRoles(), tenantId, errorMessage)){
+	if (!imtauth::CRoleDocumentValidatorComp::CheckParentRolesInTenant(*m_objectCollectionCompPtr, role.GetIncludedRoles(), tenantId, errorMessage, translationManagerPtr, languageId)){
 		return false;
 	}
 
-	return imtauth::CRoleDocumentValidatorComp::CheckParentRolesInProduct(*m_objectCollectionCompPtr, role.GetIncludedRoles(), role.GetProductId(), errorMessage);
+	return imtauth::CRoleDocumentValidatorComp::CheckParentRolesInProduct(*m_objectCollectionCompPtr, role.GetIncludedRoles(), role.GetProductId(), errorMessage, translationManagerPtr, languageId);
 }
 
 

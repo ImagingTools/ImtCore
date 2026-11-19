@@ -17,6 +17,11 @@
 
 // ACF includes
 #include <istd/CChangeNotifier.h>
+#include <iprm/CIdParam.h>
+#include <iprm/CParamsSet.h>
+
+// ImtCore includes
+#include <imtdoc/imtdoc.h>
 
 
 namespace imtdoc
@@ -116,7 +121,8 @@ bool CDocumentServiceCompBase::ValidateDocumentData(
 			const WorkingDocument& document,
 			OperationStatus& status,
 			QString* errorMessage,
-			const imtbase::IOperationContext* operationContextPtr) const
+			const imtbase::IOperationContext* operationContextPtr,
+			const QByteArray& languageId) const
 {
 	status = OS_OK;
 	if (errorMessage != nullptr){
@@ -138,8 +144,17 @@ bool CDocumentServiceCompBase::ValidateDocumentData(
 
 	const iprm::IParamsSetUniquePtr sourceParamsPtr = CreateDocumentSourceParams(document);
 
+	// The source parameters and the language of the caller; a new document has no source parameters
+	iprm::CParamsSet validationParams;
+	validationParams.SetSlaveSet(sourceParamsPtr.GetPtr());
+	if (!languageId.isEmpty()){
+		iprm::CIdParam* languageIdParamPtr = new iprm::CIdParam;
+		languageIdParamPtr->SetId(languageId);
+		validationParams.SetEditableParameter(s_languageIdParamId, languageIdParamPtr, true);
+	}
+
 	QString validationMessage;
-	if (!documentValidator->ValidateDocumentData(*document.objectPtr, validationMessage, sourceParamsPtr.GetPtr(), operationContextPtr)){
+	if (!documentValidator->ValidateDocumentData(*document.objectPtr, validationMessage, &validationParams, operationContextPtr)){
 		status = OS_INVALID_DOCUMENT_DATA;
 		if (errorMessage != nullptr){
 			*errorMessage = validationMessage.isEmpty() ? GetInvalidDocumentMessage() : validationMessage;
