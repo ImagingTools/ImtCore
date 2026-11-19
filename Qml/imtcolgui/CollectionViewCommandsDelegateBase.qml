@@ -556,8 +556,9 @@ ViewCommandsDelegateBase {
 		}
 	}
 
+	// The question is taken when the dialog opens: it names the selection of that moment
 	function onRemove(params){
-		ModalDialogManager.openDialog(removeDialog, {});
+		ModalDialogManager.openDialog(removeDialog, {"message": collectionViewCommandsDelegate.getRemoveMessage()});
 	}
 
 	function getRemoveQuestion(){
@@ -803,7 +804,7 @@ ViewCommandsDelegateBase {
 			width: Style.sizeHintM;
 			destructive: true;
 			title: collectionViewCommandsDelegate.removeDialogTitle;
-			message: collectionViewCommandsDelegate.getRemoveMessage();
+			message: collectionViewCommandsDelegate.removeMessage;
 			onFinished: {
 				if (buttonId == Enums.yes){
 					let elementIds = collectionViewCommandsDelegate.collectionView.getSelectedIds()

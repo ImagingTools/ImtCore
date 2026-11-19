@@ -162,7 +162,7 @@ Item {
             return;
         }
 
-        ModalDialogManager.openDialog(removeDialog, {});
+        ModalDialogManager.openDialog(removeDialog, {"message": containerBase.getRemoveMessage()});
     }
 
     function getRemoveMessage(){
@@ -282,7 +282,7 @@ Item {
         id: removeDialog;
         MessageDialog {
             destructive: true;
-            message: containerBase.getRemoveMessage();
+            message: containerBase.removeMessage;
             title: containerBase.removeDialogTitle;
             onFinished: {
                 if (buttonId == "Yes"){
