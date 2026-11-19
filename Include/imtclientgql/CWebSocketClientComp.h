@@ -219,6 +219,8 @@ private:
 	State m_state = ST_IDLE;
 	// A connection attempt failed: the retries are not logged until the client connects or the settings change
 	bool m_isRetrying = false;
+	// Identifies the current socket connection in the requests it delivers (publishers key the subscriptions by it)
+	QByteArray m_connectionId;
 	mutable QMap<QString, QByteArray> m_queryDataMap;
 	istd::TPointerVector<imtrest::IRequest> m_startQueries;
 	istd::TPointerVector<imtrest::IRequest> m_cacheQueries;
