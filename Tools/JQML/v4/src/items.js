@@ -36,6 +36,9 @@ export const hooks = {
 	syncModel: null,
 	// (repeater) => void: its delegate component was replaced and the items must exist before the next line.
 	syncRepeater: null,
+	// (area) => void: a MouseArea waits for pressAndHold; () => seconds: the time of the engine.
+	watchHold: null,
+	now: () => 0,
 	// (item) => void: a Binding or Connections item changed and must apply before the next statement.
 	syncBinding: null,
 	syncConnection: null,
@@ -2971,6 +2974,11 @@ export class MouseArea extends Item {
 		this.$mouseY = 0;
 		this.$sceneX = NaN;
 		this.$sceneY = NaN;
+		this.$holdInterval = 800;
+		this.$holdDeadline = 0; // seconds of the engine time at which pressAndHold is sent; 0 when it is not awaited
+		this.$held = false;
+		this.$pressX = 0;
+		this.$pressY = 0;
 		this.$declareSignal('clicked', ['mouse']);
 		this.$declareSignal('pressed', ['mouse']);
 		this.$declareSignal('released', ['mouse']);
@@ -2979,11 +2987,13 @@ export class MouseArea extends Item {
 		this.$declareSignal('entered', []);
 		this.$declareSignal('exited', []);
 		this.$declareSignal('wheel', ['wheel']);
+		this.$declareSignal('pressAndHold', ['mouse']);
+		this.$declareSignal('canceled', []);
 	}
 
 	$mouseEvent() {
 		const button = this.$pressButton === 2 ? 'RightButton' : 'LeftButton';
-		return { x: this.$mouseX, y: this.$mouseY, button, buttons: button, modifiers: 0, accepted: true, wasHeld: false, isClick: true };
+		return { x: this.$mouseX, y: this.$mouseY, button, buttons: button, modifiers: 0, accepted: true, wasHeld: this.$held, isClick: true };
 	}
 
 	get $acceptsMouse() {
@@ -2996,7 +3006,51 @@ export class MouseArea extends Item {
 
 	$mousePressAt(sceneX, sceneY) {
 		this.$trackMouse(sceneX, sceneY, false);
+		this.$held = false;
+		this.$holdDeadline = 0;
 		this.$emit('pressed', [this.$mouseEvent()]);
+		// As in Qt the wait for a hold starts only when something listens to pressAndHold (and then a hold is no click).
+		const hold = this.$sigs === null ? undefined : this.$sigs.get('pressAndHold');
+		if (hold !== undefined && hold.handlers.length > 0 && this.$pressed && hooks.watchHold !== null) {
+			this.$pressX = sceneX;
+			this.$pressY = sceneY;
+			this.$holdDeadline = hooks.now() + this.$holdInterval / 1000;
+			hooks.watchHold(this);
+		}
+	}
+
+	// The engine calls it when the button has been held for pressAndHoldInterval.
+	$fireHold() {
+		if (!this.$pressed || this.$holdDeadline === 0) return;
+		this.$holdDeadline = 0;
+		this.$held = true;
+		this.$emit('pressAndHold', [this.$mouseEvent()]);
+	}
+
+	// True when the press can no longer go on: the area or one of its parents was hidden or disabled while the button is down.
+	$pressLost() {
+		if (!this.$pressed) return false;
+		for (let item = this; item !== null; item = item.$parent) {
+			if (!item.$visible || item.$enabled === false) return true;
+		}
+		return false;
+	}
+
+	// The press is taken away (the area was disabled or hidden, another item took the drag): `canceled`, and no `released` or `clicked` follow.
+	$cancelPress() {
+		if (!this.$pressed) return;
+		this.$pressed = false;
+		this.$held = false;
+		this.$holdDeadline = 0;
+		markReaders(this, 'pressed');
+		markReaders(this, 'containsPress');
+		if (!this.$hoverEnabled && this.$containsMouse) {
+			this.$containsMouse = false;
+			markReaders(this, 'containsMouse');
+			this.$emit('exited', []);
+		}
+		this.$update();
+		this.$emit('canceled', []);
 	}
 
 	$mouseMoveAt(sceneX, sceneY) {
@@ -3013,6 +3067,8 @@ export class MouseArea extends Item {
 		const moved = sceneX !== this.$sceneX || sceneY !== this.$sceneY;
 		this.$sceneX = sceneX;
 		this.$sceneY = sceneY;
+		// A move of more than the drag distance of Qt (10 pixels) ends the wait for a hold.
+		if (this.$holdDeadline !== 0 && Math.hypot(sceneX - this.$pressX, sceneY - this.$pressY) > 10) this.$holdDeadline = 0;
 		if (x !== this.$mouseX || y !== this.$mouseY) {
 			this.$mouseX = x;
 			this.$mouseY = y;
@@ -3046,11 +3102,19 @@ export class MouseArea extends Item {
 				this.$emit(pressed ? 'entered' : 'exited', []);
 			}
 			this.$update();
-			if (!pressed) this.$emit('released', [this.$mouseEvent()]);
+			if (!pressed) {
+				this.$holdDeadline = 0;
+				this.$emit('released', [this.$mouseEvent()]);
+			}
 		}
 	}
 
 	$mouseClicked() {
+		// a press that was held is no click
+		if (this.$held) {
+			this.$held = false;
+			return;
+		}
 		this.$emit('clicked', [this.$mouseEvent()]);
 	}
 
@@ -3072,6 +3136,10 @@ defineReadOnly(MouseArea.prototype, 'containsPress', function () {
 }, undefined, true);
 defineField(MouseArea.prototype, 'hoverEnabled', '$hoverEnabled', toBool);
 defineField(MouseArea.prototype, 'preventStealing', '$preventStealing', toBool);
+defineField(MouseArea.prototype, 'pressAndHoldInterval', '$holdInterval', (value) => {
+	const interval = Number(value);
+	return Number.isFinite(interval) && interval >= 0 ? interval : 800;
+});
 // `Qt.LeftButton | Qt.RightButton` is 0 here (the enumerations are names), which stands for every button.
 defineProp(
 	MouseArea.prototype,

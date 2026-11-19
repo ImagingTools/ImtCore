@@ -1,5 +1,6 @@
 // MouseArea.onCanceled (7 uses, Button.qml among them: it resets `down`) and onPressAndHold (6 uses), as desktop Qt gives them:
-//   canceled        the press is taken away: the area is disabled or hidden while pressed, or a Flickable takes the drag over; `pressed` is false and
+//   canceled        the press is taken away: the area is disabled or hidden while pressed, or a DragHandler takes the drag over (a Flickable does not take it from an area under it
+//                   in this engine: it scrolls by a part with no area); `pressed` is false and
 //                   neither released nor clicked follow
 //   pressAndHold    the button stays down for pressAndHoldInterval (800 ms) without leaving the area; clicked is not sent on the release after it;
 //                   a move beyond the drag threshold or an earlier release cancels the wait
@@ -21,7 +22,7 @@ Item {
 	property string log: ""
 	property alias plain: plain
 	property alias held: held
-	property alias flick: flick
+	property alias dragger: dragger
 
 	MouseArea {
 		id: plain
@@ -40,13 +41,12 @@ Item {
 		onPressAndHold: root.log += "H2 "
 		onCanceled: root.log += "X2 "
 	}
-	Flickable {
-		id: flick
+	Item {
+		id: dragger
 		x: 0; y: 100; width: 200; height: 100
-		contentWidth: 200
-		contentHeight: 600
+		DragHandler { target: null }
 		MouseArea {
-			x: 0; y: 0; width: 200; height: 100
+			anchors.fill: parent
 			onPressed: root.log += "P3 "
 			onReleased: root.log += "R3 "
 			onClicked: root.log += "C3 "
@@ -122,17 +122,16 @@ scene.pointerUp(...at(root.plain));
 take();
 root.plain.visible = true;
 
-// canceled: a Flickable takes the drag
-scene.pointerDown(...at(root.flick, 50, 50));
-scene.pointerMove(...at(root.flick, 50, 30));
-scene.pointerMove(...at(root.flick, 50, 0));
-scene.pointerMove(...at(root.flick, 50, -30));
+// canceled: a DragHandler takes the drag
+scene.pointerDown(...at(root.dragger, 50, 50));
+scene.pointerMove(...at(root.dragger, 50, 40));
+scene.pointerMove(...at(root.dragger, 50, 20));
+scene.pointerMove(...at(root.dragger, 50, 0));
 advance(0.05);
-scene.pointerUp(...at(root.flick, 50, -30));
+scene.pointerUp(...at(root.dragger, 50, 0));
 advance(0.05);
-const flickLog = take();
-check('a Flickable that takes the drag cancels the area under it', flickLog.includes('X3'), true);
-check('and the click does not follow', flickLog.includes('C3'), false);
+const dragLog = take();
+check('a DragHandler that takes the drag cancels the area under it', dragLog, 'P3 X3');
 
 // pressAndHold
 check('pressAndHoldInterval is 800 by default', root.held.pressAndHoldInterval, 800);

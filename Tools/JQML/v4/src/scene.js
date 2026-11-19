@@ -98,6 +98,14 @@ export class Scene {
 	// Runs one frame; returns true if something was painted.
 	drawFrame(seconds) {
 		if (this.frameHandler !== null) this.frameHandler(seconds);
+		// An area that was hidden or disabled while its button is down loses the press.
+		const pressed = this.pressed;
+		if (pressed !== null && typeof pressed.$pressLost === 'function' && pressed.$pressLost()) {
+			this.pressed = null;
+			this.dragging = [];
+			pressed.$cancelPress();
+			this.syncCursor();
+		}
 		const root = this.root;
 		if ((!root.$updateRequested && this.engine.dirty.size === 0) || this.width <= 0 || this.height <= 0) {
 			this.layoutMs = 0;
@@ -165,7 +173,8 @@ export class Scene {
 			const target = this.pressed;
 			if (target !== null && target.$preventStealing !== true) {
 				this.pressed = null;
-				target.$pressChanged(false);
+				if (typeof target.$cancelPress === 'function') target.$cancelPress();
+				else target.$pressChanged(false);
 			}
 		}
 	}

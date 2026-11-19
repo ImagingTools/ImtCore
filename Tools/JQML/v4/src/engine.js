@@ -593,6 +593,7 @@ export class Engine {
 		this.auditMode = false;
 		this.auditMisses = new Map(); // 'Type.property file:line' -> { count, reads }
 		this.timers = new Set();
+		this.holds = new Set(); // the MouseAreas that wait for pressAndHold
 		this.shortcuts = new Set(); // the Shortcut items, in the order they were made
 		this.completed = [];
 		this.documentScope = null;
@@ -868,6 +869,8 @@ export class Engine {
 		hooks.defer = () => false;
 		hooks.syncModel = (model) => this.syncModelNow(model);
 		hooks.syncRepeater = (repeater) => this.syncRepeaterNow(repeater);
+		hooks.watchHold = (area) => this.holds.add(area);
+		hooks.now = () => this.time;
 		hooks.syncBinding = (item) => this.syncBindingItems(item);
 		hooks.syncConnection = (item) => this.syncConnections(item);
 		hooks.completing = () => this.completing > 0;
@@ -937,6 +940,7 @@ export class Engine {
 		this.inPass = false;
 		this.cursor = 0;
 		this.timers.clear();
+		this.holds.clear();
 		this.changeHandlers = [];
 		this.loaders.clear();
 		this.repeaters.clear();
@@ -2391,6 +2395,13 @@ export class Engine {
 			for (const item of [...this.carets]) {
 				if (item.$destroyed === true || !item.$active) this.carets.delete(item);
 				else item.$blink(seconds);
+			}
+		}
+		for (const area of [...this.holds]) {
+			if (area.$destroyed === true || !area.$pressed || area.$holdDeadline === 0) this.holds.delete(area);
+			else if (seconds >= area.$holdDeadline) {
+				this.holds.delete(area);
+				area.$fireHold();
 			}
 		}
 		if (this.timers.size === 0) return;
