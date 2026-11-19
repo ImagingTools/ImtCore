@@ -45,7 +45,8 @@ Item {
     }
 
     property string removeDialogTitle: qsTr("Deleting a selected element");
-    property string removeMessage: qsTr("Remove selected item from the collection ?");
+    // Empty: the question names the selected item
+    property string removeMessage: "";
 
     /**
         Requests IDs for GQL models
@@ -164,6 +165,20 @@ Item {
         ModalDialogManager.openDialog(removeDialog, {});
     }
 
+    function getRemoveMessage(){
+        if (containerBase.removeMessage !== ""){
+            return containerBase.removeMessage;
+        }
+
+        let index = containerBase.treeView.selectedIndex;
+        let name = index >= 0 ? containerBase.treeView.getData("name", index) : undefined;
+        if (name !== undefined && name !== null && String(name) !== ""){
+            return qsTr("Delete \"%1\"?").arg(String(name));
+        }
+
+        return qsTr("Delete the selected item?");
+    }
+
     function onNewDocument(){
         containerBase.collectionStructureBase.selectItem("", "");
     }
@@ -266,7 +281,8 @@ Item {
     Component {
         id: removeDialog;
         MessageDialog {
-            message: containerBase.removeMessage;
+            destructive: true;
+            message: containerBase.getRemoveMessage();
             title: containerBase.removeDialogTitle;
             onFinished: {
                 if (buttonId == "Yes"){
