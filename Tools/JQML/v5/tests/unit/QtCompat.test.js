@@ -384,6 +384,31 @@ function cases(name, runtime){
         }
     })
 
+    // the size of an image is the runtime's own work: a binding evaluated while it updates (it enables the pending
+    // binding of the image's width) gets no dependency on sourceSize, else it re-runs itself: "Binding loop detected"
+    test(name + ': an image updating its size does not make the binding being evaluated depend on sourceSize', () => withImages(() => {
+        let image, other
+        engine.batch(() => {
+            image = new Image(null)
+            image.source = 'icons/size.svg'
+            image.sourceSize.height = 64
+            other = new Item(null)
+        })
+        engine.batch(() => FakeImage.made[0].finish(32, 32))
+        let evaluations = 0
+        engine.batch(() => {
+            other.$bind(Item.WIDTH, () => {
+                evaluations++
+                image.$updateSize()
+                return 5
+            }, null)
+        })
+        assert.equal(evaluations, 1)
+        engine.batch(() => { image.sourceSize.width = 8 })
+        assert.equal(image.implicitWidth, 8)
+        assert.equal(evaluations, 1)
+    }))
+
     test(name + ': a locale name the browser does not know is the C locale, as QLocale', () => {
         let c = Qt.locale('undefined')
         assert.equal(c.name, 'C')

@@ -169,10 +169,12 @@ class Image extends Item {
         if(natural){
             width = natural.width
             height = natural.height
-            let size = this.$v[Image.SOURCESIZE]
-            if(size && (size.width > 0 || size.height > 0) && width > 0 && height > 0){
-                let sx = size.width > 0 ? size.width / width : Infinity
-                let sy = size.height > 0 ? size.height / height : Infinity
+            // the values themselves: a binding being evaluated when the size updates does not depend on them
+            let group = this.$v[Image.SOURCESIZE]
+            let sw = group ? group.$v[SourceSize.WIDTH] : -1, sh = group ? group.$v[SourceSize.HEIGHT] : -1
+            if((sw > 0 || sh > 0) && width > 0 && height > 0){
+                let sx = sw > 0 ? sw / width : Infinity
+                let sy = sh > 0 ? sh / height : Infinity
                 let scale = Math.min(sx, sy, 1)
                 width = Math.round(width * scale)
                 height = Math.round(height * scale)
