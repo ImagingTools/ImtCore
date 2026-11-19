@@ -3875,6 +3875,14 @@
         <source>Set description</source>
         <translation>Установить описание</translation>
     </message>
+    <message>
+        <source>Delete the selected item?</source>
+        <translation>Удалить выбранный элемент?</translation>
+    </message>
+    <message>
+        <source>Delete &quot;%1&quot;?</source>
+        <translation>Удалить «%1»?</translation>
+    </message>
 </context>
 <context>
     <name>CollectionStructureCommandsObserver</name>
@@ -3988,12 +3996,12 @@
     </message>
     <message>
         <location line="+65"/>
-        <source>Delete all items with the current filter ?</source>
+        <source>Delete all items with the current filter?</source>
         <translation>Удалить все элементы с текущим фильтром?</translation>
     </message>
     <message>
         <location line="+3"/>
-        <source>Delete all data from this collection ?</source>
+        <source>Delete all data from this collection?</source>
         <translation>Удалить все данные из этой коллекции?</translation>
     </message>
     <message>
@@ -4075,6 +4083,18 @@
         <location line="+8"/>
         <source>Set Description</source>
         <translation>Установить описание</translation>
+    </message>
+    <message>
+        <source>Delete the selected item?</source>
+        <translation>Удалить выбранный элемент?</translation>
+    </message>
+    <message>
+        <source>Delete the selected items (%1)?</source>
+        <translation>Удалить выбранные элементы (%1)?</translation>
+    </message>
+    <message>
+        <source>Delete &quot;%1&quot;?</source>
+        <translation>Удалить «%1»?</translation>
     </message>
 </context>
 <context>
@@ -4893,7 +4913,7 @@
     </message>
     <message>
         <location line="+1"/>
-        <source>Delete the selected revision ?</source>
+        <source>Delete the selected revision?</source>
         <translation>Удалить выбранную ревизию?</translation>
     </message>
     <message>
@@ -10083,6 +10103,14 @@ Errors: 0</source>
         <location line="+345"/>
         <source>Permissions</source>
         <translation>Права</translation>
+    </message>
+    <message>
+        <source>Please enter the role name, the Role-ID is made from it</source>
+        <translation>Введите название роли, из него создаётся Role-ID</translation>
+    </message>
+    <message>
+        <source>Correct the highlighted fields before saving</source>
+        <translation>Исправьте выделенные поля перед сохранением</translation>
     </message>
 </context>
 <context>
@@ -16506,6 +16534,36 @@ All relationships with this organization will also be removed.</source>
         <location filename="../../../Include/imtservergql/CStructureControllerCompBase.cpp" line="+300"/>
         <source>Internal error</source>
         <translation>Внутренняя ошибка</translation>
+    </message>
+</context>
+<context>
+    <name>ConnectedProductCollectionView</name>
+    <message>
+        <source>All tokens of its servers are revoked. Its roles stay.</source>
+        <translation>Все токены его серверов будут отозваны. Его роли сохранятся.</translation>
+    </message>
+</context>
+<context>
+    <name>CRoleDocumentValidatorComp</name>
+    <message>
+        <source>Role-ID can&apos;t be empty!</source>
+        <translation>Role-ID не может быть пустым!</translation>
+    </message>
+    <message>
+        <source>Role with ID: &apos;%1&apos; already exists</source>
+        <translation>Роль с ID &apos;%1&apos; уже существует</translation>
+    </message>
+    <message>
+        <source>Permission &apos;%1&apos; is not allowed for tenant &apos;%2&apos;</source>
+        <translation>Разрешение &apos;%1&apos; недоступно для организации &apos;%2&apos;</translation>
+    </message>
+    <message>
+        <source>The parent role &apos;%1&apos; belongs to another organization</source>
+        <translation>Родительская роль &apos;%1&apos; принадлежит другой организации</translation>
+    </message>
+    <message>
+        <source>The parent role &apos;%1&apos; belongs to another product</source>
+        <translation>Родительская роль &apos;%1&apos; принадлежит другому продукту</translation>
     </message>
 </context>
 </TS>

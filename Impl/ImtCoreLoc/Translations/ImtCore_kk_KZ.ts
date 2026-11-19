@@ -5636,6 +5636,14 @@
         <source>Set description</source>
         <translation>Сипаттаманы орнату</translation>
     </message>
+    <message>
+        <source>Delete the selected item?</source>
+        <translation>Таңдалған элементті жоясыз ба?</translation>
+    </message>
+    <message>
+        <source>Delete &quot;%1&quot;?</source>
+        <translation>«%1» жоясыз ба?</translation>
+    </message>
 </context>
 <context>
     <name>CollectionStructureCommandsObserver</name>
@@ -5697,12 +5705,12 @@
     </message>
     <message>
         <location line="+65"/>
-        <source>Delete all items with the current filter ?</source>
+        <source>Delete all items with the current filter?</source>
         <translation>Ағымдағы сүзгімен барлық элементтерді жоясыз ба?</translation>
     </message>
     <message>
         <location line="+3"/>
-        <source>Delete all data from this collection ?</source>
+        <source>Delete all data from this collection?</source>
         <translation>Осы жинақтан барлық деректерді жоясыз ба?</translation>
     </message>
     <message>
@@ -5784,6 +5792,18 @@
         <location line="+8"/>
         <source>Set Description</source>
         <translation>Сипаттаманы орнату</translation>
+    </message>
+    <message>
+        <source>Delete the selected item?</source>
+        <translation>Таңдалған элементті жоясыз ба?</translation>
+    </message>
+    <message>
+        <source>Delete the selected items (%1)?</source>
+        <translation>Таңдалған элементтерді (%1) жоясыз ба?</translation>
+    </message>
+    <message>
+        <source>Delete &quot;%1&quot;?</source>
+        <translation>«%1» жоясыз ба?</translation>
     </message>
 </context>
 <context>
@@ -6306,7 +6326,7 @@
     </message>
     <message>
         <location line="+1"/>
-        <source>Delete the selected revision ?</source>
+        <source>Delete the selected revision?</source>
         <translation>Таңдалған нұсқаны жоясыз ба?</translation>
     </message>
     <message>
@@ -8810,6 +8830,14 @@ Errors: 0</source>
         <location line="+47"/>
         <source>Permissions</source>
         <translation>Рұқсаттар</translation>
+    </message>
+    <message>
+        <source>Please enter the role name, the Role-ID is made from it</source>
+        <translation>Рөл атауын енгізіңіз, Role-ID одан жасалады</translation>
+    </message>
+    <message>
+        <source>Correct the highlighted fields before saving</source>
+        <translation>Сақтау алдында белгіленген өрістерді түзетіңіз</translation>
     </message>
 </context>
 <context>
@@ -12927,6 +12955,36 @@ Input-ID: </source>
         <location filename="../../../Include/imtservergql/CStructureControllerCompBase.cpp" line="+300"/>
         <source>Internal error</source>
         <translation>Ішкі қате</translation>
+    </message>
+</context>
+<context>
+    <name>ConnectedProductCollectionView</name>
+    <message>
+        <source>All tokens of its servers are revoked. Its roles stay.</source>
+        <translation>Оның серверлерінің барлық токендері кері қайтарылады. Оның рөлдері сақталады.</translation>
+    </message>
+</context>
+<context>
+    <name>CRoleDocumentValidatorComp</name>
+    <message>
+        <source>Role-ID can&apos;t be empty!</source>
+        <translation>Role-ID бос болмауы керек!</translation>
+    </message>
+    <message>
+        <source>Role with ID: &apos;%1&apos; already exists</source>
+        <translation>&apos;%1&apos; ID-і бар рөл бұрыннан бар</translation>
+    </message>
+    <message>
+        <source>Permission &apos;%1&apos; is not allowed for tenant &apos;%2&apos;</source>
+        <translation>&apos;%1&apos; рұқсаты &apos;%2&apos; ұйымы үшін қолжетімсіз</translation>
+    </message>
+    <message>
+        <source>The parent role &apos;%1&apos; belongs to another organization</source>
+        <translation>&apos;%1&apos; ата-аналық рөлі басқа ұйымға тиесілі</translation>
+    </message>
+    <message>
+        <source>The parent role &apos;%1&apos; belongs to another product</source>
+        <translation>&apos;%1&apos; ата-аналық рөлі басқа өнімге тиесілі</translation>
     </message>
 </context>
 </TS>
