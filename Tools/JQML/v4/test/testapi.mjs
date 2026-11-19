@@ -48,6 +48,7 @@ Item {
 		y: 160; width: 50; height: 30
 		enabled: false
 	}
+	Item { objectName: "ПользовательElementView"; x: 380; y: 280; width: 10; height: 10 }
 	Item {
 		objectName: "hidden"
 		visible: false
@@ -131,6 +132,22 @@ const names = (list) => list.map((h) => h.objectName);
 check('a name', parseSelector('ok').length, 1);
 check('descendants and children', parseSelector('a > b c').map((s) => s.combinator), ['descendant', 'child', 'descendant']);
 check('a leading >', parseSelector('> ok')[0].combinator, 'child');
+// A state after a bare name is a state, not a part of the name; the names of a translated client are names too.
+const compoundOf = (text) => {
+	const { name, visible, enabled, nameRe } = parseSelector(text)[0].compound;
+	return { name, visible, enabled, glob: nameRe !== null };
+};
+check('a name and :visible', compoundOf('Name:visible'), { name: 'Name', visible: true, enabled: null, glob: false });
+check('a glob and :visible', compoundOf('Page_*:visible'), { name: null, visible: true, enabled: null, glob: true });
+check('a name and :disabled', compoundOf('save:disabled'), { name: 'save', visible: null, enabled: false, glob: false });
+check('two states', compoundOf('x:visible:enabled'), { name: 'x', visible: true, enabled: true, glob: false });
+check('#name and a state', compoundOf('#ok:visible'), { name: 'ok', visible: true, enabled: null, glob: false });
+check('a state after a quoted name', compoundOf('"Name":visible'), { name: 'Name', visible: true, enabled: null, glob: false });
+check('a colon that is not a state stays in the name', compoundOf('ns:name'), { name: 'ns:name', visible: null, enabled: null, glob: false });
+check('a word that starts like a state stays in the name', compoundOf('a:visibleX'), { name: 'a:visibleX', visible: null, enabled: null, glob: false });
+check('a name of another alphabet', compoundOf('ПользовательElementView').name, 'ПользовательElementView');
+check('#name of another alphabet', compoundOf('#ПриборучетаButton').name, 'ПриборучетаButton');
+check('every item with :visible', parseSelector('*:visible')[0].compound.any, true);
 for (const bad of ['', '>', 'a >', '[x', '@', 'a >> b', ':nothing']) {
 	let message = '';
 	try {
@@ -164,6 +181,13 @@ check('a number', api.find(null, '@Rectangle[width>=200]').length, 4);
 check('visible', names(api.find(null, 'hidden:visible')), []);
 check('not visible is found without :visible', names(api.find(null, 'hidden')), ['hidden']);
 check('disabled', names(api.find(null, '@MouseArea:disabled')), ['disabledArea']);
+check('a name and :visible finds what is visible', names(api.find(null, 'title:visible')), ['title', 'title', 'title']);
+check('a name and :disabled', names(api.find(null, 'disabledArea:disabled')), ['disabledArea']);
+check('a name and :enabled does not find a disabled one', names(api.find(null, 'disabledArea:enabled')), []);
+check('a glob and :visible', names(api.find(null, 'hid*:visible')), []);
+check('a glob without a state finds it', names(api.find(null, 'hid*')), ['hidden']);
+check('a name of another alphabet', names(api.find(null, 'ПользовательElementView')), ['ПользовательElementView']);
+check('and with # and a state', names(api.find(null, '#ПользовательElementView:visible')), ['ПользовательElementView']);
 check('a quoted name', api.find(null, '"title"').length, 3);
 check('count', api.count(null, 'ok'), 2);
 check('limit', api.find(null, 'ok', { limit: 1 }).length, 1);

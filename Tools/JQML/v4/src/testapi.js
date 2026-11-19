@@ -1,7 +1,7 @@
 // The API a test uses to find and drive the items of a running application (Playwright, Puppeteer, the devtools, or a Node test).
 //
-// A canvas has no DOM tree to look into, so the page publishes `window.qmlTest` (runtime.js, for a build made with `--test-api` or
-// `--debug`). Everything it takes and gives is plain JSON, so one `page.evaluate` is one call. Items are named by handles
+// A canvas has no DOM tree to look into, so the page publishes `window.qmlTest` (runtime.js, in every build, release ones too: it
+// needs no flag). Everything it takes and gives is plain JSON, so one `page.evaluate` is one call. Items are named by handles
 // (`{ id: 'e12', ... }`): a handle stays the same while its item lives, and a call with the handle of a destroyed item fails with a
 // message that starts with `STALE:` (the Playwright client looks the element up again).
 //
@@ -59,7 +59,10 @@ function parseAttribute(selector, inner, at) {
 function parseCompound(selector, text, start) {
 	const compound = { name: null, nameRe: null, type: null, attrs: [], visible: null, enabled: null, any: false };
 	let i = 0;
-	const identity = /[A-Za-z0-9_\-.:$*?]/;
+	// The characters of a name: letters of any alphabet (the names of a translated client: `ПользовательElementView`), digits and _ - . : $ * ?
+	const identity = /[\p{L}\p{N}_\-.:$*?]/u;
+	// A `:visible`, `:enabled` or `:disabled` at `at` that is not the start of a longer word ends a name: `Name:visible` is the name `Name` and a state.
+	const stateAt = (at) => /^:(visible|enabled|disabled)(?![\p{L}\p{N}_\-.$*?])/u.test(text.slice(at, at + 10));
 	while (i < text.length) {
 		const c = text[i];
 		if (c === '"' || c === "'") {
@@ -69,7 +72,7 @@ function parseCompound(selector, text, start) {
 			i = end + 1;
 		} else if (c === '#') {
 			let j = i + 1;
-			while (j < text.length && identity.test(text[j])) j++;
+			while (j < text.length && identity.test(text[j]) && !stateAt(j)) j++;
 			if (j === i + 1) fail(selector, start + i, 'a name is expected after #');
 			compound.name = text.slice(i + 1, j);
 			i = j;
@@ -90,12 +93,12 @@ function parseCompound(selector, text, start) {
 			if (match[1] === 'visible') compound.visible = true;
 			else compound.enabled = match[1] === 'enabled';
 			i += match[0].length;
-		} else if (c === '*' && !identity.test(text[i + 1] || ' ')) {
+		} else if (c === '*' && (!identity.test(text[i + 1] || ' ') || stateAt(i + 1))) {
 			compound.any = true;
 			i++;
 		} else if (identity.test(c)) {
 			let j = i;
-			while (j < text.length && identity.test(text[j])) j++;
+			while (j < text.length && identity.test(text[j]) && !stateAt(j)) j++;
 			compound.name = text.slice(i, j);
 			i = j;
 		} else {
