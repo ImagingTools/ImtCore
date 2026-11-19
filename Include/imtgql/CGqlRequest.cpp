@@ -290,7 +290,8 @@ bool CGqlRequest::ParseQuery(const QByteArray& query, qsizetype& errorPosition)
 	}
 
 	const QByteArray header = body.left(index);
-	const QList<QByteArray> headersData = header.split(' ');
+	// GraphQL ignores whitespace and line breaks around the operation type
+	const QList<QByteArray> headersData = header.simplified().split(' ');
 
 	QByteArray type;
 	for (const QByteArray& headerItem : headersData){

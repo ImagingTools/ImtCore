@@ -709,6 +709,24 @@ void CGqlRequestTest::ParseQueryWithOperationName()
 }
 
 
+void CGqlRequestTest::ParseQueryWithLeadingWhitespace()
+{
+	const QList<QByteArray> prefixes = {"\\n", " ", "\\t", "\\r\\n  \\t"};
+	for (const QByteArray& prefix : prefixes){
+		const QByteArray query =
+					"{\"query\": \"" + prefix + "mutation Authorization($input: AuthorizationInput!) { Authorization(input: $input) { token } }\\n\","
+					"\"variables\": {\"input\": {\"login\": \"su\"}}}";
+
+		qsizetype errorPosition = -1;
+		imtgql::CGqlRequest request;
+		QVERIFY2(request.ParseQuery(query, errorPosition), prefix.constData());
+		QVERIFY(errorPosition < 0);
+		QCOMPARE(request.GetRequestType(), imtgql::IGqlRequest::RT_MUTATION);
+		QCOMPARE(request.GetCommandId(), QByteArray("Authorization"));
+	}
+}
+
+
 void CGqlRequestTest::ParseStartPatchMeasurement()
 {
 	const char* payload = R"(
