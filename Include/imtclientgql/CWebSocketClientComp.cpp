@@ -7,6 +7,7 @@
 #include <QtCore/QUrl>
 #include <QtCore/QFile>
 #include <QtCore/QThread>
+#include <QtCore/QUuid>
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 4, 0)
 #include <QtWebSockets/QWebSocketHandshakeOptions>
@@ -36,6 +37,7 @@ namespace imtclientgql
 CWebSocketClientComp::CWebSocketClientComp()
 {
 	m_lastSocketError = QAbstractSocket::SocketError::UnknownSocketError;
+	m_connectionId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 }
 
 
@@ -322,6 +324,7 @@ void CWebSocketClientComp::OnWebSocketConnected()
 	SetState(ST_CONNECTED);
 	m_isRetrying = false;
 	RestartSilenceTimer();
+	m_connectionId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
 	SendInfoMessage(0, "WebSocket connected", "CWebSocketClientComp");
 
@@ -424,6 +427,7 @@ void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message
 
 	istd::TDelPtr<imtrest::CWebSocketRequest> webSocketRequest(new imtrest::CWebSocketRequest(*m_protocolEngineCompPtr.GetPtr()));
 	webSocketRequest->SetBody(message.toUtf8());
+	webSocketRequest->SetConnectionId(m_connectionId);
 
 	imtrest::ConstResponsePtr responsePtr;
 	imtrest::CWebSocketRequest::MethodType methodType = webSocketRequest->GetMethodType();
@@ -484,6 +488,7 @@ void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message
 				}
 				newHttpRequestPtr->SetHeader("id", webSocketRequest->GetRequestId());
 				newHttpRequestPtr->SetBody(body);
+				newHttpRequestPtr->SetConnectionId(m_connectionId);
 				newHttpRequestPtr->SetMethodType(imtrest::CHttpRequest::MT_POST);
 				newHttpRequestPtr->SetCommandId("/" + *m_productId + "/graphql");
 
