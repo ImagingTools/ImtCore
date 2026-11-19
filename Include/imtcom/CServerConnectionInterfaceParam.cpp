@@ -120,6 +120,11 @@ bool CServerConnectionInterfaceParam::GetUrl(ProtocolType protocol, QUrl& url) c
 {
 	int port = GetPort(protocol);
 
+	// Without its own port WebSocket is served on the HTTP port
+	if ((protocol == PT_WEBSOCKET) && (port < 0)){
+		port = GetPort(PT_HTTP);
+	}
+
 	QString scheme;
 	switch (protocol){
 	case PT_HTTP:

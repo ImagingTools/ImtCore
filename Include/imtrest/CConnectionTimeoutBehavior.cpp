@@ -4,6 +4,7 @@
 
 // ImtCore includes
 #include <imtrest/CHttpDateTools.h>
+#include <imtrest/CHttpRequest.h>
 #include <imtrest/CHttpStreamingResponseSender.h>
 #include <imtrest/ProtocolTypeIds.h>
 
@@ -61,6 +62,11 @@ CConnectionTimeoutBehavior CConnectionTimeoutBehavior::CreateForProtocol(const Q
 		};
 		retVal.createStreamingResponseSender = [](QAbstractSocket& socket, CSocketTimeoutWatcher& watcher, qint64 writeHighWatermark){
 			return IStreamingResponseSenderPtr(new CHttpStreamingResponseSender(socket, watcher, writeHighWatermark));
+		};
+		retVal.isWebSocketUpgradeRequest = [](const IRequest& request){
+			const CHttpRequest* httpRequestPtr = dynamic_cast<const CHttpRequest*>(&request);
+
+			return (httpRequestPtr != nullptr) && httpRequestPtr->IsWebSocketUpgradeRequested();
 		};
 		retVal.isLimitedBeforeFirstMessageOnly = false;
 	}

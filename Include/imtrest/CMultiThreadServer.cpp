@@ -53,6 +53,12 @@ imtrest::IProtocolEngine* CMultiThreadServer::GetProtocolEngine()
 }
 
 
+imtrest::IWebSocketUpgradeHandler* CMultiThreadServer::GetWebSocketUpgradeHandler()
+{
+	return m_rootServer.GetWebSocketUpgradeHandler();
+}
+
+
 CConnectionTimeoutConfig CMultiThreadServer::GetConnectionTimeoutConfig() const
 {
 	return m_rootServer.GetConnectionTimeoutConfig();

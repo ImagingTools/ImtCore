@@ -21,6 +21,7 @@ namespace imtrest
 
 
 class CSocketTimeoutWatcher;
+class IRequest;
 
 
 /**
@@ -66,6 +67,12 @@ struct CConnectionTimeoutBehavior
 		\param	writeHighWatermark	Limit of the unsent data of the socket in bytes, a non-positive value means the default limit.
 	*/
 	std::function<IStreamingResponseSenderPtr(QAbstractSocket& socket, CSocketTimeoutWatcher& watcher, qint64 writeHighWatermark)> createStreamingResponseSender;
+
+	/**
+		Returns \c true if the request, whose head is received, asks to switch the connection to WebSocket. Such a connection
+		can be passed to a WebSocket server (see IWebSocketUpgradeHandler). If the function is not set, the protocol has no such requests.
+	*/
+	std::function<bool(const IRequest& request)> isWebSocketUpgradeRequest;
 
 	/**
 		If \c true, the connection is a persistent channel without a cycle of a request and a response: it is limited

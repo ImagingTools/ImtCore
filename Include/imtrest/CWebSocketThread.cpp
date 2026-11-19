@@ -3,6 +3,7 @@
 
 
 // Qt includes
+#include <QtCore/QCoreApplication>
 #include <QtCore/QMutableListIterator>
 #include <QtCore/QRegularExpression>
 #include <QtCore/QUuid>
@@ -63,6 +64,13 @@ CWebSocketThread::CWebSocketThread(CWebSocketServerComp* parent)
 
 void CWebSocketThread::SetWebSocket(QWebSocket* webSocketPtr)
 {
+	// A finished thread is reused for the next connection, and Qt keeps the events still posted to it for
+	// its next run. Messages of the previous socket processed then would be answered through the new one:
+	// the new client got the previous client's subscription data and its own answers went one connection late.
+	QCoreApplication::removePostedEvents(&m_receiver);
+	m_pendingMessages.clear();
+	m_isProcessingMessage = false;
+
 	m_socket = webSocketPtr;
 
 	start();
@@ -278,6 +286,9 @@ void CWebSocketThread::OnSocketDisconnected()
 	// unregistering subscriptions before the QWebSocket is destroyed.
 	qDeleteAll(m_requestList);
 	m_requestList.clear();
+
+	// Whatever the closed socket still had queued has nobody left to answer.
+	m_pendingMessages.clear();
 
 	m_socket = nullptr;
 	exit();

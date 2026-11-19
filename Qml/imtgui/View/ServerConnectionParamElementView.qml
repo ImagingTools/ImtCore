@@ -64,6 +64,7 @@ GroupElementView {
 
 	IntegerInputElementView {
 		id: wsPortInput_
+		visible: root.wsPort >= 0
 		controlWidth: root.controlWidth
 		name: qsTr("Web Socket Port")
 		description: qsTr("Port used for WebSocket connections and subscriptions")

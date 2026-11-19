@@ -591,7 +591,7 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 			add_dependencies(StructureTest imtbase imtaccount imtauth imtdb imttest)
 
 			add_subdirectory("${INCLUDE_DIR}/imtrest/Test/CMake" "${AUX_INCLUDE_DIR}/imtrest/Test")
-			add_dependencies(imtrestTest imtrest)
+			add_dependencies(imtrestTest imtrest imtcom)
 			imt_chain_windeploy_target(imtrestTest)
 
 			# The composition of the test is compiled by ARXC from Include/imtdb/Test/Partitura/DatabaseEnginesTest.acc,

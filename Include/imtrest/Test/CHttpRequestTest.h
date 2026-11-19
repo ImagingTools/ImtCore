@@ -53,6 +53,8 @@ private slots:
 	void ConnectionPersistenceSplitTest();
 	void ResponseBodyOmittedTest_data();
 	void ResponseBodyOmittedTest();
+	void WebSocketUpgradeRequestedTest_data();
+	void WebSocketUpgradeRequestedTest();
 	void TcpRequestIsPersistentTest();
 	void ChunkedResponseAllowedTest_data();
 	void ChunkedResponseAllowedTest();

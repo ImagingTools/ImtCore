@@ -64,6 +64,9 @@
                     <AttributeInfo Id="ThreadsLimit" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="1"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="WebSocketUpgradeHandler" Type="Reference" ExportId="WebSocketUpgradeHandler">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
@@ -125,6 +128,9 @@
                                 <Value>ExternGraphQlPublisher</Value>
                             </Values>
                         </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ListenWebSocketPort" Type="Boolean" ExportId="ListenWebSocketPort">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>

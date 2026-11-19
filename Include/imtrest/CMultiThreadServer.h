@@ -43,6 +43,7 @@ public:
 
 	imtrest::IRequestServlet* GetRequestServlet();
 	imtrest::IProtocolEngine* GetProtocolEngine();
+	imtrest::IWebSocketUpgradeHandler* GetWebSocketUpgradeHandler();
 
 	[[nodiscard]] CConnectionTimeoutConfig GetConnectionTimeoutConfig() const;
 
