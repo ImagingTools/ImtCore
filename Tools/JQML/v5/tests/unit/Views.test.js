@@ -400,6 +400,58 @@ function cases(name, runtime){
 
     // ---- GridView ----
 
+    // QQuickListViewPrivate: the visible items keep their positions, the rows not built are estimated from them with the
+    // average size (positionAt, originPosition, lastPosition). A view of rows of different heights jumped far down
+    // settles at once, and a later layout with another average does not move the rows in the view (the estimate moves
+    // the origin instead). Before, every row was positioned from the first one with the average: each fill built other
+    // rows, a new average, and the polish never ended
+    test(name + ': a ListView of rows of different heights jumped far down settles, its rows stay when the average changes', () => {
+        let root, view
+        let heights = Array.from({ length: 3000 }, (_, i) => 10 + (i * 37) % 41)
+        engine.batch(() => {
+            root = new Item(null)
+            view = new ListView(root)
+            view.width = 300
+            view.height = 400
+            view.spacing = 2
+            view.delegate = component((parent, ctx) => {
+                let item = new Item(parent)
+                item.width = 300
+                item.height = heights[ctx.index]
+                return item
+            })
+            view.model = heights.length
+        })
+        let warnings = []
+        let warn = console.warn
+        console.warn = (message) => warnings.push(String(message))
+        try {
+            engine.batch(() => { view.contentY = 52000 })
+            engine.flushFrame()
+            engine.flushFrame()
+        } finally {
+            console.warn = warn
+        }
+        assert.deepEqual(warnings, [])
+        let top = view.indexAt(10, 52001)
+        assert.ok(top > 0)
+        let item = view.itemAtIndex(top)
+        let y = item.y
+        // another row of the view grows: the average changes, the rows in the view stay, the origin moves
+        let origin = view.originY
+        heights[top + 2] += 300
+        engine.batch(() => { view.itemAtIndex(top + 2).height = heights[top + 2] })
+        engine.flushFrame()
+        assert.equal(view.itemAtIndex(top), item)
+        assert.equal(item.y, y)
+        assert.equal(view.itemAtIndex(top + 3).y, view.itemAtIndex(top + 2).y + heights[top + 2] + 2)
+        assert.notEqual(view.originY, origin)
+        // scrolled back to the origin the first row is built where the estimate puts it
+        engine.batch(() => { view.contentY = view.originY })
+        engine.flushFrame()
+        assert.equal(view.indexAt(10, view.originY + 1), 0)
+    })
+
     test(name + ': GridView arrows move the current index by a cell and by a row', () => {
         let root = window()
         let view

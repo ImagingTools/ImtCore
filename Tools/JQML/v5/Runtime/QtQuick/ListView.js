@@ -4,7 +4,7 @@ const { Item } = require('./Item')
 const { ListModel } = require('../QtQml/Models/ListModel')
 const { ModelContext, modelRows, sameModel } = require('../QtQml/Models/ModelContext')
 const { GroupObject } = require('../Core/QtObject')
-const { installFlick, flickDirection, flickState, wheelScroll, FLICK_PROPS, FLICK_SIGNALS, FLICK_ENUMS } = require('./Flickable')
+const { installFlick, flickDirection, flickState, wheelScroll, fixup, FLICK_PROPS, FLICK_SIGNALS, FLICK_ENUMS } = require('./Flickable')
 const { SmoothedAnimation } = require('./SmoothedAnimation')
 const QtEnums = require('../Qt/enums')
 
@@ -70,9 +70,17 @@ class ListView extends Item {
     constructor(parent = null){
         super(parent)
         this.$content = new Item(this)
-        this.$content.$childGeometryChanged = () => engine.queuePolish(this)
+        // QQuickListViewPrivate::itemGeometryChanged: a delegate (or its section label) changing its size along the
+        // flow lays the view out again; not one made, released or moved by the view
+        this.$content.$childGeometryChanged = (child) => {
+            let entry = child.$lvEntry
+            if(entry && entry.size !== undefined && this.$entries.get(entry.index) === entry && this.$entrySize(entry) !== entry.size) this.$forceLayoutPolish()
+        }
         this.$entries = new Map()     // index -> { item, ctx, section }
-        this.$sizes = []              // the size along the flow of an index: its section label and its item
+        this.$visible = []            // QQuickItemViewPrivate::visibleItems: the entries built in a row, each at its position
+        this.$visibleIndex = 0        // the index of the first of them (visibleIndex)
+        this.$visiblePos = 0          // its position (visiblePos)
+        this.$currentEntry = null     // the entry of the current item
         this.$model = null
         this.$filling = false
         this.$pool = []               // released { item, ctx } kept for reuseItems
@@ -80,7 +88,6 @@ class ListView extends Item {
         this.$footer = null
         this.$highlight = null
         this.$highlightAnimations = null
-        this.$itemsSize = 0
         // QQuickListViewPrivate::averageSize: 100 until items are laid out, then the rounded mean of the built ones
         this.$average = 100
         this.$flickDirectionSet = false
@@ -120,8 +127,63 @@ class ListView extends Item {
         item.$place(this.$vertical() ? Item.Y : Item.X, this.$reversed() ? -pos - size : pos)
     }
 
-    // the flow end of the last item (QQuickListViewPrivate::lastPosition)
-    $lastPosition(){ return this.$itemsSize }
+    // ---- positions along the flow (QQuickListViewPrivate, FxListItemSG) ----
+    // The view keeps the entries it built in a row ($visible, visibleItems), each at its own position; the rows not
+    // built are estimated from them with the average size. An entry's position is where its section label, then its
+    // item, start; its size is the two together
+
+    $entrySize(entry){ return (entry.section ? this.$sizeOf(entry.section) : 0) + this.$sizeOf(entry.item) }
+    $entryEnd(entry){ return entry.pos + this.$entrySize(entry) }
+
+    // FxListItemSG::setPosition: the section label at pos, the item after it
+    $setEntryPos(entry, pos){
+        entry.pos = pos
+        entry.item.$lvEntry = entry
+        if(entry.section) entry.section.$lvEntry = entry
+        if(entry.section){
+            this.$placeFlow(entry.section, pos)
+            pos += this.$sizeOf(entry.section)
+        }
+        this.$placeFlow(entry.item, pos)
+    }
+
+    // QQuickItemViewPrivate::visibleItem
+    $visibleEntry(index){
+        let i = index - this.$visibleIndex
+        let entry = i >= 0 && i < this.$visible.length ? this.$visible[i] : null
+        return entry && entry.index === index ? entry : null
+    }
+
+    // the current item when it is not one of the visible entries (QQuickItemViewPrivate::currentItem)
+    $currentOutside(){
+        let index = this.$v[ListView.CURRENTINDEX]
+        let entry = index >= 0 ? this.$entries.get(index) : null
+        return entry && !this.$visibleEntry(index) ? entry : null
+    }
+
+    // QQuickListViewPrivate::originPosition: where the first row would start
+    $originPosition(){
+        let visible = this.$visible
+        if(!visible.length) return 0
+        let pos = visible[0].pos
+        if(this.$visibleIndex > 0) pos -= this.$visibleIndex * (this.$average + this.$v[ListView.SPACING])
+        return pos
+    }
+
+    // QQuickListViewPrivate::lastPosition: where the last row would end
+    $lastPosition(){
+        let visible = this.$visible
+        let count = this.$v[ListView.COUNT]
+        let spacing = this.$v[ListView.SPACING]
+        if(visible.length){
+            let last = visible[visible.length - 1]
+            let invisible = count - (last.index + 1)
+            let pos = this.$entryEnd(last)
+            if(invisible > 0) pos += invisible * (this.$average + spacing)
+            return pos
+        }
+        return count ? count * this.$average + (count - 1) * spacing : 0
+    }
 
     // ---- the Flickable side: bounds of contentX / contentY (QQuickItemViewPrivate::minExtentForAxis, maxExtentForAxis) ----
 
@@ -137,10 +199,12 @@ class ListView extends Item {
         if(this.$reversed()){
             // the flow runs against the axis: the end of the last item is at the far end
             let highlightStart = viewSize - range.end, highlightEnd = viewSize - range.start
-            maxExtent = viewSize
+            // endPosition() of a reversed flow is -originPosition()
+            let origin = this.$originPosition()
+            maxExtent = origin + viewSize
             if(count && range.strict){
-                maxExtent = -(0 - highlightStart)
-                if(highlightEnd !== highlightStart) maxExtent = Math.max(maxExtent, -(0 - highlightEnd))
+                maxExtent = origin + highlightStart
+                if(highlightEnd !== highlightStart) maxExtent = Math.max(maxExtent, origin + highlightEnd)
             }
             maxExtent -= header
             minExtent = last + (count ? 0 : header)
@@ -151,9 +215,12 @@ class ListView extends Item {
             minExtent += footer
             if(minExtent < maxExtent) minExtent = maxExtent
         } else {
-            minExtent = header
+            // -startPosition(): the first row's estimated position
+            minExtent = header - this.$originPosition()
             if(range.strict && count){
                 minExtent += range.start
+                let first = this.$visibleEntry(0)
+                if(first && first.section) minExtent -= this.$sizeOf(first.section)
                 minExtent = Math.max(minExtent, -(this.$endPositionAt(0) - range.end))
             }
             if(!count) maxExtent = viewSize
@@ -184,38 +251,66 @@ class ListView extends Item {
         return { mode, strict: mode === STRICTLY_ENFORCE_RANGE, start: this.$v[ListView.PREFERREDHIGHLIGHTBEGIN], end: this.$v[ListView.PREFERREDHIGHLIGHTEND] }
     }
 
-    // the flow position where the item (its section label first) and the item itself start
+    // QQuickListViewPrivate::positionAt: a visible entry's position, else estimated from the first visible entry (the
+    // current item counted at its size) or after the last one
     $positionAt(index){
+        let entry = this.$visibleEntry(index)
+        if(entry) return entry.pos
+        let visible = this.$visible
+        if(!visible.length) return 0
         let spacing = this.$v[ListView.SPACING]
-        let pos = 0
-        let average = this.$averageSize()
-        for(let i = 0; i < index; i++) pos += (this.$sizes[i] === undefined ? average : this.$sizes[i]) + spacing
-        return pos
+        let average = this.$average
+        if(index < this.$visibleIndex){
+            let count = this.$visibleIndex - index
+            let cs = 0
+            let current = index === this.$v[ListView.CURRENTINDEX] ? this.$entries.get(index) : null
+            if(current){
+                cs = this.$entrySize(current) + spacing
+                count--
+            }
+            return visible[0].pos - count * (average + spacing) - cs
+        }
+        let last = visible[visible.length - 1]
+        return this.$entryEnd(last) + spacing + (index - last.index - 1) * (average + spacing)
     }
 
+    // the position of the item itself, after its section label
     $itemPositionAt(index){
-        let entry = this.$entries.get(index)
+        let entry = this.$visibleEntry(index)
         return this.$positionAt(index) + (entry && entry.section ? this.$sizeOf(entry.section) : 0)
     }
 
+    // QQuickListViewPrivate::endPositionAt
     $endPositionAt(index){
-        let size = this.$sizes[index] === undefined ? this.$averageSize() : this.$sizes[index]
-        return this.$positionAt(index) + size
+        let entry = this.$visibleEntry(index)
+        if(entry) return this.$entryEnd(entry)
+        let visible = this.$visible
+        if(!visible.length) return 0
+        let spacing = this.$v[ListView.SPACING]
+        let average = this.$average
+        if(index < this.$visibleIndex) return visible[0].pos - (this.$visibleIndex - index - 1) * (average + spacing) - spacing
+        let last = visible[visible.length - 1]
+        return this.$entryEnd(last) + (index - last.index - 1) * (average + spacing)
     }
 
-    // QQuickListViewPrivate::snapItemAt: the item whose start is nearest pos
+    // QQuickListViewPrivate::snapItemAt: the visible entry whose middle (with half the spacing) is nearest pos; past the
+    // visible entries the index the average size gives (snapPosAt)
     $snapIndexAt(pos){
-        let count = this.$v[ListView.COUNT]
         let spacing = this.$v[ListView.SPACING]
-        let average = this.$averageSize()
-        let start = 0, previousSize = 0
-        for(let i = 0; i < count; i++){
-            let size = this.$sizes[i] === undefined ? average : this.$sizes[i]
-            if(start + size / 2 >= pos && start - previousSize / 2 <= pos) return i
-            start += size + spacing
-            previousSize = size
+        let highlight = this.$highlight
+        let snap = -1, previousSize = 0
+        for(let entry of this.$visible){
+            let top = entry.pos, size = this.$entrySize(entry)
+            if(highlight && top >= pos && top + size <= pos + this.$sizeOf(highlight)) return entry.index
+            if(top + (size + spacing) / 2 >= pos && top - (previousSize + spacing) / 2 < pos) snap = entry.index
+            previousSize = this.$sizeOf(entry.item)
         }
-        return count ? count - 1 : -1
+        if(snap >= 0) return snap
+        let count = this.$v[ListView.COUNT]
+        if(!count) return -1
+        let step = this.$average + spacing
+        let index = step > 0 ? Math.round((pos - this.$originPosition()) / step) : 0
+        return Math.max(0, Math.min(count - 1, index))
     }
 
     // QQuickListViewPrivate::fixup with snapMode: the start of the view goes to the start of the nearest item
@@ -292,36 +387,97 @@ class ListView extends Item {
         return found ? found[0] : -1
     }
 
-    // QQuickItemView::positionViewAtBeginning / End: the bounds of the flow
+    // QQuickItemView::positionViewAtBeginning / End: QQuickItemViewPrivate::positionViewAtIndex(-1, Beginning) and
+    // (count, End)
     positionViewAtBeginning(){
-        this.$fill()
-        let axis = this.$vertical() ? 'y' : 'x'
-        let b = this.$flickBounds(axis)
-        this.$setContentPos(axis, this.$reversed() ? b.max : b.min)
+        this.$positionViewAt(-1, ListView.Beginning)
     }
 
     positionViewAtEnd(){
-        this.$fill()
-        let axis = this.$vertical() ? 'y' : 'x'
-        let b = this.$flickBounds(axis)
-        this.$setContentPos(axis, this.$reversed() ? b.min : b.max)
+        this.$positionViewAt(this.$v[ListView.COUNT], ListView.End)
     }
 
-    // QQuickItemViewPrivate::positionViewAtIndex: the mode decides the new position, bounded by the extents
+    // QQuickItemView::positionViewAtIndex
     positionViewAtIndex(index, mode = ListView.Beginning){
-        if(this.$v[ListView.COUNT] <= 0) return
-        this.$fill()
-        this.$moveToIndex(index, mode)
+        let count = this.$v[ListView.COUNT]
+        if(count <= 0 || index < 0 || index >= count) return
+        this.$positionViewAt(index, mode)
     }
 
-    // the position for the mode, from the items built and the average size of the others; no refill (the view
+    // the flow positions the view may take (QQuickItemViewPrivate::calculatedMinExtent, calculatedMaxExtent)
+    $flowBounds(){
+        let b = this.$flickBounds(this.$vertical() ? 'y' : 'x')
+        if(!this.$reversed()) return { min: b.min, max: b.max }
+        let viewSize = this.$viewSize()
+        return { min: -b.max - viewSize, max: -b.min - viewSize }
+    }
+
+    // QQuickItemViewPrivate::positionViewAtIndex: an index not built goes to its estimated position, where the view
+    // starts again (changedVisibleIndex) and fills; then the mode places its item, within the extents
+    $positionViewAt(index, mode){
+        if(!(this.$f & engine.COMPLETED) || !this.$v[ListView.DELEGATE]) return
+        let count = this.$v[ListView.COUNT]
+        if(count <= 0 || mode < ListView.Beginning || mode > ListView.SnapPosition) return
+        this.$fill()
+        let idx = Math.max(Math.min(index, count - 1), 0)
+        let viewSize = this.$viewSize()
+        let pos = this.$position()
+        let entry = this.$visibleEntry(idx)
+        // the extent of the view before it moves (calculatedMaxExtent, taken first)
+        let maxExtent = this.$flowBounds().max
+        if(!entry){
+            let itemPos = this.$positionAt(idx)
+            this.$visiblePos = itemPos
+            this.$visibleIndex = idx
+            // the entries built stay while the view fills, so a row built again keeps its item
+            let old = this.$visible
+            this.$visible = []
+            this.$setPosition(Math.min(itemPos, maxExtent))
+            this.$fill()
+            for(let e of old) if(this.$visible.indexOf(e) < 0) this.$releaseEntry(e)
+            entry = this.$visibleEntry(idx)
+        }
+        if(entry){
+            let stickyHeader = !!this.$header && this.$v[ListView.HEADERPOSITIONING] !== INLINE_HEADER
+            let stickyFooter = !!this.$footer && this.$v[ListView.FOOTERPOSITIONING] !== INLINE_HEADER
+            let headerSize = stickyHeader ? this.$headerSize() : 0
+            let footerSize = stickyFooter ? this.$footerSize() : 0
+            let itemPos = entry.pos, size = this.$entrySize(entry), end = itemPos + size
+            switch(mode){
+                case ListView.Beginning:
+                    pos = itemPos
+                    if(this.$header && (index < 0 || stickyHeader)) pos -= this.$headerSize()
+                    break
+                case ListView.Center: pos = itemPos - (viewSize - size) / 2; break
+                case ListView.End:
+                    pos = itemPos - viewSize + size
+                    if(this.$footer && (index >= count || stickyFooter)) pos += this.$footerSize()
+                    break
+                case ListView.Visible:
+                    if(itemPos > pos + viewSize - footerSize) pos = end - viewSize + footerSize
+                    else if(end <= pos - headerSize) pos = itemPos - headerSize
+                    break
+                case ListView.Contain:
+                    if(end >= pos + viewSize + footerSize) pos = itemPos - viewSize + size + footerSize
+                    if(itemPos - headerSize < pos) pos = itemPos - headerSize
+                    break
+                case ListView.SnapPosition: pos = itemPos - this.$v[ListView.PREFERREDHIGHLIGHTBEGIN] - headerSize; break
+            }
+            pos = Math.max(Math.min(pos, maxExtent), this.$flowBounds().min)
+            this.$setPosition(pos)
+            this.$fill()
+            this.$updateHighlight()
+        }
+    }
+
+    // the position for the mode, from the entries built and the average size of the others; no refill (the view
     // refills when its position changes, as QQuickItemView::viewportMoved)
     $moveToIndex(index, mode){
         let count = this.$v[ListView.COUNT]
         if(count <= 0) return
         let idx = Math.max(Math.min(index, count - 1), 0)
         let itemPos = this.$itemPositionAt(idx)
-        let entry = this.$entries.get(idx)
+        let entry = this.$visibleEntry(idx) || this.$entries.get(idx)
         let itemSize = entry ? this.$sizeOf(entry.item) : this.$averageSize()
         let itemEnd = itemPos + itemSize
         let viewSize = this.$viewSize()
@@ -412,14 +568,13 @@ class ListView extends Item {
 
     $averageSize(){ return this.$average }
 
-    // QQuickListViewPrivate::updateAverage: the rounded mean size of the items built; none built, it stays
+    // QQuickListViewPrivate::updateAverage: the rounded mean size of the visible entries; none, it stays
     $updateAverage(){
-        let sum = 0, count = 0
-        for(let index of this.$entries.keys()){
-            let size = this.$sizes[index]
-            if(size !== undefined){ sum += size; count++ }
-        }
-        if(count) this.$average = Math.round(sum / count)
+        let visible = this.$visible
+        if(!visible.length) return
+        let sum = 0
+        for(let entry of visible) sum += this.$entrySize(entry)
+        this.$average = Math.round(sum / visible.length)
     }
 
     $componentComplete(){
@@ -449,7 +604,7 @@ class ListView extends Item {
             this.$header = this.$componentItem(headerComponent, 1)
             if(this.$header){
                 this.$header.$component = headerComponent
-                engine.connect(this.$header, this.$vertical() ? Item.SIGNAL_heightChanged : Item.SIGNAL_widthChanged, () => engine.queuePolish(this))
+                engine.connect(this.$header, this.$vertical() ? Item.SIGNAL_heightChanged : Item.SIGNAL_widthChanged, () => this.$forceLayoutPolish())
             }
             this.$write(ListView.HEADERITEM, this.$header)
         }
@@ -462,7 +617,7 @@ class ListView extends Item {
             this.$footer = this.$componentItem(footerComponent, 1)
             if(this.$footer){
                 this.$footer.$component = footerComponent
-                engine.connect(this.$footer, this.$vertical() ? Item.SIGNAL_heightChanged : Item.SIGNAL_widthChanged, () => engine.queuePolish(this))
+                engine.connect(this.$footer, this.$vertical() ? Item.SIGNAL_heightChanged : Item.SIGNAL_widthChanged, () => this.$forceLayoutPolish())
             }
             this.$write(ListView.FOOTERITEM, this.$footer)
         }
@@ -470,18 +625,25 @@ class ListView extends Item {
         if(!footerComponent) this.$write(ListView.FOOTERITEM, null)
     }
 
-    // QQuickListViewPrivate::updateHeader / updateFooter
+    // QQuickListViewPrivate::updateHeader / updateFooter: an inline header before the first row (where the view
+    // estimates it), an inline footer after the last; overlay and pull back ones follow the view
     $placeHeaderFooter(){
         let position = this.$position()
+        let viewSize = this.$viewSize()
+        let visible = this.$visible.length > 0
         if(this.$header){
             let mode = this.$v[ListView.HEADERPOSITIONING]
             let size = this.$headerSize()
-            let pos = -size
+            let current = this.$header.$flowPos === undefined ? -size : this.$header.$flowPos
+            let pos = current
             if(mode === OVERLAY_HEADER) pos = position
+            else if(!visible) pos = -size
             else if(mode === PULL_BACK_HEADER){
-                let current = this.$header.$flowPos === undefined ? -size : this.$header.$flowPos
-                let clamped = Math.max(-size, Math.min(current, this.$lastPosition() - this.$viewSize()))
+                let clamped = Math.max(this.$originPosition() - size, Math.min(current, this.$lastPosition() - viewSize))
                 pos = Math.max(position - size, Math.min(clamped, position))
+            } else {
+                let start = this.$originPosition()
+                if(this.$visibleIndex === 0 || position <= start || current > start - size) pos = start - size
             }
             this.$header.$flowPos = pos
             this.$placeFlow(this.$header, pos)
@@ -489,13 +651,19 @@ class ListView extends Item {
         if(this.$footer){
             let mode = this.$v[ListView.FOOTERPOSITIONING]
             let size = this.$footerSize()
-            let pos = this.$lastPosition()
-            if(mode === OVERLAY_HEADER) pos = position + this.$viewSize() - size
+            let current = this.$footer.$flowPos === undefined ? this.$lastPosition() : this.$footer.$flowPos
+            let pos = current
+            if(mode === OVERLAY_HEADER) pos = position + viewSize - size
+            else if(!visible) pos = this.$visiblePos
             else if(mode === PULL_BACK_HEADER){
-                let viewEnd = position + this.$viewSize()
-                let current = this.$footer.$flowPos === undefined ? pos : this.$footer.$flowPos
-                let clamped = Math.max(-this.$headerSize() - size + this.$viewSize(), Math.min(current, this.$lastPosition()))
+                let viewEnd = position + viewSize
+                let clamped = Math.max(this.$originPosition() - size + viewSize, Math.min(current, this.$lastPosition()))
                 pos = Math.max(viewEnd - size, Math.min(clamped, viewEnd))
+            } else {
+                let end = this.$lastPosition()
+                let lastIndex = this.$visible[this.$visible.length - 1].index
+                // QQuickListViewPrivate::updateFooter compares with contentY + height along either orientation
+                if(lastIndex === this.$v[ListView.COUNT] - 1 || end <= position + this.$v[Item.HEIGHT] || current < end) pos = end
             }
             this.$footer.$flowPos = pos
             this.$placeFlow(this.$footer, pos)
@@ -628,6 +796,8 @@ class ListView extends Item {
 
     // ---- delegates ----
 
+    // QQuickItemViewPrivate::regenerate: everything released, the viewport for no item, the view at the start, refill,
+    // then the current item
     $sync(){
         let model = this.$v[ListView.MODEL]
         if(model !== this.$model){
@@ -638,13 +808,15 @@ class ListView extends Item {
         // QQuickItemViewPrivate::clear releases NotReusable
         for(let index of Array.from(this.$entries.keys())) this.$release(index, false)
         this.$drainPool()
-        this.$sizes = []
-        this.$itemsSize = 0
+        this.$visible = []
+        this.$visibleIndex = 0
+        this.$visiblePos = 0
+        this.$currentEntry = null
         let count = modelRows(this.$model).count
         this.$write(ListView.COUNT, count)
         this.$updateHeaderFooter()
-        // QQuickItemViewPrivate::regenerate: updateViewport, then setPosition(contentStartOffset)
-        this.$fill(false)
+        this.$placeHeaderFooter()
+        this.$updateViewport()
         this.$setPosition(-this.$headerSize())
         this.$fill(false)
         // QQuickItemView::componentComplete: refill(), then updateCurrent(0) unless the index was cleared
@@ -653,54 +825,45 @@ class ListView extends Item {
         this.$ensureCurrentItem()
         this.$trackCurrent()
         // QQuickItemView::setModel / componentComplete end with updateViewport, also when refill laid nothing out
-        // (a view of no size): lastPosition estimates the rows with averageSize - the size of the current item when
-        // it is the only one (initializeCurrentItem)
-        if(this.$v[Item.WIDTH] === 0 && this.$v[Item.HEIGHT] === 0 && this.$v[ListView.DELEGATE]){
-            let spacing = this.$v[ListView.SPACING]
-            this.$itemsSize = count ? count * this.$average + (count - 1) * spacing : 0
-            this.$write(this.$vertical() ? ListView.CONTENTHEIGHT : ListView.CONTENTWIDTH, this.$itemsSize + this.$headerSize() + this.$footerSize())
-        }
+        // (a view of no size): lastPosition estimates the rows with averageSize - the size of the current item when it
+        // is the only one (initializeCurrentItem)
+        this.$updateViewport()
     }
 
-    // updateCurrent() creates the current item even when it is outside the filled range
+    // QQuickItemViewPrivate::updateCurrent, QQuickListViewPrivate::initializeCurrentItem: the current item is made even
+    // outside the visible entries, at the position the view estimates for it; with no visible entry the average size
+    // is its size
     $ensureCurrentItem(){
         let index = this.$v[ListView.CURRENTINDEX]
-        if(index < 0 || this.$entries.has(index) || !this.$v[ListView.DELEGATE]) return this.$updateCurrentItem()
+        if(index < 0 || this.$entries.has(index) || !this.$v[ListView.DELEGATE] || !(this.$f & engine.COMPLETED)) return this.$updateCurrentItem()
         let rows = modelRows(this.$model)
         if(index >= rows.count) return this.$updateCurrentItem()
-        let alone = this.$entries.size === 0
-        let item = this.$create(index, rows)
-        if(item){
-            let entry = this.$entries.get(index)
-            this.$updateEntrySection(index, entry, rows)
-            // QQuickListViewPrivate::initializeCurrentItem: with no visible items the average is the current item's size
-            let size = this.$layoutEntry(index, entry, this.$positionAt(index))
-            if(alone) this.$average = size
+        let entry = this.$create(index, rows)
+        if(entry){
+            let visible = this.$visible
+            let spacing = this.$v[ListView.SPACING]
+            if(index === this.$visibleIndex - 1 && visible.length) this.$setEntryPos(entry, visible[0].pos - this.$entrySize(entry) - spacing)
+            else this.$setEntryPos(entry, this.$positionAt(index))
+            entry.size = this.$entrySize(entry)
+            if(!visible.length) this.$average = entry.size
         }
         this.$updateCurrentItem()
     }
 
-    $layoutEntry(index, entry, pos){
-        let size = this.$sizeOf(entry.item)
-        let sectionSize = 0
-        if(entry.section){
-            sectionSize = this.$sizeOf(entry.section)
-            this.$placeFlow(entry.section, pos)
-        }
-        this.$sizes[index] = sectionSize + size
-        this.$placeFlow(entry.item, pos + sectionSize)
-        return sectionSize + size
-    }
-
+    // QQmlDelegateModel::object: the entry of an index; the one the view holds (the current item), else the oldest
+    // pooled item with its index and every role updated, then reused(), else a new delegate. Its section label is made
+    // with it (QQuickListViewPrivate::newViewItem, initializeViewItem)
     $create(index, rows){
-        // QQmlDelegateModelPrivate::object: the oldest pooled item, its index and every role updated, then reused()
+        let entry = this.$entries.get(index)
+        if(entry) return entry
         if(this.$pool.length){
-            let entry = this.$pool.shift()
+            entry = this.$pool.shift()
             let ctx = entry.ctx
             ctx.$row = rows.row(index)
             ctx.$write(ModelContext.INDEX, index)
             ctx.$write(ModelContext.MODELDATA, rows.data(index))
             ctx.$rowChanged(null)
+            entry.index = index
             this.$entries.set(index, entry)
             entry.item.$culled = false
             engine.markDirty(entry.item, VISIBILITY)
@@ -708,18 +871,20 @@ class ListView extends Item {
             if(this.$currentAttached === entry.item && index !== this.$v[ListView.CURRENTINDEX]) this.$currentAttached = null
             let attached = entry.item.$v[Item.LISTVIEW]
             if(attached) engine.emitArgs(attached, ListViewAttached.SIGNAL_reused, [])
-            return entry.item
+        } else {
+            let delegate = this.$v[ListView.DELEGATE]
+            let ctx = new ModelContext(rows.row(index), index, rows.data(index))
+            ctx.$view = this
+            let item = delegate.createObject(this.$content, null, ctx)
+            if(!item) return null
+            // QQuickItemView::initItem: a delegate at z 0 goes to z 1, above the highlight
+            if(!item.$v[Item.Z]) item.z = 1
+            attachedOf(item).$write(ListViewAttached.VIEW, this)
+            entry = { item, ctx, section: null, index, pos: 0 }
+            this.$entries.set(index, entry)
         }
-        let delegate = this.$v[ListView.DELEGATE]
-        let ctx = new ModelContext(rows.row(index), index, rows.data(index))
-        ctx.$view = this
-        let item = delegate.createObject(this.$content, null, ctx)
-        if(!item) return null
-        // QQuickItemView::initItem: a delegate at z 0 goes to z 1, above the highlight
-        if(!item.$v[Item.Z]) item.z = 1
-        attachedOf(item).$write(ListViewAttached.VIEW, this)
-        this.$entries.set(index, { item, ctx, section: null })
-        return item
+        this.$updateEntrySection(index, entry, rows)
+        return entry
     }
 
     // QQuickItemViewPrivate::releaseItem: with reuseItems the item goes to the pool, culled, then pooled()
@@ -727,6 +892,7 @@ class ListView extends Item {
         let entry = this.$entries.get(index)
         if(!entry) return
         this.$entries.delete(index)
+        if(this.$currentEntry === entry) this.$currentEntry = null
         if(entry.section){
             entry.section.$releaseLater()
             entry.section = null
@@ -742,6 +908,19 @@ class ListView extends Item {
         entry.item.$releaseLater()
     }
 
+    // a visible entry the view lets go of; the current item stays (the view holds it as currentItem)
+    $releaseEntry(entry){
+        if(entry.index === this.$v[ListView.CURRENTINDEX] && this.$entries.get(entry.index) === entry) return
+        if(this.$entries.get(entry.index) === entry) this.$release(entry.index)
+    }
+
+    // QQuickItemViewPrivate::releaseVisibleItems
+    $releaseVisible(){
+        let visible = this.$visible
+        this.$visible = []
+        for(let entry of visible) this.$releaseEntry(entry)
+    }
+
     // QQmlDelegateModel::drainReusableItemsPool(0)
     $drainPool(){
         let pool = this.$pool
@@ -750,89 +929,191 @@ class ListView extends Item {
         for(let entry of pool) entry.item.$releaseLater()
     }
 
-    // QQuickItemViewPrivate::refill: the visible range first; the cacheBuffer range only on a later pass
-    // (bufferPause of 16 ms, then polish), or when the visible pass added nothing.
-    // A null-size view without items does not fill at all.
+    // QQuickItemViewPrivate::refill(from, to): the visible range; the cacheBuffer range on a later pass (bufferPause
+    // of 16 ms, then polish), or at once when the visible pass added nothing; then the entries past the buffer go.
+    // A null-size view without entries does not fill at all
     $fill(withBuffer = false){
         if(this.$filling || !(this.$f & engine.COMPLETED)) return
-        let delegate = this.$v[ListView.DELEGATE]
-        if(!delegate){
+        if(!this.$v[ListView.DELEGATE]){
             this.$placeHeaderFooter()
             return
         }
-        if(this.$v[Item.WIDTH] === 0 && this.$v[Item.HEIGHT] === 0 && this.$entries.size === 0) return
+        if(this.$v[Item.WIDTH] === 0 && this.$v[Item.HEIGHT] === 0 && !this.$visible.length) return
         this.$filling = true
-        let added = false
         try {
             let rows = modelRows(this.$model)
-            let count = rows.count
-            let vertical = this.$vertical()
-            let spacing = this.$v[ListView.SPACING]
-            let cache = this.$v[ListView.CACHEBUFFER]
-            let position = this.$position()
-            // QQuickItemViewPrivate::refill: a negative view size counts as 0
-            let keepStart = position - cache
-            let keepEnd = position + Math.max(0, this.$viewSize()) + cache
-            let start = withBuffer ? keepStart : position
-            let end = withBuffer ? keepEnd : position + Math.max(0, this.$viewSize())
-            let current = this.$v[ListView.CURRENTINDEX]
-            this.$releaseOnJump(keepStart, keepEnd, spacing, current)
-            // QQuickItemViewPrivate::refill: addVisibleItems, then removeNonVisibleItems
-            let released = []
-            // QQuickListViewPrivate::addVisibleItems: rows not built yet are estimated with averageSize
-            let average = this.$averageSize()
-            let pos = 0
-            let i = 0
-            for(; i < count; i++){
-                let entry = this.$entries.get(i)
-                let size = this.$sizes[i]
-                let reach = size === undefined ? average : size
-                let needed = pos <= end && (size === undefined && average === 0 || pos + reach >= start)
-                let kept = pos <= keepEnd && (size === undefined || pos + size >= keepStart)
-                if(needed && !entry){
-                    let item = this.$create(i, rows)
-                    if(!item) break
-                    entry = this.$entries.get(i)
-                    added = true
-                } else if(!kept && entry && i !== current){
-                    released.push(i)
-                    entry = null
-                }
-                if(entry){
-                    this.$updateEntrySection(i, entry, rows)
-                    size = this.$layoutEntry(i, entry, pos)
-                }
-                if(size === undefined){
-                    if(average === 0 || pos > keepEnd) break
-                    pos += average + spacing
-                    continue
-                }
-                pos += size + spacing
+            if(!rows.count){
+                this.$placeHeaderFooter()
+                this.$updateViewport()
+                return
             }
-            for(let index of released) this.$release(index)
-            for(let index of Array.from(this.$entries.keys())){
-                if(index >= count) this.$release(index)
+            let from = this.$position()
+            let to = from + Math.max(0, this.$viewSize())
+            let buffer = this.$v[ListView.CACHEBUFFER]
+            let bufferFrom = from - buffer, bufferTo = to + buffer
+            let added = this.$addVisible(rows, from, to, bufferFrom, bufferTo, false)
+            if(buffer > 0){
+                if(added) this.$scheduleBuffer()
+                else added = this.$addVisible(rows, bufferFrom, bufferTo, bufferFrom, bufferTo, true)
             }
-            let known = i
-            // QQuickItemViewPrivate::refill: visibleItemsChanged (updateAverage), then updateViewport
-            this.$updateAverage()
-            let estimated = pos + (count - known) * (this.$averageSize() + spacing)
-            this.$itemsSize = Math.max(0, count ? estimated - spacing : 0)
-            // QQuickItemViewPrivate::updateViewport: the items, the header and the footer
-            let contentSize = this.$itemsSize + this.$headerSize() + this.$footerSize()
-            this.$write(vertical ? ListView.CONTENTHEIGHT : ListView.CONTENTWIDTH, contentSize)
-            this.$syncContentItem()
+            let removed = this.$removeNonVisible(bufferFrom, bufferTo)
+            if(added || removed) this.$visibleItemsChanged()
             this.$placeHeaderFooter()
-            this.$updateOrigin()
+            this.$updateViewport()
+            this.$cull()
             this.$updateCurrentItem()
             this.$updateCurrentSection()
         } finally {
             this.$filling = false
         }
-        if(!withBuffer && this.$v[ListView.CACHEBUFFER] > 0){
-            if(added) this.$scheduleBuffer()
-            else this.$fill(true)
+    }
+
+    // QQuickListViewPrivate::addVisibleItems: after the last entry while the fill range goes on, before the first while
+    // it starts before. A jump of more than a page past the entries releases them and starts at the index the average
+    // size gives
+    $addVisible(rows, fillFrom, fillTo, bufferFrom, bufferTo, doBuffer){
+        let spacing = this.$v[ListView.SPACING]
+        let average = this.$average
+        let count = rows.count
+        let visible = this.$visible
+        let itemEnd = this.$visiblePos
+        if(visible.length){
+            this.$visiblePos = visible[0].pos
+            itemEnd = this.$entryEnd(visible[visible.length - 1]) + spacing
         }
+        let last = visible.length ? visible[visible.length - 1].index : -1
+        let index = last >= 0 ? last + 1 : this.$visibleIndex
+        if(last >= 0 && average + spacing > 0 && (bufferFrom > itemEnd + average + spacing || bufferTo < this.$visiblePos - average - spacing)){
+            let jump = Math.trunc((fillFrom - itemEnd) / (average + spacing))
+            let target = Math.max(0, Math.min(index + jump, count))
+            jump = target - index
+            if(jump){
+                this.$releaseVisible()
+                index = target
+                this.$visibleIndex = index
+                this.$visiblePos = itemEnd + jump * (average + spacing)
+                itemEnd = this.$visiblePos
+            }
+        }
+        let changed = false
+        let pos = itemEnd
+        while(index < count && pos <= fillTo){
+            let entry = this.$create(index, rows)
+            if(!entry) break
+            this.$setEntryPos(entry, pos)
+            this.$setCulled(entry, doBuffer)
+            entry.size = this.$entrySize(entry)
+            pos += entry.size + spacing
+            this.$visible.push(entry)
+            index++
+            changed = true
+        }
+        while(this.$visibleIndex > 0 && this.$visibleIndex <= count && this.$visiblePos > fillFrom){
+            let entry = this.$create(this.$visibleIndex - 1, rows)
+            if(!entry) break
+            this.$visibleIndex--
+            entry.size = this.$entrySize(entry)
+            this.$visiblePos -= entry.size + spacing
+            this.$setEntryPos(entry, this.$visiblePos)
+            this.$setCulled(entry, doBuffer)
+            this.$visible.unshift(entry)
+            changed = true
+        }
+        return changed
+    }
+
+    // QQuickListViewPrivate::removeNonVisibleItems: from the start the entries ending before the buffer (a zero-sized
+    // one only with a sized one after it, or refill would make it and release it again), from the end the entries
+    // starting after it; one stays
+    $removeNonVisible(bufferFrom, bufferTo){
+        let visible = this.$visible
+        let changed = false
+        let i = 0
+        while(visible.length > 1 && i < visible.length && this.$entryEnd(visible[i]) < bufferFrom){
+            let entry = visible[i]
+            if(this.$entrySize(entry) > 0){
+                for(;;){
+                    this.$visibleIndex++
+                    visible.splice(i, 1)
+                    this.$releaseEntry(entry)
+                    if(i === 0) break
+                    entry = visible[--i]
+                }
+                changed = true
+            } else i++
+        }
+        while(visible.length > 1 && visible[visible.length - 1].pos > bufferTo){
+            this.$releaseEntry(visible.pop())
+            changed = true
+        }
+        return changed
+    }
+
+    // QQuickListViewPrivate::visibleItemsChanged: the average of the visible entries, the current item at its
+    // estimated position when it is not one of them
+    $visibleItemsChanged(){
+        if(this.$visible.length) this.$visiblePos = this.$visible[0].pos
+        this.$updateAverage()
+        let current = this.$currentOutside()
+        if(current) this.$setEntryPos(current, this.$positionAt(current.index))
+    }
+
+    // QQuickListViewPrivate::layoutVisibleItems: the entries one after the other from the first one's position, the
+    // average of their sizes, the current item outside them at its estimated position. A first entry that changed its
+    // size while it ended before the view keeps its end there (QQuickListViewPrivate::itemGeometryChanged)
+    $layoutVisible(fromIndex = 0){
+        let visible = this.$visible
+        if(!visible.length) return
+        let spacing = this.$v[ListView.SPACING]
+        let first = visible[0]
+        let firstSize = this.$entrySize(first)
+        if(first.size !== undefined && first.size !== firstSize){
+            let oldEnd = first.pos + first.size
+            let contentPos = this.$vertical() ? this.$v[ListView.CONTENTY] : this.$v[ListView.CONTENTX]
+            if(!this.$reversed() && oldEnd < contentPos) first.pos -= firstSize - first.size
+            else if(this.$reversed() && oldEnd > contentPos) first.pos += firstSize - first.size
+        }
+        first.size = firstSize
+        this.$setEntryPos(first, first.pos)
+        let sum = firstSize
+        let pos = first.pos + firstSize + spacing
+        for(let i = 1; i < visible.length; i++){
+            let entry = visible[i]
+            if(entry.index >= fromIndex) this.$setEntryPos(entry, pos)
+            let size = this.$entrySize(entry)
+            entry.size = size
+            pos += size + spacing
+            sum += size
+        }
+        this.$average = Math.round(sum / visible.length)
+        let current = this.$currentOutside()
+        if(current) this.$setEntryPos(current, this.$positionAt(current.index))
+    }
+
+    // QQuickListView::viewportMoved: the entries out of the view are culled, kept but not painted
+    $cull(){
+        let from = this.$position()
+        let to = from + this.$viewSize()
+        for(let entry of this.$visible) this.$setCulled(entry, this.$entryEnd(entry) < from || entry.pos > to)
+        let current = this.$currentOutside()
+        if(current) this.$setCulled(current, this.$entryEnd(current) < from || current.pos > to)
+    }
+
+    $setCulled(entry, culled){
+        for(let item of entry.section ? [entry.section, entry.item] : [entry.item]){
+            if(item.$culled === culled) continue
+            item.$culled = culled
+            engine.markDirty(item, VISIBILITY)
+        }
+    }
+
+    // QQuickItemViewPrivate::updateViewport: the size along the flow, the rows from the first to the last estimated
+    $updateViewport(){
+        let count = this.$v[ListView.COUNT]
+        let size = count || this.$visible.length ? this.$lastPosition() - this.$originPosition() : 0
+        this.$write(this.$vertical() ? ListView.CONTENTHEIGHT : ListView.CONTENTWIDTH, size + this.$headerSize() + this.$footerSize())
+        this.$syncContentItem()
+        this.$updateOrigin()
     }
 
     // QQuickItemView::originX / originY, atXBeginning ... (QQuickFlickable::updateBeginningEnd)
@@ -864,28 +1145,6 @@ class ListView extends Item {
         this.$write(ListView.CURRENTSECTION, index < 0 ? '' : this.$sectionAt(index, modelRows(this.$model)))
     }
 
-    // QQuickListViewPrivate::addVisibleItems: a jump of more than an item past the built ones releases them before the fill,
-    // so the fill reuses them
-    $releaseOnJump(keepStart, keepEnd, spacing, current){
-        let first = Infinity, last = -1
-        for(let index of this.$entries.keys()){
-            if(index === current) continue
-            if(index < first) first = index
-            if(index > last) last = index
-        }
-        if(last < 0) return
-        let average = this.$averageSize()
-        let pos = 0, visiblePos = 0
-        for(let k = 0; k <= last; k++){
-            if(k === first) visiblePos = pos
-            pos += (this.$sizes[k] === undefined ? average : this.$sizes[k]) + spacing
-        }
-        if(keepStart <= pos + average + spacing && keepEnd >= visiblePos - average - spacing) return
-        for(let index of Array.from(this.$entries.keys())){
-            if(index !== current) this.$release(index)
-        }
-    }
-
     $scheduleBuffer(){
         if(this.$bufferTimer) return
         this.$bufferTimer = setTimeout(() => {
@@ -895,10 +1154,30 @@ class ListView extends Item {
         }, 16)
     }
 
+    // QQuickItemViewPrivate::forceLayoutPolish: the next polish lays the view out
+    $forceLayoutPolish(){
+        this.$forceLayout = true
+        engine.queuePolish(this)
+    }
+
+    // QQuickItemView::updatePolish -> layout(): after a change of the model, the geometry or a size, the visible entries
+    // one after the other, refill, and the view put back within its extents unless it is moved (fixupPosition); after
+    // a move of the view only refill (QQuickItemView::viewportMoved)
     $polish(){
         let withBuffer = !!this.$fillBuffer
         this.$fillBuffer = false
+        if(!this.$forceLayout || !(this.$f & engine.COMPLETED)){
+            this.$fill(withBuffer)
+            return
+        }
+        this.$forceLayout = false
+        this.$layoutVisible()
         this.$fill(withBuffer)
+        let s = this.$fs
+        if(!s || !(s.pressed || s.moving || s.x.flicking || s.y.flicking)){
+            fixup(this, this.$vertical() ? 'y' : 'x')
+            this.$fill(withBuffer)
+        }
     }
 
     // QQuickItemView::updateCurrent: the new current item takes the focus, then currentIndexChanged, then currentItemChanged
@@ -910,8 +1189,12 @@ class ListView extends Item {
     $updateCurrentItem(){
         this.$focusCurrentItem()
         let index = this.$v[ListView.CURRENTINDEX]
-        let entry = this.$entries.get(index)
+        let entry = this.$entries.get(index) || null
         let item = entry ? entry.item : null
+        // QQuickItemViewPrivate::updateCurrent releases the old current item; one of the visible entries stays
+        let old = this.$currentEntry
+        this.$currentEntry = entry
+        if(old && old !== entry && this.$entries.get(old.index) === old && !this.$visibleEntry(old.index)) this.$release(old.index)
         // ListView.isCurrentItem: the item that was current and the one that is
         let previous = this.$currentAttached
         if(previous !== item){
@@ -946,7 +1229,7 @@ class ListView extends Item {
         if(id === ListView.KEYNAVIGATIONENABLED) this.$keyNavigationSet = true
         super.$write(id, value)
         if(id === ListView.CURRENTINDEX && this.$v[id] !== old){
-            this.$updateCurrentItem()
+            this.$ensureCurrentItem()
             this.$trackCurrent()
         }
         // QQuickListView::geometryChange drains the pool, setReuseItems(false) as well
@@ -959,38 +1242,94 @@ class ListView extends Item {
         }
     }
 
+    // QQuickItemViewPrivate::applyModelChanges, applyRemovalChange, QQuickListViewPrivate::applyInsertionChange,
+    // repositionFirstItem: the entries after a change take their new index; rows inserted or removed before the visible
+    // entries leave them where they are (the estimate of the rows before them changes, so the origin does); rows
+    // inserted among them are made at their place; entries removed above the view give their place to the ones after,
+    // so the content in the view does not jump. The view lays out with the next polish
     $modelChanged(kind, index, count, roles = null){
         if(kind === 'insert' || kind === 'remove'){
+            let visible = this.$visible
+            let spacing = this.$v[ListView.SPACING]
+            let viewPos = this.$position()
+            let firstInView = visible.find(entry => this.$entryEnd(entry) > viewPos) || visible[0] || null
+            let firstInViewPos = firstInView ? firstInView.pos : 0
+            let prevFirst = visible[0] || null
+            let prevFirstPos = prevFirst ? prevFirst.pos : 0
             let shifted = new Map()
+            let removed = []
             for(let [i, entry] of this.$entries){
                 if(kind === 'remove' && i >= index && i < index + count){
-                    if(entry.section) entry.section.$releaseLater()
-                    entry.item.$releaseLater()
+                    removed.push(entry)
                     continue
                 }
                 let to = i >= index ? (kind === 'insert' ? i + count : i - count) : i
-                entry.ctx.$write(ModelContext.INDEX, to)
+                if(to !== i){
+                    entry.ctx.$write(ModelContext.INDEX, to)
+                    entry.index = to
+                }
                 shifted.set(to, entry)
             }
             this.$entries = shifted
-            // the sizes after index move by count (rows not laid out stay unknown); not splice(index, 0, ...new
-            // Array(count)), whose arguments overflow the call stack past about 100000 rows
-            let sizes = this.$sizes
-            if(kind === 'insert'){
-                if(index < sizes.length){
-                    let tail = sizes.splice(index)
-                    sizes.length = index + count
-                    for(let i = 0; i < tail.length; i++) sizes.push(tail[i])
-                }
-            } else sizes.splice(index, count)
             let total = modelRows(this.$model).count
+            if(kind === 'remove'){
+                // QQuickItemViewPrivate::removeItem: the sizes removed before the first entry in view (not counting the
+                // first visible entry, QQuickListViewPrivate::updateSizeChangesBeforeVisiblePos) and after it
+                let sizeBefore = 0, sizeAfter = 0
+                for(let entry of removed){
+                    let at = visible.indexOf(entry)
+                    if(at >= 0){
+                        if(entry.pos < firstInViewPos){
+                            if(entry !== prevFirst) sizeBefore += this.$entrySize(entry)
+                        } else sizeAfter += this.$entrySize(entry)
+                        visible.splice(at, 1)
+                    }
+                    if(this.$currentEntry === entry) this.$currentEntry = null
+                    if(entry.section) entry.section.$releaseLater()
+                    entry.item.$releaseLater()
+                }
+                // updateVisibleIndex
+                this.$visibleIndex = visible.length ? visible[0].index : Math.min(this.$visibleIndex, Math.max(0, total))
+                if(visible.length && prevFirst){
+                    if(prevFirst === firstInView && prevFirst !== visible[0]) visible[0].pos = prevFirstPos
+                    else if(visible[0].pos > firstInViewPos) visible[0].pos -= sizeAfter
+                    else if(visible[0].pos < firstInViewPos) visible[0].pos += sizeBefore
+                }
+            } else {
+                let at = index - this.$visibleIndex
+                if(visible.length && at >= 0 && at <= visible.length && (at < visible.length || index === visible[visible.length - 1].index + 1)){
+                    let pos = at < visible.length ? visible[at].pos : this.$entryEnd(visible[visible.length - 1]) + spacing
+                    if(firstInView && pos < firstInViewPos){
+                        // above the view: the entries before the insertion go, the view keeps its rows where they are
+                        for(let entry of visible.splice(0, at)) this.$releaseEntry(entry)
+                    } else {
+                        // in or after the view: the new rows are made at their place while they reach the buffer
+                        let lastVisiblePos = viewPos + this.$viewSize() + this.$v[ListView.CACHEBUFFER]
+                        let rows = modelRows(this.$model)
+                        let made = 0
+                        for(; made < count && pos <= lastVisiblePos; made++){
+                            let entry = this.$create(index + made, rows)
+                            if(!entry) break
+                            this.$setEntryPos(entry, pos)
+                            entry.size = this.$entrySize(entry)
+                            visible.splice(at + made, 0, entry)
+                            pos += entry.size + spacing
+                        }
+                        // the entries after rows not made are no longer in a row with them
+                        if(made < count) for(let entry of visible.splice(at + made)) this.$releaseEntry(entry)
+                    }
+                    this.$visibleIndex = visible.length ? visible[0].index : index
+                } else if(index < this.$visibleIndex){
+                    this.$visibleIndex += count
+                }
+            }
             this.$write(ListView.COUNT, total)
             let current = this.$v[ListView.CURRENTINDEX]
             if(kind === 'insert' && current >= index && current >= 0 && total > count) this.$write(ListView.CURRENTINDEX, current + count)
             else if(kind === 'remove' && current >= index + count) this.$write(ListView.CURRENTINDEX, current - count)
             else if(kind === 'remove' && current >= index) this.$write(ListView.CURRENTINDEX, Math.min(index, total - 1))
             if(total > 0 && this.$v[ListView.CURRENTINDEX] < 0) this.$write(ListView.CURRENTINDEX, 0)
-            engine.queueFrame(this)
+            this.$forceLayoutPolish()
         } else if(kind === 'change'){
             let rows = modelRows(this.$model)
             for(let i = index; i < index + count; i++){
@@ -1000,7 +1339,7 @@ class ListView extends Item {
                 entry.ctx.$write(ModelContext.MODELDATA, rows.data(i))
                 entry.ctx.$rowChanged(roles)
             }
-            if(this.$v[ListView.SECTION] && this.$v[ListView.SECTION].$v[ViewSection.PROPERTY]) engine.queuePolish(this)
+            if(this.$v[ListView.SECTION] && this.$v[ListView.SECTION].$v[ViewSection.PROPERTY]) this.$forceLayoutPolish()
         } else {
             this.$sync()
         }
@@ -1022,7 +1361,8 @@ installFlick(ListView)
 
 const resync = (view) => { if(view.$f & engine.COMPLETED) view.$sync() }
 const modelSet = (view, value, old) => { if(!sameModel(value, old)) resync(view) }
-const refill = (view) => engine.queuePolish(view)
+// QQuickItemViewPrivate::forceLayoutPolish (setSpacing, setCacheBuffer, setHighlightRangeMode ...)
+const refill = (view) => view.$forceLayoutPolish()
 const scrolled = (view) => {
     view.$content.$write(Item.X, -view.$v[ListView.CONTENTX])
     view.$content.$write(Item.Y, -view.$v[ListView.CONTENTY])
@@ -1099,7 +1439,7 @@ Object.assign(ListView, FLICK_ENUMS, ENUMS)
         base.call(this, id, value)
         if(id === Item.WIDTH || id === Item.HEIGHT){
             this.$syncContentItem()
-            engine.queuePolish(this)
+            this.$forceLayoutPolish()
         }
     }
 }
