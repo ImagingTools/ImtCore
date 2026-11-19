@@ -355,7 +355,11 @@ function setupAnchors(anchors){
             binding.flags |= engine.SETTER
             binding.next = item.$bindings
             item.$bindings = binding
-            engine.scheduleBinding(binding)
+            // the item is complete (componentComplete or a later change of anchors): QQuickAnchorsPrivate::
+            // updateOnComplete and updateHorizontalAnchors/updateVerticalAnchors set the geometry at once, also
+            // while an enclosing component is still being built - a positioner completing right after it
+            // (QQuickBasePositioner::componentComplete -> prePositioning) lays out at the anchored size
+            engine.runBinding(binding)
         }
     }
 

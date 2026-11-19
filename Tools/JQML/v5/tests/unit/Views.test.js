@@ -161,6 +161,90 @@ function cases(name, runtime){
         assert.equal(current.ListView.view, view)
         assert.equal(current.ListView.isCurrentItem, true)
         assert.equal(view.itemAtIndex(1).ListView.isCurrentItem, false)
+        engine.batch(() => { view.currentIndex = 1 })
+        assert.equal(current.ListView.isCurrentItem, false)
+        assert.equal(view.itemAtIndex(1).ListView.isCurrentItem, true)
+    })
+
+    // the popup of the filters (PopupDecorator): a view of no size gets its model; setModel creates the current item
+    // and ends with updateViewport, which estimates the rows with the current item's size (initializeCurrentItem);
+    // setting the current index does not refill (QQuickItemView::trackedPositionChanged), the rows come in the polish
+    test(name + ': a new model of a view of no size: the current item only, the content estimated from its size', () => {
+        let root = window()
+        let view
+        engine.batch(() => {
+            view = new ListView(root)
+            view.cacheBuffer = 0
+            view.spacing = 2
+            view.delegate = box(20)
+        })
+        engine.batch(() => {
+            view.model = 3
+            assert.equal(view.contentHeight, 3 * 20 + 2 * 2)
+            assert.ok(view.itemAtIndex(0))
+            assert.equal(view.itemAtIndex(1), null)
+            view.width = 100
+            view.height = 100
+        })
+        engine.flushFrame()
+        assert.equal(view.contentHeight, 3 * 20 + 2 * 2)
+        assert.ok(view.itemAtIndex(2))
+    })
+
+    // QQuickListViewPrivate::averageSize: 100 until items are laid out, then the rounded mean (qRound) of the built ones
+    test(name + ': rows not built yet are estimated with the rounded mean size of the built ones', () => {
+        const rows = (height) => component((parent, ctx) => {
+            let item = new Item(parent)
+            item.width = 100
+            item.height = ctx.modelData.h
+            return item
+        })
+        let model = []
+        for(let i = 0; i < 10; i++) model.push({ h: i % 2 ? 26 : 25 })
+        let view = list((it) => {
+            it.delegate = rows()
+            it.model = model
+        })
+        // built: 25, 26, 25, 26 (0..76, the next starts at 102 > 100); the mean 25.5 rounds to 26
+        assert.ok(view.itemAtIndex(3))
+        assert.equal(view.itemAtIndex(4), null)
+        assert.equal(view.contentHeight, 102 + 6 * 26)
+    })
+
+    // QQuickListViewPrivate::createHighlight / updateHighlight: made at the current item's size along the flow and
+    // its position; then the position moves by highlightMove*, the width and the height by highlightResize*
+    test(name + ': the highlight moves by highlightMove* and resizes by highlightResize*', () => {
+        let view = list((it) => {
+            it.delegate = component((parent, ctx) => {
+                let item = new Item(parent)
+                item.width = ctx.modelData.w
+                item.height = ctx.modelData.h
+                return item
+            })
+            it.model = [{ w: 100, h: 20 }, { w: 80, h: 40 }]
+            it.highlight = box(0, 0)
+            it.highlightMoveVelocity = 300
+            it.highlightResizeVelocity = 50
+            it.highlightResizeDuration = 120
+        })
+        let highlight = view.highlightItem
+        assert.equal(highlight.height, 20)
+        assert.equal(highlight.width, 100)
+        assert.equal(highlight.y, 0)
+        engine.batch(() => { view.currentIndex = 1 })
+        let animations = view.$highlightAnimations
+        assert.equal(highlight.height, 20)
+        assert.equal(animations.pos.running, true)
+        assert.equal(animations.pos.to, 20)
+        assert.equal(animations.pos.velocity, 300)
+        for(let [key, to] of [['height', 40], ['width', 80]]){
+            assert.equal(animations[key].running, true)
+            assert.equal(animations[key].to, to)
+            assert.equal(animations[key].velocity, 50)
+            assert.equal(animations[key].duration, 120)
+        }
+        engine.batch(() => { for(let key in animations) animations[key].complete() })
+        assert.deepEqual([highlight.y, highlight.width, highlight.height], [20, 80, 40])
     })
 
     test(name + ': sections: a label before the first item of each section, the attached section properties', () => {

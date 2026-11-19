@@ -5,7 +5,7 @@ const { Font } = require('./Font')
 const { Item, bits } = require('./Item')
 const { familyCss, measure, wrapParagraph } = require('./TextLayout')
 const { ACCEPTABLE, INVALID } = require('./Validator')
-const { isSyncingDom, CONSUMED, ACCEPTED } = require('./KeyDelivery')
+const { isSyncingDom, CONSUMED, ACCEPTED, agent: keyAgent } = require('./KeyDelivery')
 const QtEnums = require('../Qt/enums')
 
 const STYLE = bits.STYLE
@@ -357,14 +357,25 @@ class TextField extends Item {
         this.$lastEdit = null
         this.$lastEditCursor = -1
         this.$pending = null
+        // cursorDelegate (QQuickTextUtil::setCursorDelegate / createCursor): made once the cursor first shows
+        this.$cursorItem = null
+        this.$cursorPending = false
+        engine.scheduleComponentComplete(this)
         // QQuickTextInput::focusOutEvent; QQuickTextInputPrivate::handleFocusEvent: the cursor shows with the focus
+        // (QQuickTextEditPrivate::handleFocusEvent the same): the cursor shows with the focus unless read-only; losing it,
+        // the password echo ends, the selection goes unless persistentSelection or the window lost the focus
+        // (Qt::ActiveWindowFocusReason), then editingFinished
         engine.connect(this, Item.SIGNAL_activeFocusChanged, (old, active) => {
-            if(!active && this.$acceptOrFixup()) engine.emitArgs(this, this.constructor.SIGNAL_editingFinished, [])
-            this.$write(this.constructor.CURSORVISIBLE, !!active)
-            if(this.constructor.ECHOMODE !== undefined && this.$v[this.constructor.ECHOMODE] === PASSWORD_ECHO_ON_EDIT){
+            let C = this.constructor
+            if(!this.$v[C.READONLY]) this.$write(C.CURSORVISIBLE, !!active)
+            if(C.ECHOMODE !== undefined && this.$v[C.ECHOMODE] === PASSWORD_ECHO_ON_EDIT){
                 this.$updateDisplayText()
                 engine.markDirty(this, TEXT)
             }
+            if(active) return
+            if(!keyAgent.windowFocusReason && !this.$v[C.PERSISTENTSELECTION]
+                && this.$v[C.SELECTIONSTART] !== this.$v[C.SELECTIONEND]) this.deselect()
+            if(this.$acceptOrFixup()) engine.emitArgs(this, C.SIGNAL_editingFinished, [])
         })
         if(this.$dom){
             let input = document.createElement(multiline ? 'textarea' : 'input')
@@ -385,7 +396,12 @@ class TextField extends Item {
             input.addEventListener('select', () => engine.batch(() => this.$syncSelection()))
             // the caret moved by the keys or a click, nothing selected: no select event
             input.addEventListener('selectionchange', () => engine.batch(() => this.$syncSelection()))
-            input.addEventListener('scroll', () => engine.batch(() => this.$updateCursorRectangle()))
+            // the scroll of the control, kept here: reading it from the DOM would lay the page out
+            input.addEventListener('scroll', () => engine.batch(() => {
+                this.$hs = input.scrollLeft
+                this.$vs = input.scrollTop
+                this.$updateCursorRectangle()
+            }))
             listenMouse()
             input.addEventListener('mousedown', (event) => this.$mouseDown(event))
         }
@@ -761,9 +777,13 @@ class TextField extends Item {
         let font = fontOf(this)
         let C = this.constructor
         let text = String(this.$layoutText())
-        let paragraphs = text.split('\n')
         let wrap = C.WRAPMODE !== undefined ? this.$v[C.WRAPMODE] : 0
         let available = Math.max(0, this.$v[Item.WIDTH] - this.$padding('LEFTPADDING') - this.$padding('RIGHTPADDING'))
+        // the cursor moves far more often than the text, the font or the width change: the lines are kept for them
+        let key = text + '\u0000' + font.family + '\u0000' + font.pixelSize + '\u0000' + font.weight + '\u0000' + font.italic + '\u0000' + font.letterSpacing
+            + '\u0000' + wrap + '\u0000' + available + '\u0000' + (this.$explicit & 1)
+        if(this.$layoutCache && this.$layoutCache.key === key) return this.$layoutCache.layout
+        let paragraphs = text.split('\n')
         let lines = []
         let offset = 0
         for(let paragraph of paragraphs){
@@ -782,7 +802,9 @@ class TextField extends Item {
             offset += paragraph.length + 1
         }
         let lineHeight = measure('', font).height
-        return { font, lines, paragraphs, lineHeight }
+        let layout = { font, lines, paragraphs, lineHeight }
+        this.$layoutCache = { key, layout }
+        return layout
     }
 
     // implicit width is the unwrapped text; a TextEdit with wrapMode and a set width wraps its content to it;
@@ -825,8 +847,7 @@ class TextField extends Item {
     }
 
     $scroll(){
-        let input = this.$input
-        return input ? { x: input.scrollLeft, y: input.scrollTop } : { x: this.$hs, y: 0 }
+        return { x: this.$hs || 0, y: this.$vs || 0 }
     }
 
     $lineIndexOf(lines, pos){
@@ -861,8 +882,48 @@ class TextField extends Item {
         if(C.CURSORRECTANGLE === undefined || C.CURSORPOSITION === undefined) return
         let rect = this.$caretRect(this.$v[C.CURSORPOSITION] || 0)
         let old = this.$v[C.CURSORRECTANGLE]
-        if(old && old.x === rect.x && old.y === rect.y && old.width === rect.width && old.height === rect.height) return
-        this.$write(C.CURSORRECTANGLE, rect)
+        if(!(old && old.x === rect.x && old.y === rect.y && old.width === rect.width && old.height === rect.height)) this.$write(C.CURSORRECTANGLE, rect)
+        // QQuickTextInput::updateCursorRectangle: the cursor delegate follows the rectangle, its height with it
+        let cursor = this.$cursorItem
+        if(cursor && !(cursor.$f & engine.DESTROYED)){
+            cursor.x = rect.x
+            cursor.y = rect.y
+            cursor.height = rect.height
+        }
+    }
+
+    $componentComplete(){
+        super.$componentComplete()
+        // QQuickTextInput::componentComplete: the cursor delegate is made if the cursor shows already
+        if(this.$v[this.constructor.CURSORVISIBLE]) this.$createCursor()
+    }
+
+    // QQuickTextUtil::setCursorDelegate: the old cursor item goes; the new one is made now if the cursor shows
+    $setCursorDelegate(){
+        if(this.$cursorItem) this.$cursorItem.destroy()
+        this.$cursorItem = null
+        this.$cursorPending = true
+        if(this.$v[this.constructor.CURSORVISIBLE] && (this.$f & engine.COMPLETED)) this.$createCursor()
+        engine.markDirty(this, STYLE)
+    }
+
+    // QQuickTextUtil::createCursor: an instance of the delegate as a child of the field, at the cursor rectangle
+    // with its height (set before its creation completes); the field draws no cursor of its own then
+    $createCursor(){
+        if(!this.$cursorPending) return
+        this.$cursorPending = false
+        let C = this.constructor
+        let component = this.$v[C.CURSORDELEGATE]
+        if(component && typeof component.createObject === 'function'){
+            let rect = this.$caretRect(this.$v[C.CURSORPOSITION] || 0)
+            let item = component.createObject(this, { x: rect.x, y: rect.y, height: rect.height })
+            if(item && item instanceof Item) this.$cursorItem = item
+            else if(item){
+                console.warn('JQML: ' + C.name + ' does not support loading non-visual cursor delegates.')
+                item.destroy()
+            }
+        }
+        engine.markDirty(this, STYLE)
     }
 
     // the position at a point of the item; onCharacter: the character under x (TextInput.CursorOnCharacter), else
@@ -953,7 +1014,7 @@ class TextField extends Item {
             let color = toCss(this.$v[C.COLOR])
             let noEcho = C.ECHOMODE !== undefined && this.$v[C.ECHOMODE] === NO_ECHO
             s.color = noEcho ? 'transparent' : color
-            s.caretColor = this.$v[C.CURSORVISIBLE] && !this.$v[C.READONLY] ? color : 'transparent'
+            s.caretColor = this.$v[C.CURSORVISIBLE] && !this.$v[C.READONLY] && !this.$cursorItem ? color : 'transparent'
             s.setProperty('--jq2-selection', toCss(this.$v[C.SELECTIONCOLOR]))
             s.setProperty('--jq2-selected-text', toCss(this.$v[C.SELECTEDTEXTCOLOR]))
         }
@@ -1203,7 +1264,9 @@ const common = {
     selectionColor: { kind: 'color', initial: '#0078d7', effect: style },
     selectedTextColor: { kind: 'color', initial: '#ffffff', effect: style },
     cursorRectangle: { kind: 'var', readonly: true },
-    cursorVisible: { kind: 'bool', effect: style },
+    // QQuickTextInput::setCursorVisible: showing the cursor makes the pending cursor delegate
+    cursorVisible: { kind: 'bool', effect(field, on){ if(on && (field.$f & engine.COMPLETED)) field.$createCursor(); style(field) } },
+    cursorDelegate: { kind: 'component', effect: (field) => field.$setCursorDelegate() },
     persistentSelection: 'bool',
     mouseSelectionMode: 'int',
     overwriteMode: { kind: 'bool', effect: (field) => field.$updateCursorRectangle() },
