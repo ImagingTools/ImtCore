@@ -5,9 +5,11 @@ const path = require('path')
 
 const RUNTIME = path.resolve(__dirname, '../Runtime')
 let cached = null
+let cachedModules = null
 
-function sourcesBundle(){
-    if(cached) return cached
+// the modules: [{ file (relative to Runtime/), code: 'function(module, exports, __req){...}' }], index.js first
+function sourcesModules(){
+    if(cachedModules) return cachedModules
     let ids = new Map()
     let modules = []
     let visit = (file) => {
@@ -21,14 +23,21 @@ function sourcesBundle(){
             if(!target.endsWith('.js')) target = fs.existsSync(target + '.js') ? target + '.js' : path.join(target, 'index.js')
             return '__req(' + visit(target) + ')'
         })
-        modules[id] = 'function(module, exports, __req){\n' + body + '\n}'
+        modules[id] = { file: path.relative(RUNTIME, file), code: 'function(module, exports, __req){\n' + body + '\n}' }
         return id
     }
     visit(path.join(RUNTIME, 'index.js'))
+    cachedModules = modules
+    return modules
+}
+
+function sourcesBundle(){
+    if(cached) return cached
+    let modules = sourcesModules().map(m => m.code)
     cached = '(function(){\nvar __defs = [' + modules.join(',\n') + '];\nvar __cache = [];\n' +
         'function __req(id){ if(__cache[id]) return __cache[id].exports; var m = __cache[id] = { exports: {} }; __defs[id](m, m.exports, __req); return m.exports }\n' +
         '__req(0)\n})();\n'
     return cached
 }
 
-module.exports = { sourcesBundle }
+module.exports = { sourcesBundle, sourcesModules }

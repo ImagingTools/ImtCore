@@ -4,7 +4,7 @@
 // Compare two results with: node tests/bench/compare.mjs base.json new.json
 const fs = require('fs')
 const path = require('path')
-const { CORE, stats, now, gc, heapUsed, gzipSize, applicationPart, load, measure } = require('./lib')
+const { CORE, stats, now, gc, heapUsed, gzipSize, applicationPart, load, measure, disposeAll } = require('./lib')
 const { available } = require('./apps')
 const micro = require('./micro')
 
@@ -22,6 +22,31 @@ function args(){
 
 const options = args()
 const results = {}
+
+// several suites: each in a process of its own, so one does not leave garbage and timers to the next
+const ORDER = ['size', 'compile', 'docs', 'micro', 'mem']
+if(options.suites.size > 1){
+    const { execFileSync } = require('child_process')
+    const os = require('os')
+    let merged = {}
+    let tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'jqml-bench-run-'))
+    for(let suite of ORDER.filter(s => options.suites.has(s))){
+        let out = path.join(tmp, suite + '.json')
+        let argv = ['--expose-gc', __filename, '--suite', suite, '--runs', String(options.runs), '--out', out]
+        if(options.filter) argv.push('--filter', options.filter)
+        execFileSync(process.execPath, argv, { stdio: ['ignore', 'inherit', 'inherit'] })
+        Object.assign(merged, JSON.parse(fs.readFileSync(out, 'utf8')).metrics)
+    }
+    fs.rmSync(tmp, { recursive: true, force: true })
+    let output = { date: new Date().toISOString(), node: process.version, commit: commitOf(), runs: options.runs, metrics: merged }
+    if(options.out) fs.writeFileSync(options.out, JSON.stringify(output, null, 1))
+    else process.stdout.write(JSON.stringify(output, null, 1) + '\n')
+    process.exit(0)
+}
+
+function commitOf(){
+    try { return require('child_process').execSync('git rev-parse --short HEAD', { cwd: __dirname }).toString().trim() } catch(e) { return '' }
+}
 const filter = options.filter ? new RegExp(options.filter) : null
 
 function record(name, unit, samples, extra){
@@ -151,10 +176,11 @@ if(options.suites.has('docs')){
         let keys = []
         let parent = probe.root || new probe.JQ.types.Item(null)
         createAll(probe.JQ, documentsOf(probe.JQ), parent, (key, obj) => { if(obj) keys.push(key) })
+        probe.dispose()
         progress('probe: ' + keys.length + ' documents')
         let createSamples = [], destroySamples = [], heapSamples = []
         for(let i = 0; i < options.runs + 1; i++){
-            let { JQ, root } = load(application)
+            let { JQ, root, dispose } = load(application)
             let holder = JQ.create(() => new JQ.types.Item(root || null))
             let before = heapUsed()
             let start = now()
@@ -166,6 +192,7 @@ if(options.suites.has('docs')){
             JQ.batch(() => { for(let obj of created) obj.destroy() })
             JQ.engine.flushFrame()
             let destroyTime = now() - start
+            dispose()
             progress('run ' + i + ' create ' + createTime.toFixed(0) + ' destroy ' + destroyTime.toFixed(0))
             if(i === 0) continue
             createSamples.push(createTime)
@@ -184,6 +211,8 @@ if(options.suites.has('micro')){
     for(let bench of micro.benchmarks){
         if(!wanted(bench.name)) continue
         let samples = bench.run(options.runs)
+        disposeAll()
+        gc()
         record(bench.name, bench.unit || 'ms', samples)
     }
 }
@@ -194,12 +223,11 @@ if(options.suites.has('mem')){
     for(let bench of micro.memory){
         if(!wanted(bench.name)) continue
         record(bench.name, 'B', bench.run(options.runs))
+        disposeAll()
     }
 }
 
-let output = { date: new Date().toISOString(), node: process.version, commit: (() => {
-    try { return require('child_process').execSync('git rev-parse --short HEAD', { cwd: __dirname }).toString().trim() } catch(e) { return '' }
-})(), runs: options.runs, metrics: results }
+let output = { date: new Date().toISOString(), node: process.version, commit: commitOf(), runs: options.runs, metrics: results }
 if(options.out) fs.writeFileSync(options.out, JSON.stringify(output, null, 1))
 else process.stdout.write(JSON.stringify(output, null, 1) + '\n')
 // the timers of the applications in their contexts would keep the process running
