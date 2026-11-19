@@ -9,6 +9,30 @@ function cases(name, runtime){
     const { engine, Item, types } = runtime
     const { QtObject, Component, Loader } = types
 
+    // QQuickLoaderPrivate::clear removes the item change listener: the Loader lets go of the item it releases
+    test(name + ': a Loader of explicit size lets go of the item it releases', () => {
+        let root, loader, made = []
+        engine.batch(() => {
+            root = new Item(null)
+            loader = new Loader(root)
+            loader.width = 100
+            loader.height = 50
+            loader.sourceComponent = new Component(null, (parent) => {
+                let item = new Item(parent)
+                made.push(item)
+                return item
+            })
+        })
+        engine.batch(() => engine.scheduleComponentComplete(loader))
+        let first = loader.item
+        assert.equal(first.width, 100)
+        engine.batch(() => { loader.active = false })
+        engine.batch(() => { loader.width = 60 })
+        assert.equal(first.width, 100)
+        engine.batch(() => { loader.active = true })
+        assert.equal(loader.item.width, 60)
+        assert.equal(engine.hasSubscribers(loader, Item.SIGNAL_widthChanged), true)
+    })
 
 
 }
