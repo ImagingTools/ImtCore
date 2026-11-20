@@ -7,7 +7,7 @@ const { FileModel, Scope, Element } = require('./model')
 const { Codegen, TypeRef } = require('./codegen')
 const { checkFile } = require('./checks')
 const JQ = require('../Runtime')
-const { qtModule } = require('../Runtime/Qt/modules')
+const { qtModule, IMPORTED_TYPES } = require('../Runtime/Qt/modules')
 
 function dirOf(key){
     let at = key.lastIndexOf('/')
@@ -118,7 +118,7 @@ class RuntimeCodegen extends Codegen {
             let source = file.namespaces.get(qualifier)
             return source ? this.importedType(source, name) : null
         }
-        if(this.types.has(name)) return this.types.get(name)
+        if(this.types.has(name) && !IMPORTED_TYPES.has(name)) return this.types.get(name)
         if(!file) return null
         for(let source of file.typeImports){
             let found = this.importedType(source, name)

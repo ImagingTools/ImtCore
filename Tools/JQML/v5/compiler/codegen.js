@@ -8,6 +8,7 @@ const { rewriteValue, rewriteHandler, rewriteMethod, expressionText } = require(
 const { emitScript, loadScript, isPure } = require('./scripts')
 const { checkFile } = require('./checks')
 const { inlineModel } = require('./model')
+const { qtModule, IMPORTED_TYPES } = require('../Runtime/Qt/modules')
 
 const JS_GLOBALS = new Set([
     'Math', 'JSON', 'Date', 'Number', 'String', 'Boolean', 'Array', 'Object', 'RegExp', 'Error', 'TypeError', 'RangeError',
@@ -165,8 +166,8 @@ class Codegen {
             let target = String(imp.path || '').replace(/^["']|["']$/g, '')
             if(target.endsWith('.js')) continue
             if(imp.isModule && !imp.as && NATIVE_TYPES.has(target)) for(let name of NATIVE_TYPES.get(target)) file.nativeNames.add(name)
-            let source = imp.isModule ? (this.modules.has(target) ? { module: target } : null) : imp.dirKey ? { dir: imp.dirKey } : null
-            if(imp.as) file.namespaces.set(imp.as, source)
+            let source = imp.isModule ? (this.modules.has(target) ? { module: target } : qtModule(target) ? { qt: target } : null) : imp.dirKey ? { dir: imp.dirKey } : null
+            if(imp.as) file.namespaces.set(imp.as, source && source.qt ? null : source)
             else if(source) file.typeImports.unshift(source)
         }
         // QQmlObjectCreator::init makes the scripts of a document with its context: its own, then those of its modules
@@ -184,6 +185,8 @@ class Codegen {
     }
 
     importedType(source, name){
+        // a type of the runtime that a Qt module has to be imported for (QQmlImports: by the order of the imports)
+        if(source.qt) return IMPORTED_TYPES.has(name) && qtModule(source.qt).types.has(name) ? this.types.get(name) || null : null
         let types = source.module ? this.modules.get(source.module) : this.byDir.get(source.dir)
         let found = types && types.get(name)
         return found ? found.typeRef : null
@@ -241,7 +244,7 @@ class Codegen {
             let source = file.namespaces.get(qualifier)
             return source && this.importedType(source, name) || this.types.get(name) || null
         }
-        if(this.types.has(name)) return this.types.get(name)
+        if(this.types.has(name) && !IMPORTED_TYPES.has(name)) return this.types.get(name)
         if(!file) return null
         for(let source of file.typeImports){
             let found = this.importedType(source, name)

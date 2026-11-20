@@ -3,10 +3,11 @@
 // QML type that has no instances (abstract, attached, an enum holder).
 
 const QML = ['QtObject', 'Component', 'Timer', 'Connections', 'Binding']
-const MODELS = ['ListModel', 'ListElement', 'Instantiator']
+const MODELS = ['ListModel', 'ListElement', 'Instantiator', 'ItemSelectionModel', 'DelegateChooser', 'DelegateChoice']
+const LABS_MODELS = ['TableModel', 'TableModelColumn', 'DelegateChooser', 'DelegateChoice']
 const QUICK = [
     'Item', 'FocusScope', 'Rectangle', 'Gradient', 'GradientStop', 'Text', 'TextInput', 'TextEdit', 'Image', 'Canvas',
-    'MouseArea', 'DropArea', 'Flickable', 'Column', 'Row', 'Flow', 'Repeater', 'Loader', 'ListView', 'GridView', 'Shortcut',
+    'MouseArea', 'DropArea', 'Flickable', 'Column', 'Row', 'Flow', 'Repeater', 'Loader', 'ListView', 'GridView', 'TableView', 'Shortcut',
     'IntValidator', 'DoubleValidator', 'RegularExpressionValidator', 'FontLoader',
     'State', 'PropertyChanges', 'StateChangeScript', 'Transition', 'StateGroup',
     'PauseAnimation', 'PropertyAnimation', 'NumberAnimation', 'ColorAnimation', 'RotationAnimation', 'SmoothedAnimation',
@@ -22,6 +23,7 @@ const MODULES = {
     'QtQuick': { types: [...QML, ...MODELS, ...QUICK], uncreatable: QUICK_UNCREATABLE },
     'QtQuick.Window': { types: ['Window'], uncreatable: [] },
     'QtQuick.Layouts': { types: LAYOUTS, uncreatable: ['Layout'] },
+    'Qt.labs.qmlmodels': { types: LABS_MODELS, uncreatable: [] },
     'QtQuick.Dialogs': { types: ['FileDialog', 'FolderDialog'], uncreatable: [] },
     'QtWebSockets': { types: ['WebSocket'], uncreatable: [] },
     'Qt5Compat.GraphicalEffects': { types: ['DropShadow'], uncreatable: [] },
@@ -29,6 +31,12 @@ const MODULES = {
     'Qt.labs.settings': { types: ['Settings'], uncreatable: [] },
     'QtTest': { types: ['TestCase', 'SignalSpy'], uncreatable: [] },
 }
+
+// The types of the runtime a document sees only through the import of a module that has them, in the order of its imports
+// (QQmlImports): the ones Qt added to QtQuick, QtQml.Models and Qt.labs.qmlmodels for tables, whose names a project of
+// its own may use for a type (imtcontrols has a SortFilterProxyModel). The older types stay visible without an import,
+// as v5 always had them.
+const IMPORTED_TYPES = new Set(['ItemSelectionModel', 'TableView', ...LABS_MODELS])
 
 // { types: Set, uncreatable: Set } of a Qt module, or null
 function qtModule(name){
@@ -39,4 +47,4 @@ function qtModule(name){
     return { types: module.typeSet, uncreatable: module.uncreatableSet }
 }
 
-module.exports = { qtModule }
+module.exports = { qtModule, IMPORTED_TYPES }

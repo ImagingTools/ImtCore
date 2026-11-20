@@ -271,6 +271,7 @@ defineType(Item, {
         KeyNavigation: { group: null },
         Drag: { group: null },      // set by Drag.js
         ListView: { group: null },  // set by ListView.js
+        TableView: { group: null }, // set by TableView.js
     },
     signals: ['childrenChanged'],
 })

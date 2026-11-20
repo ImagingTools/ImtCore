@@ -313,6 +313,12 @@ function filterKey(item, event, kind, post){
 }
 
 // from the item with active focus up the parents until one accepts; a Shortcut that matched has the key already
+// QObject::installEventFilter of an item on the focus object: an object that sees the key before the focus item does
+// (TableView on the focus item of its editor); $filterEditKey(event, kind, target) returns true to take it
+const keyFilters = []
+function addKeyFilter(filter){ if(keyFilters.indexOf(filter) < 0) keyFilters.push(filter) }
+function removeKeyFilter(filter){ let i = keyFilters.indexOf(filter); if(i >= 0) keyFilters.splice(i, 1) }
+
 function deliverKey(e, kind){
     if(engine.isStopped() || e.defaultPrevented) return
     let item = agent.activeFocusItem
@@ -320,6 +326,12 @@ function deliverKey(e, kind){
     let event = new KeyEvent(e)
     let result = 0
     engine.batch(() => {
+        for(let filter of keyFilters.slice()){
+            if(!(filter.$f & engine.DESTROYED) && filter.$filterEditKey(event, kind, item)){
+                result = ACCEPTED
+                return
+            }
+        }
         for(let it = item; it instanceof Item && !result; it = it.$parent) result = deliverTo(it, event, kind)
     })
     if(result === ACCEPTED) e.preventDefault()
@@ -476,4 +488,4 @@ for(let [name, Group] of [['Keys', Keys], ['KeyNavigation', KeyNavigation]]){
     }
 }
 
-module.exports = { agent, deliverTo, nextPrevItemInTabFocusChain, focusNextPrev, isEnabled, setWindowFocused, activateWindow, windowCreated, isSyncingDom: () => syncingDom, ACCEPTED, CONSUMED }
+module.exports = { agent, addKeyFilter, removeKeyFilter, deliverKey, deliverTo, nextPrevItemInTabFocusChain, focusNextPrev, isEnabled, setWindowFocused, activateWindow, windowCreated, isSyncingDom: () => syncingDom, ACCEPTED, CONSUMED }

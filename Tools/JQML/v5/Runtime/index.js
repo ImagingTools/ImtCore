@@ -11,6 +11,8 @@ const { Connections } = require('./QtQml/Connections')
 const { Binding } = require('./QtQml/Binding')
 const { ListModel } = require('./QtQml/Models/ListModel')
 const { Instantiator } = require('./QtQml/Models/Instantiator')
+const { ItemSelectionModel } = require('./QtQml/Models/ItemSelectionModel')
+const { TableModel, TableModelColumn } = require('./QtQml/Models/TableModel')
 const { Item, Anchors } = require('./QtQuick/Item')
 const { FocusScope } = require('./QtQuick/FocusScope')
 const { Keys } = require('./QtQuick/Keys')
@@ -35,6 +37,8 @@ const { Repeater } = require('./QtQuick/Repeater')
 const { Loader } = require('./QtQuick/Loader')
 const { ListView } = require('./QtQuick/ListView')
 const { GridView } = require('./QtQuick/GridView')
+const { TableView } = require('./QtQuick/TableView')
+const { DelegateChooser, DelegateChoice } = require('./QtQml/Models/DelegateChooser')
 const { Shortcut, StandardKey } = require('./QtQuick/Shortcut')
 const { IntValidator } = require('./QtQuick/IntValidator')
 const { DoubleValidator } = require('./QtQuick/DoubleValidator')
@@ -351,9 +355,10 @@ const JQ = {
     Qt,
     // QML types by name
     types: {
-        QtObject, Component, Timer, Connections, Binding, ListModel, Instantiator,
+        QtObject, Component, Timer, Connections, Binding, ListModel, Instantiator, ItemSelectionModel, TableModel, TableModelColumn,
         Item, Anchors, FocusScope, Keys, KeyNavigation, Rectangle, Border, Gradient, GradientStop, Text, Font, TextInput, TextEdit, Image, Canvas,
-        MouseArea, MouseDrag, DropArea, Drag, Flickable, Column, Row, Flow, Repeater, Loader, ListView, GridView, Shortcut, StandardKey,
+        MouseArea, MouseDrag, DropArea, Drag, Flickable, Column, Row, Flow, Repeater, Loader, ListView, GridView, TableView, Shortcut, StandardKey,
+        DelegateChooser, DelegateChoice,
         IntValidator, DoubleValidator, RegularExpressionValidator, RegExpValidator, FontLoader,
         State, PropertyChanges, StateChangeScript, Transition, StateGroup,
         Animation, PauseAnimation, PropertyAnimation, NumberAnimation, ColorAnimation, RotationAnimation, SmoothedAnimation,

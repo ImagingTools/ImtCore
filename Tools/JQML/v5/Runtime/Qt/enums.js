@@ -1,5 +1,5 @@
-// The enums of the Qt namespace a QML document sees (qnamespace.h, Q_ENUM_NS / Q_FLAG_NS), with the values of Qt 6.12:
-// generated from what Qt prints for every name (Tools/JQML/v5/tests/diff/cases/qt_namespace_enums.qml compares them).
+// The enums of the Qt namespace a QML document sees (qnamespace.h: Q_ENUM_NS, and the enums of Q_FLAG_NS flags), with the
+// values of Qt 6.12: generated from what Qt prints for every name (tests/diff/cases/qt_namespace_enums.qml compares them).
 // A scoped enum (enum class) is an object: Qt.ColorScheme.Dark.
 module.exports = {
     // GlobalColor
@@ -12,6 +12,15 @@ module.exports = {
     ContrastPreference: { NoPreference: 0, HighContrast: 1 },
     // MotionPreference
     MotionPreference: { NoPreference: 0, ReducedMotion: 1 },
+    // MouseButton
+    NoButton: 0, LeftButton: 1, RightButton: 2, MiddleButton: 4, BackButton: 8, XButton1: 8, ExtraButton1: 8,
+    ForwardButton: 16, XButton2: 16, ExtraButton2: 16, TaskButton: 32, ExtraButton3: 32, ExtraButton4: 64,
+    ExtraButton5: 128, ExtraButton6: 0x100, ExtraButton7: 0x200, ExtraButton8: 0x400, ExtraButton9: 0x800,
+    ExtraButton10: 0x1000, ExtraButton11: 0x2000, ExtraButton12: 0x4000, ExtraButton13: 0x8000,
+    ExtraButton14: 0x10000, ExtraButton15: 0x20000, ExtraButton16: 0x40000, ExtraButton17: 0x80000,
+    ExtraButton18: 0x100000, ExtraButton19: 0x200000, ExtraButton20: 0x400000, ExtraButton21: 0x800000,
+    ExtraButton22: 0x1000000, ExtraButton23: 0x2000000, ExtraButton24: 0x4000000, AllButtons: 0x7ffffff,
+    MaxMouseButton: 0x4000000, MouseButtonMask: -1,
     // Orientation
     Horizontal: 1, Vertical: 2,
     // FocusPolicy
@@ -20,6 +29,12 @@ module.exports = {
     NoTabFocus: 0, TabFocusTextControls: 1, TabFocusListControls: 2, TabFocusAllControls: 255,
     // SortOrder
     AscendingOrder: 0, DescendingOrder: 1,
+    // SplitBehaviorFlags
+    KeepEmptyParts: 0, SkipEmptyParts: 1,
+    // AlignmentFlag
+    AlignLeft: 1, AlignLeading: 1, AlignRight: 2, AlignTrailing: 2, AlignHCenter: 4, AlignJustify: 8,
+    AlignAbsolute: 16, AlignHorizontal_Mask: 31, AlignTop: 32, AlignBottom: 64, AlignVCenter: 128,
+    AlignBaseline: 0x100, AlignVertical_Mask: 0x1e0, AlignCenter: 132,
     // TextFlag
     TextSingleLine: 0x100, TextDontClip: 0x200, TextExpandTabs: 0x400, TextShowMnemonic: 0x800, TextWordWrap: 0x1000,
     TextWrapAnywhere: 0x2000, TextDontPrint: 0x4000, TextIncludeTrailingSpaces: 0x8000000, TextHideMnemonic: 0x8000,
@@ -85,6 +100,11 @@ module.exports = {
     AA_DontCheckOpenGLContextThreadAffinity: 26, AA_DisableShaderDiskCache: 27,
     AA_DontShowShortcutsInContextMenus: 28, AA_CompressTabletEvents: 29, AA_DisableSessionManager: 31,
     AA_AttributeCount: 32,
+    // ImageConversionFlag
+    ColorMode_Mask: 3, AutoColor: 0, ColorOnly: 3, MonoOnly: 2, AlphaDither_Mask: 12, ThresholdAlphaDither: 0,
+    OrderedAlphaDither: 4, DiffuseAlphaDither: 8, NoAlpha: 12, Dither_Mask: 48, DiffuseDither: 0, OrderedDither: 16,
+    ThresholdDither: 32, DitherMode_Mask: 192, AutoDither: 0, PreferDither: 64, AvoidDither: 128,
+    NoOpaqueDetection: 0x100, NoFormatConversion: 0x200,
     // BGMode
     TransparentMode: 0, OpaqueMode: 1,
     // Key
@@ -218,7 +238,7 @@ module.exports = {
     SizeHorCursor: 6, SizeBDiagCursor: 7, SizeFDiagCursor: 8, SizeAllCursor: 9, BlankCursor: 10, SplitVCursor: 11,
     SplitHCursor: 12, PointingHandCursor: 13, ForbiddenCursor: 14, WhatsThisCursor: 15, BusyCursor: 16,
     OpenHandCursor: 17, ClosedHandCursor: 18, DragCopyCursor: 19, DragMoveCursor: 20, DragLinkCursor: 21,
-    LastCursor: 21, CustomCursor: 25, BitmapCursor: 24, CustomCursor: 25,
+    LastCursor: 21, CustomCursor: 25, BitmapCursor: 24,
     // TextFormat
     PlainText: 0, RichText: 1, AutoText: 2, MarkdownText: 3,
     // AspectRatioMode
@@ -302,6 +322,14 @@ module.exports = {
     DecorationPropertyRole: 28, ToolTipPropertyRole: 29, StatusTipPropertyRole: 30, WhatsThisPropertyRole: 31,
     RangeModelDataRole: 40, RangeModelAdapterRole: 41, UserRole: 0x100, StandardItemFlagsRole: 255, FileInfoRole: 252,
     RemoteObjectsCacheRole: 255,
+    // ItemFlag
+    NoItemFlags: 0, ItemIsSelectable: 1, ItemIsEditable: 2, ItemIsDragEnabled: 4, ItemIsDropEnabled: 8,
+    ItemIsUserCheckable: 16, ItemIsEnabled: 32, ItemIsAutoTristate: 64, ItemNeverHasChildren: 128,
+    ItemIsUserTristate: 0x100,
+    // MatchFlag
+    MatchExactly: 0, MatchContains: 1, MatchStartsWith: 2, MatchEndsWith: 3, MatchRegularExpression: 4,
+    MatchWildcard: 5, MatchFixedString: 8, MatchTypeMask: 15, MatchCaseSensitive: 16, MatchWrap: 32,
+    MatchRecursive: 64,
     // WindowModality
     NonModal: 0, WindowModal: 1, ApplicationModal: 2,
     // TextInteractionFlag
@@ -309,6 +337,9 @@ module.exports = {
     LinksAccessibleByKeyboard: 8, TextEditable: 16, TextEditorInteraction: 19, TextBrowserInteraction: 13,
     // SizeHint
     MinimumSize: 0, PreferredSize: 1, MaximumSize: 2, MinimumDescent: 3, NSizeHints: 4,
+    // TouchPointState
+    TouchPointUnknownState: 0, TouchPointPressed: 1, TouchPointMoved: 2, TouchPointStationary: 4,
+    TouchPointReleased: 8,
     // GestureState
     NoGesture: 0, GestureStarted: 1, GestureUpdated: 2, GestureFinished: 3, GestureCanceled: 4,
     // GestureType
@@ -328,6 +359,8 @@ module.exports = {
     // MouseEventSource
     MouseEventNotSynthesized: 0, MouseEventSynthesizedBySystem: 1, MouseEventSynthesizedByQt: 2,
     MouseEventSynthesizedByApplication: 3,
+    // MouseEventFlag
+    NoMouseEventFlag: 0, MouseEventCreatedDoubleClick: 1, MouseEventFlagMask: 255,
     // ChecksumType
     ChecksumIso3309: 0, ChecksumItuV41: 1,
     // HighDpiScaleFactorRoundingPolicy

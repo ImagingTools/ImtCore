@@ -10,6 +10,16 @@ class QPointF extends ValueType {
     toString(){ return 'QPointF(' + this.x + ', ' + this.y + ')' }
 }
 
+// a point of whole numbers (a cell of a TableView: QPoint(column, row))
+class QPoint extends ValueType {
+    constructor(x = 0, y = 0){
+        super()
+        this.x = Math.trunc(x)
+        this.y = Math.trunc(y)
+    }
+    toString(){ return 'QPoint(' + this.x + ', ' + this.y + ')' }
+}
+
 class QSizeF extends ValueType {
     constructor(width = -1, height = -1){
         super()
@@ -279,4 +289,4 @@ function makeFont(specifier){
     return font
 }
 
-module.exports = { ValueType, QPointF, QSizeF, QRectF, QVector2D, QVector3D, QVector4D, QQuaternion, QMatrix4x4, QFont, makeFont, formatG, installConsole }
+module.exports = { ValueType, QPoint, QPointF, QSizeF, QRectF, QVector2D, QVector3D, QVector4D, QQuaternion, QMatrix4x4, QFont, makeFont, formatG, installConsole }

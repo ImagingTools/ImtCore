@@ -353,7 +353,19 @@ function cssCursor(shape){
     return shape || ''
 }
 
+// QGuiApplication::setOverrideCursor / restoreOverrideCursor: a cursor over every item (TableView resizing a column);
+// the last one set wins, an owner takes its own off
+const overrides = []
+function setOverrideCursor(owner, shape){
+    let at = overrides.findIndex(o => o.owner === owner)
+    if(at >= 0) overrides.splice(at, 1)
+    if(shape !== null && shape !== undefined) overrides.push({ owner, shape })
+    setCursor(scene.lastCursor === undefined ? null : scene.lastCursor)
+}
+
 function setCursor(cursor){
+    scene.lastCursor = cursor
+    if(overrides.length) cursor = overrides[overrides.length - 1].shape
     if(scene.element) scene.element.style.cursor = cursor === null || cursor === undefined ? '' : cssCursor(cursor)
 }
 
@@ -532,4 +544,4 @@ Object.assign(Item.prototype, {
     }
 }
 
-module.exports = { modifiersOf, NoButton, LeftButton, scenePos, contains, scene, targetsAt, press, move, release, leaveWindow, wheel, ungrab, pointerOver, deliverHover, isHovered }
+module.exports = { setOverrideCursor, modifiersOf, NoButton, LeftButton, scenePos, contains, scene, targetsAt, press, move, release, leaveWindow, wheel, ungrab, pointerOver, deliverHover, isHovered }
