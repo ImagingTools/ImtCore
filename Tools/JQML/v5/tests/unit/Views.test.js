@@ -143,12 +143,26 @@ function cases(name, runtime){
         assert.equal(fixed.currentIndex, 0)
     })
 
-    test(name + ': a new current index brings its item into the view', () => {
+    // QQuickItemView::trackedPositionChanged: after a new current index (moveReason SetIndex) the view follows the
+    // highlight - an empty item without a highlight component (createHighlightItem, createDefault) - which moves to the
+    // current item by a SmoothedAnimation (highlightMoveVelocity 400); the view moved by hand stops following
+    test(name + ': a new current index: the view follows the highlight moving to the item', () => {
         let view = list()
+        assert.ok(view.highlightItem)
         engine.batch(() => { view.currentIndex = 9 })
+        assert.equal(view.contentY, 0)
+        let animations = view.$highlightAnimations
+        assert.equal(animations.pos.to, 180)
+        engine.batch(() => animations.pos.complete())
+        assert.equal(view.highlightItem.y, 180)
         assert.equal(view.contentY, 100)
         engine.batch(() => { view.currentIndex = 2 })
+        engine.batch(() => animations.pos.complete())
         assert.equal(view.contentY, 40)
+        // by hand: the view does not follow the highlight any more
+        engine.batch(() => { view.contentY = 0 })
+        engine.batch(() => { view.highlightItem.y = 150 })
+        assert.equal(view.contentY, 0)
     })
 
     test(name + ': the delegates are at z 1, the highlight at z 0 under the current item; ListView.view and isCurrentItem', () => {
@@ -520,7 +534,12 @@ function cases(name, runtime){
         assert.equal(view.currentIndex, 4)
         key('ArrowUp')
         assert.equal(view.currentIndex, 1)
+        // the view follows the highlight (an empty item without a component), moved in highlightMoveDuration (150 ms)
         engine.batch(() => { view.currentIndex = 6 })
+        assert.ok(view.highlightItem)
+        assert.equal(view.$highlightAnimations.y.duration, 150)
+        engine.batch(() => { for(let key in view.$highlightAnimations) view.$highlightAnimations[key].complete() })
+        assert.equal(view.highlightItem.y, 200)
         assert.equal(view.contentY, 100)
     })
 }

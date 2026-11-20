@@ -17,6 +17,8 @@ const RIGHT_TO_LEFT = 1
 const NO_SNAP = 0, SNAP_TO_ITEM = 1, SNAP_ONE_ITEM = 2
 const NO_HIGHLIGHT_RANGE = 0, APPLY_RANGE = 1, STRICTLY_ENFORCE_RANGE = 2
 const INLINE_HEADER = 0, OVERLAY_HEADER = 1, PULL_BACK_HEADER = 2
+// QQuickItemViewPrivate::MovementReason: the view follows the highlight only after a new current index
+const MOVE_OTHER = 0, MOVE_SET_INDEX = 1, MOVE_MOUSE = 2
 const FULL_STRING = 0, FIRST_CHARACTER = 1
 
 const ENUMS = {
@@ -81,6 +83,8 @@ class ListView extends Item {
         this.$visibleIndex = 0        // the index of the first of them (visibleIndex)
         this.$visiblePos = 0          // its position (visiblePos)
         this.$currentEntry = null     // the entry of the current item
+        this.$moveReason = MOVE_OTHER
+        this.$internalMove = 0        // the view moves itself (setPosition): not a move of the user
         this.$model = null
         this.$filling = false
         this.$pool = []               // released { item, ctx } kept for reuseItems
@@ -118,8 +122,19 @@ class ListView extends Item {
     // QQuickListViewPrivate::setPosition
     $setPosition(pos){
         let content = this.$reversed() ? -pos - this.$viewSize() : pos
-        if(this.$vertical()) this.contentY = content
-        else this.contentX = content
+        this.$internalMove++
+        try {
+            if(this.$vertical()) this.contentY = content
+            else this.contentX = content
+        } finally {
+            this.$internalMove--
+        }
+    }
+
+    // QQuickItemView::setContentX / setContentY: positioning the view by hand overrides the movement state
+    $assign(id, value){
+        if((id === ListView.CONTENTX || id === ListView.CONTENTY) && !this.$internalMove) this.$moveReason = MOVE_OTHER
+        super.$assign(id, value)
     }
 
     $placeFlow(item, pos){
@@ -241,9 +256,17 @@ class ListView extends Item {
 
     $contentPos(axis){ return this.$v[axis === 'x' ? ListView.CONTENTX : ListView.CONTENTY] }
 
+    // the flick engine moves the view: QQuickListView::viewportMoved takes it for a move of the mouse while flicking
     $setContentPos(axis, value){
-        if(axis === 'x') this.contentX = value
-        else this.contentY = value
+        let s = this.$fs
+        if(s && (s.pressed || s.moving || s.dragging || s.x.flicking || s.y.flicking)) this.$moveReason = MOVE_MOUSE
+        this.$internalMove++
+        try {
+            if(axis === 'x') this.contentX = value
+            else this.contentY = value
+        } finally {
+            this.$internalMove--
+        }
     }
 
     $highlightRange(){
@@ -416,6 +439,7 @@ class ListView extends Item {
     // starts again (changedVisibleIndex) and fills; then the mode places its item, within the extents
     $positionViewAt(index, mode){
         if(!(this.$f & engine.COMPLETED) || !this.$v[ListView.DELEGATE]) return
+        this.$moveReason = MOVE_OTHER
         let count = this.$v[ListView.COUNT]
         if(count <= 0 || mode < ListView.Beginning || mode > ListView.SnapPosition) return
         this.$fill()
@@ -468,43 +492,6 @@ class ListView extends Item {
             this.$fill()
             this.$updateHighlight()
         }
-    }
-
-    // the position for the mode, from the entries built and the average size of the others; no refill (the view
-    // refills when its position changes, as QQuickItemView::viewportMoved)
-    $moveToIndex(index, mode){
-        let count = this.$v[ListView.COUNT]
-        if(count <= 0) return
-        let idx = Math.max(Math.min(index, count - 1), 0)
-        let itemPos = this.$itemPositionAt(idx)
-        let entry = this.$visibleEntry(idx) || this.$entries.get(idx)
-        let itemSize = entry ? this.$sizeOf(entry.item) : this.$averageSize()
-        let itemEnd = itemPos + itemSize
-        let viewSize = this.$viewSize()
-        let pos = this.$position()
-        switch(mode){
-            case ListView.Beginning: pos = itemPos; if(idx === 0 && this.$header) pos -= this.$headerSize(); break
-            case ListView.Center: pos = itemPos - (viewSize - itemSize) / 2; break
-            case ListView.End: pos = itemPos - viewSize + itemSize; if(idx === count - 1 && this.$footer) pos += this.$footerSize(); break
-            case ListView.Visible:
-                if(itemPos > pos + viewSize) pos = itemEnd - viewSize
-                else if(itemEnd <= pos) pos = itemPos
-                break
-            case ListView.Contain:
-                if(itemEnd >= pos + viewSize) pos = itemPos - viewSize + itemSize
-                if(itemPos < pos) pos = itemPos
-                break
-            case ListView.SnapPosition: pos = itemPos - this.$v[ListView.PREFERREDHIGHLIGHTBEGIN]; break
-            default: return
-        }
-        this.$setFlowPositionBounded(pos)
-    }
-
-    $setFlowPositionBounded(pos){
-        let axis = this.$vertical() ? 'y' : 'x'
-        let b = this.$flickBounds(axis)
-        let content = this.$reversed() ? -pos - this.$viewSize() : pos
-        this.$setContentPos(axis, Math.max(b.min, Math.min(b.max, content)))
     }
 
     forceLayout(){ this.$fill() }
@@ -681,14 +668,19 @@ class ListView extends Item {
             this.$highlight = null
             this.$write(ListView.HIGHLIGHTITEM, null)
         }
-        if(!component || !current) return
+        if(!current) return
         let vertical = this.$vertical()
         let follows = this.$v[ListView.HIGHLIGHTFOLLOWSCURRENTITEM]
         if(!this.$highlight){
-            let highlight = this.$componentItem(component, 0)
+            // QQuickItemViewPrivate::createHighlightItem: without a highlight component an empty item (createDefault)
+            let highlight = component ? this.$componentItem(component, 0) : new Item(this.$content)
             if(!highlight) return
             highlight.$component = component
             this.$highlight = highlight
+            // QQuickItemViewPrivate::itemGeometryChanged: the tracked item (the highlight) moving moves the view
+            for(let signal of [Item.SIGNAL_xChanged, Item.SIGNAL_yChanged, Item.SIGNAL_widthChanged, Item.SIGNAL_heightChanged]){
+                engine.connect(highlight, signal, () => { if(this.$highlight === highlight) this.$trackedPositionChanged() })
+            }
             // QQuickListViewPrivate::createHighlight: following the current item, it takes its size along the flow
             // and its position at once
             if(follows){
@@ -702,10 +694,12 @@ class ListView extends Item {
             }
             this.$write(ListView.HIGHLIGHTITEM, highlight)
         }
-        if(!follows) return
-        // QQuickListViewPrivate::updateHighlight: not while a StrictlyEnforceRange view is pressed
+        // QQuickListViewPrivate::updateHighlight: not while a StrictlyEnforceRange view is pressed; then updateTrackedItem
         let s = this.$fs
-        if(this.$v[ListView.HIGHLIGHTRANGEMODE] === STRICTLY_ENFORCE_RANGE && s && s.pressed) return
+        if(!follows || (this.$v[ListView.HIGHLIGHTRANGEMODE] === STRICTLY_ENFORCE_RANGE && s && s.pressed)){
+            this.$trackedPositionChanged()
+            return
+        }
         let highlight = this.$highlight
         // across the flow an empty highlight takes the current item's size at once
         if(vertical && !highlight.$v[Item.WIDTH]) highlight.width = current.$v[Item.WIDTH]
@@ -716,6 +710,82 @@ class ListView extends Item {
         this.$animateHighlight('pos', vertical ? 'y' : 'x', current.$v[vertical ? Item.Y : Item.X], move)
         this.$animateHighlight('width', 'width', current.$v[Item.WIDTH], resize)
         this.$animateHighlight('height', 'height', current.$v[Item.HEIGHT], resize)
+        this.$trackedPositionChanged()
+    }
+
+    // QQuickListViewPrivate::resetHighlightPosition: the highlight at the current item at once
+    $resetHighlightPosition(){
+        let highlight = this.$highlight, current = this.$v[ListView.CURRENTITEM]
+        if(!highlight || !current || !this.$v[ListView.HIGHLIGHTFOLLOWSCURRENTITEM]) return
+        this.$stopHighlightAnimations()
+        let vertical = this.$vertical()
+        highlight.$write(vertical ? Item.Y : Item.X, current.$v[vertical ? Item.Y : Item.X])
+    }
+
+    // the flow position and size of an item (FxListItemSG::position, size)
+    $flowPosOf(item){
+        let vertical = this.$vertical()
+        let pos = item.$v[vertical ? Item.Y : Item.X]
+        return this.$reversed() ? -pos - this.$sizeOf(item) : pos
+    }
+
+    // QQuickItemView::trackedPositionChanged: after a new current index (SetIndex) the view follows the tracked item,
+    // the highlight: into the highlight range when there is one, else so the highlight and the current item show
+    $trackedPositionChanged(){
+        let highlight = this.$highlight
+        let entry = this.$currentEntry
+        if(!highlight || !entry || this.$entries.get(entry.index) !== entry) return
+        if(this.$moveReason !== MOVE_SET_INDEX) return
+        let range = this.$highlightRange()
+        let haveRange = range.mode !== NO_HIGHLIGHT_RANGE && range.start <= range.end
+        if(!this.$v[ListView.HIGHLIGHTFOLLOWSCURRENTITEM] && range.mode === NO_HIGHLIGHT_RANGE) return
+        let size = this.$viewSize()
+        let trackedPos = this.$flowPosOf(highlight)
+        let trackedSize = this.$sizeOf(highlight)
+        let viewPos = this.$position()
+        let pos = viewPos
+        if(haveRange){
+            if(trackedPos > pos + range.end - trackedSize) pos = trackedPos - range.end + trackedSize
+            if(trackedPos < pos + range.start) pos = trackedPos - range.start
+            if(range.mode !== STRICTLY_ENFORCE_RANGE){
+                let bounds = this.$flowBounds()
+                if(pos > bounds.max) pos = bounds.max
+                if(pos < bounds.min) pos = bounds.min
+            }
+        } else {
+            let trackedEndPos = trackedPos + trackedSize
+            let sectionSize = entry.section ? this.$sizeOf(entry.section) : 0
+            // the section label of the current item shows too
+            trackedPos -= sectionSize
+            trackedSize += sectionSize
+            let toItemPos = entry.pos, toItemEndPos = this.$entryEnd(entry)
+            let index = entry.index
+            // showHeaderForIndex / showFooterForIndex: an inline header before the first row, footer after the last
+            if(this.$header && this.$v[ListView.HEADERPOSITIONING] === INLINE_HEADER && index === 0){
+                let startOffset = this.$headerSize()
+                trackedPos -= startOffset
+                trackedEndPos -= startOffset
+                toItemPos -= startOffset
+                toItemEndPos -= startOffset
+            } else if(this.$footer && this.$v[ListView.FOOTERPOSITIONING] === INLINE_HEADER && index === this.$v[ListView.COUNT] - 1){
+                let endOffset = this.$footerSize()
+                trackedPos += endOffset
+                trackedEndPos += endOffset
+                toItemPos += endOffset
+                toItemEndPos += endOffset
+            }
+            if(trackedEndPos >= viewPos + size && toItemEndPos >= viewPos + size){
+                if(trackedEndPos <= toItemEndPos){
+                    pos = trackedEndPos - size
+                    if(trackedSize > size) pos = trackedPos
+                } else {
+                    pos = toItemEndPos - size
+                    if(this.$entrySize(entry) > size) pos = toItemPos
+                }
+            }
+            if(trackedPos < pos && toItemPos < pos) pos = Math.max(trackedPos, toItemPos)
+        }
+        if(pos !== viewPos) this.$setPosition(pos)
     }
 
     $animateHighlight(key, property, to, [velocity, duration]){
@@ -822,8 +892,13 @@ class ListView extends Item {
         // QQuickItemView::componentComplete: refill(), then updateCurrent(0) unless the index was cleared
         if(count > 0 && this.$v[ListView.CURRENTINDEX] < 0) this.$write(ListView.CURRENTINDEX, 0)
         if(this.$v[ListView.CURRENTINDEX] >= count) this.$write(ListView.CURRENTINDEX, count - 1)
+        // QQuickItemView::modelUpdated(reset) / componentComplete: SetIndex for the regeneration, the highlight put at
+        // the current item at once (resetHighlightPosition) and tracked
+        this.$moveReason = MOVE_SET_INDEX
         this.$ensureCurrentItem()
-        this.$trackCurrent()
+        this.$resetHighlightPosition()
+        this.$trackedPositionChanged()
+        this.$moveReason = MOVE_OTHER
         // QQuickItemView::setModel / componentComplete end with updateViewport, also when refill laid nothing out
         // (a view of no size): lastPosition estimates the rows with averageSize - the size of the current item when it
         // is the only one (initializeCurrentItem)
@@ -1206,31 +1281,15 @@ class ListView extends Item {
         this.$updateHighlight()
     }
 
-    // QQuickItemView::trackedPositionChanged: a new current index brings its item into the view (into the highlight
-    // range when one is applied); not while the user moves the view. It only moves the view, it does not refill:
-    // a contentHeight handler sees the new items after the bindings of the change settle (the PopupDecorator
-    // of the filters sizes itself in onContentHeightChanged)
-    $trackCurrent(){
-        let index = this.$v[ListView.CURRENTINDEX]
-        if(index < 0 || !(this.$f & engine.COMPLETED) || this.$modelUpdating) return
-        let s = this.$fs
-        if(s && (s.pressed || s.moving)) return
-        let range = this.$highlightRange()
-        if(range.mode !== NO_HIGHLIGHT_RANGE){
-            this.$setFlowPositionBounded(this.$itemPositionAt(index) - range.start)
-            return
-        }
-        this.$moveToIndex(index, ListView.Contain)
-    }
-
     $write(id, value){
         let old = this.$v[id]
         if(id === ListView.FLICKABLEDIRECTION && !this.$settingDirection) this.$flickDirectionSet = true
         if(id === ListView.KEYNAVIGATIONENABLED) this.$keyNavigationSet = true
         super.$write(id, value)
+        // QQuickItemView::setCurrentIndex: moveReason SetIndex (not for a change of the model), updateCurrent
         if(id === ListView.CURRENTINDEX && this.$v[id] !== old){
+            if(!this.$modelUpdating && this.$f & engine.COMPLETED) this.$moveReason = MOVE_SET_INDEX
             this.$ensureCurrentItem()
-            this.$trackCurrent()
         }
         // QQuickListView::geometryChange drains the pool, setReuseItems(false) as well
         else if((id === Item.WIDTH || id === Item.HEIGHT || id === ListView.REUSEITEMS) && this.$v[id] !== old && this.$pool.length){
@@ -1248,18 +1307,14 @@ class ListView extends Item {
     // inserted among them are made at their place; entries removed above the view give their place to the ones after,
     // so the content in the view does not jump. The view lays out with the next polish
     $modelChanged(kind, index, count, roles = null, to = -1){
-        if(kind === 'move'){
+        if(kind === 'move' || kind === 'insert' || kind === 'remove'){
             this.$modelUpdating = true
             try {
-                this.$modelMoved(index, to, count)
-            } finally {
-                this.$modelUpdating = false
-            }
-            this.$forceLayoutPolish()
-        } else if(kind === 'insert' || kind === 'remove'){
-            this.$modelUpdating = true
-            try {
-                this.$modelInsertedOrRemoved(kind, index, count)
+                if(kind === 'move') this.$modelMoved(index, to, count)
+                else this.$modelInsertedOrRemoved(kind, index, count)
+                // QQuickItemViewPrivate::applyModelChanges -> updateCurrent: the current item exists at once (also when
+                // its row was removed and the index stays), the highlight stays and moves to it
+                this.$ensureCurrentItem()
             } finally {
                 this.$modelUpdating = false
             }
