@@ -454,6 +454,13 @@ Rectangle {
 				}
 			}
 			
+			onCanceled: {
+				controlArea.isPressed = false;
+				controlArea.wasMoving = false;
+				canvasPage.resetDrop();
+				canvas.dropSuppressedIndex = -1;
+			}
+			
 			onReleased: {
 				// Released over a blinking target: the object is dropped onto it instead of being moved.
 				let dropTargetIndex = canvas.dropTargetIndex
