@@ -452,6 +452,52 @@ function cases(name, runtime){
         assert.equal(view.indexAt(10, view.originY + 1), 0)
     })
 
+    // QQmlChangeSet move (QQmlListModel::move -> rowsMoved): the delegates of the moved rows are the same objects at
+    // their new place, the rows moved out of the view release theirs, the ones moved in are made; the current index
+    // follows its row and the view does not move (tests/diff/cases/listview_move.qml: the same as Qt 6)
+    test(name + ': ListModel.move moves the delegates of a ListView, the current item follows its row', () => {
+        const { ListModel } = types
+        let root, model, view
+        engine.batch(() => {
+            root = new Item(null)
+            model = new ListModel(root)
+            for(let i = 0; i < 60; i++) model.append({ n: i })
+            view = new ListView(root)
+            view.width = 300
+            view.height = 200
+            view.cacheBuffer = 0
+            view.delegate = box(20, 300)
+            view.model = model
+        })
+        engine.flushFrame()
+        let items = Array.from({ length: 10 }, (_, i) => view.itemAtIndex(i))
+        engine.batch(() => { view.currentIndex = 3 })
+        engine.batch(() => model.move(2, 5, 1))
+        engine.flushFrame()
+        assert.equal(view.itemAtIndex(5), items[2])
+        assert.equal(view.itemAtIndex(2), items[3])
+        assert.equal(view.itemAtIndex(5).y, 100)
+        assert.equal(view.currentIndex, 2)
+        assert.equal(view.currentItem, items[3])
+        // to the top, before the first visible row: put back there
+        engine.batch(() => model.move(3, 0, 2))
+        engine.flushFrame()
+        assert.equal(view.itemAtIndex(0), items[4])
+        assert.equal(view.itemAtIndex(0).y, 0)
+        assert.equal(view.contentY, 0)
+        // out of the view: released; in from far: made
+        let out = view.itemAtIndex(1)
+        engine.batch(() => model.move(1, 40, 1))
+        engine.flushFrame()
+        assert.notEqual(view.itemAtIndex(1), out)
+        assert.equal(view.itemAtIndex(40), null)
+        engine.batch(() => model.move(50, 2, 3))
+        engine.flushFrame()
+        assert.equal(model.get(2).n, 50)
+        assert.equal(view.itemAtIndex(2).y, 40)
+        assert.equal(view.contentY, 0)
+    })
+
     test(name + ': GridView arrows move the current index by a cell and by a row', () => {
         let root = window()
         let view

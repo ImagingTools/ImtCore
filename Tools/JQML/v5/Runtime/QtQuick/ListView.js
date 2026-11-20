@@ -1212,7 +1212,7 @@ class ListView extends Item {
     // of the filters sizes itself in onContentHeightChanged)
     $trackCurrent(){
         let index = this.$v[ListView.CURRENTINDEX]
-        if(index < 0 || !(this.$f & engine.COMPLETED)) return
+        if(index < 0 || !(this.$f & engine.COMPLETED) || this.$modelUpdating) return
         let s = this.$fs
         if(s && (s.pressed || s.moving)) return
         let range = this.$highlightRange()
@@ -1247,88 +1247,22 @@ class ListView extends Item {
     // entries leave them where they are (the estimate of the rows before them changes, so the origin does); rows
     // inserted among them are made at their place; entries removed above the view give their place to the ones after,
     // so the content in the view does not jump. The view lays out with the next polish
-    $modelChanged(kind, index, count, roles = null){
-        if(kind === 'insert' || kind === 'remove'){
-            let visible = this.$visible
-            let spacing = this.$v[ListView.SPACING]
-            let viewPos = this.$position()
-            let firstInView = visible.find(entry => this.$entryEnd(entry) > viewPos) || visible[0] || null
-            let firstInViewPos = firstInView ? firstInView.pos : 0
-            let prevFirst = visible[0] || null
-            let prevFirstPos = prevFirst ? prevFirst.pos : 0
-            let shifted = new Map()
-            let removed = []
-            for(let [i, entry] of this.$entries){
-                if(kind === 'remove' && i >= index && i < index + count){
-                    removed.push(entry)
-                    continue
-                }
-                let to = i >= index ? (kind === 'insert' ? i + count : i - count) : i
-                if(to !== i){
-                    entry.ctx.$write(ModelContext.INDEX, to)
-                    entry.index = to
-                }
-                shifted.set(to, entry)
+    $modelChanged(kind, index, count, roles = null, to = -1){
+        if(kind === 'move'){
+            this.$modelUpdating = true
+            try {
+                this.$modelMoved(index, to, count)
+            } finally {
+                this.$modelUpdating = false
             }
-            this.$entries = shifted
-            let total = modelRows(this.$model).count
-            if(kind === 'remove'){
-                // QQuickItemViewPrivate::removeItem: the sizes removed before the first entry in view (not counting the
-                // first visible entry, QQuickListViewPrivate::updateSizeChangesBeforeVisiblePos) and after it
-                let sizeBefore = 0, sizeAfter = 0
-                for(let entry of removed){
-                    let at = visible.indexOf(entry)
-                    if(at >= 0){
-                        if(entry.pos < firstInViewPos){
-                            if(entry !== prevFirst) sizeBefore += this.$entrySize(entry)
-                        } else sizeAfter += this.$entrySize(entry)
-                        visible.splice(at, 1)
-                    }
-                    if(this.$currentEntry === entry) this.$currentEntry = null
-                    if(entry.section) entry.section.$releaseLater()
-                    entry.item.$releaseLater()
-                }
-                // updateVisibleIndex
-                this.$visibleIndex = visible.length ? visible[0].index : Math.min(this.$visibleIndex, Math.max(0, total))
-                if(visible.length && prevFirst){
-                    if(prevFirst === firstInView && prevFirst !== visible[0]) visible[0].pos = prevFirstPos
-                    else if(visible[0].pos > firstInViewPos) visible[0].pos -= sizeAfter
-                    else if(visible[0].pos < firstInViewPos) visible[0].pos += sizeBefore
-                }
-            } else {
-                let at = index - this.$visibleIndex
-                if(visible.length && at >= 0 && at <= visible.length && (at < visible.length || index === visible[visible.length - 1].index + 1)){
-                    let pos = at < visible.length ? visible[at].pos : this.$entryEnd(visible[visible.length - 1]) + spacing
-                    if(firstInView && pos < firstInViewPos){
-                        // above the view: the entries before the insertion go, the view keeps its rows where they are
-                        for(let entry of visible.splice(0, at)) this.$releaseEntry(entry)
-                    } else {
-                        // in or after the view: the new rows are made at their place while they reach the buffer
-                        let lastVisiblePos = viewPos + this.$viewSize() + this.$v[ListView.CACHEBUFFER]
-                        let rows = modelRows(this.$model)
-                        let made = 0
-                        for(; made < count && pos <= lastVisiblePos; made++){
-                            let entry = this.$create(index + made, rows)
-                            if(!entry) break
-                            this.$setEntryPos(entry, pos)
-                            entry.size = this.$entrySize(entry)
-                            visible.splice(at + made, 0, entry)
-                            pos += entry.size + spacing
-                        }
-                        // the entries after rows not made are no longer in a row with them
-                        if(made < count) for(let entry of visible.splice(at + made)) this.$releaseEntry(entry)
-                    }
-                    this.$visibleIndex = visible.length ? visible[0].index : index
-                } else if(index < this.$visibleIndex){
-                    this.$visibleIndex += count
-                }
+            this.$forceLayoutPolish()
+        } else if(kind === 'insert' || kind === 'remove'){
+            this.$modelUpdating = true
+            try {
+                this.$modelInsertedOrRemoved(kind, index, count)
+            } finally {
+                this.$modelUpdating = false
             }
-            this.$write(ListView.COUNT, total)
-            let current = this.$v[ListView.CURRENTINDEX]
-            if(kind === 'insert' && current >= index && current >= 0 && total > count) this.$write(ListView.CURRENTINDEX, current + count)
-            else if(kind === 'remove' && current >= index + count) this.$write(ListView.CURRENTINDEX, current - count)
-            else if(kind === 'remove' && current >= index) this.$write(ListView.CURRENTINDEX, Math.min(index, total - 1))
-            if(total > 0 && this.$v[ListView.CURRENTINDEX] < 0) this.$write(ListView.CURRENTINDEX, 0)
             this.$forceLayoutPolish()
         } else if(kind === 'change'){
             let rows = modelRows(this.$model)
@@ -1342,6 +1276,178 @@ class ListView extends Item {
             if(this.$v[ListView.SECTION] && this.$v[ListView.SECTION].$v[ViewSection.PROPERTY]) this.$forceLayoutPolish()
         } else {
             this.$sync()
+        }
+    }
+
+    // insert / remove (see $modelChanged)
+    $modelInsertedOrRemoved(kind, index, count){
+        let visible = this.$visible
+        let spacing = this.$v[ListView.SPACING]
+        let viewPos = this.$position()
+        let firstInView = visible.find(entry => this.$entryEnd(entry) > viewPos) || visible[0] || null
+        let firstInViewPos = firstInView ? firstInView.pos : 0
+        let prevFirst = visible[0] || null
+        let prevFirstPos = prevFirst ? prevFirst.pos : 0
+        let shifted = new Map()
+        let removed = []
+        for(let [i, entry] of this.$entries){
+            if(kind === 'remove' && i >= index && i < index + count){
+                removed.push(entry)
+                continue
+            }
+            let to = i >= index ? (kind === 'insert' ? i + count : i - count) : i
+            if(to !== i){
+                entry.ctx.$write(ModelContext.INDEX, to)
+                entry.index = to
+            }
+            shifted.set(to, entry)
+        }
+        this.$entries = shifted
+        let total = modelRows(this.$model).count
+        if(kind === 'remove'){
+            // QQuickItemViewPrivate::removeItem: the sizes removed before the first entry in view (not counting the
+            // first visible entry, QQuickListViewPrivate::updateSizeChangesBeforeVisiblePos) and after it
+            let sizeBefore = 0, sizeAfter = 0
+            for(let entry of removed){
+                let at = visible.indexOf(entry)
+                if(at >= 0){
+                    if(entry.pos < firstInViewPos){
+                        if(entry !== prevFirst) sizeBefore += this.$entrySize(entry)
+                    } else sizeAfter += this.$entrySize(entry)
+                    visible.splice(at, 1)
+                }
+                if(this.$currentEntry === entry) this.$currentEntry = null
+                if(entry.section) entry.section.$releaseLater()
+                entry.item.$releaseLater()
+            }
+            // updateVisibleIndex
+            this.$visibleIndex = visible.length ? visible[0].index : Math.min(this.$visibleIndex, Math.max(0, total))
+            if(visible.length && prevFirst){
+                if(prevFirst === firstInView && prevFirst !== visible[0]) visible[0].pos = prevFirstPos
+                else if(visible[0].pos > firstInViewPos) visible[0].pos -= sizeAfter
+                else if(visible[0].pos < firstInViewPos) visible[0].pos += sizeBefore
+            }
+        } else {
+            let at = index - this.$visibleIndex
+            if(visible.length && at >= 0 && at <= visible.length && (at < visible.length || index === visible[visible.length - 1].index + 1)){
+                let pos = at < visible.length ? visible[at].pos : this.$entryEnd(visible[visible.length - 1]) + spacing
+                if(firstInView && pos < firstInViewPos){
+                    // above the view: the entries before the insertion go, the view keeps its rows where they are
+                    for(let entry of visible.splice(0, at)) this.$releaseEntry(entry)
+                } else {
+                    // in or after the view: the new rows are made at their place while they reach the buffer
+                    let lastVisiblePos = viewPos + this.$viewSize() + this.$v[ListView.CACHEBUFFER]
+                    let rows = modelRows(this.$model)
+                    let made = 0
+                    for(; made < count && pos <= lastVisiblePos; made++){
+                        let entry = this.$create(index + made, rows)
+                        if(!entry) break
+                        this.$setEntryPos(entry, pos)
+                        entry.size = this.$entrySize(entry)
+                        visible.splice(at + made, 0, entry)
+                        pos += entry.size + spacing
+                    }
+                    // the entries after rows not made are no longer in a row with them
+                    if(made < count) for(let entry of visible.splice(at + made)) this.$releaseEntry(entry)
+                }
+                this.$visibleIndex = visible.length ? visible[0].index : index
+            } else if(index < this.$visibleIndex){
+                this.$visibleIndex += count
+            }
+        }
+        this.$write(ListView.COUNT, total)
+        let current = this.$v[ListView.CURRENTINDEX]
+        if(kind === 'insert' && current >= index && current >= 0 && total > count) this.$write(ListView.CURRENTINDEX, current + count)
+        else if(kind === 'remove' && current >= index + count) this.$write(ListView.CURRENTINDEX, current - count)
+        else if(kind === 'remove' && current >= index) this.$write(ListView.CURRENTINDEX, Math.min(index, total - 1))
+        if(total > 0 && this.$v[ListView.CURRENTINDEX] < 0) this.$write(ListView.CURRENTINDEX, 0)
+    }
+
+    // QQmlChangeSet move: a removal and an insertion with move keys; the delegates of the moved rows are taken out of
+    // the visible ones and put back where the rows land when that is in the view (the removed items of the change set
+    // are the moved ones: their item is reused), else released. The rows in view keep their place as for a removal
+    // and an insertion (repositionFirstItem); the current index follows its row, the view does not move to it
+    $modelMoved(from, to, count){
+        let visible = this.$visible
+        let spacing = this.$v[ListView.SPACING]
+        let viewPos = this.$position()
+        let firstInView = visible.find(entry => this.$entryEnd(entry) > viewPos) || visible[0] || null
+        let firstInViewPos = firstInView ? firstInView.pos : 0
+        let prevFirst = visible[0] || null
+        let prevFirstPos = prevFirst ? prevFirst.pos : 0
+        let map = (i) => {
+            if(i >= from && i < from + count) return to + (i - from)
+            let j = i < from ? i : i - count
+            return j >= to ? j + count : j
+        }
+        let shifted = new Map()
+        for(let [i, entry] of this.$entries){
+            let k = map(i)
+            if(k !== i){
+                entry.ctx.$write(ModelContext.INDEX, k)
+                entry.index = k
+            }
+            shifted.set(k, entry)
+        }
+        this.$entries = shifted
+        let isMoved = (entry) => entry.index >= to && entry.index < to + count
+        // the removal: the moved entries leave the visible ones (kept in $entries for the insertion)
+        let sizeBefore = 0, sizeAfter = 0
+        for(let i = visible.length - 1; i >= 0; i--){
+            let entry = visible[i]
+            if(!isMoved(entry)) continue
+            if(entry.pos < firstInViewPos){
+                if(entry !== prevFirst) sizeBefore += this.$entrySize(entry)
+            } else sizeAfter += this.$entrySize(entry)
+            visible.splice(i, 1)
+        }
+        if(visible.length){
+            this.$visibleIndex = visible[0].index
+            if(prevFirst && prevFirst === firstInView && prevFirst !== visible[0]) visible[0].pos = prevFirstPos
+            else if(visible[0].pos > firstInViewPos) visible[0].pos -= sizeAfter
+            else if(visible[0].pos < firstInViewPos) visible[0].pos += sizeBefore
+            this.$layoutVisible()
+        }
+        // the insertion at to, found as applyInsertionChange does after the removal: by the indexes the rows have
+        // between the two (the final index of a row after to, less count); the moved entries put back among the
+        // visible ones while they reach the buffer
+        let between = (entry) => entry.index >= to ? entry.index - count : entry.index
+        let lastVisiblePos = viewPos + this.$viewSize() + this.$v[ListView.CACHEBUFFER]
+        let at = -1
+        if(visible.length){
+            let first = between(visible[0]), last = visible[visible.length - 1]
+            if(to >= first && to <= between(last)) at = to - first
+            else if(to === between(last) + 1 && this.$entryEnd(last) <= lastVisiblePos) at = visible.length
+        }
+        if(at >= 0){
+            let pos = at < visible.length ? visible[at].pos : this.$entryEnd(visible[visible.length - 1]) + spacing
+            if(firstInView && pos < firstInViewPos){
+                for(let entry of visible.splice(0, at)) this.$releaseEntry(entry)
+            } else {
+                let rows = modelRows(this.$model)
+                let made = 0
+                for(; made < count && pos <= lastVisiblePos; made++){
+                    let entry = this.$create(to + made, rows)
+                    if(!entry) break
+                    this.$setEntryPos(entry, pos)
+                    entry.size = this.$entrySize(entry)
+                    visible.splice(at + made, 0, entry)
+                    pos += entry.size + spacing
+                }
+                if(made < count) for(let entry of visible.splice(at + made)) this.$releaseEntry(entry)
+            }
+        }
+        if(visible.length) this.$visibleIndex = visible[0].index
+        // the moved entries not put back go, the current item stays
+        for(let [i, entry] of Array.from(this.$entries)){
+            if(isMoved(entry) && visible.indexOf(entry) < 0) this.$releaseEntry(entry)
+        }
+        let current = this.$v[ListView.CURRENTINDEX]
+        if(current >= 0) this.$write(ListView.CURRENTINDEX, map(current))
+        // the sections around the moved rows change
+        if(this.$v[ListView.SECTION] && this.$v[ListView.SECTION].$v[ViewSection.PROPERTY]){
+            let rows = modelRows(this.$model)
+            for(let entry of visible) this.$updateEntrySection(entry.index, entry, rows)
         }
     }
 
