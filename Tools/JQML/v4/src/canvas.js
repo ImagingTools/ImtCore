@@ -1085,6 +1085,61 @@ export class CanvasContext {
 		this.$ellipticArc(cx, cy, radius, radius, start, start + sweep);
 	}
 
+	// An arc of the radius that touches the line from the current point to (x1, y1) and the line from there to (x2, y2): a line to the first
+	// point of touch, then the arc to the second (the rounded corners of PaintedCorner and LicenseTreeCanvas). With no current point it
+	// starts the path at (x1, y1); a zero radius or points on one line give a line to (x1, y1); a negative radius is an error (Qt).
+	// It answers the context.
+	arcTo(x1, y1, x2, y2, radius) {
+		x1 = toFloat(x1);
+		y1 = toFloat(y1);
+		x2 = toFloat(x2);
+		y2 = toFloat(y2);
+		radius = toFloat(radius);
+		if (radius < 0) throw new Error('Incorrect argument radius');
+		const from = this.$currentPoint();
+		if (from === null) {
+			this.moveTo(x1, y1);
+			return this;
+		}
+		const ax = from.x - x1;
+		const ay = from.y - y1;
+		const bx = x2 - x1;
+		const by = y2 - y1;
+		const la = Math.hypot(ax, ay);
+		const lb = Math.hypot(bx, by);
+		const cross = ax * by - ay * bx;
+		if (radius === 0 || la === 0 || lb === 0 || Math.abs(cross) < 1e-9 * la * lb) {
+			this.lineTo(x1, y1);
+			return this;
+		}
+		const ux = ax / la;
+		const uy = ay / la;
+		const vx = bx / lb;
+		const vy = by / lb;
+		const angle = Math.acos(Math.max(-1, Math.min(1, ux * vx + uy * vy)));
+		const touch = radius / Math.tan(angle / 2);
+		const t1x = x1 + ux * touch;
+		const t1y = y1 + uy * touch;
+		const t2x = x1 + vx * touch;
+		const t2y = y1 + vy * touch;
+		const mx = ux + vx;
+		const my = uy + vy;
+		const lm = Math.hypot(mx, my);
+		const centre = radius / Math.sin(angle / 2);
+		const cx = x1 + (mx / lm) * centre;
+		const cy = y1 + (my / lm) * centre;
+		this.lineTo(t1x, t1y);
+		let start = Math.atan2(t1y - cy, t1x - cx);
+		let end = Math.atan2(t2y - cy, t2x - cx);
+		// the shorter way round: clockwise (towards growing angles) when the turn at (x1, y1) is clockwise
+		let sweep = end - start;
+		while (sweep > Math.PI) sweep -= 2 * Math.PI;
+		while (sweep < -Math.PI) sweep += 2 * Math.PI;
+		this.$ellipticArc(cx, cy, radius, radius, start, start + sweep);
+		this.lineTo(t2x, t2y);
+		return this;
+	}
+
 	$ellipticArc(cx, cy, rx, ry, start, end) {
 		const steps = Math.max(8, Math.ceil(Math.abs(end - start) * Math.max(rx, ry, 1) / 4));
 		for (let i = 0; i <= steps; i++) {
