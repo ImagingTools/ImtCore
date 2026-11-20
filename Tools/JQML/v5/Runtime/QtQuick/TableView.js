@@ -2043,23 +2043,16 @@ class TableView extends Flickable {
         }
     }
 
+    // QQuickTableViewPrivate::clearSection: the mapping goes; the loop of Qt that would tell the moves walks the vector it
+    // just cleared (a reference to it), so no columnMoved / rowMoved is emitted
     $clearSection(horizontal){
-        let owner = this.$syncView || this
-        let oldLogical = (horizontal ? owner.$horizontalLogicalIndices : owner.$verticalLogicalIndices).slice()
-        let oldVisual = (horizontal ? owner.$horizontalVisualIndices : owner.$verticalVisualIndices).slice()
         if(this.$syncView){
             this.$syncView.$clearSection(horizontal)
-        } else {
-            if(horizontal){ this.$horizontalLogicalIndices = []; this.$horizontalVisualIndices = [] }
-            else { this.$verticalLogicalIndices = []; this.$verticalVisualIndices = [] }
-            this.$scheduleRebuildTable(RO.ViewportOnly)
+            return
         }
-        for(let index = 0; index < oldLogical.length; index++){
-            if(oldLogical[index].index !== index){
-                let current = oldLogical[index].index
-                engine.emitArgs(this, horizontal ? TableView.SIGNAL_columnMoved : TableView.SIGNAL_rowMoved, [current, oldVisual[current].index, index])
-            }
-        }
+        if(horizontal){ this.$horizontalLogicalIndices = []; this.$horizontalVisualIndices = [] }
+        else { this.$verticalLogicalIndices = []; this.$verticalVisualIndices = [] }
+        this.$scheduleRebuildTable(RO.ViewportOnly)
     }
 
     // ---- the public functions (Q_INVOKABLE) ----

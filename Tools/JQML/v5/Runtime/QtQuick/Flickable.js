@@ -199,6 +199,16 @@ function fixup(view, axis, immediate = false){
     })
 }
 
+// QQuickFlickable::geometryChange: "Make sure that we're entirely in view" - a new width or height puts the content
+// back within its bounds at once, unless it is pressed or moving
+function geometryFixup(view, axis){
+    let s = view.$fs
+    if(s && (s.pressed || s.moving)) return
+    let { min, max } = bounds(view, axis)
+    let pos = view.$contentPos(axis)
+    if(pos < min || pos > max) fixup(view, axis, true)
+}
+
 function endIfIdle(view){
     let s = flickState(view)
     if(!s.pressed && !animating(s)) movementEnding(view)
@@ -635,8 +645,12 @@ Object.assign(Flickable, FLICK_ENUMS)
 {
     let base = Flickable.prototype.$write
     Flickable.prototype.$write = function(id, value){
+        let old = this.$v[id]
         base.call(this, id, value)
-        if(id === Item.WIDTH || id === Item.HEIGHT) this.$syncContentSize()
+        if(id === Item.WIDTH || id === Item.HEIGHT){
+            this.$syncContentSize()
+            if(old !== this.$v[id]) geometryFixup(this, id === Item.WIDTH ? 'x' : 'y')
+        }
     }
 }
 

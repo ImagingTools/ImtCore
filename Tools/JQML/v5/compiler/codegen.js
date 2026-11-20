@@ -303,7 +303,23 @@ class Codegen {
         return this.ownMember(el, name) || this.typeMember(el.typeRef, name)
     }
 
+    // a type that is a component itself (Component, DelegateChooser: QQmlComponent subclasses): no implicit Component
+    // is made around it (QQmlPropertyValidator / QQmlComponentAndAliasResolver)
+    isComponentType(file, typeName){
+        if(typeName === 'Component') return true
+        let type = typeName ? this.typeOf(typeName, file) : null
+        return !!(type && type.kind === 'builtin' && (type.Class === JQ.types.Component || type.Class.prototype instanceof JQ.types.Component))
+    }
+
     isComponentProperty(el, name){
+        // a grouped or attached property: `TableView.editDelegate: Item {}` is a component of the attached object
+        let dot = name.indexOf('.')
+        if(dot > 0){
+            let group = this.member(el, name.slice(0, dot))
+            let Group = group && group.kind === 'prop' && group.builtin && group.prop.group
+            let sub = Group && Group.$type && Group.$type.propByName.get(name.slice(dot + 1))
+            return !!(sub && sub.kind === 'component')
+        }
         let m = this.member(el, name)
         if(!m) return false
         if(m.kind === 'prop' && m.builtin) return m.prop.kind === 'component'
@@ -461,7 +477,7 @@ class Codegen {
             for(let assign of el.assigns){
                 if(assign.elementNode && !assign.element){
                     // `delegate: Component {...}` is already a component
-                    let asComponent = this.isComponentProperty(el, assign.name) && assign.elementNode[1] !== 'Component'
+                    let asComponent = this.isComponentProperty(el, assign.name) && !this.isComponentType(file, assign.elementNode[1])
                     let before = file.elements.length
                     assign.element = file.elementValue(assign.elementNode, el.scope, null, asComponent)
                     assign.asComponent = asComponent
@@ -1005,7 +1021,12 @@ class Codegen {
         }
         // A default property holding a component (Repeater.delegate): the child is the delegate
         let defaultProperty = el.typeRef.kind === 'builtin' && el.typeRef.Class.$defaultProperty
-        if(defaultProperty && children.length === 1 && this.isComponentProperty(el, defaultProperty)){
+        // ...a component itself (a DelegateChooser) is the value as it is
+        if(defaultProperty && children.length === 1 && this.isComponentProperty(el, defaultProperty) && this.isComponentType(file, children[0].type)){
+            post.push(v + '.' + defaultProperty + '=' + this.elementExpr(file, children[0], false, post) + ';')
+            return
+        }
+        if(defaultProperty && children.length === 1 && this.isComponentProperty(el, defaultProperty) && !this.isComponentType(file, children[0].type)){
             let child = children[0]
             if(!child.$asDelegate){
                 child.$asDelegate = true
@@ -1090,6 +1111,7 @@ class Codegen {
             let defaultProperty = el.typeRef && el.typeRef.kind === 'builtin' && el.typeRef.Class.$defaultProperty
             if(!defaultProperty || el.children.length !== 1 || !this.isComponentProperty(el, defaultProperty)) continue
             let child = el.children[0]
+            if(this.isComponentType(file, child.type)) continue
             if(child.$asDelegate) continue
             child.$asDelegate = true
             file.reparentToScope(child, file.newScope(el.scope, true))
