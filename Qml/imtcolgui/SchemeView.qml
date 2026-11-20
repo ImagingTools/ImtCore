@@ -107,10 +107,23 @@ Rectangle {
 	function updateDropTarget(){
 		let index = canvasPage.findDropCandidate()
 		// A target cancelled with Escape is ignored until the dragged object leaves it.
-		if (index !== canvas.dropSuppressedIndex){
-			canvas.dropSuppressedIndex = -1
+		if (canvas.dropSuppressedIndex >= 0){
+			if (canvas.dropSuppressedIndex >= canvasPage.objectsModel.count
+					|| canvas.selectedIndex < 0 || canvas.selectedIndex >= canvasPage.objectsModel.count){
+				canvas.dropSuppressedIndex = -1
+			}
+			else{
+				let dragged = canvasPage.objectsModel.get(canvas.selectedIndex).item
+				let target = canvasPage.objectsModel.get(canvas.dropSuppressedIndex).item
+				let draggedWidth = dragged.m_width ? dragged.m_width : canvas.mainRec_width
+				let targetWidth = target.m_width ? target.m_width : canvas.mainRec_width
+				if (dragged.m_x >= target.m_x + targetWidth || target.m_x >= dragged.m_x + draggedWidth
+						|| dragged.m_y >= target.m_y + canvas.mainRec_height || target.m_y >= dragged.m_y + canvas.mainRec_height){
+					canvas.dropSuppressedIndex = -1
+				}
+			}
 		}
-		else{
+		if (index === canvas.dropSuppressedIndex){
 			index = -1
 		}
 
