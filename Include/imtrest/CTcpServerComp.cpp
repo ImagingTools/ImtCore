@@ -31,6 +31,7 @@ CTcpServerComp::CTcpServerComp()
 
 CTcpServerComp::~CTcpServerComp()
 {
+	// The threads are stopped in OnComponentDestroyed already, unless the component has not been created
 	m_serverPtr.Reset();
 }
 
@@ -147,6 +148,21 @@ void CTcpServerComp::OnComponentCreated()
 	}
 
 	m_isInitialized = true;
+}
+
+
+void CTcpServerComp::OnComponentDestroyed()
+{
+	// The threads of the connections use the references and the attributes of the component: they are stopped here, while the
+	// component has them, not later in the destructor. A queued move to another port does nothing then
+	m_isStartRequested = false;
+
+	m_serverPtr->close();
+	m_serverPtr->ShutdownServer();
+
+	BaseClass2::UnregisterAllModels();
+
+	BaseClass::OnComponentDestroyed();
 }
 
 

@@ -251,6 +251,21 @@ struct SServer
 	}
 
 	/**
+		The threads of the connections that still run.
+	*/
+	int GetRunningThreadCount() const
+	{
+		int retVal = 0;
+		for (const QThread* threadPtr : server.findChildren<QThread*>()){
+			if (threadPtr->isRunning()){
+				++retVal;
+			}
+		}
+
+		return retVal;
+	}
+
+	/**
 		Answer all requests that the servlet keeps with \c 200, the body of the response is the path of the request.
 	*/
 	int RespondToHeld(int bodySize = -1)
@@ -806,6 +821,27 @@ void CTcpServerConnectionTest::StartedServerMovesTest()
 	QCOMPARE(server.RespondToHeld(), 1);
 	QTRY_COMPARE_WITH_TIMEOUT(client.GetResponseCount(), 1, 5000);
 	client.Disconnect();
+}
+
+
+// The threads of the connections use the references and the attributes of the server: they are stopped when the component is
+// destroyed, while it still has them. Later, in the destructor of the server, the wrapper of the component has removed them already
+void CTcpServerConnectionTest::ConnectionsStopWhenComponentIsDestroyedTest()
+{
+	SServer server(5);
+	QVERIFY(server.IsListening());
+
+	CClient client;
+	QVERIFY(client.Connect(server.port));
+	client.SendGet("/held");
+	QTRY_COMPARE_WITH_TIMEOUT(server.servlet->GetHeld().size(), 1, 5000);
+	QVERIFY(server.GetRunningThreadCount() > 0);
+
+	// As the destructor of the wrapper does it: the component is destroyed and loses its context
+	server.server.SetComponentContext(icomp::IComponentContextSharedPtr(), nullptr, false);
+
+	QCOMPARE(server.GetRunningThreadCount(), 0);
+	QVERIFY(!server.IsListening());
 }
 
 
