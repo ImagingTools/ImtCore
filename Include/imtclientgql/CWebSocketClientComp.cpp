@@ -7,6 +7,7 @@
 #include <QtCore/QUrl>
 #include <QtCore/QFile>
 #include <QtCore/QThread>
+#include <QtCore/QUuid>
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 4, 0)
 #include <QtWebSockets/QWebSocketHandshakeOptions>
@@ -36,6 +37,7 @@ namespace imtclientgql
 CWebSocketClientComp::CWebSocketClientComp()
 {
 	m_lastSocketError = QAbstractSocket::SocketError::UnknownSocketError;
+	m_connectionId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 }
 
 
@@ -211,6 +213,7 @@ void CWebSocketClientComp::Shutdown()
 	SetState(ST_SHUTDOWN);
 
 	m_refreshTimer.stop();
+	m_silenceTimer.stop();
 
 	m_webSocket.disconnect();
 	m_webSocket.close();
@@ -243,6 +246,10 @@ void CWebSocketClientComp::OnComponentCreated()
 
 	m_refreshTimer.setSingleShot(true);
 	m_refreshTimer.setInterval(4000);
+
+	connect(&m_silenceTimer, &QTimer::timeout, this, &CWebSocketClientComp::OnSilenceTimeout);
+	m_silenceTimer.setSingleShot(true);
+	m_silenceTimer.setInterval(qMax(0, *m_silenceTimeoutAttrPtr) * 1000);
 
 	if (m_clientIdCompPtr.IsValid()){
 		QString clientId = m_clientIdCompPtr->GetText();
@@ -285,6 +292,27 @@ void CWebSocketClientComp::OnTimeout()
 }
 
 
+void CWebSocketClientComp::OnSilenceTimeout()
+{
+	if (m_state != ST_CONNECTED){
+		return;
+	}
+
+	SendWarningMessage(0, QStringLiteral("No message from the WebSocket server for %1 s, the connection is reopened").arg(m_silenceTimer.interval() / 1000), "CWebSocketClientComp");
+
+	// The disconnected() handler sets the status, schedules the reconnect and the subscriptions register again on it
+	m_webSocket.abort();
+}
+
+
+void CWebSocketClientComp::RestartSilenceTimer()
+{
+	if (m_state == ST_CONNECTED && m_silenceTimer.interval() > 0){
+		m_silenceTimer.start();
+	}
+}
+
+
 void CWebSocketClientComp::OnWebSocketConnected()
 {
 	// The signal is queued: the socket may have been aborted or closed in the meantime.
@@ -295,6 +323,8 @@ void CWebSocketClientComp::OnWebSocketConnected()
 
 	SetState(ST_CONNECTED);
 	m_isRetrying = false;
+	RestartSilenceTimer();
+	m_connectionId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
 	SendInfoMessage(0, "WebSocket connected", "CWebSocketClientComp");
 
@@ -330,6 +360,7 @@ void CWebSocketClientComp::OnWebSocketDisconnected()
 		m_isRetrying = true;
 	}
 
+	m_silenceTimer.stop();
 	m_connectionStatusProvider.SetConnectionStatus(imtcom::IConnectionStatusProvider::CS_DISCONNECTED);
 	m_startQueries.Reset();
 
@@ -383,9 +414,7 @@ void CWebSocketClientComp::OnSslErrors(const QList<QSslError>& sslErrors)
 
 void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message)
 {
-	if (!message.contains("keep_alive")){
-		SendVerboseMessage(message, "OnWebSocketTextMessageReceived");
-	}
+	RestartSilenceTimer();
 
 	QWebSocket* webSocketPtr = dynamic_cast<QWebSocket*>(sender());
 	if (webSocketPtr == nullptr){
@@ -398,9 +427,14 @@ void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message
 
 	istd::TDelPtr<imtrest::CWebSocketRequest> webSocketRequest(new imtrest::CWebSocketRequest(*m_protocolEngineCompPtr.GetPtr()));
 	webSocketRequest->SetBody(message.toUtf8());
+	webSocketRequest->SetConnectionId(m_connectionId);
 
 	imtrest::ConstResponsePtr responsePtr;
 	imtrest::CWebSocketRequest::MethodType methodType = webSocketRequest->GetMethodType();
+
+	if (methodType != imtrest::CWebSocketRequest::MT_KEEP_ALIVE && methodType != imtrest::CWebSocketRequest::MT_KEEP_ALIVE_ACK){
+		SendVerboseMessage(message, "OnWebSocketTextMessageReceived");
+	}
 	if (
 			methodType == imtrest::CWebSocketRequest::MT_CONNECTION_ACK ||
 			methodType == imtrest::CWebSocketRequest::MT_KEEP_ALIVE ||
@@ -454,6 +488,7 @@ void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message
 				}
 				newHttpRequestPtr->SetHeader("id", webSocketRequest->GetRequestId());
 				newHttpRequestPtr->SetBody(body);
+				newHttpRequestPtr->SetConnectionId(m_connectionId);
 				newHttpRequestPtr->SetMethodType(imtrest::CHttpRequest::MT_POST);
 				newHttpRequestPtr->SetCommandId("/" + *m_productId + "/graphql");
 
@@ -484,6 +519,7 @@ void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message
 
 void CWebSocketClientComp::OnWebSocketBinaryMessageReceived(const QByteArray& /*message*/)
 {
+	RestartSilenceTimer();
 }
 
 

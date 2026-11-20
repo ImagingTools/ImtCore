@@ -2,13 +2,16 @@
 // glyphs are rasterized into atlas pages (canvases) that the renderer uploads as textures.
 //
 // Without a font family the 8x8 look of SDL's debug font is emulated: every character occupies
-// a square cell of `pixelSize` and is drawn with the generic monospace font of the browser.
+// a square cell of `pixelSize` and is drawn with the generic monospace font of the browser. A family
+// that is not installed is drawn with the sans-serif font of the browser.
 
 const PAGE_SIZE = 1024;
 const MAX_PAGES = 4;
 const GLYPH_PAD = 1;
 const MAX_RASTER_PX = 256;
 const GENERIC_FAMILIES = new Set(['serif', 'sans-serif', 'monospace', 'cursive', 'fantasy', 'system-ui', 'ui-monospace']);
+// The family of text whose families are not installed (Segoe UI on macOS or Linux)
+const FALLBACK_FAMILY = 'sans-serif';
 
 function makeCanvas(width, height) {
 	if (typeof OffscreenCanvas !== 'undefined') {
@@ -373,7 +376,8 @@ export class FontManager {
 		return widths[0] !== widths[1] || widths[2] !== widths[3];
 	}
 
-	// The first available family of a comma-separated list, or null.
+	// The first available family of a comma-separated list. When none is installed, the sans-serif font of the browser: Qt
+	// takes a font of the system for a family that is missing (the built-in look of Qt is only for a system without fonts).
 	resolveFamily(list) {
 		if (this.resolved.has(list)) return this.resolved.get(list);
 		let result = null;
@@ -383,9 +387,12 @@ export class FontManager {
 				break;
 			}
 		}
-		if (result === null && !this.warned.has(list)) {
-			this.warned.add(list);
-			if (this.onWarning) this.onWarning(`Font family '${list}' not found, using the built-in font`);
+		if (result === null) {
+			result = FALLBACK_FAMILY;
+			if (!this.warned.has(list)) {
+				this.warned.add(list);
+				if (this.onWarning) this.onWarning(`Font family '${list}' not found, using ${FALLBACK_FAMILY}`);
+			}
 		}
 		this.resolved.set(list, result);
 		return result;

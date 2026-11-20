@@ -3,7 +3,7 @@ const { toCss } = require('../Core/color')
 const { defineType, makeReadonly } = require('../Core/type')
 const { Font } = require('./Font')
 const { Item, bits } = require('./Item')
-const { NOWRAP, measure, style, wrapParagraph } = require('./TextLayout')
+const { NOWRAP, familyCss, measure, style, wrapParagraph } = require('./TextLayout')
 
 const STYLE = bits.STYLE
 
@@ -161,7 +161,18 @@ class Text extends Item {
                 engine.batch(() => engine.emitArgs(this, Text.SIGNAL_linkActivated, [link.getAttribute('href') || '']))
             })
         }
+        // QQuickTextPrivate::updateLayout: a Text made by a component lays out once at componentComplete, not after
+        // each property its creation sets (outside a creation it completes at once)
+        engine.scheduleComponentComplete(this)
         this.$updateImplicitSize()
+    }
+
+    $componentComplete(){
+        super.$componentComplete()
+        if(this.$layoutPending){
+            this.$layoutPending = false
+            this.$updateImplicitSize()
+        }
     }
 
     $font(){
@@ -239,6 +250,10 @@ class Text extends Item {
     }
 
     $updateImplicitSize(){
+        if(!(this.$f & engine.COMPLETED)){
+            this.$layoutPending = true
+            return
+        }
         let layout = this.$relayout()
         let v = this.$v
         engine.markDirty(this, TEXT)
@@ -293,7 +308,7 @@ class Text extends Item {
 
     $styleFont(s, font, lh){
         s.fontSize = font.pixelSize + 'px'
-        s.fontFamily = font.family
+        s.fontFamily = familyCss(font.family)
         s.fontWeight = font.weight
         s.fontStyle = font.italic ? 'italic' : ''
         s.textDecoration = [font.underline ? 'underline' : '', font.strikeout ? 'line-through' : ''].join(' ').trim()

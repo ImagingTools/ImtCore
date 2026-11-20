@@ -25,7 +25,40 @@ class ModelContext extends QtObject {
         return this.$row ? this.$row[name] : undefined
     }
 
+    // QQmlDelegateModel with required properties: the required properties of the delegate get the row (the roles by
+    // their name, index, modelData, model) when it is made, and again when the row, its data or its index change
+    $attachRequired(item){
+        let names = item && item.constructor && item.constructor.$qmlRequired
+        if(!names || !names.length) return
+        this.$requiredItem = item
+        this.$requiredNames = names
+        this.$applyRequired(null)
+    }
+
+    $applyRequired(roles){
+        let item = this.$requiredItem
+        if(!item || item.$f & engine.DESTROYED) return
+        for(let name of this.$requiredNames){
+            let value
+            if(name === 'index') value = this.$v[ModelContext.INDEX]
+            else if(name === 'modelData') value = this.$v[ModelContext.MODELDATA]
+            else if(name === 'model') value = this.model
+            else if(this.$row && typeof this.$row === 'object' && name in this.$row){
+                if(roles && !roles.includes(name)) continue
+                value = this.$row[name]
+            } else continue
+            if(item[name] !== value) item[name] = value
+        }
+    }
+
+    $write(id, value){
+        let old = this.$v[id]
+        super.$write(id, value)
+        if((id === ModelContext.INDEX || id === ModelContext.MODELDATA) && old !== this.$v[id]) this.$applyRequired(null)
+    }
+
     $rowChanged(roles){
+        this.$applyRequired(roles)
         engine.emitArgs(this, ModelContext.SIGNAL_rowChanged, [])
         if(!this.$cells) return
         if(!roles){

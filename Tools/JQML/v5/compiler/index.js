@@ -302,7 +302,15 @@ window.addEventListener('load', () => {
     let usesQmlCompiler = [...files.values()].some(file => file.createsQmlObjects)
         || [...codegen.scripts.keys()].some(fileName => fs.existsSync(fileName) && fs.readFileSync(fileName, 'utf8').includes('createQmlObject'))
     let qmlCompiler = usesQmlCompiler ? fs.readFileSync(path.resolve(__dirname, '../dist/qmlcompiler.js'), 'utf8') + '\n' : ''
-    let output = runtime + '\n' + qmlCompiler + ';(function(){\n' + code + '\n' + bootstrap + '\n})();\n'
+    let application = ';(function(){\n' + code + '\n' + bootstrap + '\n})();\n'
+    // --minify: the names of the code are shortened and the spaces dropped; the names of functions and classes stay, the
+    // runtime reads them (Qt.createComponent of a lazy type, the messages of errors)
+    if(options.minify){
+        let result = require('uglify-js').minify(application, { compress: false, mangle: { keep_fnames: true }, output: { ascii_only: true } })
+        if(result.error) throw result.error
+        application = result.code + '\n'
+    }
+    let output = runtime + '\n' + qmlCompiler + application
     fs.writeFileSync(path.resolve(options.output, options.name + '.js'), escapeNonLatin1(output))
     return { warnings: codegen.warnings }
 }

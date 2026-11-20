@@ -170,7 +170,7 @@ sdl::V1_0::imtauth::CPersonalAccessTokenList CPersonalAccessTokenControllerComp:
 		getTokenListRequest.GetRequestedArguments();
 
 	if (!arguments.input.has_value()){
-		Q_ASSERT(false);
+		errorMessage = QStringLiteral("The input is required");
 		return response;
 	}
 
@@ -226,7 +226,7 @@ sdl::V1_0::imtauth::CPersonalAccessToken CPersonalAccessTokenControllerComp::OnG
 		getTokenRequest.GetRequestedArguments();
 
 	if (!arguments.input.has_value()){
-		Q_ASSERT(false);
+		errorMessage = QStringLiteral("The input is required");
 		return response;
 	}
 
@@ -275,7 +275,7 @@ sdl::V1_0::imtauth::CValidateTokenPayload CPersonalAccessTokenControllerComp::On
 		validateTokenRequest.GetRequestedArguments();
 
 	if (!arguments.input.has_value()){
-		Q_ASSERT(false);
+		errorMessage = QStringLiteral("The input is required");
 		return response;
 	}
 
@@ -339,7 +339,7 @@ sdl::V1_0::imtauth::CCreateTokenPayload CPersonalAccessTokenControllerComp::OnCr
 		createTokenRequest.GetRequestedArguments();
 
 	if (!arguments.input.has_value()){
-		Q_ASSERT(false);
+		errorMessage = QStringLiteral("The input is required");
 		return response;
 	}
 
@@ -470,7 +470,7 @@ sdl::V1_0::imtauth::CRevokeTokenPayload CPersonalAccessTokenControllerComp::OnRe
 		revokeTokenRequest.GetRequestedArguments();
 
 	if (!arguments.input.has_value()){
-		Q_ASSERT(false);
+		errorMessage = QStringLiteral("The input is required");
 		return response;
 	}
 
@@ -533,7 +533,7 @@ sdl::V1_0::imtauth::CDeleteTokenPayload CPersonalAccessTokenControllerComp::OnDe
 		deleteTokenRequest.GetRequestedArguments();
 
 	if (!arguments.input.has_value()){
-		Q_ASSERT(false);
+		errorMessage = QStringLiteral("The input is required");
 		return response;
 	}
 

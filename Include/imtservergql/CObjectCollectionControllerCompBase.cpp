@@ -2196,7 +2196,9 @@ QJsonObject CObjectCollectionControllerCompBase::InsertObject(
 	QString description = gqlInputParamPtr->GetParamArgumentValue("description").toString();
 
 	if (typeId.isEmpty()){
-		typeId = "DocumentInfo";
+		// A collection of one type stores the object as that type: a "DocumentInfo" row of a typed collection cannot be read back
+		const iprm::IOptionsList* typesPtr = m_objectCollectionCompPtr->GetObjectTypesInfo();
+		typeId = (typesPtr != nullptr && typesPtr->GetOptionsCount() == 1) ? typesPtr->GetOptionId(0) : QByteArrayLiteral("DocumentInfo");
 	}
 
 	QByteArray objectId;

@@ -224,7 +224,12 @@ void CCollectionDocumentServicePublisherComp::PublishRepresentation(
 
 		if (commandId == networkRequest.gqlRequest.GetCommandId()){
 			for (auto it = networkRequest.networkRequests.constBegin(); it != networkRequest.networkRequests.constEnd(); ++it) {
-				PushDataToSubscriber(it.key(), commandId, data, *it.value());
+				for (const imtrest::IRequest* requestPtr : it.value()) {
+					Q_ASSERT(requestPtr != nullptr);
+					if (requestPtr != nullptr) {
+						PushDataToSubscriber(it.key(), commandId, data, *requestPtr);
+					}
+				}
 			}
 		}
 	}

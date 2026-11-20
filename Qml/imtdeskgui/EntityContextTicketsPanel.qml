@@ -38,7 +38,7 @@ Item {
 	readonly property int ticketsCount: ticketsProvider.totalCount
 
 	readonly property string pageBgColor: Style.baseColor
-	readonly property string accentColor: Style.imaginToolsAccentColor
+	readonly property string accentColor: Style.imagingToolsAccentColor
 
 	function reloadTickets() {
 		ticketsProvider.refresh()
@@ -167,7 +167,7 @@ Item {
 				enabled: !root.creatingTicket
 				decorator: Component {
 					ButtonDecorator {
-						color: Style.imaginToolsAccentColor
+						color: Style.imagingToolsAccentColor
 						textColor: Style.highlightedTextColor
 						opacity: newTicketButton.hovered ? 0.85 : 1
 					}
@@ -558,7 +558,7 @@ Item {
 					widthFromDecorator: true
 					decorator: Component {
 						ButtonDecorator {
-							color: popupCreateButton.enabled ? Style.imaginToolsAccentColor : Style.baseColor
+							color: popupCreateButton.enabled ? Style.imagingToolsAccentColor : Style.baseColor
 							textColor: popupCreateButton.enabled ? Style.highlightedTextColor : Style.inactiveTextColor
 							opacity: popupCreateButton.hovered ? 0.85 : 1
 						}

@@ -87,7 +87,7 @@ DocumentServiceBase {
 			undoManagerSubscription.gqlCommandId = "On" + "UndoRedoChanged"
 			documentManagerSubscription.registerSubscription()
 			undoManagerSubscription.registerSubscription()
-			getOpenedDocumentList()
+			root.__restoreOpenedDocuments()
 		}
 	}
 
@@ -103,8 +103,13 @@ DocumentServiceBase {
 	}
 
 	onDocumentServiceActivated: {
-		if (root.collectionId !== ""){
-			// getOpenedDocumentList()
+		root.__restoreOpenedDocuments()
+	}
+
+	// Only a view restores the listed documents: asked once both the collection and a view are set, whichever comes last
+	function __restoreOpenedDocuments(){
+		if (root.collectionId !== "" && root.getDocumentServiceActiveView() !== null){
+			root.getOpenedDocumentList()
 		}
 	}
 
@@ -291,7 +296,7 @@ DocumentServiceBase {
 			}
 		}
 
-		if (documentIsDirty(documentId) && !force){
+		if (documentIsDirty(documentId) && !force && !documentIsUntouchedNew(documentId)){
 			tryCloseDirtyDocument(documentId, closeFunc)
 		}
 		else{

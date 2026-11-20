@@ -19,6 +19,13 @@ const JS_GLOBALS = new Set([
     'globalThis', 'BigInt', 'Intl', 'Reflect', 'Proxy', 'alert', 'print', 'gc',
 ])
 
+// QML types that only the C++ of the desktop host registers in a module (qmlRegisterType, qmlRegisterSingletonInstance
+// of com.imtcore.imtqml, Impl/JQMLHost/Main.cpp): a file importing the module may name them in code the page does not
+// run (an else of Qt.platform.os === "web"); the page has none of them
+const NATIVE_TYPES = new Map([
+    ['com.imtcore.imtqml', new Set(['NetworkEventInterceptor', 'DocumentServiceController', 'DataModelController'])],
+])
+
 const QML_KIND = {
     int: 'int', real: 'real', double: 'real', bool: 'bool', string: 'string', url: 'string',
     color: 'color', var: 'var', variant: 'var', Component: 'component',
@@ -153,9 +160,11 @@ class Codegen {
     resolveImports(file){
         file.typeImports = []
         file.namespaces = new Map()
+        file.nativeNames = new Set()
         for(let imp of file.imports){
             let target = String(imp.path || '').replace(/^["']|["']$/g, '')
             if(target.endsWith('.js')) continue
+            if(imp.isModule && !imp.as && NATIVE_TYPES.has(target)) for(let name of NATIVE_TYPES.get(target)) file.nativeNames.add(name)
             let source = imp.isModule ? (this.modules.has(target) ? { module: target } : null) : imp.dirKey ? { dir: imp.dirKey } : null
             if(imp.as) file.namespaces.set(imp.as, source)
             else if(source) file.typeImports.unshift(source)
@@ -314,6 +323,8 @@ class Codegen {
     resolver(el, selfExpr, file, memberEl){
         const resolve = (name) => {
             if(name === '$self' || name === '$s' || name === 'JQ') return null
+            // qsTr of a QML document translates in the context of its file (lupdate: the file's base name)
+            if(name === 'qsTr' && !this.declaresName(el, name)) return 'JQ.qsTrIn(' + JSON.stringify(this.translationContext(file)) + ')'
             let depth = 0
             for(let scope = el.scope; scope; scope = scope.parent, depth++){
                 if(scope.ids.has(name)) return '$s' + '.$p'.repeat(depth) + '[' + scope.ids.get(name) + ']'
@@ -346,7 +357,7 @@ class Codegen {
             for(let scope = el.scope; scope; scope = scope.parent, depth++){
                 if(scope.isDelegate) return 'JQ.mctx($s' + '.$p'.repeat(depth) + ').$role(' + JSON.stringify(name) + ')'
             }
-            if(name !== 'model' && name !== 'index' && name !== 'modelData' && name !== 'context') this.warn(file, el.line, name + ' is not found')
+            if(name !== 'model' && name !== 'index' && name !== 'modelData' && name !== 'context' && !(file.nativeNames && file.nativeNames.has(name))) this.warn(file, el.line, name + ' is not found')
             return 'JQ.ctx($s,' + JSON.stringify(name) + ')'
         }
         // x.createQmlObject(...) creates in the context of the call: the file, the scope and the names of its ids
@@ -354,6 +365,17 @@ class Codegen {
             resolve.callingContext = () => ({ qt: file.typeRef.ref + '$qt', scope: '$s', ids: this.scopeInfo(file, el.scope) })
         }
         return resolve
+    }
+
+    translationContext(file){
+        let owner = file.inlineOf || file
+        return path.basename(String(owner.fileName || owner.name || ''), '.qml')
+    }
+
+    // an id or a member of the scope named name (it would hide the global)
+    declaresName(el, name){
+        for(let scope = el.scope; scope; scope = scope.parent) if(scope.ids.has(name)) return true
+        return !!this.member(el, name)
     }
 
     // the scope of the document instance from the code of el: its scripts are per document instance
@@ -567,34 +589,68 @@ class Codegen {
         // Loader that is the root of its own file
         if(file.url && el !== file.root && this.inherits(el, JQ.types.Loader)) this.current.push(v + '.$base=' + JSON.stringify(file.url) + ';')
 
+        // The order of QQmlObjectCreator::setupBindings, which pushes the bindings onto allCreatedBindings; finalize
+        // enables them from the last pushed (a stack), and a binding subscribes to what it reads when it is enabled,
+        // which orders the notifications later. QmlIR::Object::appendBinding prepends a named binding (a property
+        // declaration with its value as well) and inserts a child of the default property by its position, and
+        // QmlUnitGenerator writes the value bindings, the signal handlers, the attached properties, the group
+        // properties and the bindings to aliases in that order. So: the named values from the last written to the
+        // first, the children (emitChildren), then the attached, group and alias bindings (lateMembers), each from the
+        // last written to the first.
+        let named = [], late = []
+        let unit = (list, at, kind, group, emit) => {
+            let start = this.current.length
+            emit()
+            list.push({ at, kind, group, code: this.current.splice(start) })
+        }
+        let atOf = (x) => x ? x.line * 100000 + (x.col || 0) : 0
+
         for(let def of el.propdefs){
             let constName = cls + '.' + def.name.toUpperCase()
+            let at = atOf(def.declAt || def.nameAt)
             if(def.element){
-                // in declaration order, like QQmlObjectCreator populating the object
-                this.current.push(v + '.$write(' + constName + ',' + this.elementExpr(file, def.element, def.asComponent, post) + ');')
+                unit(named, at, 'named', null, () => {
+                    this.current.push(v + '.$write(' + constName + ',' + this.elementExpr(file, def.element, def.asComponent, post) + ');')
+                })
                 continue
             }
             if(!def.value) continue
-            this.assignValue(file, el, v, def.name, def.value, def.raw, constName, null, def.readonly)
+            unit(named, at, 'named', null, () => this.assignValue(file, el, v, def.name, def.value, def.raw, constName, null, def.readonly))
         }
 
         for(let assign of el.assigns){
+            let at = atOf(assign)
             if(assign.element){
                 // through an alias the target may be a later element of this body
                 let viaAlias = (this.member(el, assign.name.split('.')[0]) || {}).kind === 'alias'
                 let line = this.assignTarget(file, el, v, assign.name) + '=' + this.elementExpr(file, assign.element, assign.asComponent, post) + ';'
                 if(viaAlias) post.push(line)
-                else this.current.push(line)
+                else unit(named, at, 'named', null, () => this.current.push(line))
                 continue
             }
             if(assign.elements){
-                let vars = assign.elements.map(child => this.emitElement(file, child, v, post))
-                let m = this.member(el, assign.name)
-                if(m && m.kind === 'prop' && LIST_VALUE.has(assign.name)) this.current.push(v + '.' + assign.name + '=[' + vars.join(',') + '];')
+                unit(named, at, 'named', null, () => {
+                    let vars = assign.elements.map(child => this.emitElement(file, child, v, post))
+                    let m = this.member(el, assign.name)
+                    if(m && m.kind === 'prop' && LIST_VALUE.has(assign.name)) this.current.push(v + '.' + assign.name + '=[' + vars.join(',') + '];')
+                })
                 continue
             }
-            this.assignProperty(file, el, v, assign)
+            let parts = assign.name.split('.')
+            let first = this.member(el, parts[0])
+            let kind = 'named', group = null
+            if(parts.length === 1 && first && first.kind === 'alias') kind = 'alias'
+            else if(parts.length > 1 && first && first.kind === 'prop' && first.group && !this.inherits(el, JQ.types.PropertyChanges)){
+                kind = /^[A-Z]/.test(parts[0]) ? 'attached' : 'group'
+                group = parts[0]
+            }
+            unit(kind === 'named' ? named : late, at, kind, group, () => this.assignProperty(file, el, v, assign))
         }
+
+        // the named values: prepended, so written from the last to the first
+        named.sort((a, b) => b.at - a.at)
+        for(let u of named) this.current.push(...u.code)
+        el.$lateMembers = late
 
         if(el.$subAssigns){
             for(let [name, entries] of el.$subAssigns) post.push('JQ.subAssign(' + v + ',' + JSON.stringify(name) + ',[' + entries.join(',') + '],$s);')
@@ -611,6 +667,29 @@ class Codegen {
             let last = a.path[a.path.length - 1]
             post.push('JQ.forward(' + owner + ',' + owner + '.constructor.$type.signalByName.get(' + JSON.stringify(last + 'Changed') + '),' + v + ',' + cls + '.SIGNAL_' + a.name + 'Changed);')
         }
+    }
+
+    // after the children: the attached properties, the group properties, the bindings to aliases (QmlUnitGenerator::
+    // writeBindings). A group (anchors, Layout) is prepended where it is first written, and its own bindings are
+    // prepended in its object: the groups from the last first written, each from its last binding; the aliases from
+    // the last written
+    lateMembers(el){
+        let late = el.$lateMembers
+        el.$lateMembers = null
+        if(!late || !late.length) return
+        let groups = (kind) => {
+            let byGroup = new Map()
+            for(let u of late){
+                if(u.kind !== kind) continue
+                if(!byGroup.has(u.group)) byGroup.set(u.group, [])
+                byGroup.get(u.group).push(u)
+            }
+            let list = Array.from(byGroup.values())
+            list.sort((a, b) => Math.min(...b.map(u => u.at)) - Math.min(...a.map(u => u.at)))
+            return list.flatMap(units => units.sort((a, b) => b.at - a.at))
+        }
+        let aliases = late.filter(u => u.kind === 'alias').sort((a, b) => b.at - a.at)
+        for(let u of [...groups('attached'), ...groups('group'), ...aliases]) this.current.push(...u.code)
     }
 
     assignTarget(file, el, v, name){
@@ -657,6 +736,21 @@ class Codegen {
                     return
                 }
                 this.assignValue(file, el, v + '.' + parts[0], parts[1], assign.value, assign.raw, groupRef + '.' + parts[1].toUpperCase(), v)
+                return
+            }
+        }
+        // a group in a group: Drag.hotSpot.x
+        if(parts.length === 3){
+            let m = this.member(el, parts[0])
+            let outer = m && m.kind === 'prop' && m.group
+            let inner = outer && outer.$type.propByName.get(parts[1])
+            if(inner && inner.group){
+                if(!inner.group.$type.propByName.get(parts[2])){
+                    this.report(file, 2, assign.nameAt || assign, 'Cannot assign to non-existent property "' + parts[2] + '"', el.type + '.' + assign.name + ' is not found')
+                    return
+                }
+                let groupRef = this.classRef(el) + '.$type.propByName.get(' + JSON.stringify(parts[0]) + ').group.$type.propByName.get(' + JSON.stringify(parts[1]) + ').group'
+                this.assignValue(file, el, v + '.' + parts[0] + '.' + parts[1], parts[2], assign.value, assign.raw, groupRef + '.' + parts[2].toUpperCase(), v)
                 return
             }
         }
@@ -847,13 +941,15 @@ class Codegen {
         return null
     }
 
-    // `function onFoo(args) {...}` in Connections is a handler; any `onFoo:` handler makes them ignored (Qt docs)
+    // `function onFoo(args) {...}` in Connections is a handler; any `onFoo:` handler makes them ignored (Qt docs).
+    // It stays a method of the Connections too: the other functions call it by its name (QQmlConnections is the
+    // scope object of its functions)
     prepareConnections(file){
         for(let el of file.elements){
             if(!this.isConnections(el)) continue
             let functions = el.methods.filter(m => /^on[A-Z]/.test(m.name))
-            el.methods = el.methods.filter(m => !/^on[A-Z]/.test(m.name))
-            if(el.handlers.length) continue
+            // attached handlers (Component.onCompleted) are no handlers of the Connections
+            if(el.handlers.some(h => !h.name.includes('.'))) continue
             for(let m of functions) el.handlers.push({ name: m.name, value: ['function'], raw: m.raw.replace(/^function\s+[\w$]+\s*\(/, 'function('), line: m.line, declaredFunction: true })
         }
     }
@@ -889,6 +985,7 @@ class Codegen {
         }
         this.applyMembers(file, el, v, post)
         this.emitChildren(file, el, v, post, this.classRef(el))
+        this.lateMembers(el)
         if(parentVar !== 'null') this.current.push(v + '.$setParent(' + parentVar + ');')
         return v
     }
@@ -1024,6 +1121,7 @@ class Codegen {
         if(file.eagerScripts && file.eagerScripts.length) this.current.push('JQ.inContext($root);JQ.sis($s,[' + file.eagerScripts.join(',') + ']);')
         this.applyMembers(file, root, '$root', post)
         this.emitChildren(file, root, '$root', post, this.use(root.typeRef))
+        this.lateMembers(root)
         let body = this.current.concat(post)
         this.out.push('function ' + className + '$build($root){' + body.join('') + '}')
         let definition = this.out.splice(start)

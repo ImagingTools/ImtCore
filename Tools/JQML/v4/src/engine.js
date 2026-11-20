@@ -132,8 +132,7 @@ const IGNORED_TYPES = new Set([
 	'AnchorChanges', 'StateChangeScript', 'ParentChange', 'StateGroup', 'Glow', 'RectangularGlow',
 	'InnerShadow', 'FastBlur', 'GaussianBlur', 'ColorOverlay', 'OpacityMask', 'LinearGradient', 'RadialGradient', 'Blend',
 	'BrightnessContrast', 'Colorize', 'Desaturate', 'DisplacementMap', 'HueSaturation', 'ShaderEffect', 'ShaderEffectSource',
-	'Translate', 'Rotation', 'Scale', 'Matrix4x4', 'DoubleValidator', 'IntValidator',
-	'RegExpValidator',
+	'Translate', 'Rotation', 'Scale', 'Matrix4x4', 'RegExpValidator',
 ]);
 
 // Enumerations whose values are not interpreted by the engine: each name stands for itself.
@@ -254,6 +253,84 @@ function formatDateTime(value, format, defaultOptions) {
 	}
 	return result;
 }
+
+// The `Locale` of Qt.locale(): the locale of the browser or the one named ("de_DE"), with its number separators. The QML methods
+// of Date take it (installLocaleDates).
+class QmlLocale {
+	constructor(name) {
+		this.name = name;
+		this.$tag = name.replace('_', '-');
+		let parts = [];
+		try {
+			parts = new Intl.NumberFormat(this.$tag).formatToParts(12345.6);
+		} catch {
+			this.$tag = undefined;
+			parts = new Intl.NumberFormat().formatToParts(12345.6);
+		}
+		const part = (type, fallback) => (parts.find((p) => p.type === type) || { value: fallback }).value;
+		this.decimalPoint = part('decimal', '.');
+		this.groupSeparator = part('group', ',');
+	}
+}
+
+// The language tag of the system (of the browser), the default locale of Qt.
+function systemLanguageTag() {
+	return typeof navigator !== 'undefined' && navigator.language ? navigator.language : 'en-US';
+}
+
+function qmlLocale(name) {
+	if (name) return new QmlLocale(String(name));
+	return new QmlLocale(systemLanguageTag().replace('-', '_'));
+}
+
+// The plural categories of CLDR in their order: the forms of a plural message of a Qt catalog come in this order in its language.
+const PLURAL_CATEGORIES = ['zero', 'one', 'two', 'few', 'many', 'other'];
+
+// The form of a plural message for the count `n` in `language`; a category without a form of its own takes the last form.
+function pluralForm(forms, n, language) {
+	let index = 0;
+	if (n >= 0) {
+		try {
+			const rules = new Intl.PluralRules(language.replace('_', '-'));
+			const categories = PLURAL_CATEGORIES.filter((category) => rules.resolvedOptions().pluralCategories.includes(category));
+			index = Math.max(0, categories.indexOf(rules.select(n)));
+		} catch {
+			index = n === 1 ? 0 : 1;
+		}
+	}
+	return forms[Math.min(index, forms.length - 1)];
+}
+
+// As in Qt: with a count (qsTr(text, disambiguation, n)) `%n` of the text is the count, `%Ln` the count written in the system locale.
+function replacePercentN(text, n) {
+	if (typeof text !== 'string' || typeof n !== 'number' || n < 0) return text;
+	return text.replace(/%(L?)n/g, (_, localized) => (localized ? n.toLocaleString(systemLanguageTag()) : String(n)));
+}
+
+// Locale.FormatType, and the styles of Intl for it: the date and the time.
+const LOCALE_FORMAT = Object.freeze({ LongFormat: 0, ShortFormat: 1, NarrowFormat: 2 });
+const LOCALE_STYLES = [{ date: 'full', time: 'long' }, { date: 'short', time: 'short' }, { date: 'short', time: 'short' }];
+
+// Date.toLocaleString(locale, format), toLocaleDateString and toLocaleTimeString of QML: with a Locale the format is a
+// Locale.FormatType (LongFormat when there is none) or a text of Qt ("dd.MM.yyyy"). Other calls are the methods of JavaScript.
+function installLocaleDates() {
+	for (const [method, parts] of [['toLocaleString', ['date', 'time']], ['toLocaleDateString', ['date']], ['toLocaleTimeString', ['time']]]) {
+		const native = Date.prototype[method];
+		if (native.$qml === true) continue;
+		const qml = function (locale, format) {
+			if (!(locale instanceof QmlLocale)) return native.apply(this, arguments);
+			if (typeof format === 'string') return formatDateTime(this, format, {});
+			const style = LOCALE_STYLES[format === undefined ? 0 : format] || LOCALE_STYLES[0];
+			const options = {};
+			if (parts.includes('date')) options.dateStyle = style.date;
+			if (parts.includes('time')) options.timeStyle = style.time;
+			return native.call(this, locale.$tag, options);
+		};
+		qml.$qml = true;
+		Object.defineProperty(Date.prototype, method, { value: qml, writable: true, configurable: true });
+	}
+}
+installLocaleDates();
 
 // Qt::BrushStyle, the second argument of `ctx.createPattern(color, mode)`.
 const BRUSH_PATTERN = Object.freeze({
@@ -563,6 +640,8 @@ export class Engine {
 		this.animations = new Set();
 		this.carets = new Set(); // editors with the focus: their text cursor blinks
 		this.fresh = []; // bindings created since they were last evaluated
+		this.freshLoading = false; // the first values of the bindings are being worked out (evaluateFresh)
+		this.freshLoaders = new Set(); // the Loaders that changed meanwhile: they load when the pass is over
 		this.subQueue = []; // bindings to re-run because a property they read was written
 		this.draining = false;
 		this.trackingPass = 0; // > 0 while every binding is already being swept; writes do not fan out
@@ -654,7 +733,7 @@ export class Engine {
 			formatDateTime: (d, f) => { const z = (n) => String(n).padStart(2, '0'); return String(f).replace('dd', z(d.getDate())).replace('MM', z(d.getMonth() + 1)).replace('yyyy', d.getFullYear()).replace('hh', z(d.getHours())).replace('mm', z(d.getMinutes())); },
 			isQtObject: (v) => v !== null && typeof v === 'object' && v.$typeName !== undefined,
 			atob: (s) => atob(s), btoa: (s) => btoa(s),
-			locale: () => ({ decimalPoint: (1.5).toLocaleString().charAt(1), name: typeof navigator === 'undefined' ? '' : navigator.language }),
+			locale: (name) => qmlLocale(name),
 			openUrlExternally: (url) => { window.open(String(url), '_blank'); return true; },
 			point: (x, y) => ({ x, y }),
 			size: (width, height) => ({ width, height }),
@@ -710,6 +789,7 @@ export class Engine {
 			Canvas: CANVAS,
 			Gradient: enumObject(['Vertical', 'Horizontal']),
 			FileDialog: Object.freeze(Object.fromEntries(FILE_DIALOG_MODES.map((name, index) => [name, index]))),
+			Locale: LOCALE_FORMAT,
 			XMLHttpRequest: typeof XMLHttpRequest === 'undefined' ? class XMLHttpRequest { open() {} send() {} setRequestHeader() {} } : XMLHttpRequest,
 			Animation: Object.freeze({ Infinite: -1, Forward: 'Forward', Backward: 'Backward' }),
 			Easing: enumObject(['Linear', 'InQuad', 'OutQuad', 'InOutQuad', 'OutInQuad', 'InCubic', 'OutCubic', 'InOutCubic', 'OutInCubic', 'InQuart', 'OutQuart', 'InOutQuart', 'InQuint', 'OutQuint', 'InOutQuint', 'InSine', 'OutSine', 'InOutSine', 'InExpo', 'OutExpo', 'InOutExpo', 'InCirc', 'OutCirc', 'InOutCirc', 'InElastic', 'OutElastic', 'InOutElastic', 'InBack', 'OutBack', 'InOutBack', 'InBounce', 'OutBounce', 'InOutBounce', 'BezierSpline']),
@@ -717,9 +797,9 @@ export class Engine {
 			mouseMove() {
 				throw new Error('QtQuickTest::fail');
 			},
-			qsTr: (text) => engine.translate(text),
-			qsTrId: (text) => engine.translate(text),
-			qsTranslate: (context, text) => engine.translate(text),
+			qsTr: (text, disambiguation, n) => engine.translate(text, n),
+			qsTrId: (text, n) => engine.translate(text, n),
+			qsTranslate: (context, text, disambiguation, n) => engine.translate(text, n),
 			QT_TR_NOOP: (text) => text,
 			console: {
 				log: (...args) => {
@@ -770,7 +850,12 @@ export class Engine {
 		hooks.notify = (item, name) => this.notify(item, name);
 		hooks.dirty = (item, name) => this.markReaders(item, name);
 		hooks.geometry = (item) => this.geoDirty.add(item);
-		hooks.reloadLoader = (loader) => this.updateLoader(loader);
+		// While the first values of bindings are worked out, a Loader waits: as in Qt, it loads when the object is complete, after every
+		// property of it has its first value (the handler of a property that comes after `sourceComponent` must see no item).
+		hooks.reloadLoader = (loader) => {
+			if (this.freshLoading) this.freshLoaders.add(loader);
+			else this.updateLoader(loader);
+		};
 		hooks.clipboardWrite = (text, html) => {
 			this.clipboard = { text, html };
 			if (this.onClipboardWrite !== null) this.onClipboardWrite(text, html);
@@ -814,15 +899,18 @@ export class Engine {
 		this.context.language = value;
 	}
 
-	// The translation of `text` in the current language: `de_DE` falls back to `de`, a missing entry to the text.
-	translate(text) {
-		if (typeof text !== 'string' || !this.language) return text;
+	// The translation of `text` in the current language: `de_DE` falls back to `de`, a missing entry to the text. A plural message
+	// (a list of forms in the catalog) takes the form of the count `n`; `%n` of the result is the count.
+	translate(text, n = -1) {
+		if (typeof text !== 'string' || !this.language) return replacePercentN(text, n);
 		const languages = [this.language, this.language.replace('-', '_'), this.language.split(/[-_]/)[0]];
 		for (const language of languages) {
 			const catalog = this.translations[language];
-			if (catalog && typeof catalog[text] === 'string' && catalog[text] !== '') return catalog[text];
+			const entry = catalog ? catalog[text] : undefined;
+			const translation = Array.isArray(entry) ? pluralForm(entry, n, language) : entry;
+			if (typeof translation === 'string' && translation !== '') return replacePercentN(translation, n);
 		}
-		return text;
+		return replacePercentN(text, n);
 	}
 
 	get isAnimated() {
@@ -1059,10 +1147,12 @@ export class Engine {
 						for (const name of declared.keys()) singletons.set(name, this.project.moduleSingletonPath(imp.name, name, imp.version));
 					}
 				}
-				if (singletons.size === 0) continue;
+				// The alias of a module also gives the enumerations of the engine: `Platform.FileDialog.OpenFiles`.
+				const moduleAlias = imp.kind === 'module' && imp.alias !== '';
+				if (singletons.size === 0 && !moduleAlias) continue;
 				if (layer === null) layer = Object.create(null);
 				if (imp.alias) {
-					if (!Object.prototype.hasOwnProperty.call(layer, imp.alias)) layer[imp.alias] = Object.create(null);
+					if (!Object.prototype.hasOwnProperty.call(layer, imp.alias)) layer[imp.alias] = Object.create(moduleAlias ? this.globals : null);
 					for (const [name, path] of singletons) define(layer[imp.alias], name, path);
 				} else {
 					for (const [name, path] of singletons) if (this.ambiguousSingletons.has(name)) define(layer, name, path);
@@ -1561,14 +1651,32 @@ export class Engine {
 		const list = this.fresh;
 		this.fresh = [];
 		this.trackingPass++;
+		const outer = this.freshLoading;
+		this.freshLoading = true;
 		try {
 			for (let pass = 0; pass < 2; pass++) {
 				for (const binding of list) this.evaluateOne(binding, true);
+				this.loadFreshLoaders();
 			}
 		} finally {
+			this.freshLoading = outer;
 			this.trackingPass--;
 		}
 		if (this.connections.size > 0) this.syncConnections();
+	}
+
+	// The Loaders that changed while the first values were worked out load now, one after the other, outside of that work.
+	loadFreshLoaders() {
+		if (this.freshLoaders.size === 0) return;
+		const loaders = [...this.freshLoaders];
+		this.freshLoaders.clear();
+		const outer = this.freshLoading;
+		this.freshLoading = false;
+		try {
+			for (const loader of loaders) this.updateLoader(loader);
+		} finally {
+			this.freshLoading = outer;
+		}
 	}
 
 	// (Re)creates the delegates of every Repeater whose model changed.
@@ -1999,7 +2107,8 @@ export class Engine {
 
 	// (Re)creates the content of every Loader whose source changed.
 	updateLoaders() {
-		for (const loader of [...this.loaders]) this.updateLoader(loader);
+		// a full pass of the bindings follows (evaluateBindings), so the Loaders do not settle them one by one
+		for (const loader of [...this.loaders]) this.updateLoader(loader, false);
 	}
 
 	// What the loader should show now. An inactive loader shows nothing; the last assigned source wins.
@@ -2010,7 +2119,10 @@ export class Engine {
 	}
 
 	// One Loader. The loaded item's onCompleted runs before itemChanged, statusChanged and loaded.
-	updateLoader(loader) {
+	// `settle`: read again the bindings that the Loader told (see below). A Loader that is made with the document does not:
+	// the objects after it do not exist yet, so a pass now would count the failures of the bindings that read them (a binding
+	// that fails 30 times is dropped), and the pass of the whole document follows anyway.
+	updateLoader(loader, settle = true) {
 		if (loader.$destroyed) {
 			this.loaders.delete(loader);
 			return;
@@ -2042,6 +2154,9 @@ export class Engine {
 			loader.$failed = false;
 			const before = new Set(loader.$children);
 			if (key !== '' && key !== null) {
+				// The properties of the Loader take their first values before it loads, as in Qt: the handlers of their change see
+				// no item yet (a dialog moves its Loader by the size of the window only when it has an item).
+				this.evaluateFresh();
 				const mark = this.completed.length;
 				this.guard(() => {
 					let created = null;
@@ -2073,6 +2188,9 @@ export class Engine {
 						loader.$removeChild(child);
 					}
 				} else {
+					// The size of the Loader is the size of its item, which it did not have while the item was made: the layouts that its
+					// onCompleted handlers asked for ran with a Loader of size 0 and left nothing queued, so the Loader asks for one more.
+					loader.$update();
 					// A loaded item with no onCompleted still has bindings (anchors.fill: parent) that must run before geometry is read.
 					// The Loader sizes its item after the bindings of the item have run, as in Qt: a size that it wrote while they ran
 					// (its own `height` binding is one of them) would be written over by the binding of the item that comes after.
@@ -2092,8 +2210,11 @@ export class Engine {
 		}
 		loader.$emit('itemChanged');
 		this.emitLoaderStatus(loader);
+		// The bindings that read the item, the size or the status of the Loader (those of the item among them, which read 0 and null while
+		// it was made) are told by the signals above: they read again before `loaded` and before a layout reads what they set, as in Qt.
+		if (ok && settle) this.runBindingPass();
 		if (ok) loader.$emit('loaded');
-		if (this.loaderKey(loader) !== loader.$wanted) this.updateLoader(loader);
+		if (this.loaderKey(loader) !== loader.$wanted) this.updateLoader(loader, settle);
 	}
 
 	applyInitialProps(item, props) {
@@ -2382,11 +2503,22 @@ export class Engine {
 		}
 	}
 
+	// `Platform.FileDialog` of `import Qt.labs.platform 1.1 as Platform`: a type under the alias of a module that has no file for
+	// it is a type of the engine, as without the alias.
+	moduleTypeName(type, file) {
+		const dot = type.indexOf('.');
+		if (dot < 0 || this.project === null) return type;
+		const doc = this.project.docs.get(file);
+		const alias = type.slice(0, dot);
+		if (doc === undefined || !this.project.fileImports(doc).some((imp) => imp.kind === 'module' && imp.alias === alias)) return type;
+		return this.project.resolveType(type, file) === null ? type.slice(dot + 1) : type;
+	}
+
 	// Creates the item of an object definition below `parent`. `overlays` are the definitions (use
 	// sites of a component) that are applied on top of `def`.
 	// `fromScript`: the parent was given by a script (`createObject(parent)`), not by the nesting of the QML source.
 	createItem(def, scope, parent, overlays, index, depth, fromScript = false) {
-		const type = def.type;
+		const type = this.moduleTypeName(def.type, scope.file);
 		if (this.lenient && IGNORED_TYPES.has(type)) return null;
 		let item;
 		const builtin = BUILTIN_TYPES.get(type);
@@ -2579,7 +2711,7 @@ export class Engine {
 			}
 		}
 		for (const handler of completedHandlers) this.completed.push(handler);
-		if (item instanceof Loader) this.updateLoader(item);
+		if (item instanceof Loader) this.updateLoader(item, false);
 		return item;
 	}
 
@@ -3029,6 +3161,7 @@ export class Engine {
 			this.defineAlias(item, prop, scope);
 			return;
 		}
+		if (prop.isRequired && prop.text === null && this.defineRequired(item, prop.name, scope)) return;
 		// `property string` always holds a string.
 		if (prop.typeName === 'string') item.$defineCustom(prop.name, '', toQmlString, prop.isReadonly === true);
 		else if (INT_TYPES.has(prop.typeName)) item.$defineCustom(prop.name, 0, toQmlInt, prop.isReadonly === true);
@@ -3040,6 +3173,29 @@ export class Engine {
 		else if (prop.typeName === 'rect') item.$defineCustom(prop.name, { x: 0, y: 0, width: 0, height: 0 }, null, prop.isReadonly === true);
 		else item.$defineCustom(prop.name, undefined, null, prop.isReadonly === true);
 		if (prop.text !== null) this.setValue(item, [prop.name], prop.text, scope, prop);
+	}
+
+	// `required property var modelData` of a delegate: Qt sets it from the row, as `index`, `model` and the roles. The property
+	// reads the variable of the row (it follows the row when the delegate is reused); `index` is the one the delegate has. False
+	// for an item that is not made for a row (it has no `index`): the property is an ordinary one, set by createObject() or the
+	// use site.
+	defineRequired(item, name, scope) {
+		if (item.$custom === null || !('index' in item.$custom)) return false;
+		if (name === 'index') return true;
+		let delegateScope = scope;
+		while (delegateScope !== null && delegateScope.data === null) delegateScope = delegateScope.parent;
+		if (delegateScope === null) return false;
+		const context = delegateScope.context;
+		Object.defineProperty(item, name, {
+			get: () => context[name],
+			set: (value) => {
+				const variable = Object.getOwnPropertyDescriptor(context, name);
+				if (variable !== undefined && variable.set !== undefined) context[name] = value;
+			},
+			enumerable: true,
+			configurable: true,
+		});
+		return true;
 	}
 
 	// `property alias name: target.property`: reads and writes are forwarded to the target.
@@ -3097,6 +3253,16 @@ export class Engine {
 		});
 	}
 
+	// The function of a handler: its statements, or the arrow or function expression that is the whole handler
+	// (`Keys.onPressed: function(event) {...}`), not a statement that builds and drops it. Called with the item as `this`.
+	compileHandler(body, params, scope, item, line) {
+		if (!callableHandler(body)) return this.compile('body', body, params, scope, item, line);
+		const produce = this.compile('expr', body, '', scope, item, line);
+		return function (...args) {
+			return produce.call(this).apply(this, args);
+		};
+	}
+
 	connectHandler(item, prop, scope, completedOut) {
 		const name = prop.name;
 		const body = prop.text === null ? '' : prop.text;
@@ -3105,29 +3271,22 @@ export class Engine {
 			return;
 		}
 		if (name === 'Component.onCompleted') {
-			completedOut.push({ fn: this.compile('body', body, '', scope, item, prop.line), item, line: prop.line, file: scope.file });
+			completedOut.push({ fn: this.compileHandler(body, '', scope, item, prop.line), item, line: prop.line, file: scope.file });
 			return;
 		}
 		if (name === 'ListView.onPooled' || name === 'ListView.onReused') {
 			const key = name === 'ListView.onPooled' ? '$pooledFns' : '$reusedFns';
 			if (item[key] === undefined) item[key] = [];
-			item[key].push({ fn: this.compile('body', body, '', scope, item, prop.line), file: scope.file, line: prop.line });
+			item[key].push({ fn: this.compileHandler(body, '', scope, item, prop.line), file: scope.file, line: prop.line });
 			return;
 		}
 		if (name === 'Component.onDestruction') {
 			if (item.$destruction === undefined) item.$destruction = [];
-			item.$destruction.push({ fn: this.compile('body', body, '', scope, item, prop.line), file: scope.file, line: prop.line });
+			item.$destruction.push({ fn: this.compileHandler(body, '', scope, item, prop.line), file: scope.file, line: prop.line });
 			return;
 		}
 		if (name === 'Keys.onPressed' || name === 'Keys.onReleased' || NAMED_KEY_HANDLERS.has(name)) {
-			let fn;
-			if (callableHandler(body)) {
-				// `Keys.onPressed: function(event) { ... }` (Qt 6): the function expression is the handler.
-				const produce = this.compile('expr', body, '', scope, item, prop.line);
-				fn = (...args) => produce.call(item).apply(item, args);
-			} else {
-				fn = this.compile('body', body, 'event', scope, item, prop.line);
-			}
+			const fn = this.compileHandler(body, 'event', scope, item, prop.line);
 			if (item.$keys === undefined) item.$keys = { pressed: [], released: [], byKey: new Map() };
 			if (name === 'Keys.onPressed') item.$keys.pressed.push(fn);
 			else if (name === 'Keys.onReleased') item.$keys.released.push(fn);
@@ -3150,7 +3309,7 @@ export class Engine {
 			if (name.length > 9 && name.endsWith('Changed')) {
 				// A property change handler: the property is polled once per evaluation pass.
 				const property = decapitalize(name.slice(2, -7));
-				const fn = this.compile('body', body, '', scope, item, prop.line);
+				const fn = this.compileHandler(body, '', scope, item, prop.line);
 				// The handler starts from the value the property has now, so the first assigned or bound value is a change (as in Qt).
 				// An alias whose target does not exist yet has no value to start from: its first value is the initial one.
 				let initial;
@@ -3167,14 +3326,7 @@ export class Engine {
 			}
 			return;
 		}
-		let fn;
-		if (callableHandler(body)) {
-			// The arrow or function expression is the handler, not a statement that builds and drops it.
-			const produce = this.compile('expr', body, '', scope, item, prop.line);
-			fn = (...args) => produce.call(item).apply(item, args);
-		} else {
-			fn = this.compile('body', body, signal.params.join(', '), scope, item, prop.line);
-		}
+		const fn = this.compileHandler(body, signal.params.join(', '), scope, item, prop.line);
 		item.$connect(signalName, (...args) => this.guard(() => fn.apply(item, args), `handler '${name}' (${scope.file})`, prop.line));
 	}
 
@@ -3278,7 +3430,7 @@ export class Engine {
 		if (handler.fn !== null) {
 			call = handler.fn;
 		} else {
-			const fn = this.compile('body', handler.body, signal === undefined ? '' : signal.params.join(', '), handler.scope, conn, handler.line);
+			const fn = this.compileHandler(handler.body, signal === undefined ? '' : signal.params.join(', '), handler.scope, conn, handler.line);
 			call = (...args) => fn.apply(conn, args);
 		}
 		const run = (...args) => {

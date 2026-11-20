@@ -101,7 +101,8 @@ protected:
 				const WorkingDocument& document,
 				OperationStatus& status,
 				QString* errorMessage = nullptr,
-				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
+				const imtbase::IOperationContext* operationContextPtr = nullptr,
+				const QByteArray& languageId = QByteArray()) const override;
 	virtual QList<imtdoc::IDocumentServiceEventHandler*> GetDocumentServiceEventHandlers() const override;
 	virtual istd::IChangeableUniquePtr CreateObject(const QByteArray& typeId) const override;
 	virtual idoc::IUndoManagerUniquePtr CreateUndoManager() const override;

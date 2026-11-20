@@ -27,8 +27,14 @@ QtObject {
 
     property string modelState: container.authorizationGqlModel.state;
 
+    // Nobody is signed in yet: the language goes with the request, so a failed sign-in is answered in it
     function getHeaders(){
-        return {}
+        let headers = {}
+        if (context && context.language && context.language !== ""){
+            headers["languageid"] = context.language
+        }
+
+        return headers
     }
 
     function authorization(loginF, passwordF){

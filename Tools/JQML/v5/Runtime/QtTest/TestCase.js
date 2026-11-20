@@ -4,6 +4,10 @@ const QtEnums = require('../Qt/enums')
 const { defineType } = require('../Core/type')
 const { Item } = require('../QtQuick/Item')
 
+// Qt on macOS (Qt::AA_MacDontSwapCtrlAndMeta off): the Command key is Qt::ControlModifier, the Control key Qt::MetaModifier
+const isMac = () => typeof navigator !== 'undefined' && !!navigator && /Mac|iPhone|iPad|iPod/.test(String(navigator.platform || ''))
+
+
 const NoButton = 0, LeftButton = 1
 
 class TestFailError extends Error {}
@@ -323,9 +327,9 @@ class TestCase extends Item {
             key: domKey,
             code: domKey,
             shiftKey: !!(modifiers & QtEnums.ShiftModifier),
-            ctrlKey: !!(modifiers & QtEnums.ControlModifier),
+            ctrlKey: !!(modifiers & (isMac() ? QtEnums.MetaModifier : QtEnums.ControlModifier)),
             altKey: !!(modifiers & QtEnums.AltModifier),
-            metaKey: !!(modifiers & QtEnums.MetaModifier),
+            metaKey: !!(modifiers & (isMac() ? QtEnums.ControlModifier : QtEnums.MetaModifier)),
         })
         let target = document.activeElement && document.activeElement !== document.body ? document.activeElement : window
         target.dispatchEvent(event)

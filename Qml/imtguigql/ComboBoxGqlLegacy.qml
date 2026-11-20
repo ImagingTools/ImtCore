@@ -114,8 +114,8 @@ Item {
 	}
 
 	onModelChanged: {
-		if (comboBoxContainerGql.currentIndex > -1){
-			comboBoxContainerGql.currentText = popup.model.getData(nameId);
+		if (comboBoxContainerGql.currentIndex > -1 && comboBoxContainerGql.model){
+			comboBoxContainerGql.currentText = comboBoxContainerGql.model.getData(comboBoxContainerGql.nameId, comboBoxContainerGql.currentIndex);
 		}
 	}
 

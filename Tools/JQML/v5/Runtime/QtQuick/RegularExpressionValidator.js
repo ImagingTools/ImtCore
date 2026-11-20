@@ -78,7 +78,10 @@ class RegularExpressionValidator extends Validator {
         let re = this.$v[RegularExpressionValidator.REGULAREXPRESSION]
         this.$full = this.$partial = null
         if(!re) return
-        if(!(re instanceof RegExp)){
+        // a RegExp of any realm (a script of another frame): by its source and flags
+        if(re && typeof re === 'object' && typeof re.source === 'string' && typeof re.flags === 'string'){
+            try { re = new RegExp(re.source, re.flags) } catch(error) { return }
+        } else {
             try { re = new RegExp(String(re)) } catch(error) { return }
         }
         if(!re.source || re.source === '(?:)') return

@@ -21,14 +21,14 @@ Rectangle {
 	color: Style.baseColor;
 
 	border.width: revisionCard.selectable && revisionCard.selected ? 2 : Style.buttonBorderWidth;
-	border.color: revisionCard.selectable && revisionCard.selected ? Style.imaginToolsAccentColor : (cardMouseArea.containsMouse ? Style.borderColor2 : Style.borderColor);
+	border.color: revisionCard.selectable && revisionCard.selected ? Style.imagingToolsAccentColor : (cardMouseArea.containsMouse ? Style.borderColor2 : Style.borderColor);
 
 	Rectangle {
 		visible: revisionCard.selectable && revisionCard.selected;
 		anchors.fill: parent;
 		anchors.margins: 1;
 		radius: Style.radiusM;
-		color: Style.imaginToolsAccentColor;
+		color: Style.imagingToolsAccentColor;
 		opacity: Style.opacityFaint;
 	}
 
@@ -64,7 +64,7 @@ Rectangle {
 				width: Style.iconSizeL;
 				height: width;
 				radius: height / 2;
-				color: revisionCard.isActive ? Style.imaginToolsAccentColor : Style.borderColor2;
+				color: revisionCard.isActive ? Style.imagingToolsAccentColor : Style.borderColor2;
 
 				Text {
 					anchors.centerIn: parent;
@@ -112,7 +112,7 @@ Rectangle {
 						width: currentLabel.implicitWidth + Style.marginM;
 						height: currentLabel.implicitHeight + Style.marginXS;
 						radius: height / 2;
-						color: Style.imaginToolsAccentColor;
+						color: Style.imagingToolsAccentColor;
 
 						Text {
 							id: currentLabel;

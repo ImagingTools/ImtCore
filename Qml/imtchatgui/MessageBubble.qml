@@ -40,7 +40,7 @@ Item {
 			text: messageBubbleRoot.senderName
 			font.pixelSize: Style.fontSizeXS
 			font.bold: true
-			color: Style.imaginToolsAccentColor
+			color: Style.imagingToolsAccentColor
 		}
 
 		// Message bubble
@@ -49,7 +49,7 @@ Item {
 			width: bubbleColumn.width
 			height: contentText.height + Style.paddingS * 2
 			radius: Style.radiusS
-			color: messageBubbleRoot.isOwn ? Style.imaginToolsAccentColor : Style.baseColor
+			color: messageBubbleRoot.isOwn ? Style.imagingToolsAccentColor : Style.baseColor
 
 			Text {
 				id: contentText
@@ -59,7 +59,7 @@ Item {
 				anchors.margins: Style.paddingM
 				text: messageBubbleRoot.content
 				font.pixelSize: Style.fontSizeS
-				color: messageBubbleRoot.isOwn ? Style.highlightedTextColor : Style.imaginToolsAccentColor
+				color: messageBubbleRoot.isOwn ? Style.highlightedTextColor : Style.imagingToolsAccentColor
 				wrapMode: Text.Wrap
 			}
 		}
@@ -110,7 +110,7 @@ Item {
 					: messageBubbleRoot.status === 1 ? "✓✓"
 					: "✓"
 				font.pixelSize: Style.fontSizeXS
-				color: messageBubbleRoot.status === 2 ? Style.imaginToolsAccentColor : Style.buttonInactiveTextColor
+				color: messageBubbleRoot.status === 2 ? Style.imagingToolsAccentColor : Style.buttonInactiveTextColor
 				anchors.verticalCenter: parent.verticalCenter
 			}
 		}

@@ -34,7 +34,7 @@ Rectangle {
 			width: parent.width - Style.paddingS - Style.iconSizeXS - clearBtn.width - Style.paddingS * 2
 			anchors.verticalCenter: parent.verticalCenter
 			font.pixelSize: Style.fontSizeXS
-			color: Style.imaginToolsAccentColor
+			color: Style.imagingToolsAccentColor
 			clip: true
 			selectByMouse: true
 

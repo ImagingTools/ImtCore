@@ -11,18 +11,20 @@ Dialog {
 	title: qsTr("Message");
 	
 	property string message;
-	
+	// Yes in the error color, No focused and taken by Enter
+	property bool destructive: false;
+
 	canMove: true;
 	forceFocus: true;
-	
+
 	Component.onCompleted: {
-		addButton(Enums.yes, qsTr("Yes"), true)
-		addButton(Enums.no, qsTr("No"), true)
+		addButton(Enums.yes, qsTr("Yes"), true, false, messageDialog.destructive ? "danger" : "")
+		addButton(Enums.no, qsTr("No"), true, messageDialog.destructive)
 	}
-	
+
 	Keys.onPressed: {
 		if (event.key === Qt.Key_Return){
-			messageDialog.finished(Enums.yes);
+			messageDialog.finished(messageDialog.destructive ? Enums.no : Enums.yes);
 		}
 	}
 	

@@ -5,6 +5,7 @@
 // Qt includes
 #include <QtCore/QMutableListIterator>
 #include <QtCore/QRegularExpression>
+#include <QtCore/QUuid>
 
 // ImtCore includes
 #include <imtrest/IProtocolEngine.h>
@@ -27,6 +28,8 @@ CWebSocketThread::CWebSocketThread(CWebSocketServerComp* parent)
 	m_status(ST_START)
 {
 	qRegisterMetaType<ConstResponsePtr>("ConstResponsePtr");
+
+	m_connectionId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
 	m_server = parent;
 
@@ -86,9 +89,9 @@ CWebSocketThread::Status CWebSocketThread::GetSocketStatus()
 }
 
 
-QByteArray CWebSocketThread::GetRequestId()
+QByteArray CWebSocketThread::GetConnectionId() const
 {
-	return m_requestId;
+	return m_connectionId;
 }
 
 
@@ -167,6 +170,7 @@ void CWebSocketThread::ProcessTextMessage(const QString& textMessage)
 		}
 
 		webSocketRequest->SetBody(textMessage.toUtf8());
+		webSocketRequest->SetConnectionId(m_connectionId);
 
 		imtrest::CWebSocketRequest::MethodType methodType = webSocketRequest->GetMethodType();
 		if (methodType == CWebSocketRequest::MT_START || methodType == CWebSocketRequest::MT_SUBSCRIBE){
@@ -229,6 +233,7 @@ void CWebSocketThread::ProcessTextMessage(const QString& textMessage)
 							newHttpRequestPtr->SetHeader(QByteArrayLiteral("id"), queryRequestId);
 						}
 						newHttpRequestPtr->SetBody(body);
+						newHttpRequestPtr->SetConnectionId(m_connectionId);
 						newHttpRequestPtr->SetMethodType(CHttpRequest::MT_POST);
 						newHttpRequestPtr->SetCommandId("/" + m_productId + "/graphql");
 	

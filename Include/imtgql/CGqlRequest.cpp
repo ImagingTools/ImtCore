@@ -290,7 +290,8 @@ bool CGqlRequest::ParseQuery(const QByteArray& query, qsizetype& errorPosition)
 	}
 
 	const QByteArray header = body.left(index);
-	const QList<QByteArray> headersData = header.split(' ');
+	// GraphQL ignores whitespace and line breaks around the operation type
+	const QList<QByteArray> headersData = header.simplified().split(' ');
 
 	QByteArray type;
 	for (const QByteArray& headerItem : headersData){
@@ -299,6 +300,12 @@ bool CGqlRequest::ParseQuery(const QByteArray& query, qsizetype& errorPosition)
 
 			break;
 		}
+	}
+
+	// An anonymous operation may put its variables right after the type: "mutation($input: X!)"
+	const qsizetype variablesIndex = type.indexOf('(');
+	if (variablesIndex >= 0){
+		type = type.left(variablesIndex);
 	}
 
 	if (!s_requestNameMap.contains(type)){
@@ -614,6 +621,44 @@ bool CGqlRequest::Serialize(iser::IArchive& /*archive*/)
 int CGqlRequest::GetSupportedOperations() const
 {
 	return SO_COPY | SO_RESET | SO_CLONE;
+}
+
+
+bool CGqlRequest::IsEqual(const IChangeable& object) const
+{
+	const CGqlRequest* sourcePtr = dynamic_cast<const CGqlRequest*>(&object);
+	if (sourcePtr == nullptr){
+		return false;
+	}
+
+	if (sourcePtr == this){
+		return true;
+	}
+
+	if (m_requestType != sourcePtr->m_requestType ||
+		m_commandId != sourcePtr->m_commandId ||
+		m_protocolVersion != sourcePtr->m_protocolVersion ||
+		m_operationName != sourcePtr->m_operationName){
+		return false;
+	}
+
+	if (!m_params.IsEqual(sourcePtr->m_params) ||
+		!m_fields.IsEqual(sourcePtr->m_fields) ||
+		!m_variables.IsEqual(sourcePtr->m_variables)){
+		return false;
+	}
+
+	if (m_gqlContextPtr.IsValid() != sourcePtr->m_gqlContextPtr.IsValid()){
+		return false;
+	}
+
+	if (m_gqlContextPtr.IsValid() && m_gqlContextPtr.GetPtr() != sourcePtr->m_gqlContextPtr.GetPtr()){
+		if (!m_gqlContextPtr->IsEqual(*sourcePtr->m_gqlContextPtr.GetPtr())){
+			return false;
+		}
+	}
+
+	return true;
 }
 
 

@@ -80,8 +80,12 @@ function keyOf(e){
     return key
 }
 
+// Qt on macOS (Qt::AA_MacDontSwapCtrlAndMeta off): the Command key is Qt::ControlModifier, the Control key Qt::MetaModifier
+const isMac = () => typeof navigator !== 'undefined' && !!navigator && /Mac|iPhone|iPad|iPod/.test(String(navigator.platform || ''))
+
 function modsOf(e){
-    return (e.ctrlKey ? CTRL : 0) | (e.shiftKey ? SHIFT : 0) | (e.altKey ? ALT : 0) | (e.metaKey ? META : 0)
+    let mac = isMac()
+    return (e.ctrlKey ? (mac ? META : CTRL) : 0) | (e.shiftKey ? SHIFT : 0) | (e.altKey ? ALT : 0) | (e.metaKey ? (mac ? CTRL : META) : 0)
 }
 
 function comboMatches(combo, key, mods){
@@ -202,4 +206,4 @@ defineType(Shortcut, {
     signals: ['activated', 'activatedAmbiguously'],
 })
 
-module.exports = { Shortcut, StandardKey, parseSequences }
+module.exports = { Shortcut, StandardKey, parseSequences, modsOf }

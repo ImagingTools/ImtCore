@@ -172,7 +172,7 @@ public:
 		}
 		return true;
 	}
-	bool UnregisterSubscription(const QByteArray& subscriptionId) override
+	bool UnregisterSubscription(const QByteArray&, const QByteArray& subscriptionId) override
 	{
 		++removals;
 		QMutexLocker locker(&m_mutex);
@@ -363,10 +363,10 @@ public:
 		return CObjectCollectionChangeNotifierComp::RegisterSubscription(id, request, networkRequest, error);
 	}
 
-	bool UnregisterSubscription(const QByteArray& id) override
+	bool UnregisterSubscription(const QByteArray& connectionId, const QByteArray& id) override
 	{
 		++removals;
-		return CObjectCollectionChangeNotifierComp::UnregisterSubscription(id);
+		return CObjectCollectionChangeNotifierComp::UnregisterSubscription(connectionId, id);
 	}
 };
 
@@ -427,6 +427,8 @@ struct CSubscriptionFixture
 				const icomp::TSimSharedComponentPtr<CObservableCacheComp>* cachePtr = nullptr,
 				bool isUndeclaredChannelDenied = false)
 	{
+		request.SetConnectionId("connection");
+		otherRequest.SetConnectionId("otherConnection");
 		creator->access = 1;
 		creator->InitComponent();
 		controller->InitComponent();
@@ -908,6 +910,8 @@ void CWebSocketCredentialsTest::ExhaustedPoolHoldsBackNothing()
 	std::vector<std::unique_ptr<imtrest::CWebSocketRequest>> requests;
 	const auto subscribe = [&fixture, &requests](int index){
 		requests.push_back(std::make_unique<imtrest::CWebSocketRequest>(fixture.engine));
+		// Every subscription on its own socket: the server gives each request the ID of its connection
+		requests.back()->SetConnectionId("connection-" + QByteArray::number(index));
 		CSubscriptionFixture::Prepare(*requests.back(), QStringLiteral("subscription-%1").arg(index), QStringLiteral("user-credential-%1").arg(index));
 		fixture.servlet->RegisterSubscription(*requests.back());
 	};
@@ -986,6 +990,8 @@ void CWebSocketCredentialsTest::ExpiredQueuedCheckDoesNotReadTheSource()
 	std::vector<std::unique_ptr<imtrest::CWebSocketRequest>> requests;
 	for (int index = 0; index < 5; ++index){
 		requests.push_back(std::make_unique<imtrest::CWebSocketRequest>(fixture.engine));
+		// Every subscription on its own socket: the server gives each request the ID of its connection
+		requests.back()->SetConnectionId("connection-" + QByteArray::number(index));
 		CSubscriptionFixture::Prepare(*requests.back(), QStringLiteral("queued-%1").arg(index), QStringLiteral("user-credential-%1").arg(index));
 		fixture.servlet->RegisterSubscription(*requests.back());
 	}
@@ -1299,6 +1305,7 @@ void CWebSocketCredentialsTest::RecipientChannelsAreDeclaredByCommand()
 	QVERIFY(!IsOpen(*restrictedStatus, Controller::SK_RECIPIENT, request("OnConnectionStatusChanged")));
 	imtrest::CWebSocketProtocolEngineComp engine;
 	imtrest::CWebSocketRequest networkRequest(engine);
+	networkRequest.SetConnectionId("connection");
 	imtgql::CGqlRequest restrictedRequest = request("OnConnectionStatusChanged");
 	restrictedRequest.AddField("status", imtgql::CGqlFieldObject());
 	QString error;
@@ -1306,7 +1313,9 @@ void CWebSocketCredentialsTest::RecipientChannelsAreDeclaredByCommand()
 	QVERIFY(!controller.RegisterSubscription("restricted", restrictedRequest, networkRequest, error));
 	QVERIFY(!error.isEmpty());
 	QCOMPARE(statusDelivery->responses.load(), 0);
-	QVERIFY(!controller.UnregisterSubscription("restricted"));
+	const QByteArray connectionId = networkRequest.GetConnectionId();
+	Q_ASSERT(!connectionId.isEmpty());
+	QVERIFY(!controller.UnregisterSubscription(connectionId, "restricted"));
 }
 
 
@@ -1381,13 +1390,16 @@ void CWebSocketCredentialsTest::PublisherReadPermissions()
 	}
 	publisher->InitComponent();
 	imtrest::CWebSocketRequest networkRequest(engine);
+	networkRequest.SetConnectionId("connection");
 	imtgql::CGqlRequest request(imtgql::IGqlRequest::RT_SUBSCRIPTION, "OnPlainChanged");
 	request.AddField("id", imtgql::CGqlFieldObject());
 	request.SetGqlContext(context);
 	QString error;
 	QCOMPARE(publisher->RegisterSubscription("subscription", request, networkRequest, error), allowed);
 	QCOMPARE(error.isEmpty(), allowed);
-	QCOMPARE(publisher->UnregisterSubscription("subscription"), allowed);
+	const QByteArray connectionId = networkRequest.GetConnectionId();
+	Q_ASSERT(!connectionId.isEmpty());
+	QCOMPARE(publisher->UnregisterSubscription(connectionId, "subscription"), allowed);
 }
 
 
@@ -1421,6 +1433,7 @@ void CWebSocketCredentialsTest::CollectionNotificationContainsOnlyIdentifiers()
 	publisher->SetIdAttr("CollectionId", "Users");
 	publisher->InitComponent();
 	imtrest::CWebSocketRequest networkRequest(engine);
+	networkRequest.SetConnectionId("connection");
 	imtgql::CGqlRequest request(imtgql::IGqlRequest::RT_SUBSCRIPTION, "OnUsersCollectionChanged");
 	QString error;
 	QVERIFY2(publisher->RegisterSubscription("subscription", request, networkRequest, error), qPrintable(error));
@@ -1455,7 +1468,9 @@ void CWebSocketCredentialsTest::CollectionNotificationContainsOnlyIdentifiers()
 	else{
 		QCOMPARE(payload.value("itemId").toString(), QString("object"));
 	}
-	QVERIFY(publisher->UnregisterSubscription("subscription"));
+	const QByteArray connectionId = networkRequest.GetConnectionId();
+	Q_ASSERT(!connectionId.isEmpty());
+	QVERIFY(publisher->UnregisterSubscription(connectionId, "subscription"));
 }
 
 
@@ -1536,6 +1551,7 @@ void CWebSocketCredentialsTest::ForwardedRefusalKeepsItsCode()
 
 	imtrest::CWebSocketProtocolEngineComp engine;
 	imtrest::CWebSocketRequest request(engine);
+	request.SetConnectionId("connection");
 	request.SetBody(R"({"id":"client","type":"start"})");
 	imtgql::CGqlRequest gqlRequest(imtgql::IGqlRequest::RT_SUBSCRIPTION, "OnChanged");
 	imtgql::CGqlFieldObject field;

@@ -321,12 +321,18 @@ function(jqml_runtime_files out_var version)
 		endif()
 		file(GLOB_RECURSE _jqml_found CONFIGURE_DEPENDS "${_jqml_child}/*.js")
 		list(APPEND _jqml_sources ${_jqml_found})
-	# Track consumed runtime bundles without including unrelated dist artifacts.
-	file(GLOB _jqml_bundles CONFIGURE_DEPENDS
-		"${_jqml_dir}/dist/main.js"
-		"${_jqml_dir}/dist/core.js"
-		"${_jqml_dir}/dist/qmlcompiler.js")
-	list(APPEND _jqml_sources ${_jqml_bundles})
+	# Track consumed runtime bundles without including unrelated dist artifacts.
+
+	file(GLOB _jqml_bundles CONFIGURE_DEPENDS
+
+		"${_jqml_dir}/dist/main.js"
+
+		"${_jqml_dir}/dist/core.js"
+
+		"${_jqml_dir}/dist/qmlcompiler.js")
+
+	list(APPEND _jqml_sources ${_jqml_bundles})
+
 	endforeach()
 	set(${out_var} "${_jqml_sources}" PARENT_SCOPE)
 endfunction()
@@ -458,6 +464,18 @@ function(jq_compile_web)
 		COMMENT "Create html for ${PROJECT_NAME}"
 		VERBATIM
 	)
+
+	# v5: the compiled QML of a Release build is minified; JQML_MINIFY ON / OFF decides for any build
+	set(_jqml_minify_args)
+	if(JQML_VERSION STREQUAL "v5")
+		if(DEFINED JQML_MINIFY)
+			if(JQML_MINIFY)
+				set(_jqml_minify_args --minify)
+			endif()
+		elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+			set(_jqml_minify_args --minify)
+		endif()
+	endif()
 
 	# JS build
 	add_custom_command(

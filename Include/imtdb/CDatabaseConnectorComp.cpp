@@ -142,7 +142,8 @@ void CDatabaseConnectorComp::OnComponentCreated()
 
 void CDatabaseConnectorComp::OnComponentDestroyed()
 {
-	DisconnectFromDatabase(*m_serverNameAttrPtr);
+	// Not virtual: in the destructor of the wrapper a virtual call gets a wrong this
+	CDatabaseConnectorComp::DisconnectFromDatabase(*m_serverNameAttrPtr);
 	
 	BaseClass::OnComponentDestroyed();
 }

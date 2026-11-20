@@ -2,7 +2,15 @@ const QtEnums = require('../Qt/enums')
 
 const KEYPAD_MODIFIER = 0x20000000     // Qt::KeypadModifier
 
-const MODIFIERS = { shiftKey: QtEnums.ShiftModifier, ctrlKey: QtEnums.ControlModifier, altKey: QtEnums.AltModifier, metaKey: QtEnums.MetaModifier }
+// Qt on macOS (Qt::AA_MacDontSwapCtrlAndMeta off): the Command key is Qt::ControlModifier, the Control key Qt::MetaModifier
+const isMac = () => typeof navigator !== 'undefined' && !!navigator && /Mac|iPhone|iPad|iPod/.test(String(navigator.platform || ''))
+
+function modifiersOf(e){
+    let mac = isMac()
+    return (e.shiftKey ? QtEnums.ShiftModifier : 0) | (e.altKey ? QtEnums.AltModifier : 0)
+        | (e.ctrlKey ? (mac ? QtEnums.MetaModifier : QtEnums.ControlModifier) : 0)
+        | (e.metaKey ? (mac ? QtEnums.ControlModifier : QtEnums.MetaModifier) : 0)
+}
 
 // The Qt key of a DOM event: named keys are their DOM names (the Qt.Key_* values of this runtime),
 // letters and digits their Qt codes by the physical key, so Ctrl+A is Key_A in any layout; Shift+Tab is Key_Backtab
@@ -21,8 +29,7 @@ function qtKey(e){
 class KeyEvent {
     constructor(e){
         this.key = qtKey(e)
-        let modifiers = 0
-        for(let name in MODIFIERS) if(e[name]) modifiers |= MODIFIERS[name]
+        let modifiers = modifiersOf(e)
         if(e.location === 3) modifiers |= KEYPAD_MODIFIER
         this.modifiers = modifiers
         this.$code = e.code || ''
@@ -48,4 +55,4 @@ class KeyEvent {
     }
 }
 
-module.exports = { KeyEvent, qtKey }
+module.exports = { KeyEvent, qtKey, modifiersOf }

@@ -24,6 +24,8 @@ class Component extends QtObject {
             // its context is a child of the component's one wherever the object goes: it ends with that context
             let creator = obj && obj.$own && (obj.$own.$p || made)
             if(creator) (creator.$made || (creator.$made = new Set())).add(obj)
+            // a delegate made for a row of a model: its required properties take the row (QQmlDelegateModel)
+            if(obj && context && context.$attachRequired) context.$attachRequired(obj)
             if(properties){
                 // QQmlComponent::setInitialProperties: a dotted name sets a sub-property ("border.width")
                 for(let key in properties){

@@ -195,7 +195,8 @@ void CWebSocketServerComp::OnComponentCreated()
 
 void CWebSocketServerComp::OnComponentDestroyed()
 {
-	StopServer();
+	// Not virtual: in the destructor of the wrapper a virtual call gets a wrong this
+	CWebSocketServerComp::StopServer();
 
 	m_timer.stop();
 

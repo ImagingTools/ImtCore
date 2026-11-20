@@ -42,12 +42,14 @@ public:
 				const imtgql::CGqlRequest& gqlRequest,
 				const imtrest::IRequest& networkRequest,
 				QString& errorMessage) override;
-	virtual bool UnregisterSubscription(const QByteArray& subscriptionId) override;
+	virtual bool UnregisterSubscription(const QByteArray& connectionId, const QByteArray& subscriptionId) override;
 
 	// reimplemented (imtrest::IRequestEventHandler)
 	virtual void OnRequestDestroyed(imtrest::IRequest* request) override;
 
 protected:
+	static QByteArray GetConnectionId(const imtrest::IRequest& networkRequest);
+
 	virtual bool PushDataToSubscriber(const QByteArray& subscriptionId, const QByteArray& commandId, const QByteArray& data, const imtrest::IRequest& networkRequest, const bool useAwsStyle = true) const;
 	virtual bool PublishData(const QByteArray& commandId, const QByteArray& data) const;
 	virtual bool PublishDataFiltered(
@@ -64,7 +66,7 @@ protected:
 	struct RequestNetworks
 	{
 		imtgql::CGqlRequest gqlRequest;
-		QMap<QByteArray, const imtrest::IRequest*> networkRequests; // Subscription-ID -> NetworkRequest
+		QMap<QByteArray, QList<const imtrest::IRequest*>> networkRequests; // Subscription-ID -> NetworkRequests (one per connection)
 
 		RequestNetworks()
 			:gqlRequest(imtgql::IGqlRequest::RT_SUBSCRIPTION)

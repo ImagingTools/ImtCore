@@ -57,8 +57,8 @@ Rectangle {
 				height: Style.buttonHeight
 				verticalAlignment: TextInput.AlignVCenter
 				font.pixelSize: Style.fontSizeS
-				color: Style.imaginToolsAccentColor
-				selectionColor: Style.imaginToolsAccentColor
+				color: Style.imagingToolsAccentColor
+				selectionColor: Style.imagingToolsAccentColor
 				clip: true
 
 				property bool _typing: false
@@ -126,7 +126,7 @@ Rectangle {
 				id: sendButton
 				width: Style.buttonHeightM
 				radius: Style.radiusS
-				color: textField.text.trim().length > 0 ? Style.imaginToolsAccentColor : Style.inactiveTextColor
+				color: textField.text.trim().length > 0 ? Style.imagingToolsAccentColor : Style.inactiveTextColor
 
 				Text {
 					anchors.centerIn: parent

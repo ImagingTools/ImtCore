@@ -614,18 +614,17 @@ void CCollectionDocumentServicePublisherComp::SendCachedUndoRedoNotificationsToS
 		}
 	}
 
-	const imtrest::IRequest* networkRequestPtr = nullptr;
+	QList<const imtrest::IRequest*> networkRequests;
 	for (const RequestNetworks& entry : m_registeredSubscribers){
 		auto foundIter = entry.networkRequests.constFind(subscriptionId);
 		if (foundIter == entry.networkRequests.constEnd()){
 			continue;
 		}
 
-		networkRequestPtr = foundIter.value();
-		break;
+		networkRequests.append(foundIter.value());
 	}
 
-	if (networkRequestPtr == nullptr){
+	if (networkRequests.isEmpty()){
 		return;
 	}
 
@@ -638,12 +637,20 @@ void CCollectionDocumentServicePublisherComp::SendCachedUndoRedoNotificationsToS
 
 		QJsonDocument jsonDoc;
 		jsonDoc.setObject(jsonObject);
+		const QByteArray data = jsonDoc.toJson(QJsonDocument::Compact);
 
-		PushDataToSubscriber(
-			subscriptionId,
-			sdl::V1_0::imtbase::COnUndoRedoChangedGqlRequest::GetCommandId(),
-			jsonDoc.toJson(QJsonDocument::Compact),
-			*networkRequestPtr);
+		for (const imtrest::IRequest* networkRequestPtr : networkRequests){
+			Q_ASSERT(networkRequestPtr != nullptr);
+			if (networkRequestPtr == nullptr){
+				continue;
+			}
+
+			PushDataToSubscriber(
+				subscriptionId,
+				sdl::V1_0::imtbase::COnUndoRedoChangedGqlRequest::GetCommandId(),
+				data,
+				*networkRequestPtr);
+		}
 	}
 }
 

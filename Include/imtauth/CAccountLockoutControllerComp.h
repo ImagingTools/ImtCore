@@ -42,6 +42,7 @@ public:
 
 	// reimplemented (imtauth::IAccountLockoutController)
 	virtual bool IsAccountLocked(const QByteArray& login, qint64* remainingLockoutSecsPtr = nullptr) const override;
+	virtual int GetRemainingAttempts(const QByteArray& login, qint64* lockoutDurationSecsPtr = nullptr) const override;
 	virtual bool RegisterFailedAttempt(const QByteArray& login) override;
 	virtual void RegisterSuccessfulAttempt(const QByteArray& login) override;
 	virtual bool UnlockAccount(const QByteArray& login) override;

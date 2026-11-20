@@ -127,9 +127,26 @@ QByteArrayList CAuthorizationControllerComp::CalculateGlobalPermissions(
 
 sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateInvalidLoginOrPasswordResponse(
 			const QByteArray& login,
-			QString& errorMessage) const
+			QString& errorMessage,
+			const QByteArray& languageId,
+			int remainingAttempts,
+			qint64 lockoutDurationSecs) const
 {
-	errorMessage = QT_TR_NOOP(QStringLiteral("Invalid login or password. Login: '%1'").arg(login));
+	errorMessage = Translate(QT_TRANSLATE_NOOP("CAuthorizationControllerComp", "Invalid login or password. Login: '%1'"), languageId).arg(QString::fromUtf8(login));
+
+	// The lock must not come as a surprise: every failed attempt tells how many are left
+	if (remainingAttempts > 0){
+		if (lockoutDurationSecs > 0){
+			errorMessage += QStringLiteral(". ") + Translate(QT_TRANSLATE_NOOP("CAuthorizationControllerComp", "Attempts left before the account is locked for %1: %2."), languageId)
+						.arg(FormatDuration(lockoutDurationSecs, languageId))
+						.arg(remainingAttempts);
+		}
+		else{
+			errorMessage += QStringLiteral(". ") + Translate(QT_TRANSLATE_NOOP("CAuthorizationControllerComp", "Attempts left before the account is locked until an administrator unlocks it: %1."), languageId)
+						.arg(remainingAttempts);
+		}
+	}
+
 	SendErrorMessage(0, errorMessage, "imtgql::CAuthorizationControllerComp");
 
 	return sdl::V1_0::imtauth::CAuthorizationPayload();
@@ -157,27 +174,19 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateAc
 sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateAccountLockedResponse(
 			const QByteArray& login,
 			qint64 remainingLockoutSecs,
-			QString& errorMessage) const
+			QString& errorMessage,
+			const QByteArray& languageId) const
 {
 	// The user reads this message, so it says when to try again rather than only that the account is locked.
 	QString retryText;
 	if (remainingLockoutSecs < 0){
-		retryText = QStringLiteral("It stays locked until an administrator unlocks it.");
-	}
-	else if (remainingLockoutSecs < 60){
-		retryText = (remainingLockoutSecs <= 1) ? QStringLiteral("Try again in 1 second.") : QStringLiteral("Try again in %1 seconds.").arg(remainingLockoutSecs);
+		retryText = Translate(QT_TRANSLATE_NOOP("CAuthorizationControllerComp", "It stays locked until an administrator unlocks it."), languageId);
 	}
 	else{
-		qint64 minutes = (remainingLockoutSecs + 59) / 60;
-		if (minutes < 120){
-			retryText = (minutes == 1) ? QStringLiteral("Try again in 1 minute.") : QStringLiteral("Try again in %1 minutes.").arg(minutes);
-		}
-		else{
-			retryText = QStringLiteral("Try again in %1 hours.").arg((minutes + 59) / 60);
-		}
+		retryText = Translate(QT_TRANSLATE_NOOP("CAuthorizationControllerComp", "Try again in %1."), languageId).arg(FormatDuration(remainingLockoutSecs, languageId));
 	}
 
-	errorMessage = QStringLiteral("Too many invalid sign-in attempts. The account is locked. %1").arg(retryText);
+	errorMessage = Translate(QT_TRANSLATE_NOOP("CAuthorizationControllerComp", "Too many invalid sign-in attempts. The account is locked. %1"), languageId).arg(retryText);
 	SendErrorMessage(0, QStringLiteral("%1 Login: '%2'").arg(errorMessage, QString::fromUtf8(login)), "imtgql::CAuthorizationControllerComp");
 
 	return sdl::V1_0::imtauth::CAuthorizationPayload();
@@ -186,16 +195,53 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateAc
 
 sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateFailedAttemptResponse(
 			const QByteArray& login,
-			QString& errorMessage) const
+			QString& errorMessage,
+			const QByteArray& languageId) const
 {
 	RegisterAccessAttempt(login, false);
 
 	qint64 remainingLockoutSecs = 0;
 	if (IsAccountLocked(login, &remainingLockoutSecs)){
-		return CreateAccountLockedResponse(login, remainingLockoutSecs, errorMessage);
+		return CreateAccountLockedResponse(login, remainingLockoutSecs, errorMessage, languageId);
 	}
 
-	return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
+	int remainingAttempts = -1;
+	qint64 lockoutDurationSecs = -1;
+	if (m_accountLockoutControllerCompPtr.IsValid()){
+		remainingAttempts = m_accountLockoutControllerCompPtr->GetRemainingAttempts(login, &lockoutDurationSecs);
+	}
+
+	return CreateInvalidLoginOrPasswordResponse(login, errorMessage, languageId, remainingAttempts, lockoutDurationSecs);
+}
+
+
+QString CAuthorizationControllerComp::Translate(const char* text, const QByteArray& languageId) const
+{
+	// Without a language of the caller the text stays English, not the language of the server
+	if (languageId.isEmpty()){
+		return QString::fromUtf8(text);
+	}
+
+	return QString::fromUtf8(iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), text, languageId, "CAuthorizationControllerComp"));
+}
+
+
+QString CAuthorizationControllerComp::FormatDuration(qint64 secs, const QByteArray& languageId) const
+{
+	if (secs < 60){
+		return (secs <= 1)
+					? Translate(QT_TRANSLATE_NOOP("CAuthorizationControllerComp", "1 second"), languageId)
+					: Translate(QT_TRANSLATE_NOOP("CAuthorizationControllerComp", "%1 seconds"), languageId).arg(secs);
+	}
+
+	const qint64 minutes = (secs + 59) / 60;
+	if (minutes < 120){
+		return (minutes == 1)
+					? Translate(QT_TRANSLATE_NOOP("CAuthorizationControllerComp", "1 minute"), languageId)
+					: Translate(QT_TRANSLATE_NOOP("CAuthorizationControllerComp", "%1 minutes"), languageId).arg(minutes);
+	}
+
+	return Translate(QT_TRANSLATE_NOOP("CAuthorizationControllerComp", "%1 hours"), languageId).arg((minutes + 59) / 60);
 }
 
 
@@ -351,7 +397,7 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateAu
 
 sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnAuthorization(
 			const sdl::V1_0::imtauth::CAuthorizationGqlRequest& authorizationRequest,
-			const imtgql::CGqlRequest& /*gqlRequest*/,
+			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	if (!m_userCollectionCompPtr.IsValid()){
@@ -359,9 +405,9 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnAuthor
 		return sdl::V1_0::imtauth::CAuthorizationPayload();
 	}
 
-	istd::TNullableValue<sdl::V1_0::imtauth::CAuthorizationInput> inputArgument = *authorizationRequest.GetRequestedArguments().input;
+	istd::TNullableValue<sdl::V1_0::imtauth::CAuthorizationInput> inputArgument = authorizationRequest.GetRequestedArguments().input;
 	if (!inputArgument.has_value()){
-		Q_ASSERT(false);
+		errorMessage = QStringLiteral("The input is required");
 		return sdl::V1_0::imtauth::CAuthorizationPayload();
 	}
 
@@ -380,14 +426,15 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnAuthor
 		password = inputArgument->password->toUtf8();
 	}
 
+	const QByteArray languageId = gqlRequest.GetRequestContext() != nullptr ? gqlRequest.GetRequestContext()->GetLanguageId() : QByteArray();
 	qint64 remainingLockoutSecs = 0;
 	if (IsAccountLocked(login, &remainingLockoutSecs)){
-		return CreateAccountLockedResponse(login, remainingLockoutSecs, errorMessage);
+		return CreateAccountLockedResponse(login, remainingLockoutSecs, errorMessage, languageId);
 	}
 
 	QByteArray userObjectId = GetUserObjectId(login);
 	if (userObjectId.isEmpty()){
-		return CreateFailedAttemptResponse(login, errorMessage);
+		return CreateFailedAttemptResponse(login, errorMessage, languageId);
 	}
 
 	imtauth::CUserInfo* userInfoPtr = nullptr;
@@ -397,7 +444,7 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnAuthor
 	}
 
 	if (userInfoPtr == nullptr){
-		return CreateFailedAttemptResponse(login, errorMessage);
+		return CreateFailedAttemptResponse(login, errorMessage, languageId);
 	}
 
 	QByteArray activeSystemId;
@@ -413,7 +460,7 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnAuthor
 	}
 
 	if (!ok){
-		return CreateFailedAttemptResponse(login, errorMessage);
+		return CreateFailedAttemptResponse(login, errorMessage, languageId);
 	}
 
 	RegisterAccessAttempt(login, true);
@@ -429,7 +476,7 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnAuthor
 
 sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnUserToken(
 			const sdl::V1_0::imtauth::CUserTokenGqlRequest& userTokenRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	if (!m_userCollectionCompPtr.IsValid()){
@@ -439,7 +486,7 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnUserTo
 
 	istd::TNullableValue<sdl::V1_0::imtauth::CAuthorizationInput> inputArgument = userTokenRequest.GetRequestedArguments().input;
 	if (!inputArgument.has_value()){
-		Q_ASSERT(false);
+		errorMessage = QStringLiteral("The input is required");
 		return sdl::V1_0::imtauth::CAuthorizationPayload();
 	}
 
@@ -458,14 +505,15 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnUserTo
 		password = inputArgument->password->toUtf8();
 	}
 
+	const QByteArray languageId = gqlRequest.GetRequestContext() != nullptr ? gqlRequest.GetRequestContext()->GetLanguageId() : QByteArray();
 	qint64 remainingLockoutSecs = 0;
 	if (IsAccountLocked(login, &remainingLockoutSecs)){
-		return CreateAccountLockedResponse(login, remainingLockoutSecs, errorMessage);
+		return CreateAccountLockedResponse(login, remainingLockoutSecs, errorMessage, languageId);
 	}
 
 	QByteArray userObjectId = GetUserObjectId(login);
 	if (userObjectId.isEmpty()){
-		return CreateFailedAttemptResponse(login, errorMessage);
+		return CreateFailedAttemptResponse(login, errorMessage, languageId);
 	}
 
 	imtauth::CUserInfo* userInfoPtr = nullptr;
@@ -475,7 +523,7 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnUserTo
 	}
 
 	if (userInfoPtr == nullptr){
-		return CreateFailedAttemptResponse(login, errorMessage);
+		return CreateFailedAttemptResponse(login, errorMessage, languageId);
 	}
 
 	QByteArray activeSystemId;
@@ -491,7 +539,7 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnUserTo
 	}
 
 	if (!ok){
-		return CreateFailedAttemptResponse(login, errorMessage);
+		return CreateFailedAttemptResponse(login, errorMessage, languageId);
 	}
 
 	RegisterAccessAttempt(login, true);

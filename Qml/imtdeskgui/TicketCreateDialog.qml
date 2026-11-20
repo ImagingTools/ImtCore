@@ -55,7 +55,7 @@ Rectangle {
 				text: qsTr("New Issue")
 				font.pixelSize: Style.fontSizeL
 				font.bold: true
-				color: Style.imaginToolsAccentColor
+				color: Style.imagingToolsAccentColor
 			}
 
 			// Title field
@@ -94,7 +94,7 @@ Rectangle {
 					width: parent.width
 					height: Math.min(180, Math.max(100, descriptionInput.contentHeight)) + Style.paddingM * 2
 					radius: Style.radiusM
-					border.color: descriptionInput.activeFocus ? Style.imaginToolsAccentColor : Style.borderColor
+					border.color: descriptionInput.activeFocus ? Style.imagingToolsAccentColor : Style.borderColor
 					border.width: descriptionInput.activeFocus ? 2 : 1
 					color: descriptionInput.activeFocus ? Style.baseColor : Style.backgroundColor
 
@@ -209,7 +209,7 @@ Rectangle {
 						anchors.centerIn: parent
 						text: qsTr("Cancel")
 						font.pixelSize: Style.fontSizeS
-						color: Style.imaginToolsAccentColor
+						color: Style.imagingToolsAccentColor
 					}
 
 					MouseArea {

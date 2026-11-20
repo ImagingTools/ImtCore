@@ -139,7 +139,7 @@ void CDatabaseLoginSettingsEditorComp::on_TestConnectionButton_clicked()
 	Q_ASSERT(m_databaseConnectionCheckerCompPtr.IsValid());
 
 	QString errorMessage;
-	bool connectionSuccessful = m_databaseConnectionCheckerCompPtr->CheckDatabaseConnection(errorMessage);
+	const bool connectionSuccessful = m_databaseConnectionCheckerCompPtr->CheckDatabaseConnection(errorMessage) != imtdb::IDatabaseServerConnectionChecker::DS_NOT_CONNECTED;
 	if (connectionSuccessful){
 		errorMessage = tr("Database connection test was successful");
 	}

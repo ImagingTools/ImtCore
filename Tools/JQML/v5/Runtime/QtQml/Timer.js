@@ -20,16 +20,33 @@ class Timer extends QtObject {
     $schedule(){
         this.$cancel()
         if(!this.$v[Timer.RUNNING] || this.$f & engine.DESTROYED) return
-        let interval = Math.max(0, this.$v[Timer.INTERVAL])
-        let fire = () => {
-            this.$handle = null
-            if(engine.isStopped()) return
-            if(!this.$v[Timer.RUNNING]) return
-            if(!this.$v[Timer.REPEAT]) this.$write(Timer.RUNNING, false)
-            engine.batch(() => engine.emitArgs(this, Timer.SIGNAL_triggered, []))
-            if(this.$v[Timer.REPEAT] && this.$v[Timer.RUNNING] && !this.$handle) this.$handle = setTimeout(fire, interval)
+        this.$start(Math.max(0, this.$v[Timer.INTERVAL]))
+    }
+
+    // the timer expires after interval; a frame that comes first fires it when it is due (engine.runDueTimers)
+    $start(interval){
+        this.$handle = setTimeout(() => this.$fire(), interval)
+        engine.timerScheduled(this, interval)
+    }
+
+    $fire(){
+        this.$handle = null
+        engine.timerDone(this)
+        if(engine.isStopped()) return
+        if(!this.$v[Timer.RUNNING]) return
+        if(!this.$v[Timer.REPEAT]) this.$write(Timer.RUNNING, false)
+        engine.batch(() => engine.emitArgs(this, Timer.SIGNAL_triggered, []))
+        if(this.$v[Timer.REPEAT] && this.$v[Timer.RUNNING] && this.$handle === null && !(this.$f & engine.DESTROYED)){
+            this.$start(Math.max(0, this.$v[Timer.INTERVAL]))
         }
-        this.$handle = setTimeout(fire, interval)
+    }
+
+    $fireNow(){
+        if(this.$handle !== null){
+            clearTimeout(this.$handle)
+            this.$handle = null
+        }
+        this.$fire()
     }
 
     $cancel(){
@@ -37,6 +54,7 @@ class Timer extends QtObject {
             clearTimeout(this.$handle)
             this.$handle = null
         }
+        engine.timerDone(this)
     }
 
     $disposeNative(){

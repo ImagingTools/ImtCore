@@ -84,7 +84,7 @@ Item {
         }
     }
 
-    onDocumentServicePtrChanged: {
+    onDocumentManagerPtrChanged: {
         if (commandsDelegateLoader.item){
             if (commandsDelegateLoader.item.documentManagerPtr !== undefined){
                 commandsDelegateLoader.item.documentManagerPtr = collectionStructureContainer.documentManagerPtr;

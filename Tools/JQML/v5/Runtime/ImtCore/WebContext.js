@@ -4,6 +4,7 @@
 const engine = require('../Core/engine')
 const { QtObject } = require('../Core/QtObject')
 const { defineType } = require('../Core/type')
+const Translations = require('../Core/Translations')
 
 class WebContext extends QtObject {
     constructor(){
@@ -15,9 +16,17 @@ class WebContext extends QtObject {
 
     // qsTr bindings are evaluated again when the translations change (QQmlEngine::retranslate)
     translate(sourceText){
+        return this.translateIn(null, sourceText)
+    }
+
+    translateIn(context, sourceText, disambiguation, n){
         engine.track(this, WebContext.SIGNAL_translationsChanged)
-        let result = this.$dict ? this.$dict[sourceText] : undefined
-        return result ? result : sourceText
+        return Translations.translate(this.$dict, context, sourceText, disambiguation, n)
+    }
+
+    translateId(id, n){
+        engine.track(this, WebContext.SIGNAL_translationsChanged)
+        return Translations.translateId(this.$dict, id, n)
     }
 
     // The .ts files load in the background; until they are there the texts keep the previous language
@@ -28,24 +37,17 @@ class WebContext extends QtObject {
             this.$useLanguage(language)
             return
         }
-        if(typeof fetch === 'undefined' || typeof DOMParser === 'undefined') return
+        if(typeof fetch === 'undefined') return
         let application = this.$v[WebContext.APPLICATION]
         let prefixes = typeof application === 'string' ? [application] : Array.isArray(application) ? application : []
         let load = (prefix) => fetch(prefix ? '../Translations/' + prefix + '_' + language + '.ts' : '../Translations/' + language + '.ts')
             .then(response => response.ok ? response.text() : '')
             .catch(() => '')
         Promise.all(prefixes.map(load)).then(texts => {
-            let dict = {}
-            for(let text of texts){
-                if(!text) continue
-                let xml = new DOMParser().parseFromString(text, 'text/xml')
-                for(let message of xml.getElementsByTagName('message')){
-                    let source = message.getElementsByTagName('source')[0]
-                    let translation = message.getElementsByTagName('translation')[0]
-                    if(source && translation && translation.textContent) dict[source.textContent] = translation.textContent
-                }
-            }
-            this.$languages[language] = dict
+            let catalog = Translations.emptyCatalog()
+            for(let text of texts) if(text) Translations.parseTs(text, catalog)
+            if(!catalog.language) catalog.language = language
+            this.$languages[language] = catalog
             if(this.$v[WebContext.LANGUAGE] === language) this.$useLanguage(language)
         })
     }

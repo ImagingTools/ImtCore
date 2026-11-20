@@ -55,7 +55,6 @@ sdl::V1_0::imtauth::CChangePasswordPayload CUserControllerComp::OnChangePassword
 
 	sdl::V1_0::imtauth::ChangePasswordRequestArguments arguments = changePasswordRequest.GetRequestedArguments();
 	if (!arguments.input.has_value()){
-		Q_ASSERT(false);
 		return CreateChangePasswordFailure(
 					QStringLiteral("Unable to change password. Error: Input argument is invalid"),
 					QStringList() << QStringLiteral("InvalidRequest"));
@@ -468,8 +467,7 @@ sdl::V1_0::imtauth::CCheckSuperuserPayload CUserControllerComp::OnCheckSuperuser
 
 	if (m_databaseConnectionCheckerCompPtr.IsValid()){
 		QString connectionMessage;
-		bool ok = m_databaseConnectionCheckerCompPtr->CheckDatabaseConnection(connectionMessage);
-		if (!ok){
+		if (m_databaseConnectionCheckerCompPtr->CheckDatabaseConnection(connectionMessage) == imtdb::IDatabaseServerConnectionChecker::DS_NOT_CONNECTED){
 			response.status = sdl::V1_0::imtauth::ExistsStatus::UNKNOWN;
 			response.message = connectionMessage;
 

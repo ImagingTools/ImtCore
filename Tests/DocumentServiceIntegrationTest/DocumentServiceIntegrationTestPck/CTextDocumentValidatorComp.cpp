@@ -5,6 +5,9 @@
 // ACF includes
 #include <iprm/ITextParam.h>
 
+// ImtCore includes
+#include <imtdoc/imtdoc.h>
+
 
 namespace DocumentServiceIntegrationTestPck
 {
@@ -15,7 +18,7 @@ namespace DocumentServiceIntegrationTestPck
 bool CTextDocumentValidatorComp::ValidateDocumentData(
 			const istd::IChangeable& document,
 			QString& errorMessage,
-			const iprm::IParamsSet* /*validationParams*/,
+			const iprm::IParamsSet* validationParams,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	errorMessage.clear();
@@ -27,6 +30,14 @@ bool CTextDocumentValidatorComp::ValidateDocumentData(
 
 	if (m_errorMessageAttrPtr.IsValid()){
 		errorMessage = *m_errorMessageAttrPtr;
+
+		// With a language the message shows what reached the validator: "[<language>|<object-ID>]"
+		const QByteArray languageId = imtdoc::GetLanguageIdFromParams(validationParams);
+		if (!languageId.isEmpty()){
+			errorMessage += QStringLiteral(" [%1|%2]").arg(
+						QString::fromUtf8(languageId),
+						QString::fromUtf8(imtdoc::GetObjectIdFromParams(validationParams)));
+		}
 	}
 
 	return false;

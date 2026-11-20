@@ -23,8 +23,11 @@ The selector is a small CSS-like text:
 | `save`, `#save`, `"Save as"` | the `objectName` (`*` and `?` are wildcards: `row*`) |
 | `@Rectangle`, `@ImtButton`, `@ImtButton#ok` | the type: the QML type, or the name of the component where it is used |
 | `[text="OK"]`, `[width>0]`, `[model.count>=3]` | a property: `=`, `!=`, `*=` (contains), `^=`, `$=`, `>`, `<`, `>=`, `<=`; `[prop]` is "has it" |
-| `:visible`, `:enabled`, `:disabled` | the state |
+| `:visible`, `:enabled`, `:disabled` | the state; it follows a name, a type or a quoted name: `save:visible`, `row*:enabled`, `@Text:visible`, `"Save as":disabled` |
 | `a b` / `a > b` / `> b` | `b` anywhere under `a` / directly under `a` / directly under the scope |
+
+A name has letters of any alphabet, digits and `_ - . : $ * ?` (`ПользовательElementView`, `#ПриборучетаButton`); a name with a space or any
+other character is quoted. A `:` that is not followed by `visible`, `enabled` or `disabled` stays in the name (`ns:name`).
 
 The items come in the order of the tree. Hidden items and items without a size are found as well (use `:visible`).
 Items that do not exist are not found: a row of a list that was not built yet has to be scrolled to first.
