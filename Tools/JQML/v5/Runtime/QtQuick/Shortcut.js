@@ -206,4 +206,4 @@ defineType(Shortcut, {
     signals: ['activated', 'activatedAmbiguously'],
 })
 
-module.exports = { Shortcut, StandardKey, parseSequences, modsOf }
+module.exports = { Shortcut, StandardKey, parseSequences, modsOf, keyOf }

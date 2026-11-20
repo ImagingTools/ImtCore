@@ -1,6 +1,7 @@
 const engine = require('../Core/engine')
 const mouse = require('../QtQuick/PointerDelivery')
 const QtEnums = require('../Qt/enums')
+const { domKey: domKeyOf } = require('../QtQuick/KeyEvent')
 const { defineType } = require('../Core/type')
 const { Item } = require('../QtQuick/Item')
 
@@ -311,11 +312,14 @@ class TestCase extends Item {
 
     $key(type, key, modifiers = 0){
         if(typeof window === 'undefined') return
-        // Qt key enums are DOM key names; letter and digit codes become characters, Backtab is Shift+Tab
-        let domKey = String(key)
+        // a Qt key is the DOM key it stands for: a named key by its name, a letter or digit code its character (lower
+        // case without Shift), another code its character; Backtab is Shift+Tab; a string is a character
+        let domKey = typeof key === 'string' ? key : domKeyOf(key)
         if(typeof key === 'number' && ((key >= 0x30 && key <= 0x39) || (key >= 0x41 && key <= 0x5a))){
             domKey = String.fromCharCode(key)
             if(!(modifiers & QtEnums.ShiftModifier)) domKey = domKey.toLowerCase()
+        } else if(typeof key === 'number' && domKey === null){
+            domKey = key > 0 && key < 0x110000 ? String.fromCodePoint(key) : 'Unidentified'
         }
         if(key === QtEnums.Key_Backtab){
             domKey = 'Tab'
@@ -326,6 +330,7 @@ class TestCase extends Item {
             cancelable: true,
             key: domKey,
             code: domKey,
+            location: key === QtEnums.Key_Enter ? 3 : 0,
             shiftKey: !!(modifiers & QtEnums.ShiftModifier),
             ctrlKey: !!(modifiers & (isMac() ? QtEnums.MetaModifier : QtEnums.ControlModifier)),
             altKey: !!(modifiers & QtEnums.AltModifier),
@@ -370,13 +375,13 @@ class TestCase extends Item {
             input.value = current
             input.setSelectionRange(current.length, current.length)
         }
-        this.$key('keydown', ch === '\n' ? QtEnums.Key_Enter : ch)
+        this.$key('keydown', ch === '\n' ? QtEnums.Key_Return : ch)
         let start = input.selectionStart === null ? input.value.length : input.selectionStart
         let end = input.selectionEnd === null ? start : input.selectionEnd
         input.value = input.value.slice(0, start) + ch + input.value.slice(end)
         input.setSelectionRange(start + 1, start + 1)
         input.dispatchEvent(new Event('input', { bubbles: true }))
-        this.$key('keyup', ch === '\n' ? QtEnums.Key_Enter : ch)
+        this.$key('keyup', ch === '\n' ? QtEnums.Key_Return : ch)
     }
 
     keySequence(sequence){

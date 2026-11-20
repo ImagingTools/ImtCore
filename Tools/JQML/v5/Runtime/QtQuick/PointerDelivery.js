@@ -343,8 +343,18 @@ engine.onSceneChanged(() => {
     if(!scene.grabber && scene.x >= 0 && scene.y >= 0 && scene.roots.length) engine.queueFrame(frameHover)
 })
 
+// Qt::CursorShape -> the CSS cursor that looks like it (QCursor shapes by number; BitmapCursor / CustomCursor have none)
+const CSS_CURSORS = ['default', 'default', 'crosshair', 'wait', 'text', 'ns-resize', 'ew-resize', 'nesw-resize', 'nwse-resize',
+    'move', 'none', 'row-resize', 'col-resize', 'pointer', 'not-allowed', 'help', 'progress', 'grab', 'grabbing', 'copy', 'move',
+    'alias']
+
+function cssCursor(shape){
+    if(typeof shape === 'number') return CSS_CURSORS[shape] || 'default'
+    return shape || ''
+}
+
 function setCursor(cursor){
-    if(scene.element) scene.element.style.cursor = cursor || ''
+    if(scene.element) scene.element.style.cursor = cursor === null || cursor === undefined ? '' : cssCursor(cursor)
 }
 
 // ---- DOM ------------------------------------------------------------------------------------
