@@ -147,19 +147,22 @@ bool CWebSocketServerComp::SendRequest(const QByteArray& requestId, ConstRequest
 
 // reimplemented (icomp::CComponentBase)
 
-void CWebSocketServerComp::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
+void CWebSocketServerComp::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
+	if (!m_startServerOnCreateAttrPtr.IsValid() || !*m_startServerOnCreateAttrPtr || !m_isInitialized){
+		return;
+	}
+
+	if (modelId == MI_SERVER_CONNECTION){
+		// The server is moved in its own thread: the port can be changed in the thread of a request
+		QMetaObject::invokeMethod(this, [this](){ MoveToConfiguredPort(); }, Qt::AutoConnection);
+
+		return;
+	}
+
 	Q_ASSERT_X(m_sslConfigurationCompPtr.IsValid() && m_sslConfigurationManagerCompPtr.IsValid(), "Update server's SSL configuration", "SSL configuration or manager is not set!");
 
-	if (m_startServerOnCreateAttrPtr.IsValid() && *m_startServerOnCreateAttrPtr && m_isInitialized){
-		while (m_webSocketThreadList.count() > 0){
-			imtrest::CWebSocketThread* webSocketThread = m_webSocketThreadList.back();
-			webSocketThread->disconnect();
-			m_webSocketThreadList.pop_back();
-		}
-		StopServer();
-		EnsureServerStarted();
-	}
+	RestartServer();
 }
 
 
@@ -178,7 +181,11 @@ void CWebSocketServerComp::OnComponentCreated()
 	BaseClass::OnComponentCreated();
 
 	if (m_sslConfigurationModelCompPtr.IsValid() && m_sslConfigurationManagerCompPtr.IsValid()){
-		BaseClass2::RegisterModel(m_sslConfigurationModelCompPtr.GetPtr());
+		BaseClass2::RegisterModel(m_sslConfigurationModelCompPtr.GetPtr(), MI_SSL_CONFIGURATION);
+	}
+
+	if (m_webServerInterfaceModelCompPtr.IsValid()){
+		BaseClass2::RegisterModel(m_webServerInterfaceModelCompPtr.GetPtr(), MI_SERVER_CONNECTION);
 	}
 
 	if (m_startServerOnCreateAttrPtr.IsValid() && *m_startServerOnCreateAttrPtr){
@@ -224,7 +231,10 @@ bool CWebSocketServerComp::StartServer()
 
 bool CWebSocketServerComp::StopServer()
 {
-	m_webSocketServerPtr->close();
+	// Nothing to close before the server has listened once
+	if (m_webSocketServerPtr.IsValid()){
+		m_webSocketServerPtr->close();
+	}
 
 	return true;
 }
@@ -232,7 +242,7 @@ bool CWebSocketServerComp::StopServer()
 
 IServer::ServerStatus CWebSocketServerComp::GetServerStatus() const
 {
-	if (m_webSocketServerPtr->isListening()){
+	if (m_webSocketServerPtr.IsValid() && m_webSocketServerPtr->isListening()){
 		return SS_LISTENING;
 	}
 
@@ -241,6 +251,43 @@ IServer::ServerStatus CWebSocketServerComp::GetServerStatus() const
 
 
 // private methods
+
+bool CWebSocketServerComp::RestartServer()
+{
+	while (m_webSocketThreadList.count() > 0){
+		imtrest::CWebSocketThread* webSocketThread = m_webSocketThreadList.back();
+		webSocketThread->disconnect();
+		m_webSocketThreadList.pop_back();
+	}
+
+	StopServer();
+
+	return EnsureServerStarted();
+}
+
+
+void CWebSocketServerComp::MoveToConfiguredPort()
+{
+	if (!m_webServerInterfaceCompPtr.IsValid()){
+		return;
+	}
+
+	const int port = m_webServerInterfaceCompPtr->GetPort(imtcom::IServerConnectionInterface::PT_WEBSOCKET);
+	const bool isListening = m_webSocketServerPtr.IsValid() && m_webSocketServerPtr->isListening();
+	if (isListening && (m_webSocketServerPtr->serverPort() == port)){
+		return;
+	}
+
+	const quint16 previousPort = isListening ? m_webSocketServerPtr->serverPort() : 0;
+	if (RestartServer() || (previousPort == 0)){
+		return;
+	}
+
+	SendErrorMessage(0, QStringLiteral("Web socket server stays on port %1").arg(previousPort));
+
+	StartListening(QHostAddress::Any, previousPort);
+}
+
 
 bool CWebSocketServerComp::EnsureServerStarted()
 {

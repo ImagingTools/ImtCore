@@ -6,6 +6,8 @@
 #include <imtfile/CDiskFileLoaderComp.h>
 #include <imtfile/CFileFormatConversionComp.h>
 #include <imtfile/CFileSystemStructureProviderComp.h>
+#include <imtfile/CPrivateFilePersistenceComp.h>
+#include <imtfile/CSystemConfigLocationComp.h>
 
 
 /**
@@ -18,6 +20,8 @@ namespace ImtFilePck
 typedef imtfile::CDiskFileLoaderComp FileProvider;
 typedef imtfile::CFileFormatConversionComp FileFormatConversion;
 typedef imtfile::CFileSystemStructureProviderComp FileSystemStructureProvider;
+typedef imtfile::CSystemConfigLocationComp SystemConfigLocation;
+typedef imtfile::CPrivateFilePersistenceComp PrivateFilePersistence;
 
 
 } // namespace ImtFilePck

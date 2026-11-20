@@ -30,6 +30,16 @@ I_EXPORT_COMPONENT(
 			"File system structure provider",
 			"File System Structure Provider Folder");
 
+I_EXPORT_COMPONENT(
+			SystemConfigLocation,
+			"Configuration folder of the application for the whole computer (ProgramData, /Library/Preferences, /etc/xdg)",
+			"System Configuration Folder Location Settings");
+
+I_EXPORT_COMPONENT(
+			PrivateFilePersistence,
+			"File persistence of secrets: the file and its folder are accessible to their owner only",
+			"Private Secret File Persistence Owner Permissions");
+
 
 } // namespace ImtFilePck
 

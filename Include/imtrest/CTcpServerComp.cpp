@@ -90,14 +90,22 @@ qint64 CTcpServerComp::GetWriteHighWatermark() const
 
 // protected methods
 
-void CTcpServerComp::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
+void CTcpServerComp::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
+	if (!m_startServerOnCreateAttrPtr.IsValid() || !*m_startServerOnCreateAttrPtr || !m_isInitialized){
+		return;
+	}
+
+	if (modelId == MI_SERVER_CONNECTION){
+		// The server is moved in its own thread: the port can be changed in the thread of a request
+		QMetaObject::invokeMethod(this, [this](){ MoveToConfiguredPort(); }, Qt::AutoConnection);
+
+		return;
+	}
 
 	Q_ASSERT_X(m_sslConfigurationCompPtr.IsValid() && m_sslConfigurationManagerCompPtr.IsValid(), "Update server's SSL configuration", "SSL configuration or manager is not set!");
 
-	if (m_startServerOnCreateAttrPtr.IsValid() && *m_startServerOnCreateAttrPtr && m_isInitialized){
-		EnsureServerStarted();
-	}
+	EnsureServerStarted();
 }
 
 
@@ -117,8 +125,15 @@ void CTcpServerComp::OnComponentCreated()
 
 	m_serverPtr->SetLogPtr(GetLogPtr());
 
+	// Once: the server object stays the same when it listens on another port
+	connect(m_serverPtr.GetPtr(), &CMultiThreadServer::NewThreadConnection, this, &CTcpServerComp::OnNewThreadConnection);
+
 	if (m_sslConfigurationModelCompPtr.IsValid() && m_sslConfigurationManagerCompPtr.IsValid()){
-		BaseClass2::RegisterModel(m_sslConfigurationModelCompPtr.GetPtr());
+		BaseClass2::RegisterModel(m_sslConfigurationModelCompPtr.GetPtr(), MI_SSL_CONFIGURATION);
+	}
+
+	if (m_serverConnectionInterfaceModelCompPtr.IsValid()){
+		BaseClass2::RegisterModel(m_serverConnectionInterfaceModelCompPtr.GetPtr(), MI_SERVER_CONNECTION);
 	}
 
 	if (m_startServerOnCreateAttrPtr.IsValid() && *m_startServerOnCreateAttrPtr){
@@ -173,8 +188,6 @@ bool CTcpServerComp::StartListening(const QHostAddress &address, quint16 port)
 		QString message = QStringLiteral("Tcp server successfully started on port %1").arg(port);
 
 		SendInfoMessage(0, message);
-
-		connect(m_serverPtr.GetPtr(), &CMultiThreadServer::NewThreadConnection, this, &CTcpServerComp::OnNewThreadConnection);
 
 		return true;
 	}
@@ -238,6 +251,29 @@ bool CTcpServerComp::EnsureServerStarted()
 	}
 
 	return false;
+}
+
+
+void CTcpServerComp::MoveToConfiguredPort()
+{
+	if (!m_serverConnnectionInterfaceCompPtr.IsValid()){
+		return;
+	}
+
+	const int port = m_serverConnnectionInterfaceCompPtr->GetPort(imtcom::IServerConnectionInterface::PT_HTTP);
+	const bool isListening = m_serverPtr->isListening();
+	if (isListening && (m_serverPtr->serverPort() == port)){
+		return;
+	}
+
+	const quint16 previousPort = isListening ? m_serverPtr->serverPort() : 0;
+	if (EnsureServerStarted() || (previousPort == 0)){
+		return;
+	}
+
+	SendErrorMessage(0, QStringLiteral("Tcp server stays on port %1").arg(previousPort));
+
+	StartListening(QHostAddress::Any, previousPort);
 }
 
 
