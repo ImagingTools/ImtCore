@@ -1,7 +1,7 @@
 const engine = require('../Core/engine')
 const { defineType } = require('../Core/type')
 const { ListModel } = require('../QtQml/Models/ListModel')
-const { ModelContext, modelRows, sameModel } = require('../QtQml/Models/ModelContext')
+const { ModelContext, modelRows, sameModel, moveEntries } = require('../QtQml/Models/ModelContext')
 const { Item } = require('./Item')
 
 // ---- Repeater: delegates go to the parent right after the Repeater --------------------------
@@ -68,9 +68,12 @@ class Repeater extends Item {
     // Children order (and DOM order) of the parent: Repeater, delegate 0, delegate 1, ...
     $placeAfter(item, index){
         let siblings = this.$parent.$children
+        let anchor = index === 0 ? this : this.$items[index - 1]
+        // a delegate made at the end, right after the one before it: already in its place (children and DOM)
+        let last = siblings.length - 1
+        if(siblings[last] === item && siblings[last - 1] === anchor) return
         let from = siblings.indexOf(item)
         if(from >= 0) siblings.splice(from, 1)
-        let anchor = index === 0 ? this : this.$items[index - 1]
         let to = siblings.indexOf(anchor) + 1
         siblings.splice(to, 0, item)
         if(item.$dom && this.$parent.$dom){
@@ -81,10 +84,16 @@ class Repeater extends Item {
         }
     }
 
-    $modelChanged(kind, index, count, roles = null){
+    $modelChanged(kind, index, count, roles = null, to = -1){
         if(!this.$v[Repeater.DELEGATE]) return
         let rows = modelRows(this.$model)
-        if(kind === 'insert'){
+        // QQuickRepeater::modelUpdated: the items of moved rows are the same, in their new place among the parent's
+        // children; no itemRemoved, no itemAdded
+        if(kind === 'move'){
+            moveEntries([this.$items, this.$contexts], index, to, count)
+            this.$reindex()
+            if(this.$parent) for(let i = 0; i < this.$items.length; i++) this.$placeAfter(this.$items[i], i)
+        } else if(kind === 'insert'){
             for(let i = 0; i < count; i++) this.$create(index + i, rows)
             this.$reindex()
             this.$write(Repeater.COUNT, this.$items.length)

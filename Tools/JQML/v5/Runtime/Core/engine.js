@@ -175,7 +175,11 @@ function dropSubscribers(obj){
     let subs = obj.$subs
     if(!subs) return
     for(let i = 1; i < subs.length; i += 2){
-        for(let link = subs[i]; link; link = link.nextSub) link.flags |= DEAD
+        for(let link = subs[i]; link; link = link.nextSub){
+            if(link.flags & DEAD) continue
+            link.flags |= DEAD
+            stats.links--
+        }
     }
     obj.$subs = null
 }
@@ -272,27 +276,31 @@ function endUpdate(){
     depth++
     try {
         // Order: deferred calls, DOM writes, deferred deletes. Polish runs with the next frame, and while one is
-        // pending the DOM waits for it: a frame is rendered after its items are polished (QQuickWindow::polishItems)
-        while(callLater.length){
-            let calls = callLater
-            callLater = []
-            for(let fn of calls) fn()
-        }
-        if(dirty.length && !polish.length){
-            let items = dirty
-            dirty = []
-            for(let item of items){
-                let bits = item.$dirty
-                item.$dirty = 0
-                if(!(item.$f & DESTROYED)) item.$flush(bits)
+        // pending the DOM waits for it: a frame is rendered after its items are polished (QQuickWindow::polishItems).
+        // What a pass queues (a call or a delete from Component.onDestruction, an item changed by a delete) runs in
+        // another pass: the event loop would take it at once, nothing else may come to run it
+        do {
+            while(callLater.length){
+                let calls = callLater
+                callLater = []
+                for(let fn of calls) fn()
             }
-            if(sceneChanged) sceneChanged()
-        }
-        if(deleteLater.length){
-            let objects = deleteLater
-            deleteLater = []
-            for(let obj of objects) obj.$destroyNow()
-        }
+            if(dirty.length && !polish.length){
+                let items = dirty
+                dirty = []
+                for(let item of items){
+                    let bits = item.$dirty
+                    item.$dirty = 0
+                    if(!(item.$f & DESTROYED)) item.$flush(bits)
+                }
+                if(sceneChanged) sceneChanged()
+            }
+            if(deleteLater.length){
+                let objects = deleteLater
+                deleteLater = []
+                for(let obj of objects) obj.$destroyNow()
+            }
+        } while(callLater.length || deleteLater.length || (dirty.length && !polish.length))
     } finally {
         depth--
     }
@@ -330,13 +338,44 @@ function queuePolish(item){
     requestFrame()
 }
 
+// QQuickWindowPrivate::polishItems with its PolishLoopDetector: an item whose polish queues a polish again, 1000 times
+// in a row, gets the warning "possible QQuickItem::polish() loop"; at 10000 the loop gives up, so the frame is rendered
+// ("not a fix, just a remedy so that the application can be somewhat responsive") and the items left wait for the
+// next frame
+const POLISH_LOOP_WARN = 1000, POLISH_LOOP_GIVE_UP = 10000
+let polishNextFrame = []
+
 function runPolish(){
+    let loops = 0
     while(polish.length){
         let items = polish
         polish = []
-        for(let item of items){
+        for(let i = 0; i < items.length; i++){
+            let item = items[i]
             item.$polishQueued = false
-            if(!(item.$f & DESTROYED)) item.$polish()
+            if(item.$f & DESTROYED) continue
+            let queued = polish.length
+            item.$polish()
+            if(polish.length <= queued){
+                loops = 0
+                continue
+            }
+            loops++
+            if(loops >= POLISH_LOOP_WARN && loops < POLISH_LOOP_WARN + 5){
+                let guilty = polish[polish.length - 1]
+                console.warn('JQML: ' + item.constructor.name + ': possible QQuickItem::polish() loop')
+                console.warn('JQML: ' + guilty.constructor.name + ': ' + guilty.constructor.name + ' called polish() inside updatePolish() of ' + item.constructor.name)
+            }
+            if(loops === POLISH_LOOP_GIVE_UP){
+                for(let k = i + 1; k < items.length; k++){
+                    items[k].$polishQueued = true
+                    polishNextFrame.push(items[k])
+                }
+                for(let queuedItem of polish) polishNextFrame.push(queuedItem)
+                polish = []
+                requestFrame()
+                return
+            }
         }
     }
 }
@@ -412,6 +451,10 @@ function runFrame(){
     clearTimeout(frameTimer)
     frameHandle = frameTimer = 0
     if(stopped) return
+    if(polishNextFrame.length){
+        polish = polishNextFrame.concat(polish)
+        polishNextFrame = []
+    }
     batch(() => {
         runDueTimers()
         let items = frameItems
@@ -668,12 +711,18 @@ function runBinding(binding){
     runningFailed = false
     try {
         let value = evaluate(binding)
-        // an error further down the notification does not stop the other subscribers of the signal
+        // an error further down the notification does not stop the other subscribers of the signal. The write reads
+        // with no binding active: a binding enabled by a read of another one's evaluation (flushPending) gives that one
+        // no dependency on what its setter reads (QQmlBinding::update captures the expression only)
         if(value !== NO_VALUE){
+            let previousActive = active
+            active = null
             try {
                 binding.target.$write(binding.prop, value)
             } catch(error) {
                 reportError(error, binding.target.constructor.name + '.' + binding.target.constructor.$type.props[binding.prop].name)
+            } finally {
+                active = previousActive
             }
         }
         if(!runningFailed && erroredBindings.size) erroredBindings.delete(binding)
