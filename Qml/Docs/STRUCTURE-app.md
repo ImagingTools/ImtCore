@@ -1136,10 +1136,9 @@
 - `normalizePermissions(rawPermissions)`
 - `refreshPermissions(callback)`
 - `saveLoginSettings()`
-- `clearLoginSettings()`
 - `onAccessTokenUnauthorizedEvent(parameters)`
 - `isLoggedIn()`
-- `handleAuthFailure(gqlData, gqlRequestRef)`
+- `handleAuthFailure(gqlData, gqlRequestRef, gqlHeaders)`
 - `completeTokenRefresh(ok)`
 - `readDataFromStorage()`
 - `saveDataToStorage()`
