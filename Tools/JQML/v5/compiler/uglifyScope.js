@@ -4,13 +4,29 @@
 // functions and names, so the mangler spent most of the build there (O(names x functions), 8 of the 14 s of ProLife).
 // The same method with the same lists in the same order: membership is kept in a Set beside each list (built again
 // when the list changed elsewhere), and the functions of a scope are not walked again into a list that has them all.
-// The output is the same, byte for byte (tests/unit/Compiler.test.js).
-let installed = false
+// The output is the same, byte for byte (tests/unit/Compiler.test.js, tests/stress/Compiler.test.js).
 
-function install(U){
-    if(installed) return
-    installed = true
-    const sets = new WeakMap()
+// the Sets beside the lists and the functions walked, made for one minify
+let sets = new WeakMap()
+let walked = new WeakMap()
+
+// U.minify(code, options) with the method replaced for its time only: a method replaced on the prototype for good made
+// the rest of uglify (the parser the code generator uses before) a few percent slower
+function minify(U, code, options){
+    let original = U.AST_Symbol.prototype.mark_enclosed
+    U.AST_Symbol.prototype.mark_enclosed = markEnclosedOf(U)
+    sets = new WeakMap()
+    walked = new WeakMap()
+    try {
+        return U.minify(code, options)
+    } finally {
+        U.AST_Symbol.prototype.mark_enclosed = original
+        sets = new WeakMap()
+        walked = new WeakMap()
+    }
+}
+
+function markEnclosedOf(U){
     function pushUniq(array, el){
         let set = sets.get(array)
         if(!set || set.size !== array.length){
@@ -21,8 +37,7 @@ function install(U){
         set.add(el)
         return array.push(el)
     }
-    // scope -> (enclosed list -> the number of functions of the scope all in that list)
-    const walked = new WeakMap()
+    // walked: scope -> (enclosed list -> the number of functions of the scope all in that list)
     function addFunctions(s, target){
         let done = walked.get(s)
         if(!done){
@@ -47,9 +62,7 @@ function install(U){
             if(s === def.scope) break
         }
     }
-    markEnclosed.$jqml = true
-    markEnclosed.$original = U.AST_Symbol.prototype.mark_enclosed
-    U.AST_Symbol.prototype.mark_enclosed = markEnclosed
+    return markEnclosed
 }
 
-module.exports = { install }
+module.exports = { minify, markEnclosedOf }
