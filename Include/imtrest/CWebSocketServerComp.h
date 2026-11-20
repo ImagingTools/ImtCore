@@ -6,6 +6,9 @@
 #include <QtWebSockets/QWebSocket>
 #include <QtCore/QSharedPointer>
 
+// STL includes
+#include <atomic>
+
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
 #include <ibase/TRuntimeStatusHanderCompWrap.h>
@@ -125,16 +128,25 @@ private:
 	bool EnsureServerStarted();
 	bool StartListening(const QHostAddress& address = QHostAddress::Any, quint16 port = 0);
 
+	void StopListening();
+
 	/**
-		Close the connections and listen again: after a change of the SSL configuration or of the port.
+		Close the connections and listen again: after a change of the SSL configuration the clients connect again with it. The connections
+		are closed as a client closes them: their workers finish through the usual disconnection and are used again.
 	*/
 	bool RestartServer();
 
 	/**
-		Listen on the port of the server connection interface, if it is another one. When the new port cannot be listened on, the server
-		stays on the previous port.
+		Listen on the port of the server connection interface, if it is another one and the server is to work (started on creation or
+		by StartServer and not stopped). The established connections stay. When the new port cannot be listened on, the server stays
+		on the previous port.
 	*/
 	void MoveToConfiguredPort();
+
+	/**
+		Listen on another port with the same server object: the sockets of the established connections belong to it.
+	*/
+	bool ListenAgain(quint16 port);
 
 private Q_SLOTS:
 	void HandleNewConnections();
@@ -166,6 +178,11 @@ private:
 	I_REF(iprm::IOptionsList, m_subprotocolListCompPtr);
 
 	bool m_isInitialized = false;
+
+	/**
+		The server is started (on creation or by StartServer) and not stopped by StopServer: a new port is taken by it.
+	*/
+	std::atomic<bool> m_isStartRequested = false;
 };
 
 

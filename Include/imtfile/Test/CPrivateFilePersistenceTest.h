@@ -11,8 +11,8 @@
 
 
 /**
-	Tests of CPrivateFilePersistenceComp (the file and the folder of secrets are accessible to their owner only) and of the path of
-	CSystemConfigLocationComp.
+	Tests of CPrivateFilePersistenceComp (the file and the folder of secrets are accessible to their owner only, the data never leave
+	the folder), of CPrivateAutoPersistenceComp and of the path of CSystemConfigLocationComp.
 */
 class CPrivateFilePersistenceTest: public QObject
 {
@@ -20,9 +20,13 @@ class CPrivateFilePersistenceTest: public QObject
 private slots:
 	void SaveCreatesPrivateFolderAndFileTest();
 	void SaveReplacesSharedFileTest();
-	void SaveToTemporaryFileTest();
+	void SaveKeepsFileOnFailureTest();
+	void OtherFolderIsRefusedTest();
+	void ReplaceableParentFolderIsRefusedTest();
 	void LoadRefusesSharedFileTest();
 	void LoadRefusesSharedFolderTest();
+	void AutoPersistenceStoresInPlaceTest();
+	void AutoPersistenceReloadTest();
 	void SystemConfigPathTest();
 };
 

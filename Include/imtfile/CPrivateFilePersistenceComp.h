@@ -13,9 +13,36 @@ namespace imtfile
 
 
 /**
-	File persistence of data that other users of the computer must not read, for example passwords: the slave persistence writes into
-	a new file that only its owner can read (on Windows the permissions are its access list), the folder of the file is created for its
-	owner only. On Unix a file or a folder that other users can read is not loaded: the secrets in it are not trusted to be secret.
+	File persistence of data that other users of the computer must not read, for example passwords.
+
+	The data never leave the private folder of the file (the folder of \c FilePath): another path, for example a temporary file of
+	ifile::CAutoPersistenceComp, is refused; use CPrivateAutoPersistenceComp for the automatic persistence. The slave persistence writes
+	into a new file of the owner next to the file, the file is replaced by it as a whole only when the data are complete: a failed save
+	keeps the previous file.
+
+	The private folder:
+	- belongs to the account of the process, nobody else can open it: on Unix its mode is 700, on Windows only this account, the system
+	  and the administrators are in its access list;
+	- is created so when it does not exist, with the missing folders above it; it is private from the start, it is never open;
+	- if it exists already, it is only checked, its owner and its permissions are never changed: a folder that another account owns
+	  could be taken back by it, and a folder that was open could have been read or given a planted file. Such a folder is refused,
+	  the reason (and what to do) goes to the log.
+
+	The folders above the private folder may be readable by others, they need not be private. But nobody else may replace what is in
+	them: otherwise another account could rename the private folder and put its own one in its place. A folder above:
+	- on Unix belongs to this account or to root; if others can write into it, it must have the sticky bit (as /tmp has: only the
+	  owner of an entry can remove or rename it). Examples: /etc (root, 755) and /tmp (root, 1777) are accepted, a folder with mode 777
+	  or one of another user is refused. A link on the way must belong to this account or to root;
+	- on Windows belongs to this account, the system, the administrators or the installer of Windows; other accounts may read it and
+	  create new entries in it, but not delete, rename or change the access of what is in it (DELETE, FILE_DELETE_CHILD, WRITE_DAC,
+	  WRITE_OWNER, GENERIC_ALL). The usual access of ProgramData and of a folder created in it is accepted, but only if the service or
+	  an administrator created it: the creator of a folder becomes its owner and gets full access (CREATOR OWNER), so a folder created
+	  by an ordinary user is refused. "Everyone: full control" is refused.
+	The folders that exist are checked before the missing ones are created: nothing is created in a refused folder.
+
+	The file belongs to this account and nobody else can read it (Unix: a regular file with mode 600, not a link; Windows: its owner and
+	access list as of the private folder). A file or a folder that does not satisfy all of it is neither loaded nor saved: when in doubt
+	(the access cannot be read, an entry of an unknown kind), the persistence refuses.
 */
 class CPrivateFilePersistenceComp:
 			public ilog::CLoggerComponentBase,
@@ -28,17 +55,19 @@ public:
 		I_REGISTER_INTERFACE(ifile::IFileTypeInfo);
 		I_REGISTER_INTERFACE(ifile::IFilePersistence);
 		I_ASSIGN(m_slavePersistenceCompPtr, "SlavePersistence", "Persistence that writes and reads the data", true, "SlavePersistence");
-		I_ASSIGN(m_filePathCompPtr, "FilePath", "The file of the data: its folder is kept for its owner only (the data can be written to a temporary file first)", true, "FilePath");
+		I_ASSIGN(m_filePathCompPtr, "FilePath", "The file of the data: only the files of its folder are written and read, the folder is kept for its owner only", true, "FilePath");
 	I_END_COMPONENT;
 
 	/**
-		Create the folder (and its parents) so that only its owner can open it. An existing folder is not changed.
-		\return \c false if the folder cannot be created, or (on Unix) other users can open it; \c errorMessage tells why.
+		Create the folder for its owner only (on Windows: this account, the system and the administrators) and the missing folders above
+		it, after the existing folders above it are checked. An existing folder is only checked, never changed.
+		\return \c false if the folder cannot be created, another account owns or can open it, or another account can replace a folder
+		above it; \c errorMessage tells why.
 	*/
 	static bool EnsurePrivateFolder(const QString& folderPath, QString& errorMessage);
 
 	/**
-		Check that only the owner of the file can read it (on Unix; on Windows the access list is not checked).
+		Check that the file belongs to this account and nobody else can read it (on Windows: its owner and its access list).
 	*/
 	static bool IsPrivateFile(const QString& filePath, QString& errorMessage);
 
@@ -60,6 +89,13 @@ public:
 	// reimplemented (ifile::IFileTypeInfo)
 	virtual bool GetFileExtensions(QStringList& result, const istd::IChangeable* dataObjectPtr = nullptr, int flags = -1, bool doAppend = false) const override;
 	virtual QString GetTypeDescription(const QString* extensionPtr = nullptr) const override;
+
+private:
+	/**
+		The path of the file to write or read: \c filePath, or the file of the component if it is empty. It must be in the folder of the
+		file of the component.
+	*/
+	bool GetPrivatePath(const QString& filePath, QString& path, QString& errorMessage) const;
 
 private:
 	I_REF(ifile::IFilePersistence, m_slavePersistenceCompPtr);

@@ -6,6 +6,9 @@
 #include <QtNetwork/QTcpServer>
 #include <QtNetwork/QTcpSocket>
 
+// STL includes
+#include <atomic>
+
 // ACF includes
 #include <istd/TPointerVector.h>
 #include <ibase/TRuntimeStatusHanderCompWrap.h>
@@ -115,8 +118,8 @@ private:
 	bool EnsureServerStarted();
 
 	/**
-		Listen on the port of the server connection interface, if it is another one. When the new port cannot be listened on, the server
-		stays on the previous port.
+		Listen on the port of the server connection interface, if it is another one and the server is to work (started on creation or
+		by StartServer and not stopped). When the new port cannot be listened on, the server stays on the previous port.
 	*/
 	void MoveToConfiguredPort();
 
@@ -147,6 +150,11 @@ private:
 	Requests m_requests;
 
 	bool m_isInitialized = false;
+
+	/**
+		The server is started (on creation or by StartServer) and not stopped by StopServer: a new port is taken by it.
+	*/
+	std::atomic<bool> m_isStartRequested = false;
 };
 
 
