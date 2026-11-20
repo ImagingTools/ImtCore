@@ -12,13 +12,48 @@ const QtEnums = require('../Qt/enums')
 // the roles the proxy names in its dataChanged (QQmlTreeModelToTableModel::TreeModelRoles)
 const DepthRole = QtEnums.UserRole - 5, ExpandedRole = DepthRole + 1, HasChildrenRole = DepthRole + 2, ModelIndexRole = DepthRole + 4
 
+// ---- the expanded indexes: QSet<QPersistentModelIndex> (m_expandedItems) ------------------------------------------------
+// A lookup by an index is O(1) in Qt (the hash of the persistent data the index has). Here an index whose internal
+// pointer is an object (a row of a TreeModel: one object a node, for its life) is found by it; others by a walk.
+class ExpandedSet {
+    constructor(){
+        this.all = new Set()
+        this.byPointer = new Map()
+    }
+    $find(index){
+        let pointer = index.internalPointer
+        if(pointer && typeof pointer === 'object'){
+            let p = this.byPointer.get(pointer)
+            return p && p.valid && sameIndex(p.index, index) ? p : null
+        }
+        for(let p of this.all) if(p.valid && sameIndex(p.index, index)) return p
+        return null
+    }
+    has(index){ return this.$find(index) !== null }
+    add(index){
+        if(this.has(index)) return
+        let p = new QPersistentModelIndex(index)
+        this.all.add(p)
+        let pointer = index.internalPointer
+        if(pointer && typeof pointer === 'object') this.byPointer.set(pointer, p)
+    }
+    remove(index){
+        let p = this.$find(index)
+        if(!p) return
+        this.all.delete(p)
+        let pointer = index.internalPointer
+        if(pointer && typeof pointer === 'object' && this.byPointer.get(pointer) === p) this.byPointer.delete(pointer)
+        p.release()
+    }
+}
+
 // ---- QQmlTreeModelToTableModel --------------------------------------------------------------------------------------------
 class TreeModelToTableModel extends AbstractItemModel {
     constructor(){
         super(null)
         this.$model = null
         this.$items = []                // { index: QPersistentModelIndex, depth, expanded }
-        this.$expanded = []             // the expanded indexes (QSet<QPersistentModelIndex>)
+        this.$expanded = new ExpandedSet()  // the expanded indexes (QSet<QPersistentModelIndex>)
         this.$itemsToExpand = []
         this.$rootIndex = new QPersistentModelIndex(INVALID)
         this.$links = []
@@ -30,12 +65,9 @@ class TreeModelToTableModel extends AbstractItemModel {
 
     get model(){ return this.$model }
 
-    $expandedHas(index){ return this.$expanded.some(p => p.valid && sameIndex(p.index, index)) }
-    $expandedAdd(index){ if(!this.$expandedHas(index)) this.$expanded.push(new QPersistentModelIndex(index)) }
-    $expandedRemove(index){
-        let at = this.$expanded.findIndex(p => p.valid && sameIndex(p.index, index))
-        if(at >= 0) this.$expanded.splice(at, 1)[0].release()
-    }
+    $expandedHas(index){ return this.$expanded.has(index) }
+    $expandedAdd(index){ this.$expanded.add(index) }
+    $expandedRemove(index){ this.$expanded.remove(index) }
     $item(index, depth = 0, expanded = false){ return { index: new QPersistentModelIndex(index), depth, expanded } }
 
     setModel(model){
@@ -71,7 +103,7 @@ class TreeModelToTableModel extends AbstractItemModel {
     $clearModelData(){
         this.beginResetModel()
         this.$items = []
-        this.$expanded = []
+        this.$expanded = new ExpandedSet()
         this.endResetModel()
     }
 
@@ -102,9 +134,24 @@ class TreeModelToTableModel extends AbstractItemModel {
 
     depthAtRow(row){ return row < 0 || row >= this.$items.length ? 0 : this.$items[row].depth }
 
+    // QQmlTreeModelToTableModel::itemIndex: the search starts at the item found last (m_lastItemIndex) and goes both
+    // ways, the rest after that: a walk over the tree finds its rows next to each other
     itemIndex(index){
         if(!index || !index.valid || sameIndex(index, this.$rootIndex.index) || !this.$items.length) return -1
-        for(let i = 0; i < this.$items.length; i++) if(sameIndex(this.$items[i].index.index, index)) return i
+        let items = this.$items
+        let total = items.length
+        let last = Math.min(this.$lastItemIndex || 0, total)
+        let local = Math.min(last - 1, total - last)
+        for(let i = 0; i < local; i++){
+            if(sameIndex(items[last + i].index.index, index)) return (this.$lastItemIndex = last + i)
+            if(sameIndex(items[last - i - 1].index.index, index)) return (this.$lastItemIndex = last - i - 1)
+        }
+        for(let j = Math.max(0, last + local); j < total; j++){
+            if(sameIndex(items[j].index.index, index)) return (this.$lastItemIndex = j)
+        }
+        for(let j = Math.min(total, last - local) - 1; j >= 0; j--){
+            if(sameIndex(items[j].index.index, index)) return (this.$lastItemIndex = j)
+        }
         return -1
     }
     $isVisible(index){ return this.itemIndex(index) !== -1 }
@@ -159,13 +206,17 @@ class TreeModelToTableModel extends AbstractItemModel {
         }
         let rowDepth = rowIdx === 0 ? 0 : parentItem.depth + 1
         if(doInsertRows) this.beginInsertRows(INVALID, startIdx, startIdx + insertCount - 1)
+        // the items inserted at once (m_items.insert one by one in Qt: the same list, without moving the tail each time)
+        let inserted = new Array(insertCount)
         for(let i = 0; i < insertCount; i++){
             let cmi = this.$model.index(start + i, 0, parentIndex)
             let expanded = this.$expandedHas(cmi)
             let item = this.$item(cmi, rowDepth, expanded)
-            this.$items.splice(startIdx + i, 0, item)
+            inserted[i] = item
             if(expanded) this.$itemsToExpand.push(item)
         }
+        if(startIdx >= this.$items.length) for(let item of inserted) this.$items.push(item)
+        else this.$items.splice(startIdx, 0, ...inserted)
         if(doInsertRows) this.endInsertRows()
         if(doExpandPendingRows) this.$expandPendingRows(doInsertRows)
     }
@@ -539,8 +590,12 @@ class TreeView extends TableView {
     }
 
     // QQuickTreeViewPrivate::dataChangedCallback: the tree properties of the cells of the changed rows
+    // QQuickTreeViewPrivate::dataChangedCallback: the items of the changed cells take their properties again. Only
+    // loaded rows have items (itemAtCell is null for the others): the range is cut to them
     $treeDataChanged(topLeft, bottomRight){
-        for(let row = topLeft.row; row <= bottomRight.row; row++){
+        if(this.$loadedRows.isEmpty()) return
+        let first = Math.max(topLeft.row, this.$topRow()), last = Math.min(bottomRight.row, this.$bottomRow())
+        for(let row = first; row <= last; row++){
             for(let column = topLeft.column; column <= bottomRight.column; column++){
                 let item = this.itemAtCell({ x: column, y: row })
                 if(!item) continue
