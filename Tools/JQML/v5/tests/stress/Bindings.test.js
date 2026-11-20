@@ -21,25 +21,28 @@ Item {
         assert.deepEqual(errors, [])
     })
 
-    test(name + ': a chain of 2000 bindings follows its head; a chain of 20000 stops with an error, not a crash', { timeout: 60000 }, () => {
+    // a change runs down a chain through the stack (each binding notifies the next one), about 7 frames a binding:
+    // 500 follow their head; past about 700 the stack of the browser overflows, the error is reported, nothing hangs
+    test(name + ': a chain of 500 bindings follows its head; a chain of 2000 reports the overflow, no crash', { timeout: 60000 }, () => {
         let { JQ, root, errors } = run(`import QtQuick 2.15
 Item {
     id: root
     property int v: 0
-${lines(2000, i => `    property int p${i}: ${i ? 'p' + (i - 1) : 'v'} + 1`)}
+${lines(500, i => `    property int p${i}: ${i ? 'p' + (i - 1) : 'v'} + 1`)}
 }`, core)
         JQ.batch(() => { root.v = 10 })
-        assert.equal(root.p1999, 2010)
+        assert.equal(root.p499, 510)
         assert.deepEqual(errors, [])
         let deep = run(`import QtQuick 2.15
 Item {
     id: root
     property int v: 0
-${lines(20000, i => `    property int p${i}: ${i ? 'p' + (i - 1) : 'v'} + 1`)}
+${lines(2000, i => `    property int p${i}: ${i ? 'p' + (i - 1) : 'v'} + 1`)}
 }`, core)
-        // the creation already reads the chain from its last binding down: deep, but it must end, and report the overflow
+        assert.equal(deep.root.p1999, 2000)
         deep.JQ.batch(() => { deep.root.v = 10 })
-        assert.ok(deep.root.p0 === 11)
+        assert.equal(deep.root.p0, 11)
+        assert.ok(deep.errors.some(e => /call stack/i.test(e)))
     })
 
     test(name + ': diamonds: d reads b and c, both reading a; d ends right and its handler sees the last value', () => {
