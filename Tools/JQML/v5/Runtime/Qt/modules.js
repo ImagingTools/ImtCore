@@ -15,6 +15,8 @@ const QUICK = [
     'SequentialAnimation', 'ParallelAnimation', 'Behavior', 'Window',
 ]
 const QUICK_UNCREATABLE = ['Keys', 'KeyNavigation', 'Animation', 'Easing', 'StandardKey']
+// QtQuick.Controls: the views of tables only (the project has controls of its own)
+const CONTROLS = ['HorizontalHeaderView', 'VerticalHeaderView', 'HeaderViewDelegate', 'TableViewDelegate', 'TreeViewDelegate']
 const LAYOUTS = ['RowLayout', 'ColumnLayout', 'GridLayout', 'StackLayout', 'LayoutItemProxy']
 
 const MODULES = {
@@ -24,6 +26,8 @@ const MODULES = {
     'QtQuick.Window': { types: ['Window'], uncreatable: [] },
     'QtQuick.Layouts': { types: LAYOUTS, uncreatable: ['Layout'] },
     'Qt.labs.qmlmodels': { types: LABS_MODELS, uncreatable: [] },
+    'QtQuick.Controls': { types: CONTROLS, uncreatable: [] },
+    'QtQuick.Controls.Basic': { types: CONTROLS, uncreatable: [] },
     'QtQuick.Dialogs': { types: ['FileDialog', 'FolderDialog'], uncreatable: [] },
     'QtWebSockets': { types: ['WebSocket'], uncreatable: [] },
     'Qt5Compat.GraphicalEffects': { types: ['DropShadow'], uncreatable: [] },
@@ -36,7 +40,7 @@ const MODULES = {
 // (QQmlImports): the ones Qt added to QtQuick, QtQml.Models and Qt.labs.qmlmodels for tables, whose names a project of
 // its own may use for a type (imtcontrols has a SortFilterProxyModel). The older types stay visible without an import,
 // as v5 always had them.
-const IMPORTED_TYPES = new Set(['ItemSelectionModel', 'TableView', 'TreeView', ...LABS_MODELS])
+const IMPORTED_TYPES = new Set(['ItemSelectionModel', 'TableView', 'TreeView', ...LABS_MODELS, ...CONTROLS])
 
 // { types: Set, uncreatable: Set } of a Qt module, or null
 function qtModule(name){

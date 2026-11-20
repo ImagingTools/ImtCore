@@ -502,6 +502,7 @@ class TableView extends Flickable {
         this.$horizontalLogicalIndices = []
         this.$verticalLogicalIndices = []
         this.$sectionMoving = false
+        this.$isTransposed = false
         this.$needsModelSynchronization = false
         this.$assignedModel = 0
         this.$tableModel = new TableInstanceModel(this, (ctx, item) => this.$initNewItem(ctx, item))
@@ -526,8 +527,16 @@ class TableView extends Flickable {
     $contentY(){ return this.$v[Flickable.CONTENTY] }
     $margin(name){ return this.$v[TableView[name.toUpperCase()]] || 0 }
 
-    $modelIndexAtCell(cell){ return cell.x * this.$tableSize.h + cell.y }
+    // the flat index of a cell: down the rows column by column; a transposed table (a horizontal header of a list) runs
+    // along the columns row by row
+    $modelIndexAtCell(cell){
+        return this.$isTransposed ? cell.y * this.$tableSize.w + cell.x : cell.x * this.$tableSize.h + cell.y
+    }
     $cellAtModelIndex(flat){
+        if(this.$isTransposed){
+            let columns = this.$tableSize.w
+            return columns ? { x: flat % columns, y: Math.floor(flat / columns) } : { x: 0, y: 0 }
+        }
         let rows = this.$tableSize.h
         return rows ? { x: Math.floor(flat / rows), y: flat % rows } : { x: 0, y: 0 }
     }
@@ -857,7 +866,8 @@ class TableView extends Flickable {
 
     // ---- items ----
     $createFxTableItem(cell){
-        let modelRow = this.$logicalRowIndex(cell.y), modelColumn = this.$logicalColumnIndex(cell.x)
+        let modelRow = this.$isTransposed ? this.$logicalColumnIndex(cell.y) : this.$logicalRowIndex(cell.y)
+        let modelColumn = this.$isTransposed ? this.$logicalRowIndex(cell.x) : this.$logicalColumnIndex(cell.x)
         let flat = this.$modelIndexAtCell({ x: modelColumn, y: modelRow })
         let object = this.$tableModel.object(flat)
         let own = false
@@ -965,7 +975,8 @@ class TableView extends Flickable {
 
     $calculateTableSize(){
         let tm = this.$tableModel
-        return tm.model ? { w: tm.columns(), h: tm.rows() } : { w: 0, h: 0 }
+        let size = tm.model ? { w: tm.columns(), h: tm.rows() } : { w: 0, h: 0 }
+        return this.$isTransposed ? { w: size.h, h: size.w } : size
     }
 
     $getColumnLayoutWidth(column){
