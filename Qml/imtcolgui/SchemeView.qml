@@ -222,6 +222,7 @@ Rectangle {
 	}
 	
 	onObjectsModelChanged: {
+		controlArea.setLinkHintHover(-1);
 		canvasPage.resetDrop();
 		canvas.dropSuppressedIndex = -1;
 		canvas.requestPaint();
