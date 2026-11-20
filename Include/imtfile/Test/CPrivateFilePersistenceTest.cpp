@@ -4,8 +4,11 @@
 
 // Qt includes
 #include <QtCore/QCoreApplication>
+#include <QtCore/QCryptographicHash>
 #include <QtCore/QDir>
+#include <QtCore/QElapsedTimer>
 #include <QtCore/QFile>
+#include <QtCore/QProcess>
 #include <QtCore/QStandardPaths>
 #include <QtCore/QTemporaryDir>
 #include <QtCore/QUuid>
@@ -15,6 +18,7 @@
 #include <icomp/TModelCompWrap.h>
 #include <icomp/TSimComponentWrap.h>
 #include <ifile/CFileNameParamComp.h>
+#include <ilog/IMessageConsumer.h>
 #include <istd/CChangeNotifier.h>
 
 // ImtCore includes
@@ -28,8 +32,11 @@
 #include <sddl.h>
 #include <vector>
 #else
-#include <QtCore/QProcess>
+#include <fcntl.h>
 #include <sys/stat.h>
+#include <atomic>
+#include <thread>
+#include <unistd.h>
 #ifdef Q_OS_MACOS
 #include <sys/acl.h>
 #endif
@@ -145,6 +152,128 @@ public:
 };
 
 
+/**
+	The log of the tests: the reasons why the persistence refuses a file or a folder go to the output of the test.
+*/
+class CTestLogComp:
+			public icomp::CComponentBase,
+			virtual public ilog::IMessageConsumer
+{
+public:
+	typedef icomp::CComponentBase BaseClass;
+
+	I_BEGIN_COMPONENT(CTestLogComp);
+		I_REGISTER_INTERFACE(ilog::IMessageConsumer);
+	I_END_COMPONENT;
+
+	// reimplemented (ilog::IMessageConsumer)
+	bool IsMessageSupported(int /*messageCategory*/, int /*messageId*/, const istd::IInformationProvider* /*messagePtr*/) const override
+	{
+		return true;
+	}
+
+	void AddMessage(const MessagePtr& messagePtr) override
+	{
+		if (messagePtr.IsValid()){
+			qWarning().noquote() << messagePtr->GetInformationDescription();
+		}
+	}
+};
+
+
+/**
+	The template of the temporary folder of a test. The folders above it must not be replaceable by other accounts, or every save is
+	refused. On Windows the temporary folder of a build can be anywhere, for example on another drive, whose root all the users may
+	change: the local data folder of the account is in its profile, only the account and the system have access to it.
+*/
+QString GetTestRootTemplate()
+{
+#ifdef Q_OS_WIN
+	const QString localDataPath = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
+	if (!localDataPath.isEmpty() && QDir().mkpath(localDataPath)){
+		return localDataPath + QStringLiteral("/imtfileTest-XXXXXX");
+	}
+#endif
+
+	return QDir::tempPath() + QStringLiteral("/imtfileTest-XXXXXX");
+}
+
+
+/**
+	The loader of the automatic persistence, through which another program writes the file right after each save: before the saver
+	could read the file back.
+*/
+class CInterferedPersistenceComp:
+			public icomp::CComponentBase,
+			virtual public ifile::IFilePersistence,
+			virtual public imtfile::ISavedFileDigestProvider
+{
+public:
+	typedef icomp::CComponentBase BaseClass;
+
+	I_BEGIN_COMPONENT(CInterferedPersistenceComp);
+		I_REGISTER_INTERFACE(ifile::IFilePersistence);
+		I_REGISTER_INTERFACE(imtfile::ISavedFileDigestProvider);
+		I_ASSIGN(m_persistenceCompPtr, "Persistence", "Persistence that writes and reads the file", true, "Persistence");
+		I_ASSIGN_TO(m_digestProviderCompPtr, m_persistenceCompPtr, true);
+	I_END_COMPONENT;
+
+	/**
+		The contents that the other program writes after the next save.
+	*/
+	mutable QByteArray otherText;
+
+	// reimplemented (imtfile::ISavedFileDigestProvider)
+	QByteArray GetSavedFileDigest(const QString& filePath) const override
+	{
+		return m_digestProviderCompPtr->GetSavedFileDigest(filePath);
+	}
+
+	// reimplemented (ifile::IFilePersistence)
+	bool IsOperationSupported(const istd::IChangeable* dataObjectPtr, const QString* filePathPtr, int flags, bool beQuiet) const override
+	{
+		return m_persistenceCompPtr->IsOperationSupported(dataObjectPtr, filePathPtr, flags, beQuiet);
+	}
+
+	OperationState LoadFromFile(istd::IChangeable& data, const QString& filePath, ibase::IProgressManager* progressManagerPtr) const override
+	{
+		return m_persistenceCompPtr->LoadFromFile(data, filePath, progressManagerPtr);
+	}
+
+	OperationState SaveToFile(const istd::IChangeable& data, const QString& filePath, ibase::IProgressManager* progressManagerPtr) const override
+	{
+		const OperationState retVal = m_persistenceCompPtr->SaveToFile(data, filePath, progressManagerPtr);
+		if ((retVal == OS_OK) && !otherText.isEmpty()){
+			// The file of the owner is written in place: it stays private
+			QFile file(filePath);
+			if (file.open(QIODevice::WriteOnly)){
+				file.write(otherText);
+			}
+
+			otherText.clear();
+		}
+
+		return retVal;
+	}
+
+	// reimplemented (ifile::IFileTypeInfo)
+	bool GetFileExtensions(QStringList& result, const istd::IChangeable* dataObjectPtr, int flags, bool doAppend) const override
+	{
+		return m_persistenceCompPtr->GetFileExtensions(result, dataObjectPtr, flags, doAppend);
+	}
+
+	QString GetTypeDescription(const QString* extensionPtr) const override
+	{
+		return m_persistenceCompPtr->GetTypeDescription(extensionPtr);
+	}
+
+private:
+	I_REF(ifile::IFilePersistence, m_persistenceCompPtr);
+	I_REF(imtfile::ISavedFileDigestProvider, m_digestProviderCompPtr);
+};
+
+
+typedef icomp::TSimSharedComponentPtr<CTestLogComp> TestLog;
 typedef icomp::TSimSharedComponentPtr<CTextPersistenceComp> TextPersistence;
 typedef icomp::TSimSharedComponentPtr<ifile::CFileNameParamComp> FilePath;
 typedef icomp::TSimComponentWrap<imtfile::CPrivateFilePersistenceComp> PrivatePersistence;
@@ -157,16 +286,20 @@ struct SPersistence
 {
 	explicit SPersistence(const QString& path)
 	{
+		log->InitComponent();
+
 		slave->InitComponent();
 
 		filePath->InitComponent();
 		filePath->SetPath(path);
 
+		persistence.SetRef("Log", log);
 		persistence.SetRef("SlavePersistence", slave);
 		persistence.SetRef("FilePath", filePath);
 		persistence.InitComponent();
 	}
 
+	TestLog log;
 	TextPersistence slave;
 	FilePath filePath;
 	PrivatePersistence persistence;
@@ -175,29 +308,39 @@ struct SPersistence
 
 typedef icomp::TSimSharedComponentPtr<icomp::TModelCompWrap<CTextDataComp>> TextObject;
 typedef icomp::TSimSharedComponentPtr<imtfile::CPrivateFilePersistenceComp> PrivatePersistencePtr;
+typedef icomp::TSimSharedComponentPtr<CInterferedPersistenceComp> InterferedPersistence;
 typedef icomp::TSimComponentWrap<imtfile::CPrivateAutoPersistenceComp> PrivateAutoPersistence;
 
 
 /**
-	The text kept in a private file by the automatic persistence, as the settings of an application are.
+	The text kept in a private file by the automatic persistence, as the settings of an application are. Another program can write
+	the file right after a save (\c interferedLoader).
 */
 struct SAutoPersistence
 {
 	SAutoPersistence(const QString& path, bool autoReload, bool storeOnBegin = true)
 	{
+		log->InitComponent();
+
 		slave->InitComponent();
 
 		filePath->InitComponent();
 		filePath->SetPath(path);
 
+		loader->SetRef("Log", log);
 		loader->SetRef("SlavePersistence", slave);
 		loader->SetRef("FilePath", filePath);
 		loader->InitComponent();
 
+		interferedLoader->SetRef("Persistence", loader);
+		interferedLoader->InitComponent();
+
 		object->InitComponent();
 
+		persistence.SetRef("Log", log);
 		persistence.SetRef("Object", object);
-		persistence.SetRef("FileLoader", loader);
+		persistence.SetRef("FileLoader", interferedLoader);
+		persistence.SetRef("SavedFileDigestProvider", interferedLoader);
 		persistence.SetRef("FilePath", filePath);
 		persistence.SetBoolAttr("StoreOnBegin", storeOnBegin);
 		persistence.SetBoolAttr("AutoReload", autoReload);
@@ -210,9 +353,11 @@ struct SAutoPersistence
 		object->text = text;
 	}
 
+	TestLog log;
 	TextPersistence slave;
 	FilePath filePath;
 	PrivatePersistencePtr loader;
+	InterferedPersistence interferedLoader;
 	TextObject object;
 	PrivateAutoPersistence persistence;
 };
@@ -493,10 +638,23 @@ bool MakeFolder(const QString& path, Access access)
 } // namespace
 
 
+// The folders of the tests must be in a trusted place, or every save is refused: the reason tells what to change on the computer
+void CPrivateFilePersistenceTest::initTestCase()
+{
+	QTemporaryDir root(GetTestRootTemplate());
+	QVERIFY2(root.isValid(), qPrintable(root.errorString()));
+
+	QString errorMessage;
+	if (!imtfile::CPrivateFilePersistenceComp::EnsurePrivateFolder(root.filePath(QStringLiteral("Private")), errorMessage)){
+		QFAIL(qPrintable(QStringLiteral("The folder of the tests '%1' is not trusted: %2").arg(root.path(), errorMessage)));
+	}
+}
+
+
 // The folder that does not exist is created for its owner only, the file is readable by its owner only
 void CPrivateFilePersistenceTest::SaveCreatesPrivateFolderAndFileTest()
 {
-	QTemporaryDir root;
+	QTemporaryDir root(GetTestRootTemplate());
 	QVERIFY(root.isValid());
 	const QString folderPath = root.filePath(QStringLiteral("Company/Application"));
 	const QString filePath = folderPath + QStringLiteral("/Secrets.xml");
@@ -518,7 +676,7 @@ void CPrivateFilePersistenceTest::SaveCreatesPrivateFolderAndFileTest()
 // A file that other users could read is replaced by a new file of the owner, not written in place
 void CPrivateFilePersistenceTest::SaveReplacesSharedFileTest()
 {
-	QTemporaryDir root;
+	QTemporaryDir root(GetTestRootTemplate());
 	QVERIFY(root.isValid());
 	QVERIFY(SetAccess(root.path(), A_OWNER_ONLY));
 	const QString filePath = root.filePath(QStringLiteral("Secrets.xml"));
@@ -540,7 +698,7 @@ void CPrivateFilePersistenceTest::SaveReplacesSharedFileTest()
 // The serializer rejects the data: the file keeps the data of the last save, nothing else is left in the folder
 void CPrivateFilePersistenceTest::SaveKeepsFileOnFailureTest()
 {
-	QTemporaryDir root;
+	QTemporaryDir root(GetTestRootTemplate());
 	QVERIFY(root.isValid());
 	const QString folderPath = root.filePath(QStringLiteral("Private"));
 	const QString filePath = folderPath + QStringLiteral("/Secrets.xml");
@@ -562,7 +720,7 @@ void CPrivateFilePersistenceTest::SaveKeepsFileOnFailureTest()
 // A file in another folder (the temporary folder of ifile::CAutoPersistenceComp) is neither written nor read
 void CPrivateFilePersistenceTest::OtherFolderIsRefusedTest()
 {
-	QTemporaryDir root;
+	QTemporaryDir root(GetTestRootTemplate());
 	QVERIFY(root.isValid());
 	const QString filePath = root.filePath(QStringLiteral("Private/Secrets.xml"));
 	const QString otherPath = root.filePath(QStringLiteral("Secrets.xml"));
@@ -584,7 +742,7 @@ void CPrivateFilePersistenceTest::OtherFolderIsRefusedTest()
 // folder above that the others can only read is accepted
 void CPrivateFilePersistenceTest::ReplaceableParentFolderIsRefusedTest()
 {
-	QTemporaryDir root;
+	QTemporaryDir root(GetTestRootTemplate());
 	QVERIFY(root.isValid());
 	const QString sharedPath = root.filePath(QStringLiteral("Shared"));
 	QVERIFY(MakeFolder(sharedPath, A_REPLACEABLE_BY_OTHERS));
@@ -617,7 +775,7 @@ void CPrivateFilePersistenceTest::LinkInReplaceableFolderIsRefusedTest()
 #ifdef Q_OS_WIN
 	QSKIP("The links of Unix are tested");
 #else
-	QTemporaryDir root;
+	QTemporaryDir root(GetTestRootTemplate());
 	QVERIFY(root.isValid());
 	const QString privatePath = root.filePath(QStringLiteral("Real/Private"));
 	QVERIFY(MakeFolder(privatePath, A_OWNER_ONLY));
@@ -658,7 +816,7 @@ void CPrivateFilePersistenceTest::InheritedAccessIsRefusedTest()
 #if !defined(Q_OS_WIN) && !defined(Q_OS_MACOS)
 	QSKIP("The mode of a new file limits its access list on Linux");
 #else
-	QTemporaryDir root;
+	QTemporaryDir root(GetTestRootTemplate());
 	QVERIFY(root.isValid());
 	const QString folderPath = root.filePath(QStringLiteral("Private"));
 	QVERIFY(MakeFolder(folderPath, A_FILES_READABLE_BY_OTHERS));
@@ -677,10 +835,104 @@ void CPrivateFilePersistenceTest::InheritedAccessIsRefusedTest()
 }
 
 
+// A link leads to a link in a folder that everybody can change, that one to the private folder: the others could replace the link in
+// the middle. The folders are checked on the whole way that the links lead, not only on the written path and at its end
+void CPrivateFilePersistenceTest::LinkChainThroughReplaceableFolderIsRefusedTest()
+{
+#ifdef Q_OS_WIN
+	QSKIP("The links of Unix are tested, a junction on Windows is refused (JunctionIsRefusedTest)");
+#else
+	QTemporaryDir root(GetTestRootTemplate());
+	QVERIFY(root.isValid());
+	const QString privatePath = root.filePath(QStringLiteral("Real/Private"));
+	QVERIFY(MakeFolder(privatePath, A_OWNER_ONLY));
+	const QString sharedPath = root.filePath(QStringLiteral("Shared"));
+	QVERIFY(MakeFolder(sharedPath, A_REPLACEABLE_BY_OTHERS));
+	const QString safePath = root.filePath(QStringLiteral("Safe"));
+	QVERIFY(MakeFolder(safePath, A_READABLE_BY_OTHERS));
+	QVERIFY(QFile::link(privatePath, sharedPath + QStringLiteral("/Bridge")));
+	QVERIFY(QFile::link(sharedPath + QStringLiteral("/Bridge"), safePath + QStringLiteral("/Link")));
+
+	SPersistence persistence(safePath + QStringLiteral("/Link/Secrets.xml"));
+	CTextData data;
+	data.text = "secret";
+	QCOMPARE(persistence.persistence.SaveToFile(data), ifile::IFilePersistence::OS_FAILED);
+	QVERIFY(QDir(privatePath).entryList(QDir::Files | QDir::Hidden).isEmpty());
+
+	QVERIFY(SetAccess(sharedPath, A_READABLE_BY_OTHERS));
+	QCOMPARE(persistence.persistence.SaveToFile(data), ifile::IFilePersistence::OS_OK);
+	QCOMPARE(ReadFile(privatePath + QStringLiteral("/Secrets.xml")), QByteArray("secret"));
+#endif
+}
+
+
+// The access of a junction is read from the folder that it leads to, the folders on the way there are not checked: a path with a
+// junction is refused, the path of the folder itself is accepted
+void CPrivateFilePersistenceTest::JunctionIsRefusedTest()
+{
+#ifndef Q_OS_WIN
+	QSKIP("Junctions are of Windows, the links of Unix are resolved and checked (LinkChainThroughReplaceableFolderIsRefusedTest)");
+#else
+	QTemporaryDir root(GetTestRootTemplate());
+	QVERIFY(root.isValid());
+	const QString privatePath = root.filePath(QStringLiteral("Real/Private"));
+	QVERIFY(MakeFolder(privatePath, A_OWNER_ONLY));
+	const QString junctionPath = root.filePath(QStringLiteral("Junction"));
+	QCOMPARE(QProcess::execute(
+				QStringLiteral("cmd.exe"),
+				{QStringLiteral("/c"), QStringLiteral("mklink"), QStringLiteral("/J"), QDir::toNativeSeparators(junctionPath), QDir::toNativeSeparators(privatePath)}), 0);
+
+	SPersistence persistence(junctionPath + QStringLiteral("/Secrets.xml"));
+	CTextData data;
+	data.text = "secret";
+	QCOMPARE(persistence.persistence.SaveToFile(data), ifile::IFilePersistence::OS_FAILED);
+	QVERIFY(QDir(privatePath).entryList(QDir::Files | QDir::Hidden).isEmpty());
+
+	SPersistence directPersistence(privatePath + QStringLiteral("/Secrets.xml"));
+	QCOMPARE(directPersistence.persistence.SaveToFile(data), ifile::IFilePersistence::OS_OK);
+
+	CTextData loaded;
+	QCOMPARE(persistence.persistence.LoadFromFile(loaded), ifile::IFilePersistence::OS_FAILED);
+	QVERIFY(loaded.text.isEmpty());
+	QCOMPARE(directPersistence.persistence.LoadFromFile(loaded), ifile::IFilePersistence::OS_OK);
+	QCOMPARE(loaded.text, QByteArray("secret"));
+#endif
+}
+
+
+// The digest of a save is the one of the contents written, a failed save keeps the digest of the last one. A file of another folder
+// has none
+void CPrivateFilePersistenceTest::SavedFileDigestTest()
+{
+	QTemporaryDir root(GetTestRootTemplate());
+	QVERIFY(root.isValid());
+	const QString filePath = root.filePath(QStringLiteral("Private/Secrets.xml"));
+
+	SPersistence persistence(filePath);
+	const imtfile::ISavedFileDigestProvider& digestProvider = persistence.persistence;
+	QVERIFY(digestProvider.GetSavedFileDigest(filePath).isEmpty());
+
+	CTextData data;
+	data.text = "old";
+	QCOMPARE(persistence.persistence.SaveToFile(data), ifile::IFilePersistence::OS_OK);
+	const QByteArray oldDigest = QCryptographicHash::hash("old", QCryptographicHash::Sha256);
+	QCOMPARE(digestProvider.GetSavedFileDigest(filePath), oldDigest);
+	QCOMPARE(digestProvider.GetSavedFileDigest(QString()), oldDigest);
+	QCOMPARE(QCryptographicHash::hash(ReadFile(filePath), QCryptographicHash::Sha256), oldDigest);
+
+	persistence.slave->isFailing = true;
+	data.text = "new";
+	QCOMPARE(persistence.persistence.SaveToFile(data), ifile::IFilePersistence::OS_FAILED);
+	QCOMPARE(digestProvider.GetSavedFileDigest(filePath), oldDigest);
+
+	QVERIFY(digestProvider.GetSavedFileDigest(root.filePath(QStringLiteral("Secrets.xml"))).isEmpty());
+}
+
+
 // A file that other users can read is not loaded: its secrets are not secret any more
 void CPrivateFilePersistenceTest::LoadRefusesSharedFileTest()
 {
-	QTemporaryDir root;
+	QTemporaryDir root(GetTestRootTemplate());
 	QVERIFY(root.isValid());
 	QVERIFY(SetAccess(root.path(), A_OWNER_ONLY));
 	const QString filePath = root.filePath(QStringLiteral("Secrets.xml"));
@@ -700,7 +952,7 @@ void CPrivateFilePersistenceTest::LoadRefusesSharedFileTest()
 // A folder that other users can open is not trusted either: the file is neither loaded nor saved
 void CPrivateFilePersistenceTest::LoadRefusesSharedFolderTest()
 {
-	QTemporaryDir root;
+	QTemporaryDir root(GetTestRootTemplate());
 	QVERIFY(root.isValid());
 	QVERIFY(SetAccess(root.path(), A_READABLE_BY_OTHERS));
 	const QString filePath = root.filePath(QStringLiteral("Secrets.xml"));
@@ -721,7 +973,7 @@ void CPrivateFilePersistenceTest::LoadRefusesSharedFolderTest()
 // The object is stored into the file itself: no copy in the temporary folder of the system, no working file left
 void CPrivateFilePersistenceTest::AutoPersistenceStoresInPlaceTest()
 {
-	QTemporaryDir root;
+	QTemporaryDir root(GetTestRootTemplate());
 	QVERIFY(root.isValid());
 	const QString folderPath = root.filePath(QStringLiteral("Private"));
 	const QString fileName = QStringLiteral("Secrets-%1.xml").arg(QUuid::createUuid().toString(QUuid::WithoutBraces));
@@ -745,7 +997,7 @@ void CPrivateFilePersistenceTest::AutoPersistenceStoresInPlaceTest()
 // again is watched again
 void CPrivateFilePersistenceTest::AutoPersistenceReloadTest()
 {
-	QTemporaryDir root;
+	QTemporaryDir root(GetTestRootTemplate());
 	QVERIFY(root.isValid());
 	const QString filePath = root.filePath(QStringLiteral("Private/Secrets.xml"));
 
@@ -780,7 +1032,7 @@ void CPrivateFilePersistenceTest::AutoPersistenceReloadTest()
 // not stored
 void CPrivateFilePersistenceTest::AutoPersistenceStoresWholeObjectChangeTest()
 {
-	QTemporaryDir root;
+	QTemporaryDir root(GetTestRootTemplate());
 	QVERIFY(root.isValid());
 	const QString filePath = root.filePath(QStringLiteral("Private/Secrets.xml"));
 
@@ -798,7 +1050,7 @@ void CPrivateFilePersistenceTest::AutoPersistenceStoresWholeObjectChangeTest()
 // loaded
 void CPrivateFilePersistenceTest::AutoPersistenceWatchesCreatedFolderTest()
 {
-	QTemporaryDir root;
+	QTemporaryDir root(GetTestRootTemplate());
 	QVERIFY(root.isValid());
 	const QString filePath = root.filePath(QStringLiteral("Private/Secrets.xml"));
 
@@ -813,6 +1065,82 @@ void CPrivateFilePersistenceTest::AutoPersistenceWatchesCreatedFolderTest()
 	data.text = "other";
 	QCOMPARE(otherProgram.persistence.SaveToFile(data), ifile::IFilePersistence::OS_OK);
 	QTRY_COMPARE(persistence.object->text, QByteArray("other"));
+}
+
+
+// Another program writes the file right after the own save, before the saver could read it back: its contents are loaded, they are
+// not taken for the own ones
+void CPrivateFilePersistenceTest::AutoPersistenceReloadsChangeAfterOwnSaveTest()
+{
+	QTemporaryDir root(GetTestRootTemplate());
+	QVERIFY(root.isValid());
+	const QString filePath = root.filePath(QStringLiteral("Private/Secrets.xml"));
+
+	SAutoPersistence persistence(filePath, true);
+	persistence.interferedLoader->otherText = "other";
+	persistence.SetText("own");
+
+	QTRY_COMPARE(persistence.object->text, QByteArray("other"));
+	QCOMPARE(ReadFile(filePath), QByteArray("other"));
+}
+
+
+// A special file (a FIFO) in place of the file: the persistence does not wait for a program that writes into it, neither on begin
+// nor when the folder changes. The loader refuses it
+void CPrivateFilePersistenceTest::AutoPersistenceIgnoresSpecialFileTest()
+{
+#ifdef Q_OS_WIN
+	QSKIP("Windows has no special files in the folders");
+#else
+	QTemporaryDir root(GetTestRootTemplate());
+	QVERIFY(root.isValid());
+	const QString folderPath = root.filePath(QStringLiteral("Private"));
+	QVERIFY(MakeFolder(folderPath, A_OWNER_ONLY));
+	const QString filePath = folderPath + QStringLiteral("/Secrets.xml");
+	const QByteArray nativeFilePath = QFile::encodeName(filePath);
+	QCOMPARE(::mkfifo(nativeFilePath.constData(), 0600), 0);
+
+	// If the persistence waited for a writer, one would come every 3 seconds: the test fails instead of hanging
+	const qint64 writerDelay = 3000;
+	std::atomic<bool> isFinished(false);
+	std::thread writer([nativeFilePath, &isFinished](){
+		QElapsedTimer writerTimer;
+		writerTimer.start();
+		while (!isFinished){
+			std::this_thread::sleep_for(std::chrono::milliseconds(50));
+
+			if (writerTimer.elapsed() >= writerDelay){
+				const int fileHandle = ::open(nativeFilePath.constData(), O_WRONLY | O_NONBLOCK);
+				if (fileHandle >= 0){
+					::close(fileHandle);
+				}
+
+				writerTimer.restart();
+			}
+		}
+	});
+
+	QElapsedTimer timer;
+	timer.start();
+
+	bool isLoaded = true;
+	{
+		SAutoPersistence persistence(filePath, true, false);
+
+		// The folder changes: the watcher looks at the file again
+		WriteFile(folderPath + QStringLiteral("/Other.txt"), "other");
+		QTest::qWait(500);
+
+		isLoaded = !persistence.object->text.isEmpty();
+	}
+
+	const qint64 elapsed = timer.elapsed();
+	isFinished = true;
+	writer.join();
+
+	QVERIFY(elapsed < writerDelay);
+	QVERIFY(!isLoaded);
+#endif
 }
 
 

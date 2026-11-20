@@ -2,10 +2,17 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QMap>
+#include <QtCore/QMutex>
+
 // ACF includes
 #include <ifile/IFileNameParam.h>
 #include <ifile/IFilePersistence.h>
 #include <ilog/TLoggerCompWrap.h>
+
+// ImtCore includes
+#include <imtfile/ISavedFileDigestProvider.h>
 
 
 namespace imtfile
@@ -36,22 +43,29 @@ namespace imtfile
 	- on Unix belongs to this account or to root; if others can write into it, it must have the sticky bit (as /tmp has: only the
 	  owner of an entry can remove or rename it). Examples: /etc (root, 755) and /tmp (root, 1777) are accepted, a folder with mode 777
 	  or one of another user is refused. On macOS the access list may not allow the others to delete, rename or change the access
-	  either. A link on the way must belong to this account or to root; the folders are checked as the path is written and as the
-	  links resolve it: a link in a folder that the others can change could be replaced by them;
+	  either. The path is resolved as the system resolves it, element by element: each folder on the way is checked, also the folders
+	  that a link leads to and the links that a link leads to. A link must belong to this account or to root, the folder that contains
+	  it is checked as any other: a link in a folder that the others can change could be replaced by them;
 	- on Windows belongs to this account, the system, the administrators or the installer of Windows; other accounts may read it and
 	  create new entries in it, but not delete, rename or change the access of what is in it (DELETE, FILE_DELETE_CHILD, WRITE_DAC,
 	  WRITE_OWNER, GENERIC_ALL). The usual access of ProgramData and of a folder created in it is accepted, but only if the service or
 	  an administrator created it: the creator of a folder becomes its owner and gets full access (CREATOR OWNER), so a folder created
-	  by an ordinary user is refused. "Everyone: full control" is refused.
-	The folders that exist are checked before the missing ones are created: nothing is created in a refused folder.
+	  by an ordinary user is refused. "Everyone: full control" is refused. A junction or a link (a reparse point) on the way is
+	  refused: the access is read through it, the folders that it leads to are not checked.
+	The folders that exist are checked before the missing ones are created: nothing is created in a refused folder. When all the folders
+	on the way are checked so, only this account and the system can change where the path leads: the files are written and read by the
+	path (the slave persistence takes a path) and get to the checked folder.
 
 	The file belongs to this account and nobody else can read it (Unix: a regular file with mode 600, not a link; Windows: its owner and
-	access list as of the private folder). A file or a folder that does not satisfy all of it is neither loaded nor saved: when in doubt
-	(the access cannot be read, an entry of an unknown kind), the persistence refuses.
+	access list as of the private folder, not a link). A file or a folder that does not satisfy all of it is neither loaded nor saved:
+	when in doubt (the access cannot be read, an entry of an unknown kind), the persistence refuses.
+
+	The digest of the contents of each save (ISavedFileDigestProvider) is taken from the new file before it replaces the file.
 */
 class CPrivateFilePersistenceComp:
 			public ilog::CLoggerComponentBase,
-			virtual public ifile::IFilePersistence
+			virtual public ifile::IFilePersistence,
+			virtual public ISavedFileDigestProvider
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
@@ -59,6 +73,7 @@ public:
 	I_BEGIN_COMPONENT(CPrivateFilePersistenceComp);
 		I_REGISTER_INTERFACE(ifile::IFileTypeInfo);
 		I_REGISTER_INTERFACE(ifile::IFilePersistence);
+		I_REGISTER_INTERFACE(ISavedFileDigestProvider);
 		I_ASSIGN(m_slavePersistenceCompPtr, "SlavePersistence", "Persistence that writes and reads the data", true, "SlavePersistence");
 		I_ASSIGN(m_filePathCompPtr, "FilePath", "The file of the data: only the files of its folder are written and read, the folder is kept for its owner only", true, "FilePath");
 	I_END_COMPONENT;
@@ -75,6 +90,9 @@ public:
 		Check that the file belongs to this account and nobody else can read it (on Windows: its owner and its access list).
 	*/
 	static bool IsPrivateFile(const QString& filePath, QString& errorMessage);
+
+	// reimplemented (imtfile::ISavedFileDigestProvider)
+	virtual QByteArray GetSavedFileDigest(const QString& filePath) const override;
 
 	// reimplemented (ifile::IFilePersistence)
 	virtual bool IsOperationSupported(
@@ -105,6 +123,12 @@ private:
 private:
 	I_REF(ifile::IFilePersistence, m_slavePersistenceCompPtr);
 	I_REF(ifile::IFileNameParam, m_filePathCompPtr);
+
+	/**
+		The digests of the last saves by the path of the file. The saves can run in several threads.
+	*/
+	mutable QMutex m_savedDigestsMutex;
+	mutable QMap<QString, QByteArray> m_savedDigests;
 };
 
 

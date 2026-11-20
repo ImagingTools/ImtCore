@@ -3,36 +3,11 @@
 
 
 // Qt includes
-#include <QtCore/QCryptographicHash>
-#include <QtCore/QFile>
 #include <QtCore/QFileInfo>
 #include <QtCore/QThread>
 
-
-namespace
-{
-
-
-/**
-	The hash of the contents of the file, empty if it cannot be read.
-*/
-QByteArray GetFileHash(const QString& filePath)
-{
-	QFile file(filePath);
-	if (!file.open(QIODevice::ReadOnly)){
-		return {};
-	}
-
-	QCryptographicHash hash(QCryptographicHash::Sha256);
-	if (!hash.addData(&file)){
-		return {};
-	}
-
-	return hash.result();
-}
-
-
-} // namespace
+// ImtCore includes
+#include <imtfile/CFileTools.h>
 
 
 namespace imtfile
@@ -137,7 +112,9 @@ bool CPrivateAutoPersistenceComp::LoadObject()
 	QMutexLocker locker(&m_fileMutex);
 
 	const QString filePath = GetFilePath();
-	const QByteArray fileHash = GetFileHash(filePath);
+
+	// Taken before the load: if the file is changed meanwhile, the next change of it loads it once more
+	const QByteArray fileHash = CFileTools::GetFileDigest(filePath);
 
 	m_loadingThreadId = QThread::currentThreadId();
 	const int operationState = m_fileLoaderCompPtr->LoadFromFile(*m_objectCompPtr, filePath);
@@ -157,7 +134,7 @@ bool CPrivateAutoPersistenceComp::LoadObject()
 
 bool CPrivateAutoPersistenceComp::StoreObject()
 {
-	if (!m_objectCompPtr.IsValid() || !m_fileLoaderCompPtr.IsValid()){
+	if (!m_objectCompPtr.IsValid() || !m_fileLoaderCompPtr.IsValid() || !m_savedFileDigestProviderCompPtr.IsValid()){
 		return false;
 	}
 
@@ -170,7 +147,8 @@ bool CPrivateAutoPersistenceComp::StoreObject()
 		return false;
 	}
 
-	m_fileHash = GetFileHash(filePath);
+	// The file read back could be of another program already: the digest of what has been written is told
+	m_fileHash = m_savedFileDigestProviderCompPtr->GetSavedFileDigest(filePath);
 
 	if (*m_reloadOnFileChangeAttrPtr){
 		WatchCreatedFile();
@@ -192,8 +170,9 @@ void CPrivateAutoPersistenceComp::WatchFile()
 		return;
 	}
 
+	// A special file (a FIFO) is not watched: the watcher could wait for a program that writes into it. Its folder tells the changes
 	const QFileInfo fileInfo(filePath);
-	if (fileInfo.exists()){
+	if (fileInfo.isFile()){
 		m_fileWatcher.addPath(fileInfo.absoluteFilePath());
 	}
 
@@ -226,11 +205,11 @@ void CPrivateAutoPersistenceComp::OnFileSystemChanged()
 		return;
 	}
 
-	// The own saves and the other files of the folder change nothing
+	// The own saves and the other files of the folder change nothing. A special file (a FIFO) is not waited for, the loader refuses it
 	{
 		QMutexLocker locker(&m_fileMutex);
 
-		if (GetFileHash(filePath) == m_fileHash){
+		if (CFileTools::GetFileDigest(filePath) == m_fileHash){
 			return;
 		}
 	}

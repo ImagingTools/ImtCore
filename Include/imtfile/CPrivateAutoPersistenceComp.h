@@ -16,16 +16,22 @@
 #include <imod/CMultiModelDispatcherBase.h>
 #include <imod/IModel.h>
 
+// ImtCore includes
+#include <imtfile/ISavedFileDigestProvider.h>
+
 
 namespace imtfile
 {
 
 
 /**
-	Automatic persistence of an object in a private file (CPrivateFilePersistenceComp as the file loader): the object is restored from
-	the file on begin, stored into it on each change and reloaded when another program changes the file.
+	Automatic persistence of an object in a private file: the object is restored from the file on begin, stored into it on each change
+	and reloaded when another program changes the file.
 	Unlike ifile::CAutoPersistenceComp the data never go to the temporary folder of the system, where other accounts can create files:
-	the loader is given the file itself, it replaces the file as a whole.
+	the loader is given the file itself, it must replace the file as a whole and keep it private.
+	The own saves are not loaded again: \c SavedFileDigestProvider tells the digest of what the loader has written (usually the loader
+	itself), the file is not read back, another program could have changed it already. A special file in place of the file (a FIFO) is
+	not waited for.
 	\note The component has no interface: activate 'Automatically create instance' or initialize it explicitly.
 */
 class CPrivateAutoPersistenceComp:
@@ -45,7 +51,8 @@ public:
 	I_BEGIN_COMPONENT(CPrivateAutoPersistenceComp);
 		I_ASSIGN(m_objectCompPtr, "Object", "Object that is restored from the file and stored into it", true, "Object");
 		I_ASSIGN_TO(m_objectModelCompPtr, m_objectCompPtr, false);
-		I_ASSIGN(m_fileLoaderCompPtr, "FileLoader", "Persistence of the file that replaces it as a whole (PrivateFilePersistence)", true, "FileLoader");
+		I_ASSIGN(m_fileLoaderCompPtr, "FileLoader", "Persistence of the file that replaces it as a whole", true, "FileLoader");
+		I_ASSIGN(m_savedFileDigestProviderCompPtr, "SavedFileDigestProvider", "Digest of the contents that the file loader has saved: the own saves are not loaded again", true, "SavedFileDigestProvider");
 		I_ASSIGN(m_filePathCompPtr, "FilePath", "File of the object", true, "FilePath");
 		I_ASSIGN_TO(m_filePathModelCompPtr, m_filePathCompPtr, false);
 		I_ASSIGN(m_restoreOnBeginAttrPtr, "RestoreOnBegin", "Restore the object from the file on begin", true, true);
@@ -86,6 +93,7 @@ private:
 	I_REF(istd::IChangeable, m_objectCompPtr);
 	I_REF(imod::IModel, m_objectModelCompPtr);
 	I_REF(ifile::IFilePersistence, m_fileLoaderCompPtr);
+	I_REF(ISavedFileDigestProvider, m_savedFileDigestProviderCompPtr);
 	I_REF(ifile::IFileNameParam, m_filePathCompPtr);
 	I_REF(imod::IModel, m_filePathModelCompPtr);
 	I_ATTR(bool, m_restoreOnBeginAttrPtr);
