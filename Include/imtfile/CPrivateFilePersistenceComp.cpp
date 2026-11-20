@@ -6,7 +6,11 @@
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
+#include <QtCore/QMutexLocker>
 #include <QtCore/QUuid>
+
+// ImtCore includes
+#include <imtfile/CFileTools.h>
 
 #ifdef Q_OS_WIN
 #include <windows.h>
@@ -15,6 +19,7 @@
 #include <vector>
 #else
 #include <cerrno>
+#include <climits>
 #include <cstdio>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -296,11 +301,35 @@ bool CreatePrivateEntry(const QString& path, bool isFolder)
 }
 
 
+/**
+	A junction or a link (a reparse point) is not accepted: its access would be read through it, from where it leads to, and the
+	folders on the way there would not be checked.
+*/
+bool CheckNoReparsePoint(const QString& path, QString& errorMessage)
+{
+	const std::wstring nativePath = QDir::toNativeSeparators(path).toStdWString();
+	const DWORD attributes = ::GetFileAttributesW(nativePath.c_str());
+	if (attributes == INVALID_FILE_ATTRIBUTES){
+		errorMessage = QStringLiteral("'%1' cannot be checked").arg(path);
+
+		return false;
+	}
+
+	if ((attributes & FILE_ATTRIBUTE_REPARSE_POINT) != 0){
+		errorMessage = QStringLiteral("'%1' is a junction or a link: use the path of the folder that it leads to").arg(path);
+
+		return false;
+	}
+
+	return true;
+}
+
+
 bool CheckFolderChain(const QString& folderPath, bool isPrivateFolder, QString& errorMessage)
 {
 	const QStringList chain = GetFolderChain(folderPath);
 	for (int index = 0; index < chain.count(); ++index){
-		if (!CheckSecurity(chain[index], isPrivateFolder && (index == chain.count() - 1), errorMessage)){
+		if (!CheckNoReparsePoint(chain[index], errorMessage) || !CheckSecurity(chain[index], isPrivateFolder && (index == chain.count() - 1), errorMessage)){
 			return false;
 		}
 	}
@@ -311,7 +340,7 @@ bool CheckFolderChain(const QString& folderPath, bool isPrivateFolder, QString& 
 
 bool CheckFile(const QString& filePath, QString& errorMessage)
 {
-	return CheckSecurity(filePath, true, errorMessage);
+	return CheckNoReparsePoint(filePath, errorMessage) && CheckSecurity(filePath, true, errorMessage);
 }
 
 
@@ -451,70 +480,139 @@ bool IsOpenToOthers(const QString& path, const struct stat& info)
 
 
 /**
-	On the way to the folder no other user can replace a folder or a link: the folders belong to this user or to the system, and the
-	others cannot write into them or only with the sticky bit (/tmp). A private folder at the end belongs to this user and nobody else
-	can open it.
+	The target of the link as it is written, not resolved: empty if it cannot be read.
 */
-bool CheckFolderChain(const QString& folderPath, bool isPrivateFolder, QString& errorMessage)
+QString ReadLink(const QString& linkPath)
 {
-	// A link is replaced through the folder that contains it: the folders are checked as they are on the way, not only as they are
-	// when the links are resolved
-	for (const QString& path : GetFolderChain(folderPath)){
-		struct stat info;
-		if (::lstat(QFile::encodeName(path).constData(), &info) != 0){
-			errorMessage = QStringLiteral("The folder '%1' cannot be checked").arg(path);
+	QByteArray target(PATH_MAX, Qt::Uninitialized);
+	const ssize_t size = ::readlink(QFile::encodeName(linkPath).constData(), target.data(), size_t(target.size()));
+	if ((size <= 0) || (size >= target.size())){
+		return {};
+	}
+
+	return QFile::decodeName(target.left(int(size)));
+}
+
+
+/**
+	Resolve the folder as the system does, element by element, and check each element on the way: in a folder that the others can
+	change they could put another entry in place of the next one, a link of another user could lead anywhere. A link leads on to its
+	target, which is resolved and checked so as well, also the links that it leads to.
+	\param resolvedPath	the folder without links.
+*/
+bool ResolveFolder(const QString& folderPath, QString& resolvedPath, QString& errorMessage)
+{
+	// The links that one path may lead through (SYMLOOP_MAX): a loop is not followed for ever
+	const int maxLinkCount = 40;
+
+	QString path = QStringLiteral("/");
+
+	struct stat info;
+	if ((::lstat("/", &info) != 0) || IsReplaceableByOthers(path, info)){
+		errorMessage = QStringLiteral("Other users can replace what is in the folder '/'");
+
+		return false;
+	}
+
+	QStringList names = QFileInfo(folderPath).absoluteFilePath().split(QLatin1Char('/'), Qt::SkipEmptyParts);
+	int linkCount = 0;
+	while (!names.isEmpty()){
+		const QString name = names.takeFirst();
+		if (name == QLatin1String(".")){
+			continue;
+		}
+
+		// The path has no links: its parent is the folder on the disk, it is checked already
+		if (name == QLatin1String("..")){
+			path = QFileInfo(path).path();
+
+			continue;
+		}
+
+		const QString nextPath = (path == QLatin1String("/")) ? (path + name) : (path + QLatin1Char('/') + name);
+		if (::lstat(QFile::encodeName(nextPath).constData(), &info) != 0){
+			errorMessage = QStringLiteral("The folder '%1' cannot be checked").arg(nextPath);
 
 			return false;
 		}
 
 		if (S_ISLNK(info.st_mode)){
 			if (!IsTrustedOwner(info.st_uid)){
-				errorMessage = QStringLiteral("The link '%1' belongs to another user").arg(path);
+				errorMessage = QStringLiteral("The link '%1' belongs to another user").arg(nextPath);
 
 				return false;
 			}
+
+			const QString targetPath = ReadLink(nextPath);
+			if (targetPath.isEmpty() || (++linkCount > maxLinkCount)){
+				errorMessage = QStringLiteral("The link '%1' cannot be followed").arg(nextPath);
+
+				return false;
+			}
+
+			// The target goes on from the folder of the link or from the root, the rest of the path after it
+			names = targetPath.split(QLatin1Char('/'), Qt::SkipEmptyParts) + names;
+			if (targetPath.startsWith(QLatin1Char('/'))){
+				path = QStringLiteral("/");
+			}
+
+			continue;
 		}
-		else if (S_ISDIR(info.st_mode) && IsReplaceableByOthers(path, info)){
-			errorMessage = QStringLiteral("Other users can replace what is in the folder '%1'").arg(path);
+
+		if (!S_ISDIR(info.st_mode)){
+			errorMessage = QStringLiteral("'%1' is not a folder").arg(nextPath);
 
 			return false;
 		}
+
+		if (IsReplaceableByOthers(nextPath, info)){
+			errorMessage = QStringLiteral("Other users can replace what is in the folder '%1'").arg(nextPath);
+
+			return false;
+		}
+
+		path = nextPath;
 	}
 
-	const QString canonicalPath = QFileInfo(folderPath).canonicalFilePath();
-	if (canonicalPath.isEmpty()){
-		errorMessage = QStringLiteral("The folder '%1' cannot be checked").arg(folderPath);
+	resolvedPath = path;
+
+	return true;
+}
+
+
+/**
+	On the way to the folder no other user can replace a folder or a link: the folders belong to this user or to the system, and the
+	others cannot write into them or only with the sticky bit (/tmp). A private folder at the end belongs to this user and nobody else
+	can open it.
+*/
+bool CheckFolderChain(const QString& folderPath, bool isPrivateFolder, QString& errorMessage)
+{
+	QString resolvedPath;
+	if (!ResolveFolder(folderPath, resolvedPath, errorMessage)){
+		return false;
+	}
+
+	if (!isPrivateFolder){
+		return true;
+	}
+
+	struct stat info;
+	if (::stat(QFile::encodeName(resolvedPath).constData(), &info) != 0){
+		errorMessage = QStringLiteral("The folder '%1' cannot be checked").arg(resolvedPath);
 
 		return false;
 	}
 
-	const QStringList chain = GetFolderChain(canonicalPath);
-	for (int index = 0; index < chain.count(); ++index){
-		struct stat info;
-		if ((::stat(QFile::encodeName(chain[index]).constData(), &info) != 0) || !S_ISDIR(info.st_mode)){
-			errorMessage = QStringLiteral("'%1' is not a folder").arg(chain[index]);
+	if (info.st_uid != ::geteuid()){
+		errorMessage = QStringLiteral("The folder '%1' belongs to another user").arg(resolvedPath);
 
-			return false;
-		}
+		return false;
+	}
 
-		if (isPrivateFolder && (index == chain.count() - 1)){
-			if (info.st_uid != ::geteuid()){
-				errorMessage = QStringLiteral("The folder '%1' belongs to another user").arg(chain[index]);
+	if (IsOpenToOthers(resolvedPath, info)){
+		errorMessage = QStringLiteral("Other users can open the folder '%1': make it accessible to its owner only (chmod 700%2)").arg(resolvedPath, s_accessListHint);
 
-				return false;
-			}
-
-			if (IsOpenToOthers(chain[index], info)){
-				errorMessage = QStringLiteral("Other users can open the folder '%1': make it accessible to its owner only (chmod 700%2)").arg(chain[index], s_accessListHint);
-
-				return false;
-			}
-		}
-		else if (IsReplaceableByOthers(chain[index], info)){
-			errorMessage = QStringLiteral("Other users can replace what is in the folder '%1'").arg(chain[index]);
-
-			return false;
-		}
+		return false;
 	}
 
 	return true;
@@ -674,6 +772,22 @@ bool CPrivateFilePersistenceComp::IsPrivateFile(const QString& filePath, QString
 }
 
 
+// reimplemented (imtfile::ISavedFileDigestProvider)
+
+QByteArray CPrivateFilePersistenceComp::GetSavedFileDigest(const QString& filePath) const
+{
+	QString path;
+	QString errorMessage;
+	if (!GetPrivatePath(filePath, path, errorMessage)){
+		return {};
+	}
+
+	QMutexLocker locker(&m_savedDigestsMutex);
+
+	return m_savedDigests.value(path);
+}
+
+
 // reimplemented (ifile::IFilePersistence)
 
 bool CPrivateFilePersistenceComp::IsOperationSupported(
@@ -748,13 +862,24 @@ ifile::IFilePersistence::OperationState CPrivateFilePersistenceComp::SaveToFile(
 
 	OperationState retVal = m_slavePersistenceCompPtr->SaveToFile(data, workingPath, progressManagerPtr);
 	if (retVal == OS_OK){
-		if (!CheckFile(workingPath, errorMessage)){
+		// The digest of the own contents is taken before the file is replaced: right after it another program can change the file
+		const QByteArray digest = CheckFile(workingPath, errorMessage) ? CFileTools::GetFileDigest(workingPath) : QByteArray();
+		if (digest.isEmpty()){
+			if (errorMessage.isEmpty()){
+				errorMessage = QStringLiteral("The file '%1' cannot be read").arg(workingPath);
+			}
+
 			retVal = OS_FAILED;
 		}
 		else if (!ReplaceFile(workingPath, path)){
 			errorMessage = QStringLiteral("The file '%1' cannot be replaced").arg(path);
 
 			retVal = OS_FAILED;
+		}
+		else{
+			QMutexLocker locker(&m_savedDigestsMutex);
+
+			m_savedDigests[path] = digest;
 		}
 
 		if (retVal != OS_OK){

@@ -18,6 +18,7 @@ class CPrivateFilePersistenceTest: public QObject
 {
 	Q_OBJECT
 private slots:
+	void initTestCase();
 	void SaveCreatesPrivateFolderAndFileTest();
 	void SaveReplacesSharedFileTest();
 	void SaveKeepsFileOnFailureTest();
@@ -25,12 +26,17 @@ private slots:
 	void ReplaceableParentFolderIsRefusedTest();
 	void LinkInReplaceableFolderIsRefusedTest();
 	void InheritedAccessIsRefusedTest();
+	void LinkChainThroughReplaceableFolderIsRefusedTest();
+	void JunctionIsRefusedTest();
+	void SavedFileDigestTest();
 	void LoadRefusesSharedFileTest();
 	void LoadRefusesSharedFolderTest();
 	void AutoPersistenceStoresInPlaceTest();
 	void AutoPersistenceReloadTest();
 	void AutoPersistenceStoresWholeObjectChangeTest();
 	void AutoPersistenceWatchesCreatedFolderTest();
+	void AutoPersistenceReloadsChangeAfterOwnSaveTest();
+	void AutoPersistenceIgnoresSpecialFileTest();
 	void SystemConfigPathTest();
 };
 
