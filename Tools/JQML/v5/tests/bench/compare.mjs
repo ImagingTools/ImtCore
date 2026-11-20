@@ -8,9 +8,11 @@ import fs from 'fs'
 let argv = process.argv.slice(2)
 let files = argv.filter((a, i) => !a.startsWith('--') && !(argv[i - 1] || '').startsWith('--'))
 let option = (name) => { let i = argv.indexOf('--' + name); return i >= 0 ? argv[i + 1] : null }
+let escapeRegExp = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 let [base, next] = files.map(f => JSON.parse(fs.readFileSync(f, 'utf8')))
 let noise = option('noise') ? JSON.parse(fs.readFileSync(option('noise'), 'utf8')).thresholds : {}
-let target = option('accept') ? new RegExp(option('accept')) : null
+let accept = option('accept')
+let target = accept ? new RegExp(escapeRegExp(accept)) : null
 
 let rows = [], worse = [], better = []
 for(let name of Object.keys(base.metrics)){
