@@ -3,7 +3,7 @@ const { defineType } = require('../Core/type')
 const { ListModel } = require('../QtQml/Models/ListModel')
 const { ModelContext, modelRows, sameModel, moveEntries, movedIndex } = require('../QtQml/Models/ModelContext')
 const { Item } = require('./Item')
-const { installFlick, flickDirection, wheelScroll, FLICK_PROPS, FLICK_SIGNALS, FLICK_ENUMS } = require('./Flickable')
+const { installFlick, flickDirection, wheelScroll, externalMove, FLICK_PROPS, FLICK_SIGNALS, FLICK_ENUMS } = require('./Flickable')
 const QtEnums = require('../Qt/enums')
 const { SmoothedAnimation } = require('./SmoothedAnimation')
 
@@ -466,8 +466,8 @@ defineType(GridView, {
         flow: { kind: 'int', effect: flowChanged },
         currentIndex: { kind: 'int', initial: -1 },
         currentItem: { kind: 'var', initial: null, readonly: true },
-        contentX: { kind: 'real', effect: scrolled },
-        contentY: { kind: 'real', effect: scrolled },
+        contentX: { kind: 'real', effect: scrolled, set(value){ externalMove(this, 'x'); this.$assign(GridView.CONTENTX, value) } },
+        contentY: { kind: 'real', effect: scrolled, set(value){ externalMove(this, 'y'); this.$assign(GridView.CONTENTY, value) } },
         contentWidth: 'real',
         contentHeight: 'real',
         flickableDirection: { kind: 'int', initial: 2 },

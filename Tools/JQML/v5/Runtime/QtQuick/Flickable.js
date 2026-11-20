@@ -67,10 +67,28 @@ function animating(s){
     return !!(s.x.animation || s.y.animation)
 }
 
-function movementEnding(view){
+// QQuickFlickable::movementEnding(hMovementEnding, vMovementEnding): both axes, or the one given
+function movementEnding(view, only = null){
     let s = flickState(view)
     let type = view.constructor
     let wasFlicking = s.x.flicking || s.y.flicking
+    if(only){
+        s[only].flicking = false
+        s[only].moved = false
+        s[only].fixingUp = false
+        s[only].smoothVelocity = 0
+        let other = s[only === 'x' ? 'y' : 'x']
+        if(wasFlicking && !other.flicking){
+            setFlag(view, type.FLICKING, false)
+            engine.emitArgs(view, type.SIGNAL_flickEnded, [])
+        }
+        if(s.moving && !s.pressed && !s.dragging && !other.flicking && !other.moved && !other.animation){
+            s.moving = false
+            setFlag(view, type.MOVING, false)
+            engine.emitArgs(view, type.SIGNAL_movementEnded, [])
+        }
+        return
+    }
     s.x.flicking = s.y.flicking = false
     if(wasFlicking){
         setFlag(view, type.FLICKING, false)
@@ -120,6 +138,24 @@ function draggingEnding(view){
     engine.emitArgs(view, view.constructor.SIGNAL_dragEnded, [])
 }
 
+// a move of the view itself (its timeline, a drag, a fixup): not a write of contentX / contentY from outside
+function setPos(view, axis, value){
+    let s = flickState(view)
+    let was = s.internalMove
+    s.internalMove = true
+    try { view.$setContentPos(axis, value) } finally { s.internalMove = was }
+}
+
+// QQuickFlickable::setContentX / setContentY from outside the view: the timeline of the axis stops, and a movement
+// or a flick ends on that axis (movementEnding(h, v))
+function externalMove(view, axis){
+    let s = view.$fs
+    if(!s || s.internalMove) return
+    resetTimeline(view, axis)
+    s[axis].fixingUp = false
+    if(s.moving || s[axis].flicking) movementEnding(view, axis)
+}
+
 // ---- the timeline: segments of an axis, one frame after the other ----
 
 function resetTimeline(view, axis){
@@ -141,7 +177,7 @@ function runTimeline(view, axis, segments, done){
                 let elapsed = time - animation.start
                 let value = segment.at(Math.min(elapsed, segment.duration))
                 s.smoothVelocity = segment.velocity ? segment.velocity(Math.min(elapsed, segment.duration)) : 0
-                view.$setContentPos(axis, value)
+                setPos(view, axis, value)
                 if(elapsed < segment.duration) return
                 animation.start += segment.duration
                 animation.index++
@@ -188,7 +224,7 @@ function fixup(view, axis, immediate = false){
     if(target === pos) return endIfIdle(view)
     resetTimeline(view, axis)
     if(immediate){
-        view.$setContentPos(axis, target)
+        setPos(view, axis, target)
         return endIfIdle(view)
     }
     s[axis].fixingUp = true
@@ -299,7 +335,7 @@ function dragAxis(view, axis, delta, overThreshold, elapsedSincePress){
     else if(pos > max) pos = max + (pos - max) / 2
     if(!result.reject && s.stealMouse && delta !== a.previousDragDelta){
         resetTimeline(view, axis)
-        view.$setContentPos(axis, pos)
+        setPos(view, axis, pos)
         a.moved = true
     }
     if(!result.reject && overThreshold) result.steal = true
@@ -584,7 +620,44 @@ function wheelMovement(view){
     }, 100)
 }
 
+// QStyleHints::wheelScrollLines * 24: the pixels of a wheel step
+const WHEEL_SCROLL = 3 * 24
+// a wheel step (QQuickFlickable::wheelEvent with an angle delta and no scroll phase): the content moves by 72 pixels
+// a step, OutExpo over 3/4 of the fixup duration, then back into the bounds; at the bound it goes the event is not
+// accepted (the items below get it). The return: accepted
+function wheelStep(view, axis, delta){
+    let s = flickState(view)
+    let pos = view.$contentPos(axis)
+    let { min, max } = bounds(view, axis)
+    let move = -delta / 120 * WHEEL_SCROLL
+    if(move < 0 ? pos <= min : pos >= max) return false
+    let accept = true
+    if(view.$v[view.constructor.BOUNDSBEHAVIOR] === 0){
+        let est = pos + move
+        if(est < min){ move = min - pos; accept = false }
+        else if(est > max){ move = max - pos; accept = false }
+    }
+    resetTimeline(view, axis)
+    movementStarting(view)
+    s[axis].moved = true
+    s[axis].fixingUp = true
+    runTimeline(view, axis, [moveSegment(pos, pos + move, 3 * FIXUP_DURATION / 4, easeOutExpo)], () => fixup(view, axis))
+    return accept
+}
+
+// a step of a wheel: an angle delta with no pixels (a test, a browser in lines or pages) or a whole number of steps
+const isWheelStep = (angle, pixel) => angle !== 0 && (!pixel || angle % 120 === 0)
+
 function wheelScroll(view, angleDelta, pixelDelta){
+    let stepX = view.$flickAxis('x') && isWheelStep(angleDelta.x, pixelDelta.x)
+    let stepY = view.$flickAxis('y') && isWheelStep(angleDelta.y, pixelDelta.y)
+    if(stepX || stepY){
+        let accepted = false
+        if(stepY && wheelStep(view, 'y', angleDelta.y)) accepted = true
+        if(stepX && wheelStep(view, 'x', angleDelta.x)) accepted = true
+        return accepted
+    }
+    // pixels (a touchpad): the content follows them
     let dx = pixelDelta.x || angleDelta.x / 120 * 100
     let dy = pixelDelta.y || angleDelta.y / 120 * 100
     let bx = bounds(view, 'x'), by = bounds(view, 'y')
@@ -593,8 +666,8 @@ function wheelScroll(view, angleDelta, pixelDelta){
     let ny = view.$flickAxis('y') ? Math.max(by.min, Math.min(by.max, y - dy)) : y
     if(nx === x && ny === y) return false
     wheelMovement(view)
-    if(nx !== x) view.$setContentPos('x', nx)
-    if(ny !== y) view.$setContentPos('y', ny)
+    if(nx !== x) setPos(view, 'x', nx)
+    if(ny !== y) setPos(view, 'y', ny)
     return true
 }
 Flickable.$defaultParent = (flickable) => flickable.$content
@@ -622,8 +695,8 @@ const FLICK_SIGNALS = ['movementStarted', 'movementEnded', 'flickStarted', 'flic
 
 defineType(Flickable, {
     props: Object.assign({
-        contentX: { kind: 'real', effect: moved },
-        contentY: { kind: 'real', effect: moved },
+        contentX: { kind: 'real', effect: moved, set(value){ externalMove(this, 'x'); this.$assign(Flickable.CONTENTX, value) } },
+        contentY: { kind: 'real', effect: moved, set(value){ externalMove(this, 'y'); this.$assign(Flickable.CONTENTY, value) } },
         contentWidth: { kind: 'real', initial: -1, effect: contentSize },
         contentHeight: { kind: 'real', initial: -1, effect: contentSize },
         originX: { kind: 'real', readonly: true },
@@ -654,4 +727,4 @@ Object.assign(Flickable, FLICK_ENUMS)
     }
 }
 
-module.exports = { Flickable, wheelScroll, installFlick, flickDirection, flickState, fixup, FLICK_PROPS, FLICK_SIGNALS, FLICK_ENUMS, clock, DRAG_THRESHOLD }
+module.exports = { Flickable, wheelScroll, externalMove, installFlick, flickDirection, flickState, fixup, FLICK_PROPS, FLICK_SIGNALS, FLICK_ENUMS, clock, DRAG_THRESHOLD }

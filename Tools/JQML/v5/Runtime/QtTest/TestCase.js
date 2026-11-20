@@ -68,6 +68,17 @@ class TestCase extends Item {
     }
 
     async $run(){
+        // qmltestrunner shows the root item of the document in a window and waits for it to be active
+        // (qWaitForWindowActive); a page that was not mounted (node) gets that window here
+        let keys = require('../QtQuick/KeyDelivery')
+        let top = this
+        while(top.$parent instanceof Item) top = top.$parent
+        if(!keys.agent.root){
+            keys.agent.root = top
+            top.$isFocusScope = true
+        }
+        if(!mouse.scene.roots.length) mouse.scene.roots.push(top)
+        keys.activateWindow()
         this.running = true
         try {
             await this.$call('initTestCase')
@@ -325,7 +336,7 @@ class TestCase extends Item {
             domKey = 'Tab'
             modifiers |= QtEnums.ShiftModifier
         }
-        let event = new KeyboardEvent(type, {
+        let init = {
             bubbles: true,
             cancelable: true,
             key: domKey,
@@ -335,16 +346,22 @@ class TestCase extends Item {
             ctrlKey: !!(modifiers & (isMac() ? QtEnums.MetaModifier : QtEnums.ControlModifier)),
             altKey: !!(modifiers & QtEnums.AltModifier),
             metaKey: !!(modifiers & (isMac() ? QtEnums.ControlModifier : QtEnums.MetaModifier)),
-        })
+        }
+        // without a document (node): the event goes to the key delivery as the window listener gives it
+        if(typeof document === 'undefined' || typeof KeyboardEvent === 'undefined'){
+            let event = Object.assign({ type, repeat: false, defaultPrevented: false, preventDefault(){ this.defaultPrevented = true } }, init)
+            require('../QtQuick/KeyDelivery').deliverKey(event, type === 'keydown' ? 'pressed' : 'released')
+            return
+        }
         let target = document.activeElement && document.activeElement !== document.body ? document.activeElement : window
-        target.dispatchEvent(event)
+        target.dispatchEvent(new KeyboardEvent(type, init))
     }
 
     keyPress(key, modifiers){ this.$key('keydown', key, modifiers) }
     keyRelease(key, modifiers){ this.$key('keyup', key, modifiers) }
 
     keyClick(key, modifiers){
-        let input = document.activeElement
+        let input = typeof document === 'undefined' ? null : document.activeElement
         if(!modifiers && input && (input.tagName === 'TEXTAREA' || input.tagName === 'INPUT')){
             let ch = typeof key === 'string' && key.length === 1 ? key : key === QtEnums.Key_Return && input.tagName === 'TEXTAREA' ? '\n' : null
             if(ch){

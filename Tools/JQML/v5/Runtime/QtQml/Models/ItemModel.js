@@ -31,7 +31,7 @@ class QModelIndex {
     flags(){ return this.model ? this.model.flags(this) : 0 }
     // QDebug of a QModelIndex (the pointers of Qt are not ours: 0x0)
     toString(){
-        return this.valid ? 'QModelIndex(' + this.row + ',' + this.column + ',0x0,' + modelName(this.model) + ')' : 'QModelIndex(-1,-1,0x0,QObject(0x0))'
+        return this.valid ? 'QModelIndex(' + this.row + ',' + this.column + ',0x0,' + modelName(this.model) + ')' : 'QModelIndex()'
     }
 }
 

@@ -4,7 +4,7 @@ const { Item } = require('./Item')
 const { ListModel } = require('../QtQml/Models/ListModel')
 const { ModelContext, modelRows, sameModel } = require('../QtQml/Models/ModelContext')
 const { GroupObject } = require('../Core/QtObject')
-const { installFlick, flickDirection, flickState, wheelScroll, fixup, FLICK_PROPS, FLICK_SIGNALS, FLICK_ENUMS } = require('./Flickable')
+const { installFlick, flickDirection, flickState, wheelScroll, externalMove, fixup, FLICK_PROPS, FLICK_SIGNALS, FLICK_ENUMS } = require('./Flickable')
 const { SmoothedAnimation } = require('./SmoothedAnimation')
 const QtEnums = require('../Qt/enums')
 
@@ -1552,8 +1552,8 @@ defineType(ListView, {
         orientation: { kind: 'int', initial: VERTICAL, effect: orientationChanged },
         spacing: { kind: 'real', effect: refill },
         cacheBuffer: { kind: 'real', initial: 320, effect: refill },
-        contentX: { kind: 'real', effect: scrolled },
-        contentY: { kind: 'real', effect: scrolled },
+        contentX: { kind: 'real', effect: scrolled, set(value){ externalMove(this, 'x'); this.$assign(ListView.CONTENTX, value) } },
+        contentY: { kind: 'real', effect: scrolled, set(value){ externalMove(this, 'y'); this.$assign(ListView.CONTENTY, value) } },
         contentWidth: 'real',
         contentHeight: 'real',
         keyNavigationEnabled: { kind: 'bool', initial: true },

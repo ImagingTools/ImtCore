@@ -46,6 +46,8 @@ const fuzzyIsNull = (d) => Math.abs(d) <= 0.000000000001
 const fuzzyCompare = (a, b) => Math.abs(a - b) * 1000000000000 <= Math.min(Math.abs(a), Math.abs(b))
 const bound = (min, v, max) => Math.max(min, Math.min(v, max))
 const cellValid = (cell) => cell.x !== -1 && cell.y !== -1
+// DelegateModel.DelegateModelAccess
+const ACCESS_READ_ONLY = 1, ACCESS_READ_WRITE = 2
 
 // ---- QMinimalFlatSet<int>: the loaded columns / rows, kept sorted --------------------------------------------------------
 class SortedSet {
@@ -129,7 +131,8 @@ class CellContext extends ModelContext {
         return model.$roleOf(name) >= 0
     }
 
-    // modelData: the only role of a model with one role (the element of an array, the number of a count)
+    // modelData: the only role of a model with one role (the element of an array, the number of a count); a model of
+    // more roles has none in the context, a required modelData is the model object of the cell ($applyRequired)
     $modelData(){
         let model = this.$im.model
         if(!model) return undefined
@@ -159,6 +162,8 @@ class CellContext extends ModelContext {
                     return ctx.$role(key)
                 },
                 set(target, key, value){
+                    // DelegateModel.ReadOnly: the roles of the model object are read-only properties
+                    if(ctx.$access() === ACCESS_READ_ONLY) throw new TypeError('Cannot assign to read-only property "' + String(key) + '"')
                     let model = ctx.$im.model
                     if(model){
                         let role = key === 'modelData' ? 0 : model.$roleOf(key)
@@ -174,6 +179,7 @@ class CellContext extends ModelContext {
 
     // QQmlDelegateModelItem::setModelIndex: the cell moved to another index; every role is new
     $setModelIndex(flat, row, column){
+        this.$takeAccess()
         this.$cellRow = row
         this.$cellColumn = column
         this.$write(ModelContext.INDEX, flat)
@@ -191,9 +197,49 @@ class CellContext extends ModelContext {
         if(item[name] !== value) item[name] = value
     }
 
+    // TableView.delegateModelAccess (QQmlDelegateModel::DelegateModelAccess) as it was when the item was made or reused:
+    // a new access takes effect with the next rebuild
+    $access(){ return this.$itemAccess === undefined ? this.$takeAccess() : this.$itemAccess }
+    $takeAccess(){ return (this.$itemAccess = this.$view ? this.$view.$v[TableView.DELEGATEMODELACCESS] : 0) }
+
+    $applyRequired(roles){
+        this.$applyingRequired = (this.$applyingRequired || 0) + 1
+        try {
+            super.$applyRequired(roles)
+            // a required modelData of a model of more roles: the model object (QQmlDMAbstractItemModelData::modelData)
+            let item = this.$requiredItem
+            let model = this.$im.model
+            if(item && model && this.$requiredNames.indexOf('modelData') >= 0 && this.$v[ModelContext.MODELDATA] === undefined
+                && !(item.$f & engine.DESTROYED) && item.modelData !== this.model) item.modelData = this.model
+        } finally { this.$applyingRequired-- }
+    }
+
+    // DelegateModel.ReadWrite: a required property of a role written by the delegate writes the model
+    // (QQmlDelegateModelItem with ReadWrite access: the property is bound both ways)
+    $linkRequiredRoles(item){
+        if(this.$linkedItem === item) return
+        this.$linkedItem = item
+        for(let name of this.$requiredNames || []){
+            if(name === 'index' || name === 'row' || name === 'column' || name === 'model') continue
+            let signal = item.constructor['SIGNAL_' + name + 'Changed']
+            if(signal === undefined) continue
+            engine.connect(item, signal, () => {
+                if(this.$applyingRequired || this.$access() !== ACCESS_READ_WRITE || !this.$hasRole(name)) return
+                let model = this.$im.model
+                if(!model) return
+                let role = name === 'modelData' ? 0 : model.$roleOf(name)
+                if(role < 0) return
+                let value = item[name]
+                if(value !== this.$roleValue(name)) model.setData(this.$index(), value, role)
+            })
+        }
+    }
+
     $attachRequired(item){
         this.$tableItem = item
+        this.$takeAccess()
         super.$attachRequired(item)
+        if(this.$requiredItem === item) this.$linkRequiredRoles(item)
         // QQmlTableInstanceModelIncubationTask::setInitialState: initItem, then updateItemProperties(init)
         if(this.$im.onInit) this.$im.onInit(this, item)
     }
@@ -2951,9 +2997,10 @@ class TableView extends Flickable {
         return super.$filterPointer(kind, receiver, x, y, buttons)
     }
 
+    // QQuickTableViewResizeHandler::updateState: a press starts tracking the grid line the hover handler is over (a
+    // press with no hover before it resizes nothing)
     $startResize(x, y){
         if(!this.$acceptsHover()) return false
-        this.$hoverMove(x, y)
         let row = this.$v[TableView.RESIZABLEROWS] ? this.$hover.row : -1
         let column = this.$v[TableView.RESIZABLECOLUMNS] ? this.$hover.column : -1
         if(row === -1 && column === -1) return false
@@ -3026,7 +3073,9 @@ class TableView extends Flickable {
         super.$mouseRelease(x, y)
         if(t.pressed){
             t.pressed = false
-            if(!t.moved && !moving && !longPressed && this.$v[Flickable.INTERACTIVE]) this.$tapAt(x, y, false)
+            // the tap handler taps whether the view flicks or not; singleTapped handles the tap of an interactive
+            // view only (a view that does not flick did on the press)
+            if(!t.moved && !moving && !longPressed) this.$tapAt(x, y, false, !this.$v[Flickable.INTERACTIVE])
         }
         if(control) control.$pointerRelease()
     }
@@ -3042,7 +3091,7 @@ class TableView extends Flickable {
     }
 
     // QQuickTapHandler singleTapped / doubleTapped (QStyleHints::mouseDoubleClickInterval, the double click distance)
-    $tapAt(x, y, onGridLine){
+    $tapAt(x, y, onGridLine, tappedOnPress = false){
         let t = this.$tap
         let now = clock.now()
         let double = t.lastTapTime >= 0 && now - t.lastTapTime <= 400 && Math.abs(x - t.lastX) <= 5 && Math.abs(y - t.lastY) <= 5
@@ -3062,7 +3111,7 @@ class TableView extends Flickable {
             if(this.$doubleTapped) this.$doubleTapped(x, y, t.modifiers)
             return
         }
-        if(!onGridLine) this.$handleTap(x, y, t.modifiers)
+        if(!onGridLine && !tappedOnPress) this.$handleTap(x, y, t.modifiers)
     }
 
     $handleTap(x, y, modifiers){

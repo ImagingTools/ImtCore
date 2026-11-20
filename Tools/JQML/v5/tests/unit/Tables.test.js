@@ -101,6 +101,47 @@ Item {
     }
 }` })
 
+const DOUBLE = compileQml({ 'Main.qml': `import QtQuick
+import QtQml.Models
+import Qt.labs.qmlmodels
+Item {
+    id: root
+    width: 400
+    height: 300
+    property alias view: tableView
+    property var log: []
+    TableModel {
+        id: tableModel
+        TableModelColumn { display: "a"; edit: "a" }
+        TableModelColumn { display: "b"; edit: "b" }
+        rows: [ { a: "a0", b: "b0" }, { a: "a1", b: "b1" }, { a: "a2", b: "b2" } ]
+    }
+    property alias model: tableModel
+    TableView {
+        id: tableView
+        width: 300
+        height: 200
+        interactive: false
+        model: tableModel
+        selectionModel: ItemSelectionModel {}
+        resizableColumns: true
+        editTriggers: TableView.DoubleTapped
+        delegate: Rectangle {
+            id: cell
+            required property int row
+            required property int column
+            required property var display
+            implicitWidth: 60
+            implicitHeight: 30
+            function write(value) { cell.display = value }
+            function writeModel(value) { model.display = value }
+            TableView.editDelegate: Item {
+                Component.onCompleted: root.log.push("editor " + cell.row + "," + cell.column)
+            }
+        }
+    }
+}` })
+
 const tick = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
 for(let [name, core] of [['Runtime', sourcesCore], ['dist/core.js', CORE]]){
@@ -192,6 +233,74 @@ for(let [name, core] of [['Runtime', sourcesCore], ['dist/core.js', CORE]]){
         let other = t.root.children.find(c => c.objectName === 'unsupported')
         t.JQ.batch(() => { other.target = other.plain })
         assert.ok(t.warnings.some(w => /the assigned target is not supported by the control/.test(w)))
+        t.close()
+    })
+
+    function openDouble(){
+        let loaded = load(DOUBLE, { core })
+        let { JQ, root } = loaded
+        JQ.mouse.scene.roots = [root]
+        let click = (x, y, double = false) => {
+            JQ.mouse.press(x, y, 1, 1, 0, double)
+            JQ.mouse.release(x, y, 1, 0, 0)
+        }
+        let hover = (x, y) => JQ.mouse.move(x, y, 0, 0)
+        let close = () => { JQ.mouse.scene.roots = []; loaded.dispose() }
+        return Object.assign(loaded, { click, hover, close })
+    }
+
+    // QQuickTableViewPrivate tapHandler doubleTapped: on the grid line the hover handler is over, back to the implicit
+    // size (setColumnWidth(column, -1)); a drag on it resizes first
+    test(name + ': a double tap on a hovered grid line resets the column to its implicit width', () => {
+        let t = openDouble()
+        let view = t.root.view
+        t.hover(60, 15)
+        t.JQ.mouse.press(60, 15, 1, 1, 0, false)
+        t.JQ.mouse.move(75, 15, 1, 0)
+        t.JQ.mouse.move(90, 15, 1, 0)
+        t.JQ.mouse.release(90, 15, 1, 0, 0)
+        // the drag starts where it passes the threshold (m_columnStartX): 60 + 90 - 75
+        assert.equal(view.explicitColumnWidth(0), 75)
+        t.JQ.batch(() => view.forceLayout())
+        t.hover(75, 15)
+        t.click(75, 15)
+        t.click(75, 15, true)
+        assert.equal(view.explicitColumnWidth(0), -1)
+        assert.deepEqual(JSON.parse(JSON.stringify(t.root.log)), [])
+        t.close()
+    })
+
+    // editTriggers DoubleTapped: the second tap within the double click interval opens the editor of the cell
+    test(name + ': a double tap on a cell edits it with the DoubleTapped trigger, a single tap does not', () => {
+        let t = openDouble()
+        t.click(100, 45)
+        assert.deepEqual(JSON.parse(JSON.stringify(t.root.log)), [])
+        t.click(100, 45, true)
+        assert.deepEqual(JSON.parse(JSON.stringify(t.root.log)), ['editor 1,1'])
+        t.close()
+    })
+
+    // TableView.delegateModelAccess: ReadOnly makes the roles of the model object read-only, ReadWrite writes a required
+    // property of a role back to the model; a new access takes effect with the next layout
+    test(name + ': delegateModelAccess ReadOnly and ReadWrite', () => {
+        let t = openDouble()
+        let view = t.root.view
+        let model = t.root.model
+        let cell = (row) => view.itemAtCell({ x: 0, y: row })
+        t.JQ.batch(() => cell(0).write('required'))
+        assert.equal(model.rows[0].a, 'a0')
+        t.JQ.batch(() => cell(0).writeModel('through model'))
+        assert.equal(model.rows[0].a, 'through model')
+        t.JQ.batch(() => { view.delegateModelAccess = 2 })
+        t.JQ.batch(() => cell(1).write('not yet'))
+        assert.equal(model.rows[1].a, 'a1')
+        t.JQ.batch(() => view.forceLayout())
+        t.JQ.batch(() => cell(2).write('read write'))
+        assert.equal(model.rows[2].a, 'read write')
+        t.JQ.batch(() => { view.delegateModelAccess = 1 })
+        t.JQ.batch(() => view.forceLayout())
+        assert.throws(() => t.JQ.batch(() => cell(1).writeModel('read only')), /read-only/)
+        assert.equal(model.rows[1].a, 'a1')
         t.close()
     })
 
