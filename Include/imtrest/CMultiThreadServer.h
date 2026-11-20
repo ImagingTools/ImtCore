@@ -73,7 +73,9 @@ Q_SIGNALS:
 public Q_SLOTS:
 	void Disconnected(QByteArray requestId);
 
-protected Q_SLOTS:
+	/**
+		Stop the threads of the connections and wait for them. It can be called again, then it does nothing.
+	*/
 	void ShutdownServer();
 
 protected:

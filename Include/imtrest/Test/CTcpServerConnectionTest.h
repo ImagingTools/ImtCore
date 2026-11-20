@@ -37,6 +37,9 @@ private slots:
 	void BusyPortKeepsServerTest();
 	void StoppedServerStaysStoppedTest();
 	void StartedServerMovesTest();
+
+	// The threads of the connections are stopped before the component loses its references and attributes
+	void ConnectionsStopWhenComponentIsDestroyedTest();
 };
 
 

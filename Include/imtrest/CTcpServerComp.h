@@ -97,6 +97,7 @@ protected:
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
+	virtual void OnComponentDestroyed() override;
 
 	// reimplemented (imtrest::IResponseDispatcher)
 	virtual bool SendResponse(const QByteArray& requestId, ConstResponsePtr& response) const override;
