@@ -95,3 +95,27 @@ test('every real application compiles to the same bytes twice', { timeout: 60000
         assert.ok(outputs[0].equals(outputs[1]), app.name + ' differs between two compiles')
     }
 })
+
+test('every real application minified with the faster mark_enclosed is the same, byte for byte', { timeout: 900000 }, () => {
+    const U = require('uglify-js')
+    require('../../compiler/uglifyScope').install(U)
+    const fast = U.AST_Symbol.prototype.mark_enclosed
+    for(let app of available()){
+        let outputs = []
+        for(let method of [fast.$original, fast]){
+            U.AST_Symbol.prototype.mark_enclosed = method
+            let out = fs.mkdtempSync(path.join(os.tmpdir(), 'jqml-minify-'))
+            let log = console.log
+            console.log = () => {}
+            try {
+                compile({ mode: 'js', config: app.config, entry: app.entry, output: out, name: 'index', root: app.root, minify: true })
+            } finally {
+                console.log = log
+                U.AST_Symbol.prototype.mark_enclosed = fast
+            }
+            outputs.push(fs.readFileSync(path.join(out, 'index.js')))
+            fs.rmSync(out, { recursive: true, force: true })
+        }
+        assert.ok(outputs[0].equals(outputs[1]), app.name + ': the minified output differs')
+    }
+})

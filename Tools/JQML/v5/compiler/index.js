@@ -306,7 +306,9 @@ window.addEventListener('load', () => {
     // --minify: the names of the code are shortened and the spaces dropped; the names of functions and classes stay, the
     // runtime reads them (Qt.createComponent of a lazy type, the messages of errors)
     if(options.minify){
-        let result = require('uglify-js').minify(application, { compress: false, mangle: { keep_fnames: true }, output: { ascii_only: true } })
+        let uglify = require('uglify-js')
+        require('./uglifyScope').install(uglify)
+        let result = uglify.minify(application, { compress: false, mangle: { keep_fnames: true }, output: { ascii_only: true } })
         if(result.error) throw result.error
         application = result.code + '\n'
     }
