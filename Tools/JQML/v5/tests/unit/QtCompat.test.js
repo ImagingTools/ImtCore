@@ -409,6 +409,16 @@ function cases(name, runtime){
         assert.equal(evaluations, 1)
     }))
 
+    // QtObject::md5: QCryptographicHash::hash(data.toUtf8(), Md5).toHex(); the values printed by Qt 6.12
+    test(name + ': Qt.md5 is the hex MD5 of the UTF-8 bytes', () => {
+        assert.equal(Qt.md5('ab'), '187ef4436122d1cc2f40dc2b92f0eba0')
+        assert.equal(Qt.md5(''), 'd41d8cd98f00b204e9800998ecf8427e')
+        assert.equal(Qt.md5(12), 'c20ad4d76fe97759aa27a0c99bff6710')
+        assert.equal(Qt.md5('\u043f\u0430\u0440\u043e\u043b\u044c'), 'e242f36f4f95f12966da8fa2efd59992')
+    })
+
+
+
     test(name + ': a locale name the browser does not know is the C locale, as QLocale', () => {
         let c = Qt.locale('undefined')
         assert.equal(c.name, 'C')

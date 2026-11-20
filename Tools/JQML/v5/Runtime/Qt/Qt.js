@@ -30,6 +30,8 @@ const Qt = Object.assign({}, require('./enums'), { NonModal: 0, WindowModal: 1, 
     formatDateTime(value, format, option){ return formatValue('toLocaleString', value, format, option) },
     formatDate(value, format, option){ return formatValue('toLocaleDateString', value, format, option) },
     formatTime(value, format, option){ return formatValue('toLocaleTimeString', value, format, option) },
+    // QtObject::md5: the hex MD5 digest of the UTF-8 bytes
+    md5: require('./md5').md5,
     // QtObject::btoa: base64 of the UTF-8 bytes
     btoa(data){
         let bytes = new TextEncoder().encode(String(data))
