@@ -76,12 +76,12 @@ bool CCollectionStorageResolver::RemoveObject(const Id& objectId)
 QVariantMap CCollectionStorageResolver::GetStorageParams(const Id& objectId) const
 {
 	QVariantMap params;
-	params["storage"] = "collection";
-	params["objectId"] = objectId;
+	params[QStringLiteral("storage")] = QStringLiteral("collection");
+	params[QStringLiteral("objectId")] = objectId;
 
 	if (m_collectionPtr != nullptr){
-		params["typeId"] = m_collectionPtr->GetObjectTypeId(objectId);
-		params["name"] = m_collectionPtr->GetElementInfo(objectId, IObjectCollection::EIT_NAME);
+		params[QStringLiteral("typeId")] = m_collectionPtr->GetObjectTypeId(objectId);
+		params[QStringLiteral("name")] = m_collectionPtr->GetElementInfo(objectId, IObjectCollection::EIT_NAME);
 	}
 
 	return params;
