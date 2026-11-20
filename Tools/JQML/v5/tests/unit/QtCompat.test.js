@@ -417,6 +417,21 @@ function cases(name, runtime){
         assert.equal(Qt.md5('\u043f\u0430\u0440\u043e\u043b\u044c'), 'e242f36f4f95f12966da8fa2efd59992')
     })
 
+    // QQmlInstantiatorPrivate::clear: objectRemoved from the first object to the last
+    test(name + ': Instantiator removes its objects from the first one', () => {
+        const { Instantiator, QtObject } = types
+        let removed = []
+        let inst
+        engine.batch(() => {
+            inst = new Instantiator(null)
+            inst.delegate = new Component(null, () => new QtObject(null))
+            inst.model = 3
+        })
+        engine.batch(() => engine.scheduleComponentComplete(inst))
+        engine.connect(inst, Instantiator.SIGNAL_objectRemoved, (index) => removed.push(index))
+        engine.batch(() => { inst.model = 0 })
+        assert.deepEqual(removed, [0, 1, 2])
+    })
 
 
     test(name + ': a locale name the browser does not know is the C locale, as QLocale', () => {

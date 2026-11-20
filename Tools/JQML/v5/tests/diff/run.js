@@ -23,7 +23,9 @@ function qmlTool(){
 // Qt prints console.log as "qml: text" on stderr; the lines of v5 are collected from its console
 async function v5Lines(file){
     let lines = []
-    let consoleOf = { log: (...a) => lines.push(a.join(' ')), info(){}, debug(){}, warn(){}, error: (...a) => lines.push('ERROR ' + a.join(' ')) }
+    // console.log of Qt: the arguments as strings, null and undefined by name
+    let text = (args) => args.map(a => a === null ? 'null' : a === undefined ? 'undefined' : String(a)).join(' ')
+    let consoleOf = { log: (...a) => lines.push(text(a)), info(){}, debug(){}, warn(){}, error: (...a) => lines.push('ERROR ' + text(a)) }
     let app = compileQml({ 'Main.qml': fs.readFileSync(file, 'utf8') }, { allowWarnings: true })
     let { context, dispose } = load(app, { console: consoleOf })
     let start = Date.now()
