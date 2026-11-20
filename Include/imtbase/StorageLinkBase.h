@@ -18,6 +18,7 @@
 namespace iser
 {
 	class IArchive;
+	class CArchiveTag;
 }
 
 
@@ -59,6 +60,12 @@ public:
 		Set the link target. The loaded object will be dropped.
 	*/
 	void SetLink(const Id& objectId, const QByteArray& storageId = QByteArray());
+
+	/**
+		Set the ID of the linked object and keep the logical storage ID. The loaded object will be dropped.
+		It is used for links whose storage is a property of the data model field, set once in the constructor.
+	*/
+	void SetObjectId(const Id& objectId);
 
 	/**
 		Returns \c true, if the link doesn't point to any object.
@@ -117,6 +124,13 @@ public:
 	bool Remove();
 
 	bool Serialize(iser::IArchive& archive);
+
+	/**
+		Serialize only the object ID as a single leaf under the given tag.
+		The archive gets the same data as a plain ID field written under this tag, so a data model can replace such a field with a link without changing its stored format.
+		The logical storage ID is not written: it is a property of the data model field and stays as it was set in the constructor.
+	*/
+	bool SerializeObjectId(iser::IArchive& archive, const iser::CArchiveTag& tag);
 
 	bool operator==(const StorageLinkBase& other) const;
 	bool operator!=(const StorageLinkBase& other) const;

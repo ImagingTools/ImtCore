@@ -6,10 +6,23 @@ namespace imtbase
 {
 
 
+CCollectionStorageResolver::CCollectionStorageResolver()
+	:m_collectionPtr(nullptr)
+{
+}
+
+
 CCollectionStorageResolver::CCollectionStorageResolver(IObjectCollection& collection, const QByteArray& typeId)
-	:m_collection(collection),
+	:m_collectionPtr(&collection),
 	m_typeId(typeId)
 {
+}
+
+
+void CCollectionStorageResolver::SetCollection(IObjectCollection* collectionPtr, const QByteArray& typeId)
+{
+	m_collectionPtr = collectionPtr;
+	m_typeId = typeId;
 }
 
 
@@ -17,8 +30,12 @@ CCollectionStorageResolver::CCollectionStorageResolver(IObjectCollection& collec
 
 istd::IChangeableSharedPtr CCollectionStorageResolver::LoadObject(const Id& objectId) const
 {
+	if (m_collectionPtr == nullptr){
+		return istd::IChangeableSharedPtr();
+	}
+
 	IObjectCollection::DataPtr dataPtr;
-	if (m_collection.GetObjectData(objectId, dataPtr) && dataPtr.IsValid()){
+	if (m_collectionPtr->GetObjectData(objectId, dataPtr) && dataPtr.IsValid()){
 		return dataPtr;
 	}
 
@@ -28,23 +45,31 @@ istd::IChangeableSharedPtr CCollectionStorageResolver::LoadObject(const Id& obje
 
 bool CCollectionStorageResolver::SaveObject(const Id& objectId, const istd::IChangeable& object)
 {
-	return m_collection.SetObjectData(objectId, object);
+	if (m_collectionPtr == nullptr){
+		return false;
+	}
+
+	return m_collectionPtr->SetObjectData(objectId, object);
 }
 
 
 IStorageResolver::Id CCollectionStorageResolver::InsertObject(const istd::IChangeableSharedPtr& objectPtr, const QString& name)
 {
-	if (!objectPtr.IsValid()){
+	if ((m_collectionPtr == nullptr) || !objectPtr.IsValid()){
 		return Id();
 	}
 
-	return m_collection.InsertNewObject(m_typeId, name, QString(), objectPtr.GetPtr());
+	return m_collectionPtr->InsertNewObject(m_typeId, name, QString(), objectPtr.GetPtr());
 }
 
 
 bool CCollectionStorageResolver::RemoveObject(const Id& objectId)
 {
-	return m_collection.RemoveElements(IObjectCollection::Ids() << objectId);
+	if (m_collectionPtr == nullptr){
+		return false;
+	}
+
+	return m_collectionPtr->RemoveElements(IObjectCollection::Ids() << objectId);
 }
 
 
@@ -53,8 +78,11 @@ QVariantMap CCollectionStorageResolver::GetStorageParams(const Id& objectId) con
 	QVariantMap params;
 	params["storage"] = "collection";
 	params["objectId"] = objectId;
-	params["typeId"] = m_collection.GetObjectTypeId(objectId);
-	params["name"] = m_collection.GetElementInfo(objectId, IObjectCollection::EIT_NAME);
+
+	if (m_collectionPtr != nullptr){
+		params["typeId"] = m_collectionPtr->GetObjectTypeId(objectId);
+		params["name"] = m_collectionPtr->GetElementInfo(objectId, IObjectCollection::EIT_NAME);
+	}
 
 	return params;
 }

@@ -21,11 +21,19 @@ namespace imtbase
 class CCollectionStorageResolver: virtual public IStorageResolver
 {
 public:
+	CCollectionStorageResolver();
+
 	/**
 		\param collection	The collection used as the storage. It must outlive the resolver.
 		\param typeId		Type-ID of the objects to be created in the collection by InsertObject.
 	*/
 	CCollectionStorageResolver(IObjectCollection& collection, const QByteArray& typeId);
+
+	/**
+		Set the collection used as the storage. The collection must outlive the resolver.
+		Without a collection the resolver finds no objects.
+	*/
+	void SetCollection(IObjectCollection* collectionPtr, const QByteArray& typeId);
 
 	// reimplemented (imtbase::IStorageResolver)
 	virtual istd::IChangeableSharedPtr LoadObject(const Id& objectId) const override;
@@ -36,7 +44,7 @@ public:
 	virtual bool IsSnapshotStorage() const override;
 
 private:
-	IObjectCollection& m_collection;
+	IObjectCollection* m_collectionPtr;
 	QByteArray m_typeId;
 };
 
