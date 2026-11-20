@@ -154,7 +154,7 @@ ViewBase {
 					radius: Style.radiusL
 					color: Style.baseColor
 					border.width: 1
-					border.color: Style.imaginToolsAccentColor
+					border.color: Style.imagingToolsAccentColor
 
 					Row {
 						id: currentOrgRow
@@ -178,7 +178,7 @@ ViewBase {
 							width: 8
 							height: 8
 							radius: 4
-							color: Style.imaginToolsAccentColor
+							color: Style.imagingToolsAccentColor
 							anchors.verticalCenter: parent.verticalCenter
 						}
 
@@ -271,7 +271,7 @@ ViewBase {
 										width: acceptLabel.contentWidth + 2 * Style.marginL
 										height: Style.controlHeightS
 										radius: Style.radiusM
-										color: Style.imaginToolsAccentColor
+										color: Style.imagingToolsAccentColor
 										opacity: acceptMA.containsMouse ? 0.8 : 1
 
 										Text {
@@ -406,7 +406,7 @@ ViewBase {
 									width: switchLabel.contentWidth + 2 * Style.marginL
 									height: Style.controlHeightS
 									radius: Style.radiusM
-									color: Style.imaginToolsAccentColor
+									color: Style.imagingToolsAccentColor
 									opacity: switchMA.containsMouse ? 0.8 : 1
 
 									Text {

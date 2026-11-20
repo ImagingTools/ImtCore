@@ -5958,7 +5958,7 @@
 - `colorMenuPanel: string`
 - `errorColor: string`
 - `errorTextColor: string`
-- `imaginToolsAccentColor: string`
+- `imagingToolsAccentColor: string`
 - `positiveAccentColor: string`
 - `negativeAccentColor: string`
 - `middleAccentColor: string`

@@ -718,6 +718,58 @@ void CCollectionDocumentServiceIntegrationTest::SaveDocumentValidationFailWithMe
 }
 
 
+void CCollectionDocumentServiceIntegrationTest::SaveDocumentValidatorGetsLanguageTest()
+{
+	AddCollectionObject(TEST_OBJECT_ID, VALIDATED_TYPE_ID, TEST_DOC_NAME, QStringLiteral("original"));
+
+	QByteArray docId = OpenDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, TEST_OBJECT_ID);
+	QVERIFY(!docId.isEmpty());
+
+	iprm::CTextParam invalidData;
+	invalidData.SetText(INVALID_TEXT);
+	QCOMPARE(m_servicePtr->SetDocumentData(TEST_USER_ID, docId, invalidData), imtdoc::IDocumentService::OS_OK);
+
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.documentId = docId;
+	params.languageId = QByteArrayLiteral("ru_RU");
+
+	QByteArray taskId = m_servicePtr->BeginDocumentTask(imtdoc::IDocumentService::TT_SAVE, params);
+	imtdoc::IDocumentService::TaskResult result = m_servicePtr->WaitForTaskFinished(taskId);
+	QCOMPARE(result.status, imtdoc::IDocumentService::OS_INVALID_DOCUMENT_DATA);
+
+	// The language of the caller and the object of the document both reach the validator
+	QCOMPARE(result.errorMessage, VALIDATION_ERROR_MESSAGE + QStringLiteral(" [ru_RU|%1]").arg(QString::fromUtf8(TEST_OBJECT_ID)));
+}
+
+
+void CCollectionDocumentServiceIntegrationTest::SaveNewDocumentValidatorGetsLanguageTest()
+{
+	const int objectsCount = m_collectionPtr->GetElementsCount();
+
+	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, VALIDATED_TYPE_ID);
+	QVERIFY(!docId.isEmpty());
+
+	iprm::CTextParam invalidData;
+	invalidData.SetText(INVALID_TEXT);
+	QCOMPARE(m_servicePtr->SetDocumentData(TEST_USER_ID, docId, invalidData), imtdoc::IDocumentService::OS_OK);
+
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.documentId = docId;
+	params.documentName = TEST_DOC_NAME;
+	params.languageId = QByteArrayLiteral("de_DE");
+
+	QByteArray taskId = m_servicePtr->BeginDocumentTask(imtdoc::IDocumentService::TT_SAVE, params);
+	imtdoc::IDocumentService::TaskResult result = m_servicePtr->WaitForTaskFinished(taskId);
+	QCOMPARE(result.status, imtdoc::IDocumentService::OS_INVALID_DOCUMENT_DATA);
+
+	// A new document has no source parameters, the language still reaches the validator
+	QCOMPARE(result.errorMessage, VALIDATION_ERROR_MESSAGE + QStringLiteral(" [de_DE|]"));
+	QCOMPARE(m_collectionPtr->GetElementsCount(), objectsCount);
+}
+
+
 void CCollectionDocumentServiceIntegrationTest::SaveDocumentWithNameProviderTest()
 {
 	QByteArray docId = CreateDocumentAndWaitForLoad(*m_servicePtr, TEST_USER_ID, VALIDATED_TYPE_ID);

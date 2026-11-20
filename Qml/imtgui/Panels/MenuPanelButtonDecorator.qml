@@ -107,7 +107,7 @@ DecoratorBase {
 		height: width;
 		radius: width / 2;
 		visible: leftPanelElement.collapsed && leftPanelElement.badge !== "";
-		color: Style.imaginToolsAccentColor;
+		color: Style.imagingToolsAccentColor;
 	}
 
 	Rectangle {
@@ -121,7 +121,7 @@ DecoratorBase {
 		width: Math.max(height, badgeText.width + Style.marginS);
 		radius: height / 2;
 		visible: !leftPanelElement.collapsed && leftPanelElement.badge !== "";
-		color: Style.imaginToolsAccentColor;
+		color: Style.imagingToolsAccentColor;
 
 		Text {
 			id: badgeText;

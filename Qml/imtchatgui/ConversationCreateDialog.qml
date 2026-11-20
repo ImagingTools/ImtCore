@@ -49,7 +49,7 @@ Rectangle {
 				text: qsTr("New Conversation")
 				font.pixelSize: Style.fontSizeL
 				font.bold: true
-				color: Style.imaginToolsAccentColor
+				color: Style.imagingToolsAccentColor
 			}
 
 			// Name field
@@ -68,7 +68,7 @@ Rectangle {
 					height: Style.controlHeightM
 					radius: Style.radiusS
 					color: Style.baseColor
-					border.color: nameField.activeFocus ? Style.imaginToolsAccentColor : Style.borderColor2
+					border.color: nameField.activeFocus ? Style.imagingToolsAccentColor : Style.borderColor2
 
 					TextInput {
 						id: nameField
@@ -132,7 +132,7 @@ Rectangle {
 						anchors.centerIn: parent
 						text: qsTr("Cancel")
 						font.pixelSize: Style.fontSizeS
-						color: Style.imaginToolsAccentColor
+						color: Style.imagingToolsAccentColor
 					}
 
 					MouseArea {
@@ -147,7 +147,7 @@ Rectangle {
 					width: createText.width + Style.paddingL * 2
 					height: Style.buttonHeightM
 					radius: Style.radiusS
-					color: Style.imaginToolsAccentColor
+					color: Style.imagingToolsAccentColor
 					opacity: nameField.text.trim().length > 0 ? 1 : 0.5
 
 					Text {

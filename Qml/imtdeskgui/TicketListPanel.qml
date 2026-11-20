@@ -36,7 +36,7 @@ Rectangle {
 					text: qsTr("Tickets")
 					font.pixelSize: Style.fontSizeM
 					font.bold: true
-					color: Style.imaginToolsAccentColor
+					color: Style.imagingToolsAccentColor
 					width: parent.width - newTicketBtn.width
 					anchors.verticalCenter: parent.verticalCenter
 				}
@@ -52,7 +52,7 @@ Rectangle {
 						anchors.centerIn: parent
 						text: "+"
 						font.pixelSize: Style.fontSizeL
-						color: Style.imaginToolsAccentColor
+						color: Style.imagingToolsAccentColor
 					}
 
 					MouseArea {
@@ -86,7 +86,7 @@ Rectangle {
 						anchors.bottom: parent.bottom
 						width: parent.width
 						height: 2
-						color: Style.imaginToolsAccentColor
+						color: Style.imagingToolsAccentColor
 						visible: ticketListPanelRoot.statusFilter === modelData.value
 					}
 
@@ -95,7 +95,7 @@ Rectangle {
 						text: modelData.label
 						font.pixelSize: Style.fontSizeXS
 						color: ticketListPanelRoot.statusFilter === modelData.value
-							? Style.imaginToolsAccentColor
+							? Style.imagingToolsAccentColor
 							: Style.buttonInactiveTextColor
 						font.bold: ticketListPanelRoot.statusFilter === modelData.value
 					}
@@ -161,7 +161,7 @@ Rectangle {
 							text: model.title || ""
 							font.pixelSize: Style.fontSizeS
 							font.bold: true
-							color: Style.imaginToolsAccentColor
+							color: Style.imagingToolsAccentColor
 							elide: Text.ElideRight
 							width: parent.width - priorityBadge.width - Style.paddingS * 4 - 30
 							anchors.verticalCenter: parent.verticalCenter

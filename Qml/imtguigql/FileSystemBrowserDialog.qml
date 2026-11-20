@@ -1659,7 +1659,7 @@ Dialog {
 					anchors.verticalCenter: parent.verticalCenter
 					radius: width / 2
 					color: root.errorText !== "" ? Style.errorColor
-						: (root.isLoading ? Style.highlightColor : Style.imaginToolsAccentColor)
+						: (root.isLoading ? Style.highlightColor : Style.imagingToolsAccentColor)
 				}
 
 				Text {

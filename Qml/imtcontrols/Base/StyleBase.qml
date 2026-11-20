@@ -302,7 +302,9 @@ StyleComponents {
 	property string errorTextColor: "#d1242f";
 
 		//accent
-	property string imaginToolsAccentColor: "#005fb8"
+	property string imagingToolsAccentColor: "#005fb8"
+	// Legacy misspelled name, kept so that consumer projects keep working
+	property alias imaginToolsAccentColor: styleContainer.imagingToolsAccentColor
 	property string positiveAccentColor: styleContainer.successColor;
 	property string negativeAccentColor: styleContainer.dangerColor;
 	property string middleAccentColor: styleContainer.attentionColor;
@@ -386,9 +388,9 @@ StyleComponents {
 	property string buttonPressedColor: "#c4c4c4";
 	// Hover behind icon-only buttons on toolbars and tab strips (VS Code toolbar.hoverBackground).
 	property string toolButtonHoverColor: "#50b8b8b8";
-	property string buttonAccentColor: imaginToolsAccentColor;
+	property string buttonAccentColor: imagingToolsAccentColor;
 	property string buttonInactiveColor: "#ebebeb";
-	property string buttonBorderFocusColor: imaginToolsAccentColor;
+	property string buttonBorderFocusColor: imagingToolsAccentColor;
 	property string buttonBorderInactiveColor: "#1a000000";
 	property string buttonTextColor: "#3b3b3b";
 	property string buttonInactiveTextColor: "#9e9e9e";
@@ -410,7 +412,7 @@ StyleComponents {
 	property string buttonDangerTextColor: "#ffffff";
 
 		//focus ring drawn outside the control border
-	property string focusRingColor: imaginToolsAccentColor;
+	property string focusRingColor: imagingToolsAccentColor;
 	property int focusRingWidth: 1;
 
 		//text inputs, combo boxes, check boxes
@@ -492,25 +494,35 @@ StyleComponents {
 		return styleContainer.getIconPath(iconName, state, mode, extention);
 	}
 
-	function getThemeColor(colorType, colorKey, themeType){
-		if (themeType.containsKey("Style")){
-			let styleModel = themeType.getData("Style");
-			if (styleModel.containsKey(colorType)){
-				let typeModel = styleModel.getData(colorType);
-				if (typeModel.containsKey(colorKey)){
-					let colorPalette = typeModel.getData(colorKey);
+	// Returns defaultValue when the theme does not define the color, so a stale theme file keeps the declared defaults
+	function getThemeColor(colorType, colorKey, themeType, defaultValue){
+		let retVal = defaultValue !== undefined ? defaultValue : "";
 
-					if (themeType.containsKey("ColorPalette")){
-						let themeModel = themeType.getData("ColorPalette")
-						if (themeModel.containsKey(colorPalette)){
-							return themeModel.getData(colorPalette)
-						}
-					}
-				}
-			}
+		if (!themeType.containsKey("Style")){
+			return retVal;
 		}
 
-		return "";
+		let styleModel = themeType.getData("Style");
+		if (!styleModel.containsKey(colorType)){
+			return retVal;
+		}
+
+		let typeModel = styleModel.getData(colorType);
+		if (!typeModel.containsKey(colorKey)){
+			return retVal;
+		}
+
+		if (!themeType.containsKey("ColorPalette")){
+			return retVal;
+		}
+
+		let colorPalette = typeModel.getData(colorKey);
+		let themeModel = themeType.getData("ColorPalette");
+		if (!themeModel.containsKey(colorPalette)){
+			return retVal;
+		}
+
+		return themeModel.getData(colorPalette);
 	}
 
 	function setDecorators(sourceDecorators){
@@ -690,27 +702,27 @@ StyleComponents {
 				}
 			}
 
-			styleContainer.borderColor = styleContainer.getThemeColor("ActiveColors", "BorderColor", dataSource);
-			styleContainer.baseColor = styleContainer.getThemeColor("ActiveColors", "Base", dataSource);
-			styleContainer.alternateBaseColor = styleContainer.getThemeColor("ActiveColors", "AlternateBase", dataSource);
-			styleContainer.backgroundColor = styleContainer.getThemeColor("ActiveColors", "Background", dataSource);
-			styleContainer.backgroundColor2 = styleContainer.getThemeColor("ActiveColors", "Background2", dataSource);
+			styleContainer.borderColor = styleContainer.getThemeColor("ActiveColors", "BorderColor", dataSource, styleContainer.borderColor);
+			styleContainer.baseColor = styleContainer.getThemeColor("ActiveColors", "Base", dataSource, styleContainer.baseColor);
+			styleContainer.alternateBaseColor = styleContainer.getThemeColor("ActiveColors", "AlternateBase", dataSource, styleContainer.alternateBaseColor);
+			styleContainer.backgroundColor = styleContainer.getThemeColor("ActiveColors", "Background", dataSource, styleContainer.backgroundColor);
+			styleContainer.backgroundColor2 = styleContainer.getThemeColor("ActiveColors", "Background2", dataSource, styleContainer.backgroundColor2);
 
-			styleContainer.textColor = styleContainer.getThemeColor("ActiveColors", "Text", dataSource);
-			styleContainer.textSelectedColor = styleContainer.getThemeColor("ActiveColors", "TextSelectedBackground", dataSource);
-			styleContainer.shadowColor = styleContainer.getThemeColor("ActiveColors", "Shadow", dataSource);
+			styleContainer.textColor = styleContainer.getThemeColor("ActiveColors", "Text", dataSource, styleContainer.textColor);
+			styleContainer.textSelectedColor = styleContainer.getThemeColor("ActiveColors", "TextSelectedBackground", dataSource, styleContainer.textSelectedColor);
+			styleContainer.shadowColor = styleContainer.getThemeColor("ActiveColors", "Shadow", dataSource, styleContainer.shadowColor);
 
-			styleContainer.selectedColor = styleContainer.getThemeColor("ActiveColors", "ItemSelected", dataSource);
+			styleContainer.selectedColor = styleContainer.getThemeColor("ActiveColors", "ItemSelected", dataSource, styleContainer.selectedColor);
 
-			styleContainer.buttonColor = styleContainer.getThemeColor("ActiveColors", "Button", dataSource);
-			styleContainer.buttonBorderColor = styleContainer.getThemeColor("ActiveColors", "ButtonBorder", dataSource);
-			styleContainer.buttonInactiveColor = styleContainer.getThemeColor("InactiveColors", "Button", dataSource);
-			styleContainer.buttonBorderInactiveColor = styleContainer.getThemeColor("InactiveColors", "ButtonBorder", dataSource);
-			styleContainer.buttonTextColor = styleContainer.getThemeColor("ActiveColors", "ButtonText", dataSource);
-			styleContainer.buttonInactiveTextColor = styleContainer.getThemeColor("InactiveColors", "ButtonText", dataSource);
-			styleContainer.highlightedTextColor = styleContainer.getThemeColor("ActiveColors", "HighlightedText", dataSource);
+			styleContainer.buttonColor = styleContainer.getThemeColor("ActiveColors", "Button", dataSource, styleContainer.buttonColor);
+			styleContainer.buttonBorderColor = styleContainer.getThemeColor("ActiveColors", "ButtonBorder", dataSource, styleContainer.buttonBorderColor);
+			styleContainer.buttonInactiveColor = styleContainer.getThemeColor("InactiveColors", "Button", dataSource, styleContainer.buttonInactiveColor);
+			styleContainer.buttonBorderInactiveColor = styleContainer.getThemeColor("InactiveColors", "ButtonBorder", dataSource, styleContainer.buttonBorderInactiveColor);
+			styleContainer.buttonTextColor = styleContainer.getThemeColor("ActiveColors", "ButtonText", dataSource, styleContainer.buttonTextColor);
+			styleContainer.buttonInactiveTextColor = styleContainer.getThemeColor("InactiveColors", "ButtonText", dataSource, styleContainer.buttonInactiveTextColor);
+			styleContainer.highlightedTextColor = styleContainer.getThemeColor("ActiveColors", "HighlightedText", dataSource, styleContainer.highlightedTextColor);
 
-			styleContainer.inactiveTextColor = styleContainer.getThemeColor("InactiveColors", "Text", dataSource);
+			styleContainer.inactiveTextColor = styleContainer.getThemeColor("InactiveColors", "Text", dataSource, styleContainer.inactiveTextColor);
 
 			// Disabled state: InactiveColors holds the muted text color, not the disabled one
 			let textDisabledColor = styleContainer.getThemeColor("ActiveColors", "TextDisabled", dataSource);
@@ -729,9 +741,9 @@ StyleComponents {
 				styleContainer.buttonBorderInactiveColor = buttonBorderDisabledColor;
 			}
 
-			styleContainer.buttonHoverColor = styleContainer.getThemeColor("ActiveColors", "Midlight", dataSource);
-			styleContainer.buttonPressedColor = styleContainer.getThemeColor("ActiveColors", "Mid", dataSource);
-			styleContainer.hover = styleContainer.getThemeColor("ActiveColors", "Midlight", dataSource);
+			styleContainer.buttonHoverColor = styleContainer.getThemeColor("ActiveColors", "Midlight", dataSource, styleContainer.buttonHoverColor);
+			styleContainer.buttonPressedColor = styleContainer.getThemeColor("ActiveColors", "Mid", dataSource, styleContainer.buttonPressedColor);
+			styleContainer.hover = styleContainer.getThemeColor("ActiveColors", "Midlight", dataSource, styleContainer.hover);
 
 			let itemHoverColor = styleContainer.getThemeColor("ActiveColors", "ItemHover", dataSource);
 			if (itemHoverColor !== ""){
@@ -754,72 +766,83 @@ StyleComponents {
 			styleContainer.imagingToolsGradient4 = dataSource.getData("ColorPalette").getData("ImagingToolsGradient4");
 			styleContainer.greenColor = dataSource.getData("ColorPalette").getData("Green");
 
-			styleContainer.iconColorOnSelected = styleContainer.getThemeColor("ActiveColors", "Highlight", dataSource);
+			styleContainer.iconColorOnSelected = styleContainer.getThemeColor("ActiveColors", "Highlight", dataSource, styleContainer.iconColorOnSelected);
 
-			styleContainer.tabSelectedColor = styleContainer.getThemeColor("ActiveColors", "TabSelected", dataSource);
+			styleContainer.tabSelectedColor = styleContainer.getThemeColor("ActiveColors", "TabSelected", dataSource, styleContainer.tabSelectedColor);
 
 			let tabBackgroundColor = styleContainer.getThemeColor("ActiveColors", "TabBackground", dataSource);
 			if (tabBackgroundColor !== ""){
 				styleContainer.tabPanelBackgroundColor = tabBackgroundColor;
 			}
-			styleContainer.errorTextColor = styleContainer.getThemeColor("ActiveColors", "ErrorText", dataSource);
+			styleContainer.errorTextColor = styleContainer.getThemeColor("ActiveColors", "ErrorText", dataSource, styleContainer.errorTextColor);
 
-			styleContainer.popupErrorBackgroundColor = styleContainer.getThemeColor("ActiveColors", "PopupErrorBackground", dataSource);
-			styleContainer.popupWarningBackgroundColor = styleContainer.getThemeColor("ActiveColors", "PopupWarningBackground", dataSource);
-			styleContainer.popupSuccessBackgroundColor = styleContainer.getThemeColor("ActiveColors", "PopupSuccessBackground", dataSource);
-			styleContainer.popupInfoBackgroundColor = styleContainer.getThemeColor("ActiveColors", "PopupInfoBackground", dataSource);
+			styleContainer.popupErrorBackgroundColor = styleContainer.getThemeColor("ActiveColors", "PopupErrorBackground", dataSource, styleContainer.popupErrorBackgroundColor);
+			styleContainer.popupWarningBackgroundColor = styleContainer.getThemeColor("ActiveColors", "PopupWarningBackground", dataSource, styleContainer.popupWarningBackgroundColor);
+			styleContainer.popupSuccessBackgroundColor = styleContainer.getThemeColor("ActiveColors", "PopupSuccessBackground", dataSource, styleContainer.popupSuccessBackgroundColor);
+			styleContainer.popupInfoBackgroundColor = styleContainer.getThemeColor("ActiveColors", "PopupInfoBackground", dataSource, styleContainer.popupInfoBackgroundColor);
 
-			styleContainer.successColor = styleContainer.getThemeColor("ActiveColors", "Success", dataSource);
-			styleContainer.successSubtleColor = styleContainer.getThemeColor("ActiveColors", "SuccessSubtle", dataSource);
-			styleContainer.attentionColor = styleContainer.getThemeColor("ActiveColors", "Attention", dataSource);
-			styleContainer.attentionSubtleColor = styleContainer.getThemeColor("ActiveColors", "AttentionSubtle", dataSource);
-			styleContainer.dangerColor = styleContainer.getThemeColor("ActiveColors", "Danger", dataSource);
-			styleContainer.dangerSubtleColor = styleContainer.getThemeColor("ActiveColors", "DangerSubtle", dataSource);
-			styleContainer.doneColor = styleContainer.getThemeColor("ActiveColors", "Done", dataSource);
-			styleContainer.doneSubtleColor = styleContainer.getThemeColor("ActiveColors", "DoneSubtle", dataSource);
-			styleContainer.severeColor = styleContainer.getThemeColor("ActiveColors", "Severe", dataSource);
-			styleContainer.neutralEmphasisColor = styleContainer.getThemeColor("ActiveColors", "NeutralEmphasis", dataSource);
-			styleContainer.neutralSubtleColor = styleContainer.getThemeColor("ActiveColors", "NeutralSubtle", dataSource);
+			styleContainer.successColor = styleContainer.getThemeColor("ActiveColors", "Success", dataSource, styleContainer.successColor);
+			styleContainer.successSubtleColor = styleContainer.getThemeColor("ActiveColors", "SuccessSubtle", dataSource, styleContainer.successSubtleColor);
+			styleContainer.attentionColor = styleContainer.getThemeColor("ActiveColors", "Attention", dataSource, styleContainer.attentionColor);
+			styleContainer.attentionSubtleColor = styleContainer.getThemeColor("ActiveColors", "AttentionSubtle", dataSource, styleContainer.attentionSubtleColor);
+			styleContainer.dangerColor = styleContainer.getThemeColor("ActiveColors", "Danger", dataSource, styleContainer.dangerColor);
+			styleContainer.dangerSubtleColor = styleContainer.getThemeColor("ActiveColors", "DangerSubtle", dataSource, styleContainer.dangerSubtleColor);
+			styleContainer.doneColor = styleContainer.getThemeColor("ActiveColors", "Done", dataSource, styleContainer.doneColor);
+			styleContainer.doneSubtleColor = styleContainer.getThemeColor("ActiveColors", "DoneSubtle", dataSource, styleContainer.doneSubtleColor);
+			styleContainer.severeColor = styleContainer.getThemeColor("ActiveColors", "Severe", dataSource, styleContainer.severeColor);
+			styleContainer.neutralEmphasisColor = styleContainer.getThemeColor("ActiveColors", "NeutralEmphasis", dataSource, styleContainer.neutralEmphasisColor);
+			styleContainer.neutralSubtleColor = styleContainer.getThemeColor("ActiveColors", "NeutralSubtle", dataSource, styleContainer.neutralSubtleColor);
 
-			styleContainer.linkColor = styleContainer.getThemeColor("ActiveColors", "Link", dataSource);
-			styleContainer.lightBlueColor = styleContainer.getThemeColor("ActiveColors", "BlueLabel", dataSource);
-			styleContainer.titleColor = styleContainer.getThemeColor("ActiveColors", "Text", dataSource);
-			styleContainer.subtitleColor = styleContainer.getThemeColor("InactiveColors", "Text", dataSource);
-			styleContainer.placeHolderTextColor = styleContainer.getThemeColor("InactiveColors", "Text", dataSource);
-			styleContainer.menuPanelBackgroundColor = styleContainer.getThemeColor("ActiveColors", "MenuPanelBackground", dataSource);
-			styleContainer.menuPanelItemSelectedColor = styleContainer.getThemeColor("ActiveColors", "MenuPanelItemSelected", dataSource);
-			styleContainer.menuPanelItemHoverColor = styleContainer.getThemeColor("ActiveColors", "MenuPanelItemHover", dataSource);
-			styleContainer.topPanelBackgroundColor = styleContainer.getThemeColor("ActiveColors", "TopPanelBackground", dataSource);
-			styleContainer.topPanelBorderColor = styleContainer.getThemeColor("ActiveColors", "TopPanelBorder", dataSource);
-			styleContainer.overlayBackgroundColor = styleContainer.getThemeColor("ActiveColors", "OverlayBackground", dataSource);
-			styleContainer.dialogBackgroundColor = styleContainer.getThemeColor("ActiveColors", "DialogBackground", dataSource);
-			styleContainer.borderColor2 = styleContainer.getThemeColor("ActiveColors", "ScrollIndicator", dataSource);
+			styleContainer.linkColor = styleContainer.getThemeColor("ActiveColors", "Link", dataSource, styleContainer.linkColor);
+			styleContainer.lightBlueColor = styleContainer.getThemeColor("ActiveColors", "BlueLabel", dataSource, styleContainer.lightBlueColor);
+			styleContainer.titleColor = styleContainer.getThemeColor("ActiveColors", "Text", dataSource, styleContainer.titleColor);
+			styleContainer.subtitleColor = styleContainer.getThemeColor("InactiveColors", "Text", dataSource, styleContainer.subtitleColor);
+			styleContainer.placeHolderTextColor = styleContainer.getThemeColor("InactiveColors", "Text", dataSource, styleContainer.placeHolderTextColor);
 
-			styleContainer.tableHeaderColor = styleContainer.getThemeColor("ActiveColors", "HeaderSection", dataSource);
-			styleContainer.tableHeaderBorederColor = styleContainer.getThemeColor("ActiveColors", "HeaderBorder", dataSource);
-			styleContainer.tableHeaderFontColor = styleContainer.getThemeColor("InactiveColors", "Text", dataSource);
-			styleContainer.tableCellColor = styleContainer.getThemeColor("ActiveColors", "Base", dataSource);
-			styleContainer.tableCellBorderColor = styleContainer.getThemeColor("ActiveColors", "BorderColor", dataSource);
-			styleContainer.tableCellFontColor = styleContainer.getThemeColor("ActiveColors", "Text", dataSource);
+			// Themes may define a dedicated placeholder color, otherwise it follows the inactive text color
+			styleContainer.placeHolderTextColor = styleContainer.getThemeColor("ActiveColors", "PlaceholderText", dataSource, styleContainer.placeHolderTextColor);
 
-			styleContainer.buttonPrimaryColor = styleContainer.getThemeColor("ActiveColors", "ButtonPrimary", dataSource);
-			styleContainer.buttonPrimaryHoverColor = styleContainer.getThemeColor("ActiveColors", "ButtonPrimaryHover", dataSource);
-			styleContainer.buttonPrimaryPressedColor = styleContainer.getThemeColor("ActiveColors", "ButtonPrimaryPressed", dataSource);
-			styleContainer.buttonPrimaryBorderColor = styleContainer.getThemeColor("ActiveColors", "ButtonPrimary", dataSource);
-			styleContainer.buttonPrimaryTextColor = styleContainer.getThemeColor("ActiveColors", "HighlightedText", dataSource);
-			styleContainer.buttonDangerColor = styleContainer.getThemeColor("ActiveColors", "ButtonDanger", dataSource);
-			styleContainer.buttonDangerHoverColor = styleContainer.getThemeColor("ActiveColors", "ButtonDangerHover", dataSource);
-			styleContainer.buttonDangerPressedColor = styleContainer.getThemeColor("ActiveColors", "ButtonDangerPressed", dataSource);
-			styleContainer.buttonDangerBorderColor = styleContainer.getThemeColor("ActiveColors", "ButtonDanger", dataSource);
-			styleContainer.buttonDangerTextColor = styleContainer.getThemeColor("ActiveColors", "HighlightedText", dataSource);
-			styleContainer.focusRingColor = styleContainer.getThemeColor("ActiveColors", "Highlight", dataSource);
+			styleContainer.menuPanelBackgroundColor = styleContainer.getThemeColor("ActiveColors", "MenuPanelBackground", dataSource, styleContainer.menuPanelBackgroundColor);
+			styleContainer.menuPanelItemSelectedColor = styleContainer.getThemeColor("ActiveColors", "MenuPanelItemSelected", dataSource, styleContainer.menuPanelItemSelectedColor);
+			styleContainer.menuPanelItemHoverColor = styleContainer.getThemeColor("ActiveColors", "MenuPanelItemHover", dataSource, styleContainer.menuPanelItemHoverColor);
+			styleContainer.topPanelBackgroundColor = styleContainer.getThemeColor("ActiveColors", "TopPanelBackground", dataSource, styleContainer.topPanelBackgroundColor);
+			styleContainer.topPanelBorderColor = styleContainer.getThemeColor("ActiveColors", "TopPanelBorder", dataSource, styleContainer.topPanelBorderColor);
+			styleContainer.overlayBackgroundColor = styleContainer.getThemeColor("ActiveColors", "OverlayBackground", dataSource, styleContainer.overlayBackgroundColor);
+			styleContainer.dialogBackgroundColor = styleContainer.getThemeColor("ActiveColors", "DialogBackground", dataSource, styleContainer.dialogBackgroundColor);
+			styleContainer.borderColor2 = styleContainer.getThemeColor("ActiveColors", "ScrollIndicator", dataSource, styleContainer.borderColor2);
+
+			styleContainer.tableHeaderColor = styleContainer.getThemeColor("ActiveColors", "HeaderSection", dataSource, styleContainer.tableHeaderColor);
+			styleContainer.tableHeaderBorederColor = styleContainer.getThemeColor("ActiveColors", "HeaderBorder", dataSource, styleContainer.tableHeaderBorederColor);
+			styleContainer.tableHeaderFontColor = styleContainer.getThemeColor("InactiveColors", "Text", dataSource, styleContainer.tableHeaderFontColor);
+			styleContainer.tableCellColor = styleContainer.getThemeColor("ActiveColors", "Base", dataSource, styleContainer.tableCellColor);
+			styleContainer.tableCellBorderColor = styleContainer.getThemeColor("ActiveColors", "BorderColor", dataSource, styleContainer.tableCellBorderColor);
+			styleContainer.tableCellFontColor = styleContainer.getThemeColor("ActiveColors", "Text", dataSource, styleContainer.tableCellFontColor);
+
+			styleContainer.buttonPrimaryColor = styleContainer.getThemeColor("ActiveColors", "ButtonPrimary", dataSource, styleContainer.buttonPrimaryColor);
+			styleContainer.buttonPrimaryHoverColor = styleContainer.getThemeColor("ActiveColors", "ButtonPrimaryHover", dataSource, styleContainer.buttonPrimaryHoverColor);
+			styleContainer.buttonPrimaryPressedColor = styleContainer.getThemeColor("ActiveColors", "ButtonPrimaryPressed", dataSource, styleContainer.buttonPrimaryPressedColor);
+			styleContainer.buttonPrimaryBorderColor = styleContainer.getThemeColor("ActiveColors", "ButtonPrimary", dataSource, styleContainer.buttonPrimaryBorderColor);
+			styleContainer.buttonPrimaryTextColor = styleContainer.getThemeColor("ActiveColors", "HighlightedText", dataSource, styleContainer.buttonPrimaryTextColor);
+			styleContainer.buttonDangerColor = styleContainer.getThemeColor("ActiveColors", "ButtonDanger", dataSource, styleContainer.buttonDangerColor);
+			styleContainer.buttonDangerHoverColor = styleContainer.getThemeColor("ActiveColors", "ButtonDangerHover", dataSource, styleContainer.buttonDangerHoverColor);
+			styleContainer.buttonDangerPressedColor = styleContainer.getThemeColor("ActiveColors", "ButtonDangerPressed", dataSource, styleContainer.buttonDangerPressedColor);
+			styleContainer.buttonDangerBorderColor = styleContainer.getThemeColor("ActiveColors", "ButtonDanger", dataSource, styleContainer.buttonDangerBorderColor);
+			styleContainer.buttonDangerTextColor = styleContainer.getThemeColor("ActiveColors", "HighlightedText", dataSource, styleContainer.buttonDangerTextColor);
+			styleContainer.focusRingColor = styleContainer.getThemeColor("ActiveColors", "Highlight", dataSource, styleContainer.focusRingColor);
 
 			let focusRingThemeColor = styleContainer.getThemeColor("ActiveColors", "FocusRing", dataSource);
 			if (focusRingThemeColor !== ""){
 				styleContainer.focusRingColor = focusRingThemeColor;
 			}
 
-			styleContainer.imaginToolsAccentColor = dataSource.getData("ColorPalette").getData("ImaginTools Accent");
+			// "ImaginTools Accent" is the legacy misspelled palette key, still used by themes of consumer projects
+			let colorPalette = dataSource.getData("ColorPalette");
+			if (colorPalette.containsKey("ImagingTools Accent")){
+				styleContainer.imagingToolsAccentColor = colorPalette.getData("ImagingTools Accent");
+			}
+			else if (colorPalette.containsKey("ImaginTools Accent")){
+				styleContainer.imagingToolsAccentColor = colorPalette.getData("ImaginTools Accent");
+			}
 
 			styleContainer.themeApplied();
 		}

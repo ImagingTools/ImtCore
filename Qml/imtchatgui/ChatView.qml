@@ -40,7 +40,7 @@ Rectangle {
 					width: Style.controlHeightL
 					height: Style.controlHeightL
 					radius: Style.controlHeightL / 2
-					color: Style.imaginToolsAccentColor
+					color: Style.imagingToolsAccentColor
 					anchors.verticalCenter: parent.verticalCenter
 
 					Text {
@@ -56,7 +56,7 @@ Rectangle {
 					text: chatViewContainer.conversationName
 					font.pixelSize: Style.fontSizeM
 					font.bold: true
-					color: Style.imaginToolsAccentColor
+					color: Style.imagingToolsAccentColor
 					anchors.verticalCenter: parent.verticalCenter
 				}
 			}

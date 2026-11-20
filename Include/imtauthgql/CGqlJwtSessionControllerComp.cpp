@@ -224,7 +224,7 @@ sdl::V1_0::imtauth::CValidateSessionPayload CGqlJwtSessionControllerComp::OnVali
 	QByteArray sessionId;
 	sdl::V1_0::imtauth::ValidateSessionRequestArguments arguments = validateSessionRequest.GetRequestedArguments();
 	if (!arguments.input.has_value()){
-		Q_ASSERT(false);
+		errorMessage = QStringLiteral("The input is required");
 		return response;
 	}
 
@@ -250,7 +250,7 @@ sdl::V1_0::imtauth::CValidateSessionPayload CGqlJwtSessionControllerComp::OnVali
 sdl::V1_0::imtauth::CValidateJwtPayload CGqlJwtSessionControllerComp::OnValidateJwt(
 	const sdl::V1_0::imtauth::CValidateJwtGqlRequest& validateJwtRequest,
 	const ::imtgql::CGqlRequest& /*gqlRequest*/,
-	QString& /*errorMessage*/) const
+	QString& errorMessage) const
 {
 	sdl::V1_0::imtauth::CValidateJwtPayload response;
 
@@ -262,7 +262,7 @@ sdl::V1_0::imtauth::CValidateJwtPayload CGqlJwtSessionControllerComp::OnValidate
 	QString jwt;
 	sdl::V1_0::imtauth::ValidateJwtRequestArguments arguments = validateJwtRequest.GetRequestedArguments();
 	if (!arguments.input.has_value()){
-		Q_ASSERT(false);
+		errorMessage = QStringLiteral("The input is required");
 		return response;
 	}
 
@@ -303,7 +303,7 @@ sdl::V1_0::imtauth::CGetSessionPayload CGqlJwtSessionControllerComp::OnGetSessio
 
 	sdl::V1_0::imtauth::GetSessionRequestArguments arguments = getSessionRequest.GetRequestedArguments();
 	if (!arguments.input.has_value()){
-		Q_ASSERT(false);
+		errorMessage = QStringLiteral("The input is required");
 
 		return response;
 	}
@@ -354,7 +354,7 @@ sdl::V1_0::imtauth::CGetSessionPayload CGqlJwtSessionControllerComp::OnGetSessio
 sdl::V1_0::imtauth::CRefreshTokenPayload CGqlJwtSessionControllerComp::OnRefreshToken(
 	const sdl::V1_0::imtauth::CRefreshTokenGqlRequest& refreshTokenRequest,
 	const ::imtgql::CGqlRequest& gqlRequest,
-	QString& /*errorMessage*/) const
+	QString& errorMessage) const
 {
 	sdl::V1_0::imtauth::CRefreshTokenPayload response;
 
@@ -366,7 +366,7 @@ sdl::V1_0::imtauth::CRefreshTokenPayload CGqlJwtSessionControllerComp::OnRefresh
 	QByteArray refreshToken;
 	sdl::V1_0::imtauth::RefreshTokenRequestArguments arguments = refreshTokenRequest.GetRequestedArguments();
 	if (!arguments.input.has_value()){
-		Q_ASSERT(false);
+		errorMessage = QStringLiteral("The input is required");
 		return response;
 	}
 
@@ -400,7 +400,7 @@ sdl::V1_0::imtauth::CRefreshTokenPayload CGqlJwtSessionControllerComp::OnRefresh
 sdl::V1_0::imtauth::CCreateNewSessionPayload CGqlJwtSessionControllerComp::OnCreateNewSession(
 	const sdl::V1_0::imtauth::CCreateNewSessionGqlRequest& createNewSessionRequest,
 	const ::imtgql::CGqlRequest& gqlRequest,
-	QString& /*errorMessage*/) const
+	QString& errorMessage) const
 {
 	sdl::V1_0::imtauth::CCreateNewSessionPayload response;
 
@@ -413,7 +413,7 @@ sdl::V1_0::imtauth::CCreateNewSessionPayload CGqlJwtSessionControllerComp::OnCre
 	QByteArray tenantId;
 	sdl::V1_0::imtauth::CreateNewSessionRequestArguments arguments = createNewSessionRequest.GetRequestedArguments();
 	if (!arguments.input.has_value()){
-		Q_ASSERT(false);
+		errorMessage = QStringLiteral("The input is required");
 		return response;
 	}
 
@@ -470,7 +470,7 @@ sdl::V1_0::imtauth::CCreateNewSessionPayload CGqlJwtSessionControllerComp::OnCre
 sdl::V1_0::imtauth::CSelectTenantPayload CGqlJwtSessionControllerComp::OnSelectTenant(
 	const sdl::V1_0::imtauth::CSelectTenantGqlRequest& selectTenantRequest,
 	const ::imtgql::CGqlRequest& gqlRequest,
-	QString& /*errorMessage*/) const
+	QString& errorMessage) const
 {
 	sdl::V1_0::imtauth::CSelectTenantPayload response;
 
@@ -489,7 +489,7 @@ sdl::V1_0::imtauth::CSelectTenantPayload CGqlJwtSessionControllerComp::OnSelectT
 	QByteArray tenantId;
 	sdl::V1_0::imtauth::SelectTenantRequestArguments arguments = selectTenantRequest.GetRequestedArguments();
 	if (!arguments.input.has_value()){
-		Q_ASSERT(false);
+		errorMessage = QStringLiteral("The input is required");
 		return response;
 	}
 	if (arguments.input->tenantId){
@@ -541,7 +541,7 @@ sdl::V1_0::imtauth::CSelectTenantPayload CGqlJwtSessionControllerComp::OnSelectT
 sdl::V1_0::imtauth::CRemoveSessionPayload CGqlJwtSessionControllerComp::OnRemoveSession(
 	const sdl::V1_0::imtauth::CRemoveSessionGqlRequest& removeSessionRequest,
 	const ::imtgql::CGqlRequest& gqlRequest,
-	QString& /*errorMessage*/) const
+	QString& errorMessage) const
 {
 	sdl::V1_0::imtauth::CRemoveSessionPayload response;
 
@@ -553,7 +553,7 @@ sdl::V1_0::imtauth::CRemoveSessionPayload CGqlJwtSessionControllerComp::OnRemove
 	QByteArray sessionId;
 	sdl::V1_0::imtauth::RemoveSessionRequestArguments arguments = removeSessionRequest.GetRequestedArguments();
 	if (!arguments.input.has_value()){
-		Q_ASSERT(false);
+		errorMessage = QStringLiteral("The input is required");
 		return response;
 	}
 	if (arguments.input->sessionId){
@@ -576,7 +576,7 @@ sdl::V1_0::imtauth::CRemoveSessionPayload CGqlJwtSessionControllerComp::OnRemove
 sdl::V1_0::imtauth::CGetUserFromJwtPayload CGqlJwtSessionControllerComp::OnGetUserFromJwt(
 	const sdl::V1_0::imtauth::CGetUserFromJwtGqlRequest& getUserFromJwtRequest,
 	const ::imtgql::CGqlRequest& /*gqlRequest*/,
-	QString& /*errorMessage*/) const
+	QString& errorMessage) const
 {
 	sdl::V1_0::imtauth::CGetUserFromJwtPayload response;
 
@@ -588,7 +588,7 @@ sdl::V1_0::imtauth::CGetUserFromJwtPayload CGqlJwtSessionControllerComp::OnGetUs
 	QString jwt;
 	sdl::V1_0::imtauth::GetUserFromJwtRequestArguments arguments = getUserFromJwtRequest.GetRequestedArguments();
 	if (!arguments.input.has_value()){
-		Q_ASSERT(false);
+		errorMessage = QStringLiteral("The input is required");
 		return response;
 	}
 	if (arguments.input->jwt){
@@ -604,7 +604,7 @@ sdl::V1_0::imtauth::CGetUserFromJwtPayload CGqlJwtSessionControllerComp::OnGetUs
 sdl::V1_0::imtauth::CGetTenantFromJwtPayload CGqlJwtSessionControllerComp::OnGetTenantFromJwt(
 	const sdl::V1_0::imtauth::CGetTenantFromJwtGqlRequest& getTenantFromJwtRequest,
 	const ::imtgql::CGqlRequest& /*gqlRequest*/,
-	QString& /*errorMessage*/) const
+	QString& errorMessage) const
 {
 	sdl::V1_0::imtauth::CGetTenantFromJwtPayload response;
 
@@ -616,7 +616,7 @@ sdl::V1_0::imtauth::CGetTenantFromJwtPayload CGqlJwtSessionControllerComp::OnGet
 	QString jwt;
 	sdl::V1_0::imtauth::GetTenantFromJwtRequestArguments arguments = getTenantFromJwtRequest.GetRequestedArguments();
 	if (!arguments.input.has_value()){
-		Q_ASSERT(false);
+		errorMessage = QStringLiteral("The input is required");
 		return response;
 	}
 	if (arguments.input->jwt){

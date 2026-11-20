@@ -128,6 +128,7 @@ public:
 		QByteArray documentId;
 		QString documentName;
 		const imtbase::IOperationContext* operationContextPtr = nullptr; ///< Optional operation context for tenant/owner propagation during save.
+		QByteArray languageId; ///< Optional. Language of the caller, the validators answer in it (TT_SAVE).
 		const istd::IChangeable* defaultDataPtr = nullptr;
 		const iprm::IParamsSet* initParamsPtr = nullptr; ///< Optional initialization parameters passed to the init delegate (TT_NEW only).
 		bool singleDocumentInstance = false; ///< Optional. For \c TT_OPEN, when \c true the document is opened in single-instance mode: opening a second instance of an already-open document is forbidden. For \c TT_NEW, when \c true the newly created document is marked as single-instance so that it cannot be opened again elsewhere. Defaults to \c false.

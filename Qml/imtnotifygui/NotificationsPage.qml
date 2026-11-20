@@ -164,7 +164,6 @@ RemoteCollectionView {
 
 			collectionView: notificationsPage
 			removeDialogTitle: qsTr("Removing notifications")
-			removeMessage: qsTr("Remove the selected notifications?")
 
 			function updateStateCustomCommands(selection, commandsController, elementsModel){
 				var hasUnread = false
@@ -235,7 +234,7 @@ RemoteCollectionView {
 				height: width
 				radius: width / 2
 
-				color: Style.imaginToolsAccentColor
+				color: Style.imagingToolsAccentColor
 			}
 
 			Image {

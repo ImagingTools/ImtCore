@@ -32,6 +32,7 @@ private slots:
 	void ParseComplexTest();
 	void ParseQueryWithVariables();
 	void ParseQueryWithOperationName();
+	void ParseQueryWithLeadingWhitespace();
 	void ParseStartPatchMeasurement();
 	void ParseStartPatchMeasurementComplex();
 	void TestVariableObjectList();

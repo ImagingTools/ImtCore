@@ -21,6 +21,7 @@ const BLOCK = 8;
 const READONLY = 16;
 const DEFAULT = 32;
 const RETURN_BLOCK = 64;
+const REQUIRED = 128;
 
 function fail(what, key) {
 	throw new Error(`The packed format of documents does not know '${key}' of ${what}: add it to src/packed.js`);
@@ -36,7 +37,7 @@ function flag(value, key, what) {
 }
 
 const OBJECT_KEYS = ['type', 'id', 'propertyName', 'properties', 'functions', 'signalDefs', 'imports', 'enums', 'children', 'line', 'col', 'modules', 'onProperty', 'inList'];
-const PROPERTY_KEYS = ['name', 'isDeclaration', 'isAlias', 'isHandler', 'isBlock', 'text', 'line', 'col', 'typeName', 'isReadonly', 'isDefault', 'isReturnBlock'];
+const PROPERTY_KEYS = ['name', 'isDeclaration', 'isAlias', 'isHandler', 'isBlock', 'text', 'line', 'col', 'typeName', 'isReadonly', 'isDefault', 'isRequired', 'isReturnBlock'];
 
 function packProperty(prop, script) {
 	expectKeys(prop, PROPERTY_KEYS, 'a property');
@@ -54,9 +55,12 @@ function packProperty(prop, script) {
 	if (prop.isDeclaration) {
 		if (flag(prop.isReadonly, 'isReadonly', 'a property')) flags |= READONLY;
 		if (flag(prop.isDefault, 'isDefault', 'a property')) flags |= DEFAULT;
+		if (flag(prop.isRequired, 'isRequired', 'a property')) flags |= REQUIRED;
 		return [prop.name, flags, text, prop.line, prop.col, prop.typeName];
 	}
-	if (prop.typeName !== undefined || prop.isReadonly !== undefined || prop.isDefault !== undefined) throw new Error('a property that is not a declaration has the fields of one');
+	if (prop.typeName !== undefined || prop.isReadonly !== undefined || prop.isDefault !== undefined || prop.isRequired !== undefined) {
+		throw new Error('a property that is not a declaration has the fields of one');
+	}
 	return [prop.name, flags, text, prop.line, prop.col];
 }
 
@@ -76,6 +80,7 @@ function unpackProperty(p) {
 		prop.typeName = p[5];
 		prop.isReadonly = (flags & READONLY) !== 0;
 		prop.isDefault = (flags & DEFAULT) !== 0;
+		prop.isRequired = (flags & REQUIRED) !== 0;
 	}
 	if ((flags & RETURN_BLOCK) !== 0) prop.isReturnBlock = true;
 	return prop;

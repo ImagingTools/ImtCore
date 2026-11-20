@@ -94,9 +94,14 @@ export class Renderer {
 		this.drawCalls = 0;
 		this.vertexCount = 0;
 
-		const atlas = fonts.ensureAtlas();
-		if (atlas !== null) {
-			this.page = atlas.pages[0];
+		// The draws that are queued only refer to the pages: they are sent before a page is emptied for new glyphs.
+		// The atlas is a singleton, so the renderer is in its `beforeReset` only while it has queued geometry
+		// (from reserve() until submit() or beginFrame()); otherwise the atlas would keep every renderer alive.
+		this.atlas = fonts.ensureAtlas();
+		this.atlasHooked = false;
+		this.onAtlasReset = () => this.submit();
+		if (this.atlas !== null) {
+			this.page = this.atlas.pages[0];
 			this.whiteUv = 2 / this.page.size;
 		}
 
@@ -186,6 +191,7 @@ export class Renderer {
 		this.ni = 0;
 		this.segStart = 0;
 		this.cmds.length = 0;
+		this.unhookAtlas();
 		this.stencilLevel = 0;
 		this.clipX0 = 0;
 		this.clipY0 = 0;
@@ -268,6 +274,14 @@ export class Renderer {
 		this.nv = 0;
 		this.ni = 0;
 		this.segStart = 0;
+		this.unhookAtlas();
+	}
+
+	// Removes the renderer from the atlas' `beforeReset`: nothing that refers to the pages is queued.
+	unhookAtlas() {
+		if (!this.atlasHooked) return;
+		this.atlas.beforeReset.delete(this.onAtlasReset);
+		this.atlasHooked = false;
 	}
 
 	// Binds the texture of a page, creating it and uploading the canvas when needed.
@@ -345,7 +359,13 @@ export class Renderer {
 
 	reserve(vertices, indices) {
 		if (this.nv + vertices > MAX_VERTICES || this.ni + indices > this.indices.length) this.submit();
-		return vertices <= MAX_VERTICES && indices <= this.indices.length;
+		if (vertices > MAX_VERTICES || indices > this.indices.length) return false;
+		// Geometry is about to be queued: an atlas reset has to submit it first (see the constructor).
+		if (!this.atlasHooked && this.atlas !== null) {
+			this.atlas.beforeReset.add(this.onAtlasReset);
+			this.atlasHooked = true;
+		}
+		return true;
 	}
 
 	vertex(x, y, u, v, color) {

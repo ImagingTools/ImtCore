@@ -35,7 +35,7 @@ Rectangle {
 					text: qsTr("Chats")
 					font.pixelSize: Style.fontSizeM
 					font.bold: true
-					color: Style.imaginToolsAccentColor
+					color: Style.imagingToolsAccentColor
 					anchors.verticalCenter: parent.verticalCenter
 					width: parent.width - newConvButton.width
 				}
@@ -51,7 +51,7 @@ Rectangle {
 						anchors.centerIn: parent
 						text: "+"
 						font.pixelSize: Style.fontSizeL
-						color: Style.imaginToolsAccentColor
+						color: Style.imagingToolsAccentColor
 					}
 
 					MouseArea {
@@ -107,7 +107,7 @@ Rectangle {
 						width: Style.controlHeightL
 						height: Style.controlHeightL
 						radius: Style.controlHeightL / 2
-						color: Style.imaginToolsAccentColor
+						color: Style.imagingToolsAccentColor
 						anchors.verticalCenter: parent.verticalCenter
 
 						Text {
@@ -127,7 +127,7 @@ Rectangle {
 							text: model.name || ""
 							font.pixelSize: Style.fontSizeS
 							font.bold: true
-							color: Style.imaginToolsAccentColor
+							color: Style.imagingToolsAccentColor
 							elide: Text.ElideRight
 							width: parent.width
 						}
@@ -151,7 +151,7 @@ Rectangle {
 					width: Style.sizeHintL
 					height: Style.sizeHintL
 					radius: height / 2
-					color: Style.imaginToolsAccentColor
+					color: Style.imagingToolsAccentColor
 
 					Text {
 						id: unreadText
