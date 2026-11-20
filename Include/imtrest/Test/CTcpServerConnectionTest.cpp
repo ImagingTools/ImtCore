@@ -17,7 +17,10 @@
 
 // ACF includes
 #include <icomp/CComponentBase.h>
+#include <icomp/TModelCompWrap.h>
 #include <icomp/TSimComponentWrap.h>
+#include <iser/CMemoryReadArchive.h>
+#include <iser/CMemoryWriteArchive.h>
 
 // ImtCore includes
 #include <imtcom/CServerConnectionInterfaceParamComp.h>
@@ -194,7 +197,8 @@ private:
 typedef icomp::TSimSharedComponentPtr<CHoldingServletComp> Servlet;
 typedef icomp::TSimSharedComponentPtr<CSlowBodyPolicyComp> SlowBodyPolicy;
 typedef icomp::TSimSharedComponentPtr<imtrest::CHttpProtocolEngineComp> Engine;
-typedef icomp::TSimSharedComponentPtr<imtcom::CServerConnectionInterfaceParamComp> Connection;
+// A model, as the package of the component makes it: the server follows the changes of its port
+typedef icomp::TSimSharedComponentPtr<icomp::TModelCompWrap<imtcom::CServerConnectionInterfaceParamComp>> Connection;
 typedef icomp::TSimComponentWrap<imtrest::CTcpServerComp> TcpServer;
 
 
@@ -676,6 +680,87 @@ void CTcpServerConnectionTest::QueuedConnectionsAreServedTest()
 
 	const QStringList messages = warnings.GetMessages();
 	QVERIFY2(messages.isEmpty(), qPrintable(messages.join(QStringLiteral("; "))));
+}
+
+
+// A new HTTP port of the connection interface moves the running server: the old port is closed, a request on the new one is handled
+// once (the server object is the same, its connection to the handler is not doubled)
+void CTcpServerConnectionTest::PortChangeMovesServerTest()
+{
+	SServer server(2);
+	QVERIFY(server.IsListening());
+	const int firstPort = server.port;
+
+	const int secondPort = FindFreePort();
+	QVERIFY(secondPort != 0 && secondPort != firstPort);
+	server.connection->SetPort(imtcom::IServerConnectionInterface::PT_HTTP, secondPort);
+
+	const imtrest::IServer* serverPtr = &server.server;
+	QCOMPARE(serverPtr->GetServerStatus(), imtrest::IServer::SS_LISTENING);
+
+	CClient oldClient;
+	QVERIFY(!oldClient.Connect(firstPort));
+
+	CClient client;
+	QVERIFY(client.Connect(secondPort));
+	client.SendGet("/moved");
+	QTRY_COMPARE_WITH_TIMEOUT(server.servlet->GetHeld().size(), 1, 5000);
+	QTest::qWait(300);
+	QCOMPARE(server.servlet->GetHeld().size(), 1);
+
+	QCOMPARE(server.RespondToHeld(), 1);
+	QTRY_COMPARE_WITH_TIMEOUT(client.GetResponseCount(), 1, 5000);
+	client.Disconnect();
+}
+
+
+// The settings are loaded again (a file of the settings changed): the loaded port moves the server as a set one does
+void CTcpServerConnectionTest::LoadedPortMovesServerTest()
+{
+	SServer server(2);
+	QVERIFY(server.IsListening());
+
+	const int newPort = FindFreePort();
+	QVERIFY(newPort != 0 && newPort != server.port);
+	imtcom::CServerConnectionInterfaceParam loaded;
+	loaded.RegisterProtocol(imtcom::IServerConnectionInterface::PT_HTTP);
+	loaded.SetPort(imtcom::IServerConnectionInterface::PT_HTTP, newPort);
+
+	iser::CMemoryWriteArchive writeArchive;
+	QVERIFY(loaded.Serialize(writeArchive));
+	iser::CMemoryReadArchive readArchive(writeArchive);
+	QVERIFY(server.connection->Serialize(readArchive));
+
+	CClient client;
+	QVERIFY(client.Connect(newPort));
+	client.SendGet("/loaded");
+	QTRY_COMPARE_WITH_TIMEOUT(server.servlet->GetHeld().size(), 1, 5000);
+	QCOMPARE(server.RespondToHeld(), 1);
+	QTRY_COMPARE_WITH_TIMEOUT(client.GetResponseCount(), 1, 5000);
+	client.Disconnect();
+}
+
+
+// A port that another program listens on cannot be taken: the server stays on its port and goes on working
+void CTcpServerConnectionTest::BusyPortKeepsServerTest()
+{
+	SServer server(2);
+	QVERIFY(server.IsListening());
+
+	QTcpServer otherProgram;
+	QVERIFY(otherProgram.listen(QHostAddress::Any, 0));
+
+	QTest::ignoreMessage(QtDebugMsg, QRegularExpression(QStringLiteral("Tcp server could not be started on port")));
+	server.connection->SetPort(imtcom::IServerConnectionInterface::PT_HTTP, otherProgram.serverPort());
+
+	CClient client;
+	QVERIFY(client.Connect(server.port));
+	client.SendGet("/stays");
+	QTRY_COMPARE_WITH_TIMEOUT(server.servlet->GetHeld().size(), 1, 5000);
+
+	QCOMPARE(server.RespondToHeld(), 1);
+	QTRY_COMPARE_WITH_TIMEOUT(client.GetResponseCount(), 1, 5000);
+	client.Disconnect();
 }
 
 
