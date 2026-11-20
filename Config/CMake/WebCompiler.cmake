@@ -493,6 +493,7 @@ function(jq_compile_web)
 		-r ${dataroot}
 		-e ${startqml}
 		-m js
+		${_jqml_minify_args}
 		DEPENDS ${DEPEND_LIST} ${_jqml_runtime} ${sdldependency}
 		COMMENT "WEB COMPILER for ${PROJECT_NAME}"
 		VERBATIM
