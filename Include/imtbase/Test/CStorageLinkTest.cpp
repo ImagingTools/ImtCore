@@ -4,6 +4,7 @@
 
 // std includes
 #include <algorithm>
+#include <memory>
 #include <optional>
 
 // Qt includes
@@ -12,6 +13,9 @@
 
 // ACF includes
 #include <istd/TSingleFactory.h>
+#include <icomp/TMakeComponentWrap.h>
+#include <icomp/TSimComponentWrap.h>
+#include <iser/CArchiveTag.h>
 #include <iser/CMemoryReadArchive.h>
 #include <iser/CMemoryWriteArchive.h>
 #include <itest/CStandardTestExecutor.h>
@@ -21,6 +25,7 @@
 #include <imtbase/CMemoryStorageResolver.h>
 #include <imtbase/CCollectionStorageResolver.h>
 #include <imtbase/CStorageResolverRegistry.h>
+#include <imtbase/CStorageResolverRegistryComp.h>
 #include <imtbase/StorageLink.h>
 
 
@@ -71,6 +76,8 @@ class COtherTestData: public istd::IChangeable
 
 typedef imtbase::StorageLink<CLinkTestData> DataLink;
 typedef istd::TSingleFactory<istd::IChangeable, CLinkTestData> DataFactory;
+using MemoryResolverComp	= icomp::TMakeComponentWrap<imtbase::CMemoryStorageResolver, imtbase::IStorageResolver>;
+using RegistryComp			= icomp::TSimComponentWrap<imtbase::CStorageResolverRegistryComp>;
 
 const QByteArray s_typeId = "LinkTestData";
 
@@ -453,6 +460,106 @@ void CStorageLinkTest::testOptionalInterface()
 	QVERIFY(second.IsNull());
 	QVERIFY(!second);
 	QCOMPARE(storage.GetObjectsCount(), 1);
+}
+
+
+void CStorageLinkTest::testStorageIdKept()
+{
+	imtbase::CMemoryStorageResolver storage;
+	imtbase::CStorageResolverRegistry registry;
+	registry.RegisterResolver(&storage, QByteArrayLiteral("images"));
+
+	const QByteArray firstId = storage.InsertObject(CreateData(1));
+	const QByteArray secondId = storage.InsertObject(CreateData(2));
+
+	DataLink link(firstId, QByteArrayLiteral("images"));
+	link.SetResolverProvider(&registry);
+	QCOMPARE(link->m_value, 1);
+
+	// A new object ID keeps the storage ID and drops the loaded object
+	link.SetObjectId(secondId);
+	QVERIFY(!link.IsLoaded());
+	QCOMPARE(link.GetStorageId(), QByteArrayLiteral("images"));
+	QCOMPARE(link->m_value, 2);
+
+	// Clearing the link keeps the storage ID, so the link does not fall back to the default storage
+	link.reset();
+	QVERIFY(link.IsNull());
+	QCOMPARE(link.GetStorageId(), QByteArrayLiteral("images"));
+
+	link.SetObjectId(firstId);
+	link = std::nullopt;
+	QCOMPARE(link.GetStorageId(), QByteArrayLiteral("images"));
+}
+
+
+void CStorageLinkTest::testSerializeObjectId()
+{
+	imtbase::CMemoryStorageResolver storage;
+	const QByteArray objectId = storage.InsertObject(CreateData(7));
+
+	const iser::CArchiveTag tag("AddressId", "Address Id", iser::CArchiveTag::TT_LEAF);
+
+	DataLink source(objectId, QByteArrayLiteral("images"));
+	iser::CMemoryWriteArchive linkArchive;
+	QVERIFY(source.SerializeObjectId(linkArchive, tag));
+
+	QByteArray plainId = objectId;
+	iser::CMemoryWriteArchive plainArchive;
+	QVERIFY(plainArchive.BeginTag(tag));
+	QVERIFY(plainArchive.Process(plainId));
+	QVERIFY(plainArchive.EndTag(tag));
+
+	// The link writes exactly what a plain ID field writes under the same tag
+	const QByteArray linkData(static_cast<const char*>(linkArchive.GetBuffer()), linkArchive.GetBufferSize());
+	const QByteArray plainData(static_cast<const char*>(plainArchive.GetBuffer()), plainArchive.GetBufferSize());
+	QCOMPARE(linkData, plainData);
+
+	// Data of a plain ID field is read into a link, which keeps its own storage ID
+	DataLink restored(QByteArray(), QByteArrayLiteral("images"));
+	iser::CMemoryReadArchive readArchive(plainArchive);
+	QVERIFY(restored.SerializeObjectId(readArchive, tag));
+	QCOMPARE(restored.GetObjectId(), objectId);
+	QCOMPARE(restored.GetStorageId(), QByteArrayLiteral("images"));
+
+	imtbase::CStorageResolverRegistry registry;
+	registry.RegisterResolver(&storage, QByteArrayLiteral("images"));
+	restored.SetResolverProvider(&registry);
+	QCOMPARE(restored->m_value, 7);
+}
+
+
+void CStorageLinkTest::testRegistryComponent()
+{
+	icomp::TSimSharedComponentPtr<MemoryResolverComp> imagesStoragePtr;
+	imagesStoragePtr->InitComponent();
+
+	icomp::TSimSharedComponentPtr<MemoryResolverComp> defaultStoragePtr;
+	defaultStoragePtr->InitComponent();
+
+	const QByteArray objectId = imagesStoragePtr->InsertObject(CreateData(3));
+
+	std::unique_ptr<RegistryComp> registryPtr(new RegistryComp);
+	registryPtr->InsertMultiAttr("StorageIds", QByteArrayLiteral("images"));
+	registryPtr->InsertMultiRef("StorageResolvers", imagesStoragePtr);
+	registryPtr->InsertMultiAttr("StorageIds", QByteArray());
+	registryPtr->InsertMultiRef("StorageResolvers", defaultStoragePtr);
+	registryPtr->InitComponent();
+
+	// The created registry is the application-wide provider of the links
+	QVERIFY(imtbase::StorageLinkBase::GetDefaultResolverProvider() == registryPtr.get());
+
+	DataLink link(objectId, QByteArrayLiteral("images"));
+	QCOMPARE(link->m_value, 3);
+
+	DataLink defaultLink(objectId);
+	QVERIFY(defaultLink.GetResolver() == &*defaultStoragePtr);
+	QVERIFY(!defaultLink.GetObject().IsValid());
+
+	// The destroyed registry is not the provider anymore
+	registryPtr.reset();
+	QVERIFY(imtbase::StorageLinkBase::GetDefaultResolverProvider() == nullptr);
+	QVERIFY(link.GetResolver() == nullptr);
 }
 
 

@@ -89,7 +89,7 @@ public:
 
 	/**
 		Clear the link target and drop the loaded object. The stored object remains untouched.
-		The resolver binding of the link is kept.
+		The logical storage ID and the resolver binding of the link are kept.
 	*/
 	void reset();
 
@@ -189,7 +189,7 @@ T StorageLink<T>::value_or(U&& defaultValue) const
 template <class T>
 void StorageLink<T>::reset()
 {
-	SetLink(Id());
+	SetObjectId(Id());
 }
 
 
