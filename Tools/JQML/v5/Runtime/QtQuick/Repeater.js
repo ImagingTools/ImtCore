@@ -68,9 +68,12 @@ class Repeater extends Item {
     // Children order (and DOM order) of the parent: Repeater, delegate 0, delegate 1, ...
     $placeAfter(item, index){
         let siblings = this.$parent.$children
+        let anchor = index === 0 ? this : this.$items[index - 1]
+        // a delegate made at the end, right after the one before it: already in its place (children and DOM)
+        let last = siblings.length - 1
+        if(siblings[last] === item && siblings[last - 1] === anchor) return
         let from = siblings.indexOf(item)
         if(from >= 0) siblings.splice(from, 1)
-        let anchor = index === 0 ? this : this.$items[index - 1]
         let to = siblings.indexOf(anchor) + 1
         siblings.splice(to, 0, item)
         if(item.$dom && this.$parent.$dom){
