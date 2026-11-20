@@ -39,8 +39,9 @@ Item {
 		id: localizationEvent;
 
 		onLocalizationChanged: {
+			// The pages that are not received yet are requested by whoever shows the application, in this language
 			let loggedUserId = AuthorizationController.getLoggedUserId();
-			if (loggedUserId !== ""){
+			if (loggedUserId !== "" && pagesProvider.pagesReceived){
 
 				container.updateModel();
 			}

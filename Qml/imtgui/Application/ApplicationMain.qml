@@ -411,8 +411,17 @@ Item {
 		}
 	}
 
+	// The pages and the views behind them depend on the language of the user, which comes with the settings,
+	// so they are updated after the settings are applied, not beside them.
 	function updateAllModels(){
-		userSettingsController.getSettings()
+		userSettingsController.getSettings(function(){
+			thumbnailDecorator.updateModels();
+		})
+	}
+
+	function showApplication(){
+		thumbnailDecorator.drawingContainer.content = Style.drawingContainerDecorator;
+		thumbnailDecorator.showPage(undefined)
 		thumbnailDecorator.updateModels();
 	}
 
@@ -551,10 +560,7 @@ Item {
 		}
 
 		function onLoggedIn(){
-			thumbnailDecorator.drawingContainer.content = Style.drawingContainerDecorator;
-			thumbnailDecorator.showPage(undefined)
-
-			application.updateAllModels();
+			userSettingsController.getSettings(application.showApplication)
 		}
 
 		function onTenantSelected(tenantId){
