@@ -23,6 +23,7 @@ Item {
         width: 300; height: 200
         model: tm
         selectionModel: sm
+        alternatingRows: true
         delegate: TableViewDelegate {}
     }
     TreeView {
@@ -49,6 +50,14 @@ Item {
         sm.select(tm.index(1, 1), ItemSelectionModel.Select)
         sm.setCurrentIndex(tm.index(0, 1), ItemSelectionModel.NoUpdate)
         console.log("table selected " + cells(tv))
+        var looks = []
+        for (var r = 0; r < 2; ++r)
+            for (var c = 0; c < 2; ++c) {
+                var d = tv.itemAtCell(Qt.point(c, r))
+                looks.push(d.background.color + " " + d.background.border.width + " " + d.background.border.color + " " + d.contentItem.color
+                    + " " + d.leftPadding + "/" + d.topPadding + " " + (d.implicitHeight === d.contentItem.implicitHeight))
+            }
+        console.log("looks " + looks.join(" | "))
         trv.expand(0)
         trv.forceLayout()
         treeSm.setCurrentIndex(tree.index([0, 0], 0), ItemSelectionModel.NoUpdate)

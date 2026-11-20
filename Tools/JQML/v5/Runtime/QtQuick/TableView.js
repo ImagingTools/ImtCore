@@ -2485,6 +2485,59 @@ class TableView extends Flickable {
         if(this.$selectableCallback) this.$selectableCallback('cancel')
     }
 
+    // QQuickTableViewPrivate::normalizeSelection: the start cell to the left of and above the end cell, the selection
+    // the same (after a drag, the start and the end match the handles)
+    $normalizeSelection(){
+        let s = this.$selectionStartCell, e = this.$selectionEndCell
+        if(e.x < s.x){ let t = s.x; s.x = e.x; e.x = t }
+        if(e.y < s.y){ let t = s.y; s.y = e.y; e.y = t }
+    }
+
+    // QQuickTableViewPrivate::scrollTowardsPoint: the content scrolls a step towards a point outside the viewport; the
+    // distance of the point from the edge of the viewport, 0 when it is inside or the table ends there
+    $scrollTowardsPoint(pos, step){
+        let dist = { width: 0, height: 0 }
+        if(!this.$loadedItems.size) return dist
+        let vp = this.$viewportRect, outer = this.$outer
+        if(pos.x < vp.x){
+            let firstColumnLoaded = this.$atTableEnd(LEFT)
+            let remaining = vp.x - outer.x
+            if(remaining > 0 || !firstColumnLoaded){
+                let stepX = firstColumnLoaded ? Math.min(step.width, remaining) : step.width
+                this.contentX = this.$contentX() - stepX
+                dist.width = pos.x - vp.x - 1
+            }
+        } else if(pos.x >= vp.x + vp.width - 1){
+            let lastColumnLoaded = this.$atTableEnd(RIGHT)
+            let remaining = outer.x + outer.width - (vp.x + vp.width)
+            if(remaining > 0 || !lastColumnLoaded){
+                let stepX = lastColumnLoaded ? Math.min(step.width, remaining) : step.width
+                this.contentX = this.$contentX() + stepX
+                dist.width = pos.x - (vp.x + vp.width) - 1
+            }
+        }
+        if(pos.y < vp.y){
+            let firstRowLoaded = this.$atTableEnd(TOP)
+            let remaining = vp.y - outer.y
+            if(remaining > 0 || !firstRowLoaded){
+                let stepY = firstRowLoaded ? Math.min(step.height, remaining) : step.height
+                this.contentY = this.$contentY() - stepY
+                dist.height = pos.y - vp.y - 1
+            }
+        } else if(pos.y >= vp.y + vp.height - 1){
+            let lastRowLoaded = this.$atTableEnd(BOTTOM)
+            let remaining = outer.y + outer.height - (vp.y + vp.height)
+            if(remaining > 0 || !lastRowLoaded){
+                let stepY = lastRowLoaded ? Math.min(step.height, remaining) : step.height
+                this.contentY = this.$contentY() + stepY
+                dist.height = pos.y - (vp.y + vp.height) - 1
+            }
+        }
+        return dist
+    }
+
+    $hasSelection(){ return !!(this.$selectionModel && this.$selectionModel.hasSelection) }
+
     $clearSelection(){
         if(!this.$selectionModel) return
         this.$inSelectionModelUpdate = true
@@ -2908,7 +2961,7 @@ class TableView extends Flickable {
         return true
     }
 
-    $mousePress(x, y, button, modifiers){
+    $mousePress(x, y, button, buttons, modifiers){
         this.$positionXAnimation.stop()
         this.$positionYAnimation.stop()
         if(this.$startResize(x, y)) return true
@@ -2921,8 +2974,12 @@ class TableView extends Flickable {
             t.moved = false
             if(!this.$v[Flickable.INTERACTIVE]) this.$handleTap(x, y, t.modifiers)
         }
+        // the handlers of a SelectionRectangle on the content item (made after the tap handler of the view): its drag
+        // handler takes the drag instead of the flick
+        let control = this.$selectionControl
+        if(control && button === 1 && control.$pointerPress({ x: x + this.$contentX(), y: y + this.$contentY() }, modifiers || 0)) return true
         let flickTook = super.$mousePress(x, y, button)
-        return flickTook || (button === 1 && this.$v[TableView.POINTERNAVIGATIONENABLED])
+        return flickTook || (button === 1 && this.$v[TableView.POINTERNAVIGATIONENABLED]) || !!(control && control.$point)
     }
 
     $mouseMove(x, y, buttons){
@@ -2948,6 +3005,8 @@ class TableView extends Flickable {
         }
         let t = this.$tap
         if(t.pressed && (Math.abs(x - t.x) > DRAG_THRESHOLD || Math.abs(y - t.y) > DRAG_THRESHOLD)) t.moved = true
+        let control = this.$selectionControl
+        if(control && control.$point) control.$pointerMove({ x: x + this.$contentX(), y: y + this.$contentY() })
         super.$mouseMove(x, y, buttons)
     }
 
@@ -2962,11 +3021,14 @@ class TableView extends Flickable {
         }
         let t = this.$tap
         let moving = this.$isMoving()
+        let control = this.$selectionControl
+        let longPressed = !!(control && control.$longPressedNow())
         super.$mouseRelease(x, y)
         if(t.pressed){
             t.pressed = false
-            if(!t.moved && !moving && this.$v[Flickable.INTERACTIVE]) this.$tapAt(x, y, false)
+            if(!t.moved && !moving && !longPressed && this.$v[Flickable.INTERACTIVE]) this.$tapAt(x, y, false)
         }
+        if(control) control.$pointerRelease()
     }
 
     $ungrabMouse(){
@@ -2975,6 +3037,7 @@ class TableView extends Flickable {
             this.$updateCursor()
         }
         this.$tap.pressed = false
+        if(this.$selectionControl) this.$selectionControl.$cancelPointer()
         super.$ungrabMouse()
     }
 

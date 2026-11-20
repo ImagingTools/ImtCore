@@ -272,6 +272,7 @@ defineType(Item, {
         Drag: { group: null },      // set by Drag.js
         ListView: { group: null },  // set by ListView.js
         TableView: { group: null }, // set by TableView.js
+        SelectionRectangle: { group: null }, // set by Controls/SelectionRectangle.js
     },
     signals: ['childrenChanged'],
 })

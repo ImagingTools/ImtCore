@@ -41,6 +41,7 @@ const { TableView } = require('./QtQuick/TableView')
 const { TreeView } = require('./QtQuick/TreeView')
 const { HorizontalHeaderView, VerticalHeaderView, HeaderViewDelegate } = require('./QtQuick/Controls/HeaderView')
 const { TableViewDelegate, TreeViewDelegate } = require('./QtQuick/Controls/ViewDelegates')
+const { SelectionRectangle } = require('./QtQuick/Controls/SelectionRectangle')
 const { TreeModel } = require('./QtQml/Models/TreeModel')
 const { DelegateChooser, DelegateChoice } = require('./QtQml/Models/DelegateChooser')
 const { Shortcut, StandardKey } = require('./QtQuick/Shortcut')
@@ -361,7 +362,7 @@ const JQ = {
     types: {
         QtObject, Component, Timer, Connections, Binding, ListModel, Instantiator, ItemSelectionModel, TableModel, TableModelColumn, TreeModel,
         Item, Anchors, FocusScope, Keys, KeyNavigation, Rectangle, Border, Gradient, GradientStop, Text, Font, TextInput, TextEdit, Image, Canvas,
-        MouseArea, MouseDrag, DropArea, Drag, Flickable, Column, Row, Flow, Repeater, Loader, ListView, GridView, TableView, TreeView, HorizontalHeaderView, VerticalHeaderView, HeaderViewDelegate, TableViewDelegate, TreeViewDelegate, Shortcut, StandardKey,
+        MouseArea, MouseDrag, DropArea, Drag, Flickable, Column, Row, Flow, Repeater, Loader, ListView, GridView, TableView, TreeView, HorizontalHeaderView, VerticalHeaderView, HeaderViewDelegate, TableViewDelegate, TreeViewDelegate, SelectionRectangle, Shortcut, StandardKey,
         DelegateChooser, DelegateChoice,
         IntValidator, DoubleValidator, RegularExpressionValidator, RegExpValidator, FontLoader,
         State, PropertyChanges, StateChangeScript, Transition, StateGroup,

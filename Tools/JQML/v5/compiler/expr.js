@@ -143,15 +143,52 @@ function rewriteHandler(raw, kind, params, args, resolve, where){
     return ast.print_to_string(PRINT).replace(/;$/, '')
 }
 
-// `function name(args) { body }` -> function expression with a prologue
-function rewriteMethod(raw, prologue, resolve, where){
+// QtTest: wait(), tryCompare(), tryVerify() and SignalSpy.wait() block a test function in Qt while the events go on;
+// here they return promises. The calls of a method that wait: free calls of the names (the TestCase functions and its
+// methods that wait themselves) and calls of x.wait(), in the method itself (not in the functions it makes)
+function waitingCalls(fn, names){
+    let calls = []
+    fn.walk(new U.TreeWalker(function(node){
+        if(node !== fn && node instanceof U.AST_Lambda) return true
+        if(node instanceof U.AST_Call){
+            let callee = node.expression
+            if(callee instanceof U.AST_SymbolRef && names.has(callee.name) && (!callee.thedef || callee.thedef.undeclared)) calls.push(node)
+            else if(callee instanceof U.AST_Dot && callee.property === 'wait') calls.push(node)
+        }
+    }))
+    return calls
+}
+
+function methodAst(raw, where){
     let source = '(' + raw.replace(/^function\s+[\w$]+\s*\(/, 'function(') + '\n)'
-    let ast = parse(source, where)
+    return parse(source, where)
+}
+
+// does the method wait (waitingCalls)
+function methodWaits(raw, names, where){
+    let ast = methodAst(raw, where)
+    return waitingCalls(ast.body[0].body, names).length > 0
+}
+
+// `function name(args) { body }` -> function expression with a prologue; with waitNames, an async function that
+// awaits its waiting calls (when it has any)
+function rewriteMethod(raw, prologue, resolve, where, waitNames = null){
+    let ast = methodAst(raw, where)
     let fn = ast.body[0].body
+    let waits = waitNames ? new Set(waitingCalls(fn, waitNames)) : null
+    if(waits && waits.size){
+        ast = ast.transform(new U.TreeTransformer(null, function(node){
+            if(waits.has(node)) return new U.AST_Await({ start: node.start, end: node.end, expression: node })
+            return undefined
+        }))
+        fn = ast.body[0].body
+    }
     fn.body.unshift(U.parse(prologue).body[0])
     ast.figure_out_scope()
     ast = transformFree(ast, resolve, null)
-    return ast.print_to_string(PRINT).replace(/;$/, '')
+    let code = ast.print_to_string(PRINT).replace(/;$/, '')
+    if(waits && waits.size) code = code.replace(/^(\(?)function\(/, '$1async function(')
+    return code
 }
 
-module.exports = { rewriteValue, rewriteHandler, rewriteMethod, expressionText }
+module.exports = { rewriteValue, rewriteHandler, rewriteMethod, methodWaits, expressionText }

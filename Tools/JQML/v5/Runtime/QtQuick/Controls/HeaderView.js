@@ -216,8 +216,8 @@ class HeaderViewBase extends TableView {
 
     // QQuickTableViewSectionDragHandler: a section dragged onto another one moves there (movableColumns / movableRows)
     $movable(){ return false }
-    $mousePress(x, y, button, modifiers){
-        let took = super.$mousePress(x, y, button, modifiers)
+    $mousePress(x, y, button, buttons, modifiers){
+        let took = super.$mousePress(x, y, button, buttons, modifiers)
         if(this.$movable() && button === 1 && this.$resize.state === 'listening'){
             let cell = this.cellAtPosition({ x: x + this.$contentX(), y: y + this.$contentY() })
             let horizontal = this.$orientation() === QtEnums.Horizontal

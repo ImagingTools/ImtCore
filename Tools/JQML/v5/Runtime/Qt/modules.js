@@ -16,7 +16,7 @@ const QUICK = [
 ]
 const QUICK_UNCREATABLE = ['Keys', 'KeyNavigation', 'Animation', 'Easing', 'StandardKey']
 // QtQuick.Controls: the views of tables only (the project has controls of its own)
-const CONTROLS = ['HorizontalHeaderView', 'VerticalHeaderView', 'HeaderViewDelegate', 'TableViewDelegate', 'TreeViewDelegate']
+const CONTROLS = ['HorizontalHeaderView', 'VerticalHeaderView', 'HeaderViewDelegate', 'TableViewDelegate', 'TreeViewDelegate', 'SelectionRectangle']
 const LAYOUTS = ['RowLayout', 'ColumnLayout', 'GridLayout', 'StackLayout', 'LayoutItemProxy']
 
 const MODULES = {

@@ -4,7 +4,7 @@
 const JQ = require('../Runtime')
 const fs = require('fs')
 const path = require('path')
-const { rewriteValue, rewriteHandler, rewriteMethod, expressionText } = require('./expr')
+const { rewriteValue, rewriteHandler, rewriteMethod, methodWaits, expressionText } = require('./expr')
 const { emitScript, loadScript, isPure } = require('./scripts')
 const { checkFile } = require('./checks')
 const { inlineModel } = require('./model')
@@ -311,6 +311,17 @@ class Codegen {
         return !!(type && type.kind === 'builtin' && (type.Class === JQ.types.Component || type.Class.prototype instanceof JQ.types.Component))
     }
 
+    // the element is of the builtin type (or of a QML type built on it)
+    derivesFromBuiltin(el, typeName){
+        let Base = JQ.types[typeName]
+        if(!Base) return false
+        for(let typeRef = el.typeRef, depth = 0; typeRef && depth < 64; depth++){
+            if(typeRef.kind === 'builtin') return typeRef.Class === Base || typeRef.Class.prototype instanceof Base
+            typeRef = typeRef.file && typeRef.file.root && typeRef.file.root.typeRef
+        }
+        return false
+    }
+
     isComponentProperty(el, name){
         // a grouped or attached property: `TableView.editDelegate: Item {}` is a component of the attached object
         let dot = name.indexOf('.')
@@ -590,9 +601,24 @@ class Codegen {
             this.out.push(className + '.$qmlRequired=(' + base + '.$qmlRequired||[]).concat(' + JSON.stringify(required) + ');')
         }
 
+        // a TestCase: its methods that wait are async (methodWaits), and so are the methods that call them
+        let waitNames = null
+        if(this.derivesFromBuiltin(el, 'TestCase')){
+            waitNames = new Set(['wait', 'tryCompare', 'tryVerify', 'waitForRendering', 'waitForItemPolished'])
+            for(let grew = true; grew;){
+                grew = false
+                for(let m of el.methods){
+                    if(waitNames.has(m.name)) continue
+                    if(methodWaits(m.raw, waitNames, file.fileName + ':' + m.line)){
+                        waitNames.add(m.name)
+                        grew = true
+                    }
+                }
+            }
+        }
         for(let m of el.methods){
             let prologue = 'const $self=this,$s=this.$s_' + className + ';'
-            let code = rewriteMethod(m.raw, prologue, this.resolver(el, '$self', file), file.fileName + ':' + m.line)
+            let code = rewriteMethod(m.raw, prologue, this.resolver(el, '$self', file), file.fileName + ':' + m.line, waitNames)
             // A QML method stays bound to its object when passed around (signal.connect(handler))
             this.out.push('JQ.defineMethod(' + className + ',' + JSON.stringify(m.name) + ',' + code + ');')
         }

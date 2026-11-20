@@ -15,9 +15,9 @@ const { Component } = require('../../QtQml/Component')
 const { TableView, TableViewAttached } = require('../TableView')
 const QtEnums = require('../../Qt/enums')
 
-// the Basic style's palette (QQuickBasicTheme)
+// the Basic style's palette (QQuickBasicTheme, as Qt 6.12 gives it with QT_QUICK_CONTROLS_STYLE=Basic)
 const P = {
-    base: '#ffffff', alternateBase: '#f6f6f6', highlight: '#0066ff', highlightedText: '#ffffff', buttonText: '#26282a',
+    base: '#ffffff', alternateBase: '#f7f7f7', highlight: '#0066ff', highlightedText: '#090909', buttonText: '#26282a',
     windowText: '#26282a',
 }
 
@@ -91,11 +91,12 @@ defineType(ViewDelegateBase, {
 class TableViewDelegate extends ViewDelegateBase {
     constructor(parent = null){
         super(parent)
-        // same as AbstractButton.qml: the content and the padding (the Basic ItemDelegate's 12 / 8)
+        // same as AbstractButton.qml: the content and the padding (0 in T.TableViewDelegate), the background has no
+        // implicit size
         this.$label.$bind(Item.X, () => this.leftPadding, null)
         this.$label.$bind(Item.WIDTH, () => Math.max(0, this.width - this.leftPadding - this.rightPadding), null)
         this.$bind(Item.IMPLICITWIDTH, () => this.$label.implicitWidth + this.leftPadding + this.rightPadding, null)
-        this.$bind(Item.IMPLICITHEIGHT, () => Math.max(this.$label.implicitHeight + this.topPadding + this.bottomPadding, 40), null)
+        this.$bind(Item.IMPLICITHEIGHT, () => this.$label.implicitHeight + this.topPadding + this.bottomPadding, null)
         this.$bind(ViewDelegateBase.HIGHLIGHTED, () => this.selected, null)
     }
     $view(){ return this.tableView }
@@ -103,8 +104,7 @@ class TableViewDelegate extends ViewDelegateBase {
 defineType(TableViewDelegate, {
     props: {
         tableView: 'var', column: 'int',
-        leftPadding: { kind: 'real', initial: 12 }, rightPadding: { kind: 'real', initial: 12 },
-        topPadding: { kind: 'real', initial: 8 }, bottomPadding: { kind: 'real', initial: 8 },
+        leftPadding: 'real', rightPadding: 'real', topPadding: 'real', bottomPadding: 'real',
     },
 })
 TableViewDelegate.$qmlRequired = ['tableView', 'current', 'selected', 'editing', 'row', 'column', 'model']
