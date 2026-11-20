@@ -692,6 +692,7 @@ Rectangle {
 			}
 
 			onExited: {
+				positionChangedPause.stop();
 				controlArea.setLinkHintHover(-1);
 			}
 
