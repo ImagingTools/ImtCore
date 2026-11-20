@@ -71,8 +71,8 @@ bool CMemoryStorageResolver::RemoveObject(const Id& objectId)
 QVariantMap CMemoryStorageResolver::GetStorageParams(const Id& objectId) const
 {
 	QVariantMap params;
-	params["storage"] = "memory";
-	params["objectId"] = objectId;
+	params[QStringLiteral("storage")] = QStringLiteral("memory");
+	params[QStringLiteral("objectId")] = objectId;
 
 	return params;
 }

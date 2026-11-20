@@ -56,6 +56,13 @@ void StorageLinkBase::SetLink(const Id& objectId, const QByteArray& storageId)
 }
 
 
+void StorageLinkBase::SetObjectId(const Id& objectId)
+{
+	m_objectId = objectId;
+	m_dataPtr.Reset();
+}
+
+
 bool StorageLinkBase::IsNull() const
 {
 	return m_objectId.isEmpty();
@@ -176,15 +183,29 @@ bool StorageLinkBase::Serialize(iser::IArchive& archive)
 {
 	bool retVal = true;
 
-	iser::CArchiveTag objectIdTag("ObjectId", "ID of the linked object", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag objectIdTag(QByteArrayLiteral("ObjectId"), QByteArrayLiteral("ID of the linked object"), iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(objectIdTag);
 	retVal = retVal && archive.Process(m_objectId);
 	retVal = retVal && archive.EndTag(objectIdTag);
 
-	iser::CArchiveTag storageIdTag("StorageId", "Logical ID of the storage", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag storageIdTag(QByteArrayLiteral("StorageId"), QByteArrayLiteral("Logical ID of the storage"), iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(storageIdTag);
 	retVal = retVal && archive.Process(m_storageId);
 	retVal = retVal && archive.EndTag(storageIdTag);
+
+	if (!archive.IsStoring()){
+		m_dataPtr.Reset();
+	}
+
+	return retVal;
+}
+
+
+bool StorageLinkBase::SerializeObjectId(iser::IArchive& archive, const iser::CArchiveTag& tag)
+{
+	bool retVal = archive.BeginTag(tag);
+	retVal = retVal && archive.Process(m_objectId);
+	retVal = retVal && archive.EndTag(tag);
 
 	if (!archive.IsStoring()){
 		m_dataPtr.Reset();

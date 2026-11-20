@@ -4,6 +4,7 @@
 
 // std includes
 #include <algorithm>
+#include <memory>
 #include <optional>
 
 // Qt includes
@@ -12,6 +13,9 @@
 
 // ACF includes
 #include <istd/TSingleFactory.h>
+#include <icomp/TMakeComponentWrap.h>
+#include <icomp/TSimComponentWrap.h>
+#include <iser/CArchiveTag.h>
 #include <iser/CMemoryReadArchive.h>
 #include <iser/CMemoryWriteArchive.h>
 #include <itest/CStandardTestExecutor.h>
@@ -21,6 +25,8 @@
 #include <imtbase/CMemoryStorageResolver.h>
 #include <imtbase/CCollectionStorageResolver.h>
 #include <imtbase/CStorageResolverRegistry.h>
+#include <imtbase/CStorageResolverRegistryComp.h>
+#include <imtbase/CCollectionStorageResolverComp.h>
 #include <imtbase/StorageLink.h>
 
 
@@ -71,8 +77,12 @@ class COtherTestData: public istd::IChangeable
 
 typedef imtbase::StorageLink<CLinkTestData> DataLink;
 typedef istd::TSingleFactory<istd::IChangeable, CLinkTestData> DataFactory;
+using MemoryResolverComp	= icomp::TMakeComponentWrap<imtbase::CMemoryStorageResolver, imtbase::IStorageResolver>;
+using RegistryComp			= icomp::TSimComponentWrap<imtbase::CStorageResolverRegistryComp>;
+using CollectionComp		= icomp::TMakeComponentWrap<imtbase::CObjectCollection, imtbase::IObjectCollection>;
+using CollectionResolverComp	= icomp::TSimComponentWrap<imtbase::CCollectionStorageResolverComp>;
 
-const QByteArray s_typeId = "LinkTestData";
+const QByteArray s_typeId = QByteArrayLiteral("LinkTestData");
 
 
 istd::TSharedInterfacePtr<CLinkTestData> CreateData(int value)
@@ -156,7 +166,7 @@ void CStorageLinkTest::testCollectionResolverSnapshot()
 
 	imtbase::CCollectionStorageResolver resolver(collection, s_typeId);
 
-	DataLink link = CreateLink(resolver, 5, "Item");
+	DataLink link = CreateLink(resolver, 5, QStringLiteral("Item"));
 	QCOMPARE(collection.GetElementsCount(), 1);
 
 	DataLink other(link.GetObjectId());
@@ -212,26 +222,26 @@ void CStorageLinkTest::testRegistryLateBinding()
 
 	// The same data model, two "application profiles"
 	imtbase::CStorageResolverRegistry desktopProfile;
-	desktopProfile.RegisterResolver(&desktopStorage, "images");
+	desktopProfile.RegisterResolver(&desktopStorage, QByteArrayLiteral("images"));
 
 	imtbase::CStorageResolverRegistry serverProfile;
-	serverProfile.RegisterResolver(&serverStorage, "images");
+	serverProfile.RegisterResolver(&serverStorage, QByteArrayLiteral("images"));
 
 	const QByteArray desktopId = desktopStorage.InsertObject(CreateData(1));
 	const QByteArray serverId = serverStorage.InsertObject(CreateData(2));
 
-	DataLink desktopLink(desktopId, "images");
+	DataLink desktopLink(desktopId, QByteArrayLiteral("images"));
 	desktopLink.SetResolverProvider(&desktopProfile);
 	QCOMPARE(desktopLink->m_value, 1);
 	QVERIFY(desktopLink.GetResolver() == &desktopStorage);
 
-	DataLink serverLink(serverId, "images");
+	DataLink serverLink(serverId, QByteArrayLiteral("images"));
 	serverLink.SetResolverProvider(&serverProfile);
 	QCOMPARE(serverLink->m_value, 2);
 	QVERIFY(serverLink.GetResolver() == &serverStorage);
 
 	// Re-binding to another provider drops the loaded object
-	desktopLink.SetLink(serverId, "images");
+	desktopLink.SetLink(serverId, QByteArrayLiteral("images"));
 	desktopLink.SetResolverProvider(&serverProfile);
 	QVERIFY(!desktopLink.IsLoaded());
 	QCOMPARE(desktopLink->m_value, 2);
@@ -251,7 +261,7 @@ void CStorageLinkTest::testResolverPriority()
 	defaultRegistry.RegisterResolver(&defaultStorage);
 	imtbase::StorageLinkBase::SetDefaultResolverProvider(&defaultRegistry);
 
-	DataLink link("someId");
+	DataLink link(QByteArrayLiteral("someId"));
 	QVERIFY(link.GetResolver() == &defaultStorage);
 
 	link.SetResolverProvider(&providerRegistry);
@@ -296,7 +306,7 @@ void CStorageLinkTest::testUnknownStorageId()
 	const QByteArray objectId = storage.InsertObject(CreateData(1));
 
 	// An unknown non-empty storage ID must not fall back to the default resolver
-	DataLink link(objectId, "unknown");
+	DataLink link(objectId, QByteArrayLiteral("unknown"));
 	link.SetResolverProvider(&registry);
 
 	QVERIFY(link.GetResolver() == nullptr);
@@ -334,16 +344,16 @@ void CStorageLinkTest::testStorageParams()
 	imtbase::CCollectionStorageResolver collectionResolver(collection, s_typeId);
 	imtbase::CMemoryStorageResolver memoryResolver;
 
-	DataLink collectionLink = CreateLink(collectionResolver, 1, "Named item");
+	DataLink collectionLink = CreateLink(collectionResolver, 1, QStringLiteral("Named item"));
 
 	QVariantMap params = collectionLink.GetStorageParams();
-	QCOMPARE(params["storage"].toString(), QString("collection"));
-	QCOMPARE(params["objectId"].toByteArray(), collectionLink.GetObjectId());
-	QCOMPARE(params["typeId"].toByteArray(), s_typeId);
-	QCOMPARE(params["name"].toString(), QString("Named item"));
+	QCOMPARE(params[QStringLiteral("storage")].toString(), QStringLiteral("collection"));
+	QCOMPARE(params[QStringLiteral("objectId")].toByteArray(), collectionLink.GetObjectId());
+	QCOMPARE(params[QStringLiteral("typeId")].toByteArray(), s_typeId);
+	QCOMPARE(params[QStringLiteral("name")].toString(), QStringLiteral("Named item"));
 
 	DataLink memoryLink = CreateLink(memoryResolver, 1);
-	QCOMPARE(memoryLink.GetStorageParams()["storage"].toString(), QString("memory"));
+	QCOMPARE(memoryLink.GetStorageParams()[QStringLiteral("storage")].toString(), QStringLiteral("memory"));
 }
 
 
@@ -352,7 +362,7 @@ void CStorageLinkTest::testSerialization()
 	imtbase::CMemoryStorageResolver storage;
 
 	DataLink source = CreateLink(storage, 7);
-	source.SetLink(source.GetObjectId(), "images");
+	source.SetLink(source.GetObjectId(), QByteArrayLiteral("images"));
 
 	iser::CMemoryWriteArchive writeArchive;
 	QVERIFY(source.Serialize(writeArchive));
@@ -362,14 +372,14 @@ void CStorageLinkTest::testSerialization()
 	QVERIFY(restored.Serialize(readArchive));
 
 	QCOMPARE(restored.GetObjectId(), source.GetObjectId());
-	QCOMPARE(restored.GetStorageId(), QByteArray("images"));
+	QCOMPARE(restored.GetStorageId(), QByteArrayLiteral("images"));
 	QVERIFY(restored == source);
 
 	// Resolver binding is runtime state and is not serialized
 	QVERIFY(restored.GetResolver() == nullptr);
 
 	imtbase::CStorageResolverRegistry registry;
-	registry.RegisterResolver(&storage, "images");
+	registry.RegisterResolver(&storage, QByteArrayLiteral("images"));
 	restored.SetResolverProvider(&registry);
 	QCOMPARE(restored->m_value, 7);
 }
@@ -432,7 +442,7 @@ void CStorageLinkTest::testOptionalInterface()
 	QCOMPARE(link.value_or(CLinkTestData(99)).m_value, 5);
 
 	// A link with an ID of a missing object is not engaged, although it is not null
-	DataLink dangling("missing-id");
+	DataLink dangling(QByteArrayLiteral("missing-id"));
 	dangling.SetResolver(&storage);
 	QVERIFY(!dangling.IsNull());
 	QVERIFY(!dangling.has_value());
@@ -453,6 +463,128 @@ void CStorageLinkTest::testOptionalInterface()
 	QVERIFY(second.IsNull());
 	QVERIFY(!second);
 	QCOMPARE(storage.GetObjectsCount(), 1);
+}
+
+
+void CStorageLinkTest::testStorageIdKept()
+{
+	imtbase::CMemoryStorageResolver storage;
+	imtbase::CStorageResolverRegistry registry;
+	registry.RegisterResolver(&storage, QByteArrayLiteral("images"));
+
+	const QByteArray firstId = storage.InsertObject(CreateData(1));
+	const QByteArray secondId = storage.InsertObject(CreateData(2));
+
+	DataLink link(firstId, QByteArrayLiteral("images"));
+	link.SetResolverProvider(&registry);
+	QCOMPARE(link->m_value, 1);
+
+	// A new object ID keeps the storage ID and drops the loaded object
+	link.SetObjectId(secondId);
+	QVERIFY(!link.IsLoaded());
+	QCOMPARE(link.GetStorageId(), QByteArrayLiteral("images"));
+	QCOMPARE(link->m_value, 2);
+
+	// Clearing the link keeps the storage ID, so the link does not fall back to the default storage
+	link.reset();
+	QVERIFY(link.IsNull());
+	QCOMPARE(link.GetStorageId(), QByteArrayLiteral("images"));
+
+	link.SetObjectId(firstId);
+	link = std::nullopt;
+	QCOMPARE(link.GetStorageId(), QByteArrayLiteral("images"));
+}
+
+
+void CStorageLinkTest::testSerializeObjectId()
+{
+	imtbase::CMemoryStorageResolver storage;
+	const QByteArray objectId = storage.InsertObject(CreateData(7));
+
+	const iser::CArchiveTag tag(QByteArrayLiteral("AddressId"), QByteArrayLiteral("Address Id"), iser::CArchiveTag::TT_LEAF);
+
+	DataLink source(objectId, QByteArrayLiteral("images"));
+	iser::CMemoryWriteArchive linkArchive;
+	QVERIFY(source.SerializeObjectId(linkArchive, tag));
+
+	QByteArray plainId = objectId;
+	iser::CMemoryWriteArchive plainArchive;
+	QVERIFY(plainArchive.BeginTag(tag));
+	QVERIFY(plainArchive.Process(plainId));
+	QVERIFY(plainArchive.EndTag(tag));
+
+	// The link writes exactly what a plain ID field writes under the same tag
+	const QByteArray linkData(static_cast<const char*>(linkArchive.GetBuffer()), linkArchive.GetBufferSize());
+	const QByteArray plainData(static_cast<const char*>(plainArchive.GetBuffer()), plainArchive.GetBufferSize());
+	QCOMPARE(linkData, plainData);
+
+	// Data of a plain ID field is read into a link, which keeps its own storage ID
+	DataLink restored(QByteArray(), QByteArrayLiteral("images"));
+	iser::CMemoryReadArchive readArchive(plainArchive);
+	QVERIFY(restored.SerializeObjectId(readArchive, tag));
+	QCOMPARE(restored.GetObjectId(), objectId);
+	QCOMPARE(restored.GetStorageId(), QByteArrayLiteral("images"));
+
+	imtbase::CStorageResolverRegistry registry;
+	registry.RegisterResolver(&storage, QByteArrayLiteral("images"));
+	restored.SetResolverProvider(&registry);
+	QCOMPARE(restored->m_value, 7);
+}
+
+
+void CStorageLinkTest::testRegistryComponent()
+{
+	icomp::TSimSharedComponentPtr<MemoryResolverComp> imagesStoragePtr;
+	imagesStoragePtr->InitComponent();
+
+	icomp::TSimSharedComponentPtr<MemoryResolverComp> defaultStoragePtr;
+	defaultStoragePtr->InitComponent();
+
+	const QByteArray objectId = imagesStoragePtr->InsertObject(CreateData(3));
+
+	std::unique_ptr<RegistryComp> registryPtr(new RegistryComp);
+	registryPtr->InsertMultiAttr(QByteArrayLiteral("StorageIds"), QByteArrayLiteral("images"));
+	registryPtr->InsertMultiRef(QByteArrayLiteral("StorageResolvers"), imagesStoragePtr);
+	registryPtr->InsertMultiAttr(QByteArrayLiteral("StorageIds"), QByteArray());
+	registryPtr->InsertMultiRef(QByteArrayLiteral("StorageResolvers"), defaultStoragePtr);
+	registryPtr->InitComponent();
+
+	// The created registry is the application-wide provider of the links
+	QVERIFY(imtbase::StorageLinkBase::GetDefaultResolverProvider() == registryPtr.get());
+
+	DataLink link(objectId, QByteArrayLiteral("images"));
+	QCOMPARE(link->m_value, 3);
+
+	DataLink defaultLink(objectId);
+	QVERIFY(defaultLink.GetResolver() == &*defaultStoragePtr);
+	QVERIFY(!defaultLink.GetObject().IsValid());
+
+	// The destroyed registry is not the provider anymore
+	registryPtr.reset();
+	QVERIFY(imtbase::StorageLinkBase::GetDefaultResolverProvider() == nullptr);
+	QVERIFY(link.GetResolver() == nullptr);
+}
+
+
+void CStorageLinkTest::testCollectionResolverComponent()
+{
+	icomp::TSimSharedComponentPtr<CollectionComp> collectionPtr;
+	collectionPtr->InitComponent();
+	SetupCollection(*collectionPtr);
+
+	const CLinkTestData data(8);
+	const QByteArray objectId = collectionPtr->InsertNewObject(s_typeId, QStringLiteral("Item"), QString(), &data);
+	QVERIFY(!objectId.isEmpty());
+
+	// The compositions that only read the linked objects leave the type-ID out.
+	std::unique_ptr<CollectionResolverComp> resolverPtr(new CollectionResolverComp);
+	resolverPtr->SetRef(QByteArrayLiteral("ObjectCollection"), collectionPtr);
+	resolverPtr->InitComponent();
+
+	DataLink link(objectId);
+	link.SetResolver(resolverPtr.get());
+	QVERIFY(link.has_value());
+	QCOMPARE(link->m_value, 8);
 }
 
 
