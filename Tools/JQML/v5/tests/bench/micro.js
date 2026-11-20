@@ -139,6 +139,13 @@ Item {
     }
 }`
 
+const CHILDREN = `import QtQuick 2.15
+Item {
+    id: root
+    property int n: 0
+    Item { Repeater { model: root.n; Item { width: 1; height: 1 } } }
+}`
+
 const benchmarks = [
     {
         name: 'bind.fanout_1000x100', run(runs){
@@ -262,6 +269,30 @@ const benchmarks = [
             return measure(() => {
                 for(let i = 0; i < 60; i++) frame()
             }, { runs })
+        },
+    },
+    {
+        // 10000 children of one parent made, then destroyed (a Repeater filling an item)
+        name: 'scale.children_10000_create', run(runs){
+            let { JQ, root } = app('children', CHILDREN)
+            return measure(() => {
+                let start = now()
+                JQ.batch(() => { root.n = 10000 })
+                let time = now() - start
+                JQ.batch(() => { root.n = 0 })
+                return time
+            }, { runs: Math.min(runs, 5), warmup: 1 })
+        },
+    },
+    {
+        name: 'scale.children_10000_destroy', run(runs){
+            let { JQ, root } = app('children', CHILDREN)
+            return measure(() => {
+                JQ.batch(() => { root.n = 10000 })
+                let start = now()
+                JQ.batch(() => { root.n = 0 })
+                return now() - start
+            }, { runs: Math.min(runs, 5), warmup: 1 })
         },
     },
     {
