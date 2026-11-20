@@ -28,10 +28,10 @@ const DEFAULTS = { fillStyle: '#000000', strokeStyle: '#000000', globalAlpha: 1,
     shadowOffsetY: 0, shadowBlur: 0, shadowColor: 'rgba(0, 0, 0, 0)', font: '10px sans-serif', textAlign: 'start',
     textBaseline: 'alphabetic' }
 
+// THROW_DOM of qquickcontext2d.cpp: an Error (newErrorObject) with the DOM exception code
 function domException(code, name, message){
     let error = new Error(message)
     error.code = code
-    error.name = name
     return error
 }
 const NOT_SUPPORTED_ERR = 9, SYNTAX_ERR = 12, INDEX_SIZE_ERR = 1
@@ -92,6 +92,17 @@ function extendContext(ctx, item, ratioOf){
     for(let name of RETURNS_CONTEXT){
         let fn = ctx[name]
         if(typeof fn === 'function') returnsContext(name, fn)
+    }
+
+    // QQuickJSContext2DPrototype::method_arc / method_arcTo: a finite negative radius is refused
+    for(let [name, at] of [['arc', 2], ['arcTo', 4]]){
+        let fn = ctx[name]
+        if(typeof fn !== 'function') continue
+        ctx[name] = function(...args){
+            let radius = Number(args[at])
+            if(Number.isFinite(radius) && radius < 0) throw domException(INDEX_SIZE_ERR, 'IndexSizeError', 'Incorrect argument radius')
+            return fn.apply(this, args)
+        }
     }
 
     // ---- state ----

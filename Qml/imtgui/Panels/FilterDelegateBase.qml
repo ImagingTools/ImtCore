@@ -29,6 +29,9 @@ Item {
 	property bool isActive: false
 	property bool readOnly: false
 	property FilterMenu filterMenu: null
+	// A switch rather than a chip (EnableableFilterDelegate): the overflow menu
+	// shows it as a checkable row.
+	readonly property bool toggleable: false
 
 	// What the filter settled on, when that is something other than its own name.
 	readonly property string valueText: filterDelegateBase.isActive

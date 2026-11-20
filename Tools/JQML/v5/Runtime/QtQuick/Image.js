@@ -73,14 +73,59 @@ function loadPixmap(url, image){
     }))
     return entry
 }
-// sourceSize: a size value type with width / height; unset parts are -1
-class SourceSize extends GroupObject {}
+// sourceSize: a QSize value type of width and height; -1 is a part not set.
+// QQuickImageBase::sourceSize reads a part not set as the size of the loaded picture (0 without one). Writing one part is
+// a write of the whole QSize read first: the other part not set takes its value read back (sourceSize.width: 10 before
+// the picture loads leaves the height 0). A change emits sourceSizeChanged of the image
+class SourceSize extends GroupObject {
+    $write(id, value){
+        let other = id === SourceSize.WIDTH ? SourceSize.HEIGHT : SourceSize.WIDTH
+        if(this.$v[other] === -1) this.$v[other] = this.$readBack(other)
+        super.$write(id, value)
+    }
+
+    $readBack(id){
+        let value = this.$v[id]
+        if(value !== -1) return value
+        let natural = this.$owner.$natural
+        return natural ? (id === SourceSize.WIDTH ? natural.width : natural.height) : 0
+    }
+}
+const sourceSizeChanged = (size) => {
+    size.$owner.$updateSize()
+    engine.emit(size.$owner, Image.SIGNAL_sourceSizeChanged)
+}
+const readBack = (name) => function(){
+    let id = SourceSize[name.toUpperCase()]
+    engine.track(this, SourceSize.$type.props[id].signal)
+    return this.$readBack(id)
+}
 defineType(SourceSize, {
     props: {
-        width: { kind: 'real', initial: -1, effect: (size) => size.$owner.$updateSize() },
-        height: { kind: 'real', initial: -1, effect: (size) => size.$owner.$updateSize() },
+        width: { kind: 'real', initial: -1, effect: sourceSizeChanged, get: readBack('width') },
+        height: { kind: 'real', initial: -1, effect: sourceSizeChanged, get: readBack('height') },
     },
 })
+
+// QQuickImageProviderWithOptions::loadSize: the size a picture of originalSize is loaded at for the requested size (0 is a
+// part not requested). A raster picture is only made smaller, a vector one (svg) takes the size; with PreserveAspectFit
+// or PreserveAspectCrop the picture covers the box. Nothing requested: null (the natural size)
+function loadSize(original, requested, scalable, cropOrFit){
+    let rw = requested.width, rh = requested.height
+    if((rw <= 0 && rh <= 0) || original.width <= 0 || original.height <= 0) return null
+    if(!cropOrFit && scalable && rw > 0 && rh > 0) return { width: rw, height: rh }
+    let ratio = 0
+    if(rw > 0 && (cropOrFit || scalable || rw < original.width)) ratio = rw / original.width
+    if(rh > 0 && (cropOrFit || scalable || rh < original.height)){
+        let hr = rh / original.height
+        if(ratio === 0) ratio = hr
+        else if(!cropOrFit && hr < ratio) ratio = hr
+        else if(cropOrFit && hr > ratio) ratio = hr
+    }
+    return ratio > 0 ? { width: Math.round(original.width * ratio), height: Math.round(original.height * ratio) } : null
+}
+
+const isScalable = (url) => /\.svgz?$/i.test(String(url || '').replace(/[?#].*$/, ''))
 
 class Image extends Item {
     constructor(parent = null){
@@ -154,7 +199,15 @@ class Image extends Item {
     }
 
     $ready(url, size, paint){
+        let group = this.$v[Image.SOURCESIZE]
+        let before = group ? [group.$readBack(SourceSize.WIDTH), group.$readBack(SourceSize.HEIGHT)] : null
         this.$natural = { width: size.width, height: size.height }
+        // QQuickImageBase::requestFinished: sourceSizeChanged when the size read back changes
+        if(group && (group.$readBack(SourceSize.WIDTH) !== before[0] || group.$readBack(SourceSize.HEIGHT) !== before[1])){
+            engine.emit(group, SourceSize.SIGNAL_widthChanged)
+            engine.emit(group, SourceSize.SIGNAL_heightChanged)
+            engine.emit(this, Image.SIGNAL_sourceSizeChanged)
+        }
         this.$url = url
         this.$paintUrl = paint
         this.$updateSize()
@@ -171,13 +224,14 @@ class Image extends Item {
             height = natural.height
             // the values themselves: a binding being evaluated when the size updates does not depend on them
             let group = this.$v[Image.SOURCESIZE]
-            let sw = group ? group.$v[SourceSize.WIDTH] : -1, sh = group ? group.$v[SourceSize.HEIGHT] : -1
-            if((sw > 0 || sh > 0) && width > 0 && height > 0){
-                let sx = sw > 0 ? sw / width : Infinity
-                let sy = sh > 0 ? sh / height : Infinity
-                let scale = Math.min(sx, sy, 1)
-                width = Math.round(width * scale)
-                height = Math.round(height * scale)
+            if(group){
+                let mode = this.$v[Image.FILLMODE]
+                let size = loadSize(natural, { width: group.$v[SourceSize.WIDTH], height: group.$v[SourceSize.HEIGHT] },
+                    isScalable(this.$url), mode === PreserveAspectFit || mode === PreserveAspectCrop)
+                if(size){
+                    width = size.width
+                    height = size.height
+                }
             }
         }
         this.$write(Item.IMPLICITWIDTH, width)
@@ -234,7 +288,8 @@ const repaint = (image) => {
 defineType(Image, {
     props: {
         source: { kind: 'string', effect: reload },
-        fillMode: { kind: 'int', effect: repaint },
+        // the fill mode decides the size a picture is loaded at too (preserveAspectRatioCrop / Fit)
+        fillMode: { kind: 'int', effect: (image) => image.$updateSize() },
         sourceSize: { group: SourceSize },
         paintedWidth: { kind: 'real', readonly: true },
         paintedHeight: { kind: 'real', readonly: true },
