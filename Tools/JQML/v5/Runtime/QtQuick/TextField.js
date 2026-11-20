@@ -240,35 +240,18 @@ const RTL = /[\p{Script=Hebrew}\p{Script=Arabic}\p{Script=Syriac}\p{Script=Thaan
 
 // ---- mouse ----
 
-// A mouse selection that leaves a single-line field: QQuickTextInput::mouseMoveEvent puts the cursor at the
-// x of the mouse (positionAt, clamped to the text) wherever the mouse is; the browser instead snaps it to
-// whichever end of the field the point outside maps to in document order
+// A mouse selection in a single-line field, as QQuickTextInput::mousePressEvent and mouseMoveEvent: the press puts
+// the cursor at the x of the mouse, every move selects from there to the x of the mouse (positionAt, clamped to the
+// text) wherever the mouse is. The field does it itself, at once: the browser snaps a selection dragged out of the
+// field to whichever end the point maps to in document order, and correcting it afterwards painted the two in turn.
 let selectionDrag = null
 // a press in a field that does not select by mouse: the browser's selection collapses while the button is down
 let pressedNoSelect = null
 
 function dragSelectionMove(e){
-    let drag = selectionDrag
-    if(!drag || !(e.buttons & 1)) return
-    let input = drag.field.$input
-    if(drag.anchor === null) drag.anchor = input.selectionDirection === 'backward' ? input.selectionEnd : input.selectionStart
-    let rect = input.getBoundingClientRect()
-    if(e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom){
-        drag.focus = null
-        return
-    }
-    drag.focus = drag.field.$positionAtPoint(e.clientX - rect.left, (rect.bottom - rect.top) / 2, false)
-    // after the browser's own handling of this move
-    setTimeout(applyDragSelection, 0)
-}
-
-function applyDragSelection(){
-    let drag = selectionDrag
-    if(!drag || drag.focus === null) return
-    let input = drag.field.$input
-    let start = Math.min(drag.anchor, drag.focus), end = Math.max(drag.anchor, drag.focus)
-    let direction = drag.focus < drag.anchor ? 'backward' : 'forward'
-    if(input.selectionStart !== start || input.selectionEnd !== end || input.selectionDirection !== direction) input.setSelectionRange(start, end, direction)
+    let field = selectionDrag
+    if(!field || !(e.buttons & 1)) return
+    engine.batch(() => field.$dragSelectTo(e.clientX))
 }
 
 function listenMouse(){
@@ -279,7 +262,6 @@ function listenMouse(){
         selectionDrag = null
         pressedNoSelect = null
     }, true)
-    document.addEventListener('selectionchange', applyDragSelection)
 }
 
 // ---- keys ----
@@ -423,7 +405,43 @@ class TextField extends Item {
             if(event.detail > 1) event.preventDefault()
             return
         }
-        if(this.$input.tagName !== 'TEXTAREA' && event.detail === 1 && !event.shiftKey) selectionDrag = { field: this, anchor: null, focus: null }
+        if(this.$input.tagName === 'TEXTAREA' || event.detail !== 1) return
+        // the browser neither focuses nor selects: QQuickTextInput::mousePressEvent takes the focus, then moves the
+        // cursor there, keeping the anchor with Shift (moveCursor(pos, mark))
+        event.preventDefault()
+        let input = this.$input
+        if(typeof document === 'undefined' || document.activeElement !== input){
+            if(input.focus) input.focus({ preventScroll: true })
+            if(!this.$v[Item.ACTIVEFOCUS]) this.forceActiveFocus()
+        }
+        let position = this.$positionAtClientX(event.clientX)
+        engine.batch(() => {
+            if(event.shiftKey) this.moveCursorSelection(position, 0)
+            else this.$applySelection(position, position, true)
+        })
+        selectionDrag = this
+    }
+
+    // the position at the x of the mouse (in the viewport), on the middle of the line: a single-line field
+    $positionAtClientX(clientX){
+        let rect = this.$input.getBoundingClientRect()
+        return this.$positionAtPoint(clientX - rect.left, (rect.bottom - rect.top) / 2, false)
+    }
+
+    // QQuickTextInput::mouseMoveEvent: moveCursorSelection(positionAt(mouse), mouseSelectionMode)
+    $dragSelectTo(clientX){
+        if(this.$f & engine.DESTROYED || !this.$input) return
+        let C = this.constructor
+        this.moveCursorSelection(this.$positionAtClientX(clientX), this.$v[C.MOUSESELECTIONMODE] || 0)
+        // QQuickTextInputPrivate::updateHorizontalScroll: the text scrolls just enough to show the cursor
+        let x = this.$caretRect(this.$v[C.CURSORPOSITION]).x
+        let left = this.$padding('LEFTPADDING'), right = this.$v[Item.WIDTH] - this.$padding('RIGHTPADDING') - 1
+        let delta = x > right ? x - right : x < left ? x - left : 0
+        if(delta === 0) return
+        let input = this.$input
+        input.scrollLeft = Math.max(0, (this.$hs || 0) + delta)
+        this.$hs = input.scrollLeft || 0
+        this.$updateCursorRectangle()
     }
 
     // the text the control shows: with an input mask its separators and blanks (QQuickTextInputPrivate::m_text)
