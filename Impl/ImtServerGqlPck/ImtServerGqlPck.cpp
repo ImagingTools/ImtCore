@@ -126,6 +126,11 @@ I_EXPORT_COMPONENT(
 			"Table View Param Controller");
 
 I_EXPORT_COMPONENT(
+			AccessChangePublisher,
+			"Channel telling a signed-in user that the own access changed, granted or taken",
+			"Access Change Publisher");
+
+I_EXPORT_COMPONENT(
 			ConnectionStatusSubscriberController,
 			"Connection status subscriber controller",
 			"Connection Status Subscriber Controller");

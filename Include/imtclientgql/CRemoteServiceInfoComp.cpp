@@ -2,6 +2,9 @@
 #include <imtclientgql/CRemoteServiceInfoComp.h>
 
 
+// Qt includes
+#include <QtCore/QThread>
+
 // ImtCore includes
 #include <imtgql/imtgql.h>
 #include <imtgql/CGqlRequest.h>
@@ -42,7 +45,12 @@ void CRemoteServiceInfoComp::OnModelChanged(int /*modelId*/, const istd::IChange
 		return;
 	}
 
-	UpdateServiceInfo();
+	if (QThread::currentThread() == thread()){
+		UpdateServiceInfo();
+	}
+	else{
+		QMetaObject::invokeMethod(this, &CRemoteServiceInfoComp::UpdateServiceInfo, Qt::QueuedConnection);
+	}
 }
 
 
@@ -58,10 +66,8 @@ void CRemoteServiceInfoComp::OnComponentCreated()
 	QMetaObject::invokeMethod(this, [this](){
 		BaseClass2::RegisterModel(m_connectionStatusModelCompPtr.GetPtr());
 
-		if (m_serverCredentialCompPtr.IsValid() && !m_serverCredentialCompPtr->GetServerToken().isEmpty()){
-			connect(&m_credentialCheckTimer, &QTimer::timeout, this, [this](){ UpdateServiceInfo(); });
-			m_credentialCheckTimer.start(s_credentialCheckInterval);
-		}
+		m_credentialCheckTimer.setSingleShot(true);
+		connect(&m_credentialCheckTimer, &QTimer::timeout, this, &CRemoteServiceInfoComp::UpdateServiceInfo);
 
 		UpdateServiceInfo();
 	}, Qt::QueuedConnection);
@@ -82,6 +88,7 @@ void CRemoteServiceInfoComp::OnComponentDestroyed()
 
 void CRemoteServiceInfoComp::UpdateServiceInfo()
 {
+	m_credentialCheckTimer.stop();
 	const QByteArray serverToken = m_serverCredentialCompPtr.IsValid() ? m_serverCredentialCompPtr->GetServerToken() : QByteArray();
 	if (m_serverCredentialCompPtr.IsValid() && serverToken.isEmpty()){
 		SetCredentialStatus(CRS_MISSING);
@@ -138,7 +145,12 @@ void CRemoteServiceInfoComp::OnRequestFinished(int requestId, bool isTokenUsed, 
 	}
 
 	// The service answered and refused the token
-	if (isTokenUsed && result.errorCategory == IAsyncGqlClient::EC_ACCESS_DENIED){
+	const bool isRejected = isTokenUsed && result.errorCategory == IAsyncGqlClient::EC_ACCESS_DENIED;
+	if (isTokenUsed){
+		ScheduleCredentialCheck(isRejected ? CRS_REJECTED : (result.errorCategory == IAsyncGqlClient::EC_NONE ? CRS_VALID : CRS_UNAVAILABLE));
+	}
+
+	if (isRejected){
 		SetCredentialStatus(CRS_REJECTED);
 		SetServiceStatus(imtcom::IConnectionStatusProvider::CS_CONNECTED);
 
@@ -218,6 +230,23 @@ void CRemoteServiceInfoComp::SetCredentialStatus(CredentialStatus status)
 	if (isChanged && status == CRS_REJECTED){
 		qCritical().noquote() << QStringLiteral("The service '%1' refuses the token of this server: it is wrong, revoked or issued for another product").arg(QString::fromUtf8(*m_serviceIdAttrPtr));
 	}
+}
+
+
+void CRemoteServiceInfoComp::ScheduleCredentialCheck(CredentialStatus status)
+{
+	// Accepted: the periodic check. A failed request while it is refused tells nothing: it is asked again soon too
+	const bool isRecheckedSoon = status == CRS_REJECTED || (status == CRS_UNAVAILABLE && m_rejectionRecheckInterval != 0);
+	if (!isRecheckedSoon){
+		m_rejectionRecheckInterval = 0;
+		m_credentialCheckTimer.start(s_credentialCheckInterval);
+
+		return;
+	}
+
+	const int firstInterval = m_rejectionRecheckIntervalAttrPtr.IsValid() ? qBound(1, *m_rejectionRecheckIntervalAttrPtr, s_credentialCheckInterval) : 5000;
+	m_rejectionRecheckInterval = (m_rejectionRecheckInterval == 0) ? firstInterval : qMin(m_rejectionRecheckInterval * 2, s_credentialCheckInterval);
+	m_credentialCheckTimer.start(m_rejectionRecheckInterval);
 }
 
 

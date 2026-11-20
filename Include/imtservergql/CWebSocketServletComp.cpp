@@ -22,6 +22,7 @@
 #include <imtbase/IObjectCollection.h>
 #include <imtgql/CGqlRequestContextManager.h>
 #include <imtservergql/imtservergql.h>
+#include <imtservergql/CAccessChangePublisherComp.h>
 
 
 namespace imtservergql
@@ -346,7 +347,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 				subscription.registeredAccess = registeredAccess;
 				subscription.isRecipientChannel = isRecipientChannel;
 				subscription.requestPtr = &request;
-				subscription.connectionPtr = webSocketRequest->parent();
+				subscription.connectionId = webSocketRequest->GetConnectionId();
 
 				AddTokenSubscription(subscription, sessionExpiresAt, accessGeneration);
 				webSocketRequestPtr->RegisterRequestEventHandler(const_cast<CWebSocketServletComp*>(this));
@@ -387,8 +388,8 @@ imtrest::ConstResponsePtr CWebSocketServletComp::UnregisterSubscription(const im
 	Q_ASSERT(!connectionId.isEmpty());
 
 	// The stop comes in a request of its own over the same connection
-	RemoveTokenSubscriptions([&subscriptionId, webSocketRequest](const TokenSubscription& subscription){
-		return subscription.subscriptionId == subscriptionId && subscription.connectionPtr == webSocketRequest->parent();
+	RemoveTokenSubscriptions([&](const TokenSubscription& subscription){
+		return subscription.subscriptionId == subscriptionId && subscription.connectionId == connectionId;
 	});
 
 	for (int index = 0; index < m_gqlSubscriberControllersCompPtr.GetCount(); index++){
@@ -787,9 +788,17 @@ void CWebSocketServletComp::CheckCredentials(const QByteArray& credentialKey, qi
 		}
 		QList<TokenSubscription>& subscriptions = *found;
 		for (int index = subscriptions.size() - 1; index >= 0; --index){
-			const TokenSubscription& subscription = subscriptions[index];
+			TokenSubscription& subscription = subscriptions[index];
 			if (!IsServedBy(subscription.registeredAccess, subscription.isRecipientChannel, currentAccess)){
 				DropTokenSubscriptionLocked(subscriptions.takeAt(index), s_subscriptionPermissionsChangedCode, QStringLiteral("The permissions have changed"));
+				continue;
+			}
+
+			// A channel of the changes of the access is told any change, granted or taken, and goes on with the new access
+			const auto* publisher = dynamic_cast<const CAccessChangePublisherComp*>(subscription.controllerPtr);
+			if (publisher != nullptr && !IsSameAccess(subscription.registeredAccess, currentAccess) &&
+						publisher->NotifyAccessChanged(subscription.subscriptionId, *subscription.requestPtr)){
+				subscription.registeredAccess = currentAccess;
 			}
 		}
 
@@ -816,11 +825,7 @@ void CWebSocketServletComp::CheckCredentials(const QByteArray& credentialKey, qi
 void CWebSocketServletComp::DropTokenSubscriptionLocked(const TokenSubscription& subscription, const QByteArray& reasonCode, const QString& reason) const
 {
 	// Under the lock the request is alive: its destructor waits for it in OnRequestDestroyed
-	const imtrest::CWebSocketRequest* subscriptionRequestPtr = dynamic_cast<const imtrest::CWebSocketRequest*>(subscription.requestPtr);
-	Q_ASSERT(subscriptionRequestPtr != nullptr);
-	const QByteArray connectionId = subscriptionRequestPtr != nullptr ? subscriptionRequestPtr->GetConnectionId() : QByteArray();
-	Q_ASSERT(!connectionId.isEmpty());
-	subscription.controllerPtr->UnregisterSubscription(connectionId, subscription.subscriptionId);
+	subscription.controllerPtr->UnregisterSubscription(subscription.connectionId, subscription.subscriptionId);
 
 	SendWarningMessage(0, QStringLiteral("Subscription '%1' dropped: %2").arg(QString::fromUtf8(subscription.requestPtr->GetCommandId()), reason), QStringLiteral("CWebSocketServletComp"));
 

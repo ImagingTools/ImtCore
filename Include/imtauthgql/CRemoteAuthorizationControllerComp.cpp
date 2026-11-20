@@ -87,7 +87,15 @@ sdl::V1_0::imtauth::CLogoutPayload CRemoteAuthorizationControllerComp::OnLogout(
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::V1_0::imtauth::CLogoutPayload>(gqlRequest, errorMessage);
+	sdl::V1_0::imtauth::CLogoutPayload payload = SendModelRequest<sdl::V1_0::imtauth::CLogoutPayload>(gqlRequest, errorMessage);
+
+	// Kept here the token would open requests until its cache expires
+	const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
+	if (m_jwtSessionControllerCompPtr.IsValid() && contextPtr != nullptr && payload.ok.HasValue() && *payload.ok){
+		m_jwtSessionControllerCompPtr->InvalidateToken(contextPtr->GetToken());
+	}
+
+	return payload;
 }
 
 

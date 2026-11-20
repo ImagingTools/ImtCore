@@ -185,6 +185,13 @@ inline bool IsAccessWithin(const AuthorizationData& registered, const Authorizat
 }
 
 
+/// Neither access gives more than the other
+inline bool IsSameAccess(const AuthorizationData& registered, const AuthorizationData& current)
+{
+	return IsAccessWithin(registered, current) && IsAccessWithin(current, registered);
+}
+
+
 /**
 	Check the permissions held by the user of the given context, requirements included.
 */

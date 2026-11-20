@@ -12,5 +12,8 @@ class CAuthenticationCacheTest: public QObject
 private slots:
 	void TargetedInvalidation();
 	void InFlightInvalidation();
+	void RevokedDuringItsCheck();
+	void FreshReadDuringTheCheck();
+	void AccessChangeDuringTheCheckIsNoTokenChange();
 	void SubscriptionCheckBypassesCache();
 };

@@ -34,6 +34,7 @@ private slots:
 	void UnreadOrganizationIsNotCached();
 	void ChangeDuringCheckIsStale();
 	void StaleReadDoesNotFillCache();
+	void ChangeOfAnAccessModelDropsOrganizationData();
 	void GrantingAuthorityOfRequest_data();
 	void GrantingAuthorityOfRequest();
 	void GrantedPermissionsAreChecked_data();
@@ -61,6 +62,8 @@ private slots:
 	void SessionAuthorizationRejectsIncompleteReply();
 	void SessionAuthorizationContextIsDetached();
 	void SessionAuthorizationIsKeptForRequests();
+	void SessionDenialFencesPendingAnswer();
+	void SessionEndBoundsComputedAnswer();
 	void SessionOfAnotherProductIsRefused();
 	void SessionAuthorizationSyncTransportFailure_data();
 	void SessionAuthorizationSyncTransportFailure();
