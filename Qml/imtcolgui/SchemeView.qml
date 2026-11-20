@@ -14,6 +14,25 @@ Rectangle {
 	color: Style.imagingToolsGradient0;
 	
 	property BaseModel objectsModel: BaseModel {}
+
+	// Additional links between the shown objects, besides the m_links of the objects: [{fromId, toId}].
+	// E.g. links of composite objects derived from the links of their content.
+	property var extraLinks: []
+	onExtraLinksChanged: canvas.requestPaint()
+
+	// Objects with a link icon in the top right corner: {objectId: tooltip text}. E.g. links to
+	// objects that are not shown on the scheme. The icon is highlighted and shows the text on hover.
+	property var linkHints: ({})
+	property string linkHintIcon: "Icons/Link"
+	onLinkHintsChanged: {
+		canvas.hoverLinkHintIndex = -1
+		linkHintTooltip.hide()
+		canvas.requestPaint()
+	}
+
+	function hasLinkHint(item){
+		return item && canvasPage.linkHints && !!canvasPage.linkHints[item.m_id]
+	}
 	
 	// property TreeItemModel objectsModel: TreeItemModel{};
 	property int selectedIndex: -1;
@@ -44,6 +63,128 @@ Rectangle {
 	signal objectMoveFinished();
 	// Right click on an object (it is selected first); menuX/menuY are window coordinates.
 	signal contextMenuRequested(int index, real menuX, real menuY);
+
+	// Dropping a dragged object onto another object (e.g. into a group). Disabled while dropTargetFilter
+	// is null. When the dragged object overlaps an accepted target, the target is enlarged, highlighted
+	// and blinks after dropArmDelay; releasing the mouse then emits objectDropped (instead of
+	// objectMoveFinished). Escape or leaving the target cancels; a release before the target blinks
+	// is an ordinary move.
+	// function(objectId, targetId): true if the object can be dropped onto the target.
+	property var dropTargetFilter: null
+	property int dropArmDelay: 600
+	// objectX/objectY: position of the dropped object at the release (scheme coordinates).
+	signal objectDropped(string objectId, string targetId, real objectX, real objectY);
+
+	function findDropCandidate(){
+		if (!canvasPage.dropTargetFilter || canvas.selectedIndex < 0 || canvas.selectedIndex >= canvasPage.objectsModel.count){
+			return -1
+		}
+
+		let dragged = canvasPage.objectsModel.get(canvas.selectedIndex).item
+		let draggedWidth = dragged.m_width ? dragged.m_width : canvas.mainRec_width
+		let bestIndex = -1
+		let bestArea = 0
+		for (let i = 0; i < canvasPage.objectsModel.count; i++){
+			if (i === canvas.selectedIndex){
+				continue
+			}
+			let item = canvasPage.objectsModel.get(i).item
+			let width_ = item.m_width ? item.m_width : canvas.mainRec_width
+			let overlapX = Math.min(dragged.m_x + draggedWidth, item.m_x + width_) - Math.max(dragged.m_x, item.m_x)
+			let overlapY = Math.min(dragged.m_y + canvas.mainRec_height, item.m_y + canvas.mainRec_height) - Math.max(dragged.m_y, item.m_y)
+			if (overlapX <= 0 || overlapY <= 0){
+				continue
+			}
+			let area = overlapX * overlapY
+			if (area > bestArea && canvasPage.dropTargetFilter(dragged.m_id, item.m_id)){
+				bestArea = area
+				bestIndex = i
+			}
+		}
+		return bestIndex
+	}
+
+	function updateDropTarget(){
+		let index = canvasPage.findDropCandidate()
+		// A target cancelled with Escape is ignored until the dragged object leaves it.
+		if (index !== canvas.dropSuppressedIndex){
+			canvas.dropSuppressedIndex = -1
+		}
+		else{
+			index = -1
+		}
+
+		if (index === canvas.dropCandidateIndex){
+			return
+		}
+
+		canvasPage.resetDrop()
+		canvas.dropCandidateIndex = index
+		if (index >= 0){
+			dropArmTimer.restart()
+		}
+	}
+
+	function resetDrop(){
+		dropArmTimer.stop()
+		dropBlinkTimer.stop()
+		dropScaleAnimation.stop()
+		let wasActive = canvas.dropTargetIndex >= 0
+		canvas.dropCandidateIndex = -1
+		canvas.dropTargetIndex = -1
+		canvas.dropScale = 1.0
+		canvas.dropBlinkOn = false
+		if (wasActive){
+			canvas.requestPaint()
+		}
+	}
+
+	Timer {
+		id: dropArmTimer
+
+		interval: canvasPage.dropArmDelay
+		repeat: false
+		onTriggered: {
+			if (canvas.dropCandidateIndex < 0){
+				return
+			}
+			canvas.dropTargetIndex = canvas.dropCandidateIndex
+			canvas.dropBlinkOn = true
+			dropScaleAnimation.restart()
+			dropBlinkTimer.restart()
+			canvas.requestPaint()
+		}
+	}
+
+	Timer {
+		id: dropBlinkTimer
+
+		interval: 250
+		repeat: true
+		onTriggered: {
+			canvas.dropBlinkOn = !canvas.dropBlinkOn
+			canvas.requestPaint()
+		}
+	}
+
+	NumberAnimation {
+		id: dropScaleAnimation
+
+		target: canvas
+		property: "dropScale"
+		from: 1.0
+		to: 1.1
+		duration: 150
+	}
+
+	Shortcut {
+		sequence: "Escape"
+		enabled: canvasPage.visible && canvas.dropCandidateIndex >= 0
+		onActivated: {
+			canvas.dropSuppressedIndex = canvas.dropCandidateIndex
+			canvasPage.resetDrop()
+		}
+	}
 	
 	ApplicationEvents {
 		onDesignSchemeChanged: {
@@ -68,6 +209,8 @@ Rectangle {
 	}
 	
 	onObjectsModelChanged: {
+		canvasPage.resetDrop();
+		canvas.dropSuppressedIndex = -1;
 		canvas.requestPaint();
 	}
 	
@@ -255,6 +398,7 @@ Rectangle {
 			
 			// The right button only selects an object, it neither moves objects nor pans the scheme.
 			property bool rightButtonPressed: false;
+
 			
 			onRightClicked: {
 				if (canvas.selectedIndex >= 0){
@@ -283,6 +427,8 @@ Rectangle {
 			
 			onPressed: {
 				console.log("onPressed", canvas.selectedIndex)
+				controlArea.setLinkHintHover(-1);
+				canvas.dropSuppressedIndex = -1;
 				controlArea.rightButtonPressed = mouse.button == Qt.RightButton;
 				canvas.selectedIndex = -1;
 				for(let i = 0; i < canvasPage.objectsModel.count; i++){
@@ -309,6 +455,19 @@ Rectangle {
 			}
 			
 			onReleased: {
+				// Released over a blinking target: the object is dropped onto it instead of being moved.
+				let dropTargetIndex = canvas.dropTargetIndex
+				let droppedIndex = canvas.selectedIndex
+				canvasPage.resetDrop()
+				canvas.dropSuppressedIndex = -1
+				if (dropTargetIndex >= 0 && droppedIndex >= 0 && !controlArea.rightButtonPressed
+						&& dropTargetIndex < canvasPage.objectsModel.count && droppedIndex < canvasPage.objectsModel.count){
+					let droppedItem = canvasPage.objectsModel.get(droppedIndex).item
+					let targetItem = canvasPage.objectsModel.get(dropTargetIndex).item
+					controlArea.cursorShape = Qt.ArrowCursor
+					canvasPage.objectDropped(droppedItem.m_id, targetItem.m_id, droppedItem.m_x, droppedItem.m_y)
+					return
+				}
 				if(canvas.selectedIndex >= 0){
 					controlArea.cursorShape = Qt.ArrowCursor;
 				}
@@ -343,6 +502,7 @@ Rectangle {
 				}
 				else {
 					movingFunction(delta);
+					canvasPage.updateDropTarget();
 				}
 			}
 			
@@ -470,6 +630,57 @@ Rectangle {
 						
 					}
 				}
+
+				// The link icon of the hovered object
+				let linkHintIndex = -1;
+				if(canvas.hoverIndex >= 0 && !controlArea.pressed){
+					let hoverItem = canvasPage.objectsModel.get(canvas.hoverIndex).item;
+					if(canvasPage.hasLinkHint(hoverItem)){
+						let rect = canvas.linkHintRect(hoverItem);
+						let ok = controlArea.checkHoverItem(
+									rect.x * canvas.scaleCoeff + canvas.deltaX,
+									rect.y * canvas.scaleCoeff + canvas.deltaY,
+									rect.width * canvas.scaleCoeff,
+									rect.height * canvas.scaleCoeff,
+									position);
+						if(ok){
+							linkHintIndex = canvas.hoverIndex;
+						}
+					}
+				}
+				controlArea.setLinkHintHover(linkHintIndex, position);
+				if(linkHintIndex >= 0){
+					controlArea.cursorShape = Qt.PointingHandCursor;
+				}
+			}
+
+			function setLinkHintHover(index, position){
+				if(index === canvas.hoverLinkHintIndex){
+					return;
+				}
+
+				canvas.hoverLinkHintIndex = index;
+				linkHintTooltip.hide();
+				if(index >= 0){
+					let item = canvasPage.objectsModel.get(index).item;
+					linkHintTooltip.text = canvasPage.linkHints[item.m_id];
+					linkHintTooltip.show(position.x, position.y);
+				}
+				canvas.requestPaint();
+			}
+
+			onExited: {
+				controlArea.setLinkHintHover(-1);
+			}
+
+			CustomTooltip {
+				id: linkHintTooltip;
+
+				componentWidth: Style.sizeHintS;
+				horizontalAlignment: Text.AlignLeft;
+				// The same frame as the highlighted link icon
+				borderColor: canvas.compositeBorderColor;
+				borderWidth: 1;
 			}
 			//hover reaction
 			
@@ -505,6 +716,15 @@ Rectangle {
 			
 			property int selectedIndex: -1;
 			property int hoverIndex: -1;
+			// Object whose link icon is under the cursor
+			property int hoverLinkHintIndex: -1;
+			// Dropping the dragged object onto another object (see dropTargetFilter)
+			property int dropCandidateIndex: -1;
+			property int dropTargetIndex: -1;
+			property int dropSuppressedIndex: -1;
+			property real dropScale: 1.0;
+			property bool dropBlinkOn: false;
+			onDropScaleChanged: requestPaint()
 			property bool linkSelected: false;
 			property bool hasTailSelection: false;
 			
@@ -541,6 +761,7 @@ Rectangle {
 			property string selectedLinkFromColor: Style.selectedLinkFromColor
 			property string selectedLinkToColor: Style.selectedLinkToColor
 			property string linkColor: Style.borderColor2
+			property string linkHintHoverColor: Style.hover
 			property string mainTextColor: Style.textColor
 			property string secondTextColor: Style.inactiveTextColor
 			// The grid is drawn faint with the border color, which suits every theme
@@ -645,6 +866,13 @@ Rectangle {
 						canvas.drawLink(ctx, ind, i);
 					}
 				}
+
+				for(let i = 0; i < canvasPage.extraLinks.length; i++){
+					let fromIndex = canvasPage.findModelIndex(canvasPage.extraLinks[i].fromId);
+					let toIndex = canvasPage.findModelIndex(canvasPage.extraLinks[i].toId);
+					if(fromIndex === -1 || toIndex === -1 || fromIndex === toIndex) continue
+					canvas.drawLink(ctx, fromIndex, toIndex);
+				}
 				
 				//drawObject
 				for(let i = 0; i < canvasPage.objectsModel.count; i++){
@@ -733,6 +961,9 @@ Rectangle {
 				if (item.m_icon2 !== ""){
 					iconsWidth += canvas.imageSize + canvas.imageMargin
 				}
+				if (canvasPage.hasLinkHint(item)){
+					iconsWidth += canvas.imageSize + canvas.imageMargin
+				}
 				let bottomSpacing = thirdText !== "" ? canvas.textMargin : 0
 				let mainRecWidth = Math.max(textWidth_main + horizontalMargins + iconsWidth,
 					textWidth_second + textWidth_third + horizontalMargins + bottomSpacing,
@@ -760,7 +991,42 @@ Rectangle {
 				return elidedText + suffix
 			}
 			
+			// The drop target is drawn enlarged, highlighted and blinking.
 			function drawObject(ctx, index){
+				if (index !== canvas.dropTargetIndex){
+					drawObjectBody(ctx, index);
+					return;
+				}
+
+				let item = canvasPage.objectsModel.get(index).item;
+				let width_ = item.m_width ? item.m_width : canvas.mainRec_width;
+				let centerX = item.m_x + width_ / 2;
+				let centerY = item.m_y + canvas.mainRec_height / 2;
+
+				ctx.save();
+				ctx.translate(centerX, centerY);
+				ctx.scale(canvas.dropScale, canvas.dropScale);
+				ctx.translate(-centerX, -centerY);
+
+				drawObjectBody(ctx, index);
+
+				width_ = item.m_width ? item.m_width : width_;
+				ctx.beginPath();
+				ctx.roundedRect(item.m_x, item.m_y, width_, canvas.mainRec_height, canvas.radius_, canvas.radius_);
+				if (canvas.dropBlinkOn){
+					ctx.globalAlpha = 0.3;
+					ctx.fillStyle = canvas.compositeBorderColor;
+					ctx.fill();
+					ctx.globalAlpha = 1.0;
+				}
+				ctx.lineWidth = 3;
+				ctx.strokeStyle = canvas.compositeBorderColor;
+				ctx.stroke();
+
+				ctx.restore();
+			}
+
+			function drawObjectBody(ctx, index){
 				let item = canvasPage.objectsModel.get(index).item;
 				
 				let x_  = item.m_x
@@ -841,6 +1107,10 @@ Rectangle {
 				if (iconUrl_2 !== ""){
 					iconsWidth += canvas.imageSize + canvas.imageMargin
 				}
+				let hasLinkHint = canvasPage.hasLinkHint(item)
+				if (hasLinkHint){
+					iconsWidth += canvas.imageSize + canvas.imageMargin
+				}
 				let mainTextWidth = mainRecWidth - 2 * (canvas.borderShift + canvas.textMargin) - iconsWidth
 				let textStr = elideText(ctx, mainText, mainTextWidth)
 				
@@ -888,8 +1158,26 @@ Rectangle {
 					ctx.strokeText(textStr3, text_x3, text_y3);
 				}
 				
-				//images
+				//images; the link icon is the rightmost one (top right corner)
 				let image1_x = x_ + mainRecWidth - canvas.borderShift - canvas.imageSize - canvas.imageMargin;
+				if (hasLinkHint){
+					let linkRect = canvas.linkHintRect(item)
+					let hovered = index === canvas.hoverLinkHintIndex
+					if (hovered){
+						ctx.fillStyle = canvas.linkHintHoverColor
+						ctx.strokeStyle = canvas.compositeBorderColor
+						ctx.lineWidth = 1
+						ctx.beginPath()
+						ctx.roundedRect(linkRect.x, linkRect.y, linkRect.width, linkRect.height, canvas.radius_, canvas.radius_)
+						ctx.fill()
+						ctx.stroke()
+					}
+					let linkIconUrl = "../../../" + Style.getIconPath(canvasPage.linkHintIcon, Icon.State.On,
+								hovered ? Icon.Mode.Active : Icon.Mode.Normal)
+					ctx.beginPath()
+					ctx.drawImage(linkIconUrl, image1_x, text_y - canvas.imageSize + canvas.imageMargin, canvas.imageSize, canvas.imageSize);
+					image1_x -= canvas.imageSize + canvas.imageMargin
+				}
 				let image1_y = text_y - canvas.imageSize + canvas.imageMargin;
 				let image2_x = iconUrl_1 !== "" ? image1_x - canvas.imageSize - canvas.imageMargin : image1_x;
 				let image2_y = text_y - canvas.imageSize + canvas.imageMargin;
@@ -903,6 +1191,20 @@ Rectangle {
 				
 			}
 			
+			// Area of the link icon of the object (scheme coordinates), slightly larger than the icon.
+			function linkHintRect(item){
+				let width_ = item.m_width ? item.m_width : canvas.mainRec_width
+				let iconX = item.m_x + width_ - canvas.borderShift - canvas.imageSize - canvas.imageMargin
+				let iconY = item.m_y + canvas.borderShift + canvas.textVerticalOffset - canvas.imageSize + canvas.imageMargin
+				let padding = 2
+				return {
+					"x": iconX - padding,
+					"y": iconY - padding,
+					"width": canvas.imageSize + 2 * padding,
+					"height": canvas.imageSize + 2 * padding
+				}
+			}
+
 			function drawLink(ctx, fromIndex, toIndex){
 				let fromItem = canvasPage.objectsModel.get(fromIndex).item;
 				let toItem = canvasPage.objectsModel.get(toIndex).item;
