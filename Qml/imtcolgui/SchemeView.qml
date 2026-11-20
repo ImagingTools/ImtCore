@@ -482,7 +482,8 @@ Rectangle {
 				canvasPage.resetDrop()
 				canvas.dropSuppressedIndex = -1
 				if (dropTargetIndex >= 0 && droppedIndex >= 0 && !controlArea.rightButtonPressed
-						&& dropTargetIndex < canvasPage.objectsModel.count && droppedIndex < canvasPage.objectsModel.count){
+						&& dropTargetIndex < canvasPage.objectsModel.count && droppedIndex < canvasPage.objectsModel.count
+						&& canvasPage.findDropCandidate() === dropTargetIndex){
 					let droppedItem = canvasPage.objectsModel.get(droppedIndex).item
 					let targetItem = canvasPage.objectsModel.get(dropTargetIndex).item
 					controlArea.cursorShape = Qt.ArrowCursor
