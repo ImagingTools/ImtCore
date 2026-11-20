@@ -100,15 +100,17 @@ void CPrivateAutoPersistenceComp::OnModelChanged(int modelId, const istd::IChang
 			LoadObject();
 		}
 
+		// The watcher is not thread safe: the path can be changed in another thread
 		if (*m_reloadOnFileChangeAttrPtr){
-			WatchFile();
+			QMetaObject::invokeMethod(&m_fileWatcher, [this](){ WatchFile(); }, Qt::AutoConnection);
 		}
 
 		return;
 	}
 
-	// The object that is being loaded from the file is not stored back into it
-	if (changeSet.Contains(istd::IChangeable::CF_NO_UNDO) || (m_loadingThreadId == QThread::currentThreadId())){
+	// The object that is being loaded from the file is not stored back into it. The change of the whole object (CF_ALL_DATA) contains
+	// every flag for Contains: only the explicit flag counts
+	if (changeSet.ContainsExplicit(istd::IChangeable::CF_NO_UNDO) || (m_loadingThreadId == QThread::currentThreadId())){
 		return;
 	}
 
@@ -170,6 +172,10 @@ bool CPrivateAutoPersistenceComp::StoreObject()
 
 	m_fileHash = GetFileHash(filePath);
 
+	if (*m_reloadOnFileChangeAttrPtr){
+		WatchCreatedFile();
+	}
+
 	return true;
 }
 
@@ -194,6 +200,20 @@ void CPrivateAutoPersistenceComp::WatchFile()
 	if (QFileInfo::exists(fileInfo.absolutePath())){
 		m_fileWatcher.addPath(fileInfo.absolutePath());
 	}
+}
+
+
+void CPrivateAutoPersistenceComp::WatchCreatedFile()
+{
+	QMetaObject::invokeMethod(
+				&m_fileWatcher,
+				[this](){
+					// The folder that is watched already tells about the new file itself
+					if (m_fileWatcher.directories().isEmpty()){
+						WatchFile();
+					}
+				},
+				Qt::AutoConnection);
 }
 
 

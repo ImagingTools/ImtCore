@@ -18,11 +18,14 @@ namespace imtfile
 	The data never leave the private folder of the file (the folder of \c FilePath): another path, for example a temporary file of
 	ifile::CAutoPersistenceComp, is refused; use CPrivateAutoPersistenceComp for the automatic persistence. The slave persistence writes
 	into a new file of the owner next to the file, the file is replaced by it as a whole only when the data are complete: a failed save
-	keeps the previous file.
+	keeps the previous file. The new file is private by itself (Unix: mode 600; Windows: its own protected access list, nothing of the
+	folder is inherited) and is checked before the slave writes anything into it.
 
 	The private folder:
 	- belongs to the account of the process, nobody else can open it: on Unix its mode is 700, on Windows only this account, the system
 	  and the administrators are in its access list;
+	- gives nobody else any access to its new files either: on Windows its access list has no entry for another account, also not one
+	  for the contained files only; on macOS its access list (it gives its rights before the mode) has no entry that allows anything;
 	- is created so when it does not exist, with the missing folders above it; it is private from the start, it is never open;
 	- if it exists already, it is only checked, its owner and its permissions are never changed: a folder that another account owns
 	  could be taken back by it, and a folder that was open could have been read or given a planted file. Such a folder is refused,
@@ -32,7 +35,9 @@ namespace imtfile
 	them: otherwise another account could rename the private folder and put its own one in its place. A folder above:
 	- on Unix belongs to this account or to root; if others can write into it, it must have the sticky bit (as /tmp has: only the
 	  owner of an entry can remove or rename it). Examples: /etc (root, 755) and /tmp (root, 1777) are accepted, a folder with mode 777
-	  or one of another user is refused. A link on the way must belong to this account or to root;
+	  or one of another user is refused. On macOS the access list may not allow the others to delete, rename or change the access
+	  either. A link on the way must belong to this account or to root; the folders are checked as the path is written and as the
+	  links resolve it: a link in a folder that the others can change could be replaced by them;
 	- on Windows belongs to this account, the system, the administrators or the installer of Windows; other accounts may read it and
 	  create new entries in it, but not delete, rename or change the access of what is in it (DELETE, FILE_DELETE_CHILD, WRITE_DAC,
 	  WRITE_OWNER, GENERIC_ALL). The usual access of ProgramData and of a folder created in it is accepted, but only if the service or

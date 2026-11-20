@@ -393,12 +393,13 @@ bool CWebSocketServerComp::StartListening(const QHostAddress& address, quint16 p
 	}
 #endif
 
+	// The server that could not listen now listens later on another port (ListenAgain): it is connected already
+	connect(m_webSocketServerPtr.GetPtr(), &QWebSocketServer::newConnection, this, &CWebSocketServerComp::HandleNewConnections);
+	connect(m_webSocketServerPtr.GetPtr(), &QWebSocketServer::acceptError, this, &CWebSocketServerComp::OnAcceptError);
+	connect(m_webSocketServerPtr.GetPtr(), &QWebSocketServer::sslErrors, this, &CWebSocketServerComp::OnSslErrors);
+
 	if (m_webSocketServerPtr->listen(address, port)){
 		SendInfoMessage(0, QStringLiteral("Web socket server successfully started on port %1").arg(port));
-
-		connect(m_webSocketServerPtr.GetPtr(), &QWebSocketServer::newConnection, this, &CWebSocketServerComp::HandleNewConnections);
-		connect(m_webSocketServerPtr.GetPtr(), &QWebSocketServer::acceptError, this, &CWebSocketServerComp::OnAcceptError);
-		connect(m_webSocketServerPtr.GetPtr(), &QWebSocketServer::sslErrors, this, &CWebSocketServerComp::OnSslErrors);
 
 		return true;
 	}
