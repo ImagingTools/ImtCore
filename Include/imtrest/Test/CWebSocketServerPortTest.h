@@ -24,6 +24,7 @@ private slots:
 	void PortChangeKeepsConnectionsTest();
 	void StoppedServerStaysStoppedTest();
 	void StartedServerMovesTest();
+	void BusyStartPortThenFreePortServesClientsTest();
 };
 
 

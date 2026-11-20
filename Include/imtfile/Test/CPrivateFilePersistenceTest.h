@@ -23,10 +23,14 @@ private slots:
 	void SaveKeepsFileOnFailureTest();
 	void OtherFolderIsRefusedTest();
 	void ReplaceableParentFolderIsRefusedTest();
+	void LinkInReplaceableFolderIsRefusedTest();
+	void InheritedAccessIsRefusedTest();
 	void LoadRefusesSharedFileTest();
 	void LoadRefusesSharedFolderTest();
 	void AutoPersistenceStoresInPlaceTest();
 	void AutoPersistenceReloadTest();
+	void AutoPersistenceStoresWholeObjectChangeTest();
+	void AutoPersistenceWatchesCreatedFolderTest();
 	void SystemConfigPathTest();
 };
 

@@ -73,6 +73,13 @@ private:
 		Watch the file and its folder: a file that is replaced (renamed over) is watched again.
 	*/
 	void WatchFile();
+
+	/**
+		Watch the file and its folder that a save has created: before they existed there was nothing to watch. In the thread of the
+		watcher, it is not thread safe.
+	*/
+	void WatchCreatedFile();
+
 	void OnFileSystemChanged();
 
 private:

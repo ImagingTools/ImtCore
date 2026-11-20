@@ -22,8 +22,17 @@
 #include <imtfile/CPrivateFilePersistenceComp.h>
 #include <imtfile/CSystemConfigLocationComp.h>
 
-#ifndef Q_OS_WIN
+#ifdef Q_OS_WIN
+#include <windows.h>
+#include <aclapi.h>
+#include <sddl.h>
+#include <vector>
+#else
+#include <QtCore/QProcess>
 #include <sys/stat.h>
+#ifdef Q_OS_MACOS
+#include <sys/acl.h>
+#endif
 #endif
 
 
@@ -174,7 +183,7 @@ typedef icomp::TSimComponentWrap<imtfile::CPrivateAutoPersistenceComp> PrivateAu
 */
 struct SAutoPersistence
 {
-	SAutoPersistence(const QString& path, bool autoReload)
+	SAutoPersistence(const QString& path, bool autoReload, bool storeOnBegin = true)
 	{
 		slave->InitComponent();
 
@@ -190,14 +199,14 @@ struct SAutoPersistence
 		persistence.SetRef("Object", object);
 		persistence.SetRef("FileLoader", loader);
 		persistence.SetRef("FilePath", filePath);
-		persistence.SetBoolAttr("StoreOnBegin", true);
+		persistence.SetBoolAttr("StoreOnBegin", storeOnBegin);
 		persistence.SetBoolAttr("AutoReload", autoReload);
 		persistence.InitComponent();
 	}
 
-	void SetText(const QByteArray& text)
+	void SetText(const QByteArray& text, const istd::IChangeable::ChangeSet& changeSet = istd::IChangeable::GetAnyChange())
 	{
-		istd::CChangeNotifier notifier(&*object);
+		istd::CChangeNotifier notifier(&*object, &changeSet);
 		object->text = text;
 	}
 
@@ -220,34 +229,264 @@ QByteArray ReadFile(const QString& path)
 }
 
 
-#ifndef Q_OS_WIN
-const QFileDevice::Permissions s_sharedPermissions =
-			QFileDevice::ReadGroup | QFileDevice::WriteGroup | QFileDevice::ExeGroup |
-			QFileDevice::ReadOther | QFileDevice::WriteOther | QFileDevice::ExeOther;
-#endif
+/**
+	The access of the other accounts to a file or a folder of the test.
+*/
+enum Access
+{
+	/**
+		Unix: mode 700 (600 for a file); Windows: this account, the system and the administrators only, nothing inherited.
+	*/
+	A_OWNER_ONLY,
+
+	/**
+		The others can read (and open a folder), not change. Unix: mode 755 (644); Windows: Everyone may read and execute.
+	*/
+	A_READABLE_BY_OTHERS,
+
+	/**
+		A folder that the others can change, also delete and rename what is in it. Unix: mode 777; Windows: Everyone has full
+		control.
+	*/
+	A_REPLACEABLE_BY_OTHERS,
+
+	/**
+		A folder of the owner only, but the new files in it are readable by the others. macOS: the inherited entry of the access
+		list; Windows: the entry for the files only. Linux has no such access: the mode of a new file limits its access list.
+	*/
+	A_FILES_READABLE_BY_OTHERS
+};
 
 
+#ifdef Q_OS_WIN
+
+
+/**
+	The account of the process as SDDL.
+*/
+QString GetUserSidString()
+{
+	HANDLE token = nullptr;
+	if (!::OpenProcessToken(::GetCurrentProcess(), TOKEN_QUERY, &token)){
+		return QString();
+	}
+
+	QString retVal;
+
+	DWORD size = 0;
+	::GetTokenInformation(token, TokenUser, nullptr, 0, &size);
+	std::vector<BYTE> tokenUser(size);
+	LPWSTR sidStringPtr = nullptr;
+	if (		(size > 0) &&
+				::GetTokenInformation(token, TokenUser, tokenUser.data(), size, &size) &&
+				::ConvertSidToStringSidW(reinterpret_cast<const TOKEN_USER*>(tokenUser.data())->User.Sid, &sidStringPtr)){
+		retVal = QString::fromWCharArray(sidStringPtr);
+
+		::LocalFree(sidStringPtr);
+	}
+
+	::CloseHandle(token);
+
+	return retVal;
+}
+
+
+bool SetAccess(const QString& path, Access access)
+{
+	const QString userSid = GetUserSidString();
+	if (userSid.isEmpty()){
+		return false;
+	}
+
+	const bool isFolder = QFileInfo(path).isDir();
+	const QString inheritance = isFolder ? QStringLiteral("OICI") : QString();
+
+	// The protected list (P): nothing is inherited from the parent folder
+	QString sddl = QStringLiteral("D:P(A;%1;FA;;;%2)(A;%1;FA;;;SY)(A;%1;FA;;;BA)").arg(inheritance, userSid);
+	switch (access){
+	case A_OWNER_ONLY:
+		break;
+
+	case A_READABLE_BY_OTHERS:
+		sddl += QStringLiteral("(A;%1;FRFX;;;WD)").arg(inheritance);
+		break;
+
+	case A_REPLACEABLE_BY_OTHERS:
+		sddl += QStringLiteral("(A;%1;FA;;;WD)").arg(inheritance);
+		break;
+
+	case A_FILES_READABLE_BY_OTHERS:
+		sddl += QStringLiteral("(A;OIIO;FR;;;WD)");
+		break;
+	}
+
+	PSECURITY_DESCRIPTOR descriptorPtr = nullptr;
+	if (!::ConvertStringSecurityDescriptorToSecurityDescriptorW(reinterpret_cast<LPCWSTR>(sddl.utf16()), SDDL_REVISION_1, &descriptorPtr, nullptr)){
+		return false;
+	}
+
+	BOOL isPresent = FALSE;
+	BOOL isDefaulted = FALSE;
+	PACL daclPtr = nullptr;
+	const std::wstring nativePath = QDir::toNativeSeparators(path).toStdWString();
+	const bool retVal =
+				::GetSecurityDescriptorDacl(descriptorPtr, &isPresent, &daclPtr, &isDefaulted) &&
+				(::SetNamedSecurityInfoW(
+							const_cast<LPWSTR>(nativePath.c_str()),
+							SE_FILE_OBJECT,
+							DACL_SECURITY_INFORMATION | PROTECTED_DACL_SECURITY_INFORMATION,
+							nullptr,
+							nullptr,
+							daclPtr,
+							nullptr) == ERROR_SUCCESS);
+
+	::LocalFree(descriptorPtr);
+
+	return retVal;
+}
+
+
+/**
+	Only this account, the system and the administrators have any access, also to the new files of a folder, and nothing is inherited
+	from the parent folder.
+*/
 bool IsOwnerOnly(const QString& path)
 {
-#ifndef Q_OS_WIN
-	return (QFile::permissions(path) & s_sharedPermissions) == 0;
+	const QStringList privateSids = {GetUserSidString(), QStringLiteral("S-1-5-18"), QStringLiteral("S-1-5-32-544")};
+
+	PACL daclPtr = nullptr;
+	PSECURITY_DESCRIPTOR descriptorPtr = nullptr;
+	const std::wstring nativePath = QDir::toNativeSeparators(path).toStdWString();
+	if (::GetNamedSecurityInfoW(nativePath.c_str(), SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, nullptr, nullptr, &daclPtr, nullptr, &descriptorPtr) != ERROR_SUCCESS){
+		return false;
+	}
+
+	SECURITY_DESCRIPTOR_CONTROL control = 0;
+	DWORD revision = 0;
+	bool retVal =
+				(daclPtr != nullptr) &&
+				::GetSecurityDescriptorControl(descriptorPtr, &control, &revision) &&
+				((control & SE_DACL_PROTECTED) != 0);
+
+	for (DWORD index = 0; retVal && (index < daclPtr->AceCount); ++index){
+		ACE_HEADER* headerPtr = nullptr;
+		LPWSTR sidStringPtr = nullptr;
+		retVal =
+					::GetAce(daclPtr, index, reinterpret_cast<LPVOID*>(&headerPtr)) &&
+					(headerPtr->AceType == ACCESS_ALLOWED_ACE_TYPE) &&
+					::ConvertSidToStringSidW(&reinterpret_cast<ACCESS_ALLOWED_ACE*>(headerPtr)->SidStart, &sidStringPtr);
+		if (retVal){
+			retVal = privateSids.contains(QString::fromWCharArray(sidStringPtr));
+
+			::LocalFree(sidStringPtr);
+		}
+	}
+
+	::LocalFree(descriptorPtr);
+
+	return retVal;
+}
+
+
 #else
-	return QFileInfo::exists(path);
+
+
+bool SetAccess(const QString& path, Access access)
+{
+	const bool isFolder = QFileInfo(path).isDir();
+
+	mode_t mode = isFolder ? 0700 : 0600;
+	switch (access){
+	case A_OWNER_ONLY:
+	case A_FILES_READABLE_BY_OTHERS:
+		break;
+
+	case A_READABLE_BY_OTHERS:
+		mode = isFolder ? 0755 : 0644;
+		break;
+
+	case A_REPLACEABLE_BY_OTHERS:
+		mode = 0777;
+		break;
+	}
+
+	if (::chmod(QFile::encodeName(path).constData(), mode) != 0){
+		return false;
+	}
+
+#ifdef Q_OS_MACOS
+	// The access list gives its rights before the mode: an empty one removes them
+	acl_t acl = ::acl_init(0);
+	const bool isAclRemoved = (acl != nullptr) && (::acl_set_file(QFile::encodeName(path).constData(), ACL_TYPE_EXTENDED, acl) == 0);
+	::acl_free(acl);
+	if (!isAclRemoved){
+		return false;
+	}
+#endif
+
+	if (access != A_FILES_READABLE_BY_OTHERS){
+		return true;
+	}
+
+#ifdef Q_OS_MACOS
+	return QProcess::execute(QStringLiteral("/bin/chmod"), {QStringLiteral("+a"), QStringLiteral("everyone allow read,file_inherit,only_inherit"), path}) == 0;
+#else
+	return false;
 #endif
 }
 
 
-bool WriteShared(const QString& path, const QByteArray& text)
+/**
+	Only the owner has any access: by the mode and (macOS) by the access list.
+*/
+bool IsOwnerOnly(const QString& path)
+{
+	const QFileDevice::Permissions sharedPermissions =
+				QFileDevice::ReadGroup | QFileDevice::WriteGroup | QFileDevice::ExeGroup |
+				QFileDevice::ReadOther | QFileDevice::WriteOther | QFileDevice::ExeOther;
+	if ((QFile::permissions(path) & sharedPermissions) != 0){
+		return false;
+	}
+
+#ifdef Q_OS_MACOS
+	acl_t acl = ::acl_get_file(QFile::encodeName(path).constData(), ACL_TYPE_EXTENDED);
+	if (acl != nullptr){
+		::acl_free(acl);
+
+		return false;
+	}
+#endif
+
+	return true;
+}
+
+
+#endif
+
+
+bool WriteFile(const QString& path, const QByteArray& text)
 {
 	QFile file(path);
 	if (!file.open(QIODevice::WriteOnly)){
 		return false;
 	}
 
-	file.write(text);
-	file.close();
+	return file.write(text) == text.size();
+}
 
-	return file.setPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ReadGroup | QFileDevice::ReadOther);
+
+/**
+	Write a file that other accounts can read.
+*/
+bool WriteShared(const QString& path, const QByteArray& text)
+{
+	return WriteFile(path, text) && SetAccess(path, A_READABLE_BY_OTHERS);
+}
+
+
+bool MakeFolder(const QString& path, Access access)
+{
+	return QDir().mkpath(path) && SetAccess(path, access);
 }
 
 
@@ -279,12 +518,9 @@ void CPrivateFilePersistenceTest::SaveCreatesPrivateFolderAndFileTest()
 // A file that other users could read is replaced by a new file of the owner, not written in place
 void CPrivateFilePersistenceTest::SaveReplacesSharedFileTest()
 {
-#ifdef Q_OS_WIN
-	QSKIP("The permissions of other users are the access list on Windows");
-#endif
 	QTemporaryDir root;
 	QVERIFY(root.isValid());
-	QVERIFY(QFile::setPermissions(root.path(), QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ExeOwner));
+	QVERIFY(SetAccess(root.path(), A_OWNER_ONLY));
 	const QString filePath = root.filePath(QStringLiteral("Secrets.xml"));
 	QVERIFY(WriteShared(filePath, "old"));
 	QVERIFY(!IsOwnerOnly(filePath));
@@ -344,19 +580,14 @@ void CPrivateFilePersistenceTest::OtherFolderIsRefusedTest()
 }
 
 
-// Another user could replace the private folder in a folder above it that everybody can write into: nothing is saved there.
-// With the sticky bit (as /tmp has) only the owner of a folder can replace it
+// Another account could replace the private folder in a folder above it that everybody can change: nothing is saved there. The
+// folder above that the others can only read is accepted
 void CPrivateFilePersistenceTest::ReplaceableParentFolderIsRefusedTest()
 {
-#ifdef Q_OS_WIN
-	QSKIP("The rights of other accounts are the access list on Windows");
-#else
 	QTemporaryDir root;
 	QVERIFY(root.isValid());
 	const QString sharedPath = root.filePath(QStringLiteral("Shared"));
-	QVERIFY(QDir().mkdir(sharedPath));
-	const QByteArray nativeSharedPath = QFile::encodeName(sharedPath);
-	QCOMPARE(::chmod(nativeSharedPath.constData(), 0777), 0);
+	QVERIFY(MakeFolder(sharedPath, A_REPLACEABLE_BY_OTHERS));
 
 	SPersistence persistence(sharedPath + QStringLiteral("/Company/Private/Secrets.xml"));
 	CTextData data;
@@ -366,11 +597,82 @@ void CPrivateFilePersistenceTest::ReplaceableParentFolderIsRefusedTest()
 	// The folders that exist are checked before the missing ones are created: nothing is left in a refused folder
 	QVERIFY(!QFileInfo::exists(sharedPath + QStringLiteral("/Company")));
 
-	QCOMPARE(::chmod(nativeSharedPath.constData(), 01777), 0);
+#ifndef Q_OS_WIN
+	// With the sticky bit (as /tmp has) only the owner of an entry can delete or rename it
+	QCOMPARE(::chmod(QFile::encodeName(sharedPath).constData(), 01777), 0);
 	QCOMPARE(persistence.persistence.SaveToFile(data), ifile::IFilePersistence::OS_OK);
+#endif
 
-	QCOMPARE(::chmod(nativeSharedPath.constData(), 0755), 0);
+	QVERIFY(SetAccess(sharedPath, A_READABLE_BY_OTHERS));
 	QCOMPARE(persistence.persistence.SaveToFile(data), ifile::IFilePersistence::OS_OK);
+	QVERIFY(IsOwnerOnly(sharedPath + QStringLiteral("/Company/Private")));
+	QVERIFY(IsOwnerOnly(sharedPath + QStringLiteral("/Company/Private/Secrets.xml")));
+}
+
+
+// A link to the private folder in a folder that everybody can change could be replaced by another account (with a link to its own
+// folder): the folders are checked on the way to the link as well, not only on the way to the folder it points to
+void CPrivateFilePersistenceTest::LinkInReplaceableFolderIsRefusedTest()
+{
+#ifdef Q_OS_WIN
+	QSKIP("The links of Unix are tested");
+#else
+	QTemporaryDir root;
+	QVERIFY(root.isValid());
+	const QString privatePath = root.filePath(QStringLiteral("Real/Private"));
+	QVERIFY(MakeFolder(privatePath, A_OWNER_ONLY));
+	const QString sharedPath = root.filePath(QStringLiteral("Shared"));
+	QVERIFY(MakeFolder(sharedPath, A_REPLACEABLE_BY_OTHERS));
+	const QString linkPath = sharedPath + QStringLiteral("/Link");
+	QVERIFY(QFile::link(privatePath, linkPath));
+
+	SPersistence persistence(linkPath + QStringLiteral("/Secrets.xml"));
+	CTextData data;
+	data.text = "secret";
+	QCOMPARE(persistence.persistence.SaveToFile(data), ifile::IFilePersistence::OS_FAILED);
+	QVERIFY(QDir(privatePath).entryList(QDir::Files | QDir::Hidden).isEmpty());
+
+	QVERIFY(WriteFile(privatePath + QStringLiteral("/Secrets.xml"), "secret"));
+	QVERIFY(SetAccess(privatePath + QStringLiteral("/Secrets.xml"), A_OWNER_ONLY));
+	CTextData loaded;
+	QCOMPARE(persistence.persistence.LoadFromFile(loaded), ifile::IFilePersistence::OS_FAILED);
+	QVERIFY(loaded.text.isEmpty());
+
+	// With the sticky bit only the owner of the link can replace it
+	QCOMPARE(::chmod(QFile::encodeName(sharedPath).constData(), 01777), 0);
+	QCOMPARE(persistence.persistence.LoadFromFile(loaded), ifile::IFilePersistence::OS_OK);
+	QCOMPARE(loaded.text, QByteArray("secret"));
+
+	QVERIFY(SetAccess(sharedPath, A_READABLE_BY_OTHERS));
+	data.text = "new";
+	QCOMPARE(persistence.persistence.SaveToFile(data), ifile::IFilePersistence::OS_OK);
+	QCOMPARE(ReadFile(privatePath + QStringLiteral("/Secrets.xml")), QByteArray("new"));
+#endif
+}
+
+
+// The private folder gives the others the access to its new files (an inherited entry of its access list): the folder is refused
+// before any file is created in it, the data are not written
+void CPrivateFilePersistenceTest::InheritedAccessIsRefusedTest()
+{
+#if !defined(Q_OS_WIN) && !defined(Q_OS_MACOS)
+	QSKIP("The mode of a new file limits its access list on Linux");
+#else
+	QTemporaryDir root;
+	QVERIFY(root.isValid());
+	const QString folderPath = root.filePath(QStringLiteral("Private"));
+	QVERIFY(MakeFolder(folderPath, A_FILES_READABLE_BY_OTHERS));
+
+	SPersistence persistence(folderPath + QStringLiteral("/Secrets.xml"));
+	CTextData data;
+	data.text = "secret";
+	QCOMPARE(persistence.persistence.SaveToFile(data), ifile::IFilePersistence::OS_FAILED);
+	QCOMPARE(persistence.slave->saveCount, 0);
+	QVERIFY(QDir(folderPath).entryList(QDir::Files | QDir::Hidden).isEmpty());
+
+	QVERIFY(SetAccess(folderPath, A_OWNER_ONLY));
+	QCOMPARE(persistence.persistence.SaveToFile(data), ifile::IFilePersistence::OS_OK);
+	QVERIFY(IsOwnerOnly(folderPath + QStringLiteral("/Secrets.xml")));
 #endif
 }
 
@@ -378,12 +680,9 @@ void CPrivateFilePersistenceTest::ReplaceableParentFolderIsRefusedTest()
 // A file that other users can read is not loaded: its secrets are not secret any more
 void CPrivateFilePersistenceTest::LoadRefusesSharedFileTest()
 {
-#ifdef Q_OS_WIN
-	QSKIP("The permissions of other users are the access list on Windows");
-#endif
 	QTemporaryDir root;
 	QVERIFY(root.isValid());
-	QVERIFY(QFile::setPermissions(root.path(), QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ExeOwner));
+	QVERIFY(SetAccess(root.path(), A_OWNER_ONLY));
 	const QString filePath = root.filePath(QStringLiteral("Secrets.xml"));
 	QVERIFY(WriteShared(filePath, "secret"));
 
@@ -392,7 +691,7 @@ void CPrivateFilePersistenceTest::LoadRefusesSharedFileTest()
 	QCOMPARE(persistence.persistence.LoadFromFile(loaded), ifile::IFilePersistence::OS_FAILED);
 	QVERIFY(loaded.text.isEmpty());
 
-	QVERIFY(QFile::setPermissions(filePath, QFileDevice::ReadOwner | QFileDevice::WriteOwner));
+	QVERIFY(SetAccess(filePath, A_OWNER_ONLY));
 	QCOMPARE(persistence.persistence.LoadFromFile(loaded), ifile::IFilePersistence::OS_OK);
 	QCOMPARE(loaded.text, QByteArray("secret"));
 }
@@ -401,16 +700,12 @@ void CPrivateFilePersistenceTest::LoadRefusesSharedFileTest()
 // A folder that other users can open is not trusted either: the file is neither loaded nor saved
 void CPrivateFilePersistenceTest::LoadRefusesSharedFolderTest()
 {
-#ifdef Q_OS_WIN
-	QSKIP("The permissions of other users are the access list on Windows");
-#endif
 	QTemporaryDir root;
 	QVERIFY(root.isValid());
-	QVERIFY(QFile::setPermissions(root.path(), QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ExeOwner |
-				QFileDevice::ReadOther | QFileDevice::ExeOther));
+	QVERIFY(SetAccess(root.path(), A_READABLE_BY_OTHERS));
 	const QString filePath = root.filePath(QStringLiteral("Secrets.xml"));
-	QVERIFY(WriteShared(filePath, "secret"));
-	QVERIFY(QFile::setPermissions(filePath, QFileDevice::ReadOwner | QFileDevice::WriteOwner));
+	QVERIFY(WriteFile(filePath, "secret"));
+	QVERIFY(SetAccess(filePath, A_OWNER_ONLY));
 
 	SPersistence persistence(filePath);
 	CTextData loaded;
@@ -478,6 +773,46 @@ void CPrivateFilePersistenceTest::AutoPersistenceReloadTest()
 	QCOMPARE(persistence.object->text, QByteArray("fourth"));
 	QCOMPARE(persistence.slave->saveCount, 1);
 	QCOMPARE(ReadFile(filePath), QByteArray("fourth"));
+}
+
+
+// The change of the whole object (CF_ALL_DATA, as CopyFrom makes it) is stored as well. Only the change explicitly without undo is
+// not stored
+void CPrivateFilePersistenceTest::AutoPersistenceStoresWholeObjectChangeTest()
+{
+	QTemporaryDir root;
+	QVERIFY(root.isValid());
+	const QString filePath = root.filePath(QStringLiteral("Private/Secrets.xml"));
+
+	SAutoPersistence persistence(filePath, false);
+
+	persistence.SetText("whole", istd::IChangeable::GetAllChanges());
+	QCOMPARE(ReadFile(filePath), QByteArray("whole"));
+
+	persistence.SetText("temporary", istd::IChangeable::ChangeSet(istd::IChangeable::CF_NO_UNDO));
+	QCOMPARE(ReadFile(filePath), QByteArray("whole"));
+}
+
+
+// The folder of the file does not exist on begin, the first change creates it: from now on the changes of another program are
+// loaded
+void CPrivateFilePersistenceTest::AutoPersistenceWatchesCreatedFolderTest()
+{
+	QTemporaryDir root;
+	QVERIFY(root.isValid());
+	const QString filePath = root.filePath(QStringLiteral("Private/Secrets.xml"));
+
+	SAutoPersistence persistence(filePath, true, false);
+	QVERIFY(!QFileInfo::exists(filePath));
+
+	persistence.SetText("own");
+	QCOMPARE(ReadFile(filePath), QByteArray("own"));
+
+	SPersistence otherProgram(filePath);
+	CTextData data;
+	data.text = "other";
+	QCOMPARE(otherProgram.persistence.SaveToFile(data), ifile::IFilePersistence::OS_OK);
+	QTRY_COMPARE(persistence.object->text, QByteArray("other"));
 }
 
 

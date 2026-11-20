@@ -55,9 +55,12 @@ bool IsAccepted(int port)
 */
 struct SServer
 {
-	explicit SServer(bool startOnCreate = true)
+	/**
+		\param initialPort	the port of the server on creation, a free one if 0.
+	*/
+	explicit SServer(bool startOnCreate = true, int initialPort = 0)
 	{
-		port = FindFreePort();
+		port = (initialPort != 0) ? initialPort : FindFreePort();
 
 		engine->InitComponent();
 
@@ -212,6 +215,32 @@ void CWebSocketServerPortTest::StartedServerMovesTest()
 
 	QVERIFY(IsAccepted(newPort));
 	QVERIFY(!IsAccepted(server.port));
+}
+
+
+// The port is busy when the server is created, it cannot listen: on the free port that the connection interface gets later it serves
+// its clients
+void CWebSocketServerPortTest::BusyStartPortThenFreePortServesClientsTest()
+{
+	QTcpServer otherProgram;
+	QVERIFY(otherProgram.listen(QHostAddress::Any, 0));
+
+	SServer server(true, otherProgram.serverPort());
+	const imtrest::IServer* serverPtr = &server.server;
+	QCOMPARE(serverPtr->GetServerStatus(), imtrest::IServer::SS_NOT_STARTED);
+
+	const int newPort = FindFreePort();
+	QVERIFY(newPort != 0 && newPort != server.port);
+	server.connection->SetPort(imtcom::IServerConnectionInterface::PT_WEBSOCKET, newPort);
+	QCOMPARE(serverPtr->GetServerStatus(), imtrest::IServer::SS_LISTENING);
+
+	QWebSocket client;
+	client.open(QUrl(QStringLiteral("ws://127.0.0.1:%1").arg(newPort)));
+	QTRY_COMPARE_WITH_TIMEOUT(client.state(), QAbstractSocket::ConnectedState, 5000);
+	QTRY_COMPARE_WITH_TIMEOUT(server.GetRunningWorkerCount(), 1, 5000);
+
+	client.close();
+	QTRY_COMPARE_WITH_TIMEOUT(server.GetRunningWorkerCount(), 0, 5000);
 }
 
 

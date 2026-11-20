@@ -14,9 +14,13 @@
 #include <sddl.h>
 #include <vector>
 #else
+#include <cerrno>
 #include <cstdio>
 #include <sys/stat.h>
 #include <unistd.h>
+#ifdef Q_OS_MACOS
+#include <sys/acl.h>
+#endif
 #endif
 
 
@@ -194,8 +198,9 @@ bool CheckSecurity(const QString& path, bool isPrivate, QString& errorMessage)
 			break;
 		}
 
-		// The entries for the contained files and folders only, and the denials, do not give any access to this one
-		if (((headerPtr->AceFlags & INHERIT_ONLY_ACE) != 0) || (headerPtr->AceType == ACCESS_DENIED_ACE_TYPE)){
+		// The denials do not give any access. The entries for the contained files and folders only do not give any access to a folder
+		// above, but the new files of the private folder get them
+		if ((!isPrivate && ((headerPtr->AceFlags & INHERIT_ONLY_ACE) != 0)) || (headerPtr->AceType == ACCESS_DENIED_ACE_TYPE)){
 			continue;
 		}
 
@@ -222,23 +227,23 @@ bool CheckSecurity(const QString& path, bool isPrivate, QString& errorMessage)
 
 
 /**
-	Create the folder with the access of the account of the process, the system and the administrators only: the access of the
-	parent folder is not inherited.
+	The access list of the account of the process, the system and the administrators only, \c nullptr if it cannot be made. Free it
+	with LocalFree.
 */
-bool CreatePrivateFolder(const QString& folderPath)
+PACL CreatePrivateAcl(DWORD inheritance)
 {
 	const std::vector<SidBuffer> sids = GetPrivateSids();
 
 	std::vector<EXPLICIT_ACCESSW> entries;
 	for (const SidBuffer& sid : sids){
 		if (sid.empty()){
-			return false;
+			return nullptr;
 		}
 
 		EXPLICIT_ACCESSW entry = {};
 		entry.grfAccessPermissions = FILE_ALL_ACCESS;
 		entry.grfAccessMode = SET_ACCESS;
-		entry.grfInheritance = SUB_CONTAINERS_AND_OBJECTS_INHERIT;
+		entry.grfInheritance = inheritance;
 		entry.Trustee.TrusteeForm = TRUSTEE_IS_SID;
 		entry.Trustee.TrusteeType = TRUSTEE_IS_UNKNOWN;
 		entry.Trustee.ptstrName = reinterpret_cast<LPWSTR>(const_cast<BYTE*>(sid.data()));
@@ -247,6 +252,21 @@ bool CreatePrivateFolder(const QString& folderPath)
 
 	PACL aclPtr = nullptr;
 	if (::SetEntriesInAclW(ULONG(entries.size()), entries.data(), nullptr, &aclPtr) != ERROR_SUCCESS){
+		return nullptr;
+	}
+
+	return aclPtr;
+}
+
+
+/**
+	Create a folder (\c isFolder) or a new empty file with the private access list: the access of the parent folder is not inherited.
+	A file or a link with this name is not opened.
+*/
+bool CreatePrivateEntry(const QString& path, bool isFolder)
+{
+	PACL aclPtr = CreatePrivateAcl(isFolder ? SUB_CONTAINERS_AND_OBJECTS_INHERIT : NO_INHERITANCE);
+	if (aclPtr == nullptr){
 		return false;
 	}
 
@@ -257,8 +277,17 @@ bool CreatePrivateFolder(const QString& folderPath)
 				::SetSecurityDescriptorControl(&descriptor, SE_DACL_PROTECTED, SE_DACL_PROTECTED);
 	if (retVal){
 		SECURITY_ATTRIBUTES attributes = {sizeof(SECURITY_ATTRIBUTES), &descriptor, FALSE};
-		const std::wstring nativePath = QDir::toNativeSeparators(folderPath).toStdWString();
-		retVal = ::CreateDirectoryW(nativePath.c_str(), &attributes) != 0;
+		const std::wstring nativePath = QDir::toNativeSeparators(path).toStdWString();
+		if (isFolder){
+			retVal = ::CreateDirectoryW(nativePath.c_str(), &attributes) != 0;
+		}
+		else{
+			const HANDLE fileHandle = ::CreateFileW(nativePath.c_str(), GENERIC_WRITE, 0, &attributes, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, nullptr);
+			retVal = fileHandle != INVALID_HANDLE_VALUE;
+			if (retVal){
+				::CloseHandle(fileHandle);
+			}
+		}
 	}
 
 	::LocalFree(aclPtr);
@@ -287,18 +316,11 @@ bool CheckFile(const QString& filePath, QString& errorMessage)
 
 
 /**
-	Create a new empty file: it takes the access of its private folder.
+	Create a new empty file with its own private access list: what its folder would give to the new files is not taken.
 */
 bool CreatePrivateFile(const QString& filePath)
 {
-	QFile file(filePath);
-	if (!file.open(QIODevice::WriteOnly | QIODevice::NewOnly)){
-		return false;
-	}
-
-	file.close();
-
-	return true;
+	return CreatePrivateEntry(filePath, false);
 }
 
 
@@ -314,9 +336,117 @@ bool ReplaceFile(const QString& sourcePath, const QString& targetPath)
 #else
 
 
+#ifdef Q_OS_MACOS
+// The access list gives its rights before the mode: chmod does not remove it
+const QString s_accessListHint = QStringLiteral(", chmod -N");
+#else
+const QString s_accessListHint;
+#endif
+
+
 bool IsTrustedOwner(uid_t ownerId)
 {
 	return (ownerId == 0) || (ownerId == ::geteuid());
+}
+
+
+#ifdef Q_OS_MACOS
+
+
+/**
+	The access list of macOS gives its rights before the mode is checked. A private file or folder may have no entry that allows
+	anything, a folder above no entry that allows to replace what is in it. The denials do not give any access, the entries for the
+	contained files and folders only do not give any access to a folder above. When in doubt (the list cannot be read, an entry of an
+	unknown kind) the list allows.
+*/
+bool IsAllowedByAccessList(const QString& path, bool isPrivate)
+{
+	acl_t acl = ::acl_get_file(QFile::encodeName(path).constData(), ACL_TYPE_EXTENDED);
+	if (acl == nullptr){
+		// No list, or a file system without them
+		return (errno != ENOENT) && (errno != ENOTSUP) && (errno != EOPNOTSUPP);
+	}
+
+	bool retVal = false;
+
+	acl_entry_t entry = nullptr;
+	for (int entryId = ACL_FIRST_ENTRY; !retVal && (::acl_get_entry(acl, entryId, &entry) == 0); entryId = ACL_NEXT_ENTRY){
+		acl_tag_t tag = ACL_UNDEFINED_TAG;
+		if ((::acl_get_tag_type(entry, &tag) == 0) && (tag == ACL_EXTENDED_DENY)){
+			continue;
+		}
+
+		if (isPrivate || (tag != ACL_EXTENDED_ALLOW)){
+			retVal = true;
+
+			continue;
+		}
+
+		acl_flagset_t flags = nullptr;
+		acl_permset_t permissions = nullptr;
+		if ((::acl_get_flagset_np(entry, &flags) != 0) || (::acl_get_permset(entry, &permissions) != 0)){
+			retVal = true;
+
+			continue;
+		}
+
+		if (::acl_get_flag_np(flags, ACL_ENTRY_ONLY_INHERIT) == 1){
+			continue;
+		}
+
+		retVal =
+					(::acl_get_perm_np(permissions, ACL_DELETE) != 0) ||
+					(::acl_get_perm_np(permissions, ACL_DELETE_CHILD) != 0) ||
+					(::acl_get_perm_np(permissions, ACL_WRITE_SECURITY) != 0) ||
+					(::acl_get_perm_np(permissions, ACL_CHANGE_OWNER) != 0);
+	}
+
+	::acl_free(acl);
+
+	return retVal;
+}
+
+
+#endif
+
+
+/**
+	Other users can delete, rename or replace what is in the folder: it belongs to another user, the others can write into it without
+	the sticky bit (/tmp), or its access list (macOS) allows it.
+*/
+bool IsReplaceableByOthers(const QString& folderPath, const struct stat& info)
+{
+	const bool isWritableByOthers = (info.st_mode & (S_IWGRP | S_IWOTH)) != 0;
+	if (!IsTrustedOwner(info.st_uid) || (isWritableByOthers && ((info.st_mode & S_ISVTX) == 0))){
+		return true;
+	}
+
+#ifdef Q_OS_MACOS
+	return IsAllowedByAccessList(folderPath, false);
+#else
+	Q_UNUSED(folderPath);
+
+	return false;
+#endif
+}
+
+
+/**
+	Other users have any access to the private file or folder: by its mode or by its access list (macOS).
+*/
+bool IsOpenToOthers(const QString& path, const struct stat& info)
+{
+	if ((info.st_mode & (S_IRWXG | S_IRWXO)) != 0){
+		return true;
+	}
+
+#ifdef Q_OS_MACOS
+	return IsAllowedByAccessList(path, true);
+#else
+	Q_UNUSED(path);
+
+	return false;
+#endif
 }
 
 
@@ -327,6 +457,8 @@ bool IsTrustedOwner(uid_t ownerId)
 */
 bool CheckFolderChain(const QString& folderPath, bool isPrivateFolder, QString& errorMessage)
 {
+	// A link is replaced through the folder that contains it: the folders are checked as they are on the way, not only as they are
+	// when the links are resolved
 	for (const QString& path : GetFolderChain(folderPath)){
 		struct stat info;
 		if (::lstat(QFile::encodeName(path).constData(), &info) != 0){
@@ -335,8 +467,15 @@ bool CheckFolderChain(const QString& folderPath, bool isPrivateFolder, QString& 
 			return false;
 		}
 
-		if (S_ISLNK(info.st_mode) && !IsTrustedOwner(info.st_uid)){
-			errorMessage = QStringLiteral("The link '%1' belongs to another user").arg(path);
+		if (S_ISLNK(info.st_mode)){
+			if (!IsTrustedOwner(info.st_uid)){
+				errorMessage = QStringLiteral("The link '%1' belongs to another user").arg(path);
+
+				return false;
+			}
+		}
+		else if (S_ISDIR(info.st_mode) && IsReplaceableByOthers(path, info)){
+			errorMessage = QStringLiteral("Other users can replace what is in the folder '%1'").arg(path);
 
 			return false;
 		}
@@ -365,19 +504,16 @@ bool CheckFolderChain(const QString& folderPath, bool isPrivateFolder, QString& 
 				return false;
 			}
 
-			if ((info.st_mode & (S_IRWXG | S_IRWXO)) != 0){
-				errorMessage = QStringLiteral("Other users can open the folder '%1': make it accessible to its owner only (chmod 700)").arg(chain[index]);
+			if (IsOpenToOthers(chain[index], info)){
+				errorMessage = QStringLiteral("Other users can open the folder '%1': make it accessible to its owner only (chmod 700%2)").arg(chain[index], s_accessListHint);
 
 				return false;
 			}
 		}
-		else{
-			const bool isWritableByOthers = (info.st_mode & (S_IWGRP | S_IWOTH)) != 0;
-			if (!IsTrustedOwner(info.st_uid) || (isWritableByOthers && ((info.st_mode & S_ISVTX) == 0))){
-				errorMessage = QStringLiteral("Other users can replace what is in the folder '%1'").arg(chain[index]);
+		else if (IsReplaceableByOthers(chain[index], info)){
+			errorMessage = QStringLiteral("Other users can replace what is in the folder '%1'").arg(chain[index]);
 
-				return false;
-			}
+			return false;
 		}
 	}
 
@@ -406,8 +542,8 @@ bool CheckFile(const QString& filePath, QString& errorMessage)
 		return false;
 	}
 
-	if ((info.st_mode & (S_IRWXG | S_IRWXO)) != 0){
-		errorMessage = QStringLiteral("Other users can read the file '%1': make it readable by its owner only (chmod 600)").arg(filePath);
+	if (IsOpenToOthers(filePath, info)){
+		errorMessage = QStringLiteral("Other users can read the file '%1': make it readable by its owner only (chmod 600%2)").arg(filePath, s_accessListHint);
 
 		return false;
 	}
@@ -476,7 +612,7 @@ bool CreateParentFolders(const QString& folderPath)
 bool CreateFolder(const QString& folderPath)
 {
 #if defined(Q_OS_WIN)
-	return CreatePrivateFolder(folderPath);
+	return CreatePrivateEntry(folderPath, true);
 #elif QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
 	return QDir().mkdir(folderPath, QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ExeOwner);
 #else
@@ -597,6 +733,15 @@ ifile::IFilePersistence::OperationState CPrivateFilePersistenceComp::SaveToFile(
 
 	if (!CreatePrivateFile(workingPath)){
 		SendErrorMessage(0, QStringLiteral("The data are not saved: the file '%1' cannot be created for its owner only").arg(workingPath));
+
+		return OS_FAILED;
+	}
+
+	// The new file is checked before the data are written into it: nobody else may have got any access to it
+	if (!CheckFile(workingPath, errorMessage)){
+		QFile::remove(workingPath);
+
+		SendErrorMessage(0, QStringLiteral("The data are not saved: %1").arg(errorMessage));
 
 		return OS_FAILED;
 	}
