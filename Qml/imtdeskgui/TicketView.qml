@@ -64,7 +64,7 @@ Rectangle {
 						text: ticketViewRoot.title
 						font.pixelSize: Style.fontSizeL
 						font.bold: true
-						color: Style.imaginToolsAccentColor
+						color: Style.imagingToolsAccentColor
 						wrapMode: Text.Wrap
 						width: parent.width - (ticketViewRoot.number > 0 ? Style.paddingS + Style.fontSizeL * 3 : 0)
 					}
@@ -156,7 +156,7 @@ Rectangle {
 						: qsTr("(No description provided)")
 					font.pixelSize: Style.fontSizeS
 					color: ticketViewRoot.description.length > 0
-						? Style.imaginToolsAccentColor
+						? Style.imagingToolsAccentColor
 						: Style.buttonInactiveTextColor
 					wrapMode: Text.Wrap
 				}
@@ -173,7 +173,7 @@ Rectangle {
 					Text {
 						text: ticketViewRoot.ticketTypeLabel(ticketViewRoot.ticketType)
 						font.pixelSize: Style.fontSizeXS
-						color: Style.imaginToolsAccentColor
+						color: Style.imagingToolsAccentColor
 					}
 				}
 
@@ -183,7 +183,7 @@ Rectangle {
 					Text {
 						text: ticketViewRoot.reporterName || ticketViewRoot.reporterId || "—"
 						font.pixelSize: Style.fontSizeXS
-						color: Style.imaginToolsAccentColor
+						color: Style.imagingToolsAccentColor
 					}
 				}
 
@@ -193,7 +193,7 @@ Rectangle {
 					Text {
 						text: ticketViewRoot.assigneeName || (ticketViewRoot.assigneeIds.length > 0 ? ticketViewRoot.assigneeIds.join(", ") : "") || qsTr("No one assigned")
 						font.pixelSize: Style.fontSizeXS
-						color: Style.imaginToolsAccentColor
+						color: Style.imagingToolsAccentColor
 					}
 				}
 
@@ -203,7 +203,7 @@ Rectangle {
 					Text {
 						text: ticketViewRoot.createdAt || "—"
 						font.pixelSize: Style.fontSizeXS
-						color: Style.imaginToolsAccentColor
+						color: Style.imagingToolsAccentColor
 					}
 				}
 
@@ -214,7 +214,7 @@ Rectangle {
 					Text {
 						text: ticketViewRoot.closedAt
 						font.pixelSize: Style.fontSizeXS
-						color: Style.imaginToolsAccentColor
+						color: Style.imagingToolsAccentColor
 					}
 				}
 			}
@@ -239,7 +239,7 @@ Rectangle {
 							anchors.centerIn: parent
 							text: modelData
 							font.pixelSize: Style.fontSizeXS
-							color: Style.imaginToolsAccentColor
+							color: Style.imagingToolsAccentColor
 						}
 					}
 				}
@@ -332,14 +332,14 @@ Rectangle {
 					height: Style.buttonHeightM
 					radius: Style.radiusS
 					color: "transparent"
-					border.color: Style.imaginToolsAccentColor
+					border.color: Style.imagingToolsAccentColor
 
 					Text {
 						id: openChatText
 						anchors.centerIn: parent
 						text: qsTr("Open Chat")
 						font.pixelSize: Style.fontSizeXS
-						color: Style.imaginToolsAccentColor
+						color: Style.imagingToolsAccentColor
 					}
 
 					MouseArea {

@@ -143,12 +143,26 @@ function cases(name, runtime){
         assert.equal(fixed.currentIndex, 0)
     })
 
-    test(name + ': a new current index brings its item into the view', () => {
+    // QQuickItemView::trackedPositionChanged: after a new current index (moveReason SetIndex) the view follows the
+    // highlight - an empty item without a highlight component (createHighlightItem, createDefault) - which moves to the
+    // current item by a SmoothedAnimation (highlightMoveVelocity 400); the view moved by hand stops following
+    test(name + ': a new current index: the view follows the highlight moving to the item', () => {
         let view = list()
+        assert.ok(view.highlightItem)
         engine.batch(() => { view.currentIndex = 9 })
+        assert.equal(view.contentY, 0)
+        let animations = view.$highlightAnimations
+        assert.equal(animations.pos.to, 180)
+        engine.batch(() => animations.pos.complete())
+        assert.equal(view.highlightItem.y, 180)
         assert.equal(view.contentY, 100)
         engine.batch(() => { view.currentIndex = 2 })
+        engine.batch(() => animations.pos.complete())
         assert.equal(view.contentY, 40)
+        // by hand: the view does not follow the highlight any more
+        engine.batch(() => { view.contentY = 0 })
+        engine.batch(() => { view.highlightItem.y = 150 })
+        assert.equal(view.contentY, 0)
     })
 
     test(name + ': the delegates are at z 1, the highlight at z 0 under the current item; ListView.view and isCurrentItem', () => {
@@ -400,6 +414,104 @@ function cases(name, runtime){
 
     // ---- GridView ----
 
+    // QQuickListViewPrivate: the visible items keep their positions, the rows not built are estimated from them with the
+    // average size (positionAt, originPosition, lastPosition). A view of rows of different heights jumped far down
+    // settles at once, and a later layout with another average does not move the rows in the view (the estimate moves
+    // the origin instead). Before, every row was positioned from the first one with the average: each fill built other
+    // rows, a new average, and the polish never ended
+    test(name + ': a ListView of rows of different heights jumped far down settles, its rows stay when the average changes', () => {
+        let root, view
+        let heights = Array.from({ length: 3000 }, (_, i) => 10 + (i * 37) % 41)
+        engine.batch(() => {
+            root = new Item(null)
+            view = new ListView(root)
+            view.width = 300
+            view.height = 400
+            view.spacing = 2
+            view.delegate = component((parent, ctx) => {
+                let item = new Item(parent)
+                item.width = 300
+                item.height = heights[ctx.index]
+                return item
+            })
+            view.model = heights.length
+        })
+        let warnings = []
+        let warn = console.warn
+        console.warn = (message) => warnings.push(String(message))
+        try {
+            engine.batch(() => { view.contentY = 52000 })
+            engine.flushFrame()
+            engine.flushFrame()
+        } finally {
+            console.warn = warn
+        }
+        assert.deepEqual(warnings, [])
+        let top = view.indexAt(10, 52001)
+        assert.ok(top > 0)
+        let item = view.itemAtIndex(top)
+        let y = item.y
+        // another row of the view grows: the average changes, the rows in the view stay, the origin moves
+        let origin = view.originY
+        heights[top + 2] += 300
+        engine.batch(() => { view.itemAtIndex(top + 2).height = heights[top + 2] })
+        engine.flushFrame()
+        assert.equal(view.itemAtIndex(top), item)
+        assert.equal(item.y, y)
+        assert.equal(view.itemAtIndex(top + 3).y, view.itemAtIndex(top + 2).y + heights[top + 2] + 2)
+        assert.notEqual(view.originY, origin)
+        // scrolled back to the origin the first row is built where the estimate puts it
+        engine.batch(() => { view.contentY = view.originY })
+        engine.flushFrame()
+        assert.equal(view.indexAt(10, view.originY + 1), 0)
+    })
+
+    // QQmlChangeSet move (QQmlListModel::move -> rowsMoved): the delegates of the moved rows are the same objects at
+    // their new place, the rows moved out of the view release theirs, the ones moved in are made; the current index
+    // follows its row and the view does not move (tests/diff/cases/listview_move.qml: the same as Qt 6)
+    test(name + ': ListModel.move moves the delegates of a ListView, the current item follows its row', () => {
+        const { ListModel } = types
+        let root, model, view
+        engine.batch(() => {
+            root = new Item(null)
+            model = new ListModel(root)
+            for(let i = 0; i < 60; i++) model.append({ n: i })
+            view = new ListView(root)
+            view.width = 300
+            view.height = 200
+            view.cacheBuffer = 0
+            view.delegate = box(20, 300)
+            view.model = model
+        })
+        engine.flushFrame()
+        let items = Array.from({ length: 10 }, (_, i) => view.itemAtIndex(i))
+        engine.batch(() => { view.currentIndex = 3 })
+        engine.batch(() => model.move(2, 5, 1))
+        engine.flushFrame()
+        assert.equal(view.itemAtIndex(5), items[2])
+        assert.equal(view.itemAtIndex(2), items[3])
+        assert.equal(view.itemAtIndex(5).y, 100)
+        assert.equal(view.currentIndex, 2)
+        assert.equal(view.currentItem, items[3])
+        // to the top, before the first visible row: put back there
+        engine.batch(() => model.move(3, 0, 2))
+        engine.flushFrame()
+        assert.equal(view.itemAtIndex(0), items[4])
+        assert.equal(view.itemAtIndex(0).y, 0)
+        assert.equal(view.contentY, 0)
+        // out of the view: released; in from far: made
+        let out = view.itemAtIndex(1)
+        engine.batch(() => model.move(1, 40, 1))
+        engine.flushFrame()
+        assert.notEqual(view.itemAtIndex(1), out)
+        assert.equal(view.itemAtIndex(40), null)
+        engine.batch(() => model.move(50, 2, 3))
+        engine.flushFrame()
+        assert.equal(model.get(2).n, 50)
+        assert.equal(view.itemAtIndex(2).y, 40)
+        assert.equal(view.contentY, 0)
+    })
+
     test(name + ': GridView arrows move the current index by a cell and by a row', () => {
         let root = window()
         let view
@@ -422,7 +534,12 @@ function cases(name, runtime){
         assert.equal(view.currentIndex, 4)
         key('ArrowUp')
         assert.equal(view.currentIndex, 1)
+        // the view follows the highlight (an empty item without a component), moved in highlightMoveDuration (150 ms)
         engine.batch(() => { view.currentIndex = 6 })
+        assert.ok(view.highlightItem)
+        assert.equal(view.$highlightAnimations.y.duration, 150)
+        engine.batch(() => { for(let key in view.$highlightAnimations) view.$highlightAnimations[key].complete() })
+        assert.equal(view.highlightItem.y, 200)
         assert.equal(view.contentY, 100)
     })
 }

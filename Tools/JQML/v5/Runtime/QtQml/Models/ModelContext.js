@@ -120,4 +120,21 @@ function sameModel(a, b){
     return keys.length === Object.keys(b).length && keys.every(key => key in b && sameModel(a[key], b[key]))
 }
 
-module.exports = { sameModel, ModelContext, modelRows }
+// QQmlChangeSet move (rowsMoved): count entries of each array from from go to to (where they start afterwards)
+function moveEntries(arrays, from, to, count){
+    for(let array of arrays){
+        let moved = array.splice(from, count)
+        let tail = array.splice(to)
+        for(let i = 0; i < moved.length; i++) array.push(moved[i])
+        for(let i = 0; i < tail.length; i++) array.push(tail[i])
+    }
+}
+
+// the index a row has after a move
+function movedIndex(i, from, to, count){
+    if(i >= from && i < from + count) return to + (i - from)
+    let j = i < from ? i : i - count
+    return j >= to ? j + count : j
+}
+
+module.exports = { sameModel, ModelContext, modelRows, moveEntries, movedIndex }

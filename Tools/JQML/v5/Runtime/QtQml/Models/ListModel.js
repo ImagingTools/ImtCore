@@ -16,6 +16,14 @@ const missing = (value) => value === undefined || value === null
 
 // Without dynamicRoles a role is created by the first value seen for it and every element has it,
 // an undefined/null member creates no role (QQmlListModel, ListModel::setOrCreateProperty)
+// array.splice(index, 0, ...items) without passing the items as arguments: past about 100000 of them the call stack
+// overflows (RangeError)
+function spliceIn(array, index, items){
+    let tail = array.splice(index)
+    for(let i = 0; i < items.length; i++) array.push(items[i])
+    for(let i = 0; i < tail.length; i++) array.push(tail[i])
+}
+
 class ListModel extends QtObject {
     constructor(parent = null){
         super(parent)
@@ -65,13 +73,14 @@ class ListModel extends QtObject {
     }
 
     // roles: the roles a 'change' touched (dataChanged), all of them when not given
-    $notify(kind, index, count, roles = null){
+    // a 'move' gives to: the index the moved rows start at afterwards (QAbstractItemModel::rowsMoved)
+    $notify(kind, index, count, roles = null, to = -1){
         this.$write(ListModel.COUNT, this.$rows.length)
         if(kind === 'change'){
             for(let i = index; i < index + count; i++) if(this.$rows[i] !== writingElement) notifyCells(this.$rows[i], roles)
         }
         if(this.$views){
-            for(let view of this.$views.slice()) view.$modelChanged(kind, index, count, roles)
+            for(let view of this.$views.slice()) view.$modelChanged(kind, index, count, roles, to)
         }
     }
 
@@ -84,7 +93,7 @@ class ListModel extends QtObject {
 
     insert(index, value){
         let rows = Array.isArray(value) ? value : [value]
-        this.$rows.splice(index, 0, ...rows.map(row => this.$newRow(row)))
+        spliceIn(this.$rows, index, rows.map(row => this.$newRow(row)))
         this.$notify('insert', index, rows.length)
     }
 
@@ -133,8 +142,9 @@ class ListModel extends QtObject {
 
     move(from, to, count = 1){
         let moved = this.$rows.splice(from, count)
-        this.$rows.splice(to, 0, ...moved)
-        this.$notify('reset', 0, this.$rows.length)
+        spliceIn(this.$rows, to, moved)
+        // views that move their delegates take 'move'; the others build again as for a reset
+        if(moved.length && from !== to) this.$notify('move', from, moved.length, null, to)
     }
 
     $addView(view){

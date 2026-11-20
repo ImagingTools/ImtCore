@@ -19,7 +19,7 @@ Rectangle {
 	readonly property var _colorMap: ({
 		"status":      [Style.successColor, Style.doneColor],
 		"priority":    [Style.successColor, Style.attentionColor, Style.severeColor, Style.dangerColor],
-		"stateReason": [Style.neutralEmphasisColor, Style.doneColor, Style.neutralEmphasisColor, Style.imaginToolsAccentColor]
+		"stateReason": [Style.neutralEmphasisColor, Style.doneColor, Style.neutralEmphasisColor, Style.imagingToolsAccentColor]
 	})
 
 	readonly property var _labelMap: ({

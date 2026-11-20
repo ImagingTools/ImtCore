@@ -140,8 +140,14 @@ class QtObject {
         let old = this.$parent
         if(old === parent) return
         if(old && old.$children){
-            let index = old.$children.indexOf(this)
-            if(index >= 0) old.$children.splice(index, 1)
+            // children leave from the last one when a parent destroys them, a Repeater clears or a view releases
+            let children = old.$children
+            let last = children.length - 1
+            if(children[last] === this) children.length = last
+            else {
+                let index = children.indexOf(this)
+                if(index >= 0) children.splice(index, 1)
+            }
         }
         this.$parent = parent
         if(parent){

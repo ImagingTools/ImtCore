@@ -1,10 +1,14 @@
 const engine = require('../Core/engine')
 const { defineType } = require('../Core/type')
 const { ListModel } = require('../QtQml/Models/ListModel')
-const { ModelContext, modelRows, sameModel } = require('../QtQml/Models/ModelContext')
+const { ModelContext, modelRows, sameModel, moveEntries, movedIndex } = require('../QtQml/Models/ModelContext')
 const { Item } = require('./Item')
 const { installFlick, flickDirection, wheelScroll, FLICK_PROPS, FLICK_SIGNALS, FLICK_ENUMS } = require('./Flickable')
 const QtEnums = require('../Qt/enums')
+const { SmoothedAnimation } = require('./SmoothedAnimation')
+
+// QQuickItemViewPrivate::MovementReason: the view follows the highlight only after a new current index
+const MOVE_OTHER = 0, MOVE_SET_INDEX = 1, MOVE_MOUSE = 2
 
 // ---- GridView: every delegate exists, laid out in cells ---------------------------------------
 
@@ -17,6 +21,10 @@ class GridView extends Item {
         this.$items = []
         this.$contexts = []
         this.$model = null
+        this.$highlight = null
+        this.$highlightAnimations = null
+        this.$moveReason = MOVE_OTHER
+        this.$internalMove = 0
         this.$v[Item.CLIP] = false
         engine.scheduleComponentComplete(this)
     }
@@ -28,6 +36,22 @@ class GridView extends Item {
     $componentComplete(){
         super.$componentComplete()
         this.$sync()
+    }
+
+    // a delegate for row index of rows, put at index
+    $createAt(index, rows){
+        let ctx = new ModelContext(rows.row(index), index, rows.data(index))
+        ctx.$view = this
+        let item = this.$v[GridView.DELEGATE].createObject(this.$content, null, ctx)
+        if(!item) return null
+        if(!item.$v[Item.Z]) item.z = 1
+        this.$items.splice(index, 0, item)
+        this.$contexts.splice(index, 0, ctx)
+        return item
+    }
+
+    $reindex(){
+        for(let i = 0; i < this.$contexts.length; i++) this.$contexts[i].$write(ModelContext.INDEX, i)
     }
 
     $sync(){
@@ -58,10 +82,46 @@ class GridView extends Item {
         this.$layout()
         if(this.$items.length && this.$v[GridView.CURRENTINDEX] < 0) this.$write(GridView.CURRENTINDEX, 0)
         if(this.$v[GridView.CURRENTINDEX] >= this.$items.length) this.$write(GridView.CURRENTINDEX, this.$items.length - 1)
+        this.$moveReason = MOVE_SET_INDEX
         this.$updateCurrent()
+        this.$resetHighlightPosition()
+        this.$trackedPositionChanged()
+        this.$moveReason = MOVE_OTHER
     }
 
-    $modelChanged(kind, index, count, roles = null){
+    // QQuickItemView applyModelChanges: the delegates of the rows that stay are kept, inserted rows get new ones,
+    // moved rows keep theirs (QQmlChangeSet move); the current index follows its row and the view does not move to it
+    $modelChanged(kind, index, count, roles = null, to = -1){
+        if((kind === 'insert' || kind === 'remove' || kind === 'move') && this.$v[GridView.DELEGATE] && this.$f & engine.COMPLETED){
+            let current = this.$v[GridView.CURRENTINDEX]
+            let next = current
+            if(kind === 'insert'){
+                let rows = modelRows(this.$model)
+                for(let i = 0; i < count; i++) this.$createAt(index + i, rows)
+                if(current >= index) next = current + count
+            } else if(kind === 'remove'){
+                let removed = this.$items.splice(index, count)
+                this.$contexts.splice(index, count)
+                for(let item of removed) item.$releaseLater()
+                if(current >= index + count) next = current - count
+                else if(current >= index) next = Math.min(index, this.$items.length - 1)
+            } else {
+                moveEntries([this.$items, this.$contexts], index, to, count)
+                if(current >= 0) next = movedIndex(current, index, to, count)
+            }
+            this.$reindex()
+            this.$write(GridView.COUNT, this.$items.length)
+            this.$layout()
+            if(this.$items.length && next < 0) next = 0
+            this.$modelUpdating = true
+            try {
+                if(next !== current) this.$write(GridView.CURRENTINDEX, next)
+                else this.$updateCurrent()
+            } finally {
+                this.$modelUpdating = false
+            }
+            return
+        }
         if(kind === 'change'){
             let rows = modelRows(this.$model)
             for(let i = index; i < index + count; i++){
@@ -91,9 +151,23 @@ class GridView extends Item {
 
     $contentPos(axis){ return this.$v[axis === 'x' ? GridView.CONTENTX : GridView.CONTENTY] }
 
+    // the flick engine moves the view: QQuickItemView::viewportMoved takes it for a move of the mouse while flicking
     $setContentPos(axis, value){
-        if(axis === 'x') this.contentX = value
-        else this.contentY = value
+        let s = this.$fs
+        if(s && (s.pressed || s.moving || s.dragging || s.x.flicking || s.y.flicking)) this.$moveReason = MOVE_MOUSE
+        this.$internalMove++
+        try {
+            if(axis === 'x') this.contentX = value
+            else this.contentY = value
+        } finally {
+            this.$internalMove--
+        }
+    }
+
+    // QQuickItemView::setContentX / setContentY: positioning the view by hand overrides the movement state
+    $assign(id, value){
+        if((id === GridView.CONTENTX || id === GridView.CONTENTY) && !this.$internalMove) this.$moveReason = MOVE_OTHER
+        super.$assign(id, value)
     }
 
     $alongFlow(axis){ return (axis === 'y') === (this.$v[GridView.FLOW] === LEFT_TO_RIGHT) }
@@ -189,50 +263,113 @@ class GridView extends Item {
         return old !== this.$v[GridView.CURRENTINDEX] || this.$v[GridView.KEYNAVIGATIONWRAPS] ? 1 : 0
     }
 
+    // QQuickItemViewPrivate::updateCurrent: the new current item takes the focus, then the highlight
     $updateCurrent(){
         let index = this.$v[GridView.CURRENTINDEX]
         let item = this.$items[index] || null
         if(item && item !== this.$v[GridView.CURRENTITEM]) item.$setFocus(true)
         this.$write(GridView.CURRENTITEM, item)
         this.$updateHighlight()
-        // QQuickItemView::trackedPositionChanged: the current item comes into the view
-        if(item && (this.$f & engine.COMPLETED) && !(this.$fs && (this.$fs.pressed || this.$fs.moving))){
-            for(let axis of ['x', 'y']){
-                if(!this.$alongFlow(axis)) continue
-                let start = item.$v[axis === 'x' ? Item.X : Item.Y]
-                let size = axis === 'x' ? this.$v[GridView.CELLWIDTH] : this.$v[GridView.CELLHEIGHT]
-                let viewSize = axis === 'x' ? this.$v[Item.WIDTH] : this.$v[Item.HEIGHT]
-                let pos = this.$contentPos(axis)
-                if(start + size > pos + viewSize) pos = start + size - viewSize
-                if(start < pos) pos = start
-                let b = this.$flickBounds(axis)
-                this.$setContentPos(axis, Math.max(b.min, Math.min(b.max, pos)))
-            }
-        }
     }
 
+    // QQuickGridViewPrivate::createHighlight / updateHighlight: the highlight (an empty item without a highlight
+    // component) takes the current item's size and moves to it by two SmoothedAnimations of highlightMoveDuration;
+    // then updateTrackedItem
     $updateHighlight(){
         let component = this.$v[GridView.HIGHLIGHT]
         let current = this.$v[GridView.CURRENTITEM]
         if(this.$highlight && (this.$highlight.$component !== component || !current)){
+            this.$stopHighlightAnimations()
             this.$highlight.$releaseLater()
             this.$highlight = null
             this.$write(GridView.HIGHLIGHTITEM, null)
         }
-        if(!component || !current) return
+        if(!current) return
+        let follows = this.$v[GridView.HIGHLIGHTFOLLOWSCURRENTITEM]
         if(!this.$highlight){
-            let item = component.createObject(this.$content, null, null)
-            if(!item) return
-            item.$component = component
-            this.$highlight = item
-            this.$write(GridView.HIGHLIGHTITEM, item)
+            let highlight = component ? component.createObject(this.$content, null, null) : new Item(this.$content)
+            if(!highlight) return
+            highlight.$component = component
+            this.$highlight = highlight
+            for(let signal of [Item.SIGNAL_xChanged, Item.SIGNAL_yChanged, Item.SIGNAL_widthChanged, Item.SIGNAL_heightChanged]){
+                engine.connect(highlight, signal, () => { if(this.$highlight === highlight) this.$trackedPositionChanged() })
+            }
+            if(follows) this.$resetHighlightPosition()
+            this.$write(GridView.HIGHLIGHTITEM, highlight)
         }
-        if(!this.$v[GridView.HIGHLIGHTFOLLOWSCURRENTITEM]) return
-        let h = this.$highlight
-        h.x = current.$v[Item.X]
-        h.y = current.$v[Item.Y]
-        if(!h.$v[Item.WIDTH]) h.width = this.$v[GridView.CELLWIDTH]
-        if(!h.$v[Item.HEIGHT]) h.height = this.$v[GridView.CELLHEIGHT]
+        if(follows){
+            let h = this.$highlight
+            h.width = current.$v[Item.WIDTH]
+            h.height = current.$v[Item.HEIGHT]
+            this.$animateHighlight('x', current.$v[Item.X])
+            this.$animateHighlight('y', current.$v[Item.Y])
+        }
+        this.$trackedPositionChanged()
+    }
+
+    $animateHighlight(property, to){
+        let animations = this.$highlightAnimations || (this.$highlightAnimations = {})
+        let animation = animations[property]
+        let highlight = this.$highlight
+        if(animation && animation.running && animation.to === to && animation.target === highlight) return
+        if(highlight[property] === to){
+            if(animation && animation.running) animation.stop()
+            return
+        }
+        if(!animation) animation = animations[property] = new SmoothedAnimation(null)
+        if(animation.target !== highlight) animation.target = highlight
+        animation.property = property
+        animation.duration = this.$v[GridView.HIGHLIGHTMOVEDURATION]
+        animation.to = to
+        animation.restart()
+    }
+
+    $stopHighlightAnimations(){
+        let animations = this.$highlightAnimations
+        if(animations) for(let key in animations) animations[key].stop()
+    }
+
+    // QQuickGridViewPrivate::resetHighlightPosition
+    $resetHighlightPosition(){
+        let highlight = this.$highlight, current = this.$v[GridView.CURRENTITEM]
+        if(!highlight || !current) return
+        this.$stopHighlightAnimations()
+        highlight.$write(Item.X, current.$v[Item.X])
+        highlight.$write(Item.Y, current.$v[Item.Y])
+    }
+
+    // QQuickItemView::trackedPositionChanged: after a new current index the view follows the highlight along the flow,
+    // so the highlight and the current item show (rows of cellHeight with LeftToRight, columns of cellWidth else)
+    $trackedPositionChanged(){
+        let highlight = this.$highlight
+        let current = this.$v[GridView.CURRENTITEM]
+        if(!highlight || !current || this.$moveReason !== MOVE_SET_INDEX || !this.$v[GridView.HIGHLIGHTFOLLOWSCURRENTITEM]) return
+        let axis = this.$v[GridView.FLOW] === LEFT_TO_RIGHT ? 'y' : 'x'
+        let id = axis === 'y' ? Item.Y : Item.X
+        let cell = axis === 'y' ? this.$v[GridView.CELLHEIGHT] : this.$v[GridView.CELLWIDTH]
+        let size = axis === 'y' ? this.$v[Item.HEIGHT] : this.$v[Item.WIDTH]
+        let trackedPos = highlight.$v[id], trackedEndPos = trackedPos + cell, trackedSize = cell
+        let toItemPos = current.$v[id], toItemEndPos = toItemPos + cell
+        let viewPos = this.$contentPos(axis)
+        let pos = viewPos
+        if(trackedEndPos >= viewPos + size && toItemEndPos >= viewPos + size){
+            if(trackedEndPos <= toItemEndPos){
+                pos = trackedEndPos - size
+                if(trackedSize > size) pos = trackedPos
+            } else {
+                pos = toItemEndPos - size
+                if(cell > size) pos = toItemPos
+            }
+        }
+        if(trackedPos < pos && toItemPos < pos) pos = Math.max(trackedPos, toItemPos)
+        if(pos === viewPos) return
+        this.$internalMove++
+        try {
+            if(axis === 'x') this.contentX = pos
+            else this.contentY = pos
+        } finally {
+            this.$internalMove--
+        }
     }
 
     $updateBeginningEnd(){
@@ -284,6 +421,7 @@ class GridView extends Item {
 
     $write(id, value){
         let old = this.$v[id]
+        if(id === GridView.CURRENTINDEX && value !== old && this.$items && !this.$modelUpdating && this.$f & engine.COMPLETED) this.$moveReason = MOVE_SET_INDEX
         if(id === GridView.KEYNAVIGATIONENABLED) this.$keyNavigationSet = true
         if(id === GridView.FLICKABLEDIRECTION && !this.$settingDirection) this.$flickDirectionSet = true
         super.$write(id, value)
@@ -293,6 +431,7 @@ class GridView extends Item {
 
     $disposeNative(){
         if(this.$model instanceof ListModel) this.$model.$removeView(this)
+        this.$stopHighlightAnimations()
         super.$disposeNative()
     }
 }
@@ -345,6 +484,7 @@ defineType(GridView, {
         keyNavigationEnabled: { kind: 'bool', initial: true },
         highlight: { kind: 'component', effect: (view) => { if(view.$items) view.$updateHighlight() } },
         highlightFollowsCurrentItem: { kind: 'bool', initial: true },
+        highlightMoveDuration: { kind: 'int', initial: 150 },
         reuseItems: 'bool',
     }),
     signals: FLICK_SIGNALS,

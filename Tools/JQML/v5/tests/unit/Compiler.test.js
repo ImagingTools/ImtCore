@@ -86,3 +86,18 @@ Item { function f(){ return notDeclaredAnywhere } }
     assert.equal(warnings.length, 1)
     assert.match(warnings[0], /notDeclaredAnywhere is not found/)
 })
+
+// compiler/uglifyScope.js: the mangler's mark_enclosed with Set lookups gives the same output as uglify's own, and
+// leaves uglify as it was
+test('the faster mark_enclosed of the minifier gives the same output, byte for byte', () => {
+    const U = require('uglify-js')
+    const scope = require('../../compiler/uglifyScope')
+    const lines = []
+    for(let i = 0; i < 300; i++) lines.push(`const c${i}=function(a,b){return a+b+${i}};function f${i}(x){let y=c${(i * 7) % 300}(x,1);return function g${i}(){return y+c${(i * 13) % 300}(y,2)+(typeof f${(i + 1) % 300})}}`)
+    const source = ';(function(){' + lines.join('\n') + ';window.r=[' + Array.from({ length: 300 }, (_, i) => 'f' + i).join(',') + ']})();'
+    const options = { compress: false, mangle: { keep_fnames: true }, output: { ascii_only: true } }
+    const original = U.AST_Symbol.prototype.mark_enclosed
+    const expected = U.minify(source, options).code
+    assert.equal(scope.minify(U, source, options).code, expected)
+    assert.equal(U.AST_Symbol.prototype.mark_enclosed, original)
+})

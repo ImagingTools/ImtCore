@@ -1307,6 +1307,23 @@ export function commandsExceed(commands, w, h) {
 	return false;
 }
 
+// The largest pixel size of the glyphs of a scaled text: a larger scale stretches these glyphs (the atlas stays small).
+const MAX_SCALED_TEXT_SIZE = 256;
+
+// The font a text of `info` is drawn with under the current matrix of `r`, and the factor of its size, or null when the
+// glyphs of `info` are right. Under a scale (ctx.scale(), the zoom of a document) the glyphs of the nominal size would
+// be stretched bitmaps: the glyphs of the font of the scaled size are drawn unscaled instead. Only a scale without a
+// rotation or a skew; the built-in look (no family) is a box font and stays as it is.
+function scaledTextFont(r, info) {
+	if (info.style === null || r.mb !== 0 || r.mc !== 0) return null;
+	const scale = r.ma;
+	if (!(scale > 0) || Math.abs(r.md - scale) > scale * 1e-3 || Math.abs(scale - 1) < 0.01) return null;
+	// a quarter of a pixel: a zoom that goes in small steps does not make a font for every step
+	const size = Math.min(MAX_SCALED_TEXT_SIZE, Math.round(info.size * scale * 4) / 4);
+	if (size <= info.size) return null;
+	return { info: fonts.get(info.style.family, size, info.style.bold, info.style.italic), factor: size / info.size };
+}
+
 export function replayCommands(r, commands, opacity, aa) {
 	const { ma, mb, mc, md, me, mf } = r;
 	const clips = []; // open clips: { skip } or { token, m, w, h }
@@ -1382,6 +1399,22 @@ export function replayCommands(r, commands, opacity, aa) {
 				if (hidden > 0) break;
 				const color = r.pack(c.color, opacity);
 				const info = c.info;
+				const scaled = scaledTextFont(r, info);
+				if (scaled !== null) {
+					// the matrix without the factor, the places of the glyphs with it; the pen moves by the advances of
+					// the nominal font, so the text is laid out as it was measured
+					const k = scaled.factor;
+					const { ma: a, mb: b, mc: cc, md: d, me: e, mf: f } = r;
+					r.setMatrix(a / k, b / k, cc / k, d / k, e, f);
+					let pen = c.x;
+					for (const ch of c.text) {
+						const glyph = scaled.info.glyph(ch);
+						if (glyph !== null) r.glyph(glyph, pen * k, c.y * k, color);
+						pen += info.advance(ch);
+					}
+					r.setMatrix(a, b, cc, d, e, f);
+					break;
+				}
 				let pen = c.x;
 				for (const ch of c.text) {
 					const glyph = info.glyph(ch);
