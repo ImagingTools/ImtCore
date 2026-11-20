@@ -23,7 +23,12 @@ Rectangle{
                               : (vertical ? (decorator_.implicitWidth > 0 ? decorator_.implicitWidth : secondSize)
                                           : (decorator_.implicitHeight > 0 ? decorator_.implicitHeight : secondSize))
 
-	visible: vertical ? targetItem.contentHeight - allowableGapVert > scrollContainer.height : targetItem.contentWidth - allowableGapHor > scrollContainer.width;
+	// Not before the bar has a length of its own. A view not laid out yet is
+	// zero or less, so any content "overflows" it: in TableBase both bars came
+	// up at once, each one shrinking the view along the other's axis - a
+	// binding loop on every page with a table.
+	visible: vertical ? scrollContainer.height > 0 && targetItem.contentHeight - allowableGapVert > scrollContainer.height
+					  : scrollContainer.width > 0 && targetItem.contentWidth - allowableGapHor > scrollContainer.width;
 
     property var targetItem: null;
 
