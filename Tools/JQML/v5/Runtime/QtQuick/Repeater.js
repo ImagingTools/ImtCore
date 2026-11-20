@@ -1,7 +1,7 @@
 const engine = require('../Core/engine')
 const { defineType } = require('../Core/type')
 const { ListModel } = require('../QtQml/Models/ListModel')
-const { ModelContext, modelRows, sameModel } = require('../QtQml/Models/ModelContext')
+const { ModelContext, modelRows, sameModel, moveEntries } = require('../QtQml/Models/ModelContext')
 const { Item } = require('./Item')
 
 // ---- Repeater: delegates go to the parent right after the Repeater --------------------------
@@ -84,10 +84,16 @@ class Repeater extends Item {
         }
     }
 
-    $modelChanged(kind, index, count, roles = null){
+    $modelChanged(kind, index, count, roles = null, to = -1){
         if(!this.$v[Repeater.DELEGATE]) return
         let rows = modelRows(this.$model)
-        if(kind === 'insert'){
+        // QQuickRepeater::modelUpdated: the items of moved rows are the same, in their new place among the parent's
+        // children; no itemRemoved, no itemAdded
+        if(kind === 'move'){
+            moveEntries([this.$items, this.$contexts], index, to, count)
+            this.$reindex()
+            if(this.$parent) for(let i = 0; i < this.$items.length; i++) this.$placeAfter(this.$items[i], i)
+        } else if(kind === 'insert'){
             for(let i = 0; i < count; i++) this.$create(index + i, rows)
             this.$reindex()
             this.$write(Repeater.COUNT, this.$items.length)
