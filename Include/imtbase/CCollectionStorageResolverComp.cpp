@@ -14,7 +14,10 @@ void CCollectionStorageResolverComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	SetCollection(m_collectionCompPtr.GetPtr(), *m_typeIdAttrPtr);
+	// The type-ID is needed only to insert objects, so the resolver works without it.
+	const QByteArray typeId = m_typeIdAttrPtr.IsValid() ? *m_typeIdAttrPtr : QByteArray();
+
+	SetCollection(m_collectionCompPtr.GetPtr(), typeId);
 }
 
 

@@ -26,6 +26,7 @@
 #include <imtbase/CCollectionStorageResolver.h>
 #include <imtbase/CStorageResolverRegistry.h>
 #include <imtbase/CStorageResolverRegistryComp.h>
+#include <imtbase/CCollectionStorageResolverComp.h>
 #include <imtbase/StorageLink.h>
 
 
@@ -78,6 +79,8 @@ typedef imtbase::StorageLink<CLinkTestData> DataLink;
 typedef istd::TSingleFactory<istd::IChangeable, CLinkTestData> DataFactory;
 using MemoryResolverComp	= icomp::TMakeComponentWrap<imtbase::CMemoryStorageResolver, imtbase::IStorageResolver>;
 using RegistryComp			= icomp::TSimComponentWrap<imtbase::CStorageResolverRegistryComp>;
+using CollectionComp		= icomp::TMakeComponentWrap<imtbase::CObjectCollection, imtbase::IObjectCollection>;
+using CollectionResolverComp	= icomp::TSimComponentWrap<imtbase::CCollectionStorageResolverComp>;
 
 const QByteArray s_typeId = QByteArrayLiteral("LinkTestData");
 
@@ -560,6 +563,28 @@ void CStorageLinkTest::testRegistryComponent()
 	registryPtr.reset();
 	QVERIFY(imtbase::StorageLinkBase::GetDefaultResolverProvider() == nullptr);
 	QVERIFY(link.GetResolver() == nullptr);
+}
+
+
+void CStorageLinkTest::testCollectionResolverComponent()
+{
+	icomp::TSimSharedComponentPtr<CollectionComp> collectionPtr;
+	collectionPtr->InitComponent();
+	SetupCollection(*collectionPtr);
+
+	const CLinkTestData data(8);
+	const QByteArray objectId = collectionPtr->InsertNewObject(s_typeId, QStringLiteral("Item"), QString(), &data);
+	QVERIFY(!objectId.isEmpty());
+
+	// The compositions that only read the linked objects leave the type-ID out.
+	std::unique_ptr<CollectionResolverComp> resolverPtr(new CollectionResolverComp);
+	resolverPtr->SetRef(QByteArrayLiteral("ObjectCollection"), collectionPtr);
+	resolverPtr->InitComponent();
+
+	DataLink link(objectId);
+	link.SetResolver(resolverPtr.get());
+	QVERIFY(link.has_value());
+	QCOMPARE(link->m_value, 8);
 }
 
 
