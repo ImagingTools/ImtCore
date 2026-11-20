@@ -219,7 +219,7 @@ int FindFreePort()
 */
 struct SServer
 {
-	explicit SServer(int threadsLimit, bool isSlowBody = false)
+	explicit SServer(int threadsLimit, bool isSlowBody = false, bool startOnCreate = true)
 	{
 		port = FindFreePort();
 
@@ -236,6 +236,7 @@ struct SServer
 		connection->InitComponent();
 
 		server.SetIntAttr("ThreadsLimit", threadsLimit);
+		server.SetBoolAttr("StartServerOnCreate", startOnCreate);
 		server.SetRef("RequestHandler", servlet);
 		server.SetRef("ProtocolEngine", engine);
 		server.SetRef("ServerInterface", connection);
@@ -758,6 +759,50 @@ void CTcpServerConnectionTest::BusyPortKeepsServerTest()
 	client.SendGet("/stays");
 	QTRY_COMPARE_WITH_TIMEOUT(server.servlet->GetHeld().size(), 1, 5000);
 
+	QCOMPARE(server.RespondToHeld(), 1);
+	QTRY_COMPARE_WITH_TIMEOUT(client.GetResponseCount(), 1, 5000);
+	client.Disconnect();
+}
+
+
+// The server stopped by StopServer stays stopped when the port changes
+void CTcpServerConnectionTest::StoppedServerStaysStoppedTest()
+{
+	SServer server(2);
+	imtrest::IServer* serverPtr = &server.server;
+	QVERIFY(serverPtr->StopServer());
+
+	const int newPort = FindFreePort();
+	QVERIFY(newPort != 0 && newPort != server.port);
+	server.connection->SetPort(imtcom::IServerConnectionInterface::PT_HTTP, newPort);
+	QCoreApplication::processEvents();
+
+	QCOMPARE(serverPtr->GetServerStatus(), imtrest::IServer::SS_NOT_STARTED);
+	CClient client;
+	QVERIFY(!client.Connect(newPort));
+}
+
+
+// The server that is not started on creation but by StartServer takes a new port as well
+void CTcpServerConnectionTest::StartedServerMovesTest()
+{
+	SServer server(2, false, false);
+	imtrest::IServer* serverPtr = &server.server;
+	QCOMPARE(serverPtr->GetServerStatus(), imtrest::IServer::SS_NOT_STARTED);
+	QVERIFY(serverPtr->StartServer());
+	QVERIFY(server.IsListening());
+
+	const int newPort = FindFreePort();
+	QVERIFY(newPort != 0 && newPort != server.port);
+	server.connection->SetPort(imtcom::IServerConnectionInterface::PT_HTTP, newPort);
+
+	CClient oldClient;
+	QVERIFY(!oldClient.Connect(server.port));
+
+	CClient client;
+	QVERIFY(client.Connect(newPort));
+	client.SendGet("/started");
+	QTRY_COMPARE_WITH_TIMEOUT(server.servlet->GetHeld().size(), 1, 5000);
 	QCOMPARE(server.RespondToHeld(), 1);
 	QTRY_COMPARE_WITH_TIMEOUT(client.GetResponseCount(), 1, 5000);
 	client.Disconnect();

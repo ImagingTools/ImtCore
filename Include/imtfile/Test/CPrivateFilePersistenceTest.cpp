@@ -8,15 +8,23 @@
 #include <QtCore/QFile>
 #include <QtCore/QStandardPaths>
 #include <QtCore/QTemporaryDir>
+#include <QtCore/QUuid>
 
 // ACF includes
 #include <icomp/CComponentBase.h>
+#include <icomp/TModelCompWrap.h>
 #include <icomp/TSimComponentWrap.h>
 #include <ifile/CFileNameParamComp.h>
+#include <istd/CChangeNotifier.h>
 
 // ImtCore includes
+#include <imtfile/CPrivateAutoPersistenceComp.h>
 #include <imtfile/CPrivateFilePersistenceComp.h>
 #include <imtfile/CSystemConfigLocationComp.h>
+
+#ifndef Q_OS_WIN
+#include <sys/stat.h>
+#endif
 
 
 namespace
@@ -34,7 +42,24 @@ public:
 
 
 /**
-	Persistence of the text as a serializer of files does it: the file is opened for writing (truncated) and read whole.
+	The text as the object of the automatic persistence.
+*/
+class CTextDataComp:
+			public icomp::CComponentBase,
+			public CTextData
+{
+public:
+	typedef icomp::CComponentBase BaseClass;
+
+	I_BEGIN_COMPONENT(CTextDataComp);
+		I_REGISTER_INTERFACE(istd::IChangeable);
+	I_END_COMPONENT;
+};
+
+
+/**
+	Persistence of the text as a serializer of files does it: the file is opened for writing (truncated) and read whole, the loaded
+	object tells its observers about the change.
 */
 class CTextPersistenceComp:
 			public icomp::CComponentBase,
@@ -46,6 +71,13 @@ public:
 	I_BEGIN_COMPONENT(CTextPersistenceComp);
 		I_REGISTER_INTERFACE(ifile::IFilePersistence);
 	I_END_COMPONENT;
+
+	/**
+		The serializer rejects the data before it writes anything.
+	*/
+	bool isFailing = false;
+
+	mutable int saveCount = 0;
 
 	// reimplemented (ifile::IFilePersistence)
 	bool IsOperationSupported(const istd::IChangeable* /*dataObjectPtr*/, const QString* /*filePathPtr*/, int /*flags*/, bool /*beQuiet*/) const override
@@ -60,6 +92,7 @@ public:
 			return OS_FAILED;
 		}
 
+		istd::CChangeNotifier notifier(&data);
 		dynamic_cast<CTextData&>(data).text = file.readAll();
 
 		return OS_OK;
@@ -67,6 +100,13 @@ public:
 
 	OperationState SaveToFile(const istd::IChangeable& data, const QString& filePath, ibase::IProgressManager* /*progressManagerPtr*/) const override
 	{
+		// The serializers of files check the extension
+		if (isFailing || (QFileInfo(filePath).suffix() != QStringLiteral("xml"))){
+			return OS_FAILED;
+		}
+
+		++saveCount;
+
 		QFile file(filePath);
 		if (!file.open(QIODevice::WriteOnly)){
 			return OS_FAILED;
@@ -122,6 +162,62 @@ struct SPersistence
 	FilePath filePath;
 	PrivatePersistence persistence;
 };
+
+
+typedef icomp::TSimSharedComponentPtr<icomp::TModelCompWrap<CTextDataComp>> TextObject;
+typedef icomp::TSimSharedComponentPtr<imtfile::CPrivateFilePersistenceComp> PrivatePersistencePtr;
+typedef icomp::TSimComponentWrap<imtfile::CPrivateAutoPersistenceComp> PrivateAutoPersistence;
+
+
+/**
+	The text kept in a private file by the automatic persistence, as the settings of an application are.
+*/
+struct SAutoPersistence
+{
+	SAutoPersistence(const QString& path, bool autoReload)
+	{
+		slave->InitComponent();
+
+		filePath->InitComponent();
+		filePath->SetPath(path);
+
+		loader->SetRef("SlavePersistence", slave);
+		loader->SetRef("FilePath", filePath);
+		loader->InitComponent();
+
+		object->InitComponent();
+
+		persistence.SetRef("Object", object);
+		persistence.SetRef("FileLoader", loader);
+		persistence.SetRef("FilePath", filePath);
+		persistence.SetBoolAttr("StoreOnBegin", true);
+		persistence.SetBoolAttr("AutoReload", autoReload);
+		persistence.InitComponent();
+	}
+
+	void SetText(const QByteArray& text)
+	{
+		istd::CChangeNotifier notifier(&*object);
+		object->text = text;
+	}
+
+	TextPersistence slave;
+	FilePath filePath;
+	PrivatePersistencePtr loader;
+	TextObject object;
+	PrivateAutoPersistence persistence;
+};
+
+
+QByteArray ReadFile(const QString& path)
+{
+	QFile file(path);
+	if (!file.open(QIODevice::ReadOnly)){
+		return QByteArray();
+	}
+
+	return file.readAll();
+}
 
 
 #ifndef Q_OS_WIN
@@ -205,26 +301,77 @@ void CPrivateFilePersistenceTest::SaveReplacesSharedFileTest()
 }
 
 
-// The data are written to a temporary file first (as the automatic persistence does): it is readable by its owner only too
-void CPrivateFilePersistenceTest::SaveToTemporaryFileTest()
+// The serializer rejects the data: the file keeps the data of the last save, nothing else is left in the folder
+void CPrivateFilePersistenceTest::SaveKeepsFileOnFailureTest()
+{
+	QTemporaryDir root;
+	QVERIFY(root.isValid());
+	const QString folderPath = root.filePath(QStringLiteral("Private"));
+	const QString filePath = folderPath + QStringLiteral("/Secrets.xml");
+
+	SPersistence persistence(filePath);
+	CTextData data;
+	data.text = "old";
+	QCOMPARE(persistence.persistence.SaveToFile(data), ifile::IFilePersistence::OS_OK);
+
+	persistence.slave->isFailing = true;
+	data.text = "new";
+	QCOMPARE(persistence.persistence.SaveToFile(data), ifile::IFilePersistence::OS_FAILED);
+
+	QCOMPARE(ReadFile(filePath), QByteArray("old"));
+	QCOMPARE(QDir(folderPath).entryList(QDir::Files | QDir::Hidden), QStringList{QStringLiteral("Secrets.xml")});
+}
+
+
+// A file in another folder (the temporary folder of ifile::CAutoPersistenceComp) is neither written nor read
+void CPrivateFilePersistenceTest::OtherFolderIsRefusedTest()
 {
 	QTemporaryDir root;
 	QVERIFY(root.isValid());
 	const QString filePath = root.filePath(QStringLiteral("Private/Secrets.xml"));
-	const QString temporaryPath = root.filePath(QStringLiteral("Secrets.xml"));
-	QVERIFY(WriteShared(temporaryPath, "left from before"));
+	const QString otherPath = root.filePath(QStringLiteral("Secrets.xml"));
 
 	SPersistence persistence(filePath);
 	CTextData data;
 	data.text = "secret";
-	QCOMPARE(persistence.persistence.SaveToFile(data, temporaryPath), ifile::IFilePersistence::OS_OK);
+	QCOMPARE(persistence.persistence.SaveToFile(data, otherPath), ifile::IFilePersistence::OS_FAILED);
+	QVERIFY(!QFileInfo::exists(otherPath));
 
-	QVERIFY(IsOwnerOnly(temporaryPath));
-	QVERIFY(IsOwnerOnly(root.filePath(QStringLiteral("Private"))));
+	QVERIFY(WriteShared(otherPath, "planted"));
+	CTextData loaded;
+	QCOMPARE(persistence.persistence.LoadFromFile(loaded, otherPath), ifile::IFilePersistence::OS_FAILED);
+	QVERIFY(loaded.text.isEmpty());
+}
 
-	QFile file(temporaryPath);
-	QVERIFY(file.open(QIODevice::ReadOnly));
-	QCOMPARE(file.readAll(), QByteArray("secret"));
+
+// Another user could replace the private folder in a folder above it that everybody can write into: nothing is saved there.
+// With the sticky bit (as /tmp has) only the owner of a folder can replace it
+void CPrivateFilePersistenceTest::ReplaceableParentFolderIsRefusedTest()
+{
+#ifdef Q_OS_WIN
+	QSKIP("The rights of other accounts are the access list on Windows");
+#else
+	QTemporaryDir root;
+	QVERIFY(root.isValid());
+	const QString sharedPath = root.filePath(QStringLiteral("Shared"));
+	QVERIFY(QDir().mkdir(sharedPath));
+	const QByteArray nativeSharedPath = QFile::encodeName(sharedPath);
+	QCOMPARE(::chmod(nativeSharedPath.constData(), 0777), 0);
+
+	SPersistence persistence(sharedPath + QStringLiteral("/Company/Private/Secrets.xml"));
+	CTextData data;
+	data.text = "secret";
+	QCOMPARE(persistence.persistence.SaveToFile(data), ifile::IFilePersistence::OS_FAILED);
+
+	// The folders that exist are checked before the missing ones are created: nothing is left in a refused folder
+	QVERIFY(!QFileInfo::exists(sharedPath + QStringLiteral("/Company")));
+
+	QCOMPARE(::chmod(nativeSharedPath.constData(), 01777), 0);
+	QCOMPARE(persistence.persistence.SaveToFile(data), ifile::IFilePersistence::OS_OK);
+
+	QCOMPARE(::chmod(nativeSharedPath.constData(), 0755), 0);
+	QCOMPARE(persistence.persistence.SaveToFile(data), ifile::IFilePersistence::OS_OK);
+#endif
 }
 
 
@@ -273,6 +420,64 @@ void CPrivateFilePersistenceTest::LoadRefusesSharedFolderTest()
 	CTextData data;
 	data.text = "new";
 	QCOMPARE(persistence.persistence.SaveToFile(data), ifile::IFilePersistence::OS_FAILED);
+}
+
+
+// The object is stored into the file itself: no copy in the temporary folder of the system, no working file left
+void CPrivateFilePersistenceTest::AutoPersistenceStoresInPlaceTest()
+{
+	QTemporaryDir root;
+	QVERIFY(root.isValid());
+	const QString folderPath = root.filePath(QStringLiteral("Private"));
+	const QString fileName = QStringLiteral("Secrets-%1.xml").arg(QUuid::createUuid().toString(QUuid::WithoutBraces));
+	const QString filePath = folderPath + QLatin1Char('/') + fileName;
+
+	SAutoPersistence persistence(filePath, false);
+	QVERIFY(QFileInfo::exists(filePath));
+	QVERIFY(IsOwnerOnly(folderPath));
+	QVERIFY(IsOwnerOnly(filePath));
+
+	persistence.SetText("secret");
+	QCOMPARE(ReadFile(filePath), QByteArray("secret"));
+	QVERIFY(IsOwnerOnly(filePath));
+
+	QVERIFY(!QFileInfo::exists(QDir::tempPath() + QLatin1Char('/') + fileName));
+	QCOMPARE(QDir(folderPath).entryList(QDir::Files | QDir::Hidden), QStringList{fileName});
+}
+
+
+// Another program changes the file (it is replaced): the object takes the new data and does not store them back. The file replaced
+// again is watched again
+void CPrivateFilePersistenceTest::AutoPersistenceReloadTest()
+{
+	QTemporaryDir root;
+	QVERIFY(root.isValid());
+	const QString filePath = root.filePath(QStringLiteral("Private/Secrets.xml"));
+
+	SPersistence otherProgram(filePath);
+	CTextData data;
+	data.text = "first";
+	QCOMPARE(otherProgram.persistence.SaveToFile(data), ifile::IFilePersistence::OS_OK);
+
+	SAutoPersistence persistence(filePath, true);
+	QCOMPARE(persistence.object->text, QByteArray("first"));
+	QCOMPARE(persistence.slave->saveCount, 0);
+
+	data.text = "second";
+	QCOMPARE(otherProgram.persistence.SaveToFile(data), ifile::IFilePersistence::OS_OK);
+	QTRY_COMPARE(persistence.object->text, QByteArray("second"));
+
+	data.text = "third";
+	QCOMPARE(otherProgram.persistence.SaveToFile(data), ifile::IFilePersistence::OS_OK);
+	QTRY_COMPARE(persistence.object->text, QByteArray("third"));
+
+	// The own save is not loaded again
+	persistence.SetText("fourth");
+	QCOMPARE(persistence.slave->saveCount, 1);
+	QTest::qWait(200);
+	QCOMPARE(persistence.object->text, QByteArray("fourth"));
+	QCOMPARE(persistence.slave->saveCount, 1);
+	QCOMPARE(ReadFile(filePath), QByteArray("fourth"));
 }
 
 

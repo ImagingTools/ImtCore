@@ -6,6 +6,7 @@
 #include <QtNetwork/QHostAddress>
 #include <QtNetwork/QTcpServer>
 #include <QtNetwork/QTcpSocket>
+#include <QtWebSockets/QWebSocket>
 
 // ACF includes
 #include <icomp/TModelCompWrap.h>
@@ -15,6 +16,7 @@
 #include <imtcom/CServerConnectionInterfaceParamComp.h>
 #include <imtrest/CWebSocketProtocolEngineComp.h>
 #include <imtrest/CWebSocketServerComp.h>
+#include <imtrest/CWebSocketThread.h>
 
 
 namespace
@@ -53,7 +55,7 @@ bool IsAccepted(int port)
 */
 struct SServer
 {
-	SServer()
+	explicit SServer(bool startOnCreate = true)
 	{
 		port = FindFreePort();
 
@@ -64,9 +66,25 @@ struct SServer
 		connection->SetIntAttr("DefaultWebSocketPort", port);
 		connection->InitComponent();
 
+		server.SetBoolAttr("StartServerOnCreate", startOnCreate);
 		server.SetRef("ProtocolEngine", engine);
 		server.SetRef("WebServerConnectionInterface", connection);
 		server.InitComponent();
+	}
+
+	/**
+		The workers of the connections that still run.
+	*/
+	int GetRunningWorkerCount() const
+	{
+		int retVal = 0;
+		for (const imtrest::CWebSocketThread* threadPtr : server.findChildren<imtrest::CWebSocketThread*>()){
+			if (threadPtr->isRunning()){
+				++retVal;
+			}
+		}
+
+		return retVal;
 	}
 
 	bool IsListening() const
@@ -133,6 +151,67 @@ void CWebSocketServerPortTest::OtherPortChangeKeepsServerTest()
 	QVERIFY(server.IsListening());
 	QVERIFY(IsAccepted(server.port));
 	QVERIFY(!client.waitForDisconnected(300));
+}
+
+
+// A client connected before the port changes stays connected and is served by its worker: when it disconnects the worker finishes as
+// usual
+void CWebSocketServerPortTest::PortChangeKeepsConnectionsTest()
+{
+	SServer server;
+	QVERIFY(server.IsListening());
+
+	QWebSocket client;
+	client.open(QUrl(QStringLiteral("ws://127.0.0.1:%1").arg(server.port)));
+	QTRY_COMPARE_WITH_TIMEOUT(client.state(), QAbstractSocket::ConnectedState, 5000);
+	QTRY_COMPARE_WITH_TIMEOUT(server.GetRunningWorkerCount(), 1, 5000);
+
+	const int newPort = FindFreePort();
+	QVERIFY(newPort != 0 && newPort != server.port);
+	server.connection->SetPort(imtcom::IServerConnectionInterface::PT_WEBSOCKET, newPort);
+	QVERIFY(IsAccepted(newPort));
+
+	QTest::qWait(300);
+	QCOMPARE(client.state(), QAbstractSocket::ConnectedState);
+	QCOMPARE(server.GetRunningWorkerCount(), 1);
+
+	client.close();
+	QTRY_COMPARE_WITH_TIMEOUT(server.GetRunningWorkerCount(), 0, 5000);
+}
+
+
+// The server stopped by StopServer stays stopped when the port changes
+void CWebSocketServerPortTest::StoppedServerStaysStoppedTest()
+{
+	SServer server;
+	imtrest::IServer* serverPtr = &server.server;
+	QVERIFY(serverPtr->StopServer());
+
+	const int newPort = FindFreePort();
+	QVERIFY(newPort != 0 && newPort != server.port);
+	server.connection->SetPort(imtcom::IServerConnectionInterface::PT_WEBSOCKET, newPort);
+	QCoreApplication::processEvents();
+
+	QCOMPARE(serverPtr->GetServerStatus(), imtrest::IServer::SS_NOT_STARTED);
+	QVERIFY(!IsAccepted(newPort));
+}
+
+
+// The server that is not started on creation but by StartServer takes a new port as well
+void CWebSocketServerPortTest::StartedServerMovesTest()
+{
+	SServer server(false);
+	imtrest::IServer* serverPtr = &server.server;
+	QCOMPARE(serverPtr->GetServerStatus(), imtrest::IServer::SS_NOT_STARTED);
+	QVERIFY(serverPtr->StartServer());
+	QVERIFY(server.IsListening());
+
+	const int newPort = FindFreePort();
+	QVERIFY(newPort != 0 && newPort != server.port);
+	server.connection->SetPort(imtcom::IServerConnectionInterface::PT_WEBSOCKET, newPort);
+
+	QVERIFY(IsAccepted(newPort));
+	QVERIFY(!IsAccepted(server.port));
 }
 
 

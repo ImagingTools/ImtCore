@@ -92,7 +92,7 @@ qint64 CTcpServerComp::GetWriteHighWatermark() const
 
 void CTcpServerComp::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-	if (!m_startServerOnCreateAttrPtr.IsValid() || !*m_startServerOnCreateAttrPtr || !m_isInitialized){
+	if (!m_isInitialized){
 		return;
 	}
 
@@ -100,6 +100,10 @@ void CTcpServerComp::OnModelChanged(int modelId, const istd::IChangeable::Change
 		// The server is moved in its own thread: the port can be changed in the thread of a request
 		QMetaObject::invokeMethod(this, [this](){ MoveToConfiguredPort(); }, Qt::AutoConnection);
 
+		return;
+	}
+
+	if (!m_startServerOnCreateAttrPtr.IsValid() || !*m_startServerOnCreateAttrPtr){
 		return;
 	}
 
@@ -137,6 +141,8 @@ void CTcpServerComp::OnComponentCreated()
 	}
 
 	if (m_startServerOnCreateAttrPtr.IsValid() && *m_startServerOnCreateAttrPtr){
+		m_isStartRequested = true;
+
 		EnsureServerStarted();
 	}
 
@@ -160,11 +166,15 @@ bool CTcpServerComp::SendRequest(const QByteArray& requestId, ConstRequestPtr& r
 
 bool CTcpServerComp::StartServer()
 {
+	m_isStartRequested = true;
+
 	return EnsureServerStarted();
 }
 
 bool CTcpServerComp::StopServer()
 {
+	m_isStartRequested = false;
+
 	m_serverPtr->close();
 
 	return true;
@@ -256,7 +266,8 @@ bool CTcpServerComp::EnsureServerStarted()
 
 void CTcpServerComp::MoveToConfiguredPort()
 {
-	if (!m_serverConnnectionInterfaceCompPtr.IsValid()){
+	// Checked when the queued call runs: the server can be stopped meanwhile
+	if (!m_isStartRequested || !m_serverConnnectionInterfaceCompPtr.IsValid()){
 		return;
 	}
 
