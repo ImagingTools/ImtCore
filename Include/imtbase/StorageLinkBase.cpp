@@ -183,12 +183,12 @@ bool StorageLinkBase::Serialize(iser::IArchive& archive)
 {
 	bool retVal = true;
 
-	iser::CArchiveTag objectIdTag("ObjectId", "ID of the linked object", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag objectIdTag(QByteArrayLiteral("ObjectId"), QByteArrayLiteral("ID of the linked object"), iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(objectIdTag);
 	retVal = retVal && archive.Process(m_objectId);
 	retVal = retVal && archive.EndTag(objectIdTag);
 
-	iser::CArchiveTag storageIdTag("StorageId", "Logical ID of the storage", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag storageIdTag(QByteArrayLiteral("StorageId"), QByteArrayLiteral("Logical ID of the storage"), iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(storageIdTag);
 	retVal = retVal && archive.Process(m_storageId);
 	retVal = retVal && archive.EndTag(storageIdTag);
