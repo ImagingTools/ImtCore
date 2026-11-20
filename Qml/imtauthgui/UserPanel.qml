@@ -206,7 +206,7 @@ Item {
 		height: width;
 		radius: width / 2;
 
-		color: Style.imaginToolsAccentColor;
+		color: Style.imagingToolsAccentColor;
 
 		Text {
 			anchors.centerIn: parent;
@@ -317,7 +317,7 @@ Item {
 		height: width
 		visible: AuthorizationController.pendingInvitationsCount > 0
 		radius: width/2
-		color: Style.imaginToolsAccentColor
+		color: Style.imagingToolsAccentColor
 		z: parent.z + 1
 	}
 
@@ -479,7 +479,7 @@ Item {
 							width: Style.iconSizeXL;
 							height: width;
 							radius: width / 2;
-							color: Style.imaginToolsAccentColor;
+							color: Style.imagingToolsAccentColor;
 
 							Text {
 								anchors.centerIn: parent;
@@ -597,7 +597,7 @@ Item {
 							width: Style.spacingS;
 							height: width;
 							radius: width / 2;
-							color: Style.imaginToolsAccentColor;
+							color: Style.imagingToolsAccentColor;
 
 							visible: model.badge && actionIcon.visible;
 						}

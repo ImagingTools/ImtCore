@@ -306,6 +306,37 @@ function(jqml3_qmldir_qml_files out_var config_path)
 	set(${out_var}_OK TRUE PARENT_SCOPE)
 endfunction()
 
+# The JavaScript sources of the JQML version VERSION (its runtime and its compiler): a web client is compiled again when
+# one of them changes, not only when a qml file does. The folders of the version except node_modules, the tests, the
+# editor extension and dist; CONFIGURE_DEPENDS: a file that is added or removed is seen by the next build.
+function(jqml_runtime_files out_var version)
+	set(_jqml_dir "${IMTCOREDIR}/Tools/JQML/${version}")
+	set(_jqml_sources)
+	file(GLOB _jqml_children CONFIGURE_DEPENDS LIST_DIRECTORIES true "${_jqml_dir}/*")
+
+	foreach(_jqml_child ${_jqml_children})
+		get_filename_component(_jqml_name "${_jqml_child}" NAME)
+		if(NOT IS_DIRECTORY "${_jqml_child}" OR _jqml_name MATCHES "^(node_modules|tests?|vscode-extension|dist)$")
+			continue()
+		endif()
+		file(GLOB_RECURSE _jqml_found CONFIGURE_DEPENDS "${_jqml_child}/*.js")
+		list(APPEND _jqml_sources ${_jqml_found})
+	# Track consumed runtime bundles without including unrelated dist artifacts.
+
+	file(GLOB _jqml_bundles CONFIGURE_DEPENDS
+
+		"${_jqml_dir}/dist/main.js"
+
+		"${_jqml_dir}/dist/core.js"
+
+		"${_jqml_dir}/dist/qmlcompiler.js")
+
+	list(APPEND _jqml_sources ${_jqml_bundles})
+
+	endforeach()
+	set(${out_var} "${_jqml_sources}" PARENT_SCOPE)
+endfunction()
+
 function(jq_compile_web)
 	set(QRC_WEB_FILE ${buildwebdir}/Resources/qmlJsWeb.qrc)
 	set(QRC_CPP_WEB_FILE ${buildwebdir}/Resources/qrc_${resname}Web.cpp)
@@ -371,11 +402,17 @@ function(jq_compile_web)
 	if(inputjs)
 		jqml3_qmldir_qml_files(DEPEND_LIST "${inputjs}")
 		set(_jqml_list_ok "${DEPEND_LIST_OK}")
+		if(NOT _jqml_list_ok)
+			# the qml files are not dependencies then: a change of one of them does not compile the client again
+			message(WARNING "JQML: the qml files of ${inputjs} are not known (see the message above), a changed qml file does not rebuild the web client of ${PROJECT_NAME}")
+		endif()
 		if(startqml)
 			list(APPEND DEPEND_LIST "${startqml}")
 		endif()
 		list(APPEND DEPEND_LIST "${inputjs}")
 	endif()
+
+	jqml_runtime_files(_jqml_runtime ${JQML_VERSION})
 
 	message(VERBOSE "DIRS_COUNT ${DIRS_COUNT}")
 
@@ -423,7 +460,7 @@ function(jq_compile_web)
 		-i ${appicon}
 		-o ${buildwebdir}/Resources/
 		-m html
-		DEPENDS ${DEPEND_LIST} ${sdldependency}
+		DEPENDS ${DEPEND_LIST} ${_jqml_runtime} ${sdldependency}
 		COMMENT "Create html for ${PROJECT_NAME}"
 		VERBATIM
 	)
@@ -456,8 +493,8 @@ function(jq_compile_web)
 		-r ${dataroot}
 		-e ${startqml}
 		-m js
-		${_jqml_minify_args}
-		DEPENDS ${DEPEND_LIST} ${sdldependency}
+		${_jqml_minify_args}
+		DEPENDS ${DEPEND_LIST} ${_jqml_runtime} ${sdldependency}
 		COMMENT "WEB COMPILER for ${PROJECT_NAME}"
 		VERBATIM
 	)
@@ -475,6 +512,7 @@ function(jq_compile_web)
 			set(_jqml_extra_dir ${IMTCOREDIR}/Tools/JQML/${_jqml_extra})
 			set(_jqml_extra_out ${buildwebdir}/Resources/${_jqml_extra})
 			set(_jqml_extra_qrc ${_jqml_extra_out}/qmlJsWeb${_jqml_number}.qrc)
+			jqml_runtime_files(_jqml_extra_runtime ${_jqml_extra})
 
 			# the version's own file list under its own prefix
 			file(READ ${_jqml_extra_dir}/dist/qmlJsWeb.qrc _jqml_qrc)
@@ -495,7 +533,7 @@ function(jq_compile_web)
 				-o ${_jqml_extra_out}/
 				-m html
 				WORKING_DIRECTORY ${_jqml_extra_dir}
-				DEPENDS ${DEPEND_LIST} ${sdldependency}
+				DEPENDS ${DEPEND_LIST} ${_jqml_extra_runtime} ${sdldependency}
 				COMMENT "Create html ${_jqml_extra} for ${PROJECT_NAME}"
 				VERBATIM
 			)
@@ -514,7 +552,7 @@ function(jq_compile_web)
 				-r ${dataroot}
 				-e ${startqml}
 				-m js
-				DEPENDS ${DEPEND_LIST} ${sdldependency} ${_jqml_extra_out}/index.html
+				DEPENDS ${DEPEND_LIST} ${_jqml_extra_runtime} ${sdldependency} ${_jqml_extra_out}/index.html
 				COMMENT "WEB COMPILER ${_jqml_extra} for ${PROJECT_NAME}"
 				VERBATIM
 			)

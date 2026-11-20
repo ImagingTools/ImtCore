@@ -1,0 +1,568 @@
+{
+ "runs": 3,
+ "thresholds": {
+  "size.core.raw": 6593.02,
+  "size.core.gzip": 2122.6,
+  "size.ProLife.raw": 187090.2,
+  "size.ProLife.gzip": 29941.62,
+  "size.Lisa.raw": 166518.74,
+  "size.Lisa.gzip": 26949.12,
+  "size.Puma.raw": 166518.34,
+  "size.Puma.gzip": 26951.52,
+  "compile.ProLife.parse": 40.13947524322338,
+  "compile.ProLife.model": 6.417771954541934,
+  "compile.ProLife.codegen": 219.61985265252233,
+  "compile.ProLife.minify": 997.687531884137,
+  "compile.ProLife.total": 1284.264950340191,
+  "compile.Lisa.parse": 76.47720159455913,
+  "compile.Lisa.model": 20.551069723876754,
+  "compile.Lisa.codegen": 974.4736202470102,
+  "compile.Lisa.minify": 2406.065897207978,
+  "compile.Lisa.total": 3528.734126218393,
+  "compile.Puma.parse": 53.372077627840056,
+  "compile.Puma.model": 6.90350870866458,
+  "compile.Puma.codegen": 341.37144268546155,
+  "compile.Puma.minify": 641.0544406936634,
+  "compile.Puma.total": 879.6974560096694,
+  "docs.ProLife.create": 252.99867975637628,
+  "docs.ProLife.destroy": 44.943405718164755,
+  "docs.ProLife.heapPerDocument": 2055.4563590709354,
+  "docs.Lisa.create": 157.98544320017652,
+  "docs.Lisa.destroy": 45.82522113442868,
+  "docs.Lisa.heapPerDocument": 1865.850778015703,
+  "docs.Puma.create": 105.53234004648898,
+  "docs.Puma.destroy": 63.16201751630745,
+  "docs.Puma.heapPerDocument": 1864.975894417692,
+  "bind.fanout_1000x100": 10.04423629726346,
+  "bind.chain_1000x100": 2.5605241131420553,
+  "bind.diamond_100x1000": 55.812322818425265,
+  "bind.diamond_evaluations": 8,
+  "bind.conditional_500x200": 1.2789443259658622,
+  "signal.emit_handler_100k": 0.4846904164552689,
+  "signal.emit_100connections_1k": 1.1602302631049717,
+  "signal.connect_disconnect_10k": 0.7819930944626188,
+  "frame.column_1000x20": 1.6464407635273612,
+  "frame.anchors_chain100x100": 108.08568178309365,
+  "frame.listview_scroll_200": 66.02239998998658,
+  "frame.listview_scroll_far_200": 3620.253099695134,
+  "frame.animation_300x60": 0.955427747101725,
+  "create.delegates_1000": 1.8448780104684457,
+  "destroy.delegates_1000": 1.2176819130097656,
+  "mem.item": 74.80550121032546,
+  "mem.rectangle": 344.8705872589775,
+  "mem.text": 59.390083520803444,
+  "mem.delegate": 140.68586666666664
+ },
+ "spread": {
+  "size.core.raw": {
+   "medians": [
+    329651,
+    329651,
+    329651
+   ],
+   "between": 0,
+   "within": 0,
+   "thresholdPct": 2
+  },
+  "size.core.gzip": {
+   "medians": [
+    106130,
+    106130,
+    106130
+   ],
+   "between": 0,
+   "within": 0,
+   "thresholdPct": 2
+  },
+  "size.ProLife.raw": {
+   "medians": [
+    9354510,
+    9354510,
+    9354510
+   ],
+   "between": 0,
+   "within": 0,
+   "thresholdPct": 2
+  },
+  "size.ProLife.gzip": {
+   "medians": [
+    1497081,
+    1497081,
+    1497081
+   ],
+   "between": 0,
+   "within": 0,
+   "thresholdPct": 2
+  },
+  "size.Lisa.raw": {
+   "medians": [
+    8325937,
+    8325937,
+    8325937
+   ],
+   "between": 0,
+   "within": 0,
+   "thresholdPct": 2
+  },
+  "size.Lisa.gzip": {
+   "medians": [
+    1347456,
+    1347456,
+    1347456
+   ],
+   "between": 0,
+   "within": 0,
+   "thresholdPct": 2
+  },
+  "size.Puma.raw": {
+   "medians": [
+    8325917,
+    8325917,
+    8325917
+   ],
+   "between": 0,
+   "within": 0,
+   "thresholdPct": 2
+  },
+  "size.Puma.gzip": {
+   "medians": [
+    1347576,
+    1347576,
+    1347576
+   ],
+   "between": 0,
+   "within": 0,
+   "thresholdPct": 2
+  },
+  "compile.ProLife.parse": {
+   "medians": [
+    471.32550889253616,
+    478.7220759987831,
+    509.19031408429146
+   ],
+   "between": 20.06973762161169,
+   "within": 16.447783699219993,
+   "thresholdPct": 8.252144891124622
+  },
+  "compile.ProLife.model": {
+   "medians": [
+    15.997515171766281,
+    18.626218914985657,
+    19.694400638341904
+   ],
+   "between": 1.9025446870225298,
+   "within": 3.208885977270967,
+   "thresholdPct": 35.445465793454744
+  },
+  "compile.ProLife.codegen": {
+   "medians": [
+    2936.692666500807,
+    2943.958291977644,
+    3098.004500001669
+   ],
+   "between": 91.10848034766092,
+   "within": 109.80992632626116,
+   "thresholdPct": 7.338064825009967
+  },
+  "compile.ProLife.minify": {
+   "medians": [
+    14298.78318747878,
+    14561.326770991087,
+    15263.624687492847
+   ],
+   "between": 498.8437659420685,
+   "within": 329.2314988136882,
+   "thresholdPct": 6.78333921565788
+  },
+  "compile.ProLife.total": {
+   "medians": [
+    17959.866750001907,
+    18217.340728521347,
+    19178.2287710011
+   ],
+   "between": 642.1324751700955,
+   "within": 360.81577202906215,
+   "thresholdPct": 6.960102046081659
+  },
+  "compile.Lisa.parse": {
+   "medians": [
+    434.76609843969345,
+    447.1639216542244,
+    447.2422081530094
+   ],
+   "between": 7.180592626579779,
+   "within": 38.23860079727957,
+   "thresholdPct": 17.261239733114156
+  },
+  "compile.Lisa.model": {
+   "medians": [
+    16.555335223674774,
+    16.719836384058,
+    16.081346064805984
+   ],
+   "between": 0.33151074448930234,
+   "within": 10.275534861938377,
+   "thresholdPct": 124.91401759880074
+  },
+  "compile.Lisa.codegen": {
+   "medians": [
+    2588.9814789891243,
+    2652.2828544974327,
+    2692.7385835051537
+   ],
+   "between": 52.29605926571693,
+   "within": 487.2368101235051,
+   "thresholdPct": 36.84673287024058
+  },
+  "compile.Lisa.minify": {
+   "medians": [
+    11352.671146035194,
+    11492.686291962862,
+    11596.499271005392
+   ],
+   "between": 122.36116638413321,
+   "within": 1203.032948603989,
+   "thresholdPct": 20.95763231526663
+  },
+  "compile.Lisa.total": {
+   "medians": [
+    14538.983229011297,
+    14840.820354014635,
+    14851.335249990225
+   ],
+   "between": 177.37906588117932,
+   "within": 1764.3670631091966,
+   "thresholdPct": 23.933822772732118
+  },
+  "compile.Puma.parse": {
+   "medians": [
+    438.76615393161774,
+    441.4554307758808,
+    461.2088480591774
+   ],
+   "between": 12.25495970356717,
+   "within": 26.686038813920028,
+   "thresholdPct": 11.936230830344542
+  },
+  "compile.Puma.model": {
+   "medians": [
+    16.746790915727615,
+    15.723710894584656,
+    17.006900638341904
+   ],
+   "between": 0.6783467299181828,
+   "within": 3.45175435433229,
+   "thresholdPct": 41.85855582755453
+  },
+  "compile.Puma.codegen": {
+   "medians": [
+    2584.095687508583,
+    2578.850791990757,
+    2664.705270498991
+   ],
+   "between": 48.12553944078825,
+   "within": 170.68572134273077,
+   "thresholdPct": 13.083289353752905
+  },
+  "compile.Puma.minify": {
+   "medians": [
+    11100.080895483494,
+    11291.951583504677,
+    11558.059082984924
+   ],
+   "between": 229.98970354795145,
+   "within": 320.5272203468317,
+   "thresholdPct": 5.664677865655867
+  },
+  "compile.Puma.total": {
+   "medians": [
+    14273.951875001192,
+    14520.901167035103,
+    14851.263583004475
+   ],
+   "between": 289.6584445281595,
+   "within": 439.8487280048347,
+   "thresholdPct": 6.0465685657699515
+  },
+  "docs.ProLife.create": {
+   "medians": [
+    4134.767062485218,
+    4018.5941874980927,
+    4005.8968954980373
+   ],
+   "between": 71.02215387493865,
+   "within": 126.49933987818814,
+   "thresholdPct": 6.242124562107342
+  },
+  "docs.ProLife.destroy": {
+   "medians": [
+    383.6984789967537,
+    385.47616651654243,
+    374.58562499284744
+   ],
+   "between": 5.842490560452332,
+   "within": 22.471702859082377,
+   "thresholdPct": 11.788328431344132
+  },
+  "docs.ProLife.heapPerDocument": {
+   "medians": [
+    102773.27495291902,
+    102774.23540489642,
+    102770.94350282487
+   ],
+   "between": 1.6928647706903355,
+   "within": 6.2764346802198645,
+   "thresholdPct": 2
+  },
+  "docs.Lisa.create": {
+   "medians": [
+    2777.353728502989,
+    2814.520999968052,
+    2873.287208020687
+   ],
+   "between": 48.370283179889036,
+   "within": 78.99272160008826,
+   "thresholdPct": 5.598904464631593
+  },
+  "docs.Lisa.destroy": {
+   "medians": [
+    339.1900210082531,
+    350.7841455042362,
+    345.20914602279663
+   ],
+   "between": 5.798479800590141,
+   "within": 22.91261056721434,
+   "thresholdPct": 13.280320667707823
+  },
+  "docs.Lisa.heapPerDocument": {
+   "medians": [
+    93293.04496788008,
+    93292.8608137045,
+    93291.71092077089
+   ],
+   "between": 0.7229393944974294,
+   "within": 34.46724753506601,
+   "thresholdPct": 2
+  },
+  "docs.Puma.create": {
+   "medians": [
+    2893.229041516781,
+    2959.8936664760113,
+    2906.5819379985332
+   ],
+   "between": 35.27183120343953,
+   "within": 52.76617002324449,
+   "thresholdPct": 3.614243093051661
+  },
+  "docs.Puma.destroy": {
+   "medians": [
+    353.4442714750767,
+    372.35489600896835,
+    362.51139599084854
+   ],
+   "between": 9.457968068010713,
+   "within": 31.581008758153725,
+   "thresholdPct": 17.411027597114163
+  },
+  "docs.Puma.heapPerDocument": {
+   "medians": [
+    93248.52220438738,
+    93249.20278223649,
+    93248.65917602996
+   ],
+   "between": 0.35996646773164265,
+   "within": 10.122547185551978,
+   "thresholdPct": 2
+  },
+  "bind.fanout_1000x100": {
+   "medians": [
+    35.86710402369499,
+    26.81435450911522,
+    27.572333484888077
+   ],
+   "between": 5.02211814863173,
+   "within": 0.28661733880750256,
+   "thresholdPct": 33.38664029305441
+  },
+  "bind.chain_1000x100": {
+   "medians": [
+    85.5212709903717,
+    88.01424998044968,
+    86.26179149746895
+   ],
+   "between": 1.2802620565710277,
+   "within": 0.8347084019176659,
+   "thresholdPct": 2.9567558903688598
+  },
+  "bind.diamond_100x1000": {
+   "medians": [
+    400.2057504951954,
+    357.80112501978874,
+    358.03383350372314
+   ],
+   "between": 24.41542203090643,
+   "within": 27.906161409212633,
+   "thresholdPct": 15.002765320495955
+  },
+  "bind.diamond_evaluations": {
+   "medians": [
+    400,
+    400,
+    400
+   ],
+   "between": 0,
+   "within": 0,
+   "thresholdPct": 2
+  },
+  "bind.conditional_500x200": {
+   "medians": [
+    33.934916496276855,
+    34.02064549922943,
+    34.37718749046326
+   ],
+   "between": 0.23454753809510628,
+   "within": 0.6394721629829311,
+   "thresholdPct": 3.749369578331949
+  },
+  "signal.emit_handler_100k": {
+   "medians": [
+    24.022479474544525,
+    24.314166516065598,
+    24.366916477680206
+   ],
+   "between": 0.18551762619346432,
+   "within": 0.15450267491145583,
+   "thresholdPct": 2
+  },
+  "signal.emit_100connections_1k": {
+   "medians": [
+    1.9977714717388153,
+    2.0722914934158325,
+    2.040354013442993
+   ],
+   "between": 0.037386515206570305,
+   "within": 0.5801151315524858,
+   "thresholdPct": 56.963228557173586
+  },
+  "signal.connect_disconnect_10k": {
+   "medians": [
+    0.5241250097751617,
+    0.549936980009079,
+    0.5531460344791412
+   ],
+   "between": 0.01591003725544268,
+   "within": 0.3909965472313094,
+   "thresholdPct": 144.1720571928628
+  },
+  "frame.column_1000x20": {
+   "medians": [
+    9.260500013828278,
+    9.751145988702774,
+    9.296166509389877
+   ],
+   "between": 0.27356044370547716,
+   "within": 0.8232203817636806,
+   "thresholdPct": 17.44861878148319
+  },
+  "frame.anchors_chain100x100": {
+   "medians": [
+    91.53960400819778,
+    94.93608301877975,
+    186.79656252264977
+   ],
+   "between": 54.042840891546824,
+   "within": 2.7769399849882173,
+   "thresholdPct": 86.8687789516939
+  },
+  "frame.listview_scroll_200": {
+   "medians": [
+    92.13754099607468,
+    93.9036455154419,
+    94.0048959851265
+   ],
+   "between": 1.050110429595969,
+   "within": 33.01119999499329,
+   "thresholdPct": 70.72664548783109
+  },
+  "frame.listview_scroll_far_200": {
+   "medians": [
+    5244.304958462715,
+    5395.424271017313,
+    5443.026562988758
+   ],
+   "between": 103.75716917665171,
+   "within": 1810.126549847567,
+   "thresholdPct": 67.53046206279689
+  },
+  "frame.animation_300x60": {
+   "medians": [
+    15.062541514635086,
+    15.18572947382927,
+    14.772603988647461
+   ],
+   "between": 0.21209734745039333,
+   "within": 0.4777138735508625,
+   "thresholdPct": 6.366564938514335
+  },
+  "create.delegates_1000": {
+   "medians": [
+    17.53785452246666,
+    18.615666449069977,
+    17.604853987693787
+   ],
+   "between": 0.6038638518659742,
+   "within": 0.9224390052342228,
+   "thresholdPct": 10.295389389286273
+  },
+  "destroy.delegates_1000": {
+   "medians": [
+    2.358707994222641,
+    2.5267710089683533,
+    2.4864580035209656
+   ],
+   "between": 0.08774050775757325,
+   "within": 0.6088409565048828,
+   "thresholdPct": 49.553404155560365
+  },
+  "mem.item": {
+   "medians": [
+    876.032,
+    811.9824,
+    827.7504
+   ],
+   "between": 33.37187933655123,
+   "within": 37.40275060516273,
+   "thresholdPct": 8.92040876122348
+  },
+  "mem.rectangle": {
+   "medians": [
+    905.0736,
+    870.928,
+    831.6304
+   ],
+   "between": 36.751705156269075,
+   "within": 172.43529362948874,
+   "thresholdPct": 39.67629488274927
+  },
+  "mem.text": {
+   "medians": [
+    1607.0496,
+    1564.0128,
+    1579.8928
+   ],
+   "between": 21.763242483907007,
+   "within": 29.695041760401722,
+   "thresholdPct": 3.750198498239056
+  },
+  "mem.delegate": {
+   "medians": [
+    7024.592,
+    7037.288,
+    7041
+   ],
+   "between": 8.60416395318775,
+   "within": 23.131141848166354,
+   "thresholdPct": 2
+  }
+ }
+}

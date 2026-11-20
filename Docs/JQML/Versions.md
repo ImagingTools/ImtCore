@@ -7,7 +7,7 @@
 |---|---|---|
 | v3 | `Tools/JQML/v3` | default |
 | v4 | `Tools/JQML/v4` | |
-| v5 | `Tools/JQML/v5` | snapshot of the JQMLNext repository |
+| v5 | `Tools/JQML/v5` | developed here |
 
 ## Choosing the version
 
@@ -56,13 +56,20 @@ off unless the product or the build turns it on.
 Each extra version is compiled into `<buildwebdir>/Resources/vN` with its own compiler. Its resource file
 is the version's `dist/qmlJsWeb.qrc` with the prefix `/html` replaced by `/htmlN`.
 
-## Updating v5
+## Changing v5
 
-v5 is a copy of the JQMLNext repository, which is where it is developed and tested. To update it, copy
-these from a JQMLNext commit, unchanged:
+v5 is developed in `Tools/JQML/v5` (it was a copy of JQMLNext; that repository is no longer its source):
 
-- `compiler/`, `Runtime/`, `dist/` (`dist/core.js` is the built runtime, `npm run build` in JQMLNext);
-- `preparesources.py`, `generate_translations_qrc.py`.
+- `compiler/` is the QML compiler, `Runtime/` the runtime;
+- `dist/core.js` is the runtime built from `Runtime/`: after a change of `Runtime/`, run `npm run build` in
+  `Tools/JQML/v5` (`compiler/buildcore.js`: the modules bundled by `compiler/runtimeBundle.js`, minified by
+  uglify-js; the same sources give the same file) and commit `dist/core.js` with the change;
+- `npm test` runs the unit tests on the sources of `Runtime/` and on `dist/core.js`, `npm run stress` the stress
+  tests, `node --expose-gc tests/bench/run.js` the benchmarks, `node tests/diff/run.js` the comparison with Qt 6
+  (`Docs/JQML/V5Optimization.md`).
+
+The build of a product does not depend on `dist/core.js` or `compiler/`: after a change of either, delete the
+product's `AuxInclude/Web/Resources/index.js` (or build clean) so the web client is compiled again.
 
 `node_modules` holds only `uglify-js`, the same version as in v3. `.gitignore` excludes `node_modules`,
 `Bin/` and `Lib/` everywhere except under `Tools/JQML/v5/node_modules`, so a plain `git add` takes it whole.
@@ -75,4 +82,4 @@ Nothing is installed during the build; everything v5 needs is in the repository:
   elsewhere `node` from the `PATH`, or `NODE_EXE`. When v5 is built, the configure step stops with a message
   if Node.js does not run or is too old; v3 and v4 builds configure as before.
 - Python 3.8 or newer for `preparesources.py`, as for v4.
-- `dist/core.js` is built in JQMLNext and committed; webpack is not needed.
+- `dist/core.js` is committed (built by `npm run build`); webpack is not needed.

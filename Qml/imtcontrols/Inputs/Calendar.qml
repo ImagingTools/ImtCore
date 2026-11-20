@@ -123,7 +123,7 @@ Rectangle {
 
 	//decoration
 	// VS Code look: a neutral header, the accent only on the picked days and today's ring.
-	property string mainColor: Style.imaginToolsAccentColor;
+	property string mainColor: Style.imagingToolsAccentColor;
 	property string cellColor: Style.baseColor;
 	property string selectColor: mainColor;
 	// Days strictly inside a picked range.

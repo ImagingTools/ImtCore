@@ -2,7 +2,7 @@ const engine = require('../../Core/engine')
 const { QtObject } = require('../../Core/QtObject')
 const { defineType } = require('../../Core/type')
 const { ListModel } = require('./ListModel')
-const { ModelContext, modelRows } = require('./ModelContext')
+const { ModelContext, modelRows, moveEntries } = require('./ModelContext')
 
 class Instantiator extends QtObject {
     constructor(parent = null){
@@ -67,10 +67,16 @@ class Instantiator extends QtObject {
         this.$write(Instantiator.OBJECT, this.$objects[0] || null)
     }
 
-    $modelChanged(kind, index, count, roles = null){
+    $modelChanged(kind, index, count, roles = null, to = -1){
         if(!this.$v[Instantiator.DELEGATE] || !this.$v[Instantiator.ACTIVE]) return
         let rows = modelRows(this.$model)
-        if(kind === 'insert'){
+        // QQmlInstantiatorPrivate::_q_modelUpdated: the objects of moved rows are the same, at their new index; no
+        // objectRemoved, no objectAdded
+        if(kind === 'move'){
+            moveEntries([this.$objects, this.$contexts], index, to, count)
+            this.$reindex()
+            this.$updateCount()
+        } else if(kind === 'insert'){
             for(let i = 0; i < count; i++) this.$create(index + i, rows)
             this.$reindex()
             this.$updateCount()

@@ -234,7 +234,7 @@ RemoteCollectionView {
 				height: width
 				radius: width / 2
 
-				color: Style.imaginToolsAccentColor
+				color: Style.imagingToolsAccentColor
 			}
 
 			Image {

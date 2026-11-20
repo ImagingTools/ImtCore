@@ -33,6 +33,8 @@ function built(){
     Object.defineProperty(context, 'Image', { get: () => globalThis.Image, configurable: true })
     // the tests give the browser's requests as globalThis.XMLHttpRequest
     Object.defineProperty(context, 'XMLHttpRequest', { get: () => globalThis.XMLHttpRequest, configurable: true })
+    // and the page's server as globalThis.fetch, URL and location
+    for(let name of ['fetch', 'URL', 'location']) Object.defineProperty(context, name, { get: () => globalThis[name], configurable: true })
     vm.createContext(context)
     vm.runInContext(fs.readFileSync(path.resolve(__dirname, '../../dist/core.js'), 'utf8'), context)
     let JQ = context.JQ

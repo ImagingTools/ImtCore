@@ -61,6 +61,8 @@ class Loader extends Item {
     $load(){
         let old = this.$v[Loader.ITEM]
         if(old){
+            // QQuickLoaderPrivate::clear: the item's change listener goes with it
+            this.$followItem(null)
             this.$write(Loader.ITEM, null)
             old.$releaseLater(true, true)
         }

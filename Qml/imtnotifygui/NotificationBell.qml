@@ -62,7 +62,7 @@ Item {
 		z: bellButton.z + 1
 
 		visible: NotificationCenter.unreadCount > 0
-		color: Style.imaginToolsAccentColor
+		color: Style.imagingToolsAccentColor
 
 		BaseText {
 			id: badgeText

@@ -280,6 +280,150 @@ function cases(name, runtime){
             else delete globalThis.Image
         }
     })
+
+    // QQuickPixmapStore: one load per url, shared also while in progress
+    async function withImages(body){
+        let previous = globalThis.Image
+        globalThis.Image = FakeImage
+        FakeImage.made = []
+        try {
+            return await body()
+        } finally {
+            if(previous) globalThis.Image = previous
+            else delete globalThis.Image
+        }
+    }
+
+    test(name + ': the Images of a url share its load, also while it is in progress; cache: false loads on its own', () => withImages(() => {
+        let images = []
+        engine.batch(() => {
+            for(let i = 0; i < 3; i++){
+                let image = new Image(null)
+                image.source = 'icons/shared.svg'
+                images.push(image)
+            }
+        })
+        assert.equal(FakeImage.made.length, 1)
+        // nothing is drawn while it loads: the element would ask the server for the url a second time
+        assert.equal(images[0].$paintUrl, '')
+        let gone
+        engine.batch(() => {
+            gone = new Image(null)
+            gone.source = 'icons/shared.svg'
+        })
+        engine.batch(() => gone.destroy())
+        engine.batch(() => FakeImage.made[0].finish(20, 10))
+        for(let image of images){
+            assert.equal(image.status, Image.Ready)
+            assert.equal(image.implicitWidth, 20)
+        }
+        assert.equal(gone.status, Image.Loading)
+        let own
+        engine.batch(() => {
+            own = new Image(null)
+            own.cache = false
+            own.source = 'icons/shared.svg'
+        })
+        assert.equal(FakeImage.made.length, 2)
+        assert.equal(own.status, Image.Loading)
+        engine.batch(() => FakeImage.made[1].finish(20, 10))
+        assert.equal(own.status, Image.Ready)
+    }))
+
+    test(name + ': an image of the page\'s server is fetched once and drawn from its blob', async () => {
+        let saved = { fetch: globalThis.fetch, URL: globalThis.URL, location: globalThis.location }
+        let fetched = []
+        globalThis.fetch = (url) => {
+            fetched.push(url)
+            return Promise.resolve({ ok: true, blob: () => Promise.resolve({ url }) })
+        }
+        globalThis.URL = class extends saved.URL {
+            static createObjectURL(blob){ return 'blob:' + blob.url }
+            static revokeObjectURL(){}
+        }
+        globalThis.location = { href: 'http://server/app/index.html', origin: 'http://server' }
+        try {
+            await withImages(async () => {
+                let first, second
+                engine.batch(() => {
+                    first = new Image(null)
+                    first.source = 'icons/own.svg'
+                    second = new Image(null)
+                    second.source = 'icons/own.svg'
+                })
+                await new Promise((resolve) => setTimeout(resolve, 0))
+                assert.deepEqual(fetched, ['http://server/app/icons/own.svg'])
+                assert.equal(FakeImage.made.length, 1)
+                assert.equal(FakeImage.made[0].url, 'blob:http://server/app/icons/own.svg')
+                engine.batch(() => FakeImage.made[0].finish(16, 16))
+                assert.equal(second.status, Image.Ready)
+                assert.equal(second.$paintUrl, 'blob:http://server/app/icons/own.svg')
+                // a later Image of the url, as a delegate made on scrolling, draws the blob too and reads nothing
+                let later
+                engine.batch(() => {
+                    later = new Image(null)
+                    later.source = 'icons/own.svg'
+                })
+                assert.equal(later.status, Image.Ready)
+                assert.equal(later.$paintUrl, 'blob:http://server/app/icons/own.svg')
+                assert.equal(fetched.length, 1)
+                // another server's image is drawn from its url
+                let remote
+                engine.batch(() => {
+                    remote = new Image(null)
+                    remote.source = 'https://other.example/a.png'
+                })
+                assert.equal(fetched.length, 1)
+                assert.equal(FakeImage.made[1].url, 'https://other.example/a.png')
+            })
+        } finally {
+            for(let key of Object.keys(saved)){
+                if(saved[key] === undefined) delete globalThis[key]
+                else globalThis[key] = saved[key]
+            }
+        }
+    })
+
+    // the size of an image is the runtime's own work: a binding evaluated while it updates (it enables the pending
+    // binding of the image's width) gets no dependency on sourceSize, else it re-runs itself: "Binding loop detected"
+    test(name + ': an image updating its size does not make the binding being evaluated depend on sourceSize', () => withImages(() => {
+        let image, other
+        engine.batch(() => {
+            image = new Image(null)
+            image.source = 'icons/size.svg'
+            image.sourceSize.height = 64
+            other = new Item(null)
+        })
+        engine.batch(() => FakeImage.made[0].finish(32, 32))
+        let evaluations = 0
+        engine.batch(() => {
+            other.$bind(Item.WIDTH, () => {
+                evaluations++
+                image.$updateSize()
+                return 5
+            }, null)
+        })
+        assert.equal(evaluations, 1)
+        engine.batch(() => { image.sourceSize.width = 8 })
+        assert.equal(image.implicitWidth, 8)
+        assert.equal(evaluations, 1)
+    }))
+
+    test(name + ': a locale name the browser does not know is the C locale, as QLocale', () => {
+        let c = Qt.locale('undefined')
+        assert.equal(c.name, 'C')
+        assert.equal(c.decimalPoint, '.')
+        // a browser language it does not know (Firefox under automation gives "undefined"): the default locale is en_US
+        let saved = Object.getOwnPropertyDescriptor(globalThis, 'navigator')
+        Object.defineProperty(globalThis, 'navigator', { value: { language: 'undefined' }, configurable: true, writable: true })
+        try {
+            assert.equal(Qt.locale().name, 'en_US')
+            assert.equal(Qt.formatDateTime(new Date(2024, 0, 2, 3, 4), 'dd.MM.yyyy hh:mm'), '02.01.2024 03:04')
+        } finally {
+            if(saved) Object.defineProperty(globalThis, 'navigator', saved)
+            else delete globalThis.navigator
+        }
+    })
 }
 
 for(let [name, load] of runtimes) cases(name, load())
