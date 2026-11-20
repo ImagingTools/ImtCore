@@ -35,6 +35,8 @@ namespace imtclientgql
 	A lost connection forgets everything but the application name, so a restarted service reports its new version.
 	With a \c ServerCredentialProvider the query carries the token of this server: the answer tells the state of the token,
 	which is checked again periodically, because the service knows about a revoked token only by the token itself.
+	A refused token is checked again sooner, after \c RejectionRecheckInterval and then twice as long each time up to the periodic check:
+	a service that has just started may refuse a valid token for a moment.
 	The information may be read from any thread.
 */
 class CRemoteServiceInfoComp:
@@ -55,6 +57,7 @@ public:
 		I_ASSIGN(m_connectionStatusCompPtr, "ConnectionStatus", "Status of the connection to the remote service, the information is requested on each connection", true, "ConnectionStatus");
 		I_ASSIGN_TO(m_connectionStatusModelCompPtr, m_connectionStatusCompPtr, true);
 		I_ASSIGN(m_serverCredentialCompPtr, "ServerCredentialProvider", "Token of this server at the remote service, its state is reported with the information", false, "ServerCredentialProvider");
+		I_ASSIGN(m_rejectionRecheckIntervalAttrPtr, "RejectionRecheckInterval", "Pause in ms before a refused token is checked again, doubled for each refusal up to the periodic check", false, 5000);
 	I_END_COMPONENT;
 
 	// reimplemented (imtcom::IServiceInfoProvider)
@@ -73,6 +76,8 @@ private:
 	void SendInfoRequest(const QByteArray& serverToken);
 	void OnRequestFinished(int requestId, bool isTokenUsed, const GqlModelResult<sdl::V1_0::imtapp::CApplicationInfo>& result);
 	void SetCredentialStatus(CredentialStatus status);
+	// The next check of the token: sooner after a refusal, periodic once accepted
+	void ScheduleCredentialCheck(CredentialStatus status);
 	void SetServiceStatus(imtcom::IConnectionStatusProvider::ConnectionStatus status);
 	void SetServiceInfo(const ServiceInfo& serviceInfo);
 	static void ReadDependencies(
@@ -86,10 +91,13 @@ private:
 	I_REF(imtcom::IConnectionStatusProvider, m_connectionStatusCompPtr);
 	I_REF(imod::IModel, m_connectionStatusModelCompPtr);
 	I_REF(IServerCredentialProvider, m_serverCredentialCompPtr);
+	I_ATTR(int, m_rejectionRecheckIntervalAttrPtr);
 
 	mutable QMutex m_serviceInfoMutex;
 	ServiceInfo m_serviceInfo;
 	QTimer m_credentialCheckTimer;
+	// The pause before the next check of a refused token, 0 while it is not refused
+	int m_rejectionRecheckInterval = 0;
 
 	// Only the answer to the last request is used, e.g. after a quick reconnection
 	int m_lastRequestId = 0;

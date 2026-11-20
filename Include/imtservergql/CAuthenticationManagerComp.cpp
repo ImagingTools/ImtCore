@@ -48,6 +48,9 @@ static imtgql::IGqlContextCreator::ContextCreationStatus ToContextCreationStatus
 }
 
 
+static const QString s_expiredTokenReadMessage = QStringLiteral("The access token expired and the access could not be read with it.");
+
+
 // What a user of a product without a token of its server is told
 static QString GetNotConnectedMessage(const QByteArray& productId, const QByteArray& receiverProductId)
 {
@@ -145,6 +148,8 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateContext(
 	QByteArray userTokenProductId;
 	QByteArrayList scopes;
 	bool isPat = false;
+	// A remote source refuses a read made with it: only a new token tells the access
+	bool isTokenExpired = false;
 	const bool isSessionAuthorized = !token.isEmpty() && !IsPatToken(token) && IsComputedBySource();
 	imtauth::ISessionAuthorizationProvider::SessionAuthorization sessionAuthorization;
 	const IServerTokenReceiver* receiverPtr = GetServerTokenReceiver();
@@ -159,9 +164,14 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateContext(
 		// A request may use an answer a few seconds old; a subscription is checked on the current state
 		imtauth::SessionTokenClaims claims;
 		const bool hasClaims = imtauth::ParseSessionTokenClaims(token, claims);
-		const qint64 resolutionGeneration = GetAuthorizationGeneration();
+		const qint64 resolutionGeneration = GetJwtCacheGeneration();
 		bool isClaimed = false;
 		const bool isCached = !isRenewal && TryAwaitOrClaimSessionAuthorization(token, sessionAuthorization, isClaimed);
+		auto claimGuard = qScopeGuard([&](){
+			if (isClaimed){
+				ReleaseTokenResolutionClaim(token);
+			}
+		});
 		if (!isCached){
 			sessionAuthorization = m_sessionAuthorizationProviderCompPtr->GetSessionAuthorization(token, productId, kind == CK_ESTABLISHED_SUBSCRIPTION);
 		}
@@ -173,24 +183,17 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateContext(
 					&& sessionAuthorization.userId == claims.userId && sessionAuthorization.tenantId == claims.tenantId
 					&& userInfoPtr != nullptr && identifiablePtr != nullptr
 					&& identifiablePtr->GetObjectUuid() == sessionAuthorization.userId && userInfoPtr->IsEnabled();
-		if (!isCached){
-			if (isAnswerValid){
-				CAuthorizationSnapshot::DetachUser(*sessionAuthorization.userPtr.GetPtr());
-				if (!isRenewal){
-					StoreCachedSessionAuthorization(token, sessionAuthorization, claims.expSecs, resolutionGeneration);
-				}
-			}
-			if (isClaimed){
-				ReleaseTokenResolutionClaim(token);
-			}
-		}
-
 		if (!isComputed){
 			if (sessionAuthorization.state == imtauth::ISessionAuthorizationProvider::SAS_REFUSED){
-				if (sessionAuthorization.refusalReason == imtauth::ISessionAuthorizationProvider::RR_REAUTHENTICATE){
+				const bool reauthenticate = sessionAuthorization.refusalReason == imtauth::ISessionAuthorizationProvider::RR_REAUTHENTICATE;
+				if (reauthenticate){
+					InvalidateExpiredJwt(token, kind == CK_ESTABLISHED_SUBSCRIPTION);
+				}
+				else{
+					// A forbidden answer need not authenticate the claims. Evict only this credential.
 					InvalidateTokenCache(token);
 				}
-				SetError(error, sessionAuthorization.refusalReason == imtauth::ISessionAuthorizationProvider::RR_REAUTHENTICATE ? CCS_UNAUTHORIZED : CCS_FORBIDDEN, sessionAuthorization.message);
+				SetError(error, reauthenticate ? CCS_UNAUTHORIZED : CCS_FORBIDDEN, sessionAuthorization.message);
 			}
 			else{
 				SetError(error, CCS_INTERNAL_ERROR, sessionAuthorization.message);
@@ -201,6 +204,17 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateContext(
 		if (!isAnswerValid){
 			SetError(error, CCS_INTERNAL_ERROR, QStringLiteral("The authorization server answered with an invalid user or session."));
 			return nullptr;
+		}
+		if (sessionAuthorization.sessionExpiresAt.isValid() && sessionAuthorization.sessionExpiresAt <= QDateTime::currentDateTimeUtc()){
+			InvalidateSessionTokenCache(claims.sessionId, false);
+			SetError(error, CCS_UNAUTHORIZED, QStringLiteral("The session of the token is expired."));
+			return nullptr;
+		}
+		if (!isCached){
+			CAuthorizationSnapshot::DetachUser(*sessionAuthorization.userPtr.GetPtr());
+			if (!isRenewal){
+				StoreCachedSessionAuthorization(token, sessionAuthorization, claims.expSecs, resolutionGeneration);
+			}
 		}
 		resolvedUserId = sessionAuthorization.userId;
 		tenantId = sessionAuthorization.tenantId;
@@ -223,18 +237,17 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateContext(
 			scopes = freshToken.scopes;
 			isPat = freshToken.isPat;
 			sessionId = freshToken.sessionId;
+			isTokenExpired = freshToken.isExpired;
 			tokenProductId = freshToken.productId;
 			clientProductId = freshToken.clientProductId;
 		}
 		else{
 			imtgql::IGqlContextCreator::ContextCreationStatus authStatus = imtgql::IGqlContextCreator::CCS_OK;
 			QString authErrorMessage;
-			if (!ResolveUserId(token, resolvedUserId, tenantId, scopes, isPat, authErrorMessage, authStatus)){
+			if (!ResolveUserId(token, resolvedUserId, tenantId, scopes, isPat, tokenProductId, clientProductId, authErrorMessage, authStatus)){
 				SetError(error, authStatus, authErrorMessage);
 				return nullptr;
 			}
-
-			isTokenAccepted = !isPat || GetCachedPatProducts(token, tokenProductId, clientProductId);
 		}
 
 		if (isPat){
@@ -377,7 +390,12 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateContext(
 			tenantData = ReadTenantData(resolvedUserId, tenantId);
 			if (!tenantData.isRead){
 				imtgql::CGqlRequestContextManager::Clear();
-				SetError(error, imtgql::IGqlContextCreator::CCS_INTERNAL_ERROR, QStringLiteral("The organization data could not be read."));
+				if (isTokenExpired){
+					SetError(error, imtgql::IGqlContextCreator::CCS_UNAUTHORIZED, s_expiredTokenReadMessage);
+				}
+				else{
+					SetError(error, imtgql::IGqlContextCreator::CCS_INTERNAL_ERROR, QStringLiteral("The organization data could not be read."));
+				}
 				return nullptr;
 			}
 		}
@@ -410,7 +428,12 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateContext(
 			// A user computed by the source holds permissions of one product and one organization: no shared cache may serve it.
 			if (!ReadCurrentUser(resolvedUserId, productId, userDataPtr, readError) && isRenewal){
 				imtgql::CGqlRequestContextManager::Clear();
-				SetError(error, readError.status, readError.message);
+				if (isTokenExpired){
+					SetError(error, imtgql::IGqlContextCreator::CCS_UNAUTHORIZED, s_expiredTokenReadMessage);
+				}
+				else{
+					SetError(error, readError.status, readError.message);
+				}
 				return nullptr;
 			}
 		}
@@ -441,6 +464,11 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateContext(
 					SetError(error, imtgql::IGqlContextCreator::CCS_INTERNAL_ERROR, QStringLiteral("The session could not be checked."));
 					return nullptr;
 				}
+			}
+
+			if (userInfoPtr == nullptr && isTokenExpired){
+				SetError(error, imtgql::IGqlContextCreator::CCS_UNAUTHORIZED, s_expiredTokenReadMessage);
+				return nullptr;
 			}
 
 			// The access could not be checked: that is not a refusal
@@ -567,7 +595,15 @@ bool CAuthenticationManagerComp::ValidateSession(const QByteArray& sessionId, bo
 		return false;
 	}
 
-	return m_slaveJwtSessionControllerCompPtr->ValidateSession(sessionId, isCheckedPtr);
+	bool isChecked = false;
+	const bool valid = m_slaveJwtSessionControllerCompPtr->ValidateSession(sessionId, &isChecked);
+	if (isChecked && !valid){
+		InvalidateSessionTokenCache(sessionId, false);
+	}
+	if (isCheckedPtr != nullptr){
+		*isCheckedPtr = isChecked;
+	}
+	return valid;
 }
 
 
@@ -576,8 +612,7 @@ imtauth::IJwtSessionController::JwtState CAuthenticationManagerComp::ValidateJwt
 	if (!m_slaveJwtSessionControllerCompPtr.IsValid()){
 		SendWarningMessage(
 					0,
-					QStringLiteral("ValidateJwt: slave JWT session controller is not configured (token %1)")
-							.arg(MaskToken(jwt)),
+					QStringLiteral("ValidateJwt: slave JWT session controller is not configured"),
 					QStringLiteral("CAuthenticationManagerComp"));
 		return imtauth::IJwtSessionController::JS_INVALID;
 	}
@@ -586,12 +621,15 @@ imtauth::IJwtSessionController::JwtState CAuthenticationManagerComp::ValidateJwt
 	QByteArray tenantId;
 	QByteArrayList scopes;
 	bool isPat = false;
+	QByteArray patProductId;
+	QByteArray patClientProductId;
 	JwtState cachedState = JwtState::JS_NONE;
-	if (TryAwaitOrClaimTokenResolution(jwt, userId, tenantId, scopes, isPat, cachedState)){
+	if (TryAwaitOrClaimTokenResolution(jwt, userId, tenantId, scopes, isPat, patProductId, patClientProductId, cachedState)){
 		return cachedState;
 	}
 
 	auto claimGuard = qScopeGuard([this, jwt](){ ReleaseTokenResolutionClaim(jwt); });
+	const qint64 generation = GetJwtCacheGeneration();
 	JwtState state = m_slaveJwtSessionControllerCompPtr->ValidateJwt(jwt);
 
 	if (state == JwtState::JS_OK){
@@ -607,7 +645,7 @@ imtauth::IJwtSessionController::JwtState CAuthenticationManagerComp::ValidateJwt
 			resolvedTenantId = m_slaveJwtSessionControllerCompPtr->GetTenantFromJwt(jwt);
 			expSecs = GetJwtExpirationSecs(jwt);
 		}
-		StoreCachedToken(jwt, resolvedUserId, resolvedTenantId, QByteArray(), QByteArrayList(), false, expSecs);
+		StoreCachedToken(jwt, resolvedUserId, resolvedTenantId, QByteArray(), QByteArrayList(), false, expSecs, generation);
 	}
 	else if (state == JwtState::JS_EXPIRED){
 		StoreExpiredToken(jwt);
@@ -615,8 +653,7 @@ imtauth::IJwtSessionController::JwtState CAuthenticationManagerComp::ValidateJwt
 	else{
 		SendWarningMessage(
 					0,
-					QStringLiteral("ValidateJwt: slave rejected token %1 with state %2")
-							.arg(MaskToken(jwt))
+					QStringLiteral("ValidateJwt: slave rejected token with state %1")
 							.arg(static_cast<int>(state)),
 					QStringLiteral("CAuthenticationManagerComp"));
 	}
@@ -633,6 +670,7 @@ bool CAuthenticationManagerComp::RefreshToken(
 		return false;
 	}
 
+	const qint64 generation = GetJwtCacheGeneration();
 	bool result = m_slaveJwtSessionControllerCompPtr->RefreshToken(refreshToken, outputData);
 	// Note: the slave rotates the session's refresh token but keeps the same
 	// session-ID and updates it in place, so a JWT issued before this refresh
@@ -652,7 +690,7 @@ bool CAuthenticationManagerComp::RefreshToken(
 					QByteArray(),
 					QByteArrayList(),
 					false,
-					expSecs);
+					expSecs, generation);
 	}
 
 	return result;
@@ -668,6 +706,7 @@ bool CAuthenticationManagerComp::CreateNewSession(
 		return false;
 	}
 
+	const qint64 generation = GetJwtCacheGeneration();
 	bool result = m_slaveJwtSessionControllerCompPtr->CreateNewSession(userId, tenantId, outputData);
 	if (result && !outputData.accessToken.isEmpty()){
 		// Pre-populate the cache for the newly created JWT so subsequent
@@ -686,7 +725,7 @@ bool CAuthenticationManagerComp::CreateNewSession(
 					QByteArray(),
 					QByteArrayList(),
 					false,
-					expSecs);
+					expSecs, generation);
 	}
 
 	return result;
@@ -827,6 +866,19 @@ void CAuthenticationManagerComp::OnComponentCreated()
 		}
 	}
 
+	// A session removed by anybody, e.g. closed for a stolen refresh token, ends its access tokens
+	if (m_sessionCollectionModelCompPtr.IsValid() && !IsModelAttached(m_sessionCollectionModelCompPtr.GetPtr())){
+		m_sessionCollectionModelCompPtr->AttachObserver(this);
+	}
+
+	// A change of the access, e.g. of a membership: the organization data kept for the tokens is not used any more
+	for (int index = 0; index < m_accessModelsCompPtr.GetCount(); ++index){
+		imod::IModel* modelPtr = m_accessModelsCompPtr[index];
+		if (modelPtr != nullptr && !IsModelAttached(modelPtr)){
+			modelPtr->AttachObserver(this);
+		}
+	}
+
 	// A change of the users, roles or groups the authorization server computes with: the kept answers are not used any more
 	if (m_sessionAuthorizationProviderCompPtr.IsValid()){
 		for (imtbase::IObjectCollection* collectionPtr : {m_userCollectionCompPtr.GetPtr(), m_roleCollectionCompPtr.GetPtr(), m_userGroupCollectionCompPtr.GetPtr()}){
@@ -849,13 +901,29 @@ void CAuthenticationManagerComp::OnComponentDestroyed()
 
 // reimplemented (imod::CMultiModelObserverBase)
 
-void CAuthenticationManagerComp::OnUpdate(imod::IModel* /*modelPtr*/, const istd::IChangeable::ChangeSet& changeSet)
+void CAuthenticationManagerComp::OnUpdate(imod::IModel* modelPtr, const istd::IChangeable::ChangeSet& changeSet)
 {
+	// A refreshed session changes nothing here; a removed one ends its tokens
+	if (modelPtr != nullptr && modelPtr == m_sessionCollectionModelCompPtr.GetPtr()){
+		if (changeSet.Contains(imtbase::ICollectionInfo::CF_REMOVED)){
+			const imtbase::ICollectionInfo::ElementsRemoveInfo info = changeSet.GetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENTS_REMOVED).value<imtbase::ICollectionInfo::ElementsRemoveInfo>();
+			for (const QByteArray& sessionId : info.elementIds){
+				InvalidateSessionTokenCache(sessionId);
+			}
+		}
+
+		return;
+	}
+
 	QMutexLocker cacheLocker(&m_tokenCacheMutex);
 	const QByteArray tokenId = changeSet.Contains(imtauth::IPersonalAccessTokenManager::CF_TOKEN_CHANGED)
 				? changeSet.GetChangeInfo(imtauth::IPersonalAccessTokenManager::CN_TOKEN_ID).toByteArray() : QByteArray();
 	if (tokenId.isEmpty()){
 		InvalidateAuthorizationLocked();
+		// A token manager changed some token: the checks under way read it again
+		if (changeSet.Contains(imtauth::IPersonalAccessTokenManager::CF_TOKEN_CHANGED)){
+			m_lastTokenSetChangeGeneration = m_tokenChangeGeneration;
+		}
 	}
 	else{
 		++m_tokenChangeGeneration;
@@ -935,7 +1003,7 @@ bool CAuthenticationManagerComp::IsSessionClosed(const QByteArray& token, bool& 
 		return true;
 	}
 
-	const bool isSessionValid = m_slaveJwtSessionControllerCompPtr->ValidateSession(sessionId, &isChecked);
+	const bool isSessionValid = ValidateSession(sessionId, &isChecked);
 
 	return isChecked && !isSessionValid;
 }
@@ -1079,7 +1147,8 @@ bool CAuthenticationManagerComp::TryAwaitOrClaimSessionAuthorization(
 		if (iter != m_sessionAuthorizationCache.cend()){
 			// An answer never outlives its access token
 			const qint64 now = QDateTime::currentMSecsSinceEpoch();
-			if (now - iter->resolvedAt <= ttlMs && iter->jwtExpSecs * 1000 > now){
+			const QDateTime& end = iter->authorization.sessionExpiresAt;
+			if (now - iter->resolvedAt <= ttlMs && iter->jwtExpSecs > now / 1000 && (!end.isValid() || now < end.toMSecsSinceEpoch())){
 				authorization = iter->authorization;
 				return true;
 			}
@@ -1111,7 +1180,7 @@ void CAuthenticationManagerComp::StoreCachedSessionAuthorization(
 	QMutexLocker cacheLocker(&m_tokenCacheMutex);
 
 	// Asked before the access or a token changed
-	if (resolutionGeneration != m_tokenChangeGeneration){
+	if (resolutionGeneration != m_tokenChangeGeneration + m_jwtRefusalGeneration){
 		return;
 	}
 
@@ -1134,11 +1203,13 @@ bool CAuthenticationManagerComp::ResolveUserId(
 			QByteArray& tenantId,
 			QByteArrayList& scopes,
 			bool& isPat,
+			QByteArray& patProductId,
+			QByteArray& patClientProductId,
 			QString& errorMessage,
 			imtgql::IGqlContextCreator::ContextCreationStatus& status) const
 {
 	if (!imtauth::IsServerToken(token)){
-		return ResolveToken(token, m_patManagerCompPtr.GetPtr(), userId, tenantId, scopes, isPat, errorMessage, status);
+		return ResolveToken(token, m_patManagerCompPtr.GetPtr(), userId, tenantId, scopes, isPat, patProductId, patClientProductId, errorMessage, status);
 	}
 
 	// The token of a server is known only where it was issued
@@ -1150,7 +1221,7 @@ bool CAuthenticationManagerComp::ResolveUserId(
 		return false;
 	}
 
-	return ResolveToken(token, receiverPtr->GetTokenManager(), userId, tenantId, scopes, isPat, errorMessage, status);
+	return ResolveToken(token, receiverPtr->GetTokenManager(), userId, tenantId, scopes, isPat, patProductId, patClientProductId, errorMessage, status);
 }
 
 
@@ -1161,11 +1232,15 @@ bool CAuthenticationManagerComp::ResolveToken(
 			QByteArray& tenantId,
 			QByteArrayList& scopes,
 			bool& isPat,
+			QByteArray& patProductId,
+			QByteArray& patClientProductId,
 			QString& errorMessage,
 			imtgql::IGqlContextCreator::ContextCreationStatus& status) const
 {
+	patProductId.clear();
+	patClientProductId.clear();
 	JwtState cachedState = JwtState::JS_NONE;
-	if (TryAwaitOrClaimTokenResolution(token, userId, tenantId, scopes, isPat, cachedState)){
+	if (TryAwaitOrClaimTokenResolution(token, userId, tenantId, scopes, isPat, patProductId, patClientProductId, cachedState)){
 		if (cachedState == JwtState::JS_EXPIRED){
 			errorMessage = QStringLiteral("JWT token expired.");
 			status = imtgql::IGqlContextCreator::CCS_UNAUTHORIZED;
@@ -1192,39 +1267,39 @@ bool CAuthenticationManagerComp::ResolveToken(
 			status = imtgql::IGqlContextCreator::CCS_INTERNAL_ERROR;
 			SendErrorMessage(
 						0,
-						QStringLiteral("ResolveUserId: PAT manager not configured (token %1)")
-								.arg(MaskToken(token)),
+						QStringLiteral("ResolveUserId: PAT manager not configured"),
 						QStringLiteral("CAuthenticationManagerComp"));
 			return false;
 		}
 
-		QByteArray tokenProductId;
-		QByteArray tokenClientProductId;
-		bool isCheckFailed = false;
-		qint64 resolutionGeneration;
-		{
-			QMutexLocker locker(&m_tokenCacheMutex);
-			resolutionGeneration = m_tokenChangeGeneration;
-		}
-		if (!patManagerPtr->ValidateToken(token, userId, tokenId, scopes, &tokenProductId, &tokenClientProductId, &isCheckFailed)){
-			errorMessage = isCheckFailed ? QStringLiteral("The personal access token could not be checked.") : QStringLiteral("Invalid personal access token.");
-			status = isCheckFailed ? imtgql::IGqlContextCreator::CCS_INTERNAL_ERROR : imtgql::IGqlContextCreator::CCS_FORBIDDEN;
-			SendWarningMessage(
-						0,
-						QStringLiteral("ResolveUserId: invalid PAT %1")
-								.arg(MaskToken(token)),
-						QStringLiteral("CAuthenticationManagerComp"));
-		}
-		else{
-			isTokenValid = true;
-			patManagerPtr->UpdateLastUsedAt(tokenId);
+		// A token changed while it was checked (revoked, narrowed) is checked again: the answer may be the one before the change
+		qint64 resolutionGeneration = 0;
+		for (int checkCount = 1; !isTokenValid; ++checkCount){
+			{
+				QMutexLocker locker(&m_tokenCacheMutex);
+				resolutionGeneration = m_tokenChangeGeneration;
+			}
+			bool isCheckFailed = false;
+			if (!patManagerPtr->ValidateToken(token, userId, tokenId, scopes, &patProductId, &patClientProductId, &isCheckFailed)){
+				errorMessage = isCheckFailed ? QStringLiteral("The personal access token could not be checked.") : QStringLiteral("Invalid personal access token.");
+				status = isCheckFailed ? imtgql::IGqlContextCreator::CCS_INTERNAL_ERROR : imtgql::IGqlContextCreator::CCS_FORBIDDEN;
+				SendWarningMessage(
+							0,
+							QStringLiteral("ResolveUserId: invalid PAT"),
+							QStringLiteral("CAuthenticationManagerComp"));
+				return false;
+			}
+
+			isTokenValid = !IsTokenChangedSince(tokenId, resolutionGeneration);
+			if (!isTokenValid && checkCount >= 2){
+				errorMessage = QStringLiteral("The personal access token could not be checked.");
+				status = imtgql::IGqlContextCreator::CCS_INTERNAL_ERROR;
+				return false;
+			}
 		}
 
-		if (!isTokenValid){
-			return false;
-		}
-
-		StoreCachedToken(token, userId, tenantId, tokenId, scopes, true, 0, tokenProductId, tokenClientProductId, resolutionGeneration);
+		patManagerPtr->UpdateLastUsedAt(tokenId);
+		StoreCachedToken(token, userId, tenantId, tokenId, scopes, true, 0, resolutionGeneration, patProductId, patClientProductId);
 		return true;
 	}
 
@@ -1236,12 +1311,12 @@ bool CAuthenticationManagerComp::ResolveToken(
 		status = imtgql::IGqlContextCreator::CCS_INTERNAL_ERROR;
 		SendErrorMessage(
 					0,
-					QStringLiteral("ResolveUserId: slave JWT session controller is not configured (token %1)")
-							.arg(MaskToken(token)),
+					QStringLiteral("ResolveUserId: slave JWT session controller is not configured"),
 					QStringLiteral("CAuthenticationManagerComp"));
 		return false;
 	}
 
+	const qint64 generation = GetJwtCacheGeneration();
 	state = m_slaveJwtSessionControllerCompPtr->ValidateJwt(token);
 	qint64 expSecs = 0;
 	if (state == JwtState::JS_OK){
@@ -1261,8 +1336,7 @@ bool CAuthenticationManagerComp::ResolveToken(
 		status = imtgql::IGqlContextCreator::CCS_UNAUTHORIZED;
 		SendWarningMessage(
 					0,
-					QStringLiteral("ResolveUserId: token %1 expired (client should refresh)")
-							.arg(MaskToken(token)),
+					QStringLiteral("ResolveUserId: token expired (client should refresh)"),
 					QStringLiteral("CAuthenticationManagerComp"));
 		return false;
 	}
@@ -1274,9 +1348,8 @@ bool CAuthenticationManagerComp::ResolveToken(
 		status = imtgql::IGqlContextCreator::CCS_INTERNAL_ERROR;
 		SendErrorMessage(
 					0,
-					QStringLiteral("ResolveUserId: slave returned JS_NONE for token %1 "
-								"(remote validation failure / transport error) — returning INTERNAL_ERROR, not FORBIDDEN")
-							.arg(MaskToken(token)),
+					QStringLiteral("ResolveUserId: slave returned JS_NONE "
+								"(remote validation failure / transport error) — returning INTERNAL_ERROR, not FORBIDDEN"),
 					QStringLiteral("CAuthenticationManagerComp"));
 		return false;
 	}
@@ -1285,14 +1358,13 @@ bool CAuthenticationManagerComp::ResolveToken(
 		status = imtgql::IGqlContextCreator::CCS_FORBIDDEN;
 		SendWarningMessage(
 					0,
-					QStringLiteral("ResolveUserId: token %1 rejected as invalid (state %2)")
-							.arg(MaskToken(token))
+					QStringLiteral("ResolveUserId: token rejected as invalid (state %1)")
 							.arg(static_cast<int>(state)),
 					QStringLiteral("CAuthenticationManagerComp"));
 		return false;
 	}
 
-	StoreCachedToken(token, userId, tenantId, QByteArray(), QByteArrayList(), false, expSecs);
+	StoreCachedToken(token, userId, tenantId, QByteArray(), QByteArrayList(), false, expSecs, generation);
 	return true;
 }
 
@@ -1314,8 +1386,7 @@ bool CAuthenticationManagerComp::TryGetCachedToken(
 	if (iter->expiresAt <= now){
 		SendWarningMessage(
 					0,
-					QStringLiteral("Token cache miss (expired entry): token %1 expired %2 ms ago")
-							.arg(MaskToken(token))
+					QStringLiteral("Token cache miss: entry expired %1 ms ago")
 							.arg(now - iter->expiresAt),
 					QStringLiteral("CAuthenticationManagerComp"));
 		m_tokenCache.erase(iter);
@@ -1330,17 +1401,11 @@ bool CAuthenticationManagerComp::TryGetCachedToken(
 }
 
 
-bool CAuthenticationManagerComp::GetCachedPatProducts(const QByteArray& token, QByteArray& productId, QByteArray& clientProductId) const
+bool CAuthenticationManagerComp::IsTokenChangedSince(const QByteArray& tokenId, qint64 generation) const
 {
 	QMutexLocker cacheLocker(&m_tokenCacheMutex);
-	auto iter = m_tokenCache.constFind(token);
-	if (iter == m_tokenCache.constEnd()){
-		return false;
-	}
 
-	productId = iter->patProductId;
-	clientProductId = iter->patClientProductId;
-	return true;
+	return generation < m_lastTokenSetChangeGeneration || generation < m_tokenChangeGenerations.value(tokenId);
 }
 
 
@@ -1349,7 +1414,9 @@ bool CAuthenticationManagerComp::TryReadCachedTokenLocked(
 			QByteArray& userId,
 			QByteArray& tenantId,
 			QByteArrayList& scopes,
-			bool& isPat) const
+			bool& isPat,
+			QByteArray& patProductId,
+			QByteArray& patClientProductId) const
 {
 	// Precondition: m_tokenCacheMutex is already held by the caller.
 	const qint64 now = QDateTime::currentMSecsSinceEpoch();
@@ -1367,6 +1434,8 @@ bool CAuthenticationManagerComp::TryReadCachedTokenLocked(
 	tenantId = iter->tenantId;
 	scopes = iter->scopes;
 	isPat = iter->isPat;
+	patProductId = iter->patProductId;
+	patClientProductId = iter->patClientProductId;
 	return true;
 }
 
@@ -1377,12 +1446,14 @@ bool CAuthenticationManagerComp::TryAwaitOrClaimTokenResolution(
 			QByteArray& tenantId,
 			QByteArrayList& scopes,
 			bool& isPat,
+			QByteArray& patProductId,
+			QByteArray& patClientProductId,
 			JwtState& state) const
 {
 	QMutexLocker cacheLocker(&m_tokenCacheMutex);
 
 	while (true){
-		if (TryReadCachedTokenLocked(token, userId, tenantId, scopes, isPat)){
+		if (TryReadCachedTokenLocked(token, userId, tenantId, scopes, isPat, patProductId, patClientProductId)){
 			state = JwtState::JS_OK;
 			return true;
 		}
@@ -1414,6 +1485,7 @@ void CAuthenticationManagerComp::ReleaseTokenResolutionClaim(const QByteArray& t
 	m_tokensBeingResolved.remove(token);
 	if (m_tokensBeingResolved.isEmpty()){
 		m_tokenChangeGenerations.clear();
+		m_tokenRereadGenerations.clear();
 	}
 	m_tokenResolutionWaitCondition.wakeAll();
 }
@@ -1427,9 +1499,9 @@ void CAuthenticationManagerComp::StoreCachedToken(
 			const QByteArrayList& scopes,
 			bool isPat,
 			qint64 jwtExpSecs,
+			qint64 resolutionGeneration,
 			const QByteArray& patProductId,
-			const QByteArray& patClientProductId,
-			qint64 resolutionGeneration) const
+			const QByteArray& patClientProductId) const
 {
 	TokenCacheEntry entry;
 	entry.patProductId = patProductId;
@@ -1451,29 +1523,20 @@ void CAuthenticationManagerComp::StoreCachedToken(
 		}
 	}
 
-	const qint64 cacheTtlSecs = (entry.expiresAt - now) / 1000;
-
-	QByteArray sessionId;
+	imtauth::SessionTokenClaims claims;
 	if (!isPat){
-		QByteArray claimUserId;
-		QByteArray claimTenantId;
-		qint64 claimExpSecs = 0;
-		ParseJwtClaims(token, claimUserId, claimTenantId, sessionId, claimExpSecs);
+		imtauth::ParseSessionTokenClaims(token, claims);
 	}
-
 	QMutexLocker cacheLocker(&m_tokenCacheMutex);
-	if (!sessionId.isEmpty()){
-		// A resolution that started before RemoveSession() must not re-insert
-		// a token of the removed session after its cache entries were swept.
-		auto revokedIter = m_revokedSessionIds.constFind(sessionId);
-		if (revokedIter != m_revokedSessionIds.constEnd() && *revokedIter > now){
-			return;
-		}
+	if (!isPat && (resolutionGeneration != m_tokenChangeGeneration + m_jwtRefusalGeneration
+				|| m_revokedSessionIds.value(claims.sessionId) > now)){
+		return;
 	}
 
 	// The same for a validation that started before a token was revoked or changed
 	if (isPat && (resolutionGeneration < m_lastGlobalTokenChangeGeneration
-				|| resolutionGeneration < m_tokenChangeGenerations.value(tokenId))){
+				|| resolutionGeneration < m_tokenChangeGenerations.value(tokenId)
+				|| resolutionGeneration < m_tokenRereadGenerations.value(tokenId))){
 		return;
 	}
 
@@ -1508,6 +1571,7 @@ void CAuthenticationManagerComp::StoreCachedToken(
 
 void CAuthenticationManagerComp::StoreExpiredToken(const QByteArray& token) const
 {
+	InvalidateExpiredJwt(token, false);
 	const qint64 now = QDateTime::currentMSecsSinceEpoch();
 	const qint64 expiresAt = now + 10 * 1000;
 	QMutexLocker cacheLocker(&m_tokenCacheMutex);
@@ -1565,7 +1629,7 @@ bool CAuthenticationManagerComp::ResolveFreshToken(
 		QMutexLocker cacheLocker(&m_tokenCacheMutex);
 		if (m_tokensBeingResolved.contains(token)){
 			// The resolution running now may have read it before: it does not fill the cache. Not a change of the access
-			m_tokenChangeGenerations.insert(tokenId, m_tokenChangeGeneration + 1);
+			m_tokenRereadGenerations.insert(tokenId, m_tokenChangeGeneration + 1);
 		}
 		auto cached = m_tokenCache.find(token);
 		if (cached != m_tokenCache.end() && (cached->userId != freshToken.userId || cached->tokenId != tokenId || cached->scopes != freshToken.scopes
@@ -1586,6 +1650,12 @@ bool CAuthenticationManagerComp::ResolveFreshToken(
 	QString message;
 	const imtauth::SessionTokenCheck check = imtauth::CheckSessionToken(*m_slaveJwtSessionControllerCompPtr, token, isExpiryAccepted, claims, message);
 	if (check != imtauth::STC_VALID){
+		if (check == imtauth::STC_REAUTHENTICATE){
+			InvalidateExpiredJwt(token, isExpiryAccepted);
+		}
+		else if (check != imtauth::STC_UNCHECKED){
+			InvalidateTokenCache(token);
+		}
 		SetError(error, ToContextCreationStatus(check), message);
 		return false;
 	}
@@ -1593,6 +1663,7 @@ bool CAuthenticationManagerComp::ResolveFreshToken(
 	freshToken.userId = claims.userId;
 	freshToken.tenantId = claims.tenantId;
 	freshToken.sessionId = claims.sessionId;
+	freshToken.isExpired = claims.expSecs < QDateTime::currentSecsSinceEpoch();
 
 	return true;
 }
@@ -1628,14 +1699,10 @@ bool CAuthenticationManagerComp::ResolveServerToken(
 		bool isPat = false;
 		QString errorMessage;
 		ContextCreationStatus status = CCS_OK;
-		if (!ResolveToken(serverToken, m_serverTokenReceiverCompPtr->GetTokenManager(), userId, tenantId, scopes, isPat, errorMessage, status)){
+		if (!ResolveToken(serverToken, m_serverTokenReceiverCompPtr->GetTokenManager(), userId, tenantId, scopes, isPat, tokenProductId, clientProductId, errorMessage, status)){
 			SetError(error, status == CCS_OK ? CCS_FORBIDDEN : status, errorMessage.isEmpty() ? QStringLiteral("The token of the server is not valid.") : errorMessage);
 
 			return false;
-		}
-
-		if (!GetCachedPatProducts(serverToken, tokenProductId, clientProductId)){
-			clientProductId.clear();
 		}
 	}
 
@@ -1649,12 +1716,30 @@ bool CAuthenticationManagerComp::ResolveServerToken(
 }
 
 
+void CAuthenticationManagerComp::InvalidateExpiredJwt(const QByteArray& token, bool expiryAccepted) const
+{
+	// A signed token refused despite its lifetime (or where expiry is accepted) contradicts sibling JWTs.
+	imtauth::SessionTokenClaims claims;
+	if (imtauth::ParseSessionTokenClaims(token, claims) && !claims.sessionId.isEmpty()
+				&& (expiryAccepted || claims.expSecs >= QDateTime::currentSecsSinceEpoch())){
+		InvalidateSessionTokenCache(claims.sessionId, false);
+	}
+	else{
+		InvalidateTokenCache(token);
+	}
+}
+
+
 void CAuthenticationManagerComp::InvalidateTokenCache(const QByteArray& token) const
 {
 	QMutexLocker cacheLocker(&m_tokenCacheMutex);
+	if (!IsPatToken(token)){
+		++m_jwtRefusalGeneration;
+	}
 	if (IsPatToken(token) && m_tokensBeingResolved.contains(token)){
 		// An invalid remote token may not reveal its ID; reject outstanding PAT cache fills conservatively.
 		m_lastGlobalTokenChangeGeneration = ++m_tokenChangeGeneration;
+		m_lastTokenSetChangeGeneration = m_tokenChangeGeneration;
 	}
 	m_tokenCache.remove(token);
 	m_expiredTokenCache.remove(token);
@@ -1662,34 +1747,36 @@ void CAuthenticationManagerComp::InvalidateTokenCache(const QByteArray& token) c
 }
 
 
-void CAuthenticationManagerComp::InvalidateSessionTokenCache(const QByteArray& sessionId) const
+qint64 CAuthenticationManagerComp::GetJwtCacheGeneration() const
+{
+	QMutexLocker cacheLocker(&m_tokenCacheMutex);
+	return m_tokenChangeGeneration + m_jwtRefusalGeneration;
+}
+
+
+void CAuthenticationManagerComp::InvalidateSessionTokenCache(const QByteArray& sessionId, bool notifyChange) const
 {
 	if (sessionId.isEmpty()){
 		return;
 	}
 
-	const qint64 now = QDateTime::currentMSecsSinceEpoch();
-	const qint64 tokenCacheTtlMs = m_tokenCacheTtlAttrPtr.IsValid() ? (static_cast<qint64>(*m_tokenCacheTtlAttrPtr) * 1000) : (30 * 1000);
-
 	QMutexLocker cacheLocker(&m_tokenCacheMutex);
-
-	// A check of the session that is running now must not confirm it
-	++m_tokenChangeGeneration;
-
-	for (auto iter = m_revokedSessionIds.begin(); iter != m_revokedSessionIds.end(); ){
-		if (*iter <= now){
-			iter = m_revokedSessionIds.erase(iter);
+	if (notifyChange){
+		++m_tokenChangeGeneration;
+		const qint64 now = QDateTime::currentMSecsSinceEpoch();
+		for (auto iter = m_revokedSessionIds.begin(); iter != m_revokedSessionIds.end(); ){
+			iter = *iter <= now ? m_revokedSessionIds.erase(iter) : std::next(iter);
 		}
-		else{
-			++iter;
+		const int limit = m_maxTokenCacheSizeAttrPtr.IsValid() ? *m_maxTokenCacheSizeAttrPtr : 10000;
+		while (!m_revokedSessionIds.isEmpty() && m_revokedSessionIds.size() >= limit){
+			m_revokedSessionIds.erase(m_revokedSessionIds.begin());
 		}
+		const int ttlSecs = m_tokenCacheTtlAttrPtr.IsValid() ? *m_tokenCacheTtlAttrPtr : 30;
+		m_revokedSessionIds.insert(sessionId, now + qint64(ttlSecs) * 1000);
 	}
-
-	const int maxTokenCacheSize = m_maxTokenCacheSizeAttrPtr.IsValid() ? *m_maxTokenCacheSizeAttrPtr : 10000;
-	while (!m_revokedSessionIds.isEmpty() && m_revokedSessionIds.size() >= maxTokenCacheSize){
-		m_revokedSessionIds.erase(m_revokedSessionIds.begin());
+	else{
+		++m_jwtRefusalGeneration;
 	}
-	m_revokedSessionIds.insert(sessionId, now + tokenCacheTtlMs);
 
 	for (auto iter = m_tokenCache.begin(); iter != m_tokenCache.end();){
 		QByteArray userId;
@@ -1835,16 +1922,6 @@ bool CAuthenticationManagerComp::ParseJwtClaims(
 	expSecs = claims.expSecs;
 
 	return retVal;
-}
-
-
-QString CAuthenticationManagerComp::MaskToken(const QByteArray& token)
-{
-	if (token.isEmpty()){
-		return QStringLiteral("<empty>");
-	}
-
-	return QStringLiteral("***") + QString::fromUtf8(token.right(4));
 }
 
 

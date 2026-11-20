@@ -37,13 +37,14 @@ Item {
 	property alias authConnectionState: connectionState.authConnectionState
 	property alias pageAboutProvider: pageAboutProvider
 
-	// TODO: ConnectionStateMachine.qml
 	QtObject {
 		id: connectionState
+		objectName: "connectionState"
 
+		property int appConnectionState: !application.useWebSocketSubscription ? 1 : (application.webSocketPort < 0 ? 0 : subscriptionManager_.status)
+		property int authConnectionState: 1
 		property int totalStatus: -1
-
-		property var status : ({
+		property var status: ({
 			TRY_CONNECTING_TO_AUTH_SERVER: 0,
 			AUTH_SERVER_CONNECTION_ERROR: 1,
 			TRY_CONNECTING_TO_APP_SERVER: 2,
@@ -51,51 +52,24 @@ Item {
 			CONNECTION_SUCCESFUL: 4
 		})
 
-		// 0 - WebSocket.Connecting, 1 - WebSocket.Open, 2 - WebSocket.Closing, 3 - WebSocket.Closed, 4 - WebSocket.Error
-		//
-		// Until the WebSocket has been given a URL it still reports its initial
-		// Closed state - and the port it needs only arrives with the first
-		// GetApplicationInfo response. Reporting that as APP_SERVER_CONNECTION_ERROR
-		// meant every cold start emitted ServerConnectionError at t=0 and, whenever
-		// the first response took longer than statusTimer's second, showed
-		// "Server connection error" instead of "Try connecting...". Report
-		// "connecting" for the whole window in which the port is still unknown.
-		property int appConnectionState: {
-			if (!application.useWebSocketSubscription){
-				return 1;
-			}
-
-			if (application.webSocketPort < 0){
-				return 0;
-			}
-
-			return subscriptionManager_.status;
-		}
-		property int authConnectionState: 1 // -1 - Unknown, 0 - Connecting, 1 - Connected, 2 - Disconnected
-
-		onAppConnectionStateChanged: {
-			checkState()
-		}
-
-		onAuthConnectionStateChanged: {
-			checkState()
-		}
+		onAppConnectionStateChanged: connectionState.checkState()
+		onAuthConnectionStateChanged: connectionState.checkState()
 
 		function checkState(){
-			if (authConnectionState == 1 && appConnectionState == 1){
-				totalStatus = status.CONNECTION_SUCCESFUL
+			if (connectionState.appConnectionState == 1 && connectionState.authConnectionState == 1){
+				connectionState.totalStatus = connectionState.status.CONNECTION_SUCCESFUL
 			}
-			else if (appConnectionState == 0){
-				totalStatus = status.TRY_CONNECTING_TO_APP_SERVER
+			else if (connectionState.appConnectionState == 0){
+				connectionState.totalStatus = connectionState.status.TRY_CONNECTING_TO_APP_SERVER
 			}
-			else if (appConnectionState == 4 || appConnectionState == 3){
-				totalStatus = status.APP_SERVER_CONNECTION_ERROR
+			else if (connectionState.appConnectionState == 3 || connectionState.appConnectionState == 4){
+				connectionState.totalStatus = connectionState.status.APP_SERVER_CONNECTION_ERROR
 			}
-			else if (authConnectionState == 0){
-				totalStatus = status.TRY_CONNECTING_TO_AUTH_SERVER
+			else if (connectionState.authConnectionState == 0){
+				connectionState.totalStatus = connectionState.status.TRY_CONNECTING_TO_AUTH_SERVER
 			}
-			else if (authConnectionState == 2){
-				totalStatus = status.AUTH_SERVER_CONNECTION_ERROR
+			else if (connectionState.authConnectionState == 2){
+				connectionState.totalStatus = connectionState.status.AUTH_SERVER_CONNECTION_ERROR
 			}
 		}
 
@@ -129,29 +103,30 @@ Item {
 				internal.errorDescription = qsTr("The application is paused until the connection is back. The open pages stay as they are.")
 				internal.retryVisible = true
 				internal.loadingVisible = false
-				ModalDialogManager.onServerConnectionError();
-				Events.sendEvent("ServerConnectionError");
 			}
 			else if (totalStatus == status.CONNECTION_SUCCESFUL){
-				thumbnailDecorator.stackView.clear();
 				statusTimer.stop()
+				thumbnailDecorator.stackView.clear();
 				Events.sendEvent("SearchVisible", true);
 				Events.sendEvent("SetUserPanelEnabled", true);
-
 				application.firstModelsInit()
-
 				return
 			}
 
+			statusTimer.interval = totalStatus == status.APP_SERVER_CONNECTION_ERROR ? 3000 : 1000
 			statusTimer.restart()
 		}
 	}
 
 	Timer {
 		id: statusTimer
-		interval: 1000
 		repeat: false
 		onTriggered: {
+			if (connectionState.totalStatus == connectionState.status.APP_SERVER_CONNECTION_ERROR){
+				ModalDialogManager.onServerConnectionError();
+				Events.sendEvent("ServerConnectionError");
+			}
+
 			thumbnailDecorator.stackView.clear();
 
 			Events.sendEvent("SearchVisible", false);
@@ -583,6 +558,11 @@ Item {
 		}
 
 		function onTenantSelected(tenantId){
+			application.updateAllModels();
+		}
+
+		// The pages and commands the permissions open are read again
+		function onAccessChanged(){
 			application.updateAllModels();
 		}
 

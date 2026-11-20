@@ -21,6 +21,8 @@ function post(owner, query, headers, done){
     if(typeof XMLHttpRequest === 'undefined') return false
     let xhr = new XMLHttpRequest()
     xhr.$gql = true
+    // The sender of the request, as CNetworkEventInterceptor tells it: a request refused with 401 is sent again by it
+    xhr.gqlRequest = owner
     xhr.open('POST', graphqlUrl)
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
     let given = new Set()

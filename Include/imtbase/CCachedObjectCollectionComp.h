@@ -144,12 +144,15 @@ protected:
 	FilteredCollectionPtr GetFilteredCollection(
 				int offset = 0,
 				int count = -1,
-				const iprm::IParamsSet* selectionParamsPtr = nullptr) const;
+				const iprm::IParamsSet* selectionParamsPtr = nullptr,
+				bool allowUncachedSnapshot = true) const;
 
 	void ClearCache();
 	void RemoveOldestObjectFromCache() const;
 
 private:
+	void ClearFilteredCacheLocked();
+
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
 	I_REF(imod::IModel, m_objectCollectionModelCompPtr);
 	I_MULTIREF(imod::IModel, m_invalidationModels);
@@ -169,6 +172,7 @@ private:
 
 	int m_operationFlags;
 	mutable QReadWriteLock m_lock;
+	quint64 m_cacheGeneration = 0; // Protected by m_lock, including the snapshot taken on a miss.
 	std::atomic<bool> m_isSourceUnwatched = false;
 };
 

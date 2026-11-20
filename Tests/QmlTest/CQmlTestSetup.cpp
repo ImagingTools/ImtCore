@@ -3,6 +3,8 @@
 
 
 // Qt includes
+#include <QtCore/QCoreApplication>
+#include <QtCore/QSettings>
 #include <QtQml/qqml.h>
 
 // ImtCore includes
@@ -64,6 +66,12 @@ CQmlTestSetup::CQmlTestSetup()
 void CQmlTestSetup::applicationAvailable()
 {
 	InitQmlResources();
+
+	// QML Settings (stored login, tokens of a session) work as in an application, in a store of this run only
+	QCoreApplication::setOrganizationName(QStringLiteral("ImagingTools"));
+	QCoreApplication::setApplicationName(QStringLiteral("ImtCoreQmlTest"));
+	QSettings::setDefaultFormat(QSettings::IniFormat);
+	QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, m_settingsDir.path());
 
 	qmlRegisterType<imtbase::CTreeItemModel>("com.imtcore.imtqml", 1, 0, "TreeItemModel");
 	qmlRegisterType<imtqml::CQmlWebSocket>("com.imtcore.imtqml", 1, 0, "WebSocket");

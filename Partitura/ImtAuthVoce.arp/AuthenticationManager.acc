@@ -13,6 +13,9 @@
         <Element Id="AuthenticationManager" PackageId="ImtServerGqlPck" ComponentId="AuthenticationManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="AccessModels" Type="Reference[]" ExportId="AccessModels">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ServerTokenReceiver" Type="Reference" ExportId="ServerTokenReceiver">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -41,6 +44,9 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RoleCollection" Type="Reference" ExportId="RoleCollection">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SessionCollection" Type="Reference" ExportId="SessionCollection">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SessionAuthorizationProvider" Type="Reference" ExportId="SessionAuthorizationProvider">

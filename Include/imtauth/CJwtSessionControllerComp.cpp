@@ -31,7 +31,7 @@ namespace imtauth
 bool CJwtSessionControllerComp::ValidateSession(const QByteArray& sessionId, bool* isCheckedPtr) const
 {
 	if (isCheckedPtr != nullptr){
-		*isCheckedPtr = true;
+		*isCheckedPtr = false;
 	}
 
 	ISessionSharedPtr sessionInfoPtr = GetSession(sessionId);
@@ -48,6 +48,9 @@ bool CJwtSessionControllerComp::ValidateSession(const QByteArray& sessionId, boo
 
 	QDateTime currentDate = QDateTime::currentDateTimeUtc();
 	QDateTime expirationDate = sessionInfoPtr->GetExpirationDate();
+	if (isCheckedPtr != nullptr){
+		*isCheckedPtr = true;
+	}
 
 	return currentDate < expirationDate;
 }
@@ -106,25 +109,11 @@ imtauth::IJwtSessionController::JwtState CJwtSessionControllerComp::ValidateJwt(
 	// along with it, making it impossible for the client to recover; session
 	// cleanup belongs to RefreshToken()/a maintenance task, not to validation.
 	//
-	// GetSession() is called directly (instead of ValidateSession()) so the two
-	// distinct failure reasons - no session record at all vs. an existing but
-	// expired session - can be logged and diagnosed separately.
-	ISessionSharedPtr sessionInfoPtr = GetSession(sessionId);
-	if (!sessionInfoPtr.IsValid()){
-		SendWarningMessage(0, QStringLiteral("JWT rejected: no session record found for session-ID '%1' "
-								"(already removed by cleanup, or the JWT references a session that never existed)")
-								.arg(sessionId), "CJwtSessionControllerComp");
-		return imtauth::IJwtSessionController::JS_EXPIRED;
-	}
-
-	QDateTime currentDate = QDateTime::currentDateTimeUtc();
-	QDateTime sessionExpirationDate = sessionInfoPtr->GetExpirationDate();
-	if (currentDate >= sessionExpirationDate){
-		SendWarningMessage(0, QStringLiteral("JWT rejected: session '%1' expired at %2 (current time %3) - "
-								"the client was idle longer than RefreshTokenLifetime")
-								.arg(sessionId, sessionExpirationDate.toString(Qt::ISODate), currentDate.toString(Qt::ISODate)),
-								"CJwtSessionControllerComp");
-		return imtauth::IJwtSessionController::JS_EXPIRED;
+	bool isChecked = false;
+	if (!ValidateSession(sessionId, &isChecked)){
+		SendWarningMessage(0, isChecked ? QStringLiteral("JWT rejected: session absent or expired")
+					: QStringLiteral("JWT validation unavailable: session could not be checked"), "CJwtSessionControllerComp");
+		return isChecked ? JS_EXPIRED : JS_NONE;
 	}
 
 	return imtauth::IJwtSessionController::JS_OK;
@@ -147,6 +136,10 @@ bool CJwtSessionControllerComp::RefreshToken(
 
 	QByteArray sessionId = GetSessionIdByRefreshToken(refreshToken);
 	if (sessionId.isEmpty()){
+		if (ReplayRotatedToken(refreshToken, userSession)){
+			return true;
+		}
+
 		SendWarningMessage(0, "Refresh rejected: no session found for the given refresh token (unknown, already rotated, or already used once)",
 								"CJwtSessionControllerComp");
 		return false;
@@ -194,7 +187,7 @@ bool CJwtSessionControllerComp::RefreshToken(
 
 	// Sliding expiration: an actively-used session keeps getting extended
 	// instead of dying exactly RefreshTokenLifetime after the original login.
-	clonedSessionInfo->SetExpirationDate(currentDate.addSecs(*m_refreshTokenLifetimeAttrPtr));
+	clonedSessionInfo->SetExpirationDate(currentDate.addSecs(GetRefreshTokenLifetime()));
 
 	// Update the session record in place (same session-ID) instead of
 	// remove-then-insert. This means any JWT already issued for this session -
@@ -202,8 +195,7 @@ bool CJwtSessionControllerComp::RefreshToken(
 	// client is about to discard - keeps validating for the remainder of its
 	// own lifetime, instead of being invalidated the instant a refresh happens.
 	if (!m_sessionCollectionCompPtr->SetObjectData(sessionId, *clonedSessionInfo.GetPtr())){
-		SendErrorMessage(0, QStringLiteral("Unable to update session '%1' in collection")
-								.arg(refreshToken), "CJwtSessionControllerComp");
+		SendErrorMessage(0, QStringLiteral("Unable to update session in collection"), "CJwtSessionControllerComp");
 		return false;
 	}
 
@@ -214,6 +206,8 @@ bool CJwtSessionControllerComp::RefreshToken(
 		SendErrorMessage(0, QStringLiteral("Unable to refresh session for user '%1'. Error: JWT is invalid").arg(userId), "CJwtSessionControllerComp");
 		return false;
 	}
+
+	RememberRotatedToken(refreshToken, newRefreshToken, sessionId, clonedSessionInfo->GetExpirationDate().toMSecsSinceEpoch());
 
 	userSession.accessToken = jwt;
 	userSession.refreshToken = newRefreshToken;
@@ -239,7 +233,7 @@ bool CJwtSessionControllerComp::CreateNewSession(
 	QDateTime creationDate = QDateTime::currentDateTimeUtc();
 	sessionInfoPtr->SetCreationDate(creationDate);
 
-	QDateTime expirationDate = creationDate.addSecs(*m_refreshTokenLifetimeAttrPtr);
+	QDateTime expirationDate = creationDate.addSecs(GetRefreshTokenLifetime());
 	sessionInfoPtr->SetExpirationDate(expirationDate);
 
 	sessionInfoPtr->SetUserId(userId);
@@ -251,7 +245,7 @@ bool CJwtSessionControllerComp::CreateNewSession(
 
 	QByteArray sessionId = InsertNewSession(*sessionInfoPtr.GetPtr());
 	if (sessionId.isEmpty()){
-		SendErrorMessage(0, QStringLiteral("Unable to insert session '%1' to collection").arg(refreshToken), "CJwtSessionControllerComp");
+		SendErrorMessage(0, QStringLiteral("Unable to insert session into collection"), "CJwtSessionControllerComp");
 		return false;
 	}
 
@@ -414,7 +408,8 @@ QByteArray CJwtSessionControllerComp::CreateSignature(
 
 QByteArray CJwtSessionControllerComp::GenerateJwt(const QByteArray& sessionId, const QByteArray& userId, const QByteArray& tenantId, const QByteArray& productId) const
 {
-	qint64 expiresAt = QDateTime::currentSecsSinceEpoch() + *m_jwtLifetimeAttrPtr;
+	const qint64 issuedAt = QDateTime::currentSecsSinceEpoch();
+	qint64 expiresAt = issuedAt + GetJwtLifetime();
 	QJsonObject header;
 	header["alg"] = "HS256";
 	header["typ"] = "JWT";
@@ -424,6 +419,8 @@ QByteArray CJwtSessionControllerComp::GenerateJwt(const QByteArray& sessionId, c
 	payload["tenantId"] = QString(tenantId);
 	payload["sessionId"] = QString(sessionId);
 	payload["exp"] = expiresAt;
+	// A client tells the lifetime from it, whatever its own clock says
+	payload["iat"] = issuedAt;
 	if (!productId.isEmpty()){
 		payload[imtauth::s_jwtProductIdClaim] = QString::fromUtf8(productId);
 	}
@@ -437,6 +434,87 @@ QByteArray CJwtSessionControllerComp::GenerateJwt(const QByteArray& sessionId, c
 	}
 
 	return headerBase64 + "." + payloadBase64 + "." + signature;
+}
+
+
+bool CJwtSessionControllerComp::ReplayRotatedToken(const QByteArray& refreshToken, UserSession& userSession) const
+{
+	const auto found = m_rotatedTokens.constFind(GetTokenHash(refreshToken));
+	if (found == m_rotatedTokens.cend()){
+		return false;
+	}
+
+	const RotatedToken rotated = *found;
+	ISessionSharedPtr sessionInfoPtr = GetSession(rotated.sessionId);
+	if (!sessionInfoPtr.IsValid() || sessionInfoPtr->GetProductId() != userSession.productId
+				|| QDateTime::currentDateTimeUtc() >= sessionInfoPtr->GetExpirationDate()){
+		return false;
+	}
+
+	// Its successor was not used: the same tokens again, nothing is rotated
+	const QByteArray currentRefreshToken = sessionInfoPtr->GetToken();
+	if (GetTokenHash(currentRefreshToken) == rotated.successorHash){
+		const QByteArray jwt = GenerateJwt(rotated.sessionId, sessionInfoPtr->GetUserId(), sessionInfoPtr->GetTenantId(), sessionInfoPtr->GetProductId());
+		if (jwt.isEmpty()){
+			return false;
+		}
+
+		userSession.accessToken = jwt;
+		userSession.refreshToken = currentRefreshToken;
+		userSession.userId = sessionInfoPtr->GetUserId();
+		userSession.tenantId = sessionInfoPtr->GetTenantId();
+
+		return true;
+	}
+
+	const qint64 leewayMs = qint64(m_reuseLeewayAttrPtr.IsValid() ? *m_reuseLeewayAttrPtr : 30) * 1000;
+	if (QDateTime::currentMSecsSinceEpoch() - rotated.rotatedAtMs <= leewayMs){
+		// Clients of one session refreshing at once: the later one takes the stored token, nothing is closed
+		return false;
+	}
+
+	// Replaced, and its successor replaced too: somebody holds a copy of it. The session is closed for everybody holding it
+	if (!RemoveSession(rotated.sessionId)){
+		SendErrorMessage(0, QStringLiteral("Refresh token reuse: session removal failed; retaining rotation history"), "CJwtSessionControllerComp");
+		return false;
+	}
+	SendWarningMessage(0, QStringLiteral("Refresh token reuse: session removed"), "CJwtSessionControllerComp");
+	for (auto iter = m_rotatedTokens.begin(); iter != m_rotatedTokens.end(); ){
+		iter = (iter->sessionId == rotated.sessionId) ? m_rotatedTokens.erase(iter) : std::next(iter);
+	}
+	m_rotatedSessionEnds.remove(rotated.sessionId);
+
+	return false;
+}
+
+
+void CJwtSessionControllerComp::RememberRotatedToken(const QByteArray& refreshToken, const QByteArray& successorToken, const QByteArray& sessionId, qint64 sessionEndMs) const
+{
+	const qint64 nowMs = QDateTime::currentMSecsSinceEpoch();
+	m_rotatedSessionEnds.insert(sessionId, sessionEndMs);
+
+	if (nowMs >= m_nextPruneMs){
+		// Often enough for short sessions, at most once a minute for long ones
+		m_nextPruneMs = nowMs + qMin(qint64(60 * 1000), qint64(GetRefreshTokenLifetime()) * 500);
+		for (auto iter = m_rotatedSessionEnds.begin(); iter != m_rotatedSessionEnds.end(); ){
+			iter = (*iter <= nowMs) ? m_rotatedSessionEnds.erase(iter) : std::next(iter);
+		}
+		for (auto iter = m_rotatedTokens.begin(); iter != m_rotatedTokens.end(); ){
+			iter = !m_rotatedSessionEnds.contains(iter->sessionId) ? m_rotatedTokens.erase(iter) : std::next(iter);
+		}
+	}
+
+	RotatedToken rotated;
+	rotated.sessionId = sessionId;
+	rotated.successorHash = GetTokenHash(successorToken);
+	rotated.rotatedAtMs = nowMs;
+	m_rotatedTokens.insert(GetTokenHash(refreshToken), rotated);
+}
+
+
+QByteArray CJwtSessionControllerComp::GetTokenHash(const QByteArray& refreshToken)
+{
+	return QCryptographicHash::hash(refreshToken, QCryptographicHash::Sha256);
 }
 
 
@@ -461,6 +539,32 @@ QByteArray CJwtSessionControllerComp::GetSessionIdByRefreshToken(const QByteArra
 	}
 
 	return QByteArray();
+}
+
+
+int CJwtSessionControllerComp::GetJwtLifetime() const
+{
+	return GetLifetime(m_jwtLifetimeParamCompPtr.GetPtr(), m_jwtLifetimeAttrPtr.IsValid() ? *m_jwtLifetimeAttrPtr : 3600);
+}
+
+
+int CJwtSessionControllerComp::GetRefreshTokenLifetime() const
+{
+	return GetLifetime(m_refreshTokenLifetimeParamCompPtr.GetPtr(), m_refreshTokenLifetimeAttrPtr.IsValid() ? *m_refreshTokenLifetimeAttrPtr : 86400);
+}
+
+
+int CJwtSessionControllerComp::GetLifetime(const iprm::ITextParam* paramPtr, int attributeValue)
+{
+	if (paramPtr != nullptr){
+		bool isNumber = false;
+		const int value = paramPtr->GetText().trimmed().toInt(&isNumber);
+		if (isNumber && value >= 1){
+			return value;
+		}
+	}
+
+	return attributeValue;
 }
 
 

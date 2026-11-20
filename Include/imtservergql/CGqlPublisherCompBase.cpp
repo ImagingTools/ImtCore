@@ -237,7 +237,7 @@ bool CGqlPublisherCompBase::PushDataToSubscriber(
 		SendErrorMessage(0, message, "CGqlPublisherCompBase");
 	}
 
-	return true;
+	return retVal;
 }
 
 

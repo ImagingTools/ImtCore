@@ -45,6 +45,8 @@
 #include <imtbase/CCachedObjectCollectionComp.h>
 #include <imtbase/CCollectionInfo.h>
 #include <imtbase/CObjectCollection.h>
+#include <imod/TModelWrap.h>
+#include <istd/CChangeNotifier.h>
 #include <imtbase/IIdentifiable.h>
 #include <imtbase/IComplexCollectionFilter.h>
 #include <imtbase/imtbase.h>
@@ -416,6 +418,17 @@ public:
 	QByteArray GetUserFromJwt(const QByteArray&) const override { return QByteArray(); }
 	QByteArray GetTenantFromJwt(const QByteArray&) const override { return QByteArray(); }
 	QByteArray GetSessionFromJwt(const QByteArray&) const override { return QByteArray(); }
+};
+
+
+// Memberships, users or organizations stored on this server: their changes notify the observers
+class CAccessSourceComp: public icomp::CComponentBase, public imod::TModelWrap<imtbase::CObjectCollection>
+{
+public:
+	typedef icomp::CComponentBase BaseClass;
+	I_BEGIN_COMPONENT(CAccessSourceComp)
+		I_REGISTER_INTERFACE(imod::IModel);
+	I_END_COMPONENT
 };
 
 
@@ -1020,6 +1033,7 @@ struct CRenewalFixture
 	icomp::TSimSharedComponentPtr<CLoopbackGqlClientComp> network;
 	icomp::TSimSharedComponentPtr<imtauthgql::CRemoteJwtSessionControllerComp> remoteSessions;
 	icomp::TSimSharedComponentPtr<CMembershipManagerComp> memberships;
+	icomp::TSimSharedComponentPtr<CAccessSourceComp> accessSource;
 	icomp::TSimSharedComponentPtr<CTenantManagerComp> tenants;
 	icomp::TSimSharedComponentPtr<CTokenManagerStub> personalTokens;
 	icomp::TSimSharedComponentPtr<CTokenManagerStub> serverTokens;
@@ -1243,6 +1257,8 @@ struct CRenewalFixture
 			authentication->SetRef("FeatureContainer", productInfo);
 		}
 		authentication->SetFactory("GqlContextFactory", &factory);
+		accessSource->InitComponent();
+		authentication->InsertMultiRef("AccessModels", accessSource);
 		authentication->InitComponent();
 	}
 
@@ -1952,6 +1968,29 @@ void CAuthorizationRenewalTest::StaleReadDoesNotFillCache()
 	fixture.authentication->AccessChanged();
 	QCOMPARE(fixture.Create(headers), Creator::CCS_OK);
 	QCOMPARE(fixture.memberships->reads, readsAfterStale + 2);
+}
+
+
+// A membership changed on this server: the organization data kept for the token is dropped at once, not after its lifetime
+void CAuthorizationRenewalTest::ChangeOfAnAccessModelDropsOrganizationData()
+{
+	CRenewalFixture fixture;
+	const auto headers = CRenewalFixture::Headers(CRenewalFixture::Jwt(s_tenantId));
+
+	QCOMPARE(fixture.Create(headers), Creator::CCS_OK);
+	const int reads = fixture.memberships->reads;
+	QCOMPARE(fixture.Create(headers), Creator::CCS_OK);
+	QCOMPARE(fixture.memberships->reads, reads);
+
+	fixture.memberships->permissions = {"/Organization/Read", "/Organization/Manage"};
+	{
+		istd::CChangeNotifier notifier(&*fixture.accessSource);
+	}
+
+	QByteArray fingerprint;
+	QCOMPARE(fixture.Create(headers, &fingerprint), Creator::CCS_OK);
+	QCOMPARE(fixture.memberships->reads, reads + 1);
+	QVERIFY2(Part(fingerprint, FP_ORGANIZATION_PERMISSIONS).contains("/Organization/Manage"), fingerprint.constData());
 }
 
 
@@ -2900,16 +2939,11 @@ void CAuthorizationRenewalTest::SessionAuthorizationIsKeptForRequests()
 	QCOMPARE(fixture.ownerInput->requests, asked);
 	QCOMPARE(second, first);
 
-	// A subscription is checked there every time, and its answer is not kept for the requests
+	// A fresh refusal invalidates the previously computed user, without waiting for a notification.
 	fixture.User().SetEnabled(false);
 	QCOMPARE(fixture.Renew(headers), Creator::AS_DENIED);
 	QVERIFY(fixture.ownerInput->requests > asked);
 	asked = fixture.ownerInput->requests;
-	QCOMPARE(fixture.Create(headers), Creator::CCS_OK);
-	QCOMPARE(fixture.ownerInput->requests, asked);
-
-	// A change this server is told about ends the answer; a refusal is not kept
-	fixture.authentication->AccessChanged();
 	QCOMPARE(fixture.Create(headers), Creator::CCS_FORBIDDEN);
 	QVERIFY(fixture.ownerInput->requests > asked);
 	fixture.User().SetEnabled(true);
@@ -2929,6 +2963,49 @@ void CAuthorizationRenewalTest::SessionAuthorizationIsKeptForRequests()
 	QTest::qWait(2100);
 	asked = fixture.ownerInput->requests;
 	QVERIFY(fixture.Create(shortHeaders) != Creator::CCS_OK);
+	QVERIFY(fixture.ownerInput->requests > asked);
+}
+
+
+void CAuthorizationRenewalTest::SessionDenialFencesPendingAnswer()
+{
+	CRenewalFixture fixture(CRenewalFixture::O_COMPUTED_BY_SOURCE | CRenewalFixture::O_SESSION_CACHE);
+	const auto first = CRenewalFixture::Headers(CRenewalFixture::Jwt({}, s_productId, 1800));
+	const auto second = CRenewalFixture::Headers(CRenewalFixture::Jwt({}, s_productId, 3600));
+	QCOMPARE(fixture.Create(first), Creator::CCS_OK);
+
+	// The second answer is already computed, but has not reached the product server.
+	bool checked = false;
+	fixture.ownerInput->changePayload = [&](QJsonObject&){
+		if (!checked){
+			checked = true;
+			fixture.sessions->isSessionAlive = false;
+			QCOMPARE(fixture.Renew(first), Creator::AS_DENIED);
+		}
+	};
+	fixture.Create(second);
+	QVERIFY(checked);
+	fixture.ownerInput->changePayload = {};
+	QCOMPARE(fixture.Create(second), Creator::CCS_UNAUTHORIZED);
+	QCOMPARE(fixture.Create(first), Creator::CCS_UNAUTHORIZED);
+}
+
+
+void CAuthorizationRenewalTest::SessionEndBoundsComputedAnswer()
+{
+	CRenewalFixture fixture(CRenewalFixture::O_COMPUTED_BY_SOURCE | CRenewalFixture::O_SESSION_CACHE);
+	const auto headers = CRenewalFixture::Headers(CRenewalFixture::Jwt({}, s_productId));
+	QDateTime end;
+	fixture.ownerInput->changePayload = [&](QJsonObject& data){
+		if (!end.isValid()){
+			end = QDateTime::currentDateTimeUtc().addMSecs(500);
+		}
+		data.insert("sessionExpiresAt", end.toString(Qt::ISODateWithMs));
+	};
+	QCOMPARE(fixture.Create(headers), Creator::CCS_OK);
+	const int asked = fixture.ownerInput->requests;
+	QTRY_VERIFY(QDateTime::currentDateTimeUtc() >= end);
+	QCOMPARE(fixture.Create(headers), Creator::CCS_UNAUTHORIZED);
 	QVERIFY(fixture.ownerInput->requests > asked);
 }
 

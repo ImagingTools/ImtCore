@@ -50,8 +50,15 @@ GqlRequest {
 	// Unique ID of the last sent request (X-Request-ID header), e.g. a DocumentChanged notification names the request that made the change
 	property string requestId: ""
 
-	signal finished(int status); // If status -1 - error, 1 - success response
-	
+	// Emitted once per request: -1 - error, 1 - success response. A request refused as Unauthorized
+	// ends when the authorization decides: sent again with a new token, or onAuthorizationLost()
+	signal finished(int status);
+
+	// The request refused as Unauthorized is not sent again (the session ended): it fails
+	function onAuthorizationLost(){
+		root.finished(-1);
+	}
+
 	function addInputParam(id, value){
 		inputParams.InsertField(id, value);
 	}
@@ -206,11 +213,12 @@ GqlRequest {
 			console.warn("GraphQL request failed:", root.gqlCommandId);
 			root.onError(qsTr("Network error"), "");
 		}
-		else if (state === "Unauthorized" || state === "Forbidden"){
-			// Auth recovery is owned by XmlHttpRequestProxy / AuthorizationController
-			// (refresh + retry). Do not open a modal for every 401/403, but complete
-			// the request so callers waiting on finished() are not stuck forever.
+		else if (state === "Forbidden"){
+			// Not refreshed: the authorization signs out. No modal, the request ends failed
 			root.finished(-1);
+		}
+		else if (state === "Unauthorized"){
+			// Not ended here: AuthorizationController sends it again after the refresh or calls onAuthorizationLost()
 		}
 		else if (state === "Ready"){
 			let responseObj = null
