@@ -28,5 +28,8 @@ private slots:
 	void testSerialization();
 	void testLinksInContainer();
 	void testOptionalInterface();
+	void testStorageIdKept();
+	void testSerializeObjectId();
+	void testRegistryComponent();
 	void cleanupTestCase();
 };
