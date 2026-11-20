@@ -2,8 +2,8 @@
 
 Ветка `feature/jqml-v5-audit` от `feature/jqml-v5-qt-compat-2` (PR #1159). Эталон поведения — Qt 6 (исходники
 qtdeclarative 6.8, поведение проверено на Qt 6.12). Каждый принятый шаг — отдельный коммит с цифрами «до/после»;
-исправления отделены от оптимизаций. `dist/core.js` пересобирается вклейкой изменённых модулей Runtime/
-(JQMLNext на этой машине нет; по согласованию с владельцем), каждое изменение проверено на обоих runtime:
+исправления отделены от оптимизаций. v5 развивается в ImtCore (JQMLNext больше не источник); `dist/core.js` собирается
+из Runtime/ (`npm run build`, сначала — вклейкой изменённых модулей), каждое изменение проверено на обоих runtime:
 исходники Runtime/ (`tests/sourcesBundle.js`) и `dist/core.js`.
 
 ## 1. Сводка
@@ -106,7 +106,7 @@ qtdeclarative 6.8, поведение проверено на Qt 6.12). Кажд
 | Браузерный бенчмарк: первый кадр, длительность кадра прокрутки, число DOM-узлов, forced reflow (Playwright есть, обвязка `walk.js` в сессии) | нужен стабильный стенд: в Node DOM-стоимость не видна |
 | Ленивый DOM-узел Item (создавать при первой отрисовке) | память и время создания в браузере; в Node не измерить |
 | IotPlatform в бенчмарке | исходников нет на машине; добавить в tests/bench/apps.js |
-| Пересобрать `dist/core.js` в JQMLNext из Runtime/ этой ветки | вклейка модулей проверена тестами на обоих runtime, но эталонная сборка — webpack в JQMLNext |
+| Шаг веб-компиляции в CMake не зависит от `dist/core.js` и `compiler/` | после изменения рантайма бандл продукта не пересобирается сам; нужна правка `WebCompiler.cmake` (DEPENDS) |
 
 Источники: qtdeclarative 6.8 (`qquicklistview.cpp`, `qquickitemview.cpp`, `qquickwindow.cpp` PolishLoopDetector,
 `qqmlbinding.cpp`, `qquickpixmapcache.cpp`); uglify-js 3.19.3 `lib/scope.js`; https://github.com/stackblitz/alien-signals ;

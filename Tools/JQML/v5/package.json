@@ -1,10 +1,11 @@
 {
   "name": "jqml",
   "version": "5.0.0",
-  "description": "QML compiler and runtime for the web (snapshot of JQMLNext)",
+  "description": "QML compiler and runtime for the web",
   "main": "compiler/index.js",
   "license": "ISC",
   "scripts": {
+    "build": "node compiler/buildcore.js",
     "test": "node --test tests/unit",
     "stress": "node --expose-gc --test --test-concurrency=1 tests/stress",
     "bench": "node --expose-gc tests/bench/run.js"
