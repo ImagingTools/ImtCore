@@ -4,10 +4,10 @@
 
 const QML = ['QtObject', 'Component', 'Timer', 'Connections', 'Binding']
 const MODELS = ['ListModel', 'ListElement', 'Instantiator', 'ItemSelectionModel', 'DelegateChooser', 'DelegateChoice']
-const LABS_MODELS = ['TableModel', 'TableModelColumn', 'DelegateChooser', 'DelegateChoice']
+const LABS_MODELS = ['TableModel', 'TableModelColumn', 'TreeModel', 'DelegateChooser', 'DelegateChoice']
 const QUICK = [
     'Item', 'FocusScope', 'Rectangle', 'Gradient', 'GradientStop', 'Text', 'TextInput', 'TextEdit', 'Image', 'Canvas',
-    'MouseArea', 'DropArea', 'Flickable', 'Column', 'Row', 'Flow', 'Repeater', 'Loader', 'ListView', 'GridView', 'TableView', 'Shortcut',
+    'MouseArea', 'DropArea', 'Flickable', 'Column', 'Row', 'Flow', 'Repeater', 'Loader', 'ListView', 'GridView', 'TableView', 'TreeView', 'Shortcut',
     'IntValidator', 'DoubleValidator', 'RegularExpressionValidator', 'FontLoader',
     'State', 'PropertyChanges', 'StateChangeScript', 'Transition', 'StateGroup',
     'PauseAnimation', 'PropertyAnimation', 'NumberAnimation', 'ColorAnimation', 'RotationAnimation', 'SmoothedAnimation',
@@ -36,7 +36,7 @@ const MODULES = {
 // (QQmlImports): the ones Qt added to QtQuick, QtQml.Models and Qt.labs.qmlmodels for tables, whose names a project of
 // its own may use for a type (imtcontrols has a SortFilterProxyModel). The older types stay visible without an import,
 // as v5 always had them.
-const IMPORTED_TYPES = new Set(['ItemSelectionModel', 'TableView', ...LABS_MODELS])
+const IMPORTED_TYPES = new Set(['ItemSelectionModel', 'TableView', 'TreeView', ...LABS_MODELS])
 
 // { types: Set, uncreatable: Set } of a Qt module, or null
 function qtModule(name){

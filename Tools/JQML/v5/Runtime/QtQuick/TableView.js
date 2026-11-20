@@ -1557,7 +1557,20 @@ class TableView extends Flickable {
         if(!fx) return
         this.$setRequired(fx.item, 'selected', select)
     }
-    $selectionSourceModel(){ return this.$tableModel.model }
+    // QQuickTableViewPrivate::selectionSourceModel: the item model of the model assigned (a ListModel's own)
+    $selectionSourceModel(){
+        if(!this.$needsModelSynchronization && this.$tableModel.model) return this.$tableModel.model
+        return adaptModel(this.$assignedModel).model
+    }
+    // TableView.model as it reads: the value assigned
+    $modelValue(){
+        return this.$needsModelSynchronization ? this.$assignedModel : this.$tableModel.modelValue === undefined ? this.$assignedModel : this.$tableModel.modelValue
+    }
+    // qaim(modelImpl()): the model assigned is an item model (a ListModel is a QAbstractListModel), not an array
+    $assignedIsItemModel(){
+        let value = this.$modelValue()
+        return value instanceof AbstractItemModel || !!(value && value.$rows && value.$addView)
+    }
     $updateSelectedOnAllDelegateItems(){
         this.$updateCurrentRowAndColumn()
         for(let [cellIndex, fx] of this.$loadedItems){
@@ -2696,8 +2709,8 @@ class TableView extends Flickable {
             if(warn) console.warn('TableView: cannot edit: index is not valid!')
             return false
         }
-        let model = this.$tableModel.model
-        if(!model || this.$tableModel.adaptor.owned && !(this.$tableModel.modelValue instanceof AbstractItemModel) && !(model.$list)){
+        let model = this.$selectionSourceModel()
+        if(!model || !this.$assignedIsItemModel()){
             if(warn) console.warn('TableView: cannot edit: TableView.model does not inherit QAbstractItemModel!')
             return false
         }
@@ -2729,7 +2742,7 @@ class TableView extends Flickable {
         let delegate = attached.$v[TableViewAttached.EDITDELEGATE]
         let entry = cellItem.$tableEntry
         let flat = entry ? entry.flat : this.$modelIndexToCellIndex(index)
-        let ctx = new CellContext(this.$tableModel, flat, index.row, index.column)
+        let ctx = new CellContext(this.$tableModel, flat, entry ? entry.ctx.$cellRow : index.row, entry ? entry.ctx.$cellColumn : index.column)
         this.$creatingEditItem = true
         let editItem
         try {
@@ -2972,6 +2985,7 @@ class TableView extends Flickable {
                 let index = this.$modelIndexOfCell(this.cellAtPosition({ x: x + this.$contentX(), y: y + this.$contentY() }))
                 if(this.$canEdit(index, false)) this.edit(index)
             }
+            if(this.$doubleTapped) this.$doubleTapped(x, y, t.modifiers)
             return
         }
         if(!onGridLine) this.$handleTap(x, y, t.modifiers)
@@ -3016,7 +3030,7 @@ class TableView extends Flickable {
         this.$assignedModel = model
         this.$needsModelSynchronization = true
         this.$scheduleRebuildTable(RO.All)
-        if(this.$selectionModel) this.$selectionModel.$setModel(adaptModel(model).model)
+        if(this.$selectionModel) this.$selectionModel.$setModel(this.$selectionSourceModel())
     }
 
     $setSelectionModelValue(selectionModel){
@@ -3026,7 +3040,7 @@ class TableView extends Flickable {
         this.$selectionModel = selectionModel || null
         let sm = this.$selectionModel
         if(sm){
-            sm.$setModel(this.$needsModelSynchronization || !this.$tableModel.model ? adaptModel(this.$assignedModel).model : this.$tableModel.model)
+            sm.$setModel(this.$selectionSourceModel())
             let link = (signal, fn) => {
                 engine.connect(sm, signal, fn)
                 this.$selectionLinks.push([sm, signal, fn])
@@ -3086,7 +3100,7 @@ defineType(TableView, {
     props: {
         model: { kind: 'var', initial: 0, effect: (view, value) => view.$setModelValue(value), get(){
             engine.track(this, TableView.SIGNAL_modelChanged)
-            return this.$needsModelSynchronization ? this.$assignedModel : this.$tableModel.modelValue === undefined ? this.$assignedModel : this.$tableModel.modelValue
+            return this.$modelValue()
         } },
         delegate: { kind: 'component', effect: rebuildOn(RO.All) },
         rowSpacing: { kind: 'real', effect: (view, value) => {

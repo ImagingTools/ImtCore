@@ -38,6 +38,8 @@ const { Loader } = require('./QtQuick/Loader')
 const { ListView } = require('./QtQuick/ListView')
 const { GridView } = require('./QtQuick/GridView')
 const { TableView } = require('./QtQuick/TableView')
+const { TreeView } = require('./QtQuick/TreeView')
+const { TreeModel } = require('./QtQml/Models/TreeModel')
 const { DelegateChooser, DelegateChoice } = require('./QtQml/Models/DelegateChooser')
 const { Shortcut, StandardKey } = require('./QtQuick/Shortcut')
 const { IntValidator } = require('./QtQuick/IntValidator')
@@ -355,9 +357,9 @@ const JQ = {
     Qt,
     // QML types by name
     types: {
-        QtObject, Component, Timer, Connections, Binding, ListModel, Instantiator, ItemSelectionModel, TableModel, TableModelColumn,
+        QtObject, Component, Timer, Connections, Binding, ListModel, Instantiator, ItemSelectionModel, TableModel, TableModelColumn, TreeModel,
         Item, Anchors, FocusScope, Keys, KeyNavigation, Rectangle, Border, Gradient, GradientStop, Text, Font, TextInput, TextEdit, Image, Canvas,
-        MouseArea, MouseDrag, DropArea, Drag, Flickable, Column, Row, Flow, Repeater, Loader, ListView, GridView, TableView, Shortcut, StandardKey,
+        MouseArea, MouseDrag, DropArea, Drag, Flickable, Column, Row, Flow, Repeater, Loader, ListView, GridView, TableView, TreeView, Shortcut, StandardKey,
         DelegateChooser, DelegateChoice,
         IntValidator, DoubleValidator, RegularExpressionValidator, RegExpValidator, FontLoader,
         State, PropertyChanges, StateChangeScript, Transition, StateGroup,
