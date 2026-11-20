@@ -30,6 +30,16 @@ private slots:
 
 	// More connections than threads: the connections wait in the queue and are served one after another
 	void QueuedConnectionsAreServedTest();
+
+	// The port of the connection interface is changed while the server works
+	void PortChangeMovesServerTest();
+	void LoadedPortMovesServerTest();
+	void BusyPortKeepsServerTest();
+	void StoppedServerStaysStoppedTest();
+	void StartedServerMovesTest();
+
+	// The threads of the connections are stopped before the component loses its references and attributes
+	void ConnectionsStopWhenComponentIsDestroyedTest();
 };
 
 

@@ -17,7 +17,10 @@
 
 // ACF includes
 #include <icomp/CComponentBase.h>
+#include <icomp/TModelCompWrap.h>
 #include <icomp/TSimComponentWrap.h>
+#include <iser/CMemoryReadArchive.h>
+#include <iser/CMemoryWriteArchive.h>
 
 // ImtCore includes
 #include <imtcom/CServerConnectionInterfaceParamComp.h>
@@ -194,7 +197,8 @@ private:
 typedef icomp::TSimSharedComponentPtr<CHoldingServletComp> Servlet;
 typedef icomp::TSimSharedComponentPtr<CSlowBodyPolicyComp> SlowBodyPolicy;
 typedef icomp::TSimSharedComponentPtr<imtrest::CHttpProtocolEngineComp> Engine;
-typedef icomp::TSimSharedComponentPtr<imtcom::CServerConnectionInterfaceParamComp> Connection;
+// A model, as the package of the component makes it: the server follows the changes of its port
+typedef icomp::TSimSharedComponentPtr<icomp::TModelCompWrap<imtcom::CServerConnectionInterfaceParamComp>> Connection;
 typedef icomp::TSimComponentWrap<imtrest::CTcpServerComp> TcpServer;
 
 
@@ -215,7 +219,7 @@ int FindFreePort()
 */
 struct SServer
 {
-	explicit SServer(int threadsLimit, bool isSlowBody = false)
+	explicit SServer(int threadsLimit, bool isSlowBody = false, bool startOnCreate = true)
 	{
 		port = FindFreePort();
 
@@ -232,6 +236,7 @@ struct SServer
 		connection->InitComponent();
 
 		server.SetIntAttr("ThreadsLimit", threadsLimit);
+		server.SetBoolAttr("StartServerOnCreate", startOnCreate);
 		server.SetRef("RequestHandler", servlet);
 		server.SetRef("ProtocolEngine", engine);
 		server.SetRef("ServerInterface", connection);
@@ -243,6 +248,21 @@ struct SServer
 		const imtrest::IServer* serverPtr = &server;
 
 		return (port != 0) && (serverPtr->GetServerStatus() == imtrest::IServer::SS_LISTENING);
+	}
+
+	/**
+		The threads of the connections that still run.
+	*/
+	int GetRunningThreadCount() const
+	{
+		int retVal = 0;
+		for (const QThread* threadPtr : server.findChildren<QThread*>()){
+			if (threadPtr->isRunning()){
+				++retVal;
+			}
+		}
+
+		return retVal;
 	}
 
 	/**
@@ -676,6 +696,152 @@ void CTcpServerConnectionTest::QueuedConnectionsAreServedTest()
 
 	const QStringList messages = warnings.GetMessages();
 	QVERIFY2(messages.isEmpty(), qPrintable(messages.join(QStringLiteral("; "))));
+}
+
+
+// A new HTTP port of the connection interface moves the running server: the old port is closed, a request on the new one is handled
+// once (the server object is the same, its connection to the handler is not doubled)
+void CTcpServerConnectionTest::PortChangeMovesServerTest()
+{
+	SServer server(2);
+	QVERIFY(server.IsListening());
+	const int firstPort = server.port;
+
+	const int secondPort = FindFreePort();
+	QVERIFY(secondPort != 0 && secondPort != firstPort);
+	server.connection->SetPort(imtcom::IServerConnectionInterface::PT_HTTP, secondPort);
+
+	const imtrest::IServer* serverPtr = &server.server;
+	QCOMPARE(serverPtr->GetServerStatus(), imtrest::IServer::SS_LISTENING);
+
+	CClient oldClient;
+	QVERIFY(!oldClient.Connect(firstPort));
+
+	CClient client;
+	QVERIFY(client.Connect(secondPort));
+	client.SendGet("/moved");
+	QTRY_COMPARE_WITH_TIMEOUT(server.servlet->GetHeld().size(), 1, 5000);
+	QTest::qWait(300);
+	QCOMPARE(server.servlet->GetHeld().size(), 1);
+
+	QCOMPARE(server.RespondToHeld(), 1);
+	QTRY_COMPARE_WITH_TIMEOUT(client.GetResponseCount(), 1, 5000);
+	client.Disconnect();
+}
+
+
+// The settings are loaded again (a file of the settings changed): the loaded port moves the server as a set one does
+void CTcpServerConnectionTest::LoadedPortMovesServerTest()
+{
+	SServer server(2);
+	QVERIFY(server.IsListening());
+
+	const int newPort = FindFreePort();
+	QVERIFY(newPort != 0 && newPort != server.port);
+	imtcom::CServerConnectionInterfaceParam loaded;
+	loaded.RegisterProtocol(imtcom::IServerConnectionInterface::PT_HTTP);
+	loaded.SetPort(imtcom::IServerConnectionInterface::PT_HTTP, newPort);
+
+	iser::CMemoryWriteArchive writeArchive;
+	QVERIFY(loaded.Serialize(writeArchive));
+	iser::CMemoryReadArchive readArchive(writeArchive);
+	QVERIFY(server.connection->Serialize(readArchive));
+
+	CClient client;
+	QVERIFY(client.Connect(newPort));
+	client.SendGet("/loaded");
+	QTRY_COMPARE_WITH_TIMEOUT(server.servlet->GetHeld().size(), 1, 5000);
+	QCOMPARE(server.RespondToHeld(), 1);
+	QTRY_COMPARE_WITH_TIMEOUT(client.GetResponseCount(), 1, 5000);
+	client.Disconnect();
+}
+
+
+// A port that another program listens on cannot be taken: the server stays on its port and goes on working
+void CTcpServerConnectionTest::BusyPortKeepsServerTest()
+{
+	SServer server(2);
+	QVERIFY(server.IsListening());
+
+	QTcpServer otherProgram;
+	QVERIFY(otherProgram.listen(QHostAddress::Any, 0));
+
+	QTest::ignoreMessage(QtDebugMsg, QRegularExpression(QStringLiteral("Tcp server could not be started on port")));
+	server.connection->SetPort(imtcom::IServerConnectionInterface::PT_HTTP, otherProgram.serverPort());
+
+	CClient client;
+	QVERIFY(client.Connect(server.port));
+	client.SendGet("/stays");
+	QTRY_COMPARE_WITH_TIMEOUT(server.servlet->GetHeld().size(), 1, 5000);
+
+	QCOMPARE(server.RespondToHeld(), 1);
+	QTRY_COMPARE_WITH_TIMEOUT(client.GetResponseCount(), 1, 5000);
+	client.Disconnect();
+}
+
+
+// The server stopped by StopServer stays stopped when the port changes
+void CTcpServerConnectionTest::StoppedServerStaysStoppedTest()
+{
+	SServer server(2);
+	imtrest::IServer* serverPtr = &server.server;
+	QVERIFY(serverPtr->StopServer());
+
+	const int newPort = FindFreePort();
+	QVERIFY(newPort != 0 && newPort != server.port);
+	server.connection->SetPort(imtcom::IServerConnectionInterface::PT_HTTP, newPort);
+	QCoreApplication::processEvents();
+
+	QCOMPARE(serverPtr->GetServerStatus(), imtrest::IServer::SS_NOT_STARTED);
+	CClient client;
+	QVERIFY(!client.Connect(newPort));
+}
+
+
+// The server that is not started on creation but by StartServer takes a new port as well
+void CTcpServerConnectionTest::StartedServerMovesTest()
+{
+	SServer server(2, false, false);
+	imtrest::IServer* serverPtr = &server.server;
+	QCOMPARE(serverPtr->GetServerStatus(), imtrest::IServer::SS_NOT_STARTED);
+	QVERIFY(serverPtr->StartServer());
+	QVERIFY(server.IsListening());
+
+	const int newPort = FindFreePort();
+	QVERIFY(newPort != 0 && newPort != server.port);
+	server.connection->SetPort(imtcom::IServerConnectionInterface::PT_HTTP, newPort);
+
+	CClient oldClient;
+	QVERIFY(!oldClient.Connect(server.port));
+
+	CClient client;
+	QVERIFY(client.Connect(newPort));
+	client.SendGet("/started");
+	QTRY_COMPARE_WITH_TIMEOUT(server.servlet->GetHeld().size(), 1, 5000);
+	QCOMPARE(server.RespondToHeld(), 1);
+	QTRY_COMPARE_WITH_TIMEOUT(client.GetResponseCount(), 1, 5000);
+	client.Disconnect();
+}
+
+
+// The threads of the connections use the references and the attributes of the server: they are stopped when the component is
+// destroyed, while it still has them. Later, in the destructor of the server, the wrapper of the component has removed them already
+void CTcpServerConnectionTest::ConnectionsStopWhenComponentIsDestroyedTest()
+{
+	SServer server(5);
+	QVERIFY(server.IsListening());
+
+	CClient client;
+	QVERIFY(client.Connect(server.port));
+	client.SendGet("/held");
+	QTRY_COMPARE_WITH_TIMEOUT(server.servlet->GetHeld().size(), 1, 5000);
+	QVERIFY(server.GetRunningThreadCount() > 0);
+
+	// As the destructor of the wrapper does it: the component is destroyed and loses its context
+	server.server.SetComponentContext(icomp::IComponentContextSharedPtr(), nullptr, false);
+
+	QCOMPARE(server.GetRunningThreadCount(), 0);
+	QVERIFY(!server.IsListening());
 }
 
 

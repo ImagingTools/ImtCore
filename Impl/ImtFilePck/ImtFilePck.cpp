@@ -30,6 +30,21 @@ I_EXPORT_COMPONENT(
 			"File system structure provider",
 			"File System Structure Provider Folder");
 
+I_EXPORT_COMPONENT(
+			SystemConfigLocation,
+			"Configuration folder of the application for the whole computer (ProgramData, /Library/Application Support, /etc)",
+			"System Configuration Folder Location Settings");
+
+I_EXPORT_COMPONENT(
+			PrivateFilePersistence,
+			"File persistence of secrets: the file and its folder are accessible to their owner only",
+			"Private Secret File Persistence Owner Permissions");
+
+I_EXPORT_COMPONENT(
+			PrivateAutoPersistence,
+			"Automatic persistence of an object in a private file, without the temporary folder of the system",
+			"Private Secret Automatic File Persistence Reload");
+
 
 } // namespace ImtFilePck
 
