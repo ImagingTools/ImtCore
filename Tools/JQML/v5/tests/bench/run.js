@@ -47,7 +47,10 @@ if(options.suites.size > 1){
 function commitOf(){
     try { return require('child_process').execSync('git rev-parse --short HEAD', { cwd: __dirname }).toString().trim() } catch(e) { return '' }
 }
-const filter = options.filter ? new RegExp(options.filter) : null
+function escapeRegExp(value){
+    return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+const filter = options.filter ? new RegExp(escapeRegExp(options.filter)) : null
 
 function record(name, unit, samples, extra){
     if(filter && !filter.test(name)) return
