@@ -1683,7 +1683,32 @@ class StackView extends T.StackView {
 }
 defineType(StackView, {})
 
+// ---- SplitView: the handle a 6 px bar, darker when hovered and pressed ----
+class SplitView extends T.SplitView {
+    constructor(parent = null){
+        super(parent)
+        implicitSize(this)
+    }
+    $makeStyle(){
+        let c = this
+        if(this.$v[T.SplitView.HANDLE]) return
+        this.$plain(T.SplitView.HANDLE, new (require('../../QtQml/Component').Component)(null, (parent) => {
+            let h = make(Rectangle, parent, {
+                implicitWidth: () => (c.orientation === 1 ? 6 : c.width),
+                implicitHeight: () => (c.orientation === 1 ? c.height : 6),
+                'border.color': () => c.palette.dark,
+                'border.width': 0,
+            })
+            h.$bind(Rectangle.COLOR, () => (h.SplitHandle.pressed ? c.palette.mid : h.SplitHandle.hovered ? c.palette.midlight : c.palette.button), null, h)
+            return h
+        }))
+        this.$layout()
+    }
+}
+defineType(SplitView, {})
+
 module.exports = {
+    SplitView,
     StackView,
     ScrollView,
     Action: T.Action, ActionGroup: T.ActionGroup, ButtonGroup: T.ButtonGroup,

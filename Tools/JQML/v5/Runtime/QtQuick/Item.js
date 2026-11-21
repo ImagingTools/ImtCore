@@ -315,6 +315,8 @@ defineType(Item, {
         ButtonGroup: { group: null },       // set by Controls/Actions.js
         ActionGroup: { group: null },       // set by Controls/Actions.js
         StackView: { group: null },         // set by Controls/StackView.js
+        SplitView: { group: null },         // set by Controls/SplitView.js
+        SplitHandle: { group: null },       // set by Controls/SplitView.js
         // QQuickItem::palette (Qt 6): made when it is read or set (Palette.js)
         palette: { group: require('./Palette').Palette },
     },
