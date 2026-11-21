@@ -140,7 +140,7 @@ class SelectionRectangle extends Item {
         let target = this.$target
         if(mode === ENUMS.Auto){
             let parentItem = target && target.parent
-            if(parentItem && parentItem.constructor && parentItem.constructor.name === 'ScrollView'){
+            if(parentItem instanceof require('./ScrollView').ScrollView){
                 this.$effectiveSelectionMode = ENUMS.Drag
                 this.$dragEnabled = enabled
             } else if(target instanceof Flickable){

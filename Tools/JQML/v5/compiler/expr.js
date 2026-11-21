@@ -40,7 +40,49 @@ function escapeStringBreaks(source){
     return out
 }
 
+// `value as Type` (QML type assertion, a RelationalExpression like instanceof): written `value instanceof __qmlas__(Type)`
+// for the parser of JavaScript, then a call JQ.as(value, Type) (transformFree). `as` is the operator only after the end
+// of an operand (a name, a number, a string, ) or ]) and before a type name
+function rewriteAs(source){
+    if(source.indexOf(' as ') < 0) return source
+    let out = '', quote = null
+    for(let i = 0; i < source.length; i++){
+        let ch = source[i]
+        if(quote){
+            out += ch
+            if(ch === '\\'){ out += source[++i]; continue }
+            if(ch === quote) quote = null
+            continue
+        }
+        if(ch === '"' || ch === "'" || ch === '`'){ quote = ch; out += ch; continue }
+        if(ch === '/' && (source[i + 1] === '/' || source[i + 1] === '*')){
+            let end = source[i + 1] === '/' ? source.indexOf('\n', i) : source.indexOf('*/', i + 2) + 2
+            if(end <= 0) end = source.length
+            out += source.slice(i, end)
+            i = end - 1
+            continue
+        }
+        if(ch === 'a' && source[i + 1] === 's' && /\s/.test(source[i - 1] || '') && /\s/.test(source[i + 2] || '')){
+            let before = out.replace(/\s+$/, '')
+            let last = before[before.length - 1] || ''
+            let m = /^\s+([A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*)/.exec(source.slice(i + 2))
+            if(m && /[\w$)\]"'`]/.test(last) && !/\b(?:import|export|return|typeof|case|new|in|of)$/.test(before)){
+                out += 'instanceof __qmlas__(' + m[1] + ')'
+                i += 1 + m[0].length
+                continue
+            }
+        }
+        out += ch
+    }
+    return out
+}
+
+function parses(source){
+    try { U.parse(source); return true } catch(error) { return false }
+}
+
 function parseQml(source){
+    source = rewriteAs(source)
     try {
         return U.parse(source)
     } catch(error) {
@@ -64,6 +106,12 @@ function parse(source, where){
 // (QV4 callingQmlContext), as JS sources { qt, scope, ids }
 function transformFree(ast, resolve, free){
     return ast.transform(new U.TreeTransformer(null, function(node){
+        // value instanceof __qmlas__(Type): JQ.as(value, Type) (rewriteAs)
+        if(node instanceof U.AST_Binary && node.operator === 'instanceof' && node.right instanceof U.AST_Call
+            && node.right.expression instanceof U.AST_SymbolRef && node.right.expression.name === '__qmlas__'){
+            return new U.AST_Call({ expression: replacementNode('JQ.as'), args: [node.left, node.right.args[0]] })
+        }
+        if(node instanceof U.AST_SymbolRef && node.name === '__qmlas__') return undefined
         if(node instanceof U.AST_SymbolRef && node.thedef && node.thedef.undeclared){
             let source = resolve(node.name)
             if(source === null || source === undefined) return undefined
@@ -103,6 +151,7 @@ const PRINT = { beautify: false, comments: false, ascii_only: false }
 // The raw text of a property value runs up to the next member and can carry `;` and comments
 // (`radius: radiusL; // sizes`). When it is not an expression as is, the parser extracts it.
 function expressionText(raw){
+    raw = rewriteAs(raw)
     try {
         U.parse('(' + raw + '\n)')
         return raw
@@ -120,12 +169,39 @@ function expressionText(raw){
 
 // Value of a binding or an assignment: `expr`, `{ statements }` (block with return) or `function(...){...}`
 function rewriteValue(raw, isBlock, params, resolve, where){
+    // `map: { "a": x, "b": y }`: no block of statements, an object literal (the QML parser of Qt takes the expression)
+    if(isBlock && !parses('(function()' + rewriteAs(raw) + '\n)') && parses('(' + rewriteAs(raw) + '\n)')) isBlock = false
     let source = isBlock
         ? '(function(' + params + ')' + raw + '\n)'
         : '(function(' + params + '){return(' + expressionText(raw) + '\n)})'
     let free = new Set()
-    let ast = transformFree(parse(source, where), resolve, free)
+    let parsed = parse(source, where)
+    // a block is a binding by its completion value: `{ n * 10 }`, `{ let k = 1; k + n }` (the last statement)
+    if(isBlock) completionReturn(parsed)
+    let ast = transformFree(parsed, resolve, free)
     return { code: ast.print_to_string(PRINT).replace(/;$/, ''), free }
+}
+
+// the last statement of the function of a block binding, an expression, returns its value; an if / else does it in its
+// branches (the completion value of the block, as QV4 evaluates a binding)
+function completionReturn(ast){
+    let fn = ast.body[0] && ast.body[0].body
+    if(!(fn instanceof U.AST_Lambda)) return
+    const last = (body) => {
+        let i = body.length - 1
+        while(i >= 0 && body[i] instanceof U.AST_EmptyStatement) i--
+        if(i < 0) return
+        let st = body[i]
+        if(st instanceof U.AST_SimpleStatement) body[i] = new U.AST_Return({ value: st.body })
+        else if(st instanceof U.AST_If){
+            for(let branch of ['body', 'alternative']){
+                let b = st[branch]
+                if(b instanceof U.AST_BlockStatement) last(b.body)
+                else if(b instanceof U.AST_SimpleStatement) st[branch] = new U.AST_Return({ value: b.body })
+            }
+        } else if(st instanceof U.AST_BlockStatement) last(st.body)
+    }
+    last(fn.body)
 }
 
 // Signal handler body: statement, block or a function expression called with the signal arguments

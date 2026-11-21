@@ -71,7 +71,7 @@ class StyleHints extends QtObject {
         this.$v[StyleHints.COLORSCHEME] = colorScheme()
         if(hasWindow() && typeof window.matchMedia === 'function'){
             let query = window.matchMedia('(prefers-color-scheme: dark)')
-            let update = () => engine.batch(() => this.$write(StyleHints.COLORSCHEME, colorScheme()))
+            let update = () => engine.batch(() => { if(!this.$requestedScheme) this.$write(StyleHints.COLORSCHEME, colorScheme()) })
             if(query.addEventListener) query.addEventListener('change', update)
         }
     }
@@ -107,7 +107,11 @@ defineType(StyleHints, {
         toolTipWakeUpDelay: { kind: 'int', initial: 700 },
         toolTipWakeUpDelayAsMSec: { kind: 'int', initial: 700 },
         contextMenuTrigger: { kind: 'int', initial: QtEnums.ContextMenuTrigger.Press },
-        colorScheme: { kind: 'int', readonly: true },
+        // QStyleHints::setColorScheme (Qt 6.8): Light or Dark asks for that scheme, Unknown follows the system again
+        colorScheme: { kind: 'int', set(value){
+            this.$requestedScheme = value === 1 || value === 2 ? value : 0
+            engine.batch(() => this.$write(StyleHints.COLORSCHEME, this.$requestedScheme || colorScheme()))
+        } },
     },
 })
 

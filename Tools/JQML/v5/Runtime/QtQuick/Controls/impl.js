@@ -158,7 +158,27 @@ defineType(ColorImage, {
 })
 
 // IconImage (QQuickIconImage): an image of an icon, by its source (a theme icon by name the page has none of)
-class IconImage extends ColorImage {}
+// a name of the icon theme of the application (JQ.iconTheme: QIcon::fromTheme) when there is no source: the file of the
+// scale of the screen, else the nearest one
+class IconImage extends ColorImage {
+    $write(id, value){
+        super.$write(id, value)
+        if(id === IconImage.NAME || id === Image.SOURCE) this.$themeSource()
+    }
+    $themeSource(){
+        let name = this.$v[IconImage.NAME]
+        let JQ = typeof globalThis !== 'undefined' ? globalThis.JQ : null
+        let theme = JQ && JQ.iconTheme
+        if(!name || !theme || (this.$v[Image.SOURCE] && !this.$fromTheme)) return
+        let files = theme.icons[name]
+        if(!files) return
+        let ratio = typeof window !== 'undefined' && window.devicePixelRatio ? window.devicePixelRatio : 1
+        let scales = Object.keys(files).map(Number).sort((a, b) => a - b)
+        let scale = scales.find(s => s >= ratio) || scales[scales.length - 1]
+        this.$fromTheme = true
+        super.$write(Image.SOURCE, files[scale])
+    }
+}
 defineType(IconImage, { props: { name: 'string' } })
 
 // ---- IconLabel (QQuickIconLabel) ----

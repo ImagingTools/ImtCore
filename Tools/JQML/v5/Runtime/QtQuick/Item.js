@@ -49,6 +49,11 @@ function injectStyle(){
 }
 
 const geometry = (bits) => (item) => engine.markDirty(item, bits)
+// the size that follows the implicit size (no explicit size)
+function implicitWrite(item, id, value){
+    item.$implicitWrite = true
+    try { item.$write(id, value) } finally { item.$implicitWrite = false }
+}
 
 function sizeChanged(item){
     engine.markDirty(item, GEOMETRY)
@@ -140,6 +145,19 @@ class Item extends QtObject {
 
     // visible holds the effective visibility: own flag and the parent's
     $write(id, value){
+        // undefined resets the size (QQuickItem::resetWidth / resetHeight): it follows the implicit size again
+        if(id === Item.WIDTH || id === Item.HEIGHT){
+            let bit = id === Item.WIDTH ? EXPLICIT_WIDTH : EXPLICIT_HEIGHT
+            if(value === undefined){
+                this.$explicit &= ~bit
+                this.$sizeReset = (this.$sizeReset || 0) | bit
+                value = this.$v[id === Item.WIDTH ? Item.IMPLICITWIDTH : Item.IMPLICITHEIGHT]
+            } else if(this.$sizeReset & bit && !this.$implicitWrite){
+                // a size again after a reset: explicit again (QQuickItem::setWidth: widthValid)
+                this.$explicit |= bit
+                this.$sizeReset &= ~bit
+            }
+        }
         if(id === Item.STATE && Item.$states){
             Item.$states.write(this, value)
             return
@@ -283,8 +301,8 @@ defineType(Item, {
         },
         width: { kind: 'real', effect: sizeChanged },
         height: { kind: 'real', effect: sizeChanged },
-        implicitWidth: { kind: 'real', effect(item, value){ if(!(item.$explicit & EXPLICIT_WIDTH)) item.$write(Item.WIDTH, value) } },
-        implicitHeight: { kind: 'real', effect(item, value){ if(!(item.$explicit & EXPLICIT_HEIGHT)) item.$write(Item.HEIGHT, value) } },
+        implicitWidth: { kind: 'real', effect(item, value){ if(!(item.$explicit & EXPLICIT_WIDTH)) implicitWrite(item, Item.WIDTH, value) } },
+        implicitHeight: { kind: 'real', effect(item, value){ if(!(item.$explicit & EXPLICIT_HEIGHT)) implicitWrite(item, Item.HEIGHT, value) } },
         opacity: { kind: 'real', initial: 1, effect: geometry(OPACITY) },
         scale: { kind: 'real', initial: 1, effect: geometry(GEOMETRY) },
         rotation: { kind: 'real', effect: geometry(GEOMETRY) },
@@ -343,6 +361,8 @@ defineType(Item, {
         Tumbler: { group: null },           // set by Controls/Tumbler.js
         SwipeDelegate: { group: null },     // set by Controls/SwipeDelegate.js
         ContextMenu: { group: null },       // set by Controls/ContextMenu.js
+        Accessible: { group: null },        // set by Accessible.js
+        SwipeView: { group: null },         // set by Controls/Containers.js
         // QQuickItem::palette (Qt 6): made when it is read or set (Palette.js)
         palette: { group: require('./Palette').Palette },
     },
@@ -512,6 +532,12 @@ class Anchors extends GroupObject {
     $write(id, value){
         let prop = Anchors.$type.props[id]
         let bit = EXPLICIT_BITS[prop.name]
+        // undefined resets a margin (QQuickAnchors::resetLeftMargin): it follows margins again
+        if(bit && value === undefined){
+            this.$explicitMargins &= ~bit
+            return super.$write(id, this.$v[Anchors.MARGINS])
+        }
+        if(prop.name === 'margins' && value === undefined) value = 0
         if(bit) this.$explicitMargins |= bit
         // QQuickAnchors::setLeft, setFill: the signal first, then the geometry
         let axes = LINE_AXES[prop.name]

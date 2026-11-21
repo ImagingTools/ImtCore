@@ -242,6 +242,9 @@ class Container extends Control {
     }
     $childAdded(child){
         if(child.$delegateOf === this || child === this.$v[Control.CONTENTITEM] || child === this.$v[Control.BACKGROUND]) return
+        // a Repeater is transparent for the positioner (QQuickContainerPrivate::contentData_append): not an item of the
+        // container; the delegates it makes in the container are
+        if(child instanceof require('../Repeater').Repeater) return
         this.addItem(child)
     }
     $setDelegate(id, item, z){
@@ -265,21 +268,23 @@ class Container extends Control {
         return this.$v[Container.CONTENTMODEL].$items.length
     }
     itemAt(index){ return this.$v[Container.CONTENTMODEL].$items[index] || null }
-    // QQuickContainerPrivate::insertItem: the item in the model; the first one becomes current
+    // QQuickContainerPrivate::insertItem: the item in the model
     $insert(index, item){
         let model = this.$v[Container.CONTENTMODEL]
         if(!item || model.$items.includes(item)) return
         item.$delegateOf = undefined
+        item.$container = this
         model.insert(index, item)
         this.$itemAdded(item)
-        let current = this.$v[Container.CURRENTINDEX]
-        if(current < 0) this.setCurrentIndex(0)
-        else if(index <= current) this.setCurrentIndex(current + 1)
+        // QQuickContainerPrivate::insertItem: the first item becomes current; the current index does not follow a move
+        if(model.$items.length === 1 && this.$v[Container.CURRENTINDEX] === -1) this.setCurrentIndex(index)
         this.$countChanged()
     }
     $itemAdded(item){}
     $itemRemoved(item){}
     $countChanged(){
+        // currentItem: the item at the current index (QQuickContainer::currentItem)
+        this.$plain(Container.CURRENTITEM, this.itemAt(this.$v[Container.CURRENTINDEX]))
         engine.emit(this, Container.SIGNAL_countChanged)
         engine.emit(this, Container.SIGNAL_contentChildrenChanged)
     }
@@ -447,5 +452,40 @@ SwipeView.$setters = withSetters(Container, [[SwipeView.ORIENTATION, (s, v) => {
 
 // the QML names of the types (the objectName of a Pane's content item)
 for(let [Class, name] of [[Pane, 'Pane'], [Frame, 'Frame'], [GroupBox, 'GroupBox'], [ToolBar, 'ToolBar'], [Page, 'Page']]) Class.prototype.$controlName = name
+
+// ---- the attached SwipeView.view / index / isCurrentItem / isNextItem / isPreviousItem of a page ----
+class SwipeViewAttached extends require('../../Core/QtObject').GroupObject {
+    $view(){
+        engine.track(this.$owner, Item.SIGNAL_parentChanged)
+        let owner = this.$owner
+        if(owner && owner.$container instanceof SwipeView && owner.$container.$v[Container.CONTENTMODEL].$items.includes(owner)){
+            engine.track(owner.$container, Container.SIGNAL_currentIndexChanged)
+            engine.track(owner.$container, Container.SIGNAL_countChanged)
+            return owner.$container
+        }
+        for(let it = this.$owner && this.$owner.$parent; it; it = it.$parent){
+            if(it instanceof SwipeView){
+                engine.track(it, Container.SIGNAL_currentIndexChanged)
+                engine.track(it, Container.SIGNAL_countChanged)
+                return it
+            }
+        }
+        return null
+    }
+    get view(){ return this.$view() }
+    get index(){ let v = this.$view(); return v ? v.$v[Container.CONTENTMODEL].$items.indexOf(this.$owner) : -1 }
+    get isCurrentItem(){ let v = this.$view(); return !!v && this.index === v.$v[Container.CURRENTINDEX] && this.index >= 0 }
+    get isNextItem(){ let v = this.$view(); return !!v && this.index >= 0 && this.index === v.$v[Container.CURRENTINDEX] + 1 }
+    get isPreviousItem(){ let v = this.$view(); return !!v && this.index >= 0 && this.index === v.$v[Container.CURRENTINDEX] - 1 }
+}
+defineType(SwipeViewAttached, {})
+{
+    let prop = Item.$type.propByName.get('SwipeView')
+    prop.group = SwipeViewAttached
+    Object.defineProperty(Item.prototype, 'SwipeView', {
+        get(){ return this.$v[prop.id] || (this.$v[prop.id] = new SwipeViewAttached(this)) },
+        configurable: true,
+    })
+}
 
 module.exports = { ContentItem, Pane, Frame, GroupBox, ToolBar, Page, ToolSeparator, MenuSeparator, Container, TabBar, SwipeView }

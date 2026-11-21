@@ -502,6 +502,8 @@ for(let name of ['Overlay', 'anchors']){
         configurable: true,
     })
 }
+// Popup.transformOrigin (Item.TransformOrigin)
+Object.assign(Popup, { TopLeft: 0, Top: 1, TopRight: 2, Left: 3, Center: 4, Right: 5, BottomLeft: 6, Bottom: 7, BottomRight: 8 })
 Object.assign(Popup, { NoAutoClose, CloseOnPressOutside, CloseOnPressOutsideParent, CloseOnReleaseOutside, CloseOnReleaseOutsideParent,
     CloseOnEscape, Item: 0, Window: 1, Native: 2 })
 // x and y read where the popup is (QQuickPopup::x: effectiveX)

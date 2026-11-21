@@ -4,7 +4,33 @@ const path = require('path')
 const parser = require('./parser')
 const { FileModel } = require('./model')
 const { Codegen } = require('./codegen')
-const { loadConfig } = require('./config')
+const { loadConfig, loadIconTheme } = require('./config')
+
+// the icons of a theme: index.theme lists its directories (Size, Scale); a file <dir>/<name>.png|svg of one of them
+// (the url of a file is its resource path, as under ":/" in Qt: from the folder above the search path, "icons/...")
+function themeIcons(theme){
+    let icons = {}
+    for(let base of theme.paths){
+        let root = path.join(base, theme.name)
+        let index = path.join(root, 'index.theme')
+        if(!fs.existsSync(index)) continue
+        let text = fs.readFileSync(index, 'utf8')
+        let dirs = ((/^Directories=(.*)$/m.exec(text) || [])[1] || '').split(',').map(d => d.trim()).filter(Boolean)
+        for(let dir of dirs){
+            let section = new RegExp('^\\[' + dir.replace(/[.*+?^${}()|[\]\\@]/g, '\\$&') + '\\]([^\\[]*)', 'm').exec(text)
+            let scale = section && /^Scale=(\d+)/m.exec(section[1]) ? Number(/^Scale=(\d+)/m.exec(section[1])[1]) : 1
+            let full = path.join(root, dir)
+            if(!fs.existsSync(full)) continue
+            for(let file of fs.readdirSync(full)){
+                let m = /^(.*)\.(png|svg)$/.exec(file)
+                if(!m) continue
+                let url = path.relative(path.dirname(base), path.join(full, file)).split(path.sep).join('/')
+                ;(icons[m[1]] || (icons[m[1]] = {}))[scale] = url
+            }
+        }
+    }
+    return icons
+}
 
 function readFileModel(fileName){
     let source = fs.readFileSync(fileName, 'utf8')
@@ -281,6 +307,12 @@ function compile(options){
     for(let warning of codegen.warnings) console.log(warning)
 
     let runtime = fs.readFileSync(path.resolve(__dirname, '../dist/core.js'), 'utf8')
+    // the icons of the icon theme: name -> { scale: url relative to the page } (QIconLoader: the directories of index.theme)
+    let iconTheme = null
+    if(options.config && fs.existsSync(options.config)){
+        let theme = loadIconTheme(options.config)
+        if(theme) iconTheme = { name: theme.name, icons: themeIcons(theme) }
+    }
     let bootstrap = `
 window.addEventListener('load', () => {
     // resource root (-r): the page path up to and including it, as the current runtime sets rootPath
@@ -295,6 +327,9 @@ window.addEventListener('load', () => {
     fit()
     window.addEventListener('resize', fit)
     content.$mount(document.body)
+    ${iconTheme ? 'JQ.iconTheme = ' + JSON.stringify(iconTheme) : ''}
+    // a top-level Window made later (createObject(null)) is shown in it too
+    JQ.types.Window.$pageContent = content
     const root = JQ.create(() => new (${entryFile.typeRef.ref}$())(content))
     window.__root = root
 })`

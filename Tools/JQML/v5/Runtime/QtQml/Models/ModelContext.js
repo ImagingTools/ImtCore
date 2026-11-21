@@ -103,6 +103,8 @@ function modelRows(model){
     // an ObjectModel (QQmlObjectModel): its items, which the views show themselves
     if(model && model.$isObjectModel) return { count: model.$items.length, row: () => null, data: (i) => model.$items[i], object: (i) => model.$items[i] }
     if(model instanceof ListModel) return { count: model.$rows.length, row: (i) => model.$rows[i], data: (i) => model.$rows[i] }
+    // SortFilterProxyModel: the rows of its source it shows
+    if(model && model.$isProxyModel) return model.$rowsView()
     if(typeof model === 'number') return { count: Math.max(0, Math.floor(model)), row: () => null, data: (i) => i }
     if(Array.isArray(model)) return { count: model.length, row: (i) => (model[i] && typeof model[i] === 'object' ? model[i] : null), data: (i) => model[i] }
     if(model && typeof model.length === 'number') return { count: model.length, row: (i) => model[i], data: (i) => model[i] }

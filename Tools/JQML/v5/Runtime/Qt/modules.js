@@ -3,7 +3,7 @@
 // QML type that has no instances (abstract, attached, an enum holder).
 
 const QML = ['QtObject', 'Component', 'Timer', 'Connections', 'Binding']
-const MODELS = ['ListModel', 'ListElement', 'Instantiator', 'ItemSelectionModel', 'DelegateChooser', 'DelegateChoice', 'DelegateModel', 'ObjectModel']
+const MODELS = ['ListModel', 'ListElement', 'Instantiator', 'ItemSelectionModel', 'DelegateChooser', 'DelegateChoice', 'DelegateModel', 'ObjectModel', 'SortFilterProxyModel', 'ValueFilter', 'FunctionFilter', 'RoleSorter', 'StringSorter', 'FunctionSorter']
 const LABS_MODELS = ['TableModel', 'TableModelColumn', 'TreeModel', 'DelegateChooser', 'DelegateChoice']
 const QUICK = [
     'Item', 'FocusScope', 'Rectangle', 'Gradient', 'GradientStop', 'Text', 'TextInput', 'TextEdit', 'Image', 'Canvas',
@@ -12,9 +12,9 @@ const QUICK = [
     'State', 'PropertyChanges', 'StateChangeScript', 'Transition', 'StateGroup',
     'PauseAnimation', 'PropertyAnimation', 'NumberAnimation', 'ColorAnimation', 'RotationAnimation', 'SmoothedAnimation',
     'XAnimator', 'YAnimator', 'ScaleAnimator', 'RotationAnimator', 'OpacityAnimator', 'PropertyAction', 'ScriptAction',
-    'SequentialAnimation', 'ParallelAnimation', 'Behavior', 'Window', 'Translate', 'Scale', 'Rotation', 'Matrix4x4',
+    'SequentialAnimation', 'ParallelAnimation', 'Behavior', 'Window', 'Translate', 'Scale', 'Rotation', 'Matrix4x4', 'Accessible',
 ]
-const QUICK_UNCREATABLE = ['Keys', 'KeyNavigation', 'Animation', 'Easing', 'StandardKey']
+const QUICK_UNCREATABLE = ['Keys', 'KeyNavigation', 'Animation', 'Easing', 'StandardKey', 'Accessible']
 // QtQuick.Controls.Basic (the style QtQuick.Controls imports) and QtQuick.Templates (the controls without a style): the
 // types the runtime has, the names of the Qt 6.12 qmldir / plugins.qmltypes. A Templates class is JQ.types['T.<Name>']
 const TABLE_CONTROLS = ['HorizontalHeaderView', 'VerticalHeaderView', 'TableViewDelegate', 'TreeViewDelegate', 'SelectionRectangle']

@@ -39,7 +39,7 @@ const FN_MARKS = /\u0001(\d+)\u0001/g
 const LOCAL_NAME = /\bT\d*_\w*\$(?!\(\))/
 
 // list properties whose element values are assigned as an array (data / children / resources only parent them)
-const LIST_VALUE = new Set(['states', 'transitions', 'targets', 'animations', 'changes', 'transform'])
+const LIST_VALUE = new Set(['states', 'transitions', 'targets', 'animations', 'changes', 'transform', 'filters', 'sorters'])
 
 class TypeRef {
     constructor(name, kind, Class, file, ref){
@@ -616,6 +616,10 @@ class Codegen {
         if(isFileType && defaultAlias && defaultAlias.path.length === 2 && (defaultAlias.path[1] === 'data' || defaultAlias.path[1] === 'children')){
             let slot = el.scope.ids.get(defaultAlias.path[0])
             if(slot !== undefined) this.out.push(className + '.$defaultParent=(o)=>o.$s_' + className + '[' + slot + '];')
+        } else if(isFileType && defaultAlias && defaultAlias.path.length === 2){
+            // `default property alias content: pane.contentItem`: a child is assigned to that property
+            let slot = el.scope.ids.get(defaultAlias.path[0])
+            if(slot !== undefined) this.out.push(className + '.$defaultAssign=(o,c)=>{o.$s_' + className + '[' + slot + '].' + defaultAlias.path[1] + '=c};')
         }
         if(aliasTargets.length){
             this.out.push(className + '.$aliases=Object.assign({},' + base + '.$aliases,{' + aliasTargets.join(',') + '});')
@@ -648,7 +652,10 @@ class Codegen {
             let prologue = 'const $self=this,$s=this.$s_' + className + ';'
             let code = rewriteMethod(m.raw, prologue, this.resolver(el, '$self', file), file.fileName + ':' + m.line, waitNames)
             // A QML method stays bound to its object when passed around (signal.connect(handler))
-            this.out.push('JQ.defineMethod(' + className + ',' + JSON.stringify(m.name) + ',' + code + ');')
+            // the names of its parameters (FunctionFilter: the roles it takes), kept through a minification
+            let header = /function\s*[\w$]*\s*\(([^)]*)\)/.exec(m.raw)
+            let params = header ? header[1].split(',').map(p => p.trim().split(/[\s=]/)[0]).filter(Boolean) : []
+            this.out.push('JQ.defineMethod(' + className + ',' + JSON.stringify(m.name) + ',' + code + (params.length ? ',' + JSON.stringify(params) : '') + ');')
         }
     }
 
@@ -1089,6 +1096,18 @@ class Codegen {
             post.push(v + '.' + defaultProperty + '=' + this.elementExpr(file, child, true, post) + ';')
             return
         }
+        if(this.hasDefaultAssign(el.typeRef)){
+            for(let child of children){
+                if(child.onProp){
+                    let cv = this.emitElement(file, child, v, post)
+                    this.current.push(cv + '.$setTarget(' + v + ',' + JSON.stringify(child.onProp) + ');')
+                    continue
+                }
+                let cv = this.emitElement(file, child, 'null', post)
+                this.current.push('JQ.defaultAssign(' + classRef + ',' + v + ',' + cv + ');')
+            }
+            return
+        }
         let parent = v
         if(this.hasDefaultParent(el.typeRef)){
             parent = v + '$d'
@@ -1102,6 +1121,17 @@ class Codegen {
             }
             this.emitElement(file, child, parent, post)
         }
+    }
+
+    // A QML type in the chain declares `default property alias x: id.prop` of an object property (not data / children)
+    hasDefaultAssign(typeRef){
+        for(let type = typeRef; type; type = type.kind === 'qml' ? type.file.root.typeRef : null){
+            if(type.kind === 'builtin') return false
+            let alias = type.file.root.defaultAlias
+            if(alias && alias.path.length === 2) return alias.path[1] !== 'data' && alias.path[1] !== 'children'
+            if(type.file.root.propdefs.some(p => p.defaultProp)) return false
+        }
+        return false
     }
 
     // A QML type in the chain declares `default property alias x: id.data`

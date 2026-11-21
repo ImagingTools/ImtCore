@@ -71,6 +71,9 @@ class SearchField extends Control {
         if(role){
             if(row && typeof row === 'object' && role in row) value = row[role]
             else if(data && typeof data === 'object' && role in data) value = data[role]
+        } else if(row && typeof row === 'object' && !Array.isArray(row) && Object.keys(row).length === 1){
+            // modelData of a model of one role: the value of that role (QQmlDMAbstractItemModelData)
+            value = row[Object.keys(row)[0]]
         } else value = this.$model instanceof ListModel ? undefined : data
         return value === undefined || value === null ? '' : String(value)
     }

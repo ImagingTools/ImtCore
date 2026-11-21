@@ -46,6 +46,21 @@ defineType(ListViewAttached, {
     signals: ['pooled', 'reused', 'add', 'remove'],
 })
 Object.assign(ListViewAttached.prototype, ENUMS)
+// ListView.view of a delegate while its bindings are first evaluated: the view it is made in (QQuickItemView::initItem
+// sets it before the delegate is complete)
+{
+    let get = Object.getOwnPropertyDescriptor(ListViewAttached.prototype, 'view').get
+    Object.defineProperty(ListViewAttached.prototype, 'view', {
+        get(){
+            let view = get.call(this)
+            if(view) return view
+            let parent = this.$owner && this.$owner.$parent
+            let candidate = parent && parent.$parent
+            return candidate instanceof ListView && candidate.$content === parent ? candidate : null
+        },
+        configurable: true,
+    })
+}
 
 // ListView.section (QQuickViewSection)
 class ViewSection extends GroupObject {}

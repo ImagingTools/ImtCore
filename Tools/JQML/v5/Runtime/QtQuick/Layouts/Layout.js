@@ -174,9 +174,12 @@ class Layout extends Item {
     $minimum(horizontal){ return 0 }
 
     // position first, then size, like QQuickLayout::rearrange applying item geometry
-    $place(item, x, y, width, height){
+    // (not $place: that is Item.$place(id, value), a layout in a layout is placed by it)
+    $placeItem(item, x, y, width, height){
         item.$place(Item.X, x)
         item.$place(Item.Y, y)
+        // QQuickItem::setWidth / setHeight of the layout: the size is valid (a Text wraps at it)
+        item.$explicit |= 3
         item.$write(Item.WIDTH, width)
         item.$write(Item.HEIGHT, height)
     }

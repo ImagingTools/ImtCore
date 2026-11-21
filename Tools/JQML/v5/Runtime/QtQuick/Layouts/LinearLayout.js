@@ -45,7 +45,7 @@ class LinearLayout extends Layout {
             geometry.push(horizontal ? [item, mainPos, crossPos, mainContent, crossContent] : [item, crossPos, mainPos, crossContent, mainContent])
             pos += cells[i] + spacing
         }
-        for(let i = geometry.length - 1; i >= 0; i--) this.$place(...geometry[i])
+        for(let i = geometry.length - 1; i >= 0; i--) this.$placeItem(...geometry[i])
     }
 }
 

@@ -140,8 +140,12 @@ function bindAlias(owner, name, fn, scope){
 
 // QML methods are bound to their object, also when read as a value: obj.ping.connect(handler).
 // The bound function is made on first access and kept on the object.
-function defineMethod(Class, name, fn){
+function defineMethod(Class, name, fn, params){
     let key = '$m_' + name
+    if(params){
+        if(!Object.prototype.hasOwnProperty.call(Class, '$methodParams')) Class.$methodParams = Object.assign({}, Class.$methodParams)
+        Class.$methodParams[name] = params
+    }
     Object.defineProperty(Class.prototype, name, {
         get(){
             return Object.prototype.hasOwnProperty.call(this, key) ? this[key] : (this[key] = fn.bind(this))
@@ -156,6 +160,10 @@ function defineMethod(Class, name, fn){
 // Parent for the children of obj: the target of a default property alias of Class, or obj itself
 function defaultParent(Class, obj){
     return Class.$defaultParent ? Class.$defaultParent(obj) : obj
+}
+// a child of a type whose default property is an alias of an object property (pane.contentItem): assigned to it
+function defaultAssign(Class, obj, child){
+    Class.$defaultAssign(obj, child)
 }
 
 // Root context properties: "context" is CClientUserContextComp on the desktop, the web context in a browser
@@ -196,6 +204,13 @@ function lookup(s, name){
     }
     if(name in rootContext) return rootContext[name]
     return MISSING
+}
+
+// `value as Type` of QML (a type assertion, Qt 6): the value when it is an instance of the type, else null
+function as(value, Type){
+    if(value === null || value === undefined) return null
+    if(typeof Type !== 'function') return value
+    return value instanceof Type ? value : null
 }
 
 // The nearest model context up the context chain: a component declared in a delegate and created by a Loader
@@ -354,7 +369,7 @@ function qsTrIn(context){
 }
 
 const JQ = {
-    qsTrIn, forward, bindAlias, handleGroup, callCreateQmlObject, files, scripts, script, si, sis, moduleScripts, make: engine.make, inContext: engine.inContext, callCreateComponent, sctx, sctxValue, sset, singleton, defineMethod, defaultParent, ctx, ctxValue, mctx, ns, qmlModule, subAssign, rootContext,
+    qsTrIn, forward, bindAlias, handleGroup, callCreateQmlObject, files, scripts, script, si, sis, moduleScripts, make: engine.make, inContext: engine.inContext, callCreateComponent, sctx, sctxValue, sset, singleton, defineMethod, defaultParent, defaultAssign, ctx, ctxValue, mctx, as, ns, qmlModule, subAssign, rootContext,
     engine, defineType, create,
     batch: engine.batch,
     stats: engine.stats,
@@ -370,6 +385,8 @@ const JQ = {
         Animation, PauseAnimation, PropertyAnimation, NumberAnimation, ColorAnimation, RotationAnimation, SmoothedAnimation,
         XAnimator, YAnimator, ScaleAnimator, RotationAnimator, OpacityAnimator, PropertyAction, ScriptAction,
         SequentialAnimation, ParallelAnimation, Behavior, Easing, EasingGroup,
+        Accessible: require('./QtQuick/Accessible').Accessible,
+        ...(({ SortFilterProxyModel, ValueFilter, FunctionFilter, RoleSorter, StringSorter, FunctionSorter }) => ({ SortFilterProxyModel, ValueFilter, FunctionFilter, RoleSorter, StringSorter, FunctionSorter }))(require('./QtQml/Models/SortFilterProxyModel')),
         Translate: require('./QtQuick/Transform').Translate, Scale: require('./QtQuick/Transform').Scale, Rotation: require('./QtQuick/Transform').Rotation, Matrix4x4: require('./QtQuick/Transform').Matrix4x4,
         LayoutAttached, RowLayout, ColumnLayout, GridLayout, StackLayout, LayoutItemProxy,
         Window, FileDialog, FolderDialog, Settings, WebSocket: QmlWebSocket, DropShadow, TestCase, SignalSpy,

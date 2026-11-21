@@ -14,14 +14,27 @@ class Window extends Item {
 
     $componentComplete(){
         super.$componentComplete()
+        this.$showTopLevel()
         if(this.$ownVisible) this.requestActivate()
+    }
+    // a top-level window (made with no parent: Qt.createComponent(...).createObject(null), a C++ QQmlComponent::create of
+    // main.cpp) is a window of the screen in Qt: here it goes on the page, as the root object does
+    $showTopLevel(){
+        let page = Window.$pageContent
+        if(!page || this.$parent || !this.$ownVisible || this.$f & engine.DESTROYED) return
+        this.$setParent(page)
     }
 
     show(){
         this.visible = true
+        this.$showTopLevel()
         this.requestActivate()
     }
     hide(){ this.visible = false }
+    $write(id, value){
+        super.$write(id, value)
+        if(id === Item.VISIBLE && this.$f & engine.COMPLETED) this.$showTopLevel()
+    }
     showNormal(){ this.show() }
     showMaximized(){ this.show() }
     showFullScreen(){ this.show() }

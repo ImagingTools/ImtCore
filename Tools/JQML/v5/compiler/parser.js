@@ -891,9 +891,28 @@ function qmlweb_tokenizer($TEXT, document_type) {
 
 }
 
+// Type annotations of QML functions (Qt 6): `function f(a: int, b: list<Item>): string {`, `(a: real) => ...`. JavaScript
+// has none: they become spaces, so lines and columns stay where they are
+function stripTypeAnnotations(text) {
+  if (text.indexOf(":") < 0) return text;
+  var TYPE = "[A-Za-z_$][\\w$]*(?:\\.[A-Za-z_$][\\w$]*)*(?:\\s*<[^<>()]*>)?";
+  var blank = function(str) { return str.replace(/[^\n]/g, " "); };
+  var params = function(list) {
+    return list.replace(new RegExp("([A-Za-z_$][\\w$]*\\s*)(:\\s*" + TYPE + ")", "g"), function(m, name, type) { return name + blank(type); });
+  };
+  // a function declaration or expression: its parameters and its return type
+  text = text.replace(new RegExp("(\\bfunction\\b\\s*[A-Za-z_$]?[\\w$]*\\s*\\()([^()]*)(\\))(\\s*:\\s*" + TYPE + ")?", "g"),
+    function(m, open, list, close, ret) { return open + params(list) + close + (ret ? blank(ret) : ""); });
+  // an arrow function with typed parameters
+  text = text.replace(new RegExp("\\(([^()]*:[^()]*)\\)(\\s*:\\s*" + TYPE + ")?(\\s*=>)", "g"),
+    function(m, list, ret, arrow) { return "(" + params(list) + ")" + (ret ? blank(ret) : "") + arrow; });
+  return text;
+}
+
 function qmlweb_parse($TEXT, document_type, exigent_mode) {
   var embed_tokens = false; // embed_tokens option is not supported
   document_type = document_type || qmlweb_parse.QMLDocument;
+  $TEXT = stripTypeAnnotations(String($TEXT));
 
   var TEXT = $TEXT.replace(/\r\n?|[\n\u2028\u2029]/g, "\n").replace(/^\uFEFF/, '');
   $TEXT = qmlweb_tokenizer($TEXT, document_type);
@@ -1540,6 +1559,15 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
     };
 
     function expr_op(left, min_prec, no_in) {
+        // `value as Type` (QML type assertion): a relational operator like instanceof; the type is a name or Ns.Name
+        // (compiler/expr.js makes it JQ.as(value, Type))
+        if (is("name", "as") && PRECEDENCE["instanceof"] > min_prec) {
+            next();
+            var typeName = S.token.value;
+            expect_token("name");
+            while (is("punc", ".")) { next(); typeName += "." + S.token.value; expect_token("name"); }
+            return expr_op(as_(undefined, "binary", "instanceof", left, as_(undefined, "name", typeName)), min_prec, no_in);
+        }
         var op = is("operator") ? S.token.value : null;
         if (op && op == "in" && no_in) op = null;
         var prec = op != null ? PRECEDENCE[op] : null;
@@ -1711,7 +1739,18 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
     var res = slice(args);
     S.in_function++;
     var start = S.token.pos;
-    res.push(statement());
+    if (is("punc", "{")) {
+      // `map: { "a": x }`: not a block of statements but an object literal (QQmlJS takes the expression then)
+      var saved = { input: Object.assign({}, S.input.context()), token: S.token, prev: S.prev, peeked: S.peeked };
+      try {
+        res.push(statement());
+      } catch (error) {
+        if (!error || error.line === undefined) throw error;
+        S.input.context(saved.input);
+        S.token = saved.token; S.prev = saved.prev; S.peeked = saved.peeked;
+        res.push(simple_statement());
+      }
+    } else res.push(statement());
     var end = S.token.pos;
     S.in_function--;
     res.push(TEXT.substr(start, end - start));

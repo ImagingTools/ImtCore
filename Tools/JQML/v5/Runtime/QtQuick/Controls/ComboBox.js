@@ -60,7 +60,8 @@ class ComboBox extends Control {
             if(data && typeof data === 'object' && role in data) return data[role]
             return undefined
         }
-        // no role: the value of a list (modelData); a ListModel has none
+        // no role: the value of a list (modelData); of a model of one role, that role's value (QQmlDMAbstractItemModelData)
+        if(row && typeof row === 'object' && !Array.isArray(row) && Object.keys(row).length === 1) return row[Object.keys(row)[0]]
         return this.$model instanceof ListModel ? undefined : data
     }
     textAt(index){

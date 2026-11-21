@@ -72,6 +72,8 @@ class Repeater extends Item {
     // Children order (and DOM order) of the parent: delegate 0, delegate 1, ..., Repeater (QQuickRepeater::initItem: an
     // item is stacked after the one before it, else before the next one, else before the Repeater)
     $placeAfter(item, index, next = this.$items[index + 1]){
+        // a delegate another item took (a Container makes it one of its items): not among the Repeater's siblings
+        if(item.$parent !== this.$parent) return
         let siblings = this.$parent.$children
         let prev = index > 0 ? this.$items[index - 1] : null
         let last = siblings.length - 1, at
