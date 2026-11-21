@@ -39,7 +39,7 @@ const FN_MARKS = /\u0001(\d+)\u0001/g
 const LOCAL_NAME = /\bT\d*_\w*\$(?!\(\))/
 
 // list properties whose element values are assigned as an array (data / children / resources only parent them)
-const LIST_VALUE = new Set(['states', 'transitions', 'targets', 'animations', 'changes'])
+const LIST_VALUE = new Set(['states', 'transitions', 'targets', 'animations', 'changes', 'transform'])
 
 class TypeRef {
     constructor(name, kind, Class, file, ref){
@@ -381,16 +381,18 @@ class Codegen {
             if(name === '$self' || name === '$s' || name === 'JQ') return null
             // qsTr of a QML document translates in the context of its file (lupdate: the file's base name)
             if(name === 'qsTr' && !this.declaresName(el, name)) return 'JQ.qsTrIn(' + JSON.stringify(this.translationContext(file)) + ')'
+            // QQmlContextWrapper::lookup: the ids of the context, the scope object, the context object (the root of the
+            // component), then the same in the context above (an id of the document does not hide a property of an
+            // object of a component in it)
             let depth = 0
-            for(let scope = el.scope; scope; scope = scope.parent, depth++){
-                if(scope.ids.has(name)) return '$s' + '.$p'.repeat(depth) + '[' + scope.ids.get(name) + ']'
-            }
+            if(el.scope && el.scope.ids.has(name)) return '$s[' + el.scope.ids.get(name) + ']'
             if(name === 'parent') return selfExpr + '.parent'
             // ListView in an expression is the type (ListView.Horizontal); its attached group only takes handlers
             const valueMember = (target) => { let m = this.member(target, name); return m && !(m.group && m.group.$handlersOnly) }
             if(valueMember(memberEl || el)) return selfExpr + '.' + name
             depth = 0
             for(let scope = el.scope; scope; scope = scope.parent, depth++){
+                if(depth > 0 && scope.ids.has(name)) return '$s' + '.$p'.repeat(depth) + '[' + scope.ids.get(name) + ']'
                 if(scope.isDelegate && (name === 'index' || name === 'model' || name === 'modelData')){
                     return 'JQ.mctx($s' + '.$p'.repeat(depth) + ').' + name
                 }

@@ -12,7 +12,7 @@ const QUICK = [
     'State', 'PropertyChanges', 'StateChangeScript', 'Transition', 'StateGroup',
     'PauseAnimation', 'PropertyAnimation', 'NumberAnimation', 'ColorAnimation', 'RotationAnimation', 'SmoothedAnimation',
     'XAnimator', 'YAnimator', 'ScaleAnimator', 'RotationAnimator', 'OpacityAnimator', 'PropertyAction', 'ScriptAction',
-    'SequentialAnimation', 'ParallelAnimation', 'Behavior', 'Window',
+    'SequentialAnimation', 'ParallelAnimation', 'Behavior', 'Window', 'Translate', 'Scale', 'Rotation', 'Matrix4x4',
 ]
 const QUICK_UNCREATABLE = ['Keys', 'KeyNavigation', 'Animation', 'Easing', 'StandardKey']
 // QtQuick.Controls.Basic (the style QtQuick.Controls imports) and QtQuick.Templates (the controls without a style): the

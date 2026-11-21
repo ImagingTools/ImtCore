@@ -220,11 +220,27 @@ class Item extends QtObject {
         if(bits & GEOMETRY){
             // a default is not written: the browser keeps every inline declaration per element
             let transformed = v[Item.ROTATION] !== 0 || v[Item.SCALE] !== 1
-            let transform = v[Item.X] !== 0 || v[Item.Y] !== 0 || transformed ? 'translate(' + v[Item.X] + 'px,' + v[Item.Y] + 'px)' : ''
-            if(v[Item.ROTATION] !== 0) transform += ' rotate(' + v[Item.ROTATION] + 'deg)'
-            if(v[Item.SCALE] !== 1) transform += ' scale(' + v[Item.SCALE] + ')'
-            style.transform = transform
-            style.transformOrigin = transformed ? ORIGIN[v[Item.TRANSFORMORIGIN]] || '50% 50%' : ''
+            let list = v[Item.TRANSFORM] ? require('./Transform').transformsCss(v[Item.TRANSFORM]) : ''
+            if(list){
+                // QQuickItemPrivate::itemToParentTransform: the position, the transforms of Item.transform, then the
+                // scale and the rotation about the transform origin (worked out here: the CSS origin is 0 0)
+                let origin = (ORIGIN[v[Item.TRANSFORMORIGIN]] || '50% 50%').split(' ').map((p, i) => parseFloat(p) / 100 * v[i ? Item.HEIGHT : Item.WIDTH])
+                let transform = 'translate(' + v[Item.X] + 'px,' + v[Item.Y] + 'px)' + list
+                if(transformed){
+                    transform += ' translate(' + origin[0] + 'px,' + origin[1] + 'px)'
+                    if(v[Item.ROTATION] !== 0) transform += ' rotate(' + v[Item.ROTATION] + 'deg)'
+                    if(v[Item.SCALE] !== 1) transform += ' scale(' + v[Item.SCALE] + ')'
+                    transform += ' translate(' + -origin[0] + 'px,' + -origin[1] + 'px)'
+                }
+                style.transform = transform
+                style.transformOrigin = '0 0'
+            } else {
+                let transform = v[Item.X] !== 0 || v[Item.Y] !== 0 || transformed ? 'translate(' + v[Item.X] + 'px,' + v[Item.Y] + 'px)' : ''
+                if(v[Item.ROTATION] !== 0) transform += ' rotate(' + v[Item.ROTATION] + 'deg)'
+                if(v[Item.SCALE] !== 1) transform += ' scale(' + v[Item.SCALE] + ')'
+                style.transform = transform
+                style.transformOrigin = transformed ? ORIGIN[v[Item.TRANSFORMORIGIN]] || '50% 50%' : ''
+            }
             style.width = Math.max(0, v[Item.WIDTH]) + 'px'
             style.height = Math.max(0, v[Item.HEIGHT]) + 'px'
         }
@@ -273,6 +289,12 @@ defineType(Item, {
         scale: { kind: 'real', initial: 1, effect: geometry(GEOMETRY) },
         rotation: { kind: 'real', effect: geometry(GEOMETRY) },
         transformOrigin: { kind: 'int', initial: 4, effect: geometry(GEOMETRY) },
+        // Item.transform: Translate, Scale, Rotation, Matrix4x4 (Transform.js)
+        transform: { kind: 'var', initial: null, effect: (item, value, old) => {
+            // a list property: one transform is a list of one (QQmlListProperty<QQuickTransform>)
+            if(value && !Array.isArray(value)) value = item.$v[Item.TRANSFORM] = [value]
+            require('./Transform').setItemTransforms(item, value, old)
+        } },
         visible: {
             kind: 'bool',
             initial: true,

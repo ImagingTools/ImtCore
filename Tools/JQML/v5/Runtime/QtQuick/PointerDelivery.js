@@ -503,19 +503,27 @@ function windowOrigin(){
     return { x: rect.left + (window.screenX || 0), y: rect.top + (window.screenY || 0) }
 }
 
+// a point (or a rectangle: the bounds of its corners) from the coordinates of an item to those of another (null: the
+// scene), through the positions and the transforms of both (QQuickItem::mapToItem)
+function mapBetween(from, to, p){
+    const T = require('./Transform')
+    let a = from instanceof Item ? T.itemToScene(from, Item) : { x: 0, y: 0 }
+    let b = to instanceof Item ? T.itemToScene(to, Item) : { x: 0, y: 0 }
+    if(!Array.isArray(a) && !Array.isArray(b)) return translated(p, a.x - b.x, a.y - b.y)
+    let toM = (m) => (Array.isArray(m) ? m : [1, 0, 0, 1, m.x, m.y])
+    let back = T.invert(toM(b))
+    if(!back) return translated(p, 0, 0)
+    let m = T.mul(back, toM(a))
+    if(!('width' in p)) return T.apply(m, p.x, p.y)
+    let corners = [T.apply(m, p.x, p.y), T.apply(m, p.x + p.width, p.y), T.apply(m, p.x, p.y + p.height), T.apply(m, p.x + p.width, p.y + p.height)]
+    let xs = corners.map(c => c.x), ys = corners.map(c => c.y)
+    let x = Math.min(...xs), y = Math.min(...ys)
+    return { x, y, width: Math.max(...xs) - x, height: Math.max(...ys) - y }
+}
+
 Object.assign(Item.prototype, {
-    mapToItem(item, ...args){
-        let p = pointArgs(args)
-        let from = scenePos(this)
-        let to = item instanceof Item ? scenePos(item) : { x: 0, y: 0 }
-        return translated(p, from.x - to.x, from.y - to.y)
-    },
-    mapFromItem(item, ...args){
-        let p = pointArgs(args)
-        let from = item instanceof Item ? scenePos(item) : { x: 0, y: 0 }
-        let to = scenePos(this)
-        return translated(p, from.x - to.x, from.y - to.y)
-    },
+    mapToItem(item, ...args){ return mapBetween(this, item, pointArgs(args)) },
+    mapFromItem(item, ...args){ return mapBetween(item, this, pointArgs(args)) },
     mapToGlobal(...args){
         let p = pointArgs(args)
         let from = scenePos(this), origin = windowOrigin()

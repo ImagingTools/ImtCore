@@ -370,6 +370,7 @@ const JQ = {
         Animation, PauseAnimation, PropertyAnimation, NumberAnimation, ColorAnimation, RotationAnimation, SmoothedAnimation,
         XAnimator, YAnimator, ScaleAnimator, RotationAnimator, OpacityAnimator, PropertyAction, ScriptAction,
         SequentialAnimation, ParallelAnimation, Behavior, Easing, EasingGroup,
+        Translate: require('./QtQuick/Transform').Translate, Scale: require('./QtQuick/Transform').Scale, Rotation: require('./QtQuick/Transform').Rotation, Matrix4x4: require('./QtQuick/Transform').Matrix4x4,
         LayoutAttached, RowLayout, ColumnLayout, GridLayout, StackLayout, LayoutItemProxy,
         Window, FileDialog, FolderDialog, Settings, WebSocket: QmlWebSocket, DropShadow, TestCase, SignalSpy,
         BaseClass, BaseModel, TreeItemModel, GqlModel, GqlRequest, FileIO, Process, RemoteFileController, NavigationHistory,
