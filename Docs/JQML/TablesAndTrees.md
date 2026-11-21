@@ -61,6 +61,8 @@ The first matching choice is used. A choice can also match a `row` or a role val
 | `tableview_delegates` | The pool (`pooled` / `reused`), `reuseItems`, writes from a delegate, `delegateModelAccess`, array and ListModel models |
 | `treeview_basic`, `treeview_interaction` | Expanding and collapsing, the keys, the indicator of `TreeViewDelegate`, `rootIndex`, the model changing under expanded nodes |
 | `headerview`, `view_delegates`, `selection_rectangle`, `tablemodel_selection`, `flickable_wheel` | The controls, the models and the Flickable wheel |
+| `headerview_models` | A header with a model of its own (a JS array, a number, a ListModel), the default `textRole`, the look of the Basic delegate |
+| `tablemodel_editrole` | `setData` with `EditRole`: a column without an `edit` role refuses it, and the roles `dataChanged` gives |
 
 Some things qmltestrunner cannot show are covered by `tests/unit/Tables.test.js`:
 
@@ -93,11 +95,37 @@ Some cases in Qt depend on time. The cases are written so that they do not:
   - `itemIndex` searches from the item it found last, as Qt does.
   - The set of expanded nodes is looked up by a hash.
   - A data change updates only the loaded rows.
+- **HeaderView:**
+  - The Basic delegate is a control with a `background` and a `contentItem`, in the Basic palette of Qt 6.12 (`#f6f6f6`,
+    a `#e4e4e4` border, `#26282a` text); a selected section looks the same, as in Qt.
+  - A model that is a JS array or a number keeps an empty `textRole` and shows its `modelData`. Before, such a header
+    was empty.
+- **TreeViewDelegate:** the indicator is the chevron of the Basic style (`arrow-indicator.png`, 11 × 18) in
+  `windowText`, also on a highlighted row.
+- **Rectangle:** the border is a `QQuickPen`: 1 px and black by default, drawn once `border.color` or `border.width` is
+  written (the same value too), while the color is visible and the width rounds to 1 or more. A rectangle with only
+  `border.color` has a border, as in Qt and in JQML v3.
+- **Image:** an image with bindings made in a component took no end of its first load and stayed `Loading`: its load was
+  kept in `$pending`, where the engine counts pending bindings.
 - **TestCase:**
   - `wait()`, `tryCompare()` and `tryVerify()` block the test function: test methods that call them are compiled as
     async.
   - Keys are delivered without a DOM.
   - The window is activated when the tests start, as qmltestrunner does.
+
+## What a page looks like
+
+The documents of a table (headers, `TableViewDelegate`, a selection and the current cell), of a `DelegateChooser` with a
+component per column, a hidden column and `rowHeightProvider`, and of a tree (`TreeViewDelegate`) were rendered in Qt
+6.12 (`QT_QUICK_CONTROLS_STYLE=Basic`) and in Chromium. They are the same except for the font: Qt offscreen and the
+browser have different default faces, so a text can differ by a pixel.
+
+Not in v5: `ScrollBar`, `ScrollIndicator` and the other controls of `QtQuick.Controls` (`CheckBox`, `Button`...). A
+TableView has no scroll bar of its own in Qt either: it is attached with `ScrollBar.vertical: ScrollBar {}`.
+
+`TableModel` sends `dataChanged` with the role that was set only. A delegate bound to `display` does not show an edit
+made with `EditRole` (the editor of `TableViewDelegate`), in Qt as in v5. A model whose `display` and `edit` are one
+value has to change `display` too.
 
 ## Compared with the ImtCore views
 

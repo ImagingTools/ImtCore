@@ -1,7 +1,7 @@
 // HorizontalHeaderView and VerticalHeaderView of QtQuick.Controls (qquickheaderview.cpp of Qt 6.12 and the Basic style's
 // HorizontalHeaderView.qml / *HeaderViewDelegate.qml): a TableView synced to another one along its orientation, whose
-// model is the header data of that one's model (QHeaderDataProxyModel). Its default delegate is the Basic style's: a light
-// rectangle with a midlight border and the text of the textRole, centered, eight pixels of padding.
+// model is the header data of that one's model (QHeaderDataProxyModel). Its default delegate is the Basic style's: a control
+// with a light background, a midlight border and the text of the textRole, centered, eight pixels of padding.
 const engine = require('../../Core/engine')
 const { defineType } = require('../../Core/type')
 const { TableView } = require('../TableView')
@@ -9,7 +9,7 @@ const { Item } = require('../Item')
 const { Rectangle } = require('../Rectangle')
 const { Text } = require('../Text')
 const { Component } = require('../../QtQml/Component')
-const { AbstractItemModel, AbstractTableModel, INVALID, adaptModel } = require('../../QtQml/Models/ItemModel')
+const { AbstractItemModel, AbstractTableModel, ListAccessorModel, INVALID, adaptModel } = require('../../QtQml/Models/ItemModel')
 const { TableModel } = require('../../QtQml/Models/TableModel')
 const QtEnums = require('../../Qt/enums')
 
@@ -103,14 +103,20 @@ class HeaderDataProxyModel extends AbstractItemModel {
 
 // ---- the Basic style's delegate (HorizontalHeaderViewDelegate.qml / VerticalHeaderViewDelegate.qml) ----------------------
 const PADDING = 8
-const LIGHT = '#ffffff', MIDLIGHT = '#cacaca', WINDOW_TEXT = '#000000', HIGHLIGHT = '#0078d7', HIGHLIGHTED_TEXT = '#ffffff'
+// the Basic palette of Qt 6.12 (QT_QUICK_CONTROLS_STYLE=Basic): light, midlight, windowText; a highlighted (selected)
+// section looks the same in the Basic style
+const LIGHT = '#f6f6f6', MIDLIGHT = '#e4e4e4', WINDOW_TEXT = '#26282a'
 
-// HeaderViewDelegate (QQuickHeaderViewDelegate, Qt 6.10): the cell of a header with the required properties a header gives
-class HeaderViewDelegate extends Rectangle {}
+// HeaderViewDelegate (QQuickHeaderViewDelegate, Qt 6.10): a control (background and contentItem, padding) with the
+// required properties a header gives
+class HeaderViewDelegate extends Item {
+    get background(){ return this.$background || null }
+    get contentItem(){ return this.$contentItem || null }
+}
 defineType(HeaderViewDelegate, {
     props: {
         headerView: 'var', model: 'var', index: 'int', row: 'int', column: 'int', selected: 'bool', current: 'bool',
-        containsDrag: 'bool', highlighted: 'bool',
+        containsDrag: 'bool', highlighted: 'bool', padding: 'real',
     },
 })
 HeaderViewDelegate.$qmlRequired = ['headerView', 'model', 'index', 'row', 'column', 'selected', 'current', 'containsDrag']
@@ -118,26 +124,36 @@ HeaderViewDelegate.$qmlRequired = ['headerView', 'model', 'index', 'row', 'colum
 function defaultDelegate(){
     return new Component(null, (parent, ctx) => {
         let control = new HeaderViewDelegate(parent)
+        control.padding = PADDING
+        // background: Rectangle { border.color: palette.midlight; color: palette.light }
+        let background = new Rectangle(control)
+        background.$bind(Item.WIDTH, () => control.width, null)
+        background.$bind(Item.HEIGHT, () => control.height, null)
+        background.border.color = MIDLIGHT
+        background.color = LIGHT
+        // contentItem: Label { text: control.model[control.headerView.textRole] }; the model object of a list accessor (a
+        // JS array, a number) gives its modelData for any name, so "" (the textRole of such a model) shows the value
         let label = new Text(control)
         let view = ctx.$view
         label.$bind(Text.TEXT, () => {
-            let role = view.$v[HeaderViewBase.TEXTROLE] || 'display'
-            let value = ctx.$role(role)
+            let role = view.$v[HeaderViewBase.TEXTROLE]
+            let value = ctx.$role(role || 'modelData')
             return value === undefined || value === null ? '' : String(value)
         }, null)
         label.horizontalAlignment = Text.AlignHCenter
         label.verticalAlignment = Text.AlignVCenter
-        label.x = PADDING
-        label.y = PADDING
-        label.$bind(Item.WIDTH, () => Math.max(0, control.width - 2 * PADDING), null)
-        label.$bind(Item.HEIGHT, () => Math.max(0, control.height - 2 * PADDING), null)
-        control.$bind(Item.IMPLICITWIDTH, () => label.implicitWidth + 2 * PADDING, null)
-        control.$bind(Item.IMPLICITHEIGHT, () => label.implicitHeight + 2 * PADDING, null)
-        control.border.color = MIDLIGHT
+        label.$bind(Item.X, () => control.padding, null)
+        label.$bind(Item.Y, () => control.padding, null)
+        label.$bind(Item.WIDTH, () => Math.max(0, control.width - 2 * control.padding), null)
+        label.$bind(Item.HEIGHT, () => Math.max(0, control.height - 2 * control.padding), null)
+        label.color = WINDOW_TEXT
+        // same as AbstractButton.qml: the content and the padding
+        control.$bind(Item.IMPLICITWIDTH, () => label.implicitWidth + 2 * control.padding, null)
+        control.$bind(Item.IMPLICITHEIGHT, () => label.implicitHeight + 2 * control.padding, null)
         // highlighted: selected
         control.$bind(HeaderViewDelegate.HIGHLIGHTED, () => control.selected, null)
-        control.$bind(Rectangle.COLOR, () => (control.highlighted ? HIGHLIGHT : LIGHT), null)
-        label.$bind(Text.COLOR, () => (control.highlighted ? HIGHLIGHTED_TEXT : WINDOW_TEXT), null)
+        control.$background = background
+        control.$contentItem = label
         return control
     })
 }
@@ -189,7 +205,8 @@ class HeaderViewBase extends TableView {
         super.$syncModel()
         let aim = this.$tableModel.model
         this.$isTransposed = this.$orientation() === QtEnums.Horizontal ? !aim || aim.$columnCount() === 1 : false
-        if(!this.$v[HeaderViewBase.TEXTROLE] && aim) this.$v[HeaderViewBase.TEXTROLE] = 'display'
+        // the display role of an item model; a list accessor (a JS array, a number) keeps "" and shows its modelData
+        if(!this.$v[HeaderViewBase.TEXTROLE] && aim && !(aim instanceof ListAccessorModel)) this.$v[HeaderViewBase.TEXTROLE] = 'display'
     }
 
     $syncSyncView(){

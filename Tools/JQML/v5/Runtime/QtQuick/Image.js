@@ -130,14 +130,14 @@ const isScalable = (url) => /\.svgz?$/i.test(String(url || '').replace(/[?#].*$/
 class Image extends Item {
     constructor(parent = null){
         super(parent)
-        this.$pending = null      // the pixmap entry this Image waits for
+        this.$pixmap = null       // the pixmap entry this Image waits for (not $pending: the engine counts pending bindings there)
         this.$natural = null      // { width, height } of the loaded image
         this.$paintUrl = ''       // what the element draws: the blob of an own url, or the url
     }
 
     $stopWaiting(){
-        let pending = this.$pending
-        this.$pending = null
+        let pending = this.$pixmap
+        this.$pixmap = null
         if(pending && pending.waiters) pending.waiters.delete(this)
     }
 
@@ -169,11 +169,11 @@ class Image extends Item {
             this.$write(Image.STATUS, Loading)
         }
         if(this.$v[Image.CACHE]){
-            this.$pending = loadPixmap(url, this)
+            this.$pixmap = loadPixmap(url, this)
             return
         }
         let entry = { size: null, paint: url, waiters: new Set([this]) }
-        this.$pending = entry
+        this.$pixmap = entry
         readImage(url, (size, paint) => engine.batch(() => {
             entry.waiters = null
             entry.size = size
@@ -184,8 +184,8 @@ class Image extends Item {
 
     // the load of url this Image waits for has ended
     $loaded(url, entry){
-        if(this.$pending !== entry) return
-        this.$pending = null
+        if(this.$pixmap !== entry) return
+        this.$pixmap = null
         if(entry.size){
             this.$ready(url, entry.size, entry.paint)
             return

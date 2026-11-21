@@ -330,6 +330,25 @@ function cases(name, runtime){
         assert.equal(own.status, Image.Ready)
     }))
 
+    // the engine counts the pending bindings of an object in $pending: an Image made in a component, with bindings and a
+    // source set while it is created, still takes the end of its load (the TreeViewDelegate indicator stayed Loading)
+    test(name + ': an Image with bindings made in a component takes the end of its load', () => withImages(() => {
+        let image
+        runtime.jq.create(() => {
+            let root = new Item(null)
+            image = new Image(root)
+            image.source = 'icons/pending.svg'
+            image.$bind(Item.X, () => root.width / 2, null)
+            image.$bind(Item.ROTATION, () => 90, null)
+            return root
+        })
+        assert.equal(image.status, Image.Loading)
+        engine.batch(() => FakeImage.made[0].finish(11, 18))
+        assert.equal(image.status, Image.Ready)
+        assert.equal(image.implicitWidth, 11)
+        assert.equal(image.rotation, 90)
+    }))
+
     test(name + ': an image of the page\'s server is fetched once and drawn from its blob', async () => {
         let saved = { fetch: globalThis.fetch, URL: globalThis.URL, location: globalThis.location }
         let fetched = []

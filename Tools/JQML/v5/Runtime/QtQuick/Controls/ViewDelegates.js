@@ -9,6 +9,7 @@ const { Item } = require('../Item')
 const { Rectangle } = require('../Rectangle')
 const { Text } = require('../Text')
 const { TextInput } = require('../TextInput')
+const { Image } = require('../Image')
 const { FocusScope } = require('../FocusScope')
 const { MouseArea } = require('../MouseArea')
 const { Component } = require('../../QtQml/Component')
@@ -20,6 +21,12 @@ const P = {
     base: '#ffffff', alternateBase: '#f7f7f7', highlight: '#0066ff', highlightedText: '#090909', buttonText: '#26282a',
     windowText: '#26282a',
 }
+
+// Basic/images/arrow-indicator.png (11 x 18): a chevron pointing right, 3 px thick, as a vector of the same outline
+const ARROW_WIDTH = 11, ARROW_HEIGHT = 18
+const arrowIndicator = (color) => 'data:image/svg+xml,' + encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${ARROW_WIDTH}" height="${ARROW_HEIGHT}" viewBox="0 0 ${ARROW_WIDTH} ${ARROW_HEIGHT}">`
+    + `<path d="M1 1.2H3L10 9L3 16.8H1V15.3L6.6 9L1 2.7Z" fill="${color}"/></svg>`)
 
 // the editor of the Basic delegates: a field over the cell, its text all selected, committed with setData(EditRole)
 function editDelegate(control){
@@ -120,12 +127,15 @@ class TreeViewDelegate extends ViewDelegateBase {
         indicator.$bind(Item.X, () => this.leftMargin + this.depth * this.indentation, null)
         indicator.$bind(Item.Y, () => (this.height - indicator.height) / 2, null)
         indicator.$bind(Item.VISIBLE, () => this.isTreeNode && this.hasChildren, null)
-        let arrow = new Text(indicator)
-        arrow.text = '▸'
+        // ColorImage { source: ".../images/arrow-indicator.png"; color: control.palette.windowText }: the 11 x 18 chevron
+        // of the Basic style, drawn in windowText (also on a highlighted row)
+        let arrow = new Image(indicator)
+        arrow.width = ARROW_WIDTH
+        arrow.height = ARROW_HEIGHT
+        arrow.source = arrowIndicator(P.windowText)
         arrow.$bind(Item.X, () => (indicator.width - arrow.width) / 2, null)
         arrow.$bind(Item.Y, () => (indicator.height - arrow.height) / 2, null)
         arrow.$bind(Item.ROTATION, () => (this.expanded ? 90 : 0), null)
-        arrow.$bind(Text.COLOR, () => (this.highlighted ? P.highlightedText : P.windowText), null)
         let area = new MouseArea(indicator)
         area.$bind(Item.WIDTH, () => indicator.width, null)
         area.$bind(Item.HEIGHT, () => indicator.height, null)
