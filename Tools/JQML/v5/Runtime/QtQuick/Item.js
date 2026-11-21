@@ -62,6 +62,7 @@ class Item extends QtObject {
         this.$anchored = 0
         this.$anchorsReady = false
         this.$ownVisible = true
+        this.$ownEnabled = true     // enabled as set; the property holds the effective value (QQuickItemPrivate::effectiveEnable)
         this.$dirty = 0
         this.$deferred = 0          // dirty bits held while the item is hidden
         this.$polishQueued = false
@@ -78,7 +79,28 @@ class Item extends QtObject {
         engine.markDirty(this, ALL)
     }
 
+    // QQuickItemPrivate::setEffectiveEnableRecur: enabled reads false below a disabled item; each item whose effective value
+    // changes emits enabledChanged. The focus is updated once, from the item whose own value changed.
+    $setOwnEnabled(value){
+        this.$ownEnabled = !!value
+        this.$updateEnabled(true)
+    }
+    $updateEnabled(focus){
+        let parent = this.$parent
+        let effective = this.$ownEnabled && (!(parent instanceof Item) || parent.$v[Item.ENABLED])
+        if(this.$v[Item.ENABLED] === effective) return
+        cascadingEnable++
+        try {
+            super.$write(Item.ENABLED, effective)
+            if(this.$children) for(let child of this.$children) if(child instanceof Item) child.$updateEnabled(false)
+        } finally {
+            cascadingEnable--
+        }
+        if(focus) this.$enabledChanged()
+    }
+
     $parentChanged(old, parent){
+        if(parent instanceof Item || old instanceof Item) this.$updateEnabled(true)
         if(this.$dom){
             if(parent && parent.$dom) parent.$dom.appendChild(this.$dom)
             else if(this.$dom.parentNode) this.$dom.parentNode.removeChild(this.$dom)
@@ -119,6 +141,10 @@ class Item extends QtObject {
         }
         if(id === Item.FOCUS){
             this.$setFocus(value)
+            return
+        }
+        if(id === Item.ENABLED){
+            this.$setOwnEnabled(value)
             return
         }
         if(id === Item.VISIBLE){
@@ -220,6 +246,9 @@ class Item extends QtObject {
     }
 }
 
+// while the effective enabled of a subtree is updated: the focus is updated after it, once
+let cascadingEnable = 0
+
 defineType(Item, {
     props: {
         x: { kind: 'real', effect: geometry(GEOMETRY) },
@@ -253,7 +282,7 @@ defineType(Item, {
                 if(item.$parent && item.$parent.$childGeometryChanged) item.$parent.$childGeometryChanged(item)
             },
         },
-        enabled: { kind: 'bool', initial: true, effect(item){ item.$enabledChanged() } },
+        enabled: { kind: 'bool', initial: true, effect(item){ if(!cascadingEnable) item.$enabledChanged() } },
         focus: 'bool',
         activeFocus: { kind: 'bool', readonly: true },
         activeFocusOnTab: 'bool',
@@ -273,9 +302,14 @@ defineType(Item, {
         ListView: { group: null },  // set by ListView.js
         TableView: { group: null }, // set by TableView.js
         SelectionRectangle: { group: null }, // set by Controls/SelectionRectangle.js
+        // QQuickItem::palette (Qt 6): made when it is read or set (Palette.js)
+        palette: { group: require('./Palette').Palette },
     },
     signals: ['childrenChanged'],
 })
+
+// an item of the tree a palette and a font pass along (Palette.js)
+Item.prototype.$isItem = true
 
 // QQuickItemPrivate::culled: not painted, the visible property stays (a delegate in the reuse pool)
 Item.prototype.$culled = false

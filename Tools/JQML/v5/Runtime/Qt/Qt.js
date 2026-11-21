@@ -4,7 +4,7 @@ const { isDefined } = require('../Core/type')
 const { QPointF, QRectF, QSizeF } = require('../Core/ValueTypes')
 const { Component } = require('../QtQml/Component')
 const { files, findFile, load, resolveExact } = require('../QtQml/files')
-const { qtModule } = require('./modules')
+const { qtModule, moduleTypeKey } = require('./modules')
 const color = require('../Core/color')
 const ValueTypes = require('../Core/ValueTypes')
 const { QtObject: QtObjectType } = require('../Core/QtObject')
@@ -278,7 +278,9 @@ function moduleComponent(moduleUri, typeName, mode){
     let qt = qtModule(module)
     if(qt){
         if(qt.uncreatable.has(name)) return failedComponent('', ':-1 Could not load ' + name + ', as the type is uncreatable\n')
-        let Class = qt.types.has(name) ? Qt.$types[name === 'ListElement' ? 'QtObject' : name] : null
+        // its own types and those of the modules it imports (QtQuick.Controls: the controls of QtQuick.Controls.Basic)
+        let key = name === 'ListElement' ? 'QtObject' : moduleTypeKey(module, name)
+        let Class = key ? Qt.$types[key] : null
         if(!Class) return failedComponent('', ':-1 Module "' + module + '" contains no type named "' + name + '"\n')
         let component = new Component(null, (parent) => new Class(parent))
         component.$v[Component.URL] = ''

@@ -375,6 +375,9 @@ const JQ = {
         BaseClass, BaseModel, TreeItemModel, GqlModel, GqlRequest, FileIO, Process, RemoteFileController, NavigationHistory,
         // the Locale of QML: Locale.ShortFormat, the type of Qt.locale()
         Locale: require('./Qt/Locale').Locale,
+        // QtQuick.Controls (Basic) and QtQuick.Templates ('T.Button')
+        ...require('./QtQuick/Controls/index').types(),
+        'T.HeaderViewDelegate': HeaderViewDelegate,
     },
     mouse: require('./QtQuick/PointerDelivery'),
     keys: require('./QtQuick/KeyDelivery'),

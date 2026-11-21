@@ -54,7 +54,10 @@ async function v5Lines(file){
     }
     let consoleOf = { log: (...a) => lines.push(text(a)), info(){}, debug(){}, warn(){}, error }
     let app = compileQml({ 'Main.qml': fs.readFileSync(file, 'utf8') }, { allowWarnings: true })
-    let { context, JQ, root, dispose } = load(app, { console: consoleOf })
+    // the platform Qt runs on (offscreen): its navigator for the focus policies of macOS, no hover effects (no mouse)
+    let globals = { navigator: { platform: process.platform === 'darwin' ? 'MacIntel' : process.platform === 'win32' ? 'Win32' : 'Linux x86_64', language: 'en-US' } }
+    let beforeMount = (JQ) => { JQ.Qt.styleHints.useHoverEffects = false }
+    let { context, JQ, root, dispose } = load(app, { console: consoleOf, globals, beforeMount })
     let tests = []
     if(testCase){
         JQ.mouse.scene.roots = [root]

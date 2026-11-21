@@ -7,7 +7,7 @@ const { FileModel, Scope, Element } = require('./model')
 const { Codegen, TypeRef } = require('./codegen')
 const { checkFile } = require('./checks')
 const JQ = require('../Runtime')
-const { qtModule, IMPORTED_TYPES } = require('../Runtime/Qt/modules')
+const { qtModule, transitiveModules, IMPORTED_TYPES } = require('../Runtime/Qt/modules')
 
 function dirOf(key){
     let at = key.lastIndexOf('/')
@@ -91,7 +91,7 @@ class RuntimeCodegen extends Codegen {
     importedType(source, name){
         if(source.qt){
             let module = qtModule(source.qt)
-            return module.types.has(name) ? this.types.get(name === 'ListElement' ? 'QtObject' : name) || null : null
+            return module.types.has(name) ? this.types.get(name === 'ListElement' ? 'QtObject' : module.key(name)) || null : null
         }
         if(source.module){
             let types = this.env.modules[source.module]
@@ -116,7 +116,7 @@ class RuntimeCodegen extends Codegen {
     typeOf(name, file = null, qualifier = ''){
         if(qualifier){
             let source = file.namespaces.get(qualifier)
-            return source ? this.importedType(source, name) : null
+            return source ? this.importedType(source, name) || this.transitiveType([source], name) : null
         }
         if(this.types.has(name) && !IMPORTED_TYPES.has(name)) return this.types.get(name)
         if(!file) return null
@@ -124,7 +124,19 @@ class RuntimeCodegen extends Codegen {
             let found = this.importedType(source, name)
             if(found) return found
         }
-        return this.importedType({ dir: file.dir }, name)
+        return this.transitiveType(file.typeImports, name) || this.importedType({ dir: file.dir }, name)
+    }
+
+    // the modules the imported Qt modules import, after every module the document imports itself (QQmlImports)
+    transitiveType(sources, name){
+        for(let source of sources){
+            if(!source || !source.qt) continue
+            for(let module of transitiveModules(source.qt)){
+                let found = this.importedType({ qt: module }, name)
+                if(found) return found
+            }
+        }
+        return null
     }
 
     // the code of the document: emitFile of the build, as a function body that returns the class

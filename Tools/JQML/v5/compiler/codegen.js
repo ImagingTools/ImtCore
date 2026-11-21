@@ -8,7 +8,7 @@ const { rewriteValue, rewriteHandler, rewriteMethod, methodWaits, expressionText
 const { emitScript, loadScript, isPure } = require('./scripts')
 const { checkFile } = require('./checks')
 const { inlineModel } = require('./model')
-const { qtModule, IMPORTED_TYPES } = require('../Runtime/Qt/modules')
+const { qtModule, transitiveModules, IMPORTED_TYPES } = require('../Runtime/Qt/modules')
 
 const JS_GLOBALS = new Set([
     'Math', 'JSON', 'Date', 'Number', 'String', 'Boolean', 'Array', 'Object', 'RegExp', 'Error', 'TypeError', 'RangeError',
@@ -110,7 +110,7 @@ class Codegen {
         // inline components are types of their own; a document of Qt.createQmlObject has none (Qt cannot load them)
         if(!files.$document) expandInlineComponents(files)
         for(let name of Object.keys(JQ.types)){
-            this.types.set(name, new TypeRef(name, 'builtin', JQ.types[name], null, 'JQ.types.' + name))
+            this.types.set(name, new TypeRef(name, 'builtin', JQ.types[name], null, IDENT.test(name) ? 'JQ.types.' + name : 'JQ.types[' + JSON.stringify(name) + ']'))
         }
         // JavaScript resources: one const per file, module qualifiers are global like module types
         this.scripts = new Map()        // .js file -> const name
@@ -156,8 +156,8 @@ class Codegen {
         for(let file of files.values()) this.resolveImports(file)
     }
 
-    // file.typeImports: modules ({ module }) and dirs ({ dir }) imported without a qualifier, the last import
-    // first; file.namespaces: qualifier -> one of them, null for a Qt module
+    // file.typeImports: modules ({ module }, { qt }) and dirs ({ dir }) imported without a qualifier, the last import
+    // first; file.namespaces: qualifier -> one of them
     resolveImports(file){
         file.typeImports = []
         file.namespaces = new Map()
@@ -167,7 +167,7 @@ class Codegen {
             if(target.endsWith('.js')) continue
             if(imp.isModule && !imp.as && NATIVE_TYPES.has(target)) for(let name of NATIVE_TYPES.get(target)) file.nativeNames.add(name)
             let source = imp.isModule ? (this.modules.has(target) ? { module: target } : qtModule(target) ? { qt: target } : null) : imp.dirKey ? { dir: imp.dirKey } : null
-            if(imp.as) file.namespaces.set(imp.as, source && source.qt ? null : source)
+            if(imp.as) file.namespaces.set(imp.as, source)
             else if(source) file.typeImports.unshift(source)
         }
         // QQmlObjectCreator::init makes the scripts of a document with its context: its own, then those of its modules
@@ -186,7 +186,10 @@ class Codegen {
 
     importedType(source, name){
         // a type of the runtime that a Qt module has to be imported for (QQmlImports: by the order of the imports)
-        if(source.qt) return IMPORTED_TYPES.has(name) && qtModule(source.qt).types.has(name) ? this.types.get(name) || null : null
+        if(source.qt){
+            let module = qtModule(source.qt)
+            return IMPORTED_TYPES.has(name) && module.types.has(name) ? this.types.get(module.key(name)) || null : null
+        }
         let types = source.module ? this.modules.get(source.module) : this.byDir.get(source.dir)
         let found = types && types.get(name)
         return found ? found.typeRef : null
@@ -242,7 +245,8 @@ class Codegen {
         if(!qualifier && file && file.inlineTypes && file.inlineTypes.has(name)) return file.inlineTypes.get(name).typeRef
         if(qualifier){
             let source = file.namespaces.get(qualifier)
-            return source && this.importedType(source, name) || this.types.get(name) || null
+            return source && (this.importedType(source, name) || this.transitiveType([source], name))
+                || (IMPORTED_TYPES.has(name) ? null : this.types.get(name)) || null
         }
         if(this.types.has(name) && !IMPORTED_TYPES.has(name)) return this.types.get(name)
         if(!file) return null
@@ -250,6 +254,8 @@ class Codegen {
             let found = this.importedType(source, name)
             if(found) return found
         }
+        let indirect = this.transitiveType(file.typeImports, name)
+        if(indirect) return indirect
         let own = this.importedType({ dir: file.dir }, name)
         if(own) return own
         // not imported: Qt fails, the old compiler took the type by name
@@ -257,6 +263,19 @@ class Codegen {
         if(!named) return null
         if(named.length > 1) this.warn(file, 0, name + ' is not imported and is ambiguous: ' + named.map(f => f.url).join(', ') + ', the last one is used')
         return named[named.length - 1].typeRef
+    }
+
+    // the modules the imported Qt modules import (QtQuick.Controls: QtQuick.Controls.Basic), searched after every module
+    // a document imports itself
+    transitiveType(sources, name){
+        for(let source of sources){
+            if(!source || !source.qt) continue
+            for(let module of transitiveModules(source.qt)){
+                let found = this.importedType({ qt: module }, name)
+                if(found) return found
+            }
+        }
+        return null
     }
 
     // `Q.Name` of an element type: the qualifier and the name

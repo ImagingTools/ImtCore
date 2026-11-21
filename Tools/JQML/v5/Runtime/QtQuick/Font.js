@@ -1,7 +1,13 @@
 const { GroupObject } = require('../Core/QtObject')
 const { defineType } = require('../Core/type')
 
-const ownerText = (group) => group.$owner.$updateImplicitSize()
+// the text of the font is laid out again: its owner's, and of the texts that show it (`font: control.font` gives a Text the
+// font of the control itself)
+const ownerText = (group) => {
+    let owner = group.$owner
+    if(owner && owner.$updateImplicitSize) owner.$updateImplicitSize()
+    if(group.$users) for(let user of group.$users) if(user !== owner && user.$updateImplicitSize) user.$updateImplicitSize()
+}
 
 const POINTS_PER_PIXEL = 72 / 96
 

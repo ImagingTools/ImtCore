@@ -1,5 +1,5 @@
 // Types of the Qt modules for Qt.createComponent(moduleUri, typeName): what `import <module>` makes visible, with the
-// modules it imports (QtQuick imports QtQml and QtQml.Models), checked against Qt 6.8. An uncreatable type is a
+// modules it imports, checked against Qt 6.8 and 6.12. An uncreatable type is a
 // QML type that has no instances (abstract, attached, an enum holder).
 
 const QML = ['QtObject', 'Component', 'Timer', 'Connections', 'Binding']
@@ -15,19 +15,31 @@ const QUICK = [
     'SequentialAnimation', 'ParallelAnimation', 'Behavior', 'Window',
 ]
 const QUICK_UNCREATABLE = ['Keys', 'KeyNavigation', 'Animation', 'Easing', 'StandardKey']
-// QtQuick.Controls: the views of tables only (the project has controls of its own)
-const CONTROLS = ['HorizontalHeaderView', 'VerticalHeaderView', 'HeaderViewDelegate', 'TableViewDelegate', 'TreeViewDelegate', 'SelectionRectangle']
+// QtQuick.Controls.Basic (the style QtQuick.Controls imports) and QtQuick.Templates (the controls without a style): the
+// types the runtime has, the names of the Qt 6.12 qmldir / plugins.qmltypes. A Templates class is JQ.types['T.<Name>']
+const TABLE_CONTROLS = ['HorizontalHeaderView', 'VerticalHeaderView', 'TableViewDelegate', 'TreeViewDelegate', 'SelectionRectangle']
+// the style's types (JQ.types.<Name>) and those of Templates (JQ.types['T.<Name>']); tests/unit/Controls.test.js checks
+// that the runtime has each of them
+const BASIC_CONTROLS = ['Control', 'Label', 'AbstractButton', 'Button', 'ToolButton', 'RoundButton', 'CheckBox', 'RadioButton', 'Switch',
+    'DelayButton', 'TabButton', 'ItemDelegate', 'CheckDelegate', 'RadioDelegate', 'SwitchDelegate']
+const CONTROLS = [...TABLE_CONTROLS, ...BASIC_CONTROLS]
+const TEMPLATES = ['HeaderViewDelegate', ...BASIC_CONTROLS]
 const LAYOUTS = ['RowLayout', 'ColumnLayout', 'GridLayout', 'StackLayout', 'LayoutItemProxy']
 
+// transitive: the modules its qmldir imports (`import X auto`, `default import X auto`). QQmlImports looks up a name in
+// the modules a document imports, the last one first, then in the modules they import, then in the document's directory
+// (checked in Qt 6.12: `import ModA; import QtQuick.Controls` takes the Button of ModA, as QtQuick.Controls has none of
+// its own: its controls are those of QtQuick.Controls.Basic)
 const MODULES = {
-    'QtQml': { types: [...QML, ...MODELS], uncreatable: [] },
+    'QtQml': { types: QML, uncreatable: [], transitive: ['QtQml.Models'] },
     'QtQml.Models': { types: MODELS, uncreatable: [] },
-    'QtQuick': { types: [...QML, ...MODELS, ...QUICK], uncreatable: QUICK_UNCREATABLE },
-    'QtQuick.Window': { types: ['Window'], uncreatable: [] },
+    'QtQuick': { types: [...QML, ...MODELS, ...QUICK], uncreatable: QUICK_UNCREATABLE, transitive: ['QtQml'] },
+    'QtQuick.Window': { types: ['Window'], uncreatable: [], transitive: ['QtQuick'] },
     'QtQuick.Layouts': { types: LAYOUTS, uncreatable: ['Layout'] },
     'Qt.labs.qmlmodels': { types: LABS_MODELS, uncreatable: [] },
-    'QtQuick.Controls': { types: CONTROLS, uncreatable: [] },
+    'QtQuick.Controls': { types: [], uncreatable: [], transitive: ['QtQuick.Controls.Basic'] },
     'QtQuick.Controls.Basic': { types: CONTROLS, uncreatable: [] },
+    'QtQuick.Templates': { types: TEMPLATES, uncreatable: [], prefix: 'T.' },
     'QtQuick.Dialogs': { types: ['FileDialog', 'FolderDialog'], uncreatable: [] },
     'QtWebSockets': { types: ['WebSocket'], uncreatable: [] },
     'Qt5Compat.GraphicalEffects': { types: ['DropShadow'], uncreatable: [] },
@@ -37,18 +49,39 @@ const MODULES = {
 }
 
 // The types of the runtime a document sees only through the import of a module that has them, in the order of its imports
-// (QQmlImports): the ones Qt added to QtQuick, QtQml.Models and Qt.labs.qmlmodels for tables, whose names a project of
-// its own may use for a type (imtcontrols has a SortFilterProxyModel). The older types stay visible without an import,
-// as v5 always had them.
-const IMPORTED_TYPES = new Set(['ItemSelectionModel', 'TableView', 'TreeView', ...LABS_MODELS, ...CONTROLS])
+// (QQmlImports): the ones Qt added to QtQuick, QtQml.Models and Qt.labs.qmlmodels for tables, and the controls, whose
+// names a project of its own may use for a type (imtcontrols has a SortFilterProxyModel, a Button). The older types stay
+// visible without an import, as v5 always had them.
+const IMPORTED_TYPES = new Set(['ItemSelectionModel', 'TableView', 'TreeView', ...LABS_MODELS, ...CONTROLS, ...TEMPLATES])
 
-// { types: Set, uncreatable: Set } of a Qt module, or null
+// { types: Set, uncreatable: Set, transitive: [module names], key(name): its name in JQ.types } of a Qt module, or null
 function qtModule(name){
     let module = MODULES[name]
     if(!module) return null
     if(!module.typeSet) module.typeSet = new Set(module.types)
     if(!module.uncreatableSet) module.uncreatableSet = new Set(module.uncreatable)
-    return { types: module.typeSet, uncreatable: module.uncreatableSet }
+    let prefix = module.prefix || ''
+    return { types: module.typeSet, uncreatable: module.uncreatableSet, transitive: module.transitive || [], key: (type) => prefix + type }
 }
 
-module.exports = { qtModule, IMPORTED_TYPES }
+// the modules a Qt module imports, and those they import, in the order Qt searches them
+function transitiveModules(name, seen = new Set()){
+    let out = []
+    for(let next of (MODULES[name] && MODULES[name].transitive) || []){
+        if(seen.has(next)) continue
+        seen.add(next)
+        out.push(next, ...transitiveModules(next, seen))
+    }
+    return out
+}
+
+// the key in JQ.types of a type of a module, its own or one of the modules it imports (Qt.createComponent), or null
+function moduleTypeKey(name, type){
+    for(let module of [name, ...transitiveModules(name)]){
+        let m = qtModule(module)
+        if(m && m.types.has(type)) return m.key(type)
+    }
+    return null
+}
+
+module.exports = { qtModule, transitiveModules, moduleTypeKey, IMPORTED_TYPES, CONTROLS, TEMPLATES }
