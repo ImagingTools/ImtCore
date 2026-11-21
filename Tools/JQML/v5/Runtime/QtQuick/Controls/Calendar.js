@@ -27,8 +27,8 @@ function weekNumber(date){
 // populate: some days of the month before are always shown)
 function firstShown(year, month, firstDay){
     let first = new Date(year, month, 1)
-    let weekday = first.getDay() || 7       // Qt: Monday 1 .. Sunday 7
-    let back = (weekday - firstDay + 7) % 7 || 7
+    // (firstDay: Locale.firstDayOfWeek, Sunday 0)
+    let back = (first.getDay() - firstDay % 7 + 7) % 7 || 7
     return new Date(year, month, 1 - back)
 }
 // the positioner of the content lays its new delegates out at once (the Grid of Qt is complete after its Repeater)
@@ -72,7 +72,7 @@ class AbstractMonthGrid extends Control {
         let month = this.$v[AbstractMonthGrid.MONTH], year = this.$v[AbstractMonthGrid.YEAR]
         this.$plain(AbstractMonthGrid.SOURCE, rowsModel(this, this.$days()))
         let locale = localeOf(this)
-        let title = this.$titleSet ? this.$v[AbstractMonthGrid.TITLE] : locale.standaloneMonthName(month + 1) + ' ' + year
+        let title = this.$titleSet ? this.$v[AbstractMonthGrid.TITLE] : locale.standaloneMonthName(month) + ' ' + year
         this.$plain(AbstractMonthGrid.TITLE, title)
     }
     $componentComplete(){
@@ -136,7 +136,8 @@ class AbstractDayOfWeekRow extends Control {
         let first = locale.firstDayOfWeek
         let rows = []
         for(let i = 0; i < 7; i++){
-            let day = ((first - 1 + i) % 7) + 1
+            // the day role: Qt.Monday 1 .. Qt.Sunday 7
+            let day = ((first + i) % 7) || 7
             rows.push({ day, longName: locale.standaloneDayName(day, 0), shortName: locale.standaloneDayName(day, 1), narrowName: locale.standaloneDayName(day, 2) })
         }
         this.$plain(AbstractDayOfWeekRow.SOURCE, rowsModel(this, rows))

@@ -63,7 +63,8 @@ class ViewDelegateBase extends Item {
         let background = new Rectangle(this)
         background.$bind(Item.WIDTH, () => this.width, null)
         background.$bind(Item.HEIGHT, () => this.height, null)
-        let label = new Text(this)
+        // contentItem: Label { ... } (TableViewDelegate.qml): `contentItem as Label` finds it
+        let label = new (require('./Basic').Label)(this)
         label.elide = Text.ElideRight
         label.verticalAlignment = Text.AlignVCenter
         label.$bind(Item.HEIGHT, () => this.height, null)

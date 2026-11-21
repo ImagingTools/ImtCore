@@ -835,22 +835,20 @@ class Dial extends T.Dial {
             opacity: () => (c.enabled ? 1 : 0.3),
         }))
         if(handle){
-            handle.$bind(Image.SOURCE, () => svg(14, 10, '<path d="M0.5 0.5H13.5L7 9.5Z" fill="' + handle.color + '"/>'), null, handle)
+            // dial-indicator.png: a triangle pointing up
+            handle.$bind(Image.SOURCE, () => svg(14, 10, '<path d="M7 0.5L13.5 9.5H0.5Z" fill="' + handle.color + '"/>'), null, handle)
             handle.$bind(Item.X, () => (c.background ? c.background.x + c.background.width / 2 - handle.width / 2 : 0), null, handle)
             handle.$bind(Item.Y, () => (c.background ? c.background.y + c.background.height / 2 - handle.height / 2 : 0), null, handle)
-            // Translate { y: -min(background size) * 0.4 + height / 2 } then Rotation { angle } about the middle
-            handle.$bind(Item.ROTATION, () => c.angle, null, handle)
-            handle.$dialOffset = () => (c.background ? -Math.min(c.background.width, c.background.height) * 0.4 + handle.height / 2 : 0)
-            watch(handle, () => [handle.$dialOffset(), c.angle], () => this.$placeHandle(handle))
-            this.$placeHandle(handle)
+            // transform: [ Translate { y: -min(background size) * 0.4 + handle.height / 2 }, Rotation { angle; origin: middle } ]
+            const { Translate, Rotation } = require('../Transform')
+            let translate = new Translate(handle)
+            translate.$bind(Translate.Y, () => (c.background ? -Math.min(c.background.width, c.background.height) * 0.4 : 0) + handle.height / 2, null, translate)
+            let rotation = new Rotation(handle)
+            rotation.$bind(Rotation.ANGLE, () => c.angle, null, rotation)
+            rotation.origin.$bind(rotation.origin.constructor.X, () => handle.width / 2, null, rotation.origin)
+            rotation.origin.$bind(rotation.origin.constructor.Y, () => handle.height / 2, null, rotation.origin)
+            handle.transform = [translate, rotation]
         }
-    }
-    // the rotation of the handle about its middle after its translation (CSS: translate then rotate about the middle)
-    $placeHandle(handle){
-        if(!handle.$dom) return
-        let offset = handle.$dialOffset()
-        handle.$dom.style.transformOrigin = '50% ' + (50 - offset / handle.height * 100) + '%'
-        handle.$dom.style.translate = '0px ' + offset + 'px'
     }
 }
 defineType(Dial, {})

@@ -5,12 +5,14 @@ const { Layout, LayoutAttached, align, hints, solve } = require('./Layout')
 // ---- GridLayout ----------------------------------------------------------------------------------
 
 class GridLayout extends Layout {
-    // cell of each item: explicit Layout.row / Layout.column, otherwise auto-placed along `flow`
+    // QQuickGridLayout::insertLayoutItems: a cursor (next row, next column); a row or a column the item sets moves it;
+    // without both, the cursor goes along the flow (columns, or rows) to the first cells the item fits in
     $cells(items){
         let leftToRight = this.$v[GridLayout.FLOW] === 0
-        let limit = leftToRight ? this.$v[GridLayout.COLUMNS] : this.$v[GridLayout.ROWS]
+        let bound = leftToRight ? this.$v[GridLayout.COLUMNS] : this.$v[GridLayout.ROWS]
+        if(!(bound > 0)) bound = Infinity
         let occupied = new Set()
-        let row = 0, column = 0
+        let next = { row: 0, column: 0 }
         let result = []
         for(let item of items){
             let attached = item.$v[Item.LAYOUT]
@@ -18,25 +20,23 @@ class GridLayout extends Layout {
             let c = attached ? attached.$v[LayoutAttached.COLUMN] : -1
             let rowSpan = Math.max(1, attached ? attached.$v[LayoutAttached.ROWSPAN] || 1 : 1)
             let columnSpan = Math.max(1, attached ? attached.$v[LayoutAttached.COLUMNSPAN] || 1 : 1)
-            const free = (r0, c0) => {
-                for(let i = 0; i < rowSpan; i++) for(let j = 0; j < columnSpan; j++) if(occupied.has((r0 + i) + ':' + (c0 + j))) return false
-                return true
-            }
+            let span = leftToRight ? columnSpan : rowSpan
+            if(span > bound) continue
+            if(r >= 0) next.row = r
+            if(c >= 0) next.column = c
             if(r < 0 || c < 0){
-                while(!free(row, column) || (leftToRight && limit > 0 && column + columnSpan > limit && column > 0)){
-                    if(leftToRight){
-                        column++
-                        if(limit > 0 && column >= limit){ column = 0; row++ }
-                    } else {
-                        row++
-                        if(limit > 0 && row >= limit){ row = 0; column++ }
-                    }
+                let flow = leftToRight ? 'column' : 'row', across = leftToRight ? 'row' : 'column'
+                for(;;){
+                    let fits = next[flow] + span <= bound
+                    for(let i = 0; fits && i < rowSpan; i++) for(let j = 0; fits && j < columnSpan; j++) if(occupied.has((next.row + i) + ':' + (next.column + j))) fits = false
+                    if(fits) break
+                    next[flow]++
+                    if(next[flow] >= bound){ next[flow] = 0; next[across]++ }
                 }
-                r = row
-                c = column
             }
-            for(let i = 0; i < rowSpan; i++) for(let j = 0; j < columnSpan; j++) occupied.add((r + i) + ':' + (c + j))
-            result.push({ item, row: r, column: c, rowSpan, columnSpan })
+            let row = next.row, column = next.column
+            for(let i = 0; i < rowSpan; i++) for(let j = 0; j < columnSpan; j++) occupied.add((row + i) + ':' + (column + j))
+            result.push({ item, row, column, rowSpan, columnSpan })
         }
         return result
     }

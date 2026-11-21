@@ -25,17 +25,18 @@ class Locale {
         return new Intl.DateTimeFormat(this.$tag, options).format(date)
     }
 
-    // QLocale::firstDayOfWeek: Qt.Monday 1 .. Qt.Sunday 7 (Intl.Locale weekInfo, else by the region)
+    // Locale.firstDayOfWeek of QML: Locale.Sunday 0 .. Locale.Saturday 6 (Intl.Locale weekInfo, else by the region)
     get firstDayOfWeek(){
         try {
             let info = new Intl.Locale(this.$tag)
             let week = info.getWeekInfo ? info.getWeekInfo() : info.weekInfo
-            if(week && week.firstDay) return week.firstDay
+            if(week && week.firstDay) return week.firstDay % 7
         } catch(error) {}
         let region = (this.$tag.split('-')[1] || '').toUpperCase()
-        return ['US', 'CA', 'JP', 'BR', 'IL', 'KR', 'MX', 'PH', 'TW', 'ZA', 'AU', ''].includes(region) && region !== 'AU' ? 7 : 1
+        return ['US', 'CA', 'JP', 'BR', 'IL', 'KR', 'MX', 'PH', 'TW', 'ZA', ''].includes(region) ? 0 : 1
     }
-    // QLocale::dayName / standaloneDayName (day: Qt.Monday 1 .. Qt.Sunday 7) and monthName / standaloneMonthName (1 .. 12)
+    // Locale.dayName / standaloneDayName of QML (day: Sunday 0 .. Saturday 6; 7 is a Sunday too) and monthName /
+    // standaloneMonthName (month 0 .. 11)
     dayName(day, type = Locale.LongFormat){ return this.$day(day, type, false) }
     standaloneDayName(day, type = Locale.LongFormat){ return this.$day(day, type, true) }
     monthName(month, type = Locale.LongFormat){ return this.$month(month, type, false) }
@@ -46,14 +47,15 @@ class Locale {
         return this.$name(date, { weekday: WIDTHS[type] || 'long' })
     }
     $month(month, type, standalone){
-        let date = new Date(2024, month - 1, 15)
+        let date = new Date(2024, month, 15)
         let options = { month: WIDTHS[type] || 'long' }
         if(!standalone) return new Intl.DateTimeFormat(this.$tag, Object.assign({ day: 'numeric' }, options)).formatToParts(date).find(p => p.type === 'month').value
         return this.$name(date, options)
     }
 }
 const WIDTHS = ['long', 'short', 'narrow']
-Object.assign(Locale, { LongFormat: 0, ShortFormat: 1, NarrowFormat: 2 })
+Object.assign(Locale, { LongFormat: 0, ShortFormat: 1, NarrowFormat: 2,
+    Sunday: 0, Monday: 1, Tuesday: 2, Wednesday: 3, Thursday: 4, Friday: 5, Saturday: 6 })
 
 function defaultName(){
     let tag = typeof navigator !== 'undefined' && navigator.language ? navigator.language : 'en-US'

@@ -156,7 +156,9 @@ class Layout extends Item {
     }
 
     $invalidate(){
-        if(this.$f & engine.COMPLETED && !this.$arranging) engine.queuePolish(this)
+        // a change while the layout arranges (a Text that wraps at its new width: a new implicit height) arranges again
+        if(this.$arranging) this.$again = true
+        else if(this.$f & engine.COMPLETED) engine.queuePolish(this)
     }
 
     $childGeometryChanged(){
@@ -187,9 +189,14 @@ class Layout extends Item {
     $polish(){
         this.$arranging = true
         try {
-            this.$arrange()
+            for(let pass = 0; pass < 3; pass++){
+                this.$again = false
+                this.$arrange()
+                if(!this.$again) break
+            }
         } finally {
             this.$arranging = false
+            this.$again = false
         }
     }
 }

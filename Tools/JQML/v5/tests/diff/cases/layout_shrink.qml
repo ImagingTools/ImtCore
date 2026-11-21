@@ -16,12 +16,14 @@ Item {
         Rectangle { id: c; Layout.column: 1; Layout.row: 2; Layout.fillWidth: true; Layout.fillHeight: true }
     }
     ColumnLayout {
-        y: 220; width: 200
+        y: 220; width: 200; height: 170
+        spacing: 10
         Label { id: l2; wrapMode: Label.Wrap; Layout.fillWidth: true; text: "A long line of text in a column layout that has to wrap" }
+        Rectangle { id: below; Layout.fillWidth: true; Layout.fillHeight: true }
     }
     Component.onCompleted: {
         console.log("grid", l1.width, l1.lineCount > 1, a.x, a.width, b.x, b.width, c.x, c.width, c.height > 50)
-        console.log("column", l2.width, l2.lineCount > 1)
+        console.log("column", l2.width, l2.lineCount > 1, below.y === l2.height + 10, below.height === 170 - l2.height - 10)
         Qt.quit()
     }
 }

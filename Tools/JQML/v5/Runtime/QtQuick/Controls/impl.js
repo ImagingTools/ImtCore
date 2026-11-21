@@ -110,8 +110,37 @@ class PaddedRectangle extends Rectangle {
         let pad = (side) => (Number.isNaN(v[side]) ? v[PaddedRectangle.PADDING] : v[side])
         let top = pad(PaddedRectangle.TOPPADDING), left = pad(PaddedRectangle.LEFTPADDING)
         let right = pad(PaddedRectangle.RIGHTPADDING), bottom = pad(PaddedRectangle.BOTTOMPADDING)
-        // the rectangle less the paddings: a clip of the box
-        this.$dom.style.clipPath = top || left || right || bottom ? 'inset(' + top + 'px ' + right + 'px ' + bottom + 'px ' + left + 'px round ' + v[Rectangle.RADIUS] + 'px)' : ''
+        let style = this.$dom.style
+        if(!(top || left || right || bottom)){
+            if(this.$padDom){ this.$padDom.remove(); this.$padDom = null }
+            return
+        }
+        // the rectangle less the paddings (QQuickPaddedRectangle: only the fill is inset, the children are not clipped): a
+        // layer under the children with the fill, the radius and the border of the rectangle
+        let layer = this.$padDom
+        if(!layer){
+            layer = this.$padDom = document.createElement('div')
+            layer.style.position = 'absolute'
+            layer.style.pointerEvents = 'none'
+            this.$dom.insertBefore(layer, this.$dom.firstChild)
+        }
+        let ls = layer.style
+        ls.left = left + 'px'
+        ls.top = top + 'px'
+        ls.width = Math.max(0, v[Item.WIDTH] - left - right) + 'px'
+        ls.height = Math.max(0, v[Item.HEIGHT] - top - bottom) + 'px'
+        // (the rectangle writes its fill when its style changes: then the layer takes it)
+        if(dirty & require('../Item').bits.STYLE || !layer.$filled){
+            ls.backgroundColor = style.backgroundColor
+            ls.backgroundImage = style.backgroundImage
+            ls.boxShadow = style.boxShadow
+            layer.$filled = true
+        }
+        ls.borderRadius = style.borderRadius
+        style.backgroundColor = 'transparent'
+        style.backgroundImage = ''
+        style.boxShadow = ''
+        style.clipPath = ''
     }
 }
 const restyle = (rect) => engine.markDirty(rect, require('../Item').bits.STYLE)

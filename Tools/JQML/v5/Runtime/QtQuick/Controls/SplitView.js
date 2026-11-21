@@ -138,32 +138,36 @@ class SplitView extends Container {
                 h.$write(Item.WIDTH, across)
             }
         }
-        // before the filling item: from the start
-        let pos = 0
-        for(let i = 0; i < fill; i++){
-            let size = sizeOf(items[i])
-            place(items[i], pos, size)
-            pos += size
-            placeHandle(this.$handles[i], pos)
-            pos += handleSize(this.$handles[i])
-        }
-        let start = pos
-        // after it: from the end
-        pos = total
-        for(let i = items.length - 1; i > fill; i--){
-            let size = sizeOf(items[i])
-            pos -= size
-            place(items[i], pos, size)
-            let h = this.$handles[i - 1]
-            pos -= handleSize(h)
-            placeHandle(h, pos)
-        }
-        // the filling item: the rest, within its minimum and maximum
-        let rest = pos - start
+        // QQuickSplitViewPrivate::layoutResizeSplitItems: the items their preferred size within their minimum and maximum,
+        // the handles theirs; layoutResizeFillItem: the filling item what is left within its own
+        let sizes = items.map((item, i) => (i === fill ? 0 : sizeOf(item)))
+        let handles = items.slice(0, -1).reduce((t, item, i) => t + handleSize(this.$handles[i]), 0)
+        let used = sizes.reduce((t, size) => t + size, 0) + handles
+        let rest = total - used
         let min = get(items[fill], 'minimum'), max = get(items[fill], 'maximum')
         if(max >= 0) rest = Math.min(rest, max)
-        if(min >= 0) rest = Math.max(rest, min)
-        place(items[fill], start, Math.max(0, rest))
+        rest = Math.max(rest, min >= 0 ? min : 0)
+        sizes[fill] = rest
+        used += rest
+        // limitAndApplySizes: too large, the other items give back from the last one, down to their minimum
+        let delta = used - total
+        for(let i = items.length - 1; i >= 0 && delta > 0; i--){
+            if(i === fill) continue
+            let itemMin = Math.max(0, get(items[i], 'minimum'))
+            let reduce = Math.min(Math.max(0, sizes[i] - itemMin), delta)
+            sizes[i] -= reduce
+            delta -= reduce
+        }
+        // layoutPositionItems: one after the other, a handle after each but the last
+        let pos = 0
+        items.forEach((item, i) => {
+            place(item, pos, sizes[i])
+            pos += sizes[i]
+            if(i < items.length - 1){
+                placeHandle(this.$handles[i], pos)
+                pos += handleSize(this.$handles[i])
+            }
+        })
         this.$fillIndex = fill
         this.$items = items
     }
