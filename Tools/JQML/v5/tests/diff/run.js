@@ -59,8 +59,15 @@ async function v5Lines(file){
     let beforeMount = (JQ) => { JQ.Qt.styleHints.useHoverEffects = false }
     let { context, JQ, root, dispose } = load(app, { console: consoleOf, globals, beforeMount })
     let tests = []
+    // QQuickView::ResizeViewToRootObject (qml, qmltestrunner): the window is the size of the root; its content item (the
+    // parent of the root, where the Overlay of popups is) is in the pointer scene
+    let top = root && root.$parent && root.$parent.$isItem ? root.$parent : root
+    if(top !== root) JQ.batch(() => {
+        top.width = root.width
+        top.height = root.height
+    })
     if(testCase){
-        JQ.mouse.scene.roots = [root]
+        JQ.mouse.scene.roots = [top]
         let visit = (obj) => {
             if(obj instanceof JQ.types.TestCase) tests.push(obj)
             for(let child of obj.$children || []) visit(child)

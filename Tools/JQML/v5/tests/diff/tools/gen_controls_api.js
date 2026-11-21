@@ -11,7 +11,7 @@ const { CONTROLS } = require('../../../Runtime/Qt/modules')
 const qml = process.argv[2] || path.join(os.homedir(), 'Qt/6.12.0/macos/qml')
 const components = parse(path.join(qml, 'QtQuick/Templates/plugins.qmltypes'))
 // the table controls have cases of their own; values that differ by font or platform are left out
-const SKIP_TYPES = new Set(['HorizontalHeaderView', 'VerticalHeaderView', 'TableViewDelegate', 'TreeViewDelegate', 'SelectionRectangle'])
+const SKIP_TYPES = new Set(['Overlay', 'HorizontalHeaderView', 'VerticalHeaderView', 'TableViewDelegate', 'TreeViewDelegate', 'SelectionRectangle'])
 const SKIP_PROPS = new Set(['locale', 'font', 'palette'])
 // the sizes of a text (an empty one too) depend on the font of the platform: printed on a line of their own (text:), which
 // a v5 build on another platform may print otherwise

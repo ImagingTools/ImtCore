@@ -1239,7 +1239,34 @@ class TextArea extends T.TextArea {
 }
 defineType(TextArea, {})
 
+// ---- Popup ----
+const { transparent } = require('./impl')
+// T.Overlay.modal / modeless: the dimming of the window under a popup
+function dimmer(c, modal){
+    return new (require('../../QtQml/Component').Component)(null, (parent) => make(Rectangle, parent, {
+        color: () => transparent(c.palette.shadow, modal ? 0.5 : 0.12),
+    }))
+}
+function popupStyle(c, background){
+    implicitSize(c.$item)
+    c.$styleDimmer = (modal) => dimmer(c, modal)
+    let item = c.$item
+    item.$makeStyle = () => {}
+    if(background) item.$styleDelegate(T.Control.BACKGROUND, background, -1)
+}
+class Popup extends T.Popup {
+    constructor(parent = null){
+        super(parent)
+        this.padding = 12
+    }
+    $makeStyle(){
+        popupStyle(this, () => make(Rectangle, null, { color: () => this.palette.window, 'border.color': () => this.palette.dark }))
+    }
+}
+defineType(Popup, {})
+
 module.exports = {
+    Popup, Overlay: T.Overlay,
     TextField, TextArea,
     Pane, Frame, GroupBox, Page, ToolBar, ToolSeparator, MenuSeparator, Container, TabBar, SwipeView,
     Slider, RangeSlider, ProgressBar, BusyIndicator, Dial, PageIndicator, SpinBox, ProgressBarImpl, BusyIndicatorImpl, DialImpl,

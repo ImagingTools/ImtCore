@@ -116,6 +116,9 @@ class Item extends QtObject {
             engine.emit(parent, Item.SIGNAL_childrenChanged)
             // a parent that takes its children elsewhere (Pane: its contentItem, Container: its contentModel)
             if(parent.$childAdded) parent.$childAdded(this)
+        } else if(parent && parent.$childAdded){
+            // an object that shows its items in an item of its own (Popup: its popup item)
+            parent.$childAdded(this)
         }
         if(old && old.$childGeometryChanged) old.$childGeometryChanged(this)
         if(parent && parent.$childGeometryChanged) parent.$childGeometryChanged(this)
@@ -306,6 +309,7 @@ defineType(Item, {
         SelectionRectangle: { group: null }, // set by Controls/SelectionRectangle.js
         ScrollBar: { group: null },         // set by Controls/ScrollBar.js
         ScrollIndicator: { group: null },   // set by Controls/ScrollBar.js
+        Overlay: { group: null },           // set by Controls/Popup.js
         // QQuickItem::palette (Qt 6): made when it is read or set (Palette.js)
         palette: { group: require('./Palette').Palette },
     },

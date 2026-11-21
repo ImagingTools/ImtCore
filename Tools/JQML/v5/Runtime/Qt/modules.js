@@ -21,7 +21,7 @@ const TABLE_CONTROLS = ['HorizontalHeaderView', 'VerticalHeaderView', 'TableView
 // the style's types (JQ.types.<Name>) and those of Templates (JQ.types['T.<Name>']); tests/unit/Controls.test.js checks
 // that the runtime has each of them
 const BASIC_CONTROLS = ['Control', 'Label', 'AbstractButton', 'Button', 'ToolButton', 'RoundButton', 'CheckBox', 'RadioButton', 'Switch',
-    'DelayButton', 'TabButton', 'ItemDelegate', 'CheckDelegate', 'RadioDelegate', 'SwitchDelegate', 'ScrollBar', 'ScrollIndicator', 'Slider', 'RangeSlider', 'ProgressBar', 'BusyIndicator', 'Dial', 'PageIndicator', 'SpinBox', 'Pane', 'Frame', 'GroupBox', 'Page', 'ToolBar', 'ToolSeparator', 'MenuSeparator', 'Container', 'TabBar', 'SwipeView', 'TextField', 'TextArea']
+    'DelayButton', 'TabButton', 'ItemDelegate', 'CheckDelegate', 'RadioDelegate', 'SwitchDelegate', 'ScrollBar', 'ScrollIndicator', 'Slider', 'RangeSlider', 'ProgressBar', 'BusyIndicator', 'Dial', 'PageIndicator', 'SpinBox', 'Pane', 'Frame', 'GroupBox', 'Page', 'ToolBar', 'ToolSeparator', 'MenuSeparator', 'Container', 'TabBar', 'SwipeView', 'TextField', 'TextArea', 'Popup', 'Overlay']
 const CONTROLS = [...TABLE_CONTROLS, ...BASIC_CONTROLS]
 const TEMPLATES = ['HeaderViewDelegate', ...BASIC_CONTROLS]
 const LAYOUTS = ['RowLayout', 'ColumnLayout', 'GridLayout', 'StackLayout', 'LayoutItemProxy']
@@ -38,8 +38,8 @@ const MODULES = {
     'QtQuick.Layouts': { types: LAYOUTS, uncreatable: ['Layout'] },
     'Qt.labs.qmlmodels': { types: LABS_MODELS, uncreatable: [] },
     'QtQuick.Controls': { types: [], uncreatable: [], transitive: ['QtQuick.Controls.Basic'] },
-    'QtQuick.Controls.Basic': { types: CONTROLS, uncreatable: [] },
-    'QtQuick.Templates': { types: TEMPLATES, uncreatable: [], prefix: 'T.' },
+    'QtQuick.Controls.Basic': { types: CONTROLS, uncreatable: ['Overlay'] },
+    'QtQuick.Templates': { types: TEMPLATES, uncreatable: ['Overlay'], prefix: 'T.' },
     'QtQuick.Dialogs': { types: ['FileDialog', 'FolderDialog'], uncreatable: [] },
     'QtWebSockets': { types: ['WebSocket'], uncreatable: [] },
     'Qt5Compat.GraphicalEffects': { types: ['DropShadow'], uncreatable: [] },
