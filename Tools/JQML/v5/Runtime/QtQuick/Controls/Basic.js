@@ -1707,7 +1707,65 @@ class SplitView extends T.SplitView {
 }
 defineType(SplitView, {})
 
+// ---- ApplicationWindow, MenuBar, MenuBarItem ----
+class ApplicationWindow extends T.ApplicationWindow {
+    constructor(parent = null){
+        super(parent)
+        this.$bind(require('../Window/Window').Window.COLOR, () => this.palette.window, null, this)
+    }
+}
+defineType(ApplicationWindow, {})
+
+class MenuBarItem extends T.MenuBarItem {
+    constructor(parent = null){
+        super(parent)
+        implicitSize(this, true)
+        this.spacing = 6
+        this.padding = 6
+        this.leftPadding = 12
+        this.rightPadding = 16
+        this.icon.width = 24
+        this.icon.height = 24
+    }
+    $makeStyle(){
+        let c = this
+        this.$styleDelegate(T.Control.CONTENTITEM, () => iconLabel(c, {
+            alignment: 1,
+            defaultIconColor: () => c.palette.buttonText,
+            color: () => c.palette.buttonText,
+        }))
+        this.$styleDelegate(T.Control.BACKGROUND, () => make(Rectangle, null, {
+            implicitWidth: 40,
+            implicitHeight: 40,
+            color: () => (c.down || c.highlighted ? c.palette.mid : 'transparent'),
+            'border.color': () => c.palette.dark,
+            'border.width': 0,
+        }), -1)
+    }
+}
+defineType(MenuBarItem, {})
+
+class MenuBar extends T.MenuBar {
+    constructor(parent = null){
+        super(parent)
+        implicitSize(this)
+        for(let id of [T.Control.TOPPADDING, T.Control.LEFTPADDING, T.Control.RIGHTPADDING, T.Control.BOTTOMPADDING]) this.$write(id, 0)
+    }
+    $makeStyle(){
+        let c = this
+        if(!this.$v[T.MenuBar.DELEGATE]) this.$plain(T.MenuBar.DELEGATE, new (require('../../QtQml/Component').Component)(null, (parent) => new MenuBarItem(parent)))
+        this.$styleDelegate(T.Control.CONTENTITEM, () => {
+            let row = make(require('../Row').Row, null, { spacing: () => c.spacing })
+            make(require('../Repeater').Repeater, row, { model: () => c.contentModel })
+            return row
+        })
+        this.$styleDelegate(T.Control.BACKGROUND, () => make(Rectangle, null, { implicitHeight: 40, color: () => c.palette.button }), -1)
+    }
+}
+defineType(MenuBar, {})
+
 module.exports = {
+    ApplicationWindow, MenuBar, MenuBarItem,
     SplitView,
     StackView,
     ScrollView,

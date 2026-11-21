@@ -61,7 +61,7 @@ ${types.map((name, i) => `    ${name} { id: c${i} }`).join('\n')}
             console.log(t.name, "objects:", t.objects.map(n => n + "=" + (c[n] === null || c[n] === undefined ? show(c[n]) : "object")).join(" "))
             console.log(t.name, "signals:", t.signals.filter(n => typeof c[n] !== "function").join(" ") || "all")
             console.log(t.name, "methods:", t.methods.filter(n => typeof c[n] !== "function").join(" ") || "all")
-            console.log(t.name, "size:", ${'"'}${'"'} + (${JSON.stringify([...TEXT_TYPES])}.indexOf(t.name) >= 0 ? "(text)" : c.implicitWidth + " " + c.implicitHeight), "font:", c.font ? [c.font.pixelSize, c.font.bold, c.font.weight].join(" ") : "-",
+            console.log(t.name, "size:", ${'"'}${'"'} + (t.name === "ApplicationWindow" ? "(window)" : ${JSON.stringify([...TEXT_TYPES])}.indexOf(t.name) >= 0 ? "(text)" : c.implicitWidth + " " + c.implicitHeight), "font:", c.font ? [c.font.pixelSize, c.font.bold, c.font.weight].join(" ") : "-",
                         "icon:", c.icon ? [c.icon.name, c.icon.source, c.icon.width, c.icon.height, c.icon.color, c.icon.cache].join(",") : "-")
         }
         Qt.quit()
