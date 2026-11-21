@@ -1656,7 +1656,35 @@ class ScrollView extends T.ScrollView {
 }
 defineType(ScrollView, {})
 
+// ---- StackView: the items slide by the width of the view (XAnimator, 400 ms, OutCubic) ----
+class StackView extends T.StackView {
+    $makeStyle(){
+        let c = this
+        let { Transition } = require('../Transition')
+        let { XAnimator } = require('../Animators')
+        let slide = (from, to) => {
+            let t = new Transition(c)
+            let a = new XAnimator(t)
+            a.$bind(XAnimator.FROM, from, null, a)
+            a.$bind(XAnimator.TO, to, null, a)
+            a.duration = 400
+            a.easing.type = 6     // Easing.OutCubic
+            return t
+        }
+        let sign = () => (c.mirrored ? -1 : 1)
+        let set = (id, make) => { if(!this.$v[id]) this.$plain(id, make()) }
+        set(T.StackView.POPENTER, () => slide(() => sign() * -c.width, () => 0))
+        set(T.StackView.POPEXIT, () => slide(() => 0, () => sign() * c.width))
+        set(T.StackView.PUSHENTER, () => slide(() => sign() * c.width, () => 0))
+        set(T.StackView.PUSHEXIT, () => slide(() => 0, () => sign() * -c.width))
+        set(T.StackView.REPLACEENTER, () => slide(() => sign() * c.width, () => 0))
+        set(T.StackView.REPLACEEXIT, () => slide(() => 0, () => sign() * -c.width))
+    }
+}
+defineType(StackView, {})
+
 module.exports = {
+    StackView,
     ScrollView,
     Action: T.Action, ActionGroup: T.ActionGroup, ButtonGroup: T.ButtonGroup,
     ToolTip, DialogButtonBox, Dialog, Menu, MenuItem, Drawer,

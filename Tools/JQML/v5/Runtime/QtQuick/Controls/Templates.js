@@ -11,5 +11,6 @@ const { ComboBox } = require('./ComboBox')
 const morePopups = require('./Popups')
 const actions = require('./Actions')
 const { ScrollView } = require('./ScrollView')
+const { StackView } = require('./StackView')
 
-module.exports = Object.assign({ Control, Label, ScrollBar, ScrollIndicator, ComboBox, ScrollView }, buttons, range, containers, texts, popups, morePopups, actions)
+module.exports = Object.assign({ Control, Label, ScrollBar, ScrollIndicator, ComboBox, ScrollView, StackView }, buttons, range, containers, texts, popups, morePopups, actions)

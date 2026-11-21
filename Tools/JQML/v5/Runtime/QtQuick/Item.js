@@ -314,6 +314,7 @@ defineType(Item, {
         DialogButtonBox: { group: null },   // set by Controls/Popups.js
         ButtonGroup: { group: null },       // set by Controls/Actions.js
         ActionGroup: { group: null },       // set by Controls/Actions.js
+        StackView: { group: null },         // set by Controls/StackView.js
         // QQuickItem::palette (Qt 6): made when it is read or set (Palette.js)
         palette: { group: require('./Palette').Palette },
     },
