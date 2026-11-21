@@ -8,7 +8,7 @@ const { Rectangle, Border } = require('../Rectangle')
 const { Image } = require('../Image')
 const { Text } = require('../Text')
 const T = require('./Templates')
-const { make, blend, IconLabel, CheckLabel, PaddedRectangle, ColorImage, IconOnly, TextUnderIcon } = require('./impl')
+const { make, apply, blend, IconLabel, CheckLabel, PaddedRectangle, ColorImage, IconOnly, TextUnderIcon } = require('./impl')
 const { Behavior } = require('../Behavior')
 const { SmoothedAnimation } = require('../SmoothedAnimation')
 
@@ -1265,7 +1265,125 @@ class Popup extends T.Popup {
 }
 defineType(Popup, {})
 
+// ---- ComboBox ----
+// the ListView of the popup: its delegates take the row on a click and highlight it on hover (QQuickComboBoxPrivate::createdItem)
+class ComboListView extends ListView {
+    $create(index, rows){
+        let entry = super.$create(index, rows)
+        if(entry && this.$combo) this.$combo.$connectDelegate(entry.item, () => entry.ctx.index)
+        return entry
+    }
+}
+defineType(ComboListView, {})
+// delegate: ItemDelegate { width: ListView.view.width; text: model[control.textRole]; font.weight; highlighted; hoverEnabled }
+function comboDelegate(c){
+    return new (require('../../QtQml/Component').Component)(null, (parent, ctx) => {
+        let d = new ItemDelegate(parent)
+        let index = () => ctx.index
+        apply(d, {
+            width: () => (ctx.$view ? ctx.$view.width : 0),
+            text: () => c.textAt(index()),
+            'palette.text': () => c.palette.text,
+            'palette.highlightedText': () => c.palette.highlightedText,
+            'font.weight': () => (c.currentIndex === index() ? 600 : 400),
+            highlighted: () => c.highlightedIndex === index(),
+            hoverEnabled: () => c.hoverEnabled,
+        })
+        return d
+    })
+}
+class ComboBox extends T.ComboBox {
+    constructor(parent = null){
+        super(parent)
+        let c = this
+        implicitSize(this, true)
+        this.$bind(T.Control.LEFTPADDING, () => c.padding + (!c.mirrored || !c.indicator || !c.indicator.visible ? 0 : c.indicator.width + c.spacing), null, this)
+        this.$bind(T.Control.RIGHTPADDING, () => c.padding + (c.mirrored || !c.indicator || !c.indicator.visible ? 0 : c.indicator.width + c.spacing), null, this)
+    }
+    $makeStyle(){
+        let c = this
+        if(!this.$v[T.ComboBox.DELEGATE]) this.$plain(T.ComboBox.DELEGATE, comboDelegate(this))
+        let indicator = this.$styleDelegate(T.ComboBox.INDICATOR, () => styleImage('double-arrow', null, () => c.palette.dark, { opacity: () => (c.enabled ? 1 : 0.3) }))
+        if(indicator){
+            indicator.$bind(Item.X, () => (c.mirrored ? c.padding : c.width - indicator.width - c.padding), null, indicator)
+            indicator.$bind(Item.Y, () => c.topPadding + (c.availableHeight - indicator.height) / 2, null, indicator)
+            // the size of double-arrow.png (an image loaded later, or never without a page, has it already)
+            indicator.$write(Item.IMPLICITWIDTH, 40)
+            indicator.$write(Item.IMPLICITHEIGHT, 28)
+        }
+        this.$styleDelegate(T.Control.CONTENTITEM, () => {
+            let field = new T.TextField(null)
+            apply(field, {
+                leftPadding: () => (!c.mirrored ? 12 : c.editable && field.activeFocus ? 3 : 1),
+                rightPadding: () => (c.mirrored ? 12 : c.editable && field.activeFocus ? 3 : 1),
+                topPadding: () => 6 - c.padding,
+                bottomPadding: () => 6 - c.padding,
+                text: () => (c.editable ? c.editText : c.displayText),
+                enabled: () => c.editable,
+                autoScroll: () => c.editable,
+                readOnly: () => c.down,
+                inputMethodHints: () => c.inputMethodHints,
+                validator: () => c.validator,
+                selectByMouse: () => c.selectTextByMouse,
+                color: () => (c.editable ? c.palette.text : c.palette.buttonText),
+                selectionColor: () => c.palette.highlight,
+                selectedTextColor: () => c.palette.highlightedText,
+                verticalAlignment: 128,
+            })
+            field.$bind(Item.IMPLICITHEIGHT, () => field.contentHeight + field.topPadding + field.bottomPadding, null, field)
+            field.$styleSize = true
+            c.font.$follow(field)
+            let background = make(Rectangle, null, {
+                visible: () => c.enabled && c.editable && !c.flat,
+                'border.width': () => (field.activeFocus ? 2 : 1),
+                'border.color': () => (field.activeFocus ? c.palette.highlight : c.palette.button),
+                color: () => c.palette.base,
+            })
+            field.$setBackground(background)
+            return field
+        })
+        this.$styleDelegate(T.Control.BACKGROUND, () => make(Rectangle, null, {
+            implicitWidth: 140,
+            implicitHeight: 40,
+            color: () => (c.down ? c.palette.mid : c.palette.button),
+            'border.color': () => (!c.editable && c.visualFocus ? c.palette.highlight : c.palette.buttonText),
+            'border.width': () => (!c.editable && c.visualFocus ? 2 : 0),
+            visible: () => !c.flat || c.down,
+        }), -1)
+        if(!this.$v[T.ComboBox.POPUP]){
+            let popup = new T.Popup(this)
+            let view = new ComboListView(null)
+            view.$combo = this
+            apply(view, {
+                clip: true,
+                model: () => c.model,
+                delegate: () => c.delegate,
+                currentIndex: () => c.highlightedIndex,
+                highlightMoveDuration: 0,
+            })
+            view.$bind(Item.IMPLICITHEIGHT, () => view.contentHeight, null, view)
+            let frame = make(Rectangle, view, { z: 10, color: 'transparent', 'border.color': () => c.palette.mid })
+            frame.$bind(Item.WIDTH, () => view.width, null, frame)
+            frame.$bind(Item.HEIGHT, () => view.height, null, frame)
+            let indicator = new ScrollIndicator(null)
+            view.ScrollIndicator.vertical = indicator
+            popup.contentItem = view
+            popup.$item.$styleDelegate(T.Control.BACKGROUND, () => make(Rectangle, null, { color: () => c.palette.window }), -1)
+            apply(popup, {
+                y: () => c.height,
+                width: () => c.width,
+                height: () => Math.min(view.implicitHeight, (popup.$overlay() ? popup.$overlay().height : Infinity) - popup.topMargin - popup.bottomMargin),
+                topMargin: 6,
+                bottomMargin: 6,
+            })
+            this.$setPopup(popup)
+        }
+    }
+}
+defineType(ComboBox, {})
+
 module.exports = {
+    ComboBox,
     Popup, Overlay: T.Overlay,
     TextField, TextArea,
     Pane, Frame, GroupBox, Page, ToolBar, ToolSeparator, MenuSeparator, Container, TabBar, SwipeView,

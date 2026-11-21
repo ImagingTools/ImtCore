@@ -7,5 +7,6 @@ const range = require('./Range')
 const containers = require('./Containers')
 const texts = require('./TextControls')
 const popups = require('./Popup')
+const { ComboBox } = require('./ComboBox')
 
-module.exports = Object.assign({ Control, Label, ScrollBar, ScrollIndicator }, buttons, range, containers, texts, popups)
+module.exports = Object.assign({ Control, Label, ScrollBar, ScrollIndicator, ComboBox }, buttons, range, containers, texts, popups)

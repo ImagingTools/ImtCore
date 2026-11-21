@@ -79,6 +79,8 @@ class ModelContext extends QtObject {
                 get(target, key){
                     if(key === 'index') return ctx.index
                     if(key === 'modelData') return ctx.modelData
+                    // the model object of a list accessor (an array, a number) gives its modelData for "" (QQmlDMListAccessorData)
+                    if(key === '' && !ctx.$row) return ctx.modelData
                     return ctx.$role(key)
                 },
                 set(target, key, value){

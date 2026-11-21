@@ -16,7 +16,7 @@ const SKIP_PROPS = new Set(['locale', 'font', 'palette'])
 // the sizes of a text (an empty one too) depend on the font of the platform: printed on a line of their own (text:), which
 // a v5 build on another platform may print otherwise
 const TEXT_METRICS = new Set(['baselineOffset', 'implicitContentWidth', 'implicitContentHeight', 'implicitLabelHeight', 'implicitLabelWidth', 'implicitWidth', 'implicitHeight'])
-const TEXT_TYPES = new Set(['Label', 'CheckBox', 'RadioButton', 'Switch', 'DelayButton', 'SpinBox', 'GroupBox', 'TextField', 'TextArea'])
+const TEXT_TYPES = new Set(['Label', 'CheckBox', 'RadioButton', 'Switch', 'DelayButton', 'SpinBox', 'GroupBox', 'TextField', 'TextArea', 'ComboBox'])
 // properties that hold an object: printed as null or object
 const isObject = (p) => p.pointer || p.list || /^Q(Font|Locale|QuickIcon|Color|JSValue|Variant|Object)$|^QQuick|Component|QRectF|QPointF|QSizeF/.test(p.type) && p.type !== 'QColor'
 
