@@ -1,6 +1,6 @@
 const { defineType } = require('../../Core/type')
 const { Item } = require('../Item')
-const { Layout, LayoutAttached, align, hints, solve } = require('./Layout')
+const { Layout, LayoutAttached, align, hints, solve, snapCells } = require('./Layout')
 
 class LinearLayout extends Layout {
     $horizontal(){ return true }
@@ -27,11 +27,15 @@ class LinearLayout extends Layout {
 
         let mainSize = this.$v[horizontal ? Item.WIDTH : Item.HEIGHT]
         let crossSize = this.$v[horizontal ? Item.HEIGHT : Item.WIDTH]
-        let cells = solve(mainHints, mainSize - spacing * Math.max(0, items.length - 1))
+        let solved = solve(mainHints, mainSize - spacing * Math.max(0, items.length - 1))
+        let snapped = snapCells(solved, spacing, mainSize, mainHints.map(h => h.min))
+        let cells = snapped.sizes
+        // a row laid out from the right (layoutDirection Qt.RightToLeft): the geometry is mirrored in the layout
+        let mirrored = horizontal && this.$v[LinearLayout.LAYOUTDIRECTION] === 1
 
         let geometry = []
-        let pos = 0
         for(let i = 0; i < items.length; i++){
+            let pos = snapped.positions[i]
             let item = items[i]
             let attached = item.$v[Item.LAYOUT]
             let flags = attached ? attached.$v[LayoutAttached.ALIGNMENT] : 0
@@ -42,8 +46,8 @@ class LinearLayout extends Layout {
             let crossContent = crossItem - cross.before - cross.after
             let mainPos = align(pos, cells[i], mainItem, flags, horizontal) + main.before
             let crossPos = align(0, crossSize, crossItem, flags, !horizontal) + cross.before
+            if(mirrored) mainPos = mainSize - mainPos - mainContent
             geometry.push(horizontal ? [item, mainPos, crossPos, mainContent, crossContent] : [item, crossPos, mainPos, crossContent, mainContent])
-            pos += cells[i] + spacing
         }
         for(let i = geometry.length - 1; i >= 0; i--) this.$placeItem(...geometry[i])
     }
@@ -52,7 +56,7 @@ class LinearLayout extends Layout {
 defineType(LinearLayout, {
     props: {
         spacing: { kind: 'real', initial: 5, effect: (layout) => layout.$invalidate() },
-        layoutDirection: 'int',
+        layoutDirection: { kind: 'int', effect: (layout) => layout.$invalidate() },
         uniformCellSizes: 'bool',
     },
 })

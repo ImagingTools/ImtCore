@@ -240,7 +240,53 @@ function tintColor(base, tint){
     return rgbaColor(mix(t.r, b.r), mix(t.g, b.g), mix(t.b, b.b), F(a + F(inv * F(b.a / USHRT_MAX))))
 }
 
+// QColor::toHsl of an Rgb color: { a, h (hundredths of a degree, USHRT_MAX achromatic), s, l }
+function rgbToHsl(c){
+    const r = F(c.r / USHRT_MAX), g = F(c.g / USHRT_MAX), b = F(c.b / USHRT_MAX)
+    const max = Math.max(r, g, b), min = Math.min(r, g, b)
+    const sum = F(max + min)
+    const l = F(sum * 0.5)
+    let hsl = { a: c.a, h: USHRT_MAX, s: 0, l: roundMul(l, USHRT_MAX) }
+    if(max === min) return hsl
+    const delta = F(max - min)
+    const s = l < 0.5 ? F(delta / sum) : F(delta / F(2 - sum))
+    let hue
+    if(max === r) hue = F(F(g - b) / delta)
+    else if(max === g) hue = F(2 + F(F(b - r) / delta))
+    else hue = F(4 + F(F(r - g) / delta))
+    hue = F(hue * 60)
+    if(hue < 0) hue = F(hue + 360)
+    hsl.h = roundMul(hue, 100)
+    hsl.s = roundMul(s, USHRT_MAX)
+    return hsl
+}
+
+// The components of a color value (a color is kept as its name, #rrggbb or #aarrggbb): color.r, .hsvHue, .valid ...
+// as the QColor value type of QML gives them (QColor::redF, hsvHueF: floats; -1 is the hue of a gray)
+const COLOR_TEXT = /^#(?:[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/
+const hueF = (h) => (h === USHRT_MAX ? -1 : F(h / 36000))
+const COMPONENTS = {
+    r: (c) => F(c.r / USHRT_MAX), g: (c) => F(c.g / USHRT_MAX), b: (c) => F(c.b / USHRT_MAX), a: (c) => F(c.a / USHRT_MAX),
+    hsvHue: (c) => hueF(rgbToHsv(c).h), hsvSaturation: (c) => F(rgbToHsv(c).s / USHRT_MAX), hsvValue: (c) => F(rgbToHsv(c).v / USHRT_MAX),
+    hslHue: (c) => hueF(rgbToHsl(c).h), hslSaturation: (c) => F(rgbToHsl(c).s / USHRT_MAX), hslLightness: (c) => F(rgbToHsl(c).l / USHRT_MAX),
+    valid: () => true,
+}
+function installComponents(){
+    for(let name of Object.keys(COMPONENTS)){
+        if(Object.prototype.hasOwnProperty.call(String.prototype, name)) continue
+        let read = COMPONENTS[name]
+        Object.defineProperty(String.prototype, name, {
+            get(){
+                let text = String(this)
+                return COLOR_TEXT.test(text) ? read(parseColor(text)) : undefined
+            },
+            configurable: true,
+        })
+    }
+}
+
 module.exports = {
+    installComponents, rgbToHsl,
     coerceColor, toCss, rgba, NAMED, parseColor, colorName, rgbaColor, hslaColor, hsvaColor, lighterColor, darkerColor,
     alphaColor, tintColor,
 }

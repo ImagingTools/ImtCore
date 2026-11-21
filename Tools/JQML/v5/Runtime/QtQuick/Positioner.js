@@ -25,8 +25,23 @@ class Positioner extends Item {
         if(this.$f & engine.COMPLETED) this.$polish()
     }
 
-    // A side padding set explicitly wins over padding, like in Qt
+    // laid out from the right (layoutDirection Qt.RightToLeft of Row, Grid, Flow)
+    $rightToLeft(){
+        let id = this.constructor.LAYOUTDIRECTION
+        return id !== undefined && this.$v[id] === 1
+    }
+
+    // QQuickRow / QQuickGrid / QQuickFlow::doPositioning from the right: the children placed from the left (with the
+    // side paddings swapped) are mirrored in the width, or in the implicit width without one
+    $mirror(children){
+        if(!this.$rightToLeft()) return
+        let end = this.$explicit & 1 ? this.$v[Item.WIDTH] : this.$v[Item.IMPLICITWIDTH]
+        for(let child of children) child.$place(Item.X, end - child.$v[Item.X] - child.$v[Item.WIDTH])
+    }
+
+    // A side padding set explicitly wins over padding, like in Qt; from the right the left and right ones swap
     $padding(name){
+        if(this.$rightToLeft() && (name === 'leftPadding' || name === 'rightPadding')) name = name === 'leftPadding' ? 'rightPadding' : 'leftPadding'
         let type = this.constructor.$type
         let own = this.$v[type.propByName.get(name).id]
         return this.$explicitPadding & PADDING_BITS[name] ? own : this.$v[Positioner.PADDING]

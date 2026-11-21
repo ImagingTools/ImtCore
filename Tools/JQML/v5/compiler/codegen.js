@@ -41,6 +41,9 @@ const LOCAL_NAME = /\bT\d*_\w*\$(?!\(\))/
 // list properties whose element values are assigned as an array (data / children / resources only parent them)
 const LIST_VALUE = new Set(['states', 'transitions', 'targets', 'animations', 'changes', 'transform', 'filters', 'sorters'])
 
+// the list properties of an item an alias can name: an object declared in such an alias is appended to the list
+const LIST_ALIAS = new Set(['data', 'children', 'resources'])
+
 class TypeRef {
     constructor(name, kind, Class, file, ref){
         this.name = name
@@ -418,11 +421,41 @@ class Codegen {
             if(name !== 'model' && name !== 'index' && name !== 'modelData' && name !== 'context' && !(file.nativeNames && file.nativeNames.has(name))) this.warn(file, el.line, name + ' is not found')
             return 'JQ.ctx($s,' + JSON.stringify(name) + ')'
         }
+        // Singleton.Value of an enum of a singleton type is a value of the type: no instance is made (a singleton reads
+        // its own enums while it is made)
+        resolve.typeMember = (name, property) => {
+            if(!/^[A-Z]/.test(property)) return null
+            let type = this.typeOf(name, file)
+            if(!type || !this.hasEnum(type, property)) return null
+            // the name is that type here (not an id or a property of the same name)
+            let source = resolve(name)
+            return source && source.startsWith('JQ.singleton(') ? this.use(type) + '.' + property : null
+        }
+        // T.Overlay of a namespace (import QtQuick.Templates as T) is Overlay of that module: the attached object of the
+        // scope object when the type has one (T.Overlay.overlay), as an unqualified Overlay
+        resolve.qualifiedMember = (namespace, name) => {
+            if(!file.namespaces.has(namespace) || !/^[A-Z]/.test(name) || (el.scope && el.scope.ids.has(namespace))) return null
+            if(!this.typeOf(name, file, namespace)) return null
+            let m = this.member(memberEl || el, name)
+            return m && m.kind === 'prop' && m.group && !m.group.$handlersOnly ? selfExpr + '.' + name : null
+        }
         // x.createQmlObject(...) creates in the context of the call: the file, the scope and the names of its ids
         if(file.createsQmlObjects || file.createsComponents){
             resolve.callingContext = () => ({ qt: file.typeRef.ref + '$qt', scope: '$s', ids: this.scopeInfo(file, el.scope) })
         }
         return resolve
+    }
+
+    // an enum of the type (Type.Enum) or a value of one (Type.Value), declared by it or by a type it inherits
+    hasEnum(typeRef, property){
+        if(!/^[A-Z]/.test(property)) return false
+        for(let type = typeRef; type; type = type.kind === 'qml' ? type.file.root.typeRef : null){
+            if(type.kind !== 'qml') return !!type.Class && Object.prototype.hasOwnProperty.call(type.Class, property) && typeof type.Class[property] !== 'function'
+            for(let e of type.file.root.enums || []){
+                if(e.name === property || Object.prototype.hasOwnProperty.call(e.values || {}, property)) return true
+            }
+        }
+        return false
     }
 
     translationContext(file){
@@ -596,7 +629,7 @@ class Codegen {
             this.out.push(className + '.' + e.name + '=' + JSON.stringify(e.values || {}) + ';')
         }
 
-        let aliasTargets = []
+        let aliasTargets = [], listAliases = []
         for(let a of el.aliases){
             let slot = el.scope.ids.get(a.path[0])
             // reported by compiler/checks.js
@@ -609,6 +642,11 @@ class Codegen {
                 let owner = [target].concat(path.slice(0, -1)).join('.')
                 let last = path[path.length - 1]
                 this.out.push('Object.defineProperty(' + className + '.prototype,' + JSON.stringify(a.name) + ',{get(){return ' + owner + '.' + last + '},set(v){' + owner + '.' + last + '=v},configurable:true});')
+                if(LIST_ALIAS.has(last)){
+                    // an alias of the data / children / resources of an item: an object declared in it is appended
+                    listAliases.push(JSON.stringify(a.name) + ':(o)=>[o.$s_' + className + '[' + slot + ']' + path.slice(0, -1).map(p => '.' + p).join('') + ',' + JSON.stringify(last) + ']')
+                    continue
+                }
                 aliasTargets.push(JSON.stringify(a.name) + ':(o)=>{let t=o.$s_' + className + '[' + slot + ']' + path.slice(0, -1).map(p => '.' + p).join('') + ';return[t,t.constructor.$type.propByName.get(' + JSON.stringify(last) + ').id]}')
             }
         }
@@ -621,6 +659,9 @@ class Codegen {
             let slot = el.scope.ids.get(defaultAlias.path[0])
             if(slot !== undefined) this.out.push(className + '.$defaultAssign=(o,c)=>{o.$s_' + className + '[' + slot + '].' + defaultAlias.path[1] + '=c};')
         }
+        if(listAliases.length){
+            this.out.push(className + '.$listAliases=Object.assign({},' + base + '.$listAliases,{' + listAliases.join(',') + '});')
+        }
         if(aliasTargets.length){
             this.out.push(className + '.$aliases=Object.assign({},' + base + '.$aliases,{' + aliasTargets.join(',') + '});')
         }
@@ -628,7 +669,7 @@ class Codegen {
         if(el.aliases.length){
             this.out.push(className + '.$qmlAliases=(' + base + '.$qmlAliases||[]).concat(' + JSON.stringify(el.aliases.map(a => a.name)) + ');')
         }
-        let required = el.propdefs.filter(p => p.required && !p.value && !p.elementNode).map(p => p.name)
+        let required = el.propdefs.filter(p => p.required && !p.value && !p.elementNode).map(p => p.name).concat(el.requiredNames || [])
         if(required.length){
             this.out.push(className + '.$qmlRequired=(' + base + '.$qmlRequired||[]).concat(' + JSON.stringify(required) + ');')
         }
@@ -700,10 +741,19 @@ class Codegen {
 
         for(let assign of el.assigns){
             let at = atOf(assign)
+            // T.Overlay.modal: an attached property of a type of a namespace (import QtQuick.Templates as T) is the
+            // attached property of that type
+            let nsParts = assign.name.split('.')
+            if(nsParts.length > 2 && file.namespaces.has(nsParts[0]) && /^[A-Z]/.test(nsParts[1]) && this.typeOf(nsParts[1], file, nsParts[0])){
+                assign.name = nsParts.slice(1).join('.')
+                assign.qualified = true
+            }
             if(assign.element){
                 // through an alias the target may be a later element of this body
                 let viaAlias = (this.member(el, assign.name.split('.')[0]) || {}).kind === 'alias'
-                let line = this.assignTarget(file, el, v, assign.name) + '=' + this.elementExpr(file, assign.element, assign.asComponent, post) + ';'
+                let line = viaAlias && assign.name.indexOf('.') < 0
+                    ? 'JQ.aliasAssign(' + v + ',' + JSON.stringify(assign.name) + ',' + this.elementExpr(file, assign.element, assign.asComponent, post) + ');'
+                    : this.assignTarget(file, el, v, assign.name) + '=' + this.elementExpr(file, assign.element, assign.asComponent, post) + ';'
                 if(viaAlias) post.push(line)
                 else unit(named, at, 'named', null, () => this.current.push(line))
                 continue
@@ -717,7 +767,7 @@ class Codegen {
                 continue
             }
             let parts = assign.name.split('.')
-            let first = this.attachedMember(file, el, parts[0])
+            let first = assign.qualified ? this.member(el, parts[0]) : this.attachedMember(file, el, parts[0])
             let kind = 'named', group = null
             if(parts.length === 1 && first && first.kind === 'alias') kind = 'alias'
             else if(parts.length > 1 && first && first.kind === 'prop' && first.group && !this.inherits(el, JQ.types.PropertyChanges)){
@@ -798,7 +848,7 @@ class Codegen {
             return
         }
         if(parts.length === 2){
-            let m = this.attachedMember(file, el, parts[0])
+            let m = assign.qualified ? this.member(el, parts[0]) : this.attachedMember(file, el, parts[0])
             if(m && (m.kind === 'alias' || (m.kind === 'prop' && !m.group))){
                 let entry = isConstant(assign.value)
                     ? '[' + JSON.stringify(parts[1]) + ',false,(' + expressionText(assign.raw) + '\n)]'
@@ -821,7 +871,7 @@ class Codegen {
         }
         // a group in a group: Drag.hotSpot.x
         if(parts.length === 3){
-            let m = this.attachedMember(file, el, parts[0])
+            let m = assign.qualified ? this.member(el, parts[0]) : this.attachedMember(file, el, parts[0])
             let outer = m && m.kind === 'prop' && m.group
             let inner = outer && outer.$type.propByName.get(parts[1])
             if(inner && inner.group){

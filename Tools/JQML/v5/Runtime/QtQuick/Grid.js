@@ -52,6 +52,7 @@ class Grid extends Positioner {
         let height = heights.reduce((s, w) => s + w, 0) + Math.max(0, heights.filter(w => w).length - 1) * rowSpacing
         this.$write(Item.IMPLICITWIDTH, width + left + this.$padding('rightPadding'))
         this.$write(Item.IMPLICITHEIGHT, height + top + this.$padding('bottomPadding'))
+        this.$mirror(this.$visibleChildren())
         engine.emitArgs(this, Positioner.SIGNAL_positioningComplete, [])
     }
     $write(id, value){
@@ -64,7 +65,8 @@ defineType(Grid, {
     props: {
         rows: { kind: 'int', effect: relayout }, columns: { kind: 'int', effect: relayout },
         rowSpacing: { kind: 'real', effect: relayout }, columnSpacing: { kind: 'real', effect: relayout },
-        flow: { kind: 'int', effect: relayout }, layoutDirection: { kind: 'int', effect: relayout },
+        flow: { kind: 'int', effect: relayout },
+        layoutDirection: { kind: 'int', effect: (grid) => { grid.$write(Grid.EFFECTIVELAYOUTDIRECTION, grid.$v[Grid.LAYOUTDIRECTION]); relayout(grid) } },
         effectiveLayoutDirection: { kind: 'int', readonly: true },
         horizontalItemAlignment: { kind: 'int', initial: AlignLeft, effect: relayout },
         effectiveHorizontalItemAlignment: { kind: 'int', readonly: true, initial: AlignLeft },

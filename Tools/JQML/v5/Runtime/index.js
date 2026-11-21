@@ -162,6 +162,18 @@ function defaultParent(Class, obj){
     return Class.$defaultParent ? Class.$defaultParent(obj) : obj
 }
 // a child of a type whose default property is an alias of an object property (pane.contentItem): assigned to it
+// an object declared in an alias (media: Item {}): appended to the list of an alias of data / children / resources
+// (QQmlObjectCreator appends to a list property), else the value of the alias
+function aliasAssign(obj, name, child){
+    let list = obj.constructor.$listAliases && obj.constructor.$listAliases[name]
+    if(!list){
+        obj[name] = child
+        return
+    }
+    let [owner, prop] = list(obj)
+    if(child && child.$setParent && (prop !== 'children' || child.$isItem)) child.$setParent(owner)
+}
+
 function defaultAssign(Class, obj, child){
     Class.$defaultAssign(obj, child)
 }
@@ -347,9 +359,10 @@ function subAssign(owner, name, entries, scope){
     else owner[name] = build(owner, scope)
 }
 
-// pragma Singleton types: one instance, created on first use
+// pragma Singleton types: one instance, created on first use. It is the instance from its construction on: its own
+// bindings and Component.onCompleted, run before the creation ends, read the singleton through its name
 function singleton(Class){
-    if(!Object.prototype.hasOwnProperty.call(Class, '$instance')) Class.$instance = create(() => new Class(null))
+    if(!Object.prototype.hasOwnProperty.call(Class, '$instance')) create(() => Class.$instance = new Class(null))
     return Class.$instance
 }
 
@@ -369,7 +382,7 @@ function qsTrIn(context){
 }
 
 const JQ = {
-    qsTrIn, forward, bindAlias, handleGroup, callCreateQmlObject, files, scripts, script, si, sis, moduleScripts, make: engine.make, inContext: engine.inContext, callCreateComponent, sctx, sctxValue, sset, singleton, defineMethod, defaultParent, defaultAssign, ctx, ctxValue, mctx, as, ns, qmlModule, subAssign, rootContext,
+    qsTrIn, forward, bindAlias, handleGroup, callCreateQmlObject, files, scripts, script, si, sis, moduleScripts, make: engine.make, inContext: engine.inContext, callCreateComponent, sctx, sctxValue, sset, singleton, defineMethod, defaultParent, defaultAssign, aliasAssign, ctx, ctxValue, mctx, as, ns, qmlModule, subAssign, rootContext,
     engine, defineType, create,
     batch: engine.batch,
     stats: engine.stats,
@@ -386,6 +399,12 @@ const JQ = {
         XAnimator, YAnimator, ScaleAnimator, RotationAnimator, OpacityAnimator, PropertyAction, ScriptAction,
         SequentialAnimation, ParallelAnimation, Behavior, Easing, EasingGroup,
         Accessible: require('./QtQuick/Accessible').Accessible,
+        Screen: require('./QtQuick/Screen').Screen,
+        ...require('./QtQuick/Path'),
+        ...(({ Shape, ShapePath, ShapeGradient, LinearGradient, RadialGradient, ConicalGradient }) => ({ Shape, ShapePath, ShapeGradient, LinearGradient, RadialGradient, ConicalGradient }))(require('./QtQuick/Shapes')),
+        ...(({ PointerDevice, PointerHandler, HoverHandler, DragHandler }) => ({ PointerDevice, PointerHandler, HoverHandler, DragHandler }))(require('./QtQuick/PointerHandlers')),
+        ...(({ PlaceholderText, ColorImage, IconImage, IconLabel, PaddedRectangle }) => ({ PlaceholderText, ColorImage, IconImage, IconLabel, PaddedRectangle }))(require('./QtQuick/Controls/impl')),
+        MultiEffect: require('./QtQuick/Effects').MultiEffect, ShaderEffectSource: require('./QtQuick/Effects').ShaderEffectSource,
         ...(({ SortFilterProxyModel, ValueFilter, FunctionFilter, RoleSorter, StringSorter, FunctionSorter }) => ({ SortFilterProxyModel, ValueFilter, FunctionFilter, RoleSorter, StringSorter, FunctionSorter }))(require('./QtQml/Models/SortFilterProxyModel')),
         Translate: require('./QtQuick/Transform').Translate, Scale: require('./QtQuick/Transform').Scale, Rotation: require('./QtQuick/Transform').Rotation, Matrix4x4: require('./QtQuick/Transform').Matrix4x4,
         LayoutAttached, RowLayout, ColumnLayout, GridLayout, StackLayout, LayoutItemProxy,
@@ -423,6 +442,7 @@ if(typeof globalThis !== 'undefined'){
 }
 
 require('./Qt/Locale').install()
+require('./Core/color').installComponents()
 
 if(!String.prototype.arg){
     // QString::arg: replaces the lowest-numbered %N

@@ -105,7 +105,21 @@ function parse(source, where){
 // resolve.callingContext(), when the resolver has it: the calling context of the code for a call x.createQmlObject(...)
 // (QV4 callingQmlContext), as JS sources { qt, scope, ids }
 function transformFree(ast, resolve, free){
-    return ast.transform(new U.TreeTransformer(null, function(node){
+    // Singleton.EnumValue: a value of the type (resolve.typeMember); T.Overlay: the attached object of a type of a
+    // namespace (resolve.qualifiedMember); before the name in it is resolved
+    const before = (node) => {
+        if(resolve.typeMember && node instanceof U.AST_Dot && typeof node.property === 'string' && node.expression instanceof U.AST_SymbolRef
+            && node.expression.thedef && node.expression.thedef.undeclared){
+            let source = resolve.typeMember(node.expression.name, node.property)
+                || (resolve.qualifiedMember && resolve.qualifiedMember(node.expression.name, node.property))
+            if(source){
+                if(free) free.add(node.expression.name)
+                return replacementNode(source)
+            }
+        }
+        return undefined
+    }
+    return ast.transform(new U.TreeTransformer(before, function(node){
         // value instanceof __qmlas__(Type): JQ.as(value, Type) (rewriteAs)
         if(node instanceof U.AST_Binary && node.operator === 'instanceof' && node.right instanceof U.AST_Call
             && node.right.expression instanceof U.AST_SymbolRef && node.right.expression.name === '__qmlas__'){

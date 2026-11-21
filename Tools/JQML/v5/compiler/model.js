@@ -198,6 +198,9 @@ class FileModel {
                 }
                 return
             }
+            case 'qmlrequired':
+                (el.requiredNames || (el.requiredNames = [])).push(m[1])
+                return
             case 'qmlpropdef': {
                 let mods = m[1] || []
                 let def = { name: m[2], type: m[3], defaultProp: !!mods[0], required: !!mods[1], readonly: !!mods[2], line }

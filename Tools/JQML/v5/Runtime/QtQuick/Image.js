@@ -91,9 +91,13 @@ class SourceSize extends GroupObject {
         return natural ? (id === SourceSize.WIDTH ? natural.width : natural.height) : 0
     }
 }
+// QQuickImageBase::setSourceSize: sourceSizeChanged, then a load of a complete image (that emits it again when the size
+// differs from the one of the last load)
 const sourceSizeChanged = (size) => {
-    size.$owner.$updateSize()
-    engine.emit(size.$owner, Image.SIGNAL_sourceSizeChanged)
+    let image = size.$owner
+    image.$updateSize()
+    engine.emit(image, Image.SIGNAL_sourceSizeChanged)
+    if(image.$f & engine.COMPLETED) image.$load()
 }
 const readBack = (name) => function(){
     let id = SourceSize[name.toUpperCase()]
@@ -133,6 +137,31 @@ class Image extends Item {
         this.$pixmap = null       // the pixmap entry this Image waits for (not $pending: the engine counts pending bindings there)
         this.$natural = null      // { width, height } of the loaded image
         this.$paintUrl = ''       // what the element draws: the blob of an own url, or the url
+        this.$oldSourceSize = null    // sourceSize at the end of the last load (QQuickImageBasePrivate::oldSourceSize)
+        engine.scheduleComponentComplete(this)
+    }
+
+    // QQuickImageBase::sourceSize: a part not set is the size of the loaded picture (0 without one)
+    $sourceSize(){
+        let group = this.$v[Image.SOURCESIZE]
+        if(group) return [group.$readBack(SourceSize.WIDTH), group.$readBack(SourceSize.HEIGHT)]
+        let natural = this.$natural
+        return natural ? [natural.width, natural.height] : [0, 0]
+    }
+
+    // the end of a load (QQuickImageBase::requestFinished, loadEmptyUrl): sourceSizeChanged when the size differs from
+    // the one at the end of the last load
+    $loadFinished(){
+        let size = this.$sourceSize()
+        let old = this.$oldSourceSize
+        if(old && old[0] === size[0] && old[1] === size[1]) return
+        this.$oldSourceSize = size
+        let group = this.$v[Image.SOURCESIZE]
+        if(group){
+            engine.emit(group, SourceSize.SIGNAL_widthChanged)
+            engine.emit(group, SourceSize.SIGNAL_heightChanged)
+        }
+        engine.emit(this, Image.SIGNAL_sourceSizeChanged)
     }
 
     $stopWaiting(){
@@ -150,6 +179,7 @@ class Image extends Item {
             this.$write(Image.PROGRESS, 0)
             this.$write(Image.STATUS, Null)
             this.$updateSize()
+            if(this.$f & engine.COMPLETED) this.$loadFinished()
             return
         }
         if(!nativeImage()) return
@@ -196,23 +226,17 @@ class Image extends Item {
         this.$paintUrl = ''
         this.$updateSize()
         this.$write(Image.STATUS, Error)
+        this.$loadFinished()
     }
 
     $ready(url, size, paint){
-        let group = this.$v[Image.SOURCESIZE]
-        let before = group ? [group.$readBack(SourceSize.WIDTH), group.$readBack(SourceSize.HEIGHT)] : null
         this.$natural = { width: size.width, height: size.height }
-        // QQuickImageBase::requestFinished: sourceSizeChanged when the size read back changes
-        if(group && (group.$readBack(SourceSize.WIDTH) !== before[0] || group.$readBack(SourceSize.HEIGHT) !== before[1])){
-            engine.emit(group, SourceSize.SIGNAL_widthChanged)
-            engine.emit(group, SourceSize.SIGNAL_heightChanged)
-            engine.emit(this, Image.SIGNAL_sourceSizeChanged)
-        }
         this.$url = url
         this.$paintUrl = paint
         this.$updateSize()
         this.$write(Image.PROGRESS, 1)
         this.$write(Image.STATUS, Ready)
+        this.$loadFinished()
     }
 
     // implicit size: the loaded size scaled to sourceSize (one dimension keeps the aspect ratio)

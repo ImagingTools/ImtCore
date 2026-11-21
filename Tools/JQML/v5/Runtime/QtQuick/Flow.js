@@ -42,11 +42,16 @@ class Flow extends Positioner {
         }
         this.$write(Item.IMPLICITWIDTH, maxX + right)
         this.$write(Item.IMPLICITHEIGHT, maxY + bottom)
+        this.$mirror(this.$visibleChildren())
         engine.emitArgs(this, Positioner.SIGNAL_positioningComplete, [])
     }
 }
 defineType(Flow, {
-    props: { flow: { kind: 'int', effect: relayout } },
+    props: {
+        flow: { kind: 'int', effect: relayout },
+        layoutDirection: { kind: 'int', effect: (flow) => { flow.$write(Flow.EFFECTIVELAYOUTDIRECTION, flow.$v[Flow.LAYOUTDIRECTION]); relayout(flow) } },
+        effectiveLayoutDirection: { kind: 'int', readonly: true },
+    },
 })
 Flow.LeftToRight = 0
 Flow.TopToBottom = 1

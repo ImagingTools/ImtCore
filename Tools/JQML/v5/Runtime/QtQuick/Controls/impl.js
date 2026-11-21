@@ -419,5 +419,31 @@ Icon.prototype.$write = function(id, value){
     if(this.$iconUsers) for(let label of this.$iconUsers) label.$sync()
 }
 
-module.exports = { make, apply, Color, blend, transparent, Icon, IconLabel, MnemonicLabel, CheckLabel, PaddedRectangle, ColorImage, IconImage,
+// ---- PlaceholderText (QQuickPlaceholderText) ----
+// The placeholder of a text control: a Text with the horizontal alignment of the TextInput / TextEdit it is in (an
+// alignment that control does not set is the default one), followed when it changes
+class PlaceholderText extends Text {
+    constructor(parent = null){
+        super(parent)
+        engine.scheduleComponentComplete(this)
+    }
+
+    $componentComplete(){
+        super.$componentComplete()
+        let control = this.$parent
+        if(control && control.constructor.SIGNAL_effectiveHorizontalAlignmentChanged !== undefined){
+            engine.connect(control, control.constructor.SIGNAL_effectiveHorizontalAlignmentChanged, () => this.$updateAlignment(), this)
+        }
+        this.$updateAlignment()
+    }
+
+    $updateAlignment(){
+        let control = this.$parent
+        let field = control instanceof require('../TextField').TextField ? control : null
+        this.$write(Text.HORIZONTALALIGNMENT, field ? field.$v[field.constructor.HORIZONTALALIGNMENT] : Text.AlignLeft)
+    }
+}
+defineType(PlaceholderText)
+
+module.exports = { PlaceholderText, make, apply, Color, blend, transparent, Icon, IconLabel, MnemonicLabel, CheckLabel, PaddedRectangle, ColorImage, IconImage,
     stripMnemonic, copyFont, IconOnly, TextOnly, TextBesideIcon, TextUnderIcon }

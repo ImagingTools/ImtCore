@@ -41,6 +41,23 @@ function qtTestLines(file){
     return lines
 }
 
+// the documents of a case: its file, or every file of the directory of a case that is a directory (Main.qml with the
+// singletons and the types its qmldir declares)
+function caseDocuments(file){
+    if(path.basename(file) !== 'Main.qml' || path.basename(path.dirname(file)) === 'cases') return { 'Main.qml': fs.readFileSync(file, 'utf8') }
+    let documents = {}
+    let dir = path.dirname(file)
+    for(let name of fs.readdirSync(dir)){
+        if(fs.statSync(path.join(dir, name)).isFile()) documents[name] = fs.readFileSync(path.join(dir, name), 'utf8')
+    }
+    return documents
+}
+
+// a case: a .qml file of cases, or the Main.qml of a directory of cases
+function caseFile(file){
+    return fs.statSync(file).isDirectory() ? path.join(file, 'Main.qml') : file
+}
+
 // Qt prints console.log as "qml: text" on stderr; the lines of v5 are collected from its console
 async function v5Lines(file){
     let lines = []
@@ -55,7 +72,7 @@ async function v5Lines(file){
         if(fail && process.env.DIFF_VERBOSE) lines.push('  ' + text(a))
     }
     let consoleOf = { log: (...a) => lines.push(text(a)), info(){}, debug(){}, warn(){}, error }
-    let app = compileQml({ 'Main.qml': fs.readFileSync(file, 'utf8') }, { allowWarnings: true })
+    let app = compileQml(caseDocuments(file), { allowWarnings: true })
     // the platform Qt runs on (offscreen): its navigator for the focus policies of macOS, no hover effects (no mouse)
     let globals = { navigator: { platform: process.platform === 'darwin' ? 'MacIntel' : process.platform === 'win32' ? 'Win32' : 'Linux x86_64', language: 'en-US' } }
     let beforeMount = (JQ) => { JQ.Qt.styleHints.useHoverEffects = false }
@@ -90,7 +107,9 @@ async function main(){
         process.exit(0)
     }
     let files = process.argv.slice(2)
-    if(!files.length) files = fs.readdirSync(path.join(__dirname, 'cases')).filter(f => f.endsWith('.qml')).map(f => path.join(__dirname, 'cases', f))
+    let cases = path.join(__dirname, 'cases')
+    if(!files.length) files = fs.readdirSync(cases).filter(f => f.endsWith('.qml') || fs.existsSync(path.join(cases, f, 'Main.qml'))).map(f => path.join(cases, f))
+    files = files.map(caseFile)
     let failed = 0
     for(let file of files){
         let qtOut = isTestCase(file) ? qtTestLines(file)
@@ -98,7 +117,8 @@ async function main(){
                 .split('\n').filter(l => l.startsWith('qml: ')).map(l => l.slice(5))
         let v5 = await v5Lines(file)
         let same = qtOut.length === v5.length && qtOut.every((l, i) => l === v5[i])
-        console.log((same ? 'same    ' : 'DIFFERS ') + path.basename(file) + ' (' + qtOut.length + ' lines)')
+        let name = path.basename(file) === 'Main.qml' && path.basename(path.dirname(file)) !== 'cases' ? path.basename(path.dirname(file)) + '/' : path.basename(file)
+        console.log((same ? 'same    ' : 'DIFFERS ') + name + ' (' + qtOut.length + ' lines)')
         if(!same){
             failed++
             for(let i = 0; i < Math.max(qtOut.length, v5.length); i++){

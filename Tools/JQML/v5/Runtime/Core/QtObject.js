@@ -62,6 +62,11 @@ class QtObject {
             return
         }
         let prop = this.constructor.$type.props[id]
+        // a value of a grouped value type (sourceSize: Qt.size(48, 48)) is a write of each of its fields
+        if(prop.group && value && typeof value === 'object' && !(value instanceof prop.group)){
+            this[prop.name].$writeValue(value)
+            return
+        }
         if(prop.coerce){
             try {
                 value = prop.coerce(value)
@@ -77,7 +82,10 @@ class QtObject {
             if(old instanceof QtObject) unguard(old, this, id)
             if(value instanceof QtObject) guard(value, this, id)
         }
-        if(prop.effect) prop.effect(this, value, old)
+        if(prop.effect){
+            if(this.$effects) this.$effects.add(prop.effect)
+            else prop.effect(this, value, old)
+        }
         engine.emit(this, prop.signal, old, value)
     }
 
@@ -381,6 +389,18 @@ class GroupObject extends QtObject {
     constructor(owner){
         super(null)
         this.$owner = owner
+    }
+
+    // a whole value written to the group (sourceSize: Qt.size(48, 24)): each field, then the effect of the changed ones
+    // once, as one write of a value type property emits one change of it
+    $writeValue(value){
+        let effects = this.$effects = new Set()
+        try {
+            for(let key in value) this[key] = value[key]
+        } finally {
+            this.$effects = null
+        }
+        for(let effect of effects) effect(this)
     }
 }
 

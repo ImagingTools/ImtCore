@@ -8,7 +8,7 @@ const { Rectangle, Border } = require('../Rectangle')
 const { Image } = require('../Image')
 const { Text } = require('../Text')
 const T = require('./Templates')
-const { make, apply, blend, IconLabel, CheckLabel, PaddedRectangle, ColorImage, IconOnly, TextUnderIcon } = require('./impl')
+const { make, apply, blend, IconLabel, CheckLabel, PaddedRectangle, ColorImage, IconOnly, TextUnderIcon, PlaceholderText } = require('./impl')
 const { Behavior } = require('../Behavior')
 const { SmoothedAnimation } = require('../SmoothedAnimation')
 
@@ -1150,7 +1150,7 @@ defineType(SwipeView, {})
 // ---- TextField, TextArea ----
 // PlaceholderText (QQuickPlaceholderText): the placeholder of a text control, shown while it is empty
 function placeholder(c, wrap){
-    let text = make(Text, c, {
+    let text = make(PlaceholderText, c, {
         x: () => c.leftPadding,
         y: () => c.topPadding,
         width: () => c.width - (c.leftPadding + c.rightPadding),

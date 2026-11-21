@@ -185,6 +185,9 @@ var OPERATORS = array_to_hash([
     "!==",
     "?",
     "?.",
+    "??",
+    "**",
+    "**=",
     "=",
     "+=",
     "-=",
@@ -317,7 +320,7 @@ var ASSIGNMENT = (function(a, ret, i){
     }
     return ret;
 })(
-    ["+=", "-=", "/=", "*=", "%=", ">>=", "<<=", ">>>=", "|=", "^=", "&="],
+    ["+=", "-=", "/=", "*=", "%=", ">>=", "<<=", ">>>=", "|=", "^=", "&=", "**="],
     { "=": true },
     0
 );
@@ -332,6 +335,7 @@ var PRECEDENCE = (function(a, ret){
     return ret;
 })(
     [
+        ["??"],
         ["||"],
         ["&&"],
         ["|"],
@@ -341,7 +345,8 @@ var PRECEDENCE = (function(a, ret){
         ["<", ">", "<=", ">=", "in", "instanceof"],
         [">>", "<<", ">>>"],
         ["+", "-"],
-        ["*", "/", "%"]
+        ["*", "/", "%"],
+        ["**"]
     ],
     {}
 );
@@ -1972,6 +1977,13 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
         }
       }
 
+      // `required name`: a property the type has already becomes required (Qt 6)
+      if (attrs[1] && !attrs[0] && !attrs[2] && is("name") && S.token.value != "property") {
+        var requiredName = S.token.value;
+        next();
+        if (is("punc", ";")) next();
+        return as_(info, "qmlrequired", requiredName);
+      }
       if (S.token.value == "property" && !is_token(peek(), "punc", ":")) {
         next();
         var propdef = qmlpropdef(attrs);
@@ -1996,6 +2008,12 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
           next();
           onProp = S.token.value;
           next();
+          // a property of a group: `Behavior on anchors.rightMargin`, `NumberAnimation on border.width`
+          while (is("punc", ".")) {
+            next();
+            onProp += "." + S.token.value;
+            next();
+          }
         }
         
         return as_(info, "qmlelem", propname, onProp, qmlblock());

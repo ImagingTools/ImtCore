@@ -205,7 +205,21 @@ class Item extends QtObject {
         }
     }
     get resources(){ return this.$children ? this.$children.filter(child => !(child instanceof Item)) : [] }
+    // resources_clear / resources_append
+    set resources(list){
+        for(let child of this.resources) child.$setParent(null)
+        for(let child of list || []){
+            if(child && child.$setParent) child.$setParent(this)
+        }
+    }
     get data(){ return this.$children ? this.$children.slice() : [] }
+    // data_clear (the resources and the children), then data_append of each object
+    set data(list){
+        for(let child of this.data) child.$setParent(null)
+        for(let child of list || []){
+            if(child && child.$setParent) child.$setParent(this)
+        }
+    }
 
     get left(){ return this.$line(LEFT) }
     get right(){ return this.$line(RIGHT) }
@@ -362,6 +376,8 @@ defineType(Item, {
         SwipeDelegate: { group: null },     // set by Controls/SwipeDelegate.js
         ContextMenu: { group: null },       // set by Controls/ContextMenu.js
         Accessible: { group: null },        // set by Accessible.js
+        Screen: { group: null },            // set by Screen.js
+        layer: { group: null },             // set by Effects.js
         SwipeView: { group: null },         // set by Controls/Containers.js
         // QQuickItem::palette (Qt 6): made when it is read or set (Palette.js)
         palette: { group: require('./Palette').Palette },

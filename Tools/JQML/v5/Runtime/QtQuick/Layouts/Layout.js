@@ -141,6 +141,31 @@ function solve(cells, available){
     return sizes
 }
 
+// QGridLayoutRowData::calculateGeometries with snapToPixelGrid: the cells start at whole pixels (the difference goes to
+// the cell before), the last one ends at the size, each at least its minimum. { positions, sizes } of the cells
+function snapCells(sizes, spacing, target, minimums){
+    let n = sizes.length
+    let positions = [], out = sizes.slice()
+    let at = 0
+    for(let i = 0; i < n; i++){
+        positions.push(at)
+        at += sizes[i] + spacing
+    }
+    if(!n) return { positions, sizes: out }
+    for(let i = 0; i < n; i++){
+        let old = positions[i]
+        positions[i] = qround(old)
+        let delta = positions[i] - old
+        out[i] -= delta
+        if(i > 0) out[i - 1] += delta
+    }
+    out[n - 1] = target - positions[n - 1]
+    for(let i = 0; i < n; i++) out[i] = Math.max(minimums[i], qround(out[i]))
+    return { positions, sizes: out }
+}
+// qRound
+const qround = (d) => (d >= 0 ? Math.floor(d + 0.5) : Math.ceil(d - 0.5))
+
 // ---- base -------------------------------------------------------------------------------------
 
 class Layout extends Item {
@@ -235,4 +260,4 @@ for(let Class of [Layout]){
     })
 }
 
-module.exports = { LayoutAttached, hints, solve, Layout, align }
+module.exports = { LayoutAttached, hints, solve, snapCells, Layout, align }
