@@ -1142,7 +1142,105 @@ class SwipeView extends T.SwipeView {
 }
 defineType(SwipeView, {})
 
+// ---- TextField, TextArea ----
+// PlaceholderText (QQuickPlaceholderText): the placeholder of a text control, shown while it is empty
+function placeholder(c, wrap){
+    let text = make(Text, c, {
+        x: () => c.leftPadding,
+        y: () => c.topPadding,
+        width: () => c.width - (c.leftPadding + c.rightPadding),
+        height: () => c.height - (c.topPadding + c.bottomPadding),
+        text: () => c.placeholderText,
+        color: () => c.placeholderTextColor,
+        verticalAlignment: () => c.verticalAlignment,
+        visible: () => !c.length && !c.preeditText && (!c.activeFocus || c.horizontalAlignment !== 4),
+        elide: Text.ElideRight,
+    })
+    if(wrap) text.$bind(Text.WRAPMODE, () => c.wrapMode, null, text)
+    text.$delegateOf = c
+    c.font.$follow(text)
+    return text
+}
+function textColors(c){
+    c.$bind(T.TextField.COLOR, () => c.palette.text, null, c)
+    c.$bind(T.TextField.SELECTIONCOLOR, () => c.palette.highlight, null, c)
+    c.$bind(T.TextField.SELECTEDTEXTCOLOR, () => c.palette.highlightedText, null, c)
+    c.$bind(T.TextField.PLACEHOLDERTEXTCOLOR, () => c.palette.placeholderText, null, c)
+}
+
+class TextField extends T.TextField {
+    constructor(parent = null){
+        super(parent)
+        let c = this
+        this.$styleSize = true
+        this.padding = 6
+        this.$bind(T.TextField.LEFTPADDING, () => c.padding + 4, null, this)
+        textColors(this)
+        this.verticalAlignment = 128
+        this.$placeholder = placeholder(this, false)
+        let p = this.$placeholder
+        this.$bind(Item.IMPLICITWIDTH, () => (c.implicitBackgroundWidth + c.leftInset + c.rightInset)
+            || Math.max(c.contentWidth, p.implicitWidth) + c.leftPadding + c.rightPadding, null, this)
+        this.$bind(Item.IMPLICITHEIGHT, () => Math.max(c.implicitBackgroundHeight + c.topInset + c.bottomInset,
+            c.contentHeight + c.topPadding + c.bottomPadding, p.implicitHeight + c.topPadding + c.bottomPadding), null, this)
+        engine.scheduleComponentComplete(this)
+    }
+    $componentComplete(){
+        super.$componentComplete()
+        if(this.$v[T.TextField.BACKGROUND]) return
+        let c = this
+        let background = make(Rectangle, null, {
+            implicitWidth: 200,
+            implicitHeight: 40,
+            color: () => c.palette.base,
+            'border.width': () => (c.activeFocus ? 2 : 1),
+            'border.color': () => (c.activeFocus ? c.palette.highlight : c.palette.mid),
+        })
+        if(!this.$defaults) this.$defaults = new Set()
+        this.$defaults.add(background)
+        this.$setBackground(background)
+    }
+}
+defineType(TextField, {})
+
+class TextArea extends T.TextArea {
+    constructor(parent = null){
+        super(parent)
+        let c = this
+        this.$styleSize = true
+        this.padding = 6
+        this.$bind(T.TextArea.LEFTPADDING, () => c.padding + 4, null, this)
+        c.$bind(T.TextArea.COLOR, () => c.palette.text, null, c)
+        c.$bind(T.TextArea.SELECTIONCOLOR, () => c.palette.highlight, null, c)
+        c.$bind(T.TextArea.SELECTEDTEXTCOLOR, () => c.palette.highlightedText, null, c)
+        c.$bind(T.TextArea.PLACEHOLDERTEXTCOLOR, () => c.palette.placeholderText, null, c)
+        this.$placeholder = placeholder(this, true)
+        let p = this.$placeholder
+        this.$bind(Item.IMPLICITWIDTH, () => Math.max(c.contentWidth + c.leftPadding + c.rightPadding, c.implicitBackgroundWidth + c.leftInset + c.rightInset,
+            p.implicitWidth + c.leftPadding + c.rightPadding), null, this)
+        this.$bind(Item.IMPLICITHEIGHT, () => Math.max(c.contentHeight + c.topPadding + c.bottomPadding, c.implicitBackgroundHeight + c.topInset + c.bottomInset,
+            p.implicitHeight + c.topPadding + c.bottomPadding), null, this)
+        engine.scheduleComponentComplete(this)
+    }
+    $componentComplete(){
+        super.$componentComplete()
+        if(this.$v[T.TextArea.BACKGROUND]) return
+        let c = this
+        let background = make(Rectangle, null, {
+            visible: false,
+            color: 'transparent',
+            'border.width': () => (c.activeFocus ? 2 : 1),
+            'border.color': () => (c.activeFocus ? c.palette.highlight : c.enabled ? c.palette.mid : c.palette.midlight),
+        })
+        if(!this.$defaults) this.$defaults = new Set()
+        this.$defaults.add(background)
+        this.$setBackground(background)
+    }
+}
+defineType(TextArea, {})
+
 module.exports = {
+    TextField, TextArea,
     Pane, Frame, GroupBox, Page, ToolBar, ToolSeparator, MenuSeparator, Container, TabBar, SwipeView,
     Slider, RangeSlider, ProgressBar, BusyIndicator, Dial, PageIndicator, SpinBox, ProgressBarImpl, BusyIndicatorImpl, DialImpl,
     ScrollBar, ScrollIndicator,

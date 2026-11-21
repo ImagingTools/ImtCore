@@ -156,6 +156,8 @@ function press(x, y, button, buttons, modifiers, doubleClick, native = null){
                 }
             } else if(item.$acceptsMouse){
                 scene.grabber = item
+                // QQuickTextInput::mousePressEvent: activeFocusOnPress gives the field the focus (Qt::MouseFocusReason)
+                if(item.$pressFocus && button === LeftButton) item.$pressFocus()
                 break
             }
         }

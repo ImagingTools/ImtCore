@@ -324,6 +324,55 @@ class TextField extends Item {
         return true
     }
 
+    // the focus of a press (QQuickTextInput::mousePressEvent: activeFocusOnPress)
+    $pressFocus(){
+        if(this.$v[this.constructor.ACTIVEFOCUSONPRESS] && !this.$v[Item.ACTIVEFOCUS]) this.forceActiveFocus(require('./KeyDelivery').MouseFocusReason)
+    }
+
+    // QQuickTextInput::keyPressEvent where there is no native control to edit (a page without a document: the tests in
+    // node): the characters typed replace the selection, Backspace / Delete, the arrows, Home / End, Return accepts
+    $editWithoutNative(event, kind){
+        if(this.$input || kind !== 'pressed') return 0
+        let C = this.constructor
+        let K = require('../Qt/enums')
+        let content = this.$content()
+        let cursor = this.$v[C.CURSORPOSITION]
+        let start = this.$v[C.SELECTIONSTART], end = this.$v[C.SELECTIONEND]
+        let readOnly = this.$v[C.READONLY]
+        let text = event.text || ''
+        let ctrl = event.modifiers & (K.ControlModifier | K.MetaModifier)
+        if((event.key === K.Key_Return || event.key === K.Key_Enter) && this.$multiline()){
+            if(readOnly) return 0
+            if(start !== end) this.remove(start, end)
+            this.insert(this.$v[C.CURSORPOSITION], '\n')
+            return 1
+        }
+        if(event.key === K.Key_Backspace || event.key === K.Key_Delete){
+            if(readOnly) return 1
+            if(start !== end) this.remove(start, end)
+            else if(event.key === K.Key_Backspace && cursor > 0) this.remove(cursor - 1, cursor)
+            else if(event.key === K.Key_Delete && cursor < content.length) this.remove(cursor, cursor + 1)
+            return 1
+        }
+        if(event.key === K.Key_Left || event.key === K.Key_Right || event.key === K.Key_Home || event.key === K.Key_End){
+            let to = event.key === K.Key_Home ? 0 : event.key === K.Key_End ? content.length : cursor + (event.key === K.Key_Left ? -1 : 1)
+            to = Math.max(0, Math.min(content.length, to))
+            if(event.modifiers & K.ShiftModifier) this.moveCursorSelection(to)
+            else {
+                this.deselect()
+                this.cursorPosition = to
+            }
+            return 1
+        }
+        if(text && !ctrl && text >= ' ' && text !== '\x7f' && !readOnly){
+            if(start !== end) this.remove(start, end)
+            this.insert(this.$v[C.CURSORPOSITION], text)
+            engine.emit(this, C.SIGNAL_textEdited)
+            return 1
+        }
+        return 0
+    }
+
     constructor(parent = null, multiline = false){
         super(parent)
         this.$input = null
@@ -1042,6 +1091,9 @@ class TextField extends Item {
     // emits accepted and goes on to the parents like the keys a single line field does not use; Undo and Redo
     // are the field's
     $keyEvent(event, kind){
+        // without a native control the key edits here
+        let edited = this.$editWithoutNative(event, kind)
+        if(edited) return edited
         if(kind !== 'pressed') return 0
         let key = event.key
         let multiline = this.$input ? this.$input.tagName === 'TEXTAREA' : this.$multiline()
