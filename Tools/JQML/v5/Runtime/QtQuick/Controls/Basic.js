@@ -1617,7 +1617,47 @@ class Drawer extends T.Drawer {
 }
 defineType(Drawer, {})
 
+// ---- ScrollView: its bars at its right and bottom, following its Flickable ----
+class ScrollView extends T.ScrollView {
+    constructor(parent = null){
+        super(parent)
+        implicitSize(this)
+    }
+    $makeStyle(){
+        let c = this
+        let attached = this.ScrollBar
+        if(!attached.vertical){
+            let bar = new ScrollBar(this)
+            apply(bar, { x: () => (c.mirrored ? 0 : c.width - bar.width), y: () => c.topPadding, height: () => c.availableHeight })
+            attached.vertical = bar
+        }
+        if(!attached.horizontal){
+            let bar = new ScrollBar(this)
+            apply(bar, { x: () => c.leftPadding, y: () => c.height - bar.height, width: () => c.availableWidth })
+            attached.horizontal = bar
+        }
+        // active: the other bar's active too (control.ScrollBar.horizontal.active)
+        let v = attached.vertical, h = attached.horizontal
+        watch(this, () => [v.active, h.active], () => {
+            let active = v.$attachedActive || v.$hoverActive || v.pressed || h.$attachedActive || h.$hoverActive || h.pressed
+            v.$plain(T.ScrollBar.ACTIVE, active)
+            h.$plain(T.ScrollBar.ACTIVE, active)
+        })
+        for(let bar of [v, h]){
+            engine.connect(bar, Item.SIGNAL_widthChanged, () => this.$updateBarSizes(), null, engine.PRIORITY_NORMAL, this)
+            engine.connect(bar, Item.SIGNAL_heightChanged, () => this.$updateBarSizes(), null, engine.PRIORITY_NORMAL, this)
+            engine.connect(bar, Item.SIGNAL_visibleChanged, () => this.$updateBarSizes(), null, engine.PRIORITY_NORMAL, this)
+            engine.connect(bar, T.ScrollBar.SIGNAL_sizeChanged, () => this.$updateBarSizes(), null, engine.PRIORITY_NORMAL, this)
+            engine.connect(bar, T.ScrollBar.SIGNAL_policyChanged, () => this.$updateBarSizes(), null, engine.PRIORITY_NORMAL, this)
+        }
+        if(this.$flickable) this.$moveBarsTo(this.$flickable)
+        this.$updateBarSizes()
+    }
+}
+defineType(ScrollView, {})
+
 module.exports = {
+    ScrollView,
     Action: T.Action, ActionGroup: T.ActionGroup, ButtonGroup: T.ButtonGroup,
     ToolTip, DialogButtonBox, Dialog, Menu, MenuItem, Drawer,
     ComboBox,

@@ -269,24 +269,42 @@ class BarsAttached extends GroupObject {
         super(owner)
         this.$installed = false
     }
-    $view(){ return isView(this.$owner) ? this.$owner : null }
+    // the view the bars follow: the item they are attached to, or the Flickable of a ScrollView
+    $view(){
+        let owner = this.$owner
+        if(isView(owner)) return owner
+        return owner && owner.$flickable && isView(owner.$flickable) ? owner.$flickable : null
+    }
     // QQuickScrollBarAttached::setVertical / setHorizontal
     $setBar(id, bar){
         let old = this.$v[id]
         if(old === bar) return
-        let view = this.$view()
         if(old && !(old.$f & engine.DESTROYED)){
             old.$attached = null
             if(old.$layoutLink) for(let link of old.$layoutLink) engine.unsubscribe(link)
             old.$layoutLink = null
         }
         super.$write(id, bar || null)
-        if(!bar || !view) return
+        if(!bar) return
         let horizontal = id === this.constructor.HORIZONTAL
         bar.$attached = this
         bar.$attachedAxis = horizontal ? 'x' : 'y'
+        bar.orientation = horizontal ? 1 : 2
+        let view = this.$view()
+        if(view) this.$connectBar(bar, view)
+    }
+    // the view of a ScrollView is made (or changes): the bars follow it
+    $retarget(view){
+        for(let id of [this.constructor.HORIZONTAL, this.constructor.VERTICAL]){
+            let bar = this.$v[id]
+            if(!bar || bar.$f & engine.DESTROYED) continue
+            if(bar.$layoutLink) for(let link of bar.$layoutLink) engine.unsubscribe(link)
+            bar.$layoutLink = null
+            this.$connectBar(bar, view)
+        }
+    }
+    $connectBar(bar, view){
         if(!bar.$parent || !bar.$parent.$isItem) bar.$setParent(view)
-        bar.orientation = horizontal ? Horizontal : Vertical
         let layout = () => this.$layout(bar)
         bar.$layoutLink = [
             engine.connect(view, Item.SIGNAL_widthChanged, layout, null, engine.PRIORITY_NORMAL, bar),

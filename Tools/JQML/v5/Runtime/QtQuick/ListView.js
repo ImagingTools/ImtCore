@@ -1581,8 +1581,9 @@ defineType(ListView, {
         cacheBuffer: { kind: 'real', initial: 320, effect: refill },
         contentX: { kind: 'real', effect: scrolled, set(value){ externalMove(this, 'x'); this.$assign(ListView.CONTENTX, value) } },
         contentY: { kind: 'real', effect: scrolled, set(value){ externalMove(this, 'y'); this.$assign(ListView.CONTENTY, value) } },
-        contentWidth: 'real',
-        contentHeight: 'real',
+        // -1 across the flow, as a Flickable's (QQuickItemView sets the size along it)
+        contentWidth: { kind: 'real', initial: -1 },
+        contentHeight: { kind: 'real', initial: -1 },
         keyNavigationEnabled: { kind: 'bool', initial: true },
         keyNavigationWraps: 'bool',
         highlightFollowsCurrentItem: { kind: 'bool', initial: true },
