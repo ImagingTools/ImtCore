@@ -360,11 +360,13 @@ defineType(Item, {
             kind: 'var',
             readonly: true,
             get(){
-                engine.track(this, Item.SIGNAL_childrenRectChanged)
+                // made and computed before the reading binding depends on it: its first change is emitted to the
+                // others (QQuickContents::complete -> updateRect), not to that binding
                 if(!this.$contents){
                     this.$contents = { x: 0, y: 0, w: 0, h: 0 }
                     this.$calcContents(null)
                 }
+                engine.track(this, Item.SIGNAL_childrenRectChanged)
                 let c = this.$contents
                 return new (require('../Core/ValueTypes').QRectF)(c.x, c.y, c.w, c.h)
             },
