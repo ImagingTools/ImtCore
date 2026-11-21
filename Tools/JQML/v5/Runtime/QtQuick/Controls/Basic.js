@@ -963,7 +963,187 @@ class SpinBox extends T.SpinBox {
 }
 defineType(SpinBox, {})
 
+// ---- Pane, Frame, GroupBox, Page, ToolBar, ToolSeparator, MenuSeparator, Container, TabBar, SwipeView ----
+class Pane extends T.Pane {
+    constructor(parent = null){
+        super(parent)
+        implicitSize(this)
+        this.padding = 12
+    }
+    $makeStyle(){ this.$styleDelegate(T.Control.BACKGROUND, () => make(Rectangle, null, { color: () => this.palette.window }), -1) }
+}
+defineType(Pane, {})
+
+const frameBackground = (c) => make(Rectangle, null, { color: 'transparent', 'border.color': () => c.palette.mid })
+class Frame extends T.Frame {
+    constructor(parent = null){
+        super(parent)
+        implicitSize(this)
+        this.padding = 12
+    }
+    $makeStyle(){ this.$styleDelegate(T.Control.BACKGROUND, () => frameBackground(this), -1) }
+}
+defineType(Frame, {})
+
+class GroupBox extends T.GroupBox {
+    constructor(parent = null){
+        super(parent)
+        let c = this
+        this.$bind(Item.IMPLICITWIDTH, () => Math.max(c.implicitBackgroundWidth + c.leftInset + c.rightInset, c.implicitContentWidth + c.leftPadding + c.rightPadding,
+            c.implicitLabelWidth + c.leftPadding + c.rightPadding), null, this)
+        this.$bind(Item.IMPLICITHEIGHT, () => Math.max(c.implicitBackgroundHeight + c.topInset + c.bottomInset, c.implicitContentHeight + c.topPadding + c.bottomPadding), null, this)
+        this.spacing = 6
+        this.padding = 12
+        this.$bind(T.Control.TOPPADDING, () => c.padding + (c.implicitLabelWidth > 0 ? c.implicitLabelHeight + c.spacing : 0), null, this)
+    }
+    $makeStyle(){
+        let c = this
+        if(!this.$v[T.GroupBox.LABEL]){
+            let label = make(Text, null, {
+                x: () => c.leftPadding,
+                width: () => c.availableWidth,
+                text: () => c.title,
+                color: () => c.palette.windowText,
+                elide: Text.ElideRight,
+                verticalAlignment: Text.AlignVCenter,
+            })
+            c.font.$follow(label)
+            if(!this.$defaults) this.$defaults = new Set()
+            this.$defaults.add(label)
+            this.$setLabel(label)
+        }
+        let background = this.$styleDelegate(T.Control.BACKGROUND, () => frameBackground(c), -1)
+        if(background){
+            background.$ownSize = 3
+            background.$bind(Item.Y, () => c.topPadding - c.bottomPadding, null, background)
+            background.$bind(Item.WIDTH, () => c.width, null, background)
+            background.$bind(Item.HEIGHT, () => c.height - c.topPadding + c.bottomPadding, null, background)
+        }
+    }
+}
+defineType(GroupBox, {})
+
+class Page extends T.Page {
+    constructor(parent = null){
+        super(parent)
+        let c = this
+        this.$bind(Item.IMPLICITWIDTH, () => Math.max(c.implicitBackgroundWidth + c.leftInset + c.rightInset, c.implicitContentWidth + c.leftPadding + c.rightPadding,
+            c.implicitHeaderWidth, c.implicitFooterWidth), null, this)
+        this.$bind(Item.IMPLICITHEIGHT, () => Math.max(c.implicitBackgroundHeight + c.topInset + c.bottomInset, c.implicitContentHeight + c.topPadding + c.bottomPadding
+            + (c.implicitHeaderHeight > 0 ? c.implicitHeaderHeight + c.spacing : 0) + (c.implicitFooterHeight > 0 ? c.implicitFooterHeight + c.spacing : 0)), null, this)
+    }
+    $makeStyle(){ this.$styleDelegate(T.Control.BACKGROUND, () => make(Rectangle, null, { color: () => this.palette.window }), -1) }
+}
+defineType(Page, {})
+
+class ToolBar extends T.ToolBar {
+    constructor(parent = null){
+        super(parent)
+        implicitSize(this)
+        // topPadding: SafeArea.margins.top ... (no safe area on a page)
+        for(let id of [T.Control.TOPPADDING, T.Control.LEFTPADDING, T.Control.RIGHTPADDING, T.Control.BOTTOMPADDING]) this.$write(id, 0)
+    }
+    $makeStyle(){ this.$styleDelegate(T.Control.BACKGROUND, () => make(Rectangle, null, { implicitHeight: 40, color: () => this.palette.button }), -1) }
+}
+defineType(ToolBar, {})
+
+class ToolSeparator extends T.ToolSeparator {
+    constructor(parent = null){
+        super(parent)
+        implicitSize(this)
+        this.$bind(T.Control.PADDING, () => (this.vertical ? 6 : 2), null, this)
+        this.$bind(T.Control.VERTICALPADDING, () => (this.vertical ? 2 : 6), null, this)
+    }
+    $makeStyle(){
+        let c = this
+        this.$styleDelegate(T.Control.CONTENTITEM, () => make(Rectangle, null, {
+            implicitWidth: () => (c.vertical ? 1 : 30),
+            implicitHeight: () => (c.vertical ? 30 : 1),
+            color: () => c.palette.mid,
+        }))
+    }
+}
+defineType(ToolSeparator, {})
+
+class MenuSeparator extends T.MenuSeparator {
+    constructor(parent = null){
+        super(parent)
+        implicitSize(this)
+        this.padding = 2
+        this.$bind(T.Control.VERTICALPADDING, () => this.padding + 4, null, this)
+    }
+    $makeStyle(){
+        this.$styleDelegate(T.Control.CONTENTITEM, () => make(Rectangle, null, { implicitWidth: 188, implicitHeight: 1, color: () => this.palette.mid }))
+    }
+}
+defineType(MenuSeparator, {})
+
+class Container extends T.Container {
+    constructor(parent = null){
+        super(parent)
+        implicitSize(this)
+    }
+}
+defineType(Container, {})
+
+const { ListView } = require('../ListView')
+class TabBar extends T.TabBar {
+    constructor(parent = null){
+        super(parent)
+        implicitSize(this)
+        this.spacing = 1
+    }
+    $makeStyle(){
+        let c = this
+        this.$styleDelegate(T.Control.CONTENTITEM, () => {
+            let view = make(ListView, null, {
+                model: () => c.contentModel,
+                currentIndex: () => c.currentIndex,
+                spacing: () => c.spacing,
+                orientation: ListView.Horizontal,
+                boundsBehavior: 0,
+                flickableDirection: 0xc,
+                snapMode: ListView.SnapToItem,
+                highlightMoveDuration: 0,
+                highlightRangeMode: ListView.ApplyRange,
+                preferredHighlightBegin: 40,
+            })
+            view.$bind(ListView.PREFERREDHIGHLIGHTEND, () => view.width - 40, null, view)
+            return view
+        })
+        this.$styleDelegate(T.Control.BACKGROUND, () => make(Rectangle, null, { color: () => c.palette.window }), -1)
+    }
+}
+defineType(TabBar, {})
+
+class SwipeView extends T.SwipeView {
+    constructor(parent = null){
+        super(parent)
+        implicitSize(this)
+    }
+    $makeStyle(){
+        let c = this
+        this.$styleDelegate(T.Control.CONTENTITEM, () => make(ListView, null, {
+            model: () => c.contentModel,
+            interactive: () => c.interactive,
+            currentIndex: () => c.currentIndex,
+            focus: () => c.focus,
+            spacing: () => c.spacing,
+            orientation: () => c.orientation,
+            snapMode: ListView.SnapOneItem,
+            boundsBehavior: 0,
+            highlightRangeMode: ListView.StrictlyEnforceRange,
+            preferredHighlightBegin: 0,
+            preferredHighlightEnd: 0,
+            highlightMoveDuration: 250,
+            maximumFlickVelocity: () => 4 * (c.orientation === 1 ? c.width : c.height),
+        }))
+    }
+}
+defineType(SwipeView, {})
+
 module.exports = {
+    Pane, Frame, GroupBox, Page, ToolBar, ToolSeparator, MenuSeparator, Container, TabBar, SwipeView,
     Slider, RangeSlider, ProgressBar, BusyIndicator, Dial, PageIndicator, SpinBox, ProgressBarImpl, BusyIndicatorImpl, DialImpl,
     ScrollBar, ScrollIndicator,
     Control, Label, AbstractButton, Button, ToolButton, RoundButton, CheckBox, RadioButton, Switch, DelayButton, TabButton,

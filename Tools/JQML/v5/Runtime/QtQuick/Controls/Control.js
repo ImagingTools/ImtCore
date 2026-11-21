@@ -208,7 +208,6 @@ class Control extends Item {
         }
         engine.batch(() => {
             for(let name of PADDINGS) this.$plain(Control[name.toUpperCase()], values[name])
-            this.$updateBaseline()
             this.$updateAvailable()
             this.$resizeContent()
         })

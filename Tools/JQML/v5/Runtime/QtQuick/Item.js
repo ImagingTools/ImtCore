@@ -114,6 +114,8 @@ class Item extends QtObject {
         if(parent instanceof Item){
             parent.$paintOrder = null
             engine.emit(parent, Item.SIGNAL_childrenChanged)
+            // a parent that takes its children elsewhere (Pane: its contentItem, Container: its contentModel)
+            if(parent.$childAdded) parent.$childAdded(this)
         }
         if(old && old.$childGeometryChanged) old.$childGeometryChanged(this)
         if(parent && parent.$childGeometryChanged) parent.$childGeometryChanged(this)

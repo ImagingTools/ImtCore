@@ -438,7 +438,7 @@ class ListView extends Item {
     // QQuickItemViewPrivate::positionViewAtIndex: an index not built goes to its estimated position, where the view
     // starts again (changedVisibleIndex) and fills; then the mode places its item, within the extents
     $positionViewAt(index, mode){
-        if(!(this.$f & engine.COMPLETED) || !this.$v[ListView.DELEGATE]) return
+        if(!(this.$f & engine.COMPLETED) || !this.$hasItems()) return
         this.$moveReason = MOVE_OTHER
         let count = this.$v[ListView.COUNT]
         if(count <= 0 || mode < ListView.Beginning || mode > ListView.SnapPosition) return
@@ -494,7 +494,12 @@ class ListView extends Item {
         }
     }
 
-    forceLayout(){ this.$fill() }
+    // QQuickItemView::forceLayout: layout() now (the visible items one after the other, refill), not at the next polish
+    forceLayout(){
+        if(!(this.$f & engine.COMPLETED)) return
+        this.$forceLayout = true
+        this.$polish()
+    }
 
     $frame(){ this.$fill() }
 
@@ -871,9 +876,9 @@ class ListView extends Item {
     $sync(){
         let model = this.$v[ListView.MODEL]
         if(model !== this.$model){
-            if(this.$model instanceof ListModel) this.$model.$removeView(this)
+            if(this.$model && this.$model.$removeView) this.$model.$removeView(this)
             this.$model = model
-            if(model instanceof ListModel) model.$addView(this)
+            if(model && model.$addView) model.$addView(this)
         }
         // QQuickItemViewPrivate::clear releases NotReusable
         for(let index of Array.from(this.$entries.keys())) this.$release(index, false)
@@ -910,7 +915,7 @@ class ListView extends Item {
     // is its size
     $ensureCurrentItem(){
         let index = this.$v[ListView.CURRENTINDEX]
-        if(index < 0 || this.$entries.has(index) || !this.$v[ListView.DELEGATE] || !(this.$f & engine.COMPLETED)) return this.$updateCurrentItem()
+        if(index < 0 || this.$entries.has(index) || !this.$hasItems() || !(this.$f & engine.COMPLETED)) return this.$updateCurrentItem()
         let rows = modelRows(this.$model)
         if(index >= rows.count) return this.$updateCurrentItem()
         let entry = this.$create(index, rows)
@@ -946,6 +951,18 @@ class ListView extends Item {
             if(this.$currentAttached === entry.item && index !== this.$v[ListView.CURRENTINDEX]) this.$currentAttached = null
             let attached = entry.item.$v[Item.LISTVIEW]
             if(attached) engine.emitArgs(attached, ListViewAttached.SIGNAL_reused, [])
+        } else if(rows.object){
+            // an ObjectModel: its item itself (QQmlObjectModel::object), shown in the view and kept when it is released
+            let item = rows.object(index)
+            if(!item) return null
+            let ctx = new ModelContext(null, index, item)
+            ctx.$view = this
+            if(item.$parent !== this.$content) item.$setParent(this.$content)
+            item.$culled = false
+            engine.markDirty(item, VISIBILITY)
+            attachedOf(item).$write(ListViewAttached.VIEW, this)
+            entry = { item, ctx, section: null, index, pos: 0, object: true }
+            this.$entries.set(index, entry)
         } else {
             let delegate = this.$v[ListView.DELEGATE]
             let ctx = new ModelContext(rows.row(index), index, rows.data(index))
@@ -972,6 +989,12 @@ class ListView extends Item {
             entry.section.$releaseLater()
             entry.section = null
         }
+        // an item of an ObjectModel is the model's: hidden, not deleted (QQmlObjectModel::release)
+        if(entry.object){
+            entry.item.$culled = true
+            engine.markDirty(entry.item, VISIBILITY)
+            return
+        }
         if(reusable && this.$v[ListView.REUSEITEMS]){
             this.$pool.push(entry)
             entry.item.$culled = true
@@ -982,6 +1005,9 @@ class ListView extends Item {
         }
         entry.item.$releaseLater()
     }
+
+    // items to show: a delegate, or the items of an ObjectModel
+    $hasItems(){ return !!this.$v[ListView.DELEGATE] || !!(this.$model && this.$model.$isObjectModel) }
 
     // a visible entry the view lets go of; the current item stays (the view holds it as currentItem)
     $releaseEntry(entry){
@@ -1009,7 +1035,7 @@ class ListView extends Item {
     // A null-size view without entries does not fill at all
     $fill(withBuffer = false){
         if(this.$filling || !(this.$f & engine.COMPLETED)) return
-        if(!this.$v[ListView.DELEGATE]){
+        if(!this.$hasItems()){
             this.$placeHeaderFooter()
             return
         }
@@ -1513,7 +1539,7 @@ class ListView extends Item {
     }
 
     $disposeNative(){
-        if(this.$model instanceof ListModel) this.$model.$removeView(this)
+        if(this.$model && this.$model.$removeView) this.$model.$removeView(this)
         if(this.$bufferTimer) clearTimeout(this.$bufferTimer)
         this.$stopHighlightAnimations()
         super.$disposeNative()

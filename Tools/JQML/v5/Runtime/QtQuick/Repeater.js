@@ -22,9 +22,9 @@ class Repeater extends Item {
     $sync(){
         let model = this.$v[Repeater.MODEL]
         if(model !== this.$model){
-            if(this.$model instanceof ListModel) this.$model.$removeView(this)
+            if(this.$model && this.$model.$removeView) this.$model.$removeView(this)
             this.$model = model
-            if(model instanceof ListModel) model.$addView(this)
+            if(model && model.$addView) model.$addView(this)
         }
         this.$rebuild()
     }
@@ -33,7 +33,8 @@ class Repeater extends Item {
         for(let i = this.$items.length - 1; i >= 0; i--){
             let item = this.$items[i]
             engine.emitArgs(this, Repeater.SIGNAL_itemRemoved, [i, item])
-            item.$releaseLater()
+            // an item of an ObjectModel stays the model's (QQmlObjectModel::release)
+            if(!this.$objectItems) item.$releaseLater()
         }
         this.$items = []
         this.$contexts = []
@@ -43,7 +44,8 @@ class Repeater extends Item {
         this.$clear()
         let delegate = this.$v[Repeater.DELEGATE]
         let parent = this.$parent
-        if(!delegate || !parent || this.$f & engine.DESTROYED){
+        this.$objectItems = !!(this.$model && this.$model.$isObjectModel)
+        if((!delegate && !this.$objectItems) || !parent || this.$f & engine.DESTROYED){
             this.$write(Repeater.COUNT, 0)
             return
         }
@@ -57,7 +59,9 @@ class Repeater extends Item {
         let delegate = this.$v[Repeater.DELEGATE]
         let ctx = new ModelContext(rows.row(index), index, rows.data(index))
         ctx.$view = this
-        let item = delegate.createObject(this.$parent, null, ctx)
+        // an ObjectModel: its item itself, put in the parent of the Repeater
+        let item = rows.object ? rows.object(index) : delegate.createObject(this.$parent, null, ctx)
+        if(item && rows.object && item.$parent !== this.$parent) item.$setParent(this.$parent)
         if(!item) return null
         this.$placeAfter(item, index)
         this.$items.splice(index, 0, item)
@@ -85,7 +89,7 @@ class Repeater extends Item {
     }
 
     $modelChanged(kind, index, count, roles = null, to = -1){
-        if(!this.$v[Repeater.DELEGATE]) return
+        if(!this.$v[Repeater.DELEGATE] && !this.$objectItems) return
         let rows = modelRows(this.$model)
         // QQuickRepeater::modelUpdated: the items of moved rows are the same, in their new place among the parent's
         // children; no itemRemoved, no itemAdded
@@ -105,7 +109,7 @@ class Repeater extends Item {
             this.$write(Repeater.COUNT, this.$items.length)
             for(let i = 0; i < removed.length; i++){
                 engine.emitArgs(this, Repeater.SIGNAL_itemRemoved, [index + i, removed[i]])
-                removed[i].$releaseLater()
+                if(!this.$objectItems) removed[i].$releaseLater()
             }
         } else if(kind === 'change'){
             for(let i = index; i < index + count; i++){
@@ -136,7 +140,7 @@ class Repeater extends Item {
     }
 
     $disposeNative(){
-        if(this.$model instanceof ListModel) this.$model.$removeView(this)
+        if(this.$model && this.$model.$removeView) this.$model.$removeView(this)
         super.$disposeNative()
     }
 }

@@ -3,7 +3,7 @@
 // QML type that has no instances (abstract, attached, an enum holder).
 
 const QML = ['QtObject', 'Component', 'Timer', 'Connections', 'Binding']
-const MODELS = ['ListModel', 'ListElement', 'Instantiator', 'ItemSelectionModel', 'DelegateChooser', 'DelegateChoice', 'DelegateModel']
+const MODELS = ['ListModel', 'ListElement', 'Instantiator', 'ItemSelectionModel', 'DelegateChooser', 'DelegateChoice', 'DelegateModel', 'ObjectModel']
 const LABS_MODELS = ['TableModel', 'TableModelColumn', 'TreeModel', 'DelegateChooser', 'DelegateChoice']
 const QUICK = [
     'Item', 'FocusScope', 'Rectangle', 'Gradient', 'GradientStop', 'Text', 'TextInput', 'TextEdit', 'Image', 'Canvas',
@@ -21,7 +21,7 @@ const TABLE_CONTROLS = ['HorizontalHeaderView', 'VerticalHeaderView', 'TableView
 // the style's types (JQ.types.<Name>) and those of Templates (JQ.types['T.<Name>']); tests/unit/Controls.test.js checks
 // that the runtime has each of them
 const BASIC_CONTROLS = ['Control', 'Label', 'AbstractButton', 'Button', 'ToolButton', 'RoundButton', 'CheckBox', 'RadioButton', 'Switch',
-    'DelayButton', 'TabButton', 'ItemDelegate', 'CheckDelegate', 'RadioDelegate', 'SwitchDelegate', 'ScrollBar', 'ScrollIndicator', 'Slider', 'RangeSlider', 'ProgressBar', 'BusyIndicator', 'Dial', 'PageIndicator', 'SpinBox']
+    'DelayButton', 'TabButton', 'ItemDelegate', 'CheckDelegate', 'RadioDelegate', 'SwitchDelegate', 'ScrollBar', 'ScrollIndicator', 'Slider', 'RangeSlider', 'ProgressBar', 'BusyIndicator', 'Dial', 'PageIndicator', 'SpinBox', 'Pane', 'Frame', 'GroupBox', 'Page', 'ToolBar', 'ToolSeparator', 'MenuSeparator', 'Container', 'TabBar', 'SwipeView']
 const CONTROLS = [...TABLE_CONTROLS, ...BASIC_CONTROLS]
 const TEMPLATES = ['HeaderViewDelegate', ...BASIC_CONTROLS]
 const LAYOUTS = ['RowLayout', 'ColumnLayout', 'GridLayout', 'StackLayout', 'LayoutItemProxy']
@@ -52,7 +52,7 @@ const MODULES = {
 // (QQmlImports): the ones Qt added to QtQuick, QtQml.Models and Qt.labs.qmlmodels for tables, and the controls, whose
 // names a project of its own may use for a type (imtcontrols has a SortFilterProxyModel, a Button). The older types stay
 // visible without an import, as v5 always had them.
-const IMPORTED_TYPES = new Set(['ItemSelectionModel', 'TableView', 'TreeView', ...LABS_MODELS, ...CONTROLS, ...TEMPLATES])
+const IMPORTED_TYPES = new Set(['ItemSelectionModel', 'ObjectModel', 'TableView', 'TreeView', ...LABS_MODELS, ...CONTROLS, ...TEMPLATES])
 
 // { types: Set, uncreatable: Set, transitive: [module names], key(name): its name in JQ.types } of a Qt module, or null
 function qtModule(name){
