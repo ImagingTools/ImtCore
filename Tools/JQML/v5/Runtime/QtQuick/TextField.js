@@ -661,8 +661,7 @@ class TextField extends Item {
             this.$editing = true
             try {
                 if(this.$mask) this.$maskText = content
-                let binding = this.$takeBinding(C.TEXT)
-                if(binding) engine.disposeBinding(binding)
+                // an edit is no write of the property: a binding of text stays (QQuickTextInputPrivate::internalChange)
                 this.$write(C.TEXT, text)
                 if(text === oldText) this.$textChanged()
                 this.$applySelection(anchor, cursor, true)
@@ -790,8 +789,7 @@ class TextField extends Item {
         this.$syncing = true
         this.$editing = true
         try {
-            let binding = this.$takeBinding(C.TEXT)
-            if(binding) engine.disposeBinding(binding)
+            // a binding of text stays (checked)
             this.$write(C.TEXT, input.value)
             this.$syncSelection()
         } finally {

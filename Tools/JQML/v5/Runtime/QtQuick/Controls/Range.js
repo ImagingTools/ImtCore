@@ -645,6 +645,8 @@ class SpinBox extends Control {
         let text = typeof fn === 'function' ? fn.call(this, this.$v[SpinBox.VALUE], this.$locale()) : defaultTextFromValue(this.$v[SpinBox.VALUE], this.$locale())
         this.$plain(SpinBox.DISPLAYTEXT, String(text))
     }
+    // the value as the spin box holds it (an int; DoubleSpinBox: rounded to its decimals)
+    $round(value){ return Math.round(Number(value)) }
     // QQuickSpinBoxPrivate::boundValue: from..to, or wrapped
     $bound(value, wrap){
         let from = this.$v[SpinBox.FROM], to = this.$v[SpinBox.TO]
@@ -656,17 +658,24 @@ class SpinBox extends Control {
         }
         return clamp(value, lo, hi)
     }
-    $setValue(value, modified, wrap = false){
-        value = this.$bound(Math.round(Number(value)), wrap)
+    // QQuickSpinBoxPrivate::setValue: bound to from..to once complete; a step is not rounded (DoubleSpinBox)
+    $setValue(value, modified, wrap = false, step = false){
+        value = step ? Number(value) : this.$round(value)
+        if(this.$f & engine.COMPLETED) value = this.$bound(value, wrap)
         let changed = this.$v[SpinBox.VALUE] !== value
         this.$plain(SpinBox.VALUE, value)
         this.$updateDisplayText()
         if(changed && modified) engine.emit(this, SpinBox.SIGNAL_valueModified)
         return changed
     }
-    increase(){ engine.batch(() => this.$setValue(this.$v[SpinBox.VALUE] + this.$v[SpinBox.STEPSIZE], false, this.$v[SpinBox.WRAP])) }
-    decrease(){ engine.batch(() => this.$setValue(this.$v[SpinBox.VALUE] - this.$v[SpinBox.STEPSIZE], false, this.$v[SpinBox.WRAP])) }
-    $step(sign){ this.$setValue(this.$v[SpinBox.VALUE] + sign * this.$v[SpinBox.STEPSIZE], true, this.$v[SpinBox.WRAP]) }
+    increase(){ engine.batch(() => this.$setValue(this.$v[SpinBox.VALUE] + this.$v[SpinBox.STEPSIZE], false, this.$v[SpinBox.WRAP], true)) }
+    decrease(){ engine.batch(() => this.$setValue(this.$v[SpinBox.VALUE] - this.$v[SpinBox.STEPSIZE], false, this.$v[SpinBox.WRAP], true)) }
+    $step(sign){ this.$setValue(this.$v[SpinBox.VALUE] + sign * this.$v[SpinBox.STEPSIZE], true, this.$v[SpinBox.WRAP], true) }
+    // QQuickSpinBox::componentComplete: the value bound to from..to
+    $componentComplete(){
+        super.$componentComplete()
+        this.$setValue(this.$v[SpinBox.VALUE], false, false, true)
+    }
     $buttonAt(x, y){
         for(let [id, sign] of [[SpinBox.UP, 1], [SpinBox.DOWN, -1]]){
             let button = this.$v[id]
@@ -750,10 +759,66 @@ defineType(SpinBox, {
     signals: ['valueModified'],
 })
 SpinBox.$setters = withSetters(Control, [
-    [SpinBox.FROM, (c, v) => { c.$plain(SpinBox.FROM, Math.round(v)); c.$setValue(c.$v[SpinBox.VALUE], false) }],
-    [SpinBox.TO, (c, v) => { c.$plain(SpinBox.TO, Math.round(v)); c.$setValue(c.$v[SpinBox.VALUE], false) }],
+    [SpinBox.FROM, (c, v) => { c.$plain(SpinBox.FROM, c.$round(v)); c.$setValue(c.$v[SpinBox.VALUE], false) }],
+    [SpinBox.TO, (c, v) => { c.$plain(SpinBox.TO, c.$round(v)); c.$setValue(c.$v[SpinBox.VALUE], false) }],
     [SpinBox.VALUE, (c, v) => c.$setValue(v, false)],
     [SpinBox.TEXTFROMVALUE, (c, v) => { c.$plain(SpinBox.TEXTFROMVALUE, v); c.$updateDisplayText() }],
 ])
 
-module.exports = { Slider, RangeSlider, RangeSliderNode, Dial, ProgressBar, BusyIndicator, PageIndicator, SpinBox, IndicatorButton }
+// ---- DoubleSpinBox (QQuickDoubleSpinBox, Qt 6.11): a SpinBox of reals, 0 - 99.99 by 1, rounded to decimals (2);
+// textFromValue(value, decimals, locale): the number with decimals in the locale ('f'), valueFromText(text, locale) ----
+function doubleTextFromValue(value, decimals, locale){
+    let n = Number(value)
+    let text = Math.abs(n).toFixed(Math.max(0, decimals))
+    let [whole, fraction] = text.split('.')
+    let group = locale && locale.groupSeparator !== undefined ? locale.groupSeparator : ','
+    let point = locale && locale.decimalPoint !== undefined ? locale.decimalPoint : '.'
+    whole = whole.replace(/\B(?=(\d{3})+(?!\d))/g, group)
+    return (n < 0 && Number(text) !== 0 ? (locale && locale.negativeSign || '-') : '') + whole + (fraction !== undefined ? point + fraction : '')
+}
+function doubleValueFromText(text, locale){
+    let group = locale && locale.groupSeparator !== undefined ? locale.groupSeparator : ','
+    let point = locale && locale.decimalPoint !== undefined ? locale.decimalPoint : '.'
+    let n = Number(String(text).split(group).join('').split(point).join('.').replace(locale && locale.negativeSign || '-', '-'))
+    return Number.isFinite(n) ? n : 0
+}
+class DoubleSpinBox extends SpinBox {
+    constructor(parent = null){
+        super(parent)
+        this.$plain(DoubleSpinBox.DECIMALS, 2)
+        this.$plain(SpinBox.TO, 99.99)
+        this.$plain(SpinBox.TEXTFROMVALUE, doubleTextFromValue)
+        this.$plain(SpinBox.VALUEFROMTEXT, doubleValueFromText)
+        this.$plain(SpinBox.DISPLAYTEXT, '0.00')
+    }
+    // QQuickDoubleSpinBoxPrivate::round: QString::number(value, 'f', decimals)
+    $round(value){ return Number(Number(value).toFixed(this.$v[DoubleSpinBox.DECIMALS])) }
+    $updateDisplayText(){
+        let fn = this.$v[SpinBox.TEXTFROMVALUE]
+        let decimals = this.$v[DoubleSpinBox.DECIMALS]
+        let text = typeof fn === 'function' ? fn.call(this, this.$v[SpinBox.VALUE], decimals, this.$locale()) : doubleTextFromValue(this.$v[SpinBox.VALUE], decimals, this.$locale())
+        this.$plain(SpinBox.DISPLAYTEXT, String(text))
+    }
+}
+defineType(DoubleSpinBox, { props: { decimals: 'int' } })
+// from, to, value, stepSize are reals here
+{
+    const kinds = require('../../Core/values')
+    let type = DoubleSpinBox.$type
+    for(let name of ['from', 'to', 'value', 'stepSize']){
+        let prop = Object.assign({}, type.propByName.get(name), { kind: 'real', coerce: kinds.real.coerce })
+        type.props[prop.id] = prop
+        type.propByName.set(name, prop)
+    }
+}
+DoubleSpinBox.$setters = withSetters(SpinBox, [
+    // QQuickDoubleSpinBox::setDecimals: 0 - 323, from, to and value rounded again
+    [DoubleSpinBox.DECIMALS, (c, v) => {
+        c.$plain(DoubleSpinBox.DECIMALS, Math.max(0, Math.min(323, Math.round(v))))
+        c.$plain(SpinBox.FROM, c.$round(c.$v[SpinBox.FROM]))
+        c.$plain(SpinBox.TO, c.$round(c.$v[SpinBox.TO]))
+        c.$setValue(c.$v[SpinBox.VALUE], false)
+    }],
+])
+
+module.exports = { Slider, RangeSlider, RangeSliderNode, Dial, ProgressBar, BusyIndicator, PageIndicator, SpinBox, DoubleSpinBox, IndicatorButton }

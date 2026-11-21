@@ -166,9 +166,14 @@ function press(x, y, button, buttons, modifiers, doubleClick, native = null){
             scene.grabber.$mouseDoubleClick(p.x, p.y, button, buttons, modifiers)
         }
         scene.contextMenuGrabbed = !!(scene.grabber && button === RightButton && scene.grabber.$mousePress)
+        // QWindowPrivate::maybeSynthesizeContextMenuEvent: a right press no item takes is a context menu event
+        // (QQuickDeliveryAgentPrivate::deliverContextMenuEvent: ContextMenu of QtQuick.Controls)
+        if(button === RightButton && !scene.grabber && !reached && contextMenuHandler) contextMenuHandler(x, y, targetsAt(x, y, true).map(t => t.item))
     })
     return reached
 }
+let contextMenuHandler = null
+function setContextMenuHandler(fn){ contextMenuHandler = fn }
 
 function move(x, y, buttons, modifiers){
     engine.batch(() => {
@@ -546,4 +551,4 @@ Object.assign(Item.prototype, {
     }
 }
 
-module.exports = { setOverrideCursor, modifiersOf, NoButton, LeftButton, scenePos, contains, scene, targetsAt, press, move, release, leaveWindow, wheel, ungrab, pointerOver, deliverHover, isHovered }
+module.exports = { setContextMenuHandler, setOverrideCursor, modifiersOf, NoButton, LeftButton, scenePos, contains, scene, targetsAt, press, move, release, leaveWindow, wheel, ungrab, pointerOver, deliverHover, isHovered }

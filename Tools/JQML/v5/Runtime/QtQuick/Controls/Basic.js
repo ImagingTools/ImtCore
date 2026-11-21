@@ -23,8 +23,12 @@ const IMAGES = {
     'double-arrow': (color) => svg(40, 28, '<path d="M14.6 11.6L20 6.2L25.4 11.6M14.6 16.4L20 21.8L25.4 16.4" fill="none" stroke="' + color + '" stroke-width="2.2"/>'),
     // drop-indicator.png, 18 x 11
     'drop-indicator': (color) => svg(18, 11, '<path d="M1.8 1.8L9 9L16.2 1.8" fill="none" stroke="' + color + '" stroke-width="2.4"/>'),
+    // search-magnifier.png, 24 x 24 (SearchField)
+    'search-magnifier': (color) => svg(24, 24, '<circle cx="10.5" cy="10.5" r="6" fill="none" stroke="' + color + '" stroke-width="2"/><path d="M15 15L20.5 20.5" stroke="' + color + '" stroke-width="2.4" stroke-linecap="round"/>'),
+    // close_circle.png, 24 x 24 (SearchField)
+    close_circle: (color) => svg(24, 24, '<circle cx="12" cy="12" r="8.5" fill="none" stroke="' + color + '" stroke-width="2"/><path d="M8.8 8.8L15.2 15.2M15.2 8.8L8.8 15.2" stroke="' + color + '" stroke-width="2" stroke-linecap="round"/>'),
 }
-const SIZES = { check: [28, 28], 'double-arrow': [40, 28], 'drop-indicator': [18, 11] }
+const SIZES = { check: [28, 28], 'double-arrow': [40, 28], 'drop-indicator': [18, 11], 'search-magnifier': [24, 24], close_circle: [24, 24] }
 // ColorImage { source: ".../images/<name>.png"; defaultColor: "#353637"; color: <binding> }: the vector drawn in the color
 function styleImage(name, parent, color, props = {}){
     let image = make(ColorImage, parent, Object.assign({ width: SIZES[name][0], height: SIZES[name][1], defaultColor: '#353637', color }, props))
@@ -887,15 +891,18 @@ class PageIndicator extends T.PageIndicator {
 defineType(PageIndicator, {})
 
 // ---- SpinBox ----
+// the implicit size and the paddings of SpinBox and DoubleSpinBox (the indicators within the paddings)
+function spinBoxLayout(c){
+    c.$bind(Item.IMPLICITWIDTH, () => Math.max(c.implicitBackgroundWidth + c.leftInset + c.rightInset, (c.contentItem ? c.contentItem.implicitWidth : 0) + c.leftPadding + c.rightPadding), null, c)
+    c.$bind(Item.IMPLICITHEIGHT, () => Math.max(c.implicitBackgroundHeight + c.topInset + c.bottomInset, c.implicitContentHeight + c.topPadding + c.bottomPadding,
+        c.up.implicitIndicatorHeight, c.down.implicitIndicatorHeight), null, c)
+    c.$bind(T.Control.LEFTPADDING, () => c.padding + (c.mirrored ? (c.up.indicator ? c.up.indicator.width : 0) : (c.down.indicator ? c.down.indicator.width : 0)), null, c)
+    c.$bind(T.Control.RIGHTPADDING, () => c.padding + (c.mirrored ? (c.down.indicator ? c.down.indicator.width : 0) : (c.up.indicator ? c.up.indicator.width : 0)), null, c)
+}
 class SpinBox extends T.SpinBox {
     constructor(parent = null){
         super(parent)
-        let c = this
-        this.$bind(Item.IMPLICITWIDTH, () => Math.max(c.implicitBackgroundWidth + c.leftInset + c.rightInset, (c.contentItem ? c.contentItem.implicitWidth : 0) + c.leftPadding + c.rightPadding), null, this)
-        this.$bind(Item.IMPLICITHEIGHT, () => Math.max(c.implicitBackgroundHeight + c.topInset + c.bottomInset, c.implicitContentHeight + c.topPadding + c.bottomPadding,
-            c.up.implicitIndicatorHeight, c.down.implicitIndicatorHeight), null, this)
-        this.$bind(T.Control.LEFTPADDING, () => c.padding + (c.mirrored ? (c.up.indicator ? c.up.indicator.width : 0) : (c.down.indicator ? c.down.indicator.width : 0)), null, this)
-        this.$bind(T.Control.RIGHTPADDING, () => c.padding + (c.mirrored ? (c.down.indicator ? c.down.indicator.width : 0) : (c.up.indicator ? c.up.indicator.width : 0)), null, this)
+        spinBoxLayout(this)
     }
     $makeStyle(){
         let c = this
@@ -1865,7 +1872,180 @@ class Tumbler extends T.Tumbler {
 }
 defineType(Tumbler, {})
 
+// ---- SwipeDelegate ----
+class SwipeDelegate extends T.SwipeDelegate {
+    constructor(parent = null){
+        super(parent)
+        implicitSize(this, true)
+        this.padding = 12
+        this.spacing = 12
+        this.icon.width = 24
+        this.icon.height = 24
+    }
+    $makeStyle(){
+        let c = this
+        // swipe.transition: Transition { SmoothedAnimation { velocity: 3; easing.type: Easing.InOutCubic } }
+        if(!this.swipe.transition) this.swipe.transition = { $children: [{ velocity: 3 }] }
+        this.$styleDelegate(T.Control.CONTENTITEM, () => iconLabel(c, {
+            alignment: delegateAlignment(c),
+            defaultIconColor: () => c.palette.text,
+            color: () => c.palette.text,
+        }))
+        this.$styleDelegate(T.Control.BACKGROUND, () => make(Rectangle, null, {
+            implicitWidth: 100,
+            implicitHeight: 40,
+            color: () => blend(c.down ? c.palette.midlight : c.palette.light, c.palette.highlight, c.visualFocus ? 0.15 : 0.0),
+            'border.width': 0,
+            'border.color': () => (c.down || c.highlighted || c.visualFocus ? c.palette.highlightedText : c.palette.text),
+        }), -1)
+    }
+}
+defineType(SwipeDelegate, {})
+
+// ---- DoubleSpinBox: the SpinBox of the style, validator: DoubleValidator { locale, bottom, top, decimals } ----
+class DoubleSpinBox extends T.DoubleSpinBox {
+    constructor(parent = null){
+        super(parent)
+        spinBoxLayout(this)
+    }
+    $makeStyle(){
+        let c = this
+        if(!this.$v[T.SpinBox.VALIDATOR]){
+            let validator = make(require('../DoubleValidator').DoubleValidator, this, {
+                bottom: () => Math.min(c.from, c.to),
+                top: () => Math.max(c.from, c.to),
+                decimals: () => c.decimals,
+            })
+            this.$plain(T.SpinBox.VALIDATOR, validator)
+        }
+        SpinBox.prototype.$makeStyle.call(this)
+    }
+}
+defineType(DoubleSpinBox, {})
+
+// ---- SearchField ----
+// delegate: ItemDelegate { width: ListView.view.width; highlighted; hoverEnabled; contentItem: Text { model[textRole] } }
+function searchDelegate(c){
+    return new (require('../../QtQml/Component').Component)(null, (parent, ctx) => {
+        let d = new ItemDelegate(parent)
+        let index = () => ctx.index
+        apply(d, {
+            width: () => (ctx.$view ? ctx.$view.width : 0),
+            highlighted: () => c.highlightedIndex === index(),
+            hoverEnabled: () => c.hoverEnabled,
+        })
+        let text = make(Text, null, {
+            text: () => c.textAt(index()),
+            'font.weight': () => (c.currentIndex === index() ? 600 : 400),
+            color: () => (d.highlighted ? d.palette.highlightedText : d.palette.windowText),
+            elide: Text.ElideRight,
+            verticalAlignment: Text.AlignVCenter,
+        })
+        d.contentItem = text
+        return d
+    })
+}
+// searchIndicator / clearIndicator: Rectangle { 28 x 28, the height of the field less the border; ColorImage centered }
+function searchIndicator(c, name, left, visible){
+    let r = make(Rectangle, null, {
+        implicitWidth: 28,
+        implicitHeight: 28,
+        color: () => c.palette.button,
+    })
+    let border = () => (c.background && c.background.border ? c.background.border.width : 0)
+    r.$bind(Item.HEIGHT, () => c.height - border() * 2, null, r)
+    r.$bind(Item.X, () => (left() ? 3 : c.width - r.width - 3), null, r)
+    r.$bind(Item.Y, () => border(), null, r)
+    if(visible) r.$bind(Item.VISIBLE, visible, null, r)
+    let image = styleImage(name, r, () => c.palette.dark, { opacity: () => (r.enabled ? 1 : 0.3) })
+    image.$bind(Item.X, () => (r.width - image.width) / 2, null, image)
+    image.$bind(Item.Y, () => (r.height - image.height) / 2, null, image)
+    return r
+}
+class SearchField extends T.SearchField {
+    constructor(parent = null){
+        super(parent)
+        let c = this
+        let shown = (button) => !!(button.indicator && button.indicator.visible)
+        this.$bind(Item.IMPLICITWIDTH, () => Math.max(c.implicitBackgroundWidth + c.leftInset + c.rightInset, c.implicitContentWidth + c.leftPadding + c.rightPadding), null, this)
+        this.$bind(Item.IMPLICITHEIGHT, () => Math.max(c.implicitBackgroundHeight + c.topInset + c.bottomInset, c.implicitContentHeight + c.topPadding + c.bottomPadding,
+            c.searchIndicator.implicitIndicatorHeight + c.topPadding + c.bottomPadding, c.clearIndicator.implicitIndicatorHeight + c.topPadding + c.bottomPadding), null, this)
+        this.$bind(T.Control.LEFTPADDING, () => c.padding + (c.mirrored ? (shown(c.clearIndicator) ? c.clearIndicator.indicator.width + c.spacing : 0)
+            : (shown(c.searchIndicator) ? c.searchIndicator.indicator.width + c.spacing : 0)), null, this)
+        this.$bind(T.Control.RIGHTPADDING, () => c.padding + (c.mirrored ? (shown(c.searchIndicator) ? c.searchIndicator.indicator.width + c.spacing : 0)
+            : (shown(c.clearIndicator) ? c.clearIndicator.indicator.width + c.spacing : 0)), null, this)
+    }
+    $makeStyle(){
+        let c = this
+        let shown = (button) => !!(button.indicator && button.indicator.visible)
+        if(!this.$v[T.SearchField.DELEGATE]) this.$plain(T.SearchField.DELEGATE, searchDelegate(this))
+        if(!this.searchIndicator.indicator) this.searchIndicator.indicator = searchIndicator(c, 'search-magnifier', () => !c.mirrored)
+        if(!this.clearIndicator.indicator) this.clearIndicator.indicator = searchIndicator(c, 'close_circle', () => c.mirrored, () => c.text.length > 0)
+        this.$styleDelegate(T.Control.CONTENTITEM, () => {
+            let field = new T.TextField(null)
+            apply(field, {
+                leftPadding: () => (c.mirrored ? (shown(c.clearIndicator) ? 6 : 3) : (shown(c.searchIndicator) ? 6 : 3)),
+                rightPadding: () => (c.mirrored ? (shown(c.searchIndicator) ? 6 : 3) : (shown(c.clearIndicator) ? 6 : 3)),
+                topPadding: () => 6 - c.padding,
+                bottomPadding: () => 6 - c.padding,
+                text: () => c.text,
+                placeholderText: () => c.placeholderText,
+                selectByMouse: () => c.selectTextByMouse,
+                color: () => c.palette.text,
+                selectionColor: () => c.palette.highlight,
+                selectedTextColor: () => c.palette.highlightedText,
+                verticalAlignment: 128,
+            })
+            let p = placeholder(field, false)
+            p.$bind(Text.COLOR, () => c.palette.placeholderText, null, p)
+            field.$bind(Item.IMPLICITHEIGHT, () => Math.max(field.contentHeight + field.topPadding + field.bottomPadding, p.implicitHeight + field.topPadding + field.bottomPadding), null, field)
+            field.$styleSize = true
+            c.font.$follow(field)
+            return field
+        })
+        this.$styleDelegate(T.Control.BACKGROUND, () => make(Rectangle, null, {
+            implicitWidth: 200,
+            implicitHeight: 40,
+            color: () => c.palette.button,
+            'border.width': () => (c.activeFocus || (c.contentItem && c.contentItem.activeFocus) ? 2 : 1),
+            'border.color': () => (c.activeFocus || (c.contentItem && c.contentItem.activeFocus) ? c.palette.highlight : c.palette.mid),
+        }), -1)
+        if(!this.$v[T.SearchField.POPUP]){
+            let popup = new T.Popup(this)
+            let view = new ComboListView(null)
+            view.$combo = this
+            apply(view, {
+                clip: true,
+                model: () => c.delegateModel,
+                delegate: () => c.delegate,
+                currentIndex: () => c.highlightedIndex,
+                highlightMoveDuration: 0,
+            })
+            view.$bind(Item.IMPLICITHEIGHT, () => view.contentHeight, null, view)
+            let frame = make(Rectangle, view, { z: 10, color: 'transparent', 'border.color': () => c.palette.mid })
+            frame.$bind(Item.WIDTH, () => view.width, null, frame)
+            frame.$bind(Item.HEIGHT, () => view.height, null, frame)
+            view.ScrollIndicator.vertical = new ScrollIndicator(null)
+            popup.contentItem = view
+            popup.$item.$styleDelegate(T.Control.BACKGROUND, () => make(Rectangle, null, { color: () => c.palette.window }), -1)
+            apply(popup, {
+                y: () => c.height,
+                width: () => c.width,
+                height: () => Math.min(view.implicitHeight, (popup.$overlay() ? popup.$overlay().height : Infinity) - c.y - c.height - c.padding),
+                topMargin: 6,
+                bottomMargin: 6,
+            })
+            this.$setPopup(popup)
+        }
+    }
+}
+defineType(SearchField, {})
+
 module.exports = {
+    SearchField,
+    ContextMenu: T.ContextMenu,
+    DoubleSpinBox,
+    SwipeDelegate,
     Tumbler,
     MonthGrid, DayOfWeekRow, WeekNumberColumn, CalendarModel: T.CalendarModel, Calendar: T.Calendar,
     ApplicationWindow, MenuBar, MenuBarItem,

@@ -18,15 +18,17 @@ const QUICK_UNCREATABLE = ['Keys', 'KeyNavigation', 'Animation', 'Easing', 'Stan
 // QtQuick.Controls.Basic (the style QtQuick.Controls imports) and QtQuick.Templates (the controls without a style): the
 // types the runtime has, the names of the Qt 6.12 qmldir / plugins.qmltypes. A Templates class is JQ.types['T.<Name>']
 const TABLE_CONTROLS = ['HorizontalHeaderView', 'VerticalHeaderView', 'TableViewDelegate', 'TreeViewDelegate', 'SelectionRectangle']
+// the delegates of the headers of the Basic style (Qt 6.10)
+const HEADER_DELEGATES = ['HorizontalHeaderViewDelegate', 'VerticalHeaderViewDelegate']
 // the style's types (JQ.types.<Name>) and those of Templates (JQ.types['T.<Name>']); tests/unit/Controls.test.js checks
 // that the runtime has each of them
 const BASIC_CONTROLS = ['Control', 'Label', 'AbstractButton', 'Button', 'ToolButton', 'RoundButton', 'CheckBox', 'RadioButton', 'Switch',
-    'DelayButton', 'TabButton', 'ItemDelegate', 'CheckDelegate', 'RadioDelegate', 'SwitchDelegate', 'ScrollBar', 'ScrollIndicator', 'Slider', 'RangeSlider', 'ProgressBar', 'BusyIndicator', 'Dial', 'PageIndicator', 'SpinBox', 'Pane', 'Frame', 'GroupBox', 'Page', 'ToolBar', 'ToolSeparator', 'MenuSeparator', 'Container', 'TabBar', 'SwipeView', 'TextField', 'TextArea', 'Popup', 'Overlay', 'ComboBox', 'ToolTip', 'DialogButtonBox', 'Dialog', 'Menu', 'MenuItem', 'Drawer', 'Action', 'ActionGroup', 'ButtonGroup', 'ScrollView', 'StackView', 'SplitView', 'ApplicationWindow', 'MenuBar', 'MenuBarItem', 'Tumbler']
+    'DelayButton', 'TabButton', 'ItemDelegate', 'CheckDelegate', 'RadioDelegate', 'SwitchDelegate', 'ScrollBar', 'ScrollIndicator', 'Slider', 'RangeSlider', 'ProgressBar', 'BusyIndicator', 'Dial', 'PageIndicator', 'SpinBox', 'Pane', 'Frame', 'GroupBox', 'Page', 'ToolBar', 'ToolSeparator', 'MenuSeparator', 'Container', 'TabBar', 'SwipeView', 'TextField', 'TextArea', 'Popup', 'Overlay', 'ComboBox', 'ToolTip', 'DialogButtonBox', 'Dialog', 'Menu', 'MenuItem', 'Drawer', 'Action', 'ActionGroup', 'ButtonGroup', 'ScrollView', 'StackView', 'SplitView', 'ApplicationWindow', 'MenuBar', 'MenuBarItem', 'Tumbler', 'SwipeDelegate', 'DoubleSpinBox', 'ContextMenu', 'SearchField']
 // the calendar: MonthGrid, DayOfWeekRow, WeekNumberColumn of QtQuick.Controls are AbstractMonthGrid... of QtQuick.Templates
 const CALENDAR = ['CalendarModel', 'Calendar']
 const CALENDAR_CONTROLS = ['MonthGrid', 'DayOfWeekRow', 'WeekNumberColumn']
-const CONTROLS = [...TABLE_CONTROLS, ...BASIC_CONTROLS, ...CALENDAR_CONTROLS, ...CALENDAR]
-const TEMPLATES = ['HeaderViewDelegate', ...BASIC_CONTROLS, 'AbstractMonthGrid', 'AbstractDayOfWeekRow', 'AbstractWeekNumberColumn', ...CALENDAR]
+const CONTROLS = [...TABLE_CONTROLS, ...HEADER_DELEGATES, 'SplitHandle', ...BASIC_CONTROLS, ...CALENDAR_CONTROLS, ...CALENDAR]
+const TEMPLATES = ['HeaderViewDelegate', ...TABLE_CONTROLS, 'SplitHandle', ...BASIC_CONTROLS, 'AbstractMonthGrid', 'AbstractDayOfWeekRow', 'AbstractWeekNumberColumn', ...CALENDAR]
 const LAYOUTS = ['RowLayout', 'ColumnLayout', 'GridLayout', 'StackLayout', 'LayoutItemProxy']
 
 // transitive: the modules its qmldir imports (`import X auto`, `default import X auto`). QQmlImports looks up a name in
@@ -41,8 +43,8 @@ const MODULES = {
     'QtQuick.Layouts': { types: LAYOUTS, uncreatable: ['Layout'] },
     'Qt.labs.qmlmodels': { types: LABS_MODELS, uncreatable: [] },
     'QtQuick.Controls': { types: [], uncreatable: [], transitive: ['QtQuick.Controls.Basic'] },
-    'QtQuick.Controls.Basic': { types: CONTROLS, uncreatable: ['Overlay', 'Calendar'] },
-    'QtQuick.Templates': { types: TEMPLATES, uncreatable: ['Overlay', 'Calendar'], prefix: 'T.' },
+    'QtQuick.Controls.Basic': { types: CONTROLS, uncreatable: ['Overlay', 'Calendar', 'ContextMenu', 'SplitHandle'] },
+    'QtQuick.Templates': { types: TEMPLATES, uncreatable: ['Overlay', 'Calendar', 'ContextMenu', 'SplitHandle'], prefix: 'T.' },
     'QtQuick.Dialogs': { types: ['FileDialog', 'FolderDialog'], uncreatable: [] },
     'QtWebSockets': { types: ['WebSocket'], uncreatable: [] },
     'Qt5Compat.GraphicalEffects': { types: ['DropShadow'], uncreatable: [] },

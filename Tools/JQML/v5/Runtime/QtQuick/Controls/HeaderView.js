@@ -158,6 +158,49 @@ function defaultDelegate(){
     })
 }
 
+// HorizontalHeaderViewDelegate / VerticalHeaderViewDelegate of QtQuick.Controls.Basic (Qt 6.10): the delegate above as a type,
+// declared in a header (delegate: HorizontalHeaderViewDelegate { }); the text from its required model and headerView
+class BasicHeaderViewDelegate extends HeaderViewDelegate {
+    constructor(parent = null){
+        super(parent)
+        let control = this
+        control.padding = PADDING
+        let background = new Rectangle(control)
+        background.$bind(Item.WIDTH, () => control.width, null)
+        background.$bind(Item.HEIGHT, () => control.height, null)
+        background.border.color = MIDLIGHT
+        background.color = LIGHT
+        let label = new Text(control)
+        label.$bind(Text.TEXT, () => {
+            let model = control.model, view = control.headerView
+            // (the header the delegate is in, when its required headerView is not given)
+            for(let it = control.$parent; !view && it; it = it.$parent) if(it instanceof HeaderViewBase) view = it
+            if(!model) return ''
+            let role = view ? view.textRole : ''
+            let value = model[role || '']
+            if(value === undefined) value = model.modelData
+            return value === undefined || value === null ? '' : String(value)
+        }, null)
+        label.horizontalAlignment = Text.AlignHCenter
+        label.verticalAlignment = Text.AlignVCenter
+        label.$bind(Item.X, () => control.padding, null)
+        label.$bind(Item.Y, () => control.padding, null)
+        label.$bind(Item.WIDTH, () => Math.max(0, control.width - 2 * control.padding), null)
+        label.$bind(Item.HEIGHT, () => Math.max(0, control.height - 2 * control.padding), null)
+        label.color = WINDOW_TEXT
+        control.$bind(Item.IMPLICITWIDTH, () => label.implicitWidth + 2 * control.padding, null)
+        control.$bind(Item.IMPLICITHEIGHT, () => label.implicitHeight + 2 * control.padding, null)
+        control.$bind(HeaderViewDelegate.HIGHLIGHTED, () => control.selected, null)
+        control.$background = background
+        control.$contentItem = label
+    }
+}
+defineType(BasicHeaderViewDelegate, {})
+class HorizontalHeaderViewDelegate extends BasicHeaderViewDelegate {}
+defineType(HorizontalHeaderViewDelegate, {})
+class VerticalHeaderViewDelegate extends BasicHeaderViewDelegate {}
+defineType(VerticalHeaderViewDelegate, {})
+
 // ---- QQuickHeaderViewBase -----------------------------------------------------------------------------------------------
 class HeaderViewBase extends TableView {
     constructor(parent, orientation){
@@ -298,4 +341,4 @@ class VerticalHeaderView extends HeaderViewBase {
 }
 defineType(VerticalHeaderView, { props: { movableRows: 'bool' } })
 
-module.exports = { HorizontalHeaderView, VerticalHeaderView, HeaderViewBase, HeaderDataProxyModel, HeaderViewDelegate }
+module.exports = { HorizontalHeaderView, VerticalHeaderView, HeaderViewBase, HeaderDataProxyModel, HeaderViewDelegate, HorizontalHeaderViewDelegate, VerticalHeaderViewDelegate }

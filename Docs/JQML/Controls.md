@@ -1,0 +1,100 @@
+# QtQuick.Controls in JQML v5
+
+JQML v5 (`Tools/JQML/v5`) has the controls of `QtQuick.Controls` (the Basic style) and `QtQuick.Templates` of Qt 6.12.
+They are written in JavaScript in `Runtime/QtQuick/Controls`, from the C++ templates (`qquick*.cpp`) and the QML of the
+Basic style (`Basic/*.qml`), and every one is checked against Qt 6.12 by a diff test (`tests/diff`).
+
+## Imports
+
+A control is a type only when the document imports its module, as `QQmlImports` of Qt resolves it:
+
+| Import | What the document sees |
+| --- | --- |
+| none | no control: `Button {}` is not found (a project type `Button.qml` is used) |
+| `import QtQuick.Controls` | the Basic controls: the module has no types of its own and imports `QtQuick.Controls.Basic` (`import X auto` of its qmldir) |
+| `import QtQuick.Controls.Basic` | the same controls |
+| `import QtQuick.Templates as T` | `T.Button` ...: the controls without a style |
+
+- The modules the document imports come first, the last one wins; then the modules they import (transitively); then the
+  directory of the document. A `Button.qml` next to the document loses to `QtQuick.Controls`.
+- The attached objects of a module are part of it too: `ScrollBar.vertical`, `ToolTip.text`, `ContextMenu.menu`,
+  `SplitHandle.pressed` ... without the import are an error, as in Qt ("Non-existent attached object").
+- The lists of the types are in `Runtime/Qt/modules.js` (`CONTROLS`, `TEMPLATES`, `IMPORTED_TYPES`).
+
+## The controls
+
+| Group | Types |
+| --- | --- |
+| base | Control, Label, Pane, Frame, GroupBox, Page, ToolBar, ToolSeparator, MenuSeparator, Container |
+| buttons | AbstractButton, Button, ToolButton, RoundButton, CheckBox, RadioButton, Switch, DelayButton, TabButton, ItemDelegate, CheckDelegate, RadioDelegate, SwitchDelegate, SwipeDelegate |
+| ranges | Slider, RangeSlider, Dial, ProgressBar, BusyIndicator, PageIndicator, SpinBox, DoubleSpinBox (6.11), Tumbler |
+| text | TextField, TextArea, SearchField (6.10) |
+| popups | Popup, Overlay, Dialog, DialogButtonBox, Menu, MenuItem, MenuBar, MenuBarItem, Drawer, ToolTip, ComboBox, ContextMenu (6.9) |
+| views | ScrollBar, ScrollIndicator, ScrollView, StackView, SplitView, SplitHandle, SwipeView, TabBar |
+| actions | Action, ActionGroup, ButtonGroup |
+| window | ApplicationWindow |
+| calendar | MonthGrid, DayOfWeekRow, WeekNumberColumn, CalendarModel, Calendar (T.AbstractMonthGrid ...) |
+| tables | HorizontalHeaderView, VerticalHeaderView, HorizontalHeaderViewDelegate, VerticalHeaderViewDelegate, TableViewDelegate, TreeViewDelegate, SelectionRectangle (see [TablesAndTrees.md](TablesAndTrees.md)) |
+
+`controls_api.qml` (made by `tests/diff/tools/gen_controls_api.js` from `plugins.qmltypes` of Qt 6.12) checks that every
+property, signal and method of every control exists and has the default of Qt.
+
+## How a control is made
+
+- **Template** (`Control.js`, `AbstractButton.js`, `Range.js` ...): the logic of the C++ template — the properties, the
+  press / move / release, the keys, the focus reasons, the paddings and insets, the implicit sizes.
+- **Style** (`Basic.js`): what `Basic/*.qml` declares — the background, the content item, the indicators, the delegates —
+  made by `make()` / `apply()`, where a function is a binding. The delegates are made at `componentComplete`, so a
+  delegate the document declares replaces the style's one (deferred properties of Qt).
+- **Palette** (`Palette.js`): resolved on read — the control's own, then the nearest explicit one above, then the theme
+  (Basic for controls, the system one for items); active / inactive / disabled groups.
+- **Font** (`ControlFont`): the fields set on a control pass to the controls below it that do not set them.
+
+## Behaviour that changed outside the controls (checked against Qt)
+
+| Change | Test |
+| --- | --- |
+| `Item.enabled` is the effective value: an item under a disabled parent is disabled | `controls_style.qml` |
+| `Rectangle.border`: a pen of width 1 is drawn once its color or width is set (QQuickPen) | `Border.test.js` |
+| `Repeater` stacks its delegates before itself (`d0, d1, ..., Repeater`), as `QQuickRepeater::initItem` | `repeater_order.qml` |
+| `delegate` / `handle` properties of the controls are `Component` properties (an inline item becomes a component) | `calendar.qml` |
+| `QFont`: `bold` sets the weight 700 / 400, a weight above 500 is bold | `font_bold.qml` |
+| `ListView` with `StrictlyEnforceRange`: the highlight stays in the range and the item at it becomes current while the view moves; a view made with its component stays at its start | `listview_strict_range.qml` |
+| `ListView.model` set again: `currentIndex` 0 (-1 without a delegate); a new delegate keeps it | `listview_strict_range.qml` |
+| a `TextInput` / `TextEdit` keeps a binding of `text` while the user types | `textinput_binding_edit.qml` |
+| `SpinBox.value` is bound to `from .. to` only once the spin box is complete | `doublespinbox.qml` |
+| a right press no item takes is a context menu event (`ContextMenu`) | `contextmenu.qml` |
+| `Grid` positioner, `ObjectModel`, `Locale.firstDayOfWeek / dayName / monthName` | `grid.qml`, `objectmodel.qml`, `calendar.qml` |
+
+## Tests
+
+```
+cd Tools/JQML/v5
+npm run build                          # dist/core.js
+npm test                               # unit tests (tests/unit: Controls.test.js - the imports)
+node tests/diff/run.js                 # every case against Qt 6.12 (~/Qt/6.12.0)
+node tests/diff/run.js tests/diff/cases/tumbler.qml
+DIFF_VERBOSE=1 node tests/diff/run.js <case>   # with the message of a failed test function
+```
+
+A case with `import QtTest` runs as a `TestCase` in `qmltestrunner` (real pointer and key events), else with `qml`.
+The cases of the controls: `controls_api`, `controls_style`, `abstractbutton_signals`, `scrollbar`, `tableview_scrollbar`,
+`range_controls`, `range_style`, `containers`, `text_controls`, `popup`, `popups`, `combobox`, `actions`, `scrollview`,
+`stackview`, `splitview`, `applicationwindow`, `calendar`, `tumbler`, `swipedelegate`, `doublespinbox`, `searchfield`,
+`contextmenu`, `header_delegates`.
+
+## Known differences
+
+- **Text metrics.** The default font of Qt is 13 px on macOS, of v5 the page's: sizes that depend on a text are not
+  compared.
+- **Flick speed.** `qmltestrunner` gives its events timestamps that do not follow `wait()`, so the speed of a drag in a
+  Qt test is far above the real one. The cases compare where a view rests after a drag, not how far it flicked
+  (Tumbler, SwipeDelegate).
+- **Tumbler** draws its wrapping view itself (the `PathView` of Qt is not in v5): the positions, the displacement and the
+  animations follow `QQuickPathView`; a flick decelerates with `flickDeceleration`, then snaps to an item.
+- **SwipeDelegate:** a click on an item of an open swipe: Qt handles the events of that item twice (through the
+  delegate and through its filter); v5 gives the same result (`SwipeDelegate.clicked` of the item, the swipe stays open)
+  with one pass. `swipe.transition` is run as its `SmoothedAnimation` (velocity), easing InOutCubic.
+- **Images** of the Basic style (`check.png`, `double-arrow.png`, `search-magnifier.png` ...) are vectors of the same
+  outline, drawn in the color of the `ColorImage`.
+- **Native popups and menus** (`popupType: Popup.Native`) are drawn as items.

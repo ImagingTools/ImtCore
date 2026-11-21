@@ -39,7 +39,7 @@ const { ListView } = require('./QtQuick/ListView')
 const { GridView } = require('./QtQuick/GridView')
 const { TableView } = require('./QtQuick/TableView')
 const { TreeView } = require('./QtQuick/TreeView')
-const { HorizontalHeaderView, VerticalHeaderView, HeaderViewDelegate } = require('./QtQuick/Controls/HeaderView')
+const { HorizontalHeaderView, VerticalHeaderView, HeaderViewDelegate, HorizontalHeaderViewDelegate, VerticalHeaderViewDelegate } = require('./QtQuick/Controls/HeaderView')
 const { TableViewDelegate, TreeViewDelegate } = require('./QtQuick/Controls/ViewDelegates')
 const { SelectionRectangle } = require('./QtQuick/Controls/SelectionRectangle')
 const { DelegateModel } = require('./QtQml/Models/DelegateModel')
@@ -378,6 +378,11 @@ const JQ = {
         // QtQuick.Controls (Basic) and QtQuick.Templates ('T.Button')
         ...require('./QtQuick/Controls/index').types(),
         'T.HeaderViewDelegate': HeaderViewDelegate,
+        // the table controls have no style of their own: the templates are the same types (QtQuick.Templates 6.12)
+        'T.HorizontalHeaderView': HorizontalHeaderView, 'T.VerticalHeaderView': VerticalHeaderView,
+        'T.TableViewDelegate': TableViewDelegate, 'T.TreeViewDelegate': TreeViewDelegate, 'T.SelectionRectangle': SelectionRectangle,
+        HorizontalHeaderViewDelegate, VerticalHeaderViewDelegate,
+        SplitHandle: require('./QtQuick/Controls/SplitView').SplitHandle, 'T.SplitHandle': require('./QtQuick/Controls/SplitView').SplitHandle,
     },
     mouse: require('./QtQuick/PointerDelivery'),
     keys: require('./QtQuick/KeyDelivery'),

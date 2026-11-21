@@ -271,4 +271,8 @@ for(let [name, Group] of [['SplitView', SplitViewAttached], ['SplitHandle', Spli
     })
 }
 
-module.exports = { SplitView, SplitViewAttached, SplitHandleAttached }
+// the type SplitHandle: its attached properties only (uncreatable)
+class SplitHandle extends GroupObject {}
+defineType(SplitHandle, {})
+
+module.exports = { SplitView, SplitViewAttached, SplitHandleAttached, SplitHandle }

@@ -322,6 +322,13 @@ class Codegen {
         return this.ownMember(el, name) || this.typeMember(el.typeRef, name)
     }
 
+    // the attached object of a type of a module (ScrollBar.vertical, ContextMenu.menu, Layout.fillWidth): only with the
+    // module imported (Qt: "Non-existent attached object"); a member of the item otherwise
+    attachedMember(file, el, name){
+        if(/^[A-Z]/.test(name) && IMPORTED_TYPES.has(name) && !this.typeOf(name, file)) return null
+        return this.member(el, name)
+    }
+
     // a type that is a component itself (Component, DelegateChooser: QQmlComponent subclasses): no implicit Component
     // is made around it (QQmlPropertyValidator / QQmlComponentAndAliasResolver)
     isComponentType(file, typeName){
@@ -701,7 +708,7 @@ class Codegen {
                 continue
             }
             let parts = assign.name.split('.')
-            let first = this.member(el, parts[0])
+            let first = this.attachedMember(file, el, parts[0])
             let kind = 'named', group = null
             if(parts.length === 1 && first && first.kind === 'alias') kind = 'alias'
             else if(parts.length > 1 && first && first.kind === 'prop' && first.group && !this.inherits(el, JQ.types.PropertyChanges)){
@@ -782,7 +789,7 @@ class Codegen {
             return
         }
         if(parts.length === 2){
-            let m = this.member(el, parts[0])
+            let m = this.attachedMember(file, el, parts[0])
             if(m && (m.kind === 'alias' || (m.kind === 'prop' && !m.group))){
                 let entry = isConstant(assign.value)
                     ? '[' + JSON.stringify(parts[1]) + ',false,(' + expressionText(assign.raw) + '\n)]'
@@ -805,7 +812,7 @@ class Codegen {
         }
         // a group in a group: Drag.hotSpot.x
         if(parts.length === 3){
-            let m = this.member(el, parts[0])
+            let m = this.attachedMember(file, el, parts[0])
             let outer = m && m.kind === 'prop' && m.group
             let inner = outer && outer.$type.propByName.get(parts[1])
             if(inner && inner.group){
@@ -939,7 +946,7 @@ class Codegen {
         if(name.indexOf('.') >= 0){
             // a grouped attached property of the item (Keys.onPressed): its signal, the item as the handler's object
             let [groupName, handlerName] = name.split('.')
-            let m = this.member(el, groupName)
+            let m = this.attachedMember(file, el, groupName)
             let group = m && m.kind === 'prop' && m.group
             let signalName = handlerName.length > 2 ? handlerName[2].toLowerCase() + handlerName.slice(3) : ''
             let id = group && group.$type.signalByName.get(signalName)

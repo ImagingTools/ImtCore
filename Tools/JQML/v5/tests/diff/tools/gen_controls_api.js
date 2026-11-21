@@ -11,12 +11,14 @@ const { CONTROLS } = require('../../../Runtime/Qt/modules')
 const qml = process.argv[2] || path.join(os.homedir(), 'Qt/6.12.0/macos/qml')
 const components = parse(path.join(qml, 'QtQuick/Templates/plugins.qmltypes'))
 // the table controls have cases of their own; values that differ by font or platform are left out
-const SKIP_TYPES = new Set(['Overlay', 'HorizontalHeaderView', 'VerticalHeaderView', 'TableViewDelegate', 'TreeViewDelegate', 'SelectionRectangle', 'CalendarModel', 'Calendar'])
+const SKIP_TYPES = new Set(['Overlay', 'HorizontalHeaderView', 'VerticalHeaderView', 'TableViewDelegate', 'TreeViewDelegate', 'SelectionRectangle', 'CalendarModel', 'Calendar', 'ContextMenu'])
 const SKIP_PROPS = new Set(['locale', 'font', 'palette'])
 // the sizes of a text (an empty one too) depend on the font of the platform: printed on a line of their own (text:), which
 // a v5 build on another platform may print otherwise
 const TEXT_METRICS = new Set(['baselineOffset', 'implicitContentWidth', 'implicitContentHeight', 'implicitLabelHeight', 'implicitLabelWidth', 'implicitWidth', 'implicitHeight', 'height', 'contentHeight', 'availableHeight'])
-const TEXT_TYPES = new Set(['Label', 'CheckBox', 'RadioButton', 'Switch', 'DelayButton', 'SpinBox', 'GroupBox', 'TextField', 'TextArea', 'ComboBox', 'ToolTip', 'MonthGrid', 'DayOfWeekRow', 'WeekNumberColumn'])
+const TEXT_TYPES = new Set(['Label', 'CheckBox', 'RadioButton', 'Switch', 'DelayButton', 'SpinBox', 'GroupBox', 'TextField', 'TextArea', 'ComboBox', 'ToolTip', 'SearchField', 'MonthGrid', 'DayOfWeekRow', 'WeekNumberColumn', 'SwipeDelegate', 'DoubleSpinBox'])
+// a text of a number in the locale: en_US (the system locale of Qt is the platform's)
+const LOCALE_TYPES = new Set(['DoubleSpinBox'])
 // properties that hold an object: printed as null or object
 const isObject = (p) => p.pointer || p.list || /^Q(Font|Locale|QuickIcon|Color|JSValue|Variant|Object)$|^QQuick|Component|QRectF|QPointF|QSizeF/.test(p.type) && p.type !== 'QColor'
 
@@ -43,7 +45,7 @@ Item {
     id: root
     width: 800
     height: 600
-${types.map((name, i) => `    ${name} { id: c${i} }`).join('\n')}
+${types.map((name, i) => `    ${name} { id: c${i}${LOCALE_TYPES.has(name) ? '; locale: Qt.locale("en_US")' : ''} }`).join('\n')}
 
     property var types: ${JSON.stringify(entries, null, 0).replace(/"(\w+)":/g, '$1:')}
 

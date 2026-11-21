@@ -320,6 +320,7 @@ defineType(Item, {
         ApplicationWindow: { group: null }, // set by Controls/ApplicationWindow.js
         Tumbler: { group: null },           // set by Controls/Tumbler.js
         SwipeDelegate: { group: null },     // set by Controls/SwipeDelegate.js
+        ContextMenu: { group: null },       // set by Controls/ContextMenu.js
         // QQuickItem::palette (Qt 6): made when it is read or set (Palette.js)
         palette: { group: require('./Palette').Palette },
     },

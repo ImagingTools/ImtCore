@@ -17,4 +17,7 @@ const appWindow = require('./ApplicationWindow')
 
 const calendar = require('./Calendar')
 const tumbler = require('./Tumbler')
-module.exports = Object.assign({ Control, Label, ScrollBar, ScrollIndicator, ComboBox, ScrollView, StackView, SplitView }, buttons, range, containers, texts, popups, morePopups, actions, appWindow, calendar, tumbler)
+const swipe = require('./SwipeDelegate')
+const contextMenu = require('./ContextMenu')
+const searchField = require('./SearchField')
+module.exports = Object.assign({ Control, Label, ScrollBar, ScrollIndicator, ComboBox, ScrollView, StackView, SplitView }, buttons, range, containers, texts, popups, morePopups, actions, appWindow, calendar, tumbler, swipe, { ContextMenu: contextMenu.ContextMenu }, searchField)
