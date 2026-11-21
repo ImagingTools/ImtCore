@@ -465,7 +465,103 @@ class SwitchDelegate extends T.SwitchDelegate {
 }
 defineType(SwitchDelegate, {})
 
+// ---- ScrollBar, ScrollIndicator ----
+// a value of the QML that changes: fn read in a binding, onChange(value) when it changes (states: `when: ...`)
+const { QtObject } = require('../../Core/QtObject')
+class Watch extends QtObject {}
+defineType(Watch, { props: { value: 'var' } })
+function watch(owner, fn, onChange){
+    let w = new Watch(owner)
+    w.$bind(Watch.VALUE, fn, null, w)
+    engine.connect(w, Watch.SIGNAL_valueChanged, () => onChange(w.$v[Watch.VALUE]), null, engine.PRIORITY_NORMAL, w)
+    return w
+}
+// State { name: "active"; when: ...; PropertyChanges { opacity: 0.75 } } and Transition { from: "active"; SequentialAnimation {
+// PauseAnimation { duration: 450 } NumberAnimation { property: "opacity"; duration: 200; to: 0.0 } } }
+function activeOpacity(owner, item, when){
+    let timer = null
+    let stop = () => {
+        if(timer){
+            clearTimeout(timer)
+            clearInterval(timer)
+            timer = null
+        }
+    }
+    let set = (value) => engine.batch(() => item.$write(Item.OPACITY, value))
+    watch(owner, when, (active) => {
+        stop()
+        if(active){
+            set(0.75)
+            return
+        }
+        let from = item.$v[Item.OPACITY]
+        timer = setTimeout(() => {
+            let start = Date.now()
+            timer = setInterval(() => {
+                if(item.$f & engine.DESTROYED) return stop()
+                let t = Math.min(1, (Date.now() - start) / 200)
+                set(from + (0 - from) * t)
+                if(t >= 1) stop()
+            }, 16)
+        }, 450)
+    })
+    item.$write(Item.OPACITY, when() ? 0.75 : 0.0)
+}
+
+class ScrollBar extends T.ScrollBar {
+    constructor(parent = null){
+        super(parent)
+        implicitSize(this)
+        this.padding = 2
+        this.$bind(Item.VISIBLE, () => this.policy !== T.ScrollBar.AlwaysOff, null, this)
+        this.$bind(T.ScrollBar.MINIMUMSIZE, () => (this.orientation === 1 ? this.height / this.width : this.width / this.height), null, this)
+    }
+    $makeStyle(){
+        let c = this
+        let handle = this.$styleDelegate(T.Control.CONTENTITEM, () => make(Rectangle, null, {
+            implicitWidth: () => (c.interactive ? 6 : 2),
+            implicitHeight: () => (c.interactive ? 6 : 2),
+            color: () => (c.pressed ? c.palette.dark : c.palette.mid),
+        }))
+        if(handle){
+            handle.$bind(Rectangle.RADIUS, () => handle.width / 2, null, handle)
+            activeOpacity(handle, handle, () => c.policy === T.ScrollBar.AlwaysOn || (c.active && c.size < 1.0))
+        }
+        this.$styleDelegate(T.Control.BACKGROUND, () => make(Rectangle, null, {
+            visible: false,
+            opacity: () => (c.contentItem ? c.contentItem.opacity : 0),
+            color: () => c.palette.mid,
+        }), -1)
+    }
+}
+defineType(ScrollBar, {})
+
+class ScrollIndicator extends T.ScrollIndicator {
+    constructor(parent = null){
+        super(parent)
+        implicitSize(this)
+        this.padding = 2
+    }
+    $makeStyle(){
+        let c = this
+        let handle = this.$styleDelegate(T.Control.CONTENTITEM, () => make(Rectangle, null, {
+            implicitWidth: 2,
+            implicitHeight: 2,
+            color: () => c.palette.mid,
+            visible: () => c.size < 1.0,
+        }))
+        if(handle) activeOpacity(handle, handle, () => c.active)
+        this.$styleDelegate(T.Control.BACKGROUND, () => make(Rectangle, null, {
+            visible: false,
+            opacity: () => (c.contentItem ? c.contentItem.opacity : 0),
+            color: () => c.palette.mid,
+        }), -1)
+    }
+}
+defineType(ScrollIndicator, {})
+
 module.exports = {
+    ScrollBar, ScrollIndicator,
     Control, Label, AbstractButton, Button, ToolButton, RoundButton, CheckBox, RadioButton, Switch, DelayButton, TabButton,
     ItemDelegate, CheckDelegate, RadioDelegate, SwitchDelegate, IMAGES, styleImage, implicitSize, iconLabel, checkLabel,
 }

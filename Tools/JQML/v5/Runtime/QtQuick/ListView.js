@@ -1210,6 +1210,7 @@ class ListView extends Item {
             this.$write(axis === 'x' ? ListView.ATXBEGINNING : ListView.ATYBEGINNING, pos <= b.min)
             this.$write(axis === 'x' ? ListView.ATXEND : ListView.ATYEND, pos >= b.max)
         }
+        this.$updateVisibleArea()
     }
 
     // QQuickListView::currentSection: the section of the item at the start of the view

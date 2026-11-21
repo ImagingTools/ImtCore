@@ -379,6 +379,7 @@ class GridView extends Item {
             this.$write(axis === 'x' ? GridView.ATXBEGINNING : GridView.ATYBEGINNING, pos <= b.min)
             this.$write(axis === 'x' ? GridView.ATXEND : GridView.ATYEND, pos >= b.max)
         }
+        this.$updateVisibleArea()
     }
 
     $layout(){

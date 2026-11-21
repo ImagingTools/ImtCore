@@ -442,13 +442,17 @@ const baseWrite = Control.prototype.$write
 // a write that keeps the value only (what a setter does)
 Control.prototype.$plain = function(id, value){ return baseWrite.call(this, id, value) }
 Control.prototype.$write = function(id, value){
-    let setter = this.$inSetter ? null : this.constructor.$setters.get(id)
-    if(!setter) return baseWrite.call(this, id, value)
-    this.$inSetter = true
+    // the setter of a property keeps its value with plain writes; a write of another property while it runs (a binding
+    // that follows) goes through that one's setter
+    let setter = this.constructor.$setters.get(id)
+    let busy = this.$settingIds
+    if(!setter || (busy && busy.has(id))) return baseWrite.call(this, id, value)
+    if(!busy) busy = this.$settingIds = new Set()
+    busy.add(id)
     try {
         setter(this, value)
     } finally {
-        this.$inSetter = false
+        busy.delete(id)
     }
 }
 

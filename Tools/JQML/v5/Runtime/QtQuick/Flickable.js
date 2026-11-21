@@ -511,7 +511,50 @@ const flickMouse = {
     },
 }
 
+// ---- visibleArea (QQuickFlickableVisibleArea): the part of the content the view shows, as fractions ----
+const { GroupObject } = require('../Core/QtObject')
+class VisibleArea extends GroupObject {}
+defineType(VisibleArea, { props: { xPosition: { kind: 'real', readonly: true }, widthRatio: { kind: 'real', readonly: true },
+    yPosition: { kind: 'real', readonly: true }, heightRatio: { kind: 'real', readonly: true } } })
+
+// QQuickFlickableVisibleArea::updateVisible: pagePos = (-move + minExtent) / (maxExtent range + view size), pageSize =
+// view size / that; the attached scroll bars follow it
+function updateVisibleArea(view){
+    let area = view.$visibleArea
+    if(!area && !view.$scrollBars) return
+    let values = {}
+    for(let axis of AXES){
+        let b = bounds(view, axis)
+        let viewSize = view.$v[axis === 'x' ? Item.WIDTH : Item.HEIGHT]
+        let range = b.max - b.min + viewSize
+        let pos = 0, size = 0
+        if(range !== 0){
+            pos = (view.$contentPos(axis) - b.min) / range
+            size = viewSize / range
+        }
+        values[axis] = { pos, size }
+    }
+    if(area){
+        area.$write(VisibleArea.XPOSITION, values.x.pos)
+        area.$write(VisibleArea.WIDTHRATIO, values.x.size)
+        area.$write(VisibleArea.YPOSITION, values.y.pos)
+        area.$write(VisibleArea.HEIGHTRATIO, values.y.size)
+    }
+    if(view.$scrollBars) view.$scrollBars.$visibleAreaChanged(values)
+}
+
 function installFlick(Class){
+    Object.defineProperty(Class.prototype, 'visibleArea', {
+        get(){
+            if(!this.$visibleArea){
+                this.$visibleArea = new VisibleArea(this)
+                updateVisibleArea(this)
+            }
+            return this.$visibleArea
+        },
+        configurable: true,
+    })
+    Class.prototype.$updateVisibleArea = function(){ updateVisibleArea(this) }
     for(let name of Object.getOwnPropertyNames(flickMouse)){
         Object.defineProperty(Class.prototype, name, Object.getOwnPropertyDescriptor(flickMouse, name))
     }
@@ -587,6 +630,7 @@ class Flickable extends Item {
         this.$write(Flickable.ATXEND, x >= bx.max)
         this.$write(Flickable.ATYBEGINNING, y <= by.min)
         this.$write(Flickable.ATYEND, y >= by.max)
+        updateVisibleArea(this)
     }
 
     resizeContent(width, height, center){
@@ -727,4 +771,4 @@ Object.assign(Flickable, FLICK_ENUMS)
     }
 }
 
-module.exports = { Flickable, wheelScroll, externalMove, installFlick, flickDirection, flickState, fixup, FLICK_PROPS, FLICK_SIGNALS, FLICK_ENUMS, clock, DRAG_THRESHOLD }
+module.exports = { Flickable, VisibleArea, updateVisibleArea, wheelScroll, externalMove, installFlick, flickDirection, flickState, fixup, FLICK_PROPS, FLICK_SIGNALS, FLICK_ENUMS, clock, DRAG_THRESHOLD }

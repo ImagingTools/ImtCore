@@ -26,6 +26,7 @@ let entries = types.map(name => {
     // QQuickLabel derives from QQuickText: its own part only
     if(name === 'Label') ({ props, signals, methods } = api(components, name, 'QQuickText'))
     let metric = (p) => TEXT_TYPES.has(name) && TEXT_METRICS.has(p.name)
+    props = props.filter(p => !p.name.startsWith('__'))
     let scalar = props.filter(p => !SKIP_PROPS.has(p.name) && !isObject(p) && !metric(p)).map(p => p.name)
     let objects = props.filter(p => !SKIP_PROPS.has(p.name) && isObject(p)).map(p => p.name)
     return { name, scalar: [...new Set(scalar)], objects: [...new Set(objects)], signals: [...new Set(signals)], methods: [...new Set(methods)] }

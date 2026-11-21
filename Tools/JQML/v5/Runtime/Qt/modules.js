@@ -21,7 +21,7 @@ const TABLE_CONTROLS = ['HorizontalHeaderView', 'VerticalHeaderView', 'TableView
 // the style's types (JQ.types.<Name>) and those of Templates (JQ.types['T.<Name>']); tests/unit/Controls.test.js checks
 // that the runtime has each of them
 const BASIC_CONTROLS = ['Control', 'Label', 'AbstractButton', 'Button', 'ToolButton', 'RoundButton', 'CheckBox', 'RadioButton', 'Switch',
-    'DelayButton', 'TabButton', 'ItemDelegate', 'CheckDelegate', 'RadioDelegate', 'SwitchDelegate']
+    'DelayButton', 'TabButton', 'ItemDelegate', 'CheckDelegate', 'RadioDelegate', 'SwitchDelegate', 'ScrollBar', 'ScrollIndicator']
 const CONTROLS = [...TABLE_CONTROLS, ...BASIC_CONTROLS]
 const TEMPLATES = ['HeaderViewDelegate', ...BASIC_CONTROLS]
 const LAYOUTS = ['RowLayout', 'ColumnLayout', 'GridLayout', 'StackLayout', 'LayoutItemProxy']

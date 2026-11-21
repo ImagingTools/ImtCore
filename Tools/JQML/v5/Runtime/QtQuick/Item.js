@@ -302,6 +302,8 @@ defineType(Item, {
         ListView: { group: null },  // set by ListView.js
         TableView: { group: null }, // set by TableView.js
         SelectionRectangle: { group: null }, // set by Controls/SelectionRectangle.js
+        ScrollBar: { group: null },         // set by Controls/ScrollBar.js
+        ScrollIndicator: { group: null },   // set by Controls/ScrollBar.js
         // QQuickItem::palette (Qt 6): made when it is read or set (Palette.js)
         palette: { group: require('./Palette').Palette },
     },
