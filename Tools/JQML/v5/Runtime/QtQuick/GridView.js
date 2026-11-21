@@ -36,6 +36,10 @@ class GridView extends Item {
     $componentComplete(){
         super.$componentComplete()
         this.$sync()
+        // QQuickItemViewPrivate::contentStartOffset: the view starts before the margin at the start of its flow
+        let axis = this.$alongFlow('y') ? 'y' : 'x'
+        let m = require('./Flickable').margins(this, axis)
+        if(m.start) this.$setContentPos(axis, -m.start)
     }
 
     // a delegate for row index of rows, put at index

@@ -31,7 +31,7 @@ class LinearLayout extends Layout {
         let snapped = snapCells(solved, spacing, mainSize, mainHints.map(h => h.min))
         let cells = snapped.sizes
         // a row laid out from the right (layoutDirection Qt.RightToLeft): the geometry is mirrored in the layout
-        let mirrored = horizontal && this.$v[LinearLayout.LAYOUTDIRECTION] === 1
+        let mirrored = horizontal && ((this.$v[LinearLayout.LAYOUTDIRECTION] === 1) !== require('../LayoutMirroring').mirrored(this))
 
         let geometry = []
         for(let i = 0; i < items.length; i++){

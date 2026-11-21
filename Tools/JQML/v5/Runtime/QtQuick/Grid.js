@@ -66,13 +66,14 @@ defineType(Grid, {
         rows: { kind: 'int', effect: relayout }, columns: { kind: 'int', effect: relayout },
         rowSpacing: { kind: 'real', effect: relayout }, columnSpacing: { kind: 'real', effect: relayout },
         flow: { kind: 'int', effect: relayout },
-        layoutDirection: { kind: 'int', effect: (grid) => { grid.$write(Grid.EFFECTIVELAYOUTDIRECTION, grid.$v[Grid.LAYOUTDIRECTION]); relayout(grid) } },
+        layoutDirection: { kind: 'int', effect: (grid) => { engine.emit(grid, Grid.SIGNAL_effectiveLayoutDirectionChanged); relayout(grid) } },
         effectiveLayoutDirection: { kind: 'int', readonly: true },
         horizontalItemAlignment: { kind: 'int', initial: AlignLeft, effect: relayout },
         effectiveHorizontalItemAlignment: { kind: 'int', readonly: true, initial: AlignLeft },
         verticalItemAlignment: { kind: 'int', initial: AlignTop, effect: relayout },
     },
 })
+require('./Positioner').effectiveDirection(Grid)
 Object.assign(Grid, { LeftToRight, TopToBottom, AlignLeft, AlignRight, AlignHCenter, AlignTop, AlignBottom, AlignVCenter })
 makeReadonly(Grid, 'implicitWidth')
 makeReadonly(Grid, 'implicitHeight')

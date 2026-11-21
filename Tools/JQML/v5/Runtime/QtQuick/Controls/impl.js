@@ -444,7 +444,8 @@ class PlaceholderText extends Text {
     $updateAlignment(){
         let control = this.$parent
         let field = control instanceof require('../TextField').TextField ? control : null
-        this.$write(Text.HORIZONTALALIGNMENT, field ? field.$v[field.constructor.HORIZONTALALIGNMENT] : Text.AlignLeft)
+        // setHAlign of the field's alignment, resetHAlign without a field
+        this.$write(Text.HORIZONTALALIGNMENT, field ? field.$v[field.constructor.HORIZONTALALIGNMENT] : undefined)
     }
 }
 defineType(PlaceholderText)

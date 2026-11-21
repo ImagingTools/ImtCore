@@ -14,7 +14,7 @@ const QUICK = [
     'XAnimator', 'YAnimator', 'ScaleAnimator', 'RotationAnimator', 'OpacityAnimator', 'PropertyAction', 'ScriptAction',
     'SequentialAnimation', 'ParallelAnimation', 'Behavior', 'Window', 'Translate', 'Scale', 'Rotation', 'Matrix4x4', 'Accessible', 'ShaderEffectSource', 'Screen', 'EnterKey', 'HoverHandler', 'DragHandler', 'PointerDevice', 'PointerHandler',
     'Path', 'PathLine', 'PathMove', 'PathQuad', 'PathCubic', 'PathArc', 'PathAngleArc', 'PathRectangle', 'PathSvg', 'PathPolyline',
-    'PathMultiline', 'PathAttribute', 'PathPercent', 'PathElement',
+    'PathMultiline', 'PathAttribute', 'PathPercent', 'PathElement', 'PathView',
 ]
 const SHAPES = ['Shape', 'ShapePath', 'ShapeGradient', 'LinearGradient', 'RadialGradient', 'ConicalGradient']
 const IMPL = ['PlaceholderText', 'ColorImage', 'IconImage', 'IconLabel', 'PaddedRectangle', 'Color']
@@ -53,10 +53,10 @@ const MODULES = {
     'QtQuick.Shapes': { types: SHAPES, uncreatable: ['ShapeGradient'] },
     // the items the styles are made of (Controls/impl.js)
     'QtQuick.Controls.impl': { types: IMPL, uncreatable: ['Color'] },
-    'QtQuick.Dialogs': { types: ['FileDialog', 'FolderDialog'], uncreatable: [] },
+    'QtQuick.Dialogs': { types: ['FileDialog', 'FolderDialog', 'ColorDialog'], uncreatable: [] },
     'QtWebSockets': { types: ['WebSocket'], uncreatable: [] },
     'Qt5Compat.GraphicalEffects': { types: ['DropShadow'], uncreatable: [] },
-    'QtCore': { types: ['Settings'], uncreatable: [] },
+    'QtCore': { types: ['Settings', 'StandardPaths'], uncreatable: ['StandardPaths'] },
     'Qt.labs.settings': { types: ['Settings'], uncreatable: [] },
     'QtTest': { types: ['TestCase', 'SignalSpy'], uncreatable: [] },
 }

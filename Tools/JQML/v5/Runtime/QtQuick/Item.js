@@ -413,6 +413,8 @@ defineType(Item, {
         KeyNavigation: { group: null },
         Drag: { group: null },      // set by Drag.js
         ListView: { group: null },  // set by ListView.js
+        PathView: { group: null },  // set by PathView.js
+        LayoutMirroring: { group: null },   // set by LayoutMirroring.js
         TableView: { group: null }, // set by TableView.js
         SelectionRectangle: { group: null }, // set by Controls/SelectionRectangle.js
         ScrollBar: { group: null },         // set by Controls/ScrollBar.js
@@ -484,14 +486,26 @@ function margin(anchors, id){
 
 const field = (anchors, id) => anchors.$v[id]
 
+// LayoutMirroring (QQuickAnchorsPrivate::updateHorizontalAnchors, fillChanged, centerInChanged of a mirrored item): the
+// left anchor acts as a right one on the other line (reverseAnchorLine) with the left margin, the right as a left
+// one, the horizontal center offset is negated
+const isMirrored = (item) => require('./LayoutMirroring').mirrored(item)
+const reverse = (line) => (line && (line.line === LEFT || line.line === RIGHT) ? { item: line.item, line: line.line === LEFT ? RIGHT : LEFT } : line)
+const effLeft = (item, a) => (isMirrored(item) ? reverse(field(a, Anchors.RIGHT)) : field(a, Anchors.LEFT))
+const effRight = (item, a) => (isMirrored(item) ? reverse(field(a, Anchors.LEFT)) : field(a, Anchors.RIGHT))
+const effLeftMargin = (item, a) => margin(a, isMirrored(item) ? Anchors.RIGHTMARGIN : Anchors.LEFTMARGIN)
+const effRightMargin = (item, a) => margin(a, isMirrored(item) ? Anchors.LEFTMARGIN : Anchors.RIGHTMARGIN)
+const effCenterOffset = (item, a) => (isMirrored(item) ? -1 : 1) * field(a, Anchors.HORIZONTALCENTEROFFSET)
+
 const H = {
-    fillX: (item, a) => linePos(item, field(a, Anchors.FILL).left) + margin(a, Anchors.LEFTMARGIN),
+    fillX: (item, a) => linePos(item, field(a, Anchors.FILL).left) + effLeftMargin(item, a),
     fillWidth: (item, a) => field(a, Anchors.FILL).width - margin(a, Anchors.LEFTMARGIN) - margin(a, Anchors.RIGHTMARGIN),
-    centerX: (item, a) => linePos(item, field(a, Anchors.CENTERIN).horizontalCenter) - half(item, item.width) + field(a, Anchors.HORIZONTALCENTEROFFSET),
-    leftX: (item, a) => linePos(item, field(a, Anchors.LEFT)) + margin(a, Anchors.LEFTMARGIN),
-    leftRightWidth: (item, a) => linePos(item, field(a, Anchors.RIGHT)) - margin(a, Anchors.RIGHTMARGIN) - linePos(item, field(a, Anchors.LEFT)) - margin(a, Anchors.LEFTMARGIN),
-    rightX: (item, a) => linePos(item, field(a, Anchors.RIGHT)) - margin(a, Anchors.RIGHTMARGIN) - item.width,
-    hcenterX: (item, a) => linePos(item, field(a, Anchors.HORIZONTALCENTER)) - half(item, item.width) + field(a, Anchors.HORIZONTALCENTEROFFSET),
+    centerX: (item, a) => linePos(item, field(a, Anchors.CENTERIN).horizontalCenter) - half(item, item.width) + effCenterOffset(item, a),
+    // the anchors of one side: a left one (or a mirrored right one) gives x, the other side x from the right
+    leftX: (item, a) => (effLeft(item, a) ? linePos(item, effLeft(item, a)) + effLeftMargin(item, a) : linePos(item, effRight(item, a)) - effRightMargin(item, a) - item.width),
+    leftRightWidth: (item, a) => linePos(item, effRight(item, a)) - effRightMargin(item, a) - linePos(item, effLeft(item, a)) - effLeftMargin(item, a),
+    rightX: (item, a) => (effRight(item, a) ? linePos(item, effRight(item, a)) - effRightMargin(item, a) - item.width : linePos(item, effLeft(item, a)) + effLeftMargin(item, a)),
+    hcenterX: (item, a) => linePos(item, field(a, Anchors.HORIZONTALCENTER)) - half(item, item.width) + effCenterOffset(item, a),
 }
 
 const V = {
@@ -572,6 +586,8 @@ function updateAxes(anchors, axes){
     }
 }
 const axisOf = (axes) => (anchors) => updateAxes(anchors, axes)
+// the mirroring of the item changed (LayoutMirroring.js)
+const updateHorizontalAnchors = (anchors) => updateAxes(anchors, HORIZONTAL)
 
 // QQuickAnchors::setMargins: the sides not set explicitly take the value and notify, then the geometry
 function marginsWritten(anchors, value){
@@ -676,4 +692,4 @@ AXIS_IDS[HORIZONTAL | VERTICAL] = [Item.X, Item.Y, Item.WIDTH, Item.HEIGHT]
 // Q_OBJECT_COMPAT_PROPERTY of QQuickItemPrivate (Qt 6): bindings on them update before the notify signal
 Item.prototype.$bindableSignals = new Set([Item.SIGNAL_xChanged, Item.SIGNAL_yChanged, Item.SIGNAL_widthChanged, Item.SIGNAL_heightChanged])
 
-module.exports = { Item, Anchors, AnchorLine, bits: { GEOMETRY, VISIBILITY, OPACITY, Z, CLIP, STYLE } }
+module.exports = { updateHorizontalAnchors, Item, Anchors, AnchorLine, bits: { GEOMETRY, VISIBILITY, OPACITY, Z, CLIP, STYLE } }

@@ -25,10 +25,11 @@ class Row extends Positioner {
 }
 defineType(Row, {
     props: {
-        layoutDirection: { kind: 'int', effect: (row) => { row.$write(Row.EFFECTIVELAYOUTDIRECTION, row.$v[Row.LAYOUTDIRECTION]); relayout(row) } },
+        layoutDirection: { kind: 'int', effect: (row) => { engine.emit(row, Row.SIGNAL_effectiveLayoutDirectionChanged); relayout(row) } },
         effectiveLayoutDirection: { kind: 'int', readonly: true },
     },
 })
+require('./Positioner').effectiveDirection(Row)
 
 // read-only in Qt, writable in the base class
 makeReadonly(Row, 'implicitWidth')

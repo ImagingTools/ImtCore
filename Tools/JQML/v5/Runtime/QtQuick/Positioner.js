@@ -26,9 +26,17 @@ class Positioner extends Item {
     }
 
     // laid out from the right (layoutDirection Qt.RightToLeft of Row, Grid, Flow)
+    // effectiveLayoutDirection: layoutDirection, the other one when the item is mirrored (LayoutMirroring)
     $rightToLeft(){
         let id = this.constructor.LAYOUTDIRECTION
-        return id !== undefined && this.$v[id] === 1
+        if(id === undefined) return false
+        return (this.$v[id] === 1) !== require('./LayoutMirroring').mirrored(this)
+    }
+
+    $mirrorChanged(){
+        if(this.constructor.SIGNAL_effectiveLayoutDirectionChanged !== undefined) engine.emit(this, this.constructor.SIGNAL_effectiveLayoutDirectionChanged)
+        // QQuickBasePositionerPrivate::mirrorChange: laid out again at once
+        if(this.$f & engine.COMPLETED) this.$polish()
     }
 
     // QQuickRow / QQuickGrid / QQuickFlow::doPositioning from the right: the children placed from the left (with the
@@ -85,4 +93,17 @@ defineType(Positioner, {
     signals: ['positioningComplete'],
 })
 
-module.exports = { Positioner, relayout }
+// effectiveLayoutDirection of Row, Grid, Flow
+function effectiveDirection(Class){
+    let id = Class.EFFECTIVELAYOUTDIRECTION
+    Object.defineProperty(Class.prototype, 'effectiveLayoutDirection', {
+        get(){
+            engine.track(this, Class.SIGNAL_effectiveLayoutDirectionChanged)
+            return this.$rightToLeft() ? 1 : 0
+        },
+        configurable: true,
+    })
+    return id
+}
+
+module.exports = { Positioner, relayout, effectiveDirection }

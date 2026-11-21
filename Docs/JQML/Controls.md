@@ -90,7 +90,7 @@ The cases of the controls: `controls_api`, `controls_style`, `abstractbutton_sig
 | [2048.qml](https://github.com/MartinBriza/2048.qml) (a game, pure QML) | `Item.transform` (Scale, Rotation, Translate, Matrix4x4); `mapToItem` through transforms; an id of the document does not hide a property of an object of a component in it |
 | Qt Quick Controls Gallery (the example of Qt 6.12, 38 files) | `as`, type annotations of functions, an object literal binding without parentheses; SortFilterProxyModel; Accessible; a top-level Window of `createObject(null)`; icon themes; default property alias of an object property; `undefined` resets a property; nested layouts, GridLayout spans and auto placement; Container with a Repeater, SwipeView attached; SplitView sizes; Locale month and day numbers of QML; a Menu of Actions; Escape and the shortcuts behind a popup; the overlay of a window only |
 
-| [QmlAppTemplate](https://github.com/emericg/QmlAppTemplate) (an application template with a component library, 200+ files; its C++ helpers replaced by QML stubs of the same API) | `??` and `**`; `Behavior on anchors.margin`; `required name` of an existing property; a Behavior animates changes made in `Component.onCompleted`; `MultiEffect` and `layer.effect` (colorization, shadow, blur, mask), `ShaderEffectSource`; `sourceSize: Qt.size(...)` (a value of a group); a singleton reading its own enums while it is made; `Screen`; `T.Overlay.modal` (an attached property through a namespace); `PlaceholderText`; the corner radii of `Rectangle`; `HoverHandler`, `DragHandler`, `PointerDevice`; an object declared in an alias of `data`; the components of a color (`color.r`, `hsvHue` ...); the position of a window (its place on the screen); `QtQuick.Shapes` and `Path` elements; `layoutDirection` of RowLayout, Row, Grid, Flow; the cells and items of a layout at whole pixels; a layout follows the implicit size of its items; `font: control.font`; `Item.childrenRect`; `topMargin` ... of Flickable and the views; the inherited `locale` of a control; a name in a delegate that is no role (an id of the document around); `Text.linkColor`; the SVG color names (`grey`); `Color` of QtQuick.Controls.impl; `EnterKey`; `Window.activeFocusItem` |
+| [QmlAppTemplate](https://github.com/emericg/QmlAppTemplate) (an application template with a component library, 200+ files; its C++ helpers replaced by QML stubs of the same API) | `??` and `**`; `Behavior on anchors.margin`; `required name` of an existing property; a Behavior animates changes made in `Component.onCompleted`; `MultiEffect` and `layer.effect` (colorization, shadow, blur, mask), `ShaderEffectSource`; `sourceSize: Qt.size(...)` (a value of a group); a singleton reading its own enums while it is made; `Screen`; `T.Overlay.modal` (an attached property through a namespace); `PlaceholderText`; the corner radii of `Rectangle`; `HoverHandler`, `DragHandler`, `PointerDevice`; an object declared in an alias of `data`; the components of a color (`color.r`, `hsvHue` ...); the position of a window (its place on the screen); `QtQuick.Shapes` and `Path` elements; `layoutDirection` of RowLayout, Row, Grid, Flow; the cells and items of a layout at whole pixels; a layout follows the implicit size of its items; `font: control.font`; `Item.childrenRect`; `topMargin` ... of Flickable and the views; the inherited `locale` of a control; a name in a delegate that is no role (an id of the document around); `Text.linkColor`; the SVG color names (`grey`); `Color` of QtQuick.Controls.impl; `EnterKey`; `Window.activeFocusItem`; `PathView` (and the `Path` geometry: `pointAtPercent`, `PathAttribute`, `PathPercent`); a Tumbler whose content item is a PathView or a ListView of the document; `ColorDialog` (the color input of the browser); `StandardPaths`; `LayoutMirroring` |
 
 The Gallery runs as built for the desktop: a `Main.qml` does what `gallery.cpp` does (the style in the settings, the
 `builtInStyles` initial property), the compiler config lists the module (the `qmldir` `qt_add_qml_module` writes) and the
@@ -104,8 +104,9 @@ was compared with the same page in Qt 6.12, and a click through the drawer, a co
 - **Flick speed.** `qmltestrunner` gives its events timestamps that do not follow `wait()`, so the speed of a drag in a
   Qt test is far above the real one. The cases compare where a view rests after a drag, not how far it flicked
   (Tumbler, SwipeDelegate).
-- **Tumbler** draws its wrapping view itself (the `PathView` of Qt is not in v5): the positions, the displacement and the
-  animations follow `QQuickPathView`; a flick decelerates with `flickDeceleration`, then snaps to an item.
+- **Tumbler** of the Basic style draws its wrapping view itself: the positions, the displacement and the animations
+  follow `QQuickPathView`; a flick decelerates with `flickDeceleration`, then snaps to an item. A content item of the
+  document with a `PathView` or a `ListView` is used as Qt does (QQuickTumblerPrivate::setupViewData).
 - **SwipeDelegate:** a click on an item of an open swipe: Qt handles the events of that item twice (through the
   delegate and through its filter); v5 gives the same result (`SwipeDelegate.clicked` of the item, the swipe stays open)
   with one pass. `swipe.transition` is run as its `SmoothedAnimation` (velocity), easing InOutCubic.
@@ -116,8 +117,9 @@ was compared with the same page in Qt 6.12, and a click through the drawer, a co
 - **Native popups and menus** (`popupType: Popup.Native`) are drawn as items.
 - **Colors** are kept as their names (`#rrggbb`, `#aarrggbb`): the components of a color made by `Qt.lighter`,
   `Qt.darker`, `Qt.tint` are those of its 8-bit name (Qt keeps 16 bits).
-- **LayoutMirroring** is not there yet (`layoutDirection` of the positioners and layouts is); nor `PathView` and
-  `ColorDialog` (QmlAppTemplate uses them on one page each).
-- **GridView** has the margins in its range, but does not start at `-topMargin` as ListView and Flickable do.
+- **LayoutMirroring** mirrors anchors, Row / Grid / Flow, RowLayout / GridLayout and the explicit alignment of a Text;
+  not yet the horizontal ListView / GridView.
+- **StandardPaths**: a page has no file system of the user, every location is empty.
+- **ColorDialog** is the color input of the browser (no alpha in it: the alpha of `selectedColor` is kept).
 - **Shapes** are drawn as SVG: the renderer types of Qt are reported, a `ConicalGradient` is a CSS conic gradient
   clipped to the path; `fillItem` and `fillTransform` are kept, not drawn.

@@ -18,6 +18,7 @@ const { FocusScope } = require('./QtQuick/FocusScope')
 const { Keys } = require('./QtQuick/Keys')
 const { KeyNavigation } = require('./QtQuick/KeyNavigation')
 require('./QtQuick/KeyDelivery')
+require('./QtQuick/LayoutMirroring')
 const { Rectangle, Border } = require('./QtQuick/Rectangle')
 const { Gradient, GradientStop } = require('./QtQuick/Gradient')
 const { Text } = require('./QtQuick/Text')
@@ -412,6 +413,9 @@ const JQ = {
         Accessible: require('./QtQuick/Accessible').Accessible,
         EnterKey: require('./QtQuick/Accessible').EnterKey,
         Screen: require('./QtQuick/Screen').Screen,
+        PathView: require('./QtQuick/PathView').PathView,
+        ColorDialog: require('./QtQuick/Dialogs/ColorDialog').ColorDialog,
+        StandardPaths: require('./QtCore/StandardPaths').StandardPaths,
         ...require('./QtQuick/Path'),
         ...(({ Shape, ShapePath, ShapeGradient, LinearGradient, RadialGradient, ConicalGradient }) => ({ Shape, ShapePath, ShapeGradient, LinearGradient, RadialGradient, ConicalGradient }))(require('./QtQuick/Shapes')),
         ...(({ PointerDevice, PointerHandler, HoverHandler, DragHandler }) => ({ PointerDevice, PointerHandler, HoverHandler, DragHandler }))(require('./QtQuick/PointerHandlers')),

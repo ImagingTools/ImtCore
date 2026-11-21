@@ -49,10 +49,11 @@ class Flow extends Positioner {
 defineType(Flow, {
     props: {
         flow: { kind: 'int', effect: relayout },
-        layoutDirection: { kind: 'int', effect: (flow) => { flow.$write(Flow.EFFECTIVELAYOUTDIRECTION, flow.$v[Flow.LAYOUTDIRECTION]); relayout(flow) } },
+        layoutDirection: { kind: 'int', effect: (flow) => { engine.emit(flow, Flow.SIGNAL_effectiveLayoutDirectionChanged); relayout(flow) } },
         effectiveLayoutDirection: { kind: 'int', readonly: true },
     },
 })
+require('./Positioner').effectiveDirection(Flow)
 Flow.LeftToRight = 0
 Flow.TopToBottom = 1
 

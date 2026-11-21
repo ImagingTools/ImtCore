@@ -347,7 +347,87 @@ class Tumbler extends Control {
     $wraps(){ return this.$wrapValue }
     $view(){
         let content = this.$v[Control.CONTENTITEM]
-        return content instanceof TumblerView ? content.$view : null
+        if(content instanceof TumblerView) return content.$view
+        return this.$extView && this.$extView.content === content ? this.$extView.view : null
+    }
+
+    // QQuickTumblerPrivate::setupViewData for a content item of the document: the PathView or ListView it is, or the
+    // first one in it (determineViewType); the Tumbler follows its current index, count and moving, sizes its delegates
+    // and computes their displacement from its offset / contentY
+    $setupExternalView(){
+        let content = this.$v[Control.CONTENTITEM]
+        if(!content || content instanceof TumblerView || !(this.$f & engine.COMPLETED)) return
+        if(this.$extView && this.$extView.content === content) return
+        const { PathView } = require('../PathView')
+        const { ListView } = require('../ListView')
+        let find = (item) => {
+            if(item instanceof PathView || item instanceof ListView) return item
+            for(let child of item.$children || []){
+                let found = child instanceof Item ? find(child) : null
+                if(found) return found
+            }
+            return null
+        }
+        let view = find(content)
+        if(!view){
+            engine.reportError('Tumbler: contentItem must contain either a PathView or a ListView', 'Tumbler')
+            return
+        }
+        let path = view instanceof PathView
+        let viewContent = path ? view : view.contentItem
+        this.$extView = { content, view, path, viewContent }
+        let C = view.constructor
+        engine.connect(view, C.SIGNAL_currentIndexChanged, () => { if(!this.$syncing) this.$viewIndexChanged(view.currentIndex) }, null, engine.PRIORITY_NORMAL, this)
+        engine.connect(view, C.SIGNAL_currentItemChanged, () => this.$updateCurrentItem(), null, engine.PRIORITY_NORMAL, this)
+        engine.connect(view, C.SIGNAL_countChanged, () => this.$onViewCountChanged(), null, engine.PRIORITY_NORMAL, this)
+        engine.connect(view, C.SIGNAL_movingChanged, () => this.$setMoving(view.moving), null, engine.PRIORITY_NORMAL, this)
+        engine.connect(view, path ? C.SIGNAL_offsetChanged : C.SIGNAL_contentYChanged, () => this.$updateDisplacements(), null, engine.PRIORITY_NORMAL, this)
+        // QQuickTumblerPrivate::itemChildAdded: the delegates take the width and the height of a row
+        let added = viewContent.$childAdded
+        viewContent.$childAdded = (child) => {
+            if(added) added.call(viewContent, child)
+            this.$sizeItem(child)
+        }
+        // itemGeometryChanged of the Tumbler: the rows are sized again
+        for(let signal of [Item.SIGNAL_widthChanged, Item.SIGNAL_heightChanged, Control.SIGNAL_availableWidthChanged, Control.SIGNAL_availableHeightChanged]){
+            if(signal !== undefined) engine.connect(this, signal, () => { this.$updateItemSizes(); this.$updateDisplacements() }, null, engine.PRIORITY_NORMAL, this)
+        }
+        // syncCurrentIndex
+        let index = this.$v[Tumbler.CURRENTINDEX]
+        if(view.currentIndex !== index && !(view.count === 0 && view.currentIndex <= 0)){
+            this.$syncing = true
+            try { if(index >= 0) view.currentIndex = index } finally { this.$syncing = false }
+        }
+        this.$updateItemSizes()
+        this.$updateDisplacements()
+    }
+
+    $sizeItem(item){
+        if(!(item instanceof Item) || item === (this.$extView && this.$extView.view.$highlightItem)) return
+        item.width = this.availableWidth
+        item.height = this.$delegateHeight()
+    }
+
+    // _q_updateItemWidths / _q_updateItemHeights
+    $updateItemSizes(){
+        let ext = this.$extView
+        if(!ext || ext.content !== this.$v[Control.CONTENTITEM]) return
+        for(let child of ext.viewContent.$children || []) this.$sizeItem(child)
+    }
+
+    // _q_onViewCountChanged
+    $onViewCountChanged(){
+        let view = this.$view()
+        if(!view) return
+        let count = view.count
+        if(count !== this.$v[Tumbler.COUNT]){
+            this.$plain(Tumbler.COUNT, count)
+            this.$setWrapBasedOnCount()
+        }
+        if(count > 0){
+            if(this.$v[Tumbler.CURRENTINDEX] === -1) this.currentIndex = 0
+        } else this.$plain(Tumbler.CURRENTINDEX, -1)
+        this.$updateCurrentItem()
     }
     // the view of the content as the Tumbler wraps, with the model and the current index
     $setupView(){
@@ -376,11 +456,14 @@ class Tumbler extends Control {
         // a non-empty Tumbler has a current index (_q_onViewCountChanged)
         if(this.$v[Tumbler.COUNT] > 0 && this.$v[Tumbler.CURRENTINDEX] < 0) this.$plain(Tumbler.CURRENTINDEX, 0)
         this.$setupView()
+        this.$setupExternalView()
+        if(this.$extView) this.$onViewCountChanged()
         this.$updateCurrentItem()
     }
     // QQuickTumblerPrivate::setCount
     $updateCount(){
-        let count = modelRows(this.$v[Tumbler.MODEL]).count
+        let ext = this.$extView && this.$view()
+        let count = ext ? ext.count : modelRows(this.$v[Tumbler.MODEL]).count
         if(count === this.$v[Tumbler.COUNT]) return
         this.$plain(Tumbler.COUNT, count)
         this.$setWrapBasedOnCount()
@@ -401,6 +484,7 @@ class Tumbler extends Control {
     $updateCurrentItem(){
         let view = this.$view()
         let item = view ? (view instanceof TumblerPathView ? view.itemAt(this.$v[Tumbler.CURRENTINDEX]) : view.currentItem) : null
+        if(item === undefined) item = null
         this.$plain(Tumbler.CURRENTITEM, item || null)
     }
     $setMoving(moving){ this.$plain(Tumbler.MOVING, moving) }
@@ -433,6 +517,20 @@ class Tumbler extends Control {
         let view = this.$view()
         if(!view || !item) return 0
         if(view instanceof TumblerPathView) return item.$tumblerIndex === undefined ? 0 : view.$displacementOf(item.$tumblerIndex)
+        // a PathView of the document: count - index - offset, folded into the visible half
+        if(view.$positionOfIndex){
+            let count = view.count
+            if(count <= 1) return 0
+            let index = view.$indexOf(item)
+            if(index < 0 && view.$requested) index = view.$requested.index
+            if(index < 0) return 0
+            let d = count - index - view.offset
+            let visible = this.$v[Tumbler.VISIBLEITEMCOUNT]
+            let half = Math.floor(visible / 2) + (visible < count ? 1 : 0)
+            if(d > half) d -= count
+            else if(d < -half) d += count
+            return d
+        }
         // the distance from the current item, less where the current item is from the highlight range
         let dh = this.$delegateHeight()
         if(!dh || !view.count) return 0
@@ -453,6 +551,7 @@ Tumbler.Beginning = Beginning; Tumbler.Center = Center; Tumbler.End = End; Tumbl
 const relayout = (t) => {
     let view = t.$view()
     if(view instanceof TumblerPathView) view.$layout()
+    t.$updateItemSizes()
     t.$updateDisplacements()
 }
 Tumbler.$setters = withSetters(Control, [
