@@ -118,6 +118,11 @@ function onKeyDown(e){
         return
     }
 
+    // QQuickPopupItem: an open popup with the focus takes Escape before the shortcuts (ShortcutOverride)
+    if(Shortcut.$override && Shortcut.$override(key, mods)){
+        partial = []
+        return
+    }
     let candidates = partial.length ? partial : null
     let next = [], complete = []
     let consider = (shortcut, sequence, index) => {
@@ -172,7 +177,8 @@ class Shortcut extends QtObject {
     }
 
     $enabledNow(){
-        return this.$v[Shortcut.ENABLED] && !(this.$f & engine.DESTROYED)
+        // QQuickShortcutContext: a shortcut out of an open modal popup does not work (Popup.js: $blocked)
+        return this.$v[Shortcut.ENABLED] && !(this.$f & engine.DESTROYED) && !(Shortcut.$blocked && Shortcut.$blocked(this))
     }
 
     $update(){
@@ -206,4 +212,4 @@ defineType(Shortcut, {
     signals: ['activated', 'activatedAmbiguously'],
 })
 
-module.exports = { Shortcut, StandardKey, parseSequences, modsOf, keyOf }
+module.exports = { Shortcut, StandardKey, parseSequences, modsOf, keyOf, onKeyDown }

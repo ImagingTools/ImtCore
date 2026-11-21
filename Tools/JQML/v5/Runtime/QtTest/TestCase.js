@@ -352,6 +352,9 @@ class TestCase extends Item {
         // without a document (node): the event goes to the key delivery as the window listener gives it
         if(typeof document === 'undefined' || typeof KeyboardEvent === 'undefined'){
             let event = Object.assign({ type, repeat: false, defaultPrevented: false, preventDefault(){ this.defaultPrevented = true } }, init)
+            // the shortcuts first, as the window's listener of the capture phase does in a page
+            if(type === 'keydown') require('../QtQuick/Shortcut').onKeyDown(event)
+            if(event.defaultPrevented) return
             require('../QtQuick/KeyDelivery').deliverKey(event, type === 'keydown' ? 'pressed' : 'released')
             return
         }

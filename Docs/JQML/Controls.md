@@ -83,6 +83,18 @@ The cases of the controls: `controls_api`, `controls_style`, `abstractbutton_sig
 `stackview`, `splitview`, `applicationwindow`, `calendar`, `tumbler`, `swipedelegate`, `doublespinbox`, `searchfield`,
 `contextmenu`, `header_delegates`.
 
+## Checked on projects of others
+
+| Project | What it took |
+| --- | --- |
+| [2048.qml](https://github.com/MartinBriza/2048.qml) (a game, pure QML) | `Item.transform` (Scale, Rotation, Translate, Matrix4x4); `mapToItem` through transforms; an id of the document does not hide a property of an object of a component in it |
+| Qt Quick Controls Gallery (the example of Qt 6.12, 38 files) | `as`, type annotations of functions, an object literal binding without parentheses; SortFilterProxyModel; Accessible; a top-level Window of `createObject(null)`; icon themes; default property alias of an object property; `undefined` resets a property; nested layouts, GridLayout spans and auto placement; Container with a Repeater, SwipeView attached; SplitView sizes; Locale month and day numbers of QML; a Menu of Actions; Escape and the shortcuts behind a popup; the overlay of a window only |
+
+The Gallery runs as built for the desktop: a `Main.qml` does what `gallery.cpp` does (the style in the settings, the
+`builtInStyles` initial property), the compiler config lists the module (the `qmldir` `qt_add_qml_module` writes) and the
+icon theme (`"iconTheme": "gallery"`, `"iconThemePaths": ["src/icons"]`, as `QIcon::setThemeName`). Each of its 33 pages
+was compared with the same page in Qt 6.12, and a click through the drawer, a combo box, the dialogs and the options menu.
+
 ## Known differences
 
 - **Text metrics.** The default font of Qt is 13 px on macOS, of v5 the page's: sizes that depend on a text are not
@@ -97,4 +109,6 @@ The cases of the controls: `controls_api`, `controls_style`, `abstractbutton_sig
   with one pass. `swipe.transition` is run as its `SmoothedAnimation` (velocity), easing InOutCubic.
 - **Images** of the Basic style (`check.png`, `double-arrow.png`, `search-magnifier.png` ...) are vectors of the same
   outline, drawn in the color of the `ColorImage`.
+- **The width of a binding against a control's resize** at creation (a `width: parent.width` of the content item of a
+  Pane): Qt 6 evaluates the bindings of `width` (bindable properties) in an order of their own; v5 may keep the resize.
 - **Native popups and menus** (`popupType: Popup.Native`) are drawn as items.

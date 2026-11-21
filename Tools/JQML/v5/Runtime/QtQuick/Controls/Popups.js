@@ -396,7 +396,16 @@ class Menu extends Popup {
         this.$write(Popup.MARGINS, 0)
     }
     // the items declared in the menu: its content model (QQuickMenuPrivate::insertItem)
+    $childObjectAdded(child){ if(child instanceof require('./Actions').Action) this.$childAdded(child) }
     $childAdded(child){
+        // an Action declared in the menu: an item for it (QQuickMenuPrivate::contentData_append: insertAction)
+        if(child instanceof require('./Actions').Action){
+            if(!this.$declaredActions) this.$declaredActions = new Set()
+            if(this.$declaredActions.has(child)) return
+            this.$declaredActions.add(child)
+            this.$insert(this.$items().length, this.$actionItem(child))
+            return
+        }
         if(!child.$isItem || child === this.$item) return
         this.$insert(this.$items().length, child)
     }
@@ -451,7 +460,8 @@ class Menu extends Popup {
     // actions: an item of the delegate shows the action
     $actionItem(action){
         let delegate = this.$v[Menu.DELEGATE]
-        let item = delegate && delegate.createObject ? delegate.createObject(null) : new MenuItem(null)
+        // (no delegate yet: the MenuItem of the style, the delegate of Menu.qml)
+        let item = delegate && delegate.createObject ? delegate.createObject(null) : new (require('./Basic').MenuItem || MenuItem)(null)
         item.action = action
         return item
     }
@@ -500,15 +510,11 @@ class Menu extends Popup {
         super.$hide()
         this.$setCurrentIndex(-1)
     }
-    // the actions and menus declared in the menu: items of it, in their order (QQuickMenuPrivate::contentData_append)
+    // the menus declared in the menu: items of it (QQuickMenuPrivate::contentData_append; the actions are items as they
+    // come, $childAdded)
     $componentComplete(){
-        let { Action } = require('./Actions')
-        let declared = (this.$children || []).filter(c => c instanceof Action || (c instanceof Menu && c !== this))
-        for(let child of declared){
-            let at = this.$items().length
-            if(child instanceof Action) this.insertAction(at, child)
-            else this.insertMenu(at, child)
-        }
+        let declared = (this.$children || []).filter(c => c instanceof Menu && c !== this)
+        for(let child of declared) this.insertMenu(this.$items().length, child)
         super.$componentComplete()
     }
 }

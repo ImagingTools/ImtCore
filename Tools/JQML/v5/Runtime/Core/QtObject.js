@@ -158,6 +158,8 @@ class QtObject {
             else children.push(this)
         }
         this.$parentChanged(old, parent)
+        // an object that is not an item (an Action in a Menu): a parent that takes such children
+        if(parent && !this.$isItem && parent.$childObjectAdded) parent.$childObjectAdded(this)
         engine.emit(this, QtObject.SIGNAL_parentChanged, old, parent)
     }
 

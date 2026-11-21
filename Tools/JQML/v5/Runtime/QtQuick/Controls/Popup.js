@@ -26,12 +26,23 @@ class Overlay extends Item {
     constructor(parent = null){
         super(parent)
         this.$popups = []           // open (visible) popups, in stacking order
+        ;(Overlay.$all || (Overlay.$all = [])).push(this)
     }
     // the overlay of the window an item is in: a child of its topmost item, made on the first use
+    // (QQuickOverlay::overlay(window): only an item in a window has one; the content of a popup is in the window of the
+    // popup's parent item)
     static of(item){
         let top = item
-        while(top && top.$parent && top.$parent.$isItem) top = top.$parent
+        for(let guard = 0; top && guard < 1000; guard++){
+            if(top.$popup && top.$popup.$parentItem && top.$popup.$parentItem() && top.$popup.$parentItem() !== top){
+                top = top.$popup.$parentItem()
+                continue
+            }
+            if(top.$parent && top.$parent.$isItem){ top = top.$parent; continue }
+            break
+        }
         if(!top || !top.$isItem) return null
+        if(!top.$overlay && !Overlay.$isRoot(top)) return null
         if(top.$overlay && !(top.$overlay.$f & engine.DESTROYED)) return top.$overlay
         let overlay = new Overlay(top)
         overlay.objectName = 'overlay'
@@ -40,6 +51,16 @@ class Overlay extends Item {
         overlay.$bind(Item.HEIGHT, () => top.height, null, overlay)
         top.$overlay = overlay
         return overlay
+    }
+    // a root of the scene: the page's content item, a window, a root the pointer delivery shows (a test)
+    static $isRoot(top){
+        let { Window } = require('../Window/Window')
+        if(top === Window.$pageContent || top instanceof Window) return true
+        let scene = require('../PointerDelivery').scene
+        if(scene.roots.includes(top)) return true
+        if(top.$dom && top.$dom.isConnected) return true
+        // a document of no page (a test of node, a bench): its root has no parent
+        return !Window.$pageContent && !scene.roots.length && !(top.$delegateOf)
     }
     $stacked(){ return this.$popups.slice().sort((a, b) => a.$item.$v[Item.Z] - b.$item.$v[Item.Z]) }
     $add(popup){ if(!this.$popups.includes(popup)) this.$popups.push(popup) }
@@ -108,6 +129,8 @@ class PopupItem extends Page {
     $paletteParent(){ return this.$popup ? this.$popup.$parentItem() : null }
     $keyEvent(event, kind){
         let popup = this.$popup
+        // (a popup that is closed or closing takes no key)
+        if(!popup.$v[Popup.VISIBLE] || popup.$transitionTo === false) return 0
         if(event.key === QtEnums.Key_Escape && kind === 'pressed' && (popup.$v[Popup.CLOSEPOLICY] & CloseOnEscape)){
             if(popup.$closeByEscape) popup.$closeByEscape()
             else popup.close()
@@ -252,7 +275,10 @@ class Popup extends QtObject {
         engine.emit(this, Popup.SIGNAL_aboutToHide)
         this.$pull(Popup.OPENED, false)
         let item = this.$item
-        let hadFocus = item.$v[Item.ACTIVEFOCUS]
+        // the active focus in the popup: on its item or on an item in it
+        let keys = require('../KeyDelivery')
+        let inside = (it) => { for(; it; it = it.$parent) if(it === item) return true; return false }
+        let hadFocus = item.$v[Item.ACTIVEFOCUS] || inside(keys.agent.activeFocusItem)
         this.$runTransition(this.$v[Popup.EXIT], () => {
             this.$transitionTo = undefined
             item.$ownVisible = false
@@ -265,8 +291,14 @@ class Popup extends QtObject {
             if(hadFocus){
                 let before = this.$focusBefore
                 this.$focusBefore = null
-                if(before && !(before.$f & engine.DESTROYED) && before.$v[Item.VISIBLE]) before.forceActiveFocus()
-                else item.$setFocus(false)
+                if(before && !(before.$f & engine.DESTROYED) && before.$v[Item.VISIBLE] && !inside(before)) before.forceActiveFocus()
+                else {
+                    // nothing had it: the window (QQuickWindow: its content item)
+                    item.$setFocus(false)
+                    let root = overlay
+                    while(root && root.$parent instanceof Item) root = root.$parent
+                    if(root && inside(keys.agent.activeFocusItem)) root.forceActiveFocus()
+                }
             }
             engine.emit(this, Popup.SIGNAL_closed)
         })
@@ -535,6 +567,25 @@ for(let name of ['availableWidth', 'availableHeight', 'implicitContentWidth', 'i
             get(){ return this.$v[prop.id] || (this.$v[prop.id] = new OverlayAttached(this)) },
             configurable: true,
         })
+    }
+}
+
+// the shortcuts and the open popups (QQuickShortcutContext, QQuickPopupItem::event ShortcutOverride)
+{
+    const { Shortcut } = require('../Shortcut')
+    const keys = () => require('../KeyDelivery')
+    const openPopups = () => (Overlay.$all || []).filter(o => !(o.$f & engine.DESTROYED)).flatMap(o => o.$popups || []).filter(p => p.$v[Popup.VISIBLE])
+    const inItem = (it, item) => { for(; it; it = it.$parent) if(it === item) return true; return false }
+    Shortcut.$override = (key, mods) => {
+        if(key !== 'escape') return false
+        let focus = keys().agent.activeFocusItem
+        return openPopups().some(p => (p.$v[Popup.CLOSEPOLICY] & CloseOnEscape) && inItem(focus, p.$item))
+    }
+    Shortcut.$blocked = (shortcut) => {
+        let modal = openPopups().filter(p => p.$v[Popup.MODAL])
+        if(!modal.length) return false
+        let owner = shortcut.$parent
+        return !modal.some(p => inItem(owner, p.$item) || owner === p)
     }
 }
 
