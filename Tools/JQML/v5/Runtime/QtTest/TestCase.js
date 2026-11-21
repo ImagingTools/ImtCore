@@ -79,6 +79,8 @@ class TestCase extends Item {
         }
         if(!mouse.scene.roots.length) mouse.scene.roots.push(top)
         keys.activateWindow()
+        // qWaitForWindowExposed: the window has shown a frame, its items are polished (positioners laid out)
+        engine.flushFrame()
         this.running = true
         try {
             await this.$call('initTestCase')

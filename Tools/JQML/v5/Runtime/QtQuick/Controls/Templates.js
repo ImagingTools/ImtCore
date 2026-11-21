@@ -3,5 +3,6 @@ const { Control } = require('./Control')
 const { Label } = require('./Label')
 const buttons = require('./AbstractButton')
 const { ScrollBar, ScrollIndicator } = require('./ScrollBar')
+const range = require('./Range')
 
-module.exports = Object.assign({ Control, Label, ScrollBar, ScrollIndicator }, buttons)
+module.exports = Object.assign({ Control, Label, ScrollBar, ScrollIndicator }, buttons, range)

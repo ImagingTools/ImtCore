@@ -98,7 +98,8 @@ function copyFont(text, font){
         own.$write(Font.PIXELSIZE, font.$v[Font.PIXELSIZE])
     })
 }
-Text.prototype.$copyFont = function(font){ copyFont(this, font) }
+// a text, a text input or a text edit follows the font of a control (font: control.font)
+for(let Class of [Text, require('../TextInput').TextInput, require('../TextEdit').TextEdit]) Class.prototype.$copyFont = function(font){ copyFont(this, font) }
 
 // ---- PaddedRectangle (QQuickPaddedRectangle): a rectangle drawn inside its paddings ----
 class PaddedRectangle extends Rectangle {

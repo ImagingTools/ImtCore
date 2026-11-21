@@ -4,7 +4,7 @@
 const engine = require('../../Core/engine')
 const { defineType } = require('../../Core/type')
 const { Item } = require('../Item')
-const { Rectangle } = require('../Rectangle')
+const { Rectangle, Border } = require('../Rectangle')
 const { Image } = require('../Image')
 const { Text } = require('../Text')
 const T = require('./Templates')
@@ -560,7 +560,411 @@ class ScrollIndicator extends T.ScrollIndicator {
 }
 defineType(ScrollIndicator, {})
 
+// ---- Slider, RangeSlider ----
+// the groove of a slider and the part of it up to the value (Slider.qml / RangeSlider.qml)
+function sliderGroove(c, from, to){
+    let groove = make(Rectangle, null, {
+        implicitWidth: () => (c.horizontal ? 200 : 6),
+        implicitHeight: () => (c.horizontal ? 6 : 200),
+        radius: 3,
+        color: () => c.palette.midlight,
+        scale: () => (c.horizontal && c.mirrored ? -1 : 1),
+        'border.width': 0,
+        'border.color': () => (c.enabled ? c.palette.dark : c.palette.mid),
+    })
+    groove.$bind(Item.X, () => c.leftPadding + (c.horizontal ? 0 : (c.availableWidth - groove.width) / 2), null, groove)
+    groove.$bind(Item.Y, () => c.topPadding + (c.horizontal ? (c.availableHeight - groove.height) / 2 : 0), null, groove)
+    groove.$bind(Item.WIDTH, () => (c.horizontal ? c.availableWidth : groove.implicitWidth), null, groove)
+    groove.$bind(Item.HEIGHT, () => (c.horizontal ? groove.implicitHeight : c.availableHeight), null, groove)
+    let fill = make(Rectangle, groove, { radius: () => (from ? 0 : 3), color: () => c.palette.dark })
+    if(from){
+        // RangeSlider: between the handles
+        fill.$bind(Item.X, () => (c.horizontal ? c.first.position * groove.width + 3 : 0), null, fill)
+        fill.$bind(Item.Y, () => (c.horizontal ? 0 : c.second.visualPosition * groove.height + 3), null, fill)
+        fill.$bind(Item.WIDTH, () => (c.horizontal ? c.second.position * groove.width - c.first.position * groove.width - 6 : 6), null, fill)
+        fill.$bind(Item.HEIGHT, () => (c.horizontal ? 6 : c.second.position * groove.height - c.first.position * groove.height - 6), null, fill)
+    } else {
+        fill.$bind(Item.Y, () => (c.horizontal ? 0 : c.visualPosition * groove.height), null, fill)
+        fill.$bind(Item.WIDTH, () => (c.horizontal ? c.position * groove.width : 6), null, fill)
+        fill.$bind(Item.HEIGHT, () => (c.horizontal ? 6 : c.position * groove.height), null, fill)
+    }
+    return groove
+}
+// the round handle at a visual position
+function sliderHandle(c, node){
+    let visual = node ? () => node.visualPosition : () => c.visualPosition
+    let pressed = node ? () => node.pressed : () => c.pressed
+    let handle = make(Rectangle, null, {
+        implicitWidth: 28,
+        implicitHeight: 28,
+        color: () => (pressed() ? c.palette.light : c.palette.window),
+    })
+    handle.$bind(Rectangle.RADIUS, () => handle.width / 2, null, handle)
+    if(node){
+        handle.border.$bind(Border.WIDTH, () => (c.activeFocus ? 2 : 1), null, handle)
+        handle.border.$bind(Border.COLOR, () => c.handleBorderColor, null, handle)
+    } else {
+        handle.border.$bind(Border.WIDTH, () => (c.visualFocus ? 2 : 1), null, handle)
+        handle.border.$bind(Border.COLOR, () => (handle.activeFocus ? c.palette.highlight : c.enabled ? c.palette.mid : c.palette.midlight), null, handle)
+    }
+    handle.$bind(Item.X, () => c.leftPadding + (c.horizontal ? visual() * (c.availableWidth - handle.width) : (c.availableWidth - handle.width) / 2), null, handle)
+    handle.$bind(Item.Y, () => c.topPadding + (c.horizontal ? (c.availableHeight - handle.height) / 2 : visual() * (c.availableHeight - handle.height)), null, handle)
+    return handle
+}
+
+class Slider extends T.Slider {
+    constructor(parent = null){
+        super(parent)
+        this.$bind(Item.IMPLICITWIDTH, () => Math.max(this.implicitBackgroundWidth + this.leftInset + this.rightInset, this.implicitHandleWidth + this.leftPadding + this.rightPadding), null, this)
+        this.$bind(Item.IMPLICITHEIGHT, () => Math.max(this.implicitBackgroundHeight + this.topInset + this.bottomInset, this.implicitHandleHeight + this.topPadding + this.bottomPadding), null, this)
+        this.padding = 6
+    }
+    $makeStyle(){
+        this.$styleDelegate(T.Slider.HANDLE, () => sliderHandle(this, null))
+        this.$styleDelegate(T.Control.BACKGROUND, () => sliderGroove(this, false), -1)
+    }
+}
+defineType(Slider, {})
+
+class RangeSlider extends T.RangeSlider {
+    constructor(parent = null){
+        super(parent)
+        this.$bind(Item.IMPLICITWIDTH, () => Math.max(this.implicitBackgroundWidth + this.leftInset + this.rightInset,
+            this.first.implicitHandleWidth + this.leftPadding + this.rightPadding, this.second.implicitHandleWidth + this.leftPadding + this.rightPadding), null, this)
+        this.$bind(Item.IMPLICITHEIGHT, () => Math.max(this.implicitBackgroundHeight + this.topInset + this.bottomInset,
+            this.first.implicitHandleHeight + this.topPadding + this.bottomPadding, this.second.implicitHandleHeight + this.topPadding + this.bottomPadding), null, this)
+        this.padding = 6
+        // readonly property color handleBorderColor
+        this.$bind(RangeSlider.HANDLEBORDERCOLOR, () => (this.activeFocus ? this.palette.highlight : this.enabled ? this.palette.mid : this.palette.midlight), null, this)
+    }
+    $makeStyle(){
+        for(let node of [this.first, this.second]){
+            if(node.handle) continue
+            let handle = sliderHandle(this, node)
+            if(!this.$defaults) this.$defaults = new Set()
+            this.$defaults.add(handle)
+            node.$setHandle(handle)
+        }
+        this.$styleDelegate(T.Control.BACKGROUND, () => sliderGroove(this, true), -1)
+    }
+}
+defineType(RangeSlider, { props: { handleBorderColor: { kind: 'color', readonly: true } } })
+
+// ---- ProgressBar, BusyIndicator ----
+// ProgressBarImpl (QQuickBasicProgressBar): the part up to the progress; indeterminate: a block that runs along it
+class ProgressBarImpl extends Item {
+    constructor(parent = null){
+        super(parent)
+        this.$fill = make(Rectangle, this, {})
+        this.$fill.$bind(Rectangle.COLOR, () => this.color, null, this.$fill)
+        this.$fill.$bind(Item.HEIGHT, () => this.height, null, this.$fill)
+        this.$fill.$bind(Item.WIDTH, () => (this.indeterminate ? Math.min(this.width, 12) : this.progress * this.width), null, this.$fill)
+        this.$timer = null
+        watch(this, () => this.indeterminate && this.visible, (on) => this.$run(on))
+    }
+    $run(on){
+        if(this.$timer){ clearInterval(this.$timer); this.$timer = null }
+        if(!on){ this.$fill.$write(Item.X, 0); return }
+        let start = Date.now()
+        this.$timer = setInterval(() => {
+            if(this.$f & engine.DESTROYED) return clearInterval(this.$timer)
+            let t = ((Date.now() - start) % 4000) / 4000
+            engine.batch(() => this.$fill.$write(Item.X, t * Math.max(0, this.width - this.$fill.width)))
+        }, 32)
+    }
+}
+defineType(ProgressBarImpl, { props: { progress: 'real', indeterminate: 'bool', color: 'color' } })
+
+class ProgressBar extends T.ProgressBar {
+    constructor(parent = null){
+        super(parent)
+        implicitSize(this)
+    }
+    $makeStyle(){
+        let c = this
+        this.$styleDelegate(T.Control.CONTENTITEM, () => make(ProgressBarImpl, null, {
+            implicitHeight: 6,
+            implicitWidth: 116,
+            scale: () => (c.mirrored ? -1 : 1),
+            progress: () => c.position,
+            indeterminate: () => c.visible && c.indeterminate,
+            color: () => c.palette.dark,
+        }))
+        let background = this.$styleDelegate(T.Control.BACKGROUND, () => make(Rectangle, null, {
+            implicitWidth: 200,
+            implicitHeight: 6,
+            height: 6,
+            color: () => c.palette.midlight,
+        }), -1)
+        if(background) background.$bind(Item.Y, () => (c.height - background.height) / 2, null, background)
+    }
+}
+defineType(ProgressBar, {})
+
+// BusyIndicatorImpl (QQuickBasicBusyIndicator): ten circles round a ring, filled one after another and emptied again
+class BusyIndicatorImpl extends Item {
+    constructor(parent = null){
+        super(parent)
+        this.$circles = []
+        for(let i = 0; i < 10; i++){
+            let circle = make(Rectangle, this, { 'border.width': 1 })
+            circle.border.$bind(Border.COLOR, () => this.pen, null, circle)
+            this.$circles.push(circle)
+        }
+        this.$phase = 0
+        this.$timer = null
+        engine.connect(this, Item.SIGNAL_widthChanged, () => this.$layoutCircles(), null, engine.PRIORITY_NORMAL, this)
+        engine.connect(this, Item.SIGNAL_heightChanged, () => this.$layoutCircles(), null, engine.PRIORITY_NORMAL, this)
+        watch(this, () => this.running && this.visible, (on) => this.$run(on))
+        watch(this, () => [this.fill, this.pen], () => this.$paintCircles())
+    }
+    $layoutCircles(){
+        let size = Math.min(this.$v[Item.WIDTH], this.$v[Item.HEIGHT])
+        let d = size / 5.6
+        let r = (size - d) / 2
+        let cx = this.$v[Item.WIDTH] / 2, cy = this.$v[Item.HEIGHT] / 2
+        this.$circles.forEach((circle, i) => {
+            let a = (i / 10) * 2 * Math.PI - Math.PI / 2
+            circle.$write(Item.X, cx + r * Math.cos(a) - d / 2)
+            circle.$write(Item.Y, cy + r * Math.sin(a) - d / 2)
+            circle.$write(Item.WIDTH, d)
+            circle.$write(Item.HEIGHT, d)
+            circle.$write(Rectangle.RADIUS, d / 2)
+        })
+    }
+    // phase 0..19: the first ten fill the circles one by one, the next ten empty them
+    $paintCircles(){
+        let phase = this.$phase
+        this.$circles.forEach((circle, i) => {
+            let filled = phase < 10 ? i <= phase : i > phase - 10
+            circle.$write(Rectangle.COLOR, filled ? this.fill : 'transparent')
+        })
+    }
+    $run(on){
+        if(this.$timer){ clearInterval(this.$timer); this.$timer = null }
+        if(!on) return
+        this.$timer = setInterval(() => {
+            if(this.$f & engine.DESTROYED) return clearInterval(this.$timer)
+            this.$phase = (this.$phase + 1) % 20
+            engine.batch(() => this.$paintCircles())
+        }, 100)
+    }
+}
+defineType(BusyIndicatorImpl, { props: { pen: 'color', fill: 'color', running: 'bool' } })
+
+class BusyIndicator extends T.BusyIndicator {
+    constructor(parent = null){
+        super(parent)
+        implicitSize(this)
+        this.padding = 6
+    }
+    $makeStyle(){
+        let c = this
+        let busy = this.$styleDelegate(T.Control.CONTENTITEM, () => make(BusyIndicatorImpl, null, {
+            implicitWidth: 48,
+            implicitHeight: 48,
+            pen: () => c.palette.dark,
+            fill: () => c.palette.dark,
+            running: () => c.running,
+        }))
+        if(busy){
+            // opacity: running ? 1 : 0, Behavior on opacity { OpacityAnimator { duration: 250 } }
+            let behavior = new Behavior(busy)
+            make(require('../NumberAnimation').NumberAnimation, behavior, { duration: 250 })
+            behavior.$setTargetProperty(busy, 'opacity')
+            busy.$bind(Item.OPACITY, () => (c.running ? 1 : 0), null, busy)
+        }
+    }
+}
+defineType(BusyIndicator, {})
+
+// ---- Dial: DialImpl (QQuickBasicDial: an 8 px arc up to the progress in a 1 px circle) and the dial indicator ----
+class DialImpl extends Item {
+    constructor(parent = null){
+        super(parent)
+        // the painting: a vector of the arc and the circle, the size of the item
+        let picture = this.$picture = new Image(this)
+        picture.$bind(Item.WIDTH, () => this.width, null, picture)
+        picture.$bind(Item.HEIGHT, () => this.height, null, picture)
+        picture.$bind(Image.SOURCE, () => dialSvg(this.width, this.height, this.progress, this.color, this.startAngle, this.endAngle), null, picture)
+    }
+}
+defineType(DialImpl, { props: { progress: 'real', color: 'color', startAngle: 'real', endAngle: 'real' } })
+function dialSvg(w, h, progress, color, startAngle, endAngle){
+    let size = Math.min(w, h)
+    if(size <= 0) return ''
+    let pen = 8
+    let r = (size - pen - 2) / 2
+    let cx = w / 2, cy = h / 2
+    let point = (deg, radius) => [cx + radius * Math.sin(deg * Math.PI / 180), cy - radius * Math.cos(deg * Math.PI / 180)]
+    let end = startAngle + progress * (endAngle - startAngle)
+    let [x0, y0] = point(startAngle, r), [x1, y1] = point(end, r)
+    let large = Math.abs(end - startAngle) > 180 ? 1 : 0
+    let arc = progress > 0 ? '<path d="M' + x0 + ' ' + y0 + 'A' + r + ' ' + r + ' 0 ' + large + ' 1 ' + x1 + ' ' + y1 + '" fill="none" stroke="' + color + '" stroke-width="' + pen + '"/>' : ''
+    return 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '">'
+        + arc + '<circle cx="' + cx + '" cy="' + cy + '" r="' + (r + pen / 2 - 0.5) + '" fill="none" stroke="' + color + '" stroke-width="1"/></svg>')
+}
+class Dial extends T.Dial {
+    constructor(parent = null){
+        super(parent)
+        implicitSize(this)
+    }
+    $makeStyle(){
+        let c = this
+        let background = this.$styleDelegate(T.Control.BACKGROUND, () => {
+            let dial = make(DialImpl, null, {
+                implicitWidth: 184,
+                implicitHeight: 184,
+                color: () => (c.visualFocus ? c.palette.highlight : c.palette.dark),
+                progress: () => c.position,
+                opacity: () => (c.enabled ? 1 : 0.3),
+                startAngle: () => c.startAngle,
+                endAngle: () => c.endAngle,
+            })
+            return dial
+        }, -1)
+        let handle = this.$styleDelegate(T.Dial.HANDLE, () => make(ColorImage, null, {
+            width: 14,
+            height: 10,
+            defaultColor: '#353637',
+            color: () => (c.visualFocus ? c.palette.highlight : c.palette.dark),
+            opacity: () => (c.enabled ? 1 : 0.3),
+        }))
+        if(handle){
+            handle.$bind(Image.SOURCE, () => svg(14, 10, '<path d="M0.5 0.5H13.5L7 9.5Z" fill="' + handle.color + '"/>'), null, handle)
+            handle.$bind(Item.X, () => (c.background ? c.background.x + c.background.width / 2 - handle.width / 2 : 0), null, handle)
+            handle.$bind(Item.Y, () => (c.background ? c.background.y + c.background.height / 2 - handle.height / 2 : 0), null, handle)
+            // Translate { y: -min(background size) * 0.4 + height / 2 } then Rotation { angle } about the middle
+            handle.$bind(Item.ROTATION, () => c.angle, null, handle)
+            handle.$dialOffset = () => (c.background ? -Math.min(c.background.width, c.background.height) * 0.4 + handle.height / 2 : 0)
+            watch(handle, () => [handle.$dialOffset(), c.angle], () => this.$placeHandle(handle))
+            this.$placeHandle(handle)
+        }
+    }
+    // the rotation of the handle about its middle after its translation (CSS: translate then rotate about the middle)
+    $placeHandle(handle){
+        if(!handle.$dom) return
+        let offset = handle.$dialOffset()
+        handle.$dom.style.transformOrigin = '50% ' + (50 - offset / handle.height * 100) + '%'
+        handle.$dom.style.translate = '0px ' + offset + 'px'
+    }
+}
+defineType(Dial, {})
+
+// ---- PageIndicator: a Row of the delegate (8 px dots, the current one darker) ----
+// the dot of the style: Rectangle { required property int index; opacity: current 0.95, pressed 0.7, else 0.45 }
+class PageDot extends Rectangle {}
+defineType(PageDot, { props: { index: 'int', pressed: 'bool' } })
+function pageDot(c){
+    return new (require('../../QtQml/Component').Component)(null, (parent, ctx) => {
+        let dot = make(PageDot, parent, { implicitWidth: 8, implicitHeight: 8, color: () => c.palette.dark })
+        if(ctx && ctx.index !== undefined) dot.index = ctx.index
+        dot.$bind(Rectangle.RADIUS, () => dot.width / 2, null, dot)
+        dot.$bind(Item.OPACITY, () => (dot.index === c.currentIndex ? 0.95 : dot.pressed ? 0.7 : 0.45), null, dot)
+        return dot
+    })
+}
+class PageIndicator extends T.PageIndicator {
+    constructor(parent = null){
+        super(parent)
+        implicitSize(this)
+        this.padding = 6
+        this.spacing = 6
+    }
+    $makeStyle(){
+        let c = this
+        if(!this.$v[T.PageIndicator.DELEGATE]) this.$plain(T.PageIndicator.DELEGATE, pageDot(this))
+        // contentItem: Row { spacing; Repeater { model: control.count; delegate: control.delegate } }
+        this.$styleDelegate(T.Control.CONTENTITEM, () => {
+            let row = make(require('../Row').Row, null, { spacing: () => c.spacing })
+            make(require('../Repeater').Repeater, row, { model: () => c.count, delegate: () => c.delegate })
+            // QQuickBasePositioner::componentComplete: the row is laid out when it is made
+            row.forceLayout()
+            return row
+        })
+    }
+}
+defineType(PageIndicator, {})
+
+// ---- SpinBox ----
+class SpinBox extends T.SpinBox {
+    constructor(parent = null){
+        super(parent)
+        let c = this
+        this.$bind(Item.IMPLICITWIDTH, () => Math.max(c.implicitBackgroundWidth + c.leftInset + c.rightInset, (c.contentItem ? c.contentItem.implicitWidth : 0) + c.leftPadding + c.rightPadding), null, this)
+        this.$bind(Item.IMPLICITHEIGHT, () => Math.max(c.implicitBackgroundHeight + c.topInset + c.bottomInset, c.implicitContentHeight + c.topPadding + c.bottomPadding,
+            c.up.implicitIndicatorHeight, c.down.implicitIndicatorHeight), null, this)
+        this.$bind(T.Control.LEFTPADDING, () => c.padding + (c.mirrored ? (c.up.indicator ? c.up.indicator.width : 0) : (c.down.indicator ? c.down.indicator.width : 0)), null, this)
+        this.$bind(T.Control.RIGHTPADDING, () => c.padding + (c.mirrored ? (c.down.indicator ? c.down.indicator.width : 0) : (c.up.indicator ? c.up.indicator.width : 0)), null, this)
+    }
+    $makeStyle(){
+        let c = this
+        if(!this.$v[T.SpinBox.VALIDATOR]){
+            let validator = make(require('../IntValidator').IntValidator, this, {
+                bottom: () => Math.min(c.from, c.to),
+                top: () => Math.max(c.from, c.to),
+            })
+            this.$plain(T.SpinBox.VALIDATOR, validator)
+        }
+        let indicator = (button, plus) => {
+            let r = make(Rectangle, null, {
+                implicitWidth: 40,
+                implicitHeight: 40,
+                color: () => (button.pressed ? c.palette.mid : c.palette.button),
+                'border.width': 0,
+                'border.color': () => (c.enabled ? c.palette.text : c.palette.mid),
+            })
+            r.$bind(Item.HEIGHT, () => c.height, null, r)
+            r.$bind(Item.X, plus ? () => (c.mirrored ? 0 : c.width - r.width) : () => (c.mirrored ? c.width - r.width : 0), null, r)
+            let bar = (horizontal) => {
+                let b = make(Rectangle, r, { color: () => (c.enabled ? c.palette.buttonText : c.palette.mid) })
+                b.$bind(Item.WIDTH, () => (horizontal ? r.width / 3 : 2), null, b)
+                b.$bind(Item.HEIGHT, () => (horizontal ? 2 : r.width / 3), null, b)
+                b.$bind(Item.X, () => (r.width - b.width) / 2, null, b)
+                b.$bind(Item.Y, () => (r.height - b.height) / 2, null, b)
+            }
+            bar(true)
+            if(plus) bar(false)
+            return r
+        }
+        for(let [button, plus] of [[this.up, true], [this.down, false]]){
+            if(button.indicator) continue
+            let item = indicator(button, plus)
+            if(!this.$defaults) this.$defaults = new Set()
+            this.$defaults.add(item)
+            button.$write(T.IndicatorButton.INDICATOR, item)
+        }
+        this.$styleDelegate(T.Control.CONTENTITEM, () => {
+            let input = make(require('../TextInput').TextInput, null, {
+                z: 2,
+                text: () => c.displayText,
+                padding: 6,
+                color: () => c.palette.text,
+                selectionColor: () => c.palette.highlight,
+                selectedTextColor: () => c.palette.highlightedText,
+                horizontalAlignment: 4,
+                verticalAlignment: 128,
+                readOnly: () => !c.editable,
+            })
+            input.$bind(Item.CLIP, () => input.width < input.implicitWidth, null, input)
+            c.font.$follow(input)
+            let frame = make(Rectangle, input, { color: 'transparent', 'border.width': 2, visible: () => c.activeFocus })
+            frame.border.$bind(Border.COLOR, () => c.palette.highlight, null, frame)
+            frame.$bind(Item.WIDTH, () => input.width, null, frame)
+            frame.$bind(Item.HEIGHT, () => input.height, null, frame)
+            return input
+        })
+        this.$styleDelegate(T.Control.BACKGROUND, () => make(Rectangle, null, {
+            implicitWidth: 140,
+            color: () => (c.enabled ? c.palette.base : c.palette.button),
+            'border.color': () => c.palette.button,
+        }), -1)
+    }
+}
+defineType(SpinBox, {})
+
 module.exports = {
+    Slider, RangeSlider, ProgressBar, BusyIndicator, Dial, PageIndicator, SpinBox, ProgressBarImpl, BusyIndicatorImpl, DialImpl,
     ScrollBar, ScrollIndicator,
     Control, Label, AbstractButton, Button, ToolButton, RoundButton, CheckBox, RadioButton, Switch, DelayButton, TabButton,
     ItemDelegate, CheckDelegate, RadioDelegate, SwitchDelegate, IMAGES, styleImage, implicitSize, iconLabel, checkLabel,
